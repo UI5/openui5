@@ -285,7 +285,7 @@ sap.ui.define([
 					if (!ControllerClass) {
 						sap.ui.require([sControllerName], function (ControllerClass) {
 							resolve(resolveClass(ControllerClass));
-						});
+						}, reject);
 					} else {
 						resolve(ControllerClass);
 					}
@@ -318,7 +318,7 @@ sap.ui.define([
 								oProvider = new ExtensionProvider();
 								mExtensionProvider[sProviderName] = oProvider;
 								resolve(oProvider);
-							});
+							}, reject);
 						}
 					} else {
 						resolve();
