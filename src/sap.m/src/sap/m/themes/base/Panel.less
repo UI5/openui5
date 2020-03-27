@@ -18,7 +18,6 @@
 	text-transform: none;
 	height: 3rem;
 	line-height: 3rem;
-	padding: 0 1rem;
 	margin: 0;
 
 	/*
@@ -32,6 +31,25 @@
 	font-family: @sapUiFontHeaderFamily;
 	color: @sapUiGroupTitleTextColor;
 	background-color: @sapUiGroupTitleBackground;
+}
+
+.sapMPanel {
+	.sapMPanelHdr,
+	.sapMTB.sapMPanelHeaderTB {
+		padding-left: 1rem;
+		padding-right: 0.5rem;
+	}
+
+	& .sapMPanelExpandable {
+		.sapMPanelHdr, .sapMTB.sapMPanelHeaderTB {
+			padding-left: 0.5rem;
+		}
+	}
+}
+
+.sapUiSizeCompact .sapMPanel .sapMPanelHdr {
+	line-height: 2rem;
+	height: 2rem;
 }
 
 .sapMPanelContent {
@@ -57,7 +75,11 @@
 
 	> .sapMBtn {
 		position: absolute;
-		top: 0;
+		top: 50%;
+		-webkit-transform: translateY(-50%);
+		transform: translateY(-50%);
+		padding-left: 0.25rem;
+		padding-right: 0.25rem;
 	}
 }
 
@@ -83,8 +105,7 @@ html.sap-desktop .sapUiFioriObjectPage > section > .sapMPanel {
 
 .sapMPanel .sapMPanelWrappingDiv .sapMPanelHdr,
 .sapMPanel .sapMPanelWrappingDivTb .sapMIBar.sapMTB {
-	padding-left: 0;
-	margin-left: 3rem;
+	margin-left: 2.5rem;
 
   	>:first-child {
 	  margin-left: 0;
