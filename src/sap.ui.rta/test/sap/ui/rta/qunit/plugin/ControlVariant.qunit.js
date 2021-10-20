@@ -5,6 +5,7 @@ sap.ui.define([
 	"sap/m/FlexBox",
 	"sap/m/Page",
 	"sap/ui/core/Manifest",
+	"sap/m/Dialog",
 	"sap/ui/dt/plugin/ToolHooks",
 	"sap/ui/dt/DesignTime",
 	"sap/ui/dt/ElementOverlay",
@@ -34,6 +35,7 @@ sap.ui.define([
 	FlexBox,
 	Page,
 	Manifest,
+	Dialog,
 	ToolHooksPlugin,
 	DesignTime,
 	ElementOverlay,
@@ -148,6 +150,7 @@ sap.ui.define([
 				appComponent: this.oMockedAppComponent
 			}).then(function(oInitializedModel) {
 				this.oModel = oInitializedModel;
+				sandbox.stub(VariantManagement.prototype, "_updateInnerModelWithSettingsInfo").resolves(true);
 				this.oVariantManagementControl = new VariantManagement(this.sLocalVariantManagementId);
 				this.oVariantManagementControl.setModel(this.oModel, flUtils.VARIANT_MODEL_NAME);
 				this.oObjectPageLayout = new ObjectPageLayout("objPage", {
@@ -433,11 +436,15 @@ sap.ui.define([
 		});
 
 		QUnit.test("when configure variants context menu item opens the manage dialog, followed by de-registration of variant management overlay", function(assert) {
+			var fnDone = assert.async();
+			sandbox.stub(Dialog.prototype, "open").callsFake(function () {
+				assert.ok(this.oVariantManagementControl.getManageDialog().isA("sap.m.Dialog"), "then initially a dialog is created");
+				this.oControlVariantPlugin.deregisterElementOverlay(this.oVariantManagementOverlay);
+				assert.ok(this.oVariantManagementControl.getManageDialog().bIsDestroyed, "then on overlay de-registration, manage dialog is destroyed");
+				fnDone();
+			}.bind(this));
 			this.oControlVariantPlugin.registerElementOverlay(this.oVariantManagementOverlay);
 			this.oControlVariantPlugin.configureVariants([this.oVariantManagementOverlay]);
-			assert.ok(this.oVariantManagementControl.getManageDialog().isA("sap.m.Dialog"), "then initially a dialog is created");
-			this.oControlVariantPlugin.deregisterElementOverlay(this.oVariantManagementOverlay);
-			assert.ok(this.oVariantManagementControl.getManageDialog().bIsDestroyed, "then on overlay de-registration, manage dialog is destroyed");
 		});
 
 		QUnit.test("when _propagateVariantManagement is called with a root overlay and VariantManagement reference", function(assert) {
@@ -1023,7 +1030,7 @@ sap.ui.define([
 			});
 
 			return new Promise(function (fnResolve) {
-				new ElementOverlay({
+				return new ElementOverlay({
 					element: this.oVariantManagementControl.getTitle(),
 					init: function (oEvent) {
 						var oTitleOverlay = oEvent.getSource();

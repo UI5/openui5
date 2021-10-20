@@ -478,7 +478,8 @@ sap.ui.define([
 									favorite: oVariant.content.content.favorite,
 									executeOnSelect: oVariant.content.content.executeOnSelect,
 									visible: oVariant.content.content.visible,
-									author: ObjectPath.get("content.support.user", oVariant)
+									author: ObjectPath.get("content.support.user", oVariant),
+									contexts: oVariant.content.contexts
 								})
 							);
 					});
