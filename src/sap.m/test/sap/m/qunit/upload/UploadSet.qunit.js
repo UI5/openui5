@@ -12,9 +12,10 @@ sap.ui.define([
 	"sap/ui/Device",
 	"sap/m/MessageBox",
 	"sap/ui/model/json/JSONModel",
-	"test-resources/sap/m/qunit/upload/UploadSetTestUtils"
+	"test-resources/sap/m/qunit/upload/UploadSetTestUtils",
+        "sap/ui/core/Core"
 ], function (jQuery, UploadSet, UploadSetItem, UploadSetRenderer, Uploader, Toolbar, Label, ListItemBaseRenderer,
-			 Dialog, Device, MessageBox, JSONModel, TestUtils) {
+			 Dialog, Device, MessageBox, JSONModel, TestUtils, oCore) {
 	"use strict";
 
 	function getData() {
@@ -265,5 +266,30 @@ sap.ui.define([
 				files: oFileList
 			}
 		});
+	});
+
+        QUnit.test("oXhr parameters are not empty", function (assert) {
+		var oUploader = new Uploader(),
+			oItem = this.oUploadSet.getItems()[0],
+			done = assert.async();
+
+		this.oUploadSet.attachEventOnce("uploadCompleted",function(oEvent){
+			//Assert
+			assert.ok(oEvent.getParameter("item"), "item param present");
+			assert.ok(oEvent.getParameter("response"), "response param present");
+			assert.equal(oEvent.getParameter("responseXML"), null, "response xml param present");
+			assert.ok(oEvent.getParameter("readyState"), "readystate param present");
+			assert.ok(oEvent.getParameter("status"), "status param present");
+			assert.ok(oEvent.getParameter("headers"), "headers param present");
+			done();
+		});
+
+		//Arrange
+		this.oUploadSet.registerUploaderEvents(oUploader);
+		this.oUploadSet.addDependent(oUploader);
+		oCore.applyChanges();
+
+		//Act
+		oUploader.uploadItem(oItem);
 	});
 });
