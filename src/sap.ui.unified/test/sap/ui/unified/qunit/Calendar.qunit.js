@@ -1414,7 +1414,7 @@ sap.ui.define([
 		oShowYearPickerSpy.restore();
 	});
 
-	QUnit.test("Header buttons visibility and text is corretly managed when selecting a year range", function (assert) {
+	QUnit.test("Header buttons visibility and text is correctly managed when selecting a year range", function (assert) {
 		// Prepare
 		var oCal = new Calendar({
 				primaryCalendarType: sap.ui.core.CalendarType.Gregorian,
