@@ -52,9 +52,15 @@ function (
 	// as the stored column % widths may then resolve to new px values that break constaints (e.g.
 	// min-column-width constraint)
 	function clearStoredResizeInfo() {
+		var sBeginItem1 = FlexibleColumnLayout.STORAGE_PREFIX_DESKTOP + "-begin";
+		var sBeginItem2 = FlexibleColumnLayout.STORAGE_PREFIX_TABLET + "-begin";
+		window.localStorage.removeItem(sBeginItem1);
+		window.localStorage.removeItem(sBeginItem2);
+
 		Object.keys(library.LayoutType).forEach(function(sLayoutType) {
 			var sItem1 = FlexibleColumnLayout.STORAGE_PREFIX_DESKTOP + "-" + sLayoutType;
 			var sItem2 = FlexibleColumnLayout.STORAGE_PREFIX_TABLET + "-" + sLayoutType;
+
 			window.localStorage.removeItem(sItem1);
 			window.localStorage.removeItem(sItem2);
 		});
@@ -150,6 +156,7 @@ function (
 			$("#" + sQUnitFixture).width("");
 			Core.getConfiguration().setAnimationMode(this.sOldAnimationMode);
 			this.oFCL.destroy();
+			window.localStorage.removeItem(FlexibleColumnLayout.STORAGE_PREFIX_DESKTOP + "-begin");
 		},
 		after: clearStoredResizeInfo
 	});
@@ -529,6 +536,7 @@ function (
 			$("#" + sQUnitFixture).width("");
 			Core.getConfiguration().setAnimationMode(this.sOldAnimationMode);
 			this.oFCL.destroy();
+			window.localStorage.removeItem(FlexibleColumnLayout.STORAGE_PREFIX_TABLET + "-begin");
 		},
 		after: clearStoredResizeInfo
 	});
@@ -1107,6 +1115,36 @@ function (
 		oConfiguration.setAnimationMode(sOriginalAnimationMode);
 	});
 
+	QUnit.test("User setting for Begin column width is passed through layouts", function (assert) {
+		var iPreviousFixtureWidth = $("#" + sQUnitFixture).width(),
+			fnDone = assert.async(),
+			iPercentBeginColumnUserWidth;
+
+		assert.expect(1);
+
+		$("#" + sQUnitFixture).width(DESKTOP_SIZE);
+
+		setTimeout(function () {
+			// Assert
+			dragSeparator("begin", -500, this.oFCL);
+			this.oFCL._attachAfterAllColumnsResizedOnce(function() {
+				iPercentBeginColumnUserWidth = this.oFCL._getColumnWidthDistributionForLayout("TwoColumnsMidExpanded", true, 3)[0];
+
+				// Act
+				this.oFCL.setLayout("ThreeColumnsMidExpanded");
+
+				this.oFCL._attachAfterAllColumnsResizedOnce(function () {
+					assert.strictEqual(iPercentBeginColumnUserWidth, this.oFCL._getColumnWidthDistributionForLayout("ThreeColumnsMidExpanded", true, 3)[0],
+						"User setting for Begin column width is saved, when switching layouts");
+
+					// Clean up
+					$("#" + sQUnitFixture).width(iPreviousFixtureWidth);
+					fnDone();
+				}.bind(this));
+			}.bind(this));
+		}.bind(this), 500);
+	});
+
 	QUnit.module("Column without width");
 
 	//BCP: 1980006195
@@ -1472,6 +1510,21 @@ function (
 	});
 
 
+	QUnit.test("_getColumnWidthDistributionForLayout converts percent widths to integers", function (assert) {
+		// setup
+		this.oFCL = new FlexibleColumnLayout();
+		this.stub(this.oFCL, "_getLocalStorage").returns({
+			get: function() {
+				return "33.5/66.5/0";
+			}
+		});
+		var oExpectedResult = [34, 66, 0];
+
+		// assert
+		assert.deepEqual(this.oFCL._getColumnWidthDistributionForLayout(LT.TwoColumnsMidExpanded, true, 2),
+			oExpectedResult, "conversion to integer is correct");
+	});
+
 	QUnit.module("Focus handling");
 
 	QUnit.test("AutoFocus - Should synchronize with NavContainer instances", function (assert) {
@@ -1523,6 +1576,7 @@ function (
 	});
 
 	QUnit.module("Keyboard Handling", {
+		before: clearStoredResizeInfo,
 		beforeEach: function () {
 			this.oFCL = oFactory.createFCL({
 				layout: LT.TwoColumnsBeginExpanded
@@ -1537,7 +1591,8 @@ function (
 			this.beginColumnDOM = null;
 			this.midColumnDOM = null;
 			this.beginColumnInitialWidth = null;
-		}
+		},
+		after: clearStoredResizeInfo
 	});
 
 	QUnit.test("Left arrow", function (assert) {
