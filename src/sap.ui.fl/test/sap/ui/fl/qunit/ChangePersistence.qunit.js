@@ -46,35 +46,36 @@ sap.ui.define([
 ) {
 	"use strict";
 
-	var sandbox = sinon.createSandbox();
-	var aControls = [];
+	const sandbox = sinon.createSandbox();
+	const aControls = [];
+	const sComponentName = "MyComponent";
 
 	function getInitialChangesMap(mPropertyBag) {
 		return merge(DependencyHandler.createEmptyDependencyMap(), mPropertyBag);
 	}
 
 	QUnit.module("sap.ui.fl.ChangePersistence", {
-		beforeEach() {
-			sandbox.stub(FlexState, "initialize").resolves();
+		async beforeEach() {
 			sandbox.stub(VariantManagementState, "getInitialChanges").returns([]);
 			this._mComponentProperties = {
-				name: "MyComponent"
+				name: sComponentName
 			};
 			this.oChangePersistence = new ChangePersistence(this._mComponentProperties);
 
-			return Component.create({
+			const oComponent = await Component.create({
 				name: "sap.ui.fl.qunit.integration.testComponentComplex",
 				manifest: false
-			}).then(function(oComponent) {
-				this._oComponentInstance = oComponent;
-				this.oControl = new Control("abc123");
-				aControls.push(this.oControl);
-				this.oControlWithComponentId = new Control(oComponent.createId("abc123"));
-				aControls.push(this.oControlWithComponentId);
-			}.bind(this));
+			});
+			this._oComponentInstance = oComponent;
+			this.oControl = new Control("abc123");
+			aControls.push(this.oControl);
+			this.oControlWithComponentId = new Control(oComponent.createId("abc123"));
+			aControls.push(this.oControlWithComponentId);
+			await FlQUnitUtils.initializeFlexStateWithData(sandbox, sComponentName);
 		},
 		afterEach() {
 			sandbox.restore();
+			FlexState.clearState(sComponentName);
 			this._oComponentInstance.destroy();
 			aControls.forEach(function(control) {
 				control.destroy();
@@ -1006,7 +1007,7 @@ sap.ui.define([
 				assert.equal(fnGetCompEntitiesByIdMapStub.callCount, 1, "then getCompEntitiesByIdMap called once");
 				assert.equal(oResetChangesStub.callCount, 1, "Storage.reset is called once");
 				var oResetArgs = oResetChangesStub.getCall(0).args[0];
-				assert.equal(oResetArgs.reference, "MyComponent");
+				assert.equal(oResetArgs.reference, sComponentName);
 				assert.equal(oResetArgs.layer, Layer.CUSTOMER);
 				assert.equal(oResetArgs.changes.length, 3); // oCUSTOMERChange1, oCUSTOMERChange2, oMockCompVariant3
 				assert.equal(oResetArgs.changes[0].getId(), "oCUSTOMERChange1");
@@ -1019,7 +1020,7 @@ sap.ui.define([
 			});
 		});
 
-		QUnit.test("when calling resetChanges with selector and change type (control reset)", function(assert) {
+		QUnit.test("when calling resetChanges with selector and change type (control reset)", async function(assert) {
 			// changes for the component
 			var oVENDORChange1 = FlexObjectFactory.createFromFileContent({
 				fileType: "change",
@@ -1059,27 +1060,32 @@ sap.ui.define([
 			sandbox.stub(this.oChangePersistence, "getChangesForComponent").resolves(aChanges);
 			var aDeletedChangeContentIds = {response: [{fileName: "1"}, {fileName: "2"}]};
 
-			var oResetChangesStub = sandbox.stub(WriteStorage, "reset").resolves(aDeletedChangeContentIds);
-			var oUpdateStorageResponseStub = sandbox.stub(FlexState, "updateStorageResponse");
-			var oGetChangesFromMapByNamesStub = sandbox.stub(this.oChangePersistence, "_getChangesFromMapByNames").returns(aChanges);
+			const oResetChangesStub = sandbox.stub(WriteStorage, "reset").resolves(aDeletedChangeContentIds);
+			const oUpdateStorageResponseSpy = sandbox.spy(FlexState, "updateStorageResponse");
+			const oGetChangesFromMapByNamesStub = sandbox.stub(this.oChangePersistence, "_getChangesFromMapByNames").returns(aChanges);
 
-			return this.oChangePersistence.resetChanges(Layer.VENDOR, "", ["abc123"], ["labelChange"]).then(function() {
-				assert.equal(oResetChangesStub.callCount, 1, "Storage.reset is called once");
-				var oResetArgs = oResetChangesStub.getCall(0).args[0];
-				assert.equal(oResetArgs.reference, "MyComponent");
-				assert.equal(oResetArgs.layer, Layer.VENDOR);
-				assert.deepEqual(oResetArgs.selectorIds, ["abc123"]);
-				assert.deepEqual(oResetArgs.changeTypes, ["labelChange"]);
-				assert.equal(oUpdateStorageResponseStub.callCount, 1, "the FlexState is called once");
-				assert.deepEqual(oUpdateStorageResponseStub.args[0][1],
-					aChanges.map((oFlexObject) => {
-						return {flexObject: oFlexObject.convertToFileContent(), type: "delete"};
-					}),
-					"and with the correct names"
-				);
-				assert.equal(oGetChangesFromMapByNamesStub.callCount, 1, "the getChangesFromMapByNames is called once");
-				assert.deepEqual(oGetChangesFromMapByNamesStub.args[0][0], ["1", "2"], "and with the correct names");
-			});
+			await this.oChangePersistence.resetChanges(Layer.VENDOR, "", ["abc123"], ["labelChange"]);
+
+			assert.strictEqual(oResetChangesStub.callCount, 1, "Storage.reset is called once");
+			const oResetArgs = oResetChangesStub.getCall(0).args[0];
+			assert.strictEqual(oResetArgs.reference, sComponentName);
+			assert.strictEqual(oResetArgs.layer, Layer.VENDOR);
+			assert.deepEqual(oResetArgs.selectorIds, ["abc123"]);
+			assert.deepEqual(oResetArgs.changeTypes, ["labelChange"]);
+			assert.strictEqual(oUpdateStorageResponseSpy.callCount, 1, "the FlexState.updateStorageResponse is called once");
+			assert.deepEqual(oUpdateStorageResponseSpy.args[0][1],
+				aChanges.map((oFlexObject) => {
+					return {flexObject: oFlexObject.convertToFileContent(), type: "delete"};
+				}),
+				"and with the correct names"
+			);
+			assert.strictEqual(
+				FlexState.getFlexObjectsDataSelector().get({reference: sComponentName}).length,
+				0,
+				"then the change is also removed from the flex state"
+			);
+			assert.strictEqual(oGetChangesFromMapByNamesStub.callCount, 1, "the getChangesFromMapByNames is called once");
+			assert.deepEqual(oGetChangesFromMapByNamesStub.args[0][0], ["1", "2"], "and with the correct names");
 		});
 	});
 
