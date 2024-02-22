@@ -391,11 +391,11 @@ sap.ui.define([
 		}), 1);
 		this.oTable.setAutoBindOnInit(false);
 
-		return this.oTable._fullyInitialized().then(function() {
+		return this.oTable._fullyInitialized().then(async function() {
 			const aMDCColumns = oTable.getColumns();
 			const aInnerColumns = oTable._oTable.getColumns();
 
-			oTable._rebind();
+			await oTable._rebind();
 
 			assert.equal(aMDCColumns.length, aInnerColumns.length);
 			assert.equal(aInnerColumns[0].getLabel().getText(), "Test");
@@ -665,11 +665,11 @@ sap.ui.define([
 		}), 1);
 		this.oTable.setAutoBindOnInit(false);
 
-		return this.oTable._fullyInitialized().then(function() {
+		return this.oTable._fullyInitialized().then(async function() {
 			const aMDCColumns = this.oTable.getColumns();
 			const aInnerColumns = this.oTable._oTable.getColumns();
 
-			this.oTable.rebind();
+			await this.oTable.rebind();
 
 			assert.equal(aMDCColumns.length, aInnerColumns.length);
 			assert.equal(aInnerColumns[0].getHeader().getText(), "Test");
@@ -729,11 +729,11 @@ sap.ui.define([
 		}), 1);
 		this.oTable.setAutoBindOnInit(false);
 
-		return this.oTable._fullyInitialized().then(function() {
+		return this.oTable._fullyInitialized().then(async function() {
 			const aMDCColumns = this.oTable.getColumns();
 			const aInnerColumns = this.oTable._oTable.getColumns();
 
-			this.oTable.rebind();
+			await this.oTable.rebind();
 
 			assert.equal(aMDCColumns.length, aInnerColumns.length);
 			assert.equal(aInnerColumns[0].getHeader().getText(), "Test");
@@ -1249,7 +1249,7 @@ sap.ui.define([
 			}
 		]);
 
-		return this.oTable._fullyInitialized().then(function() {
+		return this.oTable._fullyInitialized().then(async function() {
 			const oSortConditions = {
 				sorters: [
 					{name: "name", descending: true}
@@ -1258,7 +1258,7 @@ sap.ui.define([
 			const aInnerColumns = this.oTable._oTable.getColumns();
 
 			this.oTable.setSortConditions(oSortConditions);
-			this.oTable.rebind();
+			await this.oTable.rebind();
 
 			assert.equal(aInnerColumns[0].getSortOrder(), "Descending");
 			assert.equal(aInnerColumns[1].getSortOrder(), "None");
@@ -1292,7 +1292,7 @@ sap.ui.define([
 			}
 		]);
 
-		return this.oTable._fullyInitialized().then(function() {
+		return this.oTable._fullyInitialized().then(async function() {
 			const aInnerColumns = this.oTable._oTable.getColumns();
 
 			this.oTable.setSortConditions({
@@ -1305,7 +1305,7 @@ sap.ui.define([
 					{name: "name"}
 				]
 			});
-			this.oTable.rebind();
+			await this.oTable.rebind();
 
 			assert.equal(aInnerColumns[0].getSortIndicator(), "None");
 			assert.equal(aInnerColumns[1].getSortIndicator(), "Ascending");
@@ -4448,6 +4448,263 @@ sap.ui.define([
 		}.bind(this));
 	});
 
+	QUnit.module("Rows binding", {
+		afterEach: function() {
+			this.oTable?.destroy();
+		},
+		createTable: function(mSettings) {
+			this.oTable = new Table({
+				delegate: {
+					name: sDelegatePath,
+					payload: {
+						collectionPath: "/testPath"
+					}
+				},
+				columns: [
+					new Column({
+						header: "Test",
+						template: new Text({
+							text: "Test"
+						})
+					}),
+					new Column({
+						header: "Test2",
+						template: new Text({
+							text: "Test2"
+						})
+					})
+				],
+				...mSettings
+			});
+			this.oTable.placeAt("qunit-fixture");
+			Core.applyChanges();
+
+			return this.oTable;
+		}
+	});
+
+	QUnit.test("GridTable", async function(assert) {
+		this.createTable();
+
+		await this.oTable.initialized();
+		assert.ok(!this.oTable._oTable.isBound("rows"), "Table is not bound when the 'initialized' promise resolves");
+
+		sinon.stub(this.oTable.getControlDelegate(), "updateBindingInfo").callsFake(function(oTable, oBindingInfo) {
+			this.updateBindingInfo.wrappedMethod.apply(this, arguments);
+			oBindingInfo.template = new Text();
+		});
+
+		await TableQUnitUtils.waitForBindingInfo(this.oTable);
+		assert.ok(this.oTable._oTable.isBound("rows"), "Table is bound after initialization");
+
+		const oBindingInfo = this.oTable._oTable.getBindingInfo("rows");
+		assert.strictEqual(oBindingInfo.path, "/testPath", "BindingInfo.path");
+		assert.ok(!("template" in oBindingInfo), "BindingInfo.template does not exist");
+
+		this.oTable.getControlDelegate().updateBindingInfo.restore();
+	});
+
+	QUnit.test("ResponsiveTable", async function(assert) {
+		this.createTable({
+			type: TableType.ResponsiveTable
+		});
+
+		await this.oTable.initialized();
+		assert.ok(!this.oTable._oTable.isBound("rows"), "Table is not bound when the 'initialized' promise resolves");
+
+		sinon.stub(this.oTable.getControlDelegate(), "updateBindingInfo").callsFake(function(oTable, oBindingInfo) {
+			this.updateBindingInfo.wrappedMethod.apply(this, arguments);
+			oBindingInfo.template = new Text();
+			oBindingInfo.templateShareable = false;
+		});
+
+		await TableQUnitUtils.waitForBindingInfo(this.oTable);
+		assert.ok(this.oTable._oTable.isBound("items"), "Table is bound after initialization");
+
+		const oBindingInfo = this.oTable._oTable.getBindingInfo("items");
+		assert.strictEqual(oBindingInfo.path, "/testPath", "BindingInfo.path");
+		assert.ok(oBindingInfo.template, "BindingInfo.template");
+		assert.strictEqual(oBindingInfo.templateShareable, true, "BindingInfo.templateShareable");
+		assert.deepEqual(oBindingInfo.template.getCells().map((oCell) => oCell.getText()), [
+			"Test", "Test2"
+		], "Cells in the template");
+
+		this.oTable.getControlDelegate().updateBindingInfo.restore();
+	});
+
+	QUnit.test("autoBindOnInit=false", async function(assert) {
+		this.createTable({
+			autoBindOnInit: false
+		});
+
+		await this.oTable._fullyInitialized();
+		await wait(100);
+		assert.ok(!this.oTable.isTableBound(), "Table is not bound automatically");
+
+		await this.oTable.rebind();
+		await TableQUnitUtils.waitForBindingInfo(this.oTable);
+		assert.ok(this.oTable.isTableBound(), "Table is bound after calling Table#rebind");
+	});
+
+	QUnit.test("Modifications supported", async function(assert) {
+		this.createTable();
+
+		const oRebindSpy = sinon.spy(this.oTable, "rebind");
+		const oWaitForChanges = new Deferred();
+		const oWaitForChangesStub = sinon.stub(this.oTable.getEngine(), "waitForChanges");
+		const oIsModificationSupportedStub = sinon.stub(this.oTable.getEngine(), "isModificationSupported");
+
+		oIsModificationSupportedStub.withArgs(this.oTable).returns(Promise.resolve(true));
+		oWaitForChangesStub.withArgs(this.oTable).returns(oWaitForChanges.promise);
+
+		await this.oTable._fullyInitialized();
+		await wait(100);
+		assert.ok(oRebindSpy.notCalled, "Table#rebind not called after initialization");
+		oWaitForChanges.resolve();
+		await oWaitForChanges.promise;
+		assert.equal(oRebindSpy.callCount, 1, "Table#rebind called once after changes have been applied");
+		await TableQUnitUtils.waitForBindingInfo(this.oTable);
+		assert.ok(this.oTable.isTableBound(), "Table is bound");
+
+		oWaitForChangesStub.restore();
+		oIsModificationSupportedStub.restore();
+	});
+
+	QUnit.test("Modifications not supported", async function(assert) {
+		this.createTable();
+
+		const oRebindSpy = sinon.spy(this.oTable, "rebind");
+		const oIsModificationSupported = new Deferred();
+		const oIsModificationSupportedStub = sinon.stub(this.oTable.getEngine(), "isModificationSupported");
+
+		oIsModificationSupportedStub.withArgs(this.oTable).returns(oIsModificationSupported.promise);
+
+		await this.oTable._fullyInitialized();
+		assert.ok(oRebindSpy.notCalled, "Table#rebind not called during initialization");
+		oIsModificationSupported.resolve(false);
+		await oIsModificationSupported.promise;
+		assert.equal(oRebindSpy.callCount, 1, "Table#rebind called once after initialization");
+		await TableQUnitUtils.waitForBindingInfo(this.oTable);
+		assert.ok(this.oTable.isTableBound(), "Table is bound");
+
+		oIsModificationSupportedStub.restore();
+	});
+
+	QUnit.test("_rebind", async function(assert) {
+		this.createTable({
+			autoBindOnInit: false
+		});
+
+		const oDelegate = await this.oTable.awaitControlDelegate();
+
+		sinon.stub(oDelegate, "updateBindingInfo")
+			.callThrough()
+			.onCall(0).callsFake(function(oTable, oBindingInfo) {
+				oDelegate.updateBindingInfo.wrappedMethod.apply(this, arguments);
+				assert.ok(oTable._oTable, "The table is initialized when TableDelegate.updateBindingInfo is called");
+			});
+		sinon.stub(oDelegate, "updateBinding").callThrough();
+
+		// Initial binding
+		assert.ok(!this.oTable._oTable, "The table is not yet initialized when #_rebind is called");
+		await this.oTable._rebind().then((oResult) => {
+			assert.strictEqual(oResult, undefined, "No binding exists: #_rebind resolved without value");
+		}).catch(() => {
+			assert.ok(false, "No binding exists: #_rebind resolved");
+		});
+		assert.ok(oDelegate.updateBindingInfo.calledOnceWith(this.oTable), "No binding exists: TableDelegate.updateBindingInfo call");
+		assert.ok(oDelegate.updateBinding.calledOnceWithExactly(this.oTable, oDelegate.updateBindingInfo.getCall(0).args[1], null,
+			{forceRefresh: false}), "No binding exists: TableDelegate.updateBinding call");
+		sinon.assert.callOrder(oDelegate.updateBindingInfo, oDelegate.updateBinding);
+		assert.ok(this.oTable.isTableBound(), "Table is bound");
+
+		oDelegate.updateBindingInfo.reset();
+		oDelegate.updateBinding.reset();
+
+		// Rebind
+		await this.oTable._rebind().then((oResult) => {
+			assert.strictEqual(oResult, undefined, "Binding exists: #_rebind resolved without value");
+		}).catch(() => {
+			assert.ok(false, "Binding exists: #_rebind resolved");
+		});
+		assert.ok(oDelegate.updateBindingInfo.calledOnceWith(this.oTable), "Binding exists: TableDelegate.updateBindingInfo call");
+		assert.ok(oDelegate.updateBinding.calledOnceWithExactly(this.oTable, oDelegate.updateBindingInfo.getCall(0).args[1],
+			this.oTable.getRowBinding(), {forceRefresh: false}), "Binding exists: TableDelegate.updateBinding call");
+
+		// Force rebind
+		oDelegate.updateBindingInfo.resetHistory();
+		oDelegate.updateBinding.resetHistory();
+		this.oTable._bForceRebind = true;
+		await this.oTable._rebind().then((oResult) => {
+			assert.strictEqual(oResult, undefined, "Force rebind: #_rebind resolved without value");
+		}).catch(() => {
+			assert.ok(false, "Force rebind: #_rebind resolved");
+		});
+		assert.ok(oDelegate.updateBindingInfo.calledOnceWith(this.oTable), "Force rebind: TableDelegate.updateBindingInfo call");
+		assert.ok(oDelegate.updateBinding.calledOnceWithExactly(this.oTable, oDelegate.updateBindingInfo.getCall(0).args[1], null,
+			{forceRefresh: false}), "Force rebind: TableDelegate.updateBinding call");
+
+		// Force refresh
+		oDelegate.updateBindingInfo.resetHistory();
+		oDelegate.updateBinding.resetHistory();
+		await this.oTable._rebind(true).then((oResult) => {
+			assert.strictEqual(oResult, undefined, "Force refresh: #_rebind resolved without value");
+		}).catch(() => {
+			assert.ok(false, "Force refresh: #_rebind resolved");
+		});
+		assert.ok(oDelegate.updateBindingInfo.calledOnceWith(this.oTable), "Force refresh: TableDelegate.updateBindingInfo call");
+		assert.ok(oDelegate.updateBinding.calledOnceWithExactly(this.oTable, oDelegate.updateBindingInfo.getCall(0).args[1],
+			this.oTable.getRowBinding(), {forceRefresh: true}), "Force refresh: TableDelegate.updateBinding call");
+
+		// Rebind fails with an error
+		oDelegate.updateBindingInfo.throws(new Error("Some fake error"));
+		oDelegate.updateBindingInfo.resetHistory();
+		oDelegate.updateBinding.resetHistory();
+		await this.oTable._rebind(true).then((oResult) => {
+			assert.ok(false, "TableDelegate.updateBindingInfo throws: #_rebind rejected");
+		}).catch((oError) => {
+			assert.deepEqual(oError, new Error("Some fake error"), "TableDelegate.updateBindingInfo throws: #_rebind rejected");
+		});
+		assert.ok(oDelegate.updateBinding.notCalled, "TableDelegate.updateBindingInfo throws: TableDelegate.updateBinding not called");
+
+		oDelegate.updateBindingInfo.restore();
+		oDelegate.updateBinding.restore();
+	});
+
+	QUnit.test("_onModifications", async function(assert) {
+		this.createTable({
+			autoBindOnInit: false
+		});
+
+		await this.oTable.finalizePropertyHelper();
+
+		sinon.stub(this.oTable, "finalizePropertyHelper").resolves();
+		sinon.stub(this.oTable, "rebind").resolves();
+		sinon.stub(this.oTable, "isTableBound").returns(false);
+
+		await this.oTable._onModifications(["Sort"]);
+		assert.ok(this.oTable.finalizePropertyHelper.notCalled, "Table not bound: Table#finalizePropertyHelper not called");
+		assert.ok(this.oTable.rebind.notCalled, "Table not bound: Table#rebind not called");
+
+		this.oTable.isTableBound.returns(true);
+
+		for (const sP13nController of ["Sort", "Filter", "Column", "Group", "Aggregate"]) {
+			this.oTable.finalizePropertyHelper.resetHistory();
+			this.oTable.rebind.resetHistory();
+			await this.oTable._onModifications([sP13nController]);
+			assert.ok(this.oTable.finalizePropertyHelper.calledOnce, sP13nController + ": Table#finalizePropertyHelper called once");
+			assert.ok(this.oTable.rebind.calledOnce, sP13nController + ": Table#rebind called once");
+		}
+
+		for (const sP13nController of ["ColumnWidth", "Dummy"]) {
+			this.oTable.finalizePropertyHelper.resetHistory();
+			this.oTable.rebind.resetHistory();
+			await this.oTable._onModifications([sP13nController]);
+			assert.ok(this.oTable.finalizePropertyHelper.notCalled, sP13nController + ": Table#finalizePropertyHelper not called");
+			assert.ok(this.oTable.rebind.notCalled, sP13nController + ": Table#rebind not called");
+		}
+	});
+
 	QUnit.module("Inbuilt filter initialization", {
 		createTable: function(mSettings) {
 			this.oTable = new Table(mSettings);
@@ -5968,7 +6225,7 @@ sap.ui.define([
 		}
 	});
 
-	QUnit.test("DataStateIndicator", function(assert) {
+	QUnit.test("DataStateIndicator (TODO: SHOULD BE AN OPA TEST!)", function(assert) {
 		const done = assert.async();
 
 		const aMessages = [
@@ -6017,7 +6274,7 @@ sap.ui.define([
 				assert.notOk(this.oDataStateIndicator.isFiltering(), "Message filter is not active");
 				this.oDataStateIndicator._oLink.firePress();
 
-				this.oTable.initialized().then(function() {
+				TableQUnitUtils.waitForBindingInfo(this.oTable).then(function() {
 					assert.deepEqual(this.oTable._oTable.getBindingInfo("items").filters[0], oError, "The table rebinds and dataStateIndicator Filter is set to the bindingInfo");
 
 					this.oDataStateIndicator = new DataStateIndicator({
@@ -6034,7 +6291,7 @@ sap.ui.define([
 
 					setTimeout(function() {
 						this.oDataStateIndicator._oLink.firePress();
-						this.oTable.initialized().then(function() {
+						TableQUnitUtils.waitForBindingInfo(this.oTable).then(function() {
 							assert.deepEqual(this.oTable._oTable.getBindingInfo("items").filters[0], oWarning, "dataStateIndicator Filter is set to the right bindingInfo");
 							done();
 						}.bind(this));

@@ -852,21 +852,19 @@ sap.ui.define([
          * Rebinds the inner chart instance by calling oDelegate.rebind
 		 *
 		 * @param {boolean} [bForceRefresh] Indicates that the binding must be refreshed regardless of any <code>bindingInfo</code> change
+		 * @returns {Promise} A <code>Promise</code> that resolves after rebind is executed
 		 * @private
 		 */
-        Chart.prototype._rebind = function (bForceRefresh) {
+		Chart.prototype._rebind = async function(bForceRefresh) {
 
             if (!this._bInnerChartReady) {
                 //TODO: This can lead to a race conditition when the "Go" button is pressed while the inner chart still intializes
                 //TODO: Check whether we really need this since we insantiate the inner chart right away
                 //this._initInnerControls();
 
-                //Wait with rebind until inner chart is ready
-                this.initialized().then(function () {
-                    this._rebind(bForceRefresh);
-                }.bind(this));
-                return;
-            }
+				//Wait with rebind until inner chart is ready
+				await this.initialized();
+			}
 
             this.setBusy(true);
 
@@ -1324,11 +1322,11 @@ sap.ui.define([
             return bRebindRequired;
         };
 
-        Chart.prototype._onModifications = function(aAffectedP13nControllers) {
-            if (fCheckIfRebindIsRequired(aAffectedP13nControllers)) {
-                this.rebind();
-            }
-        };
+		Chart.prototype._onModifications = async function(aAffectedP13nControllers) {
+			if (fCheckIfRebindIsRequired(aAffectedP13nControllers)) {
+				await this.rebind();
+			}
+		};
 
         Chart.prototype.setVariant = function(oControl) {
             this.setAggregation("variant", oControl);

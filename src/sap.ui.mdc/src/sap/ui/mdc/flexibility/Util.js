@@ -67,13 +67,13 @@ sap.ui.define([
 			});
 
 			if (!oControl._pPendingModification && oControl._onModifications instanceof Function) {
-				oControl._pPendingModification = Engine.getInstance().waitForChanges(oControl).then(function() {
+				oControl._pPendingModification = Engine.getInstance().waitForChanges(oControl).then(async () => {
 					const aAffectedControllerKeys = Engine.getInstance().getTrace(oControl);
 					Engine.getInstance().clearTrace(oControl);
 					delete oControl._pPendingModification;
-					resumeInvalidation(oControl);
 					Engine.getInstance().fireStateChange(oControl);
-					return oControl._onModifications(aAffectedControllerKeys);
+					await oControl._onModifications(aAffectedControllerKeys);
+					resumeInvalidation(oControl);
 				});
 			}
 		}

@@ -264,6 +264,7 @@ sap.ui.define([
 	 * {@link sap.ui.mdc.table.PropertyInfo}.
 	 *
 	 * @extends sap.ui.mdc.Control
+	 * @borrows sap.ui.mdc.mixin.FilterIntegrationMixin.rebind as #rebind
 	 * @author SAP SE
 	 * @since 1.58
 	 * @alias sap.ui.mdc.Table
@@ -855,12 +856,9 @@ sap.ui.define([
 		}
 	});
 
-	const aToolBarBetweenAggregations = ["variant", "quickFilter"];
-
-	/**
-	 * @borrows sap.ui.mdc.mixin.FilterIntegrationMixin.rebind as #rebind
-	 */
 	FilterIntegrationMixin.call(Table.prototype);
+
+	const aToolBarBetweenAggregations = ["variant", "quickFilter"];
 
 	/**
 	 * Create setter and getter for aggregation that are passed to ToolBar aggregation named "Between"
@@ -1320,21 +1318,15 @@ sap.ui.define([
 		return bRebindRequired;
 	};
 
-	Table.prototype._onModifications = function(aAffectedP13nControllers) {
-		if (fCheckIfRebindIsRequired(aAffectedP13nControllers) && this.isTableBound()) {
-			this.rebind();
-		}
-
-		if (!this.isPropertyHelperFinal()) {
-			this._bFinalzingPropertiesOnModification = true;
-			this.finalizePropertyHelper().then(function() {
-				delete this._bFinalzingPropertiesOnModification;
-			}.bind(this));
-		}
-
-		this.getColumns().forEach(function(oColumn) {
+	Table.prototype._onModifications = async function(aAffectedP13nControllers) {
+		this.getColumns().forEach((oColumn) => {
 			oColumn._onModifications();
 		});
+
+		if (fCheckIfRebindIsRequired(aAffectedP13nControllers) && this.isTableBound()) {
+			await this.finalizePropertyHelper();
+			await this.rebind();
+		}
 	};
 
 	Table.prototype.setP13nMode = function(aMode) {
@@ -1769,7 +1761,6 @@ sap.ui.define([
 			if (vError != null) {
 				this._oFullInitialize.reject(vError);
 			} else {
-				this._bFullyInitialized = true;
 				this._oFullInitialize.resolve(this);
 			}
 		}
@@ -2946,15 +2937,33 @@ sap.ui.define([
 	 * Rebinds the table rows.
 	 *
 	 * @param {boolean} [bForceRefresh] Indicates that the binding must be refreshed regardless of any <code>bindingInfo</code> change
+	 * @returns {Promise} A <code>Promise</code> that resolves after rebind is executed
 	 * @private
 	 */
-	Table.prototype._rebind = function(bForceRefresh) {
-		// Bind the rows/items of the table, only once it is initialized.
-		if (this._bFullyInitialized) {
-			this.bindRows(bForceRefresh);
+	Table.prototype._rebind = async function(bForceRefresh = false) {
+		const oBindingInfo = {};
+
+		await this._fullyInitialized(); // Can be changed to initialized after removal of the CreationRow.
+		this.getControlDelegate().updateBindingInfo(this, oBindingInfo);
+		this._finalizeBindingInfo(oBindingInfo);
+		this._oTable.setShowOverlay(false);
+		this._updateColumnsBeforeBinding();
+		this.getControlDelegate().updateBinding(this, oBindingInfo, this._bForceRebind ? null : this.getRowBinding(), {forceRefresh: bForceRefresh});
+		this._updateInnerTableNoData();
+		this._bForceRebind = false;
+	};
+
+	Table.prototype._finalizeBindingInfo = function(oBindingInfo) {
+		if (this._oRowTemplate) {
+			oBindingInfo.template = this._oRowTemplate;
+			oBindingInfo.templateShareable = true;
 		} else {
-			this._fullyInitialized().then(this._rebind.bind(this, bForceRefresh));
+			delete oBindingInfo.template;
 		}
+
+		Table._addBindingListener(oBindingInfo, "dataRequested", this._onDataRequested.bind(this));
+		Table._addBindingListener(oBindingInfo, "dataReceived", this._onDataReceived.bind(this));
+		Table._addBindingListener(oBindingInfo, "change", this._onBindingChange.bind(this));
 	};
 
 	Table.prototype._onPaste = function(mPropertyBag) {
