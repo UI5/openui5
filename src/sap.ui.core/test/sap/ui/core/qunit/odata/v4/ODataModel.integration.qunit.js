@@ -2347,6 +2347,62 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
+	// Scenario: PATCH an entity with a key predicate consisting of a single key property of type
+	// Edm.DateTimeOffset. The PATCH failed and a UI5 message is created.
+	// SNOW: CS20240007200281
+	QUnit.test("CS20240007200281: key property is Edm.DateTimeOffset", function (assert) {
+		var oInput,
+			oModel = this.createSpecialCasesModel({autoExpandSelect : true}),
+			sView = '\
+<Table id="table" items="{/Artists(ArtistID=\'42\',IsActiveEntity=true)/_Event}">\
+	<Input id="name" value="{Name}"/>\
+</Table>',
+			that = this;
+
+		this.expectRequest("Artists(ArtistID='42',IsActiveEntity=true)/_Event"
+				+ "?$select=Name,TimeStamp&$skip=0&$top=100", {
+				value : [
+					{Name : "Taubertal Festival", TimeStamp : "08-08-2024T01:02:03Z"}
+				]
+			})
+			.expectChange("name", ["Taubertal Festival"]);
+
+		return this.createView(assert, sView, oModel).then(function () {
+			var aTableRows = that.oView.byId("table").getItems();
+
+			that.expectChange("name", ["Woodstock"])
+				.expectRequest({
+					method : "PATCH",
+					url : "Artists(ArtistID='42',IsActiveEntity=true)"
+						+ "/_Event(08-08-2024T01%3A02%3A03Z)",
+					payload : {Name : "Woodstock"}
+				}, createErrorInsideBatch({target : "Name"}))
+				.expectMessages([{
+					code : "CODE",
+					message : "Request intentionally failed",
+					persistent : true,
+					target : "/Artists(ArtistID='42',IsActiveEntity=true)"
+						+ "/_Event(08-08-2024T01%3A02%3A03Z)/Name",
+					technical : true,
+					type : "Error"
+				}]);
+
+			that.oLogMock.expects("error")
+				.withArgs("Failed to update path /Artists(ArtistID='42',IsActiveEntity=true)"
+					+ "/_Event(08-08-2024T01%3A02%3A03Z)/Name");
+
+			oInput = aTableRows[0].getCells()[0];
+			// code under test
+			oInput.getBinding("value").setValue("Woodstock");
+
+			return that.waitForChanges(assert);
+		}).then(function () {
+			return that.checkValueState(assert, oInput, "Error",
+				"Request intentionally failed");
+		});
+	});
+
+	//*********************************************************************************************
 	// Scenario: Minimal test for an absolute ODataPropertyBinding. This scenario is comparable with
 	// "FavoriteProduct" in the SalesOrders application.
 	testViewStart("Absolute ODPB",
