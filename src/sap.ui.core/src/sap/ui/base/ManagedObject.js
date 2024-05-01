@@ -1456,7 +1456,7 @@ sap.ui.define([
 	 *
 	 * There is no guarantee or check or requirement for the ID of a <code>ManagedObject</code> to be unique.
 	 * Only some subclasses of <code>ManagedObject</code> introduce this as a requirement, e.g. <code>Component</code>
-	 * or <code>Element</code>. All elements existing in the same window at the same time must have different IDs.
+	 * or <code>Element</code>. All elements existing in the same JavaScript context at the same time must have different IDs.
 	 * A new element will fail during construction when the given ID is already used by another element.
 	 * But there might be a component with the same ID as an element or another <code>ManagedObject</code>.
 	 *

@@ -1155,7 +1155,7 @@
 			configurable: true // we have to allow a redefine for debug mode or restart from CDN etc.
 		});
 	} catch (e) {
-		log.warning("could not intercept changes to window.define, ui5loader won't be able to detect a change of the AMD loader");
+		log.warning("could not intercept changes to globalThis.define, ui5loader won't be able to detect a change of the AMD loader");
 	}
 
 	// --------------------------------------------------------------------------------------------
@@ -2242,9 +2242,9 @@
 	const ui5Require = createContextualRequire(null, false);
 
 	/*
-	 * AMD version of require (window.require)
+	 * AMD version of require (globalThis.require)
 	 *
-	 * Difference between require (sap.ui.require) and amdRequire (window.require):
+	 * Difference between require (sap.ui.require) and amdRequire (globalThis.require):
 	 * - require("my/module"), returns undefined if the module was not loaded yet
 	 * - amdRequire("my/module"), throws an error if the module was not loaded yet
 	 */
