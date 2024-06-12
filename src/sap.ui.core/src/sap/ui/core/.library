@@ -240,7 +240,7 @@
             <copyright>2010-2014 Michael Bostock</copyright>
             <pattern>sap/ui/thirdparty/d3.js</pattern>
         </lib>
-        <lib name="jszip" displayName="JSZip" npmName="jszip" version="2.2.0" hash="a5402e9bb617f807e6f0af5b7cb9aab1" homepage="http://stuartk.com/jszip/" id="73554900106100005531">
+        <lib name="jszip" displayName="JSZip" npmName="jszip" version="2.2.0" hash="e32a02b830c002f4abc44aeaced160d4" homepage="http://stuartk.com/jszip/" id="73554900106100005531">
             <license url="https://github.com/Stuk/jszip/blob/master/LICENSE.markdown" type="MIT" />
             <copyright>2009-2014 Stuart Knightley, David Duponchel, Franz Buchinger, António Afonso</copyright>
             <pattern>sap/ui/thirdparty/jszip.js</pattern>
