@@ -15,7 +15,8 @@ sap.ui.define([
 	"sap/ui/thirdparty/jquery",
 	"sap/ui/dom/includeStylesheet",
 	"require",
-	"sap/ui/core/Core"
+	"sap/ui/core/Core",
+	"sap/ui/qunit/utils/nextUIUpdate"
 ], function(
 	createAndAppendDiv,
 	HTML,
@@ -32,7 +33,8 @@ sap.ui.define([
 	jQuery,
 	includeStylesheet,
 	require,
-	oCore
+	oCore,
+	nextUIUpdate
 ) {
 	"use strict";
 
@@ -343,6 +345,33 @@ sap.ui.define([
 
 		oPage.destroy();
 		oPage = null;
+	});
+
+	QUnit.test("calling twice showFooter with false and true", async function (assert) {
+		// Setup
+		var oBar = new Bar();
+		var oPage = new Page({
+			showFooter: false,
+			footer: oBar,
+			floatingFooter: true
+		}).placeAt("content");
+		var oClock = sinon.useFakeTimers();
+
+		await nextUIUpdate(oClock);
+
+		// Act
+		oPage.setShowFooter(false);
+		oPage.setShowFooter(true);
+		oClock.runAll();
+		await nextUIUpdate(oClock);
+
+		// Assert
+		assert.ok(!oBar.$().parent().hasClass("sapUiHidden"), "Footer is visible.");
+
+		oBar.destroy();
+		oPage.destroy();
+		oClock.runAll();
+		oClock.restore();
 	});
 
 	QUnit.test("contentOnlyBusy property", function (assert) {
