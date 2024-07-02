@@ -1326,6 +1326,82 @@
 							]
 						},
 						{
+							"$comment": "A typedef for a data type",
+							"type": "object",
+							"properties": {
+								"kind": {
+									"enum": [
+										"typedef"
+									]
+								},
+								"final": {
+									"type": "boolean"
+								},
+								"type": {
+									"$ref": "#/definitions/typeName"
+								},
+								"ui5-metadata": {
+									"type": "object",
+									"properties": {
+										"stereotype": {
+											"type": "string",
+											"enum": [
+												"datatype"
+											]
+										},
+										"basetype": {
+											"$comment": "The name of the DataType instance that this type inherits from, defaults to 'string'",
+											"type": "string"
+										},
+										"pattern": {
+											"$comment": "A regular expression that limits the valid values for a string type",
+											"type": "string"
+										},
+										"range": {
+											"$comment": "Value range for numeric types",
+											"type": "object",
+											"properties": {
+												"minExclusive": {
+													"type": "integer"
+												},
+												"maxInclusive": {
+													"type": "integer"
+												},
+												"minInclusive": {
+													"type": "integer"
+												},
+												"maxExclusive": {
+													"type": "integer"
+												}
+											},
+											"additionalProperties": false
+										}
+									},
+									"required": [
+										"stereotype"
+									],
+									"additionalProperties": false
+								}
+							},
+							"propertyNames": {
+								"anyOf": [
+									{
+										"$ref": "#/definitions/symbol-propertyNames"
+									},
+									{
+										"enum": [
+											"final",
+											"type",
+											"ui5-metadata"
+										]
+									}
+								]
+							},
+							"required": [
+								"type"
+							]
+						},
+						{
 							"$comment": "A typedef for a structure type",
 							"type": "object",
 							"properties": {
@@ -1342,6 +1418,28 @@
 									"items": {
 										"$ref": "#/definitions/typedef-property"
 									}
+								},
+								"type": {
+									"$ref": "#/definitions/typeName"
+								},
+								"ui5-metadata": {
+									"type": "object",
+									"properties": {
+										"stereotype": {
+											"type": "string",
+											"enum": [
+												"datatype"
+											]
+										},
+										"basetype": {
+											"$comment": "The name of the DataType instance that this type inherits from, must be an object type",
+											"type": "string"
+										}
+									},
+									"required": [
+										"stereotype"
+									],
+									"additionalProperties": false
 								}
 							},
 							"propertyNames": {
@@ -1352,7 +1450,9 @@
 									{
 										"enum": [
 											"extends",
-											"properties"
+											"properties",
+											"type",
+											"ui5-metadata"
 										]
 									}
 								]
@@ -1396,6 +1496,28 @@
 									"items": {
 										"$ref": "#/definitions/exception"
 									}
+								},
+								"type": {
+									"$ref": "#/definitions/typeName"
+								},
+								"ui5-metadata": {
+									"type": "object",
+									"properties": {
+										"stereotype": {
+											"type": "string",
+											"enum": [
+												"datatype"
+											]
+										},
+										"basetype": {
+											"$comment": "The name of the DataType instance that this type inherits from, must be a function type",
+											"type": "string"
+										}
+									},
+									"required": [
+										"stereotype"
+									],
+									"additionalProperties": false
 								}
 							},
 							"propertyNames": {
@@ -1407,7 +1529,9 @@
 										"enum": [
 											"parameters",
 											"returnValue",
-											"throws"
+											"throws",
+											"type",
+											"ui5-metadata"
 										]
 									}
 								]
