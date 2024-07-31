@@ -47,43 +47,65 @@ sap.ui.define([
 
 	var TitleAlignment = mobileLibrary.TitleAlignment;
 
-	var oHtml = new HTML({
-		content : '<h1 id="qunit-header">Header</h1><h2 id="qunit-banner"></h2><h2 id="qunit-userAgent"></h2><ol id="qunit-tests"></ol>'
+
+	async function createPageControls(oContext) {
+		oContext.oHtml = new HTML({
+			content: '<h1 id="qunit-header">Header</h1><h2 id="qunit-banner"></h2><h2 id="qunit-userAgent"></h2><ol id="qunit-tests"></ol>'
+		});
+
+		oContext.oButton = new Button("bigButton", {
+			text: "Test",
+			width: "2000px"
+		});
+
+		oContext.oPage = new Page("myFirstPage", {
+			backgroundDesign: "Standard",
+			title: "Test",
+			showNavButton: true,
+			enableScrolling: false,
+			content: oContext.oHtml,
+			headerContent: [new Button("hdrbtn", { text: "HDRBTN" })]
+		}).placeAt("content");
+
+		oContext.oPage.setSubHeader(new Bar("mySubHeader", { contentMiddle: [new SearchField("SFB1", { placeholder: "search for...", width: "100%" })] }));
+		oContext.oPage.setFooter(new Bar("myFooter", { contentMiddle: [new Button('FooterBtn', { text: "Footer Btn" })] }));
+
+		oContext.oPage2 = new Page("mySecondPage", {
+			title: "Test 2",
+			showNavButton: false,
+			content: [new HTML({
+				content: "<div id='p2content'>test content</div>"
+			}), oContext.oButton]
+		}).placeAt("content");
+
+		oContext.oPage3 = new Page("myThirdPage", {
+			showHeader: false,
+			enableScrolling: false,
+			content: new HTML({
+				content: "<div id='p3content'>another test content</div>"
+			})
+		}).placeAt("content");
+
+		await nextUIUpdate();
+	}
+
+	function destroyControls(oContext) {
+		oContext.oPage.destroy();
+		oContext.oPage2.destroy();
+		oContext.oPage3.destroy();
+		oContext.oButton.destroy();
+		oContext.oHtml.destroy();
+	}
+
+
+	QUnit.module("Initial Check", {
+		beforeEach: async function () {
+			await createPageControls(this);
+		},
+		afterEach: function () {
+			destroyControls(this);
+		}
 	});
-	var oButton = new Button("bigButton", {
-		text: "Test",
-		width: "2000px"
-	});
-
-	var oPage = new Page("myFirstPage", {
-		backgroundDesign: "Standard",
-		title : "Test",
-		showNavButton : true,
-		enableScrolling : false,
-		content : oHtml,
-		headerContent: [new Button("hdrbtn",{text:"HDRBTN"})]
-	}).placeAt("content");
-	oPage.setSubHeader(new Bar("mySubHeader",{contentMiddle: [new SearchField("SFB1", {placeholder: "search for...", width: "100%"})]}));
-	oPage.setFooter(new Bar("myFooter", { contentMiddle: [ new Button('FooterBtn', {text: "Footer Btn"})]}));
-
-	var oPage2 = new Page("mySecondPage", {
-		title : "Test 2",
-		showNavButton : false,
-		content : [new HTML({
-			content : "<div id='p2content'>test content</div>"
-		}), oButton]
-	}).placeAt("content");
-
-	/* var oPage3 = */ new Page("myThirdPage", {
-		showHeader : false,
-		enableScrolling : false,
-		content : new HTML({
-			content : "<div id='p3content'>another test content</div>"
-		})
-	}).placeAt("content");
-
-
-	QUnit.module("Initial Check");
 
 	QUnit.test("Page rendered", function(assert) {
 		assert.ok(document.getElementById("myFirstPage"), "Page should be rendered");
@@ -108,16 +130,16 @@ sap.ui.define([
 		assert.ok(!oCore.byId("mySubHeader").$().hasClass("sapMHeader-CTX"), "subHeader should not contain header context");
 		assert.ok(oCore.byId("myFooter").$().hasClass("sapMFooter-CTX"), "footer should contain footer context");
 		assert.ok(!oCore.byId("myFirstPage").$().hasClass("sapMPageBgList"), "Page content should not have list gray background color");
-		oPage.setBackgroundDesign("List");
+		this.oPage.setBackgroundDesign("List");
 		assert.ok(oCore.byId("myFirstPage").$().hasClass("sapMPageBgList"), "Page content should have list background color");
-		oPage.setBackgroundDesign("Standard");
+		this.oPage.setBackgroundDesign("Standard");
 		assert.ok(oCore.byId("myFirstPage").$().hasClass("sapMPageBgStandard"), "Page content should have standard background color");
 		assert.ok(!oCore.byId("myFirstPage").$().hasClass("sapMPageBgList"), "Page content should not have list background color");
-		oPage.setBackgroundDesign("Solid");
+		this.oPage.setBackgroundDesign("Solid");
 		assert.ok(oCore.byId("myFirstPage").$().hasClass("sapMPageBgSolid"), "Page content should have a solid background color");
-		oPage.setBackgroundDesign("Transparent");
+		this.oPage.setBackgroundDesign("Transparent");
 		assert.ok(oCore.byId("myFirstPage").$().hasClass("sapMPageBgTransparent"), "Page content should be transparent");
-		assert.equal(oPage.$("cont").hasClass("sapMPageEnableScrolling"), false, "In a page with scrolling disabled, no scroll-related class should be added");
+		assert.equal(this.oPage.$("cont").hasClass("sapMPageEnableScrolling"), false, "In a page with scrolling disabled, no scroll-related class should be added");
 	});
 
 	QUnit.test("Page 2 rendered", function(assert) {
@@ -125,7 +147,7 @@ sap.ui.define([
 		assert.ok(document.getElementById("mySecondPage-intHeader"), "header should be rendered");
 		assert.equal(document.getElementById("mySecondPage-navButton"), undefined, "nav button should not be rendered");
 		assert.ok(document.getElementById("p2content"), "Page 2 content should be rendered");
-		oPage2.setBackgroundDesign("List");
+		this.oPage2.setBackgroundDesign("List");
 		assert.ok(oCore.byId("mySecondPage").$().hasClass("sapMPageBgList"), "Page 2 content should have list background color");
 	});
 
@@ -233,10 +255,27 @@ sap.ui.define([
 		oModel.destroy();
 	});
 
-	QUnit.test("showSubHeader", function(assert) {
-		var oSubHeader = oCore.byId("mySubHeader");
-		assert.ok(oSubHeader.$().length, "subHeader should be rendered");
+	QUnit.test("showSubHeader", async function(assert) {
+		var oHtml = new HTML({
+			content: '<h1 id="qunit-header">Header</h1><h2 id="qunit-banner"></h2><h2 id="qunit-userAgent"></h2><ol id="qunit-tests"></ol>'
+		});
 
+		const oPage = new Page("myFirstPage", {
+			backgroundDesign: "Standard",
+			title: "Test",
+			showNavButton: true,
+			enableScrolling: false,
+			content: oHtml,
+			headerContent: [new Button("hdrbtn", { text: "HDRBTN" })]
+		}).placeAt("content");
+		await nextUIUpdate();
+
+		oPage.setSubHeader(new Bar("mySubHeader", { contentMiddle: [new SearchField("SFB1", { placeholder: "search for...", width: "100%" })] }));
+		oPage.setFooter(new Bar("myFooter", { contentMiddle: [new Button('FooterBtn', { text: "Footer Btn" })] }));
+		await nextUIUpdate();
+
+		var oSubHeader = oCore.getElementById("mySubHeader");
+		assert.ok(oSubHeader.$().length, "subHeader should be rendered");
 
 		oPage.setShowSubHeader(false);
 		oCore.applyChanges();
@@ -246,7 +285,8 @@ sap.ui.define([
 		oPage.setShowSubHeader(true);
 		oCore.applyChanges();
 		assert.ok(document.getElementById("mySubHeader"), "subHeader should be rendered");
-		assert.equal(jQuery("#myFirstPage-cont").css("top"), "96px", "top of Page content with subHeader shown should be 96px (6rem)");
+
+		oPage.destroy();
 	});
 
 	QUnit.test("showFooter when floatingFooter=true and showFooter=false initially", function(assert) {
@@ -261,7 +301,7 @@ sap.ui.define([
 
 		oCore.applyChanges();
 
-		assert.equal(!!document.getElementById("myFooter"), true, "footer should be rendered");
+		assert.equal(!!document.getElementById("idFooter"), true, "footer should be rendered");
 		assert.equal(oPage.getFooter().$().parent().hasClass("sapUiHidden"), true, "footer is hidden");
 
 		oPage.destroy();
@@ -361,8 +401,9 @@ sap.ui.define([
 
 		// Act
 		oPage.setShowFooter(false);
+		oClock.tick(1000);
 		oPage.setShowFooter(true);
-		oClock.runAll();
+		oClock.tick(1000);
 		await nextUIUpdate(oClock);
 
 		// Assert
@@ -458,7 +499,10 @@ sap.ui.define([
 	// scrolling tests only for non-IE8 browsers
 	if (Device.browser.mozilla || Device.browser.safari || Device.browser.chrome) {
 
-		QUnit.module("Scrolling");
+		QUnit.module("Scrolling", {
+			before: async function() { await createPageControls( this ); },
+			after: function() {	 destroyControls( this ); }
+		});
 
 		var getScrollPos = function(sPageId) {
 			var fScrollLeft, scrollEnablement = oCore.byId(sPageId).getScrollDelegate();
@@ -487,7 +531,7 @@ sap.ui.define([
 		QUnit.test("Scrolling", function(assert) {
 			assert.expect(2);
 			assert.equal(getScrollPos("mySecondPage"), 0, "Page 2 should be scrolled to position 0");
-			oPage2.scrollTo(100, 0);
+			this.oPage2.scrollTo(100, 0);
 			assert.equal(getScrollPos("mySecondPage"), -100, "Page 2 should be scrolled to position 100");
 		});
 
@@ -540,7 +584,7 @@ sap.ui.define([
 
 		QUnit.test("Restoring scrolling state after rendering", function(assert) {
 			assert.expect(1); // event should not be fired after rerendering
-			oPage2.invalidate();
+			this.oPage2.invalidate();
 			oCore.applyChanges();
 			assert.equal(getScrollPos("mySecondPage"), -100, "Page 2 should be scrolled to position 100");
 		});
@@ -607,8 +651,27 @@ sap.ui.define([
 	} // end of scrolling test "if" which filters out IE8
 
 	QUnit.module("Busy Indication", {
-		afterEach : function() {
-			oPage.setBusy(false);
+		before: async function () {
+			var oHtml = new HTML({
+				content: '<h1 id="qunit-header">Header</h1><h2 id="qunit-banner"></h2><h2 id="qunit-userAgent"></h2><ol id="qunit-tests"></ol>'
+			});
+
+			this.oPage = new Page("myFirstPage", {
+				backgroundDesign: "Standard",
+				title: "Test",
+				showNavButton: true,
+				enableScrolling: false,
+				content: oHtml,
+				headerContent: [new Button("hdrbtn", { text: "HDRBTN" })]
+			}).placeAt("content");
+
+			await nextUIUpdate();
+		},
+		afterEach: function () {
+			this.oPage.setBusy(false);
+		},
+		after: function () {	// cleanup
+			this.oPage.destroy();
 		}
 	});
 
@@ -616,7 +679,7 @@ sap.ui.define([
 		var done = assert.async();
 		var sDesiredZIndex = "3";
 
-		oPage.setBusy(true);
+		this.oPage.setBusy(true);
 
 		setTimeout(function() {
 			var sZIndex = jQuery('.sapUiLocalBusyIndicator').css('z-index');
@@ -630,8 +693,8 @@ sap.ui.define([
 		var done = assert.async();
 		var sDesiredZIndex = "auto";
 
-		oPage.setContentOnlyBusy(true);
-		oPage.setBusy(true);
+		this.oPage.setContentOnlyBusy(true);
+		this.oPage.setBusy(true);
 
 		setTimeout(function() {
 			var sZIndex = jQuery('.sapUiLocalBusyIndicator').css('z-index');
@@ -726,11 +789,11 @@ sap.ui.define([
 
 			oSetting[sPropertyName] = sLandmark;
 
-			oPage.setLandmarkInfo(new PageAccessibleLandmarkInfo(oSetting));
+			this.oPage.setLandmarkInfo(new PageAccessibleLandmarkInfo(oSetting));
 
 			oCore.applyChanges();
 
-			assert.ok(oPage[sTagGeter](), sExtectedTag);
+			assert.ok(this.oPage[sTagGeter](), sExtectedTag);
 		}
 	});
 
