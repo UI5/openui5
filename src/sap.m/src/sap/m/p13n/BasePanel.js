@@ -18,11 +18,29 @@ sap.ui.define([
 	"sap/ui/core/dnd/DragDropInfo",
 	'sap/ui/core/ShortcutHintsMixin',
 	"sap/ui/events/KeyCodes",
-	"sap/base/Log",
 	"sap/ui/Device",
-	"sap/m/library",
-	"sap/ui/core/InvisibleText"
-], function(JSONModel, VBox, Control, Column, Text, Filter, Table, OverflowToolbar, SearchField, ToolbarSpacer, OverflowToolbarButton, OverflowToolbarLayoutData, DragDropInfo, ShortcutHintsMixin, KeyCodes, Log, Device, library, InvisibleText) {
+	"sap/ui/core/InvisibleText",
+	"sap/m/table/Util"
+], (
+	JSONModel,
+	VBox,
+	Control,
+	Column,
+	Text,
+	Filter,
+	Table,
+	OverflowToolbar,
+	SearchField,
+	ToolbarSpacer,
+	OverflowToolbarButton,
+	OverflowToolbarLayoutData,
+	DragDropInfo,
+	ShortcutHintsMixin,
+	KeyCodes,
+	Device,
+	InvisibleText,
+	TableUtil
+) => {
 	"use strict";
 
 	/**
@@ -561,7 +579,10 @@ sap.ui.define([
 					shrinkable: true,
 					priority: "High",
 					maxWidth: "16rem"
-				})
+				}),
+				change: () => {
+					TableUtil.announceTableUpdate(this.getTableInvisibleText().getText(), this._oListControl.getItems().length);
+				}
 			});
 		}
 		return this._oSearchField;
@@ -577,6 +598,24 @@ sap.ui.define([
 	 */
 	BasePanel.prototype.getInitialFocusedControl = function() {
 		return this._oSearchField;
+	};
+
+	/**
+	 * @private
+	 * @ui5-restricted sap.m.p13n
+	 * Returns the <code>InvisibleText</code> control describing the table in the personalization panel.
+	 *
+	 * @returns {sap.ui.core.InvisibleText} The invisible text describing the table control.
+	 */
+	BasePanel.prototype.getTableInvisibleText = function() {
+		return this._oInvText;
+	};
+
+	BasePanel.prototype.setTitle = function(sTitle) {
+		this.setProperty("title", sTitle);
+		this._oInvText?.setText(sTitle);
+
+		return this;
 	};
 
 	BasePanel.prototype._setTemplate = function(oTemplate) {
