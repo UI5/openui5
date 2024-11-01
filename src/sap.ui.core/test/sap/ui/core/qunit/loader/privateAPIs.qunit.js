@@ -13,16 +13,48 @@ sap.ui.define(function() {
 			this.EXPECTED_VIEW_CONTENT = '<mvc:View xmlns:mvc="sap.ui.core.mvc"></mvc:View>';
 			sap.ui.require.preload({
 				'fixture/resource-preload/Main.view.xml': this.EXPECTED_VIEW_CONTENT,
+				'fixture/resource-preload/App.view.xml': this.EXPECTED_VIEW_CONTENT,
+				'fixture/resource-preload/Details.view.xml': this.EXPECTED_VIEW_CONTENT,
 				'fixture/resource-preload/i18n.properties': ""
+			});
+			sap.ui.predefine("fixture/resource-preload/App.controller", function() {
+				return {};
+			});
+			sap.ui.predefine("fixture/resource-preload/Helper", function() {
+				return {};
+			});
+			sap.ui.loader.config({
+				depCacheUI5: {
+					'fixture/resource-preload/App.view.xml': [
+						"fixture/resource-preload/App.controller.js",
+						"fixture/resource-preload/Details.view.xml",
+						"fixture/private-apis/ControlX.js"
+					],
+					'fixture/private-apis/ControlX.js': [
+						"fixture/private-apis/ControlY.js"
+					]
+				}
 			});
 		}
 	});
 
 	QUnit.test("Simple access to a resource", function(assert) {
 		assert.strictEqual(
+			privateLoaderAPI.getModuleState('fixture/resource-preload/Main.view.xml'),
+			-1,
+			"(precondition) View resource should be in state PRELOADED"
+		);
+
+		assert.strictEqual(
 			privateLoaderAPI.getModuleContent('fixture/resource-preload/Main.view.xml'),
 			this.EXPECTED_VIEW_CONTENT,
 			"reading a preloaded non-JS resource should return the expected text result");
+
+		assert.strictEqual(
+			privateLoaderAPI.getModuleState('fixture/resource-preload/Main.view.xml'),
+			2,
+			"After accessing its content, View resource should be in state LOADED"
+		);
 	});
 
 	QUnit.test("Access via a denormalized name", function(assert) {
@@ -57,10 +89,69 @@ sap.ui.define(function() {
 			"reading a preloaded empty resource via url should return the expected text result");
 	});
 
+	QUnit.test("Access to a resource with depCache info requires the dependencies", function (assert) {
+		// App.controller.js is a direct dependency of the view and also preloaded
+		assert.strictEqual(
+			privateLoaderAPI.getModuleState("fixture/resource-preload/App.controller.js"),
+			-1,
+			"(precondition) dependency JS resource still should be in state PRELOADED"
+		);
+		// ControlX is a direct dependency of the view
+		assert.strictEqual(
+			privateLoaderAPI.getModuleState("fixture/private-apis/ControlX.js"),
+			0,
+			"(precondition) dependency JS resource still should be in state INITIAL"
+		);
+		// ControlX is a transitive dependency of the view (dependency of Control)
+		assert.strictEqual(
+			privateLoaderAPI.getModuleState("fixture/private-apis/ControlY.js"),
+			0,
+			"(precondition) dependency JS resource still should be in state INITIAL"
+		);
+
+		// Act
+		privateLoaderAPI.getModuleContent("fixture/resource-preload/App.view.xml");
+
+		// Assert
+		assert.ok(
+			privateLoaderAPI.getModuleState("fixture/private-apis/ControlX.js") > 0,
+			"Retrieving the content of the view should have triggered loading the JS resource"
+		);
+		assert.ok(
+			privateLoaderAPI.getModuleState("fixture/private-apis/ControlY.js") > 0,
+			"Retrieving the content of the view should have triggered loading the JS resource"
+		);
+		assert.ok(
+			privateLoaderAPI.getModuleState("fixture/resource-preload/App.controller.js") > 0,
+			"Retrieving the content of the view should have triggered loading the JS resource"
+		);
+	});
+
+	QUnit.test("Access to a JS resource does not change its state", function(assert) {
+		const JS_RESOURCE = "fixture/resource-preload/Helper.js";
+
+		assert.strictEqual(
+			privateLoaderAPI.getModuleState(JS_RESOURCE),
+			-1,
+			"(precondition) JS resource shouls be in state PRELOADED"
+		);
+
+		// Act and assert
+		assert.ok(
+			Array.isArray(privateLoaderAPI.getModuleContent(JS_RESOURCE)),
+			"getModuleContent should return the predefined JS module"
+		);
+
+		assert.strictEqual(
+			privateLoaderAPI.getModuleState(JS_RESOURCE),
+			-1,
+			"Retrieving the content of a JS resource should not change its state"
+		);
+	});
 
 
 	// ========================================================================================
-	// Non-JS Resources (_getModuleContent)
+	// Non-JS Resources (guessResourceName)
 	// ========================================================================================
 
 	QUnit.module("guessResourceName", {

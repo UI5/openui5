@@ -1528,7 +1528,7 @@
 				missingDeps.forEach((dep) => {
 					if (/\.js$/.test(dep)) {
 						// The resulting promise is ignored here intentionally.
-						// Error handling will happen while module `sModuleName`` is processed
+						// Error handling will happen while module `sModuleName` is processed
 						requireModule(null, dep, /* always async */ true);
 					} // else: TODO handle non-JS resources, e.g. link rel=prefetch
 				});
@@ -2403,15 +2403,19 @@
 		if ( name ) {
 			name = getMappedName(name);
 		} else {
-			name = guessResourceName(url, true);
+			name = guessResourceName(url);
 		}
-		const oModule = name && mModules[name];
-		if ( oModule ) {
-			oModule.state = LOADED;
-			return oModule.data;
-		} else {
-			return undefined;
+		if ( name ) {
+			requireDependenciesUpfront(name);
+			const oModule = mModules[name];
+			if ( oModule?.data !== undefined ) {
+				if ( oModule.state === PRELOADED && !name.endsWith(".js") ) {
+					oModule.state = LOADED;
+				}
+				return oModule.data;
+			}
 		}
+		return undefined;
 	}
 
 	/**
