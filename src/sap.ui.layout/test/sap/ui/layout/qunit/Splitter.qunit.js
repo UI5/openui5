@@ -11,7 +11,9 @@ sap.ui.define([
 	"sap/ui/core/RenderManager",
 	"sap/ui/core/ResizeHandler",
 	"sap/ui/core/Core",
-	"sap/ui/dom/units/Rem"
+	"sap/ui/dom/units/Rem",
+	"sap/ui/qunit/utils/nextUIUpdate",
+	"sap/ui/core/Theming"
 ], function (
 	Log,
 	Splitter,
@@ -24,7 +26,9 @@ sap.ui.define([
 	RenderManager,
 	ResizeHandler,
 	oCore,
-	Rem
+	Rem,
+	nextUIUpdate,
+	Theming
 ) {
 	"use strict";
 
@@ -643,6 +647,41 @@ sap.ui.define([
 
 		assert.ok(oKeyboardResizeSpy.withArgs(0, 5, true).calledOnce);
 
+		oSplitter.destroy();
+	});
+
+	QUnit.test("Sizes are calculated after the theme is applied", function (assert) {
+		// Arrange
+		let fnThemeAppliedCb;
+
+		this.stub(Theming, "attachApplied").callsFake((cb) => {
+			fnThemeAppliedCb = cb;
+		});
+
+		const oSplitter = new Splitter({
+			contentAreas: [
+				new Button(),
+				new Button()
+			]
+		});
+
+		const oResizeBarsSpy = this.spy(oSplitter, "_resizeBars");
+
+		oSplitter.placeAt("qunit-fixture");
+		oCore.applyChanges();
+
+		// Assert
+		assert.ok(oResizeBarsSpy.notCalled, "Bars size calculations should NOT happen if the theme is not applied");
+		assert.notOk(oSplitter._bThemeApplied, "'_bThemeApplied' is false");
+
+		// Act
+		fnThemeAppliedCb();
+
+		// Assert
+		assert.ok(oResizeBarsSpy.called, "Bars size calculations should happen if the theme is applied");
+		assert.ok(oSplitter._bThemeApplied, "'_bThemeApplied' is true");
+
+		// Clean up
 		oSplitter.destroy();
 	});
 
