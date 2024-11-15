@@ -42,8 +42,8 @@ sap.ui.define(['sap/ui/Device', "sap/ui/dom/getScrollbarSize", "sap/ui/core/Conf
 		var sContentSize = oScrollBar.getContentSize();
 
 		var oBSS = getScrollbarSize(sScrollBarTouchClass);
-		var sWidth = oBSS.width;
-		var sHeight = oBSS.height;
+		var sWidth = oBSS.width || 1;
+		var sHeight = oBSS.height || 1;
 
 		if (bVertical) {
 			// First div. <div style="overflow:hidden;width:16px;height:200px">
