@@ -26,7 +26,8 @@ sap.ui.define(['sap/base/util/JSTokenizer'], function(JSTokenizer) {
 				["{arr:[1,2,3,4]}", { arr: [1, 2, 3, 4] }],
 				["{arr:[1,'2',3,false]}", { arr: [1, "2", 3, false] }],
 				["{test:'{test}'}", { test: "{test}" }],
-				["{test:'\\'\"\\\\'}", { test: "'\"\\"}]
+				["{test:'\\'\"\\\\'}", { test: "'\"\\"}],
+				["{test\t:'foo'}", { test: "foo"}]
 			];
 		for (var i = 0; i < list.length; i++) {
 			var aListEntries = list[i];
@@ -49,9 +50,27 @@ sap.ui.define(['sap/base/util/JSTokenizer'], function(JSTokenizer) {
 				"{test:'{test}',test}",
 				"{test:'\'\"\\'}"
 		].forEach(function(input) {
-			assert.throws(function() { JSTokenizer.parseJS(input); }, "Invalid " + input);
+			assert.throws(function() { JSTokenizer.parseJS(input); }, SyntaxError, "Invalid " + input);
 		});
 	});
+
+	QUnit.test("bad name", function(assert) {
+		var input = "{foo:'',}";
+		var expectedError = new SyntaxError(
+			"Syntax error: Unexpected character '}'.\n\n" +
+			"{foo:'',}\n" +
+			"        ^"
+		);
+		expectedError.at = input.indexOf("}") + 1; // 'at' positions are 1-based
+		expectedError.text = input;
+
+		assert.throws(
+			function() { JSTokenizer.parseJS(input); },
+			expectedError,
+			"'Bad name' syntax error provides context information"
+		);
+	});
+
 
 	QUnit.test("tokenizer with enhancements getCh, getIndex, init, setIndex", function (assert) {
 		var oTokenizer = new JSTokenizer(),
