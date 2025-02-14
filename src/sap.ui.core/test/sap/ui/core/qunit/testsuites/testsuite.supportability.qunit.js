@@ -126,6 +126,14 @@ sap.ui.define([], function() {
 			},
 			"performance/XHRInterceptor": {
 				title: "sap.ui.performance.XHRInterceptor"
+			},
+			"performance/FetchInterceptor": {
+				title: "sap.ui.performance.FetchInterceptor",
+				loader: {
+					paths: {
+						performance: "test-resources/sap/ui/core/qunit/performance"
+					}
+				}
 			}
 		}
 	};
