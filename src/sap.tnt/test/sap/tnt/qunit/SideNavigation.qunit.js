@@ -476,8 +476,8 @@ sap.ui.define([
 		});
 	});
 
-	QUnit.test("Aria attributes - aria-label", function (assert) {
-
+	QUnit.test("Aria attributes - aria-label",  function (assert) {
+		const oRB = Core.getLibraryResourceBundle("sap.tnt");
 		var label = "Side navigation menu with options";
 
 		assert.notOk(this.sideNavigation.$().attr('aria-label'),  'aria-label is not set initially');
@@ -486,5 +486,7 @@ sap.ui.define([
 		Core.applyChanges();
 
 		assert.strictEqual(this.sideNavigation.$().attr('aria-label'), label, 'aria-label is as expected');
+		assert.strictEqual(this.sideNavigation.getAggregation("item").$().attr('aria-label'), oRB.getText("SIDE_NAVIGATION_FLEXIBLE_LIST_LABEL"), 'ul for flexible list should have aria-label "Primary Navigation Menu"');
+		assert.strictEqual(this.sideNavigation.getAggregation("fixedItem").$().attr('aria-label'), oRB.getText("SIDE_NAVIGATION_FIXED_LIST_LABEL"), 'ul for fixed list should have aria-label "Footer Navigation Menu"');
 	});
 });
