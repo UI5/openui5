@@ -487,7 +487,6 @@ sap.ui.define([
 						window.sessionStorage.setItem(sWhatsNewReloadFlag, true);
 					}
 				});
-				 GeneralTour.getTourContent();
 				oGuidedTour.autoStart(GeneralTour.getTourContent());
 			} else if (bShowWhatsNew) {
 				this.getWhatsNew().initializeWhatsNewDialog();
@@ -622,7 +621,6 @@ sap.ui.define([
 			if (!bSkipRestart) {
 				ReloadInfoAPI.removeInfoSessionStorage(this.getRootControlInstance());
 				ReloadManager.handleReloadOnExit(oReloadInfo);
-				ReloadManager.removeDontShowWhatsNewAfterReload();
 			}
 			VersionsAPI.clearInstances();
 		} catch (vError) {
@@ -1045,8 +1043,13 @@ sap.ui.define([
 		const bHasConnectors = aConnectors.length > 0;
 		const bHasOnlyAllowedConnectors = bHasConnectors
 		&& aConnectors.every((sConnector) => !aProhibitedConnectors.includes(sConnector));
+		const sUIAdaptationTourReloadFlag = "sap.ui.rta.dontShowUIAdaptationTourAfterReload";
 
-		if (!bHasOnlyAllowedConnectors || LayerUtils.isDeveloperLayer(sLayer)) {
+		if (
+			!bHasOnlyAllowedConnectors
+			|| LayerUtils.isDeveloperLayer(sLayer)
+			|| window.sessionStorage.getItem(sUIAdaptationTourReloadFlag)
+		) {
 			return false;
 		}
 
@@ -1066,6 +1069,11 @@ sap.ui.define([
 		}
 
 		const bHasSeenWNFeatures = (await FeaturesAPI.getSeenFeatureIds({ layer: sLayer })).length > 0;
+
+		// UI Adaptation Tour should only be shown once per session
+		if (!bHasSeenWNFeatures) {
+			window.sessionStorage.setItem(sUIAdaptationTourReloadFlag, true);
+		}
 		return !bHasSeenWNFeatures;
 	}
 
