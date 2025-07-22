@@ -160,6 +160,7 @@ builder:
             name: sap-ui-integration
             filters:
               - sap/ui/core/boot/
+              - sap/ui/base/config/
               - sap/ui/thirdparty/jquery-compat.js
               - sap/ui/core/Core.js
               - sap/ui/core/CustomData.js
@@ -227,6 +228,7 @@ builder:
           - mode: provided
             filters:
               - sap/ui/core/boot/
+              - sap/ui/base/config/
               - sap/ui/thirdparty/jquery-compat.js
               - sap/ui/core/Core.js
               - sap/ui/core/CustomData.js
