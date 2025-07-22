@@ -1683,7 +1683,7 @@ sap.ui.define([
 			this._bPosCalced = true;
 
 			//set position of popover to calculated position
-			var iPlacePos = this._placements.indexOf(this._oCalcedPos);
+			var iPlacePos = this._placements.indexOf(this._getCalculatedPlacement());
 			this.oPopup.setPosition(this._myPositions[iPlacePos], this._atPositions[iPlacePos], oParentDomRef, this._calcOffset(this._offsets[iPlacePos]), "fit");
 		};
 
