@@ -147,7 +147,14 @@ sap.ui.define(["sap/base/i18n/Localization", "sap/ui/core/Renderer", "sap/ui/cor
 		if (iModeOrder == -1) {
 			openStartCell("ModeCol", "SelCol", "TABLE_SELECTION_COLUMNHEADER").openEnd();
 			if (bRenderAriaSelected && sMode == "MultiSelect") {
-				rm.renderControl(oTable.getMultiSelectMode() == MultiSelectMode.ClearAll ? oTable._getClearAllButton() : oTable._getSelectAllCheckbox());
+				if (oTable.getMultiSelectMode() == MultiSelectMode.ClearAll) {
+					rm.renderControl(oTable._getClearAllButton());
+				} else {
+					const oBundle = Library.getResourceBundleFor("sap.m");
+					rm.attr("aria-description",
+						oBundle.getText("TABLE_SELECTION_COLUMNHEADER_DESCRIPTION") + " " + oBundle.getText("ACC_CTR_STATE_NOT_CHECKED"));
+					rm.renderControl(oTable._getSelectAllCheckbox());
+				}
 			}
 			rm.close(sCellTag);
 			iIndex++;

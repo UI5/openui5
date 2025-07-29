@@ -1126,6 +1126,23 @@ sap.ui.define([
 		assert.ok(!oColumnHeader._isInColumnHeaderContext , "Label is not marked as column header label");
 		assert.ok(oColumn.getHeader().hasListeners("_change"), "Property change event handler is added for the new column header");
 
+		sut.setMode("MultiSelect");
+		Core.applyChanges();
+
+		const $tblSelectionColumnHeder = sut.$("tblHeadModeCol");
+		assert.equal($tblSelectionColumnHeder.attr("role"), "columnheader", "Selection column header has role columnheader");
+		assert.equal($tblSelectionColumnHeder.attr("aria-label"), oResourceBundle.getText("TABLE_SELECTION_COLUMNHEADER"),
+					"Selection column header has correct aria-label");
+		assert.equal($tblSelectionColumnHeder.attr("aria-description"),
+					oResourceBundle.getText("TABLE_SELECTION_COLUMNHEADER_DESCRIPTION") + " " + oResourceBundle.getText("ACC_CTR_STATE_NOT_CHECKED"),
+					"Selection column header has correct aria-description");
+
+		sut.selectAll();
+
+		assert.equal($tblSelectionColumnHeder.attr("aria-description"),
+					oResourceBundle.getText("TABLE_SELECTION_COLUMNHEADER_DESCRIPTION") + " " + oResourceBundle.getText("ACC_CTR_STATE_CHECKED"),
+					"Selection column header aria-description has updated to checked state");
+
 		// _setFooterAnnouncment() test
 		var $tblFooter = sut.$("tblFooter").trigger("focus");
 		oInvisibleText = document.getElementById($tblFooter.attr("aria-labelledby"));
