@@ -4375,15 +4375,12 @@ sap.ui.define([
 			.expectChange("manager_id", ["3"]);
 
 		return this.createView(assert, sView, oModel).then(function () {
-			that.expectRequest("EMPLOYEES?$select=ID&$expand=EMPLOYEE_2_TEAM($select=Team_Id;"
-					+ "$expand=TEAM_2_MANAGER($select=ID))&$filter=ID eq '1'", {
-					value : [{
-						ID : "1",
-						EMPLOYEE_2_TEAM : {
-							Team_Id : "2*",
-							TEAM_2_MANAGER : {ID : "3*"}
-						}
-					}]
+			that.expectRequest("EMPLOYEES('1')?$select=EMPLOYEE_2_TEAM&$expand="
+					+ "EMPLOYEE_2_TEAM($select=Team_Id;$expand=TEAM_2_MANAGER($select=ID))", {
+					EMPLOYEE_2_TEAM : {
+						Team_Id : "2*",
+						TEAM_2_MANAGER : {ID : "3*"}
+					}
 				})
 				.expectChange("team_id", ["2*"])
 				.expectChange("manager_id", ["3*"]);
@@ -4563,16 +4560,6 @@ sap.ui.define([
 			]);
 		}).then(function () {
 			that.expectRequest("SalesOrderList('SO1')/SO_2_SOITEM?sap-client=123"
-					+ "&$select=GrossAmount,ItemPosition,SalesOrderID"
-					+ "&$filter=SalesOrderID eq 'SO1' and ItemPosition eq '0010'", {
-					value : [{
-						GrossAmount : "42.2",
-						ItemPosition : "0010",
-						SalesOrderID : "SO1"
-					}]
-				})
-				.expectChange("grossAmount", ["42.2"])
-				.expectRequest("SalesOrderList('SO1')/SO_2_SOITEM?sap-client=123"
 					+ "&$select=ItemPosition,Note,Quantity,SalesOrderID"
 					+ "&$filter=SalesOrderID eq 'SO1' and ItemPosition eq '0010'"
 					+ " or SalesOrderID eq 'SO1' and ItemPosition eq '0020'&$top=2", {
@@ -4586,7 +4573,13 @@ sap.ui.define([
 						SalesOrderID : "SO1"
 					}]
 				})
-				.expectChange("quantity", ["5.000", "3.000"]);
+				.expectChange("quantity", ["5.000", "3.000"])
+				.expectRequest("SalesOrderList('SO1')"
+					+ "/SO_2_SOITEM(SalesOrderID='SO1',ItemPosition='0010')?sap-client=123"
+					+ "&$select=GrossAmount", {
+					GrossAmount : "42.2"
+				})
+				.expectChange("grossAmount", ["42.2"]);
 
 			oItemsTable = that.oView.byId("items");
 
@@ -4713,8 +4706,7 @@ sap.ui.define([
 }, {
 	name : "property of undeleted context",
 	run : function (_assert, oUndeletedContext) {
-		this.expectRequest("SalesOrderList?$select=Note,SalesOrderID&$filter=SalesOrderID eq '2'",
-				{value : [{Note : "Note 2", SalesOrderID : "2"}]});
+		this.expectRequest("SalesOrderList('2')?$select=Note", {Note : "Note 2"});
 
 		return oUndeletedContext.requestSideEffects(["Note"]);
 	}
@@ -6833,7 +6825,8 @@ sap.ui.define([
 	// Ignore unchanged binding-specific parameters ("$$*").
 	// JIRA: CPOUI5ODATAV4-939
 	QUnit.test("Absolute ODLB changing parameters; sap-valid-*", function (assert) {
-		var sView = '\
+		var oBinding,
+			sView = '\
 <Table id="table" items="{\
 	path : \'/EMPLOYEES\',\
 	parameters : {\
@@ -6855,6 +6848,8 @@ sap.ui.define([
 			.expectChange("name", ["Jonathan Smith", "Frederic Fall"]);
 
 		return this.createView(assert, sView).then(function () {
+			oBinding = that.oView.byId("table").getBinding("items");
+
 			that.expectRequest("EMPLOYEES?$select=ID,Name&foo=bar"
 					+ "&$expand=EMPLOYEE_2_MANAGER($select=ID)&$search=Fall"
 					+ "&sap-valid-from=2016-01-01&sap-valid-to=2016-12-31T23:59:59.9Z"
@@ -6868,7 +6863,7 @@ sap.ui.define([
 				.expectChange("name", ["Frederic Fall"]);
 
 			// code under test
-			that.oView.byId("table").getBinding("items").changeParameters({
+			oBinding.changeParameters({
 				$$ownRequest : true,
 				$$sharedRequest : undefined,
 				$expand : {EMPLOYEE_2_MANAGER : {$select : "ID"}},
@@ -6881,6 +6876,20 @@ sap.ui.define([
 			});
 
 			return that.waitForChanges(assert);
+		}).then(function () {
+			that.expectRequest("EMPLOYEES('2')?$select=ID,Name&foo=bar"
+					+ "&sap-valid-from=2016-01-01&sap-valid-to=2016-12-31T23:59:59.9Z", {
+					ID : "2",
+					Name : "Frederic Spring"
+				})
+				.expectChange("name", ["Frederic Spring"]);
+
+			return Promise.all([
+				// code under test
+				oBinding.getCurrentContexts()[0].requestSideEffects(["ID"]),
+				oBinding.getCurrentContexts()[0].requestSideEffects(["Name"]),
+				that.waitForChanges(assert, "side effect: ID, Name for a single row")
+			]);
 		});
 	});
 
@@ -15279,14 +15288,9 @@ sap.ui.define([
 					url : "Artists(ArtistID='42',IsActiveEntity=true)",
 					payload : {Picture : null}
 				})
-				.expectRequest("Artists?$select=ArtistID,IsActiveEntity,Picture"
-					+ "&$filter=ArtistID eq '42' and IsActiveEntity eq true", {
-					value : [{
-						ArtistID : "42",
-						IsActiveEntity : true,
-						// Picture (Edm.Stream) missing here
-						"Picture@odata.mediaContentType" : null
-					}]
+				.expectRequest("Artists(ArtistID='42',IsActiveEntity=true)?$select=Picture", {
+					// Picture (Edm.Stream) missing here
+					"Picture@odata.mediaContentType" : null
 				})
 				.expectChange("link", sLink); // due to "Picture@$ui5.noData : true" being set
 
@@ -25506,19 +25510,16 @@ sap.ui.define([
 			assert.strictEqual(aResults[1], sExpectedDownloadUrl,
 				"JIRA: CPOUI5ODATAV4-1920, CPOUI5ODATAV4-2275");
 
-			that.expectRequest("Artists"
-						+ "?$select=ArtistID,IsActiveEntity,Messages,_/NodeID,defaultChannel"
-					+ "&$filter=ArtistID eq '0' and IsActiveEntity eq true", {
-					value : [{
-						"@odata.etag" : "etag0.1",
-						ArtistID : "0",
-						IsActiveEntity : true,
-						Messages : [],
-						_ : {
-							NodeID : "0,true"
-						},
-						defaultChannel : "160"
-					}]
+			that.expectRequest("Artists(ArtistID='0',IsActiveEntity=true)"
+					+ "?$select=ArtistID,IsActiveEntity,Messages,_/NodeID,defaultChannel", {
+					"@odata.etag" : "etag0.1",
+					ArtistID : "0",
+					IsActiveEntity : true,
+					Messages : [],
+					_ : {
+						NodeID : "0,true"
+					},
+					defaultChannel : "160"
 				});
 
 			return Promise.all([
@@ -25529,17 +25530,13 @@ sap.ui.define([
 		}).then(function () {
 			assert.strictEqual(oRoot.getProperty("defaultChannel"), "160");
 
-			that.expectRequest("Artists?$select=ArtistID,IsActiveEntity,_/NodeID,defaultChannel"
-					+ "&$filter=ArtistID eq '0' and IsActiveEntity eq true", {
-					value : [{
-						"@odata.etag" : "etag0.2",
-						ArtistID : "0",
-						IsActiveEntity : true,
-						_ : {
-							NodeID : "0,true"
-						},
-						defaultChannel : "260"
-					}]
+			that.expectRequest("Artists(ArtistID='0',IsActiveEntity=true)"
+					+ "?$select=_/NodeID,defaultChannel", {
+					"@odata.etag" : "etag0.2",
+					_ : {
+						NodeID : "0,true"
+					},
+					defaultChannel : "260"
 				});
 
 			return Promise.all([
@@ -25591,19 +25588,16 @@ sap.ui.define([
 				oRoot.requestRefresh();
 			}, new Error("Cannot refresh " + oRoot + " when using data aggregation"));
 
-			that.expectRequest("Artists"
-						+ "?$select=ArtistID,IsActiveEntity,Messages,_/NodeID,defaultChannel"
-					+ "&$filter=ArtistID eq '0' and IsActiveEntity eq true", {
-					value : [{
-						"@odata.etag" : "etag0.3",
-						ArtistID : "0",
-						IsActiveEntity : true,
-						Messages : [],
-						_ : { // in case we get a value, we will happily check it :-)
-							NodeID : "-0,true-"
-						},
-						defaultChannel : "360"
-					}]
+			that.expectRequest("Artists(ArtistID='0',IsActiveEntity=true)"
+					+ "?$select=ArtistID,IsActiveEntity,Messages,_/NodeID,defaultChannel", {
+					"@odata.etag" : "etag0.3",
+					ArtistID : "0",
+					IsActiveEntity : true,
+					Messages : [],
+					_ : { // in case we get a value, we will happily check it :-)
+						NodeID : "-0,true-"
+					},
+					defaultChannel : "360"
 				})
 				.expectMessages([{
 					message : sErrorMessage,
@@ -26605,13 +26599,11 @@ sap.ui.define([
 				}) // 204 No Content
 				.expectRequest({
 					batchNo : 3,
-					url : "EMPLOYEES?$select=AGE,ID,Name&$filter=ID eq '2'"
+					url : "EMPLOYEES('2')?$select=AGE,ID,Name"
 				}, {
-					value : [{
-						AGE : 66, // artificial side effect
-						ID : "2",
-						Name : "Kappa: κ"
-					}]
+					AGE : 66, // artificial side effect
+					ID : "2",
+					Name : "Kappa: κ"
 				});
 
 			oNameBinding = oTable.getRows()[2].getCells()[4].getBinding("value");
@@ -34049,7 +34041,7 @@ make root = ${bMakeRoot}`;
 					: that.oView.byId("table").getBinding("items");
 
 			that.expectRequest("Artists(ArtistID='42',IsActiveEntity=false)/_Publication"
-				+ "?$select=Price,PublicationID&$filter=Price gt 8&$skip=0&$top=100", {
+					+ "?$select=Price,PublicationID&$filter=Price gt 8&$skip=0&$top=100", {
 					value : [{
 						Price : "8.88",
 						PublicationID : "42-0"
@@ -34458,18 +34450,18 @@ make root = ${bMakeRoot}`;
 		}).then(function () {
 			// 2a. Refresh the RVC, expect one request
 			that.expectRequest("Artists(ArtistID='23',IsActiveEntity=false)"
-				+ "?$select=ArtistID,IsActiveEntity,Messages,Name"
-				+ "&$expand=BestFriend($select=ArtistID,IsActiveEntity,Name)", {
-				ArtistID : "23",
-				IsActiveEntity : false,
-				Messages : [],
-				Name : "DJ Bobo",
-				BestFriend : {
-					ArtistID : "32",
-					IsActiveEntity : true,
-					Name : "Robin Schulz"
-				}
-			});
+					+ "?$select=ArtistID,IsActiveEntity,Messages,Name"
+					+ "&$expand=BestFriend($select=ArtistID,IsActiveEntity,Name)", {
+					ArtistID : "23",
+					IsActiveEntity : false,
+					Messages : [],
+					Name : "DJ Bobo",
+					BestFriend : {
+						ArtistID : "32",
+						IsActiveEntity : true,
+						Name : "Robin Schulz"
+					}
+				});
 
 			return Promise.all([
 				// code under test
@@ -38679,14 +38671,15 @@ make root = ${bMakeRoot}`;
 			}),
 			oTable,
 			sView = '\
-<t:Table id="table" rows="{/Artists(\'42\')/_Publication}" threshold="0" visibleRowCount="2">\
+<t:Table id="table" rows="{/Artists(ArtistID=\'42\',IsActiveEntity=true)/_Publication}"\
+		threshold="0" visibleRowCount="2">\
 	<Text id="id" text="{PublicationID}"/>\
 	<Text id="price" text="{Price}"/>\
 </t:Table>',
 			that = this;
 
-		this.expectRequest("Artists('42')/_Publication?$select=Price,PublicationID"
-				+ "&$skip=0&$top=2", {
+		this.expectRequest("Artists(ArtistID='42',IsActiveEntity=true)/_Publication"
+				+ "?$select=Price,PublicationID&$skip=0&$top=2", {
 				value : [{
 					Price : "1.11",
 					PublicationID : "42-1"
@@ -38710,7 +38703,7 @@ make root = ${bMakeRoot}`;
 		}).then(function () {
 			that.expectRequest({
 					method : "POST",
-					url : "Artists('42')/_Publication",
+					url : "Artists(ArtistID='42',IsActiveEntity=true)/_Publication",
 					payload : {PublicationID : "New 1"}
 				}, {
 					Price : "3.33",
@@ -38724,14 +38717,8 @@ make root = ${bMakeRoot}`;
 				that.waitForChanges(assert)
 			]);
 		}).then(function () {
-			that.expectRequest("Artists('42')/_Publication"
-					+ "?$select=Price,PublicationID"
-					+ "&$filter=PublicationID eq '42-1'", {
-					value : [{
-						Price : "1.12",
-						PublicationID : "42-1"
-					}]
-				})
+			that.expectRequest("Artists(ArtistID='42',IsActiveEntity=true)/_Publication('42-1')"
+					+ "?$select=Price", {Price : "1.12"})
 				.expectChange("price", [, "1.12"]);
 
 			return Promise.all([
@@ -38741,7 +38728,7 @@ make root = ${bMakeRoot}`;
 				that.waitForChanges(assert)
 			]);
 		}).then(function () {
-			that.expectRequest("Artists('42')/_Publication('New 1')"
+			that.expectRequest("Artists(ArtistID='42',IsActiveEntity=true)/_Publication('New 1')"
 					+ "?$select=Messages,Price,PublicationID", {
 					Messages : [],
 					Price : "3.34",
@@ -38764,7 +38751,7 @@ make root = ${bMakeRoot}`;
 
 			return that.waitForChanges(assert);
 		}).then(function () {
-			that.expectRequest("Artists('42')/_Publication"
+			that.expectRequest("Artists(ArtistID='42',IsActiveEntity=true)/_Publication"
 					+ "?$select=Price,PublicationID"
 					+ "&$filter=PublicationID eq 'New 1' or "
 					+ "PublicationID eq '42-1' or PublicationID eq '42-2'&$top=3", {
@@ -38967,23 +38954,18 @@ make root = ${bMakeRoot}`;
 		return this.createView(assert, sView, oModel).then(function () {
 			oBestFriendBox = that.oView.byId("table").getItems()[1].getCells()[0];
 
-			that.expectRequest("Artists?$select=ArtistID,IsActiveEntity"
+			that.expectRequest("Artists(ArtistID='24',IsActiveEntity=true)?$select=BestFriend"
 					+ "&$expand=BestFriend($select=ArtistID,IsActiveEntity,Name;"
-						+ "$expand=BestPublication($select=CurrencyCode,PublicationID))"
-					+ "&$filter=ArtistID eq '24' and IsActiveEntity eq true", {
-					value : [{
-						ArtistID : "24",
-						BestFriend : {
-							ArtistID : "44",
-							BestPublication : {
-								CurrencyCode : "JPY2",
-								PublicationID : "44-0"
-							},
-							IsActiveEntity : true,
-							Name : "New Best Friend of 24"
+						+ "$expand=BestPublication($select=CurrencyCode,PublicationID))", {
+					BestFriend : {
+						ArtistID : "44",
+						BestPublication : {
+							CurrencyCode : "JPY2",
+							PublicationID : "44-0"
 						},
-						IsActiveEntity : true
-					}]
+						IsActiveEntity : true,
+						Name : "New Best Friend of 24"
+					}
 				})
 				.expectChange("currency", [, "JPY2"])
 				.expectChange("name", [, "New Best Friend of 24"]);
@@ -38995,34 +38977,29 @@ make root = ${bMakeRoot}`;
 				}, {
 					$PropertyPath : "Name"
 				}]),
-				that.waitForChanges(assert, "Scenario 1")
+				that.waitForChanges(assert, "Scenario 1 (a)")
 			]);
 		}).then(function () {
 			var oBestPublicationBox = oBestFriendBox.getItems()[1];
 
-			that.expectRequest("Artists?$select=ArtistID,IsActiveEntity"
+			that.expectRequest("Artists(ArtistID='24',IsActiveEntity=true)?$select=BestFriend"
 					+ "&$expand=BestFriend($select=ArtistID,IsActiveEntity;"
-						+ "$expand=BestPublication($select=CurrencyCode,PublicationID))"
-					+ "&$filter=ArtistID eq '24' and IsActiveEntity eq true", {
-					value : [{
-						ArtistID : "24",
-						BestFriend : {
-							ArtistID : "44",
-							BestPublication : {
-								CurrencyCode : "JPY3",
-								PublicationID : "44-0"
-							},
-							IsActiveEntity : true
+						+ "$expand=BestPublication($select=CurrencyCode,PublicationID))", {
+					BestFriend : {
+						ArtistID : "44",
+						BestPublication : {
+							CurrencyCode : "JPY3",
+							PublicationID : "44-0"
 						},
 						IsActiveEntity : true
-					}]
+					}
 				})
 				.expectChange("currency", [, "JPY3"]);
 
 			return Promise.all([
 				// code under test
 				oBestPublicationBox.getBindingContext().requestSideEffects(["CurrencyCode"]),
-				that.waitForChanges(assert, "Scenario 1")
+				that.waitForChanges(assert, "Scenario 1 (b)")
 			]);
 		}).then(function () {
 			var oHeaderContext = that.oView.byId("table").getBinding("items").getHeaderContext();
@@ -40693,15 +40670,16 @@ make root = ${bMakeRoot}`;
 	// Scenario: property binding with "##"-path pointing to a metamodel property.
 	// CPOUI5UISERVICESV3-1676
 	testViewStart("Property binding with metapath", '\
-<FlexBox binding="{/Artists(\'42\')}">\
+<FlexBox binding="{/Artists(ArtistID=\'42\',IsActiveEntity=true)}">\
 	<Text id="label0" text="{Name##@com.sap.vocabularies.Common.v1.Label}"/>\
 	<Text id="name" text="{Name}"/>\
 </FlexBox>\
 <Text id="insertable"\
 	text="{/Artists##@Org.OData.Capabilities.V1.InsertRestrictions/Insertable}"/>\
 <Text id="label1" text="{/Artists##/@com.sap.vocabularies.Common.v1.Label}"/>',
-		{"Artists('42')?$select=ArtistID,IsActiveEntity,Name" : {
-			//ArtistID : ..., IsActiveEntity : ...
+		{"Artists(ArtistID='42',IsActiveEntity=true)?$select=ArtistID,IsActiveEntity,Name" : {
+			ArtistID : "42",
+			IsActiveEntity : true,
 			Name : "Foo"
 		}},
 		{label0 : "Artist Name", name : "Foo", insertable : true, label1 : "Artist"},
@@ -40730,12 +40708,13 @@ make root = ${bMakeRoot}`;
 	// has an object value.
 	// CPOUI5UISERVICESV3-1676
 	testViewStart("Relative data property binding with object value", '\
-<FlexBox binding="{/Artists(\'42\')}">\
+<FlexBox binding="{/Artists(ArtistID=\'42\',IsActiveEntity=true)}">\
 	<Text id="publicationCount" text="{:= %{_Publication}.length }"/>\
 </FlexBox>',
-		{"Artists('42')?$select=ArtistID,IsActiveEntity&$expand=_Publication($select=PublicationID)" : {
-			//ArtistID : ..., IsActiveEntity : ...
-			_Publication : [{/*PublicationID : ...*/}, {}, {}]
+		{"Artists(ArtistID='42',IsActiveEntity=true)?$select=ArtistID,IsActiveEntity&$expand=_Publication($select=PublicationID)" : {
+			ArtistID : "42",
+			IsActiveEntity : true,
+			_Publication : [{PublicationID : "n/a"}, {}, {}]
 		}},
 		{publicationCount : 3},
 		function () {
@@ -41194,8 +41173,8 @@ make root = ${bMakeRoot}`;
 				"/special/CurrencyCode/$metadata"
 					: {source : "odata/v4/data/metadata_CurrencyCode.xml"}
 			}),
-			oOperationBinding
-				= oModel.bindContext("/Artists('42')/_Publication/special.cases.Create(...)"),
+			oOperationBinding = oModel.bindContext("/Artists(ArtistID='42',IsActiveEntity=true)"
+				+ "/_Publication/special.cases.Create(...)"),
 			oPropertyBinding
 				= oModel.bindProperty("CurrencyCode", oOperationBinding.getParameterContext());
 
@@ -41225,8 +41204,8 @@ make root = ${bMakeRoot}`;
 				"/special/Price/$metadata"
 					: {source : "odata/v4/data/metadata_Price.xml"}
 			}),
-			oOperationBinding
-				= oModel.bindContext("/Artists('42')/_Publication/special.cases.Create(...)"),
+			oOperationBinding = oModel.bindContext("/Artists(ArtistID='42',IsActiveEntity=true)"
+				+ "/_Publication/special.cases.Create(...)"),
 			oPropertyBinding
 				= oModel.bindProperty("Price", oOperationBinding.getParameterContext());
 
@@ -42362,8 +42341,8 @@ make root = ${bMakeRoot}`;
 				Name : "The Beatles"
 			})
 			.expectRequest("Artists(ArtistID='1',IsActiveEntity=true)/BestFriend/_Publication"
-					+ "?$select=Price,PublicationID&$skip=0&$top=100",
-					{value : [{Price : "19.99", PublicationID : "P1"}]})
+				+ "?$select=Price,PublicationID&$skip=0&$top=100",
+				{value : [{Price : "19.99", PublicationID : "P1"}]})
 			.expectChange("id", "2")
 			.expectChange("name", "The Beatles")
 			.expectChange("price", ["19.99"])
@@ -44360,12 +44339,9 @@ make root = ${bMakeRoot}`;
 
 			that.expectRequest("SalesOrderList('42')?$select=Messages,Note",
 					{Note : "refreshed Note"})
-				.expectRequest("SalesOrderList('42')/SO_2_SOITEM"
-					+ "?$select=GrossAmount,ItemPosition,SalesOrderID"
-					+ "&$filter=SalesOrderID eq '42' and ItemPosition eq '0010'", {
-					value : [
-						{GrossAmount : "1.41", ItemPosition : "0010", SalesOrderID : "42"}
-					]
+				.expectRequest("SalesOrderList('42')"
+					+ "/SO_2_SOITEM(SalesOrderID='42',ItemPosition='0010')?$select=GrossAmount", {
+					GrossAmount : "1.41"
 				})
 				.expectRequest("SalesOrderList('42')/SO_2_SCHDL?$select=ScheduleKey"
 					+ "&$skip=0&$top=100", {value : [{ScheduleKey : "B"}]})
@@ -44493,15 +44469,11 @@ make root = ${bMakeRoot}`;
 			that.expectRequest("As(1)?$select=AValue",
 					{AValue : 121}) // unrealistic, but shows the link between response and control
 				.expectChange("avalue::form", "121")
-				.expectRequest("As(1)/AtoCs?$select=CID&$expand=CtoA($select=AID,AValue)"
-					+ "&$filter=CID eq 2", {
-					value : [{
-						CID : 2,
-						CtoA : {
-							AID : 1,
-							AValue : 122 // unrealistic, see above
-						}
-					}]
+				.expectRequest("As(1)/AtoCs(2)?$select=CtoA&$expand=CtoA($select=AID,AValue)", {
+					CtoA : {
+						AID : 1,
+						AValue : 122 // unrealistic, see above
+					}
 				})
 				.expectChange("avalue::table", ["122"]);
 
@@ -51151,20 +51123,16 @@ make root = ${bMakeRoot}`;
 				}) // 204 No Content - no need to update the ETag when requesting side effects
 				.expectRequest({
 					batchNo : oFixture.patchNo,
-					url : "Artists?$select=ArtistID,IsActiveEntity,Messages,defaultChannel"
-						+ "&$filter=ArtistID eq 'A1' and IsActiveEntity eq false"
+					url : "Artists(ArtistID='A1',IsActiveEntity=false)"
+						+ "?$select=Messages,defaultChannel"
 				}, {
-					value : [{
-						"@odata.etag" : "etag.draft2",
-						ArtistID : "A1",
-						IsActiveEntity : false,
-						Messages : [{
-							message : "Updated message",
-							numericSeverity : 2,
-							target : "defaultChannel"
-						}],
-						defaultChannel : "Channel 3*"
-					}]
+					"@odata.etag" : "etag.draft2",
+					Messages : [{
+						message : "Updated message",
+						numericSeverity : 2,
+						target : "defaultChannel"
+					}],
+					defaultChannel : "Channel 3*"
 				})
 				.expectChange("defaultChannel", "Channel 3*")
 				.expectMessages([{
@@ -57384,11 +57352,8 @@ make root = ${bMakeRoot}`;
 
 		await this.createView(assert, sView, oModel);
 
-		this.expectRequest("TEAMS('TEAM_01')/TEAM_2_EMPLOYEES?$select=ID,Name&$filter=ID eq '2'", {
-				value : [{
-					ID : "2",
-					Name : "Frederic Winter"
-				}]
+		this.expectRequest("TEAMS('TEAM_01')/TEAM_2_EMPLOYEES('2')?$select=Name", {
+				Name : "Frederic Winter"
 			})
 			.expectRequest("TEAMS('TEAM_01')/TEAM_2_EMPLOYEES?$select=ID,Name&$skip=0&$top=100", {
 				value : [{
@@ -57895,9 +57860,10 @@ make root = ${bMakeRoot}`;
 			assert.strictEqual(oLastUsedChannel0.getValue(), "mail");
 			assert.strictEqual(oSendsAutoGraphs.getValue(), false);
 		}).then(function () {
-			oDummyContext = oModel.bindContext("/Artists('41')").getBoundContext();
+			oDummyContext = oModel.bindContext("/Artists(ArtistID='41',IsActiveEntity=true)")
+				.getBoundContext();
 
-			that.expectRequest("Artists('41')", {/*response doesn't matter*/});
+			that.expectRequest("Artists(ArtistID='41',IsActiveEntity=true)", {/*doesn't matter*/});
 
 			return Promise.all([
 				oDummyContext.requestObject(""),
@@ -58936,19 +58902,14 @@ make root = ${bMakeRoot}`;
 			oTable = that.oView.byId("table");
 			oListBinding = oTable.getBinding("rows");
 
-			that.expectRequest("SalesOrderList('1')/SO_2_SOITEM"
-					+ "?$select=ItemPosition,Messages,SalesOrderID"
-					+ "&$filter=SalesOrderID eq '1' and ItemPosition eq '0010'", {
-					value : [{
-						ItemPosition : "0010",
-						Messages : [{
-							code : "OK",
-							message : "Just A Message",
-							numericSeverity : 1,
-							target : "Quantity",
-							transition : false
-						}],
-						SalesOrderID : "1"
+			that.expectRequest("SalesOrderList('1')"
+					+ "/SO_2_SOITEM(SalesOrderID='1',ItemPosition='0010')?$select=Messages", {
+					Messages : [{
+						code : "OK",
+						message : "Just A Message",
+						numericSeverity : 1,
+						target : "Quantity",
+						transition : false
 					}]
 				})
 				.expectMessages([{
@@ -58989,21 +58950,19 @@ make root = ${bMakeRoot}`;
 
 			return that.waitForChanges(assert, "scroll down");
 		}).then(function () {
-			that.expectRequest("SalesOrderList('1')/SO_2_SOITEM"
-					+ "?$select=ItemPosition,Messages,Quantity,SalesOrderID"
-					+ "&$filter=SalesOrderID eq '1' and ItemPosition eq '0030'", {
-					value : [{
-						ItemPosition : "0030",
-						Messages : [{
-							code : "NEW",
-							message : "Yet Another Message",
-							numericSeverity : 2,
-							target : "Quantity",
-							transition : false
-						}],
-						Quantity : "30",
-						SalesOrderID : "1"
-					}]
+			that.expectRequest("SalesOrderList('1')"
+					+ "/SO_2_SOITEM(SalesOrderID='1',ItemPosition='0030')"
+					+ "?$select=ItemPosition,Messages,Quantity,SalesOrderID", {
+					ItemPosition : "0030",
+					Messages : [{
+						code : "NEW",
+						message : "Yet Another Message",
+						numericSeverity : 2,
+						target : "Quantity",
+						transition : false
+					}],
+					Quantity : "30",
+					SalesOrderID : "1"
 				})
 				.expectChange("quantity", [,, "30.000"])
 				.expectMessages([{
