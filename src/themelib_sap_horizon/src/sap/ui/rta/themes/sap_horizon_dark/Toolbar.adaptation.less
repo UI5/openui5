@@ -1,19 +1,19 @@
 /********************************************************************
 	Style of the RTA Toolbar (type: adaptation) - Horizon Dark Theme
 *********************************************************************/
-@_sap_ui_rta_Toolbar_Adaptation_TextColor: @sapUiShellTextColor; //#eaecee
+@_sap_ui_rta_Toolbar_Adaptation_TextColor: var(--sapShell_TextColor); //#f5f6f7
 @_sap_ui_rta_Toolbar_Adaptation_BtnFocusBorderColor: transparent;
-@_sap_ui_rta_Toolbar_Adaptation_SegBBtnTextColor: @sapUiButtonEmphasizedTextColor; //#fff
-@_sap_ui_rta_Toolbar_Adaptation_SegBBtnBackgroundColor: @sapUiShellBorderColor; //#1d232a
-@_sap_ui_rta_Toolbar_Adaptation_SegBBtnHoverBackgroundColor: @sapUiButtonHoverBorderColor; //#3a4a5a
-@_sap_ui_rta_Toolbar_Adaptation_SegBBtnFocusColor: @sapUiShellBorderColor; //#1d232a
-@_sap_ui_rta_Toolbar_Adaptation_SegBBtnSelectedBackgroundColor: darken(@sapUiButtonEmphasizedBackground, 5%); //#0064d9
-@_sap_ui_rta_Toolbar_Adaptation_BorderRadius: @sapUiButtonBorderCornerRadius; //0.5rem
-@_sap_ui_rta_Toolbar_Adaptation_DraftVersionColor: @sapUiContentRatedColor; //##ffdf72
-@_sap_ui_rta_Toolbar_Adaptation_ActiveVersionColor: @sapUiShellPositiveColor; //#97dd40
-@_sap_ui_rta_Toolbar_Adaptation_FocusOutlineColor: @sapUiContentFocusColor; //#9ad3ff
-@_sap_ui_rta_Toolbar_Adaptation_VersionListBackgroundColor: @sapUiShellBorderColor; //#1d232a
-@_sap_ui_rta_Toolbar_Adaptation_BtnHoverTextColor: @sapUiButtonLiteHoverTextColor; //#4db1ff
+@_sap_ui_rta_Toolbar_Adaptation_SegBBtnTextColor: var(--sapButton_Emphasized_TextColor); //#fff
+@_sap_ui_rta_Toolbar_Adaptation_SegBBtnBackgroundColor: var(--sapToolbar_Background); //#1d232a
+@_sap_ui_rta_Toolbar_Adaptation_SegBBtnHoverBackgroundColor: var(--sapButton_Hover_BorderColor); //#3a4a5a
+@_sap_ui_rta_Toolbar_Adaptation_SegBBtnFocusColor: var(--sapToolbar_Background); //#1d232a
+@_sap_ui_rta_Toolbar_Adaptation_SegBBtnSelectedBackgroundColor: ~"hsl(from var(--sapButton_Emphasized_Background) h s calc(l - 5) / alpha)"; // #0064d9, darken the emphasized button background by 5%
+@_sap_ui_rta_Toolbar_Adaptation_BorderRadius: var(--sapButton_BorderCornerRadius); //0.5rem
+@_sap_ui_rta_Toolbar_Adaptation_DraftVersionColor: var(--sapContent_RatedColor); //##ffdf72
+@_sap_ui_rta_Toolbar_Adaptation_ActiveVersionColor: var(--sapShell_PositiveColor); //#97dd40
+@_sap_ui_rta_Toolbar_Adaptation_FocusOutlineColor: var(--sapContent_FocusColor); //#9ad3ff
+@_sap_ui_rta_Toolbar_Adaptation_VersionListBackgroundColor: var(--sapToolbar_Background); //#1d232a
+@_sap_ui_rta_Toolbar_Adaptation_BtnHoverTextColor: var(--sapButton_Lite_Hover_TextColor); //#4db1ff
 
 .sapUiRtaMode {
 	.sapUiRtaToolbar.sapUiRtaToolbarAdaptation {
