@@ -300,7 +300,7 @@ sap.ui.define([
 			throw oException;
 		};
 
-		return _parseValues.call(this, [vValue], sSourceType, iIndex, fnParse, fnHandleError);
+		return _parseValues.call(this, [vValue], sSourceType, iIndex, fnParse, fnHandleError, false);
 
 	}
 
@@ -335,11 +335,11 @@ sap.ui.define([
 			throw oException;
 		};
 
-		return _parseValues.call(this, aValues, sSourceType, iIndex, fnParse, fnHandleError);
+		return _parseValues.call(this, aValues, sSourceType, iIndex, fnParse, fnHandleError, true);
 
 	}
 
-	function _parseValues(aValues, sSourceType, iIndex, fnParse, fnHandleError) {
+	function _parseValues(aValues, sSourceType, iIndex, fnParse, fnHandleError, bIgnoreDuplicates) {
 
 		const aSyncPromises = [];
 
@@ -350,7 +350,7 @@ sap.ui.define([
 		const aConditions = SyncPromise.all(aSyncPromises).then(function(aNewConditions) {
 			let aConditions = this.oFormatOptions.getConditions && this.oFormatOptions.getConditions();
 			for (let i = 0; i < aNewConditions.length; i++) {
-				aConditions = _parseConditionToConditions.call(this, aNewConditions[i], aConditions, iIndex);
+				aConditions = _parseConditionToConditions.call(this, aNewConditions[i], aConditions, iIndex, bIgnoreDuplicates);
 				if (iIndex >= 0) {
 					iIndex++;
 				}
@@ -368,7 +368,7 @@ sap.ui.define([
 
 	}
 
-	function _parseConditionToConditions(oCondition, aConditions, iIndex) {
+	function _parseConditionToConditions(oCondition, aConditions, iIndex, bIgnoreDuplicates) {
 
 		const bIsUnit = _isUnit(this.oFormatOptions.valueType);
 		const iMaxConditions = _getMaxConditions.call(this);
@@ -383,7 +383,7 @@ sap.ui.define([
 					// if there is already a condition containing only a unit and no numeric value, remove it and use the new condition
 					aConditions.splice(0, 1);
 				}
-				if (FilterOperatorUtil.indexOfCondition(oCondition, aConditions) === -1) { // check if already exist (compare with old conditions as multiple values are checked for duplicates before)
+				if (FilterOperatorUtil.indexOfCondition(oCondition, aConditions) === -1) { // check if already exist (compare with old conditions as multiple values are not checked for duplicates before)
 					if (iIndex >= 0 && aConditions.length > iIndex) {
 						// insert new condition
 						aConditions.splice(iIndex, 0, oCondition);
@@ -391,7 +391,7 @@ sap.ui.define([
 						// add new condition
 						aConditions.push(oCondition);
 					}
-				} else {
+				} else if (!bIgnoreDuplicates) {
 					throw new ParseException(this._oResourceBundle.getText("field.CONDITION_ALREADY_EXIST", [oCondition.values[0]]));
 				}
 

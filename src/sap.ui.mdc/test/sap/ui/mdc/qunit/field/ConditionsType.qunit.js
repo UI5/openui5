@@ -378,6 +378,18 @@ sap.ui.define([
 		_checkCondition(assert, aConditions[0], OperatorName.EQ, ["X"], ConditionValidated.NotValidated);
 		_checkCondition(assert, aConditions[1], OperatorName.EQ, ["I1\n!=I2\nI3	I5"], ConditionValidated.NotValidated);
 
+		// ignore duplicates
+		aConditions = [Condition.createCondition(OperatorName.EQ, ["X"], undefined, undefined, ConditionValidated.NotValidated, undefined)];
+		oConditionsType.setFormatOptions({operators: [OperatorName.EQ], maxConditions: -1, multipleLines: false, getConditions: function() {return aConditions;}, asyncParsing: fnAsync});
+		aConditions = oConditionsType.parseValue("I1\nI2\nI1\nI3");
+		assert.ok(aConditions, "Result returned");
+		assert.ok(Array.isArray(aConditions), "Arry returned");
+		assert.equal(aConditions.length, 4, "4 condition returned");
+		_checkCondition(assert, aConditions[0], OperatorName.EQ, ["X"], ConditionValidated.NotValidated);
+		_checkCondition(assert, aConditions[1], OperatorName.EQ, ["I1"], ConditionValidated.NotValidated);
+		_checkCondition(assert, aConditions[2], OperatorName.EQ, ["I2"], ConditionValidated.NotValidated);
+		_checkCondition(assert, aConditions[3], OperatorName.EQ, ["I3"], ConditionValidated.NotValidated);
+
 	});
 
 	QUnit.module("Async", {
