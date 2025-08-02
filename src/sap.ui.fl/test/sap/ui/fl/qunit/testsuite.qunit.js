@@ -106,20 +106,6 @@ sap.ui.define([
 				}
 			},
 
-			"initial/_internal/Loader": {
-				group: "Initial Internal",
-				coverage: {
-					only: ["sap/ui/fl/initial/_internal/Loader"]
-				}
-			},
-
-			"initial/_internal/ManifestUtils": {
-				group: "Initial Internal",
-				coverage: {
-					only: ["sap/ui/fl/initial/_internal/ManifestUtils"]
-				}
-			},
-
 			"initial/_internal/Settings": {
 				group: "Initial Internal",
 				coverage: {
@@ -664,6 +650,20 @@ sap.ui.define([
 				group: "Apply Internal",
 				coverage: {
 					only: ["sap/ui/fl/apply/_internal/flexState/DataSelector"]
+				}
+			},
+
+			"apply/_internal/flexState/Loader": {
+				group: "Apply Internal",
+				coverage: {
+					only: ["sap/ui/fl/apply/_internal/flexState/Loader"]
+				}
+			},
+
+			"apply/_internal/flexState/ManifestUtils": {
+				group: "Apply Internal",
+				coverage: {
+					only: ["sap/ui/fl/apply/_internal/flexState/ManifestUtils"]
 				}
 			},
 
