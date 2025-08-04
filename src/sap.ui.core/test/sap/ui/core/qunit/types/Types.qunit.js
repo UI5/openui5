@@ -2971,7 +2971,11 @@ sap.ui.define([
 		const oUnitType = {};
 		if (aTypes[0]) {
 			aTypes[0].isA = () => {};
-			this.mock(aTypes[0]).expects("isA").withExactArgs("sap.ui.model.odata.type.Decimal").returns(true);
+			const oTypeMock = this.mock(aTypes[0]);
+			oTypeMock.expects("isA")
+				.withExactArgs(["sap.ui.model.odata.type.Int", "sap.ui.model.odata.type.Int64"])
+				.returns(false);
+			oTypeMock.expects("isA").withExactArgs("sap.ui.model.odata.type.Decimal").returns(true);
 		}
 
 		// code under test
@@ -2982,14 +2986,27 @@ sap.ui.define([
 });
 
 	//*********************************************************************************************
-	QUnit.test("Unit: processPartTypes, first part has non-Decimal type", function (assert) {
-		const oUnitType = {iScale : 42};
-		const oNonDecimalType = {isA() {}};
-		this.mock(oNonDecimalType).expects("isA").withExactArgs("sap.ui.model.odata.type.Decimal").returns(false);
+[
+	{bInt: undefined, iScale: undefined}, // no quantity type
+	{bInt: false, iScale: undefined}, // quantity type is not Int* and not Decimal
+	{bInt: true, iScale: 0} // quantity type is Int*
+].forEach(({bInt, iScale}, i) => {
+	QUnit.test(`Unit: processPartTypes defaults scale to '0' if measure part is integer (${i})`, function (assert) {
+		const oUnitType = {};
+		const oQuantityType = {isA() {}};
+		const aTypes = bInt === undefined ? [] : [oQuantityType];
+		if (aTypes[0]) {
+			const oTypeMock = this.mock(aTypes[0]);
+			oTypeMock.expects("isA")
+				.withExactArgs(["sap.ui.model.odata.type.Int", "sap.ui.model.odata.type.Int64"])
+				.returns(bInt);
+			oTypeMock.expects("isA").withExactArgs("sap.ui.model.odata.type.Decimal").returns(false);
+		}
 
 		// code under test
-		UnitType.prototype.processPartTypes.call(oUnitType, [oNonDecimalType]);
+		UnitType.prototype.processPartTypes.call(oUnitType, aTypes);
 
-		assert.strictEqual(oUnitType.iScale, 42);
+		assert.strictEqual(oUnitType.iScale, iScale);
 	});
+});
 });
