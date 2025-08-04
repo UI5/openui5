@@ -174,7 +174,7 @@
 				<p>Si la zone activée se trouve sur l'en-tête de colonne, le menu de l'en-tête de colonne s'ouvre.</p>
 			</description>
 		</interaction>
-		<interaction> <kbd>Shift + mouse click</kbd> <description>
+		<interaction> <kbd>Shift + MouseClick</kbd> <description>
 				<p><span class="emphasis">Si la sélection de cellule est activée&#x00a0;:</span></p>
 				<p>Si des cellules sont sélectionnées, <kbd>Shift + MouseClick</kbd> sur une autre cellule étend la sélection jusqu'à la cellule sur laquelle vous avez cliqué.</p>
 			</description>

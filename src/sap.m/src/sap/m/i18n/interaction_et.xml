@@ -115,7 +115,7 @@
 		</interaction>
 		<interaction> <kbd>Shift + MouseClick</kbd> <description>
 				<p><span class="emphasis">Kui lahtrivalik on lubatud</span></p>
-				<p>Kui valitud on lahtreid, siis otsetee <kbd>Shift</kbd> vajutamine ja mõnel muul lahtril klõpsamine laiendab valiku kuni klõpsatud lahtrini.</p>
+				<p>Kui valitud on lahtreid, siis otsetee <kbd>Shift + MouseClick</kbd> kasutamine muul lahtril laiendab valiku kuni klõpsatud lahtrini.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + C</kbd> <description>

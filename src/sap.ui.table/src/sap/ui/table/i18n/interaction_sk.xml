@@ -174,7 +174,7 @@
 				<p>Ak je zameranie na hlavičku stĺpca, otvorí sa ponuka hlavičky stĺpca.</p>
 			</description>
 		</interaction>
-		<interaction> <kbd>Shift + mouse click</kbd> <description>
+		<interaction> <kbd>Shift + MouseClick</kbd> <description>
 				<p><span class="emphasis">Ak je povolený výber buniek:</span></p>
 				<p>Ak sú vybraté bunky, <kbd>Shift + MouseClick</kbd> v inej bunke sa výber rozšíri až po bunku, na ktorú sa klikne.</p>
 			</description>

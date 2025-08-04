@@ -174,7 +174,7 @@
 				<p>Ha a fókusz az oszlopfejlécen van, megnyitja az oszlopfejlécmenüt.</p>
 			</description>
 		</interaction>
-		<interaction> <kbd>Shift + mouse click</kbd> <description>
+		<interaction> <kbd>Shift + MouseClick</kbd> <description>
 				<p><span class="emphasis">Ha engedélyezett a cellakijelölés:</span></p>
 				<p>Ha vannak kijelölve cellák, és egy másik cellánál lenyomja a(z) <kbd>Shift + MouseClick</kbd> billentyűkombinációt, akkor a kijelölés kibővül a kattintott celláig.</p>
 			</description>

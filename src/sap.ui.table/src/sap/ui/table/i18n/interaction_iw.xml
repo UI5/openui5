@@ -174,7 +174,7 @@
 				<p>אם המיקוד הוא בכותרת העמודה, תפריט כותרת העמודה נפתח.</p>
 			</description>
 		</interaction>
-		<interaction> <kbd>Shift + mouse click</kbd> <description>
+		<interaction> <kbd>Shift + MouseClick</kbd> <description>
 				<p><span class="emphasis">אם בחירת תא מופעלת:</span></p>
 				<p>אם נבחרים תאים, <kbd>Shift + MouseClick</kbd> בתא אחר מרחיב את הבחירה עד לתא שנלחץ.</p>
 			</description>

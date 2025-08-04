@@ -174,7 +174,7 @@
 				<p>Kui fookus on veerupäisel, avatakse veerupäise menüü.</p>
 			</description>
 		</interaction>
-		<interaction> <kbd>Shift + mouse click</kbd> <description>
+		<interaction> <kbd>Shift + MouseClick</kbd> <description>
 				<p><span class="emphasis">Kui lahtrivalik on lubatud</span></p>
 				<p>Kui valitud on lahtreid, siis otsetee <kbd>Shift + MouseClick</kbd> kasutamine muul lahtril laiendab valiku kuni klõpsatud lahtrini.</p>
 			</description>

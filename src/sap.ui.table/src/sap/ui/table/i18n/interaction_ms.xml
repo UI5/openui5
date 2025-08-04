@@ -174,7 +174,7 @@
 				<p>Jika fokus berada pada pengepala lajur, menu pengepala lajur dibuka.</p>
 			</description>
 		</interaction>
-		<interaction> <kbd>Shift + mouse click</kbd> <description>
+		<interaction> <kbd>Shift + MouseClick</kbd> <description>
 				<p><span class="emphasis">Jika pemilihan sel didayakan:</span></p>
 				<p>Jika sel dipilih, <kbd>Shift + MouseClick</kbd> pada sel berbeza akan meningkatkan pemilihan sehingga sel yang diklik.</p>
 			</description>

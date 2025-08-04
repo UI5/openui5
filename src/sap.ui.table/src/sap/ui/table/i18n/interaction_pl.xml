@@ -174,7 +174,7 @@
 				<p>Jeśli fokus jest ustawiony na nagłówku konkretnej kolumny, następuje otwarcie menu tego nagłówka kolumny.</p>
 			</description>
 		</interaction>
-		<interaction> <kbd>Shift + mouse click</kbd> <description>
+		<interaction> <kbd>Shift + MouseClick</kbd> <description>
 				<p><span class="emphasis">Jeśli zaznaczanie komórki jest włączone:</span></p>
 				<p>Jeśli komórki są zaznaczone, <kbd>Shift + MouseClick</kbd> na innej komórce powoduje rozszerzenie zaznaczenia do klikniętej komórki.</p>
 			</description>

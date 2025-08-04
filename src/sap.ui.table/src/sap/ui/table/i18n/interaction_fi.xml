@@ -174,7 +174,7 @@
 				<p>Jos kohdistus on sarakeotsikossa, sarakeotsikkovalikko avautuu.</p>
 			</description>
 		</interaction>
-		<interaction> <kbd>Shift + mouse click</kbd> <description>
+		<interaction> <kbd>Shift + MouseClick</kbd> <description>
 				<p><span class="emphasis">Jos solun valinta on käytössä:</span></p>
 				<p>Jos solut on valittu, <kbd>Shift + MouseClick</kbd> eri solun kohdalla laajentaa valinnan napsautettuun soluun asti.</p>
 			</description>

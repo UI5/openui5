@@ -174,7 +174,7 @@
 				<p>Hvis fokus er på kolonneoverskriften, åbnes kolonneoverskriftsmenuen.</p>
 			</description>
 		</interaction>
-		<interaction> <kbd>Shift + mouse click</kbd> <description>
+		<interaction> <kbd>Shift + MouseClick</kbd> <description>
 				<p><span class="emphasis">Hvis cellevalg er aktiveret:</span></p>
 				<p>Hvis celler er valgt, udvider <kbd>Shift + MouseClick</kbd> på en anden celle valget op til den klikkede celle.</p>
 			</description>

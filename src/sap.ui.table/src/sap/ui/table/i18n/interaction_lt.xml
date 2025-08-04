@@ -174,7 +174,7 @@
 				<p>Jei suaktyvinta stulpelio antraštė, atidaromas stulpelio antraštės meniu.</p>
 			</description>
 		</interaction>
-		<interaction> <kbd>Shift + mouse click</kbd> <description>
+		<interaction> <kbd>Shift + MouseClick</kbd> <description>
 				<p><span class="emphasis">Jei įgalintas langelių pasirinkimas:</span></p>
 				<p>Jei pasirinkti langeliai, spustelėjus <kbd>Shift + MouseClick</kbd> kitame langelyje pasirinkimas išplečiamas iki paspausto langelio.</p>
 			</description>
