@@ -61,6 +61,8 @@ sap.ui.define([
 				 * In this case this property must be set to <code>false</code>.
 				 *
 				 * By default, if not set, the list opens if the user clicks into the connected field.
+				 *
+				 * <b>Note: </b> if <code>restrictedToFixedValues</code> is set, filtering should be disabled.
 				 */
 				filterList: {
 					type: "boolean",
@@ -81,6 +83,8 @@ sap.ui.define([
 				},
 				/**
 				 * If set, the connected field must not allow other values than the items of the <code>FixedList</code>. Free text must be avoided.
+				 *
+				 * By default, if set, the list opens if the user clicks into the connected field.
 				 *
 				 * @since 1.138
 				 */
@@ -736,7 +740,7 @@ sap.ui.define([
 	 */
 	FixedList.prototype.shouldOpenOnClick = function() {
 
-		return this.getRestrictedToFixedValues();
+		return this.getRestrictedToFixedValues() || !this.getFilterList(); // on DefineConditionPanel Operator field is not a Select, but should be opened on click
 
 	};
 

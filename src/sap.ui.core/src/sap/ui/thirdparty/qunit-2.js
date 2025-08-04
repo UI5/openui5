@@ -2739,7 +2739,10 @@
   			started: 0,
   			updateRate: 1000,
   			autostart: true,
-  			filter: ""
+  			filter: "",
+			//### BEGIN MODIFIED BY SAP
+			testTimeout: 30000
+			//### END MODIFIED BY SAP
   		}, true);
 
   		if (!runStarted) {
