@@ -907,6 +907,10 @@ sap.ui.define([
 			var bSelected = aItems.length > 0 && iSelectedItemCount == iSelectableItemCount;
 			this.$("tblHeader").find(".sapMTblCellFocusable").addBack().attr("aria-selected", bSelected);
 			this._selectAllCheckBox.setSelected(bSelected);
+
+			var oBundle = Library.getResourceBundleFor("sap.m");
+			var sCheckedState = bSelected ? oBundle.getText("ACC_CTR_STATE_CHECKED") : oBundle.getText("ACC_CTR_STATE_NOT_CHECKED");
+			this.$("tblHeadModeCol").attr("aria-description", oBundle.getText("TABLE_SELECTION_COLUMNHEADER_DESCRIPTION") + " " + sCheckedState);
 		} else if (this._clearAllButton) {
 			this._clearAllButton.toggleStyleClass("sapMTableDisableClearAll", !this.getSelectedItems().length);
 		}
