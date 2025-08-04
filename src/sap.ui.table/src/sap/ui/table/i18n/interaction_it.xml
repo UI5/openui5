@@ -174,7 +174,7 @@
 				<p>Se il focus è sull'intestazione della colonna, viene aperto il menu dell'intestazione colonna.</p>
 			</description>
 		</interaction>
-		<interaction> <kbd>Shift + mouse click</kbd> <description>
+		<interaction> <kbd>Shift + MouseClick</kbd> <description>
 				<p><span class="emphasis">Se la selezione della cella è attivata:</span></p>
 				<p>Se le celle sono selezionate, <kbd>Shift + MouseClick</kbd> su una cella differente amplia la selezione fino alla cella su cui è stato fatto clic.</p>
 			</description>

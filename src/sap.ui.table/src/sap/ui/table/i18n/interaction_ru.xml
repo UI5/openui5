@@ -174,7 +174,7 @@
 				<p>Если фокус находится на заголовке столбца, открывается меню заголовка столбца.</p>
 			</description>
 		</interaction>
-		<interaction> <kbd>Shift + mouse click</kbd> <description>
+		<interaction> <kbd>Shift + MouseClick</kbd> <description>
 				<p><span class="emphasis">Если активирован выбор ячейки:</span></p>
 				<p>Если ячейки выбраны, <kbd>Shift + MouseClick</kbd> в другой ячейке расширяет выбор до ячейки щелчка.</p>
 			</description>

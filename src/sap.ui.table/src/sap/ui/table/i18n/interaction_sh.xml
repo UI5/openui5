@@ -174,7 +174,7 @@
 				<p>Ako je fokus na zaglavlju kolone, otvara se meni zaglavlja kolone.</p>
 			</description>
 		</interaction>
-		<interaction> <kbd>Shift + mouse click</kbd> <description>
+		<interaction> <kbd>Shift + MouseClick</kbd> <description>
 				<p><span class="emphasis">Ako je odabir ćelije aktiviran:</span></p>
 				<p>Ako su ćelije odabrane, <kbd>Shift + MouseClick</kbd> na drugoj ćeliji proširuje odabir do ćelije na koju je kliknuto.</p>
 			</description>

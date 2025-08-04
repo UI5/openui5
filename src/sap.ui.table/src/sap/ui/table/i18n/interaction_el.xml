@@ -174,7 +174,7 @@
 				<p>Αν η εστίαση βρίσκεται στην κεφαλίδα στήλης, το μενού κεφαλίδας στήλης είναι ανοικτό.</p>
 			</description>
 		</interaction>
-		<interaction> <kbd>Shift + mouse click</kbd> <description>
+		<interaction> <kbd>Shift + MouseClick</kbd> <description>
 				<p><span class="emphasis">Αν είναι ενεργοποιημένη η επιλογή κελιού:</span></p>
 				<p>Αν τα κελιά επιλεχτούν, το <kbd>Shift + MouseClick</kbd> σε διαφορετικό κελί βελτιώνει την επιλογή μέχρι το κελί που έχει επιλεχτεί.</p>
 			</description>

@@ -174,7 +174,7 @@
 				<p>Ако фокусът е върху заглавката на колоната, менюто в заглавката се отваря.</p>
 			</description>
 		</interaction>
-		<interaction> <kbd>Shift + mouse click</kbd> <description>
+		<interaction> <kbd>Shift + MouseClick</kbd> <description>
 				<p><span class="emphasis">Ако изборът на клетка е активиран:</span></p>
 				<p>Ако са избрани клетки, <kbd>Shift + MouseClick</kbd> върху друга клетка разширява избора до кликнатата клетка.</p>
 			</description>

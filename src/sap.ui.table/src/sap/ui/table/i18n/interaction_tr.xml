@@ -174,7 +174,7 @@
 				<p>Odak sütun başlığındaysa sütun başlığı menüsü açılır.</p>
 			</description>
 		</interaction>
-		<interaction> <kbd>Shift + mouse click</kbd> <description>
+		<interaction> <kbd>Shift + MouseClick</kbd> <description>
 				<p><span class="emphasis">Hücre seçimi etkinleştirildiyse:</span></p>
 				<p>Hücreler seçiliyse, farklı bir hücre üzerinde <kbd>Shift + MouseClick</kbd>, seçimi tıklanan hücreye kadar genişletir.</p>
 			</description>

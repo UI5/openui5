@@ -174,7 +174,7 @@
 				<p>Če je fokus na glavi stolpca, se odpre meni glave stolpca.</p>
 			</description>
 		</interaction>
-		<interaction> <kbd>Shift + mouse click</kbd> <description>
+		<interaction> <kbd>Shift + MouseClick</kbd> <description>
 				<p><span class="emphasis">Če je omogočena izbira celic:</span></p>
 				<p>Če so izbrane celice, z možnostjo <kbd>Shift + MouseClick</kbd> na drugo celico razširite izbiro do celice, na katero ste kliknili.</p>
 			</description>

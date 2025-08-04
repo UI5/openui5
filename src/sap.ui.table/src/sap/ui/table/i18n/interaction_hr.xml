@@ -174,7 +174,7 @@
 				<p>Ako je fokus na zaglavlju stupca, otvara se izbornik zaglavlja stupca.</p>
 			</description>
 		</interaction>
-		<interaction> <kbd>Shift + mouse click</kbd> <description>
+		<interaction> <kbd>Shift + MouseClick</kbd> <description>
 				<p><span class="emphasis">Ako je aktiviran odabir ćelije:</span></p>
 				<p>Ako su ćelije odabrane, <kbd>Shift + MouseClick</kbd> na različitu ćeliju povećava odabir do kliknute ćelije.</p>
 			</description>

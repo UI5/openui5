@@ -174,7 +174,7 @@
 				<p>열 헤더에 포커스가 있다면 열 헤더 메뉴가 열립니다.</p>
 			</description>
 		</interaction>
-		<interaction> <kbd>Shift + mouse click</kbd> <description>
+		<interaction> <kbd>Shift + MouseClick</kbd> <description>
 				<p><span class="emphasis">셀 선택이 활성화된 경우:</span></p>
 				<p>셀이 선택된 경우, 다른 셀에서 <kbd>Shift + MouseClick</kbd> 클릭 시 클릭한 셀까지 선택이 확장됩니다.</p>
 			</description>

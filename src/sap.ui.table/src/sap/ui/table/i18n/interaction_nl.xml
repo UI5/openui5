@@ -174,7 +174,7 @@
 				<p>Als de focus op de kolomkop ligt, wordt het kolomkopmenu geopend.</p>
 			</description>
 		</interaction>
-		<interaction> <kbd>Shift + mouse click</kbd> <description>
+		<interaction> <kbd>Shift + MouseClick</kbd> <description>
 				<p><span class="emphasis">Als celselectie is ingeschakeld:</span></p>
 				<p>Als de cellen zijn geselecteerd, wordt door <kbd>Shift + MouseClick</kbd> op een andere cel de selectie tot de geklikte cel uitgebreid.</p>
 			</description>

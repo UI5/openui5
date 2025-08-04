@@ -174,7 +174,7 @@
 				<p>若焦點在欄表頭上，則會開啟欄表頭功能表。</p>
 			</description>
 		</interaction>
-		<interaction> <kbd>Shift + mouse click</kbd> <description>
+		<interaction> <kbd>Shift + MouseClick</kbd> <description>
 				<p><span class="emphasis">若已啟用儲存格選擇：</span></p>
 				<p>若已選擇儲存格，則 <kbd>Shift + MouseClick</kbd> 在其他儲存格可增強至所點擊儲存格的選擇。</p>
 			</description>

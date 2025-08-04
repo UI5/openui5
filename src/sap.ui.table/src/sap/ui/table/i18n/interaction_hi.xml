@@ -174,7 +174,7 @@
 				<p>यदि यह फ़ोकस किसी स्तंभ शीर्षलेख पर है, तो स्तंभ शीर्षलेख मेनू खुल जाता है.</p>
 			</description>
 		</interaction>
-		<interaction> <kbd>Shift + mouse click</kbd> <description>
+		<interaction> <kbd>Shift + MouseClick</kbd> <description>
 				<p><span class="emphasis">यदि सेल चयन सक्षम है:</span></p>
 				<p>यदि सेल चयनित हैं, तो किसी भिन्न सेल पर <kbd>Shift + MouseClick</kbd> क्लिक किए गए सेल तक चयन को एन्हांस करता है.</p>
 			</description>

@@ -174,7 +174,7 @@
 				<p>Ако фокусот е на заглавието на колоната, се отвора менито на заглавието на колоната.</p>
 			</description>
 		</interaction>
-		<interaction> <kbd>Shift + mouse click</kbd> <description>
+		<interaction> <kbd>Shift + MouseClick</kbd> <description>
 				<p><span class="emphasis">Ако е овозможен избор на ќелија:</span> </p>
 				<p>Ако се избрани ќелии, <kbd>Shift + MouseClick</kbd> на различна ќелија, се проширува изборот до ќелијата што е кликната. </p>
 			</description>

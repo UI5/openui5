@@ -174,7 +174,7 @@
 				<p>إذا كان التركيز على مقدمة العمود، فسيتم فتح قائمة مقدمة العمود.</p>
 			</description>
 		</interaction>
-		<interaction> <kbd>Shift + mouse click</kbd> <description>
+		<interaction> <kbd>Shift + MouseClick</kbd> <description>
 				<p><span class="emphasis">إذا تم تمكين تحديد الخلية:</span></p>
 				<p>في حالة تحديد الخلايا، يقوم <kbd>Shift + MouseClick</kbd> في خلية مختلفة بتحسين التحديد حتى الخلية التي تم النقر فوقها.</p>
 			</description>

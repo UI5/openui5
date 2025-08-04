@@ -174,7 +174,7 @@
 				<p>ถ้าโฟกัสอยู่ที่ส่วนหัวของคอลัมน์ เมนูส่วนหัวของคอลัมน์จะเปิดขึ้น</p>
 			</description>
 		</interaction>
-		<interaction> <kbd>Shift + mouse click</kbd> <description>
+		<interaction> <kbd>Shift + MouseClick</kbd> <description>
 				<p><span class="emphasis">ถ้าเปิดใช้งานการเลือกเซลล์:</span></p>
 				<p>ถ้ามีการเลือกเซลล์ การกด <kbd>Shift + MouseClick</kbd> ที่เซลล์อื่นจะเพิ่มเติมการเลือกจนถึงเซลล์ที่คลิก</p>
 			</description>
