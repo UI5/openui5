@@ -44,7 +44,7 @@ sap.ui.define([
 		}
 
 		const [oContent] = oContainer?.getContent() || [];
-		return !!oContent && oContent.isA("sap.ui.mdc.valuehelp.content.FixedList") && oContent.isRestrictedToFixedValues();
+		return !!oContent && oContent.isA("sap.ui.mdc.valuehelp.content.FixedList") && (oContent.isRestrictedToFixedValues() || !oContent.getFilterList()); // on DefineConditionPanel Operator field is not a Select, but should be opened on click
 	};
 
 	/**

@@ -4088,6 +4088,26 @@ sap.ui.define([
 		oOtb.destroy();
 	});
 
+	QUnit.test("OverflowToolbar with Buttons, _getControlMargins returns 0 instead of NaN", function (assert) {
+		// Arrange
+		var oButton1 = new Button({text: "Button 1", width: "100px"}),
+			oButton2 = new Button({text: "Button 2", width: "100px"}),
+			oOverflowToolbar = new OverflowToolbar({
+				content: [oButton1, oButton2]
+			});
+
+		// Act
+		var oMargins1 = OverflowToolbar._getControlMargins(oButton1),
+			oMargins2 = OverflowToolbar._getControlMargins(oButton2);
+
+		// Assert
+		assert.strictEqual(oMargins1, 0, "Button 1 margins are 0, as Button is not rendered yet");
+		assert.strictEqual(oMargins2, 0, "Button 2 margins are 0, as Button is not rendered yet");
+
+		//Cleanup
+		oOverflowToolbar.destroy();
+	});
+
 	QUnit.module("Associative popover");
 
 	QUnit.test("Popover _recalculateMargins method overwrite", function (assert) {

@@ -1,19 +1,15 @@
 sap.ui.define([
-	"sap/ui/core/mvc/Controller",
-	"fl/performance/utils/FlexPerformanceTestUtil"
+	"sap/ui/core/mvc/Controller"
 ], function(
-	Controller,
-	FlexPerformanceTestUtil
+	Controller
 ) {
 	"use strict";
 
 	return Controller.extend("sap.ui.fl.internal.performance.flexBundleLoad.view.appView", {
-		runPerformanceTests() {
-			window.runPerformanceTests();
-		},
 		onAfterRendering() {
 			const sMeasure = "fl.performance.flexBundleLoad";
-			FlexPerformanceTestUtil.stopMeasurement(sMeasure);
+			performance.measure(sMeasure, `${sMeasure}`);
+			window.wpp.customMetrics[sMeasure] = performance.getEntriesByName(sMeasure, "measure")[0].duration;
 			this.byId("ResultText").setText(`Measurement result: ${window.wpp.customMetrics[sMeasure]} ms`);
 		}
 	});

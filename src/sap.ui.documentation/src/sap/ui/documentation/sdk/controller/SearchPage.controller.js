@@ -162,8 +162,7 @@ sap.ui.define([
 							if (bExternal) {
 								sHref = new URL(sHref, document.baseURI).href;
 								sTarget = "_blank";
-							}
-							if (sQuery && this.isDocumentationItem(oItem)) {
+							} else if (sQuery && this.isDocumentationItem(oItem)) {
 								sHref = `${sHref}?q=${encodeURIComponent(sQuery)}`;
 							}
 							oLink.setHref(sHref);

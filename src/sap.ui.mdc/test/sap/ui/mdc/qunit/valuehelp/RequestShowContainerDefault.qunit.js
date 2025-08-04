@@ -35,19 +35,30 @@ sap.ui.define([
 			isDialog: () => false,
 			getContent: () => ([{
 				isA: (sClass) => sClass === 'sap.ui.mdc.valuehelp.content.FixedList',
-				isRestrictedToFixedValues: () => true
+				isRestrictedToFixedValues: () => true,
+				getFilterList: () => true
 			}])
 		}), "A FixedList which only allows fixed values should be shown.");
 
+		assert.ok(await RequestShowContainerDefault[RequestShowContainerReason.Tap](oFakeValueHelp, {
+			isSingleSelect: () => false,
+			isDialog: () => false,
+			getContent: () => ([{
+				isA: (sClass) => sClass === 'sap.ui.mdc.valuehelp.content.FixedList',
+				isRestrictedToFixedValues: () => false,
+				getFilterList: () => false
+			}])
+		}), "A FixedList which is not filtered should be shown.");
 
 		assert.notOk(await RequestShowContainerDefault[RequestShowContainerReason.Tap](oFakeValueHelp, {
 			isSingleSelect: () => false,
 			isDialog: () => false,
 			getContent: () => ([{
 				isA: (sClass) => sClass === 'sap.ui.mdc.valuehelp.content.FixedList',
-				isRestrictedToFixedValues: () => false
+				isRestrictedToFixedValues: () => false,
+				getFilterList: () => true
 			}])
-		}), "A FixedList which allows more than fixed values should be hidden.");
+		}), "A FixedList which allows more than fixed values and is filtered should be hidden.");
 
 		assert.ok(await RequestShowContainerDefault[RequestShowContainerReason.Tap](oFakeValueHelp, {
 			isSingleSelect: () => false,

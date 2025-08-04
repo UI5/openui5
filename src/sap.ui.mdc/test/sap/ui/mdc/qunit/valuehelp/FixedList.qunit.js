@@ -853,6 +853,10 @@ sap.ui.define([
 		oFixedList.setRestrictedToFixedValues(true);
 		assert.ok(oFixedList.shouldOpenOnClick(), "should open if restrictedToFixedValues set");
 
+		oFixedList.setRestrictedToFixedValues(false);
+		oFixedList.setFilterList(false);
+		assert.ok(oFixedList.shouldOpenOnClick(), "should open if filterList not set");
+
 	});
 
 	QUnit.test("isFocusInHelp", (assert) => {

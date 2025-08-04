@@ -1675,5 +1675,39 @@ sap.ui.define([
 			oStubOpenUrl.restore();
 		});
 
+		QUnit.test("Action should not fire when text is selected", async function (assert) {
+			var oActionSpy = sinon.spy(CardActions, "fireAction"),
+				oStubOpenUrl = sinon.stub(NavigationAction.prototype, "execute").callsFake(function () {});
+
+			this.oCard.setManifest(oManifestListCardRequest);
+			this.oCard.placeAt(DOM_RENDER_LOCATION);
+			await nextCardReadyEvent(this.oCard);
+			await nextUIUpdate();
+
+			var oHeaderDom = this.oCard.getCardHeader().getDomRef().querySelector(".sapFCardHeaderMainPart");
+
+			// Simulate text selection in the header
+			var oRange = document.createRange();
+			var oTextNode = oHeaderDom.childNodes[0];
+			if (oTextNode && oTextNode.nodeType === Node.TEXT_NODE) {
+				oRange.selectNodeContents(oTextNode);
+			} else {
+				oRange.selectNodeContents(oHeaderDom);
+			}
+			var oSelection = window.getSelection();
+			oSelection.removeAllRanges();
+			oSelection.addRange(oRange);
+
+			// Try to trigger the header action
+			qutils.triggerKeydown(oHeaderDom, KeyCodes.ENTER);
+			await nextUIUpdate();
+
+			assert.strictEqual(oActionSpy.callCount, 0, "Action should NOT be fired when text is selected");
+			assert.strictEqual(oStubOpenUrl.callCount, 0, "Navigation should NOT be executed when text is selected");
+
+			oActionSpy.restore();
+			oStubOpenUrl.restore();
+		});
+
 	}
 );

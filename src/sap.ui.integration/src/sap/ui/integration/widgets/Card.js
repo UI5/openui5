@@ -1405,21 +1405,24 @@ sap.ui.define([
 		this.destroyAggregation("_filterBar");
 		this.destroyAggregation("_footer");
 
-		this._cleanupOldManifest();
+		this._cleanupOldManifest(false);
 	};
 
 	/**
 	 * Cleans up internal models and other before new manifest processing.
+	 * @param {boolean} [bResetInternalModels=true] If true, the internal models will be reset.
 	 */
-	Card.prototype._cleanupOldManifest = function() {
+	Card.prototype._cleanupOldManifest = function(bResetInternalModels = true) {
 		if (this._fnOnModelChange) {
 			this.getModel().detachEvent("change", this._fnOnModelChange, this);
 			delete this._fnOnModelChange;
 		}
 
-		for (const modelName in this._INTERNAL_MODELS) {
-			if (this._INTERNAL_MODELS[modelName].reset) {
-				this._INTERNAL_MODELS[modelName].reset();
+		if (bResetInternalModels) {
+			for (const modelName in this._INTERNAL_MODELS) {
+				if (this._INTERNAL_MODELS[modelName].reset) {
+					this._INTERNAL_MODELS[modelName].reset();
+				}
 			}
 		}
 
