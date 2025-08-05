@@ -426,14 +426,13 @@ sap.ui.define([
 	};
 
 	/**
-	 * There should be only 1 card manifest in sample, with name "manifest.json" or "cardManifest.json"
+	 * Checks it the file should be editable
 	 *
 	 * @param {object} oFile The file with all properties.
 	 * @returns {boolean} Whether the file is editable.
 	 */
 	FileEditor.prototype._isFileEditable = function (oFile) {
-		return !oFile.isApplicationManifest
-			&& (oFile.name.toLowerCase().endsWith("manifest.json") || oFile.key === "designtime.js" || oFile.key === "manifestChanges.json");
+		return (oFile.editable === true || oFile.key === "designtime.js" || oFile.key === "manifestChanges.json");
 	};
 
 	FileEditor.prototype._findIndex = function (sName) {
@@ -502,10 +501,10 @@ sap.ui.define([
 
 	FileEditor.prototype.getCardManifestFile = function () {
 		return this._aFiles.find(function (oFile) {
-			if (oFile.key !== "designtime.js" && this._isFileEditable(oFile)) {
+			if (oFile.name.toLowerCase().endsWith("manifest.json") || oFile.key === "manifestChanges.json") {
 				return oFile;
 			}
-		}.bind(this));
+		});
 	};
 
 	FileEditor.prototype.setCardManifestContent = function (sValue) {

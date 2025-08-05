@@ -252,8 +252,8 @@ sap.ui.define([
 						press: this.handleConfirmed.bind(this),
 						visible: {
 							parts: ['$valueHelp>/_config/maxConditions', '$help>/_quickSelectEnabled'],
-							formatter: function(iMaxConditions, bQuickSelectEnabled) {
-								return iMaxConditions !== 1 || !bQuickSelectEnabled;
+							formatter: (iMaxConditions, bQuickSelectEnabled) => {
+								return !this.isQuickSelectActive();
 							}
 						}
 					});
@@ -361,13 +361,8 @@ sap.ui.define([
 	Dialog.prototype.handleSelect = function(oEvent) {
 		Container.prototype.handleSelect.apply(this, arguments);
 
-		if (this.getProperty("_quickSelectEnabled") && this.isSingleSelect()) {
-			const aEventConditions = oEvent.getParameter("conditions");
-			const bPositiveType = [ValueHelpSelectionType.Set, ValueHelpSelectionType.Add].indexOf(oEvent.getParameter("type")) !== -1;
-			const iLength = aEventConditions && aEventConditions.length;
-			if (bPositiveType && iLength) {
-				this.fireConfirm({ close: true });
-			}
+		if (this.isQuickSelectActive()) {
+			this.fireConfirm({ close: true });
 		}
 	};
 
@@ -400,6 +395,16 @@ sap.ui.define([
 		}
 
 		Container.prototype.observeChanges.apply(this, arguments);
+	};
+
+	/**
+	 * Gets whether quickselect (confirms values on selection) is active on the dialog.
+	 * @returns {boolean} true if quickselect is active
+	 * @protected
+	 * @since 1.140
+	 */
+	Dialog.prototype.isQuickSelectActive = function () {
+		return this.getProperty("_quickSelectEnabled") && this.isSingleSelect();
 	};
 
 	Dialog.prototype._updateInitialContentKey = function() {
