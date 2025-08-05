@@ -69,6 +69,11 @@ sap.ui.define([
 		var aConditions = oChange.conditions;
 		var aOldConditions = oContent.getConditions();
 
+		// Prevent de-select in dialog scenarios
+		if (oContent.getParent().isQuickSelectActive?.() && !aConditions.length && aOldConditions.length) {
+			oChange.conditions = aOldConditions;
+		}
+
 		if (oChange.type === ValueHelpSelectionType.Remove) {
 			for (var i = 0; i < aConditions.length; i++) {
 				var oCondition = aConditions[i];

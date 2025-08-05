@@ -27,7 +27,8 @@ sap.ui.define([
 									{
 										url: '/samples/list/highlight.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/list/dt/Configuration.js',
@@ -43,7 +44,8 @@ sap.ui.define([
 									{
 										url: '/samples/list/icon.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									}
 								]
 							},
@@ -54,7 +56,8 @@ sap.ui.define([
 									{
 										url: '/samples/list/numeric.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									}
 								]
 							},
@@ -65,7 +68,8 @@ sap.ui.define([
 									{
 										url: '/samples/list/numericIndicators.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									}
 								]
 							},
@@ -79,7 +83,8 @@ sap.ui.define([
 									{
 										url: '/samples/list/quickLinks.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									}
 								]
 							},
@@ -90,7 +95,8 @@ sap.ui.define([
 									{
 										url: '/samples/list/attributes.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									}
 								]
 							},
@@ -101,7 +107,8 @@ sap.ui.define([
 									{
 										url: '/samples/list/attributesVisibility.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									}
 								]
 							},
@@ -113,7 +120,8 @@ sap.ui.define([
 									{
 										url: '/samples/list/bulletChart/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/list/bulletChart/data.json',
@@ -130,7 +138,8 @@ sap.ui.define([
 									{
 										url: '/samples/list/stackedBar/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/list/stackedBar/data.json',
@@ -146,7 +155,8 @@ sap.ui.define([
 									{
 										url: '/samples/list/friendRequests/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/list/friendRequests/images/John_Miller.png',
@@ -172,7 +182,8 @@ sap.ui.define([
 									{
 										url: '/samples/list/actionsStrip/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/list/actionsStrip/Extension.js',
@@ -189,7 +200,8 @@ sap.ui.define([
 									{
 										url: '/samples/list/dynamicActionsStrip/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/list/dynamicActionsStrip/data.json',
@@ -205,7 +217,8 @@ sap.ui.define([
 								files: [{
 										url: '/samples/list/actionsLabels/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									}
 								]
 							},
@@ -215,7 +228,8 @@ sap.ui.define([
 								files: [{
 									url: '/samples/list/grouping.json',
 									name: 'manifest.json',
-									key: 'manifest.json'
+									key: 'manifest.json',
+										editable: true
 								}]
 							},
 							{
@@ -225,7 +239,8 @@ sap.ui.define([
 									{
 										url: '/samples/list/iconVisibility.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									}
 								]
 							},
@@ -236,7 +251,8 @@ sap.ui.define([
 									{
 										url: '/samples/list/myCampaigns/myCampaigns.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/list/myCampaigns/images/example3.jpg',
@@ -272,7 +288,8 @@ sap.ui.define([
 									{
 										url: '/samples/object/object.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									}
 								]
 							},
@@ -286,7 +303,8 @@ sap.ui.define([
 									{
 										url: '/samples/object/visibleObject.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									}
 								]
 							},
@@ -300,7 +318,8 @@ sap.ui.define([
 									{
 										url: '/samples/object/todo/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									}
 								]
 							},
@@ -314,7 +333,8 @@ sap.ui.define([
 									{
 										url: '/samples/object/additionalObjectDetails.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									}
 								]
 							},
@@ -329,7 +349,8 @@ sap.ui.define([
 									{
 										url: '/samples/object/form/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									}
 								]
 							},
@@ -344,7 +365,8 @@ sap.ui.define([
 									{
 										url: '/samples/object/formWithValidation/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/object/formWithValidation/i18n/i18n.properties',
@@ -364,7 +386,8 @@ sap.ui.define([
 									{
 										url: '/samples/object/formWithExtension/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/object/formWithExtension/SampleExtension.js',
@@ -388,7 +411,8 @@ sap.ui.define([
 								files: [{
 										url: '/samples/object/titleMaxLinesAndLabelWrapping/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									}
 								]
 							},
@@ -402,7 +426,8 @@ sap.ui.define([
 									{
 										url: '/samples/object/iconVisibility.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									}
 								]
 							},
@@ -413,7 +438,8 @@ sap.ui.define([
 									{
 										url: '/samples/object/iconFitType/iconFitType.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/object/iconFitType/images/team.jpg',
@@ -443,7 +469,8 @@ sap.ui.define([
 									{
 										url: '/samples/object/image/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: "/samples/object/image/images/workingWithTablet.jpg",
@@ -463,7 +490,8 @@ sap.ui.define([
 									{
 										url: '/samples/object/imageWithOverlay/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: "/samples/object/imageWithOverlay/images/natureAndChildren.jpg",
@@ -483,7 +511,8 @@ sap.ui.define([
 									{
 										url: '/samples/object/imageFallback/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: "/samples/object/imageFallback/images/workingWithTablet.jpg",
@@ -509,7 +538,8 @@ sap.ui.define([
 									{
 										url: '/samples/table/table.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									}
 								]
 							},
@@ -523,7 +553,8 @@ sap.ui.define([
 									{
 										url: '/samples/table/visibleColumns.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									}
 								]
 							},
@@ -537,7 +568,8 @@ sap.ui.define([
 									{
 										url: '/samples/table/employees/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/table/employees/images/John_Miller.png',
@@ -565,7 +597,8 @@ sap.ui.define([
 								files: [{
 									url: '/samples/table/grouping.json',
 									name: 'manifest.json',
-									key: 'manifest.json'
+									key: 'manifest.json',
+										editable: true
 								}]
 							},
 							{
@@ -578,7 +611,8 @@ sap.ui.define([
 									{
 										url: '/samples/table/highlight.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									}
 								]
 							}
@@ -599,7 +633,8 @@ sap.ui.define([
 									{
 										url: '/samples/analytical/line.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									}
 								]
 							},
@@ -614,7 +649,8 @@ sap.ui.define([
 									{
 										url: '/samples/analytical/stackedColumn.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									}
 								]
 							},
@@ -629,7 +665,8 @@ sap.ui.define([
 									{
 										url: '/samples/analytical/donut.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									}
 								]
 							},
@@ -644,7 +681,8 @@ sap.ui.define([
 									{
 										url: '/samples/analytical/bubble/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/analytical/bubble/data.json',
@@ -664,7 +702,8 @@ sap.ui.define([
 									{
 										url: '/samples/analytical/barWithReferenceLines/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/analytical/barWithReferenceLines/data.json',
@@ -684,7 +723,8 @@ sap.ui.define([
 									{
 										url: '/samples/analytical/columnWithConditionalColors/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/analytical/columnWithConditionalColors/data.json',
@@ -705,7 +745,8 @@ sap.ui.define([
 									{
 										url: '/samples/analytical/chartActions/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									}
 								]
 							},
@@ -721,7 +762,8 @@ sap.ui.define([
 									{
 										url: '/samples/analytical/detailsPopover/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/analytical/detailsPopover/data.json',
@@ -742,7 +784,8 @@ sap.ui.define([
 									{
 										url: '/samples/analytical/popoverActions/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/analytical/popoverActions/data.json',
@@ -763,7 +806,8 @@ sap.ui.define([
 									{
 										url: '/samples/analytical/popoverExtensionActions/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/analytical/popoverExtensionActions/ChartExtension.js',
@@ -783,7 +827,8 @@ sap.ui.define([
 									{
 										url: '/samples/analytical/timeAxis/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/analytical/timeAxis/data.json',
@@ -809,7 +854,8 @@ sap.ui.define([
 									{
 										url: '/samples/calendar/calendar.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									}
 								]
 							},
@@ -824,7 +870,8 @@ sap.ui.define([
 									{
 										url: '/samples/calendar/extensionSample/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/calendar/extensionSample/SampleExtension.js',
@@ -841,7 +888,8 @@ sap.ui.define([
 							{
 								url: '/samples/calendar/calendar.json',
 								name: 'manifest.json',
-								key: 'manifest.json'
+								key: 'manifest.json',
+										editable: true
 							}
 						]
 					},
@@ -860,7 +908,8 @@ sap.ui.define([
 									{
 										url: '/samples/timeline/activities.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									}
 								]
 							},
@@ -871,7 +920,8 @@ sap.ui.define([
 									{
 										url: '/samples/timeline/members.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/timeline/images/Alain_Chevalier.png',
@@ -918,7 +968,8 @@ sap.ui.define([
 									{
 										url: '/samples/adaptive/adaptive.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/adaptive/dt/Configuration.js',
@@ -934,7 +985,8 @@ sap.ui.define([
 									{
 										url: '/samples/adaptive/richtext.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									}
 								]
 							},
@@ -945,7 +997,8 @@ sap.ui.define([
 									{
 										url: '/samples/adaptive/form.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									}
 								]
 							},
@@ -956,7 +1009,8 @@ sap.ui.define([
 									{
 										url: '/samples/adaptive/templating.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/adaptive/templating-content.json',
@@ -972,7 +1026,8 @@ sap.ui.define([
 									{
 										url: '/samples/adaptive/data.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/adaptive/data-json.json',
@@ -988,7 +1043,8 @@ sap.ui.define([
 									{
 										url: '/samples/adaptive/markdown.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									}
 								]
 							},
@@ -999,7 +1055,8 @@ sap.ui.define([
 									{
 										url: '/samples/adaptive/action-submit.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									}
 								]
 							},
@@ -1010,7 +1067,8 @@ sap.ui.define([
 									{
 										url: '/samples/adaptive/action-submit-custom-payload.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									}
 								]
 							},
@@ -1021,7 +1079,8 @@ sap.ui.define([
 									{
 										url: '/samples/adaptive/extensionSample/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/adaptive/extensionSample/SampleExtension.js',
@@ -1042,7 +1101,8 @@ sap.ui.define([
 									{
 										url: '/samples/adaptive/action-openurl.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									}
 								]
 							},
@@ -1053,7 +1113,8 @@ sap.ui.define([
 									{
 										url: '/samples/adaptive/action-styling.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									}
 								]
 							},
@@ -1064,7 +1125,8 @@ sap.ui.define([
 									{
 										url: '/samples/adaptive/translationSample/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/adaptive/translationSample/i18n/i18n.properties',
@@ -1087,7 +1149,8 @@ sap.ui.define([
 									{
 										url: '/samples/component/cardContent/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/component/cardContent/Component.js',
@@ -1118,7 +1181,8 @@ sap.ui.define([
 									{
 										url: '/samples/component/cardContentHeaderBottom/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/component/cardContentHeaderBottom/Component.js',
@@ -1149,7 +1213,8 @@ sap.ui.define([
 									{
 										url: '/samples/component/cardContentControls/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/component/cardContentControls/Component.js',
@@ -1180,7 +1245,8 @@ sap.ui.define([
 									{
 										url: '/samples/component/advanced/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/component/advanced/Component.js',
@@ -1206,7 +1272,8 @@ sap.ui.define([
 									{
 										url: '/samples/component/triggerAction/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/component/triggerAction/Component.js',
@@ -1232,7 +1299,8 @@ sap.ui.define([
 									{
 										url: '/samples/component/customActions/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/component/customActions/Component.js',
@@ -1263,7 +1331,8 @@ sap.ui.define([
 									{
 										url: '/samples/component/noDataMessage/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/component/noDataMessage/Component.js',
@@ -1285,7 +1354,8 @@ sap.ui.define([
 									{
 										url: '/samples/component/CustomImageMessage/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/component/CustomImageMessage/Component.js',
@@ -1311,7 +1381,8 @@ sap.ui.define([
 									{
 										url: '/samples/component/Translation/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/component/Translation/Component.js',
@@ -1343,7 +1414,8 @@ sap.ui.define([
 									{
 										url: '/samples/component/requestData/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/component/requestData/Component.js',
@@ -1381,7 +1453,8 @@ sap.ui.define([
 									{
 										url: '/samples/component/componentPreload/card/manifest.json',
 										name: 'card/manifest.json',
-										key: 'card/manifest.json'
+										key: 'card/manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/component/componentPreload/card/Component.js',
@@ -1418,7 +1491,8 @@ sap.ui.define([
 									{
 										url: '/samples/component/uploadFile/manifest.json',
 										name: 'card/manifest.json',
-										key: 'card/manifest.json'
+										key: 'card/manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/component/uploadFile/Component.js',
@@ -1447,7 +1521,8 @@ sap.ui.define([
 							{
 								url: '/samples/webPage/manifest.json',
 								name: 'manifest.json',
-								key: 'manifest.json'
+								key: 'manifest.json',
+								editable: true
 							}
 						],
 						settings: {
@@ -1546,8 +1621,7 @@ sap.ui.define([
 							{
 								url: '/samples/progressive/manifest.json',
 								name: 'manifest.json',
-								key: 'manifest.json',
-								isApplicationManifest: true
+								key: 'manifest.json'
 							},
 							{
 								url: '/samples/progressive/Component.js',
@@ -1575,7 +1649,8 @@ sap.ui.define([
 							{
 								url: '/samples/footer/generalActions/manifest.json',
 								name: 'manifest.json',
-								key: 'manifest.json'
+								key: 'manifest.json',
+								editable: true
 							}
 						]
 					},
@@ -1590,7 +1665,8 @@ sap.ui.define([
 							{
 								url: '/samples/footer/cardWithDialog/manifest.json',
 								name: 'manifest.json',
-								key: 'manifest.json'
+								key: 'manifest.json',
+								editable: true
 							},
 							{
 								url: '/samples/footer/cardWithDialog/DetailsDialogExtension.js',
@@ -1619,7 +1695,8 @@ sap.ui.define([
 							{
 								url: '/samples/footer/hiddenFooter/manifest.json',
 								name: 'manifest.json',
-								key: 'manifest.json'
+								key: 'manifest.json',
+								editable: true
 							}
 						]
 					}
@@ -1645,7 +1722,8 @@ sap.ui.define([
 									{
 										url: '/samples/filters/comboBox/dynamicComboBoxFilter.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/filters/comboBox/countries.json',
@@ -1661,7 +1739,8 @@ sap.ui.define([
 									{
 										url: '/samples/filters/comboBox/dynamicComboBoxFilterSelectedIndex.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/filters/comboBox/countries.json',
@@ -1677,7 +1756,8 @@ sap.ui.define([
 									{
 										url: '/samples/filters/comboBox/dynamicComboBoxFilterGrouping.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/filters/comboBox/countries.json',
@@ -1705,7 +1785,8 @@ sap.ui.define([
 									{
 										url: '/samples/filters/dateRange/activities.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									}
 								]
 							},
@@ -1720,7 +1801,8 @@ sap.ui.define([
 									{
 										url: '/samples/filters/dateRange/agenda.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									}
 								]
 							},
@@ -1731,7 +1813,8 @@ sap.ui.define([
 									{
 										url: '/samples/filters/dateRange/dateRangeFilter.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									}
 								]
 							}
@@ -1749,7 +1832,8 @@ sap.ui.define([
 									{
 										url: '/samples/filters/search/singleFilter.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									}
 								]
 							},
@@ -1760,7 +1844,8 @@ sap.ui.define([
 									{
 										url: '/samples/filters/search/multipleFilters/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									}
 								]
 							},
@@ -1771,7 +1856,8 @@ sap.ui.define([
 									{
 										url: '/samples/filters/search/multipleFiltersWithExtension/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/filters/search/multipleFiltersWithExtension/FilterExtension.js',
@@ -1794,7 +1880,8 @@ sap.ui.define([
 									{
 										url: '/samples/filters/select/dynamicFilter.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									}
 								]
 							},
@@ -1806,7 +1893,8 @@ sap.ui.define([
 									{
 										url: '/samples/filters/select/usingStaticItems.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									}
 								]
 							}
@@ -1837,7 +1925,8 @@ sap.ui.define([
 									{
 										url: '/samples/actions/navigation/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									}
 								]
 							},
@@ -1853,7 +1942,8 @@ sap.ui.define([
 									{
 										url: '/samples/actions/ibn/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									}
 								]
 							},
@@ -1869,7 +1959,8 @@ sap.ui.define([
 									{
 										url: '/samples/actions/showHide/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/actions/showHide/detailsManifest.json',
@@ -1891,7 +1982,8 @@ sap.ui.define([
 									{
 										url: '/samples/actions/wholeCardInteraction/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/actions/wholeCardInteraction/detailsManifest.json',
@@ -1911,7 +2003,8 @@ sap.ui.define([
 								files: [{
 										url: '/samples/actions/approve/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/actions/approve/detailsManifest.json',
@@ -1945,7 +2038,8 @@ sap.ui.define([
 									{
 										url: '/samples/cache/default/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									}
 								]
 							},
@@ -1961,7 +2055,8 @@ sap.ui.define([
 									{
 										url: '/samples/cache/maxAge/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									}
 								]
 							},
@@ -1977,7 +2072,8 @@ sap.ui.define([
 									{
 										url: '/samples/cache/disabledCache/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									}
 								]
 							}
@@ -1996,7 +2092,8 @@ sap.ui.define([
 									{
 										url: '/samples/noDataMessages/customNoDataMessage/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									}
 								]
 							},
@@ -2007,7 +2104,8 @@ sap.ui.define([
 									{
 										url: '/samples/noDataMessages/objectNoDataMessage/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/noDataMessages/objectNoDataMessage/mockdata/employee.json',
@@ -2030,7 +2128,8 @@ sap.ui.define([
 									{
 										url: '/samples/data/basic/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									}
 								]
 							},
@@ -2042,7 +2141,8 @@ sap.ui.define([
 									{
 										url: '/samples/data/graphql/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									}
 								]
 							},
@@ -2055,7 +2155,8 @@ sap.ui.define([
 									{
 										url: '/samples/data/batchRequest/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									}
 								]
 							},
@@ -2067,7 +2168,8 @@ sap.ui.define([
 									{
 										url: '/samples/data/csrf/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/data/csrf/dt/Configuration.js',
@@ -2086,7 +2188,8 @@ sap.ui.define([
 									{
 										url: '/samples/data/oauth3lo/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									}
 								]
 							},
@@ -2098,7 +2201,8 @@ sap.ui.define([
 									{
 										url: '/samples/data/mockData/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/data/mockData/mockData.json',
@@ -2115,7 +2219,8 @@ sap.ui.define([
 									{
 										url: '/samples/data/modelSizeLimit/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/data/modelSizeLimit/DataExtension.js',
@@ -2140,7 +2245,14 @@ sap.ui.define([
 									rows: 5,
 									columns: 4
 								},
-								manifestUrl: '/samples/dataTimestamp/default.json'
+								files: [
+									{
+										url: '/samples/dataTimestamp/default.json',
+										name: 'manifest.json',
+										key: 'manifest.json',
+										editable: true
+									}
+								]
 							},
 							{
 								title: 'Numeric Header',
@@ -2150,7 +2262,14 @@ sap.ui.define([
 									rows: 5,
 									columns: 4
 								},
-								manifestUrl: '/samples/dataTimestamp/numeric.json'
+								files: [
+									{
+										url: '/samples/dataTimestamp/numeric.json',
+										name: 'manifest.json',
+										key: 'manifest.json',
+										editable: true
+									}
+								]
 							}
 						]
 					},
@@ -2166,7 +2285,8 @@ sap.ui.define([
 							{
 								url: '/samples/dateRanges/card1/manifest.json',
 								name: 'manifest.json',
-								key: 'manifest.json'
+								key: 'manifest.json',
+								editable: true
 							}
 						]
 					},
@@ -2178,7 +2298,8 @@ sap.ui.define([
 							{
 								url: '/samples/dynamicCounter/manifest.json',
 								name: 'manifest.json',
-								key: 'manifest.json'
+								key: 'manifest.json',
+								editable: true
 							},
 							{
 								url: '/samples/dynamicCounter/i18n/i18n.properties',
@@ -2200,7 +2321,8 @@ sap.ui.define([
 									{
 										url: '/samples/headerInfoSection/basic/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									}
 								]
 							},
@@ -2211,7 +2333,8 @@ sap.ui.define([
 									{
 										url: '/samples/headerInfoSection/advancedLayout/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									}
 								]
 							},
@@ -2222,7 +2345,8 @@ sap.ui.define([
 									{
 										url: '/samples/headerInfoSection/numeric/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									}
 								]
 							},
@@ -2233,7 +2357,8 @@ sap.ui.define([
 									{
 										url: '/samples/headerInfoSection/interactiveStatus/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									}
 								]
 							}
@@ -2251,7 +2376,8 @@ sap.ui.define([
 									{
 										url: '/samples/extension/gettingData/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/extension/gettingData/DataExtension.js',
@@ -2267,7 +2393,8 @@ sap.ui.define([
 									{
 										url: '/samples/extension/customFormatters/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/extension/customFormatters/CustomFormattersExtension.js',
@@ -2283,7 +2410,8 @@ sap.ui.define([
 									{
 										url: '/samples/extension/customActions/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/extension/customActions/CustomActionsExtension.js',
@@ -2300,7 +2428,8 @@ sap.ui.define([
 									{
 										url: '/samples/extension/namedDataSection/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/extension/namedDataSection/DataExtension.js',
@@ -2320,7 +2449,8 @@ sap.ui.define([
 									{
 										url: '/samples/extension/loadDependencies/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/extension/loadDependencies/Extension.js',
@@ -2336,7 +2466,8 @@ sap.ui.define([
 									{
 										url: '/samples/extension/northwindImage/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/extension/northwindImage/NorthwindImageExtension.js',
@@ -2352,7 +2483,8 @@ sap.ui.define([
 									{
 										url: '/samples/extension/refreshData/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/extension/refreshData/DataExtension.js',
@@ -2371,7 +2503,8 @@ sap.ui.define([
 									{
 										url: '/samples/extension/showMessage/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/extension/showMessage/ShowMessageExtension.js',
@@ -2391,7 +2524,8 @@ sap.ui.define([
 									{
 										url: '/samples/extension/messages/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/extension/messages/SampleExtension.js',
@@ -2408,7 +2542,8 @@ sap.ui.define([
 									{
 										url: '/samples/extension/sharedExtension/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/extension/shared/lib/library.js',
@@ -2430,7 +2565,8 @@ sap.ui.define([
 									{
 										url: '/samples/extension/sharedFetchExtension/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/extension/shared/lib/library.js',
@@ -2451,7 +2587,8 @@ sap.ui.define([
 									{
 										url: '/samples/extension/translation/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/extension/translation/TranslationExtension.js',
@@ -2486,7 +2623,8 @@ sap.ui.define([
 									{
 										url: '/samples/microCharts/lineChart/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/microCharts/lineChart/data.json',
@@ -2503,7 +2641,8 @@ sap.ui.define([
 									{
 										url: '/samples/microCharts/bulletChart/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/microCharts/bulletChart/data.json',
@@ -2520,7 +2659,8 @@ sap.ui.define([
 									{
 										url: '/samples/microCharts/columnChart/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/microCharts/columnChart/data.json',
@@ -2537,7 +2677,8 @@ sap.ui.define([
 									{
 										url: '/samples/microCharts/harveyBallChart/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/microCharts/harveyBallChart/data.json',
@@ -2554,7 +2695,8 @@ sap.ui.define([
 									{
 										url: '/samples/microCharts/radialChart/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/microCharts/radialChart/data.json',
@@ -2571,7 +2713,8 @@ sap.ui.define([
 									{
 										url: '/samples/microCharts/stackedBar/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/microCharts/stackedBar/data.json',
@@ -2588,7 +2731,8 @@ sap.ui.define([
 									{
 										url: '/samples/microCharts/stackedBarZeroValues/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/microCharts/stackedBarZeroValues/data.json',
@@ -2615,7 +2759,8 @@ sap.ui.define([
 									{
 										url: '/samples/pagination/client/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									}
 								]
 							},
@@ -2626,7 +2771,8 @@ sap.ui.define([
 									{
 										url: '/samples/pagination/server/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									}
 								]
 							},
@@ -2637,7 +2783,8 @@ sap.ui.define([
 									{
 										url: '/samples/pagination/extension/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/pagination/extension/DataExtension.js',
@@ -2653,7 +2800,8 @@ sap.ui.define([
 									{
 										url: '/samples/pagination/clientactions/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									}
 								]
 							},
@@ -2664,7 +2812,8 @@ sap.ui.define([
 									{
 										url: '/samples/pagination/table/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									}
 								]
 							},
@@ -2675,7 +2824,8 @@ sap.ui.define([
 									{
 										url: '/samples/pagination/timeline/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									}
 								]
 							}
@@ -2693,7 +2843,8 @@ sap.ui.define([
 									{
 										url: '/samples/parameters/parameters/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									}
 								]
 							},
@@ -2707,7 +2858,8 @@ sap.ui.define([
 									{
 										url: '/samples/parameters/arrayParameters/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/parameters/arrayParameters/dt/Configuration.js',
@@ -2726,7 +2878,8 @@ sap.ui.define([
 							{
 								url: '/samples/translation/manifest.json',
 								name: 'manifest.json',
-								key: 'manifest.json'
+								key: 'manifest.json',
+										editable: true
 							},
 							{
 								url: '/samples/translation/i18n/i18n.properties',
@@ -2757,7 +2910,8 @@ sap.ui.define([
 							{
 								url: '/samples/formatters/currency/manifest.json',
 								name: 'manifest.json',
-								key: 'manifest.json'
+								key: 'manifest.json',
+								editable: true
 							}
 						]
 					},
@@ -2773,7 +2927,8 @@ sap.ui.define([
 									{
 										url: '/samples/formatters/dateAndTime/dateTime/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									}
 								]
 							},
@@ -2784,7 +2939,8 @@ sap.ui.define([
 									{
 										url: '/samples/formatters/dateAndTime/date/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									}
 								]
 							}
@@ -2798,7 +2954,8 @@ sap.ui.define([
 							{
 								url: '/samples/formatters/encodeURIComponent/manifest.json',
 								name: 'manifest.json',
-								key: 'manifest.json'
+								key: 'manifest.json',
+								editable: true
 							}
 						]
 					},
@@ -2810,7 +2967,8 @@ sap.ui.define([
 							{
 								url: '/samples/formatters/float/manifest.json',
 								name: 'manifest.json',
-								key: 'manifest.json'
+								key: 'manifest.json',
+								editable: true
 							}
 						]
 					},
@@ -2822,7 +2980,8 @@ sap.ui.define([
 							{
 								url: '/samples/formatters/initials/manifest.json',
 								name: 'manifest.json',
-								key: 'manifest.json'
+								key: 'manifest.json',
+								editable: true
 							}
 						]
 					},
@@ -2834,7 +2993,8 @@ sap.ui.define([
 							{
 								url: '/samples/formatters/integer/manifest.json',
 								name: 'manifest.json',
-								key: 'manifest.json'
+								key: 'manifest.json',
+								editable: true
 							}
 						]
 					},
@@ -2846,7 +3006,8 @@ sap.ui.define([
 							{
 								url: '/samples/formatters/percent/manifest.json',
 								name: 'manifest.json',
-								key: 'manifest.json'
+								key: 'manifest.json',
+								editable: true
 							}
 						]
 					},
@@ -2858,7 +3019,8 @@ sap.ui.define([
 							{
 								url: '/samples/formatters/text/manifest.json',
 								name: 'manifest.json',
-								key: 'manifest.json'
+								key: 'manifest.json',
+								editable: true
 							},
 							{
 								url: '/samples/formatters/text/i18n/i18n.properties',
@@ -2880,7 +3042,8 @@ sap.ui.define([
 							{
 								url: '/samples/formatters/unit/manifest.json',
 								name: 'manifest.json',
-								key: 'manifest.json'
+								key: 'manifest.json',
+								editable: true
 							}
 						]
 					}
@@ -2908,7 +3071,8 @@ sap.ui.define([
 							{
 								url: '/samples/adaptiveCustomizedActions/cardManifest.json',
 								name: 'cardManifest.json',
-								key: 'cardManifest.json'
+								key: 'cardManifest.json',
+								editable: true
 							},
 							{
 								url: '/samples/adaptiveCustomizedActions/AdaptiveCustomizedActions.view.xml',
@@ -2923,8 +3087,7 @@ sap.ui.define([
 							{
 								url: '/samples/adaptiveCustomizedActions/manifest.json',
 								name: 'manifest.json',
-								key: 'manifest.json',
-								isApplicationManifest: true
+								key: 'manifest.json'
 							},
 							{
 								url: '/samples/adaptiveCustomizedActions/Component.js',
@@ -2968,8 +3131,7 @@ sap.ui.define([
 							{
 								url: '/samples/badge/manifest.json',
 								name: 'manifest.json',
-								key: 'manifest.json',
-								isApplicationManifest: true
+								key: 'manifest.json'
 							},
 							{
 								url: '/samples/badge/Component.js',
@@ -2997,7 +3159,8 @@ sap.ui.define([
 									{
 										url: '/samples/htmlConsumption/simpleExmpl/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json'
+										key: 'manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/htmlConsumption/simpleExmpl/i18n/i18n.properties',
@@ -3062,7 +3225,8 @@ sap.ui.define([
 									{
 										url: '/samples/destinations/general/cardManifest.json',
 										name: 'cardManifest.json',
-										key: 'cardManifest.json'
+										key: 'cardManifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/destinations/general/Destinations.view.xml',
@@ -3077,8 +3241,7 @@ sap.ui.define([
 									{
 										url: '/samples/destinations/general/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json',
-										isApplicationManifest: true
+										key: 'manifest.json'
 									},
 									{
 										url: '/samples/destinations/general/Component.js',
@@ -3111,8 +3274,7 @@ sap.ui.define([
 									{
 										url: '/samples/destinations/component/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json',
-										isApplicationManifest: true
+										key: 'manifest.json'
 									},
 									{
 										url: '/samples/destinations/component/Component.js',
@@ -3122,7 +3284,8 @@ sap.ui.define([
 									{
 										url: '/samples/destinations/component/sampleComponent/manifest.json',
 										name: 'sampleComponent/manifest.json',
-										key: 'sampleComponent/manifest.json'
+										key: 'sampleComponent/manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/destinations/component/sampleComponent/Component.js',
@@ -3150,7 +3313,8 @@ sap.ui.define([
 									{
 										url: '/samples/destinations/extensionUsingDestinations/cardBundle/cardManifest.json',
 										name: 'cardBundle/cardManifest.json',
-										key: 'cardBundle/cardManifest.json'
+										key: 'cardBundle/cardManifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/destinations/extensionUsingDestinations/cardBundle/DataExtension.js',
@@ -3170,8 +3334,7 @@ sap.ui.define([
 									{
 										url: '/samples/destinations/extensionUsingDestinations/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json',
-										isApplicationManifest: true
+										key: 'manifest.json'
 									},
 									{
 										url: '/samples/destinations/extensionUsingDestinations/Component.js',
@@ -3195,7 +3358,8 @@ sap.ui.define([
 									{
 										url: '/samples/destinations/scp/cardBundle/cardManifest.json',
 										name: 'cardBundle/cardManifest.json',
-										key: 'cardBundle/cardManifest.json'
+										key: 'cardBundle/cardManifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/destinations/scp/neo-app.json',
@@ -3210,8 +3374,7 @@ sap.ui.define([
 									{
 										url: '/samples/destinations/scp/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json',
-										isApplicationManifest: true
+										key: 'manifest.json'
 									},
 									{
 										url: '/samples/destinations/scp/Component.js',
@@ -3257,8 +3420,7 @@ sap.ui.define([
 							{
 								url: '/samples/hostActions/manifest.json',
 								name: 'manifest.json',
-								key: 'manifest.json',
-								isApplicationManifest: true
+								key: 'manifest.json'
 							},
 							{
 								url: '/samples/hostActions/Component.js',
@@ -3282,7 +3444,8 @@ sap.ui.define([
 							{
 								url: '/samples/hostAndExtensionActions/cardBundle/cardManifest.json',
 								name: 'cardBundle/cardManifest.json',
-								key: 'cardBundle/cardManifest.json'
+								key: 'cardBundle/cardManifest.json',
+								editable: true
 							},
 							{
 								url: '/samples/hostAndExtensionActions/cardBundle/ActionsExtension.js',
@@ -3302,8 +3465,7 @@ sap.ui.define([
 							{
 								url: '/samples/hostAndExtensionActions/manifest.json',
 								name: 'manifest.json',
-								key: 'manifest.json',
-								isApplicationManifest: true
+								key: 'manifest.json'
 							},
 							{
 								url: '/samples/hostAndExtensionActions/Component.js',
@@ -3357,8 +3519,7 @@ sap.ui.define([
 							{
 								url: '/samples/interactionInGrid/manifest.json',
 								name: 'manifest.json',
-								key: 'manifest.json',
-								isApplicationManifest: true
+								key: 'manifest.json'
 							},
 							{
 								url: '/samples/interactionInGrid/Component.js',
@@ -3397,8 +3558,7 @@ sap.ui.define([
 									{
 										url: '/samples/preview/allModes/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json',
-										isApplicationManifest: true
+										key: 'manifest.json'
 									},
 									{
 										url: '/samples/preview/allModes/Component.js',
@@ -3408,7 +3568,8 @@ sap.ui.define([
 									{
 										url: '/samples/preview/allModes/listCard/manifest.json',
 										name: 'listCard/manifest.json',
-										key: 'listCard/manifest.json'
+										key: 'listCard/manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/preview/allModes/listCard/mockData.json',
@@ -3436,8 +3597,7 @@ sap.ui.define([
 									{
 										url: '/samples/preview/missingMockConfiguration/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json',
-										isApplicationManifest: true
+										key: 'manifest.json'
 									},
 									{
 										url: '/samples/preview/missingMockConfiguration/Component.js',
@@ -3447,7 +3607,8 @@ sap.ui.define([
 									{
 										url: '/samples/preview/missingMockConfiguration/tableCard/manifest.json',
 										name: 'tableCard/manifest.json',
-										key: 'tableCard/manifest.json'
+										key: 'tableCard/manifest.json',
+										editable: true
 									}
 								]
 							},
@@ -3470,8 +3631,7 @@ sap.ui.define([
 									{
 										url: '/samples/preview/component/manifest.json',
 										name: 'manifest.json',
-										key: 'manifest.json',
-										isApplicationManifest: true
+										key: 'manifest.json'
 									},
 									{
 										url: '/samples/preview/component/Component.js',
@@ -3481,7 +3641,8 @@ sap.ui.define([
 									{
 										url: '/samples/preview/component/sampleComponent/manifest.json',
 										name: 'sampleComponent/manifest.json',
-										key: 'sampleComponent/manifest.json'
+										key: 'sampleComponent/manifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/preview/component/sampleComponent/Component.js',
@@ -3528,8 +3689,7 @@ sap.ui.define([
 							{
 								url: '/samples/configurationChanges/manifest.json',
 								name: 'manifest.json',
-								key: 'manifest.json',
-								isApplicationManifest: true
+								key: 'manifest.json'
 							},
 							{
 								url: '/samples/configurationChanges/Component.js',
@@ -3554,7 +3714,8 @@ sap.ui.define([
 							{
 								url: '/samples/hostContext/cardManifest.json',
 								name: 'cardManifest.json',
-								key: 'cardManifest.json'
+								key: 'cardManifest.json',
+								editable: true
 							},
 							{
 								url: '/samples/hostContext/HostContext.view.xml',
@@ -3569,8 +3730,7 @@ sap.ui.define([
 							{
 								url: '/samples/hostContext/manifest.json',
 								name: 'manifest.json',
-								key: 'manifest.json',
-								isApplicationManifest: true
+								key: 'manifest.json'
 							},
 							{
 								url: '/samples/hostContext/Component.js',
@@ -3594,8 +3754,7 @@ sap.ui.define([
 							{
 								url: '/samples/design/manifest.json',
 								name: 'manifest.json',
-								key: 'manifest.json',
-								isApplicationManifest: true
+								key: 'manifest.json'
 							},
 							{
 								url: '/samples/design/Design.view.xml',
@@ -3692,7 +3851,8 @@ sap.ui.define([
 							{
 								url: '/samples/designtimeAdmin/manifest.json',
 								name: 'manifest.json',
-								key: 'cardManifest.json'
+								key: 'cardManifest.json',
+								editable: true
 							},
 							{
 								url: '/samples/designtimeAdmin/i18n/i18n.properties',
@@ -3715,7 +3875,8 @@ sap.ui.define([
 							{
 								url: '/samples/designtimeTranslation/manifest.json',
 								name: 'manifest.json',
-								key: 'cardManifest.json'
+								key: 'cardManifest.json',
+								editable: true
 							},
 							{
 								url: '/samples/designtimeTranslation/i18n/i18n_fr.properties',
@@ -3751,7 +3912,8 @@ sap.ui.define([
 									{
 										url: '/samples/designtimePreview/manifest.json',
 										name: 'manifest.json',
-										key: 'cardManifest.json'
+										key: 'cardManifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/designtimePreview/i18n/i18n.properties',
@@ -3772,7 +3934,8 @@ sap.ui.define([
 									{
 										url: '/samples/designtimePreviewInteractive/manifest.json',
 										name: 'manifest.json',
-										key: 'cardManifest.json'
+										key: 'cardManifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/designtimePreviewInteractive/i18n/i18n.properties',
@@ -3794,7 +3957,8 @@ sap.ui.define([
 									{
 										url: '/samples/designtimePreviewPositionLeft/manifest.json',
 										name: 'manifest.json',
-										key: 'cardManifest.json'
+										key: 'cardManifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/designtimePreviewPositionLeft/i18n/i18n.properties',
@@ -3816,7 +3980,8 @@ sap.ui.define([
 									{
 										url: '/samples/designtimePreviewPositionRight/manifest.json',
 										name: 'manifest.json',
-										key: 'cardManifest.json'
+										key: 'cardManifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/designtimePreviewPositionRight/i18n/i18n.properties',
@@ -3838,7 +4003,8 @@ sap.ui.define([
 									{
 										url: '/samples/designtimePreviewPositionTop/manifest.json',
 										name: 'manifest.json',
-										key: 'cardManifest.json'
+										key: 'cardManifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/designtimePreviewPositionTop/i18n/i18n.properties',
@@ -3860,7 +4026,8 @@ sap.ui.define([
 									{
 										url: '/samples/designtimePreviewPositionBottom/manifest.json',
 										name: 'manifest.json',
-										key: 'cardManifest.json'
+										key: 'cardManifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/designtimePreviewPositionBottom/i18n/i18n.properties',
@@ -3882,7 +4049,8 @@ sap.ui.define([
 									{
 										url: '/samples/designtimePreviewPositionSeparate/manifest.json',
 										name: 'manifest.json',
-										key: 'cardManifest.json'
+										key: 'cardManifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/designtimePreviewPositionSeparate/i18n/i18n.properties',
@@ -3910,7 +4078,8 @@ sap.ui.define([
 									{
 										url: '/samples/designtimeFields/manifest.json',
 										name: 'manifest.json',
-										key: 'cardManifest.json'
+										key: 'cardManifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/designtimeFields/i18n/i18n.properties',
@@ -3931,7 +4100,8 @@ sap.ui.define([
 									{
 										url: '/samples/designtimeFormatter/manifest.json',
 										name: 'manifest.json',
-										key: 'cardManifest.json'
+										key: 'cardManifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/designtimeFormatter/i18n/i18n.properties',
@@ -3952,7 +4122,8 @@ sap.ui.define([
 									{
 										url: '/samples/designtimeDataExtension/manifest.json',
 										name: 'manifest.json',
-										key: 'cardManifest.json'
+										key: 'cardManifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/designtimeDataExtension/i18n/i18n.properties',
@@ -3978,7 +4149,8 @@ sap.ui.define([
 									{
 										url: '/samples/designtimeSharedDataExtension/manifest.json',
 										name: 'manifest.json',
-										key: 'cardManifest.json'
+										key: 'cardManifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/designtimeSharedDataExtension/i18n/i18n.properties',
@@ -4004,7 +4176,8 @@ sap.ui.define([
 									{
 										url: '/samples/designtimeFilter/manifest.json',
 										name: 'manifest.json',
-										key: 'cardManifest.json'
+										key: 'cardManifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/designtimeFilter/i18n/i18n.properties',
@@ -4025,7 +4198,8 @@ sap.ui.define([
 									{
 										url: '/samples/designtimeLinkedParameter/manifest.json',
 										name: 'manifest.json',
-										key: 'cardManifest.json'
+										key: 'cardManifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/designtimeLinkedParameter/i18n/i18n.properties',
@@ -4046,7 +4220,8 @@ sap.ui.define([
 									{
 										url: '/samples/designtimeValidation/manifest.json',
 										name: 'manifest.json',
-										key: 'cardManifest.json'
+										key: 'cardManifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/designtimeValidation/i18n/i18n.properties',
@@ -4067,7 +4242,8 @@ sap.ui.define([
 									{
 										url: '/samples/designtimeLayout/manifest.json',
 										name: 'manifest.json',
-										key: 'cardManifest.json'
+										key: 'cardManifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/designtimeLayout/i18n/i18n.properties',
@@ -4134,7 +4310,8 @@ sap.ui.define([
 									{
 										url: '/samples/designtimeSepareteConfigToJS/manifest.json',
 										name: 'manifest.json',
-										key: 'cardManifest.json'
+										key: 'cardManifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/designtimeSepareteConfigToJS/i18n/i18n.properties',
@@ -4180,7 +4357,8 @@ sap.ui.define([
 									{
 										url: '/samples/designtimeCustomField/manifest.json',
 										name: 'manifest.json',
-										key: 'cardManifest.json'
+										key: 'cardManifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/designtimeCustomField/i18n/i18n.properties',
@@ -4216,7 +4394,8 @@ sap.ui.define([
 									{
 										url: '/samples/designtimeDestinations/manifest.json',
 										name: 'manifest.json',
-										key: 'cardManifest.json'
+										key: 'cardManifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/designtimeDestinations/i18n/i18n.properties',
@@ -4237,7 +4416,8 @@ sap.ui.define([
 									{
 										url: '/samples/designtimeDestinationsAtTop/manifest.json',
 										name: 'manifest.json',
-										key: 'cardManifest.json'
+										key: 'cardManifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/designtimeDestinationsAtTop/i18n/i18n.properties',
@@ -4258,7 +4438,8 @@ sap.ui.define([
 									{
 										url: '/samples/designtimeDestinationsSorterAndFilter/manifest.json',
 										name: 'manifest.json',
-										key: 'cardManifest.json'
+										key: 'cardManifest.json',
+										editable: true
 									},
 									{
 										url: '/samples/designtimeDestinationsSorterAndFilter/i18n/i18n.properties',

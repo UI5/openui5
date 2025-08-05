@@ -225,7 +225,7 @@ sap.ui.define([
 
 			this._doMSCardsOverwrites();
 			this._adjustHostConfig();
-			this._handleActions();
+			this._handleActions(); // TODO: fix propagation of whole Card-level actions to Adaptive Content
 			this._replaceElements();
 			this._isRtl();
 		};
