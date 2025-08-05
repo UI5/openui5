@@ -1,7 +1,17 @@
 {
   "1.139.0": {
-    "date": "July 2025",
+    "date": "August 2025",
     "notes": [
+      {
+        "id": "d1d3a987d573dff59decd3231d206c4c171d9dc7",
+        "type": "FIX",
+        "text": " sap.m.IconTabBar: Unnecessary bold on tab text is now removed"
+      },
+      {
+        "id": "8f0d7d7ea6db4914cd74cbc392714685e10342bc",
+        "type": "FIX",
+        "text": " sap.m.Button: fix focus border color"
+      },
       {
         "id": "244a7a95668035936f09f5825a6823b8848a8a41",
         "type": "FIX",

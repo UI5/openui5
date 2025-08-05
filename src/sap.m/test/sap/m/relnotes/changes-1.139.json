@@ -1,7 +1,22 @@
 {
   "1.139.0": {
-    "date": "July 2025",
+    "date": "August 2025",
     "notes": [
+      {
+        "id": "d1d3a987d573dff59decd3231d206c4c171d9dc7",
+        "type": "FIX",
+        "text": " sap.m.IconTabBar: Unnecessary bold on tab text is now removed"
+      },
+      {
+        "id": "05191e6de74f979066af853c8f13a84008f6cc82",
+        "type": "FIX",
+        "text": " sap.m.Menu: fixed endContent controls `press` event firing"
+      },
+      {
+        "id": "f4bae52a03e8714ceb74173e7d114d5f7ad4c4cd",
+        "type": "FIX",
+        "text": " sap.m.QuickViewPage: Remove synchronous request during initalization"
+      },
       {
         "id": "02a01be1836636078bc80db1d49b423e4d115637",
         "type": "FEATURE",

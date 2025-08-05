@@ -1,7 +1,12 @@
 {
   "1.139.0": {
-    "date": "July 2025",
+    "date": "August 2025",
     "notes": [
+      {
+        "id": "67af0ab3926fc82e59bfab3b170e232f8c5fc4c7",
+        "type": "FIX",
+        "text": " sap.tnt.SideNavigation: no exceptions in the console"
+      },
       {
         "id": "244a7a95668035936f09f5825a6823b8848a8a41",
         "type": "FIX",

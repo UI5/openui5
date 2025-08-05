@@ -1,7 +1,12 @@
 {
   "1.139.0": {
-    "date": "July 2025",
+    "date": "August 2025",
     "notes": [
+      {
+        "id": "430d41d9f6a0d8f5a952989a36ae71a079e03e9c",
+        "type": "FIX",
+        "text": " Demo Kit: Remove redundant version visibility"
+      },
       {
         "id": "a83887c16abc6ec6f221a93da3a678343edda6ac",
         "type": "FIX",
