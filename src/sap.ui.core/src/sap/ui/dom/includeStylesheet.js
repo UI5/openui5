@@ -13,9 +13,7 @@ sap.ui.define(["sap/base/assert"],
 			// create the new link element
 			var oLink = document.createElement("link");
 			oLink.rel = "stylesheet";
-			if (sUrl) {
-				oLink.href = sUrl;
-			}
+			oLink.href = sUrl;
 			if (mAttributes && typeof mAttributes === "object") {
 				Object.keys(mAttributes).forEach(function(sKey) {
 					if (mAttributes[sKey] != null) {
