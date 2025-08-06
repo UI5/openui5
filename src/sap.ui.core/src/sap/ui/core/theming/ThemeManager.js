@@ -128,8 +128,9 @@ sap.ui.define([
 				customCss: false,
 				fileName: "library",
 				themeFallback: false,
-				getUrl: function({sTheme = Theming.getTheme(), bAsync = false} = {}) {
-					const buildUrl = () => {
+				getUrl: function(sTheme) {
+					const buildUrl = (skipVersionInfo) => {
+						sTheme ??= Theming.getTheme();
 						/**
 						 * Custom libs which are not part of the DIST layer have no custom theme
 						 * except they provide it as part of the library (no themeroots for the custom library)
@@ -138,7 +139,18 @@ sap.ui.define([
 							!ThemeHelper.isStandardTheme(sTheme) && Theming.getThemeRoot(sTheme, this.libName)) {
 							sTheme = _sFallbackThemeFromMetadata || _sFallbackThemeFromThemeRoot;
 							if (!sTheme) {
-								this.failed = true;
+								// 'sUrl' may be 'undefined' if we need to wait for the fallback theme. In this case,
+								// only a link element is added to the DOM to preserve the correct CSS order.
+								// This prevents other library themes - which do not require waiting for a fallback -
+								// from being added before the fallback theme.
+								const oLink = document.createElement("link");
+								oLink.setAttribute("id", this.linkId);
+								if (this.cssLinkElement) {
+									this.cssLinkElement.parentNode.replaceChild(oLink, this.cssLinkElement);
+								} else {
+									document.head.appendChild(oLink);
+								}
+								this.cssLinkElement = oLink;
 								return undefined;
 							}
 						}
@@ -162,14 +174,14 @@ sap.ui.define([
 						// Note: Considered to use AppCacheBuster.js#convertURL for adding the AppCachebuster ID
 						//       but there would be a dependency to AppCacheBuster as trade-off
 						const oTmpLink = document.createElement("link");
-						oTmpLink.href = `${sCssPath}${`?sap-ui-dist-version=${sUi5Version || CORE_VERSION || ""}`}`;
+						oTmpLink.href = `${sCssPath}${skipVersionInfo ? "" : `?sap-ui-dist-version=${sUi5Version || CORE_VERSION || ""}`}`;
 						return oTmpLink.href;
 					};
-					if (bAsync) {
-						return versionInfoLoaded.then(buildUrl);
-					} else {
-						return buildUrl();
-					}
+					return {
+						urlPromise: versionInfoLoaded.then(buildUrl),
+						url: buildUrl(),
+						baseUrl: buildUrl(true)
+					};
 				}
 			};
 
@@ -251,16 +263,14 @@ sap.ui.define([
 			Log.debug(`Register theme change for library ${libInfo.id}`, undefined, MODULE_NAME);
 		}
 		if (!sUi5Version && isVersionInfoNeeded()) {
-			Log.error("[FUTURE FATAL] UI5 theming lifecycle requires valid version information when a theming service is active. Please check why the version info could not be loaded in this system.", undefined, MODULE_NAME);
+			Log.error("UI5 theming lifecycle requires valid version information when a theming service is active. Please check why the version info could not be loaded in this system.", undefined, MODULE_NAME);
 		}
 		// Compare the link including the UI5 version only if it is already available; otherwise, compare the link without the version to prevent unnecessary requests.
-		const sOldUrl = sUi5Version ? libInfo.cssLinkElement?.getAttribute("href") : libInfo.cssLinkElement?.getAttribute("href").replace(/\?.*/, "");
-		const sUrl = libInfo.getUrl({sTheme: theme});
+		const sOldUrl = libInfo.cssLinkElement?.getAttribute("href")?.replace(/\?.*/, "");
+		const sUrl = libInfo.getUrl(theme).baseUrl;
 		if (!sUrl || sOldUrl !== sUrl) {
 			libInfo.finishedLoading = false;
 			libInfo.failed = false;
-			libInfo.cssLoaded ??= Promise.resolve();
-			libInfo.cssLoaded.aborted = true;
 			if (suppressFOUC) {
 				// Only add stylesheet in case there is no existing stylesheet or the href is different
 				// use the special FOUC handling for initially existing stylesheets
@@ -268,57 +278,88 @@ sap.ui.define([
 				// includeStyleSheet API and to be removed later
 				fnAddFoucmarker(libInfo.linkId);
 			}
-			const pCssLoaded = libInfo.getUrl({sTheme: theme, bAsync: true}).then((sUrl) => {
-				Log.debug(`Add new CSS for library ${libInfo.id} with URL: ${sUrl}`, undefined, MODULE_NAME);
-				// 'sUrl' may be 'undefined' if we need to wait for the fallback theme. In this case,
-				// only a link element is added to the DOM to preserve the correct CSS order.
-				// This prevents other library themes - which do not require waiting for a fallback -
-				// from being added before the fallback theme.
-				return includeStylesheet({
-					url: sUrl,
-					id: libInfo.linkId
-				});
+			const pCssLoaded = libInfo.getUrl(theme).urlPromise.then((sUrl) => {
+				if (sUrl) {
+					Log.debug(`Add new CSS for library ${libInfo.id} with URL: ${sUrl}`, undefined, MODULE_NAME);
+					return includeStylesheet({
+						url: sUrl,
+						id: libInfo.linkId
+					});
+				} else {
+					// If there is no URL, a theme fallback must be detected first.
+					// We reject here because only a placeholder link element has been added to the DOM.
+					// The handleThemeFailed function will process this rejection and apply the fallback
+					// theme for the library once it has been detected.
+					return Promise.reject();
+				}
 			});
 
 			if (libInfo.cssLoaded) {
 				libInfo.cssLoaded.aborted = true;
 			}
 
-			libInfo.cssLoaded = pCssLoaded.finally(function() {
-				if (!libInfo.cssLoaded.aborted) {
-					libInfo.finishedLoading = true;
-					document.querySelector(`link[data-sap-ui-foucmarker='${libInfo.linkId}']`)?.remove();
-					libInfo.cssLinkElement = document.getElementById(`${libInfo.linkId}`);
-					Log.debug(`New stylesheet loaded and old stylesheet removed for library: ${libInfo.id}`, undefined, MODULE_NAME);
-				}
-			}).then(function() {
-				if (!libInfo.cssLoaded.aborted) {
-					handleThemeSucceeded(libInfo.id);
-				}
-			}).catch(function() {
-				if (!libInfo.cssLoaded.aborted) {
-					handleThemeFailed(libInfo.id);
-				}
-			}).finally(function() {
-				if (!libInfo.cssLoaded.aborted) {
-					handleThemeFinished(libInfo.id);
-					pAllCssRequests = Promise.allSettled([...mAllLoadedLibraries.values()].map((libInfo) => libInfo.cssLoaded));
-					pAllCssRequests.finally(function() {
-						if (this === pAllCssRequests) {
-							Log.debug("Theme change finished", undefined, MODULE_NAME);
-							// Even if suppressFOUC is not set, we must fire the event if themeLoaded was previously set to false,
-							// because this indicates that at least one theme change was caused by a theming-relevant trigger.
-							if (suppressFOUC || !ThemeManager.themeLoaded) {
-								ThemeManager.themeLoaded = true;
-								oEventing.fireEvent("applied", {
-									theme: Theming.getTheme()
-								});
-							}
-						}
-					}.bind(pAllCssRequests));
-				}
-			});
+			includeStyleSheetPostProcessing(libInfo, pCssLoaded, suppressFOUC);
 		}
+	}
+
+	/**
+	 * Handles post-processing of CSS link elements after they have been requested.
+	 *
+	 * This function manages the lifecycle of CSS loading for a library by attaching handlers to the CSS loading promise.
+	 * It handles success and failure cases, as well as generic post-processing that occurs regardless of the request status.
+	 * The function is responsible for:
+	 *
+	 * 1. Managing the loading state of the CSS for the library
+	 * 2. Removing FOUC (Flash of Unstyled Content) markers when loading completes
+	 * 3. Updating references to the CSS link element
+	 * 4. Triggering appropriate theme lifecycle events (success, failure, completion)
+	 * 5. Updating the global CSS request promise collection
+	 * 6. Managing the global theme loaded state
+	 * 7. Firing the "applied" event when all CSS requests have completed
+	 *
+	 * The function uses promise chaining to ensure proper sequencing of operations and to handle
+	 * both successful and failed CSS loading scenarios. It also includes an abort mechanism to
+	 * prevent stale CSS requests from affecting the UI when a new request supersedes them.
+	 *
+	 * @param {object} libInfo - The library info object containing metadata about the library and its CSS
+	 * @param {Promise} cssLoadededPromise - The promise that resolves when the CSS has been loaded
+	 * @param {boolean} suppressFOUC - Whether to suppress Flash of Unstyled Content during theme changes
+	 */
+	function includeStyleSheetPostProcessing(libInfo, cssLoadededPromise, suppressFOUC) {
+		libInfo.cssLoaded = cssLoadededPromise.finally(function() {
+			if (!libInfo.cssLoaded.aborted) {
+				libInfo.finishedLoading = true;
+				document.querySelector(`link[data-sap-ui-foucmarker='${libInfo.linkId}']`)?.remove();
+				libInfo.cssLinkElement = document.getElementById(`${libInfo.linkId}`);
+				Log.debug(`New stylesheet loaded and old stylesheet removed for library: ${libInfo.id}`, undefined, MODULE_NAME);
+			}
+		}).then(function() {
+			if (!libInfo.cssLoaded.aborted) {
+				handleThemeSucceeded(libInfo.id);
+			}
+		}).catch(function() {
+			if (!libInfo.cssLoaded.aborted) {
+				handleThemeFailed(libInfo.id);
+			}
+		}).finally(function() {
+			if (!libInfo.cssLoaded.aborted) {
+				handleThemeFinished(libInfo.id);
+				pAllCssRequests = Promise.allSettled([...mAllLoadedLibraries.values()].map((libInfo) => libInfo.cssLoaded));
+				pAllCssRequests.finally(function() {
+					if (this === pAllCssRequests) {
+						Log.debug("Theme change finished", undefined, MODULE_NAME);
+						// Even if suppressFOUC is not set, we must fire the event if themeLoaded was previously set to false,
+						// because this indicates that at least one theme change was caused by a theming-relevant trigger.
+						if (suppressFOUC || !ThemeManager.themeLoaded) {
+							ThemeManager.themeLoaded = true;
+							oEventing.fireEvent("applied", {
+								theme: Theming.getTheme()
+							});
+						}
+					}
+				}.bind(pAllCssRequests));
+			}
+		});
 	}
 
 	/**
@@ -576,9 +617,8 @@ sap.ui.define([
 
 		Log.info(`Preloaded CSS for library ${libName})} detected: ${cssLinkElement.href}`, undefined, MODULE_NAME);
 
-		const { promise: cssLoaded, resolve, reject} = Promise.withResolvers();
-		const handleDataSapUiReady = function(bError) {
-			oLibInfo.finishedLoading = true;
+		const { promise: cssLoaded, resolve, reject } = Promise.withResolvers();
+		const handleReady = function(bError) {
 			if (bError) {
 				reject();
 			} else {
@@ -590,13 +630,16 @@ sap.ui.define([
 			bPreloadedCssReady = !!(cssLinkElement.sheet?.href === cssLinkElement.href && cssLinkElement.sheet?.cssRules);
 			if (!bPreloadedCssReady) {
 				ThemeManager.themeLoaded = bPreloadedCssReady;
-				cssLinkElement.addEventListener("load", (oEvent) => {
-					handleDataSapUiReady(oEvent.type === "error");
+				cssLinkElement.addEventListener("load", () => {
+					handleReady(false);
+				});
+				cssLinkElement.addEventListener("error", () => {
+					handleReady(true);
 				});
 			} else {
-				handleDataSapUiReady(!(cssLinkElement.sheet.cssRules.length > 0));
+				handleReady(!(cssLinkElement.sheet.cssRules.length > 0));
 			}
-			oLibInfo.cssLoaded = cssLoaded;
+			includeStyleSheetPostProcessing(oLibInfo, cssLoaded, true);
 		} catch (e) {
 			// If the stylesheet is cross-origin and throws a security error, we can't verify directly
 			Log.info("Could not detect ready state of preloaded CSS. Request stylesheet again to verify the response status", undefined, MODULE_NAME);

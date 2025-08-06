@@ -216,11 +216,11 @@ sap.ui.define([
 	}
 
 	function getThemeBaseUrlForId (libInfo) {
-		if (!libInfo.getUrl() && !libInfo.cssLinkElement) {
+		if (!libInfo.getUrl().url && !libInfo.cssLinkElement) {
 			throw new Error(`sap.ui.core.theming.Parameters: Could not find stylesheet element with ID "${libInfo.id}"`);
 		}
 
-		var sStyleSheetUrl = libInfo.getUrl() || libInfo.cssLinkElement?.getAttribute("href");
+		var sStyleSheetUrl = libInfo.getUrl().url || libInfo.cssLinkElement?.getAttribute("href");
 
 		// Remove CSS file name and query to create theme base url (to resolve relative urls)
 		return {
