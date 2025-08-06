@@ -1565,7 +1565,7 @@ sap.ui.define([
 		};
 
 		var oManifest_ComponentCard = {
-			"_version": "2.0.2",
+			"_version": "2.0.0",
 			"sap.app": {
 				"id": "test.card.loading.componentContent",
 				"type": "card",
