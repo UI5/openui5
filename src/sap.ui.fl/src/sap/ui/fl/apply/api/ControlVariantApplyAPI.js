@@ -241,7 +241,7 @@ sap.ui.define([
 			var oControl = mPropertyBag.selector.id && Element.getElementById(mPropertyBag.selector.id) || mPropertyBag.selector;
 			var oAppComponent = Utils.getAppComponentForControl(oControl);
 			waitForVariantModel(oAppComponent).then(function(oVariantModel) {
-				oVariantModel.detachVariantApplied(mPropertyBag.vmControlId, oControl.getId());
+				oVariantModel.detachVariantApplied(mPropertyBag.vmControlId, oControl);
 			});
 		}
 	};

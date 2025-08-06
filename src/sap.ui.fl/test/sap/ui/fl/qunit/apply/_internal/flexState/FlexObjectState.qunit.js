@@ -466,12 +466,16 @@ sap.ui.define([
 
 		QUnit.test("with a variant switch going on", async function(assert) {
 			let bCalled = false;
-			VariantManagementState.setVariantSwitchPromise(sReference, new Promise(function(resolve) {
-				setTimeout(function() {
-					bCalled = true;
-					resolve();
-				});
-			}), "variantManagementReference");
+			VariantManagementState.setVariantSwitchPromise(
+				sReference,
+				"variantManagementReference",
+				new Promise(function(resolve) {
+					setTimeout(function() {
+						bCalled = true;
+						resolve();
+					});
+				})
+			);
 
 			Applier.applyAllChangesForControl(oAppComponent, sReference, this.oControl1);
 			await FlexObjectState.waitForFlexObjectsToBeApplied([{selector: this.oControl1}]);

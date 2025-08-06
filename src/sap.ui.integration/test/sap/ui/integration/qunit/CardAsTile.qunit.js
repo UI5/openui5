@@ -4,19 +4,23 @@ sap.ui.define([
 	"sap/ui/integration/widgets/Card",
 	"sap/ui/integration/library",
 	"sap/ui/test/utils/nextUIUpdate",
-	"qunit/testResources/nextCardReadyEvent"
+	"qunit/testResources/nextCardReadyEvent",
+	"sap/ui/core/Lib"
 ],
 	function(
 		Card,
 		library,
 		nextUIUpdate,
-		nextCardReadyEvent
+		nextCardReadyEvent,
+		coreLibrary
 	) {
 		"use strict";
 
 		const DOM_RENDER_LOCATION = "qunit-fixture";
 
 		const CardDisplayVariant = library.CardDisplayVariant;
+
+		const oRB = coreLibrary.getResourceBundleFor("sap.ui.integration");
 
 		const sLongText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum congue libero ut blandit faucibus. Phasellus sed urna id tortor consequat accumsan eget at leo. Cras quis arcu magna.";
 
@@ -141,6 +145,7 @@ sap.ui.define([
 			assert.strictEqual(oLink.href, "http://www.sap.com/", "Link has correct href");
 			assert.strictEqual(oLink.target, "_blank", "Link has correct target");
 			assert.strictEqual(oLink.rel, "noopener noreferrer", "Link has correct rel");
+			assert.strictEqual(document.getElementById(oCard._ariaText.getId()).innerText, oRB.getText("ARIA_LABELLEDBY_DISPLAY_VARIANT_TILE"));
 
 			oCard.destroy();
 		});
@@ -190,6 +195,7 @@ sap.ui.define([
 			assert.strictEqual(oLink.href, "http://www.sap.com/", "Link has correct href");
 			assert.strictEqual(oLink.target, "_blank", "Link has correct target");
 			assert.strictEqual(oLink.rel, "noopener noreferrer", "Link has correct rel");
+			assert.strictEqual(document.getElementById(oCard._ariaText.getId()).innerText, oRB.getText("ARIA_LABELLEDBY_DISPLAY_VARIANT_TILE"));
 
 			oCard.destroy();
 		});

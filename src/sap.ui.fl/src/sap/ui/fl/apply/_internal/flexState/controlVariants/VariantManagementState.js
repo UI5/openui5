@@ -789,24 +789,35 @@ sap.ui.define([
 	};
 
 	/**
-	 * Sets the promise for the variant switch for the given reference.
+	 * Sets the promise for the variant switch for the given flex reference and VM reference.
 	 *
 	 * @param {string} sReference - Flex reference of the app
-	 * @param {Promise<undefined>} oPromise - Variant Switch Promise
 	 * @param {string} sVMReference - Variant Management reference
+	 * @param {Promise<undefined>} oPromise - Variant Switch Promise
 	 */
-	VariantManagementState.setVariantSwitchPromise = function(sReference, oPromise, sVMReference) {
+	VariantManagementState.setVariantSwitchPromise = function(sReference, sVMReference, oPromise) {
 		mVariantSwitchPromises[sReference] ||= {};
 		mVariantSwitchPromises[sReference][sVMReference] = oPromise;
 	};
 
 	/**
-	 * Gets the promise for the variant switch for the given reference.
+	 * Waits for the variant switch of a given VM.
 	 *
 	 * @param {string} sReference - Flex reference of the app
+	 * @param {string} sVMReference - Variant Management reference
 	 * @returns {Promise<undefined>} Variant Switch Promise
 	 */
-	VariantManagementState.waitForVariantSwitch = function(sReference) {
+	VariantManagementState.waitForVariantSwitch = function(sReference, sVMReference) {
+		return mVariantSwitchPromises[sReference]?.[sVMReference] || Promise.resolve();
+	};
+
+	/**
+	 * Waits for all variant switches for the given flex reference.
+	 *
+	 * @param {string} sReference - Flex reference of the app
+	 * @returns {Promise<undefined>} Variant Switches Promise
+	 */
+	VariantManagementState.waitForAllVariantSwitches = function(sReference) {
 		return Promise.all(Object.values(mVariantSwitchPromises[sReference] || {}));
 	};
 

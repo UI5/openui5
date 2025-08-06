@@ -1683,18 +1683,39 @@ sap.ui.define([
 			sandbox.restore();
 		}
 	}, function() {
-		QUnit.test("variantSwitchPromise", async function(assert) {
+		QUnit.test("waitForVariantSwitch", async function(assert) {
 			const done = assert.async();
-			await VariantManagementState.waitForVariantSwitch(sReference);
+			const sVMReference = "variantManagementReference";
+			await VariantManagementState.waitForVariantSwitch(sReference, sVMReference);
 			assert.ok(true, "the function resolves");
 
 			const oDeferred = new Deferred();
-			VariantManagementState.setVariantSwitchPromise(sReference, oDeferred.promise, "variantManagementReference");
-			VariantManagementState.waitForVariantSwitch(sReference).then(() => {
+			VariantManagementState.setVariantSwitchPromise(sReference, sVMReference, oDeferred.promise);
+			VariantManagementState.waitForVariantSwitch(sReference, sVMReference).then(() => {
 				assert.ok(true, "the promise is resolved");
 				done();
 			});
 			oDeferred.resolve();
+		});
+
+		QUnit.test("waitForAllVariantSwitches", async function(assert) {
+			const done = assert.async();
+			await VariantManagementState.waitForAllVariantSwitches(sReference);
+			assert.ok(true, "the function resolves");
+
+			const oDeferred = new Deferred();
+			const oDeferred2 = new Deferred();
+			VariantManagementState.setVariantSwitchPromise(sReference, "someVMReference", oDeferred.promise);
+			VariantManagementState.setVariantSwitchPromise(sReference, "someOtherVMReference", oDeferred2.promise);
+			VariantManagementState.waitForAllVariantSwitches(sReference).then(() => {
+				assert.ok(true, "the promise is resolved");
+				done();
+			});
+			oDeferred.resolve();
+			setTimeout(() => {
+				assert.ok(true, "the second promise is resolved after a timeout");
+				oDeferred2.resolve();
+			}, 100);
 		});
 
 		QUnit.test("addRuntimeOnlyFlexObjects", function(assert) {

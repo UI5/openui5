@@ -4,6 +4,7 @@
 	xmlns:mvc="sap.ui.core.mvc"
 	xmlns="sap.m">
 	<VBox>
+		<CheckBox />
 		<CheckBox text="Option a" selected="true" />
 		<CheckBox text="Option b" />
 		<CheckBox text="Option c" selected="true" />

@@ -6,7 +6,6 @@ sap.ui.define([
 	"sap/base/util/restricted/_difference",
 	"sap/base/util/restricted/_isEqual",
 	"sap/base/util/restricted/_omit",
-	"sap/base/util/each",
 	"sap/base/util/isEmptyObject",
 	"sap/base/util/merge",
 	"sap/base/Log",
@@ -33,7 +32,6 @@ sap.ui.define([
 	_difference,
 	_isEqual,
 	_omit,
-	each,
 	isEmptyObject,
 	merge,
 	Log,
@@ -61,22 +59,23 @@ sap.ui.define([
 
 	var _mUShellServices = {};
 	const { SharingMode } = mobileLibrary;
+
 	/**
 	 * Adds the passed function to the variant switch promise and returns the whole promise chain.
 	 *
 	 * @param {function():Promise} fnCallback - Callback function returning a promise
-	 * @param {sap.ui.fl.variants.VariantModel} oModel - Variant model
+	 * @param {string} sFlexReference - Flex reference of the app
 	 * @param {string} sVMReference - Variant Management reference
 	 * @returns {Promise} Resolves when the variant model is not busy anymore
 	 * @private
 	 */
-	function executeAfterSwitch(fnCallback, oModel, sVMReference) {
+	function executeAfterSwitch(fnCallback, sFlexReference, sVMReference) {
 		// if there are multiple switches triggered very quickly this makes sure that they are being executed one after another
-		oModel._oVariantSwitchPromises[sVMReference] = oModel._oVariantSwitchPromises[sVMReference]
+		const oNewPromise = VariantManagementState.waitForVariantSwitch(sFlexReference, sVMReference)
 		.catch(function() {})
 		.then(fnCallback);
-		VariantManagementState.setVariantSwitchPromise(oModel.sFlexReference, oModel._oVariantSwitchPromises[sVMReference], sVMReference);
-		return oModel._oVariantSwitchPromises[sVMReference];
+		VariantManagementState.setVariantSwitchPromise(sFlexReference, sVMReference, oNewPromise);
+		return oNewPromise;
 	}
 
 	/**
@@ -119,7 +118,9 @@ sap.ui.define([
 		var oSettings = Settings.getInstanceOrUndef();
 		var bUserIsAuthorized = oSettings &&
 			(oSettings.getIsKeyUser() || !oSettings.getUserId() ||
-			(oSettings.getIsPublicFlVariantEnabled() && oSettings.getUserId().toUpperCase() === oVariant.instance.getSupportInformation().user.toUpperCase()));
+			(oSettings.getIsPublicFlVariantEnabled() &&
+				oSettings.getUserId().toUpperCase() === oVariant.instance.getSupportInformation().user.toUpperCase()
+			));
 		oVariant.remove = bUserIsAuthorized;
 		oVariant.rename = bUserIsAuthorized;
 		oVariant.change = bUserIsAuthorized;
@@ -192,6 +193,16 @@ sap.ui.define([
 		return aSelectors.length ? FlexObjectState.waitForFlexObjectsToBeApplied(aSelectors) : Promise.resolve();
 	}
 
+	function getVariantManagementControl(sVariantManagementReference, oAppComponent) {
+		let sVMControlId;
+		if (oAppComponent.byId(sVariantManagementReference)) {
+			sVMControlId = oAppComponent.createId(sVariantManagementReference);
+		} else {
+			sVMControlId = sVariantManagementReference;
+		}
+		return Element.getElementById(sVMControlId);
+	}
+
 	/**
 	 * Constructor for a new sap.ui.fl.variants.VariantModel model.
 	 * @class Variant model implementation for JSON format.
@@ -222,8 +233,6 @@ sap.ui.define([
 			this.sFlexReference = ManifestUtils.getFlexReferenceForControl(mPropertyBag.appComponent);
 			this.oAppComponent = mPropertyBag.appComponent;
 			this._oResourceBundle = Lib.getResourceBundleFor("sap.ui.fl");
-			this._oVariantSwitchPromises = {};
-			this._oVariantAppliedListeners = {};
 
 			// set variant model data
 			this.fnUpdateListener = this.updateData.bind(this);
@@ -286,10 +295,6 @@ sap.ui.define([
 		}.bind(this));
 	};
 
-	VariantModel.prototype.waitForAllVMSwitchPromises = function() {
-		return Promise.all(Object.values(this._oVariantSwitchPromises));
-	};
-
 	/**
 	 * Updates the storage of the current variant for a given variant management control.
 	 * @param {object} mPropertyBag - Object with parameters as properties
@@ -317,7 +322,7 @@ sap.ui.define([
 		}
 		return executeAfterSwitch(
 			switchVariantAndUpdateModel.bind(this, mProperties, mPropertyBag.scenario),
-			this,
+			this.sFlexReference,
 			mPropertyBag.variantManagementReference
 		);
 	};
@@ -343,6 +348,7 @@ sap.ui.define([
 					iIndex = index;
 					return true;
 				}
+				return false;
 			});
 		}.bind(this));
 		return {
@@ -408,8 +414,6 @@ sap.ui.define([
 		var sVMReference = this.getVariantManagementReferenceForControl(oVariantManagementControl);
 
 		return this.waitForVMControlInit(sVMReference).then(function(sVMReference, mPropertyBag) {
-			this._oVariantAppliedListeners[sVMReference] ||= {};
-
 			var bInitialLoad = handleInitialLoadScenario.call(this, sVMReference, oVariantManagementControl);
 
 			// if the parameter callAfterInitialVariant or initialLoad is true call the function without check
@@ -436,7 +440,7 @@ sap.ui.define([
 				) {
 					this.oData[sVMReference].showExecuteOnSelection = true;
 					this.checkUpdate(true);
-					this._oVariantAppliedListeners[sVMReference][mPropertyBag.control.getId()] = mPropertyBag.callback;
+					oVariantManagementControl._addVariantAppliedListener(mPropertyBag.control, mPropertyBag.callback);
 				} else {
 					Log.error("Error in attachVariantApplied: The passed VariantManagement ID does not match the "
 					+ "responsible VariantManagement control");
@@ -446,27 +450,22 @@ sap.ui.define([
 	};
 
 	VariantModel.prototype.callVariantSwitchListeners = function(sVMReference, sNewVariantReference, fnCallback, sScenario) {
-		if (this._oVariantAppliedListeners[sVMReference]) {
-			var oVariant = getVariant(this.oData[sVMReference].variants, sNewVariantReference);
-			if (sScenario) {
-				oVariant.createScenario = sScenario;
-			}
+		const oVMControl = getVariantManagementControl(sVMReference, this.oAppComponent);
+		const oVariant = getVariant(this.oData[sVMReference].variants, sNewVariantReference);
+		if (sScenario) {
+			oVariant.createScenario = sScenario;
+		}
 
-			if (fnCallback) {
-				fnCallback(oVariant);
-			} else {
-				each(this._oVariantAppliedListeners[sVMReference], function(sControlId, fnCallback) {
-					fnCallback(oVariant);
-				});
-			}
+		if (fnCallback) {
+			fnCallback(oVariant);
+		} else {
+			oVMControl._executeAllVariantAppliedListeners(oVariant);
 		}
 	};
 
-	VariantModel.prototype.detachVariantApplied = function(sVMControlId, sControlId) {
-		var sVMReference = this.getVariantManagementReferenceForControl(Element.getElementById(sVMControlId));
-		if (this._oVariantAppliedListeners[sVMReference]) {
-			delete this._oVariantAppliedListeners[sVMReference][sControlId];
-		}
+	VariantModel.prototype.detachVariantApplied = function(sVMControlId, oControl) {
+		const oVMControl = Element.getElementById(sVMControlId);
+		oVMControl._removeVariantAppliedListener(oControl);
 	};
 
 	VariantModel.prototype._getVariantTitleCount = function(sNewText, sVariantManagementReference) {
@@ -525,7 +524,10 @@ sap.ui.define([
 			return oVariantChange.convertToFileContent();
 		});
 
-		mPropertyBag.currentVariantComparison = LayerUtils.compareAgainstCurrentLayer(oSourceVariant.instance.getLayer(), mPropertyBag.layer);
+		mPropertyBag.currentVariantComparison = LayerUtils.compareAgainstCurrentLayer(
+			oSourceVariant.instance.getLayer(),
+			mPropertyBag.layer
+		);
 		if (mPropertyBag.currentVariantComparison === 1) {
 			mPropertyBag.sourceVariantSource = this.getVariant(oSourceVariant.instance.getVariantReference());
 		}
@@ -699,7 +701,8 @@ sap.ui.define([
 				break;
 			case "setVisible":
 				mAdditionalChangeContent.visible = mPropertyBag.visible;
-				mAdditionalChangeContent.createdByReset = false; // 'createdByReset' is used by the backend to distinguish between setVisible change created via reset and delete
+				// 'createdByReset' is used by the backend to distinguish between setVisible change created via reset and delete
+				mAdditionalChangeContent.createdByReset = false;
 				oVariantInstance.setVisible(mPropertyBag.visible);
 				break;
 			case "setContexts":
@@ -715,7 +718,7 @@ sap.ui.define([
 						oData[sVariantManagementReference].defaultVariant !== oData[sVariantManagementReference].currentVariant
 						&& aHashParameters.indexOf(oData[sVariantManagementReference].currentVariant) === -1
 					) {
-						// if default variant is changed from the current variant, then add the current variant id as a variant URI parameter
+						// if default variant is changed from the current variant, add the current variant id as a variant URI parameter
 						URLHandler.update({
 							parameters: aHashParameters.concat(oData[sVariantManagementReference].currentVariant),
 							updateURL: !this._bDesignTimeMode,
@@ -987,7 +990,11 @@ sap.ui.define([
 			reference: this.sFlexReference,
 			vmReference: sVariantManagementReference
 		};
-		this._oVariantSwitchPromises[sVariantManagementReference] = waitForInitialVariantChanges(mParameters);
+		VariantManagementState.setVariantSwitchPromise(
+			this.sFlexReference,
+			sVariantManagementReference,
+			waitForInitialVariantChanges(mParameters)
+		);
 
 		if (this.oData[sVariantManagementReference].initPromise) {
 			this.oData[sVariantManagementReference].initPromise.resolveFunction();

@@ -108,7 +108,7 @@
 					"target": "learnDetail"
 				},
 				{
-					"pattern": "explore/{sample}/:subSample:",
+					"pattern": "explore/{sample}/:subSample::?query:",
 					"name": "exploreSamples",
 					"target": "exploreSamples"
 				},

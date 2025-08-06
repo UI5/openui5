@@ -52,7 +52,20 @@ sap.ui.define([
 					});
 				},
 				properties: {
-					layout: GenericTestCollection.ExcludeReason.NotChangeableAfterInit
+					layout: GenericTestCollection.ExcludeReason.NotChangeableAfterInit,
+					columnsXL: GenericTestCollection.ExcludeReason.SetterNeedsSpecificSettings,
+					columnsL: GenericTestCollection.ExcludeReason.SetterNeedsSpecificSettings,
+					columnsM: GenericTestCollection.ExcludeReason.SetterNeedsSpecificSettings,
+
+					// Generic tests do not know about value restrictions for "int" based types
+					labelSpanXL: GenericTestCollection.ExcludeReason.SetterNeedsSpecificSettings,
+					labelSpanL: GenericTestCollection.ExcludeReason.SetterNeedsSpecificSettings,
+					labelSpanM: GenericTestCollection.ExcludeReason.SetterNeedsSpecificSettings,
+					labelSpanS: GenericTestCollection.ExcludeReason.SetterNeedsSpecificSettings,
+					emptySpanXL: GenericTestCollection.ExcludeReason.SetterNeedsSpecificSettings,
+					emptySpanL: GenericTestCollection.ExcludeReason.SetterNeedsSpecificSettings,
+					emptySpanM: GenericTestCollection.ExcludeReason.SetterNeedsSpecificSettings,
+					emptySpanS: GenericTestCollection.ExcludeReason.SetterNeedsSpecificSettings
 				},
 				aggregations: {
 					content: GenericTestCollection.ExcludeReason.SetterNeedsSpecificSettings, // don't use senseless content
@@ -85,6 +98,14 @@ sap.ui.define([
 					const oLayout = new ColumnLayout(mSettings);
 					await _createForm(oLayout.getId() + "Form", oLayout);
 					return oLayout;
+				},
+				properties: {
+					// Generic tests do not know about value restrictions for "int" based types
+					columnsXL: GenericTestCollection.ExcludeReason.SetterNeedsSpecificSettings,
+					columnsL: GenericTestCollection.ExcludeReason.SetterNeedsSpecificSettings,
+					columnsM: GenericTestCollection.ExcludeReason.SetterNeedsSpecificSettings,
+					labelCellsLarge: GenericTestCollection.ExcludeReason.SetterNeedsSpecificSettings,
+					emptyCellsLarge: GenericTestCollection.ExcludeReason.SetterNeedsSpecificSettings
 				}
 			},
 			"sap.ui.layout.form.GridLayout": {

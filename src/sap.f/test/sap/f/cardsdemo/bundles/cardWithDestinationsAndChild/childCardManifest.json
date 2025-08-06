@@ -1,0 +1,68 @@
+{
+	"_version": "1.20.0",
+	"sap.app": {
+		"id": "card.explorer.features.destinations",
+		"type": "card",
+		"title": "Sample of Destinations",
+		"subTitle": "Sample of Destinations",
+		"applicationVersion": {
+			"version": "1.0.0"
+		},
+		"shortTitle": "A short title for this card",
+		"info": "Additional information about this card",
+		"description": "A long description for this card",
+		"tags": {
+			"keywords": [
+				"Destinations",
+				"Card",
+				"Sample"
+			]
+		}
+	},
+	"sap.card": {
+		"type": "List",
+		"data": {
+			"request": {
+				"url": "{{mainDestinations.myDestination}}/Products",
+				"parameters": {
+					"$format": "json",
+					"$top": "{parameters>/maxItems/value}",
+					"$orderby": "ProductID asc"
+				}
+			}
+		},
+		"configuration": {
+			"useMainDestinations": true,
+			"parameters": {
+				"maxItems": {
+					"value": 3,
+					"type": "integer",
+					"label": "Maximum Items",
+					"description": "Defines how many items will be displayed at most."
+				}
+			}
+		},
+		"header": {
+			"title": "Resolve Destinations",
+			"subtitle": "First {parameters>/maxItems/value} products from 'Northwind'"
+		},
+		"content": {
+			"data": {
+				"path": "/value/"
+			},
+			"maxItems": "{parameters>/maxItems/value}",
+			"item": {
+				"title": "{ProductName}",
+				"description": "Unit Price {= format.currency(${UnitPrice}, 'EUR')}",
+				"actions": [
+					{
+						"type": "Navigation",
+						"parameters": {
+							"url": "{{mainDestinations.myNavigation}}/{ProductName}"
+						}
+					}
+				]
+			}
+		}
+	}
+}

@@ -185,7 +185,6 @@ sap.ui.define([
 			this.oModel = new VariantModel({}, {
 				appComponent: oComponent
 			});
-			this.oModel._oVariantSwitchPromises[sVMReference] = Promise.resolve();
 			oComponent.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
 			return this.oModel.initialize();
 		},

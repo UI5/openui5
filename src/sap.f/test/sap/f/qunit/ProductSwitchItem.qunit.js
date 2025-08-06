@@ -166,4 +166,18 @@ sap.ui.define(["sap/f/ProductSwitchItem", "sap/ui/test/utils/nextUIUpdate"],
 			// Assert
 			assert.strictEqual($ProductSwitchItem.attr("title"), sTooltip, "Tooltip is set");
 		});
+
+		QUnit.test("customImage aggregation overrides icon rendering", async function (assert) {
+			this.oProductSwitchItem.setSrc("sap-icon://home");
+			this.oProductSwitchItem.setImageSrc("test-resources/sap/m/images/Woman_avatar_01.png");
+			await nextUIUpdate();
+
+			const $ProductSwitchItem = this.oProductSwitchItem.$();
+			const $Avatar = $ProductSwitchItem.find(".sapFAvatar");
+			const $IconPlaceholder = $ProductSwitchItem.find(".sapFPSItemIconPlaceholder");
+			const $DirectIcon = $IconPlaceholder.children(".sapUiIcon");
+
+			assert.ok($Avatar.length, "Avatar is rendered in the item");
+			assert.strictEqual($DirectIcon.length, 0, "No direct icon is rendered in the icon placeholder when customImage is set");
+		});
 	});

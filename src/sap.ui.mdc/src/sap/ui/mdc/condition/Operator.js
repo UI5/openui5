@@ -98,10 +98,10 @@ sap.ui.define([
 	 * 					(In this case <code>#tokenText#</code> is used in <code>tokenFormat</code>, <code>tokenTest</code>, or <code>tokenParse</code>.)
 	 * 					For operators just showing the value and a operator symbol, no token text is needed.<br>
 	 *					If the token text is not given, the <code>longText</code> is used.
-	 *					If <code>tokenTextForTypes</code> is provided for a special type, this one will be used for the corresponding type.
-	 * @param {object} [oConfiguration.tokenTextForTypes] Object holding String representation of the operator as a token text for single basic types.<br>
-	 * 					This text is shown in a single-value field as text or a multi-value field as token.<br>
-	 * 					This is needed if the text depends on the used data type. For example the "equal" operator should be named "Not Specified (empty)" if a date or time type is used.
+	 *					If <code>tokenTextForTypes</code> is provided for a special type, it will be used for that.
+	 * @param {object} [oConfiguration.tokenTextForTypes] Object holding string representation of the operator as a token text for single basic types.<br>
+	 * 					This text is shown  as text in a single-value field or as token in a multi-value field.<br>
+	 * 					This is needed if the text depends on the data type used. For example, the "equal" operator should be named "Not Specified (empty)" if a date or time type is used.
 	 * @param {object} [oConfiguration.longTextForTypes] Object holding String representation of the operator as a long text for single basic types.<br>
 	 * 					This text is shown in the operator dropdown of the value help.<br>
 	 * 					This is needed if the text depends on the used data type. For example the "less than" operator should be named "before" if a date or time type is used.
@@ -136,9 +136,9 @@ sap.ui.define([
 	 * group: {id : 1} - adds the operator to existing group 1 'Single Dates'<br>
 	 * group: {id : 2, text: "new group"} - inserts a new group with id 2. Existing group 2 will be shifted to 3, 4....<br>
 	 * group: {id : 10, text: "new group at the end"} - adds a new group with id 10 and text "new group as the end" to the end of all groups<br>
-	 * <b>Note:</b> The ids 900-999 are reserved for internal mdc usage, please use ids outside this range
+	 * <b>Note:</b> The ids 900-999 are reserved for internal mdc usage, please use only IDs outside of this range.
 	 * @param {string} [oConfiguration.group.text] Group title for the operator. When used a new group with this title will be added.
-	 * @param {object} [oConfiguration.groupsForTypes] Additional group settings for the operator depending on the type. For every type a group object can be defined.
+	 * @param {object} [oConfiguration.groupsForTypes] Additional group settings for the operator depending on the type. For every type, a group object can be defined.
 	 * @param {function} [oConfiguration.getTextForCopy] Function to determine the text copied into clipboard
 	 * @constructor
 	 * @author SAP SE

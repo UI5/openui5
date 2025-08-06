@@ -1809,11 +1809,20 @@ sap.ui.define([
 			this._oDataProviderFactory.destroy();
 		}
 
-		this._oDestinations = new Destinations({
-			host: this.getHostInstance(),
-			card: this,
-			manifestConfig: this._oCardManifest.get(MANIFEST_PATHS.DESTINATIONS)
-		});
+		try {
+			this._oDestinations = Destinations.create(this, this.getMainCard());
+		} catch (oError) {
+			this.getMainCard()._handleError({
+				illustrationType: IllustratedMessageType.UnableToLoad,
+				title: oResourceBundle.getText("CARD_ERROR_CONFIGURATION_TITLE"),
+				description: oResourceBundle.getText("CARD_ERROR_CONFIGURATION_DESCRIPTION"),
+				details: " ",
+				originalError: oError
+			});
+
+			return Promise.reject(oError);
+		}
+
 		this._oIconFormatter = new IconFormatter({
 			card: this
 		});
@@ -2188,24 +2197,44 @@ sap.ui.define([
 	};
 
 	/**
-	 * Creates specific type of card content based on sap.card/content part of the manifest
+	 * Generates accessibility texts based on the rendering style of the card.
+	 *
+	 * @private
+	 */
+	Card.prototype._applyAriaTexts = function () {
+		const sCardType = this._oCardManifest.get(MANIFEST_PATHS.TYPE);
+		const bIsTileDisplayVariant = this.isTileDisplayVariant();
+		let sAriaText;
+
+
+		if (sCardType  && !bIsTileDisplayVariant) {
+			sAriaText = this._oIntegrationRb.getText("ARIA_DESCRIPTION_CARD_TYPE_" + sCardType.toUpperCase());
+
+			// @TODO: This adds the same text to the card. The region has an aria-describedby = card type. Group has aria-labelledby with the card type. Leads to duplicate hidden text.
+			// Suggestion for a fix: delete _ariaText and add _describedByCardTypeText to aria-labelled by of the region.
+			this._describedByCardTypeText.setText(sAriaText);
+		} else if (bIsTileDisplayVariant) {
+			sAriaText = this._oIntegrationRb.getText("ARIA_LABELLEDBY_DISPLAY_VARIANT_TILE");
+		} else {
+			sAriaText = this._oRb.getText("ARIA_ROLEDESCRIPTION_CARD");
+		}
+
+		this._ariaText.setText(sAriaText);
+	};
+
+	/**
+	 * Creates specific type of card content based on sap.card/content part of the manifest.
 	 *
 	 * @private
 	 */
 	Card.prototype._applyContentManifestSettings = function () {
 		var sCardType = this._oCardManifest.get(MANIFEST_PATHS.TYPE),
 			oContentManifest = this.getContentManifest(),
-			sAriaText,
 			oContent;
 
-		if (sCardType) {
-			sAriaText = this._oIntegrationRb.getText("ARIA_DESCRIPTION_CARD_TYPE_" + sCardType.toUpperCase());
-		} else {
-			sAriaText = this._oRb.getText("ARIA_ROLEDESCRIPTION_CARD");
-		}
 		this.destroyAggregation("_content");
-		this._ariaText.setText(sAriaText);
-		this._describedByCardTypeText.setText(sAriaText);
+
+		this._applyAriaTexts();
 
 		if (this._shouldIgnoreContent()) {
 			this.fireEvent("_contentReady");
@@ -3407,6 +3436,21 @@ sap.ui.define([
 	 */
 	Card.prototype.isDataReady = function () {
 		return !!this._bDataReady;
+	};
+
+	/**
+	 * @private
+	 * @ui5-restricted sap.ui.integration
+	 * @returns {sap.ui.integration.widgets.Card} The main card of the current card.
+	 */
+	Card.prototype.getMainCard = function () {
+		let oParentCard = Element.getElementById(this.getAssociation("openerReference"));
+
+		while (oParentCard && oParentCard.getAssociation("openerReference")) {
+			oParentCard = Element.getElementById(oParentCard.getAssociation("openerReference"));
+		}
+
+		return oParentCard || this;
 	};
 
 	return Card;

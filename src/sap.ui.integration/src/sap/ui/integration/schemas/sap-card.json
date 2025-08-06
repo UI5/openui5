@@ -130,11 +130,16 @@
           }
         },
         "destinations": {
-          "description": "Describes what destinations are used by the card",
+          "description": "Specifies the destinations configured for use by the card",
           "type": "object",
           "additionalProperties": {
             "$ref": "#/$defs/Configuration.Destinations"
           }
+        },
+        "useMainDestinations": {
+          "description": "Indicates if child cards should reference the main card's destinations. Must be set to true in child cards to use the main card's destinations",
+          "type": "boolean",
+          "default": false
         },
         "csrfTokens": {
           "description": "Describes the CSRF tokens used by the card",
@@ -144,7 +149,7 @@
           }
         },
         "actionHandlers": {
-          "description": "Holds configuration for the default action handlers",
+          "description": "Contains configuration settings for the default action handlers",
           "type": "object",
           "additionalProperties": false,
           "properties": {

@@ -148,13 +148,13 @@ sap.ui.define([
 		 * @param {sap.ui.test.generic.GenericTestCollection.ObjectCapabilities} oObjectCapabilities The capabilities of the corresponding control
 		 */
 		 fillControlProperties: function(oControl, oObjectCapabilities) {
-			var mProperties = oControl.getMetadata().getAllProperties(),
-				mPropertyCapabilities = oObjectCapabilities && oObjectCapabilities.properties || {},
-				vValueToSet = "test"; // just try a string as default, with some frequently happening exceptions
+			const mProperties = oControl.getMetadata().getAllProperties();
+			const mPropertyCapabilities = oObjectCapabilities && oObjectCapabilities.properties || {};
+			let vValueToSet = "test"; // just try a string as default, with some frequently happening exceptions
 
-			for (var sPropertyName in mProperties) {
-				var oProperty = mProperties[sPropertyName],
-					sPropertyCapability;
+			for (const sPropertyName in mProperties) {
+				const oProperty = mProperties[sPropertyName];
+				let sPropertyCapability;
 
 				// Check if property should be skipped because of known issues or if a specific value should be used for setting the property
 				if (mPropertyCapabilities[sPropertyName]) {

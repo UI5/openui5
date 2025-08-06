@@ -173,7 +173,7 @@
 	bottom: 0.3125rem;
 	right: 0;
 	position: absolute;
-	border-radius: 0.5rem;
+	border-radius:var(--sapField_BorderCornerRadius);
 }
 
 /* In Form Checkbox needs to be left aligned to bi in line with other controls (as Form itself has a padding) */
@@ -233,6 +233,17 @@
 	.sapMCbDisplayOnly .sapMCbBg.sapMCbMark.sapMCbMarkChecked.sapMCbMarkPartiallyChecked {
 		top: 0.5625rem;
 		left: 0.5625rem;
+	}
+
+	.sapMCb:focus::before {
+		inset: 0.125rem;
+	}
+
+	.sapMCb.sapMCbHasLabel:focus::before {
+		top: 0.125rem;
+		left: 0.125rem;
+		bottom: 0.125rem;
+		right: 0;
 	}
 
 	/* In Form Checkbox needs to be left aligned to bi in line with other controls (as Form itself has a padding) */

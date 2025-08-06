@@ -403,14 +403,23 @@ sap.ui.define([
 			this.oPopup.setAnimations(jQuery.proxy(this._openAnimation, this), jQuery.proxy(this._closeAnimation, this));
 
 			// This is data used to position the popover depending on the placement property
-			this._placements = [PlacementType.Top, PlacementType.Right, PlacementType.Bottom, PlacementType.Left,
-				PlacementType.Vertical, PlacementType.Horizontal, PlacementType.Auto,
-				PlacementType.VerticalPreferedTop, PlacementType.VerticalPreferedBottom,
-				PlacementType.HorizontalPreferedLeft, PlacementType.HorizontalPreferedRight,
-				PlacementType.VerticalPreferredTop, PlacementType.VerticalPreferredBottom,
-				PlacementType.HorizontalPreferredLeft, PlacementType.HorizontalPreferredRight,
-				PlacementType.PreferredRightOrFlip, PlacementType.PreferredLeftOrFlip,
-				PlacementType.PreferredTopOrFlip, PlacementType.PreferredBottomOrFlip];
+			this._placements = [
+				PlacementType.Top,
+				PlacementType.Right,
+				PlacementType.Bottom,
+				PlacementType.Left,
+				PlacementType.Vertical,
+				PlacementType.Horizontal,
+				PlacementType.Auto,
+				PlacementType.VerticalPreferredTop,
+				PlacementType.VerticalPreferredBottom,
+				PlacementType.HorizontalPreferredLeft,
+				PlacementType.HorizontalPreferredRight,
+				PlacementType.PreferredRightOrFlip,
+				PlacementType.PreferredLeftOrFlip,
+				PlacementType.PreferredTopOrFlip,
+				PlacementType.PreferredBottomOrFlip
+			];
 
 			this._myPositions = ["center bottom", "begin center", "center top", "end center"];
 			this._atPositions = ["center top", "end center", "center bottom", "begin center"];

@@ -10,8 +10,18 @@ sap.ui.define([
 	"sap/ui/core/mvc/XMLView",
 	"sap/ui/core/routing/HashChanger",
 	"sap/ui/test/utils/nextUIUpdate"
-], function(Component, View,
-	InstanceManager, future, Log, merge, JSONModel, XMLView, HashChanger, nextUIUpdate) {
+], function(
+	Component,
+	View,
+	InstanceManager,
+	future,
+	Log,
+	merge,
+	JSONModel,
+	XMLView,
+	HashChanger,
+	nextUIUpdate
+) {
 	"use strict";
 
 	var TESTDATA_PREFIX = "testdata.xml-require";
@@ -450,6 +460,38 @@ sap.ui.define([
 		future: true,
 		runAssertions: function (oView, mSpies, assert, bAsync) {
 
+		}
+	}, {
+		testDescription: "core:require in XMLView with binding ($control, $controller) contexts in formatter functions",
+		viewName: ".view.XMLTemplateProcessorAsync_require_bind_formatter",
+		settings: {
+			async: {
+				create: createView
+			}
+		},
+		future: true,
+		runAssertions: async function (oView, mSpies, assert, bAsync) {
+			/*
+			 * The corresponding assertions for checking the this context are written in the Helper module and the controller
+			 *
+			 * see:
+			 *  - testdata/xml-require/helper/Helper.js
+			 *  - testdata/xml-require/view/XMLTemplateProcessorAsync_require_bind_formatter.controller.js
+			 */
+			oView.placeAt("qunit-fixture");
+			await nextUIUpdate();
+
+			const oButton1 = oView.byId("btn_1");
+			oButton1.firePress();
+
+			const oButton2 = oView.byId("btn_2");
+			assert.equal(oButton2.getText(), "$controller", "'$controller' shouldn't be resolved without a binding.");
+
+			const oButton5 = oView.byId("btn_5");
+			const sValue = oButton5.data("key");
+			assert.equal(sValue, "Click Me! (formatted by customDataFormatter)", "The custom data formatter is called with the correct value");
+
+			oView.destroy();
 		}
 	}, {
 		testDescription: "Error-Handling: core:require in XMLView with binding formatter functions - invalid $controller usage in XML view (future=true)",

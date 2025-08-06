@@ -106,6 +106,16 @@
 						<f:GridContainerItemLayoutData columns="4" />
 					</w:layoutData>
 				</w:Card>
+				<w:Card id="kpicard7" manifest="{manifests>/kpiManifests/kpicard7}" baseUrl="{cardsPlayground>/playgroundBaseUrl}">
+					<w:layoutData>
+						<f:GridContainerItemLayoutData columns="4" />
+					</w:layoutData>
+				</w:Card>
+				<w:Card id="kpicard8" manifest="{manifests>/kpiManifests/kpicard8}" baseUrl="{cardsPlayground>/playgroundBaseUrl}">
+					<w:layoutData>
+						<f:GridContainerItemLayoutData columns="4" />
+					</w:layoutData>
+				</w:Card>
 				<w:Card id="tablecard1" manifest="{manifests>/kpiManifests/tablecard1}" baseUrl="{cardsPlayground>/playgroundBaseUrl}">
 					<w:layoutData>
 						<f:GridContainerItemLayoutData columns="4" />

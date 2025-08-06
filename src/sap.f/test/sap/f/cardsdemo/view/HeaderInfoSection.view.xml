@@ -42,5 +42,17 @@
 					manifest="{cardsPlayground>/playgroundBaseUrl}/cardcontent/headerInfoSection/onlyMainPart.json">
 			</w:Card>
 		</Panel>
+		<Panel>
+			<w:Card id="card6"
+					width="300px"
+					class="sapUiTinyMargin"
+					manifest="{cardsPlayground>/playgroundBaseUrl}/cardcontent/headerInfoSection/statusTimestampWithInfoSection.json">
+			</w:Card>
+			<w:Card id="card7"
+					width="300px"
+					class="sapUiTinyMargin"
+					manifest="{cardsPlayground>/playgroundBaseUrl}/cardcontent/headerInfoSection/actionsToolbarWithInfoSection.json">
+			</w:Card>
+		</Panel>
 	</Page>
 </mvc:View>

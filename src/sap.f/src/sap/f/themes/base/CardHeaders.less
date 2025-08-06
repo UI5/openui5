@@ -16,6 +16,27 @@
 	background: @sapUiTileBackground;
 	display: flex;
 	flex-direction: column;
+	overflow: hidden;
+	border-radius: inherit;
+
+	.sapFCardHeaderMainWrapper {
+		display: flex;
+		border-radius: inherit;
+		flex-direction: column;
+		height: 100%;
+
+		.sapFCardHeaderTopRow {
+			display: flex;
+			flex-direction: row;
+			height: 100%;
+			position: relative;
+			border-radius: inherit;
+		}
+
+		&:has(.sapFCardHeaderInfoSection) {
+			flex-wrap: wrap;
+		}
+	}
 
 	.sapFCardHeaderMainPart {
 		outline: none;
@@ -25,9 +46,27 @@
 		padding: @_sap_f_CardHeaders_Padding @_sap_f_CardHeaders_Padding 0.25rem @_sap_f_CardHeaders_Padding;
 		position: relative;
 		border-radius: 0;
+		flex-grow: 1;
 
 		&.sapFCardHeaderLastPart{
 			padding: @_sap_f_CardHeaders_Padding;
+		}
+
+		&:has(+ .sapFCardHeaderToolbarCont),
+		&.sapFCardHeaderLastPart:has(+ .sapFCardHeaderToolbarCont)  {
+			padding-right: 0;
+		}
+	}
+
+	.sapFCardHeaderTopRow:has(.sapFCardSectionClickable) {
+		cursor: pointer;
+
+		&:hover {
+			background: @sapUiTileHoverBackground;
+		}
+
+		&:active {
+			background: @sapUiTileActiveBackground;
 		}
 	}
 
@@ -81,6 +120,18 @@
 		flex-grow: 1;
 	}
 
+	&:not(.sapFCardHeaderHasToolbar) {
+		.sapFCardStatusWrapper{
+			padding-top: 1rem;
+		}
+	}
+
+	.sapFCardStatusWrapper {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-end;
+	}
+
 	.sapFCardStatus {
 		position: relative;
 		font-family: @sapUiFontFamily;
@@ -88,7 +139,6 @@
 		color: @sapUiTileTextColor;
 		text-align: right;
 		line-height: normal;
-		margin-left: 1rem;
 		margin-top: 0.188rem;
 		display: inline-block;
 		white-space: nowrap;
@@ -111,18 +161,24 @@
 	.sapFCardDataTimestamp {
 		color: @sapUiTileTextColor;
 		font-size: @sapMFontSmallSize;
-		margin-left: auto;
 		flex-shrink: 0;
 	}
 
-	.sapFCardHeaderLineIncludesDataTimestamp .sapFCardSubtitle {
-		margin-right: 1rem;
+	.sapFCardStatusWrapper.sapFCardHeaderLineIncludesDataTimestamp  .sapFCardStatus{
+		padding-bottom: 0.25rem;
 	}
 
 	.sapFCardHeaderToolbarCont {
-		position: absolute;
-		right: 0.65rem;
-		top: 0.45rem;
+		display: flex;
+		flex-direction: column;
+		align-items: flex-end;
+		padding-right: 1rem;
+		padding-left: 0.5rem;
+		padding-bottom: 1rem;
+
+		&:not(:has(> :not(:empty))) {
+			display: none;
+		}
 	}
 
 	&.sapFCardHeaderHasToolbar {
@@ -145,7 +201,6 @@
 			padding-inline-start: 0.25rem;
 			padding-inline-end: @_sap_f_CardHeaders_Padding;
 			background-color: @sapUiInfobarNonInteractiveBackground;
-			border-radius: 0.125rem 0 0 0.125rem;
 			min-width: 0;
 
 			.sapFCardHeaderBannerLine {
@@ -170,14 +225,6 @@
 
 		.sapMText {
 			cursor: pointer;
-		}
-
-		&:hover {
-			background: @sapUiTileHoverBackground;
-		}
-
-		&:active {
-			background: @sapUiTileActiveBackground;
 		}
 	}
 }
@@ -204,6 +251,10 @@
 }
 
 .sapFCardHeader.sapFCardNumericHeader {
+
+	.sapFCardHeaderMainWrapper {
+		flex-direction: column;
+	}
 
 	.sapFCardNumericHeaderNumericPart {
 		padding: 0rem @_sap_f_CardHeaders_Padding @_sap_f_CardHeaders_Padding @_sap_f_CardHeaders_Padding;
@@ -340,7 +391,7 @@
 	}
 }
 
-.sapFCardHeader:not(.sapFCardHeaderToolbarFocused) .sapFCardHeaderFocusable:focus::before {
+.sapFCardHeader:not(.sapFCardHeaderToolbarFocused) .sapFCardHeaderTopRow:has(.sapFCardHeaderMainPart:focus)::before {
 	content: '';
 	display: block;
 	position: absolute;
