@@ -369,6 +369,7 @@ sap.ui.define([
 		this._aSaveEventHandlers = [];
 		this._aManageEventHandlers = [];
 		this._aSelectEventHandlers = [];
+		this._oVariantAppliedListeners = {};
 
 		this._oVM.attachManage(this._fireManage, this);
 		this._oVM.attachCancel(this._fireCancel, this);
@@ -1076,6 +1077,44 @@ sap.ui.define([
 	 */
 	VariantManagement.prototype._getToolbarInteractive = function() {
 		return true;
+	};
+
+	/**
+	 * Adds a listener for a control that is called when a variant is applied.
+	 *
+	 * @param {sap.ui.core.Control} oControl The control for which the listener is registered
+	 * @param {function} fnCallBack The callback function that is called when the variant is applied
+	 *
+	 * @ui5-restricted sap.ui.fl
+	 * @private
+	 */
+	VariantManagement.prototype._addVariantAppliedListener = function(oControl, fnCallBack) {
+		this._oVariantAppliedListeners[oControl.getId()] = fnCallBack;
+	};
+
+	/**
+	 * Removes a listener for a control that is called when a variant is applied.
+	 *
+	 * @param {sap.ui.core.Control} oControl The control for which the listener is registered
+	 *
+	 * @ui5-restricted sap.ui.fl
+	 * @private
+	 */
+	VariantManagement.prototype._removeVariantAppliedListener = function(oControl) {
+		delete this._oVariantAppliedListeners[oControl.getId()];
+	};
+
+	/**
+	 * Executes all variant applied listeners (for all controls).
+	 * @param {object} oVariant The variant that was applied
+	 *
+	 * @ui5-restricted sap.ui.fl
+	 * @private
+	 */
+	VariantManagement.prototype._executeAllVariantAppliedListeners = function(oVariant) {
+		Object.values(this._oVariantAppliedListeners).forEach(function(fnCallback) {
+			fnCallback(oVariant);
+		});
 	};
 
 	return VariantManagement;

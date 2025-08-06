@@ -191,19 +191,19 @@
 	},
 	{
 		"title": "Footer",
-		"description": "Having buttons with actions in a footer",
+		"description": "Demonstrates the usage of actionable buttons within a card footer.",
 		"route": "footer",
 		"group": "Header and Footer"
 	},
 	{
 		"title": "Manifest initialization",
-		"description": "Three types of manifest initializations are possible",
+		"description": "Details two approaches for initializing card manifests.",
 		"route": "manifest",
 		"group": "Initialization and Data"
 	},
 	{
 		"title": "Data Service",
-		"description": "Examples for FLP data scenarios",
+		"description": "Examples for FLP data scenarios.",
 		"route": "dataService",
 		"group": "Initialization and Data"
 	},
@@ -328,8 +328,14 @@
 	},
 	{
 		"title": "Focus Full Card",
-		"description": "The focus goes on the full card, instead of the header.",
+		"description": "Demonstrates shifting focus to the entire card rather than to the header.",
 		"route": "focusFullCard",
 		"group": "Card Variants"
+	},
+	{
+		"title": "Destinations",
+		"description": "Cards with Destinations",
+		"route": "destinations",
+		"group": "Initialization and Data"
 	}
 ]

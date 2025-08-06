@@ -254,12 +254,16 @@ html[data-sap-ui-browser^='cr'] .sapFCard {
 
 	&:not(.sapFCardTransparent) {
 
-		.sapFCardSectionClickable:hover {
-			background: var(--sapTile_Hover_Background);
-		}
+		.sapFCardSectionClickable {
+			border-radius: var(--sapTile_BorderCornerRadius);
 
-		.sapFCardSectionClickable:active {
-			background: var(--sapTile_Active_Background);
+			&:hover {
+				background: var(--sapTile_Hover_Background);
+			}
+
+			&:active {
+				background: var(--sapTile_Active_Background);
+			}
 		}
 	}
 

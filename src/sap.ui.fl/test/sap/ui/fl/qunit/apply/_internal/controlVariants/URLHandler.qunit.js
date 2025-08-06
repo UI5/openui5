@@ -5,8 +5,9 @@ sap.ui.define([
 	"sap/ui/base/ManagedObjectObserver",
 	"sap/ui/core/Component",
 	"sap/ui/fl/apply/_internal/controlVariants/URLHandler",
-	"sap/ui/fl/initial/_internal/ManifestUtils",
+	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
 	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
+	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/variants/VariantManagement",
 	"sap/ui/fl/variants/VariantModel",
 	"sap/ui/fl/Layer",
@@ -17,8 +18,9 @@ sap.ui.define([
 	ManagedObjectObserver,
 	Component,
 	URLHandler,
-	ManifestUtils,
+	VariantManagementState,
 	ControlVariantApplyAPI,
+	ManifestUtils,
 	VariantManagement,
 	VariantModel,
 	Layer,
@@ -28,15 +30,13 @@ sap.ui.define([
 	"use strict";
 	document.getElementById("qunit-fixture").style.display = "none";
 	var sandbox = sinon.createSandbox();
+	const sFlexReference = "someReference";
 
 	QUnit.module("Given an instance of VariantModel", {
 		beforeEach() {
 			this.oAppComponent = new Component("appComponent");
-			this.oModel = {
-				oAppComponent: this.oAppComponent,
-				destroy: sandbox.stub().resolves(),
-				getUShellService() {}
-			};
+			sandbox.stub(ManifestUtils, "getFlexReferenceForControl").returns(sFlexReference);
+			this.oModel = new VariantModel({}, { appComponent: this.oAppComponent });
 			this.fnDestroyObserverSpy = sandbox.spy(ManagedObjectObserver.prototype, "observe");
 			this.fnDestroyUnobserverSpy = sandbox.spy(ManagedObjectObserver.prototype, "unobserve");
 			this.oGetUShellServiceStub = sandbox.stub(this.oModel, "getUShellService");
@@ -135,20 +135,20 @@ sap.ui.define([
 			); // app component's destroy handlers are attached here
 
 			var fnVariantSwitchPromiseStub = sandbox.stub();
-			this.oModel._oVariantSwitchPromises = {
-				[sVariantManagementReference]: new Promise(function(resolve) {
+			VariantManagementState.setVariantSwitchPromise(
+				sFlexReference,
+				sVariantManagementReference,
+				new Promise(function(resolve) {
 					setTimeout(function() {
 						resolve();
 					}, 0);
 				}).then(fnVariantSwitchPromiseStub)
-			};
-			this.oModel.waitForAllVMSwitchPromises = () => {
-				return this.oModel._oVariantSwitchPromises[sVariantManagementReference];
-			};
+			);
 
 			this.oAppComponent.destroy();
 
-			return this.oModel._oVariantSwitchPromises[sVariantManagementReference].then(function() {
+			return VariantManagementState.waitForAllVariantSwitches(sFlexReference)
+			.then(function() {
 				var aCallArgs = this.fnDestroyUnobserverSpy.getCall(0).args;
 				assert.equal(this.oModel.destroy.callCount, 1, "then variant model resetMap() was called");
 				assert.deepEqual(
@@ -771,7 +771,7 @@ sap.ui.define([
 
 	QUnit.module("Given URLHandler.updateVariantInURL() to update a new variant parameter in the URL", {
 		beforeEach() {
-			sandbox.stub(ManifestUtils, "getFlexReferenceForControl").returns("someComponentName");
+			sandbox.stub(ManifestUtils, "getFlexReferenceForControl").returns(sFlexReference);
 			this.oModel = new VariantModel({
 				variantMgmtId1: {
 					defaultVariant: "variant1",

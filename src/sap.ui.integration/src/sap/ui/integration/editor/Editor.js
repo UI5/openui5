@@ -1237,7 +1237,8 @@ sap.ui.define([
 			var sConfigurationPath = this.getConfigurationPath();
 			this._oDestinations = new Destinations({
 				host: oHostInstance,
-				manifestConfig: this._manifestModel.getProperty(sConfigurationPath + "/destinations")
+				manifestConfig: this._manifestModel.getProperty(sConfigurationPath + "/destinations"),
+				prefix: "destinations"
 			});
 		}
 	};

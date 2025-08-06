@@ -207,7 +207,7 @@ sap.ui.define([
 					if (!aMatch) {
 						throw new Error(`Error in formatter '${sName}': Either syntax error in the usage of '.bind(...)' or wrong number of arguments given. Only one argument is allowed when using '.bind()'.`);
 					}
-					if (aMatch[2].startsWith("$") && !Object.hasOwn(oEnv.mAdditionalBindableValues, aMatch[2])) {
+					if (aMatch[2].startsWith("$") && (!oEnv.mAdditionalBindableValues || !Object.hasOwn(oEnv.mAdditionalBindableValues, aMatch[2]))) {
 						throw new Error(`Error in formatter '${sName}': The argument '${aMatch[2]}' used in the '.bind()' call starts with '$', which is only allowed for framework-reserved variables. Please rename the variable so that it doesn't start with '$'.`);
 					}
 

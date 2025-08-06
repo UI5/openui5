@@ -308,7 +308,7 @@ sap.ui.define([
 	 * @returns {sap.ui.fl.apply._internal.flexObjects.UIChange[]} List of changes for the variant
 	 */
 	CompVariantManagementState.getVariantChanges = function(oVariant) {
-		const sReference = null.reference;
+		const sReference = oVariant.getFlexObjectMetadata().reference;
 		const sVariantId = oVariant.getVariantId();
 		const sPersistencyKey = oVariant.getPersistencyKey();
 		return oChangesByVariantIdsDataSelector.get({
@@ -336,7 +336,7 @@ sap.ui.define([
 	/**
 	 * Returns the 'defaultVariant' changes for a given variant management
 	 *
-	 * @param {object} mPropertyBag Object with the necessary properties
+	 * @param {object} mPropertyBag - Object with the necessary properties
 	 * @param {string} mPropertyBag.persistencyKey - Persistency key of the variant management
 	 * @param {string} mPropertyBag.reference - Flexibility reference of the app
 	 *

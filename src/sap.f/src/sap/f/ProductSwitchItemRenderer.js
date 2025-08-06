@@ -9,16 +9,16 @@ sap.ui.define([], function () {
 	};
 
 	ProductSwitchItemRenderer.render = function (oRm, oControl) {
-		var oProductSwith = oControl._getProductSwitch(),
+		var oProductSwitch = oControl._getProductSwitch(),
 			oAccessibilityState = {
 				role: "menuitemradio"
 			},
 			sTooltip = oControl.getTooltip_AsString();
 
-		if (oProductSwith) {
-			oAccessibilityState.setsize = oProductSwith._getItemsCount();
-			oAccessibilityState.posinset = oProductSwith._getItemPosition(oControl);
-			oAccessibilityState.checked = oControl.getId() === oProductSwith.getSelectedItem() ? "true" : "false";
+		if (oProductSwitch) {
+			oAccessibilityState.setsize = oProductSwitch._getItemsCount();
+			oAccessibilityState.posinset = oProductSwitch._getItemPosition(oControl);
+			oAccessibilityState.checked = oControl.getId() === oProductSwitch.getSelectedItem() ? "true" : "false";
 		}
 
 		oRm.openStart("div", oControl);
@@ -33,9 +33,13 @@ sap.ui.define([], function () {
 			oRm.class("sapFPSItemIconPlaceholder");
 			oRm.class("sapUiTinyMarginBottom");
 			oRm.openEnd();
-				if (oControl.getSrc()) {
-					oRm.renderControl(oControl._getIcon());
-				}
+
+			if (oControl.getImageSrc()) {
+				oRm.renderControl(oControl._getAvatar());
+			} else if (oControl.getSrc()) {
+				oRm.renderControl(oControl._getIcon());
+			}
+
 			oRm.close("span");
 			oRm.openStart("div");
 			oRm.class("sapFPSItemTextSection");

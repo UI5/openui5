@@ -45,6 +45,30 @@
 				width="320px"
 				class="sapUiSmallMargin" />
 			<w:Card
+				id="card6"
+				manifest="{manifests>/defaultHeader/card6}"
+				baseUrl="{cardsPlayground>/playgroundBaseUrl}"
+				width="320px"
+				class="sapUiSmallMargin" />
+			<w:Card
+				id="card7"
+				manifest="{manifests>/defaultHeader/card7}"
+				baseUrl="{cardsPlayground>/playgroundBaseUrl}"
+				width="320px"
+				class="sapUiSmallMargin" />
+			<w:Card
+				id="card8"
+				manifest="{manifests>/defaultHeader/card8}"
+				baseUrl="{cardsPlayground>/playgroundBaseUrl}"
+				width="300px"
+				class="sapUiSmallMargin" />
+			<w:Card
+				id="card9"
+				manifest="{manifests>/defaultHeader/card9}"
+				baseUrl="{cardsPlayground>/playgroundBaseUrl}"
+				width="320px"
+				class="sapUiSmallMargin" />
+			<w:Card
 				id="defaultDataTimestamp"
 				manifest="{manifests>/defaultHeader/defaultDataTimestamp}"
 				baseUrl="{cardsPlayground>/playgroundBaseUrl}"
@@ -79,6 +103,16 @@
 			<w:Card
 				id="hyphenated"
 				manifest="{cardsPlayground>/playgroundBaseUrl}/cardcontent/tilesVariants/sample7.json"
+				width="320px"
+				class="sapUiSmallMargin" />
+			<w:Card
+				id="actionableHeader"
+				manifest="{manifests>/defaultHeader/actionableHeader}"
+				width="320px"
+				class="sapUiSmallMargin" />
+			<w:Card
+				id="actionableHeaderCustomActions"
+				manifest="{manifests>/defaultHeader/actionableHeader}"
 				width="320px"
 				class="sapUiSmallMargin" />
 		</Panel>

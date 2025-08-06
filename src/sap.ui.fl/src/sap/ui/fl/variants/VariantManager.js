@@ -92,18 +92,18 @@ sap.ui.define([
 	 * Adds the passed function to the variant switch promise and returns the whole promise chain.
 	 *
 	 * @param {function():Promise} fnCallback - Callback function returning a promise
-	 * @param {sap.ui.fl.variants.VariantModel} oModel - Variant model
+	 * @param {string} sFlexReference - Flex reference of the app
 	 * @param {string} sVMReference - Variant Management reference
-	 * @returns {Promise<undefined>} Resolves when the variant model is not busy anymore
+	 * @returns {Promise} Resolves when the variant model is not busy anymore
 	 * @private
 	 */
-	function executeAfterSwitch(fnCallback, oModel, sVMReference) {
+	function executeAfterSwitch(fnCallback, sFlexReference, sVMReference) {
 		// if there are multiple switches triggered very quickly this makes sure that they are being executed one after another
-		oModel._oVariantSwitchPromises[sVMReference] = oModel._oVariantSwitchPromises[sVMReference]
+		const oNewPromise = VariantManagementState.waitForVariantSwitch(sFlexReference, sVMReference)
 		.catch(function() {})
 		.then(fnCallback);
-		VariantManagementState.setVariantSwitchPromise(oModel.sFlexReference, oModel._oVariantSwitchPromises[sVMReference], sVMReference);
-		return oModel._oVariantSwitchPromises[sVMReference];
+		VariantManagementState.setVariantSwitchPromise(sFlexReference, sVMReference, oNewPromise);
+		return oNewPromise;
 	}
 
 	async function handleDirtyChanges(aDirtyChanges, sVariantManagementReference, oAppComponent, oVariantModel) {

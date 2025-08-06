@@ -1,0 +1,31 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:f="sap.f" xmlns:core="sap.ui.core">
+	<ResponsivePopover placement="Bottom" showHeader="false">
+		<f:ProductSwitch change="fnChange">
+			<f:items>
+				<f:ProductSwitchItem
+					src="sap-icon://newspaper"
+					imageSrc="test-resources/sap/ui/documentation/sdk/images/HT-1002.jpg"
+					title="JPG"
+					subTitle="JPG image"
+					targetSrc="https://listserv.sap.com/mailman/listinfo/ui5.announce"
+					target="_blank"/>
+				<f:ProductSwitchItem
+					src="sap-icon://group"
+					imageSrc="https://www.sap.com/dam/application/shared/logos/sap-logo-svg.svg.adapt.svg/1493030643828.svg"
+					title="SVG"
+					subTitle="SVG image"
+					targetSrc="https://community.sap.com/topics/ui5"
+					target="_blank">
+				</f:ProductSwitchItem>
+				<f:ProductSwitchItem
+					src="sap-icon://group"
+					imageSrc="test-resources/sap/m/images/Woman_avatar_01.png"
+					title="PNG"
+					subTitle="PNG image"
+					targetSrc="https://community.sap.com/topics/ui5"
+					target="_blank">
+				</f:ProductSwitchItem>
+			</f:items>
+		</f:ProductSwitch>
+	</ResponsivePopover>
+</core:FragmentDefinition>

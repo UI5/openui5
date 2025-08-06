@@ -676,4 +676,87 @@ sap.ui.define([
 
 		oPolling.stop();
 	});
+
+	QUnit.module("Utils.find()");
+
+	QUnit.test("finds the first element that matches the condition", function (assert) {
+		// Arrange
+		const oObject = {
+			a: 1,
+			b: 2,
+			c: 3,
+			d: 4
+		};
+		const fnCondition = (iValue) => iValue > 2;
+
+		// Act
+		const oResult = Utils.find(oObject, fnCondition);
+
+		// Assert
+		assert.strictEqual(oResult, 3, "The first value that matches the condition is found.");
+	});
+
+	QUnit.test("returns 'false' if no element matches the condition", function (assert) {
+		// Arrange
+		const oObject = {
+			a: 1,
+			b: 2,
+			c: 3,
+			d: 4
+		};
+		const fnCondition = (iValue) => iValue > 4;
+
+		// Act
+		const oResult = Utils.find(oObject, fnCondition);
+
+		// Assert
+		assert.strictEqual(oResult, false, "No value matches the condition.");
+	});
+
+	QUnit.test("returns 'false' if the object is empty", function (assert) {
+		// Arrange
+		const oObject = {};
+		const fnCondition = (iValue) => iValue > 3;
+
+		// Act
+		const oResult = Utils.find(oObject, fnCondition);
+
+		// Assert
+		assert.strictEqual(oResult, false, "No value matches the condition in an empty object.");
+	});
+
+	QUnit.test("finds the first element in a nested object", function (assert) {
+		// Arrange
+		const oObject = {
+			a: 1,
+			b: {
+				c: 2,
+				d: 5
+			},
+			e: 4
+		};
+		const fnCondition = (iValue) => iValue > 3;
+
+		// Act
+		const oResult = Utils.find(oObject, fnCondition);
+
+		// Assert
+		assert.strictEqual(oResult, 5, "The first value that matches the condition in a nested object is found.");
+	});
+
+	QUnit.test("finds the first element in an array", function (assert) {
+		// Arrange
+		const oObject = {
+			a: 1,
+			b: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+			c: 5
+		};
+		const fnCondition = (iValue) => iValue > 3;
+
+		// Act
+		const oResult = Utils.find(oObject, fnCondition);
+
+		// Assert
+		assert.strictEqual(oResult, 4, "The first value that matches the condition in an array is found.");
+	});
 });

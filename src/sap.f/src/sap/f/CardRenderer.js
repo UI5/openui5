@@ -31,7 +31,10 @@ sap.ui.define([
 	CardRenderer.render = function (oRm, oCard) {
 		var oHeader = oCard._getHeaderAggregation(),
 			bHeaderTop = oHeader && oCard.getCardHeaderPosition() === HeaderPosition.Top,
-			bHasCardBadgeCustomData = oCard._getCardBadgeCustomData().length > 0;
+			bHasCardBadgeCustomData = oCard._getCardBadgeCustomData().length > 0,
+			oContent = oCard.getCardContent(),
+			bHasContent = !!oContent,
+			bIsInteractive = oCard.isInteractive();
 
 		oRm.openStart("div", oCard);
 		this.renderContainerAttributes(oRm, oCard);
@@ -58,10 +61,19 @@ sap.ui.define([
 		this.renderFooterSection(oRm, oCard);
 
 		oRm.renderControl(oCard._ariaText);
-		oRm.renderControl(oCard._ariaContentText);
 
-		oRm.renderControl(oCard._describedByCardTypeText);
-		oRm.renderControl(oCard._describedByInteractiveText);
+		if (bHasContent) {
+			oRm.renderControl(oCard._ariaContentText);
+		}
+
+		if (!oCard.isTileDisplayVariant()) {
+			oRm.renderControl(oCard._describedByCardTypeText);
+		}
+
+		if (bIsInteractive) {
+			oRm.renderControl(oCard._describedByInteractiveText);
+		}
+
 		if (oCard._invisibleTitle) {
 			oRm.renderControl(oCard._invisibleTitle);
 		}

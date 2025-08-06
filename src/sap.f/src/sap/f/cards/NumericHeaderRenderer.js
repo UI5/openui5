@@ -38,6 +38,38 @@ sap.ui.define([
 	/**
 	 * @override
 	 */
+	NumericHeaderRenderer.renderMainWrapperContent = function (oRm, oHeader) {
+		const oError = oHeader.getAggregation("_error");
+		const oToolbar = oHeader.getToolbar();
+		const bHasToolbar = oToolbar && oToolbar.getVisible();
+		const oBindingInfos = oHeader.mBindingInfos;
+		const bHasStatus = oHeader.getStatusVisible() && oHeader.getStatusText();
+		const bHasDataTimestamp = oHeader.getDataTimestamp() || oBindingInfos.dataTimestamp;
+		const bHasNumericPart = this.hasNumericPart(oHeader);
+
+		oRm.openStart("div").class("sapFCardHeaderTopRow").openEnd();
+		this.renderMainPart(oRm, oHeader);
+
+		if (!oError && (bHasToolbar || bHasStatus || bHasDataTimestamp)) {
+			this._renderToolbar(oRm, oToolbar, oHeader);
+		}
+
+		oRm.close("div"); // .sapFCardHeaderTopRow
+
+		// Info sections (if any)
+		if (!oError) {
+			this._renderInfoSections(oRm, oHeader);
+		}
+
+		// Numeric part below
+		if (bHasNumericPart && !oError) {
+			this.renderNumericPart(oRm, oHeader);
+		}
+	};
+
+	/**
+	 * @override
+	 */
 	NumericHeaderRenderer.renderNumericPart = function (oRm, oHeader) {
 		if (oHeader.getProperty("useTileLayout")) {
 			return;
@@ -184,20 +216,14 @@ sap.ui.define([
 	NumericHeaderRenderer._renderDetails = function(oRm, oNumericHeader) {
 		var oBindingInfos = oNumericHeader.mBindingInfos,
 			oDetails = oNumericHeader.getAggregation("_details"),
-			bHasDetails = oNumericHeader.getDetails() || oBindingInfos.details,
-			oDataTimestamp = oNumericHeader.getAggregation("_dataTimestamp"),
-			bHasDataTimestamp = oNumericHeader.getDataTimestamp() || oBindingInfos.dataTimestamp;
+			bHasDetails = oNumericHeader.getDetails() || oBindingInfos.details;
 
-		if (!bHasDetails && !bHasDataTimestamp) {
+		if (!bHasDetails) {
 			return;
 		}
 
 		oRm.openStart("div")
 			.class("sapFCardHeaderDetailsWrapper");
-
-		if (bHasDataTimestamp) {
-			oRm.class("sapFCardHeaderLineIncludesDataTimestamp");
-		}
 
 		oRm.openEnd();
 
@@ -208,10 +234,6 @@ sap.ui.define([
 			}
 
 			oRm.renderControl(oDetails);
-		}
-
-		if (bHasDataTimestamp) {
-			oRm.renderControl(oDataTimestamp);
 		}
 
 		oRm.close("div");

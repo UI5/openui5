@@ -3038,7 +3038,7 @@ sap.ui.define([
 			var iHeight = this.oCard.getCardContent().getDomRef().getBoundingClientRect().height;
 
 			// Assert
-			assert.strictEqual(iHeight, fFirstHeight, "The height of the content did not decrease.");
+			assert.ok(iHeight >= fFirstHeight, "The height of the content did not decrease.");
 
 			// Clean up
 			oServer.restore();
