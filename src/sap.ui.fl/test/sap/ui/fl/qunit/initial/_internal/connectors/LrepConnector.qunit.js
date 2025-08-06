@@ -196,7 +196,7 @@ sap.ui.define([
 				cacheKey: sCacheKey,
 				siteId: "dummySite",
 				appDescriptor: {
-					"_version": "2.0.2",
+					"_version": "2.0.0",
 
 					"sap.app": {
 						id: "appDescriptorId"

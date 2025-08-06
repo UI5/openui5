@@ -62,7 +62,7 @@ sap.ui.define([
 	const sParametersAfterRestartKey = "sap.ui.rta.RuntimeAuthoring.parametersAfterRestart";
 
 	var oComp = RtaQunitUtils.createAndStubAppComponent(sinon, "fixture.application", {
-		"_version": "2.0.2",
+		"_version": "2.0.0",
 
 		"sap.app": {
 			id: "fixture.application"
