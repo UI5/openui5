@@ -384,18 +384,45 @@ sap.ui.define([
 	};
 
 	/**
+	 * Set the _sAriaLabelledByAnchorButton - the id of the AnchorBar button that corresponds to this section.
+	 * @param {object} oAnchorButton The AnchorBar button that corresponds to this section
+	 * @param {boolean} bInvalidate Whether to invalidate the control or not
+	 * @private
+	 */
+	ObjectPageSection.prototype._setAriaLabelledByAnchorButton = function (oAnchorButton, bInvalidate) {
+		this._sAriaLabelledByAnchorButton = oAnchorButton?.getId();
+		if (bInvalidate) {
+			this.invalidate();
+		}
+	};
+
+	/**
+	 * Returns the id of the AnchorBar button that corresponds to this section.
+	 * @private
+	 * @returns {string} The id of the AnchorBar button that corresponds to this section
+	 */
+	ObjectPageSection.prototype._getAriaLabelledByAnchorButton = function () {
+		return this._sAriaLabelledByAnchorButton;
+	};
+
+	/**
 	 * Returns the label id for the section.
 	 * @private
 	 * @returns {string} aria-labeled by id
 	 */
 	ObjectPageSection.prototype._getAriaLabelledById = function () {
+		var oFirstVisibleSubSection = this._getFirstVisibleSubSection();
 		// Each section should be labelled as:
 		// 'titleID' - either its own or the promoted subsection's title
-		if (this._hasPromotedSubSection()) {
-			return this._getFirstVisibleSubSection()?._getTitleControl().getId();
-		} else {
+		if (this._hasPromotedSubSection() && oFirstVisibleSubSection?.getTitleVisible()) {
+			return oFirstVisibleSubSection._getTitleControl().getId();
+		}
+
+		if (!this._hasPromotedSubSection() && this.getTitleVisible()) {
 			return this._getTitleControl().getId();
 		}
+
+		return this._getAriaLabelledByAnchorButton();
 	};
 
 	/**

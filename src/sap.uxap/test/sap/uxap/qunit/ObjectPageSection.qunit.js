@@ -753,7 +753,7 @@ function(Element, nextUIUpdate, jQuery, XMLView, library, ObjectPageLayout, Obje
 	});
 
 	QUnit.test("Test aria-labelledby attribute", async function(assert) {
-		assert.expect(7);
+		assert.expect(8);
 
 		var oFirstSection = this.ObjectPageSectionView.byId("SectionWithSubSection"),
 			oSectionWithOneSubsection = this.ObjectPageSectionView.byId("SectionWithoneSubSection"),
@@ -762,6 +762,7 @@ function(Element, nextUIUpdate, jQuery, XMLView, library, ObjectPageLayout, Obje
 			sFirstSectionAriaLabelledBy = oFirstSection.$().attr("aria-labelledby"),
 			oSectionWithoutTitle = this.ObjectPageSectionView.byId("SectionWithNoTitleAndTwoSubSections"),
 			sSectionWithoutTitleAriaLabel = oSectionWithoutTitle.$().attr("aria-labelledby"),
+			sSectionWithNotTitleAriaLabel = this.ObjectPageSectionView.byId("SectionWithHiddenTitleAndOneSubSectionWithHiddenTitle").$().attr("aria-labelledby"),
 			oLastSection = this.ObjectPageSectionView.byId("SectionWithNoTitleAndOneSubSection"),
 			sLastSectionAriaLabelledBy = oLastSection.$().attr("aria-labelledby"),
 			oLastSectionFirstSubsection = oLastSection.getSubSections()[0];
@@ -771,6 +772,8 @@ function(Element, nextUIUpdate, jQuery, XMLView, library, ObjectPageLayout, Obje
 			oFirstSection.getTitle(), "aria-labelledby is set properly");
 		assert.strictEqual(Element.getElementById(sSectionWithoutTitleAriaLabel).getText(),
 			"", "sections without title, which have more than one subsection do not have aria-labelledby");
+		assert.strictEqual(Element.getElementById(sSectionWithNotTitleAriaLabel).getId(), sSectionWithNotTitleAriaLabel,
+			"sections with hidden title and only one subsection with hidden title have aria-labelledby pointing to the Section's anchor bar button");
 		assert.strictEqual(Element.getElementById(sLastSectionAriaLabelledBy).getText(),
 			oLastSectionFirstSubsection.getTitle(), "aria-labelledby is set properly"); //labelled by the subsection title
 
@@ -781,14 +784,13 @@ function(Element, nextUIUpdate, jQuery, XMLView, library, ObjectPageLayout, Obje
 			oFirstSection.getTitle(), "aria-labelledby is updated properly");
 
 		// act
-		// setShowTitle = false should remove the title from the aria-labelledby attribute
 		oFirstSection.setShowTitle(false);
 		await nextUIUpdate();
 		sFirstSectionAriaLabelledBy = oFirstSection.$().attr("aria-labelledby");
 
 		// assert
-		assert.strictEqual(Element.getElementById(sFirstSectionAriaLabelledBy).getText(),
-			oFirstSection.getTitle(), "sections with hidden title are still labelled by it");
+		assert.strictEqual(Element.getElementById(sFirstSectionAriaLabelledBy).getId(),
+			sFirstSectionAriaLabelledBy, "sections with hidden title have labelled by pointing to the Section's anchor bar button");
 
 		// assert
 		assert.strictEqual(Element.getElementById(sSectionWithOneSubsectionAriaLabelledBy).getText(),

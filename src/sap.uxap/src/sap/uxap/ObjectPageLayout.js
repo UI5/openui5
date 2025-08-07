@@ -1719,7 +1719,7 @@ sap.ui.define([
 	 * @param {boolean} bInvalidate request the invalidation of the sectionBase that would turn into visible or hidden. This may not be necessary if you are already within a rendering process.
 	 */
 	ObjectPageLayout.prototype._applyUxRules = function (bInvalidate) {
-		var aSections, aSubSections, iVisibleSubSections, iVisibleSection, iVisibleBlocks,
+		var aSections, aSubSections, iVisibleSubSections, iVisibleSection, iVisibleBlocks, oAnchorBar, aAnchorBarItems,
 			bVisibleAnchorBar, bUseIconTabBar, oFirstVisibleSection, oFirstVisibleSubSection, oTitleVisibilityInfo = {};
 
 		aSections = this.getSections() || [];
@@ -1843,6 +1843,15 @@ sap.ui.define([
 		// the AnchorBar needs to reflect the dom state
 		if (bVisibleAnchorBar) {
 			this._oABHelper._buildAnchorBar();
+		}
+
+		oAnchorBar = this.getAggregation("_anchorBar");
+		aAnchorBarItems = oAnchorBar?.getItems() || [];
+		for (var i = 0; i < aSections.length; i++) {
+			var oSection = aSections[i];
+			if (oSection._getInternalVisible()) {
+				oSection._setAriaLabelledByAnchorButton(aAnchorBarItems[i], bInvalidate);
+			}
 		}
 
 		this._setInternalAnchorBarVisible(bVisibleAnchorBar, bInvalidate);
