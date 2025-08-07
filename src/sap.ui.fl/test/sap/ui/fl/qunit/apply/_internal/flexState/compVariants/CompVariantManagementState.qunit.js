@@ -309,6 +309,63 @@ sap.ui.define([
 		});
 	});
 
+	QUnit.module("CompVariantManagementState can handle changes on multiple different standard variants", {
+		async beforeEach() {
+			await initializeFlexState();
+		},
+		afterEach() {
+			sandbox.restore();
+		}
+	}, function() {
+		QUnit.test("when changes are present for multiple different persistency keys", async function(assert) {
+			const oUpdateVariantChange0 = FlexObjectFactory.createFromFileContent({
+				reference: sReference,
+				fileType: "change",
+				changeType: "updateVariant",
+				selector: {
+					persistencyKey: "anotherPersistencyKey",
+					variantId: "*standard*"
+				},
+				layer: Layer.CUSTOMER,
+				content: {
+					executeOnSelection: true
+				}
+			});
+
+			const oChangeContent = {
+				bField: {
+					visible: true
+				}
+			};
+
+			const oUpdateVariantChange1 = FlexObjectFactory.createFromFileContent({
+				reference: sReference,
+				fileType: "change",
+				changeType: "updateVariant",
+				selector: {
+					persistencyKey: sPersistencyKey,
+					variantId: "*standard*"
+				},
+				layer: Layer.CUSTOMER,
+				content: {
+					variantContent: oChangeContent
+				}
+			});
+
+			stubFlexObjectsSelector([oUpdateVariantChange0, oUpdateVariantChange1]);
+
+			const aVariants = await CompVariantManagementState.assembleVariantList({
+				reference: sReference,
+				persistencyKey: sPersistencyKey,
+				componentId: sComponentId
+			});
+
+			assert.equal(aVariants.length, 1, "the standard variant is returned");
+			assert.deepEqual(aVariants[0].getContent(), oChangeContent, "the content was updated");
+			assert.equal(aVariants[0].getExecuteOnSelection(), false, "the execute on selection was NOT updated");
+		});
+	});
+
 	QUnit.done(function() {
 		document.getElementById("qunit-fixture").style.display = "none";
 	});

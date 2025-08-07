@@ -115,14 +115,29 @@ sap.ui.define([
 		}
 	});
 
-	const oChangesByVariantIdsDataSelector = new DataSelector({
-		id: "getChangesByVariantIds",
+	// comp entities may hold the persistency key within the persistencyKey property (variant) or within the selector (changes)
+	const oCompEntitiesByPersistencyKeyDataSelector = new DataSelector({
+		id: "compEntitiesByPersistencyKey",
 		parameterKey: "persistencyKey",
 		parentDataSelector: oCompEntitiesDataSelector,
 		executeFunction(aFlexObjects, mPropertyBag) {
+			return aFlexObjects.filter((oFlexObject) =>
+				(oFlexObject.getPersistencyKey?.() || oFlexObject.getSelector?.().persistencyKey) === mPropertyBag.persistencyKey
+			);
+		},
+		checkInvalidation(mParameters, oUpdateInfo) {
+			const oFlexObject = oUpdateInfo.updatedObject;
+			return (oFlexObject?.getPersistencyKey?.() || oFlexObject.getSelector?.().persistencyKey) === mParameters.persistencyKey;
+		}
+	});
+
+	const oChangesByVariantIdsDataSelector = new DataSelector({
+		id: "getChangesByVariantIds",
+		parentDataSelector: oCompEntitiesByPersistencyKeyDataSelector,
+		executeFunction(aFlexObjects) {
 			const mChanges = {};
 			const aVariantIds = aFlexObjects
-			.filter((oFlexObject) => oFlexObject.getFileType() === "variant" && oFlexObject.getPersistencyKey() === mPropertyBag.persistencyKey)
+			.filter((oFlexObject) => oFlexObject.getFileType() === "variant")
 			.map((oVariant) => oVariant.getVariantId());
 
 			aFlexObjects.filter((oFlexObject) => oFlexObject.getFileType() === "change" && oFlexObject.getChangeType() !== "defaultVariant")
@@ -138,22 +153,6 @@ sap.ui.define([
 			});
 
 			return mChanges;
-		}
-	});
-
-	// comp entities may hold the persistency key within the persistencyKey property (variant) or within the selector (changes)
-	const oCompEntitiesByPersistencyKeyDataSelector = new DataSelector({
-		id: "compEntitiesByPersistencyKey",
-		parameterKey: "persistencyKey",
-		parentDataSelector: oCompEntitiesDataSelector,
-		executeFunction(aFlexObjects, mPropertyBag) {
-			return aFlexObjects.filter((oFlexObject) =>
-				(oFlexObject.getPersistencyKey?.() || oFlexObject.getSelector?.().persistencyKey) === mPropertyBag.persistencyKey
-			);
-		},
-		checkInvalidation(mParameters, oUpdateInfo) {
-			const oFlexObject = oUpdateInfo.updatedObject;
-			return (oFlexObject?.getPersistencyKey?.() || oFlexObject.getSelector?.().persistencyKey) === mParameters.persistencyKey;
 		}
 	});
 
