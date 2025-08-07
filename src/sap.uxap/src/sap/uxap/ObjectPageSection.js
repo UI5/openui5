@@ -389,13 +389,18 @@ sap.ui.define([
 	 * @returns {string} aria-labeled by id
 	 */
 	ObjectPageSection.prototype._getAriaLabelledById = function () {
+		var oFirstVisibleSubSection = this._getFirstVisibleSubSection();
 		// Each section should be labelled as:
 		// 'titleID' - either its own or the promoted subsection's title
-		if (this._hasPromotedSubSection()) {
-			return this._getFirstVisibleSubSection()?._getTitleControl().getId();
-		} else {
+		if (this._hasPromotedSubSection() && oFirstVisibleSubSection?.getTitleVisible()) {
+			return oFirstVisibleSubSection._getTitleControl().getId();
+		}
+
+		if (!this._hasPromotedSubSection() && this.getTitleVisible()) {
 			return this._getTitleControl().getId();
 		}
+
+		return "";
 	};
 
 	/**

@@ -753,7 +753,7 @@ function(Element, nextUIUpdate, jQuery, XMLView, library, ObjectPageLayout, Obje
 	});
 
 	QUnit.test("Test aria-labelledby attribute", async function(assert) {
-		assert.expect(7);
+		assert.expect(8);
 
 		var oFirstSection = this.ObjectPageSectionView.byId("SectionWithSubSection"),
 			oSectionWithOneSubsection = this.ObjectPageSectionView.byId("SectionWithoneSubSection"),
@@ -762,6 +762,7 @@ function(Element, nextUIUpdate, jQuery, XMLView, library, ObjectPageLayout, Obje
 			sFirstSectionAriaLabelledBy = oFirstSection.$().attr("aria-labelledby"),
 			oSectionWithoutTitle = this.ObjectPageSectionView.byId("SectionWithNoTitleAndTwoSubSections"),
 			sSectionWithoutTitleAriaLabel = oSectionWithoutTitle.$().attr("aria-labelledby"),
+			sSectionWithNotTitleAriaLabel = this.ObjectPageSectionView.byId("SectionWithHiddenTitleAndOneSubSectionWithHiddenTitle").$().attr("aria-labelledby"),
 			oLastSection = this.ObjectPageSectionView.byId("SectionWithNoTitleAndOneSubSection"),
 			sLastSectionAriaLabelledBy = oLastSection.$().attr("aria-labelledby"),
 			oLastSectionFirstSubsection = oLastSection.getSubSections()[0];
@@ -771,6 +772,8 @@ function(Element, nextUIUpdate, jQuery, XMLView, library, ObjectPageLayout, Obje
 			oFirstSection.getTitle(), "aria-labelledby is set properly");
 		assert.strictEqual(Element.getElementById(sSectionWithoutTitleAriaLabel).getText(),
 			"", "sections without title, which have more than one subsection do not have aria-labelledby");
+		assert.strictEqual(Element.getElementById(sSectionWithNotTitleAriaLabel), undefined,
+			"sections with hidden title and only one subsection with hidden title do not have aria-labelledby");
 		assert.strictEqual(Element.getElementById(sLastSectionAriaLabelledBy).getText(),
 			oLastSectionFirstSubsection.getTitle(), "aria-labelledby is set properly"); //labelled by the subsection title
 
@@ -787,8 +790,8 @@ function(Element, nextUIUpdate, jQuery, XMLView, library, ObjectPageLayout, Obje
 		sFirstSectionAriaLabelledBy = oFirstSection.$().attr("aria-labelledby");
 
 		// assert
-		assert.strictEqual(Element.getElementById(sFirstSectionAriaLabelledBy).getText(),
-			oFirstSection.getTitle(), "sections with hidden title are still labelled by it");
+		assert.strictEqual(Element.getElementById(sFirstSectionAriaLabelledBy),
+			undefined, "sections with hidden title does not have labelled by");
 
 		// assert
 		assert.strictEqual(Element.getElementById(sSectionWithOneSubsectionAriaLabelledBy).getText(),
