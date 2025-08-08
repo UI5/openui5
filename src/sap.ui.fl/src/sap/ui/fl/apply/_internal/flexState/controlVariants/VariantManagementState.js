@@ -233,9 +233,9 @@ sap.ui.define([
 		return oGroupedFlexObjects;
 	}
 
-	function createVariantsMap(aFlexObjects) {
+	function createVariantsMap(aFlexObjects, mPropertyBag) {
 		const oGroupedFlexObjects = groupFlexObjects(aFlexObjects);
-		const sReference = aFlexObjects[0]?.getFlexObjectMetadata().reference;
+		const sReference = mPropertyBag.reference;
 
 		const oVariantManagementsMap = {};
 		oGroupedFlexObjects.variants.forEach((oVariantInstance) => {
