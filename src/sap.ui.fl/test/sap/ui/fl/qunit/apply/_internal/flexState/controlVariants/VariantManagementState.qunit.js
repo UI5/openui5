@@ -559,6 +559,45 @@ sap.ui.define([
 				"then the default variant is still a favorite"
 			);
 		});
+
+		QUnit.test("when some flex objects have a different reference (e.g. app variant scenario)", function(assert) {
+			const sCorrectReference = sReference;
+			const sWrongReference = "wrongReferenceFlexObject";
+			VariantManagementState.setCurrentVariant({
+				reference: sCorrectReference,
+				vmReference: sVariantManagementReference,
+				newVReference: "correctVariantReference"
+			});
+
+			const oFirstFlexObjectWithWrongRef = FlexObjectFactory.createUIChange({
+				id: "changeWithWrongRef",
+				layer: Layer.CUSTOMER,
+				variantReference: sStandardVariantReference,
+				reference: sWrongReference
+			});
+			const oPreviouslySelectedVariant = createVariant({
+				variantReference: sVariantManagementReference,
+				fileName: "correctVariantReference",
+				reference: sCorrectReference
+			});
+
+			stubFlexObjectsSelector([oFirstFlexObjectWithWrongRef, oPreviouslySelectedVariant]);
+
+			const oVariantsMap = VariantManagementState.getVariantManagementMap().get({
+				reference: sCorrectReference
+			});
+
+			assert.strictEqual(
+				oVariantsMap[sVariantManagementReference].currentVariant,
+				"correctVariantReference",
+				"then the previously selected variant is preserved"
+			);
+
+			assert.ok(
+				oVariantsMap[sVariantManagementReference],
+				"then the variant management is created"
+			);
+		});
 	});
 
 	QUnit.module("VariantsMapSelector.checkInvalidation", {
