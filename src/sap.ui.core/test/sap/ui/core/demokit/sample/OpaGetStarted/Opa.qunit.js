@@ -1,4 +1,4 @@
-/* global QUnit, opaTodo, opaSkip */
+/* global QUnit */
 
 sap.ui.define([
 	"sap/ui/test/Opa5",
@@ -43,7 +43,7 @@ sap.ui.define([
 	// The following test should report 1 assertion failure because there is no element with ID "saveButton"
 	// The test itself will be successful in QUnit2
 	// It will fail in QUnit1, as QUnit.todo is not yet available, and the result will be the same as for opaTest
-	opaTodo("Should press another button", function (Given, When, Then) {
+	opaTest.todo("Should press another button", function (Given, When, Then) {
 		Given.iStartMyAppInAFrame("applicationUnderTest/index.html");
 
 		When.waitFor({
@@ -57,7 +57,7 @@ sap.ui.define([
 
 	// The following test will be skipped
 	// If opaTest is used instead, the test will fail
-	opaSkip("Should press another button", function (Given, When, Then) {
+	opaTest.skip("Should press another button", function (Given, When, Then) {
 		Given.iStartMyAppInAFrame("applicationUnderTest/index.html");
 
 		When.waitFor({

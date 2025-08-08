@@ -5,11 +5,13 @@
 sap.ui.define([
 	"./TableDelegateUtils",
 	"sap/ui/mdc/TableDelegate",
-	"sap/ui/mdc/FilterField"
+	"sap/ui/mdc/FilterField",
+	"sap/ui/mdc/enums/FilterBarValidationStatus"
 ], function(
 	TableDelegateUtils,
 	TableDelegate,
-	FilterField
+	FilterField,
+	FilterBarValidationStatus
 ) {
 	"use strict";
 
@@ -48,7 +50,10 @@ sap.ui.define([
 						propertyKey: oProperty.key
 					});
 				});
-			}.bind(this)
+			}.bind(this),
+			determineValidationState: function(oControl) {
+				return FilterBarValidationStatus.NoError;
+			}
 		};
 	};
 

@@ -18,7 +18,7 @@ sap.ui.define([
 					Description : bFilteredOut ? "Out" : ""
 				}, /*bSkipRefresh*/true);
 				await oContext.created();
-				this.scrollTo(oContext);
+				this.scrollTo(oContext.getIndex(), true);
 			} catch (oError) {
 				MessageBox.error(oError.message);
 			}
@@ -121,11 +121,13 @@ sap.ui.define([
 		async onMakeRoot(oEvent, bLastSibling, bCopy) {
 			try {
 				this.getView().setBusy(true);
-				await oEvent.getSource().getBindingContext().move({
+				const oNode = oEvent.getSource().getBindingContext();
+				const iCopyIndex = await oNode.move({
 					copy : bCopy,
 					nextSibling : bLastSibling ? null : undefined,
 					parent : null
 				});
+				this.scrollTo(iCopyIndex ?? oNode.getIndex());
 			} catch (oError) {
 				MessageBox.error(oError.message);
 			} finally {
@@ -171,13 +173,9 @@ sap.ui.define([
 						nextSibling : this._vNextSibling,
 						parent : oParent
 					});
-
-					if (this._bCopy) {
-						MessageBox.information("Index: " + iCopyIndex,
-							{title : "New Node Created"});
-					}
 				}
-				this.byId("table").setFirstVisibleRow(iCopyIndex ?? this._oNode.getIndex());
+
+				this.scrollTo(oParent.getIndex(), false, iCopyIndex ?? this._oNode.getIndex());
 			} catch (oError) {
 				MessageBox.error(oError.message);
 			} finally {
@@ -210,7 +208,7 @@ sap.ui.define([
 					await oSibling.move({nextSibling : oNode, parent : oParent});
 				}
 
-				this.scrollTo(oNode);
+				this.scrollTo(oNode.getIndex(), true);
 			} catch (oError) {
 				MessageBox.error(oError.message);
 			} finally {
@@ -234,7 +232,7 @@ sap.ui.define([
 
 				if (!oSibling) {
 					if (oParent) {
-						this.scrollTo(oParent);
+						this.scrollTo(oParent.getIndex());
 					}
 					MessageBox.information("Cannot move up", {title : "Already first sibling"});
 					return;
@@ -243,7 +241,7 @@ sap.ui.define([
 				await oNode.move({nextSibling : oSibling, parent : oParent});
 
 				// make sure moved node is visible
-				this.scrollTo(oNode);
+				this.scrollTo(oNode.getIndex());
 			} catch (oError) {
 				MessageBox.error(oError.message);
 			} finally {
@@ -288,16 +286,43 @@ sap.ui.define([
 			MessageBox.information((aSelected.join("\n") || "none"), {title : "Selected Items"});
 		},
 
-		scrollTo(oNode) {
-			const iIndex = oNode.getIndex();
+		/**
+		 * Scrolls the given table to the range indicated by a given top and bottom index. If the
+		 * whole range is already visible, nothing happens. If the range does not fit into the
+		 * visible row count, the top index is ignored in favor of the bottom index. When the top
+		 * of the range is before the visible area, it is aligned at the top. When the bottom of the
+		 * range is after the visible area, there is a choice: either the top is aligned at the top
+		 * or the bottom is aligned at the bottom.
+		 *
+		 * @param {number} iIndex - A top index
+		 * @param {boolean} [bAlignAtBottom] - Whether to prefer alignment at bottom
+		 * @param {number} [iBottomIndex] - An optional bottom index (defaults to top)
+		 */
+		scrollTo(iIndex, bAlignAtBottom, iBottomIndex = iIndex) {
 			const oTable = this.byId("table");
 			const iFirstVisibleRow = oTable.getFirstVisibleRow();
 			const iRowCount = oTable.getRowMode().getRowCount();
 
+			function isVisible(i) {
+				return i >= iFirstVisibleRow && i < iFirstVisibleRow + iRowCount;
+			}
+
+			if (isVisible(iIndex) && isVisible(iBottomIndex)) {
+				return;
+			}
+
+			if (iBottomIndex - iIndex >= iRowCount - 1) {
+				iIndex = iBottomIndex; // cannot show both :-(
+			}
+
 			if (iIndex < iFirstVisibleRow) {
 				oTable.setFirstVisibleRow(iIndex);
-			} else if (iIndex >= iFirstVisibleRow + iRowCount) {
-				oTable.setFirstVisibleRow(iIndex - iRowCount + 1);
+			} else if (iBottomIndex >= iFirstVisibleRow + iRowCount) {
+				if (bAlignAtBottom) {
+					oTable.setFirstVisibleRow(iBottomIndex - iRowCount + 1);
+				} else {
+					oTable.setFirstVisibleRow(iIndex);
+				}
 			} // else: node is already visible
 		}
 	});

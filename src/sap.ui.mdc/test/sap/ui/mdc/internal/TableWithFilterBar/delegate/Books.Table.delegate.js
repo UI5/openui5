@@ -127,6 +127,30 @@ sap.ui.define([
 
 					return oFilterField;
 				});
+			},
+			determineValidationState: function(oFilterBar, mValidation) {
+				const oFilterBarConditions = oFilterBar.getConditions();
+				const sCurrencyConditionName = "currency_code";
+				const sPriceConditionName = "price";
+
+				const bPriceConditionPresent = !!oFilterBarConditions?.[sPriceConditionName]?.length,
+					bCurrencyConditionPresent = !!oFilterBarConditions[sCurrencyConditionName]?.length;
+
+				const oPriceFilterField = [].find((oFilterItem) => oFilterItem.getPropertyKey() === sPriceConditionName);
+
+				if (!bPriceConditionPresent || (bPriceConditionPresent && bCurrencyConditionPresent)) {
+					oPriceFilterField?.setValueState("None");
+					oPriceFilterField?.setValueStateText();
+				}
+
+				if (bPriceConditionPresent && !bCurrencyConditionPresent) {
+					oPriceFilterField?.setValueState("Warning");
+					oPriceFilterField?.setValueStateText("Please select a Currency!");
+
+					return BooksTableDelegate.RequiredHasNoValue;
+				}
+
+				return oFilterBar.checkFilters();
 			}
 		};
 	};
@@ -228,6 +252,7 @@ sap.ui.define([
 			return oColumn;
 		});
 	};
+
 
 	BooksTableDelegate.updateBindingInfo = function(oTable, oBindingInfo) {
 		ODataTableDelegate.updateBindingInfo.apply(this, arguments);

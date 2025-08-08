@@ -285,14 +285,6 @@ function(
 		var CSS_CLASS = "sapMMsgPopover",
 			DEFAULT_CONTENT_HEIGHT = "320px",
 			DEFAULT_CONTENT_WIDTH = "440px",
-			ICONS = {
-				back: IconPool.getIconURI("nav-back"),
-				close: IconPool.getIconURI("decline"),
-				information: IconPool.getIconURI("message-information"),
-				warning: IconPool.getIconURI("message-warning"),
-				error: IconPool.getIconURI("message-error"),
-				success: IconPool.getIconURI("message-success")
-			},
 			// Property names array
 			ASYNC_HANDLER_NAMES = ["asyncDescriptionHandler", "asyncURLHandler"],
 			// Private class variable used for static method below that sets default async handlers
@@ -354,20 +346,21 @@ function(
 
 			this._oMessageView = this._initMessageView();
 
+			this._oMessageView.attachEvent("onClose", function (oEvent) {
+					this.close();
+			}, this);
+
 			this._oMessageView.addEventDelegate({
 				onBeforeRendering: function () {
 					var bSegmentedButtonVisibleInMV = that._oMessageView._oSegmentedButton.getVisible(),
 						bShowHeader = !that.getInitiallyExpanded() || bSegmentedButtonVisibleInMV;
 
 					that._oMessageView._oSegmentedButton.setVisible(bShowHeader);
-					that._oMessageView._listPage.setShowHeader(true);
 				}
 			});
 
-			// insert the close buttons in both list and details pages as the MessageView
-			// doesn't know it is being created in Popover
-			this._insertCloseBtn(this._oMessageView._oListHeader);
-			this._insertCloseBtn(this._oMessageView._oDetailsHeader);
+			this._oMessageView?._oDetailsHeader.insertContent(this._oMessageView.getCloseBtn(), 2);
+			this._oMessageView.insertTitle(this._oMessageView._oDetailsHeader);
 
 			this._oMessageView._oSegmentedButton.attachEvent("select", this._onSegButtonSelect, this);
 
@@ -397,7 +390,6 @@ function(
 				},
 				beforeOpen: function (oEvent) {
 					var aItems = that.getItems();
-
 					if (!that.getBindingInfo("items") && !aItems.length) {
 						that._bindToMessageModel();
 					}
@@ -502,6 +494,10 @@ function(
 			// we should close the popover as its position cannot be determined anymore
 			if (this._oOpenByControl && !this._oOpenByControl.getVisible()) {
 				this._oPopover.close();
+			}
+			if (this._oMessageView) {
+				this._oMessageView._bShowCustomHeader = true;
+				this._oMessageView.setupCustomHeader();
 			}
 
 			this._syncMessageView();
@@ -729,24 +725,6 @@ function(
 			this._oPopover
 				.addStyleClass(CSS_CLASS + "-init")
 				.setContentHeight("auto");
-		};
-
-		/**
-		 * Inserts Close button in the provided location
-		 *
-		 * @param {sap.ui.core.Control} oInsertCloseBtnHere The object in which we want to insert the control
-		 * @private
-		 */
-		MessagePopover.prototype._insertCloseBtn = function (oInsertCloseBtnHere) {
-			var sCloseBtnDescr = this._oResourceBundle.getText("MESSAGEPOPOVER_CLOSE"),
-				oCloseBtn = new Button({
-				icon: ICONS["close"],
-				visible: !Device.system.phone,
-				tooltip: sCloseBtnDescr,
-				press: this.close.bind(this)
-			}).addStyleClass(CSS_CLASS + "CloseBtn");
-
-			oInsertCloseBtnHere.insertContent(oCloseBtn, 3, true);
 		};
 
 		/**

@@ -8,8 +8,6 @@ sap.ui.define([
 	"../Element",
 	"./WebComponentMetadata",
 	"./WebComponentRenderer",
-	"sap/base/strings/hyphenate",
-	"sap/base/strings/camelize",
 	"../library",
 	"../LabelEnablement"
 ],
@@ -18,8 +16,6 @@ function(
 	Element,
 	WebComponentMetadata,
 	WebComponentRenderer,
-	hyphenate,
-	camelize,
 	coreLibrary,
 	LabelEnablement
 ) {
@@ -44,8 +40,8 @@ function(
 	/**
 	 * Returns the sap.ui.core.Element instance for an arbitrary HTML Element, or undefined, if the HTML element is not a sap.ui.core.Element
 	 *
-	 * @param obj
-	 * @returns {sap.ui.core.Element|undefined}
+	 * @param {HTMLElement|object} obj DOM Element or any object that has an id property
+	 * @returns {sap.ui.core.Element|undefined} UI5 element instance or undefined if the HTML element is not a sap.ui.core.Element
 	 * @private
 	 */
 	var fnGetControlFor = function(obj) {
@@ -57,8 +53,8 @@ function(
 	/**
 	 * Returns the active element in the shadow DOM, if any
 	 *
-	 * @param obj
-	 * @returns {HTMLElement}
+	 * @param {HTMLElement|object} obj DOM Element or any object that has an id property
+	 * @returns {HTMLElement} The active element in the shadow DOM, or the original object if no shadow DOM is present
 	 * @private
 	 */
 	var fnGetActiveElement = function(obj) {
@@ -71,10 +67,10 @@ function(
 	/**
 	 * Takes an object as an argument and returns another object, where all fields in the original object, that are HTML Elements, are deeply replaced with their sap.ui.core.Element counterparts, where applicable
 	 *
-	 * @param obj
-	 * @param level
-	 * @param maxLevel
-	 * @returns {Object}
+	 * @param {HTMLElement|object|array} obj an object that can contain HTML Elements, arrays, objects, or any other type
+	 * @param {number} level the current recursion level, used to limit the depth of the conversion
+	 * @param {number} maxLevel the maximum recursion level, defaults to 2
+	 * @returns {object} the converted object, where all HTML Elements are replaced with their sap.ui.core.Element counterparts, where applicable
 	 * @private
 	 */
 	var fnConvert = function(obj, level, maxLevel) {
@@ -163,8 +159,8 @@ function(
 
 			this.__busyIndicatorTimeout = null;
 
-			this.__onInvalidationBound = this.__onInvalidation.bind(this);
-			this.__handleCustomEventBound = this.__handleCustomEvent.bind(this);
+			this.__onInvalidation = this.__onInvalidation.bind(this);
+			this.__handleCustomEvent = this.__handleCustomEvent.bind(this);
 
 			this.__delegates = {
 				onBeforeRendering: this.__onBeforeRenderingDelegate,
@@ -194,6 +190,9 @@ function(
 	 * @property {Object<string, string | sap.ui.core.webc.WebComponent.MetadataOptions.Association>} [associations]
 	 *     An object literal whose properties each define a new association in the ManagedObject subclass.
 	 *     See {@link sap.ui.base.ManagedObject.MetadataOptions.Association Association} for more details.
+	 * @property {Object<string, string | sap.ui.core.webc.WebComponent.MetadataOptions.Event>} [events]
+	 *     An object literal whose properties each define a new event of the ManagedObject subclass.
+	 *     See {@link sap.ui.base.ManagedObject.MetadataOptions.Event Event} for more details.
 	 * @property {string[]} [getters]
 	 *     Proxied public getters of the Web Component which are directly accessible on the wrapper Control.
 	 * @property {string[]} [methods]
@@ -227,10 +226,9 @@ function(
 	 * @public
 	 */
 
+	// [FIX] The following mapping omits the <code>no-unnecessary-qualifier</code> error or we need to extend the <code>tslint.json</code>!
 	/**
 	 * @typedef {sap.ui.core.webc.WebComponent.MetadataOptions.Property.Mapping} sap.ui.core.webc.WebComponent.MetadataOptionsPropertyMapping
-	 *
-	 * HACK! This mapping omits the <code>no-unnecessary-qualifier</code> error or we need to extend the <code>tslint.json</code>!
 	 *
 	 * @public
 	 */
@@ -273,10 +271,37 @@ function(
 	 * @public
 	 */
 
+	// [FIX] The following mapping omits the <code>no-unnecessary-qualifier</code> error or we need to extend the <code>tslint.json</code>!
 	/**
 	 * @typedef {sap.ui.core.webc.WebComponent.MetadataOptions.Association.Mapping} sap.ui.core.webc.WebComponent.MetadataOptionsAssociationMapping
 	 *
-	 * HACK! This mapping omits the <code>no-unnecessary-qualifier</code> error or we need to extend the <code>tslint.json</code>!
+	 * @public
+	 */
+
+	/**
+	 * @typedef {sap.ui.base.ManagedObject.MetadataOptions.Event} sap.ui.core.webc.WebComponent.MetadataOptions.Event
+	 *
+	 * An object literal describing an event of a class derived from <code>sap.ui.core.webc.WebComponent</code>.
+	 * See {@link sap.ui.core.webc.WebComponent.MetadataOptions MetadataOptions} for details on its usage.
+	 *
+	 * @property {sap.ui.core.webc.WebComponent.MetadataOptionsEventMapping} [mapping] Defines the mapping of the event.
+	 *
+	 * @public
+	 */
+
+	/**
+	 * @typedef {object} sap.ui.core.webc.WebComponent.MetadataOptions.Event.Mapping
+	 *
+	 * An object literal describing the mapping of an event of a class derived from <code>sap.ui.core.webc.WebComponent</code>.
+	 *
+	 * @property {string} [to] Defines the target of the mapping of the event to which name it will be mapped to.
+	 *
+	 * @public
+	 */
+
+	// [FIX] The following mapping omits the <code>no-unnecessary-qualifier</code> error or we need to extend the <code>tslint.json</code>!
+	/**
+	 * @typedef {sap.ui.core.webc.WebComponent.MetadataOptions.Event.Mapping} sap.ui.core.webc.WebComponent.MetadataOptionsEventMapping
 	 *
 	 * @public
 	 */
@@ -335,8 +360,8 @@ function(
 	/**
 	 * Assigns the __slot property which tells RenderManager to render the sap.ui.core.Element (oElement) with a "slot" attribute
 	 *
-	 * @param oElement
-	 * @param sAggregationName
+	 * @param {sap.ui.core.Element} oElement a UI5 Element instance that is aggregated in the Web Component
+	 * @param {string} sAggregationName the name of the aggregation to which the element is added
 	 * @private
 	 */
 	WebComponent.prototype._setSlot = function(oElement, sAggregationName) {
@@ -535,7 +560,7 @@ function(
 		this.__updateObjectProperties(oDomRef);
 		window.customElements.whenDefined(oDomRef.localName).then(function() {
 			if (typeof oDomRef.attachInvalidate === "function") {
-				oDomRef.attachInvalidate(this.__onInvalidationBound);
+				oDomRef.attachInvalidate(this.__onInvalidation);
 			}
 
 			if (oDomRef._individualSlot) {
@@ -546,7 +571,7 @@ function(
 
 	/**
 	 * Updates all object properties (can't be done via the renderer)
-	 * @param oDomRef
+	 * @param {HTMLElement} oDomRef the DOM reference of the Web Component
 	 * @private
 	 */
 	WebComponent.prototype.__updateObjectProperties = function(oDomRef) {
@@ -566,6 +591,13 @@ function(
 		}
 	};
 
+	/**
+	 * Sets the Web Components busy state
+	 *
+	 * @param {boolean} bBusy The new busy state to be set
+	 * @returns {this} <code>this</code> to allow method chaining
+	 * @public
+	 */
 	WebComponent.prototype.setBusy = function(bBusy) {
 		var bCurrentBusyState = this.getBusy();
 
@@ -587,7 +619,7 @@ function(
 
 	/**
 	 * Synchronize user-controlled properties (such as checked, value)
-	 * @param oChangeInfo
+	 * @param {object} oChangeInfo the change information object
 	 * @private
 	 */
 	WebComponent.prototype.__onInvalidation = function(oChangeInfo) {
@@ -606,44 +638,54 @@ function(
 		}
 	};
 
+	/**
+	 * @private
+	 */
 	WebComponent.prototype.__attachCustomEventsListeners = function() {
-		var oEvents = this.getMetadata().getAllEvents();
+		var oDomRef = this.getDomRef();
+		var oEvents = this.getMetadata().getCustomEvents();
 		for (var sEventName in oEvents) {
-			var sCustomEventName = hyphenate(sEventName);
-			this.getDomRef().addEventListener(sCustomEventName, this.__handleCustomEventBound);
+			var sCustomEventName = oEvents[sEventName]._sCustomEventName;
+			oDomRef.addEventListener(sCustomEventName, this.__handleCustomEvent);
 		}
 	};
 
+	/**
+	 * @private
+	 */
 	WebComponent.prototype.__detachCustomEventsListeners = function() {
 		var oDomRef = this.getDomRef();
 		if (!oDomRef) {
 			return;
 		}
-
-		var oEvents = this.getMetadata().getAllEvents();
+		var oEvents = this.getMetadata().getCustomEvents();
 		for (var sEventName in oEvents) {
-			if (oEvents.hasOwnProperty(sEventName)) {
-				var sCustomEventName = hyphenate(sEventName);
-				oDomRef.removeEventListener(sCustomEventName, this.__handleCustomEventBound);
+			var sCustomEventName = oEvents[sEventName]._sCustomEventName;
+			oDomRef.removeEventListener(sCustomEventName, this.__handleCustomEvent);
+		}
+	};
+
+	/**
+	 * @private
+	 */
+	WebComponent.prototype.__handleCustomEvent = function(oEvent) {
+		// Prepare the event data object
+		var oEventData = this.__formatEventData(oEvent.detail);
+
+		// Notify all custom events that are registered for this event name
+		var mCustomEvents = this.getMetadata().getCustomEvents(oEvent.type);
+		for (var sName in mCustomEvents) {
+			var oEventObj = mCustomEvents[sName];
+			var bPrevented = !oEventObj.fire(this, oEventData);
+			if (bPrevented) {
+				oEvent.preventDefault();
 			}
 		}
 	};
 
-	WebComponent.prototype.__handleCustomEvent = function(oEvent) {
-		var sCustomEventName = oEvent.type;
-		var sEventName = camelize(sCustomEventName);
-
-		// Prepare the event data object
-		var oEventData = this.__formatEventData(oEvent.detail);
-
-		// Finally fire the semantic event on the control instance
-		var oEventObj = this.getMetadata().getEvent(sEventName);
-		var bPrevented = !oEventObj.fire(this, oEventData);
-		if (bPrevented) {
-			oEvent.preventDefault();
-		}
-	};
-
+	/**
+	 * @private
+	 */
 	WebComponent.prototype.__formatEventData = function(vDetail) {
 		// If the event data is an object, recursively convert all object dom element properties to control references
 		if (typeof vDetail === "object") {
@@ -654,6 +696,9 @@ function(
 		return {};
 	};
 
+	/**
+	 * @private
+	 */
 	WebComponent.prototype.__callPublicMethod = function(name, args) {
 		if (!this.getDomRef()) {
 			throw new Error("Method called before custom element has been created by: " + this.getId());
@@ -674,6 +719,9 @@ function(
 		return vResult;
 	};
 
+	/**
+	 * @private
+	 */
 	WebComponent.prototype.__callPublicGetter = function(name) {
 		if (!this.getDomRef()) {
 			throw new Error("Getter called before custom element has been created by: " + this.getId());
@@ -691,7 +739,7 @@ function(
 		var oDomRef = this.getDomRef();
 		this.__detachCustomEventsListeners();
 		if (oDomRef && typeof oDomRef.detachInvalidate === "function") {
-			oDomRef.detachInvalidate(this.__onInvalidationBound);
+			oDomRef.detachInvalidate(this.__onInvalidation);
 		}
 
 		return Control.prototype.destroy.apply(this, arguments);
@@ -699,8 +747,8 @@ function(
 
 	/**
 	 * Maps the "enabled" property to the "disabled" attribute
-	 * @param bEnabled
-	 * @returns {boolean}
+	 * @param {boolean} bEnabled the enabled state of the Web Component
+	 * @returns {boolean} the mapped enabled state value
 	 * @private
 	 */
 	WebComponent.prototype._mapEnabled = function(bEnabled) {
@@ -709,8 +757,8 @@ function(
 
 	/**
 	 * Maps the "textDirection" property to the "dir" attribute
-	 * @param sTextDirection
-	 * @returns {string}
+	 * @param {sap.ui.core.TextDirection|string} sTextDirection text direction value
+	 * @returns {string} the mapped text direction value
 	 * @private
 	 */
 	WebComponent.prototype._mapTextDirection = function(sTextDirection) {

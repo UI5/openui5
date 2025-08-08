@@ -91,7 +91,10 @@ sap.ui.define(
 							//create instance of 'AdaptationFilterBar'
 							this._oP13nFilter = new AdaptationFilterBar(this.getId() + "-p13nFilter", {
 								adaptationControl: this,
-								filterConditions: this.getFilterConditions()
+								filterConditions: this.getFilterConditions(),
+								change: async function () {
+									await this.validate(true);
+								}
 							});
 
 							if (this._registerInnerFilter) {

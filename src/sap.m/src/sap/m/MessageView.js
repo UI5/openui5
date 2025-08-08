@@ -13,6 +13,8 @@ sap.ui.define([
 	"sap/ui/core/Icon",
 	"./Button",
 	"./Toolbar",
+	"./Title",
+	"sap/ui/Device",
 	"./ToolbarSpacer",
 	"./List",
 	"./MessageListItem",
@@ -45,6 +47,8 @@ sap.ui.define([
 	Icon,
 	Button,
 	Toolbar,
+	Title,
+	Device,
 	ToolbarSpacer,
 	List,
 	MessageListItem,
@@ -231,7 +235,13 @@ sap.ui.define([
 						 */
 						item: { type: "sap.m.MessageItem" }
 					}
-				}
+				},
+
+				/**
+ 				 * Event fired when the close button in custom header is clicked.
+				 * @protected
+ 				 */
+				onClose: {}
 			}
 		},
 
@@ -302,6 +312,13 @@ sap.ui.define([
 
 		var that = this;
 		this._bHasHeaderButton = false;
+
+		/**
+		 * Defines whether the custom header of details page will be shown.
+		 * @protected
+		 * @type boolean
+		 */
+		this._bShowCustomHeader = false;
 
 		this._oResourceBundle = Library.getResourceBundleFor("sap.m");
 
@@ -675,6 +692,80 @@ sap.ui.define([
 	};
 
 	/**
+ 	 * Inserts a title into the given title container of the MessageView's header.
+	 *
+ 	 * @param {sap.ui.core.Control} oTitleParent The parent control where the title should be inserted.
+	 * @protected
+	 */
+	MessageView.prototype.insertTitle = function (oTitleParent) {
+			const sText = this._oResourceBundle.getText("MESSAGEPOPOVER_ARIA_BACK_BUTTON");
+			const oTitle = new Title({
+				text: sText
+			});
+
+			oTitleParent.insertContent(oTitle, 1);
+		};
+
+	/**
+	 * Creates a custom header for the MessageView's ListPage.
+	 *
+	 * @returns {sap.m.Toolbar} The custom header toolbar.
+	 * @private
+	 */
+	MessageView.prototype._createCustomHeader = function () {
+			const sText = this._oResourceBundle.getText("MESSAGEPOPOVER_ARIA_HEADING");
+			const oCustomHeader = new Toolbar({
+				content: [
+					new Title({
+						text: sText
+					}),
+					new ToolbarSpacer(),
+					this.getCloseBtn()
+				]
+			}).addStyleClass(CSS_CLASS + "CustomHeader");
+
+			return oCustomHeader;
+		};
+
+	/**
+	* Sets up the header for the MessageView's ListPage based on the current configuration.
+	* If `showCustomHeader` is enabled, a custom header and a sub-header are applied.
+	* Otherwise, a standard list header is used.
+	*
+	* @protected
+	*/
+	MessageView.prototype.setupCustomHeader = function () {
+
+			if (this._bShowCustomHeader) {
+				this._listPage.setCustomHeader(this._createCustomHeader());
+				this._listPage.setSubHeader(this._getListHeader());
+			} else {
+				this._listPage.setCustomHeader(this._getListHeader());
+			}
+	};
+
+	/**
+ 	 * Returns the close button used in the header of the MessageView.
+ 	 * The button is only visible on non-phone devices and triggers the `onClose` event when pressed.
+ 	 *
+ 	 * @returns {sap.m.Button} The close button instance.
+ 	 * @protected
+ 	 */
+	MessageView.prototype.getCloseBtn = function () {
+		const that = this;
+			var sCloseBtnDescr = this._oResourceBundle.getText("MESSAGEPOPOVER_CLOSE"),
+				oCloseBtn = new Button({
+				icon: ICONS["close"],
+				visible: !Device.system.phone,
+				tooltip: sCloseBtnDescr,
+					press: function () {
+						that.fireOnClose();
+					}
+			}).addStyleClass("sapMMsgPopoverCloseBtn");
+
+			return oCloseBtn;
+		};
+	/**
 	 * Creates navigation pages
 	 *
 	 * @returns {this} Reference to the 'this' for chaining purposes
@@ -683,8 +774,9 @@ sap.ui.define([
 	MessageView.prototype._createNavigationPages = function () {
 		// Create two main pages
 		this._listPage = new Page(this.getId() + "listPage", {
-			customHeader: this._getListHeader()
 		});
+
+		this.setupCustomHeader();
 
 		this._detailsPage = new Page(this.getId() + "-detailsPage", {
 			customHeader: this._getDetailsHeader()
@@ -943,7 +1035,14 @@ sap.ui.define([
 		// If SegmentedButton should not be visible,
 		// and there is no custom button - hide the initial page's header
 		var bListPageHeaderVisible = bSegmentedButtonVisible || this._bHasHeaderButton;
-		this._listPage.setShowHeader(bListPageHeaderVisible);
+
+		if (this._bShowCustomHeader && !bListPageHeaderVisible) {
+			this._listPage.setShowHeader(this._bShowCustomHeader);
+			this._listPage.setShowSubHeader(false);
+		} else {
+			this._listPage.setShowHeader(bListPageHeaderVisible);
+			this._listPage?.setShowSubHeader(true);
+		}
 
 
 		return this;
