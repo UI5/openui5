@@ -40,6 +40,7 @@ sap.ui.define([
 	const CUSTOMCSSCHECK = /\.sapUiThemeDesignerCustomCss/i;
 	const _CUSTOMID = "sap-ui-core-customcss";
 	const _THEME_PREFIX = "sap-ui-theme-";
+	let sDerivedDistVersionFromPreload;
 	let bAllPreloadedCssReady = true;
 
 	// Collect all UI5 relevant CSS files which have been added upfront
@@ -48,7 +49,10 @@ sap.ui.define([
 		let bPreloadedCssReady = true;
 		const sLibId = linkNode.getAttribute("id").replace(_THEME_PREFIX, "");
 
-		mAllLoadedLibraries[sLibId] = {};
+		sDerivedDistVersionFromPreload ??= linkNode.getAttribute("href").match(/.*sap-ui-dist-version=([^?&]*)/)?.[1];
+		mAllLoadedLibraries[sLibId] = {
+			version: sDerivedDistVersionFromPreload
+		};
 		linkNode.removeAttribute("data-sap-ui-ready");
 
 		Log.info(`ThemeManager: Preloaded CSS for library ${sLibId} detected: ${linkNode.href}`, undefined, "sap.ui.core.theming.ThemeManager");
@@ -702,8 +706,8 @@ sap.ui.define([
 			sQuery = "?version=" + oLibInfo.version;
 
 			// distribution version may not be available (will be loaded in Core constructor syncpoint2)
-			if (VersionInfo._content) {
-				sQuery += "&sap-ui-dist-version=" + VersionInfo._content.version;
+			if (VersionInfo._content || sDerivedDistVersionFromPreload) {
+				sQuery += `&sap-ui-dist-version=${VersionInfo._content?.version || sDerivedDistVersionFromPreload}`;
 			}
 		}
 		return sQuery;

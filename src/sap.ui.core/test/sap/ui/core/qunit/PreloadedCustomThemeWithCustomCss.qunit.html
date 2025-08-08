@@ -1,0 +1,37 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<!-- ui5lint-disable prefer-test-starter --><!-- test scenario needs to control the bootstrap -->
+	<title>sap.ui.core.theming.ThemeManager: Custom CSS with missing version info</title>
+
+	<!-- Setup -->
+	<link id="sap-ui-theme-sap.ui.core" href="../../../../../resources/sap/ui/core/themes/sap_hcb/library.css?sap-ui-dist-version=0.0.0" rel="stylesheet">
+	<link id="sap-ui-theme-testlibs.customCss.lib1" href="../../../../../test-resources/sap/ui/core/qunit/testdata/libraries/customCss/lib1/themes/customTheme/library.css?sap-ui-dist-version=1.2.3" rel="stylesheet">
+
+
+	<!-- Initialization -->
+	<script src="../../../../../resources/ui5loader.js"></script>
+	<script id="sap-ui-bootstrap" src="../../../../../resources/ui5loader-autoconfig.js"
+		data-sap-ui-theme-roots='{
+			"customcss": {
+				"sap.ui.core": "../../../../../test-resources/sap/ui/core/qunit/testdata/customcss/"
+			},
+			"customTheme": {
+				"sap.ui.core": "../../../../../test-resources/sap/ui/core/qunit/testdata/libraries/customCss/"
+			}
+		}'></script>
+
+	<link href="../../../../../resources/sap/ui/thirdparty/qunit-2.css" rel="stylesheet" media="screen">
+	<script src="../../../../../resources/sap/ui/thirdparty/qunit-2.js"></script>
+	<script src="../../../../../resources/sap/ui/thirdparty/sinon-4.js"></script>
+	<script src="../../../../../resources/sap/ui/qunit/qunit-junit.js"></script>
+	<script src="../../../../../resources/sap/ui/qunit/qunit-coverage.js"></script>
+
+	<!-- Test functions -->
+	<script src="PreloadedCustomThemeWithCustomCss.qunit.js"></script>
+</head>
+<body>
+	<div id="qunit"></div>
+</body>
+</html>
