@@ -1501,19 +1501,27 @@ sap.ui.define([
 	 */
 	AccExtension.prototype.getKeyboardTexts = function() {
 		const sSelectionMode = this.getTable().getSelectionMode();
-		const mTexts = {
-			rowSelect: "",
-			rowDeselect: ""
-		};
 
 		if (sSelectionMode === SelectionMode.None) {
-			return mTexts;
+			return {
+				rowSelect: "",
+				rowDeselect: ""
+			};
 		}
 
-		mTexts.rowSelect = TableUtils.getResourceText("TBL_ROW_SELECT_KEY");
-		mTexts.rowDeselect = TableUtils.getResourceText("TBL_ROW_DESELECT_KEY");
+		return this.getSelectionTexts();
+	};
 
-		return mTexts;
+	/**
+	 * Retrieve the resource texts for row selection.
+	 *
+	 * @returns {{rowSelect: string, rowDeselect: string}} The resource texts for row selection.
+	 */
+	AccExtension.prototype.getSelectionTexts = function() {
+		return {
+			rowSelect: TableUtils.getResourceText("TBL_ROW_SELECT_KEY"),
+			rowDeselect: TableUtils.getResourceText("TBL_ROW_DESELECT_KEY")
+		};
 	};
 
 	/**

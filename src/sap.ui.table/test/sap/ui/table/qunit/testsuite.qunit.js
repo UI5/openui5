@@ -193,7 +193,11 @@ sap.ui.define([
 			},
 			"Accessibility": {
 				group: "Extensions",
-				module: "./extensions/{name}.qunit"
+				module: "./extensions/{name}.qunit",
+				ui5: {
+					// Test has dependencies to sap.m modules
+					libs: ["sap.ui.table", "sap.m"]
+				}
 			},
 			"Keyboard": {
 				group: "Extensions",

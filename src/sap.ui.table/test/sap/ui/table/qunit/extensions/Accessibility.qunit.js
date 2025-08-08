@@ -11,6 +11,7 @@ sap.ui.define([
 	"sap/ui/table/library",
 	"sap/m/IllustratedMessage",
 	"sap/m/Label",
+	"sap/m/plugins/CellSelector",
 	"sap/ui/core/Control",
 	"sap/ui/core/ControlBehavior",
 	"sap/ui/core/library",
@@ -31,6 +32,7 @@ sap.ui.define([
 	library,
 	IllustratedMessage,
 	Label,
+	CellSelector,
 	Control,
 	ControlBehavior,
 	coreLibrary,
@@ -1243,6 +1245,23 @@ sap.ui.define([
 		await this.oTable.qunit.whenRenderingFinished();
 
 		assert.notOk(oRow.getDomRef("rowselectText"), `SelectionMode ${this.oTable.getSelectionMode()} - Empty row`);
+	});
+
+	QUnit.test("Selector text with CellSelector plugin", async function(assert) {
+		const oRow = this.oTable.getRows()[0];
+		const oRowSelectorText = oRow.getDomRef("rowselecttext");
+		const sSelectedText = TableUtils.getResourceText("TBL_ROW_DESELECT_KEY_ALTERNATIVE");
+		const sNotSelectedText = TableUtils.getResourceText("TBL_ROW_SELECT_KEY_ALTERNATIVE");
+		const oSelectionPlugin = new TableQUnitUtils.TestSelectionPlugin();
+
+		this.oTable.addDependent(oSelectionPlugin);
+		this.oTable.addDependent(new CellSelector());
+		this.oTable.setSelectionBehavior(library.SelectionBehavior.Row);
+
+		await this.oTable.qunit.whenRenderingFinished();
+		assert.equal(oRowSelectorText.innerText, sNotSelectedText, "not selected row");
+		oSelectionPlugin.setSelected(oRow, true);
+		assert.equal(oRowSelectorText.innerText, sSelectedText, "selected row");
 	});
 
 	QUnit.module("Row Actions", {
