@@ -3566,6 +3566,50 @@ function(
 		await helpers.renderObject(oObjectPage);
 	});
 
+	QUnit.test("Expanding Header with ObjectPageDynamicHeaderTitle with rounding issue",
+	async function (assert) {
+
+		// Arrange
+		var oObjectPage = oFactory.getObjectPageLayoutWithOneVisibleSection(),
+			oHeader = oFactory.getObjectPageDynamicHeaderTitle(),
+			fnDone = assert.async(),
+			oSpy;
+
+		assert.expect(2);
+
+		oHeader.setSnappedHeading(new Button({text: "Heading Button"}));
+		oHeader.setExpandedHeading(new Button({text: "Heading Button"}));
+		oObjectPage.setShowAnchorBar(false);
+		oObjectPage.addHeaderContent(new Button());
+		oObjectPage.setHeaderTitle(oFactory.getObjectPageDynamicHeaderTitle());
+
+		oObjectPage.attachEventOnce("onAfterRenderingDOMReady", function() {
+			// Act - Snap header
+			oObjectPage._handleDynamicTitlePress();
+
+			setTimeout(function() {
+				// Assert
+				assert.strictEqual(oObjectPage._bHeaderExpanded, false, "Header is collapsed");
+
+				// stub - simulate rounding issue
+				this.stub(oObjectPage._$opWrapper, "scrollTop").returns(oObjectPage._getSnapPosition() + 1.6);
+				oSpy = this.spy(oObjectPage, "_moveHeaderToTitleArea");
+
+				// Act - Expand header
+				oObjectPage._handleDynamicTitlePress();
+
+				// Assert
+				assert.ok(oSpy.notCalled, "_moveHeaderToTitleArea is not called");
+
+				// Cleanup
+				oObjectPage.destroy();
+				fnDone();
+			}.bind(this), 100);
+		}.bind(this));
+
+		await helpers.renderObject(oObjectPage);
+	});
+
 	QUnit.test("_updateMedia called with proper arguments onAfterRendering when _hasDynamicTitle",
 	async function (assert) {
 

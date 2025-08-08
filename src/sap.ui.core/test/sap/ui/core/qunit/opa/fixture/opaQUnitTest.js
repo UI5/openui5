@@ -1,4 +1,4 @@
-/*global QUnit, opaSkip, opaTodo */
+/*global QUnit */
 QUnit.config.autostart = false;
 
 // Use module APIs to load sinon. Loading it via script tag would result in double execution
@@ -28,7 +28,7 @@ sap.ui.require([
 			beforeEach: setQUnitTimeout
 		});
 
-		opaSkip("Should skip this test", function (oOpa) {
+		opaTest.skip("Should skip this test", function (oOpa) {
 			oOpa.waitFor({
 				success: function () {
 					Opa5.assert.ok(true);
@@ -40,7 +40,7 @@ sap.ui.require([
 			beforeEach: setQUnitTimeout
 		});
 
-		opaTodo("Should not fail when TODO test is failing", function (oOpa) {
+		opaTest.todo("Should not fail when TODO test is failing", function (oOpa) {
 			oOpa.waitFor({
 				success: function () {
 					Opa5.assert.ok(false, "Should not report test that awaits adaptation");
@@ -55,7 +55,7 @@ sap.ui.require([
 			type: "QUnit timeout",
 			timeout: 3
 		}].forEach(function (data) {
-			opaTodo("Should not fail when TODO test timeouts with " + data.type, function (oOpa) {
+			opaTest.todo("Should not fail when TODO test timeouts with " + data.type, function (oOpa) {
 				oOpa.waitFor({
 					success: function () {
 						// use Opa5.assert - the global one will no longer be defined after the QUnit timeout and will cause error when ran 2 times in the OPA test suite
@@ -71,7 +71,7 @@ sap.ui.require([
 			});
 		});
 
-		opaTodo("Should fail when TODO test is OK", function (oOpa) {
+		opaTest.todo("Should fail when TODO test is OK", function (oOpa) {
 			oOpa.waitFor({
 				success: function () {
 					Opa5.assert.ok(true, "Should report test that is already adapted");

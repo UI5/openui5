@@ -535,6 +535,18 @@ sap.ui.define([
 		return this;
 	};
 
+	AdaptationFilterBar.prototype._determineValidationState = function() {
+		return this.awaitControlDelegate().then((oDelegate) => {
+			if ("getFilterDelegate" in oDelegate &&
+				typeof oDelegate.getFilterDelegate === "function" &&
+				"determineValidationState" in oDelegate.getFilterDelegate()
+			) {
+				oDelegate = oDelegate.getFilterDelegate();
+			}
+			return oDelegate.determineValidationState(this, this.checkFilters());
+		});
+	};
+
 	/**
 	 * Returns an instance of the associated adaptation control, if available.
 	 * @private

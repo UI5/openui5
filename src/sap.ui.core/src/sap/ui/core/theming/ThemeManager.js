@@ -139,18 +139,6 @@ sap.ui.define([
 							!ThemeHelper.isStandardTheme(sTheme) && Theming.getThemeRoot(sTheme, this.libName)) {
 							sTheme = _sFallbackThemeFromMetadata || _sFallbackThemeFromThemeRoot;
 							if (!sTheme) {
-								// 'sUrl' may be 'undefined' if we need to wait for the fallback theme. In this case,
-								// only a link element is added to the DOM to preserve the correct CSS order.
-								// This prevents other library themes - which do not require waiting for a fallback -
-								// from being added before the fallback theme.
-								const oLink = document.createElement("link");
-								oLink.setAttribute("id", this.linkId);
-								if (this.cssLinkElement) {
-									this.cssLinkElement.parentNode.replaceChild(oLink, this.cssLinkElement);
-								} else {
-									document.head.appendChild(oLink);
-								}
-								this.cssLinkElement = oLink;
 								return undefined;
 							}
 						}
@@ -287,9 +275,18 @@ sap.ui.define([
 					});
 				} else {
 					// If there is no URL, a theme fallback must be detected first.
-					// We reject here because only a placeholder link element has been added to the DOM.
+					// We reject here because and add only a placeholder link element to the DOM.
 					// The handleThemeFailed function will process this rejection and apply the fallback
 					// theme for the library once it has been detected.
+					const oLink = document.createElement("link");
+					oLink.setAttribute("id", libInfo.linkId);
+					oLink.setAttribute("rel", "stylesheet");
+					if (libInfo.cssLinkElement) {
+						libInfo.cssLinkElement.parentNode.replaceChild(oLink, libInfo.cssLinkElement);
+					} else {
+						document.head.appendChild(oLink);
+					}
+					libInfo.cssLinkElement = oLink;
 					return Promise.reject();
 				}
 			});

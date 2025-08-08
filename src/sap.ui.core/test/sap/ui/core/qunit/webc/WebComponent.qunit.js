@@ -5,6 +5,7 @@ sap.ui.define([
 	"sap/ui/test/actions/Press",
 	"webc/fixtures/BasicUI5Control",
 	"webc/fixtures/ControlWrapper",
+	"webc/fixtures/ExtendsControlWrapper",
 	"webc/fixtures/LabelWrapper",
 	"webc/helper/renderingFor",
 	"webc/helper/WebcWrapperPool",
@@ -15,6 +16,7 @@ sap.ui.define([
 	Press,
 	BasicUI5Control,
 	ControlWrapper,
+	ExtendsControlWrapper,
 	LabelWrapper,
 	renderingFor,
 	WebcWrapperPool,
@@ -607,11 +609,31 @@ sap.ui.define([
 	});
 
 	QUnit.test("Event handling", async function(assert) {
+		assert.expect(5);
+
 		const myWebComponent = await WebcWrapperPool.create(ControlWrapper, {
 			id: "creationTest",
 			myWidth: "100%",
 			height: "100%",
 			pressAction: (oEvent) => {
+				assert.strictEqual(oEvent.getParameter("target"), oEvent.getSource(), "Event handler was called!");
+			},
+			otherAction: (oEvent) => {
+				assert.strictEqual(oEvent.getParameter("target"), oEvent.getSource(), "Event handler was called!");
+			}
+		});
+
+		const myExtendsWebComponent = await WebcWrapperPool.create(ExtendsControlWrapper, {
+			id: "extendsCreationTest",
+			myWidth: "100%",
+			height: "100%",
+			pressAction: (oEvent) => {
+				assert.strictEqual(oEvent.getParameter("target"), oEvent.getSource(), "Event handler was called!");
+			},
+			otherAction: (oEvent) => {
+				assert.strictEqual(oEvent.getParameter("target"), oEvent.getSource(), "Event handler was called!");
+			},
+			yetAnotherAction: (oEvent) => {
 				assert.strictEqual(oEvent.getParameter("target"), oEvent.getSource(), "Event handler was called!");
 			}
 		});
@@ -621,6 +643,12 @@ sap.ui.define([
 		await renderingFor(myWebComponent);
 
 		new Press().executeOn(myWebComponent);
+
+		// place into DOM and wait
+		myExtendsWebComponent.placeAt("webc-fixture-container");
+		await renderingFor(myExtendsWebComponent);
+
+		new Press().executeOn(myExtendsWebComponent);
 	});
 
 	QUnit.module("Read-only attributes and methods", {

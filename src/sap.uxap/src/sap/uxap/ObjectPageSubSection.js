@@ -688,6 +688,7 @@ sap.ui.define([
 		}
 
 		this._applyLayout(oObjectPageLayout);
+		this.refreshSeeMoreVisibility();
 	};
 
 	/**
@@ -1000,7 +1001,7 @@ sap.ui.define([
 		var oSeeMoreControl = this._getSeeMoreButton(),
 			oSeeLessControl = this._getSeeLessButton();
 
-		this._bBlockHasMore = !!this.getMoreBlocks().length;
+		this._bBlockHasMore = this._hasVisibleMoreBlocks();
 		if (!this._bBlockHasMore) {
 			this._bBlockHasMore = this.getBlocks().some(function (oBlock) {
 				//check if the block ask for the global see more the rule is
@@ -1018,6 +1019,14 @@ sap.ui.define([
 		oSeeLessControl.toggleStyleClass("sapUxAPSubSectionSeeMoreButtonVisible", this._bBlockHasMore);
 
 		return this._bBlockHasMore;
+	};
+
+	ObjectPageSubSection.prototype._hasVisibleMoreBlocks = function () {
+		var aMoreBlocks = this.getMoreBlocks();
+
+		return aMoreBlocks.some(function (oBlock) {
+			return oBlock.getVisible();
+		});
 	};
 
 	ObjectPageSubSection.prototype.setMode = function (sMode) {

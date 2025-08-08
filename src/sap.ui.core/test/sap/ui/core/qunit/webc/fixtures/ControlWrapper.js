@@ -230,7 +230,12 @@ sap.ui.define([
 				}
 			},
 			events: {
-				pressAction: {}
+				pressAction: {},
+				otherAction: {
+					mapping: {
+						to: "press-action"
+					}
+				}
 			}
 		},
 		// refer to "borderWidth" property above

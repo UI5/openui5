@@ -15,7 +15,8 @@ sap.ui.define([
 	"sap/m/p13n/Engine",
 	"sap/ui/mdc/p13n/subcontroller/FilterController",
 	"sap/ui/mdc/util/PropertyHelper",
-	"sap/ui/mdc/enums/OperatorName"
+	"sap/ui/mdc/enums/OperatorName",
+	"sap/ui/mdc/enums/FilterBarValidationStatus"
 ], function (
 	AdaptationFilterBar,
 	FlexUtil,
@@ -31,7 +32,8 @@ sap.ui.define([
 	Engine,
 	FilterController,
 	PropertyHelper,
-	OperatorName
+	OperatorName,
+	FilterBarValidationStatus
 ) {
 	"use strict";
 
@@ -142,6 +144,27 @@ sap.ui.define([
 
 		}.bind(this));
 
+	});
+
+
+	QUnit.test("_determineValidationState calls determineValidationState from getFilterDelegate", function(assert) {
+		const done = assert.async();
+
+		// arrange
+		this.oAdaptationFilterBar.setAdaptationControl(this.oTestTable);
+		const that = this;
+		this.oTestTable.awaitControlDelegate().then(function(oDelegate) {
+			const oSpy = sinon.spy(oDelegate, "getFilterDelegate");
+			// act
+			that.oAdaptationFilterBar._determineValidationState().then((oResult) => {
+				// assert
+				assert.equal(oResult, FilterBarValidationStatus.NoError, "determineValidationState returns the correct value");
+				assert.ok(oSpy.calledTwice, "getFilterDelegate has been called twice");
+				oSpy.restore();
+				done();
+			});
+
+		});
 	});
 
 	QUnit.module("AdaptationFilterBar - MDC Control unspecific tests", {

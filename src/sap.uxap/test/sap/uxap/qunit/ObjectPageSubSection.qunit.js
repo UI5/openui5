@@ -1262,6 +1262,46 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 		oSubSection.destroy();
 	});
 
+	QUnit.test("Show More button not shown when there are no visible moreBlocks", function (assert) {
+		var oLabel1 = new Label({text: "Block1" }),
+			oSubSection = new ObjectPageSubSectionClass({
+				title: "SubSection Title",
+				blocks: new Label({text: "Block1" }),
+				moreBlocks: [oLabel1]
+			}),
+			oSection = new ObjectPageSection({
+				title:"Personal",
+				subSections: [ oSubSection ]
+			}),
+			oObjectPageLayout = new ObjectPageLayout({
+				sections: [ oSection ]
+			}),
+			fnDone = assert.async();
+
+		assert.expect(4);
+		oObjectPageLayout.placeAt('qunit-fixture');
+		oObjectPageLayout.attachEventOnce("onAfterRenderingDOMReady", async function() {
+			//assert
+			assert.ok(oSubSection.$().hasClass("sapUxAPObjectPageSubSectionWithSeeMore"),
+				"SubSection has class sapUxAPObjectPageSubSectionWithSeeMore when there are visible moreBlocks");
+			assert.ok(oSubSection._getSeeMoreButton().$().hasClass("sapUxAPSubSectionSeeMoreButtonVisible"),
+				"Show More button is visible when there are visible moreBlocks");
+
+			// act
+			oLabel1.setVisible(false);
+			await nextUIUpdate();
+
+			// assert
+			assert.notOk(oSubSection.$().hasClass("sapUxAPObjectPageSubSectionWithSeeMore"),
+				"SubSection does not have class sapUxAPObjectPageSubSectionWithSeeMore when there are no visible moreBlocks");
+			assert.notOk(oSubSection._getSeeMoreButton().$().hasClass("sapUxAPSubSectionSeeMoreButtonVisible"),
+				"Show More button is not visible when there are no visible moreBlocks");
+
+			oObjectPageLayout.destroy();
+			fnDone();
+		});
+	});
+
 	QUnit.module("Object Page SubSection - Managing Block Layouts in Standard Mode", {
 		beforeEach: function () {
 			this.oLayoutConfig = {M: 2, L: 3, XL: 4};

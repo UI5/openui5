@@ -9,8 +9,6 @@ sap.ui.define([
 ], function (Log, coreLibrary, Helper, opaTest) {
 	"use strict";
 
-	/* global opaSkip */
-
 	// shortcut for sap.ui.core.ValueState
 	var ValueState = coreLibrary.ValueState;
 
@@ -58,7 +56,7 @@ sap.ui.define([
 		});
 
 	//*****************************************************************************
-	opaSkip("2) Entry of amount (step 1) and currency (step 2) "
+	opaTest.skip("2) Entry of amount (step 1) and currency (step 2) "
 			+ "in previously empty input fields (error case)",
 		function (Given, When, Then) {
 			Given.iStartMyUIComponent(oComponentOptions);
@@ -78,7 +76,7 @@ sap.ui.define([
 		});
 
 	//*****************************************************************************
-	opaSkip("3) Currency is already available, the user enters an invalid amount.",
+	opaTest.skip("3) Currency is already available, the user enters an invalid amount.",
 		function (Given, When, Then) {
 			Given.iStartMyUIComponent(oComponentOptions);
 
@@ -109,7 +107,7 @@ sap.ui.define([
 
 	//*****************************************************************************
 ["editable", "enabled"].forEach(function (sProperty) {
-	opaSkip("5) Currency is available, the field is not " + sProperty
+	opaTest.skip("5) Currency is available, the field is not " + sProperty
 			+ ". The user enters an invalid amount.",
 		function (Given, When, Then) {
 			var oCurrency = {content : "JPY"};
@@ -132,7 +130,7 @@ sap.ui.define([
 
 	//*****************************************************************************
 ["editable", "enabled"].forEach(function (sProperty) {
-	opaSkip("6) Amount is in a not " + sProperty
+	opaTest.skip("6) Amount is in a not " + sProperty
 			+ " field, currency is changed so that the amount has too many decimal places",
 		function (Given, When, Then) {
 			var oValue = {content : "100.1"};
@@ -174,7 +172,7 @@ sap.ui.define([
 		});
 
 	//*****************************************************************************
-	opaSkip("8) Entry of amount (step 1) and new currency (step 2) with "
+	opaTest.skip("8) Entry of amount (step 1) and new currency (step 2) with "
 			+ "previously available currency (error case)",
 		function (Given, When, Then) {
 			Given.iStartMyUIComponent(oComponentOptions);
@@ -223,7 +221,7 @@ sap.ui.define([
 		});
 
 	//*****************************************************************************
-	opaSkip("11) Invalid currency amount can be fixed by changing to a valid matching currency",
+	opaTest.skip("11) Invalid currency amount can be fixed by changing to a valid matching currency",
 		function (Given, When, Then) {
 			Given.iStartMyUIComponent(oComponentOptions);
 
@@ -259,7 +257,7 @@ sap.ui.define([
 		});
 
 	//*****************************************************************************
-	opaSkip("13) Changing a non parsable value to a value that leads to a ValidateException on both"
+	opaTest.skip("13) Changing a non parsable value to a value that leads to a ValidateException on both"
 			+ " parts leads to both parts highlighted",
 		function (Given, When, Then) {
 			Given.iStartMyUIComponent(oComponentOptions);
@@ -282,7 +280,7 @@ sap.ui.define([
 
 	//*****************************************************************************
 	// See <git>/c/openui5/+/5118252/12#message-53acb6cf_747a89d3
-	opaSkip("14) Changing to a different valid value after entering a non-parsable unit must keep"
+	opaTest.skip("14) Changing to a different valid value after entering a non-parsable unit must keep"
 			+ " the illegal unit. Correction to the unit writes both value and unit to the model."
 			+ " The same applies when changing roles of value and unit.",
 		function (Given, When, Then) {

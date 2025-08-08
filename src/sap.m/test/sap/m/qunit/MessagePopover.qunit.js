@@ -3,6 +3,7 @@ sap.ui.define([
 	"sap/ui/core/Element",
 	"sap/ui/core/Messaging",
 	"sap/ui/qunit/QUnitUtils",
+	"sap/ui/core/Lib",
 	"sap/m/MessagePopover",
 	"sap/m/Button",
 	"sap/ui/base/ObjectPool",
@@ -22,6 +23,7 @@ sap.ui.define([
 	Element,
 	Messaging,
 	qutils,
+	Library,
 	MessagePopover,
 	Button,
 	ObjectPool,
@@ -280,6 +282,28 @@ sap.ui.define([
 		oStandardListItem = this.oMessagePopover._oMessageView._oLists.all.getItems()[1];
 
 		assert.strictEqual(oStandardListItem.getType(), "Inactive", "The type of the ListItem should be Inactive");
+	});
+
+	QUnit.test("Message Popover header", async function (assert) {
+		this.clock = sinon.useFakeTimers();
+
+		this.bindMessagePopover(this.oMessagePopover, this.oMockupData);
+		this.oMessagePopover.openBy(this.oButton);
+
+		await nextUIUpdate();
+
+		const oListCustomHeader = this.oMessagePopover._oMessageView._listPage.getCustomHeader();
+
+		assert.ok(oListCustomHeader, true, "The MessagePopover has customHeader");
+		assert.strictEqual(oListCustomHeader.getContent()[0].getText(), Library.getResourceBundleFor("sap.m").getText("MESSAGEPOPOVER_ARIA_HEADING"), "Header has the correct title");
+
+		this.openDetailPageAfterOpen(this.oMessagePopover, 1);
+		this.clock.tick(500);
+		await nextUIUpdate();
+
+		const oDetailsHeader = this.oMessagePopover._oMessageView._detailsPage.getCustomHeader();
+
+		assert.strictEqual(oDetailsHeader.getContent()[1].getText(), Library.getResourceBundleFor("sap.m").getText("MESSAGEPOPOVER_ARIA_BACK_BUTTON"), "There should not be visible popover header in details page");
 	});
 
 	QUnit.test("Busy indicator should be shown", function (assert) {
@@ -640,7 +664,7 @@ sap.ui.define([
 
 		this.clock.tick(500);
 		assert.strictEqual(restoreFocusSpy.callCount, 0, "_restoreFocus() should not be called after opening");
-		assert.strictEqual(document.activeElement, this.oMessagePopover._oMessageView._oSegmentedButton.getDomRef(), "The initial focus is over the segmented button");
+		assert.strictEqual(document.activeElement, this.oMessagePopover._oMessageView._listPage.getCustomHeader().getContent()[2].getDomRef(), "The initial focus is over the close button");
 
 		// Clean
 		restoreFocusSpy.restore();

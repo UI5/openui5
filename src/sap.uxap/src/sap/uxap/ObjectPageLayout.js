@@ -997,7 +997,7 @@ sap.ui.define([
 			bAppendHeaderToContent;
 
 		if (bExpand) {
-			bIsPageTop = (this._$opWrapper.scrollTop() <= (this._getSnapPosition() + 1));
+			bIsPageTop = (Math.floor(this._$opWrapper.scrollTop()) <= (this._getSnapPosition() + 1));
 			bAppendHeaderToTitle = !this._headerBiggerThanAllowedToBeExpandedInTitleArea() && (this._shouldPreserveHeaderInTitleArea() || !bIsPageTop);
 			this._expandHeader(bAppendHeaderToTitle);
 			if (!bAppendHeaderToTitle) {

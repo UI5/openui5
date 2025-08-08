@@ -191,6 +191,9 @@ sap.ui.define([
 		}
 	}
 
+	opaTest.skip = opaSkip;
+	opaTest.todo = QUnit.todo ? opaTodo : opaTest;
+
 	// configure QUnit, modify test callback to include OPA start, and enqueue the test with QUnit
 	function callQUnit(sQUnitFn, aArgs, fnDone, fnFail) {
 		configQUnit();
