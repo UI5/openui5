@@ -343,8 +343,6 @@ sap.ui.define([
 	 * @param {boolean} [mPropertyBag.includeManifestChanges] - Flag if manifest changes should be included
 	 * @param {boolean} [mPropertyBag.includeAnnotationChanges] - Flag if annotation changes should be included
 	 * @param {boolean} [mPropertyBag.onlyCurrentVariants] - Flag if only current variants should be included. Is only considered if includeCtrlVariants is true
-	 * @param {string} [mPropertyBag.adaptationId] - Adaptation to load into Flex State after saving (e.g. undefined when exiting RTA)
-	 * @param {boolean} [mPropertyBag.version] - The version for which the objects are retrieved if the Cache should be invalidated
 	 * @returns {Promise<sap.ui.fl.apply._internal.flexObjects.FlexObject[]>} Flex objects, containing changes, compVariants & changes as well as ctrl_variant and changes
 	 */
 	FlexObjectManager.getFlexObjects = async function(mPropertyBag) {

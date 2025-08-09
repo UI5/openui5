@@ -630,10 +630,7 @@ sap.ui.define([
 			},
 
 			IconTabHeader: {
-				title: "QUnit Page for sap.m.IconTabHeader",
-				sinon: {
-					useFakeTimers: true
-				}
+				title: "QUnit Page for sap.m.IconTabHeader"
 			},
 
 			IconTabBarSelectList: {

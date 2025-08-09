@@ -5,6 +5,7 @@
 sap.ui.define([
 	"sap/ui/fl/apply/_internal/flexState/FlexState",
 	"sap/ui/fl/initial/_internal/FlexInfoSession",
+	"sap/ui/fl/initial/_internal/Loader",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/initial/_internal/Settings",
 	"sap/ui/fl/initial/api/Version",
@@ -17,6 +18,7 @@ sap.ui.define([
 ], function(
 	FlexState,
 	FlexInfoSession,
+	Loader,
 	ManifestUtils,
 	Settings,
 	Version,
@@ -93,7 +95,7 @@ sap.ui.define([
 			// Refresh oFlexInfoSession with updated backend data updated in updateResetAndPublishInfo
 			oFlexInfoSession = FlexInfoSession.getByReference(sReference);
 		} else {
-			FlexState.setAllContextsProvided(sReference, oFlexInfoSession.allContextsProvided);
+			Loader.setAllContextsProvided(sReference, oFlexInfoSession.allContextsProvided);
 		}
 		oFlexInfoSession.initialAllContexts = !oFlexInfoSession.allContextsProvided;
 		FlexInfoSession.setByReference(oFlexInfoSession, sReference);

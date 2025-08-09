@@ -1413,6 +1413,21 @@ sap.ui.define([
 			return 100;
 		};
 
+		let iSelect = 0;
+		let sSelectType;
+		let aSelectConditions;
+		oPopover.attachEvent("select", (oEvent) => {
+			iSelect++;
+			sSelectType = oEvent.getParameter("type");
+			aSelectConditions = oEvent.getParameter("conditions");
+		});
+		let iConfirm = 0;
+		let bConfirmClose;
+		oPopover.attachEvent("confirm", (oEvent) => {
+			iConfirm++;
+			bConfirmClose = oEvent.getParameter("close");
+		});
+
 		const oPromise = oPopover.open(Promise.resolve());
 
 		if (oPromise) {
@@ -1423,18 +1438,45 @@ sap.ui.define([
 					const oSubHeaderBar = oContainer.getSubHeader();
 					const aSubHeaderContent = oSubHeaderBar.getContent();
 					const oInput = aSubHeaderContent[0];
+					const aDialogContent = oContainer.getContent();
+					const oValueStateHeader = aDialogContent?.[0];
 					oInput.setValue("A");
 					sinon.spy(oInput, "fireSubmit");
 					const oCloseButton = oContainer.getBeginButton();
 					oCloseButton.firePress(); // simulate press
 
-					assert.ok(oInput.fireSubmit.calledOnce, "Input submit called"); // as OK shoulf behave similar to Input Enter-Press
-					assert.equal(oInput.fireSubmit.args[0][0].value, "A", "Input submit called with value");
+					setTimeout(() => { // as parsing might be async
+						assert.ok(oInput.fireSubmit.calledOnce, "Input submit called"); // as OK shoulf behave similar to Input Enter-Press
+						assert.equal(oInput.fireSubmit.args[0][0].value, "A", "Input submit called with value");
+						assert.equal(iSelect, 1, "Select event fired");
+						assert.equal(sSelectType, ValueHelpSelectionType.Add, "Select type");
+						const oCondition = Condition.createCondition(OperatorName.EQ, ["A"], undefined, undefined, ConditionValidated.NotValidated);
+						assert.deepEqual(aSelectConditions, [oCondition], "Selected condition");
+						assert.equal(iConfirm, 1, "Confirm event fired once");
+						assert.ok(bConfirmClose, "Close on confirm event set");
 
-					oPopover.close();
-					setTimeout(() => { // wait until closed
-						fnDone();
-					}, iPopoverDuration);
+						iSelect = 0;
+						iConfirm = 0;
+						oInput.fireSubmit.reset();
+						sinon.stub(oPopover._oInputConditionType, "parseValue").throws(new ParseException("MyError"));
+						oInput._$input.val("Y");
+						oCloseButton.firePress(); // simulate press
+						setTimeout(() => { // as parsing might be async
+							assert.ok(oInput.fireSubmit.calledOnce, "Input submit called"); // as OK shoulf behave similar to Input Enter-Press
+							assert.equal(oInput.fireSubmit.args[0][0].value, "Y", "Input submit called with value");
+							assert.equal(iSelect, 0, "Select event not fired");
+							assert.equal(iConfirm, 1, "Confirm event fired once");
+							assert.ok(bConfirmClose, "Close on confirm event set");
+							assert.equal(oInput.getValueState(), "None", "ValueState on Input");
+							assert.equal(oValueStateHeader.getValueState(), "None", "ValueState on ValueStateHeader");
+							assert.notOk(oValueStateHeader.getVisible(), "ValueStateHeader visible");
+
+							oPopover.close();
+							setTimeout(() => { // wait until closed
+								fnDone();
+							}, iPopoverDuration);
+						}, 0);
+					}, 0);
 				}, iPopoverDuration);
 			}).catch((oError) => {
 				assert.notOk(true, "Promise Catch called");

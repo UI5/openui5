@@ -159,8 +159,8 @@ function(
 
 			this.__busyIndicatorTimeout = null;
 
-			this.__onInvalidation = this.__onInvalidation.bind(this);
-			this.__handleCustomEvent = this.__handleCustomEvent.bind(this);
+			this.__onInvalidation = this.__onInvalidationBound = this.__onInvalidation.bind(this);
+			this.__handleCustomEvent = this.__handleCustomEventBound = this.__handleCustomEvent.bind(this);
 
 			this.__delegates = {
 				onBeforeRendering: this.__onBeforeRenderingDelegate,

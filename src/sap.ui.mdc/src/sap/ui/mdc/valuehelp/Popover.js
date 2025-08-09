@@ -307,6 +307,7 @@ sap.ui.define([
 					},
 					submit: async (oEvent) => {
 						const sValue = oEvent.getParameter("value");
+						const bPreventError = oEvent.getParameter("preventError");
 						if (sValue) { // TODO: support empty key?
 							const oFormatOptions = _getConditionFormatOptions.call(this);
 							this._oInputConditionType.setFormatOptions(oFormatOptions); // as config might be changed
@@ -319,7 +320,11 @@ sap.ui.define([
 								this.fireConfirm({close: true});
 							} catch (oException) {
 								if ((oException instanceof ParseException)) {
-									_updateValueHelpHeaderPhone.call(this, this.getControl(), oValueStateHeader, ValueState.Error, oException.message, oInput);
+									if (bPreventError) { // from OK-Button
+										this.fireConfirm({close: true}); // just ignore user input (typahead value) and confirm
+									} else {
+										_updateValueHelpHeaderPhone.call(this, this.getControl(), oValueStateHeader, ValueState.Error, oException.message, oInput);
+									}
 								} else {
 									throw oException;
 								}
@@ -343,7 +348,7 @@ sap.ui.define([
 				oCloseButton = new Button(this.getId() + "-pop-closeButton", {
 					text: oResourceBundleM.getText("SUGGESTIONSPOPOVER_CLOSE_BUTTON"),
 					press: (oEvent) => {
-						oInput.fireSubmit({value: oInput.getValue()}); // to select first matching item
+						oInput.fireSubmit({value: oInput.getValue(), preventError: true}); // to select first matching item, but don't show error if nothing found
 						// switch to typeahead
 						if (!bSingleSelect) { // if on conditions list, switch back to typeahead list
 							this._toggleShowConditions(false);

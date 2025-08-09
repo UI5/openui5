@@ -253,8 +253,10 @@ sap.ui.define([
 	 * @param {object} params.libInfo - The library info object containing theming metadata.
 	 * @param {string} params.theme - The name of the theme to apply.
 	 * @param {boolean} params.suppressFOUC - Whether to suppress Flash of Unstyled Content (FOUC) handling.
+	 * @param {boolean} params.force - Whether to including stylesheet regardless the baseUrl is identical or not.
+	 *                                 Use the old URL to prevent unnecessary requests.
 	 */
-	function updateThemeUrl({libInfo, theme, suppressFOUC}) {
+	function updateThemeUrl({libInfo, theme, suppressFOUC, force}) {
 		if (suppressFOUC) {
 			pAllCssRequests = Promise.resolve();
 			ThemeManager.themeLoaded = false;
@@ -266,7 +268,7 @@ sap.ui.define([
 		// Compare the link including the UI5 version only if it is already available; otherwise, compare the link without the version to prevent unnecessary requests.
 		const sOldUrl = libInfo.cssLinkElement?.getAttribute("href")?.replace(/\?.*/, "");
 		const sUrl = libInfo.getUrl(theme).baseUrl;
-		if (!sUrl || sOldUrl !== sUrl) {
+		if (!sUrl || sOldUrl !== sUrl || force) {
 			libInfo.finishedLoading = false;
 			libInfo.failed = false;
 			if (suppressFOUC) {
@@ -280,7 +282,7 @@ sap.ui.define([
 				if (sUrl) {
 					Log.debug(`Add new CSS for library ${libInfo.id} with URL: ${sUrl}`, undefined, MODULE_NAME);
 					return includeStylesheet({
-						url: sUrl,
+						url: force ? sOldUrl : sUrl,
 						id: libInfo.linkId
 					});
 				} else {
@@ -672,7 +674,8 @@ sap.ui.define([
 
 			updateThemeUrl({
 				libInfo: oLibInfo,
-				suppressFOUC: true
+				suppressFOUC: true,
+				force: true
 			});
 		}
 	});
