@@ -1,11 +1,13 @@
-<svg width="45" height="46" viewBox="0 0 45 46" id="tnt-Dot-Services">
-    <path fill-rule="evenodd" d="M21.372 14.43c.462-.304.981-.328 1.161-.055l9.64 14.644c.18.273-.048.74-.509 1.044-.461.304-.981.329-1.16.056l-9.641-14.644c-.18-.274.048-.741.51-1.045Z" fill="var: var(--sapContent_Illustrative_Color4)" clip-rule="evenodd"/>
-    <rect width="16.951" height="12.21" x="8.047" y="9.728" fill="var: var(--sapContent_Illustrative_Color2)" rx="1" transform="rotate(-33.358 8.047 9.728)"/>
-    <rect width="16.951" height="12.336" x="23.951" y="33.886" fill="var: var(--sapContent_Illustrative_Color2)" rx="1" transform="rotate(-33.358 23.95 33.886)"/>
-    <path d="m13.562 28.28 2.908-1.914 2.391 3.633-2.907 1.914z" fill="var: var(--sapContent_Illustrative_Color5)"/>
-    <path d="M14.648 24.52a1 1 0 0 1 .285-1.385L31.8 12.032a1 1 0 0 1 1.385.286l5.189 7.882a1 1 0 0 1-.286 1.385L21.222 32.688a1 1 0 0 1-1.385-.285l-5.19-7.883Z" fill="var: var(--sapContent_Illustrative_Color8)"/>
-    <path fill-rule="evenodd" d="M32.348 12.868 15.483 23.97l5.189 7.883L37.537 20.75l-5.189-7.882ZM14.933 23.135a1 1 0 0 0-.285 1.385l5.189 7.883a1 1 0 0 0 1.385.285l16.865-11.103a1 1 0 0 0 .286-1.385l-5.19-7.882a1 1 0 0 0-1.384-.286L14.933 23.135Zm-7.888 5.092a.5.5 0 0 1 .284.648L4.42 36.308l4.92-3.239c.137-.09.372.023.524.254.152.23.163.49.025.582L5.003 37.12l7.92.265a.5.5 0 1 1-.034 1l-9.044-.303a.499.499 0 0 1-.216-.057l-.177.116c-.138.091-.373-.022-.525-.253-.152-.23-.163-.49-.025-.582l.17-.111a.498.498 0 0 1 .028-.259l3.298-8.427a.5.5 0 0 1 .647-.283Z" fill="var: var(--sapContent_Illustrative_Color4)" clip-rule="evenodd"/>
-    <path fill-rule="evenodd" d="M13.782 40.57c.195.297.601.369.864.13 2.857-2.586 3.284-7.274.836-10.992-2.448-3.72-6.922-5.18-10.428-3.578-.323.147-.417.55-.222.846l8.95 13.594Z" fill="var: var(--sapContent_Illustrative_Color8)" clip-rule="evenodd"/>
-    <path fill-rule="evenodd" d="M14.34 39.6c2.11-2.272 2.414-6.143.307-9.343s-5.782-4.45-8.703-3.41l8.396 12.752Zm.306 1.1c-.263.239-.67.167-.864-.13l-8.95-13.594c-.195-.297-.1-.699.222-.846 3.506-1.602 7.98-.141 10.428 3.578 2.448 3.718 2.021 8.406-.836 10.993Z" fill="var: var(--sapContent_Illustrative_Color4)" clip-rule="evenodd"/>
-    <circle cx="2.479" cy="38.268" r="1.239" fill="var: var(--sapContent_Illustrative_Color2)" transform="rotate(-33.358 2.48 38.268)"/>
+<svg id="tnt-Dot-Services" xmlns="http://www.w3.org/2000/svg" width="45" height="45" fill="none" viewBox="0 0 45 45">
+  <path fill="var(--sapContent_Illustrative_Color22)" d="M7.997 24.572c.068-.127.232-.123.368.01.135.133.192.344.125.472L3.102 35.309l11.634 1.117c.146.014.297.174.337.357.041.184-.045.322-.19.308L2.764 35.928c-.146-.014-.297-.175-.338-.359-.028-.125.003-.228.072-.277a.343.343 0 0 1 .005-.262l5.493-10.458Z"/>
+  <path fill="var(--sapContent_Illustrative_Color25)" d="m6.708 27.615-1.75-3.031c7.361-4.25 11.227.446 11.727 1.312-1.866-1.232-7.712-.359-9.977 1.719Z"/>
+  <ellipse cx="2.602" cy="35.5" fill="var(--sapContent_Illustrative_Color11)" rx="1.434" ry="1.485" transform="rotate(-26.688 2.602 35.5)"/>
+  <path fill="var(--sapContent_Illustrative_Color1)" d="M3.051 34.112c.346.126.65.382.832.743.368.733.092 1.615-.615 1.97-.708.356-1.58.051-1.949-.681l-.006-.012c.357.13.76.12 1.118-.06.704-.355.98-1.23.62-1.96Z"/>
+  <path fill="var(--sapContent_Illustrative_Color22)" d="m24.796 14.979.866-.5 7.01 12.14-.866.5z"/>
+  <path fill="var(--sapContent_Illustrative_Color24)" d="M35.33 11.225a1 1 0 0 1 1.366.367l4 6.927a1 1 0 0 1-.366 1.367l-17.32 10a1 1 0 0 1-1.366-.367l-1.5-2.598-1.77 1.022a9.346 9.346 0 0 1-4.504 12.109L4.387 23.629c.111-.071.224-.142.34-.208 4.322-2.496 9.831-1.232 12.668 2.778l1.748-1.01-1.5-2.597a1 1 0 0 1 .367-1.367l17.32-10Z"/>
+  <rect width="16" height="10" x="25.743" y="30.618" fill="var(--sapContent_Illustrative_Color11)" rx="1" transform="rotate(-30 25.743 30.618)"/>
+  <rect width="14" height="6" x="25.743" y="30.618" fill="var(--sapContent_Illustrative_Color1)" rx="1" transform="rotate(-30 25.743 30.618)"/>
+  <rect width="16" height="10" x="13.743" y="9.833" fill="var(--sapContent_Illustrative_Color11)" rx="1" transform="rotate(-30 13.743 9.833)"/>
+  <path fill="var(--sapContent_Illustrative_Color25)" d="m17.645 22.591 19.053-11 1.5 2.598-19.053 11z"/>
+  <rect width="14" height="3" x="17.242" y="15.896" fill="var(--sapContent_Illustrative_Color1)" rx="1" transform="rotate(-30 17.242 15.896)"/>
 </svg>

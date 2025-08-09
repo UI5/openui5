@@ -1,0 +1,10 @@
+<svg id="tnt-Dot-RoadMap" xmlns="http://www.w3.org/2000/svg" width="45" height="45" fill="none" viewBox="0 0 45 45">
+  <rect width="44.109" height="28.767" x=".445" y="8.277" fill="var(--sapContent_Illustrative_Color25)" rx="1.918"/>
+  <path fill="var(--sapContent_Illustrative_Color8)" d="M44.555 19.298 13.374 37.043H2.364a1.91 1.91 0 0 1-1.282-.493l43.473-21.542v4.29Zm0 9.07-14.13 8.675H18.228l26.327-13.046v4.371Z"/>
+  <path fill="var(--sapContent_Illustrative_Color9)" fill-rule="evenodd" d="M42.832 8.287a1.919 1.919 0 0 1 1.723 1.908v24.931l-.011.196a1.918 1.918 0 0 1-1.712 1.712l-.195.01H2.363l-.196-.01a1.918 1.918 0 0 1-1.722-1.908v-24.93c0-.994.755-1.81 1.722-1.909l.196-.01h40.274l.195.01Zm-40.469.758a1.15 1.15 0 0 0-1.15 1.15v24.931a1.15 1.15 0 0 0 1.15 1.151h40.274c.635 0 1.15-.516 1.15-1.151v-24.93a1.15 1.15 0 0 0-1.15-1.151H2.363Z" clip-rule="evenodd"/>
+  <circle cx="22.582" cy="23.623" r="4.832" fill="var(--sapContent_Illustrative_Color1)"/>
+  <path fill="var(--sapContent_Illustrative_Color9)" fill-rule="evenodd" d="M22.582 15.191a8.432 8.432 0 1 1 0 16.864 8.432 8.432 0 0 1 0-16.864Zm0 .5a7.932 7.932 0 1 0 0 15.864 7.932 7.932 0 0 0 0-15.864Z" clip-rule="evenodd"/>
+  <path fill="var(--sapContent_Illustrative_Color1)" d="M18.759 12.084c2.31-.74 4.789-.777 7.12-.11a.25.25 0 0 1-.137.481A11.768 11.768 0 0 0 12.21 29.472a.25.25 0 0 1-.408.284l-.029-.042-.213-.401a12.266 12.266 0 0 1 7.199-17.229Z"/>
+  <circle cx="13.172" cy="16.49" r="2.443" fill="var(--sapContent_Illustrative_Color11)"/>
+  <circle cx="20.846" cy="31.555" r="1.788" fill="var(--sapContent_Illustrative_Color9)" transform="rotate(-112.034 20.846 31.555)"/>
+</svg>

@@ -6,8 +6,6 @@
 html.sap-desktop .sapUiMdcTokenizerDisplay.sapMTokenizer {
 	outline: none; /* hide focus of the tokenizer */
 	padding-left: 0; /* remove left padding of Tokenizer for Display mode */
-	padding-top: 0;
-	padding-bottom: 0;
 }
 
 @mdctokenizer-large-line-height: 1.375rem;
@@ -26,16 +24,7 @@ html.sap-desktop .sapUiMdcTokenizerDisplay.sapMTokenizer {
 	text-decoration: underline;
 }
 
-.sapUiFormEdit .sapUiMdcTokenizerDisplay .sapMTokenizerIndicator,
-.sapUiFormEdit .sapUiMdcTokenizerDisplay .sapMTokenizerIndicator:focus {
-	line-height: @mdctokenizer-large-line-height;
-}
-
-.sapUiFormEdit .sapUiMdcTokenizerDisplay .sapMTokenizerIndicator:focus {
-	text-decoration: underline;
-}
-
-.sapUiMdcTokenizerDisplay .sapMTokenizerIndicator {
+.sapMTokenizer.sapUiMdcTokenizerDisplay .sapMTokenizerIndicator {
 	line-height: @mdctokenizer-small-line-height;
 }
 
@@ -51,36 +40,34 @@ html.sap-desktop .sapUiMdcTokenizerDisplay.sapMTokenizer {
 	display: inline-block;
 }
 
-.sapUiFormEdit .sapUiMdcTokenizerDisplay .sapMEmptyIndicator.sapMEmptyIndicatorAuto {
-	line-height: @mdctokenizer-large-line-height;
-}
-
-.sapUiSizeCozy .sapUiFormEdit .sapUiMdcTokenizerDisplay .sapMEmptyIndicator.sapMEmptyIndicatorAuto {
-	padding-top: @mdctokenizer-large-padding-topbottom;
-	padding-bottom: @mdctokenizer-large-padding-topbottom;
-}
-
-.sapUiSizeCompact .sapUiFormEdit .sapUiMdcTokenizerDisplay .sapMEmptyIndicator.sapMEmptyIndicatorAuto {
-	padding-top: @mdctokenizer-small-padding-topbottom;
-	padding-bottom: @mdctokenizer-small-padding-topbottom;
-}
-
 /* enable mouse selection on scrollcontainer */
 .sapUiMdcTokenizerDisplay .sapMTokenizerScrollContainer {
 	-webkit-user-select: text;
 
-	/* give the scrollcontainer the required top/bottom paddings so that is works like a text control */
+	/* give the Tokenizer the required top/bottom paddings so that is works like a text control */
 	padding-top: 0;
 	padding-bottom: 0;
 }
 
-.sapUiSizeCozy .sapUiFormEdit .sapUiMdcTokenizerDisplay .sapMTokenizerScrollContainer {
-	/* give the scrollcontainer the required top/bottom paddings so that is works like a text control */
+/* usage in Form */
+.sapUiFormEdit {
+	.sapUiMdcTokenizerDisplay .sapMTokenizerIndicator,
+	.sapUiMdcTokenizerDisplay .sapMEmptyIndicator.sapMEmptyIndicatorAuto {
+		line-height: @mdctokenizer-large-line-height;
+	}
+
+	.sapUiMdcTokenizerDisplay .sapMTokenizerIndicator:focus {
+		text-decoration: underline;
+	}
+}
+
+.sapUiSizeCozy .sapUiFormEdit .sapUiMdcTokenizerDisplay {
+	/* give the Tokenizer the required top/bottom paddings so that is works like a text control */
 	padding-top: @mdctokenizer-large-padding-topbottom;
 	padding-bottom: @mdctokenizer-large-padding-topbottom;
 }
 
-.sapUiSizeCompact .sapUiFormEdit .sapUiMdcTokenizerDisplay .sapMTokenizerScrollContainer {
+.sapUiSizeCompact .sapUiFormEdit .sapUiMdcTokenizerDisplay {
 	padding-top: @mdctokenizer-small-padding-topbottom;
 	padding-bottom: @mdctokenizer-small-padding-topbottom;
 }

@@ -118,6 +118,12 @@ sap.ui.define(["sap/ui/base/DataType"], function (DataType) {
 		Dialog: "tnt-Dialog",
 
 		/**
+		 * "EmptyContentPane" illustration type.
+		 * @public
+		 */
+		EmptyContentPane: "tnt-EmptyContentPane",
+
+		/**
 		 * "ExternalLink" illustration type.
 		 * @public
 		 */

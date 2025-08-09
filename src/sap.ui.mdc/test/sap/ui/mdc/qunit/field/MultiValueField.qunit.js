@@ -307,7 +307,7 @@ sap.ui.define([
 		assert.equal(MultiValueFieldDelegate.createCondition.callCount, 6, "Conditions created via delegate");
 
 		let aConditions = oFieldEdit.getConditions();
-		assert.ok(aConditions.length, 3, "Conditions created");
+		assert.equal(aConditions.length, 3, "Conditions created");
 		assert.equal(aConditions[0].operator, OperatorName.EQ, "Condition0 operator");
 		assert.equal(aConditions[0].values[0], 1, "Condition0 value0");
 		assert.equal(aConditions[0].values[1], "Text 1", "Condition0 value1");
@@ -316,7 +316,7 @@ sap.ui.define([
 		let aContent = oFieldEdit.getAggregation("_content");
 		let oContent = aContent?.length > 0 && aContent[0];
 		let aTokens = oContent.getTokens();
-		assert.ok(aTokens.length, 3, "Tokens created");
+		assert.equal(aTokens.length, 3, "Tokens created");
 		assert.equal(aTokens[0].getText(), "Text 1", "Token0 text");
 		assert.equal(aTokens[1].getText(), "Text 2", "Token1 text");
 		assert.equal(aTokens[2].getText(), "Text 3", "Token2 text");
@@ -324,7 +324,7 @@ sap.ui.define([
 		aContent = oFieldDisplay.getAggregation("_content");
 		oContent = aContent?.length > 0 && aContent[0];
 		aTokens = oContent.getTokens();
-		assert.ok(aTokens.length, 3, "Tokens created");
+		assert.equal(aTokens.length, 3, "Tokens created");
 		assert.equal(aTokens[0].getText(), "Text 1", "Token0 text");
 		assert.equal(aTokens[1].getText(), "Text 2", "Token1 text");
 		assert.equal(aTokens[2].getText(), "Text 3", "Token2 text");
@@ -337,7 +337,7 @@ sap.ui.define([
 		await new Promise((resolve) => {setTimeout(resolve,0);});
 
 		aConditions = oFieldEdit.getConditions();
-		assert.ok(aConditions.length, 1, "Conditions created");
+		assert.equal(aConditions.length, 1, "Conditions created");
 		assert.equal(aConditions[0].operator, OperatorName.EQ, "Condition0 operator");
 		assert.equal(aConditions[0].values[0], undefined, "Condition0 value0");
 		assert.equal(aConditions[0].values[1], undefined, "Condition0 value1");
@@ -346,13 +346,13 @@ sap.ui.define([
 		aContent = oFieldEdit.getAggregation("_content");
 		oContent = aContent?.length > 0 && aContent[0];
 		aTokens = oContent.getTokens();
-		assert.ok(aTokens.length, 1, "Tokens created");
+		assert.equal(aTokens.length, 1, "Tokens created");
 		assert.equal(aTokens[0].getText(), "0", "Token0 text"); // as Integer formats undefined into 0
 
 		aContent = oFieldDisplay.getAggregation("_content");
 		oContent = aContent?.length > 0 && aContent[0];
 		aTokens = oContent.getTokens();
-		assert.ok(aTokens.length, 1, "Tokens created");
+		assert.equal(aTokens.length, 1, "Tokens created");
 		assert.equal(aTokens[0].getText(), "0", "Token0 text"); // as Integer formats undefined into 0
 
 	});
@@ -485,6 +485,57 @@ sap.ui.define([
 				}, 0);
 			}, 0);
 		}, 0);
+
+	});
+
+	QUnit.test("enter duplicate value without ValueHelp", async (assert) => {
+
+		let iParseError = 0; // eslint-disable-line no-unused-vars
+		const _myParseErrorHandler = (oEvent) => {
+			iParseError++;
+		};
+
+		const oMyItemTemplate = new MultiValueFieldItem("MFI2", {
+			key: {path: "key", type: oType}
+		});
+
+		const oField = new MultiValueField("F3", {
+			items: {path: "/items", template: oMyItemTemplate, templateShareable: true},
+			parseError: _myParseErrorHandler,
+			models: oModel
+		}).placeAt("content");
+		await nextUIUpdate();
+		await new Promise((resolve) => {setTimeout(resolve, 0);}); // async control creation
+		await new Promise((resolve) => {setTimeout(resolve, 0);}); // async token creation
+
+		const aContent = oField.getAggregation("_content");
+		const oContent = aContent?.length > 0 && aContent[0];
+		oContent.focus();
+		oContent.setDOMValue("10");
+		qutils.triggerKeydown(oContent.getFocusDomRef().id, KeyCodes.ENTER, false, false, false);
+		await new Promise((resolve) => {setTimeout(resolve, 0);}); // async model update
+		await new Promise((resolve) => {setTimeout(resolve, 0);}); // async item creation
+
+		let aConditions = oField.getConditions();
+		assert.equal(aConditions.length, 4, "Conditions created");
+		assert.equal(aConditions[3].values[0], 10, "Condition3 value0");
+		assert.equal(aConditions[3].values[1], undefined, "Condition3 value1");
+		assert.equal(aConditions[3].validated, ConditionValidated.Validated, "Condition3 validated");
+
+		oContent.setDOMValue("10");
+		qutils.triggerKeydown(oContent.getFocusDomRef().id, KeyCodes.ENTER, false, false, false);
+		await new Promise((resolve) => {setTimeout(resolve, 0);}); // async model update
+		await new Promise((resolve) => {setTimeout(resolve, 0);}); // async item creation
+
+		aConditions = oField.getConditions();
+		assert.equal(aConditions.length, 4, "Conditions created");
+		assert.equal(aConditions[3].values[0], 10, "Condition3 value0");
+		assert.equal(aConditions[3].values[1], undefined, "Condition3 value1");
+		assert.equal(aConditions[3].validated, ConditionValidated.Validated, "Condition3 validated");
+		assert.equal(iParseError, 1, "ParseError fired");
+
+		oField.destroy();
+		oMyItemTemplate.destroy();
 
 	});
 

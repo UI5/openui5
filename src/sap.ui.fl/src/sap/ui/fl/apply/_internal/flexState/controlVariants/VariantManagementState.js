@@ -12,7 +12,6 @@ sap.ui.define([
 	"sap/ui/fl/apply/_internal/flexState/DataSelector",
 	"sap/ui/fl/apply/_internal/flexState/FlexState",
 	"sap/ui/fl/changeHandler/condenser/Classification",
-	"sap/ui/fl/initial/_internal/Storage",
 	"sap/ui/fl/LayerUtils"
 ], function(
 	_omit,
@@ -24,7 +23,6 @@ sap.ui.define([
 	DataSelector,
 	FlexState,
 	Classification,
-	Storage,
 	LayerUtils
 ) {
 	"use strict";
@@ -493,13 +491,9 @@ sap.ui.define([
 	 * @param {string} mPropertyBag.variantReference - Variant reference to be loaded
 	 */
 	VariantManagementState.loadVariant = async function(mPropertyBag) {
-		const oStorageResponse = await Storage.loadFlVariant({
+		await FlexState.lazyLoadFlVariant({
 			variantReference: mPropertyBag.variantReference,
 			reference: mPropertyBag.reference
-		});
-		FlexState.updateWithDataProvided({
-			reference: mPropertyBag.reference,
-			newData: oStorageResponse
 		});
 	};
 

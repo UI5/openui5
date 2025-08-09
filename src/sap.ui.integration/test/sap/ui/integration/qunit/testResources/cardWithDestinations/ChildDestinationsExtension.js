@@ -14,7 +14,7 @@ sap.ui.define([
 			const sUrl = await this.getCard().resolveDestination("contentDestination");
 
 			return this.getCard().request({
-				url: `${sUrl}/header.json`
+				url: `${sUrl}header.json`
 			});
 		}
 	});

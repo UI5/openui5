@@ -11646,38 +11646,46 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 	});
 
 	//*********************************************************************************************
-	// Scenario: For Unit Types do not show any decimal places if the type of the measure part is an integer type.
+	// Scenario: For Unit Types do not show any decimal places if the type of the measure part is an integer type unless
+	// the unit type itself is configured to do so.
 	// SNOW: DINC0532239
-	QUnit.test("UnitType with measure part as integer", async function (assert) {
-		const oModel = createSpecialCasesModel({defaultBindingMode : "TwoWay"});
-		const sView = `
-<FlexBox binding="{/ProductSet('P1')}">
-	<Input id="weight" value="{
-		parts : [{
-			path : 'WeightMeasure',
-			type : 'sap.ui.model.odata.type.Int32'
-		}, {
-			path : 'WeightUnit',
-			type : 'sap.ui.model.odata.type.String'
-		}, {
-			mode : 'OneTime',
-			path : '/##@@requestUnitsOfMeasure',
-			targetType : 'any'
-		}],
-		mode : 'TwoWay',
-		type : 'sap.ui.model.odata.type.Unit'
-	}"/>
-</FlexBox>`;
-		this.expectHeadRequest()
-			.expectRequest("ProductSet('P1')", {
-				ProductID : "P1",
-				WeightMeasure : 12,
-				WeightUnit : "mass-kilogram"
-			})
-			.expectValue("weight", "12")
-			.expectValue("weight", "12 kg");
+	[
+		{sFormatOptions : "", sNumber : "12", sUnit : "12 kg"},
+		// explicitly set format options may overwrite the default of 0 resulting from the integer type
+		{sFormatOptions : "{minFractionDigits : 2, maxFractionDigits : 2}", sNumber : "12.00", sUnit : "12.00 kg"}
+	].forEach(({sFormatOptions, sNumber, sUnit}, i) => {
+		QUnit.test(`UnitType with measure part as integer (${i})`, async function (assert) {
+			const oModel = createSpecialCasesModel({defaultBindingMode : "TwoWay"});
+			const sView = `
+	<FlexBox binding="{/ProductSet('P1')}">
+		<Input id="weight" value="{
+			parts : [{
+				path : 'WeightMeasure',
+				type : 'sap.ui.model.odata.type.Int32'
+			}, {
+				path : 'WeightUnit',
+				type : 'sap.ui.model.odata.type.String'
+			}, {
+				mode : 'OneTime',
+				path : '/##@@requestUnitsOfMeasure',
+				targetType : 'any'
+			}],
+			mode : 'TwoWay',
+			type : 'sap.ui.model.odata.type.Unit'
+			${sFormatOptions ? ", formatOptions : " + sFormatOptions : ""}
+		}"/>
+	</FlexBox>`;
+			this.expectHeadRequest()
+				.expectRequest("ProductSet('P1')", {
+					ProductID : "P1",
+					WeightMeasure : 12,
+					WeightUnit : "mass-kilogram"
+				})
+				.expectValue("weight", sNumber)
+				.expectValue("weight", sUnit);
 
-		await this.createView(assert, sView, oModel);
+			await this.createView(assert, sView, oModel);
+		});
 	});
 
 	//*********************************************************************************************

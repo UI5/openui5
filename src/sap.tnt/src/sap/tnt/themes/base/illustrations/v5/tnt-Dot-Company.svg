@@ -1,11 +1,14 @@
-<svg width="45" height="45" id="tnt-Dot-Company" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 45 45">
-    <path d="m7.32,2.16h30.36v42.7H7.32V2.16Z" fill="var(--sapContent_Illustrative_Color8)" />
-    <path d="m36.68,3.16H8.32v40.7h28.36V3.16ZM7.32,2.16v42.7h30.36V2.16H7.32Z" fill="var(--sapContent_Illustrative_Color4)" fill-rule="evenodd" />
-    <rect x="19.8" y="3.07" width="5.39" height="40.9" fill="var(--sapContent_Illustrative_Color2)" />
-    <rect x="19.8" y="3.07" width="5.39" height="5.51" fill="var(--sapContent_Illustrative_Color14)" />
-    <rect x="4.79" y="-.06" width="35.42" height="4.84" fill="var(--sapContent_Illustrative_Color2)" />
-    <rect x="10.41" y="7.27" width="7.37" height="15.69" fill="var(--sapContent_Illustrative_Color5)" />
-    <rect x="10.41" y="25.56" width="7.37" height="15.69" fill="var(--sapContent_Illustrative_Color5)" />
-    <rect x="27.22" y="7.27" width="7.37" height="15.69" fill="var(--sapContent_Illustrative_Color5)" />
-    <rect x="27.22" y="25.56" width="7.37" height="15.69" fill="var(--sapContent_Illustrative_Color5)" />
+<svg id="tnt-Dot-Company" xmlns="http://www.w3.org/2000/svg" width="45" height="45" fill="none" viewBox="0 0 45 45">
+  <g clip-path="url(#a)">
+    <path fill="var(--sapContent_Illustrative_Color14)" d="M14.225 9.626v10.653L25.27 16.2 14.225 9.626Z"/>
+    <path fill="var(--sapContent_Illustrative_Color13)" d="m15.49 11.604 9.412 5.025-3.164 1.04-6.23-2.265-.019-3.8Zm-.017 4.405.019 3.85 5.744-1.931-5.763-1.92Z"/>
+    <path fill="var(--sapContent_Illustrative_Color14)" d="m44.524 45.34-11.826.133v-32.25l11.783 6.411.043 25.707Z"/>
+    <path fill="var(--sapContent_Illustrative_Color13)" d="M.682 45.473V16.556l13.543-6.93.046 10.575 18.466-6.97-.014 32.242H.682Zm43.073-20.818-9.863-4.446v-5.086l9.83 5.452.033 4.08Zm-.063 4.63-9.8-3.141V21.06l9.767 4.146.033 4.078Zm-.002 4.843-9.84-1.94v-5.083l9.807 2.951.032 4.072Zm.084 4.92-9.93-.957v-5.086l9.897 1.97.033 4.073Zm-.041 4.88-9.926.254v-5.083l9.893.763.033 4.066Z"/>
+    <path fill="var(--sapContent_Illustrative_Color27)" d="m14.634 21.597 17.013-5.996.008 3.408-17.013 5.023-.008-2.435Zm.008 4.953 17.01-4.389.003 3.415-17.013 3.561V26.55Zm0 5.022 17.013-3.224v3.426l-17.013 2.383v-2.585Zm0 5.058 17.013-2.13v3.432l-17.013 1.28v-2.583Zm.014 4.919 17-.764v3.265h-17v-2.501ZM1.7 17.857l11.126-5.03.014 2.382-11.119 4.755-.022-2.107Zm.022 4.18 11.14-4.369.014 2.406-11.154 4.09v-2.128ZM1.7 26.066l11.157-3.614.01 2.424L1.7 28.21v-2.144Zm.022 3.88 11.127-2.957.014 2.444L1.722 32.1v-2.155ZM1.7 33.99l11.143-2.17.014 2.463L1.72 36.16l-.022-2.17Zm.03 4.03 11.108-1.467.011 2.484-11.127 1.17.008-2.188Zm-.008 4.056 11.108-.688.016 2.66-11.124.224v-2.196Z"/>
+  </g>
+  <defs>
+    <clipPath id="a">
+      <path fill="var(--sapContent_Illustrative_Color8)" d="M0 0h45v45H0z"/>
+    </clipPath>
+  </defs>
 </svg>
