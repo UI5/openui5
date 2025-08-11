@@ -53,5 +53,30 @@
         "text": " sap.m.IconTabBar: focus outline is fixed for high contrast themes"
       }
     ]
+  },
+  "1.136.4": {
+    "date": "August 2025",
+    "notes": [
+      {
+        "id": "eb2f91c35a3c947e4f75025f214f55af44a1d98b",
+        "type": "FIX",
+        "text": " sap.m.Select: Correct CSS variable for error state background"
+      },
+      {
+        "id": "00a07a1820e12d861270096eb5d6a86060495df5",
+        "type": "FIX",
+        "text": " sap.m.IconTabBar: Unnecessary bold on tab text is now removed"
+      },
+      {
+        "id": "078904871563daa4ca994ffcff5a477df50bc10c",
+        "type": "FIX",
+        "text": " sap.m.Button: fix focus border color"
+      },
+      {
+        "id": "8bc5afcf0710dafa9d628956d8e0bafa1f5c4d9f",
+        "type": "FIX",
+        "text": " sap.m.IconTabBar: focus outline is fixed for high contrast themes"
+      }
+    ]
   }
 }
