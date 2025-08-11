@@ -10,6 +10,7 @@ sap.ui.define([
 	"sap/m/IllustratedMessageType",
 	"sap/base/Log",
 	"sap/base/util/deepClone",
+	"sap/base/util/deepEqual",
 	"sap/ui/integration/util/AnalyticsCloudHelper"
 ], function (
 	AnalyticsCloudContentRenderer,
@@ -19,6 +20,7 @@ sap.ui.define([
 	IllustratedMessageType,
 	Log,
 	deepClone,
+	deepEqual,
 	AnalyticsCloudHelper
 ) {
 	"use strict";
@@ -148,6 +150,14 @@ sap.ui.define([
 		const vInterpretation = oConfig?.interpretation;
 		const oOptions = this._getOptions(oConfig);
 
+		// Check if the configuration has changed
+		// during rendering the sac widget.
+		if (deepEqual(this._oLastConfig, oConfig)) {
+			return;
+		}
+
+		this._oLastConfig = oConfig;
+
 		if (oWidget) {
 			sap.sac.api.widget.renderWidget(
 				sContainerId,
@@ -244,6 +254,11 @@ sap.ui.define([
 	 * Sets the widget info from sap.sac.api.widget.getWidgetInfo to card's model widgetInfo
 	 */
 	AnalyticsCloudContent.prototype._updateWidgetInfo = async function () {
+		// clear the last config after the widget is rendered
+		// sо that it can be re-rendered with new configuration,
+		// if the configuration is changed.
+		this._oLastConfig = null;
+
 		const oCard = this.getCardInstance();
 		const sContainerId = this._oWidgetContainer.getId();
 
