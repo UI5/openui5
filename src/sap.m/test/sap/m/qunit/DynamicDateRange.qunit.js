@@ -1496,7 +1496,6 @@ sap.ui.define([
 		assert.strictEqual(oResult, null, "(datetime) When year is > 9999, parsing returns null (value is not parsed)");
 	});
 
-
 	QUnit.test("DynamicDateFormat doesn't cut ' in different language", function (assert) {
 		var sLanguage = Localization.getLanguage();
 

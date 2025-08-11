@@ -285,6 +285,9 @@ sap.ui.define([
 		DynamicDateFormat.prototype.parse = function(sValue, sKey) {
 			var aResult,
 				aStaticParts = _staticParts[sKey],
+				sSpecialCharsPattern = /[+\./\*]/g,
+				sSanitizedString = aStaticParts[0].replace(sSpecialCharsPattern, (match) => '\\' + match),
+				aStaticParts = [sSanitizedString].concat(aStaticParts.slice(1)),
 				sRegexPattern = "^" + aStaticParts.join("(.*)") + "$",
 				rRegex = new RegExp(sRegexPattern, "i"),
 				match = sValue.match(rRegex);
