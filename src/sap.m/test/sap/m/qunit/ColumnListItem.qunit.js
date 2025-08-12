@@ -319,11 +319,14 @@ sap.ui.define([
 		oListItem.$("sub").trigger("tap");
 		assert.notOk(fnPress.called, "Press event not fired");
 
+		const fnFocusSpy = sinon.spy(oListItem, "focus");
 		bHasSelection = false;
 		assert.equal(window.getSelection().toString(), "");
 		oListItem.$("sub").trigger("tap");
 		this.clock.tick(0);
 		assert.ok(fnPress.called, "Press event fired");
+		assert.ok(fnFocusSpy.calledWith({ preventScroll: true }), "Focus event called with preventScroll param");
+		fnFocusSpy.restore();
 
 		this.clock.restore();
 		oTable.destroy();

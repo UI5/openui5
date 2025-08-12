@@ -105,8 +105,14 @@ html.sap-desktop .sapMLnk:not(.sapMLnkDsbl) {
 }
 
 /* Link focus offset and visualization in sap.ui.table.* tables */
-html.sap-desktop .sapUiSizeCondensed .sapUiTableCell .sapMLnk:focus:not(.sapMLnkDsbl) {
-	outline-offset: -2px;
+html.sap-desktop .sapUiSizeCondensed .sapUiTableCell {
+	.sapMLnk:focus:not(.sapMLnkDsbl) {
+		outline-offset: -2.5px;
+	}
+	.sapMLnkText {
+		padding-left: 2.5px;
+		padding-right: 2.5px;
+	}
 }
 
 .sapUiForm .sapMLnk {

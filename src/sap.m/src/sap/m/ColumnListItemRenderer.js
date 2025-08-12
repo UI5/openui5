@@ -276,7 +276,6 @@ ColumnListItemRenderer.renderPopin = function(rm, oLI, oTable) {
 	// popin row
 	rm.openStart("tr", oLI.getPopin());
 	rm.class("sapMListTblSubRow");
-	rm.attr("role", "none");
 	rm.attr("tabindex", "-1");
 	rm.attr("data-sap-ui-related", oLI.getId());
 	rm.openEnd();

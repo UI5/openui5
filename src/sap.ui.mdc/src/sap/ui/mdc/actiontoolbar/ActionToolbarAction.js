@@ -36,7 +36,8 @@ sap.ui.define([
 			library: "sap.ui.mdc",
 			designtime: "sap/ui/mdc/designtime/actiontoolbar/ActionToolbarAction.designtime",
 			interfaces: [
-				"sap.m.IOverflowToolbarContent"
+				"sap.m.IOverflowToolbarContent",
+				"sap.m.IToolbarInteractiveControl"
 			],
 			properties: {
 				/**
@@ -150,6 +151,10 @@ sap.ui.define([
 			}
 			_updateSeparators(oControl.getParent());
 		};
+	};
+
+	ActionToolbarAction.prototype._getToolbarInteractive = function() {
+		return this.getAction()?._getToolbarInteractive?.() ?? false;
 	};
 
 	ActionToolbarAction.prototype.getLabel = function() {

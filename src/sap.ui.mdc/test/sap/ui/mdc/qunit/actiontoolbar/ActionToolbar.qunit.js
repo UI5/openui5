@@ -1065,4 +1065,44 @@ sap.ui.define([
 		assert.ok(bEnabled, "Enabled is true");
 	});
 
+	QUnit.module("sap.ui.mdc.ActionToolbar - Accessibility", {
+		before: function (assert) {
+			//
+		},
+		after: function () {
+			//
+		},
+		beforeEach: function (assert) {
+			this.oToolbar = new ActionToolbar();
+		},
+		afterEach: function () {
+			if (this.oToolbar) {
+				this.oToolbar.destroy();
+			}
+		}
+	});
+
+	QUnit.test("Role is set as toolbar", function (assert) {
+		const action1 = new ActionToolbarAction({action: new Button({text: "Action1"})});
+		const action2 = new ActionToolbarAction({action: new Button({text: "Action1"})});
+
+		this.oToolbar.addAction(action1);
+		this.oToolbar.addAction(action2);
+
+		const role = this.oToolbar.getAccessibilityState().role;
+
+		assert.strictEqual(role, "toolbar", "Role is 'toolbar'");
+	});
+
+	QUnit.test("Role is not toolbar if the added actions are not interactive", function (assert) {
+		const action1 = new ActionToolbarAction({action: new Text({text: "Action1"})});
+		const action2 = new ActionToolbarAction({action: new Text({text: "Action2"})});
+
+		this.oToolbar.addAction(action1);
+		this.oToolbar.addAction(action2);
+
+		const role = this.oToolbar.getAccessibilityState().role;
+
+		assert.notStrictEqual(role, "toolbar", "Role is not 'toolbar'");
+	});
 });

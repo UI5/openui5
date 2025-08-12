@@ -460,6 +460,8 @@ sap.ui.define([
 		});
 		assert.strictEqual(aVisibleColumns.length, 2, "There are 2 visible columns that are not in the popin area");
 		assert.strictEqual(parseInt(sut.getVisibleItems()[0].$Popin().find(".sapMListTblSubRowCell").attr("colspan")), aVisibleColumns.length, "Correct colspan=2 attribute set on the popin, since there are 2 visible columns");
+		assert.notOk(sut.getVisibleItems()[0].$Popin().attr("role"), "No role is set for the popin row");
+
 
 		// hide a column
 		sut.getColumns()[2].setVisible(false);

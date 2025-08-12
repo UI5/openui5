@@ -87,7 +87,7 @@ sap.ui.define([
 				return oEvent.stopImmediatePropagation(true);
 			}
 			if (oEvent.srcControl === this || !jQuery(oEvent.target).is(":sapFocusable")) {
-				this.getParent().focus();
+				this.getParent().focus({ preventScroll: true });
 			}
 		}
 	});
@@ -119,6 +119,10 @@ sap.ui.define([
 
 		ListItemBase.prototype.onAfterRendering.call(this);
 		this._checkTypeColumn();
+
+		if (this.bOutput !== false && document.activeElement.id === this.getId()) {
+			this.getTable()?._setFirstLastVisibleCells(document.activeElement);
+		}
 	};
 
 	ColumnListItem.prototype.exit = function() {

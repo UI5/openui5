@@ -242,10 +242,6 @@ sap.ui.define([
 		return this.getAggregation("label")?.getDomRef()?.offsetWidth || 0;
 	};
 
-	OverflowToolbarTokenizer.prototype.getFocusDomRef = function ()  {
-		return this.getDomRef("inner");
-	};
-
 	OverflowToolbarTokenizer.prototype.onfocusin = function (oEvent) {
 		if (this.getRenderMode() === RenderMode.Overflow) {
 			return;
