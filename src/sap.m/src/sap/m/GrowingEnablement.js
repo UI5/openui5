@@ -137,7 +137,7 @@ sap.ui.define([
 		onsapdown: function(oEvent) {
 			// Navigate from last item to growing trigger and vice versa via arrow keys
 			var oControl = this._oControl;
-			if (oControl._oItemNavigation && !oEvent.isMarked()) {
+			if (oControl._oItemNavigation && !oEvent.isMarked() && oControl.$("triggerList").css("display") !== "none") {
 				var oItemNavigation = oControl._oItemNavigation;
 				var aItemDomRefs = oItemNavigation.getItemDomRefs();
 				var oFirstItemDomRef = aItemDomRefs[0];

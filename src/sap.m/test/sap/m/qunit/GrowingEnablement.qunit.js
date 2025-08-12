@@ -183,11 +183,13 @@ sap.ui.define([
 		assert.equal(aCountInfo[1], 2, "Overall count known");
 
 		// Test Navigation via Arrow Keys from / to Trigger
+		oList._bItemNavigationInvalidated = true;
 		oList.getItems()[0].focus();
 		qutils.triggerKeydown(oList.getItems()[0].getDomRef(), KeyCodes.ARROW_DOWN);
 		assert.ok(oList.getDomRef("trigger") === document.activeElement, "Trigger has focus after navigation from last item via arrow key");
 		qutils.triggerKeydown(oList.getDomRef("trigger"), KeyCodes.ARROW_UP);
 		assert.ok(oList.getItems()[0].getDomRef() === document.activeElement, "Item has focus after navigation from trigger via arrow key");
+		assert.notOk(oList._bItemNavigationInvalidated, "Item navigation dom refs are updated");
 
 	});
 

@@ -2489,6 +2489,10 @@ function(
 			return;
 		}
 
+		if (this._bItemNavigationInvalidated) {
+			this._startItemNavigation();
+		}
+
 		var bItemEvent = $Target.hasClass("sapMLIBFocusable");
 		var preventDefault = function() {
 			oEvent.preventDefault();
