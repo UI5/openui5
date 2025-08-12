@@ -65,6 +65,10 @@ sap.ui.define(["sap/ui/Device"], function(Device) {
 					}
 				}
 			},
+			PreloadedCustomThemeWithCustomCss: {
+				title: "sap.ui.core.theming.ThemeManager: Custom CSS with missing version info",
+				page: "test-resources/sap/ui/core/qunit/PreloadedCustomThemeWithCustomCss.qunit.html"
+			},
 			ThemeManager: {
 				title: "sap.ui.core.theming.ThemeManager",
 				ui5: {
