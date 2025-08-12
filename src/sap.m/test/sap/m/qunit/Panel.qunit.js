@@ -389,6 +389,7 @@ sap.ui.define([
 
 		// Assert
 		assert.strictEqual(oButton.getIcon(), "sap-icon://slim-arrow-down", "should have sapMPanelExpandableButton class present once");
+		assert.strictEqual(oButton.$().attr("aria-expanded"), "true", "aria-expanded should equal false");
 
 		// Act
 		this.oPanel.setExpanded(false);
@@ -396,6 +397,8 @@ sap.ui.define([
 
 		// Assert
 		assert.strictEqual(oButton.getIcon(), "sap-icon://slim-arrow-right", "should have sapMPanelExpandableButton class present once");
+		assert.strictEqual(oButton.$().attr("aria-expanded"), "false", "aria-expanded should equal true");
+
 	});
 
 	QUnit.test("Panel with solid backgroundDesign", function(assert) {

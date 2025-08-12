@@ -347,7 +347,11 @@ sap.ui.define([
 				that._bInteractiveExpand = true;
 				that.setExpanded(!that.getExpanded());
 			}
-		});
+		}).addEventDelegate({
+			onAfterRendering: function() {
+				oButton.$().attr("aria-expanded", this.getExpanded());
+			}.bind(this)
+		}, this);
 
 		this.addDependent(oButton);
 
