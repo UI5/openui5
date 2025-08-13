@@ -104,7 +104,8 @@ sap.ui.define([], function() {
 	 * @param {string} [protocol] The protocol of the URL, can be falsy to allow all protocols for an entry e.g. "", "http", "mailto"
 	 * @param {string} [host] The host of the URL, can be falsy to allow all hosts. A wildcard asterisk can be set at the beginning, e.g. "examples.com", "*.example.com"
 	 * @param {string} [port] The port of the URL, can be falsy to allow all ports, e.g. "", "8080"
-	 * @param {string} [path] the path of the URL, path of the url, can be falsy to allow all paths. A wildcard asterisk can be set at the end, e.g. "/my-example*", "/my-news"
+	 * @param {string} [path] the path of the URL, e.g. "/my-news". Can be falsy to allow all paths. A wildcard asterisk can be set at the end to ensure a path starts with the given string, e.g. "/my-example*".
+	 * 	When using wildcards, make sure to only provide normalized URLs to the validate function in order to mitigate the risk of path traversal attacks.
 	 * @public
 	 */
 	oURLListValidator.add = function(protocol, host, port, path) {
@@ -139,12 +140,15 @@ sap.ui.define([], function() {
 	 * Validates a URL. Check if it's not a script or other security issue.
 	 *
 	 * <b>Note</b>:
-	 * It is strongly recommended to validate only absolute URLs. There's almost no case
+	 * It is strongly recommended to validate only absolute, normalized URLs. There's almost no case
 	 * where checking only the path of a URL would allow to ensure its validity.
-	 * For compatibility reasons, this API cannot automatically resolve URLs relative to
+	 * For compatibility reasons, this API does not normalize URLs and cannot automatically resolve URLs relative to
 	 * <code>document.baseURI</code>, but callers should do so. In that case, and when the
 	 * allow list is not empty, an entry for the origin of <code>document.baseURI</code>
 	 * must be added to the allow list.
+	 *
+	 * Any measures to mitigate path traversal or similar attack vectors must be taken by the caller, e.g. by using the
+	 * {@link https://developer.mozilla.org/docs/Web/API/URL URL} API to normalize the URL beforehand.
 	 *
 	 * <h3>Details</h3>
 	 * Splits the given URL into components and checks for allowed characters according to RFC 3986:

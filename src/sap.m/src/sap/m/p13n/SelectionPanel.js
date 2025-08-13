@@ -758,6 +758,11 @@ sap.ui.define([
 		this.getModel(this.LOCALIZATION_MODEL).setProperty("/fieldColumn", this._getResourceText("p13n.DEFAULT_DESCRIPTION"));
 	};
 
+	SelectionPanel.prototype._onSelectionChange = function(oEvent) {
+		BasePanel.prototype._onSelectionChange.apply(this, arguments);
+		this._updateCount();
+	};
+
 	SelectionPanel.prototype.exit = function() {
 		BasePanel.prototype.exit.apply(this, arguments);
 		this._aInitializedFields = null;

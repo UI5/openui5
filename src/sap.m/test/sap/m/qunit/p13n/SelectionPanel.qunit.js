@@ -243,20 +243,20 @@ sap.ui.define([
 	QUnit.test("Check deselectAll focus handling", function(assert){
 		//Arrange
 		this.oSelectionPanel.setP13nData(this.getTestData());
-		var oUpdateEnableOfMoveButtonsSpy = sinon.spy(this.oSelectionPanel, "_updateEnableOfMoveButtons");
-		var oAddMoveButtonsSpy = sinon.spy(this.oSelectionPanel, "_addMoveButtons");
+		const oUpdateEnableOfMoveButtonsSpy = sinon.spy(this.oSelectionPanel, "_updateEnableOfMoveButtons");
+		const oAddMoveButtonsSpy = sinon.spy(this.oSelectionPanel, "_addMoveButtons");
 
-		var oClearAllCell = this.oSelectionPanel.getAggregation("_content").getItems()[0].getDomRef("tblHeadModeCol");
+		const oClearAllCell = this.oSelectionPanel.getAggregation("_content").getItems()[0].getDomRef("tblHeadModeCol");
 
 		//Act
 		oClearAllCell.focus();
-		var oFocusedControl = Element.getActiveElement().getId();
+		const oFocusedControl = Element.getActiveElement().getId();
 		qutils.triggerMouseEvent(oClearAllCell, "click");
-		var oNewFocusedControl = Element.getActiveElement().getId();
+		const oNewFocusedControl = Element.getActiveElement().getId();
 
 		//Assert
 		//Focus was set to "false"
-		assert.ok(oUpdateEnableOfMoveButtonsSpy.calledWith(sinon.match.any, false), "Focus was not changed");
+		assert.ok(oUpdateEnableOfMoveButtonsSpy.notCalled, "Focus was not changed");
 		assert.ok(oAddMoveButtonsSpy.notCalled, "Focus was not changed");
 		assert.equal(oFocusedControl, oNewFocusedControl, "Focused control stayed the same");
 	});

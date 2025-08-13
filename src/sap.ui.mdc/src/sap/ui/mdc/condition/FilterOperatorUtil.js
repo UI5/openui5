@@ -524,10 +524,10 @@ sap.ui.define([
 				tokenParse: "^<#tokenText#>$",
 				tokenFormat: "<#tokenText#>",
 				longText: _getText(OperatorName.Empty, true),
-				longTextForTypes: _getTextForTypes(OperatorName.Empty, [BaseType.Date], true),
+				// longTextForTypes: _getTextForTypes(OperatorName.Empty, [BaseType.Date], true),
 				tokenText: _getText(OperatorName.Empty, false),
-				tokenTextForTypes: _getTextForTypes(OperatorName.Empty, [BaseType.Date], false),
-				groupsForTypes: _getGroupsForTypes([{id: "901", name: "GROUP3", baseType: BaseType.Date}]), // need to had a group number starting > 2 otherwise in operators dropdown it would me inserted between 1 and 2
+				// tokenTextForTypes: _getTextForTypes(OperatorName.Empty, [BaseType.Date], false),
+				// groupsForTypes: _getGroupsForTypes([{id: "901", name: "GROUP3", baseType: BaseType.Date}]), // need to had a group number starting > 2 otherwise in operators dropdown it would me inserted between 1 and 2
 				valueTypes: [],
 				getModelFilter: function(oCondition, sFieldPath, oType, bCaseSensitive, sBaseType) {
 					const oAnyAllPath = _getAnyAllPath(sFieldPath);
@@ -2587,17 +2587,17 @@ sap.ui.define([
 
 	}
 
-	function _getGroupsForTypes(aGroupsForTypes) { // Arry of objects {id: iId, name: sName, baseType: sBaseType}
+	// function _getGroupsForTypes(aGroupsForTypes) { // Arry of objects {id: iId, name: sName, baseType: sBaseType}
 
-		const sTextKey = "VALUEHELP.OPERATOR.";
-		const oGroups = {};
+	// 	const sTextKey = "VALUEHELP.OPERATOR.";
+	// 	const oGroups = {};
 
-		for (let i = 0; i < aGroupsForTypes.length; i++) {
-			oGroups[aGroupsForTypes[i].baseType] = {id: aGroupsForTypes[i].id, text: oMessageBundle.getText(sTextKey + aGroupsForTypes[i].name.toUpperCase(), undefined, true)};
-		}
-		return oGroups;
+	// 	for (let i = 0; i < aGroupsForTypes.length; i++) {
+	// 		oGroups[aGroupsForTypes[i].baseType] = {id: aGroupsForTypes[i].id, text: oMessageBundle.getText(sTextKey + aGroupsForTypes[i].name.toUpperCase(), undefined, true)};
+	// 	}
+	// 	return oGroups;
 
-	}
+	// }
 
 	function _getAnyAllPath(sFieldPath) {
 

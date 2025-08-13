@@ -991,6 +991,26 @@ sap.ui.define([
   * @since 1.121.0
   */
 
+ /**
+  * Acts a subset of the <code>FilterBarDelegate</code> that can be used in {@link module:sap/ui/mdc/TableDelegate.getFilterDelegate TableDelegate.getFilterDelegate} or {@link module:sap/ui/mdc/ChartDelegate.getFilterDelegate Chart.getFilterDelegate} to enable inbuilt filtering.
+  *
+  * It provides basic filter functionality, including
+  * <ul>
+  *   <li>Adding filter fields</li>
+  *   <li>Adding conditions</li>
+  *   <li>Removing conditions</li>
+  *   <li>Determining the validation state of filters</li>
+  * </ul>
+  *
+  * @typedef {object} sap.ui.mdc.FilterDelegateObject
+  *
+  * @property {function(sap.ui.mdc.Control, string): Promise<sap.ui.mdc.FilterField>} [addItem]
+  * @property {function(sap.ui.mdc.Control, string): Promise} [addCondition]
+  * @property {function(sap.ui.mdc.Control, string): Promise} [removeCondition]
+  * @property {function(sap.ui.mdc.Control, string): Promise<sap.ui.mdc.enums.FilterBarValidationStatus>} [determineValidationState]
+  * @public
+  */
+
 
  return thisLib;
 });

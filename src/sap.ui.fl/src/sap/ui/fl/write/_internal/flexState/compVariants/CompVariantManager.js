@@ -283,7 +283,11 @@ sap.ui.define([
 	CompVariantManager.checkSVMControlsForDirty = function(sReference) {
 		return FlexState.getSVMControls(sReference).some((oSVMControl) => {
 			// test if the control was not destroyed after the registration
-			return oSVMControl?.getModified?.();
+			// TODO: needs to be investigated why there are now some additional SVM Controls without model
+			if (oSVMControl?.oModel) {
+				return oSVMControl?.getModified?.();
+			}
+			return false;
 		});
 	};
 

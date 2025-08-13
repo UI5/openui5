@@ -23,8 +23,8 @@ sap.ui.define([
 		oDateTimeOffsetFormatter,
 		sDateValue = "\\d{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12]\\d|3[01])",
 		sDecimalValue = "[-+]?\\d+(?:\\.\\d+)?",
-		sMaxSafeInteger = "9007199254740991",
-		sMinSafeInteger = "-" + sMaxSafeInteger,
+		sMaxSafeInteger = Number.MAX_SAFE_INTEGER.toString(), // "9007199254740991"
+		sMinSafeInteger = Number.MIN_SAFE_INTEGER.toString(), // "-9007199254740991"
 		aPerformanceCategories = [sAnnotationHelper],
 		sPerformanceGetExpression = sAnnotationHelper + "/getExpression",
 		oTimeFormatter,

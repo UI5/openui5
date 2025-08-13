@@ -365,7 +365,7 @@ sap.ui.define([
 		testExpression(assert, "<Guid>21EC2020-3AEA-1069-A2DD-08002B30309D</Guid>",
 			{$Guid : "21EC2020-3AEA-1069-A2DD-08002B30309D"});
 		testExpression(assert, "<Int>42</Int>", 42);
-		testExpression(assert, "<Int>9007199254740991</Int>", 9007199254740991);
+		testExpression(assert, "<Int>9007199254740991</Int>", Number.MAX_SAFE_INTEGER);
 		testExpression(assert, "<Int>9007199254740992</Int>", {$Int : "9007199254740992"});
 		testExpression(assert, "<TimeOfDay>21:45:00</TimeOfDay>", {$TimeOfDay : "21:45:00"});
 		testExpression(assert, "<AnnotationPath>Path/f.Bar@f.Term</AnnotationPath>",

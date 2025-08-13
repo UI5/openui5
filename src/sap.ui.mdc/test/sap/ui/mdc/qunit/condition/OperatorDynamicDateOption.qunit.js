@@ -9,7 +9,9 @@ sap.ui.define([
 	"sap/ui/mdc/condition/OperatorDynamicDateOption",
 	"sap/ui/mdc/condition/Operator",
 	"sap/ui/mdc/condition/RangeOperator",
+	"sap/ui/mdc/condition/FilterOperatorUtil",
 	"sap/ui/mdc/enums/BaseType",
+	"sap/ui/mdc/enums/OperatorName",
 	"sap/ui/mdc/enums/OperatorValueType",
 	"sap/ui/model/ValidateException",
 	"sap/ui/model/FilterOperator",
@@ -19,6 +21,7 @@ sap.ui.define([
 	"sap/ui/core/date/UniversalDate",
 	"sap/ui/core/date/UniversalDateUtils",
 	"sap/ui/core/date/UI5Date",
+	"sap/ui/core/Lib",
 	"sap/m/DynamicDateValueHelpUIType",
 	"sap/m/DynamicDateRange",
 	"sap/m/DynamicDateUtil",
@@ -29,7 +32,9 @@ sap.ui.define([
 	OperatorDynamicDateOption,
 	Operator,
 	RangeOperator,
+	FilterOperatorUtil,
 	BaseType,
+	OperatorName,
 	OperatorValueType,
 	ValidateException,
 	FilterOperator,
@@ -39,6 +44,7 @@ sap.ui.define([
 	UniversalDate,
 	UniversalDateUtils,
 	UI5Date,
+	Library,
 	DynamicDateValueHelpUIType,
 	DynamicDateRange,
 	DynamicDateUtil,
@@ -47,6 +53,8 @@ sap.ui.define([
 	DateTimePicker
 ) {
 	"use strict";
+
+	const oMessageBundle = Library.getResourceBundleFor("sap.ui.mdc");
 
 	let oType;
 	let oOperator;
@@ -720,7 +728,7 @@ sap.ui.define([
 
 	});
 
-	QUnit.module("Empty - for different types", {
+	QUnit.module("Custom - Empty - for different types", {
 		beforeEach() {
 			oType = new DateType({style: "long", calendarType: "Gregorian"});
 			oOperator = new Operator({
@@ -768,6 +776,13 @@ sap.ui.define([
 
 	});
 
+	QUnit.test("getText", function(assert) {
+
+		const sText = oOperatorDynamicDateOption.getText();
+		assert.equal(sText, "Not Specified", "Text");
+
+	});
+
 	QUnit.test("format", function(assert) {
 
 		const oValue = {
@@ -788,6 +803,70 @@ sap.ui.define([
 		};
 
 		const oResult = oOperatorDynamicDateOption.parse("Not Specified"); // as DynamicDateRangle removes brackets
+		assert.deepEqual(oResult, oValue, "parsed value");
+
+	});
+
+	QUnit.module("Empty-Operator - Static texts", {
+		beforeEach() {
+			oType = new DateType({style: "long", calendarType: "Gregorian"});
+			oOperatorDynamicDateOption = new OperatorDynamicDateOption("O1", {
+				key: "Date-MyEmpty",
+				operator: FilterOperatorUtil.getOperator(OperatorName.Empty),
+				type: oType,
+				baseType: BaseType.Date
+			});
+			DynamicDateUtil.addOption(oOperatorDynamicDateOption);
+
+			oDynamicDateRange = new DynamicDateRange("DDR1", { // needed for UI functions
+				formatter: {date: {style: "long"}}
+			});
+		},
+
+		afterEach: fnTeardown
+	});
+
+	QUnit.test("getGroup", function(assert) {
+
+		const iGroup = oOperatorDynamicDateOption.getGroup();
+		assert.equal(iGroup, 901, "Group");
+
+	});
+
+	QUnit.test("getGroupHeader", function(assert) {
+
+		const sText = oOperatorDynamicDateOption.getGroupHeader();
+		assert.equal(sText, oMessageBundle.getText("VALUEHELP.OPERATOR.GROUP3", undefined, true), "Group header");
+
+	});
+
+	QUnit.test("getText", function(assert) {
+
+		const sText = oOperatorDynamicDateOption.getText();
+		assert.equal(sText, oMessageBundle.getText("operators.Empty.longText.date", undefined, true), "Text");
+
+	});
+
+	QUnit.test("format", function(assert) {
+
+		const oValue = {
+			operator: "Date-MyEmpty",
+			values: []
+		};
+
+		const sResult = oOperatorDynamicDateOption.format(oValue);
+		assert.equal(sResult, oMessageBundle.getText("operators.Empty.tokenText.date", undefined, true), "formatted value");
+
+	});
+
+	QUnit.test("parse", function(assert) {
+
+		const oValue = {
+			operator: "Date-MyEmpty",
+			values: []
+		};
+
+		const oResult = oOperatorDynamicDateOption.parse(oMessageBundle.getText("operators.Empty.longText.date", undefined, true)); // as DynamicDateRangle removes brackets
 		assert.deepEqual(oResult, oValue, "parsed value");
 
 	});

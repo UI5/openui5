@@ -1128,9 +1128,9 @@ sap.ui.define([
 			for (let i = 0; i < aOperatorsData.length; i++) {
 				const oOperatorData = aOperatorsData[i];
 				if (oOperatorData.key === OperatorName.Empty) {
-					assert.equal(oOperatorData.text, oMessageBundle.getText("operators.Empty.longText.date"), "Operator text");
-					assert.equal(oOperatorData.groupId, "901", "Operator group-id");
-					assert.equal(oOperatorData.groupText, oMessageBundle.getText("VALUEHELP.OPERATOR.GROUP3"), "Operator group-text");
+					assert.equal(oOperatorData.text, oMessageBundle.getText("operators.Empty.longText"), "Operator text");
+					assert.equal(oOperatorData.groupId, "1", "Operator group-id");
+					assert.equal(oOperatorData.groupText, oMessageBundle.getText("VALUEHELP.OPERATOR.GROUP1"), "Operator group-text");
 					break;
 				}
 			}

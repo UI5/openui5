@@ -296,7 +296,7 @@ sap.ui.define([
 					if (libInfo.cssLinkElement) {
 						libInfo.cssLinkElement.parentNode.replaceChild(oLink, libInfo.cssLinkElement);
 					} else {
-						document.head.appendChild(oLink);
+						document.head.insertBefore(oLink, document.getElementById(CUSTOM_ID));
 					}
 					libInfo.cssLinkElement = oLink;
 					return Promise.reject();

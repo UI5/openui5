@@ -726,21 +726,25 @@ sap.ui.define([
 		const aListItems = oEvent.getParameter("listItems");
 		const sSpecialChangeReason = this._checkSpecialChangeReason(oEvent.getParameter("selectAll"), oEvent.getParameter("listItems"));
 
-		aListItems.forEach(function(oTableItem) {
-			this._selectTableItem(oTableItem, !!sSpecialChangeReason);
-		}, this);
-
 		if (sSpecialChangeReason) {
-
-			const aModelItems = [];
-			aListItems.forEach(function(oTableItem) {
-				aModelItems.push(this._getModelEntry(oTableItem));
-			}, this);
+			let aModelItems = [];
+			if (sSpecialChangeReason === this.CHANGE_REASON_DESELECTALL || sSpecialChangeReason === this.CHANGE_REASON_SELECTALL) {
+				aModelItems = this.getP13nData().map((oItem) => {
+					oItem[this.PRESENCE_ATTRIBUTE] = sSpecialChangeReason === this.CHANGE_REASON_SELECTALL;
+					return oItem;
+				});
+			} else {
+				aModelItems = aListItems.map((oTableItem) => this._getModelEntry(oTableItem));
+			}
 
 			this.fireChange({
 				reason: sSpecialChangeReason,
 				item: aModelItems
 			});
+		} else {
+			aListItems.forEach(function(oTableItem) {
+				this._selectTableItem(oTableItem, !!sSpecialChangeReason);
+			}, this);
 		}
 
 		// in case of 'deselect all', the move buttons for positioning are going to be disabled
