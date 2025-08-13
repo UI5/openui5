@@ -2220,7 +2220,7 @@ sap.ui.define([
 			// The safe integers consist of all integers from -(2^53 - 1) inclusive to 2^53 - 1
 			// inclusive.
 			// 2^53 - 1 = 9007199254740991
-			return iNumber <= 9007199254740991 && Math.floor(iNumber) === iNumber;
+			return iNumber <= Number.MAX_SAFE_INTEGER && Math.floor(iNumber) === iNumber;
 		},
 
 		/**

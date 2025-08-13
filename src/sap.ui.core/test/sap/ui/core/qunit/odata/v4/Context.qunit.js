@@ -29,7 +29,7 @@ sap.ui.define([
 			Context.VIRTUAL = 42;
 		}, TypeError, "immutable");
 
-		assert.strictEqual(Context.VIRTUAL, -9007199254740991/*Number.MIN_SAFE_INTEGER*/);
+		assert.strictEqual(Context.VIRTUAL, Number.MIN_SAFE_INTEGER/*-9007199254740991*/);
 	});
 
 	//*********************************************************************************************

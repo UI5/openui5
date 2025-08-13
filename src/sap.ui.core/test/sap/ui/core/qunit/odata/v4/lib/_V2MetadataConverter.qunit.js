@@ -1743,7 +1743,7 @@ sap.ui.define([
 							"@foo.Float4" : {$Float : "-INF"},
 							"@foo.Guid" : {$Guid : "21EC2020-3AEA-1069-A2DD-08002B30309D"},
 							"@foo.Int1" : 42,
-							"@foo.Int2" : 9007199254740991,
+							"@foo.Int2" : Number.MAX_SAFE_INTEGER, // 9007199254740991
 							"@foo.Int3" : {$Int : "9007199254740992"},
 							"@foo.String" : "foobar",
 							"@foo.TimeOfDay" : {$TimeOfDay : "21:45:00"},

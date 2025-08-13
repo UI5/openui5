@@ -80,11 +80,23 @@ sap.ui.define([
 	 * @example <caption>Example usage of <code>getFilterDelegate</code></caption>
 	 * oFilterDelegate = {
 	 * 		addItem: function() {
-	 * 			var oFilterFieldPromise = new Promise(...);
+	 * 			const oFilterFieldPromise = new Promise(...);
 	 * 			return oFilterFieldPromise;
+	 * 		},
+	 * 		addCondition: function() {
+	 * 			const oConditionPromise = new Promise(...);
+	 * 			return oConditionPromise;
+	 * 		},
+	 * 		removeCondition: function() {
+	 * 			const oConditionPromise = new Promise(...);
+	 * 			return oConditionPromise;
+	 * 		},
+	 * 		determineValidationState: function() {
+	 * 			const oValidationPromise = new Promise(...);
+	 * 			return oValidationPromise;
 	 * 		}
 	 * }
-	 * @returns {{addItem: (function(sap.ui.mdc.Chart, string): Promise<sap.ui.mdc.FilterField>)}} Object for the chart filter personalization
+	 * @returns {sap.ui.mdc.FilterDelegateObject} Object for the chart filter personalization
 	 * @protected
 	 */
 	ChartDelegate.getFilterDelegate = function() {
@@ -110,6 +122,7 @@ sap.ui.define([
 			 * @param {string} sPropertyName Name of a property
 			 * @param {Object} mPropertyBag Instance of property bag from the SAPUI5 flexibility API
 			 * @returns {Promise} <code>Promise</code> that resolves once the properyInfo property has been updated
+			 * @see sap.ui.mdc.FilterBarDelegate#addCondition
 			 *
 			 */
 			addCondition: function(oControl, sPropertyName, mPropertyBag) {
@@ -124,6 +137,7 @@ sap.ui.define([
 			 * @param {string} sPropertyName Name of a property
 			 * @param {Object} mPropertyBag Instance of property bag from the SAPUI5 flexibility API
 			 * @returns {Promise} <code>Promise</code> that resolves once the properyInfo property has been updated
+			 * @see sap.ui.mdc.FilterBarDelegate#removeCondition
 			 *
 			 */
 			removeCondition: function(oControl, sPropertyName, mPropertyBag) {

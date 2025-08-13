@@ -5,9 +5,11 @@
 sap.ui.define([
 	'sap/m/DynamicDateOption',
 	'sap/m/DynamicDateValueHelpUIType',
+	'sap/m/DynamicDateRange',
 	'sap/m/Input',
-	"sap/ui/mdc/enums/BaseType",
+	'sap/ui/mdc/enums/BaseType',
 	'sap/ui/mdc/enums/FieldDisplay',
+	'sap/ui/mdc/enums/OperatorName',
 	'sap/ui/mdc/enums/OperatorValueType',
 	'sap/ui/mdc/util/DateUtil',
 	'sap/ui/mdc/util/loadModules',
@@ -15,13 +17,17 @@ sap.ui.define([
 	'sap/ui/model/FormatException',
 	'sap/ui/model/ParseException',
 	'sap/ui/model/ValidateException',
-	'sap/ui/core/library'
+	'sap/ui/core/library',
+	'sap/ui/core/Lib',
+	'sap/base/i18n/Localization'
 ], (
 	DynamicDateOption,
 	DynamicDateValueHelpUIType,
+	DynamicDateRange,
 	Input,
 	BaseType,
 	FieldDisplay,
+	OperatorName,
 	OperatorValueType,
 	DateUtil,
 	loadModules,
@@ -29,13 +35,19 @@ sap.ui.define([
 	FormatException,
 	ParseException,
 	ValidateException,
-	coreLibrary
+	coreLibrary,
+	Library,
+	Localization
 ) => {
 	"use strict";
 
 	const { ValueState } = coreLibrary;
 	let DatePicker;
 	let DateTimePicker;
+	let oMessageBundle = Library.getResourceBundleFor("sap.ui.mdc");
+	Localization.attachChange(() => {
+		oMessageBundle = Library.getResourceBundleFor("sap.ui.mdc");
+	});
 
 	/**
 	 * Constructor for a new OperatorDynamicDateOption.
@@ -148,8 +160,13 @@ sap.ui.define([
 	OperatorDynamicDateOption.prototype.getText = function(oControl) {
 
 		const oOperator = this.getOperator();
-		const sBaseType = this.getBaseType();
-		return oOperator.getLongText(sBaseType);
+
+		if (oOperator.name === OperatorName.Empty) { // Empty should be named "Not Specified", but only in DynamicDateRange
+			return oMessageBundle.getText("operators.Empty.longText.date", undefined, true);
+		} else {
+			const sBaseType = this.getBaseType();
+			return oOperator.getLongText(sBaseType);
+		}
 
 	};
 
@@ -396,10 +413,15 @@ sap.ui.define([
 
 	OperatorDynamicDateOption.prototype.getGroupHeader = function() {
 		const oOperator = this.getOperator();
-		const sBaseType = this.getBaseType();
-		const oGroup = oOperator.getGroup(sBaseType);
-		if (oGroup && oGroup.text) {
-			return oGroup.text;
+
+		if (oOperator.name === OperatorName.Empty) { // Group for empty should be named "No Date / Range", but only in DynamicDateRange
+			return oMessageBundle.getText("VALUEHELP.OPERATOR.GROUP3", undefined, true);
+		} else {
+			const sBaseType = this.getBaseType();
+			const oGroup = oOperator.getGroup(sBaseType);
+			if (oGroup && oGroup.text) {
+				return oGroup.text;
+			}
 		}
 
 		return DynamicDateOption.prototype.getGroupHeader.apply(this, arguments); // "Default group header still used!"; //TODO how to create a custom Option inside an existing group?
@@ -407,12 +429,17 @@ sap.ui.define([
 
 	OperatorDynamicDateOption.prototype.getGroup = function() {
 		const oOperator = this.getOperator();
-		const sBaseType = this.getBaseType();
-		const oGroup = oOperator.getGroup(sBaseType);
-		if (oGroup) {
-			return oGroup.id;
+
+		if (oOperator.name === OperatorName.Empty) { // Group for empty should be named "No Date / Range", but only in DynamicDateRange
+			return "901";
+		} else {
+			const sBaseType = this.getBaseType();
+			const oGroup = oOperator.getGroup(sBaseType);
+			if (oGroup) {
+				return oGroup.id;
+			}
+			return DynamicDateOption.prototype.getGroup.apply(this, arguments);
 		}
-		return DynamicDateOption.prototype.getGroup.apply(this, arguments);
 	};
 
 	OperatorDynamicDateOption.prototype.toDates = function(oValue) {
@@ -448,9 +475,14 @@ sap.ui.define([
 
 	OperatorDynamicDateOption.prototype.format = function(oValue) {
 		const oOperator = this.getOperator();
-		const oType = this.getType();
-		const sBaseType = this.getBaseType();
-		return oOperator.format(oValue, oType, FieldDisplay.Value, undefined, undefined, undefined, undefined, undefined, sBaseType);
+
+		if (oOperator.name === OperatorName.Empty) { // Empty should be named "Not Specified (empty)", but only in DynamicDateRange
+			return oMessageBundle.getText("operators.Empty.tokenText.date", undefined, true);
+		} else {
+			const oType = this.getType();
+			const sBaseType = this.getBaseType();
+			return oOperator.format(oValue, oType, FieldDisplay.Value, undefined, undefined, undefined, undefined, undefined, sBaseType);
+		}
 	};
 
 	OperatorDynamicDateOption.prototype.parse = function(sValue) {
@@ -458,7 +490,10 @@ sap.ui.define([
 		const oType = this.getType();
 		const sBaseType = this.getBaseType();
 
-		if (sValue && oOperator.test(sValue, sBaseType)) {
+
+		if (oOperator.name === OperatorName.Empty && sValue === DynamicDateRange.prototype._stripValue(oMessageBundle.getText("operators.Empty.tokenText.date", undefined, true))) { // Empty should be named "Not Specified (empty)", but only in DynamicDateRange; DynamicDateRange removes brackets so compare with same stripped text
+			return {operator: this.getKey(), values: []};
+		} else if (sValue && oOperator.test(sValue, sBaseType)) {
 			const oResult = {};
 			oResult.operator = this.getKey();
 			oResult.values = oOperator.parse(sValue, oType, FieldDisplay.Value, undefined, undefined, undefined, undefined, undefined, sBaseType);

@@ -2227,16 +2227,44 @@ sap.ui.define([
 	}, function() {
 		QUnit.test("with a modified control", function(assert) {
 			this.oGetSVMControlsStub.returns([
-				{ getModified: () => false },
+				{
+					getModified() { return this.oModel.getModified(); },
+					oModel: { getModified: () => false }
+				},
 				undefined, // destroyed control
-				{ getModified: () => true }
+				{
+					getModified() { return this.oModel.getModified(); },
+					oModel: { getModified: () => true }
+				}
+			]);
+			assert.equal(CompVariantManager.checkSVMControlsForDirty(), true, "the modified control is found");
+		});
+
+		QUnit.test("with a modified control and control without model", function(assert) {
+			this.oGetSVMControlsStub.returns([
+				{
+					getModified() { return this.oModel.getModified(); },
+					oModel: { getModified: () => false }
+				},
+				undefined, // destroyed control
+				{
+					getModified() { return this.oModel.getModified(); },
+					oModel: { getModified: () => true }
+				},
+				{
+					getModified() { return this.oModel.getModified(); },
+					oModel: undefined // no model
+				}
 			]);
 			assert.equal(CompVariantManager.checkSVMControlsForDirty(), true, "the modified control is found");
 		});
 
 		QUnit.test("without modified control", function(assert) {
 			this.oGetSVMControlsStub.returns([
-				{ getModified: () => false },
+				{
+					getModified() { return this.oModel.getModified(); },
+					oModel: { getModified: () => false }
+				},
 				undefined // destroyed control
 			]);
 			assert.equal(CompVariantManager.checkSVMControlsForDirty(), false, "no modified control is found");

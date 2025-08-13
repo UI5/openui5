@@ -280,17 +280,26 @@ sap.ui.define([
 	/**
 	 * Returns the filter delegate of the table that provides basic filter functionality, such as adding filter fields.
 	 *
-	 * <b>Note:</b> The functionality provided in this delegate acts as a subset of a <code>FilterBarDelegate</code> to enable the table for
-	 * inbuilt filtering.<br>
-	 *
 	 * @example
-	 * TableDelegate.getFilterDelegate = {
+	 * oFilterDelegate = {
 	 * 		addItem: function() {
-	 * 			var oFilterFieldPromise = new Promise(...);
+	 * 			const oFilterFieldPromise = new Promise(...);
 	 * 			return oFilterFieldPromise;
+	 * 		},
+	 * 		addCondition: function() {
+	 * 			const oConditionPromise = new Promise(...);
+	 * 			return oConditionPromise;
+	 * 		},
+	 * 		removeCondition: function() {
+	 * 			const oConditionPromise = new Promise(...);
+	 * 			return oConditionPromise;
+	 * 		},
+	 * 		determineValidationState: function() {
+	 * 			const oValidationPromise = new Promise(...);
+	 * 			return oValidationPromise;
 	 * 		}
 	 * }
-	 * @returns {{addItem: (function(sap.ui.mdc.Table, string): Promise<sap.ui.mdc.FilterField>)}} Object for the tables filter personalization
+	 * @returns {sap.ui.mdc.FilterDelegateObject} Object for the tables filter personalization
 	 * @protected
 	 */
 	TableDelegate.getFilterDelegate = function() {
@@ -321,6 +330,7 @@ sap.ui.define([
 			 * @param {string} sPropertyKey The property key
 			 * @param {Object} mPropertyBag Instance of a property bag from the SAPUI5 flexibility API
 			 * @returns {Promise} A <code>Promise</code> that resolves once the properyInfo property has been updated
+			 * @see sap.ui.mdc.FilterBarDelegate#addCondition
 			 */
 			addCondition: function(oTable, sPropertyKey, mPropertyBag) {
 				return Promise.resolve();
@@ -336,6 +346,7 @@ sap.ui.define([
 			 * @param {string} sPropertyKey The property key
 			 * @param {Object} mPropertyBag Instance of a property bag from the SAPUI5 flexibility API
 			 * @returns {Promise} A <code>Promise</code> that resolves once the properyInfo property has been updated
+			 * @see sap.ui.mdc.FilterBarDelegate#removeCondition
 			 */
 			removeCondition: function(oTable, sPropertyKey, mPropertyBag) {
 				return Promise.resolve();

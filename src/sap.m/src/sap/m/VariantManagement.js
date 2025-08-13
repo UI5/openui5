@@ -1354,6 +1354,8 @@ sap.ui.define([
 	 * Enables the programmatic selection of a variant.
 	 * @public
 	 * @param {string} sKey of variant to be selected. If the passed key doesn't identify a variant, it will be ignored
+	 *
+	 * @since 1.121
 	 */
 	VariantManagement.prototype.setCurrentVariantKey = function(sKey) {
 		var oItem = this.getItemByKey(sKey);

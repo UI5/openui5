@@ -516,7 +516,7 @@ sap.ui.define([
 		oConditionType.oFormatOptions.operators = []; // fake setting directly
 		const oCondition = Condition.createCondition(OperatorName.Empty, []);
 		const sResult = oConditionType.formatValue(oCondition);
-		const sText = oResourceBundle.getText("operators.Empty.tokenText.date", undefined, true);
+		const sText = "<" + oResourceBundle.getText("operators.Empty.tokenText", undefined, true) + ">";
 		assert.equal(sResult, sText, "Result of formatting");
 
 	});
@@ -554,7 +554,7 @@ sap.ui.define([
 	QUnit.test("Parsing: Empty - date", (assert) => {
 
 		oConditionType.oFormatOptions.operators = []; // fake setting directly
-		const sText = oResourceBundle.getText("operators.Empty.tokenText.date", undefined, true);
+		const sText = "<" + oResourceBundle.getText("operators.Empty.tokenText", undefined, true) + ">";
 		const oCondition = oConditionType.parseValue(sText);
 		assert.ok(oCondition, "Result returned");
 		assert.equal(typeof oCondition, "object", "Result is object");

@@ -129,13 +129,13 @@ sap.ui.define([
 		var oButton2 = new Button("Button2",{
 			text: "Remove",
 			width: "7em",
-			style: ButtonType.Reject,
+			type: ButtonType.Reject,
 			press: removeFromAllowlist
 		});
 		var oButton3 = new Button("Button3",{
 			text: "Clear",
 			width: "7em",
-			style: ButtonType.Reject,
+			type: ButtonType.Reject,
 			press: clearAllowlist
 		});
 
@@ -202,7 +202,7 @@ sap.ui.define([
 
 				new Button("Button4",{
 					text: "Add",
-					style: ButtonType.Accept,
+					type: ButtonType.Accept,
 					press: addToAllowlist,
 					layoutData: new GridData({
 						span: "L1 M1 S1"

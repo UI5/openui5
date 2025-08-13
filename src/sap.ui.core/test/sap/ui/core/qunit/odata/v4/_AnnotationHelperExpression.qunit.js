@@ -60,7 +60,7 @@ sap.ui.define([
 			values : ["12345678-ABCD-EFab-cdef-123456789012"]},
 
 		{constant : undefined, type : "Edm.Int32",
-			values : [-9007199254740991, 0, 9007199254740991]},
+			values : [Number.MIN_SAFE_INTEGER, 0, Number.MAX_SAFE_INTEGER]}, // -/+9007199254740991
 		{constant : "$Int", type : "Edm.Int64", expectType : "string",
 			values : ["-9007199254740992", "9007199254740992"]},
 

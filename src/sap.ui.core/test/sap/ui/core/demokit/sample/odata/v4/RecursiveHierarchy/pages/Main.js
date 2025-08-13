@@ -8,7 +8,7 @@ sap.ui.define([
 ], function (Opa5, EnterText, Press) {
 	"use strict";
 
-	const rTableId = /^((treeTable)|(table))$/;
+	const rTableId = /^(treeTable|table)$/;
 	const sViewName = "sap.ui.core.sample.odata.v4.RecursiveHierarchy.RecursiveHierarchy";
 
 	function findParent(sParent) {
