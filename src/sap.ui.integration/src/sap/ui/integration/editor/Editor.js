@@ -40,6 +40,7 @@ sap.ui.define([
 	"./Manifest",
 	"./Merger",
 	"./Settings",
+	"./Constants",
 	"sap/m/FlexItemData",
 	"sap/m/FlexBox",
 	"sap/m/Button"
@@ -81,6 +82,7 @@ sap.ui.define([
 	EditorManifest,
 	Merger,
 	Settings,
+	Constants,
 	FlexItemData,
 	FlexBox,
 	Button
@@ -148,7 +150,7 @@ sap.ui.define([
 				 */
 				mode: {
 					type: "string",
-					defaultValue: "admin"
+					defaultValue: Constants.EDITOR_MODE.ADMIN
 				},
 				language: {
 					type: "string",
@@ -230,7 +232,7 @@ sap.ui.define([
 			apiVersion: 2,
 			render: function (oRm, oControl) {
 				var oPreview = oControl.getAggregation("_preview");
-				var bShowPreview = oControl.getMode() !== "translation" && oControl.hasPreview();
+				var bShowPreview = oControl.getMode() !== Constants.EDITOR_MODE.TRANSLATION && oControl.hasPreview();
 				var sPreviewPosition = oControl.getPreviewPosition();
 				if (bShowPreview && (sPreviewPosition === "top" || sPreviewPosition === "bottom")) {
 					oRm.openStart("div", oControl);
@@ -260,11 +262,11 @@ sap.ui.define([
 					//surrounding div tag for form <div class="sapUiIntegrationEditorForm"
 					oRm.openStart("div");
 					oRm.class("sapUiIntegrationEditorForm");
-					if (oControl.getMode() !== "translation") {
+					if (oControl.getMode() !== Constants.EDITOR_MODE.TRANSLATION) {
 						oRm.class("settingsButtonSpace");
 					}
 					oRm.openEnd();
-					if (oControl.getMode() !== "translation") {
+					if (oControl.getMode() !== Constants.EDITOR_MODE.TRANSLATION) {
 						oRm.renderControl(oControl.getAggregation("_messageStrip"));
 					}
 					var oItems = oControl.getAggregation("_formContent");
@@ -352,7 +354,7 @@ sap.ui.define([
 						};
 						for (var i = 0; i < oItems.length; i++) {
 							var oItem = oItems[i];
-							if (oControl.getMode() !== "translation") {
+							if (oControl.getMode() !== Constants.EDITOR_MODE.TRANSLATION) {
 								if (oItem.isA("sap.ui.integration.editor.fields.GroupField")) {
 									var oGroupControl = oItem.getAggregation("_field");
 									if (!oGroupControl) {
@@ -1074,7 +1076,7 @@ sap.ui.define([
 				var oManifestJson = this._oEditorManifest.oJson;
 				var _beforeCurrentLayer = merge({}, oManifestJson);
 				this._beforeManifestModel = new JSONModel(_beforeCurrentLayer);
-				if (iCurrentModeIndex < Merger.layers["translation"] && this._currentLayerManifestChanges) {
+				if (iCurrentModeIndex < Merger.layers[Constants.EDITOR_MODE.TRANSLATION] && this._currentLayerManifestChanges) {
 					//merge if not translation
 					oManifestJson = Merger.mergeDelta(oManifestJson, [this._currentLayerManifestChanges], this.getSection());
 				}
@@ -1085,7 +1087,7 @@ sap.ui.define([
 				this._initResourceBundlesForMultiTranslation();
 				//use the translations
 				this._loadDefaultTranslations();
-				if (this.getMode() === "translation") {
+				if (this.getMode() === Constants.EDITOR_MODE.TRANSLATION) {
 					await this._loadSpecialTranslations();
 				}
 				//add a context model
@@ -1379,7 +1381,7 @@ sap.ui.define([
 			//editor will merge the last layer locally to allow "reset" or properties
 			//also for translation layer, the "original" value is needed
 			var iLayer = oChange.hasOwnProperty(":layer") ? oChange[":layer"] : 1000;
-			if (iLayer === Merger.layers["translation"]) {
+			if (iLayer === Merger.layers[Constants.EDITOR_MODE.TRANSLATION]) {
 				var sLanguage = that._language;
 				if (sLanguage === "") {
 					sLanguage = Localization.getLanguage().replaceAll('_', '-');
@@ -1460,7 +1462,7 @@ sap.ui.define([
 			that._oDesigntimeInstance = oDesigntime;
 			that.initDestinations();
 			that.initDataProviderFactory();
-			if (that.getMode() === "admin" || that.getMode() === "all") {
+			if (that.getMode() === Constants.EDITOR_MODE.ADMIN || that.getMode() === Constants.EDITOR_MODE.ALL) {
 				//always add destination settings for admin and all modes
 				that._addDestinationSettings(oConfiguration);
 			} else {
@@ -1543,7 +1545,7 @@ sap.ui.define([
 			for (var n in oSettings.form.items) {
 				var oItem = oSettings.form.items[n];
 				if (oItem.editable && oItem.visible) {
-					if (this.getMode() !== "translation") {
+					if (this.getMode() !== Constants.EDITOR_MODE.TRANSLATION) {
 						if (oItem.translatable && !oItem._changed && oItem._translatedPlaceholder && !this._currentLayerManifestChanges[oItem.manifestpath]) {
 							//do not save a value that was not changed and comes from a translated default value
 							//mResult[oItem.manifestpath] = oItem._translatedPlaceholder;
@@ -1657,7 +1659,7 @@ sap.ui.define([
 				}
 			}
 		}
-		if (this.getMode() === "translation") {
+		if (this.getMode() === Constants.EDITOR_MODE.TRANSLATION) {
 			// translation mode don't have texts property
 			delete mResult.texts;
 		} else if (oSettings.texts) {
@@ -1745,7 +1747,7 @@ sap.ui.define([
 				if (oItem.editable) {
 					if (oItem.validateCheck === "failed") {
 						mChecks[oItem.manifestpath] = false;
-					} else if ((oItem.isValid || oItem.required) && !(this.getMode() === "translation" && oItem.translatable)) {
+					} else if ((oItem.isValid || oItem.required) && !(this.getMode() === Constants.EDITOR_MODE.TRANSLATION && oItem.translatable)) {
 						if (oItem.isValid) {
 							mChecks[oItem.manifestpath] = oItem.isValid(oItem);
 						}
@@ -2162,7 +2164,7 @@ sap.ui.define([
 					var oMsgIcon = this._createMessageIcon(oField, sParameterKey);
 					oField.setAssociation("_messageIcon", oMsgIcon);
 				}
-				if (oConfig.description && this.getMode() !== "translation") {
+				if (oConfig.description && this.getMode() !== Constants.EDITOR_MODE.TRANSLATION) {
 					oField._descriptionIcon = this._createDescription(oConfig, sParameterKey);
 				}
 				if (oConfig._changeDynamicValues) {
@@ -2303,7 +2305,7 @@ sap.ui.define([
 					};
 				});
 			}
-			if (this.getMode() === "content" && oConfig.pageAdminValues && oConfig.pageAdminValues.length > 0) {
+			if (this.getMode() === Constants.EDITOR_MODE.CONTENT && oConfig.pageAdminValues && oConfig.pageAdminValues.length > 0) {
 				var paValues = oConfig.pageAdminValues,
 				    selValues = oConfig.value,
 					selValueItems = oConfig.valueItems || [],
@@ -2559,7 +2561,7 @@ sap.ui.define([
 			} else if (this.getAggregation("_extension")) {
 				oValueModel = this.getAggregation("_extension").getModel();
 				//filter data for page admin
-				if (oValueModel && this.getMode() === "content" && oConfig.pageAdminValues && oConfig.pageAdminValues.length > 0) {
+				if (oValueModel && this.getMode() === Constants.EDITOR_MODE.CONTENT && oConfig.pageAdminValues && oConfig.pageAdminValues.length > 0) {
 					this.prepareFieldsInKey(oConfig);
 					var ePath = oConfig.values.path;
 					if (ePath.length > 1) {
@@ -2706,7 +2708,7 @@ sap.ui.define([
 		oConfig.__cols = oConfig.cols || 2;
 
 		//if the item is not visible or translation mode, continue immediately
-		if (oConfig.visible === false || (!oConfig.translatable && sMode === "translation" && oConfig.type !== "group")) {
+		if (oConfig.visible === false || (!oConfig.translatable && sMode === Constants.EDITOR_MODE.TRANSLATION && oConfig.type !== "group")) {
 			return;
 		}
 		//display subPanel as iconTabBar or Panel
@@ -2728,7 +2730,7 @@ sap.ui.define([
 		}
 		var oNewLabel = null;
 		var sLanguage = Utils._language;
-		if (sMode === "translation") {
+		if (sMode === Constants.EDITOR_MODE.TRANSLATION) {
 			if (oConfig.type !== "string") {
 				return;
 			}
@@ -3024,7 +3026,7 @@ sap.ui.define([
 			oItems = oSettings.form.items;
 			//get current language
 			var sLanguage = this._language || this.getLanguage() || Utils._language;
-			if (this.getMode() === "translation") {
+			if (this.getMode() === Constants.EDITOR_MODE.TRANSLATION) {
 				//add top panel of translation editor
 				this._addItem({
 					type: "group",
@@ -3043,12 +3045,12 @@ sap.ui.define([
 					var sCurrentLayerValue;
 					if (oItem.manifestpath) {
 						this._mItemsByPaths[oItem.manifestpath] = oItem;
-						if (this.getMode() !== "translation") {
+						if (this.getMode() !== Constants.EDITOR_MODE.TRANSLATION) {
 							sCurrentLayerValue = this._currentLayerManifestChanges[oItem.manifestpath];
 						}
 					}
 					//if not changed it should be undefined, and ignore changes in tranlation layer
-					oItem._changed = sCurrentLayerValue !== undefined && this.getMode() !== "translation";
+					oItem._changed = sCurrentLayerValue !== undefined && this.getMode() !== Constants.EDITOR_MODE.TRANSLATION;
 
 					if (oItem.values) {
 						oItem.translatable = false;
@@ -3078,7 +3080,7 @@ sap.ui.define([
 							if (sTranslationTextKey) {
 								//force translatable, even if it was not explicitly set already
 								oItem.translatable = true;
-							} else if (oItem.translatable  && this.getMode() === "translation" && !this.getBeforeLayerChange(oItem.manifestpath)) {
+							} else if (oItem.translatable  && this.getMode() === Constants.EDITOR_MODE.TRANSLATION && !this.getBeforeLayerChange(oItem.manifestpath)) {
 								//if no translation key which means item defined as string value directly.
 								//set the _translatedValue with item manifest value.
 								oItem._translatedValue  = oItem._translatedDefaultPlaceholder;
@@ -3115,7 +3117,7 @@ sap.ui.define([
 							} else if (oItem.value === oItem._translatedDefaultPlaceholder) {
 								oItem.value = oItem._translatedValue;
 							}
-							if (this.getMode() === "translation") {
+							if (this.getMode() === Constants.EDITOR_MODE.TRANSLATION) {
 								//if we are in translation mode the default value differs and depends on the language
 								//TODO this does not work in SWZ, the base path is not taken into account...
 								//get the translated default value for the language we want to translate this.getLanguage()
@@ -3127,10 +3129,10 @@ sap.ui.define([
 							} else if (sTranslationValueinTexts) {
 								oItem.value = sTranslationValueinTexts;
 							}
-						} else if (this.getMode() !== "translation" && oItem.translatable && sTranslationValueinTexts) {
+						} else if (this.getMode() !== Constants.EDITOR_MODE.TRANSLATION && oItem.translatable && sTranslationValueinTexts) {
 							oItem.value = sTranslationValueinTexts;
 						}
-						if (this.getMode() === "translation") {
+						if (this.getMode() === Constants.EDITOR_MODE.TRANSLATION) {
 							if (this._isValueWithHandlebarsTranslation(oItem.label)) {
 								oItem._translatedLabel = this._getCurrentLanguageSpecificText(oItem.label.substring(2, oItem.label.length - 2), true);
 							} else if (oItem.label && oItem.label.startsWith("{i18n>")) {
@@ -3199,13 +3201,13 @@ sap.ui.define([
 			document.body.style.setProperty("--sapUiIntegrationEditorFormWidth", editorWidth);
 		}
 		//add preview
-		if (this.getMode() !== "translation" && this.getPreviewPosition() !== "separate") {
+		if (this.getMode() !== Constants.EDITOR_MODE.TRANSLATION && this.getPreviewPosition() !== "separate") {
 			this._initPreview();
 		}
 		Promise.all(this._aFieldReadyPromise).then(function () {
 			this._fieldReady = true;
 			this.fireFieldReady();
-			if (this.getMode() !== "admin" && this.getMode() !== "all") {
+			if (this.getMode() !== Constants.EDITOR_MODE.ADMIN && this.getMode() !== Constants.EDITOR_MODE.ALL) {
 				setTimeout(function () {
 					this.fireDestinationReady();
 				}.bind(this), 100);
@@ -3286,7 +3288,7 @@ sap.ui.define([
 			if (oItem.editable === undefined || oItem.editable === null) {
 				oItem.editable = true;
 			}
-			if (this.getMode() !== "admin") {
+			if (this.getMode() !== Constants.EDITOR_MODE.ADMIN) {
 				if (oItem.visibleToUser !== undefined) {
 					oItem.visible = oItem.visibleToUser;
 				}
@@ -3421,7 +3423,7 @@ sap.ui.define([
 			Object.keys(oConfiguration.parameters).forEach(function (n) {
 				oItems[n] = merge({
 					manifestpath: sBasePath + "/" + n + "/value",
-					editable: (sMode !== "translation"),
+					editable: (sMode !== Constants.EDITOR_MODE.TRANSLATION),
 					_settingspath: "/form/items/" + n
 				}, oConfiguration.parameters[n]);
 				var oItem = oItems[n];

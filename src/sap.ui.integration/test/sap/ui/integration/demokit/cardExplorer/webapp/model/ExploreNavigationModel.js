@@ -3845,7 +3845,7 @@ sap.ui.define([
 						key: 'designtimeAdmin',
 						target: 'exploreSamples',
 						title: 'Administrator Editor',
-						editorMode: 'AdminContent',
+						editorMode: 'admin',
 						files: [
 							{
 								url: '/samples/designtimeAdmin/dt/Configuration.js',
@@ -3869,7 +3869,7 @@ sap.ui.define([
 						key: 'designtimeTranslation',
 						target: 'exploreSamples',
 						title: 'Translator Editor',
-						editorMode: 'Translation',
+						editorMode: 'translation',
 						files: [
 							{
 								url: '/samples/designtimeTranslation/dt/Configuration.js',

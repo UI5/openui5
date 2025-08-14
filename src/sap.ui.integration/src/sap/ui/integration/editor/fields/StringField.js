@@ -19,7 +19,8 @@ sap.ui.define([
 	"sap/base/util/restricted/_debounce",
 	"sap/base/util/deepClone",
 	"sap/base/util/deepEqual",
-	"sap/ui/integration/util/Utils"
+	"sap/ui/integration/util/Utils",
+	"sap/ui/integration/editor/Constants"
 ], function (
 	BaseField,
 	Input,
@@ -37,7 +38,8 @@ sap.ui.define([
 	_debounce,
 	deepClone,
 	deepEqual,
-	Utils
+	Utils,
+	Constants
 ) {
 	"use strict";
 	var REGEXP_PARAMETERS = /parameters\.([^\}\}]+)/g;
@@ -126,7 +128,7 @@ sap.ui.define([
 					});
 				}.bind(this);
 			}
-			if (this.getMode() === "translation") {
+			if (this.getMode() === Constants.EDITOR_MODE.TRANSLATION) {
 				if (oConfig.editable) {
 					oVisualization = {
 						type: Input,
@@ -222,7 +224,7 @@ sap.ui.define([
 						}
 					};
 				}
-			} else if (this.getMode() !== "translation" && oConfig.translatable) {
+			} else if (this.getMode() !== Constants.EDITOR_MODE.TRANSLATION && oConfig.translatable) {
 				//use value help function of input to show the multi language popup
 				oVisualization = {
 					type: Input,

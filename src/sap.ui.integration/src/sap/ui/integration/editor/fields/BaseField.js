@@ -20,7 +20,8 @@ sap.ui.define([
 	"sap/m/CustomListItem",
 	"sap/m/VBox",
 	"sap/ui/core/CustomData",
-	"sap/ui/model/Sorter"
+	"sap/ui/model/Sorter",
+	"sap/ui/integration/editor/Constants"
 ], function (
 	Control,
 	Text,
@@ -40,7 +41,8 @@ sap.ui.define([
 	CustomListItem,
 	VBox,
 	CustomData,
-	Sorter
+	Sorter,
+	Constants
 ) {
 	"use strict";
 
@@ -658,9 +660,9 @@ sap.ui.define([
 		}
 		//default is true, Card editor needs set to false for translation and page admin mode if needed
 		var sMode = this.getMode();
-		oConfig.allowSettings = oConfig.allowSettings || oConfig.allowSettings !== false && sMode === "admin";
+		oConfig.allowSettings = oConfig.allowSettings || oConfig.allowSettings !== false && sMode === Constants.EDITOR_MODE.ADMIN;
 		oConfig.allowDynamicValues = oConfig.allowDynamicValues || oConfig.allowDynamicValues !== false;
-		oConfig._changeDynamicValues = oConfig.visible && oConfig.editable && (oConfig.allowDynamicValues || oConfig.allowSettings) && sMode !== "translation";
+		oConfig._changeDynamicValues = oConfig.visible && oConfig.editable && (oConfig.allowDynamicValues || oConfig.allowSettings) && sMode !== Constants.EDITOR_MODE.TRANSLATION;
 		if (oConfig._changeDynamicValues) {
 			this._getDynamicField();
 		}

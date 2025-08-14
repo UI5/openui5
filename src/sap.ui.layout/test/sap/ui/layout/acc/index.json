@@ -6,10 +6,16 @@
 			"appComponent": "CA-UI5-CTR-ROD"
 		},
 		{
+			"control": "sap.ui.layout.form.ColumnLayout",
+			"url": "ColumnLayout.html",
+			"desc": "Form using ColumnLayout",
+			"appComponent": "CA-UI5-CMP-WDF"
+		},
+		{
 			"control": "sap.ui.layout.form.ResponsiveGridLayout",
 			"url": "ResponsiveGridLayout.html",
 			"desc": "Form using ResponsiveGridLayout",
-			"appComponent": "CA-UI5-CTR"
+			"appComponent": "CA-UI5-CMP-WDF"
 		},
 		{
 			"control": "sap.ui.layout.FixFlex",

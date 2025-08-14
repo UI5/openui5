@@ -28,24 +28,24 @@
 					"bindingContexts": {}
 				}
 			},
-			"viewName": "sap.ui.mdc.acc.field.Field",
+			"viewName": "sap.ui.mdc.acc.chart.Chart",
 			"id": "MyView",
 			"height": "100%"
 		},
 		"dependencies": {
-			"minUI5Version": "1.140.0",
+			"minUI5Version": "1.70.0",
 			"libs": {
 				"sap.ui.core": {
-					"minVersion": "1.140.0"
+					"minVersion": "1.70.0"
 				},
 				"sap.m": {
-					"minVersion": "1.140.0"
+					"minVersion": "1.70.0"
 				},
 				"sap.ui.layout": {
-					"minVersion": "1.140.0"
+					"minVersion": "1.70.0"
 				},
 				"sap.ui.fl": {
-					"minVersion": "1.140.0",
+					"minVersion": "1.70.0",
 					"lazy": false
 				}
 			},

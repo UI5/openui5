@@ -12,7 +12,6 @@ sap.ui.define([
 	"sap/ui/fl/apply/_internal/flexState/FlexState",
 	"sap/ui/fl/apply/api/FlexRuntimeInfoAPI",
 	"sap/ui/fl/initial/_internal/FlexInfoSession",
-	"sap/ui/fl/initial/_internal/Loader",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/initial/_internal/Settings",
 	"sap/ui/fl/write/_internal/condenser/Condenser",
@@ -33,7 +32,6 @@ sap.ui.define([
 	FlexState,
 	FlexRuntimeInfoAPI,
 	FlexInfoSession,
-	Loader,
 	ManifestUtils,
 	Settings,
 	Condenser,
@@ -150,13 +148,9 @@ sap.ui.define([
 		FlexInfoSession.setByReference(oFlexInfoSession, sReference);
 		await FlexObjectManager.saveFlexObjects(mPropertyBag);
 
-		// When activating a new version or saving a new draft the request has to be made with the new version as parameter
-		oFlexInfoSession.version = mPropertyBag.version;
-		FlexInfoSession.setByReference(oFlexInfoSession, sReference);
-
 		// This is needed as long the save requests does not return the necessary information to update the FlexState without a new request
 		const aFlexObjects = await FlexObjectManager.getFlexObjects({
-			..._omit(mPropertyBag, ["skipUpdateCache", "layer", "version"]),
+			..._omit(mPropertyBag, ["skipUpdateCache", "layer"]),
 			invalidateCache: true,
 			currentLayer: mPropertyBag.layer,
 			includeCtrlVariants: true
@@ -221,7 +215,7 @@ sap.ui.define([
 		};
 
 		FlexInfoSession.setByReference(oNewFlexInfoSession, sReference);
-		Loader.setAllContextsProvided(sReference, oNewFlexInfoSession.allContextsProvided);
+		FlexState.setAllContextsProvided(sReference, oNewFlexInfoSession.allContextsProvided);
 	};
 
 	/**

@@ -16,6 +16,7 @@ sap.ui.define([
 	"sap/ui/model/BindingMode",
 	"sap/ui/Device",
 	"sap/ui/integration/util/loadCardEditor",
+	"sap/ui/integration/editor/Constants",
 	"sap/base/util/restricted/_debounce",
 	"sap/base/util/ObjectPath",
 	"sap/m/Dialog",
@@ -48,6 +49,7 @@ sap.ui.define([
 	BindingMode,
 	Device,
 	loadCardEditor,
+	EditorConstants,
 	_debounce,
 	ObjectPath,
 	Dialog,
@@ -237,6 +239,10 @@ sap.ui.define([
 		onSwitchEditorMode: function (oEvent) {
 			var selectedMode = oEvent.getParameter("selectedItem").getKey(),
 			sPreviewPosition = exploreSettingsModel.getProperty("/previewPosition");
+			if (selectedMode === EditorConstants.EDITOR_MODE.ADMIN || selectedMode === EditorConstants.EDITOR_MODE.CONTENT) {
+				exploreSettingsModel.setProperty("/editorMode", selectedMode);
+			}
+			this.changeEditorHash();
 			var oPanel = Element.getElementById("conf_card_panel");
 
 			var oEditor = this._getCardEditorControl();
@@ -256,14 +262,13 @@ sap.ui.define([
 				return this._oFileEditor.getCardManifestContent();
 			})).then(this._cancelIfSampleChanged(function (oManifestContent) {
 				var oManifestSettings = [];
-				if (selectedMode === "admin") {
+				if (selectedMode === EditorConstants.EDITOR_MODE.ADMIN) {
 					oManifestSettings.push(oConfigurationCardMFChangesforAdmin);
-				} else if (selectedMode === "content") {
+				} else if (selectedMode === EditorConstants.EDITOR_MODE.CONTENT) {
 					oManifestSettings.push(oConfigurationCardMFChangesforAdmin, oConfigurationCardMFChangesforContent);
 				}
 
 				sJson = JSON.parse(oManifestContent);
-				var editorPage = this.byId("editPage");
 				var oCardEditor = new CardEditor();
 				var oCard = new Card({baseUrl: baseUrl, manifest: sJson, manifestChanges: oManifestSettings});
 				oCardEditor.setCard(oCard);
@@ -271,10 +276,7 @@ sap.ui.define([
 				oCardEditor.setPreviewPosition(sPreviewPosition);
 				oCardEditor.setHeight("100%");
 				oCardEditor.setHost(this._oHost.getId());
-				oCardEditor.attachReady(function() {
-					oPanel.addContent(oCardEditor);
-					editorPage.addContent(oPanel);
-				});
+				oPanel.addContent(oCardEditor);
 			})).catch(function (oErr) {
 				if (oErr.message !== SAMPLE_CHANGED_ERROR) {
 					this._oFileEditor.showError(oErr.name + ": " + oErr.message);
@@ -293,12 +295,11 @@ sap.ui.define([
 
 			var baseUrl = this._oCardSample.getBaseUrl(),
 			sJson,
-			sMode = "translation";
+			sMode = EditorConstants.EDITOR_MODE.TRANSLATION;
 			this._loadConfigurationEditor().then(this._cancelIfSampleChanged(function () {
 				return this._oFileEditor.getCardManifestContent();
 			})).then(this._cancelIfSampleChanged(function (oManifestContent) {
 				sJson = JSON.parse(oManifestContent);
-				var editorPage = this.byId("editPage");
 				var oCardEditor = new CardEditor();
 				var oCard = new Card({baseUrl: baseUrl, manifest: sJson});
 				oCardEditor.setCard(oCard);
@@ -306,10 +307,7 @@ sap.ui.define([
 				oCardEditor.setMode(sMode);
 				oCardEditor.setHeight("100%");
 				oCardEditor.setHost(this._oHost.getId());
-				oCardEditor.attachReady(function() {
-					oPanel.addContent(oCardEditor);
-					editorPage.addContent(oPanel);
-				});
+				oPanel.addContent(oCardEditor);
 			})).catch(function (oErr) {
 				if (oErr.message !== SAMPLE_CHANGED_ERROR) {
 					this._oFileEditor.showError(oErr.name + ": " + oErr.message);
@@ -553,9 +551,9 @@ sap.ui.define([
 			sMode = exploreSettingsModel.getProperty("/editorMode"),
 			sPreviewPosition = exploreSettingsModel.getProperty("/previewPosition"),
 			cardTitle = "Card Editor with Company Administration Mode";
-			if (sMode === "Translation") {
+			if (sMode === EditorConstants.EDITOR_MODE.TRANSLATION) {
 				cardTitle = "Card Editor with Translation Mode";
-			} else if (sMode === "AdminContent") {
+			} else if (sMode === EditorConstants.EDITOR_MODE.ADMIN || sMode === EditorConstants.EDITOR_MODE.CONTENT) {
 				cardTitle = "Card Editor with Administration Mode";
 			}
 
@@ -590,7 +588,7 @@ sap.ui.define([
 				}),
 				content: [
 					new HBox({
-						visible: sMode === "Translation",
+						visible: sMode === EditorConstants.EDITOR_MODE.TRANSLATION,
 						items: [
 							new Label({
 								text: "Select Translation Language"
@@ -622,7 +620,7 @@ sap.ui.define([
 						]
 					}),
 					new HBox({
-						visible: sMode === "AdminContent",
+						visible: sMode === EditorConstants.EDITOR_MODE.ADMIN || sMode === EditorConstants.EDITOR_MODE.CONTENT,
 						items: [
 							new Label({
 								text: "Select Card Editor Mode"
@@ -632,13 +630,14 @@ sap.ui.define([
 								change: function(oEvent) {
 									that.onSwitchEditorMode(oEvent);
 								},
+								selectedKey: sMode,
 								items: [
 									new Item({
-										key: "admin",
+										key: EditorConstants.EDITOR_MODE.ADMIN,
 										text: "Company Administrator"
 									}),
 									new Item({
-										key: "content",
+										key: EditorConstants.EDITOR_MODE.CONTENT,
 										text: "Page/Content Administrator"
 									})
 								]
@@ -648,11 +647,6 @@ sap.ui.define([
 				]
 			}).addStyleClass("sapUiBody").addStyleClass("sapUiSizeCompact");
 
-			if (sMode === "AdminContent") {
-				sMode = "admin";
-			} else if (sMode === "Translation") {
-				sMode = "translation";
-			}
 			this._loadConfigurationEditor().then(this._cancelIfSampleChanged(function () {
 				return Promise.all([
 					this._oFileEditor.getCardManifestContent(),
@@ -662,14 +656,12 @@ sap.ui.define([
 				var adminChanges,
 				contentChanges,
 				oManifestSettings = [];
-				if (sMode === "admin") {
+				if (sMode === EditorConstants.EDITOR_MODE.ADMIN) {
 					adminChanges = oConfigurationCardMFChangesforAdmin || {};
-				} else if (sMode === "content") {
-					contentChanges = oConfigurationCardMFChangesforContent || {};
-				}
-				if (sMode === "admin") {
 					oManifestSettings.push(adminChanges);
-				} else if (sMode === "content") {
+				} else if (sMode === EditorConstants.EDITOR_MODE.CONTENT) {
+					adminChanges = oConfigurationCardMFChangesforAdmin || {};
+					contentChanges = oConfigurationCardMFChangesforContent || {};
 					oManifestSettings.push(adminChanges, contentChanges);
 				}
 
@@ -721,8 +713,10 @@ sap.ui.define([
 
 			if (bIsConfigurationEditor) {
 				oParams.set("editor", "configurationEditor");
+				oParams.set("editorMode", exploreSettingsModel.getProperty("/editorMode"));
 			} else {
 				oParams.delete("editor");
+				oParams.delete("editorMode");
 			}
 
 			const sNewHash = oParams.toString() ? `${sPath}?${oParams.toString()}` : sPath;
@@ -979,7 +973,7 @@ sap.ui.define([
 			this._oCurrSample = oCurrentSample;
 
 			exploreSettingsModel.getData().manifestChangesShowed = false;
-			exploreSettingsModel.getData().editorMode = "admin";
+			exploreSettingsModel.getData().editorMode = EditorConstants.EDITOR_MODE.ADMIN;
 			if (oCurrentSample.editorMode) {
 				exploreSettingsModel.getData().editorMode = oCurrentSample.editorMode;
 				exploreSettingsModel.refresh();
@@ -996,9 +990,12 @@ sap.ui.define([
 				this._initConfigurationEditor(oCurrentSample);
 				this._initFileEditor(oCurrentSample);
 				this._initSample(oSample, oSubSample);
-
-				if (oEvent.getParameter("arguments")["?query"]?.editor === "configurationEditor") {
+				const oQuery = oEvent.getParameter("arguments")["?query"] || {};
+				if (oQuery.editor === "configurationEditor") {
 					exploreSettingsModel.setProperty("/editorType", Constants.EDITOR_TYPE.CARDEDITOR);
+					if (oQuery.editorMode) {
+						exploreSettingsModel.setProperty("/editorMode", oQuery.editorMode);
+					}
 					exploreSettingsModel.refresh();
 					this._sEditSource = "cardEditor";
 					this._initCardEditor();
@@ -1259,10 +1256,10 @@ sap.ui.define([
 				this._initalChanges = this._initalChanges || this._oCardSample.getManifestChanges() || [];
 				var aChanges,
 				sMode = oCardEditor.getMode();
-				if (sMode === "admin") {
+				if (sMode === EditorConstants.EDITOR_MODE.ADMIN) {
 					oConfigurationCardMFChangesforAdmin = oCardEditor.getCurrentSettings();
 					aChanges = this._initalChanges.concat([oConfigurationCardMFChangesforAdmin]);
-				} else if (sMode === "content") {
+				} else if (sMode === EditorConstants.EDITOR_MODE.CONTENT) {
 					oConfigurationCardMFChangesforContent = oCardEditor.getCurrentSettings();
 					aChanges = this._initalChanges.concat([oConfigurationCardMFChangesforAdmin, oConfigurationCardMFChangesforContent]);
 				}
@@ -1309,10 +1306,10 @@ sap.ui.define([
 				if (oCardEditor) {
 					this._initalChanges = this._initalChanges || this._oCardSample.getManifestChanges() || [];
 					var sMode = oCardEditor.getMode();
-					if (sMode === "admin") {
+					if (sMode === EditorConstants.EDITOR_MODE.ADMIN) {
 						oConfigurationCardMFChangesforAdmin = oCardEditor.getCurrentSettings();
 						aChanges = this._initalChanges.concat([oConfigurationCardMFChangesforAdmin]);
-					} else if (sMode === "content") {
+					} else if (sMode === EditorConstants.EDITOR_MODE.CONTENT) {
 						oConfigurationCardMFChangesforContent = oCardEditor.getCurrentSettings();
 						aChanges = this._initalChanges.concat([oConfigurationCardMFChangesforAdmin, oConfigurationCardMFChangesforContent]);
 					}
@@ -1359,7 +1356,7 @@ sap.ui.define([
 			//reset card editor
 			var baseUrl = this._oCardSample.getBaseUrl(),
 			sJson,
-			// sMode = "admin",
+			// sMode = EditorConstants.EDITOR_MODE.ADMIN,
 			oCardEditor;
 			this._loadConfigurationEditor().then(this._cancelIfSampleChanged(function () {
 				return this._oFileEditor.getCardManifestContent();
