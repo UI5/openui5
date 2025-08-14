@@ -3,38 +3,21 @@
  */
 
 sap.ui.define([
-	"sap/base/util/merge",
 	"sap/base/util/ObjectPath",
 	"sap/ui/base/ManagedObject",
-	"sap/ui/fl/initial/_internal/FlexInfoSession",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/initial/_internal/Settings",
 	"sap/ui/fl/initial/_internal/Storage",
 	"sap/ui/fl/initial/_internal/StorageUtils"
 ], function(
-	merge,
 	ObjectPath,
 	ManagedObject,
-	FlexInfoSession,
 	ManifestUtils,
 	Settings,
 	Storage,
 	StorageUtils
 ) {
 	"use strict";
-
-	const _mCachedFlexData = {};
-
-	/**
-	 * Class for loading Flex Data from the backend via the Connectors.
-	 *
-	 * @namespace sap.ui.fl.apply._internal.flexState.Loader
-	 * @since 1.74
-	 * @version ${version}
-	 * @private
-	 * @ui5-restricted sap.ui.fl.apply._internal.flexState
-	 */
-	const Loader = {};
 
 	function getIdIsLocalTrueObject(vSelector) {
 		if (typeof vSelector === "string") {
@@ -45,8 +28,8 @@ sap.ui.define([
 		return vSelector;
 	}
 
-	function migrateOVPSelectorFlags(oManifest, mFlexData) {
-		if (ManifestUtils.getOvpEntry(oManifest)) {
+	function migrateSelectorFlags(bMigrationNeeded, mFlexData) {
+		if (bMigrationNeeded) {
 			[
 				mFlexData.changes,
 				mFlexData.variantChanges,
@@ -96,6 +79,18 @@ sap.ui.define([
 		return mFlexData;
 	}
 
+	function isMigrationNeeded(oManifest) {
+		return oManifest && !!ManifestUtils.getOvpEntry(oManifest);
+	}
+
+	function formatFlexData(mFlexData) {
+		// TODO: rename "changes" everywhere to avoid oResponse.changes.changes calls
+		return {
+			changes: mFlexData,
+			cacheKey: mFlexData.cacheKey
+		};
+	}
+
 	function getSideId(oComponentData) {
 		if (oComponentData?.startupParameters && Array.isArray(oComponentData.startupParameters.hcpApplicationId)) {
 			return oComponentData.startupParameters.hcpApplicationId[0];
@@ -133,262 +128,79 @@ sap.ui.define([
 		return mFlexData;
 	}
 
-	function getChangeCategory(oChangeDefinition) {
-		switch (oChangeDefinition.fileType) {
-			case "change":
-				if (oChangeDefinition.selector && oChangeDefinition.selector.persistencyKey) {
-					return ["comp", "changes"];
-				}
-				if (oChangeDefinition.variantReference) {
-					return "variantDependentControlChanges";
-				}
-				if (oChangeDefinition.appDescriptorChange) {
-					return "appDescriptorChanges";
-				}
-				return "changes";
-			case "ctrl_variant":
-				return "variants";
-			case "ctrl_variant_change":
-				return "variantChanges";
-			case "ctrl_variant_management_change":
-				return "variantManagementChanges";
-			case "variant":
-				return ["comp", "variants"];
-			case "annotation_change":
-				return "annotationChanges";
-			default:
-				return "";
-		}
-	}
-
 	/**
-	 * Provides the flex data for a given application based on the configured connectors.
-	 * This function needs a manifest object, async hints and either an ID to an instantiated component or component data as parameter.
-	 * The fetched data is cached statically in the Loader class. Together with the data, all parameters that have been used
-	 * for the request are cached as well. If the function is called again with the same parameters,
-	 * the cached data is returned instead of a new request to the backend.
+	 * Class for loading Flex Data from the backend via the Connectors.
 	 *
-	 * @param {object} mPropertyBag - Contains additional data needed for loading changes
-	 * @param {object} mPropertyBag.manifest - ManifestObject that belongs to current component
-	 * @param {object} mPropertyBag.reference - Flex Reference
-	 * @param {string} mPropertyBag.componentData - Component data of the current component
-	 * @param {object} [mPropertyBag.reInitialize] - Flag if the application is reinitialized even if it was loaded before
-	 * @param {object} [mPropertyBag.asyncHints] - Async hints passed from the app index to the component processing
-	 * @param {boolean} [mPropertyBag.skipLoadBundle=false] - If true only the partial flex data is loaded, without the bundle
-	 * @returns {Promise<object>} Resolves with the change file for the given component from the Storage
+	 * @namespace sap.ui.fl.apply._internal.flexState.Loader
+	 * @since 1.74
+	 * @version ${version}
+	 * @private
+	 * @ui5-restricted sap.ui.fl.apply._internal.flexState
 	 */
-	Loader.getFlexData = async function(mPropertyBag) {
-		if (mPropertyBag.reInitialize) {
-			delete _mCachedFlexData[mPropertyBag.reference];
-		}
+	return {
+		/**
+		 * Provides the flex data for a given application based on the configured connectors.
+		 * This function needs a manifest object, async hints and either an ID to an instantiated component or component data as parameter.
+		 *
+		 * The property <code>partialFlexData</code> contains the flexData except the data from flexibility-bundle.json or changes-bundle.json.
+		 * This is needed in case descriptor changes are required in a maniFirst scenario before the component and thus the bundle can be loaded.
+		 *
+		 * @param {object} mPropertyBag - Contains additional data needed for loading changes
+		 * @param {object} mPropertyBag.manifest - ManifestObject that belongs to current component
+		 * @param {object} mPropertyBag.reference - Flex Reference
+		 * @param {string} mPropertyBag.componentData - Component data of the current component
+		 * @param {object} [mPropertyBag.reInitialize] - Flag if the application is reinitialized even if it was loaded before
+		 * @param {object} [mPropertyBag.asyncHints] - Async hints passed from the app index to the component processing
+		 * @param {number} [mPropertyBag.version] - Number of the version in which the state should be initialized
+		 * @param {string} [mPropertyBag.adaptationId] - Context-based adaptation for which the state should be initialized
+		 * @param {boolean} [mPropertyBag.skipLoadBundle=false] - If true only the partial flex data is loaded, without the bundle
+		 * @param {boolean} [mPropertyBag.allContexts] - Includes also restricted context
+		 * @param {object} [mPropertyBag.partialFlexData] - Already loaded data if only the bundle has to be loaded
+		 * @returns {Promise<object>} resolves with the change file for the given component from the Storage
+		 */
+		loadFlexData(mPropertyBag) {
+			var sComponentName = ManifestUtils.getBaseComponentNameFromManifest(mPropertyBag.manifest);
 
-		// the FlexInfoSession is used to adjust the parameters of the request
-		let oFlexInfoSession = FlexInfoSession.getByReference(mPropertyBag.reference);
-		const mPropertyBagCopy = merge({}, mPropertyBag, {
-			version: oFlexInfoSession.version,
-			adaptationId: oFlexInfoSession.displayedAdaptationId,
-			allContextsProvided: oFlexInfoSession.allContextsProvided
-		});
+			if (mPropertyBag.partialFlexData) {
+				return Storage.completeFlexData({
+					reference: mPropertyBag.reference,
+					componentName: sComponentName,
+					partialFlexData: mPropertyBag.partialFlexData
+				}).then(formatFlexData);
+			}
 
-		if (
-			_mCachedFlexData[mPropertyBagCopy.reference]
-			&& _mCachedFlexData[mPropertyBagCopy.reference].parameters.bundleNotLoaded === !!mPropertyBagCopy.skipLoadBundle
-			&& _mCachedFlexData[mPropertyBagCopy.reference].parameters.version === mPropertyBagCopy.version
-			&& _mCachedFlexData[mPropertyBagCopy.reference].parameters.allContextsProvided === mPropertyBagCopy.allContextsProvided
-			&& _mCachedFlexData[mPropertyBagCopy.reference].parameters.adaptationId === mPropertyBagCopy.adaptationId
-		) {
-			return {
-				data: _mCachedFlexData[mPropertyBagCopy.reference].data,
-				cacheInvalidated: false
-			};
-		}
-
-		let oFlexData;
-		const sComponentName = ManifestUtils.getBaseComponentNameFromManifest(mPropertyBagCopy.manifest);
-		if (!mPropertyBagCopy.skipLoadBundle && _mCachedFlexData[mPropertyBagCopy.reference]?.parameters.bundleNotLoaded) {
-			oFlexData = await Storage.completeFlexData({
-				reference: mPropertyBagCopy.reference,
-				componentName: sComponentName,
-				partialFlexData: _mCachedFlexData[mPropertyBagCopy.reference].data.changes
-			});
-		} else {
 			// the cache key cannot be used in case of a reinitialization
-			const sCacheKey = mPropertyBagCopy.reInitialize
-				? undefined
-				: ManifestUtils.getCacheKeyFromAsyncHints(mPropertyBagCopy.reference, mPropertyBagCopy.asyncHints);
+			var sCacheKey = mPropertyBag.reInitialize ? undefined : ManifestUtils.getCacheKeyFromAsyncHints(mPropertyBag.reference, mPropertyBag.asyncHints);
 
-			oFlexData = await Storage.loadFlexData({
-				preview: ManifestUtils.getPreviewSectionFromAsyncHints(mPropertyBagCopy.asyncHints),
-				reference: mPropertyBagCopy.reference,
+			return Storage.loadFlexData({
+				preview: ManifestUtils.getPreviewSectionFromAsyncHints(mPropertyBag.asyncHints),
+				reference: mPropertyBag.reference,
 				componentName: sComponentName,
 				cacheKey: sCacheKey,
-				siteId: getSideId(mPropertyBagCopy.componentData),
-				appDescriptor: mPropertyBagCopy.manifest.getRawJson ? mPropertyBagCopy.manifest.getRawJson() : mPropertyBagCopy.manifest,
-				version: mPropertyBagCopy.version,
-				adaptationId: mPropertyBagCopy.adaptationId,
-				skipLoadBundle: mPropertyBagCopy.skipLoadBundle
-			});
-		}
+				siteId: getSideId(mPropertyBag.componentData),
+				appDescriptor: mPropertyBag.manifest.getRawJson ? mPropertyBag.manifest.getRawJson() : mPropertyBag.manifest,
+				version: mPropertyBag.version,
+				allContexts: mPropertyBag.allContexts,
+				adaptationId: mPropertyBag.adaptationId,
+				skipLoadBundle: mPropertyBag.skipLoadBundle
+			})
+			.then(applyDeactivateChanges)
+			.then(filterInvalidFileNames)
+			.then(migrateSelectorFlags.bind(undefined, isMigrationNeeded(mPropertyBag.manifest)))
+			.then(formatFlexData);
+		},
 
-		const oFlexDataCopy = Object.assign({}, oFlexData);
-		applyDeactivateChanges(oFlexDataCopy);
-		filterInvalidFileNames(oFlexDataCopy);
-		migrateOVPSelectorFlags(mPropertyBagCopy.manifest, oFlexDataCopy);
-
-		if (!mPropertyBagCopy.skipLoadBundle) {
-			oFlexDataCopy.authors = await Loader.loadVariantsAuthors(mPropertyBagCopy.reference);
-		}
-
-		const oFormattedFlexData = {
-			changes: oFlexDataCopy,
-			cacheKey: oFlexDataCopy.cacheKey
-		};
-
-		_mCachedFlexData[mPropertyBagCopy.reference] = {
-			data: oFormattedFlexData,
-			parameters: {
-				bundleNotLoaded: !!mPropertyBagCopy.skipLoadBundle,
-				version: mPropertyBagCopy.version,
-				allContextsProvided: mPropertyBagCopy.allContexts,
-				adaptationId: mPropertyBagCopy.adaptationId
-			}
-		};
-
-		if (oFormattedFlexData.changes.info !== undefined) {
-			oFlexInfoSession = { ...oFlexInfoSession, ...oFormattedFlexData.changes.info };
-		}
-		FlexInfoSession.setByReference(oFlexInfoSession, mPropertyBagCopy.reference);
-
-		return {
-			data: oFormattedFlexData,
-			cacheInvalidated: true
-		};
-	};
-
-	/**
-	 * Initializes an empty cache for a specific reference.
-	 *
-	 * @param {string} sReference - The flex reference for which to initialize the cache.
-	 * @returns {object} The empty Flex Data object
-	 */
-	Loader.initializeEmptyCache = function(sReference) {
-		const oInitialFlexData = { changes: StorageUtils.getEmptyFlexDataResponse() };
-		_mCachedFlexData[sReference] = {
-			data: oInitialFlexData,
-			parameters: {
-				bundleNotLoaded: true
-			}
-		};
-		return oInitialFlexData;
-	};
-
-	/**
-	 * Clears the cache for a specific reference or for all references if no reference is provided.
-	 * Should only be used in tests.
-	 *
-	 * @param {string} [sReference] - The flex reference for which to clear the cache.
-	 */
-	Loader.clearCache = function(sReference) {
-		if (sReference) {
-			delete _mCachedFlexData[sReference];
-		} else {
-			Object.keys(_mCachedFlexData).forEach((sReference) => {
-				delete _mCachedFlexData[sReference];
-			});
+		/**
+		 * Load the names of variants' authors for a given application.
+		 *
+		 * @param {string} sReference - Flex reference of application
+		 * @returns {Promise<object>} Resolving with a list of maps between user's ID and name
+		 */
+		loadVariantsAuthors(sReference) {
+			// the settings are available due to previous loadFlexData calls or
+			// not available due to an async hint stating that no changes are available, thus also no author mapping needed
+			const oSettings = Settings.getInstanceOrUndef();
+			return oSettings?.getIsVariantAuthorNameAvailable() ? Storage.loadVariantsAuthors(sReference) : Promise.resolve({});
 		}
 	};
-
-	/**
-	 * Loads a FlVariant and updates the cached flex data.
-	 *
-	 * @param {object} mPropertyBag - The property bag containing the variant reference and other parameters.
-	 * @param {string} mPropertyBag.variantReference - The reference of the variant to load.
-	 * @param {string} mPropertyBag.reference - The flex reference of the application.
-	 * @returns {Promise<object>} Resolves with the loaded variant data.
-	 */
-	Loader.loadFlVariant = async function(mPropertyBag) {
-		const oNewData = await Storage.loadFlVariant({
-			variantReference: mPropertyBag.variantReference,
-			reference: mPropertyBag.reference
-		});
-		Object.entries(oNewData).forEach(([sKey, vValue]) => {
-			_mCachedFlexData[mPropertyBag.reference].data.changes[sKey].push(...vValue);
-		});
-		return {
-			newData: oNewData,
-			completeData: _mCachedFlexData[mPropertyBag.reference].data
-		};
-	};
-
-	/**
-	 * Updates the storage response for a specific reference.
-	 *
-	 * @param {string} sReference - The flex reference for which to update the storage response.
-	 * @param {object[]} aUpdates - The updates to apply to the storage response.
-	 * @returns {object} The updated storage response.
-	 */
-	Loader.updateStorageResponse = function(sReference, aUpdates) {
-		aUpdates.forEach((oUpdate) => {
-			if (oUpdate.type === "ui2") {
-				_mCachedFlexData[sReference].data.changes.ui2personalization = oUpdate.newData;
-			} else {
-				const vPath = getChangeCategory(oUpdate.flexObject);
-				const sFileName = oUpdate.flexObject.fileName;
-				const aCache = ObjectPath.get(vPath, _mCachedFlexData[sReference].data.changes);
-				switch (oUpdate.type) {
-					case "add":
-						aCache.push(oUpdate.flexObject);
-						break;
-					case "delete":
-						aCache.splice(aCache.findIndex((oFlexObject) => oFlexObject.fileName === sFileName), 1);
-						break;
-					case "update":
-						aCache.splice(aCache.findIndex((oFlexObject) => oFlexObject.fileName === sFileName), 1, oUpdate.flexObject);
-						break;
-					default:
-				}
-			}
-		});
-		return Object.assign({}, _mCachedFlexData[sReference].data);
-	};
-
-	/**
-	 * Retrieves the cached flexibility data for a specific reference.
-	 *
-	 * @param {string} sReference - The flex reference for which to retrieve the cached data.
-	 * @returns {object} The cached flexibility data or an empty object if not found.
-	 */
-	Loader.getCachedFlexData = function(sReference) {
-		// TODO return copy of the data once the CompVariantManager does not mutate it anymore
-		return _mCachedFlexData[sReference]?.data || {};
-	};
-
-	/**
-	 * Load the names of variants' authors for a given application.
-	 *
-	 * @param {string} sReference - Flex reference of application
-	 * @returns {Promise<object>} Resolving with a list of maps between user's ID and name
-	 */
-	Loader.loadVariantsAuthors = function(sReference) {
-		// the settings are available due to previous loadFlexData calls or
-		// not available due to an async hint stating that no changes are available, thus also no author mapping needed
-		const oSettings = Settings.getInstanceOrUndef();
-		return oSettings?.getIsVariantAuthorNameAvailable() ? Storage.loadVariantsAuthors(sReference) : Promise.resolve({});
-	};
-
-	/**
-	 * This function is temporary and will be removed once the allContextsProvided property is part of the flex/data requests in ABAP
-	 * The allContextsProvided property is not part of the initial flex/data request and needs to be set later to prevent
-	 * FlexState from being reinitialized
-	 *
-	 * @param {string} sReference - Flexibility reference of the app
-	 * @param {boolean} bAllContextsProvided - Flag to indicate if all contexts are provided
-	 */
-	Loader.setAllContextsProvided = function(sReference, bAllContextsProvided) {
-		if (_mCachedFlexData[sReference] && _mCachedFlexData[sReference].parameters.allContextsProvided === undefined) {
-			_mCachedFlexData[sReference].parameters.allContextsProvided = bAllContextsProvided;
-		}
-	};
-
-	return Loader;
 });

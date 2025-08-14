@@ -6,6 +6,7 @@ sap.ui.define([
 	"sap/ui/core/Element",
 	"sap/ui/core/Lib",
 	"sap/ui/integration/editor/Editor",
+	"sap/ui/integration/editor/Constants",
 	"sap/ui/integration/widgets/Card",
 	"sap/ui/integration/editor/Merger",
 	"sap/ui/model/json/JSONModel",
@@ -20,6 +21,7 @@ sap.ui.define([
 	Element,
 	Library,
 	Editor,
+	Constants,
 	Card,
 	Merger,
 	JSONModel,
@@ -261,7 +263,7 @@ sap.ui.define([
 		this._isManifestReady = true;
 		this.fireManifestReady();
 		this._initResourceBundlesForMultiTranslation();
-		if (this.getMode() === "translation") {
+		if (this.getMode() === Constants.EDITOR_MODE.TRANSLATION) {
 			await this._loadSpecialTranslations();
 		}
 		//add a context model

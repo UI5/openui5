@@ -306,6 +306,7 @@ sap.ui.define([
 
 		assert.equal(MultiValueFieldDelegate.createCondition.callCount, 6, "Conditions created via delegate");
 
+		// ui5lint-disable-next-line no-deprecated-api
 		let aConditions = oFieldEdit.getConditions();
 		assert.equal(aConditions.length, 3, "Conditions created");
 		assert.equal(aConditions[0].operator, OperatorName.EQ, "Condition0 operator");
@@ -336,6 +337,7 @@ sap.ui.define([
 
 		await new Promise((resolve) => {setTimeout(resolve,0);});
 
+		// ui5lint-disable-next-line no-deprecated-api
 		aConditions = oFieldEdit.getConditions();
 		assert.equal(aConditions.length, 1, "Conditions created");
 		assert.equal(aConditions[0].operator, OperatorName.EQ, "Condition0 operator");
@@ -516,6 +518,7 @@ sap.ui.define([
 		await new Promise((resolve) => {setTimeout(resolve, 0);}); // async model update
 		await new Promise((resolve) => {setTimeout(resolve, 0);}); // async item creation
 
+		// ui5lint-disable-next-line no-deprecated-api
 		let aConditions = oField.getConditions();
 		assert.equal(aConditions.length, 4, "Conditions created");
 		assert.equal(aConditions[3].values[0], 10, "Condition3 value0");
@@ -527,6 +530,7 @@ sap.ui.define([
 		await new Promise((resolve) => {setTimeout(resolve, 0);}); // async model update
 		await new Promise((resolve) => {setTimeout(resolve, 0);}); // async item creation
 
+		// ui5lint-disable-next-line no-deprecated-api
 		aConditions = oField.getConditions();
 		assert.equal(aConditions.length, 4, "Conditions created");
 		assert.equal(aConditions[3].values[0], 10, "Condition3 value0");

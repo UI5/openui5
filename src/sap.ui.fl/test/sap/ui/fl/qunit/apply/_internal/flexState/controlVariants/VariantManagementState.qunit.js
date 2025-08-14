@@ -851,15 +851,15 @@ sap.ui.define([
 			QUnit.test(sName, async function(assert) {
 				const oInitialPrepareSpy = sandbox.spy(InitialPrepareFunctions, "variants");
 
-				const oLoaderStub = sandbox.stub(Loader, "getFlexData");
+				const oLoaderStub = sandbox.stub(Loader, "loadFlexData");
 				function fakeLoadFlexData(...aArgs) {
 					return oLoaderStub.wrappedMethod.apply(this, aArgs)
 					// eslint-disable-next-line max-nested-callbacks
 					.then(function(oOriginalResponse) {
-						const oResponseAddition = { data: { changes: {} } };
+						const oResponseAddition = { changes: {} };
 						// eslint-disable-next-line max-nested-callbacks
 						Object.keys(oTestInput.flexObjects).forEach(function(sResponseKey) {
-							oResponseAddition.data.changes[sResponseKey] = toFileContent(oTestInput.flexObjects[sResponseKey]);
+							oResponseAddition.changes[sResponseKey] = toFileContent(oTestInput.flexObjects[sResponseKey]);
 						});
 						return merge(
 							oOriginalResponse,
@@ -1701,7 +1701,7 @@ sap.ui.define([
 		}
 	}, function() {
 		QUnit.test("with the Storage returning a full response", async function(assert) {
-			const oUpdateSpy = sandbox.spy(FlexState, "lazyLoadFlVariant");
+			const oUpdateSpy = sandbox.spy(FlexState, "updateWithDataProvided");
 			const oResponse = await fetch("test-resources/sap/ui/fl/qunit/testResources/TestVariantsConnectorResponse.json");
 			const oJson = await oResponse.json();
 			sandbox.stub(Storage, "loadFlVariant").resolves(oJson);
@@ -1711,6 +1711,7 @@ sap.ui.define([
 			});
 			assert.ok(oUpdateSpy.calledOnce, "then the storage response is updated");
 			assert.strictEqual(oUpdateSpy.lastCall.args[0].reference, sReference, "with the correct reference");
+			assert.deepEqual(oUpdateSpy.lastCall.args[0].newData, oJson, "with the correct response");
 			const aAllFlexObjects = FlexState.getFlexObjectsDataSelector().get({ reference: sReference });
 			assert.strictEqual(aAllFlexObjects.length, 37, "all flex objects are loaded");
 		});

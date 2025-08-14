@@ -28,7 +28,7 @@
 					"bindingContexts": {}
 				}
 			},
-			"viewName": "sap.ui.mdc.acc.field.Field",
+			"viewName": "sap.ui.mdc.acc.multivaluefield.MultiValueField",
 			"id": "MyView",
 			"height": "100%"
 		},

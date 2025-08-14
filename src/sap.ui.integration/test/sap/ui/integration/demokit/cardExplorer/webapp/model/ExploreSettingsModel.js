@@ -1,7 +1,8 @@
 sap.ui.define([
 	"../Constants",
+	"sap/ui/integration/editor/Constants",
 	"sap/ui/model/json/JSONModel"
-], function (Constants, JSONModel) {
+], function (Constants, EditorConstants, JSONModel) {
 	"use strict";
 
 	return new JSONModel({
@@ -16,6 +17,6 @@ sap.ui.define([
 		designtimeEnabled: true,
 		//to enable/disable "Show Manifest Changes" button
 		manifestChanged: false,
-		editorMode: 'admin'
+		editorMode: EditorConstants.EDITOR_MODE.ADMIN
 	});
 });

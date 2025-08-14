@@ -1,15 +1,13 @@
 sap.ui.define([
 	"sap/base/util/merge",
+	"sap/ui/fl/initial/_internal/StorageUtils",
 	"sap/ui/fl/apply/_internal/flexState/FlexState",
-	"sap/ui/fl/initial/_internal/Loader",
-	"sap/ui/fl/initial/_internal/Storage",
-	"sap/ui/fl/initial/_internal/StorageUtils"
+	"sap/ui/fl/initial/_internal/Loader"
 ], function(
 	merge,
+	StorageUtils,
 	FlexState,
-	Loader,
-	Storage,
-	StorageUtils
+	Loader
 ) {
 	"use strict";
 
@@ -109,8 +107,10 @@ sap.ui.define([
 	 * @param {object} oData - Data that should be loaded
 	 */
 	FlQUnitUtils.initializeFlexStateWithData = async function(sandbox, sReference, oData) {
-		sandbox.stub(Storage, "loadFlexData").resolves(merge(StorageUtils.getEmptyFlexDataResponse(), oData || {}));
-		sandbox.stub(Storage, "loadVariantsAuthors").resolves({});
+		sandbox.stub(Loader, "loadFlexData").resolves({
+			changes: merge(StorageUtils.getEmptyFlexDataResponse(), oData || {})
+		});
+		sandbox.stub(Loader, "loadVariantsAuthors").resolves({});
 		await FlexState.initialize({
 			reference: sReference,
 			componentId: sReference

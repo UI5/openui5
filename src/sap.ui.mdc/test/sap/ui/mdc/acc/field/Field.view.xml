@@ -37,7 +37,7 @@
 						<mdc:ValueHelp id="VH-Status">
 							<mdc:typeahead>
 								<mdcvh:Popover id="VH-Status-Pop">
-									<mdcValueHelpContent:FixedList id="VH-Status-FL" useFirstMatch="false" items="{path: '/StatusCollection'}">
+									<mdcValueHelpContent:FixedList id="VH-Status-FL" useFirstMatch="true" filterList="false" items="{path: '/StatusCollection'}">
 										<mdcValueHelpContent:FixedListItem key="{StatusId}" text="{Name}" additionalText="{StatusId}" />
 									</mdcValueHelpContent:FixedList>
 								</mdcvh:Popover>

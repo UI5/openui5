@@ -1,0 +1,13 @@
+<mvc:View height="100%" controllerName="sap.ui.mdc.acc.chart.Chart"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:m="sap.m"
+	xmlns:mdc="sap.ui.mdc"
+	xmlns:c="sap.ui.core">
+
+	<m:App id="MyApp" defaultTransitionName="show">
+		<m:Page id="P0" title="Chart Sample" titleLevel="H1">
+			<mdc:Chart id="C1">
+			</mdc:Chart>
+		</m:Page>
+	</m:App>
+</mvc:View>

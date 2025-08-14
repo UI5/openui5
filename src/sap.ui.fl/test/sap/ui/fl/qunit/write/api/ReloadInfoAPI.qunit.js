@@ -2,33 +2,31 @@
 
 sap.ui.define([
 	"sap/ui/fl/apply/_internal/flexState/FlexState",
-	"sap/ui/fl/initial/_internal/FlexInfoSession",
-	"sap/ui/fl/initial/_internal/Loader",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
-	"sap/ui/fl/initial/_internal/Settings",
+	"sap/ui/fl/initial/_internal/FlexInfoSession",
 	"sap/ui/fl/initial/api/Version",
+	"sap/ui/fl/initial/_internal/Settings",
 	"sap/ui/fl/write/_internal/flexState/compVariants/CompVariantManager",
-	"sap/ui/fl/write/_internal/Storage",
 	"sap/ui/fl/write/api/FeaturesAPI",
 	"sap/ui/fl/write/api/PersistenceWriteAPI",
 	"sap/ui/fl/write/api/ReloadInfoAPI",
 	"sap/ui/fl/write/api/VersionsAPI",
+	"sap/ui/fl/write/_internal/Storage",
 	"sap/ui/fl/Layer",
 	"sap/ui/fl/Utils",
 	"sap/ui/thirdparty/sinon-4"
 ], function(
 	FlexState,
-	FlexInfoSession,
-	Loader,
 	ManifestUtils,
-	Settings,
+	FlexInfoSession,
 	Version,
+	Settings,
 	CompVariantManager,
-	Storage,
 	FeaturesAPI,
 	PersistenceWriteAPI,
 	ReloadInfoAPI,
 	VersionsAPI,
+	Storage,
 	Layer,
 	FlexUtils,
 	sinon
@@ -241,7 +239,7 @@ sap.ui.define([
 			sandbox.stub(ReloadInfoAPI, "hasMaxLayerStorage");
 			sandbox.stub(ReloadInfoAPI, "hasVersionStorage");
 			sandbox.stub(FeaturesAPI, "isVersioningEnabled").resolves(true);
-			const oSetAllContextsProvided = sandbox.spy(Loader, "setAllContextsProvided");
+			const oSetAllContextsProvided = sandbox.spy(FlexState, "setAllContextsProvided");
 			const oHasHigherLayerChangesAPIStub = sandbox.stub(PersistenceWriteAPI, "hasHigherLayerChanges").resolves(false);
 			const oUpdateResetAndPublishInfoAPIStub = sandbox.spy(PersistenceWriteAPI, "updateResetAndPublishInfo");
 			stubRequestsForResetAndPublishAPI(oFlexInfoResponse);

@@ -7,14 +7,16 @@ sap.ui.define([
 	"sap/m/Panel",
 	"sap/m/IconTabBar",
 	"sap/m/IconTabFilter",
-	"sap/m/MessageStrip"
+	"sap/m/MessageStrip",
+	"sap/ui/integration/editor/Constants"
 ], function (
 	Element,
 	BaseField,
 	Panel,
 	IconTabBar,
 	IconTabFilter,
-	MessageStrip
+	MessageStrip,
+	Constants
 ) {
 	"use strict";
 
@@ -108,7 +110,7 @@ sap.ui.define([
 		var oConfig = this.getConfiguration();
 		var oControl = this.getAggregation("_field");
 		if (oControl instanceof Panel) {
-			if (this.getMode() !== "translation") {
+			if (this.getMode() !== Constants.EDITOR_MODE.TRANSLATION) {
 				var oResourceBundle = this.getResourceBundle();
 				var oMessageStripOfPanel = new MessageStrip({
 					id: this.getParameterId() + "_strip",
@@ -199,7 +201,7 @@ sap.ui.define([
 			oControl.setHeaderBackgroundDesign("Transparent");
 			// oControl.setHeaderBackgroundDesign("Solid");
 			// handle messageStrip for tab filter
-			if (this.getMode() !== "translation") {
+			if (this.getMode() !== Constants.EDITOR_MODE.TRANSLATION) {
 				var oMessageStripOfTab = new MessageStrip({
 					id: this.getParameterId() + "_strip",
 					showIcon: false,
