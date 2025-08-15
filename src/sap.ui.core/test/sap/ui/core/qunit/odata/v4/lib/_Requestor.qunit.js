@@ -5459,7 +5459,7 @@ sap.ui.define([
 [undefined, true].forEach((bContinueOnError) => {
 	QUnit.test("mergeGetRequests: bContinueOnError=" + bContinueOnError, function (assert) {
 		var oClone1 = {},
-			oClone6 = {},
+			oClone6 = {$$sortIfMerged : true},
 			oClone9 = {$expand : {np2 : null}},
 			oHelperMock = this.mock(_Helper),
 			aMergedRequests,
@@ -5490,7 +5490,7 @@ sap.ui.define([
 				$mergeRequests : mustBeMocked,
 				$metaPath : "/EntitySet2",
 				$promise : {},
-				$queryOptions : {$select : ["p6"]}
+				$queryOptions : {$select : ["p6"], $$sortIfMerged : true}
 			}, { // [7] merge with [6] incl. $mergeRequests
 				url : "EntitySet2('42')",
 				$mergeRequests : mustBeMocked,
@@ -5509,8 +5509,13 @@ sap.ui.define([
 				$queryOptions : {$select : [], $expand : {np2 : null}}
 			}, { // [10] merge with [9]
 				url : "EntitySet1('44')?foo=bar",
-				$queryOptions : {$select : [], $expand : {np1 : null}},
+				$queryOptions : {$select : [], $expand : {np1 : null}, $$sortIfMerged : true},
 				$resolve : mustBeMocked
+			}, { // [11] no matching URL -> no merge; $select is not added
+				url : "EntitySet1('11')?foo=bar",
+				$metaPath : "/EntitySet1",
+				$promise : {},
+				$queryOptions : {$expand : {np1 : null}}
 			}],
 			aRequestQueryOptions = aRequests.map(function (oRequest) {
 				// Note: the original query options may well contain "live" references
@@ -5547,30 +5552,37 @@ sap.ui.define([
 		this.mock(aRequests[10]).expects("$resolve")
 			.withExactArgs(sinon.match.same(aRequests[9].$promise));
 		oRequestorMock.expects("addQueryString")
-			.withExactArgs(aRequests[1].url, aRequests[1].$metaPath, sinon.match.same(oClone1))
+			.withExactArgs(aRequests[1].url, aRequests[1].$metaPath, sinon.match.same(oClone1),
+				undefined)
 			.returns("EntitySet1('42')?$select=p1,p3");
 		oRequestorMock.expects("addQueryString")
 			.withExactArgs(aRequests[5].url, aRequests[5].$metaPath,
 				sinon.match.same(aRequests[5].$queryOptions)
-					.and(sinon.match({$select : ["p5"], $expand : {np5 : null}})))
+					.and(sinon.match({$select : ["p5"], $expand : {np5 : null}})), undefined)
 			.returns("EntitySet3('42')?$select=p5&expand=np5");
 		oRequestorMock.expects("addQueryString")
-			.withExactArgs(aRequests[6].url, aRequests[6].$metaPath, sinon.match.same(oClone6))
+			.withExactArgs(aRequests[6].url, aRequests[6].$metaPath, sinon.match.same(oClone6),
+				/*$sortSystemQueryOptions*/true)
 			.returns("EntitySet2('42')?$select=p6,p7");
 		oRequestorMock.expects("addQueryString")
 			.withExactArgs(aRequests[8].url, aRequests[8].$metaPath,
-				sinon.match.same(aRequests[8].$queryOptions))
+				sinon.match.same(aRequests[8].$queryOptions), undefined)
 			.returns("EntitySet1('42')?$select=p8");
 		oRequestorMock.expects("addQueryString")
 			.withExactArgs(aRequests[9].url, aRequests[9].$metaPath,
 				sinon.match.same(oClone9)
-					.and(sinon.match({$select : ["np1"], $expand : {np1 : null, np2 : null}})))
-			.returns("EntitySet1('44')?$select=np1&$expand=np1,np2");
+					.and(sinon.match({$select : ["np1"], $expand : {np1 : null, np2 : null}})),
+				/*$sortSystemQueryOptions*/true)
+			.returns("EntitySet1('44')?$expand=np1,np2&$select=np1");
+		oRequestorMock.expects("addQueryString")
+			.withExactArgs(aRequests[11].url, aRequests[11].$metaPath,
+				sinon.match.same(aRequests[11].$queryOptions), undefined)
+			.returns("EntitySet1('11')?$expand=np1");
 
 		// code under test
 		aMergedRequests = oRequestor.mergeGetRequests(aRequests);
 
-		assert.strictEqual(aMergedRequests.length, 8);
+		assert.strictEqual(aMergedRequests.length, 9);
 		assert.strictEqual(aMergedRequests.iChangeSet, aRequests.iChangeSet);
 		assert.strictEqual(aMergedRequests.bContinueOnError, bContinueOnError);
 		if (!bContinueOnError) {
@@ -5588,7 +5600,8 @@ sap.ui.define([
 		assert.strictEqual(aMergedRequests[4].url, "EntitySet3('42')?$select=p5&expand=np5");
 		assert.strictEqual(aMergedRequests[5].url, "EntitySet2('42')?$select=p6,p7");
 		assert.strictEqual(aMergedRequests[6].url, "EntitySet1('42')?$select=p8");
-		assert.strictEqual(aMergedRequests[7].url, "EntitySet1('44')?$select=np1&$expand=np1,np2");
+		assert.strictEqual(aMergedRequests[7].url, "EntitySet1('44')?$expand=np1,np2&$select=np1");
+		assert.strictEqual(aMergedRequests[8].url, "EntitySet1('11')?$expand=np1");
 		aRequestQueryOptions.forEach(function (mQueryOptions, i) {
 			assert.strictEqual(JSON.stringify(mQueryOptions), aRequestQueryOptionsJSON[i],
 				"unchanged #" + i);
@@ -5606,15 +5619,17 @@ sap.ui.define([
 			.withExactArgs("/meta/path", sinon.match.same(mQueryOptions), false, true)
 			.returns(mConvertedQueryOptions);
 		this.mock(_Helper).expects("buildQuery").twice()
-			.withExactArgs(sinon.match.same(mConvertedQueryOptions))
+			.withExactArgs(sinon.match.same(mConvertedQueryOptions), "~bSortSystemQueryOptions~")
 			.returns("?~");
 
 		// code under test
 		assert.strictEqual(
-			oRequestor.addQueryString("EntitySet", "/meta/path", mQueryOptions),
+			oRequestor.addQueryString("EntitySet", "/meta/path", mQueryOptions,
+				"~bSortSystemQueryOptions~"),
 			"EntitySet?~");
 		assert.strictEqual(
-			oRequestor.addQueryString("EntitySet?foo=bar", "/meta/path", mQueryOptions),
+			oRequestor.addQueryString("EntitySet?foo=bar", "/meta/path", mQueryOptions,
+				"~bSortSystemQueryOptions~"),
 			"EntitySet?foo=bar&~");
 	});
 
@@ -5628,12 +5643,14 @@ sap.ui.define([
 			.withExactArgs("/meta/path", sinon.match.same(mQueryOptions), false, true)
 			.returns(mConvertedQueryOptions);
 		this.mock(_Helper).expects("encodePair").withExactArgs("$foo", "foo~c").returns("$foo=foo");
-		this.mock(_Helper).expects("buildQuery").withExactArgs({$bar : "bar~c"})
+		this.mock(_Helper).expects("buildQuery")
+			.withExactArgs({$bar : "bar~c"}, "~bSortSystemQueryOptions~")
 			.returns("?$bar=bar");
 
 		// code under test
 		assert.strictEqual(
-			oRequestor.addQueryString("EntitySet?$foo=~", "/meta/path", mQueryOptions),
+			oRequestor.addQueryString("EntitySet?$foo=~", "/meta/path", mQueryOptions,
+				"~bSortSystemQueryOptions~"),
 			"EntitySet?$foo=foo&$bar=bar");
 	});
 
@@ -5649,11 +5666,13 @@ sap.ui.define([
 			.returns(mConvertedQueryOptions);
 		oHelperMock.expects("encodePair").withExactArgs("$foo", "foo~c").returns("$foo=foo");
 		oHelperMock.expects("encodePair").withExactArgs("$bar", "bar~c").returns("$bar=bar");
-		oHelperMock.expects("buildQuery").withExactArgs({}).returns("");
+		oHelperMock.expects("buildQuery").withExactArgs({}, "~bSortSystemQueryOptions~")
+			.returns("");
 
 		// code under test
 		assert.strictEqual(
-			oRequestor.addQueryString("EntitySet?$foo=~&$bar=~", "/meta/path", mQueryOptions),
+			oRequestor.addQueryString("EntitySet?$foo=~&$bar=~", "/meta/path", mQueryOptions,
+				"~bSortSystemQueryOptions~"),
 			"EntitySet?$foo=foo&$bar=bar");
 	});
 

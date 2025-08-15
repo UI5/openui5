@@ -301,7 +301,8 @@ sap.ui.define([
 		/**
 		 * Builds a query string from the given parameter map. Takes care of encoding, but ensures
 		 * that the characters "$", "(", ")", ";" and "=" are not encoded, so that OData queries
-		 * remain readable.
+		 * remain readable. A parameter starting with "$$" is meant to be internal and does not
+		 * become part of the query string.
 		 *
 		 * ';' is not encoded although RFC 1866 encourages its usage as separator between query
 		 * parameters. However OData Version 4.0 Part 2 specifies that only '&' is a valid
@@ -329,7 +330,7 @@ sap.ui.define([
 				return "";
 			}
 
-			aKeys = Object.keys(mParameters);
+			aKeys = Object.keys(mParameters).filter((sKey) => !sKey.startsWith("$$"));
 			if (aKeys.length === 0) {
 				return "";
 			}
@@ -1016,21 +1017,20 @@ sap.ui.define([
 		 * them as a new map while replacing their value with "~" in the old map.
 		 *
 		 * @param {object} mQueryOptions - The original query options to be MODIFIED
-		 * @returns {object} The extracted query options
+		 * @returns {object} The extracted query options in the same order
 		 *
 		 * @public
 		 */
 		extractMergeableQueryOptions : function (mQueryOptions) {
 			var mExtractedQueryOptions = {};
 
-			if ("$expand" in mQueryOptions) {
-				mExtractedQueryOptions.$expand = mQueryOptions.$expand;
-				mQueryOptions.$expand = "~";
-			}
-			if ("$select" in mQueryOptions) {
-				mExtractedQueryOptions.$select = mQueryOptions.$select;
-				mQueryOptions.$select = "~";
-			}
+			// ensure to keep the order of the query options
+			Object.keys(mQueryOptions).forEach(function (sKey) {
+				if (sKey === "$expand" || sKey === "$select") {
+					mExtractedQueryOptions[sKey] = mQueryOptions[sKey];
+					mQueryOptions[sKey] = "~";
+				}
+			});
 
 			return mExtractedQueryOptions;
 		},
