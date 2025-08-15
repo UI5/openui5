@@ -61245,7 +61245,7 @@ make root = ${bMakeRoot}`;
 
 		return this.createView(assert, sView, oModel).then(function () {
 			// combined late property requests
-			// see that DID does not occur twice in $Select when requested late
+			// see that DID does not occur twice in $select when requested late
 			that.expectRequest("As(1)/AtoCs(2)?$select=CtoD&$expand=CtoD($select=DID,DValue)", {
 					CtoD : {
 						DID : 3,
@@ -71152,6 +71152,7 @@ make root = ${bMakeRoot}`;
 	//
 	// Show that a created persisted can stay kept alive during refresh (JIRA: CPOUI5ODATAV4-1386)
 	// Show that a single refresh of a persisted enity does not change anything (SNOW: DINC0562822)
+	// Refreshing the same context twice leads to a single GET request (JIRA: CPOUI5ODATAV4-3040)
 [
 	"changeParameters", "filter", "refresh", "resume", "sideEffectsRefresh", "sort"
 ].forEach(function (sMethod) {
@@ -71243,6 +71244,8 @@ make root = ${bMakeRoot}`;
 
 			return Promise.all([
 				// code under test (SNOW: DINC0562822)
+				oContextA.requestRefresh(),
+				// code under test (JIRA: CPOUI5ODATAV4-3040)
 				oContextA.requestRefresh(),
 				that.waitForChanges(assert, "requestRefresh")
 			]);
@@ -80694,5 +80697,84 @@ make root = ${bMakeRoot}`;
 			}));
 		assert.deepEqual(aHotspots, aExpectedHotspots, "field help hotspots");
 		FieldHelp.getInstance().deactivate();
+	});
+
+	//*********************************************************************************************
+	// Scenario: A list report is given. When setting a row context to the object page and
+	// refreshing it concurrently, there is only one combined GET request for loading late
+	// properties and refreshing the context.
+	// JIRA: CPOUI5ODATAV4-3040
+	QUnit.test("CPOUI5ODATAV4-3040: merge refresh with late property", async function (assert) {
+		const oModel = this.createTeaBusiModel({autoExpandSelect : true});
+		const sView = `
+<Table id="list" items="{
+			path : '/EMPLOYEES',
+			parameters : {
+				foo : 'bar'
+			}
+		}">
+	<Text id="employeeName" text="{Name}"/>
+	<Text id="teamName" text="{EMPLOYEE_2_TEAM/Name}"/>
+</Table>
+<FlexBox id="object">
+	<Text id="age" text="{AGE}"/>
+	<Text id="memberCount" text="{EMPLOYEE_2_TEAM/MEMBER_COUNT}"/>
+	<Text id="managerId" text="{EMPLOYEE_2_MANAGER/ID}"/>
+</FlexBox>`;
+
+		this.expectRequest("EMPLOYEES?foo=bar&$select=ID,Name"
+				+ "&$expand=EMPLOYEE_2_TEAM($select=Name,Team_Id)&$skip=0&$top=100", {
+				value : [{
+					EMPLOYEE_2_TEAM : {
+						Name : "Team #1",
+						Team_Id : "Team_01"
+					},
+					ID : "1",
+					Name : "Frederic Fall"
+				}]
+			})
+			.expectChange("employeeName", ["Frederic Fall"])
+			.expectChange("teamName", ["Team #1"])
+			.expectChange("age")
+			.expectChange("memberCount")
+			.expectChange("managerId");
+
+		await this.createView(assert, sView, oModel);
+
+		this.expectRequest("EMPLOYEES('1')?foo=bar"
+				+ "&$expand=EMPLOYEE_2_MANAGER($select=ID),EMPLOYEE_2_TEAM($select=Name,Team_Id)"
+				+ "&$select=AGE,ID,Name", {
+				AGE : 42,
+				EMPLOYEE_2_MANAGER : {
+					ID : "Manager_01"
+				},
+				EMPLOYEE_2_TEAM : {
+					Name : "Team #1",
+					Team_Id : "Team_01"
+				},
+				ID : "1",
+				Name : "Frederic Fall"
+			})
+			// TODO: Avoid this request. The navigation property EMPLOYEE_2_TEAM was already loaded
+			// and therefore the cache requests the missing properties based on this navigation
+			// property. Depending on which data was already loaded, there could be multiple GET
+			// requests which could be combined into one request.
+			.expectRequest("EMPLOYEES('1')/EMPLOYEE_2_TEAM?foo=bar&$select=MEMBER_COUNT,Team_Id", {
+				MEMBER_COUNT : 11,
+				Team_Id : "Team_01"
+			})
+			.expectChange("age", "42")
+			.expectChange("memberCount", "11")
+			.expectChange("managerId", "Manager_01");
+
+		const oListBinding = this.oView.byId("list").getBinding("items");
+		const [oEmployee1] = oListBinding.getAllCurrentContexts();
+		this.oView.byId("object").setBindingContext(oEmployee1);
+
+		await Promise.all([
+			// code under test
+			oEmployee1.requestRefresh(),
+			this.waitForChanges(assert)
+		]);
 	});
 });

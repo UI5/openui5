@@ -4478,39 +4478,19 @@ sap.ui.define([
 			sKeyPredicate = "('13')",
 			oElement = {"@$ui5._" : {predicate : sKeyPredicate}},
 			aElements = oFixture.index !== undefined ? [{}, oElement, {}] : [{}, {}],
-			mExpectedQueryOptions = {
-				$expand : {EMPLOYEE_2_TEAM : null},
-				$select : ["Name"],
-				foo : "bar",
-				"sap-client" : "123"
-			},
 			oFetchValuePromise = Promise.resolve(aElements),
 			oGroupLock = {},
 			oPromise,
-			mQueryOptionsClone = {
-				$apply : "A.P.P.L.E.", // dropped
-				$count : true, // dropped
-				$expand : {EMPLOYEE_2_TEAM : null},
-				$filter : "age gt 40", // dropped
-				$orderby : "TEAM_ID desc", // dropped
-				$search : "OR", // dropped
-				$select : ["Name"],
-				foo : "bar",
-				"sap-client" : "123"
-			},
+			mQueryOptions = {$select : ["Name"]},
 			oResponse = {},
 			mTypeForMetaPath = {},
 			bWithMessages = oFixture.lateQueryOptions,
 			bMessagesAnnotated = bWithMessages && sPath === "" && oFixture.keepAlive;
 
 		if (bMessagesAlreadySelected) {
-			mQueryOptionsClone.$select = ["Name", "SAP_Messages"];
-			mExpectedQueryOptions.$select = ["Name", "SAP_Messages"];
+			mQueryOptions.$select = ["Name", "SAP_Messages"];
 		} else if (bMessagesAlreadySelected === undefined) {
-			delete mQueryOptionsClone.$select;
-			delete mExpectedQueryOptions.$select;
-		} else if (bMessagesAnnotated) {
-			mExpectedQueryOptions.$select = ["Name", "SAP_Messages"];
+			delete mQueryOptions.$select;
 		}
 		oCache.mLateQueryOptions = mLateQueryOptions;
 		aElements.$byPredicate = {};
@@ -4523,8 +4503,7 @@ sap.ui.define([
 			.returns(SyncPromise.resolve(oFetchValuePromise));
 		this.mock(_Helper).expects("aggregateExpandSelect")
 			.exactly(oFixture.keepAlive && oFixture.lateQueryOptions ? 1 : 0)
-			.withExactArgs(sinon.match.same(mQueryOptionsClone),
-				sinon.match.same(mLateQueryOptions));
+			.withExactArgs(sinon.match.same(mQueryOptions), sinon.match.same(mLateQueryOptions));
 
 		// code under test
 		oPromise = oCache.refreshSingle(oGroupLock, sPath, oFixture.index, sKeyPredicate,
@@ -4540,17 +4519,28 @@ sap.ui.define([
 			.withExactArgs("/Employees/@com.sap.vocabularies.Common.v1.Messages/$Path")
 			.returns(SyncPromise.resolve(bMessagesAnnotated ? "SAP_Messages" : undefined));
 		oCacheMock.expects("getQueryOptions4Single").withExactArgs(sPath)
-			.returns(mQueryOptionsClone);
+			.returns(mQueryOptions);
 		this.mock(_Helper).expects("buildPath")
 			.withExactArgs("Employees('31')", sPath, sKeyPredicate)
 			.returns("~");
+		const mMergeableQueryOptions = {};
+		this.mock(_Helper).expects("extractMergeableQueryOptions")
+			.withExactArgs(sinon.match.same(mQueryOptions))
+			.returns(mMergeableQueryOptions);
 		this.oRequestorMock.expects("buildQueryString")
-			.withExactArgs(oCache.sMetaPath, mExpectedQueryOptions, false,
-				sinon.match.same(oCache.bSortExpandSelect))
+			.withExactArgs(oCache.sMetaPath, sinon.match(function (mQueryOptions0) {
+					if (bMessagesAlreadySelected !== undefined
+							&& (bMessagesAlreadySelected || bMessagesAnnotated)) {
+						assert.ok(mQueryOptions0.$select.includes("SAP_Messages"));
+					}
+					return mQueryOptions0 === mQueryOptions;
+				}), /*bDropSystemQueryOptions*/true, sinon.match.same(oCache.bSortExpandSelect))
 			.returns("?$select=Name");
 		this.oRequestorMock.expects("request")
 			.withExactArgs("GET", "~?$select=Name", sinon.match.same(oGroupLock), undefined,
-				undefined, sinon.match.same(fnDataRequested))
+				undefined, sinon.match.same(fnDataRequested), undefined, undefined, undefined,
+				undefined, sinon.match.same(mMergeableQueryOptions)
+					.and(sinon.match.has("$$sortIfMerged", true)))
 			.resolves(oResponse);
 		oCacheMock.expects("fetchTypes").withExactArgs()
 			.returns(SyncPromise.resolve(mTypeForMetaPath));
