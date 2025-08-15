@@ -69,6 +69,16 @@
 				</subSections>
 			</ObjectPageSection>
 
+			<ObjectPageSection id="SectionWithHiddenTitleAndOneSubSectionWithHiddenTitle" title="Section with hidden title" showTitle="false">
+				<subSections>
+					<ObjectPageSubSection id="subsection9" title="My first SubSection title" showTitle="false" class="mysubsectiontotest">
+						<blocks>
+							<sample:MultiViewBlock/>
+						</blocks>
+					</ObjectPageSubSection>
+				</subSections>
+			</ObjectPageSection>
+
 			<ObjectPageSection id="SectionWithNoTitleAndOneSubSection">
 				<subSections>
 					<ObjectPageSubSection id="subsection8" title="My last subSection Title" class="mysubsectiontotest">

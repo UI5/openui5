@@ -390,11 +390,7 @@ sap.ui.define([
 			return;
 		}
 
-		if (oColumnMenu.isA("sap.m.table.columnmenu.Menu")) {
-			return oColumnResizer.getColumnResizeQuickAction(oColumn.getInnerColumn(), oColumnMenu);
-		} else {
-			return oColumnResizer.getColumnResizeButton(oColumn.getInnerColumn());
-		}
+		return oColumnResizer.getColumnResizeQuickAction(oColumn.getInnerColumn(), oColumnMenu);
 	};
 
 	ResponsiveTableType.prototype.createColumnResizeInputMenuItem = function(oColumn, oColumnMenu) {

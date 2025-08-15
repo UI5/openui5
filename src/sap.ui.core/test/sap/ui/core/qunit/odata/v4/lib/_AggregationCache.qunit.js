@@ -1373,6 +1373,38 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
+	[false, true].forEach((bRecursiveHierarchy) => {
+		const sTitle = "fetchValue: $count with existing count promise, "
+			+ (bRecursiveHierarchy ? "recursive hierarchy" : "data aggregation");
+
+		QUnit.test(sTitle, function (assert) {
+			const oAggregation = bRecursiveHierarchy
+				? {hierarchyQualifier : "X"}
+				: {
+					aggregate : {
+						SalesNumber : {grandTotal : true}
+					},
+					group : {},
+					groupLevels : [] // Note: added by _AggregationHelper.buildApply before
+				};
+			const oCache = _AggregationCache.create(this.oRequestor, "Foo", "", {$count : true},
+					oAggregation);
+
+			oCache.oCountPromise = "~countPromise~";
+			this.mock(oCache).expects("registerChangeListener")
+				.withExactArgs("./$count", "~oListener~")
+				.exactly(bRecursiveHierarchy ? 1 : 0);
+			this.mock(oCache.oFirstLevel).expects("fetchValue").never();
+			this.mock(oCache).expects("drillDown").never();
+
+			assert.strictEqual(
+				// code under test
+				oCache.fetchValue("~oGroupLock~", "$count", "~fnDataRequested~", "~oListener~"),
+				"~countPromise~");
+		});
+	});
+
+	//*********************************************************************************************
 	[{
 		oPromise : SyncPromise.resolve("~result~"),
 		vValue : "~result~"
@@ -1599,6 +1631,7 @@ sap.ui.define([
 			oCache.oCountPromise = oCountPromise;
 			this.mock(oGroupLock).expects("getUnlockedCopy").never();
 			this.mock(this.oRequestor).expects("request").never();
+			this.mock(_Helper).expects("fireChange").never();
 
 			// code under test
 			assert.strictEqual(oCache.readCount(oGroupLock), undefined);
@@ -1626,6 +1659,7 @@ sap.ui.define([
 			.returns("~oGroupLockCopy~");
 		this.mock(this.oRequestor).expects("request")
 			.withExactArgs("GET", "~/$count?~query~", "~oGroupLockCopy~").rejects(oError);
+		this.mock(_Helper).expects("fireChange").never();
 
 		// code under test
 		return oCache.readCount(oGroupLock).then(function () {
@@ -1709,6 +1743,12 @@ sap.ui.define([
 
 			assert.notOk(fnResolve.called, "not yet");
 			assert.notOk("$resolve" in oCache.oCountPromise, "prevent 2nd GET");
+
+			this.mock(_Helper).expects("fireChange")
+				.withExactArgs(sinon.match.same(oCache.mChangeListeners), "./$count", 42)
+				.callsFake(() => {
+					assert.ok(fnResolve.calledOnce, "resolve called before");
+				});
 
 			return oResult.then(function () {
 				assert.strictEqual(fnResolve.args[0][0], 42);

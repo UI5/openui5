@@ -168,8 +168,7 @@ sap.ui.define([
 			Theming.attachApplied(this._onThemeChanged.bind(this));
 
 			Mobile.init({
-				statusBar: "default",
-				hideBrowser: true
+				statusBar: "default"
 			});
 		};
 

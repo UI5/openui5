@@ -60,7 +60,6 @@ var ControlIterator = {};
 
 var aControlsThatCannotBeRenderedGenerically = [
 "sap.chart.Chart",
-"sap.m.ColumnHeaderPopover",
 "sap.m.FacetFilterItem",
 "sap.m.internal.NumericInput",
 "sap.m.IconTabBarSelectList",

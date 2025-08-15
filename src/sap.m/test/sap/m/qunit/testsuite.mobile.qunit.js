@@ -169,13 +169,6 @@ sap.ui.define([
 				title: "Column - sap.m"
 			},
 
-			ColumnHeaderPopover: {
-				title: "QUnit Page for sap.m.ColumnHeaderPopover",
-				ui5: {
-					language: "en-US"
-				}
-			},
-
 			ColumnListItem: {
 				title: "ColumnListItem - sap.m"
 			},

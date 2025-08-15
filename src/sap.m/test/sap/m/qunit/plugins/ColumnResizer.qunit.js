@@ -685,29 +685,6 @@ sap.ui.define([
 		assert.strictEqual(parseInt(this.oColumnResizer._oHandle.style[this.sBeginDirection]), parseInt(this.oColumnResizer._aPositions[0] - this.oColumnResizer._fContainerX), "Resize handle is visible");
 	});
 
-	QUnit.test("getColumnResizeButton", function(assert) {
-		const oColumn = this.oTable.getColumns()[0],
-			fnStartResizingSpy = sinon.spy(this.oColumnResizer, "startResizing");
-
-		const oMatchMediaStub = sinon.stub(window, "matchMedia");
-		oMatchMediaStub.withArgs("(hover:none)").returns({
-			matches: true
-		});
-
-		const oResizerButton = this.oColumnResizer.getColumnResizeButton(oColumn);
-		assert.ok(oResizerButton.isA("sap.m.ColumnPopoverActionItem"), "sap.m.ColumnPopoverActionItem instance returned");
-		assert.strictEqual(oResizerButton.getText(), Library.getResourceBundleFor("sap.m").getText("COLUMNRESIZER_RESIZE_BUTTON"), "correct text set");
-		assert.strictEqual(oResizerButton.getIcon(), "sap-icon://resize-horizontal", "correct icon set");
-		assert.ok(oResizerButton.hasListeners("press"), "press event registered");
-
-		oResizerButton.firePress(oColumn);
-
-		assert.ok(fnStartResizingSpy.calledOnce, "startResizing called once");
-		assert.ok(fnStartResizingSpy.calledWith(oColumn.getDomRef()), "startResizing called with correct args");
-
-		oMatchMediaStub.restore();
-	});
-
 	QUnit.test("getColumnResizeQuickAction", function(assert) {
 		const oColumn = this.oTable.getColumns()[0],
 			oColumnMenu = new Menu(),

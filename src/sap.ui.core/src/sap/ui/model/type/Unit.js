@@ -59,9 +59,16 @@ sap.ui.define([
 	 *   {@link sap.ui.model.Binding#supportsIgnoreMessages}, and the corresponding binding
 	 *   parameter is not set manually.
 	 * @param {object} [oFormatOptions.decimals]
-	 *   The number of decimals to be used for formatting the number part of the unit; defaults to <b>3</b> if none of
-	 *   the format options <code>maxFractionDigits</code>, <code>minFractionDigits</code> or <code>decimals</code>
-	 *   is given
+	 *   The number of decimals to be used for formatting the numerical value of the unit composite type; if none of the
+	 *   format options <code>maxFractionDigits</code>, <code>minFractionDigits</code> or <code>decimals</code> are
+	 *   given, the following defaults apply:
+	 *   <ul>
+	 *      <li> <b>0</b> if the numerical value is of an OData integer type, i.e. {@link sap.ui.model.odata.type.Int}
+	 *        or {@link sap.ui.model.odata.type.Int64} </li>
+	 *      <li> the <b>scale constraint of the numerical value's type</b> if this type is
+	 *        {@link sap.ui.model.odata.type.Decimal} and the scale is not "variable" </li>
+	 *      <li> <b>3</b> otherwise </li>
+	 *   </ul>
 	 * @param {boolean} [oFormatOptions.preserveDecimals=true]
 	 *   By default decimals are preserved, unless <code>oFormatOptions.style</code> is given as
 	 *   "short" or "long"; since 1.89.0
@@ -322,12 +329,16 @@ sap.ui.define([
 	 * @since 1.120.0
 	 */
 	Unit.prototype.processPartTypes = function (aPartTypes) {
+		this.iScale = undefined; // type of quantity binding part may be changed => reset scale
 		const oQuantityType = aPartTypes[0];
 		if (oQuantityType?.isA(["sap.ui.model.odata.type.Int", "sap.ui.model.odata.type.Int64"])) {
 			this.iScale = 0;
 		}
 		if (oQuantityType?.isA("sap.ui.model.odata.type.Decimal")) {
-			this.iScale = oQuantityType.oConstraints?.scale || 0;
+			const iScale = oQuantityType.oConstraints?.scale;
+			if (iScale !== Infinity) { // like in Decimal type, do not propagate scale "variable" to formatter
+				this.iScale = iScale || 0;
+			}
 		}
 	};
 

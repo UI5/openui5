@@ -16,6 +16,8 @@
 @_sap_m_InputBase_FocusOffset: 1px;
 @_sap_m_InputBase_FocusOffset_Busy: @_sap_m_InputBase_FocusOffset + 1px;
 @_sap_m_InputBase_FocusBorderRadius: 0;
+@_sap_m_InputBase_ReadOnly_FocusOffset: 0.125rem;
+@_sap_m_InputBase_ReadOnly_BorderRadius: 0.125rem;
 
 
 /* MIN-WIDTH variables */
@@ -288,6 +290,16 @@ input.sapMInputBaseInner:invalid {
 	border-style: var(--sapField_ReadOnly_BorderStyle);
 	background: var(--sapField_ReadOnly_BackgroundStyle);
 	background-color: var(--sapField_ReadOnly_Background);
+}
+
+/* read only focus (::before) */
+
+.sapMInputBaseReadonly.sapMInputBaseReadonly:not(.sapMInputBaseDisabled) .sapMInputBaseContentWrapper.sapMInputBaseContentWrapper::before {
+    border-radius: @_sap_m_InputBase_ReadOnly_BorderRadius;
+    top: @_sap_m_InputBase_ReadOnly_FocusOffset;
+    left: @_sap_m_InputBase_ReadOnly_FocusOffset;
+    right: @_sap_m_InputBase_ReadOnly_FocusOffset;
+    bottom: @_sap_m_InputBase_ReadOnly_FocusOffset;
 }
 
 .sapMInputBaseInner:not(.sapMInputBaseReadonlyWrapper):not(.sapMInputBaseContentWrapperState):focus {

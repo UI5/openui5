@@ -2901,10 +2901,11 @@ sap.ui.define([
 		{aTypes : [{}], iScale : 0},
 		{aTypes : [{oConstraints : {}}], iScale : 0},
 		{aTypes : [{oConstraints : {scale : 24}}], iScale : 24},
-		{aTypes : [{oConstraints : {scale : 24}}, {oConstraints : {scale : 42}}], iScale : 24}
+		{aTypes : [{oConstraints : {scale : 24}}, {oConstraints : {scale : 42}}], iScale : 24},
+		{aTypes : [{oConstraints : {scale : Infinity}}], iScale : undefined}
 	].forEach(({aTypes, iScale}, i) => {
 		QUnit.test("Unit: processPartTypes, i=" + i, function (assert) {
-			const oUnitType = {};
+			const oUnitType = {iScale: "~currentScale"};
 			if (aTypes[0]) {
 				aTypes[0].isA = () => {};
 				const oTypeMock = this.mock(aTypes[0]);
@@ -2928,7 +2929,7 @@ sap.ui.define([
 		{bInt: true, iScale: 0} // quantity type is Int*
 	].forEach(({bInt, iScale}, i) => {
 		QUnit.test(`Unit: processPartTypes defaults scale to '0' if measure part is integer (${i})`, function (assert) {
-			const oUnitType = {};
+			const oUnitType = {iScale: "~currentScale"};
 			const oQuantityType = {isA() {}};
 			const aTypes = bInt === undefined ? [] : [oQuantityType];
 			if (aTypes[0]) {
