@@ -101,9 +101,7 @@ sap.ui.define([
 			Mobile.init({
 				viewport: !this._debugZoomAndScroll,
 				statusBar: "default",
-				hideBrowser: true,
-				preventScroll: !this._debugZoomAndScroll,
-				rootId: this.getId()
+				preventScroll: !this._debugZoomAndScroll
 			});
 		};
 

@@ -1039,6 +1039,13 @@ sap.ui.define([
 
 		if (sPath === "$count") {
 			if (this.oCountPromise) {
+				if (this.oAggregation.hierarchyQualifier) {
+					// "$count" cannot be used as change listener path because e.g. #_delete calls
+					// indirectly _Helper.addCount with this.mChangeListeners to update the count of
+					// the root nodes. This count must not be propagated to the listeners. So use a
+					// name similar to "$count" which never conflicts with any other valid path.
+					this.registerChangeListener("./$count", oListener);
+				}
 				return this.oCountPromise;
 			}
 			if (this.oAggregation.hierarchyQualifier || this.oAggregation.groupLevels.length) {
@@ -1938,7 +1945,10 @@ sap.ui.define([
 				+ this.oRequestor.buildQueryString(/*sMetaPath*/null, mQueryOptions);
 
 			return this.oRequestor.request("GET", sResourcePath, oGroupLock.getUnlockedCopy())
-				.then(fnResolve) // Note: $count is already of type number here
+				.then((iCount) => { // Note: iCount is already of type number here
+					fnResolve(iCount);
+					_Helper.fireChange(this.mChangeListeners, "./$count", iCount);
+				})
 				.catch((oError) => {
 					this.oCountPromise.$restore();
 					throw oError;

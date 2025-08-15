@@ -8,7 +8,6 @@ sap.ui.define([
 	"sap/ui/core/Element",
 	"sap/ui/core/InvisibleText",
 	"sap/ui/Device",
-	"sap/m/ColumnPopoverActionItem",
 	"sap/m/table/columnmenu/QuickAction",
 	"sap/m/table/columnmenu/QuickResize",
 	"sap/m/Button",
@@ -16,7 +15,7 @@ sap.ui.define([
 	"sap/ui/thirdparty/jquery",
 	// jQuery Plugin "aria"
 	"sap/ui/dom/jquery/Aria"
-], function(PluginBase, Localization, Element, InvisibleText, Device, ColumnPopoverActionItem, QuickAction, QuickResize, Button, Library, jQuery) {
+], function(PluginBase, Localization, Element, InvisibleText, Device, QuickAction, QuickResize, Button, Library, jQuery) {
 	"use strict";
 
 	/**
@@ -543,25 +542,6 @@ sap.ui.define([
 					oColumn.setWidth(oEvent.getParameter("width") + "px");
 				}
 			}, this]
-		});
-	};
-
-	/**
-	 * Returns resizer button instance which on press calls the <code>startResizing</code> method.
-	 * @param {sap.m.Column} oColumn Column instance
-	 * @returns {sap.m.ColumnPopoverActionItem | undefined} column resize action item
-	 * @ui5-restricted sap.ui.mdc
-	 * @private
-	 */
-	ColumnResizer.prototype.getColumnResizeButton = function(oColumn) {
-		if (!oColumn || !ColumnResizer._isInTouchMode()) {
-			return;
-		}
-
-		return new ColumnPopoverActionItem({
-			text: Library.getResourceBundleFor("sap.m").getText("COLUMNRESIZER_RESIZE_BUTTON"),
-			icon: "sap-icon://resize-horizontal",
-			press: this.startResizing.bind(this, oColumn.getDomRef())
 		});
 	};
 

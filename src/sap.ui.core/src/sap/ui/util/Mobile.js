@@ -52,16 +52,12 @@ sap.ui.define(['sap/ui/Device', 'sap/base/Log', 'sap/base/util/extend', 'sap/ui/
 	 * <li>viewport: whether to set the viewport in a way that disables zooming (default: true). This does not
 	 * work in case there is already a meta tag with name 'viewport'.</li>
 	 * <li>statusBar: the iOS status bar color, "default", "black" or "black-translucent" (default: "default")</li>
-	 * <li>hideBrowser: whether the browser UI should be hidden as far as possible to make the app feel more native
-	 * (default: true)</li>
 	 * <li>preventScroll: whether native scrolling should be disabled in order to prevent the "rubber-band" effect
 	 * where the whole window is moved (default: true)</li>
 	 * <li>preventPhoneNumberDetection: whether Safari Mobile should be prevented from transforming any numbers
 	 * that look like phone numbers into clickable links; this should be left as "true", otherwise it might break
 	 * controls because Safari actually changes the DOM. This only affects all page content which is created after
 	 * init() is called and only in case there is not already a meta tag with name 'format-detection'.</li>
-	 * <li>rootId: the ID of the root element that should be made fullscreen; only used when hideBrowser is set
-	 * (default: the document.body)</li>
 	 * <li>useFullScreenHeight: a boolean that defines whether the height of the html root element should be set to
 	 * 100%, which is required for other elements to cover the full height (default: true)</li>
 	 * <li>homeIcon: deprecated since 1.12, use sap/ui/util/Mobile.setIcons instead.
@@ -71,14 +67,10 @@ sap.ui.define(['sap/ui/Device', 'sap/base/Log', 'sap/base/util/extend', 'sap/ui/
 	 * @param {boolean} [options.viewport=true] whether to set the viewport in a way that disables zooming
 	 * @param {string}  [options.statusBar='default'] the iOS status bar color, "default", "black" or
 	 *     "black-translucent"
-	 * @param {boolean} [options.hideBrowser=true] whether the browser UI should be hidden as far as possible to
-	 *     make the app feel more native
 	 * @param {boolean} [options.preventScroll=true] whether native scrolling should be disabled in order to
 	 *     prevent the "rubber-band" effect where the whole window is moved
 	 * @param {boolean} [options.preventPhoneNumberDetection=true] whether Safari mobile should be prevented from
 	 *     transforming any numbers that look like phone numbers into clickable links
-	 * @param {string}  [options.rootId] the ID of the root element that should be made fullscreen; only used when
-	 *     hideBrowser is set. If not set, the body is used
 	 * @param {boolean} [options.useFullScreenHeight=true] whether the height of the html root element should be
 	 *     set to 100%, which is required for other elements to cover the full height
 	 * @param {string}  [options.homeIcon=undefined] deprecated since 1.12, use sap/ui/util/Mobile.setIcons instead.
@@ -98,7 +90,6 @@ sap.ui.define(['sap/ui/Device', 'sap/base/Log', 'sap/base/util/extend', 'sap/ui/
 			options = extend({}, { // merge in the default values
 				viewport: true,
 				statusBar: "default",
-				hideBrowser: true,
 				preventScroll: true,
 				preventPhoneNumberDetection: true,
 				useFullScreenHeight: true,

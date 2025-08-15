@@ -102,7 +102,7 @@
 			</description>
 		</interaction>
 		<interaction> <kbd>Shift + Spacebar</kbd> <description>
-				<p>Wenn der Fokus auf <span class="uicontrol">Alle markieren</span> liegt und die <kbd>Spacebar</kbd> gedrückt wird, wird das entsprechende Ereignis nicht ausgelöst. Die <kbd>Shift</kbd> verhindert diese Aktivität.</p>
+				<p>Wenn der Fokus auf <span class="uicontrol">Alle markieren</span> liegt und die <kbd>Spacebar</kbd> gedrückt wird, wird das entsprechende Ereignis nicht ausgelöst. <kbd>Shift</kbd> verhindert diese Aktivität.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Shift + Spacebar</kbd> <kbd>Shift + Enter</kbd> <description>
