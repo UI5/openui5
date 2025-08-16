@@ -5,9 +5,10 @@ sap.ui.define([
 	"sap/m/MessageBox",
 	"sap/ui/model/Filter",
 	"sap/ui/model/FilterOperator",
+	"sap/ui/model/json/JSONModel",
 	"sap/ui/core/sample/common/Controller",
 	"sap/ui/test/TestUtils"
-], function (MessageBox, Filter, FilterOperator, Controller, TestUtils) {
+], function (MessageBox, Filter, FilterOperator, JSONModel, Controller, TestUtils) {
 	"use strict";
 
 	return Controller.extend("sap.ui.core.sample.odata.v4.RecursiveHierarchy.RecursiveHierarchy", {
@@ -64,6 +65,10 @@ sap.ui.define([
 		},
 
 		onInit() {
+			this.getView().setModel(new JSONModel({
+				bCopy : false
+			}), "ui");
+
 			// initialization has to wait for view model/context propagation
 			this.getView().attachEventOnce("modelContextChange", function () {
 				const oUriParameters = new URLSearchParams(window.location.search);
@@ -159,13 +164,13 @@ sap.ui.define([
 			}, this);
 		},
 
-		async onMakeRoot(oEvent, bLastSibling, bCopy) {
+		async onMakeRoot(oEvent, bLastSibling) {
 			try {
 				this.getView().setBusy(true);
 				const oNode = oEvent.getSource().getBindingContext();
 
 				const iCopyIndex = await oNode.move({
-					copy : bCopy,
+					copy : this.getView().getModel("ui").getProperty("/bCopy"),
 					nextSibling : bLastSibling ? null : undefined,
 					parent : null
 				});
@@ -179,10 +184,9 @@ sap.ui.define([
 			}
 		},
 
-		onMove(oEvent, bInTreeTable, vNextSibling, bCopy) {
+		onMove(oEvent, bInTreeTable, vNextSibling) {
 			this._bInTreeTable = bInTreeTable;
 			this._vNextSibling = vNextSibling === "" ? undefined : vNextSibling;
-			this._bCopy = bCopy;
 			this._oNode = oEvent.getSource().getBindingContext();
 			const oSelectDialog = this.byId("moveDialog");
 			oSelectDialog.setBindingContext(this._oNode);
@@ -215,7 +219,7 @@ sap.ui.define([
 					});
 				} else {
 					iCopyIndex = await this._oNode.move({
-						copy : this._bCopy,
+						copy : this.getView().getModel("ui").getProperty("/bCopy"),
 						nextSibling : this._vNextSibling,
 						parent : oParent
 					});

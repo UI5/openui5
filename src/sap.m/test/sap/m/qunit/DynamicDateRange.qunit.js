@@ -16,7 +16,8 @@ sap.ui.define([
 	"sap/ui/core/Icon",
 	"sap/m/Label",
 	"sap/ui/Device",
-	"sap/ui/core/date/UI5Date"
+	"sap/ui/core/date/UI5Date",
+	"sap/base/Log"
 ], function(
 	Formatting,
 	Localization,
@@ -34,7 +35,8 @@ sap.ui.define([
 	Icon,
 	Label,
 	Device,
-	UI5Date
+	UI5Date,
+	Log
 ) {
 	"use strict";
 
@@ -1875,6 +1877,33 @@ sap.ui.define([
 
 		// assert - check if the validation handler's bubbling is cancelled by the responsive popover
 		assert.ok(oPopupInvalidateSpy.called, "invalidate method of the popover is called when footer visibity is set fo truse");
+	});
+
+	QUnit.test("Empty custom option does not log error when adding suggestion item", async function(assert) {
+		// arrange
+		var oOption = new DynamicDateOption({key: "Date-Empty"}),
+			oDDR = new DynamicDateRange(),
+			oValue = {operator: 'Date-Empty', values: Array(0)};
+
+		oOption.toDates = function() {
+			return {};
+		};
+		oOption.format = function(oValue) {
+			return oValue.values[0];
+		};
+		oDDR.addCustomOption(oOption);
+
+		sinon.spy(Log, "error");
+
+		oDDR.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		// act/assert
+		oDDR._addSuggestionItem(oValue);
+		assert.equal(Log.error.callCount, 0, "No error was logged");
+
+		// cleanup
+		oDDR.destroy();
 	});
 
 	QUnit.module("Groups", {

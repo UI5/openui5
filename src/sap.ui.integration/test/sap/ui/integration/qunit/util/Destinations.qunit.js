@@ -612,6 +612,7 @@ sap.ui.define([
 				this.oCard.destroy();
 				this.oHost.destroy();
 				this.oServer.restore();
+				this.oServer.xhr.useFilters = false;
 			}
 		});
 
@@ -894,6 +895,97 @@ sap.ui.define([
 			// Assert
 			assert.strictEqual(oChildCard.getCardHeader().getTitle(), "Card Title", "Child card displays correct data.");
 			assert.ok(this.resolveDestinationSpy.calledOnceWith("contentDestination", this.oCard), "resolveDestination was called once for content destination of the child card.");
+		});
+
+		QUnit.module("Destinations in child cards created by Paginator", {
+			beforeEach: function () {
+				this.oCard = new Card({
+					baseUrl: "test-resources/sap/ui/integration/qunit/testResources/"
+				});
+				this.oCard.placeAt(DOM_RENDER_LOCATION);
+
+				this.oServer = sinon.createFakeServer({
+					autoRespond: true,
+					respondImmediately: true
+				});
+
+				this.oServer.respondWith("GET", /fakeService\/getProducts/, function (oXhr) {
+					const aDataItems = [];
+
+					for (let i = 0; i < 77; i++) {
+						aDataItems.push({
+							ProductName: "Name " + i
+						});
+					}
+
+					oXhr.respond(
+						200,
+						{
+							"Content-Type": "application/json"
+						},
+						JSON.stringify({
+							"value": aDataItems
+						})
+					);
+				});
+			},
+			afterEach: function () {
+				this.oCard.destroy();
+				this.oServer.restore();
+			}
+		});
+
+		QUnit.test("Destinations should be treated the same way as the main card's", async function (assert) {
+			const oManifest = {
+				"sap.app": {
+					"id": "test.pagination.destinations"
+				},
+				"sap.card": {
+					"type": "List",
+					"configuration": {
+						"destinations": {
+							"fakeService": {
+								"name": "fakeService",
+								"defaultUrl": "fakeService"
+							}
+						}
+					},
+					"data": {
+						"request": {
+							"url": "{{destinations.fakeService}}/getProducts"
+						},
+						"path": "/value"
+					},
+					"header": {
+						"title": "Products"
+					},
+					"content": {
+						"item": {
+							"title": "{ProductName}"
+						}
+					},
+					"footer": {
+						"paginator": {
+							"pageSize": 5
+						}
+					}
+				}
+			};
+			this.oCard.setManifest(oManifest);
+			const oLogSpy = this.spy(Log, "error");
+
+			await nextCardReadyEvent(this.oCard);
+			await nextUIUpdate();
+
+			// Act
+			this.oCard.getCardFooter().getAggregation("_showMore").$().trigger("tap");
+			const oChildCard = this.oCard.getDependents()[0].getContent()[0];
+			await nextCardReadyEvent(oChildCard);
+			await nextUIUpdate();
+
+			// Assert
+			assert.strictEqual(oChildCard.getCardContent().getInnerList().getItems().length, 77, "All items are loaded in the child card.");
+			assert.ok(oLogSpy.notCalled, "No error is logged for the child card destinations.");
 		});
 	}
 );

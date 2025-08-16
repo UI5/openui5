@@ -80,18 +80,33 @@ sap.ui.define([
 			}, `'${sText}' with ID ${sId}. ${sComment}`);
 	}
 
+	function selectEnableCopy() {
+		this.waitFor({
+			actions : function (oCheckBox) { oCheckBox.setSelected(true); },
+			controlType : "sap.m.CheckBox",
+			errorMessage : "Could not find checkbox Copy",
+			id : /copyCheckBox/,
+			success : function () {
+				Opa5.assert.ok(true, "Enable Copy");
+			},
+			viewName : sViewName
+		});
+	}
+
 	Opa5.createPageObjects({
 		onTheMainPage : {
 			actions : {
 				copyToParent : function (sId, sParent, sComment) {
-					pressButtonInRow.call(this, sId, /copyToParent/, "Copy to parent", sComment);
+					selectEnableCopy.call(this);
+					pressButtonInRow.call(this, sId, /moveToParent/, "Move to parent", sComment);
 					findParent.call(this, sParent);
 					pressButton.call(this, undefined, function (oControl) {
 							return oControl.getBindingContext().getProperty("ID") === sParent;
 						}, `to select parent with ID ${sParent}`, "sap.m.StandardListItem");
 				},
 				copyToRoot : function (sId, sComment) {
-					pressButtonInRow.call(this, sId, /copyToRoot/, "Copy to root", sComment);
+					selectEnableCopy.call(this);
+					pressButtonInRow.call(this, sId, /moveToRoot/, "Move to root", sComment);
 				},
 				createNewChild : function (sId, sComment) {
 					pressButtonInRow.call(this, sId, /create/, "Create new child below node",
