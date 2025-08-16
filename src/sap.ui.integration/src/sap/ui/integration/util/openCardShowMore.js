@@ -38,7 +38,8 @@ sap.ui.define([
 			{
 				manifest: _createManifest(oCard),
 				baseUrl: oCard.getBaseUrl(),
-				showCloseButton: true
+				showCloseButton: true,
+				isPaginationCard: true
 			}
 		);
 	}

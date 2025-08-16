@@ -68,6 +68,8 @@ sap.ui.define([
 		// shortcut for sap.m.SelectType
 		var SelectType = mobileLibrary.SelectType;
 
+		var TwoColumnSeparator = mobileLibrary.SelectTwoColumnSeparator;
+
 		// shortcut for sap.ui.core.ValueState
 		var ValueState = coreLibrary.ValueState;
 
@@ -2757,6 +2759,89 @@ sap.ui.define([
 			oLabel2.destroy();
 		});
 
+		QUnit.test("it should show the text and additionalText, separated by '-' when select is read-only", function (assert) {
+
+			// system under test
+			var sText = "lorem ipsum",
+				sAdditionalText = "lorem",
+				oSelect = new Select({
+				showSecondaryValues: true,
+				items: [
+					new ListItem({
+						key: "lorem",
+						text: sText,
+						additionalText: sAdditionalText
+					})
+				]
+			});
+
+			oSelect.placeAt("content");
+			nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+			// assert
+			assert.strictEqual(oSelect.$().find(".sapMSelectListItemText").text(), sText, "Only text is shown when select is editable.");
+
+			// act
+			oSelect.setEditable(false);
+			nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+			// assert
+			assert.strictEqual(oSelect.$().find(".sapMSelectListItemText").text(), sText + " \u2013 " + sAdditionalText,
+				"The text and additionalText should be shown, separated by '–' by default when showSecondaryValues is set to true is select is read-only.");
+
+			// act
+			oSelect.setShowSecondaryValues(false);
+			nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+			// assert
+			assert.strictEqual(oSelect.$().find(".sapMSelectListItemText").text(), sText,
+				"The text should be shown without the additionalText when showSecondaryValues is set to false");
+
+			// cleanup
+			oSelect.destroy();
+		});
+
+		QUnit.test("it should show the selected separator when select is read-only", function (assert) {
+			// system under test
+			var oSelect = new Select({
+				editable: false,
+				showSecondaryValues: true,
+				items: [
+					new ListItem({
+						key: "lorem",
+						text: "lorem ipsum",
+						additionalText: "lorem"
+					})
+				]
+			});
+
+			oSelect.placeAt("content");
+			nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+			// assert
+			assert.strictEqual(oSelect.$().find(".sapMSelectListItemText").text(), "lorem ipsum – lorem",
+				"The text and additionalText should be shown, separated by '–' by default when showSecondaryValues is set to true is select is read-only.");
+
+			// act
+			oSelect.setTwoColumnSeparator(TwoColumnSeparator.Bullet);
+			nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+			// assert
+			assert.strictEqual(oSelect.$().find(".sapMSelectListItemText").text(), "lorem ipsum • lorem",
+				"The text and additionalText should be shown, separated by '•' when twoColumnSeparator is set to Bullet");
+
+			// act
+			oSelect.setTwoColumnSeparator(TwoColumnSeparator.VerticalLine);
+			nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+			// assert
+			assert.strictEqual(oSelect.$().find(".sapMSelectListItemText").text(), "lorem ipsum | lorem",
+				"The text and additionalText should be shown, separated by '|' when twoColumnSeparator is set to VerticalLine.");
+
+			// cleanup
+			oSelect.destroy();
+		});
+
 		QUnit.module("addItem()");
 
 		QUnit.test("addItem()", function (assert) {
@@ -4233,6 +4318,152 @@ sap.ui.define([
 			oWarningSelect.destroy();
 			oErrorSelect.destroy();
 			oInformationSelect.destroy();
+		});
+
+		QUnit.test("it should display default tooltip (text) if it is read-only and text is truncated, even if tooltip is not set", function (assert) {
+
+			// system under test
+			var sText = "item 0",
+				oSelect = new Select({
+					width: "10px",
+					editable: false,
+					items: [
+						new Item({
+							key: "0",
+							text: "item 0"}),
+						new Item({
+							key: "1",
+							text: "item 1"})
+						]
+					}),
+				oSelectDomRef;
+
+			// arrange
+			oSelect.placeAt("content");
+			nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+			oSelectDomRef = oSelect.getFocusDomRef();
+
+			// assert
+			assert.strictEqual(oSelectDomRef.getAttribute("title"), sText, "tooltip is set to the text of the item, when text is truncated");
+			assert.strictEqual(oSelect.$("label").attr("title"), sText, "tooltip is set to the text of the item, when text is truncated");
+			assert.strictEqual(oSelect.$("arrow").attr("title"), sText, "tooltip is set to the text of the item, when text is truncated");
+
+			// act
+			oSelect.setWidth("300px");
+			nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+			// assert
+			assert.strictEqual(oSelectDomRef.getAttribute("title"), null, "tooltip is not set when the text is not truncated");
+			assert.strictEqual(oSelect.$("label").attr("title"), undefined, "tooltip is not set when the text is not truncated");
+			assert.strictEqual(oSelect.$("arrow").attr("title"), undefined, "tooltip is not set when the text is not truncated");
+
+			// cleanup
+			oSelect.destroy();
+		});
+
+		QUnit.test("it should display default tooltip (text + additionalText) if it is read-only and text is truncated, even if tooltip is not set", function (assert) {
+
+			// system under test
+			var sText = "item 0",
+				sAdditionalText = "additional text",
+				oSelect = new Select({
+					editable: false,
+					width: "10px",
+					showSecondaryValues: true,
+					items: [
+						new ListItem({
+							key: "0",
+							text: sText,
+							additionalText: sAdditionalText
+						})]
+					}),
+				oSelectDomRef;
+
+			// arrange
+			oSelect.placeAt("content");
+			nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+			oSelectDomRef = oSelect.getFocusDomRef();
+
+			// assert
+			assert.strictEqual(oSelectDomRef.getAttribute("title"), oSelect._getSelectedItemText(),
+				"tooltip is set to the text and additionalText of the item, when text is truncated");
+			assert.strictEqual(oSelect.$("label").attr("title"), oSelect._getSelectedItemText(),
+				"tooltip is set to the text and additionalText of the item, when text is truncated");
+
+			// act
+			oSelect.setWidth("300px");
+			nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+			// assert
+			assert.strictEqual(oSelectDomRef.getAttribute("title"), null, "tooltip is not set when the text is not truncated");
+			assert.strictEqual(oSelect.$("label").attr("title"), undefined, "tooltip is not set when the text is not truncated");
+
+			// cleanup
+			oSelect.destroy();
+		});
+
+		QUnit.test("it should display user tooltip with precedence over the default tooltip", function (assert) {
+
+			// system under test
+			var sText = "item 0",
+				sUserTooltip = "user tooltip",
+				sAdditionalText = "additional text",
+				oSelect = new Select({
+					tooltip: sUserTooltip,
+					editable: false,
+					width: "10px",
+					showSecondaryValues: true,
+					items: [
+						new ListItem({
+							key: "0",
+							text: sText,
+							additionalText: sAdditionalText
+						})]
+					}),
+				oSelectDomRef;
+
+			// arrange
+			oSelect.placeAt("content");
+			nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+			oSelectDomRef = oSelect.getFocusDomRef();
+
+			// assert
+			assert.strictEqual(oSelectDomRef.getAttribute("title"), sUserTooltip, "tooltip is set to the user tooltip");
+			assert.strictEqual(oSelect.$("label").attr("title"), sUserTooltip, "tooltip is set to the user tooltip");
+
+			// cleanup
+			oSelect.destroy();
+		});
+
+		QUnit.test("it should not display tooltip when Select is not enabled", function (assert) {
+			// system under test
+			var sText = "item 0",
+				oSelect = new Select({
+					tooltip: "user tooltip",
+					enabled: false,
+					items: [
+						new Item({
+							key: "0",
+							text: sText
+						})]
+				}),
+				oSelectDomRef;
+
+			// arrange
+			oSelect.placeAt("content");
+			nextUIUpdate.runSync()/*fake timer is used in module*/;
+			oSelectDomRef = oSelect.getFocusDomRef();
+
+			// assert
+			assert.strictEqual(oSelectDomRef.getAttribute("title"), null, "tooltip is not set when the select is not enabled");
+			assert.strictEqual(oSelect.$("label").attr("title"), undefined, "tooltip is not set when the select is not enabled");
+			assert.strictEqual(oSelect.$("arrow").attr("title"), undefined, "tooltip is not set when the select is not enabled");
+
+			// cleanup
+			oSelect.destroy();
 		});
 
 		QUnit.module("removeItem()");

@@ -7,7 +7,7 @@
 	<Page showHeader="false" class="sapUiResponsivePadding--content">
 		<content>
 			<VBox width="300px" class="sapUiSmallMarginTop">
-				<Title text="Configuration:" />
+				<Title text="Basic configuration:" />
 				<HBox alignItems="Center">
 					<Label text="First column ratio:" class="sapUiTinyMarginEnd"/>
 					<Slider width="200px" id="firstSlider" value="3" change="fnFirstSliderChange"/>
@@ -32,10 +32,36 @@
 				<Select
 					id="select"
 					showSecondaryValues= "true"
-					items="{ path: '/items' }">
+					items="{ path: '/items1' }">
 					<core:ListItem text="{firstColumnText}" additionalText="{secondColumnText}"/>
 				</Select>
 			</VBox>
+
+			<VBox width="300px" class="sapUiSmallMarginTop">
+				<Title text="Separator configuration:" />
+				<HBox alignItems="Center">
+					<Label text="Two column separator:" class="sapUiTinyMarginEnd"/>
+					<Select id="selectSeparator" change="fnTwoColumnSeparatorChange">
+						<core:ListItem key="Dash" text="Dash" />
+						<core:ListItem key="Bullet" text="Bullet" />
+						<core:ListItem key="VerticalLine" text="VerticalLine" />
+					</Select>
+				</HBox>
+				<HBox alignItems="Center">
+					<Label text="Editable:" class="sapUiTinyMarginEnd"/>
+					<Switch id="switchEditable" change="fnSwitchEditableChange"/>
+				</HBox>
+				<Title text="Result:" class="sapUiSmallMarginTop"/>
+				<Select
+					width="100%"
+					id="select2"
+					showSecondaryValues= "true"
+					editable="false"
+					items="{ path: '/items2' }">
+					<core:ListItem text="{firstColumnText}" additionalText="{secondColumnText}"/>
+				</Select>
+			</VBox>
+
 		</content>
 	</Page>
 </mvc:View>

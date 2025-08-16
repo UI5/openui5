@@ -119,7 +119,7 @@ sap.ui.define([
 			 * Depending on the model implementation a RequestSent should be fired when a request to a
 			 * backend is sent.
 			 * Contains Parameters:
-			 * url, type, async, info (<strong>deprecated</strong>), infoObject
+			 * url, type, async, info (<b>deprecated</b>), infoObject
 			 */
 			RequestSent : "requestSent",
 
@@ -127,7 +127,7 @@ sap.ui.define([
 			 * Depending on the model implementation a RequestCompleted should be fired when a request
 			 * to a backend is completed regardless if the request failed or succeeded.
 			 * Contains Parameters:
-			 * url, type, async, info (<strong>deprecated</strong>), infoObject, success, errorobject
+			 * url, type, async, info (<b>deprecated</b>), infoObject, success, errorobject
 			 */
 			RequestCompleted : "requestCompleted",
 
@@ -329,7 +329,7 @@ sap.ui.define([
 		 * @param {boolean} [oEvent.getParameters.async]
 		 *   If the request is synchronous or asynchronous (if available)
 		 * @param {string} [oEvent.getParameters.info]
-		 *   Additional information for the request (if available) <strong>deprecated</strong>
+		 *   <b>Deprecated as of version 1.38.0.</b>, additional information for the request (if available)
 		 * @param {object} [oEvent.getParameters.infoObject]
 		 *   Additional information for the request (if available)
 		 * @public
@@ -390,7 +390,7 @@ sap.ui.define([
 		 * @param {boolean} [oParameters.async]
 		 *   If the request is synchronous or asynchronous (if available)
 		 * @param {string} [oParameters.info]
-		 *   Additional information for the request (if available) <strong>deprecated</strong>
+		 *   <b>Deprecated as of version 1.38.0.</b>, additional information for the request (if available)
 		 * @param {object} [oParameters.infoObject]
 		 *   Additional information for the request (if available)
 		 *
@@ -429,7 +429,7 @@ sap.ui.define([
 		 * @param {boolean} [oEvent.getParameters.async]
 		 *   If the request is synchronous or asynchronous (if available)
 		 * @param {string} [oEvent.getParameters.info]
-		 *   Additional information for the request (if available) <strong>deprecated</strong>
+		 *   <b>Deprecated as of version 1.38.0.</b>, additional information for the request (if available)
 		 * @param {object} [oEvent.getParameters.infoObject]
 		 *   Additional information for the request (if available)
 		 * @public
@@ -493,7 +493,7 @@ sap.ui.define([
 		 * @param {boolean} [oParameters.async]
 		 *   If the request was synchronous or asynchronous (if available)
 		 * @param {string} [oParameters.info]
-		 *   additional information for the request (if available) <strong>deprecated</strong>
+		 *   <b>Deprecated as of version 1.38.0.</b>, additional information for the request (if available)
 		 * @param {object} [oParameters.infoObject]
 		 *   Additional information for the request (if available)
 		 *

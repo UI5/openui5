@@ -59,8 +59,14 @@ sap.ui.define([
 		}
 	});
 
-	Destinations.create = function (oCard, oMainCard) {
-		Destinations._validateConfiguration(oCard, oMainCard);
+	Destinations.create = function (mParameters) {
+		const oCard = mParameters.card;
+		const oMainCard = mParameters.mainCard;
+		const bIsPaginationCard = mParameters.isPaginationCard;
+
+		if (!bIsPaginationCard) {
+			Destinations._validateConfiguration(oCard, oMainCard);
+		}
 
 		let oResolverCard = oCard;
 		let sPrefix = "destinations";

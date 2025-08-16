@@ -1145,7 +1145,9 @@ sap.ui.define([
 			this._oInput.addSuggestionItem(oItem);
 
 			// Called after addSuggestionItem because the suggested items are needed in _getDatesLabelFormatter.
-			oItem.setAdditionalText(this._getDatesLabelFormatter().format(aResultingDates));
+			if (aResultingDates.length > 0) {
+				oItem.setAdditionalText(this._getDatesLabelFormatter().format(aResultingDates));
+			}
 		};
 
 		/**

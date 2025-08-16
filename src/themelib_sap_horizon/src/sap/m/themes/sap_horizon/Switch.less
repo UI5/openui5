@@ -5,30 +5,33 @@
 
 /* Switch container */
 .sapMSwtCont {
-	overflow: hidden;
+	overflow: visible;
 	/* in order to have a touchable area of 2.75rem height and 3.5rem width */
-	padding: 0.625rem 0.5rem;
+	padding: 0.625rem 0;
 }
 
 /* focus */
 html.sap-desktop {
 
-	.sapMSwtCont:focus > .sapMSwt::before {
+	.sapMSwtCont:focus::after {
 		content: ' ';
 		position: absolute;
 		display: block;
-		top: -0.3125rem;
-		left: -0.3125rem;
-		bottom: -0.3125rem;
-		right: -0.3125rem;
+		top: 0.375rem;
+		left: -0.25rem;
+		bottom: 0.375rem;
+		right: -0.25rem;
 		border: 0.125rem solid var(--sapContent_FocusColor);
 		border-radius: 1rem;
+		pointer-events: none;
 	}
 
 	.sapUiSizeCompact {
 
-		.sapMSwtCont:focus > .sapMSwt::before {
+		.sapMSwtCont:focus::after {
 			border-radius: 0.875rem;
+			top: 0.125rem;
+			bottom: 0.125rem;
 		}
 	}
 }
@@ -37,7 +40,7 @@ html.sap-desktop {
 .sapMSwt {
 	width: 2.875rem;
 	height: 1.5rem;
-	overflow: visible;
+	overflow: hidden;
 	border: none;
 	margin: 0;
 	border-radius: 0.75rem;
