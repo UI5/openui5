@@ -157,5 +157,20 @@
         "text": " sap.uxap.ObjectPageSection: Fix fast navigation"
       }
     ]
+  },
+  "1.120.34": {
+    "date": "August 2025",
+    "notes": [
+      {
+        "id": "f400cc7a30a971cbe6503217691e1f6634a79d55",
+        "type": "FIX",
+        "text": " sap.uxpa.ObjectPageSubSection: Improved key handling"
+      },
+      {
+        "id": "d5264b231792ff7f828ef834bc03dda5dc32fb4c",
+        "type": "FIX",
+        "text": " sap.uxap.ObjectPageLayout: Improve accessibility behavior"
+      }
+    ]
   }
 }

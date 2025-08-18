@@ -1286,5 +1286,20 @@
         "text": " p13n.Engine: provide a way to pass event handler context to stateHandlerRegistry"
       }
     ]
+  },
+  "1.120.34": {
+    "date": "August 2025",
+    "notes": [
+      {
+        "id": "fe7b001eb0d007731d799bc89db5ede6de93ca81",
+        "type": "FIX",
+        "text": " sap.m.SinglePlanningCalendarGrid: get appointment domref correctly"
+      },
+      {
+        "id": "f36111a0547a072a5d43af4ce1cbd2f073e8324b",
+        "type": "FIX",
+        "text": " List: Avoid aria-describedby=\"null\""
+      }
+    ]
   }
 }
