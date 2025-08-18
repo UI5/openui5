@@ -16,6 +16,26 @@
 (function(__global) {
 	"use strict";
 
+	// Polyfill `Promise.withResolvers` for older browsers.
+	if (typeof Promise.withResolvers === "undefined") {
+		Object.defineProperty(Promise, "withResolvers", {
+			writable: true,
+			configurable: true,
+			// enumerable: false
+			value: function() {
+				let resolve, reject;
+				return {
+					promise: new this((_resolve, _reject) => {
+						resolve = _resolve;
+						reject = _reject;
+					}),
+					resolve,
+					reject
+				};
+			}
+		});
+	}
+
 	/*
 	 * Helper function that removes any query and/or hash parts from the given URL.
 	 *
