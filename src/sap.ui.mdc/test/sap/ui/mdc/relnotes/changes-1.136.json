@@ -63,5 +63,15 @@
         "text": " PropertyHelperUtil: check UI5 2.0 availability by deprecations"
       }
     ]
+  },
+  "1.136.5": {
+    "date": "August 2025",
+    "notes": [
+      {
+        "id": "dabb065989d66eefa23a0973a94a872f6f58c234",
+        "type": "FIX",
+        "text": " PropertyHelperUtil: check UI5 2.0 availability by deprecations"
+      }
+    ]
   }
 }

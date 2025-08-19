@@ -38,5 +38,15 @@
         "text": " Demo Kit: Remove redundant version visibility"
       }
     ]
+  },
+  "1.136.5": {
+    "date": "August 2025",
+    "notes": [
+      {
+        "id": "316628f3845520bba05e61d72258a10208ad995a",
+        "type": "FIX",
+        "text": " Demo Kit: Remove redundant version visibility"
+      }
+    ]
   }
 }
