@@ -10,8 +10,9 @@ sap.ui.define([
 	"sap/m/Text",
 	"sap/ui/events/KeyCodes",
 	"sap/ui/qunit/QUnitUtils",
-	"sap/m/table/Util"
-], function (BasePanel, ColumnListItem, sinon, Event, MessageStrip, nextUIUpdate, VBox, Text, KeyCodes, qutils, TableUtil) {
+	"sap/m/table/Util",
+	"sap/ui/model/Filter"
+], function (BasePanel, ColumnListItem, sinon, Event, MessageStrip, nextUIUpdate, VBox, Text, KeyCodes, qutils, TableUtil, Filter) {
 	"use strict";
 
 	QUnit.module("BasePanel API tests", {
@@ -413,4 +414,85 @@ sap.ui.define([
 		assert.ok(oTableUtiLSpy.calledOnce, "TableUtil.announceTableUpdate has been called");
 	});
 
+	// Test: Filter Panel so that x items are shown. Click on Select All checkbox. Remove Filter. Observe that only the filtered items are selected instead of all items.
+	QUnit.test("Select All only affects filtered items, not all items", async function(assert) {
+		// Arrange: Set up panel with 4 items, only 1 will be shown after filtering
+		this.oBasePanel.setP13nData([
+			{ label: "Test", name: "test", visible: false },
+			{ label: "Test2", name: "test2", visible: false },
+			{ label: "Test3", name: "test3", visible: false },
+			{ label: "Field 4", name: "test4", visible: false }
+		]);
+		// Filter so only "Field 4" is shown
+		this.oBasePanel._oListControl.getBinding("items").filter(new Filter("label", "Contains", "Field 4"), "Control");
+		await nextUIUpdate();
+
+		return new Promise((resolve) => {
+			this.oBasePanel.attachChange(async (oEvt) => {
+				const aChangedItems = oEvt.getParameter("item");
+
+				// Only the filtered item should be selected
+				assert.equal(aChangedItems.length, 1, "Only one item was affected by Select All");
+				assert.equal(aChangedItems[0].name, "test4", "Only the filtered item was selected");
+
+				// Now remove the filter and check that only the previously filtered item is selected
+				this.oBasePanel._oListControl.getBinding("items").filter([]);
+				await nextUIUpdate();
+
+				const aP13nData = this.oBasePanel.getP13nData();
+				const aSelected = aP13nData.filter(function(oItem) { return oItem.visible; });
+				assert.equal(aSelected.length, 1, "Only one item is selected after removing filter");
+				assert.equal(aSelected[0].name, "test4", "Only the previously filtered item remains selected");
+
+				resolve();
+			});
+
+			this.oBasePanel._oListControl.fireSelectionChange({
+				listItems: [this.oBasePanel._oListControl.getItems()[0]],
+				selectAll: true
+			});
+		});
+	});
+
+	// Test: All items are selected initally. Filter Panel so that x items are shown. Click on Select All/Deselect All checkbox. Remove Filter. Observe that only the previously filtered items are unselected.
+	QUnit.test("Deselect All only affects filtered items, not all items", async function(assert) {
+		// Arrange: Set up panel with 4 items, all visible initially
+		this.oBasePanel.setP13nData([
+			{ label: "Test", name: "test", visible: true },
+			{ label: "Test2", name: "test2", visible: true },
+			{ label: "Test3", name: "test3", visible: true },
+			{ label: "Field 4", name: "test4", visible: true }
+		]);
+		// Filter so only "Test" and "Test2" are shown
+		this.oBasePanel._oListControl.getBinding("items").filter(new Filter("label", "Contains", "Test"), "Control");
+		await nextUIUpdate();
+
+		return new Promise((resolve) => {
+			this.oBasePanel.attachChange(async (oEvt) => {
+				const aChangedItems = oEvt.getParameter("item");
+
+				// All filtered items should be deselected
+				assert.equal(aChangedItems.length, 3, "Two items were affected by Deselect All");
+				assert.equal(aChangedItems[0].name, "test", "First filtered item was deselected");
+				assert.equal(aChangedItems[1].name, "test2", "Second filtered item was deselected");
+				assert.equal(aChangedItems[2].name, "test3", "Third filtered item was deselected");
+
+				// Now remove the filter and check that only the previously filtered items are unselected
+				this.oBasePanel._oListControl.getBinding("items").filter([]);
+				await nextUIUpdate();
+
+				const aP13nData = this.oBasePanel.getP13nData();
+				const aSelected = aP13nData.filter(function(oItem) { return oItem.visible; });
+				assert.equal(aSelected.length, 1, "Only one item remains selected after removing filter");
+				assert.equal(aSelected[0].name, "test4", "Only the unfiltered item remains selected");
+
+				resolve();
+			});
+
+			this.oBasePanel._oListControl.fireSelectionChange({
+				listItems: this.oBasePanel._oListControl.getItems(),
+				selectAll: false
+			});
+		});
+	});
 });

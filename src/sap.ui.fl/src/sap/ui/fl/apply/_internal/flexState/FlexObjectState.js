@@ -208,12 +208,12 @@ sap.ui.define([
 	};
 
 	/**
-	 * Waits for all the changes for all controls that are passed to be processed and a variant switch to be done.
+	 * Waits for all the changes for all controls that are passed to be processed.
 	 *
 	 * @param {object[]} aSelectorInformation - An array containing an object with {@link sap.ui.fl.Selector} and further configuration
 	 * @param {sap.ui.fl.Selector} aSelectorInformation.selector - A {@link sap.ui.fl.Selector}
 	 * @param {string[]} [aSelectorInformation.changeTypes] - An array containing the change types that will be considered. If empty no filtering will be done
-	 * @returns {Promise} Resolves when a variant switch is done and all changes on controls have been processed
+	 * @returns {Promise} Resolves when all changes on controls have been processed
 	 */
 	FlexObjectState.waitForFlexObjectsToBeApplied = async function(aSelectorInformation) {
 		const oAppComponent = Utils.getAppComponentForSelector(aSelectorInformation[0].selector);
@@ -222,7 +222,6 @@ sap.ui.define([
 		}
 		const sFlexReference = ManifestUtils.getFlexReferenceForControl(oAppComponent);
 
-		await VariantManagementState.waitForAllVariantSwitches(sFlexReference);
 		await Promise.all(aSelectorInformation.map((oSelector) => {
 			const oControl = oSelector.selector.id && Element.getElementById(oSelector.selector.id) || oSelector.selector;
 

@@ -9,6 +9,7 @@
 @_sap_m_Avatar_Font_Size_S: 1.5rem;
 @_sap_m_Avatar_Font_Size_XS: 1rem;
 @_sap_m_Avatar_Hover_Box_Shadow_Offset: 0 0 0 0.0625rem;
+@_sap_m_Avatar_Badge_Icon_Box_Shadow: 0 0 0 0.0625rem;
 
 .sapFAvatar {
 	display: inline-block;
@@ -285,8 +286,9 @@ html:not(.sap-desktop) .sapFAvatarFocusable.sapMAvatarPressed {
 	@background: 'sapAccentBackgroundColor@{i}';
 
 	.sapFAvatarBadgeColorAccent@{i} .sapFAvatarBadgeIcon {
-		box-shadow: @_sap_m_Avatar_Hover_Box_Shadow_Offset @@color;
+		box-shadow: @_sap_m_Avatar_Badge_Icon_Box_Shadow @@color;
 		background-color: @@background;
+		border: 0;
 		> .sapUiIcon {
 			color: @@color;
 		}
@@ -297,9 +299,28 @@ html:not(.sap-desktop) .sapFAvatarFocusable.sapMAvatarPressed {
 
 .generateBadgeColor(1);
 
+.generateIndicationBadgeColor(@i) when (@i =< 10) {
+	@color: ~'--sapIndicationColor_@{i}_TextColor';
+	@background: ~'--sapIndicationColor_@{i}_Background';
+	@border: ~'--sapIndicationColor_@{i}_BorderColor';
+
+	.sapFAvatarBadgeColorIndication@{i} .sapFAvatarBadgeIcon {
+		background-color: var(~'@{background}');
+		box-shadow: var(--sapContent_Shadow1);
+		border: var(~'@{border}');
+		> .sapUiIcon {
+			color: var(~'@{color}');
+		}
+	}
+
+	.generateIndicationBadgeColor(@i + 1);
+}
+.generateIndicationBadgeColor(1);
+
 .sapFAvatarWarning .sapFAvatarBadgeIcon {
 	background-color: var(--sapWarningBackground);
-	box-shadow: @_sap_m_Avatar_Hover_Box_Shadow_Offset var(--sapWarningBorderColor);
+	box-shadow: @_sap_m_Avatar_Badge_Icon_Box_Shadow var(--sapWarningBorderColor);
+	border: 0;
 
 	> .sapUiIcon {
 		color: var(--sapCriticalTextColor);
@@ -308,7 +329,8 @@ html:not(.sap-desktop) .sapFAvatarFocusable.sapMAvatarPressed {
 
 .sapFAvatarError .sapFAvatarBadgeIcon {
 	background-color: var(--sapErrorBackground);
-	box-shadow: @_sap_m_Avatar_Hover_Box_Shadow_Offset var(--sapErrorBorderColor);
+	box-shadow: @_sap_m_Avatar_Badge_Icon_Box_Shadow var(--sapErrorBorderColor);
+	border: 0;
 
 	> .sapUiIcon {
 		color: var(--sapNegativeTextColor);
@@ -317,7 +339,8 @@ html:not(.sap-desktop) .sapFAvatarFocusable.sapMAvatarPressed {
 
 .sapFAvatarInformation .sapFAvatarBadgeIcon {
 	background-color: var(--sapInformationBackground);
-	box-shadow: @_sap_m_Avatar_Hover_Box_Shadow_Offset var(--sapInformationBorderColor);
+	box-shadow: @_sap_m_Avatar_Badge_Icon_Box_Shadow var(--sapInformationBorderColor);
+	border: 0;
 
 	> .sapUiIcon {
 		color: var(--sapInformativeTextColor);
@@ -326,7 +349,8 @@ html:not(.sap-desktop) .sapFAvatarFocusable.sapMAvatarPressed {
 
 .sapFAvatarSuccess .sapFAvatarBadgeIcon {
 	background-color: var(--sapSuccessBackground);
-	box-shadow: @_sap_m_Avatar_Hover_Box_Shadow_Offset var(--sapSuccessBorderColor);
+	box-shadow: @_sap_m_Avatar_Badge_Icon_Box_Shadow var(--sapSuccessBorderColor);
+	border: 0;
 
 	> .sapUiIcon {
 		color: var(--sapPositiveTextColor);

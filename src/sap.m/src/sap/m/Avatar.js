@@ -438,15 +438,17 @@ sap.ui.define([
 	};
 
 	Avatar.prototype.setBadgeIconColor = function(sValue) {
-		Object.keys(AvatarBadgeColor).forEach(function(val) {
-			if (val.indexOf("Accent") !== -1) {
-				this.removeStyleClass('sapFAvatarBadgeColor' + val);
-			}
+		var aBadgeIconColors = Object.keys(AvatarBadgeColor);
+
+		if (aBadgeIconColors.indexOf(sValue) === -1) {
+			return this;
+		}
+
+		aBadgeIconColors.forEach(function(val) {
+			this.removeStyleClass('sapFAvatarBadgeColor' + val);
 		}.bind(this));
 
-		if (sValue && sValue.indexOf("Accent") !== -1) {
-			this.addStyleClass('sapFAvatarBadgeColor' + sValue);
-		}
+		this.addStyleClass('sapFAvatarBadgeColor' + sValue);
 
 		this.setProperty("badgeIconColor", sValue, true);
 		return this;

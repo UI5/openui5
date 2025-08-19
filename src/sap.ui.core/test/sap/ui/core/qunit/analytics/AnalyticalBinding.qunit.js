@@ -399,14 +399,9 @@ sap.ui.define([
 		afterEach : function (assert) {
 			// this would ruin AnalyticalTable.qunit.js in testsuite4analytics
 //			XMLHttpRequest.restore();
-			this._oSandbox.verifyAndRestore();
 		},
 
 		beforeEach : function () {
-			this._oSandbox = sinon.sandbox.create({
-				injectInto : this,
-				properties : ["mock", "spy", "stub"]
-			});
 			this.oLogMock = this.mock(AnalyticalBinding.Logger);
 			this.oLogMock.expects("warning").never();
 			this.oLogMock.expects("error").never();
@@ -567,7 +562,7 @@ sap.ui.define([
 			done = assert.async();
 
 		setupAnalyticalBinding({useBatchRequests: false}, function (oBinding, oModel) {
-			sinon.stub(oModel, "read", function (sPath) {
+			sinon.stub(oModel, "read").callsFake(function (sPath) {
 				assert.strictEqual(sPath, sExpectedPath, "percent encoding of space done");
 
 				oModel.read.restore();

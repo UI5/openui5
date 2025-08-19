@@ -719,20 +719,40 @@ sap.ui.define([
 		}
 	};
 
+	function flattenFilters(aFilters) {
+		return aFilters.reduce((aResult, oFilter) => {
+			const aFilters = oFilter.getFilters();
+			if (aFilters) {
+				aResult.push(...flattenFilters(aFilters));
+			} else {
+				aResult.push(oFilter);
+			}
+			return aResult;
+		}, []);
+	}
+
 	BasePanel.prototype._onSelectionChange = function(oEvent) {
 
 		const oSelectedItem = oEvent.getParameter("listItem");
 		this._oLastSelectedItem = oSelectedItem;
 		const aListItems = oEvent.getParameter("listItems");
-		const sSpecialChangeReason = this._checkSpecialChangeReason(oEvent.getParameter("selectAll"), oEvent.getParameter("listItems"));
+		let sSpecialChangeReason = this._checkSpecialChangeReason(oEvent.getParameter("selectAll"), oEvent.getParameter("listItems"));
 
 		if (sSpecialChangeReason) {
 			let aModelItems = [];
 			if (sSpecialChangeReason === this.CHANGE_REASON_DESELECTALL || sSpecialChangeReason === this.CHANGE_REASON_SELECTALL) {
-				aModelItems = this.getP13nData().map((oItem) => {
+				const aFilters = flattenFilters(this._oListControl.getBinding("items").getFilters("Control"));
+				const oFilter = aFilters?.find((oFilter) => oFilter.getPath() === "label");
+
+				aModelItems = this.getP13nData().filter((oItem) => oFilter?.getTest()(oItem.label.toUpperCase()) ?? true).map((oItem) => {
 					oItem[this.PRESENCE_ATTRIBUTE] = sSpecialChangeReason === this.CHANGE_REASON_SELECTALL;
 					return oItem;
 				});
+
+				if (aModelItems.length !== this.getP13nData().length) {
+					// This case will happen, if the user filtered the list and then selects/deselects all items. This should then be treated as RangeSelect instead of SelectAll/DeselectAll
+					sSpecialChangeReason = this.CHANGE_REASON_RANGESELECT;
+				}
 			} else {
 				aModelItems = aListItems.map((oTableItem) => this._getModelEntry(oTableItem));
 			}

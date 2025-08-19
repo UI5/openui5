@@ -3,7 +3,7 @@
  */
 
 // Provides information about 'explored' samples.
-sap.ui.define(["sap/ui/thirdparty/jquery", 'sap/ui/documentation/library', "sap/base/Log", "sap/ui/documentation/sdk/util/Resources"], function(jQuery, library, Log, ResourcesUtil) {
+sap.ui.define(["sap/ui/thirdparty/jquery", 'sap/ui/documentation/library', "sap/base/Log", "sap/ui/documentation/sdk/util/Resources", "sap/ui/VersionInfo"], function(jQuery, library, Log, ResourcesUtil, VersionInfo) {
 	"use strict";
 
 	var oPromise;
@@ -12,22 +12,35 @@ sap.ui.define(["sap/ui/thirdparty/jquery", 'sap/ui/documentation/library', "sap/
 
 		loadData: function() {
 			if (!oPromise) {
-
-				oPromise = new Promise(function(resolve, reject) {
-					library._loadAllLibInfo(
-						"", "_getDocuIndex",
-						function (aLibs, oDocIndicies) {
-							var oData = ControlsInfo._getIndices(aLibs, oDocIndicies, function () {
-								// We pass the resolve method to be called when we have all the component data loaded
-								resolve(oData);
-							});
-						});
-				});
+				const onInfoLoaded = function({ isOpenUI5 }) {
+					return new Promise(function(resolve, reject) {
+						library._loadAllLibInfo(
+							"", "_getDocuIndex",
+							function (aLibs, oDocIndicies) {
+								var oData = ControlsInfo._getIndices(aLibs, oDocIndicies, function () {
+									// We pass the resolve method to be called when we have all the component data loaded
+									resolve(oData);
+								}, { isOpenUI5 });
+							}
+						);
+					});
+				};
+				oPromise = Promise.all([
+					// gather all needed info first
+					VersionInfo.load()
+				]).then(function(aResults) {
+					const [oVersionInfo] = aResults;
+					const gav = oVersionInfo?.gav?.toLowerCase(); // gav is available on productive environments
+					const name = oVersionInfo?.name?.toLowerCase(); // for local development the name is sufficient
+					const isOpenUI5 = /openui5/i.test(gav || name) ?? true; // fallback to true
+					return { isOpenUI5 };
+				}).then(onInfoLoaded);
 			}
 			return oPromise;
 		},
 
-		_getIndices: function (aLibs, oDocIndicies, fnComponentLoadCallback) {
+		_getIndices: function (aLibs, oDocIndicies, fnComponentLoadCallback, oInfo) {
+			var isOpenUI5 = oInfo.isOpenUI5;
 			var aInternalCategoryAllowList = [
 				"_PRIVATE_"
 			];
@@ -212,6 +225,21 @@ sap.ui.define(["sap/ui/thirdparty/jquery", 'sap/ui/documentation/library', "sap/
 					});
 
 					oEnt.library = oDoc.library;
+
+					if (oEnt.samples?.length > 0) {
+						// filter samples based on UI5 distribution
+						oEnt.samples = oEnt.samples.filter(function (sSample) {
+							var oSample = data.samples[sSample];
+							if (oSample && oSample.sapui5Only) {
+								return !isOpenUI5;
+							}
+							return true;
+						});
+						// if no samples are left, skip the entity altogether
+						if (oEnt.samples.length === 0) {
+							return;
+						}
+					}
 
 					// add entity (exclude hidden entities)
 					if (aCategoryAllowList.indexOf(oEnt.category) > -1 && !oEnt.hidden) {

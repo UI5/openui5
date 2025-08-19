@@ -175,7 +175,6 @@ sap.ui.define([
 	}];
 
 	let aAllNodes; // in preorder, does not contain nodes that are filtered out
-	let sCopyID; // the ID of the copy, needed for patching the parent with Content-ID referencing
 	let mChildrenByParentId; // no entry for leaves! Does not contain nodes that are filtered out
 	let aNewRootIDs; // the IDs for a newly created root node or a copied node
 	let mNodeById; // contains all nodes incl. those filtered out
@@ -264,7 +263,6 @@ sap.ui.define([
 	function buildCopyResponse(aMatches, oResponse) {
 		const oCopy = copy(mNodeById[aMatches[1]], aNewRootIDs.shift(), /*sNewManagerID*/null);
 		adjustDistanceFromRoot(oCopy, -oCopy.DistanceFromRoot);
-		sCopyID = oCopy.ID;
 
 		// RAP would not respond w/ DescendantCount,DistanceFromRoot,DrillState!
 		const oResultNode = {...oCopy};
@@ -475,8 +473,9 @@ sap.ui.define([
 	 * @param {string[]} aMatches - The matches against the RegExp
 	 * @param {object} _oResponse - Response object to fill
 	 * @param {object} oRequest - Request object to get PATCH body from
+	 * @param {string} [sReferencedMessage] - Response message which this PATCH refers to
 	 */
-	function buildPatchResponse(aMatches, _oResponse, oRequest) {
+	function buildPatchResponse(aMatches, _oResponse, oRequest, sReferencedMessage) {
 		function findLastIndex(aArray, fnPredicate) {
 			return aArray.reduce((iLast, oItem, i) => (fnPredicate(oItem) ? i : iLast), -1);
 		}
@@ -489,8 +488,8 @@ sap.ui.define([
 		const oBody = JSON.parse(oRequest.requestBody);
 		switch (Object.keys(oBody).length === 1 && Object.keys(oBody)[0]) {
 			case "EMPLOYEE_2_MANAGER@odata.bind": {
-				const oChild = aMatches[1] === "$0.0"
-					? mNodeById[sCopyID]
+				const oChild = sReferencedMessage
+					? mNodeById[JSON.parse(sReferencedMessage).ID]
 					: mNodeById[aMatches[1]];
 				if (oChild.Name.includes("ERROR")) {
 					throw new Error("This request intentionally failed!");

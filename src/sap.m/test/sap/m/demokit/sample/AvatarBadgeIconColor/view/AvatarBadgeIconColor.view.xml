@@ -1,0 +1,133 @@
+<mvc:View
+	controllerName="sap.m.sample.AvatarBadgeIconColor.controller.AvatarBadgeIconColor"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m"
+	xmlns:l="sap.ui.layout"
+	height="100%">
+		<ScrollContainer
+			height="100%"
+			width="100%"
+			horizontal="false"
+			vertical="true">
+			<Text
+				text="Avatar with different Accent background colors and Accent badge icon colors:"
+				width="100%"
+				class="sapUiSmallMarginTop sapUiSmallMarginBegin sapUiMediumMarginBottom"/>
+			<l:Grid defaultSpan="XL2 L2 M4 S6">
+			<l:content>
+				<VBox alignItems="Center">
+					<Avatar displaySize="L" backgroundColor="Accent1" badgeIcon="sap-icon://edit" badgeIconColor="Accent1" press="onPress"/>
+					<Text textAlign="Center" text="Accent1 / Accent1" class="sapUiSmallMarginTop"/>
+				</VBox>
+				<VBox alignItems="Center">
+					<Avatar displaySize="L" backgroundColor="Accent2" badgeIcon="sap-icon://edit" badgeIconColor="Accent2" press="onPress"/>
+					<Text textAlign="Center" text="Accent2 / Accent2" class="sapUiSmallMarginTop"/>
+				</VBox>
+				<VBox alignItems="Center">
+					<Avatar displaySize="L" backgroundColor="Accent3" badgeIcon="sap-icon://edit" badgeIconColor="Accent3" press="onPress"/>
+					<Text textAlign="Center" text="Accent3 / Accent3" class="sapUiSmallMarginTop"/>
+				</VBox>
+				<VBox alignItems="Center">
+					<Avatar displaySize="L" backgroundColor="Accent4" badgeIcon="sap-icon://edit" badgeIconColor="Accent4" press="onPress"/>
+					<Text textAlign="Center" text="Accent4 / Accent4" class="sapUiSmallMarginTop"/>
+				</VBox>
+				<VBox alignItems="Center">
+					<Avatar displaySize="L" backgroundColor="Accent5" badgeIcon="sap-icon://edit" badgeIconColor="Accent5" press="onPress"/>
+					<Text textAlign="Center" text="Accent5 / Accent5" class="sapUiSmallMarginTop"/>
+				</VBox>
+				<VBox alignItems="Center">
+					<Avatar displaySize="L" backgroundColor="Accent6" badgeIcon="sap-icon://edit" badgeIconColor="Accent6" press="onPress"/>
+					<Text textAlign="Center" text="Accent6 / Accent6" class="sapUiSmallMarginTop"/>
+				</VBox>
+				<VBox alignItems="Center">
+					<Avatar displaySize="L" backgroundColor="Accent7" badgeIcon="sap-icon://edit" badgeIconColor="Accent7" press="onPress"/>
+					<Text textAlign="Center" text="Accent7 / Accent7" class="sapUiSmallMarginTop"/>
+				</VBox>
+				<VBox alignItems="Center">
+					<Avatar displaySize="L" backgroundColor="Accent8" badgeIcon="sap-icon://edit" badgeIconColor="Accent8" press="onPress"/>
+					<Text textAlign="Center" text="Accent8 / Accent8" class="sapUiSmallMarginTop"/>
+				</VBox>
+				<VBox alignItems="Center">
+					<Avatar displaySize="L" backgroundColor="Accent9" badgeIcon="sap-icon://edit" badgeIconColor="Accent9" press="onPress"/>
+					<Text textAlign="Center" text="Accent9 / Accent9" class="sapUiSmallMarginTop"/>
+				</VBox>
+				<VBox alignItems="Center">
+					<Avatar displaySize="L" backgroundColor="Accent10" badgeIcon="sap-icon://edit" badgeIconColor="Accent10" press="onPress"/>
+					<Text textAlign="Center" text="Accent10 / Accent10" class="sapUiSmallMarginTop"/>
+				</VBox>
+			</l:content>
+		</l:Grid>
+		<Text
+			text="Avatar with different Accent background colors and Indication badge icon colors:"
+			width="100%"
+			class="sapUiSmallMarginTop sapUiSmallMarginBegin sapUiMediumMarginBottom"/>
+		<l:Grid defaultSpan="XL2 L2 M4 S6">
+			<l:content>
+				<VBox alignItems="Center">
+					<Avatar displaySize="L" backgroundColor="Accent1" badgeIcon="sap-icon://edit" badgeIconColor="Indication1" press="onPress"/>
+					<Text textAlign="Center" text="Accent1 / Indication1" class="sapUiSmallMarginTop"/>
+				</VBox>
+				<VBox alignItems="Center">
+					<Avatar displaySize="L" backgroundColor="Accent2" badgeIcon="sap-icon://edit" badgeIconColor="Indication2" press="onPress"/>
+					<Text textAlign="Center" text="Accent2 / Indication2" class="sapUiSmallMarginTop"/>
+				</VBox>
+				<VBox alignItems="Center">
+					<Avatar displaySize="L" backgroundColor="Accent3" badgeIcon="sap-icon://edit" badgeIconColor="Indication3" press="onPress"/>
+					<Text textAlign="Center" text="Accent3 / Indication3" class="sapUiSmallMarginTop"/>
+				</VBox>
+				<VBox alignItems="Center">
+					<Avatar displaySize="L" backgroundColor="Accent4" badgeIcon="sap-icon://edit" badgeIconColor="Indication4" press="onPress"/>
+					<Text textAlign="Center" text="Accent4 / Indication4" class="sapUiSmallMarginTop"/>
+				</VBox>
+				<VBox alignItems="Center">
+					<Avatar displaySize="L" backgroundColor="Accent5" badgeIcon="sap-icon://edit" badgeIconColor="Indication5" press="onPress"/>
+					<Text textAlign="Center" text="Accent5 / Indication5" class="sapUiSmallMarginTop"/>
+				</VBox>
+				<VBox alignItems="Center">
+					<Avatar displaySize="L" backgroundColor="Accent6" badgeIcon="sap-icon://edit" badgeIconColor="Indication6" press="onPress"/>
+					<Text textAlign="Center" text="Accent6 / Indication6" class="sapUiSmallMarginTop"/>
+				</VBox>
+				<VBox alignItems="Center">
+					<Avatar displaySize="L" backgroundColor="Accent7" badgeIcon="sap-icon://edit" badgeIconColor="Indication7" press="onPress"/>
+					<Text textAlign="Center" text="Accent7 / Indication7" class="sapUiSmallMarginTop"/>
+				</VBox>
+				<VBox alignItems="Center">
+					<Avatar displaySize="L" backgroundColor="Accent8" badgeIcon="sap-icon://edit" badgeIconColor="Indication8" press="onPress"/>
+					<Text textAlign="Center" text="Accent8 / Indication8" class="sapUiSmallMarginTop"/>
+				</VBox>
+				<VBox alignItems="Center">
+					<Avatar displaySize="L" backgroundColor="Accent9" badgeIcon="sap-icon://edit" badgeIconColor="Indication9" press="onPress"/>
+					<Text textAlign="Center" text="Accent9 / Indication9" class="sapUiSmallMarginTop"/>
+				</VBox>
+				<VBox alignItems="Center">
+					<Avatar displaySize="L" backgroundColor="Accent10" badgeIcon="sap-icon://edit" badgeIconColor="Indication10" press="onPress"/>
+					<Text textAlign="Center" text="Accent10 / Indication10" class="sapUiSmallMarginTop"/>
+				</VBox>
+			</l:content>
+		</l:Grid>
+		<Text
+			text="Avatar with Accent1 background color and different badge icon value state colors:"
+			width="100%"
+			class="sapUiSmallMarginTop sapUiSmallMarginBegin sapUiMediumMarginBottom"/>
+		<l:Grid defaultSpan="XL2 L2 M4 S6">
+			<l:content>
+				<VBox alignItems="Center">
+					<Avatar displaySize="L" backgroundColor="Accent1" badgeIcon="sap-icon://edit" badgeValueState="Success" press="onPress"/>
+					<Text textAlign="Center" text="Accent1 / Success" class="sapUiSmallMarginTop"/>
+				</VBox>
+				<VBox alignItems="Center">
+					<Avatar displaySize="L" backgroundColor="Accent1" badgeIcon="sap-icon://edit" badgeValueState="Information" press="onPress"/>
+					<Text textAlign="Center" text="Accent1 / Information" class="sapUiSmallMarginTop"/>
+				</VBox>
+				<VBox alignItems="Center">
+					<Avatar displaySize="L" backgroundColor="Accent1" badgeIcon="sap-icon://edit" badgeValueState="Warning" press="onPress"/>
+					<Text textAlign="Center" text="Accent1 / Warning" class="sapUiSmallMarginTop"/>
+				</VBox>
+				<VBox alignItems="Center">
+					<Avatar displaySize="L" backgroundColor="Accent1" badgeIcon="sap-icon://edit" badgeValueState="Error" press="onPress"/>
+					<Text textAlign="Center" text="Accent1 / Error" class="sapUiSmallMarginTop"/>
+				</VBox>
+			</l:content>
+		</l:Grid>
+	</ScrollContainer>
+</mvc:View>

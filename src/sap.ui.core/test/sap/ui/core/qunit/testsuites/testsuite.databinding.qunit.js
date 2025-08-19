@@ -229,48 +229,9 @@ sap.ui.define(function() {
 				}
 			},
 
-			"analytics/AnalyticalBinding": {
-				coverage : {
-					only : "sap/ui/model/analytics/"
-				},
-				loader : {
-					paths : {
-						"sap/ui/core/qunit/analytics" : "test-resources/sap/ui/core/qunit/analytics"
-					}
-				},
-				sinon: {
-					version: 1
-				},
-				title: "sap.ui.model.analytics.AnalyticalBinding - QUnit Tests"
-			},
-
-			"analytics/AnalyticalTreeBindingAdapter": {
-				title: "sap.ui.model.analytics.AnalyticalTreeBindingAdapter",
-				module: [
-					"test-resources/sap/ui/core/qunit/analytics/AnalyticalTreeBindingAdapter.qunit"
-				]
-			},
-
-			"analytics/odata4analytics": {
-				coverage : {
-					only : "sap/ui/model/analytics/"
-				},
-				loader : {
-					paths : {
-						"sap/ui/core/qunit/analytics" : "test-resources/sap/ui/core/qunit/analytics"
-					}
-				},
-				sinon: {
-					version: 1
-				},
-				title: "sap.ui.model.analytics.odata4analytics - QUnit Tests"
-			},
-
-			"analytics/ODataModelAdapter": {
-				title: "sap.ui.model.analytics.ODataModelAdapter",
-				module: [
-					"test-resources/sap/ui/core/qunit/analytics/ODataModelAdapter.qunit"
-				]
+			"analytics/testsuite.analytics" : {
+				title: "Analytics - QUnit Tests",
+				page: "test-resources/sap/ui/core/qunit/analytics/testsuite.analytics.qunit.html"
 			},
 
 			"model/_Helper": {

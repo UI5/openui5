@@ -464,24 +464,6 @@ sap.ui.define([
 			assert.strictEqual(this.oWaitForChangeApplySpy.callCount, 3, "all changes were waited for");
 		});
 
-		QUnit.test("with a variant switch going on", async function(assert) {
-			let bCalled = false;
-			VariantManagementState.setVariantSwitchPromise(
-				sReference,
-				"variantManagementReference",
-				new Promise(function(resolve) {
-					setTimeout(function() {
-						bCalled = true;
-						resolve();
-					});
-				})
-			);
-
-			Applier.applyAllChangesForControl(oAppComponent, sReference, this.oControl1);
-			await FlexObjectState.waitForFlexObjectsToBeApplied([{selector: this.oControl1}]);
-			assert.ok(bCalled, "the function waited for the variant switch");
-		});
-
 		QUnit.test("with a change type filter and 3 queued changes - 1", async function(assert) {
 			Applier.applyAllChangesForControl(oAppComponent, sReference, this.oControl1);
 			await FlexObjectState.waitForFlexObjectsToBeApplied([{selector: this.oControl1, changeTypes: ["changeType1"]}]);

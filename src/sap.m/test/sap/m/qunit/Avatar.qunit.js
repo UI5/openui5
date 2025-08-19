@@ -1,5 +1,6 @@
 /*global QUnit */
 sap.ui.define([
+	"sap/m/AvatarBadgeColor",
 	"sap/m/AvatarColor",
 	"sap/ui/core/Lib",
 	"sap/ui/core/library",
@@ -15,6 +16,7 @@ sap.ui.define([
 	"sap/ui/test/utils/nextUIUpdate",
 	"sap/ui/core/InvisibleText"
 ], function(
+	AvatarBadgeColor,
 	AvatarColor,
 	Library,
 	coreLibrary,
@@ -1074,7 +1076,7 @@ sap.ui.define([
 		// Assert
 		for (let i = 1; i <= 10; i++) {
 			const accentClass = 'Accent' + i;
-			const avatarColor = AvatarColor[accentClass];
+			const avatarColor = AvatarBadgeColor[accentClass];
 
 			this.oAvatar.setBadgeIconColor(avatarColor);
 			await nextUIUpdate();
@@ -1085,6 +1087,31 @@ sap.ui.define([
 				if (j !== i) {
 					const otherAccentClass = 'Accent' + j;
 					assert.strictEqual(this.oAvatar.getDomRef().classList.contains('sapFAvatarBadgeColor' + otherAccentClass), false, "The avatar doesn't have the sapFAvatarBadgeColor" + otherAccentClass + " class");
+				}
+			}
+		}
+	});
+
+	QUnit.test("badgeIconColor applies correct CSS classes for Indication colors", async function(assert) {
+		// Setup
+		this.oAvatar.attachPress(function () {});
+		this.oAvatar.setBadgeIcon("sap-icon://zoom-in");
+		await nextUIUpdate();
+
+		// Assert
+		for (let i = 1; i <= 10; i++) {
+			const indicationClass = 'Indication' + i;
+			const avatarColor = AvatarBadgeColor[indicationClass];
+
+			this.oAvatar.setBadgeIconColor(avatarColor);
+			await nextUIUpdate();
+
+			assert.strictEqual(this.oAvatar.getDomRef().classList.contains('sapFAvatarBadgeColor' + indicationClass), true, 'The avatar has the sapFAvatarBadgeColor' + indicationClass + ' class');
+
+			for (let j = 1; j <= 10; j++) {
+				if (j !== i) {
+					const otherIndicationClass = 'Indication' + j;
+					assert.strictEqual(this.oAvatar.getDomRef().classList.contains('sapFAvatarBadgeColor' + otherIndicationClass), false, "The avatar doesn't have the sapFAvatarBadgeColor" + otherIndicationClass + " class");
 				}
 			}
 		}
