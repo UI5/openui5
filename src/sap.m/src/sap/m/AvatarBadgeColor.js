@@ -79,7 +79,69 @@ sap.ui.define(["sap/ui/base/DataType"], function(DataType) {
 		 *
 		 * @public
 		 */
-		Accent10: "Accent10"
+		Accent10: "Accent10",
+		/**
+		 * Indication 1
+		 *
+		 * @public
+		 * @since 1.140.0
+		 */
+		Indication1: "Indication1",
+		/**
+		 * Indication 2
+		 *
+		 * @public
+		 * @since 1.140.0
+		 */
+		Indication2: "Indication2",
+		/**
+		 * Indication 3
+		 * @public
+		 * @since 1.140.0
+		 */
+		Indication3: "Indication3",
+		/**
+		 * Indication 4
+		 * @public
+		 * @since 1.140.0
+		 */
+		Indication4: "Indication4",
+		/**
+		 * Indication 5
+		 * @public
+		 * @since 1.140.0
+		 */
+		Indication5: "Indication5",
+		/**
+		 * Indication 6
+		 * @public
+		 * @since 1.140.0
+		 */
+		Indication6: "Indication6",
+		/**
+		 * Indication 7
+		 * @public
+		 * @since 1.140.0
+		 */
+		Indication7: "Indication7",
+		/**
+		 * Indication 8
+		 * @public
+		 * @since 1.140.0
+		 */
+		Indication8: "Indication8",
+		/**
+		 * Indication 9
+		 * @public
+		 * @since 1.140.0
+		 */
+		Indication9: "Indication9",
+		/**
+		 * Indication 10
+		 * @public
+		 * @since 1.140.0
+		 */
+		Indication10: "Indication10"
 	};
 
 	DataType.registerEnum("sap.m.AvatarBadgeColor", AvatarBadgeColor);

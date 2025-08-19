@@ -128,11 +128,10 @@ sap.ui.define(function() {
 			// *************************************************************************
 			// Tests considering AnalyticalBinding
 			// *************************************************************************
-			// contained in testsuite.databinding.qunit.js
-			AnalyticalBinding : {
+			// contained in testsuite.databinding.qunit.js / testsuite.analytics.qunit.js
+			Analytics : {
 				title : "sap.ui.model.analytics.AnalyticalBinding",
-				module : ["test-resources/sap/ui/core/qunit/analytics/AnalyticalBinding.qunit"],
-				sinon : 1
+				page: "test-resources/sap/ui/core/qunit/analytics/testsuite.analytics.qunit.html"
 			},
 
 			// contained in sap.ui.table/test/sap/ui/table/qunit/testsuite.qunit.js

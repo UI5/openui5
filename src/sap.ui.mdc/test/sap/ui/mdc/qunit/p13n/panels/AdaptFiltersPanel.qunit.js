@@ -11,8 +11,9 @@ sap.ui.define([
 	"sap/m/SegmentedButtonItem",
 	"sap/ui/mdc/util/PropertyHelper",
 	"sap/m/VBox",
-	"sap/ui/test/utils/nextUIUpdate"
-], function(AdaptFiltersPanel, P13nBuilder, JSONModel, CustomListItem, Toolbar, Event, Text, List, SegmentedButtonItem, PropertyHelper, VBox, nextUIUpdate) {
+	"sap/ui/test/utils/nextUIUpdate",
+	"sap/ui/model/Filter"
+], function(AdaptFiltersPanel, P13nBuilder, JSONModel, CustomListItem, Toolbar, Event, Text, List, SegmentedButtonItem, PropertyHelper, VBox, nextUIUpdate, Filter) {
 	"use strict";
 
 	const aVisible = ["key1", "key2", "key3"];
@@ -118,6 +119,102 @@ sap.ui.define([
 		const oOuterList = this.oAFPanel.getCurrentViewContent()._oListControl;
 		assert.equal(oOuterList.getItems()[0].getVisible(), false, "Panel is invisible since no items are available");
 		assert.equal(oOuterList.getItems()[1].getVisible(), true, "Panel is visible since items are available");
+	});
+
+	// Test: Filter Panel so that x items are shown. Click on Select All checkbox. Remove Filter. Observe that only the filtered items are selected instead of all items.
+	QUnit.test("Check 'Select All' functionality", async function(assert) {
+		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
+		this.oAFPanel.switchView("list");
+		await nextUIUpdate();
+
+		let aSelectedItems = this.oAFPanel.getP13nModel().getProperty("/items").filter(function(oItem) {
+			return oItem.visible;
+		});
+		assert.equal(aSelectedItems.length, 3, "Initially all items are selected");
+
+		// Arrange:
+		this.oAFPanel._getSearchField().setValue("Field 5");
+		const oFakeEvent = new Event("liveSearch", this.oAFPanel._getSearchField(), {});
+		this.oAFPanel._filterByModeAndSearch(oFakeEvent);
+		await nextUIUpdate();
+
+		const oListControl = this.oAFPanel.getCurrentViewContent()._oListControl;
+
+		// Assert: Only one item is shown after filtering and is not selected
+		assert.equal(oListControl.getItems().length, 1, "Only one item is shown after filtering");
+		assert.equal(oListControl.getItems()[0].getSelected(), false, "Item is not selected");
+
+		// Act: Click on Select All checkbox
+		oListControl.fireSelectionChange({
+			listItems: oListControl.getItems(),
+			selectAll: true
+		});
+		await nextUIUpdate();
+
+		// Assert: item is selected now
+		aSelectedItems = oListControl.getSelectedItems();
+		assert.equal(aSelectedItems.length, 1, "Only one item was affected by Select All");
+		assert.equal(aSelectedItems[0].getCells()[0].getItems()[0].getText(), "Field 5", "Only the filtered item was selected");
+
+		// Now remove the filter and check that only the previously filtered items are selected
+		this.oAFPanel._getSearchField().setValue("");
+		this.oAFPanel._filterByModeAndSearch(oFakeEvent);
+		await nextUIUpdate();
+
+		// Assert: item is selected now
+		aSelectedItems = oListControl.getSelectedItems();
+		assert.equal(aSelectedItems.length, 4, "Only four items are selected");
+		assert.equal(aSelectedItems[0].getCells()[0].getItems()[0].getText(), "Field 1", "Field 1 is selected correctly");
+		assert.equal(aSelectedItems[1].getCells()[0].getItems()[0].getText(), "Field 2", "Field 2 is selected correctly");
+		assert.equal(aSelectedItems[2].getCells()[0].getItems()[0].getText(), "Field 3", "Field 3 is selected correctly");
+		assert.equal(aSelectedItems[3].getCells()[0].getItems()[0].getText(), "Field 5", "Field 5 is selected correctly");
+	});
+
+	QUnit.test("Check 'Deselect All' after filtering", async function(assert) {
+		this.oAFPanel.setP13nModel(new JSONModel({
+			items: [ ...this.oP13nData.items, {name: "key21", label: "Field 21", group: "G1", dataType: "String", visible: true, visibleInDialog: true} ],
+			itemsGrouped: [ ...this.oP13nData.itemsGrouped ]
+		}));
+		this.oAFPanel.switchView("list");
+		await nextUIUpdate();
+
+		let aSelectedItems = this.oAFPanel.getP13nModel().getProperty("/items").filter(function(oItem) {
+			return oItem.visible;
+		});
+		assert.equal(aSelectedItems.length, 4, "Initially all items are selected");
+
+		// Arrange:
+		this.oAFPanel._getSearchField().setValue("Field 2");
+		const oFakeEvent = new Event("liveSearch", this.oAFPanel._getSearchField(), {});
+		this.oAFPanel._filterByModeAndSearch(oFakeEvent);
+		await nextUIUpdate();
+
+		const oListControl = this.oAFPanel.getCurrentViewContent()._oListControl;
+
+		// Assert: Only one item is shown after filtering and is not selected
+		assert.equal(oListControl.getItems().length, 2, "Two items are shown after filtering");
+		assert.equal(oListControl.getItems()[0].getSelected(), true, "Item is initially selected");
+		assert.equal(oListControl.getItems()[1].getSelected(), true, "Item is initially selected");
+
+		// Act: Click on Select All checkbox
+		oListControl.getItems()[0].setSelected(false);
+		oListControl.getItems()[1].setSelected(false);
+		oListControl.fireSelectionChange({
+			listItems: oListControl.getItems(),
+			selectAll: false
+		});
+		await nextUIUpdate();
+
+		aSelectedItems = oListControl.getSelectedItems();
+		assert.equal(aSelectedItems.length, 0, "No item is selected");
+
+		// Now remove the filter and check that only the previously filtered items are selected
+		this.oAFPanel._getSearchField().setValue("");
+		this.oAFPanel._filterByModeAndSearch(oFakeEvent);
+		await nextUIUpdate();
+
+		aSelectedItems = oListControl.getSelectedItems();
+		assert.equal(aSelectedItems.length, 2, "Only 2 items are selected after removing filter");
 	});
 
 	QUnit.test("Check Search implementation - also for ToolTip", function(assert){

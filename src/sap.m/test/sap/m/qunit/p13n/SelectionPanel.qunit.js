@@ -785,4 +785,87 @@ sap.ui.define([
 		const bHideDescriptions = this.oSelectionPanel.getModel(this.oSelectionPanel.P13N_MODEL).getProperty("/hideDescriptions");
 		assert.equal(bHideDescriptions, true, "Hide descriptions is set to false by default");
 	});
+
+	// Test: Filter Panel so that x items are shown. Click on Select All checkbox. Remove Filter. Observe that only the filtered items are selected instead of all items.
+	QUnit.test("Check 'Select All' after filtering", function(assert) {
+		// Arrange
+		this.oSelectionPanel.setP13nData(this.getTestData());
+
+		// Assert: Initial state. 3 items are selected, 6 items are available.
+		let aSelectedItems = this.oSelectionPanel._oListControl.getSelectedItems();
+		assert.equal(aSelectedItems.length, 3, "Only three items are selected");
+		assert.equal(aSelectedItems[0].getCells()[0].getItems()[0].getText(), "Field 1", "Field 1 is correctly selected");
+		assert.equal(aSelectedItems[1].getCells()[0].getItems()[0].getText(), "Field 2", "Field 2 is correctly selected");
+		assert.equal(aSelectedItems[2].getCells()[0].getItems()[0].getText(), "Field 3", "Field 3 is correctly selected");
+
+		// Act
+		this.oSelectionPanel._filterList(false, "Field 4"); // --> only show key4
+		this.oSelectionPanel._oListControl.fireSelectionChange({
+			selectAll: true,
+			listItems: [this.oSelectionPanel._oListControl.getItems()[0]]
+		});
+
+		// Assert
+		aSelectedItems = this.oSelectionPanel._oListControl.getSelectedItems();
+		assert.equal(aSelectedItems.length, 1, "Only one item is selected");
+		assert.equal(aSelectedItems[0].getCells()[0].getItems()[0].getText(), "Field 4", "Field 4 is correctly selected");
+
+		// Act: Remove filter (3 were already initially selected)
+		this.oSelectionPanel._filterList(false, undefined);
+		aSelectedItems = this.oSelectionPanel._oListControl.getSelectedItems();
+		assert.equal(aSelectedItems.length, 4, "Only four items are selected");
+		assert.equal(aSelectedItems[0].getCells()[0].getItems()[0].getText(), "Field 1", "Field 1 is correctly selected");
+		assert.equal(aSelectedItems[1].getCells()[0].getItems()[0].getText(), "Field 2", "Field 2 is correctly selected");
+		assert.equal(aSelectedItems[2].getCells()[0].getItems()[0].getText(), "Field 3", "Field 3 is correctly selected");
+		assert.equal(aSelectedItems[3].getCells()[0].getItems()[0].getText(), "Field 4", "Field 4 is correctly selected");
+	});
+
+	QUnit.test("Check 'Deselect All' after filtering", async function(assert) {
+		// Arrange
+		this.oSelectionPanel.setP13nData([
+			...this.getTestData(),
+			{
+				visible: true,
+				name: "key21",
+				label: "Field 21",
+				group: "G1"
+			}
+		]);
+		await nextUIUpdate();
+
+		// Assert: Initial state. 3 items are selected, 6 items are available.
+		let aSelectedItems = this.oSelectionPanel._oListControl.getSelectedItems();
+		assert.equal(aSelectedItems.length, 4, "Only three items are selected");
+		assert.equal(aSelectedItems[0].getCells()[0].getItems()[0].getText(), "Field 1", "Field 1 is correctly selected");
+		assert.equal(aSelectedItems[1].getCells()[0].getItems()[0].getText(), "Field 2", "Field 2 is correctly selected");
+		assert.equal(aSelectedItems[2].getCells()[0].getItems()[0].getText(), "Field 3", "Field 3 is correctly selected");
+		assert.equal(aSelectedItems[3].getCells()[0].getItems()[0].getText(), "Field 21", "Field 21 is correctly selected");
+
+		// Act
+		this.oSelectionPanel._filterList(false, "Field 2"); // --> only show key2
+
+		// Simulate that the table deselects everything (as firing the change event won't deselect the items)
+		this.oSelectionPanel._oListControl.getItems()[0].setSelected(false);
+		this.oSelectionPanel._oListControl.getItems()[1].setSelected(false);
+
+		this.oSelectionPanel._oListControl.fireSelectionChange({
+			selectAll: false,
+			listItems: this.oSelectionPanel._oListControl.getItems()
+		});
+		await nextUIUpdate();
+
+		// Assert
+		aSelectedItems = this.oSelectionPanel._oListControl.getSelectedItems();
+		assert.equal(aSelectedItems.length, 0, "No items are selected");
+
+		// Act: Remove filter => 2 items are selected
+		this.oSelectionPanel._filterList(false, undefined);
+		await nextUIUpdate();
+
+		// Assert
+		aSelectedItems = this.oSelectionPanel._oListControl.getSelectedItems();
+		assert.equal(aSelectedItems.length, 2, "Only two items are selected");
+		assert.equal(aSelectedItems[0].getCells()[0].getItems()[0].getText(), "Field 1", "Field 1 is correctly selected");
+		assert.equal(aSelectedItems[1].getCells()[0].getItems()[0].getText(), "Field 3", "Field 2 is correctly selected");
+	});
 });

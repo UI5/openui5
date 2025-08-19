@@ -238,12 +238,68 @@ sap.ui.define([
 	};
 
 	/**
+	 * The state for changes of the <code>SelectionController</code>.
+	 *
+	 * @typedef {object} module:sap/m/p13n/Engine$StateChangeEventSelectionState
+	 * @property {string} key The key of the item affected
+	 * @public
+	 * @since 1.140.0
+	 */
+
+	/**
+	 * The state for changes of the <code>SortController</code>.
+	 *
+	 * @typedef {object} module:sap/m/p13n/Engine$StateChangeEventSortState
+	 * @property {string} key The key of the affected sort order
+	 * @property {number} index The position of the sort order
+	 * @property {boolean} descending Indicates whether the sort order is descending
+	 * @public
+	 * @since 1.140.0
+	 */
+
+	/**
+	 * The state for changes of the <code>GroupController</code>.
+	 *
+	 * @typedef {object} module:sap/m/p13n/Engine$StateChangeEventGroupState
+	 * @property {string} key The key of the affected group order
+	 * @property {number} index The position of the group order
+	 * @public
+	 * @since 1.140.0
+	 */
+
+	/**
+	 * The state for changes of the <code>FilterController</code>.
+	 * The keys of the object are the filter keys used in the <code>Engine</code> registration. The values are arrays of {@link sap.ui.mdc.condition.ConditionObject ConditionObject}.
+	 *
+	 * @typedef {Object<string, sap.m.p13n.FilterStateItem[]>} module:sap/m/p13n/Engine$StateChangeEventFilterState
+	 * @public
+	 * @since 1.140.0
+	 */
+
+	/**
+	 * The personalization state change event.
+	 *
+	 * @typedef {object} module:sap/m/p13n/Engine$StateChangeEvent
+	 * @property {sap.ui.core.Control} [control] Control for which the state change event was fired.
+	 * @property {Object<string, Array<module:sap/m/p13n/Engine$StateChangeEventSelectionState> | Array<module:sap/m/p13n/Engine$StateChangeEventSortState> | Array<module:sap/m/p13n/Engine$StateChangeEventGroupState> | Array<module:sap/m/p13n/Engine$StateChangeEventFilterState> | Array<any> >} [state] Changed (delta) state of the control. The keys of the object refer to the controller keys used in the <code>Engine</code> registration. The values can be an array of any of the following types:
+	 * <ul>
+	 * <li>{@link module:sap/m/p13n/Engine$StateChangeEventSelectionState StateChangeEventSelectionState}</li>
+	 * <li>{@link module:sap/m/p13n/Engine$StateChangeEventSortState StateChangeEventSortState}</li>
+	 * <li>{@link module:sap/m/p13n/Engine$StateChangeEventGroupState StateChangeEventGroupState}</li>
+	 * <li>{@link module:sap/m/p13n/Engine$StateChangeEventFilterState StateChangeEventFilterState}</li>
+	 * <li>Custom controller state definitions</li>
+	 * </ul>
+	 * @public
+	 * @since 1.140.0
+	 */
+
+	/**
 	 * Attaches an event handler to the <code>StateHandlerRegistry</code> class.
 	 * The event handler is fired every time a user triggers a personalization change for a control instance during runtime.
 	 *
 	 * @public
 	 *
-	 * @param {function(sap.ui.base.Event):void} fnStateEventHandler The handler function to call when the event occurs
+	 * @param {function(module:sap/m/p13n/Engine$StateChangeEvent):void} fnStateEventHandler The handler function to call when the event occurs
 	 * @param {object} [oListener] The context object to call the event handler with (value of <code>this</code> in the event handler function).
 	 * @returns {this} Returns <code>this</code> to allow method chaining
 	 */

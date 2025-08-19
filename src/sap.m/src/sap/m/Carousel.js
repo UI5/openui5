@@ -520,7 +520,7 @@ sap.ui.define([
 	Carousel.prototype._calculatePagesWidth = function (iNumberOfItemsToShow) {
 		var iWidth = this.$().width(),
 			oSlide = this.getDomRef().querySelector(".sapMCrslFluid .sapMCrslItem"),
-			iMargin = parseFloat(window.getComputedStyle(oSlide).marginRight),
+			iMargin = parseFloat(window.getComputedStyle(oSlide).marginInlineEnd),
 			iItemWidth = (iWidth - (iMargin * (iNumberOfItemsToShow - 1))) / iNumberOfItemsToShow,
 			iItemWidthPercent = (iItemWidth / iWidth) * 100;
 

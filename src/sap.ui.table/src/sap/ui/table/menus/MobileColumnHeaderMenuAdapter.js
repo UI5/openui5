@@ -442,9 +442,9 @@ sap.ui.define([
 	};
 
 	MobileColumnHeaderMenuAdapter.prototype._createQuickResizeInput = function() {
-		const oTable = this._oColumn._getTable();
 		return new QuickResize({
 			change: [function(oEvent) {
+				const oTable = this._oColumn._getTable();
 				TableUtils.Column.resizeColumn(oTable, this._oColumn, oEvent.getParameter("width"));
 			}, this]
 		});
