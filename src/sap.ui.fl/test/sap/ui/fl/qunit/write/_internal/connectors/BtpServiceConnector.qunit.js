@@ -23,8 +23,6 @@ sap.ui.define([
 	const sandbox = sinon.createSandbox();
 
 	QUnit.module("Seen Features", {
-		beforeEach() {
-		},
 		afterEach() {
 			sandbox.restore();
 		}
@@ -123,6 +121,47 @@ sap.ui.define([
 				tokenUrl: BtpServiceConnector.ROUTES.TOKEN
 			});
 			assert.strictEqual(oResult, "response", "the function returns the response of the request");
+		});
+	});
+
+	QUnit.module("User variants deletion", {
+		afterEach() {
+			sandbox.restore();
+		}
+	}, function() {
+		QUnit.test("when deleting user variants with given variant management references", async function(assert) {
+			const oSendRequestStub = sandbox.stub(WriteUtils, "sendRequest").resolves();
+			const testPayload = {
+				flexReference: "testReference",
+				variantManagementReferences: ["vm1", "vm2"]
+			};
+			await BtpServiceConnector.deleteUserVariantsForVM({
+				url: "/btp",
+				...testPayload
+			});
+
+			assert.strictEqual(oSendRequestStub.callCount, 1, "then the request is sent");
+			assert.strictEqual(
+				oSendRequestStub.lastCall.args[0],
+				"/btp/flex/all/v3/variantdata/delete",
+				"then the correct URL is used"
+			);
+			assert.strictEqual(
+				oSendRequestStub.lastCall.args[1],
+				"POST",
+				"then the correct HTTP method is used"
+			);
+			assert.deepEqual(
+				oSendRequestStub.lastCall.args[2],
+				{
+					tokenUrl: BtpServiceConnector.ROUTES.TOKEN,
+					initialConnector: InitialConnector,
+					payload: JSON.stringify(testPayload),
+					dataType: "json",
+					contentType: "application/json; charset=utf-8"
+				},
+				"then the correct request options are used"
+			);
 		});
 	});
 

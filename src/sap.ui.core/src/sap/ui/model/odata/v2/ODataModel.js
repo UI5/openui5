@@ -2084,31 +2084,20 @@ sap.ui.define([
 	 * For services without the <code>hierarchy-node-descendant-count-for</code> annotation, the
 	 * <code>numberOfExpandedLevels</code> property is not supported and deprecated since 1.44.5.
 	 *
-	 * <h3>Operation Modes</h3>
+	 * The OData service must always return node collections which are sufficient to create a valid hierarchy on the
+	 * client. This means that for each node in the response all parent nodes up to the hierarchy root must also
+	 * be contained in the response. Note that this rule applies independent of any filters set for the binding.
+	 *
+	 * You must not define filters on tree annotation properties for this binding as this interferes with hierarchy
+	 * filters defined by the binding itself.
+	 *
+	 * <h3>Notes On Operation Modes</h3>
 	 * For a full definition and explanation of all OData binding operation modes, see
 	 * {@link sap.ui.model.odata.OperationMode}.
 	 *
-	 * <h4>OperationMode.Server</h4>
-	 * Filtering on the <code>ODataTreeBinding</code> is only supported with filters of type
-	 * {@link sap.ui.model.FilterType.Application}. Be aware that this applies
-	 * only to filters which do not prevent the creation of a hierarchy. So filtering on a property
-	 * (e.g. a "Customer") is fine, as long as the application ensures that the responses from the
-	 * back end are sufficient to create a valid hierarchy on the client. Subsequent paging requests
-	 * for sibling and child nodes must also return responses, since the filters are sent with every
-	 * request. Using control-defined filters (see {@link sap.ui.model.FilterType.Control}) via the
-	 * {@link #filter} function is not supported for the operation mode <code>Server</code>.
-	 *
-	 * <h4>OperationMode.Client and OperationMode.Auto</h4>
-	 * The ODataTreeBinding supports control-defined filters only in operation modes
-	 * <code>Client</code> and <code>Auto</code>. With these operation modes, the filters and
-	 * sorters are applied on the client, like for the
-	 * {@link sap.ui.model.odata.v2.ODataListBinding}.
-	 *
 	 * The operation modes <code>Client</code> and <code>Auto</code> are only supported for services
 	 * which expose the hierarchy annotations mentioned above, but do <b>not</b> expose the
-	 * <code>hierarchy-node-descendant-count-for</code> annotation. Services with hierarchy
-	 * annotations including the <code>hierarchy-node-descendant-count-for</code> annotation, do
-	 * <b>not</b> support the operation modes <code>Client</code> and <code>Auto</code>.
+	 * <code>hierarchy-node-descendant-count-for</code> annotation.
 	 * <b>Note:</b> {@link sap.ui.model.odata.OperationMode.Auto} is deprecated since 1.102.0.
 	 *
 	 * <b>Note:</b> OData tree bindings do neither support
@@ -2160,7 +2149,6 @@ sap.ui.define([
 	 *   specified. {@link sap.ui.model.odata.OperationMode.Auto OperationMode.Auto} is only
 	 *   supported for services which expose the hierarchy annotations, yet do <b>NOT</b> expose the
 	 *   <code>hierarchy-node-descendant-count-for</code> annotation.
-	 *   <b>Note:</b> {@link sap.ui.model.odata.OperationMode.Auto} is deprecated since 1.102.0.
 	 * @param {number} [mParameters.threshold]
 	 *   Deprecated since 1.102.0, as {@link sap.ui.model.odata.OperationMode.Auto} is deprecated;
 	 *   the threshold that defines how many entries should be fetched at least by the binding if

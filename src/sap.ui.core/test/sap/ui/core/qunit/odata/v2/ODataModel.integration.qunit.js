@@ -22551,9 +22551,12 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 	});
 
 	//*********************************************************************************************
-	// Scenario: A table using ODataTreeBindingFlat uses the correctly grouped filters in requests.
+	// Scenario 1: A table using ODataTreeBindingFlat uses the correctly grouped filters in requests.
 	// BCP: 2370010564
-	QUnit.test("ODataTreeBindingFlat: Filters are correctly grouped", function (assert) {
+	// Scenario 2: Control and application filters are correctly combined and grouped in requests.
+	// JIRA: CPOUI5MODELS-1050
+	QUnit.test("ODataTreeBindingFlat: application and control filters are correctly grouped and combined",
+			function (assert) {
 		var oTable,
 			oModel = createHierarchyMaintenanceModel(),
 			oNode050 = {
@@ -22613,6 +22616,7 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 				HierarchyPreorderRank : 1,
 				HierarchySiblingRank : 1
 			},
+			oTreeBinding,
 			sView = '\
 <t:TreeTable id="table"\
 		rows="{\
@@ -22644,6 +22648,7 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 
 		return this.createView(assert, sView, oModel).then(() => {
 			oTable = this.oView.byId("table");
+			oTreeBinding = oTable.getBinding("rows");
 
 			// don't use expectValue to avoid timing issues causing flaky tests
 			assert.deepEqual(getTableContent(oTable), [["node050"], [""], [""], [""]]);
@@ -22659,12 +22664,12 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 				});
 
 			// code under test
-			oTable.getBinding("rows").filter([
+			oTreeBinding.filter([
 				new Filter("CreatedByUser", FilterOperator.EQ, "user2"),
 				new Filter("CreatedByUser", FilterOperator.EQ, "user3")
 			], FilterType.Application);
 
-			return this.waitForChanges(assert);
+			return this.waitForChanges(assert, "change application filter");
 		}).then(() => {
 			assert.deepEqual(getTableContent(oTable), [["node100"], [""], [""], [""]]);
 
@@ -22678,9 +22683,10 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 					results : [oNode200, oNode300]
 				});
 
+			// code under test
 			oTable.expand(0);
 
-			return this.waitForChanges(assert);
+			return this.waitForChanges(assert, "expand node '100'");
 		}).then(() => {
 			assert.deepEqual(getTableContent(oTable), [["node100"], ["node200"], ["node300"], [""]]);
 
@@ -22688,18 +22694,288 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 					batchNo : 4,
 					requestUri : "ErhaOrder('1')/to_Item?$skip=0&$top=104&$inlinecount=allpages"
 						+ "&$filter=HierarchyDistanceFromRoot le 0"
+						+ " and (ErhaOrder eq '1' and (CreatedByUser eq 'user2' or CreatedByUser eq 'user3'))"
 				}, {
-					__count : "2",
-					results : [oNode050, oNode100NoFilter]
+					__count : "1",
+					results : [oNode100]
 				});
 
 			// code under test
-			oTable.getBinding("rows").filter([], FilterType.Application);
+			oTreeBinding.filter([new Filter("ErhaOrder", FilterOperator.EQ, "1")], FilterType.Control);
 
-			return this.waitForChanges(assert);
+			return this.waitForChanges(assert, "add control filter");
 		}).then(() => {
-			assert.deepEqual(getTableContent(oTable), [["node050"], ["node100"], [""], [""]]);
+			assert.deepEqual(getTableContent(oTable), [["node100"], [""], [""], [""]]);
+
+			this.expectRequest({
+					batchNo : 5,
+					requestUri : "ErhaOrder('1')/to_Item?"
+						+ "$filter=HierarchyNode eq '100' and HierarchyDistanceFromRoot le 1"
+						+ " and (ErhaOrder eq '1'"
+						+ " and (CreatedByUser eq 'user2' or CreatedByUser eq 'user3'))"
+				}, {
+					__count : "2",
+					results : [oNode200, oNode300]
+				});
+
+			// code under test
+			oTreeBinding.expandNodeToLevel(0, 1);
+
+			return this.waitForChanges(assert, "expand node to level: application and control filter are applied");
+		}).then(() => {
+			assert.deepEqual(getTableContent(oTable), [["node100"], ["node200"], ["node300"], [""]]);
+
+			this.expectRequest({
+					batchNo : 6,
+					requestUri : "ErhaOrder('1')/to_Item?$skip=0&$top=104&$inlinecount=allpages"
+						+ "&$filter=HierarchyDistanceFromRoot le 0"
+						+ " and ErhaOrder eq '1'"
+				}, {
+					__count : "2",
+					results : [oNode100, oNode100NoFilter]
+				});
+
+			// code under test
+			oTreeBinding.filter([], FilterType.Application);
+
+			return this.waitForChanges(assert, "remove application filter: control filter remains");
+		}).then(() => {
+			assert.deepEqual(getTableContent(oTable), [["node100"], ["node100"], [""], [""]]);
+
+			this.expectRequest({
+					batchNo : 7,
+					requestUri : "ErhaOrder('1')/to_Item?$skip=0&$top=104&$inlinecount=allpages"
+						+ "&$filter=HierarchyDistanceFromRoot le 0"
+				}, {
+					__count : "3",
+					results : [oNode050, oNode100, oNode100NoFilter]
+				});
+
+			// code under test
+			oTreeBinding.filter([], FilterType.Control);
+
+			return this.waitForChanges(assert, "remove control filter: all rows visible");
+		}).then(() => {
+			assert.deepEqual(getTableContent(oTable), [["node050"], ["node100"], ["node100"], [""]]);
 		});
+	});
+
+	//*********************************************************************************************
+	// Scenario: A table using ODataTreeBindingAdapter uses the correctly combined and grouped application and control
+	// filters in requests.
+	// JIRA: CPOUI5MODELS-1050
+	QUnit.test("ODataTreeBindingAdapter: control and application filter", async function (assert) {
+		const oModel = createSpecialCasesModel();
+		const oNodeA00 = {
+			__metadata: { uri: "C_RSHMaintSchedSmltdOrdAndOp('A00')" },
+			MaintenanceOrder: "A00",
+			OrderOperationIsExpanded: "collapsed",
+			OrderOperationRowID: "A00",
+			OrderOperationRowLevel: 0,
+			CreatedByUser: "user0"
+		};
+		const oNodeB00 = {
+			__metadata: { uri: "C_RSHMaintSchedSmltdOrdAndOp('B00')" },
+			MaintenanceOrder: "B00",
+			OrderOperationIsExpanded: "leaf",
+			OrderOperationRowID: "B00",
+			OrderOperationRowLevel: 0,
+			CreatedByUser: "user1"
+		};
+		const oNodeC00 = {
+			__metadata: { uri: "C_RSHMaintSchedSmltdOrdAndOp('C00')" },
+			MaintenanceOrder: "C00",
+			OrderOperationIsExpanded: "collapsed",
+			OrderOperationRowID: "C00",
+			OrderOperationRowLevel: 0,
+			CreatedByUser: "user2"
+		};
+		const oNodeC01 = {
+			__metadata: { uri: "C_RSHMaintSchedSmltdOrdAndOp('C01')" },
+			MaintenanceOrder: "C00",
+			OrderOperationIsExpanded: "leaf",
+			OrderOperationParentRowID: "C00",
+			OrderOperationRowID: "C01",
+			OrderOperationRowLevel: 1,
+			CreatedByUser: "user2"
+		};
+		const sView = `
+<t:TreeTable id="table"
+	rows="{
+		path: '/C_RSHMaintSchedSmltdOrdAndOp',
+		parameters: {
+			countMode: 'Inline',
+			numberOfExpandedLevels: 0,
+			treeAnnotationProperties: {
+				hierarchyDrillStateFor: 'OrderOperationIsExpanded',
+				hierarchyLevelFor: 'OrderOperationRowLevel',
+				hierarchyNodeFor: 'OrderOperationRowID',
+				hierarchyParentNodeFor: 'OrderOperationParentRowID'
+			}
+		},
+		filters: [
+			{path: 'CreatedByUser', operator: 'EQ', value1: 'user0'},
+			{path: 'CreatedByUser', operator: 'EQ', value1: 'user1'}
+		]
+	}"
+	visibleRowCount="3">
+	<Text id="orderOperationRowID" text="{OrderOperationRowID}" />
+</t:TreeTable>`;
+
+		this.expectHeadRequest()
+			.expectRequest({
+				batchNo: 1,
+				requestUri: "C_RSHMaintSchedSmltdOrdAndOp"
+					+ "?$filter=OrderOperationRowLevel eq 0 "
+					+ "and (CreatedByUser eq 'user0' or CreatedByUser eq 'user1')"
+					+ "&$skip=0&$top=103&$inlinecount=allpages"
+			}, {
+				__count: "2",
+				results: [oNodeA00, oNodeB00]
+			});
+
+		await this.createView(assert, sView, oModel);
+
+		const oTable = this.oView.byId("table");
+		const oTreeBinding = oTable.getBinding("rows");
+
+		assert.deepEqual(getTableContent(oTable), [["A00"], ["B00"], [""]]);
+
+		this.expectRequest({
+				batchNo: 2,
+				requestUri: "C_RSHMaintSchedSmltdOrdAndOp"
+					+ "?$filter=OrderOperationRowLevel eq 0 "
+					+ "and (CreatedByUser eq 'user2')"
+					+ "&$skip=0&$top=103&$inlinecount=allpages"
+			}, {
+				__count: "1",
+				results: [oNodeC00]
+			});
+
+		// code under test
+		oTreeBinding.filter([new Filter("CreatedByUser", FilterOperator.EQ, "user2")], FilterType.Application);
+
+		await this.waitForChanges(assert, "change application filter: node 'C00' visible");
+		assert.deepEqual(getTableContent(oTable), [["C00"], [""], [""]]);
+
+		this.expectRequest({
+				batchNo: 3,
+				requestUri: "C_RSHMaintSchedSmltdOrdAndOp"
+					+ "?$filter=OrderOperationParentRowID eq 'C00' "
+					+ "and (CreatedByUser eq 'user2')"
+					+ "&$skip=0&$top=103&$inlinecount=allpages"
+			}, {
+				__count: "1",
+				results: [oNodeC01]
+			});
+
+		// code under test
+		oTable.expand(0);
+
+		await this.waitForChanges(assert, "expand node 'C00'");
+		assert.deepEqual(getTableContent(oTable), [["C00"], ["C01"], [""]]);
+
+		this.expectRequest({
+				batchNo: 4,
+				requestUri: "C_RSHMaintSchedSmltdOrdAndOp"
+					+ "?$filter=OrderOperationRowLevel eq 0 "
+					+ "and (MaintenanceOrder eq 'C00' and CreatedByUser eq 'user2')"
+					+ "&$skip=0&$top=103&$inlinecount=allpages"
+			}, {
+				__count: "1",
+				results: [oNodeC00]
+			});
+
+		// code under test
+		oTreeBinding.filter([new Filter("MaintenanceOrder", FilterOperator.EQ, "C00")], FilterType.Control);
+
+		await this.waitForChanges(assert, "add control filter: only node 'C00' visible");
+		assert.deepEqual(getTableContent(oTable), [["C00"], [""], [""]]);
+
+		this.expectRequest({
+				batchNo: 5,
+				requestUri: "C_RSHMaintSchedSmltdOrdAndOp"
+					+ "?$filter=OrderOperationRowID eq 'C00' and OrderOperationRowLevel le 1 "
+					+ "and (MaintenanceOrder eq 'C00' and CreatedByUser eq 'user2')"
+			}, {
+				__count: "2",
+				results: [{
+					__metadata: { uri: "C_RSHMaintSchedSmltdOrdAndOp('C00')" },
+					MaintenanceOrder: "C00",
+					OrderOperationIsExpanded: "expanded",
+					OrderOperationRowID: "C00",
+					OrderOperationRowLevel: 0,
+					CreatedByUser: "user2"
+				}, {
+					__metadata: { uri: "C_RSHMaintSchedSmltdOrdAndOp('C01')" },
+					MaintenanceOrder: "C00",
+					OrderOperationIsExpanded: "leaf",
+					OrderOperationParentRowID: "C00",
+					OrderOperationRowID: "C01",
+					OrderOperationRowLevel: 1,
+					CreatedByUser: "user2"
+				}]
+			});
+
+		// code under test
+		oTreeBinding.expandNodeToLevel(0, 1);
+
+		await this.waitForChanges(assert, "expand node to level: application and control filter are applied");
+		assert.deepEqual(getTableContent(oTable), [["C00"], ["C01"], [""]]);
+
+		this.expectRequest({
+				batchNo: 6,
+				requestUri: "C_RSHMaintSchedSmltdOrdAndOp"
+					+ "?$filter=OrderOperationRowLevel eq 0 "
+					+ "and (MaintenanceOrder eq 'C00')"
+					+ "&$skip=0&$top=103&$inlinecount=allpages"
+			}, {
+				__count: "1",
+				results: [oNodeC00]
+			});
+
+		// code under test
+		oTreeBinding.filter([], FilterType.Application);
+
+		await this.waitForChanges(assert, "remove application filter: control filter remains, 'C00' visible");
+		assert.deepEqual(getTableContent(oTable), [["C00"], [""], [""]]);
+
+		this.expectRequest({
+				batchNo: 7,
+				requestUri: "C_RSHMaintSchedSmltdOrdAndOp"
+					+ "?$filter=OrderOperationRowLevel eq 0"
+					+ "&$skip=0&$top=103&$inlinecount=allpages"
+			}, {
+				__count: "3",
+				results: [oNodeA00, oNodeB00, oNodeC00]
+			});
+
+		// code under test
+		oTreeBinding.filter([], FilterType.Control);
+
+		await this.waitForChanges(assert, "remove control filter: all rows visible");
+		assert.deepEqual(getTableContent(oTable), [["A00"], ["B00"], ["C00"]]);
+
+		this.oLogMock.expects("error")
+			.withExactArgs("Filter for tree annotation property 'OrderOperationRowID' is not allowed", undefined,
+				"sap.ui.model.odata.v2.ODataTreeBinding");
+
+		this.expectRequest({
+				batchNo: 8,
+				requestUri: "C_RSHMaintSchedSmltdOrdAndOp"
+					+ "?$filter=OrderOperationRowLevel eq 0 "
+					+ "and (OrderOperationRowID ne 'Z00')"
+					+ "&$skip=0&$top=103&$inlinecount=allpages"
+			}, {
+				__count: "3",
+				results: [oNodeA00, oNodeB00, oNodeC00]
+			});
+
+		// code under test
+		oTreeBinding.filter([new Filter("OrderOperationRowID", FilterOperator.NE, "Z00")], FilterType.Control);
+
+		await this.waitForChanges(assert, "filtering for tree annotation properties logs error");
+		assert.deepEqual(getTableContent(oTable), [["A00"], ["B00"], ["C00"]]);
 	});
 
 	//*********************************************************************************************
@@ -25538,8 +25814,8 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 	});
 
 	//*********************************************************************************************
-	// Scenario: The tree binding includes application filters in request for operation mode Client iff
-	// useServersideApplicationFilters is true.
+	// Scenario: The tree binding includes ONLY application filters in request for operation mode Client iff
+	// useServersideApplicationFilters is true but NOT the control filters.
 	// JIRA: CPOUI5MODELS-1050
 	QUnit.test("ODataTreeBinding: operation model Client with serverside application filters", async function (assert) {
 		const oModel = createSpecialCasesModel();
@@ -25551,7 +25827,7 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 		this.expectHeadRequest()
 			.expectRequest("C_RSHMaintSchedSmltdOrdAndOp?"
 					+ "$filter=(MaintenanceOrder%20eq%20%271%27)&"
-					+ "$select=MaintenanceOrder,OrderOperationRowLevel,OrderOperationParentRowID,"
+					+ "$select=MaintenanceOrder,CreatedByUser,OrderOperationRowLevel,OrderOperationParentRowID,"
 					+ "OrderOperationRowID,OrderOperationIsExpanded", {
 				results : [{
 					__metadata: {uri: "C_RSHMaintSchedSmltdOrdAndOp('id1')"},
@@ -25559,7 +25835,16 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 					OrderOperationIsExpanded: "leaf",
 					OrderOperationParentRowID: "",
 					OrderOperationRowID: "id1",
-					OrderOperationRowLevel: 0
+					OrderOperationRowLevel: 0,
+					CreatedByUser: "user0"
+				}, {
+					__metadata: {uri: "C_RSHMaintSchedSmltdOrdAndOp('id2')"},
+					MaintenanceOrder: "1",
+					OrderOperationIsExpanded: "leaf",
+					OrderOperationParentRowID: "",
+					OrderOperationRowID: "id2",
+					OrderOperationRowLevel: 0,
+					CreatedByUser: "user1"
 				}]
 			});
 		const oTable = this.oView.byId("table");
@@ -25568,7 +25853,7 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 			parameters: {
 				countMode: CountMode.Inline,
 				operationMode: "Client",
-				select: "MaintenanceOrder",
+				select: "MaintenanceOrder,CreatedByUser",
 				treeAnnotationProperties: {
 					hierarchyDrillStateFor: "OrderOperationIsExpanded",
 					hierarchyLevelFor: "OrderOperationRowLevel",
@@ -25577,10 +25862,15 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 				},
 				useServersideApplicationFilters: true
 			},
-			path: "/C_RSHMaintSchedSmltdOrdAndOp"
+			path: "C_RSHMaintSchedSmltdOrdAndOp"
 		});
 
-		await this.waitForChanges(assert);
+		// code under test - control filter not part of request
+		oTable.getBinding("rows").filter([new Filter("CreatedByUser", FilterOperator.EQ, "user0")], FilterType.Control);
+
+		oTable.setBindingContext(new Context(oModel, "/"));
+
+		await this.waitForChanges(assert, "initial request contains only application filter");
 
 		assert.deepEqual(getTableContent(oTable), [["1"], [""]]);
 	});

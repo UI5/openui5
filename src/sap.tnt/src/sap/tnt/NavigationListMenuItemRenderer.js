@@ -6,12 +6,14 @@ sap.ui.define([
 	'sap/ui/core/Renderer',
 	"sap/ui/util/defaultLinkTypes",
 	'sap/m/MenuItemRenderer',
-	'sap/tnt/NavigationListItem'
+	'sap/tnt/NavigationListItem',
+	"sap/ui/core/Lib"
 ], function(
 	Renderer,
 	defaultLinkTypes,
 	MenuItemRenderer,
-	NavigationListItem
+	NavigationListItem,
+	Lib
 ) {
 	"use strict";
 
@@ -41,6 +43,10 @@ sap.ui.define([
 		// Add ARIA attributes
 		this.setAccessibilityAttributes(oRm, oItem);
 
+		// ARIA attributes for the item
+		if (oItem?._navItem?.getSelectable() && bHasSubmenu) {
+			oRm.attr("aria-description", Lib.getResourceBundleFor("sap.tnt").getText("NAVIGATION_LIST_DUAL_CLICK_MENU_ITEM_DESCRIPTION"));
+		}
 		oRm.openEnd();
 
 		// External link "a" tag

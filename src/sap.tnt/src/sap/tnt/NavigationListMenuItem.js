@@ -193,6 +193,17 @@ sap.ui.define([
 		oPopover.addStyleClass("sapMSubmenu");
 		oPopover.addStyleClass("sapTntNLMenu");
 
+		// Add style class for replicated parent item
+		if (this._navItem.getSelectable() && this._navItem.getItems().length > 0) {
+			oPopover.getContent()[0].getItems()[0].addStyleClass("sapTntNLMenuSubItemParent");
+		}
+
+		// Add ARIA description submenus
+		const defaultAriaLabelId = oPopover.getAriaLabelledBy()[0];
+		oPopover.removeAriaLabelledBy(defaultAriaLabelId);
+
+		oPopover.addAriaLabelledBy(this.getId() + "-txt");
+
 		return oPopover;
 	};
 

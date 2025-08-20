@@ -50,7 +50,8 @@ sap.ui.define([
 				GET_SOURCELANGUAGE: `${InitialConnector.ROOT}/translation/sourcelanguages`
 			},
 			CONTEXTS: `${InitialConnector.ROOT}/contexts`,
-			SEEN_FEATURES: `${InitialConnector.ROOT}/seenFeatures`
+			SEEN_FEATURES: `${InitialConnector.ROOT}/seenFeatures`,
+			DELETE_USER_VARIANTS: `${InitialConnector.ROOT}/variantdata/delete`
 		},
 
 		async getSeenFeatureIds(mPropertyBag) {
@@ -101,6 +102,30 @@ sap.ui.define([
 			);
 
 			return WriteUtils.sendRequest(sUrl, "POST", oRequestOption);
+		},
+
+		/**
+		 * Deletes all user variants for the given variant management references.
+		 *
+		 * @param {object} mPropertyBag - Property bag
+		 * @param {string} mPropertyBag.flexReference - Flex reference of the app the variant management controls belong to
+		 * @param {string[]} mPropertyBag.variantManagementReferences - Array of variant management references
+		 * @param {string} mPropertyBag.url - Configured url for the connector
+		 * @returns {Promise<undefined>} Promise that resolves as soon as the deletion was completed
+		 */
+		deleteUserVariantsForVM(mPropertyBag) {
+			const mPayload = {
+				flexReference: mPropertyBag.flexReference,
+				variantManagementReferences: mPropertyBag.variantManagementReferences
+			};
+			const sUrl = InitialUtils.getUrl(this.ROUTES.DELETE_USER_VARIANTS, mPropertyBag);
+			return WriteUtils.sendRequest(sUrl, "POST", {
+				tokenUrl: this.ROUTES.TOKEN,
+				initialConnector: InitialConnector,
+				payload: JSON.stringify(mPayload),
+				dataType: "json",
+				contentType: "application/json; charset=utf-8"
+			});
 		}
 	});
 

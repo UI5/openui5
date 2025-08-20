@@ -14,6 +14,7 @@
 				<Property Name="OrderOperationParentRowID" Type="Edm.String"/>
 				<Property Name="OrderOperationRowID" Type="Edm.String"/>
 				<Property Name="OrderOperationRowLevel" Type="Edm.Byte"/>
+				<Property Name="CreatedByUser" Type="Edm.String"/>
 			</EntityType>
 			<EntityType Name="C_SubscrpnProductChargeTPType">
 				<Key>

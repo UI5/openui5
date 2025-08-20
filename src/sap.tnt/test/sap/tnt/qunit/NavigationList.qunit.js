@@ -1330,7 +1330,7 @@ sap.ui.define([
 
 		await nextUIUpdate(this.clock);
 
-		var $item = jQuery(".sapTntNL .sapTntNLIFirstLevel a").first();
+		var $item = jQuery(".sapTntNL .sapTntNLIFirstLevel a").eq(2);
 		$item.trigger("tap");
 
 		await nextUIUpdate(this.clock);
@@ -1537,13 +1537,18 @@ sap.ui.define([
 			assert.strictEqual(item._navItem.getText(), aExpectedMenuItems[index + 1].getText(), "correct menu item is created");
 
 			item.getItems().forEach(function(subItem, subItemIndex) {
-				assert.strictEqual(subItem._navItem.getText(), item._navItem.getItems()[subItemIndex].getText(), "correct menu sub item is created");
+				if (subItemIndex === 0) {
+					assert.strictEqual(subItem._navItem.getText(), item._navItem.getText(), "correct menu sub item is created - first one is the parent item");
+				} else {
+					assert.strictEqual(subItem._navItem.getText(), item._navItem.getItems()[subItemIndex - 1].getText(), "correct menu sub item is created");
+				}
 			});
 		});
 
 		assert.ok(menuDomRef, "overflow menu is shown");
 
-		QUnitUtils.triggerEvent("click", document.querySelector(".sapMMenuItem:nth-child(2)"));
+		// click on item without children to select it and close the menu
+		QUnitUtils.triggerEvent("click", document.querySelector(".sapMMenuItem:nth-child(4)"));
 
 		await nextUIUpdate(this.clock);
 		this.clock.tick(500);
@@ -1554,7 +1559,7 @@ sap.ui.define([
 		assert.notOk(document.querySelector(".sapMMenu"), "overflow menu is destroyed");
 
 		assert.ok(items[0].getDomRef().classList.contains("sapTntNLIHidden"), "item 0 is hidden");
-		assert.notOk(items[2].getDomRef().classList.contains("sapTntNLIHidden"), "item 2 is visible");
+		assert.notOk(items[4].getDomRef().classList.contains("sapTntNLIHidden"), "item 2 is visible");
 
 		const oSelectedItem = items[4];
 		this.navigationList._selectItem({ item: oSelectedItem});
@@ -1577,7 +1582,11 @@ sap.ui.define([
 			assert.strictEqual(item._navItem.getText(), aExpectedMenuItemsAfterSelection[index].getText(), "correct menu item is created");
 
 			item.getItems().forEach(function(subItem, subItemIndex) {
-				assert.strictEqual(subItem._navItem.getText(), item._navItem.getItems()[subItemIndex].getText(), "correct menu sub item is created");
+				if (subItemIndex === 0) {
+					assert.strictEqual(subItem._navItem.getText(), item._navItem.getText(), "correct menu sub item is created - first one is the parent item");
+				} else {
+					assert.strictEqual(subItem._navItem.getText(), item._navItem.getItems()[subItemIndex - 1].getText(), "correct menu sub item is created");
+				}
 			});
 		});
 
@@ -1616,7 +1625,7 @@ sap.ui.define([
 		QUnitUtils.triggerEvent("tap", overflowItemDomRef);
 		await nextUIUpdate(this.clock);
 
-		const oMenuSubNavigationItem = menu.getItems()[3].getItems()[2]._navItem;
+		const oMenuSubNavigationItem = menu.getItems()[3].getItems()[3]._navItem;
 		const oAttachSubItemPressSpy = this.spy(oMenuSubNavigationItem, "_firePress");
 
 		const initiallySelectedImId = this.navigationList.getSelectedItem().sId;
@@ -1627,9 +1636,9 @@ sap.ui.define([
 
 		menu.getItems()[2]._openSubmenu();
 
-		assert.strictEqual(document.querySelector(".sapMSubmenu").getElementsByTagName("li")[2].title, "Child 3", "The correct default tooltip is set");
-		assert.strictEqual(document.querySelector(".sapMSubmenu").getElementsByTagName("li")[1].title, "Child 2 - custom tooltip", "The correct default tooltip is set");
-		QUnitUtils.triggerEvent("click",  document.querySelector(".sapMSubmenu").getElementsByTagName("li")[2]);
+		assert.strictEqual(document.querySelector(".sapMSubmenu").getElementsByTagName("li")[3].title, "Child 3", "The correct default tooltip is set");
+		assert.strictEqual(document.querySelector(".sapMSubmenu").getElementsByTagName("li")[2].title, "Child 2 - custom tooltip", "The correct default tooltip is set");
+		QUnitUtils.triggerEvent("click",  document.querySelector(".sapMSubmenu").getElementsByTagName("li")[3]);
 		assert.notEqual(this.navigationList.getSelectedItem().sId, initiallySelectedImId, "The sub item is selected");
 
 		assert.ok(oAttachSubItemPressSpy.called, "press event is fired on the sub item in the overflow menu");
@@ -2072,6 +2081,49 @@ sap.ui.define([
 
 		QUnitUtils.triggerEvent("mouseout", oTarget);
 		assert.ok(oTooltipElement.getAttribute("title"), "Test", "The user provided tooltip is available");
+	});
+
+	QUnit.module("SPACE/ENTER Key Interaction Tests", {
+		beforeEach: async function () {
+			this.navigationList = getSecondNavigationList();
+			this.navigationList.placeAt("qunit-fixture");
+			this.clock = sinon.useFakeTimers();
+			await nextUIUpdate();
+		},
+		afterEach: async function () {
+			this.navigationList.destroy();
+			this.navigationList = null;
+			await clearPendingUIUpdates(this.clock);
+			this.clock.restore();
+		}
+	});
+
+	QUnit.test("Non-selectable item does not toggle expansion on SPACE key", async function (assert) {
+		const oItem = this.navigationList.getItems()[0];
+		const oDomRef = oItem.getDomRef().querySelector(".sapTntNLI");
+
+		assert.strictEqual(oItem.getExpanded(), true, "Item is initially expanded");
+
+		QUnitUtils.triggerKeyup(oDomRef, KeyCodes.SPACE);
+
+		await nextUIUpdate(this.clock);
+		this.clock.tick(50);
+
+		assert.strictEqual(oItem.getExpanded(), true, "Item remains expanded after SPACE key (not selectable)");
+	});
+
+	QUnit.test("Non-selectable item does not toggle expansion on ENTER key", async function (assert) {
+		const oItem = this.navigationList.getItems()[0];
+		const oDomRef = oItem.getDomRef().querySelector(".sapTntNLI");
+
+		assert.strictEqual(oItem.getExpanded(), true, "Item is initially expanded");
+
+		QUnitUtils.triggerKeydown(oDomRef, KeyCodes.ENTER);
+
+		await nextUIUpdate(this.clock);
+		this.clock.tick(50);
+
+		assert.strictEqual(oItem.getExpanded(), true, "Item remains expanded after ENTER key (not selectable)");
 	});
 
 	return waitForThemeApplied();

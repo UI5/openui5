@@ -840,8 +840,10 @@ sap.ui.define([
 			// construct multi-filter for level filter and application filters
 			var oLevelFilter = new Filter(this.oTreeProperties["hierarchy-level-for"], "LE", this.getNumberOfExpandedLevels());
 			var aFilters = [oLevelFilter];
-			if (this.aApplicationFilters) {
-				aFilters = aFilters.concat(this.aApplicationFilters);
+			this._checkFilterForTreeProperties();
+			const oCombinedFilter = this.getCombinedFilter();
+			if (oCombinedFilter) {
+				aFilters.push(oCombinedFilter);
 			}
 
 			var sAbsolutePath = this.getResolvedPath();
@@ -1398,8 +1400,10 @@ sap.ui.define([
 					oParentNode.context.getProperty(sHierarchyNodeForProperty));
 			var oLevelFilter = new Filter(this.oTreeProperties["hierarchy-level-for"], "LE", iLevel);
 			var aFilters = [oNodeFilter, oLevelFilter];
-			if (this.aApplicationFilters) {
-				aFilters = aFilters.concat(this.aApplicationFilters);
+			this._checkFilterForTreeProperties();
+			const oCombinedFilter = this.getCombinedFilter();
+			if (oCombinedFilter) {
+				aFilters.push(oCombinedFilter);
 			}
 
 			var sAbsolutePath = this.getResolvedPath();
@@ -2217,10 +2221,7 @@ sap.ui.define([
 	 * @private
 	 */
 	ODataTreeBindingFlat.prototype._isRestoreTreeStateSupported = function () {
-		return (
-			this._bRestoreTreeStateAfterChange &&
-			(!this.aApplicationFilters || this.aApplicationFilters.length === 0)
-		);
+		return this._bRestoreTreeStateAfterChange && !this.getCombinedFilter();
 	};
 
 	/**

@@ -524,6 +524,11 @@ sap.ui.define([
 			return false;
 		}
 
+		if ((oEvent.key ? oEvent.key === "Enter" : oEvent.keyCode === KeyCodes.ENTER)
+			|| (oEvent.key ? oEvent.key === " " : oEvent.keyCode === KeyCodes.SPACE)) {
+			return false;
+		}
+
 		if (this.getExpanded()) {
 			this.collapse();
 		} else {

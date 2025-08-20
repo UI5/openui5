@@ -376,6 +376,12 @@ sap.ui.define([
 		});
 
 		oMenu.addStyleClass("sapTntNLMenu");
+		const defaultAriaLabelId = oMenu._getPopover().getAriaLabelledBy()[0];
+		oMenu._getPopover().removeAriaLabelledBy(defaultAriaLabelId);
+
+		const ariaLabel = InvisibleText.getStaticId("sap.tnt", "NAVIGATION_LIST_ADDITIONAL_ITEMS_MENU");
+		oMenu._getPopover().addAriaLabelledBy(ariaLabel);
+
 		this.addDependent(oMenu);
 		return oMenu;
 	};
@@ -408,6 +414,20 @@ sap.ui.define([
 			});
 			menuItem._navItem = item;
 			menuItem._oMenu = oMenu;
+
+			// add parent item to the sub-menu
+			if (item.getSelectable() && item.getItems().length) {
+				var subMenuParentItem = new NavigationListMenuItem({
+					text: item.getText(),
+					enabled: item.getEnabled(),
+					href: item.getHref(),
+					target: item.getTarget()
+				});
+
+				subMenuParentItem._navItem = item;
+				subMenuParentItem._oMenu = oMenu;
+				menuItem.addItem(subMenuParentItem);
+			}
 
 			item.getItems().forEach(function (subItem) {
 				var subMenuItem = new NavigationListMenuItem({
