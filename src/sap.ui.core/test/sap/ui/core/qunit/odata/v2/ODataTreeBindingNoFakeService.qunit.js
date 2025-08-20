@@ -9,10 +9,11 @@ sap.ui.define([
 	"sap/ui/model/FilterProcessor",
 	"sap/ui/model/FilterType",
 	"sap/ui/model/odata/CountMode",
+	"sap/ui/model/odata/ODataUtils",
 	"sap/ui/model/odata/OperationMode",
 	"sap/ui/model/odata/v2/ODataTreeBinding",
 	"sap/ui/model/Sorter"
-], function (Log, ChangeReason, Context, Filter, FilterProcessor, FilterType, CountMode, OperationMode,
+], function (Log, ChangeReason, Context, Filter, FilterProcessor, FilterType, CountMode, ODataUtils, OperationMode,
 		ODataTreeBinding, Sorter) {
 	/*global QUnit,sinon*/
 	"use strict";
@@ -115,29 +116,12 @@ sap.ui.define([
 
 		assert.deepEqual(oBinding.aApplicationFilters, [oApplicationFilter]);
 
-		oModelMock.expects("checkFilter").withExactArgs(sinon.match.same(oNotAFilter));
+		oModelMock.expects("checkFilter").withExactArgs([]);
 
 		// code under test
 		oBinding = new ODataTreeBinding(oModel, "path", oContext, oNotAFilter);
 
-		assert.deepEqual(oBinding.aApplicationFilters, oNotAFilter);
-	});
-
-	//*********************************************************************************************
-	QUnit.test("constructor: multiple Application filters are grouped", function (assert) {
-		var oBinding,
-			aFilters = ["~filter0", "~filter1"],
-			oModel = {checkFilter: function () {}};
-
-		this.mock(FilterProcessor).expects("groupFilters")
-			.withExactArgs(sinon.match.same(aFilters))
-			.returns("~groupedFilters");
-		this.mock(oModel).expects("checkFilter").withExactArgs(["~groupedFilters"]);
-
-		// code under test
-		oBinding = new ODataTreeBinding(oModel, "path", /*oContext*/{}, aFilters);
-
-		assert.deepEqual(oBinding.aApplicationFilters, ["~groupedFilters"]);
+		assert.deepEqual(oBinding.aApplicationFilters, []);
 	});
 
 	//*********************************************************************************************
@@ -990,6 +974,7 @@ sap.ui.define([
 	QUnit.test("_initialize", function (assert) {
 		var oBinding = {
 				_applyAdapter : function () {},
+				_checkFilterForTreeProperties : function () {},
 				_getEntityType : function () {},
 				_hasTreeAnnotations : function () {},
 				_processSelectParameters : function () {}
@@ -998,6 +983,7 @@ sap.ui.define([
 
 		this.mock(oBinding).expects("_hasTreeAnnotations").withExactArgs()
 			.returns("~bHasTreeAnnotations");
+		this.mock(oBinding).expects("_checkFilterForTreeProperties").withExactArgs();
 		this.mock(oBinding).expects("_getEntityType").withExactArgs()
 			.returns("~oEntityType");
 		this.mock(oBinding).expects("_processSelectParameters").withExactArgs();
@@ -1168,6 +1154,7 @@ sap.ui.define([
 			oModel: {callAfterUpdate() {}, read() {}},
 			mRequestHandles: {"_OPERATIONMODE_CLIENT_TREE_LOADING": oRequestHandle},
 			bSkipDataEvents: true,
+			_applyFilter() {},
 			_getHeaders() {},
 			fireDataReceived() {},
 			getResolvedPath() {}
@@ -1194,6 +1181,7 @@ sap.ui.define([
 
 		assert.strictEqual(oBinding.mRequestHandles["_OPERATIONMODE_CLIENT_TREE_LOADING"], "~RequestHandle1");
 
+		oBindingMock.expects("_applyFilter").withExactArgs();
 		oModelMock.expects("callAfterUpdate").withExactArgs(sinon.match.func)
 			.callsFake((fnAfterUpdate) => {
 				oBindingMock.expects("fireDataReceived").withExactArgs(sinon.match({data: {results: []}}));
@@ -1379,6 +1367,7 @@ sap.ui.define([
 			var oBinding = {
 					aApplicationFilters: "~oldFilters",
 					oModel: {checkFilter: function () {}},
+					_checkFilterForTreeProperties: function () {},
 					_fireRefresh: function () {},
 					resetData: function () {}
 				};
@@ -1388,6 +1377,7 @@ sap.ui.define([
 				.withExactArgs(sinon.match.same(oFixture.filter))
 				.exactly(oFixture.groupFilter ? 1 : 0)
 				.returns(oFixture.groupFilter);
+			this.mock(oBinding).expects("_checkFilterForTreeProperties").withExactArgs();
 			this.mock(oBinding).expects("resetData").withExactArgs();
 			this.mock(oBinding).expects("_fireRefresh").withExactArgs({reason: ChangeReason.Filter});
 
@@ -1400,24 +1390,19 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	QUnit.test("getFilterInfo", function (assert) {
-		var oGroupedApplicationFilter = {
-				getAST : function () {}
-			},
-			oBinding = {
-				aApplicationFilters : [oGroupedApplicationFilter]
-			};
-
-		this.mock(oGroupedApplicationFilter).expects("getAST")
-			.withExactArgs("~bIncludeOrigin")
-			.returns("~AST");
-
-		// code under test
-		assert.strictEqual(ODataTreeBinding.prototype.getFilterInfo.call(oBinding, "~bIncludeOrigin"), "~AST");
-
-		oBinding.aApplicationFilters = [];
+		const oBinding = {getCombinedFilter() {}};
+		const oBindingMock = this.mock(oBinding);
+		oBindingMock.expects("getCombinedFilter").withExactArgs().returns(undefined);
 
 		// code under test
 		assert.strictEqual(ODataTreeBinding.prototype.getFilterInfo.call(oBinding), null);
+
+		const oCombinedFilter = {getAST () {}};
+		oBindingMock.expects("getCombinedFilter").withExactArgs().returns(oCombinedFilter);
+		this.mock(oCombinedFilter).expects("getAST").withExactArgs("~bIncludeOrigin").returns("~AST");
+
+		// code under test
+		assert.strictEqual(ODataTreeBinding.prototype.getFilterInfo.call(oBinding, "~bIncludeOrigin"), "~AST");
 	});
 
 	//*********************************************************************************************
@@ -1615,5 +1600,240 @@ sap.ui.define([
 		assert.strictEqual(oBinding.oKeys.sPath, aData);
 		assert.strictEqual(oBinding.oLengths.sPath, aData.length);
 		assert.strictEqual(oBinding.oFinalLengths.sPath, true);
+	});
+
+	//*********************************************************************************************
+	QUnit.test("_checkFilterForTreeProperties", function (assert) {
+		const oBinding = {
+			getCombinedFilter() {}
+		};
+
+		// code under test - no tree properties defined
+		ODataTreeBinding.prototype._checkFilterForTreeProperties.call(oBinding);
+
+		oBinding.oTreeProperties = {
+			hierarchyLevelFor: "level",
+			hierarchyNodeFor: "nodeID",
+			hierarchyParentNodeFor: "parentNodeID",
+			hierarchyDrillStateFor: "drillState",
+			hierarchyNodeDescendantCountFor: "descendantCount"
+		};
+		const oObjectMock = this.mock(Object);
+		oObjectMock.expects("values")
+			.withExactArgs(sinon.match.same(oBinding.oTreeProperties))
+			.returns(["level", "nodeID", "parentNodeID", "drillState", "descendantCount"]);
+		const oBindingMock = this.mock(oBinding);
+		oBindingMock.expects("getCombinedFilter").withExactArgs().returns(undefined);
+
+		// code under test
+		ODataTreeBinding.prototype._checkFilterForTreeProperties.call(oBinding);
+
+		oObjectMock.expects("values")
+			.withExactArgs(sinon.match.same(oBinding.oTreeProperties))
+			.returns(["level", "nodeID", "parentNodeID", "drillState", "descendantCount"]);
+		const oFilter0 = {getPath() {}};
+		oBindingMock.expects("getCombinedFilter").withExactArgs().returns(oFilter0);
+		const oFilterMock = this.mock(oFilter0);
+		oFilterMock.expects("getPath").withExactArgs().returns("foo");
+
+		// code under test
+		ODataTreeBinding.prototype._checkFilterForTreeProperties.call(oBinding);
+
+		oObjectMock.expects("values")
+			.withExactArgs(sinon.match.same(oBinding.oTreeProperties))
+			.returns(["level", "nodeID", "parentNodeID", "drillState", "descendantCount"]);
+		oBindingMock.expects("getCombinedFilter").withExactArgs().returns(oFilter0);
+		oFilterMock.expects("getPath").withExactArgs().returns("level").exactly(2);
+		this.oLogMock.expects("error")
+			.withExactArgs("Filter for tree annotation property 'level' is not allowed", undefined,
+				"sap.ui.model.odata.v2.ODataTreeBinding");
+
+		// code under test
+		ODataTreeBinding.prototype._checkFilterForTreeProperties.call(oBinding);
+
+		oObjectMock.expects("values")
+			.withExactArgs(sinon.match.same(oBinding.oTreeProperties))
+			.returns(["level", "nodeID", "parentNodeID", "drillState", "descendantCount"]);
+		oFilter0.aFilters = [];
+		oBindingMock.expects("getCombinedFilter").withExactArgs().returns(oFilter0);
+		oFilterMock.expects("getPath").withExactArgs().returns("level").exactly(2);
+		this.oLogMock.expects("error")
+			.withExactArgs("Filter for tree annotation property 'level' is not allowed", undefined,
+				"sap.ui.model.odata.v2.ODataTreeBinding");
+
+		// code under test
+		ODataTreeBinding.prototype._checkFilterForTreeProperties.call(oBinding);
+
+		oObjectMock.expects("values")
+			.withExactArgs(sinon.match.same(oBinding.oTreeProperties))
+			.returns(["level", "nodeID", "parentNodeID", "drillState", "descendantCount"]);
+		const oFilter1 = {getPath() {}};
+		const oFilter2 = {getPath() {}};
+		oFilter0.aFilters = [oFilter1, oFilter2];
+		oBindingMock.expects("getCombinedFilter").withExactArgs().returns(oFilter0);
+		// oFilterMock.expects("getPath").withExactArgs().returns("level").exactly(2);
+		this.mock(oFilter1).expects("getPath").withExactArgs().returns("nodeID").exactly(2);
+		this.mock(oFilter2).expects("getPath").withExactArgs().returns("drillState").exactly(2);
+		this.oLogMock.expects("error")
+			.withExactArgs("Filter for tree annotation property 'nodeID' is not allowed", undefined,
+				"sap.ui.model.odata.v2.ODataTreeBinding");
+		this.oLogMock.expects("error")
+			.withExactArgs("Filter for tree annotation property 'drillState' is not allowed", undefined,
+				"sap.ui.model.odata.v2.ODataTreeBinding");
+
+		// code under test
+		ODataTreeBinding.prototype._checkFilterForTreeProperties.call(oBinding);
+	});
+
+	//*********************************************************************************************
+	QUnit.test("getCombinedFilter", function (assert) {
+		const oBinding = {aFilters: "~aFilters", aApplicationFilters: "~aApplicationFilters"};
+
+		this.mock(FilterProcessor).expects("combineFilters")
+			.withExactArgs("~aFilters", "~aApplicationFilters")
+			.returns("~oCombinedFilter");
+
+		// code under test
+		assert.strictEqual(ODataTreeBinding.prototype.getCombinedFilter.call(oBinding), "~oCombinedFilter");
+
+	});
+
+	//*********************************************************************************************
+	QUnit.test("getFilterParams", function (assert) {
+		const oBinding = {
+			aApplicationFilters: "~aApplicationFilters",
+			oEntityType: "~oEntityType",
+			aFilters: "~aFilters",
+			sFilterParams: "",
+			oModel: {oMetadata: "~oMetadata"}
+		};
+		const oFilterProcessorMock = this.mock(FilterProcessor);
+		oFilterProcessorMock.expects("combineFilters")
+			.withExactArgs("~aFilters", "~aApplicationFilters")
+			.returns(undefined);
+
+		// code under test - use control and application filters client side; no filters defined
+		// -> no filters in filter string
+		let sFilterParameters = ODataTreeBinding.prototype.getFilterParams.call(oBinding);
+
+		assert.strictEqual(sFilterParameters, "");
+		assert.strictEqual(oBinding.sFilterParams, "");
+
+		oBinding.bUseServersideApplicationFilters = true;
+		oBinding.bClientOperation = false;
+		oFilterProcessorMock.expects("combineFilters")
+			.withExactArgs("~aFilters", "~aApplicationFilters")
+			.returns("~oCombinedFilter");
+		const oODataUtilsMock = this.mock(ODataUtils);
+		oODataUtilsMock.expects("_createFilterParams")
+			.withExactArgs("~oCombinedFilter", "~oMetadata", "~oEntityType")
+			.returns("filterString");
+
+		// code under test - send application filters to the server, no client operation
+		// -> combine both filters types for filter string
+		sFilterParameters = ODataTreeBinding.prototype.getFilterParams.call(oBinding);
+
+		assert.strictEqual(sFilterParameters, "(filterString)");
+		assert.strictEqual(oBinding.sFilterParams, "(filterString)");
+
+		oBinding.bUseServersideApplicationFilters = true;
+		oBinding.bClientOperation = true;
+		oFilterProcessorMock.expects("combineFilters")
+			.withExactArgs(undefined, "~aApplicationFilters")
+			.returns("~oCombinedFilter");
+		oODataUtilsMock.expects("_createFilterParams")
+			.withExactArgs("~oCombinedFilter", "~oMetadata", "~oEntityType")
+			.returns("filterString");
+
+		// code under test - send application filters to the server, is client operation
+		// -> only use application filters for filter string
+		sFilterParameters = ODataTreeBinding.prototype.getFilterParams.call(oBinding);
+
+		assert.strictEqual(sFilterParameters, "(filterString)");
+		assert.strictEqual(oBinding.sFilterParams, "(filterString)");
+
+		oBinding.bUseServersideApplicationFilters = false;
+		oBinding.bClientOperation = true;
+		oFilterProcessorMock.expects("combineFilters").withExactArgs(undefined, undefined).returns(undefined);
+		oODataUtilsMock.expects("_createFilterParams").never();
+
+		// code under test - don't send application filters to the server, is client operation
+		// -> no filters used for filter string
+		sFilterParameters = ODataTreeBinding.prototype.getFilterParams.call(oBinding);
+
+		assert.strictEqual(sFilterParameters, "");
+		assert.strictEqual(oBinding.sFilterParams, "");
+	});
+
+	//*********************************************************************************************
+	QUnit.test("_applyFilter: no filters", function (assert) {
+		const oBinding = {
+				aApplicationFilters: "~aApplicationFilters",
+				aFilters: "~aFilters",
+				oFinalLengths: {},
+				oKeys: {},
+				oLengths: {}
+			};
+		this.mock(FilterProcessor).expects("combineFilters")
+			.withExactArgs( "~aFilters", "~aApplicationFilters")
+			.returns(undefined);
+
+		// code under test
+		ODataTreeBinding.prototype._applyFilter.call(oBinding);
+
+		assert.deepEqual(oBinding.oKeys, {});
+		assert.deepEqual(oBinding.oLengths, {});
+		assert.deepEqual(oBinding.oFinalLengths, {});
+	});
+
+	//*********************************************************************************************
+	[false, true].forEach(function (useServerSideApplicationFilters, i) {
+		const sTitle = `_applyFilter: bUserServersideApplicationFilters=${useServerSideApplicationFilters}`;
+		QUnit.test(sTitle, function (assert) {
+			const oBinding = {
+					aApplicationFilters: "~aApplicationFilters",
+					aFilters: "~aFilters",
+					oFinalLengths: {},
+					oLengths: {},
+					oModel: {
+						checkFilter() {},
+						getContext() {},
+						getProperty() {}
+					},
+					mNormalizeCache: "~mNormalizeCache",
+					bUseServersideApplicationFilters: useServerSideApplicationFilters,
+					_filterRecursive () {}
+				};
+			this.mock(FilterProcessor).expects("combineFilters")
+				.withExactArgs("~aFilters", useServerSideApplicationFilters ? undefined : "~aApplicationFilters")
+				.returns("~oCombinedFilter");
+			this.mock(oBinding).expects("_filterRecursive")
+				.withExactArgs({id: "null"}, {}, sinon.match.func)
+				.callsFake((oObject, oFilteredKeys, fnFilter) => {
+					this.mock(FilterProcessor).expects("apply")
+						.withExactArgs(["key1"], "~oCombinedFilter", sinon.match.func, "~mNormalizeCache")
+						.callsFake((aKeys, oCombinedFilter, fnGetValue) => {
+							this.mock(oBinding.oModel).expects("getContext").withExactArgs("/ref").returns("~oContext");
+							this.mock(oBinding.oModel).expects("getProperty").withExactArgs("path", "~oContext");
+
+							// code under test
+							fnGetValue("ref", "path");
+
+							return ["key1"];
+						});
+
+					// code under test
+					fnFilter("key1");
+
+					oFilteredKeys["null"] = [1]; // simulate _filterRecursive writing into oFilteredKeys
+				});
+
+			// code under test
+			ODataTreeBinding.prototype._applyFilter.call(oBinding);
+
+			assert.deepEqual(oBinding.oKeys, {"null": [1]});
+			assert.deepEqual(oBinding.oLengths["null"], 1);
+			assert.deepEqual(oBinding.oFinalLengths["null"], true);
+		});
 	});
 });

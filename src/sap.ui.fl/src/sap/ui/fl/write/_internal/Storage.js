@@ -339,6 +339,19 @@ sap.ui.define([
 	};
 
 	/**
+	 * Deletes all user variants for the given variant management references.
+	 *
+	 * @param {object} mPropertyBag - Property bag
+	 * @param {string} mPropertyBag.flexReference - Flex reference of the app the VM controls belong to
+	 * @param {string[]} mPropertyBag.variantManagementReferences - Array of variant management references
+	 * @param {sap.ui.fl.Layer} mPropertyBag.layer - Layer
+	 * @returns {Promise<undefined>} Promise that resolves as soon as the deletion was completed
+	 */
+	Storage.deleteUserVariantsForVM = function(mPropertyBag) {
+		return _executeActionByName("deleteUserVariantsForVM", mPropertyBag);
+	};
+
+	/**
 	 * Gets the variant management context information.
 	 * The context information is a JSON object that has boolean property 'lastHitReached'
 	 * indicating that the result is paginated and whether there are more contexts that can be fetched from the backend.

@@ -477,7 +477,7 @@ sap.ui.define([
 				await loadAndCacheFlexData(mProperties);
 				prepareNewInstance(mProperties);
 			} else if (checkComponentIdChanged(mProperties)) {
-				// a changed component Id does not invalidate the cached flex data, only the instance
+				// a changed component ID does not invalidate the cached flex data, only the instance
 				prepareNewInstance(mProperties);
 			} else {
 				rebuildResponseIfMaxLayerChanged(mPropertyBag.reference);

@@ -14,7 +14,6 @@ sap.ui.define([
 	"sap/ui/fl/apply/_internal/flexObjects/UIChange",
 	"sap/ui/fl/apply/_internal/flexState/FlexState",
 	"sap/ui/fl/apply/_internal/flexState/changes/DependencyHandler",
-	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
 	"sap/ui/fl/apply/_internal/flexState/FlexObjectState",
 	"sap/ui/thirdparty/sinon-4",
 	"test-resources/sap/ui/fl/qunit/FlQUnitUtils",
@@ -33,7 +32,6 @@ sap.ui.define([
 	UIChange,
 	FlexState,
 	DependencyHandler,
-	VariantManagementState,
 	FlexObjectState,
 	sinon,
 	FlQUnitUtils,
@@ -286,6 +284,19 @@ sap.ui.define([
 			aFlexObjects[4].setState(States.LifecycleState.UPDATED);
 			oDataSelector.checkUpdate();
 			assert.strictEqual(FlexObjectState.getDirtyFlexObjects(sReference).length, 3, "then there are three dirty changes");
+		});
+
+		QUnit.test("getDirtyFlexObjects with a deleted compVariant", function(assert) {
+			const oDataSelector = FlexState.getFlexObjectsDataSelector();
+			const aFlexObjects = oDataSelector.get({reference: sReference});
+			assert.strictEqual(FlexObjectState.getDirtyFlexObjects(sReference).length, 0, "initially there are no dirty changes");
+			aFlexObjects[0].setState(States.LifecycleState.DELETED);
+			aFlexObjects[1].setState(States.LifecycleState.DELETED);
+			aFlexObjects[1].setFileType("variant");
+			aFlexObjects[2].setState(States.LifecycleState.NEW);
+			aFlexObjects[4].setState(States.LifecycleState.UPDATED);
+			oDataSelector.checkUpdate();
+			assert.strictEqual(FlexObjectState.getDirtyFlexObjects(sReference).length, 4, "then there are four dirty changes");
 		});
 
 		QUnit.test("getDirtyFlexObjects with created and delete in one session", function(assert) {

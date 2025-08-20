@@ -265,7 +265,9 @@ sap.ui.define([
 	 */
 	FlexObjectState.getDirtyFlexObjects = function(sReference) {
 		function isNewChangeDeleted(oFlexObject) {
-			return !(oFlexObject.getState() === States.LifecycleState.DELETED && oFlexObject._sPreviousState === States.LifecycleState.NEW);
+			// Also consider the fileType in case it is a compVariant("variant") because there the state is already set to DELETED
+			return !(oFlexObject.getState() === States.LifecycleState.DELETED && oFlexObject._sPreviousState === States.LifecycleState.NEW)
+				|| (oFlexObject.getState() === States.LifecycleState.DELETED && oFlexObject.getFileType() === "variant");
 		}
 
 		return oAllDirtyFlexObjectsDataSelector

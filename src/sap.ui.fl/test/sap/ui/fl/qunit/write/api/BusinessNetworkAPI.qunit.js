@@ -4,6 +4,7 @@ sap.ui.define([
 	"sap/ui/core/Control",
 	"sap/ui/fl/apply/_internal/controlVariants/Utils",
 	"sap/ui/fl/apply/_internal/flexObjects/FlexObjectFactory",
+	"sap/ui/fl/apply/_internal/flexObjects/States",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/initial/_internal/FlexInfoSession",
 	"sap/ui/fl/write/_internal/flexState/FlexObjectManager",
@@ -18,6 +19,7 @@ sap.ui.define([
 	Control,
 	ControlVariantsUtils,
 	FlexObjectFactory,
+	States,
 	ManifestUtils,
 	FlexInfoSession,
 	FlexObjectManager,
@@ -147,28 +149,40 @@ sap.ui.define([
 		});
 
 		QUnit.test("when deleteVariants is called", async function(assert) {
-			const aExpectedDeletedObjects = ["variant1", "variant2", "DeletedObject1", "DeletedObject2"];
-			sandbox.stub(ChangesWriteAPI, "deleteVariantsAndRelatedObjects")
-			.withArgs({
-				variantManagementControl: "DummyVMControl",
-				variants: ["variant1", "variant2"],
-				layer: Layer.CUSTOMER,
-				forceDelete: true
-			})
-			.returns(aExpectedDeletedObjects);
-			sandbox.stub(FeaturesAPI, "isVersioningEnabled").resolves(false);
-			const oSaveFlexObjectsStub = sandbox.stub(FlexObjectManager, "saveFlexObjects")
-			.withArgs({
-				selector: "DummyVMControl",
-				flexObjects: aExpectedDeletedObjects,
-				includeCtrlVariants: true
-			});
-			const aDeletedObjects = await BusinessNetworkAPI.deleteVariants({
-				vmControl: "DummyVMControl",
+			const oStorageStub = sandbox.stub(Storage, "condense").resolves();
+			await BusinessNetworkAPI.deleteVariants({
+				reference: "sbn.app",
 				variants: ["variant1", "variant2"]
 			});
-			assert.deepEqual(aDeletedObjects, aExpectedDeletedObjects, "then the deleted objects are returned");
-			assert.ok(oSaveFlexObjectsStub, "then the saveFlexObjects function is called once with the correct parameters");
+			assert.equal(oStorageStub.callCount, 1, "storage condense called once");
+			assert.strictEqual(oStorageStub.getCall(0).args[0].layer, Layer.CUSTOMER, "the correct layer is passed");
+			assert.strictEqual(oStorageStub.getCall(0).args[0].reference, "sbn.app", "the correct reference is passed");
+			assert.deepEqual(oStorageStub.getCall(0).args[0].allChanges.length, 2, "all changes have 2 objects");
+			assert.equal(oStorageStub.getCall(0).args[0].allChanges[0].getId(), "variant1", "change 1 has correct name");
+			assert.equal(oStorageStub.getCall(0).args[0].allChanges[0].condenserState, "delete", "change 1 has correct condenser state");
+			assert.equal(oStorageStub.getCall(0).args[0].allChanges[0].getState(), States.LifecycleState.DELETED, "change 1 has correct lifecycle state");
+			assert.equal(oStorageStub.getCall(0).args[0].allChanges[1].getId(), "variant2", "change 2 has correct name");
+			assert.equal(oStorageStub.getCall(0).args[0].allChanges[1].condenserState, "delete", "change 2 has correct condenser state");
+			assert.equal(oStorageStub.getCall(0).args[0].allChanges[1].getState(), States.LifecycleState.DELETED, "change 2 has correct lifecycle state");
+			assert.deepEqual(oStorageStub.getCall(0).args[0].condensedChanges.length, 2, "condense changes have 2 objects");
+		});
+
+		QUnit.test("when resetPersonalizationVariants is called", async function(assert) {
+			const oStorageDeleteStub = sandbox.stub(Storage, "deleteUserVariantsForVM").resolves();
+			await BusinessNetworkAPI.resetPersonalizationVariants({
+				reference: "testReference",
+				variantManagementReference: "vm1"
+			});
+			assert.ok(oStorageDeleteStub.calledOnce, "then Storage.deleteUserVariantsForVM is called once");
+			assert.deepEqual(
+				oStorageDeleteStub.lastCall.args[0],
+				{
+					flexReference: "testReference",
+					variantManagementReferences: ["vm1"],
+					layer: Layer.USER
+				},
+				"then Storage.deleteUserVariantsForVM is called with the correct parameters"
+			);
 		});
 	});
 

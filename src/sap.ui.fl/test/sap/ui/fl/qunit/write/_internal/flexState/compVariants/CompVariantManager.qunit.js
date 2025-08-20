@@ -627,14 +627,22 @@ sap.ui.define([
 					}
 				}
 			});
-			assert.equal(FlexObjectManager.hasDirtyFlexObjects({reference: sComponentId}), true, "hasDirtyChanges is true after add variant");
+			assert.equal(
+				FlexObjectManager.hasDirtyFlexObjects({reference: sComponentId}),
+				true,
+				"hasDirtyChanges is true after add variant"
+			);
 			CompVariantManager.removeVariant({
 				reference: sComponentId,
 				persistencyKey: sPersistencyKey,
 				id: oVariant.getId(),
 				layer: Layer.CUSTOMER
 			});
-			assert.equal(FlexObjectManager.hasDirtyFlexObjects({reference: sComponentId}), false, "hasDirtyChanges is false after remove variant");
+			assert.equal(
+				FlexObjectManager.hasDirtyFlexObjects({reference: sComponentId}),
+				true,
+				"hasDirtyChanges is still true after remove variant as they are part of the flexstate"
+			);
 			var oWriteStub = sandbox.stub(Storage, "write").resolves();
 			var oUpdateStub = sandbox.stub(Storage, "update").resolves();
 			var oRemoveStub = sandbox.stub(Storage, "remove").resolves();

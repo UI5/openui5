@@ -5,7 +5,6 @@
 sap.ui.define([
 	"sap/base/util/restricted/_omit",
 	"sap/base/util/restricted/_pick",
-	"sap/ui/core/Element",
 	"sap/ui/fl/Layer",
 	"sap/ui/fl/Utils",
 	"sap/ui/fl/apply/_internal/flexObjects/CompVariant",
@@ -24,7 +23,6 @@ sap.ui.define([
 ], function(
 	_omit,
 	_pick,
-	Element,
 	Layer,
 	Utils,
 	CompVariant,
@@ -697,7 +695,7 @@ sap.ui.define([
 		}
 
 		oVariant.markForDeletion();
-		CompVariantManagementState.getCompEntitiesDataSelector().checkUpdate({ reference: mPropertyBag.reference });
+		FlexState.getFlexObjectsDataSelector().checkUpdate({ reference: mPropertyBag.reference });
 		return oVariant;
 	};
 

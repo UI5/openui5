@@ -525,6 +525,10 @@ sap.ui.define([
 
 			oLinkAriaProps.roledescription = this._resourceBundleTnt.getText("NAVIGATION_LIST_ITEM_ROLE_DESCRIPTION_MENUITEM");
 		} else {
+			if (this.getSelectable() && this.getItems().length) {
+				oLinkAriaProps.description = this._resourceBundleTnt.getText("NAVIGATION_LIST_KEYBOARD_NAVIGATION") + " " + this.getText();
+			}
+
 			oLinkAriaProps.role = "treeitem";
 
 			if (bSelectable) {

@@ -54,7 +54,7 @@
 						<Button enabled="{ui>/tableBound}" icon="sap-icon://collapse"
 							press="onCollapseAll" tooltip="Collapse All" />
 						<ToolbarSpacer width="3em" />
-						<Label labelFor="filterCreator" text="Filter by Creator" />
+						<Label labelFor="filterCreator" text="Filter by Creator (AppFilter)" />
 						<SearchField id="filterCreator" search=".onFilterByCreator"
 							tooltip="Filter by Creator" value="{ui>/createdByFilter}"
 							width="15rem" />
@@ -76,31 +76,31 @@
 						targetAggregation="rows" />
 				</t:dragDropConfig>
 				<t:columns>
-					<t:Column width="20rem">
+					<t:Column width="20rem" filterProperty="ErhaOrderItem">
 						<Label text="Order Item" />
 						<t:template>
 							<Input editable="false" value="{ErhaOrderItem}" />
 						</t:template>
 					</t:Column>
-					<t:Column width="15rem">
+					<t:Column width="15rem" filterProperty="ErhaOrderItemName">
 						<Label text="Order Item Name" />
 						<t:template>
 							<Input value="{ErhaOrderItemName}" />
 						</t:template>
 					</t:Column>
-					<t:Column width="10rem">
+					<t:Column width="10rem" filterProperty="ParentItem">
 						<Label text="Parent Item" />
 						<t:template>
 							<Input editable="false" value="{ParentItem}" />
 						</t:template>
 					</t:Column>
-					<t:Column width="10rem">
+					<t:Column width="10rem" filterProperty="CreatedByUser">
 						<Label text="{/#ErhaOrderItemType/CreatedByUser/@sap:label}" />
 						<t:template>
 							<Input editable="false" value="{CreatedByUser}" />
 						</t:template>
 					</t:Column>
-					<t:Column width="10rem">
+					<t:Column width="10rem" filterProperty="CreationDateTime">
 						<Label text="{/#ErhaOrderItemType/CreationDateTime/@sap:label}" />
 						<t:template>
 							<Input editable="false" value="{

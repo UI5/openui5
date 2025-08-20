@@ -603,22 +603,6 @@ sap.ui.define([
 		oBinding.getRootContexts();
 	});
 
-	QUnit.test("Control filtering prohibited in OperationMode.Server", function(assert) {
-		var iWarningCount = 0;
-
-		sinon.stub(Log, "warning", function(sMsg) {
-			iWarningCount++;
-		});
-		createTreeBinding("/Employees(2)", null, [], {
-			navigation: {}
-		});
-
-		oBinding.filter(new Filter("FirstName", "EQ", "Tom"));
-
-		assert.equal(iWarningCount, 1, "One warning (that filtering is not enabled) should have fired");
-		Log.warning.restore();
-	});
-
 	QUnit.test("Paging - CountMode.Request", function(assert) {
 		var done = assert.async();
 
@@ -1866,35 +1850,6 @@ sap.ui.define([
 	});
 
 	/**
-	 * Test to see if the control filters are prohibited in OperationMode.Server
-	 */
-	QUnit.test("filter() API - OperationMode.Server - Control Filter - afterwards", function(assert) {
-		createTreeBinding("/GLAccountHierarchyInChartOfAccountsSet(P_MANDT='902',P_VERSN='INT',P_KTOPL='INT')/Result",
-				null,
-				[],
-				{rootLevel: 2}
-		);
-
-		//warning stub
-		var iWarningCount = 0,
-			sMessage = "";
-		sinon.stub(Log, "warning", function(sMsg) {
-			iWarningCount++;
-			sMessage = sMsg;
-		});
-
-		// should not break, even though no data is there
-		var aFilters = [new Filter("FinancialStatementItemText", "StartsWith", "A")];
-		oBinding.filter(aFilters, "Control");
-
-		assert.equal(iWarningCount, 1, "Exactly one warning logged.");
-		assert.equal(sMessage, "Filtering with ControlFilters is ONLY possible if the ODataTreeBinding is running in OperationMode.Client or " +
-				"OperationMode.Auto, in case the given threshold is lower than the total number of tree nodes.");
-
-		Log.warning.restore();
-	});
-
-	/**
 	 * Test to check if the application filters are appended to the data request if the useServersideApplicationFilters flag is set to "true"
 	 */
 	QUnit.test("filter() API - OperationMode.Client - Application Filter - useServersideApplicationFilters=true - initial", function(assert) {
@@ -2302,7 +2257,7 @@ sap.ui.define([
 		oBinding.filter(new Filter("ParentNode", "EQ", "000000"));
 
 		assert.equal(iErrorCount, 1, "One error logged, if no navigation path properties are given, and hierarchy annotations are missing/incomplete.");
-		assert.equal(iWarningCount, 2, "One warning (that filtering is not enabled) and One for the incomplete annotations.");
+		assert.equal(iWarningCount, 1, "One for the incomplete annotations.");
 
 		Log.warning.restore();
 		Log.error.restore();

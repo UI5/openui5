@@ -1722,6 +1722,7 @@ sap.ui.define([
 		beforeEach() {
 			this.oConnector = {};
 			sandbox.stub(StorageUtils, "getConnectors").resolves([{
+				url: "/btp",
 				connector: "JsObjectConnector",
 				layers: ["ALL"],
 				writeConnectorModule: this.oConnector
@@ -1748,6 +1749,28 @@ sap.ui.define([
 				done();
 			};
 			Storage.setSeenFeatureIds({layer: Layer.CUSTOMER, seenFeatureIds: ["feature1"]});
+		});
+
+		QUnit.test("when deleteUserVariantsForVM is called", function(assert) {
+			const done = assert.async();
+			this.oConnector.deleteUserVariantsForVM = (mPropertyBag) => {
+				assert.deepEqual(
+					mPropertyBag,
+					{
+						layer: Layer.USER,
+						flexReference: "testReference",
+						variantManagementReferences: ["vm1", "vm2"],
+						url: "/btp"
+					},
+					"then the correct parameters are passed"
+				);
+				done();
+			};
+			Storage.deleteUserVariantsForVM({
+				layer: Layer.USER,
+				flexReference: "testReference",
+				variantManagementReferences: ["vm1", "vm2"]
+			});
 		});
 	});
 
