@@ -104,6 +104,17 @@ sap.ui.define([
 			"a CSS Font Level 4 value (451) is not accepted");
 	});
 
+	QUnit.test("Validate CSS display value", function(assert) {
+		var input1 = '<div style="display: flex ; width: 100px ; background-color: aqua">HELLO</div>';
+		assert.equal(sanitizeHTML(input1), input1, "display:flex is preserved");
+
+		var input2 = '<div style="display: inline-flex ; width: 100px ; background-color: aqua">HELLO</div>';
+		assert.equal(sanitizeHTML(input2), input2, "display:inline-flex is preserved");
+
+		var input3 = '<div style="display: inline flow-root ; width: 100px ; background-color: aqua">HELLO</div>';
+		assert.equal(sanitizeHTML(input3), input3, "display:inline flow-root is preserved");
+	});
+
 	QUnit.module("Sanitizer Performance", {
 		before: function(assert) {
 			// add a custom assertion "lower than"

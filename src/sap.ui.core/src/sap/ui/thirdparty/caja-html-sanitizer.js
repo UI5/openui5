@@ -118,7 +118,11 @@ var cssSchema = (function () {
         'inset' ], [ 'invert' ], [ 'justify' ], [ 'local' ], [ 'medium' ], [
         'mix' ], [ 'none' ], [ 'normal' ], [ 'once' ], [ 'repeat' ], [ 'scroll'
       ], [ 'separate' ], [ 'small-caps' ], [ 'spell-out' ], [ 'transparent' ],
-      [ 'visible' ] ];
+      [ 'visible' ],
+      // ##### BEGIN: MODIFIED BY SAP
+      [ 'flex', 'inline-flex', 'grid', 'inline-grid', 'flow-root', 'contents' ], [ 'initial', 'revert', 'revert-layer', 'unset' ]
+      // ##### END: MODIFIED BY SAP
+    ];
     return {
       '-moz-border-radius': {
         'cssExtra': c[ 0 ],
@@ -440,7 +444,9 @@ var cssSchema = (function () {
       },
       'display': {
         'cssPropBits': 32,
-        'cssLitGroup': [ L[ 2 ], L[ 47 ], L[ 54 ] ]
+        // ##### BEGIN: MODIFIED BY SAP
+        'cssLitGroup': [ L[ 2 ], L[ 47 ], L[ 54 ], L[ 64 ], L[ 65 ] ]
+        // ##### END: MODIFIED BY SAP
       },
       'elevation': {
         'cssPropBits': 5,
