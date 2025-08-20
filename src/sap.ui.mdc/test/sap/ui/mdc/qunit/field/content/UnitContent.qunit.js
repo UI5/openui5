@@ -15,7 +15,8 @@ sap.ui.define([
 	'sap/base/util/merge',
 	"sap/ui/core/InvisibleText",
 	"sap/ui/model/odata/type/Unit",
-	"sap/ui/model/odata/type/Currency"
+	"sap/ui/model/odata/type/Currency",
+	"sap/ui/model/type/Integer"
 ], (
 	QUnit,
 	ContentBasicTest,
@@ -32,7 +33,8 @@ sap.ui.define([
 	merge,
 	InvisibleText,
 	UnitType,
-	CurrencyType
+	CurrencyType,
+	IntegerType
 ) => {
 	"use strict";
 
@@ -449,6 +451,76 @@ sap.ui.define([
 		aControls.forEach((oCreatedControl, iIndex) => {
 			oCreatedControl.destroy();
 		});
+	});
+
+	QUnit.module("_adjustDataTypeForUnit (DINC0532239)", {
+		beforeEach: () => {
+			ContentBasicTest.initContentFactory("sap.ui.model.odata.type.Currency", {}, fnEnhanceField, BaseType.Unit);
+		},
+		afterEach: () => {
+			ContentBasicTest.cleanUpContentFactory();
+		}
+	});
+
+
+	QUnit.test("_adjustDataTypeForUnit calls processPartTypes", (assert) => {
+		// arrange
+		const oAdjustDataTypeForUnitSpy = sinon.spy(UnitContent, "_adjustDataTypeForUnit");
+		const oProcessPartTypesSpy = sinon.spy(CurrencyType.prototype, "processPartTypes");
+
+		// act
+		this.oContentFactory.getCompositeTypes = () => {
+			return [new IntegerType()];
+		};
+		UnitContent._adjustDataTypeForUnit(this.oContentFactory);
+
+		// assert
+		assert.ok(oAdjustDataTypeForUnitSpy.calledOnce, "_adjustDataTypeForUnit is called.");
+		assert.ok(oProcessPartTypesSpy.calledTwice, "processPartTypes is called.");
+
+		// clean up
+		oProcessPartTypesSpy.restore();
+		oAdjustDataTypeForUnitSpy.restore();
+	});
+
+	QUnit.test("_adjustDataTypeForUnit does not call processPartTypes", (assert) => {
+		// arrange
+		const oAdjustDataTypeForUnitSpy = sinon.spy(UnitContent, "_adjustDataTypeForUnit");
+		const oProcessPartTypesSpy = sinon.spy(CurrencyType.prototype, "processPartTypes");
+
+		// act
+		this.oContentFactory.getCompositeTypes = () => {
+			return [];
+		};
+		UnitContent._adjustDataTypeForUnit(this.oContentFactory);
+
+		// assert
+		assert.ok(oAdjustDataTypeForUnitSpy.calledOnce, "_adjustDataTypeForUnit is called.");
+		assert.ok(oProcessPartTypesSpy.notCalled, "processPartTypes is called.");
+
+		// clean up
+		oProcessPartTypesSpy.restore();
+		oAdjustDataTypeForUnitSpy.restore();
+	});
+
+	QUnit.test("_adjustDataTypeForUnit does not call processPartTypes", (assert) => {
+		// arrange
+		const oAdjustDataTypeForUnitSpy = sinon.spy(UnitContent, "_adjustDataTypeForUnit");
+		const oProcessPartTypesSpy = sinon.spy(CurrencyType.prototype, "processPartTypes");
+
+		// act
+		this.oContentFactory.getCompositeTypes = () => {
+			return undefined;
+		};
+		UnitContent._adjustDataTypeForUnit(this.oContentFactory);
+
+		// assert
+		assert.ok(oAdjustDataTypeForUnitSpy.calledOnce, "_adjustDataTypeForUnit is called.");
+		assert.ok(oProcessPartTypesSpy.notCalled, "processPartTypes is called.");
+
+		// clean up
+		oProcessPartTypesSpy.restore();
+		oAdjustDataTypeForUnitSpy.restore();
 	});
 
 	QUnit.start();
