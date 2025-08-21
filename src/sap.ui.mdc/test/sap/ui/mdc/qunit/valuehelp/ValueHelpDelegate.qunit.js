@@ -307,7 +307,8 @@ sap.ui.define([
 				cells: [
 					{mBindingInfos: [{parts: [{path: "key", type: oIntegerType}]}]},
 					{mBindingInfos: [{parts: [{path: "text", type: oStringType}]}]},
-					{mBindingInfos: [{parts: [{path: "info", type: undefined}]}]}
+					{mBindingInfos: [{parts: [{path: "info", type: undefined}]}]},
+					{mBindingInfos: [{parts: [{path: "desc", type: "sap.ui.model.type.String"}]}]}
 				]
 			}
 		};
@@ -318,10 +319,11 @@ sap.ui.define([
 			text: {type: oStringType, baseType: BaseType.String},
 			info: {type: null, baseType: BaseType.String}
 		};
-		assert.deepEqual(oConditionTypes, oCompare, "CondtitionTypes returned");
-
-		oIntegerType.destroy();
-		oStringType.destroy();
+		assert.deepEqual(oConditionTypes.key, oCompare.key, "ConditionTypes key returned");
+		assert.deepEqual(oConditionTypes.text, oCompare.text, "ConditionTypes text returned");
+		assert.deepEqual(oConditionTypes.info, oCompare.info, "ConditionTypes info returned");
+		assert.ok(oConditionTypes.desc.type.isA("sap.ui.model.SimpleType"), "ConditionTypes desc.type is sap.ui.model.SimpleType for type as string");
+		assert.equal(oConditionTypes.desc.baseType, BaseType.String, "ConditionTypes desc.baseType is String for type as string");
 	});
 
 	QUnit.test("getFilterConditions", (assert) => {
