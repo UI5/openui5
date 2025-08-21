@@ -60,11 +60,19 @@ sap.ui.define([
 	}
 
 	function getActiveElement(oRoot) {
-		if (oRoot.activeElement && oRoot.activeElement.shadowRoot) {
-			return getActiveElement(oRoot.activeElement.shadowRoot);
+		let oActiveElement = oRoot.activeElement;
+
+		// nothing is focused
+		if (!oActiveElement) {
+			return null;
 		}
 
-		return oRoot.activeElement;
+		// If the active element has a shadow root, dive in
+		while (oActiveElement && oActiveElement.shadowRoot && oActiveElement.shadowRoot.activeElement) {
+			oActiveElement = oActiveElement.shadowRoot.activeElement;
+		}
+
+		return oActiveElement;
 	}
 
 	function isContainedIn(oTarget, oScope) {

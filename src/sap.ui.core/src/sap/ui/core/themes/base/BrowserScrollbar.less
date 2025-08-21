@@ -5,19 +5,11 @@
 
 /****** Firefox ******/
 
-html.sap-desktop:not(.sapUiNativeScrollbars) {
+html[data-sap-ui-browser^="ff"].sap-desktop:not(.sapUiNativeScrollbars) {
 	scrollbar-color: @sapUiScrollBarFaceColor @sapUiScrollBarTrackColor;
 }
 
 /****** Safari + Chrome on Desktop ******/
-
-html.sap-desktop:not(.sapUiNativeScrollbars) ::-webkit-scrollbar:horizontal {
-	height: @sapUiScrollBarDimension;
-}
-
-html.sap-desktop:not(.sapUiNativeScrollbars) ::-webkit-scrollbar:vertical {
-	width: @sapUiScrollBarDimension;
-}
 
 html.sap-desktop:not(.sapUiNativeScrollbars) ::-webkit-scrollbar {
 	background-color: @sapUiScrollBarTrackColor;
@@ -25,12 +17,9 @@ html.sap-desktop:not(.sapUiNativeScrollbars) ::-webkit-scrollbar {
 
 html.sap-desktop:not(.sapUiNativeScrollbars) ::-webkit-scrollbar-thumb {
 	background-color: @sapUiScrollBarFaceColor;
+	border-radius: @sapUiElementBorderCornerRadius;
 }
 
 html.sap-desktop:not(.sapUiNativeScrollbars) ::-webkit-scrollbar-thumb:hover {
 	background-color: @sapUiScrollBarHoverFaceColor;
-}
-
-html.sap-desktop:not(.sapUiNativeScrollbars) ::-webkit-scrollbar-corner {
-	background-color: @sapUiScrollBarTrackColor;
 }

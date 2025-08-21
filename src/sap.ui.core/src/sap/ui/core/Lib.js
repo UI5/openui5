@@ -156,6 +156,31 @@ sap.ui.define([
 	}
 
 	/**
+	 * filter/normalize given dependencies
+	 * @param {Array<{name:string, lazy:boolean}>} aDependencies
+	 * @returns {Array<{name:string, lazy:boolean}>}
+	 * @private
+	 */
+	function filterDependencies(aDependencies) {
+		const aResults = [];
+		if (aDependencies) {
+			aDependencies.forEach(function(oDependency) {
+				if (!oDependency.lazy) {
+					aResults.push({
+						name: oDependency.name
+					});
+				} else if (oLibraryWithBundleInfo.has(oDependency.name)) {
+					aResults.push({
+						name: oDependency.name,
+						lazy: true
+					});
+				}
+			});
+		}
+		return aResults;
+	}
+
+	/**
 	 * @classdesc
 	 * Constructor must not be used: To load a library, please use the static method {@link #.load}.
 	 *
@@ -391,14 +416,29 @@ sap.ui.define([
 				aAllPromises.push(this._loadLibraryPreload());
 			}
 
-			// load dependencies, if there are any
-			const aDependencies = this._getDependencies();
-
 			//css loading promises of dependent libs
 			const aDependentLibCss = [];
 
+			let aDependencies = [];
+
+			// resolve dependencies via manifest "this._getDependencies()" except for libary-preload.json
+			const oManifest = this.getManifest();
+
+			var mDependencies = oManifest?.["sap.ui5"]?.dependencies?.libs;
+			if (mDependencies) {
+				aDependencies = Object.keys(mDependencies).map((sDependency) => {
+					return  {
+						name: sDependency,
+						lazy: mDependencies[sDependency].lazy || false
+					};
+				});
+			}
+
 			if (aDependencies && aDependencies.length) {
-				const aAllDependencies = VersionInfo._getTransitiveDependencyForLibraries(aDependencies);
+
+				let aAllDependencies = VersionInfo._getTransitiveDependencyForLibraries(aDependencies);
+				aAllDependencies = filterDependencies(aAllDependencies);
+
 				aAllDependencies.forEach((oDependency) => {
 					let oLibrary = Library._get(oDependency.name);
 					if (oLibrary && oLibrary._loadingStatus) {
@@ -518,39 +558,6 @@ sap.ui.define([
 				});
 			}
 			return this._loadingStatus.manifest;
-		},
-
-		/**
-		 * Returns the dependency information of the library which is read from the library's manifest.
-		 *
-		 * The returned array contains elements which have a property "name" and an optional "lazy" property.
-		 *
-		 * @private
-		 * @returns {Array<{name:string, lazy:boolean}>} The dependency information of the library
-		 */
-		_getDependencies: function() {
-			var oManifest = this.oManifest;
-			var aDependencies = [];
-
-			var mDependencies = oManifest && oManifest["sap.ui5"] && oManifest["sap.ui5"].dependencies && oManifest["sap.ui5"].dependencies.libs;
-			if (mDependencies) {
-				// convert manifest map to array, inject object which contains "name" and optional "lazy" properties
-				return Object.keys(mDependencies).reduce(function(aResult, sDependencyName) {
-					if (!mDependencies[sDependencyName].lazy) {
-						aResult.push({
-							name: sDependencyName
-						});
-					} else if (oLibraryWithBundleInfo.has(sDependencyName)) {
-						aResult.push({
-							name: sDependencyName,
-							lazy: true
-						});
-					}
-					return aResult;
-				}, aDependencies);
-			} else {
-				return aDependencies;
-			}
 		},
 
 		/**
@@ -1135,7 +1142,7 @@ sap.ui.define([
 		});
 
 		if (!mOptions.sync) {
-			aAllLibraries = VersionInfo._getTransitiveDependencyForLibraries(aAllLibraries);
+			aAllLibraries = filterDependencies(VersionInfo._getTransitiveDependencyForLibraries(aAllLibraries));
 		}
 
 		var aLibs = aAllLibraries.map(function(oLibrary) {

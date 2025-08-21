@@ -256,9 +256,10 @@ sap.ui.define([
 			Log.error("UI5 theming lifecycle requires valid version information when a theming service is active. Please check why the version info could not be loaded in this system.", undefined, MODULE_NAME);
 		}
 		// Compare the link including the UI5 version only if it is already available; otherwise, compare the link without the version to prevent unnecessary requests.
-		const sOldUrl = libInfo.cssLinkElement?.getAttribute("href")?.replace(/\?.*/, "");
+		const sOldUrl = libInfo.cssLinkElement?.getAttribute("href");
+		const sOldUrlWoVersion = sOldUrl?.replace(/\?.*/, "");
 		const sUrl = libInfo.getUrl(theme).baseUrl;
-		if (!sUrl || sOldUrl !== sUrl || force) {
+		if (!sUrl || sOldUrlWoVersion !== sUrl || force) {
 			libInfo.finishedLoading = false;
 			libInfo.failed = false;
 			if (suppressFOUC) {
