@@ -344,8 +344,8 @@ sap.ui.define([
 				return true;
 			}
 
-			const aRelevantFlexObjectTypes = ["addFlexObject", "updateFlexObject", "removeFlexObject"];
-			const bRelevantType = aRelevantFlexObjectTypes.includes(oUpdateInfo.type);
+			const aRelevantFlexObjectUpdateTypes = ["addFlexObject", "updateFlexObject", "removeFlexObject"];
+			const bRelevantType = aRelevantFlexObjectUpdateTypes.includes(oUpdateInfo.type);
 			const aRelevantVariantFileTypes = ["ctrl_variant", "ctrl_variant_change", "ctrl_variant_management_change"];
 			const bRelevantVariantType = aRelevantVariantFileTypes.includes(oUpdateInfo.updatedObject?.getFileType?.());
 			const bHasVariantReference = oUpdateInfo.updatedObject?.getVariantReference?.();
@@ -574,6 +574,13 @@ sap.ui.define([
 		});
 	};
 
+	VariantManagementState.updateVariant = function(mPropertyBag) {
+		oVariantManagementMapDataSelector.checkUpdate(
+			{ reference: mPropertyBag.reference },
+			[{ type: "updateFlexObject", updatedObject: mPropertyBag.variant }]
+		);
+	};
+
 	/**
 	 * Returns the current variant reference for a given variant management reference.
 	 *
@@ -588,6 +595,22 @@ sap.ui.define([
 			reference: mPropertyBag.reference
 		});
 		return oVariantManagementSection.currentVariant;
+	};
+
+	/**
+	 * Returns the default variant reference for a given variant management reference.
+	 *
+	 * @param {object} mPropertyBag - Object with the necessary properties
+	 * @param {string} mPropertyBag.vmReference - Variant management reference
+	 * @param {string} mPropertyBag.reference - Component reference
+	 * @returns {string | undefined} Reference of the default variant or undefined if VM does not exist
+	 */
+	VariantManagementState.getDefaultVariantReference = function(mPropertyBag) {
+		const oVariantManagement = oVariantManagementsDataSelector.get({
+			variantManagementReference: mPropertyBag.vmReference,
+			reference: mPropertyBag.reference
+		});
+		return oVariantManagement?.defaultVariant;
 	};
 
 	/**
@@ -621,6 +644,24 @@ sap.ui.define([
 			reference: sReference
 		});
 		return Object.keys(oVariantsMap);
+	};
+
+	/**
+	 * Returns the variant management reference for a given variant reference.
+	 *
+	 * @param {string} sReference - Flex reference of the current app
+	 * @param {string} sVariantReference - Variant reference to search for
+	 * @returns {string | undefined} Variant management reference if found, otherwise undefined
+	 */
+	VariantManagementState.getVariantManagementReferenceForVariant = function(sReference, sVariantReference) {
+		const oVariantsMap = oVariantManagementMapDataSelector.get({
+			reference: sReference
+		});
+		return Object.entries(oVariantsMap).find(([, oVM]) => {
+			return oVM.variants.some((oVariant) => {
+				return oVariant.key === sVariantReference;
+			});
+		})?.[0];
 	};
 
 	/**

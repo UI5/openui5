@@ -13,7 +13,8 @@ sap.ui.define([
 	flUtils
 ) {
 	"use strict";
-	var fnSetControlAttributes = function(oVariantManagement, bDesignTimeMode) {
+
+	async function fnSetControlAttributes(oVariantManagement, bDesignTimeMode) {
 		var oAppComponent = flUtils.getAppComponentForControl(oVariantManagement);
 		var sControlId = oVariantManagement.getId();
 		var oModel = oAppComponent.getModel(ControlVariantApplyAPI.getVariantModelName());
@@ -24,15 +25,14 @@ sap.ui.define([
 		}
 
 		if (bDesignTimeMode) {
-			oModel.waitForVMControlInit(sVariantManagementReference).then(function() {
-			    oModel.setModelPropertiesForControl(sVariantManagementReference, bDesignTimeMode, oVariantManagement);
-			    oModel.checkUpdate(true);
-		    });
+			await oVariantManagement.waitForInit();
+			oModel.setModelPropertiesForControl(sVariantManagementReference, bDesignTimeMode, oVariantManagement);
+			oModel.checkUpdate(true);
 		} else {
 			oModel.setModelPropertiesForControl(sVariantManagementReference, bDesignTimeMode, oVariantManagement);
 			oModel.checkUpdate(true);
 		}
-	};
+	}
 	return {
 		annotations: {},
 		properties: {

@@ -487,7 +487,7 @@ sap.ui.define([
 		var sContextChangeEvent = "modelContextChange";
 
 		function handleContextChange(oEvent, oParams) {
-			var sVariantManagementReference = oParams.model.getVariantManagementReferenceForControl(oEvent.getSource());
+			var sVariantManagementReference = oEvent.getSource().getVariantManagementReference();
 			var aVariantManagements = oParams.model._oHashData.variantControlIds;
 			// variant management will only exist in the hash data if 'updateInVariantURL' property is set (see attachHandlers())
 			var iIndex = aVariantManagements.indexOf(sVariantManagementReference);

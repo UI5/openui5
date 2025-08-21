@@ -4,29 +4,31 @@
 
 // Provides control sap.ui.fl.variants.VariantManagement.
 sap.ui.define([
-	"sap/ui/model/Context",
-	"sap/ui/model/Filter",
-	"sap/ui/model/FilterOperator",
+	"sap/base/Log",
 	"sap/m/VariantItem",
 	"sap/m/VariantManagement",
-	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
-	"sap/ui/fl/initial/_internal/Settings",
 	"sap/ui/core/Control",
 	"sap/ui/core/Lib",
 	"sap/ui/core/library",
-	"sap/base/Log"
+	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
+	"sap/ui/fl/initial/_internal/Settings",
+	"sap/ui/fl/Utils",
+	"sap/ui/model/Context",
+	"sap/ui/model/Filter",
+	"sap/ui/model/FilterOperator"
 ], function(
-	Context,
-	Filter,
-	FilterOperator,
+	Log,
 	VariantItem,
 	MVariantManagement,
-	ControlVariantApplyAPI,
-	flSettings,
 	Control,
 	Lib,
 	coreLibrary,
-	Log
+	ControlVariantApplyAPI,
+	flSettings,
+	Utils,
+	Context,
+	Filter,
+	FilterOperator
 ) {
 	"use strict";
 
@@ -137,11 +139,11 @@ sap.ui.define([
 				},
 
 				/**
-								 * Semantic level of the header.
-								 * For more information, see {@link sap.m.Title#setLevel}.
-								 *
-								 * @since 1.104
-								 */
+				 * Semantic level of the header.
+				 * For more information, see {@link sap.m.Title#setLevel}.
+				 *
+				 * @since 1.104
+				 */
 				headerLevel: {
 					type: "sap.ui.core.TitleLevel",
 					group: "Appearance",
@@ -346,6 +348,15 @@ sap.ui.define([
 				oRm.renderControl(oControl._oVM);
 				oRm.close("div");
 			}
+		},
+		// eslint-disable-next-line object-shorthand
+		constructor: function(...aArgs) {
+			Control.prototype.constructor.apply(this, aArgs); // Call base class constructor
+			this._oInitPromise = new Promise((resolve) => {
+				this.attachEventOnce("initialized", () => {
+					resolve();
+				});
+			});
 		}
 	});
 
@@ -377,6 +388,15 @@ sap.ui.define([
 		this._oVM.attachSelect(this._fireSelect, this);
 
 		this._updateWithSettingsInfo();
+	};
+
+	/**
+	 * Waits for VM control initialization.
+	 *
+	 * @returns {Promise} A promise that resolves when the control is initialized
+	 */
+	VariantManagement.prototype.waitForInit = function() {
+		return this._oInitPromise;
 	};
 
 	/**
@@ -715,7 +735,7 @@ sap.ui.define([
 	};
 
 	VariantManagement.prototype.setShowExecuteOnSelection = function(bValue) {
-		// this.setProperty("showExecuteOnSelection", bValue);
+		// This property is not bound since it is not part of the model
 		this._oVM.setSupportApplyAutomatically(bValue);
 		return this;
 	};
@@ -863,7 +883,7 @@ sap.ui.define([
 		if (!this.oContext) {
 			oModel = this.getModel(sModelName);
 			if (oModel) {
-				sLocalId = this._getLocalId(oModel);
+				sLocalId = this.getVariantManagementReference();
 
 				if (sLocalId) {
 					this.oContext = new Context(oModel, `/${sLocalId}`);
@@ -896,11 +916,6 @@ sap.ui.define([
 
 					this._oVM.bindProperty("supportFavorites", {
 						path: `${this.oContext}/showFavorites`,
-						model: sModelName
-					});
-
-					this._oVM.bindProperty("supportApplyAutomatically", {
-						path: `${this.oContext}/showExecuteOnSelection`,
 						model: sModelName
 					});
 
@@ -941,18 +956,6 @@ sap.ui.define([
 				value1: true
 			})
 		});
-	};
-
-	VariantManagement.prototype._getLocalId = function(oModel) {
-		var sModelName = this.getModelName();
-		if (!sModelName) {
-			return null;
-		}
-		if (sModelName !== ControlVariantApplyAPI.getVariantModelName()) {
-			return this.getId();
-		}
-
-		return oModel.getVariantManagementReferenceForControl(this);
 	};
 
 	VariantManagement.prototype._getInnerItems = function() {
@@ -1115,6 +1118,16 @@ sap.ui.define([
 		Object.values(this._oVariantAppliedListeners).forEach(function(fnCallback) {
 			fnCallback(oVariant);
 		});
+	};
+
+	/**
+	 * Returns the reference of the variant management control.
+	 * @returns {string} The reference of the variant management control
+	 */
+	VariantManagement.prototype.getVariantManagementReference = function() {
+		const sControlId = this.getId();
+		const oAppComponent = Utils.getAppComponentForControl(this);
+		return (oAppComponent && oAppComponent.getLocalId(sControlId)) || sControlId;
 	};
 
 	return VariantManagement;

@@ -246,8 +246,9 @@ sap.ui.define([
 				_isAsync: function() {
 					return true;
 				},
-				getRoute: function() {
-					return that.oParentRoute;
+				getRoute: function(sName) {
+					const sVariableName = `o${sName.charAt(0).toUpperCase()}${sName.slice(1)}`;
+					return that[sVariableName];
 				}
 			};
 
@@ -262,6 +263,17 @@ sap.ui.define([
 				parent: ":parentRoute"
 			});
 
+			this.oParentRoute1 = new Route(this.oRouterStub, {
+				name: "parentRoute1",
+				pattern: "parent1/"
+			});
+
+			this.oChildRoute1 = new Route(this.oRouterStub, {
+				name: "childRoute1",
+				pattern: "child1",
+				parent: ":parentRoute1"
+			});
+
 			this.oGetParentRouteSpy = sinon.spy(Route.prototype, "_getParentRoute");
 
 			return Component.create({
@@ -271,7 +283,6 @@ sap.ui.define([
 				var that = this;
 				this.oParentComponent = oComponent;
 				this.oParentComponent.getRouter().initialize();
-
 				var oRootView = oComponent.getRootControl();
 				var oComponentContainer = oRootView.byId("container");
 
@@ -288,15 +299,19 @@ sap.ui.define([
 			this.oGetParentRouteSpy.restore();
 			this.oParentRoute.destroy();
 			this.oChildRoute.destroy();
+			this.oParentRoute1.destroy();
+			this.oChildRoute1.destroy();
 			this.oParentComponent.destroy();
 			this.oChildComponent.destroy();
 		}
 	});
 
 	QUnit.test("Route with prefixed pattern is added to router", function(assert) {
-		assert.strictEqual(this.oSpy.callCount, 2, "Two patterns are added to the router");
+		assert.strictEqual(this.oSpy.callCount, 4, "Two patterns are added to the router");
 		assert.strictEqual(this.oSpy.args[0][0], "parent", "Pattern of parent route is added to router");
 		assert.strictEqual(this.oSpy.args[1][0], "parent/child", "Pattern of child route is prefixed with the parent route and added to router");
+		assert.strictEqual(this.oSpy.args[2][0], "parent1/", "Pattern of parent route is added to router");
+		assert.strictEqual(this.oSpy.args[3][0], "parent1/child1", "Pattern of child route is prefixed with the parent route and added to router");
 	});
 
 	QUnit.test("Route with prefixed pattern matches for nested components", function(assert) {

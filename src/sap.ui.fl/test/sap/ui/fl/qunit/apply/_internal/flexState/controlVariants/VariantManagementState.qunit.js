@@ -1769,6 +1769,163 @@ sap.ui.define([
 		});
 	});
 
+	QUnit.module("updateVariant, getDefaultVariantReference, getVariantManagementReferenceForVariant", {
+		beforeEach() {
+			return initializeFlexStateWithStandardVariant().then(function(oStandardVariant) {
+				this.oStandardVariant = oStandardVariant;
+			}.bind(this));
+		},
+		afterEach() {
+			cleanup();
+		}
+	}, function() {
+		QUnit.test("updateVariant - when updating a variant", function(assert) {
+			const oCheckUpdateSpy = sandbox.spy(VariantManagementState.getVariantManagementMap(), "checkUpdate");
+			const oVariant = createVariant({
+				fileName: "customVariant",
+				variantReference: sVariantManagementReference,
+				title: "Updated Variant"
+			});
+
+			VariantManagementState.updateVariant({
+				reference: sReference,
+				variant: oVariant
+			});
+
+			assert.strictEqual(oCheckUpdateSpy.callCount, 1, "checkUpdate was called once");
+			assert.deepEqual(
+				oCheckUpdateSpy.firstCall.args[0],
+				{ reference: sReference },
+				"checkUpdate was called with the correct reference"
+			);
+			assert.deepEqual(
+				oCheckUpdateSpy.firstCall.args[1],
+				[{ type: "updateFlexObject", updatedObject: oVariant }],
+				"checkUpdate was called with the correct update information"
+			);
+		});
+
+		QUnit.test("getDefaultVariantReference - when retrieving the default variant reference", function(assert) {
+			const oCustomVariant = createVariant({
+				fileName: "customDefaultVariant",
+				variantReference: sVariantManagementReference,
+				title: "Custom Default Variant"
+			});
+
+			// Set up variant management change to change the default variant
+			const oSetDefaultChange = FlexObjectFactory.createVariantManagementChange({
+				id: "setDefaultChange",
+				layer: Layer.CUSTOMER,
+				changeType: "setDefault",
+				selector: { id: sVariantManagementReference },
+				content: {
+					defaultVariant: "customDefaultVariant"
+				}
+			});
+
+			stubFlexObjectsSelector([oCustomVariant, oSetDefaultChange]);
+
+			const sDefaultVariantReference = VariantManagementState.getDefaultVariantReference({
+				reference: sReference,
+				vmReference: sVariantManagementReference
+			});
+
+			assert.strictEqual(sDefaultVariantReference, "customDefaultVariant", "then the default variant reference is returned");
+		});
+
+		QUnit.test("getDefaultVariantReference - when variant management does not exist", function(assert) {
+			const sDefaultVariantReference = VariantManagementState.getDefaultVariantReference({
+				reference: sReference,
+				vmReference: "nonExistentVMReference"
+			});
+
+			assert.strictEqual(sDefaultVariantReference, undefined, "then undefined is returned for non-existent variant management");
+		});
+
+		QUnit.test("getVariantManagementReferenceForVariant - when finding VM reference for existing variant", function(assert) {
+			const oCustomVariant = createVariant({
+				fileName: "customVariant",
+				variantReference: sVariantManagementReference,
+				title: "Custom Variant"
+			});
+
+			stubFlexObjectsSelector([oCustomVariant]);
+
+			const sVMReference = VariantManagementState.getVariantManagementReferenceForVariant(
+				sReference,
+				"customVariant"
+			);
+
+			assert.strictEqual(
+				sVMReference,
+				sVariantManagementReference,
+				"then the correct variant management reference is returned"
+			);
+		});
+
+		QUnit.test("getVariantManagementReferenceForVariant - when finding VM reference for standard variant", function(assert) {
+			const sVMReference = VariantManagementState.getVariantManagementReferenceForVariant(
+				sReference,
+				sStandardVariantReference
+			);
+
+			assert.strictEqual(
+				sVMReference,
+				sVariantManagementReference,
+				"then the variant management reference for the standard variant is returned"
+			);
+		});
+
+		QUnit.test("getVariantManagementReferenceForVariant - when variant does not exist", function(assert) {
+			const sVMReference = VariantManagementState.getVariantManagementReferenceForVariant(
+				sReference,
+				"nonExistentVariant"
+			);
+
+			assert.strictEqual(
+				sVMReference,
+				undefined,
+				"then undefined is returned for non-existent variant"
+			);
+		});
+
+		QUnit.test("getVariantManagementReferenceForVariant - when multiple variant managements exist", function(assert) {
+			const sSecondVMReference = "secondVMReference";
+			const oSecondStandardVariant = createVariant({
+				fileName: sSecondVMReference,
+				variantManagementReference: sSecondVMReference
+			});
+			const oCustomVariantInSecondVM = createVariant({
+				fileName: "customVariantInSecondVM",
+				variantReference: sSecondVMReference,
+				variantManagementReference: sSecondVMReference,
+				title: "Custom Variant in Second VM"
+			});
+
+			stubFlexObjectsSelector([oSecondStandardVariant, oCustomVariantInSecondVM]);
+
+			const sVMReferenceForFirstVariant = VariantManagementState.getVariantManagementReferenceForVariant(
+				sReference,
+				sStandardVariantReference
+			);
+			const sVMReferenceForSecondVariant = VariantManagementState.getVariantManagementReferenceForVariant(
+				sReference,
+				"customVariantInSecondVM"
+			);
+
+			assert.strictEqual(
+				sVMReferenceForFirstVariant,
+				sVariantManagementReference,
+				"then the first variant management reference is returned for the first variant"
+			);
+			assert.strictEqual(
+				sVMReferenceForSecondVariant,
+				sSecondVMReference,
+				"then the second variant management reference is returned for the second variant"
+			);
+		});
+	});
+
 	QUnit.done(function() {
 		oComponent.destroy();
 		document.getElementById("qunit-fixture").style.display = "none";

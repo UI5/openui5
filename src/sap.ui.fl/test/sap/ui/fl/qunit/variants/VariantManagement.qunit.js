@@ -2,38 +2,40 @@
 
 sap.ui.define([
 	"sap/base/i18n/Localization",
+	"sap/m/Input",
+	"sap/m/OverflowToolbar",
+	"sap/m/RadioButton",
+	"sap/m/Text",
+	"sap/ui/core/Icon",
+	"sap/ui/core/Lib",
 	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
+	"sap/ui/fl/initial/_internal/Settings",
 	"sap/ui/fl/variants/VariantManagement",
 	"sap/ui/fl/variants/VariantModel",
 	"sap/ui/fl/Layer",
-	"sap/ui/fl/initial/_internal/Settings",
+	"sap/ui/fl/Utils",
 	"sap/ui/layout/Grid",
-	"sap/m/OverflowToolbar",
-	"sap/m/Input",
-	"sap/m/Text",
-	"sap/m/RadioButton",
-	"sap/ui/core/Icon",
-	"sap/ui/core/Lib",
-	"sap/ui/thirdparty/sinon-4",
-	"sap/ui/test/utils/nextUIUpdate"
+	"sap/ui/test/utils/nextUIUpdate",
+	"sap/ui/thirdparty/sinon-4"
 ], function(
 	Localization,
+	Input,
+	OverflowToolbar,
+	RadioButton,
+	Text,
+	Icon,
+	Lib,
 	ControlVariantApplyAPI,
 	ManifestUtils,
+	flSettings,
 	VariantManagement,
 	VariantModel,
 	Layer,
-	flSettings,
+	Utils,
 	Grid,
-	OverflowToolbar,
-	Input,
-	Text,
-	RadioButton,
-	Icon,
-	Lib,
-	sinon,
-	nextUIUpdate
+	nextUIUpdate,
+	sinon
 ) {
 	"use strict";
 
@@ -1441,6 +1443,23 @@ sap.ui.define([
 			oVariantManagement._removeVariantAppliedListener(oControl2);
 			oVariantManagement._executeAllVariantAppliedListeners(oVariant);
 			assert.ok(fnListener2.notCalled, "Listener 2 not called after removal");
+			oVariantManagement.destroy();
+		});
+
+		QUnit.test("getVariantManagementReference", function(assert) {
+			const oVariantManagement = new VariantManagement("TestVM");
+			const sFallBackReference = oVariantManagement.getVariantManagementReference();
+			assert.equal(sFallBackReference, oVariantManagement.getId(), "Reference ID matches VM ID when no app component is found");
+
+			sinon.stub(Utils, "getAppComponentForControl").returns({
+				getLocalId(sControlId) {
+					return `appComponentId-${sControlId}`;
+				}
+			});
+			const sReference = oVariantManagement.getVariantManagementReference();
+			assert.equal(sReference, "appComponentId-TestVM", "Local ID is returned when app component is found");
+
+			Utils.getAppComponentForControl.restore();
 			oVariantManagement.destroy();
 		});
 	});

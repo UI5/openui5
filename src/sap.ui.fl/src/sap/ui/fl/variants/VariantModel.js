@@ -8,10 +8,8 @@ sap.ui.define([
 	"sap/base/util/restricted/_omit",
 	"sap/base/util/isEmptyObject",
 	"sap/base/util/merge",
-	"sap/base/Log",
 	"sap/ui/core/util/reflection/JsControlTreeModifier",
 	"sap/ui/core/BusyIndicator",
-	"sap/ui/core/Element",
 	"sap/ui/core/Lib",
 	"sap/ui/fl/apply/_internal/controlVariants/URLHandler",
 	"sap/ui/fl/apply/_internal/controlVariants/Utils",
@@ -20,6 +18,7 @@ sap.ui.define([
 	"sap/ui/fl/apply/_internal/flexState/controlVariants/Switcher",
 	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
 	"sap/ui/fl/apply/_internal/flexState/FlexObjectState",
+	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/initial/_internal/Settings",
 	"sap/ui/fl/Layer",
@@ -34,10 +33,8 @@ sap.ui.define([
 	_omit,
 	isEmptyObject,
 	merge,
-	Log,
 	JsControlTreeModifier,
 	BusyIndicator,
-	Element,
 	Lib,
 	URLHandler,
 	VariantUtil,
@@ -46,6 +43,7 @@ sap.ui.define([
 	Switcher,
 	VariantManagementState,
 	FlexObjectState,
+	ControlVariantApplyAPI,
 	ManifestUtils,
 	Settings,
 	Layer,
@@ -134,20 +132,6 @@ sap.ui.define([
 		return false;
 	}
 
-	function waitForControlToBeRendered(oControl) {
-		return new Promise(function(resolve) {
-			if (oControl.getDomRef()) {
-				resolve();
-			} else {
-				oControl.addEventDelegate({
-					onAfterRendering() {
-						resolve();
-					}
-				});
-			}
-		});
-	}
-
 	function initUshellServices() {
 		var oUShellContainer = Utils.getUshellContainer();
 		if (oUShellContainer) {
@@ -191,16 +175,6 @@ sap.ui.define([
 			return aCurrentControls;
 		}, []);
 		return aSelectors.length ? FlexObjectState.waitForFlexObjectsToBeApplied(aSelectors) : Promise.resolve();
-	}
-
-	function getVariantManagementControl(sVariantManagementReference, oAppComponent) {
-		let sVMControlId;
-		if (oAppComponent.byId(sVariantManagementReference)) {
-			sVMControlId = oAppComponent.createId(sVariantManagementReference);
-		} else {
-			sVMControlId = sVariantManagementReference;
-		}
-		return Element.getElementById(sVMControlId);
 	}
 
 	/**
@@ -376,81 +350,8 @@ sap.ui.define([
 		return getVariant(this.oData[sVMReference].variants, sVariantReference).title;
 	};
 
-	function handleInitialLoadScenario(sVMReference, oVariantManagementControl) {
-		var aVariantChangesForVariant = VariantManagementState.getVariantChangesForVariant({
-			vmReference: sVMReference,
-			reference: this.sFlexReference
-		});
-		var sDefaultVariantReference = this.oData[sVMReference].defaultVariant;
-		if (
-			oVariantManagementControl.getExecuteOnSelectionForStandardDefault()
-			&& sDefaultVariantReference === sVMReference
-			&& !aVariantChangesForVariant.some((oVariantChange) => oVariantChange.getChangeType() === "setExecuteOnSelect")
-		) {
-			var oStandardVariant = getVariant(this.oData[sVMReference].variants, sVMReference);
-			// set executeOnSelect in model and State without creating a change
-			oStandardVariant.instance.setExecuteOnSelection(true);
-			this.oData[sVMReference].variants[0].executeOnSelect = true;
-			return true;
-		}
-		return false;
-	}
-
-	/**
-	 * Saves a function that will be called after a variant has been applied with the new variant as parameter.
-	 * The function also performs a sanity check after the control has been rendered.
-	 * If the passed variant control ID does not match the responsible variant management control, the callback will not be saved.
-	 * Optionally this function is also called after the initial variant is applied without a sanity check.
-	 *
-	 * @param {object} mPropertyBag - Object with parameters as properties
-	 * @param {string} mPropertyBag.control - Instance of the control
-	 * @param {string} mPropertyBag.vmControlId - ID of the variant management control
-	 * @param {function} mPropertyBag.callback - Callback that will be called after a variant has been applied
-	 * @param {boolean} mPropertyBag.callAfterInitialVariant - The callback will also be called after the initial variant is applied
-	 * @returns {Promise} Promise that resolves after the sanity check
-	 */
-	VariantModel.prototype.attachVariantApplied = function(mPropertyBag) {
-		var oVariantManagementControl = Element.getElementById(mPropertyBag.vmControlId);
-		var sVMReference = this.getVariantManagementReferenceForControl(oVariantManagementControl);
-
-		return this.waitForVMControlInit(sVMReference).then(function(sVMReference, mPropertyBag) {
-			var bInitialLoad = handleInitialLoadScenario.call(this, sVMReference, oVariantManagementControl);
-
-			// if the parameter callAfterInitialVariant or initialLoad is true call the function without check
-			if (mPropertyBag.callAfterInitialVariant || bInitialLoad) {
-				var mParameters = {
-					appComponent: this.oAppComponent,
-					reference: this.sFlexReference,
-					vmReference: sVMReference
-				};
-				waitForInitialVariantChanges(mParameters).then(function() {
-					var sCurrentVariantReference = this.oData[sVMReference].currentVariant;
-					this.callVariantSwitchListeners(sVMReference, sCurrentVariantReference, mPropertyBag.callback);
-				}.bind(this));
-			}
-
-			// first check if the passed vmControlId is correct, then save the callback
-			// for this check the control has to be in the control tree already
-			return waitForControlToBeRendered(mPropertyBag.control).then(function() {
-				if (
-					VariantUtil.getRelevantVariantManagementControlId(
-						mPropertyBag.control,
-						this.getVariantManagementControlIds()
-					) === mPropertyBag.vmControlId
-				) {
-					this.oData[sVMReference].showExecuteOnSelection = true;
-					this.checkUpdate(true);
-					oVariantManagementControl._addVariantAppliedListener(mPropertyBag.control, mPropertyBag.callback);
-				} else {
-					Log.error("Error in attachVariantApplied: The passed VariantManagement ID does not match the "
-					+ "responsible VariantManagement control");
-				}
-			}.bind(this));
-		}.bind(this, sVMReference, mPropertyBag));
-	};
-
 	VariantModel.prototype.callVariantSwitchListeners = function(sVMReference, sNewVariantReference, fnCallback, sScenario) {
-		const oVMControl = getVariantManagementControl(sVMReference, this.oAppComponent);
+		const oVMControl = ControlVariantApplyAPI.getVariantManagementControlByVMReference(sVMReference, this.oAppComponent);
 		const oVariant = getVariant(this.oData[sVMReference].variants, sNewVariantReference);
 		if (sScenario) {
 			oVariant.createScenario = sScenario;
@@ -461,11 +362,6 @@ sap.ui.define([
 		} else {
 			oVMControl._executeAllVariantAppliedListeners(oVariant);
 		}
-	};
-
-	VariantModel.prototype.detachVariantApplied = function(sVMControlId, oControl) {
-		const oVMControl = Element.getElementById(sVMControlId);
-		oVMControl._removeVariantAppliedListener(oControl);
 	};
 
 	VariantModel.prototype._getVariantTitleCount = function(sNewText, sVariantManagementReference) {
@@ -751,8 +647,7 @@ sap.ui.define([
 	VariantModel.prototype._ensureStandardVariantExists = function(sVariantManagementReference) {
 		var oData = this.getData();
 		var oVMDataSection = oData[sVariantManagementReference] || {};
-		var oVMDataSectionWithoutInit = _omit(oVMDataSection, ["initPromise"]);
-		if (!oData[sVariantManagementReference] || isEmptyObject(oVMDataSectionWithoutInit)) { // Ensure standard variant exists
+		if (!oData[sVariantManagementReference] || isEmptyObject(oVMDataSection)) { // Ensure standard variant exists
 			// Standard Variant should always contain the value: "SAP" in "author" / "Created by" field
 			var oStandardVariantInstance = FlexObjectFactory.createFlVariant({
 				id: sVariantManagementReference,
@@ -879,12 +774,6 @@ sap.ui.define([
 		return JsControlTreeModifier.getSelector(sId, oAppComponent).id;
 	};
 
-	VariantModel.prototype.getVariantManagementReferenceForControl = function(oVariantManagementControl) {
-		var sControlId = oVariantManagementControl.getId();
-		var oAppComponent = Utils.getAppComponentForControl(oVariantManagementControl);
-		return (oAppComponent && oAppComponent.getLocalId(sControlId)) || sControlId;
-	};
-
 	VariantModel.prototype.switchToDefaultForVariantManagement = function(sVariantManagementReference) {
 		if (this.oData[sVariantManagementReference].currentVariant !== this.oData[sVariantManagementReference].defaultVariant) {
 			BusyIndicator.show(200);
@@ -940,7 +829,7 @@ sap.ui.define([
 	}
 
 	VariantModel.prototype.registerToModel = function(oVariantManagementControl) {
-		const sVariantManagementReference = this.getVariantManagementReferenceForControl(oVariantManagementControl);
+		const sVariantManagementReference = oVariantManagementControl.getVariantManagementReference();
 
 		// ensure standard variants are mocked, if no variants are present in the changes.variantSection response from the backend
 		this._ensureStandardVariantExists(sVariantManagementReference);
@@ -949,7 +838,7 @@ sap.ui.define([
 		this.oData[sVariantManagementReference]._isEditable = oVariantManagementControl.getEditable();
 
 		// only attachVariantApplied will set this to true
-		this.oData[sVariantManagementReference].showExecuteOnSelection = false;
+		oVariantManagementControl.setShowExecuteOnSelection(false);
 
 		// replace bindings in titles with the resolved texts
 		resolveTitleBindingsAndCreateVariantChanges.call(this, oVariantManagementControl, sVariantManagementReference);
@@ -995,27 +884,6 @@ sap.ui.define([
 			sVariantManagementReference,
 			waitForInitialVariantChanges(mParameters)
 		);
-
-		if (this.oData[sVariantManagementReference].initPromise) {
-			this.oData[sVariantManagementReference].initPromise.resolveFunction();
-			delete this.oData[sVariantManagementReference].initPromise;
-		}
-
-		this.oData[sVariantManagementReference].init = true;
-	};
-
-	VariantModel.prototype.waitForVMControlInit = function(sVMReference) {
-		if (!this.oData[sVMReference]) {
-			this.oData[sVMReference] = {};
-		} else if (this.oData[sVMReference].init) {
-			return Promise.resolve();
-		}
-
-		this.oData[sVMReference].initPromise = {};
-		this.oData[sVMReference].initPromise.promise = new Promise(function(resolve) {
-			this.oData[sVMReference].initPromise.resolveFunction = resolve;
-		}.bind(this));
-		return this.oData[sVMReference].initPromise.promise;
 	};
 
 	/**
