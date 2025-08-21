@@ -1423,8 +1423,11 @@ sap.ui.define([
 		/**
 		 * Returns a language dependent map of ISO 4217 currency codes to the number of digits from the CLDR. The map
 		 * only contains currency codes for which the number of digits deviates from the value with the key
-		 * <code>DEFAULT</code>. If custom currencies are defined, they are merged into the map overwriting the CLDR
-		 * values including the default value if a custom default value is set.
+		 * <code>DEFAULT</code>. If custom currencies are defined which contain the key <code>DEFAULT</code>, only the
+		 * custom currencies are used to create the map of currency codes to the number of digits and the map from
+		 * CLDR is ignored.
+		 * If custom currencies are defined which do <em>not</em> contain the key <code>DEFAULT</code>, they are merged
+		 * into the map from CLDR overwriting the CLDR values.
 		 *
 		 * @returns {Object<string, number>} The map of currency codes to the number of digits
 		 * @private
@@ -1432,8 +1435,8 @@ sap.ui.define([
 		 * @since 1.135
 		 */
 		getAllCurrencyDigits() {
-			const mCurrencyDigits = {...this._get("currencyDigits")};
 			const mCustomCurrencies = this._get("currency");
+			const mCurrencyDigits = mCustomCurrencies?.["DEFAULT"] ? {} : {...this._get("currencyDigits")};
 			if (mCustomCurrencies) {
 				for (const sCurrencyCode in mCustomCurrencies) {
 					if (mCustomCurrencies[sCurrencyCode].digits !== undefined) {
