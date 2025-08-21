@@ -149,23 +149,6 @@ span.sapMBtnInner.sapMBtnEmphasized {
 /* Custom focus border:                                                 */
 /* ---------------------------------------------------------------------*/
 
-html.sap-desktop .sapMBtn:focus > .sapMBtnEmphasized.sapMBtnActive.sapMFocusable {
-	border-color:    @sapUiContentFocusColor;
-}
-
-// Value State Message buttons
-:not(.sapMBtnDisabled) > span.sapMBtnInner.sapMBtnCritical.sapMBtnActive {
-	border-color: @sapUiButtonCriticalBorderColor;
-}
-
-:not(.sapMBtnDisabled) > span.sapMBtnInner.sapMBtnNegative.sapMBtnActive {
-	border-color: @sapUiButtonNegativeBorderColor;
-}
-
-:not(.sapMBtnDisabled) > span.sapMBtnInner.sapMBtnSuccess.sapMBtnActive {
-	border-color: @sapButton_Success_BorderColor;
-}
-
 html.sap-desktop .sapMBtn:focus > .sapMFocusable:not(.sapMBadgeIndicator):before {
 	content: "";
 	position: absolute;
@@ -193,6 +176,19 @@ html.sap-desktop .sapMBtn:focus > .sapMBtnSuccess.sapMFocusable:not(.sapMBtnActi
 
 .sapMBtn .sapMBtnNeutral.sapMBtnInner {
 	text-shadow: @sapUiContentTextShadow;
+}
+
+// Value State Message buttons
+:not(.sapMBtnDisabled) > span.sapMBtnInner.sapMBtnCritical.sapMBtnActive {
+	border-color: @sapUiButtonCriticalBorderColor;
+}
+
+:not(.sapMBtnDisabled) > span.sapMBtnInner.sapMBtnNegative.sapMBtnActive {
+	border-color: @sapUiButtonNegativeBorderColor;
+}
+
+:not(.sapMBtnDisabled) > span.sapMBtnInner.sapMBtnSuccess.sapMBtnActive {
+	border-color: @sapButton_Success_BorderColor;
 }
 
 /* ---------------------------------------------------------------------*/
