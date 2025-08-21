@@ -1712,9 +1712,30 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test("getAllCurrencyDigits, with custom currencies", function(assert) {
+	QUnit.test("getAllCurrencyDigits, custom currencies without DEFAULT", function(assert) {
 		const oLocaleData = LocaleData.getInstance(Formatting.getLanguageTag());
-		oLocaleData.mData.currencyDigits = {"DEFAULT": 2, "FOO": "~cldrFOO", "BAR": 1};
+		oLocaleData.mData.currencyDigits = {BAR: 1, DEFAULT: 2, FOO: "~cldrFOO", QUX: "~cldrQUX"};
+		Formatting.setCustomCurrencies({
+			BAR: {digits: 0},
+			BAZ: {},
+			FOO: {}
+		});
+
+		// code under test
+		assert.deepEqual(oLocaleData.getAllCurrencyDigits(), {
+			BAR: 0,
+			DEFAULT: 2,
+			FOO: "~cldrFOO",
+			QUX: "~cldrQUX"
+		});
+
+		Formatting.setCustomCurrencies();
+	});
+
+	//*********************************************************************************************
+	QUnit.test("getAllCurrencyDigits, custom currencies with DEFAULT", function(assert) {
+		const oLocaleData = LocaleData.getInstance(Formatting.getLanguageTag());
+		oLocaleData.mData.currencyDigits = {BAR: 1, DEFAULT: 2, FOO: "~cldrFOO", QUX: "~cldrQUX"};
 		Formatting.setCustomCurrencies({
 			BAR: {digits: 0},
 			BAZ: {},
@@ -1724,10 +1745,10 @@ sap.ui.define([
 
 		// code under test
 		assert.deepEqual(oLocaleData.getAllCurrencyDigits(), {
-			DEFAULT: "~customDEFAULT",
-			FOO: "~cldrFOO",
-			BAR: 0
+			BAR: 0,
+			DEFAULT: "~customDEFAULT"
 		});
+
 		Formatting.setCustomCurrencies();
 	});
 });
