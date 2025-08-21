@@ -533,8 +533,11 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	QUnit.test("buildQuery: no query", function (assert) {
+		this.mock(_Helper).expects("encodePair").never();
+
 		assert.strictEqual(_Helper.buildQuery(), "");
 		assert.strictEqual(_Helper.buildQuery({}, true), "");
+		assert.strictEqual(_Helper.buildQuery({$$foo : "n/a"}, true), "");
 	});
 
 	//*********************************************************************************************
@@ -546,7 +549,7 @@ sap.ui.define([
 		oHelperMock.expects("encodePair").withExactArgs("c", "d").returns("c=d");
 		oHelperMock.expects("encodePair").withExactArgs("c", "e").returns("c=e");
 
-		sEncoded = _Helper.buildQuery({a : "b", c : ["d", "e"]});
+		sEncoded = _Helper.buildQuery({a : "b", c : ["d", "e"], $$foo : "n/a"});
 		assert.strictEqual(sEncoded, "?a=b&c=d&c=e");
 	});
 
@@ -4266,6 +4269,16 @@ sap.ui.define([
 			$expand : "~",
 			$select : "~"
 		});
+
+		assert.deepEqual(
+			// code under test
+			Object.keys(_Helper.extractMergeableQueryOptions({$expand : "foo", $select : "bar"})),
+			["$expand", "$select"], "keep order");
+
+		assert.deepEqual(
+			// code under test
+			Object.keys(_Helper.extractMergeableQueryOptions({$select : "bar", $expand : "foo"})),
+			["$select", "$expand"], "keep order");
 	});
 
 	//*********************************************************************************************

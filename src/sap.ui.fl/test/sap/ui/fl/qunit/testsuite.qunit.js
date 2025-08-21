@@ -186,6 +186,15 @@ sap.ui.define([
 
 			"apply/api/ControlVariantApplyAPI": {
 				group: "Apply API",
+				ui5: {
+					resourceroots: {
+						"fl.test": "test-resources/sap/ui/fl/qunit/testResources/"
+					},
+					flexibilityServices: '[{"connector": "SessionStorageConnector"}]'
+				},
+				qunit: {
+					reorder: false
+				},
 				coverage: {
 					only: ["sap/ui/fl/apply/api/ControlVariantApplyAPI"]
 				}

@@ -1744,8 +1744,8 @@ sap.ui.define([
 
 		QUnit.test("when calling 'setModel' of VariantManagement control", async function(assert) {
 			var fnRegisterToModelSpy = sandbox.spy(this.oModel, "registerToModel");
-			sandbox.stub(this.oModel, "getVariantManagementReferenceForControl").returns(this.sVMReference);
 			this.oVariantManagement.setExecuteOnSelectionForStandardDefault(true);
+			sandbox.stub(this.oVariantManagement, "setShowExecuteOnSelection");
 			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
 
 			assert.ok(
@@ -1756,10 +1756,8 @@ sap.ui.define([
 				fnRegisterToModelSpy.calledWith(this.oVariantManagement),
 				"then registerToModel called with VariantManagement control"
 			);
-			assert.ok(this.oModel.oData[this.sVMReference].init, "the init flag is set");
-			assert.strictEqual(
-				this.oModel.oData[this.sVMReference].showExecuteOnSelection,
-				false,
+			assert.ok(
+				this.oVariantManagement.setShowExecuteOnSelection.calledWith(false),
 				"showExecuteOnSelection is set to false"
 			);
 			await VariantManagementState.waitForVariantSwitch(sReference, this.sVMReference);
@@ -1846,95 +1844,6 @@ sap.ui.define([
 			assert.strictEqual(oVariantsData[0].controlChanges.length, 0, "then the change is not available");
 		});
 
-		QUnit.test("when waitForVMControlInit is called before the control is initialized", function(assert) {
-			var fnDone = assert.async();
-			var oData = {
-				varMgmtRef1: {
-					defaultVariant: "variant1",
-					variants: [
-						{
-							author: VariantUtil.DEFAULT_AUTHOR,
-							key: this.sVMReference,
-							layer: Layer.VENDOR,
-							title: "Standard",
-							favorite: true,
-							visible: true,
-							executeOnSelect: false
-						}
-					]
-				}
-			};
-			this.oModel.setData(oData);
-			this.oModel.waitForVMControlInit(this.sVMReference).then(function() {
-				assert.ok(true, "the function resolves");
-				fnDone();
-			});
-			this.oModel.registerToModel(this.oVariantManagement);
-		});
-
-		QUnit.test("when waitForVMControlInit is called after the control is initialized", function(assert) {
-			var oData = {
-				varMgmtRef1: {
-					defaultVariant: "variant1",
-					variants: [
-						{
-							author: VariantUtil.DEFAULT_AUTHOR,
-							key: this.sVMReference,
-							layer: Layer.VENDOR,
-							title: "Standard",
-							favorite: true,
-							visible: true,
-							executeOnSelect: false
-						}
-					]
-				}
-			};
-			this.oModel.setData(oData);
-			this.oModel.registerToModel(this.oVariantManagement);
-			return this.oModel.waitForVMControlInit(this.sVMReference).then(function() {
-				assert.ok(true, "the function resolves");
-			});
-		});
-
-		QUnit.test("when waitForVMControlInit is called before the control is initialized and with no variant data yet", function(assert) {
-			var oStandardVariant = {
-				currentVariant: this.sVMReference,
-				defaultVariant: this.sVMReference,
-				showExecuteOnSelection: false,
-				init: true,
-				modified: false,
-				showFavorites: true,
-				updateVariantInURL: false,
-				variantsEditable: true,
-				_isEditable: true,
-				variants: [{
-					change: false,
-					remove: false,
-					rename: false,
-					key: this.sVMReference,
-					title: "Standard",
-					favorite: true,
-					visible: true,
-					executeOnSelect: false,
-					author: VariantUtil.DEFAULT_AUTHOR,
-					sharing: "public",
-					contexts: {}
-				}]
-			};
-			var oReturnPromise = this.oModel.waitForVMControlInit(this.sVMReference).then(function() {
-				assert.ok(this.oModel.oData[this.sVMReference].variants, "the variant structure was added");
-				assert.strictEqual(
-					this.oModel.oData[this.sVMReference].variants[0].key,
-					this.sVMReference,
-					oStandardVariant,
-					"the standard variant is properly set"
-				);
-			}.bind(this));
-			this.oModel.registerToModel(this.oVariantManagement);
-
-			return oReturnPromise;
-		});
-
 		QUnit.test("when variant management controls are initialized with with 'updateVariantInURL' property set and default (false)", function(assert) {
 			this.oRegisterControlStub.resetHistory();
 			var oVariantManagementWithURLUpdate = new VariantManagement("varMgmtRef2", {updateVariantInURL: true});
@@ -1947,31 +1856,6 @@ sap.ui.define([
 				model: this.oModel
 			}, "then URLHandler.attachHandlers was called once for a control without URL update");
 			oVariantManagementWithURLUpdate.destroy();
-		});
-
-		QUnit.test("when calling 'getVariantManagementReferenceForControl' with a variant management control where app component couldn't be retrieved", function(assert) {
-			sandbox.stub(oComponent, "getLocalId").returns(undefined);
-			assert.strictEqual(
-				this.oModel.getVariantManagementReferenceForControl(this.oVariantManagement),
-				this.oVariantManagement.getId(),
-				"then control's id is returned"
-			);
-		});
-
-		QUnit.test("when calling 'getVariantManagementReferenceForControl' with a variant management control with no app component prefix", function(assert) {
-			assert.strictEqual(this.oModel.getVariantManagementReferenceForControl({
-				getId() {
-					return "mockControl";
-				}
-			}), "mockControl", "then control's id is returned");
-		});
-
-		QUnit.test("when calling 'getVariantManagementReferenceForControl' with a variant management control with an app component prefix", function(assert) {
-			assert.strictEqual(
-				this.oModel.getVariantManagementReferenceForControl(this.oVariantManagement),
-				this.sVMReference,
-				"then the local id of the control is returned"
-			);
 		});
 
 		QUnit.test("when 'save' event event is triggered from a variant management control for a new variant", function(assert) {
@@ -2024,8 +1908,8 @@ sap.ui.define([
 			this.oVariantManagement.setModel(oResourceModel, "i18n");
 			var sTitleBinding = "{i18n>VARIANT_MANAGEMENT_AUTHOR}";
 			stubFlexObjectsSelector(createTranslationVariants.call(this, sTitleBinding));
-			this.oModel.registerToModel(this.oVariantManagement);
-			return this.oModel.waitForVMControlInit(this.sVMReference).then(function() {
+			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
+			return this.oVariantManagement.waitForInit().then(function() {
 				assert.strictEqual(
 					this.oModel.getData()[this.sVMReference].variants[1].title,
 					oResourceBundle.getText("VARIANT_MANAGEMENT_AUTHOR"),
@@ -2045,8 +1929,8 @@ sap.ui.define([
 			this.oVariantManagement.setModel(oResourceModel, "i18n");
 			var sTitleBinding = "{i18n>test.with.dots}";
 			stubFlexObjectsSelector(createTranslationVariants.call(this, sTitleBinding));
-			this.oModel.registerToModel(this.oVariantManagement);
-			return this.oModel.waitForVMControlInit(this.sVMReference).then(function() {
+			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
+			return this.oVariantManagement.waitForInit().then(function() {
 				assert.strictEqual(
 					this.oModel.getData()[this.sVMReference].variants[1].title,
 					"Text From Key With Dots",
@@ -2061,7 +1945,7 @@ sap.ui.define([
 			this.oVariantManagement.setModel(oResourceModel, "i18n");
 			var sTitleBinding = "{anotherResourceModel>VARIANT_MANAGEMENT_AUTHOR}";
 			stubFlexObjectsSelector(createTranslationVariants.call(this, sTitleBinding));
-			this.oModel.registerToModel(this.oVariantManagement);
+			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
 			this.oVariantManagement.attachModelContextChange(function() {
 				assert.strictEqual(
 					this.oModel.getData()[this.sVMReference].variants[1].title,
@@ -2070,7 +1954,7 @@ sap.ui.define([
 				);
 				fnDone();
 			}.bind(this));
-			return this.oModel.waitForVMControlInit(this.sVMReference).then(function() {
+			return this.oVariantManagement.waitForInit().then(function() {
 				assert.strictEqual(
 					this.oModel.getData()[this.sVMReference].variants[1].title,
 					"{anotherResourceModel>VARIANT_MANAGEMENT_AUTHOR}",
@@ -2147,7 +2031,7 @@ sap.ui.define([
 			const oVariantManagement2 = new VariantManagement(sVMReference2);
 			oVariantManagement2.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
 
-			await this.oModel.waitForVMControlInit(sVMReference2).then(this.oModel.updateCurrentVariant.bind(this.oModel, {
+			await oVariantManagement2.waitForInit().then(this.oModel.updateCurrentVariant.bind(this.oModel, {
 				variantManagementReference: sVMReference2,
 				newVariantReference: "variant0",
 				appComponent: this.oModel.oAppComponent
@@ -2274,16 +2158,6 @@ sap.ui.define([
 			}
 		}
 
-		function waitForInitialCallbackCall(fnCallbackStub, oExpectedVariant, assert) {
-			return new Promise(function(resolve) {
-				fnCallbackStub.callsFake(function(oNewVariant) {
-					assert.ok(true, "the callback was called once");
-					assert.deepEqual(oNewVariant, oExpectedVariant, "the correct variant was passed");
-					resolve();
-				});
-			});
-		}
-
 		QUnit.test("when the control is switched to a new variant with no unsaved personalization changes", function(assert) {
 			var fnDone = assert.async();
 			var oCallListenerStub = sandbox.stub(this.oVariantModel, "callVariantSwitchListeners");
@@ -2314,276 +2188,6 @@ sap.ui.define([
 			clickOnVMControl(oVMControl);
 
 			selectTargetVariant(oVMControl, 0);
-		});
-
-		QUnit.test("when 'attachVariantApplied' is called with callAfterInitialVariant=false", function(assert) {
-			var sVMControlId = "testComponent---mockview--VariantManagement1";
-			var sVMReference1 = "mockview--VariantManagement1";
-			var fnCallback1 = sandbox.stub();
-			var fnCallback2 = sandbox.stub();
-			var fnCallback3 = sandbox.stub();
-			var oErrorStub = sandbox.stub(Log, "error");
-			var oUpdateStub = sandbox.stub(this.oVariantModel, "checkUpdate");
-
-			return Promise.all([
-				this.oVariantModel.attachVariantApplied({
-					vmControlId: sVMControlId,
-					control: this.oView.byId("MainForm"),
-					callback: fnCallback1,
-					callAfterInitialVariant: false
-				}),
-				this.oVariantModel.attachVariantApplied({
-					vmControlId: sVMControlId,
-					control: this.oView.byId("hbox2InnerButton1"),
-					callback: fnCallback2,
-					callAfterInitialVariant: false
-				})
-			]).then(function() {
-				assert.strictEqual(oErrorStub.callCount, 1, "an error was logged");
-				assert.strictEqual(oUpdateStub.callCount, 1, "the update function was called");
-				assert.strictEqual(this.oVariantModel.oData[sVMReference1].showExecuteOnSelection, true, "the parameter is set to true");
-				assert.strictEqual(fnCallback1.callCount, 0, "the callback was not called yet");
-				assert.strictEqual(fnCallback2.callCount, 0, "the callback was not called yet");
-
-				this.oVariantModel.callVariantSwitchListeners(sVMReference1, "variant1");
-				assert.strictEqual(fnCallback1.callCount, 1, "the callback was called once");
-				assert.deepEqual(fnCallback1.lastCall.args[0], this.oVariant1, "the new variant is passed as parameter");
-				assert.strictEqual(fnCallback2.callCount, 0, "the callback was not called");
-
-				this.oVariantModel.callVariantSwitchListeners(sVMReference1, "variant1", fnCallback3, "scenario");
-				assert.strictEqual(fnCallback3.callCount, 1, "the callback was called once");
-				assert.strictEqual(fnCallback3.lastCall.args[0].key, this.oVariant1.key, "the new variant is passed as parameter");
-				assert.strictEqual(fnCallback3.lastCall.args[0].createScenario, "scenario", "the scenario was saved in the variant");
-				assert.strictEqual(fnCallback1.callCount, 1, "the callback was not called");
-				assert.strictEqual(fnCallback2.callCount, 0, "the callback was not called");
-
-				return this.oVariantModel.attachVariantApplied({
-					vmControlId: sVMControlId,
-					control: this.oView.byId("MainForm"),
-					callback: fnCallback2,
-					callAfterInitialVariant: false
-				});
-			}.bind(this))
-			.then(function() {
-				this.oVariantModel.callVariantSwitchListeners(sVMReference1, "variant2");
-				assert.strictEqual(fnCallback1.callCount, 1, "the callback was not called again");
-				assert.strictEqual(fnCallback2.callCount, 1, "the callback was called once");
-				assert.deepEqual(fnCallback2.lastCall.args[0], this.oVariant2, "the new variant is passed as parameter");
-
-				return this.oVariantModel.attachVariantApplied({
-					vmControlId: sVMControlId,
-					control: this.oView.byId("ObjectPageSection1"),
-					callback: fnCallback1,
-					callAfterInitialVariant: false
-				});
-			}.bind(this))
-			.then(function() {
-				this.oVariantModel.callVariantSwitchListeners(sVMReference1, "variant2");
-				assert.strictEqual(fnCallback1.callCount, 2, "the callback was called again");
-				assert.strictEqual(fnCallback2.callCount, 2, "the callback was called again");
-
-				this.oVariantModel.detachVariantApplied(sVMControlId, this.oView.byId("MainForm"));
-				this.oVariantModel.callVariantSwitchListeners(sVMReference1, "variant2");
-				assert.strictEqual(fnCallback1.callCount, 3, "the callback was called again");
-				assert.strictEqual(fnCallback2.callCount, 2, "the callback was not called again");
-
-				this.oVariantModel.detachVariantApplied(sVMControlId, this.oView.byId("ObjectPageSection1"));
-				this.oVariantModel.callVariantSwitchListeners(sVMReference1, "variant2");
-				assert.strictEqual(fnCallback1.callCount, 3, "the callback was not called again");
-				assert.strictEqual(fnCallback2.callCount, 2, "the callback was not called again");
-			}.bind(this));
-		});
-
-		QUnit.test("when 'attachVariantApplied' is called with the control not being rendered yet", function(assert) {
-			var sVMControlId = "testComponent---mockview--VariantManagement1";
-			var sVMReference1 = "mockview--VariantManagement1";
-			var fnCallback1 = sandbox.stub();
-			var fnCallback2 = sandbox.stub();
-			var fnCallback3 = sandbox.stub();
-			var oNewControl1 = new Button("newControl1", {text: "foo"});
-			var oNewControl2 = new Button("newControl2", {text: "foo"});
-			var oNewControl3 = new Button("newControl3", {text: "foo"});
-
-			var oReturnPromise = Promise.all([
-				this.oVariantModel.attachVariantApplied({
-					vmControlId: sVMControlId,
-					control: oNewControl1,
-					callback: fnCallback1,
-					callAfterInitialVariant: true
-				}),
-				this.oVariantModel.attachVariantApplied({
-					vmControlId: sVMControlId,
-					control: oNewControl2,
-					callback: fnCallback2,
-					callAfterInitialVariant: true
-				}),
-				this.oVariantModel.attachVariantApplied({
-					vmControlId: sVMControlId,
-					control: oNewControl3,
-					callback: fnCallback3,
-					callAfterInitialVariant: false
-				})
-			]).then(function() {
-				assert.strictEqual(fnCallback3.callCount, 0, "the callback was not called yet");
-
-				this.oVariantModel.callVariantSwitchListeners(sVMReference1, "variant1");
-				assert.strictEqual(fnCallback1.callCount, 2, "the callback was called again");
-				assert.strictEqual(fnCallback2.callCount, 1, "the callback was not called again");
-				assert.strictEqual(fnCallback3.callCount, 1, "the callback was called once");
-			}.bind(this));
-
-			Promise.all([
-				waitForInitialCallbackCall(fnCallback1, this.oVariant1, assert),
-				waitForInitialCallbackCall(fnCallback2, this.oVariant1, assert)
-			]).then(function() {
-				this.oView.byId("MainForm").addContent(oNewControl1);
-				this.oView.byId("hbox1").addItem(oNewControl2);
-				this.oView.byId("MainForm").addContent(oNewControl3);
-			}.bind(this));
-
-			return oReturnPromise;
-		});
-
-		QUnit.test("when 'attachVariantApplied' is called with executeOnSelectionForStandardDefault set, standard being default and no flex change for apply automatically", function(assert) {
-			var sVMReference1 = "mockview--VariantManagement2";
-			var sVMControlId = `testComponent---${sVMReference1}`;
-			this.oView.byId(sVMControlId).setExecuteOnSelectionForStandardDefault(true);
-			var fnCallback1 = sandbox.stub();
-			var fnCallback2 = sandbox.stub();
-			sandbox.stub(VariantManagementState, "getVariantChangesForVariant").returns([]);
-			VariantManagementState.getCurrentVariantReference.restore();
-
-			return Promise.all([
-				this.oVariantModel.attachVariantApplied({
-					vmControlId: sVMControlId,
-					control: this.oView.byId("MainForm"),
-					callback: fnCallback1,
-					callAfterInitialVariant: true
-				}),
-				this.oVariantModel.attachVariantApplied({
-					vmControlId: sVMControlId,
-					control: this.oView.byId("MainForm"),
-					callback: fnCallback2,
-					callAfterInitialVariant: false
-				})
-			]).then(function() {
-				assert.strictEqual(fnCallback1.callCount, 1, "the callback was called");
-				assert.strictEqual(fnCallback1.lastCall.args[0].executeOnSelect, true, "the flag to apply automatically is set");
-				assert.strictEqual(fnCallback2.callCount, 1, "the callback was called");
-				assert.strictEqual(fnCallback2.lastCall.args[0].executeOnSelect, true, "the flag to apply automatically is set");
-			});
-		});
-
-		QUnit.test("when 'attachVariantApplied' is called with executeOnSelectionForStandardDefault set, standard being default, no flex change for apply automatically and a different current variant", function(assert) {
-			var sVMReference1 = "mockview--VariantManagement2";
-			var sVMControlId = `testComponent---${sVMReference1}`;
-			this.oView.byId(sVMControlId).setExecuteOnSelectionForStandardDefault(true);
-			sandbox.stub(VariantManagementState, "getVariantChangesForVariant").returns([]);
-			VariantManagementState.getCurrentVariantReference.restore();
-			this.oVariantModel.getData()[sVMReference1].currentVariant = "variant2";
-
-			return this.oVariantModel.attachVariantApplied({
-				vmControlId: sVMControlId,
-				control: this.oView.byId("MainForm"),
-				callback() {},
-				callAfterInitialVariant: true
-			}).then(function() {
-				assert.ok(
-					this.oVariantModel.getData()[sVMReference1].variants[0].executeOnSelect,
-					"then executeOnSelect is still set for the default variant"
-				);
-			}.bind(this));
-		});
-
-		QUnit.test("when 'attachVariantApplied' is called without executeOnSelectionForStandardDefault set, standard being default and no flex change for apply automatically", function(assert) {
-			var sVMReference1 = "mockview--VariantManagement2";
-			var sVMControlId = `testComponent---${sVMReference1}`;
-			var fnCallback1 = sandbox.stub();
-			var fnCallback2 = sandbox.stub();
-			sandbox.stub(VariantManagementState, "getVariantChangesForVariant").returns([]);
-			VariantManagementState.getCurrentVariantReference.restore();
-
-			return Promise.all([
-				this.oVariantModel.attachVariantApplied({
-					vmControlId: sVMControlId,
-					control: this.oView.byId("MainForm"),
-					callback: fnCallback1,
-					callAfterInitialVariant: true
-				}),
-				this.oVariantModel.attachVariantApplied({
-					vmControlId: sVMControlId,
-					control: this.oView.byId("MainForm"),
-					callback: fnCallback2,
-					callAfterInitialVariant: false
-				})
-			]).then(function() {
-				assert.strictEqual(fnCallback1.callCount, 1, "the callback was called");
-				assert.strictEqual(fnCallback1.lastCall.args[0].executeOnSelect, false, "the flag to apply automatically is not set");
-				assert.strictEqual(fnCallback2.callCount, 0, "the callback was not called");
-			});
-		});
-
-		QUnit.test("when 'attachVariantApplied' is called with executeOnSelectionForStandardDefault set, standard being default and a flex change for apply automatically", function(assert) {
-			var sVMReference1 = "mockview--VariantManagement2";
-			var sVMControlId = `testComponent---${sVMReference1}`;
-			this.oView.byId(sVMControlId).setExecuteOnSelectionForStandardDefault(true);
-			var fnCallback1 = sandbox.stub();
-			var fnCallback2 = sandbox.stub();
-			sandbox.stub(VariantManagementState, "getVariantChangesForVariant").returns([
-				FlexObjectFactory.createVariantChange({
-					content: {
-						executeOnSelect: false
-					},
-					changeType: "setExecuteOnSelect"
-				})
-			]);
-			VariantManagementState.getCurrentVariantReference.restore();
-
-			return Promise.all([
-				this.oVariantModel.attachVariantApplied({
-					vmControlId: sVMControlId,
-					control: this.oView.byId("MainForm"),
-					callback: fnCallback1,
-					callAfterInitialVariant: true
-				}),
-				this.oVariantModel.attachVariantApplied({
-					vmControlId: sVMControlId,
-					control: this.oView.byId("MainForm"),
-					callback: fnCallback2,
-					callAfterInitialVariant: false
-				})
-			]).then(function() {
-				assert.strictEqual(fnCallback1.callCount, 1, "the callback was called");
-				assert.strictEqual(fnCallback2.callCount, 0, "the callback was not called");
-			});
-		});
-
-		QUnit.test("when 'attachVariantApplied' is called with executeOnSelectionForStandardDefault set, standard not being default and no flex change for apply automatically", function(assert) {
-			var sVMReference1 = "mockview--VariantManagement1";
-			var sVMControlId = `testComponent---${sVMReference1}`;
-			var oVMControl = Element.getElementById(sVMControlId);
-			oVMControl.setExecuteOnSelectionForStandardDefault(true);
-			var fnCallback1 = sandbox.stub();
-			var fnCallback2 = sandbox.stub();
-			sandbox.stub(VariantManagementState, "getVariantChangesForVariant").returns([]);
-
-			return Promise.all([
-				this.oVariantModel.attachVariantApplied({
-					vmControlId: sVMControlId,
-					control: this.oView.byId("MainForm"),
-					callback: fnCallback1,
-					callAfterInitialVariant: true
-				}),
-				this.oVariantModel.attachVariantApplied({
-					vmControlId: sVMControlId,
-					control: this.oView.byId("MainForm"),
-					callback: fnCallback2,
-					callAfterInitialVariant: false
-				})
-			]).then(function() {
-				assert.strictEqual(fnCallback1.callCount, 1, "the callback was called");
-				assert.strictEqual(fnCallback2.callCount, 0, "the callback was not called");
-			});
 		});
 	});
 

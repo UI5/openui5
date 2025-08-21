@@ -143,7 +143,7 @@ sap.ui.define([
 						this._oNestingParent = oRoute;
 						vRoute.forEach(function(sRoute, i) {
 							var sNestingRoute = oRoute._aPattern[0];
-							sNestingRoute = sNestingRoute.charAt(sNestingRoute.length) === "/" ? sNestingRoute : sNestingRoute + "/";
+							sNestingRoute = sNestingRoute.charAt(sNestingRoute.length - 1) === "/" ? sNestingRoute : sNestingRoute + "/";
 							vRoute[i] = sNestingRoute + sRoute;
 						});
 					}

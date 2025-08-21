@@ -137,24 +137,6 @@
 /* Custom focus border:                                                 */
 /* ---------------------------------------------------------------------*/
 
-.sapMBtn:focus-visible > .sapMBtnEmphasized.sapMBtnActive.sapMFocusable,
-html.sap-desktop .sapMBtn:focus > .sapMBtnEmphasized.sapMBtnActive.sapMFocusable {
-	border-color: var(--sapContent_FocusColor);
-}
-
-// Value State Message buttons
-:not(.sapMBtnDisabled) > span.sapMBtnInner.sapMBtnCritical.sapMBtnActive {
-	border-color: var(--sapButton_Critical_BorderColor);
-}
-
-:not(.sapMBtnDisabled) > span.sapMBtnInner.sapMBtnNegative.sapMBtnActive {
-	border-color: var(--sapButton_Negative_BorderColor);
-}
-
-:not(.sapMBtnDisabled) > span.sapMBtnInner.sapMBtnSuccess.sapMBtnActive {
-	border-color: var(--sapButton_Success_BorderColor);
-}
-
 .sapMBtn:focus-visible > .sapMFocusable:not(.sapMBadgeIndicator)::before,
 html.sap-desktop .sapMBtn:focus > .sapMFocusable:not(.sapMBadgeIndicator)::before {
 	content: '';
@@ -187,6 +169,19 @@ html.sap-desktop .sapMBtn:focus > .sapMBtnSuccess.sapMFocusable:not(.sapMBtnActi
 
 .sapMBtn .sapMBtnNeutral.sapMBtnInner {
 	text-shadow: var(--sapContent_TextShadow);
+}
+
+// Value State Message buttons
+:not(.sapMBtnDisabled) > span.sapMBtnInner.sapMBtnCritical.sapMBtnActive {
+	border-color: var(--sapButton_Critical_BorderColor);
+}
+
+:not(.sapMBtnDisabled) > span.sapMBtnInner.sapMBtnNegative.sapMBtnActive {
+	border-color: var(--sapButton_Negative_BorderColor);
+}
+
+:not(.sapMBtnDisabled) > span.sapMBtnInner.sapMBtnSuccess.sapMBtnActive {
+	border-color: var(--sapButton_Success_BorderColor);
 }
 
 .sapMBtn {

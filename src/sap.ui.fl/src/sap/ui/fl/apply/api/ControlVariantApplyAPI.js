@@ -4,17 +4,25 @@
 
 sap.ui.define([
 	"sap/base/Log",
+	"sap/ui/core/util/reflection/JsControlTreeModifier",
 	"sap/ui/core/Component",
 	"sap/ui/core/Element",
 	"sap/ui/fl/apply/_internal/controlVariants/URLHandler",
+	"sap/ui/fl/apply/_internal/controlVariants/Utils",
 	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
+	"sap/ui/fl/apply/_internal/flexState/FlexObjectState",
+	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/Utils"
 ], function(
 	Log,
+	JsControlTreeModifier,
 	Component,
 	Element,
 	URLHandler,
+	VariantUtil,
 	VariantManagementState,
+	FlexObjectState,
+	ManifestUtils,
 	Utils
 ) {
 	"use strict";
@@ -36,6 +44,68 @@ sap.ui.define([
 				}
 			}
 			oAppComponent.attachModelContextChange(onModelContextChange);
+		});
+	}
+
+	function handleInitialLoadScenario(sVMReference, oVariantManagementControl, sFlexReference) {
+		const aVariantChangesForVariant = VariantManagementState.getVariantChangesForVariant({
+			vmReference: sVMReference,
+			reference: sFlexReference
+		});
+
+		const sDefaultVariantReference = VariantManagementState.getDefaultVariantReference({
+			vmReference: sVMReference,
+			reference: sFlexReference
+		});
+
+		if (
+			oVariantManagementControl.getExecuteOnSelectionForStandardDefault()
+			&& sDefaultVariantReference === sVMReference
+			&& !aVariantChangesForVariant.some((oVariantChange) => oVariantChange.getChangeType() === "setExecuteOnSelect")
+		) {
+			const oStandardVariant = VariantManagementState.getVariant({
+				vmReference: sVMReference,
+				reference: sFlexReference,
+				vReference: sVMReference
+			});
+			// set executeOnSelect without creating a change
+			oStandardVariant.instance.setExecuteOnSelection(true);
+			VariantManagementState.updateVariant({
+				reference: sFlexReference,
+				variant: oStandardVariant.instance
+			});
+			return true;
+		}
+		return false;
+	}
+
+	function waitForInitialVariantChanges(mPropertyBag) {
+		const aCurrentVariantChanges = VariantManagementState.getInitialUIChanges({
+			vmReference: mPropertyBag.vmReference,
+			reference: mPropertyBag.reference
+		});
+		const aSelectors = aCurrentVariantChanges.reduce((aCurrentControls, oChange) => {
+			const oSelector = oChange.getSelector();
+			const oControl = JsControlTreeModifier.bySelector(oSelector, mPropertyBag.appComponent);
+			if (oControl && Utils.indexOfObject(aCurrentControls, { selector: oControl }) === -1) {
+				aCurrentControls.push({ selector: oControl });
+			}
+			return aCurrentControls;
+		}, []);
+		return aSelectors.length ? FlexObjectState.waitForFlexObjectsToBeApplied(aSelectors) : Promise.resolve();
+	}
+
+	function waitForControlToBeRendered(oControl) {
+		return new Promise((resolve) => {
+			if (oControl.getDomRef()) {
+				resolve();
+			} else {
+				oControl.addEventDelegate({
+					onAfterRendering() {
+						resolve();
+					}
+				});
+			}
 		});
 	}
 
@@ -62,7 +132,7 @@ sap.ui.define([
 		/**
 		 * Returns a promise that resolves to the variant model once it is available
 		 *
-		 * @param {object} oAppComponent - Application component
+		 * @param {sap.ui.core.Component} oAppComponent - Application component
 		 * @returns {Promise} Promise resolving to the Variant Model
 		 *
 		 * @private
@@ -73,9 +143,25 @@ sap.ui.define([
 		},
 
 		/**
+		 * Returns the variant management control instance for a variant management reference.
+		 *
+		 * @param {string} sVariantManagementReference - Reference to the variant management control
+		 * @param {sap.ui.core.Component} oAppComponent - Application component
+		 * @returns {sap.ui.fl.variants.VariantManagement} The variant management control instance
+		 */
+		getVariantManagementControlByVMReference(sVariantManagementReference, oAppComponent) {
+			const sVMControlId = oAppComponent.byId(sVariantManagementReference)
+				? oAppComponent.createId(sVariantManagementReference)
+				: sVariantManagementReference;
+			return Element.getElementById(sVMControlId);
+		},
+
+		/**
 		 * Clears URL technical parameter <code>sap-ui-fl-control-variant-id</code> for control variants.
-		 * Use this method in case you normally want the variant parameter in the URL, but have a few special navigation patterns where you want to clear it.
-		 * If you don't want that parameter in general, set the <code>updateVariantInURL</code> parameter on your variant management control to <code>false</code>. SAP Fiori elements use this method.
+		 * Use this method in case you normally want the variant parameter in the URL,
+		 * but have a few special navigation patterns where you want to clear it.
+		 * If you don't want that parameter in general, set the <code>updateVariantInURL</code> parameter
+		 * on your variant management control to <code>false</code>. SAP Fiori elements use this method.
 		 * If a variant management control is given as a parameter, only parameters specific to that control are cleared.
 		 *
 		 * @param {object} mPropertyBag - Object with parameters as properties
@@ -114,11 +200,11 @@ sap.ui.define([
 		},
 
 		/**
-		 *
-		 * Activates the passed variant applicable to the passed control/component.
-		 * If the Variant is not available and the backend supports lazy loading, a backend request is made to fetch the variant.
-		 * If the flag standardVariant is set to true, the standard variant is activated and the variantReference is ignored.
-		 * In this scenario the passed element must be the variant management control.
+		 * Activates the passed variant applicable to the passed control/component. The corresponding variant management control must be
+		 * available when this function is called.
+		 * If the variant is not found and the backend supports lazy loading, a backend request is made to fetch the variant.
+		 * If the flag standardVariant is set to true, the standard variant is activated and the variantReference is ignored: in this
+		 * scenario, the passed element must be the variant management control.
 		 *
 		 * @param {object} mPropertyBag - Object with parameters as properties
 		 * @param {sap.ui.base.ManagedObject|string} mPropertyBag.element - Component or control (instance or ID) on which the <code>variantModel</code> is set
@@ -130,9 +216,9 @@ sap.ui.define([
 		 * @public
 		 */
 		async activateVariant(mPropertyBag) {
-			function logAndReject(oError) {
+			function logAndThrowError(oError) {
 				Log.error(oError);
-				return Promise.reject(oError);
+				throw oError;
 			}
 
 			let oElement;
@@ -142,7 +228,7 @@ sap.ui.define([
 					oElement = Element.getElementById(mPropertyBag.element);
 
 					if (!(oElement instanceof Element)) {
-						return logAndReject(Error("No valid component or control found for the provided ID"));
+						logAndThrowError(Error("No valid component or control found for the provided ID"));
 					}
 				}
 			} else if (mPropertyBag.element instanceof Component || mPropertyBag.element instanceof Element) {
@@ -150,52 +236,71 @@ sap.ui.define([
 			}
 
 			const oAppComponent = Utils.getAppComponentForControl(oElement);
+			const sFlexReference = ManifestUtils.getFlexReferenceForControl(oElement);
 			if (!oAppComponent) {
-				return logAndReject(Error("A valid variant management control or component (instance or ID) should be passed as parameter"));
+				logAndThrowError(
+					Error("A valid variant management control or component (instance or ID) should be passed as parameter")
+				);
 			}
 
 			const oVariantModel = oAppComponent.getModel(VARIANT_MODEL_NAME);
 			if (!oVariantModel) {
-				return logAndReject(Error("No variant management model found for the passed control or application component"));
+				logAndThrowError(Error("No variant management model found for the passed control or application component"));
 			}
 
 			if (mPropertyBag.standardVariant && !oElement.isA("sap.ui.fl.variants.VariantManagement")) {
-				return logAndReject(Error("With using standardVariant and no variantReference, a variant management control must be passed as element"));
+				logAndThrowError(
+					Error("With using standardVariant and no variantReference, a variant management control must be passed as element")
+				);
 			}
 
-			const sVariantReference = mPropertyBag.standardVariant
-				? oVariantModel.getVariantManagementReferenceForControl(mPropertyBag.element)
-				: mPropertyBag.variantReference;
+			let sVariantManagementReference;
+			let sVariantReference;
+			let oVMControl;
+			if (mPropertyBag.standardVariant) {
+				sVariantManagementReference = oElement.getVariantManagementReference();
+				sVariantReference = sVariantManagementReference;
+				oVMControl = oElement;
+			} else {
+				sVariantManagementReference = VariantManagementState.getVariantManagementReferenceForVariant(
+					sFlexReference,
+					mPropertyBag.variantReference
+				);
+				sVariantReference = mPropertyBag.variantReference;
 
-			// if the variant management reference is not available, the variant is not yet loaded
-			if (!oVariantModel.getVariantManagementReference(sVariantReference).variantManagementReference) {
-				try {
-					await VariantManagementState.loadVariant({
-						reference: oVariantModel.sFlexReference,
-						variantReference: sVariantReference
-					});
-				} catch (oError) {
-					return logAndReject(Error(`Variant with reference '${sVariantReference}' could not be found`));
+				if (!sVariantManagementReference) {
+					// if the variant management reference is not available, the variant is maybe not yet loaded
+					try {
+						await VariantManagementState.loadVariant({
+							reference: sFlexReference,
+							variantReference: sVariantReference
+						});
+
+						sVariantManagementReference = VariantManagementState.getVariantManagementReferenceForVariant(
+							sFlexReference,
+							mPropertyBag.variantReference
+						);
+					} catch (oError) {
+						logAndThrowError(Error(`Variant with reference '${sVariantReference}' could not be found`));
+					}
+					if (!sVariantManagementReference) {
+						logAndThrowError(Error("Variant management reference not found. Check the passed element and variantReference"));
+					}
 				}
-			}
-
-			const sVariantManagementReference = oVariantModel.getVariantManagementReference(sVariantReference).variantManagementReference;
-			if (!sVariantManagementReference) {
-				return logAndReject(Error("A valid control or component, and a valid variant/ID combination are required"));
+				oVMControl = this.getVariantManagementControlByVMReference(sVariantManagementReference, oAppComponent);
 			}
 
 			// sap/fe is using this API very early during app start, sometimes before FlexState is initialized
-			await oVariantModel.waitForVMControlInit(sVariantManagementReference);
+			await oVMControl.waitForInit();
 
 			try {
-				return oVariantModel.updateCurrentVariant({
+				await oVariantModel.updateCurrentVariant({
 					variantManagementReference: sVariantManagementReference,
 					newVariantReference: sVariantReference,
 					appComponent: oAppComponent
 				});
 			} catch (oError) {
-				Log.error(oError);
-				throw oError;
+				logAndThrowError(oError);
 			}
 		},
 
@@ -214,18 +319,49 @@ sap.ui.define([
 		 *
 		 * @public
 		 */
-		attachVariantApplied(mPropertyBag) {
-			var oControl = mPropertyBag.selector.id && Element.getElementById(mPropertyBag.selector.id) || mPropertyBag.selector;
-			var oAppComponent = Utils.getAppComponentForControl(oControl);
+		async attachVariantApplied(mPropertyBag) {
+			const oVariantManagementControl = Element.getElementById(mPropertyBag.vmControlId);
+			await oVariantManagementControl.waitForInit();
 
-			waitForVariantModel(oAppComponent).then(function(oVariantModel) {
-				oVariantModel.attachVariantApplied({
-					vmControlId: mPropertyBag.vmControlId,
-					control: oControl,
-					callback: mPropertyBag.callback,
-					callAfterInitialVariant: mPropertyBag.callAfterInitialVariant
+			const oControl = mPropertyBag.selector.id && Element.getElementById(mPropertyBag.selector.id) || mPropertyBag.selector;
+			const oAppComponent = Utils.getAppComponentForControl(oControl);
+			const sVMReference = oVariantManagementControl.getVariantManagementReference();
+			const sFlexReference = ManifestUtils.getFlexReferenceForControl(oVariantManagementControl);
+
+			const bInitialLoad = handleInitialLoadScenario(sVMReference, oVariantManagementControl, sFlexReference);
+			// if the parameter callAfterInitialVariant or initialLoad is true call the function without check
+			if (mPropertyBag.callAfterInitialVariant || bInitialLoad) {
+				waitForInitialVariantChanges({
+					appComponent: oAppComponent,
+					reference: sFlexReference,
+					vmReference: sVMReference
+				}).then(() => {
+					const sCurrentVariantReference = VariantManagementState.getCurrentVariantReference({
+						vmReference: sVMReference,
+						reference: sFlexReference
+					});
+					const oVariant = VariantManagementState.getVariant({
+						vmReference: sVMReference,
+						reference: sFlexReference,
+						vReference: sCurrentVariantReference
+					});
+					mPropertyBag.callback(oVariant);
 				});
-			});
+			}
+
+			// first check if the passed vmControlId is correct, then save the callback
+			// for this check the control has to be in the control tree already
+			await waitForControlToBeRendered(oControl);
+			if (VariantUtil.getRelevantVariantManagementControlId(oControl) === mPropertyBag.vmControlId) {
+				// showExecuteOnSelection is only relevant when a control can react to the variant applied event
+				// e.g. for ListReport, Table, etc.
+				oVariantManagementControl.setShowExecuteOnSelection(true);
+				oVariantManagementControl._addVariantAppliedListener(oControl, mPropertyBag.callback);
+			} else {
+				Log.error(
+					"Error in attachVariantApplied: The passed VariantManagement ID doesn't match the responsible VariantManagement control"
+				);
+			}
 		},
 
 		/**
@@ -237,12 +373,12 @@ sap.ui.define([
 		 *
 		 * @public
 		 */
-		detachVariantApplied(mPropertyBag) {
-			var oControl = mPropertyBag.selector.id && Element.getElementById(mPropertyBag.selector.id) || mPropertyBag.selector;
-			var oAppComponent = Utils.getAppComponentForControl(oControl);
-			waitForVariantModel(oAppComponent).then(function(oVariantModel) {
-				oVariantModel.detachVariantApplied(mPropertyBag.vmControlId, oControl);
-			});
+		async detachVariantApplied(mPropertyBag) {
+			const oVariantManagementControl = Element.getElementById(mPropertyBag.vmControlId);
+			const oControl = mPropertyBag.selector.id && Element.getElementById(mPropertyBag.selector.id) || mPropertyBag.selector;
+			// Ensure that the variant attach process is finished before removing the listener
+			await Promise.all([oVariantManagementControl.waitForInit(), waitForControlToBeRendered(oControl)]);
+			oVariantManagementControl._removeVariantAppliedListener(oControl);
 		}
 	};
 
