@@ -66,6 +66,7 @@ sap.ui.define([
 				src: oContactDetailsItem.getPhoto(),
 				visible: !!oContactDetailsItem.getPhoto(),
 				decorative: false,
+				alt: oContactDetailsItem.getFormattedName(),
 				width: "5rem",
 				height: "5rem"
 			});
@@ -116,7 +117,8 @@ sap.ui.define([
 				layout: "ColumnLayout",
 				content: [
 					oTitle, oLabelImage, oImage, oLabelName, oTextName, oLabelRole, oTextRole, oLabelTitle, oTextTitle, oLabelOrg, oTextOrg
-				]
+				],
+				ariaLabelledBy: oTitle
 			});
 			this._addEmailsToSimpleForm(oContactDetailsItem, oSimpleForm, oRB);
 			this._addPhonesToSimpleForm(oContactDetailsItem, oSimpleForm, oRB);

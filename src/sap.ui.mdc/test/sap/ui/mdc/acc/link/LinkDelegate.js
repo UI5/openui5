@@ -71,7 +71,7 @@ sap.ui.define([
 		var aAdditionalContent = [
 			new ContactDetails({
 				items: new ContactDetailsItem({
-					photo: "/testsuite/test-resources/sap/ui/documentation/sdk/images/johnDoe.png",
+					photo: "/test-resources/sap/ui/documentation/sdk/images/johnDoe.png",
 					formattedName: "John Doe",
 					title: "Developer",
 					role: "Research & Development",
@@ -120,8 +120,21 @@ sap.ui.define([
 				})
 			})
 		];
-
 		return Promise.resolve(aAdditionalContent);
+	};
+	SampleLinkDelegate._getLabelledByControl = function(oPanel) {
+		const aAdditionalContent = oPanel._getAdditionalContentArea().getItems();
+		return aAdditionalContent[0].getAggregation("_content").getItems()[0].getContent()[0];
+	};
+	SampleLinkDelegate.fetchPopoverTitle = function(oLink, oPanel) {
+		if (!oLink) {
+			const sTitle = "";
+			return Promise.resolve({ sTitle, undefined });
+		}
+		const sTitle = oLink.getParent()?.getValue();
+		const oLabelledByControl = this._getLabelledByControl(oPanel);
+
+		return Promise.resolve({ sTitle, oLabelledByControl });
 	};
 
     return SampleLinkDelegate;

@@ -131,6 +131,8 @@ sap.ui.require([
 		"sap/ui/core/qunit/json/JSONPropertyBinding.qunit",
 		"sap/ui/core/qunit/json/JSONTreeBinding.qunit",
 		"sap/ui/core/qunit/json/JSONTwoWay.qunit",
+		"sap/ui/core/qunit/json/TypedJSONContext.qunit",
+		"sap/ui/core/qunit/json/TypedJSONModel.qunit",
 
 		// ***************************************************************************************
 		// sap.ui.model.message.*

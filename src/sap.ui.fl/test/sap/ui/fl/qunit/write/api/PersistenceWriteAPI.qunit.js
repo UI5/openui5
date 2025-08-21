@@ -164,13 +164,14 @@ sap.ui.define([
 			assert.equal(oFlexObjectManagerGetStub.callCount, 1, "the FlexObjectManager save method was called");
 		});
 
-		QUnit.test("when save dirty change and update flex info session", function(assert) {
+		QUnit.test("when save dirty change and update flex info session", async function(assert) {
 			const oExpectedFlexInfo = {
 				adaptationId: "adaptation1",
 				allContextsProvided: true,
 				initialAllContexts: true,
 				isEndUserAdaptation: true,
-				isResetEnabled: true
+				isResetEnabled: true,
+				version: "version1"
 			};
 			FlexInfoSession.setByReference({
 				isResetEnabled: false,
@@ -195,63 +196,62 @@ sap.ui.define([
 					}, 0);
 				});
 			});
-			const mPropertyBag = { selector: this.oAppComponent.getId(), layer: sLayer };
+			const mPropertyBag = { selector: this.oAppComponent.getId(), layer: sLayer, version: "version1" };
 			sandbox.stub(PersistenceWriteAPI, "_getUIChanges").resolves([{}]);
 			sandbox.stub(FeaturesAPI, "isPublishAvailable").withArgs().resolves(true);
 
-			return PersistenceWriteAPI.save(mPropertyBag).then((oFlexObject) => {
-				assert.equal(
-					oFlexObjectManagerSaveStub.callCount,
-					1,
-					"the FlexObjectManager save method was called"
-				);
-				assert.deepEqual(
-					oFlexObject,
-					[{ change: "test" }],
-					"Flex objects returned from saveFlexObjects are returned"
-				);
-				assert.deepEqual(
-					oFlexObjectManagerSaveStub.firstCall.args[0],
-					mPropertyBag,
-					"the FlexObjectManager save was called with the same arguments"
-				);
-				assert.equal(
-					oFlexObjectManagerGetStub.callCount,
-					1,
-					"the FlexObjectManager get method was called"
-				);
-				assert.deepEqual(
-					oFlexObjectManagerGetStub.firstCall.args[0],
-					{
-						currentLayer: Layer.CUSTOMER,
-						selector: this.oAppComponent.getId(),
-						includeCtrlVariants: true,
-						invalidateCache: true
-					},
-					"the FlexObjectManager get was called with the correct arguments"
-				);
-				assert.equal(
-					oPersistenceWriteGetFlexInfoStub.callCount,
-					1,
-					"the PersistenceWriteAPI getResetAndPublishInfo method was called"
-				);
-				assert.deepEqual(
-					oPersistenceWriteGetFlexInfoStub.firstCall.args[0],
-					mPropertyBag,
-					"the PersistenceWriteAPI was called with the same arguments"
-				);
-				assert.deepEqual(
-					oExpectedFlexInfo,
-					FlexInfoSession.getByReference(sReference),
-					"session flex info is updated with isResetEnabled but adaptationId "
-						+ "and isEndUserAdaptation and initialAllContexts are kept"
-				);
-				assert.equal(
-					FlexInfoSession.getByReference(sReference).saveChangeKeepSession,
-					undefined,
-					"saveChangeKeepSession is delete in flex info session"
-				);
-			});
+			const oFlexObject = await PersistenceWriteAPI.save(mPropertyBag);
+			assert.equal(
+				oFlexObjectManagerSaveStub.callCount,
+				1,
+				"the FlexObjectManager save method was called"
+			);
+			assert.deepEqual(
+				oFlexObject,
+				[{ change: "test" }],
+				"Flex objects returned from saveFlexObjects are returned"
+			);
+			assert.deepEqual(
+				oFlexObjectManagerSaveStub.firstCall.args[0],
+				mPropertyBag,
+				"the FlexObjectManager save was called with the same arguments"
+			);
+			assert.equal(
+				oFlexObjectManagerGetStub.callCount,
+				1,
+				"the FlexObjectManager get method was called"
+			);
+			assert.deepEqual(
+				oFlexObjectManagerGetStub.firstCall.args[0],
+				{
+					currentLayer: Layer.CUSTOMER,
+					selector: this.oAppComponent.getId(),
+					includeCtrlVariants: true,
+					invalidateCache: true
+				},
+				"the FlexObjectManager get was called with the correct arguments"
+			);
+			assert.equal(
+				oPersistenceWriteGetFlexInfoStub.callCount,
+				1,
+				"the PersistenceWriteAPI getResetAndPublishInfo method was called"
+			);
+			assert.deepEqual(
+				oPersistenceWriteGetFlexInfoStub.firstCall.args[0],
+				mPropertyBag,
+				"the PersistenceWriteAPI was called with the same arguments"
+			);
+			assert.deepEqual(
+				oExpectedFlexInfo,
+				FlexInfoSession.getByReference(sReference),
+				"session flex info is updated with isResetEnabled but adaptationId "
+					+ "and isEndUserAdaptation and initialAllContexts are kept"
+			);
+			assert.equal(
+				FlexInfoSession.getByReference(sReference).saveChangeKeepSession,
+				undefined,
+				"saveChangeKeepSession is delete in flex info session"
+			);
 		});
 
 		QUnit.test("when reset is called", async function(assert) {

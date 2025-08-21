@@ -17,7 +17,7 @@ sap.ui.define([
 		if (!oSettings.scope) {
 			oSettings.scope = document.getElementById("scope");
 		}
-		if (!oSettings.target) {
+		if (!oSettings.target && !oEvent.target.shadowRoot) {
 			oSettings.target = oEvent.target;
 		}
 		F6Navigation.handleF6GroupNavigation_orig(oEvent, oSettings);
@@ -30,7 +30,6 @@ sap.ui.define([
 			qutils.triggerKeydown(sTarget, KeyCodes.F6, !bForward, false, false);
 		}
 	}
-
 
 
 	EventBus.getInstance().subscribe("fastnav", "screenready", function() {
@@ -216,6 +215,17 @@ sap.ui.define([
 
 			oPopup7.close(0);
 			oPopup6.close(0);
+		});
+
+		QUnit.test("Nested Web Components - inner Web Component focused", function(assert) {
+			const oParentComponent = document.getElementsByTagName("parent-component")[0];
+			const oChildComponent = oParentComponent.shadowRoot.querySelector("child-component");
+
+			oChildComponent.focus();
+
+			// although the child component is focused, the active element in the document is still the parent component
+			triggerTestEvent(oParentComponent, true);
+			assert.ok(document.activeElement.id, "Focus moved to the first element in the F6 chain");
 		});
 
 		QUnit.start();

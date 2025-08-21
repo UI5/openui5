@@ -686,7 +686,7 @@ sap.ui.define([
 	/**
 	 * A string type representing an ID or a name.
 	 *
-	 * Allowed is a sequence of characters (capital/lowercase), digits, underscores, dashes, points and/or colons.
+	 * Allowed is a sequence of characters (capital/lowercase), digits, underscores, hyphens, dots and/or colons.
 	 * It may start with a character or underscore only.
 	 *
 	 * @typedef {string} sap.ui.core.ID

@@ -17,7 +17,6 @@ sap.ui.define([
 
 			var oView = this.getView();
 			oView.bindElement("/ProductCollection('1239102')");
-
 			var oViewModel = new JSONModel({
 				editMode: false,
 				productItems: [
@@ -34,6 +33,20 @@ sap.ui.define([
 				materialItems: []
 			});
 			oView.setModel(oViewModel, "view");
+		},
+		onAfterRendering: function() {
+			const oMultiValueFieldName = this.getView().byId("container-multivaluefieldexample---MyView--F-Name");
+			if (oMultiValueFieldName) {
+				oMultiValueFieldName.allowTextSelection(true);
+			}
+			const oMultiValueFieldStatus = this.getView().byId("container-multivaluefieldexample---MyView--F-Status");
+			if (oMultiValueFieldStatus) {
+				oMultiValueFieldStatus.allowTextSelection(true);
+			}
+			const oMultiValueFieldMaterial = this.getView().byId("container-multivaluefieldexample---MyView--F-Material");
+			if (oMultiValueFieldMaterial) {
+				oMultiValueFieldMaterial.allowTextSelection(true);
+			}
 		}
 
 	});

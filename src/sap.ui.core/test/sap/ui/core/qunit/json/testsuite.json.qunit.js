@@ -33,6 +33,12 @@ sap.ui.define(function() {
 			},
 			JSONTwoWay: {
 				title: "sap.ui.model.json.JSONTwoWay - QUnit Tests"
+			},
+			TypedJSONContext: {
+				title: "sap.ui.model.json.TypedJSONContext - QUnit Tests"
+			},
+			TypedJSONModel: {
+				title: "sap.ui.model.json.TypedJSONModel - QUnit Tests"
 			}
 		}
 	};

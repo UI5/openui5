@@ -118,11 +118,36 @@ sap.ui.define([
 
 	includeStylesheet( require.toUrl("./fastnav.css") );
 
+	customElements.define(
+		"parent-component",
+		class extends HTMLElement {
+			constructor() {
+				super();
+				const content = document.createElement("child-component");
+				content.tabIndex = -1; // Make it focusable
+				const shadowRoot = this.attachShadow({ mode: "open" });
+				shadowRoot.appendChild(content);
+			}
+		}
+	);
+	customElements.define(
+		"child-component",
+		class extends HTMLElement {
+			constructor() {
+				super();
+				const content = document.createElement("span");
+				content.textContent = "click me";
+				const shadowRoot = this.attachShadow({ mode: "open" });
+				shadowRoot.appendChild(content);
+			}
+		}
+	);
+
 	jQuery(function(){
 
 		// create anchors in DOM
 		if ( jQuery("#scope").length === 0 ) {
-			jQuery('<div id="scope"><div id="content"></div><div id="content2"></div><div id="content3"></div></div>').appendTo(document.body);
+			jQuery('<div id="scope"><div id="content"></div><div id="content2"></div><div id="content3"></div><div id="content4"></div></div>').appendTo(document.body);
 		}
 
 		var oRoot = jQuery("#content");
@@ -189,6 +214,9 @@ sap.ui.define([
 		])));
 		oRoot.append(tabbable(true));
 
+		oRoot = jQuery("#content4");
+		const oContent = document.createElement("parent-component");
+		oRoot.append(oContent);
 
 		setTimeout(function(){
 			EventBus.getInstance().publish("fastnav", "screenready");
