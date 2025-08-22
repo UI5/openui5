@@ -215,8 +215,8 @@
 				"description": "first Table example"
 			}, {
 				"id": "sap.ui.mdc.demokit.sample.Chart.ChartJS",
-				"name": "MDC Chart using ChartJS",
-				"description": "Sample showing usage of Mdc chart with ChartJS"
+				"name": "Chart using ChartJS",
+				"description": "Chart integrated with ChartJS to demonstrate features such as dynamic dimensions, measures, and chart interactions. "
 			}, {
 				"id": "sap.ui.mdc.sample.TableWithFilterBar",
 				"name": "6.1 Table with FilterBar",

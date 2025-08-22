@@ -10,6 +10,12 @@
 	xmlns="sap.m">
 	<App id="app">
 		<Page>
+			<customHeader>
+				<Toolbar>
+					<Text text=" This sample is provided as a demo and is not officially supported. Please, use it for reference only." class="sapUiSmallMarginBottom" />
+					<ToolbarSpacer/>
+				</Toolbar>
+			</customHeader>
 			<mdc:Chart id="chart"
 					   autoBindOnInit="true"
 					   noDataText="Oops, something went wrong..."
@@ -25,7 +31,7 @@
 				}
 			}"
 					   chartType="bar"
-					   header="mdc Chart Demo"
+					   header="Products"
 					   height="100%"
 					   width="100%"
 					   ignoreToolbarActions= "DrillDownUp">
