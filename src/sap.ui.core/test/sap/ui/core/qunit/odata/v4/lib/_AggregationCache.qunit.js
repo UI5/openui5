@@ -1446,19 +1446,38 @@ sap.ui.define([
 			+ ", node property found in $select = " + bFound;
 
 	QUnit.test(sTitle, function (assert) {
-		const oCache = _AggregationCache.create(this.oRequestor, "Foo", "", {}, {
+		const oCache = _AggregationCache.create(this.oRequestor, "Foo", "", {
+			$apply : "A.P.P.L.E",
+			$count : true,
+			$expand : "expand",
+			$filter : "filter",
+			$orderby : "orderby",
+			$select : "select",
+			custom : "foo",
+			"sap-client" : "123"
+		}, {
 			hierarchyQualifier : "X",
 			$NodeProperty : "Some/NodeID"
 		});
+		const sQueryOptions = JSON.stringify(oCache.mQueryOptions);
 		if (bLate) {
-			oCache.mLateQueryOptions = "~mLateQueryOptions~";
+			oCache.mLateExpandSelect = {$expand : "lateExpand", $select : "lateSelect"};
 		}
 		this.mock(_Cache.prototype).expects("getQueryOptions4Single").never();
 		const mClone = {
 			$select : bFound ? ["alpha", "Some/NodeID", "omega"] : ["alpha", "omega"]
 		};
 		this.mock(_Helper).expects("clone")
-			.withExactArgs(bLate ? "~mLateQueryOptions~" : sinon.match.same(oCache.mQueryOptions))
+			.withExactArgs({
+				$apply : "A.P.P.L.E",
+				$count : true,
+				$expand : bLate ? "lateExpand" : "expand",
+				$filter : "filter",
+				$orderby : "orderby",
+				$select : bLate ? "lateSelect" : "select",
+				custom : "foo",
+				"sap-client" : "123"
+			})
 			.returns(mClone);
 
 		// code under test
@@ -1468,6 +1487,9 @@ sap.ui.define([
 		assert.deepEqual(mQueryOptions, {
 			$select : ["alpha", "omega"]
 		});
+		assert.strictEqual(JSON.stringify(oCache.mQueryOptions), sQueryOptions);
+		assert.deepEqual(oCache.mLateExpandSelect,
+			bLate ? {$expand : "lateExpand", $select : "lateSelect"} : null);
 	});
 	});
 });
