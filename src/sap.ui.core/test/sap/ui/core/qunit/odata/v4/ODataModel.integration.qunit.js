@@ -38519,12 +38519,14 @@ sap.ui.define([
 	// (9) Expand Alpha -> Child Beta is expanded too, Beta and Delta swap positions
 	// (10) Scroll down, Gamma becomes visible
 	// JIRA: CPOUI5ODATAV4-2032
+	//
+	// Ensure that custom URL parameters are added to a single entity refresh (SNOW: DINC0570634)
 	QUnit.test("Recursive Hierarchy: side-effects refresh (expandTo=1)", async function (assert) {
 		const oModel = this.createSpecialCasesModel({autoExpandSelect : true});
 		const sFriend = "/Artists(ArtistID='99',IsActiveEntity=false)/_Friend";
 		const baseUrl = (sExpandLevels) => sFriend.slice(1)
-			+ "?$apply=com.sap.vocabularies.Hierarchy.v1.TopLevels(HierarchyNodes=$root" + sFriend
-			+ ",HierarchyQualifier='OrgChart',NodeProperty='_/NodeID',Levels=1"
+			+ "?custom=foo&$apply=com.sap.vocabularies.Hierarchy.v1.TopLevels(HierarchyNodes=$root"
+			+ sFriend + ",HierarchyQualifier='OrgChart',NodeProperty='_/NodeID',Levels=1"
 			+ (sExpandLevels ? ",ExpandLevels=" + sExpandLevels : "") + ")";
 		const sSelect = "&$select=ArtistID,IsActiveEntity,Name,_/DrillState,_/NodeID";
 		const sFullSelect = "&$select=ArtistID,IsActiveEntity,Name,_/DescendantCount,"
@@ -38534,7 +38536,8 @@ sap.ui.define([
 		parameters : {
 			$$aggregation : {
 				hierarchyQualifier : 'OrgChart'
-			}
+			},
+			custom : 'foo'
 		}}" threshold="0" visibleRowCount="3">
 	<Text text="{= %{@$ui5.node.isExpanded} }"/>
 	<Text text="{= %{@$ui5.node.level} }"/>
@@ -38582,7 +38585,7 @@ sap.ui.define([
 		// 1 Alpha
 		//   2 Beta (collapsed)
 		// 5 Epsilon
-		this.expectRequest(sFriend.slice(1) + "?$apply=descendants($root/Artists"
+		this.expectRequest(sFriend.slice(1) + "?custom=foo&$apply=descendants($root/Artists"
 				+ "(ArtistID='99',IsActiveEntity=false)/_Friend,OrgChart,_/NodeID,"
 				+ "filter(ArtistID eq '1' and IsActiveEntity eq false),1)"
 				+ sSelect + "&$count=true&$skip=0&$top=3", {
@@ -38672,7 +38675,7 @@ sap.ui.define([
 		], 4);
 
 		this.expectRequest(sFriend.slice(1) + "(ArtistID='2',IsActiveEntity=false)"
-				+ "?$select=sendsAutographs", {
+				+ "?custom=foo&$select=sendsAutographs", {
 					sendsAutographs : true
 			});
 
@@ -38696,7 +38699,7 @@ sap.ui.define([
 			});
 
 		this.expectRequest(sFriend.slice(1) + "(ArtistID='2',IsActiveEntity=false)"
-				+ "?$select=ArtistID,IsActiveEntity,Messages,Name,sendsAutographs", {
+				+ "?custom=foo&$select=ArtistID,IsActiveEntity,Messages,Name,sendsAutographs", {
 					ArtistID : "2",
 					IsActiveEntity : false,
 					Messages : [],
@@ -38785,7 +38788,7 @@ sap.ui.define([
 
 		assert.strictEqual(oBinding.getDownloadUrl(),
 			"/special/cases/" + sFriend.slice(1)
-			+ "?$apply=com.sap.vocabularies.Hierarchy.v1.TopLevels(HierarchyNodes=$root"
+			+ "?custom=foo&$apply=com.sap.vocabularies.Hierarchy.v1.TopLevels(HierarchyNodes=$root"
 			+ "/Artists(ArtistID='99',IsActiveEntity=false)/_Friend,HierarchyQualifier='OrgChart'"
 			+ ",NodeProperty='_/NodeID')"
 			+ "&$select=ArtistID,IsActiveEntity,Name,_/DistanceFromRoot,_/DrillState,_/NodeID",
