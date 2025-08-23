@@ -32,11 +32,14 @@ sap.ui.define([
 				regExp : /^PATCH \/sap\/opu\/odata4\/IWBEP\/TEA\/default\/IWBEP\/TEA_BUSI\/0001\/EMPLOYEES\('([^']*)'\)$/,
 				response : {buildResponse : buildPatchResponse, code : 204}
 			}, {
-				regExp : /^PATCH \/sap\/opu\/odata4\/IWBEP\/TEA\/default\/IWBEP\/TEA_BUSI\/0001\/(\$0\.0)$/,
+				regExp : /^PATCH \/sap\/opu\/odata4\/IWBEP\/TEA\/default\/IWBEP\/TEA_BUSI\/0001\/\$.*/,
 				response : {buildResponse : buildPatchResponse, code : 204}
 			}, {
 				regExp : /^POST \/sap\/opu\/odata4\/IWBEP\/TEA\/default\/IWBEP\/TEA_BUSI\/0001\/EMPLOYEES$/,
 				response : {buildResponse : buildPostResponse}
+			}, {
+				regExp : /^POST \/sap\/opu\/odata4\/IWBEP\/TEA\/default\/IWBEP\/TEA_BUSI\/0001\/\$.*\/com\.sap\.gateway\.default\.iwbep\.tea_busi\.v0001\.__FAKE__AcChangeNextSibling$/,
+				response : {buildResponse : buildChangeNextSiblingResponse}
 			}, {
 				regExp : /^POST \/sap\/opu\/odata4\/IWBEP\/TEA\/default\/IWBEP\/TEA_BUSI\/0001\/EMPLOYEES\('([^']*)'\)\/com\.sap\.gateway\.default\.iwbep\.tea_busi\.v0001\.__FAKE__AcChangeNextSibling$/,
 				response : {buildResponse : buildChangeNextSiblingResponse}
@@ -215,9 +218,12 @@ sap.ui.define([
 	 * @param {string[]} aMatches - The matches against the RegExp
 	 * @param {object} _oResponse - Response object to fill
 	 * @param {object} oRequest - Request object to get POST body from
+	 * @param {string} [sReferencedMessage] - Response message which this PATCH refers to
 	 */
-	function buildChangeNextSiblingResponse(aMatches, _oResponse, oRequest) {
-		const oNode = mNodeById[aMatches[1]];
+	function buildChangeNextSiblingResponse(aMatches, _oResponse, oRequest, sReferencedMessage) {
+		const oNode = sReferencedMessage
+			? mNodeById[JSON.parse(sReferencedMessage).ID]
+			: mNodeById[aMatches[1]];
 		const sParentId = oNode.MANAGER_ID;
 
 		// {"NextSibling" : {"ID" : "1"}}
@@ -684,7 +690,7 @@ sap.ui.define([
 		oNode = {...oNode};
 		oNode.ID = sNewID;
 		oNode.MANAGER_ID = sNewManagerID;
-		oNode.Name = "Copy of " + (oNode.Name || sOldID);
+		oNode.Name = "Copy of " + sOldID + (oNode.Name ? " (" + oNode.Name + ")" : "");
 
 		aAllNodes.push(oNode); // Note: preorder (parent before child)
 		mNodeById[sNewID] = oNode;

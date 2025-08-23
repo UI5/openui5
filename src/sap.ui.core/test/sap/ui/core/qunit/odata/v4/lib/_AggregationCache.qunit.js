@@ -5342,16 +5342,20 @@ sap.ui.define([
 	[undefined, "~iRank~"].forEach((vRank) => {
 		[null, "Foo('43')"].forEach((sSiblingPath) => {
 			[false, true].forEach((bRequestSiblingRank) => {
-				const sTitle = `move: refresh needed (rank=${vRank}, sibling=${sSiblingPath}`
-					+ `, request sibling rank=${bRequestSiblingRank})`;
+				[false, true].forEach((bCopy) => {
+					const sTitle = `move: refresh needed (rank=${vRank}, sibling=${sSiblingPath}`
+						+ `, request sibling rank=${bRequestSiblingRank}, bCopy=${bCopy})`;
 
-				if (bRequestSiblingRank && !sSiblingPath) {
-					return;
-				}
+					if (bRequestSiblingRank && !sSiblingPath) {
+						return;
+					}
 
-		QUnit.test(sTitle, function (assert) {
-			const oCache = _AggregationCache.create(this.oRequestor, "n/a", "", {}, {
-					$Actions : {ChangeNextSiblingAction : "changeNextSibling"},
+		QUnit.test(sTitle, async function (assert) {
+			const oCache = _AggregationCache.create(this.oRequestor, "~sMetaPath~", "", {}, {
+					$Actions : {
+						ChangeNextSiblingAction : "changeNextSibling",
+						CopyAction : "copy.Action"
+					},
 					$ParentNavigationProperty : "myParent",
 					$fetchMetadata : mustBeMocked,
 					expandTo : Number.MAX_SAFE_INTEGER,
@@ -5362,12 +5366,30 @@ sap.ui.define([
 			const oSiblingNode = {foo : "A", bar : "B", baz : "C"};
 			oCache.aElements.$byPredicate["('43')"] = oSiblingNode;
 			const oTreeStateMock = this.mock(oCache.oTreeState);
-			oTreeStateMock.expects("isOutOfPlace").withExactArgs("('23')").returns(false);
+			oTreeStateMock.expects("isOutOfPlace").exactly(bCopy ? 0 : 1).withExactArgs("('23')")
+				.returns(false);
 			oTreeStateMock.expects("isOutOfPlace").withExactArgs("('42')").returns(false);
 			const oGroupLock = {getUnlockedCopy : mustBeMocked};
+			const oCacheMock = this.mock(oCache);
 			const oRequestorMock = this.mock(this.oRequestor);
+			const oGroupLockMock = this.mock(oGroupLock);
+			if (bCopy) {
+				oCacheMock.expects("getTypes").withExactArgs().returns({"/~sMetaPath~" : "~oType~"});
+				this.mock(_Helper).expects("selectKeyProperties")
+					.withExactArgs({$select : []}, "~oType~");
+				oRequestorMock.expects("buildQueryString")
+					.withExactArgs("/~sMetaPath~", {$select : []}, false, true)
+					.returns("?~query~");
+				oGroupLockMock.expects("getUnlockedCopy").withExactArgs()
+					.returns("~groupLockCopyAction~");
+				oRequestorMock.expects("request")
+					.withExactArgs("POST", "Foo('23')/copy.Action?~query~", "~groupLockCopyAction~", {
+						"If-Match" : "~oChildNode~"
+					}, {})
+					.returns("E");
+			}
 			oRequestorMock.expects("request")
-				.withExactArgs("PATCH", "Foo('23')", sinon.match.same(oGroupLock), {
+				.withExactArgs("PATCH", bCopy ? "$-1" : "Foo('23')", sinon.match.same(oGroupLock), {
 						"If-Match" : "~oChildNode~",
 						Prefer : "return=minimal"
 					}, {"myParent@odata.bind" : "Foo('42')"},
@@ -5381,14 +5403,14 @@ sap.ui.define([
 			this.mock(oCache.oAggregation).expects("$fetchMetadata").exactly(sSiblingPath ? 1 : 0)
 				.withExactArgs("~metaPath~")
 				.returns(SyncPromise.resolve({foo : "n/a", $bar : "n/a", baz : "n/a"}));
-			this.mock(oGroupLock).expects("getUnlockedCopy").withExactArgs().returns("~groupLockCopy~");
+			oGroupLockMock.expects("getUnlockedCopy").withExactArgs().returns("~groupLockCopy~");
 			oRequestorMock.expects("request")
-				.withExactArgs("POST", "non/canonical/changeNextSibling", "~groupLockCopy~", {
+				.withExactArgs("POST", (bCopy ? "$-2" : "non/canonical") + "/changeNextSibling",
+					"~groupLockCopy~", {
 						"If-Match" : "~oChildNode~",
 						Prefer : "return=minimal"
 					}, {NextSibling : sSiblingPath ? {foo : "A", baz : "C"} : null})
 				.returns("B");
-			const oCacheMock = this.mock(oCache);
 			oCacheMock.expects("requestRank")
 				.withExactArgs("~oChildNode~", sinon.match.same(oGroupLock), true)
 				.returns("C");
@@ -5396,30 +5418,39 @@ sap.ui.define([
 				.withExactArgs(sinon.match.same(oSiblingNode), sinon.match.same(oGroupLock), true)
 				.returns("D");
 			this.mock(SyncPromise).expects("all")
-				.withExactArgs(["A", "B", "C", bRequestSiblingRank && "D", undefined])
-				.returns(SyncPromise.resolve([,, vRank, "~iSiblingRank~"]));
+				.withExactArgs(["A", "B", "C", bRequestSiblingRank && "D", bCopy ? "E" : undefined])
+				.returns(SyncPromise.resolve([,, vRank, "~iSiblingRank~", "~oCopy~"]));
 
 			const {promise : oSyncPromise, refresh : bRefresh}
 				// code under test
 				= oCache.move(oGroupLock, "Foo('23')", "Foo('42')", sSiblingPath, "non/canonical",
-					bRequestSiblingRank);
+					bRequestSiblingRank, bCopy);
 
 			const fnGetRank = oSyncPromise.getResult();
 			assert.strictEqual(typeof fnGetRank, "function");
 			assert.strictEqual(bRefresh, true, "refresh needed");
 
+			oCacheMock.expects("requestRank").exactly(bCopy ? 1 : 0)
+				.withExactArgs("~oCopy~", sinon.match.same(oGroupLock), true)
+				.resolves("~limitedRank~");
 			oCacheMock.expects("findIndex").exactly(vRank ? 1 : 0)
 				.withExactArgs("~iRank~").returns("~findIndex~child~");
 			oCacheMock.expects("findIndex").exactly(bRequestSiblingRank ? 1 : 0)
 				.withExactArgs("~iSiblingRank~").returns("~findIndex~sibling~");
 
 			// code under test
-			assert.deepEqual(fnGetRank(), [
-				vRank ? "~findIndex~child~" : undefined,
-				bRequestSiblingRank && "~findIndex~sibling~",
-				undefined
-			]);
+			const aResult = fnGetRank();
+
+			assert.strictEqual(aResult[0], vRank ? "~findIndex~child~" : undefined);
+			assert.strictEqual(aResult[1], bRequestSiblingRank && "~findIndex~sibling~");
+			if (bCopy) {
+				oCacheMock.expects("findIndex").withExactArgs("~limitedRank~")
+					.returns("~findIndex~copy~");
+				assert.ok(aResult[2] instanceof Promise);
+				assert.strictEqual(await aResult[2], "~findIndex~copy~");
+			}
 		});
+				});
 			});
 		});
 	});

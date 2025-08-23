@@ -304,7 +304,7 @@ sap.ui.define([
 		 * @private
 		 * @returns {string} The message bundle key
 		 */
-		DateRangeSelection.prototype._getAccessibleNameLabel = function() {
+		DateRangeSelection.prototype._getAccessibleNameBundleKey = function() {
 			var sConstructorName = this._getCalendarConstructor().getMetadata().getName();
 
 			switch (sConstructorName) {

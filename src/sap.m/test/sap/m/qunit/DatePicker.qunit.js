@@ -2222,35 +2222,16 @@ sap.ui.define([
 
 	QUnit.test("Dialog accessible name", async function(assert) {
 		// Prepare
-		var oDP = new DatePicker("DP"),
-			sAriaLabelledbyText = Library.getResourceBundleFor("sap.m").getText("DATEPICKER_POPOVER_ACCESSIBLE_NAME"),
+		var oLabel = new Label({text: "Deadline", labelFor: "DP-for"}),
+			oDP = new DatePicker("DP-for"),
+			sAriaLabelledbyText = Library.getResourceBundleFor("sap.m").getText("DATEPICKER_POPOVER_ACCESSIBLE_NAME", [oLabel.getText()]),
 			sLabelId;
 
 		oDP.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
 		// Act
-		qutils.triggerEvent("click", "DP-icon");
-		await nextUIUpdate();
-		sLabelId = oDP._oPopup.getDomRef().getAttribute("aria-labelledby");
-
-		// Assert
-		assert.strictEqual(Element.getElementById(sLabelId).getDomRef().textContent, sAriaLabelledbyText, "The dialog has the correct accessible name");
-
-		oDP.destroy();
-	});
-
-	QUnit.test("Dialog accessible name", async function(assert) {
-		// Prepare
-		var oDP = new DatePicker("DP"),
-			sAriaLabelledbyText = Library.getResourceBundleFor("sap.m").getText("DATEPICKER_POPOVER_ACCESSIBLE_NAME"),
-			sLabelId;
-
-		oDP.placeAt("qunit-fixture");
-		await nextUIUpdate();
-
-		// Act
-		qutils.triggerEvent("click", "DP-icon");
+		qutils.triggerEvent("click", "DP-for-icon");
 		await nextUIUpdate();
 		sLabelId = oDP._oPopup.getDomRef().getAttribute("aria-labelledby");
 
@@ -2262,17 +2243,18 @@ sap.ui.define([
 
 	QUnit.test("Month picker dialog accessible name", async function(assert) {
 		// Prepare
-		var oDP = new DatePicker("DP", {
+		var oLabel = new Label({text: "Deadline", labelFor: "DP1-for"}),
+			oDP = new DatePicker("DP1-for", {
 				displayFormat: "MM/yyyy"
 			}),
-			sAriaLabelledbyText = Library.getResourceBundleFor("sap.m").getText("DATEPICKER_MONTH_POPOVER_ACCESSIBLE_NAME"),
+			sAriaLabelledbyText = Library.getResourceBundleFor("sap.m").getText("DATEPICKER_MONTH_POPOVER_ACCESSIBLE_NAME", [oLabel.getText()]),
 			sLabelId;
 
 		oDP.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
 		// Act
-		qutils.triggerEvent("click", "DP-icon");
+		qutils.triggerEvent("click", "DP1-for-icon");
 		await nextUIUpdate();
 		sLabelId = oDP._oPopup.getDomRef().getAttribute("aria-labelledby");
 
@@ -2284,17 +2266,18 @@ sap.ui.define([
 
 	QUnit.test("Year picker dialog accessible name", async function(assert) {
 		// Prepare
-		var oDP = new DatePicker("DP", {
+		var oLabel = new Label({text: "Deadline", labelFor: "DP2-for"}),
+			oDP = new DatePicker("DP2-for", {
 				displayFormat: "yyyy"
 			}),
-			sAriaLabelledbyText = Library.getResourceBundleFor("sap.m").getText("DATEPICKER_YEAR_POPOVER_ACCESSIBLE_NAME"),
+			sAriaLabelledbyText = Library.getResourceBundleFor("sap.m").getText("DATEPICKER_YEAR_POPOVER_ACCESSIBLE_NAME", [oLabel.getText()]),
 			sLabelId;
 
 		oDP.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
 		// Act
-		qutils.triggerEvent("click", "DP-icon");
+		qutils.triggerEvent("click", "DP2-for-icon");
 		await nextUIUpdate();
 		sLabelId = oDP._oPopup.getDomRef().getAttribute("aria-labelledby");
 
@@ -2672,7 +2655,6 @@ sap.ui.define([
 				tablet: false,
 				phone: true
 			}),
-			oLabel = new Label({text: "DatePicker Label", labelFor: this.oDP.getId()}),
 			oInvisibleText = new InvisibleText("invisibleTextId", {
 				text: "invisible text"
 			}),
@@ -2681,7 +2663,6 @@ sap.ui.define([
 		this.oDP.addAriaLabelledBy("invisibleTextId");
 
 		this.oDP.placeAt("qunit-fixture");
-		oLabel.placeAt("qunit-fixture");
 		oInvisibleText.toStatic().placeAt("qunit-fixture");
 		await nextUIUpdate();
 
@@ -2691,11 +2672,10 @@ sap.ui.define([
 
 		// assert
 		assert.ok(oDialog.getShowHeader(), "Header is shown");
-		assert.strictEqual(oDialog.getTitle(), "DatePicker Label invisible text", "Title is set");
+		assert.strictEqual(oDialog.getTitle(), "invisible text", "Title is set");
 
 		// clean
 		oDeviceStub.restore();
-		oLabel.destroy();
 	});
 
 	QUnit.test("_createPopupContent", async function (assert) {

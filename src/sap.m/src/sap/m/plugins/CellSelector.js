@@ -180,6 +180,11 @@ sap.ui.define([
 				oEvent.preventDefault(); // Prevent default, otherwise m.Table will scroll
 			}
 		},
+		onsapspacemodifiers: function(oEvent) {
+			if (this.getConfig("preventScrollOnShiftSpace", this.getControl())) {
+				oEvent.preventDefault();
+			}
+		},
 		onsapleftmodifiers: function(oEvent) {
 			this._onsaparrowmodifiers(oEvent, DIRECTION.COL, 0, -1);
 		},
@@ -1444,6 +1449,9 @@ sap.ui.define([
 					return;
 				}
 				oBinding.getContexts(Math.max(0, iStartIndex), Math.max(1, iLength), 0, true);
+			},
+			preventScrollOnShiftSpace: function(oTable) {
+				return false;
 			}
 		},
 		"sap.m.Table": {
@@ -1711,6 +1719,9 @@ sap.ui.define([
 						}
 					});
 				}
+			},
+			preventScrollOnShiftSpace: function(oTable) {
+				return oTable.getMode() != "None";
 			}
 		}
 	}, CellSelector);

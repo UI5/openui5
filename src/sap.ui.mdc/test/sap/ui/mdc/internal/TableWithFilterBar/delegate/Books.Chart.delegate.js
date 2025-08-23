@@ -12,6 +12,7 @@ sap.ui.define([
 	"sap/base/Log",
 	"sap/ui/mdc/enums/ChartItemRoleType",
 	"delegates/util/DelegateCache",
+	"sap/ui/mdc/enums/FilterBarValidationStatus",
 	"sap/ui/mdc/Link"
 ], function(
 	ChartDelegate,
@@ -24,6 +25,7 @@ sap.ui.define([
 	Log,
 	ChartItemRoleType,
 	DelegateCache,
+	FilterBarValidationStatus,
 	Link) {
 	"use strict";
 
@@ -281,6 +283,30 @@ sap.ui.define([
 			},
 			removeCondition: function(sPropertyName, oChart, mPropertyBag) {
 				return BooksFBDelegate.removeCondition(sPropertyName, oChart, mPropertyBag);
+			},
+			determineValidationState: function(oFilterBar, mValidation) {
+				const oFilterBarConditions = oFilterBar.getConditions();
+				const sCurrencyConditionName = "currency_code";
+				const sPriceConditionName = "maxprice";
+
+				const bPriceConditionPresent = !!oFilterBarConditions?.[sPriceConditionName]?.length,
+					bCurrencyConditionPresent = !!oFilterBarConditions[sCurrencyConditionName]?.length;
+
+				const oPriceFilterField = [].find((oFilterItem) => oFilterItem.getPropertyKey() === sPriceConditionName);
+
+				if (!bPriceConditionPresent || (bPriceConditionPresent && bCurrencyConditionPresent)) {
+					oPriceFilterField?.setValueState("None");
+					oPriceFilterField?.setValueStateText();
+				}
+
+				if (bPriceConditionPresent && !bCurrencyConditionPresent) {
+					oPriceFilterField?.setValueState("Warning");
+					oPriceFilterField?.setValueStateText("Please select a Currency!");
+
+					return FilterBarValidationStatus.RequiredHasNoValue;
+				}
+
+				return oFilterBar.checkFilters();
 			}
 		};
 	};

@@ -14,6 +14,7 @@ sap.ui.define([
 	"sap/ui/unified/calendar/CalendarDate",
 	"sap/ui/unified/DateTypeRange",
 	"sap/m/DateRangeSelection",
+	"sap/m/Label",
 	"sap/m/InputBase",
 	"sap/m/DatePicker",
 	"sap/ui/Device",
@@ -43,6 +44,7 @@ sap.ui.define([
 	CalendarDate,
 	DateTypeRange,
 	DateRangeSelection,
+	Label,
 	InputBase,
 	DatePicker,
 	Device,
@@ -1100,15 +1102,16 @@ sap.ui.define([
 
 	QUnit.test("Dialog accessible name", async function(assert) {
 		// Prepare
-		var oDRS = new DateRangeSelection("DRS"),
-			sAriaLabelledbyText = Library.getResourceBundleFor("sap.m").getText("DATERANGESELECTION_POPOVER_ACCESSIBLE_NAME"),
+		var oLabel = new Label({labelFor: "DRS-for"}),
+			oDRS = new DateRangeSelection("DRS-for"),
+			sAriaLabelledbyText = Library.getResourceBundleFor("sap.m").getText("DATERANGESELECTION_POPOVER_ACCESSIBLE_NAME", [oLabel.getText()]),
 			sLabelId;
 
 		oDRS.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
 		// Act
-		qutils.triggerEvent("click", "DRS-icon");
+		qutils.triggerEvent("click", "DRS-for-icon");
 		await nextUIUpdate();
 		sLabelId = oDRS._oPopup.getDomRef().getAttribute("aria-labelledby");
 
@@ -1120,17 +1123,18 @@ sap.ui.define([
 
 	QUnit.test("Month range dialog accessible name", async function(assert) {
 		// Prepare
-		var oDRS = new DateRangeSelection("DRS", {
+		var oLabel = new Label({labelFor: "DRS1-for"}),
+			oDRS = new DateRangeSelection("DRS1-for", {
 				displayFormat: "MM/yyyy"
 			}),
-			sAriaLabelledbyText = Library.getResourceBundleFor("sap.m").getText("DATERANGESELECTION_MONTH_POPOVER_ACCESSIBLE_NAME"),
+			sAriaLabelledbyText = Library.getResourceBundleFor("sap.m").getText("DATERANGESELECTION_MONTH_POPOVER_ACCESSIBLE_NAME", [oLabel.getText()]),
 			sLabelId;
 
 		oDRS.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
 		// Act
-		qutils.triggerEvent("click", "DRS-icon");
+		qutils.triggerEvent("click", "DRS1-for-icon");
 		await nextUIUpdate();
 		sLabelId = oDRS._oPopup.getDomRef().getAttribute("aria-labelledby");
 
@@ -1142,17 +1146,18 @@ sap.ui.define([
 
 	QUnit.test("Year range dialog accessible name", async function(assert) {
 		// Prepare
-		var oDRS = new DateRangeSelection("DRS", {
+		var oLabel = new Label({labelFor: "DRS2-for"}),
+			oDRS = new DateRangeSelection("DRS2-for", {
 				displayFormat: "yyyy"
 			}),
-			sAriaLabelledbyText = Library.getResourceBundleFor("sap.m").getText("DATERANGESELECTION_YEAR_POPOVER_ACCESSIBLE_NAME"),
+			sAriaLabelledbyText = Library.getResourceBundleFor("sap.m").getText("DATERANGESELECTION_YEAR_POPOVER_ACCESSIBLE_NAME", [oLabel.getText()]),
 			sLabelId;
 
 		oDRS.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
 		// Act
-		qutils.triggerEvent("click", "DRS-icon");
+		qutils.triggerEvent("click", "DRS2-for-icon");
 		await nextUIUpdate();
 		sLabelId = oDRS._oPopup.getDomRef().getAttribute("aria-labelledby");
 

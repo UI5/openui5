@@ -11,16 +11,26 @@ sap.ui.define([
 	const rTableId = /^(treeTable|table)$/;
 	const sViewName = "sap.ui.core.sample.odata.v4.RecursiveHierarchy.RecursiveHierarchy";
 
-	function findParent(sParent) {
+	function copy(sId, sParentOrSibling, sComment, rButton, sButtonText) {
+		selectCopy.call(this);
+		pressButtonInRow.call(this, sId, rButton, sButtonText, sComment);
+		findNode.call(this, sParentOrSibling);
+		pressButton.call(this, undefined, function (oControl) {
+				return oControl.getBindingContext().getProperty("ID")
+					=== sParentOrSibling;
+			}, `to select node with ID ${sParentOrSibling}`, "sap.m.StandardListItem");
+	}
+
+	function findNode(sId) {
 		this.waitFor({
-			actions : new EnterText({clearTextFirst : true, text : sParent}),
+			actions : new EnterText({clearTextFirst : true, text : sId}),
 			controlType : "sap.m.SearchField",
-			errorMessage : `Could not find parent with ID ${sParent}`,
+			errorMessage : `Could not find node with ID ${sId}`,
 			matchers : function (oControl) {
 				return oControl.getId().includes("searchField");
 			},
 			success : function () {
-				Opa5.assert.ok(true, `Found parent with ID ${sParent}`);
+				Opa5.assert.ok(true, `Found node with ID ${sId}`);
 			},
 			viewName : sViewName
 		});
@@ -80,9 +90,11 @@ sap.ui.define([
 			}, `'${sText}' with ID ${sId}. ${sComment}`);
 	}
 
-	function selectEnableCopy() {
+	function selectCopy() {
 		this.waitFor({
-			actions : function (oCheckBox) { oCheckBox.setSelected(true); },
+			actions : function (oCheckBox) {
+				oCheckBox.setSelected(true);
+			},
 			controlType : "sap.m.CheckBox",
 			errorMessage : "Could not find checkbox Copy",
 			id : /copyCheckBox/,
@@ -96,16 +108,23 @@ sap.ui.define([
 	Opa5.createPageObjects({
 		onTheMainPage : {
 			actions : {
+				copyAsLastChildOf : function (sId, sParent, sComment) {
+					copy.call(this, sId, sParent, sComment, /moveAsLastChildOf/,
+						"Move as last child of");
+				},
+				copyAsLastRoot : function (sId, sComment) {
+					selectCopy.call(this);
+					pressButtonInRow.call(this, sId, /makeLastRoot/, "Make Last Root", sComment);
+				},
+				copyJustBeforeSibling : function (sId, sParent, sComment) {
+					copy.call(this, sId, sParent, sComment, /moveJustBeforeSibling/,
+						"Move just before sibling");
+				},
 				copyToParent : function (sId, sParent, sComment) {
-					selectEnableCopy.call(this);
-					pressButtonInRow.call(this, sId, /moveToParent/, "Move to parent", sComment);
-					findParent.call(this, sParent);
-					pressButton.call(this, undefined, function (oControl) {
-							return oControl.getBindingContext().getProperty("ID") === sParent;
-						}, `to select parent with ID ${sParent}`, "sap.m.StandardListItem");
+					copy.call(this, sId, sParent, sComment, /moveToParent/, "Move to parent");
 				},
 				copyToRoot : function (sId, sComment) {
-					selectEnableCopy.call(this);
+					selectCopy.call(this);
 					pressButtonInRow.call(this, sId, /moveToRoot/, "Move to root", sComment);
 				},
 				createNewChild : function (sId, sComment) {

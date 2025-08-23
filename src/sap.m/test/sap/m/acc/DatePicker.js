@@ -2,10 +2,11 @@ sap.ui.define([
 	"sap/m/App",
 	"sap/m/DatePicker",
 	"sap/m/Label",
+	"sap/m/Text",
 	"sap/m/Page",
 	"sap/ui/layout/VerticalLayout",
 	"sap/ui/core/library"
-], function(App, DatePicker, Label, Page, VerticalLayout, coreLibrary) {
+], function(App, DatePicker, Label, Text, Page, VerticalLayout, coreLibrary) {
 	"use strict";
 
 	// shortcut for sap.ui.core.ValueState
@@ -26,20 +27,36 @@ sap.ui.define([
 
 	var oPageLayout = new VerticalLayout({
 		content: [
+			new Text("label0", {
+				text: "Deadline"
+			}),
+			new DatePicker("DP0", {
+				displayFormat: "MM/yyyy",
+				change: handleChange,
+				ariaLabelledBy: "label0"
+			}),
+			new Text("label1", {
+				text: "Deadline"
+			}),
+			new DatePicker("DP1", {
+				displayFormat: "yyyy",
+				change: handleChange,
+				ariaLabelledBy: "label1"
+			}),
 			new Label({
-				text: "Choose a date",
+				text: "Deadline",
 				labelFor: "DP1",
 				wrapping: true
 			}),
-			new DatePicker("DP1", {
+			new DatePicker("DP2", {
 				change: handleChange
 			}),
 			new Label({
-				text: "Value format defined. Select a date",
-				labelFor: "DP2",
+				text: "Showcase value format property",
+				labelFor: "DP3",
 				wrapping: true
 			}),
-			new DatePicker("DP2", {
+			new DatePicker("DP3", {
 				value: "2014-03-26",
 				valueFormat: "yyyy-MM-dd",
 				displayFormat: "long",

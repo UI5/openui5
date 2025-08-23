@@ -19,9 +19,11 @@ sap.ui.define([
 	'./TimePickerInputs',
 	'./MaskEnabler',
 	'sap/ui/Device',
+	"sap/ui/core/Element",
 	"sap/ui/core/Lib",
 	'sap/ui/core/format/DateFormat',
 	'sap/ui/core/Locale',
+	"sap/ui/core/LabelEnablement",
 	'sap/m/library',
 	'sap/ui/core/LocaleData',
 	'./TimePickerRenderer',
@@ -48,9 +50,11 @@ function(
 	TimePickerInputs,
 	MaskEnabler,
 	Device,
+	Element,
 	Library,
 	DateFormat,
 	Locale,
+	LabelEnablement,
 	library,
 	LocaleData,
 	TimePickerRenderer,
@@ -500,6 +504,11 @@ function(
 		TimePicker.prototype.exit = function () {
 			if (this._oTimeSemanticMaskHelper) {
 				this._oTimeSemanticMaskHelper.destroy();
+			}
+
+			if (this._invisibleLabelText) {
+				this._invisibleLabelText.destroy();
+				this._invisibleLabelText = null;
 			}
 
 			MaskEnabler.exit.apply(this, arguments);
@@ -1564,20 +1573,13 @@ function(
 				oPopover,
 				oPicker,
 				oClocks,
-				oResourceBundle,
 				sOKButtonText,
 				sCancelButtonText,
-				sTitle,
 				oIcon = this.getAggregation("_endIcon")[0],
-				sLocaleId  = this._getLocale().getLanguage(),
-				sArialabelledby,
-				sLabelId,
-				sLabel;
+				sLocaleId  = this._getLocale().getLanguage();
 
-			oResourceBundle = Library.getResourceBundleFor("sap.m");
-			sOKButtonText = oResourceBundle.getText("TIMEPICKER_SET");
-			sCancelButtonText = oResourceBundle.getText("TIMEPICKER_CANCEL");
-			sTitle = this._oResourceBundle.getText("TIMEPICKER_SET_TIME");
+			sOKButtonText = this._oResourceBundle.getText("TIMEPICKER_SET");
+			sCancelButtonText = this._oResourceBundle.getText("TIMEPICKER_CANCEL");
 
 			oClocks = new TimePickerClocks(this.getId() + "-clocks", {
 				support2400: this._getSupport2400(),
@@ -1596,7 +1598,6 @@ function(
 				showHeader: false,
 				horizontalScrolling: false,
 				verticalScrolling: true,
-				title: sTitle,
 				placement: PlacementType.VerticalPreferredBottom,
 				contentWidth: "20rem",
 				beginButton: new Button(this.getId() + "-OK", {
@@ -1612,7 +1613,7 @@ function(
 					oHeader,
 					oClocks
 				],
-				ariaLabelledBy: InvisibleText.getStaticId("sap.m", "TIMEPICKER_SET_TIME"),
+				ariaLabelledBy: this._getInvisibleLabelText().getId(),
 				beforeOpen: this.onBeforeOpen.bind(this),
 				afterOpen: this.onAfterOpen.bind(this),
 				afterClose: this.onAfterClose.bind(this)
@@ -1628,13 +1629,7 @@ function(
 			oPopover.oPopup.setExtraContent([oIcon]);
 
 			if (Device.system.phone) {
-				sArialabelledby = this.$("inner").attr("aria-labelledby");
-				sLabelId = sArialabelledby && sArialabelledby.split(" ")[0];
-				sLabel = sLabelId ? document.getElementById(sLabelId).textContent : "";
-
-				if (sLabel) {
-					oPicker.setTitle(sLabel);
-				}
+				oPicker.setTitle(this._getLabelledText());
 				oPicker.setShowHeader(true);
 			} else {
 				this._oPopoverKeydownEventDelegate = {
@@ -1677,15 +1672,13 @@ function(
 		 TimePicker.prototype._createNumericPicker = function(sFormat) {
 			var that = this,
 				oPicker,
-				oResourceBundle,
 				sOKButtonText,
 				sCancelButtonText,
 				sLocaleId = this._getLocale().getLanguage(),
 				oHeader = this._getValueStateHeader();
 
-			oResourceBundle = Library.getResourceBundleFor("sap.m");
-			sOKButtonText = oResourceBundle.getText("TIMEPICKER_SET");
-			sCancelButtonText = oResourceBundle.getText("TIMEPICKER_CANCEL");
+			sOKButtonText = this._oResourceBundle.getText("TIMEPICKER_SET");
+			sCancelButtonText = this._oResourceBundle.getText("TIMEPICKER_CANCEL");
 
 			oPicker = new Popover(that.getId() + "-NP", {
 				showArrow: false,
@@ -1724,7 +1717,7 @@ function(
 					})
 				],
 
-				ariaLabelledBy: InvisibleText.getStaticId("sap.m", "TIMEPICKER_SET_TIME"),
+				ariaLabelledBy: this._getInvisibleLabelText().getId(),
 				beforeOpen: this.onBeforeNumericOpen.bind(this),
 				afterOpen: function() {
 					this.fireAfterValueHelpOpen();
@@ -1742,6 +1735,47 @@ function(
 			this.setAggregation("_numPicker", oPicker, true);
 
 			return oPicker;
+		};
+
+		/**
+		 * Returns the invisible label text for the TimePicker.
+		 * @private
+		 * @returns {sap.ui.core.InvisibleText} The invisible label text
+		 */
+		TimePicker.prototype._getInvisibleLabelText = function() {
+			if (!this._invisibleLabelText) {
+				this._invisibleLabelText = new InvisibleText({
+					text: this._getPickerAccessibleName()
+				}).toStatic();
+			}
+
+			return this._invisibleLabelText;
+		};
+
+		/**
+		 * Returns the accessible name for the TimePicker.
+		 * @returns {string} The accessible name
+		 */
+		TimePicker.prototype._getPickerAccessibleName = function() {
+			return this._oResourceBundle.getText("TIMEPICKER_SET_TIME", [this._getLabelledText()]);
+		};
+
+		/**
+		 * Returns the labelled text for the TimePicker.
+		 * @private
+		 * @returns {string} The labelled text
+		 */
+		TimePicker.prototype._getLabelledText = function() {
+			const aExternalLabelRefs = LabelEnablement.getReferencingLabels(this);
+			const aLabels = aExternalLabelRefs.length ? aExternalLabelRefs : this.getAriaLabelledBy();
+
+			return aLabels
+				.reduce(function(sAccumulator, sCurrent) {
+					const oLabelTextControl = Element.getElementById(sCurrent);
+					const sLabelText = oLabelTextControl && oLabelTextControl.getText ? oLabelTextControl.getText() : "";
+					return `${sAccumulator} ${sLabelText}`;
+				}, "")
+				.trim();
 		};
 
 		/**
@@ -2383,7 +2417,7 @@ function(
 			var oRenderer = this.getRenderer();
 			var oInfo = DateTimeField.prototype.getAccessibilityInfo.apply(this, arguments);
 			var sValue = this.getValue() || "";
-			var sRequired = this.getRequired() ? Library.getResourceBundleFor("sap.m").getText("ELEMENT_REQUIRED") : '';
+			var sRequired = this.getRequired() ? this._oResourceBundle.getText("ELEMENT_REQUIRED") : '';
 
 			if (this._bValid) {
 				var oDate = this.getDateValue();
@@ -2393,7 +2427,7 @@ function(
 			}
 
 			oInfo.role = oRenderer.getAriaRole(this);
-			oInfo.type = Library.getResourceBundleFor("sap.m").getText("ACC_CTR_TYPE_TIMEINPUT");
+			oInfo.type = this._oResourceBundle.getText("ACC_CTR_TYPE_TIMEINPUT");
 			oInfo.description = [sValue || this._getPlaceholder(), oRenderer.getDescribedByAnnouncement(this), sRequired].join(" ").trim();
 			oInfo.autocomplete = "none";
 			oInfo.haspopup = true;

@@ -946,7 +946,7 @@ sap.ui.define([
 
 	DateTimePicker.prototype._createPopup = function(){
 
-		var sLabelId, sLabel, oResourceBundle, sOKButtonText, sCancelButtonText, oPopover;
+		var oResourceBundle, sOKButtonText, sCancelButtonText, oPopover;
 
 		if (!this._oPopup) {
 			oResourceBundle = Library.getResourceBundleFor("sap.m");
@@ -971,7 +971,7 @@ sap.ui.define([
 					oHeader,
 					this._oPopupContent
 				],
-				ariaLabelledBy: InvisibleText.getStaticId("sap.m", this._getAccessibleNameLabel()),
+				ariaLabelledBy: this._getInvisibleLabelText().getId(),
 				afterOpen: _handleAfterOpen.bind(this),
 				afterClose: _handleAfterClose.bind(this)
 			});
@@ -979,9 +979,7 @@ sap.ui.define([
 
 
 			if (Device.system.phone) {
-				sLabelId = this.$("inner").attr("aria-labelledby");
-				sLabel = sLabelId ? document.getElementById(sLabelId)?.textContent : "";
-				this._oPopup.setTitle(sLabel);
+				this._oPopup.setTitle(this._getLabelledText());
 				this._oPopup.setShowHeader(true);
 				this._oPopup.setShowCloseButton(true);
 			} else {
@@ -1014,7 +1012,7 @@ sap.ui.define([
 	 * @private
 	 * @returns {string} The message bundle key
 	 */
-	DateTimePicker.prototype._getAccessibleNameLabel = function() {
+	DateTimePicker.prototype._getAccessibleNameBundleKey = function() {
 		return "DATETIMEPICKER_POPOVER_ACCESSIBLE_NAME";
 	};
 

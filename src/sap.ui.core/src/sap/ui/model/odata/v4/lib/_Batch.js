@@ -10,7 +10,7 @@ sap.ui.define([
 	"use strict";
 
 	var mAllowedChangeSetMethods = {POST : true, PUT : true, PATCH : true, DELETE : true},
-		rContentIdReference = /^\$\d+/,
+		rContentIdReference = /^\$-?(\d+)/,
 		rHeaderParameter = /(\S*?)=(?:"(.+)"|(\S+))/;
 
 	/**
@@ -290,12 +290,15 @@ sap.ui.define([
 				}
 
 				if (iChangeSetIndex !== undefined && sUrl[0] === "$") {
-					// adjust URL if it starts with a Content-ID reference by adding the change set
-					// index
-					if (sUrl === "$-1") { // reference the previous request
-						sUrl = "$" + (iRequestIndex - 1) + "." + iChangeSetIndex;
-					} else {
-						sUrl = sUrl.replace(rContentIdReference, "$&." + iChangeSetIndex);
+					const aMatches = rContentIdReference.exec(sUrl);
+					if (aMatches) {
+						// adjust URL if it starts with a Content-ID reference by adding the
+						// change set index
+						const vReferencedRequestIndex = sUrl.startsWith("$-")
+							? (iRequestIndex - parseInt(aMatches[1])) // reference previous request
+							: aMatches[1];
+						sUrl = sUrl.replace(aMatches[0],
+							"$" + vReferencedRequestIndex + "." + iChangeSetIndex);
 					}
 				}
 

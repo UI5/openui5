@@ -778,6 +778,22 @@ sap.ui.define([
 		assert.notOk(this.oCellSelector._bMouseDown, "Flag has not been set");
 	});
 
+	QUnit.test("Prevent scrolling on SHIFT + SPACE", function(assert) {
+		let bPrevented = false;
+		this.oTable.addEventDelegate({
+			onsapspacemodifiers: (oEvent) => {
+				assert.equal(oEvent.isDefaultPrevented(), bPrevented, "Default action is " + (bPrevented ? "" : "not ") + "prevented");
+			}
+		});
+
+		const oCell = getCell(this.oTable, 1, 0);
+		qutils.triggerKeydown(oCell, KeyCodes.SPACE, true, false);
+
+		bPrevented = true;
+		this.oTable.setMode("MultiSelect");
+		qutils.triggerKeydown(oCell, KeyCodes.SPACE, true, false);
+	});
+
 	QUnit.module("Dialog Behavior", {
 		beforeEach: async function() {
 			this.oMockServer = new MockServer({ rootUri : sServiceURI });
