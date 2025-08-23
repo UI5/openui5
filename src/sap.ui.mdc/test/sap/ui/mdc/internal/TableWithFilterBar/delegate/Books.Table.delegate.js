@@ -11,8 +11,9 @@ sap.ui.define([
 	"sap/ui/model/odata/type/Decimal",
 	"sap/ui/model/odata/type/String",
 	"sap/m/Text",
+	"sap/ui/mdc/enums/FilterBarValidationStatus",
 	'delegates/util/DelegateCache'
-], function (ODataTableDelegate, BooksFBDelegate, Field, Link, FieldDisplay, FieldEditMode, OperatorName, DelegateUtil, CurrencyType, DecimalType, StringType, Text, DelegateCache) {
+], function (ODataTableDelegate, BooksFBDelegate, Field, Link, FieldDisplay, FieldEditMode, OperatorName, DelegateUtil, CurrencyType, DecimalType, StringType, Text, FilterBarValidationStatus, DelegateCache) {
 	"use strict";
 	var BooksTableDelegate = Object.assign({}, ODataTableDelegate);
 	var getFullId = function(oControl, sVHId) {
@@ -147,7 +148,7 @@ sap.ui.define([
 					oPriceFilterField?.setValueState("Warning");
 					oPriceFilterField?.setValueStateText("Please select a Currency!");
 
-					return BooksTableDelegate.RequiredHasNoValue;
+					return FilterBarValidationStatus.RequiredHasNoValue;
 				}
 
 				return oFilterBar.checkFilters();

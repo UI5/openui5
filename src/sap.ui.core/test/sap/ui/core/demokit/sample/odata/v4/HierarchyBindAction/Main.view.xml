@@ -94,14 +94,14 @@
 						press=".onMoveDown" tooltip="Move Down"/>
 					<m:Button icon="sap-icon://move" press=".onMove($event, '')"
 						tooltip="Move To Parent..."/>
-					<m:Button enabled="{= !%{ui>/bCopy}}" icon="sap-icon://map"
-						press=".onMove($event, '?')" tooltip="Move Just Before Sibling..."/>
-					<m:Button enabled="{= !%{ui>/bCopy}}" icon="sap-icon://arrow-bottom"
-						press=".onMove($event, null)" tooltip="Move As Last Child Of..."/>
+					<m:Button icon="sap-icon://map" press=".onMove($event, '?')"
+						tooltip="Move Just Before Sibling..."/>
+					<m:Button icon="sap-icon://arrow-bottom" press=".onMove($event, null)"
+						tooltip="Move As Last Child Of..."/>
 					<m:Button enabled="{= %{@$ui5.node.level} > 1 }" icon="sap-icon://back-to-top"
 						press=".onMakeRoot($event, false)" tooltip="Make Root"/>
-					<m:Button enabled="{= !%{ui>/bCopy}}" icon="sap-icon://pull-down"
-						press=".onMakeRoot($event, true)" tooltip="Make Last Root"/>
+					<m:Button icon="sap-icon://pull-down" press=".onMakeRoot($event, true)"
+						tooltip="Make Last Root"/>
 					<m:Button icon="sap-icon://refresh" press=".onRefreshRow" tooltip="Refresh"/>
 					<m:Button icon="sap-icon://delete" press=".onDelete" tooltip="Delete"/>
 					<m:Button enabled="{= %{@$ui5.node.isExpanded} !== undefined }"
@@ -119,7 +119,7 @@
 		<m:SelectDialog confirm=".onMoveConfirm" draggable="true" id="moveDialog"
 			items="{path : '/I_SADL_BHV_HIER_BIND_DIRECTORY(\'1\')/_Hierarchy',
 				parameters : {$count : true, $$sharedRequest : true}, suspended : true}"
-			search=".onSearch" title="Select New Parent For {Id}">
+			search=".onSearch" title="Select New Parent Or Sibling For {Id}">
 			<!-- description="{Description}" -->
 			<m:StandardListItem title="{Id}" type="Active" />
 		</m:SelectDialog>

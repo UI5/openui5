@@ -749,15 +749,16 @@ sap.ui.define([
 
 	QUnit.test("Dialog accessible name", async function(assert) {
 		// Prepare
-		var oDTP = new DateTimePicker("DTP"),
-			sAriaLabelledbyText = Library.getResourceBundleFor("sap.m").getText("DATETIMEPICKER_POPOVER_ACCESSIBLE_NAME"),
+		var oLabel = new Label({labelFor: "DTP-for"}),
+			oDTP = new DateTimePicker("DTP-for"),
+			sAriaLabelledbyText = Library.getResourceBundleFor("sap.m").getText("DATETIMEPICKER_POPOVER_ACCESSIBLE_NAME", [oLabel.getText()]),
 			sLabelId;
 
 		oDTP.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
 		// Act
-		qutils.triggerEvent("click", "DTP-icon");
+		qutils.triggerEvent("click", "DTP-for-icon");
 		await nextUIUpdate();
 		sLabelId = oDTP._oPopup.getDomRef().getAttribute("aria-labelledby");
 

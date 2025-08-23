@@ -1618,8 +1618,6 @@ sap.ui.define([
 		const invokeNextSibling = () => {
 			if (sSiblingPath !== undefined) {
 				bRefreshNeeded = true;
-				const sActionPath = sNonCanonicalChildPath + "/"
-					+ this.oAggregation.$Actions.ChangeNextSiblingAction;
 				const sSiblingPredicate = sSiblingPath?.slice(sSiblingPath.indexOf("("));
 				oSiblingNode = this.aElements.$byPredicate[sSiblingPredicate];
 				let oNextSibling = null;
@@ -1627,7 +1625,8 @@ sap.ui.define([
 					// remove OOP for all descendants (incl. itself) of a next sibling
 					this.oTreeState.deleteOutOfPlace(sSiblingPredicate);
 					const oNextSiblingType = this.oAggregation.$fetchMetadata(
-						_Helper.getMetaPath("/" + sActionPath + "/NextSibling/")
+						_Helper.getMetaPath("/" + sNonCanonicalChildPath + "/"
+						+ this.oAggregation.$Actions.ChangeNextSiblingAction + "/NextSibling/")
 					).getResult();
 					const aKeys = Object.keys(oNextSiblingType).filter((sKey) => sKey[0] !== "$");
 					oNextSibling = aKeys.reduce((oKeys, sKey) => {
@@ -1635,6 +1634,8 @@ sap.ui.define([
 						return oKeys;
 					}, {});
 				}
+				const sActionPath = (bCopy ? "$-2" : sNonCanonicalChildPath) + "/"
+					+ this.oAggregation.$Actions.ChangeNextSiblingAction;
 
 				return this.oRequestor.request("POST", sActionPath, oGroupLock.getUnlockedCopy(), {
 						"If-Match" : oChildNode,

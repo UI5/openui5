@@ -1816,21 +1816,33 @@ sap.ui.define([
 		await this.fnTestReferencing(this.oTP, assert, this.oRB, [true, false]);
 	});
 
-	QUnit.test("Popover's placeholder text", function (assert) {
+	QUnit.test("Popover's placeholder text", async function (assert) {
 		// Prepare
-		var sPlaceholderId = InvisibleText.getStaticId("sap.m", "TIMEPICKER_SET_TIME"),
-			oPicker;
+		var oLabel = new Label({ text: "Deadline", labelFor: "TP-for" }),
+			oTimePicker = new TimePicker("TP-for"),
+			sAriaLabelledbyText = Library.getResourceBundleFor("sap.m").getText("TIMEPICKER_SET_TIME", [oLabel.getText()]),
+			sLabelId;
+
+		oLabel.placeAt("qunit-fixture");
+		oTimePicker.placeAt("qunit-fixture");
+		await nextUIUpdate();
 
 		// Act
-		this.oTP.toggleOpen(false); // Open TimePicker's popover
-		oPicker = this.oTP._getPicker();
+		oTimePicker.toggleOpen(false); // Open TimePicker's popover
+
+		await nextUIUpdate();
+
+		sLabelId =  oTimePicker._getPicker().getDomRef().getAttribute("aria-labelledby");
 
 		// Assert
-		assert.ok(oPicker.getAriaLabelledBy().indexOf(sPlaceholderId) !== -1, "Placeholder's reference is set on API level");
-		assert.ok(oPicker.$().attr("aria-labelledby").indexOf(sPlaceholderId) !== -1, "Placeholder reference can be found in the DOM");
+		assert.strictEqual(Element.getElementById(sLabelId).getDomRef().textContent, sAriaLabelledbyText, "The dialog has the correct accessible name");
+
+		// Clean
+		oLabel.destroy();
+		oTimePicker.destroy();
 	});
 
-	QUnit.test("Default senatic accessible role gets used", function(assert) {
+	QUnit.test("Default sematic accessible role gets used", function(assert) {
 		// Prepare
 		var oTP = new TimePicker();
 

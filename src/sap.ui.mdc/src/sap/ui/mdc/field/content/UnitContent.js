@@ -210,13 +210,20 @@ sap.ui.define([
 				const oClonedConstraints = isEmptyObject(oConstraints) ? undefined : merge({}, oConstraints);
 
 				// Type for number
+				const bHasCompositeTypes = (oContentFactory.getCompositeTypes() ?? []).length > 0;
 				let oNewType = _getUnitTypeInstance(TypeMap, oType, oClonedFormatOptions, oClonedConstraints, true, false);
+				if (bHasCompositeTypes) {
+					oNewType.processPartTypes(oContentFactory.getCompositeTypes());
+				}
 				oContentFactory.setUnitOriginalType(oContentFactory.getDataType());
 				TypeMap.initializeInternalType(oNewType, oContentFactory.getFieldTypeInitialization());
 				oContentFactory.setDataType(oNewType);
 
 				// type for unit
 				oNewType = _getUnitTypeInstance(TypeMap, oType, oClonedFormatOptions, oClonedConstraints, false, true);
+				if (bHasCompositeTypes) {
+					oNewType.processPartTypes(oContentFactory.getCompositeTypes());
+				}
 				TypeMap.initializeInternalType(oNewType, oContentFactory.getFieldTypeInitialization());
 				oContentFactory.setUnitType(oNewType);
 				oContentFactory.updateConditionType();

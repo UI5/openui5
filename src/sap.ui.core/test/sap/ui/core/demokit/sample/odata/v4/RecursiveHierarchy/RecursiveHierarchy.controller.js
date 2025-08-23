@@ -214,6 +214,7 @@ sap.ui.define([
 				let iCopyIndex;
 				if (this._vNextSibling === "?") {
 					await this._oNode.move({
+						copy : this.getView().getModel("ui").getProperty("/bCopy"),
 						nextSibling : oParent,
 						parent : oParent.getParent()
 					});

@@ -117,17 +117,17 @@
 					<m:Button enabled="{= %{STATUS} !== 'Out' }" icon="sap-icon://move"
 						id="moveToParent" press=".onMove($event, false, '')"
 						tooltip="Move To Parent..."/>
-					<m:Button enabled="{= %{STATUS} !== 'Out' &amp;&amp; !%{ui>/bCopy}}"
-						icon="sap-icon://map" press=".onMove($event, false, '?')"
+					<m:Button enabled="{= %{STATUS} !== 'Out'}" icon="sap-icon://map"
+						id="moveJustBeforeSibling" press=".onMove($event, false, '?')"
 						tooltip="Move Just Before Sibling..."/>
-					<m:Button enabled="{= %{STATUS} !== 'Out' &amp;&amp; !%{ui>/bCopy}}"
-						icon="sap-icon://arrow-bottom" press=".onMove($event, false, null)"
+					<m:Button enabled="{= %{STATUS} !== 'Out'}" icon="sap-icon://arrow-bottom"
+						id="moveAsLastChildOf" press=".onMove($event, false, null)"
 						tooltip="Move As Last Child Of..."/>
 					<m:Button enabled="{= %{STATUS} !== 'Out' &amp;&amp; %{@$ui5.node.level} > 1 }"
 						icon="sap-icon://back-to-top" id="moveToRoot" press=".onMakeRoot"
 						tooltip="Make Root"/>
-					<m:Button enabled="{= %{STATUS} !== 'Out' &amp;&amp; !%{ui>/bCopy}}"
-						icon="sap-icon://pull-down" press=".onMakeRoot($event, true)"
+					<m:Button enabled="{= %{STATUS} !== 'Out'}" icon="sap-icon://pull-down"
+						id="makeLastRoot" press=".onMakeRoot($event, true)"
 						tooltip="Make Last Root"/>
 					<m:Button enabled="{= %{STATUS} !== 'Out' }" icon="sap-icon://delete"
 						press=".onDelete" tooltip="Delete"/>
@@ -241,17 +241,17 @@
 					<m:Button enabled="{= %{STATUS} !== 'Out' }" icon="sap-icon://move"
 						id="moveToParentTreeTable" press=".onMove($event, true)"
 						tooltip="Move To Parent..."/>
-					<m:Button enabled="{= %{STATUS} !== 'Out' &amp;&amp; !%{ui>/bCopy}}"
-						icon="sap-icon://map" press=".onMove($event, true, '?')"
+					<m:Button enabled="{= %{STATUS} !== 'Out'}" icon="sap-icon://map"
+						id="moveJustBeforeSiblingTreeTable" press=".onMove($event, true, '?')"
 						tooltip="Move Just Before Sibling..."/>
-					<m:Button enabled="{= %{STATUS} !== 'Out' &amp;&amp; !%{ui>/bCopy}}"
-						icon="sap-icon://arrow-bottom" press=".onMove($event, true, null)"
+					<m:Button enabled="{= %{STATUS} !== 'Out'}" icon="sap-icon://arrow-bottom"
+						id="moveAsLastChildOfTreeTable" press=".onMove($event, true, null)"
 						tooltip="Move As Last Child Of..."/>
 					<m:Button enabled="{= %{STATUS} !== 'Out' &amp;&amp; %{@$ui5.node.level} > 1 }"
 						icon="sap-icon://back-to-top" id="moveToRootTreeTable" press=".onMakeRoot"
 						tooltip="Make Root"/>
-					<m:Button enabled="{= %{STATUS} !== 'Out' &amp;&amp; !%{ui>/bCopy}}"
-						icon="sap-icon://pull-down" press=".onMakeRoot($event, true)"
+					<m:Button enabled="{= %{STATUS} !== 'Out'}" icon="sap-icon://pull-down"
+						id="makeLastRootTreeTable" press=".onMakeRoot($event, true)"
 						tooltip="Make Last Root"/>
 					<m:Button enabled="{= %{STATUS} !== 'Out' }" icon="sap-icon://delete"
 						press=".onDelete" tooltip="Delete"/>
@@ -270,7 +270,7 @@
 		<m:SelectDialog confirm=".onMoveConfirm" draggable="true" id="moveDialog"
 			items="{path : '/EMPLOYEES', parameters : {$count : true, $$sharedRequest : true},
 				suspended : true}"
-			search=".onSearch" title="Select New Parent For {ID} ({Name})">
+			search=".onSearch" title="Select New Parent Or Sibling For {ID} ({Name})">
 			<m:StandardListItem title="{ID} ({Name})" type="Active" />
 		</m:SelectDialog>
 	</mvc:dependents>

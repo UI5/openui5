@@ -345,12 +345,12 @@ sap.ui.define([
 				},
 				body : oNewEmployeeBody
 			}, {
-				method : "PATCH",
-				url : "$-1",
+				method : "POST",
+				url : "$-3/TEAM_2_EMPLOYEES",
 				headers : {
 					"Content-Type" : "application/json"
 				},
-				body : {AGE : 18}
+				body : oNewEmployeeBody
 			}, {
 				method : "DELETE",
 				// Note: This is unrealistic as key predicates use encodeURIComponent and entity set
@@ -437,10 +437,10 @@ sap.ui.define([
 		+ "Content-Transfer-Encoding:binary\r\n"
 		+ "Content-ID:3.1\r\n"
 		+ "\r\n"
-		+ "PATCH $2.1 HTTP/1.1\r\n"
+		+ "POST $0.1/TEAM_2_EMPLOYEES HTTP/1.1\r\n"
 		+ "Content-Type:application/json\r\n"
 		+ "\r\n"
-		+ "{\"AGE\":18}\r\n"
+		+ JSON.stringify(oNewEmployeeBody) + "\r\n"
 		+ "--changeset_id-1450426018742-913\r\n"
 		+ "Content-Type:application/http\r\n"
 		+ "Content-Transfer-Encoding:binary\r\n"

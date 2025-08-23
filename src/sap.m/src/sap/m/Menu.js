@@ -16,6 +16,7 @@ sap.ui.define([
 	'sap/ui/core/Lib',
 	'sap/ui/Device',
 	"sap/ui/core/InvisibleText",
+	'sap/ui/base/ManagedObjectMetadata',
 	'sap/ui/core/EnabledPropagator',
 	'sap/base/i18n/Localization',
 	'sap/base/Log'
@@ -33,6 +34,7 @@ sap.ui.define([
 		Lib,
 		Device,
 		InvisibleText,
+		ManagedObjectMetadata,
 		EnabledPropagator,
 		Localization,
 		Log
@@ -155,6 +157,76 @@ sap.ui.define([
 			this._openDuration = Device.system.phone ? null : 0;
 		};
 
+		Menu.prototype.updateItems = function(sReason, oEventInfo) {
+			// Special handling for the V4 ODataModel.
+			if (oEventInfo && oEventInfo.detailedReason === "AddVirtualContext") {
+				createVirtualItem(this);
+				return;
+			} else if (oEventInfo && oEventInfo.detailedReason === "RemoveVirtualContext") {
+				destroyVirtualItem(this);
+				return;
+			}
+
+			if (this._bReceivingData) {
+				//If we are receiving the data, this should be handled in oDataModel.
+				//The updateStarted event is already triggered before refreshItems.
+				//Here, the items binding is updated because the data has arrived from the server.
+				//At this point, we can reset/convert the flag for the next request.
+				this._bReceivingData = false;
+			} else {
+				//if the data is not requested, this should be handled with a JSON Model.
+				//Since the data is already in memory and not requested from the server, we do not need to change the flag.
+				//In this case, this._bReceivingData should always remain false.
+				this._updateStarted(sReason);
+			}
+
+			// for flat list update items aggregation
+			this.updateAggregation("items");
+
+			// items binding are updated
+			this._updateFinished();
+		};
+
+		Menu.prototype._updateStarted = function(sReason) {
+			// if data receiving/update is not started or ongoing
+			if (!this._bReceivingData && !this._bUpdating) {
+				this._bUpdating = true;
+			}
+		};
+
+		// called on after rendering to finalize item update finished
+		Menu.prototype._updateFinished = function() {
+			// check if data receiving/update is finished
+			if (!this._bReceivingData && this._bUpdating) {
+
+				setTimeout(function() {
+					this._getMenuWrapper()._setHoveredItem(this._getMenuWrapper()._getNextFocusableItem(-1, 1), true);
+				}.bind(this), 0);
+
+				this._bUpdating = false;
+			}
+		};
+
+		// this gets called only with oData Model when first load
+		Menu.prototype.refreshItems = function(sReason) {
+			this._bRefreshItems = true;
+
+			// if data multiple time requested during the ongoing request
+			// UI5 cancels the previous requests then we should fire updateStarted once
+			if (!this._bReceivingData) {
+				// handle update started event
+				this._updateStarted(sReason);
+				this._bReceivingData = true;
+			}
+
+			this.refreshAggregation("items");
+		};
+
+		Menu.prototype.createItem = function(oContext, oBindingInfo, sIdSuffix) {
+			const oItem = oBindingInfo.factory(ManagedObjectMetadata.uid(sIdSuffix ? sIdSuffix : "clone"), oContext);
+			return oItem.setBindingContext(oContext, oBindingInfo.model);
+		};
+
 		/**
 		 * Called from parent if the control is destroyed.
 		 */
@@ -204,21 +276,13 @@ sap.ui.define([
 		 * @public
 		 */
 		Menu.prototype.openBy = function(oControl) {
-			const oPopover = this._getPopover(),
-				oBinding = this.getBinding("items");
+			const oPopover = this._getPopover();
 
 			if (!oControl) {
 				oControl = document.body;
 			}
 
-			if (oBinding && oBinding.isA("sap.ui.model.odata.v4.ODataListBinding")) {
-				// Wait for the binding data to be received, then open
-				oBinding.attachEventOnce("dataReceived", function() {
-					this._openPopoverBy(oPopover, oControl);
-				}, this);
-			} else {
-				this._openPopoverBy(oPopover, oControl);
-			}
+			this._openPopoverBy(oPopover, oControl);
 
 			this.bIgnoreOpenerFocus = true; // reset the flag to allow the opener to be focused after the menu is closed
 
@@ -715,6 +779,26 @@ sap.ui.define([
 		Menu.prototype._setExtraContent = function(oDomRef) {
 			this._getPopover()._getPopup().setExtraContent([oDomRef]);
 		};
+
+		function createVirtualItem(oMenu) {
+			const oBinding = oMenu.getBinding("items");
+			const oBindingInfo = oMenu.getBindingInfo("items");
+			const iLength = oBindingInfo.length;
+			const iIndex = oBindingInfo.startIndex;
+			const oVirtualContext = oBinding.getContexts(iIndex, iLength)[0];
+
+			destroyVirtualItem(oMenu);
+
+			oMenu._oVirtualItem = oMenu.createItem(oVirtualContext, oBindingInfo, "virtual");
+			oMenu.addAggregation("dependents", oMenu._oVirtualItem, true);
+		}
+
+		function destroyVirtualItem(oMenu) {
+			if (oMenu._oVirtualItem) {
+				oMenu._oVirtualItem.destroy();
+				delete oMenu._oVirtualItem;
+			}
+		}
 
 		return Menu;
 	});
