@@ -178,7 +178,7 @@ sap.ui.define([
 				title: oTextResources.getText("TIT_TOUR_GENERAL_STEP_CONTEXT_BASED_ADAPTATIONS_TITLE"),
 				description: oTextResources.getText("TXT_TOUR_GENERAL_STEP_CONTEXT_BASED_ADAPTATIONS_DESCRIPTION"),
 				listContent: [],
-				markerSelector: "sapUIRta_toolbar_fragment--sapUiRta_contextBasedAdaptationsButton"
+				markerSelector: "sapUIRta_toolbar_fragment--sapUiRta_contextBasedAdaptationMenu"
 			},
 			{
 				title: oTextResources.getText("TIT_TOUR_GENERAL_STEP_FEEDBACK_BUTTON_TITLE"),
