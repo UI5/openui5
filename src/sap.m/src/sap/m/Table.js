@@ -1010,10 +1010,22 @@ sap.ui.define([
 
 	Table.prototype._setHeaderAnnouncement = function() {
 		var oBundle = Library.getResourceBundleFor("sap.m"),
-			sAnnouncement = oBundle.getText("ACC_CTR_TYPE_HEADER_ROW") + " ";
+			sAnnouncement = oBundle.getText("ACC_CTR_TYPE_HEADER_ROW") + " . ";
 
-		if (this.isAllSelectableSelected()) {
-			sAnnouncement += oBundle.getText("LIST_ALL_SELECTED");
+		if (this.getMode() === "MultiSelect") {
+			if (this.getMultiSelectMode() !== "ClearAll") {
+				if (this.isAllSelectableSelected()) {
+					sAnnouncement += oBundle.getText("LIST_ALL_SELECTED") + " . ";
+				} else {
+					sAnnouncement += oBundle.getText("TABLE_CHECKBOX_SELECT_ALL") + " . ";
+				}
+			} else {
+				sAnnouncement += oBundle.getText("TABLE_ICON_DESELECT_ALL");
+				if (this.getSelectedItems().length === 0) {
+					sAnnouncement += " " + oBundle.getText("CONTROL_DISABLED");
+				}
+				sAnnouncement += " . ";
+			}
 		}
 
 		this.getColumns(true).forEach(function(oColumn, i) {
