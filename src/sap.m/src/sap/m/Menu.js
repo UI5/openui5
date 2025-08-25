@@ -200,7 +200,7 @@ sap.ui.define([
 			if (!this._bReceivingData && this._bUpdating) {
 
 				setTimeout(function() {
-					this._getMenuWrapper()._setHoveredItem(this._getMenuWrapper()._getNextFocusableItem(-1, 1), true);
+					this._getMenuWrapper()?._setHoveredItem(this._getMenuWrapper()._getNextFocusableItem(-1, 1), true);
 				}.bind(this), 0);
 
 				this._bUpdating = false;
