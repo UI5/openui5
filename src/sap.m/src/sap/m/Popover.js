@@ -1480,7 +1480,6 @@ sap.ui.define([
 
 			this.resizedWidth = `${width}px`;
 			this.resizedHeight = `${height}px`;
-			this.invalidate();
 
 			this._calcPlacement();
 		};
