@@ -1675,6 +1675,26 @@ sap.ui.define([
 		oSpyGetArrowStyleCssClass.restore();
 	});
 
+	QUnit.test("showArrow with value true should have a designated class", async function (assert) {
+		this.oPopover.setShowArrow(true);
+		await nextUIUpdate(this.clock);
+
+		this.oButton.firePress();
+		this.clock.tick(500);
+
+		assert.ok(this.oPopover.getDomRef().classList.contains("sapMPopoverWithArrow"), "Popover should have arrow class");
+	});
+
+	QUnit.test("showArrow with value true should not have a designated class", async function (assert) {
+		this.oPopover.setShowArrow(false);
+		await nextUIUpdate(this.clock);
+
+		this.oButton.firePress();
+		this.clock.tick(500);
+
+		assert.notOk(this.oPopover.getDomRef().classList.contains("sapMPopoverWithArrow"), "Popover should not have arrow class");
+	});
+
 	QUnit.test("Popover should act according to value of resizing property", async function(assert){
 		// Arrange
 		this.oPopover.setResizable(true);
