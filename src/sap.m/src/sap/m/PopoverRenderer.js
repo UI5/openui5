@@ -282,6 +282,10 @@ sap.ui.define([
 				aClassNames.push("sapMPopoverHorScrollDisabled");
 			}
 
+			if (oControl.getShowArrow()) {
+				aClassNames.push("sapMPopoverWithArrow");
+			}
+
 			aClassNames.push("sapMPopup-CTX");
 
 			// Adds styles for compact mode
