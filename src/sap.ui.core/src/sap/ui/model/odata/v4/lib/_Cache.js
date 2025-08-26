@@ -1520,19 +1520,17 @@ sap.ui.define([
 				mQueryOptions.$select.push(sMessagesPath);
 				bKeepReportedMessagesPath = true;
 			}
-			// drop collection related system query options
-			delete mQueryOptions.$apply;
-			delete mQueryOptions.$count;
-			delete mQueryOptions.$filter;
-			delete mQueryOptions.$orderby;
-			delete mQueryOptions.$search;
-			sReadUrl += that.oRequestor.buildQueryString(that.sMetaPath, mQueryOptions, false,
-				that.bSortExpandSelect);
+			const mMergeableQueryOptions = _Helper.extractMergeableQueryOptions(mQueryOptions);
+			mMergeableQueryOptions.$$sortIfMerged = true;
+			sReadUrl += that.oRequestor.buildQueryString(that.sMetaPath, mQueryOptions,
+				// drop system query options to allow merging with late property requests
+				/*bDropSystemQueryOptions*/true, that.bSortExpandSelect);
 
 			that.bSentRequest = true;
 			return SyncPromise.all([
 				that.oRequestor
-					.request("GET", sReadUrl, oGroupLock, undefined, undefined, fnDataRequested),
+					.request("GET", sReadUrl, oGroupLock, undefined, undefined, fnDataRequested,
+						undefined, undefined, undefined, undefined, mMergeableQueryOptions),
 				that.fetchTypes()
 			]).then(function (aResult) {
 				var oElement = aResult[0];
