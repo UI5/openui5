@@ -64,7 +64,7 @@ sap.ui.define([
 	};
 
 	/**
-	 * Replace underline to dash of language codes in translation texts of changes
+	 * Replace underscore with hyphen of language codes in translation texts of changes
 	 * @returns {object} translation texts
 	 */
 	Utils.formatLanguageCodesInTranslationTexts = function(oTexts) {

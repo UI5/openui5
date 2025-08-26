@@ -203,7 +203,7 @@ sap.ui.define([
 
 			name = name
 				.replace(testValidChars, "") // Cleanup invalid characters
-				.replaceAll(".", "-"); // Replace the dots with dashes
+				.replaceAll(".", "-"); // Replace the dots with hyphens
 
 			result = name.split(/(?=[A-Z])/); // Split on Capital letters
 

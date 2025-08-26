@@ -273,10 +273,10 @@ sap.ui.define([
 	 * @param {array} [mPropertyBag.draftFilenames] - Array with filesnames which was saved as draft
 	 */
 	Versions.onAllChangesSaved = function(mPropertyBag) {
-		var oModel = Versions.getVersionsModel(mPropertyBag);
-		var bVersioningEnabled = oModel.getProperty("/versioningEnabled");
-		var bDirtyChanges = oModel.getProperty("/dirtyChanges");
-		var aDraftFilenames = oModel.getProperty("/draftFilenames");
+		const oModel = Versions.getVersionsModel(mPropertyBag);
+		const bVersioningEnabled = oModel.getProperty("/versioningEnabled");
+		const bDirtyChanges = oModel.getProperty("/dirtyChanges");
+		const aDraftFilenames = oModel.getProperty("/draftFilenames");
 		oModel.setProperty("/draftFilenames", aDraftFilenames.concat(mPropertyBag.draftFilenames));
 		oModel.setProperty("/dirtyChanges", true);
 		oModel.setProperty("/backendDraft", bVersioningEnabled && bDirtyChanges || !!mPropertyBag.contextBasedAdaptation);
@@ -284,6 +284,10 @@ sap.ui.define([
 		// Save can happen without a reload and the model must be kept up-to-date
 		oModel.setProperty("/persistedVersion", Version.Number.Draft);
 		oModel.updateBindings(true);
+		// Set the Flex InfoSession version to draft "0"
+		const oFlexInfo = FlexInfoSession.getByReference(mPropertyBag.reference);
+		oFlexInfo.version = Version.Number.Draft;
+		FlexInfoSession.setByReference(oFlexInfo, mPropertyBag.reference);
 	};
 
 	/**

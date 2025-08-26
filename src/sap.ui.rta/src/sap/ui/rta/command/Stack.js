@@ -26,24 +26,16 @@ sap.ui.define([
 ) {
 	"use strict";
 
-	function toAvailableChanges(mChanges, aChanges, sFileName) {
-		var oChange = mChanges[sFileName];
-		if (oChange) {
-			aChanges.push(oChange);
-		}
-		return aChanges;
-	}
-
 	function pushToStack(oComponent, mComposite, oStack, oChange) {
-		var oSelector = oChange.getSelector && oChange.getSelector();
-		var oCommand = new Settings({
+		const oSelector = oChange.getSelector && oChange.getSelector();
+		const oCommand = new Settings({
 			selector: oSelector,
 			changeType: oChange.getChangeType(),
 			element: JsControlTreeModifier.bySelector(oSelector, oComponent)
 		});
 		oCommand._oPreparedChange = oChange;
 		// check if change belongs to a composite command
-		var sCompositeId = oChange.getSupportInformation().compositeCommand;
+		const sCompositeId = oChange.getSupportInformation().compositeCommand;
 		if (sCompositeId) {
 			if (!mComposite[sCompositeId]) {
 				mComposite[sCompositeId] = new CompositeCommand();
@@ -96,7 +88,7 @@ sap.ui.define([
 	 * @since 1.34
 	 * @alias sap.ui.rta.command.Stack
 	 */
-	var Stack = ManagedObject.extend("sap.ui.rta.command.Stack", {
+	const Stack = ManagedObject.extend("sap.ui.rta.command.Stack", {
 		metadata: {
 			library: "sap.ui.rta",
 			properties: {
@@ -144,33 +136,35 @@ sap.ui.define([
 	 * Creates a stack prefilled with Settings commands. Every command contains a change from the given file name list
 	 *
 	 * @param {sap.ui.base.ManagedObject} oControl - Used to get the component
-	 * @param {string[]} aFileNames - Array of file names of changes the stack should be initialized with
+	 * @param {string[]} [aFileNames] - Array of file names of changes the stack should be initialized with
 	 * @returns {Promise} Resolves with a stack as parameter
 	 */
-	Stack.initializeWithChanges = function(oControl, aFileNames) {
-		var oStack = new Stack();
+	Stack.initializeWithChanges = async function(oControl, aFileNames) {
+		const oStack = new Stack();
 		oStack._aPersistedChanges = aFileNames;
-		if (aFileNames && aFileNames.length > 0) {
-			var oComponent = FlUtils.getAppComponentForControl(oControl);
-			var mPropertyBag = {
+		if (aFileNames?.length > 0) {
+			const oComponent = FlUtils.getAppComponentForControl(oControl);
+			const mPropertyBag = {
 				selector: oComponent,
 				invalidateCache: false
 			};
-			return PersistenceWriteAPI._getUIChanges(mPropertyBag)
-
-			.then(function(aChanges) {
-				var mComposite = {};
-				var mChanges = {};
-				aChanges.forEach(function(oChange) {
-					mChanges[oChange.getId()] = oChange;
-				});
-				aFileNames
-				.reduce(toAvailableChanges.bind(null, mChanges), [])
-				.forEach(pushToStack.bind(null, oComponent, mComposite, oStack));
-				return oStack;
+			const aChanges = await PersistenceWriteAPI._getUIChanges(mPropertyBag);
+			const mComposite = {};
+			const mChanges = {};
+			aChanges.forEach((oChange) => {
+				mChanges[oChange.getId()] = oChange;
 			});
+			aFileNames
+			.reduce((aChanges, sFileName) => {
+				const oChange = mChanges[sFileName];
+				if (oChange) {
+					aChanges.push(oChange);
+				}
+				return aChanges;
+			}, [])
+			.forEach(pushToStack.bind(null, oComponent, mComposite, oStack));
 		}
-		return Promise.resolve(oStack);
+		return oStack;
 	};
 
 	Stack.prototype.init = function() {
@@ -219,12 +213,12 @@ sap.ui.define([
 	};
 
 	Stack.prototype.removeCommand = function(vObject, bSuppressInvalidate) {
-		var oRemovedCommand = this.removeAggregation("commands", vObject, bSuppressInvalidate);
+		const oRemovedCommand = this.removeAggregation("commands", vObject, bSuppressInvalidate);
 		return oRemovedCommand;
 	};
 
 	Stack.prototype.removeAllCommands = function(bSuppressInvalidate) {
-		var aCommands = this.removeAllAggregation("commands", bSuppressInvalidate);
+		const aCommands = this.removeAllAggregation("commands", bSuppressInvalidate);
 		this._toBeExecuted = -1;
 		this.fireModified();
 		return aCommands;
@@ -295,10 +289,12 @@ sap.ui.define([
 
 	Stack.prototype.execute = function() {
 		this.setLastCommandExecuted(
-			this.getLastCommandExecuted().catch(() => {
+			this.getLastCommandExecuted()
+			.catch(() => {
 			// continue also if previous command failed
-			}).then(async () => {
-				var oCommand = this._getCommandToBeExecuted();
+			})
+			.then(async () => {
+				const oCommand = this._getCommandToBeExecuted();
 				if (oCommand) {
 					try {
 						await addCommandChangesToPersistence.call(this, oCommand);
@@ -316,7 +312,7 @@ sap.ui.define([
 						this._toBeExecuted--;
 						// Remove Flex Changes for failed command from persistence
 						removeCommandChangesFromPersistence.call(this, oError.command);
-						var oRtaResourceBundle = Lib.getResourceBundleFor("sap.ui.rta");
+						const oRtaResourceBundle = Lib.getResourceBundleFor("sap.ui.rta");
 						// AddXMLAtExtensionPoint errors explain to the user what they did wrong, so they shouldn't open an incident
 						const sErrorMessage = oCommand.isA("sap.ui.rta.command.AddXMLAtExtensionPoint") ?
 							oError.message : oRtaResourceBundle.getText("MSG_GENERIC_ERROR_MESSAGE", [oError.message]);
@@ -336,13 +332,15 @@ sap.ui.define([
 
 	Stack.prototype._unExecute = function() {
 		this.setLastCommandUnExecuted(
-			this.getLastCommandUnExecuted().catch(() => {
+			this.getLastCommandUnExecuted()
+			.catch(() => {
 			// continue also if previous undo failed
-			}).then(async () => {
+			})
+			.then(async () => {
 				if (this.canUndo()) {
 					this._bUndoneCommands = true;
 					this._toBeExecuted++;
-					var oCommand = this._getCommandToBeExecuted();
+					const oCommand = this._getCommandToBeExecuted();
 					const aDiscardedChanges = oCommand.getDiscardedChanges?.();
 					if (oCommand) {
 						await oCommand.undo();
@@ -363,9 +361,7 @@ sap.ui.define([
 	};
 
 	Stack.prototype.canSave = function() {
-		return this.canUndo() && this.getAllExecutedCommands().some(function(oCommand) {
-			return oCommand.getRelevantForSave();
-		});
+		return this.canUndo() && this.getAllExecutedCommands().some((oCommand) => oCommand.getRelevantForSave());
 	};
 
 	Stack.prototype.undo = function() {
@@ -392,10 +388,10 @@ sap.ui.define([
 	 * @public
 	 */
 	Stack.prototype.getAllExecutedCommands = function() {
-		var aAllExecutedCommands = [];
-		var aCommands = this.getCommands();
-		for (var i = aCommands.length - 1; i > this._toBeExecuted; i--) {
-			var aSubCommands = this.getSubCommands(aCommands[i]);
+		let aAllExecutedCommands = [];
+		const aCommands = this.getCommands();
+		for (let i = aCommands.length - 1; i > this._toBeExecuted; i--) {
+			const aSubCommands = this.getSubCommands(aCommands[i]);
 			aAllExecutedCommands = aAllExecutedCommands.concat(aSubCommands);
 		}
 		return aAllExecutedCommands;
@@ -409,12 +405,12 @@ sap.ui.define([
 	 * @private
 	 */
 	Stack.prototype.getSubCommands = function(oCommand) {
-		var aCommands = [];
+		let aCommands = [];
 		if (oCommand.getCommands) {
-			oCommand.getCommands().forEach(function(oSubCommand) {
-				var aSubCommands = this.getSubCommands(oSubCommand);
+			oCommand.getCommands().forEach((oSubCommand) => {
+				const aSubCommands = this.getSubCommands(oSubCommand);
 				aCommands = aCommands.concat(aSubCommands);
-			}, this);
+			});
 		} else {
 			aCommands.push(oCommand);
 		}
@@ -428,10 +424,10 @@ sap.ui.define([
 	 * @private
 	 */
 	Stack.prototype.compositeLastTwoCommands = function() {
-		var oLastCommand = this.pop();
-		var oSecondLastCommand = this.pop();
+		const oLastCommand = this.pop();
+		const oSecondLastCommand = this.pop();
 
-		var oCompositeCommand = new CompositeCommand();
+		const oCompositeCommand = new CompositeCommand();
 		oCompositeCommand.addCommand(oSecondLastCommand);
 		oCompositeCommand.addCommand(oLastCommand);
 		this.push(oCompositeCommand);

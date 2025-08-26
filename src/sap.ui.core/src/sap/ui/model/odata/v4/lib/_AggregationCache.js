@@ -1313,7 +1313,7 @@ sap.ui.define([
 			throw new Error("Unsupported path: " + sPath);
 		}
 
-		const mQueryOptions = _Helper.clone(this.mLateQueryOptions ?? this.mQueryOptions);
+		const mQueryOptions = _Helper.clone({...this.mQueryOptions, ...this.mLateExpandSelect});
 		const iIndex = mQueryOptions.$select.indexOf(this.oAggregation.$NodeProperty);
 		if (iIndex >= 0) {
 			mQueryOptions.$select.splice(iIndex, 1);

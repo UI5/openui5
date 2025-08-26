@@ -80,7 +80,7 @@ sap.ui.define([
 	 * code.
 	 *
 	 * As HTML is case-insensitive, in order to define a property with upper-case characters, you have to "escape" them
-	 * with a dash character, similar to CSS attributes.
+	 * with a hyphen character, similar to CSS attributes.
 	 * The following code gives an example:
 	 *
 	 * <pre>
@@ -153,7 +153,7 @@ sap.ui.define([
 	 * map. Each attribute starting with <code>data-</code> will be interpret
 	 * as setting and be parsed by considering the data type of the matching
 	 * property in the <code>ComponentContainer</code>. As HTML is case-insensitive
-	 * camel cased properties have to be written in dashed form, e.g.
+	 * camel cased properties have to be written in hyphenated form, e.g.
 	 * <code>componentCreated</code> as <code>data-component-created</code>.
 	 *
 	 * @param {Node} oElement the DOM element to be parsed

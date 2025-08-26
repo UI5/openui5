@@ -23153,6 +23153,7 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 					for (i = 0; i < iLength; i += 1) {
 						aItems.push({
 							__metadata: {uri : "SalesOrderSet('" + iFrom + "')"},
+							GrossAmount: "501", // ensure all items match filter
 							Note: "SO" + iFrom,
 							SalesOrderID: "" + iFrom
 						});
@@ -23185,8 +23186,7 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 							dataRequested: dataRequested,
 							dataReceived: dataReceived
 						},
-						//FIXME fix to filters... -> open issue in BLI
-						filter: [new Filter("GrossAmount", FilterOperator.GT, 500)],
+						filters: [new Filter("GrossAmount", FilterOperator.GT, 500)],
 						path: "/SalesOrderSet",
 						sorter: [new Sorter("CompanyCode", true)]
 					});
@@ -25684,8 +25684,7 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 					},
 					dataRequested: () => {iDataRequested += 1;}
 				},
-				//FIXME fix to filters... -> open issue in BLI
-				filter: [new Filter("OrderOperationRowLevel", FilterOperator.EQ, 1)],
+				filters: [new Filter("MaintenanceOrder", FilterOperator.NE, "3")],
 				parameters: {
 					countMode: CountMode.Inline,
 					operationMode: "Client",
@@ -25709,7 +25708,7 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 
 			return this.waitForChanges(assert);
 		}).then(() => {
-			assert.deepEqual(getTableContent(oTable), [["1"], ["2"], ["3"], ["4"]]);
+			assert.deepEqual(getTableContent(oTable), [["1"], ["2"], ["4"], [""]]);
 			assert.strictEqual(iDataRequested, 1, "dataRequested fired once");
 			assert.strictEqual(iDataReceived, 1, "dataReceived fired once");
 
@@ -25780,8 +25779,7 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 					},
 					dataRequested: () => {iDataRequested += 1;}
 				},
-				//FIXME fix to filters... -> open issue in BLI
-				filter: [new Filter("OrderOperationRowLevel", FilterOperator.EQ, 0)], // must not be in URL params
+				filters: [new Filter("MaintenanceOrder", FilterOperator.NE, "2")], // must not be in URL params
 				parameters: {
 					countMode: CountMode.Inline,
 					operationMode: "Client",
@@ -25805,7 +25803,7 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 
 			return this.waitForChanges(assert);
 		}).then(() => {
-			assert.deepEqual(getTableContent(oTable), [["1"], ["2"]]);
+			assert.deepEqual(getTableContent(oTable), [["1"], [""]]);
 			assert.strictEqual(iDataRequested, 1, "dataRequested fired once");
 			assert.strictEqual(iDataReceived, 1, "dataReceived fired once");
 

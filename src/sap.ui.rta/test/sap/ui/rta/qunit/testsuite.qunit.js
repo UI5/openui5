@@ -231,6 +231,12 @@ sap.ui.define([
 					}
 				}
 			},
+			"command/CompositeCommand": {
+				group: "Command",
+				coverage: {
+					only: ["sap/ui/rta/command/CompositeCommand"]
+				}
+			},
 			"command/ControlVariantConfigure": {
 				group: "Command",
 				coverage: {

@@ -16,7 +16,7 @@ sap.ui.define(["sap/ui/rta/command/FlexCommand"], function(FlexCommand) {
 	 * @since 1.42
 	 * @alias sap.ui.rta.command.Remove
 	 */
-	var Remove = FlexCommand.extend("sap.ui.rta.command.Remove", {
+	const Remove = FlexCommand.extend("sap.ui.rta.command.Remove", {
 		metadata: {
 			library: "sap.ui.rta",
 			properties: {
@@ -31,9 +31,9 @@ sap.ui.define(["sap/ui/rta/command/FlexCommand"], function(FlexCommand) {
 	});
 
 	Remove.prototype._getChangeSpecificData = function() {
-		var oElement = this.getRemovedElement() || this.getElement();
+		const oElement = this.getRemovedElement() || this.getElement();
 
-		var mSpecificInfo = {
+		const mSpecificInfo = {
 			changeType: this.getChangeType(),
 			removedElement: {
 				id: oElement.getId()

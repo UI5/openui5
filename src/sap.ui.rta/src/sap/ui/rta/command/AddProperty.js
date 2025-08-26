@@ -18,7 +18,7 @@ sap.ui.define([
 	 * @since 1.78
 	 * @alias sap.ui.rta.command.AddProperty
 	 */
-	var AddProperty = FlexCommand.extend("sap.ui.rta.command.AddProperty", {
+	const AddProperty = FlexCommand.extend("sap.ui.rta.command.AddProperty", {
 		metadata: {
 			library: "sap.ui.rta",
 			properties: {

@@ -23,7 +23,7 @@ sap.ui.define([
 	function normalize(sString, sSpaceReplacement) {
 		sSpaceReplacement = sSpaceReplacement || " ";
 		return sString
-			.replace(/[\-_]/g, " ") // replaces all dashes or underscores with spaces
+			.replace(/[\-_]/g, " ") // replaces all hyphens or underscores with spaces
 			.trim()
 			.replace(/(?!\s)\W/g, "") // removes all non alphanumeric characters (except for spaces)
 			.replace(/\s+/g, sSpaceReplacement); // replaces any space between words with the input sSpaceReplacement
@@ -51,7 +51,7 @@ sap.ui.define([
 		 * <ul>
 		 *   <li>Trim spaces off the string on both sides. For example: <code>" hello "</code> becomes
 		 *     <code>"hello"</code>.</li>
-		 *   <li>Assume that dashes and underscores are analogs for a space. For example: <code>"sold-to party"</code> and
+		 *   <li>Assume that hyphens and underscores are analogs for a space. For example: <code>"sold-to party"</code> and
 		 *     <code>"sold to party"</code> are equivalent, and would both convert to the camelCase
 		 *     <code>"soldToParty"</code>.</li>
 		 *   <li>Trim multiple spaces between words. For example: <code>"hello____world"</code> becomes

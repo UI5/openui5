@@ -37,19 +37,15 @@ sap.ui.define([
 
 	/**
 	 * Execute the change (load the required libraries)
-	 * @return {Promise} resolved if libraries could be loaded; rejected if not
+	 * @return {Promise} Resolves if libraries could be loaded; rejects if not
 	 */
 	AddLibrary.prototype.execute = function() {
-		const aPromises = [];
-
 		if (this.getParameters().libraries) {
 			const aLibraries = Object.keys(this.getParameters().libraries);
-			aLibraries.forEach(function(sLibrary) {
-				aPromises.push(Lib.load({name: sLibrary}));
-			});
+			return Promise.all(aLibraries.map((sLibrary) => Lib.load({name: sLibrary})));
 		}
 
-		return Promise.all(aPromises);
+		return Promise.resolve();
 	};
 
 	return AddLibrary;

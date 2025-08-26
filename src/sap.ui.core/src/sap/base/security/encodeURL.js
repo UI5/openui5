@@ -46,7 +46,7 @@ sap.ui.define(["sap/base/strings/toHex"], function(toHex) {
 	/**
 	 * Encode the string for inclusion into a URL parameter.
 	 *
-	 * Unescaped characters: alphabetic, decimal digits, -_. (dash, underscore, point)
+	 * Unescaped characters: alphabetic, decimal digits, -_. (hyphen, underscore, dot)
 	 *
 	 * @example
 	 * sap.ui.require(['sap/base/security/encodeURL'], function(encodeURL) {

@@ -40,7 +40,7 @@ sap.ui.define([
 	 * @since 1.34
 	 * @alias sap.ui.rta.command.FlexCommand
 	 */
-	var FlexCommand = BaseCommand.extend("sap.ui.rta.command.FlexCommand", {
+	const FlexCommand = BaseCommand.extend("sap.ui.rta.command.FlexCommand", {
 		metadata: {
 			library: "sap.ui.rta",
 			properties: {
@@ -67,31 +67,29 @@ sap.ui.define([
 					type: "boolean",
 					defaultValue: false
 				}
-			},
-			associations: {},
-			events: {}
+			}
 		}
 	});
 
 	/**
-	 * Retrieves id of element or selector
+	 * Retrieves the id of element or selector
 	 *
-	 * @returns {string} id value
+	 * @returns {string} Id value
 	 * @public
 	 */
 	FlexCommand.prototype.getElementId = function() {
-		var oElement = this.getElement();
+		const oElement = this.getElement();
 		return oElement ? oElement.getId() : this.getSelector().id;
 	};
 
 	/**
 	 * Retrieves app component of element or selector
 	 *
-	 * @returns {sap.ui.core.UIComponent} component
+	 * @returns {sap.ui.core.UIComponent} App component Instance
 	 * @private
 	 */
 	FlexCommand.prototype.getAppComponent = function() {
-		var oElement = this.getElement();
+		const oElement = this.getElement();
 		return oElement ? FlUtils.getAppComponentForControl(oElement) : this.getSelector().appComponent;
 	};
 
@@ -129,7 +127,7 @@ sap.ui.define([
 
 	/**
 	 * Returns a prepared change if exists in the command
-	 * @returns {object} Prepared change object
+	 * @returns {object} Prepared change instance
 	 * @public
 	 */
 	FlexCommand.prototype.getPreparedChange = function() {
@@ -138,10 +136,10 @@ sap.ui.define([
 
 	/**
 	 * @override
-	 * @returns {Promise} empty promise after finishing execution
+	 * @returns {Promise<undefined>} Resolves with undefined after finishing execution
 	 */
 	FlexCommand.prototype.execute = function() {
-		var vChange = this.getPreparedChange();
+		const vChange = this.getPreparedChange();
 		return this._applyChange(vChange);
 	};
 
@@ -151,28 +149,26 @@ sap.ui.define([
 	 * @protected
 	 */
 	FlexCommand.prototype._getChangeSpecificData = function() {
-		var mProperties = this.getMetadata().getProperties();
-		var mChangeSpecificData = {
+		const mProperties = this.getMetadata().getProperties();
+		const mChangeSpecificData = {
 			changeType: this.getChangeType(),
 			content: mProperties.content?.get(this)
 		};
 		objectValues(mProperties)
-		.filter(function(oProperty) {
-			return oProperty.group === "content";
-		})
-		.forEach(function(oProperty) {
+		.filter((oProperty) => oProperty.group === "content")
+		.forEach((oProperty) => {
 			mChangeSpecificData.content ||= {};
 			mChangeSpecificData.content[oProperty.name] = oProperty.get(this);
-		}, this);
+		});
 		return mChangeSpecificData;
 	};
 
 	/**
 	 * Creates a change.
-	 * @param {object} mFlexSettings Map containing the flexibility settings
-	 * @param {string} sVariantManagementReference Reference to the variant management
-	 * @param {string} sCommand Command name
-	 * @returns {object} Returns the change object
+	 * @param {object} mFlexSettings - Map containing the flexibility settings
+	 * @param {string} sVariantManagementReference - Reference to the variant management
+	 * @param {string} sCommand - Command name
+	 * @returns {sap.ui.fl.apply._internal.flexObjects.FlexObject} Returns the change instance
 	 * @private
 	 */
 	FlexCommand.prototype._createChange = function(mFlexSettings, sVariantManagementReference, sCommand) {
@@ -186,8 +182,8 @@ sap.ui.define([
 	 * @param {object} mChangeSpecificData - Map containing change specific data
 	 * @param {object} mFlexSettings - Map containing flex settings
 	 * @param {string} sVariantManagementReference - Reference to the variant management
-	 * @param {string} sCommand Command name
-	 * @returns {Promise.<object>} Change object wrapped in a promise.
+	 * @param {string} sCommand - Command name
+	 * @returns {Promise<object>} Resolves with the Change instance
 	 * @private
 	 */
 	FlexCommand.prototype._createChangeFromData = async function(
@@ -244,39 +240,33 @@ sap.ui.define([
 	 * @override
 	 */
 	FlexCommand.prototype.undo = function() {
-		var vControl = this.getElement() || JsControlTreeModifier.bySelector(this.getSelector());
-
-		var oChange = this.getPreparedChange();
+		const vControl = this.getElement() || JsControlTreeModifier.bySelector(this.getSelector());
+		const oChange = this.getPreparedChange();
 
 		return ChangesWriteAPI.revert({change: oChange, element: vControl});
 	};
 
 	/**
 	 * @private
-	 * @param {sap.ui.fl.apply._internal.flexObjects.UIChange|Object} vChange Change object or map containing the change object
-	 * @returns {Promise} Returns an empty promise
+	 * @param {sap.ui.fl.apply._internal.flexObjects.UIChange|Object} oChange Change object
 	 */
-	FlexCommand.prototype._applyChange = function(oChange) {
-		var oAppComponent = this.getAppComponent();
-		var oSelectorElement = JsControlTreeModifier.bySelector(oChange.getSelector(), oAppComponent);
+	FlexCommand.prototype._applyChange = async function(oChange) {
+		const oAppComponent = this.getAppComponent();
+		const oSelectorElement = JsControlTreeModifier.bySelector(oChange.getSelector(), oAppComponent);
 
-		var mPropertyBag = {
+		const mPropertyBag = {
 			modifier: JsControlTreeModifier,
 			appComponent: oAppComponent,
 			view: FlUtils.getViewForControl(oSelectorElement)
 		};
-		return ChangesWriteAPI.apply({ change: oChange, element: oSelectorElement, ...mPropertyBag })
-
-		.then(function(oResult) {
-			if (!oResult.success) {
-				return Promise.reject(oResult.error);
-			}
-			return undefined;
-		});
+		const oResult = await ChangesWriteAPI.apply({ change: oChange, element: oSelectorElement, ...mPropertyBag });
+		if (!oResult.success) {
+			throw new Error(oResult.error);
+		}
 	};
 
 	FlexCommand.prototype._validateControlForChange = function(mFlexSettings) {
-		if (mFlexSettings && mFlexSettings.originalSelector && mFlexSettings.content && mFlexSettings.content.boundAggregation) {
+		if (mFlexSettings?.originalSelector && mFlexSettings?.content?.boundAggregation) {
 			return {
 				id: mFlexSettings.originalSelector,
 				appComponent: this.getAppComponent(),

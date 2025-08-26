@@ -332,7 +332,7 @@ sap.ui.define([
 		 * for restrictions.
 		 *
 		 * @param {string|module:sap/base/i18n/LanguageTag|null} vLanguageTag the new BCP47 compliant language tag;
-		 *   case doesn't matter and underscores can be used instead of dashes to separate
+		 *   case doesn't matter and underscores can be used instead of hyphens to separate
 		 *   components (compatibility with Java Locale IDs)
 		 * @throws {TypeError} When <code>sLanguageTag</code> is given, but is not a valid BCP47 language
 		 *   tag or Java locale identifier

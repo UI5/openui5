@@ -22,7 +22,7 @@ sap.ui.define([
 	 * @since 1.87
 	 * @alias sap.ui.rta.command.compVariant.CompVariantSwitch
 	 */
-	var CompVariantSwitch = BaseCommand.extend("sap.ui.rta.command.compVariant.CompVariantSwitch", {
+	const CompVariantSwitch = BaseCommand.extend("sap.ui.rta.command.compVariant.CompVariantSwitch", {
 		metadata: {
 			library: "sap.ui.rta",
 			properties: {

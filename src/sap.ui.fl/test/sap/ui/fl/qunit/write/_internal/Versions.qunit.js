@@ -1030,10 +1030,10 @@ sap.ui.define([
 		}
 	}, function() {
 		QUnit.test("to trigger onAllChangesSaved without contextBasedAdaptation parameter", function(assert) {
-			var done = assert.async();
-			var sReference = "com.sap.app";
+			const done = assert.async();
+			const sReference = "com.sap.app";
 
-			var mPropertyBag = {
+			const mPropertyBag = {
 				layer: Layer.CUSTOMER,
 				reference: sReference,
 				appComponent: this.oAppComponent,
@@ -1041,19 +1041,19 @@ sap.ui.define([
 				draftFilenames: ["filename1", "filename2"]
 			};
 
-			var oDraftVersion = {
+			const oDraftVersion = {
 				version: Version.Number.Draft,
 				filenames: ["old draftfilename"]
 			};
 
-			var oFirstVersion = {
+			const oFirstVersion = {
 				activatedBy: "qunit",
 				activatedAt: "a while ago",
 				version: "1",
 				isPublished: true
 			};
 
-			var aReturnedVersions = [
+			const aReturnedVersions = [
 				oDraftVersion,
 				oFirstVersion
 			];
@@ -1064,23 +1064,26 @@ sap.ui.define([
 			.then(Versions.onAllChangesSaved.bind(Versions, mPropertyBag))
 			.then(Versions.getVersionsModel.bind(Versions, mPropertyBag))
 			.then(function(oResponse) {
-				var aVersions = oResponse.getProperty("/versions");
-				var aDraftFilenames = oResponse.getProperty("/draftFilenames");
+				const aVersions = oResponse.getProperty("/versions");
+				const aDraftFilenames = oResponse.getProperty("/draftFilenames");
+				const oFlexInfo = FlexInfoSession.getByReference(sReference);
 				assert.deepEqual(aVersions.length, 2, "a new draft is added to the version model");
 				assert.deepEqual(aVersions[0].type, "draft", "the latest version type is draft");
 				assert.deepEqual(oResponse.getProperty("/versioningEnabled"), true);
 				assert.deepEqual(oResponse.getProperty("/dirtyChanges"), true, "dirty changes exits");
 				assert.deepEqual(oResponse.getProperty("/backendDraft"), false, "backend draft does not exists");
 				assert.equal(aDraftFilenames.length, 3, "add dirty change filenames into draft filename list");
+				assert.strictEqual(oFlexInfo.version, Version.Number.Draft, "the FlexInfo version is set to Draft");
+
 				done();
 			});
 		});
 
 		QUnit.test("to trigger onAllChangesSaved with contextBasedAdaptation parameter", function(assert) {
-			var done = assert.async();
-			var sReference = "com.sap.app";
+			const done = assert.async();
+			const sReference = "com.sap.app";
 
-			var mPropertyBag = {
+			const mPropertyBag = {
 				layer: Layer.CUSTOMER,
 				reference: sReference,
 				appComponent: this.oAppComponent,
@@ -1088,14 +1091,14 @@ sap.ui.define([
 				contextBasedAdaptation: true
 			};
 
-			var oFirstVersion = {
+			const oFirstVersion = {
 				activatedBy: "qunit",
 				activatedAt: "a while ago",
 				version: "1",
 				isPublished: true
 			};
 
-			var aReturnedVersions = [
+			const aReturnedVersions = [
 				oFirstVersion
 			];
 
@@ -1106,11 +1109,13 @@ sap.ui.define([
 			.then(Versions.getVersionsModel.bind(Versions, mPropertyBag))
 			.then(function(oResponse) {
 				var aVersions = oResponse.getProperty("/versions");
+				const oFlexInfo = FlexInfoSession.getByReference(sReference);
 				assert.deepEqual(aVersions.length, 2, "a new version (draft) is added to the version model");
 				assert.deepEqual(aVersions[0].type, "draft", "the latest version type is draft");
 				assert.deepEqual(oResponse.getProperty("/versioningEnabled"), true);
 				assert.deepEqual(oResponse.getProperty("/dirtyChanges"), true, "dirty changes exits");
 				assert.deepEqual(oResponse.getProperty("/backendDraft"), true, "backed draft exists");
+				assert.strictEqual(oFlexInfo.version, Version.Number.Draft, "the FlexInfo version is set to Draft");
 				done();
 			});
 		});

@@ -1,55 +1,12 @@
 /* global QUnit, sinon*/
 sap.ui.define([
-	"sap/ui/mdc/p13n/subcontroller/FilterController",
+	"sap/ui/mdc/p13n/subcontroller/AdaptFiltersController",
     "sap/ui/mdc/filterbar/p13n/AdaptationFilterBar",
     "sap/ui/mdc/Control"
-], function (FilterController, AdaptationFilterBar, MDCControl) {
+], function (AdaptFiltersController, AdaptationFilterBar, MDCControl) {
 	"use strict";
 
-	QUnit.module("Generic API tests", {
-		beforeEach: function(){
-			this.oController = new FilterController();
-		},
-		afterEach: function(){
-			this.oController.destroy();
-		}
-	});
-
-    QUnit.skip("Check 'getConditionOperatorSanity' (valid)", function(assert){
-
-        const oValidOperator = {
-            String: [
-                {
-                    operator: "Contains",
-                    values: [
-                        "Test"
-                    ]
-                }
-            ]
-        };
-
-        FilterController.checkConditionOperatorSanity(oValidOperator);
-        assert.equal(oValidOperator["String"].length, 1, "Operator is valid");
-    });
-
-    QUnit.skip("Check 'getConditionOperatorSanity' (invalid)", function(assert){
-
-        const oInValidOperator = {
-            String: [
-                {
-                    operator: "INVALIDFANTASYOPERATOR",
-                    values: [
-                        "Test"
-                    ]
-                }
-            ]
-        };
-
-        FilterController.checkConditionOperatorSanity(oInValidOperator);
-        assert.equal(oInValidOperator["String"], undefined, "Operator has been removed");
-    });
-
-    QUnit.module("determineValidationState", {
+    QUnit.module("determineValidationState",{
         beforeEach: function(){
             this.oControl = new MDCControl();
             AdaptationFilterBar.prototype._checkAdvancedParent = sinon.stub().returns(true);
@@ -86,7 +43,7 @@ sap.ui.define([
             retrieveInbuiltFilter: sinon.stub().returns(Promise.resolve(this.oAdaptationFilterBar))
         };
 
-        const oController = new FilterController({
+        const oController = new AdaptFiltersController({
             control: oMockAdaptationControl
         });
         sinon.stub(oController, "getAdaptationControl").returns(oMockAdaptationControl);
@@ -137,7 +94,7 @@ sap.ui.define([
             retrieveInbuiltFilter: sinon.stub().returns(Promise.resolve(this.oAdaptationFilterBar))
         };
 
-        const oController = new FilterController({
+        const oController = new AdaptFiltersController({
             control: oMockAdaptationControl
         });
         sinon.stub(oController, "getAdaptationControl").returns(oMockAdaptationControl);

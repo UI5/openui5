@@ -568,7 +568,7 @@ sap.ui.define([
 		 */
 		UIComponent.prototype.createId = function(sId) {
 			if (!this.isPrefixedId(sId)) {
-				// components have 3 dashes as separator, views 2 and controls/elements 1
+				// components have 3 hyphens as separator, views 2 and controls/elements 1
 				sId = this.getId() + "---" + sId;
 			}
 			return sId;

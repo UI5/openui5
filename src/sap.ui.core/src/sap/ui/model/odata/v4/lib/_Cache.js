@@ -584,7 +584,7 @@ sap.ui.define([
 					_Helper.getPrivateAnnotation(oEntityData, "select"));
 				if (!bDeepCreate) { // after a deep create the complete response is accepted
 					aSelect = _Helper.getQueryOptionsForPath(
-						that.mLateQueryOptions || that.mQueryOptions, sPath
+						that.mLateExpandSelect || that.mQueryOptions, sPath
 					).$select;
 				}
 				// update selected properties (or in case of a deep create all of them incl.
@@ -996,7 +996,7 @@ sap.ui.define([
 			}
 		}
 
-		if (!(this.mLateQueryOptions || this.mQueryOptions && this.mQueryOptions.$select)) {
+		if (!(this.mLateExpandSelect || this.mQueryOptions && this.mQueryOptions.$select)) {
 			return false; // no autoExpandSelect
 		}
 
@@ -1009,7 +1009,7 @@ sap.ui.define([
 		aUpdateProperties = [sRequestedPropertyPath];
 
 		sFullResourceMetaPath = _Helper.buildPath(this.sMetaPath, sResourceMetaPath);
-		mQueryOptions = this.mLateQueryOptions
+		mQueryOptions = this.mLateExpandSelect
 			|| { // ensure that $select precedes $expand in the resulting query
 				$select : this.mQueryOptions.$select,
 				$expand : this.mQueryOptions.$expand
@@ -1283,18 +1283,6 @@ sap.ui.define([
 	};
 
 	/**
-	 * Returns the query options for late properties.
-	 *
-	 * @returns {object} The late query options
-	 *
-	 * @public
-	 * @see #setLateQueryOptions
-	 */
-	_Cache.prototype.getLateQueryOptions = function () {
-		return this.mLateQueryOptions;
-	};
-
-	/**
 	 * Returns a promise that is pending while DELETEs or POSTs are being sent, or
 	 * <code>null</code> in case no such requests are currently being sent.
 	 *
@@ -1509,10 +1497,10 @@ sap.ui.define([
 				throw new Error("No key predicate known");
 			}
 			sReadUrl = _Helper.buildPath(that.sResourcePath, sPath, sPredicate);
-			if (bKeepAlive && that.mLateQueryOptions) {
+			if (bKeepAlive && that.mLateExpandSelect) {
 				// bKeepAlive === true -> own cache of the list binding -> sPath === ''
 				// -> no need to apply _Helper.getQueryOptionsForPath
-				_Helper.aggregateExpandSelect(mQueryOptions, that.mLateQueryOptions);
+				_Helper.aggregateExpandSelect(mQueryOptions, that.mLateExpandSelect);
 			}
 			if (sMessagesPath && mQueryOptions.$select
 				&& !mQueryOptions.$select.includes(sMessagesPath)) {
@@ -1637,10 +1625,10 @@ sap.ui.define([
 
 			that.bSentRequest = true;
 			if (bKeepAlive) {
-				if (that.mLateQueryOptions) {
+				if (that.mLateExpandSelect) {
 					// bKeepAlive === true -> own cache of the list binding -> sPath === ''
 					// -> no need to apply _Helper.getQueryOptionsForPath
-					_Helper.aggregateExpandSelect(mQueryOptions, that.mLateQueryOptions);
+					_Helper.aggregateExpandSelect(mQueryOptions, that.mLateExpandSelect);
 				}
 				// clone query options for possible second request to check if entity is in
 				// the collection
@@ -2038,26 +2026,25 @@ sap.ui.define([
 
 	/**
 	 * Sets query options after the cache has sent a request to allow adding late properties.
-	 * Accepts only $expand and $select.
+	 * Remembers only $expand and $select, and ignores others.
 	 *
 	 * @param {object} mQueryOptions
 	 *   The new late query options or <code>null</code> to reset
 	 *
 	 * @public
-	 * @see #getLateQueryOptions
 	 * @see #hasSentRequest
 	 */
 	_Cache.prototype.setLateQueryOptions = function (mQueryOptions) {
 		// this.checkSharedRequest(); // don't do that here! it might work well enough
 		if (mQueryOptions) {
-			this.mLateQueryOptions = {
+			this.mLateExpandSelect = {
 				// must contain both properties for requestSideEffects
 				// ensure that $select precedes $expand in the resulting query
 				$select : mQueryOptions.$select,
 				$expand : mQueryOptions.$expand
 			};
 		} else {
-			this.mLateQueryOptions = null;
+			this.mLateExpandSelect = null;
 		}
 	};
 
@@ -2137,7 +2124,7 @@ sap.ui.define([
 		this.oTypePromise = undefined;
 
 		// the query options extended by $select for late properties
-		this.mLateQueryOptions = null;
+		this.mLateExpandSelect = null;
 		// map from resource path to request Promise for pending late property requests
 		this.mPropertyRequestByPath = {};
 	};
@@ -3538,8 +3525,8 @@ sap.ui.define([
 			var aKeyFilters,
 				mQueryOptions = _Helper.clone(that.mQueryOptions);
 
-			if (that.mLateQueryOptions) {
-				_Helper.aggregateExpandSelect(mQueryOptions, that.mLateQueryOptions);
+			if (that.mLateExpandSelect) {
+				_Helper.aggregateExpandSelect(mQueryOptions, that.mLateExpandSelect);
 			}
 			if (bDropApply) {
 				delete mQueryOptions.$apply;
@@ -3941,7 +3928,7 @@ sap.ui.define([
 		this.checkSharedRequest();
 
 		mQueryOptions = _Helper.intersectQueryOptions(
-			Object.assign({}, this.mQueryOptions, this.mLateQueryOptions), aPaths,
+			Object.assign({}, this.mQueryOptions, this.mLateExpandSelect), aPaths,
 			this.oRequestor.getModelInterface().fetchMetadata, this.sMetaPath, "", bWithMessages);
 		if (!mQueryOptions) {
 			return SyncPromise.resolve(); // micro optimization: use *sync.* promise which is cached
@@ -4653,7 +4640,7 @@ sap.ui.define([
 		this.checkSharedRequest();
 
 		mQueryOptions = this.oPromise && _Helper.intersectQueryOptions(
-			Object.assign({}, this.mQueryOptions, this.mLateQueryOptions), aPaths,
+			Object.assign({}, this.mQueryOptions, this.mLateExpandSelect), aPaths,
 			this.oRequestor.getModelInterface().fetchMetadata, this.sMetaPath);
 		if (!mQueryOptions) {
 			return SyncPromise.resolve();
@@ -4778,7 +4765,7 @@ sap.ui.define([
 
 	/**
 	 * Delegates to #fetchValue of its shared OData Singleton _SingleCache. Within the 1st call its
-	 * own relative property path is added to the mLateQueryOptions of its _SingleCache.
+	 * own relative property path is added to the mLateExpandSelect of its _SingleCache.
 	 *
 	 * @param {sap.ui.model.odata.v4.lib._GroupLock} oGroupLock
 	 *   A lock for the group to associate the request with
@@ -4803,18 +4790,18 @@ sap.ui.define([
 	_SingletonPropertyCache.prototype.fetchValue = function (oGroupLock, _sPath, fnDataRequested,
 			oListener, bCreateOnDemand) {
 		var sPropertyPath = this.oSingleton.sResourcePath + "/" + this.sRelativePath,
-			mLateQueryOptions,
+			mLateExpandSelect,
 			oMetadataPromise = this.oMetadataPromise || this.oRequestor.getModelInterface()
 				.fetchMetadata("/" + _Helper.getMetaPath(sPropertyPath)),
 			that = this;
 
 		return oMetadataPromise.then(function () {
 			if (!that.oMetadataPromise) {
-				mLateQueryOptions = that.oSingleton.getLateQueryOptions() || {};
-				_Helper.aggregateExpandSelect(mLateQueryOptions,
+				mLateExpandSelect = that.oSingleton.mLateExpandSelect || {};
+				_Helper.aggregateExpandSelect(mLateExpandSelect,
 					_Helper.wrapChildQueryOptions("/" + that.oSingleton.sResourcePath,
 						that.sRelativePath, {}, that.oRequestor.getModelInterface().fetchMetadata));
-				that.oSingleton.setLateQueryOptions(mLateQueryOptions);
+				that.oSingleton.setLateQueryOptions(mLateExpandSelect);
 			}
 			that.oMetadataPromise = oMetadataPromise;
 			return that.oSingleton.fetchValue(oGroupLock, that.sRelativePath, fnDataRequested,

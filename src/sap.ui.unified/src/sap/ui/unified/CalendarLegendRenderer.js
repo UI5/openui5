@@ -55,7 +55,7 @@ CalendarLegendRenderer.render = function(oRm, oLeg) {
 
 		if (aStandardItems) {
 			// rendering standard days and colors
-			iIdLength = oLeg.getId().length + 1; //+1, because of the dash in "CalLeg1-Today"?
+			iIdLength = oLeg.getId().length + 1; //+1, because of the hyphen in "CalLeg1-Today"?
 			for (i = 0; i < aStandardItems.length; ++i) {
 				var sClass = "sapUiUnifiedLegend" + aStandardItems[i].getId().slice(iIdLength);
 				this.renderLegendItem(oRm, sClass, aStandardItems[i], ["sapUiUnifiedLegendSquareColor"], iIndex++, iCount);

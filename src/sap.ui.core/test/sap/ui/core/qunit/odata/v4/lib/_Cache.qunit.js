@@ -252,7 +252,7 @@ sap.ui.define([
 	QUnit.test("_Cache#setResourcePath", function (assert) {
 		var oCache = new _Cache(this.oRequestor, "TEAMS('42')/name.space.Operation");
 
-		oCache.mLateQueryOptions = {};
+		oCache.mLateExpandSelect = {};
 		oCache.mPropertyRequestByPath = {};
 		oCache.oTypePromise = {};
 		this.mock(oCache).expects("checkSharedRequest").withExactArgs();
@@ -265,7 +265,7 @@ sap.ui.define([
 		assert.strictEqual(oCache.sMetaPath, "/TEAMS");
 		assert.strictEqual(oCache.oTypePromise, undefined);
 		assert.ok(oCache.hasOwnProperty("oTypePromise"));
-		assert.strictEqual(oCache.mLateQueryOptions, null);
+		assert.strictEqual(oCache.mLateExpandSelect, null);
 		assert.deepEqual(oCache.mPropertyRequestByPath, {});
 	});
 
@@ -4451,21 +4451,21 @@ sap.ui.define([
 	//*********************************************************************************************
 [
 	/*{index : undefined, keepAlive : false, ...}, combination is never called, use case invalid*/
-	{index : undefined, keepAlive : true, lateQueryOptions : false},
-	{index : undefined, keepAlive : true, lateQueryOptions : true},
-	{index : 1, keepAlive : false, lateQueryOptions : false},
-	{index : 1, keepAlive : false, lateQueryOptions : true},
-	{index : 1, keepAlive : true, lateQueryOptions : false},
-	{index : 1, keepAlive : true, lateQueryOptions : true},
-	{index : -1, keepAlive : false, lateQueryOptions : false}
+	{index : undefined, keepAlive : true, lateExpandSelect : false},
+	{index : undefined, keepAlive : true, lateExpandSelect : true},
+	{index : 1, keepAlive : false, lateExpandSelect : false},
+	{index : 1, keepAlive : false, lateExpandSelect : true},
+	{index : 1, keepAlive : true, lateExpandSelect : false},
+	{index : 1, keepAlive : true, lateExpandSelect : true},
+	{index : -1, keepAlive : false, lateExpandSelect : false}
 ].forEach(function (oFixture) {
 	["", "EMPLOYEE_2_EQUIPMENTS"].forEach(function (sPath) {
 		// undefined => no $select at all ;-)
 		[undefined, false, true].forEach(function (bMessagesAlreadySelected) {
-			var mLateQueryOptions = oFixture.lateQueryOptions ? {} : null,
+			var mLateExpandSelect = oFixture.lateExpandSelect ? {} : null,
 				sTitle = "_Cache#refreshSingle: iIndex = " + oFixture.index
 					+ ", bKeepAlive = " + oFixture.keepAlive
-					+ ", mLateQueryOptions = " + mLateQueryOptions
+					+ ", mLateExpandSelect = " + mLateExpandSelect
 					+ ", sPath = " + sPath
 					+ ", bMessagesAlreadySelected = " + bMessagesAlreadySelected;
 
@@ -4484,7 +4484,7 @@ sap.ui.define([
 			mQueryOptions = {$select : ["Name"]},
 			oResponse = {},
 			mTypeForMetaPath = {},
-			bWithMessages = oFixture.lateQueryOptions,
+			bWithMessages = oFixture.lateExpandSelect,
 			bMessagesAnnotated = bWithMessages && sPath === "" && oFixture.keepAlive;
 
 		if (bMessagesAlreadySelected) {
@@ -4492,7 +4492,7 @@ sap.ui.define([
 		} else if (bMessagesAlreadySelected === undefined) {
 			delete mQueryOptions.$select;
 		}
-		oCache.mLateQueryOptions = mLateQueryOptions;
+		oCache.mLateExpandSelect = mLateExpandSelect;
 		aElements.$byPredicate = {};
 		aElements.$byPredicate[sKeyPredicate] = oElement;
 		oCache.fetchValue = function () {};
@@ -4502,8 +4502,8 @@ sap.ui.define([
 			// Note: CollectionCache#fetchValue may be async, $cached just sends no new request!
 			.returns(SyncPromise.resolve(oFetchValuePromise));
 		this.mock(_Helper).expects("aggregateExpandSelect")
-			.exactly(oFixture.keepAlive && oFixture.lateQueryOptions ? 1 : 0)
-			.withExactArgs(sinon.match.same(mQueryOptions), sinon.match.same(mLateQueryOptions));
+			.exactly(oFixture.keepAlive && oFixture.lateExpandSelect ? 1 : 0)
+			.withExactArgs(sinon.match.same(mQueryOptions), sinon.match.same(mLateExpandSelect));
 
 		// code under test
 		oPromise = oCache.refreshSingle(oGroupLock, sPath, oFixture.index, sKeyPredicate,
@@ -4891,7 +4891,7 @@ sap.ui.define([
 		aElements.$byPredicate = {"('13')" : oElement};
 
 		oCache.fetchValue = function () {};
-		oCache.mLateQueryOptions = {};
+		oCache.mLateExpandSelect = {};
 
 		oCacheMock.expects("fetchValue")
 			.withExactArgs(sinon.match.same(_GroupLock.$cached), "~")
@@ -4905,7 +4905,7 @@ sap.ui.define([
 			.returns(mQueryOptionsForPathCopy);
 		this.mock(_Helper).expects("aggregateExpandSelect")
 			.withExactArgs(sinon.match.same(mQueryOptionsForPathCopy),
-				sinon.match.same(oCache.mLateQueryOptions));
+				sinon.match.same(oCache.mLateExpandSelect));
 		this.mock(_Helper).expects("buildPath").withExactArgs("TEAMS", "~").returns("~");
 		this.mock(_Helper).expects("getKeyFilter")
 			.withExactArgs(sinon.match.same(oElement), "/TEAMS", sinon.match.same(mTypeForMetaPath))
@@ -5015,10 +5015,10 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test("Cache#[gs]etLateQueryOptions", function (assert) {
+	QUnit.test("Cache#setLateQueryOptions", function (assert) {
 		var oCache = new _Cache(this.oRequestor, "Employees('31')", {});
 
-		assert.strictEqual(oCache.getLateQueryOptions(), null);
+		assert.strictEqual(oCache.mLateExpandSelect, null);
 
 		// code under test
 		oCache.setLateQueryOptions({
@@ -5029,7 +5029,7 @@ sap.ui.define([
 			$$ownRequest : true
 		});
 
-		assert.deepEqual(oCache.mLateQueryOptions, {
+		assert.deepEqual(oCache.mLateExpandSelect, {
 			$expand : {n : {$select : "p3"}},
 			$select : ["p1", "p2"]
 		});
@@ -5037,7 +5037,7 @@ sap.ui.define([
 		// code under test
 		oCache.setLateQueryOptions({$expand : {n : {$select : "p3"}}});
 
-		assert.deepEqual(oCache.mLateQueryOptions, {
+		assert.deepEqual(oCache.mLateExpandSelect, {
 			$expand : {n : {$select : "p3"}},
 			$select : undefined
 		});
@@ -5045,25 +5045,24 @@ sap.ui.define([
 		// code under test
 		oCache.setLateQueryOptions({$select : ["p1", "p2"]});
 
-		assert.deepEqual(oCache.mLateQueryOptions, {
+		assert.deepEqual(oCache.mLateExpandSelect, {
 			$expand : undefined,
 			$select : ["p1", "p2"]
 		});
 
-		assert.strictEqual(oCache.getLateQueryOptions(), oCache.mLateQueryOptions);
-
 		// code under test
 		oCache.setLateQueryOptions(null);
-		assert.strictEqual(oCache.getLateQueryOptions(), null);
+
+		assert.strictEqual(oCache.mLateExpandSelect, null);
 	});
 
 	//*********************************************************************************************
 [undefined, "$auto.heroes"].forEach(function (sGroupId) {
 	[false, true].forEach(function (bDataReceivedFails) {
-		[false, true].forEach(function (bHasLateQueryOptions) {
+		[false, true].forEach(function (bHasLateExpandSelect) {
 			var sTitle = "Cache#fetchLateProperty: $select, group=" + sGroupId
 				+ (bDataReceivedFails ? ", fireDataReceived fails" : "")
-				+ ", has late query options: " + bHasLateQueryOptions;
+				+ ", has late exand/select: " + bHasLateExpandSelect;
 
 	QUnit.test(sTitle, function (assert) {
 		var oCache = new _Cache(this.oRequestor, "Employees('31')", {
@@ -5101,15 +5100,15 @@ sap.ui.define([
 		if (sGroupId) {
 			_Helper.setPrivateAnnotation(oEntity, "groupId", sGroupId);
 		}
-		if (bHasLateQueryOptions) {
-			oCache.mLateQueryOptions = {};
+		if (bHasLateExpandSelect) {
+			oCache.mLateExpandSelect = {};
 		}
 		oHelperMock.expects("getMetaPath").withExactArgs("").returns("~resMetaPath~");
 		this.mock(oCache).expects("getTypes").withExactArgs().returns(mTypeForMetaPath);
 		oHelperMock.expects("buildPath").withExactArgs(oCache.sMetaPath, "~resMetaPath~")
 			.returns("~metaPath~");
 		oHelperMock.expects("getQueryOptionsForPath")
-			.withExactArgs(bHasLateQueryOptions ? sinon.match.same(oCache.mLateQueryOptions) : {
+			.withExactArgs(bHasLateExpandSelect ? sinon.match.same(oCache.mLateExpandSelect) : {
 				$select : "~select~",
 				$expand : "~expand~"
 			}, "")
@@ -5202,12 +5201,12 @@ sap.ui.define([
 				"/entity/meta/path" : {}
 			};
 
-		oCache.mLateQueryOptions = {};
+		oCache.mLateExpandSelect = {};
 		oHelperMock.expects("getMetaPath").withExactArgs("('31')/entity/path")
 			.returns("entity/path");
 		this.mock(oCache).expects("getTypes").withExactArgs().returns(mTypeForMetaPath);
 		oHelperMock.expects("getQueryOptionsForPath")
-			.withExactArgs(sinon.match.same(oCache.mLateQueryOptions), "('31')/entity/path")
+			.withExactArgs(sinon.match.same(oCache.mLateExpandSelect), "('31')/entity/path")
 			.returns(mQueryOptionsForPath);
 		oHelperMock.expects("intersectQueryOptions")
 			.withExactArgs(sinon.match.same(mQueryOptionsForPath), [sRequestedPropertyPath],
@@ -5324,14 +5323,14 @@ sap.ui.define([
 			oUpdateSelectedCall,
 			oVisitResponseCall;
 
-		oCache.mLateQueryOptions = {};
+		oCache.mLateExpandSelect = {};
 		oHelperMock.expects("getMetaPath").withExactArgs("('1')/entity/path")
 			.returns("entity/path");
 		this.mock(oCache).expects("getTypes").withExactArgs().returns(mTypeForMetaPath);
 		oHelperMock.expects("buildPath").withExactArgs(oCache.sMetaPath, "entity/path")
 			.returns(oCache.sMetaPath + "/entity/path");
 		oHelperMock.expects("getQueryOptionsForPath")
-			.withExactArgs(sinon.match.same(oCache.mLateQueryOptions), "('1')/entity/path")
+			.withExactArgs(sinon.match.same(oCache.mLateExpandSelect), "('1')/entity/path")
 			.returns(mQueryOptionsForPath);
 		oHelperMock.expects("intersectQueryOptions")
 			.withExactArgs(sinon.match.same(mQueryOptionsForPath), ["foo/bar/baz/qux"],
@@ -5423,10 +5422,10 @@ sap.ui.define([
 				"/Employees" : {}
 			};
 
-		oCache.mLateQueryOptions = {};
+		oCache.mLateExpandSelect = {};
 		this.mock(oCache).expects("getTypes").twice().withExactArgs().returns(mTypeForMetaPath);
 		oHelperMock.expects("getQueryOptionsForPath").twice()
-			.withExactArgs(sinon.match.same(oCache.mLateQueryOptions), "")
+			.withExactArgs(sinon.match.same(oCache.mLateExpandSelect), "")
 			.returns(mQueryOptionsForPath);
 		oHelperMock.expects("intersectQueryOptions")
 			.withExactArgs(sinon.match.same(mQueryOptionsForPath), ["property/foo"],
@@ -5498,10 +5497,10 @@ sap.ui.define([
 
 		oCache.fetchValue = function () {};
 
-		oCache.mLateQueryOptions = {};
+		oCache.mLateExpandSelect = {};
 		this.mock(oCache).expects("getTypes").withExactArgs().returns({});
 		this.mock(_Helper).expects("getQueryOptionsForPath")
-			.withExactArgs(sinon.match.same(oCache.mLateQueryOptions), "")
+			.withExactArgs(sinon.match.same(oCache.mLateExpandSelect), "")
 			.returns(mQueryOptionsForPath);
 		this.mock(_Helper).expects("intersectQueryOptions")
 			.withExactArgs(sinon.match.same(mQueryOptionsForPath), ["property"],
@@ -5574,13 +5573,13 @@ sap.ui.define([
 				"/Employees/EMPLOYEE_2_TEAM" : oEntityType
 			};
 
-		oCache.mLateQueryOptions = {
+		oCache.mLateExpandSelect = {
 			$expand : {expand : {}},
 			$select : ["select"]
 		};
 		this.mock(oCache).expects("getTypes").withExactArgs().returns(mTypeForMetaPath);
 		this.mock(_Helper).expects("getQueryOptionsForPath")
-			.withExactArgs(sinon.match.same(oCache.mLateQueryOptions), "")
+			.withExactArgs(sinon.match.same(oCache.mLateExpandSelect), "")
 			.returns(mQueryOptionsForPath);
 		this.mock(_Helper).expects("intersectQueryOptions")
 			.withExactArgs(sinon.match.same(mQueryOptionsForPath), ["property"],
@@ -5640,7 +5639,7 @@ sap.ui.define([
 	QUnit.test("Cache#fetchLateProperty: do not fetch client annotations", function (assert) {
 		var oCache = new _Cache(this.oRequestor, "Employees");
 
-		oCache.mLateQueryOptions = {};
+		oCache.mLateExpandSelect = {};
 		this.mock(oCache).expects("getTypes").withExactArgs().returns({});
 		this.mock(_Helper).expects("intersectQueryOptions").never();
 		this.oRequestorMock.expects("request").never();
@@ -5659,11 +5658,11 @@ sap.ui.define([
 		var oCache = new _Cache(this.oRequestor, "Employees"),
 			mQueryOptionsForPath = {};
 
-		oCache.mLateQueryOptions = {};
+		oCache.mLateExpandSelect = {};
 		this.mock(oCache).expects("getTypes").withExactArgs().returns({});
 		this.mock(_Helper).expects("getMetaPath").withExactArgs("('1')").returns("");
 		this.mock(_Helper).expects("getQueryOptionsForPath")
-			.withExactArgs(sinon.match.same(oCache.mLateQueryOptions), "('1')")
+			.withExactArgs(sinon.match.same(oCache.mLateExpandSelect), "('1')")
 			.returns(mQueryOptionsForPath);
 		this.mock(_Helper).expects("intersectQueryOptions")
 			.withExactArgs(sinon.match.same(mQueryOptionsForPath), ["property"],
@@ -9403,11 +9402,11 @@ sap.ui.define([
 	//*********************************************************************************************
 [false, true].forEach(function (bDropTransientElement) {
 	[false, true].forEach(function (bMissingPredicate) {
-		[undefined, "~mQueryOptions~"].forEach(function (mLateQueryOptions) {
+		[undefined, "~mQueryOptions~"].forEach(function (mLateExpandSelect) {
 			[false, true].forEach(function (bDeepCreate) {
 			var sTitle = "_Cache#create: bMissingPredicate: " + bMissingPredicate
 					+ ", bDropTransientElement: " + bDropTransientElement
-				+ ", mLateQueryOptions: " + mLateQueryOptions
+				+ ", mLateExpandSelect: " + mLateExpandSelect
 				+ ", bDeepCreate: " + bDeepCreate;
 
 		if (bMissingPredicate && bDropTransientElement) {
@@ -9445,7 +9444,7 @@ sap.ui.define([
 				oUpdateNestedExpectation;
 
 			oCache.fetchValue = function () {};
-			oCache.mLateQueryOptions = mLateQueryOptions;
+			oCache.mLateExpandSelect = mLateExpandSelect;
 			aCollection.$count = 0;
 			aCollection.$created = 0;
 			oHelperMock.expects("clone").withExactArgs(sinon.match.same(oInitialData))
@@ -9494,7 +9493,7 @@ sap.ui.define([
 			}
 
 			oHelperMock.expects("getQueryOptionsForPath").exactly(bDeepCreate ? 0 : 1)
-				.withExactArgs(sinon.match.same(mLateQueryOptions || oCache.mQueryOptions),
+				.withExactArgs(sinon.match.same(mLateExpandSelect || oCache.mQueryOptions),
 					sPathInCache)
 				.returns({$select : aSelectForPath});
 			oCancelNestedExpectation = oHelperMock.expects("cancelNestedCreates")
@@ -11013,7 +11012,7 @@ sap.ui.define([
 					oCacheMock.expects("checkSharedRequest").withExactArgs();
 					that.mock(Object).expects("assign")
 						.withExactArgs({}, sinon.match.same(oCache.mQueryOptions),
-							sinon.match.same(oCache.mLateQueryOptions))
+							sinon.match.same(oCache.mLateExpandSelect))
 						.returns(mQueryOptions);
 					that.mock(_Helper).expects("intersectQueryOptions")
 						.withExactArgs(sinon.match.same(mQueryOptions), sinon.match.same(aPaths),
@@ -11117,7 +11116,7 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-[null, {}].forEach(function (mLateQueryOptions, i) {
+[null, {}].forEach(function (mLateExpandSelect, i) {
 	[false, true].forEach((bSingle) => {
 		const sTitle = "CollectionCache#requestSideEffects: nothing to do #" + i
 			+ ", bSingle=" + bSingle;
@@ -11158,12 +11157,12 @@ sap.ui.define([
 		oCache.aElements = aElements;
 		oCache.aElements.$created = 1;
 		oCache.aElements.$byPredicate = mByPredicate;
-		oCache.mLateQueryOptions = mLateQueryOptions;
+		oCache.mLateExpandSelect = mLateExpandSelect;
 
 		this.mock(oCache).expects("getTypes").withExactArgs().returns({});
 		this.mock(Object).expects("assign")
 			.withExactArgs({}, sinon.match.same(oCache.mQueryOptions),
-				sinon.match.same(oCache.mLateQueryOptions))
+				sinon.match.same(oCache.mLateExpandSelect))
 			.returns(mQueryOptions);
 		this.mock(_Helper).expects("intersectQueryOptions").withExactArgs(
 				sinon.match.same(mQueryOptions), sinon.match.same(aPaths),
@@ -11241,7 +11240,7 @@ sap.ui.define([
 		};
 		this.mock(Object).expects("assign")
 			.withExactArgs({}, sinon.match.same(oCache.mQueryOptions),
-				sinon.match.same(oCache.mLateQueryOptions))
+				sinon.match.same(oCache.mLateExpandSelect))
 			.returns("~mQueryOptions~");
 		this.mock(_Helper).expects("intersectQueryOptions")
 			.withExactArgs("~mQueryOptions~", "~aPaths~",
@@ -11449,7 +11448,7 @@ sap.ui.define([
 				that.mock(oCache).expects("getTypes").withExactArgs().returns(mTypeForMetaPath);
 				that.mock(Object).expects("assign")
 					.withExactArgs({}, sinon.match.same(oCache.mQueryOptions),
-						sinon.match.same(oCache.mLateQueryOptions))
+						sinon.match.same(oCache.mLateExpandSelect))
 					.returns(mQueryOptions);
 				oHelperMock.expects("intersectQueryOptions")
 					.withExactArgs(sinon.match.same(mQueryOptions), sinon.match.same(aPaths),
@@ -11527,7 +11526,7 @@ sap.ui.define([
 					oCacheMock.expects("getTypes").withExactArgs().returns(mTypeForMetaPath);
 					that.mock(Object).expects("assign")
 						.withExactArgs({}, sinon.match.same(oCache.mQueryOptions),
-							sinon.match.same(oCache.mLateQueryOptions))
+							sinon.match.same(oCache.mLateExpandSelect))
 						.returns(mQueryOptions);
 					that.mock(_Helper).expects("intersectQueryOptions").withExactArgs(
 							sinon.match.same(mQueryOptions), sinon.match.same(aPaths),
@@ -11609,7 +11608,7 @@ sap.ui.define([
 			this.mock(oCache).expects("checkSharedRequest").withExactArgs();
 			this.mock(Object).expects("assign")
 				.withExactArgs({}, sinon.match.same(oCache.mQueryOptions),
-					sinon.match.same(oCache.mLateQueryOptions))
+					sinon.match.same(oCache.mLateExpandSelect))
 				.returns(mQueryOptions);
 			this.mock(_Helper).expects("intersectQueryOptions").withExactArgs(
 					sinon.match.same(mQueryOptions), sinon.match.same(aPaths),
@@ -12934,7 +12933,7 @@ sap.ui.define([
 });
 
 	//*********************************************************************************************
-[null, {}].forEach(function (mLateQueryOptions) {
+[null, {}].forEach(function (mLateExpandSelect) {
 	[undefined, "Me"].forEach(function (sReadPath) {
 		// false: no request merging
 		// undefined: another request merges its aPaths into the request, which is initiated by
@@ -12944,7 +12943,7 @@ sap.ui.define([
 		// -- see "callsFake" of the "request" expectation
 		[false, undefined, true].forEach(function (bSkip) {
 			var sTitle = "SingleCache#requestSideEffects, sResourcePath = " + sReadPath
-				+ " mLateQueryOptions = " + mLateQueryOptions + " skip = " + bSkip;
+				+ " mLateExpandSelect = " + mLateExpandSelect + " skip = " + bSkip;
 
 		QUnit.test(sTitle, function (assert) {
 			var sResourcePath = "Employees('42')",
@@ -12967,10 +12966,10 @@ sap.ui.define([
 				oVisitResponseExpectation;
 
 			oCache.oPromise = SyncPromise.resolve(oOldValue); // from previous #fetchValue
-			oCache.mLateQueryOptions = mLateQueryOptions;
+			oCache.mLateExpandSelect = mLateExpandSelect;
 			this.mock(Object).expects("assign")
 				.withExactArgs({}, sinon.match.same(oCache.mQueryOptions),
-					sinon.match.same(oCache.mLateQueryOptions))
+					sinon.match.same(oCache.mLateExpandSelect))
 				.returns(mQueryOptions);
 			this.mock(_Helper).expects("intersectQueryOptions").withExactArgs(
 					sinon.match.same(mQueryOptions),
@@ -13101,7 +13100,7 @@ sap.ui.define([
 		this.mock(oCache).expects("checkSharedRequest").withExactArgs();
 		this.mock(Object).expects("assign")
 			.withExactArgs({}, sinon.match.same(oCache.mQueryOptions),
-				sinon.match.same(oCache.mLateQueryOptions))
+				sinon.match.same(oCache.mLateExpandSelect))
 			.returns(mQueryOptions);
 		this.mock(_Helper).expects("intersectQueryOptions")
 			.withExactArgs(sinon.match.same(mQueryOptions), sinon.match.same(aPaths),
@@ -13175,7 +13174,7 @@ sap.ui.define([
 		oCache.oPromise.caught();
 		this.mock(Object).expects("assign")
 			.withExactArgs({}, sinon.match.same(oCache.mQueryOptions),
-				sinon.match.same(oCache.mLateQueryOptions))
+				sinon.match.same(oCache.mLateExpandSelect))
 			.returns(mQueryOptions);
 		this.mock(_Helper).expects("intersectQueryOptions").withExactArgs(
 				sinon.match.same(mQueryOptions), sinon.match.same(aPaths),
@@ -13210,7 +13209,7 @@ sap.ui.define([
 		oCache.oPromise = SyncPromise.resolve(oOldValue); // from previous #fetchValue
 		this.mock(Object).expects("assign")
 			.withExactArgs({}, sinon.match.same(oCache.mQueryOptions),
-				sinon.match.same(oCache.mLateQueryOptions))
+				sinon.match.same(oCache.mLateExpandSelect))
 			.returns(mQueryOptions);
 		this.mock(_Helper).expects("intersectQueryOptions").withExactArgs(
 				sinon.match.same(mQueryOptions), sinon.match.same(aPaths),
@@ -13266,7 +13265,7 @@ sap.ui.define([
 		oCache.oPromise = {/*from previous #fetchValue*/};
 		this.mock(Object).expects("assign")
 			.withExactArgs({}, sinon.match.same(oCache.mQueryOptions),
-				sinon.match.same(oCache.mLateQueryOptions))
+				sinon.match.same(oCache.mLateExpandSelect))
 			.returns(mQueryOptions);
 		this.mock(_Helper).expects("intersectQueryOptions").withExactArgs(
 				sinon.match.same(mQueryOptions), sinon.match.same(aPaths),
@@ -13293,7 +13292,7 @@ sap.ui.define([
 		oCache.oPromise.caught();
 		this.mock(Object).expects("assign")
 			.withExactArgs({}, sinon.match.same(oCache.mQueryOptions),
-				sinon.match.same(oCache.mLateQueryOptions))
+				sinon.match.same(oCache.mLateExpandSelect))
 			.returns(mQueryOptions);
 		this.mock(_Helper).expects("intersectQueryOptions").withExactArgs(
 				sinon.match.same(mQueryOptions), sinon.match.same(aPaths),
@@ -14733,9 +14732,9 @@ sap.ui.define([
 			oCache = _Cache.create(this.oRequestor, "Employees", {}),
 			oCacheMock = this.mock(oCache),
 			oGroupLock = {},
-			bHasLateQueryOptions = "iTop" in oFixture, // just to have some variance
+			bHasLateExpandSelect = "iTop" in oFixture, // just to have some variance
 			oHelperMock = this.mock(_Helper),
-			mLateQueryOptions = {},
+			mLateExpandSelect = {},
 			mQueryOptionsCopy = {
 				$apply : "A.P.P.L.E.",
 				$count : true,
@@ -14748,7 +14747,7 @@ sap.ui.define([
 			},
 			mTypes = {};
 
-		oCache.mLateQueryOptions = bHasLateQueryOptions ? mLateQueryOptions : undefined;
+		oCache.mLateExpandSelect = bHasLateExpandSelect ? mLateExpandSelect : undefined;
 		oHelperMock.expects("updateAll").never(); // except... see below
 		oCacheMock.expects("removeElement").never(); // except... see below
 		Object.keys(oFixture.mKeptAliveElementsByPredicate).forEach(function (sPredicate) {
@@ -14784,9 +14783,9 @@ sap.ui.define([
 		// calculateKeptElementQuery
 		oHelperMock.expects("clone").withExactArgs(sinon.match.same(oCache.mQueryOptions))
 			.returns(mQueryOptionsCopy);
-		oHelperMock.expects("aggregateExpandSelect").exactly(bHasLateQueryOptions ? 1 : 0)
+		oHelperMock.expects("aggregateExpandSelect").exactly(bHasLateExpandSelect ? 1 : 0)
 			.withExactArgs(sinon.match.same(mQueryOptionsCopy),
-				sinon.match.same(oCache.mLateQueryOptions));
+				sinon.match.same(oCache.mLateExpandSelect));
 		this.mock(oCache.oRequestor).expects("buildQueryString")
 			.withExactArgs(oCache.sMetaPath, sinon.match(function (oValue) {
 				return oValue === mQueryOptionsCopy
@@ -15024,25 +15023,23 @@ sap.ui.define([
 		oCache = _Cache.createProperty(this.oRequestor, "Singleton/foo");
 		oSingletonMock = this.mock(oCache.oSingleton);
 
+		assert.strictEqual(oCache.oSingleton.mLateExpandSelect, null);
 		this.oModelInterfaceMock.expects("fetchMetadata")
 			.withExactArgs("/Singleton/foo")
 			.returns(SyncPromise.resolve({$kind : "Property", $Type : "Edm.String"}));
-		oSingletonMock.expects("getLateQueryOptions")
-			.returns(null);
 		oHelperMock.expects("wrapChildQueryOptions")
 			.withExactArgs("/Singleton", "foo", {},
 				sinon.match.same(this.oRequestor.getModelInterface().fetchMetadata))
 			.returns("~wrappedChildQueryOptions~");
 		oHelperMock.expects("aggregateExpandSelect")
-			.withExactArgs(sinon.match.object, "~wrappedChildQueryOptions~");
-		oSingletonMock.expects("setLateQueryOptions")
-			.withExactArgs(sinon.match.object);
+			.withExactArgs({}, "~wrappedChildQueryOptions~");
+		oSingletonMock.expects("setLateQueryOptions").withExactArgs({});
 		oSingletonMock.expects("fetchValue")
 			.withExactArgs("~groupLock~", "foo", "~fnDataRequested~", "~oListener~",
 			"~bCreateOnDemand~")
 			.resolves("~fooResult~");
 
-		// code under test (first property for singleton, getLateQueryOptions returns null)
+		// code under test (first property for singleton, mLateExpandSelect is null)
 		aPromises.push(oCache.fetchValue("~groupLock~", "n/a", "~fnDataRequested~", "~oListener~",
 			"~bCreateOnDemand~").then(function (oResult) {
 				assert.strictEqual(oResult, "~fooResult~");
@@ -15050,19 +15047,18 @@ sap.ui.define([
 
 		oCache = _Cache.createProperty(this.oRequestor, "Singleton/bar");
 
+		oCache.oSingleton.mLateExpandSelect = "~mLateExpandSelect~";
 		this.oModelInterfaceMock.expects("fetchMetadata")
 			.withExactArgs("/Singleton/bar")
 			.returns(SyncPromise.resolve({$kind : "Property", $Type : "Edm.String"}));
-		oSingletonMock.expects("getLateQueryOptions")
-			.returns("~mLateQueryOptions~");
 		oHelperMock.expects("wrapChildQueryOptions")
 			.withExactArgs("/Singleton", "bar", {},
 				sinon.match.same(this.oRequestor.getModelInterface().fetchMetadata))
 			.returns("~wrappedChildQueryOptions~");
 		oHelperMock.expects("aggregateExpandSelect")
-			.withExactArgs("~mLateQueryOptions~", "~wrappedChildQueryOptions~");
+			.withExactArgs("~mLateExpandSelect~", "~wrappedChildQueryOptions~");
 		oSingletonMock.expects("setLateQueryOptions")
-			.withExactArgs("~mLateQueryOptions~");
+			.withExactArgs("~mLateExpandSelect~");
 		oSingletonMock.expects("fetchValue")
 			.withExactArgs("~groupLock~", "bar", "~fnDataRequested~", "~oListener~",
 			"~bCreateOnDemand~")
@@ -15079,7 +15075,7 @@ sap.ui.define([
 			"~bCreateOnDemand~")
 			.resolves("~barResult1~");
 
-		// code under test (add $select to mLateQueryOptions only once)
+		// code under test (add $select to mLateExpandSelect only once)
 		aPromises.push(oCache.fetchValue("~groupLock~", "n/a", "~fnDataRequested~", "~oListener~",
 			"~bCreateOnDemand~").then(function (oResult) {
 				assert.strictEqual(oResult, "~barResult1~");

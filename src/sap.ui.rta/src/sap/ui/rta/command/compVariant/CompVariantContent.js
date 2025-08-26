@@ -24,7 +24,7 @@ sap.ui.define([
 	 * @since 1.102
 	 * @alias sap.ui.rta.command.compVariant.CompVariantContent
 	 */
-	var CompVariantContent = BaseCommand.extend("sap.ui.rta.command.compVariant.CompVariantContent", {
+	const CompVariantContent = BaseCommand.extend("sap.ui.rta.command.compVariant.CompVariantContent", {
 		metadata: {
 			library: "sap.ui.rta",
 			properties: {
@@ -45,7 +45,7 @@ sap.ui.define([
 	});
 
 	function callFlAPIFunction(sFunctionName, sKey, oValue) {
-		var mPropertyBag = {
+		const mPropertyBag = {
 			...oValue,
 			...this.mInformation,
 			id: sKey,
@@ -56,11 +56,11 @@ sap.ui.define([
 
 	// private function of the SmartVariantManagement are approved and documented to be used from here
 	function setVariantContent(oContent) {
-		var oVariantManagementControl = this.getElement();
-		var oCurrentVariantContent = oVariantManagementControl._getVariantContent(this.getVariantId());
-		var oNewVariantContent = { ...oCurrentVariantContent };
+		const oVariantManagementControl = this.getElement();
+		const oCurrentVariantContent = oVariantManagementControl._getVariantContent(this.getVariantId());
+		let oNewVariantContent = { ...oCurrentVariantContent };
 		if (oVariantManagementControl.isPageVariant()) {
-			var oContentToBeSet = {};
+			const oContentToBeSet = {};
 			oContentToBeSet[this.getPersistencyKey()] = oContent;
 			oVariantManagementControl._applyVariantByPersistencyKey(this.getPersistencyKey(), oContentToBeSet, "KEY_USER");
 			oNewVariantContent[this.getPersistencyKey()] = oContent;
@@ -82,15 +82,15 @@ sap.ui.define([
 
 	CompVariantContent.prototype.execute = function() {
 		this.getElement().setModified(true);
-		var oNewVariantContent = setVariantContent.call(this, this.getNewContent());
+		const oNewVariantContent = setVariantContent.call(this, this.getNewContent());
 		callFlAPIFunction.call(this, "updateVariantContent", this.getVariantId(), {content: oNewVariantContent});
 		return Promise.resolve();
 	};
 
 	CompVariantContent.prototype.undo = function() {
-		var oVariant = callFlAPIFunction.call(this, "revert", this.getVariantId(), {});
+		const oVariant = callFlAPIFunction.call(this, "revert", this.getVariantId(), {});
 		this.getElement().setModified(this.getIsModifiedBefore());
-		var oVariantManagementControl = this.getElement();
+		const oVariantManagementControl = this.getElement();
 		if (oVariantManagementControl.isPageVariant()) {
 			setVariantContent.call(this, oVariant.getContent()[this.getPersistencyKey()]);
 		} else {
