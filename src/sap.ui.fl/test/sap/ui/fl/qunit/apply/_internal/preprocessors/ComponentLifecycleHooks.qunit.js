@@ -714,6 +714,19 @@ sap.ui.define([
 			assert.strictEqual(aAnnoChangesModel.length, 0, "the model was set with no annotation change");
 			assert.strictEqual(Log.error.callCount, 1, "an error was logged");
 		});
+
+		QUnit.test("hook gets called for an improperly created component", async function(assert) {
+			sandbox.stub(Log, "error");
+			ComponentLifecycleHooks.modelCreatedHook({
+				model: this.oFakeModel1,
+				modelId: "someModelId",
+				ownerId: undefined,
+				manifest: this.oAppComponent.getManifest()
+			});
+			const aAnnoChangesModel = await this.oSetAnnotationChangeStub1.getCall(0).args[0];
+			assert.strictEqual(aAnnoChangesModel.length, 0, "the model was set with no annotation change");
+			assert.strictEqual(Log.error.callCount, 1, "an error was logged");
+		});
 	});
 
 	QUnit.done(function() {

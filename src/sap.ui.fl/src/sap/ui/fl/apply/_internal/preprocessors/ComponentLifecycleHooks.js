@@ -239,6 +239,10 @@ sap.ui.define([
 		// the functionality still works without component Id, but the FlexState will be initialized again
 		// once the component Id is set. This will happen in the instanceCreated hook.
 		// This can only be improved once the generated component instance Id is available in the factory config
+		if (!oPropertyBag.factoryConfig) {
+			Log.error("Could not fetch Annotation changes. This can be caused by creating a component in an unsupported way");
+			return [];
+		}
 		const sAppComponentId = oPropertyBag.owner?.id || oPropertyBag.factoryConfig.id || oPropertyBag.factoryConfig.settings?.id;
 
 		const oComponentData = oOwnerComponent?.getComponentData()

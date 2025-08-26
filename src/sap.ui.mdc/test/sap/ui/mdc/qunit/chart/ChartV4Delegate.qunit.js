@@ -10,7 +10,8 @@ sap.ui.define([
     "sap/chart/Chart",
     "sap/m/VBox",
     "sap/ui/mdc/chart/PropertyHelper",
-    "sap/ui/mdc/chart/ChartImplementationContainer"
+    "sap/ui/mdc/chart/ChartImplementationContainer",
+    "sap/ui/core/Lib"
 ],
 function(
 	nextUIUpdate,
@@ -22,12 +23,14 @@ function(
     SapChart,
     VBox,
     ChartPropertyHelper,
-    ChartImplementationContainer
+    ChartImplementationContainer,
+    Library
 ) {
     "use strict";
 
     let sandbox;
     const sDelegatePath = "test-resources/sap/ui/mdc/delegates/ChartDelegate";
+    const MDCRb = Library.getResourceBundleFor("sap.ui.mdc");
 
     const getLayoutConfig = function() {
 
@@ -1429,6 +1432,56 @@ function(
 
         assert.ok(oSetVisibleSpy.calledWithExactly(false), "No Data text was set invisible after non-empty data load");
 
+    });
+
+    QUnit.test("_getIllustratedMessage", function(assert) {
+        // Act
+        const oIllustratedMessage = ChartDelegate._getIllustratedMessage(this.oMDCChart);
+
+        // Assert
+        assert.ok(ChartDelegate._oIllustratedMessage, "Illustrated message should be set");
+        assert.equal(oIllustratedMessage.isA("sap.m.IllustratedMessage"),true, "Illustrated message correct");
+        assert.equal(oIllustratedMessage.getIllustrationType(), "sapIllus-NoChartData", "Illustrated message type should be sapIllus-NoChartData");
+        assert.equal(oIllustratedMessage.getTitle(), MDCRb.getText("chart.INVALID_CHART_TYPE_ERROR_MESSAGE_TITLE"), "Illustrated message title is correct");
+        assert.equal(oIllustratedMessage.getDescription(), MDCRb.getText("chart.INVALID_CHART_TYPE_DEFAULT_ERROR_MESSAGE_DESCRIPTION"), "Illustrated message description is correct");
+        assert.equal(oIllustratedMessage.getAdditionalContent().length, 2, "Illustrated message additional content length should be 2");
+        assert.equal(oIllustratedMessage.getAdditionalContent()[0].isA("sap.m.Button"), true, "First Additional Content should be button");
+        assert.equal(oIllustratedMessage.getAdditionalContent()[0].getText(), MDCRb.getText("chart.CHANGE_SETTINGS"), "Title of the first button is correct");
+        assert.equal(oIllustratedMessage.getAdditionalContent()[1].isA("sap.m.Button"), true, "Second Additional Content should be button");
+        assert.equal(oIllustratedMessage.getAdditionalContent()[1].getText(), MDCRb.getText("chart.SELECT_ANOTHER_CHART_TYPE"), "Title of the second button is correct");
+    });
+
+    QUnit.test("_toggleIllustratedMessage", function(assert) {
+        // Arrange
+        const oVBox = new VBox();
+        const oChartImplementationContainer = new ChartImplementationContainer({
+            noDataContent: oVBox
+        });
+        ChartDelegate._setInnerStructure(this.oMDCChart, oChartImplementationContainer);
+
+        // Act
+        ChartDelegate._toggleIllustratedMessage(this.oMDCChart);
+
+        //Assert
+        assert.equal(ChartDelegate._bInvalidChartType, true, "Invalid chart type flag is set");
+        assert.equal(oChartImplementationContainer.getShowNoDataStruct(), true, "No Data should be visible");
+        assert.equal(ChartDelegate._sErrorMsg, MDCRb.getText("chart.MISSING_MEASURE_ERROR_MESSAGE", ["Bar Chart", 1]), "Error message is correct");
+        assert.equal(ChartDelegate._oIllustratedMessage.getDescription(),  MDCRb.getText("chart.MISSING_MEASURE_ERROR_MESSAGE", ["Bar Chart", 1]), "Illustrated message description is correct");
+        assert.equal(oChartImplementationContainer.getNoDataContent(), ChartDelegate._oIllustratedMessage, "No data content should be set to illustrated message");
+
+        // Arrange
+        const oStub = sinon.stub(ChartDelegate._getChart(this.oMDCChart), "getAvailableChartTypes").returns({unavailable: []});
+
+        // Act
+        ChartDelegate._toggleIllustratedMessage(this.oMDCChart);
+
+        // Assert
+        assert.equal(oChartImplementationContainer.getNoDataContent(), oVBox, "No data content should be restored to VBox");
+        assert.equal(oChartImplementationContainer.getShowNoDataStruct(), false, "No Data should not be visible");
+
+
+        // Cleanup
+        oStub.restore();
     });
 
 

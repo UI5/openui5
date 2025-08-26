@@ -93,5 +93,30 @@ sap.ui.define([
 		}
 	};
 
+	Util.getErrorMessageForMissingMeasuresAndDimensions = function (sChartType, oError) {
+		const MDCRb = Library.getResourceBundleFor("sap.ui.mdc");
+		const oChartRB = Library.getResourceBundleFor("sap.chart");
+		const sChartTypeText = oChartRB.getText("info/" + sChartType);
+
+		let sErrorMsg = "";
+		let iDimension = oError["Dimension"] ? oError["Dimension"] : "";
+		let iMeasure = oError["Measure"] ? oError["Measure"] : "";
+
+		if (iDimension < 0) {
+			iDimension = 0;
+		}
+		if (iMeasure < 0) {
+			iMeasure = 0;
+		}
+		if (iDimension && iMeasure) {
+			sErrorMsg = MDCRb.getText("chart.MISSING_DIMENSION_AND_MEASURE_ERROR_MESSAGE", [sChartTypeText, iMeasure, iDimension]);
+		} else if (iDimension) {
+			sErrorMsg = MDCRb.getText("chart.MISSING_DIMENSION_ERROR_MESSAGE", [sChartTypeText, iDimension]);
+		} else if (iMeasure) {
+			sErrorMsg = MDCRb.getText("chart.MISSING_MEASURE_ERROR_MESSAGE", [sChartTypeText, iMeasure]);
+		}
+		return sErrorMsg;
+	};
+
 	return Util;
 });
