@@ -29,8 +29,39 @@ sap.ui.define([
 	"sap/ui/events/KeyCodes",
 	"sap/ui/mdc/enums/ChartItemRoleType",
 	"sap/ui/core/InvisibleMessage",
-	"sap/ui/mdc/chart/Util"
-], (BasePanel, Label, ColumnListItem, Select, Text, Item, Button, Column, Table, Library, Element, Filter, FilterOperator, VBox, HBox, ComboBox, Sorter, Log, mLibrary, Device, ResizeHandler, CustomData, jQuery, coreLibrary, KeyCode, ChartItemRoleType, InvisibleMessage, Util) => {
+	"sap/ui/mdc/chart/Util",
+	"sap/m/p13n/MessageStrip"
+], (
+	BasePanel,
+	Label,
+	ColumnListItem,
+	Select,
+	Text,
+	Item,
+	Button,
+	Column,
+	Table,
+	Library,
+	Element,
+	Filter,
+	FilterOperator,
+	VBox,
+	HBox,
+	ComboBox,
+	Sorter,
+	Log,
+	mLibrary,
+	Device,
+	ResizeHandler,
+	CustomData,
+	jQuery,
+	coreLibrary,
+	KeyCode,
+	ChartItemRoleType,
+	InvisibleMessage,
+	Util,
+	MessageStrip
+) => {
 	"use strict";
 
 	// shortcut for sap.ui.core.ValueState
@@ -38,6 +69,48 @@ sap.ui.define([
 
 	// shortcut for sap.m.FlexJustifyContent
 	const { FlexJustifyContent } = mLibrary;
+
+	const mTypes = {
+		// requires only 1 Measure
+		"bar": "axis1Only",
+		"column": "axis1Only",
+		"line": "axis1Only",
+		"pie": "axis1Only",
+		"donut": "axis1Only",
+		"stacked_bar": "axis1Only",
+		"stacked_column": "axis1Only",
+		"100_stacked_bar": "axis1Only",
+		"100_stacked_column": "axis1Only",
+		"waterfall": "axis1Only",
+		"horizontal_waterfall": "axis1Only",
+
+		// requires 2 Measures
+		"scatter": "axis2",
+
+		// requires 3 Measures
+		"bubble": "axis3",
+
+		// requires 1 Measure and 1 Dimension
+		"heatmap": "axis1Cat1",
+		"bullet": "axis1Cat1",
+		"vertical_bullet": "axis1Cat1",
+
+		// requires 2 Measures and 1 Dimension
+		"combination": "axis2Cat1",
+		"stacked_combination": "axis2Cat1",
+		"horizontal_stacked_combination": "axis2Cat1",
+		"dual_bar": "axis2Cat1",
+		"dual_column": "axis2Cat1",
+		"dual_line": "axis2Cat1",
+		"dual_stacked_bar": "axis2Cat1",
+		"dual_stacked_column": "axis2Cat1",
+		"dual_combination": "axis2Cat1",
+		"dual_horizontal_combination": "axis2Cat1",
+		"dual_stacked_combination": "axis2Cat1",
+		"dual_horizontal_stacked_combination": "axis2Cat1",
+		"100_dual_stacked_bar": "axis2Cat1",
+		"100_dual_stacked_column": "axis2Cat1"
+	};
 
 	/**
 	 * Constructor for ChartItemPanel
@@ -67,6 +140,17 @@ sap.ui.define([
 				* }
 				*/
 				panelConfig: {
+					type: "object"
+				},
+				/**
+				 * Configuration for error handling that manages the display of an error message strip
+				 * when no valid chart type is selected on initial page load.
+				 * The configuration object contains the following information:
+				 *   chartType (string): The currently selected chart type.
+				 *   invalidChartType (boolean): Indicates whether the selected chart type is invalid.
+				 *   errorMessage (string): The error message to be displayed when invalidChartType is true.
+				 */
+				errorConfig: {
 					type: "object"
 				}
 			},
@@ -202,6 +286,83 @@ sap.ui.define([
 			}
 		});
 
+	};
+
+	ChartItemPanel.prototype._validateChartType = function() {
+		const oErrorConfig = this.getErrorConfig(),
+			aItems = this._getP13nModel()?.getProperty("/items"),
+			aMeasures = aItems?.filter((oItem) => oItem.visible && oItem.role.includes("axis")) || 0,
+			aDimensions = aItems?.filter((oItem) => oItem.visible && !oItem.role.includes("axis")) || 0,
+			oError = {};
+
+		let bValid = true;
+
+		if (oErrorConfig?.chartType) {
+
+			const sOptions = mTypes[oErrorConfig.chartType];
+			if (sOptions) {
+				if (sOptions === "axis1Only") {
+					bValid = aMeasures.length > 0;
+					if (!bValid) {
+						oError["Measure"] = 1 - aMeasures.length; // +1 because axis1Only requires at least one measure
+					}
+				} else if (sOptions === "axis2") {
+					bValid = aMeasures.length > 1;
+					if (!bValid) {
+						oError["Measure"] = 2 - aMeasures.length;
+					}
+				} else if (sOptions === "axis3") {
+					bValid = aMeasures.length > 2;
+					if (!bValid) {
+						oError["Measure"] = 3 - aMeasures.length;
+					}
+				} else if (sOptions === "axis1Cat1") {
+					bValid = aMeasures.length > 0 && aDimensions.length > 0;
+					if (!bValid) {
+						oError["Dimension"] = 1 - aDimensions.length; // +1 because axis1Cat1 requires at least one dimension
+						oError["Measure"] = 1 - aMeasures.length; // +1 because axis1Cat1 requires at least one measure
+					}
+				} else if (sOptions === "axis2Cat1") {
+					bValid = aMeasures.length > 1 && aDimensions.length > 0;
+					if (!bValid) {
+						oError["Dimension"] = 1 - aDimensions.length; // +1 because axis2Cat1 requires at least one dimension
+						oError["Measure"] = 2 - aMeasures.length; // +2 because axis2Cat1 requires at least two measures
+					}
+				}
+			}
+		}
+		if (oError["Measure"] === 0) {
+			delete oError["Measure"];
+		}
+		if (oError["Dimension"] === 0) {
+			delete oError["Dimension"];
+		}
+		return {
+			valid: bValid,
+			error: oError
+		};
+	};
+
+	ChartItemPanel.prototype._setMessageStrip = function(oMessageStrip) {
+		if (oMessageStrip) {
+			this.setMessageStrip(oMessageStrip);
+			return;
+		}
+		const oValidChartType = this._validateChartType();
+		const bValid = oValidChartType.valid;
+		const sChartType = this.getErrorConfig()?.chartType;
+
+		const sErrorMsg = this.getErrorMessage(sChartType, oValidChartType.error);
+
+		if (!bValid) {
+				this.setMessageStrip(new MessageStrip({ text: sErrorMsg, type: "Information" }));
+		} else {
+				this.setMessageStrip();
+		}
+	};
+
+	ChartItemPanel.prototype.getErrorMessage = function(sChartType, oError) {
+		return Util.getErrorMessageForMissingMeasuresAndDimensions(sChartType, oError);
 	};
 
 	ChartItemPanel.prototype._bindListItems = function(mBindingInfo) {
@@ -706,6 +867,8 @@ sap.ui.define([
 		this._refreshP13nModel();
 		this._fireChangeItems();
 		this._updateVisibleIndexes();
+
+		this._setMessageStrip();
 	};
 
 	ChartItemPanel.prototype._announce = function(sMessage) {
@@ -715,7 +878,8 @@ sap.ui.define([
 	};
 
 	ChartItemPanel.prototype.setP13nData = function(aP13nData) {
-
+		const oPanelConfig = this.getPanelConfig(),
+			oErrorConfig = this.getErrorConfig();
 		//Clear previous templates (if any)
 		aP13nData = aP13nData.filter((it) => { return !it.template; });
 
@@ -729,8 +893,8 @@ sap.ui.define([
 				oItem.availableRoles = Util.getLayoutOptionsForType(oItem.kind);
 			}
 
-			if (this.getPanelConfig() && this.getPanelConfig().allowedLayoutOptions) {
-				const aAllowedRoles = this.getPanelConfig().allowedLayoutOptions;
+			if (oPanelConfig?.allowedLayoutOptions) {
+				const aAllowedRoles = oPanelConfig.allowedLayoutOptions;
 
 				if (aAllowedRoles?.length >= 1) {
 					oItem.availableRoles = oItem.availableRoles.filter((it) => { return aAllowedRoles.indexOf(it.key) != -1; });
@@ -755,12 +919,18 @@ sap.ui.define([
 			}
 
 			aItems.push(oItem);
+
+
 		});
 
 		aItems = aItems.concat(this._getTemplateItems());
 
 		this._getP13nModel().setProperty("/items", aItems);
 		this._updateVisibleIndexes();
+
+		if (oErrorConfig?.invalidChartType) {
+			this._setMessageStrip(new MessageStrip({text: oErrorConfig.errorMessage}));
+		}
 	};
 
 	ChartItemPanel.prototype._updateVisibleIndexes = function() {
@@ -820,6 +990,9 @@ sap.ui.define([
 
 		}
 
+		if (this.getMessageStrip()) {
+			this._setMessageStrip();
+		}
 	};
 
 	ChartItemPanel.prototype._refreshP13nModel = function() {
@@ -837,13 +1010,14 @@ sap.ui.define([
 	};
 
 	ChartItemPanel.prototype._getTemplateItems = function() {
-		const aItems = [];
+		const aItems = [],
+			oPanelConfig = this.getPanelConfig();
 
-		if (!this.getPanelConfig() || !this.getPanelConfig().templateConfig) {
+		if (!oPanelConfig || !oPanelConfig.templateConfig) {
 			return [];
 		}
 
-		this.getPanelConfig().templateConfig.forEach((oTemplateConfig) => {
+		oPanelConfig.templateConfig.forEach((oTemplateConfig) => {
 			const oItem = { template: true, kind: oTemplateConfig.kind };
 
 			aItems.push(oItem);

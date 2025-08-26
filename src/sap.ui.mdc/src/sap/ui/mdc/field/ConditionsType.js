@@ -421,7 +421,7 @@ sap.ui.define([
 							aConditions.push(oCondition);
 						}
 					} else if (!bIgnoreDuplicates) {
-						throw new ParseException(this._oResourceBundle.getText("field.CONDITION_ALREADY_EXIST", [oCondition.values[0]]));
+						throw new ParseException(this._oResourceBundle.getText("field.CONDITION_ALREADY_EXIST", [this._oConditionType.formatValue(oCondition)]));
 					}
 
 					if (iMaxConditions > 0 && iMaxConditions < aConditions.length) {

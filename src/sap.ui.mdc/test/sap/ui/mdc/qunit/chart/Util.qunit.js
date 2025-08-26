@@ -74,4 +74,47 @@ sap.ui.define([
 		const result = Util.getLayoutOptionTextForTypeAndRole("MEASURE", ChartItemRoleType.axis1);
 		assert.strictEqual(result, "Text for chart.PERSONALIZATION_DIALOG_CHARTROLE_AXIS1", "Correct text returned for case-insensitive 'measure' and 'axis1'");
 	});
+
+	QUnit.test("getErrorMessageForMissingMeasuresAndDimensions for missing both Measures and Dimensions", function(assert) {
+		// Arrange
+		const MDCRb = Library.getResourceBundleFor("sap.ui.mdc");
+		const oError = {
+			Measure: 2,
+			Dimension: 1
+		};
+
+		// Act
+		const sErrorMessage = Util.getErrorMessageForMissingMeasuresAndDimensions("combination", oError);
+
+		// Assert
+		assert.equal(sErrorMessage, MDCRb.getText("chart.MISSING_DIMENSION_AND_MEASURE_ERROR_MESSAGE", ["Combined Column Line Chart", 2, 1]), "Error message is correct");
+	});
+
+	QUnit.test("getErrorMessageForMissingMeasuresAndDimensions for missing Measures", function(assert) {
+		// Arrange
+		const MDCRb = Library.getResourceBundleFor("sap.ui.mdc");
+		const oError = {
+			Measure: 1
+		};
+
+		// Act
+		const sErrorMessage = Util.getErrorMessageForMissingMeasuresAndDimensions("bar", oError);
+
+		// Assert
+		assert.equal(sErrorMessage, MDCRb.getText("chart.MISSING_MEASURE_ERROR_MESSAGE", ["Bar Chart", 1]), "Error message is correct");
+	});
+
+	QUnit.test("getErrorMessageForMissingMeasuresAndDimensions for missing Dimension", function(assert) {
+		// Arrange
+		const MDCRb = Library.getResourceBundleFor("sap.ui.mdc");
+		const oError = {
+			Dimension: 1
+		};
+
+		// Act
+		const sErrorMessage = Util.getErrorMessageForMissingMeasuresAndDimensions("heatmap", oError);
+
+		// Assert
+		assert.equal(sErrorMessage, MDCRb.getText("chart.MISSING_DIMENSION_ERROR_MESSAGE", ["Heat Map", 1]), "Error message is correct");
+	});
 });

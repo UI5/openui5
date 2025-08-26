@@ -18,6 +18,12 @@ sap.ui.define([
 		allowedLayoutOptions: ["axis1", "category", "series"], templateConfig: [{kind: "Dimension"},{kind: "Measure"}]
 	};
 
+	const oErrorConfig = {
+		chartType: "combination",
+		invalidChartType: false,
+		errorMessage: "<error message>"
+	};
+
 	QUnit.module("ChartItemPanelNew Unit tests", {
 		beforeEach: async function(){
 			await nextUIUpdate();
@@ -53,7 +59,7 @@ sap.ui.define([
 				}
 			];
 
-			this.oChartItemPanel = new ChartItemPanel({panelConfig: oChartConfig});
+			this.oChartItemPanel = new ChartItemPanel({panelConfig: oChartConfig, errorConfig: oErrorConfig});
 			this.oChartItemPanel.setP13nData(aItems);
 			this.oChartItemPanel.placeAt("qunit-fixture");
 		}.bind(this),
@@ -563,6 +569,388 @@ sap.ui.define([
 		assert.ok(!oMoveSpy.called, "moveItemsByIndex was not called");
 		assert.ok(oPreventDefaultSpy.calledOnce, "preventDefault was called on event");
 
+	}.bind(this));
+
+	QUnit.module("IllustratedMessage related errors", {
+		beforeEach: function(){
+			this.oChartItemPanel = new ChartItemPanel();
+			this.oChartItemPanel.placeAt("qunit-fixture");
+		}.bind(this),
+		afterEach: function(){
+			this.oChartItemPanel.destroy();
+		}.bind(this)
+	});
+
+	QUnit.test("_validateChartType for axis1Only", function(assert) {
+		// Arrange
+		this.oChartItemPanel.setP13nData([]);
+		sinon.stub(this.oChartItemPanel, "getErrorConfig").returns({chartType: "bar"});
+
+		// Act
+		let oValidChartType = this.oChartItemPanel._validateChartType();
+
+		// Assert
+		assert.equal(oValidChartType.valid, false, "Chart type is invalid");
+		assert.equal(oValidChartType.error["Measure"], 1, "error correctly has 1 Measure");
+
+		// Arrange
+		this.oChartItemPanel.setP13nData([{
+			label: "Test3",
+			name: "test3",
+			visible: true,
+			kind: "Measure",
+			role: "axis1"
+		}]);
+
+		// Act
+		oValidChartType = this.oChartItemPanel._validateChartType();
+
+		// Assert
+		assert.equal(oValidChartType.valid, true, "Chart type is valid");
+	}.bind(this));
+
+	QUnit.test("_validateChartType for axis2", function(assert) {
+		// Arrange
+		this.oChartItemPanel.setP13nData([]);
+		sinon.stub(this.oChartItemPanel, "getErrorConfig").returns({chartType: "scatter"});
+
+		// Act
+		let oValidChartType = this.oChartItemPanel._validateChartType();
+
+		// Assert
+		assert.equal(oValidChartType.valid, false, "Chart type is invalid");
+		assert.equal(oValidChartType.error["Measure"], 2, "error correctly has Measure 2");
+
+		// Arrange
+		this.oChartItemPanel.setP13nData([{
+			label: "Test3",
+			name: "test3",
+			visible: true,
+			kind: "Measure",
+			role: "axis1"
+		}]);
+
+		// Act
+		oValidChartType = this.oChartItemPanel._validateChartType();
+
+		// Assert
+		assert.equal(oValidChartType.valid, false, "Chart type is invalid");
+		assert.equal(oValidChartType.error["Measure"], 1, "error correctly has Measure 1");
+
+		// Arrange
+		this.oChartItemPanel.setP13nData([
+			{
+				label: "Test3",
+				name: "test3",
+				visible: true,
+				kind: "Measure",
+				role: "axis1"
+			},
+			{
+				label: "Test4",
+				name: "test4",
+				visible: true,
+				kind: "Measure",
+				role: "axis1"
+			}
+		]);
+
+		// Act
+		oValidChartType = this.oChartItemPanel._validateChartType();
+
+		// Assert
+		assert.equal(oValidChartType.valid, true, "Chart type is valid");
+	}.bind(this));
+
+	QUnit.test("_validateChartType for axis3", function(assert) {
+		// Arrange
+		this.oChartItemPanel.setP13nData([]);
+		sinon.stub(this.oChartItemPanel, "getErrorConfig").returns({chartType: "bubble"});
+
+		// Act
+		let oValidChartType = this.oChartItemPanel._validateChartType();
+
+		// Assert
+		assert.equal(oValidChartType.valid, false, "Chart type is invalid");
+		assert.equal(oValidChartType.error["Measure"], 3, "error correctly has Measure 2");
+
+		// Arrange
+		this.oChartItemPanel.setP13nData([{
+			label: "Test3",
+			name: "test3",
+			visible: true,
+			kind: "Measure",
+			role: "axis1"
+		}]);
+
+		// Act
+		oValidChartType = this.oChartItemPanel._validateChartType();
+
+		// Assert
+		assert.equal(oValidChartType.valid, false, "Chart type is invalid");
+		assert.equal(oValidChartType.error["Measure"], 2, "error correctly has Measure 1");
+
+		// Arrange
+		this.oChartItemPanel.setP13nData([
+			{
+				label: "Test3",
+				name: "test3",
+				visible: true,
+				kind: "Measure",
+				role: "axis1"
+			},
+			{
+				label: "Test4",
+				name: "test4",
+				visible: true,
+				kind: "Measure",
+				role: "axis1"
+			}
+		]);
+
+		// Act
+		oValidChartType = this.oChartItemPanel._validateChartType();
+
+		// Assert
+		assert.equal(oValidChartType.valid, false, "Chart type is invalid");
+		assert.equal(oValidChartType.error["Measure"], 1, "error correctly has Measure 1");
+
+		// Arrange
+		this.oChartItemPanel.setP13nData([
+			{
+				label: "Test3",
+				name: "test3",
+				visible: true,
+				kind: "Measure",
+				role: "axis1"
+			},
+			{
+				label: "Test4",
+				name: "test4",
+				visible: true,
+				kind: "Measure",
+				role: "axis1"
+			},
+			{
+				label: "Test5",
+				name: "test5",
+				visible: true,
+				kind: "Measure",
+				role: "axis1"
+			}
+		]);
+
+		// Act
+		oValidChartType = this.oChartItemPanel._validateChartType();
+
+		// Assert
+		assert.equal(oValidChartType.valid, true, "Chart type is valid");
+	}.bind(this));
+
+	QUnit.test("_validateChartType for axis1Cat1", function(assert) {
+		// Arrange
+		this.oChartItemPanel.setP13nData([]);
+		sinon.stub(this.oChartItemPanel, "getErrorConfig").returns({chartType: "heatmap"});
+
+		// Act
+		let oValidChartType = this.oChartItemPanel._validateChartType();
+
+		// Assert
+		assert.equal(oValidChartType.valid, false, "Chart type is invalid");
+		assert.equal(oValidChartType.error["Measure"], 1, "error correctly has Measure 1");
+		assert.equal(oValidChartType.error["Dimension"], 1, "error correctly has Dimension 1");
+
+		// Arrange
+		this.oChartItemPanel.setP13nData([{
+			label: "Test",
+			name: "test",
+			visible: true,
+			kind: "Dimension",
+			role: "category"
+		}]);
+
+		// Act
+		oValidChartType = this.oChartItemPanel._validateChartType();
+
+		// Assert
+		assert.equal(oValidChartType.valid, false, "Chart type is invalid");
+		assert.equal(oValidChartType.error["Measure"], 1, "error correctly has Measure 1");
+
+		// Arrange
+		this.oChartItemPanel.setP13nData([
+			{
+				label: "Test3",
+				name: "test3",
+				visible: true,
+				kind: "Measure",
+				role: "axis1"
+			},
+			{
+				label: "Test",
+				name: "test",
+				visible: true,
+				kind: "Dimension",
+				role: "category"
+			}
+		]);
+
+		// Act
+		oValidChartType = this.oChartItemPanel._validateChartType();
+
+		// Assert
+		assert.equal(oValidChartType.valid, true, "Chart type is valid");
+	}.bind(this));
+
+	QUnit.test("_validateChartType for axis2Cat1", function(assert) {
+		// Arrange
+		this.oChartItemPanel.setP13nData([]);
+		sinon.stub(this.oChartItemPanel, "getErrorConfig").returns({chartType: "combination"});
+
+		// Act
+		let oValidChartType = this.oChartItemPanel._validateChartType();
+
+		// Assert
+		assert.equal(oValidChartType.valid, false, "Chart type is invalid");
+		assert.equal(oValidChartType.error["Measure"], 2, "error correctly has Measure 2");
+		assert.equal(oValidChartType.error["Dimension"], 1, "error correctly has Dimension 1");
+
+		// Arrange
+		this.oChartItemPanel.setP13nData([{
+			label: "Test",
+			name: "test",
+			visible: true,
+			kind: "Dimension",
+			role: "category"
+		}]);
+
+		// Act
+		oValidChartType = this.oChartItemPanel._validateChartType();
+
+		// Assert
+		assert.equal(oValidChartType.valid, false, "Chart type is invalid");
+		assert.equal(oValidChartType.error["Measure"], 2, "error correctly has Measure 2");
+		assert.equal(oValidChartType.error["Dimension"], undefined, "error correctly has no Dimension error");
+
+		// Arrange
+		this.oChartItemPanel.setP13nData([
+			{
+				label: "Test3",
+				name: "test3",
+				visible: true,
+				kind: "Measure",
+				role: "axis1"
+			},
+			{
+				label: "Test",
+				name: "test",
+				visible: true,
+				kind: "Dimension",
+				role: "category"
+			}
+		]);
+
+		// Act
+		oValidChartType = this.oChartItemPanel._validateChartType();
+
+		// Assert
+		assert.equal(oValidChartType.valid, false, "Chart type is invalid");
+		assert.equal(oValidChartType.error["Measure"], 1, "error correctly has Measure 1");
+
+				// Arrange
+		this.oChartItemPanel.setP13nData([
+			{
+				label: "Test3",
+				name: "test3",
+				visible: true,
+				kind: "Measure",
+				role: "axis1"
+			},
+			{
+				label: "Test4",
+				name: "test4",
+				visible: true,
+				kind: "Measure",
+				role: "axis1"
+			},
+			{
+				label: "Test",
+				name: "test",
+				visible: true,
+				kind: "Dimension",
+				role: "category"
+			}
+		]);
+
+		// Act
+		oValidChartType = this.oChartItemPanel._validateChartType();
+
+		// Assert
+		assert.equal(oValidChartType.valid, true, "Chart type is valid");
+	}.bind(this));
+
+	QUnit.test("_onPressHide should call _setMessageStrip", function(assert) {
+		// Arrange
+		const oSpy = sinon.spy(this.oChartItemPanel, "_setMessageStrip"),
+			oRemoveBtn = {
+				data: function() {
+					return {
+						propertyName: "test"
+					};
+				}
+			};
+
+		// Act
+		this.oChartItemPanel._onPressHide(undefined, oRemoveBtn);
+
+		// Assert
+		assert.ok(oSpy.calledOnce, "_setMessageStrip was called");
+
+		// Cleanup
+		oSpy.restore();
+
+	}.bind(this));
+
+	QUnit.test("setP13nData should call _setMessageStrip", function(assert) {
+		//Arrange
+		const oSpy = sinon.spy(this.oChartItemPanel, "_setMessageStrip"),
+			oStub = sinon.stub(this.oChartItemPanel, "getErrorConfig").returns({invalidChartType: true, errorMessage: "Error"});
+
+		// Act
+		this.oChartItemPanel.setP13nData([]);
+
+		// Assert
+		assert.ok(oSpy.calledOnce, "_setMessageStrip was called");
+
+		// Cleanup
+		oSpy.restore();
+		oStub.restore();
+	}.bind(this));
+
+	QUnit.test("onChangeOfTemplateName should call _setMessageStrip", function(assert) {
+		//Arrange
+		const oSpy = sinon.spy(this.oChartItemPanel, "_setMessageStrip"),
+			oStub = sinon.stub(this.oChartItemPanel, "_getCleanP13nItems").returns([]),
+			oStubGetMessageStrip = sinon.stub(this.oChartItemPanel, "getMessageStrip").returns(true),
+			oEvent = {
+				getSource: function() {
+					return {
+						getSelectedKey: function() {
+							return;
+						}
+					};
+				}
+			};
+
+		// Act
+		this.oChartItemPanel.onChangeOfTemplateName(oEvent);
+
+		// Assert
+		assert.ok(oSpy.calledOnce, "_setMessageStrip was called");
+
+		// Cleanup
+		oSpy.restore();
+		oStub.restore();
+		oStubGetMessageStrip.restore();
 	}.bind(this));
 
 

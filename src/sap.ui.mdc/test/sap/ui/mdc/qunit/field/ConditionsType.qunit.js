@@ -252,12 +252,15 @@ sap.ui.define([
 
 		let oException;
 
+		sinon.spy(oConditionsType._oConditionType, "formatValue");
+
 		try {
 			aConditions = oConditionsType.parseValue("X");
 		} catch (e) {
 			oException = e;
 		}
 
+		assert.ok(oConditionsType._oConditionType.formatValue.calledWith(aConditions[0]), "formatValue called");
 		assert.ok(oException, "exception fired");
 
 		aCompareConditions.push(Condition.createCondition(OperatorName.EQ, ["Z"], undefined, undefined, ConditionValidated.NotValidated, undefined));

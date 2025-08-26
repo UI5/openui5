@@ -1,7 +1,6 @@
 /* eslint-disable */
 /*!
  * Chart.js v4.5.0
- * https://www.chartjs.org
  * (c) 2025 Chart.js Contributors
  * Released under the MIT License
  */

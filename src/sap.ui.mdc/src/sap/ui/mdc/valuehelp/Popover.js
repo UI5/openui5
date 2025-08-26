@@ -98,19 +98,7 @@ sap.ui.define([
 			return this._oGetContainerControlPromise;
 		}
 
-		let oValueHelpHeader;
-		let oInput;
-		if (Device.system.phone) {
-			const oSubHeader = oPopover.getSubHeader();
-			[oValueHelpHeader] = oPopover.getContent();
-			[oInput] = oSubHeader ? oSubHeader.getContent() : [];
-			const oFormatOptions = _getConditionFormatOptions.call(this);
-			this._oInputConditionType.setFormatOptions(oFormatOptions); // as config might be changed
-			_updateValueHelpHeaderPhone.call(this, this.getControl(), oValueHelpHeader, undefined, undefined, oInput);
-		} else {
-			oValueHelpHeader = oPopover.getCustomHeader();
-			_updateValueHelpHeader.call(this, this.getControl(), oValueHelpHeader);
-		}
+		this.updateValueHelpHeader();
 
 		return oPopover;
 	};
@@ -523,7 +511,28 @@ sap.ui.define([
 				oContent.detachNavigated(this.handleNavigated, this);
 			}
 		}
+		if (["valueState", "valueStateText"].includes(oChanges.name)) {
+			this.updateValueHelpHeader();
+		}
+
 		Container.prototype.observeChanges.apply(this, arguments);
+	};
+
+	Popover.prototype.updateValueHelpHeader = function(sValueState, sValueStateText) {
+		const oPopover = this.getAggregation("_container");
+		let oValueHelpHeader;
+		let oInput;
+		if (Device.system.phone) {
+			const oSubHeader = oPopover.getSubHeader();
+			[oValueHelpHeader] = oPopover.getContent();
+			[oInput] = oSubHeader ? oSubHeader.getContent() : [];
+			const oFormatOptions = _getConditionFormatOptions.call(this);
+			this._oInputConditionType.setFormatOptions(oFormatOptions); // as config might be changed
+			_updateValueHelpHeaderPhone.call(this, this.getControl(), oValueHelpHeader, undefined, undefined, oInput);
+		} else {
+			oValueHelpHeader = oPopover.getCustomHeader();
+			_updateValueHelpHeader.call(this, this.getControl(), oValueHelpHeader);
+		}
 	};
 
 	Popover.prototype.placeContent = function(oPopover) {
@@ -582,6 +591,9 @@ sap.ui.define([
 			} else {
 				this._openContainerByTarget(oPopover);
 			}
+			this._oObserver.observe(this.getControl(), {
+				properties: ["valueState", "valueStateText"]
+			});
 		}).catch((oError) => {
 			const oCurrentOpenPromise = this._retrievePromise("open");
 
@@ -622,6 +634,9 @@ sap.ui.define([
 			}
 			oPopover.close();
 		}
+		this._oObserver.unobserve(this.getControl(), {
+			properties: ["valueState", "valueStateText"]
+		});
 
 	};
 
