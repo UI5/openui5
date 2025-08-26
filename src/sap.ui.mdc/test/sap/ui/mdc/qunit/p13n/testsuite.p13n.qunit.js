@@ -104,6 +104,24 @@ sap.ui.define(["sap/ui/Device"], function (Device) {
 					]
 				}
 			},
+			"FilterController": {
+				group: "Controllers",
+				module: "./controllers/FilterController.qunit",
+				ui5: {
+					libs: [
+						"sap.ui.mdc"
+					]
+				}
+			},
+			"AdaptFiltersController": {
+				group: "Controllers",
+				module: "./controllers/AdaptFiltersController.qunit",
+				ui5: {
+					libs: [
+						"sap.ui.mdc"
+					]
+				}
+			},
 			"ChartItemPanel": {
 				group: "UI Panels",
 				module: "./ChartItemPanel.qunit",

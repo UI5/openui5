@@ -21,7 +21,7 @@ function(
 	 * @since 1.34
 	 * @alias sap.ui.rta.command.Move
 	 */
-	var Move = FlexCommand.extend("sap.ui.rta.command.Move", {
+	const Move = FlexCommand.extend("sap.ui.rta.command.Move", {
 		metadata: {
 			library: "sap.ui.rta",
 			properties: {
@@ -47,8 +47,8 @@ function(
 	 * @override
 	 */
 	Move.prototype._getChangeSpecificData = function() {
-		var mSource = this.getSource();
-		var mTarget = this.getTarget();
+		const mSource = this.getSource();
+		const mTarget = this.getTarget();
 
 		// replace elements by their id, unify format and help with serialization
 		if (mSource.parent) {
@@ -59,7 +59,7 @@ function(
 			mTarget.id = mTarget.parent.getId();
 			delete mTarget.parent;
 		}
-		var mSpecificInfo = {
+		const mSpecificInfo = {
 			changeType: this.getChangeType(),
 			content: {
 				source: mSource,

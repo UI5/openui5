@@ -16,7 +16,7 @@ sap.ui.define(["sap/ui/rta/command/FlexCommand"], function(FlexCommand) {
 	 * @since 1.44
 	 * @alias sap.ui.rta.command.Reveal
 	 */
-	var Reveal = FlexCommand.extend("sap.ui.rta.command.Reveal", {
+	const Reveal = FlexCommand.extend("sap.ui.rta.command.Reveal", {
 		metadata: {
 			library: "sap.ui.rta",
 			properties: {
@@ -30,7 +30,7 @@ sap.ui.define(["sap/ui/rta/command/FlexCommand"], function(FlexCommand) {
 	});
 
 	Reveal.prototype._getChangeSpecificData = function() {
-		var mSpecificChangeInfo = {
+		const mSpecificChangeInfo = {
 			changeType: this.getChangeType(),
 			content: {}
 		};

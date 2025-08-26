@@ -100,13 +100,9 @@ sap.ui.define([
 	}
 
 	function configureAddXmlCommand(oElement, mSettings, oDesignTimeMetadata) {
-		let vAction;
-		if (oDesignTimeMetadata) {
-			vAction = oDesignTimeMetadata.getAction(mSettings.name, oElement);
-		}
 		// the change type is not configurable via designtime
 		// it can also not be disabled with 'not-adaptable' or null
-		const oAction = vAction || {};
+		const oAction = oDesignTimeMetadata?.getAction(mSettings.name, oElement) || {};
 		Object.assign(oAction, {
 			changeType: mSettings.name
 		});
@@ -114,13 +110,9 @@ sap.ui.define([
 	}
 
 	function configureExtendControllerCommand(oElement, mSettings, oDesignTimeMetadata) {
-		var vAction;
-		if (oDesignTimeMetadata) {
-			vAction = oDesignTimeMetadata.getAction(mSettings.name, oElement);
-		}
 		// the change type is not configurable via designtime
 		// it can also not be disabled with 'not-adaptable' or null
-		var oAction = vAction || {};
+		const oAction = oDesignTimeMetadata?.getAction(mSettings.name, oElement) || {};
 		Object.assign(oAction, {
 			changeType: mSettings.name
 		});
@@ -186,10 +178,8 @@ sap.ui.define([
 	}
 
 	function configureRemoveCommand(oElement, mSettings, oDesignTimeMetadata) {
-		let oRemovedElement = mSettings.removedElement;
-		if (!oRemovedElement) {
-			oRemovedElement = oElement;
-		} else if (!(oRemovedElement instanceof ManagedObject)) {
+		const oRemovedElement = mSettings.removedElement || oElement;
+		if (!(oRemovedElement instanceof ManagedObject)) {
 			throw new Error("No valid 'removedElement' found");
 		}
 		const oAction = oDesignTimeMetadata.getAction("remove", oRemovedElement);
@@ -250,9 +240,7 @@ sap.ui.define([
 	}
 
 	function configureRevealCommand(oElement, mSettings, oDesignTimeMetadata) {
-		const oRevealedElement = mSettings.element;
-		const oAction = oDesignTimeMetadata.getAction("reveal", oRevealedElement);
-		return oAction;
+		return oDesignTimeMetadata.getAction("reveal", mSettings.element);
 	}
 
 	function adjustRevealCommand(mSettings) {
@@ -283,7 +271,8 @@ sap.ui.define([
 	}
 
 	function configureAddIFrame(oElement, mSettings, oDesignTimeMetadata) {
-		return oDesignTimeMetadata.getAction("addIFrame", mSettings.element) || oDesignTimeMetadata.getActionDataFromAggregations("addIFrame", mSettings.element)[0];
+		return oDesignTimeMetadata.getAction("addIFrame", mSettings.element)
+			|| oDesignTimeMetadata.getActionDataFromAggregations("addIFrame", mSettings.element)[0];
 	}
 
 	function configureBindPropertyCommand() {
@@ -427,85 +416,74 @@ sap.ui.define([
 		}
 	};
 
-	function getCommandFor(vElement, sCommand, mSettings, oDesignTimeMetadata, mFlexSettings, sVariantManagementReference) {
-		let oCommand;
-		sCommand = sCommand[0].toLowerCase() + sCommand.slice(1); // first char of command name is lower case
-		const mCommand = mCommands[sCommand];
-		let mAllFlexSettings = mFlexSettings;
-
-		if (!mCommand) {
-			return Promise.reject(DtUtil.createError("CommandFactory#getCommandFor", `Command '${sCommand}' doesn't exist, check typing`, "sap.ui.rta"));
-		}
-
+	function requireModule(mCommand) {
 		return new Promise(function(fnResolve) {
 			const sClassName = mCommand.clazz;
 			sap.ui.require([sClassName], function(Command) {
 				fnResolve(Command);
 			});
-		})
+		});
+	}
 
-		.then(function(Command) {
-			const bIsUiElement = vElement instanceof ManagedObject;
+	async function getCommandFor(vElement, sCommand, mSettings, oDesignTimeMetadata, mFlexSettings, sVariantManagementReference) {
+		const sAdjustedCommandName = sCommand[0].toLowerCase() + sCommand.slice(1); // first char of command name is lower case
+		const mCommand = mCommands[sAdjustedCommandName];
+		let mAllFlexSettings = mFlexSettings;
 
-			// only sap.ui.rta.command.FlexCommand requires a selector property
-			if (!mCommand.noSelector && !bIsUiElement) {
-				mSettings = { ...mSettings, selector: vElement };
-			}
+		if (!mCommand) {
+			return DtUtil.createError("CommandFactory#getCommandFor", `Command '${sAdjustedCommandName}' doesn't exist, check typing`, "sap.ui.rta");
+		}
 
-			mSettings = {
-				...mSettings,
-				element: bIsUiElement ? vElement : undefined,
-				name: sCommand
-			};
+		const Command = await requireModule(mCommand);
 
-			let oAction;
-			if (mCommand.configure) {
-				oAction = mCommand.configure(vElement, mSettings, oDesignTimeMetadata);
-			}
+		const bIsUiElement = vElement instanceof ManagedObject;
 
-			let oElementOverlay;
-			if (bIsUiElement) {
-				oElementOverlay = OverlayRegistry.getOverlay(vElement);
-			}
+		// only sap.ui.rta.command.FlexCommand requires a selector property
+		if (!mCommand.noSelector && !bIsUiElement) {
+			mSettings = { ...mSettings, selector: vElement };
+		}
 
-			if (oAction && oAction.changeOnRelevantContainer) {
-				Object.assign(mSettings, {
-					element: oElementOverlay.getRelevantContainer()
-				});
-				vElement = mSettings.element;
-				oElementOverlay = OverlayRegistry.getOverlay(vElement);
-			}
+		mSettings = {
+			...mSettings,
+			element: bIsUiElement ? vElement : undefined,
+			name: sAdjustedCommandName
+		};
 
-			let mTemplateSettings;
-			if (oElementOverlay && vElement.sParentAggregationName) {
-				mTemplateSettings = evaluateTemplateBinding(oElementOverlay);
-			}
+		const oAction = mCommand.configure ? mCommand.configure(vElement, mSettings, oDesignTimeMetadata) : undefined;
 
+		let oElementOverlay = bIsUiElement ? OverlayRegistry.getOverlay(vElement) : undefined;
+
+		if (oAction?.changeOnRelevantContainer) {
+			Object.assign(mSettings, {
+				element: oElementOverlay.getRelevantContainer()
+			});
+			vElement = mSettings.element;
+			oElementOverlay = OverlayRegistry.getOverlay(vElement);
+		}
+
+		if (oElementOverlay && vElement.sParentAggregationName) {
+			const mTemplateSettings = evaluateTemplateBinding(oElementOverlay);
 			if (mTemplateSettings) {
 				if (mCommand.adjustForBinding) {
 					mCommand.adjustForBinding(mSettings);
 				}
 				mAllFlexSettings = merge(mTemplateSettings, mAllFlexSettings);
 			}
+		}
 
-			oCommand = new Command(mSettings);
+		const oCommand = new Command(mSettings);
 
-			let bSuccessfullyConfigured = true; // configuration is optional
-			if (mCommand.configure) {
-				bSuccessfullyConfigured = configureActionCommand(oCommand, oAction);
-			}
+		// configuration is optional
+		const bSuccessfullyConfigured = mCommand.configure ? configureActionCommand(oCommand, oAction) : true;
 
-			if (bSuccessfullyConfigured) {
-				return oCommand.prepare(mAllFlexSettings, sVariantManagementReference, sCommand);
-			}
-			return undefined;
-		}).then(function(bPrepareStatus) {
+		if (bSuccessfullyConfigured) {
+			const bPrepareStatus = await oCommand.prepare(mAllFlexSettings, sVariantManagementReference, sAdjustedCommandName);
 			if (bPrepareStatus) {
 				return oCommand;
 			}
-			oCommand.destroy();
-			return undefined;
-		});
+		}
+		oCommand.destroy();
+		return undefined;
 	}
 
 	/**
@@ -566,7 +544,7 @@ sap.ui.define([
 	 * Static method for generating command
 	 * @param {sap.ui.core.Element|string} vElement - Could be either an element or a selector for the element for which the command is to be created
 	 * @param {string} sCommand - Command type
-	 * @param {object} mSettings -  Initial settings for the new command (command specific settings, looks different for each and every command)
+	 * @param {object} mSettings - Initial settings for the new command (command specific settings, looks different for each and every command)
 	 * @param {sap.ui.dt.DesignTimeMetadata} oDesignTimeMetadata - Contains the action used in the command
 	 * @param {object} [mFlexSettings] - Property bag
 	 * @param {string} [mFlexSettings.layer] - The Layer in which RTA should be started. Default: "CUSTOMER"
@@ -584,9 +562,9 @@ sap.ui.define([
 		};
 
 		if (mFlexSettings.scenario || mFlexSettings.baseId) {
-			const sLRepRootNamespace = FlexUtils.buildLrepRootNamespace(mFlexSettings.baseId, mFlexSettings.scenario, mFlexSettings.projectId);
-			mFlexSettings.rootNamespace = sLRepRootNamespace;
-			mFlexSettings.namespace = `${sLRepRootNamespace}changes/`;
+			const sLRepNamespace = FlexUtils.buildLrepRootNamespace(mFlexSettings.baseId, mFlexSettings.scenario, mFlexSettings.projectId);
+			mFlexSettings.rootNamespace = sLRepNamespace;
+			mFlexSettings.namespace = `${sLRepNamespace}changes/`;
 		}
 
 		return getCommandFor(vElement, sCommand, mSettings, oDesignTimeMetadata, mFlexSettings);

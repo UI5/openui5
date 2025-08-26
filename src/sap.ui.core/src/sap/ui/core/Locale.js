@@ -79,7 +79,7 @@ sap.ui.define(['sap/base/assert', 'sap/ui/base/Object', "sap/base/i18n/LanguageT
 		 /**
 		  * Get the locale variants as a single string or <code>null</code>.
 		  *
-		  * Multiple variants are separated by a dash '-'.
+		  * Multiple variants are separated by a hyphen '-'.
 		  *
 		  * @returns {string|null} the variant or <code>null</code>
 		  * @public
@@ -91,7 +91,7 @@ sap.ui.define(['sap/base/assert', 'sap/ui/base/Object', "sap/base/i18n/LanguageT
 		 /**
 		  * Get the locale variants as an array of individual variants.
 		  *
-		  * The separating dashes are not part of the result.
+		  * The separating hyphens are not part of the result.
 		  * If there is no variant section in the locale tag, an empty array is returned.
 		  *
 		  * @returns {string[]} the individual variant sections
@@ -105,8 +105,8 @@ sap.ui.define(['sap/base/assert', 'sap/ui/base/Object', "sap/base/i18n/LanguageT
 		  * Get the locale extension as a single string or <code>null</code>.
 		  *
 		  * The extension always consists of a singleton character (not 'x'),
-		  * a dash '-' and one or more extension token, each separated
-		  * again with a dash.
+		  * a hyphen '-' and one or more extension token, each separated
+		  * again with a hyphen.
 		  *
 		  * Use {@link #getExtensions} to get the individual extension tokens as an array.
 		  *
@@ -120,7 +120,7 @@ sap.ui.define(['sap/base/assert', 'sap/ui/base/Object', "sap/base/i18n/LanguageT
 		 /**
 		  * Get the locale extensions as an array of tokens.
 		  *
-		  * The leading singleton and the separating dashes are not part of the result.
+		  * The leading singleton and the separating hyphens are not part of the result.
 		  * If there is no extensions section in the locale tag, an empty array is returned.
 		  *
 		  * @returns {string[]} the individual extension sections
@@ -143,7 +143,7 @@ sap.ui.define(['sap/base/assert', 'sap/ui/base/Object', "sap/base/i18n/LanguageT
 		 /**
 		  * Get the locale private use section as an array of tokens.
 		  *
-		  * The leading singleton and the separating dashes are not part of the result.
+		  * The leading singleton and the separating hyphens are not part of the result.
 		  * If there is no private use section in the locale tag, an empty array is returned.
 		  *
 		  * @returns {string[]} the tokens of the private use section

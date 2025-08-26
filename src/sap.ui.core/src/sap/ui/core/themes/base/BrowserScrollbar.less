@@ -3,23 +3,6 @@
 /* Base theme                                    */
 /* ============================================= */
 
-/****** Firefox ******/
-
-html[data-sap-ui-browser^="ff"].sap-desktop:not(.sapUiNativeScrollbars) {
+html.sap-desktop:not(.sapUiNativeScrollbars) {
 	scrollbar-color: @sapUiScrollBarFaceColor @sapUiScrollBarTrackColor;
-}
-
-/****** Safari + Chrome on Desktop ******/
-
-html.sap-desktop:not(.sapUiNativeScrollbars) ::-webkit-scrollbar {
-	background-color: @sapUiScrollBarTrackColor;
-}
-
-html.sap-desktop:not(.sapUiNativeScrollbars) ::-webkit-scrollbar-thumb {
-	background-color: @sapUiScrollBarFaceColor;
-	border-radius: @sapUiElementBorderCornerRadius;
-}
-
-html.sap-desktop:not(.sapUiNativeScrollbars) ::-webkit-scrollbar-thumb:hover {
-	background-color: @sapUiScrollBarHoverFaceColor;
 }

@@ -76,7 +76,7 @@ sap.ui.define([
 		/**
 		 * Get the variants as a single string or <code>null</code>.
 		 *
-		 * Multiple variants are separated by a dash '-'.
+		 * Multiple variants are separated by a hyphen '-'.
 		 *
 		 * @type {string|null}
 		 * @public
@@ -86,7 +86,7 @@ sap.ui.define([
 		/**
 		 * Get the variants as an array of individual variants.
 		 *
-		 * The separating dashes are not part of the result.
+		 * The separating hyphens are not part of the result.
 		 * If there is no variant section in the language tag, an empty array is returned.
 		 *
 		 * @type {string[]}
@@ -98,8 +98,8 @@ sap.ui.define([
 		 * Get the extension as a single string or <code>null</code>.
 		 *
 		 * The extension always consists of a singleton character (not 'x'),
-		 * a dash '-' and one or more extension token, each separated
-		 * again with a dash.
+		 * a hyphen '-' and one or more extension token, each separated
+		 * again with a hyphen.
 		 *
 		 * @type {string|null}
 		 * @public
@@ -109,7 +109,7 @@ sap.ui.define([
 		/**
 		 * Get the extensions as an array of tokens.
 		 *
-		 * The leading singleton and the separating dashes are not part of the result.
+		 * The leading singleton and the separating hyphens are not part of the result.
 		 * If there is no extensions section in the language tag, an empty array is returned.
 		 *
 		 * @type {string[]}
@@ -127,7 +127,7 @@ sap.ui.define([
 		/**
 		 * Get the private use section as an array of tokens.
 		 *
-		 * The leading singleton and the separating dashes are not part of the result.
+		 * The leading singleton and the separating hyphens are not part of the result.
 		 * If there is no private use section in the language tag, an empty array is returned.
 		 *
 		 * @type {string[]}
@@ -149,9 +149,9 @@ sap.ui.define([
 			this.language = aResult[1] || null;
 			this.script = aResult[2] || null;
 			this.region = aResult[3] || null;
-			this.variant = (aResult[4] && aResult[4].slice(1)) || null; // remove leading dash from capturing group
+			this.variant = (aResult[4] && aResult[4].slice(1)) || null; // remove leading hyphen from capturing group
 			this.variantSubtags = this.variant ? this.variant.split('-') : [];
-			this.extension = (aResult[5] && aResult[5].slice(1)) || null; // remove leading dash from capturing group
+			this.extension = (aResult[5] && aResult[5].slice(1)) || null; // remove leading hyphen from capturing group
 			this.extensionSubtags = this.variant ? this.variant.split('-') : [];
 			this.privateUse = aResult[6] || null;
 			this.privateUseSubtags = this.privateUse ? this.privateUse.slice(2).split('-') : [];

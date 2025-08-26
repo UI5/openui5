@@ -162,7 +162,7 @@ sap.ui.define([
 	  * Layouts, representing the number of columns to be displayed and their relative widths for a {@link sap.f.FlexibleColumnLayout} control.
 	  *
 	  * Each layout has a default predefined ratio for the three columns, depending on device size. Based on the device and layout, some columns are hidden.
-	  * For more information, refer to the ratios (in %) for each value, listed below: (dash "-" means non-accessible columns).
+	  * For more information, refer to the ratios (in %) for each value, listed below: (hyphen "-" means non-accessible columns).
 	  *
 	  * <b>Notes:</b>
 	  * <ul>

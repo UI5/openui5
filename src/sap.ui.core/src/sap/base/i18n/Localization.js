@@ -296,7 +296,7 @@ sap.ui.define([
 		 * configured by the user or application or that has been determined from the user agent settings.
 		 * It has not been normalized, but has been validated against a relaxed version of
 		 * {@link http://www.ietf.org/rfc/bcp/bcp47.txt BCP47}, allowing underscores ('_') instead of the
-		 * suggested dashes ('-') and not taking the case of letters into account.
+		 * suggested hyphens ('-') and not taking the case of letters into account.
 		 *
 		 * The exceptions mentioned above affect languages that have been specified via the URL parameter
 		 * <code>sap-language</code>. That parameter by definition represents an SAP logon language code
@@ -441,7 +441,7 @@ sap.ui.define([
 		 * <b>Note</b>: When using config method please take note of and respect the above mentioned restrictions.
 		 *
 		 * @param {string} sLanguage the new language as a BCP47 compliant language tag; case doesn't matter
-		 *   and underscores can be used instead of dashes to separate components (compatibility with Java Locale IDs)
+		 *   and underscores can be used instead of hyphens to separate components (compatibility with Java Locale IDs)
 		 * @param {string} [sSAPLogonLanguage] SAP language code that corresponds to the <code>sLanguage</code>;
 		 *   if a value is specified, future calls to <code>getSAPLogonLanguage</code> will return that value;
 		 *   if no value is specified, the framework will use the ISO639 language part of <code>sLanguage</code>

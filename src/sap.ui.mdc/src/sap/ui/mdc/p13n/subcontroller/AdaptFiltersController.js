@@ -5,9 +5,8 @@
 sap.ui.define([
 	"./SelectionController",
 	"sap/ui/core/Lib",
-	"sap/ui/mdc/p13n/P13nBuilder",
-	"sap/base/util/merge"
-], (BaseController, Library, P13nBuilder, merge) => {
+	"sap/ui/mdc/p13n/P13nBuilder"
+], (BaseController, Library, P13nBuilder) => {
 	"use strict";
 
 	const AdaptFiltersController = BaseController.extend("sap.ui.mdc.p13n.subcontroller.AdaptFiltersController", {
@@ -64,6 +63,7 @@ sap.ui.define([
 
 			oAdaptationFilterBar.setP13nData(oAdaptationData);
 			oAdaptationFilterBar.setLiveMode(false);
+			oAdaptationFilterBar._determineValidationState();
 			return oAdaptationFilterBar.createFilterFields().then(() => {
 				return oAdaptationFilterBar;
 			});

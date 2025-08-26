@@ -20,7 +20,7 @@ sap.ui.define([
 	 * @since 1.54
 	 * @alias sap.ui.rta.command.AddXML
 	 */
-	var AddXML = FlexCommand.extend("sap.ui.rta.command.AddXML", {
+	const AddXML = FlexCommand.extend("sap.ui.rta.command.AddXML", {
 		metadata: {
 			library: "sap.ui.rta",
 			properties: {
@@ -70,7 +70,7 @@ sap.ui.define([
 	AddXML.prototype._applyChange = function(...aArgs) {
 		const vChange = aArgs[0];
 		// preload the module to be applicable in this session
-		var mModulePreloads = {};
+		const mModulePreloads = {};
 		mModulePreloads[vChange.getFlexObjectMetadata().moduleName] = this.getFragment();
 		sap.ui.require.preload(mModulePreloads);
 

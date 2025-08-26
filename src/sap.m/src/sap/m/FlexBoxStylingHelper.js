@@ -72,7 +72,7 @@ sap.ui.define(["sap/base/strings/hyphenate"], function(hyphenate) {
 	 */
 	FlexBoxStylingHelper.setStyle = function(oRm, oLayoutData, sProperty, sValue) {
 		if (typeof (sValue) === "string") {
-			// Convert camel-case to lower-case and dashes
+			// Convert camel-case to lower-case and hyphens
 			sValue = hyphenate(sValue);
 		} else if (typeof (sValue) === "number") {
 			sValue = sValue.toString();

@@ -16,7 +16,7 @@ sap.ui.define(["sap/ui/rta/command/FlexCommand"], function(FlexCommand) {
 	 * @since 1.62
 	 * @alias sap.ui.rta.command.CustomAdd
 	 */
-	var CustomAdd = FlexCommand.extend("sap.ui.rta.command.CustomAdd", {
+	const CustomAdd = FlexCommand.extend("sap.ui.rta.command.CustomAdd", {
 		metadata: {
 			library: "sap.ui.rta",
 			properties: {

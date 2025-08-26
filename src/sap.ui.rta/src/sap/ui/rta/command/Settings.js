@@ -16,7 +16,7 @@ sap.ui.define(["sap/ui/rta/command/FlexCommand"], function(FlexCommand) {
 	 * @since 1.44
 	 * @alias sap.ui.rta.command.Settings
 	 */
-	var Settings = FlexCommand.extend("sap.ui.rta.command.Settings", {
+	const Settings = FlexCommand.extend("sap.ui.rta.command.Settings", {
 		metadata: {
 			library: "sap.ui.rta",
 			properties: {

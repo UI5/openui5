@@ -36,20 +36,20 @@ sap.ui.require([
 
 window.fnFinishDragDrop = function(oOverlay, oSource, oTarget) {
 	"use strict";
-	oOverlay.$().trigger("drag");
-	oSource.$().trigger("dragenter");
-	oSource.$().trigger("dragover");
-	oSource.$().trigger("dragleave");
-	oTarget.$().trigger("dragenter");
-	oTarget.$().trigger("dragover");
-	oOverlay.$().trigger("dragend");
+	oOverlay.getDomRef().dispatchEvent(new MouseEvent("drag"));
+	oSource.getDomRef().dispatchEvent(new MouseEvent("dragenter"));
+	oSource.getDomRef().dispatchEvent(new MouseEvent("dragover"));
+	oSource.getDomRef().dispatchEvent(new MouseEvent("dragleave"));
+	oTarget.getDomRef().dispatchEvent(new MouseEvent("dragenter"));
+	oTarget.getDomRef().dispatchEvent(new MouseEvent("dragover"));
+	oOverlay.getDomRef().dispatchEvent(new MouseEvent("dragend"));
 };
 
 window.fnDrag = function(oOverlay, oSource, oTarget) {
 	"use strict";
-	oOverlay.$().trigger("click");
+	oOverlay.getDomRef().dispatchEvent(new MouseEvent("click"));
 	oOverlay.setSelected(true);
-	oOverlay.$().trigger("dragstart");
+	oOverlay.getDomRef().dispatchEvent(new MouseEvent("dragstart"));
 	if (!oTarget.getParentAggregationOverlay().getTargetZone()) {
 		oTarget.getParentAggregationOverlay().attachEventOnce("targetZoneChange", function() {
 			window.fnFinishDragDrop(oOverlay, oSource, oTarget);

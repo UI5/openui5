@@ -440,7 +440,7 @@ sap.ui.define([
 		 * state (e.g. an initial, not yet rendered control).
 		 *
 		 * If an ID suffix is given, the ID of this Element is concatenated with the suffix
-		 * (separated by a single dash) and the DOM node with that compound ID will be returned.
+		 * (separated by a single hyphen) and the DOM node with that compound ID will be returned.
 		 * This matches the UI5 naming convention for named inner DOM nodes of a control.
 		 *
 		 * @param {string} [sSuffix] ID suffix to get the DOMRef for
@@ -456,7 +456,7 @@ sap.ui.define([
 		 * I.e. the element returned by {@link sap.ui.core.Element#getDomRef} is wrapped and returned.
 		 *
 		 * If an ID suffix is given, the ID of this Element is concatenated with the suffix
-		 * (separated by a single dash) and the DOM node with that compound ID will be wrapped by jQuery.
+		 * (separated by a single hyphen) and the DOM node with that compound ID will be wrapped by jQuery.
 		 * This matches the UI5 naming convention for named inner DOM nodes of a control.
 		 *
 		 * @param {string} [sSuffix] ID suffix to get a jQuery object for

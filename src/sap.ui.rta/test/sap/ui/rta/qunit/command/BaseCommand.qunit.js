@@ -989,17 +989,18 @@ sap.ui.define([
 		});
 
 		QUnit.test("When executing a composite Command with the second command (of four) inside failing", function(assert) {
-			var oCommand1ExecuteSpy = sinon.spy(this.command, "execute");
-			var oCommand1UndoSpy = sinon.spy(this.command, "undo");
-			var oCommand3ExecuteSpy = sinon.spy(this.command3, "execute");
-			var oCommand4ExecuteSpy = sinon.spy(this.command4, "execute");
-			var oCommand3UndoSpy = sinon.spy(this.command3, "undo");
-			var oCommand4UndoSpy = sinon.spy(this.command4, "undo");
+			var oCommand1ExecuteSpy = sandbox.spy(this.command, "execute");
+			var oCommand3ExecuteSpy = sandbox.spy(this.command3, "execute");
+			var oCommand4ExecuteSpy = sandbox.spy(this.command4, "execute");
+			var oCommand1UndoSpy = sandbox.spy(this.command, "undo");
+			var oCommand2UndoSpy = sandbox.spy(this.command2, "undo");
+			var oCommand3UndoSpy = sandbox.spy(this.command3, "undo");
+			var oCommand4UndoSpy = sandbox.spy(this.command4, "undo");
 			this.compositeCommand.addCommand(this.command);
 			this.compositeCommand.addCommand(this.command2);
 			this.compositeCommand.addCommand(this.command3);
 			this.compositeCommand.addCommand(this.command4);
-			sinon.stub(this.command2, "execute").returns(Promise.reject());
+			var oCommand2ExecuteStub = sandbox.stub(this.command2, "execute").rejects();
 
 			this.stack.push(this.compositeCommand);
 			return this.stack.execute()
@@ -1008,10 +1009,12 @@ sap.ui.define([
 				assert.ok(true, "then the command returns a failing promise");
 				assert.ok(oCommand1ExecuteSpy.calledOnce, "and the first command got executed");
 				assert.ok(oCommand1UndoSpy.calledOnce, "and undone");
+				assert.ok(oCommand2ExecuteStub.calledOnce, "and the second command got executed");
+				assert.ok(oCommand2UndoSpy.calledOnce, "but undone");
 				assert.ok(oCommand3ExecuteSpy.notCalled, "and the third command didn't get executed");
 				assert.ok(oCommand3UndoSpy.calledOnce, "but undone");
 				assert.ok(oCommand4ExecuteSpy.notCalled, "and the forth command didn't get executed");
-				assert.ok(oCommand4UndoSpy.notCalled, "and not undone");
+				assert.ok(oCommand4UndoSpy.calledOnce, "but undone");
 			});
 		});
 	});

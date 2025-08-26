@@ -28,7 +28,7 @@ sap.ui.define([
 	 * @since 1.76
 	 * @alias sap.ui.rta.command.AddXMLAtExtensionPoint
 	 */
-	var AddXMLAtExtensionPoint = FlexCommand.extend("sap.ui.rta.command.AddXMLAtExtensionPoint", {
+	const AddXMLAtExtensionPoint = FlexCommand.extend("sap.ui.rta.command.AddXMLAtExtensionPoint", {
 		metadata: {
 			library: "sap.ui.rta",
 			properties: {
@@ -63,7 +63,7 @@ sap.ui.define([
 	};
 
 	AddXMLAtExtensionPoint.prototype.getAppComponent = function() {
-		var oView = this.getSelector().view;
+		const oView = this.getSelector().view;
 		return Utils.getAppComponentForControl(oView);
 	};
 
@@ -72,35 +72,33 @@ sap.ui.define([
 	 * When first applying a change we need to do the same.
 	 * @override
 	 */
-	AddXMLAtExtensionPoint.prototype._applyChange = function(vChange) {
+	AddXMLAtExtensionPoint.prototype._applyChange = async function(vChange) {
 		// preload the module to be applicable in this session
-		var mModulePreloads = {};
+		const mModulePreloads = {};
 		mModulePreloads[vChange.getFlexObjectMetadata().moduleName] = this.getFragment();
 		sap.ui.require.preload(mModulePreloads);
 
-		var oChange = vChange.change || vChange;
-		var oAppComponent = this.getAppComponent();
-		var oSelector = oChange.getSelector();
-		var oView = JsControlTreeModifier.bySelector(oSelector.viewSelector, oAppComponent);
-		var oExtensionPointInfo = ExtensionPointRegistryAPI.getExtensionPointInfo({
+		const oChange = vChange.change || vChange;
+		const oAppComponent = this.getAppComponent();
+		const oSelector = oChange.getSelector();
+		const oView = JsControlTreeModifier.bySelector(oSelector.viewSelector, oAppComponent);
+		const oExtensionPointInfo = ExtensionPointRegistryAPI.getExtensionPointInfo({
 			name: oSelector.name,
 			view: oView
 		});
-		var oSelectorElement = oExtensionPointInfo.targetControl;
+		const oSelectorElement = oExtensionPointInfo.targetControl;
 		oChange.setExtensionPointInfo(oExtensionPointInfo);
 
-		var mPropertyBag = {
+		const mPropertyBag = {
 			modifier: JsControlTreeModifier,
 			appComponent: oAppComponent,
 			view: oView
 		};
-		return ChangesWriteAPI.apply({ change: oChange, element: oSelectorElement, ...mPropertyBag })
-		.then(function(oResult) {
-			if (!oResult.success) {
-				return Promise.reject(oResult.error);
-			}
-			return undefined;
-		});
+		const oResult = await ChangesWriteAPI.apply({ change: oChange, element: oSelectorElement, ...mPropertyBag });
+		if (!oResult.success) {
+			throw Error(oResult.error);
+		}
+		return oResult;
 	};
 
 	return AddXMLAtExtensionPoint;

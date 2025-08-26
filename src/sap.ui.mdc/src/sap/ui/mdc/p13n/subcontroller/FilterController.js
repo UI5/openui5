@@ -8,8 +8,7 @@ sap.ui.define([
 	'sap/ui/mdc/enums/ProcessingStrategy',
 	'sap/ui/mdc/condition/FilterOperatorUtil',
 	'sap/base/Log',
-	'sap/base/util/merge',
-	'sap/base/util/deepEqual'
+	'sap/base/util/merge'
 ], (BaseFilterController, Library, ProcessingStrategy, FilterOperatorUtil, Log, merge) => {
 	"use strict";
 
@@ -111,6 +110,7 @@ sap.ui.define([
 			oAdaptationFilterBar.setP13nData(oAdaptationData);
 			oAdaptationFilterBar.setLiveMode(false);
 			oAdaptationFilterBar.setProperty("_useFixedWidth", false);
+			oAdaptationFilterBar._determineValidationState();
 			oAdaptationFilterBar.getTitle = function() {
 				return Library.getResourceBundleFor("sap.ui.mdc").getText("filter.PERSONALIZATION_DIALOG_TITLE");
 			};
@@ -136,7 +136,7 @@ sap.ui.define([
 
 	FilterController.prototype.getDelta = function(mPropertyBag) {
 		if (mPropertyBag.applyAbsolute === ProcessingStrategy.FullReplace) {
-			Object.keys(mPropertyBag.existingState).forEach(function(sKey){
+			Object.keys(mPropertyBag.existingState).forEach((sKey) => {
 				if (!mPropertyBag.changedState.hasOwnProperty(sKey)) {
 					mPropertyBag.changedState[sKey] = [];
 				}

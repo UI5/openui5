@@ -50,7 +50,7 @@ sap.ui.define([
 	}
 
 	/**
-	 * Promise to ensure that the event triggered methods are executed sequentionally.
+	 * Promise to ensure that the event triggered methods are executed sequentially.
 	 */
 	LREPSerializer.prototype._lastPromise = Promise.resolve();
 
@@ -65,14 +65,14 @@ sap.ui.define([
 	 * @public
 	 */
 	LREPSerializer.prototype.needsReload = function() {
-		this._lastPromise = this._lastPromise.catch(function() {
+		this._lastPromise = this._lastPromise
+		.catch(() => {
 			// _lastPromise chain must not be interrupted
-		}).then(function() {
+		})
+		.then(() => {
 			const aCommands = this.getCommandStack().getAllExecutedCommands();
-			return aCommands.some(function(oCommand) {
-				return !!oCommand.needsReload;
-			});
-		}.bind(this));
+			return aCommands.some((oCommand) => !!oCommand.needsReload);
+		});
 		return this._lastPromise;
 	};
 	/**
@@ -90,15 +90,17 @@ sap.ui.define([
 	 * @public
 	 */
 	LREPSerializer.prototype.saveCommands = function(mPropertyBag) {
-		this._lastPromise = this._lastPromise.catch(function(oError) {
+		this._lastPromise = this._lastPromise
+		.catch((oError) => {
 			Log.error(oError);
 			// _lastPromise chain must not be interrupted
-		}).then(function() {
+		})
+		.then(async () => {
 			const oRootControl = getRootControlInstance(this.getRootControl());
 			if (!oRootControl) {
 				throw new Error("Can't save commands without root control instance!");
 			}
-			return PersistenceWriteAPI.save({
+			await PersistenceWriteAPI.save({
 				selector: oRootControl,
 				skipUpdateCache: false,
 				draft: !!mPropertyBag.saveAsDraft,
@@ -108,12 +110,10 @@ sap.ui.define([
 				adaptationId: mPropertyBag.adaptationId,
 				condenseAnyLayer: mPropertyBag.condenseAnyLayer
 			});
-		}.bind(this))
-		.then(function() {
 			Log.info("UI adaptation successfully wrote changes to the persistence");
 			this.getCommandStack().setSaved(true);
 			this.getCommandStack().removeAllCommands();
-		}.bind(this));
+		});
 
 		return this._lastPromise;
 	};
@@ -143,21 +143,18 @@ sap.ui.define([
 	};
 
 	/**
-	 * @description
 	 * At this point command stack is not aware if the changes have been already booked for the new app variant.
 	 * Therefore if there shall be some UI changes present in command stack, we undo all the changes till the beginning.
 	 * In the last when user presses 'Save and Exit', there will be no change registered for the current app.
-	 * @param {boolean} bRemoveChanges if LREPSerializer should clear the dirty changes in the persistence
-	 * @returns {Promise} returns a promise with true or false
+	 * @param {boolean} bRemoveChanges - Whether LREPSerializer should clear the dirty changes in the persistence
+	 * @returns {Promise} Resolves with true or false
 	 */
-	LREPSerializer.prototype.clearCommandStack = function(bRemoveChanges) {
+	LREPSerializer.prototype.clearCommandStack = async function(bRemoveChanges) {
 		const oCommandStack = this.getCommandStack();
 
-		return this._triggerUndoChanges(bRemoveChanges)
-		.then(function() {
-			oCommandStack.removeAllCommands();
-			return true;
-		});
+		await this._triggerUndoChanges(bRemoveChanges);
+		oCommandStack.removeAllCommands();
+		return true;
 	};
 
 	return LREPSerializer;

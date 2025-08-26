@@ -16,7 +16,7 @@ sap.ui.define(["sap/ui/rta/command/FlexCommand"], function(FlexCommand) {
 	 * @since 1.34
 	 * @alias sap.ui.rta.command.Rename
 	 */
-	var Rename = FlexCommand.extend("sap.ui.rta.command.Rename", {
+	const Rename = FlexCommand.extend("sap.ui.rta.command.Rename", {
 		metadata: {
 			library: "sap.ui.rta",
 			properties: {
@@ -36,7 +36,7 @@ sap.ui.define(["sap/ui/rta/command/FlexCommand"], function(FlexCommand) {
 	});
 
 	Rename.prototype._getChangeSpecificData = function() {
-		var mSpecificInfo = {
+		const mSpecificInfo = {
 			changeType: this.getChangeType(),
 			content: {
 				renamedElement: {

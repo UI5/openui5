@@ -2825,7 +2825,7 @@ sap.ui.define([
 	 *   A valid group ID as specified in {@link sap.ui.model.odata.v4.ODataModel}. Note that
 	 *   '$auto' should be avoided to control exactly which requests are affected by this
 	 *   preference. Using a {@link module:sap/base/util/uid UID} may be one way to achieve this,
-	 *   but take care to replace dashes with underscores.
+	 *   but take care to replace hyphens with underscores.
 	 * @throws {Error}
 	 *   If the given group ID is not a valid group ID or has
 	 *   {@link sap.ui.model.odata.v4.SubmitMode.Direct} or if multiple requests that apply the
