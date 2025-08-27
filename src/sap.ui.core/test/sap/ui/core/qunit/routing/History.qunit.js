@@ -278,6 +278,8 @@ sap.ui.define([
 				that.oExtendedHashChanger.attachEvent("hashChanged", onHashChanged);
 				that.oExtendedHashChanger.replaceHash(sHash, "Backwards");
 
+				assert.notOk(that.oHistory._oNextHash, "_oNextHash isn't set because the hash isn't changed");
+
 				return new Promise(function(resolve, reject) {
 					setTimeout(function() {
 						that.oExtendedHashChanger.detachEvent("hashChanged", onHashChanged);
