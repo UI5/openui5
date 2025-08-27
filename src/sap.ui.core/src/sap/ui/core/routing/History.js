@@ -540,6 +540,7 @@ sap.ui.define([
 		// direction that is forwarded from the outer frame.
 		if (sHash === this._oHashChanger.getHash() && sDirection) {
 			this._sCurrentDirection = sDirection;
+			return;
 		}
 
 		this._hashChangedByApp(sHash, true, sDirection);
