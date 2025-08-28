@@ -1696,10 +1696,8 @@ sap.ui.define([
 		oObjectMock.expects("values")
 			.withExactArgs(sinon.match.same(oBinding.oTreeProperties))
 			.returns(["level", "nodeID", "parentNodeID", "drillState", "descendantCount"]);
-		const oFilter0 = {getPath() {}};
+		const oFilter0 = {sPath: "foo"};
 		oBindingMock.expects("getCombinedFilter").withExactArgs().returns(oFilter0);
-		const oFilterMock = this.mock(oFilter0);
-		oFilterMock.expects("getPath").withExactArgs().returns("foo");
 
 		// code under test
 		ODataTreeBinding.prototype._checkFilterForTreeProperties.call(oBinding);
@@ -1707,8 +1705,8 @@ sap.ui.define([
 		oObjectMock.expects("values")
 			.withExactArgs(sinon.match.same(oBinding.oTreeProperties))
 			.returns(["level", "nodeID", "parentNodeID", "drillState", "descendantCount"]);
+		oFilter0.sPath = "level";
 		oBindingMock.expects("getCombinedFilter").withExactArgs().returns(oFilter0);
-		oFilterMock.expects("getPath").withExactArgs().returns("level").exactly(2);
 		this.oLogMock.expects("error")
 			.withExactArgs("Filter for tree annotation property 'level' is not allowed", undefined,
 				"sap.ui.model.odata.v2.ODataTreeBinding");
@@ -1721,7 +1719,6 @@ sap.ui.define([
 			.returns(["level", "nodeID", "parentNodeID", "drillState", "descendantCount"]);
 		oFilter0.aFilters = [];
 		oBindingMock.expects("getCombinedFilter").withExactArgs().returns(oFilter0);
-		oFilterMock.expects("getPath").withExactArgs().returns("level").exactly(2);
 		this.oLogMock.expects("error")
 			.withExactArgs("Filter for tree annotation property 'level' is not allowed", undefined,
 				"sap.ui.model.odata.v2.ODataTreeBinding");
@@ -1732,13 +1729,10 @@ sap.ui.define([
 		oObjectMock.expects("values")
 			.withExactArgs(sinon.match.same(oBinding.oTreeProperties))
 			.returns(["level", "nodeID", "parentNodeID", "drillState", "descendantCount"]);
-		const oFilter1 = {getPath() {}};
-		const oFilter2 = {getPath() {}};
+		const oFilter1 = {sPath: "nodeID"};
+		const oFilter2 = {sPath: "drillState"};
 		oFilter0.aFilters = [oFilter1, oFilter2];
 		oBindingMock.expects("getCombinedFilter").withExactArgs().returns(oFilter0);
-		// oFilterMock.expects("getPath").withExactArgs().returns("level").exactly(2);
-		this.mock(oFilter1).expects("getPath").withExactArgs().returns("nodeID").exactly(2);
-		this.mock(oFilter2).expects("getPath").withExactArgs().returns("drillState").exactly(2);
 		this.oLogMock.expects("error")
 			.withExactArgs("Filter for tree annotation property 'nodeID' is not allowed", undefined,
 				"sap.ui.model.odata.v2.ODataTreeBinding");

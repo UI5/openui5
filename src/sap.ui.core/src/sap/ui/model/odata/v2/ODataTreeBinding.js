@@ -1780,8 +1780,8 @@ sap.ui.define([
 				oFilter.aFilters.forEach((oMultiFilterPart) => {
 					checkSingleFilter(oMultiFilterPart);
 				});
-			} else if (aTreePropertyPaths.includes(oFilter.getPath())) {
-				Log.error("Filter for tree annotation property '" + oFilter.getPath() + "' is not allowed", undefined,
+			} else if (aTreePropertyPaths.includes(oFilter.sPath)) {
+				Log.error("Filter for tree annotation property '" + oFilter.sPath + "' is not allowed", undefined,
 					sClassName);
 			}
 		};
