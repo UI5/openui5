@@ -379,7 +379,7 @@ License: MIT
 License Text: https://github.com/UI5/openui5/blob/master/LICENSES/MIT.txt
 Contained in: src/sap.ui.integration/src/sap/ui/integration/thirdparty/adaptive-expressions.js
 
-Component: Markdown-it, version: 12.3.2
+Component: Markdown-it, version: 14.1.0
 Copyright: 2014 Vitaly Puzrin, Alex Kocharin
 License: MIT
 License Text: https://github.com/UI5/openui5/blob/master/LICENSES/MIT.txt
