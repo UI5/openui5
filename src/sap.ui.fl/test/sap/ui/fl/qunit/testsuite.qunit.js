@@ -120,6 +120,16 @@ sap.ui.define([
 				}
 			},
 
+			"initial/_internal/preprocessors/RegistrationDelegator": {
+				group: "Initial Internal",
+				coverage: {
+					only: ["sap/ui/fl/initial/_internal/preprocessors/RegistrationDelegator"]
+				},
+				ui5: {
+					libs: [] // The fl library is being loaded inside the test
+				}
+			},
+
 			"initial/_internal/Settings": {
 				group: "Initial Internal",
 				coverage: {
@@ -711,16 +721,6 @@ sap.ui.define([
 					resourceroots: {
 						"rta/qunit": "test-resources/sap/ui/rta/qunit/"
 					}
-				}
-			},
-
-			"apply/_internal/preprocessors/RegistrationDelegator": {
-				group: "Apply Internal",
-				coverage: {
-					only: ["sap/ui/fl/apply/_internal/preprocessors/RegistrationDelegator"]
-				},
-				ui5: {
-					libs: [] // The fl library is being loaded inside the test
 				}
 			},
 
