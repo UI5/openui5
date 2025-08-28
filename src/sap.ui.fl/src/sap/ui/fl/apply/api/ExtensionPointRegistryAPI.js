@@ -3,7 +3,8 @@
  */
 
 sap.ui.define([
-	"sap/ui/fl/apply/_internal/extensionPoint/Registry"
+	"sap/ui/fl/apply/_internal/extensionPoint/Registry",
+	"sap/ui/fl/apply/_internal/init"
 ], function(
 	ExtensionPointRegistry
 ) {

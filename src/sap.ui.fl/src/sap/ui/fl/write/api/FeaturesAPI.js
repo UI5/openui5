@@ -7,7 +7,8 @@ sap.ui.define([
 	"sap/ui/fl/initial/api/InitialFlexAPI",
 	"sap/ui/fl/write/_internal/Storage",
 	"sap/ui/fl/Layer",
-	"sap/ui/fl/Utils"
+	"sap/ui/fl/Utils",
+	"sap/ui/fl/write/_internal/init"
 ], function(
 	Settings,
 	InitialFlexAPI,

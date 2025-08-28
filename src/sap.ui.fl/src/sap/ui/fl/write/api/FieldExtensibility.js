@@ -6,7 +6,8 @@ sap.ui.define([
 	"sap/ui/fl/write/_internal/fieldExtensibility/ABAPAccess",
 	"sap/ui/fl/write/_internal/fieldExtensibility/cap/CAPAccess",
 	"sap/ui/base/ManagedObject",
-	"sap/ui/fl/Utils"
+	"sap/ui/fl/Utils",
+	"sap/ui/fl/write/_internal/init"
 ], function(
 	ABAPAccess,
 	CAPAccess,

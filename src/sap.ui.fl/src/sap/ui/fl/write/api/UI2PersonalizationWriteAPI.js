@@ -5,7 +5,8 @@
 sap.ui.define([
 	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/write/_internal/flexState/UI2Personalization/UI2PersonalizationState",
-	"sap/base/util/restricted/_omit"
+	"sap/base/util/restricted/_omit",
+	"sap/ui/fl/write/_internal/init"
 ], function(
 	ManifestUtils,
 	UI2PersonalizationState,

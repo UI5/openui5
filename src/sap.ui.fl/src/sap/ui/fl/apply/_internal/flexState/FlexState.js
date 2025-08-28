@@ -18,7 +18,8 @@ sap.ui.define([
 	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/initial/_internal/FlexInfoSession",
 	"sap/ui/fl/initial/_internal/StorageUtils",
-	"sap/ui/fl/LayerUtils"
+	"sap/ui/fl/LayerUtils",
+	"sap/ui/fl/apply/_internal/init"
 ], function(
 	_omit,
 	Deferred,

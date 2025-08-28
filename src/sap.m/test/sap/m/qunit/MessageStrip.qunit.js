@@ -367,6 +367,7 @@ sap.ui.define([
 
 		setTimeout(function() {
 			this.oButton.focus();
+			qutils.triggerKeydown(this.oButton, KeyCodes.SPACE);
 			qutils.triggerKeyup(this.oButton, KeyCodes.SPACE);
 		}.bind(this), nAnimationLengthTimeout);
 	});

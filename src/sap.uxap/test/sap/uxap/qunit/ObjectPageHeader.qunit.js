@@ -573,6 +573,7 @@ function(nextUIUpdate, jQuery, Element, IconPool, ObjectPageLayout, ObjectPageHe
 			};
 
 		oActionButton.attachPress(fnPressOutside);
+		QUtils.triggerKeydown(oActionButton.getId(), "SPACE");
 		QUtils.triggerKeyup(oActionButton.getId(), "SPACE");
 
 		oActionButton.detachPress(fnPressOutside);
