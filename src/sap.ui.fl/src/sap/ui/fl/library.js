@@ -4,7 +4,7 @@
 
 sap.ui.define([
  "sap/ui/core/Lib",
- "sap/ui/fl/apply/_internal/preprocessors/RegistrationDelegator",
+ "sap/ui/fl/initial/_internal/preprocessors/RegistrationDelegator",
  "sap/ui/fl/initial/_internal/FlexConfiguration",
  "sap/ui/fl/Utils",
  "sap/ui/fl/Layer",

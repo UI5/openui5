@@ -2,7 +2,7 @@
 
 sap.ui.define([
 	"sap/ui/thirdparty/sinon-4",
-	"sap/ui/fl/apply/_internal/preprocessors/RegistrationDelegator"
+	"sap/ui/fl/initial/_internal/preprocessors/RegistrationDelegator"
 ], function(
 	sinon,
 	RegistrationDelegator

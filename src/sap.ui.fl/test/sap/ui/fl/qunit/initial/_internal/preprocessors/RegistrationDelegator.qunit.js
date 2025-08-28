@@ -8,7 +8,7 @@ sap.ui.define([
 	"sap/ui/core/ExtensionPoint",
 	"sap/ui/fl/apply/_internal/flexState/communication/FLPAboutInfo",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
-	"sap/ui/fl/apply/_internal/preprocessors/RegistrationDelegator",
+	"sap/ui/fl/initial/_internal/preprocessors/RegistrationDelegator",
 	"sap/ui/fl/apply/_internal/DelegateMediator",
 	"sap/ui/fl/apply/api/DelegateMediatorAPI",
 	"sap/ui/thirdparty/sinon-4"
