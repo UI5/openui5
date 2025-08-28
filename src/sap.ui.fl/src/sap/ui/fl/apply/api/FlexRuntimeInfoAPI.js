@@ -15,7 +15,8 @@ sap.ui.define([
 	"sap/ui/fl/initial/api/InitialFlexAPI",
 	"sap/ui/fl/Layer",
 	"sap/ui/fl/Utils",
-	"sap/ui/VersionInfo"
+	"sap/ui/VersionInfo",
+	"sap/ui/fl/apply/_internal/init"
 ], function(
 	Log,
 	JsControlTreeModifier,

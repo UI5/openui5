@@ -8,7 +8,8 @@ sap.ui.define([
 	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/initial/_internal/Settings",
 	"sap/ui/fl/write/api/ContextBasedAdaptationsAPI",
-	"sap/ui/fl/Layer"
+	"sap/ui/fl/Layer",
+	"sap/ui/fl/write/_internal/init"
 ], function(
 	Component,
 	ComponentContainer,

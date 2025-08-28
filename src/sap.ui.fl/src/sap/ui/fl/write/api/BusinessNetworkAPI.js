@@ -11,9 +11,9 @@ sap.ui.define([
 	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/write/_internal/flexState/FlexObjectManager",
 	"sap/ui/fl/write/_internal/Storage",
-	"sap/ui/fl/write/api/ChangesWriteAPI",
 	"sap/ui/fl/Layer",
-	"sap/ui/fl/Utils"
+	"sap/ui/fl/Utils",
+	"sap/ui/fl/write/_internal/init"
 ], (
 	JsControlTreeModifier,
 	ControlVariantsUtils,
@@ -23,7 +23,6 @@ sap.ui.define([
 	ManifestUtils,
 	FlexObjectManager,
 	Storage,
-	ChangesWriteAPI,
 	Layer,
 	Utils
 ) => {

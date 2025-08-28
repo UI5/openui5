@@ -7,7 +7,8 @@ sap.ui.define([
 	"sap/ui/fl/write/_internal/SaveAs",
 	"sap/ui/fl/write/_internal/connectors/LrepConnector",
 	"sap/ui/fl/write/api/FeaturesAPI",
-	"sap/ui/fl/write/_internal/Versions"
+	"sap/ui/fl/write/_internal/Versions",
+	"sap/ui/fl/write/_internal/init"
 ], function(
 	ManifestUtils,
 	SaveAs,

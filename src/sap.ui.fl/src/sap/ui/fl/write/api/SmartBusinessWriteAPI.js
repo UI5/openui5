@@ -10,7 +10,8 @@ sap.ui.define([
 	"sap/ui/fl/write/_internal/SaveAs",
 	"sap/ui/fl/write/api/ChangesWriteAPI",
 	"sap/ui/fl/write/api/PersistenceWriteAPI",
-	"sap/base/util/restricted/_pick"
+	"sap/base/util/restricted/_pick",
+	"sap/ui/fl/write/_internal/init"
 ], function(
 	ManifestUtils,
 	Settings,

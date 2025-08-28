@@ -5,7 +5,8 @@ sap.ui.define([
 	"sap/base/util/merge",
 	"sap/base/util/LoaderExtensions",
 	"sap/ui/fl/initial/_internal/StorageUtils",
-	"sap/ui/fl/write/connectors/BaseConnector"
+	"sap/ui/fl/write/connectors/BaseConnector",
+	"sap/ui/fl/write/_internal/init"
 ], function(
 	merge,
 	LoaderExtensions,

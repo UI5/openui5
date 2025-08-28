@@ -5,8 +5,8 @@ sap.ui.define([
 	"sap/ui/core/mvc/XMLView",
 	"sap/ui/core/util/reflection/JsControlTreeModifier",
 	"sap/ui/core/util/reflection/XmlTreeModifier",
+	"sap/ui/fl/apply/_internal/extensionPoint/Registry",
 	"sap/ui/fl/apply/_internal/flexObjects/FlexObjectFactory",
-	"sap/ui/fl/apply/api/ExtensionPointRegistryAPI",
 	"sap/ui/fl/changeHandler/AddXMLAtExtensionPoint",
 	"sap/ui/test/utils/nextUIUpdate",
 	"sap/ui/util/XMLHelper",
@@ -16,8 +16,8 @@ sap.ui.define([
 	XMLView,
 	JsControlTreeModifier,
 	XmlTreeModifier,
+	ExtensionPointRegistry,
 	FlexObjectFactory,
-	ExtensionPointRegistryAPI,
 	AddXMLAtExtensionPoint,
 	nextUIUpdate,
 	XMLHelper,
@@ -216,9 +216,9 @@ sap.ui.define([
 	}, function() {
 		QUnit.test("When applying changes on different extension points in xml control tree - apply scenario", function(assert) {
 			var oInsertAggregationSpy = sandbox.spy(XmlTreeModifier, "insertAggregation");
-			var oAddCreatedControlsToExtensionPointInfoSpy = sandbox.spy(
-				ExtensionPointRegistryAPI,
-				"addCreatedControlsToExtensionPointInfo"
+			var oAddCreatedControlsSpy = sandbox.spy(
+				ExtensionPointRegistry,
+				"addCreatedControls"
 			);
 			var oChange3 = createAddXMLAtExtensionPointChange(sThirdFragmentPath, "ExtensionPoint1");
 			var oChangeSpecificContent3 = {
@@ -252,15 +252,17 @@ sap.ui.define([
 					"then the control added to the second extension point is placed behind the second extension point."
 				);
 				assert.ok(
-					oAddCreatedControlsToExtensionPointInfoSpy.calledWith({
+					oAddCreatedControlsSpy.calledWith({
 						name: "ExtensionPoint1",
 						viewId: "testComponentAsync---myView",
-						createdControlsIds: ["testComponentAsync---myView--projectId.button", "testComponentAsync---myView--projectId.button2"]
+						createdControlsIds: [
+							"testComponentAsync---myView--projectId.button", "testComponentAsync---myView--projectId.button2"
+						]
 					}),
 					"then the created controls from the first change are added to the Extension Point Info on the registry"
 				);
 				assert.ok(
-					oAddCreatedControlsToExtensionPointInfoSpy.calledWith({
+					oAddCreatedControlsSpy.calledWith({
 						name: "ExtensionPoint2",
 						viewId: "testComponentAsync---myView",
 						createdControlsIds: ["testComponentAsync---myView--projectId.second_button"]
@@ -268,7 +270,7 @@ sap.ui.define([
 					"then the created controls from the second change are added to the Extension Point Info on the registry"
 				);
 				assert.ok(
-					oAddCreatedControlsToExtensionPointInfoSpy.calledWith({
+					oAddCreatedControlsSpy.calledWith({
 						name: "ExtensionPoint1",
 						viewId: "testComponentAsync---myView",
 						createdControlsIds: ["testComponentAsync---myView--projectId.third_button"]
@@ -421,9 +423,9 @@ sap.ui.define([
 				"ExtensionPoint1"
 			);
 
-			var oAddCreatedControlsToExtensionPointInfoSpy = sandbox.spy(
-				ExtensionPointRegistryAPI,
-				"addCreatedControlsToExtensionPointInfo"
+			var oAddCreatedControlsSpy = sandbox.spy(
+				ExtensionPointRegistry,
+				"addCreatedControls"
 			);
 
 			return this.oChangeHandler.applyChange(oChange1, this.oHBox, this.oPropertyBag)
@@ -451,7 +453,7 @@ sap.ui.define([
 				);
 				assert.equal(aPanelContent[1].getId(), "myView2--label2", "then the control label is now on the second position.");
 				assert.ok(
-					oAddCreatedControlsToExtensionPointInfoSpy.calledWith({
+					oAddCreatedControlsSpy.calledWith({
 						name: "ExtensionPoint1",
 						viewId: "myView2",
 						createdControlsIds: ["myView2--projectId.button", "myView2--projectId.button2"]
@@ -459,7 +461,7 @@ sap.ui.define([
 					"then the created controls from the first change are added to the Extension Point Info on the registry"
 				);
 				assert.ok(
-					oAddCreatedControlsToExtensionPointInfoSpy.calledWith({
+					oAddCreatedControlsSpy.calledWith({
 						name: "ExtensionPoint2",
 						viewId: "myView2",
 						createdControlsIds: ["myView2--projectId.second_button"]
@@ -467,7 +469,7 @@ sap.ui.define([
 					"then the created controls from the second change are added to the Extension Point Info on the registry"
 				);
 				assert.ok(
-					oAddCreatedControlsToExtensionPointInfoSpy.calledWith({
+					oAddCreatedControlsSpy.calledWith({
 						name: "ExtensionPoint1",
 						viewId: "myView2",
 						createdControlsIds: ["myView2--projectId.third_button"]

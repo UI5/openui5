@@ -3,7 +3,8 @@
  */
 
 sap.ui.define([
-	"sap/ui/fl/initial/_internal/changeHandlers/ChangeHandlerRegistration"
+	"sap/ui/fl/initial/_internal/changeHandlers/ChangeHandlerRegistration",
+	"sap/ui/fl/apply/_internal/init"
 ], function(
 	ChangeHandlerRegistration
 ) {

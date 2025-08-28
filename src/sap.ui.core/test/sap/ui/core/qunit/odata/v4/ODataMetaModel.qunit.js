@@ -193,6 +193,12 @@ sap.ui.define([
 				},
 				"tea_busi.DefaultContainer/Me" : {
 					"@Singleton" : {
+						AbsolutePath2Age : {
+							$Path : "/tea_busi.DefaultContainer/Me/AGE"
+						},
+						AbsolutePath2Me : {
+							$Path : "/tea_busi.DefaultContainer/Me"
+						},
 						Age : {
 							$Path : "AGE"
 						},
@@ -1967,11 +1973,13 @@ sap.ui.define([
 			: mScope.$Annotations["tea_busi.TEAM"]["@UI.LineItem"],
 		"/EMPLOYEES/@UI.Facets/3/Target/$AnnotationPath/"
 			: mScope.$Annotations["tea_busi.TEAM"]["@UI.LineItem"],
+		"/Me@Singleton/AbsolutePath2Age/$Path/$" : oWorkerData.AGE,
 		"/Me@Singleton/Age/$Path/$" : oWorkerData.AGE,
 		"/Me@Singleton/Empty/$Path/$" : oContainerData.Me,
 		"/Me@Singleton/Empty/$Path/$Type" : "tea_busi.Worker",
 		"/Me@Singleton/Empty/$Path/$Type/$" : oWorkerData,
 		// Note: checks that oEntitySetOrSingleton is reset (no matter whether path is empty or not)
+		"/Me@Singleton/AbsolutePath2Me/$Path/@Type/Empty/$Path/$" : oWorkerData,
 		"/Me@Singleton/Empty/$Path/@Type/Empty/$Path/$" : oWorkerData,
 		"/Me@Singleton/EMPLOYEE_2_TEAM/$Path/@Type/Empty/$Path/$" : oTeamData,
 		"/T€AMS@Capabilities.DeleteRestrictions/Deletable/$Path/$"

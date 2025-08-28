@@ -2,7 +2,7 @@
  * ${copyright}
  */
 
-sap.ui.define([], function() {
+sap.ui.define(["sap/ui/fl/write/_internal/init"], function() {
 	"use strict";
 
 	/**

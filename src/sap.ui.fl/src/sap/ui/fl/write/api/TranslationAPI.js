@@ -8,7 +8,8 @@ sap.ui.define([
 	"sap/ui/fl/write/_internal/Storage",
 	"sap/ui/fl/Utils",
 	"sap/base/util/isEmptyObject",
-	"sap/base/i18n/Localization"
+	"sap/base/i18n/Localization",
+	"sap/ui/fl/write/_internal/init"
 ], function(
 	FlexObjectState,
 	ManifestUtils,

@@ -12,7 +12,8 @@ sap.ui.define([
 	"sap/ui/fl/initial/api/Version",
 	"sap/ui/fl/write/connectors/BaseConnector",
 	"sap/ui/fl/initial/_internal/StorageUtils",
-	"sap/ui/fl/apply/_internal/connectors/ObjectStorageUtils"
+	"sap/ui/fl/apply/_internal/connectors/ObjectStorageUtils",
+	"sap/ui/fl/write/_internal/init"
 ], function(
 	hash,
 	_uniqBy,
