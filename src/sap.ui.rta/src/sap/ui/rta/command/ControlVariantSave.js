@@ -2,13 +2,13 @@
  * ${copyright}
  */
 sap.ui.define([
-	"sap/ui/rta/command/BaseCommand",
-	"sap/ui/core/util/reflection/JsControlTreeModifier",
-	"sap/ui/fl/Utils"
+	"sap/ui/fl/apply/api/FlexRuntimeInfoAPI",
+	"sap/ui/fl/variants/VariantManager",
+	"sap/ui/rta/command/BaseCommand"
 ], function(
-	BaseCommand,
-	JsControlTreeModifier,
-	flUtils
+	FlexRuntimeInfoAPI,
+	VariantManager,
+	BaseCommand
 ) {
 	"use strict";
 
@@ -24,27 +24,13 @@ sap.ui.define([
 	 * @since 1.86
 	 * @alias sap.ui.rta.command.ControlVariantSave
 	 */
-	var ControlVariantSave = BaseCommand.extend("sap.ui.rta.command.ControlVariantSave", {
+	const ControlVariantSave = BaseCommand.extend("sap.ui.rta.command.ControlVariantSave", {
 		metadata: {
 			library: "sap.ui.rta",
-			properties: {
-				model: {
-					type: "object"
-				}
-			},
 			associations: {},
 			events: {}
 		}
 	});
-
-	/**
-	 * @override
-	 */
-	ControlVariantSave.prototype.prepare = function() {
-		this.oAppComponent = flUtils.getAppComponentForControl(this.getElement());
-		this.sVariantManagementReference = JsControlTreeModifier.getSelector(this.getElement(), this.oAppComponent).id;
-		return true;
-	};
 
 	/**
 	 * Triggers the Save of a variant.
@@ -52,15 +38,20 @@ sap.ui.define([
 	 * @returns {Promise} Promise that resolves after execution
 	 */
 	ControlVariantSave.prototype.execute = function() {
-		var sCurrentVariantReference = this.getModel().getCurrentVariantReference(this.sVariantManagementReference);
-		this._aControlChanges = this.getModel().getVariant(sCurrentVariantReference, this.sVariantManagementReference).controlChanges;
-		this._aDirtyChanges = this.getModel()._getDirtyChangesFromVariantChanges(this._aControlChanges);
-		this._aDirtyChanges.forEach(function(oChange) {
+		const oVMControl = this.getElement();
+		this.sFlexReference = FlexRuntimeInfoAPI.getFlexReference({ element: oVMControl });
+		this._aControlChanges = VariantManager.getControlChangesForVariant(
+			this.sFlexReference,
+			oVMControl.getVariantManagementReference(),
+			oVMControl.getCurrentVariantKey()
+		);
+		this._aDirtyChanges = VariantManager.getDirtyChangesFromVariantChanges(this._aControlChanges, this.sFlexReference);
+		this._aDirtyChanges.forEach((oChange) => {
 			if (oChange.getFileType() === "change") {
 				oChange.setSavedToVariant(true);
 			}
 		});
-		this.getModel().invalidateMap();
+		VariantManager.updateVariantManagementMap(this.sFlexReference);
 		return Promise.resolve();
 	};
 
@@ -75,7 +66,7 @@ sap.ui.define([
 				oChange.setSavedToVariant(false);
 			}
 		});
-		this.getModel().invalidateMap();
+		VariantManager.updateVariantManagementMap(this.sFlexReference);
 		return Promise.resolve();
 	};
 

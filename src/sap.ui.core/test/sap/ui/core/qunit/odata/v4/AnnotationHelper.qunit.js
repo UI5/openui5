@@ -937,7 +937,9 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	["$PropertyPath", "$NavigationPropertyPath"].forEach(function (sPathSuffix) {
+	[
+		"$AnyPropertyPath", "$ModelElementPath", "$NavigationPropertyPath", "$PropertyPath"
+	].forEach(function (sPathSuffix) {
 		QUnit.test("format: unsupported path: " + sPathSuffix, function (assert) {
 			var sPath = "/Foo/@namespace.annotation/Value/" + sPathSuffix + "/";
 

@@ -380,6 +380,12 @@ sap.ui.define([
 		testExpression(assert,
 			"<LabeledElementReference>f.LabeledElement</LabeledElementReference>",
 			{$LabeledElementReference : "foo.LabeledElement"});
+		testExpression(assert,
+			"<AnyPropertyPath>Path/f.Bar/f.Baz</AnyPropertyPath>",
+			{$AnyPropertyPath : "Path/foo.Bar/foo.Baz"});
+		testExpression(assert,
+			"<ModelElementPath>Path/f.Bar/f.Baz</ModelElementPath>",
+			{$ModelElementPath : "Path/foo.Bar/foo.Baz"});
 	});
 
 	//*********************************************************************************************

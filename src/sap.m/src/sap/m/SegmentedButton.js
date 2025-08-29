@@ -170,6 +170,9 @@ function(
 		// Used to store individual button widths
 		this._aWidths = [];
 
+		// Used to store previous button width
+		this._previousWidth = undefined;
+
 		// Delegate keyboard processing to ItemNavigation, see commons.SegmentedButton
 		this._oItemNavigation = new ItemNavigation();
 		this._oItemNavigation.setCycling(false);
@@ -212,8 +215,7 @@ function(
 	};
 
 	SegmentedButton.prototype.onAfterRendering = function () {
-		var aButtons = this._getVisibleButtons(),
-			oParentDom;
+		var oParentDom;
 
 		//register resize listener on parent
 		if (!this._sResizeListenerId) {
@@ -227,8 +229,23 @@ function(
 		// Keyboard
 		this._setItemNavigation();
 
-		// Calculate and apply widths
-		this._aWidths = this._getRenderedButtonWidths(aButtons);
+		// Use fonts.ready Promise to detect when fonts are loaded
+		// to avoid getting incorrect button widths
+		if (document.fonts && document.fonts.ready && document.fonts.status !== "loaded") {
+			document.fonts.ready.then(() => {
+				this._adjustButtonWidth();
+			});
+		} else {
+			this._adjustButtonWidth();
+		}
+    };
+
+	/**
+	 * Calculates and applies button width.
+	 * @private
+	 */
+	SegmentedButton.prototype._adjustButtonWidth = function () {
+		this._aWidths = this._getRenderedButtonWidths(this._getVisibleButtons());
 		this._updateWidth();
 	};
 
@@ -308,10 +325,18 @@ function(
 				if (sWidth) {
 					if (sWidth.indexOf("%") !== -1) {
 						// Width in Percent
-						iSumPercents += parseInt(sWidth.slice(0, -1));
-					} else {
+						iSumPercents += parseFloat(sWidth.slice(0, -1));
+					} else if (sWidth.indexOf("px") !== -1) {
 						// Width in Pixels
 						iSumPixels += parseInt(sWidth.slice(0, -2));
+					} else {
+						// Handle other units (em, rem, vw, vh, etc.)
+						var oButtonDomRef = aButtons[i].getDomRef();
+						if (oButtonDomRef) {
+							var oComputedStyle = window.getComputedStyle(oButtonDomRef);
+							var iComputedWidth = parseFloat(oComputedStyle.width);
+							iSumPixels += iComputedWidth;
+						}
 					}
 				} else {
 					iNoWidths++;
@@ -319,7 +344,7 @@ function(
 				i++;
 			}
 
-			// If there are no buttons without width setted return
+			// If there are no buttons without width set, return
 			if (iNoWidths === 0) {
 				return false;
 			}
@@ -327,7 +352,7 @@ function(
 			iPercent = (100 - iSumPercents) / iNoWidths;
 			iPixels = (iSumPixels / iNoWidths);
 
-			// Handle invalid negative numbers or other button occupying more than 100% of the width
+			// Handle invalid negative numbers or other buttons occupying more than 100% of the width
 			if (iPercent < 0) {
 				iPercent = 0;
 			}

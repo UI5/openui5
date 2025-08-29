@@ -170,6 +170,10 @@ sap.ui.define([
 		assert.ok(!sut.$().hasClass("sapMLabelMaxWidth"), "Label has width and does not have max width restriction.");
 	});
 
+	QUnit.test("Should be selectable", function(assert){
+		assert.ok(l1.$().find("bdi").hasClass("sapUiSelectable"), "The Label element contains the 'sapUiSelectable' class, enabling text selection on mobile devices.");
+	});
+
 	QUnit.test("Label wrapping", function(assert) {
 
 		assert.strictEqual(l1.getWrapping(), false, "Has to be set to false.");

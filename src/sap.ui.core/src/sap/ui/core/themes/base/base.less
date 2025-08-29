@@ -1,11 +1,11 @@
 // /**
 // * Copyright (c) 2012-2025 SAP SE or an SAP affiliate company. All rights reserved.
-// * Theming Engine 16.0.13
-// * data:{"sModified":"2025-07-11T07:56:16Z"}
+// * Theming Engine 16.0.25
+// * data:{"sModified":"2025-08-27T14:01:23Z"}
 // */
 
 
-/******************* FILE /Base/baseLib/baseTheme/base.less (Version 11.31.1) *******************/
+/******************* FILE /Base/baseLib/baseTheme/base.less (Version 11.32.2-20250827135846+79bb30d311678435d61b21db26ecbe07d6b05079) *******************/
 
 
 // [Label "Brand Color"]
@@ -8419,6 +8419,38 @@
 // [Type "color"]
 @sapChart_Data_Active_Background: @sapDefault_Color;
 
+// [Label "IBCS Chart Actual Color"]
+// [Description "Color of values of the actual period in International Business Communication Standards (IBCS) charts."]
+// [Tags "Base", "Chart", "Color", "Protected"]
+// [Protected "true"]
+// [Category "Chart", "IBCS"]
+// [Type "color"]
+@sapChart_IBCS_Actual: @sapDefault_Color;
+
+// [Label "IBCS Chart Previous Color"]
+// [Description "Color of values of the previous period in International Business Communication Standards (IBCS) charts."]
+// [Tags "Base", "Chart", "Color", "Protected"]
+// [Protected "true"]
+// [Category "Chart", "IBCS"]
+// [Type "color"]
+@sapChart_IBCS_Previous: @sapDefault_Color;
+
+// [Label "IBCS Chart Good Color"]
+// [Description "Color of good values in International Business Communication Standards (IBCS) charts."]
+// [Tags "Base", "Chart", "Color", "Semantic", "Protected"]
+// [Protected "true"]
+// [Category "Chart", "IBCS"]
+// [Type "color"]
+@sapChart_IBCS_Good: @sapDefault_Color;
+
+// [Label "IBCS Chart Bad Color"]
+// [Description "Color of bad values in International Business Communication Standards (IBCS) charts."]
+// [Tags "Base", "Chart", "Color", "Semantic", "Protected"]
+// [Protected "true"]
+// [Category "Chart", "IBCS"]
+// [Type "color"]
+@sapChart_IBCS_Bad: @sapDefault_Color;
+
 // [Label "Chart Ordered Color 1"]
 // [Description "This color is used as an ordered color of a sequence of 12 chart colors. It has a defined contrast to its predecessor and successor."]
 // [Tags "Base", "Chart", "Color", "Protected"]
@@ -13358,12 +13390,12 @@ fill: @sapBaseColor !important;
 /*</SAP_FREETEXT_LESS>*//*!SAP_POSTPROCESS_REDUCE_END*/
 // /**
 // * Copyright (c) 2012-2025 SAP SE or an SAP affiliate company. All rights reserved.
-// * Theming Engine 16.0.13
-// * data:{"sModified":"2025-07-11T07:56:16Z"}
+// * Theming Engine 16.0.25
+// * data:{"sModified":"2025-08-27T14:01:23Z"}
 // */
 
 
-/******************* FILE /Base/baseLib/sap_belize_hcw/base.less (Version 11.31.1) *******************/
+/******************* FILE /Base/baseLib/sap_belize_hcw/base.less (Version 11.32.2-20250827135846+79bb30d311678435d61b21db26ecbe07d6b05079) *******************/
 
 
 // [Tags "SapInternal", "Base", "Dimension", "Protected"]
@@ -13392,14 +13424,14 @@ fill: @sapBaseColor !important;
 // [Tags "Base", "Content", "Color", "HighContrast"]
 // [Category "HighContrast"]
 // [Type "color"]
-@sapHC_HighlightBackground: #ec8b46;
+@sapHC_HighlightBackground: #e97624;
 
 // [Label "High-Contrast Highlight Alternative Background"]
 // [Description "The high-contrast reference background color used for selection."]
 // [Tags "Base", "Content", "Color", "HighContrast"]
 // [Category "HighContrast"]
 // [Type "color"]
-@sapHC_HighlightAltBackground: #8fb5ff;
+@sapHC_HighlightAltBackground: #5c93ff;
 
 // [Label "High-Contrast Reduced Background"]
 // [Description "The high-contrast reference background color used for read-only and disabled items."]
@@ -13427,7 +13459,7 @@ fill: @sapBaseColor !important;
 // [Tags "Base", "Content", "Color", "HighContrast"]
 // [Category "HighContrast"]
 // [Type "color"]
-@sapHC_EnhancedForeground: #006500;
+@sapHC_EnhancedForeground: #006800;
 
 // [Label "High-Contrast Reduced Foreground"]
 // [Description "The high-contrast reference foreground color for elements such as disabled text, icons, and borders."]
@@ -13724,7 +13756,8 @@ fill: @sapBaseColor !important;
 // [Protected "!true"]
 @sapContent_MarkerTextColor: @sapTextColor;
 
-// [#Tags "!Protected"]
+// [Tags "!Protected"]
+// [Protected "!true"]
 @sapContent_MeasureIndicatorColor: @sapField_BorderColor;
 
 // [Tags "!Protected"]
@@ -13873,7 +13906,7 @@ fill: @sapBaseColor !important;
 
 // [Tags "!Protected"]
 // [Protected "!true"]
-@sapContent_ContrastTextThreshold: 0.65;
+@sapContent_ContrastTextThreshold: 0.5;
 
 // [Tags "!Protected"]
 // [Protected "!true"]
@@ -14193,7 +14226,7 @@ fill: @sapBaseColor !important;
 
 // [Tags "!Protected"]
 // [Protected "!true"]
-@sapShell_TextColor: @sapTextColor;
+@sapShell_TextColor: contrast(@sapShellColor, @sapTextColor, @sapContent_ContrastTextColor, @sapContent_ContrastTextThreshold);
 
 // [Tags "!Protected"]
 // [Protected "!true"]
@@ -14697,7 +14730,7 @@ fill: @sapBaseColor !important;
 
 // [Tags "!Protected"]
 // [Protected "!true"]
-@sapButton_Hover_Background: @sapHighlightColor;
+@sapButton_Hover_Background: @sapHoverColor;
 
 // [Tags "!Protected"]
 // [Protected "!true"]
@@ -15443,7 +15476,7 @@ fill: @sapBaseColor !important;
 
 // [Tags "!Protected"]
 // [Protected "!true"]
-@sapField_ReadOnly_BorderColor: @sapHC_ReducedAltForeground;
+@sapField_ReadOnly_BorderColor: @sapField_BorderColor;
 
 // [Tags "!Protected"]
 // [Protected "!true"]
@@ -15607,7 +15640,7 @@ fill: @sapBaseColor !important;
 
 // [Tags "!Protected"]
 // [Protected "!true"]
-@sapGroup_TitleTextColor: contrast(@sapBackgroundColor, @sapTitleColor, @sapContent_ContrastTextColor, @sapContent_ContrastTextThreshold);
+@sapGroup_TitleTextColor: contrast(@sapGroup_TitleBackground, @sapTitleColor, @sapContent_ContrastTextColor, @sapContent_ContrastTextThreshold);
 
 // [Tags "!Protected"]
 // [Protected "!true"]
@@ -15707,7 +15740,7 @@ fill: @sapBaseColor !important;
 
 // [Tags "!Protected"]
 // [Protected "!true"]
-@sapList_GroupHeaderTextColor: @sapList_TextColor;
+@sapList_GroupHeaderTextColor: contrast(@sapList_GroupHeaderBackground, @sapTextColor, @sapContent_ContrastTextColor, @sapContent_ContrastTextThreshold);
 
 // [Tags "!Protected"]
 // [Protected "!true"]
@@ -16177,7 +16210,7 @@ fill: @sapBaseColor !important;
 
 // [Tags "!Protected"]
 // [Protected "!true"]
-@sapTile_Hover_Background: @sapHighlightColor;
+@sapTile_Hover_Background: @sapHoverColor;
 
 // [Tags "!Protected"]
 // [Protected "!true"]
@@ -16838,6 +16871,22 @@ fill: @sapBaseColor !important;
 // [Tags "!Protected"]
 // [Protected "!true"]
 @sapChart_Data_Active_Background: @sapActiveColor;
+
+// [Tags "!Protected"]
+// [Protected "!true"]
+@sapChart_IBCS_Actual: @sapChart_Sequence_Neutral_Minus5;
+
+// [Tags "!Protected"]
+// [Protected "!true"]
+@sapChart_IBCS_Previous: @sapChart_Sequence_Neutral;
+
+// [Tags "!Protected"]
+// [Protected "!true"]
+@sapChart_IBCS_Good: @sapChart_Sequence_Good;
+
+// [Tags "!Protected"]
+// [Protected "!true"]
+@sapChart_IBCS_Bad: @sapChart_Sequence_Bad;
 
 // [Tags "!Protected"]
 // [Protected "!true"]

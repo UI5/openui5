@@ -364,16 +364,6 @@ sap.ui.define([
 		}
 	};
 
-	VariantModel.prototype._getVariantTitleCount = function(sNewText, sVariantManagementReference) {
-		var oData = this.getData();
-		return oData[sVariantManagementReference].variants.reduce(function(iCount, oVariant) {
-			if (sNewText.toLowerCase() === oVariant.title.toLowerCase() && oVariant.visible) {
-				iCount++;
-			}
-			return iCount;
-		}, 0);
-	};
-
 	function createNewVariant(oSourceVariant, mPropertyBag) {
 		var mProperties = {
 			id: mPropertyBag.newVariantReference,
@@ -884,22 +874,6 @@ sap.ui.define([
 			sVariantManagementReference,
 			waitForInitialVariantChanges(mParameters)
 		);
-	};
-
-	/**
-	 * Checks if the passed changes exist as dirty changes.
-	 * @param {sap.ui.fl.apply._internal.flexObjects.FlexObject[]} aControlChanges - Array of changes to be checked
-	 * @returns {sap.ui.fl.apply._internal.flexObjects.FlexObject[]} Array of filtered changes
-	 * @private
-	 */
-	VariantModel.prototype._getDirtyChangesFromVariantChanges = function(aControlChanges) {
-		var aChangeFileNames = aControlChanges.map(function(oChange) {
-			return oChange.getId();
-		});
-
-		return FlexObjectState.getDirtyFlexObjects(this.sFlexReference).filter(function(oChange) {
-			return aChangeFileNames.includes(oChange.getId()) && !oChange.getSavedToVariant();
-		});
 	};
 
 	/**

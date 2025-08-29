@@ -536,6 +536,73 @@ sap.ui.define([
 		assert.strictEqual(oRating4.getValue(), 0, "On touch start/end at " + oEventTap.pageX + "px  the rating value is 0 on control " + oRating4);
 	});
 
+	QUnit.test("Second click on same star clears the rating indicator value", async function (assert) {
+		assert.expect(6);
+
+		var oRating = new RatingIndicator({
+			maxValue: 5,
+			value: 0
+		});
+
+		oRating.placeAt("content");
+		await nextUIUpdate();
+
+		var touches = {
+			0: {
+				pageX: 18,
+				length: 1
+			}
+		};
+
+		var oEventTouchStart = jQuery.Event("touchstart", {
+			target: oRating.$(),
+			touches: touches,
+			targetTouches: touches,
+			originalEvent: {
+				touches: touches
+			}
+		});
+
+		var oEventTouchEnd = jQuery.Event("touchend", {
+			targetTouches: touches,
+			changedTouches: touches
+		});
+
+		oRating.ontouchstart(oEventTouchStart);
+		oRating._ontouchend(oEventTouchEnd);
+		assert.strictEqual(oRating.getValue(), 1, "First click on first star sets value to 1");
+
+		oRating.ontouchstart(oEventTouchStart);
+		oRating._ontouchend(oEventTouchEnd);
+		assert.strictEqual(oRating.getValue(), 0, "Second click on first star clears value to 0");
+
+		touches[0].pageX = 66;
+		oEventTouchStart.targetTouches[0].pageX = 66;
+		oEventTouchEnd.changedTouches = touches;
+
+		oRating.ontouchstart(oEventTouchStart);
+		oRating._ontouchend(oEventTouchEnd);
+		assert.strictEqual(oRating.getValue(), 3, "First click on third star sets value to 3");
+
+		oRating.ontouchstart(oEventTouchStart);
+		oRating._ontouchend(oEventTouchEnd);
+		assert.strictEqual(oRating.getValue(), 0, "Second click on third star clears value to 0");
+
+		touches[0].pageX = 114;
+		oEventTouchStart.targetTouches[0].pageX = 114;
+		oEventTouchEnd.changedTouches = touches;
+
+		oRating.ontouchstart(oEventTouchStart);
+		oRating._ontouchend(oEventTouchEnd);
+		assert.strictEqual(oRating.getValue(), 5, "First click on fifth star sets value to 5");
+
+		oRating.ontouchstart(oEventTouchStart);
+		oRating._ontouchend(oEventTouchEnd);
+		assert.strictEqual(oRating.getValue(), 0, "Second click on fifth star clears value to 0");
+
+		oRating.destroy();
+	});
+
 	QUnit.test("Keyboard navigation events", function (assert) {
 		assert.expect(5);
 		// default rating with no properties

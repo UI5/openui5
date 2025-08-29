@@ -6,6 +6,7 @@ sap.ui.define([
 	"sap/m/Panel",
 	"sap/ui/dt/DesignTimeMetadata",
 	"sap/ui/fl/initial/api/Version",
+	"sap/ui/fl/variants/VariantManagement",
 	"sap/ui/fl/write/api/ChangesWriteAPI",
 	"sap/ui/fl/write/api/PersistenceWriteAPI",
 	"sap/ui/fl/Layer",
@@ -20,6 +21,7 @@ sap.ui.define([
 	Panel,
 	DesignTimeMetadata,
 	Version,
+	VariantManagement,
 	ChangesWriteAPI,
 	PersistenceWriteAPI,
 	Layer,
@@ -72,6 +74,7 @@ sap.ui.define([
 				id: "panel",
 				content: [this.oInput1, this.oInput2]
 			});
+			this.oVM = new VariantManagement("variantMgmtId1");
 
 			this.oInputDesignTimeMetadata = new DesignTimeMetadata({
 				data: {
@@ -95,6 +98,7 @@ sap.ui.define([
 			this.oPanel.destroy();
 			this.oInput1.destroy();
 			this.oInput2.destroy();
+			this.oVM.destroy();
 			this.oInputDesignTimeMetadata.destroy();
 			sandbox.restore();
 			await RtaQunitUtils.clear(oMockedAppComponent);
@@ -606,7 +610,8 @@ sap.ui.define([
 
 		QUnit.test("Execute 1 'Remove' command and 1 'ControlVariantSwitch' command and save commands", function(assert) {
 			const oSaveChangeSpy = sandbox.spy(PersistenceWriteAPI, "save");
-			return CommandFactory.getCommandFor(this.oInput1, "switch", {
+			sandbox.stub(this.oVM, "getCurrentVariantKey").returns("variantReference");
+			return CommandFactory.getCommandFor(this.oVM, "switch", {
 				targetVariantReference: "variantReference",
 				sourceVariantReference: "variantReference"
 			})
@@ -630,13 +635,14 @@ sap.ui.define([
 
 		QUnit.test("Execute 1 'Remove' command, 1 'ControlVariantSwitch' command, undo and call saveCommands", function(assert) {
 			const oSaveChangeSpy = sandbox.spy(PersistenceWriteAPI, "save");
+			sandbox.stub(this.oVM, "getCurrentVariantKey").returns("variantReference");
 			return CommandFactory.getCommandFor(this.oInput1, "Remove", {
 				removedElement: this.oInput1
 			}, this.oInputDesignTimeMetadata)
 
 			.then(this.oCommandStack.pushAndExecute.bind(this.oCommandStack))
 
-			.then(CommandFactory.getCommandFor.bind(null, this.oInput1, "switch", {
+			.then(CommandFactory.getCommandFor.bind(null, this.oVM, "switch", {
 				targetVariantReference: "variantReference",
 				sourceVariantReference: "variantReference"
 			}))

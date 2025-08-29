@@ -2,7 +2,6 @@
  * ${copyright}
  */
 sap.ui.define([
-	"sap/ui/core/util/reflection/JsControlTreeModifier",
 	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
 	"sap/ui/fl/apply/api/FlexRuntimeInfoAPI",
 	"sap/ui/fl/variants/VariantManager",
@@ -11,7 +10,6 @@ sap.ui.define([
 	"sap/ui/rta/command/BaseCommand",
 	"sap/ui/rta/library"
 ], function(
-	JsControlTreeModifier,
 	ControlVariantApplyAPI,
 	FlexRuntimeInfoAPI,
 	VariantManager,
@@ -34,7 +32,7 @@ sap.ui.define([
 	 * @since 1.52
 	 * @alias sap.ui.rta.command.ControlVariantConfigure
 	 */
-	var ControlVariantConfigure = BaseCommand.extend("sap.ui.rta.command.ControlVariantConfigure", {
+	const ControlVariantConfigure = BaseCommand.extend("sap.ui.rta.command.ControlVariantConfigure", {
 		metadata: {
 			library: "sap.ui.rta",
 			properties: {
@@ -74,25 +72,24 @@ sap.ui.define([
 	 * @returns {Promise} Returns resolve after execution
 	 */
 	ControlVariantConfigure.prototype.execute = async function() {
-		var oVariantManagementControl = this.getControl();
+		const oVariantManagementControl = this.getControl();
 		this.oAppComponent = FlUtils.getAppComponentForControl(oVariantManagementControl);
-		this.oModel = this.oAppComponent.getModel(ControlVariantApplyAPI.getVariantModelName());
-		this.sVariantManagementReference = JsControlTreeModifier.getSelector(oVariantManagementControl, this.oAppComponent).id;
+		this.sVariantManagementReference = oVariantManagementControl.getVariantManagementReference();
 
 		this._aPreparedChanges = [];
 		if (this.getChanges().some((oChange) => {
 			if (
 				oChange.visible === false
-				&& oChange.variantReference === this.oModel.getCurrentVariantReference(this.sVariantManagementReference)
+				&& oChange.variantReference === oVariantManagementControl.getCurrentVariantKey()
 			) {
 				this._sOldVReference = oChange.variantReference;
 				return true;
 			}
 			return false;
 		})) {
-			await this.oModel.updateCurrentVariant({
-				variantManagementReference: this.sVariantManagementReference,
-				newVariantReference: this.sVariantManagementReference
+			await ControlVariantApplyAPI.activateVariant({
+				element: oVariantManagementControl,
+				variantReference: this.sVariantManagementReference
 			});
 		}
 
@@ -124,12 +121,12 @@ sap.ui.define([
 		});
 		delete this._aDeletedFlexObjects;
 
-		this.getChanges().forEach(function(mChangeProperties, index) {
+		this.getChanges().forEach((mChangeProperties, index) => {
 			const mPropertyBag = {
 				appComponent: this.oAppComponent
 			};
 			Object.keys(mChangeProperties).forEach(function(sProperty) {
-				var sOriginalProperty = `original${sProperty.charAt(0).toUpperCase()}${sProperty.substr(1)}`;
+				const sOriginalProperty = `original${sProperty.charAt(0).toUpperCase()}${sProperty.substr(1)}`;
 				if (sProperty === "visible") {
 					mPropertyBag[sProperty] = true; /* visibility of the variant always set back to true on undo */
 				} else if (mChangeProperties[sOriginalProperty]) {
@@ -139,18 +136,17 @@ sap.ui.define([
 					mPropertyBag[sProperty] = mChangeProperties[sProperty];
 				}
 			});
-			var oChange = this._aPreparedChanges[index];
+			const oChange = this._aPreparedChanges[index];
 			VariantManager.deleteVariantChange(this.sVariantManagementReference, mPropertyBag, oChange);
-		}.bind(this));
+		});
 
 		this._aPreparedChanges = null;
 		if (this._sOldVReference) {
-			await this.oModel.updateCurrentVariant({
-				variantManagementReference: this.sVariantManagementReference,
-				newVariantReference: this._sOldVReference
-			}).then(() => {
-				delete this._sOldVReference;
+			await ControlVariantApplyAPI.activateVariant({
+				element: this.getControl(),
+				variantReference: this._sOldVReference
 			});
+			delete this._sOldVReference;
 		}
 	};
 

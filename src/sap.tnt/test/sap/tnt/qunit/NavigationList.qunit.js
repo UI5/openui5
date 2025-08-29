@@ -1518,6 +1518,7 @@ sap.ui.define([
 
 		await nextUIUpdate(this.clock);
 		menuDomRef = document.querySelector(".sapMMenuList");
+		menu = Element.closestTo(menuDomRef);
 
 		var bIsExternalLinkRendered = menuDomRef.children[4].classList.contains("sapTntNavMenuItemExternalLink");
 
@@ -1525,8 +1526,6 @@ sap.ui.define([
 		assert.ok(bIsExternalLinkRendered, "External link icon is rendered in the overflow");
 		assert.strictEqual(menuDomRef.children[1].title, "Root 2", "The default tooltip of the second item in the overflow menu is correct");
 		assert.strictEqual(menuDomRef.children[2].title, "Root 3 - custom tooltip", "The custom tooltip of the third item in the overflow menu is correct");
-
-		menu = Element.closestTo(menuDomRef);
 
 		const aExpectedMenuItems = items.reduce((aResult, oItem) => {
 			const oReturned = oItem.isA("sap.tnt.NavigationListGroup") ? [...oItem.getItems()] : oItem;
@@ -1609,14 +1608,14 @@ sap.ui.define([
 		});
 		await nextUIUpdate(this.clock);
 
-		assert.ok(oAttachItemPressSpy.called, "press event is fired on the parent item in the overflow");
-		const eventParams = oAttachItemPressSpy.args[0][0];
-		assert.ok(eventParams.ctrlKey, "ctrlKey parameter is true");
-		assert.ok(eventParams.shiftKey, "shiftKey parameter is true");
-		assert.ok(eventParams.altKey, "altKey parameter is true");
-		assert.notOk(eventParams.metaKey, "metaKey parameter is false");
+		assert.ok(oAttachItemPressSpy.notCalled, "press event is not fired on the parent item in the overflow");
+		assert.ok(oAttachItemPressedSpy.notCalled, "itemPress event is not fired if the parent item in the overflow is clicked");
 
-		assert.strictEqual(oAttachItemPressedSpy.callCount, 1, "itemPress event is fired if the parent item in the overflow is clicked");
+		menuDomRef = document.querySelector(".sapMMenuList");
+		menu = Element.closestTo(menuDomRef);
+
+		menu.getItems()[2]._closeSubmenu();
+		menu.getParent().close();
 
 		this.navigationList.getDomRef().style.height = `${iInitialHeight}px`;
 		this.navigationList._updateOverflowItems();
@@ -1634,15 +1633,19 @@ sap.ui.define([
 		assert.ok(menu.getItems()[2].getDomRef().querySelector(".sapMMenuItemSubMenu"), "correct class is added to the expand icon in the menu item");
 		assert.notOk(menu.getItems()[7].getDomRef().querySelector(".sapMMenuItemSubMenu"), "correct class is added to the expand icon in the menu item");
 
-		menu.getItems()[2]._openSubmenu();
+		menu.getItems()[3]._openSubmenu();
 
-		assert.strictEqual(document.querySelector(".sapMSubmenu").getElementsByTagName("li")[3].title, "Child 3", "The correct default tooltip is set");
-		assert.strictEqual(document.querySelector(".sapMSubmenu").getElementsByTagName("li")[2].title, "Child 2 - custom tooltip", "The correct default tooltip is set");
-		QUnitUtils.triggerEvent("click",  document.querySelector(".sapMSubmenu").getElementsByTagName("li")[3]);
+		const oSubMenuPopoverDomRef = menu.getItems()[3]._getPopover().getDomRef();
+
+		assert.strictEqual(oSubMenuPopoverDomRef.getElementsByTagName("li")[3].title, "Child 3", "The correct default tooltip is set");
+		assert.strictEqual(oSubMenuPopoverDomRef.getElementsByTagName("li")[2].title, "Child 2 - custom tooltip", "The correct default tooltip is set");
+		QUnitUtils.triggerEvent("click",  menu.getItems()[3]._getPopover().getDomRef().getElementsByTagName("li")[3]);
 		assert.notEqual(this.navigationList.getSelectedItem().sId, initiallySelectedImId, "The sub item is selected");
 
+		await nextUIUpdate(this.clock);
+
 		assert.ok(oAttachSubItemPressSpy.called, "press event is fired on the sub item in the overflow menu");
-		assert.strictEqual(oAttachItemPressedSpy.callCount, 2, "itemPress event is fired if the sub item in the overflow is clicked");
+		assert.ok(oAttachItemPressedSpy.called, "itemPress event is fired if the sub item in the overflow is clicked");
 	});
 
 	QUnit.test("Click on external link item in the overflow", async function (assert) {

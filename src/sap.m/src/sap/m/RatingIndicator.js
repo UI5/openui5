@@ -772,7 +772,7 @@ sap.ui.define([
 			var fValue = this._calculateSelectedValue(oEvent);
 
 			// When the value is 1 and the first star is pressed we should toggle to 0
-			if (this.getValue() === 1 && fValue === 1) {
+			if (this.getValue() === fValue) {
 				fValue = 0;
 			}
 

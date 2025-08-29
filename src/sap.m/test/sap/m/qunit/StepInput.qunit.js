@@ -1006,7 +1006,7 @@ sap.ui.define([
 
 		// Act
 		this.stepInput._getInput().$("inner").val("");
-		this.stepInput._inputLiveChangeHandler.call(this.stepInput._getInput(), oEvent);
+		this.stepInput._inputLiveChangeHandler(oEvent);
 
 		// Assert
 		assert.strictEqual(oUpdateValueSpy.callCount, 0, "The value is not updated as only a separator is added");
@@ -2579,6 +2579,47 @@ sap.ui.define([
 		oSpyCalculateNewValue.restore();
 	});
 
+	QUnit.test("_inputLiveChangeHandler - invalid Value Reflects in Input Field but Doesn't Persist in StepInput", function (assert) {
+		//Prepare
+		const oStepInput = new StepInput({
+			value: 100,
+			step: 10,
+			min: 50,
+			max: 150,
+			validationMode: "LiveChange",
+			validationError: function(oEvent) {
+				const oStepInput = oEvent.getSource();
+				const aViolatedConstraints = oEvent.getParameter("exception").violatedConstraints;
+
+				if (aViolatedConstraints.includes('minimum')) {
+					const sMinErrorText = "The value is lower than the allowed min";
+					oStepInput.setValueStateText(sMinErrorText);
+				} else {
+					const sMaxErrorText = "The value is higher that the allowed max";
+					oStepInput.setValueStateText(sMaxErrorText);
+				}
+			}
+		}).placeAt('content');
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		//Assert
+		assert.strictEqual(oStepInput._getInput().getValue(), "100", "Initial value correct");
+		assert.strictEqual(oStepInput.getValue(), 100, "Initial value correct");
+
+		//Act
+		qutils.triggerCharacterInput(oStepInput._getInput().getFocusDomRef(), "1");
+		qutils.triggerEvent("input", oStepInput._getInput().getFocusDomRef());
+		this.clock.tick(1000);
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		//Assert
+		assert.strictEqual(oStepInput.getValue(), 100, "Wrong value not applied to 'value' property");
+		assert.strictEqual(oStepInput._getInput().getValue(), "1001", "Value after adding '1' correct change inner input value");
+
+		//Cleanup
+		oStepInput.destroy();
+	});
+
 	QUnit.test("StepMode: '-', arrow Down, Page Down or Shift + Down calls _calculateNewValue", function (assert) {
 		//Prepare
 		this.stepInput.setStepMode(StepMode.Multiple);
@@ -2671,7 +2712,7 @@ sap.ui.define([
 
 		//act
 		this.stepInput.setDisplayValuePrecision(3);
-		this.stepInput._inputLiveChangeHandler.call(this.stepInput._getInput(), oEvent);
+		this.stepInput._inputLiveChangeHandler(oEvent);
 
 		//assert
 		assert.equal(oSpy.callCount, 2,

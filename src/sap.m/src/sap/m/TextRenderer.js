@@ -121,6 +121,7 @@ sap.ui.define([
 			oRm.openStart("span", oText.getId() + "-inner");
 			oRm.class("sapMTextMaxLine");
 			oRm.class("sapMTextLineClamp");
+			oRm.class("sapUiSelectable");
 			oRm.style("-webkit-line-clamp", oText.getMaxLines());
 			oRm.openEnd();
 			this.renderText(oRm, oText);

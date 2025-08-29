@@ -15,6 +15,7 @@ sap.ui.define([
 	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
 	"sap/ui/fl/apply/_internal/flexState/FlexObjectState",
 	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
+	"sap/ui/fl/apply/api/FlexRuntimeInfoAPI",
 	"sap/ui/fl/write/_internal/controlVariants/ControlVariantWriteUtils",
 	"sap/ui/fl/write/_internal/flexState/changes/UIChangeManager",
 	"sap/ui/fl/write/_internal/flexState/FlexObjectManager",
@@ -34,6 +35,7 @@ sap.ui.define([
 	VariantManagementState,
 	FlexObjectState,
 	ControlVariantApplyAPI,
+	FlexRuntimeInfoAPI,
 	ControlVariantWriteUtils,
 	UIChangeManager,
 	FlexObjectManager,
@@ -59,31 +61,40 @@ sap.ui.define([
 		return oAppComponent.getModel(ControlVariantApplyAPI.getVariantModelName());
 	}
 
+	function getDirtyChangesFromVariantChanges(aControlChanges, sFlexReference) {
+		const aChangeFileNames = aControlChanges.map((oChange) => oChange.getId());
+
+		return FlexObjectState.getDirtyFlexObjects(sFlexReference).filter(function(oChange) {
+			return aChangeFileNames.includes(oChange.getId()) && !oChange.getSavedToVariant();
+		});
+	}
+
 	/**
 	 * Removes passed control changes which are in DIRTY state from the variant state and flex controller.
 	 *
 	 * @param {object} mPropertyBag - Object with properties
 	 * @param {sap.ui.fl.apply._internal.flexObjects.FlexObject[]} mPropertyBag.changes - Array of control changes
+	 * @param {string} mPropertyBag.reference - Flex reference of the app
 	 * @param {string} mPropertyBag.vmReference - Variant management reference
 	 * @param {string} mPropertyBag.vReference - Variant reference to remove dirty changes from
-	 * @param {sap.ui.fl.variants.VariantModel} mPropertyBag.model - Variant model instance
+	 * @param {sap.ui.core.Component} mPropertyBag.appComponent - Model's app component
 	 * @param {boolean} [mPropertyBag.revert] - Revert the given changes
 	 *
 	 * @returns {Promise<undefined>} Resolves when changes have been erased
 	 */
 	async function eraseDirtyChanges(mPropertyBag) {
-		var aVariantDirtyChanges = mPropertyBag.model._getDirtyChangesFromVariantChanges(mPropertyBag.changes);
+		var aVariantDirtyChanges = getDirtyChangesFromVariantChanges(mPropertyBag.changes, mPropertyBag.reference);
 		aVariantDirtyChanges = aVariantDirtyChanges.reverse();
 
 		if (mPropertyBag.revert) {
 			await Reverter.revertMultipleChanges(aVariantDirtyChanges, {
-				appComponent: mPropertyBag.model.oAppComponent,
+				appComponent: mPropertyBag.appComponent,
 				modifier: JsControlTreeModifier,
-				reference: mPropertyBag.model.sFlexReference
+				reference: mPropertyBag.reference
 			});
 		}
 		FlexObjectManager.deleteFlexObjects({
-			reference: mPropertyBag.model.sFlexReference,
+			reference: mPropertyBag.reference,
 			flexObjects: aVariantDirtyChanges
 		});
 	}
@@ -177,10 +188,11 @@ sap.ui.define([
 				});
 				await eraseDirtyChanges({
 					changes: aControlChanges,
+					reference: oModel.sFlexReference,
 					vmReference: sVMReference,
 					vReference: sSourceVReference,
-					revert: !bVariantSwitch,
-					model: oModel
+					appComponent: oModel.oAppComponent,
+					revert: !bVariantSwitch
 				});
 			}
 			// the variant switch already calls the listeners
@@ -255,6 +267,7 @@ sap.ui.define([
 
 	VariantManager.handleSaveEvent = async function(oVariantManagementControl, mParameters, oVariantModel) {
 		var oAppComponent = Utils.getAppComponentForControl(oVariantManagementControl);
+		oVariantModel ||= getVariantModel(oVariantManagementControl);
 		var sVMReference = oVariantModel.getLocalId(oVariantManagementControl.getId(), oAppComponent);
 		var aNewVariantDirtyChanges;
 
@@ -269,7 +282,7 @@ sap.ui.define([
 			if (mParameters.overwrite) {
 				// handle triggered "Save" button
 				// Includes special handling for PUBLIC variant which requires changing all the dirty changes to PUBLIC layer before saving
-				aNewVariantDirtyChanges = oVariantModel._getDirtyChangesFromVariantChanges(aSourceVariantChanges);
+				aNewVariantDirtyChanges = getDirtyChangesFromVariantChanges(aSourceVariantChanges, oVariantModel.sFlexReference);
 				if (oVariantModel.getVariant(sSourceVariantReference, sVariantManagementReference).layer === Layer.PUBLIC) {
 					aNewVariantDirtyChanges.forEach((oChange) => oChange.setLayer(Layer.PUBLIC));
 				}
@@ -326,9 +339,10 @@ sap.ui.define([
 			// unsaved changes on the source variant are removed before copied variant changes are saved
 			await eraseDirtyChanges({
 				changes: aSourceVariantChanges,
+				reference: oVariantModel.sFlexReference,
 				vmReference: sVariantManagementReference,
 				vReference: sSourceVariantReference,
-				model: oVariantModel
+				appComponent: oAppComponent
 			});
 			return handleDirtyChanges(
 				aNewVariantDirtyChanges,
@@ -380,20 +394,21 @@ sap.ui.define([
 	 * @returns {Promise<sap.ui.fl.apply._internal.flexObjects.FlexObject[]>} Resolves with the removed dirty changes
 	 */
 	VariantManager.eraseDirtyChangesOnVariant = async function(sVariantManagementReference, sVariantReference, oControl) {
-		const oVariantModel = getVariantModel(oControl);
+		const sFlexReference = FlexRuntimeInfoAPI.getFlexReference({ element: oControl });
 		var aSourceVariantChanges = VariantManagementState.getControlChangesForVariant({
-			reference: oVariantModel.sFlexReference,
+			reference: sFlexReference,
 			vmReference: sVariantManagementReference,
 			vReference: sVariantReference
 		});
 
-		var aSourceVariantDirtyChanges = oVariantModel._getDirtyChangesFromVariantChanges(aSourceVariantChanges);
+		var aSourceVariantDirtyChanges = getDirtyChangesFromVariantChanges(aSourceVariantChanges, sFlexReference);
 
 		await eraseDirtyChanges({
 			changes: aSourceVariantChanges,
+			reference: sFlexReference,
 			vmReference: sVariantManagementReference,
 			vReference: sVariantReference,
-			model: oVariantModel,
+			appComponent: Utils.getAppComponentForControl(oControl),
 			revert: true
 		});
 		return aSourceVariantDirtyChanges;
@@ -602,6 +617,41 @@ sap.ui.define([
 			}, oVariantModel.fnManageClickRta, oVariantModel);
 			oVariantManagementControl.openManagementDialog(true, sClass, oContextSharingComponentPromise);
 		});
+	};
+
+	/**
+	 * Returns the dirty changes from the given changes.
+	 * @param {sap.ui.fl.apply._internal.flexObjects.FlexObject[]} aControlChanges - Array of changes to be checked
+	 * @param {string} sFlexReference - Flex reference of the app
+	 * @returns {sap.ui.fl.apply._internal.flexObjects.FlexObject[]} Array of filtered changes
+	 * @private
+	 */
+	VariantManager.getDirtyChangesFromVariantChanges = function(aControlChanges, sFlexReference) {
+		return getDirtyChangesFromVariantChanges(aControlChanges, sFlexReference);
+	};
+
+	/**
+	 * Invalidates the variant management map for the given flex reference.
+	 * This is used to ensure that the variant management map is updated when changes are made.
+	 * @param {string} sFlexReference - Flex reference of the app
+	 */
+	VariantManager.updateVariantManagementMap = function(sFlexReference) {
+		VariantManagementState.getVariantManagementMap().checkUpdate({ reference: sFlexReference });
+	};
+
+	/**
+	 * Returns all control changes for the given variant.
+	 * @param {string} sFlexReference - Flex reference of the app
+	 * @param {*} sVMReference - Variant Management reference
+	 * @param {*} sVReference - Variant reference
+	 * @returns {sap.ui.fl.apply._internal.flexObjects.FlexObject[]} Array of control changes for the given variant
+	 */
+	VariantManager.getControlChangesForVariant = function(sFlexReference, sVMReference, sVReference) {
+		return VariantManagementState.getVariant({
+			reference: sFlexReference,
+			vmReference: sVMReference,
+			vReference: sVReference
+		}).controlChanges;
 	};
 
 	return VariantManager;

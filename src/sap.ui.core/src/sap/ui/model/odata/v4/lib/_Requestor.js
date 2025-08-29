@@ -1598,10 +1598,11 @@ sap.ui.define([
 
 	/**
 	 * Returns a promise that will be resolved once the CSRF token has been refreshed, or rejected
-	 * if that fails. Makes sure that only one HEAD request is underway at any given time and
-	 * shares the promise accordingly. If the HEAD request fails with a 503 HTTP status code and
-	 * a "Retry-After" response header, the promise is also resolved because the next request (in
-	 * {@link #sendRequest}) will also fail with 503 and is handled there.
+	 * (unless for an initial call without <code>sOldSecurityToken</code>) if that fails. Makes sure
+	 * that only one HEAD request is underway at any given time and shares the promise accordingly.
+	 * If the HEAD request fails with a 503 HTTP status code and a "Retry-After" response header,
+	 * the promise is also resolved because the next request (in {@link #sendRequest}) will also
+	 * fail with 503 and is handled there.
 	 *
 	 * @param {string} [sOldSecurityToken]
 	 *   Security token that caused a 403. A new token is only fetched if the old one is still
@@ -1644,7 +1645,8 @@ sap.ui.define([
 						fnResolve();
 					}, function (jqXHR) {
 						that.oSecurityTokenPromise = null;
-						if (jqXHR.status === 503 && jqXHR.getResponseHeader("Retry-After")) {
+						if (!sOldSecurityToken
+								|| jqXHR.status === 503 && jqXHR.getResponseHeader("Retry-After")) {
 							fnResolve();
 						} else {
 							fnReject(

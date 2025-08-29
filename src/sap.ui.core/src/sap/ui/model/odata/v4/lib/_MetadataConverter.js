@@ -166,6 +166,8 @@ sap.ui.define([
 
 		switch (sType) {
 			case "AnnotationPath":
+			case "AnyPropertyPath":
+			case "ModelElementPath":
 			case "NavigationPropertyPath":
 			case "Path":
 			case "PropertyPath":
@@ -814,6 +816,7 @@ sap.ui.define([
 		// All Annotations elements that don't have expressions as child (leaf, non-recursive)
 		oAnnotationLeafConfig = {
 			AnnotationPath : {__postProcessor : $$.postProcessLeaf},
+			AnyPropertyPath : {__postProcessor : $$.postProcessLeaf},
 			Binary : {__postProcessor : $$.postProcessLeaf},
 			Bool : {__postProcessor : $$.postProcessLeaf},
 			Date : {__postProcessor : $$.postProcessLeaf},
@@ -825,6 +828,7 @@ sap.ui.define([
 			Guid : {__postProcessor : $$.postProcessLeaf},
 			Int : {__postProcessor : $$.postProcessLeaf},
 			LabeledElementReference : {__postProcessor : $$.postProcessLabeledElementReference},
+			ModelElementPath : {__postProcessor : $$.postProcessLeaf},
 			NavigationPropertyPath : {__postProcessor : $$.postProcessLeaf},
 			Path : {__postProcessor : $$.postProcessLeaf},
 			PropertyPath : {__postProcessor : $$.postProcessLeaf},

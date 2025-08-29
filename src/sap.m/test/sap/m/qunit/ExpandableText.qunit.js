@@ -64,6 +64,7 @@ sap.ui.define([
 		assert.strictEqual(this.oExpandableText.$().find(".sapMExTextEllipsis").text(), "... ", "Ellipsis are rendered");
 		assert.strictEqual(this.oExpandableText.$("showMoreLink").text(), TEXT_SHOW_MORE, "Show more is rendered");
 		assert.notOk(this.oExpandableText.$().find(".sapUiInvisibleText").text(), "aria-labelledby control text is empty");
+		assert.ok(this.oExpandableText.$().find(".sapMExTextString").hasClass("sapUiSelectable"), "class sapUiSelectable is present, which makes the ExpandableText selectable on mobile devices");
 	});
 
 	QUnit.module("API", {
