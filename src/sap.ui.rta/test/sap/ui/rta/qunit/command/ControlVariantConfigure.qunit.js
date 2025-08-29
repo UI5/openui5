@@ -2,6 +2,7 @@
 
 sap.ui.define([
 	"sap/base/util/restricted/_omit",
+	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
 	"sap/ui/fl/variants/VariantManagement",
 	"sap/ui/fl/variants/VariantManager",
 	"sap/ui/fl/write/api/ChangesWriteAPI",
@@ -13,6 +14,7 @@ sap.ui.define([
 	"test-resources/sap/ui/rta/qunit/RtaQunitUtils"
 ], function(
 	_omit,
+	ControlVariantApplyAPI,
 	VariantManagement,
 	VariantManager,
 	ChangesWriteAPI,
@@ -29,38 +31,12 @@ sap.ui.define([
 	const oMockedAppComponent = RtaQunitUtils.createAndStubAppComponent(sinon, "Dummy");
 
 	QUnit.module("ControlVariantConfigure, when calling command factory for configure and undo", {
-		async beforeEach() {
-			this.oModel = await FlexTestAPI.createVariantModel({
-				data: {
-					variantMgmtId1: {
-						currentVariant: "variant1",
-						defaultVariant: "variantMgmtId1",
-						variants: [
-							{
-								key: "variant0",
-								layer: Layer.CUSTOMER,
-								title: "1"
-							},
-							{
-								key: "variantMgmtId1",
-								layer: Layer.CUSTOMER,
-								title: "2"
-							},
-							{
-								key: "variant1",
-								layer: Layer.CUSTOMER,
-								title: "3"
-							}
-						]
-					}
-				},
-				appComponent: oMockedAppComponent
-			});
+		beforeEach() {
 			this.oVariantManagement = new VariantManagement("variantMgmtId1");
-			sandbox.stub(oMockedAppComponent, "getModel").returns(this.oModel);
+			sandbox.stub(this.oVariantManagement, "getCurrentVariantKey").returns("variant1");
 			this.oAddVariantChangeStub = sandbox.stub(VariantManager, "addVariantChange").returnsArg(1);
 			this.oDeleteVariantChangeStub = sandbox.stub(VariantManager, "deleteVariantChange");
-			this.oSwitchStub = sandbox.stub(this.oModel, "updateCurrentVariant").resolves();
+			this.oActivateVariantStub = sandbox.stub(ControlVariantApplyAPI, "activateVariant").resolves();
 		},
 		afterEach() {
 			this.oVariantManagement.destroy();
@@ -155,7 +131,7 @@ sap.ui.define([
 			aPreparedChanges.forEach(function(oChange) {
 				assert.equal(oChange.generator, rtaLibrary.GENERATOR_NAME, "the generator was correctly set");
 			});
-			assert.strictEqual(this.oSwitchStub.callCount, 0, "the variant was not switched");
+			assert.strictEqual(this.oActivateVariantStub.callCount, 0, "the variant was not switched");
 			assert.deepEqual(
 				oConfigureCommand._aDeletedFlexObjects,
 				aDummyDeletedFlexObjects,
@@ -189,7 +165,7 @@ sap.ui.define([
 				"the change was correctly removed"
 			);
 			assert.notOk(oConfigureCommand.getPreparedChange(), "the prepared changes got removed");
-			assert.strictEqual(this.oSwitchStub.callCount, 0, "the variant was not switched");
+			assert.strictEqual(this.oActivateVariantStub.callCount, 0, "the variant was not switched");
 		});
 
 		QUnit.test("with deleting the current variant", async function(assert) {
@@ -211,19 +187,19 @@ sap.ui.define([
 			await oConfigureCommand.execute();
 
 			assert.strictEqual(this.oAddVariantChangeStub.callCount, 1, "1 change got added");
-			assert.strictEqual(this.oSwitchStub.callCount, 1, "the variant was switched");
-			assert.deepEqual(this.oSwitchStub.lastCall.args[0], {
-				variantManagementReference: "variantMgmtId1",
-				newVariantReference: "variantMgmtId1"
+			assert.strictEqual(this.oActivateVariantStub.callCount, 1, "the variant was switched");
+			assert.deepEqual(this.oActivateVariantStub.lastCall.args[0], {
+				element: this.oVariantManagement,
+				variantReference: "variantMgmtId1"
 			}, "the correct variant was switched to");
 
 			await oConfigureCommand.undo();
 
 			assert.strictEqual(this.oDeleteVariantChangeStub.callCount, 1, "all changes got removed");
-			assert.strictEqual(this.oSwitchStub.callCount, 2, "the variant was switched again");
-			assert.deepEqual(this.oSwitchStub.lastCall.args[0], {
-				variantManagementReference: "variantMgmtId1",
-				newVariantReference: "variant1"
+			assert.strictEqual(this.oActivateVariantStub.callCount, 2, "the variant was switched again");
+			assert.deepEqual(this.oActivateVariantStub.lastCall.args[0], {
+				element: this.oVariantManagement,
+				variantReference: "variant1"
 			}, "the correct variant was switched to");
 		});
 	});

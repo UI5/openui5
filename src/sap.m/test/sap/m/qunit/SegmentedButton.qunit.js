@@ -988,7 +988,7 @@ sap.ui.define([
 
 	QUnit.module("Helper functions");
 
-	QUnit.test("_getButtonWidth private method", function (assert) {
+	QUnit.test("_getButtonWidth private method", async function (assert) {
 		// Arrange
 		var oSB = new SegmentedButton(),
 			aButtons;
@@ -1041,6 +1041,20 @@ sap.ui.define([
 		];
 		assert.strictEqual(oSB._getButtonWidth(aButtons), "0%", "Resulting css width should be 0% because the other buttons" +
 				" are occupying all the available width");
+
+		aButtons = [
+			new Button(),
+			new Button({width: "5rem"}), // this button width is set in rem units
+			new Button({width: "80px"})
+		];
+		// in this test the buttons should be rendered as the width of some of them is set in units
+		// different than % or px, so getComputedStyle() should be used to determine their width(s)
+		aButtons.forEach(function (oButton) {
+			oButton.placeAt("qunit-fixture");
+		});
+		await nextUIUpdate(this.clock);
+
+		assert.strictEqual(oSB._getButtonWidth(aButtons), "calc(100% - 160px)", "Resulting css width should be calc(100% - 160px)");
 
 		// Cleanup
 		oSB.destroy();

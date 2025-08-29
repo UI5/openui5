@@ -581,14 +581,14 @@ sap.ui.define([
 	 * @param {object} mPropertyBag - Object with the necessary properties
 	 * @param {string} mPropertyBag.vmReference - Variant management reference
 	 * @param {string} mPropertyBag.reference - Component reference
-	 * @returns {string} Reference of the current variant
+	 * @returns {string | undefined} Reference of the current variant or undefined if VM does not exist
 	 */
 	VariantManagementState.getCurrentVariantReference = function(mPropertyBag) {
 		var oVariantManagementSection = oVariantManagementsDataSelector.get({
 			variantManagementReference: mPropertyBag.vmReference,
 			reference: mPropertyBag.reference
 		});
-		return oVariantManagementSection.currentVariant;
+		return oVariantManagementSection?.currentVariant;
 	};
 
 	/**
@@ -856,5 +856,12 @@ sap.ui.define([
 		return Promise.all(Object.values(mVariantSwitchPromises[sReference] || {}));
 	};
 
+	VariantManagementState.getVariantsForVariantManagement = function(mPropertyBag) {
+		const oVariantManagement = oVariantManagementsDataSelector.get({
+			variantManagementReference: mPropertyBag.vmReference,
+			reference: mPropertyBag.reference
+		});
+		return oVariantManagement?.variants || [];
+	};
 	return VariantManagementState;
 });

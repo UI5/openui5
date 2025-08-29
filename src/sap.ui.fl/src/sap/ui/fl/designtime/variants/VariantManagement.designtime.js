@@ -33,6 +33,7 @@ sap.ui.define([
 			oModel.checkUpdate(true);
 		}
 	}
+
 	return {
 		annotations: {},
 		properties: {
@@ -83,17 +84,18 @@ sap.ui.define([
 		},
 		actions: {
 			controlVariant(oVariantManagement) {
-				var oAppComponent = flUtils.getAppComponentForControl(oVariantManagement);
-				var sControlId = oVariantManagement.getId();
-				var oModel = oAppComponent.getModel(ControlVariantApplyAPI.getVariantModelName());
-				var sVariantManagementReference = oAppComponent.getLocalId(sControlId) || sControlId;
 				return {
 					validators: [
 						"noEmptyText",
 						{
 							validatorFunction(sNewText) {
-								var iDuplicateCount = oModel._getVariantTitleCount(sNewText, sVariantManagementReference) || 0;
-								return iDuplicateCount === 0;
+								// Avoid duplicate titles
+								return !oVariantManagement.getVariants().some(function(oVariant) {
+									if (oVariant.getKey() === oVariantManagement.getCurrentVariantKey()) {
+										return false;
+									}
+									return sNewText.toLowerCase() === oVariant.getTitle().toLowerCase() && oVariant.getVisible();
+								});
 							},
 							errorMessage: Lib.getResourceBundleFor("sap.m").getText("VARIANT_MANAGEMENT_ERROR_DUPLICATE")
 						}

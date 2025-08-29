@@ -50,7 +50,6 @@ LabelRenderer.render = function(rm, oLabel){
 
 	// styles
 	rm.class("sapMLabel");
-	rm.class("sapUiSelectable");
 
 	// label wrapping
 	if (oLabel.isWrapping()) {
@@ -139,6 +138,7 @@ LabelRenderer.render = function(rm, oLabel){
 
 	// write the label text
 	rm.openStart("bdi", oLabel.getId() + "-bdi");
+	rm.class("sapUiSelectable");
 
 	// text direction
 	if (sTextDir !== TextDirection.Inherit){

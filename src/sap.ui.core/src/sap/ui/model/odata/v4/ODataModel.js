@@ -2230,8 +2230,7 @@ sap.ui.define([
 	 * @private
 	 */
 	ODataModel.prototype.initializeSecurityToken = function () {
-		// a failure is not logged, only the failed request for the service document appears
-		this.oRequestor.refreshSecurityToken().catch(function () {});
+		this.oRequestor.refreshSecurityToken(); // never rejects
 	};
 
 	/**

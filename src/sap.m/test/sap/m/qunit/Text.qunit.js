@@ -300,9 +300,11 @@ sap.ui.define([
 
 	QUnit.test("wrapping & no-wrapping", function(assert) {
 		assert.strictEqual(t1.$().css("white-space"), "pre-line", "Text has correct white-space style for wrapping");
+		assert.ok(t1.$().hasClass("sapUiSelectable"), "The Text element contains the 'sapUiSelectable' class, enabling text selection on mobile devices.");
 		assert.strictEqual(t4.$().hasClass("sapMTextNoWrap"), true, "Text has correct class for non-wrapping");
 		assert.strictEqual(t4.$().css("white-space"), "nowrap", "Text has correct white-space style for non-wrapping");
 		assert.strictEqual(t4.$().css("word-wrap"), "normal", "Text has correct word-wrap style for non-wrapping");
+		assert.ok(t4.$().hasClass("sapUiSelectable"), "The Text element contains the 'sapUiSelectable' class, enabling text selection on mobile devices.");
 	});
 
 	QUnit.test("hyphenation", function(assert) {
@@ -314,6 +316,7 @@ sap.ui.define([
 		assert.strictEqual(t5.$("inner").hasClass("sapMTextLineClamp"), true, "Text has correct class for native MaxLine");
 		assert.equal(t5.$("inner").css("-webkit-line-clamp"), t5.getMaxLines(), "Text has correct line clamp value in CSS");
 		assert.strictEqual(t5.hasOwnProperty("_sResizeListenerId"), false, "Text does not have resize handler");
+		assert.ok(t5.$("inner").hasClass("sapUiSelectable"), "The Text element contains the 'sapUiSelectable' class, enabling text selection on mobile devices.");
 	});
 
 	QUnit.test("When width is not set max-width should apply to control", async function(assert) {

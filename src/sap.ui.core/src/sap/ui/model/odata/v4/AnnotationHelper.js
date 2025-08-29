@@ -12,7 +12,7 @@ sap.ui.define([
 		rCount = /\/\$count$/,
 		rPaths = /\$(?:(?:Annotation)|(?:(?:Navigation)?Property))?Path/,
 		rSplitPathSegment = /^(.+?\/(\$(?:Annotation)?Path))(\/?)(.*)$/,
-		rUnsupportedPathSegments = /\$(?:Navigation)?PropertyPath/,
+		rUnsupportedPathSegments = /\$(?:(?:Any|Navigation)?Property|ModelElement)Path/,
 		/**
 		 * @classdesc
 		 * A collection of methods which help to consume <a href=
@@ -253,9 +253,9 @@ sap.ui.define([
 			 *   resolving with that string, for example if not all type information is already
 			 *   available
 			 * @throws {Error}
-			 *   If <code>oDetails.context.getPath()</code> contains a "$PropertyPath" or a
-			 *   "$NavigationPropertyPath" segment, or if it contains more than one
-			 *   "$AnnotationPath" or "$Path" segment
+			 *   If <code>oDetails.context.getPath()</code> contains a "$AnyPropertyPath",
+			 *   "$ModelElementPath", "$NavigationPropertyPath", or a "$PropertyPath" segment, or if
+			 *   it contains more than one "$AnnotationPath" or "$Path" segment
 			 *
 			 * @public
 			 * @see sap.ui.model.odata.v4.AnnotationHelper.resolve$Path

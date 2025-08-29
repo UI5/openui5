@@ -95,7 +95,7 @@ sap.ui.define([
 	 * @private
 	 */
 	NavigationListMenuItem.prototype.onclick = function (oEvent) {
-		if (!this.getEnabled()) {
+		if (!this.getEnabled() || this.getItems().length) {
 			return;
 		}
 

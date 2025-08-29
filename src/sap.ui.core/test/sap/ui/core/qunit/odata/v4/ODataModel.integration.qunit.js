@@ -81413,4 +81413,55 @@ sap.ui.define([
 			this.waitForChanges(assert)
 		]);
 	});
+
+	//*********************************************************************************************
+	// Scenario: An ODataModel uses parameter earlyRequests=true. The back end takes some time until
+	// the HEAD request fails. The following $batch request is not sent before the HEAD request
+	// finishes, but still the failure is ignored.
+	// JIRA: CPOUI5ODATAV4-3079
+	QUnit.test("CPOUI5ODATAV4-3079: failed token request", async function (assert) {
+		let bDataRequested;
+		TestUtils.onRequest((sPayload) => {
+			if (sPayload?.includes("GET EMPLOYEES('1')?$select=ID")) {
+				bDataRequested = true;
+			}
+		});
+		let fnRejectTokenRequest;
+		this.mock(jQuery).expects("ajax").atLeast(1)
+			.callsFake(function (sUrl, oSettings) {
+				if (sUrl !== sTeaBusi || oSettings.method !== "HEAD") {
+					return jQuery.ajax.wrappedMethod.apply(this, arguments);
+				}
+				return new Promise((_resolve, reject) => {
+					fnRejectTokenRequest = reject;
+				});
+			});
+		const oModel = this.createTeaBusiModel({autoExpandSelect : true, earlyRequests : true}, {
+			[sTeaBusi + "EMPLOYEES('1')?$select=ID"] : {
+				message : {ID : "1"}
+			}
+		});
+		oModel.$keepSend = true; // do not stub sendBatch/-Request
+		const oView = `
+<FlexBox binding="{/EMPLOYEES('1')}">
+	<Text id="id" text="{ID}"/>
+</FlexBox>`;
+
+		this.expectChange("id");
+
+		await this.createView(assert, oView, oModel);
+
+		assert.notOk(bDataRequested, "no data request as long as token request is pending");
+
+		this.expectChange("id", "1");
+
+		// code under test
+		fnRejectTokenRequest();
+
+		await this.waitForChanges(assert);
+
+		assert.ok(bDataRequested);
+
+		TestUtils.onRequest(null);
+	});
 });

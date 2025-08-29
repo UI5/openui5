@@ -1,23 +1,23 @@
 /* global QUnit */
 
 sap.ui.define([
+	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
 	"sap/ui/fl/variants/VariantManagement",
 	"sap/ui/fl/variants/VariantManager",
 	"sap/ui/rta/command/CommandFactory",
 	"sap/ui/thirdparty/sinon-4",
-	"test-resources/sap/ui/fl/api/FlexTestAPI",
 	"test-resources/sap/ui/rta/qunit/RtaQunitUtils"
 ], function(
+	ControlVariantApplyAPI,
 	VariantManagement,
 	VariantManager,
 	CommandFactory,
 	sinon,
-	FlexTestAPI,
 	RtaQunitUtils
 ) {
 	"use strict";
 
-	var sandbox = sinon.createSandbox();
+	const sandbox = sinon.createSandbox();
 
 	QUnit.module("Given a VariantManagement control and its designtime metadata are created...", {
 		beforeEach() {
@@ -25,14 +25,7 @@ sap.ui.define([
 			this.oVariantManagement = new VariantManagement(this.sVariantManagementReference, {});
 			this.oMockedAppComponent = RtaQunitUtils.createAndStubAppComponent(sandbox);
 
-			return FlexTestAPI.createVariantModel({
-				data: {"variantManagementReference-1": {variants: []}},
-				appComponent: this.oMockedAppComponent
-			}).then(function(oInitializedModel) {
-				this.oModel = oInitializedModel;
-				sandbox.stub(this.oMockedAppComponent, "getModel").returns(oInitializedModel);
-				this.oUpdateCurrentVariantStub = sandbox.stub(this.oModel, "updateCurrentVariant").resolves();
-			}.bind(this));
+			this.oActivateVariantStub = sandbox.stub(ControlVariantApplyAPI, "activateVariant").resolves();
 		},
 		afterEach() {
 			this.oMockedAppComponent.destroy();
@@ -40,57 +33,40 @@ sap.ui.define([
 			sandbox.restore();
 		}
 	}, function() {
-		QUnit.test("when getting a switch command for VariantManagement...", function(assert) {
-			var oSwitchCommand;
-			var oSwitchCommandData = {
+		QUnit.test("when getting a switch command for VariantManagement...", async function(assert) {
+			const oSwitchCommandData = {
 				targetVariantReference: "newVariantReference",
 				sourceVariantReference: "oldVariantReference"
 			};
 
-			return CommandFactory.getCommandFor(this.oVariantManagement, "switch", oSwitchCommandData)
-			.then(function(oCommand) {
-				assert.notOk(oCommand.getRelevantForSave(), "then the relevantForSave property is set to false");
-				assert.ok(oCommand, "switch command for VariantManagement exists");
-				oSwitchCommand = oCommand;
-				return oSwitchCommand.execute();
-			})
-			.then(function() {
-				assert.equal(this.oUpdateCurrentVariantStub.callCount, 1, "then updateCurrentVariant after execute command is called once");
-				assert.deepEqual(this.oUpdateCurrentVariantStub.getCall(0).args[0], {
-					variantManagementReference: this.sVariantManagementReference,
-					newVariantReference: oSwitchCommandData.targetVariantReference,
-					appComponent: this.oMockedAppComponent
-				}, "then updateCurrentVariant after execute command is called with the correct parameters");
-			}.bind(this))
-			.then(function() {
-				return oSwitchCommand.undo();
-			})
-			.then(function() {
-				assert.equal(
-					this.oUpdateCurrentVariantStub.callCount,
-					2,
-					"then updateCurrentVariant after undo command is called once again"
-				);
-				assert.deepEqual(this.oUpdateCurrentVariantStub.getCall(1).args[0], {
-					variantManagementReference: this.sVariantManagementReference,
-					newVariantReference: oSwitchCommandData.sourceVariantReference,
-					appComponent: this.oMockedAppComponent
-				}, "then updateCurrentVariant after undo command is called with the correct parameters");
-			}.bind(this))
-			.catch(function(oError) {
-				assert.ok(false, `catch must never be called - Error: ${oError}`);
-			});
+			const oSwitchCommand = await CommandFactory.getCommandFor(this.oVariantManagement, "switch", oSwitchCommandData);
+			assert.notOk(oSwitchCommand.getRelevantForSave(), "then the relevantForSave property is set to false");
+			await oSwitchCommand.execute();
+			assert.equal(this.oActivateVariantStub.callCount, 1, "then activateVariant after execute command is called once");
+			assert.deepEqual(this.oActivateVariantStub.getCall(0).args[0], {
+				element: this.oVariantManagement,
+				variantReference: oSwitchCommandData.targetVariantReference
+			}, "then activateVariant after execute command is called with the correct parameters");
+			await oSwitchCommand.undo();
+			assert.equal(
+				this.oActivateVariantStub.callCount,
+				2,
+				"then activateVariant after undo command is called once again"
+			);
+			assert.deepEqual(this.oActivateVariantStub.getCall(1).args[0], {
+				element: this.oVariantManagement,
+				variantReference: oSwitchCommandData.sourceVariantReference
+			}, "then activateVariant after undo command is called with the correct parameters");
 		});
 
-		QUnit.test("when getting a switch command for VariantManagement and discardVariantContent is true", function(assert) {
-			var oSwitchCommand;
-			var oSwitchCommandData = {
+		QUnit.test("when getting a switch command for VariantManagement and discardVariantContent is true", async function(assert) {
+			const oSwitchCommandData = {
 				targetVariantReference: "newVariantReference",
 				sourceVariantReference: "oldVariantReference",
 				discardVariantContent: true
 			};
 
-			var aDirtyChanges = [
+			const aDirtyChanges = [
 				RtaQunitUtils.createUIChange({
 					fileName: "change1",
 					reference: "Dummy",
@@ -105,75 +81,52 @@ sap.ui.define([
 				})
 			];
 
-			var oAddAndApplyChangesStub = sandbox.stub(VariantManager, "addAndApplyChangesOnVariant").resolves();
+			const oAddAndApplyChangesStub = sandbox.stub(VariantManager, "addAndApplyChangesOnVariant").resolves();
 			sandbox.stub(VariantManager, "eraseDirtyChangesOnVariant").resolves(aDirtyChanges);
 
-			return CommandFactory.getCommandFor(this.oVariantManagement, "switch", oSwitchCommandData)
-			.then(function(oCommand) {
-				assert.ok(oCommand, "switch command for VariantManagement exists");
-				oSwitchCommand = oCommand;
-				return oSwitchCommand.execute();
-			})
-			.then(function() {
-				assert.deepEqual(
-					oSwitchCommand.getDiscardedChanges(),
-					aDirtyChanges,
-					"then the dirty changes are retrieved correctly"
-				);
-				assert.equal(this.oUpdateCurrentVariantStub.callCount, 1, "then updateCurrentVariant after execute command is called once");
-				assert.deepEqual(this.oUpdateCurrentVariantStub.getCall(0).args[0], {
-					variantManagementReference: this.sVariantManagementReference,
-					newVariantReference: oSwitchCommandData.targetVariantReference,
-					appComponent: this.oMockedAppComponent
-				}, "then updateCurrentVariant after execute command is called with the correct parameters");
-			}.bind(this))
-			.then(function() {
-				return oSwitchCommand.undo();
-			})
-			.then(function() {
-				assert.deepEqual(oAddAndApplyChangesStub.getCall(0).args[0], aDirtyChanges, "then the changes are applied again");
-				assert.deepEqual(oSwitchCommand.getDiscardedChanges(), [], "then the dirty changes are cleared on the command");
-				assert.equal(
-					this.oUpdateCurrentVariantStub.callCount,
-					2,
-					"then updateCurrentVariant after undo command is called once again"
-				);
-				assert.deepEqual(this.oUpdateCurrentVariantStub.getCall(1).args[0], {
-					variantManagementReference: this.sVariantManagementReference,
-					newVariantReference: oSwitchCommandData.sourceVariantReference,
-					appComponent: this.oMockedAppComponent
-				}, "then updateCurrentVariant after undo command is called with the correct parameters");
-				assert.ok(
-					this.oUpdateCurrentVariantStub.calledBefore(oAddAndApplyChangesStub),
-					"then the variant is updated before the dirty changes are applied"
-				);
-			}.bind(this));
+			const oSwitchCommand = await CommandFactory.getCommandFor(this.oVariantManagement, "switch", oSwitchCommandData);
+			await oSwitchCommand.execute();
+			assert.deepEqual(
+				oSwitchCommand.getDiscardedChanges(),
+				aDirtyChanges,
+				"then the dirty changes are retrieved correctly"
+			);
+			assert.equal(this.oActivateVariantStub.callCount, 1, "then activateVariant after execute command is called once");
+			assert.deepEqual(this.oActivateVariantStub.getCall(0).args[0], {
+				element: this.oVariantManagement,
+				variantReference: oSwitchCommandData.targetVariantReference
+			}, "then activateVariant after execute command is called with the correct parameters");
+
+			await oSwitchCommand.undo();
+
+			assert.deepEqual(oAddAndApplyChangesStub.getCall(0).args[0], aDirtyChanges, "then the changes are applied again");
+			assert.deepEqual(oSwitchCommand.getDiscardedChanges(), [], "then the dirty changes are cleared on the command");
+			assert.equal(
+				this.oActivateVariantStub.callCount,
+				2,
+				"then activateVariant after undo command is called once again"
+			);
+			assert.deepEqual(this.oActivateVariantStub.getCall(1).args[0], {
+				element: this.oVariantManagement,
+				variantReference: oSwitchCommandData.sourceVariantReference
+			}, "then activateVariant after undo command is called with the correct parameters");
+			assert.ok(
+				this.oActivateVariantStub.calledBefore(oAddAndApplyChangesStub),
+				"then the variant is updated before the dirty changes are applied"
+			);
 		});
 
-		QUnit.test("when getting a switch command for VariantManagement with equal source and target variantId ...", function(assert) {
-			var oSwitchCommand;
-			var oSwitchCommandData = {
+		QUnit.test("when getting a switch command for VariantManagement with equal source and target variantId ...", async function(assert) {
+			const oSwitchCommandData = {
 				targetVariantReference: "variantReference",
 				sourceVariantReference: "variantReference"
 			};
 
-			return CommandFactory.getCommandFor(this.oVariantManagement, "switch", oSwitchCommandData)
-			.then(function(oCommand) {
-				oSwitchCommand = oCommand;
-				return oSwitchCommand.execute();
-			})
-			.then(function() {
-				assert.equal(this.oUpdateCurrentVariantStub.callCount, 0, "then updateCurrentVariant after execute command is not called");
-			}.bind(this))
-			.then(function() {
-				return oSwitchCommand.undo();
-			})
-			.then(function() {
-				assert.equal(this.oUpdateCurrentVariantStub.callCount, 0, "then updateCurrentVariant after undo command is not called");
-			}.bind(this))
-			.catch(function(oError) {
-				assert.ok(false, `catch must never be called - Error: ${oError}`);
-			});
+			const oSwitchCommand = await CommandFactory.getCommandFor(this.oVariantManagement, "switch", oSwitchCommandData);
+			await oSwitchCommand.execute();
+			assert.equal(this.oActivateVariantStub.callCount, 0, "then activateVariant after execute command is not called");
+			await oSwitchCommand.undo();
+			assert.equal(this.oActivateVariantStub.callCount, 0, "then activateVariant after undo command is not called");
 		});
 	});
 

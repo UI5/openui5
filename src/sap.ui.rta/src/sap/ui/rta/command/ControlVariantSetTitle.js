@@ -2,15 +2,11 @@
  * ${copyright}
  */
 sap.ui.define([
-	"sap/ui/core/util/reflection/JsControlTreeModifier",
-	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
 	"sap/ui/fl/variants/VariantManager",
 	"sap/ui/fl/Utils",
 	"sap/ui/rta/command/BaseCommand",
 	"sap/ui/rta/library"
 ], function(
-	JsControlTreeModifier,
-	ControlVariantApplyAPI,
 	VariantManager,
 	flUtils,
 	BaseCommand,
@@ -30,7 +26,7 @@ sap.ui.define([
 	 * @since 1.50
 	 * @alias sap.ui.rta.command.ControlVariantSetTitle
 	 */
-	var ControlVariantSetTitle = BaseCommand.extend("sap.ui.rta.command.ControlVariantSetTitle", {
+	const ControlVariantSetTitle = BaseCommand.extend("sap.ui.rta.command.ControlVariantSetTitle", {
 		metadata: {
 			library: "sap.ui.rta",
 			properties: {
@@ -67,30 +63,26 @@ sap.ui.define([
 	 * @public
 	 * @returns {Promise} Returns resolve after execution
 	 */
-	ControlVariantSetTitle.prototype.execute = function() {
-		var oVariantManagementControl = this.getElement();
+	ControlVariantSetTitle.prototype.execute = async function() {
+		const oVariantManagementControl = this.getElement();
 
 		this.oAppComponent = flUtils.getAppComponentForControl(oVariantManagementControl);
-		this.oModel = this.oAppComponent.getModel(ControlVariantApplyAPI.getVariantModelName());
-		this.sVariantManagementReference = JsControlTreeModifier.getSelector(oVariantManagementControl, this.oAppComponent).id;
-		this.sCurrentVariant = this.oModel.getCurrentVariantReference(this.sVariantManagementReference);
+		this.sVariantManagementReference = oVariantManagementControl.getVariantManagementReference();
+		this.sCurrentVariantKey = oVariantManagementControl.getCurrentVariantKey();
 
-		var sCurrentTitle = this.oModel.getVariantTitle(this.sCurrentVariant, this.sVariantManagementReference);
+		const sCurrentTitle = oVariantManagementControl.getVariantByKey(this.sCurrentVariantKey).getTitle();
 		this.setOldText(sCurrentTitle);
 
-		var mPropertyBag = {
+		const mPropertyBag = {
 			appComponent: this.oAppComponent,
-			variantReference: this.sCurrentVariant,
+			variantReference: this.sCurrentVariantKey,
 			changeType: "setTitle",
 			title: this.getNewText(),
 			layer: this.sLayer,
 			generator: rtaLibrary.GENERATOR_NAME
 		};
 
-		return Promise.resolve(VariantManager.addVariantChange(this.sVariantManagementReference, mPropertyBag))
-		.then(function(oChange) {
-			this._oVariantChange = oChange;
-		}.bind(this));
+		this._oVariantChange = await VariantManager.addVariantChange(this.sVariantManagementReference, mPropertyBag);
 	};
 
 	/**
@@ -98,19 +90,16 @@ sap.ui.define([
 	 * @public
 	 * @returns {Promise} Returns resolve after undo
 	 */
-	ControlVariantSetTitle.prototype.undo = function() {
-		var mPropertyBag = {
-			variantReference: this.sCurrentVariant,
+	ControlVariantSetTitle.prototype.undo = async function() {
+		const mPropertyBag = {
+			variantReference: this.sCurrentVariantKey,
 			changeType: "setTitle",
 			title: this.getOldText(),
 			appComponent: this.oAppComponent
 		};
-		var oChange = this._oVariantChange;
 
-		return Promise.resolve(VariantManager.deleteVariantChange(this.sVariantManagementReference, mPropertyBag, oChange))
-		.then(function() {
-			this._oVariantChange = null;
-		}.bind(this));
+		await VariantManager.deleteVariantChange(this.sVariantManagementReference, mPropertyBag, this._oVariantChange);
+		this._oVariantChange = null;
 	};
 
 	return ControlVariantSetTitle;

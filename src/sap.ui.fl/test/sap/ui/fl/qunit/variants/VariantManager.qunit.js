@@ -189,19 +189,28 @@ sap.ui.define([
 			return this.oModel.initialize();
 		},
 		afterEach() {
+			sandbox.restore();
 			this.oVMControl.destroy();
 			this.oModel.destroy();
 			FlexState.clearState();
 			FlexState.clearRuntimeSteadyObjects(sReference, sReference);
-			sandbox.restore();
 		}
 	}, function() {
 		QUnit.test("When eraseDirtyChangesOnVariant is called", async function(assert) {
-			const aDummyChanges = ["c1", "c2"];
+			const aDummyChanges = [{
+				getId() { return "change1"; },
+				getSavedToVariant() { return false; }
+			}, {
+				getId() { return "change2"; },
+				getSavedToVariant() { return false; }
+			}];
 
 			const oRevertMultipleChangesStub = sandbox.stub(Reverter, "revertMultipleChanges");
-			const oGetControlChangesForVariantStub = sandbox.stub(VariantManagementState, "getControlChangesForVariant");
-			sandbox.stub(this.oModel, "_getDirtyChangesFromVariantChanges").returns(aDummyChanges);
+			const oGetControlChangesForVariantStub = sandbox.stub(
+				VariantManagementState,
+				"getControlChangesForVariant"
+			).returns(aDummyChanges);
+			sandbox.stub(FlexObjectState, "getDirtyFlexObjects").returns(aDummyChanges);
 			sandbox.stub(FlexObjectManager, "deleteFlexObjects");
 
 			const aChanges = await VariantManager.eraseDirtyChangesOnVariant("vm1", "v1", oComponent);
@@ -754,6 +763,50 @@ sap.ui.define([
 				}), // the last change is reverted first
 				"then dirty changes from source variant were deleted from the persistence (in the right order)"
 			);
+		});
+
+		QUnit.test("getDirtyChangesFromVariantChanges", function(assert) {
+			const aControlChanges = [
+				FlexObjectFactory.createUIChange({
+					id: "dirtyChange",
+					variantReference: "DummyVReference"
+				}),
+				FlexObjectFactory.createUIChange({
+					id: "otherChange",
+					variantReference: "DummyVReference"
+				}),
+				FlexObjectFactory.createUIChange({
+					id: "savedToVariantChange",
+					variantReference: "DummyVReference"
+				})
+			];
+			aControlChanges[2].setSavedToVariant(true);
+			sandbox.stub(FlexObjectState, "getDirtyFlexObjects").withArgs("DummyReference").returns([aControlChanges[0]]);
+			const aDirtyChanges = VariantManager.getDirtyChangesFromVariantChanges(aControlChanges, "DummyReference");
+			assert.strictEqual(aDirtyChanges.length, 1, "then one dirty change is returned");
+			assert.strictEqual(aDirtyChanges[0].getId(), "dirtyChange", "then the dirty change is returned");
+		});
+
+		QUnit.test("updateVariantManagementMap", function(assert) {
+			const sFlexReference = "myFlexReference";
+			const oCheckUpdateStub = sandbox.stub();
+			sandbox.stub(VariantManagementState, "getVariantManagementMap").returns({
+				checkUpdate: oCheckUpdateStub
+			});
+			VariantManager.updateVariantManagementMap(sFlexReference);
+			assert.ok(oCheckUpdateStub.calledWith({reference: sFlexReference}), "then the invalidate method was called for the reference");
+		});
+
+		QUnit.test("getControlChangesForVariant", function(assert) {
+			const aControlChanges = ["change1", "change2"];
+			sandbox.stub(VariantManagementState, "getVariant")
+			.withArgs({
+				reference: "fakeVMReference",
+				vmReference: "variantMgmt1",
+				vReference: "variant1"
+			}).returns({ controlChanges: aControlChanges });
+			const aChanges = VariantManager.getControlChangesForVariant("fakeVMReference", "variantMgmt1", "variant1");
+			assert.strictEqual(aChanges, aControlChanges, "then the changes are returned");
 		});
 	});
 

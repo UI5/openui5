@@ -8,7 +8,9 @@ sap.ui.define([
 	"sap/m/Text",
 	"sap/ui/core/Icon",
 	"sap/ui/core/Lib",
+	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
 	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
+	"sap/ui/fl/apply/api/FlexRuntimeInfoAPI",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/initial/_internal/Settings",
 	"sap/ui/fl/variants/VariantManagement",
@@ -26,7 +28,9 @@ sap.ui.define([
 	Text,
 	Icon,
 	Lib,
+	VariantManagementState,
 	ControlVariantApplyAPI,
+	FlexRuntimeInfoAPI,
 	ManifestUtils,
 	flSettings,
 	VariantManagement,
@@ -40,6 +44,8 @@ sap.ui.define([
 	"use strict";
 
 	var oModel;
+	const sandbox = sinon.createSandbox();
+	const sFlexReference = "flexReference";
 
 	function fGetGrid(oDialog) {
 		var oGrid = null;
@@ -78,6 +84,7 @@ sap.ui.define([
 
 			this.oVariantManagement = new VariantManagement("One", {});
 			sinon.stub(ManifestUtils, "getFlexReferenceForControl").returns("mockComponentName");
+			sandbox.stub(FlexRuntimeInfoAPI, "getFlexReference").returns(sFlexReference);
 
 			this._oVM = this.oVariantManagement._getEmbeddedVM();
 
@@ -152,6 +159,7 @@ sap.ui.define([
 			this.oVariantManagement.destroy();
 			flSettings.getInstance.restore();
 			ManifestUtils.getFlexReferenceForControl.restore();
+			sandbox.restore();
 		}
 	}, function() {
 		QUnit.test("Shall be instantiable", function(assert) {
@@ -282,7 +290,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("Check acc text", function(assert) {
-			var sLanguage = Localization.getLanguage();
+			const sLanguage = Localization.getLanguage();
 
 			Localization.setLanguage("en_EN");
 
@@ -290,12 +298,18 @@ sap.ui.define([
 
 			this.oVariantManagement.setModel(oModel, ControlVariantApplyAPI.getVariantModelName());
 
-			var oFLRB = Lib.getResourceBundleFor("sap.ui.fl");
-			var sStandardText = oFLRB.getText("STANDARD_VARIANT_TITLE");
-			assert.equal(this._oVM.oVariantInvisibleText.getText(), this.oVariantManagement._oRb.getText("VARIANT_MANAGEMENT_SEL_VARIANT", [sStandardText]));
+			const oFLRB = Lib.getResourceBundleFor("sap.ui.fl");
+			const sStandardText = oFLRB.getText("STANDARD_VARIANT_TITLE");
+			assert.strictEqual(
+				this._oVM.oVariantInvisibleText.getText(),
+				this.oVariantManagement._oRb.getText("VARIANT_MANAGEMENT_SEL_VARIANT", [sStandardText])
+			);
 
 			this.oVariantManagement.setCurrentVariantKey("2");
-			assert.equal(this._oVM.oVariantInvisibleText.getText(), this.oVariantManagement._oRb.getText("VARIANT_MANAGEMENT_SEL_VARIANT", ["Two"]));
+			assert.strictEqual(
+				this._oVM.oVariantInvisibleText.getText(),
+				this.oVariantManagement._oRb.getText("VARIANT_MANAGEMENT_SEL_VARIANT", ["Two"])
+			);
 
 			Localization.setLanguage(sLanguage);
 		});

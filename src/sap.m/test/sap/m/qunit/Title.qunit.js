@@ -111,7 +111,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Should be selectable", function(assert){
-		assert.ok(this.title.$().hasClass("sapUiSelectable"), "Title has class sapUiSelectable.");
+		assert.ok(this.title.$().find("span").hasClass("sapUiSelectable"), "The Title element contains the 'sapUiSelectable' class, enabling text selection on mobile devices.");
 	});
 
 	QUnit.test("Wrapping", async function(assert) {

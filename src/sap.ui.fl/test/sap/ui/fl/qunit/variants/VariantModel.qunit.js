@@ -1386,66 +1386,6 @@ sap.ui.define([
 			assert.ok(this.oModel.fnManageClick, "the function 'this.fnManageClick' is available afterwards");
 		});
 
-		QUnit.test("when calling '_getDirtyChangesFromVariantChanges'", function(assert) {
-			var oChange1 = FlexObjectFactory.createFromFileContent({
-				fileName: "change1",
-				selector: {
-					id: "abc123"
-				}
-			});
-			var oChange2 = FlexObjectFactory.createFromFileContent({
-				fileName: "change2",
-				selector: {
-					id: "abc123"
-				}
-			});
-			var oChange3 = FlexObjectFactory.createFromFileContent({
-				fileName: "change3",
-				selector: {
-					id: "abc123"
-				}
-			});
-			oChange2.setSavedToVariant(true);
-			var aControlChanges = [oChange1, oChange2, oChange3];
-
-			sandbox.stub(FlexObjectState, "getDirtyFlexObjects").returns(aControlChanges);
-
-			var aDirtyChanges = this.oModel._getDirtyChangesFromVariantChanges(aControlChanges);
-			assert.strictEqual(aDirtyChanges.length, 2, "only two of the given changes are returned as dirty by the model");
-			assert.strictEqual(aDirtyChanges[0].getId(), "change1", "change1 is dirty");
-			assert.strictEqual(aDirtyChanges[1].getId(), "change3", "change3 is dirty");
-		});
-
-		QUnit.test("when calling '_getVariantTitleCount' with a title having 2 occurrences", function(assert) {
-			this.oModel.oData[sVMReference].variants.push({
-				title: "SampleTitle Copy(5)",
-				visible: true
-			}, {
-				title: "SampleTitle Copy(5)",
-				visible: true
-			});
-			assert.strictEqual(this.oModel._getVariantTitleCount("SampleTitle Copy(5)", sVMReference), 2, "then 2 occurrences returned");
-			this.oModel.oData[sVMReference].variants.splice(3, 1);
-		});
-
-		QUnit.test("when calling '_getVariantTitleCount' with a title having 4 occurrences with different cases of characters", function(assert) {
-			this.oModel.oData[sVMReference].variants.push({
-				title: "Test",
-				visible: true
-			}, {
-				title: "TEST",
-				visible: true
-			}, {
-				title: "tesT",
-				visible: true
-			}, {
-				title: "test",
-				visible: true
-			});
-			assert.strictEqual(this.oModel._getVariantTitleCount("TeSt", sVMReference), 4, "then 4 occurrences returned");
-			this.oModel.oData[sVMReference].variants.splice(3, 4);
-		});
-
 		QUnit.test("when calling 'getVariant' without a variant management reference", function(assert) {
 			assert.deepEqual(
 				this.oModel.getVariant("variant0"),

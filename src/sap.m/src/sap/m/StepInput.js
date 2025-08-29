@@ -345,7 +345,7 @@ function(
 
 			this._iRealPrecision = this._getRealValuePrecision();
 
-			this._getInput().setValue(this._getFormattedValue(vValue));
+			!this.bLiveChange && this._getInput().setValue(this._getFormattedValue(vValue));
 			this._getInput().setValueState(this.getValueState());
 			this._getOrCreateDecrementButton().setVisible(bEditable);
 			this._getOrCreateIncrementButton().setVisible(bEditable);
@@ -356,6 +356,8 @@ function(
 				this._verifyValue();
 				this._bNeedsVerification = false;
 			}
+
+			this.bLiveChange = false;
 		};
 
 		StepInput.prototype.onAfterRendering = function () {
@@ -581,7 +583,7 @@ function(
 					enabled: this.getEnabled(),
 					description: this.getDescription(),
 					fieldWidth: this.getFieldWidth(),
-					liveChange: this._inputLiveChangeHandler
+					liveChange: this._inputLiveChangeHandler.bind(this)
 				});
 				this.setAggregation("_input", oNumericInput);
 			}
@@ -1283,9 +1285,9 @@ function(
 		 * @private
 		 */
 		StepInput.prototype._inputLiveChangeHandler = function (oEvent) {
-			var iValue = this.getParent()._restrictCharsWhenDecimal(oEvent);
-
-			this.setProperty("value", iValue ? iValue : oEvent.getParameter("newValue"), true);
+			var iValue = this._restrictCharsWhenDecimal(oEvent);
+			this.bLiveChange = true;
+			this._getInput().setProperty("value", iValue ? iValue : oEvent.getParameter("newValue"), true);
 		};
 
 		/**

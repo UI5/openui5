@@ -40,7 +40,6 @@ TitleRenderer.render = function(oRm, oTitle){
 	oRm.class("sapMTitle");
 	oRm.class("sapMTitleStyle" + oTitle.getTitleStyle());
 	oRm.class(oTitle.getWrapping() ? "sapMTitleWrap" : "sapMTitleNoWrap");
-	oRm.class("sapUiSelectable");
 
 	var sWidth = oTitle.getWidth();
 	if (!sWidth) {
@@ -70,6 +69,7 @@ TitleRenderer.render = function(oRm, oTitle){
 	oRm.openEnd();
 
 	oRm.openStart("span", oTitle.getId() + "-inner");
+	oRm.class("sapUiSelectable");
 	oRm.attr("dir", sTextDir !== TextDirection.Inherit ? sTextDir.toLowerCase() : "auto");
 	oRm.openEnd();
 	if (oTitleContent) { // render a control added in the titleControl aggregation ...
