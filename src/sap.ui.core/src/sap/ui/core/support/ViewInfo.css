@@ -60,7 +60,7 @@
 
 .viewxmlheader .info {
 	margin-left: 3px;
-	display: inline-block
+	display: inline-block;
 }
 
 .viewxmlheader[collapsed='true'] .settingscontainer {
@@ -186,7 +186,7 @@
 
 .treeviewer .node.inactive {
 	color: gray!important;
-	opacity: 0.6
+	opacity: 0.6;
 }
 
 .treeviewer .node.inactive SPAN {
@@ -195,7 +195,7 @@
 }
 
 .treeviewer .node.replace .nstag {
-	text-decoration: line-through
+	text-decoration: line-through;
 }
 
 .treeviewer .node.start.select {
@@ -239,7 +239,7 @@
 }
 
 .treeviewer .node .info.red {
-	border: 1px solid #b93232
+	border: 1px solid #b93232;
 }
 
 .treeviewer .node .info.red[selected='true'] {
@@ -274,7 +274,7 @@
 
 .treeviewer .node .attrname:hover {
 	border: 1px solid #b93232;
-	background-color: #fde3d5
+	background-color: #fde3d5;
 }
 
 .treeviewer .node .attrvalue {
@@ -321,11 +321,11 @@
 }
 
 .treeviewer.hideInactive .node.inactive {
-	display: none!important
+	display: none!important;
 }
 
 .treeviewer .node .tag {
-	color: green
+	color: green;
 }
 
 .treeviewer .node .nstag {
@@ -336,12 +336,12 @@
 
 .treeviewer .node.start .nstag:hover {
 	border: 1px solid green;
-	background-color: #d5e6d5
+	background-color: #d5e6d5;
 }
 
 .treeviewer .node.start .nstagend .nstag:hover {
 	border: 1px solid transparent;
-	background-color: transparent
+	background-color: transparent;
 }
 
 .treeviewer .node.end[visible='true'] {
@@ -461,11 +461,11 @@
 
 .objectviewer .value .valueInput:not([readonly])[error='true'] {
 	color: #d80000;
-	solid 2px rgba(255, 0, 0, 0.26)
+	border: solid 2px rgba(255, 0, 0, 0.26);
 }
 
 .objectviewer .value .valueInput:not([readonly]):hover {
-	background-color: #f5f5f5
+	background-color: #f5f5f5;
 }
 
 .objectviewer .value .valueInput:not([readonly]):focus {
@@ -478,7 +478,7 @@
 	padding: 0 6px;
 	display: inline-block;
 	overflow: hidden;
-	width: 2%
+	width: 2%;
 }
 
 .objectviewer .header {

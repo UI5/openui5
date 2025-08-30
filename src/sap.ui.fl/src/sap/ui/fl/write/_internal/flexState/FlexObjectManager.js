@@ -130,7 +130,7 @@ sap.ui.define([
 				removeFlexObjectFromDependencyHandler(sReference, oChange);
 
 				// Remove also from Cache if the persisted change is still there (e.g. navigate away and back to the app)
-				FlexState.updateStorageResponse(sReference, [{flexObject: oChange.convertToFileContent(), type: "delete"}]);
+				FlexState.update(sReference, [{flexObject: oChange.convertToFileContent(), type: "delete"}]);
 			} else {
 				FlexObjectManager.deleteFlexObjects({
 					reference: sReference,
@@ -201,19 +201,19 @@ sap.ui.define([
 		if (!bSkipUpdateCache) {
 			switch (oDirtyChange.getState()) {
 				case States.LifecycleState.NEW:
-					FlexState.updateStorageResponse(sReference, [{
+					FlexState.update(sReference, [{
 						type: "add",
 						flexObject: oDirtyChange.convertToFileContent()
 					}]);
 					break;
 				case States.LifecycleState.DELETED:
-					FlexState.updateStorageResponse(sReference, [{
+					FlexState.update(sReference, [{
 						type: "delete",
 						flexObject: oDirtyChange.convertToFileContent()
 					}]);
 					break;
 				case States.LifecycleState.UPDATED:
-					FlexState.updateStorageResponse(sReference, [{
+					FlexState.update(sReference, [{
 						type: "update",
 						flexObject: oDirtyChange.convertToFileContent()
 					}]);
@@ -348,7 +348,7 @@ sap.ui.define([
 		if (mPropertyBag.invalidateCache) {
 			const oAppComponent = Utils.getAppComponentForSelector(mPropertyBag.selector);
 			mPropertyBag.componentId = oAppComponent.getId();
-			await FlexState.update(mPropertyBag);
+			await FlexState.reinitialize(mPropertyBag);
 		}
 
 		let aRelevantFlexObjects = UIChangesState.getVariantIndependentUIChanges(mPropertyBag.reference)
@@ -615,7 +615,7 @@ sap.ui.define([
 			const aChangesToRevert = aFlexObjects.filter((oChange) => {
 				return aFileNames.indexOf(oChange.getId()) !== -1;
 			});
-			FlexState.updateStorageResponse(sReference, aChangesToRevert.map((oFlexObject) => {
+			FlexState.update(sReference, aChangesToRevert.map((oFlexObject) => {
 				return { flexObject: oFlexObject.convertToFileContent(), type: "delete" };
 			}));
 

@@ -500,7 +500,7 @@ sap.ui.define([
 	 * @param {string} [mPropertyBag.componentData] - Component data of the current component
 	 * @returns {Promise<undefined>} Resolves when the data is loaded and the runtime persistence is updated
 	 */
-	FlexState.update = async function(mPropertyBag) {
+	FlexState.reinitialize = async function(mPropertyBag) {
 		enhancePropertyBag(mPropertyBag);
 		const sReference = mPropertyBag.reference;
 		const oCurrentRuntimePersistence = _mInstances[sReference].runtimePersistence;
@@ -531,8 +531,10 @@ sap.ui.define([
 	 * @param {string} sReference - Flex reference of the app
 	 * @param {object[]} aUpdates - All new FlexObjects in JSON format
 	 */
-	FlexState.updateStorageResponse = function(sReference, aUpdates) {
+	FlexState.update = function(sReference, aUpdates) {
 		const aFlexObjectUpdates = [];
+		StorageUtils.updateStorageResponse(_mInstances[sReference].storageResponse, aUpdates);
+		Loader.updateCachedResponse(sReference, aUpdates);
 		aUpdates.forEach((oUpdate) => {
 			if (oUpdate.type !== "ui2") {
 				// In some scenarios the runtime persistence is already updated
@@ -562,8 +564,6 @@ sap.ui.define([
 				}
 			}
 		});
-		const oFlexData = Loader.updateStorageResponse(sReference, aUpdates);
-		_mInstances[sReference].storageResponse = filterByMaxLayer(sReference, oFlexData);
 		if (aFlexObjectUpdates.length) {
 			oFlexObjectsDataSelector.checkUpdate({ reference: sReference }, aFlexObjectUpdates);
 		}

@@ -51,7 +51,7 @@ sap.ui.define([
 		const oPersonalizationSubsection = FlexState.getUI2Personalization(oPersonalizationResult.response.reference);
 		oPersonalizationSubsection[oPersonalizationResult.response.containerKey] ||= [];
 		oPersonalizationSubsection[oPersonalizationResult.response.containerKey].push(oPersonalizationResult.response);
-		FlexState.updateStorageResponse(oPersonalizationResult.response.reference, [{
+		FlexState.update(oPersonalizationResult.response.reference, [{
 			type: "ui2",
 			newData: oPersonalizationSubsection
 		}]);
@@ -84,7 +84,7 @@ sap.ui.define([
 		const oToBeDeletedItem = UI2PersonalizationStateApply.getPersonalization(sReference, sContainerKey, sItemName);
 		const nIndexOfItem = aItems.indexOf(oToBeDeletedItem);
 		aItems.splice(nIndexOfItem, 1);
-		FlexState.updateStorageResponse(sReference, [{
+		FlexState.update(sReference, [{
 			type: "ui2",
 			newData: oUI2Personalization
 		}]);

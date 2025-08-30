@@ -1,21 +1,23 @@
 /* global QUnit */
 
 sap.ui.define([
+	"sap/ui/comp/designtime/smartfield/SmartField.designtime",
+	"sap/ui/dt/DesignTime",
+	"sap/ui/dt/OverlayRegistry",
+	"sap/ui/fl/apply/api/DelegateMediatorAPI",
+	"sap/ui/test/utils/nextUIUpdate",
 	"sap/ui/rta/plugin/additionalElements/AdditionalElementsAnalyzer",
 	"sap/ui/rta/util/BindingsExtractor",
-	"sap/ui/dt/DesignTime",
-	"sap/ui/fl/apply/api/DelegateMediatorAPI",
-	"sap/ui/comp/designtime/smartfield/SmartField.designtime",
-	"./TestUtils",
-	"sap/ui/test/utils/nextUIUpdate"
+	"./TestUtils"
 ], function(
+	SmartFieldDesignTime,
+	DesignTime,
+	OverlayRegistry,
+	DelegateMediatorAPI,
+	nextUIUpdate,
 	AdditionalElementsAnalyzer,
 	BindingsExtractor,
-	DesignTime,
-	DelegateMediatorAPI,
-	SmartFieldDesignTime,
-	TestUtils,
-	nextUIUpdate
+	TestUtils
 ) {
 	"use strict";
 
@@ -305,6 +307,86 @@ sap.ui.define([
 					elementId: "idMain1--ObjectPageSectionForNavigationWithoutOtherGroup",
 					bindingPath: undefined
 				}, "the section with only navigation properties is found", assert);
+			});
+		});
+
+		QUnit.test("when defining custom label getters for the reveal action", async function(assert) {
+			const oObjectPageLayout = this.oView.byId("ObjectPageLayout");
+			await registerTestOverlaysWithRelevantContainer.call(this, oObjectPageLayout);
+			const sActionLabel = "ACTION";
+			const sDTLabel = "DESIGNTIME";
+			const aTests = [
+				{
+					name: "action only -> action label is used",
+					element: this.oView.byId("idMain1--ObjectPageSectionInvisible"),
+					action: {
+						getLabel: () => sActionLabel
+					},
+					expected: sActionLabel
+				},
+				{
+					name: "designtime only -> designtime label is uesed",
+					element: this.oView.byId("idMain1--ObjectPageSectionStashed1"),
+					designtimeData: {
+						getLabel: () => sDTLabel
+					},
+					expected: sDTLabel
+				},
+				{
+					name: "action + designtime -> action label wins",
+					element: this.oView.byId("idMain1--ObjectPageSectionStashed2"),
+					action: {
+						getLabel: () => sActionLabel
+					},
+					designtimeData: {
+						getLabel: () => sDTLabel
+					},
+					expected: sActionLabel
+				},
+				{
+					name: "no overlay -> fallbacks are triggered",
+					element: this.oView.byId("idMain1--ObjectPageSectionForNavigationWithoutOtherGroup"),
+					noOverlay: true,
+					expected: this.oView.byId("idMain1--ObjectPageSectionForNavigationWithoutOtherGroup").getTitle()
+				}
+			];
+
+			const oGetOverlayStub = this.sandbox.stub(OverlayRegistry, "getOverlay").callThrough();
+			const aRevealActions = [];
+			aTests.forEach((oTest) => {
+				aRevealActions.push({
+					element: oTest.element,
+					action: oTest.action || {}
+				});
+				if (oTest.noOverlay) {
+					oGetOverlayStub.withArgs(oTest.element).returns(undefined);
+				}
+				if (oTest.designtimeData) {
+					const oGetDataStub = this.sandbox.stub(
+						OverlayRegistry.getOverlay(oTest.element).getDesignTimeMetadata(),
+						"getData"
+					);
+					oGetDataStub.callsFake(function(...aArgs) {
+						return {
+							...oGetDataStub.wrappedMethod.apply(this, aArgs),
+							...oTest.designtimeData
+						};
+					});
+				}
+			});
+
+			const aAdditionalElements = await AdditionalElementsAnalyzer.enhanceInvisibleElements(
+				oObjectPageLayout,
+				{
+					reveal: { elements: aRevealActions }
+				}
+			);
+			aTests.forEach((oTest, iIndex) => {
+				assert.strictEqual(
+					aAdditionalElements[iIndex].label,
+					oTest.expected,
+					oTest.name
+				);
 			});
 		});
 

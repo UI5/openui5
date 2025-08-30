@@ -461,7 +461,7 @@ sap.ui.define([
 			this.oStorageCondenseStub = sandbox.stub(Storage, "condense").callsFake((oPropertyBag) => {
 				return Promise.resolve({ response: oPropertyBag.condensedChanges.map((oChange) => oChange.convertToFileContent()) });
 			});
-			this.oFlexStateUpdateSpy = sandbox.spy(FlexState, "updateStorageResponse");
+			this.oFlexStateUpdateSpy = sandbox.spy(FlexState, "update");
 			this.oFlexObjectDSUpdateSpy = sandbox.spy(FlexState.getFlexObjectsDataSelector(), "checkUpdate");
 			this.oDHRemoveFromMapSpy = sandbox.spy(DependencyHandler, "removeChangeFromMap");
 			this.oDHRemoveFromDependenciesSpy = sandbox.spy(DependencyHandler, "removeChangeFromDependencies");
@@ -513,7 +513,7 @@ sap.ui.define([
 			this.aChanges.forEach((oChange) => {
 				assert.strictEqual(oChange.getState(), States.LifecycleState.PERSISTED, "the change is in the PERSISTED state");
 			});
-			assert.strictEqual(this.oFlexStateUpdateSpy.callCount, 4, "FlexState.updateStorageResponse was called four times");
+			assert.strictEqual(this.oFlexStateUpdateSpy.callCount, 4, "FlexState.update was called four times");
 			// checkUpdate is called for the initial addDirtyChanges, for the update of the saved changes
 			// and for the deletion of the additional changes
 			assert.strictEqual(this.oFlexObjectDSUpdateSpy.callCount, 4, "FlexObjectDataSelector.checkUpdate was called four times");
@@ -827,7 +827,7 @@ sap.ui.define([
 			assert.strictEqual(this.oCondenserStub.callCount, 1, "the Condenser was called");
 			assert.strictEqual(this.oStorageCondenseStub.callCount, 1, "the Storage.condense was called once");
 			assert.strictEqual(this.oStorageWriteStub.callCount, 0, "the Storage.write was not called");
-			assert.strictEqual(this.oFlexStateUpdateSpy.callCount, 0, "FlexState.updateStorageResponse was not called");
+			assert.strictEqual(this.oFlexStateUpdateSpy.callCount, 0, "FlexState.update was not called");
 		});
 	});
 
@@ -1044,7 +1044,7 @@ sap.ui.define([
 			sandbox.stub(ManifestUtils, "getFlexReferenceForControl").returns(sReference);
 			this.oStorageStub = sandbox.stub(Storage, "reset");
 			this.oReverterStub = sandbox.stub(Reverter, "revertMultipleChanges");
-			this.oUpdateStorageResponse = sandbox.stub(FlexState, "updateStorageResponse");
+			this.oUpdateStorageResponse = sandbox.stub(FlexState, "update");
 			await FlQUnitUtils.initializeFlexStateWithData(sandbox, sReference, {
 				changes: [
 					{

@@ -188,9 +188,11 @@ sap.ui.define([
 				errorMessage: "Custom error message"
 			};
 			const oAction = {
-				getLabel: () => "My original label",
 				validators: [oCustomValidator]
 			};
+			sandbox.stub(this.oButtonOverlay.getDesignTimeMetadata(), "getData").returns({
+				getLabel: () => "My original label"
+			});
 			return openDialog(
 				this.oRenameDialog,
 				this.oButtonOverlay,

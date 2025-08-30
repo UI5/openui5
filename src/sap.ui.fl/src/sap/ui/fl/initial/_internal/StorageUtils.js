@@ -3,17 +3,19 @@
  */
 
 sap.ui.define([
+	"sap/base/util/isEmptyObject",
+	"sap/base/util/ObjectPath",
 	"sap/base/Log",
 	"sap/ui/fl/initial/_internal/FlexConfiguration",
 	"sap/ui/fl/Layer",
-	"sap/ui/fl/LayerUtils",
-	"sap/base/util/isEmptyObject"
+	"sap/ui/fl/LayerUtils"
 ], function(
+	isEmptyObject,
+	ObjectPath,
 	Log,
 	FlexConfiguration,
 	Layer,
-	LayerUtils,
-	isEmptyObject
+	LayerUtils
 ) {
 	"use strict";
 
@@ -100,6 +102,34 @@ sap.ui.define([
 
 			return sConnectorModuleName;
 		});
+	}
+
+	function getChangeCategoryPath(oChangeDefinition) {
+		switch (oChangeDefinition.fileType) {
+			case "change":
+				if (oChangeDefinition.selector && oChangeDefinition.selector.persistencyKey) {
+					return ["comp", "changes"];
+				}
+				if (oChangeDefinition.variantReference) {
+					return "variantDependentControlChanges";
+				}
+				if (oChangeDefinition.appDescriptorChange) {
+					return "appDescriptorChanges";
+				}
+				return "changes";
+			case "ctrl_variant":
+				return "variants";
+			case "ctrl_variant_change":
+				return "variantChanges";
+			case "ctrl_variant_management_change":
+				return "variantManagementChanges";
+			case "variant":
+				return ["comp", "variants"];
+			case "annotation_change":
+				return "annotationChanges";
+			default:
+				return "";
+		}
 	}
 
 	/**
@@ -346,6 +376,36 @@ sap.ui.define([
 				return oResponse[sKey].length !== 0;
 			}
 			return !isEmptyObject(oResponse[sKey]);
+		});
+	};
+
+	/**
+	 * Updates the storage response with the provided updates by directly mutating the given response.
+	 *
+	 * @param {object} oResponse - Storage response to apply the updates to.
+	 * @param {sap.ui.fl.apply._internal.flexState.dataSelector.UpdateInfo[]} aUpdates - The updates to apply to the storage response.
+	 */
+	StorageUtils.updateStorageResponse = function(oResponse, aUpdates) {
+		aUpdates.forEach((oUpdate) => {
+			if (oUpdate.type === "ui2") {
+				oResponse.changes.ui2personalization = oUpdate.newData;
+			} else {
+				const vPath = getChangeCategoryPath(oUpdate.flexObject);
+				const sFileName = oUpdate.flexObject.fileName;
+				const aCache = ObjectPath.get(vPath, oResponse.changes);
+				switch (oUpdate.type) {
+					case "add":
+						aCache.push(oUpdate.flexObject);
+						break;
+					case "delete":
+						aCache.splice(aCache.findIndex((oFlexObject) => oFlexObject.fileName === sFileName), 1);
+						break;
+					case "update":
+						aCache.splice(aCache.findIndex((oFlexObject) => oFlexObject.fileName === sFileName), 1, oUpdate.flexObject);
+						break;
+					default:
+				}
+			}
 		});
 	};
 

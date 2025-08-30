@@ -5,7 +5,13 @@ sap.ui.define(function() {
 		name: "TestSuite for sap.ui.core: GTP testcase CORE/DATABINDING",
 		defaults: {
 			qunit: {
-				version: 2,
+				version : "2.18",
+				versions : {
+					"2.18" : {
+						module : "test-resources/sap/ui/core/qunit/thirdparty/qunit-2.18",
+						css : "test-resources/sap/ui/core/qunit/thirdparty/qunit-2.18.css"
+					}
+				},
 				testTimeout: 6000
 			},
 			sinon: {
@@ -133,13 +139,14 @@ sap.ui.define(function() {
 			},
 
 			ODataMetadata: {
-				qunit: {
-					reorder: false
-				},
 				title: "sap.ui.model.odata.ODataMetadata - QUnit Tests",
 				module: [
 					"test-resources/sap/ui/core/qunit/odata/ODataMetadata.qunit"
 				],
+				qunit: {
+					version: 2,
+					reorder: false
+				},
 				sinon: 1 // because MockServer is used which has a hard dependency to sinon V1
 			},
 

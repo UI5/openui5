@@ -5,7 +5,13 @@ sap.ui.define(function() {
 		name: "TestSuite for sap.ui.core: GTP testcase CORE/JSONMODEL",
 		defaults: {
 			qunit: {
-				version: 2
+				version : "2.18",
+				versions : {
+					"2.18" : {
+						module : "test-resources/sap/ui/core/qunit/thirdparty/qunit-2.18",
+						css : "test-resources/sap/ui/core/qunit/thirdparty/qunit-2.18.css"
+					}
+				}
 			},
 			ui5: {
 				language: "en-US"
