@@ -6,6 +6,15 @@ sap.ui.define(function() {
 	return {
 		name: "Analytics",
 		defaults: {
+			qunit: {
+				version : "2.18",
+				versions : {
+					"2.18" : {
+						module : "test-resources/sap/ui/core/qunit/thirdparty/qunit-2.18",
+						css : "test-resources/sap/ui/core/qunit/thirdparty/qunit-2.18.css"
+					}
+				}
+			},
 			loader: {
 				paths: {
 					"sap/ui/core/qunit/analytics": "test-resources/sap/ui/core/qunit/analytics"

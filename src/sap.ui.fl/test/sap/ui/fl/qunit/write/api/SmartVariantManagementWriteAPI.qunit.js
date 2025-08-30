@@ -1381,7 +1381,7 @@ sap.ui.define([
 				componentData: {}
 			});
 
-			await FlexState.update({
+			await FlexState.reinitialize({
 				reference: sReference,
 				componentId: "__component0",
 				manifest: {},

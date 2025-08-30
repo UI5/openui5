@@ -789,7 +789,7 @@ sap.ui.define([
 			});
 
 			// Step 1: add some changes to the cache
-			Loader.updateStorageResponse(sReference, aUpdates);
+			Loader.updateCachedResponse(sReference, aUpdates);
 			const oCachedData = Loader.getCachedFlexData(sReference).changes;
 			assert.strictEqual(oCachedData.changes.length, 1, "one UI change is stored");
 			assert.strictEqual(oCachedData.changes[0].fileName, "uiChange1", "the UI change is stored");
@@ -833,7 +833,7 @@ sap.ui.define([
 				type: "update",
 				flexObject: oUpdatedChange
 			});
-			Loader.updateStorageResponse(sReference, aSecondUpdates);
+			Loader.updateCachedResponse(sReference, aSecondUpdates);
 			const oCachedData2 = Loader.getCachedFlexData(sReference).changes;
 			assert.strictEqual(oCachedData2.changes.length, 0, "the UI change is deleted");
 			assert.strictEqual(oCachedData2.variantDependentControlChanges.length, 0, "the variant dependent UI change is deleted");
@@ -875,7 +875,7 @@ sap.ui.define([
 				]
 			});
 
-			Loader.updateStorageResponse(sReference, [
+			Loader.updateCachedResponse(sReference, [
 				{
 					type: "add",
 					flexObject: FlexObjectFactory.createFlVariant({ id: "flVariant1" }).convertToFileContent()

@@ -431,12 +431,10 @@ sap.ui.define([
 			sandbox.stub(CommandFactory.prototype, "getCommandFor").resolves();
 			const oDesignTimeMetadata = this.oLayoutOverlay.getDesignTimeMetadata();
 			const oGetLabelStub = sinon.stub();
-			sandbox.stub(oDesignTimeMetadata, "getAction")
-			.callThrough()
-			.withArgs("rename")
-			.callsFake(function(...aArgs) {
+			const oGetDataStub = sandbox.stub(oDesignTimeMetadata, "getData");
+			oGetDataStub.callsFake(function(...aArgs) {
 				return {
-					...oDesignTimeMetadata.getAction.wrappedMethod.apply(this, aArgs),
+					...oGetDataStub.wrappedMethod.apply(this, aArgs),
 					getLabel: oGetLabelStub
 				};
 			});

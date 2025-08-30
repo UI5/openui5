@@ -938,7 +938,7 @@ sap.ui.define([
 					}
 				});
 				oDataSelectorUpdateSpy = sandbox.spy(FlexState.getFlexObjectsDataSelector(), "checkUpdate");
-				await FlexState.update({
+				await FlexState.reinitialize({
 					reference: sReference,
 					componentId: this.sComponentId,
 					manifest: {},
@@ -994,7 +994,7 @@ sap.ui.define([
 			});
 
 			const oDataSelectorUpdateSpy = sandbox.spy(FlexState.getFlexObjectsDataSelector(), "checkUpdate");
-			await FlexState.update({
+			await FlexState.reinitialize({
 				reference: sReference,
 				componentId: this.sComponentId,
 				manifest: {},
@@ -1068,7 +1068,7 @@ sap.ui.define([
 				}
 			});
 
-			await FlexState.update({
+			await FlexState.reinitialize({
 				reference: sReference,
 				componentId: this.sComponentId,
 				manifest: {},
@@ -1122,7 +1122,7 @@ sap.ui.define([
 
 			const oDataSelectorUpdateSpy = sandbox.spy(FlexState.getFlexObjectsDataSelector(), "checkUpdate");
 			// nothing changes - same data is returned from the storage
-			await FlexState.update({
+			await FlexState.reinitialize({
 				reference: sReference,
 				componentId: this.sComponentId,
 				manifest: {},
@@ -1137,7 +1137,7 @@ sap.ui.define([
 			assert.strictEqual(oDataSelectorUpdateSpy.callCount, 0, "then the data selector update was not called");
 		});
 
-		QUnit.test("when calling FlexState.update twice in a row", async function(assert) {
+		QUnit.test("when calling FlexState.reinitialize twice in a row", async function(assert) {
 			assert.expect(1);
 			this.oLoadFlexDataStub = mockLoader();
 			this.oLoadFlexDataStub
@@ -1164,13 +1164,13 @@ sap.ui.define([
 			});
 
 			await Promise.all([
-				FlexState.update({
+				FlexState.reinitialize({
 					reference: sReference,
 					componentId: this.sComponentId,
 					manifest: {},
 					componentData: {}
 				}),
-				FlexState.update({
+				FlexState.reinitialize({
 					reference: sReference,
 					componentId: this.sComponentId,
 					manifest: {},
@@ -1225,7 +1225,7 @@ sap.ui.define([
 						}
 					}
 				});
-				return FlexState.update({
+				return FlexState.reinitialize({
 					reference: sReference,
 					componentId: this.sComponentId,
 					manifest: {},
@@ -1268,7 +1268,7 @@ sap.ui.define([
 				}
 			});
 
-			await FlexState.update({
+			await FlexState.reinitialize({
 				reference: sReference,
 				componentId: this.sComponentId,
 				manifest: {},
@@ -1359,7 +1359,7 @@ sap.ui.define([
 		});
 	});
 
-	QUnit.module("FlexState.updateStorageResponse", {
+	QUnit.module("FlexState.update", {
 		async beforeEach() {
 			this.oAppComponent = new UIComponent(sComponentId);
 			sandbox.stub(Storage, "loadFlexData").resolves(StorageUtils.getEmptyFlexDataResponse());
@@ -1384,7 +1384,7 @@ sap.ui.define([
 				})
 			];
 			FlexState.addDirtyFlexObjects(sReference, aInitialChanges);
-			FlexState.updateStorageResponse(sReference, aInitialChanges.map((flexObject) => ({
+			FlexState.update(sReference, aInitialChanges.map((flexObject) => ({
 				type: "add",
 				flexObject: flexObject.convertToFileContent()
 			})));
@@ -1438,7 +1438,7 @@ sap.ui.define([
 			aNewChanges.forEach(function(oFlexObject) {
 				FlexState.addDirtyFlexObjects(sReference, [oFlexObject]);
 			});
-			FlexState.updateStorageResponse(sReference, [
+			FlexState.update(sReference, [
 				...aNewChanges.map((flexObject) => ({
 					type: "add",
 					flexObject: flexObject.convertToFileContent()
@@ -1465,7 +1465,7 @@ sap.ui.define([
 
 			const oUpdateSpy = sandbox.spy(oFlexObjectsDataSelector, "checkUpdate");
 			const aUpdates = [this.oUIChange, this.oFlVariant, this.oCompVariant, this.oCompChange];
-			FlexState.updateStorageResponse(sReference, [
+			FlexState.update(sReference, [
 				...aUpdates.map((flexObject) => ({
 					type: "update",
 					flexObject: flexObject.convertToFileContent()
@@ -1493,7 +1493,7 @@ sap.ui.define([
 			);
 
 			const aDeletes = [this.oVariantDepUIChange, this.oFlVariant, this.oCompVariant, this.oCompChange];
-			FlexState.updateStorageResponse(sReference, aDeletes.map((flexObject) => ({
+			FlexState.update(sReference, aDeletes.map((flexObject) => ({
 				type: "delete",
 				flexObject: flexObject.convertToFileContent()
 			})));
@@ -1531,7 +1531,7 @@ sap.ui.define([
 
 		QUnit.test("when only ui2personalization is updated", async function(assert) {
 			const oUpdateFlexObjectsSpy = sandbox.spy(FlexState.getFlexObjectsDataSelector(), "checkUpdate");
-			await FlexState.updateStorageResponse(sReference, [
+			await FlexState.update(sReference, [
 				{type: "ui2", newData: "ui2"}
 			]);
 			assert.strictEqual(oUpdateFlexObjectsSpy.callCount, 0, "then the flex objects data selector is not updated");
@@ -1540,7 +1540,7 @@ sap.ui.define([
 		QUnit.test("when adding a flex object that is not part of the runtime pertsistence", function(assert) {
 			assert.throws(
 				function() {
-					FlexState.updateStorageResponse(sReference, [
+					FlexState.update(sReference, [
 						{type: "add", flexObject: {id: "unknownObject"}}
 					]);
 				},
@@ -1550,10 +1550,10 @@ sap.ui.define([
 
 		QUnit.test("when updating the storage response", function(assert) {
 			FlexState.addDirtyFlexObjects(sReference, [this.oUIChange]);
-			FlexState.updateStorageResponse(sReference, [
+			FlexState.update(sReference, [
 				{type: "add", flexObject: this.oUIChange.convertToFileContent()}
 			]);
-			FlexState.updateStorageResponse(sReference, [
+			FlexState.update(sReference, [
 				{
 					type: "update",
 					flexObject: {

@@ -7,7 +7,13 @@ sap.ui.define(function () {
 		defaults : {
 			group : "OData Types",
 			qunit : {
-				version : "edge"
+				versions : {
+					"2.18" : {
+						module : "test-resources/sap/ui/core/qunit/thirdparty/qunit-2.18",
+						css : "test-resources/sap/ui/core/qunit/thirdparty/qunit-2.18.css"
+					}
+				},
+				version : "2.18"
 			},
 			sinon : {
 				version : "edge"

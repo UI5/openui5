@@ -390,11 +390,13 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	QUnit.test("annotations: operators", function (assert) {
+		// logical
 		testExpression(assert, "<And><Path>IsMale</Path><Path>IsMarried</Path></And>",
 			{$And : [{$Path : "IsMale"}, {$Path : "IsMarried"}]});
 		testExpression(assert, "<Or><Path>IsMale</Path><Path>IsMarried</Path></Or>",
 			{$Or : [{$Path : "IsMale"}, {$Path : "IsMarried"}]});
 		testExpression(assert, "<Not><Path>IsMale</Path></Not>", {$Not : {$Path : "IsMale"}});
+		// comparison
 		testExpression(assert, "<Eq><Null/><Path>IsMale</Path></Eq>",
 			{$Eq : [null, {$Path : "IsMale"}]});
 		testExpression(assert, "<Ne><Null/><Path>IsMale</Path></Ne>",
@@ -403,10 +405,36 @@ sap.ui.define([
 			{$Gt : [{$Path : "Price"}, 20]});
 		testExpression(assert, "<Ge><Path>Price</Path><Int>20</Int></Ge>",
 			{$Ge : [{$Path : "Price"}, 20]});
-		testExpression(assert, "<Le><Path>Price</Path><Int>20</Int></Le>",
-			{$Le : [{$Path : "Price"}, 20]});
 		testExpression(assert, "<Lt><Path>Price</Path><Int>20</Int></Lt>",
 			{$Lt : [{$Path : "Price"}, 20]});
+		testExpression(assert, "<Le><Path>Price</Path><Int>20</Int></Le>",
+			{$Le : [{$Path : "Price"}, 20]});
+		testExpression(assert,
+			"<Has><Path>Fabric</Path><EnumMember>org.example.Pattern/Red</EnumMember></Has>",
+			{$Has : [{$Path : "Fabric"}, {$EnumMember : "org.example.Pattern/Red"}]});
+		testExpression(assert, `
+<In>
+  <Path>Size</Path>
+  <Collection>
+    <String>XS</String>
+    <String>S</String>
+  </Collection>
+</In>`, {$In : [{$Path : "Size"}, ["XS", "S"]]});
+		// arithmetic
+		testExpression(assert, "<Add><Path>StartDate</Path><Path>Duration</Path></Add>",
+			{$Add : [{$Path : "StartDate"}, {$Path : "Duration"}]});
+		testExpression(assert, "<Sub><Path>Revenue</Path><Path>Cost</Path></Sub>",
+			{$Sub : [{$Path : "Revenue"}, {$Path : "Cost"}]});
+		testExpression(assert, "<Neg><Path>Height</Path></Neg>", {$Neg : {$Path : "Height"}});
+		testExpression(assert, "<Mul><Path>NetPrice</Path><Path>TaxRate</Path></Mul>",
+			{$Mul : [{$Path : "NetPrice"}, {$Path : "TaxRate"}]});
+		testExpression(assert, "<Div><Path>Quantity</Path><Path>QuantityPerParcel</Path></Div>",
+			{$Div : [{$Path : "Quantity"}, {$Path : "QuantityPerParcel"}]});
+		testExpression(assert, "<DivBy><Path>Quantity</Path><Path>QuantityPerParcel</Path></DivBy>",
+			{$DivBy : [{$Path : "Quantity"}, {$Path : "QuantityPerParcel"}]});
+		testExpression(assert, "<Mod><Path>Quantity</Path><Path>QuantityPerParcel</Path></Mod>",
+			{$Mod : [{$Path : "Quantity"}, {$Path : "QuantityPerParcel"}]});
+		// if
 		testExpression(assert,
 			"<If><Path>IsFemale</Path><String>Female</String><String>Male</String></If>",
 			{$If : [{$Path : "IsFemale"}, "Female", "Male"]});

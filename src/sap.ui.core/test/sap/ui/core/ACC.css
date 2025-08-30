@@ -38,7 +38,7 @@ html, body {
 }
 
 #bar .rightContentContainer {
-	style="float:right;"	
+	float: right;
 }
 
 #content {

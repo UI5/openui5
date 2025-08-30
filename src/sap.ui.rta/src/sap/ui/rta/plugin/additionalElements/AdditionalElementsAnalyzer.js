@@ -7,6 +7,7 @@ sap.ui.define([
 	"sap/base/util/ObjectPath",
 	"sap/ui/core/util/reflection/JsControlTreeModifier",
 	"sap/ui/dt/ElementUtil",
+	"sap/ui/dt/OverlayRegistry",
 	"sap/ui/fl/apply/api/DelegateMediatorAPI",
 	"sap/ui/rta/util/BindingsExtractor"
 ], function(
@@ -14,6 +15,7 @@ sap.ui.define([
 	ObjectPath,
 	JsControlTreeModifier,
 	ElementUtil,
+	OverlayRegistry,
 	DelegateMediatorAPI,
 	BindingsExtractor
 ) {
@@ -134,13 +136,24 @@ sap.ui.define([
 		};
 	}
 
+	function getLabel(oElement, mAction) {
+		const oOverlay = OverlayRegistry.getOverlay(oElement);
+		// Try different label sources in the following order:
+		// 1) Action.getLabel
+		// 2) DTMetadata.getLabel
+		// 3) The fallbacks in ElementUtil.getLabelForElement
+		return (mAction.getLabel || !oOverlay)
+			? ElementUtil.getLabelForElement(oElement, mAction.getLabel)
+			: oOverlay.getDesignTimeMetadata().getLabel(oElement);
+	}
+
 	function elementToAdditionalElementInfo(mData) {
 		const oElement = mData.element;
-		const mAction = mData.action;
+		const sLabel = getLabel(oElement, mData.action);
 		return {
 			selected: false,
-			label: oElement.__label || ElementUtil.getLabelForElement(oElement, mAction.getLabel),
-			tooltip: oElement.__tooltip || ElementUtil.getLabelForElement(oElement, mAction.getLabel) || oElement.__bindingPath,
+			label: oElement.__label || sLabel,
+			tooltip: oElement.__tooltip || sLabel || oElement.__bindingPath,
 			parentPropertyName: oElement.__parentPropertyName ? oElement.__parentPropertyName : "",
 			duplicateName: oElement.__duplicateName ? oElement.__duplicateName : false,
 			originalLabel: oElement.__renamedLabel && oElement.__label !== oElement.__originalLabel ? oElement.__originalLabel : "",
@@ -429,8 +442,7 @@ sap.ui.define([
 			aInvisibleElements.forEach(function(mInvisibleElement) {
 				const oInvisibleElement = mInvisibleElement.element;
 				const mRevealAction = mInvisibleElement.action;
-
-				oInvisibleElement.__label = ElementUtil.getLabelForElement(oInvisibleElement, mRevealAction.getLabel);
+				oInvisibleElement.__label = getLabel(oInvisibleElement, mRevealAction);
 
 				const bIncludeElement = enhanceByMetadata(
 					oElement, sAggregationName, mInvisibleElement, mActions, aRepresentedProperties, aProperties

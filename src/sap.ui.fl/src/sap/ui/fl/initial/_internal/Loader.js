@@ -133,34 +133,6 @@ sap.ui.define([
 		return mFlexData;
 	}
 
-	function getChangeCategory(oChangeDefinition) {
-		switch (oChangeDefinition.fileType) {
-			case "change":
-				if (oChangeDefinition.selector && oChangeDefinition.selector.persistencyKey) {
-					return ["comp", "changes"];
-				}
-				if (oChangeDefinition.variantReference) {
-					return "variantDependentControlChanges";
-				}
-				if (oChangeDefinition.appDescriptorChange) {
-					return "appDescriptorChanges";
-				}
-				return "changes";
-			case "ctrl_variant":
-				return "variants";
-			case "ctrl_variant_change":
-				return "variantChanges";
-			case "ctrl_variant_management_change":
-				return "variantManagementChanges";
-			case "variant":
-				return ["comp", "variants"];
-			case "annotation_change":
-				return "annotationChanges";
-			default:
-				return "";
-		}
-	}
-
 	/**
 	 * Provides the flex data for a given application based on the configured connectors.
 	 * This function needs a manifest object, async hints and either an ID to an instantiated component or component data as parameter.
@@ -328,31 +300,9 @@ sap.ui.define([
 	 *
 	 * @param {string} sReference - The flex reference for which to update the storage response.
 	 * @param {object[]} aUpdates - The updates to apply to the storage response.
-	 * @returns {object} The updated storage response.
 	 */
-	Loader.updateStorageResponse = function(sReference, aUpdates) {
-		aUpdates.forEach((oUpdate) => {
-			if (oUpdate.type === "ui2") {
-				_mCachedFlexData[sReference].data.changes.ui2personalization = oUpdate.newData;
-			} else {
-				const vPath = getChangeCategory(oUpdate.flexObject);
-				const sFileName = oUpdate.flexObject.fileName;
-				const aCache = ObjectPath.get(vPath, _mCachedFlexData[sReference].data.changes);
-				switch (oUpdate.type) {
-					case "add":
-						aCache.push(oUpdate.flexObject);
-						break;
-					case "delete":
-						aCache.splice(aCache.findIndex((oFlexObject) => oFlexObject.fileName === sFileName), 1);
-						break;
-					case "update":
-						aCache.splice(aCache.findIndex((oFlexObject) => oFlexObject.fileName === sFileName), 1, oUpdate.flexObject);
-						break;
-					default:
-				}
-			}
-		});
-		return Object.assign({}, _mCachedFlexData[sReference].data);
+	Loader.updateCachedResponse = function(sReference, aUpdates) {
+		StorageUtils.updateStorageResponse(_mCachedFlexData[sReference].data, aUpdates);
 	};
 
 	/**
