@@ -318,6 +318,9 @@ sap.ui.define([
 					rtl: true
 				}
 			},
+			DialogWithWebComponents: {
+				title: "QUnit Page for sap.m.Dialog containing web components"
+			},
 			DisplayListItem: {
 				title: "Test Page for sap.m.DisplayListItem"
 			},
