@@ -368,5 +368,25 @@
         "text": " sap.m.NotificationList: Focus handling on item removal is now fixed"
       }
     ]
+  },
+  "1.136.6": {
+    "date": "September 2025",
+    "notes": [
+      {
+        "id": "2c4e497c6b637a013e884d66e38c3b18a8af26c4",
+        "type": "FIX",
+        "text": " sap.m.SplitApp: busy indicator layer is now also over the master container"
+      },
+      {
+        "id": "8bc5b44259e1177cc2ce61669346007190077e8d",
+        "type": "FIX",
+        "text": " sap.m.DynamicDateFormat: Sanitizing a pattern when creating a regex"
+      },
+      {
+        "id": "3da525e8ef1526467c38cbc3a5fff6bd4374882c",
+        "type": "FIX",
+        "text": " sap.m.Button: has correct css parameters for active Emphasized"
+      }
+    ]
   }
 }

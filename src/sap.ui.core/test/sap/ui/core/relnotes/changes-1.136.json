@@ -303,5 +303,20 @@
         "text": " Make the experimental new bootstrap the productive one"
       }
     ]
+  },
+  "1.136.6": {
+    "date": "September 2025",
+    "notes": [
+      {
+        "id": "b86e877eb94365776403fd251ed00f8db06fa9fb",
+        "type": "FIX",
+        "text": " routing/History: avoid creating history entry when same hash is applied"
+      },
+      {
+        "id": "998696dc5439e8be61ac6227bcf2f921fa206bf9",
+        "type": "FIX",
+        "text": " sap/ui/core/LocaleData: getAllCurrencyDigits ignores CLDR in case of custom currencies with DEFAULT"
+      }
+    ]
   }
 }

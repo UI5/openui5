@@ -73,5 +73,15 @@
         "text": " PropertyHelperUtil: check UI5 2.0 availability by deprecations"
       }
     ]
+  },
+  "1.136.6": {
+    "date": "September 2025",
+    "notes": [
+      {
+        "id": "fe86ecb74c5e659b375a80d6f64ba6495bed065a",
+        "type": "FIX",
+        "text": " MultiValueField not working after upgrading to 1.136.1"
+      }
+    ]
   }
 }

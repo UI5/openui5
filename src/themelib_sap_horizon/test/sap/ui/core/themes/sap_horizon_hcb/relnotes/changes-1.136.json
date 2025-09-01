@@ -103,5 +103,15 @@
         "text": " sap.m.IconTabBar: focus outline is fixed for high contrast themes"
       }
     ]
+  },
+  "1.136.6": {
+    "date": "September 2025",
+    "notes": [
+      {
+        "id": "3da525e8ef1526467c38cbc3a5fff6bd4374882c",
+        "type": "FIX",
+        "text": " sap.m.Button: has correct css parameters for active Emphasized"
+      }
+    ]
   }
 }
