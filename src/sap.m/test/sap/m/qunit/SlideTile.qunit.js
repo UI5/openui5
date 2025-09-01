@@ -651,10 +651,13 @@ sap.ui.define([
 	QUnit.test("Tests if tile is getting scrolled by the buttons", function(assert) {
 		var oIndicator1 = this.oSlideTile.$("tilesWrapper")[0].children[0];
 		assert.ok(jQuery(oIndicator1.children[0]).hasClass("sapMSTActive"),"The first dot displayed as active");
+		var spy = sinon.spy(this.oSlideTile, "_scrollToNextTileManually");
 		this.oSlideTile._oRightScroll.firePress();
+		assert.ok(spy.calledOnce, "The manual scroll method has been called");
 		var oIndicator2 = this.oSlideTile.$("tilesWrapper")[0].children[1];
 		assert.ok(jQuery(oIndicator2.children[0]).hasClass("sapMSTActive"),"The second dot displayed as active");
 		this.oSlideTile._oLeftScroll.firePress();
+		assert.ok(spy.calledTwice, "The manual scroll method has been called");
 		assert.ok(jQuery(oIndicator1.children[0]).hasClass("sapMSTActive"),"The first dot displayed as active");
 
 	});
