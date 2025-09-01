@@ -1011,8 +1011,15 @@ sap.ui.define([
 		if (type == "focus") {
 			var oDomRef = this._$().get(0);
 			if (oDomRef) {
-				const oTarget = oEvent.target.shadowRoot ? oEvent.target.shadowRoot.activeElement : oEvent.target;
-				bContains = this._contains(oTarget);
+				bContains = this._contains(oEvent.target);
+
+				let oTarget = oEvent.target;
+
+				// also check the shadow dom active element in case the event target has a shadow dom attached
+				while (!bContains && oTarget.shadowRoot && oTarget.shadowRoot.activeElement) {
+					bContains = this._contains(oTarget.shadowRoot.activeElement);
+					oTarget = oTarget.shadowRoot.activeElement;
+				}
 
 				Log.debug("focus event on " + oEvent.target.id + ", contains: " + bContains);
 
