@@ -1,7 +1,12 @@
 {
   "1.140.0": {
-    "date": "August 2025",
+    "date": "September 2025",
     "notes": [
+      {
+        "id": "1b111ef9cdd35b2002449c0ec4e235bc147e22ee",
+        "type": "FIX",
+        "text": " routing/Route: Correctly join nested route patterns"
+      },
       {
         "id": "5a1bfe4289456a8bc5d3b840d0e19509320fa8d1",
         "type": "FIX",

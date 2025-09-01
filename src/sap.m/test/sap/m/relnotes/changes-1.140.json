@@ -1,7 +1,22 @@
 {
   "1.140.0": {
-    "date": "August 2025",
+    "date": "September 2025",
     "notes": [
+      {
+        "id": "d334513c565f964f7951b5992791a1a0639bcf2c",
+        "type": "FIX",
+        "text": " sap.m.Menu: Added optional chaining to avoid errors when MenuWrapper is not present"
+      },
+      {
+        "id": "91129f38239643edf5229f5249226a3c85b687d2",
+        "type": "FIX",
+        "text": " sap.m.Menu: Fix binding of menu items"
+      },
+      {
+        "id": "489c80ae36e684e554d9496262ee3c221230ee6f",
+        "type": "FIX",
+        "text": " sap.m.Button: has correct css parameters for active Emphasized"
+      },
       {
         "id": "11ecfa412c64f2ac9db290119a3e0f638cb99e6d",
         "type": "FIX",
