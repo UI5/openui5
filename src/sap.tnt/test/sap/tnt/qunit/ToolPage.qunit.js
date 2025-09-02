@@ -548,8 +548,14 @@ sap.ui.define([
 		assert.ok(Element.getElementById(this.toolPage.getId()), "ToolPage is not created");
 	});
 
-	QUnit.test("contains elements and classes", function (assert) {
-		assert.ok(this.toolPage.$().hasClass('sapTntToolPage'), "sapTntToolPage class is not set");
+	QUnit.test("contains elements and classes", async function (assert) {
+		assert.ok(this.toolPage.$().hasClass('sapTntToolPage'), "sapTntToolPage class is set");
+		assert.ok(this.toolPage.$().hasClass('sapTntToolPageWithSideContent'), "sapTntToolPageWithSideContent class is set");
+
+		this.toolPage.destroySideContent();
+		await nextUIUpdate(this.clock);
+
+		assert.notOk(this.toolPage.$().hasClass('sapTntToolPageWithSideContent'), "sapTntToolPageWithSideContent class is not set");
 	});
 
 	QUnit.test("header", function (assert) {

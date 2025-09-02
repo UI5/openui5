@@ -1,0 +1,40 @@
+{
+	"sap.app": {
+		"id": "childCard2.1",
+		"type": "card",
+		"i18n": "i18n/i18n.properties"
+	},
+	"sap.card": {
+		"type": "Object",
+		"data": {
+			"json": {
+				"item": {
+					"title": "Child Card 2.1",
+					"description": "This is another nested child card."
+				}
+			}
+		},
+		"header": {
+			"title": "Child Card 2.1"
+		},
+		"content": {
+			"data": {
+				"path": "/item"
+			},
+			"groups": [
+				{
+					"items": [
+						{
+							"label": "Title",
+							"value": "{title}"
+						},
+						{
+							"label": "Description",
+							"value": "{description}"
+						}
+					]
+				}
+			]
+		}
+	}
+}

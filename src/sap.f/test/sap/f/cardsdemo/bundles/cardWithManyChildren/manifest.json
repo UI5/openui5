@@ -1,0 +1,63 @@
+{
+	"sap.app": {
+		"id": "main",
+		"type": "card",
+		"i18n": "i18n/i18n.properties"
+	},
+	"sap.card": {
+		"type": "List",
+		"configuration": {
+			"childCards": {
+				"childCard1": {
+					"manifest": "./childCard1.json"
+				},
+				"childCard2": {
+					"manifest": "./childCard2.json"
+				}
+			}
+		},
+		"data": {
+			"json": {
+				"items": [
+					{
+						"title": "Item 1",
+						"description": "Open more details in object card"
+					},
+					{
+						"title": "Item 2",
+						"description": "Open more details in object card"
+					}
+				]
+			}
+		},
+		"header": {
+			"title": "Main Card",
+			"subtitle": "Click to open table card",
+			"actions": [
+				{
+					"type": "ShowCard",
+					"parameters": {
+						"childCardKey": "childCard1"
+					}
+				}
+			]
+		},
+		"content": {
+			"data": {
+				"path": "/items"
+			},
+			"item": {
+				"title": "{title}",
+				"description": "{description}",
+				"actions": [
+					{
+						"type": "ShowCard",
+						"parameters": {
+							"childCardKey": "childCard2"
+						}
+					}
+				]
+			}
+		}
+	}
+}

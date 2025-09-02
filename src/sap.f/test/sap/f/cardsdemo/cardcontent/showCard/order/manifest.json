@@ -31,7 +31,7 @@
 			{
 				"type": "ShowCard",
 				"parameters": {
-					"manifest": "./detailsManifest.json",
+					"childCardKey": "detailsCard",
 					"parameters": {
 						"orderId": "{parameters>/orderId/value}"
 					},
@@ -61,6 +61,11 @@
 				},
 				"enableResize": {
 					"value": true
+				}
+			},
+			"childCards": {
+				"detailsCard": {
+					"manifest": "./detailsManifest.json"
 				}
 			}
 		},
@@ -103,7 +108,7 @@
 						{
 							"type": "ShowCard",
 							"parameters": {
-								"manifest": "./detailsManifest.json",
+								"childCardKey": "detailsCard",
 								"parameters": {
 									"orderId": "{parameters>/orderId/value}"
 								},

@@ -54,6 +54,18 @@ sap.ui.define([
 			this._mainCard.triggerAction({
 				"type": "ShowCard",
 				"parameters": {
+					"childCardKey": "detailsCard",
+					"parameters": {
+						"orderId": 10249
+					}
+				}
+			});
+		},
+
+		simulateShowCardButtonPressDeprecated: function () {
+			this._mainCard.triggerAction({
+				"type": "ShowCard",
+				"parameters": {
 					"manifest": "./detailsManifest.json",
 					"parameters": {
 						"orderId": 10249

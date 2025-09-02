@@ -12,8 +12,6 @@ sap.ui.define([
 	"sap/ui/fl/apply/_internal/flexState/communication/FLPAboutInfo",
 	"sap/ui/fl/apply/_internal/preprocessors/ComponentLifecycleHooks",
 	"sap/ui/fl/apply/api/DelegateMediatorAPI",
-	"sap/ui/fl/changeHandler/ChangeAnnotation",
-	"sap/ui/fl/initial/_internal/changeHandlers/ChangeHandlerRegistration",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/base/DesignTime",
 	// the lower 2 are set as a callback in the "register...Processors" which are not detected as dependencies from the preload-building
@@ -28,15 +26,14 @@ sap.ui.define([
 	FLPAboutInfo,
 	ComponentLifecycleHooks,
 	DelegateMediatorAPI,
-	ChangeAnnotation,
-	ChangeHandlerRegistration,
 	ManifestUtils,
 	DesignTime
 ) {
 	"use strict";
 
 	/**
-	 * This class takes care of all the registration (hooks) needed to run flex!
+	 * This module registers everything needed for the app to start,
+	 * without flex changes being involved yet.
 	 *
 	 * @name sap.ui.fl.apply._internal.preprocessors.RegistrationDelegator
 	 * @class
@@ -49,16 +46,6 @@ sap.ui.define([
 	var RegistrationDelegator = {};
 	function registerChangesInComponent() {
 		ComponentHooks.onInstanceCreated.register(ComponentLifecycleHooks.instanceCreatedHook);
-	}
-
-	// TODO: Move change handler registration to apply/init module when circular dependency issues are resolved
-	function registerChangeHandlers() {
-		ChangeHandlerRegistration.registerPredefinedChangeHandlers();
-		ChangeHandlerRegistration.getChangeHandlersOfLoadedLibsAndRegisterOnNewLoadedLibs();
-		ChangeHandlerRegistration.registerAnnotationChangeHandler({
-			changeHandler: ChangeAnnotation,
-			isDefaultChangeHandler: true
-		});
 	}
 
 	function registerOnModelCreated() {
@@ -122,7 +109,6 @@ sap.ui.define([
 	 * @public
 	 */
 	RegistrationDelegator.registerAll = function() {
-		registerChangeHandlers();
 		registerLoadComponentEventHandler();
 		registerExtensionProvider();
 		registerChangesInComponent();

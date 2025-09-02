@@ -117,20 +117,17 @@ sap.ui.define([
 	}
 
 	function updateCacheAndDeleteUnsavedChanges(aAllChanges, aCondensedChanges, bSkipUpdateCache, bAlreadyDeletedViaCondense, sReference) {
-		aCondensedChanges.forEach((oDirtyChange) => {
-			updateCacheAndDirtyState(oDirtyChange, bSkipUpdateCache, sReference);
-		});
-		FlexState.getFlexObjectsDataSelector().checkUpdate({reference: sReference});
+		const aUpdates = aCondensedChanges.map((oDirtyChange) => createStorageUpdate(oDirtyChange, bSkipUpdateCache))
+		.filter(Boolean);
 
-		aAllChanges.filter((oChange) => {
-			return !aCondensedChanges.some((oCondensedChange) => oChange.getId() === oCondensedChange.getId());
-		}).forEach((oChange) => {
+		aAllChanges.filter((oChange) => !aCondensedChanges.some((oCondensedChange) => oChange.getId() === oCondensedChange.getId()))
+		.forEach((oChange) => {
 			if (bAlreadyDeletedViaCondense) {
 				FlexState.removeDirtyFlexObjects(sReference, [oChange]);
 				removeFlexObjectFromDependencyHandler(sReference, oChange);
 
 				// Remove also from Cache if the persisted change is still there (e.g. navigate away and back to the app)
-				FlexState.update(sReference, [{flexObject: oChange.convertToFileContent(), type: "delete"}]);
+				aUpdates.push({ type: "delete", flexObject: oChange.convertToFileContent() });
 			} else {
 				FlexObjectManager.deleteFlexObjects({
 					reference: sReference,
@@ -138,6 +135,10 @@ sap.ui.define([
 				});
 			}
 		});
+		if (aUpdates.length) {
+			FlexState.getFlexObjectsDataSelector().checkUpdate({reference: sReference});
+			FlexState.update(sReference, aUpdates);
+		}
 	}
 
 	function getAllRelevantChangesForCondensing(aDirtyChanges, aDraftFilenames, bCondenseAnyLayer, sLayer, sReference) {
@@ -170,6 +171,7 @@ sap.ui.define([
 			response: []
 		};
 
+		const aUpdates = [];
 		for (const oDirtyChange of aDirtyChanges) {
 			const oPropertyBag = {
 				layer: oDirtyChange.getLayer(),
@@ -187,41 +189,50 @@ sap.ui.define([
 				oPropertyBag.flexObject = oDirtyChange.convertToFileContent();
 				oStorageResponse = await Storage.remove(oPropertyBag);
 			}
-			updateCacheAndDirtyState(oDirtyChange, bSkipUpdateCache, sReference);
+			const oUpdate = createStorageUpdate(oDirtyChange, bSkipUpdateCache);
+			if (oUpdate) {
+				aUpdates.push(oUpdate);
+			}
 
 			if (oStorageResponse?.response) {
 				oCollectedResponse.response.push(...oStorageResponse.response);
 			}
 		}
+		if (aUpdates.length) {
+			FlexState.update(sReference, aUpdates);
+		}
 		FlexState.getFlexObjectsDataSelector().checkUpdate({reference: sReference});
 		return oCollectedResponse;
 	}
 
-	function updateCacheAndDirtyState(oDirtyChange, bSkipUpdateCache, sReference) {
+	function createStorageUpdate(oDirtyChange, bSkipUpdateCache) {
 		if (!bSkipUpdateCache) {
+			let oUpdate;
 			switch (oDirtyChange.getState()) {
 				case States.LifecycleState.NEW:
-					FlexState.update(sReference, [{
+					oUpdate = {
 						type: "add",
 						flexObject: oDirtyChange.convertToFileContent()
-					}]);
+					};
 					break;
 				case States.LifecycleState.DELETED:
-					FlexState.update(sReference, [{
+					oUpdate = {
 						type: "delete",
 						flexObject: oDirtyChange.convertToFileContent()
-					}]);
+					};
 					break;
 				case States.LifecycleState.UPDATED:
-					FlexState.update(sReference, [{
+					oUpdate = {
 						type: "update",
 						flexObject: oDirtyChange.convertToFileContent()
-					}]);
+					};
 					break;
 				default:
 			}
 			oDirtyChange.setState(States.LifecycleState.PERSISTED);
+			return oUpdate;
 		}
+		return undefined;
 	}
 
 	/**

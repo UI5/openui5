@@ -3,12 +3,12 @@
  */
 sap.ui.define([
 	"./BaseAction",
+	"sap/base/Log",
 	"sap/ui/integration/util/openCardDialog",
-	"sap/ui/core/Element",
-	// jQuery Plugin "firstFocusableDomRef", "lastFocusableDomRef"
-	"sap/ui/dom/jquery/Focusable"
+	"sap/ui/core/Element"
 ], function (
 	BaseAction,
+	Log,
 	openCardDialog,
 	Element
 ) {
@@ -28,6 +28,14 @@ sap.ui.define([
 			oParentCard = this.getCardInstance(),
 			oHost = oParentCard.getHostInstance();
 
+		if (oParameters.manifest) {
+			Log.warning(
+				"'ShowCard' action uses deprecated 'manifest' property. Use 'childCardKey' instead. It must refer to a child card registered in sap.card/configuration/childCards.",
+				null,
+				"sap.ui.integration.widgets.Card"
+			);
+		}
+
 		if (oHost && oHost.onShowCard) {
 			let oChildCard;
 
@@ -41,7 +49,7 @@ sap.ui.define([
 			return;
 		}
 
-		openCardDialog(oParentCard, this.getParameters());
+		openCardDialog(oParentCard, oParameters);
 	};
 
 	return ShowCardAction;

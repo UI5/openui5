@@ -129,6 +129,12 @@ sap.ui.define([
 						experimental: true
 					},
 					{
+						title: 'Child Cards',
+						target: 'learnDetail',
+						key: 'childCards',
+						experimental: true
+					},
+					{
 						title: 'CSRF Tokens',
 						target: 'learnDetail',
 						key: 'csrfTokens'

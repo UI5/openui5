@@ -1,0 +1,71 @@
+{
+	"sap.app": {
+		"id": "childCard2",
+		"type": "card",
+		"i18n": "i18n/i18n.properties"
+	},
+	"sap.card": {
+		"type": "Object",
+		"extension": "./ChildCard2Extension",
+		"data": {
+			"json": {
+				"item": {
+					"title": "Some title",
+					"description": "Some description"
+				}
+			}
+		},
+		"configuration": {
+			"childCards": {
+				"childCard2.1": {
+					"manifest": "./childCard2.1.json"
+				},
+				"childCard2.2": {
+					"manifest": "./childCard2.2.json"
+				}
+			}
+		},
+		"header": {
+			"title": "Child Card 2",
+			"actions": [
+				{
+					"type": "ShowCard",
+					"parameters": {
+						"childCardKey": "childCard2.1"
+					}
+				}
+			]
+		},
+		"content": {
+			"data": {
+				"path": "/item"
+			},
+			"groups": [
+				{
+					"items": [
+						{
+							"label": "Title",
+							"value": "{title}"
+						},
+						{
+							"label": "Description",
+							"value": "{description}"
+						},
+						{
+							"label": "Open Child Card 2.2",
+							"value": "Open Child Card 2.2 using extension",
+							"actions": [
+								{
+									"type": "Custom",
+									"parameters": {
+										"childCardKey": "childCard2.2"
+									}
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	}
+}

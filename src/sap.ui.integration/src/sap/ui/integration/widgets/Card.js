@@ -96,7 +96,8 @@ sap.ui.define([
 		CSRF_TOKENS: "/sap.card/configuration/csrfTokens",
 		FILTERS: "/sap.card/configuration/filters",
 		NO_DATA_MESSAGES: "/sap.card/configuration/messages/noData",
-		MODEL_SIZE_LIMIT: "/sap.card/configuration/modelSizeLimit"
+		MODEL_SIZE_LIMIT: "/sap.card/configuration/modelSizeLimit",
+		CHILD_CARDS: "/sap.card/configuration/childCards"
 	};
 
 	const RESERVED_PARAMETER_NAMES = ["visibleItems", "allItems"];
@@ -1881,6 +1882,7 @@ sap.ui.define([
 		this._applyPaginatorManifestSettings();
 		this._applyFooterManifestSettings();
 		this._applyContentManifestSettings();
+		this._validateChildCardsManifestSettings();
 
 		this.fireManifestApplied();
 	};
@@ -2192,6 +2194,44 @@ sap.ui.define([
 			return;
 		}
 		this.getAggregation("_loadingProvider").applyDelay(iLoadingDelay);
+	};
+
+	Card.prototype._validateChildCardsManifestSettings = function () {
+		const mChildCards = this._oCardManifest.get(MANIFEST_PATHS.CHILD_CARDS);
+
+		if (!mChildCards) {
+			return;
+		}
+
+		let oAncestor = this;
+		let sMatchingChildManifestUrl;
+
+		while (oAncestor) {
+			for (const { manifest } of Object.values(mChildCards)) {
+				let sAncestorUrl;
+
+				if (typeof oAncestor.getManifest() === "string") {
+					sAncestorUrl = new URL(oAncestor.getManifest(), window.location).href;
+				}
+
+				if (new URL(this.getRuntimeUrl(manifest), window.location).href === sAncestorUrl) {
+					sMatchingChildManifestUrl = manifest;
+					break;
+				}
+			}
+
+			oAncestor =  Element.getElementById(oAncestor.getAssociation("openerReference"));
+		}
+
+		if (sMatchingChildManifestUrl) {
+			const oError = new Error("One of the card's ancestors, or the card itself, is set as its child, which is not allowed. Remove child with manifest '" + sMatchingChildManifestUrl + "' from the child cards configuration.");
+			this._handleError({
+				illustrationType: IllustratedMessageType.UnableToLoad,
+				title: oResourceBundle.getText("CARD_ERROR_CONFIGURATION_TITLE"),
+				description: oResourceBundle.getText("CARD_ERROR_CONFIGURATION_DESCRIPTION"),
+				originalError: oError
+			});
+		}
 	};
 
 	/**
@@ -3212,15 +3252,17 @@ sap.ui.define([
 	};
 
 	/**
-	 * Shows a child card. By default opens in a dialog.
+	 * Displays a child card, opening it in a dialog by default.
+	 *
 	 * @private
 	 * @ui5-restricted
-	 * @param {Object} oParameters The settings for showing the card.
-	 * @param {String|Object} oParameters.manifest Url to a manifest or the manifest itself.
-	 * @param {String} oParameters.baseUrl If manifest is an object - specify the base url to the card.
-	 * @param {Object} oParameters.parameters Parameters to be passed to the new card.
-	 * @param {Object} oParameters.data Data to be passed to the new card.
-	 * @returns {Promise} Promise which resolves with the created card.
+	 * @param {object} oParameters The settings for displaying the card.
+	 * @param {string} oParameters.childCardKey Key of the child card to be shown.
+	 * @param {string|object} oParameters.manifest The URL to a manifest or the manifest object itself. Deprecated since 1.141. Use 'childCardKey' instead.
+	 * @param {string} oParameters.baseUrl If the manifest is an object, specify the base URL for the card.
+	 * @param {object} oParameters.parameters Parameters to be provided to the new card.
+	 * @param {object} oParameters.data Data to be provided to the new card.
+	 * @returns {Promise} A promise that resolves with the created card.
 	 */
 	Card.prototype.showCard = function (oParameters) {
 		var oChildCard = this._createChildCard(oParameters);
@@ -3263,16 +3305,28 @@ sap.ui.define([
 	};
 
 	/**
-	 * Creates the child card.
+	 * Creates a child card with the provided parameters.
 	 *
 	 * @private
 	 * @ui5-restricted
-	 * @param {Object} oParameters The parameters for the card.
-	 * @returns {sap.ui.integration.widgets.Card} The result card.
+	 * @param {Object} oParameters The parameters for the card creation.
+	 * @returns {sap.ui.integration.widgets.Card} The newly created card instance.
 	 */
 	Card.prototype._createChildCard = function (oParameters) {
-		var vManifest = oParameters.manifest,
-			sBaseUrl = oParameters.baseUrl,
+		const mChildCards = this._oCardManifest.get(MANIFEST_PATHS.CHILD_CARDS);
+		let vManifest;
+
+		if (oParameters.childCardKey) {
+			vManifest = mChildCards?.[oParameters.childCardKey]?.manifest;
+
+			if (!vManifest) {
+				Log.error("'ShowCard' action cannot find a child card with key '" + oParameters.childCardKey + "'.", null, "sap.ui.integration.widgets.Card");
+			}
+		} else {
+			vManifest = oParameters.manifest;
+		}
+
+		const sBaseUrl = oParameters.baseUrl,
 			oData = oParameters.data,
 			oChildCard = this._createCard({
 				host: this.getHostInstance(),

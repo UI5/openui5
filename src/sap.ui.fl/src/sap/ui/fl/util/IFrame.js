@@ -11,8 +11,9 @@ sap.ui.define([
 	"sap/base/security/URLListValidator",
 	"sap/base/Log",
 	"sap/ui/fl/util/IFrameRenderer",
-	"sap/ui/fl/library",
 	"sap/ui/core/library"
+	// The iFrame control does not need to require its library module because no DataTypes are defined in fl library and the control
+	// doesn't require any CSS from the library.css
 ], function(
 	uid,
 	Control,
