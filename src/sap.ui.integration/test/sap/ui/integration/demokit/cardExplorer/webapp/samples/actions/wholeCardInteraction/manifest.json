@@ -31,7 +31,7 @@
 			{
 				"type": "ShowCard",
 				"parameters": {
-					"manifest": "./detailsManifest.json",
+					"childCardKey": "detailsCard",
 					"parameters": {
 						"orderId": "{parameters>/orderId/value}"
 					},
@@ -50,6 +50,11 @@
 			"parameters": {
 				"orderId": {
 					"value": 10249
+				}
+			},
+			"childCards": {
+				"detailsCard": {
+					"manifest": "./detailsManifest.json"
 				}
 			}
 		},

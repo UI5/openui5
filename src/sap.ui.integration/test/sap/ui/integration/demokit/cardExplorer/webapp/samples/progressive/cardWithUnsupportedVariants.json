@@ -13,7 +13,12 @@
 			"unsupported": ["CompactHeader", "SmallHeader", "TileFlat", "TileFlatWide"]
 		},
 		"configuration": {
-			"editor": "./configuration"
+			"editor": "./configuration",
+			"childCards": {
+				"detailsCard": {
+					"manifest": "./cardNumericPopupManifest.json"
+				}
+			}
 		},
 		"header": {
 			"type": "Numeric",
@@ -231,7 +236,7 @@
 						{
 							"type": "ShowCard",
 							"parameters": {
-								"manifest": "./cardNumericPopupManifest.json",
+								"childCardKey": "detailsCard",
 								"parameters": {
 									"orderId": "{parameters>/orderId/value}"
 								},

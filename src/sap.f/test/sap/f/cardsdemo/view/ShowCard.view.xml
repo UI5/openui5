@@ -107,5 +107,15 @@
 				</w:Card>
 			</f:GridContainer>
 		</Panel>
+		<Panel headerText="Multiple Levels of Child Cards" class="sapUiSmallMargin" backgroundDesign="Transparent">
+			<f:GridContainer class="sapUiSmallMargin">
+				<w:Card
+					manifest="{cardsPlayground>/playgroundBaseUrl}/bundles/cardWithManyChildren/manifest.json">
+					<w:layoutData>
+						<f:GridContainerItemLayoutData columns="4" />
+					</w:layoutData>
+				</w:Card>
+			</f:GridContainer>
+		</Panel>
 	</Page>
 </mvc:View>

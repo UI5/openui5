@@ -1,4 +1,4 @@
-/* global QUnit */
+/* global QUnit, sinon */
 
 sap.ui.define([
 	"sap/base/util/Deferred",
@@ -30,30 +30,59 @@ sap.ui.define([
 
 	QUnit.module("openCardDialog", {
 		beforeEach: async function () {
-			this.oCard = new Card({
-				baseUrl: "test-resources/sap/ui/integration/qunit/testResources/",
-				manifest: {
-					"sap.app": {
-						id: "test.card"
-					},
-					"sap.card": {
-						type: "List",
-						data: {
-							json: []
-						},
-						header: {
-							title: "Test Card"
-						},
-						content: {
-							item: {
-								title: "{title}"
+			const sBaseUrl = "ShowHideCardActionsFakeUrl/";
+			this.oCardManifest = {
+				"sap.app": {
+					id: "test.card"
+				},
+				"sap.card": {
+					type: "List",
+					configuration: {
+						childCards: {
+							childCard: {
+								manifest: "childManifest.json"
 							}
+						}
+					},
+					data: {
+						json: []
+					},
+					header: {
+						title: "Test Card"
+					},
+					content: {
+						item: {
+							title: "{title}"
 						}
 					}
 				}
+			};
+
+			this.oCard = new Card({
+				baseUrl: sBaseUrl,
+				manifest: this.oCardManifest
 			});
+
 			this.oCard.placeAt(DOM_RENDER_LOCATION);
 			await nextCardReadyEvent(this.oCard);
+
+			this.oServer = sinon.createFakeServer({
+				autoRespond: true,
+				respondImmediately: true
+			});
+
+			this.oServer.xhr.useFilters = true;
+			this.oServer.xhr.addFilter(function(sMethod, sUrl) {
+				return !sUrl.includes(sBaseUrl);
+			});
+
+			this.oServer.respondWith("GET", new RegExp(sBaseUrl + "\.*childManifest\.json.*"), (oXhr) => {
+				oXhr.respond(
+					200,
+					{ "Content-Type": "application/json" },
+					JSON.stringify(this.oChildManifest)
+				);
+			});
 		},
 		afterEach: function () {
 			this.oCard.destroy();
@@ -64,33 +93,36 @@ sap.ui.define([
 		// Arrange
 		const oGetData = new Deferred();
 		this.stub(DataProvider.prototype, "getData").returns(oGetData.promise);
+		this.oChildManifest = {
+			"sap.app": {
+				id: "test.card"
+			},
+			"sap.card": {
+				type: "Table",
+				data: {
+					json: []
+				},
+				header: {
+					title: "Test Card"
+				},
+				content: {
+					row: {
+						columns: [
+							{
+								title: "Sales Order",
+								value: "{product}"
+							}
+						]
+					}
+				}
+			}
+		};
+
+		// Act
 		const oDialog = openCardDialog(
 			this.oCard,
 			{
-				manifest: {
-					"sap.app": {
-						id: "test.card"
-					},
-					"sap.card": {
-						type: "Table",
-						data: {
-							json: []
-						},
-						header: {
-							title: "Test Card"
-						},
-						content: {
-							row: {
-								columns: [
-									{
-										title: "Sales Order",
-										value: "{product}"
-									}
-								]
-							}
-						}
-					}
-				}
+				childCardKey: "childCard"
 			}
 		);
 
@@ -107,27 +139,30 @@ sap.ui.define([
 	});
 
 	QUnit.test("Missing header", async function (assert) {
-		// Act
+		// Arrange
 		const fnErrorSpy = this.spy(Log, "error");
+		this.oChildManifest = {
+			"sap.app": {
+				id: "test.card.brokenHeader"
+			},
+			"sap.card": {
+				type: "Object",
+				content: {
+					groups: [
+						{
+							title: "Group 1",
+							items: []
+						}
+					]
+				}
+			}
+		};
+
+		// Act
 		const oDialog = openCardDialog(
 			this.oCard,
 			{
-				manifest: {
-					"sap.app": {
-						id: "test.card.brokenHeader"
-					},
-					"sap.card": {
-						type: "Object",
-						content: {
-							groups: [
-								{
-									title: "Grpoup 1",
-									items: []
-								}
-							]
-						}
-					}
-				}
+				childCardKey: "childCard"
 			}
 		);
 
@@ -141,38 +176,41 @@ sap.ui.define([
 	});
 
 	QUnit.test("Accessibility attributes", async function (assert) {
+		// Arrange
+		this.oChildManifest = {
+			"sap.app": {
+				id: "test.card"
+			},
+			"sap.card": {
+				type: "Table",
+				data: {
+					json: [
+						{
+							"product": "Product 1"
+						}
+					]
+				},
+				header: {
+					title: "Test Title"
+				},
+				content: {
+					row: {
+						columns: [
+							{
+								title: "Sales Order",
+								value: "{product}"
+							}
+						]
+					}
+				}
+			}
+		};
+
 		// Act
 		const oDialog = openCardDialog(
 			this.oCard,
 			{
-				manifest: {
-					"sap.app": {
-						id: "test.card"
-					},
-					"sap.card": {
-						type: "Table",
-						data: {
-							json: [
-								{
-									"product": "Product 1"
-								}
-							]
-						},
-						header: {
-							title: "Test Title"
-						},
-						content: {
-							row: {
-								columns: [
-									{
-										title: "Sales Order",
-										value: "{product}"
-									}
-								]
-							}
-						}
-					}
-				}
+				childCardKey: "childCard"
 			}
 		);
 
@@ -194,33 +232,36 @@ sap.ui.define([
 	});
 
 	QUnit.test("Only single data request must be executed", async function (assert) {
-		// Act
+		// Arrange
 		const fnSpy = this.spy(RequestDataProvider.prototype, "getData");
+		this.oChildManifest = {
+			"sap.app": {
+				id: "test.card.dataRequest",
+				type: "card"
+			},
+			"sap.card": {
+				type: "List",
+				header: {
+					title: "Data Request Test"
+				},
+				data: {
+					request: {
+						url: "items.json"
+					}
+				},
+				content: {
+					item: {
+						title: "{Name}"
+					}
+				}
+			}
+		};
+
+		// Act
 		const oDialog = openCardDialog(
 			this.oCard,
 			{
-				manifest: {
-					"sap.app": {
-						id: "test.card.dataRequest",
-						type: "card"
-					},
-					"sap.card": {
-						type: "List",
-						header: {
-							title: "Data Request Test"
-						},
-						data: {
-							request: {
-								url: "items.json"
-							}
-						},
-						content: {
-							item: {
-								title: "{Name}"
-							}
-						}
-					}
-				}
+				childCardKey: "childCard"
 			}
 		);
 
@@ -234,33 +275,36 @@ sap.ui.define([
 	});
 
 	QUnit.test("Refresh the child card", async function (assert) {
-		// Act
+		// Arrange
 		const fnSpy = this.spy(RequestDataProvider.prototype, "getData");
+		this.oChildManifest = {
+			"sap.app": {
+				id: "test.card.dataRequestWithRefresh",
+				type: "card"
+			},
+			"sap.card": {
+				type: "List",
+				header: {
+					title: "Data Request Test"
+				},
+				data: {
+					request: {
+						url: "items.json"
+					}
+				},
+				content: {
+					item: {
+						title: "{Name}"
+					}
+				}
+			}
+		};
+
+		// Act
 		const oDialog = openCardDialog(
 			this.oCard,
 			{
-				manifest: {
-					"sap.app": {
-						id: "test.card.dataRequestWithRefresh",
-						type: "card"
-					},
-					"sap.card": {
-						type: "List",
-						header: {
-							title: "Data Request Test"
-						},
-						data: {
-							request: {
-								url: "items.json"
-							}
-						},
-						content: {
-							item: {
-								title: "{Name}"
-							}
-						}
-					}
-				}
+				childCardKey: "childCard"
 			}
 		);
 
@@ -280,38 +324,42 @@ sap.ui.define([
 	});
 
 	QUnit.test("Resize after open", async function (assert) {
-		// Act
+		// Arrange
 		const oData = [];
 		for (let i = 0; i < 100; i++) {
 			oData.push({ title: "Item" + i });
 		}
+
+		this.oChildManifest = {
+			"sap.app": {
+				id: "test.card.resize",
+				type: "card"
+			},
+			"sap.card": {
+				type: "List",
+				data: {
+					name: "testModel",
+					json: oData.slice(0, 1) // 1 item
+				},
+				header: {
+					title: "Resize test"
+				},
+				content: {
+					data: {
+						path: "testModel>/"
+					},
+					item: {
+						title: "{testModel>title}"
+					}
+				}
+			}
+		};
+
+		// Act
 		const oDialog = openCardDialog(
 			this.oCard,
 			{
-				manifest: {
-					"sap.app": {
-						id: "test.card.resize",
-						type: "card"
-					},
-					"sap.card": {
-						type: "List",
-						data: {
-							name: "testModel",
-							json: oData.slice(0, 1) // 1 item
-						},
-						header: {
-							title: "Resize test"
-						},
-						content: {
-							data: {
-								path: "testModel>/"
-							},
-							item: {
-								title: "{testModel>title}"
-							}
-						}
-					}
-				}
+				childCardKey: "childCard"
 			}
 		);
 
@@ -332,38 +380,42 @@ sap.ui.define([
 	});
 
 	QUnit.test("Do not shrink if list content gets smaller", async function (assert) {
-		// Act
+		// Arrange
 		const oData = [];
 		for (let i = 0; i < 100; i++) {
 			oData.push({ title: "Item" + i });
 		}
+
+		this.oChildManifest = {
+			"sap.app": {
+				id: "test.card.resize",
+				type: "card"
+			},
+			"sap.card": {
+				type: "List",
+				data: {
+					name: "testModel",
+					json: oData // 100 items
+				},
+				header: {
+					title: "Resize test"
+				},
+				content: {
+					data: {
+						path: "testModel>/"
+					},
+					item: {
+						title: "{testModel>title}"
+					}
+				}
+			}
+		};
+
+		// Act
 		const oDialog = openCardDialog(
 			this.oCard,
 			{
-				manifest: {
-					"sap.app": {
-						id: "test.card.resize",
-						type: "card"
-					},
-					"sap.card": {
-						type: "List",
-						data: {
-							name: "testModel",
-							json: oData // 100 items
-						},
-						header: {
-							title: "Resize test"
-						},
-						content: {
-							data: {
-								path: "testModel>/"
-							},
-							item: {
-								title: "{testModel>title}"
-							}
-						}
-					}
-				}
+				childCardKey: "childCard"
 			}
 		);
 
@@ -390,39 +442,42 @@ sap.ui.define([
 	});
 
 	QUnit.test("After manifest changes", async function (assert) {
+		// Arrange
+		this.oChildManifest = {
+			"sap.app": {
+				id: "test.card",
+				type: "card"
+			},
+			"sap.card": {
+				type: "Table",
+				data: {
+					json: [
+						{
+							"product": "Product 1"
+						}
+					]
+				},
+				header: {
+					title: "Title Before"
+				},
+				content: {
+					row: {
+						columns: [
+							{
+								title: "Sales Order",
+								value: "{product}"
+							}
+						]
+					}
+				}
+			}
+		};
+
 		// Act
 		const oDialog = openCardDialog(
 			this.oCard,
 			{
-				manifest: {
-					"sap.app": {
-						id: "test.card",
-						type: "card"
-					},
-					"sap.card": {
-						type: "Table",
-						data: {
-							json: [
-								{
-									"product": "Product 1"
-								}
-							]
-						},
-						header: {
-							title: "Title Before"
-						},
-						content: {
-							row: {
-								columns: [
-									{
-										title: "Sales Order",
-										value: "{product}"
-									}
-								]
-							}
-						}
-					}
-				}
+				childCardKey: "childCard"
 			}
 		);
 
@@ -448,25 +503,28 @@ sap.ui.define([
 	});
 
 	QUnit.test("Component Card", async function (assert) {
+		// Arrange
+		this.oChildManifest = {
+			_version: "2.0.0",
+
+			"sap.app": {
+				id: "test.card"
+			},
+
+			header: {
+				title: "Test Card"
+			},
+
+			"sap.card": {
+				type: "Component"
+			}
+		};
+
 		// Act
 		const oDialog = openCardDialog(
 			this.oCard,
 			{
-				manifest: {
-					_version: "2.0.0",
-
-					"sap.app": {
-						id: "test.card"
-					},
-
-					header: {
-						title: "Test Card"
-					},
-
-					"sap.card": {
-						type: "Component"
-					}
-				}
+				childCardKey: "childCard"
 			}
 		);
 

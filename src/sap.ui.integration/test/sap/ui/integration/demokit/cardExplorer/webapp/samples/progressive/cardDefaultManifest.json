@@ -12,7 +12,12 @@
 			"contentSize": "Standard"
 		},
 		"configuration": {
-			"editor": "./configuration"
+			"editor": "./configuration",
+			"childCards": {
+				"detailsCard": {
+					"manifest": "./cardDefaultPopupManifest.json"
+				}
+			}
 		},
 		"header": {
 			"type": "Standard",
@@ -107,7 +112,7 @@
 						{
 							"type": "ShowCard",
 							"parameters": {
-								"manifest": "./cardDefaultPopupManifest.json",
+								"childCardKey": "detailsCard",
 								"parameters": {
 									"orderId": "{parameters>/orderId/value}"
 								},

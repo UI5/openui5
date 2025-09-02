@@ -1,7 +1,6 @@
 /* global QUnit */
 
 sap.ui.define([
-	"sap/base/util/merge",
 	"sap/ui/core/Control",
 	"sap/ui/core/UIComponent",
 	"sap/ui/fl/apply/_internal/changes/Reverter",
@@ -27,7 +26,6 @@ sap.ui.define([
 	"test-resources/sap/ui/fl/qunit/FlQUnitUtils",
 	"test-resources/sap/ui/rta/qunit/RtaQunitUtils"
 ], function(
-	merge,
 	Control,
 	UIComponent,
 	Reverter,
@@ -513,7 +511,8 @@ sap.ui.define([
 			this.aChanges.forEach((oChange) => {
 				assert.strictEqual(oChange.getState(), States.LifecycleState.PERSISTED, "the change is in the PERSISTED state");
 			});
-			assert.strictEqual(this.oFlexStateUpdateSpy.callCount, 4, "FlexState.update was called four times");
+			assert.strictEqual(this.oFlexStateUpdateSpy.callCount, 1, "FlexState.updateStorageResponse was called once");
+			assert.strictEqual(this.oFlexStateUpdateSpy.firstCall.args[1].length, 4, "there are 4 updates");
 			// checkUpdate is called for the initial addDirtyChanges, for the update of the saved changes
 			// and for the deletion of the additional changes
 			assert.strictEqual(this.oFlexObjectDSUpdateSpy.callCount, 4, "FlexObjectDataSelector.checkUpdate was called four times");

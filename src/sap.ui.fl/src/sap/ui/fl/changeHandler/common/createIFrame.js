@@ -2,10 +2,7 @@
  * ${copyright}
  */
 
-sap.ui.define([
-	"sap/ui/fl/util/IFrame"
-], function(
-) {
+sap.ui.define([], function() {
 	"use strict";
 
 	/**

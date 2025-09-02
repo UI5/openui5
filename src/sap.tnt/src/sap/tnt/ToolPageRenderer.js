@@ -23,8 +23,13 @@ sap.ui.define([
 	 */
 	ToolPageRenderer.render = function (oRM, oControl) {
 		oRM.openStart("div", oControl)
-			.class("sapTntToolPage")
-			.openEnd();
+			.class("sapTntToolPage");
+
+		if (oControl.getSideContent()) {
+			oRM.class("sapTntToolPageWithSideContent");
+		}
+
+		oRM.openEnd();
 
 		this.renderHeader(oRM, oControl);
 

@@ -561,7 +561,9 @@ sap.ui.define([
 	};
 
 	BaseContent.prototype.hideNoDataMessage = function () {
-		this.hideBlockingMessage();
+		if (this.getBlockingMessage()?.type === CardBlockingMessageType.NoData) {
+			this.hideBlockingMessage();
+		}
 	};
 
 	/**

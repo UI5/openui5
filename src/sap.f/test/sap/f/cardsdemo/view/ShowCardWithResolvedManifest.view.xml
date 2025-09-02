@@ -17,6 +17,7 @@
 		<VBox renderType="Bare" height="100%">
 			<HBox>
 				<Button class="sapUiSmallMargin" text="Simulate Show Card Pressed" press=".simulateShowCardButtonPress" />
+				<Button class="sapUiSmallMargin" text="Simulate Show Card Pressed (w/deprecated parameters)" press=".simulateShowCardButtonPressDeprecated" />
 				<Button class="sapUiSmallMargin" text="Simulate Hide Card Pressed and closing of page/dilaog" press=".simulateHideCardButtonPress" />
 			</HBox>
 			<HBox>

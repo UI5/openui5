@@ -27,6 +27,13 @@
 	"sap.card": {
 		"type": "Object",
 		"extension": "./ApproveCardExtension",
+		"configuration": {
+			"childCards": {
+				"detailsCard": {
+					"manifest": "./detailsManifest.json"
+				}
+			}
+		},
 		"header": {
 			"icon": {
 				"src": "./../../images/DonnaMoore.png"
@@ -61,7 +68,7 @@
 					"buttonType": "Accept",
 					"actions": [
 						{
-							"type": "Submit",
+							"type": "Custom",
 							"parameters": {
 								"status": "approved"
 							}
@@ -75,7 +82,7 @@
 						{
 							"type": "ShowCard",
 							"parameters": {
-								"manifest": "./detailsManifest.json"
+								"childCardKey": "detailsCard"
 							}
 						}
 					]

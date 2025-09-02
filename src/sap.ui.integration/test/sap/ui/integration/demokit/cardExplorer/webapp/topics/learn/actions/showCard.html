@@ -13,8 +13,8 @@
 	<div class="topic">
 		<div class="content">
 			<h1 id="overview">Show Card</h1>
-			<p>ShowCard action type is used for showing another card with more details or additional actions.</p>
-			<p>Default behavior: opens a new card created by the given <code>manifest</code>.</p>
+			<p>The ShowCard action type is used to display a child card providing more details or additional actions.</p>
+			<p>Default behavior: opens a child card.</p>
 
 			<div class="messageStripWarning">
 				Experimental feature since version 1.112. The API may change.
@@ -33,18 +33,18 @@
 						<th>Since</th>
 					</tr>
 					<tr>
-						<td>manifest</td>
-						<td>string|object</td>
+						<td>childCardKey</td>
+						<td>string</td>
 						<td></td>
 						<td>Yes</td>
 						<td>
-							URL to the manifest of the child card to be displayed, or the manifest itself passed as an object.
+							The key of the child card to be displayed.
+							It must be listed in the <code>"sap.card"/configuration/childCards</code> property.
 							<br>
-							<b>Note:</b> The card that is opened is referred to as a <b>child card</b>.
 							Multiple child cards can be opened sequentially. The card that opens the first child card is referred to as the <b>main card</b> for all child cards.
 						</td>
-						<td>1.51.0</td>
-						<td>1.112</td>
+						<td>1.79.0</td>
+						<td>1.141</td>
 					</tr>
 					<tr>
 						<td>parameters</td>
@@ -95,18 +95,24 @@
 						<td>1.59.0</td>
 						<td>1.119</td>
 					</tr>
+					<tr>
+						<td>manifest</td>
+						<td>string|object</td>
+						<td></td>
+						<td>Yes</td>
+						<td>
+							This property is deprecated as of version 1.141. Use <code>childCardKey</code> instead.
+							<br>
+							URL to the manifest of the child card to be displayed, or the manifest itself passed as an object.
+							<br>
+							<b>Note:</b> The card that is opened is referred to as a <b>child card</b>.
+							Multiple child cards can be opened sequentially. The card that opens the first child card is referred to as the <b>main card</b> for all child cards.
+						</td>
+						<td>1.51.0</td>
+						<td>1.112</td>
+					</tr>
 				</table>
 			</div>
-
-			<h2 id="destinations">Handling Destinations in Child Cards</h2>
-			<p>
-				Cards opened by a <code>ShowCard</code> action, namely child cards, must reuse destinations defined by their main card.
-				This is done by setting the <code>"sap.card"/configuration/useMainDestinations</code> property to <code>true</code> and
-				using the <code>{{mainDestinations.destinationKey}}</code> syntax to reference the main card's destinations.
-				<br>
-				For more information, see the <a href="../../../index.html#/learn/configuration/destinations" target="_parent">Destinations</a> topic
-				and the <a href="../../../index.html#/explore/destinations/childCardUsingDestinations" target="_parent">Child Card Using Destinations</a> sample.
-			</p>
 
 			<h2 id="examples">Examples</h2>
 			<p>Example how to show a card with manifest "detailsManifest.json":</p>
@@ -120,6 +126,11 @@
 	"sap.card": {
 		"type": "Object",
 		"configuration": {
+			<mark>"childCards": {
+				"detailsCard": {
+					"manifest": "./detailsManifest.json"
+				}
+			}</mark>,
 			"parameters": {
 				"orderId": {
 					"value": 10249
@@ -168,7 +179,7 @@
 						{
 							"type": "ShowCard",
 							"parameters": {
-								"manifest": "./detailsManifest.json",
+								"childCardKey": "detailsCard"
 								"parameters": {
 									"orderId": "{parameters>/orderId/value}"
 								},

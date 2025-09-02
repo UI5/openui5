@@ -13,7 +13,7 @@
 		},
 		{
 			"control" : "sap.ui.mdc.Filterbar",
-			"url" : "./filterbar/Filterbar.html",
+			"url" : "./filterbar/FilterBar.html",
 			"desc" : "A filter bar with several filter fields of various data types",
 			"appComponent" : "CA-UI5-MDC",
 			"accTest": {
@@ -24,7 +24,7 @@
 		},
 		{
 			"control" : "sap.ui.mdc.FilterField",
-			"url" : "./filterbar/Filterbar.html",
+			"url" : "./filterbar/FilterBar.html",
 			"desc" : "FilterFields with various data types rendering various input controls",
 			"appComponent" : "CA-UI5-MDC",
 			"accTest": {
@@ -57,7 +57,7 @@
 		},
 		{
 			"control" : "sap.ui.mdc.ValueHelp",
-			"url" : "./filterbar/Filterbar.html",
+			"url" : "./filterbar/FilterBar.html",
 			"desc" : "Different FilterFields with a more complex value help dialog including filter and search features",
 			"appComponent" : "CA-UI5-MDC",
 			"accTest": {

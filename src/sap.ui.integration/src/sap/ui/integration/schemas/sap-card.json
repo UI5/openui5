@@ -172,13 +172,20 @@
           "type": "object"
         },
         "loadingPlaceholders": {
-          "description": "[Experimental] Object which will represent the loading placeholder of the card",
+          "description": "[Experimental] Object that will represent the loading placeholder of the card",
           "type": "object",
           "properties": {
             "delay": {
               "description": "The delay of the loading placeholder",
               "type": "number"
             }
+          }
+        },
+        "childCards": {
+          "description": "[Experimental] Map of child cards",
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/Configuration.ChildCard"
           }
         }
       }
@@ -3413,12 +3420,14 @@
       "description": "Parameters for ShowCard action",
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "manifest"
-      ],
       "properties": {
+        "childCardKey": {
+          "description": "The key of the card to be shown",
+          "type": "string"
+        },
         "manifest": {
-          "description": "An application identifier consisting of semanticObject and action",
+          "deprecated": true,
+          "description": "[Deprecated] Child card manifest",
           "oneOf": [
             {
               "type": "string"
@@ -3938,6 +3947,20 @@
         },
         "type": {
           "description": "Defines the image predefined from sap.m.IllustratedMessage",
+          "type": "string"
+        }
+      }
+    },
+    "Configuration.ChildCard": {
+      "description": "Represents a configuration for a child card",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "manifest"
+      ],
+      "properties": {
+        "manifest": {
+          "description": "The manifest of the child card",
           "type": "string"
         }
       }

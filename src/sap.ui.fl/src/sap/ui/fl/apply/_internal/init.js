@@ -3,11 +3,11 @@
  */
 
 sap.ui.define([
-	// "sap/ui/fl/initial/_internal/changeHandlers/ChangeHandlerRegistration",
-	// "sap/ui/fl/changeHandler/ChangeAnnotation"
+	"sap/ui/fl/initial/_internal/changeHandlers/ChangeHandlerRegistration",
+	"sap/ui/fl/changeHandler/ChangeAnnotation"
 ], function(
-	// ChangeHandlerRegistration,
-	// ChangeAnnotation
+	ChangeHandlerRegistration,
+	ChangeAnnotation
 ) {
 	"use strict";
 
@@ -21,11 +21,10 @@ sap.ui.define([
 	 * @since 1.141.0
 	 * @private
 	 */
-	// TODO: Re-enable once circular dependency issue is resolved; currently part of RegistrationDelegator
-	// ChangeHandlerRegistration.registerPredefinedChangeHandlers();
-	// ChangeHandlerRegistration.getChangeHandlersOfLoadedLibsAndRegisterOnNewLoadedLibs();
-	// ChangeHandlerRegistration.registerAnnotationChangeHandler({
-	// 	changeHandler: ChangeAnnotation,
-	// 	isDefaultChangeHandler: true
-	// });
+	ChangeHandlerRegistration.registerPredefinedChangeHandlers();
+	ChangeHandlerRegistration.getChangeHandlersOfLoadedLibsAndRegisterOnNewLoadedLibs();
+	ChangeHandlerRegistration.registerAnnotationChangeHandler({
+		changeHandler: ChangeAnnotation,
+		isDefaultChangeHandler: true
+	});
 });

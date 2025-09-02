@@ -1,0 +1,65 @@
+{
+	"sap.app": {
+		"id": "childCard1",
+		"type": "card",
+		"i18n": "i18n/i18n.properties"
+	},
+	"sap.card": {
+		"type": "Table",
+		"configuration": {
+			"parameters": {
+				"firstColumnTitle": {
+					"value": "Title"
+				}
+			},
+			"childCards": {
+				"childCard1.1": {
+					"manifest": "childCard1.1.json"
+				}
+			}
+		},
+		"data": {
+			"json": {
+				"items": [
+					{
+						"title": "Item 1"
+					},
+					{
+						"title": "Item 2"
+					},
+					{
+						"title": "Item 3"
+					}
+				]
+			}
+		},
+		"header": {
+			"title": "Child Card 1",
+			"actions": [
+				{
+					"type": "ShowCard",
+					"parameters": {
+						"childCardKey": "childCard1.1"
+					}
+				}
+			]
+		},
+		"content": {
+			"data": {
+				"path": "/items"
+			},
+			"row": {
+				"columns": [
+					{
+						"title": "{parameters>/firstColumnTitle/value}",
+						"value": "{title}"
+					},
+					{
+						"title": "Description",
+						"value": "Description"
+					}
+				]
+			}
+		}
+	}
+}
