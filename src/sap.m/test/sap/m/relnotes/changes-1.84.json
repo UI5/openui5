@@ -2328,5 +2328,15 @@
         "text": " sap.m ScrollContainer: unstable QUnit tests are now skipped"
       }
     ]
+  },
+  "1.84.52": {
+    "date": "September 2025",
+    "notes": [
+      {
+        "id": "4f3a3e75ddc6ec1b47c277f818319f9d3c6e530e",
+        "type": "FIX",
+        "text": " We now ensure that a PDF loads irrespective of the contentType if isTrustedSource is set to true"
+      }
+    ]
   }
 }
