@@ -2221,7 +2221,7 @@ sap.ui.define([
 	 * @private
 	 */
 	ODataTreeBindingFlat.prototype._isRestoreTreeStateSupported = function () {
-		return this._bRestoreTreeStateAfterChange && !this.getCombinedFilter();
+		return this._bRestoreTreeStateAfterChange;
 	};
 
 	/**
@@ -3375,10 +3375,7 @@ sap.ui.define([
 					// default. This flag defines whether the tree state before submitChanges should
 					// be restored afterwards. If this is true, a batch request is sent after the
 					// save action is finished to load the nodes which were available before in
-					// order to properly restore the tree state. Application filters are currently
-					// not supported for tree state restoration this is due to the SiblingsPosition
-					// being requested via GET Entity (not filterable) instead of GET Entity Set
-					// (filterable)
+					// order to properly restore the tree state.
 					that._restoreTreeState(oOptimizedChanges).catch(function (oError) {
 						_logTreeRestoreFailed(oError);
 						that._refresh(true);
@@ -3414,8 +3411,7 @@ sap.ui.define([
 	 *
 	 * @private
 	 */
-	ODataTreeBindingFlat.prototype._generateSubmitData
-			= function (oOptimizedChanges, fnRestoreRequestErrorHandler) {
+	ODataTreeBindingFlat.prototype._generateSubmitData = function (oOptimizedChanges, fnRestoreRequestErrorHandler) {
 		var aAdded = oOptimizedChanges.added,
 			aCreationCancelled = oOptimizedChanges.creationCancelled,
 			aMoved = oOptimizedChanges.moved,
@@ -3423,36 +3419,31 @@ sap.ui.define([
 			mRestoreRequestParameters = {
 				error: fnRestoreRequestErrorHandler,
 				groupId: this.oModel._resolveGroup(this.getResolvedPath()).groupId
-			},
-			that = this;
+			};
 
-		function setParent(oNode) {
+		const setParent = (oNode) => {
 			assert(oNode.context, "Node does not have a context.");
-			var sParentNodeID = oNode.parent.context.getProperty(that.oTreeProperties["hierarchy-node-for"]);
-			that.oModel.setProperty(that.oTreeProperties["hierarchy-parent-node-for"], sParentNodeID, oNode.context);
-
-		}
+			const sParentNodeID = oNode.parent.context.getProperty(this.oTreeProperties["hierarchy-node-for"]);
+			this.oModel.setProperty(this.oTreeProperties["hierarchy-parent-node-for"], sParentNodeID, oNode.context);
+		};
 
 		aAdded.forEach(setParent); // No extra requests for add. Everything we need should be in the POST response
-		aMoved.forEach(function(oNode) {
+		aMoved.forEach((oNode) => {
 			setParent(oNode);
 
 			if (this._isRestoreTreeStateSupported()) {
-				// Application filters are currently not supported for tree state restoration
-				//	this is due to the SiblingsPosition being requested via GET Entity (not filterable) instead of GET Entity Set (filterable
 				this._generatePreorderPositionRequest(oNode, mRestoreRequestParameters);
-				this._generateSiblingsPositionRequest(oNode, mRestoreRequestParameters);
 			}
-		}.bind(this));
+		});
 
-		aRemoved.forEach(function(oNode) {
+		aRemoved.forEach((oNode) => {
 			this._generateDeleteRequest(oNode);
 			Log.debug("ODataTreeBindingFlat: DELETE " + oNode.key);
-		}.bind(this));
+		});
 
-		aCreationCancelled.forEach(function(oNode) {
+		aCreationCancelled.forEach((oNode) => {
 			this._generateDeleteRequest(oNode);
-		}.bind(this));
+		});
 	};
 
 	/**
@@ -3522,47 +3513,6 @@ sap.ui.define([
 			sorters : this.aSorters,
 			success : fnSuccess,
 			urlParameters : this.oModel.createCustomParams(mUrlParameters)
-		});
-	};
-
-	/*
-	 * @private
-	 */
-	ODataTreeBindingFlat.prototype._generateSiblingsPositionRequest = function(oNode, mParameters) {
-		var sGroupId, mUrlParameters, successHandler, errorHandler;
-			// aFilters = [], aSorters = this.aSorters || [];
-
-		if (mParameters) {
-			sGroupId = mParameters.groupId || this.sGroupId;
-			successHandler = mParameters.success;
-			errorHandler = mParameters.error;
-		}
-
-		/* Filtering not possible as long as we request SiblingsPosition via GET Entity instead of GET Entity Set (like Preorder Position)
-		if (this.aApplicationFilters) {
-			aFilters = aFilters.concat(this.aApplicationFilters);
-		}
-
-		aFilters.push(new Filter(
-			this.oTreeProperties["hierarchy-node-for"], "EQ", oNode.context.getProperty(this.oTreeProperties["hierarchy-node-for"])
-		));
-		*/
-
-		mUrlParameters = extend({}, this.mParameters);
-		mUrlParameters.select =  this.oTreeProperties["hierarchy-sibling-rank-for"];
-
-		// request the siblings position for moved nodes only as siblings position are already available for added nodes
-		this.oModel.read(oNode.context.getPath(), {
-			headers: this._getHeaders(),
-			urlParameters: this.oModel.createCustomParams(mUrlParameters),
-			// filters: [new Filter({
-			// 	filters: aFilters,
-			// 	and: true
-			// })],
-			// sorters: aSorters,
-			groupId: sGroupId,
-			success: successHandler,
-			error: errorHandler
 		});
 	};
 
@@ -4045,14 +3995,15 @@ sap.ui.define([
 			iNextDelta, iCurrentDelta = 0, iTopDelta, sPositionAnnot,
 			aAddedIndices = [];
 
-
 		// collect the position of the added nodes
+		let iDeepNodePosition = 0;
 		for (var l = aAdded.length - 1; l >= 0; l--) {
 			oNode = aAdded[l];
 
-			if (oNode.newIsDeepOne !== undefined ? oNode.newIsDeepOne : oNode.isDeepOne) { // Only moved nodes have a "newIsDeepNode" attribute
+			if (oNode.newIsDeepOne !== undefined ? oNode.newIsDeepOne : oNode.isDeepOne) {
 				// Deep node
-				sPositionAnnot = this.oTreeProperties["hierarchy-sibling-rank-for"];
+				iPosition = iDeepNodePosition;
+				iDeepNodePosition += 1;
 			} else {
 				// Server index node
 				sPositionAnnot = this.oTreeProperties["hierarchy-preorder-rank-for"];
@@ -4060,12 +4011,13 @@ sap.ui.define([
 				if (oNode.newInitiallyCollapsed !== undefined ? !oNode.newInitiallyCollapsed : !oNode.initiallyCollapsed) {
 					iMagnitude = oNode.context.getProperty(this.oTreeProperties["hierarchy-node-descendant-count-for"]);
 				}
-			}
 
-			iPosition = oNode.context.getProperty(sPositionAnnot);
-			if (iPosition === undefined) {
-				Log.warning("ODataTreeBindingFlat", "Missing " + sPositionAnnot + " value for node " + oNode.key);
-				break;
+				iPosition = oNode.context.getProperty(sPositionAnnot);
+
+				if (iPosition === undefined) {
+					Log.warning("ODataTreeBindingFlat", "Missing " + sPositionAnnot + " value for node " + oNode.key);
+					break;
+				}
 			}
 
 			aAddedIndices.push({

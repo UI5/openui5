@@ -152,7 +152,9 @@ sap.ui.define(["sap/base/util/ObjectPath"], function(ObjectPath) {
 				}
 			}
 
-			// resolve the path under global scope, only when it can't be resolved under mVariables
+			/**
+			 * @deprecated As of version 1.141
+			 */
 			if (vRef === oNotFound ) {
 				// fallback if no value could be found under the given sPath's first segment
 				// otherwise resolve under global namespace

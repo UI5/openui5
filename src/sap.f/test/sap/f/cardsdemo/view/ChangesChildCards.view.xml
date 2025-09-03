@@ -1,0 +1,27 @@
+<mvc:View xmlns:ce="sap.ui.codeeditor" xmlns:w="sap.ui.integration.widgets"
+	controllerName="sap.f.cardsdemo.controller.ChangesChildCards"
+	xmlns="sap.m"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:f="sap.f"
+	displayBlock="true">
+	<Page title="Child Cards">
+		<HBox height="100%">
+			<w:Card
+				id="card"
+				manifest="{cardsPlayground>/playgroundBaseUrl}/bundles/cardWithManyChildren/manifest.json"
+			>
+				<w:layoutData>
+					<FlexItemData baseSize="500px" styleClass="sapUiContentPadding" />
+				</w:layoutData>
+			</w:Card>
+			<ce:CodeEditor
+				id="changes"
+				type="javascript"
+			>
+				<ce:layoutData>
+					<FlexItemData growFactor="1" />
+				</ce:layoutData>
+			</ce:CodeEditor>
+		</HBox>
+	</Page>
+</mvc:View>

@@ -61,12 +61,11 @@ sap.ui.define([
 					numberOfExpandedLevels : iExpandedLevels,
 					operationMode : OperationMode.Server,
 					restoreTreeStateAfterChange : oUiModel.getProperty("/restoreState"),
-					select : "ErhaOrderItem,ErhaOrderItemName,HierarchySiblingRank,ErhaOrder,"
+					select : "ErhaOrderItem,ErhaOrderItemName,ErhaOrder,"
 						+ "ParentItem,CreatedByUser,CreationDateTime,"
 						// technical properties
 						+ "HierarchyDrillState,HierarchyDistanceFromRoot,HierarchyDescendantCount,"
-						+ "HierarchyNode,HierarchyParentNode,HierarchyPreorderRank,"
-						+ "HierarchySiblingRank",
+						+ "HierarchyNode,HierarchyParentNode,HierarchyPreorderRank",
 					threshold : 10,
 					treeAnnotationProperties : undefined
 				}

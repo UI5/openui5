@@ -18,6 +18,11 @@ sap.ui.define([
 		layers: { "admin": 0, "content": 5, "translation": 10, "all": 20 },
 		mergeManifestPathChanges: function (oModel, oChange) {
 			Object.keys(oChange).forEach(function (s) {
+				// don't merge manifest changes for child cards
+				if (s.match(/^\/sap.card\/configuration\/childCards\/.+\/_manifestChanges$/)) {
+					return;
+				}
+
 				if (s.charAt(0) === "/") {
 					var value = oChange[s];
 					CardMerger.updateManifestProperty(oModel, s, value);
@@ -171,6 +176,15 @@ sap.ui.define([
 				oModel.setProperty(sManifestPath, oValue);
 				return;
 			}
+		},
+		extractChildCardChanges: function (aManifestChanges, sChildCardKey) {
+			return aManifestChanges.map((oChanges) => {
+				const sChangesPath = `/sap.card/configuration/childCards/${sChildCardKey}/_manifestChanges`;
+
+				return oChanges[sChangesPath];
+			}).filter((oChanges) => {
+				return oChanges && Object.keys(oChanges).length > 0;
+			});
 		}
 	};
 

@@ -2136,6 +2136,9 @@ sap.ui.define([
 	 * @param {string} [mParameters.treeAnnotationProperties.hierarchyNodeDescendantCountFor]
 	 *   The property name in the same type holding the descendant count for the node; the type of
 	 *   the referenced property has to be an integer type
+	 * @param {string} [mParameters.treeAnnotationProperties.hierarchyPreorderRankFor]
+	 *   The property name in the same type holding the preorder rank for the node; the type of
+	 *   the referenced property has to be an integer type
 	 * @param {number} [mParameters.numberOfExpandedLevels=0]
 	 *   The number of levels that are auto-expanded initially. Setting this property might lead to
 	 *   multiple back-end requests. The auto-expand feature is <b>deprecated as of Version 1.44.5
@@ -2171,14 +2174,24 @@ sap.ui.define([
 	 *   This feature is not supported if
 	 *   {@link sap.ui.model.odata.OperationMode.Server OperationMode.Server} or
 	 *   {@link sap.ui.model.odata.OperationMode.Auto OperationMode.Auto} is used.
-	 *  @param {sap.ui.model.odata.CountMode} [mParameters.countMode]
-	 *    Defines the count mode of this binding; if not specified, the default count mode of the
-	 *    binding's model is applied. The resulting count mode must not be
-	 *    {@link sap.ui.model.odata.CountMode.None}.
-	 *  @param {boolean} [mParameters.usePreliminaryContext]
-	 *    Whether a preliminary context is used; defaults to the value of the parameter
-	 *    <code>preliminaryContext</code> given on construction of the binding's model, see
-	 *    {@link sap.ui.model.odata.v2.ODataModel}
+	 * @param {boolean} [mParameters.restoreTreeStateAfterChange]
+	 *   Whether the tree state is restored on hierarchy maintenance, such as adding, removing, or deleting a node.
+	 *   This is only supported if the following conditions are met: <ul>
+	 *   <li>The binding has to use {@link sap.ui.model.odata.OperationMode.Server OperationMode.Server}</li>
+	 *   <li>The <code>"hierarchy-node-descendant-count-for"</code> annotation must be present in the service metadata
+	 *     or provided via <code>treeAnnotationProperties.hierarchyNodeDescendantCountFor</code></li>
+	 *   <li>The <code>"hierarchy-preorder-rank-for"</code> annotation must be present in the service metadata or
+	 *     provided via <code>treeAnnotationProperties.hierarchyPreorderRankFor</code></li>
+	 *   </ul>
+	 *   @experimental as of version 1.141.0.
+	 * @param {sap.ui.model.odata.CountMode} [mParameters.countMode]
+	 *   Defines the count mode of this binding; if not specified, the default count mode of the
+	 *   binding's model is applied. The resulting count mode must not be
+	 *   {@link sap.ui.model.odata.CountMode.None}.
+	 * @param {boolean} [mParameters.usePreliminaryContext]
+	 *   Whether a preliminary context is used; defaults to the value of the parameter
+	 *   <code>preliminaryContext</code> given on construction of the binding's model, see
+	 *   {@link sap.ui.model.odata.v2.ODataModel}
 	 * @param {string} [mParameters.batchGroupId]
 	 *   <b>Deprecated as of version 1.31.0</b>, use <code>groupId</code> instead. Sets the batch group id to be used
 	 *   for requests originating from this binding

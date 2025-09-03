@@ -1444,7 +1444,9 @@ sap.ui.define([
 				getAndRemoveCollection : function () {},
 				getPath : function () { return "/TEAMS"; }
 			},
-			oData = {},
+			oData = {
+				"@$ui5.resetCount" : "~iResetCount~"
+			},
 			fnDataRequested = {/*function*/},
 			oGroupLock = {},
 			oPromise,
@@ -1491,7 +1493,7 @@ sap.ui.define([
 			}
 
 			oBindingMock.expects("checkSameCache").on(oBinding)
-				.withExactArgs(sinon.match.same(oCache));
+				.withExactArgs(sinon.match.same(oCache), "~iResetCount~");
 
 			// code under test
 			oResult.$checkStillValid();

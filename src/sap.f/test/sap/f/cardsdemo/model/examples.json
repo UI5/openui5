@@ -337,5 +337,11 @@
 		"description": "Cards with Destinations",
 		"route": "destinations",
 		"group": "Initialization and Data"
+	},
+	{
+		"title": "Changes of Child Cards",
+		"description": "Card with child cards",
+		"route": "changesChildCards",
+		"group": "Manifest Changes"
 	}
 ]

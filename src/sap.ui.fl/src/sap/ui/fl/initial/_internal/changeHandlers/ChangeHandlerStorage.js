@@ -133,10 +133,17 @@ sap.ui.define([
 		const sSkipNext = "ChangeHandlerStorage.registerChangeHandlersForControl.skip_next_then";
 
 		if (typeof mChangeHandlers === "string") {
-			oPromise = requireAsync(`${mChangeHandlers}.flexibility`)
-			.catch(function(oError) {
-				Log.error(`Flexibility change handler registration failed.\nControlType: ${sControlType}\n${oError.message}`);
-				return Promise.resolve(sSkipNext); // continue without a registration
+			oPromise = new Promise((resolve) => {
+				// TODO: The setTimeout is added to circumvent dependency issues caused by synchronous module loading.
+				// This shall be removed once sync loading is not used anymore in UI5. #todos10
+				setTimeout(() => {
+					requireAsync(`${mChangeHandlers}.flexibility`)
+					.then(resolve)
+					.catch(function(oError) {
+						Log.error(`Flexibility change handler registration failed.\nControlType: ${sControlType}\n${oError.message}`);
+						resolve(sSkipNext); // continue without a registration
+					});
+				}, 0);
 			});
 		}
 

@@ -27,6 +27,7 @@
 		},
 		"header": {
 			"title": "Child Card 2",
+			"subtitle": "Open child card 2.1",
 			"actions": [
 				{
 					"type": "ShowCard",

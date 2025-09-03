@@ -26,9 +26,9 @@ sap.ui.define([
 	 * @alias sap.ui.base.BindingParser
 	 */
 	var BindingParser = {
-			_keepBindingStrings : false,
-			UI5ObjectMarker : Symbol("ui5object") // Marker to not 'forget' ui5Objects
-		};
+		_keepBindingStrings : false,
+		UI5ObjectMarker : Symbol("ui5object") // Marker to not 'forget' ui5Objects
+	};
 
 	/**
 	 * Regular expression to check for a (new) object literal.
@@ -46,6 +46,23 @@ sap.ui.define([
 	 * Regular expression to escape potential binding chars
 	 */
 	var rBindingChars = /([\\\{\}])/g;
+
+	const aSupportedNamespaces = ["Math", "JSON"];
+
+	/**
+	 * An object containing variables that can be used as global variables in a binding string.
+	 *
+	 * This object includes a subset of the global variables of the ExpressionParser.
+	 * A property is selected if it meets one of the following criteria:
+	 *  * It is a function.
+	 *  * It is included in aSupportedNamespaces.
+	 */
+	const mDefaultGlobals = Object.fromEntries(
+		Object.entries(ExpressionParser._globals).filter(([sKey, vValue]) => {
+			return aSupportedNamespaces.includes(sKey) || typeof vValue === "function";
+		})
+	);
+
 
 	/**
 	 * Creates a composite formatter which calls <code>fnRootFormatter</code> on the results of the
@@ -179,7 +196,7 @@ sap.ui.define([
 	const rFormatterBind = /(^(?:\.)?(?:[$_\p{ID_Start}][$_\p{ID_Continue}]*\.)*[\p{ID_Start}][$_\p{ID_Continue}]*)\.bind\(([$_\p{ID_Start}][$_\p{ID_Continue}]*)\)$/u;
 
 	function resolveBindingInfo(oEnv, oBindingInfo) {
-		var mVariables = Object.assign({".": oEnv.oContext}, oEnv.mLocals);
+		var mVariables = Object.assign({".": oEnv.oContext}, mDefaultGlobals, oEnv.mLocals);
 
 		/*
 		 * Resolves a function name to a function.

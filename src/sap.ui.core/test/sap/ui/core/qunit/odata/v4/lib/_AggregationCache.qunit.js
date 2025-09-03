@@ -429,6 +429,7 @@ sap.ui.define([
 			assert.ok("$count" in oCache.aElements);
 			assert.strictEqual(oCache.aElements.$count, undefined);
 			assert.strictEqual(oCache.aElements.$created, 0);
+			assert.strictEqual(oCache.iResetCount, 0);
 			assert.strictEqual(oCache.addKeptElement, "~addKeptElement~", "@borrows ...");
 			assert.strictEqual(oCache.removeKeptElement, "~removeKeptElement~", "@borrows ...");
 			assert.strictEqual(oCache.requestSideEffects, "~requestSideEffects~", "@borrows ...");
@@ -1572,6 +1573,7 @@ sap.ui.define([
 				that = this;
 
 			function checkResult(oResult) {
+				assert.strictEqual(oResult["@$ui5.resetCount"], "~iResetCount~");
 				assert.strictEqual(oResult.value.length, iLength);
 				assert.strictEqual(oResult.value.$count, 42);
 				for (let j = 0; j < iLength; j += 1) {
@@ -1599,7 +1601,8 @@ sap.ui.define([
 				});
 
 			// code under test
-			return oCache.read(iIndex, iLength, iPrefetchLength, "~oGroupLock~", "~fnDataRequested~")
+			const oPromise = oCache.read(iIndex, iLength, iPrefetchLength, "~oGroupLock~",
+					"~fnDataRequested~")
 				.then(function (oResult) {
 					var oGroupLock = {
 							unlock : function () {}
@@ -1616,6 +1619,10 @@ sap.ui.define([
 						.read(iIndex, iLength, iPrefetchLength, oGroupLock, "~fnDataRequested~")
 						.then(checkResult);
 				});
+
+			oCache.iResetCount = "~iResetCount~"; // simulate reset in the meantime
+
+			return oPromise;
 		});
 	});
 
@@ -1904,6 +1911,12 @@ sap.ui.define([
 		iOutOfPlaceCount : 1,
 		iExpectedStart : 0,
 		iExpectedLength : 23
+	}, { // different iResetCount, skip response
+		iFirstLevelIndex : 0,
+		iFirstLevelLength : 3,
+		iNewResetCount : 13,
+		iExpectedStart : 0,
+		iExpectedLength : 23
 	}].forEach(function (oFixture, i) {
 		QUnit.test("readFirst: #" + i, function (assert) {
 			var oAggregation = { // filled before by buildApply
@@ -1925,7 +1938,8 @@ sap.ui.define([
 				oReadResult = {
 					value : []
 				},
-				bSkipResponse = oFixture.bSentRequest && oFixture.iOutOfPlaceCount;
+				bSkipResponseOOP = oFixture.bSentRequest && oFixture.iOutOfPlaceCount,
+				bSkipResponse = bSkipResponseOOP || oFixture.iNewResetCount;
 
 			if (oFixture.iExpandTo) { // unrealistic combination, but never mind
 				oAggregation.expandTo = oFixture.iExpandTo;
@@ -1949,7 +1963,7 @@ sap.ui.define([
 				.returns(oFixture.iOutOfPlaceCount ?? 0);
 			this.mock(oCache.oFirstLevel).expects("read")
 				.withExactArgs(iExpectedStart, iExpectedLength, 0,
-					bSkipResponse ? sinon.match.same(_GroupLock.$cached) : "~oGroupLock~",
+					bSkipResponseOOP ? sinon.match.same(_GroupLock.$cached) : "~oGroupLock~",
 					"~fnDataRequested~")
 				.callsFake(function () {
 					oCache.oFirstLevel.bSentRequest = true;
@@ -1959,6 +1973,14 @@ sap.ui.define([
 				.exactly(oFixture.bSentRequest ? 0 : 1).withExactArgs("~oGroupLock~")
 				.returns([Promise.resolve("~outOfPlaceResult0~"),
 					Promise.resolve("~outOfPlaceResult1~"), Promise.resolve("~outOfPlaceResult2~")]);
+
+			// code under test
+			const oPromise = oCache.readFirst(oFixture.iFirstLevelIndex, oFixture.iFirstLevelLength,
+					oFixture.iPrefetchLength ?? 20, "~oGroupLock~", "~fnDataRequested~");
+
+			if (oFixture.iNewResetCount) {
+				oCache.iResetCount = oFixture.iNewResetCount; // simulate reset in the meantime
+			}
 			if (oFixture.bHasGrandTotal) {
 				switch (oFixture.grandTotalAtBottomOnly) {
 					case false: // top & bottom
@@ -2005,10 +2027,7 @@ sap.ui.define([
 					: ["~outOfPlaceResult0~", "~outOfPlaceResult1~", "~outOfPlaceResult2~"]
 				);
 
-			// code under test
-			return oCache.readFirst(oFixture.iFirstLevelIndex, oFixture.iFirstLevelLength,
-					oFixture.iPrefetchLength ?? 20, "~oGroupLock~", "~fnDataRequested~")
-				.then(function () {
+			return oPromise.then(function () {
 					if (bSkipResponse) {
 						assert.strictEqual(oCache.aElements.length, 0, "unchanged");
 						assert.strictEqual(oCache.aElements.$count, undefined, "unchanged");
@@ -2166,6 +2185,7 @@ sap.ui.define([
 			aReadResult0 = [{}, {}],
 			aReadResult1 = [{}, {}, {}, {}];
 
+		oCache.iResetCount = "~iResetCount~";
 		oCache.aElements = [
 			{/* expanded node */},
 			oFirstLeaf,
@@ -2194,6 +2214,7 @@ sap.ui.define([
 
 		// code under test
 		return oCache.read(1, 4, 5, oGroupLock, "~fnDataRequested~").then((oResult) => {
+			assert.strictEqual(oResult["@$ui5.resetCount"], "~iResetCount~");
 			assert.strictEqual(oResult.value.length, 4);
 			assert.strictEqual(oResult.value[0], oFirstLeaf);
 			assert.strictEqual(oResult.value[1], aReadResult0[0]);

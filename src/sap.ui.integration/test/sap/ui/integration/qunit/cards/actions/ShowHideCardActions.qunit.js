@@ -655,53 +655,61 @@ sap.ui.define([
 		beforeEach: function () {
 			this.oCard = new Card();
 			this.oCard.placeAt(DOM_RENDER_LOCATION);
+
+			this.oServer = sinon.createFakeServer({
+				autoRespond: true,
+				respondImmediately: true
+			});
+
+			this.oServer.respondWith("GET", /test-resources\/sap\/ui\/integration\/qunit\/testResources\/snackManifest\.json.*/, (oXhr) => {
+				const iLevel = parseInt(oXhr.url.match(/Manifest\.json(\d+)/)[1]);
+				const iNextLevel = iLevel + 1;
+
+				oXhr.respond(
+					200,
+					{ "Content-Type": "application/json" },
+					JSON.stringify({
+						"sap.app": {
+							"id": "card.level" + iLevel,
+							"type": "card"
+						},
+						"sap.card": {
+							"type": "Object",
+							"configuration": {
+								"childCards": {
+									"childCard": {
+										"manifest": "test-resources/sap/ui/integration/qunit/testResources/snackManifest.json" + iNextLevel
+									}
+								}
+							},
+							"header": {
+								"title": "Level " + iLevel,
+								"actions": [{
+									"type": "ShowCard",
+									"parameters": {
+										"childCardKey": "childCard"
+									}
+								}]
+							},
+							"content": {
+								"groups": [{
+									"items": [{
+										"value": "Child card content"
+									}]
+								}]
+							}
+						}
+					})
+				);
+			});
 		},
 		afterEach: function () {
 			this.oCard.destroy();
+			this.oServer.restore();
 		}
 	});
 
-	QUnit.test("Multiple levels of child cards", async function (assert) {
-		const oServer = sinon.createFakeServer({
-			autoRespond: true,
-			respondImmediately: true
-		});
-
-		oServer.respondWith("GET", /test-resources\/sap\/ui\/integration\/qunit\/testResources\/snackManifest\.json.*/, (oXhr) => {
-			const iLevel = parseInt(oXhr.url.match(/Manifest\.json(\d+)/)[1]);
-			const iNextLevel = iLevel + 1;
-
-			oXhr.respond(
-				200,
-				{ "Content-Type": "application/json" },
-				JSON.stringify({
-					"sap.app": {
-						"id": "card.level" + iLevel,
-						"type": "card"
-					},
-					"sap.card": {
-						"type": "Object",
-						"header": {
-							"title": "Level " + iLevel,
-							"actions": [{
-								"type": "ShowCard",
-								"parameters": {
-									"manifest": "test-resources/sap/ui/integration/qunit/testResources/snackManifest.json" + iNextLevel
-								}
-							}]
-						},
-						"content": {
-							"groups": [{
-								"items": [{
-									"value": "Child card content"
-								}]
-							}]
-						}
-					}
-				})
-			);
-		});
-
+	QUnit.test("Opening multiple levels of child cards", async function (assert) {
 		this.oCard.setManifest("test-resources/sap/ui/integration/qunit/testResources/snackManifest.json0");
 
 		await nextCardReadyEvent(this.oCard);
@@ -717,9 +725,12 @@ sap.ui.define([
 		]);
 		await nextUIUpdate();
 
+		// Assert
+		assert.strictEqual(oChildCard.getCardHeader().getTitle(), "Level 1", "First child card is opened with correct title");
+
 		// Act - Open second child card
-		const oChildCardHeader = oChildCard.getCardHeader();
-		oChildCardHeader.firePress();
+		oChildCard.getCardHeader().firePress();
+
 		const oSecondDialog = oChildCard.getDependents()[0];
 		const oSecondChildCard = oSecondDialog.getContent()[0];
 
@@ -730,9 +741,109 @@ sap.ui.define([
 
 		// Assert
 		assert.strictEqual(oSecondChildCard.getCardHeader().getTitle(), "Level 2", "Second child card is opened with correct title");
+	});
 
-		// Clean up
-		oServer.restore();
+	QUnit.test("Setting 'manifestChanges' to nested cards", async function (assert) {
+		this.oCard.setManifest("test-resources/sap/ui/integration/qunit/testResources/snackManifest.json0");
+		this.oCard.setManifestChanges([{
+			"/sap.card/header/title": "Updated Title",
+			"/sap.card/configuration/childCards/childCard/_manifestChanges": {
+				"/sap.card/header/title": "Updated Child Card Title",
+				"/sap.card/configuration/childCards/childCard/_manifestChanges": {
+					"/sap.card/header/title": "Updated Grandchild Card Title"
+				}
+			}
+		}]);
+
+		await nextCardReadyEvent(this.oCard);
+		await nextUIUpdate();
+
+		// Act - Open first child card
+		this.oCard.getCardHeader().firePress();
+		const oDialog = this.oCard.getDependents()[0];
+		const oChildCard = oDialog.getContent()[0];
+		await Promise.all([
+			nextCardReadyEvent(oChildCard),
+			new Promise((resolve) => { oDialog.attachAfterOpen(resolve); })
+		]);
+		await nextUIUpdate();
+
+		// Assert
+		assert.deepEqual(oChildCard.getManifestChanges(), [{
+			"/sap.card/header/title": "Updated Child Card Title",
+			"/sap.card/configuration/childCards/childCard/_manifestChanges": {
+				"/sap.card/header/title": "Updated Grandchild Card Title"
+			}
+		}], "Child card has correct manifest changes");
+
+		// Act - Open second child card
+		oChildCard.getCardHeader().firePress();
+
+		const oSecondDialog = oChildCard.getDependents()[0];
+		const oSecondChildCard = oSecondDialog.getContent()[0];
+
+		await Promise.all([
+			nextCardReadyEvent(oSecondChildCard),
+			new Promise((resolve) => { oSecondDialog.attachAfterOpen(resolve); })
+		]);
+
+		// Assert
+		assert.deepEqual(oSecondChildCard.getManifestChanges(), [{
+			"/sap.card/header/title": "Updated Grandchild Card Title"
+		}], "Second child card has correct manifest changes");
+	});
+
+	QUnit.test("Setting 'manifestChanges' to nested cards using private '_manifestChanges' property", async function (assert) {
+		this.oCard.setManifest("test-resources/sap/ui/integration/qunit/testResources/snackManifest.json0");
+		await nextCardReadyEvent(this.oCard);
+
+		const oManifest = this.oCard.getManifestEntry("/");
+		oManifest["sap.card"].configuration.childCards.childCard._manifestChanges = [{
+			"/sap.card/header/title": "Updated Child Card Title",
+			"/sap.card/configuration/childCards/childCard/_manifestChanges": {
+				"/sap.card/header/title": "Updated Grandchild Card Title"
+			}
+		}];
+		this.oCard.setManifest(oManifest);
+
+		await nextCardReadyEvent(this.oCard);
+		await nextUIUpdate();
+
+		// Act - Open first child card
+		this.oCard.getCardHeader().firePress();
+		const oDialog = this.oCard.getDependents()[0];
+		const oChildCard = oDialog.getContent()[0];
+		await Promise.all([
+			nextCardReadyEvent(oChildCard),
+			new Promise((resolve) => { oDialog.attachAfterOpen(resolve); })
+		]);
+		await nextUIUpdate();
+
+		// Assert
+		assert.deepEqual(oChildCard.getManifestChanges(), [{
+			"/sap.card/header/title": "Updated Child Card Title",
+			"/sap.card/configuration/childCards/childCard/_manifestChanges": {
+				"/sap.card/header/title": "Updated Grandchild Card Title"
+			}
+		}], "Child card has correct manifest changes");
+		assert.strictEqual(oChildCard.getCardHeader().getTitle(), "Updated Child Card Title", "Manifest change for child card title is applied");
+
+		// Act - Open second child card
+		oChildCard.getCardHeader().firePress();
+
+		const oSecondDialog = oChildCard.getDependents()[0];
+		const oSecondChildCard = oSecondDialog.getContent()[0];
+
+		await Promise.all([
+			nextCardReadyEvent(oSecondChildCard),
+			new Promise((resolve) => { oSecondDialog.attachAfterOpen(resolve); })
+		]);
+
+		// Assert
+		assert.deepEqual(oSecondChildCard.getManifestChanges(), [{
+			"/sap.card/header/title": "Updated Grandchild Card Title"
+		}], "Second child card has correct manifest changes");
+		assert.strictEqual(oSecondChildCard.getCardHeader().getTitle(), "Updated Grandchild Card Title", "Manifest change for grandchild card title is applied");
 	});
 
 	QUnit.module("Show/Hide cardChild card's bindings", {

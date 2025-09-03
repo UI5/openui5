@@ -3,6 +3,7 @@
  */
 sap.ui.define([
 	"sap/base/future",
+	"sap/base/util/ObjectPath",
 	"sap/ui/base/BindingParser",
 	"sap/ui/base/ExpressionParser",
 	"sap/ui/base/ManagedObject",
@@ -15,8 +16,8 @@ sap.ui.define([
 	"sap/ui/model/type/Date",
 	"sap/ui/model/type/String",
 	"sap/base/Log"
-], function (future, BindingParser, ExpressionParser, ManagedObject, BindingInfo, InvisibleText, Filter,
-	Sorter, JSONModel, Currency, Date, String, Log) {
+], function (future, ObjectPath, BindingParser, ExpressionParser, ManagedObject, BindingInfo, InvisibleText,
+	Filter, Sorter, JSONModel, Currency, Date, String, Log) {
 	/*global QUnit, sinon */
 	/*eslint no-warning-comments: 0 */
 	"use strict";
@@ -231,6 +232,29 @@ sap.ui.define([
 		this.assertBoundTo(o.formatter, oController.myformatter, oController, "parse should return the local formatter function");
 	});
 
+	QUnit.test("Single Binding with native formatter", function (assert) {
+		const oSpy = this.spy(ObjectPath, "get");
+		const o = parse("{path:'something', formatter: 'parseInt'}");
+		assert.strictEqual(typeof o, "object", "parse should return an object");
+		assert.strictEqual(o.parts, undefined, "binding info should not be a composite binding info");
+		assert.strictEqual(o.path, "something", "path should be as specified");
+		assert.strictEqual(o.type, undefined, "parse should not return a type name");
+		assert.strictEqual(o.formatter, globalThis.parseInt, "parse should return the correct formatter function");
+		sinon.assert.neverCalledWith(oSpy, "parseInt");
+	});
+
+	QUnit.test("Single Binding with formatter that shares the same name with default globals", function (assert) {
+		const myOwnParseInt = () => {};
+		var o = parse("{path:'something', formatter: 'parseInt'}", /*oContext*/null, /*bUnescape*/false,
+			/*bTolerateFunctionsNotFound*/false, /*bStaticContext*/true, /*bPreferContext*/false,
+			/*mLocals*/ {parseInt: myOwnParseInt});
+		assert.strictEqual(typeof o, "object", "parse should return an object");
+		assert.strictEqual(o.parts, undefined, "binding info should not be a composite binding info");
+		assert.strictEqual(o.path, "something", "path should be as specified");
+		assert.strictEqual(o.type, undefined, "parse should not return a type name");
+		assert.strictEqual(o.formatter, myOwnParseInt, "parse should return the local formatter function");
+	});
+
 	QUnit.test("Single Binding with required type", function (assert) {
 		var o = parse("{path:'something', type: 'myType'}", /*oContext*/null, /*bUnescape*/false,
 			/*bTolerateFunctionsNotFound*/false, /*bStaticContext*/true, /*bPreferContext*/false,
@@ -323,6 +347,18 @@ sap.ui.define([
 		assert.ok(o.filters instanceof Filter, "parse should return the specified filter");
 		assert.strictEqual(o.filters.sPath, "someFilterPath", "filter path should return the specified path");
 		this.assertBoundTo(o.filters.fnTest, oController.mytest, oController, "test function should be resolved");
+	});
+
+	QUnit.test("Single Binding with filter and native test function", function (assert) {
+		const oSpy = this.spy(ObjectPath, "get");
+		const o = parse("{path:'something', filters: {path:'someFilterPath', test:'isFinite'}}");
+		assert.strictEqual(typeof o, "object", "parse should return an object");
+		assert.strictEqual(o.parts, undefined, "binding info should not be a composite binding info");
+		assert.strictEqual(o.path, "something", "path should be as specified");
+		assert.ok(o.filters instanceof Filter, "parse should return the specified filter");
+		assert.strictEqual(o.filters.sPath, "someFilterPath", "filter path should return the specified path");
+		assert.strictEqual(o.filters.fnTest, globalThis.isFinite, "test function should be resolved");
+		sinon.assert.neverCalledWith(oSpy, "isFinite");
 	});
 
 	QUnit.test("Single Binding with multiple filters", function (assert) {
@@ -442,6 +478,18 @@ sap.ui.define([
 		assert.ok(o.sorter instanceof Sorter, "parse should return the specified sorter");
 		assert.strictEqual(o.sorter.sPath, "someSortPath", "sorter path should return the specified path");
 		this.assertBoundTo(o.sorter.fnCompare, oController.mycompare, oController, "compare function should be resolved");
+	});
+
+	QUnit.test("Single Binding with sorter and native comparator function", function (assert) {
+		const oSpy = this.spy(ObjectPath, "get");
+		const o = parse("{path:'something', sorter: {path:'someSortPath', comparator: 'Math.min'}}");
+		assert.strictEqual(typeof o, "object", "parse should return an object");
+		assert.strictEqual(o.parts, undefined, "binding info should not be a composite binding info");
+		assert.strictEqual(o.path, "something", "path should be as specified");
+		assert.ok(o.sorter instanceof Sorter, "parse should return the specified sorter");
+		assert.strictEqual(o.sorter.sPath, "someSortPath", "sorter path should return the specified path");
+		assert.ok(o.sorter.fnCompare, "compare function should be resolved");
+		sinon.assert.neverCalledWith(oSpy, "Math.min");
 	});
 
 	QUnit.test("Single Binding with multiple sorters", function (assert) {

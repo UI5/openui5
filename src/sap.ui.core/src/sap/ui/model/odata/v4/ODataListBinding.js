@@ -1889,7 +1889,8 @@ sap.ui.define([
 				return oCache.read(iIndex, iLength, iMaximumPrefetchSize, oGroupLock,
 					fnDataRequested, undefined, that.fireSeparateReceived.bind(that)
 				).then(function (oResult) {
-					oResult.$checkStillValid = that.checkSameCache.bind(that, oCache);
+					oResult.$checkStillValid
+						= that.checkSameCache.bind(that, oCache, oResult["@$ui5.resetCount"]);
 
 					return oResult;
 				});

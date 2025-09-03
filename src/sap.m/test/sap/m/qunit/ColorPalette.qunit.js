@@ -567,11 +567,9 @@ sap.ui.define([
 			oCP.onsaphome(oEvent);
 
 			// Assert
-			assert.equal(oSpyEvtPreventDefault.callCount, 1, "..should prevent default action");
-			assert.equal(oSpyEvtStopImmediatePropagation.callCount, 1, "..should prevent immediate propagation");
-			assert.equal(oSpyEvtStopImmediatePropagation.getCall(0).args[0], true, "..should prevent immediate propagation with 'true'");
-
-			// Cleanup - not needed
+			assert.notOk(oCP.getProperty("_isInPopover"), "The property '_isInPopover' should be false");
+			assert.ok(oSpyEvtPreventDefault.notCalled, "Default action should not be prevented");
+			assert.ok(oSpyEvtStopImmediatePropagation.notCalled, "Immediate propagation should not be stopped");
 		});
 
 		QUnit.test("ColorPalette.prototype.onsaphome when event does not occur on 'Default Color' nor 'More Colors..' button",
@@ -1177,13 +1175,16 @@ sap.ui.define([
 					this.oStubSetDomRef = sinon.stub(ColorPalette.prototype._ItemNavigation.prototype, "setItemDomRefs", function() {});
 
 					this.oCP._ensureItemNavigation();
+					this.oCP.setProperty("_isInPopover", true);
 					this.oCP._oPaletteColorItemNavigation.oDomRef = document.getElementsByClassName("sapUiBody")[0];
 					this.oEvent.target = document.getElementsByClassName("sapUiBody")[0];
 					this.oStubGetItemDomRefs = sinon.stub(this.oCP._oPaletteColorItemNavigation, "getItemDomRefs").returns(new Array(this.oCP.getColors().length));
+					this.oIsColorPaletteInPopoverStub = sinon.stub(this.oCP._oPaletteColorItemNavigation, "_isColorPaletteInPopover").returns(true);
 				},
 				afterEach: function() {
 					this.oStubSetDomRef.restore();
 					this.oStubGetItemDomRefs.restore();
+					this.oIsColorPaletteInPopoverStub.restore();
 				}
 			}, function() {
 				QUnit.test("ItemNavigationHomeEnd.onsaphome when HOME is pressed outside items (swatch) container)",
@@ -1280,12 +1281,15 @@ sap.ui.define([
 					this.oStubSetDomRef = sinon.stub(ColorPalette.prototype._ItemNavigation.prototype, "setItemDomRefs", function() {});
 
 					this.oCP._ensureItemNavigation();
+					this.oCP.setProperty("_isInPopover", true);
 					this.oCP._oPaletteColorItemNavigation.oDomRef = document.getElementsByClassName("sapUiBody")[0];
 					this.oEvent.target = document.getElementsByClassName("sapUiBody")[0];
 					this.oStubGetItemDomRefs = sinon.stub(this.oCP._oPaletteColorItemNavigation, "getItemDomRefs").returns(new Array(this.oCP.getColors().length));
+					this.oIsColorPaletteInPopoverStub = sinon.stub(this.oCP._oPaletteColorItemNavigation, "_isColorPaletteInPopover").returns(true);
 				},
 				afterEach: function() {
 					this.oStubSetDomRef.restore();
+					this.oIsColorPaletteInPopoverStub.restore();
 				}
 			}, function() {
 
@@ -2170,6 +2174,32 @@ sap.ui.define([
 				// Cleanup
 				oCP.destroy();
 			});
+		});
+
+		QUnit.module("ColorPalettePopover keyboard handling", function() {
+			QUnit.test("ColorPalette.prototype.onsaphome for 'Default Color' or 'More Colors..' button", function (assert) {
+
+				// Prepare
+				var oCPP = new ColorPalettePopover(),
+					oCP = oCPP._getPalette(),
+					oEvent = new jQuery.Event(),
+					oSpyEvtPreventDefault = this.spy(oEvent, "preventDefault"),
+					oSpyEvtStopImmediatePropagation = this.spy(oEvent, "stopImmediatePropagation");
+
+				this.stub(ColorPalette.prototype, "_getElementInfo").returns({
+					bIsDefaultColorButton: false,
+					bIsMoreColorsButton: true
+				});
+
+				// Act
+				oCP.onsaphome(oEvent);
+
+				// Assert
+				assert.equal(oSpyEvtPreventDefault.callCount, 1, "..should prevent default action");
+				assert.equal(oSpyEvtStopImmediatePropagation.callCount, 1, "..should prevent immediate propagation");
+				assert.equal(oSpyEvtStopImmediatePropagation.getCall(0).args[0], true, "..should prevent immediate propagation with 'true'");
+			});
+
 		});
 
 		QUnit.test("Fake test to have a root module with at least one test, otherwise qunit-2 will fail", function (assert) {

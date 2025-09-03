@@ -11,6 +11,8 @@ sap.ui.define([
 	/**
 	 * Calculates delta of old list and new list.
 	 *
+	 * Note: This function is a modified copy of {@link module:sap/base/util/array/diff}
+	 *
 	 * See <SAP Wiki>/UI/SelectionController%3A+Move+Change+Creation+Algorithm
 	 *
 	 * This function implements the algorithm described in "A Technique for Isolating Differences Between Files"
@@ -77,7 +79,7 @@ sap.ui.define([
 	 * @param {function} [vConfigOrSymbol.symbol] Function to calculate substitute symbols for array items
 	 * @param {boolean} [vConfigOrSymbol.replace=false] Switch for the <code>replace</code> type which specifies that an item within the array has been changed
 	 * @param {boolean} [vConfigOrSymbol.includeReference=false] Includes the array reference and index to determine which item is affected
-	 * @alias module:sap/base/util/array/diff
+	 * @alias module:sap/m/p13n/util/diff
 	 * @return {Array.<{type:string,index:int}>} List of update operations
 	 * @private
 	 * @ui5-restricted sap.m.p13n

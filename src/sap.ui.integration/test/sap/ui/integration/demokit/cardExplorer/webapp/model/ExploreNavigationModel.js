@@ -13,7 +13,6 @@ sap.ui.define([
 				icon: 'sap-icon://SAP-icons-TNT/requirement-diagram',
 				key: 'typesDeclarative',
 				target: 'exploreOverview',
-				hasExpander: false,
 				items: [
 					{
 						title: 'List',
@@ -954,7 +953,7 @@ sap.ui.define([
 				icon: 'sap-icon://SAP-icons-TNT/internal-block-diagram',
 				key: 'typesOther',
 				target: 'exploreOverview',
-				hasExpander: false,
+				expanded: true,
 				items: [
 					{
 						title: 'Adaptive',
@@ -1536,7 +1535,7 @@ sap.ui.define([
 				icon: 'sap-icon://dimension',
 				key: 'progressiveDisclosure',
 				target: 'exploreOverview',
-				hasExpander: false,
+				expanded: true,
 				hidden: !isDevelopmentBuild(),
 				items: [
 					{
@@ -1637,7 +1636,7 @@ sap.ui.define([
 				key: 'footer',
 				target: 'exploreSamples',
 				icon: 'sap-icon://SAP-icons-TNT/local-process-call',
-				hasExpander: false,
+				expanded: true,
 				subSamples: [
 					{
 						title: 'General Actions',
@@ -1707,7 +1706,7 @@ sap.ui.define([
 				key: 'filters',
 				target: 'exploreOverview',
 				icon: 'sap-icon://filter',
-				hasExpander: false,
+				expanded: true,
 				items: [
 					{
 						title: 'ComboBox',
@@ -1907,7 +1906,7 @@ sap.ui.define([
 				key: 'features',
 				target: 'exploreOverview',
 				icon: 'sap-icon://activities',
-				hasExpander: false,
+				expanded: true,
 				items: [
 					{
 						key: 'cardActions',
@@ -2900,7 +2899,7 @@ sap.ui.define([
 				key: 'formatters',
 				target: 'exploreOverview',
 				icon: 'sap-icon://text-formatting',
-				hasExpander: false,
+				expanded: true,
 				items: [
 					{
 						key: 'currency',
@@ -3054,7 +3053,7 @@ sap.ui.define([
 				icon: 'sap-icon://puzzle',
 				key: 'integration',
 				target: 'exploreOverview',
-				hasExpander: false,
+				expanded: true,
 				items: [
 					{
 						key: 'adaptiveCustomizedActions',
@@ -3839,7 +3838,7 @@ sap.ui.define([
 				icon: 'sap-icon://create-form',
 				key: 'designtime',
 				target: 'exploreOverview',
-				hasExpander: false,
+				expanded: true,
 				items: [
 					{
 						key: 'designtimeAdmin',

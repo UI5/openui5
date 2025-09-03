@@ -34473,11 +34473,13 @@ sap.ui.define([
 	// Side-effects refresh of single root node (SNOW: DINC0538031)
 	//
 	// Move a parent's single leaf child to the same parent (SNOW: DINC0548859)
+	//
+	// Change the table's context and concurrently refresh it (SNOW: DINC0582522)
 	[false, true].forEach(function (bResetViaModel) {
 		const sTitle = `Recursive Hierarchy: create new children, move 'em, model=${bResetViaModel}`;
 		QUnit.test(sTitle, function (assert) {
-			var oBeta, oBetaCreated, oGamma, oGammaCreated, oListBinding, oNewRoot, fnRespond, oRoot,
-				oTable;
+			var oArtist42, oBeta, oBetaCreated, oGamma, oGammaCreated, oListBinding, oNewRoot,
+				fnRespond, oRoot, oTable;
 
 			const oModel = this.createSpecialCasesModel({autoExpandSelect : true});
 			const sFriend = "/Artists(ArtistID='99',IsActiveEntity=false)/_Friend";
@@ -35575,6 +35577,50 @@ sap.ui.define([
 						NodeID : "2,false"
 					}
 				});
+
+				that.expectRequest("Artists(ArtistID='42',IsActiveEntity=false)"
+						+ "?$select=ArtistID,IsActiveEntity,Name", {
+						ArtistID : "42",
+						IsActiveEntity : false,
+						Name : "The Beatles"
+					});
+
+				oArtist42 = oModel.bindContext("/Artists(ArtistID='42',IsActiveEntity=false)")
+					.getBoundContext();
+
+				return Promise.all([
+					oArtist42.requestProperty("Name"),
+					that.waitForChanges(assert, "simulate list report: load artist 42")
+				]);
+			}).then(function () {
+				const sUrl = sBaseUrl.replaceAll("99", "42") + "&$select=ArtistID,IsActiveEntity,Name"
+					+ ",_/DescendantCount,_/DistanceFromRoot,_/DrillState,_/NodeID"
+					+ "&$count=true&$skip=0&$top=3";
+				const oResponse = {
+					"@odata.count" : "1",
+					value : [{
+						ArtistID : "A",
+						IsActiveEntity : false,
+						Name : "Aleph",
+						_ : {
+							DescendantCount : "0",
+							DistanceFromRoot : "0",
+							DrillState : "leaf",
+							NodeID : "A,false"
+						}
+					}]
+				};
+				that.expectRequest("#23 " + sUrl, oResponse)
+					.expectRequest("#23 " + sUrl, oResponse)
+					.expectChange("name", ["Aleph"]);
+
+				oTable.setBindingContext(oArtist42);
+
+				return Promise.all([
+					// code under test (SNOW: DINC0582522)
+					oArtist42.requestSideEffects([""]),
+					that.waitForChanges(assert, "DINC0582522")
+				]);
 			});
 		});
 	});
@@ -81463,5 +81509,128 @@ sap.ui.define([
 		assert.ok(bDataRequested);
 
 		TestUtils.onRequest(null);
+	});
+
+	//*********************************************************************************************
+	// Scenario: A recursive hierarchy is bound relative to a root context. Set the table's context
+	// to null, then bind the table to the same root context again and do a side-effects refresh via
+	// that root context.
+	// SNOW: DINC0582522
+	QUnit.test("Recursive Hierarchy: DINC0582522", async function (assert) {
+		const oModel = this.createTeaBusiModel({autoExpandSelect : true});
+		const sView = `
+<FlexBox binding="{/TEAMS('TEAM_01')}">
+	<Table id="table" items="{path : 'TEAM_2_EMPLOYEES',
+			parameters : {$$aggregation : {hierarchyQualifier : 'OrgChart'}}}">
+		<Text id="name" text="{Name}"/>
+	</Table>
+</FlexBox>`;
+
+		const sRequestUrl = "TEAMS('TEAM_01')/TEAM_2_EMPLOYEES"
+			+ "?$apply=com.sap.vocabularies.Hierarchy.v1.TopLevels("
+			+ "HierarchyNodes=$root/TEAMS('TEAM_01')/TEAM_2_EMPLOYEES"
+			+ ",HierarchyQualifier='OrgChart',NodeProperty='ID',Levels=1)"
+			+ "&$select=DrillState,ID,Name&$count=true&$skip=0&$top=100";
+		this.expectRequest(sRequestUrl, {
+				"@odata.count" : "1",
+				value : [{
+					DrillState : "collapsed",
+					ID : "1",
+					Name : "Alpha"
+				}]
+			})
+			.expectChange("name", ["Alpha"]);
+
+		await this.createView(assert, sView, oModel);
+
+		const oTable = this.oView.byId("table");
+		const oTeamContext = oTable.getBindingContext();
+		oTable.setBindingContext(null);
+
+		this.expectRequest(sRequestUrl, {
+				"@odata.count" : "1",
+				value : [{
+					DrillState : "collapsed",
+					ID : "1",
+					Name : "Alpha (updated)"
+				}]
+			})
+			.expectCanceledError("Failed to get contexts for " + sTeaBusi
+					+ "TEAMS('TEAM_01')/TEAM_2_EMPLOYEES with start index 0 and length 100",
+				sODLB + ": /TEAMS('TEAM_01')|TEAM_2_EMPLOYEES"
+					+ " is ignoring response from inactive cache: " + sTeaBusi
+					+ "TEAMS('TEAM_01')/TEAM_2_EMPLOYEES?"
+					+ "$apply=com.sap.vocabularies.Hierarchy.v1.TopLevels("
+					+ "HierarchyNodes=$root/TEAMS('TEAM_01')/TEAM_2_EMPLOYEES"
+					+ ",HierarchyQualifier='OrgChart',NodeProperty='ID')"
+					+ "&$select=DistanceFromRoot,DrillState,ID,Name")
+			.expectChange("name", ["Alpha (updated)"]);
+
+		await Promise.all([
+			// code under test
+			oTable.setBindingContext(oTeamContext),
+			oTeamContext.requestSideEffects([""]),
+			this.waitForChanges(assert, "bind table + side-effects refresh")
+		]);
+	});
+
+	//*********************************************************************************************
+	// Scenario: A flat list is bound relative to a root context. Set the table's context to null,
+	// then bind the table to the same root context again and do a side-effects refresh via that
+	// root context. To ensure the list binding's cache is reset (instead of recreated), create a
+	// new inactive item.
+	// SNOW: DINC0582522
+	QUnit.test("DINC0582522 (flat list)", async function (assert) {
+		const oModel = this.createTeaBusiModel({autoExpandSelect : true});
+		const sView = `
+<FlexBox binding="{/TEAMS('TEAM_01')}">
+	<Table id="table" items="{path : 'TEAM_2_EMPLOYEES', parameters : {$$ownRequest : true}}">
+		<Text id="name" text="{Name}"/>
+	</Table>
+</FlexBox>`;
+
+		this.expectRequest("TEAMS('TEAM_01')/TEAM_2_EMPLOYEES?$select=ID,Name&$skip=0&$top=100", {
+				value : [{
+					ID : "1",
+					Name : "Alpha"
+				}, {
+					ID : "2",
+					Name : "Beta"
+				}]
+			})
+			.expectChange("name", ["Alpha", "Beta"]);
+
+		await this.createView(assert, sView, oModel);
+
+		this.expectChange("name", ["Gamma", "Alpha", "Beta"]);
+
+		const oTable = this.oView.byId("table");
+		const oListBinding = oTable.getBinding("items");
+		oListBinding.create({Name : "Gamma"}, false, false, /*bInactive*/true);
+
+		await this.waitForChanges(assert, "create inactive Gamma");
+
+		const oTeamContext = oTable.getBindingContext();
+		oTable.setBindingContext(null);
+
+		this.expectRequest("TEAMS('TEAM_01')/TEAM_2_EMPLOYEES?$select=ID,Name&$skip=0&$top=99", {
+				value : [{
+					ID : "2",
+					Name : "Beta (updated)"
+				}]
+			})
+			.expectCanceledError("Failed to get contexts for " + sTeaBusi
+					+ "TEAMS('TEAM_01')/TEAM_2_EMPLOYEES with start index 0 and length 100",
+				sODLB + ": /TEAMS('TEAM_01')|TEAM_2_EMPLOYEES"
+					+ " is ignoring response from inactive cache: " + sTeaBusi
+					+ "TEAMS('TEAM_01')/TEAM_2_EMPLOYEES?$select=ID,Name")
+			.expectChange("name", ["Gamma", "Beta (updated)"]);
+
+		await Promise.all([
+			// code under test
+			oTable.setBindingContext(oTeamContext),
+			oTeamContext.requestSideEffects([""]),
+			this.waitForChanges(assert, "bind table + side-effects refresh")
+		]);
 	});
 });
