@@ -2709,6 +2709,7 @@ sap.ui.define([
 		// - iStart: the start (inclusive)
 		// - iEnd: the end (exclusive)
 		this.aReadRequests = [];
+		this.iResetCount = 0;
 		this.aSeparateProperties = []; // properties to be loaded separately
 		// maps separate property to an array of requested $skip/$top ranges (see aReadRequests)
 		this.mSeparateProperty2ReadRequests = {};
@@ -3389,12 +3390,13 @@ sap.ui.define([
 	 *   there are no separate properties
 	 * @returns {sap.ui.base.SyncPromise}
 	 *   A promise to be resolved with the requested range given as an OData response object (with
-	 *   "@odata.context" and the rows as an array in the property <code>value</code>, enhanced
-	 *   with a number property <code>$count</code> representing the element count on server-side;
-	 *   <code>$count</code> may be <code>undefined</code>, but not <code>Infinity</code>). If an
-	 *   HTTP request fails, the error from the _Requestor is returned and the requested range is
-	 *   reset to <code>undefined</code>. If the request has been obsoleted by a {@link #reset}, the
-	 *   promise is rejected with an error having a property <code>canceled = true</code>.
+	 *   "@$ui5.resetCount", "@odata.context", and the rows as an array in the property
+	 *   <code>value</code>, enhanced with a number property <code>$count</code> representing the
+	 *   element count on server-side; <code>$count</code> may be <code>undefined</code>, but not
+	 *   <code>Infinity</code>). If an HTTP request fails, the error from the _Requestor is returned
+	 *   and the requested range is reset to <code>undefined</code>. If the request has been
+	 *   obsoleted by a {@link #reset}, the promise is rejected with an error having a property
+	 *   <code>canceled = true</code>.
 	 * @throws {Error} If given index or length is less than 0
 	 *
 	 * @public
@@ -3480,6 +3482,7 @@ sap.ui.define([
 			aElements.$count = that.aElements.$count;
 
 			return {
+				"@$ui5.resetCount" : that.iResetCount,
 				"@odata.context" : that.sContext,
 				value : aElements
 			};
@@ -4039,6 +4042,7 @@ sap.ui.define([
 				iLimit : this.iLimit
 			};
 		}
+		this.iResetCount += 1;
 
 		if (mQueryOptions) {
 			this.setQueryOptions(mQueryOptions, true);
@@ -4121,6 +4125,7 @@ sap.ui.define([
 			this.aElements.$count = this.oBackup.$count;
 			this.aElements.$created = this.oBackup.$created;
 			this.iLimit = this.oBackup.iLimit;
+			this.iResetCount -= 1;
 		}
 		this.oBackup = null;
 	};

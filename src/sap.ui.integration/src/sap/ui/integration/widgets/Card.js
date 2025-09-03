@@ -3331,7 +3331,8 @@ sap.ui.define([
 			oChildCard = this._createCard({
 				host: this.getHostInstance(),
 				parameters: oParameters.parameters,
-				referenceId: this.getReferenceId()
+				referenceId: this.getReferenceId(),
+				manifestChanges: oParameters.manifestChanges
 			});
 
 		oChildCard.setAssociation("openerReference", this);

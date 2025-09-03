@@ -3122,20 +3122,33 @@ sap.ui.define([
 	//*********************************************************************************************
 	QUnit.test("checkSameCache", function (assert) {
 		var oBinding = new ODataBinding({
-				oCache : {}
+				oCache : {
+					iResetCount : 42,
+					toString : function () { return "actual"; }
+				}
 			}),
 			oCache = {
-				toString : function () { return "~"; }
+				toString : function () { return "unexpected"; }
 			};
 
 		oBinding.checkSameCache(oBinding.oCache);
+		oBinding.checkSameCache(oBinding.oCache, 42);
 
 		try {
 			oBinding.checkSameCache(oCache);
 			assert.ok(false);
 		} catch (oError) {
 			assert.strictEqual(oError.message,
-				oBinding + " is ignoring response from inactive cache: ~");
+				oBinding + " is ignoring response from inactive cache: unexpected");
+			assert.strictEqual(oError.canceled, true);
+		}
+
+		try {
+			oBinding.checkSameCache(oBinding.oCache, 23);
+			assert.ok(false);
+		} catch (oError) {
+			assert.strictEqual(oError.message,
+				oBinding + " is ignoring response from inactive cache: actual");
 			assert.strictEqual(oError.canceled, true);
 		}
 	});

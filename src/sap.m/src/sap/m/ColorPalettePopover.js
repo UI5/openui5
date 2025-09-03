@@ -376,6 +376,10 @@ sap.ui.define([
 			oColorPalette._setShowMoreColorsButton(this.getShowMoreColorsButton());
 			oColorPalette._setShowRecentColorsSection(this.getShowRecentColorsSection());
 
+			// Set the private property to indicate this ColorPalette is used in a popover
+			// This enables Home/End key navigation for better accessibility
+			oColorPalette.setProperty("_isInPopover", true);
+
 			return oColorPalette;
 		};
 

@@ -86,6 +86,7 @@ sap.ui.define([
 				icon: 'sap-icon://SAP-icons-TNT/internal-block-diagram',
 				target: 'learnDetail',
 				key: 'typesOther',
+				expanded: true,
 				items: [
 					{
 						title: 'Adaptive',
@@ -116,6 +117,7 @@ sap.ui.define([
 				key: 'configuration',
 				target: 'learnDetail',
 				icon: 'sap-icon://settings',
+				expanded: true,
 				items: [
 					{
 						title: 'Action Handlers',
@@ -168,6 +170,7 @@ sap.ui.define([
 				key: "filters",
 				target: 'learnDetail',
 				icon: 'sap-icon://filter',
+				expanded: true,
 				items: [
 					{
 						title: 'ComboBox',
@@ -198,6 +201,7 @@ sap.ui.define([
 				icon: 'sap-icon://activities',
 				target: 'learnDetail',
 				key: 'features',
+				expanded: true,
 				items: [
 					{
 						title: 'Actions Strip',
@@ -277,6 +281,7 @@ sap.ui.define([
 				icon: 'sap-icon://action',
 				target: 'learnDetail',
 				key: 'actions',
+				expanded: true,
 				items: [
 					{
 						title: 'Navigation',
@@ -313,6 +318,7 @@ sap.ui.define([
 				icon: 'sap-icon://attachment-zip-file',
 				target: 'learnDetail',
 				key: 'bundle',
+				expanded: true,
 				items: [
 					{
 						title: 'Component Preload',
@@ -326,6 +332,7 @@ sap.ui.define([
 				icon: 'sap-icon://text-formatting',
 				target: 'learnDetail',
 				key: 'formatters',
+				expanded: true,
 				items: [
 					{
 						title: 'Currency',

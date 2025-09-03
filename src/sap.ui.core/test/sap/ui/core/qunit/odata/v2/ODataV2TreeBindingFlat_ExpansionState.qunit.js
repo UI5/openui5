@@ -847,9 +847,7 @@ sap.ui.define([
 		var oNode = {
 			context: {
 				getProperty: function(sName) {
-					if (sName === "GLAccount_SiblingsPosition") {
-						return oConfig.siblingsPosition;
-					} else if (sName === "GLAccount_PreorderPosition") {
+					if (sName === "GLAccount_PreorderPosition") {
 						return oConfig.preorderPosition;
 					} else if (sName === "GLAccount_Nodecount") {
 						return oConfig.magnitude;
@@ -955,57 +953,6 @@ sap.ui.define([
 		});
 	});
 
-	QUnit.test("Restore tree state: adapt deep node sections - add nodes", function(assert) {
-		var done = assert.async();
-		createTreeBinding("/ZTJ_G4_C_GLHIER(P_CHARTOFACCOUNTS='CACN',P_FINANCIALSTATEMENTVARIANT='9999')/Results", null, [], {
-			threshold : 10,
-			countMode : "Inline",
-			operationMode : "Server",
-			numberOfExpandedLevels : 0,
-			restoreTreeStateAfterChange : true
-		});
-
-		var aSections = [
-			{ iSkip : 0, iTop : 20 },
-			{ iSkip : 80, iTop : 20 },
-			{ iSkip : 120, iTop : 40 },
-			{ iSkip : 200, iTop : 40 }
-		];
-
-		var aAddedNodesConfig = [
-			{siblingsPosition : 1, isDeepOne : true}, // New node at actual position 1
-			{siblingsPosition : 40, isDeepOne : true}, // New node at actual position 40 (abap starts at 1)
-			{siblingsPosition : 41, isDeepOne : true},
-			{siblingsPosition : 300, isDeepOne : true}
-		];
-
-		var aAdded = [];
-		aAddedNodesConfig.forEach(function(oConfig) {
-			aAdded.push(createAddedNode(oConfig));
-		});
-		// refresh indicates that the adapter code has been loaded and the binding has been
-		// successfully initialized
-		oBinding.attachEventOnce("refresh", function () {
-			oBinding._adaptSections(aSections, {
-				added : aAdded
-			}, {
-				indexName : "positionInParent",
-				ignoreMagnitude : true
-			});
-
-			var aExpectedSections = [
-				{ iSkip : 0, iTop : 21 },
-				{ iSkip : 40, iTop : 2 },
-				{ iSkip : 83, iTop : 20 },
-				{ iSkip : 123, iTop : 40 },
-				{ iSkip : 203, iTop : 40 },
-				{ iSkip : 300, iTop : 1 }
-			];
-
-			assert.deepEqual(aSections, aExpectedSections, "The server sections are correctly adapted");
-			done();
-		});
-	});
 
 	QUnit.test("Restore tree state: insert server index node (UC1)", function(assert) {
 		var done = assert.async();
@@ -1192,7 +1139,6 @@ sap.ui.define([
 		});
 
 		function handler1() {
-			oBinding.detachChange(handler1);
 			iOldLength = oBinding.getLength();
 			sOldLastNodeKey = oBinding.findNode(iOldLength - 1).key;
 
@@ -1230,13 +1176,11 @@ sap.ui.define([
 			assert.equal(oBinding.getLength(), iOldLength + 4, "length is correct after adding 4 new nodes");
 			iOldLength = oBinding.getLength();
 
-			oBinding.attachChange(handler2);
+			oBinding.attachEventOnce("change", handler2);
 			oModel.submitChanges();
 		}
 
 		function handler2() {
-			oBinding.detachChange(handler2);
-
 			var iNewLength = oBinding.getLength();
 			assert.equal(iNewLength, iOldLength, "New binding length should stay the same after new nodes are saved");
 
@@ -1250,7 +1194,7 @@ sap.ui.define([
 			}
 			done();
 		}
-		oBinding.attachChange(handler1);
+		oBinding.attachEventOnce("change", handler1);
 		requestData(oBinding, 0, 20, 100);
 	});
 
@@ -1503,66 +1447,6 @@ sap.ui.define([
 				{ iSkip : 87, iTop : 4 },
 				{ iSkip : 100, iTop : 1 },
 				{ iSkip : 108, iTop : 44 }, // Was section { iSkip : 200, iTop : 40 }
-				{ iSkip : 300, iTop : 1 }
-			];
-
-			assert.deepEqual(aSections, aExpectedSections, "The server sections are correctly adapted");
-			done();
-		});
-	});
-
-	QUnit.test("Restore tree state: adapt deep node sections - move nodes", function(assert) {
-		var done = assert.async();
-		createTreeBinding("/ZTJ_G4_C_GLHIER(P_CHARTOFACCOUNTS='CACN',P_FINANCIALSTATEMENTVARIANT='9999')/Results", null, [], {
-			threshold : 10,
-			countMode : "Inline",
-			operationMode : "Server",
-			numberOfExpandedLevels : 0,
-			restoreTreeStateAfterChange : true
-		});
-
-		var aSections = [
-			{ iSkip : 0, iTop : 20 },
-			{ iSkip : 80, iTop : 20 },
-			{ iSkip : 120, iTop : 40 },
-			{ iSkip : 200, iTop : 40 }
-		];
-
-		var aAddedNodesConfig = [
-			{siblingsPosition : 1, isDeepOne : true}, // New node at actual position 1
-			{siblingsPosition : 40, isDeepOne : true}, // New node at actual position 40 (abap starts at 1)
-			{siblingsPosition : 41, isDeepOne : true},
-			{siblingsPosition : 300, isDeepOne : true}
-		];
-
-		var aAdded = [];
-		aAddedNodesConfig.forEach(function(oConfig) {
-			aAdded.push(createAddedNode(oConfig));
-		});
-
-		var aRemovedNodes = [
-			{ positionInParent : 10, magnitude : 5 }, // magnitude properties should be ignored
-			{ positionInParent : 17, magnitude : 2 },
-			{ positionInParent : 90, magnitude : 15 },
-			{ positionInParent : 120, magnitude : 50 },
-			{ positionInParent : 239, magnitude : 10 }
-		];
-
-		oBinding.attachEventOnce("refresh", function () {
-			oBinding._adaptSections(aSections, {
-				added : aAdded,
-				removed : aRemovedNodes
-			}, {
-				indexName : "positionInParent",
-				ignoreMagnitude : true
-			});
-
-			var aExpectedSections = [
-				{ iSkip : 0, iTop : 19 },
-				{ iSkip : 40, iTop : 2 },
-				{ iSkip : 81, iTop : 19 },
-				{ iSkip : 120, iTop : 39 },
-				{ iSkip : 199, iTop : 39 },
 				{ iSkip : 300, iTop : 1 }
 			];
 

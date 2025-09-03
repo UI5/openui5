@@ -590,20 +590,14 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	[
-		{restoreTreeStateAfterChange: undefined, combinedFilter: undefined, result: undefined},
-		{restoreTreeStateAfterChange: false, combinedFilter: undefined, result: false},
-		{restoreTreeStateAfterChange: true, combinedFilter: undefined, result: true},
-		{restoreTreeStateAfterChange: true, combinedFilter: {}, result: false}
-	].forEach(({restoreTreeStateAfterChange, combinedFilter, result}, i) => {
+		{restoreTreeStateAfterChange: undefined, result: undefined},
+		{restoreTreeStateAfterChange: false, result: false},
+		{restoreTreeStateAfterChange: true, result: true}
+	].forEach(({restoreTreeStateAfterChange, result}, i) => {
 		QUnit.test("_isRestoreTreeStateSupported: #" + i, function (assert) {
 			const oBinding = {
-				_bRestoreTreeStateAfterChange: restoreTreeStateAfterChange,
-				getCombinedFilter () {}
+				_bRestoreTreeStateAfterChange: restoreTreeStateAfterChange
 			};
-
-			if (restoreTreeStateAfterChange) {
-				this.mock(oBinding).expects("getCombinedFilter").withExactArgs().returns(combinedFilter);
-			}
 
 			// code under test
 			assert.strictEqual(ODataTreeBindingFlat.prototype._isRestoreTreeStateSupported.call(oBinding), result);
@@ -626,7 +620,6 @@ sap.ui.define([
 						"hierarchy-parent-node-for" : "~hierarchyParentNode"
 					},
 					_generatePreorderPositionRequest : function () {},
-					_generateSiblingsPositionRequest : function () {},
 					_isRestoreTreeStateSupported : function () {},
 					getResolvedPath : function () {}
 				},
@@ -659,10 +652,6 @@ sap.ui.define([
 				.withExactArgs(sinon.match.same(oOptimizedChanges.moved[0]),
 					{groupId : "~groupId", error : "~fnRestoreRequestErrorHandler"})
 				.exactly(bRestoreTreeStateSupported ? 1 : 0);
-			oBindingMock.expects("_generateSiblingsPositionRequest")
-				.withExactArgs(sinon.match.same(oOptimizedChanges.moved[0]),
-					{groupId : "~groupId", error : "~fnRestoreRequestErrorHandler"})
-				.exactly(bRestoreTreeStateSupported ? 1 : 0);
 			this.mock(oOptimizedChanges.moved[1].parent.context).expects("getProperty")
 				.withExactArgs("~hierarchyNode")
 				.returns("~parentID1");
@@ -672,10 +661,6 @@ sap.ui.define([
 				.withExactArgs()
 				.returns(bRestoreTreeStateSupported);
 			oBindingMock.expects("_generatePreorderPositionRequest")
-				.withExactArgs(sinon.match.same(oOptimizedChanges.moved[1]),
-					{groupId : "~groupId", error : "~fnRestoreRequestErrorHandler"})
-				.exactly(bRestoreTreeStateSupported ? 1 : 0);
-			oBindingMock.expects("_generateSiblingsPositionRequest")
 				.withExactArgs(sinon.match.same(oOptimizedChanges.moved[1]),
 					{groupId : "~groupId", error : "~fnRestoreRequestErrorHandler"})
 				.exactly(bRestoreTreeStateSupported ? 1 : 0);
@@ -2288,54 +2273,5 @@ sap.ui.define([
 				assert.deepEqual(oBinding._aPendingSubtreeRequests, []);
 			});
 		});
-	});
-
-	//*********************************************************************************************
-	QUnit.test("_generateSiblingsPositionRequest: calls _getHeaders", function (assert) {
-		const oBinding = {
-			oModel: {
-				createCustomParams() {},
-				read() {}
-			},
-			mParameters: {foo: "~bar"},
-			oTreeProperties: {
-				"hierarchy-sibling-rank-for": "~hierarchy-sibling-rank-for"
-			},
-			_getHeaders() {}
-		};
-		const oNode = {
-			context: {
-				getPath() {}
-			}
-		};
-		this.mock(oNode.context).expects("getPath").withExactArgs().returns("~sAbsolutePath");
-		this.mock(oBinding.oModel).expects("createCustomParams")
-			.withExactArgs(sinon.match((oParams) => {
-				assert.notStrictEqual(oParams, oBinding.mParameters);
-				assert.deepEqual(oParams, {
-					foo: "~bar",
-					select: "~hierarchy-sibling-rank-for"
-				});
-				return true;
-			}))
-			.returns("~mCustomParams");
-		this.mock(oBinding).expects("_getHeaders").withExactArgs().returns("~headers");
-		this.mock(oBinding.oModel).expects("read")
-			.withExactArgs("~sAbsolutePath", {
-				error: "~error",
-				groupId: "~groupId",
-				headers: "~headers",
-				success: "~success",
-				urlParameters: "~mCustomParams"
-			})
-			.returns("~oReadHandle");
-		const mParameters = {
-			error: "~error",
-			groupId: "~groupId",
-			success: "~success"
-		};
-
-		// code under test
-		ODataTreeBindingFlat.prototype._generateSiblingsPositionRequest.call(oBinding, oNode, mParameters);
 	});
 });

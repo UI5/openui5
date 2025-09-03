@@ -113,15 +113,18 @@ sap.ui.define([
 				Then.documentActiveElementShouldBe(COMPLEX_CONTROLDEFAULTS_COLORPALETTEPOPOVER_MORECOLORS_ID);
 
 				When.iPressKeyOnATargetId(COMPLEX_CONTROLDEFAULTS_COLORPALETTEPOPOVER_MORECOLORS_ID, KeyCodes.ARROW_UP);
-				Then.documentActiveSwatchShouldBe("white");
+				Then.documentActiveSwatchShouldBe("black");
 
-				When.iPressKeyOnAColorSwatch("white", KeyCodes.ARROW_LEFT);
-				Then.documentActiveSwatchShouldBe("azure");
+				When.iPressKeyOnAColorSwatch("black", KeyCodes.ARROW_LEFT);
+				Then.documentActiveSwatchShouldBe("dimgray");
 
-				When.iPressKeyOnAColorSwatch("azure", KeyCodes.ARROW_UP);
-				Then.documentActiveSwatchShouldBe("cornflowerblue");
+				When.iPressKeyOnAColorSwatch("dimgray", KeyCodes.ARROW_UP);
+				Then.documentActiveSwatchShouldBe("darkslategray");
 
-				When.iPressKeyOnAColorSwatch("cornflowerblue", KeyCodes.HOME);
+				When.iPressKeyOnAColorSwatch("darkslategray", KeyCodes.HOME);
+				Then.documentActiveSwatchShouldBe("deepskyblue");
+
+				When.iPressKeyOnAColorSwatch("deepskyblue", KeyCodes.ARROW_UP);
 				Then.documentActiveSwatchShouldBe("gold");
 
 				When.iPressKeyOnAColorSwatch("gold", KeyCodes.ARROW_UP);

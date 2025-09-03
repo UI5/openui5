@@ -56,6 +56,7 @@ sap.ui.define([
 		this.aElements.$byPredicate = {};
 		this.aElements.$count = undefined;
 		this.aElements.$created = 0; // required for _Cache#drillDown (see _Cache.from$skip)
+		this.iResetCount = 0;
 		// Whether this cache is a unified cache, using oFirstLevel with ExpandLevels instead of
 		// separate group level caches
 		this.bUnifiedCache = oAggregation.expandTo >= Number.MAX_SAFE_INTEGER
@@ -1783,7 +1784,7 @@ sap.ui.define([
 	 *   If no back-end request is needed, the function is not called.
 	 * @returns {sap.ui.base.SyncPromise}
 	 *   A promise to be resolved with the requested range given as an OData response object (with
-	 *   "@odata.context" and the rows as an array in the property <code>value</code>, enhanced
+	 *   "@$ui5.resetCount" and the rows as an array in the property <code>value</code>, enhanced
 	 *   with a number property <code>$count</code> representing the element count on server-side;
 	 *   <code>$count</code> may be <code>undefined</code>, but not <code>Infinity</code>). If an
 	 *   HTTP request fails, the error from the _Requestor is returned.
@@ -1902,7 +1903,10 @@ sap.ui.define([
 
 			aElements.$count = that.aElements.$count;
 
-			return {value : aElements};
+			return {
+				"@$ui5.resetCount" : that.iResetCount,
+				value : aElements
+			};
 		});
 	};
 
@@ -1998,6 +2002,7 @@ sap.ui.define([
 			iStart = 0;
 		}
 
+		const iResetCount = this.iResetCount;
 		// Note: this.oFirstLevel.read changes this value
 		const bSentRequest = this.oFirstLevel.bSentRequest;
 		if (bSentRequest && iOutOfPlaceCount) { // cannot handle result below, avoid new request
@@ -2009,6 +2014,9 @@ sap.ui.define([
 				// request out-of-place nodes only once
 				...(bSentRequest ? [] : this.requestOutOfPlaceNodes(oGroupLock))
 			]).then(function ([oResult, ...aOutOfPlaceResults]) {
+				if (iResetCount !== that.iResetCount) {
+					return; // ignore result, a refresh happened in the meantime
+				}
 				if (bSentRequest && iOutOfPlaceCount) {
 					return; // not idempotent due to previous #handleOutOfPlaceNodes
 				}

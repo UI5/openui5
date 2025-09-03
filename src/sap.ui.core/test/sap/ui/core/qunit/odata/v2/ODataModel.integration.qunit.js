@@ -19596,6 +19596,148 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 	});
 
 	//*********************************************************************************************
+	// Scenario: A filtered tree table correctly maintains its state when nodes are moved to different
+	// parent nodes in the hierarchy.
+	// JIRA: CPOUI5MODELS-1051
+	var sTitle = "ODataTreeBindingFlat: restoreTreeStateAfterChange - Move operations with filter";
+	QUnit.test(sTitle, async function (assert) {
+		const oModel = createHierarchyMaintenanceModel({refreshAfterChange : true});
+		const oNode100 = {
+			__metadata: {uri: "ErhaOrderItem(ErhaOrder='1',ErhaOrderItem='100')"},
+			ErhaOrder: "1",
+			ErhaOrderItem: "100",
+			ErhaOrderItemName: "foo",
+			HierarchyNode: "100",
+			HierarchyParentNode: "",
+			HierarchyDescendantCount: 2,
+			HierarchyDistanceFromRoot: 0,
+			HierarchyDrillState: "expanded",
+			HierarchyPreorderRank: 0,
+			HierarchySiblingRank: 0
+		};
+		const oNode200 = {
+			__metadata: {uri: "ErhaOrderItem(ErhaOrder='1',ErhaOrderItem='200')"},
+			ErhaOrder: "1",
+			ErhaOrderItem: "200",
+			ErhaOrderItemName: "bar",
+			HierarchyNode: "200",
+			HierarchyParentNode: "100",
+			HierarchyDescendantCount: 0,
+			HierarchyDistanceFromRoot: 1,
+			HierarchyDrillState: "leaf",
+			HierarchyPreorderRank: 1,
+			HierarchySiblingRank: 0
+		};
+		const oNode200Parent = {
+			...oNode200,
+			HierarchyDrillState: "collapsed",
+			HierarchyDescendantCount: 1
+		};
+		const oNode300 = {
+			__metadata: {uri: "ErhaOrderItem(ErhaOrder='1',ErhaOrderItem='300')"},
+			ErhaOrder: "1",
+			ErhaOrderItem: "300",
+			ErhaOrderItemName: "baz",
+			HierarchyNode: "300",
+			HierarchyParentNode: "100",
+			HierarchyDescendantCount: 0,
+			HierarchyDistanceFromRoot: 1,
+			HierarchyDrillState: "leaf",
+			HierarchyPreorderRank: 2,
+			HierarchySiblingRank: 1
+		};
+		const oNode300Moved = {
+			...oNode300,
+			HierarchyParentNode: "200",
+			HierarchyDistanceFromRoot: 2
+		};
+		const sView = `
+<t:TreeTable id="table"
+	rows="{
+		parameters : {
+			countMode : 'Inline',
+			numberOfExpandedLevels : 2,
+			restoreTreeStateAfterChange : true
+		},
+		filters : [{
+			path : 'ErhaOrderItemName',
+			operator : 'NE',
+			value1 : 'bag'
+		}],
+		path : '/ErhaOrder(\\'1\\')/to_Item'
+	}"
+	visibleRowCount="3">
+		<Text id="itemName" text="{ErhaOrderItemName}" />
+</t:TreeTable>`;
+
+		this.expectHeadRequest()
+			.expectRequest({
+				batchNo : 1,
+				requestUri : "ErhaOrder('1')/to_Item?$skip=0&$top=103&$inlinecount=allpages"
+					+ "&$filter=HierarchyDistanceFromRoot le 2 and ErhaOrderItemName ne 'bag'"
+			}, {
+				__count : "3",
+				results : [oNode100, oNode200, oNode300]
+			});
+
+		await this.createView(assert, sView, oModel);
+
+		const oTable = this.oView.byId("table");
+		const oBinding = oTable.getBinding("rows");
+
+		assert.deepEqual(getTableContent(oTable), [["foo"], ["bar"], ["baz"]]);
+
+		const oMovedContext = oTable.getContextByIndex(2);
+
+		// move request
+		this.expectRequest({
+				batchNo : 2,
+				data : {
+					__metadata : {uri : "ErhaOrderItem(ErhaOrder='1',ErhaOrderItem='300')"},
+					HierarchyParentNode : "200"
+				},
+				deepPath: "/ErhaOrder('1')/to_Item(ErhaOrder='1',ErhaOrderItem='300')",
+				key: "ErhaOrderItem(ErhaOrder='1',ErhaOrderItem='300')",
+				method : "MERGE",
+				requestUri : "ErhaOrderItem(ErhaOrder='1',ErhaOrderItem='300')"
+			}, oNode300Moved)
+			// preorder position request
+			.expectRequest({
+				batchNo : 2,
+				requestUri : "ErhaOrder('1')/to_Item?$select=ErhaOrder,ErhaOrderItem,HierarchyNode,"
+					+ "HierarchyDescendantCount,HierarchyDrillState,HierarchyPreorderRank"
+					+ "&$filter=ErhaOrderItemName ne 'bag' and ErhaOrder eq '1' and ErhaOrderItem eq '300' "
+					+ "and HierarchyDistanceFromRoot le 2"
+			}, {
+				ErhaOrder : "1",
+				ErhaOrderItem : "300",
+				HierarchyNode : "300",
+				HierarchyDescendantCount : 0,
+				HierarchyDrillState : "leaf",
+				HierarchyPreorderRank : 2
+			})
+			// server index nodes request
+			.expectRequest({
+				batchNo : 3,
+				requestUri : "ErhaOrder('1')/to_Item?$skip=0&$top=3&$inlinecount=allpages"
+					+ "&$filter=HierarchyDistanceFromRoot le 2 and ErhaOrderItemName ne 'bag'"
+			}, {
+				__count : "1",
+				results : [oNode100, oNode200Parent, oNode300]
+			});
+
+		// code under test: hierarchy change
+		oBinding.removeContext(oMovedContext);
+		oBinding.addContexts(oTable.getContextByIndex(1), [oMovedContext]);
+		oModel.submitChanges();
+
+		await this.waitForChanges(assert);
+
+		// code under test: tree state restored
+		assert.deepEqual(getTableContent(oTable), [["foo"], ["bar"], ["baz"]]);
+	});
+
+	//*********************************************************************************************
 	// Scenario: A table using ODataTreeBindingFlat with refreshAfterChange=false and
 	// restoreTreeStateAfterChange=false. After property / hierarchy changes have been submitted the
 	// binding gets refreshed.

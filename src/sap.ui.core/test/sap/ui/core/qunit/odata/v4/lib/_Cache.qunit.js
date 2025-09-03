@@ -26,6 +26,7 @@ sap.ui.define([
 	 */
 	function createResult(iIndex, iLength, vCount, bPredicates) {
 		var oResult = {
+				"@$ui5.resetCount" : 0,
 				"@odata.context" : "$metadata#TEAMS",
 				value : aTestData.slice(iIndex, iIndex + iLength).map(function (s) {
 					return bPredicates
@@ -6316,6 +6317,7 @@ sap.ui.define([
 				oCacheMock,
 				aData = [{key : "a"}, {key : "b"}, {key : "c"}],
 				oMockResult = {
+					"@$ui5.resetCount" : 0,
 					"@odata.context" : "$metadata#TEAMS",
 					value : aData.slice(oFixture.index, oFixture.index + oFixture.length)
 				},
@@ -6363,6 +6365,8 @@ sap.ui.define([
 			// code under test
 			oPromise = oCache.read(oFixture.index, oFixture.length, 0, oReadGroupLock0);
 
+			oCache.iResetCount = "~iResetCount~"; // simulate reset in the meantime
+
 			assert.ok(!oPromise.isFulfilled());
 			assert.ok(!oPromise.isRejected());
 			assert.ok(oCache.bSentRequest);
@@ -6370,6 +6374,7 @@ sap.ui.define([
 				oFixture.index, oFixture.index + oFixture.length);
 			return oPromise.then(function (oResult) {
 				var oExpectedResult = {
+						"@$ui5.resetCount" : "~iResetCount~",
 						"@odata.context" : "$metadata#TEAMS",
 						value : oFixture.result
 					},
@@ -6483,6 +6488,7 @@ sap.ui.define([
 
 		if (iCount) {
 			assert.deepEqual(oSyncPromise.getResult(), {
+				"@$ui5.resetCount" : 0,
 				"@odata.context" : undefined,
 				value : aElements
 			});
@@ -6541,6 +6547,7 @@ sap.ui.define([
 		return oCache.read(0, 100, 0, oGroupLock, null, bIndexIsSkip)
 			.then(function (oResult) {
 				assert.deepEqual(oResult, {
+					"@$ui5.resetCount" : 0,
 					"@odata.context" : undefined,
 					value : bIndexIsSkip ? [] : aElements
 				});
@@ -6576,6 +6583,7 @@ sap.ui.define([
 		// code under test
 		return oCache.read(0, 100, 42, oGroupLock).then(function (oResult) {
 			assert.deepEqual(oResult, {
+				"@$ui5.resetCount" : 0,
 				"@odata.context" : undefined,
 				value : aElements
 			});
@@ -8609,8 +8617,9 @@ sap.ui.define([
 		assert.strictEqual(oCache.aElements.$created, 0);
 		assert.ok("$tail" in oCache.aElements);
 		assert.strictEqual(oCache.iLimit, Infinity);
-		assert.ok("oSyncPromiseAll" in oCache);
+		assert.strictEqual(oCache.iResetCount, 0);
 		assert.strictEqual(oCache.bServerDrivenPaging, false);
+		assert.ok("oSyncPromiseAll" in oCache);
 
 		this.mock(oGroupLock).expects("getUnlockedCopy").withExactArgs().returns(oUnlockedCopy);
 		this.mock(oGroupLock).expects("unlock").withExactArgs();
@@ -11775,6 +11784,7 @@ sap.ui.define([
 				"('d2')" : {index : 210}
 			};
 		}
+		oCache.iResetCount = 11;
 		oCacheMock.expects("checkSharedRequest").exactly(sGroupId ? 1 : 0).withExactArgs();
 		oCacheMock.expects("setQueryOptions").never();
 
@@ -11810,6 +11820,7 @@ sap.ui.define([
 			assert.strictEqual(oCache.aElements.length, 2, "transient ones kept");
 			assert.strictEqual(oCache.aElements[0], oTransient0);
 			assert.strictEqual(oCache.aElements[1], oTransient1);
+			assert.strictEqual(oCache.iResetCount, 12);
 		} else if (sGroupId === "$auto") {
 			delete mChangeListeners["($uid=id-1-23)/bar"];
 			delete mChangeListeners["($uid=id-1-42)/baz"];
@@ -11851,6 +11862,7 @@ sap.ui.define([
 				"('d2')" : {index : undefined}
 			});
 		}
+		assert.strictEqual(oCache.iResetCount, 12);
 
 		if (sGroupId) {
 			if (i) {
@@ -11906,6 +11918,7 @@ sap.ui.define([
 				"('6')" : oDeleted
 			});
 			assert.strictEqual(oCache.iLimit, 42);
+			assert.strictEqual(oCache.iResetCount, 11);
 		}
 	});
 		});
