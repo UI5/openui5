@@ -34,8 +34,8 @@
 		"npm": ">= 8"
 	},
 	"devDependencies": {
-		"@ui5/builder": "^4.0.7",
-		"@ui5/cli": "^4.0.22",
+		"@ui5/builder": "^4.0.10",
+		"@ui5/cli": "^4.0.24",
 		"@ui5/project": "^4.0.4",
 		"@ui5/server": "^4.0.6",
 		"@ui5/tooling-webc": "^0.2.14",
@@ -52,7 +52,7 @@
 		"cookie": "^1.0.2",
 		"decompress": "^4.2.1",
 		"eslint": "^8.57.1",
-		"glob": "^11.0.2",
+		"glob": "^11.0.3",
 		"http-proxy": "^1.18.1",
 		"lit-html": "2.2.2",
 		"moment": "^2.30.1",

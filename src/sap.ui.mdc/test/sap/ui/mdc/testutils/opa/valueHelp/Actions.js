@@ -14,9 +14,12 @@ sap.ui.define([
 	"sap/ui/events/KeyCodes",
     "./Util",
     "./doWait",
+    "../field/waitForField",
     "sap/ui/test/matchers/Properties",
-    "sap/ui/test/matchers/Matcher"
-], function (Opa5, Ancestor, PropertyStrictEquals, Press, TriggerEvent, EnterText, KeyCodes, Util, doWait, fnMatchProperties, Matcher) {
+    "sap/ui/test/matchers/Matcher",
+    "../field/Actions",
+    "sap/ui/core/Lib"
+], function (Opa5, Ancestor, PropertyStrictEquals, Press, TriggerEvent, EnterText, KeyCodes, Util, doWait, waitForField, fnMatchProperties, Matcher, FieldActions, Lib) {
 	"use strict";
 
     var oActions = {
@@ -39,6 +42,7 @@ sap.ui.define([
                                         value: bCancel ? Util.texts.cancel : Util.texts.ok
                                     })
                                 ],
+                                searchOpenDialogs: true,
                                 actions: new Press()
                            });
                         }
@@ -133,6 +137,7 @@ sap.ui.define([
                     return this.waitFor({
                         controlType: "sap.m.Button",
                         matchers: new Ancestor(oDefineConditionPanel),
+                        searchOpenDialogs: true,
                         properties: {
                             text: "Add"
                         },
@@ -151,6 +156,7 @@ sap.ui.define([
                     var oDefineConditionPanel = aResults[0];
                     var sPanelId = oDefineConditionPanel.getId();
                     return this.waitFor({
+                        searchOpenDialogs: true,
                         properties: {
                             id: {
                                 regex: {
@@ -201,6 +207,7 @@ sap.ui.define([
                                 }
                             }
                         },
+                        searchOpenDialogs: true,
                         success: function (aResults) {
                            var oField = aResults[0];
                            oField.setValue(sValue);
@@ -228,6 +235,7 @@ sap.ui.define([
                         success: function (aResults) {
                            Opa5.assert.ok(aResults[0], "Pressed remove button" + sPanelId + "--" + iIndex);
                         },
+                        searchOpenDialogs: true,
                         actions: new Press()
                     });
                 }
@@ -287,6 +295,27 @@ sap.ui.define([
                     });
                 }
             }, sValueHelp);
+        },
+        iPressShowOrHideFilters: function () {
+            const oRessourceBundle = Lib.getResourceBundleFor("sap.ui.mdc");
+            const sShowText = oRessourceBundle.getText("valuehelp.SHOWADVSEARCH");
+            const sHideText = oRessourceBundle.getText("valuehelp.HIDEADVSEARCH");
+            return this.waitFor({
+                controlType: "sap.m.Button",
+                properties: {
+                    text: {
+                        regex: {
+                            source: `^(${sShowText}|${sHideText})$`
+                        }
+                    }
+                },
+                searchOpenDialogs: true,
+                actions: new Press(),
+                success: function (aButtons) {
+                    Opa5.assert.ok(aButtons[0], "Pressed Expand/Hide Filters Button");
+                },
+                errorMessage: "Expand/Hide Filters Button not found."
+            });
         }
     };
 

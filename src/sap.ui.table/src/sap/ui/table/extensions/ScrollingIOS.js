@@ -171,10 +171,18 @@ sap.ui.define([
 		const oVSbIOS = this.getVerticalScrollbar();
 
 		oVSbIOS.style.height = oTable._getScrollExtension().getVerticalScrollbarHeight() + "px";
-		oVSbIOS.style.top = Math.max(0, oTable._getRowCounts().fixedTop * oTable._getBaseRowHeight() - 1) + "px";
 
+		this.updateVerticalScrollbarPosition();
 		this.updateVerticalScrollbarThumbPosition();
 		this.updateVerticalScrollbarThumbHeight();
+	};
+
+	ScrollIOSExtension.prototype.updateVerticalScrollbarPosition = function() {
+		const oTable = this.getTable();
+		const oScrollExtension = oTable._getScrollExtension();
+		const oVSbIOS = this.getVerticalScrollbar();
+
+		oVSbIOS.style.bottom = oScrollExtension.getVerticalScrollbarBottomOffset(oTable) + "px";
 	};
 
 	/**

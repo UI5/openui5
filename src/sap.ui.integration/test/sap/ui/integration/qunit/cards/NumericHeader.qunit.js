@@ -167,6 +167,8 @@ sap.ui.define([
 		assert.equal(oHeader.getAggregation("_title").getText(), oManifest["sap.card"].header.title, "Card header title should be correct.");
 		assert.equal(oHeader.getAggregation("_subtitle").getText(), oManifest["sap.card"].header.subtitle, "Card header subtitle should be correct.");
 		assert.equal(oHeader.getAggregation("_unitOfMeasurement").getText(), oManifest["sap.card"].header.unitOfMeasurement, "Card header unitOfMeasurement should be correct.");
+		assert.equal(oHeader.getDomRef().getElementsByClassName("sapFCardHeaderUnitOfMeasurement").length, 1, "Card header unitOfMeasurement should be rendered when there are subtitle.");
+		assert.ok(oHeader._getAriaLabelledBy().includes(oHeader.sId + "-unitOfMeasurement"), "ariallLabelledBy contains unitOfMeasurement ID");
 		assert.equal(oHeader.getAggregation("_details").getText(), oManifest["sap.card"].header.details, "Card header details should be correct.");
 		assert.equal(oHeader.getDataTimestamp(), oManifest["sap.card"].header.dataTimestamp, "Card header dataTimestamp should be correct.");
 	});
@@ -279,6 +281,7 @@ sap.ui.define([
 				"header": {
 					"type": "Numeric",
 					"title": "Project Cloud Transformation",
+					"subtitle": "Forecasted goal achievement depending on business logic and other important information",
 					"mainIndicator": {
 						"number": "56",
 						"unit": "%",
@@ -303,6 +306,8 @@ sap.ui.define([
 		assert.equal(oMainIndicator.getScale(), oManifest["sap.card"].header.mainIndicator.unit, "Card header main indicator scale should be correct.");
 		assert.equal(oMainIndicator.getIndicator(), oManifest["sap.card"].header.mainIndicator.trend, "Card header main indicator indicator should be correct.");
 		assert.equal(oMainIndicator.getValueColor(), oManifest["sap.card"].header.mainIndicator.state, "Card header main indicator valueColor should be correct.");
+		assert.equal(oHeader.getDomRef().getElementsByClassName("sapFCardHeaderUnitOfMeasurement").length, 0, "Card header unitOfMeasurement should NOT be rendered. (when there is subtitle)");
+		assert.notOk(oHeader._getAriaLabelledBy().includes(oHeader.sId + "-unitOfMeasurement"), "ariallLabelledBy do not contain unitOfMeasurement ID");
 	});
 
 	QUnit.test("Numeric Header side indicators", async function (assert) {
@@ -348,6 +353,8 @@ sap.ui.define([
 		// Assert aggregation sideIndicators
 		assert.ok(oHeader.getAggregation("sideIndicators"), "Card header side indicators should be set.");
 		assert.equal(oHeader.getAggregation("sideIndicators").length, oManifest["sap.card"].header.sideIndicators.length, "Card header should have two side indicators.");
+		assert.equal(oHeader.getDomRef().getElementsByClassName("sapFCardHeaderUnitOfMeasurement").length, 0, "Card header unitOfMeasurement should NOT be rendered. (no subtitle)");
+		assert.notOk(oHeader._getAriaLabelledBy().includes(oHeader.sId + "-unitOfMeasurement"), "ariallLabelledBy do not contain unitOfMeasurement ID");
 
 		oHeader.getAggregation("sideIndicators").forEach(function (oIndicator, iIndex) {
 			const oSideIndicator = oManifest["sap.card"].header.sideIndicators[iIndex];
@@ -368,7 +375,6 @@ sap.ui.define([
 				"header": {
 					"type": "Numeric",
 					"title": "Project Cloud Transformation Project Cloud Transformation Project Cloud Transformation Project Cloud Transformation Project Cloud Transformation Project Cloud Transformation Project Cloud Transformation ",
-					"subtitle": "Forecasted goal achievement depending on business logic and other important information Forecasted goal achievement depending on business logic and other important information",
 					"unitOfMeasurement": "EUR"
 				}
 			}
@@ -377,11 +383,15 @@ sap.ui.define([
 		await nextCardReadyEvent(this.oCard);
 		await nextUIUpdate();
 
+		const oHeader = this.oCard.getAggregation("_header");
+
 		// Assert
 		assert.equal(document.getElementsByClassName("sapFCardHeaderDetails").length, 0, "Card header Details are not rendered.");
 		assert.equal(document.getElementsByClassName("sapFCardNumericIndicators").length, 0, "Card header Indicators are not rendered.");
 		assert.equal(document.getElementsByClassName("sapFCardNumericIndicatorsMain").length, 0, "Card header Main Indicator is not rendered.");
 		assert.equal(document.getElementsByClassName("sapFCardNumericIndicatorsSide").length, 0, "Card header Side Indicator is not rendered.");
+		assert.equal(oHeader.getDomRef().getElementsByClassName("sapFCardHeaderUnitOfMeasurement").length, 1, "Card header unitOfMeasurement should be rendered when there are NO subtitle.");
+		assert.ok(oHeader._getAriaLabelledBy().includes(oHeader.sId + "-unitOfMeasurement"), "ariallLabelledBy contains unitOfMeasurement ID");
 	});
 
 	QUnit.test("hidden header", async function (assert) {

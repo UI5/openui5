@@ -127,10 +127,31 @@ sap.ui.define(function() {
 			// *************************************************************************
 			// Tests considering AnalyticalBinding
 			// *************************************************************************
-			// contained in testsuite.databinding.qunit.js / testsuite.analytics.qunit.js
-			Analytics : {
-				title : "sap.ui.model.analytics.AnalyticalBinding",
-				page: "test-resources/sap/ui/core/qunit/analytics/testsuite.analytics.qunit.html"
+			// contained in testsuite.analytics.qunit.js
+			AnalyticalBinding: {
+				coverage : {
+					only : "sap/ui/model/analytics/"
+				},
+				title : "sap.ui.model.analytics.AnalyticalBinding - QUnit Tests",
+				module : ["test-resources/sap/ui/core/qunit/analytics/AnalyticalBinding.qunit"]
+			},
+
+			AnalyticalTreeBindingAdapter: {
+				title : "sap.ui.model.analytics.AnalyticalTreeBindingAdapter - QUnit Tests",
+				module : ["test-resources/sap/ui/core/qunit/analytics/AnalyticalTreeBindingAdapter.qunit"]
+			},
+
+			ODataModelAdapter: {
+				title : "sap.ui.model.analytics.ODataModelAdapter - QUnit Tests",
+				module : ["test-resources/sap/ui/core/qunit/analytics/ODataModelAdapter.qunit"]
+			},
+
+			odata4analytics: {
+				coverage : {
+					only : "sap/ui/model/analytics/"
+				},
+				title : "sap.ui.model.analytics.odata4analytics - QUnit Tests",
+				module : ["test-resources/sap/ui/core/qunit/analytics/odata4analytics.qunit"]
 			},
 
 			// contained in sap.ui.table/test/sap/ui/table/qunit/testsuite.qunit.js

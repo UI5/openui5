@@ -88,7 +88,8 @@ sap.ui.define([
 		let oVSbThumb = oVSbIOS.firstChild;
 		const oScrollIOSExtension = this.oTable._getScrollIOSExtension();
 		const oTotalRowCountChangeSpy = sinon.spy(oScrollIOSExtension, "onTotalRowCountChanged");
-		const oUpdatePositionSpy = sinon.spy(oScrollIOSExtension, "updateVerticalScrollbarThumbPosition");
+		const oUpdateVerticalScrollbarPositionSpy = sinon.spy(oScrollIOSExtension, "updateVerticalScrollbarPosition");
+		const oUpdateThumbPositionSpy = sinon.spy(oScrollIOSExtension, "updateVerticalScrollbarThumbPosition");
 
 		assert.ok(oVSbIOS.parentElement.classList.contains("sapUiTableHidden") && oVSbThumb.style.height === "0px",
 			"Table content fits height -> Vertical scrollbar is not visible");
@@ -97,7 +98,10 @@ sap.ui.define([
 		await this.oTable.qunit.whenRenderingFinished();
 		oVSbIOS = oVSb.nextSibling;
 		oVSbThumb = oVSbIOS.firstChild;
-		assert.ok(oUpdatePositionSpy.called, "updateVerticalScrollbarThumbPosition has been called");
+		assert.ok(oUpdateVerticalScrollbarPositionSpy.called, "updateVerticalScrollbarPosition has been called");
+		assert.ok(oUpdateThumbPositionSpy.called, "updateVerticalScrollbarThumbPosition has been called");
+		assert.equal(oVSbIOS.style.bottom, oScrollExtension.getVerticalScrollbarBottomOffset(this.oTable) + "px",
+			"Vertical scrollbar bottom offset is correct");
 		assert.ok(!oVSbIOS.classList.contains("sapUiTableHidden") && oVSbThumb.style.height !== "0px",
 			"Table content does not fit height -> Vertical scrollbar is visible");
 		this.assertThumbHeight(assert);
