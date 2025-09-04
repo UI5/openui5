@@ -1440,6 +1440,38 @@ function (
 		assert.strictEqual(oEventSpy.callCount, 1, "_hideShowColumnSeparators is called");
 	});
 
+	QUnit.test("FCL rendered but still not shown (hidden parent with display: none)", function (assert) {
+		// setup
+		var $qunitFixture = $("#" + sQUnitFixture);
+		$qunitFixture.css("display", "none");
+		this.oFCL = oFactory.createFCL({
+			layout: LT.OneColumn,
+			beginColumnPages: [new Page()]
+		});
+
+		this.oFCL.placeAt(sQUnitFixture);
+		Core.applyChanges();
+
+		// assert
+		assert.strictEqual(this.oFCL._bInitialColumnsResizeDone, false, "FCL's columns are still not resized because parent is hidden");
+
+		// act
+		$qunitFixture.css("display", "block");
+
+		// call onResize immediately
+		this.oFCL._onResize({
+			oldSize: { width: 0 },
+			size: { width: 1900 }
+		});
+
+		// assert
+		assert.strictEqual(this.oFCL._bInitialColumnsResizeDone, true, "FCL's columns are resized when parent is shown");
+
+		// clean-up
+		this.oFCL.destroy();
+	});
+
+
 	QUnit.module("Focus handling");
 
 	QUnit.test("AutoFocus - Should synchronize with NavContainer instances", function (assert) {
