@@ -35,17 +35,22 @@ sap.ui.define([
 				errorMessage: 'The text "' + sValue + '" could not be entered into the field'
 			}));
 		},
-		iPressKeyOnTheField: function(vIdentifier, keyCode) {
+		iPressKeyOnTheField: function(vIdentifier, keyCode, bUseUnit) {
 			return waitForField.call(this, Utils.enhanceWaitFor(vIdentifier, {
 				success:function(oField) {
+					const oContent = bUseUnit ? oField.getCurrentContent()[1] : oField.getCurrentContent()[0];
 					oField.focus();
-					new TriggerEvent({event: "keydown", payload: {which: keyCode, keyCode: keyCode}}).executeOn(oField.getCurrentContent()[0]); // doesnt work with focusdomref
-					Opa5.assert.ok(oField, "Key '" + keyCode + "' pressed on FilterField '" + oField.getId() + "'");
+					new TriggerEvent({event: "keydown", payload: {which: keyCode, keyCode: keyCode}}).executeOn(oContent); // doesnt work with focusdomref
+					Opa5.assert.ok(oContent, "Key '" + keyCode + "' pressed on FilterField '" + oField.getId() + "'");
 				}
 			}));
 		},
 		iOpenTheValueHelpForField: function (vIdentifier) {
-			return oActions.iPressKeyOnTheField.call(this, vIdentifier, KeyCodes.F4);
+			return waitForField.call(this, Utils.enhanceWaitFor(vIdentifier, {
+				success: function(oField) {
+					return oActions.iPressKeyOnTheField.call(this, vIdentifier, KeyCodes.F4, oField.getBaseType() === "Unit");
+				}
+			}));
 		},
 		iPressOnTheField: function(vIdentifier) {
 			return waitForField.call(this, Utils.enhanceWaitFor(vIdentifier, {

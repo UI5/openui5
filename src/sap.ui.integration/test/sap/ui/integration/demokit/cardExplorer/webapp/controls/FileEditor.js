@@ -494,8 +494,15 @@ sap.ui.define([
 		// always try to return the content first, in case it is already loaded and edited
 		if (oManifestFile.content) {
 			return Promise.resolve(oManifestFile.content);
-		} else {
+		} else if (oManifestFile.promise) {
 			return oManifestFile.promise;
+		} else {
+			// create a Promise，listening to manifestChange event and return its value
+			return new Promise((resolve) => {
+				this.attachEventOnce("manifestChange", function (oEvent) {
+					resolve(oEvent.getParameter("value"));
+				});
+			});
 		}
 	};
 
@@ -565,8 +572,15 @@ sap.ui.define([
 		// always try to return the content first, in case it is already loaded and edited
 		if (oDesigntimeFile.content) {
 			return Promise.resolve(oDesigntimeFile.content);
-		} else {
+		} else if (oDesigntimeFile.promise) {
 			return oDesigntimeFile.promise;
+		} else {
+			// create a Promise，listening to designtimeChange event and return its value
+			return new Promise((resolve) => {
+				this.attachEventOnce("designtimeChange", function (oEvent) {
+					resolve(oEvent.getParameter("value"));
+				});
+			});
 		}
 	};
 

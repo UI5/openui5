@@ -1752,24 +1752,7 @@ sap.ui.define([
 				return;
 			}
 
-			const oHSb = oScrollExtension.getHorizontalScrollbar();
-			const mRowCounts = oTable._getRowCounts();
-
-			let iOffsetBottom = 0;
-			if (oHSb && _private(oTable).bHorizontalScrollbarRequired && oScrollExtension.isHorizontalScrollbarVisible()) {
-				iOffsetBottom = oHSb.offsetHeight;
-			}
-			if (mRowCounts.fixedBottom > 0) {
-				iOffsetBottom += mRowCounts.fixedBottom * oTable._getBaseRowHeight();
-			}
-			const oCreationRow = oTable.getCreationRow();
-			if (oCreationRow) {
-				const oCreationRowDomRef = oCreationRow.getDomRef();
-				if (oCreationRowDomRef && oCreationRow.getVisible()) {
-					iOffsetBottom += oCreationRowDomRef.offsetHeight;
-				}
-			}
-			oVSb.style.bottom = iOffsetBottom + "px";
+			oVSb.style.bottom = oScrollExtension.getVerticalScrollbarBottomOffset(oTable) + "px";
 		},
 
 		/**
@@ -2637,6 +2620,28 @@ sap.ui.define([
 
 		oVSbContent.style.height = this.getVerticalScrollHeight() + "px";
 		oVSb._scrollTop = oVSb.scrollTop;
+	};
+
+	ScrollExtension.prototype.getVerticalScrollbarBottomOffset = function(oTable) {
+		const oScrollExtension = oTable._getScrollExtension();
+		const oHSb = oScrollExtension.getHorizontalScrollbar();
+		const mRowCounts = oTable._getRowCounts();
+
+		let iOffsetBottom = 0;
+		if (oHSb && _private(oTable).bHorizontalScrollbarRequired && oScrollExtension.isHorizontalScrollbarVisible()) {
+			iOffsetBottom = oHSb.offsetHeight;
+		}
+		if (mRowCounts.fixedBottom > 0) {
+			iOffsetBottom += mRowCounts.fixedBottom * oTable._getBaseRowHeight();
+		}
+		const oCreationRow = oTable.getCreationRow();
+		if (oCreationRow) {
+			const oCreationRowDomRef = oCreationRow.getDomRef();
+			if (oCreationRowDomRef && oCreationRow.getVisible()) {
+				iOffsetBottom += oCreationRowDomRef.offsetHeight;
+			}
+		}
+		return iOffsetBottom;
 	};
 
 	/**
