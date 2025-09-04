@@ -580,7 +580,10 @@ sap.ui.define([
 		var validInitials = /^[a-zA-Z\xc0-\xd6\xd8-\xdc\xe0-\xf6\xf8-\xfc]{1,3}$/;
 		if (!validInitials.test(sInitials)) {
 			Log.warning("Initials should consist of only 1,2 or 3 latin letters", this);
-			this._sActualType = AvatarType.Icon;
+			// if there is no actual type or the actual type is initials but they are not valid, set the actual type to icon
+			if (!this._sActualType || this._sActualType === AvatarType.Initials) {
+				this._sActualType = AvatarType.Icon;
+			}
 			this._bIsDefaultIcon = true;
 			return false;
 		}
