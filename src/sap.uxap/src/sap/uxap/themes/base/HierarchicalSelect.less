@@ -168,30 +168,3 @@
 
 /* IE and Edge ignores outline-offset. Use an overlay: */
 /* TODO remove after the end of support for Internet Explorer */
-html[data-sap-ui-browser^="ie"].sap-desktop,
-html[data-sap-ui-browser^="ed"].sap-desktop {
-	.sapMSlt.sapUxAPHierarchicalSelect:focus  > .sapMSltArrow {
-		box-shadow: none;
-	}
-
-	.sapUxAPHierarchicalSelect.sapMSltHoverable.sapMSltIconOnly.sapMSlt:not(.sapMSltPressed):focus {
-		&:before {
-			border: none;
-		}
-		> .sapMSltIcon {
-			outline: none;
-			position: relative;
-		}
-		> .sapMSltIcon:after {
-			content: " ";
-			box-sizing: border-box;
-			width: 100%;
-			height: 100%;
-			position: absolute;
-			left: 0;
-			top: 0;
-			border: 1px dashed @sapUiContentFocusColor;
-			pointer-events: none;
-		}
-	}
-}

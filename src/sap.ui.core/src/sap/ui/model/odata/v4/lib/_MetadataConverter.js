@@ -172,7 +172,7 @@ sap.ui.define([
 			case "Path":
 			case "PropertyPath":
 				sValue = this.resolveAliasInPath(sValue);
-			// falls through
+			// fall through
 			case "Binary":
 			case "Date":
 			case "DateTimeOffset":

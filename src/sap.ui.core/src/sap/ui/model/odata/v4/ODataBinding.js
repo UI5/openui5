@@ -213,7 +213,7 @@ sap.ui.define([
 									+ sForbidden);
 							}
 						});
-					// falls through
+					// fall through
 				case "$$canonicalPath":
 				case "$$clearSelectionOnFilter":
 				case "$$noPatch":

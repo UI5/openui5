@@ -21,6 +21,9 @@
 	.sapContrast .sapMBar {
 		box-shadow: none;
 	}
+
+	border: none; /* Web Components Integration - Popover API adds default border */
+	overflow: visible; /* Web Components Integration - Popover API adds overflow: auto;, which hides the popover arrow  */
 }
 
 .sapMPopoverWrapper {
@@ -80,9 +83,13 @@
 	max-height: 100%;
 	background: var(--sapGroup_ContentBackground);
 	border: none;
-	box-shadow: var(--sapContent_Shadow1);
 	border-radius: 0.25rem;
 	min-height: 2rem;
+}
+
+.sapMPopover,
+.sapMPopover.sapUiShd /* Web Components Integration */ {
+	box-shadow: var(--sapContent_Shadow1);
 }
 
 .sapMPopover.sapMPopoverWithArrow {

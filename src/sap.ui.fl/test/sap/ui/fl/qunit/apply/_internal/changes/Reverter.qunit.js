@@ -246,21 +246,39 @@ sap.ui.define([
 
 			assert.strictEqual(this.oDestroyCDStub.callCount, 3, "destroyAppliedCustomData was called for all non failing changes");
 			assert.strictEqual(this.oDestroyCDStub.firstCall.args[0].getId(), this.oControl.getId(), "the correct value is passed");
-			assert.strictEqual(this.oDestroyCDStub.firstCall.args[1].getId(), this.oChange.getId(), "the first change' CustomData was destroyed");
+			assert.strictEqual(
+				this.oDestroyCDStub.firstCall.args[1].getId(), this.oChange.getId(), "the first change' CustomData was destroyed"
+			);
 			assert.strictEqual(this.oDestroyCDStub.secondCall.args[0], true, "the correct value is passed");
-			assert.strictEqual(this.oDestroyCDStub.secondCall.args[1].getId(), this.oAppliedChange0.getId(), "the second change' CustomData was destroyed");
+			assert.strictEqual(
+				this.oDestroyCDStub.secondCall.args[1].getId(), this.oAppliedChange0.getId(), "the second change' CustomData was destroyed"
+			);
 			assert.strictEqual(this.oDestroyCDStub.thirdCall.args[0].getId(), this.oControl.getId(), "the correct value is passed");
-			assert.strictEqual(this.oDestroyCDStub.thirdCall.args[1].getId(), this.oAppliedChange1.getId(), "the third change' CustomData was destroyed");
+			assert.strictEqual(
+				this.oDestroyCDStub.thirdCall.args[1].getId(), this.oAppliedChange1.getId(), "the third change' CustomData was destroyed"
+			);
 
 			assert.strictEqual(this.oRemoveFromDepSpy.callCount, 3, "applied and failing changes were removed from the dependencies");
 			assert.strictEqual(this.oRemoveFromMapSpy.callCount, 3, "applied and failing changes were removed from the map");
 			assert.strictEqual(this.oRemoveFromMapSpy.firstCall.args[1], this.oAppliedChange0.getId(), "change0 was reverted first");
-			assert.strictEqual(this.oRemoveFromMapSpy.secondCall.args[1], this.oFailingChange.getId(), "failing change was reverted second");
+			assert.strictEqual(
+				this.oRemoveFromMapSpy.secondCall.args[1], this.oFailingChange.getId(), "failing change was reverted second"
+			);
 			assert.strictEqual(this.oRemoveFromMapSpy.thirdCall.args[1], this.oAppliedChange1.getId(), "change1 was reverted third");
 			assert.strictEqual(oLiveDependencyMap.aChanges.length, 0, "applied and failed changes are removed from the map");
 
 			aChanges.forEach(function(oChange) {
 				assert.ok(oChange.isQueuedForRevert(), "the change was queued for revert");
+			});
+		});
+
+		QUnit.test("with skipSetQueued = true", async function(assert) {
+			const aChanges = [this.oChange, this.oAppliedChange0, this.oAppliedChange1];
+
+			await Reverter.revertMultipleChanges(aChanges, { ...this.mPropertyBag, skipSetQueued: true });
+
+			aChanges.forEach(function(oChange) {
+				assert.notOk(oChange.isQueuedForRevert(), "the change was not queued for revert");
 			});
 		});
 

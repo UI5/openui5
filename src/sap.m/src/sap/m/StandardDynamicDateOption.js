@@ -548,7 +548,15 @@ sap.ui.define([
 				}
 
 				aControls.push(oInputControl);
-				oCurrentLabel && oCurrentLabel.setLabelFor(oInputControl);
+
+				if (aParams[iIndex].getType() === "included" && oCurrentLabel) {
+					const excludedButton = oInputControl.getItems()[0];
+					const includedButton = oInputControl.getItems()[2];
+					excludedButton.addAriaLabelledBy(oCurrentLabel);
+					includedButton.addAriaLabelledBy(oCurrentLabel);
+				} else if (oCurrentLabel) {
+					oCurrentLabel.setLabelFor(oInputControl);
+				}
 
 				if (aParams[iIndex].getAdditionalText()) {
 					aControls.push(

@@ -270,6 +270,29 @@
 								</f:content>
 							</f:Card>
 
+							<!-- UI5 MCP server -->
+							<f:Card class="sapUiDemoKitResourcesRegularCard">
+								<f:header>
+									<card:Header title="{i18n>RESOURCES_CARD_TITLE_MCPSERVER}" iconSrc="sap-icon://ai" />
+								</f:header>
+								<f:content>
+									<VBox class="sapUiDemoKitResourcesCardContentSpacing" wrap="Wrap">
+										<Text text="{i18n>RESOURCES_CARD_DESC_MCPSERVER}">
+											<layoutData>
+												<FlexItemData growFactor="1" />
+											</layoutData>
+										</Text>
+										<Link
+											class="sapUiDemoKitResourcesCardLink"
+											href="{resources>/mcpserver/href}"
+											target="_blank"
+											text="{i18n>RESOURCES_CARD_LINK_MCPSERVER}"
+											tooltip="{i18n>RESOURCES_CARD_LINK_TOOLTIP}"
+											wrapping="true" />
+									</VBox>
+								</f:content>
+							</f:Card>
+
 							<!-- Flexible Programming Model Explorer -->
 							<f:Card class="sapUiDemoKitResourcesRegularCard"
 								visible="{

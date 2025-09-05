@@ -15,7 +15,7 @@
 				$orderby : 'Country desc,Region desc,Segment,AccountResponsible'
 			}, suspended : true}" selectionMode="None" threshold="0">
 		<dependents>
-			<!-- plugins:ODataV4Selection enableNotification="true"/ -->
+			<!-- plugins:ODataV4MultiSelection enableNotification="true"/ -->
 		</dependents>
 		<extension>
 			<m:Toolbar design="Transparent" class="sapMTBHeader-CTX">

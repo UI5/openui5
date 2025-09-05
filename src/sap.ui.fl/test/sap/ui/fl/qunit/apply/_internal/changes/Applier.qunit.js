@@ -940,6 +940,24 @@ sap.ui.define([
 			assert.strictEqual(this.oAddChangeStub.callCount, 2, "two changes were added to the runtime map");
 			assert.strictEqual(oAddDepStub.callCount, 1, "one change was added for later application");
 		});
+
+		QUnit.test("when called with skipSetQueued = true", async function(assert) {
+			const aChanges = [
+				FlexObjectFactory.createFromFileContent(getLabelChangeContent("a", sControlId)),
+				FlexObjectFactory.createFromFileContent(getLabelChangeContent("b", sControlId)),
+				FlexObjectFactory.createFromFileContent(getLabelChangeContent("c", sControlId))
+			];
+			await Applier.applyMultipleChanges(aChanges, {
+				appComponent: oAppComponent,
+				reference: "DummyFlexReference",
+				skipSetQueued: true
+			});
+			assert.strictEqual(this.oChangeHandlerApplyChangeStub.callCount, 3, "all changes were applied");
+			aChanges.forEach(function(oChange) {
+				assert.strictEqual(oChange.isQueuedForApply(), false, "the change is not queued for apply");
+			});
+			assert.strictEqual(this.oAddChangeStub.callCount, 0, "no changes were added to the runtime map");
+		});
 	});
 
 	QUnit.module("[JS] applyChangeOnControl", {

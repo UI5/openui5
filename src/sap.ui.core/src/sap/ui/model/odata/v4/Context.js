@@ -706,7 +706,7 @@ sap.ui.define([
 					throw new Error("Already expanded: " + this);
 				}
 				this.oBinding.collapse(this, /*bAll*/false, /*bSilent*/true);
-				// falls through
+				// fall through
 			case false: {
 				const iLevels = bAll ? Number.MAX_SAFE_INTEGER : 1;
 				return Promise.resolve(this.oBinding.expand(this, iLevels)).then(() => {});

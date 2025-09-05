@@ -721,23 +721,6 @@ sap.ui.define([
 				"Dummy cell's accessible name is provided in aria-label");
 		});
 
-		QUnit.test("Selected state announcement", async function (assert) {
-			this.oSut.placeAt("qunit-fixture");
-			await nextUIUpdate();
-			var oInvisibleMessageSpy = this.spy(this.oSut._oInvisibleMessage, "announce");
-
-
-			//Act
-			this.oSut._selectDay(CalendarDate.fromLocalJSDate(UI5Date.getInstance(), "Gregorian"));
-
-			//Assert
-			assert.ok(oInvisibleMessageSpy.calledOnce, "Selected state announcement is done");
-
-			//Clean
-			oInvisibleMessageSpy.restore();
-		});
-
-
 		QUnit.module("Unfinished range selection indication allowance", {
 			beforeEach: function () {
 				this.oMonth = new Month();

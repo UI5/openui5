@@ -23,7 +23,6 @@ h3 {
 	margin-left: -8px;
 	margin-right: -8px;
 	box-sizing: border-box;
-	-moz-box-sizing: border-box;
 	overflow: hidden;
 }
 
@@ -33,7 +32,6 @@ h3 {
 	border-right: 1px solid black;
 	padding: 5px;
 	box-sizing: border-box;
-	-moz-box-sizing: border-box;
 }
 
 .sapUiMedia-Std-Phone .StandardMedia {

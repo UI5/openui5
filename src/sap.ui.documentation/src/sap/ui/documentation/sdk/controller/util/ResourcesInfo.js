@@ -41,6 +41,11 @@ sap.ui.define([], function () {
 			"href": "https://github.com/UI5/linter"
 		},
 		{
+			"id": "mcpserver",
+			"text": "UI5 MCP server",
+			"href": "https://github.com/UI5/mcp-server"
+		},
+		{
 			"id": "fpmExplorer",
 			"text": "Flexible Programming Model Explorer",
 			"href": "test-resources/sap/fe/core/fpmExplorer/index.html#/overview/introduction",
