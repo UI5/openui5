@@ -156,7 +156,6 @@ b {
 	top: -178px;
 	right: -4%;
 	-webkit-animation: spin 40s linear infinite;
-	-moz-animation: spin 40s linear infinite;
 	animation: spin 40s linear infinite;
 }
 
@@ -178,7 +177,6 @@ b {
 	position: absolute;
 	top: 1px;
 	-webkit-animation: spin 40s linear infinite;
-	-moz-animation: spin 40s linear infinite;
 	animation: spin 40s linear infinite;
 }
 
@@ -242,9 +240,7 @@ b {
 
 	background: #1e5799;
 	/* Old browsers */
-	background: -moz-linear-gradient(top, #1e5799 0%, #2989d8 50%, #207cca 100%, #7db9e8 100%);
 	/* FF3.6-15 */
-	background: -webkit-linear-gradient(top, #1e5799 0%, #2989d8 50%, #207cca 100%, #7db9e8 100%);
 	/* Chrome10-25,Safari5.1-6 */
 	background: linear-gradient(to bottom, #1e5799 0%, #2989d8 50%, #207cca 100%, #7db9e8 100%);
 	/* W3C, FF16+, Chrome26+, Opera12+, Safari7+ */

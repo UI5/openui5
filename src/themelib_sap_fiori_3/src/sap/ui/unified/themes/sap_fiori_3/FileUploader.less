@@ -48,26 +48,4 @@ html.sap-desktop .sapUiFup .sapMBtnInner:active.sapMBtnEmphasized {
 
 /* IE ignores outline-offset. Use an overlay: */
 
-html[data-sap-ui-browser^="ie"] {
-
-	.sapUiFup .sapMBtnInner:focus.sapMFocusable {
-		outline: none;
-		position: relative;
-	}
-
-	.sapUiFup .sapMBtnInner:focus.sapMFocusable:before {
-		content: " ";
-		box-sizing: border-box;
-		width: 100%;
-		height: 100%;
-		position: absolute;
-		left: 0;
-		top: 0;
-		border: 1px dotted @sapUiContentFocusColor;
-	}
-
-	.sapMFooter-CTX .sapUiFup .sapMBtnInner:focus.sapMFocusable:before {
-		border-color: @sapUiContentContrastFocusColor;
-	}
-
-}
+ 

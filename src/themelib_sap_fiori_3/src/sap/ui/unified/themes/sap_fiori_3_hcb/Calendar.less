@@ -33,27 +33,6 @@ html[data-sap-ui-browser^="ff"].sap-desktop .sapUiCalHead > .sapUiCalHeadB:focus
 	outline-offset: 0; /* to hide firefox bug with native outline always displayed */
 }
 
-html[data-sap-ui-browser^="ie"].sap-desktop,
-html[data-sap-ui-browser^="ed"].sap-desktop {
-	.sapUiCalHead > .sapUiCalHeadB{
-		position: relative;
-		outline: none;
-	}
-
-	.sapUiCalHead > .sapUiCalHeadB:focus:after {
-		position: absolute;
-		top: 0.125rem;
-		left: 0.125rem;
-		right: 0.125rem;
-		bottom: 0.125rem;
-		border: 0.0625rem dashed @sapUiContentFocusColor;
-		content: "";
-	}
-
-	.sapUiCalHead > .sapUiCalHeadB:focus:active:after {
-		border-color: @sapUiContentContrastFocusColor;
-	}
-}
 
 html.sap-desktop .sapUiCalHead > .sapUiCalHeadB:focus:not(:hover):not(:active) {
 	background-color: transparent;
@@ -130,48 +109,6 @@ html.sap-desktop .sapUiSizeCompact .sapUiCalItemSel:not(.sapUiCalItemNow):not(.s
 	outline-color: @sapUiContentContrastFocusColor;
 }
 
-html[data-sap-ui-browser^="ie"].sap-desktop,
-html[data-sap-ui-browser^="ed"].sap-desktop {
-	// do this only for the Planing Calendar
-	.sapMPlanCal :not(.sapUiCalFirstWDay).sapUiCalItem:focus {
-		overflow: hidden;
-	}
-
-	.sapUiCalItem:focus > .sapUiCalItemText,
-	.sapUiCalMonthPicker .sapUiCalItem:focus,
-	.sapUiCalYearPicker .sapUiCalItem:focus {
-		position: relative;
-		outline: none;
-	}
-
-	.sapUiCalItem:focus > .sapUiCalItemText:after,
-	.sapUiCalMonthPicker .sapUiCalItem:focus:after,
-	.sapUiCalYearPicker .sapUiCalItem:focus:after {
-		position: absolute;
-		top: 0.125rem;
-		left: 0.125rem;
-		right: 0.125rem;
-		bottom: 0.125rem;
-		border: 0.0625rem dashed @sapUiContentFocusColor;
-		content: "";
-	}
-
-	.sapUiCalItemSel:not(.sapUiCalItemNow):not(.sapUiCalItemSelBetween):focus > .sapUiCalItemText:after,
-	.sapUiCalMonthPicker .sapUiCalItemSel:focus:after,
-	.sapUiCalYearPicker .sapUiCalItemSel:focus:after {
-		border-color: @sapUiContentContrastFocusColor;
-	}
-	.sapUiCalItemSel.sapUiCalItem:focus > .sapUiCalItemText {
-		position: static;
-	}
-
-	.sapUiCalItem.sapUiCalItemNow:focus > .sapUiCalItemText:after {
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
-	}
-}
 
 .sapUiCalItemWeekEnd,
 html.sap-desktop .sapUiCalItemWeekEnd:not(.sapUiCalItemSel):focus {
@@ -340,11 +277,6 @@ html.sap-desktop .sapUiCalItemSel:focus {
 	border-radius: 0.25rem;
 }
 
-html[data-sap-ui-browser^="ie"].sap-desktop .sapUiCalMonthPicker .sapUiCalItemSel:focus,
-html[data-sap-ui-browser^="ie"].sap-desktop .sapUiCalYearPicker .sapUiCalItemSel:focus {
-	/* as IE don't support outline-offset */
-	border-color: @sapUiContentContrastFocusColor;
-}
 
 html.sap-desktop .sapUiCalItemSelBetween:hover {
 	background-color: @sapUiListSelectionHoverBackground;

@@ -357,6 +357,7 @@ sap.ui.define([
 	 * @param {object} mPropertyBag - Object with parameters as properties
 	 * @param {object} mPropertyBag.reference - Flex reference
 	 * @param {object} mPropertyBag.appComponent - App Component instance
+	 * @param {boolean} [mPropertyBag.skipSetQueued] - If true, the changes are not set to queued for apply nor added to the dependency map
 	 * @returns {Promise<undefined>} Resolves after all changes were applied
 	 */
 	Applier.applyMultipleChanges = async function(aChanges, mPropertyBag) {
@@ -366,7 +367,7 @@ sap.ui.define([
 			const oLiveDependencyMap = FlexObjectState.getLiveDependencyMap(mPropertyBag.reference);
 			if (oControl) {
 				checkAndAdjustChangeStatus(oControl, oChange, mPropertyBag, true);
-				if (!oChange.isApplyProcessFinished()) {
+				if (!oChange.isApplyProcessFinished() && !mPropertyBag.skipSetQueued) {
 					oChange.setQueuedForApply();
 				}
 				let oResult;
@@ -375,7 +376,7 @@ sap.ui.define([
 				} catch (oError) {
 					oResult = {success: false};
 				}
-				if (oResult.success) {
+				if (oResult.success && !mPropertyBag.skipSetQueued) {
 					DependencyHandler.addRuntimeChangeToMap(oChange, mPropertyBag.appComponent, oLiveDependencyMap);
 				}
 			} else {

@@ -129,7 +129,6 @@ Doing so will result in less generated CSS, as well as less future maintanance i
 	}
 
 	.sapUxAPObjectPageSubSectionHeader.titleOnLeftLayout + .sapUxAPBlockContainer {
-		width: -webkit-calc(~"75% - 2rem");
 		width: calc(~"75% - 2rem");
 		box-sizing: border-box;
 		display: inline-block;
@@ -240,31 +239,9 @@ Doing so will result in less generated CSS, as well as less future maintanance i
 	}
 }
 
-html[data-sap-ui-browser^="ed"].sap-desktop .sapUxAPObjectPageSubSectionFocusable:focus {
-	outline-style: dashed;
-}
 
 /* IE ignores outline-offset. Use an overlay: */
 /* TODO remove after the end of support for Internet Explorer */
-html[data-sap-ui-browser^="ie"].sap-desktop {
-	.sapUxAPObjectPageSubSectionFocusable:focus {
-		outline: none;
-		position: relative;
-	}
-	.sapUxAPObjectPageSubSectionFocusable:focus:before {
-		content: " ";
-		box-sizing: border-box;
-		width: 100%;
-		height: 100%;
-		position: absolute;
-		left: 0;
-		top: 0;
-		right: 0;
-		bottom: 0;
-		border: 0.0625rem dashed @sapUiContentFocusColor;
-		pointer-events: none;
-	}
-}
 
 // Styles needed for wrapTitle property
 .sapUxAPObjectPageSubSection.sapUxAPObjectPageSubSectionWrapTitle

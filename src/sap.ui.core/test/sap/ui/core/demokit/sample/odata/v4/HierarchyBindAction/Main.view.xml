@@ -20,7 +20,7 @@
 			}"
 		selectionMode="None" threshold="0">
 		<dependents>
-			<plugins:ODataV4Selection enableNotification="true"/>
+			<plugins:ODataV4MultiSelection enableNotification="true"/>
 		</dependents>
 		<extension>
 			<m:Toolbar class="sapMTBHeader-CTX" design="Transparent">

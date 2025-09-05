@@ -551,7 +551,6 @@ code {
 	font-size: 1.25em;
 	font-weight: normal;
 	-webkit-animation: intro 6s linear 13s 1;
-	-moz-animation: intro 6s linear 13s 1;
 	animation: intro 6s linear 13s 1;
 }
 
@@ -570,7 +569,6 @@ code {
 	text-shadow: -2px -2px 0 #ff6, 2px -2px 0 #ff6, -2px 2px 0 #ff6, 2px 2px 0 #ff6;
 	z-index: 1;
 	-webkit-animation: header 7s cubic-bezier(0.000, 0.730, 0.750, 0.750) 20s 1 normal forwards;
-	-moz-animation: header 7s cubic-bezier(0.000, 0.730, 0.750, 0.750) 20s 1 normal forwards;
 	animation: header 7s cubic-bezier(0.000, 0.730, 0.750, 0.750) 20s 1 normal forwards;
 }
 
@@ -595,10 +593,8 @@ code {
 	font-weight: bold;
 	opacity: 0;
 	-webkit-animation: text 120s linear 11s 1 normal forwards;
-	-moz-animation: text 120s linear 11s 1 normal forwards;
 	animation: text 120s linear 11s 1 normal forwards;
 	-webkit-transform-style: preserve-3d;
-	-moz-transform-style: preserve-3d;
 	transform-style: preserve-3d;
 }
 

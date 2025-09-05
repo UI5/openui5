@@ -181,6 +181,7 @@ sap.ui.define([
 		}
 
 		let oFlexData;
+		let oAuthors;
 		const sComponentName = ManifestUtils.getBaseComponentNameFromManifest(mPropertyBagCopy.manifest);
 		if (bRequiresNewLoadRequest) {
 			// the cache key cannot be used in case of a reinitialization
@@ -199,13 +200,15 @@ sap.ui.define([
 				adaptationId: mPropertyBagCopy.adaptationId,
 				skipLoadBundle: mPropertyBagCopy.skipLoadBundle
 			});
-			oFlexData.authors = await Loader.loadVariantsAuthors(sReference);
+			const oSettings = await Settings.getInstance();
+			oAuthors = oSettings.getIsVariantAuthorNameAvailable() ? await Storage.loadVariantsAuthors(sReference) : {};
 		} else {
 			oFlexData = await Storage.completeFlexData({
 				reference: sReference,
 				componentName: sComponentName,
 				partialFlexData: _mCachedFlexData[sReference].data.changes
 			});
+			oAuthors = _mCachedFlexData[sReference].data.authors;
 		}
 
 		const oFlexDataCopy = Object.assign({}, oFlexData);
@@ -215,7 +218,8 @@ sap.ui.define([
 
 		const oFormattedFlexData = {
 			changes: oFlexDataCopy,
-			cacheKey: oFlexDataCopy.cacheKey
+			cacheKey: oFlexDataCopy.cacheKey,
+			authors: oAuthors
 		};
 
 		_mCachedFlexData[sReference] = {
@@ -314,19 +318,6 @@ sap.ui.define([
 	Loader.getCachedFlexData = function(sReference) {
 		// TODO return copy of the data once the CompVariantManager does not mutate it anymore
 		return _mCachedFlexData[sReference]?.data || {};
-	};
-
-	/**
-	 * Load the names of variants' authors for a given application.
-	 *
-	 * @param {string} sReference - Flex reference of application
-	 * @returns {Promise<object>} Resolving with a list of maps between user's ID and name
-	 */
-	Loader.loadVariantsAuthors = function(sReference) {
-		// the settings are available due to previous loadFlexData calls or
-		// not available due to an async hint stating that no changes are available, thus also no author mapping needed
-		const oSettings = Settings.getInstanceOrUndef();
-		return oSettings?.getIsVariantAuthorNameAvailable() ? Storage.loadVariantsAuthors(sReference) : Promise.resolve({});
 	};
 
 	/**

@@ -10,7 +10,6 @@ sap.ui.define([
 	"sap/ui/fl/initial/_internal/Settings",
 	"sap/ui/fl/initial/_internal/Storage",
 	"sap/ui/fl/initial/api/Version",
-	"sap/ui/fl/write/_internal/connectors/JsObjectConnector",
 	"sap/ui/thirdparty/sinon-4"
 ], function(
 	merge,
@@ -22,7 +21,6 @@ sap.ui.define([
 	Settings,
 	Storage,
 	Version,
-	JsObjectConnector,
 	sinon
 ) {
 	"use strict";
@@ -46,7 +44,6 @@ sap.ui.define([
 				info: {
 					foo: "bar"
 				},
-				authors: {},
 				changes: [
 					{
 						fileName: "c1",
@@ -128,7 +125,11 @@ sap.ui.define([
 			this.oCompleteFlexDataStub = sandbox.stub(Storage, "completeFlexData").resolves(oCompleteFlexDataResponse);
 			this.oGetBaseCompNameStub = sandbox.stub(ManifestUtils, "getBaseComponentNameFromManifest").returns("baseName");
 			this.oGetCacheKeyStub = sandbox.stub(ManifestUtils, "getCacheKeyFromAsyncHints").returns("cacheKey");
-			this.oLoadVariantsAuthorsStub = sandbox.stub(Loader, "loadVariantsAuthors").returns({});
+			this.oLoadVariantsAuthorsStub = sandbox.stub(Storage, "loadVariantsAuthors").resolves("authors");
+			this.oSettingsAuthorName = sandbox.stub().returns(true);
+			sandbox.stub(Settings, "getInstance").resolves({
+				getIsVariantAuthorNameAvailable: this.oSettingsAuthorName
+			});
 		},
 		afterEach() {
 			Loader.clearCache();
@@ -163,6 +164,7 @@ sap.ui.define([
 			});
 
 			assert.deepEqual(oResult.data.changes, this.oExpectedFlexDataResponse, "the Loader loads data");
+			assert.strictEqual(oResult.data.authors, "authors", "the authors are loaded");
 			assert.strictEqual(this.oLoadFlexDataStub.callCount, 1, "the Storage.loadFlexData was called");
 			assert.strictEqual(this.oCompleteFlexDataStub.callCount, 0, "the Storage.completeFlexData was not called");
 			assert.strictEqual(this.oLoadFlexDataStub.getCall(0).args[0].siteId, "siteId", "the siteId was retrieved from the Utils");
@@ -554,6 +556,19 @@ sap.ui.define([
 				}, "the dependent selector of the third change is correct");
 			});
 		});
+
+		QUnit.test("when getFlexData is called with getIsVariantAuthorNameAvailable = false", async function(assert) {
+			this.oSettingsAuthorName.reset();
+			this.oSettingsAuthorName.returns(false);
+
+			const oResult = await Loader.getFlexData({
+				manifest: this.oManifest,
+				otherValue: "a",
+				reference: sReference,
+				componentData: oComponentData
+			});
+			assert.deepEqual(oResult.data.authors, {}, "the authors are empty");
+		});
 	});
 
 	QUnit.module("Given new connector configuration in bootstrap", {
@@ -562,10 +577,14 @@ sap.ui.define([
 				property: "value"
 			};
 			this.oManifest = new Manifest(this.oRawManifest);
+			sandbox.stub(Settings, "getInstance").resolves({
+				getIsVariantAuthorNameAvailable() {
+					return false;
+				}
+			});
 		},
 		afterEach() {
 			Loader.clearCache();
-			JsObjectConnector.storage.clear();
 			sandbox.restore();
 		}
 	}, function() {
@@ -588,65 +607,6 @@ sap.ui.define([
 		});
 	});
 
-	QUnit.module("Load variant author name", {
-		afterEach() {
-			Loader.clearCache();
-			sandbox.restore();
-		}
-	}, function() {
-		QUnit.test("When load variant author name is triggered and feature is not available", async function(assert) {
-			const oBackEndResult = {
-				compVariants: {
-					comp_id1: "comp_name1"
-				},
-				variants: {
-					id1: "name1"
-				}
-			};
-			sandbox.stub(Settings, "getInstanceOrUndef").returns({
-				getIsVariantAuthorNameAvailable() {
-					return false;
-				}
-			});
-			const oStubLoadVariantsAuthors = sandbox.stub(Storage, "loadVariantsAuthors").resolves(oBackEndResult);
-
-			const oResult = await Loader.loadVariantsAuthors("test.app");
-			assert.deepEqual(oResult, {}, "then empty result is returned");
-			assert.strictEqual(oStubLoadVariantsAuthors.callCount, 0, "then correct function of storage is not called");
-		});
-
-		QUnit.test("When load variant author name is triggered and the settings are not loaded (i.e. '<NO CACHE>' mentioned in the asyncHints)", async function(assert) {
-			sandbox.stub(Settings, "getInstanceOrUndef");
-			const oStubLoadVariantsAuthors = sandbox.stub(Storage, "loadVariantsAuthors");
-
-			const oResult = await Loader.loadVariantsAuthors("test.app");
-			assert.deepEqual(oResult, {}, "then empty result is returned");
-			assert.strictEqual(oStubLoadVariantsAuthors.callCount, 0, "then correct function of storage is not called");
-		});
-
-		QUnit.test("When load variant author name is triggered and feature is available", async function(assert) {
-			const oBackEndResult = {
-				compVariants: {
-					comp_id1: "comp_name1"
-				},
-				variants: {
-					id1: "name1"
-				}
-			};
-			sandbox.stub(Settings, "getInstanceOrUndef").returns({
-				getIsVariantAuthorNameAvailable() {
-					return true;
-				}
-			});
-			const oStubLoadVariantsAuthors = sandbox.stub(Storage, "loadVariantsAuthors").resolves(oBackEndResult);
-
-			const oResult = await Loader.loadVariantsAuthors("test.app");
-			assert.deepEqual(oResult, oBackEndResult, "then result is get from LRep back end");
-			assert.strictEqual(oStubLoadVariantsAuthors.callCount, 1, "then correct function of storage is called");
-			assert.strictEqual(oStubLoadVariantsAuthors.getCall(0).args[0], "test.app", "with correct reference");
-		});
-	});
-
 	QUnit.module("misc", {
 		beforeEach() {
 			this.oFlexDataResponse = {
@@ -666,6 +626,11 @@ sap.ui.define([
 			};
 			this.oLoadFlexDataStub = sandbox.stub(Storage, "loadFlexData").resolves(this.oFlexDataResponse);
 			sandbox.stub(ManifestUtils, "getBaseComponentNameFromManifest").returns("baseName");
+			sandbox.stub(Settings, "getInstance").resolves({
+				getIsVariantAuthorNameAvailable() {
+					return false;
+				}
+			});
 			const oRawManifest = {
 				property: "value"
 			};
@@ -737,6 +702,11 @@ sap.ui.define([
 
 	QUnit.module("Loader with an empty cache", {
 		async beforeEach() {
+			sandbox.stub(Settings, "getInstance").resolves({
+				getIsVariantAuthorNameAvailable() {
+					return false;
+				}
+			});
 			await Loader.initializeEmptyCache(sReference);
 		},
 		afterEach() {

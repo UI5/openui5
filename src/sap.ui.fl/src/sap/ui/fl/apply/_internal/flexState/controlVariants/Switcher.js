@@ -6,12 +6,16 @@ sap.ui.define([
 	"sap/base/util/restricted/_pick",
 	"sap/ui/fl/apply/_internal/changes/Applier",
 	"sap/ui/fl/apply/_internal/changes/Reverter",
-	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState"
+	"sap/ui/fl/apply/_internal/flexState/changes/DependencyHandler",
+	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
+	"sap/ui/fl/apply/_internal/flexState/FlexObjectState"
 ], function(
 	_pick,
 	Applier,
 	Reverter,
-	VariantManagementState
+	DependencyHandler,
+	VariantManagementState,
+	FlexObjectState
 ) {
 	"use strict";
 
@@ -95,8 +99,21 @@ sap.ui.define([
 		async switchVariant(mPropertyBag) {
 			var mChangesToBeSwitched = getControlChangesForVariantSwitch(mPropertyBag);
 
-			await Reverter.revertMultipleChanges(mChangesToBeSwitched.changesToBeReverted, mPropertyBag);
-			await Applier.applyMultipleChanges(mChangesToBeSwitched.changesToBeApplied, mPropertyBag);
+			const oLiveDependencyMap = FlexObjectState.getLiveDependencyMap(mPropertyBag.reference);
+
+			// Early setting the changes as queued for revert/apply prevents potential timing issues
+			// when e.g. evaluating the App State after the switch
+			mChangesToBeSwitched.changesToBeReverted.forEach((oChange) => oChange.setQueuedForRevert());
+			mChangesToBeSwitched.changesToBeApplied.forEach((oChange) => {
+				if (!oChange.isApplyProcessFinished()) {
+					oChange.setQueuedForApply();
+					// Add change to the dependency map in advance so that any dependent changes are aware of the change
+					DependencyHandler.addRuntimeChangeToMap(oChange, mPropertyBag.appComponent, oLiveDependencyMap);
+				}
+			});
+
+			await Reverter.revertMultipleChanges(mChangesToBeSwitched.changesToBeReverted, {...mPropertyBag, skipSetQueued: true});
+			await Applier.applyMultipleChanges(mChangesToBeSwitched.changesToBeApplied, {...mPropertyBag, skipSetQueued: true});
 			VariantManagementState.setCurrentVariant(mPropertyBag);
 		}
 

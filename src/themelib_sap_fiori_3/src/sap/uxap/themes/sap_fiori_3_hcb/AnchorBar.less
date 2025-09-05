@@ -97,24 +97,14 @@ html .sapUxAPObjectPageLayout-Std-Desktop .sapUxAPAnchorBar.sapMTB
 // Gradient mask
 .sapUxAPAnchorBar.sapUxAPAnchorBarScrollLeft .anchorBarArrowLeft,
 html[dir=rtl] .sapUxAPAnchorBar.sapUxAPAnchorBarScrollRight .anchorBarArrowRight {
-	background: -moz-linear-gradient(left, @sapUiObjectHeaderBackground 0%, @sapUiObjectHeaderBackground 75%, fade(@sapUiObjectHeaderBackground, 0) 100%); /* FF3.6+ */
-	background: -ms-linear-gradient(left, @sapUiObjectHeaderBackground 0%, @sapUiObjectHeaderBackground 75%, fade(@sapUiObjectHeaderBackground, 0) 100%); /* IE10+ */
 	background: -webkit-gradient(linear, left top, right top, color-stop(0%, @sapUiObjectHeaderBackground), color-stop(75%, @sapUiObjectHeaderBackground), color-stop(100%, fade(@sapUiObjectHeaderBackground, 0))); /* Chrome,Safari4+ */
-	background: -webkit-linear-gradient(left, @sapUiObjectHeaderBackground 0%, @sapUiObjectHeaderBackground 75%, fade(@sapUiObjectHeaderBackground, 0) 100%); /* Chrome10+,Safari5.1+ */
 	background: linear-gradient(to right, @sapUiObjectHeaderBackground 0%, @sapUiObjectHeaderBackground 75%, fade(@sapUiObjectHeaderBackground, 0) 100%); /* W3C */
-	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#000000', endColorstr='#00000000', GradientType=1); /* IE6-9 */
-	box-shadow: inset 0 -0.125rem @sapUiObjectHeaderBorderColor;
 }
 
 .sapUxAPAnchorBar.sapUxAPAnchorBarScrollRight .anchorBarArrowRight,
 html[dir=rtl] .sapUxAPAnchorBar.sapUxAPAnchorBarScrollLeft .anchorBarArrowLeft {
-	background: -moz-linear-gradient(left, fade(@sapUiObjectHeaderBackground, 0) 0%, @sapUiObjectHeaderBackground 25%, @sapUiObjectHeaderBackground 100%); /* FF3.6+ */
-	background: -ms-linear-gradient(left, fade(@sapUiObjectHeaderBackground, 0) 0%, @sapUiObjectHeaderBackground 25%, @sapUiObjectHeaderBackground 100%); /* IE10+ */
 	background: -webkit-gradient(linear, left top, right top, color-stop(0%, fade(@sapUiObjectHeaderBackground, 0)), color-stop(25%, @sapUiObjectHeaderBackground), color-stop(100%, @sapUiObjectHeaderBackground)); /* Chrome,Safari4+ */
-	background: -webkit-linear-gradient(left, fade(@sapUiObjectHeaderBackground, 0) 0%, @sapUiObjectHeaderBackground 25%, @sapUiObjectHeaderBackground 100%); /* Chrome10+,Safari5.1+ */
 	background: linear-gradient(to right, fade(@sapUiObjectHeaderBackground, 0) 0%, @sapUiObjectHeaderBackground 25%, @sapUiObjectHeaderBackground 100%); /* W3C */
-	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#00000000', endColorstr='#000000', GradientType=1); /* IE6-9 */
-	box-shadow: inset 0 -0.125rem @sapUiObjectHeaderBorderColor;
 }
 
 /*********************/
@@ -128,28 +118,8 @@ html[dir=rtl] .sapUxAPAnchorBar.sapUxAPAnchorBarScrollLeft .anchorBarArrowLeft {
 
 /* OVERVIEW BUTTON IE, Edge focus fix */
 /* TODO remove after the end of support for Internet Explorer */
-html[data-sap-ui-browser^="ie"],
-html[data-sap-ui-browser^="ed"] {
-	.sapUxAPAnchorBar.sapUxAPAnchorBarOverflow .sapUxAPHierarchicalSelect.sapMSltIconOnly:not(.sapMSltPressed):focus,
-	.sapUxAPAnchorBar.sapUxAPAnchorBarOverflow .sapUxAPHierarchicalSelect.sapMSltIconOnly:not(.sapMSltExpanded):active,
-	.sapUxAPAnchorBar.sapUxAPAnchorBarOverflow .sapUxAPHierarchicalSelect.sapMSltIconOnly.sapMSltPressed:not(.sapMSltExpanded) {
-		right: -28px;
-		overflow: visible;
-		&:before {
-			border: 0 none;
-		}
-	}
-}
 
 /* TODO remove after the end of support for Internet Explorer */
-html[data-sap-ui-browser^="ie"] .sapUiSizeCompact .sapUxAPObjectPageLayout-Std-Tablet,
-html[data-sap-ui-browser^="ed"] .sapUiSizeCompact .sapUxAPObjectPageLayout-Std-Tablet{
-	.sapUxAPAnchorBar.sapUxAPAnchorBarOverflow .sapUxAPHierarchicalSelect.sapMSltIconOnly:not(.sapMSltPressed):focus .sapMSltIcon,
-	.sapUxAPAnchorBar.sapUxAPAnchorBarOverflow .sapUxAPHierarchicalSelect.sapMSltIconOnly:not(.sapMSltExpanded):active .sapMSltIcon,
-	.sapUxAPAnchorBar.sapUxAPAnchorBarOverflow .sapUxAPHierarchicalSelect.sapMSltIconOnly.sapMSltPressed:not(.sapMSltExpanded) .sapMSltIcon {
-		top: 0.5rem;
-	}
-}
 
 // Scroll buttons
 .sapUiSizeCompact .sapUxAPAnchorBar.sapUxAPAnchorBarScrollLeft .anchorBarArrow .sapMBtn,
