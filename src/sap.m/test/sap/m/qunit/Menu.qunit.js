@@ -1058,6 +1058,29 @@ sap.ui.define([
 
 	});
 
+	QUnit.test("MenuWrapper respects sapUiSizeCompact class", async function (assert) {
+		var _bSetCompact = false;
+
+		// Arrange
+		if (!document.body.classList.contains("sapUiSizeCompact")) {
+			document.body.classList.add("sapUiSizeCompact");
+			_bSetCompact = true;
+		}
+
+		await nextUIUpdate(this.clock);
+		var oMenuWrapper = this.oMenu._getMenuWrapper();
+
+		this.oMenu.openBy(document.body);
+		await nextUIUpdate(this.clock);
+
+		assert.ok(oMenuWrapper.hasStyleClass("sapUiSizeCompact"), "menu wrapper has 'sapUiSizeCompact' class");
+
+		// clean up
+		if (_bSetCompact) {
+			document.body.classList.remove("sapUiSizeCompact");
+		}
+	});
+
 	QUnit.test("Menu style classes are propagated to inner submenus", async function (assert) {
 		// Arrange
 		var sCustomClass = "customClass";

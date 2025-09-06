@@ -2775,11 +2775,39 @@
             }
           ]
         },
+        "state": {
+          "description": "Defines the state of the icon",
+          "oneOf": [
+            {
+              "$ref": "#/$defs/state"
+            },
+            {
+              "$ref": "#/$defs/simpleBinding"
+            }
+          ]
+        },
         "visible": {
           "description": "Visibility of the icon",
           "$ref": "#/$defs/visibility"
         }
-      }
+      },
+      "allOf": [
+        {
+          "anyOf": [
+            { "required": ["src"] },
+            { "required": ["initials"] },
+            { "required": ["state"] }
+          ]
+        },
+        {
+          "not": {
+            "anyOf": [
+              { "required": ["src", "state"] },
+              { "required": ["initials", "state"] }
+            ]
+          }
+        }
+      ]
     },
     "minHeight": {
       "description": "Defines the min-height of the Content as a CSS value",

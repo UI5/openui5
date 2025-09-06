@@ -3,12 +3,13 @@
  */
 
 // Provides renderer helper for sap.f.cards.BaseHeader
-sap.ui.define([], function () {
+sap.ui.define(["sap/ui/core/library"], function (coreLibrary) {
 	"use strict";
 
 	const BaseHeaderRenderer = {
 		apiVersion: 2
 	};
+	const ValueState = coreLibrary.ValueState;
 
 	BaseHeaderRenderer.render = function (oRm, oHeader) {
 		const oToolbar = oHeader.getToolbar();
@@ -16,6 +17,13 @@ sap.ui.define([], function () {
 		const bHasStatus = oHeader.getStatusVisible();
 		const bHasDataTimestamp = oHeader.getDataTimestamp() || oBindingInfos.dataTimestamp;
 		const bHasNumericPart = this.hasNumericPart(oHeader);
+		const bIconVisible = oHeader.getIconVisible();
+		const bHasIconSrc = oHeader.getIconSrc();
+
+		let oIconState;
+		if (typeof oHeader.getIconState === "function") {
+			oIconState = oHeader.getIconState();
+		}
 
 		oRm.openStart("div", oHeader)
 			.class("sapFCardHeader");
@@ -26,7 +34,8 @@ sap.ui.define([], function () {
 			oRm.class("sapFCardHeaderLoading");
 		}
 
-		if (oHeader.getIconSrc() && oHeader.getIconVisible()) {
+		const bHasIconState = oIconState && oIconState !== ValueState.None;
+		if (bIconVisible && (bHasIconSrc || bHasIconState)) {
 			oRm.class("sapFCardHeaderHasIcon");
 		}
 
@@ -218,9 +227,17 @@ sap.ui.define([], function () {
 	BaseHeaderRenderer.renderAvatar = function (oRm, oHeader) {
 		var oAvatar = oHeader.getAggregation("_avatar"),
 			oBindingInfos = oHeader.mBindingInfos,
-			bIconVisible = oHeader.shouldShowIcon();
+			bIconVisible = oHeader.shouldShowIcon(),
+			bHasIconPropertySet = !oHeader.isPropertyInitial("iconSrc") || !oHeader.isPropertyInitial("iconInitials"),
+			oIconState;
 
-		if (bIconVisible && (!oHeader.isPropertyInitial("iconSrc") || !oHeader.isPropertyInitial("iconInitials"))) {
+		if (typeof oHeader.getIconState === "function") {
+			oIconState = oHeader.getIconState();
+		}
+
+		const bHasIconState = oIconState && oIconState !== ValueState.None;
+
+		if (bIconVisible && (bHasIconPropertySet || bHasIconState)) {
 			oRm.openStart("div")
 				.class("sapFCardHeaderImage")
 				.openEnd();
@@ -228,6 +245,11 @@ sap.ui.define([], function () {
 			if (oBindingInfos.iconSrc && oBindingInfos.iconSrc.binding && !oBindingInfos.iconSrc.binding.getValue()) {
 				oAvatar.addStyleClass("sapFCardHeaderItemBinded");
 			}
+
+			if (oIconState != ValueState.None) {
+				oAvatar.addStyleClass("sapFCardHeaderImageState" + oIconState);
+			}
+
 			oRm.renderControl(oAvatar);
 			oRm.renderControl(oHeader._oAriaAvatarText);
 			oRm.close("div");

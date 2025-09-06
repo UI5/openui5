@@ -399,6 +399,326 @@
 					}
 				}
 			}
+		},
+		"errorIconStateHeader": {
+			"_version": "1.79.0",
+			"sap.app": {
+				"id": "card.explorer.header.message.icon.card",
+				"type": "card",
+				"title": "Sample of a card with message icon in the header",
+				"subtitle": "Sample of a card with message icon in the header",
+				"applicationVersion": {
+					"version": "1.0.0"
+				},
+				"shortTitle": "A short title for this Card",
+				"info": "Additional information about this Card",
+				"description": "A long description for this Card",
+				"tags": {
+					"keywords": [
+						"Header",
+						"Message icon",
+						"Icon",
+						"Sample"
+					]
+				}
+			},
+			"sap.card": {
+				"type": "List",
+				"header": {
+					"title": "{parameters>/title/value}",
+					"subtitle": "{parameters>/subtitle/value}",
+					"icon": {
+						"state": "Error"
+					},
+					"status": {
+						"text": "{parameters>/maxItems/value} of 20"
+					}
+				},
+				"configuration": {
+					"parameters": {
+						"title": {
+							"value": "Problematic Products"
+						},
+						"subtitle": {
+							"value": "These products have errors"
+						},
+						"maxItems": {
+							"value": 4
+						}
+					}
+				},
+				"content": {
+					"data": {
+						"json": [{
+								"Name": "Comfort Easy",
+								"Description": "32 GB Digital Assistant with high-resolution color screen",
+								"Highlight": "Error"
+							},
+							{
+								"Name": "ITelO Vault",
+								"Description": "Digital Organizer with State-of-the-Art Storage Encryption",
+								"Highlight": "Error"
+							},
+							{
+								"Name": "Notebook Professional 15",
+								"Description": "Notebook Professional 15 with 2,80 GHz quad core, 15\" Multitouch LCD, 8 GB DDR3 RAM, 500 GB SSD - DVD-Writer (DVD-R/+R/-RW/-RAM),Windows 8 Pro",
+								"Highlight": "Error"
+							},
+							{
+								"Name": "Ergo Screen E-I",
+								"Description": "Optimum Hi-Resolution max. 1920 x 1080 @ 85Hz, Dot Pitch: 0.27mm",
+								"Highlight": "Error"
+							}
+						]
+					},
+					"maxItems": "{parameters>/maxItems/value}",
+					"item": {
+						"title": "{Name}",
+						"description": "{Description}",
+						"highlight": "{Highlight}"
+					}
+				}
+			}
+		},
+		"warningIconStateHeader": {
+			"_version": "1.79.0",
+			"sap.app": {
+				"id": "card.explorer.header.message.icon.card",
+				"type": "card",
+				"title": "Sample of a card with message icon in the header",
+				"subtitle": "Sample of a card with message icon in the header",
+				"applicationVersion": {
+					"version": "1.0.0"
+				},
+				"shortTitle": "A short title for this Card",
+				"info": "Additional information about this Card",
+				"description": "A long description for this Card",
+				"tags": {
+					"keywords": [
+						"Header",
+						"Message icon",
+						"Icon",
+						"Sample"
+					]
+				}
+			},
+			"sap.card": {
+				"type": "List",
+				"header": {
+					"title": "{parameters>/title/value}",
+					"subtitle": "{parameters>/subtitle/value}",
+					"icon": {
+						"state": "Warning"
+					},
+					"status": {
+						"text": "{parameters>/maxItems/value} of 20"
+					}
+				},
+				"configuration": {
+					"parameters": {
+						"title": {
+							"value": "Expiring Products"
+						},
+						"subtitle": {
+							"value": "These products are about to expire"
+						},
+						"maxItems": {
+							"value": 4
+						}
+					}
+				},
+				"content": {
+					"data": {
+						"json": [{
+								"Name": "Comfort Easy",
+								"Description": "32 GB Digital Assistant with high-resolution color screen",
+								"Highlight": "Warning"
+							},
+							{
+								"Name": "ITelO Vault",
+								"Description": "Digital Organizer with State-of-the-Art Storage Encryption",
+								"Highlight": "Warning"
+							},
+							{
+								"Name": "Notebook Professional 15",
+								"Description": "Notebook Professional 15 with 2,80 GHz quad core, 15\" Multitouch LCD, 8 GB DDR3 RAM, 500 GB SSD - DVD-Writer (DVD-R/+R/-RW/-RAM),Windows 8 Pro",
+								"Highlight": "Warning"
+							},
+							{
+								"Name": "Ergo Screen E-I",
+								"Description": "Optimum Hi-Resolution max. 1920 x 1080 @ 85Hz, Dot Pitch: 0.27mm",
+								"Highlight": "Warning"
+							}
+						]
+					},
+					"maxItems": "{parameters>/maxItems/value}",
+					"item": {
+						"title": "{Name}",
+						"description": "{Description}",
+						"highlight": "{Highlight}"
+					}
+				}
+			}
+		},
+		"successIconStateHeader": {
+			"_version": "1.79.0",
+			"sap.app": {
+				"id": "card.explorer.header.message.icon.card",
+				"type": "card",
+				"title": "Sample of a card with message icon in the header",
+				"subtitle": "Sample of a card with message icon in the header",
+				"applicationVersion": {
+					"version": "1.0.0"
+				},
+				"shortTitle": "A short title for this Card",
+				"info": "Additional information about this Card",
+				"description": "A long description for this Card",
+				"tags": {
+					"keywords": [
+						"Header",
+						"Message icon",
+						"Icon",
+						"Sample"
+					]
+				}
+			},
+			"sap.card": {
+				"type": "List",
+				"header": {
+					"title": "{parameters>/title/value}",
+					"subtitle": "{parameters>/subtitle/value}",
+					"icon": {
+						"state": "Success"
+					},
+					"status": {
+						"text": "{parameters>/maxItems/value} of 20"
+					}
+				},
+				"configuration": {
+					"parameters": {
+						"title": {
+							"value": "List Card with Top 4 Products"
+						},
+						"subtitle": {
+							"value": "These products are the best sellers this month"
+						},
+						"maxItems": {
+							"value": 4
+						}
+					}
+				},
+				"content": {
+					"data": {
+						"json": [{
+								"Name": "Comfort Easy",
+								"Description": "32 GB Digital Assistant with high-resolution color screen",
+								"Highlight": "Success"
+							},
+							{
+								"Name": "ITelO Vault",
+								"Description": "Digital Organizer with State-of-the-Art Storage Encryption",
+								"Highlight": "Success"
+							},
+							{
+								"Name": "Notebook Professional 15",
+								"Description": "Notebook Professional 15 with 2,80 GHz quad core, 15\" Multitouch LCD, 8 GB DDR3 RAM, 500 GB SSD - DVD-Writer (DVD-R/+R/-RW/-RAM),Windows 8 Pro",
+								"Highlight": "Success"
+							},
+							{
+								"Name": "Ergo Screen E-I",
+								"Description": "Optimum Hi-Resolution max. 1920 x 1080 @ 85Hz, Dot Pitch: 0.27mm",
+								"Highlight": "Success"
+							}
+						]
+					},
+					"maxItems": "{parameters>/maxItems/value}",
+					"item": {
+						"title": "{Name}",
+						"description": "{Description}",
+						"highlight": "{Highlight}"
+					}
+				}
+			}
+		},
+		"informationIconStateHeader": {
+			"_version": "1.79.0",
+			"sap.app": {
+				"id": "card.explorer.header.message.icon.card",
+				"type": "card",
+				"title": "Sample of a card with message icon in the header",
+				"subtitle": "Sample of a card with message icon in the header",
+				"applicationVersion": {
+					"version": "1.0.0"
+				},
+				"shortTitle": "A short title for this Card",
+				"info": "Additional information about this Card",
+				"description": "A long description for this Card",
+				"tags": {
+					"keywords": [
+						"Header",
+						"Message icon",
+						"Icon",
+						"Sample"
+					]
+				}
+			},
+			"sap.card": {
+				"type": "List",
+				"header": {
+					"title": "{parameters>/title/value}",
+					"subtitle": "{parameters>/subtitle/value}",
+					"icon": {
+						"state": "Information"
+					},
+					"status": {
+						"text": "{parameters>/maxItems/value} of 20"
+					}
+				},
+				"configuration": {
+					"parameters": {
+						"title": {
+							"value": "Available Products"
+						},
+						"subtitle": {
+							"value": "These products are available this month"
+						},
+						"maxItems": {
+							"value": 4
+						}
+					}
+				},
+				"content": {
+					"data": {
+						"json": [{
+								"Name": "Comfort Easy",
+								"Description": "32 GB Digital Assistant with high-resolution color screen",
+								"Highlight": "Information"
+							},
+							{
+								"Name": "ITelO Vault",
+								"Description": "Digital Organizer with State-of-the-Art Storage Encryption",
+								"Highlight": "Information"
+							},
+							{
+								"Name": "Notebook Professional 15",
+								"Description": "Notebook Professional 15 with 2,80 GHz quad core, 15\" Multitouch LCD, 8 GB DDR3 RAM, 500 GB SSD - DVD-Writer (DVD-R/+R/-RW/-RAM),Windows 8 Pro",
+								"Highlight": "Information"
+							},
+							{
+								"Name": "Ergo Screen E-I",
+								"Description": "Optimum Hi-Resolution max. 1920 x 1080 @ 85Hz, Dot Pitch: 0.27mm",
+								"Highlight": "Information"
+							}
+						]
+					},
+					"maxItems": "{parameters>/maxItems/value}",
+					"item": {
+						"title": "{Name}",
+						"description": "{Description}",
+						"highlight": "{Highlight}"
+					}
+				}
+			}
 		}
 	},
 	"splitter": {

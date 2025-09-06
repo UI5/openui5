@@ -153,6 +153,12 @@ sap.ui.define([
 		});
 	};
 
+	MenuWrapper.prototype.onAfterRendering = function() {
+		if (document.body.classList.contains("sapUiSizeCompact") || this.hasStyleClass("sapUiSizeCompact") || this.getDomRef()?.closest(".sapUiSizeCompact")) {
+			this.addStyleClass("sapUiSizeCompact");
+		}
+	};
+
 	MenuWrapper.prototype.onmouseover = function(oEvent) {
 		const oItem = this.getItemByDomRef(oEvent.target);
 

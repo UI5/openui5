@@ -406,9 +406,31 @@
 }
 
 .sapFCardHeader .sapFCardIcon.sapFAvatar {
-	margin-right: 0.75rem;
+	margin-right: 0.5rem;
 
 	&:not(.sapFAvatarImage):not(.sapFAvatarInitials) {
 		border: none;
 	}
+}
+
+.sapFAvatar[class*="sapFCardHeaderImageState"] {
+    background-color: transparent;
+    font-size: 2rem;
+    color: var(--avatar-state-color);
+}
+
+.sapFAvatar.sapFCardHeaderImageStateError {
+    --avatar-state-color: var(--sapNegativeElementColor);
+}
+
+.sapFAvatar.sapFCardHeaderImageStateWarning {
+    --avatar-state-color: var(--sapCriticalElementColor);
+}
+
+.sapFAvatar.sapFCardHeaderImageStateInformation {
+    --avatar-state-color: var(--sapInformativeElementColor);
+}
+
+.sapFAvatar.sapFCardHeaderImageStateSuccess {
+    --avatar-state-color: var(--sapPositiveElementColor);
 }

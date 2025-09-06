@@ -374,6 +374,104 @@ sap.ui.define([
 		assert.ok(oNumericPartDomRef.classList.contains("sapFCardHeaderLastPart"), "Numeric part has correct class applied");
 	});
 
+	QUnit.test("Header with icon state - Error", async function (assert) {
+		const oHeader = new CardHeader({
+			iconState: "Error"
+		}),
+			oCard = new Card({
+				header: oHeader
+			});
+
+		oCard.placeAt(DOM_RENDER_LOCATION);
+		await nextUIUpdate();
+
+		const oAvatar = oHeader.getAggregation("_avatar").getDomRef();
+
+		assert.ok(oAvatar, "The avatar is created.");
+		assert.ok(oAvatar.classList.contains("sapFCardHeaderImageStateError"), "The sapFCardHeaderImageStateError class is correctly set.");
+
+		oCard.destroy();
+		await nextUIUpdate();
+	});
+
+	QUnit.test("Header with icon state - Warning", async function (assert) {
+		const oHeader = new CardHeader({
+			iconState: "Warning"
+		}),
+			oCard = new Card({
+				header: oHeader
+			});
+
+		oCard.placeAt(DOM_RENDER_LOCATION);
+		await nextUIUpdate();
+
+		const oAvatar = oHeader.getAggregation("_avatar").getDomRef();
+
+		assert.ok(oAvatar, "The avatar is created.");
+		assert.ok(oAvatar.classList.contains("sapFCardHeaderImageStateWarning"), "The sapFCardHeaderImageStateWarning class is correctly set.");
+
+		oCard.destroy();
+		await nextUIUpdate();
+	});
+
+	QUnit.test("Header with icon state - Success", async function (assert) {
+		const oHeader = new CardHeader({
+			iconState: "Success"
+		}),
+			oCard = new Card({
+				header: oHeader
+			});
+
+		oCard.placeAt(DOM_RENDER_LOCATION);
+		await nextUIUpdate();
+
+		const oAvatar = oHeader.getAggregation("_avatar").getDomRef();
+
+		assert.ok(oAvatar, "The avatar is created.");
+		assert.ok(oAvatar.classList.contains("sapFCardHeaderImageStateSuccess"), "The sapFCardHeaderImageStateSuccess class is correctly set.");
+
+		oCard.destroy();
+		await nextUIUpdate();
+	});
+
+	QUnit.test("Header with icon state - Information", async function (assert) {
+		const oHeader = new CardHeader({
+			iconState: "Information"
+		}),
+			oCard = new Card({
+				header: oHeader
+			});
+
+		oCard.placeAt(DOM_RENDER_LOCATION);
+		await nextUIUpdate();
+
+		const oAvatar = oHeader.getAggregation("_avatar").getDomRef();
+
+		assert.ok(oAvatar, "The avatar is created.");
+		assert.ok(oAvatar.classList.contains("sapFCardHeaderImageStateInformation"), "The sapFCardHeaderImageStateInformation class is correctly set.");
+
+		oCard.destroy();
+		await nextUIUpdate();
+	});
+
+	QUnit.test("Default Header with state and iconVisibility false", async function (assert) {
+		// Arrange
+		const oHeader = new CardHeader({
+			iconState: "Information",
+			iconVisible: false
+		});
+
+		// Act
+		oHeader.placeAt(DOM_RENDER_LOCATION);
+		await nextUIUpdate();
+
+		// Assert
+		assert.strictEqual(!!oHeader.$().find(".sapFCardHeaderImage").length, false, "Icon is not visible");
+
+		// Clean up
+		oHeader.destroy();
+	});
+
 	QUnit.module("Headers press event");
 
 	QUnit.test("Press is fired on Enter keydown for numeric header", async function (assert) {

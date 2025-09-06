@@ -1632,6 +1632,30 @@ sap.ui.define([
 				]
 			},
 			{
+				title: 'Card Header',
+				icon: 'sap-icon://header',
+				key: 'cardHeader',
+				target: 'exploreOverview',
+				hasExpander: false,
+				hidden: !isDevelopmentBuild(),
+				items: [
+					{
+						title: 'Message Icon',
+						target: 'exploreSamples',
+						key: 'messageIcon',
+						messageIcon: true,
+						files: [
+							{
+								url: '/samples/header/messageIcon.json',
+								name: 'manifest.json',
+								key: 'manifest.json',
+								editable: true
+							}
+						]
+					}
+				]
+			},
+			{
 				title: 'Card Footer',
 				key: 'footer',
 				target: 'exploreSamples',

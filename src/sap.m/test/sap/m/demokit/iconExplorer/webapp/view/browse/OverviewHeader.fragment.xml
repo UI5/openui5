@@ -28,11 +28,15 @@
 					id="themePicker"
 					change="handleThemeSelection"
 					selectedKey="{view>/SelectedTheme}">
-					<core:ListItem  key="light" text="{i18n>APP_INFORMATION_BTN_APPEARANCE_LIGHT}" />
-					<core:ListItem  key="dark" text="{i18n>APP_INFORMATION_BTN_APPEARANCE_DARK}" />
-					<core:ListItem  key="hcb" text="{i18n>APP_INFORMATION_BTN_APPEARANCE_HCB}" />
-					<core:ListItem  key="hcw" text="{i18n>APP_INFORMATION_BTN_APPEARANCE_HCW}" />
-					<core:ListItem  key="auto" text="{i18n>APP_INFORMATION_BTN_APPEARANCE_AUTO}" />
+					<core:Item key="light" text="{i18n>APP_INFORMATION_BTN_APPEARANCE_HORIZON_LIGHT}" />
+					<core:Item key="dark" text="{i18n>APP_INFORMATION_BTN_APPEARANCE_HORIZON_DARK}" />
+					<core:Item key="hcw" text="{i18n>APP_INFORMATION_BTN_APPEARANCE_HORIZON_HCW}" />
+					<core:Item key="hcb" text="{i18n>APP_INFORMATION_BTN_APPEARANCE_HORIZON_HCB}" />
+					<core:Item key="auto" text="{i18n>APP_INFORMATION_BTN_APPEARANCE_AUTO}" />
+					<core:Item key="sap_fiori_3" text="{i18n>APP_INFORMATION_BTN_APPEARANCE_FIORI3_LIGHT}" />
+					<core:Item key="sap_fiori_3_dark" text="{i18n>APP_INFORMATION_BTN_APPEARANCE_FIORI3_DARK}" />
+					<core:Item key="sap_fiori_3_hcw" text="{i18n>APP_INFORMATION_BTN_APPEARANCE_FIORI3_HCW}" />
+					<core:Item key="sap_fiori_3_hcb" text="{i18n>APP_INFORMATION_BTN_APPEARANCE_FIORI3_HCB}" />
 				</Select>
 			</VBox>
 			<VBox
