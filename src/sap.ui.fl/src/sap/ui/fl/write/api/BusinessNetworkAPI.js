@@ -69,11 +69,13 @@ sap.ui.define([
 			generator: mPropertyBag.generator || "BusinessNetworkAPI.createVariant"
 		};
 
-		const aFlexObjects = [FlexObjectFactory.createFlVariant(mProperties).convertToFileContent()];
+		const aFlexObjects = [FlexObjectFactory.createFlVariant(mProperties)];
 
-		const oResponse = await Storage.write({
-			layer: mProperties.layer,
-			flexObjects: aFlexObjects
+		const oResponse = await Storage.condense({
+			layer: mPropertyBag.layer || Layer.CUSTOMER,
+			reference: mPropertyBag.reference,
+			allChanges: aFlexObjects,
+			condensedChanges: aFlexObjects
 		});
 		return oResponse.response;
 	};

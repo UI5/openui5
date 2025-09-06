@@ -530,6 +530,34 @@ function(
 		oStub.restore();
 	});
 
+	QUnit.test("'_isContentOverflowingFullscreenContainer' returns true when fullscreen content overflows into footer area", function (assert) {
+		//Arrange
+		var oContent = new Panel({height: "100%"});
+		this.oDynamicPage.setHeader(null); // not relevant for this test
+		this.oDynamicPage.setTitle(null); // not relevant for this test
+		this.oDynamicPage.setShowFooter(true); // footer is shown
+		this.oDynamicPage.setContent(oContent);
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+		var oNeedsVerticalScrollSpy = this.spy(this.oDynamicPage, "_needsVerticalScrollBar");
+		var oContentOverflowingFullscreenContainerSpy = this.spy(this.oDynamicPage, "_isContentOverflowingFullscreenContainer");
+		this.oDynamicPage._toggleScrollingStyles();
+
+		// Assert initial state
+		assert.ok(oContentOverflowingFullscreenContainerSpy.alwaysReturned(false), "'content does not overflow the fullscreen container");
+		assert.ok(oNeedsVerticalScrollSpy.alwaysReturned(false), "no scrollbar needed");
+		oContentOverflowingFullscreenContainerSpy.resetHistory();
+		oNeedsVerticalScrollSpy.resetHistory();
+
+		// Act - Simulate content overflowing into footer area
+		var oContentHeight = oContent.getDomRef().offsetHeight;
+		oContent.getDomRef().style.height = (oContentHeight + 30) + "px"; // increase content height to make it overflow into footer area
+		this.oDynamicPage._toggleScrollingStyles();
+
+		// Assert
+		assert.ok(oContentOverflowingFullscreenContainerSpy.alwaysReturned(true), "'content overflows the fullscreen container");
+		assert.ok(oNeedsVerticalScrollSpy.alwaysReturned(true), "scrollbar is needed");
+	});
+
 	QUnit.test("BCP: 1870261908 Header title cursor CSS reset is applied", function (assert) {
 		// Arrange
 		var $MainHeading = this.oDynamicPage.$().find(".sapFDynamicPageTitleMainHeading"),

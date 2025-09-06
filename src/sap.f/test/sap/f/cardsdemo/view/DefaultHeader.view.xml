@@ -106,6 +106,26 @@
 				width="320px"
 				class="sapUiSmallMargin" />
 			<w:Card
+				id="errorIconStateHeader"
+				manifest="{manifests>/defaultHeader/errorIconStateHeader}"
+				width="320px"
+				class="sapUiSmallMargin" />
+			<w:Card
+				id="warningIconStateHeader"
+				manifest="{manifests>/defaultHeader/warningIconStateHeader}"
+				width="320px"
+				class="sapUiSmallMargin" />
+			<w:Card
+				id="successIconStateHeader"
+				manifest="{manifests>/defaultHeader/successIconStateHeader}"
+				width="320px"
+				class="sapUiSmallMargin" />
+			<w:Card
+				id="informationIconStateHeader"
+				manifest="{manifests>/defaultHeader/informationIconStateHeader}"
+				width="320px"
+				class="sapUiSmallMargin" />
+			<w:Card
 				id="actionableHeader"
 				manifest="{manifests>/defaultHeader/actionableHeader}"
 				width="320px"

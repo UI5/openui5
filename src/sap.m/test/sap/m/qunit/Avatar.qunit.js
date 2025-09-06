@@ -256,6 +256,23 @@ sap.ui.define([
 		assert.strictEqual($oAvatarImageHolder.style.backgroundImage, sExpectedOutputImage, "correct style value");
 	});
 
+	QUnit.test("Avatar with src leading to an image and incorrect initials", async function (assert) {
+		this.oAvatar.setInitials("SRLAADADADADA");
+		this.oAvatar.setSrc(sImagePath);
+		await nextUIUpdate();
+
+		var $oAvatar = this.oAvatar.$();
+
+		// Assert
+		assert.ok($oAvatar.hasClass("sapFAvatarImage"), "Avatar types is Image when src is set even if initials are not valid");
+
+		this.oAvatar.invalidate();
+		await nextUIUpdate();
+
+		// Assert
+		assert.ok($oAvatar.hasClass("sapFAvatarImage"), "Avatar types is Image when src is set even if initials are not valid and Avatar is invalidated");
+	});
+
 	QUnit.test("Avatar with sync changed src property to invalid/valid has correct css style", async function (assert) {
 		var sExpectedOutputImage = 'url("' + sImagePath + '")',
 			sWrongPath = "wrong-image-path",

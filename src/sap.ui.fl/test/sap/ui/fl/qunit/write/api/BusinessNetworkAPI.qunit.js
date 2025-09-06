@@ -37,16 +37,14 @@ sap.ui.define([
 	const sVMR = "vmReference";
 
 	QUnit.module("BusinessNetworkAPI", {
-		beforeEach() {
-			sandbox.stub(Storage, "write").callsFake((mProperties) => {
-				return Promise.resolve({response: mProperties.flexObjects.map((oChange) => oChange)});
-			});
-		},
 		afterEach() {
 			sandbox.restore();
 		}
 	}, function() {
 		QUnit.test("when createAndSaveVariant is called", async function(assert) {
+			sandbox.stub(Storage, "condense").callsFake((mProperties) => {
+				return Promise.resolve({response: mProperties.allChanges.map((oChange) => oChange.convertToFileContent())});
+			});
 			const oResponse = await BusinessNetworkAPI.createAndSaveVariant({
 				variantManagementReference: "vmReference",
 				variantName: "foo",
