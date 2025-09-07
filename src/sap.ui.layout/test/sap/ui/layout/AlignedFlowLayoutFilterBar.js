@@ -24,28 +24,28 @@ sap.ui.define([
 					new Label({text: "Delivery Date", required: true}),
 					new DatePicker({width: "100%"})
 				]
-			}).addStyleClass("sapUiCompFilterBarItem"),
+			}).addStyleClass("sapUiMdcFilterBarLayoutItem"),
 
 			new VerticalLayout({
 				content: [
 					new Label({text: "Region", required: true}),
 					new Select({width: "100%"})
 				]
-			}).addStyleClass("sapUiCompFilterBarItem"),
+			}).addStyleClass("sapUiMdcFilterBarLayoutItem"),
 
 			new VerticalLayout({
 				content: [
 					new Label({text: "Other Date"}),
 					new DatePicker({width: "100%"})
 				]
-			}).addStyleClass("sapUiCompFilterBarItem"),
+			}).addStyleClass("sapUiMdcFilterBarLayoutItem"),
 
 			new VerticalLayout({
 				content: [
 					new Label({text: "Other State"}),
 					new Select({width: "100%"})
 				]
-			}).addStyleClass("sapUiCompFilterBarItem")
+			}).addStyleClass("sapUiMdcFilterBarLayoutItem")
 
 		],
 		endContent: [

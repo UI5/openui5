@@ -77,7 +77,7 @@ sap.ui.define([], () => {
 
 		const iSpacersCount = Math.max(4, aItems.length - 1);
 		for (let i = 0; i < iSpacersCount; i++) {
-			if (aItems[i]?.isA("sap.ui.mdc.filterbar.aligned.FilterItemLayout") || aItems[i]?.filterItem?.getVisibleInFilterBar()) { // TODO: handle the difference between comp and mdc
+			if (aItems[i]?.isA?.("sap.ui.mdc.filterbar.aligned.FilterItemLayout") || aItems[i]?.filterItem?.getVisibleInFilterBar()) { // TODO: handle the difference between comp and mdc
 				this.renderFilterItemSpacer(oRm, oFilterBar);
 			}
 		}
