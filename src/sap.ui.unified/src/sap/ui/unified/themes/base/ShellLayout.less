@@ -49,38 +49,29 @@
 .sapUiUfdShellAnim .sapUiUfdShellHead > div,
 .sapUiUfdShellAnim .sapUiUfdShellCurtain,
 .sapUiUfdShellAnim .sapUiUfdShellCanvas {
-	-webkit-transition-duration: @_sap_ui_unified_ShellLayout_AnimDuration;
 	transition-duration: @_sap_ui_unified_ShellLayout_AnimDuration;
 }
 
 .sapUiUfdShellAnim .sapUiUfdShellCanvas {
-	-webkit-transition-property: top;
 	transition-property: top;
 }
 
 .sapUiUfdShellAnim .sapUiUfdShellCurtain {
-	-webkit-transition-property: top, bottom;
 	transition-property: top, bottom;
 }
 
 .sapUiUfdShellAnim .sapUiUfdShellHead {
 	perspective: 400px;
-	-webkit-perspective: 400px;
-	-webkit-transition-property: top;
 	transition-property: top;
 }
 
 .sapUiUfdShellAnim .sapUiUfdShellHead > div {
-	-webkit-transform: rotateX(0);
-	-webkit-transform-origin: bottom center;
 	transform: rotateX(0);
 	transform-origin: bottom center;
-	-webkit-transition-property: opacity, -webkit-transform;
 	transition-property: opacity, transform;
 }
 
 .sapUiUfdShellAnim.sapUiUfdShellHeadHidden .sapUiUfdShellHead > div {
-	-webkit-transform: rotateX(90deg);
 	transform: rotateX(90deg);
 	opacity: 0.3;
 }

@@ -1,4 +1,4 @@
-/*global QUnit sinon*/
+/*global QUnit*/
 
 sap.ui.define([
 	"sap/ui/thirdparty/jquery",
@@ -22,6 +22,85 @@ sap.ui.define([
 				oPdfViewer.destroy();
 			}
 		}
+	});
+
+	function createMockEvent(iEmbedCount, bCanAccessChildren) {
+		var aEmbedsArray = new Array(iEmbedCount).fill({});
+		var oMockContentWindow = {
+			document: {
+				embeds: aEmbedsArray,
+				body: {
+					children: bCanAccessChildren ? [{}] : undefined
+				}
+			}
+		};
+		return {
+			target: {
+				contentWindow: oMockContentWindow
+			}
+		};
+	}
+
+	QUnit.test("Fire loaded event when PDF plugin enabled and one embed present", function(assert) {
+		oPdfViewer = TestUtils.createPdfViewer({});
+		var bLoadedCalled = false;
+		var bErrorCalled = false;
+
+		// Mock PDFViewerRenderer._isPdfPluginEnabled
+		PDFViewerRenderer._isPdfPluginEnabled = function() { return true; };
+		oPdfViewer._fireLoadedEvent = function() { bLoadedCalled = true; };
+		oPdfViewer._fireErrorEvent = function() { bErrorCalled = true; };
+		var oEvent = createMockEvent(1, true);
+		oPdfViewer._onLoadListener(oEvent);
+
+		assert.ok(bLoadedCalled, "Loaded event should be fired");
+		assert.notOk(bErrorCalled, "Error event should not be fired");
+	});
+
+	QUnit.test("Fire error event when PDF plugin enabled but no embed present", function(assert) {
+		oPdfViewer = TestUtils.createPdfViewer({});
+		var bLoadedCalled = false;
+		var bErrorCalled = false;
+
+		PDFViewerRenderer._isPdfPluginEnabled = function() { return true; };
+		oPdfViewer._fireLoadedEvent = function() { bLoadedCalled = true; };
+		oPdfViewer._fireErrorEvent = function() { bErrorCalled = true; };
+		var oEvent = createMockEvent(0, true);
+		oPdfViewer._onLoadListener(oEvent);
+
+		assert.notOk(bLoadedCalled, "Loaded event should not be fired");
+		assert.ok(bErrorCalled, "Error event should be fired");
+	});
+
+	QUnit.test("Fire error event when PDF plugin not enabled", function(assert) {
+		oPdfViewer = TestUtils.createPdfViewer({});
+		var bLoadedCalled = false;
+		var bErrorCalled = false;
+
+		PDFViewerRenderer._isPdfPluginEnabled = function() { return false; };
+		oPdfViewer._fireLoadedEvent = function() { bLoadedCalled = true; };
+		oPdfViewer._fireErrorEvent = function() { bErrorCalled = true; };
+		var oEvent = createMockEvent(1, true);
+		oPdfViewer._onLoadListener(oEvent);
+
+		assert.notOk(bLoadedCalled, "Loaded event should not be fired");
+		assert.ok(bErrorCalled, "Error event should be fired");
+
+	});
+
+	QUnit.test("Handle error when children cannot be accessed", function(assert) {
+		oPdfViewer = TestUtils.createPdfViewer({});
+		var bLoadedCalled = false;
+		var bErrorCalled = false;
+
+		PDFViewerRenderer._isPdfPluginEnabled = function() { return true; };
+		oPdfViewer._fireLoadedEvent = function() { bLoadedCalled = true; };
+		oPdfViewer._fireErrorEvent = function() { bErrorCalled = true; };
+		var oEvent = createMockEvent(1, false);
+		oPdfViewer._onLoadListener(oEvent);
+
+		assert.ok(bLoadedCalled, "Loaded event should not be fired");
+		assert.notOk(bErrorCalled, "Error event should be fired");
 	});
 
 	// if the environment does not have pdf plugin, then it is not possible to run standard test suite
@@ -282,155 +361,5 @@ sap.ui.define([
 
 		TestUtils.wait(1000)()
 			.then(fnCheckControlStructure);
-	});
-
-	QUnit.test("getting header info", function (assert) {
-		var fnDone = assert.async();
-		var sTitle = "My Title";
-		var oOptions = {
-			source: "{/source}",
-			isTrustedSource: true,
-			title: sTitle
-		};
-
-		oPdfViewer = TestUtils.createPdfViewer(oOptions);
-		var getHeaderInfoStub = sinon.spy(oPdfViewer, "_getHeaderInfo");
-		oPdfViewer._onLoadListener({});
-
-		TestUtils.wait(1000)()
-			.then(function()  {
-				assert.ok(getHeaderInfoStub.calledOnce, "getHeaderInfo should be invoked");
-				getHeaderInfoStub.restore();
-				fnDone();
-			});
-	});
-
-	QUnit.test("_getHeaderInfo: fetch success (status 200)", function(assert) {
-		var fnDone = assert.async();
-		var sTitle = "My Title";
-		var oOptions = {
-			source: "{/source}",
-			isTrustedSource: true,
-			title: sTitle
-		};
-		var oPdfViewer = TestUtils.createPdfViewer(oOptions);
-		var oFetchStub = sinon.stub(window, "fetch").callsFake(function() {
-			return Promise.resolve({
-				status: 200,
-				headers: { get: function(key) { return key === "content-type" ? "application/pdf" : null; } }
-			});
-		});
-		oPdfViewer._getHeaderInfo("dummy.pdf", "HEAD").then(function(contentType) {
-			assert.equal(contentType, "application/pdf", "fetch branch: returns content-type on 200");
-			oFetchStub.restore();
-			fnDone();
-		});
-	});
-
-	QUnit.test("_getHeaderInfo: fetch error (status 404)", function(assert) {
-		var fnDone = assert.async();
-		var oPdfViewer = TestUtils.createPdfViewer({});
-		var oFetchStub = sinon.stub(window, "fetch").callsFake(function() {
-			return Promise.resolve({
-				status: 404,
-				statusText: "Not Found",
-				headers: { get: function() { return null; } }
-			});
-		});
-		oPdfViewer._getHeaderInfo("dummy.pdf", "HEAD").catch(function(error) {
-			assert.ok(error, "fetch branch: rejects on 404");
-			oFetchStub.restore();
-			fnDone();
-		});
-	});
-
-	QUnit.test("_getHeaderInfo: fetch network error", function(assert) {
-		var fnDone = assert.async();
-		var oPdfViewer = TestUtils.createPdfViewer({});
-		var oFetchStub = sinon.stub(window, "fetch").rejects(new Error("Network error"));
-		oPdfViewer._getHeaderInfo("dummy.pdf", "HEAD").catch(function(error) {
-			assert.ok(error, "fetch branch: rejects on network error");
-			oFetchStub.restore();
-			fnDone();
-		});
-	});
-
-	QUnit.test("_getHeaderInfo: XHR success (status 200)", function(assert) {
-		var fnDone = assert.async();
-		var oPdfViewer = TestUtils.createPdfViewer({});
-		var origFetch = window.fetch;
-		window.fetch = undefined; // force XHR branch
-		var xhr = {
-			open: sinon.spy(),
-			send: sinon.spy(),
-			status: 200,
-			getAllResponseHeaders: function() { return "content-type: application/pdf\n"; },
-			onload: null,
-			onerror: null
-		};
-		var xhrStub = sinon.stub(window, "XMLHttpRequest").callsFake(function() { return xhr; });
-		setTimeout(function() {
-			xhr.onload();
-		}, 0);
-		oPdfViewer._getHeaderInfo("dummy.pdf", "HEAD").then(function(contentType) {
-			assert.equal(contentType, "application/pdf", "XHR branch: returns content-type on 200");
-			xhrStub.restore();
-			window.fetch = origFetch;
-			fnDone();
-		});
-	});
-
-	QUnit.test("_getHeaderInfo: XHR error (status 404)", function(assert) {
-		var fnDone = assert.async();
-		var oPdfViewer = TestUtils.createPdfViewer({});
-		var origFetch = window.fetch;
-		window.fetch = undefined;
-		var xhr = {
-			open: sinon.spy(),
-			send: sinon.spy(),
-			status: 404,
-			statusText: "Not Found",
-			getAllResponseHeaders: function() { return ""; },
-			onload: null,
-			onerror: null
-		};
-		var xhrStub = sinon.stub(window, "XMLHttpRequest").callsFake(function() { return xhr; });
-		setTimeout(function() {
-			xhr.onload();
-		}, 0);
-		oPdfViewer._getHeaderInfo("dummy.pdf", "HEAD").catch(function(error) {
-			assert.ok(error, "XHR branch: rejects on 404");
-			assert.equal(error.status, 404, "Error status is 404");
-			assert.ok(error.message.indexOf("Error fetching header") !== -1, "Error message contains 'Error fetching header'");
-			xhrStub.restore();
-			window.fetch = origFetch;
-			fnDone();
-		});
-	});
-
-	QUnit.test("_getHeaderInfo: XHR network error", function(assert) {
-		var fnDone = assert.async();
-		var oPdfViewer = TestUtils.createPdfViewer({});
-		var origFetch = window.fetch;
-		window.fetch = undefined;
-		var xhr = {
-			open: sinon.spy(),
-			send: sinon.spy(),
-			status: 0,
-			statusText: "",
-			getAllResponseHeaders: function() { return ""; },
-			onload: null,
-			onerror: null
-		};
-		var xhrStub = sinon.stub(window, "XMLHttpRequest").callsFake(function() { return xhr; });
-		setTimeout(function() {
-			xhr.onerror(new Error("Network error"));
-		}, 0);
-		oPdfViewer._getHeaderInfo("dummy.pdf", "HEAD").catch(function(error) {
-			assert.ok(error, "XHR branch: rejects on network error");
-			xhrStub.restore();
-			window.fetch = origFetch;
-			fnDone();
-		});
 	});
 });

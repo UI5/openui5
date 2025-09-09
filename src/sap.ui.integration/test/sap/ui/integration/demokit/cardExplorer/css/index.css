@@ -155,7 +155,6 @@ b {
 	position: absolute;
 	top: -178px;
 	right: -4%;
-	-webkit-animation: spin 40s linear infinite;
 	animation: spin 40s linear infinite;
 }
 
@@ -176,7 +175,6 @@ b {
 .blob-small {
 	position: absolute;
 	top: 1px;
-	-webkit-animation: spin 40s linear infinite;
 	animation: spin 40s linear infinite;
 }
 

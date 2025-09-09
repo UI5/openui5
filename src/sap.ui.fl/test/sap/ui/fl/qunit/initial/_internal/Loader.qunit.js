@@ -359,6 +359,29 @@ sap.ui.define([
 			assert.strictEqual(this.oCompleteFlexDataStub.callCount, 0, "the Storage.completeFlexData was not called");
 		});
 
+		QUnit.test("when getFlexData is called with the same allContextsProvided", async function(assert) {
+			FlexInfoSession.setByReference({
+				allContextsProvided: true
+			}, sReference);
+			await Loader.getFlexData({
+				manifest: this.oManifest,
+				reference: sReference,
+				componentData: oComponentData
+			});
+
+			FlexInfoSession.setByReference({
+				allContextsProvided: true
+			}, sReference);
+			const oFlexData2 = await Loader.getFlexData({
+				manifest: this.oManifest,
+				reference: sReference,
+				componentData: oComponentData
+			});
+			assert.deepEqual(oFlexData2.data.changes, this.oExpectedCompleteFlexDataResponse, "the Loader loads data");
+			assert.strictEqual(this.oLoadFlexDataStub.callCount, 1, "the Storage.loadFlexData was called only once");
+			assert.strictEqual(this.oCompleteFlexDataStub.callCount, 0, "the Storage.completeFlexData was not called");
+		});
+
 		QUnit.test("when Loader.setAllContextsProvided is called to change the value and loadFlexData is called again", async function(assert) {
 			// calling this before an initialized Cache the call will be ignored
 			Loader.setAllContextsProvided(sReference, true);

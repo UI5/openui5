@@ -525,8 +525,6 @@ code {
 }
 
 .titlesSpaceViewport {
-	-webkit-perspective: 50rem;
-	-webkit-perspective-origin: center 20rem;
 	perspective: 50rem;
 	perspective-origin: center 20rem;
 	width: 100%;
@@ -550,7 +548,6 @@ code {
 	color: rgb(74,214,236);
 	font-size: 1.25em;
 	font-weight: normal;
-	-webkit-animation: intro 6s linear 13s 1;
 	animation: intro 6s linear 13s 1;
 }
 
@@ -568,7 +565,6 @@ code {
 	letter-spacing: -0.05em;
 	text-shadow: -2px -2px 0 #ff6, 2px -2px 0 #ff6, -2px 2px 0 #ff6, 2px 2px 0 #ff6;
 	z-index: 1;
-	-webkit-animation: header 7s cubic-bezier(0.000, 0.730, 0.750, 0.750) 20s 1 normal forwards;
 	animation: header 7s cubic-bezier(0.000, 0.730, 0.750, 0.750) 20s 1 normal forwards;
 }
 
@@ -592,9 +588,7 @@ code {
 	font-size: 1.6em;
 	font-weight: bold;
 	opacity: 0;
-	-webkit-animation: text 120s linear 11s 1 normal forwards;
 	animation: text 120s linear 11s 1 normal forwards;
-	-webkit-transform-style: preserve-3d;
 	transform-style: preserve-3d;
 }
 
