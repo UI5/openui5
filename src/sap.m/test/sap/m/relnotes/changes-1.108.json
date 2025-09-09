@@ -1912,5 +1912,20 @@
         "text": " sap.m.SinglePlanningCalendar: appointments customData aggregation is written in DOM now"
       }
     ]
+  },
+  "1.108.44": {
+    "date": "September 2025",
+    "notes": [
+      {
+        "id": "ea46bd4bbb09612472e788c481d090b102a3eba5",
+        "type": "FIX",
+        "text": " We've now fixed the SAP gateway issues for PDFViewer"
+      },
+      {
+        "id": "f542d072454a661f99e128cccac79c52c4f183f7",
+        "type": "FIX",
+        "text": " sap.m.Button: has correct css parameters for active Emphasized"
+      }
+    ]
   }
 }

@@ -757,5 +757,15 @@
         "text": " sap.ui.core.format.NumberFormat: Invalid groupingSize configuration disables grouping"
       }
     ]
+  },
+  "1.108.44": {
+    "date": "September 2025",
+    "notes": [
+      {
+        "id": "45bf30cfd6f32071c0e8569bc1bb7b507d154f96",
+        "type": "FIX",
+        "text": " sap.ui.model.json.JSONPropertyBinding.js#checkUpdate: Fix logic to determine whether an update of the DataState has to be done"
+      }
+    ]
   }
 }

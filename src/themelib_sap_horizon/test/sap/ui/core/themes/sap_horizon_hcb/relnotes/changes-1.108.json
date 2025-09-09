@@ -561,5 +561,15 @@
         "text": " SAP-icons: fix icon 'eam-work-order' in v5"
       }
     ]
+  },
+  "1.108.44": {
+    "date": "September 2025",
+    "notes": [
+      {
+        "id": "f542d072454a661f99e128cccac79c52c4f183f7",
+        "type": "FIX",
+        "text": " sap.m.Button: has correct css parameters for active Emphasized"
+      }
+    ]
   }
 }
