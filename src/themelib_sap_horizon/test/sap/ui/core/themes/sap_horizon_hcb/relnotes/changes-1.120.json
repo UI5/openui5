@@ -321,5 +321,15 @@
         "text": " sap.f.DynamicPageTitle: Focus cutting is fixed"
       }
     ]
+  },
+  "1.120.35": {
+    "date": "September 2025",
+    "notes": [
+      {
+        "id": "7061f8ffd06c45e17f38ba7900e8e5fa3731cdec",
+        "type": "FIX",
+        "text": " sap.m.Button: has correct css parameters for active Emphasized"
+      }
+    ]
   }
 }

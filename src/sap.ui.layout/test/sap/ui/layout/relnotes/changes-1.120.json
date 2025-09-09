@@ -28,5 +28,15 @@
         "text": " ColumnLayout: render as <dl> in display mode"
       }
     ]
+  },
+  "1.120.35": {
+    "date": "September 2025",
+    "notes": [
+      {
+        "id": "a43b07926621dc0e59550c39b5ebadd329b97021",
+        "type": "FIX",
+        "text": " sap.ui.layout.PaneContainer: fix invalidation of nested panes"
+      }
+    ]
   }
 }

@@ -1038,5 +1038,20 @@
         "text": " sap.ui.model.json.JSONPropertyBinding.js#checkUpdate: Fix logic to determine whether an update of the DataState has to be done"
       }
     ]
+  },
+  "1.120.35": {
+    "date": "September 2025",
+    "notes": [
+      {
+        "id": "43eb27093ac0d358d98733fd5218470a6eada071",
+        "type": "FIX",
+        "text": " sap/ui/core/format/NumberFormat.js: support rounding of numbers given as string"
+      },
+      {
+        "id": "5c05c7cfd091b18c4fea2e876caaf8c80c150474",
+        "type": "FIX",
+        "text": " routing/History: avoid creating history entry when same hash is applied"
+      }
+    ]
   }
 }

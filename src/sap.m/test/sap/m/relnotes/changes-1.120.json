@@ -1301,5 +1301,20 @@
         "text": " List: Avoid aria-describedby=\"null\""
       }
     ]
+  },
+  "1.120.35": {
+    "date": "September 2025",
+    "notes": [
+      {
+        "id": "ce33644404d63cef8d7d76c93da7220e84baf3c2",
+        "type": "FIX",
+        "text": " We've now fixed the SAP gateway issues for PDFViewer"
+      },
+      {
+        "id": "7061f8ffd06c45e17f38ba7900e8e5fa3731cdec",
+        "type": "FIX",
+        "text": " sap.m.Button: has correct css parameters for active Emphasized"
+      }
+    ]
   }
 }
