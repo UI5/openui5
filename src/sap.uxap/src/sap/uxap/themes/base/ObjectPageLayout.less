@@ -197,11 +197,9 @@ body > .sapUxAPObjectPageLayout,
 
 html[data-sap-ui-animation='on'] .sapUxAPObjectPageLayout {
 	.sapUxAPObjectPageFloatingFooterShow {
-		-webkit-animation: bounceShow 0.35s forwards ease-in-out;
 		animation: bounceShow 0.35s forwards ease-in-out;
 	}
 	.sapUxAPObjectPageFloatingFooterHide {
-		-webkit-animation: bounceHide 0.35s forwards ease-in-out;
 		animation: bounceHide 0.35s forwards ease-in-out;
 	}
 
@@ -247,11 +245,6 @@ html[data-sap-ui-animation='on'] .sapUxAPObjectPageLayout {
 		}
 	}
 }
-/* Only on Windows 8 with IE 11 there's some weird incompatibility between the usage of the transform property
- in the sapMShell and the one in the objectPageWrapper.
- Also the z-index causes the scroll bars of the table to show in the headerTitle.
- For more information see internal incident 1670194272. */
- /* TODO remove after the end of support for Internet Explorer */
 
 .ui-helper-clearfix:before,
 .ui-helper-clearfix:after {

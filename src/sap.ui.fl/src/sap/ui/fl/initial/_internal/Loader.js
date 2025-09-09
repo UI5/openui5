@@ -227,7 +227,7 @@ sap.ui.define([
 			parameters: {
 				bundleNotLoaded: !!mPropertyBagCopy.skipLoadBundle,
 				version: mPropertyBagCopy.version,
-				allContextsProvided: mPropertyBagCopy.allContexts,
+				allContextsProvided: mPropertyBagCopy.allContextsProvided,
 				adaptationId: mPropertyBagCopy.adaptationId
 			}
 		};

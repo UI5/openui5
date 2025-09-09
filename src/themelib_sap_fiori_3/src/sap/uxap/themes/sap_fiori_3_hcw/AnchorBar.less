@@ -109,12 +109,14 @@ html .sapUxAPObjectPageLayout-Std-Desktop .sapUxAPAnchorBar.sapMTB
 html[dir=rtl] .sapUxAPAnchorBar.sapUxAPAnchorBarScrollRight .anchorBarArrowRight {
 	background: -webkit-gradient(linear, left top, right top, color-stop(0%, @sapUiObjectHeaderBackground), color-stop(75%, @sapUiObjectHeaderBackground), color-stop(100%, fade(@sapUiObjectHeaderBackground, 0))); /* Chrome,Safari4+ */
 	background: linear-gradient(to right, @sapUiObjectHeaderBackground 0%, @sapUiObjectHeaderBackground 75%, fade(@sapUiObjectHeaderBackground, 0) 100%); /* W3C */
+	box-shadow: inset 0 -0.125rem @sapUiObjectHeaderBorderColor;
 }
 
 .sapUxAPAnchorBar.sapUxAPAnchorBarScrollRight .anchorBarArrowRight,
 html[dir=rtl] .sapUxAPAnchorBar.sapUxAPAnchorBarScrollLeft .anchorBarArrowLeft {
 	background: -webkit-gradient(linear, left top, right top, color-stop(0%, fade(@sapUiObjectHeaderBackground, 0)), color-stop(25%, @sapUiObjectHeaderBackground), color-stop(100%, @sapUiObjectHeaderBackground)); /* Chrome,Safari4+ */
 	background: linear-gradient(to right, fade(@sapUiObjectHeaderBackground, 0) 0%, @sapUiObjectHeaderBackground 25%, @sapUiObjectHeaderBackground 100%); /* W3C */
+	box-shadow: inset 0 -0.125rem @sapUiObjectHeaderBorderColor;
 }
 
 /*********************/
@@ -126,10 +128,7 @@ html[dir=rtl] .sapUxAPAnchorBar.sapUxAPAnchorBarScrollLeft .anchorBarArrowLeft {
 	top: 0;
 }
 
-/* OVERVIEW BUTTON IE, Edge focus fix */
-/* TODO remove after the end of support for Internet Explorer */
 
-/* TODO remove after the end of support for Internet Explorer */
 
 // Scroll buttons
 .sapUiSizeCompact .sapUxAPAnchorBar.sapUxAPAnchorBarScrollLeft .anchorBarArrow .sapMBtn,

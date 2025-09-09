@@ -10,7 +10,6 @@
 }
 
 .sapMNavFlip {
-	-webkit-perspective: 1000;
 	perspective: 1000px;
 }
 
@@ -37,35 +36,29 @@ html[data-sap-ui-animation='on'] {
 
 	.sapMNavItem,
 	.sapMNavItem.sapMPage {
-		-webkit-transition-property: -webkit-transform;
 		transition-property: transform;
 	}
 
 	/* for slide animation */
 	.sapMNavItem.sapMNavItemCenter {
-		-webkit-transform: translate3d(0px, 0px, 0px);
 		transform: translate3d(0px, 0px, 0px);
 	}
 
 	.sapMNavItem.sapMNavItemSlideLeft {
-		-webkit-transform: translate3d(1rem, 0px, 0px);
 		transform: translate3d(1rem, 0px, 0px);
 	}
 
 	.sapMNavItem.sapMNavItemSlideRight {
-		-webkit-transform: translate3d(-1rem, 0px, 0px);
 		transform: translate3d(-1rem, 0px, 0px);
 	}
 
     /* for base slide animation */
 
 	.sapMNavItem.sapMNavItemSlideRightToCenter {
-		-webkit-animation: sapMNavItemAnimationRightToCenter .3s;
 		animation: sapMNavItemAnimationRightToCenter .3s;
 	}
 
     .sapMNavItem.sapMNavItemSlideCenterToLeft {
-        -webkit-animation: sapMNavItemAnimationCenterToLeft .3s;
         animation: sapMNavItemAnimationCenterToLeft .3s;
     }
 
@@ -108,43 +101,34 @@ html[data-sap-ui-animation='on'] {
 	/* for fade animation */
 
 	.sapMNavItem.sapMNavItemTransparent {
-		-webkit-transition-property: opacity, transform;
 		transition-property: opacity, transform;
 		opacity: 0;
 	}
 
 	.sapMNavItem.sapMNavItemOpaque {
-		-webkit-transition-property: opacity, transform;
 		transition-property: opacity, transform;
 		opacity: 1;
-		-webkit-transform: translate3d(0px, 0px, 0px);
 		transform: translate3d(0px, 0px, 0px);
 	}
 
 	.sapMNavItem.sapMNavItemFading {
-		-webkit-transition-duration: .15s;
 		transition-duration: .15s;
 	}
 
 	/* for flip animation */
 
 	.sapMNavItem.sapMNavItemFlipNext {
-		-webkit-transform: rotateY(180deg);
 		transform: rotateY(180deg);
-		-webkit-backface-visibility: hidden;
 		backface-visibility: hidden;
 	}
 
 	.sapMNavItem.sapMNavItemFlipPrevious {
-		-webkit-transform: rotateY(-180deg);
 		transform: rotateY(-180deg);
 		backface-visibility: hidden;
 	}
 
 	.sapMNavItem.sapMNavItemFlipping {
-		-webkit-transition-duration: .5s;
 		transition-duration: .5s;
-		-webkit-backface-visibility: hidden;
 		backface-visibility: hidden;
 	}
 
@@ -309,42 +293,34 @@ html[data-sap-ui-animation='on'] {
 	}
 
 	.sapMNavDoor {
-		-webkit-perspective: 1000;
 		perspective: 1000px;
-		-webkit-perspective-origin: 0% 50%;
 		perspective-origin: 0% 50%;
 	}
 
 	.sapMNavItem.sapMNavItemDoorInPrevious {
-		-webkit-animation: sapMNavItemDoorInPrevious .8s;
 		animation: sapMNavItemDoorInPrevious .8s;
 		visibility: hidden;
 		opacity: 0;
 	}
 
 	.sapMNavItem.sapMNavItemDoorInNext {
-		-webkit-animation: sapMNavItemDoorInNext .8s;
 		animation: sapMNavItemDoorInNext .8s;
 		visibility: visible;
 	}
 
 	.sapMNavItem.sapMNavItemDoorOutPrevious {
-		-webkit-animation: sapMNavItemDoorOutPrevious .8s;
 		animation: sapMNavItemDoorOutPrevious .8s;
 		visibility: hidden;
 		opacity: 0;
 	}
 
 	.sapMNavItem.sapMNavItemDoorOutNext {
-		-webkit-animation: sapMNavItemDoorOutNext .8s;
 		animation: sapMNavItemDoorOutNext .8s;
 		visibility: visible;
 	}
 
 	.sapMNavItem.sapMNavItemDooring {
-		-webkit-animation-timing-function: ease-out;
 		animation-timing-function: ease-out;
-		-webkit-transform-origin: 0% 50%;
 		transform-origin: 0% 50%;
 	}
 

@@ -194,12 +194,14 @@ html.sap-desktop .sapUxAPAnchorBar .sapMBtn:focus > .sapMFocusable {
 html[dir=rtl] .sapUxAPAnchorBar.sapUxAPAnchorBarScrollRight .anchorBarArrowRight {
 	background: -webkit-gradient(linear, left top, right top, color-stop(0%, @sapUiObjectHeaderBackground), color-stop(75%, @sapUiObjectHeaderBackground), color-stop(100%, fade(@sapUiObjectHeaderBackground, 0))); /* Chrome,Safari4+ */
 	background: linear-gradient(to right, @sapUiObjectHeaderBackground 0%, @sapUiObjectHeaderBackground 75%, fade(@sapUiObjectHeaderBackground, 0) 100%); /* W3C */
+	box-shadow: @sapUiFiori3AnchorBarBottomShadow;
 }
 
 .sapUxAPAnchorBar.sapUxAPAnchorBarScrollRight .anchorBarArrowRight,
 html[dir=rtl] .sapUxAPAnchorBar.sapUxAPAnchorBarScrollLeft .anchorBarArrowLeft {
 	background: -webkit-gradient(linear, left top, right top, color-stop(0%, fade(@sapUiObjectHeaderBackground, 0)), color-stop(25%, @sapUiObjectHeaderBackground), color-stop(100%, @sapUiObjectHeaderBackground)); /* Chrome,Safari4+ */
 	background: linear-gradient(to right, fade(@sapUiObjectHeaderBackground, 0) 0%, @sapUiObjectHeaderBackground 25%, @sapUiObjectHeaderBackground 100%); /* W3C */
+	box-shadow: @sapUiFiori3AnchorBarBottomShadow;
 }
 
 html[data-sap-ui-animation="on"] {
@@ -213,9 +215,7 @@ html[data-sap-ui-animation="on"] {
 	&.sapUxAPObjectPageLayout-Std-Desktop .sapUxAPAnchorBar:hover.sapUxAPAnchorBarScrollLeft .anchorBarArrow .sapMBtn,
 	&.sapUxAPObjectPageLayout-Std-Desktop .sapUxAPAnchorBar:hover.sapUxAPAnchorBarScrollRight .anchorBarArrow .sapMBtn {
 		opacity: 1;
-		-webkit-transition-property: opacity;
 		transition-property: opacity;
-		-webkit-transition-duration: 0.7s;
 		transition-duration: 0.7s;
 	}
 }
