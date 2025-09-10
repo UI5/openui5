@@ -30,7 +30,7 @@ sap.ui.define([
 	 * @param {object} mPropertyBag.view Root view
 	 * @returns {boolean} <true> if the change got applied successfully
 	 * @private
-	 * @ui5-restricted sap.ui.fl.apply.changes.Applyer
+	 * @ui5-restricted sap.ui.fl.apply.changes.Applier
 	 * @name sap.ui.fl.changeHandler.AddXML#applyChange
 	 */
 	AddXML.applyChange = function(oChange, oControl, mPropertyBag) {

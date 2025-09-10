@@ -323,6 +323,10 @@ sap.ui.define([
 				addMenuItems.call(this, this.oContextMenuControl, aPropagatedMenuItems, true);
 				// we have to distinguish between the mouse and the keyboard event
 				const oOpenerRef = (oEvent.type === "keyup") ? oOverlay : undefined;
+				// Set focus to the overlay before opening the context menu to ensure that the keyboard
+				// navigation works properly after closing, as the popover restores the focus
+				// to the last focused element before opening (which can be a non-selectable overlay).
+				oOverlay.focus();
 				this.oContextMenuControl.openAsContextMenu(oEvent, oOpenerRef);
 			}
 

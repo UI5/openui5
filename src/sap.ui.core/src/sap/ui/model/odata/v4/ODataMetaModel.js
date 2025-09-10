@@ -3367,12 +3367,17 @@ sap.ui.define([
 	/**
 	 * Requests the resulting value of the given annotation that contains dynamic expressions. If
 	 * <code>sMetaPath</code> contains one navigation property more than
-	 * <code>oContext.getPath()</code>, then that navigation property's "Partner" (if any) is used
-	 * as a prefix to be ignored in a path expression. This is useful in case of multi input where
-	 * <code>oContext</code> refers to an entity with a collection-valued navigation property
-	 * (being edited) and the annotation (ValueListRelevantQualifiers) refers to a structural
-	 * property of the target type and thus needs to refer <b>back</b> in order to evaluate the
-	 * entity's current state.
+	 * <code>oContext.getPath()</code>, then two cases are handled specially:
+	 * <ul>
+	 *   <li> If that navigation property is single-valued, then it is assumed to be part of the
+	 *     property binding and is thus *added* as a prefix for path expressions;
+	 *   <li> otherwise that navigation property's "Partner" (if any) is used as a prefix to be
+	 *     *ignored* in a path expression. This is useful in case of multi input where
+	 *     <code>oContext</code> refers to an entity with a collection-valued navigation property
+	 *     (being edited) and the annotation (ValueListRelevantQualifiers) refers to a structural
+	 *     property of the target type and thus needs to refer <b>back</b> in order to evaluate the
+	 *     entity's current state.
+	 * </ul>
 	 *
 	 * @param {object} vRawValue
 	 *   The raw value of an annotation
@@ -3387,14 +3392,18 @@ sap.ui.define([
 	 */
 	ODataMetaModel.prototype.requestValue4Annotation = function (vRawValue, sMetaPath, oContext) {
 		let oOverload;
+		let sPrefix;
 		const sContextMetaPath = _Helper.getMetaPath(oContext.getPath());
 		const iIndexOfNextSlash = sMetaPath.indexOf("/", sContextMetaPath.length + 1);
 		if (iIndexOfNextSlash > 0) { // there's at least one segment more
-			const sPartner = this.getObject(sMetaPath.slice(0, iIndexOfNextSlash) + "/$Partner");
-			if (sPartner) { // looks like a NavigationProperty with a "Partner"
+			const oNavigationProperty = this.getObject(sMetaPath.slice(0, iIndexOfNextSlash));
+			if (!oNavigationProperty.$isCollection) {
+				// Note: include trailing, but not leading slash
+				sPrefix = sMetaPath.slice(sContextMetaPath.length + 1, iIndexOfNextSlash + 1);
+			} else if (oNavigationProperty.$Partner) {
 				oOverload = { // fake overload to determine ignoreAsPrefix
 					$IsBound : true,
-					$Parameter : [{$Name : sPartner}]
+					$Parameter : [{$Name : oNavigationProperty.$Partner}]
 				};
 			}
 		}
@@ -3402,7 +3411,8 @@ sap.ui.define([
 		const oAny = new Any({
 			any : AnnotationHelper.value(vRawValue, {
 				context : this.createBindingContext(sMetaPath),
-				overload : oOverload
+				overload : oOverload,
+				prefix : sPrefix
 			}),
 			bindingContexts : oContext,
 			models : oContext.getModel()

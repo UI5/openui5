@@ -14,7 +14,7 @@ sap.ui.define([
 	"use strict";
 
 	/**
-	 * Delegator mediator to manage default delegators.
+	 * Module to manage delegates.
 	 *
 	 * @alias sap.ui.fl.apply._internal.DelegateMediator
 	 *
@@ -27,6 +27,7 @@ sap.ui.define([
 
 	let mModelSpecificDelegateItems = {};
 	let mControlSpecificDelegateItems = {};
+	let mAddXMLAdjustFragmentHandlers = {};
 
 	function getModelTypeForControl(oControl) {
 		const oModel = oControl.getModel?.();
@@ -133,7 +134,7 @@ sap.ui.define([
 
 	/**
 	 * Returns the model-specific read delegate for the requested control.
-	 * The instance-spcific read delegate is returned if available.
+	 * The instance-specific read delegate is returned if available.
 	 *
 	 * @param {sap.ui.core.Element} oControl - Control for which the corresponding delegate should be returned
 	 * @param {sap.ui.core.util.reflection.BaseTreeModifier} oModifier - Control tree modifier
@@ -190,6 +191,15 @@ sap.ui.define([
 	DelegateMediator.clear = function() {
 		mModelSpecificDelegateItems = {};
 		mControlSpecificDelegateItems = {};
+		mAddXMLAdjustFragmentHandlers = {};
+	};
+
+	DelegateMediator.registerAddXMLAdjustFragmentHandler = function(mPropertyBag) {
+		mAddXMLAdjustFragmentHandlers[mPropertyBag.key] = mPropertyBag.handler;
+	};
+
+	DelegateMediator.getAddXMLAdjustFragmentHandlers = function() {
+		return mAddXMLAdjustFragmentHandlers;
 	};
 
 	return DelegateMediator;

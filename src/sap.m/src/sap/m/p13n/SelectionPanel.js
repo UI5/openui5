@@ -713,7 +713,7 @@ sap.ui.define([
 				this._removeFactoryControl();
 			},
 			updateFinished: () => {
-				if (this._getShowFactory()) {
+				if (this._getShowFactory() && !this._bInactive) {
 					this._addFactoryControl();
 				}
 			}

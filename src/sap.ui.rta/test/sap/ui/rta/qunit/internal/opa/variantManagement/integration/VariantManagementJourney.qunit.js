@@ -46,7 +46,9 @@ sap.ui.define([
 	});
 
 	opaTest("I create a Change in context of the second VM control", (Given, When, Then) => {
-		When.onPageWithRTA.iRightClickOnAnElementOverlay(sTitleId)
+		// This extra click is necessary to avoid occasional timing issues with the context menu
+		When.onPageWithRTA.iClickOnAnElementOverlay(sTitleId)
+		.and.iRightClickOnAnElementOverlay(sTitleId)
 		.and.iClickOnAContextMenuEntryWithKey("CTX_REMOVE");
 
 		Then.onFlVariantManagement.theModifiedIndicatorShouldBeDisplayed(sContainedVMControlId);

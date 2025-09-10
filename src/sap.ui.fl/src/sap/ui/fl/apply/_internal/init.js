@@ -3,11 +3,13 @@
  */
 
 sap.ui.define([
-	"sap/ui/fl/initial/_internal/changeHandlers/ChangeHandlerRegistration",
-	"sap/ui/fl/changeHandler/ChangeAnnotation"
+	"sap/ui/fl/apply/_internal/DelegateMediator",
+	"sap/ui/fl/changeHandler/ChangeAnnotation",
+	"sap/ui/fl/initial/_internal/changeHandlers/ChangeHandlerRegistration"
 ], function(
-	ChangeHandlerRegistration,
-	ChangeAnnotation
+	DelegateMediator,
+	ChangeAnnotation,
+	ChangeHandlerRegistration
 ) {
 	"use strict";
 
@@ -26,5 +28,18 @@ sap.ui.define([
 	ChangeHandlerRegistration.registerAnnotationChangeHandler({
 		changeHandler: ChangeAnnotation,
 		isDefaultChangeHandler: true
+	});
+
+	DelegateMediator.registerReadDelegate({
+		modelType: "sap.ui.model.odata.v4.ODataModel",
+		delegate: "sap/ui/fl/write/_internal/delegates/ODataV4ReadDelegate"
+	});
+	DelegateMediator.registerReadDelegate({
+		modelType: "sap.ui.model.odata.v2.ODataModel",
+		delegate: "sap/ui/fl/write/_internal/delegates/ODataV2ReadDelegate"
+	});
+	DelegateMediator.registerReadDelegate({
+		modelType: "sap.ui.model.odata.ODataModel",
+		delegate: "sap/ui/fl/write/_internal/delegates/ODataV2ReadDelegate"
 	});
 });

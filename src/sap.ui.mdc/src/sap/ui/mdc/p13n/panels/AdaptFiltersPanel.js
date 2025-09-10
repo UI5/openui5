@@ -163,10 +163,12 @@ sap.ui.define([
 	 * @param {string} sKey
 	 */
 	AdaptFiltersPanel.prototype.switchView = function(sKey) {
+		if (!this._isCustomView(sKey)) {
+			// DINC0615996: "Deactivate" the current view - this will prevent events such as updateFinished to
+			this.getCurrentViewContent()._bInactive = true;
+		}
 
-		const sSwitchId = sKey;
-
-		AbstractContainer.prototype.switchView.call(this, sSwitchId);
+		AbstractContainer.prototype.switchView.call(this, sKey);
 
 		//Only allow show/hide non custom view
 		this._getShowHideBtn().setVisible(!this._isCustomView());
@@ -175,6 +177,7 @@ sap.ui.define([
 
 		//Factory logic should only be executed for non custom panels
 		if (!this._isCustomView(sKey)) {
+			this.getCurrentViewContent()._bInactive = false;
 			this.showFactory(this.getCurrentViewContent()._getShowFactory());
 		}
 

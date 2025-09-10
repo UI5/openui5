@@ -1512,11 +1512,12 @@ sap.ui.define([
 
 		$segmentedButton = oSegmentedButton.$();
 		assert.strictEqual($segmentedButton.attr("role"), "listbox", "Control has role 'listbox'");
-		assert.strictEqual($segmentedButton.attr("aria-multiselectable"), "true", "aria-multiselectable is set to 'true'");
+		assert.strictEqual($segmentedButton.attr("aria-multiselectable"), "false", "aria-multiselectable is set to 'false'");
 		assert.strictEqual($segmentedButton.attr("aria-roledescription"), oResourceBundle.getText("SEGMENTEDBUTTON_NAME"),
 			"Additional description for control's role is added");
 		assert.strictEqual($segmentedButton.attr("aria-describedby"), InvisibleText.getStaticId("sap.m", "SEGMENTEDBUTTON_SELECTION"),
 			"Tutor message for selection is added");
+		assert.strictEqual($segmentedButton.attr("aria-orientation"), "horizontal", "aria-orientation is set to 'horizontal'");
 
 		oSegmentedButton.destroy();
 		await nextUIUpdate(this.clock);

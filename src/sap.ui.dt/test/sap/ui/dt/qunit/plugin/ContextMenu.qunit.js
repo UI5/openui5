@@ -212,7 +212,11 @@ sap.ui.define([
 				const oEventParameter = this.oMenuSpy.getCall(1).args[0];
 				const oOpenerRefParameter = this.oMenuSpy.getCall(1).args[1];
 				assert.equal(oEventParameter.type, "keyup", "then the sap.m.Menu is called with correct event parameter (Keyboard event)");
-				assert.equal(oOpenerRefParameter, this.oButton2Overlay, "then the sap.m.Menu is called with correct openerRef parameter (Keyboard event)");
+				assert.equal(
+					oOpenerRefParameter,
+					this.oButton2Overlay,
+					"then the sap.m.Menu is called with correct openerRef parameter (Keyboard event)"
+				);
 
 				const aItems = oContextMenuControl.getItems();
 				// triggers menu item handler() on propagated item
@@ -721,6 +725,28 @@ sap.ui.define([
 			assert.equal(oAddMenuItemStub.args[0][0], oPlainMenuItem, "then addMenuItems is called with the plain menu item");
 			assert.equal(oAddMenuItemStub.args[1][0], oPropagatedMenuItem, "then addMenuItems is called with the propagated menu item");
 			sandbox.restore();
+		});
+
+		QUnit.test("When context menu is opened with mouse and closed, but the clicked element is not the overlay responsible for the menu", function(assert) {
+			const done = assert.async();
+
+			const onOpenedContextMenu = function(oEvent) {
+				const oMenu = oEvent.getSource().oContextMenuControl;
+				oMenu.close();
+				assert.ok(this.oButton2Overlay.hasFocus(), "then the focus is back on the overlay");
+				done();
+			};
+			this.oContextMenuPlugin.attachEventOnce("openedContextMenu", onOpenedContextMenu.bind(this));
+
+			// open the context menu with mouse click
+			this.oButton2Overlay.setSelected(true);
+			this.oButton2Overlay.getDomRef().dispatchEvent(new MouseEvent("click", {
+				clientX: 100,
+				clientY: 100
+			}));
+			// Simulate focus being on another control when menu is opened - e.g. the label of a group element
+			this.oButton1Overlay.focus();
+			this.clock.tick(50);
 		});
 	});
 
