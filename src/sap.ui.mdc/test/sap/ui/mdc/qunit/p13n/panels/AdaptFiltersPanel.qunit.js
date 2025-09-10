@@ -12,8 +12,9 @@ sap.ui.define([
 	"sap/ui/mdc/util/PropertyHelper",
 	"sap/m/VBox",
 	"sap/ui/test/utils/nextUIUpdate",
-	"sap/ui/model/Filter"
-], function(AdaptFiltersPanel, P13nBuilder, JSONModel, CustomListItem, Toolbar, Event, Text, List, SegmentedButtonItem, PropertyHelper, VBox, nextUIUpdate, Filter) {
+	"sap/ui/model/Filter",
+	"sap/m/Input"
+], function(AdaptFiltersPanel, P13nBuilder, JSONModel, CustomListItem, Toolbar, Event, Text, List, SegmentedButtonItem, PropertyHelper, VBox, nextUIUpdate, Filter, Input) {
 	"use strict";
 
 	const aVisible = ["key1", "key2", "key3"];
@@ -772,6 +773,53 @@ sap.ui.define([
 		//cleanups
 		this.oAFPanel._filterByModeAndSearch.restore();
 
+	});
+
+	QUnit.test("Check filter field visibility when switching views", async function(assert) {
+		const oControlMap = new Map();
+		this.oP13nData.items.forEach((oItem) => {
+			oControlMap.set(oItem.name, new Input());
+		});
+
+		this.oAFPanel.setItemFactory(function(oContext) {
+			return oControlMap.get(oContext.getProperty("name"));
+		});
+		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
+
+		await nextUIUpdate();
+
+		this.oAFPanel.setDefaultView("list");
+		this.oAFPanel.getView("list").getContent().showFactory(true); //Show the factory
+		this.oAFPanel.switchView("list");
+
+		await nextUIUpdate();
+
+		// Check if items are visible and have the correct parent
+		const oList = this.oAFPanel.getCurrentViewContent()._oListControl;
+		assert.ok(oList, "List is available");
+		assert.ok(oList.getDomRef(), "List is rendered");
+
+		let oItem = oList.getItems()[0];
+		let oInput = oItem.getCells()[0].getItems()[1];
+		assert.ok(oItem.getDomRef(), "List item is rendered");
+		assert.ok(oInput.isA("sap.m.Input"), "List item content is an Input field");
+		assert.ok(oInput.getDomRef(), "List item content is rendered");
+
+		// Switch to group view, by simulating press on SegmentedButton (this will fire updateFinished, similar to scrolling)
+		this.oAFPanel.switchView("group");
+		await nextUIUpdate();
+
+		const oGroupList = this.oAFPanel.getCurrentViewContent()._oListControl;
+		assert.ok(oGroupList, "Group List is available");
+		assert.ok(oGroupList.getDomRef(), "Group List is rendered");
+
+		oItem = oGroupList.getItems()[0].getContent()[0].getContent()[0].getItems()[0];
+
+		assert.ok(oItem.getContent().length > 1, "Group List Hbox has two items");
+
+		oInput = oItem.getContent()[1];
+		assert.ok(oInput.isA("sap.m.Input"), "Group List item content is an Input field");
+		assert.ok(oInput.getDomRef(), "Group List item content is rendered");
 	});
 
 	QUnit.module("'AdaptFiltersPanel' instance with a custom model name",{

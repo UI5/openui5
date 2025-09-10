@@ -2822,25 +2822,34 @@ sap.ui.define([
 	};
 
 	/**
-	 * Sets the "odata.continue-on-error" preference once for the <b>current</b> batch request
-	 * associated with the given group ID. This method can be called early on, when that batch queue
-	 * is still empty, or even synchronously after {@link #submitBatch} - just as long as the $batch
-	 * request is not already being sent to the server. It needs to be called again for future
-	 * batch requests with the same group ID.
+	 * Sets the "odata.continue-on-error" preference for the <b>current</b> batch request associated
+	 * with the given group ID. This method can be called early on, when the batch queue is still
+	 * empty, or even synchronously after {@link #submitBatch} - just as long as the $batch request
+	 * is not already being sent to the server. It needs to be called again for future batch
+	 * requests with the same group ID. It is safe to call it multiple times for the same batch
+	 * request.
+	 *
+	 * <b>Caution:</b> Make sure that no user input is lost due to a side-effects GET being applied
+	 * even after a failed PATCH. It's safe to use this method if, for example, only actions are
+	 * invoked or when {@link sap.ui.model.odata.v4.Context#setProperty} is used without
+	 * <code>bRetry</code> for mass updates.
 	 *
 	 * @param {string} sGroupId
-	 *   A valid group ID as specified in {@link sap.ui.model.odata.v4.ODataModel}. Note that
-	 *   '$auto' should be avoided to control exactly which requests are affected by this
-	 *   preference. Using a {@link module:sap/base/util/uid UID} may be one way to achieve this,
-	 *   but take care to replace hyphens with underscores.
-	 * @throws {Error}
-	 *   If the given group ID is not a valid group ID or has
-	 *   {@link sap.ui.model.odata.v4.SubmitMode.Direct} or if multiple requests that apply the
-	 *   preference "handling=strict" already exist in the same change set of the batch request
+	 *   A valid group ID as specified in {@link sap.ui.model.odata.v4.ODataModel}. Avoid '$auto' to
+	 *   control which requests are affected by this preference. Using a
+	 *   {@link module:sap/base/util/uid UID} may be one way to achieve this, but take care to
+	 *   replace hyphens with underscores:
+	 *   <code>"$auto." + uid().replaceAll("-", "_")</code>
+	 * @throws {Error} If
+	 *   <ul>
+	 *     <li> the given group ID is not a valid group ID,
+	 *     <li> the given group ID has {@link sap.ui.model.odata.v4.SubmitMode.Direct},
+	 *     <li> multiple requests that apply the preference "handling=strict" already exist in the
+	 *       same change set of the batch request.
+	 *   </ul>
 	 *
-	 * @private
-	 * @since 1.134.0
-	 * @ui5-restricted sap.fe
+	 * @public
+	 * @since 1.141.0
 	 */
 	ODataModel.prototype.setContinueOnError = function (sGroupId) {
 		this.checkBatchGroupId(sGroupId);

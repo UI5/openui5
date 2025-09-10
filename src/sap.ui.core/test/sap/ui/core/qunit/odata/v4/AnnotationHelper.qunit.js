@@ -357,8 +357,11 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
+[undefined, "~prefix~"].forEach(function (sPrefix) {
 	["/my/path", "/my/path/"].forEach(function (sPath) {
-		QUnit.test("value", function (assert) {
+		const sTitle = "value: path = " + sPath + ", prefix: " + sPrefix;
+
+		QUnit.test(sTitle, function (assert) {
 			var aArguments = [{}],
 				oMetaModel = {},
 				oContext = new BaseContext(oMetaModel, sPath),
@@ -373,17 +376,22 @@ sap.ui.define([
 					model : sinon.match.same(oMetaModel),
 					parameters : sinon.match.same(aArguments[0]),
 					path : "/my/path", // trailing slash removed!
-					prefix : "",
+					prefix : sPrefix || "",
 					value : sinon.match.same(vRawValue),
 					$$valueAsPromise : undefined
 				})
 				.returns(sResult);
 
 			assert.strictEqual(
-				AnnotationHelper.value(vRawValue, {arguments : aArguments, context : oContext}),
+				AnnotationHelper.value(vRawValue, {
+					arguments : aArguments,
+					context : oContext,
+					prefix : sPrefix
+				}),
 				sResult);
 		});
 	});
+});
 
 	//*********************************************************************************************
 	QUnit.test("value: path ends with /$Path", function (assert) {

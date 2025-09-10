@@ -516,6 +516,15 @@ sap.ui.define([
 
 		_Helper.addByPath(this.mPostRequests, sTransientPredicate, oEntityData);
 		const iIndex = aElements.indexOf(oParentNode) + 1; // 0 w/o oParentNode :-)
+		if (this.oCountPromise) {
+			const fnOldSubmitCallback = fnSubmitCallback;
+			fnSubmitCallback = () => {
+				this.createCountPromise();
+				this.readCount(oGroupLock)?.catch(
+					this.oRequestor.getModelInterface().getReporter());
+				fnOldSubmitCallback();
+			};
+		}
 		const oPromise = oCache.create(oGroupLock, oPostPathPromise, sPath, sTransientPredicate,
 			oEntityData, bAtEndOfCreated, fnErrorCallback, fnSubmitCallback, /*onCancel*/() => {
 				_Helper.removeByPath(this.mPostRequests, sTransientPredicate, oEntityData);
@@ -626,13 +635,17 @@ sap.ui.define([
 		}
 
 		let fnResolve;
-		this.oCountPromise = new SyncPromise(function (resolve) {
-			fnResolve = resolve;
+		this.oCountPromise = new SyncPromise((resolve) => {
+			fnResolve = (iCount) => {
+				delete this.oCountPromise?.$old; // count promise might already be deleted
+				resolve(iCount);
+			};
 		});
 		this.oCountPromise.$resolve = fnResolve;
 		this.oCountPromise.$restore = () => {
 			fnResolve(oOldCountPromise);
 		};
+		this.oCountPromise.$old = oOldCountPromise;
 	};
 
 	/**
@@ -1046,6 +1059,12 @@ sap.ui.define([
 					// the root nodes. This count must not be propagated to the listeners. So use a
 					// name similar to "$count" which never conflicts with any other valid path.
 					this.registerChangeListener("./$count", oListener);
+				}
+				if (oGroupLock === _GroupLock.$cached && this.oCountPromise.$old) {
+					// return the old count promise if the $count is now being requested
+					// synchronously and a new count has already been requested (e.g. when creating
+					// a new entity) but is not yet available
+					return this.oCountPromise.$old;
 				}
 				return this.oCountPromise;
 			}

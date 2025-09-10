@@ -785,6 +785,10 @@ sap.ui.define([
 			 *   "14.5.12 Expression edm:Path" and "14.5.13 Expression edm:PropertyPath" where it
 			 *   might be used as a first segment (since 1.72.0). This does not apply to annotations
 			 *   on a parameter (since 1.76.0).
+			 * @param {string} [oDetails.prefix=""]
+			 *   Optional prefix to be added to each dynamic "14.5.12 Expression edm:Path" and
+			 *   "14.5.13 Expression edm:PropertyPath"; is either an empty string or a path ending
+			 *   with a "/" (since 1.141.0)
 			 * @returns {string}
 			 *   A data binding or a fixed text or a sequence thereof
 			 *
@@ -816,7 +820,7 @@ sap.ui.define([
 						model : oDetails.context.getModel(),
 						parameters : oDetails.arguments && oDetails.arguments[0],
 						path : sPath,
-						prefix : "",
+						prefix : oDetails.prefix ?? "",
 						value : vRawValue,
 						$$valueAsPromise : oDetails.$$valueAsPromise
 					});

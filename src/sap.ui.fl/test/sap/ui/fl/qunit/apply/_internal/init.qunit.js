@@ -1,10 +1,12 @@
 /* global QUnit */
 
 sap.ui.define([
+	"sap/ui/fl/apply/_internal/DelegateMediator",
 	"sap/ui/fl/changeHandler/ChangeAnnotation",
 	"sap/ui/fl/initial/_internal/changeHandlers/ChangeHandlerRegistration",
 	"sap/ui/thirdparty/sinon-4"
 ], function(
+	DelegateMediator,
 	ChangeAnnotation,
 	ChangeHandlerRegistration,
 	sinon
@@ -25,6 +27,7 @@ sap.ui.define([
 			);
 			const oRegisterPredefinedChangeHandlersStub = sandbox.stub(ChangeHandlerRegistration, "registerPredefinedChangeHandlers");
 			const oRegisterAnnotationChangeHandlerStub = sandbox.stub(ChangeHandlerRegistration, "registerAnnotationChangeHandler");
+			const oRegisterDelegateStub = sandbox.stub(DelegateMediator, "registerReadDelegate");
 
 			const fnDone = assert.async();
 			sap.ui.require(["sap/ui/fl/apply/_internal/init"], function() {
@@ -34,7 +37,20 @@ sap.ui.define([
 				assert.deepEqual(oRegisterAnnotationChangeHandlerStub.getCall(0).args[0], {
 					changeHandler: ChangeAnnotation,
 					isDefaultChangeHandler: true
-				}, "Annotation change handler registered for ODataModel v2");
+				}, "Annotation change handler registered");
+				assert.strictEqual(oRegisterDelegateStub.callCount, 3, "Read delegate registered three times.");
+				assert.strictEqual(
+					oRegisterDelegateStub.getCall(0).args[0].modelType, "sap.ui.model.odata.v4.ODataModel",
+					"then the model type is 'sap.ui.model.odata.v4.ODataModel'"
+				);
+				assert.strictEqual(
+					oRegisterDelegateStub.getCall(1).args[0].modelType, "sap.ui.model.odata.v2.ODataModel",
+					"then the model type is 'sap.ui.model.odata.v2.ODataModel'"
+				);
+				assert.strictEqual(
+					oRegisterDelegateStub.getCall(2).args[0].modelType, "sap.ui.model.odata.ODataModel",
+					"then the model type is 'sap.ui.model.odata.ODataModel'"
+				);
 				fnDone();
 			});
 		});

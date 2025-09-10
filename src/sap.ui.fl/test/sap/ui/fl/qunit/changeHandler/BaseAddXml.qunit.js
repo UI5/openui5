@@ -8,10 +8,11 @@ sap.ui.define([
 	"sap/ui/core/util/reflection/XmlTreeModifier",
 	"sap/ui/core/Component",
 	"sap/ui/fl/apply/_internal/flexObjects/FlexObjectFactory",
+	"sap/ui/fl/apply/_internal/DelegateMediator",
 	"sap/ui/fl/changeHandler/BaseAddXml",
 	"sap/ui/test/utils/nextUIUpdate",
-	"sap/ui/util/XMLHelper",
-	"sap/ui/thirdparty/sinon-4"
+	"sap/ui/thirdparty/sinon-4",
+	"sap/ui/util/XMLHelper"
 ], function(
 	Log,
 	Button,
@@ -20,10 +21,11 @@ sap.ui.define([
 	XmlTreeModifier,
 	Component,
 	FlexObjectFactory,
+	DelegateMediator,
 	BaseAddXml,
 	nextUIUpdate,
-	XMLHelper,
-	sinon
+	sinon,
+	XMLHelper
 ) {
 	"use strict";
 
@@ -31,25 +33,31 @@ sap.ui.define([
 
 	const mPreloadedModules = {};
 
-	const sFragmentPath = "sap/ui/fl/qunit/changeHander/BaseAddXml/changes/fragments/Fragment.fragment.xml";
-	mPreloadedModules[sFragmentPath] = "<core:FragmentDefinition xmlns=\"sap.m\" xmlns:core=\"sap.ui.core\"><Button xmlns=\"sap.m\" id=\"button\" text=\"Hello World\"></Button></core:FragmentDefinition>";
-	const sFragmentInvalidTypePath = "sap/ui/fl/qunit/changeHander/BaseAddXml/changes/fragments/FragmentInvalidType.fragment.xml";
+	const sReference = "sap.ui.fl.qunit.changeHandler.BaseAddXml";
+	const sFragmentPath = "sap/ui/fl/qunit/changeHandler/BaseAddXml/changes/fragments/Fragment.fragment.xml";
+	mPreloadedModules[sFragmentPath] =
+		'<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">' +
+			'<Button xmlns="sap.m" id="button" text="Hello World"></Button>' +
+		"</core:FragmentDefinition>";
+	const sFragmentInvalidTypePath = "sap/ui/fl/qunit/changeHandler/BaseAddXml/changes/fragments/FragmentInvalidType.fragment.xml";
 	mPreloadedModules[sFragmentInvalidTypePath] = '<ManagedObject xmlns="sap.ui.base" id="managedObject"></ManagedObject>';
-	const sFragmentMultiplePath = "sap/ui/fl/qunit/changeHander/BaseAddXml/changes/fragments/FragmentMultiple.fragment.xml";
-	mPreloadedModules[sFragmentMultiplePath] = '<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">' +
-		'<Button xmlns="sap.m" id="button1" text="Hello World"></Button>' +
-		'<Button xmlns="sap.m" id="button2" text="Hello World"></Button>' +
-		'<Button xmlns="sap.m" id="button3" text="Hello World"></Button>' +
+	const sFragmentMultiplePath = "sap/ui/fl/qunit/changeHandler/BaseAddXml/changes/fragments/FragmentMultiple.fragment.xml";
+	mPreloadedModules[sFragmentMultiplePath] =
+		'<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">' +
+			'<Button xmlns="sap.m" id="button1" text="Hello World"></Button>' +
+			'<Button xmlns="sap.m" id="button2" text="Hello World"></Button>' +
+			'<Button xmlns="sap.m" id="button3" text="Hello World"></Button>' +
 		"</core:FragmentDefinition>";
-	const sFragmentMultipleInvalidTypesPath = "sap/ui/fl/qunit/changeHander/BaseAddXml/changes/fragments/FragmentMultipleInvalidTypes.fragment.xml";
-	mPreloadedModules[sFragmentMultipleInvalidTypesPath] = "<core:FragmentDefinition xmlns=\"sap.m\" xmlns:core=\"sap.ui.core\" xmlns:base=\"sap.ui.base\">" +
-		'<Button xmlns="sap.m" id="button" text="Hello World"></Button>' +
-		'<Button xmlns="sap.m" id="button2" text="Hello World"></Button>' +
-		'<base:ManagedObject id="managedObject"></base:ManagedObject>' +
+	const sFragmentMultipleInvalidTypesPath = "sap/ui/fl/qunit/changeHandler/BaseAddXml/changes/fragments/FragmentMultipleInvalidTypes.fragment.xml";
+	mPreloadedModules[sFragmentMultipleInvalidTypesPath] =
+		'<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:base="sap.ui.base">' +
+			'<Button xmlns="sap.m" id="button" text="Hello World"></Button>' +
+			'<Button xmlns="sap.m" id="button2" text="Hello World"></Button>' +
+			'<base:ManagedObject id="managedObject"></base:ManagedObject>' +
 		"</core:FragmentDefinition>";
-	const sFragmentInvalidPath = "sap/ui/fl/qunit/changeHander/BaseAddXml/changes/fragments/FragmentInvalid.fragment.xml";
+	const sFragmentInvalidPath = "sap/ui/fl/qunit/changeHandler/BaseAddXml/changes/fragments/FragmentInvalid.fragment.xml";
 	mPreloadedModules[sFragmentInvalidPath] = "invalidFragment";
-	const sNonExistingPath = "sap/ui/fl/qunit/changeHander/BaseAddXml/changes/fragments/NonExisting";
+	const sNonExistingPath = "sap/ui/fl/qunit/changeHandler/BaseAddXml/changes/fragments/NonExisting";
 
 	sap.ui.require.preload(mPreloadedModules);
 
@@ -62,13 +70,12 @@ sap.ui.define([
 
 	QUnit.module("Given a BaseAddXml Change Handler", {
 		beforeEach() {
-			this.oChangeHandler = BaseAddXml;
 			this.oHBox = new HBox("hbox", {
 				items: [this.oButton]
 			});
 
 			const oChangeJson = {
-				reference: "sap.ui.fl.qunit.changeHander.BaseAddXml",
+				reference: sReference,
 				selector: {
 					id: this.oHBox.getId(),
 					type: "sap.m.HBox"
@@ -97,7 +104,7 @@ sap.ui.define([
 				fragmentPath: "fragments/Fragment.fragment.xml"
 			};
 
-			this.oChangeHandler.completeChangeContent(this.oChange, this.oChangeSpecificContent, this.oChange.getContent());
+			BaseAddXml.completeChangeContent(this.oChange, this.oChangeSpecificContent, this.oChange.getContent());
 			assert.deepEqual(
 				this.oChange.getContent(),
 				oExpectedChangeContent,
@@ -105,7 +112,7 @@ sap.ui.define([
 			);
 			assert.equal(
 				this.oChange.getFlexObjectMetadata().moduleName,
-				"sap/ui/fl/qunit/changeHander/BaseAddXml/changes/fragments/Fragment.fragment.xml",
+				"sap/ui/fl/qunit/changeHandler/BaseAddXml/changes/fragments/Fragment.fragment.xml",
 				"and the module name is set correct in change"
 			);
 		});
@@ -113,7 +120,7 @@ sap.ui.define([
 		QUnit.test("When calling 'completeChangeContent' without complete information", function(assert) {
 			this.oChangeSpecificContent.content.fragmentPath = null;
 			assert.throws(
-				() => {this.oChangeHandler.completeChangeContent(this.oChange, this.oChangeSpecificContent, this.oChange.getContent());},
+				() => {BaseAddXml.completeChangeContent(this.oChange, this.oChangeSpecificContent, this.oChange.getContent());},
 				Error("Attribute missing from the change specific content 'fragmentPath'"),
 				"without fragmentPath 'completeChangeContent' throws an error"
 			);
@@ -122,9 +129,6 @@ sap.ui.define([
 
 	QUnit.module("Given a BaseAddXml Change Handler with JSTreeModifier", {
 		async beforeEach() {
-			// general modifier beforeEach (can be extracted as soon as nested modules are supported)
-			this.oChangeHandler = BaseAddXml;
-
 			this.sHBoxId = "hbox";
 
 			this.oChangeJson = {
@@ -133,7 +137,7 @@ sap.ui.define([
 					id: this.sHBoxId,
 					type: "sap.m.HBox"
 				},
-				reference: "sap.ui.fl.qunit.changeHander.BaseAddXml",
+				reference: sReference,
 				changeType: "addXML",
 				fileName: "addXMLChange",
 				projectId: "projectId"
@@ -152,10 +156,10 @@ sap.ui.define([
 			};
 
 			this.oChange = FlexObjectFactory.createFromFileContent(this.oChangeJson);
-			this.oChangeHandler.completeChangeContent(this.oChange, this.oChangeSpecificContent, this.oChange.getContent());
+			BaseAddXml.completeChangeContent(this.oChange, this.oChangeSpecificContent, this.oChange.getContent());
 
 			// JSTreeModifier specific beforeEach
-			this.oButton = new Button();
+			this.oButton = new Button("initialButton");
 			this.oHBox = new HBox(this.sHBoxId, {
 				items: [this.oButton]
 			});
@@ -164,35 +168,71 @@ sap.ui.define([
 			await nextUIUpdate();
 
 			this.oPropertyBag = {
-				modifier: JsControlTreeModifier, view: {
-					getController() {
-					}, getId() {
-					}
+				modifier: JsControlTreeModifier,
+				view: {
+					getController() {},
+					getId() {}
 				}
 			};
 		},
 		afterEach() {
 			this.oHBox.destroy();
+			DelegateMediator.clear();
 			sandbox.restore();
 		}
 	}, function() {
-		QUnit.test("When applying the change on a js control tree", function(assert) {
+		QUnit.test("When applying the change on a js control tree", async function(assert) {
 			const mRevertData = {
 				id: "projectId.button",
 				aggregationName: "items"
 			};
-			return this.oChangeHandler.applyChange(this.oChange, this.oHBox, this.oPropertyBag, this.mChangeInfo)
-			.then(function() {
-				assert.equal(this.oHBox.getItems().length, 2, "after the change there are 2 items in the hbox");
-				assert.equal(this.oHBox.getItems()[1].getId(), "projectId.button", "the fragments control id is prefixed with project id");
-				assert.deepEqual(this.oChange.getRevertData(), [mRevertData], "then the revert data is build properly");
-			}.bind(this));
+			await BaseAddXml.applyChange(this.oChange, this.oHBox, this.oPropertyBag, this.mChangeInfo);
+			assert.equal(this.oHBox.getItems().length, 2, "after the change there are 2 items in the hbox");
+			assert.equal(this.oHBox.getItems()[1].getId(), "projectId.button", "the fragments control id is prefixed with project id");
+			assert.deepEqual(this.oChange.getRevertData(), [mRevertData], "then the revert data is build properly");
+		});
+
+		QUnit.test("when applying a change with multiple addXMLAdjustFragmentHandlers", async function(assert) {
+			const oHandler1 = sandbox.stub().callsFake((sFragment) => {
+				return sFragment.replace("<Button", '<Button xmlns="sap.m." id="newButton1" /><Button');
+			});
+			DelegateMediator.registerAddXMLAdjustFragmentHandler({
+				key: "handler1",
+				handler: oHandler1,
+				reference: sReference
+			});
+			const oHandler2 = sandbox.stub().callsFake((sFragment) => {
+				return Promise.resolve(sFragment.replace("<Button", '<Button xmlns="sap.m." id="newButton2" /><Button'));
+			});
+			DelegateMediator.registerAddXMLAdjustFragmentHandler({
+				key: "handler2",
+				handler: oHandler2,
+				reference: sReference
+			});
+			const oHandler3 = sandbox.stub().callsFake((sFragment) => {
+				return sFragment.replace("<Button", '<Button xmlns="sap.m." id="newButton3" /><Button');
+			});
+			DelegateMediator.registerAddXMLAdjustFragmentHandler({
+				key: "handler3",
+				handler: oHandler3,
+				reference: "differentReference"
+			});
+
+			await BaseAddXml.applyChange(this.oChange, this.oHBox, this.oPropertyBag, this.mChangeInfo);
+			assert.strictEqual(this.oHBox.getItems().length, 5, "after the change there are 4 items in the hbox");
+			assert.strictEqual(this.oHBox.getItems()[1].getId(), "projectId.newButton3", "the fragments control id is correctly prefixed");
+			assert.strictEqual(this.oHBox.getItems()[2].getId(), "projectId.newButton2", "the fragments control id is correctly prefixed");
+			assert.strictEqual(this.oHBox.getItems()[3].getId(), "projectId.newButton1", "the fragments control id is correctly prefixed");
+			assert.strictEqual(this.oHBox.getItems()[4].getId(), "projectId.button", "the fragments control id is correctly prefixed");
+			assert.strictEqual(oHandler1.callCount, 1, "then handler1 was called once");
+			assert.strictEqual(oHandler2.callCount, 1, "then handler2 was called once");
+			assert.strictEqual(oHandler3.callCount, 1, "then handler3 was called once");
 		});
 
 		QUnit.test("When applying the change on a js control tree with an invalid targetAggregation", function(assert) {
 			sandbox.stub(Log, "error");
 			this.mChangeInfo.aggregationName = "invalidAggregation";
-			return this.oChangeHandler.applyChange(this.oChange, this.oHBox, this.oPropertyBag, this.mChangeInfo)
+			return BaseAddXml.applyChange(this.oChange, this.oHBox, this.oPropertyBag, this.mChangeInfo)
 			.catch(function(oError) {
 				assert.equal(oError.message, sWrongAggregationError, "then apply change throws an error");
 			});
@@ -202,7 +242,7 @@ sap.ui.define([
 			sandbox.stub(Log, "error");
 			this.oChangeJson.moduleName = sFragmentMultipleInvalidTypesPath;
 			const oChange = FlexObjectFactory.createFromFileContent(this.oChangeJson);
-			return this.oChangeHandler.applyChange(oChange, this.oHBox, this.oPropertyBag, this.mChangeInfo)
+			return BaseAddXml.applyChange(oChange, this.oHBox, this.oPropertyBag, this.mChangeInfo)
 			.catch(function(oError) {
 				assert.equal(oError.message,
 					`${sTypeError}${this.sAggregationType}`,
@@ -211,37 +251,33 @@ sap.ui.define([
 			}.bind(this));
 		});
 
-		QUnit.test("When reverting the change on a js control tree", function(assert) {
-			return this.oChangeHandler.applyChange(this.oChange, this.oHBox, this.oPropertyBag, this.mChangeInfo)
-			.then(this.oChangeHandler.revertChange.bind(this.oChangeHandler, this.oChange, this.oHBox, this.oPropertyBag))
-			.then(function() {
-				assert.equal(this.oHBox.getItems().length, 1, "after reversal there is again only one child of the HBox");
-				assert.equal(this.oChange.getRevertData(), undefined, "and the revert data got reset");
-			}.bind(this));
+		QUnit.test("When reverting the change on a js control tree", async function(assert) {
+			await BaseAddXml.applyChange(this.oChange, this.oHBox, this.oPropertyBag, this.mChangeInfo);
+			await BaseAddXml.revertChange(this.oChange, this.oHBox, this.oPropertyBag);
+			assert.equal(this.oHBox.getItems().length, 1, "after reversal there is again only one child of the HBox");
+			assert.equal(this.oChange.getRevertData(), undefined, "and the revert data got reset");
 		});
 
-		QUnit.test("When reverting the change on a js control tree with multiple root elements", function(assert) {
+		QUnit.test("When reverting the change on a js control tree with multiple root elements", async function(assert) {
 			this.oChangeJson.moduleName = sFragmentMultiplePath;
 			const oChange = FlexObjectFactory.createFromFileContent(this.oChangeJson);
-			return this.oChangeHandler.applyChange(oChange, this.oHBox, this.oPropertyBag, this.mChangeInfo)
-			.then(this.oChangeHandler.revertChange.bind(this.oChangeHandler, oChange, this.oHBox, this.oPropertyBag))
-			.then(function() {
-				assert.equal(this.oHBox.getItems().length, 1, "after reversal there is again only one child of the HBox");
-				assert.equal(this.oChange.getRevertData(), undefined, "and the revert data got reset");
-			}.bind(this));
+			await BaseAddXml.applyChange(oChange, this.oHBox, this.oPropertyBag, this.mChangeInfo);
+			await BaseAddXml.revertChange(oChange, this.oHBox, this.oPropertyBag);
+			assert.equal(this.oHBox.getItems().length, 1, "after reversal there is again only one child of the HBox");
+			assert.equal(this.oChange.getRevertData(), undefined, "and the revert data got reset");
 		});
 
 		QUnit.test("When reverting a change that failed on a js control tree with multiple root elements", function(assert) {
 			sandbox.stub(Log, "error");
 			this.oChangeJson.moduleName = sFragmentMultipleInvalidTypesPath;
 			const oChange = FlexObjectFactory.createFromFileContent(this.oChangeJson);
-			return this.oChangeHandler.applyChange(oChange, this.oHBox, this.oPropertyBag, this.mChangeInfo)
+			return BaseAddXml.applyChange(oChange, this.oHBox, this.oPropertyBag, this.mChangeInfo)
 			.catch(function(oError) {
 				assert.equal(oError.message,
 					`${sTypeError}${this.sAggregationType}`,
 					"then apply change throws an error");
 				assert.equal(this.oHBox.getItems().length, 1, "after the change there is still only 1 item in the hbox");
-				return this.oChangeHandler.revertChange(oChange, this.oHBox, this.oPropertyBag);
+				return BaseAddXml.revertChange(oChange, this.oHBox, this.oPropertyBag);
 			}.bind(this))
 			.then(function() {
 				assert.equal(this.oHBox.getItems().length, 1, "after reversal there is again only one child of the HBox");
@@ -250,10 +286,7 @@ sap.ui.define([
 	});
 
 	QUnit.module("Given a BaseAddXml Change Handler with XMLTreeModifier", {
-		beforeEach() {
-			// general modifier beforeEach (can be extracted as soon as nested modules are supported)
-			this.oChangeHandler = BaseAddXml;
-
+		async beforeEach() {
 			this.sHBoxId = "hbox";
 
 			this.oChangeJson = {
@@ -262,7 +295,7 @@ sap.ui.define([
 					id: this.sHBoxId,
 					type: "sap.m.HBox"
 				},
-				reference: "sap.ui.fl.qunit.changeHander.BaseAddXml",
+				reference: sReference,
 				changeType: "addXML",
 				fileName: "addXMLChange",
 				projectId: "projectId"
@@ -281,64 +314,62 @@ sap.ui.define([
 			};
 
 			this.oChange = FlexObjectFactory.createFromFileContent(this.oChangeJson);
-			this.oChangeHandler.completeChangeContent(this.oChange, this.oChangeSpecificContent, this.oChange.getContent());
+			BaseAddXml.completeChangeContent(this.oChange, this.oChangeSpecificContent, this.oChange.getContent());
 
 			// XMLTreeModifier specific beforeEach
-			return Component.create({
+			const oComponent = await Component.create({
 				name: "testComponentAsync",
 				id: "testComponentAsync",
 				metadata: {
 					manifest: "json"
 				}
-			}).then(function(oComponent) {
-				this.oComponent = oComponent;
-				this.oXmlString =
-					"<mvc:View id=\"testComponentAsync---myView\" xmlns:mvc=\"sap.ui.core.mvc\" xmlns=\"sap.m\">" +
-						`<HBox id="${this.sHBoxId}">` +
-							"<tooltip>" +	// 0..1 aggregation
-								"<TooltipBase xmlns=\"sap.ui.core\"></TooltipBase>" + // inline namespace as sap.ui.core is use case for not existing namespace
-							"</tooltip>" +
-							"<items>" +
-								"<Button id=\"button123\"></Button>" + // content in default aggregation
-							"</items>" +
-						"</HBox>" +
-					"</mvc:View>";
-				this.oXmlView = XMLHelper.parse(this.oXmlString, "application/xml").documentElement;
-				[this.oHBox] = this.oXmlView.childNodes;
-				this.sAggregationType = "sap.ui.core.Control";
+			});
+			this.oComponent = oComponent;
+			this.oXmlString =
+				'<mvc:View id="testComponentAsync---myView" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m">' +
+					`<HBox id="${this.sHBoxId}">` +
+						"<tooltip>" +	// 0..1 aggregation
+							// inline namespace as sap.ui.core is use case for not existing namespace
+							'<TooltipBase xmlns="sap.ui.core"></TooltipBase>' +
+						"</tooltip>" +
+						"<items>" +
+							'<Button id="button123"></Button>' + // content in default aggregation
+						"</items>" +
+					"</HBox>" +
+				"</mvc:View>";
+			this.oXmlView = XMLHelper.parse(this.oXmlString, "application/xml").documentElement;
+			[this.oHBox] = this.oXmlView.childNodes;
+			this.sAggregationType = "sap.ui.core.Control";
 
-				this.oPropertyBag = {
-					modifier: XmlTreeModifier,
-					view: this.oXmlView,
-					appComponent: this.oComponent
-				};
-			}.bind(this));
+			this.oPropertyBag = {
+				modifier: XmlTreeModifier,
+				view: this.oXmlView,
+				appComponent: this.oComponent
+			};
 		},
 		afterEach() {
 			this.oComponent.destroy();
 			sandbox.restore();
 		}
 	}, function() {
-		QUnit.test("When applying the change on a xml control tree", function(assert) {
+		QUnit.test("When applying the change on a xml control tree", async function(assert) {
 			const oInsertAggregationSpy = sandbox.spy(XmlTreeModifier, "insertAggregation");
 			const oHBoxItems = this.oHBox.childNodes[1];
 			const mRevertData = {
 				id: "projectId.button",
 				aggregationName: "items"
 			};
-			return this.oChangeHandler.applyChange(this.oChange, this.oHBox, this.oPropertyBag, this.mChangeInfo)
-			.then(function() {
-				assert.notOk(oInsertAggregationSpy.args[0][5], "insertAggregation is called with falsy bSkipAdjustIndex");
-				assert.equal(oHBoxItems.childNodes.length, 2, "after the BaseAddXml there are two children of the HBox");
-				assert.deepEqual(this.oChange.getRevertData(), [mRevertData], "then the revert data is build properly");
-			}.bind(this));
+			await BaseAddXml.applyChange(this.oChange, this.oHBox, this.oPropertyBag, this.mChangeInfo);
+			assert.notOk(oInsertAggregationSpy.args[0][5], "insertAggregation is called with falsy bSkipAdjustIndex");
+			assert.equal(oHBoxItems.childNodes.length, 2, "after the BaseAddXml there are two children of the HBox");
+			assert.deepEqual(this.oChange.getRevertData(), [mRevertData], "then the revert data is build properly");
 		});
 
 		QUnit.test("When applying the change on a xml control tree with an invalid targetAggregation", function(assert) {
 			sandbox.stub(Log, "error");
 			this.mChangeInfo.aggregationName = "invalidAggregation";
 
-			return this.oChangeHandler.applyChange(this.oChange, this.oHBox, this.oPropertyBag, this.mChangeInfo)
+			return BaseAddXml.applyChange(this.oChange, this.oHBox, this.oPropertyBag, this.mChangeInfo)
 			.catch(function(oError) {
 				assert.equal(oError.message,
 					sWrongAggregationError,
@@ -350,7 +381,7 @@ sap.ui.define([
 			sandbox.stub(Log, "error");
 			this.oChangeJson.moduleName = sFragmentInvalidTypePath;
 			const oChange = FlexObjectFactory.createFromFileContent(this.oChangeJson);
-			return this.oChangeHandler.applyChange(oChange, this.oHBox, this.oPropertyBag, this.mChangeInfo)
+			return BaseAddXml.applyChange(oChange, this.oHBox, this.oPropertyBag, this.mChangeInfo)
 			.catch(function(oError) {
 				assert.equal(oError.message,
 					`${sTypeError}${this.sAggregationType}`,
@@ -358,47 +389,43 @@ sap.ui.define([
 			}.bind(this));
 		});
 
-		QUnit.test("When reverting the change on an xml control tree", function(assert) {
+		QUnit.test("When reverting the change on an xml control tree", async function(assert) {
 			const oHBoxItems = this.oHBox.childNodes[1];
 
-			return this.oChangeHandler.applyChange(this.oChange, this.oHBox, this.oPropertyBag, this.mChangeInfo)
-			.then(this.oChangeHandler.revertChange.bind(this.oChangeHandler, this.oChange, this.oHBox, this.oPropertyBag))
-			.then(function() {
-				assert.equal(oHBoxItems.childNodes.length, 1, "after reversal there is again only one child of the HBox");
-				assert.equal(this.oChange.getRevertData(), undefined, "and the revert data got reset");
-			}.bind(this));
+			await BaseAddXml.applyChange(this.oChange, this.oHBox, this.oPropertyBag, this.mChangeInfo);
+			await BaseAddXml.revertChange(this.oChange, this.oHBox, this.oPropertyBag);
+			assert.equal(oHBoxItems.childNodes.length, 1, "after reversal there is again only one child of the HBox");
+			assert.equal(this.oChange.getRevertData(), undefined, "and the revert data got reset");
 		});
 
-		QUnit.test("When applying the change on a xml control tree with multiple root elements", function(assert) {
+		QUnit.test("When applying the change on a xml control tree with multiple root elements", async function(assert) {
 			this.oChangeJson.moduleName = sFragmentMultiplePath;
 			const oChange = FlexObjectFactory.createFromFileContent(this.oChangeJson);
-			return this.oChangeHandler.applyChange(oChange, this.oHBox, this.oPropertyBag, this.mChangeInfo)
-			.then(function() {
-				const oHBoxItems = this.oHBox.childNodes[1];
-				assert.equal(oHBoxItems.childNodes.length, 4, "after the change there are 4 items in the hbox");
-				assert.equal(
-					oHBoxItems.childNodes[1].getAttribute("id"),
-					"projectId.button1",
-					"then the first button in the fragment has the correct index and ID"
-				);
-				assert.equal(
-					oHBoxItems.childNodes[2].getAttribute("id"),
-					"projectId.button2",
-					"then the second button in the fragment has the correct index and ID"
-				);
-				assert.equal(
-					oHBoxItems.childNodes[3].getAttribute("id"),
-					"projectId.button3",
-					"then the third button in the fragment has the correct index and ID"
-				);
-			}.bind(this));
+			await BaseAddXml.applyChange(oChange, this.oHBox, this.oPropertyBag, this.mChangeInfo);
+			const oHBoxItems = this.oHBox.childNodes[1];
+			assert.equal(oHBoxItems.childNodes.length, 4, "after the change there are 4 items in the hbox");
+			assert.equal(
+				oHBoxItems.childNodes[1].getAttribute("id"),
+				"projectId.button1",
+				"then the first button in the fragment has the correct index and ID"
+			);
+			assert.equal(
+				oHBoxItems.childNodes[2].getAttribute("id"),
+				"projectId.button2",
+				"then the second button in the fragment has the correct index and ID"
+			);
+			assert.equal(
+				oHBoxItems.childNodes[3].getAttribute("id"),
+				"projectId.button3",
+				"then the third button in the fragment has the correct index and ID"
+			);
 		});
 
 		QUnit.test("When applying the change on a xml control tree with multiple root elements and one invalid type inside", function(assert) {
 			sandbox.stub(Log, "error");
 			this.oChangeJson.moduleName = sFragmentMultipleInvalidTypesPath;
 			const oChange = FlexObjectFactory.createFromFileContent(this.oChangeJson);
-			return this.oChangeHandler.applyChange(oChange, this.oHBox, this.oPropertyBag, this.mChangeInfo)
+			return BaseAddXml.applyChange(oChange, this.oHBox, this.oPropertyBag, this.mChangeInfo)
 			.catch(function(oError) {
 				assert.equal(oError.message, `${sTypeError}${this.sAggregationType}`, "then apply change throws an error");
 				const oHBoxItems = this.oHBox.childNodes[1];
@@ -406,26 +433,24 @@ sap.ui.define([
 			}.bind(this));
 		});
 
-		QUnit.test("When reverting the change on an xml control tree with multiple root elements", function(assert) {
+		QUnit.test("When reverting the change on an xml control tree with multiple root elements", async function(assert) {
 			this.oChangeJson.moduleName = sFragmentMultiplePath;
 			const oChange = FlexObjectFactory.createFromFileContent(this.oChangeJson);
-			return this.oChangeHandler.applyChange(oChange, this.oHBox, this.oPropertyBag, this.mChangeInfo)
-			.then(this.oChangeHandler.revertChange.bind(this.oChangeHandler, oChange, this.oHBox, this.oPropertyBag))
-			.then(function() {
-				const oHBoxItems = this.oHBox.childNodes[1];
-				assert.equal(oHBoxItems.childNodes.length, 1, "after reversal there is again only one child of the HBox");
-				assert.equal(oChange.getRevertData(), undefined, "and the revert data got reset");
-			}.bind(this));
+			await BaseAddXml.applyChange(oChange, this.oHBox, this.oPropertyBag, this.mChangeInfo);
+			await BaseAddXml.revertChange(oChange, this.oHBox, this.oPropertyBag);
+			const oHBoxItems = this.oHBox.childNodes[1];
+			assert.equal(oHBoxItems.childNodes.length, 1, "after reversal there is again only one child of the HBox");
+			assert.equal(oChange.getRevertData(), undefined, "and the revert data got reset");
 		});
 
 		QUnit.test("When reverting a failed change on an xml control tree with multiple root elements", function(assert) {
 			sandbox.stub(Log, "error");
 			this.oChangeJson.moduleName = sFragmentMultipleInvalidTypesPath;
 			const oChange = FlexObjectFactory.createFromFileContent(this.oChangeJson);
-			return this.oChangeHandler.applyChange(oChange, this.oHBox, this.oPropertyBag, this.mChangeInfo)
+			return BaseAddXml.applyChange(oChange, this.oHBox, this.oPropertyBag, this.mChangeInfo)
 			.catch(function(oError) {
 				assert.equal(oError.message, `${sTypeError}${this.sAggregationType}`, "then apply change throws an error");
-				return this.oChangeHandler.revertChange(this.oChange, this.oHBox, this.oPropertyBag);
+				return BaseAddXml.revertChange(this.oChange, this.oHBox, this.oPropertyBag);
 			}.bind(this))
 			.then(function() {
 				const oHBoxItems = this.oHBox.childNodes[1];
@@ -436,10 +461,10 @@ sap.ui.define([
 		QUnit.test("When applying the change with a not found module", function(assert) {
 			this.oChangeJson.moduleName = sNonExistingPath;
 			const oChange = FlexObjectFactory.createFromFileContent(this.oChangeJson);
-			return this.oChangeHandler.applyChange(oChange, this.oHBox, this.oPropertyBag, this.mChangeInfo)
+			return BaseAddXml.applyChange(oChange, this.oHBox, this.oPropertyBag, this.mChangeInfo)
 			.catch(function(oError) {
-				const sErrorMessage = "resource sap/ui/fl/qunit/changeHander/BaseAddXml/" +
-						"changes/fragments/NonExisting could not be loaded from";
+				const sErrorMessage =
+					"resource sap/ui/fl/qunit/changeHandler/BaseAddXml/changes/fragments/NonExisting could not be loaded from";
 				assert.ok(oError.message.indexOf(sErrorMessage) === 0, "then apply change throws an error");
 			});
 		});

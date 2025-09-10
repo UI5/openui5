@@ -11,7 +11,6 @@ sap.ui.define([
 	"sap/ui/fl/apply/_internal/changes/descriptor/Preprocessor",
 	"sap/ui/fl/apply/_internal/flexState/communication/FLPAboutInfo",
 	"sap/ui/fl/apply/_internal/preprocessors/ComponentLifecycleHooks",
-	"sap/ui/fl/apply/api/DelegateMediatorAPI",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/base/DesignTime",
 	// the lower 2 are set as a callback in the "register...Processors" which are not detected as dependencies from the preload-building
@@ -25,7 +24,6 @@ sap.ui.define([
 	Preprocessor,
 	FLPAboutInfo,
 	ComponentLifecycleHooks,
-	DelegateMediatorAPI,
 	ManifestUtils,
 	DesignTime
 ) {
@@ -84,21 +82,6 @@ sap.ui.define([
 		ExtensionPoint.registerExtensionProvider(getExtensionPointProvider);
 	}
 
-	function registerModelSpecificReadDelegates() {
-		DelegateMediatorAPI.registerReadDelegate({
-			modelType: "sap.ui.model.odata.v4.ODataModel",
-			delegate: "sap/ui/fl/write/_internal/delegates/ODataV4ReadDelegate"
-		});
-		DelegateMediatorAPI.registerReadDelegate({
-			modelType: "sap.ui.model.odata.v2.ODataModel",
-			delegate: "sap/ui/fl/write/_internal/delegates/ODataV2ReadDelegate"
-		});
-		DelegateMediatorAPI.registerReadDelegate({
-			modelType: "sap.ui.model.odata.ODataModel",
-			delegate: "sap/ui/fl/write/_internal/delegates/ODataV2ReadDelegate"
-		});
-	}
-
 	function registerFLPAboutInfo() {
 		FLPAboutInfo.initialize();
 	}
@@ -115,7 +98,6 @@ sap.ui.define([
 		registerXMLPreprocessor();
 		registerDescriptorChangeHandler();
 		registerExtensionPointProvider();
-		registerModelSpecificReadDelegates();
 		registerOnModelCreated();
 		registerFLPAboutInfo();
 	};

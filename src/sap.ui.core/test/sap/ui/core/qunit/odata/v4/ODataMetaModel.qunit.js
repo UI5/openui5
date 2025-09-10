@@ -8102,17 +8102,27 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	// 0: no addt'l Nav.Prop. // 1: no $Partner // 2: addt'l Nav.Prop. w/ $Partner
-	[0, 1, 2].forEach((i) => {
+	// 0: no addt'l Nav.Prop.
+	// 1: no $isCollection
+	// 2: no $Partner
+	// 3: addt'l Nav.Prop. w/ $Partner
+	[0, 1, 2, 3].forEach((i) => {
 		let oOverload;
+		let sPrefix;
 
 		function setup(oTestContext, oContext) {
 			oTestContext.mock(oContext).expects("getPath").withExactArgs().returns("~path~");
 			oTestContext.mock(_Helper).expects("getMetaPath").withExactArgs("~path~")
 				.returns(i > 0 ? "/meta" : "/meta/path");
 			oTestContext.oMetaModelMock.expects("getObject").exactly(i > 0 ? 1 : 0)
-				.withExactArgs("/meta/path/$Partner").returns(i > 1 ? "~Partner~" : undefined);
-			if (i > 1) {
+				.withExactArgs("/meta/path")
+				.returns({
+					$isCollection : i !== 1,
+					$Partner : i !== 2 ? "~Partner~" : undefined
+				});
+			if (i === 1) {
+				sPrefix = "path/";
+			} else if (i === 3) {
 				oOverload = {
 					$IsBound : true,
 					$Parameter : [{$Name : "~Partner~"}]
@@ -8135,7 +8145,8 @@ sap.ui.define([
 			this.mock(AnnotationHelper).expects("value")
 				.withExactArgs(sinon.match.same(vRawValue), {
 					context : sinon.match.same(oMetaContext),
-					overload : oOverload
+					overload : oOverload,
+					prefix : sPrefix
 				})
 				.returns("foo");
 
@@ -8168,7 +8179,8 @@ sap.ui.define([
 			this.mock(AnnotationHelper).expects("value")
 				.withExactArgs(sinon.match.same(vRawValue), {
 					context : sinon.match.same(oMetaContext),
-					overload : oOverload
+					overload : oOverload,
+					prefix : sPrefix
 				})
 				.returns("{foo} {bar}"); // sync behavior only with a sap.ui.model.CompositeBinding
 			oModelMock.expects("bindProperty")
@@ -8210,7 +8222,8 @@ sap.ui.define([
 			this.mock(AnnotationHelper).expects("value")
 				.withExactArgs(sinon.match.same(vRawValue), {
 					context : sinon.match.same(oMetaContext),
-					overload : oOverload
+					overload : oOverload,
+					prefix : sPrefix
 				})
 				.returns("{foo}");
 			oModelMock.expects("bindProperty")

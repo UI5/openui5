@@ -3,13 +3,15 @@
  */
 
 sap.ui.define([
-	"sap/ui/fl/changeHandler/Base",
 	"sap/base/util/LoaderExtensions",
-	"sap/ui/fl/changeHandler/common/revertAddedControls"
+	"sap/ui/fl/apply/_internal/DelegateMediator",
+	"sap/ui/fl/changeHandler/common/revertAddedControls",
+	"sap/ui/fl/changeHandler/Base"
 ], function(
-	Base,
 	LoaderExtensions,
-	revertAddedControls
+	DelegateMediator,
+	revertAddedControls,
+	Base
 
 ) {
 	"use strict";
@@ -34,7 +36,7 @@ sap.ui.define([
 	 * @param {object} mPropertyBag - Property bag
 	 * @param {object} mPropertyBag.modifier - Modifier for the controls
 	 * @param {object} mPropertyBag.view - Root view
-	 * @param {object} mChangeInfo - Change Informantion map
+	 * @param {object} mChangeInfo - Change Information map
 	 * @param {number} mChangeInfo.index - Index defines the position at witch the xml fragment is added
 	 * @param {string} mChangeInfo.aggregationName - Aggregation name of the control to be extended by the xml fragment
 	 * @param {boolean} [mChangeInfo.skipAdjustIndex] - True in case of inserting an XML node or element at an extension point, needed only in XML case
@@ -46,14 +48,24 @@ sap.ui.define([
 	BaseAddXml.applyChange = async function(oChange, oControl, mPropertyBag, mChangeInfo) {
 		const oModifier = mPropertyBag.modifier;
 		const sAggregationName = mChangeInfo.aggregationName;
-		const sModuleName = oChange.getFlexObjectMetadata().moduleName;
+		const oFlexObjectMetadata = oChange.getFlexObjectMetadata();
+		const sModuleName = oFlexObjectMetadata.moduleName;
 
 		const oAggregationDefinition = await oModifier.findAggregation(oControl, sAggregationName);
 		if (!oAggregationDefinition) {
 			throw Error(`The given Aggregation is not available in the given control: ${oModifier.getId(oControl)}`);
 		}
-		const sFragment = await LoaderExtensions.loadResource(sModuleName, {dataType: "text"});
-		const aNewControls = await Base.instantiateFragment(oChange, mPropertyBag);
+		let sFragment = await LoaderExtensions.loadResource(sModuleName, {dataType: "text"}); // complete xml fragment as string
+
+		const oAdjustFragmentHandlers = DelegateMediator.getAddXMLAdjustFragmentHandlers();
+		if (oAdjustFragmentHandlers) {
+			for (const sKey in oAdjustFragmentHandlers) {
+				sFragment = await oAdjustFragmentHandlers[sKey](sFragment, mPropertyBag);
+			}
+		}
+
+		// now the real UI5 controls are created from the XML string
+		const aNewControls = await Base.instantiateFragment(oChange, { ...mPropertyBag, fragment: sFragment });
 
 		let iIterator = 0;
 		for (const oNewControl of aNewControls) {

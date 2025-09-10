@@ -82,6 +82,7 @@ sap.ui.define([
 
 			this.oRequestor = {
 				buildQueryString : function () { return ""; },
+				getModelInterface : mustBeMocked,
 				getServiceUrl : function () { return "/~/"; },
 				getUnlockedAutoCopy : mustBeMocked,
 				request : mustBeMocked
@@ -1375,8 +1376,12 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	[false, true].forEach((bRecursiveHierarchy) => {
-		const sTitle = "fetchValue: $count with existing count promise, "
-			+ (bRecursiveHierarchy ? "recursive hierarchy" : "data aggregation");
+		[false, true].forEach((bSync) => {
+			[false, true].forEach((bCountPromisePending) => {
+				const sTitle = "fetchValue: $count with existing count promise, "
+					+ (bRecursiveHierarchy ? "recursive hierarchy" : "data aggregation")
+					+ ", sync call: " + bSync
+					+ ", count promise pending: " + bCountPromisePending;
 
 		QUnit.test(sTitle, function (assert) {
 			const oAggregation = bRecursiveHierarchy
@@ -1391,7 +1396,11 @@ sap.ui.define([
 			const oCache = _AggregationCache.create(this.oRequestor, "Foo", "", {$count : true},
 					oAggregation);
 
-			oCache.oCountPromise = "~countPromise~";
+			const oCountPromise = {};
+			if (bCountPromisePending) {
+				oCountPromise.$old = "~oldCountPromise~";
+			}
+			oCache.oCountPromise = oCountPromise;
 			this.mock(oCache).expects("registerChangeListener")
 				.withExactArgs("./$count", "~oListener~")
 				.exactly(bRecursiveHierarchy ? 1 : 0);
@@ -1400,8 +1409,11 @@ sap.ui.define([
 
 			assert.strictEqual(
 				// code under test
-				oCache.fetchValue("~oGroupLock~", "$count", "~fnDataRequested~", "~oListener~"),
-				"~countPromise~");
+				oCache.fetchValue(bSync ? _GroupLock.$cached : "~oGroupLock~", "$count",
+					"~fnDataRequested~", "~oListener~"),
+				bSync && bCountPromisePending ? oCountPromise.$old : oCountPromise);
+		});
+			});
 		});
 	});
 
@@ -5630,17 +5642,19 @@ sap.ui.define([
 			[undefined, true].forEach(function (bParentExpanded) {
 				[false, true].forEach(function (bCreateRoot) {
 					[undefined, "~iRank~"].forEach(function (iRank) {
-						var sTitle = "create: already has group level cache: " + bHasGroupLevelCache
+						[undefined, "~oldCountPromise"].forEach(function (oCountPromise) {
+							var sTitle = "create: already has group level cache: " + bHasGroupLevelCache
 								+ ", expandTo: " + iExpandTo
 								+ ", parent's @$ui5.node.isExpanded: " + bParentExpanded
 								+ ", create root node: " + bCreateRoot
-								+ ", rank : " + iRank;
+								+ ", rank: " + iRank
+								+ ", old count promise: " + oCountPromise;
 
-						const bInFirstLevel = bCreateRoot || iExpandTo > 24;
-						if (bHasGroupLevelCache && bInFirstLevel || bParentExpanded && bCreateRoot
-								|| !bInFirstLevel && !iRank) {
-							return;
-						}
+							const bInFirstLevel = bCreateRoot || iExpandTo > 24;
+							if (bHasGroupLevelCache && bInFirstLevel || bParentExpanded && bCreateRoot
+									|| !bInFirstLevel && !iRank) {
+								return;
+							}
 
 		QUnit.test(sTitle, function (assert) {
 			var fnCancelCallback,
@@ -5652,6 +5666,7 @@ sap.ui.define([
 					hierarchyQualifier : "X"
 				});
 			assert.strictEqual(oCache.bUnifiedCache, false);
+			oCache.oCountPromise = oCountPromise;
 			const oGroupLevelCache = {
 					create : mustBeMocked,
 					setEmpty : mustBeMocked
@@ -5692,11 +5707,14 @@ sap.ui.define([
 			const oPostBody = {};
 			const oCollectionCache = bInFirstLevel ? oCache.oFirstLevel : oGroupLevelCache;
 			let bNodePropertyCompleted = false;
+			const fnSubmitCallback = sinon.spy();
+			let fnNewSubmitCallback;
 			this.mock(oCollectionCache).expects("create")
 				.withExactArgs("~oGroupLock~", "~oPostPathPromise~", "~sPath~",
 					"~sTransientPredicate~", {bar : "~bar~", foo : "~foo~"}, false, "~fnErrorCallback~",
-					"~fnSubmitCallback~", sinon.match.func)
+					sinon.match.func, sinon.match.func)
 				.callsFake(function () {
+					fnNewSubmitCallback = arguments[7];
 					fnCancelCallback = arguments[8];
 					if (!bCreateRoot) {
 						assert.strictEqual(_Helper.getPrivateAnnotation(oParentNode, "cache"),
@@ -5785,7 +5803,7 @@ sap.ui.define([
 			// code under test
 			const oResult = oCache.create("~oGroupLock~", "~oPostPathPromise~", "~sPath~",
 				"~sTransientPredicate~", oEntityData, /*bAtEndOfCreated*/false, "~fnErrorCallback~",
-				"~fnSubmitCallback~");
+				fnSubmitCallback);
 
 			assert.deepEqual(oPostBody, bCreateRoot ? {} : {"myParent@odata.bind" : "~relativeUrl~"});
 			assert.deepEqual(oEntityData, {
@@ -5827,8 +5845,48 @@ sap.ui.define([
 					"('ABC')" : oEntityData
 				});
 				assert.deepEqual(oCache.aElements, ["0", "1", oParentNode, "3", "4"]);
+
+				// check submit callback
+				assert.strictEqual(fnSubmitCallback.callCount, 0);
+				if (!oCountPromise) {
+					assert.strictEqual(fnNewSubmitCallback, fnSubmitCallback);
+				} else {
+					assert.notStrictEqual(fnNewSubmitCallback, fnSubmitCallback);
+					let oCreateCountExpectation = oCacheMock.expects("createCountPromise")
+						.withExactArgs();
+					let oReadCountExpectation = oCacheMock.expects("readCount")
+						.withExactArgs("~oGroupLock~")
+						.returns(undefined); // no count needs to be read
+
+					// code under test
+					fnNewSubmitCallback();
+
+					assert.ok(fnSubmitCallback.calledOnceWithExactly());
+					assert.ok(oCreateCountExpectation.calledBefore(oReadCountExpectation));
+					assert.ok(oReadCountExpectation.calledBefore(fnSubmitCallback));
+					fnSubmitCallback.resetHistory();
+
+					oCreateCountExpectation = oCacheMock.expects("createCountPromise").withExactArgs();
+					const oReadCountResult = {catch : mustBeMocked};
+					oReadCountExpectation = oCacheMock.expects("readCount")
+						.withExactArgs("~oGroupLock~").returns(oReadCountResult);
+					const oModelInterface = {getReporter : mustBeMocked};
+					that.mock(oCache.oRequestor).expects("getModelInterface").withExactArgs()
+						.returns(oModelInterface);
+					that.mock(oModelInterface).expects("getReporter").withExactArgs()
+						.returns("~fnReporter~");
+					that.mock(oReadCountResult).expects("catch").withExactArgs("~fnReporter~");
+
+					// code under test - count needs to be read
+					fnNewSubmitCallback();
+
+					assert.ok(fnSubmitCallback.calledOnceWithExactly());
+					assert.ok(oCreateCountExpectation.calledBefore(oReadCountExpectation));
+					assert.ok(oReadCountExpectation.calledBefore(fnSubmitCallback));
+				}
 			});
 		});
+						});
 					});
 				});
 			});
@@ -7834,11 +7892,14 @@ sap.ui.define([
 		oCache.createCountPromise();
 
 		assert.strictEqual(oCache.oCountPromise.isPending(), true);
+		assert.ok(oCache.oCountPromise.hasOwnProperty("$old"));
+		assert.strictEqual(oCache.oCountPromise.$old, undefined);
 
 		// code under test
 		oCache.oCountPromise.$resolve("foo");
 
 		assert.strictEqual(oCache.oCountPromise.getResult(), "foo");
+		assert.notOk(oCache.oCountPromise.hasOwnProperty("$old"));
 
 		// code under test: $restore has no effect on a resolved promise
 		oCache.oCountPromise.$restore();
@@ -7866,15 +7927,18 @@ sap.ui.define([
 		const oCache = _AggregationCache.create(this.oRequestor, "Foo", "", {}, {
 			hierarchyQualifier : "X"
 		});
-		oCache.oCountPromise = SyncPromise.resolve("foo");
+		const oOldCountPromise = SyncPromise.resolve("foo");
+		oCache.oCountPromise = oOldCountPromise;
 		oCache.createCountPromise();
 
 		assert.strictEqual(oCache.oCountPromise.isPending(), true);
+		assert.strictEqual(oCache.oCountPromise.$old, oOldCountPromise);
 
 		// code under test
 		oCache.oCountPromise.$restore();
 
 		assert.strictEqual(oCache.oCountPromise.getResult(), "foo");
+		assert.notOk(oCache.oCountPromise.hasOwnProperty("$old"));
 	});
 
 	//*********************************************************************************************
