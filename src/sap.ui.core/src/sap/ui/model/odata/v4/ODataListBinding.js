@@ -843,6 +843,10 @@ sap.ui.define([
 	 * method then adds a transient entity to the parent's navigation property, which is sent with
 	 * the payload of the parent entity. Such a nested context cannot be inactive.
 	 *
+	 * <b>Caution:</b> Only a single list must be bound to the same collection-valued navigation
+	 * property relative to a transient context. Created data cannot be shared between list
+	 * bindings.
+	 *
 	 * <b>Note:</b> After a successful creation of the main entity the context returned for a
 	 * nested entity is no longer valid. Do not use the
 	 * {@link sap.ui.model.odata.v4.Context#created created} promise of such a context! New contexts
@@ -1142,6 +1146,8 @@ sap.ui.define([
 	 * @returns {boolean}
 	 *   <code>true</code>, if contexts have been created or dropped or <code>isLengthFinal</code>
 	 *   has changed
+	 * @throws {Error}
+	 *   If a created context from a foreign binding is about to be reused
 	 *
 	 * @private
 	 */
@@ -1198,6 +1204,9 @@ sap.ui.define([
 					// created persisted contexts can be restored from their data, for example in
 					// case of Recursive Hierarchy maintenance
 					oContext = _Helper.getPrivateAnnotation(aResults[i], "context");
+					if (oContext.getBinding() !== this) {
+						throw new Error("Cannot share created data between list bindings");
+					}
 					oContext.iIndex = i$skipIndex;
 					// oContext.checkUpdate(); // Note: no changes expected here
 					sContextPath = oContext.getPath();

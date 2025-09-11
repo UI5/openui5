@@ -81800,6 +81800,47 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
+	// Scenario: Two list bindings cannot share created data beneath a transient context.
+	// SNOW: DINC0626097
+	QUnit.test("DINC0626097: 2x ODLB w/ shared data", async function (assert) {
+		const oModel = this.createTeaBusiModel({autoExpandSelect : true});
+		const sView = `
+<FlexBox id="form">
+	<Table id="table" items="{TEAM_2_EMPLOYEES}">
+		<Text text="{Name}"/>
+	</Table>
+	<Table items="{TEAM_2_EMPLOYEES}">
+		<Text text="{Name}"/>
+	</Table>
+</FlexBox>`;
+
+		await this.createView(assert, sView, oModel);
+
+		const oTeam = oModel.bindList("/TEAMS", null, [], [], {$$updateGroupId : "doNotSubmit"})
+			.create();
+		this.oView.byId("form").setBindingContext(oTeam);
+		// Note: auto-$expand/$select takes a moment, thus the creation below happens *before* the
+		// 2nd table fetches its data
+
+		const oMessage = {
+			message : "Cannot share created data between list bindings",
+			persistent : true,
+			technical : true,
+			type : "Error"
+		};
+		this.expectMessages([oMessage, oMessage]); // 2x due to Add-/RemoveVirtualContext
+		this.oLogMock.expects("error").twice()
+			.withArgs(sinon.match("Failed to get contexts for " + sTeaBusi),
+				sinon.match("Cannot share created data between list bindings"), sODLB);
+
+		this.oView.byId("table").getBinding("items")
+			// code under test
+			.create({Name : "Frederic Fall"});
+
+		await this.waitForChanges(assert);
+	});
+
+	//*********************************************************************************************
 	// Scenario: A recursive hierarchy is bound relative to a root context. Set the table's context
 	// to null, then bind the table to the same root context again and do a side-effects refresh via
 	// that root context.

@@ -8,10 +8,10 @@ sap.ui.define([
 	"sap/ui/base/ManagedObject",
 	"sap/ui/dt/DesignTime",
 	"sap/ui/dt/OverlayRegistry",
+	"sap/ui/layout/form/Form",
 	"sap/ui/layout/form/FormContainer",
 	"sap/ui/layout/form/FormElement",
 	"sap/ui/layout/form/FormLayout",
-	"sap/ui/layout/form/Form",
 	"sap/ui/layout/VerticalLayout",
 	"sap/ui/test/utils/nextUIUpdate",
 	"sap/ui/rta/plugin/Plugin",
@@ -25,10 +25,10 @@ sap.ui.define([
 	ManagedObject,
 	DesignTime,
 	OverlayRegistry,
+	Form,
 	FormContainer,
 	FormElement,
 	FormLayout,
-	Form,
 	VerticalLayout,
 	nextUIUpdate,
 	Plugin,
@@ -46,7 +46,11 @@ sap.ui.define([
 		if (oElement.hasStyleClass) {
 			return oElement.hasStyleClass(sStretchStyleClass);
 		}
-		return oOverlay.getAssociatedDomRef().classList.contains(sStretchStyleClass);
+		const vDomRef = oOverlay.getAssociatedDomRef();
+		const aDomRef = Array.isArray(vDomRef) ? vDomRef : [vDomRef];
+		return aDomRef.every(function(oDomRef) {
+			return oDomRef.classList.contains(sStretchStyleClass);
+		});
 	}
 
 	QUnit.module("Given a stretch plugin", {
@@ -827,6 +831,60 @@ sap.ui.define([
 	}, function() {
 		QUnit.test("After initialization", function(assert) {
 			assert.ok(isStretched(this.oFormContainerOverlay), "the style class was set");
+		});
+	});
+
+	QUnit.module("Given controls with multiple associated DomRefs and Stretch Plugin", {
+		async beforeEach(assert) {
+			const done = assert.async();
+
+			this.oFormElement = new FormElement("groupElement1", {
+				fields: [new Button({text: "fooooo"})],
+				label: "element1"
+			});
+			this.oFormContainer = new FormContainer("group1", {
+				formElements: [this.oFormElement]
+			});
+			this.oForm = new Form("smartForm", {
+				formContainers: [this.oFormContainer],
+				layout: new FormLayout()
+			});
+
+			this.oForm.placeAt("qunit-fixture");
+			await nextUIUpdate();
+
+			this.oStretchPlugin = new Stretch();
+
+			sandbox.stub(this.oStretchPlugin, "_isEditable").returns(true);
+
+			this.oDesignTime = new DesignTime({
+				rootElements: [this.oForm]
+			});
+
+			this.oDesignTime.attachEventOnce("synced", function() {
+				this.oFormContainerOverlay = OverlayRegistry.getOverlay(this.oFormContainer);
+				done();
+			}.bind(this));
+		},
+		afterEach() {
+			sandbox.restore();
+			this.oDesignTime.destroy();
+			this.oStretchPlugin.destroy();
+			this.oForm.destroy();
+		}
+	}, function() {
+		QUnit.test("When adding the plugin", function(assert) {
+			const done = assert.async();
+			sandbox.stub(this.oFormContainerOverlay, "getAssociatedDomRef").returns([
+				this.oFormContainer.getDomRef(),
+				this.oFormContainer.getDomRef()
+			]);
+			this.oDesignTime.addPlugin(this.oStretchPlugin);
+
+			this.oDesignTime.attachEventOnce("synced", function() {
+				assert.ok(isStretched(this.oFormContainerOverlay), "the style class was set");
+				done();
+			}.bind(this));
 		});
 	});
 

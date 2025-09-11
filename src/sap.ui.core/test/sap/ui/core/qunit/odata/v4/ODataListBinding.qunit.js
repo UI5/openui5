@@ -4495,7 +4495,10 @@ sap.ui.define([
 			oContext1 = Context.create(this.oModel, oBinding, "/EMPLOYEES('B')", 99),
 			oContext2 = Context.create(this.oModel, oBinding, "/EMPLOYEES('C')", 1),
 			oContext3 = {},
-			oContext4 = {getPath : mustBeMocked},
+			oContext4 = {
+				getBinding : mustBeMocked,
+				getPath : mustBeMocked
+			},
 			oContextMock = this.mock(Context);
 
 		// must be mocked here, so that later bind grabs the mock
@@ -4513,6 +4516,7 @@ sap.ui.define([
 			.withExactArgs(sinon.match.same(this.oModel), sinon.match.same(oBinding),
 				"/EMPLOYEES('C')", 1)
 			.returns(oContext2);
+		this.mock(oContext4).expects("getBinding").withExactArgs().returns(oBinding);
 		this.mock(oContext4).expects("getPath").withExactArgs().returns("/EMPLOYEES('E')");
 		oBindingMock.expects("destroyPreviousContextsLater").exactly(bCreateOnly ? 0 : 1)
 			.withExactArgs(["/EMPLOYEES('A')", "/EMPLOYEES('D')"]);
@@ -4664,6 +4668,7 @@ sap.ui.define([
 			oCreatedContext = Context.create(this.oModel, oBinding, "/EMPLOYEES('1')", -1,
 				SyncPromise.resolve()),
 			oNewContext = bSame ? oCreatedContext : {
+				getBinding : mustBeMocked,
 				getPath : mustBeMocked
 			};
 
@@ -4674,6 +4679,7 @@ sap.ui.define([
 		this.mock(Context).expects("create").never();
 		this.mock(oCreatedContext).expects("checkUpdate").never();
 		this.mock(oCreatedContext).expects("destroy").never();
+		this.mock(oNewContext).expects("getBinding").withExactArgs().returns(oBinding);
 		this.mock(oNewContext).expects("getPath").withExactArgs().returns("/EMPLOYEES('1')");
 		this.mock(oBinding).expects("destroyPreviousContextsLater").exactly(bCreateOnly ? 0 : 1)
 			.withExactArgs(bSame ? [] : ["/EMPLOYEES('1')"]);
@@ -4691,6 +4697,26 @@ sap.ui.define([
 	});
 });
 }); // for each bCreateOnly
+
+	//*********************************************************************************************
+	QUnit.test("createContexts: Cannot share created...", function (assert) {
+		var oBinding = this.bindList("/EMPLOYEES"),
+			oForeignContext = Context.create(this.oModel, "~oBinding~", "/EMPLOYEES('1')", -1,
+				SyncPromise.resolve());
+
+		this.mock(Context).expects("create").never();
+		this.mock(oForeignContext).expects("checkUpdate").never();
+		this.mock(oForeignContext).expects("destroy").never();
+		this.mock(oForeignContext).expects("doSetSelected").never();
+		this.mock(oBinding).expects("destroyPreviousContextsLater").never();
+
+		assert.throws(function () {
+			// code under test
+			oBinding.createContexts(42, [{
+				"@$ui5._" : {context : oForeignContext, predicate : "('1')"}
+			}]);
+		}, new Error("Cannot share created data between list bindings"));
+	});
 
 	//*********************************************************************************************
 [undefined, "~aElements~"].forEach(function (aElements) {

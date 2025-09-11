@@ -252,11 +252,12 @@ sap.ui.define([
 						startDate: UI5Date.getInstance("2015", "0", "1", "08", "00"),
 						endDate: UI5Date.getInstance("2015", "0", "2", "09", "00"),
 						type: CalendarDayType.Type03,
+						ariaLabelledBy: "appCaptionR1A1",
 						customContent: [
 							new FlexBox({
 								direction: "Column",
 								items: [
-									new MText({
+									new MText("appCaptionR1A1", {
 										text: "TG2P11: Maintenance"
 									}),
 									new FlexBox({

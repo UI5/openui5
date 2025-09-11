@@ -113,9 +113,20 @@ sap.ui.define([
 			 * and may lead to unpredictable results.</li>
 			 * </ul>
 			 *
+			 * <b>Note:</b> When using the <code>customContent</code> aggregation, it is the application developer's responsibility
+			 * to add appropriate labels to the <code>ariaLabelledBy</code> association to provide accessible information about this
+			 * appointment as the standard properties (<code>title</code>, <code>text</code>, <code>description</code>, and <code>icon</code>)
+			 * are ignored, which means screen readers will have no information about the appointment unless proper ARIA labeling is implemented.
+			 *
 			 * @since 1.93.0
 			 */
 			customContent: { type: "sap.ui.core.Control", multiple: true }
+		},
+		associations : {
+			/**
+			 * Association to controls / ids which label this control (see WAI-ARIA attribute aria-labelledBy).
+			 */
+			ariaLabelledBy: {type : "sap.ui.core.Control", multiple : true, singularName : "ariaLabelledBy"}
 		}
 	}});
 
