@@ -1356,12 +1356,13 @@ sap.ui.define([
 	 *   context only. Such a message can only be connected to a corresponding control if the
 	 *   control's property bindings use the return value context as binding context.
 	 *   <br>
-	 *   A return value context may also be provided if the parent context's path contains a maximum
-	 *   of one navigation property. In addition to the existing preconditions for a return value
-	 *   context, the metadata has to specify a partner attribute for the navigation property and
-	 *   the partner relationship has to be bi-directional. Also the navigation property binding has
-	 *   to be available in the entity set of the first segment in the parent context's path
-	 *   (@experimental as of version 1.119.0).
+	 *   Since 1.141.0, a return value context may also be provided if the parent context's path
+	 *   contains a maximum of one navigation property. In addition to the existing preconditions
+	 *   for a return value context, the metadata has to specify a partner attribute for the
+	 *   navigation property and the partner relationship has to be bi-directional. Also a
+	 *   navigation property binding has to be available for the entity set of the first segment in
+	 *   the parent context's path. <b>Note:</b> Ensure your service implementation returns all
+	 *   selected key properties; otherwise, no return value context is provided.
 	 * @throws {Error} If
 	 *   <ul>
 	 *     <li> the binding's root binding is suspended,

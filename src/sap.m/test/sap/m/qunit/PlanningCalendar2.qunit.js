@@ -1724,6 +1724,31 @@ sap.ui.define([
 		this._testAriaAppointmentsAndSpecialDatesIfLegendIsDestroyed(CalendarIntervalType.Month, fnExtendSut);
 	});
 
+	QUnit.test("Appointments with customContent and ariaLabelledBy", function (assert) {
+		// Prepare
+		const oPC = createPlanningCalendar("customPC", new SearchField(), new Button(), UI5Date.getInstance(2025, 0, 1));
+		const sCustomLabelId = "customText";
+		const oAppointment = new CalendarAppointment({
+			startDate: UI5Date.getInstance(2025, 0, 1, 10, 0),
+			endDate: UI5Date.getInstance(2025, 0, 1, 11, 0),
+			type: CalendarDayType.Type01,
+			title: "Appointment with custom content",
+			customContent: [new Text(sCustomLabelId, {text: "Custom content text"})],
+			ariaLabelledBy: [sCustomLabelId]
+		});
+
+		oPC.getRows()[0].addAppointment(oAppointment);
+		oPC.placeAt("bigUiArea");
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		// Assert
+		assert.ok(oAppointment.getDomRef().getAttribute("aria-labelledby").indexOf(sCustomLabelId) > -1, "Appointment has custom label added in aria-labelledby");
+
+		// Clean
+		oAppointment.destroy();
+		oPC.destroy();
+	});
+
 	QUnit.test("Interval toolbar has correct hidden label defining it's purpose", function(assert) {
 		// Prepare
 		var oPC = new PlanningCalendar(),

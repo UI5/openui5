@@ -489,8 +489,8 @@ sap.ui.define([
 					&& this.getRta()._oDesignTime) {
 					this.getRta()._oDesignTime.removeRootElement(oPopupElement);
 				}
-				// remove the Modal state from the map
-				this._oModalState.delete(oPopupElement.oPopup);
+				// remove the Modal state from the map (can be undefined if RTA has just been stopped)
+				this._oModalState?.delete(oPopupElement.oPopup);
 				// PopupManager internal method
 				this.fireClose(oPopupElement);
 			}

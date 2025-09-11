@@ -700,12 +700,6 @@ function(
 		 * @public
 		 */
 		TimePicker.prototype.onAfterOpen = function() {
-			var oClocks = this._getClocks();
-
-			if (oClocks) {
-				oClocks._focusActiveButton();
-			}
-
 			this.fireAfterValueHelpOpen();
 		};
 

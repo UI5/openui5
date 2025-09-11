@@ -20,15 +20,7 @@ sap.ui.define([], () => {
 	 */
 	FilterBarLayoutRenderer.render = function(oRm, oFilterBar) {
 		oRm.openStart("div", oFilterBar);
-		oRm.class("sapUiCompFilterBar");
-		oRm.class(oFilterBar._isPhone() ? "sapUiCompFilterBarPhone" : "sapUiCompFilterBarNonPhone");
-		if (oFilterBar._getUseToolbar()) {
-			oRm.class("sapUiCompFilterBarWithToolbar");
-		}
-
-		if (!oFilterBar._getAdvancedMode()) {
-			oRm.class("sapContrastPlus");
-		}
+		this.addRootDivClasses(oRm, oFilterBar);
 		oRm.openEnd();
 		this.renderToolbar(oRm, oFilterBar);
 		this.renderItems(oRm, oFilterBar);
@@ -36,6 +28,8 @@ sap.ui.define([], () => {
 		this.renderHintText(oRm, oFilterBar);
 		oRm.close("div");
 	};
+
+	FilterBarLayoutRenderer.addRootDivClasses = function (oRm, oFilterBar) {};
 
 	FilterBarLayoutRenderer.renderToolbar = function (oRm, oFilterBar) {};
 

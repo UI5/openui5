@@ -760,6 +760,19 @@ sap.ui.define([
 
 			assert.notOk(DOMUtil.isVisible(document.getElementById("sapUiRtaWhatsNewDialog")), "then the WhatsNew dialog is not visible");
 		});
+
+		QUnit.test("RTA start/stop/start test", async function(assert) {
+			this.oRta = new RuntimeAuthoring({
+				rootControl: oComp.getAggregation("rootControl")
+			});
+			await this.oRta.start();
+
+			await this.oRta.stop();
+
+			await this.oRta.start();
+
+			assert.ok(true, "RTA started again successfully after being stopped");
+		});
 	});
 
 	QUnit.done(function() {
