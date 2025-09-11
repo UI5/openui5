@@ -39,7 +39,12 @@ sap.ui.define([
 
 		const oObjectTemplateInfo = oContent.objectTemplateInfo;
 		if (oObjectTemplateInfo) {
-			oReturn.value = JSON.parse(oObjectTemplateInfo.templateAsString.replace(oObjectTemplateInfo.placeholder, sValue));
+			// Parse the object before replacing the placeholder to avoid issues with escaped special characters
+			const oParsedTemplate = JSON.parse(oObjectTemplateInfo.templateAsString);
+			Object.keys(oParsedTemplate).forEach((sKey) => {
+				oParsedTemplate[sKey] = oParsedTemplate[sKey].replace(oObjectTemplateInfo.placeholder, sValue);
+			});
+			oReturn.value = oParsedTemplate;
 		} else {
 			oReturn.value = sValue;
 		}
