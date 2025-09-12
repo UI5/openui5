@@ -155,7 +155,7 @@ sap.ui.define([
 			 * Since 1.71.0, for annotations on an operation or a parameter, the binding parameter's
 			 * name is stripped off any dynamic "14.5.12 Expression edm:Path" and
 			 * "14.5.13 Expression edm:PropertyPath" where it might be used as a first segment.
-			 * Since 1.76.0 this does not apply to annotations on a parameter.
+			 * Since 1.76.0, this does not apply to annotations on a parameter.
 			 * In the former case, we assume that the resulting data binding is
 			 * relative to the parent context of the operation binding, that is, to the context
 			 * representing the binding parameter itself.
@@ -693,7 +693,7 @@ sap.ui.define([
 			 * Since 1.71.0, for annotations on an operation or a parameter, the binding parameter's
 			 * name is stripped off any dynamic "14.5.12 Expression edm:Path" and
 			 * "14.5.13 Expression edm:PropertyPath" where it might be used as a first segment.
-			 * Since 1.76.0 this does not apply to annotations on a parameter.
+			 * Since 1.76.0, this does not apply to annotations on a parameter.
 			 * In the former case, we assume that the resulting data binding is
 			 * relative to the parent context of the operation binding, that is, to the context
 			 * representing the binding parameter itself.

@@ -578,7 +578,7 @@ sap.ui.define([
 			const bIsUnit = this._isUnit(oType);
 			const bCompositeType = this._isCompositeType(oType);
 
-			if (oCondition && !bIsUnit && bCompositeType) {
+			if (oCondition && bCompositeType) {
 				const oOriginalType = this._getOriginalType() || oType; // use original type for determination if unit as valueType might mapped different (if no original type, valueType is original)
 				const sName = oOriginalType.getMetadata().getName();
 				const oFormatOptions = oOriginalType.getFormatOptions();
@@ -586,13 +586,21 @@ sap.ui.define([
 				const oDelegate = this._getDelegate();
 				const oField = this.oFormatOptions.control;
 				const sBaseType = oDelegate.getTypeMap(oField).getBaseType(sName, oFormatOptions, oConstraints); // don't use _getBaseType to get "real" unit type
-				if ((sBaseType === BaseType.Unit || sBaseType === BaseType.DateTime) &&
-					!oCondition.values[0][1] && oType._aCurrentValue) {
-					// TODO: if no unit provided use last one
-					const sUnit = oType._aCurrentValue[1] === undefined ? null : oType._aCurrentValue[1]; // undefined in CompositeType means "not changed" -> if no current unit it needs to be null
-					oCondition.values[0][1] = sUnit;
-					if (oCondition.operator === OperatorName.BT) {
-						oCondition.values[1][1] = sUnit;
+
+				if (sBaseType === BaseType.Unit || sBaseType === BaseType.DateTime) {
+					if (bIsUnit) {
+						if (oCondition.values[0][0] === undefined && oType._aCurrentValue) {
+							// TODO: if no number provided use last one
+							const sNumber = oType._aCurrentValue[0] === undefined ? null : oType._aCurrentValue[0]; // undefined in CompositeType means "not changed" -> if no current number it needs to be null
+							oCondition.values[0][0] = sNumber; // TODO: can this happen for BT?
+						}
+					} else if (!oCondition.values[0][1] && oType._aCurrentValue) {
+						// TODO: if no unit provided use last one
+						const sUnit = oType._aCurrentValue[1] === undefined ? null : oType._aCurrentValue[1]; // undefined in CompositeType means "not changed" -> if no current unit it needs to be null
+						oCondition.values[0][1] = sUnit;
+						if (oCondition.operator === OperatorName.BT) {
+							oCondition.values[1][1] = sUnit;
+						}
 					}
 				}
 			}

@@ -7,7 +7,7 @@
 	<body>
 		<h1>Manual Integration Test: Recursive Hierarchy Maintenance</h1>
 		<h2>DESCRIPTION</h2>
-		Test maintenance of a recursive hierarchy, as well as editing of nodes.
+		Test maintenance of a recursive hierarchy, as well as editing and deleting of nodes.
 		<h2>PREPARATION</h2>
 
 		To check console errors open the developer tools before starting the application and check
@@ -42,6 +42,7 @@
 					</tr>
 				</table>
 			</li>
+			<li><b>Check:</b> The table title contains the count: <code>24 Employees</code></li>
 		</ul>
 		<h3>Expand 0 (Alpha)</h3>
 		<ul>
@@ -77,6 +78,7 @@
 					</tr>
 				</table>
 			</li>
+			<li><b>Check:</b> The table title contains the count: <code>24 Employees</code></li>
 		</ul>
 		<h3>Create New Child of 0 (Alpha)</h3>
 		<ul>
@@ -115,6 +117,7 @@
 					</tr>
 				</table>
 			</li>
+			<li><b>Check:</b> The table title contains the count: <code>25 Employees</code></li>
 		</ul>
 		<h3>Edit New Child's Name</h3>
 		<ul>
@@ -153,6 +156,7 @@
 					</tr>
 				</table>
 			</li>
+			<li><b>Check:</b> The table title contains the count: <code>25 Employees</code></li>
 		</ul>
 		<h3>Create New Child of 2 (Kappa)</h3>
 		<ul>
@@ -194,6 +198,7 @@
 					</tr>
 				</table>
 			</li>
+			<li><b>Check:</b> The table title contains the count: <code>26 Employees</code></li>
 		</ul>
 		<h3>Edit New Child's Name</h3>
 		<ul>
@@ -235,6 +240,7 @@
 					</tr>
 				</table>
 			</li>
+			<li><b>Check:</b> The table title contains the count: <code>26 Employees</code></li>
 		</ul>
 		<h3>Expand 5 (Xi)</h3>
 		<ul>
@@ -276,6 +282,7 @@
 					</tr>
 				</table>
 			</li>
+			<li><b>Check:</b> The table title contains the count: <code>26 Employees</code></li>
 		</ul>
 		<h3>Expand 5.1 (Omicron)</h3>
 		<ul>
@@ -302,7 +309,7 @@
 						<td>2</td><td>Collapse</td><td>2</td><td>0</td><td>Kappa</td><td>56</td><td>&#x2713;</td>
 					</tr>
 					<tr>
-						<td>2</td><td>Leaf</td><td>2.1</td><td>2</td><td>2nd new child #0+1</td><td>55</td><td>&#x2713;</td>
+						<td>2</td><td>Leaf</td><td>2.1</td><td>2</td><td>2nd new child #0+1</td><td>155</td><td>&#x2713;</td>
 					</tr>
 					<tr>
 						<td>2</td><td>Leaf</td><td>3</td><td>0</td><td>Lambda</td><td>57</td><td>&#x2713;</td>
@@ -318,6 +325,7 @@
 					</tr>
 				</table>
 			</li>
+			<li><b>Check:</b> The table title contains the count: <code>26 Employees</code></li>
 		</ul>
 		<h3>Create New Child of 5.1 (Omicron)</h3>
 		<ul>
@@ -341,7 +349,7 @@
 						<td>2</td><td>Collapse</td><td>2</td><td>0</td><td>Kappa</td><td>56</td><td>&#x2713;</td>
 					</tr>
 					<tr>
-						<td>2</td><td>Leaf</td><td>2.1</td><td>2</td><td>2nd new child #0+1</td><td>55</td><td>&#x2713;</td>
+						<td>2</td><td>Leaf</td><td>2.1</td><td>2</td><td>2nd new child #0+1</td><td>155</td><td>&#x2713;</td>
 					</tr>
 					<tr>
 						<td>2</td><td>Leaf</td><td>3</td><td>0</td><td>Lambda</td><td>57</td><td>&#x2713;</td>
@@ -360,6 +368,7 @@
 					</tr>
 				</table>
 			</li>
+			<li><b>Check:</b> The table title contains the count: <code>27 Employees</code></li>
 		</ul>
 		<h3>Scroll To The Bottom</h3>
 		<ul>
@@ -401,6 +410,142 @@
 					</tr>
 				</table>
 			</li>
+			<li><b>Check:</b> The table title contains the count: <code>27 Employees</code></li>
+		</ul>
+		<h3>Delete 5.1.4 (Tau)</h3>
+		<ul>
+			<li>Click on the "Delete" button in the row 5.1.4 (Tau).</li>
+			<li><b>Check:</b> The table should have the following content:
+				<table border="1px" cellspacing="0">
+					<tr>
+						<th>Level</th>
+						<th>(Icon's Tooltip)</th>
+						<th>ID</th>
+						<th>Manager's ID</th>
+						<th>Name</th>
+						<th>Age</th>
+						<th>"Create New Child" enabled</th>
+					</tr>
+					<tr>
+						<td>4</td><td>Leaf</td><td>5.1.1</td><td>5.1</td><td>Pi</td><td>21</td><td>&#x2713;</td>
+					</tr>
+					<tr>
+						<td>4</td><td>Leaf</td><td>5.1.2</td><td>5.1</td><td>Rho</td><td>22</td><td>&#x2713;</td>
+					</tr>
+					<tr>
+						<td>4</td><td>Leaf</td><td>5.1.3</td><td>5.1</td><td>Sigma</td><td>23</td><td>&#x2713;</td>
+					</tr>
+					<tr>
+						<td>4</td><td>Leaf</td><td>5.1.5</td><td>5.1</td><td>Upsilon</td><td>25</td><td>&#x2713;</td>
+					</tr>
+					<tr>
+						<td>4</td><td>Leaf</td><td>5.1.6</td><td>5.1</td><td>Phi</td><td>26</td><td>&#x2713;</td>
+					</tr>
+					<tr>
+						<td>4</td><td>Leaf</td><td>5.1.7</td><td>5.1</td><td>Chi</td><td>27</td><td>&#x2713;</td>
+					</tr>
+					<tr>
+						<td>4</td><td>Leaf</td><td>5.1.8</td><td>5.1</td><td>Psi</td><td>28</td><td>&#x2713;</td>
+					</tr>
+					<tr>
+						<td>4</td><td>Leaf</td><td>5.1.9</td><td>5.1</td><td>Omega</td><td>29</td><td>&#x2713;</td>
+					</tr>
+				</table>
+			</li>
+			<li><b>Check:</b> The table title contains the count: <code>26 Employees</code></li>
+		</ul>
+		<h3>Scroll up to 1 (Beta)</h3>
+		<ul>
+			<li>Scroll up until 1 (Beta) is the topmost row in the table.</li>
+			<li><b>Check:</b> The table should have the following content:
+				<table border="1px" cellspacing="0">
+					<tr>
+						<td>2</td><td>Expand</td><td>1</td><td>0</td><td>Beta</td><td>55</td><td>-</td>
+					</tr>
+					<tr>
+						<td>2</td><td>Collapse</td><td>2</td><td>0</td><td>Kappa</td><td>56</td><td>&#x2713;</td>
+					</tr>
+					<tr>
+						<td>2</td><td>Leaf</td><td>2.1</td><td>2</td><td>2nd new child #0+1</td><td>155</td><td>&#x2713;</td>
+					</tr>
+					<tr>
+						<td>2</td><td>Leaf</td><td>3</td><td>0</td><td>Lambda</td><td>57</td><td>&#x2713;</td>
+					</tr>
+					<tr>
+						<td>2</td><td>Expand</td><td>4</td><td>0</td><td>Mu</td><td>58</td><td>-</td>
+					</tr>
+					<tr>
+						<td>2</td><td>Collapse</td><td>5</td><td>0</td><td>Xi</td><td>59</td><td>&#x2713;</td>
+					</tr>
+					<tr>
+						<td>3</td><td>Collapse</td><td>5.1</td><td>5</td><td>Omicron</td><td>41</td><td>&#x2713;</td>
+					</tr>
+					<tr>
+						<td>4</td><td>Leaf</td><td>5.1.10</td><td>5.1</td><td></td><td>20</td><td>&#x2713;</td>
+					</tr>
+				</table>
+			</li>
+			<li><b>Check:</b> The table title contains the count: <code>26 Employees</code></li>
+		</ul>
+		<h3>Delete collapsed node 4 (Mu)</h3>
+		<ul>
+			<li>Click on the "Delete" button in the row 4 (Mu).</li>
+			<li><b>Check:</b> The table should have the following content:
+				<table border="1px" cellspacing="0">
+					<tr>
+						<td>2</td><td>Expand</td><td>1</td><td>0</td><td>Beta</td><td>55</td><td>-</td>
+					</tr>
+					<tr>
+						<td>2</td><td>Collapse</td><td>2</td><td>0</td><td>Kappa</td><td>56</td><td>&#x2713;</td>
+					</tr>
+					<tr>
+						<td>2</td><td>Leaf</td><td>2.1</td><td>2</td><td>2nd new child #0+1</td><td>155</td><td>&#x2713;</td>
+					</tr>
+					<tr>
+						<td>2</td><td>Leaf</td><td>3</td><td>0</td><td>Lambda</td><td>57</td><td>&#x2713;</td>
+					</tr>
+					<tr>
+						<td>2</td><td>Collapse</td><td>5</td><td>0</td><td>Xi</td><td>59</td><td>&#x2713;</td>
+					</tr>
+					<tr>
+						<td>3</td><td>Collapse</td><td>5.1</td><td>5</td><td>Omicron</td><td>41</td><td>&#x2713;</td>
+					</tr>
+					<tr>
+						<td>4</td><td>Leaf</td><td>5.1.10</td><td>5.1</td><td></td><td>20</td><td>&#x2713;</td>
+					</tr>
+					<tr>
+						<td>4</td><td>Leaf</td><td>5.1.1</td><td>5.1</td><td>Pi</td><td>21</td><td>&#x2713;</td>
+					</tr>
+				</table>
+			</li>
+			<li><b>Check:</b> The table title contains the count: <code>24 Employees</code></li>
+		</ul>
+		<h3>Delete expanded node 5 (Xi)</h3>
+		<ul>
+			<li>Click on the "Delete" button in the row 5 (Xi).</li>
+			<li><b>Check:</b> The table should have the following content:
+				<table border="1px" cellspacing="0">
+					<tr>
+						<td>1</td><td>Collapse</td><td>0</td><td></td><td>Alpha</td><td>60</td><td>&#x2713;</td>
+					</tr>
+					<tr>
+						<td>2</td><td>Leaf</td><td>6</td><td>0</td><td>1st new child #0+1</td><td>154</td><td>&#x2713;</td>
+					</tr>
+					<tr>
+						<td>2</td><td>Expand</td><td>1</td><td>0</td><td>Beta</td><td>55</td><td>-</td>
+					</tr>
+					<tr>
+						<td>2</td><td>Collapse</td><td>2</td><td>0</td><td>Kappa</td><td>56</td><td>&#x2713;</td>
+					</tr>
+					<tr>
+						<td>2</td><td>Leaf</td><td>2.1</td><td>2</td><td>2nd new child #0+1</td><td>155</td><td>&#x2713;</td>
+					</tr>
+					<tr>
+						<td>2</td><td>Leaf</td><td>3</td><td>0</td><td>Lambda</td><td>57</td><td>&#x2713;</td>
+					</tr>
+				</table>
+			</li>
+			<li><b>Check:</b> The table title contains the count: <code>13 Employees</code></li>
 		</ul>
 	</body>
 </html>

@@ -1895,7 +1895,7 @@ sap.ui.define([
 	 * Returns a context with the given path belonging to a matching list binding that has been
 	 * marked with <code>$$getKeepAliveContext</code> (see {@link #bindList}). If such a matching
 	 * binding can be found, a context is returned and kept alive (see
-	 * {@link sap.ui.model.odata.v4.ODataListBinding#getKeepAliveContext}). Since 1.100.0 a
+	 * {@link sap.ui.model.odata.v4.ODataListBinding#getKeepAliveContext}). Since 1.100.0, a
 	 * temporary binding is used if no such binding could be found. If such a binding is created or
 	 * resolved later, the context and its data are transferred to it, and the temporary binding is
 	 * destroyed again.

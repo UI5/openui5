@@ -743,7 +743,7 @@ sap.ui.define([
 	 * be updated on the server, an error is logged to the console and added to the message manager
 	 * as a technical message. Unless preconditions fail synchronously, a
 	 * {@link sap.ui.model.odata.v4.ODataModel#event:propertyChange 'propertyChange'} event is
-	 * fired and provides a promise on the outcome of the asynchronous operation. Since 1.122.0
+	 * fired and provides a promise on the outcome of the asynchronous operation. Since 1.122.0,
 	 * this method allows updates to the client-side annotation "@$ui5.context.isSelected". Note:
 	 * Changing the value of a client-side annotation never initiates a PATCH request, no matter
 	 * which <code>sGroupId</code> is given. Thus, it cannot be reverted via {@link #resetChanges}.

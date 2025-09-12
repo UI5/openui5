@@ -130,7 +130,7 @@
 						id="makeLastRoot" press=".onMakeRoot($event, true)"
 						tooltip="Make Last Root"/>
 					<m:Button enabled="{= %{STATUS} !== 'Out' }" icon="sap-icon://delete"
-						press=".onDelete" tooltip="Delete"/>
+						id="delete" press=".onDelete" tooltip="Delete"/>
 					<m:Button enabled="{= %{@$ui5.node.isExpanded} !== undefined }"
 						icon="sap-icon://expand-group" id="expandAll" press=".onExpandAll"
 						tooltip="Expand All"/>
@@ -142,7 +142,7 @@
 		</Column>
 	</Table>
 
-	<TreeTable ariaLabelledBy="treeTitle" id="treeTable"
+	<TreeTable ariaLabelledBy="titleTreeTable" id="treeTable"
 		rows="{
 				path : '/EMPLOYEES',
 				parameters : {
@@ -156,7 +156,7 @@
 		selectionMode="None">
 		<extension>
 			<m:Toolbar class="sapMTBHeader-CTX" design="Transparent">
-				<m:Title id="treeTitle" level="H1"
+				<m:Title id="titleTreeTable" level="H1"
 					text="Organizational Chart - TreeTable: {treeHeader>$count} Employees ({treeHeader>$selectionCount} selected)"/>
 				<m:ToolbarSpacer/>
 				<m:CheckBox id="copyCheckBoxTreeTable" selected="{ui>/bCopy}" text="Copy"
@@ -254,7 +254,7 @@
 						id="makeLastRootTreeTable" press=".onMakeRoot($event, true)"
 						tooltip="Make Last Root"/>
 					<m:Button enabled="{= %{STATUS} !== 'Out' }" icon="sap-icon://delete"
-						press=".onDelete" tooltip="Delete"/>
+						id="deleteTreeTable" press=".onDelete" tooltip="Delete"/>
 					<m:Button enabled="{= %{@$ui5.node.isExpanded} !== undefined }"
 						icon="sap-icon://expand-group" id="expandAllTreeTable"
 						press=".onExpandAll" tooltip="Expand All"/>

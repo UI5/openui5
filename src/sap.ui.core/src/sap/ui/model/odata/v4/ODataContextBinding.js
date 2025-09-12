@@ -426,7 +426,7 @@ sap.ui.define([
 	 * If a back-end request fails, the 'dataReceived' event provides an <code>Error</code> in the
 	 * 'error' event parameter.
 	 *
-	 * Since 1.106 this event is bubbled up to the model, unless a listener calls
+	 * Since 1.106, this event is bubbled up to the model, unless a listener calls
 	 * {@link sap.ui.base.Event#cancelBubble oEvent.cancelBubble()}.
 	 *
 	 * @param {sap.ui.base.Event} oEvent
@@ -454,7 +454,7 @@ sap.ui.define([
 	 * fired: Whatever should happen in the event handler attached to that event, can instead be
 	 * done before calling {@link #invoke}.
 	 *
-	 * Since 1.106 this event is bubbled up to the model, unless a listener calls
+	 * Since 1.106, this event is bubbled up to the model, unless a listener calls
 	 * {@link sap.ui.base.Event#cancelBubble oEvent.cancelBubble()}.
 	 *
 	 * @param {sap.ui.base.Event} oEvent

@@ -231,7 +231,7 @@ sap.ui.define([
 	 * status APIs like {@link #isDeleted}, {@link #isKeepAlive}, {@link #hasPendingChanges},
 	 * {@link #resetChanges}, or {@link #isSelected} (returns <code>false</code> since 1.114.0).
 	 *
-	 * Since 1.105 such a pending deletion is a pending change. It causes
+	 * Since 1.105, such a pending deletion is a pending change. It causes
 	 * <code>hasPendingChanges</code> to return <code>true</code> for the context, the binding
 	 * containing it, and the model. The <code>resetChanges</code> method called on the context, the
 	 * binding, or the model cancels the deletion and restores the context.
@@ -259,10 +259,10 @@ sap.ui.define([
 	 *   is transient (see {@link #isTransient}), no group ID needs to be specified. Since 1.98.0,
 	 *   you can use <code>null</code> to prevent the DELETE request in case of a kept-alive context
 	 *   that is not in the collection and of which you know that it does not exist on the server
-	 *   anymore (for example, a draft after activation). Since 1.108.0 the usage of a group ID with
-	 *   {@link sap.ui.model.odata.v4.SubmitMode.API} is possible. Since 1.121.0, you can use the
-	 *   '$single' group ID to send a DELETE request as fast as possible; it will be wrapped in a
-	 *   batch request as for a '$auto' group.
+	 *   anymore (for example, a draft after activation). Since 1.108.0, the usage of a group ID
+	 *   with {@link sap.ui.model.odata.v4.SubmitMode.API} is possible. Since 1.121.0, you can use
+	 *   the '$single' group ID to send a DELETE request as fast as possible; it will be wrapped in
+	 *   a batch request as for a '$auto' group.
 	 * @param {boolean} [bDoNotRequestCount]
 	 *   Whether not to request the new count from the server; useful in case of
 	 *   {@link #replaceWith} where it is known that the count remains unchanged (since 1.97.0).
@@ -1768,7 +1768,7 @@ sap.ui.define([
 	/**
 	 * Returns a promise on the property value for the given path relative to this context. The path
 	 * is expected to point to a structural property with primitive type.
-	 * Since 1.81.1 it is possible to request more than one property. Property values that are not
+	 * Since 1.81.1, it is possible to request more than one property. Property values that are not
 	 * cached yet are requested from the back end.
 	 *
 	 * @param {string|string[]} [vPath]
@@ -1937,7 +1937,7 @@ sap.ui.define([
 	 *   <code>[{$PropertyPath : "*"}, {$NavigationPropertyPath : "EMPLOYEE_2_MANAGER"}]</code> or
 	 *   <code>[{$PropertyPath : "EMPLOYEE_2_MANAGER/*"}]</code>.
 	 *
-	 *   Since 1.82.0 absolute paths are supported. Absolute paths must start with the entity
+	 *   Since 1.82.0, absolute paths are supported. Absolute paths must start with the entity
 	 *   container (example "/com.sap.gateway.default.iwbep.tea_busi.v0001.Container/TEAMS") of the
 	 *   service. All (navigation) properties in the complete model matching such an absolute path
 	 *   are updated. Since 1.85.0, "14.4.11 Expression edm:String" is accepted as well.
@@ -2423,7 +2423,7 @@ sap.ui.define([
 	/**
 	 * Sets a new value for the property identified by the given path. The path is relative to this
 	 * context and is expected to point to a structural property with primitive type or, since
-	 * 1.85.0, to an instance annotation. Since 1.122.0 the client-side annotation
+	 * 1.85.0, to an instance annotation. Since 1.122.0, the client-side annotation
 	 * "@$ui5.context.isSelected" can be given as a path. Note: Writing to a client-side
 	 * annotation never initiates a PATCH request, even if <code>sGroupId</code> is given.
 	 * Thus, reverting the value of this annotation cannot be done via {@link #resetChanges}.

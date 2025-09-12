@@ -773,7 +773,7 @@
 				<m:Label text="currency field"/>
 				<mdc:Field
 					id="F6-8"
-					value="{parts: [{path: 'Price'}, {path: 'CurrencyCode'}], type: 'sap.ui.model.type.Currency'}"
+					value="{parts: [{path: 'Price'}, {path: 'CurrencyCode'}], type: 'sap.ui.model.type.Currency', formatOptions: {emptyString: 0}}"
 					placeholder="{/#Product/Price/@sap:label}"
 					display="Value" change="handleChange"
 					liveChange="handleLiveChange"
@@ -793,10 +793,10 @@
 				</mdc:Field>
 
 				<m:Label text="currency field in display mode"/>
-				<mdc:Field id="F6-8_2" value="{parts: [{path: 'Price'}, {path: 'CurrencyCode'}], type: 'sap.ui.model.type.Currency'}" display="Value" editMode="Display" change="handleChange"/>
+				<mdc:Field id="F6-8_2" value="{parts: [{path: 'Price'}, {path: 'CurrencyCode'}], type: 'sap.ui.model.type.Currency', formatOptions: {emptyString: 0}}" display="Value" editMode="Display" change="handleChange"/>
 
 				<m:Label text="input with currency"/>
-				<m:Input id="I6-8_3" value="{parts: [{path: 'Price'}, {path: 'CurrencyCode'}], type: 'sap.ui.model.type.Currency'}"/>
+				<m:Input id="I6-8_3" value="{parts: [{path: 'Price'}, {path: 'CurrencyCode'}], type: 'sap.ui.model.type.Currency', formatOptions: {emptyString: 0}}"/>
 
 
 				<c:Title text="Fields with type OData Currency"/>
@@ -842,7 +842,7 @@
 				<m:Label text="unit field"/>
 				<mdc:Field
 					id="F6-10"
-					value="{parts: [{path: 'WeightMeasure', type:'sap.ui.model.type.Float', constraints: {minimum: 0}}, {path: 'WeightUnit', type: 'sap.ui.model.type.String', constraints: {maxLength: 3}}], type: 'sap.ui.model.type.Unit'}"
+					value="{parts: [{path: 'WeightMeasure', type:'sap.ui.model.type.Float', constraints: {minimum: 0}}, {path: 'WeightUnit', type: 'sap.ui.model.type.String', constraints: {maxLength: 3}}], type: 'sap.ui.model.type.Unit', formatOptions: {emptyString: 0}}"
 					placeholder="{/#Product/WeightMeasure/@sap:label}"
 					display="Value" change="handleChange"
 					liveChange="handleLiveChange"
@@ -862,10 +862,10 @@
 				</mdc:Field>
 
 				<m:Label text="unit field in display mode"/>
-				<mdc:Field id="F6-11" value="{parts: [{path: 'WeightMeasure', type:'sap.ui.model.type.Float', constraints: {minimum: 0}}, {path: 'WeightUnit', type: 'sap.ui.model.type.String', constraints: {maxLength: 3}}], type: 'sap.ui.model.type.Unit'}" display="Value" editMode="Display" change="handleChange" submit="handleSubmit"/>
+				<mdc:Field id="F6-11" value="{parts: [{path: 'WeightMeasure', type:'sap.ui.model.type.Float', constraints: {minimum: 0}}, {path: 'WeightUnit', type: 'sap.ui.model.type.String', constraints: {maxLength: 3}}], type: 'sap.ui.model.type.Unit', formatOptions: {emptyString: 0}}" display="Value" editMode="Display" change="handleChange" submit="handleSubmit"/>
 
 				<m:Label text="input with unit"/>
-				<m:Input id="I6-11_2" value="{parts: [{path: 'WeightMeasure', type:'sap.ui.model.type.Float', constraints: {minimum: 0}}, {path: 'WeightUnit', type: 'sap.ui.model.type.String', constraints: {maxLength: 3}}], type: 'sap.ui.model.type.Unit'}"/>
+				<m:Input id="I6-11_2" value="{parts: [{path: 'WeightMeasure', type:'sap.ui.model.type.Float', constraints: {minimum: 0}}, {path: 'WeightUnit', type: 'sap.ui.model.type.String', constraints: {maxLength: 3}}], type: 'sap.ui.model.type.Unit', formatOptions: {emptyString: 0}}"/>
 
 
 				<c:Title text="Fields with type OData Unit"/>
