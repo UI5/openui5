@@ -355,10 +355,16 @@ function(
 	Toolbar.prototype._handleKeyNavigation = function(oEvent) {
 		const focusedElement = document.activeElement;
 		const toolbarDom = this.getDomRef();
+
+		// Prevent navigation if Ctrl, Alt, or Command is pressed
+		if (oEvent.ctrlKey || oEvent.altKey || oEvent.metaKey) {
+			return; // Let browser handle default behavior
+		}
+
 		if (toolbarDom.contains(focusedElement)) {
 			if (oEvent.keyCode === KeyCodes.ARROW_RIGHT || oEvent.keyCode === KeyCodes.ARROW_DOWN) {
 				this._moveFocus("forward", oEvent);
-			} else if (oEvent.keyCode === KeyCodes.ARROW_LEFT || oEvent.keyCode === KeyCodes.ARROW_UP) {
+			} else if (oEvent.keyCode === KeyCodes.ARROW_LEFT  || oEvent.keyCode === KeyCodes.ARROW_UP) {
 				this._moveFocus("backward", oEvent);
 			}
 		}

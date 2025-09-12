@@ -8,8 +8,6 @@ sap.ui.define([
 	"use strict";
 
 	return {
-
-		_oDraftMetadata: {},
 		_oConstants: {
 			COM_SAP_VOCABULARIES_COMMON_V1_DRAFTROOT: "com.sap.vocabularies.Common.v1.DraftRoot",
 			COM_SAP_VOCABULARIES_COMMON_V1_DRAFTNODE: "com.sap.vocabularies.Common.v1.DraftNode",
@@ -69,62 +67,68 @@ sap.ui.define([
 					}
 				}
 			};
+			const oDraftMetadata = oMockServer._oDraftMetadata || {};
+
 			if (oAnnotations && oAnnotations.EntityContainer) {
 				var oEntitySetsAnnotations = oAnnotations.EntityContainer[Object.keys(oAnnotations.EntityContainer)[0]];
 				//iterate over entitysets annotations
 				for (var sEntityset in oEntitySetsAnnotations) {
 					//get entity set annotations and look for DraftRoot annotation
 					var oEntitySetAnnotations = oEntitySetsAnnotations[sEntityset];
-					if (oEntitySetAnnotations[this._oConstants.COM_SAP_VOCABULARIES_COMMON_V1_DRAFTROOT]) {
-						this._oDraftMetadata.draftRootName = sEntityset;
-						this._oDraftMetadata.annotations = oAnnotations;
-						this._oDraftMetadata.mockServerRootUri = oMockServer.getRootUri();
-						if (oEntitySetAnnotations[this._oConstants.COM_SAP_VOCABULARIES_COMMON_V1_DRAFTROOT][this._oConstants.ACTIVATION_ACTION]){
-							this._oDraftMetadata.draftRootActivationName = oEntitySetAnnotations[this._oConstants.COM_SAP_VOCABULARIES_COMMON_V1_DRAFTROOT][this
-								._oConstants.ACTIVATION_ACTION
-								].String;
+					const sActivationAction = this._oConstants.ACTIVATION_ACTION;
+					const sCommonVocabularyDraftRoot = this._oConstants.COM_SAP_VOCABULARIES_COMMON_V1_DRAFTROOT;
+					if (oEntitySetAnnotations[sCommonVocabularyDraftRoot]) {
+						oDraftMetadata.draftRootName = sEntityset;
+						oDraftMetadata.annotations = oAnnotations;
+						oDraftMetadata.mockServerRootUri = oMockServer.getRootUri();
+						if (oEntitySetAnnotations[sCommonVocabularyDraftRoot][sActivationAction]) {
+							oDraftMetadata.draftRootActivationName = oEntitySetAnnotations[sCommonVocabularyDraftRoot]
+								[sActivationAction].String;
 						}
-						if (this._oDraftMetadata.draftRootActivationName) {
-							this._oDraftMetadata.draftRootActivationName = this._oDraftMetadata.draftRootActivationName.substring(this._oDraftMetadata.draftRootActivationName
-								.lastIndexOf("/") + 1);
+						if (oDraftMetadata.draftRootActivationName) {
+							oDraftMetadata.draftRootActivationName = oDraftMetadata.draftRootActivationName
+								.substring(oDraftMetadata.draftRootActivationName.lastIndexOf("/") + 1);
 						}
-						this._oDraftMetadata.draftRootEditName = oEntitySetAnnotations[this._oConstants.COM_SAP_VOCABULARIES_COMMON_V1_DRAFTROOT][this
-							._oConstants.EDIT_ACTION
-						];
-						this._oDraftMetadata.draftRootEditName = this._oDraftMetadata.draftRootEditName ? this._oDraftMetadata.draftRootEditName.String :
-							undefined;
-						if (this._oDraftMetadata.draftRootEditName) {
-							this._oDraftMetadata.draftRootEditName = this._oDraftMetadata.draftRootEditName.substring(this._oDraftMetadata.draftRootEditName
-								.lastIndexOf("/") + 1);
+						oDraftMetadata.draftRootEditName = oEntitySetAnnotations[sCommonVocabularyDraftRoot]
+								[this._oConstants.EDIT_ACTION];
+						oDraftMetadata.draftRootEditName = oDraftMetadata.draftRootEditName
+							? oDraftMetadata.draftRootEditName.String
+							: undefined;
+						if (oDraftMetadata.draftRootEditName) {
+							oDraftMetadata.draftRootEditName = oDraftMetadata.draftRootEditName
+								.substring(oDraftMetadata.draftRootEditName.lastIndexOf("/") + 1);
 						}
-						this._oDraftMetadata.draftRootValidationName = oEntitySetAnnotations[this._oConstants.COM_SAP_VOCABULARIES_COMMON_V1_DRAFTROOT][this
-							._oConstants.VALIDATE_ACTION
-						];
-						this._oDraftMetadata.draftRootValidationName = this._oDraftMetadata.draftRootValidationName ? this._oDraftMetadata.draftRootValidationName
-							.String : undefined;
-						if (this._oDraftMetadata.draftRootValidationName) {
-							this._oDraftMetadata.draftRootValidationName = this._oDraftMetadata.draftRootValidationName.substring(this._oDraftMetadata.draftRootValidationName
-								.lastIndexOf("/") + 1);
+						oDraftMetadata.draftRootValidationName = oEntitySetAnnotations[sCommonVocabularyDraftRoot]
+							[this._oConstants.VALIDATE_ACTION];
+						oDraftMetadata.draftRootValidationName = oDraftMetadata.draftRootValidationName
+							? oDraftMetadata.draftRootValidationName.String
+							: undefined;
+						if (oDraftMetadata.draftRootValidationName) {
+							oDraftMetadata.draftRootValidationName = oDraftMetadata.draftRootValidationName
+								.substring(oDraftMetadata.draftRootValidationName.lastIndexOf("/") + 1);
 						}
-						this._oDraftMetadata.draftRootPreparationtionName = oEntitySetAnnotations[this._oConstants.COM_SAP_VOCABULARIES_COMMON_V1_DRAFTROOT]
-						[this
-							._oConstants.PREPARE_ACTION
-						];
-						this._oDraftMetadata.draftRootPreparationtionName = this._oDraftMetadata.draftRootPreparationtionName ? this._oDraftMetadata.draftRootPreparationtionName
-							.String : undefined;
-						if (this._oDraftMetadata.draftRootPreparationtionName) {
-							this._oDraftMetadata.draftRootPreparationtionName = this._oDraftMetadata.draftRootPreparationtionName.substring(this._oDraftMetadata
-								.draftRootPreparationtionName
-								.lastIndexOf("/") + 1);
+						oDraftMetadata.draftRootPreparationtionName = oEntitySetAnnotations[sCommonVocabularyDraftRoot]
+							[this._oConstants.PREPARE_ACTION];
+						oDraftMetadata.draftRootPreparationtionName = oDraftMetadata.draftRootPreparationtionName
+							? oDraftMetadata.draftRootPreparationtionName.String
+							: undefined;
+						if (oDraftMetadata.draftRootPreparationtionName) {
+							oDraftMetadata.draftRootPreparationtionName = oDraftMetadata.draftRootPreparationtionName
+								.substring(oDraftMetadata.draftRootPreparationtionName.lastIndexOf("/") + 1);
 						}
 						// extend the mockserver with addtional draft functionality encapsulated in this file
 						jQuery.extend(oMockServer, this);
+						oMockServer._oDraftMetadata  = oDraftMetadata;
 						// A new draft is created with a POST request on the entity set for the root entities.
-						oMockServer.attachAfter(MockServer.HTTPMETHOD.POST, fnNewDraftPost, this._oDraftMetadata.draftRootName);
-						// A new draft can be deleted with a DELETE request to the root entity of the new draft; the root entity and all dependent entities will be deleted
-						oMockServer.attachBefore(MockServer.HTTPMETHOD.DELETE, fnDraftDelete, this._oDraftMetadata.draftRootName);
+						oMockServer.attachAfter(MockServer.HTTPMETHOD.POST, fnNewDraftPost,
+							oDraftMetadata.draftRootName);
+						// A new draft can be deleted with a DELETE request to the root entity of the new draft;
+						// the root entity and all dependent entities will be deleted
+						oMockServer.attachBefore(MockServer.HTTPMETHOD.DELETE, fnDraftDelete,
+							oDraftMetadata.draftRootName);
 						// Active documents without a related draft should return null for DraftAdministrativeData
-						oMockServer.attachAfter(MockServer.HTTPMETHOD.GET, this._fnDraftAdministrativeData, this._oDraftMetadata.draftRootName);
+						oMockServer.attachAfter(MockServer.HTTPMETHOD.GET, this._fnDraftAdministrativeData,
+							oDraftMetadata.draftRootName);
 					}
 				}
 			}

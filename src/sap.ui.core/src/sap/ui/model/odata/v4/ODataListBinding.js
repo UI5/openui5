@@ -446,7 +446,7 @@ sap.ui.define([
 	 * If a back-end request fails, the 'dataReceived' event provides an <code>Error</code> in the
 	 * 'error' event parameter.
 	 *
-	 * Since 1.106 this event is bubbled up to the model, unless a listener calls
+	 * Since 1.106, this event is bubbled up to the model, unless a listener calls
 	 * {@link sap.ui.base.Event#cancelBubble oEvent.cancelBubble()}.
 	 *
 	 * @param {sap.ui.base.Event} oEvent
@@ -472,7 +472,7 @@ sap.ui.define([
 	 * for example to switch on a busy indicator. Registered event handlers are called without
 	 * parameters.
 	 *
-	 * Since 1.106 this event is bubbled up to the model, unless a listener calls
+	 * Since 1.106, this event is bubbled up to the model, unless a listener calls
 	 * {@link sap.ui.base.Event#cancelBubble oEvent.cancelBubble()}.
 	 *
 	 * @param {sap.ui.base.Event} oEvent
@@ -837,7 +837,7 @@ sap.ui.define([
 	 * {@link sap.ui.model.odata.v4.Context#requestSideEffects} in the same $batch to refresh the
 	 * complete collection containing the newly created entity.
 	 *
-	 * Since 1.115.0 it is possible to create nested entities in a collection-valued navigation
+	 * Since 1.115.0, it is possible to create nested entities in a collection-valued navigation
 	 * property together with the entity (so-called "deep create"), for example a list of items for
 	 * an order. For this purpose, bind the list relative to a transient context. Calling this
 	 * method then adds a transient entity to the parent's navigation property, which is sent with
@@ -856,7 +856,7 @@ sap.ui.define([
 	 * of <code>Error</code>, even if the deep create succeeds. This error always has the property
 	 * <code>canceled</code> with the value <code>true</code>.
 	 *
-	 * Since 1.118.0 deep create also supports single-valued navigation properties; no API call is
+	 * Since 1.118.0, deep create also supports single-valued navigation properties; no API call is
 	 * required in this case. Simply bind properties of the related entity relative to a transient
 	 * context. An update to the property adds it to the POST request of the parent entity, and by
 	 * this the create becomes deep.
@@ -910,7 +910,7 @@ sap.ui.define([
 	 *   on the client and requests only data that is missing.
 	 * @param {boolean} [bAtEnd]
 	 *   Whether the entity is inserted at the end of the list. Supported since 1.66.0.
-	 *   Since 1.99.0 the first insertion determines the overall position of created contexts
+	 *   Since 1.99.0, the first insertion determines the overall position of created contexts
 	 *   within the binding's context list. Every succeeding insertion is relative to the created
 	 *   contexts within this list.
 	 * @param {boolean} [bInactive]
@@ -3168,8 +3168,8 @@ sap.ui.define([
 
 	/**
 	 * Calls {@link sap.ui.model.odata.v4.Context#setKeepAlive} at the context for the given path
-	 * and returns it. Since 1.100.0 the function always returns such a context. If none exists yet,
-	 * it is created without data and a request for its entity is sent.
+	 * and returns it. Since 1.100.0, the function always returns such a context. If none exists
+	 * yet, it is created without data and a request for its entity is sent.
 	 *
 	 * @param {string} sPath
 	 *   The path of the context to be kept alive

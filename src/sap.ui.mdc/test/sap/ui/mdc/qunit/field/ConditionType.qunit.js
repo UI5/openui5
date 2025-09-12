@@ -1968,9 +1968,9 @@ sap.ui.define([
 
 	QUnit.module("Currency type", {
 		beforeEach() {
-			oValueType = new CurrencyType({showMeasure: false}, {maximum: 1000});
-			oUnitType = new CurrencyType({showNumber: false}, {maximum: 1000});
-			oOriginalType = new CurrencyType(undefined, {maximum: 1000});
+			oValueType = new CurrencyType({showNumber: true, showMeasure: false, emptyString: null}, {maximum: 1000});
+			oUnitType = new CurrencyType({showNumber: false, showMeasure: true, emptyString: ""}, {maximum: 1000}); // emptyString set to "" by DefaultTypeMap
+			oOriginalType = new CurrencyType({showNumber: true, showMeasure: true, emptyString: null}, {maximum: 1000});
 			oConditionType = new ConditionType({valueType: oValueType, additionalType: oUnitType, operators: [OperatorName.EQ], originalDateType: oOriginalType, delegate: FieldBaseDelegate});
 			oUnitConditionType = new ConditionType({valueType: oUnitType, additionalType: oValueType, operators: [OperatorName.EQ], originalDateType: oOriginalType, delegate: FieldBaseDelegate});
 			oOneFieldType = new CurrencyType();
@@ -2142,25 +2142,25 @@ sap.ui.define([
 		assert.equal(oCondition.values[1][0], 2, "Values1 entry0");
 		assert.equal(oCondition.values[1][1], "USD", "Values1 entry1"); // as last entry used from type
 
-//		oCondition = oUnitConditionType.parseValue("");
-//		assert.ok(oCondition, "Result returned");
-//		assert.equal(typeof oCondition, "object", "Result is object");
-//		assert.equal(oCondition.operator, OperatorName.EQ", "Operator"); // as it don't have the old condition just the old value
-//		assert.ok(Array.isArray(oCondition.values), "values are array");
-//		assert.equal(oCondition.values.length, 1, "Values length");
-//		assert.equal(oCondition.values[0].length, 2, "Values0 length");
-//		assert.ok(isNaN(oCondition.values[0][0]), "Values entry0"); // as number is cleared by type if unit is cleared
-//		assert.equal(oCondition.values[0][1], null, "Values entry1");
+		oCondition = oUnitConditionType.parseValue("");
+		assert.ok(oCondition, "Result returned");
+		assert.equal(typeof oCondition, "object", "Result is object");
+		assert.equal(oCondition.operator, OperatorName.EQ, "Operator"); // as it don't have the old condition just the old value
+		assert.ok(Array.isArray(oCondition.values), "values are array");
+		assert.equal(oCondition.values.length, 1, "Values length");
+		assert.equal(oCondition.values[0].length, 2, "Values0 length");
+		assert.equal(oCondition.values[0][0], 1, "Values entry0");
+		assert.equal(oCondition.values[0][1], "", "Values entry1");
 
-		let oException;
-
-		try {
-			oCondition = oConditionType.parseValue("");
-		} catch (e) {
-			oException = e;
-		}
-
-		assert.ok(oException, "exception fired (Currency cannot parse empty value)");
+		oCondition = oConditionType.parseValue("");
+		assert.ok(oCondition, "Result returned");
+		assert.equal(typeof oCondition, "object", "Result is object");
+		assert.equal(oCondition.operator, OperatorName.EQ, "Operator"); // as it don't have the old condition just the old value
+		assert.ok(Array.isArray(oCondition.values), "values are array");
+		assert.equal(oCondition.values.length, 1, "Values length");
+		assert.equal(oCondition.values[0].length, 2, "Values0 length");
+		assert.equal(oCondition.values[0][0], null, "Values entry0");
+		assert.equal(oCondition.values[0][1], "", "Values entry1");
 
 		// test number and unit entered in one field
 		const oType = new CurrencyType();

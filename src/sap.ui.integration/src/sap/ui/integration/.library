@@ -72,7 +72,7 @@
             <copyright>Microsoft</copyright>
             <pattern>sap/ui/integration/thirdparty/adaptive-expressions.js</pattern>
         </lib>
-        <lib name="markdown-it" displayName="Markdown-it" npmName="markdown-it" version="12.3.2" hash="fb4306ba1f8f41a66d39cc7545d879fb" homepage="https://github.com/markdown-it/markdown-it" id="73554900106100113285">
+        <lib name="markdown-it" displayName="Markdown-it" npmName="markdown-it" version="14.1.0" hash="b66544bef980a49fcfd3d5233fcaeaca" homepage="https://github.com/markdown-it/markdown-it" id="73554900106100113285">
             <license url="https://github.com/markdown-it/markdown-it/blob/master/LICENSE" type="MIT"></license>
             <copyright>2014 Vitaly Puzrin, Alex Kocharin</copyright>
             <pattern>sap/ui/integration/thirdparty/markdown-it.js</pattern>

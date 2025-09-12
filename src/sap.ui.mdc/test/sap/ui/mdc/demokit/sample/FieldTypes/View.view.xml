@@ -25,7 +25,7 @@
 		<mdc:Field id="F-Boolean" value="{path: 'data>/boolean', type: 'sap.ui.model.type.Boolean'}" editMode="{= ${view>/editMode} ? 'Editable' : 'Display'}" showEmptyIndicator="true"/>
 
 		<Label text="currency Field"/>
-		<mdc:Field id="F-Currency" value="{parts: [{path: 'data>/price', type: 'sap.ui.model.type.Float'}, {path: 'data>/currency', type: 'sap.ui.model.type.String'}], type: 'sap.ui.model.type.Currency'}" editMode="{= ${view>/editMode} ? 'Editable' : 'Display'}" showEmptyIndicator="true"/>
+		<mdc:Field id="F-Currency" value="{parts: [{path: 'data>/price', type: 'sap.ui.model.type.Float'}, {path: 'data>/currency', type: 'sap.ui.model.type.String'}], type: 'sap.ui.model.type.Currency', formatOptions: {emptyString: null}}" editMode="{= ${view>/editMode} ? 'Editable' : 'Display'}" showEmptyIndicator="true"/>
 
 		<Label text="date Field"/>
 		<mdc:Field id="F-Date" value="{path: 'data>/date', type: 'sap.ui.model.type.Date'}" editMode="{= ${view>/editMode} ? 'Editable' : 'Display'}" showEmptyIndicator="true"/>

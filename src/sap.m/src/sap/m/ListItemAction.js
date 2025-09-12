@@ -29,7 +29,7 @@ sap.ui.define([
 	 * @class
 	 * The <code>sap.m.ListItemAction</code> control provides the option to define actions directly related to list items.
 	 *
-	 * @extends sap.ui.core.ListItemActionBase
+	 * @extends sap.m.ListItemActionBase
 	 * @author SAP SE
 	 * @version ${version}
 	 *

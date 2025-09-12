@@ -11,6 +11,26 @@ sap.ui.define([
 
 	QUnit.module("sap/ui/core/util/DraftEnabledMockServer");
 
+	// SNOW: DINC0631208
+	QUnit.test("draft meta data are instance scoped", function (assert) {
+		const sMetadataUrl = "test-resources/sap/ui/core/qunit/mockserver/testdata/draft/metadata.xml";
+
+		// code under test
+		const oMockServer1 = new MockServer({
+			rootUri: "/myservice/"
+		});
+		oMockServer1.simulate(sMetadataUrl);
+		oMockServer1.start();
+
+		const oMockServer2 = new MockServer({
+			rootUri: "/myservice2/"
+		});
+		oMockServer2.simulate(sMetadataUrl);
+		oMockServer2.start();
+
+		assert.notStrictEqual(oMockServer1._oDraftMetadata, oMockServer2._oDraftMetadata);
+	});
+
 	QUnit.test("mock data generation", function (assert) {
 		var oMockServer = new MockServer({
 			rootUri: "/myservice/"

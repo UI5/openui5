@@ -9,9 +9,9 @@ sap.ui.define([
 	"use strict";
 
 	return function (Given, When, Then) {
-		function checkTable(sComment, iExpectedFirstVisibleRow, sExpected) {
+		function checkTable(sComment, iExpectedFirstVisibleRow, iExpectedCount, sExpected) {
 			Then.onTheMainPage.checkTable(sComment, sExpected, /*bCheckName*/true,
-				/*bCheckAge*/false, iExpectedFirstVisibleRow);
+				/*bCheckAge*/false, iExpectedFirstVisibleRow, iExpectedCount);
 		}
 
 		function copyAsLastChildOf(sId, sParent, sComment) {
@@ -46,7 +46,7 @@ sap.ui.define([
 
 		Then.onAnyPage.iTeardownMyUIComponentInTheEnd();
 
-		checkTable("Initial state", 0, `
+		checkTable("Initial state", 0, 24, `
 - 0 Alpha
 	- 1 Beta
 		+ 1.1 Gamma
@@ -55,7 +55,7 @@ sap.ui.define([
 	* 3 Lambda`);
 
 		copyToParent("1", "2", "Copy 1 (Beta) to 2 (Kappa)");
-		checkTable("After copy 1 to 2", 0, `
+		checkTable("After copy 1 to 2", 0, 32, `
 - 0 Alpha
 	- 1 Beta
 		+ 1.1 Gamma
@@ -64,7 +64,7 @@ sap.ui.define([
 		+ A Copy of 1 (Beta)`);
 
 		copyToRoot("1.1", "Copy 1.1 (Gamma) to root");
-		checkTable("After copy 1.1 to root", 0, `
+		checkTable("After copy 1.1 to root", 0, 35, `
 - B Copy of 1.1 (Gamma)
 	* B.1 Copy of 1.1.1 (Delta)
 	* B.2 Copy of 1.1.2 (Epsilon)
@@ -73,7 +73,7 @@ sap.ui.define([
 		+ 1.1 Gamma`);
 
 		copyAsLastChildOf("1.1", "B", "Copy 1.1 (Gamma) as last child of B (Copy of Gamma)");
-		checkTable("After copy 1.1 as last child of B", 0, `
+		checkTable("After copy 1.1 as last child of B", 0, 38, `
 - B Copy of 1.1 (Gamma)
 	* B.1 Copy of 1.1.1 (Delta)
 	* B.2 Copy of 1.1.2 (Epsilon)
@@ -83,7 +83,7 @@ sap.ui.define([
 
 		copyJustBeforeSibling("C.1", "B.1",
 			"Copy C.1 (Copy of 1.1.1 (Delta)) just before sibling B.1 (Copy of 1.1 (Gamma))");
-		checkTable("After copy C.1 just before sibling B.1", 0, `
+		checkTable("After copy C.1 just before sibling B.1", 0, 39, `
 - B Copy of 1.1 (Gamma)
 	* D Copy of C.1 (Copy of 1.1.1 (Delta))
 	* B.1 Copy of 1.1.1 (Delta)
@@ -92,7 +92,7 @@ sap.ui.define([
 		* C.1 Copy of 1.1.1 (Delta)`);
 
 		copyAsLastRoot("C", "Copy C (Copy of 1.1 (Gamma)) as last root");
-		checkTable("After copy C as last root", 15, `
+		checkTable("After copy C as last root", 15, 42, `
 		* 4.1 Nu
 	- 5 Xi
 		+ 5.1 Omicron

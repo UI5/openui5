@@ -11,6 +11,21 @@ sap.ui.define([
 	const rTableId = /^(treeTable|table)$/;
 	const sViewName = "sap.ui.core.sample.odata.v4.RecursiveHierarchy.RecursiveHierarchy";
 
+	function checkCount(oTable, iExpectedCount) {
+		this.waitFor({
+			controlType : "sap.m.Title",
+			id : /title/,
+			success : function (aControls) {
+				const sCount = aControls[0].getText().match(/ (\d+) Employees/)[1];
+				Opa5.assert.strictEqual(sCount, String(iExpectedCount),
+					"$count binding as expected");
+				Opa5.assert.strictEqual(oTable.getBinding("rows").getCount(), iExpectedCount,
+					"ODLB#getCount() as expected");
+			},
+			viewName : sViewName
+		});
+	}
+
 	function copy(sId, sParentOrSibling, sComment, rButton, sButtonText) {
 		selectCopy.call(this);
 		pressButtonInRow.call(this, sId, rButton, sButtonText, sComment);
@@ -131,6 +146,9 @@ sap.ui.define([
 					pressButtonInRow.call(this, sId, /create/, "Create new child below node",
 						sComment);
 				},
+				deleteNode : function (sId, sComment) {
+					pressButtonInRow.call(this, sId, /delete/, "Delete node", sComment);
+				},
 				editName : function (sId, sName, sComment) {
 					this.waitFor({
 						actions : new EnterText({clearTextFirst : true, text : sName}),
@@ -205,7 +223,7 @@ sap.ui.define([
 			},
 			assertions : {
 				checkTable : function (sComment, sExpected, bCheckName, bCheckAge,
-						iExpectedFirstVisibleRow) {
+						iExpectedFirstVisibleRow, iExpectedCount) {
 					this.waitFor({
 						id : rTableId,
 						success : function (aControls) {
@@ -215,6 +233,9 @@ sap.ui.define([
 							if (iExpectedFirstVisibleRow !== undefined) {
 								Opa5.assert.strictEqual(
 									oTable.getFirstVisibleRow(), iExpectedFirstVisibleRow);
+							}
+							if (iExpectedCount !== undefined) {
+								checkCount.call(this, oTable, iExpectedCount);
 							}
 						},
 						viewName : sViewName

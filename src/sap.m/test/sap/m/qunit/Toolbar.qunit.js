@@ -880,6 +880,58 @@ sap.ui.define([
 		oTB.destroy();
 	});
 
+	QUnit.test("tests that arrow key navigation is prevented when modifier keys are pressed", function(assert) {
+		var oLabel = new Label({text : "text"}),
+			oButton = new Button({text : "text"}),
+			oLink = new Link({text : "text"}),
+			oTB = createToolbar({
+				Toolbar : {
+					content : [oLink, oLabel, oButton]
+				}
+			}),
+			oMoveFocusSpy = sinon.spy(oTB, "_moveFocus");
+
+		// Focus the first element manually
+		oLink.focus();
+
+		// Test with Ctrl + Arrow Right
+		var oCtrlArrowRightEvent = new KeyboardEvent("keydown", {
+			keyCode: KeyCodes.ARROW_RIGHT,
+			ctrlKey: true
+		});
+
+		oTB._handleKeyNavigation(oCtrlArrowRightEvent);
+		assert.ok(oMoveFocusSpy.notCalled, "Navigation is prevented when Ctrl key is pressed with arrow right");
+		assert.strictEqual(document.activeElement, oLink.getDomRef(), "Focus remains on the original element with Ctrl + arrow right");
+
+		oMoveFocusSpy.resetHistory();
+
+		// Test with Alt + Arrow Left
+		var oAltArrowLeftEvent = new KeyboardEvent("keydown", {
+			keyCode: KeyCodes.ARROW_LEFT,
+			altKey: true
+		});
+
+		oTB._handleKeyNavigation(oAltArrowLeftEvent);
+		assert.ok(oMoveFocusSpy.notCalled, "Navigation is prevented when Alt key is pressed with arrow left");
+		assert.strictEqual(document.activeElement, oLink.getDomRef(), "Focus remains on the original element with Alt + arrow left");
+
+		oMoveFocusSpy.resetHistory();
+
+		// Test with Command + Arrow Left
+		oTB._handleKeyNavigation(oAltArrowLeftEvent);
+		assert.ok(oMoveFocusSpy.notCalled, "Navigation is prevented when Command key is pressed with arrow left");
+		assert.strictEqual(document.activeElement, oLink.getDomRef(), "Focus remains on the original element with Command + arrow left");
+
+		oMoveFocusSpy.resetHistory();
+
+		// Cleanup
+		oLabel.destroy();
+		oButton.destroy();
+		oLink.destroy();
+		oTB.destroy();
+	});
+
 	QUnit.test("inactive toolbar should not fire press on SPACE key", function(assert) {
 		var oLabel = new Label({text : "text"});
 		var fnPressSpy = this.spy();
