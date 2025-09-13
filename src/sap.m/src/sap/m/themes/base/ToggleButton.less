@@ -101,4 +101,11 @@ html.sap-desktop .sapMToggleBtnPressed.sapMBtnTransparent > .sapMBtnIcon {
 		border-color: var(--sapButton_Attention_Active_BorderColor);
 		color: contrast(lighten(@sapUiButtonAttentionActiveBackground, 5), @sapUiBaseText, @sapUiContentContrastTextColor, @sapUiContentContrastTextThreshold);
 	}
+
+	&.sapMBtnGhost {
+		background-color: var(--sapButton_Selected_Hover_Background);
+		border-color: var(--sapButton_Selected_Hover_BorderColor);
+		color: var(--sapButton_Selected_TextColor);
+		text-shadow: none;
+	}
 }

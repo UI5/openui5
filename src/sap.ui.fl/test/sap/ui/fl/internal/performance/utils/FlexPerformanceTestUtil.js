@@ -8,7 +8,7 @@ sap.ui.define([
 	"sap/m/VBox",
 	"sap/ui/core/Element",
 	"sap/ui/fl/apply/_internal/flexState/FlexObjectState",
-	"sap/ui/fl/apply/_internal/preprocessors/XmlPreprocessor",
+	"sap/ui/fl/initial/_internal/preprocessors/XmlPreprocessor",
 	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
 	"sap/ui/fl/apply/api/FlexRuntimeInfoAPI",
 	"sap/ui/fl/variants/VariantManager",

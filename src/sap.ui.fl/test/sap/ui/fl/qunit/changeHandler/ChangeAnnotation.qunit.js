@@ -141,6 +141,33 @@ sap.ui.define([
 				value: {String: "someTextValue"}
 			}, "applyChange returns the correct result");
 		});
+
+		QUnit.test("with objectTemplateInfo and values containing quotes", function(assert) {
+			ChangeAnnotation.completeChangeContent(this.oAnnotationChange, {
+				content: {
+					annotationPath: "somePath",
+					value: 'valueWithQuote"',
+					objectTemplateInfo: {
+						templateAsString: '{"String": "placeHolder", "anotherProperty": "placeHolder"}',
+						placeholder: "placeHolder"
+					}
+				}
+			});
+			assert.deepEqual(this.oAnnotationChange.getContent(), {
+				annotationPath: "somePath",
+				objectTemplateInfo: {
+					templateAsString: '{"String": "placeHolder", "anotherProperty": "placeHolder"}',
+					placeholder: "placeHolder"
+				},
+				value: 'valueWithQuote"'
+			}, "content was set correctly");
+
+			const oApplyChangeResult = ChangeAnnotation.applyChange(this.oAnnotationChange);
+			assert.deepEqual(oApplyChangeResult, {
+				path: "somePath",
+				value: {String: 'valueWithQuote"', anotherProperty: 'valueWithQuote"'}
+			}, "applyChange returns the correct result");
+		});
 	});
 
 	QUnit.done(function() {

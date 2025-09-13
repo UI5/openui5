@@ -5,42 +5,46 @@
 
 sap.ui.define([
 	"sap/ui/core/mvc/XMLView",
+	"sap/ui/core/util/reflection/JsControlTreeModifier",
 	"sap/ui/core/ComponentContainer",
 	"sap/ui/core/UIComponent",
-	"sap/ui/core/util/reflection/JsControlTreeModifier",
 	"sap/ui/dt/DesignTime",
 	"sap/ui/dt/DesignTimeStatus",
 	"sap/ui/dt/OverlayRegistry",
 	"sap/ui/fl/apply/_internal/changes/Utils",
+	"sap/ui/fl/apply/_internal/flexState/FlexState",
 	"sap/ui/fl/changeHandler/condenser/Classification",
+	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/write/api/PersistenceWriteAPI",
 	"sap/ui/fl/Layer",
 	"sap/ui/model/Model",
+	"sap/ui/test/utils/nextUIUpdate",
 	"sap/ui/rta/command/CommandFactory",
 	"sap/ui/rta/util/changeVisualization/ChangeCategories",
 	"sap/ui/rta/util/changeVisualization/ChangeVisualization",
-	"sap/ui/test/utils/nextUIUpdate",
 	"sap/ui/thirdparty/sinon-4",
 	"test-resources/sap/ui/fl/api/FlexTestAPI",
 	"test-resources/sap/ui/fl/qunit/FlQUnitUtils",
 	"sap/ui/fl/library" // we have to ensure to load fl, so that change handler gets registered
 ], function(
 	XMLView,
+	JsControlTreeModifier,
 	ComponentContainer,
 	UIComponent,
-	JsControlTreeModifier,
 	DesignTime,
 	DesignTimeStatus,
 	OverlayRegistry,
 	ChangesUtils,
+	FlexState,
 	CondenserClassification,
+	ManifestUtils,
 	PersistenceWriteAPI,
 	Layer,
 	Model,
+	nextUIUpdate,
 	CommandFactory,
 	ChangeCategories,
 	ChangeVisualization,
-	nextUIUpdate,
 	sinon,
 	FlexTestAPI,
 	FlQUnitUtils
@@ -613,16 +617,24 @@ sap.ui.define([
 				// Wait for each change to be applied individually to allow dependencies
 				// between changes of different actions
 				this.oUiComponentContainer.destroy();
-				PersistenceWriteAPI.add({
+				const aFlexObjects = [PersistenceWriteAPI.add({
 					change: oCommand.getPreparedChange(),
 					selector: oAppComponent
-				});
+				})];
 				if (oSecondCommand) {
-					PersistenceWriteAPI.add({
+					aFlexObjects.push(PersistenceWriteAPI.add({
 						change: oSecondCommand.getPreparedChange(),
 						selector: oAppComponent
-					});
+					}));
 				}
+				const sReference = ManifestUtils.getFlexReferenceForControl(oAppComponent);
+				FlexState.update(sReference, aFlexObjects.map((oFlexObject) => {
+					return {
+						type: "add",
+						flexObject: oFlexObject.convertToFileContent()
+					};
+				}));
+
 				return await createViewInComponent.call(this, ASYNC);
 			}
 

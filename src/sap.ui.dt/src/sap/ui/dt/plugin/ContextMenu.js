@@ -1,32 +1,29 @@
 /*!
  * ${copyright}
  */
-
 sap.ui.define([
 	"sap/base/assert",
 	"sap/m/Button",
-	"sap/m/FlexBox",
-	"sap/m/FormattedText",
 	"sap/m/Menu",
 	"sap/m/MenuItem",
 	"sap/ui/base/DesignTime",
+	"sap/ui/core/Lib",
 	"sap/ui/dt/util/_createPromise",
-	"sap/ui/dt/OverlayRegistry",
 	"sap/ui/dt/Plugin",
+	"sap/ui/dt/OverlayRegistry",
 	"sap/ui/dt/Util",
 	"sap/ui/events/KeyCodes",
 	"sap/ui/Device"
 ], function(
 	assert,
 	Button,
-	FlexBox,
-	FormattedText,
 	Menu,
 	MenuItem,
 	BaseDesignTime,
+	Lib,
 	_createPromise,
-	OverlayRegistry,
 	Plugin,
+	OverlayRegistry,
 	DtUtil,
 	KeyCodes,
 	Device
@@ -64,10 +61,10 @@ sap.ui.define([
 				closedContextMenu: {}
 			}
 		}
-
 	});
 
 	const sMainStyleClass = "sapUiDtContextMenu";
+	const oTextResources = Lib.getResourceBundleFor("sap.ui.dt");
 
 	ContextMenu.prototype.init = function() {
 		this.oContextMenuControl = new Menu();
@@ -76,6 +73,7 @@ sap.ui.define([
 		this.oContextMenuControl.addStyleClass(sMainStyleClass);
 		this._aMenuItems = [];
 		this._aGroupedItems = [];
+		this._bHasPropagatedMenuItems = false;
 		this._aSubMenus = [];
 	};
 
@@ -164,6 +162,12 @@ sap.ui.define([
 						const aMenuItemsWithPropagatingControl = aMenuItems.map((oMenuItem) => {
 							oMenuItem.propagatingControl = oPropagatedActionInfo.propagatingControl;
 							oMenuItem.propagatingControlName = oPropagatedActionInfo.propagatingControlName;
+							if (BaseDesignTime.isDesignModeEnabled() || !oMenuItem.propagatingControlName) {
+								// in design mode we use the technical name of the propagating control
+								// if no name is provided by the plugin
+								oMenuItem.propagatingControlName =
+									oPropagatedActionInfo.propagatingControl.getMetadata().getName().split(".").pop();
+							}
 							return oMenuItem;
 						});
 						resolve(aMenuItemsWithPropagatingControl);
@@ -173,7 +177,6 @@ sap.ui.define([
 			return null;
 		}).filter(Boolean);
 	}
-
 	/**
 	 * Opens the Context Menu
 	 * @param {sap.ui.dt.Overlay} oOverlay - Overlay object
@@ -182,50 +185,116 @@ sap.ui.define([
 	 */
 	ContextMenu.prototype.open = function(oOverlay, bIsSubMenu, oEvent) {
 		let aSelectedOverlays;
-		function addMenuItems(oMenu, aMenuItems) {
-			let bStartsSection = !!aMenuItems[0]?.propagatingControl;
-			let oTargetOverlay = oOverlay;
-			let aTargetSelectedOverlays = aSelectedOverlays;
-			aMenuItems.forEach(function(oMenuItem, index) {
-				if (oMenuItem.propagatingControl) {
-					oTargetOverlay = OverlayRegistry.getOverlay(oMenuItem.propagatingControl);
-					aTargetSelectedOverlays = [oTargetOverlay];
-				}
-				const sText = typeof oMenuItem.text === "function" ? oMenuItem.text(oTargetOverlay) : oMenuItem.text;
-				const bEnabled = typeof oMenuItem.enabled === "function" ? oMenuItem.enabled(aTargetSelectedOverlays) : oMenuItem.enabled;
-				const oMenuItemInstance = new MenuItem({
-					key: oMenuItem.id,
-					icon: oMenuItem.icon,
-					text: sText,
-					enabled: bEnabled,
-					startsSection: bStartsSection
-				});
+		const sExtendedMenuTitle = oTextResources.getText("CTX_EXTENDED_ACTIONS_HEADER");
+		const sExtendedMenuTooltip = oTextResources.getText("CTX_EXTENDED_ACTIONS_HEADER_DESCRIPTION");
+		const oElement = oOverlay.getElement();
+		const oElementDesignTimeMetadata = oOverlay.getDesignTimeMetadata();
+		this.sSelectedControlName = oElementDesignTimeMetadata.getName(oElement)?.singular
+			|| oElement.getMetadata().getName().split(".").pop();
+		this.bHasExtendedActionsTitleSet = false;
 
-				oMenu.addItem(oMenuItemInstance);
-
-				// Add end content to the menu item
-				if (oMenuItem.propagatingControlName || oMenuItem.additionalInfo) {
-					const oFlexBox = new FlexBox({
-						justifyContent: "SpaceBetween",
-						alignItems: "Center"
-					});
-					if (oMenuItem.propagatingControlName) {
-						oFlexBox.addItem(new FormattedText({
-							htmlText: `<strong>${oMenuItem.propagatingControlName}</strong>`
-						}));
+		function addMenuItems(oMenu, aMenuItems, sPropagatedControlName, bIsSubMenu, bAddAsNormalActions) {
+			const fnRemoveFocusability = function() {
+				return false;
+			};
+			if (sPropagatedControlName) {
+				// Extended Actions for a propagated control
+				if (!bAddAsNormalActions) {
+					// only add the title once, not for each propagated control
+					if (!this.bHasExtendedActionsTitleSet) {
+						this.bHasExtendedActionsTitleSet = true;
+						const oExtendedActionsItem = new MenuItem({
+							key: "CTX_EXTENDED_MENU_TITLE",
+							id: "CTX_EXTENDED_MENU_TITLE",
+							text: sExtendedMenuTitle,
+							enabled: false
+						});
+						oExtendedActionsItem.addStyleClass("sapUiDtContextMenuExtendedActionsTitle");
+						oExtendedActionsItem.setTooltip(sExtendedMenuTooltip);
+						// prevent focusability of the title item
+						oExtendedActionsItem.isFocusable = fnRemoveFocusability;
+						oMenu.addItem(oExtendedActionsItem);
 					}
+					// we have to provide a unique ID for each propagated control
+					// (in case there are multiple propagated controls in the menu)
+					const sId = `CTX_PROPAGATED_CONTROL_NAME_${sPropagatedControlName.replace(/[\.\s]/g, "_").toUpperCase()}`;
+					const oTitleMenuItem = new MenuItem({
+						key: sId,
+						id: sId,
+						text: sPropagatedControlName,
+						enabled: false
+					});
+					oTitleMenuItem.addStyleClass("sapUiDtContextMenuPropagatedControlTitle");
+					// prevent focusability of the title item
+					oTitleMenuItem.isFocusable = fnRemoveFocusability;
+					oMenu.addItem(oTitleMenuItem);
+				}
+				aMenuItems.forEach(function(oMenuItem) {
+					const oTargetOverlay = OverlayRegistry.getOverlay(oMenuItem.propagatingControl);
+					const aTargetSelectedOverlays = [oTargetOverlay];
+					const sText = typeof oMenuItem.text === "function" ? oMenuItem.text(oTargetOverlay) : oMenuItem.text;
+					const bEnabled = typeof oMenuItem.enabled === "function"
+						? oMenuItem.enabled(aTargetSelectedOverlays)
+						: oMenuItem.enabled;
+					const oMenuItemInstance = new MenuItem({
+						key: oMenuItem.id,
+						icon: oMenuItem.icon,
+						text: sText,
+						enabled: bEnabled
+					});
+
+					if (!bAddAsNormalActions) {
+						oMenuItemInstance.addStyleClass("sapUiDtContextMenuPropagatedItem");
+					}
+					oMenu.addItem(oMenuItemInstance);
+					// Add end content to the menu item
 					if (oMenuItem.additionalInfo) {
 						const oAdditionalInfoButton = createAdditionalInfo.call(this, oMenuItem);
-						oFlexBox.addItem(oAdditionalInfoButton);
+						oMenuItemInstance.addEndContent(oAdditionalInfoButton);
 					}
-					oMenuItemInstance.addEndContent(oFlexBox);
+				}.bind(this));
+			} else {
+				// Standard actions for the current context element
+				const aTargetSelectedOverlays = aSelectedOverlays;
+				if (!bIsSubMenu) {
+					const oTitleMenuItem = new MenuItem({
+						key: "CTX_CONTROL_NAME",
+						id: "CTX_CONTROL_NAME",
+						text: this.sSelectedControlName,
+						enabled: false
+					});
+					oTitleMenuItem.addStyleClass("sapUiDtContextMenuControlTitle");
+					// prevent focusability of the title item
+					oTitleMenuItem.isFocusable = fnRemoveFocusability;
+					oMenu.addItem(oTitleMenuItem);
 				}
+				aMenuItems.forEach(function(oMenuItem, index) {
+					const sText = typeof oMenuItem.text === "function" ? oMenuItem.text(oOverlay) : oMenuItem.text;
+					const bEnabled = typeof oMenuItem.enabled === "function"
+						? oMenuItem.enabled(aTargetSelectedOverlays)
+						: oMenuItem.enabled;
+					const oMenuItemInstance = new MenuItem({
+						key: oMenuItem.id,
+						icon: oMenuItem.icon,
+						text: sText,
+						enabled: bEnabled
+					});
 
-				if (oMenuItem.submenu) {
-					addMenuItems.call(this, oMenu.getItems()[index], oMenuItem.submenu);
-				}
-				bStartsSection = false;
-			}.bind(this));
+					oMenu.addItem(oMenuItemInstance);
+
+					// Add end content to the menu item
+					if (oMenuItem.additionalInfo) {
+						const oAdditionalInfoButton = createAdditionalInfo.call(this, oMenuItem);
+						oMenuItemInstance.addEndContent(oAdditionalInfoButton);
+					}
+
+					if (oMenuItem.submenu) {
+						const bIsSubMenu = true;
+						// we need to add one to the index, because we added the control name as first item
+						addMenuItems.call(this, oMenu.getItems()[index + 1], oMenuItem.submenu, undefined, bIsSubMenu);
+					}
+				}.bind(this));
+			}
 		}
 
 		const oNewContextElement = oOverlay.getElement();
@@ -268,6 +337,7 @@ sap.ui.define([
 			oPromise = oDtSyncPromise.promise
 			.then(function() {
 				this._aGroupedItems = [];
+				this._bHasPropagatedMenuItems = false;
 				this._aSubMenus = [];
 				const aPluginItemPromises = [];
 				const aPlugins = this.getDesignTime().getPlugins();
@@ -284,7 +354,6 @@ sap.ui.define([
 				if (aSelectedOverlays.length === 1) {
 					aPropagatedMenuItemPromises = collectPropagatedMenuItemPromises(aPlugins, aSelectedOverlays[0]);
 				}
-
 				const oPluginItemsPromise = _createPromise(function(resolve, reject) {
 					aPluginItemPromises.push(...aPropagatedMenuItemPromises);
 					Promise.all(aPluginItemPromises).then(resolve).catch(reject);
@@ -293,20 +362,25 @@ sap.ui.define([
 				return oPluginItemsPromise.promise;
 			}.bind(this))
 			.then(function(aPluginMenuItems) {
-				return aPluginMenuItems.reduce(function(aConcatenatedMenuItems, aMenuItems) {
-					return aConcatenatedMenuItems.concat(aMenuItems);
-				});
+				if (aPluginMenuItems.length > 0) {
+					return aPluginMenuItems.reduce(function(aConcatinatedMenuItems, aMenuItems) {
+						return aConcatinatedMenuItems.concat(aMenuItems);
+					});
+				}
+				return aPluginMenuItems;
 			})
 			.then(function(aPluginMenuItems) {
 				aPluginMenuItems.forEach(function(mMenuItem) {
 					if (mMenuItem.submenu !== undefined) {
 						this._addSubMenu(mMenuItem);
+					} else if (mMenuItem.propagatingControlName !== undefined) {
+						this._addMenuItemToGroup(mMenuItem);
+						this.addMenuItem(mMenuItem, true);
 					} else {
 						this.addMenuItem(mMenuItem, true);
 					}
 				}.bind(this));
 
-				this._addItemGroupsToMenu();
 				delete this._fnCancelMenuPromise;
 			}.bind(this));
 		}
@@ -317,10 +391,20 @@ sap.ui.define([
 			});
 
 			if (aAllMenuItems.length > 0) {
+				const bIsSubMenu = false;
 				const aMenuItems = this._sortMenuItems(aAllMenuItems.filter((mMenuItem) => !mMenuItem.propagatingControl));
-				const aPropagatedMenuItems = this._sortMenuItems(aAllMenuItems.filter((mMenuItem) => mMenuItem.propagatingControl));
-				addMenuItems.call(this, this.oContextMenuControl, aMenuItems);
-				addMenuItems.call(this, this.oContextMenuControl, aPropagatedMenuItems, true);
+				addMenuItems.call(this, this.oContextMenuControl, aMenuItems, undefined, bIsSubMenu);
+				this._aGroupedItems.forEach(function(oPropagatedMenuItemGroup) {
+					const bAddAsNormalActions = (oPropagatedMenuItemGroup.sGroupName === this.sSelectedControlName);
+					addMenuItems.call(
+						this,
+						this.oContextMenuControl,
+						oPropagatedMenuItemGroup.aGroupedItems,
+						oPropagatedMenuItemGroup.sGroupName,
+						bIsSubMenu,
+						bAddAsNormalActions
+					);
+				}.bind(this));
 				// we have to distinguish between the mouse and the keyboard event
 				const oOpenerRef = (oEvent.type === "keyup") ? oOverlay : undefined;
 				// Set focus to the overlay before opening the context menu to ensure that the keyboard
@@ -329,7 +413,6 @@ sap.ui.define([
 				oOverlay.focus();
 				this.oContextMenuControl.openAsContextMenu(oEvent, oOpenerRef);
 			}
-
 			this.fireOpenedContextMenu();
 		}.bind(this))
 		.catch(function(oError) {
@@ -510,12 +593,7 @@ sap.ui.define([
 		if (Device.os.ios) {
 			return false;
 		}
-
-		if (this.getDesignTime().getBusyPlugins().length) {
-			return true;
-		}
-
-		return false;
+		return !!this.getDesignTime().getBusyPlugins().length;
 	};
 
 	/**
@@ -523,18 +601,28 @@ sap.ui.define([
 	 * @param {object} mMenuItem The menu item to add to a group
 	 */
 	ContextMenu.prototype._addMenuItemToGroup = function(mMenuItem) {
+		const sGroupName = mMenuItem.propagatingControlName;
 		const bGroupExists = this._aGroupedItems.some(function(_oGroupedItem) {
-			if (_oGroupedItem.sGroupName === mMenuItem.group) {
+			if (_oGroupedItem.sGroupName === sGroupName) {
 				_oGroupedItem.aGroupedItems.push(mMenuItem);
 				return true;
 			}
 		});
 
 		if (!bGroupExists) {
-			this._aGroupedItems.push({
-				sGroupName: mMenuItem.group,
-				aGroupedItems: [mMenuItem]
-			});
+			if (sGroupName !== this.sSelectedControlName) {
+				this._aGroupedItems.push({
+					sGroupName: mMenuItem.propagatingControlName,
+					aGroupedItems: [mMenuItem]
+				});
+				this._bHasPropagatedMenuItems = true;
+			} else {
+				// ensure that the group with the same name as the current control is always on top
+				this._aGroupedItems.unshift({
+					sGroupName: mMenuItem.propagatingControlName,
+					aGroupedItems: [mMenuItem]
+				});
+			}
 		}
 	};
 
@@ -553,27 +641,6 @@ sap.ui.define([
 		});
 
 		this.addMenuItem(mMenuItem, true);
-	};
-
-	/**
-	 * Adds the grouped menu item to the collapsed version of a ContextMenu
-	 */
-	ContextMenu.prototype._addItemGroupsToMenu = function() {
-		this._aGroupedItems.forEach(function(oGroupedItem) {
-			// If there is only one menu item that belongs to a group we don't need that group
-			if (oGroupedItem.aGroupedItems.length === 1) {
-				this.addMenuItem(oGroupedItem.aGroupedItems[0], true);
-			} else {
-				this.addMenuItem({
-					id: `${oGroupedItem.sGroupName}-groupItem`,
-					enabled: true,
-					text: oGroupedItem.sGroupName,
-					icon: oGroupedItem.aGroupedItems[0].icon,
-					rank: oGroupedItem.aGroupedItems[0].rank,
-					submenu: oGroupedItem.aGroupedItems
-				}, true);
-			}
-		}.bind(this));
 	};
 
 	return ContextMenu;

@@ -1506,6 +1506,30 @@ sap.ui.define([
         this.oNavContainer.to("integrationPage2", "show", testData);
     });
 
+	QUnit.test("Should handle immediate navigation with different animations", async function (assert) {
+		const fnDone = assert.async();
+
+		// Render the NavContainer first
+		this.oNavContainer.placeAt(this.oContainer.id);
+		await nextUIUpdate();
+
+		// Start the first navigation with "fade" animation
+		this.oNavContainer.to("integrationPage3", "fade");
+
+		// Immediately navigate to the second page with "show" animation
+		this.oNavContainer.to("integrationPage2", "show");
+
+		// Immediately navigate to the second page again with "slide" animation
+		this.oNavContainer.to("integrationPage2", "slide");
+
+		setTimeout(() => {
+			assert.strictEqual(this.aPages[0].$().hasClass("sapMNavItemHidden"), true, "Integration Page 1 should be hidden");
+			assert.strictEqual(this.aPages[1].$().hasClass("sapMNavItemHidden"), false, "Integration Page 2 should be visible");
+			assert.strictEqual(this.aPages[2].$().hasClass("sapMNavItemHidden"), true, "Integration Page 3 should be hidden");
+			fnDone();
+		}, TEST_TIMEOUTS.LONG);
+	});
+
     // Module: Stress and Advanced Scenarios
     QUnit.module("Stress and Advanced Scenarios", {
         beforeEach: function () {

@@ -1911,6 +1911,8 @@ sap.ui.define([
 			this._updateHeaderVisualState(bCurrentHeight !== bOldHeight);
 			this._adaptScrollPositionOnHeaderChange(bCurrentHeight, bOldHeight);
 		}
+
+		this._expandHeaderIfNeeded(oEvent);
 	};
 
 	/**
@@ -1933,20 +1935,24 @@ sap.ui.define([
 			oDynamicPageTitle._onResize(iCurrentWidth);
 		}
 
-		if (this._shouldAutoExpandHeaderOnResize(oEvent)) {
-			this._expandHeader(true, false /* bUserInteraction */);
-			this.getHeader().$().removeClass("sapFDynamicPageHeaderHidden");
-		}
+		this._expandHeaderIfNeeded(oEvent);
 
 		this._adjustSnap();
 		this._updateTitlePositioning();
 		this._updateMedia(iCurrentWidth);
 	};
 
+	DynamicPage.prototype._expandHeaderIfNeeded = function (oEvent) {
+		if (this._shouldAutoExpandHeaderOnResize(oEvent)) {
+			this._expandHeader(true, false /* bUserInteraction */);
+			this.getHeader().$().removeClass("sapFDynamicPageHeaderHidden");
+		}
+	};
+
 	DynamicPage.prototype._shouldAutoExpandHeaderOnResize = function (oResizeEvent) {
 		var oDynamicPageHeader = this.getHeader(),
 			bHeaderSnappedByUser = exists(oDynamicPageHeader) && !this.getHeaderExpanded() && this._bIsLastToggleUserInitiated,
-			bPageResized = oResizeEvent.target === this.getDomRef(),
+			bPageResized = oResizeEvent.target === this.getDomRef() || oResizeEvent.target === this.$contentFitContainer?.get(0),
 			canToggleHeaderOnScroll = this._canSnapHeaderOnScroll.bind(this);
 
 		// auto-expand the header if the user had snapped it but

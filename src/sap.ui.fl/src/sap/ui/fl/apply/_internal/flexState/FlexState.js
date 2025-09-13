@@ -415,6 +415,7 @@ sap.ui.define([
 		enhancePropertyBag(mProperties);
 		const sFlexReference = mProperties.reference;
 
+		// TODO: Probably obsolete, as the init call is awaited in the Loader
 		const oOldInitPromise = _mInitPromises[sFlexReference];
 		const oNewInitPromise = new Deferred();
 		_mInitPromises[sFlexReference] = oNewInitPromise;

@@ -14,8 +14,8 @@ sap.ui.define([
 	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/base/DesignTime",
 	// the lower 2 are set as a callback in the "register...Processors" which are not detected as dependencies from the preload-building
-	"sap/ui/fl/apply/_internal/preprocessors/ControllerExtension",
-	"sap/ui/fl/apply/_internal/preprocessors/XmlPreprocessor"
+	"sap/ui/fl/initial/_internal/preprocessors/ControllerExtension",
+	"sap/ui/fl/initial/_internal/preprocessors/XmlPreprocessor"
 ], function(
 	MvcControllerExtensionProvider,
 	XMLView,
@@ -55,12 +55,12 @@ sap.ui.define([
 	}
 
 	function registerExtensionProvider() {
-		MvcControllerExtensionProvider.registerExtensionProvider("sap/ui/fl/apply/_internal/preprocessors/ControllerExtension");
+		MvcControllerExtensionProvider.registerExtensionProvider("sap/ui/fl/initial/_internal/preprocessors/ControllerExtension");
 	}
 
 	function registerXMLPreprocessor() {
 		if (XMLView.registerPreprocessor) {
-			XMLView.registerPreprocessor("viewxml", "sap.ui.fl.apply._internal.preprocessors.XmlPreprocessor");
+			XMLView.registerPreprocessor("viewxml", "sap.ui.fl.initial._internal.preprocessors.XmlPreprocessor");
 		}
 	}
 

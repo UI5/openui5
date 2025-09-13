@@ -654,8 +654,6 @@ sap.ui.define([
 		this._iTransitionsCompleted++;
 		this._bNavigating = false;
 
-
-		this._afterNavigation(oNavInfo, oData, oBackData);
 		// TODO: destroy HTML? Remember to destroy ALL HTML of several pages when backToTop has been called
 
 		Log.info(this + ": _afterTransitionCallback called, to: " + oNavInfo.toId);
@@ -664,6 +662,8 @@ sap.ui.define([
 			Log.warning(this.toString() + ": target page '" + oNavInfo.toId + "' still has CSS class 'sapMNavItemHidden' after transition. This should not be the case, please check the preceding log statements.");
 			oNavInfo.to.removeStyleClass("sapMNavItemHidden");
 		}
+
+		this._afterNavigation(oNavInfo, oData, oBackData);
 	};
 
 	NavContainer.prototype.enhancePagesAccessibility = function () {

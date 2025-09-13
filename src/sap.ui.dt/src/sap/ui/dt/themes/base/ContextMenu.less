@@ -1,7 +1,10 @@
 /******************************************************************
 	Style of the DT Contextmenu - base Theme
 *******************************************************************/
-@_sap_ui_dt_ContextMenu_MnuItemTextColor: @sapUiBaseText;
+@_sap_ui_dt_ContextMenu_MnuItemTextColor: var(--sapTextColor); // #000
+@_sap_ui_dt_ContextMenu_MnuItemIconColor: var(--sapContent_NonInteractiveIconColor); // #111
+@_sap_ui_dt_ContextMenu_PrpgtedMnuItemBGColor: var(--sapList_AlternatingBackground); // darken(#111, 10);
+@_sap_ui_dt_ContextMenu_PrpgtedTitleBorderColor: var(--sapShell_BorderColor); // #111
 
 .sapUiDtContextMenu.sapMMenu {
 	.sapMMenuList {
@@ -30,13 +33,73 @@
 						}
 					}
 					.sapUiIcon {
-						color: @_sap_ui_dt_ContextMenu_MnuItemTextColor !important;
+						color: @_sap_ui_dt_ContextMenu_MnuItemIconColor !important;
 					}
 				}
 			}
 
 			&.sapMMenuItemDisabled {
 				opacity: 0.5;
+			}
+
+			// style for control names
+			&.sapUiDtContextMenuControlTitle {
+				opacity: 1;
+				height: 1.5rem;
+				.sapMMenuItemIcon {
+					display: none;
+				}
+				.sapMMenuItemText {
+					font-weight: bold;
+					color: @_sap_ui_dt_ContextMenu_MnuItemTextColor;
+				}
+			}
+
+			// Style for title "Extended Actions"
+			&.sapUiDtContextMenuExtendedActionsTitle {
+				opacity: 1;
+				height: 2rem;
+				text-align: center;
+				background-color: @_sap_ui_dt_ContextMenu_PrpgtedMnuItemBGColor;
+				border-top: 0.063rem solid @_sap_ui_dt_ContextMenu_PrpgtedTitleBorderColor;
+				border-bottom: 0.063rem solid @_sap_ui_dt_ContextMenu_PrpgtedTitleBorderColor;
+				border-radius: 0;
+				padding: 0.313rem 0.625rem;
+				.sapMMenuItemIcon {
+					display: none;
+				}
+				.sapMMenuItemText {
+					color: @_sap_ui_dt_ContextMenu_MnuItemTextColor;
+				}
+			}
+
+			// style for names of propagated controls
+			&.sapUiDtContextMenuPropagatedControlTitle {
+				opacity: 1;
+				height: 1.5rem;
+				background-color: @_sap_ui_dt_ContextMenu_PrpgtedMnuItemBGColor;
+				margin: 0!important;
+				padding: 0.313rem 0.625rem;
+				.sapMMenuItemIcon {
+					display: none;
+				}
+				.sapMMenuItemText {
+					font-weight: bold;
+					color: @_sap_ui_dt_ContextMenu_MnuItemTextColor;
+				}
+			}
+
+			// style for propagated menu items
+			&.sapUiDtContextMenuPropagatedItem {
+				margin: 0!important;
+				&:not(:hover) {
+					background-color: @_sap_ui_dt_ContextMenu_PrpgtedMnuItemBGColor;
+				}
+				&.sapMMenuItemDisabled{
+					&:hover {
+						background-color: @_sap_ui_dt_ContextMenu_PrpgtedMnuItemBGColor;
+					}
+				}
 			}
 		}
 	}
@@ -59,7 +122,7 @@
 }
 
 .sapUiSizeCompact .sapMMenu.sapUiDtContextMenu {
-	.sapMMenuItem {
+	.sapMMenuItem:not(.sapUiDtContextMenuControlTitle):not(.sapUiDtContextMenuPropagatedControlTitle):not(.sapUiDtContextMenuExtendedActionsTitle) {
 		height: 2.25rem;
 		padding: 0 0.25rem;
 
@@ -77,8 +140,15 @@
 }
 
 html.sap-desktop, html.sap-tablet {
-
-	& .sapUiSizeCozy .sapUiDtContextMenu.sapMMenu .sapMMenuList > .sapMMenuItem > .sapMMenuItemIcon + .sapMMenuItemText {
-		margin-left: 1.75rem;
+	.sapUiSizeCozy {
+		.sapUiDtContextMenu.sapMMenu {
+			.sapMMenuList {
+				.sapMMenuItem:not(.sapUiDtContextMenuPropagatedControlTitle):not(.sapUiDtContextMenuControlTitle):not(.sapUiDtContextMenuExtendedActionsTitle) {
+					.sapMMenuItemIcon + .sapMMenuItemText {
+						margin-left: 1.75rem;
+					}
+				}
+			}
+		}
 	}
 }

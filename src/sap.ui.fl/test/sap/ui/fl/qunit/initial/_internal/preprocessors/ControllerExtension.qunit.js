@@ -2,16 +2,16 @@
 
 sap.ui.define([
 	"sap/ui/fl/apply/_internal/flexState/FlexState",
+	"sap/ui/fl/initial/_internal/preprocessors/ControllerExtension",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
-	"sap/ui/fl/apply/_internal/preprocessors/ControllerExtension",
 	"sap/ui/fl/Layer",
 	"sap/ui/fl/Utils",
 	"sap/ui/thirdparty/sinon-4",
 	"test-resources/sap/ui/fl/qunit/FlQUnitUtils"
 ], function(
 	FlexState,
-	ManifestUtils,
 	ControllerExtension,
+	ManifestUtils,
 	Layer,
 	Utils,
 	sinon,
@@ -203,6 +203,19 @@ sap.ui.define([
 
 			const aCodeExtensions = await oExtensionProvider.getControllerExtensions(sControllerName, "<component ID>", true);
 			assert.equal(aCodeExtensions.length, 0, "No extensions were returned.");
+		});
+
+		QUnit.test("make sure FlexState is not loaded if there are no changes", async function(assert) {
+			const oRequireSpy = sandbox.spy(sap.ui, "require");
+			await FlQUnitUtils.initializeFlexStateWithData(sandbox, sReference);
+			sandbox.stub(Utils, "getAppComponentForControl").returns(oAppComponent);
+			sandbox.stub(ManifestUtils, "getFlexReferenceForControl").returns(sReference);
+			var oExtensionProvider = new ControllerExtension();
+			sandbox.spy(FlexState, "waitForInitialization");
+			const aCodeExtensions = await oExtensionProvider.getControllerExtensions(sControllerName, "<component ID>", true);
+			assert.equal(aCodeExtensions.length, 0, "No extensions were returned.");
+			assert.strictEqual(FlexState.waitForInitialization.callCount, 0, "FlexState.waitForInitialization was not called");
+			assert.notOk(oRequireSpy.calledWith("sap/ui/fl/apply/_internal/flexState/FlexState"), "FlexState module was not required");
 		});
 
 		[{

@@ -236,7 +236,7 @@ sap.ui.define([
 				const oMenu = this.oRta.getPlugins().contextMenu.oContextMenuControl;
 				const oContextMenuItem = oMenu.getItems().find((oItem) => oItem.getKey() === "CTX_ADD_ELEMENTS_AS_SIBLING");
 				assert.equal(oContextMenuItem.getText(), "Add: Field", "then the add field action button is available in the menu");
-				QUnitUtils.triggerEvent("click", oMenu.getItems().find((oItem) => oItem.getIcon() === "sap-icon://add").getDomRef());
+				QUnitUtils.triggerEvent("click", oContextMenuItem.getDomRef());
 				await nextUIUpdate();
 			}.bind(this));
 		});
@@ -353,9 +353,9 @@ sap.ui.define([
 				}.bind(this));
 
 				const oMenu = this.oRta.getPlugins().contextMenu.oContextMenuControl;
-				const oContextMenuItem = oMenu.getItems()[1];
+				const oContextMenuItem = oMenu.getItems().find((oMenuItem) => oMenuItem.getKey() === "CTX_ADD_ELEMENTS_AS_SIBLING");
 				assert.equal(oContextMenuItem.getText(), "Add: Field", "then the add field action button is available in the menu");
-				QUnitUtils.triggerEvent("click", oMenu.getItems()[1].getDomRef());
+				QUnitUtils.triggerEvent("click", oContextMenuItem.getDomRef());
 				await nextUIUpdate();
 			}.bind(this));
 		});
@@ -461,7 +461,7 @@ sap.ui.define([
 
 				RtaQunitUtils.simulateRename(sandbox, sNewText, () => {
 					// press rename button
-					const oRenameItem = oContextMenuControl.getItems()[0];
+					const oRenameItem = oContextMenuControl.getItems().find((oMenuItem) => oMenuItem.getKey() === "CTX_RENAME");
 					QUnitUtils.triggerEvent("click", oRenameItem.getDomRef());
 				});
 

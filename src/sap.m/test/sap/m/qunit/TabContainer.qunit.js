@@ -553,6 +553,84 @@ sap.ui.define([
 		assert.equal(this.oTabStrip.getItems()[0].getCustomData()[0].getValue(), "customValue", "Inserted TabContainerItem.customData should be propagated to TabStripItem.customData");
 	});
 
+	QUnit.test("TabContainerItems are in sync with TabStripItems when binding data is updated", async function (assert) {
+		//Arrange
+		var oTabContainer = new TabContainer({
+			items: {
+				path: "/collection",
+				template: new TabContainerItem({
+					name: "{name}",
+					modified: "{modified}",
+					tooltip: "{tooltip}",
+					additionalText: "{additionalText}",
+					icon: "{icon}"
+				}),
+				templateShareable: true
+			},
+			itemSelect: function (oEvent) {
+				oEvent.preventDefault();
+			}
+		});
+
+		var oJsonModel = new JSONModel({
+			"collection": [
+				{name: "Name1", modified: false, tooltip: "tooltip1", additionalText: "additionalText1", icon: "sap-icon://accept" },
+				{name: "Name2", modified: true, tooltip: "tooltip2", additionalText: "additionalText2", icon: "sap-icon://decline" }
+			]
+		});
+
+		oTabContainer.setModel(oJsonModel);
+		oTabContainer.placeAt("qunit-fixture");
+		await nextUIUpdate(this.clock);
+
+		// Act
+		var oData = oJsonModel.getData();
+		oData.collection[0].name = "UpdatedName1";
+		oData.collection[0].tooltip = "updatedTooltip1";
+		oData.collection[0].additionalText = "updatedAdditionalText1";
+		oData.collection[0].icon = "sap-icon://edit";
+		oData.collection[0].modified = true;
+
+		oData.collection[1].name = "UpdatedName2";
+		oData.collection[1].tooltip = "updatedTooltip2";
+		oData.collection[1].additionalText = "updatedAdditionalText2";
+		oData.collection[1].icon = "sap-icon://delete";
+		oData.collection[1].modified = false;
+
+		oJsonModel.setData(oData);
+		await nextUIUpdate(this.clock);
+
+		var aTabContainerItems = oTabContainer.getItems();
+		var aTabStripItems = oTabContainer._getTabStrip().getItems();
+
+		// Assert
+		assert.strictEqual(aTabContainerItems[0].getName(), "UpdatedName1", "TabContainerItem[0] name updated");
+		assert.strictEqual(aTabContainerItems[0].getTooltip(), "updatedTooltip1", "TabContainerItem[0] tooltip updated");
+		assert.strictEqual(aTabContainerItems[0].getAdditionalText(), "updatedAdditionalText1", "TabContainerItem[0] additionalText updated");
+		assert.strictEqual(aTabContainerItems[0].getIcon(), "sap-icon://edit", "TabContainerItem[0] icon updated");
+		assert.strictEqual(aTabContainerItems[0].getModified(), true, "TabContainerItem[0] modified updated");
+
+		assert.strictEqual(aTabStripItems[0].getText(), "UpdatedName1", "TabStripItem[0] text updated");
+		assert.strictEqual(aTabStripItems[0].getTooltip(), "updatedTooltip1", "TabStripItem[0] tooltip updated");
+		assert.strictEqual(aTabStripItems[0].getAdditionalText(), "updatedAdditionalText1", "TabStripItem[0] additionalText updated");
+		assert.strictEqual(aTabStripItems[0].getIcon(), "sap-icon://edit", "TabStripItem[0] icon updated");
+		assert.strictEqual(aTabStripItems[0].getModified(), true, "TabStripItem[0] modified updated");
+
+		assert.strictEqual(aTabContainerItems[1].getName(), "UpdatedName2", "TabContainerItem[1] name updated");
+		assert.strictEqual(aTabContainerItems[1].getTooltip(), "updatedTooltip2", "TabContainerItem[1] tooltip updated");
+		assert.strictEqual(aTabContainerItems[1].getAdditionalText(), "updatedAdditionalText2", "TabContainerItem[1] additionalText updated");
+		assert.strictEqual(aTabContainerItems[1].getIcon(), "sap-icon://delete", "TabContainerItem[1] icon updated");
+		assert.strictEqual(aTabContainerItems[1].getModified(), false, "TabContainerItem[1] modified updated");
+
+		assert.strictEqual(aTabStripItems[1].getText(), "UpdatedName2", "TabStripItem[1] text updated");
+		assert.strictEqual(aTabStripItems[1].getTooltip(), "updatedTooltip2", "TabStripItem[1] tooltip updated");
+		assert.strictEqual(aTabStripItems[1].getAdditionalText(), "updatedAdditionalText2", "TabStripItem[1] additionalText updated");
+		assert.strictEqual(aTabStripItems[1].getIcon(), "sap-icon://delete", "TabStripItem[1] icon updated");
+		assert.strictEqual(aTabStripItems[1].getModified(), false, "TabStripItem[1] modified updated");
+
+		oTabContainer.destroy();
+	});
+
 	QUnit.module("Constructing with array of items", {
 		beforeEach: async function () {
 			this.item = new TabContainerItem({

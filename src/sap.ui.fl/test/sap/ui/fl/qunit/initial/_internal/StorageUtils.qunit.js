@@ -248,6 +248,11 @@ sap.ui.define([
 			assert.equal(mConnectors.length, 1, "result contains only one connector");
 			assert.equal(mConnectors[0].connector, "LrepConnector", "the connector is of type LrepConnector");
 		});
+
+		QUnit.test("getEmptyFlexDataResponse / isStorageResponseFilled", function(assert) {
+			const oFlexData = Utils.getEmptyFlexDataResponse();
+			assert.notOk(Utils.isStorageResponseFilled(oFlexData), "the response is considered not filled");
+		});
 	});
 
 	QUnit.module("Given a KeyUserConnector and PersonalizationConnector is configured", {

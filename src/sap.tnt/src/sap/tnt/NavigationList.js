@@ -546,6 +546,14 @@ sap.ui.define([
 		let oSelectedItem;
 		if (this._selectedItem) {
 			this._selectedItem._toggle(false);
+
+			const oPrevParent = this._selectedItem.getParent();
+			if (oPrevParent && oPrevParent.isA && oPrevParent.isA("sap.tnt.NavigationListItem") &&
+				oPrevParent.getExpanded() === false && oPrevParent._getVisibleItems(oPrevParent).includes(this._selectedItem)) {
+				if (!oPrevParent._getVisibleItems(oPrevParent).includes(oItem)) {
+					oPrevParent._toggle(false);
+				}
+			}
 		}
 
 		if (!oItem) {
