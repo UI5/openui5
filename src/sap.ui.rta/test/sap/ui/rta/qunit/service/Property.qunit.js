@@ -421,7 +421,11 @@ sap.ui.define([
 			var fnElementDesignTimeMetadataStub = sandbox.stub(ElementDesignTimeMetadata.prototype, "getData").returns(oDtObjProperties);
 
 			return this.oProperty.get(this.oControl.getId()).then(function(oPropertyData) {
-				assert.deepEqual(oExpectedPropertyDataWithMockedLabel, oPropertyData, "then the correct result object received from the service");
+				assert.deepEqual(
+					oExpectedPropertyDataWithMockedLabel,
+					oPropertyData,
+					"then the correct result object received from the service"
+				);
 				fnElementDesignTimeMetadataStub.restore();
 			});
 		});
@@ -435,7 +439,10 @@ sap.ui.define([
 
 			return this.oProperty.get(this.oControl.getId()).then(function(oPropertyData) {
 				assert.deepEqual(this.oExpectedPropertyData, oPropertyData, "then the correct result object received from the service");
-				assert.ok(oDtObjProperties.properties.calledWith(this.oControl), "then the control was passed to the designTimeMetadata's properties function");
+				assert.ok(
+					oDtObjProperties.properties.calledWith(this.oControl),
+					"then the control was passed to the designTimeMetadata's properties function"
+				);
 				fnElementDesignTimeMetadataStub.restore();
 			}.bind(this));
 		});
@@ -465,8 +472,15 @@ sap.ui.define([
 			oExpectedResultWithoutDtProperties.metadataProperty2.ignore = false;
 
 			return this.oProperty.get(this.oControl.getId()).then(function(oPropertyData) {
-				assert.deepEqual(oExpectedResultWithoutDtProperties, oPropertyData.properties, "then the correct properties received from the service");
-				assert.ok(oDtObjProperties.properties.calledWith(this.oControl), "then the control was passed to the designTimeMetadata's properties function");
+				assert.deepEqual(
+					oExpectedResultWithoutDtProperties,
+					oPropertyData.properties,
+					"then the correct properties received from the service"
+				);
+				assert.ok(
+					oDtObjProperties.properties.calledWith(this.oControl),
+					"then the control was passed to the designTimeMetadata's properties function"
+				);
 				fnElementDesignTimeMetadataStub.restore();
 			}.bind(this));
 		});

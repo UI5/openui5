@@ -47,7 +47,9 @@ sap.ui.define([
 ], function(ODataContextBinding, ODataListBinding, ODataMetaModel, ODataPropertyBinding, SubmitMode, _GroupLock, _Helper, _MetadataRequestor, _Parser, _Requestor, Log, Localization, SyncPromise, Messaging, Rendering, Supportability, CacheManager, Message, MessageType, BindingMode, BaseContext, Model, OperationMode, URI) {
 	"use strict";
 
-	var sClassName = "sap.ui.model.odata.v4.ODataModel",
+	var a401DenyList = ["apply", "compute", "count", "expand", "filter", "format", "id", "index",
+			"levels", "orderby", "schemaversion", "search", "select", "skip", "top"],
+		sClassName = "sap.ui.model.odata.v4.ODataModel",
 		// system query options allowed within a $expand query option
 		aExpandQueryOptions = ["$count", "$expand", "$filter", "$levels", "$orderby", "$search",
 			"$select"],
@@ -1214,6 +1216,12 @@ sap.ui.define([
 
 		if (mParameters) {
 			for (sParameterName in mParameters) {
+				if (a401DenyList.includes(sParameterName.toLowerCase())) {
+					Log.warning("[FUTURE FATAL] Custom query option " + sParameterName
+						+ " will not be supported with OData 4.01, see"
+						+ " https://sdk.openui5.org/topic/cda632b01c1e4a988ccecab759d19380",
+						undefined, sClassName);
+				}
 				if (sParameterName.startsWith("$$")) { // binding-specific parameter
 					delete mTransformedOptions[sParameterName];
 				} else if (sParameterName[0] === "@") { // OData parameter alias

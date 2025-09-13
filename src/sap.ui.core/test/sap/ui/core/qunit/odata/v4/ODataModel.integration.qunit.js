@@ -7903,6 +7903,40 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
+	// Scenario: Custom query options which conflict with OData 4.01's
+	// "2.7 Improved: Case-Insensitive System Query Options without $ prefix" feature cause a
+	// "[FUTURE FATAL]" warning.
+	// JIRA: CPOUI5ODATAV4-3112
+	QUnit.test("CPOUI5ODATAV4-3112: 4.01, 2.7 Improved: ... w/o $", async function (assert) {
+		const sView = `
+<FlexBox id="form" binding="{path : '/EMPLOYEES(\\'2\\')', parameters : {ToP : 42}}">
+	<Text id="text" text="{Name}"/>
+</FlexBox>`;
+
+		this.oLogMock.expects("warning")
+			.withExactArgs("[FUTURE FATAL] Custom query option ToP will not be supported with"
+				+ " OData 4.01, see https://sdk.openui5.org/topic/cda632b01c1e4a988ccecab759d19380",
+				undefined, "sap.ui.model.odata.v4.ODataModel");
+		this.expectRequest("EMPLOYEES('2')?ToP=42", {Name : "Jonathan Smith"})
+			.expectChange("text", "Jonathan Smith");
+
+		await this.createView(assert, sView);
+
+		this.oLogMock.expects("warning")
+			.withExactArgs("[FUTURE FATAL] Custom query option aPPly will not be supported with"
+				+ " OData 4.01, see https://sdk.openui5.org/topic/cda632b01c1e4a988ccecab759d19380",
+				undefined, "sap.ui.model.odata.v4.ODataModel");
+		this.expectRequest("EMPLOYEES('2')?aPPly=foo", {Name : "Jonathan Schmidt"})
+			.expectChange("text", "Jonathan Schmidt");
+
+		this.oView.byId("form").getObjectBinding()
+			// code under test
+			.changeParameters({aPPly : "foo", ToP : undefined});
+
+		await this.waitForChanges(assert);
+	});
+
+	//*********************************************************************************************
 	// Scenario:
 	// A table uses the list binding with extended change detection, but not all key properties of
 	// the displayed entity are known on the client, so that the key predicate cannot be determined.

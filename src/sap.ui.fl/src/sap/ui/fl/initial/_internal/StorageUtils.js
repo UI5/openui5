@@ -371,11 +371,9 @@ sap.ui.define([
 	 * @ui5-restricted sap.ui.fl
 	 */
 	StorageUtils.isStorageResponseFilled = function(oResponse) {
-		return Object.keys(oResponse || {}).some(function(sKey) {
-			if (Array.isArray(oResponse[sKey])) {
-				return oResponse[sKey].length !== 0;
-			}
-			return !isEmptyObject(oResponse[sKey]);
+		const oUI2Available = !isEmptyObject(oResponse.ui2personalization);
+		return oUI2Available || StorageUtils.getAllFlexObjectNamespaces().some(function(sKey) {
+			return ObjectPath.get(sKey, oResponse)?.length > 0;
 		});
 	};
 

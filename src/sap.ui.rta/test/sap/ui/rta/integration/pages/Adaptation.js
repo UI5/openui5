@@ -26,6 +26,13 @@ sap.ui.define([
 		buttons: 2
 	});
 
+	// these are the keys of the context menu entries that should be excluded from the check
+	// because they are added dynamically and are not actions
+	// CTX_CONTROL_NAME is the key for the name of the control
+	// CTX_EXTENDED_MENU_TITLE is the key for the title of the extended menu area
+	// CTX_PROPAGATED_CONTROL_NAME is the first part of the key for the name of the propagated control
+	const aExcludedContextMenuEntryKeys = ["CTX_CONTROL_NAME", "CTX_EXTENDED_MENU_TITLE", "CTX_PROPAGATED_CONTROL_NAME"];
+
 	Opa5.createPageObjects({
 		onPageWithRTA: {
 			actions: {
@@ -468,7 +475,11 @@ sap.ui.define([
 						id: "shell-header",
 						success(oToolbar) {
 							Opa5.assert.ok(oToolbar.getVisible(), "the FLP Toolbar is shown");
-							Opa5.assert.equal(FlexTestAPI.getNumberOfChangesSynchronous("SessionStorage", sReference), iCount, "the number of changes is correct");
+							Opa5.assert.equal(
+								FlexTestAPI.getNumberOfChangesSynchronous("SessionStorage", sReference),
+								iCount,
+								"the number of changes is correct"
+							);
 						},
 						errorMessage: "the FLP-Toolbar was not found"
 					});
@@ -625,13 +636,14 @@ sap.ui.define([
 							return oPopover.hasStyleClass("sapUiDtContextMenu");
 						},
 						success(aPopover) {
-							const aIsContextEntriesKeys = [];
 							const oMenu = aPopover[0].getContent()[0];
 							const aItems = oMenu.getItems();
-							aItems.forEach(function(oItem) {
-								aIsContextEntriesKeys.push(oItem.getKey());
+							const aFilteredItems = aItems.filter((oItem) => {
+								const bHasExcludedKey =
+									aExcludedContextMenuEntryKeys.some((sKeyToExclude) => oItem.getKey().includes(sKeyToExclude));
+								return !bHasExcludedKey;
 							});
-							Opa5.assert.deepEqual(aIsContextEntriesKeys, aContextEntriesKeys, `expected [${aContextEntriesKeys}] context entries found`);
+							Opa5.assert.deepEqual(aFilteredItems.map((oItem) => oItem.getKey()), aContextEntriesKeys, `expected [${aContextEntriesKeys}] context entries found`);
 						},
 						errorMessage: "Did not find the Context Menu entries"
 					});
@@ -643,13 +655,12 @@ sap.ui.define([
 							return oPopover.hasStyleClass("sapUiDtContextMenu");
 						},
 						success(aPopover) {
-							let iItems = 0;
 							const oMenu = aPopover[0].getContent()[0];
-							oMenu.getItems().forEach(function(oItem) {
-								if (oItem.getVisible()) {
-									iItems++;
-								}
-							});
+							const aItems = oMenu.getItems();
+							const iItems = aItems.filter((oItem) => {
+								return !aExcludedContextMenuEntryKeys.some((sKeyToExclude) =>
+									oItem.getKey().includes(sKeyToExclude)) && oItem.getVisible();
+							}).length;
 							Opa5.assert.deepEqual(iActions, iItems, `expected ${iItems} context entries found`);
 						},
 						errorMessage: "Did not find the Context Menu entries"

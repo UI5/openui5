@@ -1589,6 +1589,23 @@ sap.ui.define([
 			$count : false
 		},
 		expected : {}
+	}, {
+		bSystemQueryOptionsAllowed : false,
+		mParameters : {
+			// NO conflict with OData 4.01's
+			// "2.7 Improved: Case-Insensitive System Query Options without $ prefix" feature!
+			deletedEntity : "n/a",
+			deletedLink : "n/a",
+			delta : "n/a",
+			deltatoken : "n/a",
+			each : "n/a",
+			entity : "n/a",
+			link : "n/a",
+			query : "n/a",
+			ref : "n/a",
+			skiptoken : "n/a",
+			value : "n/a"
+		}
 	}].forEach(function (oFixture) {
 		QUnit.test("buildQueryOptions success " + JSON.stringify(oFixture), function (assert) {
 			var mOptions,
@@ -1600,6 +1617,31 @@ sap.ui.define([
 
 			assert.deepEqual(mOptions, oFixture.expected || oFixture.mParameters || {});
 			assert.strictEqual(JSON.stringify(oFixture.mParameters), sOriginalParameters);
+		});
+	});
+
+	//*********************************************************************************************
+	["apply", "compute", "count", "expand", "filter", "format", "id", "index", "levels", "orderby",
+		"schemaversion", "search", "select", "skip", "top"].forEach((sName) => {
+		QUnit.test("buildQueryOptions with 4.01 conflict: " + sName, function (assert) {
+			const sFunnyName = sName.replace(/./g, (sChar, i) => (i % 2 ? sChar : sChar.toUpperCase()));
+			const sUpperName = sName.toUpperCase();
+			const mParameters = Object.freeze({
+				[sFunnyName] : "conflict",
+				[sName] : "conflict",
+				[sUpperName] : "conflict"
+			});
+
+			[sFunnyName, sName, sUpperName].forEach((sVariant) => {
+				this.oLogMock.expects("warning")
+					.withExactArgs("[FUTURE FATAL] Custom query option " + sVariant
+						+ " will not be supported with OData 4.01, see"
+						+ " https://sdk.openui5.org/topic/cda632b01c1e4a988ccecab759d19380",
+						undefined, sClassName);
+			});
+
+			// code under test
+			assert.deepEqual(ODataModel.prototype.buildQueryOptions(mParameters), mParameters);
 		});
 	});
 

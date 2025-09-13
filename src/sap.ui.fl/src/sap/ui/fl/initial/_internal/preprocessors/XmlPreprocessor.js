@@ -4,28 +4,24 @@
 
 sap.ui.define([
 	"sap/base/util/merge",
+	"sap/base/Log",
 	"sap/ui/core/util/reflection/XmlTreeModifier",
 	"sap/ui/core/Component",
-	"sap/ui/fl/apply/_internal/changes/Applier",
-	"sap/ui/fl/apply/_internal/changes/Utils",
-	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
-	"sap/ui/fl/apply/_internal/flexState/FlexObjectState",
-	"sap/ui/fl/apply/_internal/flexState/FlexState",
+	"sap/ui/fl/initial/_internal/Loader",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
-	"sap/ui/fl/Utils",
-	"sap/base/Log"
+	"sap/ui/fl/initial/_internal/StorageUtils",
+	"sap/ui/fl/requireAsync",
+	"sap/ui/fl/Utils"
 ], function(
 	merge,
+	Log,
 	XmlTreeModifier,
 	Component,
-	Applier,
-	ChangesUtils,
-	VariantManagementState,
-	FlexObjectState,
-	FlexState,
+	Loader,
 	ManifestUtils,
-	Utils,
-	Log
+	StorageUtils,
+	requireAsync,
+	Utils
 ) {
 	"use strict";
 
@@ -67,8 +63,10 @@ sap.ui.define([
 	 * @returns {Promise} resolving with an array of changes
 	 * @public
 	 */
-	function getChangesForView(mPropertyBag) {
+	async function getChangesForView(mPropertyBag) {
+		const FlexObjectState = await requireAsync("sap/ui/fl/apply/_internal/flexState/FlexObjectState");
 		const aAllApplicableUIChanges = FlexObjectState.getAllApplicableUIChanges(mPropertyBag.reference);
+		const ChangesUtils = await requireAsync("sap/ui/fl/apply/_internal/changes/Utils");
 		return aAllApplicableUIChanges.filter(ChangesUtils.isChangeInView.bind(undefined, mPropertyBag));
 	}
 
@@ -103,6 +101,13 @@ sap.ui.define([
 
 			const sReference = ManifestUtils.getFlexReferenceForControl(oAppComponent);
 
+			await Loader.waitForInitialization(sReference);
+			const oFlexData = Loader.getCachedFlexData(sReference);
+			if (!StorageUtils.isStorageResponseFilled(oFlexData.changes)) {
+				return oView;
+			}
+
+			const FlexState = await requireAsync("sap/ui/fl/apply/_internal/flexState/FlexState");
 			await FlexState.waitForInitialization(sReference);
 
 			const mPropertyBag = merge({
@@ -111,8 +116,9 @@ sap.ui.define([
 				view: oView,
 				reference: sReference
 			}, mProperties);
-			const aChanges = getChangesForView(mPropertyBag);
+			const aChanges = await getChangesForView(mPropertyBag);
 
+			const Applier = await requireAsync("sap/ui/fl/apply/_internal/changes/Applier");
 			await Applier.applyAllChangesForXMLView(mPropertyBag, aChanges);
 
 			Log.debug(`flex processing view ${mProperties.id} finished`);
@@ -157,13 +163,15 @@ sap.ui.define([
 		const sFlexReference = ManifestUtils.getFlexReferenceForControl(oAppComponent);
 		let sCacheKey = XmlPreprocessor.NOTAG;
 		if (sFlexReference) {
-			const oWrappedChangeFileContent = await FlexState.getStorageResponse(sFlexReference);
-			if (oWrappedChangeFileContent?.cacheKey) {
-				sCacheKey = trimEtag(oWrappedChangeFileContent.cacheKey);
+			await Loader.waitForInitialization(sFlexReference);
+			const oFlexData = Loader.getCachedFlexData(sFlexReference);
+			if (oFlexData && oFlexData.cacheKey && StorageUtils.isStorageResponseFilled(oFlexData.changes)) {
+				sCacheKey = trimEtag(oFlexData.cacheKey);
 
 				// If there are no changes, the standard variant is created after the variant management control is instantiated
 				// When the cache key is calculated before this happens, the standard variant id is unknown
 				// To avoid inconsistencies between page load and navigation scenarios, all standard variants are filtered
+				const VariantManagementState = await requireAsync("sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState");
 				const aFilteredCurrentControlVariantIds = VariantManagementState.getAllCurrentVariants(sFlexReference)
 				.filter((oVariant) => !oVariant.getStandardVariant())
 				.map((oVariant) => oVariant.getId());

@@ -5,14 +5,18 @@
 sap.ui.define([
 	"sap/base/Log",
 	"sap/ui/core/Component",
-	"sap/ui/fl/apply/_internal/flexState/FlexState",
+	"sap/ui/fl/initial/_internal/Loader",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
+	"sap/ui/fl/initial/_internal/StorageUtils",
+	"sap/ui/fl/requireAsync",
 	"sap/ui/fl/Utils"
 ], function(
 	Log,
 	Component,
-	FlexState,
+	Loader,
 	ManifestUtils,
+	StorageUtils,
+	requireAsync,
 	Utils
 ) {
 	"use strict";
@@ -100,7 +104,14 @@ sap.ui.define([
 			}
 			var sFlexReference = ManifestUtils.getFlexReferenceForControl(oAppComponent);
 
-			return FlexState.waitForInitialization(sFlexReference).then(() => {
+			return Loader.waitForInitialization(sFlexReference).then(async function() {
+				const oFlexData = Loader.getCachedFlexData(sFlexReference);
+				if (!StorageUtils.isStorageResponseFilled(oFlexData?.changes)) {
+					return [];
+				}
+
+				const FlexState = await requireAsync("sap/ui/fl/apply/_internal/flexState/FlexState");
+				await FlexState.waitForInitialization(sFlexReference);
 				const aFlexObjects = FlexState.getFlexObjectsDataSelector().get({reference: sFlexReference});
 				var aExtensionModules = aFlexObjects.filter(function(oChange) {
 					return isCodeExt(oChange) && isForController(sControllerName, oChange);

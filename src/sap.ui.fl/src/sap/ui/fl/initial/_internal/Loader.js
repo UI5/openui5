@@ -3,8 +3,10 @@
  */
 
 sap.ui.define([
+	"sap/base/util/Deferred",
 	"sap/base/util/merge",
 	"sap/base/util/ObjectPath",
+	"sap/base/Log",
 	"sap/ui/base/ManagedObject",
 	"sap/ui/fl/initial/_internal/FlexInfoSession",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
@@ -12,8 +14,10 @@ sap.ui.define([
 	"sap/ui/fl/initial/_internal/Storage",
 	"sap/ui/fl/initial/_internal/StorageUtils"
 ], function(
+	Deferred,
 	merge,
 	ObjectPath,
+	Log,
 	ManagedObject,
 	FlexInfoSession,
 	ManifestUtils,
@@ -24,6 +28,7 @@ sap.ui.define([
 	"use strict";
 
 	const _mCachedFlexData = {};
+	const _mInitPromises = {};
 
 	/**
 	 * Class for loading Flex Data from the backend via the Connectors.
@@ -159,6 +164,14 @@ sap.ui.define([
 		});
 		const sReference = mPropertyBagCopy.reference;
 
+		const oOldInitPromise = _mInitPromises[sReference];
+		const oNewInitPromise = new Deferred();
+		_mInitPromises[sReference] = oNewInitPromise;
+
+		if (oOldInitPromise) {
+			await oOldInitPromise.promise;
+		}
+
 		const bRequiresNewLoadRequest =
 			mPropertyBag.reInitialize
 			|| !_mCachedFlexData[mPropertyBag.reference]
@@ -174,6 +187,7 @@ sap.ui.define([
 			&& !mPropertyBagCopy.skipLoadBundle;
 
 		if (!bRequiresNewLoadRequest && !bRequiresOnlyCompletion) {
+			oNewInitPromise.resolve();
 			return {
 				data: _mCachedFlexData[sReference].data,
 				cacheInvalidated: false
@@ -236,7 +250,7 @@ sap.ui.define([
 			oFlexInfoSession = { ...oFlexInfoSession, ...oFormattedFlexData.changes.info };
 		}
 		FlexInfoSession.setByReference(oFlexInfoSession, sReference);
-
+		oNewInitPromise.resolve();
 		return {
 			data: oFormattedFlexData,
 			cacheInvalidated: true
@@ -270,9 +284,11 @@ sap.ui.define([
 	Loader.clearCache = function(sReference) {
 		if (sReference) {
 			delete _mCachedFlexData[sReference];
+			delete _mInitPromises[sReference];
 		} else {
 			Object.keys(_mCachedFlexData).forEach((sReference) => {
 				delete _mCachedFlexData[sReference];
+				delete _mInitPromises[sReference];
 			});
 		}
 	};
@@ -313,11 +329,27 @@ sap.ui.define([
 	 * Retrieves the cached flexibility data for a specific reference.
 	 *
 	 * @param {string} sReference - The flex reference for which to retrieve the cached data.
-	 * @returns {object} The cached flexibility data or an empty object if not found.
+	 * @returns {Promise<object>} A promise that resolves with the cached flexibility data or an empty object if not found.
 	 */
 	Loader.getCachedFlexData = function(sReference) {
 		// TODO return copy of the data once the CompVariantManager does not mutate it anymore
 		return _mCachedFlexData[sReference]?.data || {};
+	};
+
+	/**
+	 * Waits for the Loader to initialize the cached backend response.
+	 * If the getFlexData was not called before an error is logged and the promise resolves immediately.
+	 *
+	 * @param {string} sReference - The flex reference for which to wait for initialization.
+	 * @return {Promise<undefined>} Resolves with undefined when the initialization is complete
+	 */
+	Loader.waitForInitialization = function(sReference) {
+		const oInitPromise = _mInitPromises[sReference]?.promise;
+		if (!oInitPromise) {
+			Log.error("Loader.waitForInitialization was called before FlexState.initialize");
+			return Promise.resolve();
+		}
+		return oInitPromise;
 	};
 
 	/**

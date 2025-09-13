@@ -1,7 +1,9 @@
 /* global QUnit */
 
 sap.ui.define([
+	"sap/base/util/Deferred",
 	"sap/base/util/merge",
+	"sap/base/Log",
 	"sap/ui/core/Manifest",
 	"sap/ui/fl/apply/_internal/flexObjects/FlexObjectFactory",
 	"sap/ui/fl/initial/_internal/FlexInfoSession",
@@ -9,10 +11,13 @@ sap.ui.define([
 	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/initial/_internal/Settings",
 	"sap/ui/fl/initial/_internal/Storage",
+	"sap/ui/fl/initial/_internal/StorageUtils",
 	"sap/ui/fl/initial/api/Version",
 	"sap/ui/thirdparty/sinon-4"
 ], function(
+	Deferred,
 	merge,
+	Log,
 	Manifest,
 	FlexObjectFactory,
 	FlexInfoSession,
@@ -20,6 +25,7 @@ sap.ui.define([
 	ManifestUtils,
 	Settings,
 	Storage,
+	StorageUtils,
 	Version,
 	sinon
 ) {
@@ -37,7 +43,12 @@ sap.ui.define([
 	QUnit.module("Loader", {
 		beforeEach() {
 			this.oRawManifest = {
-				property: "value"
+				_version: "2.0.0",
+				property: "value",
+
+				"sap.ui5": {
+					componentName: "baseName"
+				}
 			};
 			this.oManifest = new Manifest(this.oRawManifest);
 			const oFlexDataResponse = {
@@ -123,7 +134,6 @@ sap.ui.define([
 				return mPropertyBag.skipLoadBundle ? Promise.resolve(oFlexDataResponse) : Promise.resolve(oCompleteFlexDataResponse);
 			});
 			this.oCompleteFlexDataStub = sandbox.stub(Storage, "completeFlexData").resolves(oCompleteFlexDataResponse);
-			this.oGetBaseCompNameStub = sandbox.stub(ManifestUtils, "getBaseComponentNameFromManifest").returns("baseName");
 			this.oGetCacheKeyStub = sandbox.stub(ManifestUtils, "getCacheKeyFromAsyncHints").returns("cacheKey");
 			this.oLoadVariantsAuthorsStub = sandbox.stub(Storage, "loadVariantsAuthors").resolves("authors");
 			this.oSettingsAuthorName = sandbox.stub().returns(true);
@@ -132,7 +142,7 @@ sap.ui.define([
 			});
 		},
 		afterEach() {
-			Loader.clearCache();
+			Loader.clearCache(sReference);
 			sandbox.restore();
 			FlexInfoSession.removeByReference(sReference);
 		}
@@ -169,7 +179,7 @@ sap.ui.define([
 			assert.strictEqual(this.oCompleteFlexDataStub.callCount, 0, "the Storage.completeFlexData was not called");
 			assert.strictEqual(this.oLoadFlexDataStub.getCall(0).args[0].siteId, "siteId", "the siteId was retrieved from the Utils");
 			assert.strictEqual(this.oLoadFlexDataStub.getCall(0).args[0].skipLoadBundle, true, "the bundle loading was skipped");
-			assert.strictEqual(this.oGetBaseCompNameStub.callCount, 1, "the name was retrieved from the Utils");
+			assert.strictEqual(this.oLoadFlexDataStub.getCall(0).args[0].componentName, "baseName", "the name was retrieved via the Utils");
 			assert.strictEqual(this.oGetCacheKeyStub.callCount, 1, "the cache key was retrieved from the Utils");
 			assert.strictEqual(this.oLoadVariantsAuthorsStub.callCount, 1, "the loadVariantsAuthors was called");
 			var mPassedPropertyBag = this.oLoadFlexDataStub.firstCall.args[0];
@@ -224,14 +234,11 @@ sap.ui.define([
 		});
 
 		QUnit.test("when getFlexData is called twice for the same component without skipLoadBundle", async function(assert) {
-			const oFlexData = await Loader.getFlexData({
+			const oFlexDataPromise = Loader.getFlexData({
 				manifest: this.oManifest,
 				reference: sReference,
 				componentData: oComponentData
 			});
-			assert.deepEqual(oFlexData.data.changes, this.oExpectedCompleteFlexDataResponse, "the Loader loads data");
-			assert.strictEqual(this.oLoadFlexDataStub.callCount, 1, "the Storage.loadFlexData was called once");
-			assert.strictEqual(this.oLoadVariantsAuthorsStub.callCount, 1, "the loadVariantsAuthors was called once");
 
 			const oFlexData2 = await Loader.getFlexData({
 				manifest: this.oManifest,
@@ -239,8 +246,82 @@ sap.ui.define([
 				componentData: oComponentData
 			});
 			assert.deepEqual(oFlexData2.data.changes, this.oExpectedCompleteFlexDataResponse, "the Loader loads data");
-			assert.strictEqual(this.oLoadFlexDataStub.callCount, 1, "the Storage.loadFlexData was not called again");
-			assert.strictEqual(this.oLoadVariantsAuthorsStub.callCount, 1, "the loadVariantsAuthors was not called again");
+
+			await Loader.waitForInitialization(sReference);
+			const oFlexData = await oFlexDataPromise;
+			assert.deepEqual(oFlexData.data.changes, this.oExpectedCompleteFlexDataResponse, "the Loader loads data");
+			assert.strictEqual(this.oLoadFlexDataStub.callCount, 1, "the Storage.loadFlexData was called once");
+			assert.strictEqual(this.oLoadVariantsAuthorsStub.callCount, 1, "the loadVariantsAuthors was called once");
+		});
+
+		QUnit.test("when waitForInitialization is called without a getFlexData call before", async function(assert) {
+			const oLogStub = sandbox.stub(Log, "error");
+			await Loader.waitForInitialization(sReference);
+			assert.strictEqual(oLogStub.callCount, 1, "an error is logged");
+		});
+
+		QUnit.test("when getFlexData is called three times without await", async function(assert) {
+			const oDeferred = new Deferred();
+			const oDeferred2 = new Deferred();
+			this.oLoadFlexDataStub.reset();
+			this.oLoadFlexDataStub
+			.onFirstCall().callsFake(() => {
+				return oDeferred.promise;
+			})
+			.onSecondCall().callsFake(() => {
+				return oDeferred2.promise;
+			})
+			.onThirdCall().resolves(StorageUtils.getEmptyFlexDataResponse());
+
+			Loader.getFlexData({
+				manifest: {
+					_version: "2.0.0",
+					...this.oManifestRaw,
+
+					"sap.ui5": {
+						componentName: "firstCall"
+					}
+				},
+				reference: sReference,
+				componentData: oComponentData
+			});
+
+			Loader.getFlexData({
+				manifest: {
+					_version: "2.0.0",
+					...this.oManifestRaw,
+
+					"sap.ui5": {
+						componentName: "secondCall"
+					}
+				},
+				reInitialize: true,
+				reference: sReference,
+				componentData: oComponentData
+			});
+
+			Loader.getFlexData({
+				manifest: {
+					_version: "2.0.0",
+					...this.oManifestRaw,
+
+					"sap.ui5": {
+						componentName: "thirdCall"
+					}
+				},
+				reInitialize: true,
+				reference: sReference,
+				componentData: oComponentData
+			});
+			oDeferred.resolve(StorageUtils.getEmptyFlexDataResponse());
+			oDeferred2.resolve(StorageUtils.getEmptyFlexDataResponse());
+
+			await Loader.waitForInitialization(sReference);
+			assert.strictEqual(this.oLoadFlexDataStub.callCount, 3, "the Storage.loadFlexData was called three times");
+			assert.strictEqual(this.oLoadFlexDataStub.firstCall.args[0].componentName, "firstCall", "the order of calls is correct");
+			assert.strictEqual(this.oLoadFlexDataStub.secondCall.args[0].componentName, "secondCall", "the order of calls is correct");
+			assert.strictEqual(this.oLoadFlexDataStub.thirdCall.args[0].componentName, "thirdCall", "the order of calls is correct");
+			assert.strictEqual(this.oLoadVariantsAuthorsStub.callCount, 3, "the loadVariantsAuthors was called three times");
 		});
 
 		QUnit.test("when getFlexData is called with different versions and skipLoadBundle", async function(assert) {
@@ -285,7 +366,7 @@ sap.ui.define([
 			assert.strictEqual(this.oLoadVariantsAuthorsStub.callCount, 1, "the loadVariantsAuthors was called once");
 		});
 
-		QUnit.test("when loadFlexData is first called without skipLoadBundle, then with", async function(assert) {
+		QUnit.test("when getFlexData is first called without skipLoadBundle, then with", async function(assert) {
 			await Loader.getFlexData({
 				manifest: this.oManifest,
 				reference: sReference,
@@ -449,14 +530,14 @@ sap.ui.define([
 			assert.strictEqual(this.oLoadFlexDataStub.callCount, 1, "the Storage.loadFlexData was called");
 			assert.strictEqual(this.oCompleteFlexDataStub.callCount, 0, "the Storage.completeFlexData was not called");
 			assert.strictEqual(this.oLoadFlexDataStub.getCall(0).args[0].siteId, "siteId", "the siteId was retrieved from the Utils");
-			assert.strictEqual(this.oGetBaseCompNameStub.callCount, 1, "the name was retrieved from the Utils");
+			assert.strictEqual(this.oLoadFlexDataStub.getCall(0).args[0].componentName, "baseName", "the name was retrieved via the Utils");
 			assert.strictEqual(this.oGetCacheKeyStub.callCount, 1, "the cache key was retrieved from the Utils");
 			assert.deepEqual(this.oLoadFlexDataStub.firstCall.args[0], oExpectedProperties, "the first argument are the properties");
 		});
 
-		QUnit.test("when getFlexData is called with an emptyState available", function(assert) {
+		QUnit.test("when getFlexData is called with an emptyState available", async function(assert) {
 			Loader.initializeEmptyCache(sReference);
-			Loader.getFlexData({
+			await Loader.getFlexData({
 				manifest: this.oManifest,
 				reference: sReference,
 				componentData: oComponentData
@@ -477,7 +558,7 @@ sap.ui.define([
 				"sap.ovp": {}
 			}
 		}].forEach(function(oTestData) {
-			QUnit.test(`when getFlexData is called with a ovp app and ${oTestData.details}`, function(assert) {
+			QUnit.test(`when getFlexData is called with a ovp app and ${oTestData.details}`, async function(assert) {
 				var mPropertyBag = {
 					manifest: oTestData.manifest,
 					otherValue: "a",
@@ -485,50 +566,49 @@ sap.ui.define([
 					componentData: oComponentData
 				};
 
-				return Loader.getFlexData(mPropertyBag).then(function(oResult) {
-					var aChanges = oResult.data.changes.changes;
-					assert.strictEqual(aChanges.length, 4, "four changes are loaded");
-					assert.strictEqual(aChanges[0].fileName, "c1", "the file name of the first change is correct - MUST BE THE SAME");
-					assert.deepEqual(aChanges[0].selector, {
-						id: "ProductDetail--GeneralForm--generalForm",
+				const oResult = await Loader.getFlexData(mPropertyBag);
+				var aChanges = oResult.data.changes.changes;
+				assert.strictEqual(aChanges.length, 4, "four changes are loaded");
+				assert.strictEqual(aChanges[0].fileName, "c1", "the file name of the first change is correct - MUST BE THE SAME");
+				assert.deepEqual(aChanges[0].selector, {
+					id: "ProductDetail--GeneralForm--generalForm",
+					idIsLocal: true
+				}, "the selector of the first change is correct");
+				assert.deepEqual(aChanges[0].dependentSelector, {
+					movedElements: [{
+						id: "ProductDetail--GeneralForm--productLabel",
 						idIsLocal: true
-					}, "the selector of the first change is correct");
-					assert.deepEqual(aChanges[0].dependentSelector, {
-						movedElements: [{
-							id: "ProductDetail--GeneralForm--productLabel",
-							idIsLocal: true
-						}, {
-							id: "ProductDetail--GeneralForm--productLabel2",
-							idIsLocal: true
-						}],
-						anotherElement: {
-							id: "ProductDetail--GeneralForm--anotherProductLabel",
-							idIsLocal: true
-						}
-					}, "the dependent selector of the first change is correct");
-					assert.strictEqual(aChanges[1].fileName, "c2", "the file name of the third change is correct");
-					assert.deepEqual(aChanges[1].selector, {
-						id: "ProductDetail--GeneralForm--generalForm",
+					}, {
+						id: "ProductDetail--GeneralForm--productLabel2",
 						idIsLocal: true
-					}, "the selector of the third change is correct");
-					assert.deepEqual(aChanges[1].dependentSelector, {
-						movedElements: [{
-							id: "ProductDetail--GeneralForm--productLabel",
-							idIsLocal: true
-						}]
-					}, "the dependent selector of the second change is correct");
-					assert.strictEqual(aChanges[2].fileName, "c3", "the file name of the forth change is correct - MUST BE THE SAME");
-					assert.deepEqual(aChanges[2].selector, {
-						id: "ProductDetail--GeneralForm--generalForm",
+					}],
+					anotherElement: {
+						id: "ProductDetail--GeneralForm--anotherProductLabel",
 						idIsLocal: true
-					}, "the selector of the forth change is correct");
-					assert.deepEqual(aChanges[2].dependentSelector, {
-						movedElements: [{
-							id: "ProductDetail--GeneralForm--productLabel",
-							idIsLocal: true
-						}]
-					}, "the dependent selector of the forth change is correct");
-				});
+					}
+				}, "the dependent selector of the first change is correct");
+				assert.strictEqual(aChanges[1].fileName, "c2", "the file name of the third change is correct");
+				assert.deepEqual(aChanges[1].selector, {
+					id: "ProductDetail--GeneralForm--generalForm",
+					idIsLocal: true
+				}, "the selector of the third change is correct");
+				assert.deepEqual(aChanges[1].dependentSelector, {
+					movedElements: [{
+						id: "ProductDetail--GeneralForm--productLabel",
+						idIsLocal: true
+					}]
+				}, "the dependent selector of the second change is correct");
+				assert.strictEqual(aChanges[2].fileName, "c3", "the file name of the forth change is correct - MUST BE THE SAME");
+				assert.deepEqual(aChanges[2].selector, {
+					id: "ProductDetail--GeneralForm--generalForm",
+					idIsLocal: true
+				}, "the selector of the forth change is correct");
+				assert.deepEqual(aChanges[2].dependentSelector, {
+					movedElements: [{
+						id: "ProductDetail--GeneralForm--productLabel",
+						idIsLocal: true
+					}]
+				}, "the dependent selector of the forth change is correct");
 			});
 		});
 

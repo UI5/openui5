@@ -1837,6 +1837,31 @@ sap.ui.define([
 		assert.notOk(oDefaultItem.classList.contains("sapTntNLITwoClickAreas"), "sapTntNLITwoClickAreas class is not set when item has no children");
 	});
 
+	QUnit.test("correct application of sapTntNLISelected class", async function (assert) {
+
+		const oUnselectableParent = this.navigationList.getItems()[0];
+		const oUnselectableParentDomRef = oUnselectableParent.getDomRef().querySelector(".sapTntNLI");
+		const oChildOfUnselectableParent = this.navigationList.getItems()[0].getItems()[0];
+		const oChildOfUnselectableParentDomRef = this.navigationList.getItems()[0].getItems()[0].getDomRef();
+		const oDefaultItem = this.navigationList.getItems()[3];
+		const oDefaultItemDomRef = oDefaultItem.getDomRef().querySelector(".sapTntNLI");
+
+		QUnitUtils.triggerEvent("tap", oChildOfUnselectableParentDomRef);
+		oUnselectableParent.setExpanded(false);
+		await nextUIUpdate();
+
+		assert.equal(oUnselectableParent.getExpanded(), false, "Unselectable parent is collapsed");
+		assert.equal(this.navigationList.getSelectedItem(), oChildOfUnselectableParent, "Selected item is the child");
+		assert.ok(oUnselectableParentDomRef.classList.contains("sapTntNLISelected"), "sapTntNLISelected class is set on the collapsed parent");
+
+		QUnitUtils.triggerEvent("tap", oDefaultItemDomRef);
+		await nextUIUpdate();
+
+		assert.equal(this.navigationList.getSelectedItem(), oDefaultItem, "Selected item is the new one");
+		assert.ok(oDefaultItemDomRef.classList.contains("sapTntNLISelected"), "sapTntNLISelected class is set on the newly selected item");
+		assert.notOk(oUnselectableParentDomRef.classList.contains("sapTntNLISelected"), "sapTntNLISelected class is not set on the previously selected item's parent");
+	});
+
 	QUnit.test("Design Action", function (assert) {
 
 		const oActionItem = this.navigationList.getItems()[2].getDomRef().querySelector(".sapTntNLI");

@@ -7,7 +7,7 @@ sap.ui.define([
 	"sap/ui/core/cache/CacheManager",
 	"sap/ui/core/Component",
 	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
-	"sap/ui/fl/apply/_internal/preprocessors/XmlPreprocessor",
+	"sap/ui/fl/initial/_internal/preprocessors/XmlPreprocessor",
 	"sap/ui/fl/initial/_internal/StorageUtils",
 	"sap/ui/fl/initial/_internal/Storage",
 	"sap/ui/fl/Utils",

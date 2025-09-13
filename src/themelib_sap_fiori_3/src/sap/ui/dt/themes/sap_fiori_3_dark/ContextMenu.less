@@ -1,12 +1,12 @@
 /******************************************************************
 	Style of the DT Contextmenu - sap_fiori_3_dark Theme
 *******************************************************************/
-@_sap_ui_dt_ContextMenu_MnuItemTextColor: @sapUiListSelectionBorderColor; //#91c8f6
-@_sap_ui_dt_ContextMenu_MnuItemBackgroundColor: @sapUiListBackground; // #29313a
-@_sap_ui_dt_ContextMenu_MnuItemHoverBackgroundColor: @sapUiListSelectionBackgroundColor; // #334b5f
-@_sap_ui_dt_ContextMenu_BorderRadius: @sapUiButtonBorderCornerRadius; // 0.25rem
-@_sap_ui_dt_ContextMenu_FocusColor: @sapUiListSelectionBorderColor; //#91c8f6
-@_sap_ui_dt_ContextMenu_DisabledMnuItemHoverTextColor: @sapUiListSelectionBorderColor; //#91c8f6
+@_sap_ui_dt_ContextMenu_MnuItemTextColor: var(--sapList_SelectionBorderColor); //#91c8f6
+@_sap_ui_dt_ContextMenu_MnuItemBackgroundColor: var(--sapList_Background); // #29313a
+@_sap_ui_dt_ContextMenu_MnuItemHoverBackgroundColor: var(--sapList_SelectionBackgroundColor); // #334b5f
+@_sap_ui_dt_ContextMenu_BorderRadius: var(--sapButton_BorderCornerRadius); // 0.25rem
+@_sap_ui_dt_ContextMenu_FocusColor: var(--sapList_SelectionBorderColor); //#91c8f6
+@_sap_ui_dt_ContextMenu_MnuItemIconColor: var(--sapList_SelectionBorderColor); //#91c8f6
 
 .sapUiDtContextMenu.sapMMenu {
 	.sapMMenuList {
@@ -52,11 +52,20 @@
 			}
 
 			&.sapMMenuItemDisabled {
-				&:hover {
-					color: @_sap_ui_dt_ContextMenu_DisabledMnuItemHoverTextColor;
-				}
 				&:focus {
 					outline: none;
+				}
+			}
+
+			&.sapUiDtContextMenuExtendedActionsTitle {
+				&:hover {
+					background-color: @_sap_ui_dt_ContextMenu_PrpgtedMnuItemBGColor!important;
+				}
+			}
+
+			&.sapUiDtContextMenuPropagatedControlTitle {
+				&:hover {
+					background-color: @_sap_ui_dt_ContextMenu_PrpgtedMnuItemBGColor!important;
 				}
 			}
 		}
