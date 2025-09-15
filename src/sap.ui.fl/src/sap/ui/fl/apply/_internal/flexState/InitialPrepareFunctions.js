@@ -5,7 +5,6 @@ sap.ui.define([
 	"sap/ui/core/Lib",
 	"sap/ui/fl/apply/_internal/controlVariants/Utils",
 	"sap/ui/fl/apply/_internal/flexObjects/FlexObjectFactory",
-	"sap/ui/fl/apply/_internal/flexObjects/getVariantAuthor",
 	"sap/ui/fl/apply/_internal/flexObjects/States",
 	"sap/ui/fl/apply/_internal/flexState/changes/DependencyHandler",
 	"sap/ui/fl/Layer"
@@ -13,7 +12,6 @@ sap.ui.define([
 	Lib,
 	ControlVariantUtils,
 	FlexObjectFactory,
-	getVariantAuthor,
 	States,
 	DependencyHandler,
 	Layer
@@ -31,12 +29,6 @@ sap.ui.define([
 	const InitialPrepareFunctions = {};
 
 	InitialPrepareFunctions.variants = function(mPropertyBag) {
-		// Exchange author  of fl variant from userID to user's name
-		mPropertyBag.flexObjects.forEach((oFlexObject) => {
-			if (oFlexObject.getFileType() === "ctrl_variant") {
-				oFlexObject.setAuthor(getVariantAuthor(oFlexObject.getSupportInformation().user, oFlexObject.getLayer(), mPropertyBag.storageResponse.authors));
-			}
-		});
 		const aVariantIds = (mPropertyBag.storageResponse.changes.variants || [])
 		.map(function(oVariantDef) {
 			return oVariantDef.fileName;

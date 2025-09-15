@@ -19,6 +19,9 @@ sap.ui.define([
 	 *
 	 * For details about hierarchies, see {@link sap.ui.model.odata.v4.ODataListBinding#setAggregation}.
 	 *
+	 * In combination with the {@link sap.ui.table.Table Table} control, this plugin offers a UI for OData V4 that is similar to the one
+	 * the {@link sap.ui.table.TreeTable TreeTable} offers for other models.
+	 *
 	 * @extends sap.ui.core.Element
 	 *
 	 * @author SAP SE

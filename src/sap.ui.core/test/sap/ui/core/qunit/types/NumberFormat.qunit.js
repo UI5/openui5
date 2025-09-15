@@ -953,8 +953,10 @@ sap.ui.define([
 		assert.strictEqual(oDefaultFloat.format(12345.12345), "12,345.12345", "12345.12345");
 		assert.strictEqual(oDefaultFloat.format(1234567890), "1,234,567,890", "1234567890");
 		assert.strictEqual(oDefaultFloat.format(-123.23), "-123.23", "-123.23");
+		assert.strictEqual(oDefaultFloat.format("1.23e9"), "1,230,000,000", "1.23e9");
 		assert.strictEqual(oDefaultFloat.format("1.23e+9"), "1,230,000,000", "1.23e+9");
 		assert.strictEqual(oDefaultFloat.format("1.23e-9"), "0.00000000123", "1.23e-9");
+		assert.strictEqual(oDefaultFloat.format("-1.23e9"), "-1,230,000,000", "-1.23e9");
 		assert.strictEqual(oDefaultFloat.format("-1.23e+9"), "-1,230,000,000", "-1.23e+9");
 		assert.strictEqual(oDefaultFloat.format("-1.23e-9"), "-0.00000000123", "-1.23e-9");
 		assert.strictEqual(oDefaultFloat.format("1.2345e+2"), "123.45", "1.2345e+2");
@@ -1452,6 +1454,7 @@ sap.ui.define([
 		assert.strictEqual(oFormat.format(12345.12345, "mass-kilogram"), "12,345.12345 kg", "12345.12345");
 		assert.strictEqual(oFormat.format(1234567890, "mass-kilogram"), "1,234,567,890 kg", "1234567890");
 		assert.strictEqual(oFormat.format(-123.23, "mass-kilogram"), "-123.23 kg", "-123.23");
+		assert.strictEqual(oFormat.format("1.23e9", "mass-kilogram"), "1,230,000,000 kg", "1.23e9");
 		assert.strictEqual(oFormat.format("1.23e+9", "mass-kilogram"), "1,230,000,000 kg", "1.23e+9");
 		assert.strictEqual(oFormat.format("1.23e-9", "mass-kilogram"), "0.00000000123 kg", "1.23e-9");
 		assert.strictEqual(oFormat.format("-1.23e+9", "mass-kilogram"), "-1,230,000,000 kg", "-1.23e+9");
@@ -3236,9 +3239,13 @@ sap.ui.define([
 		assert.strictEqual(oIntegerFormatParseAsString.parse("10.2e+4 "), "102000", "spacing6");
 		assert.strictEqual(oIntegerFormatParseAsString.parse(" 10.2e+4 "), "102000", "spacing7");
 
-		assert.ok(isNaN(oIntegerFormatParseAsString.parse("1e4")), "no sign for exponent");
-		assert.ok(isNaN(oIntegerFormatParseAsString.parse("10 e4")), "no sign for exponent");
-		assert.ok(isNaN(oIntegerFormatParseAsString.parse("10e 4")), "no sign for exponent");
+		assert.strictEqual(oIntegerFormatParseAsString.parse("10.2e4"), "102000", "spacing1 + no sign");
+		assert.strictEqual(oIntegerFormatParseAsString.parse("10.2e 4"), "102000", "spacing2 + no sign");
+		assert.strictEqual(oIntegerFormatParseAsString.parse("10.2 e 4"), "102000", "spacing3 + no sign");
+		assert.strictEqual(oIntegerFormatParseAsString.parse("10.2 e4"), "102000", "spacing4 + no sign");
+		assert.strictEqual(oIntegerFormatParseAsString.parse(" 10.2e4"), "102000", "spacing5 + no sign");
+		assert.strictEqual(oIntegerFormatParseAsString.parse("10.2e4 "), "102000", "spacing6 + no sign");
+		assert.strictEqual(oIntegerFormatParseAsString.parse(" 10.2e4 "), "102000", "spacing7 + no sign");
 
 		assert.ok(isNaN(oIntegerFormatParseAsString.parse("1234567891234.12345e+4")), "1234567891234.12345e+4");
 		assert.ok(isNaN(oIntegerFormatParseAsString.parse("1234567891234.123456e+4")), "1234567891234.123456e+4");
@@ -3256,6 +3263,14 @@ sap.ui.define([
 		assert.strictEqual(oIntegerFormat.parse(" 10.2e+4"), 102000, "spacing5");
 		assert.strictEqual(oIntegerFormat.parse("10.2e+4 "), 102000, "spacing6");
 		assert.strictEqual(oIntegerFormat.parse(" 10.2e+4 "), 102000, "spacing7");
+
+		assert.strictEqual(oIntegerFormat.parse("10.2e4"), 102000, "spacing1 + no sign");
+		assert.strictEqual(oIntegerFormat.parse("10.2e 4"), 102000, "spacing2 + no sign");
+		assert.strictEqual(oIntegerFormat.parse("10.2 e 4"), 102000, "spacing3 + no sign");
+		assert.strictEqual(oIntegerFormat.parse("10.2 e4"), 102000, "spacing4 + no sign");
+		assert.strictEqual(oIntegerFormat.parse(" 10.2e4"), 102000, "spacing5 + no sign");
+		assert.strictEqual(oIntegerFormat.parse("10.2e4 "), 102000, "spacing6 + no sign");
+		assert.strictEqual(oIntegerFormat.parse(" 10.2e4 "), 102000, "spacing7 + no sign");
 	});
 
 	//*********************************************************************************************
@@ -5703,6 +5718,7 @@ sap.ui.define([
 		{sValue: "0E+10", sResult: "0.00"},
 		{sValue: "0.1E-4", sResult: "0.00001"},
 		{sValue: "1.234567E+3", sResult: "1,234.567"},
+		{sValue: "1.2E3", sResult: "1,200.00"},
 		{sValue: "1.2E+3", sResult: "1,200.00"},
 		{sValue: "0.1E-4", bPreserveDecimals: false, sResult: "0.00"},
 		{sValue: "1.234567E+3", bPreserveDecimals: false, sResult: "1,234.57"}
@@ -5721,6 +5737,7 @@ sap.ui.define([
 		{sValue: "0E+10", sResult: "0.000"},
 		{sValue: "0.1E-4", sResult: "0.00001"},
 		{sValue: "1.234567E+3", sResult: "1,234.567"},
+		{sValue: "1.2E3", sResult: "1,200.000"},
 		{sValue: "1.2E+3", sResult: "1,200.000"},
 		{sValue: "0.1E-4", bPreserveDecimals: false, sResult: "0.000"},
 		{sValue: "1.2345678E+3", bPreserveDecimals: false, sResult: "1,234.568"}

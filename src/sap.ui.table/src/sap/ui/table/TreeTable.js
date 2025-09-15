@@ -31,6 +31,8 @@ sap.ui.define([
 	 *
 	 * @class
 	 * The TreeTable control provides a comprehensive set of features to display hierarchical data.
+	 * The control can be used in combination with {@link sap.ui.model.json.JSONModel JSONModel} and {@link sap.ui.model.odata.v2.ODataModel ODataModel V2}.
+	 * For a tree-table-like behavior with OData V4 services, use the {@link sap.ui.table.Table Table} control with the {@link sap.ui.table.plugins.ODataV4Hierarchy ODataV4Hierarchy} plugin.
 	 * @extends sap.ui.table.Table
 	 * @version ${version}
 	 *

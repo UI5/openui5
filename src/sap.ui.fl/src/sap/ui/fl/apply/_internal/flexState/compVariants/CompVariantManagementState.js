@@ -158,7 +158,6 @@ sap.ui.define([
 
 	function createVariant(mPropertyBag) {
 		const oVariantInput = mPropertyBag.variantInput || {};
-		const mAuthors = mPropertyBag.authors || {};
 		const oVariantData = {
 			fileName: oVariantInput.fileName,
 			fileType: "variant",
@@ -179,7 +178,7 @@ sap.ui.define([
 			}
 		};
 
-		return FlexObjectFactory.createCompVariant(oVariantData, mAuthors);
+		return FlexObjectFactory.createCompVariant(oVariantData);
 	}
 
 	function escapeSpecialIdCharacters(sId) {

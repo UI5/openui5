@@ -81,7 +81,7 @@ sap.ui.define([
 				this.setVariantId(this.getId());
 			}
 			if (!this.getAuthor()) {
-				this.setAuthor(getVariantAuthor(this.getSupportInformation().user, this.getLayer(), {}));
+				this.setAuthor(getVariantAuthor(this.getSupportInformation().user, this.getLayer(), this.getFlexObjectMetadata().reference));
 			}
 		}
 	});

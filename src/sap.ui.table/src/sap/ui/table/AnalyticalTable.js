@@ -43,9 +43,11 @@ sap.ui.define([
 	 * @param {object} [mSettings] initial settings for the new control
 	 *
 	 * @class
-	 * Table that handles analytical OData back-end scenarios. The <code>AnalyticalTable</code> only works with {@link sap.ui.model.analytics.AnalyticalBinding AnalyticalBinding} and
+	 * Table that handles analytical OData V2 back-end scenarios. The <code>AnalyticalTable</code> only works with {@link sap.ui.model.analytics.AnalyticalBinding AnalyticalBinding} and
 	 * correctly annotated OData services. Please check out the functionality of analytical binding and the SAP Annotations for OData Version 2.0 documentation for further details.
+	 * For an analytical-table-like behavior with OData V4 services, use the {@link sap.ui.table.Table Table} control with the {@link sap.ui.table.plugins.ODataV4Aggregation ODataV4Aggregation} plugin.
 	 * @see https://github.com/SAP/odata-vocabularies/blob/main/docs/v2-annotations.md
+	 * @see {@link topic:148892ff9aea4a18b912829791e38f3e Tables: Which One Should I Choose?}
 	 *
 	 * @extends sap.ui.table.Table
 	 * @version ${version}

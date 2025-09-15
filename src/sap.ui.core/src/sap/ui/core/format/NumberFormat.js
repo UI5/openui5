@@ -2023,7 +2023,7 @@ sap.ui.define([
 			sPlusMinusSigns = quote(sPlusSigns + sMinusSigns),
 			sGroupingSeparator = quote(oOptions.groupingSeparator),
 			sDecimalSeparator = quote(oOptions.decimalSeparator),
-			sRegExpFloat = "^\\s*([" + sPlusMinusSigns + "]?(?:[0-9" + sGroupingSeparator + "]+|[0-9" + sGroupingSeparator + "]*" + sDecimalSeparator + "[0-9]*)(?:[eE][+-][0-9]+)?)\\s*$",
+			sRegExpFloat = "^\\s*([" + sPlusMinusSigns + "]?(?:[0-9" + sGroupingSeparator + "]+|[0-9" + sGroupingSeparator + "]*" + sDecimalSeparator + "[0-9]*)(?:[eE][+-]?[0-9]+)?)\\s*$",
 			sRegExpInt = "^\\s*([" + sPlusMinusSigns + "]?[0-9" + sGroupingSeparator + "]+)\\s*$",
 			oGroupingRegExp = new RegExp(sGroupingSeparator, "g"),
 			oDecimalRegExp = new RegExp(sDecimalSeparator, "g"),

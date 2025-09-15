@@ -9,6 +9,7 @@ sap.ui.define([
 	"sap/ui/fl/apply/_internal/flexState/compVariants/CompVariantManagementState",
 	"sap/ui/fl/apply/_internal/flexState/FlexState",
 	"sap/ui/fl/initial/_internal/connectors/LrepConnector",
+	"sap/ui/fl/initial/_internal/Settings",
 	"sap/base/util/LoaderExtensions",
 	"sap/ui/thirdparty/sinon-4"
 ], function(
@@ -20,6 +21,7 @@ sap.ui.define([
 	CompVariantManagementState,
 	FlexState,
 	LrepConnector,
+	Settings,
 	LoaderExtensions,
 	sinon
 ) {
@@ -56,8 +58,17 @@ sap.ui.define([
 					"test-resources/sap/ui/fl/qunit/apply/api/SmartVariantManagementAPI.loadVariantsTestSetup-flexData.json"
 				)
 			});
-
+			sandbox.stub(Settings, "getInstance").resolves({
+				getIsVariantAuthorNameAvailable() {
+					return true;
+				}
+			});
 			sandbox.stub(LrepConnector, "loadFlexData").resolves(mFlexData);
+			sandbox.stub(LrepConnector, "loadVariantsAuthors").resolves({
+				user1: "First1 Last1",
+				user2: "First2 Last2",
+				user3: "First3 Last3"
+			});
 
 			const sReference = "sap.ui.demoapps.rta.fiorielements";
 			var aVariants = [{
@@ -133,6 +144,7 @@ sap.ui.define([
 			);
 			assert.strictEqual(aReturnedVariants[0].getExecuteOnSelection(), false, "and is not executed on selection by default");
 			assert.strictEqual(aReturnedVariants[0].getName(), "B Variant", "and the variant has the correct title");
+			assert.equal(aReturnedVariants[0].getAuthor(), "You", "and the variant has the correct author name");
 
 			// variant 2
 			assert.strictEqual(aReturnedVariants[1].getVariantId(), "variant_2", "variant_2 is found");
@@ -147,6 +159,7 @@ sap.ui.define([
 				"and is executed on selection, because it is flagged within the content"
 			);
 			assert.strictEqual(aReturnedVariants[1].getName(), "B Variant2", "and the variant has the correct title");
+			assert.equal(aReturnedVariants[1].getAuthor(), "First2 Last2", "and the variant has the correct author name");
 
 			// variant 3
 			assert.strictEqual(
@@ -167,6 +180,7 @@ sap.ui.define([
 				some: "property",
 				another: "value"
 			}, "and the variants content was updated");
+			assert.equal(aReturnedVariants[2].getAuthor(), "First3 Last3", "and the variant has the correct author name");
 
 			// variant 4
 			assert.strictEqual(aReturnedVariants[3].getVariantId(), "_HASHTAG_variant_3", "#variant_3 is found");
