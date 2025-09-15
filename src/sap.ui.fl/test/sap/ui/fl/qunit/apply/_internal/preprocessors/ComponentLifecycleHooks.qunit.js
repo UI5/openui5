@@ -556,6 +556,7 @@ sap.ui.define([
 					serviceUrl: "url1",
 					content: { annotationPath: "somePath", value: "someValue" }
 				}),
+				{ getId: () => "WrongChangeObjectToSimulateApplyChangeFailure", getServiceUrl: () => "url2" },
 				FlexObjectFactory.createAnnotationChange({
 					serviceUrl: "url2",
 					content: { annotationPath: "somePath2", value: "someValue2" }
@@ -594,8 +595,9 @@ sap.ui.define([
 			sandbox.restore();
 		}
 	}, function() {
-		QUnit.test("hook gets called with two annotation changes available", async function(assert) {
+		QUnit.test("hook gets called with annotation changes available", async function(assert) {
 			const oAsyncHints = {foobar: "baz"};
+			const oLogStub = sandbox.stub(Log, "error");
 			ComponentLifecycleHooks.modelCreatedHook({
 				model: this.oFakeModel1,
 				modelId: "someModelId",
@@ -644,19 +646,21 @@ sap.ui.define([
 			assert.strictEqual(aAnnoChangesModel2.length, 2, "the second model was set with the correct annotation changes");
 			assert.deepEqual(
 				aAnnoChangesModel2[0],
-				{ path: this.oAnnotationChanges[1].getContent().annotationPath, value: this.oAnnotationChanges[1].getContent().value },
+				{ path: this.oAnnotationChanges[2].getContent().annotationPath, value: this.oAnnotationChanges[2].getContent().value },
 				"the second model was set with the correct annotation change"
 			);
 			assert.deepEqual(
 				aAnnoChangesModel2[1],
-				{ path: this.oAnnotationChanges[2].getContent().annotationPath, value: this.oAnnotationChanges[2].getContent().value },
+				{ path: this.oAnnotationChanges[3].getContent().annotationPath, value: this.oAnnotationChanges[3].getContent().value },
 				"the second model was set with the correct annotation change"
 			);
 
 			const aAnnoChangesModel3 = await this.oSetAnnotationChangeStub3.getCall(0).args[0];
 			assert.strictEqual(aAnnoChangesModel3.length, 0, "the third model was set with no annotation change");
 
-			assert.ok(this.oAnnotationChanges.every((oChange) => oChange._appliedOnModel), "all changes are marked as passed to the model");
+			const aValidChanges = [this.oAnnotationChanges[0], this.oAnnotationChanges[2], this.oAnnotationChanges[3]];
+			assert.ok(aValidChanges.every((oChange) => oChange._appliedOnModel), "valid changes marked as passed to the model");
+			assert.ok(oLogStub.calledOnce, "an error was logged for the invalid change");
 		});
 
 		QUnit.test("hook gets called with a model on an embedded component", async function(assert) {
