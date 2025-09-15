@@ -364,7 +364,8 @@ sap.ui.define([
 			items: [
 				oShowSelectedText,
 				oShowSelectedButton
-			]
+			],
+			columnGap: "0.5rem"
 		});
 		oShowSelectedContainer.addStyleClass("sapMSelectionPanelFiltersContainer");
 
@@ -396,7 +397,8 @@ sap.ui.define([
 			items: [
 				oHideDescriptionsText,
 				oHideDescriptionsButton
-			]
+			],
+			columnGap: "0.5rem"
 		});
 		oHideDescriptionsContainer.addStyleClass("sapMSelectionPanelFiltersContainer");
 

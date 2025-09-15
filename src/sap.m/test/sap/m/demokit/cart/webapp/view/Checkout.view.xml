@@ -31,7 +31,7 @@
 				<content>
 					<Wizard
 						id="shoppingCartWizard"
-						complete="checkCompleted"
+						complete=".checkCompleted"
 						enableBranching="true"
 						finishButtonText="{i18n>checkoutWizardReviewbtn}">
 						<steps>
@@ -92,7 +92,7 @@
 								id="paymentTypeStep"
 								title="{i18n>checkoutPaymentTitle}"
 								subsequentSteps="creditCardStep, bankAccountStep, cashOnDeliveryStep"
-								complete="goToPaymentStep"
+								complete=".goToPaymentStep"
 								icon="sap-icon://money-bills">
 								<Text
 									class="sapUiSmallMarginBottom"
@@ -103,7 +103,7 @@
 								justifyContent="Center"
 								width="100%">
 								<SegmentedButton
-										selectionChange="setPaymentMethod"
+										selectionChange=".setPaymentMethod"
 										id="paymentMethodSelection"
 										selectedKey="{/SelectedPayment}">
 										<items>
@@ -152,7 +152,7 @@
 											search: '^[a-zA-Z]+[\\s]?[a-zA-Z]+$'
 										}
 									}"
-									change="checkCreditCardStep">
+									change=".checkCreditCardStep">
 									<layoutData>
 										<layout:GridData span="XL8 L8 M8 S12"/>
 									</layoutData>
@@ -178,7 +178,7 @@
 											minLength: 16
 										}
 									}"
-									change="checkCreditCardStep">
+									change=".checkCreditCardStep">
 									<rules>
 										<MaskInputRule
 											maskFormatSymbol="C"
@@ -209,7 +209,7 @@
 											search: '^[0-9]+$'
 										}
 									}"
-									change="checkCreditCardStep">
+									change=".checkCreditCardStep">
 									<rules>
 										<MaskInputRule
 											maskFormatSymbol ="C"
@@ -237,7 +237,7 @@
 									valueFormat="MM/YYYY"
 									displayFormat="MM/YYYY"
 									required="true"
-									change="checkCreditCardStep">
+									change=".checkCreditCardStep">
 									<layoutData>
 										<layout:GridData span="XL8 L8 M8 S12"/>
 									</layoutData>
@@ -296,7 +296,7 @@
 											minLength: 2
 										}
 									}"
-									change="checkCashOnDeliveryStep">
+									change=".checkCashOnDeliveryStep">
 									<layoutData>
 										<layout:GridData span="XL8 L8 M8 S12"/>
 									</layoutData>
@@ -319,7 +319,7 @@
 											minLength: 2
 										}
 									}"
-									change="checkCashOnDeliveryStep">
+									change=".checkCashOnDeliveryStep">
 									<layoutData>
 										<layout:GridData span="XL8 L8 M8 S12"/>
 									</layoutData>
@@ -342,7 +342,7 @@
 											search: '^[(0-9+]+[)\\s]?[0-9\\/\\s]+$'
 										}
 									}"
-									change="checkCashOnDeliveryStep">
+									change=".checkCashOnDeliveryStep">
 									<layoutData>
 										<layout:GridData span="XL8 L8 M8 S12"/>
 									</layoutData>
@@ -362,7 +362,7 @@
 										path: '/CashOnDelivery/Email',
 										type: '.types.email'
 										}"
-									change="checkCashOnDeliveryStep">
+									change=".checkCashOnDeliveryStep">
 									<layoutData>
 										<layout:GridData span="XL8 L8 M8 S12"/>
 									</layoutData>
@@ -374,7 +374,7 @@
 							title="{i18n>checkoutInvoiceAddressTitle}"
 							subsequentSteps="deliveryAddressStep, deliveryTypeStep"
 							activate=".onCheckStepActivation"
-							complete="invoiceAddressComplete"
+							complete=".invoiceAddressComplete"
 							icon="sap-icon://sales-quote"
 							validated="false">
 							<form:SimpleForm
@@ -388,7 +388,7 @@
 								<CheckBox
 									id="differentDeliveryAddress"
 									selected="{/DifferentDeliveryAddress}"
-									select="setDifferentDeliveryAddress">
+									select=".setDifferentDeliveryAddress">
 									<layoutData>
 										<layout:GridData span="XL8 L8 M8 S12"/>
 									</layoutData>
@@ -412,7 +412,7 @@
 											search: '^[a-zA-Z-]+\\.?\\s?[0-9a-zA-Z\\s]*$'
 										}
 									}"
-									change="checkInvoiceStep">
+									change=".checkInvoiceStep">
 									<layoutData>
 										<layout:GridData span="XL8 L8 M8 S12"/>
 									</layoutData>
@@ -436,7 +436,7 @@
 											search: '^[a-zA-Z\\s]+$'
 										}
 									}"
-									change="checkInvoiceStep">
+									change=".checkInvoiceStep">
 									<layoutData>
 										<layout:GridData span="XL8 L8 M8 S12"/>
 									</layoutData>
@@ -460,7 +460,7 @@
 											search: '^[0-9]+$'
 										}
 									}"
-									change="checkInvoiceStep">
+									change=".checkInvoiceStep">
 									<layoutData>
 										<layout:GridData span="XL8 L8 M8 S12"/>
 									</layoutData>
@@ -484,7 +484,7 @@
 											search: '^[a-zA-Z]+$'
 										}
 									}"
-									change="checkInvoiceStep">
+									change=".checkInvoiceStep">
 									<layoutData>
 										<layout:GridData span="XL8 L8 M8 S12"/>
 									</layoutData>
@@ -535,7 +535,7 @@
 											search: '^[a-zA-Z-]+\\.?\\s?[0-9a-zA-Z\\s]*$'
 										}
 									}"
-									change="checkDeliveryAddressStep">
+									change=".checkDeliveryAddressStep">
 									<layoutData>
 										<layout:GridData span="XL8 L8 M8 S12"/>
 									</layoutData>
@@ -559,7 +559,7 @@
 											search: '^[a-zA-Z\\s]+$'
 										}
 									}"
-									change="checkDeliveryAddressStep">
+									change=".checkDeliveryAddressStep">
 									<layoutData>
 										<layout:GridData span="XL8 L8 M8 S12"/>
 									</layoutData>
@@ -583,7 +583,7 @@
 											search: '^[0-9]+$'
 										}
 									}"
-									change="checkDeliveryAddressStep">
+									change=".checkDeliveryAddressStep">
 									<layoutData>
 										<layout:GridData span="XL8 L8 M8 S12"/>
 									</layoutData>
@@ -607,7 +607,7 @@
 											search: '^[a-zA-Z]+$'
 										}
 									}"
-									change="checkDeliveryAddressStep">
+									change=".checkDeliveryAddressStep">
 									<layoutData>
 										<layout:GridData span="XL8 L8 M8 S12"/>
 									</layoutData>

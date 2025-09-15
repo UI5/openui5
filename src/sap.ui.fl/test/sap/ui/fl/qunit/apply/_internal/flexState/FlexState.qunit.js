@@ -50,7 +50,9 @@ sap.ui.define([
 
 	function mockLoader(oResponse = {}) {
 		Loader.getFlexData.restore?.();
+		Loader.getCachedFlexData.restore?.();
 		const oReturn = merge({}, mEmptyResponse, oResponse);
+		sandbox.stub(Loader, "getCachedFlexData").returns(oResponse);
 		return sandbox.stub(Loader, "getFlexData").resolves({
 			data: oReturn,
 			cacheInvalidated: false
@@ -402,13 +404,25 @@ sap.ui.define([
 						variantReference: "someOtherVmReference",
 						variantManagementReference: "someOtherVmReference",
 						fileType: "ctrl_variant",
-						fileName: "someOtherVariant"
+						fileName: "someOtherVariant",
+						layer: "USER",
+						support: {
+							user: "user1"
+						}
 					}, {
 						variantReference: "someOtherVariant",
 						variantManagementReference: "vmReference",
 						fileType: "ctrl_variant",
-						fileName: "customVariant"
+						fileName: "customVariant",
+						layer: "PUBLIC",
+						support: {
+							user: "user2"
+						}
 					}]
+				},
+				authors: {
+					user1: "First1 Last1",
+					user2: "First2 Last2"
 				}
 			});
 			return FlexState.initialize({
@@ -418,6 +432,8 @@ sap.ui.define([
 			.then(function() {
 				const aFlexObjects = FlexState.getFlexObjectsDataSelector().get({reference: sReference});
 				assert.strictEqual(aFlexObjects.length, 4, "then two additional flex objects are created");
+				assert.equal(aFlexObjects[0].getAuthor(), "You", "then the author of the first variant is correct");
+				assert.equal(aFlexObjects[1].getAuthor(), "First2 Last2", "then the author of the second variant is correct");
 				assert.strictEqual(
 					aFlexObjects[1].getVariantReference(), "vmReference",
 					"then the variant reference is changed to the standard variant"
@@ -476,7 +492,6 @@ sap.ui.define([
 
 		QUnit.test("when initialize is called without a reference and with a componentID", function(assert) {
 			const oMockResponse = { changes: merge(StorageUtils.getEmptyFlexDataResponse(), { foo: "FlexResponse" }), authors: {} };
-			sandbox.stub(Loader, "getCachedFlexData").returns(oMockResponse);
 			this.oLoadFlexDataStub = mockLoader(oMockResponse);
 
 			const oExpectedResponse = { ...oMockResponse };

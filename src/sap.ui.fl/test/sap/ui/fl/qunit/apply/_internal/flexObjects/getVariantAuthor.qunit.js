@@ -4,6 +4,7 @@ sap.ui.define([
 	"sap/ui/core/Lib",
 	"sap/ui/fl/apply/_internal/flexObjects/FlexObjectFactory",
 	"sap/ui/fl/apply/_internal/flexObjects/getVariantAuthor",
+	"sap/ui/fl/initial/_internal/Loader",
 	"sap/ui/fl/initial/_internal/Settings",
 	"sap/ui/fl/Layer",
 	"sap/ui/thirdparty/sinon-4"
@@ -11,6 +12,7 @@ sap.ui.define([
 	Lib,
 	FlexObjectFactory,
 	getVariantAuthor,
+	Loader,
 	Settings,
 	Layer,
 	sinon
@@ -28,11 +30,16 @@ sap.ui.define([
 			sandbox.stub(Settings, "getInstanceOrUndef").returns({
 				getUserId() { return "userA";}
 			});
-			assert.equal(getVariantAuthor("userB", Layer.USER, {}), sYou, "user variant always has You as author");
-			assert.equal(getVariantAuthor("userA", Layer.PUBLIC, {}), sYou, "public variant of same user has You as author");
-			assert.equal(getVariantAuthor("vendorA", Layer.VENDOR, {}), "vendorA", "vendor variant has support user as author");
-			assert.equal(getVariantAuthor("userC", Layer.CUSTOMER, {}), "userC", "customer variant has support user as author when no author name provided");
-			assert.equal(getVariantAuthor("userD", Layer.PUBLIC, {userD: "Name of user D"}), "Name of user D", "public variant has user name as author when user name provided");
+			sandbox.stub(Loader, "getCachedFlexData").returns({
+				authors: {
+					userD: "Name of user D"
+				}
+			});
+			assert.equal(getVariantAuthor("userB", Layer.USER, undefined), sYou, "user variant always has You as author");
+			assert.equal(getVariantAuthor("userA", Layer.PUBLIC, undefined), sYou, "public variant of same user has You as author");
+			assert.equal(getVariantAuthor("vendorA", Layer.VENDOR, undefined), "vendorA", "vendor variant has support user as author");
+			assert.equal(getVariantAuthor("userC", Layer.CUSTOMER, undefined), "userC", "customer variant has support user as author when no author name provided");
+			assert.equal(getVariantAuthor("userD", Layer.PUBLIC, "reference"), "Name of user D", "public variant has user name as author when user name provided");
 		});
 	});
 

@@ -7,6 +7,7 @@ sap.ui.define([
 	"sap/ui/fl/apply/_internal/flexObjects/FlexObject",
 	"sap/ui/fl/apply/_internal/flexObjects/Variant",
 	"sap/ui/fl/apply/_internal/flexObjects/CompVariant",
+	"sap/ui/fl/initial/_internal/Loader",
 	"sap/ui/fl/qunit/apply/_internal/flexObjects/getFlexObjectFileContent",
 	"sap/ui/thirdparty/sinon-4"
 ], function(
@@ -16,6 +17,7 @@ sap.ui.define([
 	FlexObject,
 	Variant,
 	CompVariant,
+	Loader,
 	getFlexObjectFileContent,
 	sinon
 ) {
@@ -93,6 +95,24 @@ sap.ui.define([
 			const oCompVariant = new CompVariant(this.mFileContent);
 			assert.strictEqual(oFlVariant.getAuthor(), "C", "then the variant author name is from support information");
 			assert.strictEqual(oCompVariant.getAuthor(), "C", "then the variant author name is from support information");
+		});
+
+		QUnit.test("when new variant is initialized with no author and a maps of users' ids and names provided", function(assert) {
+			this.mFileContent = {
+				layer: "PUBLIC",
+				supportInformation: {
+					user: "C"
+				}
+			};
+			sandbox.stub(Loader, "getCachedFlexData").returns({
+				authors: {
+					C: "NameC"
+				}
+			});
+			const oFlVariant = new Variant(this.mFileContent);
+			const oCompVariant = new CompVariant(this.mFileContent);
+			assert.strictEqual(oFlVariant.getAuthor(), "NameC", "then the variant author name is from author map");
+			assert.strictEqual(oCompVariant.getAuthor(), "NameC", "then the variant author name is from author map");
 		});
 
 		QUnit.test("after variant author has been set", function(assert) {

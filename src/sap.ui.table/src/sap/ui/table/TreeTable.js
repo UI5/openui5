@@ -34,6 +34,8 @@ sap.ui.define([
 	 *
 	 * <b>Note:</b> OData V2 is deprecated as of UI5 2.0 and is therefore not supported by the <code>TreeTable</code>.
 	 * Consider using {@link topic:3801656db27b4b7a9099b6ed5fa1d769 Table Building Block (OData V4)} for OData scenarios.
+	 * For a tree-table-like behavior with OData V4 services, you can also use the {@link sap.ui.table.Table Table}
+	 * control with the {@link sap.ui.table.plugins.ODataV4Hierarchy ODataV4Hierarchy} plugin.
 	 *
 	 * @extends sap.ui.table.Table
 	 * @version ${version}

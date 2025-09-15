@@ -19,7 +19,9 @@ sap.ui.define([
 	"sap/m/SearchField",
 	"sap/m/Image",
 	"sap/m/Title",
-	"sap/m/ToolbarSeparator"
+	"sap/m/ToolbarSeparator",
+	"sap/m/ResponsivePopover",
+	"sap/ui/core/InvisibleText"
 
 ],
 function (
@@ -43,7 +45,9 @@ function (
 	SearchField,
 	Image,
 	Title,
-	ToolbarSeparator
+	ToolbarSeparator,
+	ResponsivePopover,
+	InvisibleText
 ) {
 	"use strict";
 
@@ -329,13 +333,34 @@ function (
 		if (item && item.getKey && item.getKey() === "quickCreate") {
 			oQuickCreateDialog.open();
 		}
+
+		if (_oPopover && _oPopover.isOpen()) {
+			_oPopover.close();
+		}
+	}
+
+	function onExternalLinkPress(event) {
+		if (_oPopover && _oPopover.isOpen()) {
+			_oPopover.close();
+		}
 	}
 
 	model.setData(data);
 
+	const oInvText = new InvisibleText({text: "Main Navigation"}).toStatic();
+	const oInvDescText = new InvisibleText({text: "This is the main navigation. It contains navigation items that may have child items. Activating a navigation item opens a new page or dialog within this browser window or gives access to the child items. Navigation items can be grouped, too."}).toStatic();
+
 	const sideNavigation = new SideNavigation("SNav", {
+		selectedKey: "home",
+		design: "Plain",
 		itemSelect: function (event) {
-			navContainer.to(event.getParameter('item').getKey());
+			const item = event.getParameter('item');
+			if (item && item.getKey() && navContainer.getPage(item.getKey())) {
+				navContainer.to(item.getKey());
+			}
+			if (_oPopover && _oPopover.isOpen()) {
+				_oPopover.close();
+			}
 		},
 		item: new NavigationList("NList", {
 			items: [
@@ -359,6 +384,7 @@ function (
 							key: '{key}',
 							href: '{href}',
 							target: '{target}',
+							press: onExternalLinkPress,
 							items: {
 								template: new NavigationListItem({
 									selectable: '{selectable}',
@@ -366,7 +392,8 @@ function (
 									key: '{key}',
 									href: '{href}',
 									enabled: '{enabled}',
-									target: '{target}'
+									target: '{target}',
+									press: onExternalLinkPress
 								}),
 								path: 'items',
 								templateShareable: true
@@ -389,6 +416,7 @@ function (
 							key: '{key}',
 							href: '{href}',
 							target: '{target}',
+							press: onExternalLinkPress,
 							items: {
 								template: new NavigationListItem({
 									selectable: '{selectable}',
@@ -396,7 +424,8 @@ function (
 									key: '{key}',
 									href: '{href}',
 									enabled: '{enabled}',
-									target: '{target}'
+									target: '{target}',
+									press: onExternalLinkPress
 								}),
 								path: 'items',
 								templateShareable: true
@@ -424,6 +453,23 @@ function (
 			}
 		})
 	}).setModel(model);
+
+	let _oPopover;
+
+	function createPopover() {
+		if (!_oPopover) {
+			_oPopover = new ResponsivePopover({
+				ariaLabelledBy: oInvText.getId(),
+				ariaDescribedBy: oInvDescText.getId(),
+				placement: "Bottom",
+				showHeader: false,
+				content: sideNavigation,
+				verticalScrolling: false
+			});
+			_oPopover.setShowHeader(Device.system.phone);
+		}
+		return _oPopover;
+	}
 
 	const navContainer = new NavContainer({
 		pages: [new ScrollContainer({
@@ -842,16 +888,14 @@ function (
 				icon: 'sap-icon://menu2',
 				tooltip: 'Menu',
 				type: ButtonType.Transparent,
-				press: function () {
-					const sideExpanded = toolPage.getSideExpanded();
+				press: function (oEvent) {
+					const oPopover = createPopover();
 
-					if (sideExpanded) {
-						this.setTooltip('Large Size Navigation');
+					if (oPopover.isOpen()) {
+						oPopover.close();
 					} else {
-						this.setTooltip('Small Size Navigation');
+						oPopover.openBy(oEvent.getSource());
 					}
-
-					toolPage.setSideExpanded(!sideExpanded);
 				},
 				layoutData: new OverflowToolbarLayoutData({
 					priority: OverflowToolbarPriority.NeverOverflow
@@ -920,15 +964,10 @@ function (
 		]
 	});
 
-	if (Device.media.getCurrentRange('StdExt').name === 'Phone' ||
-		Device.media.getCurrentRange('StdExt').name === 'Tablet') {
-		toolHeader.getAggregation('content')[0].setTooltip('Large Size Navigation');
-	}
-
 	const toolPage = new ToolPage({
 		header: toolHeader,
-		sideContent: sideNavigation,
 		mainContents: [navContainer]
-	}).placeAt('body');
+	});
+	toolPage.placeAt('body');
 
 });

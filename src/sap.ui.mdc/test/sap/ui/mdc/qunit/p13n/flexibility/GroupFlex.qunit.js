@@ -1,6 +1,10 @@
 /* global QUnit */
 sap.ui.define([
-	"test-resources/sap/ui/mdc/qunit/util/createAppEnvironment", "sap/ui/mdc/flexibility/GroupFlex", "sap/ui/fl/write/api/ChangesWriteAPI", "sap/ui/core/util/reflection/JsControlTreeModifier", "sap/ui/test/utils/nextUIUpdate"
+	"test-resources/sap/ui/mdc/qunit/util/createAppEnvironment",
+	"sap/ui/mdc/flexibility/GroupFlex",
+	"sap/ui/fl/write/api/ChangesWriteAPI",
+	"sap/ui/core/util/reflection/JsControlTreeModifier",
+	"sap/ui/test/utils/nextUIUpdate"
 ], function(createAppEnvironment, GroupFlex, ChangesWriteAPI, JsControlTreeModifier, nextUIUpdate) {
 	"use strict";
 
@@ -268,6 +272,57 @@ sap.ui.define([
 				}.bind(this));
 
 				done();
+			}.bind(this));
+		}.bind(this));
+	});
+
+	QUnit.test("addGroup (for a grouping that already exists) - change marked as not applicable", function(assert) {
+		const done = assert.async();
+		const oAddContent = fCreateaddGroupDefinition();
+
+		// First, add a grouping
+		return ChangesWriteAPI.create({
+			changeSpecificData: oAddContent,
+			selector: this.oTable
+		}).then(function(oChange) {
+
+			this.faddGroup(oChange, this.oTable, {
+				modifier: JsControlTreeModifier,
+				appComponent: this.oUiComponent,
+				view: this.oView
+			}).then(function(){
+
+				let oGroupConditions = this.oTable.getGroupConditions();
+				const aGroupings = oGroupConditions.groupLevels;
+
+				assert.equal(aGroupings.length, 1, "one grouping has been created");
+				assert.equal(aGroupings[0].key, "Category", "correct grouping has been created");
+
+				// Now try to add the same grouping again
+				const oSecondAddContent = fCreateaddGroupDefinition();
+				return ChangesWriteAPI.create({
+					changeSpecificData: oSecondAddContent,
+					selector: this.oTable
+				}).then(function(oSecondChange) {
+
+					this.faddGroup(oSecondChange, this.oTable, {
+						modifier: JsControlTreeModifier,
+						appComponent: this.oUiComponent,
+						view: this.oView
+					}).catch(function(oError) {
+						// The change should be marked as not applicable and promise should reject
+						oGroupConditions = this.oTable.getGroupConditions();
+
+						// Check that the duplicate change has been ignored gracefully
+						assert.equal(oGroupConditions.groupLevels.length, 1, "group conditions still contains only one grouping - duplicate addition ignored");
+						assert.equal(oGroupConditions.groupLevels[0].key, "Category", "existing grouping remains unchanged");
+
+						// Verify that the error indicates the change was marked as not applicable
+						assert.ok(oError, "Promise was rejected as expected for duplicate change");
+
+						done();
+					}.bind(this));
+				}.bind(this));
 			}.bind(this));
 		}.bind(this));
 	});

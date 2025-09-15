@@ -43,6 +43,9 @@
       "selector": {
         "persistencyKey": "variantManagement1"
       },
+      "support": {
+        "user": "user1"
+      },
       "content": {},
       "texts": {
         "variantName": {
@@ -52,12 +55,16 @@
     },{
       "fileName": "variant_2",
       "fileType": "variant",
+      "layer": "PUBLIC",
       "reference":"sap.ui.demoapps.rta.fiorielements",
       "selector": {
         "persistencyKey": "variantManagement1"
       },
       "content": {
         "executeOnSelect": true
+      },
+      "support": {
+        "user": "user2"
       },
       "favorite": true,
       "texts": {
@@ -68,9 +75,13 @@
     },{
       "fileName": "variant_6",
       "fileType": "variant",
+      "layer": "CUSTOMER",
       "reference":"sap.ui.demoapps.rta.fiorielements",
       "selector": {
         "persistencyKey": "variantManagement1"
+      },
+      "support": {
+        "user": "user3"
       },
       "content": {},
       "executeOnSelection": true,

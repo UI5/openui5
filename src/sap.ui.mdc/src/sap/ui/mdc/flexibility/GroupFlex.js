@@ -35,7 +35,14 @@ sap.ui.define([
 						name: oChangeContent.key
 					};
 
-					aValue.splice(oChangeContent.index, 0, oGroupContent);
+					const iIndex = aValue.findIndex((o) => addKeyOrName(o).key === oChangeContent.key);
+
+					if (iIndex < 0) {
+						aValue.splice(oChangeContent.index, 0, oGroupContent);
+					} else {
+						// In case the specified change is already existing (e.g. nothing to be removed) we need to ignore the change gracefully and mark it as not applicable
+						return FLChangeHandlerBase.markAsNotApplicable("The specified change is already existing - change appliance ignored", true);
+					}
 
 					oGroupConditions = {
 						groupLevels: aValue
@@ -66,10 +73,7 @@ sap.ui.define([
 						reject();
 					}
 
-					const aFoundValue = aValue.filter((o) => {
-						return addKeyOrName(o).key === oChangeContent.key;
-					});
-					const iIndex = aValue.indexOf(aFoundValue[0]);
+					const iIndex = aValue.findIndex((o) => addKeyOrName(o).key === oChangeContent.key);
 
 					if (iIndex > -1) {
 						aValue.splice(iIndex, 1);
@@ -102,12 +106,8 @@ sap.ui.define([
 				.then((oGroupConditions) => {
 					const aValue = oGroupConditions ? oGroupConditions.groupLevels : [];
 
-					const aFoundValue = aValue.filter((o) => {
-						return addKeyOrName(o).key === oChangeContent.key;
-					});
-
 					//remove the item from the 'GroupConditions' array, insert it at the new position
-					const iOldIndex = aValue.indexOf(aFoundValue[0]);
+					const iOldIndex = aValue.findIndex((o) => addKeyOrName(o).key === oChangeContent.key);
 					aValue.splice(oChangeContent.index, 0, aValue.splice(iOldIndex, 1)[0]);
 
 					oGroupConditions = {
