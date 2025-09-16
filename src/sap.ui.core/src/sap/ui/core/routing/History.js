@@ -138,12 +138,20 @@ sap.ui.define([
 	};
 
 	/**
-	 * Determines what the navigation direction for a newly given hash would be
-	 * It will say Unknown if there is a history foo - bar (current history) - foo
-	 * If you now ask for the direction of the hash "foo" you get Unknown because it might be backwards or forwards.
-	 * For hash replacements, the history stack will be replaced at this position for the history.
+	 * Determines what the navigation direction for a newly given hash would be.
+	 *
+	 * Returns the direction as {@link sap.ui.core.routing.HistoryDirection} (for example: Forwards, Backwards,
+	 * NewEntry). If no navigation has occurred yet, returns <code>undefined</code>. In cases where the direction cannot
+	 * be determined (if the same hash appears in multiple places), returns
+	 * {@link sap.ui.core.routing.HistoryDirection.Unknown}. For hash replacements, the history stack is updated at the
+	 * current position.
+	 *
+	 * Example: It will say "Unknown" if there is a history "foo" - "bar" (current history) - "foo".
+	 * If you now ask for the direction of the hash "foo" you get "Unknown" because it might be backwards or forwards.
+	 *
 	 * @param {string} [sNewHash] optional, if this parameter is not passed the last hashChange is taken.
-	 * @returns {sap.ui.core.routing.HistoryDirection|undefined} Direction for the given hash or <code>undefined</code>, if no navigation has taken place yet.
+	 * @returns {sap.ui.core.routing.HistoryDirection|undefined} Direction for the given hash or <code>undefined</code>,
+	 *   if no navigation has taken place yet.
 	 * @public
 	 */
 	History.prototype.getDirection = function(sNewHash) {

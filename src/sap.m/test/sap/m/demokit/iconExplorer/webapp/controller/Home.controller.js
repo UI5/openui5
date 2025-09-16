@@ -17,7 +17,7 @@ sap.ui.define([
 			this._oSearchField.setFilterFunction(function (sValue, oControl) {
 				var oContext = oControl.getBindingContext().getObject();
 
-				return !!(oContext.name.indexOf(sValue) >= 0 || oContext.tagString.indexOf(sValue) >= 0);
+				return !!(oContext.name.toLowerCase().indexOf(sValue.toLowerCase()) >= 0 || oContext.tagString.toLowerCase().indexOf(sValue.toLowerCase()) >= 0);
 			});
 
 			this._oSearchField.setValueHelpIconSrc("sap-icon://search");

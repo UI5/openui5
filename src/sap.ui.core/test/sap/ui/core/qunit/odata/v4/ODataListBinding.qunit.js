@@ -2753,7 +2753,7 @@ sap.ui.define([
 			.withExactArgs(sinon.match.same(sPath));
 		this.mock(oBinding).expects("fetchCache")
 			.withExactArgs(sinon.match.same(oContext), false, /*bKeepQueryOptions*/true, "myGroup",
-				undefined);
+				undefined, "~bSync~");
 		this.mock(oBinding).expects("refreshKeptElements").withExactArgs("myGroup", undefined)
 			.callsFake(function () {
 				if (oFixture.destroyedWhileRefreshing) {
@@ -2771,7 +2771,8 @@ sap.ui.define([
 			.returns(oHeaderContextCheckUpdatePromise);
 
 		// code under test
-		oRefreshResult = oBinding.refreshInternal(sPath, "myGroup");
+		oRefreshResult = oBinding.refreshInternal(sPath, "myGroup", undefined, undefined,
+			"~bSync~");
 		// simulate getContexts
 		oBinding.resolveRefreshPromise(
 			oFixture.success ? Promise.resolve() : Promise.reject(oError));
@@ -2887,7 +2888,8 @@ sap.ui.define([
 			});
 		});
 		this.mock(oBinding).expects("fetchCache")
-			.withExactArgs(sinon.match.same(oContext), false, true, "myGroup", bKeepCacheOnError)
+			.withExactArgs(sinon.match.same(oContext), false, true, "myGroup", bKeepCacheOnError,
+				"~bSync~")
 			.callsFake(function () {
 				if (!bRestore) { // simulate creation of new cache
 					oBinding.oCache = {
@@ -2918,24 +2920,26 @@ sap.ui.define([
 		this.mock(oBinding).expects("getDependentBindings").exactly(iNoOfCalls).withExactArgs()
 			.returns([oDependentBinding]);
 		this.mock(oDependentBinding).expects("refreshInternal").exactly(iNoOfCalls)
-			.withExactArgs("", "myGroup", false, bKeepCacheOnError)
+			.withExactArgs("", "myGroup", false, bKeepCacheOnError, "~bSync~")
 			.resolves();
 
 		aPromises.push(
 			// code under test
-			oBinding.refreshInternal("", "myGroup", false, bKeepCacheOnError).then(function () {
-				assert.ok(false);
-			}, function (oReturnedError) {
-				assert.strictEqual(oReturnedError, oError);
-			}));
-		if (bAsync) { //TODO in the sync case, the wrong cache would be restored :-(
-			aPromises.push(
-				// code under test
-				oBinding.refreshInternal("", "myGroup", false, bKeepCacheOnError).then(function () {
+			oBinding.refreshInternal("", "myGroup", false, bKeepCacheOnError, "~bSync~")
+				.then(function () {
 					assert.ok(false);
 				}, function (oReturnedError) {
 					assert.strictEqual(oReturnedError, oError);
 				}));
+		if (bAsync) { //TODO in the sync case, the wrong cache would be restored :-(
+			aPromises.push(
+				// code under test
+				oBinding.refreshInternal("", "myGroup", false, bKeepCacheOnError, "~bSync~")
+					.then(function () {
+						assert.ok(false);
+					}, function (oReturnedError) {
+						assert.strictEqual(oReturnedError, oError);
+					}));
 			oBinding.oCachePromise.then(function () {
 				// simulate #getContexts call async to "Refresh" event
 				oBinding.resolveRefreshPromise(oReadPromise);
@@ -2975,7 +2979,7 @@ sap.ui.define([
 		this.mock(oBinding).expects("removeCachesAndMessages").withExactArgs("path");
 		this.mock(oBinding).expects("fetchCache")
 			.withExactArgs(sinon.match.same(oContext), false, /*bKeepQueryOptions*/true, "myGroup",
-				true)
+				true, "~bSync~")
 			.callsFake(function () {
 				oBinding.oCache = oNewCache;
 				oBinding.oCachePromise = SyncPromise.resolve(oNewCache);
@@ -3004,7 +3008,7 @@ sap.ui.define([
 		});
 
 		// code under test
-		return oBinding.refreshInternal("path", "myGroup", /*_bCheckUpdate*/false, true)
+		return oBinding.refreshInternal("path", "myGroup", /*_bCheckUpdate*/false, true, "~bSync~")
 			.then(function () {
 				assert.ok(false);
 			}, function (oReturnedError) {
@@ -3035,7 +3039,7 @@ sap.ui.define([
 		this.mock(oBinding).expects("removeCachesAndMessages").withExactArgs("path");
 		this.mock(oBinding).expects("fetchCache")
 			.withExactArgs(sinon.match.same(oContext), false, /*bKeepQueryOptions*/true, "myGroup",
-				true)
+				true, "~bSync~")
 			.callsFake(function () {
 				oBinding.oCache = oNewCache;
 				oBinding.oCachePromise = SyncPromise.resolve(oNewCache);
@@ -3051,7 +3055,7 @@ sap.ui.define([
 		this.mock(oBinding.oHeaderContext).expects("checkUpdate").never();
 
 		// code under test
-		return oBinding.refreshInternal("path", "myGroup", /*_bCheckUpdate*/false, true)
+		return oBinding.refreshInternal("path", "myGroup", /*_bCheckUpdate*/false, true, "~bSync~")
 			.then(function () {
 				assert.ok(false);
 			}, function (oReturnedError) {
@@ -3145,7 +3149,7 @@ sap.ui.define([
 			this.mock(oBinding).expects("getDependentBindings").withExactArgs()
 				.returns([oChild0, oChild1, oChild2, oChild3, oChild4]);
 			this.mock(oChild0).expects("refreshInternal")
-				.withExactArgs(sResourcePathPrefix, "myGroup", false, undefined)
+				.withExactArgs(sResourcePathPrefix, "myGroup", false, undefined, "~bSync~")
 				.returns(new Promise(function (resolve) {
 					setTimeout(function () {
 						oChild0Refreshed = true;
@@ -3153,7 +3157,7 @@ sap.ui.define([
 					});
 				}));
 			this.mock(oChild1).expects("refreshInternal")
-				.withExactArgs(sResourcePathPrefix, "myGroup", false, undefined)
+				.withExactArgs(sResourcePathPrefix, "myGroup", false, undefined, "~bSync~")
 				.returns(new Promise(function (resolve) {
 					setTimeout(function () {
 						oChild1Refreshed = true;
@@ -3161,7 +3165,7 @@ sap.ui.define([
 					});
 				}));
 			this.mock(oChild2).expects("refreshInternal")
-				.withExactArgs(sResourcePathPrefix, "myGroup", false, undefined)
+				.withExactArgs(sResourcePathPrefix, "myGroup", false, undefined, "~bSync~")
 				.returns(new Promise(function (resolve) {
 					setTimeout(function () {
 						oChild2Refreshed = true;
@@ -3169,7 +3173,7 @@ sap.ui.define([
 					});
 				}));
 			this.mock(oChild3).expects("refreshInternal").exactly(bSuspended ? 1 : 0)
-				.withExactArgs(sResourcePathPrefix, "myGroup", false, undefined)
+				.withExactArgs(sResourcePathPrefix, "myGroup", false, undefined, "~bSync~")
 				.returns(new Promise(function (resolve) {
 					setTimeout(function () {
 						oChild3RefreshedIfSuspended = true;
@@ -3179,7 +3183,8 @@ sap.ui.define([
 			this.mock(oChild4).expects("refreshInternal").never();
 
 			// code under test
-			oRefreshResult = oBinding.refreshInternal(sResourcePathPrefix, "myGroup");
+			oRefreshResult = oBinding.refreshInternal(sResourcePathPrefix, "myGroup", undefined,
+				undefined, "~bSync~");
 			if (bSuspended) {
 				assert.strictEqual(oBinding.bRefreshKeptElements, !bShared);
 				assert.strictEqual(oBinding.sResumeAction, bShared ? "resetCache" : undefined);
@@ -6187,8 +6192,8 @@ sap.ui.define([
 				sinon.match(rTransientPredicate), sinon.match.same(oEntityData),
 				false, sinon.match.func, sinon.match.func)
 			.returns(oCreatePromise);
-		this.mock(oBinding).expects("requestSideEffects").exactly(bRefresh ? 1 : 0)
-			.withExactArgs("~sGroupId~", [""])
+		this.mock(oBinding).expects("refreshInternal").exactly(bRefresh ? 1 : 0)
+			.withExactArgs("", "~sGroupId~", false, true, true)
 			.resolves("~refreshResult~");
 		this.mock(Context).expects("create")
 			.withExactArgs(sinon.match.same(this.oModel), sinon.match.same(oBinding),

@@ -1584,7 +1584,8 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test("fetchCache: bKeepQueryOptions and own cache", function (assert) {
+[true, false].forEach((bSync) => {
+	QUnit.test("fetchCache: bKeepQueryOptions and own cache, bSync: " + bSync, function (assert) {
 		var oCache = {
 				getResourcePath : function () {}
 			},
@@ -1618,14 +1619,15 @@ sap.ui.define([
 		this.mock(oBinding).expects("fetchResourcePath").never();
 
 		// code under test
-		oBinding.fetchCache(oContext, undefined, true, "~sGroupId~", "~bSideEffectsRefresh~");
+		oBinding.fetchCache(oContext, undefined, true, "~sGroupId~", "~bSideEffectsRefresh~",
+			bSync);
 
 		assert.strictEqual(oBinding.oCache, undefined);
 		assert.deepEqual(oBinding.oFetchCacheCallToken, {
 			oOldCache : oCache
 		});
 		assert.strictEqual(oBinding.oFetchCacheCallToken.oOldCache, oCache);
-		assert.ok(oBinding.oCachePromise.isPending());
+		assert.strictEqual(oBinding.oCachePromise.isPending(), !bSync);
 
 		return oBinding.oCachePromise.then(function (oCache0) {
 			assert.strictEqual(oCache0, oNewCache);
@@ -1633,6 +1635,7 @@ sap.ui.define([
 			assert.strictEqual(oBinding.mLateQueryOptions, mLateQueryOptions);
 		});
 	});
+});
 
 	//*********************************************************************************************
 	QUnit.test("fetchCache: bKeepQueryOptions and no cache", function (assert) {
@@ -1667,7 +1670,11 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test("fetchCache: bKeepQueryOptions while oCachePromise is pending", function (assert) {
+[
+	"Unsupported bSync w/o bKeepQueryOptions",
+	"Unsupported bKeepQueryOptions while oCachePromise is pending"
+].forEach((sError) => {
+	QUnit.test("fetchCache: " + sError, function (assert) {
 		var oCachePromise = SyncPromise.resolve(Promise.resolve()),
 			mCacheQueryOptions = {},
 			oCallToken = {},
@@ -1693,8 +1700,10 @@ sap.ui.define([
 
 		assert.throws(function () {
 			// code under test
-			oBinding.fetchCache(undefined, undefined, true);
-		}, new Error("Unsupported bKeepQueryOptions while oCachePromise is pending"));
+			oBinding.fetchCache.apply(oBinding, sError === "Unsupported bSync w/o bKeepQueryOptions"
+				? [undefined, undefined, false, undefined, undefined, /*bSync*/true]
+				: [undefined, undefined, true]);
+		}, new Error(sError));
 
 		assert.strictEqual(oBinding.oCache, undefined);
 		assert.strictEqual(oBinding.oCachePromise, oCachePromise);
@@ -1702,6 +1711,7 @@ sap.ui.define([
 		assert.strictEqual(oBinding.oFetchCacheCallToken, oCallToken);
 		assert.strictEqual(oBinding.mLateQueryOptions, mLateQueryOptions);
 	});
+});
 
 	//*********************************************************************************************
 [false, true].forEach(function (bHasLateQueryOptions) {

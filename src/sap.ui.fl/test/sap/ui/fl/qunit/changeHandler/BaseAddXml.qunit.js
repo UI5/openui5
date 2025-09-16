@@ -194,7 +194,7 @@ sap.ui.define([
 
 		QUnit.test("when applying a change with multiple addXMLAdjustFragmentHandlers", async function(assert) {
 			const oHandler1 = sandbox.stub().callsFake((sFragment) => {
-				return sFragment.replace("<Button", '<Button xmlns="sap.m." id="newButton1" /><Button');
+				return sFragment.replace("<Button", '<Button xmlns="sap.m" id="newButton1" /><Button');
 			});
 			DelegateMediator.registerAddXMLAdjustFragmentHandler({
 				key: "handler1",
@@ -202,7 +202,7 @@ sap.ui.define([
 				reference: sReference
 			});
 			const oHandler2 = sandbox.stub().callsFake((sFragment) => {
-				return Promise.resolve(sFragment.replace("<Button", '<Button xmlns="sap.m." id="newButton2" /><Button'));
+				return Promise.resolve(sFragment.replace("<Button", '<Button xmlns="sap.m" id="newButton2" /><Button'));
 			});
 			DelegateMediator.registerAddXMLAdjustFragmentHandler({
 				key: "handler2",
@@ -210,7 +210,7 @@ sap.ui.define([
 				reference: sReference
 			});
 			const oHandler3 = sandbox.stub().callsFake((sFragment) => {
-				return sFragment.replace("<Button", '<Button xmlns="sap.m." id="newButton3" /><Button');
+				return sFragment.replace("<Button", '<Button xmlns="sap.m" id="newButton3" /><Button');
 			});
 			DelegateMediator.registerAddXMLAdjustFragmentHandler({
 				key: "handler3",
