@@ -719,7 +719,7 @@ sap.ui.define([
 		_unicodeFilterFactory: function(query) {
 			return function (name) {
 				var sUnicode = this.getModel().getUnicodeHTML(name.toLowerCase());
-				return sUnicode.indexOf(query) !== -1;
+				return sUnicode.toLowerCase().indexOf(query.toLowerCase()) !== -1;
 			}.bind(this);
 		},
 

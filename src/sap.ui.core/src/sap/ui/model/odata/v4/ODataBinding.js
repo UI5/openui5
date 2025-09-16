@@ -490,14 +490,20 @@ sap.ui.define([
 	 *   The group ID; mandatory if <code>bSideEffectsRefresh</code> is set
 	 * @param {boolean} [bSideEffectsRefresh]
 	 *   Whether to perform a side-effects refresh
-	 * @throws {Error}
-	 *   If auto-$expand/$select is still running and query options shall be kept (this case is just
-	 *   not yet implemented and should not be needed)
+	 * @param {boolean} [bSync]
+	 *   Whether to create and set the cache synchronously; <code>bKeepQueryOptions</code> must be
+	 *   <code>true</code>
+	 * @throws {Error} If
+	 *   <ul>
+	 *     <li> auto-$expand/$select is still running and query options shall be kept (this case is
+	 *       just not yet implemented and should not be needed),
+	 *     <li> bSync is set but bKeepQueryOptions is not.
+	 *   </ul>
 	 *
 	 * @private
 	 */
 	ODataBinding.prototype.fetchCache = function (oContext, bIgnoreParentCache, bKeepQueryOptions,
-			sGroupId, bSideEffectsRefresh) {
+			sGroupId, bSideEffectsRefresh, bSync) {
 		var oCache = this.oCache,
 			oCallToken = {
 				// propagate old cache from first call of fetchCache to the latest call
@@ -517,11 +523,15 @@ sap.ui.define([
 			return;
 		}
 
+		if (bSync && !bKeepQueryOptions) {
+			throw new Error("Unsupported bSync w/o bKeepQueryOptions");
+		}
+
 		this.oCache = undefined;
 		this.oFetchCacheCallToken = oCallToken;
 		if (bKeepQueryOptions) {
-			// asynchronously re-create an equivalent cache, but skip auto-$expand/$select
-			this.oCachePromise = SyncPromise.resolve(Promise.resolve()).then(function () {
+			// re-create an equivalent cache, but skip auto-$expand/$select
+			this.oCachePromise = SyncPromise.resolve(bSync || Promise.resolve()).then(function () {
 				return that.createAndSetCache(that.mCacheQueryOptions, oCache.getResourcePath(),
 					oContext, sGroupId, bSideEffectsRefresh, oCache);
 			});
@@ -1287,6 +1297,10 @@ sap.ui.define([
 	 *   If <code>true</code>, a property binding is expected to check for updates
 	 * @param {boolean} [bKeepCacheOnError]
 	 *   If <code>true</code>, the binding data remains unchanged if the refresh fails
+	 * @param {boolean} [bSync]
+	 *   If <code>true</code>, the cache is created synchronously; cannot be combined with the
+	 *   ODataModel's <code>sharedRequests</code> constructor parameter or with the
+	 *   ODataListBinding's <code>$$sharedRequest</code> binding parameter
 	 * @returns {sap.ui.base.SyncPromise}
 	 *   A promise which is resolved without a defined result when the refresh is finished, or
 	 *   rejected when the refresh fails; the promise is resolved immediately on a suspended binding

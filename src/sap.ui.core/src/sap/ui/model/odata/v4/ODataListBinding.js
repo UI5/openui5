@@ -1104,7 +1104,8 @@ sap.ui.define([
 		if (bRefresh) {
 			oCreatePromise = SyncPromise.all([
 				oCreatePromise,
-				this.requestSideEffects(sGroupId, [""])
+				// sGroupId is set -> side-effects refresh
+				this.refreshInternal("", sGroupId, false, true, true)
 			]);
 		}
 
@@ -3946,7 +3947,7 @@ sap.ui.define([
 	 * @see sap.ui.model.odata.v4.ODataBinding#refreshInternal
 	 */
 	ODataListBinding.prototype.refreshInternal = function (sResourcePathPrefix, sGroupId,
-			_bCheckUpdate, bKeepCacheOnError) {
+			_bCheckUpdate, bKeepCacheOnError, bSync) {
 		var that = this;
 
 		// calls refreshInternal on all given bindings and returns an array of promises
@@ -3963,7 +3964,7 @@ sap.ui.define([
 				// another update request in createContexts, when the context for the row is
 				// reused.
 				return oBinding.refreshInternal(sResourcePathPrefix, sGroupId, false,
-					bKeepCacheOnError);
+					bKeepCacheOnError, bSync);
 			});
 		}
 
@@ -3994,7 +3995,7 @@ sap.ui.define([
 					oCache.reset([]);
 				} else {
 					that.fetchCache(that.oContext, false, /*bKeepQueryOptions*/true,
-						sGroupId, bKeepCacheOnError);
+						sGroupId, bKeepCacheOnError, bSync);
 					oKeptElementsPromise = that.refreshKeptElements(sGroupId,
 						/*bIgnorePendingChanges*/ bKeepCacheOnError);
 					if (that.iCurrentEnd > 0) {

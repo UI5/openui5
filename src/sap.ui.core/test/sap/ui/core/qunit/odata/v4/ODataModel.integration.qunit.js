@@ -43663,9 +43663,7 @@ sap.ui.define([
 			Name : "Zeta"
 		}, /*bSkipRefresh*/true);
 
-		// TODO: Even if a side-effects refresh to enhance ExpandLevels is needed, getCount must
-		// not return undefined but the old count value
-		assert.strictEqual(oListBinding.getCount(), undefined);
+		assert.strictEqual(oListBinding.getCount(), 5);
 
 		await oZeta.created();
 
@@ -43731,9 +43729,7 @@ sap.ui.define([
 			Name : "Eta"
 		}, /*bSkipRefresh*/true);
 
-		// TODO: Even if a side-effects refresh to enhance ExpandLevels is needed, getCount must
-		// not return undefined but the old count value
-		assert.strictEqual(oListBinding.getCount(), undefined);
+		assert.strictEqual(oListBinding.getCount(), 6);
 
 		await oEta.created();
 
