@@ -4516,12 +4516,15 @@ sap.ui.define([
 	});
 
 	QUnit.test("Token should be truncated on re-rerender", async function (assert) {
+		this.clock = sinon.useFakeTimers();
 		this.oMultiInput.destroyTokens();
+		this.clock.tick(500);
+
 		this.oMultiInput.addToken(new Token({
 			text: "Extra long token, Extra long token, Extra long token, Extra long token"
 		}));
 
-		await nextUIUpdate();
+		await nextUIUpdate(this.clock);
 
 		// Assert
 		assert.ok(this.oMultiInput.getAggregation("tokenizer").hasOneTruncatedToken(), "Token is truncated initially.");

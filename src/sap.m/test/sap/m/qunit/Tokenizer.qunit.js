@@ -2162,6 +2162,29 @@ sap.ui.define([
 		assert.strictEqual(this.tokenizer.hasOneTruncatedToken(), true, "Token's truncation was set again after resize.");
 	});
 
+	QUnit.test("Should not truncate when there is enough width", async function (assert) {
+		// Arrange
+		var oTokenizer = new Tokenizer({
+			tokens: [
+				new Token({ text: "foo" })
+			]
+		}).placeAt("content");
+		await nextUIUpdate();
+
+		var oToken = oTokenizer.getTokens()[0];
+
+		// Act
+		oTokenizer._adjustTokensVisibility();
+		await nextUIUpdate();
+
+		// Assert
+		assert.strictEqual(oToken.getTruncated(), false, "Short token should not be truncated");
+		assert.notOk(oTokenizer.$().hasClass("sapMTokenizerOneLongToken"), "Tokenizer should not have one long token class");
+
+		// Cleanup
+		oTokenizer.destroy();
+	});
+
 	QUnit.module("Mobile Dialog", {
 		stubPlatform: function () {
 			this.stub(Device, "system").value({
