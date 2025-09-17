@@ -917,7 +917,7 @@ sap.ui.define([
 	 *
 	 * @param {string} sMetaPath
 	 *   The meta path, e.g. "/SalesOrderList/SO_2_BP"
-	 * @returns {sap.ui.base.SyncPromise}
+	 * @returns {sap.ui.base.SyncPromise<object>}
 	 *   A promise that is resolved with the type at the given path.
 	 *
 	 * @private
@@ -1588,7 +1588,8 @@ sap.ui.define([
 	 * Returns a sync promise that is resolved when the requestor is ready to be used. The V4
 	 * requestor is ready immediately. Subclasses may behave differently.
 	 *
-	 * @returns {sap.ui.base.SyncPromise} A sync promise that is resolved immediately with no result
+	 * @returns {sap.ui.base.SyncPromise<void>}
+	 *   A sync promise that is resolved immediately with no result
 	 *
 	 * @public
 	 */
@@ -2258,7 +2259,7 @@ sap.ui.define([
 	 *
 	 * @param {string} sGroupId
 	 *   The group ID
-	 * @returns {sap.ui.base.SyncPromise}
+	 * @returns {sap.ui.base.SyncPromise<void>}
 	 *   A promise on the outcome of the HTTP request resolving with <code>undefined</code>; it is
 	 *   rejected with an error if the batch request itself fails.
 	 *
@@ -2306,7 +2307,7 @@ sap.ui.define([
 	 *
 	 * @param {string} sGroupId
 	 *   The group ID
-	 * @returns {sap.ui.base.SyncPromise}
+	 * @returns {sap.ui.base.SyncPromise<void>}
 	 *   A promise that resolves without a defined result when a batch response has been received
 	 *   for the given group ID, no matter if the batch succeeded or failed
 	 *
@@ -2323,7 +2324,7 @@ sap.ui.define([
 	 *
 	 * @param {string} sGroupId
 	 *   The group ID
-	 * @returns {sap.ui.base.SyncPromise}
+	 * @returns {sap.ui.base.SyncPromise<void>}
 	 *   A promise that resolves without a defined result when all currently running change requests
 	 *   for the given group ID have been processed completely, no matter if they succeed or fail
 	 *

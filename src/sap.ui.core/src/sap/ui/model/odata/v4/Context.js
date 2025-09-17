@@ -63,7 +63,7 @@ sap.ui.define([
 	 * @param {number} [iIndex]
 	 *   Index of item (within the collection addressed by <code>sPath</code>) represented
 	 *   by this context; used by list bindings, not context bindings
-	 * @param {sap.ui.base.SyncPromise} [oCreatePromise]
+	 * @param {sap.ui.base.SyncPromise<object>} [oCreatePromise]
 	 *   A promise which is resolved with the created entity when the POST request has been
 	 *   successfully sent and the entity has been marked as non-transient; used as base for
 	 *   {@link #created}
@@ -142,7 +142,7 @@ sap.ui.define([
 	/**
 	 * Updates all dependent bindings of this context.
 	 *
-	 * @returns {sap.ui.base.SyncPromise}
+	 * @returns {sap.ui.base.SyncPromise<void>}
 	 *   A promise which is resolved without a defined result when the update is finished
 	 * @private
 	 */
@@ -438,7 +438,7 @@ sap.ui.define([
 	 *  A function which is called immediately when an entity has been deleted from the cache, or
 	 *   when it was re-inserted; the index of the entity and an offset (-1 for deletion, 1 for
 	 *   re-insertion) are passed as parameter
-	 * @returns {sap.ui.base.SyncPromise}
+	 * @returns {sap.ui.base.SyncPromise<void>}
 	 *   A promise which is resolved without a result in case of success, or rejected with an
 	 *   instance of <code>Error</code> in case of failure
 	 *
@@ -492,7 +492,7 @@ sap.ui.define([
 	 *   fire "patchSent" and "patchCompleted" events
 	 * @param {boolean} [bUpdating]
 	 *   Whether the given property will not be overwritten by a creation POST(+GET) response
-	 * @returns {sap.ui.base.SyncPromise}
+	 * @returns {sap.ui.base.SyncPromise<void>}
 	 *   A promise which is resolved without a result in case of success, or rejected with an
 	 *   instance of <code>Error</code> in case of failure, for example if the annotation belongs to
 	 *   the read-only namespace "@$ui5.*"
@@ -719,7 +719,7 @@ sap.ui.define([
 	/**
 	 * Returns a promise for the "canonical path" of the entity for this context.
 	 *
-	 * @returns {sap.ui.base.SyncPromise}
+	 * @returns {sap.ui.base.SyncPromise<string>}
 	 *   A promise which is resolved with the canonical path (e.g. "/SalesOrderList('0500000000')")
 	 *   in case of success, or rejected with an instance of <code>Error</code> in case of failure,
 	 *   e.g. if the given context does not point to an entity
@@ -739,7 +739,7 @@ sap.ui.define([
 	 *   given property path that formats corresponding to the property's EDM type and constraints.
 	 * @param {boolean} [bCached]
 	 *   Whether to return cached values only and not initiate a request
-	 * @returns {sap.ui.base.SyncPromise} a promise on the formatted value
+	 * @returns {sap.ui.base.SyncPromise<any>} a promise on the formatted value
 	 *
 	 * @private
 	 */
@@ -776,7 +776,7 @@ sap.ui.define([
 	 *   A property binding which registers itself as listener at the cache
 	 * @param {boolean} [bCached]
 	 *   Whether to return cached values only and not initiate a request
-	 * @returns {sap.ui.base.SyncPromise}
+	 * @returns {sap.ui.base.SyncPromise<any>}
 	 *   A promise on the outcome of the binding's <code>fetchValue</code> call; it is rejected
 	 *   in case cached values are asked for, but not found
 	 * @throws {Error} If this context is a header context and no or empty path is given and
@@ -1489,8 +1489,8 @@ sap.ui.define([
 	 *
 	 * @param {object} oParameters - A parameter object
 	 * @param {boolean} [oParameters.copy]
-	 *   Whether the node should be copied instead of moved (@experimental as of version 1.135.0).
-	 *   The returned promise resolves with the index for the copied node.
+	 *   Whether the node should be copied instead of moved. The returned promise resolves with the
+	 *   index for the copied node. Supported since 1.141.0.
 	 * @param {sap.ui.model.odata.v4.Context|null} [oParameters.nextSibling]
 	 *   The next sibling's context, or <code>null</code> to turn this node into the last sibling.
 	 *   Omitting the sibling moves this node to a position determined by the server.
@@ -1558,7 +1558,7 @@ sap.ui.define([
 	 *
 	 * @param {object} oData
 	 *   The data to patch with
-	 * @returns {sap.ui.base.SyncPromise}
+	 * @returns {sap.ui.base.SyncPromise<void>}
 	 *   A promise that is resolved without a result when the patch is done.
 	 *
 	 * @private
@@ -1615,7 +1615,7 @@ sap.ui.define([
 	 *   If <code>true</code>, a property binding is expected to check for updates
 	 * @param {boolean} [bKeepCacheOnError]
 	 *   If <code>true</code>, the binding data remains unchanged if the refresh fails
-	 * @returns {sap.ui.base.SyncPromise}
+	 * @returns {sap.ui.base.SyncPromise<void>}
 	 *   A promise resolving when all dependent bindings are refreshed; it is rejected
 	 *   when the refresh fails; the promise is resolved immediately on a suspended binding
 	 * @throws {Error}
@@ -2105,7 +2105,7 @@ sap.ui.define([
 	 *   The absolute paths to request side effects for
 	 * @param {string} sGroupId
 	 *   The effective group ID
-	 * @returns {sap.ui.base.SyncPromise|undefined}
+	 * @returns {sap.ui.base.SyncPromise<void>|undefined}
 	 *   A promise which is resolved without a defined result, or rejected with an error if loading
 	 *   of side effects fails, or <code>undefined</code> if there is nothing to do
 	 *
@@ -2247,7 +2247,7 @@ sap.ui.define([
 	 *
 	 * Note: this is a private and internal API. Do not call this!
 	 *
-	 * @param {sap.ui.base.SyncPromise} [oSyncCreatePromise]
+	 * @param {sap.ui.base.SyncPromise<object>} [oSyncCreatePromise]
 	 *   A promise which is resolved with the created entity when the PATCH or POST request has been
 	 *   successfully sent and the entity has been marked as non-transient; used as base for
 	 *   {@link #created}. If missing, this context's {@link #created created} promise is removed
@@ -2647,9 +2647,9 @@ sap.ui.define([
 	 * @param {boolean} [bSync] Whether to use the synchronously available cache
 	 * @param {boolean} [bWithOrWithoutCache] Whether to call the processor even without a cache
 	 *   (currently implemented for operation bindings only)
-	 * @returns {sap.ui.base.SyncPromise} A sync promise that is resolved with either the result of
-	 *   the processor or <code>undefined</code> if there is no cache for this binding, or if the
-	 *   cache determination is not yet completed
+	 * @returns {sap.ui.base.SyncPromise<any>} A sync promise that is resolved with either the
+	 *   result of the processor or <code>undefined</code> if there is no cache for this binding, or
+	 *   if the cache determination is not yet completed
 	 *
 	 * @private
 	 */
@@ -2674,7 +2674,7 @@ sap.ui.define([
 		 *   An absolute path without trailing slash
 		 * @param {number} [iIndex]
 		 *   Index of item represented by this context, used by list bindings, not context bindings
-		 * @param {sap.ui.base.SyncPromise} [oCreatePromise]
+		 * @param {sap.ui.base.SyncPromise<object>} [oCreatePromise]
 		 *   A promise which is resolved with the created entity when the POST request has been
 		 *   successfully sent and the entity has been marked as non-transient; used as base for
 		 *   {@link #created}

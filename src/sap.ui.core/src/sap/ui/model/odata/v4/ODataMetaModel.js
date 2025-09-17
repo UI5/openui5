@@ -371,7 +371,8 @@ sap.ui.define([
 
 		/**
 		 * Returns the contexts that result from iterating over the binding's path/context.
-		 * @returns {sap.ui.base.SyncPromise} A promise that is resolved with an array of contexts
+		 * @returns {sap.ui.base.SyncPromise<sap.ui.model.odata.v4.Context[]>}
+		 *   A promise that is resolved with an array of contexts
 		 *
 		 * @private
 		 */
@@ -784,7 +785,7 @@ sap.ui.define([
 	 *   A namespace, for example "foo.bar.", of a schema
 	 * @param {function} fnLog
 	 *   The log function
-	 * @returns {object|sap.ui.base.SyncPromise|undefined}
+	 * @returns {object|sap.ui.base.SyncPromise<void>|undefined}
 	 *   The schema, or a promise which is resolved without details or rejected with an error, or
 	 *   <code>undefined</code>.
 	 * @throws {Error}
@@ -1083,7 +1084,7 @@ sap.ui.define([
 	 * @param {sap.ui.model.odata.v4.Context} oContext
 	 *   OData V4 context object for which the canonical path is requested; it must point to an
 	 *   entity
-	 * @returns {sap.ui.base.SyncPromise}
+	 * @returns {sap.ui.base.SyncPromise<string>}
 	 *   A promise which is resolved with the canonical path (for example "/EMPLOYEES('1')") in
 	 *   case of success; it is rejected if the requested metadata cannot be loaded, if the context
 	 *   path does not point to an entity, if the entity is transient, or if required key properties
@@ -1107,7 +1108,7 @@ sap.ui.define([
 	/**
 	 * Requests the metadata.
 	 *
-	 * @returns {sap.ui.base.SyncPromise}
+	 * @returns {sap.ui.base.SyncPromise<object>}
 	 *   A promise which is resolved with the requested metadata as soon as it is available
 	 *
 	 * @private
@@ -1128,7 +1129,7 @@ sap.ui.define([
 	 *   Whether to just read the $metadata document and annotations, but not yet convert them from
 	 *   XML to JSON; this is useful at most once in an early call that precedes all other normal
 	 *   calls and ignored after the first call without this.
-	 * @returns {sap.ui.base.SyncPromise|null}
+	 * @returns {sap.ui.base.SyncPromise<object>|null}
 	 *   A promise which is resolved with the $metadata "JSON" object as soon as the entity
 	 *   container is fully available, or rejected with an error. In case of
 	 *   <code>bPrefetch</code> in an early call, <code>null</code> is returned.
@@ -1181,7 +1182,7 @@ sap.ui.define([
 	 *   (since 1.57.0)
 	 * @param {object} [mParameters.scope]
 	 *   Optional scope for lookup of aliases for computed annotations (since 1.43.0)
-	 * @returns {sap.ui.base.SyncPromise}
+	 * @returns {sap.ui.base.SyncPromise<object>}
 	 *   A promise which is resolved with the requested metadata object as soon as it is available;
 	 *   it is rejected if the requested metadata cannot be loaded
 	 *
@@ -1810,7 +1811,7 @@ sap.ui.define([
 	 *   Type-specific format options, since 1.81.0. The boolean format option
 	 *   "parseKeepsEmptyString" applies to {@link sap.ui.model.odata.type.String} only and is
 	 *   ignored for all other types. All other format options are passed "as is".
-	 * @returns {sap.ui.base.SyncPromise}
+	 * @returns {sap.ui.base.SyncPromise<sap.ui.model.odata.type.ODataType>}
 	 *   A promise that gets resolved with the corresponding UI5 type from
 	 *   {@link sap.ui.model.odata.type}; if no specific type can be determined, a warning is logged
 	 *   and {@link sap.ui.model.odata.type.Raw} is used
@@ -1900,7 +1901,7 @@ sap.ui.define([
 	 *   Whether no edit URL is required; must be <code>undefined</code> from APIs for canonical
 	 *   paths (based on {@link #fetchCanonicalPath}). Since 1.133.0, when a boolean value is given,
 	 *   the edit URL is allowed to be adjusted for upsert use cases.
-	 * @returns {sap.ui.base.SyncPromise}
+	 * @returns {sap.ui.base.SyncPromise<object>}
 	 *   A promise that gets resolved with an object having the following properties:
 	 *   <ul>
 	 *     <li> <code>editUrl</code>: The edit URL or undefined if the entity is transient
@@ -2099,7 +2100,7 @@ sap.ui.define([
 	 * @param {object[]} [aOverloads]
 	 *   The list of operation overloads in case of an operation parameter, must contain exactly one
 	 *   entry (which means that the parameter's binding path exactly matches one overload)
-	 * @returns {sap.ui.base.SyncPromise}
+	 * @returns {sap.ui.base.SyncPromise<object>}
 	 *   A promise that gets resolved with a map containing all "ValueListMapping" annotations in
 	 *   the metadata of the given model by qualifier.
 	 *
@@ -2219,7 +2220,7 @@ sap.ui.define([
 	 *
 	 * @param {string} sPropertyPath
 	 *   An absolute path to an OData property within the OData data model
-	 * @returns {sap.ui.base.SyncPromise}
+	 * @returns {sap.ui.base.SyncPromise<sap.ui.model.odata.v4.ValueListType>}
 	 *   A promise that is resolved with the type of the value list. It is rejected if the property
 	 *   cannot be found in the metadata.
 	 *

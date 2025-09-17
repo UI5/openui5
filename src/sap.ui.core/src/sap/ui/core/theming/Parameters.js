@@ -3,7 +3,6 @@
  */
 sap.ui.define([
 	'sap/ui/core/Theming',
-	'sap/ui/thirdparty/URI',
 	'../Element',
 	'sap/base/Log',
 	'sap/base/util/syncFetch',
@@ -11,7 +10,6 @@ sap.ui.define([
 	'./ThemeManager'
 ], function(
 	Theming,
-	URI,
 	Element,
 	Log,
 	syncFetch,
@@ -42,7 +40,7 @@ sap.ui.define([
 
 	var aCallbackRegistry = [];
 
-	var sBootstrapOrigin = new URI(sap.ui.require.toUrl(""), document.baseURI).origin();
+	var sBootstrapOrigin = new URL(sap.ui.require.toUrl(""), document.baseURI).origin;
 	var mOriginsNeedingCredentials = {};
 
 	// match a CSS url
@@ -64,13 +62,20 @@ sap.ui.define([
 	 * @returns {string} the resolved URL in CSS URL notation
 	 */
 	function checkAndResolveRelativeUrl(sUrl, sThemeBaseUrl) {
-		var aMatch = rCssUrl.exec(sUrl);
+		function isRelativeUrl(sUrl) {
+			if (sUrl.startsWith('//') || /^[a-z][a-z0-9+.-]*:/i.test(sUrl)) {
+				return false; // URL definitiv absolut
+			}
+
+			return true;  // URL is relative
+		}
+
+		const aMatch = rCssUrl.exec(sUrl);
 		if (aMatch) {
-			var oUri = new URI(aMatch[1]);
-			if (oUri.is("relative")) {
+			const oUrl = new URL(aMatch[1], sThemeBaseUrl);
+			if (isRelativeUrl(aMatch[1])) {
 				// Rewrite relative URLs based on the theme base url
-				// Otherwise they would be relative to the HTML page which is incorrect
-				var sNormalizedUrl = oUri.absoluteTo(sThemeBaseUrl).normalize().toString();
+				const sNormalizedUrl = oUrl.href;
 				sUrl = "url('" + sNormalizedUrl + "')";
 			}
 		}
@@ -193,7 +198,9 @@ sap.ui.define([
 			}
 
 			// check if we need to send credentials
-			var sThemeOrigin = new URI(oUrl.themeBaseUrl).origin();
+			// Note: sThemeBaseUrl must always be absolute, as it's derived from libInfo.getUrl().baseUrl which returns absolute URLs.
+			//       If this fails, there's an error in the URL construction logic upstream.
+			const sThemeOrigin = new URL(oUrl.themeBaseUrl).origin;
 			var bWithCredentials = mOriginsNeedingCredentials[sThemeOrigin];
 			var aWithCredentials = [];
 
@@ -221,10 +228,14 @@ sap.ui.define([
 		}
 
 		var sStyleSheetUrl = libInfo.getUrl().url || libInfo.cssLinkElement?.getAttribute("href");
+		// The baseUrl from libInfo.getUrl() returns an absolute URL without query parameters or fragments.
+		// To derive the theme base directory, we only need to remove the filename portion after the last "/"
+		// (e.g., "https://example.com/resources/sap/ui/core/themes/base/library.css" → "https://example.com/resources/sap/ui/core/themes/base/")
+		const sThemeBaseUrl = libInfo.getUrl().baseUrl.replace(/\/[^\/]*$/, '/');
 
 		// Remove CSS file name and query to create theme base url (to resolve relative urls)
 		return {
-			themeBaseUrl: new URI(sStyleSheetUrl).filename("").query("").toString(),
+			themeBaseUrl: sThemeBaseUrl,
 			styleSheetUrl : sStyleSheetUrl
 		};
 	}
@@ -263,8 +274,10 @@ sap.ui.define([
 			});
 			if (response.ok) {
 				var data = response.json();
+				// Note: sThemeBaseUrl must always be absolute, as it's derived from libInfo.getUrl().baseUrl which returns absolute URLs.
+				//       If this fails, there's an error in the URL construction logic upstream.
+				const sThemeOrigin = new URL(sThemeBaseUrl).origin;
 				// Once we have a successful request we track the credentials setting for this origin
-				var sThemeOrigin = new URI(sThemeBaseUrl).origin();
 				mOriginsNeedingCredentials[sThemeOrigin] = bCurrentWithCredentials;
 
 				if (Array.isArray(data)) {

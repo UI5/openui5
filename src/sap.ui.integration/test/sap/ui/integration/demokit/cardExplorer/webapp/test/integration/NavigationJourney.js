@@ -62,7 +62,7 @@ sap.ui.define([
 
 		// topics switch test
 		When.onTheNavigationList.iSwitchToSample("headers");
-		Then.onTheLearnPage.iShouldSeeSampleTitle("Card Headers");
+		Then.onTheLearnPage.iShouldSeeSampleTitle("Card Header");
 
 		When.onTheNavigationList.iSwitchToSample("actions");
 		Then.onTheLearnPage.iShouldSeeSampleTitle("Card Actions");

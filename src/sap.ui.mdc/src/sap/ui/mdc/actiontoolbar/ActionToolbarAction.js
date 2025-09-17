@@ -167,6 +167,12 @@ sap.ui.define([
 		return oAction && oAction.getText ? oAction.getText() : this.getId();
 	};
 
+	// Provide focus fail handling to set focus back on Additional Options button of ActionToolbar
+	// SNOW: DINC0541991
+	ActionToolbarAction.prototype.onfocusfail = function (oEvent) {
+		this.getParent()?.onfocusfail(oEvent);
+	};
+
 	function _updateSeparators(oActionToolbar) {
 		if (oActionToolbar?._updateSeparators) {
 			oActionToolbar._updateSeparators();

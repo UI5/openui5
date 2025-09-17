@@ -8,7 +8,7 @@
 		<subHeader>
 			<Toolbar>
 				<ToolbarSpacer />
-				<Title text="Card with Header with Info Section" />
+				<Title text="Card with Extended Header with Info Section" />
 				<ToolbarSpacer />
 			</Toolbar>
 		</subHeader>

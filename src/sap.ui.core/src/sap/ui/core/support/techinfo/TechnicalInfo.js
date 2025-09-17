@@ -10,7 +10,6 @@ sap.ui.define([
 	"sap/ui/core/format/DateFormat",
 	"sap/ui/model/resource/ResourceModel",
 	"sap/ui/model/json/JSONModel",
-	"sap/ui/thirdparty/URI",
 	"sap/m/MessageBox",
 	"sap/m/MessageToast",
 	"sap/ui/core/support/Support",
@@ -34,7 +33,6 @@ sap.ui.define([
 	DateFormat,
 	ResourceModel,
 	JSONModel,
-	URI,
 	MessageBox,
 	MessageToast,
 	Support,
@@ -659,7 +657,7 @@ sap.ui.define([
 		 * @return {JSONModel} Model with filled data.
 		 */
 		_createViewModel: function () {
-			var sDefaultBootstrapURL = new URI(sap.ui.require.toUrl(""), window.location.origin + window.location.pathname) + "/sap/ui/support/",
+			var sDefaultBootstrapURL = new URL(sap.ui.require.toUrl("sap/ui/support/"), document.baseURI).href,
 				sDefaultSelectedLocation = "standard",
 				sDefaultOpenInNewWindow = false;
 

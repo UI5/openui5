@@ -2208,14 +2208,45 @@ sap.ui.define([
 		oInvisibleText.destroy();
 	});
 
-	QUnit.test("Popover with custom header", async function(assert) {
+	QUnit.test("Popover with custom header with Title", async function(assert) {
+		//Arrange
+		var sInvTextId = "invisibleText",
+			sCustomHeaderId = "customHeaderId",
+			sCustomHeaderTitleId = "customHeaderTitleId",
+			oInvisibleText = new InvisibleText(sInvTextId, {text: "invisible text"});
+
+		var oCustomHeader = new Bar(sCustomHeaderId, {
+			contentLeft: [new Title(sCustomHeaderTitleId, {text: "Just Title"})]
+		});
+
+		oInvisibleText.placeAt("content");
+		await nextUIUpdate(this.clock);
+
+		this.oPopover.addAriaLabelledBy(sInvTextId);
+		this.oPopover.setTitle("Title text");
+
+		this.oPopover.setShowHeader(true);
+		this.oPopover.setCustomHeader(oCustomHeader);
+		this.oPopover.openBy(this.oButton);
+		this.clock.tick(400);
+
+		//Assert
+		assert.equal(this.oPopover.getAriaLabelledBy(), sInvTextId, "should have an ariaLabelledBy association that contains only a reference to the invisible text");
+		assert.equal(this.oPopover.getDomRef().getAttribute('aria-labelledby'), (sCustomHeaderTitleId + ' ' + sInvTextId), "should have an aria-labelledby attribute pointing to the header and the additional invisible label");
+
+		//Cleanup
+		oInvisibleText.destroy();
+		oCustomHeader.destroy();
+	});
+
+	QUnit.test("Popover with custom header without Title", async function(assert) {
 		//Arrange
 		var sInvTextId = "invisibleText",
 			sCustomHeaderId = "customHeaderId",
 			oInvisibleText = new InvisibleText(sInvTextId, {text: "invisible text"});
 
 		var oCustomHeader = new Bar(sCustomHeaderId, {
-			contentLeft: [new Title({text: "Just Title"})]
+			contentLeft: [new Label({text: "Just Label"})]
 		});
 
 		oInvisibleText.placeAt("content");

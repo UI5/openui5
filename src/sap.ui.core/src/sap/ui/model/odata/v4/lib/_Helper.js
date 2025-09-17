@@ -113,7 +113,7 @@ sap.ui.define([
 		 * Adds a rejectable SyncPromise to a private annotation of the element and returns it.
 		 *
 		 * @param {object} oElement - The cache element
-		 * @returns {sap.ui.base.SyncPromise} The promise
+		 * @returns {sap.ui.base.SyncPromise<void>} The promise
 		 *
 		 * @public
 		 */
@@ -1126,8 +1126,8 @@ sap.ui.define([
 		 *
 		 * @param {function} fnFetchMetadata Function which fetches metadata for a given meta path
 		 * @param {string} sMetaPath The meta path
-		 * @returns {sap.ui.base.SyncPromise<object>} A promise resolving with the property reached
-		 *   by the meta path or <code>undefined</code> otherwise.
+		 * @returns {sap.ui.base.SyncPromise<object|undefined>} A promise resolving with the
+		 *   property reached by the meta path or <code>undefined</code> otherwise.
 		 *
 		 * @public
 		 */

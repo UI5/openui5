@@ -15,6 +15,7 @@ window.addEventListener("load", function () {
 		isLandingPage = document.location.pathname === "/test-resources/sap/ui/integration/demokit/cardExplorer/index.html";
 
 	aNodes.push('<script src="' + sWebApp + 'scripts/codesample.js"></script>');
+	aNodes.push('<script src="' + sWebApp + 'scripts/iframeHandler.js"></script>');
 	aNodes.push('<link rel="stylesheet" href="' + sWebApp + 'css/codesample.css">');
 	aNodes.push('<link rel="stylesheet" href="' + sRes + 'sap/ui/documentation/sdk/thirdparty/highlight.js/styles.css">');
 	aNodes.push('<script src="' + sRes + 'sap/ui/documentation/sdk/thirdparty/highlight.js/highlight.js"></script>');

@@ -439,7 +439,7 @@ sap.ui.define([
 	 *   The group ID
 	 * @param {boolean} [bCatch]
 	 *   Whether the returned promise always resolves and never rejects
-	 * @returns {sap.ui.base.SyncPromise}
+	 * @returns {sap.ui.base.SyncPromise<void>}
 	 *   A promise on the outcome of the HTTP request resolving with <code>undefined</code>; it is
 	 *   rejected with an error if the batch request itself fails. Use <code>bCatch</code> to catch
 	 *   that error and make the promise resolve with <code>undefined</code> instead.
@@ -2703,7 +2703,7 @@ sap.ui.define([
 	 * @param {string[]} aAbsolutePaths
 	 *   The absolute paths to request side effects for; each path must not start with the fully
 	 *   qualified container name.
-	 * @returns {sap.ui.base.SyncPromise|undefined}
+	 * @returns {sap.ui.base.SyncPromise<void>|undefined}
 	 *   A promise which is resolved without a defined result, or rejected with an error if loading
 	 *   of side effects fails, or <code>undefined</code> if there is nothing to do
 	 *
@@ -3051,7 +3051,7 @@ sap.ui.define([
 	 *
 	 * @param {sap.ui.model.odata.v4.ODataBinding} oBinding
 	 *   The binding that possibly needs the cache of a temporary keep-alive binding
-	 * @returns {sap.ui.base.SyncPromise}
+	 * @returns {sap.ui.base.SyncPromise<void>}
 	 *   A promise which is resolved without a defined result when that cache is available
 	 *
 	 * @private

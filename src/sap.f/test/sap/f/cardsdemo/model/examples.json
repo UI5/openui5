@@ -172,7 +172,7 @@
 		"group": "Header and Footer"
 	},
 	{
-		"title": "Header Info Section",
+		"title": "Extended Header with Info Section",
 		"description": "Example page for Card with Info Section",
 		"route": "headerInfoSection",
 		"group": "Header and Footer"

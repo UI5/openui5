@@ -7,12 +7,12 @@ sap.ui.define([
 	"sap/ui/performance/Measurement",
 	"sap/ui/performance/XHRInterceptor",
 	"sap/ui/performance/trace/FESRHelper",
+	"sap/ui/util/isCrossOriginURL",
 	"sap/base/util/LoaderExtensions",
 	"sap/base/util/now",
 	"sap/base/util/uid",
-	"sap/base/Log",
-	"sap/ui/thirdparty/URI"
-], function(Measurement, XHRInterceptor, FESRHelper, LoaderExtensions, now, uid, Log, URI) {
+	"sap/base/Log"
+], function(Measurement, XHRInterceptor, FESRHelper, isCrossOriginURL, LoaderExtensions, now, uid, Log) {
 
 	"use strict";
 
@@ -40,12 +40,6 @@ sap.ui.define([
 			"application/pdf": true
 		},
 		sCompressedExtensions = "zip,rar,arj,z,gz,tar,lzh,cab,hqx,ace,jar,ear,war,jpg,jpeg,pdf,gzip";
-
-	function isCORSRequest(sUrl) {
-		var sHost = new URI(sUrl.toString()).host();
-		// url is relative or with same host
-		return sHost && sHost !== window.location.host;
-	}
 
 	function hexToAscii(sValue) {
 		var hex = sValue.toString();
@@ -291,7 +285,7 @@ sap.ui.define([
 			}
 			// we only need to take care of requests when we have a running interaction
 			if (oPendingInteraction) {
-				var bIsNoCorsRequest = !isCORSRequest(sUrl);
+				var bIsNoCorsRequest = !isCrossOriginURL(sUrl);
 				// only use Interaction for non CORS requests
 				if (bIsNoCorsRequest) {
 					//only track if FESR.clientID == EPP.Action && FESR.rootContextID == EPP.rootContextID

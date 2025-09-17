@@ -441,9 +441,15 @@ sap.ui.define([
 	};
 
 	MessageView.prototype._updateDescription = function (oItem) {
-		if (!this._isListPage() && oItem._oListItem) {
-			this._updateDescriptionPage(oItem, oItem._oListItem);
+		if (this._isListPage()) {
+			return;
 		}
+
+		if (!oItem._oListItem) {
+			this._mapItemToListItem(oItem);
+		}
+
+		this._updateDescriptionPage(oItem, oItem._oListItem);
 	};
 
 	/**

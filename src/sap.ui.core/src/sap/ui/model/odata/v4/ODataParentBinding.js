@@ -428,7 +428,7 @@ sap.ui.define([
 	 * Checks dependent bindings for updates or refreshes the binding if the resource path of its
 	 * parent context changed.
 	 *
-	 * @returns {sap.ui.base.SyncPromise}
+	 * @returns {sap.ui.base.SyncPromise<void>}
 	 *   A promise which is resolved without a defined result when the check is finished, or
 	 *   rejected in case of an error
 	 * @throws {Error}
@@ -470,7 +470,7 @@ sap.ui.define([
 	 *
 	 * @param {sap.ui.model.odata.v4.lib._GroupLock} oUpdateGroupLock
 	 *   The group ID to be used for the POST request
-	 * @param {string|sap.ui.base.SyncPromise} vCreatePath
+	 * @param {string|sap.ui.base.SyncPromise<string>} vCreatePath
 	 *   The path for the POST request or a SyncPromise that resolves with that path
 	 * @param {string} sCollectionPath
 	 *   The absolute path to the collection in the cache where to create the entity
@@ -486,7 +486,7 @@ sap.ui.define([
 	 *   fails
 	 * @param {function} fnSubmitCallback
 	 *   A function which is called just before a POST request for the create is sent
-	 * @returns {sap.ui.base.SyncPromise}
+	 * @returns {sap.ui.base.SyncPromise<object>}
 	 *   A promise which is resolved with the created entity when the POST request has been
 	 *   successfully sent and the entity has been marked as non-transient
 	 *
@@ -612,7 +612,7 @@ sap.ui.define([
 	 * @param {function} fnUndelete
 	 *   A function to undelete the context (and poss. the context the deletion was delegated to)
 	 *   when the deletion failed or has been canceled
-	 * @returns {sap.ui.base.SyncPromise}
+	 * @returns {sap.ui.base.SyncPromise<void>}
 	 *   A promise which is resolved without a result in case of success, or rejected with an
 	 *   instance of <code>Error</code> in case of failure.
 	 * @throws {Error}
@@ -643,7 +643,7 @@ sap.ui.define([
 	 *  A function which is called immediately when an entity has been deleted from the cache, or
 	 *   when it was re-inserted; the index of the entity and an offset (-1 for deletion, 1 for
 	 *   re-insertion) are passed as parameter
-	 * @returns {sap.ui.base.SyncPromise}
+	 * @returns {sap.ui.base.SyncPromise<void>}
 	 *   A promise which is resolved without a result in case of success, or rejected with an
 	 *   instance of <code>Error</code> in case of failure; returns <code>undefined</code> if the
 	 *   cache promise for this binding is not yet fulfilled
@@ -715,7 +715,7 @@ sap.ui.define([
 	 *   The new value which must be primitive
 	 * @param {sap.ui.model.odata.v4.lib._GroupLock} [oGroupLock]
 	 *   A lock for the group ID to be used for the PATCH request; without a lock, no PATCH is sent
-	 * @returns {sap.ui.base.SyncPromise|undefined}
+	 * @returns {sap.ui.base.SyncPromise<void>|undefined}
 	 *   <code>undefined</code> for the general case which is handled generically by the caller
 	 *   {@link sap.ui.model.odata.v4.Context#doSetProperty} or a <code>SyncPromise</code> for the
 	 *   exceptional case
@@ -754,11 +754,11 @@ sap.ui.define([
 	 *   <code>sChildPath</code> accordingly.
 	 * @param {string} sChildPath
 	 *   The child binding's binding path relative to <code>oContext</code>
-	 * @param {object|sap.ui.base.SyncPromise} [vChildQueryOptions={}]
+	 * @param {object|sap.ui.base.SyncPromise<object>} [vChildQueryOptions={}]
 	 *   The child binding's (aggregated) query options (if any) or a promise resolving with them
 	 * @param {boolean} [bIsProperty]
 	 *   Whether the child is a property binding
-	 * @returns {sap.ui.base.SyncPromise}
+	 * @returns {sap.ui.base.SyncPromise<string|undefined>}
 	 *   A promise resolved with the reduced path for the child binding if the child binding can use
 	 *   this binding's or an ancestor binding's cache; resolved with <code>undefined</code>
 	 *   otherwise.
@@ -787,9 +787,10 @@ sap.ui.define([
 		/*
 		 * Fetches the property that is reached by the calculated meta path and (if necessary) its
 		 * type.
-		 * @returns {sap.ui.base.SyncPromise} A promise that is either resolved with the property
-		 *   or, in case of an action advertisement with the entity. If no property can be reached
-		 *   by the calculated meta path the promise is resolved with undefined.
+		 * @returns {sap.ui.base.SyncPromise<object|undefined>}
+		 *   A promise that is either resolved with the property or, in case of an action
+		 *   advertisement with the entity. If no property can be reached by the calculated meta
+		 *   path the promise is resolved with undefined.
 		 */
 		function fetchPropertyAndType() {
 			if (bIsAdvertisement) {
@@ -1316,7 +1317,7 @@ sap.ui.define([
 	/**
 	 * Recursively refreshes all dependent list bindings that have no own cache.
 	 *
-	 * @returns {sap.ui.base.SyncPromise}
+	 * @returns {sap.ui.base.SyncPromise<void>}
 	 *   A promise resolving when all dependent list bindings without own cache are refreshed; it is
 	 *   rejected when the refresh fails; the promise is resolved immediately on a suspended binding
 	 * @throws {Error}
@@ -1361,7 +1362,7 @@ sap.ui.define([
 	 * @param {sap.ui.model.odata.v4.Context} [oContext]
 	 *   The context for which to request side effects; if this parameter is missing or if it is the
 	 *   header context of a list binding, the whole binding is affected
-	 * @returns {sap.ui.base.SyncPromise}
+	 * @returns {sap.ui.base.SyncPromise<void>}
 	 *   A promise which is resolved without a defined result, or rejected with an error if loading
 	 *   of side effects fails
 	 * @throws {Error}

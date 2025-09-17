@@ -243,7 +243,7 @@ sap.ui.define([
 	 *   bubbled up to the model
 	 * @param {any} [vValue]
 	 *   The new value obtained from the cache, see {@link #onChange}
-	 * @returns {sap.ui.base.SyncPromise}
+	 * @returns {sap.ui.base.SyncPromise<void>}
 	 *   A promise which is resolved without a defined result when the check is finished, or
 	 *   rejected in case of an error. If the cache is no longer the active cache when the response
 	 *   arrives, that response is ignored almost silently (that is, with a canceled error) and the

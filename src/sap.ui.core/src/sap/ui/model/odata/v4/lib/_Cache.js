@@ -111,7 +111,7 @@ sap.ui.define([
 	 *  A function which is called immediately when an entity has been deleted from the cache, or
 	 *   when it was re-inserted; the index of the entity and an offset (-1 for deletion, 1 for
 	 *   re-insertion) are passed as parameter
-	 * @returns {sap.ui.base.SyncPromise}
+	 * @returns {sap.ui.base.SyncPromise<void>}
 	 *   A promise which is resolved without a result in case of success, or rejected with an
 	 *   instance of <code>Error</code> in case of failure
 	 * @throws {Error} If the cache is shared
@@ -456,7 +456,7 @@ sap.ui.define([
 	 *
 	 * @param {sap.ui.model.odata.v4.lib._GroupLock} oGroupLock
 	 *   A lock for the group ID
-	 * @param {sap.ui.base.SyncPromise} oPostPathPromise
+	 * @param {sap.ui.base.SyncPromise<string>} oPostPathPromise
 	 *   A SyncPromise resolving with the resource path for the POST request
 	 * @param {string} sPath
 	 *   The collection's path within the cache (as used by change listeners)
@@ -476,7 +476,7 @@ sap.ui.define([
 	 *   A function which is called when the create has been canceled (after internal clean-up and
 	 *   just before {@link sap.ui.model.odata.v4.lib._GroupLock#cancel}), except if the entity is
 	 *   simply inactive
-	 * @returns {sap.ui.base.SyncPromise}
+	 * @returns {sap.ui.base.SyncPromise<object>}
 	 *   A promise which is resolved with the created entity when the POST request has been
 	 *   successfully sent and the entity has been marked as non-transient
 	 * @throws {Error} If the cache is shared
@@ -694,7 +694,7 @@ sap.ui.define([
 	 *   An unlocked lock for the group to associate a request for late properties with
 	 * @param {boolean} [bCreateOnDemand]
 	 *   Whether to create missing objects on demand, in order to avoid drill-down errors
-	 * @returns {sap.ui.base.SyncPromise}
+	 * @returns {sap.ui.base.SyncPromise<any>}
 	 *   A promise that is resolved with the result matching to <code>sPath</code>
 	 *
 	 * @protected
@@ -724,7 +724,7 @@ sap.ui.define([
 		 * @param {string} sSegment - The path segment that is missing
 		 * @param {number} iPathLength - The length of the path of the missing value
 		 * @param {boolean} [bAgain] - Whether we are trying again and must not cause a request
-		 * @returns {sap.ui.base.SyncPromise|undefined}
+		 * @returns {sap.ui.base.SyncPromise<any>|undefined}
 		 *   Returns a SyncPromise which resolves with the value or returns undefined in some
 		 *   special cases.
 		 */
@@ -1089,7 +1089,7 @@ sap.ui.define([
 	 * "@com.sap.vocabularies.Common.v1.Messages" annotation for messages, the type is enriched by
 	 * the property "@com.sap.vocabularies.Common.v1.Messages" containing the annotation object.
 	 *
-	 * @returns {sap.ui.base.SyncPromise}
+	 * @returns {sap.ui.base.SyncPromise<object>}
 	 *   A promise that is resolved with a map from resource path + entity path to the type
 	 *
 	 * @private
@@ -1146,7 +1146,7 @@ sap.ui.define([
 	 *   called with the new value if the property at that path is modified later
 	 * @param {boolean} [bCreateOnDemand]
 	 *   Whether to create missing objects on demand, in order to avoid drill-down errors
-	 * @returns {sap.ui.base.SyncPromise}
+	 * @returns {sap.ui.base.SyncPromise<any>}
 	 *   A promise to be resolved with the requested data. It is rejected if the request for the
 	 *   data failed.
 	 * @throws {Error}
@@ -1430,7 +1430,7 @@ sap.ui.define([
 	 *
 	 * @param {string} sPath The path (as used by change listeners)
 	 * @param {object} oData The data to patch with
-	 * @returns {sap.ui.base.SyncPromise}
+	 * @returns {sap.ui.base.SyncPromise<object>}
 	 *   A promise to be resolved with the patched data
 	 * @throws {Error} If the cache is shared
 	 *
@@ -1469,7 +1469,7 @@ sap.ui.define([
 	 * @param {function} [fnDataRequested]
 	 *   The function is called just before the back-end request is sent.
 	 *   If no back-end request is needed, the function is not called.
-	 * @returns {sap.ui.base.SyncPromise}
+	 * @returns {sap.ui.base.SyncPromise<object>}
 	 *   A promise which resolves with the refreshed entity after it was updated in the cache, and
 	 *   rejects with an error when no key predicate is known.
 	 * @throws {Error} If the cache is shared
@@ -1542,7 +1542,7 @@ sap.ui.define([
 	 * @param {string} sPath
 	 *   The entity's path relative to the cache; it must end with a single-valued navigation
 	 *   property and contain no key predicates, except maybe one right at the start
-	 * @returns {Promise<void>|sap.ui.base.SyncPromise}
+	 * @returns {Promise<void>|sap.ui.base.SyncPromise<void>}
 	 *   A promise which is resolved without a defined result, or rejected with an error if loading
 	 *   of side effects fails
 	 *
@@ -1578,7 +1578,7 @@ sap.ui.define([
 	 *   see {@link sap.ui.model.odata.v4.ODataListBinding#filter}. Since 1.84.0, if the entity is
 	 *   kept alive and still exists, the function is called with <code>true</code>, otherwise with
 	 *   <code>false</code>
-	 * @returns {sap.ui.base.SyncPromise}
+	 * @returns {sap.ui.base.SyncPromise<void>}
 	 *   A promise which resolves with <code>undefined</code> when the entity is updated in
 	 *   the cache; it rejects with an error when no key predicate is known.
 	 * @throws {Error} If the cache is shared
@@ -2060,7 +2060,7 @@ sap.ui.define([
 	 *   Path of the entity, relative to the cache (as used by change listeners)
 	 * @param {boolean} [bUpdating]
 	 *   Whether the given property will not be overwritten by a creation POST(+GET) response
-	 * @returns {sap.ui.base.SyncPromise}
+	 * @returns {sap.ui.base.SyncPromise<void>}
 	 *   A promise which resolves with <code>undefined</code> once the value has been set, or is
 	 *   rejected with an error if setting fails somehow
 	 * @throws {Error} If the cache is shared
@@ -2170,7 +2170,7 @@ sap.ui.define([
 	 *   A function to tell whether the entity is kept alive
 	 * @param {function} fnSetUpsertPromise
 	 *   A function to (re)set a sync promise for the "upsert" use case
-	 * @returns {sap.ui.base.SyncPromise}
+	 * @returns {sap.ui.base.SyncPromise<void>}
 	 *   A promise for the PATCH request (resolves with <code>undefined</code>); rejected in case of
 	 *   cancellation or if no <code>fnErrorCallback</code> is given
 	 * @throws {Error} If the cache is shared
@@ -2214,7 +2214,7 @@ sap.ui.define([
 			 *   A lock for the group to associate the request with
 			 * @param {boolean} [bAtFront]
 			 *   Whether the request is added at the front of the first change set
-			 * @returns {sap.ui.base.SyncPromise}
+			 * @returns {sap.ui.base.SyncPromise<void>}
 			 *   A promise for the PATCH request (resolves with <code>undefined</code>); rejected in
 			 *   case of cancellation or if no <code>fnErrorCallback</code> is given
 			 */
@@ -2737,7 +2737,7 @@ sap.ui.define([
 	/**
 	 * Checks the given range of currently available elements to contain the given promise.
 	 *
-	 * @param {sap.ui.base.SyncPromise} oPromise
+	 * @param {sap.ui.base.SyncPromise<any>} oPromise
 	 *   The promise
 	 * @param {number} iStart
 	 *   The start index
@@ -2836,7 +2836,7 @@ sap.ui.define([
 	 *   called with the new value if the property at that path is modified later
 	 * @param {boolean} [bCreateOnDemand]
 	 *   Whether to create missing objects on demand, in order to avoid drill-down errors
-	 * @returns {sap.ui.base.SyncPromise}
+	 * @returns {sap.ui.base.SyncPromise<any>}
 	 *   A promise to be resolved with the requested data. It is rejected if the request for the
 	 *   data failed.
 	 * @throws {Error}
@@ -2883,7 +2883,7 @@ sap.ui.define([
 	 * collection count is unknown and it is not an option to enlarge the array to accommodate
 	 * <code>iEnd - 1</code>, the promise is stored in <code>aElements.$tail</code>.
 	 *
-	 * @param {sap.ui.base.SyncPromise} oPromise
+	 * @param {sap.ui.base.SyncPromise<any>} oPromise
 	 *   The promise
 	 * @param {number} iStart
 	 *   The start index
@@ -3388,7 +3388,7 @@ sap.ui.define([
 	 * @param {function} [fnSeparateReceived]
 	 *   The function is called for each completed separate property request; may be omitted only if
 	 *   there are no separate properties
-	 * @returns {sap.ui.base.SyncPromise}
+	 * @returns {sap.ui.base.SyncPromise<object>}
 	 *   A promise to be resolved with the requested range given as an OData response object (with
 	 *   "@$ui5.resetCount", "@odata.context", and the rows as an array in the property
 	 *   <code>value</code>, enhanced with a number property <code>$count</code> representing the
@@ -3646,7 +3646,7 @@ sap.ui.define([
 	 * @param {function} [fnSeparateReceived]
 	 *   The function is called for each completed separate property request; may be omitted only if
 	 *   there are no separate properties
-	 * @returns {sap.ui.base.SyncPromise}
+	 * @returns {sap.ui.base.SyncPromise<void>}
 	 *   A promise which is resolved without a defined result when the request is finished and
 	 *   rejected in case of error; if the request has been obsoleted by a {@link #reset} the error
 	 *   has a property <code>canceled = true</code>)
@@ -3780,7 +3780,7 @@ sap.ui.define([
 	 *   The start index of the range
 	 * @param {number} iEnd
 	 *   The index after the last element
-	 * @param {sap.ui.base.SyncPromise} oMainPromise
+	 * @param {sap.ui.base.SyncPromise<void>} oMainPromise
 	 *   A promise which is resolved when the main request is finished; the caller must take care of
 	 *   error handling
 	 * @param {function} [fnSeparateReceived]
@@ -3889,7 +3889,7 @@ sap.ui.define([
 	 *   in this case
 	 * @param {boolean} bWithMessages
 	 *   Whether the "@com.sap.vocabularies.Common.v1.Messages" path is treated specially
-	 * @returns {Promise<void>|sap.ui.base.SyncPromise}
+	 * @returns {Promise<void>|sap.ui.base.SyncPromise<void>}
 	 *   A promise which is resolved without a defined result, or rejected with an error if loading
 	 *   of side effects fails
 	 * @throws {Error}
@@ -4263,7 +4263,7 @@ sap.ui.define([
 	 *   called with the new value if the property at that path is modified later
 	 * @param {boolean} [bCreateOnDemand]
 	 *   Unsupported
-	 * @returns {sap.ui.base.SyncPromise}
+	 * @returns {sap.ui.base.SyncPromise<any>}
 	 *   A promise to be resolved with the value. It is rejected if the request for the data failed.
 	 * @throws {Error}
 	 *   If <code>bCreateOnDemand</code> is set or if group ID is '$cached' and the value is not
@@ -4398,7 +4398,7 @@ sap.ui.define([
 	 *   called with the new value if the property at that path is modified later
 	 * @param {boolean} [bCreateOnDemand]
 	 *   Whether to create missing objects on demand, in order to avoid drill-down errors
-	 * @returns {sap.ui.base.SyncPromise}
+	 * @returns {sap.ui.base.SyncPromise<any>}
 	 *   A promise to be resolved with the element. It is rejected if the request for the data
 	 *   failed.
 	 * @param {function(object):string} [fnGetOriginalResourcePath]
@@ -4484,7 +4484,7 @@ sap.ui.define([
 	 * @param {function(object):string} [fnGetOriginalResourcePath]
 	 *   A function returning the cache's original resource path to be used to build the target path
 	 *   for bound messages; it is called once with the response object as parameter
-	 * @returns {sap.ui.base.SyncPromise}
+	 * @returns {sap.ui.base.SyncPromise<object>}
 	 *   A promise to be resolved with the result of the request.
 	 * @throws {Error}
 	 *   If the cache does not allow POST, another POST is still being processed, or the cache is
@@ -4627,7 +4627,7 @@ sap.ui.define([
 	 *   because they may have changed due to side effects of a previous update
 	 * @param {string} [sResourcePath=this.sResourcePath]
 	 *   A resource path relative to the service URL; it must not contain a query string
-	 * @returns {sap.ui.base.SyncPromise}
+	 * @returns {sap.ui.base.SyncPromise<void>}
 	 *   A promise which is resolved without a defined result, or rejected with an error if loading
 	 *   of side effects fails.
 	 * @throws {Error} If the side effects require a $expand, if group ID is '$cached' (the error
@@ -4784,7 +4784,7 @@ sap.ui.define([
 	 *   called with the new value if the property at that path is modified later
 	 * @param {boolean} [bCreateOnDemand]
 	 *   Unsupported
-	 * @returns {sap.ui.base.SyncPromise}
+	 * @returns {sap.ui.base.SyncPromise<any>}
 	 *   A promise to be resolved with the value. It is rejected if the request for the data failed.
 	 * @throws {Error}
 	 *   If <code>bCreateOnDemand</code> is set or if group ID is '$cached' and the value is not

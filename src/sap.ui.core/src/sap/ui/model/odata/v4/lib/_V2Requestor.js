@@ -942,8 +942,8 @@ sap.ui.define([
 	 * Returns a sync promise that is resolved when the requestor is ready to be used. Waits for the
 	 * metadata to be available.
 	 *
-	 * @returns {sap.ui.base.SyncPromise} A sync promise that is resolved with no result when the
-	 * metadata is available
+	 * @returns {sap.ui.base.SyncPromise<void>}
+	 *   A sync promise that is resolved with no result when the metadata is available
 	 *
 	 * @public
 	 */

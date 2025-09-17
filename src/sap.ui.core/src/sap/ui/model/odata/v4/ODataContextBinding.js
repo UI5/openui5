@@ -223,7 +223,7 @@ sap.ui.define([
 
 		/*
 		 * Fires a "change" event and refreshes dependent bindings.
-		 * @returns {sap.ui.base.SyncPromise} A promise resolving when the refresh is finished
+		 * @returns {sap.ui.base.SyncPromise<void>} A promise resolving when the refresh is finished
 		 */
 		function fireChangeAndRefreshDependentBindings() {
 			that._fireChange({reason : ChangeReason.Change});
@@ -561,7 +561,7 @@ sap.ui.define([
 	 *   actions only
 	 * @param {function} [fnOnStrictHandlingFailed]
 	 *   Callback for strict handling; supported for actions only
-	 * @returns {sap.ui.base.SyncPromise}
+	 * @returns {sap.ui.base.SyncPromise<any>}
 	 *   The request promise
 	 * @throws {Error} If
 	 *   <ul>
@@ -877,7 +877,7 @@ sap.ui.define([
 	 *   A property binding which registers itself as listener at the cache
 	 * @param {boolean} [bCached]
 	 *   Whether to return cached values only and not initiate a request
-	 * @returns {sap.ui.base.SyncPromise}
+	 * @returns {sap.ui.base.SyncPromise<any>}
 	 *   A promise on the outcome of the cache's <code>fetchValue</code> call; it is rejected in
 	 *   case cached values are asked for, but not found, or if the cache is no longer the active
 	 *   cache when the response arrives
@@ -1474,7 +1474,7 @@ sap.ui.define([
 	/**
 	 * Returns a sync promise that tells whether we are ready to inherit $expand/$select.
 	 *
-	 * @returns {sap.ui.base.SyncPromise}
+	 * @returns {sap.ui.base.SyncPromise<void>}
 	 *   A sync promise that resolves without a defined result as soon as we are ready to inherit
 	 *   $expand/$select
 	 *
@@ -1498,7 +1498,7 @@ sap.ui.define([
 	 *   If <code>true</code>, a property binding is expected to check for updates
 	 * @param {boolean} [bKeepCacheOnError]
 	 *   If <code>true</code>, the binding data remains unchanged if the refresh fails
-	 * @returns {sap.ui.base.SyncPromise}
+	 * @returns {sap.ui.base.SyncPromise<void>}
 	 *   A promise resolving when all dependent bindings are refreshed; it is rejected
 	 *   when the refresh fails; the promise is resolved immediately on a suspended binding
 	 * @throws {Error}
@@ -1609,7 +1609,7 @@ sap.ui.define([
 	 *   The group ID for the refresh
 	 * @param {boolean} [bKeepCacheOnError]
 	 *   If <code>true</code>, the binding data remains unchanged if the refresh fails
-	 * @returns {sap.ui.base.SyncPromise}
+	 * @returns {sap.ui.base.SyncPromise<void>}
 	 *   A promise which is resolved without a defined result when the refresh is finished and if
 	 *   the context is this binding's return value context; <code>null</code> otherwise
 	 *
