@@ -6,14 +6,14 @@
 
 sap.ui.define([
 	"sap/base/config",
-	'sap/ui/thirdparty/URI',
 	'sap/ui/Device',
 	'sap/ui/performance/trace/Passport',
 	'sap/ui/performance/trace/Interaction',
 	'sap/ui/performance/XHRInterceptor',
 	'sap/ui/performance/BeaconRequest',
+	'sap/ui/util/isCrossOriginURL',
 	'sap/base/util/Version'
-], function (BaseConfig, URI, Device, Passport, Interaction, XHRInterceptor, BeaconRequest, Version) {
+], function (BaseConfig, Device, Passport, Interaction, XHRInterceptor, BeaconRequest, isCrossOriginURL, Version) {
 	"use strict";
 
 	const sIntegrationEnvironment = BaseConfig.get({
@@ -28,7 +28,6 @@ sap.ui.define([
 		oBeaconRequest,
 		iBeaconTimeoutID,
 		ROOT_ID = Passport.getRootId(), // static per session
-		HOST = window.location.host, // static per session
 		CLIENT_OS = Device.os.name + "_" + Device.os.version,
 		CLIENT_MODEL = `${Device.browser.reportingName}_${Device.browser.version}${sIntegrationEnvironment ? ":" + sIntegrationEnvironment : ""}`,
 		CLIENT_DEVICE = setClientDevice(),
@@ -61,16 +60,10 @@ sap.ui.define([
 		return oDate.toISOString().replace(/[^\d]/g, '');
 	}
 
-	function isCORSRequest(sUrl) {
-		var sHost = new URI(sUrl.toString()).host();
-		// url is relative or with same host
-		return sHost && sHost !== HOST;
-	}
-
 	function passportHeaderOverride() {
 
 		// only use Passport for non CORS requests
-		if (!isCORSRequest(arguments[1])) {
+		if (!isCrossOriginURL(arguments[1])) {
 
 			// use the first request of an interaction as FESR TransactionID
 			if (!sFESRTransactionId) {
@@ -98,7 +91,7 @@ sap.ui.define([
 	function fesrHeaderOverride() {
 
 		// only use FESR for non CORS requests
-		if (!isCORSRequest(arguments[1])) {
+		if (!isCrossOriginURL(arguments[1])) {
 
 			if (sFESR && sFESRopt) {
 				this.setRequestHeader("SAP-Perf-FESRec", sFESR);

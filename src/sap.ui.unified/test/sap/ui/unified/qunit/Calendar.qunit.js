@@ -2577,22 +2577,24 @@ sap.ui.define([
 		var oCalendar = new Calendar(),
 			oCurrentDate = UI5Date.getInstance(2017, 5, 2),
 			oNewFocusedDate = UI5Date.getInstance(2017, 6, 3),
-			sExpectedAriaLabel;
+			sExpectedAriaLabel,
+			oResourceBundle = oCalendar._oResourceBundle;
 
 		oCalendar.displayDate(oCurrentDate);
 		oCalendar.placeAt("qunit-fixture");
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
 
-		sExpectedAriaLabel = oCalendar.$("-Head-B1").text();
-		assert.equal(oCalendar.$("-Head-B1").attr("aria-label"), sExpectedAriaLabel, "aria-label should be equal to the text of the button");
+		// Expected aria-label should be in format "Month {monthName}" from resource bundle
+		sExpectedAriaLabel = oResourceBundle.getText("CALENDAR_HEADER_MONTH_BUTTON", oCalendar.$("-Head-B1").text());
+		assert.equal(oCalendar.$("-Head-B1").attr("aria-label"), sExpectedAriaLabel, "aria-label should be in format 'Month {monthName}'");
 
 		// act
 		oCalendar.focusDate(oNewFocusedDate);
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
 
 		// assert
-		sExpectedAriaLabel = oCalendar.$("-Head-B1").text();
-		assert.equal(oCalendar.$("-Head-B1").attr("aria-label"), sExpectedAriaLabel, "aria-label should be equal to the text of the button");
+		sExpectedAriaLabel = oResourceBundle.getText("CALENDAR_HEADER_MONTH_BUTTON", oCalendar.$("-Head-B1").text());
+		assert.equal(oCalendar.$("-Head-B1").attr("aria-label"), sExpectedAriaLabel, "aria-label should be in format 'Month {monthName}'");
 
 		// cleanup
 		oCalendar.destroy();
@@ -2608,16 +2610,19 @@ sap.ui.define([
 			oCurrentDate = UI5Date.getInstance(2017, 5, 2),
 			oNewFocusedDate = UI5Date.getInstance(2018, 6, 3),
 			sExpectedSecondaryInfo,
-			sExpectedAriaLabel;
+			sExpectedAriaLabel,
+			oResourceBundle;
 
 		oCalendar.displayDate(oCurrentDate);
 		oCalendar.placeAt("qunit-fixture");
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
 
+		oResourceBundle = oCalendar._oResourceBundle;
 		sExpectedSecondaryInfo = getExpectedSecondaryMonthARIAInfo(oCalendar, "Islamic", "Gregorian");
-		sExpectedAriaLabel = oCalendar.$("-Head-B1-Text").text() + ", " +  sExpectedSecondaryInfo;
+		// aria-label should now be in format "Month {monthName}, {secondaryInfo}"
+		sExpectedAriaLabel = oResourceBundle.getText("CALENDAR_HEADER_MONTH_BUTTON", oCalendar.$("-Head-B1-Text").text()) + ", " +  sExpectedSecondaryInfo;
 		assert.equal(oCalendar.$("-Head-B1").attr("aria-label"), sExpectedAriaLabel,
-			"aria-label should contain info for both primary and secondary month");
+			"aria-label should contain info for both primary and secondary month in format 'Month {monthName}, {secondaryInfo}'");
 
 		// act
 		oCalendar.displayDate(oNewFocusedDate);
@@ -2625,9 +2630,9 @@ sap.ui.define([
 
 		// assert
 		sExpectedSecondaryInfo = getExpectedSecondaryMonthARIAInfo(oCalendar, "Islamic", "Gregorian");
-		sExpectedAriaLabel = oCalendar.$("-Head-B1-Text").text() + ", " + sExpectedSecondaryInfo;
+		sExpectedAriaLabel = oResourceBundle.getText("CALENDAR_HEADER_MONTH_BUTTON", oCalendar.$("-Head-B1-Text").text()) + ", " + sExpectedSecondaryInfo;
 		assert.equal(oCalendar.$("-Head-B1").attr("aria-label"), sExpectedAriaLabel,
-			"aria-label should contain info for the updated primary and secondary month");
+			"aria-label should contain info for the updated primary and secondary month in format 'Month {monthName}, {secondaryInfo}'");
 
 		// cleanup
 		oCalendar.destroy();
@@ -2683,7 +2688,7 @@ sap.ui.define([
 
 		// assert
 		assert.equal(oSetTextButton3Spy.getCall(0).args[0], "April", "_setTextButton3 is called with April");
-		assert.equal(oSetAriaLabelButton3Spy.getCall(0).args[0], "April", "_setAriaLabelButton3 is called with April");
+		assert.equal(oSetAriaLabelButton3Spy.getCall(0).args[0], "Month April", "_setAriaLabelButton3 is called with April");
 
 		// cleanup
 		oCalendar.destroy();
@@ -2700,8 +2705,8 @@ sap.ui.define([
 		oCalendar._setHeaderText(CalendarDate.fromLocalJSDate(UI5Date.getInstance(2017, 2, 14), oCalendar.getPrimaryCalendarType()));
 
 		// assert
-		assert.equal(oSetTextButton1Spy.getCall(0).args[0], "April", "setTextButton1 is called with April");
-		assert.equal(oSetAriaLabelButton1Spy.getCall(0).args[0], "April", "setAriaLabelButton1 is called with April");
+		assert.equal(oSetTextButton1Spy.getCall(0).args[0], "April", "setTextButton1 is called with Month April");
+		assert.equal(oSetAriaLabelButton1Spy.getCall(0).args[0], "Month April", "setAriaLabelButton1 is called with Month April");
 
 		// cleanup
 		oCalendar.destroy();
@@ -3029,11 +3034,13 @@ sap.ui.define([
 				setTextButton2: this.spy(),
 				setAriaLabelButton2: this.spy(),
 				_setTextButton4: this.spy(),
-				_setAriaLabelButton4: this.spy()
+				_setAriaLabelButton4: this.spy(),
+				setProperty: this.spy()
 			},
 			oSecondMonthHeader = {
 				setTextButton2: this.spy(),
-				setAriaLabelButton2: this.spy()
+				setAriaLabelButton2: this.spy(),
+				setProperty: this.spy()
 			},
 			oCalendar = new Calendar(),
 			oGetAggregationStub = this.stub(oCalendar, "getAggregation");
@@ -3049,6 +3056,9 @@ sap.ui.define([
 		assert.equal(oHeader._setTextButton4.getCall(0).args[0], sYear, "_setTextButton4 should be called with " + sYear);
 		assert.equal(oSecondMonthHeader.setTextButton2.getCall(0).args[0], sYear, "setTextButton2 should be called with " + sYear);
 
+		// Check that accessibility properties are set for button4
+		assert.ok(oHeader.setProperty.calledWith("_tooltipButton2"), "setProperty should be called with _tooltipButton2");
+		assert.ok(oHeader.setProperty.calledWith("_descriptionButton2"), "setProperty should be called with _descriptionButton2");
 		// cleanup
 		oCalendar.destroy();
 		oGetAggregationStub.restore();
@@ -3061,13 +3071,19 @@ sap.ui.define([
 					setAdditionalTextButton2: this.spy(),
 					_setAdditionalTextButton4: this.spy(),
 					getAriaLabelButton2: this.spy(),
-					setAriaLabelButton2: this.spy()
+					setAriaLabelButton2: this.spy(),
+					setProperty: this.spy()
 				},
 				oSecondMonthHeader = {
 					setAdditionalTextButton2: this.spy()
 				},
 				oCalendar = new Calendar(),
-				oGetAggregationStub = this.stub(oCalendar, "getAggregation");
+				oGetAggregationStub = this.stub(oCalendar, "getAggregation"),
+				oResourceBundle = oCalendar._oResourceBundle,
+				sExpectedShortcut = oResourceBundle.getText("CALENDAR_HEADER_YEAR_BUTTON_SHORTCUT"),
+				sExpectedLabel = oResourceBundle.getText("CALENDAR_HEADER_YEAR_BUTTON", sExpectedValue),
+				sExpectedTooltip = sExpectedLabel + " (" + sExpectedShortcut + ")";
+
 		oGetAggregationStub.withArgs("header").returns(oHeader);
 		oGetAggregationStub.withArgs("secondMonthHeader").returns(oSecondMonthHeader);
 
@@ -3078,6 +3094,11 @@ sap.ui.define([
 		assert.equal(oHeader.setAdditionalTextButton2.getCall(0).args[0], sExpectedValue, "setAdditionalTextButton2 should be called with " + sExpectedValue);
 		assert.equal(oHeader._setAdditionalTextButton4.getCall(0).args[0], sExpectedValue, "_setAdditionalTextButton4 should be called with " + sExpectedValue);
 		assert.equal(oSecondMonthHeader.setAdditionalTextButton2.getCall(0).args[0], sExpectedValue, "setAdditionalTextButton2 should be called with " + sExpectedValue);
+
+		// Check that accessibility properties are set for button4 with correct values
+		assert.ok(oHeader.setProperty.calledWith("_tooltipButton4", sExpectedTooltip), "setProperty should be called with _tooltipButton4 and tooltip value: " + sExpectedTooltip);
+		assert.ok(oHeader.setProperty.calledWith("_keyShortcutButton4", sExpectedShortcut), "setProperty should be called with _keyShortcutButton4 and shortcut value: " + sExpectedShortcut);
+		assert.ok(oHeader.setProperty.calledWith("_descriptionButton4", sExpectedLabel), "setProperty should be called with _descriptionButton4 and label value: " + sExpectedLabel);
 
 		// cleanup
 		oCalendar.destroy();

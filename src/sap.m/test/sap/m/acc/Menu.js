@@ -3,8 +3,10 @@ sap.ui.define([
 	"sap/m/Page",
 	"sap/m/Menu",
 	"sap/m/MenuItem",
+	"sap/m/MenuItemGroup",
 	"sap/m/Label",
 	"sap/m/MenuButton",
+	"sap/m/Button",
 	"sap/m/MessageToast",
 	"sap/ui/layout/VerticalLayout",
 	"sap/ui/model/json/JSONModel",
@@ -14,8 +16,10 @@ sap.ui.define([
 	Page,
 	Menu,
 	MenuItem,
+	MenuItemGroup,
 	Label,
 	MenuButton,
+	Button,
 	MessageToast,
 	VerticalLayout,
 	JSONModel,
@@ -25,6 +29,9 @@ sap.ui.define([
 
 	// shortcut for sap.ui.core.TitleLevel
 	var TitleLevel = coreLibrary.TitleLevel;
+
+	// shortcut for sap.ui.core.ItemSelectionMode
+	var ItemSelectionMode = coreLibrary.ItemSelectionMode;
 
 	var oMenu = new Menu({
 		title: "random",
@@ -282,14 +289,284 @@ sap.ui.define([
 		menu: oMenu3
 	});
 
+	// Menu with selectable items using MenuItemGroup - Single Select
+	var oMenu4 = new Menu({
+		title: "Document View Options",
+		itemSelected: function(oEvent) {
+			var oItem = oEvent.getParameter("item");
+			MessageToast.show("Selected view: " + oItem.getText());
+		},
+		items: [
+			new MenuItemGroup({
+				itemSelectionMode: ItemSelectionMode.SingleSelect,
+				items: [
+					new MenuItem({
+						text: "List View",
+						icon: "sap-icon://list",
+						selected: true
+					}),
+					new MenuItem({
+						text: "Card View",
+						icon: "sap-icon://card"
+					}),
+					new MenuItem({
+						text: "Table View",
+						icon: "sap-icon://table-view"
+					}),
+					new MenuItem({
+						text: "Tile View",
+						icon: "sap-icon://grid"
+					})
+				]
+			}),
+			new MenuItem({
+				text: "Refresh",
+				icon: "sap-icon://refresh",
+				startsSection: true,
+				shortcutText: "F5"
+			})
+		]
+	});
+
+	var oButton4 = new MenuButton("button4", {
+		text: "View Options (Single Select)",
+		menu: oMenu4
+	});
+
+	// Menu with selectable items using MenuItemGroup - Multi Select
+	var oMenu5 = new Menu({
+		title: "Display Settings",
+		itemSelected: function(oEvent) {
+			var oItem = oEvent.getParameter("item");
+			var sState = oItem.getSelected() ? "enabled" : "disabled";
+			MessageToast.show(oItem.getText() + " " + sState);
+		},
+		items: [
+			new MenuItemGroup({
+				itemSelectionMode: ItemSelectionMode.MultiSelect,
+				items: [
+					new MenuItem({
+						text: "Show Toolbar",
+						icon: "sap-icon://toolbar",
+						selected: true
+					}),
+					new MenuItem({
+						text: "Show Status Bar",
+						icon: "sap-icon://status-positive",
+						selected: false
+					}),
+					new MenuItem({
+						text: "Show Line Numbers",
+						icon: "sap-icon://numbered-text",
+						selected: true
+					}),
+					new MenuItem({
+						text: "Word Wrap",
+						icon: "sap-icon://text-align-justified",
+						selected: false
+					})
+				]
+			}),
+			new MenuItem({
+				text: "Reset to Defaults",
+				icon: "sap-icon://reset",
+				startsSection: true
+			})
+		]
+	});
+
+	var oButton5 = new MenuButton("button5", {
+		text: "Display Settings (Multi Select)",
+		menu: oMenu5
+	});
+
+	// Menu with endContent - buttons in menu items
+	var oMenu6 = new Menu({
+		title: "Actions with Quick Access",
+		itemSelected: function(oEvent) {
+			var oItem = oEvent.getParameter("item");
+			MessageToast.show("Item selected: " + oItem.getText());
+		},
+		items: [
+			new MenuItem({
+				text: "Send Email",
+				icon: "sap-icon://email",
+				endContent: [
+					new Button({
+						icon: "sap-icon://action",
+						type: "Transparent",
+						tooltip: "Quick send",
+						press: function() {
+							MessageToast.show("Quick send email action");
+						}
+					})
+				]
+			}),
+			new MenuItem({
+				text: "Print Document",
+				icon: "sap-icon://print",
+				endContent: [
+					new Button({
+						icon: "sap-icon://download",
+						type: "Transparent",
+						tooltip: "Download PDF",
+						press: function() {
+							MessageToast.show("Download PDF action");
+						}
+					})
+				]
+			}),
+			new MenuItem({
+				text: "Share",
+				icon: "sap-icon://share-2",
+				endContent: [
+					new Button({
+						icon: "sap-icon://copy",
+						type: "Transparent",
+						tooltip: "Copy link",
+						press: function() {
+							MessageToast.show("Link copied to clipboard");
+						}
+					})
+				]
+			}),
+			new MenuItem({
+				text: "Archive",
+				icon: "sap-icon://archive",
+				startsSection: true
+			})
+		]
+	});
+
+	var oButton6 = new MenuButton("button6", {
+		text: "Actions with Buttons",
+		menu: oMenu6
+	});
+
+	// Context menu demonstration
+	var oContextMenu = new Menu({
+		title: "Context Actions",
+		itemSelected: function(oEvent) {
+			var oItem = oEvent.getParameter("item");
+			MessageToast.show("Context action: " + oItem.getText());
+		},
+		items: [
+			new MenuItem({
+				text: "Copy",
+				icon: "sap-icon://copy",
+				shortcutText: "Ctrl+C"
+			}),
+			new MenuItem({
+				text: "Paste",
+				icon: "sap-icon://paste",
+				shortcutText: "Ctrl+V"
+			}),
+			new MenuItem({
+				text: "Cut",
+				icon: "sap-icon://scissors",
+				shortcutText: "Ctrl+X"
+			}),
+			new MenuItem({
+				text: "Properties",
+				icon: "sap-icon://detail-view",
+				startsSection: true
+			})
+		]
+	});
+
+	var oContextArea = new Button("contextArea", {
+		text: "Right-click me for context menu",
+		width: "300px",
+		press: function(oEvent) {
+			MessageToast.show("Use right-click for context menu");
+		}
+	});
+
+	// Attach context menu to the button
+	oContextArea.attachBrowserEvent("contextmenu", function(oEvent) {
+		oEvent.preventDefault();
+		oContextMenu.openAsContextMenu(oEvent, oContextArea);
+	});
+
+	// Menu with mixed groups and regular items
+	var oMenu7 = new Menu({
+		title: "Advanced Settings",
+		itemSelected: function(oEvent) {
+			var oItem = oEvent.getParameter("item");
+			MessageToast.show("Settings: " + oItem.getText());
+		},
+		items: [
+			new MenuItem({
+				text: "General Settings",
+				icon: "sap-icon://settings"
+			}),
+			new MenuItemGroup({
+				itemSelectionMode: ItemSelectionMode.SingleSelect,
+				items: [
+					new MenuItem({
+						text: "Theme: Fiori 3",
+						selected: true
+					}),
+					new MenuItem({
+						text: "Theme: High Contrast"
+					}),
+					new MenuItem({
+						text: "Theme: Dark"
+					})
+				]
+			}),
+			new MenuItemGroup({
+				itemSelectionMode: ItemSelectionMode.MultiSelect,
+				items: [
+					new MenuItem({
+						text: "Enable Animations",
+						selected: true
+					}),
+					new MenuItem({
+						text: "Show Tooltips",
+						selected: true
+					}),
+					new MenuItem({
+						text: "Auto-save",
+						selected: false
+					})
+				]
+			}),
+			new MenuItem({
+				text: "Export Settings",
+				icon: "sap-icon://download",
+				startsSection: true
+			}),
+			new MenuItem({
+				text: "Import Settings",
+				icon: "sap-icon://upload"
+			})
+		]
+	});
+
+	var oButton7 = new MenuButton("button7", {
+		text: "Advanced Settings",
+		menu: oMenu7
+	});
+
 	var oLayout = new VerticalLayout({
 		content: [
-			new Label({text: "Regular menu", wrapping: true, labelFor: "button1"}),
+			new Label({text: "Regular menu with nested items and icons", wrapping: true, labelFor: "button1"}),
 			oButton,
-			new Label({text: "Initialted via binding", wrapping: true, labelFor: "button2"}),
+			new Label({text: "Menu initialized via data binding", wrapping: true, labelFor: "button2"}),
 			oButton2,
-			new Label({text: "Peform file operations", wrapping: true, labelFor: "button3"}),
-			oButton3
+			new Label({text: "File operations menu with shortcuts", wrapping: true, labelFor: "button3"}),
+			oButton3,
+			new Label({text: "Single-select menu with radio-button behavior", wrapping: true, labelFor: "button4"}),
+			oButton4,
+			new Label({text: "Multi-select menu with checkbox behavior", wrapping: true, labelFor: "button5"}),
+			oButton5,
+			new Label({text: "Menu items with interactive end content buttons", wrapping: true, labelFor: "button6"}),
+			oButton6,
+			new Label({text: "Right-click context menu demonstration", wrapping: true, labelFor: "contextArea"}),
+			oContextArea,
+			new Label({text: "Mixed groups with different selection modes", wrapping: true, labelFor: "button7"}),
+			oButton7
 		]
 	}).addStyleClass("sapUiContentPadding");
 

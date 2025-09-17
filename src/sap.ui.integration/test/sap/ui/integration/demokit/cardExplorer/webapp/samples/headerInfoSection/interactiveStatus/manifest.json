@@ -3,8 +3,8 @@
 	"sap.app": {
 		"id": "card.explorer.header.info.section.card",
 		"type": "card",
-		"title": "Sample of anHeader Info Section",
-		"subTitle": "Sample of a Header Info Section",
+		"title": "Sample of an Extended Header with Info Section",
+		"subTitle": "Sample of an Extended Header with Info Section",
 		"applicationVersion": {
 			"version": "1.0.0"
 		},
@@ -13,7 +13,9 @@
 		"description": "A long description for this Card",
 		"tags": {
 			"keywords": [
-				"Header Info Section",
+				"Extended Header Info Section",
+				"Extended Header",
+				"Info Section",
 				"Analytical",
 				"Card",
 				"Line",
@@ -30,7 +32,7 @@
 	"sap.card": {
 		"type": "List",
 		"header": {
-			"title": "Card Header with Info Section",
+			"title": "Extended Card Header with Info Section",
 			"subtitle": "Information",
 			"infoSection": {
 				"rows": [

@@ -20,7 +20,7 @@ sap.ui.define([
 				key: 'cardManifest'
 			},
 			{
-				title: 'Card Headers',
+				title: 'Card Header',
 				icon: 'sap-icon://header',
 				target: 'learnDetail',
 				key: 'headers',
@@ -36,7 +36,7 @@ sap.ui.define([
 						key: 'numeric'
 					},
 					{
-						title: 'Info Section',
+						title: 'Extended - Info Section',
 						target: 'learnDetail',
 						key: 'infoSection',
 						experimental: true

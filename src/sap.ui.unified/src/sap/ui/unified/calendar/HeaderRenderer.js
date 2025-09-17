@@ -164,6 +164,14 @@ sap.ui.define([
 			if (this.getAriaLabelButton(oHead, i)) {
 				mAccProps["label"] = this.getAriaLabelButton(oHead, i);
 			}
+
+			// Set descriptions and keyboard shortcuts from private properties using helper functions
+			this._setAccessibilityDescription(oHead, i, mAccProps);
+			this._setAccessibilityKeyShortcuts(oHead, i, mAccProps);
+
+			if (this.getTooltipButton(oHead, i)) {
+				oRm.attr("title", this.getTooltipButton(oHead, i));
+			}
 			oRm.accessibilityState(null, mAccProps);
 			mAccProps = {};
 			oRm.openEnd(); // button element
@@ -236,8 +244,60 @@ sap.ui.define([
 		return sText;
 	};
 
+	HeaderRenderer.getTooltipButton = function (oHead, iButton) {
+		var sTooltip;
+
+		if (oHead["getTooltipButton" + iButton]) {
+			sTooltip = oHead["getTooltipButton" + iButton]();
+		} else if (oHead["_getTooltipButton" + iButton]) {
+			sTooltip = oHead["_getTooltipButton" + iButton]();
+		} else if (iButton === 1) {
+			sTooltip = oHead.getProperty("_tooltipButton1");
+		} else if (iButton === 2) {
+			sTooltip = oHead.getProperty("_tooltipButton2");
+		} else if (iButton === 3) {
+			sTooltip = oHead.getProperty("_tooltipButton3");
+		} else if (iButton === 4) {
+			sTooltip = oHead.getProperty("_tooltipButton4");
+		}
+
+		return sTooltip;
+	};
+
 	HeaderRenderer._isTwoMonthsCalendar = function (oHead) {
 		return BaseObject.isObjectA(oHead.getParent(), "sap.ui.unified.Calendar") && (oHead.getParent().getMonths() >= 2);
+	};
+
+	/**
+	 * Helper function to set accessibility description for calendar header buttons
+	 * @param {sap.ui.unified.calendar.Header} oHead The header control
+	 * @param {number} iButton The button index (1-4)
+	 * @param {object} mAccProps Accessibility properties object to modify
+	 * @private
+	 */
+	HeaderRenderer._setAccessibilityDescription = function (oHead, iButton, mAccProps) {
+		if (iButton >= 1 && iButton <= 4) {
+			var sDescription = oHead.getProperty("_descriptionButton" + iButton);
+			if (sDescription) {
+				mAccProps["description"] = sDescription;
+			}
+		}
+	};
+
+	/**
+	 * Helper function to set accessibility keyboard shortcuts for calendar header buttons
+	 * @param {sap.ui.unified.calendar.Header} oHead The header control
+	 * @param {number} iButton The button index (1-4)
+	 * @param {object} mAccProps Accessibility properties object to modify
+	 * @private
+	 */
+	HeaderRenderer._setAccessibilityKeyShortcuts = function (oHead, iButton, mAccProps) {
+		if (iButton >= 1 && iButton <= 4) {
+			var sShortcut = oHead.getProperty("_keyShortcutButton" + iButton);
+			if (sShortcut) {
+				mAccProps["keyshortcuts"] = sShortcut;
+			}
+		}
 	};
 
 	return HeaderRenderer;

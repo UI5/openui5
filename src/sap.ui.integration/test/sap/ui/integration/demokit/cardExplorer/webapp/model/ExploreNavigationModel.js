@@ -9,6 +9,105 @@ sap.ui.define([
 		selectedKey: 'learnGettingStarted',
 		navigation: [
 			{
+				title: 'Card Header',
+				icon: 'sap-icon://header',
+				key: 'cardHeader',
+				target: 'exploreOverview',
+				hasExpander: false,
+				hidden: !isDevelopmentBuild(),
+				items: [
+					{
+						title: 'Default',
+						target: 'exploreSamples',
+						key: 'defaultHeader',
+						subSamples: [
+							{
+								title: "Basic",
+								key: "basic",
+								files: [
+									{
+										url: '/samples/header/default.json',
+										name: 'manifest.json',
+										key: 'manifest.json',
+										editable: true
+									}
+								]
+							},
+							{
+								title: 'Message Icon',
+								key: 'messageIcon',
+								messageIcon: true,
+								files: [
+									{
+										url: '/samples/header/messageIcon.json',
+										name: 'manifest.json',
+										key: 'manifest.json',
+										editable: true
+									}
+								]
+							}
+						]
+					},
+					{
+						title: 'Numeric',
+						target: 'exploreSamples',
+						key: 'numericHeader',
+						files: [
+							{
+								url: '/samples/header/numeric.json',
+								name: 'manifest.json',
+								key: 'manifest.json',
+								editable: true
+							}
+						]
+					},
+					{
+						key: 'headerInfoSection',
+						target: 'exploreSamples',
+						title: 'Extended - Info Section',
+						experimental: true,
+						subSamples: [
+							{
+								title: 'Numeric Header',
+								key: 'numeric',
+								files: [
+									{
+										url: '/samples/headerInfoSection/numeric/manifest.json',
+										name: 'manifest.json',
+										key: 'manifest.json',
+										editable: true
+									}
+								]
+							},
+							{
+								title: 'Advanced Layout',
+								key: 'advancedLayout',
+								files: [
+									{
+										url: '/samples/headerInfoSection/advancedLayout/manifest.json',
+										name: 'manifest.json',
+										key: 'manifest.json',
+										editable: true
+									}
+								]
+							},
+							{
+								title: 'Interactive Status',
+								key: 'interactiveStatus',
+								files: [
+									{
+										url: '/samples/headerInfoSection/interactiveStatus/manifest.json',
+										name: 'manifest.json',
+										key: 'manifest.json',
+										editable: true
+									}
+								]
+							}
+						]
+					}
+				]
+			},
+			{
 				title: 'Declarative Card Types',
 				icon: 'sap-icon://SAP-icons-TNT/requirement-diagram',
 				key: 'typesDeclarative',
@@ -1632,30 +1731,6 @@ sap.ui.define([
 				]
 			},
 			{
-				title: 'Card Header',
-				icon: 'sap-icon://header',
-				key: 'cardHeader',
-				target: 'exploreOverview',
-				hasExpander: false,
-				hidden: !isDevelopmentBuild(),
-				items: [
-					{
-						title: 'Message Icon',
-						target: 'exploreSamples',
-						key: 'messageIcon',
-						messageIcon: true,
-						files: [
-							{
-								url: '/samples/header/messageIcon.json',
-								name: 'manifest.json',
-								key: 'manifest.json',
-								editable: true
-							}
-						]
-					}
-				]
-			},
-			{
 				title: 'Card Footer',
 				key: 'footer',
 				target: 'exploreSamples',
@@ -2328,62 +2403,6 @@ sap.ui.define([
 								url: '/samples/dynamicCounter/i18n/i18n.properties',
 								name: 'i18n/i18n.properties',
 								key: 'i18n/i18n.properties'
-							}
-						]
-					},
-					{
-						key: 'headerInfoSection',
-						target: 'exploreSamples',
-						title: 'Header Info Section',
-						experimental: true,
-						subSamples: [
-							{
-								title: 'Basic',
-								key: 'basic',
-								files: [
-									{
-										url: '/samples/headerInfoSection/basic/manifest.json',
-										name: 'manifest.json',
-										key: 'manifest.json',
-										editable: true
-									}
-								]
-							},
-							{
-								title: 'Advanced Layout',
-								key: 'advancedLayout',
-								files: [
-									{
-										url: '/samples/headerInfoSection/advancedLayout/manifest.json',
-										name: 'manifest.json',
-										key: 'manifest.json',
-										editable: true
-									}
-								]
-							},
-							{
-								title: 'Numeric Header',
-								key: 'numeric',
-								files: [
-									{
-										url: '/samples/headerInfoSection/numeric/manifest.json',
-										name: 'manifest.json',
-										key: 'manifest.json',
-										editable: true
-									}
-								]
-							},
-							{
-								title: 'Interactive Status',
-								key: 'interactiveStatus',
-								files: [
-									{
-										url: '/samples/headerInfoSection/interactiveStatus/manifest.json',
-										name: 'manifest.json',
-										key: 'manifest.json',
-										editable: true
-									}
-								]
 							}
 						]
 					},

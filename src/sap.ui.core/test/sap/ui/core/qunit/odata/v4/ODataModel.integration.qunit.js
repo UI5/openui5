@@ -40912,6 +40912,9 @@ sap.ui.define([
 	// value. A binding to $count updates automatically.
 	// If the creation is cancelled, no count request is sent. If the creation fails, the count
 	// request is also retried together with the creation.
+	// If <code>oHeaderContext.requestProperty("$count")</code> is called after creating a node, the
+	// $count promise resolves with the updated count only after the creation was successful or has
+	// been cancelled. The $count promise does not resolve if the creation failed.
 	// JIRA: CPOUI5ODATAV4-3081
 	QUnit.test("Recursive Hierarchy: create updates count", async function (assert) {
 		const oModel = this.createTeaBusiModel({autoExpandSelect : true});
@@ -40966,7 +40969,7 @@ sap.ui.define([
 		], [
 			[false, 1, "Alpha"],
 			[undefined, 1, "Gamma"]
-		], 2);
+		]);
 
 		this.expectChange("count", "3");
 
@@ -40976,26 +40979,31 @@ sap.ui.define([
 		await this.waitForChanges(assert, "bind $count");
 
 		// code under test - create node
-		let oDelta = oBinding.create({Name : "Foo"}, /*bSkipRefresh*/true);
+		const oFoo = oBinding.create({Name : "Foo"}, /*bSkipRefresh*/true);
 
 		assert.strictEqual(oBinding.getCount(), 3);
 		assert.strictEqual(iCountAtCreateCompleted, undefined, "not yet updated");
+		let oCountPromise = SyncPromise.resolve(oHeaderContext.requestProperty("$count"));
 
-		// code under test - and cancel creation immediatly
+		// code under test - and cancel creation immediately
 		oModel.resetChanges();
 
+		assert.ok(oCountPromise.isPending());
+
 		await Promise.all([
-			checkCanceled(assert, oDelta.created()),
+			checkCanceled(assert, oFoo.created()),
 			this.waitForChanges(assert, "Create and immediately cancel Foo")
 		]);
 
+		assert.strictEqual(oCountPromise.getResult(), 3,
+			"$count promise resolved after cancellation");
 		checkTable("After cancelled creation of Foo", assert, oTable, [
 			"/EMPLOYEES('1')",
 			"/EMPLOYEES('3')"
 		], [
 			[false, 1, "Alpha"],
 			[undefined, 1, "Gamma"]
-		], 2);
+		]);
 
 		this.oLogMock.expects("error")
 			.withExactArgs("POST on 'EMPLOYEES' failed; will be repeated automatically",
@@ -41004,7 +41012,7 @@ sap.ui.define([
 				batchNo : 2,
 				method : "POST",
 				url : "EMPLOYEES",
-				payload : {Name : "Delta"}
+				payload : {Name : "Bar"}
 			}, createErrorInsideBatch())
 			.expectRequest("#2 " + sCountUrl) // no response required
 			.expectMessages([{
@@ -41016,13 +41024,79 @@ sap.ui.define([
 			}]);
 
 		// code under test - create another node; creation fails
-		oDelta = oBinding.create({Name : "Delta"}, /*bSkipRefresh*/true);
+		const oBar = oBinding.create({Name : "Bar"}, /*bSkipRefresh*/true);
 
 		assert.strictEqual(oBinding.getCount(), 3);
 		assert.strictEqual(iCountAtCreateCompleted, undefined, "not yet updated");
+		oCountPromise = SyncPromise.resolve(oHeaderContext.requestProperty("$count"));
+		assert.ok(oCountPromise.isPending());
+
+		await this.waitForChanges(assert, "Creation of Bar failed");
+
+		assert.ok(oCountPromise.isPending());
+		checkTable("After failed creation of Bar", assert, oTable, [
+			"/EMPLOYEES($uid=...)",
+			"/EMPLOYEES('1')",
+			"/EMPLOYEES('3')"
+		], [
+			[undefined, 1, "Bar"],
+			[false, 1, "Alpha"]
+		]);
+		assert.strictEqual(oBinding.getCount(), 3);
+		assert.strictEqual(iCountAtCreateCompleted, 3, "failed creation calls createCompleted");
+
+		// code under test - cancel failed creation of Bar
+		oModel.resetChanges();
+
+		assert.ok(oCountPromise.isPending());
+
+		await Promise.all([
+			checkCanceled(assert, oBar.created()),
+			this.waitForChanges(assert, "Creation of Bar cancelled")
+		]);
+
+		assert.strictEqual(oBinding.getCount(), 3);
+		assert.strictEqual(iCountAtCreateCompleted, 3, "still the old value");
+		assert.strictEqual(oCountPromise.getResult(), 3,
+			"$count promise resolved after cancellation");
+		checkTable("After cancelled creation of Bar", assert, oTable, [
+			"/EMPLOYEES('1')",
+			"/EMPLOYEES('3')"
+		], [
+			[false, 1, "Alpha"],
+			[undefined, 1, "Gamma"]
+		]);
+
+		Messaging.removeAllMessages();
+		this.oLogMock.expects("error")
+			.withExactArgs("POST on 'EMPLOYEES' failed; will be repeated automatically",
+				sinon.match("Request intentionally failed"), sODLB);
+		this.expectRequest({
+				batchNo : 3,
+				method : "POST",
+				url : "EMPLOYEES",
+				payload : {Name : "Delta"}
+			}, createErrorInsideBatch())
+			.expectRequest("#3 " + sCountUrl) // no response required
+			.expectMessages([{
+				code : "CODE",
+				message : "Request intentionally failed",
+				persistent : true,
+				technical : true,
+				type : "Error"
+			}]);
+
+		// code under test - create another node; creation fails
+		const oDelta = oBinding.create({Name : "Delta"}, /*bSkipRefresh*/true);
+
+		assert.strictEqual(oBinding.getCount(), 3);
+		assert.strictEqual(iCountAtCreateCompleted, 3, "still the old value");
+		oCountPromise = SyncPromise.resolve(oHeaderContext.requestProperty("$count"));
+		assert.ok(oCountPromise.isPending());
 
 		await this.waitForChanges(assert, "Creation of Delta failed");
 
+		assert.ok(oCountPromise.isPending());
 		checkTable("After failed creation of Delta", assert, oTable, [
 			"/EMPLOYEES($uid=...)",
 			"/EMPLOYEES('1')",
@@ -41030,41 +41104,38 @@ sap.ui.define([
 		], [
 			[undefined, 1, "Delta"],
 			[false, 1, "Alpha"]
-		], 3);
+		]);
 		assert.strictEqual(oBinding.getCount(), 3);
 		assert.strictEqual(iCountAtCreateCompleted, 3, "failed creation calls createCompleted");
 
 		this.expectRequest({
-				batchNo : 3,
+				batchNo : 4,
 				method : "POST",
 				url : "EMPLOYEES",
 				payload : {Name : "Delta"}
 			}, {ID : "4", Name : "Delta"})
-			.expectRequest("#3 " + sCountUrl, 4)
+			.expectRequest("#4 " + sCountUrl, 4)
 			.expectChange("count", "4");
 
 		assert.strictEqual(oBinding.getCount(), 3);
 		assert.strictEqual(iCountAtCreateCompleted, 3);
-		oHeaderContext.requestProperty("$count").then((iCount) => {
-			assert.strictEqual(iCount, 3, "count request failed -> old value; count will be"
-				+ " requested again when creation is retried");
-		});
 
-		// code under test
+		// code under test - successfully retry creation
 		const oPromise = oModel.submitBatch("$auto");
 
 		assert.strictEqual(oBinding.getCount(), 3);
 		assert.strictEqual(iCountAtCreateCompleted, 3, "still the old value");
+		assert.ok(oCountPromise.isPending());
 
 		await Promise.all([
 			oPromise,
 			oDelta.created().then(() => {
-				// As long as the creation is pending the getCount returns the old value, wait
+				// As long as the creation is pending getCount returns the old value; wait
 				// until the creation is completed to get the new count.
-				// TODO: oHeaderContext.requestProperty("$count") should resolve only if the
-				// creation is completed and the count is updated.
 				assert.strictEqual(oBinding.getCount(), 4, "count is updated after creation");
 				assert.strictEqual(iCountAtCreateCompleted, 4);
+				assert.strictEqual(oCountPromise.getResult(), 4,
+					"$count promise resolved after successful creation");
 			}),
 			this.waitForChanges(assert, "Repeat creation of Delta")
 		]);
@@ -41076,7 +41147,7 @@ sap.ui.define([
 		], [
 			[undefined, 1, "Delta"],
 			[false, 1, "Alpha"]
-		], 3);
+		]);
 	});
 
 	//*********************************************************************************************

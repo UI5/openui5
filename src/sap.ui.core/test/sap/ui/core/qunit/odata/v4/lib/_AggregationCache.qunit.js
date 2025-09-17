@@ -1680,34 +1680,51 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test("readCount: GET fails", function (assert) {
-		var oAggregation = {
-				hierarchyQualifier : "X"
-			},
-			oCache = _AggregationCache.create(this.oRequestor, "~", "", {}, oAggregation),
-			oError = new Error(),
-			oGroupLock = {
-				getUnlockedCopy : function () {}
+	[undefined, true].forEach(function (bRetryIfFailed) {
+		[false, true].forEach(function (bOtherRequestFailed) {
+			const sTitle = "readCount: GET fails, bRetryIfFailed=" + bRetryIfFailed
+				+ ", count request failed because another request failed:" + bOtherRequestFailed;
+		QUnit.test(sTitle, function (assert) {
+			var oAggregation = {
+					hierarchyQualifier : "X"
+				},
+				oCache = _AggregationCache.create(this.oRequestor, "~", "", {}, oAggregation),
+				oError = new Error(),
+				oGroupLock = {
+					getUnlockedCopy : function () {}
+				};
+
+			oCache.oCountPromise = {
+				$resolve : "~fnResolve~", // will not be called :-)
+				$restore : sinon.spy(),
+				$retryIfFailed : bRetryIfFailed
 			};
+			if (bOtherRequestFailed) {
+				// simulate that the count request failed because another request in the $batch failed
+				oError.cause = "~cause~";
+			}
+			this.mock(this.oRequestor).expects("buildQueryString").withExactArgs(null, {})
+				.returns("?~query~");
+			this.mock(oGroupLock).expects("getUnlockedCopy").withExactArgs()
+				.returns("~oGroupLockCopy~");
+			this.mock(this.oRequestor).expects("request")
+				.withExactArgs("GET", "~/$count?~query~", "~oGroupLockCopy~").rejects(oError);
+			this.mock(_Helper).expects("fireChange").never();
 
-		oCache.oCountPromise = {
-			$resolve : true, // will not be called :-)
-			$restore : sinon.spy()
-		};
-		this.mock(this.oRequestor).expects("buildQueryString").withExactArgs(null, {})
-			.returns("?~query~");
-		this.mock(oGroupLock).expects("getUnlockedCopy").withExactArgs()
-			.returns("~oGroupLockCopy~");
-		this.mock(this.oRequestor).expects("request")
-			.withExactArgs("GET", "~/$count?~query~", "~oGroupLockCopy~").rejects(oError);
-		this.mock(_Helper).expects("fireChange").never();
-
-		// code under test
-		return oCache.readCount(oGroupLock).then(function () {
-			assert.ok(false);
-		}, function (oResult) {
-			assert.strictEqual(oResult, oError);
-			assert.strictEqual(oCache.oCountPromise.$restore.callCount, 1);
+			// code under test
+			return oCache.readCount(oGroupLock).then(function () {
+				assert.ok(false);
+			}, function (oResult) {
+				assert.strictEqual(oResult, oError);
+				if (bRetryIfFailed && bOtherRequestFailed) {
+					assert.strictEqual(oCache.oCountPromise.$restore.callCount, 0);
+					assert.strictEqual(oCache.oCountPromise.$resolve, "~fnResolve~");
+				} else {
+					assert.strictEqual(oCache.oCountPromise.$restore.callCount, 1);
+					assert.notOk("$resolve" in oCache.oCountPromise);
+				}
+			});
+		});
 		});
 	});
 
@@ -5707,6 +5724,12 @@ sap.ui.define([
 			const oPostBody = {};
 			const oCollectionCache = bInFirstLevel ? oCache.oFirstLevel : oGroupLevelCache;
 			let bNodePropertyCompleted = false;
+			oCacheMock.expects("createCountPromise").withExactArgs(true).exactly(oCountPromise ? 1 : 0)
+				.callsFake(() => {
+					oCache.oCountPromise = {
+						$restore : sinon.spy()
+					};
+				});
 			const fnSubmitCallback = sinon.spy();
 			let fnNewSubmitCallback;
 			this.mock(oCollectionCache).expects("create")
@@ -5829,6 +5852,11 @@ sap.ui.define([
 				});
 				assert.strictEqual(oCache.aElements.$count, 6);
 				assert.ok(bNodePropertyCompleted, "await #requestNodeProperty");
+				if (oCountPromise) {
+					assert.ok(oCache.oCountPromise.$restore.notCalled, "not yet restored");
+				} else {
+					assert.strictEqual(oCache.oCountPromise, undefined);
+				}
 
 				oCache.aElements[bCreateRoot ? 0 : 3] = oEntityData;
 				oCache.aElements.$byPredicate["~sTransientPredicate~"] = "n/a";
@@ -5839,6 +5867,9 @@ sap.ui.define([
 				// code under test
 				fnCancelCallback();
 
+				if (oCountPromise) {
+					assert.ok(oCache.oCountPromise.$restore.calledOnceWithExactly(), "restored");
+				}
 				assert.strictEqual(oCache.aElements.$count, 5);
 				assert.deepEqual(oCache.aElements.$byPredicate, {
 					"('42')" : oParentNode,
@@ -5852,8 +5883,6 @@ sap.ui.define([
 					assert.strictEqual(fnNewSubmitCallback, fnSubmitCallback);
 				} else {
 					assert.notStrictEqual(fnNewSubmitCallback, fnSubmitCallback);
-					let oCreateCountExpectation = oCacheMock.expects("createCountPromise")
-						.withExactArgs();
 					let oReadCountExpectation = oCacheMock.expects("readCount")
 						.withExactArgs("~oGroupLock~")
 						.returns(undefined); // no count needs to be read
@@ -5862,11 +5891,9 @@ sap.ui.define([
 					fnNewSubmitCallback();
 
 					assert.ok(fnSubmitCallback.calledOnceWithExactly());
-					assert.ok(oCreateCountExpectation.calledBefore(oReadCountExpectation));
 					assert.ok(oReadCountExpectation.calledBefore(fnSubmitCallback));
 					fnSubmitCallback.resetHistory();
 
-					oCreateCountExpectation = oCacheMock.expects("createCountPromise").withExactArgs();
 					const oReadCountResult = {catch : mustBeMocked};
 					oReadCountExpectation = oCacheMock.expects("readCount")
 						.withExactArgs("~oGroupLock~").returns(oReadCountResult);
@@ -5881,7 +5908,6 @@ sap.ui.define([
 					fnNewSubmitCallback();
 
 					assert.ok(fnSubmitCallback.calledOnceWithExactly());
-					assert.ok(oCreateCountExpectation.calledBefore(oReadCountExpectation));
 					assert.ok(oReadCountExpectation.calledBefore(fnSubmitCallback));
 				}
 			});
@@ -7889,17 +7915,18 @@ sap.ui.define([
 		assert.strictEqual(oCache.oCountPromise, undefined);
 
 		// code under test
-		oCache.createCountPromise();
+		oCache.createCountPromise("~bRetryIfFailed~");
 
 		assert.strictEqual(oCache.oCountPromise.isPending(), true);
-		assert.ok(oCache.oCountPromise.hasOwnProperty("$old"));
+		assert.ok("$old" in oCache.oCountPromise);
 		assert.strictEqual(oCache.oCountPromise.$old, undefined);
+		assert.strictEqual(oCache.oCountPromise.$retryIfFailed, "~bRetryIfFailed~");
 
 		// code under test
 		oCache.oCountPromise.$resolve("foo");
 
 		assert.strictEqual(oCache.oCountPromise.getResult(), "foo");
-		assert.notOk(oCache.oCountPromise.hasOwnProperty("$old"));
+		assert.notOk("$old" in oCache.oCountPromise);
 
 		// code under test: $restore has no effect on a resolved promise
 		oCache.oCountPromise.$restore();
@@ -7938,7 +7965,7 @@ sap.ui.define([
 		oCache.oCountPromise.$restore();
 
 		assert.strictEqual(oCache.oCountPromise.getResult(), "foo");
-		assert.notOk(oCache.oCountPromise.hasOwnProperty("$old"));
+		assert.notOk("$old" in oCache.oCountPromise);
 	});
 
 	//*********************************************************************************************

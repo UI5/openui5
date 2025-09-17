@@ -829,5 +829,116 @@ sap.ui.define([
 		assert.strictEqual(oFnSpy.callCount, 2, "Calculations should be done only 2 times for all elements with the same size");
 	});
 
+	QUnit.module("Change Events", {
+		beforeEach: async function() {
+			// Create a fresh RatingIndicator for each test
+			this.oRating = new RatingIndicator({ value: 2 });
+			this.fnChangeEventSpy = this.spy(this.oRating, "fireChange");
+			this.fnLiveChangeEventSpy = this.spy(this.oRating, "fireLiveChange");
+
+			// Place the control and wait for rendering
+			this.oRating.placeAt("content");
+			await nextUIUpdate();
+		},
+		afterEach: function() {
+			// Clean up spies and destroy the control
+			if (this.fnChangeEventSpy) {
+				this.fnChangeEventSpy.restore();
+			}
+			if (this.fnLiveChangeEventSpy) {
+				this.fnLiveChangeEventSpy.restore();
+			}
+			if (this.oRating) {
+				this.oRating.destroy();
+			}
+		}
+	});
+
+	QUnit.test("Change event - keyboard interaction", function (assert) {
+		// Simulate keyboard interaction - arrow key press
+		qutils.triggerKeydown(this.oRating.getDomRef(), KeyCodes.ARROW_RIGHT);
+
+		assert.strictEqual(this.fnChangeEventSpy.callCount, 1, "Change event should be fired on keyboard interaction");
+		assert.strictEqual(this.fnLiveChangeEventSpy.callCount, 1, "LiveChange event should be fired on keyboard interaction");
+	});
+
+	QUnit.test("Change event - mouse click", function (assert) {
+		// Create touch events like the existing working tests
+		var touches = {
+			0: {
+				pageX: 50,
+				pageY: 12,
+				length: 1
+			}
+		};
+
+		var oEventTouchStart = jQuery.Event("touchstart", {
+			target: this.oRating.$(),
+			touches: touches,
+			targetTouches: touches,
+			originalEvent: {
+				touches: touches
+			}
+		});
+
+		var oEventTouchEnd = jQuery.Event("touchend", {
+			targetTouches: touches,
+			changedTouches: touches
+		});
+
+		// Call the methods directly like existing tests
+		this.oRating.ontouchstart(oEventTouchStart);
+		this.oRating._ontouchend(oEventTouchEnd);
+
+		assert.strictEqual(this.fnChangeEventSpy.callCount, 1, "Change event should be fired on mouse click");
+		assert.strictEqual(this.fnLiveChangeEventSpy.callCount, 1, "LiveChange event should be fired on mouse click");
+	});
+
+	QUnit.test("LiveChange event - dragging", function (assert) {
+		var touches = {
+			0: {
+				pageX: 20,
+				pageY: 12,
+				length: 1
+			}
+		};
+
+		var oEventTouchStart = jQuery.Event("touchstart", {
+			target: this.oRating.$(),
+			touches: touches,
+			targetTouches: touches,
+			originalEvent: {
+				touches: touches
+			}
+		});
+
+		var oEventTouchMove = jQuery.Event("touchmove", {
+			target: this.oRating.$(),
+			touches: touches,
+			targetTouches: touches,
+			originalEvent: {
+				touches: touches
+			}
+		});
+
+		var oEventTouchEnd = jQuery.Event("touchend", {
+			targetTouches: touches,
+			changedTouches: touches
+		});
+
+		// Simulate dragging: start, move, end
+		this.oRating.ontouchstart(oEventTouchStart);
+
+		// Update position for move event
+		touches[0].pageX = 60;
+		oEventTouchMove.targetTouches[0].pageX = 60;
+		this.oRating._ontouchmove(oEventTouchMove);
+
+		this.oRating._ontouchend(oEventTouchEnd);
+
+		assert.ok(this.fnLiveChangeEventSpy.callCount >= 1, "LiveChange event should be fired during dragging");
+		assert.strictEqual(this.fnChangeEventSpy.callCount, 1, "Change event should be fired at the end of dragging");
+	});
+
 	return pStyleLoaded;
 });

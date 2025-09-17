@@ -28,11 +28,11 @@ sap.ui.define([
 				return;
 			}
 
-			window.addEventListener("message", this._onTopicBootFinished);
+			window.addEventListener("message", this._onTopicBootFinished.bind(this));
 			this._registered = true;
 		},
 		stopListening: function () {
-			window.removeEventListener("message", this._onTopicBootFinished);
+			window.removeEventListener("message", this._onTopicBootFinished.bind(this));
 		}
 	};
 
@@ -68,6 +68,15 @@ sap.ui.define([
 			// sync sapUiSizeCompact with the iframe
 			var sClass = this.getOwnerComponent().getContentDensityClass();
 			this._getIFrame().contentDocument.body.classList.add(sClass);
+
+			// apply device-specific classes to iframe's html tag for proper scrollbar styling
+			var aDeviceClasses = document.documentElement.className.match(/sap-\w+/g);
+			if (aDeviceClasses && aDeviceClasses.length > 0) {
+				this._getIFrame().contentWindow.postMessage({
+					channel: "applyDeviceClass",
+					deviceClasses: aDeviceClasses
+				}, window.location.origin);
+			}
 
 			// navigate to the id in the URL
 			var sCurrentHash = this.getRouter().getHashChanger().getHash();

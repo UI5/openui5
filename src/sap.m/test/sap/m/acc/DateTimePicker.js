@@ -4,8 +4,9 @@ sap.ui.define([
 	"sap/m/Label",
 	"sap/m/Page",
 	"sap/ui/layout/VerticalLayout",
-	"sap/ui/core/library"
-], function(App, DateTimePicker, Label, Page, VerticalLayout, coreLibrary) {
+	"sap/ui/core/library",
+	"sap/ui/core/date/UI5Date"
+], function(App, DateTimePicker, Label, Page, VerticalLayout, coreLibrary, UI5Date) {
 	"use strict";
 
 	// shortcut for sap.ui.core.ValueState
@@ -26,16 +27,19 @@ sap.ui.define([
 
 	var oPageLayout = new VerticalLayout({
 		content: [
+			// Basic scenario
 			new Label({
-				text: "Choose a date and time",
+				text: "Meeting Appointment: Choose a date and time",
 				labelFor: "DTP1",
 				wrapping: true
 			}),
 			new DateTimePicker("DTP1", {
 				change: handleChange
 			}),
+
+			// Custom value format scenario
 			new Label({
-				text: "Value format defined. Select a date and time",
+				text: "Project Deadline: Select delivery date and time (custom format)",
 				labelFor: "DTP2",
 				wrapping: true
 			}),
@@ -46,13 +50,146 @@ sap.ui.define([
 				showCurrentDateButton: true,
 				showCurrentTimeButton: true,
 				change: handleChange
+			}),
+
+			// Secondary calendar type scenario (Islamic calendar)
+			new Label({
+				text: "Event Date: Choose date and time with Islamic calendar",
+				labelFor: "DTP3",
+				wrapping: true
+			}),
+			new DateTimePicker("DTP3", {
+				secondaryCalendarType: "Islamic",
+				showCurrentDateButton: true,
+				showCurrentTimeButton: true,
+				change: handleChange
+			}),
+
+			// 24-hour format without AM/PM
+			new Label({
+				text: "System Maintenance Window: Select time in 24-hour format",
+				labelFor: "DTP4",
+				wrapping: true
+			}),
+			new DateTimePicker("DTP4", {
+				displayFormat: "dd/MM/yyyy HH:mm:ss",
+				showCurrentDateButton: true,
+				showCurrentTimeButton: true,
+				change: handleChange
+			}),
+
+			// Timezone scenario
+			new Label({
+				text: "International Conference Call: Select time with timezone display",
+				labelFor: "DTP5",
+				wrapping: true
+			}),
+			new DateTimePicker("DTP5", {
+				showTimezone: true,
+				timezone: "America/New_York",
+				showCurrentDateButton: true,
+				showCurrentTimeButton: true,
+				change: handleChange
+			}),
+
+			// Custom steps scenario
+			new Label({
+				text: "Train Schedule: Select departure time (15-minute intervals)",
+				labelFor: "DTP6",
+				wrapping: true
+			}),
+			new DateTimePicker("DTP6", {
+				minutesStep: 15,
+				secondsStep: 30,
+				displayFormat: "EEE, MMM d, yyyy 'at' HH:mm",
+				showCurrentTimeButton: true,
+				change: handleChange
+			}),
+
+			// Min/Max date range scenario
+			new Label({
+				text: "Vacation Booking: Select dates within current year only",
+				labelFor: "DTP7",
+				wrapping: true
+			}),
+			new DateTimePicker("DTP7", {
+				minDate: UI5Date.getInstance(2025, 0, 1), // January 1, 2025
+				maxDate: UI5Date.getInstance(2025, 11, 31), // December 31, 2025
+				displayFormat: "EEEE, MMMM d, yyyy 'at' h:mm a",
+				showCurrentDateButton: true,
+				showCurrentTimeButton: true,
+				change: handleChange
+			}),
+
+			// Different display format styles
+			new Label({
+				text: "Flight Departure: Select date and time (medium format)",
+				labelFor: "DTP8",
+				wrapping: true
+			}),
+			new DateTimePicker("DTP8", {
+				displayFormat: "medium/medium",
+				showCurrentDateButton: true,
+				showCurrentTimeButton: true,
+				change: handleChange
+			}),
+
+			// Disabled state for comparison
+			new Label({
+				text: "Read-only Appointment: Cannot be modified",
+				labelFor: "DTP9",
+				wrapping: true
+			}),
+			new DateTimePicker("DTP9", {
+				enabled: false,
+				value: "Dec 25, 2025, 2:30:00 PM",
+				displayFormat: "long/medium"
+			}),
+
+			// Placeholder scenario
+			new Label({
+				text: "Custom Event: Enter date and time with specific placeholder",
+				labelFor: "DTP10",
+				wrapping: true
+			}),
+			new DateTimePicker("DTP10", {
+				placeholder: "When will your event take place?",
+				showCurrentDateButton: true,
+				showCurrentTimeButton: true,
+				change: handleChange
+			}),
+
+			// Error state scenario
+			new Label({
+				text: "Document Expiry: Date must be in the future (validation example)",
+				labelFor: "DTP11",
+				wrapping: true
+			}),
+			new DateTimePicker("DTP11", {
+				valueState: ValueState.Error,
+				valueStateText: "Expiry date must be in the future",
+				showCurrentDateButton: true,
+				showCurrentTimeButton: true,
+				change: function(oEvent) {
+					var oDP = oEvent.getSource();
+					var oDate = oEvent.getParameter("value");
+					var oToday = UI5Date.getInstance();
+
+					if (oDate && UI5Date.getInstance(oDate) > oToday) {
+						oDP.setValueState(ValueState.Success);
+						oDP.setValueStateText("Valid future date");
+					} else {
+						oDP.setValueState(ValueState.Error);
+						oDP.setValueStateText("Expiry date must be in the future");
+					}
+				}
 			})
 		]
 	}).addStyleClass("sapUiContentPadding");
 
 	var oApp = new App();
 	var oPage = new Page({
-		title: "DatePicker Accessibility Test Page",
+		title: "DateTimePicker Accessibility Test Page",
 		titleLevel: TitleLevel.H1,
 		content: [ oPageLayout ]
 	});

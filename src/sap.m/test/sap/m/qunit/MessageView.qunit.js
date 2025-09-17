@@ -100,14 +100,13 @@ sap.ui.define([
 			this.mockMarkupDescription = "<h2>Heading h2</h2><script>alert('this JS will be sanitized')<\/script>" +
 					"<p>Paragraph. At vero eos et accusamus et iusto odio dignissimos ducimus qui ...</p>" +
 					"<ul>" +
-					"   <li>Unordered list item 1 <a href=\"http://sap.com/some/url\">Absolute URL</a></li>" +
-					"   <li>Unordered list item 2</li>" +
+					"	<li>Unordered list item 1 <a href=\"http://sap.com/some/url\">Absolute URL</a></li>" +
+					"	<li>Unordered list item 2</li>" +
 					"</ul>" +
 					"<ol>" +
-					"   <li>Ordered list item 1 <a href=\"/relative/url\">Relative URL</a></li>" +
-					"   <li>Ordered list item 2</li>" +
-					"</ol>" +
-					"<embed src='helloworld.swf'> <object width=\"400\" height=\"400\"></object>";
+					"	<li>Ordered list item 1 <a href=\"/testsuite/test-resources/sap/m/MessageView.html?this_should_be_opened_in_new_page\">Relative URL</a></li>" +
+					"	<li>Ordered list item 2</li>" +
+					"</ol>";
 
 			this.server = sinon.fakeServer.create();
 			this.server.autoRespond = true;
@@ -272,6 +271,64 @@ sap.ui.define([
 
 		assert.strictEqual(sInterlListItemDescription, "Subtitle", "Description of the interal listItem should be binded with the subtitle of the MessageItem");
 		assert.strictEqual(sInterlListItemDescription, sMessageItemSubtitle, "Setting a subtitle to MessageItem should set the description of the internal StandardListItem");
+	});
+
+	QUnit.test("Subtitle binding updates are reflected in details page when navigated", async function (assert) {
+		this.clock = sinon.useFakeTimers();
+
+		var oModel = new JSONModel({
+			messages: [{
+				type: "Error",
+				title: "Test Message",
+				subtitle: "Initial Subtitle",
+				description: "Test Description"
+			}]
+		});
+
+		var oMessageTemplate = new MessageItem({
+			type: "{type}",
+			title: "{title}",
+			subtitle: "{subtitle}",
+			description: "{description}"
+		});
+
+		var oMessageView = new MessageView({
+			items: {
+				path: "/messages",
+				template: oMessageTemplate
+			}
+		});
+
+		oMessageView.setModel(oModel);
+		oMessageView.placeAt("qunit-fixture");
+		await nextUIUpdate(this.clock);
+
+		var oListItem = oMessageView._oLists.all.getItems()[0];
+		var oMessageItem = oMessageView.getItems()[0];
+
+		assert.strictEqual(oListItem.getDescription(), "Initial Subtitle", "List item should show initial subtitle");
+		assert.strictEqual(oMessageItem.getSubtitle(), "Initial Subtitle", "Message item should have initial subtitle");
+
+		oMessageView._fnHandleForwardNavigation(oListItem, "show");
+
+		var oSubtitleText = oMessageView._detailsPage.getContent()[1]; // Subtitle is second content after title
+		assert.strictEqual(oSubtitleText.getText(), "Initial Subtitle", "Details page should show initial subtitle");
+
+		oModel.setProperty("/messages/0/subtitle", "Updated Subtitle");
+		await nextUIUpdate(this.clock);
+
+		assert.strictEqual(oMessageItem.getSubtitle(), "Updated Subtitle", "Message item should have updated subtitle");
+
+		oSubtitleText = oMessageView._detailsPage.getContent()[1];
+		assert.strictEqual(oSubtitleText.getText(), "Updated Subtitle", "Details page should show updated subtitle after model change");
+
+		oMessageItem.setSubtitle("Programmatic Subtitle");
+
+		oSubtitleText = oMessageView._detailsPage.getContent()[1];
+		assert.strictEqual(oSubtitleText.getText(), "Programmatic Subtitle", "Details page should show programmatically set subtitle");
+
+		oMessageView.destroy();
+		this.clock.restore();
 	});
 
 	QUnit.test("setCounter() property", function (assert) {

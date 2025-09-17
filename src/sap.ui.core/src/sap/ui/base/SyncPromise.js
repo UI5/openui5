@@ -93,6 +93,7 @@ sap.ui.define([], function () {
 	 * onRejected must not be called until the execution context stack contains only platform code."
 	 * @private
 	 * @since 1.53.0
+	 * @template {any} [T=any]
 	 * @ui5-restricted sap.ui.core (Lib),sap.m,sap.ui.comp,sap.ui.dt,sap.ui.mdc
 	 *
 	 * @param {function} fnExecutor
@@ -195,7 +196,7 @@ sap.ui.define([], function () {
 		/**
 		 * Returns the current "result" of this {@link sap.ui.base.SyncPromise}.
 		 *
-		 * @returns {any}
+		 * @returns {T|any|Promise}
 		 *   The result in case this {@link sap.ui.base.SyncPromise} is already fulfilled, the
 		 *   reason if it is already rejected, or the wrapped thenable if it is still pending
 		 *
@@ -374,7 +375,7 @@ sap.ui.define([], function () {
 	 * throwing the reason if this promise is already rejected. This {@link sap.ui.base.SyncPromise}
 	 * is marked as {@link #caught}.
 	 *
-	 * @returns {any|Promise}
+	 * @returns {T|Promise}
 	 *   The result in case this {@link sap.ui.base.SyncPromise} is already fulfilled, or the
 	 *   wrapped thenable if this promise is still pending
 	 * @throws {any}

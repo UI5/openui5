@@ -200,7 +200,7 @@ sap.ui.define([
 	 * Returns a promise that is resolved when this lock does no longer block the given group ID.
 	 *
 	 * @param {string} sGroupId The group ID
-	 * @returns {sap.ui.base.SyncPromise|undefined}
+	 * @returns {sap.ui.base.SyncPromise<void>|undefined}
 	 *   A promise or <code>undefined</code> if the lock does not block this group
 	 *
 	 * @public
