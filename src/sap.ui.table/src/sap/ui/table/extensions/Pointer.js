@@ -186,19 +186,15 @@ sap.ui.define([
 				for (let i = 0; i < this._aTableHeaders.length; i++) {
 					const oTableHeaderRect = this._aTableHeaders[i].getBoundingClientRect();
 					if (this._bRtlMode) {
-						// 5px for resizer width
-						if ((iPositionX < oTableHeaderRect.right - 5) && (iPositionX >= oTableHeaderRect.left)) {
+						if ((iPositionX < oTableHeaderRect.right - 5) && (iPositionX >= oTableHeaderRect.left)) { // 5px for resizer width
 							iLastHoveredColumn = i;
 							iResizerPositionX = oTableHeaderRect.left - iTableRect.left;
 							break;
 						}
-					} else {
-						// 5px for resizer width
-						if ((iPositionX > oTableHeaderRect.left + 5) && (iPositionX <= oTableHeaderRect.right)) {
-							iLastHoveredColumn = i;
-							iResizerPositionX = oTableHeaderRect.right - iTableRect.left;
-							break;
-						}
+					} else if ((iPositionX > oTableHeaderRect.left + 5) && (iPositionX <= oTableHeaderRect.right)) { // 5px for resizer width
+						iLastHoveredColumn = i;
+						iResizerPositionX = oTableHeaderRect.right - iTableRect.left;
+						break;
 					}
 				}
 
@@ -220,6 +216,7 @@ sap.ui.define([
 		 * Initializes the drag&drop for reordering
 		 */
 		initReordering: function(oTable, iColIndex, oEvent) {
+			oTable._getPointerExtension()._bReorderInProgress = true;
 			const oColumn = oTable.getColumns()[iColIndex];
 			const $Col = oColumn.$();
 			const $Table = oTable.$();
@@ -334,6 +331,8 @@ sap.ui.define([
 		 * Ends the column reordering process via drag&drop.
 		 */
 		exitReordering: function(oEvent) {
+			this._getPointerExtension()._bReorderInProgress = true;
+
 			const iOldIndex = this._iDnDColIndex;
 			const iNewIndex = this._iNewColPos;
 
@@ -653,6 +652,9 @@ sap.ui.define([
 				oEvent.setMarked("sapUiTableHandledByPointerExtension");
 				oEvent.preventDefault(); // To prevent opening the default browser context menu.
 				delete oPointerExtension._bHideMenu;
+			} else if (oPointerExtension._bReorderInProgress) {
+				oEvent.setMarked("sapUiTableHandledByPointerExtension");
+				oEvent.preventDefault();
 			}
 		}
 	};
@@ -696,8 +698,11 @@ sap.ui.define([
 		_attachEvents: function() {
 			const oTable = this.getTable();
 			if (oTable) {
-				// Initialize the basic event handling for column resizing.
-				ColumnResizeHelper.initColumnTracking(oTable);
+				// Column resizing on touch devices is triggered via a button in the column menu.
+				if (Device.system.desktop) {
+					ColumnResizeHelper.initColumnTracking(oTable);
+				}
+
 				RowHoverHandler.initRowHovering(oTable);
 			}
 		},
@@ -732,6 +737,24 @@ sap.ui.define([
 			this._ExtensionDelegate = ExtensionDelegate;
 			this._RowHoverHandler = RowHoverHandler;
 			this._KNOWNCLICKABLECONTROLS = KNOWNCLICKABLECONTROLS;
+		},
+
+		/**
+		 * Shows the column resizer for the given column.
+		 * @param {sap.ui.table.Column} oColumn The column for which the resizer should be shown.
+		 */
+		showColumnResizer: function(oColumn) {
+			const oTable = oColumn._getTable();
+			const oDomRef = oTable.getDomRef("sapUiTableCnt");
+			const oTableRect = oDomRef.getBoundingClientRect();
+			const iColIndex = oColumn.getIndex();
+			const oColumnHeaderRect = oTable._aTableHeaders[iColIndex].getBoundingClientRect();
+			const iResizerPositionX = oTable._bRtlMode ? oColumnHeaderRect.left - oTableRect.left : oColumnHeaderRect.right - oTableRect.left;
+
+			oTable.$().toggleClass("sapUiTableResizing", true);
+			oTable._$colResize = oTable.$("rsz");
+			oTable._$colResize.toggleClass("sapUiTableColRszActive", true);
+			oTable._$colResize.css("left", iResizerPositionX + "px");
 		},
 
 		/**

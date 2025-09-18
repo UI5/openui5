@@ -418,7 +418,7 @@ sap.ui.define([
 		oMessageBox.destroy();
 	});
 
-	QUnit.test("initial focus to control with details", function (assert) {
+	QUnit.test("initial focus to control with details (deprecated)", function (assert) {
 		var oMessageBox, oShowMoreLink,
 			oButton = new Button({
 				text: 'Do something'
@@ -441,7 +441,11 @@ sap.ui.define([
 		oShowMoreLink.firePress();
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
 
+		const aActions = oMessageBox.getButtons();
+
 		assert.strictEqual(document.activeElement.id, oMessageBox.getInitialFocus(), "Focus is set correctly after details are shown");
+		assert.strictEqual(oMessageBox.getInitialFocus(), aActions[0].getId(), "Initial focus control is correct");
+
 		oMessageBox.destroy();
 	});
 

@@ -15,6 +15,8 @@ sap.ui.define([
 		}
 	};
 
+	const MIN_THUMB_HEIGHT = 25; // For better usability on touch devices the minimum height of the scroll thumb is 25px.
+
 	/**
 	 * Extension for sap.ui.table.Table which displays vertical scrollbar on iOS and provides event handlers for user interaction.
 	 * <b>This is an internal class that is only intended to be used inside the sap.ui.table library! Any usage outside the sap.ui.table library
@@ -224,7 +226,7 @@ sap.ui.define([
 		const iVerticalScrollbarHeight = oScrollExtension.getVerticalScrollbarHeight();
 		const iVerticalScrollHeight = oScrollExtension.getVerticalScrollHeight();
 
-		return Math.round(Math.pow(iVerticalScrollbarHeight, 2) / iVerticalScrollHeight);
+		return Math.max(MIN_THUMB_HEIGHT, Math.round(Math.pow(iVerticalScrollbarHeight, 2) / iVerticalScrollHeight));
 	};
 
 	/**
@@ -240,7 +242,8 @@ sap.ui.define([
 		const oVSb = oScrollExtension.getVerticalScrollbar();
 		const iVerticalScrollTop = oVSb ? oScrollExtension.getVerticalScrollbar().scrollTop : 0;
 
-		return Math.round(iVerticalScrollTop * iVerticalScrollbarHeight / iVerticalScrollHeight);
+		const iThumbHeight = this.getCalculateThumbHeight();
+		return Math.round(iVerticalScrollTop * (iVerticalScrollbarHeight - iThumbHeight) / (iVerticalScrollHeight - iThumbHeight));
 	};
 
 	/**

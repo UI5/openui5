@@ -1326,7 +1326,7 @@ sap.ui.define([
 				assert.strictEqual(oUpdateVariantStub.callCount, 1, "the variant was switched");
 				assert.deepEqual(oUpdateVariantStub.lastCall.args[0], {
 					variantManagementReference: sVMReference,
-					newVariantReference: sVMReference
+					newVariantReference: "variant1"
 				}, "the correct variant was switched to");
 				assert.strictEqual(oPropertyBag.selector, oComponent, "the app component was passed");
 				assert.strictEqual(oAddVariantChangesSpy.lastCall.args[1].length, 1, "1 change was added");

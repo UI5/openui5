@@ -5,7 +5,6 @@
 sap.ui.define([
 	"sap/base/Log",
 	"sap/ui/fl/apply/_internal/flexState/FlexState",
-	"sap/ui/fl/apply/_internal/flexState/changes/UIChangesState",
 	"sap/ui/fl/apply/_internal/flexState/DataSelector",
 	"sap/ui/fl/apply/_internal/flexState/compVariants/applyChangesOnVariant",
 	"sap/ui/fl/apply/_internal/flexObjects/CompVariant",
@@ -14,7 +13,6 @@ sap.ui.define([
 ], function(
 	Log,
 	FlexState,
-	UIChangesState,
 	DataSelector,
 	applyChangesOnVariant,
 	CompVariant,

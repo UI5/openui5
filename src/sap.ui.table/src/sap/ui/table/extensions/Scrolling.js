@@ -723,12 +723,14 @@ sap.ui.define([
 				};
 
 				oTable._getKeyboardExtension().setActionMode(false);
+				const oScrollExtension = oTable._getScrollExtension();
 
-				if (oTable._bLargeDataScrolling) {
+				// No large data scrolling on touch move
+				if (oTable._bLargeDataScrolling && !oScrollExtension._bTouchScroll) {
 					_private(oTable).mTimeouts.largeDataScrolling = setTimeout(function() {
 						delete _private(oTable).mTimeouts.largeDataScrolling;
 
-						if (oTable._getScrollExtension().getVerticalScrollbar() != null) {
+						if (oScrollExtension.getVerticalScrollbar() != null) {
 							log("VerticalScrollingHelper.performUpdateFromScrollbar (async: large data scrolling)", oTable);
 							VerticalScrollingHelper._performUpdateFromScrollbar(oTable, oProcessInterface).then(resolve);
 						} else {
@@ -744,6 +746,7 @@ sap.ui.define([
 						}
 					});
 				} else {
+					delete oScrollExtension._bTouchScroll;
 					VerticalScrollingHelper._performUpdateFromScrollbar(oTable, oProcessInterface).then(resolve);
 				}
 			});
@@ -2019,6 +2022,7 @@ sap.ui.define([
 						if (!mTouchSessionData.initialScrolledToEnd) {
 							oVSb.scrollTop = mTouchSessionData.initialScrollTop - iTouchDistanceY;
 							bScrollingPerformed = true;
+							oScrollExtension._bTouchScroll = true;
 						}
 					}
 					break;

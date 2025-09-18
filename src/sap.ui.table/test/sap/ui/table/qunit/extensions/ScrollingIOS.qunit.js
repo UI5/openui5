@@ -151,7 +151,9 @@ sap.ui.define([
 			const iVerticalScrollHeight = oScrollExtension.getVerticalScrollHeight();
 			const iVerticalScrollTop = oScrollExtension.getVerticalScrollbar().scrollTop;
 
-			const iScrollPosition = Math.round(iVerticalScrollTop * iVerticalScrollbarHeight / iVerticalScrollHeight);
+			const iThumbHeight = this.oTable._getScrollIOSExtension().getCalculateThumbHeight();
+			const iScrollPosition = Math.round(iVerticalScrollTop * (iVerticalScrollbarHeight - iThumbHeight) /
+				(iVerticalScrollHeight - iThumbHeight));
 			assert.strictEqual(oVSbThumb.style.top, iScrollPosition + "px", "Thumb position is correct");
 		}
 	});

@@ -220,9 +220,19 @@ sap.ui.define([
 			return oChange.visible === false
 			&& oChange.variantReference === oVariantModel.getCurrentVariantReference(sVMReference);
 		})) {
+			// If the current variant is deleted, switch to the default variant
+			// In case the deleted variant was the default or the default variant was changed in the
+			// same manage variants session, switch to the new default that is passed via the event
+			const sNewDefaultVariantReference = (
+				oEvent.getParameter("def")
+				|| VariantManagementState.getDefaultVariantReference({
+					reference: oVariantModel.sFlexReference,
+					vmReference: sVMReference
+				})
+			);
 			await oVariantModel.updateCurrentVariant({
 				variantManagementReference: sVMReference,
-				newVariantReference: sVMReference
+				newVariantReference: sNewDefaultVariantReference
 			});
 		}
 

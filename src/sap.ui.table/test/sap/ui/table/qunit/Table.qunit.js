@@ -3591,6 +3591,24 @@ sap.ui.define([
 		}.bind(this));
 	});
 
+	QUnit.test("Applied extensions (Mac)", async function(assert) {
+		const bOriginalDeviceOsMac = Device.os.macintosh;
+		const bOriginalDeviceSystem = Device.system.desktop;
+		Device.os.macintosh = true;
+		Device.system.desktop = false;
+		oTable.destroy();
+		await createTable();
+
+		return new Promise(function(resolve) {
+			sap.ui.require(["sap/ui/table/extensions/ScrollingIOS"], function() {
+				this.testAppliedExtensions(assert, this.aExpectedExtensions.concat("sap.ui.table.extensions.ScrollingIOS"));
+				Device.os.macintosh = bOriginalDeviceOsMac;
+				Device.system.desktop = bOriginalDeviceSystem;
+				resolve();
+			}.bind(this));
+		}.bind(this));
+	});
+
 	QUnit.test("Lifecycle", function(assert) {
 		const aExtensions = oTable._aExtensions;
 

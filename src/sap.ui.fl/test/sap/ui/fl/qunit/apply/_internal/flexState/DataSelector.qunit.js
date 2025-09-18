@@ -190,6 +190,30 @@ sap.ui.define([
 			);
 		});
 
+		QUnit.test("when a parameterized selector is created with an empty string as key", function(assert) {
+			this.oExpectedResult = {
+				"": {
+					bar: "bar"
+				},
+				baz: "baz"
+			};
+			this.oExecuteStub
+			.onFirstCall()
+			.callsFake(function(oData, mParameters) {
+				assert.deepEqual(
+					mParameters,
+					{ sampleKey: "" },
+					"then the execute function is called with the parameter value for the respective getter call"
+				);
+				return this.oExpectedResult[mParameters.sampleKey];
+			}.bind(this));
+			assert.strictEqual(
+				this.oDataSelector.get({ sampleKey: "" }),
+				this.oExpectedResult[""],
+				"then the value is returned for the passed key"
+			);
+		});
+
 		QUnit.test("when the getter is called for different parameters with initFunctions", function(assert) {
 			var oInitFunction = sandbox.stub();
 			this.oDataSelector.setInitFunction(oInitFunction);

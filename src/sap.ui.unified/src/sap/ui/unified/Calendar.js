@@ -2187,9 +2187,9 @@ sap.ui.define([
 		}
 
 		// Use sAriaLabel instead of sText for sMonthLabel to include secondary calendar info when present
-		var sMonthLabel = this._oResourceBundle.getText("CALENDAR_HEADER_MONTH_BUTTON", sAriaLabel);
+		var sMonthLabel = this._oResourceBundle.getText("CALENDAR_HEADER_MONTH_BUTTON", [sAriaLabel]);
 		var sMonthShortcut = this._oResourceBundle.getText("CALENDAR_HEADER_MONTH_BUTTON_SHORTCUT");
-		var sMonthTooltip = `${this._oResourceBundle.getText("CALENDAR_HEADER_MONTH_BUTTON", sAriaLabel)} (${sMonthShortcut})`;
+		var sMonthTooltip = `${this._oResourceBundle.getText("CALENDAR_HEADER_MONTH_BUTTON", [sAriaLabel])} (${sMonthShortcut})`;
 
 		oHeader.setTextButton1(sText);
 		oHeader.setAriaLabelButton1(sMonthLabel);
@@ -2198,8 +2198,8 @@ sap.ui.define([
 		oHeader._setTextButton3(sLastMonthName);
 		// Set properties for second month button (button3) when multiple months are displayed
 		if (aMonths.length > 1) {
-			var sLastMonthLabel = this._oResourceBundle.getText("CALENDAR_HEADER_MONTH_BUTTON", sLastMonthName);
-			var sLastMonthTooltip = `${this._oResourceBundle.getText("CALENDAR_HEADER_MONTH_BUTTON", sLastMonthName)} (${sMonthShortcut})`;
+			var sLastMonthLabel = this._oResourceBundle.getText("CALENDAR_HEADER_MONTH_BUTTON", [sLastMonthName]);
+			var sLastMonthTooltip = `${this._oResourceBundle.getText("CALENDAR_HEADER_MONTH_BUTTON", [sLastMonthName])} (${sMonthShortcut})`;
 			oHeader._setAriaLabelButton3(sLastMonthLabel);
 			oHeader.setProperty("_tooltipButton3", sLastMonthTooltip);
 			oHeader.setProperty("_keyShortcutButton3", sMonthShortcut);
@@ -2209,8 +2209,8 @@ sap.ui.define([
 
 		// Set accessibility properties for second month header's month button (button1) when multiple months are displayed
 		if (aMonths.length > 1) {
-			var sSecondMonthLabel = this._oResourceBundle.getText("CALENDAR_HEADER_MONTH_BUTTON", sLastMonthName);
-			var sSecondMonthTooltip = `${this._oResourceBundle.getText("CALENDAR_HEADER_MONTH_BUTTON", sLastMonthName)} (${sMonthShortcut})`;
+			var sSecondMonthLabel = this._oResourceBundle.getText("CALENDAR_HEADER_MONTH_BUTTON", [sLastMonthName]);
+			var sSecondMonthTooltip = `${this._oResourceBundle.getText("CALENDAR_HEADER_MONTH_BUTTON", [sLastMonthName])} (${sMonthShortcut})`;
 			oSecondMonthHeader.setAriaLabelButton1(sSecondMonthLabel);
 			oSecondMonthHeader.setProperty("_tooltipButton1", sSecondMonthTooltip);
 			oSecondMonthHeader.setProperty("_keyShortcutButton1", sMonthShortcut);
@@ -2617,9 +2617,9 @@ sap.ui.define([
 		var sYearRangeShortcut = this._oResourceBundle.getText("CALENDAR_HEADER_YEAR_RANGE_BUTTON_SHORTCUT");
 
 		// Regular year button labels and tooltips
-		var sFirstYearLabel = this._oResourceBundle.getText("CALENDAR_HEADER_YEAR_BUTTON", sFirstHeaderText);
+		var sFirstYearLabel = this._oResourceBundle.getText("CALENDAR_HEADER_YEAR_BUTTON", [sFirstHeaderText]);
 		var sFirstYearTooltip = `${sFirstYearLabel} (${sYearShortcut})`;
-		var sSecondYearLabel = this._oResourceBundle.getText("CALENDAR_HEADER_YEAR_BUTTON", sSecondHeaderText);
+		var sSecondYearLabel = this._oResourceBundle.getText("CALENDAR_HEADER_YEAR_BUTTON", [sSecondHeaderText]);
 		var sSecondYearTooltip = `${sSecondYearLabel} (${sYearShortcut})`;
 
 		// Year range labels and tooltips (will be updated if in year picker mode)
@@ -2750,7 +2750,7 @@ sap.ui.define([
 		// Set accessibility properties for button4 (same as in _updateHeadersYearPrimaryText)
 		if (sYear) {
 			sYearShortcut = this._oResourceBundle.getText("CALENDAR_HEADER_YEAR_BUTTON_SHORTCUT");
-			sYearLabel = this._oResourceBundle.getText("CALENDAR_HEADER_YEAR_BUTTON", sYear);
+			sYearLabel = this._oResourceBundle.getText("CALENDAR_HEADER_YEAR_BUTTON", [sYear]);
 			sYearTooltip = `${sYearLabel} (${sYearShortcut})`;
 
 			oHeader.setProperty("_tooltipButton4", sYearTooltip);

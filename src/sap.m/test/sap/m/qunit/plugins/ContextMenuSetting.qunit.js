@@ -183,6 +183,7 @@ sap.ui.define([
 				oItem.focus();
 				oItem.$().trigger("contextmenu");
 				assert.ok(this.oTable.getContextMenu().isOpen(), "Context menu is open");
+				oItem.$().trigger("contextmenu");
 				return oItem;
 			};
 
