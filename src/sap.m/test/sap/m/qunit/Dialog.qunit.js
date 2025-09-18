@@ -1460,6 +1460,34 @@ sap.ui.define([
 		oDialog.destroy();
 	});
 
+	QUnit.test("Header focus is preserved after invalidation", function (assert) {
+		this.clock.restore();
+		const done = assert.async();
+		const oDialog = new Dialog({
+			title: "Test Dialog",
+			draggable: true,
+			content: [
+				new Button("btn1", {
+					text: "Button 1"
+				})
+			]
+		});
+
+		oDialog.open();
+		oDialog.attachAfterOpen(async () => {
+			assert.ok(document.activeElement?.classList.contains("sapMDialogTitleGroup"), "Focus should be set to the header");
+
+			// Act
+			oDialog.invalidate();
+			await nextUIUpdate();
+
+			assert.ok(document.activeElement?.classList.contains("sapMDialogTitleGroup"), "Header focus should be preserved");
+
+			oDialog.destroy();
+			done();
+		});
+	});
+
 	QUnit.test("Container Padding Classes", function (assert) {
 		// System under Test + Act
 		var oContainer = new Dialog(),

@@ -78,8 +78,10 @@ sap.ui.define([
 		this._original_openAsContextMenu = oMenu.openAsContextMenu;
 
 		oMenu.openAsContextMenu = function(oEvent, vActiveItem) {
+			const oRetVal = that._original_openAsContextMenu.apply(this, arguments);
+
 			if (that.getScope() !== ContextMenuScope.Selection) {
-				return that._original_openAsContextMenu.apply(this, arguments);
+				return oRetVal;
 			}
 
 			const oControl = that.getControl();
@@ -102,7 +104,8 @@ sap.ui.define([
 					oItem.removeStyleClass("sapMContextMenuSettingContentOpacity");
 				});
 			});
-			return that._original_openAsContextMenu.apply(this, arguments);
+
+			return oRetVal;
 		};
 	};
 

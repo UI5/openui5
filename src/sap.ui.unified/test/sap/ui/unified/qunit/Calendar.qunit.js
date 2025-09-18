@@ -2585,7 +2585,7 @@ sap.ui.define([
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
 
 		// Expected aria-label should be in format "Month {monthName}" from resource bundle
-		sExpectedAriaLabel = oResourceBundle.getText("CALENDAR_HEADER_MONTH_BUTTON", oCalendar.$("-Head-B1").text());
+		sExpectedAriaLabel = oResourceBundle.getText("CALENDAR_HEADER_MONTH_BUTTON", [oCalendar.$("-Head-B1").text()]);
 		assert.equal(oCalendar.$("-Head-B1").attr("aria-label"), sExpectedAriaLabel, "aria-label should be in format 'Month {monthName}'");
 
 		// act
@@ -2593,7 +2593,7 @@ sap.ui.define([
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
 
 		// assert
-		sExpectedAriaLabel = oResourceBundle.getText("CALENDAR_HEADER_MONTH_BUTTON", oCalendar.$("-Head-B1").text());
+		sExpectedAriaLabel = oResourceBundle.getText("CALENDAR_HEADER_MONTH_BUTTON", [oCalendar.$("-Head-B1").text()]);
 		assert.equal(oCalendar.$("-Head-B1").attr("aria-label"), sExpectedAriaLabel, "aria-label should be in format 'Month {monthName}'");
 
 		// cleanup
@@ -2620,7 +2620,7 @@ sap.ui.define([
 		oResourceBundle = oCalendar._oResourceBundle;
 		sExpectedSecondaryInfo = getExpectedSecondaryMonthARIAInfo(oCalendar, "Islamic", "Gregorian");
 		// aria-label should now be in format "Month {monthName}, {secondaryInfo}"
-		sExpectedAriaLabel = oResourceBundle.getText("CALENDAR_HEADER_MONTH_BUTTON", oCalendar.$("-Head-B1-Text").text()) + ", " +  sExpectedSecondaryInfo;
+		sExpectedAriaLabel = oResourceBundle.getText("CALENDAR_HEADER_MONTH_BUTTON", [oCalendar.$("-Head-B1-Text").text()]) + ", " +  sExpectedSecondaryInfo;
 		assert.equal(oCalendar.$("-Head-B1").attr("aria-label"), sExpectedAriaLabel,
 			"aria-label should contain info for both primary and secondary month in format 'Month {monthName}, {secondaryInfo}'");
 
@@ -2630,7 +2630,7 @@ sap.ui.define([
 
 		// assert
 		sExpectedSecondaryInfo = getExpectedSecondaryMonthARIAInfo(oCalendar, "Islamic", "Gregorian");
-		sExpectedAriaLabel = oResourceBundle.getText("CALENDAR_HEADER_MONTH_BUTTON", oCalendar.$("-Head-B1-Text").text()) + ", " + sExpectedSecondaryInfo;
+		sExpectedAriaLabel = oResourceBundle.getText("CALENDAR_HEADER_MONTH_BUTTON", [oCalendar.$("-Head-B1-Text").text()]) + ", " + sExpectedSecondaryInfo;
 		assert.equal(oCalendar.$("-Head-B1").attr("aria-label"), sExpectedAriaLabel,
 			"aria-label should contain info for the updated primary and secondary month in format 'Month {monthName}, {secondaryInfo}'");
 
@@ -3081,7 +3081,7 @@ sap.ui.define([
 				oGetAggregationStub = this.stub(oCalendar, "getAggregation"),
 				oResourceBundle = oCalendar._oResourceBundle,
 				sExpectedShortcut = oResourceBundle.getText("CALENDAR_HEADER_YEAR_BUTTON_SHORTCUT"),
-				sExpectedLabel = oResourceBundle.getText("CALENDAR_HEADER_YEAR_BUTTON", sExpectedValue),
+				sExpectedLabel = oResourceBundle.getText("CALENDAR_HEADER_YEAR_BUTTON", [sExpectedValue]),
 				sExpectedTooltip = sExpectedLabel + " (" + sExpectedShortcut + ")";
 
 		oGetAggregationStub.withArgs("header").returns(oHeader);

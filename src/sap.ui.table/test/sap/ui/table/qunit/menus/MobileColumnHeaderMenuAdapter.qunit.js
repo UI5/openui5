@@ -351,9 +351,9 @@ sap.ui.define([
 		Device.system.desktop = false;
 
 		await this.openColumnMenu(0);
-		const oMenu = oTable.getColumns()[0].getHeaderMenuInstance();
-		const oQuickResize = this.getQuickAction(oMenu, "QuickAction")[2];
-		const aContent = oQuickResize.getContent();
+		let oMenu = oTable.getColumns()[0].getHeaderMenuInstance();
+		let oQuickResize = this.getQuickAction(oMenu, "QuickAction")[2];
+		let aContent = oQuickResize.getContent();
 
 		const sLabel = Library.getResourceBundleFor("sap.m").getText("table.COLUMNMENU_RESIZE");
 		assert.strictEqual(oQuickResize.getLabel(), sLabel, "label is correct");
@@ -364,6 +364,24 @@ sap.ui.define([
 		qutils.triggerMouseEvent(aContent[0].getId(), "click");
 
 		assert.ok(oTable.$().hasClass("sapUiTableResizing") && oTable.$("rsz").hasClass("sapUiTableColRszActive"), "Resizing started");
+		const oTableRect = oTable.getDomRef().getBoundingClientRect();
+		let oColumnRect = oTable.getColumns()[0].getDomRef().getBoundingClientRect();
+		assert.equal(oTable.$("rsz").css("left"), oColumnRect.left - oTableRect.left + oColumnRect.width + "px",
+			"Resizer is at the correct position");
+		assert.equal(oTable.$("rsz").get(0).getBoundingClientRect().width, 24, "Resizer has the correct width");
+
+		await this.openColumnMenu(1);
+		oMenu = oTable.getColumns()[1].getHeaderMenuInstance();
+		oQuickResize = this.getQuickAction(oMenu, "QuickAction")[2];
+		aContent = oQuickResize.getContent();
+
+		qutils.triggerMouseEvent(aContent[0].getId(), "mousedown", null, null, null, null, 0);
+		qutils.triggerMouseEvent(aContent[0].getId(), "click");
+
+		assert.ok(oTable.$().hasClass("sapUiTableResizing") && oTable.$("rsz").hasClass("sapUiTableColRszActive"), "Resizing started");
+		oColumnRect = oTable.getColumns()[1].getDomRef().getBoundingClientRect();
+		assert.equal(oTable.$("rsz").css("left"), oColumnRect.left - oTableRect.left + oColumnRect.width + "px",
+			"Resizer is at the correct position");
 
 		Device.support.pointer = bOriginalPointerSupport;
 		Device.system.desktop = bOriginalDesktopSupport;

@@ -28,6 +28,13 @@ sap.ui.define([
 			reference: sReference
 		});
 	}
+	function cleanup() {
+		FlexState.clearState();
+		FlexState.clearRuntimeSteadyObjects(sReference, sComponentId);
+		CompVariantManagementState.getCompEntitiesDataSelector().clearCachedResult({ reference: sReference });
+		CompVariantManagementState.getSetDefaultDataSelector().clearCachedResult({ reference: sReference });
+		sandbox.restore();
+	}
 
 	function stubFlexObjectsSelector(aFlexObjects) {
 		const oFlexObjectsSelector = FlexState.getFlexObjectsDataSelector();
@@ -43,7 +50,7 @@ sap.ui.define([
 			await initializeFlexState();
 		},
 		afterEach() {
-			sandbox.restore();
+			cleanup();
 		}
 	}, function() {
 		QUnit.test("with a stored setDefaultVariant change for the persistency key", function(assert) {
@@ -101,13 +108,13 @@ sap.ui.define([
 		});
 
 		QUnit.test("with one stored setDefaultVariant change and another variant change for the same persistency key", function(assert) {
-			const sPersitencyKey = "id1";
+			const sPersistencyKey = "id1";
 			const oSetDefaultChange1 = FlexObjectFactory.createFromFileContent({
 				reference: "myApp",
 				fileType: "change",
 				changeType: "defaultVariant",
 				selector: {
-					persistencyKey: sPersitencyKey
+					persistencyKey: sPersistencyKey
 				},
 				layer: Layer.CUSTOMER
 			});
@@ -117,14 +124,30 @@ sap.ui.define([
 				fileType: "change",
 				changeType: "setContent",
 				selector: {
-					persistencyKey: sPersitencyKey,
+					persistencyKey: sPersistencyKey,
 					variantId: "hugo"
 				},
 				layer: Layer.USER
 			});
 			stubFlexObjectsSelector([oSetDefaultChange1, oSetDefaultChange2]);
 			assert.deepEqual(CompVariantManagementState.getDefaultChanges(
-				{reference: "myApp", persistencyKey: sPersitencyKey}), [oSetDefaultChange1], "the first set default change gets returned");
+				{reference: "myApp", persistencyKey: sPersistencyKey}), [oSetDefaultChange1], "the first set default change gets returned");
+		});
+
+		QUnit.test("with one stored setDefaultVariant change with an empty string as persistency key", function(assert) {
+			const sPersistencyKey = "";
+			const oSetDefaultChange1 = FlexObjectFactory.createFromFileContent({
+				reference: "myApp",
+				fileType: "change",
+				changeType: "defaultVariant",
+				selector: {
+					persistencyKey: sPersistencyKey
+				},
+				layer: Layer.CUSTOMER
+			});
+			stubFlexObjectsSelector([oSetDefaultChange1]);
+			assert.deepEqual(CompVariantManagementState.getDefaultChanges(
+				{reference: "myApp", persistencyKey: sPersistencyKey}), [oSetDefaultChange1], "the set default change gets returned");
 		});
 	});
 
@@ -133,7 +156,7 @@ sap.ui.define([
 			await initializeFlexState();
 		},
 		afterEach() {
-			sandbox.restore();
+			cleanup();
 		}
 	}, function() {
 		QUnit.test("when called with an special character '#'", function(assert) {
@@ -174,11 +197,11 @@ sap.ui.define([
 			await initializeFlexState();
 		},
 		afterEach() {
-			sandbox.restore();
+			cleanup();
 		}
 	}, function() {
 		QUnit.test("when updateInfo is missing", function(assert) {
-			FlexObjectFactory.createFromFileContent({
+			const oUIChange = FlexObjectFactory.createFromFileContent({
 				reference: "myApp",
 				fileType: "change",
 				changeType: "defaultVariant",
@@ -187,9 +210,10 @@ sap.ui.define([
 				},
 				layer: Layer.CUSTOMER
 			});
+			stubFlexObjectsSelector([oUIChange]);
 			const oDataSelector = CompVariantManagementState.getSetDefaultDataSelector();
 			const oClearCacheSpy = sandbox.spy(oDataSelector, "_clearCache");
-			oDataSelector.checkUpdate({reference: sReference});
+			oDataSelector.checkUpdate({reference: sReference, persistencyKey: sPersistencyKey});
 			assert.strictEqual(oClearCacheSpy.callCount, 1, "then the update happened");
 		});
 
@@ -236,7 +260,7 @@ sap.ui.define([
 			const oDataSelector = CompVariantManagementState.getSetDefaultDataSelector();
 			const oClearCacheSpy = sandbox.spy(oDataSelector, "_clearCache");
 			oDataSelector.checkUpdate(
-				{reference: sReference},
+				{reference: sReference, persistencyKey: sPersistencyKey},
 				[
 					{type: "addFlexObject", updatedObject: oDefaultVariantChange},
 					{type: "removeFlexObject", updatedObject: oDefaultVariantChange}
@@ -314,7 +338,7 @@ sap.ui.define([
 			await initializeFlexState();
 		},
 		afterEach() {
-			sandbox.restore();
+			cleanup();
 		}
 	}, function() {
 		QUnit.test("when changes are present for multiple different persistency keys", async function(assert) {

@@ -880,7 +880,7 @@ sap.ui.define([
 		ExtensionBase.enrich(this, AccExtension); // Must be registered after keyboard to reach correct delegate order
 		ExtensionBase.enrich(this, DragAndDropExtension);
 
-		if (Device.os.ios) {
+		if (Device.os.ios /*iPhone*/ || (Device.os.macintosh && !Device.system.desktop) /*iPad*/) {
 			sap.ui.require(["sap/ui/table/extensions/ScrollingIOS"], function(ScrollingIOSExtension) {
 				if (!this.bIsDestroyed) {
 					ExtensionBase.enrich(this, ScrollingIOSExtension);

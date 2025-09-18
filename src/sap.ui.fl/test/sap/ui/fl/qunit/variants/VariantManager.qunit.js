@@ -399,8 +399,37 @@ sap.ui.define([
 				variantsToBeDeleted: ["variant1", "variant3"]
 			});
 			const oSaveStub = sandbox.stub(FlexObjectManager, "saveFlexObjects");
-			await VariantManager.handleManageEvent({}, {variantManagementReference: sVMReference}, this.oModel);
+			await VariantManager.handleManageEvent(
+				{ getParameter: () => undefined},
+				{variantManagementReference: sVMReference},
+				this.oModel
+			);
 			assert.strictEqual(oSaveStub.callCount, 2, "then saveDirtyChanges is called twice, once for each layer");
+		});
+
+		QUnit.test("when calling 'handleManageEvent' deleting a USER variant", async function(assert) {
+			sandbox.stub(this.oModel, "_collectModelChanges").returns({
+				changes: [{
+					changeType: "setVisible",
+					layer: "USER",
+					variantReference: "variant2",
+					visible: false
+				}],
+				variantsToBeDeleted: ["variant2"]
+			});
+			sandbox.stub(this.oModel, "getCurrentVariantReference").returns("variant2");
+			const oSaveStub = sandbox.stub(FlexObjectManager, "saveFlexObjects");
+			const oGetDefaultVariantReferenceSpy = sandbox.spy(VariantManagementState, "getDefaultVariantReference");
+			const oUpdateCurrentVariantSpy = sandbox.spy(this.oModel, "updateCurrentVariant");
+			await VariantManager.handleManageEvent(
+				{ getParameter: () => undefined},
+				{variantManagementReference: sVMReference},
+				this.oModel
+			);
+			assert.strictEqual(oSaveStub.callCount, 1, "then saveDirtyChanges is called once");
+			assert.strictEqual(oGetDefaultVariantReferenceSpy.callCount, 1, "then default variant is requested");
+			assert.strictEqual(oUpdateCurrentVariantSpy.callCount, 1, "then current variant is updated");
+			assert.strictEqual(oUpdateCurrentVariantSpy.lastCall.args[0].newVariantReference, "variant1", "to the default variant");
 		});
 
 		QUnit.test("when calling 'handleSaveEvent' with parameter from SaveAs button and default/execute box checked", async function(assert) {

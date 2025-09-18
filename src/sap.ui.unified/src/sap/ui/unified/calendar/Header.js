@@ -125,84 +125,72 @@ sap.ui.define([
 
 			/**
 			 * Tooltip of the first button (normally month) - private property
-			 * @restricted sap.ui.unified.Calendar
 			 * @private
 			 */
 			_tooltipButton1 : {type : "string", group : "Misc", visibility: "hidden"},
 
 			/**
 			 * Tooltip of the second button (normally year) - private property
-			 * @restricted sap.ui.unified.Calendar
 			 * @private
 			 */
 			_tooltipButton2 : {type : "string", group : "Misc", visibility: "hidden"},
 
 			/**
 			 * Keyboard shortcut of the first button (normally month) - private property
-			 * @restricted sap.ui.unified.Calendar
 			 * @private
 			 */
 			_keyShortcutButton1 : {type : "string", group : "Misc", visibility: "hidden"},
 
 			/**
 			 * Keyboard shortcut of the second button (normally year) - private property
-			 * @restricted sap.ui.unified.Calendar
 			 * @private
 			 */
 			_keyShortcutButton2 : {type : "string", group : "Misc", visibility: "hidden"},
 
 			/**
 			 * Description of the first button (normally month) - private property used for aria-description
-			 * @restricted sap.ui.unified.Calendar
 			 * @private
 			 */
 			_descriptionButton1 : {type : "string", group : "Misc", visibility: "hidden"},
 
 			/**
 			 * Description of the second button (normally year) - private property used for aria-description
-			 * @restricted sap.ui.unified.Calendar
 			 * @private
 			 */
 			_descriptionButton2 : {type : "string", group : "Misc", visibility: "hidden"},
 
 			/**
 			 * Tooltip of the third button (normally second month) - private property
-			 * @restricted sap.ui.unified.Calendar
 			 * @private
 			 */
 			_tooltipButton3 : {type : "string", group : "Misc", visibility: "hidden"},
 
 			/**
 			 * Tooltip of the fourth button (normally second year) - private property
-			 * @restricted sap.ui.unified.Calendar
 			 * @private
 			 */
 			_tooltipButton4 : {type : "string", group : "Misc", visibility: "hidden"},
 
 			/**
 			 * Keyboard shortcut of the third button (normally second month) - private property
-			 * @restricted sap.ui.unified.Calendar
 			 * @private
 			 */
 			_keyShortcutButton3 : {type : "string", group : "Misc", visibility: "hidden"},
 
 			/**
 			 * Keyboard shortcut of the fourth button (normally second year) - private property
-			 * @restricted sap.ui.unified.Calendar
 			 * @private
 			 */
 			_keyShortcutButton4 : {type : "string", group : "Misc", visibility: "hidden"},
 
 			/**
 			 * Description of the third button (normally second month) - private property used for aria-description
-			 * @restricted sap.ui.unified.Calendar
 			 * @private
 			 */
 			_descriptionButton3 : {type : "string", group : "Misc", visibility: "hidden"},
 
 			/**
 			 * Description of the fourth button (normally second year) - private property used for aria-description
-			 * @restricted sap.ui.unified.Calendar
 			 * @private
 			 */
 			_descriptionButton4 : {type : "string", group : "Misc", visibility: "hidden"}

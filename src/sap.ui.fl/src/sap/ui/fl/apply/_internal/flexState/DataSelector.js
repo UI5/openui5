@@ -120,7 +120,7 @@ sap.ui.define([
 			const sParameterValue = getParameterValue(oCurrentDataSelector);
 			// If no parameter value is provided for the last child selector in the chain
 			// skip it, start with its parent and thus return the whole cache entry
-			if (sParameterValue || oCurrentDataSelector !== oLowestDataSelector) {
+			if (sParameterValue !== undefined || oCurrentDataSelector !== oLowestDataSelector) {
 				if (sParameterValue === undefined) {
 					throw new Error(`Parameter '${oCurrentDataSelector.getParameterKey()}' is missing`);
 				}
@@ -241,7 +241,7 @@ sap.ui.define([
 	 */
 	DataSelector.prototype.get = function(mParameters) {
 		var sParameterKey = this.getParameterKey();
-		if (sParameterKey && !(mParameters || {})[sParameterKey]) {
+		if (sParameterKey && mParameters?.[sParameterKey] === undefined) {
 			throw new Error(`Parameter '${sParameterKey}' is missing`);
 		}
 		var vResult = this._getParameterizedCachedResult(mParameters);

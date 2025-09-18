@@ -12,6 +12,38 @@ sap.ui.define([
 	"use strict";
 
 	/**
+	 * Modules for form-like controls.
+	 *
+	 * Use {@link sap.ui.layout.form.Form Form} if you want to do the following:
+	 * <ul>
+	 * <li>Create a highly customized form</li>
+	 * <li>Display a large amount of data in a form</li>
+	 * <li>Create complex forms with multiple sections and different types of input fields</li>
+	 * <li>Have granular control over the structure of a form</li>
+	 * <li>Manage the responsiveness of the form yourself</li>
+	 * </ul>
+	 *
+	 * Use {@link sap.ui.layout.form.SimpleForm SimpleForm} if you want to do the following:
+	 * <ul>
+	 * <li>Use a very simple structure of a form in a straightforward way</li>
+	 * <li>Create a form quickly and easily</li>
+	 * <li>Use a form that is automatically responsive</li>
+	 * </ul>
+	 *
+	 * <b>Recommendations</b>
+	 * <ul>
+	 * <li>Do not nest layouts and forms as nesting can lead to undesired issues.</li>
+	 * <li>Do not use other forms or layout controls.
+	 * Using any other form or layout control (for example, <code>HBox</code>) as children of a <code>Form</code> can lead to issues with accessibility or the responsive design.</li>
+	 * <li>Use the <code>ColumnLayout</code> as <code>Layout</code>, as its responsiveness uses the space available in the best way possible.</li>
+	 * </ul>
+	 * @namespace
+	 * @name sap.ui.layout.form
+	 * @since 1.16.0
+	 * @public
+	 */
+
+	/**
 	 * Constructor for a new sap.ui.layout.form.Form.
 	 *
 	 * @param {string} [sId] ID for the new control, generated automatically if no ID is given
@@ -21,23 +53,23 @@ sap.ui.define([
 	 * A <code>Form</code> control arranges labels and fields (like input fields) into groups and rows.
 	 * There are different ways to visualize forms for different screen sizes.
 	 *
-	 * A <code>Form</code> is structured into <code>FormContainers</code>. Each <code>FormContainer</code> consists of <code>FormElements</code>.
-	 * The <code>FormElements</code> consists of a label and the form fields.
-	 * A <code>Form</code> doesn't render its content by itself. The rendering is done by the assigned <code>FormLayout</code>.
+	 * A <code>Form</code> is structured into <code>FormContainers</code>. Each {@link sap.ui.layout.form.FormContainer FormContainer} consists of <code>FormElements</code>.
+	 * The {@link sap.ui.layout.form.FormElement FormElement} consists of a label and the form fields.
+	 * A <code>Form</code> doesn't render its content on its own. The rendering is done by the assigned {@link sap.ui.layout.form.FormLayout FormLayout}.
 	 * This is so that the rendering can be adopted to new UI requirements without changing the <code>Form</code> itself.
 	 *
-	 * For the content of a <code>Form</code>, <code>VariantLayoutData</code> are supported to allow simple switching of the <code>FormLayout</code>.
+	 * For the content of a <code>Form</code>, {@link sap.ui.core.VariantLayoutData VariantLayoutData} are supported to allow simple switching of the <code>FormLayout</code>.
 	 * <code>LayoutData</code> on the content can be used to overwrite the default layout of the <code>Form</code>.
 	 *
 	 * The <code>Form</code> (and its sub-controls) automatically add label and field assignment to enable screen reader support.
 	 * It also adds keyboard support to navigate between the fields and groups inside the form.
 	 *
-	 * <b>Warning:</b> Do not put any layout or other container controls into the <code>FormElement</code>.
+	 * <b>Warning:</b> Do not put any layout or other container controls into the {@link sap.ui.layout.form.FormElement FormElement}.
 	 * Views are also not supported. This could damage the visual layout, keyboard support and screen-reader support.
 	 *
 	 * If editable controls are used as content, the <code>editable</code> property must be set to <code>true</code>,
 	 * otherwise to <code>false</code>. If the <code>editable</code> property is set incorrectly, there will be visual issues
-	 * like wrong label alignment or wrong spacing between the controls.
+	 * like wrong label alignment or wrong spacing between the controls. In addition to that, wrong screen reader announcements might occur.
 	 *
 	 * @extends sap.ui.core.Control
 	 *
@@ -73,6 +105,7 @@ sap.ui.define([
 				 * The labels and fields might be misaligned, the labels might be rendered in the wrong mode,
 				 * and the spacing between the single controls might be wrong.
 				 * Also, controls that do not fit the mode might be rendered incorrectly.
+				 * In addition to that, wrong screen reader announcements might occur.
 				 * @since 1.20.0
 				 */
 				editable : {type : "boolean", group : "Misc", defaultValue : false}

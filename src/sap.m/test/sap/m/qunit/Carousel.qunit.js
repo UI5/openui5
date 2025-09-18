@@ -2227,12 +2227,11 @@ sap.ui.define([
 			 fnPageChangedSpy = sinon.spy(oCarousel, 'firePageChanged');
 
 		this.oDialog.attachAfterOpen(function () {
-			this.oDialog._setInitialFocus();
+			assert.ok(oCarousel.getDomRef().contains(document.activeElement), "Focus is applied in carousel");
 			assert.ok(fnPageChangedSpy.notCalled, "pageChanged event is not fired");
 			fnPageChangedSpy.restore();
 			done();
-
-		}.bind(this));
+		});
 
 		this.oDialog.open();
 		this.clock.tick(3000);

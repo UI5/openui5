@@ -397,7 +397,7 @@ sap.ui.define([
 	MobileColumnHeaderMenuAdapter.prototype._prepareQuickResize = function(oColumn) {
 		if (!Device.system.desktop && oColumn.getResizable()) {
 			if (!this._oQuickResize) {
-				this._oQuickResize = this._createQuickResize(oColumn);
+				this._oQuickResize = this._createQuickResize();
 			}
 			this._oQuickResize.setVisible(true);
 		} else if (this._oQuickResize) {
@@ -405,7 +405,7 @@ sap.ui.define([
 		}
 	};
 
-	MobileColumnHeaderMenuAdapter.prototype._createQuickResize = function(oColumn) {
+	MobileColumnHeaderMenuAdapter.prototype._createQuickResize = function() {
 		const oSapMResourceBundle = Library.getResourceBundleFor("sap.m");
 		const sLabel = oSapMResourceBundle.getText("table.COLUMNMENU_RESIZE");
 
@@ -415,7 +415,7 @@ sap.ui.define([
 				icon: "sap-icon://resize-horizontal",
 				tooltip: sLabel,
 				press: [function(oEvent) {
-					this._startColumnResize(oColumn);
+					this._startColumnResize(this._oColumn);
 					this._oMenu.close();
 				}, this]
 			})
@@ -423,10 +423,7 @@ sap.ui.define([
 	};
 
 	MobileColumnHeaderMenuAdapter.prototype._startColumnResize = function(oColumn) {
-		const oTable = oColumn._getTable();
-		oTable.$().toggleClass("sapUiTableResizing", true);
-		oTable._$colResize = oTable.$("rsz");
-		oTable._$colResize.toggleClass("sapUiTableColRszActive", true);
+		oColumn._getTable()._getPointerExtension().showColumnResizer(oColumn);
 	};
 
 	MobileColumnHeaderMenuAdapter.prototype._prepareQuickResizeInput = function(oColumn) {

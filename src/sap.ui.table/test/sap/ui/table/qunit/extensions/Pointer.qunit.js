@@ -30,6 +30,7 @@ sap.ui.define([
 	const createTables = window.createTables;
 	const destroyTables = window.destroyTables;
 	const getCell = window.getCell;
+	const getColumnHeader = window.getColumnHeader;
 	const getRowHeader = window.getRowHeader;
 	const getRowAction = window.getRowAction;
 	const iNumberOfRows = window.iNumberOfRows;
@@ -331,13 +332,66 @@ sap.ui.define([
 		}
 	});
 
+	QUnit.test("Column header long press doesn't open menu", async function(assert) {
+		const oSettings = computeSettingsForReordering(oTable, 2, true);
+		const oColumn = oSettings.column;
+		const oOpenHeaderMenuSpy = this.spy(oColumn, "_openHeaderMenu");
+
+		assert.equal(oTable.indexOfColumn(oColumn), 2, "Initial index of column");
+
+		qutils.triggerMouseEvent(oColumn.$(), "mousedown", 1, 1, oSettings.left, oSettings.top, 0);
+		await TableQUnitUtils.wait(250);
+		assert.ok(oTable._$ReorderGhost, "Column Reordering triggered");
+		assert.ok(oTable.$().hasClass("sapUiTableDragDrop"), "Table has drag drop class");
+
+		qutils.triggerMouseEvent(getColumnHeader(3), "mouseup", 1, 1, oSettings.left, oSettings.top, 0);
+		await TableQUnitUtils.wait(100);
+		assert.ok(oOpenHeaderMenuSpy.notCalled, "_openHeaderMenu is not called");
+	});
+
+	QUnit.test("Resizer position is updated on mousemove only on desktop devices", async function(assert) {
+		function assertResizerPosition(oTable, bUpdated) {
+			const oDomRef = oTable.getDomRef("sapUiTableCnt");
+			const oTableRect = oDomRef.getBoundingClientRect();
+			const oColumn1HeaderRect = oTable._aTableHeaders[0].getBoundingClientRect();
+			const iResizerPositionX = oTable._bRtlMode ? oColumn1HeaderRect.left - oTableRect.left : oColumn1HeaderRect.right - oTableRect.left;
+
+			oTable.$().toggleClass("sapUiTableResizing", true);
+			oTable._$colResize = oTable.$("rsz");
+			oTable._$colResize.toggleClass("sapUiTableColRszActive", true);
+			oTable.$("rsz").css("left", iResizerPositionX + "px");
+
+			const oEvent = jQuery.Event({type: "mousemove"});
+			oEvent.target = oTable.getColumns()[1].getDomRef();
+			const oColumn2HeaderRect = oTable._aTableHeaders[1].getBoundingClientRect();
+			oEvent.clientX = oColumn2HeaderRect.left + 50;
+			jQuery(oEvent.target).trigger(oEvent);
+
+			const oColumnHeaderRect = bUpdated ? oColumn2HeaderRect : oColumn1HeaderRect;
+			assert.equal(oTable.$("rsz").css("left"), oColumnHeaderRect.left - oTableRect.left + oColumnHeaderRect.width + "px",
+				"Resizer is at the correct position");
+		}
+
+		assertResizerPosition(oTable, true);
+
+		destroyTables();
+		const bOriginalDesktopSupport = Device.system.desktop;
+		Device.system.desktop = false;
+		createTables();
+		await nextUIUpdate();
+
+		assertResizerPosition(oTable, false);
+
+		Device.system.desktop = bOriginalDesktopSupport;
+	});
+
 	QUnit.test("Scrollbar", function(assert) {
-		let oEvent = jQuery.Event({type: "mousedown"});
+		const oEvent = jQuery.Event({type: "mousedown"});
 		oEvent.target = oTable._getScrollExtension().getHorizontalScrollbar();
 		oEvent.button = 0;
 		jQuery(oEvent.target).trigger(oEvent);
 		assert.ok(oEvent.isDefaultPrevented(), "Prevent Default of mousedown on horizontal scrollbar");
-		oEvent = jQuery.Event({type: "mousedown"});
+
 		oEvent.target = oTable._getScrollExtension().getVerticalScrollbar();
 		oEvent.button = 0;
 		jQuery(oEvent.target).trigger(oEvent);

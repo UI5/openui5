@@ -141,6 +141,8 @@ html[data-sap-ui-animation^='on'] .sapUiTableColReorderIndicator {
 
 .sapUiTableColRsz.sapUiTableColRszActive {
 	z-index: 5; /* Ensure be above Row Action Area */
+	padding: 0 12px; /* Increase clickable area (width) to 24px */
+	margin: 0 -12px;
 }
 
 html[dir=rtl] .sapUiTableColRsz {
@@ -156,7 +158,12 @@ html.sap-desktop .sapUiTableColRsz:hover {
 
 .sapUiTableColRszActive,
 html.sap-desktop .sapUiTableColRsz.sapUiTableColRszActive:hover {
-	background-color: @_sap_ui_table_DragDrop_ColumnDnDHighlightColor;
+	background: linear-gradient(
+		to left,
+		transparent 0% 40%,
+		@_sap_ui_table_DragDrop_ColumnDnDHighlightColor 40% 60%,
+		transparent 60%
+	);
 	opacity: 1;
 }
 
