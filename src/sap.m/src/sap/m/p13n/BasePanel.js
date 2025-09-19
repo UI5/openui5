@@ -719,16 +719,27 @@ sap.ui.define([
 		}
 	};
 
-	function flattenFilters(aFilters) {
-		return aFilters.reduce((aResult, oFilter) => {
-			const aFilters = oFilter.getFilters();
-			if (aFilters) {
-				aResult.push(...flattenFilters(aFilters));
+	/**
+	 * Evaluates a given filter recursively including its subfilters against a given item.
+	 * @param {sap.ui.model.Filter} oFilter Filter to evaluate
+	 * @param {object} oItem p13n item to evaluate the filter against
+	 * @returns {boolean} Whether the filter matched the item
+	 */
+	function evaluateFilter(oFilter, oItem) {
+		const aSubFilters = oFilter.getFilters && oFilter.getFilters();
+		if (aSubFilters && aSubFilters.length > 0) {
+			if (oFilter.bAnd) {
+				return aSubFilters.every((oSubFilter) => evaluateFilter(oSubFilter, oItem));
 			} else {
-				aResult.push(oFilter);
+				return aSubFilters.some((oSubFilter) => evaluateFilter(oSubFilter, oItem));
 			}
-			return aResult;
-		}, []);
+		} else {
+			let sValue = oItem[oFilter.getPath()];
+			if (typeof sValue === "string") {
+				sValue = sValue.toUpperCase();
+			}
+			return oFilter.getTest()(sValue);
+		}
 	}
 
 	BasePanel.prototype._onSelectionChange = function(oEvent) {
@@ -741,10 +752,18 @@ sap.ui.define([
 		if (sSpecialChangeReason) {
 			let aModelItems = [];
 			if (sSpecialChangeReason === this.CHANGE_REASON_DESELECTALL || sSpecialChangeReason === this.CHANGE_REASON_SELECTALL) {
-				const aFilters = flattenFilters(this._oListControl.getBinding("items").getFilters("Control"));
-				const oFilter = aFilters?.find((oFilter) => oFilter.getPath() === "label");
+				const aFilters = this._oListControl.getBinding("items").getFilters("Control");
+				aModelItems = this.getP13nData();
 
-				aModelItems = this.getP13nData().filter((oItem) => oFilter?.getTest()(oItem.label.toUpperCase()) ?? true).map((oItem) => {
+				if (aFilters.length > 0) {
+					aModelItems = aModelItems.filter((oItem) => {
+						return aFilters.reduce((bResult, oFilter) => {
+							return bResult || evaluateFilter(oFilter, oItem);
+						}, false);
+					});
+				}
+
+				aModelItems = aModelItems.map((oItem) => {
 					oItem[this.PRESENCE_ATTRIBUTE] = sSpecialChangeReason === this.CHANGE_REASON_SELECTALL;
 					return oItem;
 				});

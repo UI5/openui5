@@ -109,7 +109,7 @@ sap.ui.define([
 		 *  Retrieves the externalized state for a given control instance.
 		 *  The retrieved state is equivalent to the <code>getCurrentState</code> API for the given control,
 		 *  after all necessary changes have been applied (for example, variant appliance and <code>p13n, StateUtil</code> changes).
-		 *  After the returned <code>Promise</code> has been resolved, the returned state is in sync with the according
+		 *  After the returned <code>Promise</code> has been resolved, the returned state is in sync with the corresponding
 		 *  state object of the MDC control (for example, <code>filterConditions</code> for the <code>FilterBar</code> control).
 		 *
 		 * @public

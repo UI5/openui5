@@ -29,7 +29,7 @@
                 "@ui5/project",
                 "@ui5/server"
             ],
-            "groupName": "All UI5 Tooling devDependencies"
+            "groupName": "All UI5 CLI devDependencies"
         }
     ]
 }

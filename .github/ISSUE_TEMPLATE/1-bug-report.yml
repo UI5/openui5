@@ -15,7 +15,7 @@ body:
         > You can easily create an MRE using:
         > - An online JavaScript code-sharing platform like [JSBin](https://jsbin.com/neyagus/edit?html,js,output), [Plunker](https://embed.plnkr.co/16J1TFICxbqETCzaxuZ0?preview=README), etc.
         > - One of our [Demo Kit samples](https://sdk.openui5.org/nightly/#/controls) with any necessary code modifications.
-        > - A fork of our [OpenUI5 sample app](https://github.com/SAP/openui5-sample-app).
+        > - A fork of our [OpenUI5 sample app](https://github.com/UI5/sample-app).
         > 
         > Alternatively, share a version of your existing project that has been stripped down to a minimum sufficient to reproduce the issue.  
         > Please do not share real business data or other sensitive information.

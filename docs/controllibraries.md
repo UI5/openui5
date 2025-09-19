@@ -271,7 +271,7 @@ The main JavaScript file of a control contains the metadata object describing th
 
 1.  By convention, the overall control is implemented in an [AMD structure](http://requirejs.org/docs/whyamd.html) ("Asynchronous Module Definition"), so there is a `sap.ui.define` function call wrapping the implementation and passing in all dependencies. Inside the implementation only the passed objects are used, not fully-namespaced global objects. E.g. if a `sap.m.Button` is required, it is added to the `define` function and the inner code only refers to a local `Button` object. This is to allow asynchronous usage and to conform with many tools depending on this structure.
 2.  Usually [the renderer](#the-control-renderer) is not just a static function in the behavior JS file, but a separate JS file. This is technically not mandatory, but a way to keep files smaller and more maintainable.
-3.  The documentation written for the API definition and any public methods is significant because it can be automatically extracted and converted into JSDoc documentation pages (this build step is not yet re-implemented with the UI5 Tooling build, though).
+3.  The documentation written for the API definition and any public methods is significant because it can be automatically extracted and converted into JSDoc documentation pages (this build step is not yet re-implemented with the UI5 CLI build, though).
 4.  To be built and packaged with the library, controls need to be registered in [the library.js file](#libraryjs-file).
 
 #### The AMD syntax

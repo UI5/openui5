@@ -414,7 +414,6 @@ sap.ui.define([
 		assert.ok(oTableUtiLSpy.calledOnce, "TableUtil.announceTableUpdate has been called");
 	});
 
-	// Test: Filter Panel so that x items are shown. Click on Select All checkbox. Remove Filter. Observe that only the filtered items are selected instead of all items.
 	QUnit.test("Select All only affects filtered items, not all items", async function(assert) {
 		// Arrange: Set up panel with 4 items, only 1 will be shown after filtering
 		this.oBasePanel.setP13nData([
@@ -447,14 +446,10 @@ sap.ui.define([
 				resolve();
 			});
 
-			this.oBasePanel._oListControl.fireSelectionChange({
-				listItems: [this.oBasePanel._oListControl.getItems()[0]],
-				selectAll: true
-			});
+			this.oBasePanel._oListControl.selectAll(true);
 		});
 	});
 
-	// Test: All items are selected initally. Filter Panel so that x items are shown. Click on Select All/Deselect All checkbox. Remove Filter. Observe that only the previously filtered items are unselected.
 	QUnit.test("Deselect All only affects filtered items, not all items", async function(assert) {
 		// Arrange: Set up panel with 4 items, all visible initially
 		this.oBasePanel.setP13nData([

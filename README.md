@@ -27,7 +27,7 @@ Get it!
 Go to the [**download page**](https://openui5.org/releases/) and get the complete UI5 runtime
 and the UI5 SDK containing the documentation and many example apps as well as the complete runtime.
 
-Or use [**UI5 Tooling**](https://sap.github.io/ui5-tooling/), the recommended tool for working with OpenUI5! It allows you to manage your framework dependencies and to build optimized packages for all applications, components and libraries. **Get started [here](https://sap.github.io/ui5-tooling/pages/GettingStarted/).**
+Or use [**UI5 CLI**](https://ui5.github.io/cli/), the recommended tool for working with OpenUI5! It allows you to manage your framework dependencies and to build optimized packages for all applications, components and libraries. **Get started [here](https://ui5.github.io/cli/pages/GettingStarted/).**
 
 Get started!
 ------------

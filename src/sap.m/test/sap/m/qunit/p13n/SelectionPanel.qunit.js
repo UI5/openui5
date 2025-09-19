@@ -786,7 +786,6 @@ sap.ui.define([
 		assert.equal(bHideDescriptions, true, "Hide descriptions is set to false by default");
 	});
 
-	// Test: Filter Panel so that x items are shown. Click on Select All checkbox. Remove Filter. Observe that only the filtered items are selected instead of all items.
 	QUnit.test("Check 'Select All' after filtering", function(assert) {
 		// Arrange
 		this.oSelectionPanel.setP13nData(this.getTestData());
@@ -818,6 +817,53 @@ sap.ui.define([
 		assert.equal(aSelectedItems[1].getCells()[0].getItems()[0].getText(), "Field 2", "Field 2 is correctly selected");
 		assert.equal(aSelectedItems[2].getCells()[0].getItems()[0].getText(), "Field 3", "Field 3 is correctly selected");
 		assert.equal(aSelectedItems[3].getCells()[0].getItems()[0].getText(), "Field 4", "Field 4 is correctly selected");
+	});
+
+	QUnit.test("Check 'Select All' with description toggle", async function(assert) {
+		const oP13nData = this.getTestData().map((oItem, iIndex) => {
+			oItem.isRedundant = iIndex == 4;
+			return oItem;
+		});
+
+		// act
+		this.oSelectionPanel.setP13nData(oP13nData);
+		this.oSelectionPanel.setMultiSelectMode(MultiSelectMode.SelectAll);
+
+		await nextUIUpdate();
+
+		// Assert: Initial state. 3 items are selected, 6 items are available.
+		let aSelectedItems = this.oSelectionPanel._oListControl.getSelectedItems();
+		assert.equal(aSelectedItems.length, 3, "Only three items are selected");
+		assert.equal(aSelectedItems[0].getCells()[0].getItems()[0].getText(), "Field 1", "Field 1 is correctly selected");
+		assert.equal(aSelectedItems[1].getCells()[0].getItems()[0].getText(), "Field 2", "Field 2 is correctly selected");
+		assert.equal(aSelectedItems[2].getCells()[0].getItems()[0].getText(), "Field 3", "Field 3 is correctly selected");
+
+		// Act
+		this.oSelectionPanel._oListControl.selectAll(true);
+		await nextUIUpdate();
+
+		// Assert
+		aSelectedItems = this.oSelectionPanel._oListControl.getSelectedItems();
+		assert.equal(aSelectedItems.length, 5, "Only one item is selected");
+		assert.equal(aSelectedItems[0].getCells()[0].getItems()[0].getText(), "Field 1", "Field 1 is correctly selected");
+		assert.equal(aSelectedItems[1].getCells()[0].getItems()[0].getText(), "Field 2", "Field 2 is correctly selected");
+		assert.equal(aSelectedItems[2].getCells()[0].getItems()[0].getText(), "Field 3", "Field 3 is correctly selected");
+		assert.equal(aSelectedItems[3].getCells()[0].getItems()[0].getText(), "Field 4", "Field 4 is correctly selected");
+		assert.equal(aSelectedItems[4].getCells()[0].getItems()[0].getText(), "Field 6", "Field 6 is correctly selected");
+
+		// Act: Show all items including descriptions
+		this.oSelectionPanel._filterList(false, undefined);
+		this.oSelectionPanel.getModel(this.oSelectionPanel.P13N_MODEL).setProperty("/hideDescriptions", true);
+		await nextUIUpdate();
+
+		// Assert: 5 items should still only be shown (description was not selected as it was hidden)
+		aSelectedItems = this.oSelectionPanel._oListControl.getSelectedItems();
+		assert.equal(aSelectedItems.length, 5, "Only four items are selected");
+		assert.equal(aSelectedItems[0].getCells()[0].getItems()[0].getText(), "Field 1", "Field 1 is correctly selected");
+		assert.equal(aSelectedItems[1].getCells()[0].getItems()[0].getText(), "Field 2", "Field 2 is correctly selected");
+		assert.equal(aSelectedItems[2].getCells()[0].getItems()[0].getText(), "Field 3", "Field 3 is correctly selected");
+		assert.equal(aSelectedItems[3].getCells()[0].getItems()[0].getText(), "Field 4", "Field 4 is correctly selected");
+		assert.equal(aSelectedItems[4].getCells()[0].getItems()[0].getText(), "Field 6", "Field 6 is correctly selected");
 	});
 
 	QUnit.test("Check 'Deselect All' after filtering", async function(assert) {
@@ -867,5 +913,42 @@ sap.ui.define([
 		assert.equal(aSelectedItems.length, 2, "Only two items are selected");
 		assert.equal(aSelectedItems[0].getCells()[0].getItems()[0].getText(), "Field 1", "Field 1 is correctly selected");
 		assert.equal(aSelectedItems[1].getCells()[0].getItems()[0].getText(), "Field 3", "Field 2 is correctly selected");
+	});
+
+	QUnit.test("Check 'Deselect All' with description toggle", async function(assert) {
+		const oP13nData = this.getTestData().map((oItem, iIndex) => {
+			oItem.isRedundant = iIndex == 4;
+			return oItem;
+		});
+		oP13nData[4].visible = true;
+
+		// act
+		this.oSelectionPanel.setP13nData(oP13nData);
+		await nextUIUpdate();
+
+		// Assert: Initial state. 3 items are selected, 5 items are visible (6 total).
+		let aSelectedItems = this.oSelectionPanel._oListControl.getSelectedItems();
+		assert.equal(aSelectedItems.length, 3, "Only three items are selected");
+		assert.equal(aSelectedItems[0].getCells()[0].getItems()[0].getText(), "Field 1", "Field 1 is correctly selected");
+		assert.equal(aSelectedItems[1].getCells()[0].getItems()[0].getText(), "Field 2", "Field 2 is correctly selected");
+		assert.equal(aSelectedItems[2].getCells()[0].getItems()[0].getText(), "Field 3", "Field 3 is correctly selected");
+
+		// Act
+		this.oSelectionPanel._oListControl.removeSelections(true, true);
+		await nextUIUpdate();
+
+		// Assert
+		aSelectedItems = this.oSelectionPanel._oListControl.getSelectedItems();
+		assert.equal(aSelectedItems.length, 0, "No visible items are selected");
+
+		// Act: Show all items including descriptions
+		this.oSelectionPanel._filterList(false, undefined);
+		this.oSelectionPanel.getModel(this.oSelectionPanel.P13N_MODEL).setProperty("/hideDescriptions", false);
+		await nextUIUpdate();
+
+		// Assert: 1 item should still only be shown (description was selected as it was hidden)
+		aSelectedItems = this.oSelectionPanel._oListControl.getSelectedItems();
+		assert.equal(aSelectedItems.length, 1, "Only one item is selected");
+		assert.equal(aSelectedItems[0].getCells()[0].getItems()[0].getText(), "Field 5", "Field 5 is correctly selected");
 	});
 });

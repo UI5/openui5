@@ -39,7 +39,7 @@ sap.ui.define([
 				sPath = "/ProductSet('HT-1021')/ToSupplier",
 				oViewContainer = new VBox({
 					items : [
-						new Title({text : "Run this code sample with UI5 Tooling. "
+						new Title({text : "Run this code sample with UI5 CLI. "
 							+ "See the example in 'XML Templating' in the Demo Kit.",
 							titleStyle : TitleLevel.H3})
 					]
