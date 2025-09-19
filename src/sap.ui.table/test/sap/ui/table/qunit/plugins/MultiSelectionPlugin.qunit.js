@@ -1267,6 +1267,30 @@ sap.ui.define([
 		});
 	});
 
+	QUnit.test("Select All when count is not available and context length is lower than the limit", async function(assert) {
+		const oTable = this.oTable;
+		const oSelectionPlugin = oTable._getSelectionPlugin();
+
+		const oSelectionChangeSpy = sinon.spy();
+		oSelectionPlugin.attachSelectionChange(oSelectionChangeSpy);
+
+		await oTable.qunit.whenRenderingFinished();
+		assert.equal(oSelectionPlugin.getRenderConfig().headerSelector.type, "custom", "The headerSelector type is correct");
+
+		sinon.stub(oSelectionPlugin, "_getHighestSelectableIndex").returns(250); // simulate count is not available
+
+		await new Promise(function(resolve) {
+			oSelectionPlugin.attachEventOnce("selectionChange", resolve);
+			oSelectionPlugin.onHeaderSelectorPress();
+		});
+
+		assert.ok(oSelectionChangeSpy.calledOnce, "The \"selectionChange\" event was fired once");
+		assert.deepEqual(oSelectionChangeSpy.getCall(0).args[0].getParameter("rowIndices"), [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+			"The \"rowIndices\" parameter is correct");
+		assert.equal(oSelectionChangeSpy.getCall(0).args[0].getParameter("limitReached"), false, "The \"limitReached\" parameter is correct");
+		assert.equal(oTable.getFirstVisibleRow(), 0, "The table is not scrolled because the limit is not reached");
+	});
+
 	QUnit.test("Scroll position", async function(assert) {
 		const oSelectionPlugin = this.oTable._getSelectionPlugin();
 		const oSelectionSpy = sinon.spy(oSelectionPlugin, "addSelectionInterval");
