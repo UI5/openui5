@@ -689,6 +689,25 @@ sap.ui.define([
 		oDDR.destroy();
 	});
 
+	QUnit.test("last/next x - 'Current Unit of Time' label for RadioButtonGroup", function(assert) {
+		const oDDR = new DynamicDateRange();
+		oDDR.setStandardOptions(["LASTMONTHS", "LASTMONTHSINCLUDED"]);
+
+		const oOptionLastMonths = new StandardDynamicDateOption({ key: "LASTMONTHS" });
+
+		const aInputControls = oOptionLastMonths.createValueHelpUI(oDDR, oDDR._updateInternalControls.bind(oDDR));
+		oDDR.aInputControls = aInputControls;
+		oOptionLastMonths.alignValueHelpUI(oDDR);
+
+		const oLabel = aInputControls[5];
+		const oRadioButtonGroup = aInputControls[5];
+
+		assert.equal(oLabel.getIdForLabel(), oRadioButtonGroup.getId(), "RadioButtonGroup is correctly assigned to the label");
+
+		oOptionLastMonths.destroy();
+		oDDR.destroy();
+	});
+
 	QUnit.test("today -x/+y creating and validating the option UI", function(assert) {
 		this.ddr.open();
 		this.ddr.addStandardOption("TODAYFROMTO");

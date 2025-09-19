@@ -20,12 +20,12 @@
 				For productive environments they should all be bundled into one single file called Component-preload.js.
 			</p>
 			<p>
-				The recommended way to generate Component-preload.js is to use the <a href="https://sap.github.io/ui5-tooling" target="_blank" rel="noopener noreferrer">UI5 Tooling</a>.
+				The recommended way to generate Component-preload.js is to use the <a href="https://ui5.github.io/cli" target="_blank" rel="noopener noreferrer">UI5 CLI</a>.
 				To generate the bundle, follow these steps:
 			</p>
 			<ol>
 				<li>Initiate an NPM project with <code>npm init</code></li>
-				<li>Add dev dependency to the UI5 Tooling - <code>npm install @ui5/cli --save-dev</code></li>
+				<li>Add dev dependency to the UI5 CLI - <code>npm install @ui5/cli --save-dev</code></li>
 				<li>
 					Add build script into the generated "package.json" file -
 					<pre class="lang-json">
@@ -80,7 +80,7 @@ yourCardPackage
 				</li>
 			</ol>
 			<p>
-				<b>Note:</b> By default, the UI5 Tooling also includes the "dt" folder into the Component-preload.js.
+				<b>Note:</b> By default, the UI5 CLI also includes the "dt" folder into the Component-preload.js.
 				As it is used only during card configuration, you have to remove the "dt" folder.
 			</p>
 			<pre class="lang-yaml">
@@ -90,8 +90,8 @@ builder:
       - "your/component/card/dt/*"
 </pre>
 			<p>
-				There are many options provided by the UI5 Tooling that the card developer should use to create the most optimal preload for his card.
-				For more information, see <a href="https://sap.github.io/ui5-tooling/stable/pages/Configuration" rel="noopener noreferrer" target="_blank">UI5 Tooling - Configuration</a> section.
+				There are many options provided by the UI5 CLI that the card developer should use to create the most optimal preload for his card.
+				For more information, see <a href="https://ui5.github.io/cli/stable/pages/Configuration" rel="noopener noreferrer" target="_blank">UI5 CLI - Configuration</a> section.
 			</p>
 
 			<h2 id="example">Example</h2>

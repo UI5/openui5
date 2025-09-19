@@ -2,12 +2,12 @@
 Developing OpenUI5 (older versions)
 ==============
 
-This page explains the initial setup, development workflow, and test execution for older versions of OpenUI5, leveraging the former [UI5 Tooling 2.x](https://sap.github.io/ui5-tooling/v2/). The standard setup for OpenUI5 1.113 an upwards is based on [UI5 Tooling 3.x](https://sap.github.io/ui5-tooling/v3/) and explained in a revised version of [Developing OpenUI5](./developing.md).
+This page explains the initial setup, development workflow, and test execution for older versions of OpenUI5, leveraging the former [UI5 CLI 2.x](https://ui5.github.io/cli/v2/). The standard setup for OpenUI5 1.113 an upwards is based on [UI5 CLI 3.x](https://ui5.github.io/cli/v3/) and explained in a revised version of [Developing OpenUI5](./developing.md).
 
 
 Setting up the OpenUI5 Development Environment
 ------------------------------------------
-OpenUI5 content is developed in an environment based on Node.js. [UI5 Tooling](https://sap.github.io/ui5-tooling/) is used as development server and build tool.
+OpenUI5 content is developed in an environment based on Node.js. [UI5 CLI](https://ui5.github.io/cli/) is used as development server and build tool.
 
 ### Basic Setup
 The basic setup allows you to start a server for the OpenUI5 project in an easy way:
@@ -74,18 +74,18 @@ In the OpenUI5 **root directory**:
 `OPENUI5_LIBRARIES="sap.m,sap.ui.core" npm run sdk`
 
 ### Advanced Setup
-The basic setup described above uses a custom setup focused on starting the [UI5 Server](https://sap.github.io/ui5-tooling/pages/Server/) for the OpenUI5 TestSuite project in an easy way.
+The basic setup described above uses a custom setup focused on starting the [UI5 Server](https://ui5.github.io/cli/pages/Server/) for the OpenUI5 TestSuite project in an easy way.
 
-The advanced setup allows you to use the [UI5 CLI](https://github.com/SAP/ui5-cli) and all of its features. The use of [Yarn](https://yarnpkg.com) is required in this setup, as npm can't handle workspaces yet, see [What's the thing with Yarn](https://sap.github.io/ui5-tooling/pages/FAQ/#whats-the-thing-with-yarn) in the FAQ.
+The advanced setup allows you to use the [UI5 CLI](https://github.com/UI5/cli) and all of its features. The use of [Yarn](https://yarnpkg.com) is required in this setup, as npm can't handle workspaces yet, see [What's the thing with Yarn](https://ui5.github.io/cli/pages/FAQ/#whats-the-thing-with-yarn) in the FAQ.
 
 **You need to use the advanced setup if you plan to do any of the following:**
 - **Build** an OpenUI5 project
 - **Serve** a project with HTTPS or HTTP/2.
-- Use any of the other **[UI5 CLI](https://sap.github.io/ui5-tooling/pages/CLI/) features** and parameters.
+- Use any of the other **[UI5 CLI](https://ui5.github.io/cli/pages/CLI/) features** and parameters.
 
 #### Setup
-1. Install the UI5 CLI globally, see [UI5 Tooling: Installing the UI5 CLI](https://sap.github.io/ui5-tooling/pages/GettingStarted/#installing-the-ui5-cli).
-2. Install [Yarn](https://yarnpkg.com) from [here](https://yarnpkg.com/en/docs/install) (*also see [FAQ: What's the thing with Yarn?](https://sap.github.io/ui5-tooling/pages/FAQ/#whats-the-thing-with-yarn)*)
+1. Install the UI5 CLI globally, see [UI5 CLI: Installing the UI5 CLI](https://ui5.github.io/cli/pages/GettingStarted/#installing-the-ui5-cli).
+2. Install [Yarn](https://yarnpkg.com) from [here](https://yarnpkg.com/en/docs/install) (*also see [FAQ: What's the thing with Yarn?](https://ui5.github.io/cli/pages/FAQ/#whats-the-thing-with-yarn)*)
 3. In the OpenUI5 repository root directory, install all dependencies using Yarn. This also links all OpenUI5 libraries to each other.
 ```sh
 yarn
@@ -97,9 +97,9 @@ ui5 serve --open index.html
 ```
 
 #### Workflow
-Now you can use the UI5 CLI in any of your local OpenUI5 libraries. Check the [UI5 CLI documentation](https://github.com/SAP/ui5-cli) for details.
+Now you can use the UI5 CLI in any of your local OpenUI5 libraries. Check the [UI5 CLI documentation](https://github.com/UI5/cli) for details.
 
-Whenever you make changes to your OpenUI5 repository's `node_modules` directory (e.g. by executing `npm install`), you may need to recreate the links between the OpenUI5 libraries. You can always do this by executing `yarn` in the OpenUI5 root directory. Also see [FAQ: What's the thing with Yarn?](https://sap.github.io/ui5-tooling/pages/FAQ/#whats-the-thing-with-yarn)
+Whenever you make changes to your OpenUI5 repository's `node_modules` directory (e.g. by executing `npm install`), you may need to recreate the links between the OpenUI5 libraries. You can always do this by executing `yarn` in the OpenUI5 root directory. Also see [FAQ: What's the thing with Yarn?](https://ui5.github.io/cli/pages/FAQ/#whats-the-thing-with-yarn)
 
 ### Legacy Setup
 You can continue to use the legacy Grunt-based setup. However, the setups described above are recommended for working with the OpenUI5 repository.
@@ -130,13 +130,13 @@ This build-free development process does not feature optimized runtime performan
 
 ### Working With Other UI5 Projects
 
-When working on UI5 applications or libraries that already make use of the [`@openui5`-npm packages](https://www.npmjs.com/org/openui5) like the [OpenUI5 Sample App](https://github.com/SAP/openui5-sample-app), you can link your local OpenUI5 repository into that project. This allows you to make changes to the project itself as well as to the OpenUI5 libraries simultaneously and test them immediately.
+When working on UI5 applications or libraries that already make use of the [`@openui5`-npm packages](https://www.npmjs.com/org/openui5) like the [OpenUI5 Sample App](https://github.com/UI5/sample-app), you can link your local OpenUI5 repository into that project. This allows you to make changes to the project itself as well as to the OpenUI5 libraries simultaneously and test them immediately.
 
-A detailed step-by-step guide on how to achieve such a setup with the OpenUI5 sample app can be found [here](https://github.com/SAP/openui5-sample-app#working-with-local-dependencies).
+A detailed step-by-step guide on how to achieve such a setup with the OpenUI5 sample app can be found [here](https://github.com/UI5/sample-app#working-with-local-dependencies).
 
 ### Building UI5
 
-[UI5 Tooling](https://github.com/SAP/ui5-tooling) is used to build a production-ready version of OpenUI5. Every library needs to be built individually. 
+[UI5 CLI](https://github.com/UI5/cli) is used to build a production-ready version of OpenUI5. Every library needs to be built individually. 
 
 Usage:
 ```

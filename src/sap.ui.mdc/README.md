@@ -14,7 +14,7 @@ The APIs in this library are experimental. See the [OpenUI5 Compatibility Rules]
 
 ## Usage
 
-Add this library as a dependency to your UI5 project by using [UI5 Tooling](https://sap.github.io/ui5-tooling/):
+Add this library as a dependency to your UI5 project by using [UI5 CLI](https://ui5.github.io/cli/):
 
 
 
@@ -27,7 +27,7 @@ ui5 add sap.ui.mdc
 
 
 
-For more information, please refer to our documentation on [Consuming OpenUI5 Libraries](https://sap.github.io/ui5-tooling/pages/OpenUI5/).
+For more information, please refer to our documentation on [Consuming OpenUI5 Libraries](https://ui5.github.io/cli/pages/OpenUI5/).
 
 
 

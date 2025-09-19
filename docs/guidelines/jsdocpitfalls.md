@@ -72,7 +72,7 @@ Cross-References using a {@link} tag
 When using the @link tag, the JSDoc toolkit basically allows any kind of target reference. The only restriction is that the first whitespace
 character or pipe symbol separates the cross reference from an optional caption text. 
 
-The UI5 tooling and the SDK however support only a more limited set of cross references. In UI5 documentation, the target must be one of the following
+The UI5 CLI and the SDK however support only a more limited set of cross references. In UI5 documentation, the target must be one of the following
 
 Example | Description
 ------- | -----------
@@ -90,7 +90,7 @@ That text will be used as text of the hyperlink in the SDK.
 
 :bomb: Typical errors: 
  * `{@link Button#attachPress}` using an unqualified name instead of the qualified one (correct: `sap.m.Button#attachPress`)
- * `{@link #attachPress|attach a listener to the press event}` using the pipe symbol to separate caption and reference. JSDoc supports this, but UI5 tooling doesn't (not yet)
+ * `{@link #attachPress|attach a listener to the press event}` using the pipe symbol to separate caption and reference. JSDoc supports this, but UI5 CLI doesn't (not yet)
  
 
 Static Classes

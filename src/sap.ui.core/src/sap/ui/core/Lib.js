@@ -915,7 +915,7 @@ sap.ui.define([
 	 * <b>Note:</b> Dependencies between libraries have to be modeled consistently in several places:
 	 * <ul>
 	 * <li>Both eager and lazy dependencies have to be modelled in the <code>.library</code> file.</li>
-	 * <li>By default, UI5 Tooling generates a <code>manifest.json</code> file from the content of the <code>.library</code>
+	 * <li>By default, UI5 CLI generates a <code>manifest.json</code> file from the content of the <code>.library</code>
 	 * file. However, if the <code>manifest.json</code> file for the library is not generated but
 	 * maintained manually, it must be kept consistent with the <code>.library</code> file, especially regarding
 	 * its listed library dependencies.</li>

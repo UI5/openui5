@@ -178,14 +178,14 @@
 								</grid:GridResponsiveLayout>
 							</grid:customLayout>
 
-							<!-- UI5 Tooling -->
+							<!-- UI5 CLI -->
 							<f:Card class="sapUiDemoKitResourcesRegularCard">
 								<f:header>
-									<card:Header title="{i18n>RESOURCES_CARD_TITLE_TOOLING}" iconSrc="sap-icon://hello-world" />
+									<card:Header title="{i18n>RESOURCES_CARD_TITLE_UI5_CLI}" iconSrc="sap-icon://hello-world" />
 								</f:header>
 								<f:content>
 									<VBox class="sapUiDemoKitResourcesCardContentSpacing" wrap="Wrap">
-										<Text text="{i18n>RESOURCES_CARD_DESC_TOOLING}">
+										<Text text="{i18n>RESOURCES_CARD_DESC_UI5_CLI}">
 											<layoutData>
 												<FlexItemData growFactor="1" />
 											</layoutData>
@@ -194,7 +194,7 @@
 											class="sapUiDemoKitResourcesCardLink"
 											href="{resources>/tooling/href}"
 											target="_blank"
-											text="{i18n>RESOURCES_CARD_LINK_TOOLING}"
+											text="{i18n>RESOURCES_CARD_LINK_UI5_CLI}"
 											tooltip="{i18n>RESOURCES_CARD_LINK_TOOLTIP}"
 											wrapping="true" />
 									</VBox>

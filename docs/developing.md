@@ -7,7 +7,7 @@ This page explains the initial setup, development workflow, and test execution f
 
 Setting up the OpenUI5 Development Environment
 ------------------------------------------
-OpenUI5 content is developed in an environment based on Node.js. [UI5 Tooling](https://sap.github.io/ui5-tooling/) is used as a development server and build tool. Leveraging its newer version [UI5 Tooling 3.x](https://sap.github.io/ui5-tooling/v3/) allows for a consolidated development setup.
+OpenUI5 content is developed in an environment based on Node.js. [UI5 CLI](https://ui5.github.io/cli/) is used as a development server and build tool. Leveraging its newer version [UI5 CLI 3.x](https://ui5.github.io/cli/v3/) allows for a consolidated development setup.
 
 ### Standard Setup
 This setup allows you to start a server for the OpenUI5 project in an easy way:
@@ -37,7 +37,7 @@ npm start
 #### Configuring the TestSuite Server
 
 ##### Using npm scripts
-You can pass arguments to an [npm script](https://docs.npmjs.com/cli/v9/commands/npm-run-script) by using `--`. As `npm start` executes the CLI command `ui5 serve`, you can pass any of its [CLI options](https://sap.github.io/ui5-tooling/stable/pages/CLI/#ui5-serve).
+You can pass arguments to an [npm script](https://docs.npmjs.com/cli/v9/commands/npm-run-script) by using `--`. As `npm start` executes the CLI command `ui5 serve`, you can pass any of its [CLI options](https://ui5.github.io/cli/stable/pages/CLI/#ui5-serve).
 
 For example, to allow remote access to the server, that is, from an interface other than your computer's loopback/localhost, you can configure the server as follows:
 ```sh
@@ -58,7 +58,7 @@ ui5 serve --accept-remote-connections
 
 In this case, the UI5 CLI will always try to invoke the local installation. This behavior can be disabled by setting the environment variable `UI5_CLI_NO_LOCAL`.
 
-In principle, you may be interested in other features of the UI5 CLI than _serving_ the TestSuite. See the [UI5 CLI documentation](https://sap.github.io/ui5-tooling/pages/CLI/) for many comprehensive features such as building a project.
+In principle, you may be interested in other features of the UI5 CLI than _serving_ the TestSuite. See the [UI5 CLI documentation](https://ui5.github.io/cli/pages/CLI/) for many comprehensive features such as building a project.
 
 
 #### Building the OpenUI5 SDK (Demo Kit)
@@ -122,13 +122,13 @@ This build-free development process does not feature optimized runtime performan
 
 ### Working With Other UI5 Projects
 
-When working on UI5 applications or libraries that already make use of the [`@openui5` npm packages](https://www.npmjs.com/org/openui5) like the [OpenUI5 Sample App](https://github.com/SAP/openui5-sample-app), you can link your local OpenUI5 repository into that project. This allows you to make changes to the project itself as well as to the OpenUI5 libraries simultaneously and test them immediately.
+When working on UI5 applications or libraries that already make use of the [`@openui5` npm packages](https://www.npmjs.com/org/openui5) like the [OpenUI5 Sample App](https://github.com/UI5/sample-app), you can link your local OpenUI5 repository into that project. This allows you to make changes to the project itself as well as to the OpenUI5 libraries simultaneously and test them immediately.
 
-A detailed step-by-step guide on how to achieve such a setup with the OpenUI5 sample app can be found [here](https://github.com/SAP/openui5-sample-app#working-with-local-dependencies).
+A detailed step-by-step guide on how to achieve such a setup with the OpenUI5 sample app can be found [here](https://github.com/UI5/sample-app#working-with-local-dependencies).
 
 ### Building UI5
 
-[UI5 Tooling](https://sap.github.io/ui5-tooling/) is used to build a production-ready version of OpenUI5. Every library needs to be built individually. 
+[UI5 CLI](https://ui5.github.io/cli/) is used to build a production-ready version of OpenUI5. Every library needs to be built individually. 
 
 Usage:
 ```

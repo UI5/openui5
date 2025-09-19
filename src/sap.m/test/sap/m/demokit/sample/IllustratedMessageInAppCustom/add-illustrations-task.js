@@ -1,7 +1,7 @@
 /* eslint-disable */
 
 /**
- * Custom UI5 Tooling task to validate and copy SVGs from npm package to UI5 resources
+ * Custom UI5 CLI task to validate and copy SVGs from npm package to UI5 resources
  *
  * This task:
  * 1. Validates all SVGs from the specified SVG package using its validation module

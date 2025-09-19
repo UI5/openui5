@@ -7,10 +7,9 @@ sap.ui.define([
 	'sap/ui/Device',
 	'sap/ui/base/EventProvider',
 	'./ReadyState',
-	'sap/ui/thirdparty/URI',
 	"sap/base/Log"
 ],
-	function(Device, EventProvider, ReadyState, URI, Log) {
+	function(Device, EventProvider, ReadyState, Log) {
 	"use strict";
 
 	/**
@@ -371,24 +370,21 @@ sap.ui.define([
 	 * @private
 	 */
 	WebSocket.prototype._resolveFullUrl = function(sUrl) {
-		// parse URI string
-		var oUri = new URI(sUrl);
-
 		// create base URI to resolve absolute URL
-		var oBaseUri = new URI(document.baseURI);
+		const oBaseUrl = new URL(document.baseURI);
 
 		// clear search string to remove parameters from the current page
-		oBaseUri.search('');
+		oBaseUrl.search = '';
 
 		// set according WebSocket protocol (secure / non-secure)
-		oBaseUri.protocol(oBaseUri.protocol() === 'https' ? 'wss' : 'ws');
+		oBaseUrl.protocol = oBaseUrl.protocol === 'https' ? 'wss' : 'ws';
 
 		// resolve absolute to base
 		// if there is already a protocol defined it won't be replaced
-		oUri = oUri.absoluteTo(oBaseUri);
+		const oUrl = new URL(sUrl, oBaseUrl);
 
 		// build string
-		return oUri.toString();
+		return oUrl.toString();
 	};
 
 	/**

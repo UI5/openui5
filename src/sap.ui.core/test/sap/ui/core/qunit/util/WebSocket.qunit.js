@@ -1,7 +1,7 @@
 /*global QUnit */
 
-sap.ui.define(["sap/ui/core/ws/WebSocket", "sap/ui/Device", "sap/ui/thirdparty/URI"],
-	function (WebSocket, Device, URI) {
+sap.ui.define(["sap/ui/core/ws/WebSocket", "sap/ui/Device"],
+	function (WebSocket, Device) {
 		"use strict";
 
 		QUnit.test("Constructor with url only", function (assert) {
@@ -108,11 +108,12 @@ sap.ui.define(["sap/ui/core/ws/WebSocket", "sap/ui/Device", "sap/ui/thirdparty/U
 			assert.equal(_resolveFullUrl.call(null, "ws://hostname:1234/foo/bar"), "ws://hostname:1234/foo/bar", "resolved full URL (ws://)");
 			assert.equal(_resolveFullUrl.call(null, "wss://hostname:1234/foo/bar"), "wss://hostname:1234/foo/bar", "resolved full URL (wss://)");
 
-			var oBaseUri = new URI(document.baseURI);
-			oBaseUri.search('').protocol(oBaseUri.protocol() === 'https' ? 'wss' : 'ws');
+			const oBaseUrl = new URL(document.baseURI);
+			oBaseUrl.search = '';
+			oBaseUrl.protocol = oBaseUrl.protocol === 'https' ? 'wss' : 'ws';
 
-			assert.equal(_resolveFullUrl.call(null, "/foo/bar"), new URI("/foo/bar").absoluteTo(oBaseUri).toString(), "resolved absolute URL");
-			assert.equal(_resolveFullUrl.call(null, "../foo/bar"), new URI("../foo/bar").absoluteTo(oBaseUri).toString(), "resolved relative URL");
+			assert.equal(_resolveFullUrl.call(null, "/foo/bar"), new URL("/foo/bar", oBaseUrl).toString(), "resolved absolute URL");
+			assert.equal(_resolveFullUrl.call(null, "../foo/bar"), new URL("../foo/bar", oBaseUrl).toString(), "resolved relative URL");
 
 		});
 

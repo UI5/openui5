@@ -1,6 +1,6 @@
 # UI5 Demo Application with sap.m.IllustratedMessage and custom illustrations
 
-This application demonstrates how to integrate libraries of cusrom illustrations into UI5 applications through npm packages and UI5 Tooling.
+This application demonstrates how to integrate libraries of cusrom illustrations into UI5 applications through npm packages and UI5 CLI.
 
 ## Overview
 
@@ -35,9 +35,9 @@ ui5-custom-illustrations-app/
 │   ├── resources/            # Target directory for illustrations (populated during build)
 │   ├── view/
 │   └── index.html
-├── ui5.yaml                  # UI5 Tooling configuration
+├── ui5.yaml                  # UI5 CLI configuration
 └── package.json              # lists the custom illustrations library in its dependencies
-└── add-illustrations-task.js # Custom UI5 build-time task to move the illustrations of the installed illustrations library into a local folder of the UI5 application
+└── add-illustrations-task.js # Custom UI5 CLI task to move the illustrations of the installed illustrations library into a local folder of the UI5 application
 ├── mock-external-package/    # mock representation of the custom illustrations library that in real scenarious will be fetched from an npm repo instead of this local folder (given the external package is declared in the package.json)
 │   ├── ui5-illustrations-library/
 │       ├── illustrations/
@@ -137,6 +137,6 @@ function (UIComponent, IllustrationPool) {
 
 ## Learn More
 
-- [UI5 Tooling Documentation](https://sap.github.io/ui5-tooling/)
+- [UI5 CLI Documentation](https://ui5.github.io/cli/)
 - [SVG in UI5 Applications](https://openui5.hana.ondemand.com/#/topic/3cc020e2ff3940e88c3d56913b64143a)
 - [UI5 Resource Handling](https://openui5.hana.ondemand.com/#/topic/5bb388fc289d44dca886c8fa25da466e)
