@@ -2228,6 +2228,8 @@ sap.ui.define([
 	 *   {@link sap.ui.model.odata.OperationMode.Server OperationMode.Server} or
 	 *   {@link sap.ui.model.odata.OperationMode.Auto OperationMode.Auto} is used.
 	 * @param {boolean} [mParameters.restoreTreeStateAfterChange]
+	 *   This parameter is experimental as of version 1.141.0.
+	 *
 	 *   Whether the tree state is restored on hierarchy maintenance, such as adding, removing, or deleting a node.
 	 *   This is only supported if the following conditions are met: <ul>
 	 *   <li>The binding has to use {@link sap.ui.model.odata.OperationMode.Server OperationMode.Server}</li>
@@ -2236,7 +2238,6 @@ sap.ui.define([
 	 *   <li>The <code>"hierarchy-preorder-rank-for"</code> annotation must be present in the service metadata or
 	 *     provided via <code>treeAnnotationProperties.hierarchyPreorderRankFor</code></li>
 	 *   </ul>
-	 *   @experimental as of version 1.141.0.
 	 * @param {sap.ui.model.odata.CountMode} [mParameters.countMode]
 	 *   Defines the count mode of this binding; if not specified, the default count mode of the
 	 *   binding's model is applied. The resulting count mode must not be
