@@ -110,7 +110,7 @@ sap.ui.define(["sap/ui/core/ws/WebSocket", "sap/ui/Device"],
 
 			const oBaseUrl = new URL(document.baseURI);
 			oBaseUrl.search = '';
-			oBaseUrl.protocol = oBaseUrl.protocol === 'https' ? 'wss' : 'ws';
+			oBaseUrl.protocol = oBaseUrl.protocol === 'https:' ? 'wss:' : 'ws:';
 
 			assert.equal(_resolveFullUrl.call(null, "/foo/bar"), new URL("/foo/bar", oBaseUrl).toString(), "resolved absolute URL");
 			assert.equal(_resolveFullUrl.call(null, "../foo/bar"), new URL("../foo/bar", oBaseUrl).toString(), "resolved relative URL");

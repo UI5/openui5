@@ -1301,4 +1301,61 @@ sap.ui.define([
 		}.bind(this));
 	});
 
+	QUnit.module("Tab Order");
+
+	QUnit.test("Tab Order of Feed List Item", async function (assert) {
+		// Arrange
+		feedListPage.addContent(oFeedList);
+		appFeedList.addPage(feedListPage);
+		appFeedList.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		// Assert
+		var oFocusFeedListItem = oFeedList.getItems()[11];
+		assert.ok(oFocusFeedListItem.getTabbables()[0] == oFocusFeedListItem.oAvatar.getDomRef());
+		assert.ok(oFocusFeedListItem.getTabbables()[1] == oFocusFeedListItem._oLinkControl.getDomRef());
+		assert.ok(oFocusFeedListItem.getTabbables()[2] == document.getElementsByClassName("_class")[0]);
+		assert.ok(oFocusFeedListItem.getTabbables()[3] == document.getElementById("__link14"));
+
+		// Cleanup
+		oFocusFeedListItem.destroy();
+		oFocusFeedListItem = null;
+	});
+
+	QUnit.module("FeedListItem action button", {
+		beforeEach: async function () {
+			this.oFeedListItem = new FeedListItem({
+				sender: "Mrs Smith",
+				text: "Thisisaerynnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongvvaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylong",
+				timestamp: "Jul 03, 2014",
+				actions: [
+					new FeedListItemAction({
+						icon: "sap-icon://edit",
+						key: "edit",
+						text: "edit"
+					}),
+					new FeedListItemAction({
+						icon: "sap-icon://delete",
+						key: "delete",
+						text: "delete"
+					})
+				]
+			}).placeAt("qunit-fixture");
+			await nextUIUpdate();
+		},
+		afterEach: function () {
+			this.oFeedListItem.destroy();
+			this.oFeedListItem = null;
+		}
+	});
+	QUnit.test("FeedListItem children shouldn't overflow their parent and action button should appear even for long non-breaking FeedListItemText", function (assert) {
+		const iFeedListItemWidth = this.oFeedListItem.getDomRef().querySelector('.sapMFeedListItem').getBoundingClientRect().width;
+
+		let iTotalChildrenWidth = 0;
+		for (const child of this.oFeedListItem.getDomRef().children) {
+			iTotalChildrenWidth += child.getBoundingClientRect().width;
+		}
+		assert.ok(iFeedListItemWidth >= iTotalChildrenWidth,`FeedListItem children don't overflow`);
+	});
+
 });

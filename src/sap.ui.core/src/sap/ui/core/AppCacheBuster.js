@@ -9,7 +9,7 @@
  */
 sap.ui.define([
 	'sap/ui/base/ManagedObject',
-	'sap/ui/thirdparty/URI',
+	'sap/ui/util/_URL',
 	'sap/base/config',
 	'sap/base/Log',
 	'sap/base/i18n/Localization',
@@ -17,7 +17,7 @@ sap.ui.define([
 	'sap/base/util/mixedFetch',
 	'sap/base/strings/escapeRegExp',
 	'sap/ui/core/_IconRegistry'
-], function(ManagedObject, URI, BaseConfig, Log, Localization, extend, mixedFetch, escapeRegExp, _IconRegistry) {
+], function(ManagedObject, _URL, BaseConfig, Log, Localization, extend, mixedFetch, escapeRegExp, _IconRegistry) {
 	"use strict";
 
 	/*
@@ -79,14 +79,14 @@ sap.ui.define([
 	var sLocation = document.baseURI.replace(/\?.*|#.*/g, "");
 
 	// determine the base urls (normalize and then calculate the resources and test-resources urls)
-	var oUri = URI(sap.ui.require.toUrl("") + "/../");
-	var sOrgBaseUrl = oUri.toString();
-	if (oUri.is("relative")) {
-		oUri = oUri.absoluteTo(sLocation);
+	var oUri = new _URL(sap.ui.require.toUrl("") + "/../");
+	var sOrgBaseUrl = oUri.sourceUrl;
+	if (!oUri.isAbsolute()) {
+		oUri = new _URL(oUri.originUrl, sLocation);
 	}
-	var sBaseUrl = oUri.normalize().toString();
-	var sResBaseUrl = URI("resources").absoluteTo(sBaseUrl).toString();
-	//var sTestResBaseUrl = URI("test-resources").absoluteTo(sBaseUrl).toString();
+	var sBaseUrl = oUri.toString();
+	var sResBaseUrl = new _URL("resources", sBaseUrl).toString();
+	//var sTestResBaseUrl = new _URL("test-resources", sBaseUrl).toString();
 
 	// create resources check regex
 	var oFilter = new RegExp("^" + escapeRegExp(sResBaseUrl));
@@ -309,8 +309,8 @@ sap.ui.define([
 							// register the current base URL (if it is a relative URL)
 							// hint: if UI5 is referenced relative on a server it might be possible
 							//       with the mechanism to register another base URL.
-							var oUri = URI(sOrgBaseUrl);
-							oConfig = oUri.is("relative") ? [oUri.toString()] : [];
+							var oUri = new _URL(sOrgBaseUrl);
+							oConfig = !oUri.isAbsolute() ? [oUri.sourceUrl] : [];
 						} else if (sValue === "false") {
 							bActive = false;
 						}
@@ -567,14 +567,16 @@ sap.ui.define([
 				// local resources are registered with "./" => we remove the leading "./"!
 				// (code location for this: sap/ui/Global.js:sap.ui.localResources)
 				// we by default normalize all relative URLs for a common base
-				var oUri = URI(sUrl || "./");
-				if (oUri.is("relative")) { //(sUrl.match(/^\.\/|\..\//g)) {
-					oUri = oUri.absoluteTo(sLocation);
+				try {
+					// Use native URL constructor with sLocation as base
+					// This automatically handles relative URLs and normalization
+					// (protocol, hostname, port, path normalization)
+					var url = new URL(sUrl || "./", sLocation);
+					return url.toString();
+				} catch (e) {
+					// Fallback for invalid URLs - return original or handle gracefully
+					return sUrl || "./";
 				}
-				//return oUri.normalize().toString();
-				// prevent to normalize the search and hash to avoid "+" in the search string
-				// because for search strings the space will be normalized as "+"
-				return oUri.normalizeProtocol().normalizeHostname().normalizePort().normalizePath().toString();
 
 			},
 

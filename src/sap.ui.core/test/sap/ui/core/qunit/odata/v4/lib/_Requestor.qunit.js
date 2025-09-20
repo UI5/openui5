@@ -1477,77 +1477,84 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-[false, true].forEach((bEmptyChangeSet) => {
-	const sTitle = "request: no serial number, initial change set empty = " + bEmptyChangeSet;
-
-	QUnit.test(sTitle, function (assert) {
-		const oRequestor = _Requestor.create("/", oModelInterface);
-		this.mock(oRequestor).expects("convertResourcePath").withExactArgs("resource/path")
-			.returns("converted/resource/path");
-		const aRequests = [["~some request~"]];
-		aRequests[0].iSerialNumber = 0;
-		aRequests.iChangeSet = 0;
-		const addChangeSet = () => {
-			aRequests.push([]);
-			aRequests[1].iSerialNumber = Infinity; // must not matter
-			aRequests.iChangeSet = 1;
-		};
-		if (bEmptyChangeSet) {
-			addChangeSet();
+	QUnit.test("request: negative serial number", function (assert) {
+		function check(oRequest, i) {
+			delete oRequest.$promise;
+			delete oRequest.$reject;
+			delete oRequest.$resolve;
+			assert.deepEqual(oRequest, {
+				$cancel : "~fnCancel~",
+				$mergeRequests : "~fnMergeRequests~",
+				$metaPath : "/meta/path",
+				$owner : "~vOwner~",
+				$queryOptions : "~mQueryOptions~",
+				$resourcePath : "original/resource/path",
+				$submit : "~fnSubmit~",
+				body : "~oPayload~",
+				headers : {
+					Accept : "application/json;odata.metadata=minimal;IEEE754Compatible=true",
+					"Content-Type" : "application/json;charset=UTF-8;IEEE754Compatible=true"
+				},
+				method : "non-GET",
+				url : "resource/path/" + i
+			});
 		}
-		this.mock(oRequestor).expects("getOrCreateBatchQueue").withExactArgs("groupId")
-			.returns(aRequests);
-		let oRequest;
-		this.mock(oRequestor).expects("addChangeSet").exactly(bEmptyChangeSet ? 1 : 2)
-			.withExactArgs("groupId")
-			.callsFake(() => {
-				if (!bEmptyChangeSet && !oRequest) {
-					addChangeSet();
-				} else {
-					assert.strictEqual(aRequests[1].length, 1, "request already added here");
-					assert.strictEqual(aRequests[1][0], oRequest);
-				}
+
+		const oRequestor = _Requestor.create("/", oModelInterface);
+		const aRequests = [["~unrealistic~"], ["~side-effects~"]];
+		aRequests[0].iSerialNumber = 0;
+		aRequests[1].iSerialNumber = 10;
+		aRequests.iChangeSet = 1;
+		this.mock(oRequestor).expects("getOrCreateBatchQueue").thrice()
+			.withExactArgs("groupId").returns(aRequests);
+		const aNewRequests = [];
+		this.mock(oRequestor).expects("checkConflictingStrictRequest").thrice()
+			.withExactArgs(sinon.match.object, sinon.match.same(aRequests), sinon.match.number)
+			.callsFake((oRequest, _aRequests, iChangeSetNo) => {
+				assert.strictEqual(iChangeSetNo, oRequest.url.endsWith("/5") ? 2 : 1);
+				aNewRequests.push(oRequest);
 			});
-		this.mock(oRequestor).expects("checkConflictingStrictRequest")
-			.withExactArgs(sinon.match.object, sinon.match.same(aRequests), 1)
-			.callsFake((oRequest0) => {
-				oRequest = oRequest0;
-			});
+		this.mock(oRequestor).expects("submitBatch").never();
 		this.mock(oRequestor).expects("addQueryString").never();
 		this.mock(oRequestor).expects("sendRequest").never();
-		const oGroupLock = this.createGroupLock("groupId", NaN);
+		const oGroupLock3 = this.createGroupLock("groupId", -3);
+		const oGroupLock5 = this.createGroupLock("groupId", -5);
+		const oGroupLock7 = this.createGroupLock("groupId", -7);
 
 		// code under test
-		const oPromise = oRequestor.request("non-GET", "resource/path", oGroupLock, {},
+		const oPromise7 = oRequestor.request("non-GET", "resource/path/7", oGroupLock7, {},
 			"~oPayload~", "~fnSubmit~", "~fnCancel~", "/meta/path", "original/resource/path",
 			/*bAtFront*/false, "~mQueryOptions~", "~vOwner~", "~fnMergeRequests~");
 
-		assert.strictEqual(aRequests.length, 2, "two change sets");
-		assert.strictEqual(aRequests[1].length, 1, "request added here");
-		assert.strictEqual(aRequests[1].pop(), oRequest);
-		assert.strictEqual(oRequest.$promise, oPromise);
-		delete oRequest.$promise;
-		delete oRequest.$reject;
-		delete oRequest.$resolve;
-		assert.deepEqual(oRequest, {
-			$cancel : "~fnCancel~",
-			$mergeRequests : "~fnMergeRequests~",
-			$metaPath : "/meta/path",
-			$owner : "~vOwner~",
-			$queryOptions : "~mQueryOptions~",
-			$resourcePath : "original/resource/path",
-			$submit : "~fnSubmit~",
-			body : "~oPayload~",
-			headers : {
-				Accept : "application/json;odata.metadata=minimal;IEEE754Compatible=true",
-				"Content-Type" : "application/json;charset=UTF-8;IEEE754Compatible=true"
-			},
-			method : "non-GET",
-			url : "converted/resource/path"
-		});
-		assert.deepEqual(aRequests, [["~some request~"], [/*oRequest*/]], "nothing else");
+		// code under test: "3" must be inserted *before* "7"
+		const oPromise3 = oRequestor.request("non-GET", "resource/path/3", oGroupLock3, {},
+			"~oPayload~", "~fnSubmit~", "~fnCancel~", "/meta/path", "original/resource/path",
+			/*bAtFront*/false, "~mQueryOptions~", "~vOwner~", "~fnMergeRequests~");
+
+		// code under test: "5" must be inserted *between* "3" and "7"
+		const oPromise5 = oRequestor.request("non-GET", "resource/path/5", oGroupLock5, {},
+			"~oPayload~", "~fnSubmit~", "~fnCancel~", "/meta/path", "original/resource/path",
+			/*bAtFront*/false, "~mQueryOptions~", "~vOwner~", "~fnMergeRequests~");
+
+		assert.strictEqual(aNewRequests[0].$promise, oPromise7);
+		check(aNewRequests[0], 7);
+		assert.strictEqual(aNewRequests[1].$promise, oPromise3);
+		check(aNewRequests[1], 3);
+		assert.strictEqual(aNewRequests[2].$promise, oPromise5);
+		check(aNewRequests[2], 5);
+		assert.strictEqual(aRequests[0].iSerialNumber, 0);
+		assert.strictEqual(aRequests[1].iSerialNumber, 3);
+		assert.strictEqual(aRequests[1].pop(), aNewRequests[1]); // "3"
+		assert.strictEqual(aRequests[2].iSerialNumber, 5);
+		assert.strictEqual(aRequests[2].pop(), aNewRequests[2]); // "5"
+		assert.strictEqual(aRequests[3].iSerialNumber, 7);
+		assert.strictEqual(aRequests[3].pop(), aNewRequests[0]); // "7"
+		assert.strictEqual(aRequests[4].iSerialNumber, 10);
+		assert.deepEqual(aRequests,
+			[["~unrealistic~"], [/*"3"*/], [/*"5"*/], [/*"7"*/], ["~side-effects~"]],
+			"nothing else");
+		assert.strictEqual(aRequests.iChangeSet, 4);
 	});
-});
 
 	//*********************************************************************************************
 	QUnit.test("request: sOriginalPath, $batch", function () {

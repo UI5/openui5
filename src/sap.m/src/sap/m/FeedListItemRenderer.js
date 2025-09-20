@@ -44,19 +44,6 @@ FeedListItemRenderer.renderLIContent = function(oRm, oControl) {
 		this._writeAvatarControl(oRm, oControl, sMyId);
 	}
 
-	// action button
-	if (oControl.getActions().length > 0) {
-		var isAllActionsNotVisible = oControl.getActions().every(function (oAction) {
-			return oAction.getVisible() === false ;
-		});
-		if (!isAllActionsNotVisible) {
-			oRm.openStart("div", sMyId + "-action-button");
-			oRm.class('sapMFeedListItemActionButton');
-			oRm.openEnd();
-			oRm.renderControl(oControl.getAggregation("_actionButton"));
-			oRm.close("div");
-		}
-	}
 
 	// text (starting with sender)
 	if (bIsPhone) {
@@ -154,6 +141,20 @@ FeedListItemRenderer.renderLIContent = function(oRm, oControl) {
 			oRm.close('p');
 		}
 		oRm.close('div');
+	}
+
+	// action button
+	if (oControl.getActions().length > 0) {
+		var bisAllActionsNotVisible = oControl.getActions().every(function (oAction) {
+			return oAction.getVisible() === false ;
+		});
+		if (!bisAllActionsNotVisible) {
+			oRm.openStart("div", sMyId + "-action-button");
+			oRm.class('sapMFeedListItemActionButton');
+			oRm.openEnd();
+			oRm.renderControl(oControl.getAggregation("_actionButton"));
+			oRm.close("div");
+		}
 	}
 	oRm.close('div');
 };

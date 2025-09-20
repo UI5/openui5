@@ -1821,8 +1821,8 @@ sap.ui.define([
 	 *   other group ID values, the request is added to the given group and you can use
 	 *   {@link #submitBatch} to send all requests in that group. This group lock will be unlocked
 	 *   immediately, even if the request itself is queued. The request is rejected if the lock is
-	 *   already canceled. For a group lock w/o a serial number, a non-GET is put into a change set
-	 *   of its own (unless <code>bAtFront</code> is used).
+	 *   already canceled. For a group lock with a negative serial number, a non-GET is put into a
+	 *   change set of its own (unless <code>bAtFront</code> is used).
 	 * @param {object} [mHeaders]
 	 *   Map of request-specific headers, overriding both the mandatory OData V4 headers and the
 	 *   default headers given to the factory. This map of headers must not contain
@@ -1944,18 +1944,19 @@ sap.ui.define([
 				} else if (bAtFront) { // add at front of first change set
 					aRequests[0].unshift(oRequest);
 				} else { // push into change set which was current when the request was initiated
-					if (!iRequestSerialNumber && aRequests[aRequests.iChangeSet].length) {
-						that.addChangeSet(sGroupId);
-					}
 					iChangeSetNo = aRequests.iChangeSet;
-					while (aRequests[iChangeSetNo].iSerialNumber > iRequestSerialNumber) {
+					while (aRequests[iChangeSetNo].iSerialNumber > Math.abs(iRequestSerialNumber)) {
 						iChangeSetNo -= 1;
+					}
+					if (iRequestSerialNumber < 0) {
+						iChangeSetNo += 1; // insert own change set *afterwards*
+						const aChangeSet = [];
+						aChangeSet.iSerialNumber = -iRequestSerialNumber;
+						aRequests.iChangeSet += 1;
+						aRequests.splice(iChangeSetNo, 0, aChangeSet);
 					}
 					that.checkConflictingStrictRequest(oRequest, aRequests, iChangeSetNo);
 					aRequests[iChangeSetNo].push(oRequest);
-					if (!iRequestSerialNumber) {
-						that.addChangeSet(sGroupId);
-					}
 				}
 				if (sGroupId === "$single") {
 					that.submitBatch("$single").catch(that.oModelInterface.getReporter());

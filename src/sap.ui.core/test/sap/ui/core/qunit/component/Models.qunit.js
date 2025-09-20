@@ -243,7 +243,7 @@ sap.ui.define([
 			sinon.assert.calledWithExactly(this.modelSpy.odataV2, {
 				serviceUrl: '/path/to/odata/service/with/multi/origin/annotations/?sap-client=foo&sap-server=bar',
 				annotationURI: ["/path/to/other/odata/service/Annotations(TechnicalName='%2FIWBEP%2FTEA_TEST_ANNOTATION_FILE',Version='0001')/$value?sap-language=EN&sap-client=foo",
-					"test-resources/sap/ui/core/qunit/component/testdata/v2models/parentValid/path/to/other/odata/service/Annotations%28TechnicalName=%27%2FIWBEP%2FTEA_TEST_ANNOTATION_FILE%27,Version=%270001%27%29/$value?sap-language=EN&sap-client=foo",
+					"test-resources/sap/ui/core/qunit/component/testdata/v2models/parentValid/path/to/other/odata/service/Annotations(TechnicalName='%2FIWBEP%2FTEA_TEST_ANNOTATION_FILE',Version='0001')/$value?sap-language=EN&sap-client=foo",
 					"/path/to/other/odata/service/other2/Annotations(TechnicalName='%2FIWBEP%2FTEA_TEST_ANNOTATION_FILE',Version='0001')/?sap-language=EN&sap-client=foo",
 					"/path/to/other3/odata/service/;o=sid(G1Y.400)/Annotations(TechnicalName='%2FIWBEP%2FTEA_TEST_ANNOTATION_FILE',Version='0001')/$value?sap-language=EN&sap-client=foo"
 				],
@@ -772,7 +772,7 @@ sap.ui.define([
 			sinon.assert.calledWithExactly(this.modelSpy.odataV2, {
 				serviceUrl: '/path/to/odata/service/with/multi/origin/annotations;o=BLA_123/?sap-client=foo&sap-server=bar',
 				annotationURI: ["/path/to/other/odata/service;o=BLA_123/Annotations(TechnicalName='%2FIWBEP%2FTEA_TEST_ANNOTATION_FILE',Version='0001')/$value?sap-language=EN&sap-client=foo",
-												"test-resources/sap/ui/core/qunit/component/testdata/v2models/parentValid/path/to/other/odata/service;o=BLA_123/Annotations%28TechnicalName=%27%2FIWBEP%2FTEA_TEST_ANNOTATION_FILE%27,Version=%270001%27%29/$value?sap-language=EN&sap-client=foo",
+												"test-resources/sap/ui/core/qunit/component/testdata/v2models/parentValid/path/to/other/odata/service;o=BLA_123/Annotations(TechnicalName='%2FIWBEP%2FTEA_TEST_ANNOTATION_FILE',Version='0001')/$value?sap-language=EN&sap-client=foo",
 												"/path/to/other/odata/service/other2/Annotations(TechnicalName='%2FIWBEP%2FTEA_TEST_ANNOTATION_FILE',Version='0001')/?sap-language=EN&sap-client=foo",
 												"/path/to/other3/odata/service/;o=sid(G1Y.400)/Annotations(TechnicalName='%2FIWBEP%2FTEA_TEST_ANNOTATION_FILE',Version='0001')/$value?sap-language=EN&sap-client=foo"
 												],
@@ -838,7 +838,7 @@ sap.ui.define([
 			sinon.assert.calledWithExactly(this.modelSpy.odataV2, {
 				serviceUrl: '/path/to/odata/service/with/multi/origin/annotations;o=STARTUP456/?sap-client=foo&sap-server=bar',
 				annotationURI: ["/path/to/other/odata/service;o=STARTUP456/Annotations(TechnicalName='%2FIWBEP%2FTEA_TEST_ANNOTATION_FILE',Version='0001')/$value?sap-language=EN&sap-client=foo",
-												"test-resources/sap/ui/core/qunit/component/testdata/v2models/parentValid/path/to/other/odata/service;o=STARTUP456/Annotations%28TechnicalName=%27%2FIWBEP%2FTEA_TEST_ANNOTATION_FILE%27,Version=%270001%27%29/$value?sap-language=EN&sap-client=foo",
+												"test-resources/sap/ui/core/qunit/component/testdata/v2models/parentValid/path/to/other/odata/service;o=STARTUP456/Annotations(TechnicalName='%2FIWBEP%2FTEA_TEST_ANNOTATION_FILE',Version='0001')/$value?sap-language=EN&sap-client=foo",
 												"/path/to/other/odata/service/other2/Annotations(TechnicalName='%2FIWBEP%2FTEA_TEST_ANNOTATION_FILE',Version='0001')/?sap-language=EN&sap-client=foo",
 												"/path/to/other3/odata/service/;o=sid(G1Y.400)/Annotations(TechnicalName='%2FIWBEP%2FTEA_TEST_ANNOTATION_FILE',Version='0001')/$value?sap-language=EN&sap-client=foo"
 												],
@@ -1080,7 +1080,7 @@ sap.ui.define([
 		sinon.assert.calledWithExactly(this.modelSpy.odataV4, {
 			serviceUrl: '/path/to/odata/service/with/multi/origin/annotations;o=URL_123/?sap-client=foo&sap-server=bar',
 			annotationURI: ["/path/to/other/odata/service;o=URL_123/Annotations(TechnicalName='%2FIWBEP%2FTEA_TEST_ANNOTATION_FILE',Version='0001')/$value?sap-language=EN&sap-client=foo",
-							"test-resources/sap/ui/core/qunit/component/testdata/v4models/sapSystem/path/to/other/odata/service;o=URL_123/Annotations%28TechnicalName=%27%2FIWBEP%2FTEA_TEST_ANNOTATION_FILE%27,Version=%270001%27%29/$value?sap-language=EN&sap-client=foo",
+							"test-resources/sap/ui/core/qunit/component/testdata/v4models/sapSystem/path/to/other/odata/service;o=URL_123/Annotations(TechnicalName='%2FIWBEP%2FTEA_TEST_ANNOTATION_FILE',Version='0001')/$value?sap-language=EN&sap-client=foo",
 							"/path/to/other/odata/service/other2/Annotations(TechnicalName='%2FIWBEP%2FTEA_TEST_ANNOTATION_FILE',Version='0001')/?sap-language=EN&sap-client=foo",
 							"/path/to/other3/odata/service/;o=sid(G1Y.400)/Annotations(TechnicalName='%2FIWBEP%2FTEA_TEST_ANNOTATION_FILE',Version='0001')/$value?sap-language=EN&sap-client=foo"
 							],
@@ -1131,7 +1131,7 @@ sap.ui.define([
 		sinon.assert.calledWithExactly(this.modelSpy.odataV4, {
 			serviceUrl: '/path/to/odata/service/with/multi/origin/annotations;o=STARTUP123/?sap-client=foo&sap-server=bar',
 			annotationURI: ["/path/to/other/odata/service;o=STARTUP123/Annotations(TechnicalName='%2FIWBEP%2FTEA_TEST_ANNOTATION_FILE',Version='0001')/$value?sap-language=EN&sap-client=foo",
-							"test-resources/sap/ui/core/qunit/component/testdata/v4models/sapSystem/path/to/other/odata/service;o=STARTUP123/Annotations%28TechnicalName=%27%2FIWBEP%2FTEA_TEST_ANNOTATION_FILE%27,Version=%270001%27%29/$value?sap-language=EN&sap-client=foo",
+							"test-resources/sap/ui/core/qunit/component/testdata/v4models/sapSystem/path/to/other/odata/service;o=STARTUP123/Annotations(TechnicalName='%2FIWBEP%2FTEA_TEST_ANNOTATION_FILE',Version='0001')/$value?sap-language=EN&sap-client=foo",
 							"/path/to/other/odata/service/other2/Annotations(TechnicalName='%2FIWBEP%2FTEA_TEST_ANNOTATION_FILE',Version='0001')/?sap-language=EN&sap-client=foo",
 							"/path/to/other3/odata/service/;o=sid(G1Y.400)/Annotations(TechnicalName='%2FIWBEP%2FTEA_TEST_ANNOTATION_FILE',Version='0001')/$value?sap-language=EN&sap-client=foo"
 							],
@@ -1192,7 +1192,7 @@ sap.ui.define([
 			sinon.assert.calledWithExactly(this.modelSpy.odataV2, {
 				serviceUrl: '/path/to/odata/service/with/multi/origin/annotations/?sap-client=foo&sap-server=bar',
 				annotationURI: ["/path/to/other/odata/service/Annotations(TechnicalName='%2FIWBEP%2FTEA_TEST_ANNOTATION_FILE',Version='0001')/$value?sap-language=EN&sap-client=foo",
-												"test-resources/sap/ui/core/qunit/component/testdata/v2models/parentValid/path/to/other/odata/service/Annotations%28TechnicalName=%27%2FIWBEP%2FTEA_TEST_ANNOTATION_FILE%27,Version=%270001%27%29/$value?sap-language=EN&sap-client=foo",
+												"test-resources/sap/ui/core/qunit/component/testdata/v2models/parentValid/path/to/other/odata/service/Annotations(TechnicalName='%2FIWBEP%2FTEA_TEST_ANNOTATION_FILE',Version='0001')/$value?sap-language=EN&sap-client=foo",
 												"/path/to/other/odata/service/other2/Annotations(TechnicalName='%2FIWBEP%2FTEA_TEST_ANNOTATION_FILE',Version='0001')/?sap-language=EN&sap-client=foo",
 												"/path/to/other3/odata/service/;o=sid(G1Y.400)/Annotations(TechnicalName='%2FIWBEP%2FTEA_TEST_ANNOTATION_FILE',Version='0001')/$value?sap-language=EN&sap-client=foo"
 												],
@@ -1566,7 +1566,7 @@ sap.ui.define([
 			sinon.assert.calledWithExactly(this.modelSpy.odataV2, {
 				serviceUrl: '/path/to/odata/service/with/multi/origin/annotations/?sap-client=foo&sap-server=bar',
 				annotationURI: ["/path/to/other/odata/service/Annotations(TechnicalName='%2FIWBEP%2FTEA_TEST_ANNOTATION_FILE',Version='0001')/$value?sap-language=EN&sap-client=foo",
-												"test-resources/sap/ui/core/qunit/component/testdata/v2models/parentValid/path/to/other/odata/service/Annotations%28TechnicalName=%27%2FIWBEP%2FTEA_TEST_ANNOTATION_FILE%27,Version=%270001%27%29/$value?sap-language=EN&sap-client=foo",
+												"test-resources/sap/ui/core/qunit/component/testdata/v2models/parentValid/path/to/other/odata/service/Annotations(TechnicalName='%2FIWBEP%2FTEA_TEST_ANNOTATION_FILE',Version='0001')/$value?sap-language=EN&sap-client=foo",
 												"/path/to/other/odata/service/other2/Annotations(TechnicalName='%2FIWBEP%2FTEA_TEST_ANNOTATION_FILE',Version='0001')/?sap-language=EN&sap-client=foo",
 												"/path/to/other3/odata/service/;o=sid(G1Y.400)/Annotations(TechnicalName='%2FIWBEP%2FTEA_TEST_ANNOTATION_FILE',Version='0001')/$value?sap-language=EN&sap-client=foo"
 												],

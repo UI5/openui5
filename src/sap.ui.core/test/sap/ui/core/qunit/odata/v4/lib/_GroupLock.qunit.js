@@ -96,8 +96,9 @@ sap.ui.define([
 		assert.strictEqual(oGroupLock2.getSerialNumber(), oGroupLock1.getSerialNumber());
 
 		// code under test
-		assert.ok(isNaN(oGroupLock1.getUnlockedCopy(/*bNoSerialNumber*/true).getSerialNumber()),
-			"NaN if none should be used");
+		assert.strictEqual(
+			oGroupLock1.getUnlockedCopy(/*bNegativeSerialNumber*/true).getSerialNumber(),
+			-42);
 	});
 
 	//*********************************************************************************************
