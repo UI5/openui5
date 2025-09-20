@@ -527,11 +527,30 @@ sap.ui.define([
 			oSalesOrder2.created()
 		]);
 
+		const sNamespace = "com.sap.gateway.default.zui5_epm_sample.v0002.";
+		const sInvoiceCreated = sNamespace + "SalesOrder_InvoiceCreated(...)";
+
+		function requestSideEffects() {
+			return [
+				// code under test (DINC0614013): side effects in separate change set
+				oModel.submitBatch("$auto"),
+				// Note: API call for GET intentionally before POST
+				oSalesOrder1.requestSideEffects(["*"]),
+				oModel.bindContext(sInvoiceCreated, oSalesOrder1).invoke("$auto").then(function () {
+					assert.ok(false);
+				}, function (oError0) { // Note: it's OK that this fails
+					assert.strictEqual(oError0.message,
+						"Error occurred while processing the request");
+					assert.strictEqual(oError0.resourcePath, "R#V#C"); //TODO useful?
+				})
+			];
+		}
+
 		try {
-			const sConfirm
-				= "com.sap.gateway.default.zui5_epm_sample.v0002.SalesOrder_Confirm(...)";
+			const sConfirm = sNamespace + "SalesOrder_Confirm(...)";
 			const oConfirm1 = oModel.bindContext(sConfirm, oSalesOrder1);
 			const oConfirm2 = oModel.bindContext(sConfirm, oSalesOrder2);
+			let bRepeatSideEffects = true;
 			const fnOnStrictHandlingFailed = (sId, aMessages) => {
 				assert.strictEqual(aMessages.length, 1);
 				assert.strictEqual(aMessages[0].getCode(), "ZUI5_EPM_SAMPLE/000");
@@ -541,6 +560,10 @@ sap.ui.define([
 					+ `/SO_2_SOITEM(SalesOrderID='${sId}',ItemPosition='0000000010')/Note`
 				]);
 				oModel.setContinueOnError("$auto");
+				if (bRepeatSideEffects) {
+					bRepeatSideEffects = false;
+					requestSideEffects();
+				}
 				return Promise.resolve(true);
 			};
 			oModel.setContinueOnError("$auto");
@@ -550,6 +573,13 @@ sap.ui.define([
 			this.oLogMock.expects("error")
 				.withExactArgs("Failed to invoke " + oSalesOrder2.getPath() + "/" + sConfirm,
 					sinon.match(sErrorMessage), "sap.ui.model.odata.v4.ODataContextBinding");
+			this.oLogMock.expects("error").twice()
+				.withExactArgs("Failed to invoke " + oSalesOrder1.getPath() + "/" + sInvoiceCreated,
+					sinon.match("500 Internal Server Error"),
+					"sap.ui.model.odata.v4.ODataContextBinding");
+			this.oLogMock.expects("warning").twice() //TODO avoid this!
+				.withExactArgs("Unknown child R#V#C of " + sNamespace + "Container", "/R#V#C",
+					"sap.ui.model.odata.v4.ODataMetaModel");
 
 			await Promise.all([
 				oConfirm1.invoke("$auto", false,
@@ -563,12 +593,17 @@ sap.ui.define([
 					assert.ok(false, "unexpected success");
 				}, function (oError) {
 					assert.strictEqual(oError.message, sErrorMessage);
-				})
+				}),
+				...requestSideEffects()
 			]);
 
 			assert.strictEqual(oSpy.args.length, 2, "2x $batch");
 			oSpy.args.forEach(([aRequests]) => {
-				assert.strictEqual(aRequests.length, 2, "2x POST");
+				assert.deepEqual(aRequests.map((oRequest) => oRequest.method),
+					["POST", "POST", "POST", "GET"]);
+				assert.strictEqual(
+					aRequests.findIndex((oRequest) => oRequest.url.includes("InvoiceCreated")),
+					2);
 				assert.strictEqual(aRequests.bContinueOnError, true);
 				aRequests.forEach((oRequest) => {
 					assert.notOk(Array.isArray(oRequest), "not a change set");

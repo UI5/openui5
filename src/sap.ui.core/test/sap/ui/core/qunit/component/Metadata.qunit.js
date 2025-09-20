@@ -431,7 +431,7 @@ sap.ui.define([
 				var oBaseTag = document.querySelector("base"),
 					sOldHRef = oBaseTag.href;
 				oBaseTag.href = "./";
-				var sActual = _UrlResolver._resolveUri(sInput, sBase).toString();
+				var sActual = _UrlResolver._resolveUri(sInput, sBase).sourceUrl;
 				oBaseTag.href = sOldHRef;
 				assert.equal(sActual, sExpected, "Resolved URI is correct!");
 			};

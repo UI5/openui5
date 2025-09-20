@@ -7,14 +7,16 @@ sap.ui.define([
 	'sap/base/Log',
 	'sap/base/util/syncFetch',
 	'sap/ui/base/OwnStatics',
-	'./ThemeManager'
+	'./ThemeManager',
+	'sap/ui/util/_URL'
 ], function(
 	Theming,
 	Element,
 	Log,
 	syncFetch,
 	OwnStatics,
-	ThemeManager
+	ThemeManager,
+	_URL
 ) {
 	"use strict";
 
@@ -62,18 +64,10 @@ sap.ui.define([
 	 * @returns {string} the resolved URL in CSS URL notation
 	 */
 	function checkAndResolveRelativeUrl(sUrl, sThemeBaseUrl) {
-		function isRelativeUrl(sUrl) {
-			if (sUrl.startsWith('//') || /^[a-z][a-z0-9+.-]*:/i.test(sUrl)) {
-				return false; // URL definitiv absolut
-			}
-
-			return true;  // URL is relative
-		}
-
 		const aMatch = rCssUrl.exec(sUrl);
 		if (aMatch) {
-			const oUrl = new URL(aMatch[1], sThemeBaseUrl);
-			if (isRelativeUrl(aMatch[1])) {
+			const oUrl = new _URL(aMatch[1], sThemeBaseUrl);
+			if (!oUrl.isAbsolute()) {
 				// Rewrite relative URLs based on the theme base url
 				const sNormalizedUrl = oUrl.href;
 				sUrl = "url('" + sNormalizedUrl + "')";

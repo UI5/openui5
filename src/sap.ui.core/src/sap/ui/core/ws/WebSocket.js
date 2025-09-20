@@ -377,7 +377,7 @@ sap.ui.define([
 		oBaseUrl.search = '';
 
 		// set according WebSocket protocol (secure / non-secure)
-		oBaseUrl.protocol = oBaseUrl.protocol === 'https' ? 'wss' : 'ws';
+		oBaseUrl.protocol = oBaseUrl.protocol === 'https:' ? 'wss:' : 'ws:';
 
 		// resolve absolute to base
 		// if there is already a protocol defined it won't be replaced

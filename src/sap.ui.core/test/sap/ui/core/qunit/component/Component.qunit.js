@@ -1106,7 +1106,7 @@ sap.ui.define([
 			}
 		}).then(function(oComponent) {
 			assert.equal(oComponent.getManifestObject().getComponentName(), "samples.components.oneview2", "The proper component has been loaded!");
-			assert.equal(oComponent.getManifestObject()._oBaseUri.path(), "/someUrl/oneview2/", "Manifest baseURI is set correctly");
+			assert.equal(oComponent.getManifestObject()._oBaseUri.plainUrl, "/someUrl/oneview2/", "Manifest baseURI is set correctly");
 		}, function(oError) {
 			assert.ok(false, "Component should be loaded!");
 		});

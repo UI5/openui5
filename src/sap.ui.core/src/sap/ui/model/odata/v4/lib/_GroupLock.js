@@ -26,8 +26,7 @@ sap.ui.define([
 	 * @param {boolean} [bModifying]
 	 *   Whether the reason for the group lock is a modifying request
 	 * @param {number} [iSerialNumber=Infinity]
-	 *   A {@link #getSerialNumber serial number} which may be used on unlock, or <code>NaN</code>
-	 *   if none should be used
+	 *   A {@link #getSerialNumber serial number} which may be used on unlock
 	 * @param {function} [fnCancel]
 	 *   Function that is called when the group lock is canceled
 	 * @throws {Error}
@@ -98,7 +97,7 @@ sap.ui.define([
 	 * Returns the serial number.
 	 *
 	 * @returns {number}
-	 *   The serial number or <code>NaN</code> if none should be used
+	 *   The serial number, which may be negative
 	 *
 	 * @public
 	 * @see #getUnlockedCopy
@@ -112,17 +111,17 @@ sap.ui.define([
 	 * lock on which {@link #unlock} has already been called (e.g. when one group is used to create
 	 * multiple requests).
 	 *
-	 * @param {boolean} [bNoSerialNumber]
-	 *   Whether to replace the old serial number with <code>NaN</code> instead of keeping it
+	 * @param {boolean} [bNegativeSerialNumber]
+	 *   Whether to remember the old serial number with a negative sign
 	 * @returns {sap.ui.model.odata.v4.lib._GroupLock}
 	 *   The group lock
 	 *
 	 * @public
 	 * @see #getSerialNumber
 	 */
-	_GroupLock.prototype.getUnlockedCopy = function (bNoSerialNumber) {
+	_GroupLock.prototype.getUnlockedCopy = function (bNegativeSerialNumber) {
 		return new _GroupLock(this.sGroupId, this.oOwner, false, false,
-			bNoSerialNumber ? NaN : this.iSerialNumber);
+			bNegativeSerialNumber ? -this.iSerialNumber : this.iSerialNumber);
 	};
 
 	/**

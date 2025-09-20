@@ -4,7 +4,7 @@
 /* =================================== */
 
 .sapMFeedListItem {
-	display: block;
+	display: flex;
 }
 
 .sapMFeedListItem .sapUiSelectable > * {
@@ -93,6 +93,7 @@
 .sapMFeedListItemText {
 	vertical-align: top;
 	margin: 0;
+	min-width: 0;
 }
 
 .sapMFeedListItemTextString {
@@ -106,7 +107,8 @@
 
 html.sap-tablet .sapMFeedListItemHasFigure,
 html.sap-desktop .sapMFeedListItemHasFigure {
-	margin-left: 3.75rem;
+	margin-left: 1rem;
+	width: 100%;
 }
 
 .sapMFeedListItemTextText {
@@ -274,6 +276,7 @@ html.sap-tablet .sapMFeedListItem .sapMLnk:focus {
 /* Allow image outline(-left) to be rendered completely */
 .sapMFeedListShowSeparatorsAll .sapMFeedListItem {
 	padding-left: 1rem;
+	padding-right: 1rem;
 }
 
 .sapMFeedListItemTitleDiv.sapMLIB {

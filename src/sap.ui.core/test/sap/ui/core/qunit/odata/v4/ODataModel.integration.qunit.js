@@ -63,6 +63,7 @@ sap.ui.define([
 		sPreviousFailed = "HTTP request was not processed because the previous request failed",
 		sSalesOrderService = "/sap/opu/odata4/sap/zui5_testv4/default/sap/zui5_epm_sample/0002/",
 		rSkip = /&\$skip=(\d+)/, // $skip=<number>
+		rStartsWithMethod = /^(DELETE|GET|PATCH|POST|PUT) (.*)$/,
 		sTeaBusi = "/sap/opu/odata4/IWBEP/TEA/default/IWBEP/TEA_BUSI/0001/",
 		// the timeout for the tests and for waitForChanges in millseconds, 0 = keep defaults
 		iTestTimeout = parseInt(new URLSearchParams(window.location.search).get("timeout")),
@@ -1166,7 +1167,7 @@ sap.ui.define([
 		},
 
 		/**
-		 * Checks that exactly the expected messages have been reported, the order doesn't matter.
+		 * Checks that exactly the expected messages have been reported, the order does not matter.
 		 *
 		 * @param {object} assert The QUnit assert object
 		 */
@@ -1328,7 +1329,9 @@ sap.ui.define([
 		 * Removes the found request from the list.
 		 *
 		 * @param {object} oActualRequest The actual request
-		 * @returns {object} The matching expected request or undefined if none was found
+		 * @returns {Array<object,number>} An array with two elements:
+		 *   - The matching expected request or undefined if none was found
+		 *   - The index where the request was found in the list
 		 */
 		consumeExpectedRequest : function (oActualRequest) {
 			var oExpectedRequest, i;
@@ -1337,11 +1340,11 @@ sap.ui.define([
 				oExpectedRequest = this.aRequests[i];
 				if (oExpectedRequest.url === oActualRequest.url) {
 					this.aRequests.splice(i, 1);
-					return oExpectedRequest;
+					return [oExpectedRequest, i];
 				}
 			}
 
-			return this.aRequests.shift(); // consume the first candidate to get a diff
+			return [this.aRequests.shift(), 0]; // consume the first candidate to get a diff
 		},
 
 		/**
@@ -1376,8 +1379,7 @@ sap.ui.define([
 				oPayload["EMPLOYEE_2_MANAGER@odata.bind"] = oParent.getPath().slice(1);
 			}
 			this.expectRequest({
-					method : "POST",
-					url : "EMPLOYEES",
+					url : "POST EMPLOYEES",
 					payload : oPayload
 				}, {
 					ID : sId,
@@ -1728,8 +1730,7 @@ sap.ui.define([
 				return that.waitForChanges(assert);
 			}).then(function () {
 				that.expectRequest({
-						method : "POST",
-						url : "SalesOrderList",
+						url : "POST SalesOrderList",
 						payload : {Note : "New 1"}
 					}, {
 						Note : "New 1",
@@ -1752,8 +1753,7 @@ sap.ui.define([
 				return that.waitForChanges(assert);
 			}).then(function () {
 				that.expectRequest({
-						method : "POST",
-						url : "SalesOrderList",
+						url : "POST SalesOrderList",
 						payload : {Note : "New 2"}
 					}, {
 						Note : "New 2",
@@ -1966,7 +1966,8 @@ sap.ui.define([
 						headers : _Helper.resolveIfMatchHeader(mHeaders),
 						payload : typeof vPayload === "string" ? JSON.parse(vPayload) : vPayload
 					},
-					oExpectedRequest = that.consumeExpectedRequest(oActualRequest),
+					oExpectedRequest,
+					iFoundAt,
 					oResponse,
 					mResponseHeaders,
 					bWaitForResponse = true;
@@ -1985,6 +1986,7 @@ sap.ui.define([
 				delete oActualRequest.headers["Accept"];
 				delete oActualRequest.headers["Accept-Language"];
 				delete oActualRequest.headers["Content-Type"];
+				[oExpectedRequest, iFoundAt] = that.consumeExpectedRequest(oActualRequest);
 				if (oExpectedRequest) {
 					if (!oExpectedRequest.headers) {
 						oExpectedRequest.headers = {};
@@ -2006,14 +2008,14 @@ sap.ui.define([
 						if (bHasBatchNo === false) {
 							assert.ok(false, "A previous request within this $batch did not have"
 								+ " batchNo : " + oActualRequest.batchNo
-								+ ", but this one has");
+								+ ", but this one has: " + sUrl);
 						}
 						bHasBatchNo = true;
 					} else if (iBatchNo !== undefined) {
 						if (bHasBatchNo === true) {
 							assert.ok(false, "All previous requests within this $batch did have"
-								+ " batchNo : " + oActualRequest.batchNo
-								+ ", but this one doesn't");
+								+ " batchNo : " + iBatchNo
+								+ ", but this one doesn't: " + sUrl);
 						}
 						bHasBatchNo = false;
 					} // else: $direct/$single
@@ -2022,6 +2024,9 @@ sap.ui.define([
 					}
 					if ("$ContentID" in oExpectedRequest) {
 						oActualRequest.$ContentID = sContentID;
+					}
+					if (iFoundAt > 0 && sMethod !== "GET") {
+						oActualRequest.__error__ = `Request is ${iFoundAt} step(s) ahead!`;
 					}
 					assert.deepEqual(oActualRequest, oExpectedRequest,
 						`${sMethod} ${TestUtils.makeUrlReadable(sUrl)} (batchNo: ${iBatchNo})`);
@@ -2453,19 +2458,30 @@ sap.ui.define([
 		 * responses).
 		 *
 		 * @param {string|object} vRequest
-		 *   The request with the properties "method", "url" and "headers". Spaces, double quotes,
-		 *   square brackets, and curly brackets inside the URL are percent-encoded automatically.
-		 *   Additionally, the following properties may be given for requests within a $batch:
-		 *   <ul>
-		 *      <li> groupId: the group ID by which the $batch was sent
-		 *      <li> batchNo: the number of the ($direct or $batch) request within the test
-		 *        (starting with 1). Use a negative number to expect a $direct request.
-		 *      <li> changeSetNo: The number of the change set within $batch (starting with 1)
-		 *      <li> $ContentID: The content ID of the request within the change set
-		 *   </ul>
-		 *   A simple string is interpreted as URL with default method "GET" and no headers, but you
-		 *   can also prefix the URL with "DELETE " to specify that method. Additionally, you can
-		 *   add a prefix with "#", the "batchNo" value, and a space.
+		 *   Either a URL string as defined in "vRequest.url" or a request object with following
+		 *   properties
+		 * @param {string} [vRequest.$ContentID]
+		 *   The content ID of the request within the change set
+		 * @param {number} [vRequest.batchNo]
+		 *   The number of the ($direct or $batch) request within the test (starting with 1); use a
+		 *   negative number to expect a $direct request; see also "vRequest.url"
+		 * @param {number} [vRequest.changeSetNo]
+		 *   The number of the change set within $batch (starting with 1)
+		 * @param {string} [vRequest.groupId]
+		 *   The group ID by which the $batch was sent
+		 * @param {object} [vRequest.headers]
+		 *   The expected HTTP request headers without "Accept", "Accept-Language", and
+		 *   "Content-Type" which are never checked; if "vRequest.headers" is omitted
+		 *   "sap-cancel-on-close" is ignored and it is expected that the request does not have
+		 *   any additional headers
+		 * @param {"DELETE"|"GET"|"PATCH"|"POST"|"PUT"} [vRequest.method="GET"]
+		 *   The HTTP method, see also "vRequest.url"
+		 * @param {object} [vRequest.payload]
+		 *   The payload of the request
+		 * @param {string} vRequest.url
+		 *   The request URL in the following format "#<batchNo> <method> <URL>"; "#<batchNo> " and
+		 *   "<method> " are optional; spaces, double quotes, square brackets, and curly brackets
+		 *   inside the URL are percent-encoded automatically
 		 * @param {object|string|number|Error|Promise|function} [vResponse]
 		 *   The response message to be returned from the requestor or a promise on it or a function
 		 *   (invoked "just in time" when the request is actually sent) returning the response
@@ -2489,17 +2505,16 @@ sap.ui.define([
 				vRequest = {
 					url : vRequest
 				};
-				if (vRequest.url.startsWith("#")) { // "#batchNo ..."
-					const iSpace = vRequest.url.indexOf(" ");
-					vRequest.batchNo = parseInt(vRequest.url.slice(1, iSpace));
-					vRequest.url = vRequest.url.slice(iSpace + 1);
-				}
-				if (vRequest.url.startsWith("DELETE ")) {
-					vRequest.method = "DELETE";
-					vRequest.url = vRequest.url.slice(7);
-				}
 			}
-
+			if (vRequest.url.startsWith("#")) { // "#batchNo ..."
+				const iSpace = vRequest.url.indexOf(" ");
+				vRequest.batchNo = parseInt(vRequest.url.slice(1, iSpace));
+				vRequest.url = vRequest.url.slice(iSpace + 1);
+			}
+			const aURLParts = rStartsWithMethod.exec(vRequest.url);
+			if (aURLParts) {
+				[, vRequest.method, vRequest.url] = aURLParts;
+			}
 			// ensure that these properties are defined (required for deepEqual)
 			vRequest.method ??= "GET";
 			vRequest.payload ??= undefined;
@@ -2969,20 +2984,17 @@ sap.ui.define([
 			that.expectChange("note", ["Note 1 changed", "Note 2 changed", "Note 3 changed"])
 				.expectRequest({
 					changeSetNo : 1,
-					method : "PATCH",
-					url : "SalesOrderList('1')",
+					url : "PATCH SalesOrderList('1')",
 					payload : {Note : "Note 1 changed"}
 				}, oError)
 				.expectRequest({
 					changeSetNo : 2,
-					method : "PATCH",
-					url : "SalesOrderList('2')",
+					url : "PATCH SalesOrderList('2')",
 					payload : {Note : "Note 2 changed"}
 				}) // no response required
 				.expectRequest({
 					changeSetNo : 2,
-					method : "PATCH",
-					url : "SalesOrderList('3')",
+					url : "PATCH SalesOrderList('3')",
 					payload : {Note : "Note 3 changed"}
 				}) // no response required
 				.expectRequest("BusinessPartnerList('1')/CompanyName") // no response required
@@ -3034,8 +3046,7 @@ sap.ui.define([
 
 		this.expectChange("name", ["Woodstock"])
 			.expectRequest({
-				method : "PATCH",
-				url : "Artists(ArtistID='42',IsActiveEntity=true)"
+				url : "PATCH Artists(ArtistID='42',IsActiveEntity=true)"
 					+ "/_Event(08-08-2024T01%3A02%3A03Z)",
 				payload : {Name : "Woodstock"}
 			}, createErrorInsideBatch({target : "Name"}))
@@ -4061,8 +4072,7 @@ sap.ui.define([
 
 		return this.createView(assert, sView, oModel).then(function () {
 			that.expectRequest({
-				method : "POST",
-				url : "SalesOrderList('1')/" + sAction,
+				url : "POST SalesOrderList('1')/" + sAction,
 				payload : {}
 			}, {
 				SalesOrderID : "1"
@@ -4295,8 +4305,7 @@ sap.ui.define([
 
 		return this.createView(assert, sView, oModel).then(function () {
 			that.expectRequest({
-					method : "POST",
-					url : "SalesOrderList('1')/" + sAction + "?$select=Messages,SalesOrderID"
+					url : "POST SalesOrderList('1')/" + sAction + "?$select=Messages,SalesOrderID"
 						+ "&$expand=SO_2_SOITEM($select=ItemPosition,Messages,SalesOrderID)",
 					payload : {}
 				}, {
@@ -4535,10 +4544,9 @@ sap.ui.define([
 			// BCP 1980517597
 			that.expectChange("unit1", "t")
 				.expectRequest({
-					method : "PATCH",
 					headers : {"If-Match" : "etag0"},
-					url : "SalesOrderList('1')/SO_2_SOITEM(SalesOrderID='1',ItemPosition='10')"
-						+ "?sap-client=123",
+					url : "PATCH SalesOrderList('1')"
+						+ "/SO_2_SOITEM(SalesOrderID='1',ItemPosition='10')?sap-client=123",
 					payload : {QuantityUnit : "t"}
 				}, {
 					"@odata.etag" : "etag23",
@@ -4568,9 +4576,8 @@ sap.ui.define([
 		}).then(function () {
 			that.expectChange("bp", "changed")
 				.expectRequest({
-					method : "PATCH",
 					headers : {"If-Match" : "ETag"},
-					url : "BusinessPartnerList('4')?sap-client=123",
+					url : "PATCH BusinessPartnerList('4')?sap-client=123",
 					payload : {CompanyName : "changed"}
 				});
 
@@ -5810,8 +5817,7 @@ sap.ui.define([
 			oTable = that.oView.byId("table");
 
 			that.expectRequest({
-					method : "PATCH",
-					url : "EMPLOYEES('0')?foo=bar",
+					url : "PATCH EMPLOYEES('0')?foo=bar",
 					headers : {"If-Match" : "ETag0"},
 					payload : {AGE : 10}
 				}) // 204 No Content
@@ -6117,11 +6123,10 @@ sap.ui.define([
 
 		this.expectChange("name", "Frederic Spring")
 			.expectRequest({
-				method : "PATCH",
 				payload : {
 					Name : "Frederic Spring"
 				},
-				url : "EMPLOYEES('1')"
+				url : "PATCH EMPLOYEES('1')"
 			}, {
 				ID : "1",
 				Name : "Frederic Spring",
@@ -6222,14 +6227,13 @@ sap.ui.define([
 		this.expectChange("monthly", "2,345.67")
 			.expectChange("salary", "2345.67 EUR")
 			.expectRequest({
-				method : "PATCH",
 				payload : {
 					SALARY : {
 						BASIC_SALARY_CURR : "EUR",
 						MONTHLY_BASIC_SALARY_AMOUNT : "2345.67"
 					}
 				},
-				url : "EMPLOYEES('1')"
+				url : "PATCH EMPLOYEES('1')"
 			}, {
 				SALARY : {
 					BASIC_SALARY_CURR : "DEM", // side effect
@@ -6529,8 +6533,7 @@ sap.ui.define([
 
 		return this.createView(assert, sView, this.createSalesOrdersModel()).then(function () {
 			that.expectRequest({
-					method : "POST",
-					url : "SalesOrderList('1')/"
+					url : "POST SalesOrderList('1')/"
 						+ "com.sap.gateway.default.zui5_epm_sample.v0002.SalesOrder_Confirm"
 						+ "?$expand=SO_2_SOITEM($expand=SOITEM_2_PRODUCT)",
 					payload : {}
@@ -6593,8 +6596,7 @@ sap.ui.define([
 		}).then(function () {
 			that.expectChange("name", ["Notebook Basic 15.2"])
 				.expectRequest({
-					method : "PATCH",
-					url : "ProductList('HT-1000')",
+					url : "PATCH ProductList('HT-1000')",
 					payload : {Name : "Notebook Basic 15.2"}
 				});
 
@@ -7156,8 +7158,7 @@ sap.ui.define([
 
 		return this.createView(assert, sView).then(function () {
 			that.expectRequest({
-					method : "POST",
-					url : "ChangeTeamBudgetByID",
+					url : "POST ChangeTeamBudgetByID",
 					payload : {
 						Budget : "1234.1234",
 						TeamID : "TEAM_01"
@@ -7284,8 +7285,7 @@ sap.ui.define([
 			return that.waitForChanges(assert);
 		}).then(function () {
 			that.expectRequest({
-					method : "POST",
-					url : "ChangeTeamBudgetByID",
+					url : "POST ChangeTeamBudgetByID",
 					payload : {
 						Budget : "1234.1234",
 						TeamID : "TEAM_01"
@@ -7389,8 +7389,7 @@ sap.ui.define([
 			]);
 		}).then(function () {
 			that.expectRequest({
-				method : "POST",
-				url : "ChangeTeamBudgetByID",
+				url : "POST ChangeTeamBudgetByID",
 				payload : {
 					Budget : "4321.1234",
 					TeamID : "TEAM_01"
@@ -7413,8 +7412,7 @@ sap.ui.define([
 				.withExactArgs("Failed to invoke /ChangeTeamBudgetByID(...)",
 					sinon.match(oError.message), sODCB);
 			that.expectRequest({
-					method : "POST",
-					url : "ChangeTeamBudgetByID",
+					url : "POST ChangeTeamBudgetByID",
 					payload : {
 						Budget : "-42",
 						TeamID : "TEAM_01"
@@ -7729,8 +7727,7 @@ sap.ui.define([
 			return that.waitForChanges(assert);
 		}).then(function () {
 			that.expectRequest({
-				method : "POST",
-				url : "HirePerson",
+				url : "POST HirePerson",
 				payload : {
 					Person : {
 						Address : {
@@ -7772,8 +7769,7 @@ sap.ui.define([
 			sPerson = JSON.stringify(oPerson);
 
 			that.expectRequest({
-				method : "POST",
-				url : "HirePerson",
+				url : "POST HirePerson",
 				payload : {
 					Person : {
 						Address : {
@@ -9206,8 +9202,7 @@ sap.ui.define([
 			assert.notOk(bDone, "not yet PATCHed");
 
 			that.expectRequest({
-					method : "PATCH",
-					url : "BusinessPartnerList('42')",
+					url : "PATCH BusinessPartnerList('42')",
 					headers : {"If-Match" : "ETag"},
 					payload : {CompanyName : "Bar"}
 				}, {CompanyName : "Bar"});
@@ -9280,8 +9275,7 @@ sap.ui.define([
 
 			return this.createView(assert, sView, oModel).then(function () {
 				// that.expectRequest({
-				//         method : "PATCH",
-				//         url : "EMPLOYEES('2')",
+				//         url : "PATCH EMPLOYEES('2')",
 				//         payload : {Name : "Jonathan Schmidt"}
 				//     }) // 204 No Content
 				that.expectChange("text", "Jonathan Schmidt");
@@ -9397,8 +9391,7 @@ sap.ui.define([
 
 			this.expectChange("name", "Team*")
 				.expectRequest({
-					method : "PATCH",
-					url : "TEAMS('TEAM')",
+					url : "PATCH TEAMS('TEAM')",
 					payload : {Name : "Team*"}
 				}, undefined, {
 					"sap-messages" : JSON.stringify([{
@@ -10100,8 +10093,7 @@ sap.ui.define([
 
 		return this.createView(assert, sView, oModel).then(function () {
 			that.expectRequest({
-					method : "PATCH",
-					url : "EntitiesWithComplexKey(Key1='foo',Key2=42)",
+					url : "PATCH EntitiesWithComplexKey(Key1='foo',Key2=42)",
 					headers : {"If-Match" : "ETag"},
 					payload : {Value : "New"}
 				}, {
@@ -10212,8 +10204,7 @@ sap.ui.define([
 					sinon.match("Request intentionally failed"), sODLB);
 			that.expectChange("item", ["", "Baz", "Foo", "Bar"])
 				.expectRequest({
-					method : "POST",
-					url : "EntitiesWithComplexKey",
+					url : "POST EntitiesWithComplexKey",
 					payload : {}
 				}, createErrorInsideBatch({target : "Value"}))
 				.expectMessages([{
@@ -10370,8 +10361,7 @@ sap.ui.define([
 				if (iCase > 0) {
 					that.expectChange("quantity", [,, "5.000"])
 						.expectRequest({
-							method : "POST",
-							url : "SalesOrderList('42')/SO_2_SOITEM",
+							url : "POST SalesOrderList('42')/SO_2_SOITEM",
 							payload : {Quantity : "5"}
 						}, {
 							ItemPosition : "0030",
@@ -10464,8 +10454,7 @@ sap.ui.define([
 		}).then(function () {
 			that.expectChange("value", "changed")
 				.expectRequest({
-					method : "PATCH",
-					url : "EntitiesWithComplexKey(Key1='p1',Key2=2)",
+					url : "PATCH EntitiesWithComplexKey(Key1='p1',Key2=2)",
 					payload : {Value : "changed"}
 				}, {
 					Key : {
@@ -10543,7 +10532,6 @@ sap.ui.define([
 
 		this.expectChange("delta", "Hello, World!")
 			.expectRequest({
-				method : "PATCH",
 				payload : {
 					Delta : "Hello, World!",
 					"Delta@complexAnnotation" : {
@@ -10553,7 +10541,7 @@ sap.ui.define([
 						"Iota@simpleAnnotation" : "iota"
 					}
 				},
-				url : "EntitiesWithComplexKey(Key1='p1',Key2=p2)"
+				url : "PATCH EntitiesWithComplexKey(Key1='p1',Key2=p2)"
 			}, {
 				Delta : "hello, world", // like Brian Kernighan said
 				Key : {
@@ -10747,8 +10735,7 @@ sap.ui.define([
 			oBinding.attachCreateSent(onCreateSent);
 
 			that.expectRequest({
-					method : "POST",
-					url : "SalesOrderList",
+					url : "POST SalesOrderList",
 					payload : {Note : "bar"}
 				}, new Promise(function (_resolve, reject) {
 					fnRejectPost = reject;
@@ -10792,8 +10779,7 @@ sap.ui.define([
 			var oCreateSentPromise = expectCreateSent();
 
 			that.expectRequest({
-					method : "POST",
-					url : "SalesOrderList",
+					url : "POST SalesOrderList",
 					payload : {Note : "baz"}
 				}, new Promise(function (resolve) {
 					fnResolvePost = resolve;
@@ -10844,8 +10830,7 @@ sap.ui.define([
 			});
 
 			that.expectRequest({
-					method : "POST",
-					url : "EMPLOYEES",
+					url : "POST EMPLOYEES",
 					payload : {Name : "Anonymous"}
 				}, createErrorInsideBatch())
 				.expectMessages([{
@@ -10905,16 +10890,14 @@ sap.ui.define([
 
 			that.expectChange("note", ["new2", "new1", "#42"])
 				.expectRequest({
-					method : "POST",
-					url : "SalesOrderList",
+					url : "POST SalesOrderList",
 					payload : {Note : "new1"}
 				}, {
 					Note : "new1",
 					SalesOrderID : "43"
 				})
 				.expectRequest({
-					method : "POST",
-					url : "SalesOrderList",
+					url : "POST SalesOrderList",
 					payload : {Note : "new2"}
 				}, {
 					Note : "new2",
@@ -10950,13 +10933,11 @@ sap.ui.define([
 				.expectChange("note", "new2", -1)
 				.expectChange("note", ["new1", "#42"])
 				.expectRequest({
-					method : "POST",
-					url : "SalesOrderList",
+					url : "POST SalesOrderList",
 					payload : {Note : "new3"}
 				}, oError)
 				.expectRequest({
-					method : "POST",
-					url : "SalesOrderList",
+					url : "POST SalesOrderList",
 					payload : {Note : "new4"}
 				}/* response does not matter here */)
 				.expectRequest("SalesOrderList?$select=Note,SalesOrderID&$skip=0&$top=99"
@@ -11108,8 +11089,7 @@ sap.ui.define([
 				return that.waitForChanges(assert);
 			}).then(function () {
 				that.expectRequest({
-						method : "POST",
-						url : "SalesOrderList",
+						url : "POST SalesOrderList",
 						payload : {BuyerID : "24", Note : "baz"}
 					}, {
 						// no BuyerID (JIRA: CPOUI5ODATAV4-1503)
@@ -11255,16 +11235,14 @@ sap.ui.define([
 			return that.waitForChanges(assert);
 		}).then(function () {
 			that.expectRequest({
-					method : "POST",
-					url : "SalesOrderList",
+					url : "POST SalesOrderList",
 					payload : {Note : "New 1"}
 				}, {
 					Note : "New 1",
 					SalesOrderID : "43"
 				})
 				.expectRequest({
-					method : "POST",
-					url : "SalesOrderList",
+					url : "POST SalesOrderList",
 					payload : {Note : "New 2"}
 				}, {
 					Note : "New 2",
@@ -11296,8 +11274,7 @@ sap.ui.define([
 			return that.waitForChanges(assert);
 		}).then(function () {
 			that.expectRequest({
-					method : "POST",
-					url : "SalesOrderList",
+					url : "POST SalesOrderList",
 					payload : {Note : "New 3"}
 				}, {
 					Note : "New 3",
@@ -11390,8 +11367,7 @@ sap.ui.define([
 			oCreatedContext = that.createThird();
 
 			that.expectRequest({
-					method : "POST",
-					url : "SalesOrderList",
+					url : "POST SalesOrderList",
 					payload : {Note : "New 3"}
 				}, {
 					Note : "New 3",
@@ -11593,27 +11569,21 @@ sap.ui.define([
 			return that.waitForChanges(assert);
 		}).then(function () {
 			that.expectRequest({
-					batchNo : 2,
-					method : "POST",
-					url : "BusinessPartnerList('4711')/BP_2_SO",
+					url : "#2 POST BusinessPartnerList('4711')/BP_2_SO",
 					payload : {Note : "New 1"}
 				}, {
 					Note : "New 1",
 					SalesOrderID : "43"
 				})
 				.expectRequest({
-					batchNo : 2,
-					method : "POST",
-					url : "BusinessPartnerList('4711')/BP_2_SO",
+					url : "#2 POST BusinessPartnerList('4711')/BP_2_SO",
 					payload : {Note : "New 2"}
 				}, {
 					Note : "New 2",
 					SalesOrderID : "44"
 				})
 				.expectRequest({
-					batchNo : 2,
-					method : "POST",
-					url : "BusinessPartnerList('4711')/BP_2_SO",
+					url : "#2 POST BusinessPartnerList('4711')/BP_2_SO",
 					payload : {Note : "New 3"}
 				}, {
 					Note : "New 3",
@@ -11685,8 +11655,7 @@ sap.ui.define([
 			return that.waitForChanges(assert);
 		}).then(function () {
 			that.expectRequest({
-					method : "POST",
-					url : "SalesOrderList",
+					url : "POST SalesOrderList",
 					payload : {Note : "New 1"}
 				}, {
 					Note : "New 1",
@@ -11748,8 +11717,7 @@ sap.ui.define([
 			assert.strictEqual(oCreatedContext0.isTransient(), false);
 
 			that.expectRequest({
-					method : "POST",
-					url : "SalesOrderList",
+					url : "POST SalesOrderList",
 					payload : {Note : "New 3 - Changed"}
 				}, {
 					Note : "New 3 - Changed",
@@ -11829,24 +11797,21 @@ sap.ui.define([
 			return that.waitForChanges(assert);
 		}).then(function () {
 			that.expectRequest({
-					method : "POST",
-					url : "BusinessPartnerList('4711')/BP_2_SO",
+					url : "POST BusinessPartnerList('4711')/BP_2_SO",
 					payload : {Note : "New 1"}
 				}, {
 					Note : "New 1",
 					SalesOrderID : "43"
 				})
 				.expectRequest({
-					method : "POST",
-					url : "BusinessPartnerList('4711')/BP_2_SO",
+					url : "POST BusinessPartnerList('4711')/BP_2_SO",
 					payload : {Note : "New 2"}
 				}, {
 					Note : "New 2",
 					SalesOrderID : "44"
 				})
 				.expectRequest({
-					method : "POST",
-					url : "BusinessPartnerList('4711')/BP_2_SO",
+					url : "POST BusinessPartnerList('4711')/BP_2_SO",
 					payload : {Note : "New 3"}
 				}, {
 					Note : "New 3",
@@ -11963,16 +11928,14 @@ sap.ui.define([
 			return that.waitForChanges(assert);
 		}).then(function () {
 			that.expectRequest({
-					method : "POST",
-					url : "BusinessPartnerList('4711')/BP_2_SO",
+					url : "POST BusinessPartnerList('4711')/BP_2_SO",
 					payload : {Note : "New 1"}
 				}, {
 					Note : "New 1",
 					SalesOrderID : "43"
 				})
 				.expectRequest({
-					method : "POST",
-					url : "BusinessPartnerList('4711')/BP_2_SO",
+					url : "POST BusinessPartnerList('4711')/BP_2_SO",
 					payload : {Note : "New 2"}
 				}, {
 					Note : "New 2",
@@ -12070,27 +12033,21 @@ sap.ui.define([
 			return that.waitForChanges(assert);
 		}).then(function () {
 			that.expectRequest({
-					batchNo : 2,
-					method : "POST",
-					url : "SalesOrderList",
+					url : "#2 POST SalesOrderList",
 					payload : {Note : "New 1"}
 				}, {
 					Note : "New 1",
 					SalesOrderID : "44"
 				})
 				.expectRequest({
-					batchNo : 2,
-					method : "POST",
-					url : "SalesOrderList",
+					url : "#2 POST SalesOrderList",
 					payload : {Note : "New 2"}
 				}, {
 					Note : "New 2",
 					SalesOrderID : "45"
 				})
 				.expectRequest({
-					batchNo : 2,
-					method : "POST",
-					url : "SalesOrderList",
+					url : "#2 POST SalesOrderList",
 					payload : {Note : "New 3"}
 				}, {
 					Note : "New 3",
@@ -12117,8 +12074,7 @@ sap.ui.define([
 			]);
 		}).then(function () {
 			that.expectRequest({
-					method : "PATCH",
-					url : "SalesOrderList('46')",
+					url : "PATCH SalesOrderList('46')",
 					payload : {Note : "New 3 - Changed"}
 				}, {
 					Note : "New 3 - Changed",
@@ -12216,18 +12172,14 @@ sap.ui.define([
 			return that.waitForChanges(assert);
 		}).then(function () {
 			that.expectRequest({
-					batchNo : 2,
-					method : "POST",
-					url : "SalesOrderList",
+					url : "#2 POST SalesOrderList",
 					payload : {Note : "New 1"}
 				}, {
 					Note : "New 1",
 					SalesOrderID : "43"
 				})
 				.expectRequest({
-					batchNo : 2,
-					method : "POST",
-					url : "SalesOrderList",
+					url : "#2 POST SalesOrderList",
 					payload : {Note : "New 2"}
 				}, {
 					Note : "New 2",
@@ -12407,8 +12359,7 @@ sap.ui.define([
 			return that.waitForChanges(assert);
 		}).then(function () {
 			that.expectRequest({
-					method : "POST",
-					url : "BusinessPartnerList('4711')/BP_2_SO",
+					url : "POST BusinessPartnerList('4711')/BP_2_SO",
 					payload : {Note : "New 1"}
 				}, {
 					Note : "New 1",
@@ -12650,8 +12601,7 @@ sap.ui.define([
 			return that.waitForChanges(assert);
 		}).then(function () {
 			that.expectRequest({
-					method : "POST",
-					url : "BusinessPartnerList('4711')/BP_2_SO",
+					url : "POST BusinessPartnerList('4711')/BP_2_SO",
 					payload : {Note : "New 1"}
 				}, {
 					Note : "New 1",
@@ -12812,8 +12762,7 @@ sap.ui.define([
 			return that.waitForChanges(assert);
 		}).then(function () {
 			that.expectRequest({
-					method : "POST",
-					url : "SalesOrderList",
+					url : "POST SalesOrderList",
 					payload : {Note : "New 1"}
 				}, {
 					Note : "New 1",
@@ -12907,16 +12856,14 @@ sap.ui.define([
 			return that.waitForChanges(assert);
 		}).then(function () {
 			that.expectRequest({
-					method : "POST",
-					url : "BusinessPartnerList('4711')/BP_2_SO",
+					url : "POST BusinessPartnerList('4711')/BP_2_SO",
 					payload : {Note : "New 1"}
 				}, {
 					Note : "New 1",
 					SalesOrderID : "43"
 				})
 				.expectRequest({
-					method : "POST",
-					url : "BusinessPartnerList('4711')/BP_2_SO",
+					url : "POST BusinessPartnerList('4711')/BP_2_SO",
 					payload : {Note : "New 2"}
 				}, {
 					Note : "New 2",
@@ -13037,27 +12984,21 @@ sap.ui.define([
 			return that.waitForChanges(assert);
 		}).then(function () {
 			that.expectRequest({
-					batchNo : 2,
-					method : "POST",
-					url : "SalesOrderList",
+					url : "#2 POST SalesOrderList",
 					payload : {Note : "New 1"}
 				}, {
 					Note : "New 1",
 					SalesOrderID : "43"
 				})
 				.expectRequest({
-					batchNo : 2,
-					method : "POST",
-					url : "SalesOrderList",
+					url : "#2 POST SalesOrderList",
 					payload : {Note : "New 2"}
 				}, {
 					Note : "New 2",
 					SalesOrderID : "44"
 				})
 				.expectRequest({
-					batchNo : 2,
-					method : "POST",
-					url : "SalesOrderList",
+					url : "#2 POST SalesOrderList",
 					payload : {Note : "New 3"}
 				}, {
 					Note : "New 3",
@@ -13213,8 +13154,7 @@ sap.ui.define([
 			return that.waitForChanges(assert);
 		}).then(function () {
 			that.expectRequest({
-					method : "POST",
-					url : "BusinessPartnerList('4711')/BP_2_SO",
+					url : "POST BusinessPartnerList('4711')/BP_2_SO",
 					payload : {Note : "New 1"}
 				}, {
 					Note : "New 1",
@@ -13306,27 +13246,21 @@ sap.ui.define([
 			return that.waitForChanges(assert);
 		}).then(function () {
 			that.expectRequest({
-					batchNo : 2,
-					method : "POST",
-					url : "SalesOrderList",
+					url : "#2 POST SalesOrderList",
 					payload : {Note : "New 1"}
 				}, {
 					Note : "New 1",
 					SalesOrderID : "43"
 				})
 				.expectRequest({
-					batchNo : 2,
-					method : "POST",
-					url : "SalesOrderList",
+					url : "#2 POST SalesOrderList",
 					payload : {Note : "New 2"}
 				}, {
 					Note : "New 2",
 					SalesOrderID : "44"
 				})
 				.expectRequest({
-					batchNo : 2,
-					method : "POST",
-					url : "SalesOrderList",
+					url : "#2 POST SalesOrderList",
 					payload : {Note : "New 3"}
 				}, {
 					Note : "New 3",
@@ -13413,9 +13347,7 @@ sap.ui.define([
 			return that.waitForChanges(assert);
 		}).then(function () {
 			that.expectRequest({
-					batchNo : 2,
-					method : "POST",
-					url : "BusinessPartnerList('4711')/BP_2_SO",
+					url : "#2 POST BusinessPartnerList('4711')/BP_2_SO",
 					payload : {Note : "New 1"}
 				}, {
 					Note : "New 1",
@@ -13515,18 +13447,14 @@ sap.ui.define([
 			return that.waitForChanges(assert);
 		}).then(function () {
 			that.expectRequest({
-					batchNo : 2,
-					method : "POST",
-					url : "SalesOrderList",
+					url : "#2 POST SalesOrderList",
 					payload : {Note : "New 1"}
 				}, {
 					Note : "New 1",
 					SalesOrderID : "43"
 				})
 				.expectRequest({
-					batchNo : 2,
-					method : "POST",
-					url : "SalesOrderList",
+					url : "#2 POST SalesOrderList",
 					payload : {Note : "New 2"}
 				}, {
 					Note : "New 2",
@@ -13623,8 +13551,7 @@ sap.ui.define([
 			return that.waitForChanges(assert);
 		}).then(function () {
 			that.expectRequest({
-					method : "POST",
-					url : "BusinessPartnerList",
+					url : "POST BusinessPartnerList",
 					payload : {
 						Address : {
 							City : "Heidelberg",
@@ -13702,8 +13629,7 @@ sap.ui.define([
 			return that.waitForChanges(assert);
 		}).then(function () {
 			that.expectRequest({
-					method : "POST",
-					url : "SalesOrderList('42')/SO_2_SOITEM",
+					url : "POST SalesOrderList('42')/SO_2_SOITEM",
 					payload : {
 						Quantity : "2.000",
 						QuantityUnit : "EA"
@@ -13770,9 +13696,8 @@ sap.ui.define([
 				.withExactArgs("POST on 'SalesOrderList('42')/SO_2_SOITEM' failed; "
 					+ "will be repeated automatically", sinon.match(oError.message), sODLB);
 			that.expectRequest({
-					method : "POST",
 					headers : {/*NO "sap-cancel-on-close"*/},
-					url : "SalesOrderList('42')/SO_2_SOITEM",
+					url : "POST SalesOrderList('42')/SO_2_SOITEM",
 					payload : {}
 				}, oError)
 				.expectMessages([{
@@ -13858,8 +13783,7 @@ sap.ui.define([
 					+ "/SO_2_SOITEM('0010')/Quantity", sinon.match(oError.message));
 			that.expectChange("quantity", "0.000")
 				.expectRequest({
-						method : "PATCH",
-						url : "SalesOrderList('42')/SO_2_SOITEM('0010')",
+						url : "PATCH SalesOrderList('42')/SO_2_SOITEM('0010')",
 						payload : {
 							Quantity : "0.000",
 							QuantityUnit : "DZ"
@@ -13961,8 +13885,7 @@ sap.ui.define([
 
 		return this.createView(assert, sView, oModel).then(function () {
 			that.expectRequest({
-					method : "PATCH",
-					url : "SalesOrderList('42')",
+					url : "PATCH SalesOrderList('42')",
 					headers : {"If-Match" : sEtag},
 					payload : {
 						GrossAmount : "1234.56",
@@ -14027,8 +13950,7 @@ sap.ui.define([
 				oBindingNote1 = aTableItems[1].getCells()[1].getBinding("value");
 
 			that.expectRequest({
-					method : "PATCH",
-					url : "SalesOrderList('41')",
+					url : "PATCH SalesOrderList('41')",
 					headers : {"If-Match" : "ETag0"},
 					payload : {
 						GrossAmount : "123.45",
@@ -14039,8 +13961,7 @@ sap.ui.define([
 					Note : "Note02"
 				})
 				.expectRequest({
-					method : "PATCH",
-					url : "SalesOrderList('42')",
+					url : "PATCH SalesOrderList('42')",
 					headers : {"If-Match" : "ETag1"},
 					payload : {
 						GrossAmount : "456.78",
@@ -14113,14 +14034,12 @@ sap.ui.define([
 				oBindingAmount1 = aTableItems[1].getCells()[0].getBinding("value");
 
 			that.expectRequest({
-					method : "PATCH",
-					url : "SalesOrderList('41')",
+					url : "PATCH SalesOrderList('41')",
 					headers : {"If-Match" : "ETag0"},
 					payload : {GrossAmount : "4.11"}
 				}) // no response required since the 2nd request fails
 				.expectRequest({
-					method : "PATCH",
-					url : "SalesOrderList('42')",
+					url : "PATCH SalesOrderList('42')",
 					headers : {"If-Match" : "ETag1"},
 					payload : {GrossAmount : "4.22"}
 				}, oError)
@@ -14286,15 +14205,13 @@ sap.ui.define([
 				.expectRequest({
 					changeSetNo : 1,
 					$ContentID : "0.0",
-					method : "PATCH",
-					url : "SalesOrderList('41')",
+					url : "PATCH SalesOrderList('41')",
 					payload : {GrossAmount : "4.11"}
 				}, oError)
 				.expectRequest({
 					changeSetNo : 1,
 					$ContentID : "1.0",
-					method : "PATCH",
-					url : "SalesOrderList('42')",
+					url : "PATCH SalesOrderList('42')",
 					payload : {GrossAmount : "4.22"}
 				}) // no response required
 				.expectMessages([{
@@ -14375,8 +14292,7 @@ sap.ui.define([
 			oBinding = that.oView.byId("note").getBinding("value");
 
 			that.expectRequest({
-					method : "PATCH",
-					url : "SalesOrderList('42')",
+					url : "PATCH SalesOrderList('42')",
 					headers : {"If-Match" : "ETag0"},
 					payload : {Note : "Changed Note"}
 				}, new Promise(function (resolve) {
@@ -14393,8 +14309,7 @@ sap.ui.define([
 			return that.waitForChanges(assert);
 		}).then(function () {
 			that.expectRequest({
-					method : "PATCH",
-					url : "SalesOrderList('42')",
+					url : "PATCH SalesOrderList('42')",
 					headers : {"If-Match" : "ETag1"},
 					payload : {Note : "Changed Note while $batch is running"}
 				}, {
@@ -14455,8 +14370,7 @@ sap.ui.define([
 			oBinding = that.oView.byId("name").getBinding("value");
 
 			that.expectRequest({
-					method : "PATCH",
-					url : "EMPLOYEES('1')",
+					url : "PATCH EMPLOYEES('1')",
 					headers : {"If-Match" : "ETag0"},
 					payload : {Name : "Jonathan Mueller"}
 				}, new Promise(function (resolve) {
@@ -14485,9 +14399,8 @@ sap.ui.define([
 			]);
 		}).then(function () {
 			that.expectRequest({
-					method : "POST",
 					headers : {"If-Match" : "ETag1"},
-					url : "EMPLOYEES('1')/" + sAction,
+					url : "POST EMPLOYEES('1')/" + sAction,
 					payload : {TeamID : "42"}
 				}, {
 					// ID : "1", // no key predicate here!
@@ -14537,9 +14450,8 @@ sap.ui.define([
 			oContext = that.oView.byId("name").getBindingContext();
 
 			that.expectRequest({
-					method : "POST",
 					headers : {"If-Match" : "ETag0"},
-					url : "EMPLOYEES('1')/" + sAction,
+					url : "POST EMPLOYEES('1')/" + sAction,
 					payload : {TeamID : "42"}
 				}, new Promise(function (resolve) {
 					fnRespond = resolve.bind(null, {
@@ -14567,9 +14479,8 @@ sap.ui.define([
 			that.expectChange("name", "Jonathan Smith junior")
 				.expectChange("teamId", "42")
 				.expectRequest({
-					method : "POST",
 					headers : {"If-Match" : "ETag1"},
-					url : "EMPLOYEES('1')/" + sAction,
+					url : "POST EMPLOYEES('1')/" + sAction,
 					payload : {TeamID : "23"}
 				}, {
 					"@odata.etag" : "ETag2",
@@ -14623,8 +14534,7 @@ sap.ui.define([
 			oBinding = that.oView.byId("note").getBinding("value");
 
 			that.expectRequest({
-					method : "PATCH",
-					url : "SalesOrderList('42')",
+					url : "PATCH SalesOrderList('42')",
 					headers : {"If-Match" : "ETag0"},
 					payload : {Note : "Changed Note"}
 				}, new Promise(function (resolve) {
@@ -14672,8 +14582,7 @@ sap.ui.define([
 			that.expectChange("note", "Changed Note From Server")
 				.expectRequest({
 					changeSetNo : 1,
-					method : "PATCH",
-					url : "SalesOrderList('42')",
+					url : "PATCH SalesOrderList('42')",
 					headers : {"If-Match" : "ETag1"},
 					payload : {Note : "(1) Changed Note while $batch is running"}
 				}, {
@@ -14682,8 +14591,7 @@ sap.ui.define([
 				})
 				.expectRequest({
 					changeSetNo : 2,
-					method : "PATCH",
-					url : "SalesOrderList('42')",
+					url : "PATCH SalesOrderList('42')",
 					headers : {"If-Match" : "ETag1"},
 					payload : {Note : "(2) Changed Note while $batch is running"}
 				}, {
@@ -14743,8 +14651,7 @@ sap.ui.define([
 			oBinding77 = that.oView.byId("note77").getBinding("value");
 
 			that.expectRequest({
-					method : "PATCH",
-					url : "SalesOrderList('42')",
+					url : "PATCH SalesOrderList('42')",
 					headers : {"If-Match" : "42ETag0"},
 					payload : {Note : "42Changed Note"}
 				}, new Promise(function (resolve) {
@@ -14780,8 +14687,7 @@ sap.ui.define([
 			that.expectChange("note42", "42Changed Note From Server")
 				.expectRequest({
 					changeSetNo : 1,
-					method : "PATCH",
-					url : "SalesOrderList('42')",
+					url : "PATCH SalesOrderList('42')",
 					headers : {"If-Match" : "42ETag1"},
 					payload : {Note : "(1) 42Changed Note while $batch is running"}
 				}, {
@@ -14790,8 +14696,7 @@ sap.ui.define([
 				})
 				.expectRequest({
 					changeSetNo : 1,
-					method : "PATCH",
-					url : "SalesOrderList('77')",
+					url : "PATCH SalesOrderList('77')",
 					headers : {"If-Match" : "77ETag0"},
 					payload : {Note : "(1) 77Changed Note while $batch is running"}
 				}, {
@@ -14800,8 +14705,7 @@ sap.ui.define([
 				})
 				.expectRequest({
 					changeSetNo : 2,
-					method : "PATCH",
-					url : "SalesOrderList('77')",
+					url : "PATCH SalesOrderList('77')",
 					headers : {"If-Match" : "77ETag0"},
 					payload : {Note : "77Changed Note"}
 				}, {
@@ -14877,8 +14781,7 @@ sap.ui.define([
 				});
 
 				that.expectRequest({
-						method : "PATCH",
-						url : "SalesOrderList('42')",
+						url : "PATCH SalesOrderList('42')",
 						headers : {"If-Match" : "ETag0"},
 						payload : {Note : "Changed Note"}
 					}, new Promise(function (_resolve, reject) {
@@ -14924,8 +14827,7 @@ sap.ui.define([
 					}])
 					.expectChange("lifecycleStatus", "P")
 					.expectRequest({
-						method : "PATCH",
-						url : "SalesOrderList('42')",
+						url : "PATCH SalesOrderList('42')",
 						headers : {"If-Match" : "ETag0"},
 						payload : {
 							LifecycleStatus : "P",
@@ -15461,8 +15363,7 @@ sap.ui.define([
 			return that.waitForChanges(assert);
 		}).then(function () {
 			that.expectRequest({
-					method : "POST",
-					url : "TEAMS('42')/TEAM_2_EMPLOYEES",
+					url : "POST TEAMS('42')/TEAM_2_EMPLOYEES",
 					payload : {
 						ID : null,
 						Name : "John Doe"
@@ -15604,9 +15505,8 @@ sap.ui.define([
 			return that.waitForChanges(assert);
 		}).then(function () {
 			that.expectRequest({
-					method : "POST",
 					headers : {"If-Match" : "ETag"/*, NO "sap-cancel-on-close"*/},
-					url : sUrl,
+					url : "POST " + sUrl,
 					payload : {TeamID : "42"}
 				}, {TEAM_ID : "42"})
 				.expectChange("teamId", "42");
@@ -15643,9 +15543,8 @@ sap.ui.define([
 				"Failed to read path /" + sUrl + "(...)/TEAM_ID", sinon.match(oError.message),
 				sODPrB);
 			that.expectRequest({
-					method : "POST",
 					headers : {"If-Match" : "ETag"/*, NO "sap-cancel-on-close"*/},
-					url : sUrl,
+					url : "POST " + sUrl,
 					payload : {TeamID : ""}
 				}, oError) // simulates failure
 				.expectMessages([{
@@ -15751,8 +15650,7 @@ sap.ui.define([
 					oDefaults = aResults[0];
 
 				that.expectRequest({
-						method : "POST",
-						url : "Artists/special.cases.Create"
+						url : "POST Artists/special.cases.Create"
 							+ "?$select=ArtistID,IsActiveEntity,Messages,Name",
 						payload : {
 							ArtistID : "ABC",
@@ -15870,9 +15768,8 @@ sap.ui.define([
 				that.expectChange("nameCreated", "TAFKAP")
 					.expectRequest({
 						headers : {"If-Match" : "ETagAfterRefresh"},
-						method : "PATCH",
 						payload : {Name : "TAFKAP"},
-						url : "Artists(ArtistID='ABC',IsActiveEntity=false)"
+						url : "PATCH Artists(ArtistID='ABC',IsActiveEntity=false)"
 					}, {
 						// "@odata.etag" : "ETagAfterPatch",
 						ArtistID : "ABC",
@@ -15950,8 +15847,7 @@ sap.ui.define([
 					}, oPredicates);
 
 				that.expectRequest({
-						method : "POST",
-						url : "TEAMS('42')/TEAM_2_EMPLOYEES('2')/"
+						url : "POST TEAMS('42')/TEAM_2_EMPLOYEES('2')/"
 							+ "com.sap.gateway.default.iwbep.tea_busi.v0001.AcChangeTeamOfEmployee"
 							+ "?$select=ID,__CT__FAKE__Message/__FAKE__Messages"
 							+ "&$expand=EMPLOYEE_2_TEAM($select=Team_Id)",
@@ -16013,8 +15909,7 @@ sap.ui.define([
 
 		return this.createView(assert, sView, oModel).then(function () {
 			that.expectRequest({
-					method : "POST",
-					url : "EMPLOYEES('0')/com.sap.gateway.default.iwbep.tea_busi.v0001"
+					url : "POST EMPLOYEES('0')/com.sap.gateway.default.iwbep.tea_busi.v0001"
 						+ ".AcChangeTeamOfEmployee",
 					payload : {TeamID : "42"}
 				}, {TEAM_ID : "42"})
@@ -16071,9 +15966,8 @@ sap.ui.define([
 
 			return this.createView(assert, sView).then(function () {
 				that.expectRequest({
-						method : "POST",
 						headers : bHasETag ? {"If-Match" : "*"} : {},
-						url : "EMPLOYEES('1')/com.sap.gateway.default.iwbep.tea_busi.v0001"
+						url : "POST EMPLOYEES('1')/com.sap.gateway.default.iwbep.tea_busi.v0001"
 							+ ".__FAKE__AcOverload",
 						payload : {Message : "The quick brown fox jumps over the lazy dog"}
 					}, {Is_Manager : true})
@@ -16813,7 +16707,7 @@ sap.ui.define([
 		this.oModel.setSizeLimit(1025);
 		const oBinding = this.oModel.bindList("/EMPLOYEES");
 
-		this.expectRequest("EMPLOYEES?$skip=0&$top=1025", {value : [/*doesn't matter*/]});
+		this.expectRequest("EMPLOYEES?$skip=0&$top=1025", {value : [/*does not matter*/]});
 
 		// code under test
 		oBinding.requestContexts();
@@ -16968,9 +16862,8 @@ sap.ui.define([
 		}).then(function () {
 			that.expectRequest({
 					headers : {"If-Match" : "ETag"},
-					method : "PATCH",
 					payload : {Name : "foo"},
-					url : "EMPLOYEES('01')"
+					url : "PATCH EMPLOYEES('01')"
 				});
 
 			return Promise.all([
@@ -17288,9 +17181,8 @@ sap.ui.define([
 
 				that.expectChange("url", null)
 					.expectRequest({
-						method : "PATCH",
 						// prefixed with container since Products is in a different metadata document
-						url : "com.sap.gateway.default.iwbep.tea_busi_product.v0001.Container%2F"
+						url : "PATCH com.sap.gateway.default.iwbep.tea_busi_product.v0001.Container%2F"
 							+ "Products(42)",
 						payload : {
 							ProductPicture : {
@@ -17499,8 +17391,7 @@ sap.ui.define([
 			this.expectChange("link", null)
 				.expectChange("link", sLink)
 				.expectRequest({
-					method : "PATCH",
-					url : "Artists(ArtistID='42',IsActiveEntity=true)",
+					url : "PATCH Artists(ArtistID='42',IsActiveEntity=true)",
 					payload : {Picture : null}
 				})
 				.expectRequest("Artists(ArtistID='42',IsActiveEntity=true)?$select=Picture", {
@@ -17550,8 +17441,7 @@ sap.ui.define([
 			var oListBinding = that.oModel.bindList("/Products");
 
 			that.expectRequest({
-					method : "POST",
-					url : "Products",
+					url : "POST Products",
 					payload : oPayload
 				}, Object.assign({ID : "42"}, oPayload));
 
@@ -17566,8 +17456,7 @@ sap.ui.define([
 			]);
 		}).then(function () {
 			that.expectRequest({
-				method : "PATCH",
-				url : "Products(42)",
+				url : "PATCH Products(42)",
 				payload : {
 					"@annotation" : "baz*",
 					"@annotation@annotation" : "bazbaz*",
@@ -17629,8 +17518,7 @@ sap.ui.define([
 				.expectChange("instanceAnnotation", [undefined])
 				.expectChange("propertyAnnotation", [undefined])
 				.expectRequest({
-					method : "POST",
-					url : "TEAMS",
+					url : "POST TEAMS",
 					payload : {Budget : "42.1", Name : "New Team"}
 				}, {
 					"@a.b" : "A & B",
@@ -17699,8 +17587,7 @@ sap.ui.define([
 
 		return this.createView(assert, sView, oModel).then(function () {
 			that.expectRequest({
-					method : "PATCH",
-					url : "SalesOrderList('42')/SO_2_SOITEM('10')",
+					url : "PATCH SalesOrderList('42')/SO_2_SOITEM('10')",
 					headers : {"If-Match" : "ETag"},
 					payload : {
 						Quantity : "11.000",
@@ -17734,8 +17621,7 @@ sap.ui.define([
 			return that.waitForChanges(assert, "no PATCH yet");
 		}).then(function () {
 			that.expectRequest({
-					method : "PATCH",
-					url : "SalesOrderList('42')/SO_2_SOITEM('10')",
+					url : "PATCH SalesOrderList('42')/SO_2_SOITEM('10')",
 					headers : {"If-Match" : "changed"},
 					payload : {
 						QuantityUnit : "DZ"
@@ -17780,8 +17666,7 @@ sap.ui.define([
 
 		return this.createView(assert, sView, oModel).then(function () {
 			that.expectRequest({
-					method : "PATCH",
-					url : "EMPLOYEES('1')",
+					url : "PATCH EMPLOYEES('1')",
 					headers : {"If-Match" : "ETag"},
 					payload : {ROOM_ID : "1.02"}
 				})
@@ -18882,8 +18767,7 @@ sap.ui.define([
 			var oText = that.oView.byId("table").getItems()[0].getCells()[0];
 
 			that.expectRequest({
-					method : "PATCH",
-					url : "BusinessPartnerList('1')",
+					url : "PATCH BusinessPartnerList('1')",
 					headers : {"If-Match" : "ETag"},
 					payload : {CompanyName : "Bar, Inc"}
 				}, {});
@@ -19018,9 +18902,8 @@ sap.ui.define([
 			return that.waitForChanges(assert);
 		}).then(function () {
 			that.expectRequest({
-					method : "PATCH",
 					payload : {Name : "Frederic Spring"},
-					url : "EMPLOYEES('2')"
+					url : "PATCH EMPLOYEES('2')"
 				}, {
 					"#com.sap.gateway.default.iwbep.tea_busi.v0001.AcSetIsAvailable" : {
 						title : "Third Title"
@@ -19041,9 +18924,8 @@ sap.ui.define([
 				oActionBinding = oModel.bindContext(sActionName + "(...)", oContext);
 
 			that.expectRequest({
-					method : "POST",
 					payload : {TeamID : "TEAM_02"},
-					url : "EMPLOYEES('2')/" + sActionName
+					url : "POST EMPLOYEES('2')/" + sActionName
 				}, {
 					"#com.sap.gateway.default.iwbep.tea_busi.v0001.AcSetIsAvailable" : {
 						title : "Fourth Title"
@@ -19104,9 +18986,8 @@ sap.ui.define([
 			return that.waitForChanges(assert);
 		}).then(function () {
 			that.expectRequest({
-					method : "PATCH",
 					payload : {Name : "Frederic Spring"},
-					url : "EMPLOYEES('2')"
+					url : "PATCH EMPLOYEES('2')"
 				}, {
 					"#com.sap.gateway.default.iwbep.tea_busi.v0001.AcSetIsAvailable" : {}
 					// ID : "2",
@@ -19125,9 +19006,8 @@ sap.ui.define([
 				oActionBinding = oModel.bindContext(sActionName + "(...)", oContext);
 
 			that.expectRequest({
-					method : "POST",
 					payload : {TeamID : "TEAM_02"},
-					url : "EMPLOYEES('2')/" + sActionName
+					url : "POST EMPLOYEES('2')/" + sActionName
 				}, {
 					ID : "2",
 					Name : "Frederic Winter"
@@ -19178,9 +19058,8 @@ sap.ui.define([
 
 			oActionBinding = oModel.bindContext(sActionName + "(...)", oContext);
 			that.expectRequest({
-					method : "POST",
 					payload : {},
-					url : "EMPLOYEES('2')/" + sActionName
+					url : "POST EMPLOYEES('2')/" + sActionName
 				}, {ID : "2"})
 				.expectChange("enabled", 0)
 				.expectChange("title", null);
@@ -19192,9 +19071,8 @@ sap.ui.define([
 			]);
 		}).then(function () {
 			that.expectRequest({
-					method : "POST",
 					payload : {},
-					url : "EMPLOYEES('2')/" + sActionName
+					url : "POST EMPLOYEES('2')/" + sActionName
 				}, {
 					"#com.sap.gateway.default.iwbep.tea_busi.v0001.AcSetIsAvailable" : {
 						title : "Second Title"
@@ -19527,12 +19405,9 @@ sap.ui.define([
 		return this.createView(assert, "", oModel).then(function () {
 			oContextBinding = oModel.bindContext("/__FAKE__ActionImport(...)");
 
-			that.expectRequest({
-					method : "POST",
-					url : "__FAKE__ActionImport?carrid='AA'"
-						+ "&guid=guid'0050568D-393C-1ED4-9D97-E65F0F3FCC23'"
-						+ "&fldate=datetime'2017-08-10T00:00:00'&flightTime=42"
-				}, {
+			that.expectRequest("POST __FAKE__ActionImport?carrid='AA'"
+					+ "&guid=guid'0050568D-393C-1ED4-9D97-E65F0F3FCC23'"
+					+ "&fldate=datetime'2017-08-10T00:00:00'&flightTime=42", {
 					d : {
 						__metadata : {type : "RMTSAMPLEFLIGHT.Flight"},
 						carrid : "AA",
@@ -19595,10 +19470,7 @@ sap.ui.define([
 		return this.createView(assert, sView, oModel).then(function () {
 			var oContextBinding = that.oView.byId("action").getObjectBinding();
 
-			that.expectRequest({
-					method : "POST",
-					url : "SalesOrder_Confirm?SalesOrderID='0815'"
-				}, {
+			that.expectRequest("POST SalesOrder_Confirm?SalesOrderID='0815'", {
 					d : {
 						__metadata : {type : "GWSAMPLE_BASIC.SalesOrder"},
 						SalesOrderID : "08/15",
@@ -19639,10 +19511,7 @@ sap.ui.define([
 						SalesOrderID : "0815"
 					}
 				})
-				.expectRequest({
-					method : "POST",
-					url : "SalesOrder_Confirm?SalesOrderID='0815'"
-				}, {
+				.expectRequest("POST SalesOrder_Confirm?SalesOrderID='0815'", {
 					d : {
 						__metadata : {type : "GWSAMPLE_BASIC.SalesOrder"},
 						SalesOrderID : "08/15"
@@ -19690,11 +19559,8 @@ sap.ui.define([
 		return this.createView(assert, sView, oModel).then(function () {
 			var oContextBinding = that.oView.byId("action").getObjectBinding();
 
-			that.expectRequest({
-					method : "PUT",
-					url : "UpdateAgencyPhoneNo?agencynum='00000061'"
-						+ "&telephone='%2B49 (0)2102 69555'"
-				}, {
+			that.expectRequest("PUT UpdateAgencyPhoneNo?agencynum='00000061'"
+					+ "&telephone='%2B49 (0)2102 69555'", {
 					d : {
 						__metadata : {type : "RMTSAMPLEFLIGHT.Travelagency"},
 						agencynum : "00000061",
@@ -21338,8 +21204,7 @@ sap.ui.define([
 
 			that.expectRequest({
 					headers : {"If-Match" : "ETag"},
-					method : "DELETE",
-					url : "BusinessPartnerList('0100000000')"
+					url : "DELETE BusinessPartnerList('0100000000')"
 				})
 				.expectChange("companyName", "") // defaulting to null in the cache
 				.expectChange("phoneNumber", null);
@@ -21419,8 +21284,7 @@ sap.ui.define([
 				} else {
 					that.expectRequest({
 						headers : {"If-Match" : "ETag"},
-						method : "DELETE",
-						url : "SalesOrderList('0500000000')"
+						url : "DELETE SalesOrderList('0500000000')"
 					});
 				}
 
@@ -21555,15 +21419,13 @@ sap.ui.define([
 					if (bChange) {
 						that.expectRequest({
 							headers : {"If-Match" : "ETag4"},
-							method : "PATCH",
-							url : "SalesOrderList('0500000000')",
+							url : "PATCH SalesOrderList('0500000000')",
 							payload : {Note : "Note (changed)"}
 						});
 					}
 					that.expectRequest({
 							headers : {"If-Match" : bChange ? "*" : "ETag4"},
-							method : "DELETE",
-							url : "SalesOrderList('0500000000')"
+							url : "DELETE SalesOrderList('0500000000')"
 						});
 				}
 
@@ -21679,9 +21541,8 @@ sap.ui.define([
 				that.oLogMock.expects("error")
 					.withArgs("Failed to update path " + sQuantityTarget);
 				that.expectRequest({
-						method : "PATCH",
 						payload : {Quantity : "3", QuantityUnit : "DZ"},
-						url : sItemPath
+						url : "PATCH " + sItemPath
 					}, oError)
 					.expectChange("quantity", ["1.000"])
 					.expectMessages([oStateMessage, oTransitionMessage]);
@@ -21723,14 +21584,12 @@ sap.ui.define([
 				} else {
 					that.expectRequest({
 							headers : {"If-Match" : "etag"},
-							method : "PATCH",
-							url : "SalesOrderList('1')",
+							url : "PATCH SalesOrderList('1')",
 							payload : {Note : "Note (changed)"}
 						})
 						.expectRequest({
 							headers : {"If-Match" : "*"},
-							method : "DELETE",
-							url : "SalesOrderList('1')"
+							url : "DELETE SalesOrderList('1')"
 						}, oFixture.error
 							? createErrorInsideBatch({
 								details : [{
@@ -22065,8 +21924,7 @@ sap.ui.define([
 
 				if (oFixture.success) {
 					that.expectRequest({
-							method : "PATCH",
-							url : "SalesOrderList('2')",
+							url : "PATCH SalesOrderList('2')",
 							payload : {Note : "Note 2 (changed)"}
 						})
 						.expectRequest("DELETE SalesOrderList('2')")
@@ -22320,8 +22178,7 @@ sap.ui.define([
 		return this.createView(assert, sView, oModel).then(function () {
 			that.expectChange("id", [""])
 				.expectRequest({
-					method : "POST",
-					url : "SalesOrderList",
+					url : "POST SalesOrderList",
 					payload : {}
 				}, {SalesOrderID : "new"})
 				.expectChange("id", ["new"]);
@@ -22480,13 +22337,11 @@ sap.ui.define([
 		return this.createView(assert, sView, oModel).then(function () {
 			that.expectChange("id", ["new1", "new2", "1"])
 				.expectRequest({
-					method : "POST",
-					url : "SalesOrderList",
+					url : "POST SalesOrderList",
 					payload : {SalesOrderID : "new1"}
 				}, {SalesOrderID : "new1"})
 				.expectRequest({
-					method : "POST",
-					url : "SalesOrderList",
+					url : "POST SalesOrderList",
 					payload : {SalesOrderID : "new2"}
 				}, {SalesOrderID : "new2"});
 
@@ -22519,8 +22374,7 @@ sap.ui.define([
 		}).then(function () {
 			that.expectRequest("DELETE SalesOrderList('new1')")
 				.expectRequest({
-					method : "POST",
-					url : "SalesOrderList",
+					url : "POST SalesOrderList",
 					payload : {SalesOrderID : "new3"}
 				}, {SalesOrderID : "new3"});
 
@@ -22563,8 +22417,7 @@ sap.ui.define([
 			that.expectChange("id", [, ""])
 				.expectChange("active", [, null])
 				.expectRequest({
-					method : "POST",
-					url : "Artists",
+					url : "POST Artists",
 					payload : {}
 				}, {ArtistID : "new", IsActiveEntity : false})
 				.expectChange("id", [, "new"])
@@ -22582,8 +22435,7 @@ sap.ui.define([
 			var oAction = oModel.bindContext(sAction + "(...)", oContext);
 
 			that.expectRequest({
-					method : "POST",
-					url : "Artists(ArtistID='new',IsActiveEntity=false)/" + sAction,
+					url : "POST Artists(ArtistID='new',IsActiveEntity=false)/" + sAction,
 					payload : {}
 				}, {ArtistID : "new", IsActiveEntity : true})
 				.expectChange("active", [, "Yes"]);
@@ -22749,10 +22601,8 @@ sap.ui.define([
 
 			that.oLogMock.expects("error").withArgs("Failed to delete /SalesOrderList('1')");
 			that.expectRequest({
-					batchNo : 6,
-					method : "DELETE",
 					headers : {"If-Match" : "etag1"},
-					url : "SalesOrderList('1')"
+					url : "#6 DELETE SalesOrderList('1')"
 				}, createErrorInsideBatch())
 				// from the binding's reset due to the failed DELETE
 				.expectRequest("#7 SalesOrderList?$count=true"
@@ -23568,8 +23418,7 @@ sap.ui.define([
 					undefined, undefined, {$$updateGroupId : "update"});
 
 			that.expectRequest({
-					method : "POST",
-					url : "SalesOrderList('0500000000')/SO_2_SOITEM",
+					url : "POST SalesOrderList('0500000000')/SO_2_SOITEM",
 					payload : {}
 				}, {
 					SalesOrderID : "0500000000",
@@ -23600,8 +23449,7 @@ sap.ui.define([
 
 		return this.createView(assert, sView, oModel).then(function () {
 			that.expectRequest({
-					method : "POST",
-					url : sAction,
+					url : "POST " + sAction,
 					payload : {}
 				}, {SalesOrderID : "0500000000"});
 
@@ -24278,8 +24126,7 @@ sap.ui.define([
 
 			that.expectChange("lifecycleStatus", [, "Z*"])
 				.expectRequest({
-					method : "PATCH",
-					url : "SalesOrderList('26')",
+					url : "PATCH SalesOrderList('26')",
 					payload : {LifecycleStatus : "Z*"}
 				}, {GrossAmount : "1", LifecycleStatus : "*Z*", SalesOrderID : "26"})
 				.expectChange("lifecycleStatus", [, "*Z*"]);
@@ -29712,10 +29559,8 @@ sap.ui.define([
 
 			this.expectChange("selected", [,, undefined])
 				.expectRequest({
-					batchNo : 2,
-					method : "POST",
 					payload : {ID : "New"},
-					url : "EMPLOYEES?custom=baz"
+					url : "#2 POST EMPLOYEES?custom=baz"
 				}, {ID : "New"})
 				.expectRequest("#2 " + sCountUrl, 3);
 
@@ -30186,8 +30031,7 @@ sap.ui.define([
 			]);
 
 			that.expectRequest({
-					method : "PATCH",
-					url : "EMPLOYEES('0')",
+					url : "PATCH EMPLOYEES('0')",
 					payload : {
 						SALARY : {
 							BONUS_CURR : "EUR",
@@ -30196,8 +30040,7 @@ sap.ui.define([
 					}
 				}) // 204 No Content
 				.expectRequest({
-					method : "PATCH",
-					url : "EMPLOYEES('1')",
+					url : "PATCH EMPLOYEES('1')",
 					payload : {
 						SALARY : {
 							BONUS_CURR : "DEM",
@@ -30228,8 +30071,7 @@ sap.ui.define([
 			assert.strictEqual(oChildAmountBinding.getValue(), "900");
 
 			that.expectRequest({
-					method : "POST",
-					url : "TEAMS('42')/TEAM_2_EMPLOYEES('0')/" + sAction
+					url : "POST TEAMS('42')/TEAM_2_EMPLOYEES('0')/" + sAction
 						+ "?$expand=EMPLOYEE_2_TEAM($select=Team_Id)",
 					payload : {TeamID : "23"}
 				}, {
@@ -30245,8 +30087,7 @@ sap.ui.define([
 					TEAM_ID : "23" // "side effect"
 				})
 				.expectRequest({
-					method : "POST",
-					url : "TEAMS('42')/TEAM_2_EMPLOYEES('1')/" + sAction
+					url : "POST TEAMS('42')/TEAM_2_EMPLOYEES('1')/" + sAction
 						+ "?$expand=EMPLOYEE_2_TEAM($select=Team_Id)",
 					payload : {TeamID : "42"}
 				}, {
@@ -30508,13 +30349,11 @@ sap.ui.define([
 			assert.strictEqual(oKappa.getSibling(), oLambda, "CPOUI5ODATAV4-2558");
 
 			that.expectRequest({
-					batchNo : 3,
-					method : "PATCH",
 					headers : {
 						"If-Match" : "etag_kappa",
 						Prefer : "return=minimal"
 					},
-					url : "EMPLOYEES('2')",
+					url : "#3 PATCH EMPLOYEES('2')",
 					payload : {Name : "κ (Kappa)"}
 				}) // 204 No Content
 				.expectRequest("#3 EMPLOYEES('2')?$select=AGE,ID,Name", {
@@ -30702,9 +30541,7 @@ sap.ui.define([
 			]);
 
 			that.expectRequest({
-					batchNo : 6,
-					method : "POST",
-					url : "EMPLOYEES",
+					url : "#6 POST EMPLOYEES",
 					payload : {
 						// not needed: "EMPLOYEE_2_MANAGER@odata.bind" : null,
 						AGE : 99,
@@ -30869,26 +30706,22 @@ sap.ui.define([
 			// 0 Alpha (collapsed)
 			//   (1 Beta) (still expanded, but does not matter)
 			that.expectRequest({
-					batchNo : 10,
 					headers : {
 						Prefer : "return=minimal"
 					},
-					method : "PATCH",
 					payload : {
 						"EMPLOYEE_2_MANAGER@odata.bind" : null
 					},
-					url : "EMPLOYEES('9')"
+					url : "#10 PATCH EMPLOYEES('9')"
 				}) // 204 No Content
 				.expectRequest({
-					batchNo : 10,
 					headers : {
 						Prefer : "return=minimal"
 					},
-					method : "POST",
 					payload : {
 						NextSibling : {ID : "0"}
 					},
-					url : "EMPLOYEES('9')" + sNextSiblingAction
+					url : "#10 POST EMPLOYEES('9')" + sNextSiblingAction
 				}) // 204 No Content
 				.expectRequest("#10 " + sTopLevelsUrl.slice(0, -1) + ",ExpandLevels="
 					+ JSON.stringify([{NodeID : "1", Levels : 1}, {NodeID : "0", Levels : 0}])
@@ -30907,8 +30740,8 @@ sap.ui.define([
 				})
 				.expectRequest("#10 EMPLOYEES/$count", 25)
 				.expectRequest("#10 " + sTopLevelsUrl.slice(0, -1) + ",ExpandLevels="
-						+ JSON.stringify([{NodeID : "1", Levels : 1}, {NodeID : "0", Levels : 0}])
-						+ ")" + sSelect + "&$count=true&$skip=0&$top=3", {
+					+ JSON.stringify([{NodeID : "1", Levels : 1}, {NodeID : "0", Levels : 0}])
+					+ ")" + sSelect + "&$count=true&$skip=0&$top=3", {
 					"@odata.count" : "2",
 					value : [{
 						AGE : 299, // side effect
@@ -30953,9 +30786,7 @@ sap.ui.define([
 			// 0 Alpha (collapsed)
 			//   (1 Beta) (still expanded, but does not matter)
 			that.expectRequest({
-					batchNo : 11,
-					method : "POST",
-					url : "EMPLOYEES",
+					url : "#11 POST EMPLOYEES",
 					payload : {
 						// not needed: "EMPLOYEE_2_MANAGER@odata.bind" : null,
 						Name : "Beth"
@@ -31107,23 +30938,19 @@ sap.ui.define([
 			assert.strictEqual(oBeta.getSibling(+1), null, "cannot move down");
 
 			this.expectRequest({
-					batchNo : 5,
 					headers : {
 						Prefer : "return=minimal"
 					},
-					method : "PATCH",
-					url : "EMPLOYEES('2')",
+					url : "#5 PATCH EMPLOYEES('2')",
 					payload : {
 						"EMPLOYEE_2_MANAGER@odata.bind" : "EMPLOYEES('0')"
 					}
 				}) // 204 No Content
 				.expectRequest({
-					batchNo : 5,
 					headers : {
 						Prefer : "return=minimal"
 					},
-					method : "POST",
-					url : "EMPLOYEES('2')" + sNextSiblingAction,
+					url : "#5 POST EMPLOYEES('2')" + sNextSiblingAction,
 					payload : {
 						NextSibling : {ID : "1"}
 					}
@@ -31728,9 +31555,7 @@ sap.ui.define([
 			assert.strictEqual(oAleph.isAncestorOf(oAlpha), false, "JIRA: CPOUI5ODATAV4-2337");
 
 			that.expectRequest({
-					batchNo : 4,
-					method : "POST",
-					url : "EMPLOYEES",
+					url : "#4 POST EMPLOYEES",
 					payload : {
 						// not needed: "EMPLOYEE_2_MANAGER@odata.bind" : null,
 						Name : "Beth"
@@ -31851,9 +31676,7 @@ sap.ui.define([
 			], 10);
 
 			that.expectRequest({
-					batchNo : 8,
-					method : "POST",
-					url : "EMPLOYEES",
+					url : "#8 POST EMPLOYEES",
 					payload : {
 						"EMPLOYEE_2_MANAGER@odata.bind" : "EMPLOYEES('0')",
 						Name : "gIMEL"
@@ -34648,8 +34471,7 @@ sap.ui.define([
 				that.expectChange("etag", [, undefined])
 					.expectChange("name", [, "Beta"])
 					.expectRequest({
-						method : "POST",
-						url : sFriend.slice(1),
+						url : "POST " + sFriend.slice(1),
 						payload : {
 							"BestFriend@odata.bind" : "../Artists(ArtistID='0',IsActiveEntity=false)",
 							Name : "Beta"
@@ -34755,9 +34577,7 @@ sap.ui.define([
 				that.expectChange("etag", [, undefined, "etag1.0"])
 					.expectChange("name", [, "Gamma", "Beta: β"])
 					.expectRequest({
-						batchNo : 5,
-						method : "POST",
-						url : sFriend.slice(1),
+						url : "#5 POST " + sFriend.slice(1),
 						payload : {
 							"BestFriend@odata.bind" : "../Artists(ArtistID='0',IsActiveEntity=false)",
 							Name : "Gamma"
@@ -34820,13 +34640,11 @@ sap.ui.define([
 				checkCreatedPersisted(assert, oGamma, oGammaCreated);
 
 				that.expectRequest({
-						batchNo : 7,
 						headers : {
 							"If-Match" : "etag2.0",
 							Prefer : "return=minimal"
 						},
-						method : "PATCH",
-						url : "Artists(ArtistID='2',IsActiveEntity=false)",
+						url : "#7 PATCH Artists(ArtistID='2',IsActiveEntity=false)",
 						payload : {
 							"BestFriend@odata.bind" : "Artists(ArtistID='1',IsActiveEntity=false)"
 						}
@@ -34952,13 +34770,11 @@ sap.ui.define([
 				}, new Error("Unsupported parent context: " + oGamma));
 
 				that.expectRequest({
-						batchNo : 8,
 						headers : {
 							"If-Match" : "etag2.1",
 							Prefer : "return=minimal"
 						},
-						method : "PATCH",
-						url : "Artists(ArtistID='2',IsActiveEntity=false)",
+						url : "#8 PATCH Artists(ArtistID='2',IsActiveEntity=false)",
 						payload : {
 							"BestFriend@odata.bind" : "Artists(ArtistID='0',IsActiveEntity=false)"
 						}
@@ -35290,13 +35106,11 @@ sap.ui.define([
 				]);
 			}).then(function () {
 				that.expectRequest({
-						batchNo : 14,
 						headers : {
 							"If-Match" : "etag1.4",
 							Prefer : "return=minimal"
 						},
-						method : "PATCH",
-						url : "Artists(ArtistID='1',IsActiveEntity=false)",
+						url : "#14 PATCH Artists(ArtistID='1',IsActiveEntity=false)",
 						payload : {
 							"BestFriend@odata.bind" : "Artists(ArtistID='2',IsActiveEntity=false)"
 						}
@@ -35367,9 +35181,7 @@ sap.ui.define([
 				that.expectChange("etag", [undefined, "etag0.3", "etag2.4"])
 					.expectChange("name", ["Aleph", "Alpha #2", "Gamma #2"])
 					.expectRequest({
-						batchNo : 15,
-						method : "POST",
-						url : sFriend.slice(1),
+						url : "#15 POST " + sFriend.slice(1),
 						payload : {
 							// not needed: "BestFriend@odata.bind" : null,
 							Name : "Aleph"
@@ -35514,13 +35326,11 @@ sap.ui.define([
 				oBeta = oListBinding.getCurrentContexts()[2];
 
 				that.expectRequest({
-						batchNo : 19,
 						headers : {
 							"If-Match" : "etag1.6",
 							Prefer : "return=minimal"
 						},
-						method : "PATCH",
-						url : "Artists(ArtistID='1',IsActiveEntity=false)",
+						url : "#19 PATCH Artists(ArtistID='1',IsActiveEntity=false)",
 						payload : {
 							"BestFriend@odata.bind" : null
 						}
@@ -35559,13 +35369,11 @@ sap.ui.define([
 					]);
 			}).then(function () {
 				that.expectRequest({
-						batchNo : 20,
 						headers : {
 							"If-Match" : "etag2.5",
 							Prefer : "return=minimal"
 						},
-						method : "PATCH",
-						url : "Artists(ArtistID='2',IsActiveEntity=false)",
+						url : "#20 PATCH Artists(ArtistID='2',IsActiveEntity=false)",
 						payload : {
 							"BestFriend@odata.bind" : "Artists(ArtistID='0',IsActiveEntity=false)"
 						}
@@ -35786,8 +35594,7 @@ sap.ui.define([
 			//   7 Kappa (loaded later)
 			// 8 Aleph (created)
 			this.expectRequest({
-					method : "POST",
-					url : sFriend.slice(1),
+					url : "POST " + sFriend.slice(1),
 					payload : {
 						// not needed: "BestFriend@odata.bind" : null,
 						Name : "Aleph"
@@ -35808,9 +35615,9 @@ sap.ui.define([
 				})
 				// no "filter(...)/search(...)" (SNOW: DINC0087713)
 				.expectRequest("#3 " + sFriend.slice(1) + "?$apply="
-						+ "com.sap.vocabularies.Hierarchy.v1.TopLevels(HierarchyNodes=$root" + sFriend
-						+ ",HierarchyQualifier='" + sHierarchyQualifier + "',NodeProperty='_/NodeID')"
-						+ "&$filter=ArtistID eq '8' and IsActiveEntity eq false&$select=_/NodeID", {
+					+ "com.sap.vocabularies.Hierarchy.v1.TopLevels(HierarchyNodes=$root" + sFriend
+					+ ",HierarchyQualifier='" + sHierarchyQualifier + "',NodeProperty='_/NodeID')"
+					+ "&$filter=ArtistID eq '8' and IsActiveEntity eq false&$select=_/NodeID", {
 					value : [{
 						_ : {
 							NodeID : "8,false"
@@ -35941,8 +35748,7 @@ sap.ui.define([
 			//   7 Kappa (loaded later)
 			// 8 Aleph (created)
 			this.expectRequest({
-					method : "POST",
-					url : sFriend.slice(1),
+					url : "POST " + sFriend.slice(1),
 					payload : {
 						"BestFriend@odata.bind" : "../Artists(ArtistID='0',IsActiveEntity=false)",
 						Name : "New"
@@ -36705,12 +36511,10 @@ sap.ui.define([
 			} else { // "A failed move must not leave the node collapsed"
 				this.expectEvents(assert, "sap.ui.model.odata.v4.ODataListBinding: /EMPLOYEES", [])
 					.expectRequest({
-						batchNo : 2,
 						headers : {
 							Prefer : "return=minimal"
 						},
-						method : "PATCH",
-						url : "EMPLOYEES('0')",
+						url : "#2 PATCH EMPLOYEES('0')",
 						payload : {
 							"EMPLOYEE_2_MANAGER@odata.bind" : "EMPLOYEES('9')"
 						}
@@ -36764,8 +36568,7 @@ sap.ui.define([
 					headers : {
 						Prefer : "return=minimal"
 					},
-					method : "PATCH",
-					url : "EMPLOYEES('0')",
+					url : "PATCH EMPLOYEES('0')",
 					payload : {
 						"EMPLOYEE_2_MANAGER@odata.bind" : "EMPLOYEES('9')"
 					}
@@ -36834,8 +36637,7 @@ sap.ui.define([
 					headers : {
 						Prefer : "return=minimal"
 					},
-					method : "PATCH",
-					url : "EMPLOYEES('2')",
+					url : "PATCH EMPLOYEES('2')",
 					payload : {
 						"EMPLOYEE_2_MANAGER@odata.bind" : "EMPLOYEES('1')"
 					}
@@ -36905,8 +36707,7 @@ sap.ui.define([
 					headers : {
 						Prefer : "return=minimal"
 					},
-					method : "PATCH",
-					url : "EMPLOYEES('0')",
+					url : "PATCH EMPLOYEES('0')",
 					payload : {
 						"EMPLOYEE_2_MANAGER@odata.bind" : "EMPLOYEES('9')"
 					}
@@ -37098,12 +36899,10 @@ sap.ui.define([
 		// 8 Eta
 		//   9 Theta
 		this.expectRequest({
-				batchNo : 3,
 				headers : {
 					Prefer : "return=minimal"
 				},
-				method : "PATCH",
-				url : "EMPLOYEES('3')",
+				url : "#3 PATCH EMPLOYEES('3')",
 				payload : {
 					"EMPLOYEE_2_MANAGER@odata.bind" : "EMPLOYEES('1')"
 				}
@@ -37201,12 +37000,10 @@ sap.ui.define([
 		//     3 Zeta
 		//     1.2 Delta
 		this.expectRequest({
-				batchNo : 4,
 				headers : {
 					Prefer : "return=minimal"
 				},
-				method : "PATCH",
-				url : "EMPLOYEES('1')",
+				url : "#4 PATCH EMPLOYEES('1')",
 				payload : {
 					"EMPLOYEE_2_MANAGER@odata.bind" : "EMPLOYEES('8')"
 				}
@@ -37315,12 +37112,10 @@ sap.ui.define([
 		//       3 Zeta
 		//       1.2 Delta
 		this.expectRequest({
-				batchNo : 5,
 				headers : {
 					Prefer : "return=minimal"
 				},
-				method : "PATCH",
-				url : "EMPLOYEES('1')",
+				url : "#5 PATCH EMPLOYEES('1')",
 				payload : {
 					"EMPLOYEE_2_MANAGER@odata.bind" : "EMPLOYEES('9')"
 				}
@@ -37442,12 +37237,10 @@ sap.ui.define([
 		//     0 Alpha (moved here)
 		//       2 Epsilon
 		this.expectRequest({
-				batchNo : 6,
 				headers : {
 					Prefer : "return=minimal"
 				},
-				method : "PATCH",
-				url : "EMPLOYEES('0')",
+				url : "#6 PATCH EMPLOYEES('0')",
 				payload : {
 					"EMPLOYEE_2_MANAGER@odata.bind" : "EMPLOYEES('9')"
 				}
@@ -37641,15 +37434,13 @@ sap.ui.define([
 					//         1 Beta (moved here)
 					//     3.2 Eta
 					this.expectRequest({
-							batchNo : 10,
 							headers : {
 								Prefer : "return=minimal"
 							},
-							method : "PATCH",
 							payload : {
 								"EMPLOYEE_2_MANAGER@odata.bind" : "EMPLOYEES('3.1.1')"
 							},
-							url : "EMPLOYEES('1')"
+							url : "#10 PATCH EMPLOYEES('1')"
 						}) // 204 No Content
 						.expectRequest("#10 " + sBaseUrl + "&$filter=ID eq '1'&$select=LimitedRank", {
 							value : [{
@@ -37739,15 +37530,13 @@ sap.ui.define([
 					//       3.2 Eta
 					//   2 Gamma
 					this.expectRequest({
-							batchNo : 10,
 							headers : {
 								Prefer : "return=minimal"
 							},
-							method : "PATCH",
 							payload : {
 								"EMPLOYEE_2_MANAGER@odata.bind" : "EMPLOYEES('1')"
 							},
-							url : "EMPLOYEES('3')"
+							url : "#10 PATCH EMPLOYEES('3')"
 						}) // 204 No Content
 						.expectRequest("#10 " + sBaseUrl + "&$filter=ID eq '3'&$select=LimitedRank", {
 							value : [{
@@ -37837,15 +37626,13 @@ sap.ui.define([
 					//   3 Delta
 					//     3.2 Eta
 					this.expectRequest({
-							batchNo : 10,
 							headers : {
 								Prefer : "return=minimal"
 							},
-							method : "PATCH",
 							payload : {
 								"EMPLOYEE_2_MANAGER@odata.bind" : "EMPLOYEES('1')"
 							},
-							url : "EMPLOYEES('3.1')"
+							url : "#10 PATCH EMPLOYEES('3.1')"
 						}) // 204 No Content
 						.expectRequest("#10 " + sBaseUrl + "&$filter=ID eq '3.1'&$select=LimitedRank", {
 							value : [{
@@ -37982,15 +37769,13 @@ sap.ui.define([
 					// 3.1 Epsilon (moved here)
 					//   3.1.1 Zeta
 					this.expectRequest({
-							batchNo : 10,
 							headers : {
 								Prefer : "return=minimal"
 							},
-							method : "PATCH",
 							payload : {
 								"EMPLOYEE_2_MANAGER@odata.bind" : null
 							},
-							url : "EMPLOYEES('3.1')"
+							url : "#10 PATCH EMPLOYEES('3.1')"
 						}) // 204 No Content
 						.expectRequest("#10 " + sBaseUrl + "&$filter=ID eq '3.1'&$select=LimitedRank", {
 							value : [{
@@ -38121,15 +37906,13 @@ sap.ui.define([
 					//       3.1 Epsilon (moved here)
 					//         3.1.1 Zeta
 					this.expectRequest({
-							batchNo : 10,
 							headers : {
 								Prefer : "return=minimal"
 							},
-							method : "PATCH",
 							payload : {
 								"EMPLOYEE_2_MANAGER@odata.bind" : "EMPLOYEES('3.2')"
 							},
-							url : "EMPLOYEES('3.1')"
+							url : "#10 PATCH EMPLOYEES('3.1')"
 						}) // 204 No Content
 						.expectRequest("#10 " + sBaseUrl + "&$filter=ID eq '3.1'&$select=LimitedRank", {
 							value : [{
@@ -38219,15 +38002,13 @@ sap.ui.define([
 					//       (3.1 Epsilon (moved here))
 					//         (3.1.1 Zeta)
 					this.expectRequest({
-							batchNo : 10,
 							headers : {
 								Prefer : "return=minimal"
 							},
-							method : "PATCH",
 							payload : {
 								"EMPLOYEE_2_MANAGER@odata.bind" : "EMPLOYEES('3.2')"
 							},
-							url : "EMPLOYEES('3.1')"
+							url : "#10 PATCH EMPLOYEES('3.1')"
 						}) // 204 No Content
 						.expectRequest("#10 " + sBaseUrl + "&$filter=ID eq '3.1'&$select=LimitedRank", {
 							value : [] // filtered out
@@ -38288,26 +38069,22 @@ sap.ui.define([
 					//       3.1.1 Zeta
 					//     3.2 Eta
 					this.expectRequest({
-							batchNo : 10,
 							headers : {
 								Prefer : "return=minimal"
 							},
-							method : "PATCH",
 							payload : {
 								"EMPLOYEE_2_MANAGER@odata.bind" : "EMPLOYEES('0')"
 							},
-							url : "EMPLOYEES('1')"
+							url : "#10 PATCH EMPLOYEES('1')"
 						}) // 204 No Content
 						.expectRequest({
-							batchNo : 10,
 							headers : {
 								Prefer : "return=minimal"
 							},
-							method : "POST",
 							payload : {
 								NextSibling : {ID : "3"}
 							},
-							url : "EMPLOYEES('1')" + sNextSiblingAction
+							url : "#10 POST EMPLOYEES('1')" + sNextSiblingAction
 						}) // 204 No Content
 						.expectRequest("#10 " + sBaseUrl + "&$filter=ID eq '1'&$select=LimitedRank", {
 							value : [{
@@ -38460,15 +38237,13 @@ sap.ui.define([
 		const oBeta = oListBinding.getCurrentContexts()[1];
 
 		this.expectRequest({
-				batchNo : 2,
 				headers : {
 					Prefer : "return=minimal"
 				},
-				method : "PATCH",
 				payload : {
 					"EMPLOYEE_2_MANAGER@odata.bind" : null
 				},
-				url : "EMPLOYEES('2')"
+				url : "#2 PATCH EMPLOYEES('2')"
 			}) // 204 No Content
 			.expectRequest("#2 " + sUrl + "&$filter=ID eq '2'&$select=LimitedRank", {
 				value : [{
@@ -39607,8 +39382,7 @@ sap.ui.define([
 			const sParentId = oParent.getProperty("ArtistID");
 			iCount += 1;
 			this.expectRequest({
-					method : "POST",
-					url : sFriend + "?custom=foo",
+					url : "POST " + sFriend + "?custom=foo",
 					payload : {
 						"BestFriend@odata.bind" :
 							`../Artists(ArtistID='${sParentId}',IsActiveEntity=false)`,
@@ -40680,9 +40454,7 @@ sap.ui.define([
 		], 4);
 
 		this.expectRequest({
-				batchNo : 3,
-				method : "POST",
-				url : "EMPLOYEES?custom=foo",
+				url : "#3 POST EMPLOYEES?custom=foo",
 				payload : {Name : "Zeta"}
 			}, {ID : "6", Name : "Zeta"})
 			.expectRequest("#3 " + sCountUrl, 6)
@@ -40714,9 +40486,7 @@ sap.ui.define([
 		]);
 
 		this.expectRequest({
-				batchNo : 5,
-				method : "POST",
-				url : "EMPLOYEES?custom=foo",
+				url : "#5 POST EMPLOYEES?custom=foo",
 				payload : {Name : "Eta"}
 			}, {ID : "7", Name : "Eta"})
 			.expectRequest("#5 " + sCountUrl, 7)
@@ -40731,9 +40501,7 @@ sap.ui.define([
 		]);
 
 		this.expectRequest({
-				batchNo : 7,
-				method : "POST",
-				url : "EMPLOYEES?custom=foo",
+				url : "#7 POST EMPLOYEES?custom=foo",
 				payload : {
 					"EMPLOYEE_2_MANAGER@odata.bind" : "EMPLOYEES('1')",
 					Name : "Theta"
@@ -41009,9 +40777,7 @@ sap.ui.define([
 			.withExactArgs("POST on 'EMPLOYEES' failed; will be repeated automatically",
 				sinon.match("Request intentionally failed"), sODLB);
 		this.expectRequest({
-				batchNo : 2,
-				method : "POST",
-				url : "EMPLOYEES",
+				url : "#2 POST EMPLOYEES",
 				payload : {Name : "Bar"}
 			}, createErrorInsideBatch())
 			.expectRequest("#2 " + sCountUrl) // no response required
@@ -41072,9 +40838,7 @@ sap.ui.define([
 			.withExactArgs("POST on 'EMPLOYEES' failed; will be repeated automatically",
 				sinon.match("Request intentionally failed"), sODLB);
 		this.expectRequest({
-				batchNo : 3,
-				method : "POST",
-				url : "EMPLOYEES",
+				url : "#3 POST EMPLOYEES",
 				payload : {Name : "Delta"}
 			}, createErrorInsideBatch())
 			.expectRequest("#3 " + sCountUrl) // no response required
@@ -41109,9 +40873,7 @@ sap.ui.define([
 		assert.strictEqual(iCountAtCreateCompleted, 3, "failed creation calls createCompleted");
 
 		this.expectRequest({
-				batchNo : 4,
-				method : "POST",
-				url : "EMPLOYEES",
+				url : "#4 POST EMPLOYEES",
 				payload : {Name : "Delta"}
 			}, {ID : "4", Name : "Delta"})
 			.expectRequest("#4 " + sCountUrl, 4)
@@ -41378,8 +41140,7 @@ sap.ui.define([
 		const oAlpha = oBinding.getCurrentContexts()[0];
 
 		this.expectRequest({
-				method : "POST",
-				url : "EMPLOYEES",
+				url : "POST EMPLOYEES",
 				payload : {
 					"EMPLOYEE_2_MANAGER@odata.bind" : "EMPLOYEES('1')",
 					Name : "New1"
@@ -41405,8 +41166,7 @@ sap.ui.define([
 		]);
 
 		this.expectRequest({
-				method : "POST",
-				url : "EMPLOYEES",
+				url : "POST EMPLOYEES",
 				payload : {
 					"EMPLOYEE_2_MANAGER@odata.bind" : "EMPLOYEES('11')",
 					Name : "New2"
@@ -41809,12 +41569,10 @@ sap.ui.define([
 			// 10 Beth (loaded later)
 			//   10.1 Gimel (loaded later)
 			this.expectRequest({
-					batchNo : 3,
 					headers : {
 						Prefer : "return=minimal"
 					},
-					method : "PATCH",
-					url : "Artists(ArtistID='1',IsActiveEntity=false)",
+					url : "#3 PATCH Artists(ArtistID='1',IsActiveEntity=false)",
 					payload : {
 						"BestFriend@odata.bind" : "Artists(ArtistID='3',IsActiveEntity=false)"
 					}
@@ -42016,12 +41774,10 @@ sap.ui.define([
 			//   10 Beth (now moved beneath Aleph)
 			//     10.1 Gimel
 			this.expectRequest({
-					batchNo : 6,
 					headers : {
 						Prefer : "return=minimal"
 					},
-					method : "PATCH",
-					url : "Artists(ArtistID='10',IsActiveEntity=false)",
+					url : "#6 PATCH Artists(ArtistID='10',IsActiveEntity=false)",
 					payload : {
 						"BestFriend@odata.bind" : "Artists(ArtistID='9',IsActiveEntity=false)"
 					}
@@ -42052,12 +41808,10 @@ sap.ui.define([
 				]);
 
 			this.expectRequest({
-					batchNo : 7,
 					headers : {
 						Prefer : "return=minimal"
 					},
-					method : "PATCH",
-					url : "Artists(ArtistID='10.1',IsActiveEntity=false)",
+					url : "#7 PATCH Artists(ArtistID='10.1',IsActiveEntity=false)",
 					payload : {
 						"BestFriend@odata.bind" : "Artists(ArtistID='9',IsActiveEntity=false)"
 					}
@@ -42102,12 +41856,10 @@ sap.ui.define([
 			// 9 Aleph
 			//   10 Beth
 			this.expectRequest({
-					batchNo : 8,
 					headers : {
 						Prefer : "return=minimal"
 					},
-					method : "PATCH",
-					url : "Artists(ArtistID='10.1',IsActiveEntity=false)",
+					url : "#8 PATCH Artists(ArtistID='10.1',IsActiveEntity=false)",
 					payload : {
 						"BestFriend@odata.bind" : "Artists(ArtistID='0',IsActiveEntity=false)"
 					}
@@ -42169,12 +41921,10 @@ sap.ui.define([
 
 			if (bMakeRoot) {
 				this.expectRequest({
-						batchNo : 9,
 						headers : {
 							Prefer : "return=minimal"
 						},
-						method : "PATCH",
-						url : "Artists(ArtistID='1',IsActiveEntity=false)",
+						url : "#9 PATCH Artists(ArtistID='1',IsActiveEntity=false)",
 						payload : {
 							"BestFriend@odata.bind" : null
 						}
@@ -42216,21 +41966,9 @@ sap.ui.define([
 			}
 
 			const iBatchNo = this.iBatchNo + 1; // don't care about exact no., but use thrice below
-			this.expectRequest({
-					batchNo : iBatchNo,
-					method : "DELETE",
-					url : "Artists(ArtistID='1',IsActiveEntity=false)"
-				})
-				.expectRequest({
-					batchNo : iBatchNo,
-					method : "DELETE",
-					url : "Artists(ArtistID='10',IsActiveEntity=false)"
-				})
-				.expectRequest({
-					batchNo : iBatchNo,
-					method : "DELETE",
-					url : "Artists(ArtistID='10.1',IsActiveEntity=false)"
-				});
+			this.expectRequest(`#${iBatchNo} DELETE Artists(ArtistID='1',IsActiveEntity=false)`)
+				.expectRequest(`#${iBatchNo} DELETE Artists(ArtistID='10',IsActiveEntity=false)`)
+				.expectRequest(`#${iBatchNo} DELETE Artists(ArtistID='10.1',IsActiveEntity=false)`);
 
 			await Promise.all([
 				// code under test
@@ -42337,28 +42075,24 @@ sap.ui.define([
 		oAlpha.move();
 
 		this.expectRequest({
-				batchNo : 2,
 				headers : {
 					"If-Match" : "Delta's ETag",
 					Prefer : "return=minimal"
 				},
-				method : "PATCH",
 				payload : {
 					"EMPLOYEE_2_MANAGER@odata.bind" : "EMPLOYEES('1')"
 				},
-				url : "EMPLOYEES('4')"
+				url : "#2 PATCH EMPLOYEES('4')"
 			}) // 204 No Content
 			.expectRequest({
-				batchNo : 2,
 				headers : {
 					"If-Match" : "Delta's ETag",
 					Prefer : "return=minimal"
 				},
-				method : "POST",
 				payload : {
 					NextSibling : {ID : "3"}
 				},
-				url : "EMPLOYEES('4')" + sNextSiblingAction
+				url : "#2 POST EMPLOYEES('4')" + sNextSiblingAction
 			}) // 204 No Content
 			.expectRequest("#2 " + sUrl + "&$filter=ID eq '4'&$select=LimitedRank", {
 				value : [{
@@ -42418,26 +42152,22 @@ sap.ui.define([
 		], 5);
 
 		this.expectRequest({
-				batchNo : 3,
 				headers : {
 					Prefer : "return=minimal"
 				},
-				method : "PATCH",
 				payload : {
 					"EMPLOYEE_2_MANAGER@odata.bind" : null
 				},
-				url : "EMPLOYEES('4')"
+				url : "#3 PATCH EMPLOYEES('4')"
 			}) // 204 No Content
 			.expectRequest({
-				batchNo : 3,
 				headers : {
 					Prefer : "return=minimal"
 				},
-				method : "POST",
 				payload : {
 					NextSibling : null
 				},
-				url : "EMPLOYEES('4')" + sNextSiblingAction
+				url : "#3 POST EMPLOYEES('4')" + sNextSiblingAction
 			}) // 204 No Content
 			.expectRequest("#3 " + sUrl + "&$filter=ID eq '4'&$select=LimitedRank", {
 				value : [{
@@ -42619,26 +42349,22 @@ sap.ui.define([
 		const oBeta = oListBinding.getCurrentContexts()[1];
 
 		this.expectRequest({
-				batchNo : 3,
 				headers : {
 					Prefer : "return=minimal"
 				},
-				method : "PATCH",
 				payload : {
 					"EMPLOYEE_2_MANAGER@odata.bind" : null
 				},
-				url : "EMPLOYEES('2')"
+				url : "#3 PATCH EMPLOYEES('2')"
 			}) // 204 No Content
 			.expectRequest({
-				batchNo : 3,
 				headers : {
 					Prefer : "return=minimal"
 				},
-				method : "POST",
 				payload : {
 					NextSibling : null
 				},
-				url : "EMPLOYEES('2')" + sNextSiblingAction
+				url : "#3 POST EMPLOYEES('2')" + sNextSiblingAction
 			}) // 204 No Content
 			.expectRequest("#3 " + sUrl.slice(0, -1) + ",ExpandLevels="
 				+ JSON.stringify([{NodeID : "1", Levels : 1}])
@@ -42780,12 +42506,10 @@ sap.ui.define([
 		], 4);
 
 		this.expectRequest({
-				batchNo : 2,
-				method : "POST",
 				payload : {
 					Name : "Epsilon"
 				},
-				url : "EMPLOYEES"
+				url : "#2 POST EMPLOYEES"
 			}, {
 				ID : "5",
 				Name : "Epsilon"
@@ -42818,26 +42542,22 @@ sap.ui.define([
 		const [, oAlpha, oBeta] = oListBinding.getCurrentContexts();
 
 		this.expectRequest({
-				batchNo : 4,
 				headers : {
 					Prefer : "return=minimal"
 				},
-				method : "PATCH",
 				payload : {
 					"EMPLOYEE_2_MANAGER@odata.bind" : "EMPLOYEES('1')"
 				},
-				url : "EMPLOYEES('2')"
+				url : "#4 PATCH EMPLOYEES('2')"
 			}) // 204 No Content
 			.expectRequest({
-				batchNo : 4,
 				headers : {
 					Prefer : "return=minimal"
 				},
-				method : "POST",
 				payload : {
 					NextSibling : null
 				},
-				url : "EMPLOYEES('2')" + sNextSiblingAction
+				url : "#4 POST EMPLOYEES('2')" + sNextSiblingAction
 			}) // 204 No Content
 			.expectRequest("#4 " + sUrl + "&$filter=ID eq '2'&$select=LimitedRank", {
 				value : [{
@@ -42937,15 +42657,13 @@ sap.ui.define([
 		//   4 Delta
 		// 5 Epsilon
 		this.expectRequest({
-				batchNo : 6,
 				headers : {
 					Prefer : "return=minimal"
 				},
-				method : "PATCH",
 				payload : {
 					"EMPLOYEE_2_MANAGER@odata.bind" : "EMPLOYEES('3')"
 				},
-				url : "EMPLOYEES('2')"
+				url : "#6 PATCH EMPLOYEES('2')"
 			}) // 204 No Content
 			.expectRequest("#6 " + sUrl + "&$filter=ID eq '2'&$select=LimitedRank", {
 				value : [{
@@ -42977,22 +42695,18 @@ sap.ui.define([
 		//   _6 Copy of 5 Epsilon
 		// 5 Epsilon
 		this.expectRequest({
-				batchNo : 7,
-				method : "POST",
 				payload : {},
-				url : "EMPLOYEES('5')/com.sap.gateway.default.iwbep.tea_busi.v0001.__FAKE__AcCopy"
-					+ "?$select=ID"
+				url : "#7 POST EMPLOYEES('5')/"
+					+ "com.sap.gateway.default.iwbep.tea_busi.v0001.__FAKE__AcCopy?$select=ID"
 			}, {ID : "_6"})
 			.expectRequest({
-				batchNo : 7,
 				headers : {
 					Prefer : "return=minimal"
 				},
-				method : "PATCH",
 				payload : {
 					"EMPLOYEE_2_MANAGER@odata.bind" : "EMPLOYEES('1')"
 				},
-				url : "$-1"
+				url : "#7 PATCH $-1"
 			}) // 204 No Content
 			.expectRequest("#7 " + sUrl + "&$filter=ID eq '5'&$select=LimitedRank", {
 				value : [{
@@ -43077,22 +42791,18 @@ sap.ui.define([
 		// _7 Copy of 5 Epsilon
 		// 5 Epsilon
 		this.expectRequest({
-				batchNo : 9,
-				method : "POST",
 				payload : {},
-				url : "EMPLOYEES('5')/com.sap.gateway.default.iwbep.tea_busi.v0001.__FAKE__AcCopy"
-					+ "?$select=ID"
+				url : "#9 POST EMPLOYEES('5')"
+					+ "/com.sap.gateway.default.iwbep.tea_busi.v0001.__FAKE__AcCopy?$select=ID"
 			}, {ID : "_7"})
 			.expectRequest({
-				batchNo : 9,
 				headers : {
 					Prefer : "return=minimal"
 				},
-				method : "PATCH",
 				payload : {
 					"EMPLOYEE_2_MANAGER@odata.bind" : null
 				},
-				url : "$-1"
+				url : "#9 PATCH $-1"
 			}) // 204 No Content
 			.expectRequest("#9 " + sUrl + "&$filter=ID eq '5'&$select=LimitedRank", {
 				value : [{
@@ -43171,22 +42881,18 @@ sap.ui.define([
 		// 5 Epsilon
 		//   _8 Copy of 5 Epsilon
 		this.expectRequest({
-				batchNo : 11,
-				method : "POST",
 				payload : {},
-				url : "EMPLOYEES('5')/com.sap.gateway.default.iwbep.tea_busi.v0001.__FAKE__AcCopy"
-					+ "?$select=ID"
+				url : "#11 POST EMPLOYEES('5')"
+					+ "/com.sap.gateway.default.iwbep.tea_busi.v0001.__FAKE__AcCopy?$select=ID"
 			}, {ID : "_8"})
 			.expectRequest({
-				batchNo : 11,
 				headers : {
 					Prefer : "return=minimal"
 				},
-				method : "PATCH",
 				payload : {
 					"EMPLOYEE_2_MANAGER@odata.bind" : "EMPLOYEES('5')"
 				},
-				url : "$-1"
+				url : "#11 PATCH $-1"
 			}) // 204 No Content
 			.expectRequest("#11 " + sUrl + "&$filter=ID eq '5'&$select=LimitedRank", {
 				value : [{
@@ -43300,27 +43006,23 @@ sap.ui.define([
 		const [oAlpha, oBeta] = oListBinding.getCurrentContexts();
 
 		this.expectRequest({
-				batchNo : 2,
 				headers : {
 					Prefer : "return=minimal"
 				},
-				method : "PATCH",
 				payload : {
 					"BestFriend@odata.bind" : null
 				},
-				url : "Artists(ArtistID='2',IsActiveEntity=false)"
+				url : "#2 PATCH Artists(ArtistID='2',IsActiveEntity=false)"
 			}) // 204 No Content
 			.expectRequest({
-				batchNo : 2,
 				headers : {
 					Prefer : "return=minimal"
 				},
-				method : "POST",
 				payload : {
 					// Note: add a non-key property for demonstrating the multi key scenario
 					NextSibling : {ArtistID : "1", Name : "Alpha"}
 				},
-				url : sFriend.slice(1)
+				url : "#2 POST " + sFriend.slice(1)
 					+ "(ArtistID='2',IsActiveEntity=false)/special.cases.ChangeNextSibling"
 			}) // 204 No Content
 			.expectRequest("#2 " + sUrl
@@ -43467,9 +43169,7 @@ sap.ui.define([
 		const [oAlpha, oGamma] = oListBinding.getAllCurrentContexts();
 
 		this.expectRequest({
-				batchNo : 2,
-				method : "POST",
-				url : "EMPLOYEES",
+				url : "#2 POST EMPLOYEES",
 				payload : {
 					"EMPLOYEE_2_MANAGER@odata.bind" : "EMPLOYEES('3')",
 					Name : "FilteredOut"
@@ -43567,9 +43267,7 @@ sap.ui.define([
 		]);
 
 		this.expectRequest({
-				batchNo : 5,
-				method : "POST",
-				url : "EMPLOYEES",
+				url : "#5 POST EMPLOYEES",
 				payload : {
 					"EMPLOYEE_2_MANAGER@odata.bind" : "EMPLOYEES('1')",
 					Name : "Delta"
@@ -43620,9 +43318,7 @@ sap.ui.define([
 			]);
 
 		this.expectRequest({
-				batchNo : 7,
-				method : "POST",
-				url : "EMPLOYEES",
+				url : "#7 POST EMPLOYEES",
 				payload : {
 					"EMPLOYEE_2_MANAGER@odata.bind" : "EMPLOYEES('4')",
 					Name : "Epsilon"
@@ -43689,9 +43385,7 @@ sap.ui.define([
 		]);
 
 		this.expectRequest({
-				batchNo : 9,
-				method : "POST",
-				url : "EMPLOYEES",
+				url : "#9 POST EMPLOYEES",
 				payload : {
 					"EMPLOYEE_2_MANAGER@odata.bind" : "EMPLOYEES('5')",
 					Name : "Zeta"
@@ -43757,9 +43451,7 @@ sap.ui.define([
 		oZeta = oListBinding.getCurrentContexts()[1];
 
 		this.expectRequest({
-				batchNo : 11,
-				method : "POST",
-				url : "EMPLOYEES",
+				url : "#11 POST EMPLOYEES",
 				payload : {
 					"EMPLOYEE_2_MANAGER@odata.bind" : "EMPLOYEES('6')",
 					Name : "Eta"
@@ -43910,8 +43602,7 @@ sap.ui.define([
 		const [oAlpha] = oListBinding.getAllCurrentContexts();
 
 		this.expectRequest({
-				method : "POST",
-				url : "EMPLOYEES",
+				url : "POST EMPLOYEES",
 				payload : {
 					"EMPLOYEE_2_MANAGER@odata.bind" : "EMPLOYEES('1')",
 					Name : "Epsilon"
@@ -44046,15 +43737,13 @@ sap.ui.define([
 		const [oAlpha, oBeta] = oListBinding.getAllCurrentContexts();
 
 		this.expectRequest({
-				batchNo : 2,
 				headers : {
 					Prefer : "return=minimal"
 				},
-				method : "PATCH",
 				payload : {
 					"EMPLOYEE_2_MANAGER@odata.bind" : "EMPLOYEES('1')"
 				},
-				url : "EMPLOYEES('1.1')"
+				url : "#2 PATCH EMPLOYEES('1.1')"
 			}) // 204 No Content
 			.expectRequest("#2 " + sUrl + "&$filter=ID eq '1.1'&$select=LimitedRank", {
 				value : [{
@@ -44201,9 +43890,7 @@ sap.ui.define([
 		const oListBinding = oTable.getBinding("rows");
 
 		this.expectRequest({
-				batchNo : 2,
-				method : "POST",
-				url : "Artists",
+				url : "#2 POST Artists",
 				payload : {
 					Name : "FilteredOut"
 				}
@@ -44246,9 +43933,7 @@ sap.ui.define([
 		]);
 
 		this.expectRequest({
-				batchNo : 4,
-				method : "POST",
-				url : "Artists",
+				url : "#4 POST Artists",
 				payload : {
 					Name : "Gamma"
 				}
@@ -44851,20 +44536,16 @@ sap.ui.define([
 			this.waitForChanges(assert, "request side effects refresh")
 		]);
 
-		this.expectRequest({
-				url : "EMPLOYEES?custom=foo"
-					+ "&$apply=ancestors($root/EMPLOYEES,OrgChart,ID,filter(ID eq '5'),1)"
-					+ "&$select=ID,Name"
-			}, {
+		this.expectRequest("EMPLOYEES?custom=foo"
+				+ "&$apply=ancestors($root/EMPLOYEES,OrgChart,ID,filter(ID eq '5'),1)"
+				+ "&$select=ID,Name", {
 				value : [{
 					ID : "1",
 					Name : "Beta"
 				}]
 			})
-			.expectRequest({
-				url : sUrl + "&$filter=ID eq '1'"
-					+ "&$select=DescendantCount,DistanceFromRoot,DrillState,LimitedRank"
-			}, {
+			.expectRequest(sUrl + "&$filter=ID eq '1'"
+				+ "&$select=DescendantCount,DistanceFromRoot,DrillState,LimitedRank", {
 				value : [{
 					DescendantCount : "0",
 					DistanceFromRoot : "1",
@@ -44989,10 +44670,10 @@ sap.ui.define([
 		assert.strictEqual(oBeta.iIndex, undefined, "still unknown");
 
 		let fnResolve;
-		this.expectRequest({
-				url : "EMPLOYEES?$apply=ancestors($root/EMPLOYEES,OrgChart,ID,filter(ID eq '2'),1)"
-					+ "&$select=ID,Name"
-			}, new Promise(function (resolve) {
+		this.expectRequest("EMPLOYEES"
+				+ "?$apply=ancestors($root/EMPLOYEES,OrgChart,ID,filter(ID eq '2'),1)"
+				+ "&$select=ID,Name",
+			new Promise(function (resolve) {
 				fnResolve = resolve.bind(null, {
 					value : [{
 						ID : "1",
@@ -45006,19 +44687,16 @@ sap.ui.define([
 
 		await this.waitForChanges(assert, "request parent of 3 (Delta)");
 
-		this.expectRequest({
-				url : "EMPLOYEES?$apply=ancestors($root/EMPLOYEES,OrgChart,ID,filter(ID eq '5'),1)"
-					+ "&$select=ID,Name"
-			}, {
+		this.expectRequest("EMPLOYEES"
+				+ "?$apply=ancestors($root/EMPLOYEES,OrgChart,ID,filter(ID eq '5'),1)"
+				+ "&$select=ID,Name", {
 				value : [{
 					ID : "1",
 					Name : "Beta"
 				}]
 			})
-			.expectRequest({
-				url : sUrl + "&$filter=ID eq '1'"
-					+ "&$select=DescendantCount,DistanceFromRoot,DrillState,LimitedRank"
-			}, {
+			.expectRequest(sUrl + "&$filter=ID eq '1'"
+				+ "&$select=DescendantCount,DistanceFromRoot,DrillState,LimitedRank", {
 				value : [{
 					DescendantCount : "5",
 					DistanceFromRoot : "0",
@@ -45143,8 +44821,7 @@ sap.ui.define([
 		const oBeta = oTable.getRows()[1].getBindingContext();
 
 		this.expectRequest({
-				method : "POST",
-				url : "Artists",
+				url : "POST Artists",
 				payload : {
 					"BestFriend@odata.bind" : "Artists(ArtistID='1',IsActiveEntity=false)",
 					Name : "Iota"
@@ -45186,8 +44863,7 @@ sap.ui.define([
 		], 13);
 
 		this.expectRequest({
-				method : "POST",
-				url : "Artists",
+				url : "POST Artists",
 				payload : {
 					"BestFriend@odata.bind" : "Artists(ArtistID='0',IsActiveEntity=false)",
 					Name : "Rho"
@@ -45993,29 +45669,25 @@ sap.ui.define([
 		//   3 Delta
 		//   6 Eta (not loaded)
 		this.expectRequest({
-				batchNo : 8,
 				headers : {
 					"If-Match" : "etag4.1",
 					Prefer : "return=minimal"
 				},
-				method : "PATCH",
 				payload : {
 					"BestFriend@odata.bind" : "Artists(ArtistID='0',IsActiveEntity=false)"
 				},
-				url : "Artists(ArtistID='4',IsActiveEntity=false)"
+				url : "#8 PATCH Artists(ArtistID='4',IsActiveEntity=false)"
 			}) // 204 No Content
 			.expectRequest({
-				batchNo : 8,
 				headers : {
 					"If-Match" : "etag4.1",
 					Prefer : "return=minimal"
 				},
-				method : "POST",
 				payload : {
 					// Note: add a non-key property for demonstrating the multi key scenario
 					NextSibling : {ArtistID : "3", Name : "Delta #1"}
 				},
-				url : sFriend.slice(1)
+				url : "#8 POST " + sFriend.slice(1)
 					+ "(ArtistID='4',IsActiveEntity=false)/special.cases.ChangeNextSibling"
 			}) // 204 No Content
 			.expectRequest("#8 " + sBaseUrl + "&$filter=ArtistID eq '4' and IsActiveEntity eq false"
@@ -46518,8 +46190,7 @@ sap.ui.define([
 				that.expectChange("id", [, "", "1"])
 					.expectChange("name", [, "1st new child", "Beta"])
 					.expectRequest({
-						method : "POST",
-						url : "Artists",
+						url : "POST Artists",
 						payload : {
 							"BestFriend@odata.bind" : "Artists(ArtistID='0',IsActiveEntity=false)",
 							Name : "1st new child"
@@ -46557,8 +46228,7 @@ sap.ui.define([
 				that.expectChange("id", [, "", "11"])
 					.expectChange("name", [, "2nd new child", "First new child"])
 					.expectRequest({
-						method : "POST",
-						url : "Artists",
+						url : "POST Artists",
 						payload : {
 							"BestFriend@odata.bind" : "Artists(ArtistID='0',IsActiveEntity=false)",
 							Name : "2nd new child"
@@ -46687,11 +46357,10 @@ sap.ui.define([
 				that.expectChange("id", [, "11", "1"])
 					.expectChange("name", [, "First new child", "Beta"])
 					.expectRequest({
-						method : "DELETE",
 						headers : {
 							"If-Match" : "etag2.0"
 						},
-						url : "Artists(ArtistID='12',IsActiveEntity=false)"
+						url : "DELETE Artists(ArtistID='12',IsActiveEntity=false)"
 					});
 
 				return Promise.all([
@@ -46796,8 +46465,7 @@ sap.ui.define([
 			]);
 
 			this.expectRequest({
-					method : "POST",
-					url : "EMPLOYEES?foo=bar",
+					url : "POST EMPLOYEES?foo=bar",
 					payload : {
 						"EMPLOYEE_2_MANAGER@odata.bind" : "EMPLOYEES('1')",
 						Name : "Gamma"
@@ -47023,8 +46691,7 @@ sap.ui.define([
 		}, new Error("Deep create is not supported with data aggregation"));
 
 		this.expectRequest({
-				method : "POST",
-				url : "EMPLOYEES",
+				url : "POST EMPLOYEES",
 				payload : {Name : "foo"}
 			}, {ID : "42", Name : "foo"})
 			.expectRequest("EMPLOYEES('42')/EMPLOYEE_2_EQUIPMENTS?$select=Category,ID"
@@ -47040,8 +46707,7 @@ sap.ui.define([
 
 		this.expectChange("category", ["D", "C"])
 			.expectRequest({
-				method : "POST",
-				url : "EMPLOYEES('42')/EMPLOYEE_2_EQUIPMENTS",
+				url : "POST EMPLOYEES('42')/EMPLOYEE_2_EQUIPMENTS",
 				payload : {Category : "D"}
 			}, {Category : "D", ID : 24});
 
@@ -47337,13 +47003,11 @@ sap.ui.define([
 
 		this.expectChange("name", [, "Beta"])
 			.expectRequest({
-				method : "POST",
-				url : "EMPLOYEES",
+				url : "POST EMPLOYEES",
 				payload : {"EMPLOYEE_2_MANAGER@odata.bind" : "EMPLOYEES('0')", Name : "Gamma"}
 			}, {DrillState : "leaf", ID : "0.1", Name : "Gamma"})
 			.expectRequest({
-				method : "POST",
-				url : "EMPLOYEES",
+				url : "POST EMPLOYEES",
 				payload : {"EMPLOYEE_2_MANAGER@odata.bind" : "EMPLOYEES('0')", Name : "Beta"}
 			}, {DrillState : "leaf", ID : "0.0", Name : "Beta"});
 
@@ -48857,9 +48521,8 @@ sap.ui.define([
 		], 5);
 
 		this.expectRequest({
-				batchNo : 6,
 				groupId : "$auto.Heroes",
-				url : "Artists?custom=foo&$apply=" + sFilterSearch
+				url : "#6 Artists?custom=foo&$apply=" + sFilterSearch
 					+ "/descendants($root/Artists,OrgChart,_/NodeID"
 					+ ",filter(ArtistID eq '1' and IsActiveEntity eq false))"
 					+ "&$filter=ArtistID eq '1.1.1' and IsActiveEntity eq false"
@@ -48871,9 +48534,8 @@ sap.ui.define([
 				}]
 			})
 			.expectRequest({
-				batchNo : 6,
 				groupId : "$auto.Heroes",
-				url : sUnifiedUrl + ",ExpandLevels=" + JSON.stringify([
+				url : "#6 " + sUnifiedUrl + ",ExpandLevels=" + JSON.stringify([
 						{NodeID : "1,false", Levels : 1},
 						{NodeID : "1.1,false", Levels : 1},
 						{NodeID : "1.1.1,false", Levels : 1}
@@ -49868,8 +49530,7 @@ sap.ui.define([
 		const [oAlpha, oBeta] = oListBinding.getCurrentContexts();
 
 		this.expectRequest({
-				method : "POST",
-				url : "EMPLOYEES",
+				url : "POST EMPLOYEES",
 				payload : {
 					"EMPLOYEE_2_MANAGER@odata.bind" : "EMPLOYEES('0')",
 					Name : "Gamma"
@@ -50048,22 +49709,18 @@ sap.ui.define([
 		const [oZeta, oAlpha, oBeta, oEpsilon] = oListBinding.getCurrentContexts();
 
 		this.expectRequest({
-				batchNo : 2,
-				method : "POST",
 				payload : {},
-				url : "EMPLOYEES('1')/com.sap.gateway.default.iwbep.tea_busi.v0001.__FAKE__AcCopy"
-					+ "?$select=ID"
+				url : "#2 POST EMPLOYEES('1')"
+					+ "/com.sap.gateway.default.iwbep.tea_busi.v0001.__FAKE__AcCopy?$select=ID"
 			}, {ID : "_1"})
 			.expectRequest({
-				batchNo : 2,
 				headers : {
 					Prefer : "return=minimal"
 				},
-				method : "PATCH",
 				payload : {
 					"EMPLOYEE_2_MANAGER@odata.bind" : "EMPLOYEES('9')"
 				},
-				url : "$-1" // Note: "$-1" references the previous request
+				url : "#2 PATCH $-1" // Note: "$-1" references the previous request
 			}) // 204 No Content
 			.expectRequest("#2 " + sBaseUrl + "&$filter=ID eq '1'&$select=LimitedRank", {
 				value : [{ // Note: Beta's position did change
@@ -50247,8 +49904,7 @@ sap.ui.define([
 			return that.waitForChanges(assert, "no private annotation in transient entity");
 		}).then(function () {
 			that.expectRequest({
-					method : "POST",
-					url : "EMPLOYEES",
+					url : "POST EMPLOYEES",
 					payload : {
 						Name : "New Employee",
 						SALARY : {
@@ -50816,8 +50472,7 @@ sap.ui.define([
 			var oText = that.oView.byId("Name");
 
 			that.expectRequest({
-					method : "PATCH",
-					url : "TEAMS('1')",
+					url : "PATCH TEAMS('1')",
 					payload : {Name : "New Name"}
 				}, {
 					Team_Id : "1",
@@ -50874,9 +50529,8 @@ sap.ui.define([
 				headers : {
 					"If-Match" : "*"
 				},
-				method : "POST",
 				payload : {},
-				url : "SalesOrderList('1')/" + sAction + "?$select=Note,SalesOrderID"
+				url : "POST SalesOrderList('1')/" + sAction + "?$select=Note,SalesOrderID"
 			}, {
 				"@odata.etag" : "etag1.1",
 				Note : "1st note (draft)",
@@ -50935,13 +50589,11 @@ sap.ui.define([
 		const sSchema = "com.sap.gateway.default.zui5_epm_sample.v0002";
 		const sAction = sSchema + ".SalesOrder_Confirm";
 		this.expectRequest({
-				method : "POST",
-				url : "SalesOrderList('1')/" + sAction,
+				url : "POST SalesOrderList('1')/" + sAction,
 				payload : {}
 			})
 			.expectRequest({
-				method : "POST",
-				url : "SalesOrderList('2')/" + sAction,
+				url : "POST SalesOrderList('2')/" + sAction,
 				payload : {}
 			})
 			.expectRequest("SalesOrderList?$select=SalesOrderID"
@@ -51035,8 +50687,7 @@ sap.ui.define([
 					});
 
 				that.expectRequest({
-					method : oFixture.method,
-					url : sRequestPath
+					url : oFixture.method + " " + sRequestPath
 						+ "?$select=Address/City,ArtistID,IsActiveEntity,Messages,Name",
 					payload : oFixture.method === "GET" ? undefined : {}
 				}, {
@@ -51095,8 +50746,7 @@ sap.ui.define([
 				return that.checkValueState(assert, "name", "Success", "Just A Message");
 			}).then(function () {
 				that.expectRequest({
-						method : "PATCH",
-						url : "Artists(ArtistID='42',IsActiveEntity=false)",
+						url : "PATCH Artists(ArtistID='42',IsActiveEntity=false)",
 						payload : {Name : "foo"}
 					}, {Name : "foo"})
 					.expectChange("name", "foo");
@@ -51244,8 +50894,7 @@ sap.ui.define([
 					bReplaceWithRVC = sId === "42" && oFixture.keepAlive;
 
 				that.expectRequest({
-						method : "POST",
-						url : "Artists(ArtistID='" + sId + "',IsActiveEntity=" + !bIsActive
+						url : "POST Artists(ArtistID='" + sId + "',IsActiveEntity=" + !bIsActive
 							+ ")/special.cases." + sAction + "?$select=ArtistID,IsActiveEntity,Name",
 						payload : {}
 					}, {
@@ -51379,8 +51028,7 @@ sap.ui.define([
 				that.expectChange("name", "The Beatles (modified)")
 					.expectRequest({
 						headers : {Prefer : "return=minimal"},
-						method : "PATCH",
-						url : "Artists(ArtistID='42',IsActiveEntity=false)",
+						url : "PATCH Artists(ArtistID='42',IsActiveEntity=false)",
 						payload : {Name : "The Beatles (modified)"}
 					}); // 204 No Content
 
@@ -51493,8 +51141,7 @@ sap.ui.define([
 						oEntityContext, {$$inheritExpandSelect : true});
 
 				that.expectRequest({
-						method : "POST",
-						url : "Artists(ArtistID='42',IsActiveEntity=" + !bIsActive
+						url : "POST Artists(ArtistID='42',IsActiveEntity=" + !bIsActive
 							+ ")/special.cases." + sAction
 							+ "?$select=ArtistID,IsActiveEntity,Messages,Name"
 							+ "&$expand=BestFriend($select=ArtistID,IsActiveEntity,Name)",
@@ -51585,8 +51232,7 @@ sap.ui.define([
 				that.expectChange("name", "The Beatles (modified)")
 					.expectRequest({
 						headers : {Prefer : "return=minimal"},
-						method : "PATCH",
-						url : "Artists(ArtistID='42',IsActiveEntity=false)",
+						url : "PATCH Artists(ArtistID='42',IsActiveEntity=false)",
 						payload : {Name : "The Beatles (modified)"}
 					}, {
 						ArtistID : "42",
@@ -51603,8 +51249,7 @@ sap.ui.define([
 				that.expectChange("bestFriend", "Sgt. Pepper (modified)")
 					.expectRequest({
 						headers : {Prefer : "return=minimal"},
-						method : "PATCH",
-						url : "Artists(ArtistID='23',IsActiveEntity=true)",
+						url : "PATCH Artists(ArtistID='23',IsActiveEntity=true)",
 						payload : {Name : "Sgt. Pepper (modified)"}
 					}); // 204 No Content
 
@@ -51724,9 +51369,8 @@ sap.ui.define([
 					{$$patchWithoutSideEffects : true, $select : "Messages"});
 
 			that.expectRequest({
-					method : "POST",
 					payload : {},
-					url : "Artists/special.cases.Create?$select=Messages"
+					url : "POST Artists/special.cases.Create?$select=Messages"
 				}, {
 					ArtistID : "23",
 					IsActiveEntity : false,
@@ -51817,8 +51461,7 @@ sap.ui.define([
 					oReturnValueContext, {$$inheritExpandSelect : true});
 
 			that.expectRequest({
-					method : "POST",
-					url : "Artists(ArtistID='23',IsActiveEntity=false)"
+					url : "POST Artists(ArtistID='23',IsActiveEntity=false)"
 						+ "/special.cases.ActivationAction"
 						+ "?$select=ArtistID,IsActiveEntity,Messages,Name"
 						+ "&$expand=BestFriend($select=ArtistID,IsActiveEntity,Name)",
@@ -52089,8 +51732,7 @@ sap.ui.define([
 						oActiveArtistContext, {$$inheritExpandSelect : true});
 
 				that.expectRequest({
-						method : "POST",
-						url : "Artists(ArtistID='42',IsActiveEntity=true)/special.cases.EditAction"
+						url : "POST Artists(ArtistID='42',IsActiveEntity=true)/special.cases.EditAction"
 							+ "?$select=ArtistID,IsActiveEntity,Name",
 						payload : {}
 					}, {
@@ -52127,8 +51769,7 @@ sap.ui.define([
 					.withArgs("Failed to drill-down into ('42-0')/CurrencyCode"
 						+ ", invalid segment: CurrencyCode"); //TODO we'd better avoid this :-(
 				that.expectRequest({
-						method : "PATCH",
-						url : "Artists(ArtistID='42',IsActiveEntity=false)/_Publication('42-0')",
+						url : "PATCH Artists(ArtistID='42',IsActiveEntity=false)/_Publication('42-0')",
 						payload : {Price : "8.88"}
 					}, {
 						Price : "8.88"
@@ -52159,8 +51800,7 @@ sap.ui.define([
 						oInactiveArtistContext, {$$inheritExpandSelect : true});
 
 				that.expectRequest({
-						method : "POST",
-						url : "Artists(ArtistID='42',IsActiveEntity=false)"
+						url : "POST Artists(ArtistID='42',IsActiveEntity=false)"
 							+ "/special.cases.ActivationAction?$select=ArtistID,IsActiveEntity,Name",
 						payload : {}
 					}, {
@@ -52369,8 +52009,7 @@ sap.ui.define([
 			oOperation.attachDataReceived(fnDataReceived);
 			oOperation.attachDataRequested(fnDataRequested);
 			that.expectRequest({
-					method : "POST",
-					url : "Artists(ArtistID='42',IsActiveEntity=true)/special.cases.EditAction"
+					url : "POST Artists(ArtistID='42',IsActiveEntity=true)/special.cases.EditAction"
 						+ "?$select=ArtistID,IsActiveEntity,Messages,Name"
 						+ "&$expand=DraftAdministrativeData($select=DraftID,InProcessByUser)",
 					payload : {}
@@ -52414,8 +52053,7 @@ sap.ui.define([
 
 			that.expectChange("name", "TAFKAP")
 				.expectRequest({
-					method : "PATCH",
-					url : "Artists(ArtistID='42',IsActiveEntity=false)",
+					url : "PATCH Artists(ArtistID='42',IsActiveEntity=false)",
 					headers : {"If-Match" : "ETag0"},
 					payload : {Name : "TAFKAP"}
 				}, {/* response does not matter here */});
@@ -52471,8 +52109,7 @@ sap.ui.define([
 			assert.strictEqual(fnDataReceived.callCount, 1, "dataReceived");
 			assert.strictEqual(fnDataRequested.callCount, 1, "dataRequested");
 			that.expectRequest({
-					method : "POST",
-					url : "Artists(ArtistID='42',IsActiveEntity=false)"
+					url : "POST Artists(ArtistID='42',IsActiveEntity=false)"
 						+ "/special.cases.ActivationAction"
 						+ "?$select=ArtistID,IsActiveEntity,Messages,Name"
 						+ "&$expand=DraftAdministrativeData($select=DraftID,InProcessByUser)",
@@ -52544,8 +52181,7 @@ sap.ui.define([
 			});
 
 			that.expectRequest({
-					method : "POST",
-					url : "Artists(ArtistID='42',IsActiveEntity=true)/special.cases.EditAction"
+					url : "POST Artists(ArtistID='42',IsActiveEntity=true)/special.cases.EditAction"
 						+ "?$select=ArtistID,IsActiveEntity,Picture",
 					payload : {}
 				}, {
@@ -52613,8 +52249,7 @@ sap.ui.define([
 			var oOperation = that.oView.byId("action").getObjectBinding();
 
 			that.expectRequest({
-					method : "POST",
-					url : "SalesOrderList('42')/"
+					url : "POST SalesOrderList('42')/"
 						+ "com.sap.gateway.default.zui5_epm_sample.v0002.SalesOrder_Confirm"
 						+ "?$select=LifecycleStatusDesc,SalesOrderID"
 						+ "&$expand=SO_2_BP($select=BusinessPartnerID,CompanyName)",
@@ -52673,8 +52308,8 @@ sap.ui.define([
 			return that.waitForChanges(assert);
 		}).then(function () {
 			that.expectRequest({
-					method : "POST",
-					url : "Artists(ArtistID='42',IsActiveEntity=true)/special.cases.EditAction",
+					url : "POST Artists(ArtistID='42',IsActiveEntity=true)"
+						+ "/special.cases.EditAction",
 					payload : {}
 				}, {
 					ArtistID : "42",
@@ -52726,8 +52361,8 @@ sap.ui.define([
 			return that.createView(assert, "", oModel);
 		}).then(function () {
 			that.expectRequest({
-					method : "POST",
-					url : "Artists(ArtistID='4%2F2',IsActiveEntity=true)/special.cases.EditAction",
+					url : "POST Artists(ArtistID='4%2F2',IsActiveEntity=true)"
+						+ "/special.cases.EditAction",
 					payload : {}
 				}, {
 					ArtistID : "4/2",
@@ -52942,22 +52577,18 @@ sap.ui.define([
 
 					that.expectChange("name", ["Mrs Eliot"])
 						.expectRequest({
-							batchNo : 6,
 							headers : {
 								"If-Match" : "inactivETag",
 								Prefer : "return=minimal"
 							},
-							method : "PATCH",
 							payload : {Name : "Mrs Eliot"},
-							url : "Artists(ArtistID='42',IsActiveEntity=false)"
+							url : "#6 PATCH Artists(ArtistID='42',IsActiveEntity=false)"
 						}, null, {ETag : "inactivETag*"}) // 204 No Content
 						.expectRequest({
-							batchNo : 6,
 							headers : {
 								"If-Match" : "inactivETag"
 							},
-							method : "POST",
-							url : "Artists(ArtistID='42',IsActiveEntity=false)"
+							url : "#6 POST Artists(ArtistID='42',IsActiveEntity=false)"
 								+ "/special.cases.ActivationAction"
 								+ "?$select=ArtistID,IsActiveEntity,Messages,Name",
 							payload : {}
@@ -53163,8 +52794,7 @@ sap.ui.define([
 							headers : {
 								"If-Match" : "inactivETag"
 							},
-							method : "DELETE",
-							url : "Artists(ArtistID='42',IsActiveEntity=false)"
+							url : "DELETE Artists(ArtistID='42',IsActiveEntity=false)"
 						}) // 204 No Content
 						.expectMessages([{
 							message : sMessage1,
@@ -53218,8 +52848,7 @@ sap.ui.define([
 			return that.waitForChanges(assert);
 		}).then(function () {
 			that.expectRequest({
-					method : "POST",
-					url : "SalesOrderList('1')/" + sAction + "?$select=Messages,SalesOrderID",
+					url : "POST SalesOrderList('1')/" + sAction + "?$select=Messages,SalesOrderID",
 					payload : {}
 				}, {
 					SalesOrderID : "1"
@@ -53280,8 +52909,7 @@ sap.ui.define([
 			return that.waitForChanges(assert);
 		}).then(function () {
 			that.expectRequest({
-					method : "POST",
-					url : "Artists(ArtistID='1',IsActiveEntity=true)/BestFriend/" + sAction
+					url : "POST Artists(ArtistID='1',IsActiveEntity=true)/BestFriend/" + sAction
 						+ "?$select=ArtistID,IsActiveEntity,Messages",
 					payload : {}
 				}, {
@@ -53335,8 +52963,7 @@ sap.ui.define([
 
 		return this.createView(assert, sView, oModel).then(function () {
 			that.expectRequest({
-					method : "POST",
-					url : "TEAMS",
+					url : "POST TEAMS",
 					payload : {Team_Id : "new"}
 				}, {Team_Id : "newer"})
 				.expectChange("Team_Id", ["new"])
@@ -53355,8 +52982,7 @@ sap.ui.define([
 			assert.strictEqual(oCreatedContext.getPath(), "/TEAMS('newer')");
 
 			that.expectRequest({
-					method : "POST",
-					url : "TEAMS('newer')/com.sap.gateway.default.iwbep.tea_busi.v0001."
+					url : "POST TEAMS('newer')/com.sap.gateway.default.iwbep.tea_busi.v0001."
 						+ "AcChangeManagerOfTeam",
 					payload : {ManagerID : "01"}
 			});
@@ -53399,8 +53025,7 @@ sap.ui.define([
 		return this.createView(assert, sView, oModel).then(function () {
 			// create new relative entity
 			that.expectRequest({
-					method : "POST",
-					url : "TEAMS('42')/TEAM_2_EMPLOYEES",
+					url : "POST TEAMS('42')/TEAM_2_EMPLOYEES",
 					payload : {ID : null}
 				}, {ID : "7"})
 				.expectRequest("TEAMS('42')/TEAM_2_EMPLOYEES('7')?$select=ID", {ID : "7"})
@@ -53418,8 +53043,7 @@ sap.ui.define([
 			assert.strictEqual(oCreatedContext.getPath(), "/TEAMS('42')/TEAM_2_EMPLOYEES('7')");
 
 			that.expectRequest({
-					method : "POST",
-					url : "TEAMS('42')/TEAM_2_EMPLOYEES('7')/"
+					url : "POST TEAMS('42')/TEAM_2_EMPLOYEES('7')/"
 						+ "com.sap.gateway.default.iwbep.tea_busi.v0001.AcChangeTeamOfEmployee"
 						+ "?$expand=EMPLOYEE_2_TEAM($select=Team_Id)",
 					payload : {TeamID : "02"}
@@ -53473,8 +53097,7 @@ sap.ui.define([
 
 		return this.createView(assert, sView, oModel).then(function () {
 			that.expectRequest({
-					method : "POST",
-					url : "SalesOrderList",
+					url : "POST SalesOrderList",
 					payload : {SalesOrderID : "newID"}
 				}, {SalesOrderID : "43"})
 				.expectChange("SalesOrderID", ["newID"]) // from create()
@@ -53497,8 +53120,7 @@ sap.ui.define([
 		}).then(function () {
 			// create a sales order line item
 			that.expectRequest({
-					method : "POST",
-					url : "SalesOrderList('43')/SO_2_SOITEM",
+					url : "POST SalesOrderList('43')/SO_2_SOITEM",
 					payload : {
 						SalesOrderID : "43",
 						ItemPosition : "newPos"
@@ -53528,9 +53150,8 @@ sap.ui.define([
 					+ ".v0002.SalesOrder_Confirm(...)", oCreatedSOContext);
 
 			that.expectRequest({
-					method : "POST",
-					url : "SalesOrderList('43')/com.sap.gateway.default.zui5_epm_sample"
-						+ ".v0002.SalesOrder_Confirm",
+					url : "POST SalesOrderList('43')"
+						+ "/com.sap.gateway.default.zui5_epm_sample.v0002.SalesOrder_Confirm",
 					payload : {}
 				}, {SalesOrderID : "43"});
 
@@ -54655,8 +54276,7 @@ sap.ui.define([
 			oBinding = that.oView.byId("name").getBinding("value");
 
 			that.expectRequest({
-					method : "PATCH",
-					url : "EMPLOYEES('1')",
+					url : "PATCH EMPLOYEES('1')",
 					payload : {Name : ""}
 				}, {
 					ID : "1",
@@ -54693,8 +54313,7 @@ sap.ui.define([
 			return that.checkValueState(assert, "name", "Warning", "Enter a name");
 		}).then(function () {
 			that.expectRequest({
-					method : "PATCH",
-					url : "EMPLOYEES('1')",
+					url : "PATCH EMPLOYEES('1')",
 					payload : {Name : "Hugo"}
 				}, {
 					ID : "1",
@@ -54759,8 +54378,7 @@ sap.ui.define([
 			oContext = that.oView.byId("form").getBindingContext();
 
 			that.expectRequest({
-					method : "PATCH",
-					url : "EMPLOYEES('1')",
+					url : "PATCH EMPLOYEES('1')",
 					payload : {Name : ""}
 				}, {
 					ID : "1",
@@ -54839,8 +54457,7 @@ sap.ui.define([
 			oBinding = that.oView.byId("table").getItems()[0].getCells()[0].getBinding("value");
 
 			that.expectRequest({
-					method : "PATCH",
-					url : "EMPLOYEES('1')",
+					url : "PATCH EMPLOYEES('1')",
 					payload : {Name : ""}
 				}, {
 					ID : "1",
@@ -54922,9 +54539,7 @@ sap.ui.define([
 
 			that.expectChange("netAmount", "-1.00")
 				.expectRequest({
-					batchNo : 2,
-					method : "PATCH",
-					url : "SalesOrderList('42')?sap-client=123",
+					url : "#2 PATCH SalesOrderList('42')?sap-client=123",
 					headers : {"If-Match" : "ETag0", Prefer : "return=minimal"},
 					payload : {NetAmount : "-1"}
 				}, createErrorInsideBatch({message : "Value -1 not allowed"}))
@@ -54962,9 +54577,7 @@ sap.ui.define([
 		}).then(function () {
 			that.expectChange("netAmount", "200.00")
 				.expectRequest({
-					batchNo : 3,
-					method : "PATCH",
-					url : "SalesOrderList('42')?sap-client=123",
+					url : "#3 PATCH SalesOrderList('42')?sap-client=123",
 					headers : {"If-Match" : "ETag0", Prefer : "return=minimal"},
 					payload : {NetAmount : "200"}
 				}, null, {ETag : "ETag1"}); // 204 No Content
@@ -54994,9 +54607,7 @@ sap.ui.define([
 				});
 
 			that.expectRequest({
-					batchNo : 4,
-					method : "PATCH",
-					url : "SalesOrderList('42')?sap-client=123",
+					url : "#4 PATCH SalesOrderList('42')?sap-client=123",
 					headers : {
 						"If-Match" : "ETag1", // new ETag is used!
 						Prefer : "return=minimal"
@@ -55083,8 +54694,7 @@ sap.ui.define([
 
 			that.expectChange("listNote", ["Note (entered)"])
 				.expectRequest({
-					method : "PATCH",
-					url : "SalesOrderList('42')",
+					url : "PATCH SalesOrderList('42')",
 					headers : {"If-Match" : "ETag0", Prefer : "return=minimal"},
 					payload : {Note : "Note (entered)"}
 				}); // 204 No Content
@@ -55108,8 +54718,7 @@ sap.ui.define([
 		}).then(function () {
 			that.expectChange("formNote", "Note (entered)")
 				.expectRequest({
-					method : "PATCH",
-					url : "SalesOrderList('42')",
+					url : "PATCH SalesOrderList('42')",
 					headers : {"If-Match" : "ETag1", Prefer : "return=minimal"},
 					payload : {Note : "Note (entered)"}
 				}); // 204 No Content
@@ -55172,9 +54781,7 @@ sap.ui.define([
 			that.oView.byId("name").getBinding("value").setValue("TAFKAP");
 
 			that.expectRequest({
-					batchNo : 2,
-					method : "PATCH",
-					url : "Artists(ArtistID='42',IsActiveEntity=true)",
+					url : "#2 PATCH Artists(ArtistID='42',IsActiveEntity=true)",
 					headers : {"If-Match" : "ETag0"},
 					payload : {Name : "TAFKAP"}
 				}, {/* response does not matter here */})
@@ -55347,9 +54954,8 @@ sap.ui.define([
 			that.expectChange("company", "changed")
 				.expectRequest({
 					headers : {"If-Match" : "ETag"},
-					method : "PATCH",
 					payload : {CompanyName : "changed"},
-					url : "BusinessPartnerList('42')"
+					url : "PATCH BusinessPartnerList('42')"
 				});
 
 			that.oView.byId("company").getBinding("value").setValue("changed");
@@ -55490,13 +55096,11 @@ sap.ui.define([
 
 		this.expectChange("name", ["New Team"])
 			.expectRequest({
-				batchNo : 2,
 				headers : {
 					"If-Match" : "etag1.0",
 					Prefer : "return=minimal"
 				},
-				method : "PATCH",
-				url : "TEAMS('TEAM_01')",
+				url : "#2 PATCH TEAMS('TEAM_01')",
 				payload : {Name : "New Team"}
 			}, null, {ETag : "etag1.1"}) // no response required
 			.expectRequest("#2 TEAMS?$select=Budget,Name,Team_Id&$filter=Team_Id eq 'TEAM_01'", {
@@ -56143,8 +55747,7 @@ sap.ui.define([
 			return that.waitForChanges(assert);
 		}).then(function () {
 			that.expectRequest({
-					method : "POST",
-					url : "Artists(ArtistID='42',IsActiveEntity=true)/_Publication",
+					url : "POST Artists(ArtistID='42',IsActiveEntity=true)/_Publication",
 					payload : {PublicationID : "New 1"}
 				}, {
 					Price : "3.33",
@@ -56798,9 +56401,8 @@ sap.ui.define([
 						{$$inheritExpandSelect : true, $select : ["Messages"]});
 
 			that.expectRequest({
-					method : "POST",
 					payload : {},
-					url : "SalesOrderList('1')/" + sOperation
+					url : "POST SalesOrderList('1')/" + sOperation
 						+ "?$select=Messages,Note,SalesOrderID"
 				}, {
 					Messages : [{
@@ -56977,9 +56579,8 @@ sap.ui.define([
 		}).then(function () {
 			that.expectRequest({
 					headers : {"If-Match" : "ETag2"}, // uses ETag from side effect!
-					method : "PATCH",
 					payload : {Note : "User input"},
-					url : "SalesOrderList('42')"
+					url : "PATCH SalesOrderList('42')"
 				}, {
 					Note : "Server response",
 					SalesOrderID : "42"
@@ -57024,9 +56625,7 @@ sap.ui.define([
 
 		return this.createView(assert, sView, oModel).then(function () {
 			that.expectRequest({
-					batchNo : 2,
-					method : "POST",
-					url : "SalesOrderList('1')/" + sAction,
+					url : "#2 POST SalesOrderList('1')/" + sAction,
 					headers : {"If-Match" : "ETag"},
 					payload : {}
 				})
@@ -57061,8 +56660,7 @@ sap.ui.define([
 
 		this.expectChange("status0", "Busy")
 			.expectRequest({
-				method : "PATCH",
-				url : "EMPLOYEES('3')",
+				url : "PATCH EMPLOYEES('3')",
 				headers : {"If-Match" : "ETag3"},
 				payload : {
 					ROOM_ID : "31", // <-- retry
@@ -57076,8 +56674,7 @@ sap.ui.define([
 
 		this.expectChange("roomId0", "32")
 			.expectRequest({
-				method : "PATCH",
-				url : "EMPLOYEES('3')",
+				url : "PATCH EMPLOYEES('3')",
 				headers : {"If-Match" : "ETag3"},
 				payload : {
 					ROOM_ID : "32" // <-- new change wins over retry
@@ -57090,17 +56687,15 @@ sap.ui.define([
 			oRoomIdBinding = this.oView.byId("roomId0").getBinding("value");
 
 		this.expectRequest({
-				method : "PATCH",
-				url : "EMPLOYEES('3')",
+				url : "PATCH EMPLOYEES('3')",
 				headers : {"If-Match" : "ETag3"},
 				payload : {
 					ROOM_ID : "31" // <-- retry
 				}
 			}, {/* don't care */})
 			.expectRequest({
-				method : "POST",
 				headers : {"If-Match" : "ETag3"},
-				url : "EMPLOYEES('3')/" + sAction,
+				url : "POST EMPLOYEES('3')/" + sAction,
 				payload : {TeamID : "23"}
 			}, {/* don't care */});
 
@@ -57118,16 +56713,14 @@ sap.ui.define([
 		this.expectChange("roomId0", null)
 			.expectChange("status0", null)
 			.expectRequest({
-				method : "PATCH",
-				url : "EMPLOYEES('3')",
+				url : "PATCH EMPLOYEES('3')",
 				headers : {"If-Match" : "ETag3"},
 				payload : {
 					ROOM_ID : "31" // <-- retry
 				}
 			}, {/* don't care */})
 			.expectRequest({
-				method : "DELETE",
-				url : "EMPLOYEES('3')",
+				url : "DELETE EMPLOYEES('3')",
 				headers : {"If-Match" : "*"}
 			});
 
@@ -57139,11 +56732,10 @@ sap.ui.define([
 				changeSetNo : 1,
 				groupId : "$auto",
 				headers : {"If-Match" : "ETag4"},
-				method : "PATCH",
 				payload : {
 					ROOM_ID : "41" // <-- retry
 				},
-				url : "EMPLOYEES('4')"
+				url : "PATCH EMPLOYEES('4')"
 			}, {/* don't care */})
 			.expectRequest({
 				$ContentID : "1.0",
@@ -57151,23 +56743,21 @@ sap.ui.define([
 				changeSetNo : 1,
 				groupId : "$auto",
 				headers : {"If-Match" : "ETag3"},
-				method : "PATCH",
 				payload : {
 					ROOM_ID : "31" // <-- retry
 				},
-				url : "EMPLOYEES('3')"
+				url : "PATCH EMPLOYEES('3')"
 			}, {/* don't care */})
 			.expectRequest({
 				$ContentID : undefined,
 				batchNo : 4,
 				changeSetNo : 2, // new changeset via submitBatch("$auto")
 				groupId : "$auto",
-				method : "POST",
 				payload : {
 					Budget : "1234.1234",
 					TeamID : "TEAM_01"
 				},
-				url : "ChangeTeamBudgetByID"
+				url : "POST ChangeTeamBudgetByID"
 			}, {/* don't care */});
 
 		return Promise.all([
@@ -57201,23 +56791,20 @@ sap.ui.define([
 		});
 	}, function (_assert, oForm0Binding) {
 		// Context#requestSideEffects restarts all PATCHes within the same $batch as the side effect
+		// Note: order of PATCHes not preserved, but should not be critical
 		this.expectRequest({
-				batchNo : 4,
-				headers : {"If-Match" : "ETag3"},
-				method : "PATCH",
-				payload : {
-					ROOM_ID : "31" // <-- retry
-				},
-				url : "EMPLOYEES('3')"
-			}, {/* don't care */})
-			.expectRequest({
-				batchNo : 4,
 				headers : {"If-Match" : "ETag4"},
-				method : "PATCH",
 				payload : {
 					ROOM_ID : "41" // <-- retry
 				},
-				url : "EMPLOYEES('4')"
+				url : "#4 PATCH EMPLOYEES('4')"
+			}, {/* don't care */})
+			.expectRequest({
+				headers : {"If-Match" : "ETag3"},
+				payload : {
+					ROOM_ID : "31" // <-- retry
+				},
+				url : "#4 PATCH EMPLOYEES('3')"
 			}, {/* don't care */})
 			.expectRequest("#4 EMPLOYEES('3')?$select=STATUS", {
 				STATUS : "Busy"
@@ -57268,14 +56855,12 @@ sap.ui.define([
 				that.expectChange("roomId0", "31")
 					.expectChange("roomId1", "41")
 					.expectRequest({
-						method : "PATCH",
-						url : "EMPLOYEES('3')",
+						url : "PATCH EMPLOYEES('3')",
 						headers : {"If-Match" : "ETag3"},
 						payload : {ROOM_ID : "31"}
 					}, createErrorInsideBatch())
 					.expectRequest({
-						method : "PATCH",
-						url : "EMPLOYEES('4')",
+						url : "PATCH EMPLOYEES('4')",
 						headers : {"If-Match" : "ETag4"},
 						payload : {ROOM_ID : "41"}
 					}) // no response required
@@ -57363,8 +56948,7 @@ sap.ui.define([
 				that.expectChange("age", "67")
 					.expectChange("roomId", "42")
 					.expectRequest({
-						method : "PATCH",
-						url : "EMPLOYEES('3')",
+						url : "PATCH EMPLOYEES('3')",
 						headers : {"If-Match" : "ETag0"},
 						payload : {
 							AGE : 67,
@@ -57398,8 +56982,7 @@ sap.ui.define([
 				assert.strictEqual(mParameters.resolvedPath, "/EMPLOYEES('3')/ROOM_ID");
 
 				that.expectRequest({
-						method : "PATCH",
-						url : "EMPLOYEES('3')",
+						url : "PATCH EMPLOYEES('3')",
 						headers : {"If-Match" : "ETag0"},
 						payload : {
 							AGE : 67,
@@ -57437,8 +57020,7 @@ sap.ui.define([
 
 				that.expectChange("status", "Busy")
 					.expectRequest({
-						method : "PATCH",
-						url : "EMPLOYEES('3')",
+						url : "PATCH EMPLOYEES('3')",
 						headers : {"If-Match" : "ETag1"},
 						payload : {STATUS : "Busy"}
 					}, {/* don't care */});
@@ -57486,8 +57068,7 @@ sap.ui.define([
 			that.expectChange("age", "67")
 				.expectChange("roomId", "42")
 				.expectRequest({
-					method : "PATCH",
-					url : "EMPLOYEES('3')",
+					url : "PATCH EMPLOYEES('3')",
 					headers : {"If-Match" : "ETag0"},
 					payload : {
 						AGE : 67,
@@ -57522,9 +57103,7 @@ sap.ui.define([
 			}
 
 			that.expectRequest({
-					batchNo : 3,
-					method : "PATCH",
-					url : "EMPLOYEES('3')",
+					url : "#3 PATCH EMPLOYEES('3')",
 					headers : {"If-Match" : "ETag0"},
 					payload : {
 						AGE : 67,
@@ -57532,10 +57111,8 @@ sap.ui.define([
 					}
 				}, {/* don't care */})
 				.expectRequest({
-					batchNo : 3,
-					method : "POST",
 					headers : {"If-Match" : "ETag0"},
-					url : "EMPLOYEES('3')/" + sAction,
+					url : "#3 POST EMPLOYEES('3')/" + sAction,
 					payload : {TeamID : "23"}
 				}, {/* don't care */});
 
@@ -57582,8 +57159,7 @@ sap.ui.define([
 		return this.createView(assert, sView, oModel).then(function () {
 			// create a new team
 			that.expectRequest({
-					method : "POST",
-					url : "TEAMS",
+					url : "POST TEAMS",
 					payload : {}
 				}, {Team_Id : "23"});
 
@@ -57613,8 +57189,7 @@ sap.ui.define([
 		}).then(function () {
 			// create new relative entity
 			that.expectRequest({
-					method : "POST",
-					url : "TEAMS('23')/TEAM_2_EMPLOYEES",
+					url : "POST TEAMS('23')/TEAM_2_EMPLOYEES",
 					payload : {ID : null}
 				}, {
 					ID : "7",
@@ -57729,8 +57304,7 @@ sap.ui.define([
 					.withArgs("Failed to update path /SalesOrderList('0500000000')/SO_2_BP/"
 						+ "BP_2_PRODUCT('1')/Name", sinon.match(oError.message));
 				that.expectRequest({
-						method : "PATCH",
-						url : "ProductList('1')",
+						url : "PATCH ProductList('1')",
 						headers : {"If-Match" : "ETag"},
 						payload : {Name : "A product with no name"}
 					}, oError)
@@ -57775,8 +57349,7 @@ sap.ui.define([
 						+ " /SalesOrderList('0500000000')/SO_2_BP/BP_2_PRODUCT('1')",
 						sinon.match(oError.message), sContext);
 				that.expectRequest({
-						method : "DELETE",
-						url : "ProductList('1')",
+						url : "DELETE ProductList('1')",
 						headers : {"If-Match" : "ETag"/*, NO "sap-cancel-on-close" */}
 					}, oError)
 					.expectMessages([{
@@ -57806,8 +57379,7 @@ sap.ui.define([
 				]);
 			}).then(function () {
 				that.expectRequest({
-						method : "PATCH",
-						url : "ProductList('1')",
+						url : "PATCH ProductList('1')",
 						headers : {"If-Match" : "ETag"},
 						payload : {Name : "A product name leads to PATCH success with a message"}
 					}, {
@@ -58319,8 +57891,7 @@ sap.ui.define([
 				.expectChange("weight1", "23.400")
 				.expectChange("weightMeasure", "23.400")
 				.expectRequest({
-					method : "PATCH",
-					url : "ProductList('HT-1000')?sap-client=123",
+					url : "PATCH ProductList('HT-1000')?sap-client=123",
 					headers : {"If-Match" : "ETag"},
 					payload : {WeightMeasure : "23.4", WeightUnit : "KG"}
 				});
@@ -58347,8 +57918,7 @@ sap.ui.define([
 				.expectChange("weight0", "34.510")
 				.expectChange("weight1", "34.510")
 				.expectRequest({
-					method : "PATCH",
-					url : "ProductList('HT-1000')?sap-client=123",
+					url : "PATCH ProductList('HT-1000')?sap-client=123",
 					headers : {"If-Match" : "ETag"},
 					payload : {WeightMeasure : "34.51", WeightUnit : "KG"}
 				});
@@ -58362,8 +57932,7 @@ sap.ui.define([
 				.expectChange("weight0", "0.000")
 				.expectChange("weight1", "0.000")
 				.expectRequest({
-					method : "PATCH",
-					url : "ProductList('HT-1000')?sap-client=123",
+					url : "PATCH ProductList('HT-1000')?sap-client=123",
 					headers : {"If-Match" : "ETag"},
 					payload : {WeightMeasure : "0", WeightUnit : "KG"}
 				});
@@ -58518,8 +58087,7 @@ sap.ui.define([
 				.expectChange("price1", "42")
 				.expectChange("amount", "42")
 				.expectRequest({
-					method : "PATCH",
-					url : "ProductList('HT-1000')?sap-client=123",
+					url : "PATCH ProductList('HT-1000')?sap-client=123",
 					headers : {"If-Match" : "ETag"},
 					payload : {Price : "42", CurrencyCode : "JPY"}
 				});
@@ -58532,8 +58100,7 @@ sap.ui.define([
 				.expectChange("price0", "0")
 				.expectChange("price1", "0")
 				.expectRequest({
-					method : "PATCH",
-					url : "ProductList('HT-1000')?sap-client=123",
+					url : "PATCH ProductList('HT-1000')?sap-client=123",
 					headers : {"If-Match" : "ETag"},
 					payload : {Price : "0", CurrencyCode : "JPY"}
 				});
@@ -58779,8 +58346,7 @@ sap.ui.define([
 					oContext, {$$inheritExpandSelect : true});
 
 			that.expectRequest({
-				method : "POST",
-				url : sResourcePath + "/special.cases.PreparationAction"
+				url : "POST " + sResourcePath + "/special.cases.PreparationAction"
 					+ "?$select=Messages,Price,PublicationID",
 				payload : {}
 			}, {
@@ -58842,9 +58408,8 @@ sap.ui.define([
 					oHeaderContext, {$$patchWithoutSideEffects : true});
 
 			that.expectRequest({
-				method : "POST",
 				payload : {},
-				url : "Artists/special.cases.Create"
+				url : "POST Artists/special.cases.Create"
 			}, {
 				ArtistID : "42",
 				IsActiveEntity : false
@@ -58981,9 +58546,8 @@ sap.ui.define([
 
 			return this.createView(assert, sView, oModel).then(function () {
 				that.expectRequest({
-						method : "POST",
 						payload : {},
-						url : "BusinessPartnerList"
+						url : "POST BusinessPartnerList"
 					}, new Promise(function (resolve) {
 						fnRespond = resolve.bind(null, {
 							BusinessPartnerID : "4710",
@@ -59074,9 +58638,8 @@ sap.ui.define([
 				.expectRequest({
 					batchNo : 2,
 					changeSetNo : 1, //TODO maybe this "reordering" is wrong (here)?
-					method : "POST",
 					payload : {},
-					url : "BusinessPartnerList"
+					url : "POST BusinessPartnerList"
 				}, {BusinessPartnerID : "4710"})
 				.expectChange("id", ["4710",,, "4713"]);
 			oContext = oBinding.create({}, true);
@@ -59241,14 +58804,13 @@ sap.ui.define([
 
 		this.expectChange("salary", "1,234.89")
 			.expectRequest({
-				method : "PATCH",
 				payload : {
 					SALARY : {
 						BASIC_SALARY_CURR : "EUR",
 						MONTHLY_BASIC_SALARY_AMOUNT : "1234.89"
 					}
 				},
-				url : "TEAMS('42')/TEAM_2_EMPLOYEES('1')"
+				url : "PATCH TEAMS('42')/TEAM_2_EMPLOYEES('1')"
 			}, {/* response does not matter here */});
 
 		// code under test
@@ -59257,10 +58819,7 @@ sap.ui.define([
 		await this.waitForChanges(assert, "PATCH salary");
 
 		this.expectChange("salary", null)
-			.expectRequest({
-				method : "DELETE",
-				url : "TEAMS('42')/TEAM_2_EMPLOYEES('1')"
-			}); // 204 No Content
+			.expectRequest("DELETE TEAMS('42')/TEAM_2_EMPLOYEES('1')"); // 204 No Content
 
 		await Promise.all([
 			// code under test
@@ -59398,9 +58957,7 @@ sap.ui.define([
 			return that.waitForChanges(assert);
 		}).then(function () {
 			that.expectRequest({
-					batchNo : 2,
-					method : "POST",
-					url : "SalesOrderList('1')/SO_2_SOITEM",
+					url : "#2 POST SalesOrderList('1')/SO_2_SOITEM",
 					payload : {}
 				}, {
 					SalesOrderID : "1",
@@ -59569,9 +59126,8 @@ sap.ui.define([
 			return that.waitForChanges(assert);
 		}).then(function () {
 			that.expectRequest({
-					method : "PATCH",
 					payload : {Name : "Best Team Ever"},
-					url : "TEAMS('TEAM_01')"
+					url : "PATCH TEAMS('TEAM_01')"
 				}, {
 					Name : "Best Team Ever",
 					Team_Id : "TEAM_01",
@@ -59623,9 +59179,8 @@ sap.ui.define([
 			return that.waitForChanges(assert);
 		}).then(function () {
 			that.expectRequest({
-					method : "PATCH",
 					payload : {Name : "Best Team Ever"},
-					url : "TEAMS('TEAM_01')"
+					url : "PATCH TEAMS('TEAM_01')"
 				}, createErrorInsideBatch())
 				.expectMessages([{
 					code : "CODE",
@@ -59672,9 +59227,8 @@ sap.ui.define([
 
 			that.expectChange("name", "Foo")
 				.expectRequest({
-					method : "PATCH",
 					payload : {Name : "Foo"},
-					url : "TEAMS('TEAM_01')"
+					url : "PATCH TEAMS('TEAM_01')"
 				}, createErrorInsideBatch())
 				.expectMessages([{
 					code : "CODE",
@@ -59710,9 +59264,8 @@ sap.ui.define([
 			assert.strictEqual(iPatchCompleted, 1);
 
 			that.expectRequest({
-					method : "PATCH",
 					payload : {Name : "Foo"},
-					url : "TEAMS('TEAM_01')"
+					url : "PATCH TEAMS('TEAM_01')"
 				});
 
 			return Promise.all([
@@ -59758,15 +59311,13 @@ sap.ui.define([
 			});
 			that.expectRequest({
 					headers : {"If-Match" : "*"},
-					method : "PATCH",
 					payload : {MEMBER_COUNT : 99, Name : "Best Team Ever"},
-					url : "TEAMS('TEAM_01')"
+					url : "PATCH TEAMS('TEAM_01')"
 				})
 				.expectRequest({
 					headers : {"If-Match" : "*"},
-					method : "PATCH",
 					payload : {Name : "Yet another team!"},
-					url : "TEAMS('TEAM_02')"
+					url : "PATCH TEAMS('TEAM_02')"
 				});
 
 			return Promise.all([
@@ -59913,9 +59464,8 @@ sap.ui.define([
 				return that.waitForChanges(assert);
 			}).then(function () {
 				that.expectRequest({
-						method : "DELETE",
 						headers : {"If-Match" : "*"},
-						url : "SalesOrderList('1')"
+						url : "DELETE SalesOrderList('1')"
 					});
 				if (bKeepAlive) {
 					that.expectRequest("SalesOrderList?$count=true&$filter=not (SalesOrderID eq '1')"
@@ -59947,8 +59497,7 @@ sap.ui.define([
 				]);
 			}).then(function () {
 				that.expectRequest({
-						method : "PATCH",
-						url : "SalesOrderList('3')",
+						url : "PATCH SalesOrderList('3')",
 						payload : {Note : "Note 3 (changed)"}
 					});
 
@@ -60032,9 +59581,8 @@ sap.ui.define([
 				"Request canceled: PATCH Artists(ArtistID='2',IsActiveEntity=true)"
 				+ "/_Publication('P1'); group: update");
 			that.expectRequest({
-					method : "DELETE",
 					headers : {"If-Match" : "*"},
-					url : "Artists(ArtistID='2',IsActiveEntity=true)"
+					url : "DELETE Artists(ArtistID='2',IsActiveEntity=true)"
 				})
 				.expectChange("id", null)
 				.expectChange("name", "The Beatles")
@@ -60091,9 +59639,8 @@ sap.ui.define([
 					oForm.getBindingContext(), {$$inheritExpandSelect : true});
 
 			that.expectRequest({
-					method : "POST",
 					payload : {},
-					url : "Artists(ArtistID='1',IsActiveEntity=true)/special.cases.EditAction"
+					url : "POST Artists(ArtistID='1',IsActiveEntity=true)/special.cases.EditAction"
 						+ "?$select=ArtistID,IsActiveEntity,Messages"
 				}, {
 					ArtistID : "1",
@@ -60123,9 +59670,8 @@ sap.ui.define([
 			return that.waitForChanges(assert);
 		}).then(function () {
 			that.expectRequest({
-					method : "DELETE",
 					headers : {"If-Match" : "*"},
-					url : "Artists(ArtistID='1',IsActiveEntity=false)"
+					url : "DELETE Artists(ArtistID='1',IsActiveEntity=false)"
 				})
 				.expectChange("id", null)
 				.expectChange("active", null)
@@ -60207,11 +59753,10 @@ sap.ui.define([
 				});
 
 			this.expectRequest({
-					method : "POST",
 					payload : {
 						TeamID : sTeamId
 					},
-					url : "TEAMS('TEAM_01')/TEAM_2_EMPLOYEES('1')" + "/" + sChangeTeamAction
+					url : "POST TEAMS('TEAM_01')/TEAM_2_EMPLOYEES('1')" + "/" + sChangeTeamAction
 						+ (bInheritExpandSelect
 							? "?$select=Age,ID,Name,TEAM_ID"
 							: "?$select=Age,ID")
@@ -60277,9 +59822,8 @@ sap.ui.define([
 			oTable.setBindingContext(null);
 
 			that.expectRequest({
-					method : "DELETE",
 					headers : {"If-Match" : "*"},
-					url : "ProductList('P1')"
+					url : "DELETE ProductList('P1')"
 				});
 
 			return Promise.all([
@@ -60324,14 +59868,12 @@ sap.ui.define([
 			return that.waitForChanges(assert, "object page");
 		}).then(function () {
 			that.expectRequest({
-					method : "DELETE",
 					headers : {"If-Match" : "etag"},
-					url : "SalesOrderList('1')?sap-client=123"
+					url : "DELETE SalesOrderList('1')?sap-client=123"
 				})
 				.expectRequest({
-					method : "DELETE",
 					headers : {"If-Match" : "*"},
-					url : "SalesOrderList('1')?sap-client=123"
+					url : "DELETE SalesOrderList('1')?sap-client=123"
 				})
 				.expectChange("id", null);
 
@@ -60343,9 +59885,8 @@ sap.ui.define([
 			]);
 		}).then(function () {
 			that.expectRequest({
-					method : "DELETE",
 					headers : {"If-Match" : "*"},
-					url : "SalesOrderList('42')?sap-client=123"
+					url : "DELETE SalesOrderList('42')?sap-client=123"
 				}, createError())
 				.expectMessages([{
 					message : "Communication error: 500 ",
@@ -60479,9 +60020,8 @@ sap.ui.define([
 
 			that.expectChange("soCurrencyCode", ["USD"])
 				.expectRequest({
-					method : "PATCH",
 					headers : {"If-Match" : "ETag"},
-					url : "SalesOrderList('1')",
+					url : "PATCH SalesOrderList('1')",
 					payload : {CurrencyCode : "USD"}
 				}, {
 					CurrencyCode : "USD",
@@ -60808,8 +60348,7 @@ sap.ui.define([
 			var oForm = that.oView.byId("form");
 
 			that.expectRequest({
-					method : "POST",
-					url : "SalesOrderList('1')/SO_2_SOITEM(SalesOrderID='1',ItemPosition='10')"
+					url : "POST SalesOrderList('1')/SO_2_SOITEM(SalesOrderID='1',ItemPosition='10')"
 						+ "/SOITEM_2_SO/" + sAction, // TODO reduce operation path
 					headers : {"If-Match" : "ETag"},
 					payload : {}
@@ -61012,8 +60551,7 @@ sap.ui.define([
 
 			that.expectChange("note", ["New", "Foo", "Bar"])
 				.expectRequest({
-					method : "POST",
-					url : "SalesOrderList('1')/SO_2_SOITEM",
+					url : "POST SalesOrderList('1')/SO_2_SOITEM",
 					payload : {Note : "New"}
 				}, {
 					ItemPosition : "30",
@@ -61151,10 +60689,8 @@ sap.ui.define([
 				that.expectChange("count", bEmpty ? "1" : "4")
 					.expectChange("note", ["First new row"]);
 				that.expectRequest({
-						batchNo : 2,
-						method : "POST",
 						payload : {Note : "First new row"},
-						url : "SalesOrderList('1')/SO_2_SOITEM"
+						url : "#2 POST SalesOrderList('1')/SO_2_SOITEM"
 					}, bSuccess ? {
 						ItemPosition : "0",
 						Note : "First *new* row",
@@ -61338,9 +60874,8 @@ sap.ui.define([
 			that.oLogMock.expects("error")
 				.withArgs("Failed to update path /SalesOrderList('1')/CurrencyCode");
 			that.expectRequest({
-					method : "PATCH",
 					payload : {CurrencyCode : "invalid"},
-					url : "SalesOrderList('1')"
+					url : "PATCH SalesOrderList('1')"
 				}, oError)
 				.expectChange("soCurrencyCode", "invalid")
 				.expectMessages([{
@@ -61490,8 +61025,7 @@ sap.ui.define([
 			]);
 		}).then(function () {
 			that.expectRequest({
-					method : "POST",
-					url : "BusinessPartnerList",
+					url : "POST BusinessPartnerList",
 					payload : {Address : {City : "Heidelberg"}}
 				}, {
 					Address : null,
@@ -61517,19 +61051,15 @@ sap.ui.define([
 	[{
 		expectations : function () {
 			this.expectRequest({
-					batchNo : 3,
-					method : "POST",
 					payload : {Note : "Created"},
-					url : "BusinessPartnerList('4711')/BP_2_SO"
+					url : "#3 POST BusinessPartnerList('4711')/BP_2_SO"
 				}, {
 					Note : "Created",
 					SalesOrderID : "43"
 				})
 				.expectRequest({
-					batchNo : 3,
-					method : "POST",
 					payload : {Note : "Created as well"},
-					url : "BusinessPartnerList('4711')/BP_2_SO"
+					url : "#3 POST BusinessPartnerList('4711')/BP_2_SO"
 				}, {
 					Note : "Created as well",
 					SalesOrderID : "44"
@@ -61570,16 +61100,12 @@ sap.ui.define([
 			this.oLogMock.expects("error").withArgs("Failed to request side effects");
 
 			this.expectRequest({
-					batchNo : 3,
-					method : "POST",
 					payload : {Note : "Created"},
-					url : "BusinessPartnerList('4711')/BP_2_SO"
+					url : "#3 POST BusinessPartnerList('4711')/BP_2_SO"
 				}, oCausingError)
 				.expectRequest({
-					batchNo : 3,
-					method : "POST",
 					payload : {Note : "Created as well"},
-					url : "BusinessPartnerList('4711')/BP_2_SO"
+					url : "#3 POST BusinessPartnerList('4711')/BP_2_SO"
 				}) // no response required
 				.expectRequest("#3 BusinessPartnerList('4711')?$select=BP_2_SO"
 					+ "&$expand=BP_2_SO($select=Note,SalesOrderID)") // no response required
@@ -61628,16 +61154,12 @@ sap.ui.define([
 				that.expectChange("id", ["", "", "0500000001"])
 					.expectChange("note", ["Created as well", "Created", "Test"])
 					.expectRequest({
-						batchNo : 2,
-						method : "POST",
 						payload : {Note : "Created"},
-						url : "BusinessPartnerList('4711')/BP_2_SO"
+						url : "#2 POST BusinessPartnerList('4711')/BP_2_SO"
 					}, createError())
 					.expectRequest({
-						batchNo : 2,
-						method : "POST",
 						payload : {Note : "Created as well"},
-						url : "BusinessPartnerList('4711')/BP_2_SO"
+						url : "#2 POST BusinessPartnerList('4711')/BP_2_SO"
 					}) // no response required
 					.expectMessages([{
 						message : "Communication error: 500 ",
@@ -61730,9 +61252,8 @@ sap.ui.define([
 					sinon.match("Request intentionally failed"), sODLB);
 
 			that.expectRequest({
-					method : "POST",
 					payload : {Note : "Created"},
-					url : "SalesOrderList"
+					url : "POST SalesOrderList"
 				}, createErrorInsideBatch())
 				.expectMessages([{
 					code : "CODE",
@@ -61773,10 +61294,8 @@ sap.ui.define([
 					sODLB);
 
 			that.expectRequest({
-					batchNo : 3,
-					method : "POST",
 					payload : {Note : "Created"},
-					url : "SalesOrderList"
+					url : "#3 POST SalesOrderList"
 				}, oError)
 				.expectRequest("#3 SalesOrderList?$select=Note,SalesOrderID&$skip=1&$top=2")
 					// no response required
@@ -61848,9 +61367,8 @@ sap.ui.define([
 					+ "will be repeated automatically", sinon.match.string, sODLB);
 
 			that.expectRequest({
-					method : "POST",
 					payload : {Note : "Created"},
-					url : "BusinessPartnerList('4711')/BP_2_SO"
+					url : "POST BusinessPartnerList('4711')/BP_2_SO"
 				}, new Promise(function (_resolve, reject) {
 					fnRespond = reject.bind(null, createError()); // take care of timing
 				}))
@@ -61878,10 +61396,8 @@ sap.ui.define([
 					type : "Error"
 				}])
 				.expectRequest({
-					batchNo : 3,
-					method : "POST",
 					payload : {Note : "Created"},
-					url : "BusinessPartnerList('4711')/BP_2_SO"
+					url : "#3 POST BusinessPartnerList('4711')/BP_2_SO"
 				}, {
 					Note : "Created",
 					SalesOrderID : "43"
@@ -61938,9 +61454,8 @@ sap.ui.define([
 			that.oLogMock.expects("error").withArgs("$batch failed");
 
 			that.expectRequest({
-					method : "PATCH",
 					payload : {CompanyName : "SAP SE"},
-					url : "BusinessPartnerList('4711')"
+					url : "PATCH BusinessPartnerList('4711')"
 				}, new Promise(function (_resolve, reject) {
 					fnRespond = reject.bind(null, createError()); // take care of timing
 				}))
@@ -61967,10 +61482,8 @@ sap.ui.define([
 					type : "Error"
 				}])
 				.expectRequest({
-					batchNo : 3,
-					method : "PATCH",
 					payload : {CompanyName : "SAP SE"},
-					url : "BusinessPartnerList('4711')"
+					url : "#3 PATCH BusinessPartnerList('4711')"
 				}, {/* response does not matter here */})
 				.expectRequest("#3 BusinessPartnerList('4711')"
 					+ "?$select=BusinessPartnerID,CompanyName", {
@@ -62482,8 +61995,7 @@ sap.ui.define([
 
 			return this.createView(assert, sView, oModel).then(function () {
 				that.expectRequest({
-						method : "POST",
-						url : "SalesOrderList",
+						url : "POST SalesOrderList",
 						payload : {}
 					}, {
 						Note : "New",
@@ -62678,8 +62190,7 @@ sap.ui.define([
 		return this.createView(assert, sView, oModel).then(function () {
 			that.expectChange("note", "modified")
 				.expectRequest({
-					method : "PATCH",
-					url : "SalesOrderList('4711')",
+					url : "PATCH SalesOrderList('4711')",
 					payload : {Note : "modified"}
 				}, createErrorInsideBatch({target : "Note"}))
 				.expectMessages([{
@@ -62699,8 +62210,7 @@ sap.ui.define([
 			return that.waitForChanges(assert);
 		}).then(function () {
 			that.expectRequest({
-					method : "PATCH",
-					url : "SalesOrderList('4711')",
+					url : "PATCH SalesOrderList('4711')",
 					payload : {Note : "modified"}
 				}, {
 					Note : "modified",
@@ -63444,9 +62954,8 @@ sap.ui.define([
 		}).then(function () {
 			that.expectChange("name", "Palpatine")
 				.expectRequest({
-					method : "PATCH",
 					payload : {Name : "Palpatine"},
-					url : "TEAMS('TEAM_02')"
+					url : "PATCH TEAMS('TEAM_02')"
 				}, {/* response does not matter here */});
 
 			oInput.getBinding("value").setValue("Palpatine");
@@ -63535,9 +63044,8 @@ sap.ui.define([
 
 			that.expectChange("name", ["Palpatine"])
 				.expectRequest({
-					method : "PATCH",
 					payload : {Name : "Palpatine"},
-					url : "EMPLOYEES('2')"
+					url : "PATCH EMPLOYEES('2')"
 				}, {/* response does not matter here */});
 
 			oInput.getBinding("value").setValue("Palpatine");
@@ -63620,8 +63128,7 @@ sap.ui.define([
 			assertIndices(assert, oListBinding.getCurrentContexts(), [-1, 0, 1]);
 
 			that.expectRequest({
-					method : "POST",
-					url : "TEAMS",
+					url : "POST TEAMS",
 					payload : {Name : "Team 00", Team_Id : "Team_00"}
 				}, {Name : "Team 00", Team_Id : "Team_00"});
 
@@ -64103,8 +63610,7 @@ sap.ui.define([
 				.withExactArgs("POST on 'People' failed; will be repeated automatically",
 					sinon.match("Could not load metadata: 500 Internal Server Error"), sODLB);
 			that.expectRequest({
-					method : "POST",
-					url : "People",
+					url : "POST People",
 					payload : {}
 				})
 				.expectMessages([{
@@ -64153,8 +63659,7 @@ sap.ui.define([
 
 		return this.createView(assert, sView, oModel).then(function () {
 			that.expectRequest({
-					method : "POST",
-					url : "SalesOrderList('1')/" + sAction,
+					url : "POST SalesOrderList('1')/" + sAction,
 					payload : {}
 				}, {
 					LifecycleStatus : "N", // Note: wrong response, should be "C"
@@ -64188,6 +63693,7 @@ sap.ui.define([
 	// SNOW: DINC0032238
 	//
 	// ODM#setContinueOnError must not violate constraints w.r.t. change sets (SNOW: DINC0512589)
+	// See that side effects can be properly repeated (SNOW: DINC0614013)
 	[true, false].forEach(function (bConfirm) {
 		[true, false].forEach(function (bDifferentContentIDs) {
 			const sTitle = "CPOUI5ODATAV4-943: handling=strict, confirm=" + bConfirm
@@ -64218,6 +63724,7 @@ sap.ui.define([
 					}]
 				},
 				oError,
+				oListBinding,
 				oModel = this.createSalesOrdersModel({autoExpandSelect : true}),
 				fnResolve0,
 				fnResolve1,
@@ -64305,8 +63812,7 @@ sap.ui.define([
 						headers : {
 							Prefer : "handling=strict"
 						},
-						method : "POST",
-						url : "SalesOrderList('0')/" + sAction,
+						url : "POST SalesOrderList('0')/" + sAction,
 						payload : {}
 					}, oError, {
 						"Preference-Applied" : "handling=strict"
@@ -64317,45 +63823,72 @@ sap.ui.define([
 						headers : {
 							Prefer : "handling=strict"
 						},
-						method : "POST",
-						url : "SalesOrderList('1')/" + sAction,
+						url : "POST SalesOrderList('1')/" + sAction,
 						payload : {}
-					}/*response does not matter*/)
+					}) // no response required
 					.expectRequest({
 						batchNo : 2,
 						changeSetNo : 1,
 						headers : {
 							Prefer : "handling=strict"
 						},
-						method : "POST",
-						url : "SalesOrderList('2')/" + sAction,
+						url : "POST SalesOrderList('2')/" + sAction,
 						payload : {}
-					}/*response does not matter*/);
+					}) // no response required
+					.expectRequest({
+						batchNo : 2,
+						changeSetNo : 2,
+						url : "POST RegenerateEPMData",
+						payload : {}
+					}) // no response required
+					.expectRequest("#2 SalesOrderList?$select=LifecycleStatus,SalesOrderID"
+						+ "&$skip=0&$top=100"); // no response required
+				that.oLogMock.expects("error")
+					.withExactArgs("Failed to invoke /RegenerateEPMData(...)",
+						sinon.match(sPreviousFailed), sODCB);
+				that.oLogMock.expects("error")
+					.withExactArgs("Failed to get contexts for " + sSalesOrderService + "SalesOrderList"
+						+ " with start index 0 and length 100", sinon.match(sPreviousFailed), sODLB);
 
-				const oListBinding = that.oView.byId("table").getBinding("items");
+				oListBinding = that.oView.byId("table").getBinding("items");
 				const aContexts = oListBinding.getCurrentContexts();
 
 				// code under test
-				oAction0Promise = that.oModel.bindContext(sAction + "(...)", aContexts[0])
+				oAction0Promise = oModel.bindContext(sAction + "(...)", aContexts[0])
 					.invoke("$auto", false, onStrictHandlingFailed0);
-				oAction1Promise = that.oModel.bindContext(sAction + "(...)", aContexts[1])
+				oAction1Promise = oModel.bindContext(sAction + "(...)", aContexts[1])
 					.invoke("$auto", false, onStrictHandlingFailed1);
 				assert.throws(function () {
 					// code under test (SNOW: DINC0512589; no effect on 3rd action!)
-					that.oModel.setContinueOnError("$auto");
+					oModel.setContinueOnError("$auto");
 				}, new Error("Each request with strict handling must belong to its own change set due"
 					+ ' to the "odata.continue-on-error" preference'));
-				oAction2Promise = that.oModel.bindContext(sAction + "(...)", aContexts[2])
+				oAction2Promise = oModel.bindContext(sAction + "(...)", aContexts[2])
 					.invoke("$auto", false, onStrictHandlingFailed2);
 
-				return that.waitForChanges(assert);
+				return Promise.all([
+					// code under test (DINC0614013): side effects in separate change set
+					oModel.submitBatch("$auto"),
+					// Note: API call for GET intentionally before POST
+					oListBinding.getHeaderContext().requestSideEffects([""]).then(function () {
+						assert.ok(false);
+					}, function (oError0) {
+						assert.strictEqual(oError0.message, sPreviousFailed);
+					}),
+					oModel.bindContext("/RegenerateEPMData(...)").invoke("$auto").then(function () {
+						assert.ok(false);
+					}, function (oError0) {
+						assert.strictEqual(oError0.message, sPreviousFailed);
+					}),
+					that.waitForChanges(assert)
+				]);
 			}).then(function () {
+				let aPromises = [];
 				if (bConfirm) {
 					that.expectRequest({
 							batchNo : 3,
 							changeSetNo : 1,
-							method : "POST",
-							url : "SalesOrderList('0')/" + sAction,
+							url : "POST SalesOrderList('0')/" + sAction,
 							payload : {}
 						}, {
 							LifecycleStatus : "C0",
@@ -64364,8 +63897,7 @@ sap.ui.define([
 						.expectRequest({
 							batchNo : 3,
 							changeSetNo : 1,
-							method : "POST",
-							url : "SalesOrderList('1')/" + sAction,
+							url : "POST SalesOrderList('1')/" + sAction,
 							payload : {}
 						}, {
 							LifecycleStatus : "C1",
@@ -64374,14 +63906,41 @@ sap.ui.define([
 						.expectRequest({
 							batchNo : 3,
 							changeSetNo : 1,
-							method : "POST",
-							url : "SalesOrderList('2')/" + sAction,
+							url : "POST SalesOrderList('2')/" + sAction,
 							payload : {}
 						}, {
 							LifecycleStatus : "C2",
 							SalesOrderID : "2"
 						})
-						.expectChange("status", ["C0", "C1", "C2"]);
+						.expectRequest({
+							batchNo : 3,
+							changeSetNo : 2,
+							url : "POST RegenerateEPMData",
+							payload : {}
+						}, {/*does not matter*/})
+						.expectRequest("#3 SalesOrderList?$select=LifecycleStatus,SalesOrderID"
+							+ "&$skip=0&$top=100", {
+							// Note: bDifferentContentIDs is misused to show whether side effects win
+							value : [{
+									LifecycleStatus : bDifferentContentIDs ? "N0" : "C0",
+									SalesOrderID : "0"
+								}, {
+									LifecycleStatus : bDifferentContentIDs ? "N1" : "C1",
+									SalesOrderID : "1"
+								}, {
+									LifecycleStatus : bDifferentContentIDs ? "N2" : "C2",
+									SalesOrderID : "2"
+							}]
+						})
+						.expectChange("status",
+							/*TODO bDifferentContentIDs ? ["N0", "N1", "N2"] :*/ ["C0", "C1", "C2"]);
+
+					// code under test (DINC0614013) - repeat side effects in separate change set
+					aPromises = [
+						oModel.submitBatch("$auto"),
+						oListBinding.getHeaderContext().requestSideEffects([""]),
+						oModel.bindContext("/RegenerateEPMData(...)").invoke("$auto")
+					];
 				} else {
 					that.expectCanceledError("Failed to invoke /SalesOrderList('0')/" + sAction
 							+ "(...)", "Action canceled due to strict handling");
@@ -64397,6 +63956,7 @@ sap.ui.define([
 				fnResolve2(bConfirm);
 
 				return Promise.all([
+					...aPromises,
 					oAction0Promise.then(function () {
 						assert.ok(bConfirm);
 					}, function (oError0) {
@@ -64419,7 +63979,7 @@ sap.ui.define([
 						assert.strictEqual(oError0.canceled, true);
 					}),
 					that.waitForChanges(assert)
-				]);
+	]);
 			});
 		});
 		});
@@ -64466,8 +64026,7 @@ sap.ui.define([
 					headers : {
 						Prefer : "handling=strict"
 					},
-					method : "POST",
-					url : "SalesOrderList('0')/" + sAction,
+					url : "POST SalesOrderList('0')/" + sAction,
 					payload : {}
 				}, {
 					LifecycleStatus : "C",
@@ -64477,8 +64036,7 @@ sap.ui.define([
 					headers : {
 						Prefer : "handling=strict"
 					},
-					method : "POST",
-					url : "RegenerateEPMData",
+					url : "POST RegenerateEPMData",
 					payload : {}
 				}, {})
 				.expectRequest("GetProductStock()", {})
@@ -64593,10 +64151,8 @@ sap.ui.define([
 				return Promise.resolve(false);
 			}
 
-			that.expectRequest({
-					method : "POST",
-					headers : {},
-					url : "SalesOrderList('42')/" + sConfirmAction,
+			that.expectRequest({ // No `Prefer : "handling=strict"` header
+					url : "POST SalesOrderList('42')/" + sConfirmAction,
 					payload : {}
 				}, {
 					LifecycleStatus : "C",
@@ -64614,8 +64170,7 @@ sap.ui.define([
 					headers : {
 						Prefer : "handling=strict"
 					},
-					method : "POST",
-					url : "SalesOrderList('42')/" + sGoodsAction,
+					url : "POST SalesOrderList('42')/" + sGoodsAction,
 					payload : {}
 				}, oError, {
 					"Preference-Applied" : "handling=strict"
@@ -64981,9 +64536,8 @@ sap.ui.define([
 				.expectChange("equipmentID", [null, "11"])
 				.expectChange("equipmentName", ["", "F1-11"])
 				.expectRequest({
-					method : "POST",
 					payload : {Category : "F2"},
-					url : "EMPLOYEES('1')/EMPLOYEE_2_EQUIPMENTS"
+					url : "POST EMPLOYEES('1')/EMPLOYEE_2_EQUIPMENTS"
 				}, createErrorInsideBatch({
 					message : "Invalid category",
 					target : "Category",
@@ -65017,9 +64571,8 @@ sap.ui.define([
 				.expectChange("equipmentID", ["33"])
 				.expectChange("equipmentName", ["F3-33"])
 				.expectRequest({
-					method : "POST",
 					payload : {Category : "F3"},
-					url : "EMPLOYEES('1')/EMPLOYEE_2_EQUIPMENTS"
+					url : "POST EMPLOYEES('1')/EMPLOYEE_2_EQUIPMENTS"
 				}, {
 					Category : "F3",
 					ID : 33,
@@ -65649,8 +65202,7 @@ sap.ui.define([
 
 			that.expectChange("name", [, "John Doe"])
 				.expectRequest({
-					method : "POST",
-					url : "EMPLOYEES",
+					url : "POST EMPLOYEES",
 					payload : {Name : "John Doe"}
 				}, {/*response does not matter here*/});
 
@@ -65679,26 +65231,24 @@ sap.ui.define([
 		this.expectChange("name", []);
 
 		return this.createView(assert, sView, oModel).then(function () {
-			// Note: GET invoked by 1st #create - one transient taken into account for prefetch
-			that.expectRequest("EMPLOYEES?$count=true&$select=ID,Name&$skip=0&$top=3", {
-					"@odata.count" : "1",
-					value : [{ID : "1", Name : "Frederic Fall"}]
-				})
-				.expectRequest({
-					method : "POST",
-					url : "EMPLOYEES",
+			that.expectRequest({
+					url : "POST EMPLOYEES",
 					payload : {Name : "John Doe"}
 				}, {
 					ID : "new1",
 					Name : "John Doe"
 				})
 				.expectRequest({
-					method : "POST",
-					url : "EMPLOYEES",
+					url : "POST EMPLOYEES",
 					payload : {Name : "Jane Doe"}
 				}, {
 					ID : "new2",
 					Name : "Jane Doe"
+				})
+				// Note: GET invoked by 1st #create - one transient taken into account for prefetch
+				.expectRequest("EMPLOYEES?$count=true&$select=ID,Name&$skip=0&$top=3", {
+					"@odata.count" : "1",
+					value : [{ID : "1", Name : "Frederic Fall"}]
 				})
 				.expectChange("name", ["Frederic Fall", "John Doe"]);
 
@@ -65746,9 +65296,9 @@ sap.ui.define([
 		await this.createView(assert, sView, oModel);
 
 		this.expectChange("managerId", ["", "", ""])
-			.expectRequest({method : "POST", url : "EMPLOYEES", payload : {}}, {ID : "0"})
-			.expectRequest({method : "POST", url : "EMPLOYEES", payload : {}}, {ID : "1"})
-			.expectRequest({method : "POST", url : "EMPLOYEES", payload : {}}, {ID : "2"})
+			.expectRequest({url : "POST EMPLOYEES", payload : {}}, {ID : "0"})
+			.expectRequest({url : "POST EMPLOYEES", payload : {}}, {ID : "1"})
+			.expectRequest({url : "POST EMPLOYEES", payload : {}}, {ID : "2"})
 			.expectRequest("EMPLOYEES('0')?$select=ID&$expand=EMPLOYEE_2_MANAGER($select=ID)",
 				{ID : "0", EMPLOYEE_2_MANAGER : {ID : "10"}})
 			.expectRequest("EMPLOYEES('1')?$select=ID&$expand=EMPLOYEE_2_MANAGER($select=ID)",
@@ -65877,8 +65427,7 @@ sap.ui.define([
 					.expectChange("note", [, "Note 1"])
 					.expectChange("inactive", [, false])
 					.expectRequest({
-						method : "POST",
-						url : "SalesOrderList('42')/SO_2_SOITEM",
+						url : "POST SalesOrderList('42')/SO_2_SOITEM",
 						payload : {Note : "Note 1"}
 					}, createErrorInsideBatch())
 					.expectMessages([{
@@ -65919,9 +65468,8 @@ sap.ui.define([
 						batchNo : 3,
 						changeSetNo : 1,
 						groupId : sGroupId,
-						method : "POST",
 						payload : {Note : "Note 1"},
-						url : "SalesOrderList('42')/SO_2_SOITEM"
+						url : "POST SalesOrderList('42')/SO_2_SOITEM"
 					}, {
 						SalesOrderID : "42",
 						ItemPosition : "0020",
@@ -65932,9 +65480,8 @@ sap.ui.define([
 						batchNo : 3,
 						changeSetNo : 2, // new changeset via submitBatch("$auto")
 						groupId : sGroupId,
-						method : "POST",
 						payload : {},
-						url : "RegenerateEPMData"
+						url : "POST RegenerateEPMData"
 					}, {/* don't care */})
 					.expectChange("position", [, "0020"]);
 
@@ -65993,8 +65540,7 @@ sap.ui.define([
 					.expectChange("note", [,, "Note 3"])
 					.expectChange("inactive", [,, false])
 					.expectRequest({
-						method : "POST",
-						url : "SalesOrderList('42')/SO_2_SOITEM",
+						url : "POST SalesOrderList('42')/SO_2_SOITEM",
 						payload : {Note : "Note 3"}
 					}, {
 						SalesOrderID : "42",
@@ -66520,8 +66066,7 @@ sap.ui.define([
 			assert.strictEqual(oKeptAliveContext1.getIndex(), undefined);
 
 			this.expectRequest({
-					method : "POST",
-					url : "SalesOrderList",
+					url : "POST SalesOrderList",
 					payload : {Note : "foobar"}
 				}, {
 					Note : "foobar*",
@@ -66797,9 +66342,8 @@ sap.ui.define([
 			that.expectChange("count", "4")
 				.expectChange("id", ["", ""])
 				.expectRequest({
-					method : "POST",
 					payload : {},
-					url : "BusinessPartnerList"
+					url : "POST BusinessPartnerList"
 				}, {BusinessPartnerID : "new1"})
 				.expectChange("id", [, "new1"]);
 
@@ -66986,8 +66530,7 @@ sap.ui.define([
 			that.expectChange("buyerId", "42b")
 				.expectRequest({
 					headers : {"If-Match" : "etag1"},
-					method : "PATCH",
-					url : "SalesOrderList('1')",
+					url : "PATCH SalesOrderList('1')",
 					payload : {BuyerID : "42b"}
 				}, {"@odata.etag" : "etag2", BuyerID : "42c", SalesOrderID : "1"})
 				.expectChange("buyerId", "42c");
@@ -67301,8 +66844,7 @@ sap.ui.define([
 
 				that.expectChange("id", ["", ""])
 					.expectRequest({
-						method : "POST",
-						url : "SalesOrderList",
+						url : "POST SalesOrderList",
 						payload : {}
 					}, {SalesOrderID : "new"})
 					.expectChange("count", oFixture.bFilter ? "43" : "103")
@@ -67323,17 +66865,14 @@ sap.ui.define([
 				if (!oFixture.bDeferred) {
 					that.expectRequest({
 							groupId : "$auto.foo",
-							batchNo : iBatch,
-							method : "DELETE",
-							url : "SalesOrderList('1')"
+							url : "#" + iBatch + " DELETE SalesOrderList('1')"
 						});
 				}
 
 				if (oFixture.bFilter) {
 					that.expectRequest({
 							groupId : oFixture.bDeferred ? "$auto" : "$auto.foo",
-							batchNo : iBatch,
-							url : "SalesOrderList?$count=true"
+							url : "#" + iBatch + " SalesOrderList?$count=true"
 								+ "&$filter=(GrossAmount gt 1000) and not (SalesOrderID eq '1'"
 									+ " or SalesOrderID eq 'new')"
 								+ "&$top=0"
@@ -67396,12 +66935,10 @@ sap.ui.define([
 			that.checkMoreButton(assert, "[2/27]");
 
 			that.expectRequest({
-					batchNo : 4,
 					headers : {
 						"If-Match" : "etag1"
 					},
-					method : "DELETE",
-					url : "SalesOrderList('1')"
+					url : "#4 DELETE SalesOrderList('1')"
 				}, createErrorInsideBatch(null, 404))
 				.expectRequest("#4 SalesOrderList?$count=true"
 					+ "&$filter=(GrossAmount gt 123) and not (SalesOrderID eq '1')&$top=0"
@@ -68236,8 +67773,7 @@ sap.ui.define([
 				return that.waitForChanges(assert);
 			}).then(function () {
 				that.expectRequest({
-						method : "POST",
-						url : "TEAMS('1')/TEAM_2_EMPLOYEES",
+						url : "POST TEAMS('1')/TEAM_2_EMPLOYEES",
 						payload : {Name : "John Doe"}
 					}, {ID : "2", Name : "John Doe"})
 					.expectRequest("TEAMS('1')/TEAM_2_EMPLOYEES('2')/EMPLOYEE_2_EQUIPMENTS?"
@@ -68293,8 +67829,7 @@ sap.ui.define([
 			return that.waitForChanges(assert);
 		}).then(function () {
 			that.expectRequest({
-					method : "POST",
-					url : "TEAMS('1')/TEAM_2_EMPLOYEES",
+					url : "POST TEAMS('1')/TEAM_2_EMPLOYEES",
 					payload : {Name : "John Doe"}
 				}, {ID : "2", Name : "John Doe"})
 				.expectRequest("TEAMS('1')/TEAM_2_EMPLOYEES('2')/EMPLOYEE_2_MANAGER"
@@ -68971,6 +68506,7 @@ sap.ui.define([
 	// patchNo: the batchNo of the $batch with the PATCH and the side effect request
 	[
 		{list : 1, page : 2, patchNo : 5, title : "(1) first list, then object page"},
+		// Note: #expectRequest out-of-order here!
 		{list : 1, page : 1, patchNo : 4, title : "(2) list and object page in the same batch"},
 		{list : 2, page : 1, patchNo : 5, title : "(3) first object page, then list, then tests"},
 		{list : 7, page : 1, patchNo : 4, title : "(4) first object page, then tests, then list"}
@@ -69017,12 +68553,9 @@ sap.ui.define([
 			 * @param {number} iBatchNo - The number of the $batch for the request
 			 */
 			function initializeList(iBatchNo) {
-				that.expectRequest({
-						batchNo : iBatchNo,
-						url : "Artists"
-							+ "?$select=ArtistID,IsActiveEntity,Name,defaultChannel,sendsAutographs"
-							+ "&$skip=0&$top=100"
-					}, {
+				that.expectRequest("#" + iBatchNo + " Artists"
+						+ "?$select=ArtistID,IsActiveEntity,Name,defaultChannel,sendsAutographs"
+						+ "&$skip=0&$top=100", {
 						value : [{
 							"@odata.etag" : "etag.active1",
 							ArtistID : "A1",
@@ -69065,12 +68598,10 @@ sap.ui.define([
 							+ "?$select=HasDraftEntity,Messages,lastUsedChannel",
 							oResponse);
 				} else { // if not late, the list's properties are also part of the request
-					that.expectRequest({
-							batchNo : iBatchNo,
-							url : "Artists(ArtistID='A1',IsActiveEntity=true)"
-								+ "?$select=ArtistID,HasDraftEntity,IsActiveEntity,Messages,Name,"
-								+ "defaultChannel,lastUsedChannel"
-						}, Object.assign(oResponse, {
+					that.expectRequest("#" + iBatchNo + " Artists(ArtistID='A1',IsActiveEntity=true)"
+							+ "?$select=ArtistID,HasDraftEntity,IsActiveEntity,Messages,Name"
+							+ ",defaultChannel,lastUsedChannel",
+						Object.assign(oResponse, {
 							ArtistID : "A1",
 							IsActiveEntity : true,
 							Name : "Artist 1",
@@ -69161,8 +68692,7 @@ sap.ui.define([
 					oResponse.sendsAutographs = true;
 				}
 				that.expectRequest({
-						method : "POST",
-						url : sUrl,
+						url : "POST " + sUrl,
 						headers : {"If-Match" : "etag.active1"},
 						payload : {}
 					}, oResponse)
@@ -69203,11 +68733,10 @@ sap.ui.define([
 							"If-Match" : "etag.draft1",
 							Prefer : "return=minimal"
 						},
-						method : "PATCH",
 						payload : {
 							defaultChannel : "Channel 3"
 						},
-						url : "Artists(ArtistID='A1',IsActiveEntity=false)"
+						url : "PATCH Artists(ArtistID='A1',IsActiveEntity=false)"
 					}) // 204 No Content - no need to update the ETag when requesting side effects
 					.expectRequest({
 						batchNo : oFixture.patchNo,
@@ -69454,9 +68983,8 @@ sap.ui.define([
 			that.expectChange("name", "The Beatles (changed)")
 				.expectChange("listName", [,, "The Beatles (changed)"])
 				.expectRequest({
-					method : "PATCH",
 					headers : {"If-Match" : "etag3"},
-					url : "Artists(ArtistID='3',IsActiveEntity=false)",
+					url : "PATCH Artists(ArtistID='3',IsActiveEntity=false)",
 					payload : {Name : "The Beatles (changed)"}
 				}, {
 					"@odata.etag" : "etag3.1",
@@ -69560,8 +69088,7 @@ sap.ui.define([
 			that.expectChange("name", "The Beatles (changed)")
 				.expectChange("listName", ["The Beatles (changed)"])
 				.expectRequest({
-					method : "PATCH",
-					url : "Artists(ArtistID='1',IsActiveEntity=false)?foo=bar",
+					url : "PATCH Artists(ArtistID='1',IsActiveEntity=false)?foo=bar",
 					payload : {Name : "The Beatles (changed)"}
 				}, {
 					ArtistID : "1",
@@ -69634,8 +69161,7 @@ sap.ui.define([
 		}).then(function () {
 			that.expectChange("name", "The Beatles (changed)")
 				.expectRequest({
-					method : "PATCH",
-					url : "Artists(ArtistID='1',IsActiveEntity=false)",
+					url : "PATCH Artists(ArtistID='1',IsActiveEntity=false)",
 					payload : {Name : "The Beatles (changed)"}
 				}); // no response required
 
@@ -70213,8 +69739,7 @@ sap.ui.define([
 
 					sNewNote = "from server";
 					that.expectRequest({
-							method : "PATCH",
-							url : "SalesOrderList('2')",
+							url : "PATCH SalesOrderList('2')",
 							payload : {Note : "updated"}
 						}, {ID : "2", Note : sNewNote})
 						.expectChange("listNote", [, sNewNote]);
@@ -70432,11 +69957,10 @@ sap.ui.define([
 
 			that.expectChange("itemPosition", ["0111"])
 				.expectRequest({
-					method : "POST",
 					payload : {
 						ItemPosition : "0111"
 					},
-					url : "SalesOrderList('42')/SO_2_SOITEM"
+					url : "POST SalesOrderList('42')/SO_2_SOITEM"
 				}); // response does not matter here
 
 			// code under test
@@ -70515,11 +70039,10 @@ sap.ui.define([
 			assert.strictEqual(oKeptAliveItem.getProperty("Note"), "First SalesOrder###");
 
 			that.expectRequest({
-					method : "PATCH",
 					payload : {
 						Note : "update"
 					},
-					url : "SalesOrderList('42')"
+					url : "PATCH SalesOrderList('42')"
 				}); // no response required
 
 			return Promise.all([
@@ -70665,9 +70188,8 @@ sap.ui.define([
 			oListBinding = that.oModel.bindList("/TEAMS");
 
 			that.expectRequest({
-					method : "POST",
 					payload : {},
-					url : "TEAMS"
+					url : "POST TEAMS"
 				}, new Promise(function (resolve) {
 					fnResolveCreate0 = resolve.bind(null, {/* response does not matter here */});
 				}));
@@ -70678,9 +70200,8 @@ sap.ui.define([
 			return that.waitForChanges(assert);
 		}).then(function () {
 			that.expectRequest({
-					method : "POST",
 					payload : {},
-					url : "TEAMS"
+					url : "POST TEAMS"
 				}, new Promise(function (resolve) {
 					fnResolveCreate1 = resolve.bind(null, {/* response does not matter here */});
 				}));
@@ -70742,9 +70263,8 @@ sap.ui.define([
 			var oBinding = that.oModel.bindList("/EMPLOYEES");
 
 			that.expectRequest({
-					method : "POST",
 					payload : {AGE : 42},
-					url : "EMPLOYEES"
+					url : "POST EMPLOYEES"
 				}, {
 					AGE : 42,
 					// intentionally no ID!
@@ -70824,9 +70344,8 @@ sap.ui.define([
 			oOperationBinding.setParameter("EmployeeID", "1");
 
 			that.expectRequest({
-					method : "POST",
 					payload : {EmployeeID : "1"},
-					url : "FireEmployee"
+					url : "POST FireEmployee"
 				}, new Promise(function (resolve) {
 					fnResolveOperation0 = resolve; // 204 No Content
 				}));
@@ -70841,9 +70360,8 @@ sap.ui.define([
 			oOperationBinding.setParameter("EmployeeID", "2");
 
 			that.expectRequest({
-					method : "POST",
 					payload : {EmployeeID : "2"},
-					url : "FireEmployee"
+					url : "POST FireEmployee"
 				}, new Promise(function (resolve) {
 					fnResolveOperation1 = resolve; // 204 No Content
 				}));
@@ -71645,9 +71163,8 @@ sap.ui.define([
 					{$$inheritExpandSelect : true, $select : "Note,Messages,LifecycleStatus"});
 
 			that.expectRequest({
-					method : "POST",
-					url : "SalesOrderList('42')/" + sAction + "?$select=LifecycleStatus,Messages,"
-						+ "Note,SalesOrderID",
+					url : "POST SalesOrderList('42')/" + sAction
+						+ "?$select=LifecycleStatus,Messages,Note,SalesOrderID",
 					payload : {}
 				}, {SalesOrderID : "42", LifecycleStatus : "B", Messages : [], Note : "some note"})
 				.expectChange("lifecycleStatus", ["B"]);
@@ -71726,8 +71243,7 @@ sap.ui.define([
 		return this.createView(assert, sView, oModel).then(function () {
 			that.expectChange("note", [""])
 				.expectRequest({
-					method : "POST",
-					url : "SalesOrderList('1')/SO_2_SOITEM",
+					url : "POST SalesOrderList('1')/SO_2_SOITEM",
 					payload : {}
 				}, {
 					ItemPosition : "10",
@@ -71753,8 +71269,8 @@ sap.ui.define([
 			return that.waitForChanges(assert, "patch");
 		}).then(function () {
 			that.expectRequest({
-					method : "PATCH",
-					url : "SalesOrderList('1')/SO_2_SOITEM(SalesOrderID='1',ItemPosition='10')",
+					url : "PATCH SalesOrderList('1')"
+						+ "/SO_2_SOITEM(SalesOrderID='1',ItemPosition='10')",
 					payload : {Note : "modified"}
 				}, new Promise(function (_resolve, reject) { fnReject = reject; }))
 				.expectRequest("SalesOrderList('1')?$select=SO_2_SOITEM"
@@ -71816,8 +71332,7 @@ sap.ui.define([
 			that.oLogMock.expects("error").twice().withArgs(sinon.match("Failed to update path"));
 			that.expectChange("note", "Note 1 (changed)")
 				.expectRequest({
-					method : "PATCH",
-					url : "SalesOrderList('1')",
+					url : "PATCH SalesOrderList('1')",
 					payload : {Note : "Note 1 (changed)"}
 				}, new Promise(function (_resolve, reject) { fnReject = reject; }));
 
@@ -72037,13 +71552,11 @@ sap.ui.define([
 			oContextC.setProperty("Name", "New C Team");
 
 			that.expectRequest({
-					method : "POST",
-					url : "TEAMS",
+					url : "POST TEAMS",
 					payload : {Name : "New A Team", Team_Id : "TEAM_A"}
 				}, {Name : "New 'A' Team", Team_Id : "TEAM_A"})
 				.expectRequest({
-					method : "POST",
-					url : "TEAMS",
+					url : "POST TEAMS",
 					payload : {Name : "New C Team", Team_Id : "TEAM_C"}
 				}, {Name : "New 'C' Team", Team_Id : "TEAM_C"})
 				.expectChange("name", [,, "New 'A' Team"]);
@@ -72142,13 +71655,11 @@ sap.ui.define([
 				oContextB = oBinding.create({Name : "New Team B", Team_Id : "TEAM_B"}, true);
 
 				that.expectRequest({
-						method : "POST",
-						url : sTeams,
+						url : "POST " + sTeams,
 						payload : {Name : "New Team A", Team_Id : "TEAM_A"}
 					}, {Name : "New 'A' Team", Team_Id : "TEAM_A"})
 					.expectRequest({
-						method : "POST",
-						url : sTeams,
+						url : "POST " + sTeams,
 						payload : {Name : "New Team B", Team_Id : "TEAM_B"}
 					}, {Name : "New 'B' Team", Team_Id : "TEAM_B"})
 					.expectChange("name", ["New 'B' Team", "New 'A' Team"]);
@@ -72281,13 +71792,11 @@ sap.ui.define([
 				oContextD.setProperty("Name", "New D Team");
 
 				that.expectRequest({
-						method : "POST",
-						url : sTeams,
+						url : "POST " + sTeams,
 						payload : {Name : "New C Team", Team_Id : "TEAM_C"}
 					}, {Name : "New 'C' Team", Team_Id : "TEAM_C"})
 					.expectRequest({
-						method : "POST",
-						url : sTeams,
+						url : "POST " + sTeams,
 						payload : {Name : "New D Team", Team_Id : "TEAM_D"}
 					}, {Name : "New 'D' Team", Team_Id : "TEAM_D"})
 					.expectChange("name", ["New 'D' Team", "New 'C' Team"]);
@@ -72417,8 +71926,7 @@ sap.ui.define([
 					.expectChange("id", ["NEW", "TEAM_01", "TEAM_02", "TEAM_03"])
 					.expectChange("memberCount", ["0", "9", "10", "11"])
 					.expectRequest({
-						method : "POST",
-						url : "TEAMS",
+						url : "POST TEAMS",
 						payload : {
 							MEMBER_COUNT : 0,
 							Team_Id : "NEW"
@@ -72648,8 +72156,7 @@ sap.ui.define([
 						headers : {
 							"If-Match" : "*"
 						},
-						method : "DELETE",
-						url : "TEAMS('TEAM_03')"
+						url : "DELETE TEAMS('TEAM_03')"
 					})
 					.expectChange("selectionCount", "2");
 
@@ -72759,8 +72266,7 @@ sap.ui.define([
 					assert.strictEqual(oBinding.getSelectionCount(), 0);
 				} else {
 					that.expectRequest({
-							method : "POST",
-							url : "TEAMS",
+							url : "POST TEAMS",
 							payload : {
 								MEMBER_COUNT : 0,
 								Team_Id : "NEW"
@@ -72866,8 +72372,7 @@ sap.ui.define([
 					[new Filter("MEMBER_COUNT", FilterOperator.GT, 10)]);
 
 				that.expectRequest({
-						method : "POST",
-						url : "TEAMS",
+						url : "POST TEAMS",
 						payload : {
 							MEMBER_COUNT : 0,
 							Team_Id : "NEW"
@@ -73013,23 +72518,17 @@ sap.ui.define([
 			]);
 
 			that.expectRequest({
-					batchNo : 2,
-					method : "POST",
-					url : "TEAMS",
+					url : "#2 POST TEAMS",
 					payload : {Name : "New Team A", Team_Id : "TEAM_A"}
 				}, {Name : "New 'A' Team", Team_Id : "TEAM_A"})
 				.expectChange("name", [, "New 'A' Team"])
 				.expectRequest({
-					batchNo : 2,
-					method : "POST",
-					url : "TEAMS",
+					url : "#2 POST TEAMS",
 					payload : {Name : "New Team B", Team_Id : "TEAM_B"}
 				}, {"@odata.etag" : "b", Name : "New 'B' Team", Team_Id : "TEAM_B"})
 				.expectChange("name", ["New 'B' Team"])
 				.expectRequest({
-					batchNo : 2,
-					method : "POST",
-					url : "TEAMS",
+					url : "#2 POST TEAMS",
 					payload : {Name : "New Team C", Team_Id : "TEAM_C"}
 				}, {Name : "n/c", Team_Id : "TEAM_C"})
 				// .expectChange("name", "New 'C' Team", -1) // would happen w/ bSkipRefresh
@@ -73231,8 +72730,7 @@ sap.ui.define([
 					batchNo : 3,
 					changeSetNo : 1,
 					groupId : "update",
-					method : "POST",
-					url : "TEAMS",
+					url : "POST TEAMS",
 					payload : {Name : "New A", Team_Id : "TEAM_A"}
 				}, {Name : "'A' Team", Team_Id : "TEAM_A"})
 				// Note: GET not yet processed, binding still "empty"
@@ -73241,8 +72739,7 @@ sap.ui.define([
 					batchNo : 3,
 					changeSetNo : 1,
 					groupId : "update",
-					method : "POST",
-					url : "TEAMS",
+					url : "POST TEAMS",
 					payload : {Name : "New B", Team_Id : "TEAM_B"}
 				}, {"@odata.etag" : "b", Name : "'B' Team", Team_Id : "TEAM_B"})
 				.expectChange("name", [, "'B' Team"])
@@ -73250,17 +72747,15 @@ sap.ui.define([
 					batchNo : 3,
 					changeSetNo : 1,
 					groupId : "update",
-					method : "POST",
-					url : "TEAMS",
+					url : "POST TEAMS",
 					payload : {Name : "New C", Team_Id : "TEAM_C"}
 				}, {Name : "n/c", Team_Id : "TEAM_C"})
 				.expectChange("name", [,, "'C' Team"])
 				.expectRequest({
-					batchNo : 4,
 					groupId : "$auto",
 					// Note: expect no separate refresh immediately after creation
 					// Note: TEAM_C is not an inline creation row!
-					url : "TEAMS?$count=true&$select=Name,Team_Id"
+					url : "#4 TEAMS?$count=true&$select=Name,Team_Id"
 						+ "&$filter=not (Team_Id eq 'TEAM_A' or Team_Id eq 'TEAM_B')&$skip=5&$top=9"
 				}, {
 					"@odata.count" : "10",
@@ -73310,9 +72805,8 @@ sap.ui.define([
 			]);
 
 			that.expectRequest({
-					batchNo : 5,
 					groupId : "$auto",
-					url : "TEAMS?$select=Name,Team_Id"
+					url : "#5 TEAMS?$select=Name,Team_Id"
 					+ "&$filter=Team_Id eq 'TEAM_A' or Team_Id eq 'TEAM_B'&$top=2"
 				}, {
 					value : [
@@ -73322,9 +72816,8 @@ sap.ui.define([
 				})
 				// prefetch compensates for exclusive filter (JIRA: CPOUI5ODATAV4-1521)
 				.expectRequest({
-					batchNo : 5,
 					groupId : "$auto",
-					url : "TEAMS?$count=true&$select=Name,Team_Id"
+					url : "#5 TEAMS?$count=true&$select=Name,Team_Id"
 					+ "&$filter=not (Team_Id eq 'TEAM_A' or Team_Id eq 'TEAM_B')&$skip=5&$top=9"
 				}, {
 					"@odata.count" : "10",
@@ -73830,9 +73323,8 @@ sap.ui.define([
 					.expectChange("salary", [null])
 					.expectChange("salaryCurrency", [""])
 					.expectRequest({
-						method : "POST",
 						payload : {Name : "New A"},
-						url : "EMPLOYEES"
+						url : "POST EMPLOYEES"
 					}, new Promise(function (_resolve, reject) {
 						fnRespond0 = reject.bind(null, createError()); // take care of timing
 					}));
@@ -73858,7 +73350,6 @@ sap.ui.define([
 						type : "Error"
 					}])
 					.expectRequest({
-						method : "POST",
 						// Note: PATCH is merged into POST
 						payload : {
 							SALARY : {
@@ -73866,7 +73357,7 @@ sap.ui.define([
 							},
 							Name : "New A"
 						},
-						url : "EMPLOYEES"
+						url : "POST EMPLOYEES"
 					}, new Promise(function (resolve) {
 						fnRespond1 = resolve.bind(null, {
 							"@odata.etag" : "etag0",
@@ -73909,7 +73400,6 @@ sap.ui.define([
 				}
 				that.expectRequest({
 						headers : {"If-Match" : bSkipRefresh ? "etag0" : "etag1"},
-						method : "PATCH",
 						// Note: up-to-date currency value is used!
 						payload : {
 							SALARY : {
@@ -73917,7 +73407,7 @@ sap.ui.define([
 								BASIC_SALARY_CURR : bSkipRefresh ? "EUR" : "DEM"
 							}
 						},
-						url : "EMPLOYEES('A')"
+						url : "PATCH EMPLOYEES('A')"
 					}, {
 						"@odata.etag" : "etag2",
 						SALARY : {
@@ -74094,8 +73584,7 @@ sap.ui.define([
 			}).then(function () {
 				if (sCase === "context") {
 					that.expectRequest({
-							method : "POST",
-							url : "TEAMS",
+							url : "POST TEAMS",
 							payload : {
 								BudgetCurrency : "EUR",
 								Name : "Team #1 edited",
@@ -74147,8 +73636,7 @@ sap.ui.define([
 				]);
 			}).then(function () {
 				that.expectRequest({
-					method : "POST",
-					url : "TEAMS",
+					url : "POST TEAMS",
 					payload : {
 						BudgetCurrency : "EUR",
 						Name : "Team #2 inactive",
@@ -74599,13 +74087,11 @@ sap.ui.define([
 			this.oLogMock.expects("error")
 				.withArgs("Failed to update path " + sPublicationPath + "/Price");
 			this.expectRequest({
-					batchNo : 2,
-					method : "PATCH",
 					headers : {
 						"If-None-Match" : "*",
 						Prefer : "return=minimal"
 					},
-					url : sPublicationPath.slice(1),
+					url : "#2 PATCH " + sPublicationPath.slice(1),
 					payload : {
 						CurrencyCode : "$MD", // default value from $metadata
 						Price : "12",
@@ -74708,13 +74194,11 @@ sap.ui.define([
 				}
 			} else {
 				this.expectRequest({
-						batchNo : 3,
-						method : "PATCH",
 						headers : {
 							"If-None-Match" : "*",
 							Prefer : "return=minimal"
 						},
-						url : sPublicationPath.slice(1),
+						url : "#3 PATCH " + sPublicationPath.slice(1),
 						payload : {
 							CurrencyCode : "$MD", // default value from $metadata
 							Price : bMerge ? "11" : "12",
@@ -74849,13 +74333,11 @@ sap.ui.define([
 			assert.strictEqual(oOrderContext.isTransient(), undefined, "JIRA: CPOUI5ODATAV4-2856");
 
 			this.expectRequest({
-					batchNo : 2,
-					method : "PATCH",
 					headers : {
 						"If-None-Match" : "*",
 						Prefer : "return=minimal"
 					},
-					url : "SalesOrderList('1')/SO_2_BP",
+					url : "#2 PATCH SalesOrderList('1')/SO_2_BP",
 					payload : {Address : {City : "Heidelberg"}}
 				}, null, {ETag : "etag2"}); // 204 No Content
 			const oSalesOrder = {
@@ -74928,12 +74410,11 @@ sap.ui.define([
 				this.expectChange("city", ["Walldorf"]);
 			}
 			this.expectRequest({
-					method : "PATCH",
 					headers : {
 						"If-Match" : "etag2",
 						Prefer : "return=minimal"
 					},
-					url : "BusinessPartnerList('2')",
+					url : "PATCH BusinessPartnerList('2')",
 					payload : {Address : {City : "Walldorf"}}
 				}, null, {ETag : "etag3"}); // 204 No Content
 
@@ -75083,8 +74564,7 @@ sap.ui.define([
 				);
 			}).then(function () {
 				that.expectRequest({
-						method : "POST",
-						url : "SalesOrderList",
+						url : "POST SalesOrderList",
 						payload : {
 							SO_2_SOITEM : [
 								{Note : "AA", SOITEM_2_PRODUCT : {Name : "PA"}},
@@ -75192,9 +74672,8 @@ sap.ui.define([
 
 				that.expectChange("note", ["AAAA"])
 					.expectRequest({
-						method : "PATCH",
 						headers : {"If-Match" : "etag10"},
-						url : "SalesOrderList('new')"
+						url : "PATCH SalesOrderList('new')"
 							+ "/SO_2_SOITEM(SalesOrderID='new',ItemPosition='0010')",
 						payload : {Note : "AAAA"}
 					});
@@ -75334,8 +74813,7 @@ sap.ui.define([
 				that.oLogMock.expects("error")
 					.withArgs("POST on 'SalesOrderList' failed; will be repeated automatically");
 				that.expectRequest({
-						method : "POST",
-						url : "SalesOrderList",
+						url : "POST SalesOrderList",
 						payload : {
 							SO_2_SOITEM : [
 								{Note : "AA"},
@@ -75357,8 +74835,7 @@ sap.ui.define([
 				]);
 			}).then(function () {
 				that.expectRequest({
-						method : "POST",
-						url : "SalesOrderList",
+						url : "POST SalesOrderList",
 						payload : {
 							SO_2_SOITEM : [
 								{Note : "AA"},
@@ -75547,9 +75024,8 @@ sap.ui.define([
 
 				that.expectChange("note", [, "BBBB"])
 					.expectRequest({
-						method : "PATCH",
 						headers : {"If-Match" : "etag20"},
-						url : "SalesOrderList('new')"
+						url : "PATCH SalesOrderList('new')"
 							+ "/SO_2_SOITEM(SalesOrderID='new',ItemPosition='0020')",
 						payload : {Note : "BBBB"}
 					});
@@ -75692,8 +75168,7 @@ sap.ui.define([
 			return that.waitForChanges(assert, "create order");
 		}).then(function () {
 			that.expectRequest({
-					method : "POST",
-					url : "SalesOrderList",
+					url : "POST SalesOrderList",
 					payload : {SO_2_SOITEM : []}
 				}, {
 					SalesOrderID : "new1",
@@ -75866,8 +75341,7 @@ sap.ui.define([
 					aEquipmentsContexts1 = aEquipmentsBindings[1].getCurrentContexts();
 
 				that.expectRequest({
-						method : "POST",
-						url : "TEAMS",
+						url : "POST TEAMS",
 						payload : {
 							TEAM_2_EMPLOYEES : [{
 								Name : "Peter Burke",
@@ -76032,8 +75506,7 @@ sap.ui.define([
 			return that.waitForChanges(assert, "patch transient");
 		}).then(function () {
 			that.expectRequest({
-					method : "POST",
-					url : "EMPLOYEES",
+					url : "POST EMPLOYEES",
 					payload : {
 						EMPLOYEE_2_TEAM : {
 							Name : "Team 2",
@@ -76131,8 +75604,7 @@ sap.ui.define([
 				}, new Error("Unexpected ODataContextBinding in deep create"));
 
 				that.expectRequest({
-						method : "POST",
-						url : "SalesOrderList",
+						url : "POST SalesOrderList",
 						payload : {Note : "Note"}
 					}, {
 						Note : "Note*",
@@ -76191,8 +75663,7 @@ sap.ui.define([
 
 		this.expectChange("teamId", ["new"])
 			.expectRequest({
-				method : "POST",
-				url : "TEAMS",
+				url : "POST TEAMS",
 				payload : {Team_Id : "new", TEAM_2_EMPLOYEES : []}
 			}, {Team_Id : "new", TEAM_2_EMPLOYEES : []});
 
@@ -76206,8 +75677,7 @@ sap.ui.define([
 
 		this.expectChange("employeeId", ["E1"])
 			.expectRequest({
-				method : "POST",
-				url : "TEAMS('new')/TEAM_2_EMPLOYEES",
+				url : "POST TEAMS('new')/TEAM_2_EMPLOYEES",
 				payload : {ID : "E1"}
 			}, {ID : "E1", Team_Id : "new"})
 			// the binding does not get the data from the deep create using another binding
@@ -76789,7 +76259,7 @@ sap.ui.define([
 			oDummyContext = oModel.bindContext("/Artists(ArtistID='41',IsActiveEntity=true)")
 				.getBoundContext();
 
-			that.expectRequest("Artists(ArtistID='41',IsActiveEntity=true)", {/*doesn't matter*/});
+			that.expectRequest("Artists(ArtistID='41',IsActiveEntity=true)", {/*does not matter*/});
 
 			return Promise.all([
 				oDummyContext.requestObject(""),
@@ -76930,16 +76400,14 @@ sap.ui.define([
 				.withArgs("Failed to update path /SalesOrderList('1')/SO_2_BP/Address/PostalCode");
 
 			that.expectRequest({
-					method : "PATCH",
-					url : "SalesOrderList('1')",
+					url : "PATCH SalesOrderList('1')",
 					payload : {
 						GrossAmount : "400",
 						Note : "RAISE_ERROR"
 					}
 				}, createErrorInsideBatch())
 				.expectRequest({
-					method : "PATCH",
-					url : "BusinessPartnerList('23')",
+					url : "PATCH BusinessPartnerList('23')",
 					payload : {
 						Address : {
 							City : "Trill",
@@ -77117,8 +76585,7 @@ sap.ui.define([
 			that.expectChange("artistID", ["", "42"])
 				.expectChange("isActiveEntity", [null, "Yes"])
 				.expectRequest({
-					method : "POST",
-					url : "Artists",
+					url : "POST Artists",
 					payload : {}
 				}, {
 					ArtistID : "23",
@@ -77142,8 +76609,7 @@ sap.ui.define([
 			assert.strictEqual(oDraftContext.isTransient(), false);
 
 			that.expectRequest({
-					method : "POST",
-					url : "Artists(ArtistID='23',IsActiveEntity=false)"
+					url : "POST Artists(ArtistID='23',IsActiveEntity=false)"
 						+ "/special.cases.ActivationAction",
 					payload : {}
 				}, {
@@ -77228,8 +76694,7 @@ sap.ui.define([
 				]);
 			}).then(function () {
 				that.expectRequest({
-						method : "POST",
-						url : "Artists",
+						url : "POST Artists",
 						payload : {}
 					}, {
 						ArtistID : "23",
@@ -77247,8 +76712,7 @@ sap.ui.define([
 					= that.oModel.bindContext("special.cases.ActivationAction(...)", oDraftContext);
 
 				that.expectRequest({
-						method : "POST",
-						url : "Artists(ArtistID='23',IsActiveEntity=false)"
+						url : "POST Artists(ArtistID='23',IsActiveEntity=false)"
 							+ "/special.cases.ActivationAction",
 						payload : {}
 					}, {
@@ -77321,8 +76785,7 @@ sap.ui.define([
 				[new Filter("sendsAutographs", FilterOperator.EQ, true)]);
 
 			that.expectRequest({
-					method : "POST",
-					url : "Artists",
+					url : "POST Artists",
 					payload : {}
 				}, {
 					ArtistID : "23",
@@ -77340,8 +76803,7 @@ sap.ui.define([
 				= that.oModel.bindContext("special.cases.ActivationAction(...)", oDraftContext);
 
 			that.expectRequest({
-					method : "POST",
-					url : "Artists(ArtistID='23',IsActiveEntity=false)"
+					url : "POST Artists(ArtistID='23',IsActiveEntity=false)"
 						+ "/special.cases.ActivationAction",
 					payload : {}
 				}, {
@@ -77382,8 +76844,7 @@ sap.ui.define([
 			assert.notOk(fnOnBeforeDestroy.called, "still alive");
 
 			that.expectRequest({
-					method : "POST",
-					url : "Artists(ArtistID='23',IsActiveEntity=true)"
+					url : "POST Artists(ArtistID='23',IsActiveEntity=true)"
 						+ "/special.cases.EditAction",
 					payload : {}
 				}, {/* This page intentionally left blank. */})
@@ -77503,9 +76964,8 @@ sap.ui.define([
 			oActionBinding.setParameter("TeamID", "TEAM_02");
 
 			that.expectRequest({
-					method : "POST",
 					payload : {TeamID : "TEAM_02"},
-					url : "EMPLOYEES('2')/" + sActionName
+					url : "POST EMPLOYEES('2')/" + sActionName
 				}, {
 					ID : "2",
 					Name : "Frederic Fall",
@@ -77523,9 +76983,8 @@ sap.ui.define([
 			assert.strictEqual(oReturnValueContext.getProperty("Name"), "Frederic Fall");
 
 			that.expectRequest({
-					method : "POST",
 					payload : {TeamID : "TEAM_0815"},
-					url : "EMPLOYEES('2')/" + sActionName
+					url : "POST EMPLOYEES('2')/" + sActionName
 				}, {
 					// ID : "2", // no key predicate here!
 					Name : "n/a",
@@ -77576,8 +77035,7 @@ sap.ui.define([
 					that.oView.byId("artist").getBindingContext());
 
 			that.expectRequest({
-				method : "POST",
-				url : "Artists(ArtistID='1',IsActiveEntity=true)/special.cases.EditAction",
+				url : "POST Artists(ArtistID='1',IsActiveEntity=true)/special.cases.EditAction",
 				payload : {}
 			}, {
 				ArtistID : "1",
@@ -77606,8 +77064,8 @@ sap.ui.define([
 		}).then(function () {
 			that.expectChange("user", "invalid")
 				.expectRequest({
-					method : "PATCH",
-					url : "Artists(ArtistID='1',IsActiveEntity=false)/DraftAdministrativeData",
+					url : "PATCH Artists(ArtistID='1',IsActiveEntity=false)"
+						+ "/DraftAdministrativeData",
 					payload : {InProcessByUser : "invalid"}
 				}, createErrorInsideBatch({
 					details : [{
@@ -78093,9 +77551,7 @@ sap.ui.define([
 			]);
 		}).then(function () {
 			that.expectRequest({
-					batchNo : 2,
-					method : "PATCH",
-					url : "SalesOrderList('2')",
+					url : "#2 PATCH SalesOrderList('2')",
 					payload : {Note : "Order 2 changed"}
 				}, new Promise(function (resolve) {
 					fnResolvePatch = resolve;
@@ -78304,8 +77760,8 @@ sap.ui.define([
 				assert.ok(oModel.hasPendingChanges());
 
 				that.expectRequest({
-						method : "PATCH",
-						url : "SalesOrderList('2')/SO_2_SOITEM(SalesOrderID='2',ItemPosition='20')",
+						url : "PATCH SalesOrderList('2')"
+							+ "/SO_2_SOITEM(SalesOrderID='2',ItemPosition='20')",
 						payload : {Note : "Item 2.20 changed"}
 					});// response does not matter here
 
@@ -78402,8 +77858,7 @@ sap.ui.define([
 
 			that.expectRequest({
 					headers : {"If-Match" : "ETag"},
-					method : "DELETE",
-					url : "Artists(ArtistID='42',IsActiveEntity=false)"
+					url : "DELETE Artists(ArtistID='42',IsActiveEntity=false)"
 				}, undefined, {
 					"sap-messages" : JSON.stringify([{
 						code : "foo-42",
@@ -78445,8 +77900,7 @@ sap.ui.define([
 				.withArgs("Failed to delete /Artists(ArtistID='42',IsActiveEntity=false)");
 			that.expectRequest({
 					headers : {"If-Match" : "ETag"},
-					method : "DELETE",
-					url : "Artists(ArtistID='42',IsActiveEntity=false)"
+					url : "DELETE Artists(ArtistID='42',IsActiveEntity=false)"
 				}, createErrorInsideBatch({target : "ArtistID"}))
 				.expectMessages([{
 					message : sMessage1,
@@ -78497,10 +77951,9 @@ sap.ui.define([
 
 		let fnResolveCreate;
 		this.expectRequest({
-				method : "POST",
 				headers : {/*NO "sap-cancel-on-close"*/},
 				payload : {},
-				url : "EMPLOYEES"
+				url : "POST EMPLOYEES"
 			}, new Promise(function (resolve) {
 				fnResolveCreate = resolve.bind(null, {/* response does not matter here */});
 			}));
@@ -78538,9 +77991,8 @@ sap.ui.define([
 </Table>`;
 
 		this.expectRequest({
-				batchNo : 1,
 				groupId : "$auto",
-				url : "SalesOrderList?$select=SalesOrderID&$skip=0&$top=100"
+				url : "#1 SalesOrderList?$select=SalesOrderID&$skip=0&$top=100"
 			}, {value : [
 				{SalesOrderID : "1"},
 				{SalesOrderID : "2"},
@@ -78555,24 +78007,18 @@ sap.ui.define([
 
 		const sAction = "com.sap.gateway.default.zui5_epm_sample.v0002.SalesOrder_Confirm";
 		this.expectRequest({
-				batchNo : 2,
-				groupId : "$single",
-				method : "POST",
-				payload : {},
-				url : "SalesOrderList('1')/" + sAction
-			})
-			.expectRequest({
-				method : "POST",
-				batchNo : 3,
 				groupId : "$single",
 				payload : {},
-				url : "SalesOrderList('2')/" + sAction
+				url : "#2 POST SalesOrderList('1')/" + sAction
 			})
 			.expectRequest({
-				batchNo : -4,
-				method : "POST",
+				groupId : "$single",
 				payload : {},
-				url : "SalesOrderList('3')/" + sAction
+				url : "#3 POST SalesOrderList('2')/" + sAction
+			})
+			.expectRequest({
+				payload : {},
+				url : "#-4 POST SalesOrderList('3')/" + sAction
 		});
 
 		const oListBinding = this.oView.byId("orders").getBinding("items");
@@ -78595,16 +78041,12 @@ sap.ui.define([
 		]);
 
 		this.expectRequest({
-				batchNo : 5,
 				groupId : "$single",
-				method : "DELETE",
-				url : "SalesOrderList('1')"
+				url : "#5 DELETE SalesOrderList('1')"
 			})
 			.expectRequest({
-				batchNo : 6,
 				groupId : "$single",
-				method : "DELETE",
-				url : "SalesOrderList('2')"
+				url : "#6 DELETE SalesOrderList('2')"
 			})
 			.expectRequest("#-7 DELETE SalesOrderList('3')")
 			.expectChange("id", ["4", "5", "6"]);
@@ -78618,24 +78060,18 @@ sap.ui.define([
 		]);
 
 		this.expectRequest({
-				batchNo : 8,
 				groupId : "$single",
 				headers : {"If-Match" : "*"},
-				method : "DELETE",
-				url : "SalesOrderList('4')"
+				url : "#8 DELETE SalesOrderList('4')"
 			})
 			.expectRequest({
-				batchNo : 9,
 				groupId : "$single",
 				headers : {"If-Match" : "*"},
-				method : "DELETE",
-				url : "SalesOrderList('5')"
+				url : "#9 DELETE SalesOrderList('5')"
 			})
 			.expectRequest({
-				batchNo : -10,
 				headers : {"If-Match" : "*"},
-				method : "DELETE",
-				url : "SalesOrderList('6')"
+				url : "#-10 DELETE SalesOrderList('6')"
 			});
 
 		await Promise.all([
@@ -78666,11 +78102,10 @@ sap.ui.define([
 			oListBinding.getHeaderContext(), {$$inheritExpandSelect : true});
 
 		this.expectRequest({
-				method : "POST",
 				payload : {
 					Name : "Jane Doe"
 				},
-				url : "Artists/special.cases.Create?$select=Messages"
+				url : "POST Artists/special.cases.Create?$select=Messages"
 			}, {
 				ArtistID : "23",
 				IsActiveEntity : false,
@@ -78706,11 +78141,9 @@ sap.ui.define([
 		const oAction = oModel.bindContext(sAction + "(...)", oContext);
 
 		this.expectRequest({
-				batchNo : 1,
 				headers : {"If-Match" : "*"},
-				method : "POST",
 				payload : {TeamID : "42"},
-				url : "EMPLOYEES('0')/" + sAction
+				url : "#1 POST EMPLOYEES('0')/" + sAction
 			}, {/* don't care */})
 			.expectRequest("#1 EMPLOYEES('0')?$select=ID", {ID : "0"});
 
@@ -78745,9 +78178,9 @@ sap.ui.define([
 		});
 
 		this.expectRequest({
-				method : "POST",
 				headers : {"If-Match" : "*"},
-				url : "EMPLOYEES('0')/" + sAction + "?$select=__CT__FAKE__Message/__FAKE__Messages",
+				url : "POST EMPLOYEES('0')/" + sAction
+					+ "?$select=__CT__FAKE__Message/__FAKE__Messages",
 				payload : {TeamID : "42"}
 			}, {/* don't care */});
 
@@ -79275,9 +78708,8 @@ sap.ui.define([
 
 			const sExpectedGroupId = sMethod === "refresh" && !bSuspend ? "$auto.foo" : "$auto";
 			this.expectRequest({ // ODLB#validateSelection
-					batchNo : 2,
 					groupId : sExpectedGroupId,
-					url : "SalesOrderList?custom=baz&$apply=A.P.P.L.E."
+					url : "#2 SalesOrderList?custom=baz&$apply=A.P.P.L.E."
 						+ "&$filter=LifecycleStatus eq 'N' and (SalesOrderID ge '1') and"
 							+ " (SalesOrderID eq '1' or SalesOrderID eq '3')"
 						+ "&$search=foo&$select=SalesOrderID&$top=2"
@@ -79289,9 +78721,8 @@ sap.ui.define([
 				});
 			if (sMethod === "refresh" || sMethod === "requestSideEffects") {
 				this.expectRequest({ // ODLB#refreshKeptElements via "refresh"
-						batchNo : 2,
 						groupId : sExpectedGroupId,
-						url : "SalesOrderList?$apply=A.P.P.L.E.&"
+						url : "#2 SalesOrderList?$apply=A.P.P.L.E.&"
 							+ "$expand=SO_2_BP($select=BusinessPartnerID)"
 							+ "&$filter=SalesOrderID eq '1' or SalesOrderID eq '3'&custom=baz"
 							+ "&$select=Note,SalesOrderID&$top=2"
@@ -79312,9 +78743,8 @@ sap.ui.define([
 					"LifecycleStatus,SalesOrderID");
 			}
 			this.expectRequest({ // "refresh"
-					batchNo : 2,
 					groupId : sExpectedGroupId,
-					url : sRefreshUrl
+					url : "#2 " + sRefreshUrl
 				}, {
 					"@odata.count" : "3",
 					value : [
@@ -79417,8 +78847,7 @@ sap.ui.define([
 				])
 				.expectChange("selected", [,, null])
 				.expectRequest({
-					method : "POST",
-					url : "SalesOrderList",
+					url : "POST SalesOrderList",
 					payload : {Note : "SO 3 (bar) - created persisted"}
 				}, {
 					Note : "SO 3 (bar) - created persisted",
@@ -79446,8 +78875,7 @@ sap.ui.define([
 				])
 				.expectChange("selected", [,,, null])
 				.expectRequest({
-					method : "POST",
-					url : "SalesOrderList",
+					url : "POST SalesOrderList",
 					payload : {Note : "SO 4 (foo) - created persisted"}
 				}, {
 					Note : "SO 4 (foo) - created persisted",
@@ -79683,8 +79111,7 @@ sap.ui.define([
 			await this.waitForChanges(assert, "form bound to oContext3");
 
 			this.expectRequest({
-					method : "PATCH",
-					url : "SalesOrderList('2')?custom=foo",
+					url : "PATCH SalesOrderList('2')?custom=foo",
 					payload : {LifecycleStatus : "P"}
 				})
 				.expectChange("status", [, "P"]);
@@ -79929,8 +79356,7 @@ sap.ui.define([
 
 			if (bCreateAtEnd) {
 				this.expectRequest({
-						method : "POST",
-						url : "SalesOrderList",
+						url : "POST SalesOrderList",
 						payload : {ID : "N"}
 					}); // no response required
 
@@ -80269,8 +79695,7 @@ sap.ui.define([
 		this.expectChange("id", ["5"])
 			.expectChange("count", "5")
 			.expectRequest({
-				method : "POST",
-				url : "SalesOrderList",
+				url : "POST SalesOrderList",
 				payload : {SalesOrderID : "5"}
 			}, {
 				SalesOrderID : "5"
@@ -80329,8 +79754,7 @@ sap.ui.define([
 		this.expectChange("id", ["6"])
 			.expectChange("count", "5")
 			.expectRequest({
-				method : "POST",
-				url : "SalesOrderList",
+				url : "POST SalesOrderList",
 				payload : {SalesOrderID : "6"}
 			}, {
 				SalesOrderID : "6"
@@ -80421,16 +79845,14 @@ sap.ui.define([
 
 		this.expectChange("note", ["bar", "foo"])
 			.expectRequest({
-				method : "POST",
-				url : "SalesOrderList",
+				url : "POST SalesOrderList",
 				payload : {Note : "foo"}
 			}, {
 				Note : "foo",
 				SalesOrderID : "1"
 			})
 			.expectRequest({
-				method : "POST",
-				url : "SalesOrderList",
+				url : "POST SalesOrderList",
 				payload : {Note : "bar"}
 			}, {
 				Note : "bar",
@@ -80562,7 +79984,7 @@ sap.ui.define([
 			let fnResolveBestFriend;
 			let fnResolveSiblingEntity;
 			this.expectRequest({
-					batchNo : bAutoExpandSelect ? 3 : 1,
+					batchNo : bAutoExpandSelect ? 3 : 1, // Note: #expectRequest out-of-order here!
 					url : sMainUrl + "&$skip=0&$top=2"
 				}, {
 					"@odata.count" : "8",
@@ -80959,9 +80381,7 @@ sap.ui.define([
 				.expectChange("friendBusy__AS_COMPOSITE", [true])
 				.expectChange("sibling", [""])
 				.expectRequest({
-					batchNo : 18,
-					method : "POST",
-					url : "Artists?custom=foo",
+					url : "#18 POST Artists?custom=foo",
 					payload : {Name : "Artist X"}
 				}, {
 					ArtistID : "240",
@@ -81140,12 +80560,37 @@ sap.ui.define([
 
 			assert.strictEqual(sCity, "Heidelberg");
 
+			this.expectRequest({
+					groupId : "$single",
+					url : "#4 " + sFriendUrl + "&$skip=0&$top=2"
+				}, {
+					value : [{
+						"@odata.etag" : "etag.10.1",
+						ArtistID : "10",
+						BestFriend : {
+							"@odata.etag" : "etag.F1.1",
+							ArtistID : "F1",
+							IsActiveEntity : true,
+							Name : "Friend A #1"
+						},
+						IsActiveEntity : true
+					}, {
+						"@odata.etag" : "etag.20.1",
+						ArtistID : "20",
+						BestFriend : {
+							"@odata.etag" : "etag.F2.1",
+							ArtistID : "F2",
+							IsActiveEntity : true,
+							Name : "Friend B #1"
+						},
+						IsActiveEntity : true
+					}]
+				});
 			if (bReset) {
 				// reset requests kept-alive element
 				this.expectRequest({
-						batchNo : 5,
 						groupId : "$auto",
-						url : "Artists?$select=Address/City,ArtistID,IsActiveEntity,Name"
+						url : "#5 Artists?$select=Address/City,ArtistID,IsActiveEntity,Name"
 							+ "&$expand=BestFriend($select=ArtistID,IsActiveEntity,Name)"
 							+ "&$filter=ArtistID eq '10' and IsActiveEntity eq true"
 					}, {
@@ -81171,36 +80616,8 @@ sap.ui.define([
 				oArtistA.setKeepAlive(true); // set kept-alive to reset (instead of recreate) the cache
 			}
 			this.expectRequest({
-					batchNo : 4,
-					groupId : "$single",
-					url : sFriendUrl + "&$skip=0&$top=2"
-				}, {
-					value : [{
-						"@odata.etag" : "etag.10.1",
-						ArtistID : "10",
-						BestFriend : {
-							"@odata.etag" : "etag.F1.1",
-							ArtistID : "F1",
-							IsActiveEntity : true,
-							Name : "Friend A #1"
-						},
-						IsActiveEntity : true
-					}, {
-						"@odata.etag" : "etag.20.1",
-						ArtistID : "20",
-						BestFriend : {
-							"@odata.etag" : "etag.F2.1",
-							ArtistID : "F2",
-							IsActiveEntity : true,
-							Name : "Friend B #1"
-						},
-						IsActiveEntity : true
-					}]
-				})
-				.expectRequest({
-					batchNo : 5,
 					groupId : "$auto",
-					url : sMainUrl + "&$skip=0&$top=2"
+					url : "#5 " + sMainUrl + "&$skip=0&$top=2"
 				}, {
 					value : [{
 						"@odata.etag" : "etag.10.1",

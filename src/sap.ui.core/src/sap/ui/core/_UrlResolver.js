@@ -2,8 +2,8 @@
  * ${copyright}
  */
 sap.ui.define([
-	"sap/ui/thirdparty/URI"
-], function(URI) {
+	"sap/ui/util/_URL"
+], function(_URL) {
 	"use strict";
 
 	/**
@@ -33,8 +33,8 @@ sap.ui.define([
 	 * @param {object} mBundleConfig Map with bundle config settings
 	 * @param {object} mSettings Map with settings for processing the resource configuration
 	 * @param {boolean} [mSettings.alreadyResolvedOnRoot=false] Whether the bundleUrl was already resolved (usually by the sap.ui.core.Component)
-	 * @param {URI} mSettings.baseURI The base URI of the Component (usually provided by the sap.ui.core.Component or sap.ui.core.Manifest)
-	 * @param {URI} mSettings.manifestBaseURI The base URI of the manifest (usually provided by the sap.ui.core.Component or sap.ui.core.Manifest)
+	 * @param {module:sap/ui/util/_URL} mSettings.baseURI The base URI of the Component (usually provided by the sap.ui.core.Component or sap.ui.core.Manifest)
+	 * @param {module:sap/ui/util/_URL} mSettings.manifestBaseURI The base URI of the manifest (usually provided by the sap.ui.core.Component or sap.ui.core.Manifest)
 	 * @param {string} [mSettings.relativeTo="component"] Either "component", "manifest" or a "library path" to which the bundleUrl should be resolved
 	 * @private
 	 * @ui5-restricted sap.ui.core
@@ -59,7 +59,7 @@ sap.ui.define([
 			if (sKey === "bundleUrl" && !bAlreadyResolvedOnRoot) {
 				var sBundleUrl = mBundleConfig[sKey];
 				var oResolvedUri = _UrlResolver._resolveUri(sBundleUrl, vRelativeToURI);
-				mBundleConfig[sKey] = oResolvedUri && oResolvedUri.toString();
+				mBundleConfig[sKey] = oResolvedUri && oResolvedUri.sourceUrl;
 			}
 			if (sKey === "terminologies") {
 				var mTerminologies = mBundleConfig[sKey];
@@ -85,17 +85,14 @@ sap.ui.define([
 	};
 
 	/**
-	 * Makes sure that we can safely deal with URI instances.
+	 * Makes sure that we can safely deal with URL instances.
 	 * See return value.
 	 *
-	 * @param {URI|string|undefined} v either a URI instance, a string value or undefined
-	 * @returns {URI} a URI instance created from the given argument, or the given argument if it is already a URI instance
+	 * @param {module:sap/ui/util/_URL|string|undefined} v either a URL instance, a string value or undefined
+	 * @returns {module:sap/ui/util/_URL} a URL instance created from the given argument, or the given argument if it is already a URL instance
 	 */
-	function normalizeToUri(v) {
-		if (v && v instanceof URI) {
-			return v;
-		}
-		return new URI(v);
+	function normalizeToUrl(v) {
+		return (v instanceof _URL) ? v : new _URL(v);
 	}
 
 	/**
@@ -104,33 +101,38 @@ sap.ui.define([
 	 * or relative to URL path when passing an URL string as seceond
 	 * parameter.
 	 *
-	 * @param {URI|string} vUri URI to resolve
-	 * @param {URI|string} [vRelativeToURI] defines to which base URI the given URI will be resolved to.
+	 * @param {module:sap/ui/util/_URL|string} vUrl URI to resolve
+	 * @param {module:sap/ui/util/_URL|string} [vRelativeToURL] defines to which base URI the given URI will be resolved to.
 	 *                                      Either a string or a URI instance.
 	 *                                      Can be a component base URI, a manifest base URI or a library path.
-	 * @return {URI} resolved URI
+	 * @return {module:sap/ui/util/_URL} resolved URI
 	 * @private
 	 */
-	_UrlResolver._resolveUri = function (vUri, vRelativeToURI) {
-		return _UrlResolver._resolveUriRelativeTo(normalizeToUri(vUri), normalizeToUri(vRelativeToURI));
+	_UrlResolver._resolveUri = function (vUrl, vRelativeToURL) {
+		return _UrlResolver._resolveUriRelativeTo(normalizeToUrl(vUrl), normalizeToUrl(vRelativeToURL));
 	};
 
 	/**
-	 * Resolves the given URI relative to the given base URI.
+	 * Resolves the given URL relative to the given base URL.
 	 *
-	 * @param {URI} oUri URI to resolve
-	 * @param {URI} oBase Base URI
-	 * @return {URI} resolved URI
+	 * @param {module:sap/ui/util/_URL} oUrl URL to resolve
+	 * @param {module:sap/ui/util/_URL} oBase Base URL
+	 * @return {module:sap/ui/util/_URL} resolved URL
 	 * @static
 	 * @private
 	 */
-	_UrlResolver._resolveUriRelativeTo = function(oUri, oBase) {
-		if (oUri.is("absolute") || (oUri.path() && oUri.path()[0] === "/")) {
-			return oUri;
+	_UrlResolver._resolveUriRelativeTo = function(oUrl, oBase) {
+		if (oUrl.isAbsolute() || oUrl.plainUrl?.[0] === "/") {
+			return oUrl;
 		}
-		var oPageBase = new URI(document.baseURI).search("");
-		oBase = oBase.absoluteTo(oPageBase);
-		return oUri.absoluteTo(oBase).relativeTo(oPageBase);
+		const oPageBase = new _URL(document.baseURI);
+
+		// Step 1: Resolve oUrl absolute to oBase
+		const absoluteUrl = new _URL(oUrl.sourceUrl, oBase.href);
+
+		// Step 2: Resolve path relative to oPageBase
+		const relativePath = absoluteUrl.relativeTo(oPageBase);
+		return new _URL(relativePath);
 	};
 
 	return _UrlResolver;

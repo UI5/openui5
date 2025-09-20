@@ -4,13 +4,14 @@
 
 // Provides base class sap.ui.core.Component for all components
 sap.ui.define([
+	"sap/base/assert",
 	"sap/base/i18n/Localization",
 	'sap/ui/base/Object',
-	'sap/ui/thirdparty/URI',
 	'sap/ui/VersionInfo',
 	'sap/base/util/Version',
 	'sap/base/Log',
 	'sap/ui/dom/includeStylesheet',
+	'sap/ui/util/_URL',
 	'sap/base/i18n/ResourceBundle',
 	'sap/base/util/uid',
 	'sap/base/util/merge',
@@ -22,13 +23,14 @@ sap.ui.define([
 	'sap/ui/core/mvc/ViewType',
 	'./_UrlResolver'
 ], function(
+	assert,
 	Localization,
 	BaseObject,
-	URI,
 	VersionInfo,
 	Version,
 	Log,
 	includeStylesheet,
+	_URL,
 	ResourceBundle,
 	uid,
 	merge,
@@ -199,13 +201,14 @@ sap.ui.define([
 			var sComponentName = this.getComponentName(),
 				sBaseUrl = mOptions && mOptions.baseUrl || sComponentName && sap.ui.require.toUrl(sComponentName.replace(/\./g, "/")) + "/";
 			if (sBaseUrl) {
-				this._oBaseUri = new URI(sBaseUrl).absoluteTo(new URI(document.baseURI).search(""));
+				this._oBaseUri = new _URL(sBaseUrl, document.baseURI);
 			}
 
 			// determine the base URL of the manifest or use the component base
 			// as by default the manifest is next to the component controller
 			if (mOptions && typeof mOptions.url === "string") {
-				this._oManifestBaseUri = new URI(mOptions.url).absoluteTo(new URI(document.baseURI).search("")).search("");
+				this._oManifestBaseUri = new _URL(mOptions.url, document.baseURI);
+				this._oManifestBaseUri.search = "";
 			} else {
 				this._oManifestBaseUri = this._oBaseUri;
 			}
@@ -294,18 +297,15 @@ sap.ui.define([
 		_loadI18n: function(bAsync) {
 			// extract the i18n URI from the manifest
 			var oManifest = this._oRawManifest,
-				oI18nURI,
 				// a bundle url given in the "sap.app.i18n" section is by default always resolved relative to the manifest
 				// when using the object syntax for the "sap.app.i18n" section a "bundleRelativeTo" property can be given to change the default
 				sBaseBundleUrlRelativeTo = "manifest",
 				vI18n = (oManifest["sap.app"] && oManifest["sap.app"]["i18n"]) || "i18n/i18n.properties";
 
 			if (typeof vI18n === "string") {
-				oI18nURI = new URI(vI18n);
-
 				// load the ResourceBundle relative to the manifest
 				return ResourceBundle.create({
-					url: this.resolveUri(oI18nURI, sBaseBundleUrlRelativeTo),
+					url: this.resolveUri(vI18n, sBaseBundleUrlRelativeTo),
 					async: bAsync
 				});
 
@@ -594,8 +594,8 @@ sap.ui.define([
 			if (mResourceRoots) {
 				for (var sResourceRoot in mResourceRoots) {
 					var sResourceRootPath = mResourceRoots[sResourceRoot];
-					var oResourceRootURI = new URI(sResourceRootPath);
-					if (oResourceRootURI.is("absolute") || (oResourceRootURI.path() && oResourceRootURI.path()[0] === "/")) {
+					var oResourceRootURI = new _URL(sResourceRootPath);
+					if (oResourceRootURI.isAbsolute() || oResourceRootURI.plainUrl?.[0] === "/") {
 						throw new Error(
 							`${this.getComponentName()}: Resource root for "${sResourceRoot}" is absolute and therefore won't be registered! "${sResourceRootPath}"`
 						);
@@ -635,9 +635,10 @@ sap.ui.define([
 		 * @since 1.60.1
 		 */
 		resolveUri: function(sUri, sRelativeTo) {
+			assert(sUri !== undefined && typeof sUri === "string", "'sUri' must be of type 'string'");
 			var oRelativeToBaseUri = sRelativeTo === "manifest" ? this._oManifestBaseUri : this._oBaseUri;
 			var oResultUri = _UrlResolver._resolveUri(sUri, oRelativeToBaseUri);
-			return oResultUri && oResultUri.toString();
+			return oResultUri && oResultUri.sourceUrl;
 		},
 
 		/**
@@ -778,20 +779,20 @@ sap.ui.define([
 		// or needs to be loaded from a specific client.
 		// If the language or the client is already provided it won't be overridden
 		// as this is expected to be only done by intension.
-		var oManifestUrl = new URI(sManifestUrl);
-		if (!oManifestUrl.hasQuery("sap-language")) {
-			var sValue = Localization.getSAPLogonLanguage();
+		var oManifestUrl = new _URL(sManifestUrl);
+		if (!oManifestUrl.searchParams.has("sap-language")) {
+			const sValue = Localization.getSAPLogonLanguage();
 			if (sValue) {
-				oManifestUrl.addQuery("sap-language", sValue);
+				oManifestUrl.searchParams.set("sap-language", sValue);
 			}
 		}
-		if (!oManifestUrl.hasQuery("sap-client")) {
-			var sValue = BaseConfig.get({name: "sapClient", type:BaseConfig.Type.String, external: true});
+		if (!oManifestUrl.searchParams.has("sap-client")) {
+			const sValue = BaseConfig.get({name: "sapClient", type:BaseConfig.Type.String, external: true});
 			if (sValue) {
-				oManifestUrl.addQuery("sap-client", sValue);
+				oManifestUrl.searchParams.set("sap-client", sValue);
 			}
 		}
-		sManifestUrl = oManifestUrl.toString();
+		sManifestUrl = oManifestUrl.sourceUrl;
 
 		Log.info("Loading manifest via URL: " + sManifestUrl);
 		if (!bAsync) {
