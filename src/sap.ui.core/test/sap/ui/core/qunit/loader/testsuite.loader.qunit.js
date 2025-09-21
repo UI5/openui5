@@ -93,6 +93,11 @@ sap.ui.define(function() {
 				title: "QUnit tests: Multiple AMD loaders"
 			},
 
+			bootstrapConfig: {
+				page: "test-resources/sap/ui/core/qunit/loader/bootstrapConfig.qunit.html",
+				title: "QUnit tests: Expose loader via bootstrap attribute"
+			},
+
 			conflictWithRequire: {
 				title: "QUnit tests: conflict between require.js and ui5loader",
 				bootCore: false,

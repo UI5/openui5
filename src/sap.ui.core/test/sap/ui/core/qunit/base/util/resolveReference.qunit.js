@@ -195,26 +195,6 @@ sap.ui.define(['sap/base/util/resolveReference'], function(resolveReference) {
 		fn = resolveReference("module2.method", {".": oDotModule, "module2": oModule}, {preferDotContext: true});
 		assert.strictEqual(fn(), "method", "correct method was returned");
 		assert.strictEqual(oContext, oModule, "correct context was bound");
-
-		/**
-		 * @deprecated As of Version 1.141
-		 */
-		(() => {
-			window.module2 = {
-				method: function() {
-					oContext = this;
-					return "window.module2.method";
-				}
-			};
-
-			// test the resolve order (function is not found under dot variable and the first segment isn't defined in the
-			// other variables then fallback to global
-			fn = resolveReference("module2.method", {".": oDotModule, "module": oModule}, {preferDotContext: true});
-			assert.strictEqual(fn(), "window.module2.method", "correct method was returned");
-			assert.strictEqual(oContext, undefined, "correct context was bound");
-
-			delete window.module2;
-		})();
 	});
 
 	QUnit.test("resolve function from variable map with bind context and prefer dot context", function(assert) {
@@ -270,23 +250,6 @@ sap.ui.define(['sap/base/util/resolveReference'], function(resolveReference) {
 		assert.strictEqual(this.context, undefined, "correct context was bound");
 	});
 
-	/**
-	 * @deprecated As of Version 1.141
-	 */
-	QUnit.test("resolve function from global scope - fallback", function(assert) {
-		var oContext;
-		window.globalMethodOnWindow = function(){
-			oContext = this;
-			return "globalMethodOnWindow";
-		};
-
-		var fn = resolveReference("globalMethodOnWindow");
-		assert.strictEqual(fn(), "globalMethodOnWindow", "correct method was returned");
-		assert.strictEqual(oContext, undefined, "correct context was bound");
-
-		delete window.globalMethodOnWindow;
-	});
-
 	QUnit.test("resolve function with missing dot variable doesn't fallback to global scope", function(assert) {
 		var fn = resolveReference(".globalMethodOnWindow");
 		assert.strictEqual(fn, undefined, "correct method was returned");
@@ -301,23 +264,6 @@ sap.ui.define(['sap/base/util/resolveReference'], function(resolveReference) {
 		// even though the moudle.evilFunction is defined with "undefined", it shouldn't fallback to the global scope
 		fn = resolveReference("evilModule.handler", {"evilModule": {handler: undefined}});
 		assert.strictEqual(fn, undefined, "The function should be taken from module even when the module value is defined with undefined and shouldn't fallback to global");
-
-		/**
-		 * @deprecated As of Version 1.141
-		 */
-		(() => {
-			var oContext;
-			window.module1 = {
-				x: function() {
-					oContext = this;
-					return "window.module1.x";
-				}
-			};
-			fn = resolveReference("module1.x", {"module": {}});
-			assert.strictEqual(fn(), "window.module1.x", "correction method was returned");
-			assert.strictEqual(oContext, undefined, "correct context was bound");
-			delete window.module1;
-		})();
 	});
 
 	QUnit.test("resolve function with prefer dot context shouldn't be done for path which already starts with dot", function(assert) {
