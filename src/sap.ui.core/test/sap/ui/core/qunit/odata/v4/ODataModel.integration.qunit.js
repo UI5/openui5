@@ -15341,6 +15341,8 @@ sap.ui.define([
 	// Scenario: create an entity on a relative binding without an own cache and check that
 	// hasPendingChanges is working
 	// None of our applications has such a scenario.
+	//
+	// Prove that Context#refresh works even if Binding#refresh doesn't (JIRA: CPOUI5ODATAV4-3133)
 	QUnit.test("Create on a relative binding; check hasPendingChanges()", function (assert) {
 		var oTeam2EmployeesBinding,
 			oTeamBinding,
@@ -15388,7 +15390,23 @@ sap.ui.define([
 			assert.notOk(oTeam2EmployeesBinding.hasPendingChanges(), "no more pending changes");
 			assert.notOk(oTeamBinding.hasPendingChanges(), "no more pending changes");
 
-			return that.waitForChanges(assert);
+			return oTeam2EmployeesBinding.getCurrentContexts()[0].created();
+		}).then(function () {
+			assert.throws(function () {
+				oTeam2EmployeesBinding.refresh();
+			}, new Error("Refresh on this binding is not supported"));
+
+			that.expectRequest("TEAMS('42')/TEAM_2_EMPLOYEES('7')?$select=ID,Name", {
+					ID : "7",
+					Name : "The one & only John Doe"
+				})
+				.expectChange("text", ["The one & only John Doe"]);
+
+			return Promise.all([
+				// code under test
+				oTeam2EmployeesBinding.getCurrentContexts()[0].requestRefresh(),
+				that.waitForChanges(assert)
+			]);
 		});
 	});
 

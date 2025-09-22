@@ -178,7 +178,7 @@ sap.ui.define([
 								"minVersion": "1.22.0"
 							}
 						},
-						"minUI5Version": "1.22.5"
+						"minUI5Version": "2.0.0"
 					},
 					"models": {
 						"i18n": {

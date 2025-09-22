@@ -20,7 +20,8 @@
 		"dependencies": {
 			"minUI5Version": [
 				"1.108",
-				"1.120"
+				"1.120",
+				"2.0.0"
 			],
 			"libs": {}
 		}

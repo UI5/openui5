@@ -25,7 +25,7 @@
 		"componentName": "sap.ui.fl.qunit.integration.testComponentComplex",
 		"rootView": "sap.ui.fl.qunit.integration.testComponentReuse.View",
 		"dependencies": {
-			"minUI5Version": "1.46",
+			"minUI5Version": "2.0.0",
 			"libs": {
 				"sap.m": {},
 				"sap.ui.layout": {}

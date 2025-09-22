@@ -29,7 +29,7 @@ sap.ui.define([
 			assert.throws(function() {
 				var oManifest = {
 					"_version": "2.0.0",
-					"sap.ui5": { dependencies: { minUI5Version: "1.75.2" } }
+					"sap.ui5": { dependencies: { minUI5Version: "2.0.0" } }
 				};
 				SetMinUI5Version.applyChange(oManifest, new AppDescriptorChange({
 					content: {
@@ -44,7 +44,7 @@ sap.ui.define([
 			assert.throws(function() {
 				var oManifest = {
 					"_version": "2.0.0",
-					"sap.ui5": { dependencies: { minUI5Version: "1.75.2" } }
+					"sap.ui5": { dependencies: { minUI5Version: "2.0.0" } }
 				};
 				SetMinUI5Version.applyChange(oManifest, new AppDescriptorChange({
 					content: {
@@ -56,7 +56,7 @@ sap.ui.define([
 			assert.throws(function() {
 				var oManifest = {
 					"_version": "2.0.0",
-					"sap.ui5": { dependencies: { minUI5Version: "1.75.2" } }
+					"sap.ui5": { dependencies: { minUI5Version: "2.0.0" } }
 				};
 				SetMinUI5Version.applyChange(oManifest, new AppDescriptorChange({
 					content: {
@@ -68,7 +68,7 @@ sap.ui.define([
 			assert.throws(function() {
 				var oManifest = {
 					"_version": "2.0.0",
-					"sap.ui5": { dependencies: { minUI5Version: "1.75.2" } }
+					"sap.ui5": { dependencies: { minUI5Version: "2.0.0" } }
 				};
 				SetMinUI5Version.applyChange(oManifest, new AppDescriptorChange({
 					content: {
@@ -80,7 +80,7 @@ sap.ui.define([
 			assert.throws(function() {
 				var oManifest = {
 					"_version": "2.0.0",
-					"sap.ui5": { dependencies: { minUI5Version: "1.75.2" } }
+					"sap.ui5": { dependencies: { minUI5Version: "2.0.0" } }
 				};
 				SetMinUI5Version.applyChange(oManifest, new AppDescriptorChange({
 					content: {

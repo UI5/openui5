@@ -86,7 +86,7 @@ sap.ui.define([
 					"component.card.inner.resources": "./componentCardInnerResources"
 				},
 				"dependencies": {
-					"minUI5Version": "1.38",
+					"minUI5Version": "2.0.0",
 					"libs": {
 						"component.card.inner.resources.lib1": {}
 					}

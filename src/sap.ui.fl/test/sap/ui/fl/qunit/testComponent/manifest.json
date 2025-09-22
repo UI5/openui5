@@ -24,7 +24,7 @@
 	"sap.ui5": {
 		"rootView": "testComponent.View",
 		"dependencies": {
-			"minUI5Version": "1.37",
+			"minUI5Version": "2.0.0",
 			"libs": {
 				"sap.m": {},
 				"sap.ui.core": {}

@@ -159,6 +159,27 @@ sap.ui.define([
 			});
 		});
 
+		QUnit.test("when response is not filled for a JSON request", async function(assert) {
+			const sUrl = "/someUrl";
+
+			this.server.respondWith(
+				"POST",
+				sUrl,
+				function(oXhr) {
+					Object.defineProperty(oXhr, "responseText", {
+						set() {},
+						get() {
+							assert.notOk(true, "responseText must not be used as a fallback");
+							throw new Error("InvalidStateError");
+						}
+					});
+					oXhr.respond([200, {}, ""]);
+				}
+			);
+			const oResponse = await Utils.sendRequest(sUrl, "POST", { dataType: "json" });
+			assert.strictEqual(oResponse.reponse, undefined);
+		});
+
 		QUnit.test("when sendRequest is called with Internal Server Error", function(assert) {
 			var sUrl = "/flexKeyuser/flex/keyuser/v2/data/sap.ui.demoapps.rta.fiorielements.Component?sap-language=de-DE";
 			var sMethod = "GET";

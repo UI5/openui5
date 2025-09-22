@@ -411,7 +411,7 @@ sap.ui.define([
 			},
 			"sap.ui5": {
 				"dependencies": {
-					"minUI5Version": "1.28.0",
+					"minUI5Version": "2.0.0",
 					"libs": {
 						"sap.ui.core": {
 							"minVersion": "1.28.0"
@@ -469,7 +469,7 @@ sap.ui.define([
 			},
 			"sap.ui5": {
 				"dependencies": {
-					"minUI5Version": "1.28.0",
+					"minUI5Version": "2.0.0",
 					"libs": {
 						"sap.ui.core": {
 							"minVersion": "1.28.0"
@@ -527,7 +527,7 @@ sap.ui.define([
 			},
 			"sap.ui5": {
 				"dependencies": {
-					"minUI5Version": "1.28.0",
+					"minUI5Version": "2.0.0",
 					"libs": {
 						"sap.ui.core": {
 							"minVersion": "1.28.0"
@@ -585,7 +585,7 @@ sap.ui.define([
 			},
 			"sap.ui5": {
 				"dependencies": {
-					"minUI5Version": "1.28.0",
+					"minUI5Version": "2.0.0",
 					"libs": {
 						"sap.ui.core": {
 							"minVersion": "1.28.0"
@@ -642,7 +642,7 @@ sap.ui.define([
 			},
 			"sap.ui5": {
 				"dependencies": {
-					"minUI5Version": "1.28.0",
+					"minUI5Version": "2.0.0",
 					"libs": {
 						"sap.ui.core": {
 							"minVersion": "1.28.0"
@@ -708,7 +708,7 @@ sap.ui.define([
 			},
 			"sap.ui5": {
 				"dependencies": {
-					"minUI5Version": "1.28.0",
+					"minUI5Version": "2.0.0",
 					"libs": {
 						"sap.ui.core": {
 							"minVersion": "1.28.0"

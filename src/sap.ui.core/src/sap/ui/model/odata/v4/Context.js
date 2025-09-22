@@ -1587,12 +1587,21 @@ sap.ui.define([
 	 *   Since 1.84.0, if this context is {@link #isKeepAlive kept alive}, it is only destroyed if
 	 *   the corresponding entity does no longer exist in the back end. In this case, the
 	 *   <code>fnOnBeforeDestroy</code> callback passed with {@link #setKeepAlive}) is called.
-	 * @throws {Error}
-	 *   If the group ID is not valid, if this context has pending changes or does not represent a
-	 *   single entity (see {@link sap.ui.model.odata.v4.ODataListBinding#getHeaderContext}), if the
-	 *   binding is not refreshable or is a list binding with data aggregation, if its root binding
-	 *   is suspended, or if the parameter <code>bAllowRemoval</code> is set for a context belonging
-	 *   to a context binding.
+	 * @throws {Error} If
+	 *   <ul>
+	 *     <li> the group ID is not valid,
+	 *     <li> this context
+	 *       <ul>
+	 *         <li> {@link #isInactive is inactive},
+	 *         <li> {@link #hasPendingChanges has pending changes},
+	 *         <li> does not represent a single entity (see
+	 *           {@link sap.ui.model.odata.v4.ODataListBinding#getHeaderContext}),
+	 *       </ul>
+	 *     <li> the binding is a list binding with "$$aggregation",
+	 *     <li> the binding's root binding is suspended,
+	 *     <li> the <code>bAllowRemoval</code> parameter is set for a context belonging to a context
+	 *       binding.
+	 *   </ul>
 	 *
 	 * @public
 	 * @since 1.53.0

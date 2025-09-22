@@ -27,7 +27,7 @@
 	},
 	"sap.ui5": {
 		"dependencies": {
-			"minUI5Version": "1.53"
+			"minUI5Version": "2.0.0"
 		},
 		"models": {
 			"": {
