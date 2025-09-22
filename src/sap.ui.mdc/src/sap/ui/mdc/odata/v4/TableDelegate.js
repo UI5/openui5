@@ -230,6 +230,36 @@ sap.ui.define([
 	};
 
 	/**
+	 * Extracts the model name and path from a binding path string.
+	 *
+	 * @param {string} sPath The binding path that might contain a model name (e.g. "myModel>/Products" or "/Products")
+	 * @returns {{modelName: string, path: string}} Model name and path
+	 */
+	function extractModelNameAndPath(sPath) {
+		const aMatch = sPath?.match(/^([^>]+)>(.*)$/);
+
+		if (aMatch) {
+			return {modelName: aMatch[1], path: aMatch[2]};
+		} else {
+			return {modelName: undefined, path: sPath};
+		}
+	}
+
+	/**
+	 * Compares two binding paths, taking into account that one might contain a model name while the other doesn't.
+	 *
+	 * @param {string} sPath1 The first path to compare
+	 * @param {string} sPath2 The second path to compare
+	 * @returns {boolean} Whether the paths are different
+	 */
+	function hasPathChanged(sPath1, sPath2) {
+		const oPath1 = extractModelNameAndPath(sPath1);
+		const oPath2 = extractModelNameAndPath(sPath2);
+
+		return oPath1.path !== oPath2.path;
+	}
+
+	/**
 	 * Updates the binding of the table with the binding info object returned from
 	 * {@link module:sap/ui/mdc/TableDelegate.updateBindingInfo updateBindingInfo}. If an update is not possible, it rebinds the table.
 	 *
@@ -260,7 +290,7 @@ sap.ui.define([
 			oModel.setProperty("/@custom/hasGrandTotal", false);
 		}
 
-		if (!oBinding || oBinding.getPath() !== oBindingInfo.path) {
+		if (!oBinding || hasPathChanged(oBinding.getPath(), oBindingInfo.path)) {
 			this.rebind(oTable, oBindingInfo);
 			return;
 		}

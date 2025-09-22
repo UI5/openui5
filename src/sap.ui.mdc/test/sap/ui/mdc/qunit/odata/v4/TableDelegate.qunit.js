@@ -2117,16 +2117,84 @@ sap.ui.define([
 	QUnit.test("Change path", async function(assert) {
 		const oUpdateBindingInfoStub = sinon.stub(this.oTable.getControlDelegate(), "updateBindingInfo");
 
-		oUpdateBindingInfoStub.callThrough().onCall(1).callsFake(function(oMDCTable, oBindingInfo) {
-			oUpdateBindingInfoStub.wrappedMethod.apply(this, arguments);
-			oBindingInfo.path = oBindingInfo.path + "something_else";
-		});
+		this.oTable.setModel(new ODataModel({
+			serviceUrl: "serviceUrl/",
+			operationMode: "Server",
+			autoExpandSelect: true
+		}), "MyModel");
 
+		oUpdateBindingInfoStub.callsFake(function(oTable, oBindingInfo) {
+			oUpdateBindingInfoStub.wrappedMethod.apply(this, arguments);
+			oBindingInfo.path = "/MyPath";
+		});
 		await this.oTable.rebind();
+
+		oUpdateBindingInfoStub.callsFake(function(oTable, oBindingInfo) {
+			oUpdateBindingInfoStub.wrappedMethod.apply(this, arguments);
+			oBindingInfo.path = "MyPath";
+		});
 		this.oRebindSpy.resetHistory();
 		await this.oTable.rebind();
+		assert.equal(this.oRebindSpy.callCount, 1, "/MyPath to MyPath: Delegate#rebind call");
 
-		assert.equal(this.oRebindSpy.callCount, 1, "Delegate#rebind call");
+		this.oRebindSpy.resetHistory();
+		await this.oTable.rebind();
+		assert.equal(this.oRebindSpy.callCount, 0, "MyPath to MyPath: Delegate#rebind call");
+
+		oUpdateBindingInfoStub.callsFake(function(oTable, oBindingInfo) {
+			oUpdateBindingInfoStub.wrappedMethod.apply(this, arguments);
+			oBindingInfo.path = "/MyPath";
+		});
+		this.oRebindSpy.resetHistory();
+		await this.oTable.rebind();
+		assert.equal(this.oRebindSpy.callCount, 1, "MyPath to /MyPath: Delegate#rebind call");
+
+		this.oRebindSpy.resetHistory();
+		await this.oTable.rebind();
+		assert.equal(this.oRebindSpy.callCount, 0, "/MyPath to /MyPath: Delegate#rebind call");
+
+		oUpdateBindingInfoStub.callsFake(function(oTable, oBindingInfo) {
+			oUpdateBindingInfoStub.wrappedMethod.apply(this, arguments);
+			oBindingInfo.path = "MyModel>/MyPath";
+		});
+		this.oRebindSpy.resetHistory();
+		await this.oTable.rebind();
+		// Model name must not change. We assume "MyModel" was previously set in BindingInfo.model, hence no rebind is needed.
+		assert.equal(this.oRebindSpy.callCount, 0, "/MyPath to MyModel>/MyPath: Delegate#rebind call");
+
+		oUpdateBindingInfoStub.callsFake(function(oTable, oBindingInfo) {
+			oUpdateBindingInfoStub.wrappedMethod.apply(this, arguments);
+			oBindingInfo.path = "MyModel>MyPath";
+		});
+		this.oRebindSpy.resetHistory();
+		await this.oTable.rebind();
+		assert.equal(this.oRebindSpy.callCount, 1, "MyModel>/MyPath to MyModel>MyPath: Delegate#rebind call");
+
+		this.oRebindSpy.resetHistory();
+		await this.oTable.rebind();
+		assert.equal(this.oRebindSpy.callCount, 0, "MyModel>MyPath to MyModel>MyPath: Delegate#rebind call");
+
+		oUpdateBindingInfoStub.callsFake(function(oTable, oBindingInfo) {
+			oUpdateBindingInfoStub.wrappedMethod.apply(this, arguments);
+			oBindingInfo.path = "MyModel>/MyPath";
+		});
+		this.oRebindSpy.resetHistory();
+		await this.oTable.rebind();
+		assert.equal(this.oRebindSpy.callCount, 1, "MyModel>MyPath to MyModel>/MyPath: Delegate#rebind call");
+
+		this.oRebindSpy.resetHistory();
+		await this.oTable.rebind();
+		assert.equal(this.oRebindSpy.callCount, 0, "MyModel>/MyPath to MyModel>/MyPath: Delegate#rebind call");
+
+		oUpdateBindingInfoStub.callsFake(function(oTable, oBindingInfo) {
+			oUpdateBindingInfoStub.wrappedMethod.apply(this, arguments);
+			oBindingInfo.path = "/MyPath";
+		});
+		this.oRebindSpy.resetHistory();
+		await this.oTable.rebind();
+		// Model name must not change. We assume "MyModel" is now set in BindingInfo.model, hence no rebind is needed.
+		assert.equal(this.oRebindSpy.callCount, 0, "MyModel>/MyPath to /MyPath: Delegate#rebind call");
+
 		oUpdateBindingInfoStub.restore();
 	});
 

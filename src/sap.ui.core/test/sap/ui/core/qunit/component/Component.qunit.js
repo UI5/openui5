@@ -2157,7 +2157,7 @@ sap.ui.define([
 
 			"sap.ui5": {
 				"dependencies": {
-					"minUI5Version": "1.71.0",
+					"minUI5Version": "2.0.0",
 					"libs": {
 						"sap.m": {
 							"minVersion": "1.72"

@@ -24,7 +24,7 @@
 	"sap.ui5": {
 		"componentName": "sap.ui.fl.qunit.integration.async.testComponentWithView",
 		"dependencies": {
-			"minUI5Version": "1.46",
+			"minUI5Version": "2.0.0",
 			"libs": {
 				"sap.m": {},
 				"sap.ui.core": {},

@@ -47,7 +47,7 @@ sap.ui.define(['sap/ui/core/UIComponent'],
 					},
 
 					"dependencies": {
-						"minUI5Version": "1.22.5",
+						"minUI5Version": "2.0.0",
 						"libs": {
 							"sap.ui.layout": {
 								"minVersion": "1.22.0"

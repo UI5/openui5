@@ -186,7 +186,12 @@ sap.ui.define([
 
 							if (xhr.status !== 204 && xhr.status !== 205) {
 								// mockservers using sinon servers have the response in responseText, not in response
-								if (!xhr.response && xhr.responseText) {
+								// responseText must only be accessed if the type is empty or text
+								if (
+									["", "text"].includes(xhr.responseType)
+									&& !xhr.response
+									&& xhr.responseText
+								) {
 									xhr.response = xhr.responseText;
 								}
 

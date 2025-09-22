@@ -25,7 +25,7 @@
 			"id": "UnitTable"
 		},
 		"dependencies": {
-			"minUI5Version": "1.122.1",
+			"minUI5Version": "2.0.0",
 			"libs": {
 				"sap.ui.core": {},
 				"sap.m": {}

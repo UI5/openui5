@@ -32,7 +32,7 @@
 			"id": "rootView"
 		},
 		"dependencies": {
-			"minUI5Version": "1.45",
+			"minUI5Version": "2.0.0",
 			"libs": {
 				"sap.m": {},
 				"sap.ui.layout": {}

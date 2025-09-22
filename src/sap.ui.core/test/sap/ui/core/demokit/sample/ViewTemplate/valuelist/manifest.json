@@ -43,7 +43,7 @@
 			}
 		},
 		"dependencies": {
-			"minUI5Version": "1.120",
+			"minUI5Version": "2.0.0",
 			"libs": {
 				"sap.m": {},
 				"sap.ui.core": {}
