@@ -257,6 +257,16 @@ sap.ui.define([
 			const sLocale = aFallbackChain.shift();
 			const sFileName = sLocale ? `interaction_${sLocale}.xml` : `interaction.xml`;
 			const sResource = sap.ui.require.toUrl(`${sLibrary.replace(/\./g, "/")}/i18n/${sFileName}`);
+			const sCacheKey = `${sLibrary}:${sLocale}`;
+
+			if (oInteractionXMLCache.has(sCacheKey)) {
+				const oCacheResult = oInteractionXMLCache.get(sCacheKey);
+				if (oCacheResult === null) {
+					Log.debug(`Skipping loading of previously failed interaction XML for library ${sLibrary}, locale ${sLocale}`);
+					continue;
+				}
+				return oCacheResult;
+			}
 
 			try {
 				const oResponse = await fetch(sResource);
@@ -273,6 +283,10 @@ sap.ui.define([
 					break;
 				}
 			} catch (error) {
+				// Cache the failed loading attempt if not already cached
+				if (!oInteractionXMLCache.has(sCacheKey)) {
+					oInteractionXMLCache.set(sCacheKey, null);
+				}
 				Log.error(`Error loading interaction XML for library ${sLibrary}:`, error);
 			}
 		}
@@ -492,7 +506,17 @@ sap.ui.define([
 			translateShortcut,
 			annotateAndTranslateKbdTags,
 			getInteractions,
-			getCommandInfosFor
+			getCommandInfosFor,
+			loadInteractionXMLFor,
+			hasCacheEntry: (sCacheKey) => {
+				return oInteractionXMLCache.has(sCacheKey);
+			},
+			getInteractionXMLFromCache: (sCacheKey) => {
+				return oInteractionXMLCache.get(sCacheKey);
+			},
+			clearCache: () => {
+				oInteractionXMLCache.clear();
+			}
 		}
 	};
 });
