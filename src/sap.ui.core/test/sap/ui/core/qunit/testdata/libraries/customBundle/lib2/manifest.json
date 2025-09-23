@@ -1,1 +1,39 @@
-{"_version":"1.45.0","sap.app":{"id":"testlibs.customBundle.lib2","type":"library"},"sap.ui5":{"dependencies":{"libs":{"sap.ui.core":{},"testlibs.customBundle.lib1":{}, "testlibs.customBundle.lib3":{}}},"library":{"css":false,"i18n":{"bundleUrl":"i18n/i18n.properties","supportedLocales":["en"],"fallbackLocale":"en"}}}}
+{
+	"_version": "2.0.0",
+	"sap.app": {
+		"id": "testlibs.customBundle.lib2",
+		"type": "library",
+		"title": "Library 'testlibs.customBundle.lib2'",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
+	},
+	"sap.ui": {
+		"technology": "UI5",
+		"deviceTypes": {
+			"desktop": true,
+			"tablet": true,
+			"phone": true
+		}
+	},
+	"sap.ui5": {
+		"dependencies": {
+			"libs": {
+				"sap.ui.core": {},
+				"testlibs.customBundle.lib1": {},
+				"testlibs.customBundle.lib3": {}
+			},
+			"minUI5Version": "2.0.0"
+		},
+		"library": {
+			"css": false,
+			"i18n": {
+				"bundleUrl": "i18n/i18n.properties",
+				"supportedLocales": [
+					"en"
+				],
+				"fallbackLocale": "en"
+			}
+		}
+	}
+}
