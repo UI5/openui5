@@ -285,5 +285,15 @@
         "text": " sap.f.SidePanel: side panel can be closed now"
       }
     ]
+  },
+  "1.120.36": {
+    "date": "September 2025",
+    "notes": [
+      {
+        "id": "dbc06652e241b9aacdb9738bddee75bed303d7a5",
+        "type": "FIX",
+        "text": " sap.f.FlexibleColumnLayout: prevent animation when initially shown"
+      }
+    ]
   }
 }
