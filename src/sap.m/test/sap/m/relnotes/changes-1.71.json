@@ -4008,5 +4008,15 @@
         "text": " sap.m ScrollContainer: unstable QUnit tests are now skipped"
       }
     ]
+  },
+  "1.71.73": {
+    "date": "September 2025",
+    "notes": [
+      {
+        "id": "3ba1c3fcfe485eadac8f93e5447e48f1afef68e0",
+        "type": "FIX",
+        "text": " We've now fixed the SAP gateway issues for PDFViewer"
+      }
+    ]
   }
 }

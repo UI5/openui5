@@ -351,5 +351,15 @@
         "text": " sap.uxap.ObjectPageLayout: Remove restrictions for text size"
       }
     ]
+  },
+  "1.71.73": {
+    "date": "September 2025",
+    "notes": [
+      {
+        "id": "e58cdbecf37119efaf7b888e75a4fbf08c7f73ea",
+        "type": "FIX",
+        "text": " sap.uxap.ObjectPageHeader: Improve responsive paddings"
+      }
+    ]
   }
 }
