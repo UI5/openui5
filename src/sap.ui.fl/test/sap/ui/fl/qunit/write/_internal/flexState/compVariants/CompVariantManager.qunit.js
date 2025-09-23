@@ -544,6 +544,7 @@ sap.ui.define([
 			var oWriteStub = sandbox.stub(Storage, "write").resolves();
 			var oUpdateStub = sandbox.stub(Storage, "update").resolves();
 			var oRemoveStub = sandbox.stub(Storage, "remove").resolves();
+			const oFlexStateUpdateStub = sandbox.stub(FlexState, "update").resolves();
 			// Preparation ends
 
 			await CompVariantManager.persist(mPropertyBag);
@@ -556,6 +557,7 @@ sap.ui.define([
 			assert.strictEqual(oWriteStub.callCount, 3, "then the write method was called 3 times,");
 			assert.strictEqual(oUpdateStub.callCount, 0, "no update was called");
 			assert.strictEqual(oRemoveStub.callCount, 0, "and no delete was called");
+			assert.strictEqual(oFlexStateUpdateStub.callCount, 0, "and flexState update was called once");
 
 			const aVariantChange = CompVariantManagementState.getVariantChanges(oVariant)[0];
 
@@ -597,6 +599,11 @@ sap.ui.define([
 			assert.strictEqual(oUpdateStub.callCount, 1, "one update was called");
 			assert.strictEqual(oRemoveStub.callCount, 2, "and two deletes were called");
 			assert.strictEqual(aCompVariants.length, 1, "the variant is cleared and only the standard variant is left");
+			assert.strictEqual(oFlexStateUpdateStub.callCount, 2, "and flexState update was called twice");
+			assert.strictEqual(oFlexStateUpdateStub.firstCall.args[0], sComponentId, "the first update call was for the correct reference");
+			assert.deepEqual(oFlexStateUpdateStub.firstCall.args[1], [{type: "delete", flexObject: oVariant.convertToFileContent()}], "the first update call was for the correct object");
+			assert.strictEqual(oFlexStateUpdateStub.secondCall.args[0], sComponentId, "the second update call was for the correct reference");
+			assert.deepEqual(oFlexStateUpdateStub.secondCall.args[1], [{type: "delete", flexObject: aSetDefaultChanges[0].convertToFileContent()}], "the second update call was for the correct object");
 			assert.strictEqual(
 				aVariantChange.getState(),
 				States.LifecycleState.PERSISTED,

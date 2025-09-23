@@ -129,19 +129,6 @@ sap.ui.define([
 		return oFileContent;
 	}
 
-	function removeFromArrayById(aObjectArray, sObjectId) {
-		for (let i = aObjectArray.length - 1; i >= 0; i--) {
-			// aObjectArray can come from either back end response or flex state
-			// In the first case, the fileName is a direct property of object
-			// In the second case, it can be obtained from getId() function
-			const sFileName = aObjectArray[i].fileName || (aObjectArray[i].getId() && aObjectArray[i].getId());
-			if ((sFileName || aObjectArray[i].getId()) === sObjectId) {
-				aObjectArray.splice(i, 1);
-				break;
-			}
-		}
-	}
-
 	async function deleteObjectAndRemoveFromStorage(oFlexObject, oStoredResponse, sParentVersion, sReference) {
 		var oFileContent = oFlexObject.convertToFileContent();
 		await Storage.remove({
@@ -156,11 +143,7 @@ sap.ui.define([
 			layer: oFileContent.layer
 		});
 
-		// update StorageResponse
-		removeFromArrayById(
-			getSubSection(oStoredResponse.changes.comp, oFlexObject),
-			oFileContent.fileName
-		);
+		FlexState.update(sReference, [{ type: "delete", flexObject: oFileContent }]);
 		FlexState.getFlexObjectsDataSelector().checkUpdate({ reference: sReference });
 		return oFileContent;
 	}
