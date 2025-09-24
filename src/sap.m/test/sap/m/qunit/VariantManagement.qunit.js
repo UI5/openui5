@@ -1513,6 +1513,428 @@ sap.ui.define([
 		assert.ok(this.oVM._handleManageSavePressed(), "expected no errors");
 	});
 
+	QUnit.module("VariantManagement _findNextFocusTargetAfterDelete", {
+		beforeEach: async function() {
+			this.oVM = new VariantManagement();
+			this.oVM.addItem(new VariantItem({
+				key: "1",
+				title: "Standard",
+				favorite: true,
+				remove: false
+			}));
+			this.oVM.addItem(new VariantItem({
+				key: "2",
+				title: "Item 2",
+				favorite: true,
+				remove: true
+			}));
+			this.oVM.addItem(new VariantItem({
+				key: "3",
+				title: "Item 3",
+				favorite: false,
+				remove: true
+			}));
+			this.oVM.addItem(new VariantItem({
+				key: "4",
+				title: "Item 4",
+				favorite: true,
+				remove: true
+			}));
+			this.oVM.placeAt("qunit-fixture");
+			await nextUIUpdate();
+		},
+		afterEach: function() {
+			this.oVM.destroy();
+		}
+	});
+
+	QUnit.test("no management table returns cancel button", function(assert) {
+		// Test when no management table exists
+		var oVariantItem = this.oVM.getItemByKey("2");
+		var oResult = this.oVM._findNextFocusTargetAfterDelete(oVariantItem);
+
+		assert.strictEqual(oResult, this.oVM.oManagementCancel, "Should return cancel button when no management table exists");
+	});
+
+	QUnit.test("no variant item returns cancel button", function(assert) {
+		const done = assert.async();
+
+		// Open management dialog to create the table
+		const fOriginalManageCall = this.oVM._openManagementDialog.bind(this.oVM);
+		sinon.stub(this.oVM, "_openManagementDialog").callsFake(function() {
+			fOriginalManageCall();
+
+			// Test with null variant item
+			let oResult = this.oVM._findNextFocusTargetAfterDelete(null);
+			assert.strictEqual(oResult, this.oVM.oManagementCancel, "Should return cancel button when variant item is null");
+
+			// Test with undefined variant item
+			oResult = this.oVM._findNextFocusTargetAfterDelete(undefined);
+			assert.strictEqual(oResult, this.oVM.oManagementCancel, "Should return cancel button when variant item is undefined");
+
+			done();
+		}.bind(this));
+
+		const fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
+		sinon.stub(this.oVM, "_openVariantList").callsFake(function() {
+			fOriginalCall();
+			const oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
+			QUnitUtils.triggerTouchEvent("tap", oTarget, {
+				srcControl: null
+			});
+		}.bind(this));
+
+		this.oVM.onclick();
+	});
+
+	QUnit.test("variant not found returns cancel button", function(assert) {
+		const done = assert.async();
+
+		const fOriginalManageCall = this.oVM._openManagementDialog.bind(this.oVM);
+		sinon.stub(this.oVM, "_openManagementDialog").callsFake(function() {
+			fOriginalManageCall();
+
+			// Create a mock variant item that doesn't exist in the table
+			const oMockVariantItem = {
+				getKey: function() { return "nonexistent"; }
+			};
+
+			const oResult = this.oVM._findNextFocusTargetAfterDelete(oMockVariantItem);
+			assert.strictEqual(oResult, this.oVM.oManagementCancel, "Should return cancel button when variant item is not found in table");
+
+			done();
+		}.bind(this));
+
+		const fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
+		sinon.stub(this.oVM, "_openVariantList").callsFake(function() {
+			fOriginalCall();
+			const oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
+			QUnitUtils.triggerTouchEvent("tap", oTarget, {
+				srcControl: null
+			});
+		}.bind(this));
+
+		this.oVM.onclick();
+	});
+
+	QUnit.test("returns next visible row", function(assert) {
+		const done = assert.async();
+
+		const fOriginalManageCall = this.oVM._openManagementDialog.bind(this.oVM);
+		sinon.stub(this.oVM, "_openManagementDialog").callsFake(function() {
+			fOriginalManageCall();
+
+			// Test deleting item "2", should return the row for item "3"
+			const oVariantItem2 = this.oVM.getItemByKey("2");
+			const oResult = this.oVM._findNextFocusTargetAfterDelete(oVariantItem2);
+
+			assert.ok(oResult, "Should return a result");
+			assert.ok(oResult.isA && oResult.isA("sap.m.ColumnListItem"), "Should return a ColumnListItem (table row)");
+
+			// Verify it's the correct row by checking the binding context
+			const oResultBindingContext = oResult.getBindingContext("$mVariants");
+			assert.ok(oResultBindingContext, "Result should have a binding context");
+
+			const oResultRowItem = oResultBindingContext.getObject();
+			assert.strictEqual(oResultRowItem.getKey(), "3", "Should return the row for item '3'");
+
+			done();
+		}.bind(this));
+
+		const fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
+		sinon.stub(this.oVM, "_openVariantList").callsFake(function() {
+			fOriginalCall();
+			const oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
+			QUnitUtils.triggerTouchEvent("tap", oTarget, {
+				srcControl: null
+			});
+		}.bind(this));
+
+		this.oVM.onclick();
+	});
+
+	QUnit.test("returns previous row when no next row", function(assert) {
+		var done = assert.async();
+
+		var fOriginalManageCall = this.oVM._openManagementDialog.bind(this.oVM);
+		sinon.stub(this.oVM, "_openManagementDialog").callsFake(function() {
+			fOriginalManageCall();
+
+			// Test deleting the last item "4", should return the previous row for item "3"
+			var oVariantItem4 = this.oVM.getItemByKey("4");
+			var oResult = this.oVM._findNextFocusTargetAfterDelete(oVariantItem4);
+
+			assert.ok(oResult, "Should return a result");
+			assert.ok(oResult.isA && oResult.isA("sap.m.ColumnListItem"), "Should return a ColumnListItem (table row)");
+
+			var oResultBindingContext = oResult.getBindingContext("$mVariants");
+			assert.ok(oResultBindingContext, "Result should have a binding context");
+
+			var oResultRowItem = oResultBindingContext.getObject();
+			assert.strictEqual(oResultRowItem.getKey(), "3", "Should return the previous row for item '3' when no next row available");
+
+			done();
+		}.bind(this));
+
+		var fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
+		sinon.stub(this.oVM, "_openVariantList").callsFake(function() {
+			fOriginalCall();
+			var oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
+			QUnitUtils.triggerTouchEvent("tap", oTarget, {
+				srcControl: null
+			});
+		}.bind(this));
+
+		this.oVM.onclick();
+	});
+
+	QUnit.test("returns previous row when next row is invisible", function(assert) {
+		var done = assert.async();
+
+		var fOriginalManageCall = this.oVM._openManagementDialog.bind(this.oVM);
+		sinon.stub(this.oVM, "_openManagementDialog").callsFake(function() {
+			fOriginalManageCall();
+
+			// Hide the last row (item 4) to simulate no next visible row
+			var aTableItems = this.oVM.oManagementTable.getItems();
+			var oRowToHide = null;
+
+			for (var i = 0; i < aTableItems.length; i++) {
+				var oRow = aTableItems[i];
+				var oBindingContext = oRow.getBindingContext("$mVariants");
+				if (oBindingContext) {
+					var oRowItem = oBindingContext.getObject();
+					if (oRowItem && oRowItem.getKey() === "4") {
+						oRowToHide = oRow;
+						break;
+					}
+				}
+			}
+
+			if (oRowToHide) {
+				oRowToHide.setVisible(false);
+			}
+
+			// Test deleting item "3", should return previous row for item "2" since next row is hidden
+			var oVariantItem3 = this.oVM.getItemByKey("3");
+			var oResult = this.oVM._findNextFocusTargetAfterDelete(oVariantItem3);
+
+			assert.ok(oResult, "Should return a result");
+			assert.ok(oResult.isA && oResult.isA("sap.m.ColumnListItem"), "Should return a ColumnListItem (table row)");
+
+			var oResultBindingContext = oResult.getBindingContext("$mVariants");
+			assert.ok(oResultBindingContext, "Result should have a binding context");
+
+			var oResultRowItem = oResultBindingContext.getObject();
+			assert.strictEqual(oResultRowItem.getKey(), "2", "Should return the previous row for item '2' when next row is hidden");
+
+			done();
+		}.bind(this));
+
+		var fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
+		sinon.stub(this.oVM, "_openVariantList").callsFake(function() {
+			fOriginalCall();
+			var oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
+			QUnitUtils.triggerTouchEvent("tap", oTarget, {
+				srcControl: null
+			});
+		}.bind(this));
+
+		this.oVM.onclick();
+	});
+
+	QUnit.test("returns cancel button when only one item", function(assert) {
+		var done = assert.async();
+
+		// Remove all items except one to test the edge case
+		this.oVM.removeItem(this.oVM.getItemByKey("2"));
+		this.oVM.removeItem(this.oVM.getItemByKey("3"));
+		this.oVM.removeItem(this.oVM.getItemByKey("4"));
+
+		var fOriginalManageCall = this.oVM._openManagementDialog.bind(this.oVM);
+		sinon.stub(this.oVM, "_openManagementDialog").callsFake(function() {
+			fOriginalManageCall();
+
+			// Test deleting the only remaining item "1", should return cancel button
+			var oVariantItem1 = this.oVM.getItemByKey("1");
+			var oResult = this.oVM._findNextFocusTargetAfterDelete(oVariantItem1);
+
+			assert.strictEqual(oResult, this.oVM.oManagementCancel, "Should return cancel button when deleting the only remaining item");
+
+			done();
+		}.bind(this));
+
+		var fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
+		sinon.stub(this.oVM, "_openVariantList").callsFake(function() {
+			fOriginalCall();
+			var oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
+			QUnitUtils.triggerTouchEvent("tap", oTarget, {
+				srcControl: null
+			});
+		}.bind(this));
+
+		this.oVM.onclick();
+	});
+
+	QUnit.test("skips invisible previous rows", function(assert) {
+		var done = assert.async();
+
+		var fOriginalManageCall = this.oVM._openManagementDialog.bind(this.oVM);
+		sinon.stub(this.oVM, "_openManagementDialog").callsFake(function() {
+			fOriginalManageCall();
+
+			// Hide both the next row (item 4) and immediate previous row (item 2)
+			var aTableItems = this.oVM.oManagementTable.getItems();
+
+			for (var i = 0; i < aTableItems.length; i++) {
+				var oRow = aTableItems[i];
+				var oBindingContext = oRow.getBindingContext("$mVariants");
+				if (oBindingContext) {
+					var oRowItem = oBindingContext.getObject();
+					if (oRowItem && (oRowItem.getKey() === "2" || oRowItem.getKey() === "4")) {
+						oRow.setVisible(false);
+					}
+				}
+			}
+
+			// Test deleting item "3", should skip hidden item "2" and return item "1"
+			var oVariantItem3 = this.oVM.getItemByKey("3");
+			var oResult = this.oVM._findNextFocusTargetAfterDelete(oVariantItem3);
+
+			assert.ok(oResult, "Should return a result");
+			assert.ok(oResult.isA && oResult.isA("sap.m.ColumnListItem"), "Should return a ColumnListItem (table row)");
+
+			var oResultBindingContext = oResult.getBindingContext("$mVariants");
+			assert.ok(oResultBindingContext, "Result should have a binding context");
+
+			var oResultRowItem = oResultBindingContext.getObject();
+			assert.strictEqual(oResultRowItem.getKey(), "1", "Should skip invisible previous row and return the next available previous row for item '1'");
+
+			done();
+		}.bind(this));
+
+		var fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
+		sinon.stub(this.oVM, "_openVariantList").callsFake(function() {
+			fOriginalCall();
+			var oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
+			QUnitUtils.triggerTouchEvent("tap", oTarget, {
+				srcControl: null
+			});
+		}.bind(this));
+
+		this.oVM.onclick();
+	});
+
+	QUnit.test("handles invisible rows", function(assert) {
+		var done = assert.async();
+
+		var fOriginalManageCall = this.oVM._openManagementDialog.bind(this.oVM);
+		sinon.stub(this.oVM, "_openManagementDialog").callsFake(function() {
+			fOriginalManageCall();
+
+			// Hide the next row (item 3) to test skipping invisible rows
+			var aTableItems = this.oVM.oManagementTable.getItems();
+			var oRowToHide = null;
+
+			for (var i = 0; i < aTableItems.length; i++) {
+				var oRow = aTableItems[i];
+				var oBindingContext = oRow.getBindingContext("$mVariants");
+				if (oBindingContext) {
+					var oRowItem = oBindingContext.getObject();
+					if (oRowItem && oRowItem.getKey() === "3") {
+						oRowToHide = oRow;
+						break;
+					}
+				}
+			}
+
+			if (oRowToHide) {
+				oRowToHide.setVisible(false);
+			}
+
+			// Test deleting item "2", should skip invisible item "3" and return item "4"
+			var oVariantItem2 = this.oVM.getItemByKey("2");
+			var oResult = this.oVM._findNextFocusTargetAfterDelete(oVariantItem2);
+
+			assert.ok(oResult, "Should return a result");
+			assert.ok(oResult.isA && oResult.isA("sap.m.ColumnListItem"), "Should return a ColumnListItem (table row)");
+
+			var oResultBindingContext = oResult.getBindingContext("$mVariants");
+			assert.ok(oResultBindingContext, "Result should have a binding context");
+
+			var oResultRowItem = oResultBindingContext.getObject();
+			assert.strictEqual(oResultRowItem.getKey(), "4", "Should skip invisible row and return the row for item '4'");
+
+			done();
+		}.bind(this));
+
+		var fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
+		sinon.stub(this.oVM, "_openVariantList").callsFake(function() {
+			fOriginalCall();
+			var oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
+			QUnitUtils.triggerTouchEvent("tap", oTarget, {
+				srcControl: null
+			});
+		}.bind(this));
+
+		this.oVM.onclick();
+	});
+
+	QUnit.test("handles row without binding context", function(assert) {
+		var done = assert.async();
+
+		var fOriginalManageCall = this.oVM._openManagementDialog.bind(this.oVM);
+		sinon.stub(this.oVM, "_openManagementDialog").callsFake(function() {
+			fOriginalManageCall();
+
+			// Find the row for item "3" and stub its getBindingContext to return null
+			var aTableItems = this.oVM.oManagementTable.getItems();
+			var oRowToStub = null;
+
+			for (var i = 0; i < aTableItems.length; i++) {
+				var oRow = aTableItems[i];
+				var oBindingContext = oRow.getBindingContext("$mVariants");
+				if (oBindingContext) {
+					var oRowItem = oBindingContext.getObject();
+					if (oRowItem && oRowItem.getKey() === "3") {
+						oRowToStub = oRow;
+						break;
+					}
+				}
+			}
+
+			if (oRowToStub) {
+				sinon.stub(oRowToStub, "getBindingContext").returns(null);
+			}
+
+			// Test deleting item "2", should skip item "3" (no binding context) and return item "4"
+			var oVariantItem2 = this.oVM.getItemByKey("2");
+			var oResult = this.oVM._findNextFocusTargetAfterDelete(oVariantItem2);
+
+			assert.ok(oResult, "Should return a result");
+			assert.ok(oResult.isA && oResult.isA("sap.m.ColumnListItem"), "Should return a ColumnListItem (table row)");
+
+			var oResultBindingContext = oResult.getBindingContext("$mVariants");
+			assert.ok(oResultBindingContext, "Result should have a binding context");
+
+			var oResultRowItem = oResultBindingContext.getObject();
+			assert.strictEqual(oResultRowItem.getKey(), "4", "Should skip row without binding context and return the row for item '4'");
+
+			done();
+		}.bind(this));
+
+		var fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
+		sinon.stub(this.oVM, "_openVariantList").callsFake(function() {
+			fOriginalCall();
+			var oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
+			QUnitUtils.triggerTouchEvent("tap", oTarget, {
+				srcControl: null
+			});
+		}.bind(this));
+
+		this.oVM.onclick();
+	});
+
 	QUnit.module("VariantManagement Roles handling", {
 		beforeEach: async function() {
 			this.oVM = new VariantManagement();

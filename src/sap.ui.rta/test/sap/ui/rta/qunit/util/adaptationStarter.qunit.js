@@ -263,7 +263,7 @@ sap.ui.define([
 				assert.strictEqual(this.oLogStub.lastCall.args[0],
 					"UI Adaptation could not be started", "the generic part is correct");
 				assert.strictEqual(
-					this.oLogStub.lastCall.args[1],
+					this.oLogStub.lastCall.args[1].message,
 					"You do not have key user permissions. Please contact your administrator.",
 					"the specific part is correct"
 				);
@@ -295,7 +295,7 @@ sap.ui.define([
 				assert.strictEqual(this.fnMessageBoxStub.callCount, 1, "a message box is displayed with the error");
 				assert.strictEqual(this.oLogStub.lastCall.args[0],
 					"UI Adaptation could not be started", "the generic part is correct");
-				assert.strictEqual(this.oLogStub.lastCall.args[1],
+				assert.strictEqual(this.oLogStub.lastCall.args[1].message,
 					"This app is not enabled for key user adaptation", "the specific part is correct");
 				assert.ok(oError instanceof Error, "then promise was rejected with an error");
 				assert.strictEqual(oError.reason, "flexEnabled", "the reason is properly set");
@@ -353,7 +353,7 @@ sap.ui.define([
 				), "the specific message part is correct");
 				assert.strictEqual(this.oLogStub.lastCall.args[0],
 					"UI Adaptation could not be started", "the generic part is correct");
-				assert.strictEqual(this.oLogStub.lastCall.args[1],
+				assert.strictEqual(this.oLogStub.lastCall.args[1].message,
 					"An invalid root control was passed", "the specific part is correct");
 				assert.ok(oError instanceof Error, "then promise was rejected with an error");
 				assert.strictEqual(oError.reason, "rootControl", "the reason is properly set");
@@ -423,7 +423,7 @@ sap.ui.define([
 				assert.strictEqual(this.oLogStub.lastCall.args[0],
 					"UI Adaptation could not be started", "the generic part of the error in the log is correct");
 				assert.strictEqual(
-					this.oLogStub.lastCall.args[1],
+					this.oLogStub.lastCall.args[1].message,
 					sExpectedError,
 					"the specific part of the error in the log is correct"
 				);

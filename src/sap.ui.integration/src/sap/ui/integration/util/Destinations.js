@@ -268,6 +268,9 @@ sap.ui.define([
 
 		return this.getUrl(sKey)
 			.then(function (sUrl) {
+				if (sUrl === undefined || sUrl === null) {
+					return Promise.reject("Destination '" + sKey + "' was resolved by the host with 'undefined' or 'null'.");
+				}
 				return this._replaceUrl(sString, sKey, sUrl);
 			}.bind(this));
 	};
@@ -276,6 +279,7 @@ sap.ui.define([
 	 * @private
 	 */
 	Destinations.prototype._replaceUrl = function (sString, sKey, sUrl) {
+
 		const sSanitizedUrl = sUrl.trim().replace(/\/$/, ""); // remove any trailing spaces and slashes
 
 		if (this._sPrefix === "destinations") {

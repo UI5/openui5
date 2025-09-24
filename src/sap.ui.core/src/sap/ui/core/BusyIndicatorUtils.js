@@ -23,7 +23,7 @@ var BusyIndicatorSize = coreLibrary.BusyIndicatorSize;
 
 /**
  * Returns the HTML content for the busy indicator
- * styling + animation: LocalBusyIndicator.less
+ * styling + animation: BusyIndicator.less
  *
  * @param {string} sSize either "Large", "Medium" or "Section". Other sizes will be mapped to "Medium"
  * @returns {Element} the element for the busy indicator

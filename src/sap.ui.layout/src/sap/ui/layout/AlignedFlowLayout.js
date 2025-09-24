@@ -389,8 +389,8 @@ sap.ui.define([
 			var sEndItemWidth = iEndItemWidth + "px";
 			mLastSpacerStyle.width = sEndItemWidth;
 			mLastSpacerStyle.minWidth = sEndItemWidth;
-			mLastSpacerStyle.marginLeft = iEndItemMarginLeft + "px";
-			mLastSpacerStyle.marginRight = iEndItemMarginRight + "px";
+			mLastSpacerStyle.marginLeft = Math.abs(iEndItemMarginLeft) + "px";
+			mLastSpacerStyle.marginRight = Math.abs(iEndItemMarginRight) + "px";
 			this.toggleDisplayOfSpacers(oDomRef);
 		};
 
