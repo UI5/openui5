@@ -18485,6 +18485,48 @@ sap.ui.define([
 });
 
 	//*********************************************************************************************
+	// Scenario: Display the $count of a "manually expanded" collection-valued navigation property
+	// in a list. This worked even before JIRA: CPOUI5ODATAV4-1002. Make sure the request does not
+	// change in an incompatible way.
+	// SNOW: DINC0641817
+[
+	"'TEAM_2_EMPLOYEES'",
+	"{TEAM_2_EMPLOYEES : {}}",
+	"{TEAM_2_EMPLOYEES : null}",
+	"{TEAM_2_EMPLOYEES : true}"
+].forEach((sExpand) => {
+	const sTitle = "before CPOUI5ODATAV4-1002, SNOW: DINC0641817, $expand : " + sExpand;
+
+	QUnit.test(sTitle, function (assert) {
+		const oModel = this.createTeaBusiModel({autoExpandSelect : true});
+		const sView = `
+<Table id="table" items="{
+			path : '/TEAMS',
+			parameters : {$expand : ${sExpand}}
+		}">
+	<Text id="id" text="{Team_Id}"/>
+	<Text id="count" text="{TEAM_2_EMPLOYEES/$count}"/>
+</Table>`;
+		this.expectRequest("TEAMS?$expand=TEAM_2_EMPLOYEES&$select=Team_Id&$skip=0&$top=100", {
+				value : [{
+					Team_Id : "TEAM_00",
+					TEAM_2_EMPLOYEES : [{}]
+				}, {
+					Team_Id : "TEAM_01",
+					TEAM_2_EMPLOYEES : []
+				}, {
+					Team_Id : "TEAM_02",
+					TEAM_2_EMPLOYEES : [{}, {}, {}]
+				}]
+			})
+			.expectChange("id", ["TEAM_00", "TEAM_01", "TEAM_02"])
+			.expectChange("count", ["1", "0", "3"]);
+
+		return this.createView(assert, sView, oModel);
+	});
+});
+
+	//*********************************************************************************************
 	// Scenario: Display the $count of a collection-valued navigation property in a list. Opt-in to
 	// new request with $count inside $expand.
 	// JIRA: CPOUI5ODATAV4-1002

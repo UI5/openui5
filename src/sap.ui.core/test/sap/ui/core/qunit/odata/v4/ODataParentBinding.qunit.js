@@ -961,6 +961,24 @@ sap.ui.define([
 			"@$ui5.$count" : true
 		},
 		reducedChildMetaPath : "foo/$count" // JIRA: CPOUI5ODATAV4-1002
+	}, {
+		canMergeQueryOptions : true,
+		hasChildQueryOptions : false, // no #aggregateQueryOptions, early return instead
+		initial : false,
+		isCount : true,
+		localQueryOptions : { // SNOW: DINC0641817
+			$expand : {
+				// Note: think "foo/$count" instead of "childPath" here ;-)
+				ch : {}
+			}
+		},
+		metadata : {
+			$kind : "Property",
+			// $Type : "Edm.Int64",
+			"@$ui5.$count" : true
+		},
+		reducedChildMetaPath : "foo/$count", // JIRA: CPOUI5ODATAV4-1002
+		sayYes : true
 	}].forEach(function (oFixture, i) {
 		[true, false].forEach(function (bCacheCreationPending) {
 			QUnit.test("fetchIfChildCanUseCache, multiple calls aggregate query options, "
@@ -1000,7 +1018,7 @@ sap.ui.define([
 							}
 						},
 						oHelperMock = this.mock(_Helper),
-						mLocalQueryOptions = {},
+						mLocalQueryOptions = oFixture.localQueryOptions ?? {},
 						oModelMock = this.mock(oBinding.oModel),
 						oPromise,
 						sReducedChildMetaPath = oFixture.reducedChildMetaPath
@@ -1067,6 +1085,7 @@ sap.ui.define([
 					return Promise.all([oPromise, oBinding.oCachePromise]).then(function (aResult) {
 						assert.strictEqual(aResult[0],
 							oFixture.hasChildQueryOptions && oFixture.canMergeQueryOptions
+								|| oFixture.sayYes
 								? "/reduced/child/path"
 								: undefined);
 						assert.strictEqual(oBinding.mAggregatedQueryOptions,

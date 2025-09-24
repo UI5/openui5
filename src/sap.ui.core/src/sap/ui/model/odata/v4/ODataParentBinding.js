@@ -890,7 +890,10 @@ sap.ui.define([
 			}
 
 			if (oProperty?.["@$ui5.$count"]
-					&& oContext !== oContext.getBinding().getHeaderContext?.()) {
+					&& oContext !== oContext.getBinding().getHeaderContext?.()
+					// avoid new $count handling in case of "manual" $expand
+					// Note: sChildPath.slice(0, -7) is the navigation property name
+					&& !mLocalQueryOptions.$expand?.[sChildPath.slice(0, -7)]) {
 				mCountQueryOptions = {
 					$expand : {
 						[sChildPath.slice(0, -7)] : {$count : true, $top : 0}
