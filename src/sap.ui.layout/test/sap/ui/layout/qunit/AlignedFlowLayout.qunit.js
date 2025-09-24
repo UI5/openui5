@@ -112,6 +112,19 @@ sap.ui.define([
 		}
 	});
 
+	function updateDomStyle(oNode, oChanges, sQuery) {
+		var aTargets = sQuery ? oNode.querySelectorAll(sQuery) : oNode;
+		aTargets.forEach(function (oTargetNode) {
+			Object.keys(oChanges).forEach(function (sStyle) {
+				if (typeof oChanges[sStyle] === 'function') {
+					oTargetNode.style[sStyle] = oChanges[sStyle](oTargetNode.style[sStyle]);
+					return;
+				}
+				oTargetNode.style[sStyle] = oChanges[sStyle];
+			});
+		});
+	}
+
 	QUnit.module("", {
 		beforeEach: async function(assert) {
 
@@ -1399,6 +1412,58 @@ sap.ui.define([
 		}.bind(this));
 	});
 
+	// SNOW: DINC0609071
+	QUnit.test("it should wrap the items onto multiple lines and the end item should not overlap other items even when negative margins are used", async function(assert) {
+		// Note: This is simulating the style changes that are applied in the MDC FilterBar.
+		// MDC adds additional negative margins and has an end content, that is differently sized than the main content (e.g. fields have 200px, end content has 100px)
+		// In those cases, it seemed like the calculation for the spacers is not ideal, as it does not account for those negative margins.
+
+		const done = assert.async();
+
+		// system under test
+		const oInput1 = new Input(),
+			oInput2 = new Input(),
+			oInput3 = new Input();
+		const iButtonWidth = 100;
+		const oButton = new Button({
+			width: iButtonWidth + "px"
+		});
+
+		// arrange
+		this.oContentDomRef.style.width = "1024px";
+		this.oAlignedFlowLayout.setMinItemWidth("12rem");
+		this.oAlignedFlowLayout.setMaxItemWidth("24rem");
+		this.oAlignedFlowLayout.addContent(oInput1);
+		this.oAlignedFlowLayout.addContent(oInput2);
+		this.oAlignedFlowLayout.addContent(oInput3);
+		this.oAlignedFlowLayout.addEndContent(oButton);
+		this.oAlignedFlowLayout.placeAt(CONTENT_ID);
+		await nextUIUpdate();
+
+		this.oAlignedFlowLayout.getDomRef().style["margin-left"] = "-0.5rem";
+		this.oAlignedFlowLayout.getDomRef().style["margin-right"] = "0.5rem";
+		updateDomStyle(this.oAlignedFlowLayout.getDomRef(), { marginLeft: "0.25rem", marginRight: "0.25rem", paddingLeft: "0.25rem", paddingRight: "0.25rem" }, ".sapUiAFLayoutItem, .sapUiAFLayoutEnd");
+		updateDomStyle(this.oAlignedFlowLayout.getDomRef(), { marginLeft: "-0.25rem" }, ".sapUiAFLayoutEnd");
+
+		const iLayoutWidth = 620;
+		this.oContentDomRef.style.width = iLayoutWidth + "px";
+
+		// wait some time until the browser layout finished
+		setTimeout(fnAfterResize.bind(this), 200);
+
+		const iButtonSize = 302; // 620 / 2 (two column layout) = 310. 310 - 8 (0.5rem margin) = 302
+		function fnAfterResize() {
+			// assert
+			assert.strictEqual(this.oAlignedFlowLayout.checkItemsWrapping(), true);
+			assert.strictEqual(oInput1.getDomRef().parentElement.offsetWidth, iButtonSize);
+			assert.strictEqual(oInput2.getDomRef().parentElement.offsetWidth, iButtonSize);
+			assert.strictEqual(oInput3.getDomRef().parentElement.offsetWidth, iButtonSize);
+			assert.strictEqual(oButton.getDomRef().parentElement.offsetWidth, 108);
+			assert.notOk(this.oAlignedFlowLayout.getDomRef().classList.contains(this.CSS_CLASS_ONE_LINE));
+			done();
+		}
+	});
+
 	QUnit.test("it should wrap the items onto multiple lines and the end item should not overlap other items", async function(assert) {
 		var done = assert.async();
 
@@ -1518,19 +1583,6 @@ sap.ui.define([
 		assert.ok(true);
 	});
 
-	function updateDomStyle(oNode, oChanges, sQuery) {
-		var aTargets = sQuery ? oNode.querySelectorAll(sQuery) : oNode;
-		aTargets.forEach(function (oTargetNode) {
-			Object.keys(oChanges).forEach(function (sStyle) {
-				if (typeof oChanges[sStyle] === 'function') {
-					oTargetNode.style[sStyle] = oChanges[sStyle](oTargetNode.style[sStyle]);
-					return;
-				}
-				oTargetNode.style[sStyle] = oChanges[sStyle];
-			});
-		});
-	}
-
 	var fnIncreaseValue = function (sValue) {
 		return ((sValue ? parseInt(sValue) : 0) + 1) + "px";
 	};
@@ -1588,7 +1640,6 @@ sap.ui.define([
 			}.bind(this));
 		}.bind(this), Promise.resolve());
 	});
-
 
 	QUnit.module("suspend", {
 		beforeEach: async function(assert) {

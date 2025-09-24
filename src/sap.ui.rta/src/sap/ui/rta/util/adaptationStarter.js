@@ -158,7 +158,7 @@ sap.ui.define([
 						"error"
 					);
 				}
-				Log.error("UI Adaptation could not be started", vError.message);
+				Log.error("UI Adaptation could not be started", vError);
 			}
 			throw vError;
 		}

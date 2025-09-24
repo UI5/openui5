@@ -557,7 +557,7 @@ sap.ui.define([
 				this._sStatus = FAILED;
 				this.fireFailed({vError: vError.message});
 			}
-			throw Error(vError.message);
+			throw vError;
 		}
 	};
 

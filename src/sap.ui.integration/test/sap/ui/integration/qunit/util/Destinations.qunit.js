@@ -189,6 +189,43 @@ sap.ui.define([
 			}
 		};
 
+		var oManifestUndefinedUrl = {
+			"sap.app": {
+				"id": "card.explorer.actions.list.card",
+				"type": "card"
+			},
+			"sap.card": {
+				"type": "List",
+				"configuration": {
+					"destinations": {
+						"myDest": {
+							"name": "otherDest",
+							"defaultUrl": ""
+						}
+					}
+				},
+				"header": {
+					"title": "Request to destination"
+				},
+				"content": {
+					"data": {
+						"request": {
+							"url": "{{destinations.myDest}}/Products",
+							"method": "GET",
+							"parameters": {
+								"$format": "json"
+							}
+						},
+						"path": "/value"
+					},
+					"item": {
+						"title": "{ProductName}",
+						"description": "Click to show child card"
+					}
+				}
+			}
+		};
+
 		async function checkValidDestinations(assert) {
 			this.oCard.placeAt(DOM_RENDER_LOCATION);
 
@@ -986,6 +1023,51 @@ sap.ui.define([
 			// Assert
 			assert.strictEqual(oChildCard.getCardContent().getInnerList().getItems().length, 77, "All items are loaded in the child card.");
 			assert.ok(oLogSpy.notCalled, "No error is logged for the child card destinations.");
+		});
+
+		QUnit.module("Default Url", {
+
+			beforeEach: function () {
+				const resolveCardDestination = () => {
+					return new Promise((resolve, reject) => {
+						reject("ERROR");
+					});
+				};
+
+				const _unresolvedDestinations = () => {
+					// returns nothing
+				};
+				this.oHost = new Host({
+					resolveDestination: (sDestinationName) => {
+						return resolveCardDestination().catch((sReason) => {
+							_unresolvedDestinations();
+						});
+					}
+				});
+
+				this.oCard = new Card({
+					manifest: oManifestUndefinedUrl,
+					host: this.oHost
+				});
+			},
+			afterEach: function () {
+				this.oCard.destroy();
+				this.oCard = null;
+				this.oHost.destroy();
+				this.oHost = null;
+			}
+		});
+		QUnit.test("Undefined default url", async function (assert) {
+			// Arrange
+			const logSpy = this.spy(Log, "error");
+
+			// Act
+			this.oCard.placeAt(DOM_RENDER_LOCATION);
+			await nextCardReadyEvent(this.oCard);
+
+			// Assert
+			assert.ok(logSpy.calledWith("Destination 'myDest' was resolved by the host with 'undefined' or 'null'."));
+			assert.strictEqual(this.oCard._oCardManifest.getJson()["sap.card"].content.data.request.url, "", "The url is set to empty string");
 		});
 	}
 );

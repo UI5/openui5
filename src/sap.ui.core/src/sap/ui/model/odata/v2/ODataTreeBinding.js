@@ -826,6 +826,10 @@ sap.ui.define([
 			aParams.push(sFilterParams);
 		}
 
+		if (this.sCustomParams) {
+			aParams.push(this.sCustomParams);
+		}
+
 		// Only send request, if path is defined
 		if (sAbsolutePath) {
 			sGroupId = this.sRefreshGroupId ? this.sRefreshGroupId : this.sGroupId;

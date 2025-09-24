@@ -1127,9 +1127,11 @@ sap.ui.define([
 					if (this.bPopoverOpen) {
 						setTimeout(function() {
 							this.bPopoverOpen = false;
-							this.oVariantPopoverTrigger?.$().attr("aria-expanded", "false");
 						}.bind(this), 200);
 					}
+				}.bind(this),
+				beforeClose: function() {
+					this.oVariantPopoverTrigger?.$().attr("aria-expanded", "false");
 				}.bind(this),
 				contentHeight: "300px"
 			});
@@ -1341,9 +1343,11 @@ sap.ui.define([
 				if (this.bPopoverOpen) {
 					setTimeout(function() {
 						this.bPopoverOpen = false;
-						this.oVariantPopoverTrigger.$().attr("aria-expanded", "false");
 					}.bind(this), 200);
 				}
+			}.bind(this),
+			beforeClose: function() {
+				this.oVariantPopoverTrigger?.$().attr("aria-expanded", "false");
 			}.bind(this),
 			contentHeight: "300px"
 		});
@@ -2572,7 +2576,6 @@ sap.ui.define([
 		}
 	};
 
-
 	VariantManagement.prototype._handleManageDeletePressed = function(oItem) {
 		var sKey = oItem.getKey();
 
@@ -2580,6 +2583,8 @@ sap.ui.define([
 		if (!oItem.getRemove()) {
 			return;
 		}
+
+		const oNextFocusTarget = this._findNextFocusTargetAfterDelete(oItem);
 
 		this._addDeletedItem(oItem);
 
@@ -2602,10 +2607,73 @@ sap.ui.define([
 			oListItem.setVisible(false);
 		}
 
-		//this.oManagementTable.getBinding("items").filter(this._getVisibleFilter());
-
-		this.oManagementCancel.focus();
+		if (oNextFocusTarget) {
+			oNextFocusTarget.focus();
+		}
 	};
+
+	VariantManagement.prototype._findNextFocusTargetAfterDelete = function(oVariantItem) {
+		if (!this.oManagementTable || !oVariantItem) {
+			return this.oManagementCancel;
+		}
+
+		// Get all visible table items
+		const aTableItems = this.oManagementTable.getItems();
+		const sCurrentKey = oVariantItem.getKey();
+		let nCurrentIndex = -1;
+
+		// Find the current row index based on the variant item key
+		for (let i = 0; i < aTableItems.length; i++) {
+			const oRow = aTableItems[i];
+			if (oRow.getVisible()) {
+				const oBindingContext = oRow.getBindingContext("$mVariants");
+				if (oBindingContext) {
+					const oRowItem = oBindingContext.getObject();
+					if (oRowItem && oRowItem.getKey() === sCurrentKey) {
+						nCurrentIndex = i;
+						break;
+					}
+				}
+			}
+		}
+
+		if (nCurrentIndex === -1) {
+			return this.oManagementCancel;
+		}
+
+		// Try to find the next visible row
+		let oFoundRow = _findVisibleRowFromIndex(aTableItems, nCurrentIndex + 1, aTableItems.length, 1);
+		if (oFoundRow) {
+			return oFoundRow;
+		}
+
+		// If no next row found, try to find the previous visible row
+		oFoundRow = _findVisibleRowFromIndex(aTableItems, nCurrentIndex - 1, -1, -1);
+		if (oFoundRow) {
+			return oFoundRow;
+		}
+
+		return this.oManagementCancel;
+	};
+
+	/**
+	 * Helper function to find a visible row with valid binding context in a given direction
+	 */
+	function _findVisibleRowFromIndex(aTableItems, nStartIndex, nEndIndex, nStep) {
+		for (let i = nStartIndex; (nStep > 0 ? i < nEndIndex : i > nEndIndex); i += nStep) {
+			const oRow = aTableItems[i];
+			if (oRow && oRow.getVisible()) {
+				const oBindingContext = oRow.getBindingContext("$mVariants");
+				if (oBindingContext) {
+					const oRowItem = oBindingContext.getObject();
+					if (oRowItem) {
+						return oRow;
+					}
+				}
+			}
+		}
+		return null;
+	}
 
 	VariantManagement.prototype._collectManageData = function() {
 
