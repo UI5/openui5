@@ -336,7 +336,6 @@ sap.ui.define([
 			this._fnCancelMenuPromise = oDtSyncPromise.cancel;
 			oPromise = oDtSyncPromise.promise
 			.then(function() {
-				this._aGroupedItems = [];
 				this._bHasPropagatedMenuItems = false;
 				this._aSubMenus = [];
 				const aPluginItemPromises = [];
@@ -563,6 +562,7 @@ sap.ui.define([
 	 * Called when ContextMenu gets closed
 	 */
 	ContextMenu.prototype._contextMenuClosed = function() {
+		this._aGroupedItems = [];
 		this.fireClosedContextMenu();
 	};
 
