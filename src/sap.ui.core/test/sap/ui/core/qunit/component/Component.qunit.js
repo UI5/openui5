@@ -261,6 +261,8 @@ sap.ui.define([
 
 							"sap.ui5": {
 								"dependencies": {
+									minUI5Version: "2.0.0",
+
 									"libs": {
 										"sap.ui.core": {},
 										"sap.m": {}
@@ -324,6 +326,8 @@ sap.ui.define([
 
 				"sap.ui5": {
 					"dependencies": {
+						minUI5Version: "2.0.0",
+
 						"libs": {
 							"sap.ui.core": {},
 							"sap.m": {}
@@ -1126,6 +1130,8 @@ sap.ui.define([
 
 				"sap.ui5" : {
 					"dependencies": {
+						minUI5Version: "2.0.0",
+
 						"components": {
 							"my.used": {}
 						}
@@ -1241,6 +1247,8 @@ sap.ui.define([
 
 					"sap.ui5" : {
 						"dependencies": {
+							minUI5Version: "2.0.0",
+
 							"components": {
 								"my.used": {},
 								"my.changed.constructor": {}

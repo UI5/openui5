@@ -23,6 +23,7 @@
 			"sap.uxap.sample.SharedJSONData": "../SharedJSONData"
 		},
 		"dependencies": {
+			"minUI5Version": "2.0.0",
 			"libs": {
 				"sap.m": {},
 				"sap.ui.core": {},

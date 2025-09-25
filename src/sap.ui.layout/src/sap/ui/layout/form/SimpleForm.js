@@ -56,7 +56,7 @@ sap.ui.define([
 	 * <li>A new <code>Label</code> control starts a new row (<code>{@link sap.ui.layout.form.FormElement FormElement}</code>) in the form.</li>
 	 * <li>All other controls will be assigned to the row (<code>{@link sap.ui.layout.form.FormElement FormElement}</code>) that started with the last label.</li>
 	 * </ul>
-	 * Use <code>LayoutData</code> to influence the layout for special cases in the Input/Display controls.
+	 * Use {@link sap.ui.core.Element#setLayoutData LayoutData} to influence the layout for special cases in the Input/Display controls.
 	 *
 	 * <b>Note:</b> If a more complex form is needed, use the <code>{@link sap.ui.layout.form.Form Form}</code> control instead.
 	 *
@@ -286,14 +286,14 @@ sap.ui.define([
 				 * The content of the form is structured in the following way:
 				 * <ul>
 				 * <li>Add a {@link sap.ui.core.Title Title} element or <code>Toolbar</code> control to start a new group (<code>{@link sap.ui.layout.form.FormContainer FormContainer}</code>).</li>
-				 * <li>Add a <code>Label</code> control to start a new row (<code>{@link sap.ui.layout.form.FormElement FormElement}</code>).</li>
+				 * <li>Add a {@link sap.m.Label Label} control to start a new row (<code>{@link sap.ui.layout.form.FormElement FormElement}</code>).</li>
 				 * <li>Add controls as input fields, text fields or other as needed.</li>
-				 * <li>Use <code>LayoutData</code> to influence the layout for special cases in the single controls.
-				 * For example, if a <code>ColumnLayout</code> is used as a layout,
+				 * <li>Use {@link sap.ui.core.Element#setLayoutData LayoutData} to influence the layout for special cases in the single controls.
+				 * For example, if a {@link sap.ui.layout.ColumnLayout ColumnLayout} is used as a layout,
 				 * the form content is weighted using 4 cells for the labels and 8 cells for the field part, for large size.
 				 * If there is only little space, the labels are above the fields and each field uses 12 cells.
 				 * If your input controls should influence their width, you can add {@link sap.ui.layout.form.ColumnElementData ColumnElementData}
-				 * to them via the {@link #setLayoutData setLayoutData} method.
+				 * to them via the {@link sap.ui.core.Element#setLayoutData setLayoutData} method.
 				 * Ensure that the sum of the weights in the {@link sap.ui.layout.form.ColumnElementData ColumnElementData} is not more than 12,
 				 * as this is the total width of the input control part of each form row.</li>
 				 * </ul>
@@ -308,7 +308,7 @@ sap.ui.define([
 				 * Depending on the screen size the labels use the defined <code>labelSpan</code>.
 				 * The remaining cells are used for the fields (and <code>emptySpan</code> if defined).
 				 * The available cells are distributed to all fields in the row. If one field should use a fixed number of cells
-				 * you can add {@link sap.ui.layout.GridData GridData} to them via the {@link #setLayoutData setLayoutData} method.
+				 * you can add {@link sap.ui.layout.GridData GridData} to them via the {@link sap.ui.core.Element#setLayoutData setLayoutData} method.
 				 * If there are additional fields in the row they will get the remaining cells.
 				 * </ul>
 				 * Example for a row with two {@link sap.m.Input Input} controls where one uses four cells on small screens,
@@ -321,10 +321,10 @@ sap.ui.define([
 				 *
 				 * <b>Warning:</b> Do not put any layout or other container controls in here. This could damage the visual layout,
 				 * keyboard support and screen-reader support. Only labels, titles, toolbars and form controls are allowed.
-				 * Views are also not supported. Allowed form controls implement the interface <code>sap.ui.core.IFormContent</code>.
+				 * Views are also not supported. Allowed form controls implement the interface {@link sap.ui.core.IFormContent}.
 				 *
-				 * If editable controls are used as content, the <code>editable</code> property must be set to <code>true</code>,
-				 * otherwise to <code>false</code>. If the <code>editable</code> property is set incorrectly, there will be visual issues
+				 * If editable controls are used as content, the {@link #setEditable editable} property must be set to <code>true</code>,
+				 * otherwise to <code>false</code>. If the {@link #setEditable editable} property is set incorrectly, there will be visual issues
 				 * like wrong label alignment or wrong spacing between the controls. In addition to that, wrong screen reader announcements might occur.
 				 */
 				content : {type : "sap.ui.core.Element", multiple : true, singularName : "content"},
@@ -337,7 +337,7 @@ sap.ui.define([
 				/**
 				 * Title element of the <code>SimpleForm</code>. Can either be a <code>Title</code> element, or a string.
 				 *
-				 * <b>Note:</b> If a <code>Toolbar</code> is used, the <code>Title</code> is ignored.
+				 * <b>Note:</b> If a {@link #getToolbar Toolbar} is used, the <code>Title</code> is ignored.
 				 *
 				 * <b>Note:</b> If the title is provided as a string, the title is rendered with a theme-dependent default level.
 				 * As the <code>Form</code> control cannot know the structure of the page, this might not fit the page structure.
@@ -349,9 +349,10 @@ sap.ui.define([
 				/**
 				 * Toolbar of the <code>SimpleForm</code>.
 				 *
-				 * <b>Note:</b> If a <code>Toolbar</code> is used, the <code>Title</code> is ignored.
+				 * <b>Note:</b> If a <code>Toolbar</code> is used, the {@link #getTitle Title} is ignored.
 				 * If a title is needed inside the <code>Toolbar</code> it must be added at content to the <code>Toolbar</code>.
-				 * In this case, add the <code>Title</code> to the <code>ariaLabelledBy</code> association.
+				 * In this case, add the <code>Title</code> to the {@link #addAriaLabelledBy ariaLabelledBy} association.
+				 * Use the right title level to meet the visual requirements. This might be theme-dependent.
 				 * @since 1.36.0
 				 */
 				toolbar : {type : "sap.ui.core.Toolbar", multiple : false,
@@ -366,8 +367,8 @@ sap.ui.define([
 				/**
 				 * Association to controls / IDs which label this control (see WAI-ARIA attribute <code>aria-labelledby</code>).
 				 *
-				 * <b>Note:</b> Every <code>Form</code> needs to have some title or label (at least for screen reader support). If no <code>Title</code>
-				 * is set, and the <code>Form</code> is not a child or a control with a title, such as {@link sap.m.Panel Panel} or {@link sap.m.Dialog Dialog},
+				 * <b>Note:</b> Every <code>Form</code> needs to have some title or label (at least for screen reader support). If no {@link #getTitle Title}
+				 * is set, and the <code>SimpleForm</code> is not a child or a control with a title, such as {@link sap.m.Panel Panel} or {@link sap.m.Dialog Dialog},
 				 * a label or title needs to be assigned using the <code>ariaLabelledBy</code> association.
 				 * @since 1.32.0
 				 */

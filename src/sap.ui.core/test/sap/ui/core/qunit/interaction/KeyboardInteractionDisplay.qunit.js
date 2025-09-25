@@ -202,4 +202,52 @@ sap.ui.define([
 
 		getResourceBundleForStub.restore();
 	});
+
+	QUnit.module("Caching", {
+		beforeEach: function() {
+			KeyboardInteractionDisplay._.clearCache();
+		}
+	});
+
+	QUnit.test("Cache failed requests of 'interaction.xml' files and to avoid retry attempts", async function (assert) {
+		const oFetchStub = sinon.stub(window, 'fetch');
+		oFetchStub.resolves({
+			ok: false,
+			status: 404,
+			statusText: 'Not Found'
+		});
+
+		// Mock control and library
+		const oMockControl = {
+			getMetadata: () => ({
+				getLibraryName: () => 'sap.ui.dummy'
+			}),
+			getParent: () => null
+		};
+
+		const oMockLibrary = {
+			interactionDocumentation: true
+		};
+		const oLibraryGetStub = sinon.stub(Library, '_get').returns(oMockLibrary);
+
+		try {
+			const oAttempt1 = await KeyboardInteractionDisplay._.loadInteractionXMLFor(oMockControl);
+			assert.strictEqual(oAttempt1, null, "First call should return null for 404");
+			assert.equal(oFetchStub.callCount, 2, "Fetch should be called two times at first attempt (for libraries 'sap.ui.core' & 'sap.ui.dummy')");
+
+			const sCacheKey = 'sap.ui.dummy:';
+			assert.ok(KeyboardInteractionDisplay._.hasCacheEntry(sCacheKey), "Failed request should be cached");
+			assert.strictEqual(KeyboardInteractionDisplay._.getInteractionXMLFromCache(sCacheKey), null, "Cached entry should be null");
+
+			oFetchStub.resetHistory();
+
+			const oAttempt2 = await KeyboardInteractionDisplay._.loadInteractionXMLFor(oMockControl);
+			assert.strictEqual(oAttempt2, null, "Second call should return null from cache");
+			assert.equal(oFetchStub.callCount, 0, "Fetch should not be called again");
+
+		} finally {
+			oLibraryGetStub.restore();
+			oFetchStub.restore();
+		}
+	});
 });

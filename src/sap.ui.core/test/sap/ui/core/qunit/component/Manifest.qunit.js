@@ -158,8 +158,11 @@ sap.ui.define([
 			"sap.ui5": {
 				"someValue": "someValue456",
 				"dependencies": {
+					minUI5Version: "2.0.0",
+
 					"libs": {
 					},
+
 					"components": {
 						"testdata.manifestload": {}
 					}

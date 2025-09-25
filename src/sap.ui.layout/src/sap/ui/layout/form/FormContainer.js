@@ -22,8 +22,8 @@ sap.ui.define([
 	 * @param {object} [mSettings] Initial settings for the new control
 	 *
 	 * @class
-	 * A <code>FormContainer</code> represents a group inside a <code>Form</code>. It consists of <code>FormElements</code>.
-	 * The rendering of the <code>FormContainer</code> is done by the <code>FormLayout</code> assigned to the <code>Form</code>.
+	 * A <code>FormContainer</code> represents a group inside a {@link sap.ui.layout.form.Form Form}. It consists of {@link sap.ui.layout.form.FormElement FormElements}.
+	 * The rendering of the <code>FormContainer</code> is done by the {@link sap.ui.layout.form.Form#getLayout FormLayout} assigned to the {@link sap.ui.layout.form.Form Form}.
 	 * @extends sap.ui.core.Element
 	 *
 	 * @author SAP SE
@@ -42,14 +42,14 @@ sap.ui.define([
 			/**
 			 * Container is expanded.
 			 *
-			 * <b>Note:</b> This property only works if <code>expandable</code> is set to <code>true</code>.
+			 * <b>Note:</b> This property only works if {@link #getExpandable expandable} is set to <code>true</code>.
 			 */
 			expanded : {type : "boolean", group : "Misc", defaultValue : true},
 
 			/**
 			 * Defines if the <code>FormContainer</code> is expandable.
 			 *
-			 * <b>Note:</b> The expander icon will only be shown if a <code>title</code> is set for the <code>FormContainer</code>.
+			 * <b>Note:</b> The expander icon will only be shown if a {@link #getTitle Title} is set for the <code>FormContainer</code>.
 			 */
 			expandable : {type : "boolean", group : "Misc", defaultValue : false},
 
@@ -80,7 +80,7 @@ sap.ui.define([
 			 * Title of the <code>FormContainer</code>. Can either be a <code>Title</code> element or a string.
 			 * If a <code>Title</code> element is used, the style of the title can be set.
 			 *
-			 * <b>Note:</b> If a <code>Toolbar</code> is used, the <code>Title</code> is ignored.
+			 * <b>Note:</b> If a {@link #getToolbar Toolbar} is used, the <code>Title</code> is ignored.
 			 *
 			 * <b>Note:</b> If the title is provided as a string, the title is rendered with a theme-dependent default level.
 			 * As the <code>Form</code> control cannot know the structure of the page, this might not fit the page structure.
@@ -91,9 +91,9 @@ sap.ui.define([
 			/**
 			 * Toolbar of the <code>FormContainer</code>.
 			 *
-			 * <b>Note:</b> If a <code>Toolbar</code> is used, the <code>Title</code> is ignored.
+			 * <b>Note:</b> If a <code>Toolbar</code> is used, the {@link #getTitle Title} is ignored.
 			 * If a title is needed inside the <code>Toolbar</code> it must be added at content to the <code>Toolbar</code>.
-			 * In this case add the <code>Title</code> to the <code>ariaLabelledBy</code> association.
+			 * In this case add the <code>Title</code> to the {@link #addAriaLabelledBy ariaLabelledBy} association.
 			 * Use the right title level to meet the visual requirements. This might be theme-dependent.
 			 * @since 1.36.0
 			 */
@@ -114,7 +114,7 @@ sap.ui.define([
 			 *
 			 * <b>Note:</b> If there is more than one <code>FormContainers</code>, every <code>FormContainer</code> needs to have some title or label
 			 * (at least for screen reader support).
-			 * If no <code>Title</code> is set, a label or title needs to be assigned using the <code>ariaLabelledBy</code> association.
+			 * If no {@link #getTitle Title} is set, a label or title needs to be assigned using the <code>ariaLabelledBy</code> association.
 			 * @since 1.36.0
 			 */
 			ariaLabelledBy: { type: "sap.ui.core.Control", multiple: true, singularName: "ariaLabelledBy" }

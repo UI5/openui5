@@ -22,6 +22,7 @@
 			"viewName": "sap.m.test.plugins.CellSelector.ResponsiveTableOPA.View"
 		},
 		"dependencies": {
+			"minUI5Version": "2.0.0",
 			"libs": {
 				"sap.m": {},
 				"sap.ui.unified": {},

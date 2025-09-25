@@ -19,6 +19,7 @@
 	"sap.ui5": {
 		"rootView": "sap.ui.integration.localServices.oath3lo.consentApp.View",
 		"dependencies": {
+			"minUI5Version": "2.0.0",
 			"libs": {
 				"sap.m": {}
 			}

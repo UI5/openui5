@@ -19,7 +19,7 @@ sap.ui.define([
 	 * @param {object} [mSettings] Initial settings for the new control
 	 *
 	 * @class
-	 * A <code>FormElement</code> represents a row in a <code>FormContainer</code>.
+	 * A <code>FormElement</code> represents a row in a {@link sap.ui.layout.form.FormContainer FormContainer}.
 	 * A <code>FormElement</code> is a combination of one label and different controls associated to this label.
 	 * @extends sap.ui.core.Element
 	 *
@@ -74,7 +74,7 @@ sap.ui.define([
 			 * <b>Warning:</b> Do not put any layout or other container controls in here.
 			 * This could damage the visual layout, keyboard support and screen-reader support.
 			 * Only form controls are allowed. Views are also not supported.
-			 * Allowed controls implement the interface <code>sap.ui.core.IFormContent</code>.
+			 * Allowed controls implement the interface {@link sap.ui.core.IFormContent}.
 			 */
 			fields : {type : "sap.ui.core.Control", multiple : true, singularName : "field"}
 		},

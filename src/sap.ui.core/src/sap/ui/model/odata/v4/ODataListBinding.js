@@ -1096,7 +1096,7 @@ sap.ui.define([
 			// currently the optimized update w/o bSkipRefresh is restricted to deep create
 			return bSkipRefresh || bDeepCreate
 				? oContext.updateAfterCreate(bSkipRefresh, sGroupId0)
-				: that.refreshSingle(oContext, that.lockGroup(sGroupId0));
+				: that.refreshSingle(oContext, sGroupId0);
 		}, function (oError) {
 			oGroupLock.unlock(true); // createInCache failed, so the lock might still be blocking
 			throw oError;
@@ -4093,8 +4093,10 @@ sap.ui.define([
 	 *
 	 * @param {sap.ui.model.odata.v4.Context} oContext
 	 *   The context object for the entity to be refreshed
-	 * @param {sap.ui.model.odata.v4.lib._GroupLock} oGroupLock
-	 *   A lock for the group ID to be used for refresh
+	 * @param {string} [sGroupId]
+	 *   The group ID to be used
+	 * @param {boolean} [bLocked]
+	 *   Whether the group lock created from the given group ID is locked
 	 * @param {boolean} [bAllowRemoval]
 	 *   Allows the list binding to remove the given context from its collection because the
 	 *   entity does not match the binding's filter anymore, see {@link #filter}; a removed context
@@ -4117,7 +4119,7 @@ sap.ui.define([
 	 *
 	 * @private
 	 */
-	ODataListBinding.prototype.refreshSingle = function (oContext, oGroupLock, bAllowRemoval,
+	ODataListBinding.prototype.refreshSingle = function (oContext, sGroupId, bLocked, bAllowRemoval,
 			bKeepCacheOnError, bWithMessages) {
 		var sContextPath = oContext.getPath(),
 			sResourcePathPrefix = sContextPath.slice(1),
@@ -4204,6 +4206,7 @@ sap.ui.define([
 				throw new Error("Cannot refresh. Hint: Side-effects refresh in parallel? "
 					+ oContext);
 			}
+			const oGroupLock = that.lockGroup(sGroupId, bLocked);
 			aPromises.push(
 				(bAllowRemoval
 					? oCache.refreshSingleWithRemove(oGroupLock, sPath, iModelIndex, sPredicate,
@@ -4219,8 +4222,8 @@ sap.ui.define([
 						aUpdatePromises.push(oContext.checkUpdateInternal());
 						if (bAllowRemoval) {
 							aUpdatePromises.push(
-								oContext.refreshDependentBindings(sResourcePathPrefix,
-									oGroupLock.getGroupId(), false, bKeepCacheOnError));
+								oContext.refreshDependentBindings(sResourcePathPrefix, sGroupId,
+									false, bKeepCacheOnError));
 						}
 					}
 
@@ -4241,8 +4244,8 @@ sap.ui.define([
 			if (!bAllowRemoval) {
 				// call refreshInternal on all dependent bindings to ensure that all resulting data
 				// requests are in the same batch request
-				aPromises.push(oContext.refreshDependentBindings(sResourcePathPrefix,
-					oGroupLock.getGroupId(), false, bKeepCacheOnError));
+				aPromises.push(oContext.refreshDependentBindings(sResourcePathPrefix, sGroupId,
+					false, bKeepCacheOnError));
 			}
 
 			return SyncPromise.all(aPromises);
@@ -4591,7 +4594,7 @@ sap.ui.define([
 			oModel.withUnresolvedBindings("removeCachesAndMessages",
 				oContext.getPath().slice(1));
 
-			return this.refreshSingle(oContext, this.lockGroup(sGroupId), /*bAllowRemoval*/false,
+			return this.refreshSingle(oContext, sGroupId, /*bLocked*/false, /*bAllowRemoval*/false,
 				/*bKeepCacheOnError*/true, /*bWithMessages*/true);
 		}
 		if (this.iCurrentEnd === 0) {

@@ -19,6 +19,7 @@
 	"sap.ui5": {
 		"componentName": "testdata.dependencyLoading.component1",
 		"dependencies": {
+			"minUI5Version": "2.0.0",
 			"libs": {
 				"sap.m": {},
 				"sap.tnt": {},
