@@ -22,6 +22,7 @@
 			"id": "app"
 		},
 		"dependencies": {
+			"minUI5Version": "2.0.0",
 			"libs": {
 				"sap.ui.fl": {},
 				"sap.ui.layout": {}

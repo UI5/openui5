@@ -87,6 +87,8 @@ sap.ui.define([
 							}
 						},
 						"dependencies": {
+							minUI5Version: "2.0.0",
+
 							"libs": {
 								"sap.ui.core": {},
 								"sap.m": {}
@@ -153,6 +155,8 @@ sap.ui.define([
 							}
 						},
 						"dependencies": {
+							minUI5Version: "2.0.0",
+
 							"libs": {
 								"sap.ui.core": {},
 								"sap.m": {}

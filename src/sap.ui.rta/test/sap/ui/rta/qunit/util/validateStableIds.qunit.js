@@ -234,6 +234,8 @@ sap.ui.define([
 
 				"sap.ui5": {
 					dependencies: {
+						minUI5Version: "2.0.0",
+
 						libs: {
 							dummyLibrary: {},
 							"sap.fe.templates": {},

@@ -58,8 +58,8 @@ sap.ui.define([
 	 * A <code>Form</code> doesn't render its content on its own. The rendering is done by the assigned {@link sap.ui.layout.form.FormLayout FormLayout}.
 	 * This is so that the rendering can be adopted to new UI requirements without changing the <code>Form</code> itself.
 	 *
-	 * For the content of a <code>Form</code>, {@link sap.ui.core.VariantLayoutData VariantLayoutData} are supported to allow simple switching of the <code>FormLayout</code>.
-	 * <code>LayoutData</code> on the content can be used to overwrite the default layout of the <code>Form</code>.
+	 * For the content of a <code>Form</code>, {@link sap.ui.core.VariantLayoutData VariantLayoutData} are supported to allow simple switching of the {@link sap.ui.layout.form.FormLayout FormLayout}.
+	 * {@link sap.ui.core.Element#setLayoutData LayoutData} on the content can be used to overwrite the default layout of the <code>Form</code>.
 	 *
 	 * The <code>Form</code> (and its sub-controls) automatically add label and field assignment to enable screen reader support.
 	 * It also adds keyboard support to navigate between the fields and groups inside the form.
@@ -67,8 +67,8 @@ sap.ui.define([
 	 * <b>Warning:</b> Do not put any layout or other container controls into the {@link sap.ui.layout.form.FormElement FormElement}.
 	 * Views are also not supported. This could damage the visual layout, keyboard support and screen-reader support.
 	 *
-	 * If editable controls are used as content, the <code>editable</code> property must be set to <code>true</code>,
-	 * otherwise to <code>false</code>. If the <code>editable</code> property is set incorrectly, there will be visual issues
+	 * If editable controls are used as content, the {@link #setEditable editable} property must be set to <code>true</code>,
+	 * otherwise to <code>false</code>. If the {@link #setEditable editable} property is set incorrectly, there will be visual issues
 	 * like wrong label alignment or wrong spacing between the controls. In addition to that, wrong screen reader announcements might occur.
 	 *
 	 * @extends sap.ui.core.Control
@@ -99,7 +99,7 @@ sap.ui.define([
 				 * The labels inside the form will be rendered by default in the according mode.
 				 *
 				 * <b>Note:</b> The setting of this property does not change the content of the form.
-				 * For example, <code>Input</code> controls in a form with <code>editable</code> set to false are still editable.
+				 * For example, {@link sap.m.Input Input} controls in a form with <code>editable</code> set to false are still editable.
 				 *
 				 * <b>Warning:</b> If this property is wrongly set, this might lead to visual issues.
 				 * The labels and fields might be misaligned, the labels might be rendered in the wrong mode,
@@ -122,7 +122,7 @@ sap.ui.define([
 				 * Title of the <code>Form</code>. Can either be a <code>Title</code> element or a string.
 				 * If a <code>Title</code> element it used, the style of the title can be set.
 				 *
-				 * <b>Note:</b> If a <code>Toolbar</code> is used, the <code>Title</code> is ignored.
+				 * <b>Note:</b> If a {@link #getToolbar Toolbar} is used, the <code>Title</code> is ignored.
 				 *
 				 * <b>Note:</b> If the title is provided as a string, the title is rendered with a theme-dependent default level.
 				 * As the <code>Form</code> control cannot know the structure of the page, this might not fit the page structure.
@@ -133,9 +133,9 @@ sap.ui.define([
 				/**
 				 * Toolbar of the <code>Form</code>.
 				 *
-				 * <b>Note:</b> If a <code>Toolbar</code> is used, the <code>Title</code> is ignored.
+				 * <b>Note:</b> If a <code>Toolbar</code> is used, the {@link #getTitle Title} is ignored.
 				 * If a title is needed inside the <code>Toolbar</code> it must be added at content to the <code>Toolbar</code>.
-				 * In this case, add the <code>Title</code> to the <code>ariaLabelledBy</code> association.
+				 * In this case, add the <code>Title</code> to the {@link #addAriaLabelledBy ariaLabelledBy} association.
 				 * Use the right title level to meet the visual requirements. This might be theme-dependent.
 				 * @since 1.36.0
 				 */
@@ -153,7 +153,7 @@ sap.ui.define([
 				/**
 				 * Association to controls / IDs that label this control (see WAI-ARIA attribute <code>aria-labelledby</code>).
 				 *
-				 * <b>Note:</b> Every <code>Form</code> needs to have some title or label (at least for screen reader support). If no <code>Title</code>
+				 * <b>Note:</b> Every <code>Form</code> needs to have some title or label (at least for screen reader support). If no {@link #getTitle Title}
 				 * is set, and the <code>Form</code> is not a child or a control with a title, such as {@link sap.m.Panel Panel} or {@link sap.m.Dialog Dialog},
 				 * a label or title needs to be assigned using the <code>ariaLabelledBy</code> association.
 				 * @since 1.28.0

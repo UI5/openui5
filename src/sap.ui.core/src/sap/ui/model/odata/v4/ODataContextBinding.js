@@ -1605,7 +1605,7 @@ sap.ui.define([
 	 *
 	 * @param {sap.ui.model.odata.v4.Context} oContext
 	 *   The context to refresh
-	 * @param {string} sGroupId
+	 * @param {string} [sGroupId]
 	 *   The group ID for the refresh
 	 * @param {boolean} [bKeepCacheOnError]
 	 *   If <code>true</code>, the binding data remains unchanged if the refresh fails

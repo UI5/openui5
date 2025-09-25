@@ -397,7 +397,15 @@ sap.ui.define([
 			}
 		}
 
-		return TableUtils.loadContexts(oPlugin.getControl().getBinding(), iGetContextsStartIndex, iGetContextsLength).then(function() {
+		return TableUtils.loadContexts(oPlugin.getControl().getBinding(), iGetContextsStartIndex, iGetContextsLength).then(function(aContexts) {
+			if (!oPlugin._bLimitDisabled && aContexts.length < iLimit) {
+				oPlugin.setLimitReached(false);
+				if (bReverse) {
+					iIndexTo = iIndexFrom - aContexts.length + 1;
+				} else {
+					iIndexTo = iIndexFrom + aContexts.length - 1;
+				}
+			}
 			return {indexFrom: iIndexFrom, indexTo: iIndexTo};
 		});
 	}

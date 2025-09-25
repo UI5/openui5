@@ -21,7 +21,7 @@
 			"supported": true
 		},
 		"dependencies": {
-			"libs": {}
+			"minUI5Version": "2.0.0"
 		},
 		"rootView": {
 			"viewName": "testdata.keepAlive.child3.App",

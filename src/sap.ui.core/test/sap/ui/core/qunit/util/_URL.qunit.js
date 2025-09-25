@@ -127,28 +127,28 @@ sap.ui.define([
 			expected: "../../"
 		},
 		{
-			caption: "Input and base are same (name only",
+			caption: "Input and base are same (name only)",
 			base: "http://example.org/index.html",
 			url: "http://example.org/index.html",
 			expected: "index.html"
 		},
 		{
-			caption: "Input and base are same (folder + name",
+			caption: "Input and base are same (folder + name)",
 			base: "http://example.org/folder/index.html",
 			url: "http://example.org/folder/index.html",
 			expected: "index.html"
 		},
 		{
-			caption: "Input and base are same (folder only",
+			caption: "Input and base are same (folder only)",
 			base: "http://example.org/folder/",
 			url: "http://example.org/folder/",
 			expected: "."
 		},
 		{
-			caption: "Input and base are same (folder only",
-			base: "http://example.org/folder/",
-			url: "http://example.org/folder/",
-			expected: "."
+			caption: "Input and base have different origins but the relative path is the same (folder only)",
+			base: "http://otherExample.org/folder/",
+			url: "folder/",
+			expected: `${document.baseURI}folder/`
 		}
 	].forEach(({caption, base, url, expected}) => {
 		QUnit.test(caption, function(assert) {
@@ -161,7 +161,7 @@ sap.ui.define([
 			// Assert
 			assert.equal(relativeHref, expected,
 				"calculated relative href should match the expected href");
-			assert.equal(new URL(relativeHref, base).href, url,
+			assert.equal(new URL(relativeHref, base).href, testURL.isAbsolute() ? url : expected,
 				"resolving the relative href to the base should produce the original URL");
 		});
 	});

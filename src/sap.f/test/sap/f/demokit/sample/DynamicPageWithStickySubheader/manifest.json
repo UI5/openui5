@@ -19,6 +19,7 @@
 	"sap.ui5": {
 		"rootView": "sap.f.sample.DynamicPageWithStickySubheader.view.DynamicPageWithStickySubheader",
 		"dependencies": {
+			"minUI5Version": "2.0.0",
 			"libs": {
 				"sap.f": {},
 				"sap.m": {},

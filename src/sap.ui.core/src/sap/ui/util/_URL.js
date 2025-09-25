@@ -96,7 +96,7 @@ sap.ui.define([], function() {
 			}
 			// If different origins, return absolute URL
 			if (base.origin !== this.origin) {
-				return this.sourceUrl;
+				return this.href;
 			}
 
 			// Normalize paths

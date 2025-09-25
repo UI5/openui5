@@ -1846,8 +1846,7 @@ sap.ui.define([
 		}
 
 		if (this.oBinding.refreshSingle) {
-			oPromise = this.oBinding.refreshSingle(this, this.oBinding.lockGroup(sGroupId, true),
-				bAllowRemoval);
+			oPromise = this.oBinding.refreshSingle(this, sGroupId, true, bAllowRemoval);
 		} else {
 			if (arguments.length > 1) {
 				throw new Error("Unsupported parameter bAllowRemoval: " + bAllowRemoval);

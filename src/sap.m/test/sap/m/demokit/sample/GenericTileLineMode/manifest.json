@@ -19,6 +19,7 @@
 	"sap.ui5": {
 		"rootView": "sap.m.sample.GenericTileLineMode.Page",
 		"dependencies": {
+			"minUI5Version": "2.0.0",
 			"libs": {
 				"sap.m": {},
 				"sap.ui.core": {}

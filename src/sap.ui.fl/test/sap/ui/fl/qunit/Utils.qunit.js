@@ -377,7 +377,11 @@ sap.ui.define([
 			}, true), "false if no type node in sap.app");
 			assert.equal(false, Utils.isApplication({
 				"_version": "2.0.0",
-				"sap.ui5": {dependencies: {libs: 1}}
+
+				"sap.ui5": {dependencies: {
+					minUI5Version: "2.0.0",
+					libs: 1
+				}}
 			}, true), "false if no sap.app node");
 		});
 

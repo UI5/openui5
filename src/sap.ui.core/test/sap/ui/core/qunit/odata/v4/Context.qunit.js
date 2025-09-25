@@ -2175,12 +2175,10 @@ sap.ui.define([
 				checkSuspended : function () {},
 				getContext : function () { return null; },
 				isRelative : function () { return false; },
-				lockGroup : function () {},
 				refreshSingle : function () {},
 				mParameters : {}
 			},
 			oBindingMock = this.mock(oBinding),
-			oGroupLock = {},
 			oModel = {
 				withUnresolvedBindings : function () {}
 			},
@@ -2188,12 +2186,11 @@ sap.ui.define([
 			oPromise,
 			bRefreshed = false;
 
-		this.mock(_Helper).expects("checkGroupId");
-		oBindingMock.expects("lockGroup").withExactArgs("myGroup", true).returns(oGroupLock);
+		this.mock(_Helper).expects("checkGroupId").withExactArgs("myGroup");
 		oBindingMock.expects("checkSuspended").withExactArgs();
 		this.mock(oContext).expects("hasPendingChanges").withExactArgs().returns(false);
 		oBindingMock.expects("refreshSingle")
-			.withExactArgs(sinon.match.same(oContext), sinon.match.same(oGroupLock),
+			.withExactArgs(sinon.match.same(oContext), "myGroup", true,
 				sinon.match.same(bAllowRemoval))
 			.callsFake(function () {
 				return new SyncPromise(function (resolve) {

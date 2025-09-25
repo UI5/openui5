@@ -19,6 +19,7 @@
 	"sap.ui5": {
 		"rootView": "sap.ui.layout.sample.SimpleForm354wideDual.Page",
 		"dependencies": {
+			"minUI5Version": "2.0.0",
 			"libs": {
 				"sap.ui.core": {},
 				"sap.ui.layout": {}
