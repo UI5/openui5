@@ -863,6 +863,10 @@ sap.ui.define([
 			oHeaders = this._getHeaders();
 		}
 
+		if (this.sCustomParams) {
+			aParams.push(this.sCustomParams);
+		}
+
 		// send the counting request
 		if (sAbsolutePath) {
 			this.oModel.read(sAbsolutePath + sCountType, {
@@ -938,6 +942,10 @@ sap.ui.define([
 
 			sFilterParams = "$filter=" + sFilterParams + sAnd + sNodeFilter;
 			aParams.push(sFilterParams);
+		}
+
+		if (this.sCustomParams) {
+			aParams.push(this.sCustomParams);
 		}
 
 		// Only send request, if path is defined
