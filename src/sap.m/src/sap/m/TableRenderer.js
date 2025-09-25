@@ -145,16 +145,20 @@ sap.ui.define(["sap/base/i18n/Localization", "sap/ui/core/Renderer", "sap/ui/cor
 		createBlankCell("Highlight", "HighlightCol");
 
 		if (iModeOrder == -1) {
-			openStartCell("ModeCol", "SelCol", "TABLE_SELECTION_COLUMNHEADER").openEnd();
+			openStartCell("ModeCol", "SelCol", "TABLE_SELECTION_COLUMNHEADER");
 			if (bRenderAriaSelected && sMode == "MultiSelect") {
 				if (oTable.getMultiSelectMode() == MultiSelectMode.ClearAll) {
+					rm.openEnd();
 					rm.renderControl(oTable._getClearAllButton());
 				} else {
 					const oBundle = Library.getResourceBundleFor("sap.m");
 					rm.attr("aria-description",
 						oBundle.getText("TABLE_SELECTION_COLUMNHEADER_DESCRIPTION") + " " + oBundle.getText("ACC_CTR_STATE_NOT_CHECKED"));
+					rm.openEnd();
 					rm.renderControl(oTable._getSelectAllCheckbox());
 				}
+			} else {
+				rm.openEnd();
 			}
 			rm.close(sCellTag);
 			iIndex++;
