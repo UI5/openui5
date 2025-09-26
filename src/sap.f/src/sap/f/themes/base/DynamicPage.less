@@ -129,6 +129,10 @@ html[data-sap-ui-os^='win'][data-sap-ui-browser^='cr'].sap-desktop .sapFDynamicP
 
 .sapUiContainerContentPadding(~".sapFDynamicPage", ~".sapFDynamicPageContentFitContainer");
 
+.sapFDynamicPage.sapUiResponsiveContentPadding .sapFDynamicPageContent {
+	padding-bottom: 0;
+}
+
 .sapFDynamicPage.sapUiContentPadding,
 .sapFDynamicPage.sapUiNoContentPadding,
 .sapFDynamicPage.sapUiResponsiveContentPadding {
@@ -164,6 +168,7 @@ html[data-sap-ui-os^='win'][data-sap-ui-browser^='cr'].sap-desktop .sapFDynamicP
 		.sapFDynamicPageContent,
 		.sapFDynamicPageContentFitContainer {
 			padding: 1rem;
+			padding-bottom: 0;
 		}
 	}
 
@@ -171,7 +176,7 @@ html[data-sap-ui-os^='win'][data-sap-ui-browser^='cr'].sap-desktop .sapFDynamicP
 
 		.sapFDynamicPageContent,
 		.sapFDynamicPageContentFitContainer {
-			padding: 1rem 2rem;
+			padding: 1rem 2rem 0 2rem;
 		}
 	}
 }

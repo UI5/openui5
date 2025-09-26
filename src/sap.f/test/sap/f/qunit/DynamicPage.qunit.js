@@ -619,6 +619,14 @@ function(
 		}.bind(this));
 	});
 
+	QUnit.test("should not have padding-bottom", function (assert) {
+		var oDynamicPage = this.oDynamicPage;
+
+		oDynamicPage.addStyleClass("sapUiResponsiveContentPadding");
+
+		assert.strictEqual(this.oDynamicPage.$().find(".sapFDynamicPageContent").css("paddingBottom"), "0px", "padding-bottom of DynamicPageContent is 0");
+	});
+
 	QUnit.module("DynamicPage - Rendering - No Title", {
 		beforeEach: function () {
 			this.oDynamicPageNoTitle = oFactory.getDynamicPageNoTitle();

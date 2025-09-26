@@ -2176,7 +2176,9 @@ sap.ui.define([
 				getContext : function () { return null; },
 				isRelative : function () { return false; },
 				refreshSingle : function () {},
-				mParameters : {}
+				mParameters : {
+					$$aggregation : {} // MUST not make any difference here
+				}
 			},
 			oBindingMock = this.mock(oBinding),
 			oModel = {
@@ -2187,6 +2189,8 @@ sap.ui.define([
 			bRefreshed = false;
 
 		this.mock(_Helper).expects("checkGroupId").withExactArgs("myGroup");
+		this.mock(_Helper).expects("isDataAggregation")
+			.withExactArgs(sinon.match.same(oBinding.mParameters)).returns(false);
 		oBindingMock.expects("checkSuspended").withExactArgs();
 		this.mock(oContext).expects("hasPendingChanges").withExactArgs().returns(false);
 		oBindingMock.expects("refreshSingle")
@@ -2244,6 +2248,8 @@ sap.ui.define([
 			}
 
 			this.mock(_Helper).expects("checkGroupId").withExactArgs("myGroup");
+			this.mock(_Helper).expects("isDataAggregation")
+				.withExactArgs(sinon.match.same(oBinding.mParameters)).returns(false);
 			oBindingMock.expects("checkSuspended").withExactArgs();
 			oContextMock.expects("hasPendingChanges").withExactArgs().returns(false);
 			if (bReturnValueContext) {
@@ -2281,6 +2287,8 @@ sap.ui.define([
 			oContext = Context.create({/*oModel*/}, oBinding, "/EMPLOYEES('42')");
 
 		this.mock(_Helper).expects("checkGroupId").withExactArgs("myGroup");
+		this.mock(_Helper).expects("isDataAggregation")
+			.withExactArgs(sinon.match.same(oBinding.mParameters)).returns(false);
 		this.mock(oBinding).expects("checkSuspended").withExactArgs();
 		this.mock(oContext).expects("hasPendingChanges").withExactArgs().returns(false);
 
@@ -2298,6 +2306,9 @@ sap.ui.define([
 			sGroupId = "$foo";
 
 		this.mock(_Helper).expects("checkGroupId").withExactArgs(sGroupId).throws(oError);
+		this.mock(_Helper).expects("isDataAggregation").never();
+		// this.mock(oBinding).expects("checkSuspended").never();
+		this.mock(oContext).expects("hasPendingChanges").never();
 
 		assert.throws(function () {
 			// code under test
@@ -2315,6 +2326,8 @@ sap.ui.define([
 			sGroupId = "myGroup";
 
 		this.mock(_Helper).expects("checkGroupId").withExactArgs(sGroupId);
+		this.mock(_Helper).expects("isDataAggregation")
+			.withExactArgs(sinon.match.same(oBinding.mParameters)).returns(false);
 		this.mock(oBinding).expects("checkSuspended").withExactArgs();
 		this.mock(oContext).expects("hasPendingChanges").withExactArgs().returns(true);
 
@@ -2325,16 +2338,16 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test("requestRefresh: $$aggregation", function (assert) {
+	QUnit.test("requestRefresh: data aggregation", function (assert) {
 		var oBinding = {
-				mParameters : {
-					$$aggregation : {}
-				}
+				mParameters : {}
 			},
 			oContext = Context.create({/*oModel*/}, oBinding, "/EMPLOYEES/42", 42),
 			sGroupId = "myGroup";
 
 		this.mock(_Helper).expects("checkGroupId").withExactArgs(sGroupId);
+		this.mock(_Helper).expects("isDataAggregation")
+			.withExactArgs(sinon.match.same(oBinding.mParameters)).returns(true);
 
 		assert.throws(function () {
 			// code under test

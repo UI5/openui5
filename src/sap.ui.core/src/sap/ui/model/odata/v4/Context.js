@@ -1581,7 +1581,7 @@ sap.ui.define([
 	 *   the context from the list binding's collection because the entity does not match the
 	 *   binding's filter anymore, see {@link sap.ui.model.odata.v4.ODataListBinding#filter};
 	 *   a removed context is destroyed, see {@link #destroy}. If the context belongs to a context
-	 *   binding, the parameter must not be used.
+	 *   binding or to a list binding with "$$aggregation", the parameter must not be used.
 	 *   Supported since 1.55.0
 	 *
 	 *   Since 1.84.0, if this context is {@link #isKeepAlive kept alive}, it is only destroyed if
@@ -1597,10 +1597,10 @@ sap.ui.define([
 	 *         <li> does not represent a single entity (see
 	 *           {@link sap.ui.model.odata.v4.ODataListBinding#getHeaderContext}),
 	 *       </ul>
-	 *     <li> the binding is a list binding with "$$aggregation",
+	 *     <li> the binding is a list binding with data aggregation,
 	 *     <li> the binding's root binding is suspended,
 	 *     <li> the <code>bAllowRemoval</code> parameter is set for a context belonging to a context
-	 *       binding.
+	 *       binding or to a list binding with "$$aggregation".
 	 *   </ul>
 	 *
 	 * @public
@@ -1837,7 +1837,7 @@ sap.ui.define([
 		var oPromise;
 
 		_Helper.checkGroupId(sGroupId);
-		if (this.oBinding.mParameters.$$aggregation) {
+		if (_Helper.isDataAggregation(this.oBinding.mParameters)) {
 			throw new Error("Cannot refresh " + this + " when using data aggregation");
 		}
 		this.oBinding.checkSuspended();
