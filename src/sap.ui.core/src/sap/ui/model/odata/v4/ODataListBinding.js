@@ -2672,7 +2672,7 @@ sap.ui.define([
 			oContext.oBinding = that;
 		});
 		oCache = oBinding.oCache;
-		oCache.setQueryOptions(mQueryOptions);
+		oCache.setQueryOptions(mQueryOptions, /*bForce*/true);
 		// avoid that the cache is set inactive or that contexts are destroyed
 		oBinding.oCache = null;
 		oBinding.oCachePromise = SyncPromise.resolve(null);
@@ -4115,7 +4115,8 @@ sap.ui.define([
 	 *   or rejects if the refresh failed.
 	 * @throws {Error}
 	 *   If the given context does not represent a single entity (see {@link #getHeaderContext}), or
-	 *   if <code>bAllowRemoval && bWithMessages</code> are combined
+	 *   if <code>bAllowRemoval</code> is combined with <code>bWithMessages</code> or with a
+	 *   recursive hierarchy
 	 *
 	 * @private
 	 */
@@ -4127,6 +4128,15 @@ sap.ui.define([
 
 		if (oContext === this.oHeaderContext) {
 			throw new Error("Unsupported header context: " + oContext);
+		}
+		if (this.mParameters.$$aggregation?.hierarchyQualifier) {
+			if (!oContext.isEffectivelyKeptAlive()
+					&& this.aContexts[oContext.iIndex] !== oContext) {
+				throw new Error("Not currently part of the hierarchy: " + oContext);
+			}
+			if (bAllowRemoval) {
+				throw new Error("Unsupported parameter bAllowRemoval: " + bAllowRemoval);
+			}
 		}
 		if (bAllowRemoval && bWithMessages) {
 			throw new Error("Unsupported: bAllowRemoval && bWithMessages");

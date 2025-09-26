@@ -146,6 +146,11 @@ pre.sapUiDocumentationAPICode,
 #teconsent > a {
 	display: none;
 }
+
+/* remove obsolete padding on the TrustArc consent bar that only causes a layout issue */
+#consent_blackbar {
+	padding: 0;
+}
 /************************************************* Custom control styles *********************************************/
 
 

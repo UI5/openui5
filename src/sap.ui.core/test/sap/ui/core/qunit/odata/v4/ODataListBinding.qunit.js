@@ -7921,11 +7921,14 @@ sap.ui.define([
 	//*********************************************************************************************
 [false, true].forEach(function (bSameCache) {
 	[false, true].forEach(function (bKeepCacheOnError) {
-		const sTitle = "refreshSingle: bSameCache=" + bSameCache + ", bKeepCacheOnError="
-			+ bKeepCacheOnError;
+		// 0: no $$aggregation, 1: no hierarchyQualifier, 2: isEffectivelyKeptAlive, 3: not present
+		[0, 1, 2, 3].forEach(function (iCase) {
+			const sTitle = "refreshSingle: bSameCache=" + bSameCache + ", bKeepCacheOnError="
+				+ bKeepCacheOnError + ", $$aggregation case #" + iCase;
 
 	QUnit.test(sTitle, function (assert) {
-		var oBinding = this.bindList("/EMPLOYEES"),
+		var bAllowRemoval,
+			oBinding = this.bindList("/EMPLOYEES"),
 			oCache = {
 				refreshSingle : function () {}
 			},
@@ -7956,6 +7959,20 @@ sap.ui.define([
 		oContext = oBinding.aContexts[2];
 		oBinding.oCache = oCache;
 		oBinding.oCachePromise = SyncPromise.resolve(oCache);
+		this.mock(oContext).expects("isEffectivelyKeptAlive").exactly(iCase > 1 ? 1 : 0)
+			.withExactArgs().returns(iCase === 2);
+		if (iCase) {
+			// Note: autoExpandSelect at model would be required for hierarchyQualifier, but that
+			// leads too far :-(
+			oBinding.mParameters.$$aggregation = {};
+			if (iCase !== 1) {
+				oBinding.mParameters.$$aggregation.hierarchyQualifier = "X";
+			}
+			if (iCase !== 3) {
+				delete oBinding.aContexts[2];
+				bAllowRemoval = false; // MUST have the same effect as undefined
+			}
+		}
 
 		this.mock(oBinding).expects("withCache")
 			.withExactArgs(sinon.match.func)
@@ -8004,7 +8021,7 @@ sap.ui.define([
 		});
 
 		// code under test
-		oPromise = oBinding.refreshSingle(oContext, "groupId", "~bLocked~", undefined,
+		oPromise = oBinding.refreshSingle(oContext, "groupId", "~bLocked~", bAllowRemoval,
 			bKeepCacheOnError, "~bWithMessages~");
 
 		assert.strictEqual(oPromise.isFulfilled(), false);
@@ -8020,6 +8037,7 @@ sap.ui.define([
 			assert.strictEqual(bDependentsRefreshed, true);
 		});
 	});
+		});
 	});
 });
 	//TODO: within #refreshSingle
@@ -8405,6 +8423,46 @@ sap.ui.define([
 			// code under test
 			oBinding.refreshSingle(oHeaderContext);
 		}, new Error("Unsupported header context: " + oHeaderContext));
+	});
+
+	//*********************************************************************************************
+	QUnit.test("refreshSingle: Not currently part of the hierarchy", function (assert) {
+		var oBinding = this.bindList("/EMPLOYEES"),
+			oContext = {
+				iIndex : 0,
+				getPath : function () { return "n/a"; },
+				isEffectivelyKeptAlive : mustBeMocked
+			};
+
+		// Note: autoExpandSelect at model would be required for hierarchyQualifier, but that leads
+		// too far :-(
+		oBinding.mParameters.$$aggregation = {hierarchyQualifier : "X"};
+		oBinding.aContexts = [, oContext];
+		this.mock(oContext).expects("isEffectivelyKeptAlive").withExactArgs().returns(false);
+
+		assert.throws(function () {
+			// code under test
+			oBinding.refreshSingle(oContext);
+		}, new Error("Not currently part of the hierarchy: " + oContext));
+	});
+
+	//*********************************************************************************************
+	QUnit.test("refreshSingle: Unsupported parameter bAllowRemoval", function (assert) {
+		var oBinding = this.bindList("/EMPLOYEES"),
+			oContext = {
+				getPath : function () { return "n/a"; },
+				isEffectivelyKeptAlive : mustBeMocked
+			};
+
+		// Note: autoExpandSelect at model would be required for hierarchyQualifier, but that leads
+		// too far :-(
+		oBinding.mParameters.$$aggregation = {hierarchyQualifier : "X"};
+		this.mock(oContext).expects("isEffectivelyKeptAlive").withExactArgs().returns(true);
+
+		assert.throws(function () {
+			// code under test
+			oBinding.refreshSingle(oContext, "n/a", /*bLocked*/undefined, /*bAllowRemoval*/true);
+		}, new Error("Unsupported parameter bAllowRemoval: true"));
 	});
 
 	//*********************************************************************************************
@@ -11387,7 +11445,7 @@ sap.ui.define([
 			.returns("~mQueryOptionsClone~");
 		this.mock(_Helper).expects("aggregateExpandSelect")
 			.withExactArgs("~mQueryOptionsClone~", "~mLateQueryOptions~");
-		this.mock(oCache).expects("setQueryOptions").withExactArgs("~mQueryOptions~");
+		this.mock(oCache).expects("setQueryOptions").withExactArgs("~mQueryOptions~", true);
 		this.mock(oTemporaryBinding).expects("destroy").withExactArgs().callsFake(function () {
 			assert.deepEqual(oTemporaryBinding.mPreviousContextsByPath, {});
 			assert.strictEqual(oTemporaryBinding.oCache, null);

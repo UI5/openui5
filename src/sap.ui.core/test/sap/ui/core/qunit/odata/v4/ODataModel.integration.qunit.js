@@ -18370,6 +18370,48 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
+	// Scenario: Display the $count of a "manually expanded" collection-valued navigation property
+	// in a list. This worked even before JIRA: CPOUI5ODATAV4-1002. Make sure the request does not
+	// change in an incompatible way.
+	// SNOW: DINC0641817
+	[
+		"'TEAM_2_EMPLOYEES'",
+		"{TEAM_2_EMPLOYEES : {}}",
+		"{TEAM_2_EMPLOYEES : null}",
+		"{TEAM_2_EMPLOYEES : true}"
+	].forEach((sExpand) => {
+		const sTitle = "before CPOUI5ODATAV4-1002, SNOW: DINC0641817, $expand : " + sExpand;
+
+		QUnit.test(sTitle, function (assert) {
+			const oModel = this.createTeaBusiModel({autoExpandSelect : true});
+			const sView = `
+	<Table id="table" items="{
+				path : '/TEAMS',
+				parameters : {$expand : ${sExpand}}
+			}">
+		<Text id="id" text="{Team_Id}"/>
+		<Text id="count" text="{TEAM_2_EMPLOYEES/$count}"/>
+	</Table>`;
+			this.expectRequest("TEAMS?$expand=TEAM_2_EMPLOYEES&$select=Team_Id&$skip=0&$top=100", {
+					value : [{
+						Team_Id : "TEAM_00",
+						TEAM_2_EMPLOYEES : [{}]
+					}, {
+						Team_Id : "TEAM_01",
+						TEAM_2_EMPLOYEES : []
+					}, {
+						Team_Id : "TEAM_02",
+						TEAM_2_EMPLOYEES : [{}, {}, {}]
+					}]
+				})
+				.expectChange("id", ["TEAM_00", "TEAM_01", "TEAM_02"])
+				.expectChange("count", ["1", "0", "3"]);
+
+			return this.createView(assert, sView, oModel);
+		});
+	});
+
+	//*********************************************************************************************
 	// Scenario: Display the $count of a collection-valued navigation property in a list. Opt-in to
 	// new request with $count inside $expand.
 	// JIRA: CPOUI5ODATAV4-1002
@@ -28732,8 +28774,8 @@ sap.ui.define([
 	// JIRA: CPOUI5ODATAV4-1643
 	//
 	// Request various side effects that do not affect the hierarchy (JIRA: CPOUI5ODATAV4-1785).
-	// Check that refresh is not supported (JIRA: CPOUI5ODATAV4-1851)
-	// ...but a side-effects refresh of a single node is supported (SNOW: DINC0538031)
+	// Check that refresh is supported (JIRA: CPOUI5ODATAV4-2515)
+	// ...and a side-effects refresh of a single node is supported (SNOW: DINC0538031)
 	// Additionally, ODLB#getDownloadUrl is tested (JIRA: CPOUI5ODATAV4-1920, BCP: 2370011296).
 	// Retrieve "DistanceFromRoot" property path via ODLB#getAggregation (JIRA: CPOUI5ODATAV4-1961).
 	// See that Filter.NONE is not allowed (JIRA: CPOUI5ODATAV4-2321).
@@ -28957,6 +28999,7 @@ sap.ui.define([
 					"JIRA: CPOUI5ODATAV4-1920, CPOUI5ODATAV4-2275");
 
 				that.expectRequest("Artists(ArtistID='0',IsActiveEntity=true)"
+						// Note: Messages "treated specially" and thus requested with side effects
 						+ "?$select=ArtistID,IsActiveEntity,Messages,_/NodeID,defaultChannel", {
 						"@odata.etag" : "etag0.1",
 						ArtistID : "0",
@@ -29025,9 +29068,48 @@ sap.ui.define([
 				assert.strictEqual(oListBinding.getCount(), 1, "count of nodes"); // code under test
 
 				assert.throws(function () {
-					// code under test (JIRA: CPOUI5ODATAV4-1851)
-					oRoot.requestRefresh();
-				}, new Error("Cannot refresh " + oRoot + " when using data aggregation"));
+					// code under test (JIRA: CPOUI5ODATAV4-2515)
+					oRoot.requestRefresh(undefined, true);
+				}, new Error("Unsupported parameter bAllowRemoval: true"));
+
+				that.expectRequest("Artists(ArtistID='0',IsActiveEntity=true)"
+						+ "?$select=ArtistID,IsActiveEntity,defaultChannel"
+						+ "&$expand=BestFriend($select=ArtistID,IsActiveEntity,Name)", {
+						"@odata.etag" : "etag0.2*",
+						ArtistID : "0",
+						BestFriend : {
+							ArtistID : "01",
+							IsActiveEntity : true,
+							Name : "Friend #01 (refreshed)"
+						},
+						IsActiveEntity : true,
+						// Note: Messages not requested by refresh, only by side effects!
+						defaultChannel : "260*"
+					});
+
+				return Promise.all([
+					// code under test (JIRA: CPOUI5ODATAV4-2515)
+					oRoot.requestRefresh(),
+					that.waitForChanges(assert, "refresh of single node")
+				]);
+			}).then(function () {
+				assert.deepEqual(oRoot.getObject(), {
+						"@$ui5.context.isSelected" : true,
+						"@$ui5.node.level" : 1,
+						"@odata.etag" : "etag0.2*",
+						ArtistID : "0",
+						BestFriend : {
+							ArtistID : "01",
+							IsActiveEntity : true,
+							Name : "Friend #01 (refreshed)"
+						},
+						IsActiveEntity : true,
+						Messages : [],
+						_ : {
+							NodeID : "0,true"
+						},
+						defaultChannel : "260*"
+					}, "Messages kept by refresh, although not requested");
 
 				that.expectRequest("Artists(ArtistID='0',IsActiveEntity=true)"
 						+ "?$select=ArtistID,IsActiveEntity,Messages,defaultChannel"
@@ -29073,14 +29155,14 @@ sap.ui.define([
 
 				that.expectRequest("Artists(ArtistID='0',IsActiveEntity=true)"
 						+ "?$select=ArtistID,IsActiveEntity,Messages,_/NodeID,defaultChannel", {
-						"@odata.etag" : "etag0.4",
+						"@odata.etag" : "n/a",
 						ArtistID : "0",
 						IsActiveEntity : true,
 						Messages : [],
 						_ : { // in case we get a value, we will happily check it :-)
 							NodeID : "-0,true-"
 						},
-						defaultChannel : "460"
+						defaultChannel : "n/a"
 					})
 					.expectMessages([{
 						message : sErrorMessage,
@@ -29107,7 +29189,7 @@ sap.ui.define([
 					[true, undefined, 1, "Friend #01 (updated)"]
 				]);
 				assert.strictEqual(oListBinding.getCount(), 1, "count of nodes"); // code under test
-				assert.strictEqual(oRoot.getProperty("defaultChannel"), "360", "460 has been ignored");
+				assert.strictEqual(oRoot.getProperty("defaultChannel"), "360", "n/a has been ignored");
 
 				that.expectMessages([]);
 				Messaging.removeAllMessages(); // clean up
@@ -29124,7 +29206,7 @@ sap.ui.define([
 
 				return that.waitForChanges(assert, "keep alive");
 			}).then(function () {
-				that.expectRequest("#8 Artists?$select=ArtistID,IsActiveEntity"
+				that.expectRequest("#9 Artists?$select=ArtistID,IsActiveEntity"
 							+ (bKeepAlive ? ",Messages" : "") + ",defaultChannel"
 						+ "&$expand=BestFriend($select=ArtistID,IsActiveEntity,Name)"
 						+ "&$filter=ArtistID eq '0' and IsActiveEntity eq true", {
@@ -29141,8 +29223,8 @@ sap.ui.define([
 							defaultChannel : "460"
 						}]
 					})
-					.expectRequest("#8 Artists/$count", 3)
-					.expectRequest("#8 Artists?$apply=com.sap.vocabularies.Hierarchy.v1.TopLevels("
+					.expectRequest("#9 Artists/$count", 3)
+					.expectRequest("#9 Artists?$apply=com.sap.vocabularies.Hierarchy.v1.TopLevels("
 						+ "HierarchyNodes=$root/Artists,HierarchyQualifier='"
 						+ sHierarchyQualifier + "',NodeProperty='_/NodeID',Levels=1)"
 						+ "&$select=ArtistID,IsActiveEntity,_/DrillState,_/NodeID"
@@ -29163,14 +29245,11 @@ sap.ui.define([
 					.expectChange("count", "3");
 
 				return Promise.all([
-					// Note: "Cannot refresh " + oRoot + " when using data aggregation"
 					// code under test
 					oListBinding.requestRefresh(),
 					that.waitForChanges(assert, "refresh w/ kept-alive root")
 				]);
 			}).then(function () {
-				var oError = new Error("418 I'm a teapot");
-
 				checkTable("after refresh w/ kept-alive root", assert, oTable, [
 					"/Artists(ArtistID='1',IsActiveEntity=true)",
 					"/Artists(ArtistID='0',IsActiveEntity=true)"
@@ -29200,6 +29279,7 @@ sap.ui.define([
 					}, "after refresh");
 
 				// refresh via side effect fails
+				const oError = new Error("418 I'm a teapot");
 				that.expectRequest("Artists?$select=ArtistID,IsActiveEntity"
 							+ (bKeepAlive ? ",Messages" : "") + ",defaultChannel"
 						+ "&$expand=BestFriend($select=ArtistID,IsActiveEntity,Name)"
@@ -29243,6 +29323,45 @@ sap.ui.define([
 				assert.strictEqual(oListBinding.getCount(), 3, "count of nodes"); // code under test
 				assert.strictEqual(oListBinding.getAllCurrentContexts()[1], oKeptAliveNode,
 					"still kept alive");
+
+				that.expectRequest("Artists(ArtistID='0',IsActiveEntity=true)?$select=ArtistID"
+						+ ",IsActiveEntity" + (bKeepAlive ? ",Messages" : "") + ",defaultChannel"
+						+ "&$expand=BestFriend($select=ArtistID,IsActiveEntity,Name)", {
+						"@odata.etag" : "etag0.4",
+						ArtistID : "0",
+						BestFriend : {
+							ArtistID : "01",
+							IsActiveEntity : true,
+							Name : "Friend #01 (refreshed again)"
+						},
+						IsActiveEntity : true,
+						Messages : [],
+						defaultChannel : "460"
+					});
+
+				return Promise.all([
+					// code under test (JIRA: CPOUI5ODATAV4-2515)
+					oKeptAliveNode.requestRefresh(),
+					that.waitForChanges(assert, "refresh of kept-alive node outside the collection")
+				]);
+			}).then(function () {
+				assert.deepEqual(oKeptAliveNode.getObject(), {
+						"@$ui5.context.isSelected" : true,
+						// NO! "@$ui5.node.level" : 1,
+						"@odata.etag" : "etag0.4",
+						ArtistID : "0",
+						BestFriend : {
+							ArtistID : "01",
+							IsActiveEntity : true,
+							Name : "Friend #01 (refreshed again)"
+						},
+						IsActiveEntity : true,
+						Messages : [],
+						_ : {
+							NodeID : "0,true"
+						},
+						defaultChannel : "460"
+					});
 
 				that.expectRequest("Artists?$apply=descendants($root/Artists," + sHierarchyQualifier
 							+ ",_/NodeID,filter(ArtistID eq '1' and IsActiveEntity eq true),1)"
@@ -29306,8 +29425,8 @@ sap.ui.define([
 						defaultChannel : "460"
 					}, "after expand");
 
-				that.expectRequest("#13 Artists/$count", 3)
-					.expectRequest("#13 Artists?$apply=com.sap.vocabularies.Hierarchy.v1.TopLevels("
+				that.expectRequest("#15 Artists/$count", 3)
+					.expectRequest("#15 Artists?$apply=com.sap.vocabularies.Hierarchy.v1.TopLevels("
 						+ "HierarchyNodes=$root/Artists,HierarchyQualifier='" + sHierarchyQualifier
 						+ "',NodeProperty='_/NodeID')&$select=ArtistID,IsActiveEntity"
 						+ ",_/DescendantCount,_/DistanceFromRoot,_/DrillState,_/NodeID"
@@ -31386,6 +31505,7 @@ sap.ui.define([
 	// JIRA: CPOUI5ODATAV4-2359
 	//
 	// Use LimitedRank after #create (JIRA: CPOUI5ODATAV4-2430)
+	// Cannot refresh C (Gimel) while 0 (Alpha) is collapsed  (JIRA: CPOUI5ODATAV4-2515)
 	QUnit.test("Recursive Hierarchy: collapse nested initially expanded nodes", function (assert) {
 		var oAlpha,
 			oBeta,
@@ -31767,13 +31887,11 @@ sap.ui.define([
 			assert.strictEqual(oBeta.getBinding(), undefined, "destroyed");
 			oBeta = null;
 
-			//TODO must not drop "context" from Gimel's data once supported
-			//  return Promise.all([
-			//   // code under test
-			//   oNewChild.requestRefresh(undefined, /*bAllowRemoval*/true),
-			//   that.waitForChanges(assert, "refresh C (Gimel)")
-			//  ]);
-			// }).then(function () {
+			//TODO must not drop "context" from Gimel's data once refresh supported
+			assert.throws(function () {
+				// code under test (JIRA: CPOUI5ODATAV4-2515)
+				oNewChild.requestRefresh();
+			}, new Error("Not currently part of the hierarchy: " + oNewChild));
 
 			return Promise.all([
 				// code under test
@@ -68518,6 +68636,10 @@ sap.ui.define([
 	// report and must be inherited by the action.
 	// Check that for all GET requests including late property requests the dataRequested and
 	// dataReceived events are fired at the model (JIRA: CPOUI5ODATAV4-1671)
+	//
+	// Refresh a kept-alive context before it is transferred from a temporary binding to its actual
+	// resolved binding.
+	// SNOW: DINC0637489
 	// list, page: the step number in which they are initialized;
 	// patchNo: the batchNo of the $batch with the PATCH and the side effect request
 	[
@@ -68598,31 +68720,33 @@ sap.ui.define([
 			 * @returns {Promise} - The promise of the requestProperty for "HasDraftEntity"
 			 */
 			function initializeObjectPage(iBatchNo, bLate) {
-				var oResponse = {
-						"@odata.etag" : "etag.active1",
-						HasDraftEntity : false,
-						Messages : [{
-							message : "Active message",
-							numericSeverity : 2,
-							target : "defaultChannel"
-						}],
-						lastUsedChannel : "Channel 2"
-					};
+				const oLateResponse = {
+					"@odata.etag" : "etag.active1",
+					HasDraftEntity : false,
+					Messages : [{
+						message : "Active message",
+						numericSeverity : 2,
+						target : "defaultChannel"
+					}],
+					lastUsedChannel : "Channel 2"
+				};
+				const oResponse = {
+					...oLateResponse,
+					ArtistID : "A1",
+					IsActiveEntity : true,
+					Name : "Artist 1",
+					defaultChannel : "Channel 1"
+				};
 
 				if (bLate) {
 					that.expectRequest("#" + iBatchNo + " Artists(ArtistID='A1',IsActiveEntity=true)"
 							+ "?$select=HasDraftEntity,Messages,lastUsedChannel",
-							oResponse);
+							oLateResponse);
 				} else { // if not late, the list's properties are also part of the request
 					that.expectRequest("#" + iBatchNo + " Artists(ArtistID='A1',IsActiveEntity=true)"
 							+ "?$select=ArtistID,HasDraftEntity,IsActiveEntity,Messages,Name"
 							+ ",defaultChannel,lastUsedChannel",
-						Object.assign(oResponse, {
-							ArtistID : "A1",
-							IsActiveEntity : true,
-							Name : "Artist 1",
-							defaultChannel : "Channel 1"
-						}));
+							oResponse);
 				}
 				that.expectRequest("#" + iBatchNo
 						+ " Artists(ArtistID='A1',IsActiveEntity=true)/_Publication"
@@ -68645,7 +68769,27 @@ sap.ui.define([
 					{$$patchWithoutSideEffects : true});
 				oObjectPage.setBindingContext(oActiveContext);
 
-				return oActiveContext.requestProperty("HasDraftEntity");
+				return oActiveContext.requestProperty("HasDraftEntity").then(function () {
+					that.expectRequest("Artists(ArtistID='A1',IsActiveEntity=true)"
+							+ "?$select=ArtistID,HasDraftEntity,IsActiveEntity,Messages,Name"
+							+ ",defaultChannel,lastUsedChannel"
+							+ (oFixture.list === 1 ? ",sendsAutographs" : ""), {
+							...oResponse,
+							...(oFixture.list === 1 && {sendsAutographs : true})
+						})
+						.expectRequest("Artists(ArtistID='A1',IsActiveEntity=true)/_Publication"
+							+ "?$select=PublicationID&$skip=0&$top=100",
+							{value : [{PublicationID : "P1"}]}
+						);
+
+					// do not observe events and batchNo of these requests (not relevant)
+					iDataRequestedCount -= 2;
+					iDataReceivedCount -= 2;
+					that.iBatchNo -= 1;
+
+					// code under test (SNOW: DINC0637489)
+					return oActiveContext.requestRefresh();
+				});
 			}
 
 			this.expectChange("listName", [])
