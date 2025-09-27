@@ -109,6 +109,28 @@ sap.ui.define([
 		}
 	};
 
+	ABHelper.prototype._setLandmarkInfo = function (oLandmarkInfo) {
+		this._oLandmarkInfo = oLandmarkInfo;
+
+		this._applyAriaAttributes();
+	};
+
+	ABHelper.prototype._applyAriaAttributes = function () {
+		var $oAnchorBar = this._getAnchorBar().$(),
+			oObjectPageLayout = this.getObjectPageLayout(),
+			oFormattedLandmarkInfo = oObjectPageLayout._formatLandmarkInfo(this._oLandmarkInfo, "Navigation");
+
+		if (oFormattedLandmarkInfo.role) {
+			$oAnchorBar.attr("role", oFormattedLandmarkInfo.role);
+		} else if (oFormattedLandmarkInfo.role === ""){
+			$oAnchorBar.removeAttr("role");
+		}
+
+		if (oFormattedLandmarkInfo.label) {
+			$oAnchorBar.attr("aria-label", oFormattedLandmarkInfo.label);
+		}
+	};
+
 	/**
 	 * build the anchorBar and all the anchorBar buttons
 	 * @private

@@ -3053,7 +3053,7 @@ sap.ui.define([
 			.withExactArgs(sinon.match.same(aBatchRequests), sEpilogue, "~bIgnoreETag~")
 			.returns(oBatchRequest);
 
-		this.mock(oRequestor).expects("processOptimisticBatch")
+		this.mock(oRequestor).expects("processOptimisticBatch").exactly(bHasChanges ? 0 : 1)
 			.withExactArgs(sinon.match.same(aBatchRequests), sGroupId);
 		this.mock(oRequestor).expects("sendRequest")
 			.withExactArgs("POST", "$batch?sap-client=123", mExpectedBatchHeaders, "~body~")

@@ -82,6 +82,9 @@ sap.ui.define([
 				 *
 				 * To display the key and the description in one field,
 				 * the key must be set on the <code>value</code> property.
+				 *
+				 * <b>Warning:</b> Don't use a <code>Formatter</code> in the binding of this property since this only allows one-way binding.
+				 * Therefore, no parsing of user input and no model updates are possible.
 				 */
 				value: {
 					type: "any",
@@ -94,6 +97,9 @@ sap.ui.define([
 				 *
 				 * To display the key and the description in one field,
 				 * the description must be set on the <code>additionalValue</code> property.
+				 *
+				 * <b>Warning:</b> Don't use a <code>Formatter</code> in the binding of this property since this only allows one-way binding.
+				 * Therefore, no parsing of user input and no model updates are possible.
 				 */
 				additionalValue: {
 					type: "any",
@@ -237,6 +243,8 @@ sap.ui.define([
 				this.getContentFactory().updateConditionType();
 				this.invalidate(); // as new inner control might be needed
 			}
+		} else if (oBindingInfo.formatter && (sName === "value" || sName === "additionalValue")) { // a formatter is used -> not really supported (no parsing, no model update....)
+			Log.error("Binding for property '" + sName + " uses Formatter, this is not fully supported. Field: " + this);
 		}
 
 		FieldBase.prototype.bindProperty.apply(this, arguments);
@@ -766,7 +774,7 @@ sap.ui.define([
 				// map message to inner control, if needed
 				const oBinding = this.getBinding("value"); // only check value binding
 				let sControlId = this.getId();
-				if (oBinding.isA("sap.ui.model.CompositeBinding") && this.getContentFactory().isMeasure()) {
+				if (oBinding?.isA("sap.ui.model.CompositeBinding") && this.getContentFactory().isMeasure()) {
 					const aContent = this.getCurrentContent();
 					if (aContent.length > 0) {
 						if (oMessage.getMessageProcessor().isA("sap.ui.model.Model")) {

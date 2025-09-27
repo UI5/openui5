@@ -53,7 +53,6 @@
 		},
 		"rootView": {
 			"viewName": "sap.ui.mdc.demokit.sample.Chart.ChartJS.view.Demo",
-			"async": false,
 			"id": "app"
 		},
 		"dependencies": {

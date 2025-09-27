@@ -1386,6 +1386,33 @@ sap.ui.define([
 		oITH.destroy();
 	});
 
+	QUnit.test("Focus moves to selected tab when selectedKey is updated after rendering", async function(assert) {
+		this.clock = sinon.useFakeTimers();
+
+		var oITH = new IconTabHeader({
+			items: [
+				new IconTabFilter({ text: "Tab1", key: "tab1" }),
+				new IconTabFilter({ text: "Tab2", key: "tab2" }),
+				new IconTabFilter({ text: "Tab3", key: "tab3" }),
+				new IconTabFilter({ text: "Tab4", key: "tab4" })
+			]
+		});
+		oITH.placeAt(DOM_RENDER_LOCATION);
+		await nextUIUpdate(this.clock);
+
+		this.clock.tick(1000);
+
+		var fnSpy = this.spy(oITH, "_initItemNavigation");
+
+		oITH.setSelectedKey("tab4");
+		await nextUIUpdate(this.clock);
+
+		assert.ok(fnSpy.calledOnce, "_initItemNavigation was called");
+
+		oITH.destroy();
+		fnRunAllTimersAndRestore(this.clock);
+	});
+
 	QUnit.test("Focused index on focus leave when StartAndEnd overflow", async function(assert) {
 		var oITH = new IconTabHeader({
 			tabsOverflowMode: TabsOverflowMode.StartAndEnd,

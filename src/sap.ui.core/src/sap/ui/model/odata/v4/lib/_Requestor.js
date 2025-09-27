@@ -2011,7 +2011,7 @@ sap.ui.define([
 				this.oModelInterface.isIgnoreETag()
 			);
 
-		return this.processOptimisticBatch(aRequests, sGroupId)
+		return !bHasChanges && this.processOptimisticBatch(aRequests, sGroupId)
 			|| this.sendRequest("POST", "$batch" + this.sQueryParams,
 				Object.assign(oBatchRequest.headers, mBatchHeaders,
 					bHasChanges ? undefined : {"sap-cancel-on-close" : "true"},

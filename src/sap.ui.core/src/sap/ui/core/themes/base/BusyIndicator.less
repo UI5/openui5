@@ -3,6 +3,12 @@
 /* Base theme                                 */
 /* ========================================== */
 
+@_sap_ui_core_LocalBusyIndicator_Background: fade(@sapBackgroundColor, 72%);
+@_sap_ui_core_LocalBusyIndicator_Color: @sapBrandColor;
+@_sap_ui_core_LocalBusyIndicator_BorderRadius: 100%;
+@_sap_ui_core_LocalBusyIndicator_SizeMedium: 1rem;
+@_sap_ui_core_LocalBusyIndicator_SizeBig: 2rem;
+
 .sapUiBusy {
 	background-image: url(img/Busy.gif);
 	display: block;
@@ -10,7 +16,6 @@
 	height: 48px;
 	outline: none;
 	cursor: wait;
-
 	top: 0 !important;
 }
 
@@ -22,17 +27,8 @@
  * Style classes and definitions for the busy indicator implementation of the sap.ui.core.Control.
  */
 
-@_sap_ui_core_LocalBusyIndicator_Background: fade(@sapBackgroundColor, 72%);
-@_sap_ui_core_LocalBusyIndicator_BackgroundIE: @sapBackgroundColor;
-
-@_sap_ui_core_LocalBusyIndicator_Color: @sapBrandColor;
-
-@_sap_ui_core_LocalBusyIndicator_BorderRadius: 100%;
-
-@_sap_ui_core_LocalBusyIndicator_SizeMedium: 1rem;
-@_sap_ui_core_LocalBusyIndicator_SizeBig: 2rem;
-
-.sapUiBlockLayer, .sapUiLocalBusyIndicator {
+.sapUiBlockLayer,
+.sapUiLocalBusyIndicator {
 	background-color: @_sap_ui_core_LocalBusyIndicator_Background;
 	position: absolute;
 	top: 0;
@@ -46,15 +42,15 @@
 	transition: opacity 0.3s ease-in;
 	outline: none;
 
-	&:focus:after {
-		content: "";
+	&:focus::after {
+		content: '';
 		position: absolute;
 		left: 0;
 		top: 0;
 		right: 0;
 		bottom: 0;
 		border-radius: 0.375rem;
-		border: @sapUiContentFocusWidth @sapUiContentFocusStyle @sapUiContentFocusColor;
+		border: var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);
 		pointer-events: none;
 	}
 }
@@ -68,7 +64,7 @@
 	z-index: 1;
 }
 
-//  Make sure blocked layers are not "nested", and in case of busy indicators the animations do not overlay each other
+/* Make sure blocked layers are not "nested", and in case of busy indicators the animations do not overlay each other */
 [__is-busy] .sapUiLocalBusy .sapUiBlockLayer,
 .sapUiLocalBusy .sapUiLocalBusy .sapUiBlockLayer {
 	display: none;
@@ -92,7 +88,6 @@
 .sapUiLocalBusyIndicatorSizeBig {
 	font-size: @_sap_ui_core_LocalBusyIndicator_SizeBig;
 	background-color: transparent;
-
 }
 
 /* Centers the busy indicator markers */
@@ -111,7 +106,7 @@
 	border-radius: @_sap_ui_core_LocalBusyIndicator_BorderRadius;
 	display: block;
 	float: left;
-	margin: 0px;
+	margin: 0;
 	position: relative;
 	text-indent: 1px;
 }
@@ -119,7 +114,7 @@
 /* General pseudo-element styles for background/shadow animation */
 .sapUiLocalBusyIndicatorAnimation > div::before,
 .sapUiLocalBusyIndicatorAnimation > div::after {
-	content: "";
+	content: '';
 	opacity: 1;
 	position: absolute;
 	z-index: -1;
@@ -137,7 +132,7 @@
 
 /* Shadow animation element */
 .sapUiLocalBusyIndicatorAnimation > div::after {
-	box-shadow: inset 0px 0px 2px 1px fade(@_sap_ui_core_LocalBusyIndicator_Color, 80%);
+	box-shadow: inset 0 0 2px 1px fade(@_sap_ui_core_LocalBusyIndicator_Color, 80%);
 }
 
 /* Animations Starting Classes */
@@ -181,13 +176,15 @@
 	animation: sapUiBusyAnimationSmallShadow 1.6s infinite ease-in-out;
 }
 
-html[data-sap-ui-animation-mode="none"] {
+html[data-sap-ui-animation-mode='none'] {
+
 	.sapUiLocalBusyIndicator {
 		transition: none;
 	}
 
 	.sapUiLocalBusyIndicatorAnimStandard,
 	.sapUiLocalBusyIndicatorAnimSmall {
+
 		> div,
 		> div::before,
 		> div::after {
@@ -197,10 +194,12 @@ html[data-sap-ui-animation-mode="none"] {
 	}
 }
 
-html[data-sap-ui-animation-mode="basic"],
-html[data-sap-ui-animation-mode="minimal"] {
+html[data-sap-ui-animation-mode='basic'],
+html[data-sap-ui-animation-mode='minimal'] {
+
 	.sapUiLocalBusyIndicatorAnimStandard,
 	.sapUiLocalBusyIndicatorAnimSmall {
+
 		> div,
 		> div::before,
 		> div::after {
@@ -235,36 +234,50 @@ html[data-sap-ui-animation-mode="minimal"] {
  * Keyframe definitions
  */
 .mixin-standard-background-animation-frames {
-	0%, 80%, 100% {
+
+	0%,
+	80%,
+	100% {
 		opacity: 1;
 	}
+
 	40% {
 		opacity: 0.1;
 	}
 }
 
 .mixin-standard-shadow-animation-frames {
-	0%, 80%, 100% {
+
+	0%,
+	80%,
+	100% {
 		opacity: 0;
 	}
+
 	40% {
 		opacity: 1;
 	}
 }
 
 .mixin-small-background-animation-frames {
-	0%, 100% {
+
+	0%,
+	100% {
 		opacity: 1;
 	}
+
 	50% {
 		opacity: 0.1;
 	}
 }
 
 .mixin-small-shadow-animation-frames {
-	0%, 100% {
+
+	0%,
+	100% {
 		opacity: 0;
 	}
+
 	50% {
 		opacity: 1;
 	}
@@ -274,39 +287,54 @@ html[data-sap-ui-animation-mode="minimal"] {
  * Animations
  */
 @keyframes sapUiBusyAnimationStandard {
-	0%, 80%, 100% {
+
+	0%,
+	80%,
+	100% {
 		transform: scale(0.4);
 	}
+
 	40% {
 		transform: scale(1);
 	}
 }
 
-@keyframes sapUiBusyAnimationStandardBackground { .mixin-standard-background-animation-frames; }
+@keyframes sapUiBusyAnimationStandardBackground {
+	.mixin-standard-background-animation-frames;
+}
 
-@keyframes sapUiBusyAnimationStandardShadow { .mixin-standard-shadow-animation-frames; }
+@keyframes sapUiBusyAnimationStandardShadow {
+	.mixin-standard-shadow-animation-frames;
+}
 
 @keyframes sapUiBusyAnimationSmall {
-	0%, 100% {
+
+	0%,
+	100% {
 		transform: scale(0.2);
 	}
+
 	50% {
 		transform: scale(1);
 	}
 }
-@keyframes sapUiBusyAnimationSmallBackground { .mixin-small-background-animation-frames; }
 
-@keyframes sapUiBusyAnimationSmallShadow { .mixin-small-shadow-animation-frames; }
+@keyframes sapUiBusyAnimationSmallBackground {
+	.mixin-small-background-animation-frames;
+}
 
+@keyframes sapUiBusyAnimationSmallShadow {
+	.mixin-small-shadow-animation-frames;
+}
 
-// #### RETROFIT ####
+/* #### RETROFIT #### */
 
 :root {
 	--ui5_web_components_busy_indicator_display: flex;
 	--ui5_web_components_busy_indicator_background-color: @_sap_ui_core_LocalBusyIndicator_Background;
 }
 
-//  Make sure blocked layers are not "nested", and in case of busy indicators the animations do not overlay each other
+/* Make sure blocked layers are not "nested", and in case of busy indicators the animations do not overlay each other */
 .sapUiLocalBusy {
 	--ui5_web_components_busy_indicator_display: none;
 }

@@ -4010,8 +4010,8 @@ function(
 		assert.strictEqual(oObjectPage.$("headerTitle").attr("aria-label"), "Header", "Header label is set correctly.");
 		assert.strictEqual(oObjectPage.$("footerWrapper").attr("role"), "region", "Footer role is set correctly.");
 		assert.strictEqual(oObjectPage.$("footerWrapper").attr("aria-label"), "Footer", "Footer label is set correctly.");
-		assert.strictEqual(oObjectPage.$("anchorBar").attr("role"), "navigation", "Navigation role is set correctly.");
-		assert.strictEqual(oObjectPage.$("anchorBar").attr("aria-label"), "Navigation", "Navigation label is set correctly.");
+		assert.strictEqual(Element.getElementById(oObjectPage.getId() + "-anchBar").$().attr("role"), "navigation", "Navigation role is set correctly.");
+		assert.strictEqual(Element.getElementById(oObjectPage.getId() + "-anchBar").$().attr("aria-label"), "Navigation", "Navigation label is set correctly.");
 
 		oLandmarkInfo = new ObjectPageAccessibleLandmarkInfo({
 			rootRole: "None",
@@ -4041,9 +4041,9 @@ function(
 		assert.strictEqual(oObjectPage.$("footerWrapper").attr("role"), undefined, "Footer role is not set");
 		assert.strictEqual(oObjectPage.$("footerWrapper").attr("aria-label"), undefined, "Footer label is not set");
 		assert.strictEqual(oObjectPage.$("footerWrapper").attr("aria-roledescription"), undefined, "Footer roledescription is not set");
-		assert.strictEqual(oObjectPage.$("anchorBar").attr("role"), undefined, "Navigation role is not set");
-		assert.strictEqual(oObjectPage.$("anchorBar").attr("aria-label"), undefined, "Navigation label  is not set");
-		assert.strictEqual(oObjectPage.$("anchorBar").attr("aria-roledescription"), undefined, "Navigation roledescription is not set");
+		assert.strictEqual(Element.getElementById(oObjectPage.getId() + "-anchBar").$().attr("role"), undefined, "Navigation role is not set");
+		assert.strictEqual(Element.getElementById(oObjectPage.getId() + "-anchBar").$().attr("aria-label"), undefined, "Navigation label  is not set");
+		assert.strictEqual(Element.getElementById(oObjectPage.getId() + "-anchBar").$().attr("aria-roledescription"), undefined, "Navigation roledescription is not set");
 
 		oLandmarkInfo = new ObjectPageAccessibleLandmarkInfo({
 			rootRole: "None",
