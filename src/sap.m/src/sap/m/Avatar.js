@@ -346,6 +346,15 @@ sap.ui.define([
 		this._checkInitialsHolderWidth();
 	};
 
+	/**
+	 * @returns {object} Current accessibility state of the Avatar
+	 * @see sap.ui.core.Control#getAccessibilityInfo
+	 * @protected
+	 */
+	Avatar.prototype.getAccessibilityInfo = function () {
+		return this.getDecorative() ? { description: "" } : null; // SNOW DINC0365871
+	};
+
 	Avatar.prototype.exit = function () {
 		if (this._fnLightBoxOpen) {
 			this._fnLightBoxOpen = null;

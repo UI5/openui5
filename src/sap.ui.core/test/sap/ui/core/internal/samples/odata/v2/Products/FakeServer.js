@@ -15,7 +15,7 @@ sap.ui.define([
 		};
 	}
 	const mFixture = {
-		"ProductSet?customAll='custom%2Fall'&customService='custom%2Fservice'&$skip=0&$top=5&$select=ProductID%2cName%2cWeightMeasure%2cWeightUnit%2cPrice%2cCurrencyCode&$inlinecount=allpages":
+		"ProductSet?customAll=%27custom%2Fall%27&customService='custom%2Fservice'&$skip=0&$top=5&$select=ProductID%2cName%2cWeightMeasure%2cWeightUnit%2cPrice%2cCurrencyCode&$inlinecount=allpages":
 		{
 			source: "ProductSet_0_5.json"
 		}

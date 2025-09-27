@@ -1243,6 +1243,9 @@ sap.ui.define([
 			oHeaderContent._setLandmarkInfo(this.getLandmarkInfo());
 		}
 
+		if (exists(this._oABHelper) && this._oABHelper._setLandmarkInfo) {
+			this._oABHelper._setLandmarkInfo(this.getLandmarkInfo());
+		}
 	};
 
 	ObjectPageLayout.prototype._onAfterRenderingDomReady = function () {

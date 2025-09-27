@@ -125,7 +125,6 @@ sap.ui.define(["sap/ui/core/Lib"], function(Library) {
 			oRm.class("sapUxAPObjectPageNavigation" + sBackgroundDesign);
 		}
 
-		oRm.accessibilityState(oControl, oControl._formatLandmarkInfo(oLandmarkInfo, "Navigation"));
 		oRm.openEnd();
 
 		// if the content is expanded render bars outside the scrolling div
@@ -168,7 +167,6 @@ sap.ui.define(["sap/ui/core/Lib"], function(Library) {
 			oRm.class("sapUxAPObjectPageNavigation" + sBackgroundDesign);
 		}
 
-		oRm.accessibilityState(oControl, oControl._formatLandmarkInfo(oLandmarkInfo, "Navigation"));
 		oRm.openEnd();
 
 		this._renderAnchorBar(oRm, oControl, oAnchorBar, !oControl._bHeaderInTitleArea);

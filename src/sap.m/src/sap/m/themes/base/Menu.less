@@ -18,7 +18,6 @@
 	font-family: @sapUiFontFamily;
 	font-size: @sapMFontMediumSize;
 	color: @sapUiListTextColor;
-	box-shadow: @sapUiContentShadow1;
 	border-radius: @sapUiElementBorderCornerRadius;
 
 	&.sapMPopover .sapMPopoverCont {
@@ -311,6 +310,11 @@
 
 }
 
+/* Occasionally, the .sapUiShd class loads after .sapMMenu, overriding its box-shadow. */
+.sapMMenu,
+.sapMMenu.sapUiShd {
+	box-shadow: @sapUiContentShadow1;
+}
 /* mobile view */
 .sapMMenu.sapMDialog > header:last-of-type .sapMIBar {
     box-shadow: inset 0 -1px #ebebeb;

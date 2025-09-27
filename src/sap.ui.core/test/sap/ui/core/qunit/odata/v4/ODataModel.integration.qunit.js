@@ -17292,7 +17292,7 @@ sap.ui.define([
 					// Picture (Edm.Stream) missing here
 				})
 				.expectChange("picture", sPrefix + sArtist + "/Picture")
-				.expectChange("link", undefined) // no more Picture@odata.mediaReadlink
+				.expectChange("link", undefined) // no more Picture@odata.mediaReadLink
 				.expectEvents(assert, "sap.ui.model.odata.v4.OData", [
 					["PropertyBinding: /" + sArtist + "|Picture@odata.mediaReadLink", "change",
 						{reason : "change"}],
