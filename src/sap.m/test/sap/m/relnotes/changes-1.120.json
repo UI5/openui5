@@ -1316,5 +1316,15 @@
         "text": " sap.m.Button: has correct css parameters for active Emphasized"
       }
     ]
+  },
+  "1.120.37": {
+    "date": "September 2025",
+    "notes": [
+      {
+        "id": "62e0d0cb0dc284136f09fcb77a38b8268e203991",
+        "type": "FIX",
+        "text": " m.VariantManagement: add aria-expanded & aria-haspopup"
+      }
+    ]
   }
 }
