@@ -388,5 +388,45 @@
         "text": " sap.m.Button: has correct css parameters for active Emphasized"
       }
     ]
+  },
+  "1.136.7": {
+    "date": "September 2025",
+    "notes": [
+      {
+        "id": "7b5e5801fcf10ade2cd0b2a72bfc4a0baef1f65d",
+        "type": "FIX",
+        "text": " sap.m.Tokenizer: first token is now not truncated when not needed"
+      },
+      {
+        "id": "6e25c50118dfabd78720ca14af9f75c3726db795",
+        "type": "FIX",
+        "text": " core/Popup: Use activeElement of both light and shadow DOM to determine focus loss"
+      },
+      {
+        "id": "a4f1bbf1e3dbf608a5f4bbd9e88fc1955579f8cf",
+        "type": "FIX",
+        "text": " sap.m.Avatar: Fix image not visible, when initials are incorrect"
+      },
+      {
+        "id": "452acc9575873ea9bf8bac3b6e51a46fb036d6f7",
+        "type": "FIX",
+        "text": " sap.m.Input: Invisible message is announced correctly"
+      },
+      {
+        "id": "0323cb7e087cc06667fee6abb6c7fba90d18b0b2",
+        "type": "FIX",
+        "text": " We've now fixed the SAP gateway issues for PDFViewer"
+      },
+      {
+        "id": "a5d0b4b8628ea1b2aede931cefd6afe216072639",
+        "type": "FIX",
+        "text": " We've now fixed the issue of tiles not scrolling left or right when buttons are pressed on the slideTile control"
+      },
+      {
+        "id": "b3160e4d9f0f6170e7056b12af2a881ec84a360c",
+        "type": "FIX",
+        "text": " sap.m.IllustratedMessage: correct CSS variable references"
+      }
+    ]
   }
 }

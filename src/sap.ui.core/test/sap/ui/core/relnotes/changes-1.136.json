@@ -318,5 +318,20 @@
         "text": " sap/ui/core/LocaleData: getAllCurrencyDigits ignores CLDR in case of custom currencies with DEFAULT"
       }
     ]
+  },
+  "1.136.7": {
+    "date": "September 2025",
+    "notes": [
+      {
+        "id": "6e25c50118dfabd78720ca14af9f75c3726db795",
+        "type": "FIX",
+        "text": " core/Popup: Use activeElement of both light and shadow DOM to determine focus loss"
+      },
+      {
+        "id": "5ffaa09484e324d53ff151b14f000392c3a22b4e",
+        "type": "FIX",
+        "text": " core/interaction: Cache failed requests to avoid retry attempts"
+      }
+    ]
   }
 }

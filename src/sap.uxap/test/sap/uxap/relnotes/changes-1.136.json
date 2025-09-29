@@ -93,5 +93,15 @@
         "text": " sap.uxap.ObjectPageSubSection: Fix cloning of \"actions\""
       }
     ]
+  },
+  "1.136.7": {
+    "date": "September 2025",
+    "notes": [
+      {
+        "id": "6906fc8783bec2a08beff76542cac5bed80d81e7",
+        "type": "FIX",
+        "text": " sap.uxap.ObjectPageSection: Invalid aria-labelledBy fixed"
+      }
+    ]
   }
 }

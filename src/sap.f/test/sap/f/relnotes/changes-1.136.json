@@ -8,5 +8,15 @@
         "text": " Integration Card: Header Info Section is now implemented"
       }
     ]
+  },
+  "1.136.7": {
+    "date": "September 2025",
+    "notes": [
+      {
+        "id": "58fd4cc3529a210a18f6a02c102124240bb59000",
+        "type": "FIX",
+        "text": " sap.f.FlexibleColumnLayout: prevent animation when initially shown"
+      }
+    ]
   }
 }
