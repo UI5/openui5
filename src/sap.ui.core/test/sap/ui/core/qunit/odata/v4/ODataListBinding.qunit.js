@@ -11253,7 +11253,7 @@ sap.ui.define([
 			.returns("~mQueryOptionsClone~");
 		this.mock(_Helper).expects("aggregateExpandSelect")
 			.withExactArgs("~mQueryOptionsClone~", "~mLateQueryOptions~");
-		this.mock(oCache).expects("setQueryOptions").withExactArgs("~mQueryOptions~");
+		this.mock(oCache).expects("setQueryOptions").withExactArgs("~mQueryOptions~", true);
 		this.mock(oTemporaryBinding).expects("destroy").withExactArgs().callsFake(function () {
 			assert.deepEqual(oTemporaryBinding.mPreviousContextsByPath, {});
 			assert.strictEqual(oTemporaryBinding.oCache, null);
