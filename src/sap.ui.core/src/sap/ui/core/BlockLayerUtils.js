@@ -208,6 +208,13 @@ sap.ui.define([
 		 * @private
 		 */
 		function suppressDefaultAndStopPropagation(oEvent) {
+			const bIsBlocked = !!this.control.getBlocked();
+			const bIsBusy = !!this.control.getBusy();
+			if (!bIsBlocked && !bIsBusy) {
+				// If the control is not blocked anymore, we do not need to suppress events
+				return;
+			}
+
 			var bTargetIsBlockLayer = oEvent.target === this.$blockLayer.get(0),
 				oTabbable;
 
