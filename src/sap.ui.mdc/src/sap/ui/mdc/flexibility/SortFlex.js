@@ -7,8 +7,9 @@ sap.ui.define([
 	"sap/ui/fl/changeHandler/Base",
 	"sap/ui/fl/changeHandler/condenser/Classification",
 	"sap/ui/fl/changeHandler/common/ChangeCategories",
-	"./helpers/addKeyOrName"
-], (merge, Util, FLChangeHandlerBase, CondenserClassification, ChangeCategories, addKeyOrName) => {
+	"./helpers/addKeyOrName",
+	"./helpers/getAffectedSorter"
+], (merge, Util, FLChangeHandlerBase, CondenserClassification, ChangeCategories, addKeyOrName, getAffectedSorter) => {
 	"use strict";
 
 	const fFinalizeSortChange = function(oChange, oControl, oSortContent, bIsRevert) {
@@ -172,7 +173,13 @@ sap.ui.define([
 		revert: fRemoveSort,
 		getCondenserInfo: function(oChange, mPropertyBag) {
 			return {
-				affectedControl: { id: addKeyOrName(oChange.getContent()).key },
+				// DINC0635408: If the application uses flex without backend condensing, the following action will result in a faulty condensing behaviour:
+				// addSort(asc) -> save variant -> removeSort(asc) -> addSort(desc) == addSort(asc) !! expected outcome is addSort(desc)
+				// This is due to the fact, that in those cases only the additional changes applied are considered for condensing, leading to removeSort, addSort canceling each other out,
+				// as they do not have any differing information (both have the same "affectedControl").
+				// To circumvent this issue (also will happen in RTA), we add the sort order to the affectedControl id, to provide a proper distinction during condensing.
+				// This does not have any effect on the actual change, as condensing (and the affectedControl) is not stored in the change, but solely used during runtime.
+				affectedControl: { id: getAffectedSorter(oChange.getContent()) },
 				affectedControlIdProperty: "name",
 				targetContainer: oChange.getSelector(),
 				targetAggregation: "sorters",
@@ -194,7 +201,7 @@ sap.ui.define([
 		revert: fAddSort,
 		getCondenserInfo: function(oChange, mPropertyBag) {
 			return {
-				affectedControl: { id: addKeyOrName(oChange.getContent()).key },
+				affectedControl: { id: getAffectedSorter(oChange.getContent()) },
 				affectedControlIdProperty: "name",
 				targetContainer: oChange.getSelector(),
 				targetAggregation: "sorters",
@@ -216,7 +223,7 @@ sap.ui.define([
 		revert: fMoveSort,
 		getCondenserInfo: function(oChange, mPropertyBag) {
 			return {
-				affectedControl: { id: addKeyOrName(oChange.getContent()).key },
+				affectedControl: { id: getAffectedSorter(oChange.getContent()) },
 				affectedControlIdProperty: "name",
 				targetContainer: oChange.getSelector(),
 				targetAggregation: "sorters",
