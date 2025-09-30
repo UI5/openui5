@@ -416,6 +416,8 @@ sap.ui.define([
 	QUnit.test("validate success equal precision and scale: " + sValue, function (assert) {
 		var oType = new Decimal({}, {precision : 3, scale : 3});
 
+		assert.strictEqual(oType.bIsFloating, false);
+
 		// code under test
 		oType.validateValue(sValue);
 	});
@@ -434,9 +436,9 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	QUnit.test('scale="variable"', function (assert) {
-		var oType;
+		const oType = new Decimal({}, {precision : 3, scale : "variable"});
+		assert.strictEqual(oType.bIsFloating, false);
 
-		oType = new Decimal({}, {precision : 3, scale : "variable"});
 		["123", "12.3", "-1.23"].forEach(function (sValue) {
 			assert.strictEqual(oType.formatValue(sValue, "string"), sValue);
 			oType.validateValue(sValue);
@@ -597,5 +599,34 @@ sap.ui.define([
 
 		// code under test
 		assert.strictEqual(oType.parseValue("~emptyString", "foo"), "~emptyValue");
+	});
+
+	//*********************************************************************************************
+	QUnit.test("constructor: scale='floating'", function (assert) {
+		// code under test
+		const oType = new Decimal({}, {scale: "floating"});
+
+		assert.strictEqual(oType.bIsFloating, true);
+	});
+
+	//*********************************************************************************************
+	QUnit.test("validateValue: scale='floating'", function (assert) {
+		const oType = new Decimal({}, {scale: "floating", precision: 2});
+
+		["120.000", "0.00012", "1.20000", "0", "-12.000", "+0.00012", "-1.20000"].forEach((sValue) => {
+			// code under test
+			oType.validateValue(sValue);
+		});
+
+		["12030.0000", "0.0001203", "12.0300000", "-12030.0000", "+0.0001203", "-12.0300000"].forEach((sValue) => {
+			try {
+				// code under test
+				oType.validateValue(sValue);
+				assert.ok(false);
+			} catch (oError) {
+				assert.ok(oError instanceof ValidateException);
+				assert.strictEqual(oError.message, "Enter a number with a maximum of 2 digits, excluding any leading and trailing zeros");
+			}
+		});
 	});
 });

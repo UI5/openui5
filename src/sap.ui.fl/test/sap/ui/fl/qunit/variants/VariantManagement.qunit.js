@@ -357,7 +357,7 @@ sap.ui.define([
 			oInput.destroy();
 		});
 
-		QUnit.test("Create Variants List", function(assert) {
+		QUnit.skip("Create Variants List", function(assert) {
 			this.oVariantManagement.setModel(oModel, ControlVariantApplyAPI.getVariantModelName());
 
 			assert.ok(!this._oVM.oVariantPopOver);

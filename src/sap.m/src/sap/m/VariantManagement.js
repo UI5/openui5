@@ -1379,8 +1379,6 @@ sap.ui.define([
 			if (bTriggerForSameItem || (!bTriggerForSameItem && (this.getSelectedKey() !== sKey))) {
 				this.setSelectedKey(sKey);
 
-				this.setModified(false);
-
 				this.fireSelect({
 					key: sKey
 				});

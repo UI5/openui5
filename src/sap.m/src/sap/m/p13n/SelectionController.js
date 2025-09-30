@@ -665,7 +665,8 @@ sap.ui.define([
 			//check if the provided state item holds the value to check for
 			if (oItem.hasOwnProperty(sSetAttribute)) {
 				const oExistingItem = aExistingState.find((oExisting) => {
-					return oExisting.name == oItem.name;
+					const sIdentifier = oExisting.hasOwnProperty("key") ? "key" : "name";
+					return oExisting[sIdentifier] == oItem[sIdentifier];
 				});
 
 				//compare to identify delta (only create a change if really necessary)
