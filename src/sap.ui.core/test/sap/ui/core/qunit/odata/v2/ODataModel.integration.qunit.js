@@ -27125,4 +27125,51 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 
 		await this.waitForChanges(assert);
 	});
+
+	//*********************************************************************************************
+	// Scenario: Decimal type with scale="floating" can be used to represent a DECFLOAT.
+	// JIRA: CPOUI5MODELS-1961
+	QUnit.test("odata.type.Decimal: scale='floating'", async function (assert) {
+		const oModel = new JSONModel({
+				RequestedQuantity: "1.23e+5"
+			});
+		const sView = `
+<Input id="quantity" value="{
+	path: '/RequestedQuantity',
+	type: 'sap.ui.model.odata.type.Decimal',
+	constraints: {scale: 'floating', precision: 4}
+}" />`;
+		this.expectValue("quantity", "123,000");
+
+		await this.createView(assert, sView, oModel);
+
+		const oInput = this.oView.byId("quantity");
+		this.expectMessages([{
+				code: undefined,
+				descriptionUrl: undefined,
+				fullTarget: "",
+				message: "EnterNumberSignificantDigits 4",
+				persistent: false,
+				target: oInput.getId() + "/value",
+				technical: false,
+				type: "Error"
+			}])
+			.expectValue("quantity", "12345e+4");
+
+		TestUtils.withNormalizedMessages(() => {
+			// code under test
+			oInput.setValue("12345e+4");
+		});
+
+		await this.waitForChanges(assert, "produce validation error");
+
+		this.expectMessages([])
+			.expectValue("quantity", "124,000")
+			.expectValue("quantity", "124,000");
+
+		// code under test
+		oInput.setValue("1.24e+5");
+
+		await this.waitForChanges(assert, "valid entry");
+	});
 });

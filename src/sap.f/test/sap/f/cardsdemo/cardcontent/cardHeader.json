@@ -1,0 +1,14 @@
+{
+    "number": "65.34",
+    "unit": "K",
+    "trend": "Down",
+    "state": "Error",
+    "target": {
+        "number": 100,
+        "unit": "K"
+    },
+    "deviation": {
+        "number": 34.7,
+        "state": "Critical"
+    }
+}

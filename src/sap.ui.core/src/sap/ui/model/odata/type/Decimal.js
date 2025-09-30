@@ -16,6 +16,7 @@ sap.ui.define([
 
 	var rDecimal = /^[-+]?(\d+)(?:\.(\d+))?$/,
 		rTrailingZeroes = /(?:(\.[0-9]*[1-9]+)0+|\.0*)$/;
+	const rInsignificantZeros = /^0+|0+$/g;
 
 	/**
 	 * Returns the type's scale constraint.
@@ -131,7 +132,8 @@ sap.ui.define([
 			vPrecision = oConstraints.precision;
 			vScale = oConstraints.scale;
 
-			iScale = vScale === "variable" ? Infinity : validateInt(vScale, 0, 0, "scale");
+			iScale = vScale === "variable" || vScale === "floating" ? Infinity : validateInt(vScale, 0, 0, "scale");
+			oType.bIsFloating = vScale === "floating";
 			iPrecision = validateInt(vPrecision, Infinity, 1, "precision");
 			if (iScale !== Infinity && iPrecision < iScale) {
 				Log.warning("Illegal scale: must be less than or equal to precision (precision="
@@ -395,7 +397,12 @@ sap.ui.define([
 			throw new ValidateException(getText("EnterNumberFraction", [iScale]));
 		}
 		if (iScale === Infinity) {
-			if (iIntegerDigits + iFractionDigits > iPrecision) {
+			if (this.bIsFloating) {
+				const sSignificantDigits = (aMatches[1] + (aMatches[2] ?? "")).replace(rInsignificantZeros, "");
+				if (sSignificantDigits.length > iPrecision) {
+					throw new ValidateException(getText("EnterNumberSignificantDigits", [iPrecision]));
+				}
+			} else if (iIntegerDigits + iFractionDigits > iPrecision) {
 				throw new ValidateException(getText("EnterNumberPrecision", [iPrecision]));
 			}
 		} else if (iIntegerDigits > iPrecision - iScale) {

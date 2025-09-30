@@ -66,14 +66,14 @@ sap.ui.define([
 	 * @param {string} sServiceUrl
 	 *   URL of the service document to request the CSRF token from; also used to resolve
 	 *   relative resource paths (see {@link #request})
+	 * @param {object} oModelInterface
+	 *   An interface allowing to call back to the owning model (see {@link .create})
 	 * @param {object} [mHeaders={}]
 	 *   Map of default headers; may be overridden with request-specific headers; certain
 	 *   predefined OData V4 headers are added by default, but may be overridden
 	 * @param {object} [mQueryParams={}]
 	 *   A map of query parameters as described in
 	 *   {@link sap.ui.model.odata.v4.lib._Helper.buildQuery}; used only to request the CSRF token
-	 * @param {object} oModelInterface
-	 *   An interface allowing to call back to the owning model (see {@link .create})
 	 * @param {boolean} [bWithCredentials]
 	 *   Whether the XHR should be called with <code>withCredentials</code>
 	 *
@@ -81,7 +81,7 @@ sap.ui.define([
 	 * @constructor
 	 * @private
 	 */
-	function _Requestor(sServiceUrl, mHeaders, mQueryParams, oModelInterface, bWithCredentials) {
+	function _Requestor(sServiceUrl, oModelInterface, mHeaders, mQueryParams, bWithCredentials) {
 		this.mBatchQueue = {};
 		this.bBatchSent = false;
 		this.mHeaders = mHeaders || {};
@@ -2449,7 +2449,7 @@ sap.ui.define([
 	 */
 	_Requestor.create = function (sServiceUrl, oModelInterface, mHeaders, mQueryParams,
 			sODataVersion, bWithCredentials) {
-		var oRequestor = new _Requestor(sServiceUrl, mHeaders, mQueryParams, oModelInterface,
+		var oRequestor = new _Requestor(sServiceUrl, oModelInterface, mHeaders, mQueryParams,
 			bWithCredentials);
 
 		if (sODataVersion === "2.0") {

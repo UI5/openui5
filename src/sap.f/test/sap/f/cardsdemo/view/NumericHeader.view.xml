@@ -17,6 +17,36 @@
 
 		<Panel>
 			<f:GridContainer>
+				<w:Card id="cardWithActionStatusAndTimestamp" manifest="{manifests>/kpiManifests/cardWithActionStatusAndTimestamp}" width="320px" class="sapUiSmallMargin" baseUrl="{cardsPlayground>/playgroundBaseUrl}">
+					<w:layoutData>
+						<f:GridContainerItemLayoutData columns="4" />
+					</w:layoutData>
+				</w:Card>
+
+				<w:Card id="cardWithStatusAndTimestamp" manifest="{manifests>/kpiManifests/cardWithStatusAndTimestamp}" width="320px" class="sapUiSmallMargin" baseUrl="{cardsPlayground>/playgroundBaseUrl}">
+					<w:layoutData>
+						<f:GridContainerItemLayoutData columns="4" />
+					</w:layoutData>
+				</w:Card>
+
+				<w:Card id="cardWithStatus" manifest="{manifests>/kpiManifests/cardWithStatus}" width="320px" class="sapUiSmallMargin">
+					<w:layoutData>
+						<f:GridContainerItemLayoutData columns="4" />
+					</w:layoutData>
+				</w:Card>
+
+				<w:Card id="cardWithTimestamp" manifest="{manifests>/kpiManifests/cardWithTimestamp}" width="320px" class="sapUiSmallMargin" baseUrl="{cardsPlayground>/playgroundBaseUrl}">
+					<w:layoutData>
+						<f:GridContainerItemLayoutData columns="4" />
+					</w:layoutData>
+				</w:Card>
+
+				<w:Card id="cardWithTimestampAndNoSubtitle" manifest="{manifests>/kpiManifests/cardWithTimestampAndNoSubtitle}" width="320px" class="sapUiSmallMargin" baseUrl="{cardsPlayground>/playgroundBaseUrl}">
+					<w:layoutData>
+						<f:GridContainerItemLayoutData columns="4" />
+					</w:layoutData>
+				</w:Card>
+
 				<f:Card id="fcard1">
 					<f:layoutData>
 						<f:GridContainerItemLayoutData columns="4" />

@@ -993,15 +993,16 @@ sap.ui.define([
 			});
 		});
 
-		QUnit.test("returns a resolving promise when no change handler can be found", function(assert) {
-			const oError = Error("no change handler");
+		QUnit.test("returns a resolving promise when no change handler can be found", async function(assert) {
+			const errorMsg = "No Change handler registered for the Control and Change type";
 			ChangeUtils.getChangeHandler.restore();
-			sandbox.stub(ChangeUtils, "getChangeHandler").rejects(oError);
+			const oMarkFailedChangeSpy = sandbox.spy(this.oChange, "markFailed");
 
-			return Applier.applyChangeOnControl(this.oChange, this.oControl, this.mPropertyBag).then(function(oReturn) {
-				assert.strictEqual(oReturn.success, false, "the promise returns false as result");
-				assert.ok(oReturn.error, oError, "the error object was passed");
-			});
+			const result = await Applier.applyChangeOnControl(this.oChange, this.oControl, this.mPropertyBag);
+			assert.notOk(result.success, "Result indicates failure");
+			assert.ok(result.error instanceof Error, "Error object is returned");
+			assert.strictEqual(result.error.message, errorMsg, "Correct error message is returned");
+			assert.strictEqual(oMarkFailedChangeSpy.callCount, 1, "markFailed was called once");
 		});
 
 		QUnit.test("does not call the changeHandler if the change is currently being applied and succeeds", async function(assert) {

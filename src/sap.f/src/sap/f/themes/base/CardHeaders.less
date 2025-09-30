@@ -162,6 +162,11 @@
 		color: @sapUiTileTextColor;
 		font-size: @sapMFontSmallSize;
 		flex-shrink: 0;
+		text-align: right;
+		line-height: normal;
+		display: inline-flex;
+		justify-content: flex-end;
+		align-items: center;
 	}
 
 	.sapFCardStatusWrapper.sapFCardHeaderLineIncludesDataTimestamp  .sapFCardStatus{
@@ -174,11 +179,15 @@
 		align-items: flex-end;
 		padding-right: 1rem;
 		padding-left: 0.5rem;
-		padding-bottom: 1rem;
+		padding-bottom: 0.25rem;
 
 		&:not(:has(> :not(:empty))) {
 			display: none;
 		}
+	}
+
+	.sapFCardHeaderLastPart + .sapFCardHeaderToolbarCont {
+		padding-bottom: @_sap_f_CardHeaders_Padding;
 	}
 
 	&.sapFCardHeaderHasToolbar {
@@ -225,6 +234,19 @@
 
 		.sapMText {
 			cursor: pointer;
+		}
+	}
+
+	.sapMBtn {
+		right: -0.5rem;
+		padding-top: 0.5rem;
+		padding-bottom: 0.25rem;
+		height: auto;
+	} 
+
+	&:not(:has(.sapFCardSubtitle)) {
+		.sapFCardHeaderToolbarCont {
+			justify-content: center;
 		}
 	}
 }
@@ -275,7 +297,7 @@
 	}
 
 	.sapFCardSubtitle {
-		margin: 0.25rem 0 0 0;
+		margin: 0.5rem 0 0 0;
 		display: flex;
 		align-items: flex-end;
 

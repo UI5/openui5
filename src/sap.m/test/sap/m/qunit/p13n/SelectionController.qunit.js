@@ -1081,6 +1081,24 @@ sap.ui.define([
 		assert.equal(aSetChanges.length, 1, "One change created as the value is changed");
 	});
 
+	QUnit.test("Check 'getPropertySetterChanges' (without 'name' property)", function(assert) {
+		const aSetChanges = this.oSelectionController.getPropertySetterChanges({
+			operation: "setSomeProperty",
+			control: new Control(),
+			deltaAttribute: "someProperty",
+			existingState: [
+				{ key: "a", someProperty: "foo" },
+				{ key: "b", someProperty: "bar" }
+			],
+			changedState: [
+				{ key: "a", someProperty: "foo" },
+				{ key: "b", someProperty: "bar" }
+			]
+		});
+
+		assert.equal(aSetChanges.length, 0, "No changes created as the value is the same");
+	});
+
 	QUnit.test("Check 'getKeyForItem' execution", function(assert){
 
 		const oControl1 =  new Control("TestControl_1");

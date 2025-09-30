@@ -2630,11 +2630,11 @@ sap.ui.define([
 					// registered, is still waiting for its value and gets it via fetchValue
 					if (sCount) {
 						vPropertyValue.$count = parseInt(sCount);
-					} else if (!oInstance[sProperty + "@odata.nextLink"]) {
+					} else if (oInstance[sProperty + "@odata.nextLink"]) {
+						vPropertyValue.$count = undefined; // see _Helper.setCount
+					} else {
 						// Note: This relies on the fact that $skip/$top is not used on nested lists
 						vPropertyValue.$count = vPropertyValue.length;
-					} else {
-						vPropertyValue.$count = undefined; // see _Helper.setCount
 					}
 					visitArray(vPropertyValue, sPropertyMetaPath, sPropertyPath,
 						buildContextUrl(sContextUrl, oInstance[sProperty + "@odata.context"]));
