@@ -9,8 +9,9 @@
 
 sap.ui.define([
 	"sap/base/util/isPlainObject",
-	"sap/base/util/merge"
-], function(isPlainObject, merge) {
+	"sap/base/util/merge",
+	"./config"
+], function(isPlainObject, merge, DEFAULT_CONFIG) {
 	"use strict";
 
 	// ---- helpers ----
@@ -110,7 +111,7 @@ sap.ui.define([
 		// add URL parameters if given
 		if ( oParams != null ) {
 			if ( typeof oParams !== "object" ) {
-				throw new TypeError(`Test '${sName}': Option 'uriParams' must be an object.`);
+				throw new TypeError(`Test '${sName}': URL parameters must be an object.`);
 			}
 			const urlParams = url.searchParams;
 			for (const name in oParams) {
@@ -130,61 +131,6 @@ sap.ui.define([
 	}
 
 	// ---- Suite Configuration ----
-
-	var DEFAULT_CONFIG = {
-		name: null,
-		beforeBootstrap: null,
-		module: "./{name}.qunit",
-		page: "resources/sap/ui/test/starter/Test.qunit.html?testsuite={suite}&test={name}",
-		title: "QUnit tests '{name}' of suite '{suite}'",
-		qunit: {
-			versions: {
-				1: {
-					module: "sap/ui/thirdparty/qunit",
-					css: "sap/ui/thirdparty/qunit-2.css"
-				},
-				2: {
-					module: "sap/ui/thirdparty/qunit-2",
-					css: "sap/ui/thirdparty/qunit-2.css"
-				},
-				edge: 2,
-				"true": "edge"
-			},
-			version: "edge"
-		},
-		sinon: {
-			versions: {
-				1: {
-					module: "sap/ui/thirdparty/sinon",
-					bridge: "sap/ui/thirdparty/sinon-qunit"
-				},
-				4: {
-					module: "sap/ui/thirdparty/sinon-4",
-					bridge: "sap/ui/qunit/sinon-qunit-bridge"
-				},
-				edge: 4,
-				"true": "edge"
-			},
-			version: "edge",
-			qunitBridge: true,
-			useFakeTimers: false,
-			useFakeServer: false
-		},
-		coverage: {
-			only: null,
-			never: null,
-			branchTracking: false,
-			// "auto" checks for istanbul middleware and loads istanbul instrumentation, otherwise blanket is used.
-			// The other options set explicitly the desired instrumenter.
-			instrumenter: "auto" // blanket, istanbul, auto (default)
-		},
-		ui5: {
-			bindingSyntax: 'complex',
-			libs: []
-		},
-		bootCore: true,
-		autostart: true
-	};
 
 	function normalize(oTestConfig) {
 		if ( oTestConfig && typeof oTestConfig === "object" ) {
@@ -261,7 +207,7 @@ sap.ui.define([
 				oTestConfig.module = resolvePackage(resolvePlaceholders(oTestConfig.module, name));
 			}
 			oTestConfig.beforeBootstrap = resolvePackage(resolvePlaceholders(oTestConfig.beforeBootstrap, name));
-			oTestConfig.page = createEffectivePageURL(resolvePlaceholders(oTestConfig.page, name), oTestConfig.uriParams, name);
+			oTestConfig.page = createEffectivePageURL(resolvePlaceholders(oTestConfig.page, name), oTestConfig.searchParams || oTestConfig.uriParams, name);
 
 			oTestConfig.title = resolvePlaceholders(oTestConfig.title, name);
 			oSuiteConfig.tests[name] = oTestConfig;

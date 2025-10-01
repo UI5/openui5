@@ -29,6 +29,7 @@ sap.ui.define([
 	const oEventing = new Eventing();
 	// Remember the initial favicon path in case there was already a favicon provided
 	const sInitialFaviconPath = document.querySelector("link[rel=icon]")?.getAttribute("href");
+	const aInitialThemeLibs = [];
 	let pThemeManager, oThemeManager;
 
 	/**
@@ -619,6 +620,14 @@ sap.ui.define([
 					library: oLibThemingInfo
 				});
 			} else {
+				// Handle scenarios where sap.ui.core is bundled with other libraries but the ThemeManager
+				// is not yet loaded (though it's part of the same bundle). In these cases, the ThemeManager
+				// is executed via the sap.ui.require call below, which causes it to register for the Theming
+				// facade's change event while other libraries are still being processed in the same call stack.
+				// This timing issue results in library themes being added to the DOM before the core theme,
+				// so we need to collect libraries when the ThemeManager is unavailable and process them
+				// during registerThemeManager execution.
+				aInitialThemeLibs.push(oLibThemingInfo);
 				if (!pThemeManager) {
 					pThemeManager = new Promise(function (resolve, reject) {
 						sap.ui.require([
@@ -628,11 +637,6 @@ sap.ui.define([
 						}, reject);
 					});
 				}
-				pThemeManager.then(() => {
-					fireChange({
-						library: oLibThemingInfo
-					});
-				});
 			}
 		},
 
@@ -706,6 +710,11 @@ sap.ui.define([
 			oThemeManager = oManager;
 			attachThemeApplied(function(oEvent) {
 				fireApplied(BaseEvent.getParameters(oEvent));
+			});
+			aInitialThemeLibs.forEach((oLibThemingInfo) => {
+				fireChange({
+					library: oLibThemingInfo
+				});
 			});
 		}
 	});
