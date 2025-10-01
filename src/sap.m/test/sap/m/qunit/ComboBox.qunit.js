@@ -5521,6 +5521,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("onsapescape - close the picker popup", async function (assert) {
+        await nextUIUpdate(this.clock);
 		this.clock.restore();
 		// system under test
 		var oComboBox = new ComboBox({
