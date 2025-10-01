@@ -162,6 +162,109 @@ sap.ui.define([
 		assert.ok(!this.oVM._isItemDeleted(oVMI2), "item is not deleted.");
 	});
 
+	QUnit.test("VariantManagement check aria-expanded initial state", async function(assert) {
+		this.oVM.addItem(new VariantItem({key: "1", title:"One"}));
+		this.oVM.setSelectedKey("1");
+
+		await nextUIUpdate();
+
+		const oTriggerButton = this.oVM.oVariantPopoverTrigger;
+		assert.ok(oTriggerButton, "trigger button should exist");
+
+		const sAriaExpanded = oTriggerButton.$().attr("aria-expanded");
+		assert.equal(sAriaExpanded, "false", "aria-expanded should be 'false' after initial rendering");
+	});
+
+	QUnit.test("VariantManagement check aria-expanded attribute", async function(assert) {
+		this.oVM.addItem(new VariantItem({key: "1", title:"One"}));
+		this.oVM.addItem(new VariantItem({key: "2", title:"Two"}));
+		this.oVM.setSelectedKey("1");
+
+		await nextUIUpdate();
+
+		const oTriggerButton = this.oVM.oVariantPopoverTrigger;
+		assert.ok(oTriggerButton, "trigger button should exist");
+
+		// Assert initial state - should be false
+		const sInitialAriaExpanded = oTriggerButton.$().attr("aria-expanded");
+		assert.equal(sInitialAriaExpanded, "false", "aria-expanded should initially be 'false'");
+
+		const done = assert.async();
+
+		// Mock the variant list opening to test aria-expanded behavior
+		const fOriginalOpenVariantList = this.oVM._openVariantList.bind(this.oVM);
+		sinon.stub(this.oVM, "_openVariantList").callsFake(function() {
+			fOriginalOpenVariantList();
+
+			// Verify aria-expanded is set to true when opening
+			const sExpandedValue = oTriggerButton.$().attr("aria-expanded");
+			assert.equal(sExpandedValue, "true", "aria-expanded should be 'true' when variant list opens");
+
+			// Test closing behavior
+			if (this.oVariantPopOver && this.oVariantPopOver.isOpen()) {
+				this.oVariantPopOver.attachAfterClose(function() {
+					// Wait a bit for the timeout in afterClose to execute (longer than the 200ms timeout in the implementation)
+					setTimeout(function() {
+						const sCollapsedValue = oTriggerButton.$().attr("aria-expanded");
+						assert.equal(sCollapsedValue, "false", "aria-expanded should be 'false' when variant list closes");
+						done();
+					}, 250);
+				});
+				this.oVariantPopOver.close();
+			} else {
+				done();
+			}
+		}.bind(this));
+
+		// Act
+		this.oVM.onclick();
+	});
+
+	QUnit.test("VariantManagement check aria-expanded attribute in error state", async function(assert) {
+		this.oVM.addItem(new VariantItem({key: "1", title:"One"}));
+		this.oVM.setSelectedKey("1");
+		this.oVM.setInErrorState(true);
+
+		await nextUIUpdate();
+
+		const oTriggerButton = this.oVM.oVariantPopoverTrigger;
+		assert.ok(oTriggerButton, "trigger button should exist");
+
+		// Assert initial state - should be false
+		const sInitialAriaExpanded = oTriggerButton.$().attr("aria-expanded");
+		assert.equal(sInitialAriaExpanded, "false", "aria-expanded should initially be 'false'");
+
+		const done = assert.async();
+
+		// Mock the error state opening to test aria-expanded behavior
+		const fOriginalOpenInErrorState = this.oVM._openInErrorState.bind(this.oVM);
+		sinon.stub(this.oVM, "_openInErrorState").callsFake(function() {
+			fOriginalOpenInErrorState();
+
+			// In error state, aria-expanded should remain false since the variant list doesn't open
+			const sExpandedValue = oTriggerButton.$().attr("aria-expanded");
+			assert.equal(sExpandedValue, "false", "aria-expanded should remain 'false' in error state since variant list doesn't open");
+
+			// Test closing behavior for error popover
+			if (this.oErrorVariantPopOver && this.oErrorVariantPopOver.isOpen()) {
+				this.oErrorVariantPopOver.attachAfterClose(function() {
+					// Wait a bit for the timeout in afterClose to execute (longer than the 200ms timeout in the implementation)
+					setTimeout(function() {
+						const sCollapsedValue = oTriggerButton.$().attr("aria-expanded");
+						assert.equal(sCollapsedValue, "false", "aria-expanded should remain 'false' after error popover closes");
+						done();
+					}, 250);
+				});
+				this.oErrorVariantPopOver.close();
+			} else {
+				done();
+			}
+		}.bind(this));
+
+		// Act
+		this.oVM.onclick();
+	});
+
 	QUnit.module("VariantManagement variantlist", {
 		beforeEach: async function() {
 			this.oVM = new VariantManagement();
