@@ -717,7 +717,7 @@ sap.ui.define([
 		}
 	});
 
-	registerThemeManager(ThemeManager, (fireApplied) => {
+	registerThemeManager((fireApplied) => {
 		oEventing.attachEvent("applied", fireApplied);
 	});
 

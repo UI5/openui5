@@ -381,7 +381,7 @@ sap.ui.define([
 		 */
 		attachAppliedOnce: (fnFunction) => {
 			const sId = "applied";
-			if (!oThemeManager || oThemeManager.themeLoaded) {
+			if (!pThemeManager || oThemeManager?.themeLoaded) {
 				fnFunction.call(null, new BaseEvent(sId, {theme: Theming.getTheme()}));
 			} else {
 				oEventing.attachEventOnce(sId, fnFunction);
@@ -402,7 +402,7 @@ sap.ui.define([
 		attachApplied: (fnFunction) => {
 			const sId = "applied";
 			oEventing.attachEvent(sId, fnFunction);
-			if (!oThemeManager || oThemeManager.themeLoaded) {
+			if (!pThemeManager || oThemeManager?.themeLoaded) {
 				fnFunction.call(null, new BaseEvent(sId, {theme: Theming.getTheme()}));
 			}
 		},
@@ -586,6 +586,18 @@ sap.ui.define([
 		return libThemePath;
 	}
 
+	function loadThemeManager() {
+		pThemeManager ??= new Promise(function (resolve, reject) {
+			sap.ui.require([
+				"sap/ui/core/theming/ThemeManager"
+			], function (ThemeManager) {
+					oThemeManager = ThemeManager;
+					resolve(ThemeManager);
+			}, reject);
+		});
+		return pThemeManager;
+	}
+
 	Theming.attachApplied(() => {
 		Theming.getFavicon().then((favicon) => {
 			if (favicon) {
@@ -620,16 +632,7 @@ sap.ui.define([
 					library: oLibThemingInfo
 				});
 			} else {
-				if (!pThemeManager) {
-					pThemeManager = new Promise(function (resolve, reject) {
-						sap.ui.require([
-							"sap/ui/core/theming/ThemeManager"
-						], function (ThemeManager) {
-								resolve(ThemeManager);
-						}, reject);
-					});
-				}
-				pThemeManager.then(() => {
+				loadThemeManager().then(() => {
 					fireChange({
 						library: oLibThemingInfo
 					});
@@ -696,17 +699,18 @@ sap.ui.define([
 			oEventing.detachEvent("change", fnFunction);
 		},
 
-		/** Register a ThemeManager instance
-		 * @param {sap.ui.core.theming.ThemeManager} oManager The ThemeManager to register.
+		/**
+		 * Register a ThemeManager instance
 		 * @param {function} attachThemeApplied Callback function to register fireThemeApplied.
 		 * @private
 		 * @ui5-restricted sap.ui.core.theming.ThemeManager
 		 * @since 1.118.0
 		*/
-		registerThemeManager: (oManager, attachThemeApplied) => {
-			oThemeManager = oManager;
-			attachThemeApplied(function(oEvent) {
-				fireApplied(BaseEvent.getParameters(oEvent));
+		registerThemeManager: (attachThemeApplied) => {
+			loadThemeManager().then(() => {
+				attachThemeApplied(function(oEvent) {
+					fireApplied(BaseEvent.getParameters(oEvent));
+				});
 			});
 		}
 	});
