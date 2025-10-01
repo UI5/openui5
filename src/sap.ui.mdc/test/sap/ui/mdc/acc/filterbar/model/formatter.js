@@ -10,6 +10,12 @@ sap.ui.define(function() {
 			} catch (error) {
 				return value;
 			}
+		},
+		formatCountryArray: (countryArray) => {
+			if (!countryArray || !Array.isArray(countryArray)) {
+				return "";
+			}
+			return countryArray.join(", ");
 		}
 	};
 });

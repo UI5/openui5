@@ -15,7 +15,225 @@
 	>
 
 	<App id="MyApp" defaultTransitionName="show">
-		<Page id="P0" title="FilterBar Sample" titleLevel="H1">
+		<Page id="P0" title="FilterBar Sample" titleLevel="H1">			
+		<dependents>
+			<mdc:ValueHelp id="VHRange"
+				delegate='\{"name": "sap/ui/mdc/acc/filterbar/delegate/JSONValueHelpDelegate", "payload": \{"firstMatch": "CaseInsensitiveStartsWith", "searchKeys": ["range"]\}\}'>
+				<mdc:dialog>
+					<mdcvh:Dialog title="Ranges">
+					<mdcvc:MDCTable id="languageTable2" keyPath="range" descriptionPath="range" title="Ranges with Countries" group="colsearch"
+							forceBind="true">
+							<mdcvc:filterBar>
+								<mdcvh:FilterBar id="titleVHFB" liveMode="false"
+									delegate='\{"name": "sap/ui/mdc/acc/filterbar/delegate/JSONFilterBarDelegate", "payload": \{\}\}'>
+									<mdcvh:basicSearchField>
+										<mdc:FilterField
+											delegate='\{"name": "sap/ui/mdc/field/FieldBaseDelegate", "payload": \{\}\}'
+											conditions="{$filters>/conditions/$search}"
+											propertyKey="$search"
+											width="50%"
+											maxConditions="1"
+											placeholder="Search" />
+									</mdcvh:basicSearchField>
+									<mdcvh:filterItems>
+										<mdc:FilterField
+											delegate='\{"name": "sap/ui/mdc/field/FieldBaseDelegate", "payload": \{\}\}'
+											label="Countries" conditions="{$filters>/conditions/countries}"
+											propertyKey="countries" />
+										<mdc:FilterField
+											delegate='\{"name": "sap/ui/mdc/field/FieldBaseDelegate", "payload": \{\}\}'
+											label="Dummy1"
+											propertyKey="dummy1" />
+										<mdc:FilterField
+											delegate='\{"name": "sap/ui/mdc/field/FieldBaseDelegate", "payload": \{\}\}'
+											label="Dummy2"
+											propertyKey="dummy2" />
+										<mdc:FilterField
+											delegate='\{"name": "sap/ui/mdc/field/FieldBaseDelegate", "payload": \{\}\}'
+											label="Dummy3"
+											propertyKey="dummy3" />
+										<mdc:FilterField
+											delegate='\{"name": "sap/ui/mdc/field/FieldBaseDelegate", "payload": \{\}\}'
+											label="Dummy4"
+											propertyKey="dummy4" />
+										<mdc:FilterField
+											delegate='\{"name": "sap/ui/mdc/field/FieldBaseDelegate", "payload": \{\}\}'
+											label="Dummy5"
+											propertyKey="dummy5" />
+										<mdc:FilterField
+											delegate='\{"name": "sap/ui/mdc/field/FieldBaseDelegate", "payload": \{\}\}'
+											label="Dummy6"
+											propertyKey="dummy6" />
+										<mdc:FilterField
+											delegate='\{"name": "sap/ui/mdc/field/FieldBaseDelegate", "payload": \{\}\}'
+											label="Dummy7"
+											propertyKey="dummy7" />
+										<mdc:FilterField
+											delegate='\{"name": "sap/ui/mdc/field/FieldBaseDelegate", "payload": \{\}\}'
+											label="Dummy8"
+											propertyKey="dummy8" />
+										<mdc:FilterField
+											delegate='\{"name": "sap/ui/mdc/field/FieldBaseDelegate", "payload": \{\}\}'
+											label="Dummy9"
+											propertyKey="dummy9" />
+									</mdcvh:filterItems>
+								</mdcvh:FilterBar>
+							</mdcvc:filterBar>
+
+							<mdc:Table id="FHLanguage-mdcTable2"
+								autoBindOnInit="false"
+								width="100%"
+								p13nMode="Sort"
+								delegate='\{"name": "sap/ui/mdc/acc/filterbar/delegate/JSONTableDelegate", "payload": \{"bindingPath": "mountains>/ranges"\}\}'
+								threshold="50"
+								enableAutoColumnWidth="true">
+								<mdc:columns>
+									<mdct:Column id="FHRange-mdcTable--range2" header="Ranges"
+										propertyKey="range">
+										<Text text="{mountains>range}" />
+									</mdct:Column>
+									<mdct:Column id="FHRange-mdcTable--country2" header="Countries"
+										propertyKey="country">
+										<Text text="{
+											parts: ['mountains>country'],
+											formatter: '.formatter.formatCountryArray'
+										}" />
+									</mdct:Column>
+								</mdc:columns>
+								<mdc:type>
+									<mdct:ResponsiveTableType />
+								</mdc:type>
+							</mdc:Table>
+						</mdcvc:MDCTable>
+
+						<mdcvc:MDCTable id="languageTable" keyPath="range" descriptionPath="range" title="Only Ranges" group="colsearch"
+							forceBind="true">
+							<mdc:Table id="FHLanguage-mdcTable"
+								autoBindOnInit="false"
+								width="100%"
+								p13nMode="Sort"
+								delegate='\{"name": "sap/ui/mdc/acc/filterbar/delegate/JSONTableDelegate", "payload": \{"bindingPath": "mountains>/ranges"\}\}'
+								threshold="50"
+								enableAutoColumnWidth="true">
+								<mdc:columns>
+									<mdc:table.Column id="FHRange-mdcTable--range" header="Ranges"
+										propertyKey="range">
+										<Text text="{mountains>range}" />
+									</mdc:table.Column>
+								</mdc:columns>
+								<mdc:type>
+									<mdc:table.ResponsiveTableType />
+								</mdc:type>
+							</mdc:Table>
+						</mdcvc:MDCTable>
+					</mdcvh:Dialog>
+				</mdc:dialog>
+			</mdc:ValueHelp>
+
+			<mdc:ValueHelp id="VHCountries"
+				delegate='\{"name": "sap/ui/mdc/acc/filterbar/delegate/JSONValueHelpDelegate", "payload": \{"searchKeys": ["code"]\}\}'>
+				<mdc:typeahead>
+					<mdcvh:Popover title="Countries">
+						<mdcvc:MTable keyPath="code" descriptionPath="name" useAsValueHelp="false">
+							<Table id="mTable1_title" items='{path : "mountains>/countries", length: 10, templateShareable: false}'
+								width="30rem" mode="MultiSelect">
+								<columns>
+									<Column>
+										<header>
+											<Text text="Country Code" />
+										</header>
+									</Column>
+									<Column>
+										<header>
+											<Text text="Country Name" />
+										</header>
+									</Column>
+								</columns>
+								<items>
+									<ColumnListItem type="Active">
+										<cells>
+											<Text text="{mountains>code}" />
+											<Text text="{mountains>name}" />
+										</cells>
+									</ColumnListItem>
+								</items>
+							</Table>
+						</mdcvc:MTable>
+					</mdcvh:Popover>
+				</mdc:typeahead>
+
+				<mdc:dialog>
+					<mdcvh:Dialog title="Countries">
+						<mdcvc:MDCTable keyPath="code" descriptionPath="name" forceBind="true">
+							<mdc:Table id="FH4--mdc--gridtable"
+								autoBindOnInit="false"
+								width="100%"
+								selectionMode="Multi"
+								p13nMode="Column,Sort"
+								delegate='\{"name": "sap/ui/mdc/acc/filterbar/delegate/JSONTableDelegate", "payload": \{"bindingPath": "mountains>/countries"\}\}'
+								threshold="50"
+								enableAutoColumnWidth="true">
+								<mdc:columns>
+									<mdc:table.Column id="FH4--mdc--gridtable--code" header="Country Code"
+										propertyKey="code">
+										<mdc:Field	
+											delegate='\{"name": "sap/ui/mdc/field/FieldBaseDelegate", "payload": \{\}\}'
+											value="{mountains>code}"
+											editMode="Display" width="100%" multipleLines="false" />
+									</mdc:table.Column>
+									<mdc:table.Column id="FH4--mdc--gridtable--name" header="Country Name"
+										propertyKey="code">
+										<mdc:Field
+											delegate='\{"name": "sap/ui/mdc/field/FieldBaseDelegate", "payload": \{\}\}'
+											value="{mountains>name}"
+											editMode="Display" width="100%" multipleLines="false" />
+									</mdc:table.Column>
+								</mdc:columns>
+								<mdc:type>
+									<!-- <mdc:table.GridTableType rowCountMode="Auto"/> -->
+									<mdc:table.ResponsiveTableType growingMode="Scroll" />
+								</mdc:type>
+							</mdc:Table>
+						</mdcvc:MDCTable>
+						<mdcvc:Conditions label="Countries" valueHelp="VHCountries_DEFCOND"/>
+					</mdcvh:Dialog>
+				</mdc:dialog>
+
+			</mdc:ValueHelp>
+			
+			<!-- Define Conditions typeahead for countries -->
+			<mdc:ValueHelp id="VHCountries_DEFCOND" validateInput="false" delegate='\{"name": "sap/ui/mdc/acc/filterbar/delegate/JSONValueHelpDelegate", "payload": \{"searchKeys": ["code"]\}\}'>
+				<mdc:typeahead>
+					<mdcvh:Popover title="Countries">
+						<mdcvc:MTable keyPath="code" descriptionPath="name" useAsValueHelp="false">
+							<Table id="mTable1_title_DEFCOND" items='{path : "mountains>/countries", length: 10, templateShareable: false}' width="30rem" mode="SingleSelectMaster">
+								<columns>
+									<Column>
+										<header>
+											<Text text="Country Code" />
+										</header>
+									</Column>
+									<Column>
+										<header>
+											<Text text="Country Name" />
+										</header>
+									</Column>
+								</columns>
+								<items>
+									<ColumnListItem type="Active">
+										<cells>
+											<Text text="{mountains>code}" />
+											<Text text="{mountains>name}" />
+										</cells>
+									</ColumnListItem>
+								</items>
+							</Table>
+						</mdcvc:MTable>
+					</mdcvh:Popover>
+				</mdc:typeahead>
+			</mdc:ValueHelp>
+		</dependents>
+
 			<mdc:FilterBar
 				id="mountainsFilterbar"
 				delegate='\{"name": "sap/ui/mdc/acc/filterbar/delegate/JSONFilterBarDelegate", "payload": \{\}\}'
@@ -36,7 +254,7 @@
 								<mdc:typeahead>
 									<mdcvh:Popover title="Select Mountain">
 										<mdcvc:MTable keyPath="name" descriptionPath="name">
-											<Table id="ddListMountains" items='{path : "mountains>/mountains" }' width="30rem">
+											<Table id="ddListMountains" items='{path : "mountains>/mountains", templateShareable: false }' width="30rem">
 												<columns>
 													<Column visible="false">
 														<header>
@@ -69,6 +287,26 @@
 								</mdc:typeahead>
 							</mdc:ValueHelp>
 						</mdc:dependents>
+					</mdc:FilterField>
+
+					<!-- Countries - String -->
+					<mdc:FilterField
+						label="Countries (String)"
+						propertyKey="countries"
+						dataType="sap.ui.model.type.String"
+						conditions="{$filters>/conditions/countries}"
+						delegate='\{"name": "sap/ui/mdc/field/FieldBaseDelegate"\}' 
+						valueHelp="VHCountries">
+					</mdc:FilterField>
+
+					<!-- Range - String -->
+					<mdc:FilterField
+						label="Range (String)"
+						propertyKey="range"
+						dataType="sap.ui.model.type.String"
+						conditions="{$filters>/conditions/range}"
+						delegate='\{"name": "sap/ui/mdc/field/FieldBaseDelegate"\}' 
+						valueHelp="VHRange">
 					</mdc:FilterField>
 
 					<!-- Height - Integer -->

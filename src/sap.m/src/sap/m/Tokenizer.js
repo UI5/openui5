@@ -80,6 +80,12 @@ sap.ui.define([
 		 * Still the Token itself can determine if it is <code>editable</code>. This allows you to have non-editable Tokens in an editable Tokenizer.
 		 *
 		 * @extends sap.ui.core.Control
+		 * @implements sap.ui.core.ISemanticFormContent
+		 *
+		 * @borrows sap.ui.core.ISemanticFormContent.getFormFormattedValue as #getFormFormattedValue
+		 * @borrows sap.ui.core.ISemanticFormContent.getFormValueProperty as #getFormValueProperty
+		 * @borrows sap.ui.core.ISemanticFormContent.getFormObservingProperties as #getFormObservingProperties
+		 * @borrows sap.ui.core.ISemanticFormContent.getFormRenderAsControl as #getFormRenderAsControl
 		 * @author SAP SE
 		 * @version ${version}
 		 *
@@ -91,6 +97,10 @@ sap.ui.define([
 		 */
 		var Tokenizer = Control.extend("sap.m.Tokenizer", /** @lends sap.m.Tokenizer.prototype */ {
 			metadata : {
+				interfaces : [
+					"sap.ui.core.IFormContent",
+					"sap.ui.core.ISemanticFormContent"
+				],
 				library : "sap.m",
 				properties : {
 
@@ -134,7 +144,30 @@ sap.ui.define([
 					/**
 					 * The ID of the opener of the tokens popup.
 					 */
-					opener: { type: "string", multiple: false, visibility: "hidden" }
+					opener: { type: "string", multiple: false, visibility: "hidden" },
+
+					/**
+					 * The name property to be used in the HTML code for the tokenizer (e.g. for HTML forms that send data to the server via submit).
+					 * @since 1.142.0
+					 */
+					name: { type: "string", group: "Misc", defaultValue: "" },
+
+					/**
+					 * Determines whether the <code>Tokenizer</code> is in display only state.
+					 *
+					 * When set to <code>true</code>, the <code>Tokenizer</code> is not editable.
+					 * This setting is used for forms in review mode.
+					 *
+					 * @since 1.142.0
+					 */
+					displayOnly : {type : "boolean", group : "Behavior", defaultValue : false},
+
+					/**
+					 * Changed when tokens are changed. The value for sap.ui.core.ISemanticFormContent interface.
+					 * Contains a comma-separated list of all token texts for form processing.
+					 * @private
+					 */
+					_semanticFormValue: {type: "string", group: "Behavior", defaultValue: "", visibility: "hidden"}
 
 				},
 				defaultAggregation : "tokens",
@@ -211,6 +244,7 @@ sap.ui.define([
 			this.allowTextSelection(false);
 			this._oTokensWidthMap = {};
 			this._oIndicator = null;
+			this._bInForm = false;
 			this._bShouldRenderTabIndex = null;
 			this._oScroller = new ScrollEnablement(this, this.getId() + "-scrollContainer", {
 				horizontal : true,
@@ -289,6 +323,46 @@ sap.ui.define([
 			}
 
 			return this._oTokensList;
+		};
+
+		Tokenizer.prototype.getFormFormattedValue = function () {
+			this._bInForm = true;
+			const sTokens = this.getTokens()
+				.map(function (oToken) { return oToken.getText(); })
+				.join(", ");
+
+			// show en-dash in form display mode when empty
+			if (!sTokens) {
+				return "\u2013";
+			}
+			return sTokens;
+		};
+
+		Tokenizer.prototype.getFormValueProperty = function () {
+			return "_semanticFormValue";
+		};
+
+		Tokenizer.prototype.getFormObservingProperties = function() {
+			return ["_semanticFormValue"];
+		};
+
+		Tokenizer.prototype.getFormRenderAsControl = function () {
+			// if there are no tokens, we render the tokenizer as en-dash and not as a control
+			if (this.getDisplayOnly() && !this.getTokens().length) {
+				return false;
+			} else {
+				return this.getDisplayOnly();
+			}
+		};
+
+		/**
+		 * ISemanticFormContent interface works only with properties. The state of Tokenizer is kept as Tokens.
+		 * Update _semanticFormValue property so it'd match Tokenizer's state, but as a string which could be reused.
+		 *
+		 * @private
+		 */
+		Tokenizer.prototype.updateFormValueProperty = function () {
+			this.setProperty("_semanticFormValue", this.getFormFormattedValue(), true);
 		};
 
 		/**
@@ -1135,6 +1209,9 @@ sap.ui.define([
 					default:
 						break;
 				}
+
+				this.updateFormValueProperty();
+				this.invalidate();
 			}.bind(this));
 
 			oTokensObserver.observe(this, {
@@ -1674,6 +1751,7 @@ sap.ui.define([
 			this._oIndicator = null;
 			this._aTokenValidators = null;
 			this._bShouldRenderTabIndex = null;
+			this._bInForm = false;
 			this._bThemeApplied = false;
 
 		};

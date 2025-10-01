@@ -37,7 +37,11 @@ TokenizerRenderer.renderInnerContent = function(oRm, oControl) {
 
 	oRm.class("sapMTokenizer");
 
-	if (!oControl.getEditable()) {
+	if (oControl._bInForm){
+		oRm.class("sapMTokenizerHeightMargin");
+	}
+
+	if (!oControl.getEditable() || oControl.getDisplayOnly()) {
 		oRm.class("sapMTokenizerReadonly");
 	}
 
@@ -46,7 +50,7 @@ TokenizerRenderer.renderInnerContent = function(oRm, oControl) {
 
 	}
 
-	if (!aTokens.length) {
+	if (!aTokens.length && !oControl._bInForm) {
 		oRm.class("sapMTokenizerEmpty");
 		oRm.attr("aria-hidden", "true");
 	}

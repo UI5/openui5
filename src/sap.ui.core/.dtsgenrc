@@ -374,6 +374,28 @@
 						"type": "Omit<this, \"and\">"
 					}
 				]
+			},
+			{
+				"name": "module:sap/ui/test/starter/config.QUnitConfiguration",
+				"properties": [
+					{
+						"name": "[key: string]",
+						"type": "any",
+						"visibility": "public",
+						"description": "Any valid QUnit configuration property"
+					}
+				]
+			},
+			{
+				"name": "module:sap/ui/test/starter/config.SinonConfiguration",
+				"properties": [
+					{
+						"name": "[key: string]",
+						"type": "any",
+						"visibility": "public",
+						"description": "Any valid Sinon configuration property (up to Sinon version 4 at least)"
+					}
+				]
 			}
 		]
 	},

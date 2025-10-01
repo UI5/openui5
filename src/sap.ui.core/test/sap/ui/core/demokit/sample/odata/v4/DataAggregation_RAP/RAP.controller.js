@@ -69,6 +69,7 @@ sap.ui.define([
 					sVisibleRowCount = oUriParameters.get("visibleRowCount");
 
 				this.getView().setModel(new JSONModel({
+					bBookingID : bBookingID,
 					iMessages : 0,
 					sSearch : "",
 					iVisibleRowCount : parseInt(sVisibleRowCount) || 20
@@ -86,8 +87,7 @@ sap.ui.define([
 					group : {
 						airline : {additionally : ["airlineName"]},
 						ConnectionID : {
-							additionally : ["DepAirport", "DepCity", "DestAirport", "DestCity",
-								"Distance", "DistanceUnit"]
+							additionally : ["DepAirport", "DepCity", "DestAirport", "DestCity"]
 						}
 					},
 					groupLevels : ["airline", "ConnectionID", "FlightDate", "status", "TravelID",
@@ -95,11 +95,6 @@ sap.ui.define([
 				};
 				if (bBookingID) { // leaf level is individual bookings
 					this._oAggregation.groupLevels.push("BookingID");
-				} else { // leaf level shows aggregates
-					const oColumn = oTable.getColumns()[9];
-					if (oColumn.getLabel().getText() === "Booking ID") {
-						oColumn.destroy(); // destroy BookingID column
-					}
 				}
 				oTable._oProxy._bEnableV4 = true; // enable V4 tree table flag
 				this.getView().setModel(oRowsBinding.getModel(), "header");
@@ -153,6 +148,10 @@ sap.ui.define([
 			this._oAggregation.search
 				= this.getView().getModel("ui").getProperty("/sSearch");
 			this.byId("table").getBinding("rows").setAggregation(this._oAggregation);
+		},
+
+		onShowDetails : function (oEvent) {
+			this.byId("details").setBindingContext(oEvent.getSource().getBindingContext());
 		},
 
 		onShowSelection : function () {

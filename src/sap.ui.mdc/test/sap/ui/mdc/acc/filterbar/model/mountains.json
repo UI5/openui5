@@ -1,40 +1,347 @@
 {
+	"countries": [
+		{
+			"code": "AD",
+			"name": "Andorra"
+		},
+		{
+			"code": "AF",
+			"name": "Afghanistan"
+		},
+		{
+			"code": "AL",
+			"name": "Albania"
+		},
+		{
+			"code": "AM",
+			"name": "Armenia"
+		},
+		{
+			"code": "AR",
+			"name": "Argentina"
+		},
+		{
+			"code": "AT",
+			"name": "Austria"
+		},
+		{
+			"code": "AZ",
+			"name": "Azerbaijan"
+		},
+		{
+			"code": "BA",
+			"name": "Bosnia and Herzegovina"
+		},
+		{
+			"code": "BD",
+			"name": "Bangladesh"
+		},
+		{
+			"code": "BG",
+			"name": "Bulgaria"
+		},
+		{
+			"code": "BO",
+			"name": "Bolivia"
+		},
+		{
+			"code": "BT",
+			"name": "Bhutan"
+		},
+		{
+			"code": "CA",
+			"name": "Canada"
+		},
+		{
+			"code": "CH",
+			"name": "Switzerland"
+		},
+		{
+			"code": "CL",
+			"name": "Chile"
+		},
+		{
+			"code": "CN",
+			"name": "China"
+		},
+		{
+			"code": "CO",
+			"name": "Colombia"
+		},
+		{
+			"code": "CR",
+			"name": "Costa Rica"
+		},
+		{
+			"code": "CZ",
+			"name": "Czech Republic"
+		},
+		{
+			"code": "EC",
+			"name": "Ecuador"
+		},
+		{
+			"code": "FR",
+			"name": "France"
+		},
+		{
+			"code": "GE",
+			"name": "Georgia"
+		},
+		{
+			"code": "GT",
+			"name": "Guatemala"
+		},
+		{
+			"code": "ID",
+			"name": "Indonesia"
+		},
+		{
+			"code": "IN",
+			"name": "India"
+		},
+		{
+			"code": "IR",
+			"name": "Iran"
+		},
+		{
+			"code": "IT",
+			"name": "Italy"
+		},
+		{
+			"code": "JP",
+			"name": "Japan"
+		},
+		{
+			"code": "KE",
+			"name": "Kenya"
+		},
+		{
+			"code": "KG",
+			"name": "Kyrgyzstan"
+		},
+		{
+			"code": "KZ",
+			"name": "Kazakhstan"
+		},
+		{
+			"code": "MA",
+			"name": "Morocco"
+		},
+		{
+			"code": "MX",
+			"name": "Mexico"
+		},
+		{
+			"code": "MY",
+			"name": "Malaysia"
+		},
+		{
+			"code": "NP",
+			"name": "Nepal"
+		},
+		{
+			"code": "NO",
+			"name": "Norway"
+		},
+		{
+			"code": "NZ",
+			"name": "New Zealand"
+		},
+		{
+			"code": "PE",
+			"name": "Peru"
+		},
+		{
+			"code": "PH",
+			"name": "Philippines"
+		},
+		{
+			"code": "PK",
+			"name": "Pakistan"
+		},
+		{
+			"code": "RO",
+			"name": "Romania"
+		},
+		{
+			"code": "RU",
+			"name": "Russia"
+		},
+		{
+			"code": "SK",
+			"name": "Slovakia"
+		},
+		{
+			"code": "SI",
+			"name": "Slovenia"
+		},
+		{
+			"code": "TJ",
+			"name": "Tajikistan"
+		},
+		{
+			"code": "TR",
+			"name": "Turkey"
+		},
+		{
+			"code": "TZ",
+			"name": "Tanzania"
+		},
+		{
+			"code": "US",
+			"name": "United States"
+		},
+		{
+			"code": "UZ",
+			"name": "Uzbekistan"
+		},
+		{
+			"code": "VE",
+			"name": "Venezuela"
+		}
+	],
 	"ranges": [
-		{"range": "Mahalangur Himalaya"},
-		{"range": "Baltoro Karakoram"},
-		{"range": "Kangchenjunga Himalaya"},
-		{"range": "Dhaulagiri Himalaya"},
-		{"range": "Manaslu Himalaya"},
-		{"range": "Nanga Parbat Himalaya"},
-		{"range": "Annapurna Himalaya"},
-		{"range": "Jugal Himalaya"},
-		{"range": "Hispar Karakoram"},
-		{"range": "Masherbrum Karakoram"},
-		{"range": "Garhwal Himalaya"},
-		{"range": "Batura Karakoram"},
-		{"range": "Rakaposhi-Haramosh Karakoram"},
-		{"range": "Assam Himalaya"},
-		{"range": "Saltoro Karakoram"},
-		{"range": "Hindu Kush"},
-		{"range": "Langtang Himalaya"},
-		{"range": "Nalakankar Himalaya"},
-		{"range": "Saser Karakoram"},
-		{"range": "Kongur Shan (Eastern Pamirs)"},
-		{"range": "Kula Kangri Himalaya"},
-		{"range": "Daxue Mountains (Hengduan Shan)"},
-		{"range": "Rimo Karakoram"},
-		{"range": "Muztagata (Eastern Pamirs)"},
-		{"range": "Pamir (Academy of Sciences Range)"},
-		{"range": "Siachen Karakoram"},
-		{"range": "Tian Shan"},
-		{"range": "Ganesh Himalaya"},
-		{"range": "Labuche Himalaya"},
-		{"range": "Jomolhari Himalaya"},
-		{"range": "Yengisogat Karakoram"},
-		{"range": "Panmah Karakoram"},
-		{"range": "Baiku Himalaya"},
-		{"range": "Lunana Himalaya"},
-		{"range": "Nagarze Himalaya"}
+		{
+			"range": "Mahalangur Himalaya",
+			"country": ["CN", "NP"]
+		},
+		{
+			"range": "Baltoro Karakoram",
+			"country": ["CN", "PK"]
+		},
+		{
+			"range": "Kangchenjunga Himalaya",
+			"country": ["CN", "IN", "NP"]
+		},
+		{
+			"range": "Dhaulagiri Himalaya",
+			"country": ["NP"]
+		},
+		{
+			"range": "Manaslu Himalaya",
+			"country": ["NP"]
+		},
+		{
+			"range": "Nanga Parbat Himalaya",
+			"country": ["PK"]
+		},
+		{
+			"range": "Annapurna Himalaya",
+			"country": ["NP"]
+		},
+		{
+			"range": "Jugal Himalaya",
+			"country": ["CN"]
+		},
+		{
+			"range": "Hispar Karakoram",
+			"country": ["PK"]
+		},
+		{
+			"range": "Masherbrum Karakoram",
+			"country": ["PK"]
+		},
+		{
+			"range": "Garhwal Himalaya",
+			"country": ["CN", "IN"]
+		},
+		{
+			"range": "Batura Karakoram",
+			"country": ["PK"]
+		},
+		{
+			"range": "Rakaposhi-Haramosh Karakoram",
+			"country": ["PK"]
+		},
+		{
+			"range": "Assam Himalaya",
+			"country": ["CN"]
+		},
+		{
+			"range": "Saltoro Karakoram",
+			"country": ["IN", "PK"]
+		},
+		{
+			"range": "Hindu Kush",
+			"country": ["AF", "PK"]
+		},
+		{
+			"range": "Langtang Himalaya",
+			"country": ["CN", "NP"]
+		},
+		{
+			"range": "Nalakankar Himalaya",
+			"country": ["CN"]
+		},
+		{
+			"range": "Saser Karakoram",
+			"country": ["IN"]
+		},
+		{
+			"range": "Kongur Shan (Eastern Pamirs)",
+			"country": ["CN"]
+		},
+		{
+			"range": "Kula Kangri Himalaya",
+			"country": ["BT", "CN"]
+		},
+		{
+			"range": "Daxue Mountains (Hengduan Shan)",
+			"country": ["CN"]
+		},
+		{
+			"range": "Rimo Karakoram",
+			"country": ["IN"]
+		},
+		{
+			"range": "Muztagata (Eastern Pamirs)",
+			"country": ["CN"]
+		},
+		{
+			"range": "Pamir (Academy of Sciences Range)",
+			"country": ["TJ"]
+		},
+		{
+			"range": "Siachen Karakoram",
+			"country": ["CN", "IN", "PK"]
+		},
+		{
+			"range": "Tian Shan",
+			"country": ["CN", "KG"]
+		},
+		{
+			"range": "Ganesh Himalaya",
+			"country": ["CN", "NP"]
+		},
+		{
+			"range": "Labuche Himalaya",
+			"country": ["CN"]
+		},
+		{
+			"range": "Jomolhari Himalaya",
+			"country": ["BT", "CN"]
+		},
+		{
+			"range": "Yengisogat Karakoram",
+			"country": ["CN"]
+		},
+		{
+			"range": "Panmah Karakoram",
+			"country": ["PK"]
+		},
+		{
+			"range": "Baiku Himalaya",
+			"country": ["CN"]
+		},
+		{
+			"range": "Lunana Himalaya",
+			"country": ["BT", "CN"]
+		},
+		{
+			"range": "Nagarze Himalaya",
+			"country": ["CN"]
+		}
 	],
 	"mountains": [
 		{
@@ -1357,4 +1664,5 @@
 			"first_ascent": "1979-01-01",
 			"countries": "Pakistan"
 		}
-	]}
+	]
+}

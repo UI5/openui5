@@ -31,6 +31,7 @@ sap.ui.define([
 	"sap/m/Slider",
 	"sap/m/MultiInput",
 	"sap/m/MultiComboBox",
+	"sap/m/Tokenizer",
 	"sap/m/Token",
 	"sap/m/ObjectStatus",
 	"sap/ui/core/Item"
@@ -68,6 +69,7 @@ function(
 	Slider,
 	MultiInput,
 	MultiComboBox,
+	Tokenizer,
 	Token,
 	ObjectStatus,
 	Item
@@ -185,6 +187,20 @@ function(
 									new Token({key: "{/countries/1/key}", text: "{/countries/1/text}"})
 								],
 								showValueHelp: false
+							})
+						]
+					}),
+					new SemanticFormElement("C2FE8", {
+						label: "Tokenizer",
+						fields: [
+							new Tokenizer({
+								displayOnly: "{= !${/editMode}}",
+								width: "300px",
+								tokens: [
+									new Token({text: "Token 1"}),
+									new Token({text: "Token 2"}),
+									new Token({text: "Token 3"})
+								]
 							})
 						]
 					}),

@@ -3,6 +3,7 @@
 	controllerName="sap.ui.core.sample.odata.v4.DataAggregation_RAP.RAP"
 	xmlns="sap.ui.table"
 	xmlns:core="sap.ui.core"
+	xmlns:form="sap.ui.layout.form"
 	xmlns:m="sap.m"
 	xmlns:mvc="sap.ui.core.mvc"
 	xmlns:plugins="sap.ui.table.plugins"
@@ -10,7 +11,7 @@
 
 	<!-- Note: for $$aggregation, see controller's onInit! -->
 	<!-- Note: status is either 'B' or 'N', filter is just kiddin' ;-) -->
-	<TreeTable id="table" ariaLabelledBy="title"
+	<TreeTable id="table" ariaLabelledBy="title" rowActionCount="{:= %{ui>/bBookingID} ? 1 : 0 }"
 		rows="{path : '/Bookings',
 			filters : {path : 'status', operator : 'NE', value1 : ''},
 			parameters : {$count : true},
@@ -43,6 +44,12 @@
 				</m:Select>
 			</m:Toolbar>
 		</extension>
+		<rowActionTemplate>
+			<RowAction>
+				<RowActionItem press=".onShowDetails" type="Navigation"
+					visible="{= !!%{BookingID} }"/>
+			</RowAction>
+		</rowActionTemplate>
 		<rowMode>
 			<rm:Interactive rowCount="{ui>/iVisibleRowCount}" fixedTopRowCount="1" minRowCount="2"/>
 		</rowMode>
@@ -70,19 +77,6 @@
 				<m:Text text="{DestAirport} - {DestCity}" wrapping="false"/>
 			</template>
 		</Column>
-		<Column hAlign="End" sortProperty="Distance" width="7em">
-			<m:Label text="Distance"/>
-			<template>
-				<m:Text text="{
-					parts : ['Distance', 'DistanceUnit', {
-						mode : 'OneTime',
-						path : '/##@@requestUnitsOfMeasure',
-						targetType : 'any'
-					}],
-					type : 'sap.ui.model.odata.type.Unit'
-				}" wrapping="false"/>
-			</template>
-		</Column>
 		<Column sortProperty="FlightDate" width="7em">
 			<m:Label text="Flight Date"/>
 			<template>
@@ -107,7 +101,7 @@
 				<m:Text text="{BookingDate}" wrapping="false"/>
 			</template>
 		</Column>
-		<Column sortProperty="BookingID" width="6em">
+		<Column sortProperty="BookingID" visible="{ui>/bBookingID}" width="6em">
 			<m:Label text="Booking ID"/>
 			<template>
 				<m:Text text="{BookingID}" wrapping="false"/>
@@ -133,7 +127,7 @@
 				<m:Text text="{CurrencyCode_code}" wrapping="false"/>
 			</template>
 		</Column>
-		<Column hAlign="End"  width="5em">
+		<Column hAlign="End" width="5em">
 			<m:Label text="G.L.C." tooltip="Group Level Count"/>
 			<template>
 				<m:Label text="{= %{@$ui5.node.groupLevelCount} }"/>
@@ -146,6 +140,25 @@
 			</template>
 		</Column>
 	</TreeTable>
+
+	<form:SimpleForm columnsL="3" id="details" layout="ColumnLayout" title="Booking Details"
+			visible="{ui>/bBookingID}">
+		<m:Label text="Booking"/>
+		<m:Text text="{TravelID} / {BookingID}"/>
+		<m:Label text="Departure"/>
+		<m:Text text="{DepAirport} - {DepCity}"/>
+		<m:Label text="Destination"/>
+		<m:Text text="{DestAirport} - {DestCity}"/>
+		<m:Label text="Distance"/>
+		<m:Text text="{
+				parts : ['Distance', 'DistanceUnit', {
+					mode : 'OneTime',
+					path : '/##@@requestUnitsOfMeasure',
+					targetType : 'any'
+				}],
+				type : 'sap.ui.model.odata.type.Unit'
+			}"/>
+	</form:SimpleForm>
 
 	<m:FormattedText htmlText="&lt;em>Available URL parameters:&lt;/em>
 		&lt;ul>
