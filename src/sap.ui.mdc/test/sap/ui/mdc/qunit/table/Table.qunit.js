@@ -4174,7 +4174,7 @@ sap.ui.define([
 
 			const sTableView =
 			`<mvc:View xmlns:core="sap.ui.core" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.ui.mdc" xmlns:mdcTable="sap.ui.mdc.table">
-				<Table id="table" enableColumnResize="${mSettings.enableColumnResize}" delegate='${JSON.stringify({
+				<Table id="table" p13nMode="Column" enableColumnResize="${mSettings.enableColumnResize}" delegate='${JSON.stringify({
 					name: sDelegatePath,
 					payload: {
 						propertyInfo: [{
