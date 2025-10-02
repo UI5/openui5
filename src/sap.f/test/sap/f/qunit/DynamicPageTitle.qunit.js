@@ -433,20 +433,28 @@ function (
 			iTitleBigWidth = 1500,
 			oActionToFocus = oTitle.getNavigationActions()[0].getDomRef(),
 			oMoveToTopSpy = this.spy(oTitle, "_showNavigationActionsInTopArea"),
-			oMoveToMainSpy = this.spy(oTitle, "_showNavigationActionsInMainArea");
+			oMoveToMainSpy = this.spy(oTitle, "_showNavigationActionsInMainArea"),
+			done = assert.async();
 
 		oActionToFocus.focus();
 
 		oTitle._onResize(iTitleBigWidth);
 
-		assert.strictEqual(oMoveToMainSpy.callCount, 1, "move actions to main is called");
-		assert.strictEqual(document.activeElement, oActionToFocus, "focus is preserved");
+		// Safari needs a microtask delay for DOM manipulation and focus to settle
+		setTimeout(function() {
+			assert.strictEqual(oMoveToMainSpy.callCount, 1, "move actions to main is called");
+			assert.strictEqual(document.activeElement, oActionToFocus, "focus is preserved");
 
-		// Ensure the Title is smaller than 1280px, then navigationAction are in the Title`s top area.
-		oTitle._onResize(iTitleSmallWidth);
+			// Ensure the Title is smaller than 1280px, then navigationAction are in the Title`s top area.
+			oTitle._onResize(iTitleSmallWidth);
 
-		assert.strictEqual(oMoveToTopSpy.callCount, 1, "move actions to top is called");
-		assert.strictEqual(document.activeElement, oActionToFocus, "focus is preserved");
+			// Safari needs a microtask delay for DOM manipulation and focus to settle
+			setTimeout(function() {
+				assert.strictEqual(oMoveToTopSpy.callCount, 1, "move actions to top is called");
+				assert.strictEqual(document.activeElement, oActionToFocus, "focus is preserved");
+				done();
+			}, 0);
+		}, 0);
 	});
 
 
