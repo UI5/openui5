@@ -7,6 +7,7 @@ sap.ui.define([
 	"sap/f/library",
 	"./DynamicPageUtil",
 	"sap/ui/core/Core",
+	"sap/ui/qunit/utils/nextUIUpdate",
 	"sap/m/Link",
 	"sap/m/Title",
 	"sap/m/Text",
@@ -21,6 +22,7 @@ function (
 	fioriLibrary,
 	DynamicPageUtil,
 	Core,
+	nextUIUpdate,
 	Link,
 	Title,
 	Text,
@@ -31,6 +33,12 @@ function (
 
 	var oFactory = DynamicPageUtil.oFactory,
 		oUtil = DynamicPageUtil.oUtil;
+
+	async function timeout(iDuration) {
+		await new Promise(function (resolve) {
+			window.setTimeout(resolve, iDuration);
+		});
+	}
 
 	/* --------------------------- DynamicPage Title Rendering ---------------------------------- */
 	QUnit.module("DynamicPage - Rendering - Title", {
@@ -488,7 +496,7 @@ function (
 				"Top area should be visible when there is at least one visible navigation action");
 	});
 
-	QUnit.test("Move actions to top/main area preserves focus", function (assert) {
+	QUnit.test("Move actions to top/main area preserves focus", async function (assert) {
 		var oTitle = this.oDynamicPageStandardAndNavigationActions.getTitle(),
 			iTitleSmallWidth = 900,
 			iTitleBigWidth = 1500,
@@ -500,11 +508,20 @@ function (
 
 		oTitle._onResize(iTitleBigWidth);
 
+		// Wait for DOM update and focus restoration (especially needed in Safari)
+		// Using both nextUIUpdate and setTimeout to ensure Safari has time to restore focus
+		await nextUIUpdate();
+		await timeout();
+
 		assert.strictEqual(oMoveToMainSpy.callCount, 1, "move actions to main is called");
 		assert.strictEqual(document.activeElement, oActionToFocus, "focus is preserved");
 
 		// Ensure the Title is smaller than 1280px, then navigationAction are in the Title`s top area.
 		oTitle._onResize(iTitleSmallWidth);
+
+		// Wait for DOM update and focus restoration (especially needed in Safari)
+		await nextUIUpdate();
+		await timeout();
 
 		assert.strictEqual(oMoveToTopSpy.callCount, 1, "move actions to top is called");
 		assert.strictEqual(document.activeElement, oActionToFocus, "focus is preserved");
