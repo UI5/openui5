@@ -295,5 +295,15 @@
         "text": " sap.m.DynamicPage: blank space on snap is no longer visible"
       }
     ]
+  },
+  "1.108.45": {
+    "date": "October 2025",
+    "notes": [
+      {
+        "id": "eb1e1ff50b26d79a4292706aee55414d179f2e17",
+        "type": "FIX",
+        "text": " sap.f.DynamicPage: Header visibility issue fixed"
+      }
+    ]
   }
 }
