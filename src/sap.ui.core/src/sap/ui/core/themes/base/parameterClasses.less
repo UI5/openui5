@@ -1,14 +1,15 @@
-
 /* CSS parameters which are available in base theme */
 
 /* font */
 .sapThemeFont {
-	font-family: @sapUiFontFamily !important;
+	font-family: var(--sapFontFamily) !important;
 	font-size: @sapUiFontSize !important;
 }
+
 .sapThemeFontFamily {
-	font-family: @sapUiFontFamily !important;
+	font-family: var(--sapFontFamily) !important;
 }
+
 .sapThemeFontSize {
 	font-size: @sapUiFontSize !important;
 }
@@ -16,68 +17,79 @@
 /* text color */
 .sapThemeText,
 .sapThemeText-asColor {
-	color: @sapUiBaseText !important;
+	color: var(--sapTextColor) !important;
 }
+
 .sapThemeText-asBackgroundColor {
-	background-color: @sapUiBaseText !important;
+	background-color: var(--sapTextColor) !important;
 }
+
 .sapThemeText-asBorderColor {
-	border-color: @sapUiBaseText !important;
+	border-color: var(--sapTextColor) !important;
 }
+
 .sapThemeText-asOutlineColor {
-	outline-color: @sapUiBaseText !important;
+	outline-color: var(--sapTextColor) !important;
 }
 
 /* text color inverted */
 .sapThemeTextInverted,
 .sapThemeTextInverted-asColor {
-	color: @sapUiContentContrastTextColor !important;
+	color: var(--sapContent_ContrastTextColor) !important;
 }
 
 /* base bg */
 .sapThemeBaseBG,
 .sapThemeBaseBG-asBackgroundColor {
-	background-color: @sapUiBaseBG !important;
+	background-color: var(--sapBackgroundColor) !important;
 }
+
 .sapThemeBaseBG-asBorderColor {
-	border-color: @sapUiBaseBG !important;
+	border-color: var(--sapBackgroundColor) !important;
 }
+
 .sapThemeBaseBG-asColor {
-	color: @sapUiBaseBG !important;
+	color: var(--sapBackgroundColor) !important;
 }
 
 /* brand color */
 .sapThemeBrand,
 .sapThemeBrand-asColor {
-	color: @sapUiBrand !important;
+	color: var(--sapBrandColor) !important;
 }
+
 .sapThemeBrand-asBorderColor {
-	border-color: @sapUiBrand !important;
+	border-color: var(--sapBrandColor) !important;
 }
+
 .sapThemeBrand-asBackgroundColor {
-	background-color: @sapUiBrand !important;
+	background-color: var(--sapBrandColor) !important;
 }
+
 .sapThemeBrand-asOutlineColor {
-	outline-color: @sapUiBrand !important;
+	outline-color: var(--sapBrandColor) !important;
 }
 
 /* highlight color */
 .sapThemeHighlight,
 .sapThemeHighlight-asColor {
-	color: @sapUiHighlight !important;
+	color: var(--sapHighlightColor) !important;
 }
+
 .sapThemeHighlight-asBorderColor {
-	border-color: @sapUiHighlight !important;
+	border-color: var(--sapHighlightColor) !important;
 }
+
 .sapThemeHighlight-asBackgroundColor {
-	background-color: @sapUiHighlight !important;
+	background-color: var(--sapHighlightColor) !important;
 }
+
 .sapThemeHighlight-asOutlineColor {
-	outline-color: @sapUiHighlight !important;
+	outline-color: var(--sapHighlightColor) !important;
 }
 
 /* border color */
 .sapThemeForegroundBorderColor,
 .sapThemeForegroundBorderColor-asBorderColor {
-	border-color: @sapUiContentForegroundBorderColor  !important;
+	border-color: var(--sapContent_ForegroundBorderColor) !important;
 }

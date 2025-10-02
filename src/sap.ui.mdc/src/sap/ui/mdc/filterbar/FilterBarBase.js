@@ -223,6 +223,17 @@ sap.ui.define([
 						type: "sap.ui.mdc.filterbar.IFilterContainer",
 						multiple: false,
 						visibility: "hidden"
+					},
+
+					/**
+					 * Internal aggregation that stores invisible texts for accessibility.
+					 *
+					 * @since 1.142
+					 */
+					invisibleTexts: {
+						type: "sap.ui.core.InvisibleText",
+						multiple: true,
+						visibility: "hidden"
 					}
 				},
 				associations: {
@@ -2027,6 +2038,29 @@ sap.ui.define([
 		FilterBarBase.prototype.getSearch = function() {
 			const aSearchConditions = this._getConditionModel() ? this._getConditionModel().getConditions(SEARCH_CONDITION) : [];
 			return aSearchConditions[0] ? aSearchConditions[0].values[0] : "";
+		};
+
+		/**
+		 * Adds an <code>InvisibleText</code> to the <code>FilterBar</code> that can be used for accessibility purposes.
+		 *
+		 * @param {sap.ui.core.InvisibleText} oInvisibleText The invisible text to be added
+		 * @protected
+		 * @since 1.142
+		 */
+		FilterBarBase.prototype.addInvisibleText = function(oInvisibleText) {
+			this.addAggregation("invisibleTexts", oInvisibleText);
+		};
+
+		/**
+		 * Retrieves an <code>InvisibleText</code> by ID.
+		 *
+		 * @param {string} sId ID of the invisible text to be retrieved
+		 * @returns {sap.ui.core.InvisibleText} The invisible text with the given ID
+		 * @protected
+		 * @since 1.142
+		 */
+		FilterBarBase.prototype.getInvisibleText = function(sId) {
+			return this.getAggregation("invisibleTexts")?.find((oInvisibleText) => oInvisibleText.getId() === sId);
 		};
 
 		FilterBarBase.prototype.exit = function() {

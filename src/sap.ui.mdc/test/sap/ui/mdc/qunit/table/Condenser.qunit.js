@@ -322,6 +322,53 @@ sap.ui.define([
 		afterRedo: fnConfirmInitialSortingState
 	});
 
+	elementActionTest("addSort(asc) removeSort(asc) addSort(desc) condensed to addSort(desc)", {
+		xmlView: fnGetView(),
+		action: {
+			name: "settings",
+			controlId: "myMDCTable",
+			parameter: function() {
+				return {
+					changeType: "addSort",
+					content: {
+						name: "modifiedBy",
+						index: 0,
+						descending: true
+					}
+				};
+			}
+		},
+		previousActions: [{
+			name: "settings",
+			controlId: "myMDCTable",
+			parameter: function() {
+				return {
+					changeType: "addSort",
+					content: {
+						index: 0,
+						name: "modifiedBy",
+						descending: false
+					}
+				};
+			}
+		}, {
+			name: "settings",
+			controlId: "myMDCTable",
+			parameter: function() {
+				return {
+					changeType: "removeSort",
+					content: {
+						name: "modifiedBy"
+					}
+				};
+			}
+		}],
+		changesAfterCondensing: 1,
+		afterAction: fnConfirmInitialSortingState,
+		afterUndo: fnConfirmSortingGotAdded(),
+		afterRedo: fnConfirmInitialSortingState
+	});
+
 	// ---------------------------------------------------------------------
 
 	function fnGetDataView() {
