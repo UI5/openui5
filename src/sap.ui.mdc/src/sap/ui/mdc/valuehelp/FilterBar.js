@@ -10,7 +10,8 @@ sap.ui.define(
 		"sap/ui/mdc/valuehelp/FilterContainer",
 		"sap/m/Button",
 		"sap/m/p13n/enums/PersistenceMode",
-		"sap/m/OverflowToolbarLayoutData"
+		"sap/m/OverflowToolbarLayoutData",
+		"sap/ui/core/InvisibleText"
 	],
 	(
 		mLibrary,
@@ -20,7 +21,8 @@ sap.ui.define(
 		FilterContainer,
 		Button,
 		PersistenceMode,
-		OverflowToolbarLayoutData
+		OverflowToolbarLayoutData,
+		InvisibleText
 	) => {
 		"use strict";
 		const {OverflowToolbarPriority} = mLibrary;
@@ -249,6 +251,8 @@ sap.ui.define(
 		};
 
 		FilterBar.prototype.setBasicSearchField = function(oBasicSearchField) {
+			const fnGetAriaLabelId = (sSearchFieldId) => this.getId() + "__" + sSearchFieldId + "-labelledBy";
+
 			if (this._oBasicSearchField) {
 				const oLD = this._oBasicSearchField.getLayoutData();
 				if (oLD && oLD._bSetByFilterBar) {
@@ -259,6 +263,10 @@ sap.ui.define(
 					this._oFilterBarLayout.removeControl(this._oBasicSearchField);
 				}
 				this._oBasicSearchField.detachSubmit(this._handleFilterItemSubmit, this);
+
+				const sAriaLabelId = fnGetAriaLabelId(this._oBasicSearchField.getId());
+				this._oBasicSearchField.removeAriaLabelledBy(sAriaLabelId);
+				this.getInvisibleText(sAriaLabelId)?.destroy();
 			}
 			this._oBasicSearchField = oBasicSearchField;
 
@@ -273,6 +281,17 @@ sap.ui.define(
 				if (this.isPropertyInitial("expandFilterFields")) {
 					this.setExpandFilterFields(false);
 				}
+
+				const sAriaLabelId = fnGetAriaLabelId(oBasicSearchField.getId());
+				let oBasicSearchFieldAriaLabel = this.getInvisibleText(sAriaLabelId);
+				if (!oBasicSearchFieldAriaLabel) {
+					oBasicSearchFieldAriaLabel = new InvisibleText(sAriaLabelId, { text: {
+						path: "$help>/title",
+						formatter: (sTitle) => this._oRb.getText("valuehelp.SEARCHFIELD_ARIA_LABEL", [sTitle])
+					}});
+					this.addInvisibleText(oBasicSearchFieldAriaLabel);
+				}
+				oBasicSearchField.addAriaLabelledBy(oBasicSearchFieldAriaLabel);
 
 				if (this._oFilterBarLayout) {
 					this._oFilterBarLayout.insertControl(oBasicSearchField, this._oCollectiveSearch ? 1 : 0);

@@ -174,9 +174,6 @@ sap.ui.define([
 					 * UI5 currently does not provide a recommended implementation of <code>TooltipBase</code>
 					 * as the use of content-rich tooltips is discouraged by the Fiori Design Guidelines.
 					 * Existing subclasses of <code>TooltipBase</code> therefore have been deprecated.
-					 * However, apps can still subclass from <code>TooltipBase</code> and create their own
-					 * implementation when needed (potentially taking the deprecated implementations as a
-					 * starting point).
 					 *
 					 * See the section {@link https://experience.sap.com/fiori-design-web/using-tooltips/ Using Tooltips}
 					 * in the Fiori Design Guideline.

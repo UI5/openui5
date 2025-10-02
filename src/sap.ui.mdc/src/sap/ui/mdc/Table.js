@@ -2737,7 +2737,7 @@ sap.ui.define([
 			insertFilterInfoBar(this);
 		}
 
-		if (!this._oColumnHeaderMenu) {
+		if (this._isColumnMenuEnabled() && !this._oColumnHeaderMenu) {
 			this._oQuickActionContainer = new QuickActionContainer({table: this});
 			this._oColumnHeaderMenu = new ColumnMenu({
 				id: this.getId() + "-columnHeaderMenu",
@@ -2752,6 +2752,10 @@ sap.ui.define([
 		}
 
 		this._updateInvisibleTitle();
+	};
+
+	Table.prototype._isColumnMenuEnabled = function() {
+		return this.getActiveP13nModes().length > 0 || this.getEnableColumnResize();
 	};
 
 	Table.prototype._createColumnMenuContent = function(oEvent) {

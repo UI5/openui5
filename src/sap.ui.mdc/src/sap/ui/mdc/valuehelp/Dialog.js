@@ -295,7 +295,7 @@ sap.ui.define([
 
 					DensityHelper.syncDensity(oDialog);
 
-					oDialog.setModel(this._oManagedObjectModel, "$help");
+					this.setModel(this._oManagedObjectModel, "$help");
 					this.setAggregation("_container", oDialog, true);
 
 					oDialog.isPopupAdaptationAllowed = function() {

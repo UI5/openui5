@@ -5,13 +5,17 @@ sap.ui.define([
 	"sap/ui/mdc/filterbar/FilterBarBase",
 	"sap/ui/mdc/FilterField",
 	"sap/ui/mdc/valuehelp/CollectiveSearchSelect",
-	"sap/ui/core/Lib"
+	"sap/ui/core/Element",
+	"sap/ui/core/Lib",
+	"sap/ui/model/json/JSONModel"
 ], (
 	FilterBar,
 	FilterBarBase,
 	FilterField,
 	CollectiveSearchSelect,
-	Library
+	Element,
+	Library,
+	JSONModel
 ) => {
 	"use strict";
 
@@ -291,5 +295,22 @@ sap.ui.define([
 			assert.equal(aPropertyInfos?.[0].dataType, "sap.ui.model.type.String", "dataType");
 			assert.equal(aPropertyInfos?.[0].label, mdcMessageBundle.getText("filterbar.SEARCH"), "Label");
 		});
+	});
+
+	QUnit.test("Searchfield aria label", function(assert) {
+		const vhModelMock = new JSONModel({title: "Title"});
+		oFilterBar.setModel(vhModelMock, "$help");
+
+		const oBasicSearchField = new FilterField({ conditions: "{cm>/conditions/$search}", propertyKey: "$search" });
+		oFilterBar.setBasicSearchField(oBasicSearchField);
+
+
+		const aAriaLabels = oBasicSearchField.getAriaLabelledBy();
+		const sExpectedLabelText = mdcMessageBundle.getText("valuehelp.SEARCHFIELD_ARIA_LABEL", ["Title"]);
+		const sAriaLabelId = aAriaLabels.find((sId) => Element.getElementById(sId).getText() === sExpectedLabelText);
+		assert.ok(sAriaLabelId != null, "Search field has aria label referencing the VH title");
+
+		oFilterBar.setBasicSearchField(null);
+		assert.ok(!Element.getElementById(sAriaLabelId), "Aria label elements removed when Search field is removed");
 	});
 });

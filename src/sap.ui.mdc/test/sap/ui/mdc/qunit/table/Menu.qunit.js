@@ -39,7 +39,7 @@ sap.ui.define([
 	};
 
 	QUnit.module("Menu", {
-		beforeEach: function() {
+		createTable: function() {
 			this.oTable = new Table({
 				columns: [
 					new Column({
@@ -72,7 +72,9 @@ sap.ui.define([
 					}
 				}
 			});
-
+		},
+		beforeEach: function() {
+			this.createTable();
 			return this.oTable.initialized().then(async function() {
 				this.oTable.placeAt("qunit-fixture");
 				await nextUIUpdate();
@@ -83,7 +85,7 @@ sap.ui.define([
 		}
 	});
 
-	QUnit.test("Initialize", function(assert) {
+	QUnit.test("Initialize", async function(assert) {
 		const oTable = this.oTable;
 		const oOpenSpy = sinon.spy(oTable._oColumnHeaderMenu, "openBy");
 
@@ -101,10 +103,19 @@ sap.ui.define([
 		assert.equal(oTable._oQuickActionContainer.getEffectiveQuickActions().length, 0, "The ColumnMenu contains no quick actions");
 		assert.ok(!oTable._oColumnHeaderMenu._oPopover, "The popover is not initialized");
 
-		return TableQUnitUtils.openColumnMenu(oTable, 0).then(function() {
-			assert.equal(oTable._oQuickActionContainer.getEffectiveQuickActions().length, 1, "The ColumnMenu contains quick actions");
-			assert.ok(oOpenSpy.calledWithExactly(oTable.getColumns()[0].getInnerColumn(), true), "openBy is called once with the correct parameters");
-		});
+		await TableQUnitUtils.openColumnMenu(oTable, 0);
+		assert.equal(oTable._oQuickActionContainer.getEffectiveQuickActions().length, 1, "The ColumnMenu contains quick actions");
+		assert.ok(oOpenSpy.calledWithExactly(oTable.getColumns()[0].getInnerColumn(), true), "openBy is called once with the correct parameters");
+
+		this.oTable.destroy();
+		this.createTable();
+		this.oTable.setP13nMode([]);
+		this.oTable.setEnableColumnResize(false);
+		await this.oTable.initialized();
+		this.oTable.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		assert.notOk(this.oTable._oColumnHeaderMenu, "The ColumnMenu is not initialized when there are no active p13n modes and no column resizing");
 	});
 
 	QUnit.test("Open menu before the table is fully initialized", function(assert) {

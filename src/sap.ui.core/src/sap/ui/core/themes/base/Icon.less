@@ -22,9 +22,9 @@
 }
 
 .sapUiIcon:focus {
-	outline-width: @sapUiContentFocusWidth;
-	outline-style: @sapUiContentFocusStyle;
-	outline-color: @sapUiContentFocusColor;
+	outline-width: var(--sapContent_FocusWidth);
+	outline-style: var(--sapContent_FocusStyle);
+	outline-color: var(--sapContent_FocusColor);
 }
 
 .sapUiIcon::before {
@@ -51,9 +51,11 @@
  *   in the wrong direction.
  *  3. Custom CSS style should be set on the root DOM and not the pesudo element.
  */
-html[dir=rtl] .sapUiIconMirrorInRTL:not(.sapUiIconSuppressMirrorInRTL) {
-	&::before, &::after /* some controls render the icon using 'after' pesudo element */ {
-		transform: scale(-1,1);
+html[dir='rtl'] .sapUiIconMirrorInRTL:not(.sapUiIconSuppressMirrorInRTL) {
+
+	&::before,
+	&::after /* some controls render the icon using 'after' pesudo element */ {
+		transform: scale(-1, 1);
 		display: inline-block; /* pesudo element has display: inline by default and can't apply the transform css style for RTL mode*/
 	}
 }
@@ -62,82 +64,82 @@ html[dir=rtl] .sapUiIconMirrorInRTL:not(.sapUiIconSuppressMirrorInRTL) {
  * The Default color and the semantic colors for Icon which always points to the variable across themes.
  */
 .sapUiIconColorDefault {
-	color: @sapUiContentIconColor;
+	color: var(--sapContent_IconColor);
 }
 
 .sapUiIconColorContrast {
-	color: @sapUiContentContrastIconColor;
+	color: var(--sapContent_ContrastIconColor);
 }
 
 .sapUiIconColorNeutral {
-	color: @sapUiNeutralElement;
+	color: var(--sapNeutralElementColor);
 }
 
 .sapUiIconColorCritical {
-	color: @sapUiCriticalElement;
+	color: var(--sapCriticalElementColor);
 }
 
 .sapUiIconColorPositive {
-	color: @sapUiPositiveElement;
+	color: var(--sapPositiveElementColor);
 }
 
 .sapUiIconColorNegative {
-	color: @sapUiNegativeElement;
+	color: var(--sapNegativeElementColor);
 }
 
 .sapUiIconColorNonInteractive {
-	color: @sapUiContentNonInteractiveIconColor;
+	color: var(--sapContent_NonInteractiveIconColor);
 }
 
 .sapUiIconColorTile {
-	color: @sapUiTileIconColor;
+	color: var(--sapTile_IconColor);
 }
 
 .sapUiIconColorMarker {
-	color: @sapUiContentMarkerIconColor;
+	color: var(--sapContent_MarkerIconColor);
 }
 
 .sapUiIconBGColorDefault {
-	color: @sapUiGroupContentBackground;
-	background-color: @sapUiContentIconColor;
+	color: var(--sapGroup_ContentBackground);
+	background-color: var(--sapContent_IconColor);
 }
 
 .sapUiIconBGColorContrast {
-	color: @sapUiContentIconColor;
-	background-color: @sapUiContentContrastIconColor;
+	color: var(--sapContent_IconColor);
+	background-color: var(--sapContent_ContrastIconColor);
 }
 
 .sapUiIconBGColorNeutral {
-	color: @sapUiGroupContentBackground;
-	background-color: @sapUiNeutralElement;
+	color: var(--sapGroup_ContentBackground);
+	background-color: var(--sapNeutralElementColor);
 }
 
 .sapUiIconBGColorCritical {
-	color: @sapUiGroupContentBackground;
-	background-color: @sapUiCriticalElement;
+	color: var(--sapGroup_ContentBackground);
+	background-color: var(--sapCriticalElementColor);
 }
 
 .sapUiIconBGColorPositive {
-	color: @sapUiGroupContentBackground;
-	background-color: @sapUiPositiveElement;
+	color: var(--sapGroup_ContentBackground);
+	background-color: var(--sapPositiveElementColor);
 }
 
 .sapUiIconBGColorNegative {
-	color: @sapUiGroupContentBackground;
-	background-color: @sapUiNegativeElement;
+	color: var(--sapGroup_ContentBackground);
+	background-color: var(--sapNegativeElementColor);
 }
 
 .sapUiIconBGColorNonInteractive {
-	color: @sapUiGroupContentBackground;
-	background-color: @sapUiContentNonInteractiveIconColor;
+	color: var(--sapGroup_ContentBackground);
+	background-color: var(--sapContent_NonInteractiveIconColor);
 }
 
 .sapUiIconBGColorTile {
-	color: @sapUiGroupContentBackground;
-	background-color: @sapUiTileIconColor;
+	color: var(--sapGroup_ContentBackground);
+	background-color: var(--sapTile_IconColor);
 }
 
 .sapUiIconBGColorMarker {
-	color: @sapUiGroupContentBackground;
-	background-color: @sapUiContentMarkerIconColor;
+	color: var(--sapGroup_ContentBackground);
+	background-color: var(--sapContent_MarkerIconColor);
 }
