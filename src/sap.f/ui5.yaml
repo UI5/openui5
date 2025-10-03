@@ -10,3 +10,44 @@ metadata:
 resources:
   configuration:
     propertiesFileSourceEncoding: ISO-8859-1
+builder:
+  bundles:
+    - bundleDefinition:
+        name: sap/f/library-preload.js
+        sections:
+          - mode: preload
+            name: sap/f/library-preload.js
+            filters:
+              - sap/f/
+              - sap/f/**/manifest.json
+              - "!sap/f/**/*-preload.js" # exclude all bundles
+              - "!sap/f/designtime/"
+              - "!sap/f/**/*.designtime.js"
+              - "!sap/f/**/*.support.js"
+              - "!sap/f/gen/"
+              - "!sap/f/thirdparty/"
+            resolve: false
+            resolveConditional: false
+            renderer: true
+          - mode: bundleInfo
+            name: sap/f/library-webcomponents-preload.js
+            filters:
+              - sap/f/gen/
+              - sap/f/thirdparty/ui5/ # special entry points for AllIcons files
+            resolve: false
+      bundleOptions:
+        optimize: true
+    - bundleDefinition:
+        name: sap/f/library-webcomponents-preload.js
+        sections:
+          - mode: preload
+            name: sap/f/library-webcomponents-preload.js
+            filters:
+              - sap/f/gen/
+              - sap/f/thirdparty/
+              - "!sap/f/thirdparty/_dynamics/"
+            resolve: false
+            resolveConditional: false
+            renderer: true
+      bundleOptions:
+        optimize: true

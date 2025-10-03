@@ -3,6 +3,7 @@
 sap.ui.define([
 	"./QUnitUtils",
 	"sap/ui/test/utils/nextUIUpdate",
+	"sap/ui/core/Element",
 	"sap/ui/mdc/Table",
 	"sap/ui/mdc/table/Column",
 	"sap/ui/mdc/table/GridTableType",
@@ -19,6 +20,7 @@ sap.ui.define([
 ], function(
 	TableQUnitUtils,
 	nextUIUpdate,
+	Element,
 	Table,
 	Column,
 	GridTableType,
@@ -594,7 +596,7 @@ sap.ui.define([
 				rowActions: [
 					new RowActionItem({
 						id: "myRowActionitem",
-						type: RowActionType.Navigation,
+						type: RowActionType.Delete,
 						press: (oEvent) => {
 							oPress(oEvent.getParameters());
 						}
@@ -614,14 +616,19 @@ sap.ui.define([
 			this.oTable._oTable.attachEventOnce("rowsUpdated", resolve);
 		});
 
-		this.oTable._oTable.getRows()[1].getRowAction().$("icon0").trigger("click");
+		let oRowAction = this.oTable._oTable.getRows()[1].getRowAction();
+		let oIcon = Element.closestTo(oRowAction.getDomRef().children[0]);
+		oIcon.firePress();
 		assert.ok(oPress.calledOnceWithExactly({
 			id: "myRowActionitem",
 			bindingContext: this.oTable._oTable.getRows()[1].getBindingContext("namedModel")
 		}), "'press' event handler called with the correct parameters");
 
 		oPress.resetHistory();
-		this.oTable._oTable.getRows()[2].getRowAction().$("icon1").trigger("click");
+
+		oRowAction = this.oTable._oTable.getRows()[2].getRowAction();
+		oIcon = Element.closestTo(oRowAction.getDomRef().children[1]);
+		oIcon.firePress();
 		assert.ok(oPress.calledOnceWithExactly({
 			id: "myOtherRowActionitem",
 			bindingContext: this.oTable._oTable.getRows()[2].getBindingContext("namedModel")

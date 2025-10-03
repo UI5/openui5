@@ -5895,7 +5895,7 @@ sap.ui.define([
 		const oContextMenuEventHandlerSpy = this.spy(this.oTable._getKeyboardExtension()._delegate, "oncontextmenu");
 		const oOpenContextMenuSpy = this.spy(TableUtils.Menu, "openContextMenu");
 		const aTestElements = [
-			this.oTable.getRows()[0].getRowAction().getAggregation("_icons")[0].getDomRef(),
+			this.oTable.getRows()[0].getRowAction().getDomRef().children[0],
 			this.oTable.getRows()[0].getCells()[1].getDomRef(),
 			this.oTable.getColumns()[1].getLabel().getDomRef(),
 			this.oTable.getRows()[0].getCells()[2].getDomRef(),

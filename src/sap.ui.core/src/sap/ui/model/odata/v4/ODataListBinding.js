@@ -968,6 +968,7 @@ sap.ui.define([
 			oEntityData,
 			sGroupId = this.getUpdateGroupId(),
 			oGroupLock,
+			bRefresh,
 			sResolvedPath = this.getResolvedPath(),
 			sTransientPredicate = "($uid=" + _Helper.uid() + ")",
 			sTransientPath = sResolvedPath + sTransientPredicate,
@@ -1011,7 +1012,6 @@ sap.ui.define([
 		// clone data to avoid modifications outside the cache
 		// remove any property starting with "@$ui5."
 		oEntityData = _Helper.publicClone(oInitialData, true) || {};
-		let bRefresh;
 		if (oAggregation) {
 			if (!bSkipRefresh) {
 				throw new Error("Missing bSkipRefresh");

@@ -19,8 +19,8 @@ function(Element, nextUIUpdate, ObjectPageLayout, ObjectPageSection, XMLView, $)
 		assertCorrectRole = function ($element, sRole, sMessage, assert) {
 			assert.strictEqual($element.attr(sRoleAttribute), sRole, sMessage);
 		},
-		assertCorrectRoleDescription = function ($element, sRoleDescription, sMessage, assert) {
-			assert.strictEqual($element.attr(sRoleDescriptionAttribute), sRoleDescription, sMessage);
+		assertNoRoleDescription = function ($element, sMessage, assert) {
+			assert.strictEqual($element.attr(sRoleDescriptionAttribute), undefined, sMessage);
 		};
 
 	QUnit.module("Screen reader support - Page elements", {
@@ -44,18 +44,17 @@ function(Element, nextUIUpdate, ObjectPageLayout, ObjectPageSection, XMLView, $)
 	});
 
 	QUnit.test("Root element role", function (assert) {
-		var sRoleBundleText = getResourceBundleText("ROOT_ROLE_DESCRIPTION");
-
 		assertCorrectRole(this.oObjectPage.$(), "main", "Root element has appropriate main role set", assert);
-		assertCorrectRoleDescription(this.oObjectPage.$(), sRoleBundleText, "Root element has appropriate role description set", assert);
+		assertNoRoleDescription(this.oObjectPage.$(), "Root element has no role description", assert);
 	});
 
 	QUnit.test("Root element aria-label", function (assert) {
 		var oHeader = this.objectPageView.byId("objectPageHeader"),
 			sTitleText = oHeader.getTitleText(),
-			sBundleTextWithoutTitle = getResourceBundleText("ROOT_ARIA_LABEL_WITHOUT_TITLE");
+			sBundleTextWithoutTitle = getResourceBundleText("ROOT_ARIA_LABEL_WITHOUT_TITLE"),
+			sBundleTextRootRoleDescription = getResourceBundleText("ROOT_ROLE_DESCRIPTION");
 
-		assert.strictEqual(this.oObjectPage.$().attr("aria-label"), sBundleTextWithoutTitle,
+		assert.strictEqual(this.oObjectPage.$().attr("aria-label"), sBundleTextWithoutTitle + " " + sBundleTextRootRoleDescription,
 			"The root element has correct aria-label set");
 
 		// Update title's text
@@ -74,20 +73,19 @@ function(Element, nextUIUpdate, ObjectPageLayout, ObjectPageSection, XMLView, $)
 	});
 
 	QUnit.test("Header element role", function (assert) {
-		var sRoleBundleText = getResourceBundleText("HEADER_ROLE_DESCRIPTION");
-
 		assertCorrectRole(this.oObjectPage.$("headerTitle"), "banner", "Header element has appropriate banner role set", assert);
-		assertCorrectRoleDescription(this.oObjectPage.$("headerTitle"), sRoleBundleText, "Header element has appropriate role description set", assert);
+		assertNoRoleDescription(this.oObjectPage.$("headerTitle"), "Header element has no role description", assert);
 	});
 
 	QUnit.test("Header element aria-label", function (assert) {
 		var oHeader = this.objectPageView.byId("objectPageHeader"),
 			sTitleText = oHeader.getTitleText(),
 			sBundleTextWithTitle = getResourceBundleText("HEADER_ARIA_LABEL_WITH_TITLE"),
-			sBundleTextWithoutTitle = getResourceBundleText("HEADER_ARIA_LABEL_WITHOUT_TITLE");
+			sBundleTextWithoutTitle = getResourceBundleText("HEADER_ARIA_LABEL_WITHOUT_TITLE"),
+			sBundleTextHeaderRoleDescription = getResourceBundleText("HEADER_ROLE_DESCRIPTION");
 
 		assert.strictEqual(this.oObjectPage.$("headerTitle").attr("aria-label"), sTitleText + " "
-			+ sBundleTextWithTitle, "The header element has correct aria-label set");
+			+ sBundleTextWithTitle + " " + sBundleTextHeaderRoleDescription, "The header element has correct aria-label set");
 
 		// Update title's text
 		sTitleText = "Updated title";
@@ -135,10 +133,8 @@ function(Element, nextUIUpdate, ObjectPageLayout, ObjectPageSection, XMLView, $)
 	});
 
 	QUnit.test("Footer element role", function (assert) {
-		var sRoleBundleText = getResourceBundleText("FOOTER_ROLE_DESCRIPTION");
-
 		assertCorrectRole(this.oObjectPage.$("footerWrapper"), "region", "Footer element has appropriate banner role set", assert);
-		assertCorrectRoleDescription(this.oObjectPage.$("footerWrapper"), sRoleBundleText, "Footer element has appropriate role description set", assert);
+		assertNoRoleDescription(this.oObjectPage.$("footerWrapper"), "Footer element has no role description", assert);
 	});
 
 	QUnit.test('AriaLabelledBy attribute is set correctly on the footer toolbar', function(assert) {
@@ -223,9 +219,11 @@ function(Element, nextUIUpdate, ObjectPageLayout, ObjectPageSection, XMLView, $)
 	});
 
 	QUnit.test("Header element aria-label - nested Title", function (assert) {
-		var sBundleTextWithTitle = getResourceBundleText("HEADER_ARIA_LABEL_WITH_TITLE");
+		var sBundleTextWithTitle = getResourceBundleText("HEADER_ARIA_LABEL_WITH_TITLE"),
+			sBundleTextHeaderRoleDescription = getResourceBundleText("HEADER_ROLE_DESCRIPTION");
 
 		assert.strictEqual(this.oObjectPage.$("headerTitle").attr("aria-label"), "Denise Smith "
-				+ sBundleTextWithTitle, "The header element has correct aria-label with nested Title in 'heading' aggregation");
+				+ sBundleTextWithTitle + " " + sBundleTextHeaderRoleDescription,
+				"The header element has correct aria-label with nested Title in 'heading' aggregation");
 	});
 });

@@ -21,6 +21,44 @@ SPDX-License-Identifier = "Apache-2.0"
 #
 
 
+# Library: sap.f:
+
+[[annotations]]
+path = "src/sap.f/src/sap/f/thirdparty/**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "SAP"
+SPDX-License-Identifier = "Apache-2.0"
+SPDX-FileComment = "these files belong to: UI5 Web Components"
+
+[[annotations]]
+path = "src/sap.f/src/sap/f/thirdparty/**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "SAP"
+SPDX-License-Identifier = "Apache-2.0"
+SPDX-FileComment = "these files belong to: UI5 Web Components Fiori"
+
+[[annotations]]
+path = "src/sap.f/src/sap/f/thirdparty/**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "SAP"
+SPDX-License-Identifier = "Apache-2.0"
+SPDX-FileComment = "these files belong to: UI5 Web Components Icons"
+
+[[annotations]]
+path = "src/sap.f/src/sap/f/thirdparty/**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "SAP"
+SPDX-License-Identifier = "Apache-2.0"
+SPDX-FileComment = "these files belong to: UI5 Web Components Icons Business Suite"
+
+[[annotations]]
+path = "src/sap.f/src/sap/f/thirdparty/**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "SAP"
+SPDX-License-Identifier = "Apache-2.0"
+SPDX-FileComment = "these files belong to: UI5 Web Components Icons TNT"
+
+
 # Library: sap.m:
 
 [[annotations]]

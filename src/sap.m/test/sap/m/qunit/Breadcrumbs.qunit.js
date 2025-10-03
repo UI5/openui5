@@ -793,7 +793,7 @@ function(Library, DomUnitsRem, Parameters, Breadcrumbs, Link, OverflowToolBar, T
 
 		// Assert
 		assert.strictEqual(oCurrentLocation.$().attr("aria-current"), "page", "Current location should have correct aria attribute");
-		assert.strictEqual(oCurrentLocation.$().attr("role"), "listitem", "Current location should have correct role attribute");
+		assert.strictEqual(oCurrentLocation.$().attr("role"), undefined, "Current location should not have role attribute, when Text control is rendered");
 	});
 
 	QUnit.test("Keyboard Handling", function (assert) {

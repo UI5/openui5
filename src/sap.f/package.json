@@ -17,5 +17,19 @@
     "@openui5/sap.m": "2.0.0-SNAPSHOT",
     "@openui5/sap.ui.core": "2.0.0-SNAPSHOT",
     "@openui5/sap.ui.layout": "2.0.0-SNAPSHOT"
+  },
+  "devDependencies": {
+    "@ui5/webcomponents": "2.15.0-rc.3",
+    "@ui5/webcomponents-fiori": "2.15.0-rc.3",
+    "@ui5/webcomponents-icons": "2.15.0-rc.3",
+    "@ui5/webcomponents-icons-business-suite": "2.15.0-rc.3",
+    "@ui5/webcomponents-icons-tnt": "2.15.0-rc.3",
+    "@ui5/cli": "4.0.26",
+    "fs-extra": "11.3.2",
+    "ui5-tooling-modules": "3.31.1"
+  },
+  "scripts": {
+    "pregenerate-webcomponents": "node -e \"const fsx = require('fs-extra'); fsx.emptyDirSync('src/sap/f/gen'); fsx.emptyDirSync('src/sap/f/thirdparty');\"",
+    "generate-webcomponents": "ui5 build --dest ./src/sap/f --output-style flat --config ui5-build.yaml --exclude-task \\* --include-task ui5-tooling-modules-task"
   }
 }

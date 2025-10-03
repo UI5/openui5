@@ -87,8 +87,15 @@ sap.ui.define([
 		}
 
 		if (TableUtils.hasRowActions(oTable)) {
+			rm.class("sapUiTableRAct");
 			const iRowActionCount = oTable.getRowActionCount();
-			rm.class(iRowActionCount === 1 ? "sapUiTableRActS" : "sapUiTableRAct");
+			if (iRowActionCount === 1) {
+				rm.class("sapUiTableRActS");
+			} else if (iRowActionCount === 2) {
+				rm.class("sapUiTableRActM");
+			} else {
+				rm.class("sapUiTableRActL");
+			}
 		} else if (TableUtils.hasRowNavigationIndicators(oTable)) {
 			rm.class("sapUiTableRowNavIndicator");
 		}

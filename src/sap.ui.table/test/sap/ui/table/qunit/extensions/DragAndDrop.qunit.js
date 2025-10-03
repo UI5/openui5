@@ -317,7 +317,7 @@ sap.ui.define([
 					sourceAggregation: "rows",
 					targetAggregation: "rows"
 				}),
-				rowActionTemplate: TableQUnitUtils.createRowAction(null),
+				rowActionTemplate: TableQUnitUtils.createRowAction(),
 				rowActionCount: 1
 			});
 
@@ -492,7 +492,7 @@ sap.ui.define([
 					case "Scrollable":
 						return this.oTable.getRows()[iRowIndex].getCells()[1].getDomRef();
 					case "Action":
-						return this.oTable.qunit.getRowActionCell(iRowIndex).querySelector(".sapUiTableActionIcon");
+						return this.oTable.qunit.getRowActionCell(iRowIndex).querySelector(".sapUiTableAction");
 					default:
 						return null;
 				}

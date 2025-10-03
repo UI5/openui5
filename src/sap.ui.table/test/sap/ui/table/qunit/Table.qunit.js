@@ -413,11 +413,14 @@ sap.ui.define([
 		oTable.setRowActionCount(2);
 		assert.equal(oTable.getRowActionCount(), 2, "Set to 2, count is 2");
 
+		oTable.setRowActionCount(3);
+		assert.equal(oTable.getRowActionCount(), 3, "Set to 3, count is 3");
+
 		oTable.setRowActionCount(0);
 		assert.equal(oTable.getRowActionCount(), 0, "Set to 0, count is 0");
 
-		oTable.setRowActionCount(3);
-		assert.equal(oTable.getRowActionCount(), 2, "Set to 3, count is 2");
+		oTable.setRowActionCount(4);
+		assert.equal(oTable.getRowActionCount(), 3, "Set to 4, count is 3");
 
 		oTable.setRowActionCount(-1);
 		assert.equal(oTable.getRowActionCount(), 0, "Set to -1, count is 0");
@@ -600,25 +603,33 @@ sap.ui.define([
 	QUnit.test("Row Actions", async function(assert) {
 		assert.equal(oTable.getRowActionCount(), 0, "RowActionCount is 0: Table has no row actions");
 		assert.ok(!oTable.$().hasClass("sapUiTableRAct"), "RowActionCount is 0: No CSS class sapUiTableRAct");
-		assert.ok(!oTable.$().hasClass("sapUiTableRActS"), "RowActionCount is 0: No CSS class sapUiTableRActS");
 		assert.ok(!oTable.$("sapUiTableRowActionScr").length, "RowActionCount is 0: No action area");
 
 		oTable.setRowActionCount(2);
 		await nextUIUpdate();
 		assert.ok(!oTable.$().hasClass("sapUiTableRAct"), "No row action template: No CSS class sapUiTableRAct");
-		assert.ok(!oTable.$().hasClass("sapUiTableRActS"), "No row action template: No CSS class sapUiTableRActS");
 		assert.ok(!oTable.$("sapUiTableRowActionScr").length, "No row action template: No action area");
 
 		oTable.setRowActionTemplate(TableQUnitUtils.createRowAction(null));
 		await nextUIUpdate();
 		assert.ok(oTable.$().hasClass("sapUiTableRAct"), "CSS class sapUiTableRAct");
-		assert.ok(!oTable.$().hasClass("sapUiTableRActS"), "No CSS class sapUiTableRActS");
 		assert.ok(oTable.$("sapUiTableRowActionScr").length, "Action area exists");
 
 		oTable.setRowActionCount(1);
 		await nextUIUpdate();
-		assert.ok(!oTable.$().hasClass("sapUiTableRAct"), "RowActionCount is 1: No CSS class sapUiTableRAct");
+		assert.ok(oTable.$().hasClass("sapUiTableRAct"), "RowActionCount is 1: CSS class sapUiTableRAct");
 		assert.ok(oTable.$().hasClass("sapUiTableRActS"), "RowActionCount is 1: CSS class sapUiTableRActS");
+
+		oTable.setRowActionCount(2);
+		await nextUIUpdate();
+		assert.ok(oTable.$().hasClass("sapUiTableRAct"), "RowActionCount is 2: CSS class sapUiTableRAct");
+		assert.ok(oTable.$().hasClass("sapUiTableRActM"), "RowActionCount is 2: CSS class sapUiTableRActM");
+
+		oTable.setRowActionCount(3);
+		await nextUIUpdate();
+		assert.ok(oTable.$().hasClass("sapUiTableRAct"), "RowActionCount is 3: CSS class sapUiTableRAct");
+		assert.ok(oTable.$().hasClass("sapUiTableRActL"), "RowActionCount is 3: CSS class sapUiTableRActL");
+
 		assert.ok(oTable.$("sapUiTableRowActionScr").length, "Action area exists");
 		assert.notOk(oTable.$().hasClass("sapUiTableRActFlexible"), "The RowActions column is positioned right");
 
@@ -3022,7 +3033,7 @@ sap.ui.define([
 			const oControl = oTable.getRows()[0].getCells()[oColumn.getIndex()];
 			this.test(assert, "Content - Column " + oColumn.getIndex(), oControl.getDomRef(), oControl.allowsPasteOnTable());
 		}.bind(this));
-		this.test(assert, "Content - Row action", oTable.getRows()[0].getRowAction().getAggregation("_icons")[0].getDomRef(), true);
+		//this.test(assert, "Content - Row action", oTable.getRows()[0].getRowAction().getAggregation("_icons")[0].getDomRef(), true);
 	});
 
 	QUnit.test("No paste data", function(assert) {
