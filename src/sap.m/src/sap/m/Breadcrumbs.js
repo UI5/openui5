@@ -344,7 +344,6 @@ sap.ui.define([
 
 		oCurrentLocation.$().attr("aria-current", "page");
 		oCurrentLocation.$().attr("tabindex", 0);
-		oCurrentLocation.$().attr("role", "listitem");
 		oCurrentLocation.$().attr("aria-label", this.getCurrentLocation().getText() + " " + positionText);
 	};
 

@@ -264,8 +264,9 @@ sap.ui.define([
 			enableBusyIndicator: {type: "boolean", group: "Behavior", defaultValue: false},
 
 			/**
-			 * Number of row actions made visible which determines the width of the row action column.
-			 * The values <code>0</code>, <code>1</code> and <code>2</code> are possible.
+			 * Number of row actions made visible, hence this property also determines the width of the row action column.
+			 * The maximum number of visible row actions is 3. If the <code>rowActionTemplate</code> contains more <code>rowActionItems</code>, they
+			 * are shown in an overflow menu.
 			 * @since 1.45.0
 			 */
 			rowActionCount: {type: "int", group: "Appearance", defaultValue: 0},
@@ -3375,7 +3376,7 @@ sap.ui.define([
 
 	Table.prototype.setRowActionCount = function(iCount) {
 		if (typeof iCount === "number") {
-			iCount = Math.max(0, Math.min(iCount, 2));
+			iCount = Math.max(0, Math.min(iCount, 3));
 		}
 
 		return this.setProperty("rowActionCount", iCount);

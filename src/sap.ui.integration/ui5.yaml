@@ -71,6 +71,8 @@ builder:
                - "!sap/ui/fl/"
                - sap/m/
                - sap/f/
+               - "!sap/f/gen/"
+               - "!sap/f/thirdparty/"
                - sap/ui/layout/
                - sap/ui/unified/
                - "!**/designtime/"
@@ -131,6 +133,8 @@ builder:
               - "!sap/ui/fl/"
               - sap/m/
               - sap/f/
+              - "!sap/f/gen/"
+              - "!sap/f/thirdparty/"
               - sap/ui/layout/
               - sap/ui/unified/
               - "!**/designtime/"
@@ -207,6 +211,8 @@ builder:
                - "!sap/ui/fl/"
                - sap/m/
                - sap/f/
+               - "!sap/f/gen/"
+               - "!sap/f/thirdparty/"
                - sap/ui/layout/
                - sap/ui/unified/
                - "!**/designtime/"
@@ -271,6 +277,8 @@ builder:
               - "!sap/ui/fl/"
               - sap/m/
               - sap/f/
+              - "!sap/f/gen/"
+              - "!sap/f/thirdparty/"
               - sap/ui/layout/
               - sap/ui/unified/
               - "!**/designtime/"

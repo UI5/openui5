@@ -139,23 +139,6 @@
 	}
 }
 
-.sapUiTableVScr.sapUiTableRAct {
-
-	._sapUiTableVScrWithActionsInnerMixin();
-}
-
-.sapUiSizeCozy.sapUiTableVScr.sapUiTableRAct,
-.sapUiSizeCozy .sapUiTableVScr.sapUiTableRAct {
-
-	._sapUiTableVScrWithActionsInnerMixin("WidthCozy");
-}
-
-.sapUiSizeCondensed.sapUiTableVScr.sapUiTableRAct,
-.sapUiSizeCondensed .sapUiTableVScr.sapUiTableRAct {
-
-	._sapUiTableVScrWithActionsInnerMixin("WidthCondensed");
-}
-
 .sapUiTableVScr.sapUiTableRActS {
 
 	._sapUiTableVScrWithActionsInnerMixin("SmallWidth");
@@ -173,21 +156,38 @@
 	._sapUiTableVScrWithActionsInnerMixin("SmallWidthCondensed");
 }
 
-.sapUiTableRAct:not(.sapUiTableVScr) {
+.sapUiTableVScr.sapUiTableRActM {
 
-	._sapUiTableNoVScrWithActionsInnerMixin();
+	._sapUiTableVScrWithActionsInnerMixin();
 }
 
-.sapUiSizeCozy.sapUiTableRAct:not(.sapUiTableVScr),
-.sapUiSizeCozy .sapUiTableRAct:not(.sapUiTableVScr) {
+.sapUiSizeCozy.sapUiTableVScr.sapUiTableRActM,
+.sapUiSizeCozy .sapUiTableVScr.sapUiTableRActM {
 
-	._sapUiTableNoVScrWithActionsInnerMixin("WidthCozy");
+	._sapUiTableVScrWithActionsInnerMixin("WidthCozy");
 }
 
-.sapUiSizeCondensed.sapUiTableRAct:not(.sapUiTableVScr),
-.sapUiSizeCondensed .sapUiTableRAct:not(.sapUiTableVScr) {
+.sapUiSizeCondensed.sapUiTableVScr.sapUiTableRActM,
+.sapUiSizeCondensed .sapUiTableVScr.sapUiTableRActM {
 
-	._sapUiTableNoVScrWithActionsInnerMixin("WidthCondensed");
+	._sapUiTableVScrWithActionsInnerMixin("WidthCondensed");
+}
+
+.sapUiTableVScr.sapUiTableRActL {
+
+	._sapUiTableVScrWithActionsInnerMixin("LargeWidth");
+}
+
+.sapUiSizeCozy.sapUiTableVScr.sapUiTableRActL,
+.sapUiSizeCozy .sapUiTableVScr.sapUiTableRActL {
+
+	._sapUiTableVScrWithActionsInnerMixin("LargeWidthCozy");
+}
+
+.sapUiSizeCondensed.sapUiTableVScr.sapUiTableRActL,
+.sapUiSizeCondensed .sapUiTableVScr.sapUiTableRActL {
+
+	._sapUiTableVScrWithActionsInnerMixin("LargeWidthCondensed");
 }
 
 .sapUiTableRActS:not(.sapUiTableVScr) {
@@ -205,6 +205,40 @@
 .sapUiSizeCondensed .sapUiTableRActS:not(.sapUiTableVScr) {
 
 	._sapUiTableNoVScrWithActionsInnerMixin("SmallWidthCondensed");
+}
+
+.sapUiTableRActM:not(.sapUiTableVScr) {
+
+	._sapUiTableNoVScrWithActionsInnerMixin();
+}
+
+.sapUiSizeCozy.sapUiTableRActM:not(.sapUiTableVScr),
+.sapUiSizeCozy .sapUiTableRActM:not(.sapUiTableVScr) {
+
+	._sapUiTableNoVScrWithActionsInnerMixin("WidthCozy");
+}
+
+.sapUiSizeCondensed.sapUiTableRActM:not(.sapUiTableVScr),
+.sapUiSizeCondensed .sapUiTableRActM:not(.sapUiTableVScr) {
+
+	._sapUiTableNoVScrWithActionsInnerMixin("WidthCondensed");
+}
+
+.sapUiTableRActL:not(.sapUiTableVScr) {
+
+	._sapUiTableNoVScrWithActionsInnerMixin("LargeWidth");
+}
+
+.sapUiSizeCozy.sapUiTableRActL:not(.sapUiTableVScr),
+.sapUiSizeCozy .sapUiTableRActL:not(.sapUiTableVScr) {
+
+	._sapUiTableNoVScrWithActionsInnerMixin("LargeWidthCozy");
+}
+
+.sapUiSizeCondensed.sapUiTableRActL:not(.sapUiTableVScr),
+.sapUiSizeCondensed .sapUiTableRActL:not(.sapUiTableVScr) {
+
+	._sapUiTableNoVScrWithActionsInnerMixin("LargeWidthCondensed");
 }
 
 /* Hide last border right of column header and cell when no vertical scroll is available */

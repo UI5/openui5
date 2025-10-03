@@ -3983,7 +3983,7 @@ function(
 
 	QUnit.module("ObjectPage landmarkInfo API");
 
-	QUnit.test("DynamicPage landmark info is set correctly", async function(assert) {
+	QUnit.test("ObjectPage landmark info is set correctly", async function(assert) {
 		var oObjectPage = helpers.generateObjectPageWithContent(oFactory, 3, false, true),
 			oLandmarkInfo = new ObjectPageAccessibleLandmarkInfo({
 				rootRole: "Region",

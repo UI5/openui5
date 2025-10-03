@@ -100,32 +100,40 @@ sap.ui.define([
 
 	/**
 	 * Final (cannot be overridden) request headers for OData V4.
+	 *
+	 * @private
 	 */
-	_Requestor.prototype.mFinalHeaders = {
+	_Requestor.prototype.mFinalHeaders = Object.freeze({
 		"Content-Type" : "application/json;charset=UTF-8;IEEE754Compatible=true"
-	};
+	});
 
 	/**
 	 * Predefined request headers in $batch parts for OData V4.
+	 *
+	 * @private
 	 */
-	_Requestor.prototype.mPredefinedPartHeaders = {
+	_Requestor.prototype.mPredefinedPartHeaders = Object.freeze({
 		Accept : "application/json;odata.metadata=minimal;IEEE754Compatible=true"
-	};
+	});
 
 	/**
 	 * Predefined request headers for all requests for OData V4.
+	 *
+	 * @private
 	 */
-	_Requestor.prototype.mPredefinedRequestHeaders = {
+	_Requestor.prototype.mPredefinedRequestHeaders = Object.freeze({
 		Accept : "application/json;odata.metadata=minimal;IEEE754Compatible=true",
 		"OData-MaxVersion" : "4.0",
 		"OData-Version" : "4.0",
 		"X-CSRF-Token" : "Fetch"
-	};
+	});
 
 	/**
 	 * OData V4 request headers reserved for internal use.
+	 *
+	 * @private
 	 */
-	_Requestor.prototype.mReservedHeaders = {
+	_Requestor.prototype.mReservedHeaders = Object.freeze({
 		accept : true,
 		"accept-charset" : true,
 		"content-encoding" : true,
@@ -142,7 +150,7 @@ sap.ui.define([
 		"odata-version" : true,
 		prefer : true,
 		"sap-contextid" : true
-	};
+	});
 
 	/**
 	 * Adds a change set to the batch queue for the given group. All modifying requests created
@@ -1879,6 +1887,7 @@ sap.ui.define([
 	 *     <li>the {@link #checkConflictingStrictRequest rules for strict handling} w.r.t. change
 	 *       sets are violated
 	 *   </ul>
+	 *
 	 * @public
 	 */
 	_Requestor.prototype.request = function (sMethod, sResourcePath, oGroupLock, mHeaders, oPayload,
@@ -2353,6 +2362,8 @@ sap.ui.define([
 	 * @param {string} sOptimisticGroupId The group ID of the optimistic batch
 	 * @returns {boolean}
 	 *   Whether the actual batch requests and group ID matches the optimistic one
+	 *
+	 * @private
 	 */
 	_Requestor.matchesOptimisticBatch = function (aActualRequests, sActualGroupId,
 		aOptimisticRequests, sOptimisticGroupId) {
@@ -2446,6 +2457,8 @@ sap.ui.define([
 	 *   Whether the XHR should be called with <code>withCredentials</code>
 	 * @returns {object}
 	 *   A new <code>_Requestor</code> instance
+	 *
+	 * @public
 	 */
 	_Requestor.create = function (sServiceUrl, oModelInterface, mHeaders, mQueryParams,
 			sODataVersion, bWithCredentials) {

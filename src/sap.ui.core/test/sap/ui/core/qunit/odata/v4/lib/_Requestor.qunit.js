@@ -279,6 +279,26 @@ sap.ui.define([
 });
 
 	//*********************************************************************************************
+	QUnit.test("frozen", function (assert) {
+		assert.throws(function () {
+			// code under test
+			_Requestor.prototype.mFinalHeaders.foo = "bar";
+		}, new TypeError("Cannot add property foo, object is not extensible"));
+		assert.throws(function () {
+			// code under test
+			_Requestor.prototype.mPredefinedPartHeaders.foo = "bar";
+		}, new TypeError("Cannot add property foo, object is not extensible"));
+		assert.throws(function () {
+			// code under test
+			_Requestor.prototype.mPredefinedRequestHeaders.foo = "bar";
+		}, new TypeError("Cannot add property foo, object is not extensible"));
+		assert.throws(function () {
+			// code under test
+			_Requestor.prototype.mReservedHeaders.foo = "bar";
+		}, new TypeError("Cannot add property foo, object is not extensible"));
+	});
+
+	//*********************************************************************************************
 	QUnit.test("destroy", function () {
 		var oRequestor = _Requestor.create(sServiceUrl, oModelInterface);
 

@@ -329,33 +329,45 @@
 	height: 100%;
 	display: none;
 	z-index: 4; /* Ensure Action Area before Resize/Reorder bars */
-	width: @_sap_ui_table_RowActionColumnWidth;
 
-	.sapUiTableRAct &,
-	.sapUiTableRActS & {
+	.sapUiTableRAct & {
 		display: block;
 	}
 
 	.sapUiTableRActS & {
 		width: @_sap_ui_table_RowActionColumnSmallWidth;
+
+		.sapUiSizeCozy & {
+			width: @_sap_ui_table_RowActionColumnSmallWidthCozy;
+		}
+
+		.sapUiSizeCondensed & {
+			width: @_sap_ui_table_RowActionColumnSmallWidthCondensed;
+		}
 	}
 
-	.sapUiSizeCozy & {
-		width: @_sap_ui_table_RowActionColumnWidthCozy;
+	.sapUiTableRActM & {
+		width: @_sap_ui_table_RowActionColumnWidth;
+
+		.sapUiSizeCozy & {
+			width: @_sap_ui_table_RowActionColumnWidthCozy;
+		}
+
+		.sapUiSizeCondensed & {
+			width: @_sap_ui_table_RowActionColumnWidthCondensed;
+		}
 	}
 
-	.sapUiSizeCozy .sapUiTableRActS &,
-	.sapUiSizeCozy.sapUiTableRActS & {
-		width: @_sap_ui_table_RowActionColumnSmallWidthCozy;
-	}
+	.sapUiTableRActL & {
+		width: @_sap_ui_table_RowActionColumnLargeWidth;
 
-	.sapUiSizeCondensed & {
-		width: @_sap_ui_table_RowActionColumnWidthCondensed;
-	}
+		.sapUiSizeCozy & {
+			width: @_sap_ui_table_RowActionColumnLargeWidthCozy;
+		}
 
-	.sapUiSizeCondensed .sapUiTableRActS &,
-	.sapUiSizeCondensed.sapUiTableRActS & {
-		width: @_sap_ui_table_RowActionColumnSmallWidthCondensed;
+		.sapUiSizeCondensed & {
+			width: @_sap_ui_table_RowActionColumnLargeWidthCondensed;
+		}
 	}
 
 	> span {
@@ -386,28 +398,41 @@
 .sapUiTableRowActionCell {
 	display: flex;
 	align-items: center;
-	min-width: @_sap_ui_table_RowActionColumnWidth;
 
 	.sapUiTableRActS & {
 		min-width: @_sap_ui_table_RowActionColumnSmallWidth;
+
+		.sapUiSizeCozy & {
+			min-width: @_sap_ui_table_RowActionColumnSmallWidthCozy;
+		}
+
+		.sapUiSizeCondensed & {
+			min-width: @_sap_ui_table_RowActionColumnSmallWidthCondensed;
+		}
 	}
 
-	.sapUiSizeCozy & {
-		min-width: @_sap_ui_table_RowActionColumnWidthCozy;
+	.sapUiTableRActM & {
+		min-width: @_sap_ui_table_RowActionColumnWidth;
+
+		.sapUiSizeCozy & {
+			min-width: @_sap_ui_table_RowActionColumnWidthCozy;
+		}
+
+		.sapUiSizeCondensed & {
+			min-width: @_sap_ui_table_RowActionColumnWidthCondensed;
+		}
 	}
 
-	.sapUiSizeCozy .sapUiTableRActS &,
-	.sapUiSizeCozy.sapUiTableRActS & {
-		min-width: @_sap_ui_table_RowActionColumnSmallWidthCozy;
-	}
+	.sapUiTableRActL & {
+		min-width: @_sap_ui_table_RowActionColumnLargeWidth;
 
-	.sapUiSizeCondensed & {
-		min-width: @_sap_ui_table_RowActionColumnWidthCondensed;
-	}
+		.sapUiSizeCozy & {
+			min-width: @_sap_ui_table_RowActionColumnLargeWidthCozy;
+		}
 
-	.sapUiSizeCondensed .sapUiTableRActS &,
-	.sapUiSizeCondensed.sapUiTableRActS & {
-		min-width: @_sap_ui_table_RowActionColumnSmallWidthCondensed;
+		.sapUiSizeCondensed & {
+			min-width: @_sap_ui_table_RowActionColumnLargeWidthCondensed;
+		}
 	}
 
 	.sapUiTableRowNavIndicator & {

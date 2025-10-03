@@ -1,0 +1,53 @@
+specVersion: "3.0"
+type: library
+metadata:
+  name: sap.f
+# keep the customConfiguration section in sync with ui5.yaml
+# as ui5-tooling-modules is reading the config across projects
+customConfiguration:
+  ui5-tooling-modules: &cfgModules
+    additionalDependencies:
+      - "@ui5/webcomponents"
+      - "@ui5/webcomponents-fiori"
+      - "@ui5/webcomponents-icons"
+      - "@ui5/webcomponents-icons-business-suite"
+      - "@ui5/webcomponents-icons-tnt"
+    entryPoints:
+      - "@ui5/webcomponents/dist/Avatar"
+      - "@ui5/webcomponents/dist/Button"
+      - "@ui5/webcomponents/dist/Label"
+      - "@ui5/webcomponents/dist/Menu"
+      - "@ui5/webcomponents/dist/MenuItem"
+      - "@ui5/webcomponents-fiori/dist/IllustratedMessage"
+      - "@ui5/webcomponents-fiori/dist/NotificationList"
+      - "@ui5/webcomponents-fiori/dist/NotificationListGroupItem"
+      - "@ui5/webcomponents-fiori/dist/NotificationListItem"
+      - "@ui5/webcomponents-fiori/dist/ShellBar"
+      - "@ui5/webcomponents-fiori/dist/ShellBarBranding"
+      - "@ui5/webcomponents-fiori/dist/ShellBarSearch"
+      - "@ui5/webcomponents-fiori/dist/ShellBarItem"
+      - "@ui5/webcomponents-fiori/dist/SearchItem"
+      - "@ui5/webcomponents-fiori/dist/SearchItemGroup"
+      - "@ui5/webcomponents-fiori/dist/SearchMessageArea"
+      - "@ui5/webcomponents-fiori/dist/SearchScope"
+      - "@ui5/webcomponents-fiori/dist/ShellBarSpacer"
+      - "@ui5/webcomponents-fiori/dist/UserMenu"
+      - "@ui5/webcomponents-fiori/dist/UserMenuItem"
+      - "@ui5/webcomponents-fiori/dist/UserMenuAccount"
+      - "@ui5/webcomponents-icons/AllIcons"
+      - "@ui5/webcomponents-icons-tnt/AllIcons"
+      - "@ui5/webcomponents-icons-business-suite/AllIcons"
+    sanitizeNpmPackageName: true
+    pluginOptions:
+      webcomponents:
+        skipJSDoc: false # enable the JSDoc generation
+        #skipDtsGeneration: false
+        force: true # framework version is missing for auto enablement, so force it
+        scoping: true
+        includeAssets: true
+builder:
+  customTasks:
+    - name: ui5-tooling-modules-task
+      afterTask: replaceVersion
+      configuration:
+        <<: *cfgModules

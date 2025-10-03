@@ -989,7 +989,7 @@ sap.ui.define("test-resources/sap/ui/table/Settings", [
 									new RowActionItem({icon: "sap-icon://edit", text: "Edit", press: fnRowActionPress}),
 									new RowActionItem({icon: "sap-icon://line-chart", text: "Analyze", press: fnRowActionPress})
 								]});
-								switchRowActions(oTable, 2, oTemplate);
+								switchRowActions(oTable, 3, oTemplate);
 							}
 						},
 						MULTI_ONE: {

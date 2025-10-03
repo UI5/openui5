@@ -13,9 +13,7 @@ sap.ui.define([
 	'sap/m/p13n/enums/PersistenceMode',
 	'sap/m/p13n/Engine',
 	'sap/base/util/merge',
-	'sap/ui/mdc/p13n/StateUtil',
-	'sap/ui/mdc/condition/FilterOperatorUtil',
-	'sap/base/Log'
+	'sap/ui/mdc/p13n/StateUtil'
 ], (
 	Library,
 	loadModules,
@@ -27,9 +25,7 @@ sap.ui.define([
 	PersistenceMode,
 	Engine,
 	merge,
-	StateUtil,
-	FilterOperatorUtil,
-	Log
+	StateUtil
 ) => {
 	"use strict";
 
@@ -200,27 +196,6 @@ sap.ui.define([
 	FilterableListContent.prototype._findConditionsForContext = function(oContext, aConditions) {
 		const oDelegate = this.isValueHelpDelegateInitialized() && this.getValueHelpDelegate();
 		if (oContext && oDelegate) {
-			// <!-- Support for deprecated delegate method isFilterableListItemSelected
-			if (oDelegate.isFilterableListItemSelected) {
-				Log.warning("MDC.ValueHelp", "Delegate method 'isFilterableListItemSelected' is deprecated, please implement 'findConditionsForContext' instead.");
-
-				const bRepresentsConditions = oDelegate.isFilterableListItemSelected(this.getValueHelpInstance(), this, {
-					getBindingContext: function() {
-						return oContext; // Dirty way to simulate listitem.getBindingContext()
-					}
-				}, aConditions);
-
-				if (bRepresentsConditions) {
-					const oValues = this.getItemFromContext(oContext);
-					const oContextCondition = oValues && this.createCondition(oValues.key, oValues.description, oValues.payload);
-
-					return aConditions.filter((oCondition) => {
-						return FilterOperatorUtil.compareConditions(oCondition, oContextCondition);
-					});
-				}
-				return [];
-			}
-			// -->
 			return oDelegate.findConditionsForContext(this.getValueHelpInstance(), this, oContext, aConditions);
 		}
 		return [];
