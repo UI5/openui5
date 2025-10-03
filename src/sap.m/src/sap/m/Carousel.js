@@ -411,7 +411,7 @@ sap.ui.define([
 	};
 
 	Carousel.prototype._resize = function() {
-		var $inner = this.$().find('> .sapMCrslInner');
+		var $inner = this.$().find('> .sapMCrslList > .sapMCrslInner');
 
 		if (this._iResizeTimeoutId) {
 			clearTimeout(this._iResizeTimeoutId);
@@ -579,7 +579,7 @@ sap.ui.define([
 		}
 
 		var $element = this.$(),
-			$inner = $element.find('> .sapMCrslInner'),
+			$inner = $element.find('> .sapMCrslList > .sapMCrslInner'),
 			$items = $inner.children(),
 			iIndex = this._iCurrSlideIndex,
 			iLength = $items.length,
@@ -696,7 +696,6 @@ sap.ui.define([
 		this.$().find(Carousel._ITEM_SELECTOR).each(function (iIndex, oPage) {
 			var bSelected = iIndex === iSelectedPageIndex;
 
-			oPage.setAttribute("aria-selected", bSelected);
 			oPage.setAttribute("aria-hidden", !this._isPageDisplayed(iIndex));
 			oPage.setAttribute("tabindex", bSelected ? 0 : -1);
 		}.bind(this));
@@ -1211,7 +1210,7 @@ sap.ui.define([
 	 * @private
 	 */
 	Carousel.prototype.onsapup = function(oEvent) {
-		this._fnSkipToIndex(oEvent, 1, false);
+		this._fnSkipToIndex(oEvent, -1, false);
 	};
 
 	/**
@@ -1232,7 +1231,7 @@ sap.ui.define([
 	 * @private
 	 */
 	Carousel.prototype.onsapdown = function(oEvent) {
-		this._fnSkipToIndex(oEvent, -1, false);
+		this._fnSkipToIndex(oEvent, 1, false);
 	};
 
 	/**
@@ -1554,7 +1553,7 @@ sap.ui.define([
 	};
 
 	Carousel.prototype._initialize  = function () {
-		var $inner = this.$().find('> .sapMCrslInner'),
+		var $inner = this.$().find('> .sapMCrslList > .sapMCrslInner'),
 			iNumberOfItemsToShow = this._getNumberOfItemsToShow();
 
 		this._bIsInitialized = false;
@@ -1593,7 +1592,7 @@ sap.ui.define([
 		}
 
 		var $element = this.$(),
-			$inner = $element.find('> .sapMCrslInner'),
+			$inner = $element.find('> .sapMCrslList > .sapMCrslInner'),
 			$items = $inner.children(),
 			$start = $items.eq(0),
 			$current = $items.eq(this._iCurrSlideIndex),
@@ -1618,7 +1617,7 @@ sap.ui.define([
 	Carousel.prototype._initActivePages = function () {
 		var sActiveClass = "sapMCrslActive",
 			$element = this.$(),
-			$inner = $element.find('> .sapMCrslInner'),
+			$inner = $element.find('> .sapMCrslList > .sapMCrslInner'),
 			$items = $inner.children(),
 			sId = this.getDomRef().id,
 			sPageIndicatorId = sId.replace(/(:|\.)/g,'\\$1') + '-pageIndicator',
