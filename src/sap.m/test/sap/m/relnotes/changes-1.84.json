@@ -2338,5 +2338,15 @@
         "text": " We now ensure that a PDF loads irrespective of the contentType if isTrustedSource is set to true"
       }
     ]
+  },
+  "1.84.53": {
+    "date": "October 2025",
+    "notes": [
+      {
+        "id": "744f362659ae4c8e4fb273cf1e81190cb3551871",
+        "type": "FIX",
+        "text": " We've now fixed the SAP gateway issues for PDFViewer"
+      }
+    ]
   }
 }
