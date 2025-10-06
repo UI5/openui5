@@ -248,5 +248,35 @@
         "text": " sap.m.Page: headerContent controls are now selectable in UI Adapt mode"
       }
     ]
+  },
+  "1.139.1": {
+    "date": "October 2025",
+    "notes": [
+      {
+        "id": "88e6f1cf04b706fa8f4a3e125dc5411d62da3fbb",
+        "type": "FIX",
+        "text": " sap.m.ComboBox: qUnit tests are now stabilized"
+      },
+      {
+        "id": "0d88cc92b150089585846df08a64cdbe93ab2cc0",
+        "type": "FIX",
+        "text": " sap.m.Tokenizer: first token is now not truncated when not needed"
+      },
+      {
+        "id": "f7773a7579ef9fa053c417d24e42a42b562432d6",
+        "type": "FIX",
+        "text": " core/Popup: Use activeElement of both light and shadow DOM to determine focus loss"
+      },
+      {
+        "id": "dbc35b4329d1d709a95da16b539fbeb5e39ee596",
+        "type": "FIX",
+        "text": " m.VariantManagement: add aria-expanded & aria-haspopup"
+      },
+      {
+        "id": "4f47864a6ae52141e929b4a030394ebb803c754a",
+        "type": "FIX",
+        "text": " sap.m.Avatar: Fix image not visible, when initials are incorrect"
+      }
+    ]
   }
 }

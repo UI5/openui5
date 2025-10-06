@@ -48,5 +48,45 @@
         "text": " ResourceBundle: Improve performance"
       }
     ]
+  },
+  "1.139.1": {
+    "date": "October 2025",
+    "notes": [
+      {
+        "id": "f7773a7579ef9fa053c417d24e42a42b562432d6",
+        "type": "FIX",
+        "text": " core/Popup: Use activeElement of both light and shadow DOM to determine focus loss"
+      },
+      {
+        "id": "f8dcf108c09b53eda3e01d81ae5aa642825b5d94",
+        "type": "FIX",
+        "text": " core/interaction: Cache failed requests to avoid retry attempts"
+      },
+      {
+        "id": "5c0516aa5afaad188bdf002751ec3dc8b07c1f43",
+        "type": "FEATURE",
+        "text": " sap.ui.core: make sap/ui/Device a standard AMD module"
+      },
+      {
+        "id": "a756049f13b187676062b9eacada92863ce3a5c9",
+        "type": "FEATURE",
+        "text": " sap/ui/base: enable static inheritance for UI5 classes"
+      },
+      {
+        "id": "4067b4720900a77181422452da34a00b6729bca3",
+        "type": "FIX",
+        "text": " sap.base.config: fix logging for URL parameters"
+      },
+      {
+        "id": "d99d21eea058cef4a9a6bf64a45030aff280f13a",
+        "type": "FIX",
+        "text": " sap/ui/core/AppCAcheBuster.js: Core.ready() does not resolve"
+      },
+      {
+        "id": "a6a4893661033cad8c7b24019d0fa52b6fb93489",
+        "type": "FEATURE",
+        "text": " Make the experimental new bootstrap the productive one"
+      }
+    ]
   }
 }

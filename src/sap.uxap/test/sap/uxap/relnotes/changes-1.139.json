@@ -18,5 +18,15 @@
         "text": " sap.uxap.ObjectPageSubSection: Fix cloning of \"actions\""
       }
     ]
+  },
+  "1.139.1": {
+    "date": "October 2025",
+    "notes": [
+      {
+        "id": "c46592423e911f1e572a59411b66b283c4a03122",
+        "type": "FIX",
+        "text": " sap.uxap.ObjectPageSection - hidden title aria-labelledby"
+      }
+    ]
   }
 }
