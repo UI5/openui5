@@ -140,7 +140,7 @@ sap.ui.define([
 			formatInt(oInteraction.busyDuration, 4), // extension_1 - busy duration
 			formatInt(oFESRHandle.interactionType || 0, 4), // extension_2 - type of interaction: 0 = not implemented, 1 = app start, 2 = follow up step, 3 = unknown
 			format(CLIENT_DEVICE, 1), // extension_3 - client device
-			"", // extension_4
+			formatInt(oInteraction.legacyDuration, 10), // extension_4
 			format(formatInteractionStartTimestamp(oInteraction.start), 20), // extension_5 - interaction start time
 			format(oFESRHandle.appNameLong, 70, true) // application_name with 70 characters, trimmed from left
 		].join(",");
@@ -300,8 +300,9 @@ sap.ui.define([
 			oBeaconRequest = sUrl ? BeaconRequest.isSupported() && new BeaconRequest({url: sUrl}) : null;
 			sBeaconURL = sUrl;
 			bFesrActive = true;
-			Passport.setActive(true);
 			await Interaction.setActive(true);
+			// activate passport after Interaction is ready to make the XHRInterceptor work properly. The Interceptor needs a pending interaction to work.
+			Passport.setActive(true);
 			XHRInterceptor.register("PASSPORT_HEADER", "open", passportHeaderOverride);
 			if (!oBeaconRequest) {
 				XHRInterceptor.register("FESR", "open" , fesrHeaderOverride);

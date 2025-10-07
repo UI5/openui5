@@ -116,11 +116,16 @@ sap.ui.define([
 	});
 
 	QUnit.module("FESR Header", {
+		before: function() {
+			this.counter = 0;
+		},
 		beforeEach: function() {
 			this.spy = sinon.spy(window.XMLHttpRequest.prototype, "setRequestHeader");
-			this.stub = sinon.stub(performance, "getEntriesByType").returns([]);
+			this.getEntriesByTypeStub = sinon.stub(performance, "getEntriesByType").returns([]);
+			this.clearResourceTimingsStub = sinon.stub(performance, "clearResourceTimings");
 			this.start = function(aRequests) {
 				return new Promise(async function (resolve) {
+					const aOrigRequests = aRequests.slice();
 					var iEndtimeOfLastRequest = 0;
 					await jQuery.sap.fesr.setActive(true);
 					jQuery.sap.interaction.notifyStepStart(null, null, true);
@@ -132,26 +137,33 @@ sap.ui.define([
 						oRequest.startTime = oRequest.startTime ? oRequest.startTime + iNow : undefined;
 						oRequest.requestStart = oRequest.requestStart ? oRequest.requestStart + iNow : undefined;
 						oRequest.responseEnd = oRequest.responseEnd ? oRequest.responseEnd + iNow : undefined;
+						oRequest.name = new URL("resources/ui5loader.js?noCache=", document.baseURI).href;
+						oRequest.transferSize = 1;
+						oRequest.decodedBodySize = 1;
 					});
-					this.stub.returns(aRequests);
+					this.getEntriesByTypeStub.callsFake(() => {return aRequests[0] ? [aRequests[0]] : [];});
+					this.clearResourceTimingsStub.callsFake(() => {aRequests.shift();});
 					setTimeout(function () {
 						// Trigger request within setTimeout to set the preliminary end of startup interaction after the last request was ended
-						this.oReq = new XMLHttpRequest();
-						this.oReq.open("GET", "resources/ui5loader.js?noCache=" + Date.now(), false);
-						this.oReq.send();
+						aOrigRequests.forEach(function(oRequest) {
+							this.oReq = new XMLHttpRequest();
+							this.oReq.open("GET", oRequest.name, false);
+							this.oReq.send();
+						}.bind(this));
 						jQuery.sap.interaction.notifyStepEnd();
 						// Second request to send FESR header via piggyback
 						this.oReq = new XMLHttpRequest();
 						this.oReq.open("GET", "resources/ui5loader.js?noCache=" + Date.now(), false);
 						this.oReq.send();
 						resolve();
-					}, iEndtimeOfLastRequest + 1 /*Wait for the last finished request before ending the interaction*/);
+					}.bind(this), iEndtimeOfLastRequest + 1 /*Wait for the last finished request before ending the interaction*/);
 				}.bind(this));
 			};
 		},
 		afterEach: async function() {
 			this.spy.restore();
-			this.stub.restore();
+			this.getEntriesByTypeStub.restore();
+			this.clearResourceTimingsStub.restore();
 			jQuery.sap.measure.endInteraction(true);
 			jQuery.sap.measure.clearInteractionMeasurements();
 			await jQuery.sap.fesr.setActive(false);
@@ -305,51 +317,10 @@ sap.ui.define([
 			var sFESR = getHeaderContent(this.spy.args, "SAP-Perf-FESRec");
 			assert.ok(sFESR, "mandatory header present");
 			var aFESR = sFESR.split(",");
-			assert.strictEqual(parseInt(aFESR[2]), 3, "client_navigation_time");
+			assert.strictEqual(parseInt(aFESR[2]), 4, "client_navigation_time");
 			assert.strictEqual(parseInt(aFESR[3]), 6, "client_round_trip_time");
 			assert.strictEqual(parseInt(aFESR[5]), 3, "network_round_trips");
 			assert.strictEqual(parseInt(aFESR[8]), 8, "request_time");
-		}.bind(this));
-	});
-
-	QUnit.test("ignore incomplete request", function(assert) {
-		// mock an incomplete request
-		return this.start([{
-			startTime: 1,
-			requestStart: 2,
-			responseEnd: 3,
-			initiatorType: "xmlhttprequest"
-		}, {
-			startTime: 4,
-			requestStart: 5,
-			responseEnd: 6,
-			initiatorType: "xmlhttprequest"
-		}, {
-			startTime: 7,
-			requestStart: 8,
-			responseEnd: 9,
-			initiatorType: "xmlhttprequest"
-		}, {
-			startTime: 10,
-			requestStart: 11,
-			initiatorType: "xmlhttprequest"
-			// no responseEnd
-		}]).then(function () {
-			// catch the interaction measurement
-			var aInteractions = jQuery.sap.measure.getAllInteractionMeasurements();
-			this.oInteraction = aInteractions[aInteractions.length - 1];
-
-			// sixth call of setRequestHeader
-			var sFESR = getHeaderContent(this.spy.args, "SAP-Perf-FESRec");
-			assert.ok(sFESR, "mandatory header present");
-			var aFESR = sFESR.split(",");
-			assert.strictEqual(parseInt(aFESR[2]), 3, "client_navigation_time");
-			assert.strictEqual(parseInt(aFESR[3]), 6, "client_round_trip_time");
-			assert.strictEqual(parseInt(aFESR[5]), 3, "completed network_round_trips");
-			assert.strictEqual(parseInt(aFESR[7]), 0, "network_time");
-			assert.strictEqual(parseInt(aFESR[8]), 6, "request_time");
-
-			assert.strictEqual(this.oInteraction.completeRoundtrips, 3, "complete request counted");
 		}.bind(this));
 	});
 

@@ -585,7 +585,7 @@ sap.ui.define([
 			assert.equal(oMeasurement.measurements.length, 1, "One measurements");
 			assert.ok(oMeasurement.networkTime === 0, "No sap-perf-fesrec response header");
 			assert.ok(oMeasurement.bytesSent === 0, "Nothing posted/putted");
-			assert.ok(oMeasurement.bytesReceived === 0, "No bytes received when fesr is not active"); //parseInt(oReq.getResponseHeader("content-length"), 10)
+			assert.ok(oMeasurement.bytesReceived != 0, "Some bytes received ");
 		} else {
 			assert.ok(!bStablePerformanceAPI, "Performance API not fully/stable available");
 		}

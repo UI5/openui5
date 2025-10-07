@@ -2688,6 +2688,15 @@ sap.ui.define([
 			assert(oInstance instanceof Component, "The specified component \"" + sController + "\" must be an instance of sap.ui.core.Component!");
 			Log.info("Component instance Id = " + oInstance.getId());
 
+			// if maybeA2A collect the component id for the given hash
+			if (Interaction.getPending()?.maybeA2A) {
+				var oApp = oInstance.getManifestEntry("sap.app");
+				if (oApp?.type === "application") {
+					Interaction.getNavInfo().set(Interaction.getPending().hash, oInstance.getId());
+					delete Interaction.getPending().maybeA2A;
+				}
+			}
+
 			/*
 			 * register for messaging: register if either handleValidation is set in metadata
 			 * or if not set in metadata and set on instance
