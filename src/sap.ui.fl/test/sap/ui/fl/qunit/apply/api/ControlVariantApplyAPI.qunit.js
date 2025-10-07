@@ -80,8 +80,8 @@ sap.ui.define([
 	}
 
 	function checkActivateVariantErrorResponse(assert, sExpectedError, sReceivedError) {
-		assert.equal(sReceivedError, sExpectedError, "then Promise.reject() with the appropriate error message returned");
-		assert.equal(this.oModel.updateCurrentVariant.callCount, 0, "then variantModel.updateCurrentVariant not called");
+		assert.strictEqual(sReceivedError, sExpectedError, "then Promise.reject() with the appropriate error message returned");
+		assert.strictEqual(this.oModel.updateCurrentVariant.callCount, 0, "then variantModel.updateCurrentVariant not called");
 	}
 
 	QUnit.module("Given an instance of VariantModel", {
@@ -178,7 +178,7 @@ sap.ui.define([
 				variantReference: "variant1"
 			})
 			.then(function() {
-				assert.equal(this.oModel.waitForVMControlInit.callCount, 1, "the function waits for the control");
+				assert.strictEqual(this.oModel.waitForVMControlInit.callCount, 1, "the function waits for the control");
 				checkUpdateCurrentVariantCalled.call(this, assert, "variantMgmtId1", "variant1");
 			}.bind(this));
 		});
@@ -283,21 +283,23 @@ sap.ui.define([
 		QUnit.test("when calling 'attachVariantApplied'", function(assert) {
 			var oModelAttachStub = sandbox.stub(this.oModel, "attachVariantApplied");
 			var oCallbackStub = sinon.stub();
-			ControlVariantApplyAPI.attachVariantApplied({
+			return ControlVariantApplyAPI.attachVariantApplied({
 				selector: this.oAppComponent,
 				vmControlId: "vmcontrolId",
 				callback: oCallbackStub,
 				callAfterInitialVariant: true
-			});
-			var mExpectedPropertyBag = {
-				vmControlId: "vmcontrolId",
-				control: this.oAppComponent,
-				callback: oCallbackStub,
-				callAfterInitialVariant: true
-			};
-			var mPropertyBag = oModelAttachStub.lastCall.args[0];
-			assert.equal(oModelAttachStub.callCount, 1, "the model was called");
-			assert.deepEqual(mPropertyBag, mExpectedPropertyBag, "the function is called with the correct properties");
+			})
+			.then(function() {
+				var mExpectedPropertyBag = {
+					vmControlId: "vmcontrolId",
+					control: this.oAppComponent,
+					callback: oCallbackStub,
+					callAfterInitialVariant: true
+				};
+				var mPropertyBag = oModelAttachStub.lastCall.args[0];
+				assert.strictEqual(oModelAttachStub.callCount, 1, "the model was called");
+				assert.deepEqual(mPropertyBag, mExpectedPropertyBag, "the function is called with the correct properties");
+			}.bind(this));
 		});
 
 		QUnit.test("when calling 'detachVariantApplied'", function(assert) {
@@ -307,9 +309,47 @@ sap.ui.define([
 				vmControlId: "vmcontrolId"
 			});
 			var aArguments = oModelDetachStub.lastCall.args;
-			assert.equal(oModelDetachStub.callCount, 1, "the model was called");
-			assert.equal(aArguments[0], "vmcontrolId", "the function is called with the correct properties");
-			assert.equal(aArguments[1], this.oAppComponent.getId(), "the function is called with the correct properties");
+			assert.strictEqual(oModelDetachStub.callCount, 1, "the model was called");
+			assert.strictEqual(aArguments[0], "vmcontrolId", "the function is called with the correct properties");
+			assert.strictEqual(aArguments[1], this.oAppComponent.getId(), "the function is called with the correct properties");
+		});
+
+		QUnit.test("when calling 'attachVariantApplied' with AppComponent available but variant model not yet attached", function(assert) {
+			var done = assert.async();
+			var oCallbackStub = sinon.stub();
+			var oModelAttachStub = sandbox.stub(this.oModel, "attachVariantApplied");
+
+			// Remove the variant model to simulate it not being attached yet
+			this.oAppComponent.setModel(null, Utils.VARIANT_MODEL_NAME);
+
+			// Call the API
+			var oPromise = ControlVariantApplyAPI.attachVariantApplied({
+				selector: this.oAppComponent,
+				vmControlId: "vmcontrolId",
+				callback: oCallbackStub,
+				callAfterInitialVariant: true
+			});
+
+			// Assert that the promise is not yet resolved (model not available)
+			assert.ok(oPromise instanceof Promise, "a promise is returned");
+			assert.strictEqual(oModelAttachStub.callCount, 0, "the model attachVariantApplied was not called yet");
+
+			// Simulate the variant model being attached later and trigger the modelContextChange event
+			this.oAppComponent.setModel(this.oModel, Utils.VARIANT_MODEL_NAME);
+
+			// Wait for the promise to resolve
+			oPromise.then(function() {
+				var mExpectedPropertyBag = {
+					vmControlId: "vmcontrolId",
+					control: this.oAppComponent,
+					callback: oCallbackStub,
+					callAfterInitialVariant: true
+				};
+				var mPropertyBag = oModelAttachStub.lastCall.args[0];
+				assert.strictEqual(oModelAttachStub.callCount, 1, "the model attachVariantApplied was called after model became available");
+				assert.deepEqual(mPropertyBag, mExpectedPropertyBag, "the function is called with the correct properties");
+				done();
+			}.bind(this));
 		});
 	});
 
