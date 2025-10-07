@@ -20831,6 +20831,9 @@ sap.ui.define([
 	//
 	// Ensure that auto-$expand/$select does not add $select (JIRA: CPOUI5ODATAV4-270).
 	// Ensure that #changeParameters w/ unchanged $$aggregation is ignored (BCP: 2370045709).
+	//
+	// No "AddVirtualContext" / "RemoveVirtualContext" events with data aggregation.
+	// JIRA: CPOUI5ODATAV4-2756
 	QUnit.test("Data Aggregation: suspend/resume: call setAggregation on a suspended ODLB",
 			function (assert) {
 		var oBinding,
@@ -20868,10 +20871,9 @@ sap.ui.define([
 				+ ": sap.ui.model.odata.v4.ODataListBinding: /BusinessPartnerList"));
 
 			that.expectEvents(assert, oBinding, [
-					[, "change", {detailedReason : "AddVirtualContext", reason : "filter"}],
+					// no "AddVirtualContext" / "RemoveVirtualContext" events with data aggregation
+					[, "refresh", {reason : "filter"}],
 					[, "dataRequested"],
-					[, "change", {detailedReason : "RemoveVirtualContext", reason : "change"}],
-					[, "refresh", {reason : "refresh"}],
 					[, "change", {reason : "change"}],
 					[, "dataReceived", {data : {}}]
 				])
@@ -20894,6 +20896,50 @@ sap.ui.define([
 			assert.strictEqual(oBinding.getHeaderContext().isAggregated(), true,
 				"JIRA: CPOUI5ODATAV4-2760");
 		});
+	});
+
+	//*********************************************************************************************
+	// Scenario: A suspended ODLB with data aggregation is defined in the view. Auto-$expand/$select
+	// is used. The data aggregation information is removed before resuming the binding, change
+	// events with detailed reason "AddVirtualContext" / "RemoveVirtualContext" are fired.
+	// JIRA: CPOUI5ODATAV4-3140
+	QUnit.test("Data Aggregation: suspend/resume: remove aggregation", async function (assert) {
+		const oModel = this.createSalesOrdersModel({autoExpandSelect : true});
+		const sView = `
+<Table id="table" items="{path : '/BusinessPartnerList',
+		parameters : {$$aggregation : {groupLevels : ['BusinessPartnerRole']}},
+		suspended : true}">
+	<Text id="role" text="{BusinessPartnerRole}"/>
+</Table>`;
+
+		this.expectChange("role", []);
+
+		await this.createView(assert, sView, oModel);
+
+		const oBinding = this.oView.byId("table").getBinding("items");
+
+		// code under test
+		oBinding.setAggregation(undefined);
+
+		this.expectCanceledError("Cache discarded as a new cache has been created")
+			.expectEvents(assert, oBinding, [
+				[, "change", {detailedReason : "AddVirtualContext", reason : "filter"}],
+				[, "dataRequested"],
+				[, "change", {detailedReason : "RemoveVirtualContext", reason : "change"}],
+				[, "refresh", {reason : "refresh"}],
+				[, "change", {reason : "change"}],
+				[, "dataReceived", {data : {}}]
+			])
+			.expectRequest("BusinessPartnerList?$select=BusinessPartnerID,BusinessPartnerRole"
+				+ "&$skip=0&$top=100", {
+				value : [{BusinessPartnerRole : "01"}]
+			})
+			.expectChange("role", ["01"]);
+
+		// code under test
+		oBinding.resume();
+
+		await this.waitForChanges(assert);
 	});
 
 	//*********************************************************************************************

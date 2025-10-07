@@ -2146,7 +2146,7 @@ sap.ui.define([
 
 		return oPromise.then((oEntityType) => {
 			const oAggregation = this.mParameters.$$aggregation;
-			if (oEntityType) {
+			if (oEntityType && oAggregation) {
 				oAggregation.$leafLevelAggregated = !oEntityType.$Key?.every((sKey) => {
 					// "group" and "additionally" determine groupby()
 					return sKey in oAggregation.group
@@ -4937,19 +4937,18 @@ sap.ui.define([
 		 * @since 1.55.0
 		 */
 	ODataListBinding.prototype.setAggregation = function (oAggregation) {
-		var mParameters;
-
 		/*
 		 * Returns the use case of data aggregation (recursive hierarchy, pure data aggregation, or
-		 * none at all) as <code>true</code>, <code>false</code>, or <code>undefined</code>.
+		 * none at all) as <code>false</code>, <code>true</code>, or <code>undefined</code>.
 		 *
 		 * @param {object} [oAggregation]
 		 *   An object holding the information needed for data aggregation
 		 * @returns {boolean|undefined}
 		 *   The use case of data aggregation
+		 * @see _Helper.isDataAggregation
 		 */
 		function useCase(oDataAggregationObject) {
-			return oDataAggregationObject && !!oDataAggregationObject.hierarchyQualifier;
+			return oDataAggregationObject && !oDataAggregationObject.hierarchyQualifier;
 		}
 
 		this.checkTransient();
@@ -4962,18 +4961,29 @@ sap.ui.define([
 		if (this.hasPendingChanges()) {
 			throw new Error("Cannot set $$aggregation due to pending changes");
 		}
-		if (useCase(this.mParameters.$$aggregation) !== useCase(oAggregation)
-				&& this.getKeepAlivePredicates().length) {
+		const bOldUseCase = useCase(this.mParameters.$$aggregation);
+		const bNewUseCase = useCase(oAggregation);
+		if (bOldUseCase !== bNewUseCase && this.getKeepAlivePredicates().length) {
 			throw new Error("Cannot set $$aggregation due to a kept-alive context");
 		}
 
-		mParameters = Object.assign({}, this.mParameters);
+		const mParameters = Object.assign({}, this.mParameters);
 		if (oAggregation === undefined) {
 			delete mParameters.$$aggregation;
 		} else {
 			mParameters.$$aggregation = _Helper.clone(oAggregation);
 		}
 		this.applyParameters(mParameters, "");
+		if (!!bOldUseCase !== !!bNewUseCase) {
+			// if data aggregation is turned on or off, set change reason accordingly
+			if (bNewUseCase) {
+				if (this.sChangeReason === "AddVirtualContext") {
+					this.sChangeReason = undefined;
+				}
+			} else if (this.oModel.bAutoExpandSelect) {
+				this.sChangeReason ??= "AddVirtualContext";
+			}
+		}
 	};
 
 	/**

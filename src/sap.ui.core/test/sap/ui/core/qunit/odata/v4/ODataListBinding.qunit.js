@@ -538,6 +538,48 @@ sap.ui.define([
 });
 
 	//*********************************************************************************************
+[undefined, "AddVirtualContext", "foo"].forEach((sOldChangeReason) => {
+	// 0 no aggregation, 1 recursive hierarchy, 2 data aggregation
+	[undefined, {hierarchyQualifier : "X"}, {}].forEach((oOldAggregation, i) => {
+		[undefined, {hierarchyQualifier : "X"}, {}].forEach((oAggregation, j) => {
+			[true, false].forEach((bAutoExpandSelect) => {
+				const sTitle = "setAggregation: set change reason if data aggregation is turned on"
+					+ " or off; old change reason: " + sOldChangeReason
+					+ ", old aggregation: " + JSON.stringify(oOldAggregation)
+					+ ", set aggregation to: " + JSON.stringify(oAggregation)
+					+ ", use auto-$expand/$select: " + bAutoExpandSelect;
+
+	QUnit.test(sTitle, function (assert) {
+		const oBinding = {
+			sChangeReason : sOldChangeReason,
+			oModel : {bAutoExpandSelect : bAutoExpandSelect},
+			mParameters : {$$aggregation : oOldAggregation},
+			// it is not relevant here whether these methods are called, and how
+			applyParameters : () => {},
+			checkTransient : () => {},
+			getKeepAlivePredicates : () => [],
+			hasFilterNone : () => false,
+			hasPendingChanges : () => false,
+			isUnchangedParameter : () => false
+		};
+
+		// code under test
+		ODataListBinding.prototype.setAggregation.call(oBinding, oAggregation);
+
+		let sExpectedChangeReason = sOldChangeReason;
+		if (i !== 2 && j === 2 && sOldChangeReason === "AddVirtualContext") {
+			sExpectedChangeReason = undefined;
+		} else if (i === 2 && j !== 2 && !sOldChangeReason && bAutoExpandSelect) {
+			sExpectedChangeReason = "AddVirtualContext";
+		}
+		assert.strictEqual(oBinding.sChangeReason, sExpectedChangeReason);
+	});
+			});
+		});
+	});
+});
+
+	//*********************************************************************************************
 	QUnit.test("setAggregation: null", function () {
 		var oBinding = this.bindList("/EMPLOYEES");
 
@@ -7158,13 +7200,15 @@ sap.ui.define([
 			undefined // no metadata for entity type
 		].forEach((oEntityType, j) => {
 			[false, true].forEach((bAdditionally) => {
-				const sTitle = "fetchFilter: list binding aggregates data " + i
-					+ ", data aggregation = " + bDataAggregation
-					+ ", entity type = " + JSON.stringify(oEntityType)
-					+ ", key in additionally = " + bAdditionally;
-				if (oEntityType && !bDataAggregation) {
-					return;
-				}
+				[false, true].forEach((bAggregationRemoved) => {
+					const sTitle = "fetchFilter: list binding aggregates data " + i
+						+ ", data aggregation = " + bDataAggregation
+						+ ", entity type = " + JSON.stringify(oEntityType)
+						+ ", key in additionally = " + bAdditionally
+						+ ", aggregation removed = " + bAggregationRemoved;
+					if ((oEntityType || bAggregationRemoved) && !bDataAggregation) {
+						return;
+					}
 
 	QUnit.test(sTitle, function (assert) {
 		var oAggregation = bAdditionally ? {
@@ -7204,9 +7248,15 @@ sap.ui.define([
 			.returns("/some/meta/path");
 		this.oMetaModelMock.expects("fetchObject").exactly(bDataAggregation ? 1 : 0)
 			.withExactArgs("/some/meta/path/")
-			.returns(SyncPromise.resolve(Promise.resolve(oEntityType)));
+			.callsFake(() => {
+				if (bAggregationRemoved) { // simulate setAggregation(undefined) call in between
+					delete oBinding.mParameters.$$aggregation;
+				}
+				return SyncPromise.resolve(Promise.resolve(oEntityType));
+			});
 		this.mock(_AggregationHelper).expects("splitFilter")
-			.withExactArgs(sinon.match.same(oFilter), sinon.match.same(oAggregation))
+			.withExactArgs(sinon.match.same(oFilter),
+				bAggregationRemoved ? undefined : sinon.match.same(oAggregation))
 			.returns(aSplitFilters);
 		this.mock(this.oModel).expects("resolve").withExactArgs("Set", sinon.match.same(oContext))
 			.returns("~");
@@ -7222,13 +7272,14 @@ sap.ui.define([
 		// code under test
 		return oBinding.fetchFilter(oContext, oFixture.staticFilter).then(function (aFilterValues) {
 			assert.deepEqual(aFilterValues, oFixture.result);
-			if (oEntityType) {
+			if (oEntityType && !bAggregationRemoved) {
 				assert.strictEqual(oAggregation.$leafLevelAggregated, j > 0);
 			} else {
 				assert.notOk("$leafLevelAggregated" in oAggregation);
 			}
 		});
 	});
+				});
 			});
 		});
 	});
