@@ -27,11 +27,11 @@ sap.ui.define([
 		Then.onTheApp.iShouldSeeTheMoreButton(sTableId);
 	});
 
-	opaTest("Adding a column works", function (Given, When, Then) {
+	opaTest("Personalizing columns works", function(Given, When, Then) {
+		// Show Coordinates, hide First Ascent
 		When.onTheMDCTable.iPersonalizeColumns(sTableId, [
 			"Name",
 			"Range",
-			"First Ascent",
 			"Countries",
 			"Parent Mountain",
 			"Coordinates"
@@ -40,26 +40,8 @@ sap.ui.define([
 			"Coordinates",
 			"Parent Mountain",
 			"Countries",
-			"First Ascent",
 			"Range",
 			"Name"
-		]);
-	});
-
-	opaTest("Removing a column works", function (Given, When, Then) {
-		When.onTheMDCTable.iPersonalizeColumns(sTableId, [
-			"Name",
-			"Range",
-			"Countries",
-			"Parent Mountain",
-			"Coordinates"
-		]);
-		Then.onTheMDCTable.iCheckColumnsInOrder(sTableId, [
-			"Name",
-			"Parent Mountain",
-			"Range",
-			"Coordinates",
-			"Countries"
 		]);
 	});
 

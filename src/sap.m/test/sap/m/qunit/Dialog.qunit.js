@@ -3290,6 +3290,57 @@ sap.ui.define([
 		}
 	});
 
+	QUnit.test("Pressing Enter should close the child dialog", function (assert) {
+		var oSecondDialog = new Dialog({
+			title: "Second Dialog",
+			content: new Button({
+				text: "Close Second Dialog",
+				press: function () {
+					oSecondDialog.close();
+				}
+			}),
+			endButton: new Button({
+				text: "Close",
+				press: function () {
+					oSecondDialog.close();
+				}
+			})
+		});
+
+		var oFirstDialog = new Dialog({
+			title: "First Dialog",
+			content: new Button({
+				text: "Open Second Dialog",
+				press: function () {
+					oSecondDialog.open();
+				}
+			}),
+			endButton: new Button({
+				text: "Close First Dialog",
+				press: function () {
+					oFirstDialog.close();
+				}
+			})
+		});
+
+		oFirstDialog.open();
+		this.clock.tick(500);
+
+		var oFocusedControl = Element.closestTo(document.activeElement);
+		qutils.triggerKeydown(oFocusedControl.getDomRef(), KeyCodes.ENTER);
+
+		qutils.triggerKeydown(oSecondDialog.getDomRef(), KeyCodes.ESCAPE);
+		this.clock.tick(500);
+		assert.strictEqual(oSecondDialog.isOpen(), false, "After pressing Escape, the second dialog is closed");
+
+		qutils.triggerKeydown(oFirstDialog.getDomRef(), KeyCodes.ESCAPE);
+		this.clock.tick(500);
+		assert.strictEqual(oFirstDialog.isOpen(), false, "After pressing Escape, the first dialog is closed");
+
+		oFirstDialog.destroy();
+		oSecondDialog.destroy();
+	});
+
 	QUnit.test("Pressing ESC should close the dialog", function (assert) {
 		// Arrange
 		this.oDialog.open();

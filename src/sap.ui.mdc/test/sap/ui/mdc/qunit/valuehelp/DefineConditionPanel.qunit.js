@@ -13,6 +13,7 @@ sap.ui.define([
 	"sap/ui/mdc/condition/Operator",
 	// bring back to default one
 	"sap/ui/mdc/field/FieldBaseDelegate",
+	"sap/ui/mdc/ValueHelpDelegate",
 	// don't want to test async loading in Field here
 	"sap/ui/mdc/field/FieldInput",
 	"sap/ui/mdc/enums/BaseType",
@@ -65,6 +66,7 @@ sap.ui.define([
 	FilterOperatorUtil,
 	Operator,
 	FieldBaseDelegate,
+	ValueHelpDelegate,
 	FieldInput,
 	BaseType,
 	ConditionValidated,
@@ -221,6 +223,56 @@ sap.ui.define([
 
 	});
 
+	QUnit.test("InvisibleText for aria-label works correctly", async (assert) => {
+
+		// arrange
+		const aConditions = _getModelConditions();
+		const oGrid = Element.getElementById("DCP1--conditions");
+		const aContent = oGrid.getContent();
+		const oInvisibleText1 = aContent[4];
+		const sEmptyText = oMessageBundle.getText("valuehelp.DEFINECONDITIONS_REMOVECONDITION_ARIALABEL_UNDEFINED");
+		const sRemoveText = oMessageBundle.getText("valuehelp.DEFINECONDITIONS_REMOVECONDITION_ARIALABEL", ["=Andreas"]);
+
+		// assert
+		assert.equal(aConditions.length, 1, "one empty condition should exist");
+		assert.equal(aConditions[0].operator, OperatorName.EQ, "Operator of empty condition");
+		assert.equal(aConditions[0].values[0], null, "Value of empty condition");
+		assert.ok(aConditions[0].isEmpty, "isEmpty of empty condition");
+
+		assert.equal(aContent.length, 6, "One row with one field created - Grid contains 6 controls");
+		assert.ok(oInvisibleText1?.isA("sap.ui.core.InvisibleText"), "InvisibleText is core.InvisibleText");
+		assert.equal(oInvisibleText1.getText(), sEmptyText, "InvisibleText has correct text");
+
+		// act
+		_addModelCondition(Condition.createCondition(OperatorName.EQ, ["Andreas"], undefined, undefined, ConditionValidated.NotValidated));
+		await nextUIUpdate();
+
+		// arrange
+		const aConditions2 = _getModelConditions();
+		const fnDone = assert.async();
+
+		setTimeout(async () => {
+			await nextUIUpdate();
+			const aContent = oGrid.getContent();
+			const oInvisibleText2 = aContent[9];
+
+			// assert
+			assert.equal(aConditions2.length, 2, "2 conditions should exist");
+			assert.equal(aConditions2[0].operator, OperatorName.EQ, "Operator of first condition");
+			assert.equal(aConditions2[0].values[0], null, "Value of first condition");
+			assert.ok(aConditions2[0].isEmpty, "isEmpty of first condition");
+			assert.equal(aConditions2[1].operator, OperatorName.EQ, "Operator of second condition");
+			assert.equal(aConditions2[1].values[0], "Andreas", "Value of second condition");
+			assert.notOk(aConditions2[1].isEmpty, "isEmpty of second condition");
+
+			assert.equal(aContent.length, 11, "One row with one field created - Grid contains 11 controls");
+
+			assert.ok(oInvisibleText2?.isA("sap.ui.core.InvisibleText"), "InvisibleText is core.InvisibleText");
+			assert.equal(oInvisibleText2.getText(), sRemoveText, "InvisibleText has correct text");
+			fnDone();
+		});
+	});
+
 	QUnit.test("dummy condition with different operator", async (assert) => {
 
 		oConfig = {
@@ -277,7 +329,7 @@ sap.ui.define([
 			assert.equal(_getModelConditions().length, 3, "3 conditions should exist");
 			const oGrid = Element.getElementById("DCP1--conditions");
 			let aContent = oGrid.getContent();
-			assert.equal(aContent.length, 9, "two rows with one field created - Grid contains 9 controls");
+			assert.equal(aContent.length, 11, "two rows with one field created - Grid contains 11 controls");
 
 			assert.equal(oDefineConditionPanel.getInitialFocusedControl(), aContent[0], "First Operator-Field is initial focus control");
 			assert.equal(oDefineConditionPanel.getFocusControlAfterTokenRemoval(), aContent[2], "First Field is initial focus control for TokenDelete");
@@ -290,7 +342,7 @@ sap.ui.define([
 				await nextUIUpdate();
 				assert.equal(_getModelConditions().length, 4, "4 conditions should exist");
 				aContent = oGrid.getContent();
-				assert.equal(aContent.length, 13, "three rows with one field created - Grid contains 13 controls");
+				assert.equal(aContent.length, 16, "three rows with one field created - Grid contains 16 controls");
 				assert.notOk(oGridData.getVisibleL(), "Add-Button is not visible");
 
 				const oRemoveBtn = Element.getElementById("DCP1--2--removeBtnLarge");
@@ -301,7 +353,7 @@ sap.ui.define([
 					assert.ok(oGridData.getVisibleL(), "Add-Button is visible");
 					assert.ok(oAddBtn.getVisible(), "Button is visible");
 					aContent = oGrid.getContent();
-					assert.equal(aContent.length, 9, "two rows with one field created - Grid contains 9 controls");
+					assert.equal(aContent.length, 11, "two rows with one field created - Grid contains 11 controls");
 
 					fnDone();
 				}, 0);
@@ -352,7 +404,7 @@ sap.ui.define([
 			setTimeout(() => { // for internal Controls update via ManagedObjectModel
 				const oGrid = Element.getElementById("DCP1--conditions");
 				const aContent = oGrid.getContent();
-				assert.equal(aContent.length, 9, "two rows with one field created - Grid contains 9 controls");
+				assert.equal(aContent.length, 11, "two rows with one field created - Grid contains 11 controls");
 
 				delete FilterOperatorUtil._mOperators["MyInclude"]; // TODO API to remove operator
 				delete FilterOperatorUtil._mOperators["MyExclude"]; // TODO API to remove operator
@@ -378,7 +430,7 @@ sap.ui.define([
 			let aContent = oGrid.getContent();
 			const oField = aContent[2];
 
-			assert.equal(aContent.length, 5, "One row with one field created - Grid contains 5 controls");
+			assert.equal(aContent.length, 6, "One row with one field created - Grid contains 6 controls");
 			assert.ok(oField?.isA("sap.ui.mdc.Field"), "Field is mdc Field");
 			aContent = oField?.getAggregation("_content");
 			const oControl = aContent?.length > 0 && aContent[0];
@@ -424,7 +476,7 @@ sap.ui.define([
 							const oField1 = aContent[2];
 							const oField2 = aContent[3];
 
-							assert.equal(aContent.length, 6, "One row with two fields created - Grid contains 6 controls");
+							assert.equal(aContent.length, 7, "One row with two fields created - Grid contains 7 controls");
 							assert.ok(oField1?.isA("sap.ui.mdc.Field"), "Field1 is mdc Field");
 							assert.ok(oField2?.isA("sap.ui.mdc.Field"), "Field2 is mdc Field");
 							assert.equal(oField1?.getPlaceholder(), oMessageBundle.getText("valuehelp.DEFINECONDITIONS_FROM"), "Placeholder of Field1");
@@ -466,7 +518,7 @@ sap.ui.define([
 							const aContent = oGrid.getContent();
 							const oField1 = aContent[2];
 
-							assert.equal(aContent.length, 5, "One row with one fields created - Grid contains 5 controls");
+							assert.equal(aContent.length, 6, "One row with one fields created - Grid contains 6controls");
 							assert.ok(oField1?.isA("sap.ui.mdc.Field"), "Field1 is mdc Field");
 							assert.equal(oField1?.getPlaceholder(), oMessageBundle.getText("valuehelp.DEFINECONDITIONS_VALUE"), "Placeholder of Field1");
 							assert.equal(oField1?.getValue(), "A", "Field1 value not changed");
@@ -505,7 +557,7 @@ sap.ui.define([
 							const oGrid = Element.getElementById("DCP1--conditions");
 							const aContent = oGrid.getContent();
 
-							assert.equal(aContent.length, 4, "One row with no fields created - Grid contains 4 controls");
+							assert.equal(aContent.length, 5, "One row with no fields created - Grid contains 5 controls");
 
 							fnDone();
 						}, 0);
@@ -544,7 +596,7 @@ sap.ui.define([
 							let oField1 = aContent[2];
 							let oField2 = aContent[3];
 
-							assert.equal(aContent.length, 6, "One row with two fields created - Grid contains 6 controls");
+							assert.equal(aContent.length, 7, "One row with two fields created - Grid contains 7 controls");
 							assert.ok(oField1?.isA("sap.ui.mdc.Field"), "Field1 is mdc Field");
 							assert.ok(oField2?.isA("sap.ui.mdc.Field"), "Field2 is mdc Field");
 							assert.equal(oField1?.getEditMode(), FieldEditMode.ReadOnly, "Field1 is readonly");
@@ -567,7 +619,7 @@ sap.ui.define([
 											oField1 = aContent[2];
 											oField2 = aContent[3];
 
-											assert.equal(aContent.length, 6, "One row with two fields created - Grid contains 6 controls");
+											assert.equal(aContent.length, 7, "One row with two fields created - Grid contains 7 controls");
 											assert.ok(oField1?.isA("sap.ui.mdc.Field"), "Field1 is mdc Field");
 											assert.ok(oField2?.isA("sap.ui.mdc.Field"), "Field2 is mdc Field");
 											assert.equal(oField1?.getEditMode(), FieldEditMode.Editable, "Field1 is editable");
@@ -692,9 +744,9 @@ sap.ui.define([
 			const oField1 = aContent[2];
 			const oField2 = aContent[3];
 			const oButton = aContent[4];
-			const oField3 = aContent[7];
-			const oField4 = aContent[8];
-			const oButton2 = aContent[9];
+			const oField3 = aContent[8];
+			const oField4 = aContent[9];
+			const oButton2 = aContent[10];
 
 			oField1.focus();
 			setTimeout(async () => { // for FieldGroup delay
@@ -907,7 +959,7 @@ sap.ui.define([
 			const aContent = oGrid.getContent();
 			const oField = aContent[2];
 
-			assert.equal(aContent.length, 5, "One row with one field created - Grid contains 5 controls");
+			assert.equal(aContent.length, 6, "One row with one field created - Grid contains 6 controls");
 			assert.ok(oField?.isA("sap.m.Button"), "Field is sap.m.Button");
 			assert.equal(oField?.getText(), "Test", "Value of FIeld");
 
@@ -957,7 +1009,7 @@ sap.ui.define([
 			assert.equal(aConditions[0].operator, "MyOperator", "Operator of empty condition");
 			assert.equal(aConditions[0].values[0], null, "Value of empty condition");
 			assert.ok(aConditions[0].isEmpty, "isEmpty of empty condition");
-			assert.equal(aContent.length, 5, "One row with one field created - Grid contains 5 controls");
+			assert.equal(aContent.length, 6, "One row with one field created - Grid contains 6 controls");
 			assert.ok(oField?.isA("sap.m.Button"), "Field is sap.m.Button");
 			assert.deepEqual(oField?.getText?.(), "", "Field empty");
 
@@ -974,7 +1026,7 @@ sap.ui.define([
 				aContent = oGrid.getContent();
 				oField = aContent[2];
 
-				assert.equal(aContent.length, 6, "One row with one fields created - Grid contains 6 controls");
+				assert.equal(aContent.length, 7, "One row with one fields created - Grid contains 7 controls");
 				assert.ok(oField?.isA("sap.ui.mdc.Field"), "Field is mdc Field");
 				assert.deepEqual(oField?.getValue?.(), null, "Field value");
 				oField = aContent[3];
@@ -994,7 +1046,7 @@ sap.ui.define([
 					aContent = oGrid.getContent();
 					oField = aContent[2];
 
-					assert.equal(aContent.length, 5, "One row with one fields created - Grid contains 5 controls");
+					assert.equal(aContent.length, 6, "One row with one fields created - Grid contains 6 controls");
 					assert.ok(oField?.isA("sap.m.Button"), "Field is sap.m.Button");
 					assert.deepEqual(oField?.getText?.(), "", "Field empty");
 
@@ -1044,7 +1096,7 @@ sap.ui.define([
 			let aContent = oGrid.getContent();
 			const oField = aContent[2];
 
-			assert.equal(aContent.length, 5, "One row with one field created - Grid contains 5 controls");
+			assert.equal(aContent.length, 6, "One row with one field created - Grid contains 6 controls");
 			aContent = oField.getAggregation("_content");
 			const oControl = aContent?.length > 0 && aContent[0];
 
@@ -1069,7 +1121,7 @@ sap.ui.define([
 			let aContent = oGrid.getContent();
 			const oField = aContent[2];
 
-			assert.equal(aContent.length, 5, "One row with one field created - Grid contains 5 controls");
+			assert.equal(aContent.length, 6, "One row with one field created - Grid contains 6 controls");
 			aContent = oField.getAggregation("_content");
 			const oControl = aContent?.length > 0 && aContent[0];
 
@@ -1096,7 +1148,7 @@ sap.ui.define([
 			let aContent = oGrid.getContent();
 			const oField = aContent[2];
 
-			assert.equal(aContent.length, 5, "One row with one field created - Grid contains 5 controls");
+			assert.equal(aContent.length, 6, "One row with one field created - Grid contains 6 controls");
 			aContent = oField.getAggregation("_content");
 			const oControl = aContent?.length > 0 && aContent[0];
 
@@ -1120,7 +1172,7 @@ sap.ui.define([
 			const oGrid = Element.getElementById("DCP1--conditions");
 			const aContent = oGrid.getContent();
 			const oOperatorField = aContent[0];
-			assert.equal(aContent.length, 4, "One row with no field created - Grid contains 4 controls");
+			assert.equal(aContent.length, 5, "One row with no field created - Grid contains 5 controls");
 			assert.equal(oOperatorField.getValue(), OperatorName.Empty, "Operator - value");
 
 			// just check operatorModel to not wait for ValueHelp update and Field-content update (changing data-type on runtime is not a real use-case)
@@ -1152,7 +1204,7 @@ sap.ui.define([
 			const oField1 = aContent[2];
 			const oField2 = aContent[3];
 
-			assert.equal(aContent.length, 6, "One row with two fields created - Grid contains 6 controls");
+			assert.equal(aContent.length, 7, "One row with two fields created - Grid contains 7 controls");
 			aContent = oField1.getAggregation("_content");
 			let oControl = aContent?.length > 0 && aContent[0];
 
@@ -1195,7 +1247,7 @@ sap.ui.define([
 				await nextUIUpdate();
 				aContent = oGrid.getContent();
 				let oField = aContent[2];
-				assert.equal(aContent.length, 5, "One row with one field created - Grid contains 5 controls");
+				assert.equal(aContent.length, 6, "One row with one field created - Grid contains 6 controls");
 				aContent = oField?.getAggregation("_content");
 				let oControl = aContent?.length > 0 && aContent[0];
 
@@ -1213,7 +1265,7 @@ sap.ui.define([
 						await nextUIUpdate();
 						aContent = oGrid.getContent();
 						oField = aContent[2];
-						assert.equal(aContent.length, 5, "One row with one field created - Grid contains 5 controls");
+						assert.equal(aContent.length, 6, "One row with one field created - Grid contains 6 controls");
 						aContent = oField?.getAggregation("_content");
 						oControl = aContent?.length > 0 && aContent[0];
 
@@ -1233,7 +1285,7 @@ sap.ui.define([
 									await nextUIUpdate();
 									aContent = oGrid.getContent();
 									oField = aContent[2];
-									assert.equal(aContent.length, 5, "One row with one field created - Grid contains 5 controls");
+									assert.equal(aContent.length, 6, "One row with one field created - Grid contains 6 controls");
 									aContent = oField?.getAggregation("_content");
 									oControl = aContent?.length > 0 && aContent[0];
 
@@ -1250,7 +1302,7 @@ sap.ui.define([
 											await nextUIUpdate();
 											aContent = oGrid.getContent();
 											oField = aContent[2];
-											assert.equal(aContent.length, 6, "One row with two field created - Grid contains 6 controls");
+											assert.equal(aContent.length, 7, "One row with two field created - Grid contains 7 controls");
 											aContent = oField?.getAggregation("_content");
 											oControl = aContent?.length > 0 && aContent[0];
 											assert.ok(oControl.isA("sap.ui.mdc.field.FieldInput"), "Field uses Input");
@@ -1280,7 +1332,7 @@ sap.ui.define([
 														await nextUIUpdate();
 														aContent = oGrid.getContent();
 														oField = aContent[2];
-														assert.equal(aContent.length, 6, "One row with two field created - Grid contains 6 controls");
+														assert.equal(aContent.length, 7, "One row with two field created - Grid contains 7 controls");
 														aContent = oField?.getAggregation("_content");
 														oControl = aContent?.length > 0 && aContent[0];
 														assert.ok(oControl.isA("sap.m.DatePicker"), "Field uses DatePicker");
@@ -1333,7 +1385,7 @@ sap.ui.define([
 				let aContent = oGrid.getContent();
 				const oField = aContent[2];
 
-				assert.equal(aContent.length, 5, "One row with one field created - Grid contains 5 controls");
+				assert.equal(aContent.length, 6, "One row with one field created - Grid contains 6 controls");
 				aContent = oField.getAggregation("_content");
 				const oControl = aContent?.length > 0 && aContent[0];
 
@@ -1360,7 +1412,7 @@ sap.ui.define([
 				const oGrid = Element.getElementById("DCP1--conditions");
 				let aContent = oGrid.getContent();
 				const oField = aContent[2];
-				assert.equal(aContent.length, 5, "One row with one field created - Grid contains 5 controls");
+				assert.equal(aContent.length, 6, "One row with one field created - Grid contains 6 controls");
 				aContent = oField.getAggregation("_content");
 				const oControl = aContent?.length > 0 && aContent[0];
 
@@ -1385,7 +1437,7 @@ sap.ui.define([
 			const oGrid = Element.getElementById("DCP1--conditions");
 			let aContent = oGrid.getContent();
 			const oField = aContent[2];
-			assert.equal(aContent.length, 5, "One row with one field created - Grid contains 5 controls");
+			assert.equal(aContent.length, 6, "One row with one field created - Grid contains 6 controls");
 			aContent = oField.getAggregation("_content");
 			const oControl = aContent?.length > 0 && aContent[0];
 
@@ -1409,7 +1461,7 @@ sap.ui.define([
 
 			let aContent = oGrid.getContent();
 			const oField = aContent[2];
-			assert.equal(aContent.length, 5, "One row with one field created - Grid contains 5 controls");
+			assert.equal(aContent.length, 6, "One row with one field created - Grid contains 6 controls");
 			aContent = oField.getAggregation("_content");
 			const oControl = aContent?.length > 0 && aContent[0];
 
@@ -1442,7 +1494,7 @@ sap.ui.define([
 			const oGrid = Element.getElementById("DCP1--conditions");
 			let aContent = oGrid.getContent();
 			const oField = aContent[2];
-			assert.equal(aContent.length, 5, "One row with one field created - Grid contains 5 controls");
+			assert.equal(aContent.length, 6, "One row with one field created - Grid contains 6 controls");
 			aContent = oField.getAggregation("_content");
 			const oControl = aContent?.length > 0 && aContent[0];
 
@@ -1477,7 +1529,7 @@ sap.ui.define([
 			const oGrid = Element.getElementById("DCP1--conditions");
 			let aContent = oGrid.getContent();
 			const oField = aContent[2];
-			assert.equal(aContent.length, 5, "One row with one field created - Grid contains 5 controls");
+			assert.equal(aContent.length, 6, "One row with one field created - Grid contains 6 controls");
 			aContent = oField.getAggregation("_content");
 			const oControl = aContent?.length > 0 && aContent[0];
 
@@ -1516,7 +1568,7 @@ sap.ui.define([
 							const aContent = oGrid.getContent();
 							const oField = aContent[2];
 
-							assert.equal(aContent.length, 5, "One row with two fields created - Grid contains 6 controls");
+							assert.equal(aContent.length, 6, "One row with two fields created - Grid contains 6 controls");
 							assert.ok(oField?.isA("sap.ui.mdc.Field"), "Field is mdc Field");
 							assert.equal(oField?.getPlaceholder(), oMessageBundle.getText("valuehelp.DEFINECONDITIONS_VALUE"), "Placeholder of Field");
 							assert.equal(oField?.getValue(), "1.10", "Field value not changed");
@@ -1589,7 +1641,7 @@ sap.ui.define([
 		const fnDone = assert.async();
 		setTimeout(() => { // to wait for retemplating
 			setTimeout(async () => { // to for internal Conditions update in DefineConditionPanel (is async)
-				fnTest(assert, false, undefined, undefined, undefined, 41, "1", 10, 10);
+				fnTest(assert, false, undefined, undefined, undefined, 51, "1", 10, 10);
 				assert.notOk(oButtonPrev?.getVisible(), "Previous-Button hidden");
 				assert.notOk(oPageCount?.getVisible(), "Page-count hidden");
 				assert.notOk(oButtonNext?.getVisible(), "Next-Button hidden");
@@ -1600,23 +1652,23 @@ sap.ui.define([
 				await nextUIUpdate();
 				setTimeout(() => { // to wait for retemplating
 					setTimeout(async () => { // to for internal Conditions update in DefineConditionPanel (is async)
-						fnTest(assert, true, false, true, "1/3", 41, "1", 10, 21);
+						fnTest(assert, true, false, true, "1/3", 51, "1", 10, 21);
 
 						oButtonNext.firePress();
 						await nextUIUpdate();
-						fnTest(assert, true, true, true, "2/3", 41, "10", 10, 21);
+						fnTest(assert, true, true, true, "2/3", 51, "10", 10, 21);
 
 						oDefineConditionPanel.cleanUp(); // should move to first page
 						await nextUIUpdate();
-						fnTest(assert, true, false, true, "1/3", 41, "1", 10, 21);
+						fnTest(assert, true, false, true, "1/3", 51, "1", 10, 21);
 
 						oButtonNext.firePress();
 						await nextUIUpdate();
-						fnTest(assert, true, true, true, "2/3", 41, "10", 10, 21);
+						fnTest(assert, true, true, true, "2/3", 51, "10", 10, 21);
 
 						oButtonNext.firePress();
 						await nextUIUpdate();
-						fnTest(assert, true, true, false, "3/3", 5, "20", 1, 21);
+						fnTest(assert, true, true, false, "3/3", 6, "20", 1, 21);
 
 						const aContent = oGrid.getContent();
 						aContent[3].firePress(); // remove the only one condition on page
@@ -1624,18 +1676,18 @@ sap.ui.define([
 
 						setTimeout(() => { // to wait for retemplating
 							setTimeout(async () => { // to for internal Conditions update in DefineConditionPanel (is async)
-								fnTest(assert, true, true, false, "2/2", 41, "10", 10, 20);
+								fnTest(assert, true, true, false, "2/2", 51, "10", 10, 20);
 
 								oButtonInsert.firePress();
 								await nextUIUpdate();
 
 								setTimeout(() => { // to wait for retemplating
 									setTimeout(async () => { // to for internal Conditions update in DefineConditionPanel (is async)
-										fnTest(assert, true, true, false, "2/2", 45, null, 11, 21);
+										fnTest(assert, true, true, false, "2/2", 56, null, 11, 21);
 
 										oButtonPrev.firePress();
 										await nextUIUpdate();
-										fnTest(assert, true, false, true, "1/3", 41, "1", 10, 21);
+										fnTest(assert, true, false, true, "1/3", 51, "1", 10, 21);
 
 										const aContent = oGrid.getContent();
 										aContent[40].firePress(); // add one condition
@@ -1643,14 +1695,14 @@ sap.ui.define([
 
 										setTimeout(() => { // to wait for retemplating
 											setTimeout(async () => { // to for internal Conditions update in DefineConditionPanel (is async)
-												fnTest(assert, true, false, true, "1/3", 45, "1", 11, 22);
+												fnTest(assert, true, false, true, "1/3", 51, "1", 11, 21);
 
 												oButtonRemoveAll.firePress();
 												await nextUIUpdate();
 
 												setTimeout(() => { // to wait for retemplating
 													setTimeout(() => { // to for internal Conditions update in DefineConditionPanel (is async)
-														fnTest(assert, false, undefined, undefined, undefined, 5, null, 1, 1);
+														fnTest(assert, false, undefined, undefined, undefined, 6, null, 1, 1);
 
 														fnDone();
 													}, 0);
@@ -1680,7 +1732,7 @@ sap.ui.define([
 			const oGrid = Element.getElementById("DCP1--conditions");
 			let aContent = oGrid.getContent();
 			const oField = aContent[2];
-			assert.equal(aContent.length, 5, "Dummy line created");
+			assert.equal(aContent.length, 6, "Dummy line created");
 
 			aContent = oField.getAggregation("_content");
 			const oControl = aContent?.length > 0 && aContent[0];
@@ -1725,7 +1777,7 @@ sap.ui.define([
 			const oGrid = Element.getElementById("DCP1--conditions");
 			let aContent = oGrid.getContent();
 			const oField = aContent[2];
-			assert.equal(aContent.length, 6, "BT line created");
+			assert.equal(aContent.length, 7, "BT line created");
 
 			aContent = oField.getAggregation("_content");
 			const oControl = aContent?.length > 0 && aContent[0];
@@ -1778,7 +1830,7 @@ sap.ui.define([
 			const oGrid = Element.getElementById("DCP1--conditions");
 			let aContent = oGrid.getContent();
 			const oField = aContent[2];
-			assert.equal(aContent.length, 5, "Dummy line created");
+			assert.equal(aContent.length, 6, "Dummy line created");
 
 			aContent = oField.getAggregation("_content");
 			const oControl = aContent?.length > 0 && aContent[0];

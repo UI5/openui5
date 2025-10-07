@@ -912,7 +912,7 @@ function(
 			oPromiseArgument = {},
 			that = this;
 
-		if (this._isSpaceOrEnterPressed) {
+		if (this._isSpacePressed) {
 			return;
 		}
 
@@ -950,27 +950,27 @@ function(
 
 	/**
 	 * Event handler for the onkeyup event.
-	 * Register if SPACE or ENTER is released.
+	 * Register if SPACE is released.
 	 *
 	 * @param {jQuery.Event} oEvent The event object
 	 * @private
 	 */
 	Dialog.prototype.onkeyup = function (oEvent) {
-		if (this._isSpaceOrEnter(oEvent)) {
-			this._isSpaceOrEnterPressed = false;
+		if (this._isSpace(oEvent)) {
+			this._isSpacePressed = false;
 		}
 	};
 
 	/**
 	 * Event handler for the onkeydown event.
-	 * Register if SPACE or ENTER is pressed.
+	 * Register if SPACE is pressed.
 	 *
 	 * @param {jQuery.Event} oEvent The event object
 	 * @private
 	 */
 	Dialog.prototype.onkeydown = function (oEvent) {
-		if (this._isSpaceOrEnter(oEvent)) {
-			this._isSpaceOrEnterPressed = true;
+		if (this._isSpace(oEvent)) {
+			this._isSpacePressed = true;
 		}
 
 		var iKeyCode = oEvent.which || oEvent.keyCode;
@@ -1112,16 +1112,16 @@ function(
 	};
 
 	/**
-	 * Determines if the key from oEvent is SPACE or ENTER.
+	 * Determines if the key from oEvent is SPACE.
 	 *
 	 * @param {jQuery.Event} oEvent The event object
 	 * @private
-	 * @return {boolean} True if the key from the event is space or enter
+	 * @return {boolean} True if the key from the event is space
 	 */
-	Dialog.prototype._isSpaceOrEnter = function (oEvent) {
-		var iKeyCode = oEvent.which || oEvent.keyCode;
+	Dialog.prototype._isSpace = function (oEvent) {
+		var iKeyCode = oEvent.which || oEvent.key;
 
-		return iKeyCode == KeyCodes.SPACE || iKeyCode == KeyCodes.ENTER;
+		return iKeyCode == KeyCodes.SPACE;
 	};
 
 	/* =========================================================== */
