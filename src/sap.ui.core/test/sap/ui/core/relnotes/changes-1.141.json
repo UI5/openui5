@@ -43,5 +43,15 @@
         "text": " F6Navigation: Correctly identify active element in nested web components"
       }
     ]
+  },
+  "1.141.1": {
+    "date": "October 2025",
+    "notes": [
+      {
+        "id": "a0c3c52720e5354fd7d312173b453615d4747d3e",
+        "type": "FIX",
+        "text": " sap/ui/core/Theming: Ensure to fully await ThemeManager"
+      }
+    ]
   }
 }
