@@ -23202,6 +23202,84 @@ ToProduct/ToSupplier/BusinessPartnerID\'}}">\
 	});
 
 	//*********************************************************************************************
+	// Scenario 1: ODataTreeBinding: custom query options (like search) are included in $count requests
+	// SNOW: DINC0621482
+	// Scenario 2: ODataTreeBinding: $expand and $select are not included in the $count requests
+	// SNOW: CS20250010803423
+	QUnit.test("ODataTreeBinding: custom query options in $count requests", async function (assert) {
+		const oModel = createSpecialCasesModel();
+		const sView = `
+<t:TreeTable id="table"
+	rows="{
+		parameters: {
+			countMode : 'Request',
+			numberOfExpandedLevels: 0,
+			custom: {
+				search: 'Product',
+				foo: 'bar'
+			},
+			select: 'CreatedByUser',
+			treeAnnotationProperties: {
+				hierarchyDrillStateFor: 'OrderOperationIsExpanded',
+				hierarchyLevelFor: 'OrderOperationRowLevel',
+				hierarchyNodeFor: 'OrderOperationRowID',
+				hierarchyParentNodeFor: 'OrderOperationParentRowID'
+			}
+		},
+		path: '/C_RSHMaintSchedSmltdOrdAndOp'
+	}"
+	threshold="0"
+	visibleRowCount="2">
+	<Text id="orderOperationRowID" text="{OrderOperationRowID}" />
+</t:TreeTable>`;
+
+		this.expectHeadRequest()
+			.expectRequest("C_RSHMaintSchedSmltdOrdAndOp/$count?$filter=OrderOperationRowLevel eq 0"
+				+ "&search=Product&foo=bar", "2")
+			.expectRequest("C_RSHMaintSchedSmltdOrdAndOp?$filter=OrderOperationRowLevel eq 0"
+				+ "&search=Product&foo=bar"
+				+ "&$select=CreatedByUser,OrderOperationRowLevel,OrderOperationParentRowID,OrderOperationRowID,"
+				+ "OrderOperationIsExpanded&$skip=0&$top=2", {
+				results: [{
+					__metadata: {uri: "C_RSHMaintSchedSmltdOrdAndOp('A00')"},
+					OrderOperationRowID: "A00",
+					OrderOperationIsExpanded: "collapsed",
+					OrderOperationRowLevel: 0
+				}, {
+					__metadata: {uri: "C_RSHMaintSchedSmltdOrdAndOp('B00')"},
+					OrderOperationRowID: "B00",
+					OrderOperationIsExpanded: "leaf",
+					OrderOperationRowLevel: 0
+				}]
+			});
+
+		await this.createView(assert, sView, oModel);
+		const oTable = this.oView.byId("table");
+
+		assert.deepEqual(getTableContent(oTable), [["A00"], ["B00"]]);
+
+		this.expectRequest("C_RSHMaintSchedSmltdOrdAndOp/$count?"
+				+ "$filter=OrderOperationParentRowID eq 'A00'&search=Product&foo=bar", "1")
+			.expectRequest("C_RSHMaintSchedSmltdOrdAndOp?$filter=OrderOperationParentRowID eq 'A00'"
+				+ "&search=Product&foo=bar"
+				+ "&$select=CreatedByUser,OrderOperationRowLevel,OrderOperationParentRowID,OrderOperationRowID,"
+				+ "OrderOperationIsExpanded&$skip=0&$top=2", {
+				results: [{
+					__metadata: {uri: "C_RSHMaintSchedSmltdOrdAndOp('A01')"},
+					OrderOperationRowID: "A01",
+					OrderOperationParentRowID: "A00",
+					OrderOperationIsExpanded: "leaf",
+					OrderOperationRowLevel: 1
+				}]
+			});
+
+		oTable.expand(0);
+
+		await this.waitForChanges(assert);
+		assert.deepEqual(getTableContent(oTable), [["A00"], ["A01"]]);
+	});
+
+	//*********************************************************************************************
 	// Scenario: On creation of an inactive entity, the createActivate event handler fails due to an Error in its
 	// coding. This error is reported on the console and not stifled.
 	// JIRA: CPOUI5MODELS-1196
