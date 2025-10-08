@@ -18,7 +18,7 @@ sap.ui.define([
 		 * @param {object} mHeaders
 		 *   A map of headers
 		 * @param {string} sODataVersion
-		 *   The version of the OData service. Supported values are "2.0" and "4.0".
+		 *   The version of the OData service. Supported values are "2.0", "4.0", and "4.01".
 		 * @param {boolean} [bIgnoreAnnotationsFromMetadata]
 		 *   Whether to ignore all annotations from metadata documents. Only annotations from
 		 *   additional annotation files are loaded.
@@ -67,15 +67,15 @@ sap.ui.define([
 					var oPromise;
 
 					function convertXMLMetadata(oJSON) {
-						var Converter = sODataVersion === "4.0" || bAnnotations
-								? _V4MetadataConverter
-								: _V2MetadataConverter,
+						var oConverter = !bAnnotations && sODataVersion === "2.0"
+								? new _V2MetadataConverter()
+								: new _V4MetadataConverter(sODataVersion),
 							oData = oJSON.$XML,
 							bIgnoreAnnotations = bIgnoreAnnotationsFromMetadata && !bAnnotations;
 
 						delete oJSON.$XML; // be nice to the garbage collector
 						return Object.assign(
-							new Converter().convertXMLMetadata(oData, sUrl, bIgnoreAnnotations),
+							oConverter.convertXMLMetadata(oData, sUrl, bIgnoreAnnotations),
 							oJSON);
 					}
 

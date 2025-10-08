@@ -4403,6 +4403,7 @@ sap.ui.define([
 
 		// Act
 		qutils.triggerKeydown(oMultiInput.getDomRef(), KeyCodes.ARROW_DOWN);
+		this.clock.tick(10); // Allow setTimeout in updateAriaActiveDescendant to execute
 
 		// Assert
 		assert.strictEqual(oMultiInput.getFocusDomRef().getAttribute('aria-activedescendant'), sInvisibleTextId, "Input has aria-activedescendant attribute set");

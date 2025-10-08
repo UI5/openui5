@@ -43,7 +43,7 @@ sap.ui.define(["sap/m/AvatarSize", "sap/m/AvatarType", "sap/base/security/encode
 			aDescribedBy = oAvatar.getAriaDescribedBy(),
 			aHasPopup = oAvatar.getAriaHasPopup(),
 			bHasListener = oAvatar.hasListeners("press"),
-			bHasSrc = (!oAvatar._bIsDefaultIcon && bHasDetailBox) || (!bHasDetailBox),
+			bHasSrc = (!oAvatar._getUseDefaultIcon() && bHasDetailBox) || (!bHasDetailBox),
 			bHideBadge = bHasDetailBox && bIsIconURI && !bHasBadgeIcon,
 			bShouldBeClickable = bHasListener && bHasSrc,
 			oBadge = bHasSrc && !bHideBadge ?  oAvatar._getBadge() : null,

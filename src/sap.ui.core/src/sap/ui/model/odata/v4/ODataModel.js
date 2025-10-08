@@ -141,7 +141,7 @@ sap.ui.define([
 		 *   "sap-context-token" applies only to the service's root $metadata, but not to
 		 *   "cross-service references". Supported since 1.81.0
 		 * @param {string} [mParameters.odataVersion="4.0"]
-		 *   The version of the OData service. Supported values are "2.0" and "4.0".
+		 *   The version of the OData service. Supported values are "2.0", "4.0", and "4.01".
 		 * @param {sap.ui.model.odata.OperationMode} [mParameters.operationMode]
 		 *   The operation mode for filtering and sorting. Since 1.39.0, the operation mode
 		 *   {@link sap.ui.model.odata.OperationMode.Server} is supported. All other operation modes
@@ -268,7 +268,7 @@ sap.ui.define([
 
 		sODataVersion = mParameters.odataVersion || "4.0";
 		this.sODataVersion = sODataVersion;
-		if (sODataVersion !== "4.0" && sODataVersion !== "2.0") {
+		if (sODataVersion !== "4.01" && sODataVersion !== "4.0" && sODataVersion !== "2.0") {
 			throw new Error("Unsupported value for parameter odataVersion: " + sODataVersion);
 		}
 		for (sParameter in mParameters) {
@@ -1225,10 +1225,13 @@ sap.ui.define([
 		if (mParameters) {
 			for (sParameterName in mParameters) {
 				if (a401DenyList.includes(sParameterName.toLowerCase())) {
-					Log.warning("[FUTURE FATAL] Custom query option " + sParameterName
-						+ " will not be supported with OData 4.01, see"
-						+ " https://sdk.openui5.org/topic/cda632b01c1e4a988ccecab759d19380",
-						undefined, sClassName);
+					const sMessage = "Custom query option " + sParameterName
+						+ " not supported with OData 4.01, see"
+						+ " https://sdk.openui5.org/topic/cda632b01c1e4a988ccecab759d19380";
+					if (this.sODataVersion === "4.01") {
+						throw new Error(sMessage);
+					}
+					Log.warning("[FUTURE FATAL] " + sMessage, undefined, sClassName);
 				}
 				if (sParameterName.startsWith("$$")) { // binding-specific parameter
 					delete mTransformedOptions[sParameterName];

@@ -45,27 +45,27 @@
 
     <!-- Thirdparty references -->
     <thirdparty xmlns="http://www.sap.com/ui5/buildext/thirdparty" >
-      <lib name="ui5-web-components" displayName="UI5 Web Components" npmName="@ui5/webcomponents" version="2.15.0-rc.3" homepage="https://ui5.github.io/webcomponents/" id="73555000106100314797">
+      <lib name="ui5-web-components" displayName="UI5 Web Components" npmName="@ui5/webcomponents" version="2.15.0" homepage="https://ui5.github.io/webcomponents/" id="73555000106100326641">
         <license url="https://github.com/UI5/webcomponents/blob/-/LICENSE.txt" type="Apache-2.0"></license>
         <copyright>SAP</copyright>
         <pattern>sap/f/thirdparty/**</pattern>
       </lib>
-      <lib name="ui5-web-components-fiori" displayName="UI5 Web Components Fiori" npmName="@ui5/webcomponents-fiori" version="2.15.0-rc.3" homepage="https://ui5.github.io/webcomponents/" id="73555000106100314983">
+      <lib name="ui5-web-components-fiori" displayName="UI5 Web Components Fiori" npmName="@ui5/webcomponents-fiori" version="2.15.0" homepage="https://ui5.github.io/webcomponents/" id="73555000106100326639">
         <license url="https://github.com/UI5/webcomponents/blob/-/LICENSE.txt" type="Apache-2.0"></license>
         <copyright>SAP</copyright>
         <pattern>sap/f/thirdparty/**</pattern>
       </lib>
-      <lib name="ui5-web-components-icons" displayName="UI5 Web Components Icons" npmName="@ui5/webcomponents-icons" version="2.15.0-rc.3" homepage="https://ui5.github.io/webcomponents/" id="73555000106100314981">
+      <lib name="ui5-web-components-icons" displayName="UI5 Web Components Icons" npmName="@ui5/webcomponents-icons" version="2.15.0" homepage="https://ui5.github.io/webcomponents/" id="73555000106100326647">
         <license url="https://github.com/UI5/webcomponents/blob/-/LICENSE.txt" type="Apache-2.0"></license>
         <copyright>SAP</copyright>
         <pattern>sap/f/thirdparty/**</pattern>
       </lib>
-      <lib name="ui5-web-components-icons-business-suite" displayName="UI5 Web Components Icons Business Suite" npmName="@ui5/webcomponents-icons-business-suite" version="2.15.0-rc.3" homepage="https://ui5.github.io/webcomponents/" id="73555000106100315206">
+      <lib name="ui5-web-components-icons-business-suite" displayName="UI5 Web Components Icons Business Suite" npmName="@ui5/webcomponents-icons-business-suite" version="2.15.0" homepage="https://ui5.github.io/webcomponents/" id="73555000106100326296">
         <license url="https://github.com/UI5/webcomponents/blob/-/LICENSE.txt" type="Apache-2.0"></license>
         <copyright>SAP</copyright>
         <pattern>sap/f/thirdparty/**</pattern>
       </lib>      
-      <lib name="ui5-web-components-icons-tnt" displayName="UI5 Web Components Icons TNT" npmName="@ui5/webcomponents-icons-tnt" version="2.15.0-rc.3" homepage="https://ui5.github.io/webcomponents/" id="73555000106100315208">
+      <lib name="ui5-web-components-icons-tnt" displayName="UI5 Web Components Icons TNT" npmName="@ui5/webcomponents-icons-tnt" version="2.15.0" homepage="https://ui5.github.io/webcomponents/" id="73555000106100327007">
         <license url="https://github.com/UI5/webcomponents/blob/-/LICENSE.txt" type="Apache-2.0"></license>
         <copyright>SAP</copyright>
         <pattern>sap/f/thirdparty/**</pattern>

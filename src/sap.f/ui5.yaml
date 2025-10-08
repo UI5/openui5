@@ -11,6 +11,9 @@ resources:
   configuration:
     propertiesFileSourceEncoding: ISO-8859-1
 builder:
+  jsdoc:
+    excludes:
+      - "sap/f/thirdparty/**"
   bundles:
     - bundleDefinition:
         name: sap/f/library-preload.js

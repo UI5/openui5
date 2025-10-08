@@ -1455,6 +1455,7 @@ sap.ui.define([
 		}).then(function(oComponent) {
 			assert.ok(false, "creating a component that uses an unupported OData version must not succeed");
 		}, function(oErr) {
+			assert.strictEqual(oErr.message, "Unsupported value for parameter odataVersion: 4.foo");
 
 			// sap.ui.model.odata.v4.ODataModel
 			sinon.assert.callCount(this.modelSpy.odataV4, 1);
@@ -1462,11 +1463,31 @@ sap.ui.define([
 				serviceUrl: '/path/to/odata/service/',
 				metadataUrlParams: {"sap-language": "EN"},
 				autoExpandSelect: false,
-				odataVersion: "foo",
+				odataVersion: "4.foo",
 				operationMode: "Server"
 			});
 
 		}.bind(this));
+	});
+
+	QUnit.test("pass 4.01 service version to V4 model", function(assert) {
+		return Component.create({
+			name: "testdata.v4models.v4_01",
+			manifest: false
+		}).then((oComponent) => {
+			// sap.ui.model.odata.v4.ODataModel
+			sinon.assert.callCount(this.modelSpy.odataV4, 1);
+			sinon.assert.calledWithExactly(this.modelSpy.odataV4, {
+				serviceUrl: '/path/to/odata/service/',
+				metadataUrlParams: {"sap-language": "EN"},
+				autoExpandSelect: false,
+				odataVersion: "4.01",
+				operationMode: "Server"
+			});
+
+		}, function(oErr) {
+			assert.ok(false, "creating a component that uses a 4.01 OData version must not fail");
+		});
 	});
 
 	QUnit.test("pass 'ignoreAnnotationsFromMetadata' parameter to V2 and V4 model", function(assert) {

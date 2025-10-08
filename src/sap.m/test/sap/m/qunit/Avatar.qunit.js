@@ -195,14 +195,14 @@ sap.ui.define([
 		this.oAvatar.setSrc("sap-icon://touch");
 		await nextUIUpdate();
 
-		assert.notOk(this.oAvatar._bIsDefaultIcon, "Icon source is valid");
+		assert.notOk(this.oAvatar._getUseDefaultIcon(), "Icon source is valid");
 	});
 
 	QUnit.test("Avatar with invalid icon src should use default icon", async function (assert) {
 		this.oAvatar.setSrc("sap-icon://qwertyu");
 		await nextUIUpdate();
 
-		assert.ok(this.oAvatar._bIsDefaultIcon, "Icon source is invalid and fallback icon will be shown");
+		assert.ok(this.oAvatar._getUseDefaultIcon(), "Icon source is invalid and fallback icon will be shown");
 	});
 
 	QUnit.test("Fallback type should be always restored according to current property values", async function (assert) {
@@ -279,9 +279,9 @@ sap.ui.define([
 			fnDone = assert.async(),
 			that = this,
 			$oAvatarImageHolder,
-			oStub = this.stub(this.oAvatar, "_onImageError").callsFake(function(sSrc) {
+			oStub = this.stub(this.oAvatar, "_onImageLoad").callsFake(function(sSrc) {
 				oStub.restore(); // avoid endless recursion
-				that.oAvatar._onImageError(sSrc);
+				that.oAvatar._onImageLoad(sSrc);
 				$oAvatarImageHolder = that.oAvatar.$().find('.sapFAvatarImageHolder').get(0);
 				assert.strictEqual($oAvatarImageHolder.style.backgroundImage, sExpectedOutputImage, "correct style value");
 				assert.ok(that.oAvatar.$().hasClass("sapFAvatarImage"), "Avatar has image class");
@@ -561,7 +561,7 @@ sap.ui.define([
 		var sAvatarUrl = this.oAvatar.$().find(".sapFAvatarImageHolder")[0].style.backgroundImage;
 
 		// based on internal state re-run src validating function so that image is preloaded
-		this.oAvatar._validateSrc(this.oAvatar._getAvatarSrc());
+		this.oAvatar._getActualTypeBySrc(this.oAvatar._getAvatarSrc());
 
 
 		if (this.oAvatar.preloadedImage) {

@@ -229,12 +229,14 @@ function (
 		const oCardEvent = new KeyboardEvent("keydown", {
 			bubbles: true,
 			cancelable: true,
-			keyCode: KeyCodes.SPACE
+			keyCode: KeyCodes.SPACE,
+			which: KeyCodes.SPACE
 		});
 		const oTextAreaEvent = new KeyboardEvent("keydown", {
 			bubbles: true,
 			cancelable: true,
-			keyCode: KeyCodes.SPACE
+			keyCode: KeyCodes.SPACE,
+			which: KeyCodes.SPACE
 		});
 
 		// Act

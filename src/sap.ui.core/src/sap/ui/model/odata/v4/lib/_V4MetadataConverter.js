@@ -12,14 +12,19 @@ sap.ui.define([
 	/**
 	 * Creates a converter for V4 metadata.
 	 *
+	 * @param {string} sODataVersion
+	 *   The version of the OData service. Supported values are "2.0" (in case an annotation file is
+	 *   converted), "4.0", and "4.01".
+	 *
 	 * @alias sap.ui.model.odata.v4.lib._V4MetadataConverter
 	 * @constructor
 	 * @extends sap.ui.model.odata.v4.lib._MetadataConverter
 	 */
-	function _V4MetadataConverter() {
+	function _V4MetadataConverter(sODataVersion) {
 		this.enumType = null; // the current EnumType
 		this.enumTypeMemberCounter = 0; // the current EnumType member value counter
 		this.navigationProperty = null; // the current NavigationProperty
+		this.odataVersion = sODataVersion;
 
 		_MetadataConverter.call(this);
 	}
@@ -31,7 +36,7 @@ sap.ui.define([
 	 * @see sap.ui.model.odata.v4.lib._MetadataConverter#finalize
 	 */
 	_V4MetadataConverter.prototype.finalize = function () {
-		if (this.result.$Version !== "4.0") {
+		if (this.result.$Version !== this.odataVersion && this.result.$Version !== "4.0") {
 			throw new Error(this.url + ": Unsupported OData version " + this.result.$Version);
 		}
 	};
@@ -248,7 +253,9 @@ sap.ui.define([
 			},
 			Precision : this.setNumber,
 			Scale : function (sValue) {
-				return sValue === "variable" ? sValue : that.setNumber(sValue);
+				return sValue === "floating" || sValue === "variable"
+					? sValue
+					: that.setNumber(sValue);
 			},
 			SRID : this.setValue,
 			Unicode : this.setIfFalse

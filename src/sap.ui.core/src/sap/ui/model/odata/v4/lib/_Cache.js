@@ -780,8 +780,7 @@ sap.ui.define([
 						return invalidSegment(sSegment);
 					}
 					if (oProperty.$Type === "Edm.Stream" && !sPropertyName) {
-						sReadLink = oValue[sSegment + "@odata.mediaReadLink"]
-							|| oValue[sSegment + "@mediaReadLink"];
+						sReadLink = oValue[sSegment + "@odata.mediaReadLink"];
 						if (sReadLink) {
 							return sReadLink;
 						}
@@ -2610,22 +2609,20 @@ sap.ui.define([
 			}
 
 			Object.keys(oInstance).forEach(function (sProperty) {
-				var sCount,
-					sPropertyMetaPath = sMetaPath + "/" + sProperty,
-					vPropertyValue = oInstance[sProperty],
-					sPropertyPath = _Helper.buildPath(sInstancePath, sProperty);
+				var sPropertyMetaPath = sMetaPath + "/" + sProperty,
+					sPropertyPath = _Helper.buildPath(sInstancePath, sProperty),
+					vPropertyValue = oInstance[sProperty];
 
-				if (sProperty.endsWith("@odata.mediaReadLink")
-						|| sProperty.endsWith("@mediaReadLink")) {
-					oInstance[sProperty] = _Helper.makeAbsolute(vPropertyValue, sContextUrl);
+				if (sProperty.includes("@")) {
+					if (sProperty.endsWith("@odata.mediaReadLink")) {
+						oInstance[sProperty] = _Helper.makeAbsolute(vPropertyValue, sContextUrl);
+					}
+					return; // ignore other annotations
 				}
-				if (sProperty === sMessageProperty || sProperty.includes("@")) {
-					return; // ignore message property and other annotations
-				}
-				if (Array.isArray(vPropertyValue)) {
+				if (Array.isArray(vPropertyValue) && sProperty !== sMessageProperty) {
 					vPropertyValue.$created = 0; // number of (client-side) created elements
 					// compute count
-					sCount = oInstance[sProperty + "@odata.count"];
+					const sCount = oInstance[sProperty + "@odata.count"];
 					// Note: ignore change listeners, because any change listener that is already
 					// registered, is still waiting for its value and gets it via fetchValue
 					if (sCount) {

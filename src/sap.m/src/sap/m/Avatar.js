@@ -302,7 +302,7 @@ sap.ui.define([
 		// Property holding the actual display type of the avatar
 		this._sActualType = null;
 		// Property that determines if the created icon is going to be the default one
-		this._bIsDefaultIcon = true;
+		this._bUseDefaultIcon = true;
 		this._sImageFallbackType = null;
 
 		// Property holding the currently picked random background color of the avatar, if any
@@ -312,13 +312,17 @@ sap.ui.define([
 		this._badgeRef = null;
 
 		this._bImageLoadError = false;
+
+		// does not have initials by default (null value)
+		this._bInitialsValid = false;
 	};
 
 	Avatar.prototype.onBeforeRendering = function () {
 		if (this._getImageCustomData() && !this._iCacheBustingValue) {
 			this._setNewCacheBustingValue();
-			this._validateSrc(this._getAvatarSrc());
 		}
+		// determine the actual display type of the avatar before rendering
+		this._setActualDisplayType();
 	};
 
 	Avatar.prototype.onAfterRendering = function() {
@@ -336,8 +340,19 @@ sap.ui.define([
 		this._bImageLoadError = false;
 
 		this.setProperty("src", sSrc);
-		this._validateSrc(this._getAvatarSrc());
+		this._setUseDefaultIcon(IconPool.getIconInfo(sSrc) ? false : true);
 		this._handleDetailBoxPress(bIsIconURI, oLightBox);
+
+		return this;
+	};
+
+	Avatar.prototype.setInitials = function (sInitials) {
+		this.setProperty("initials", sInitials);
+		this._setInitialsValid(this._areInitialsValid(sInitials));
+
+		if (!this._getInitialsValid()) {
+			this._setUseDefaultIcon(true);
+		}
 
 		return this;
 	};
@@ -560,7 +575,7 @@ sap.ui.define([
 	};
 
 	Avatar.prototype._handlePress = function () {
-		if (!this.getEnabled() || (this._bIsDefaultIcon && this.getDetailBox())) {
+		if (!this.getEnabled() || (this._getUseDefaultIcon() && this.getDetailBox())) {
 			return;
 		}
 		this.firePress({/* no parameters */});
@@ -579,10 +594,6 @@ sap.ui.define([
 	   if (!validInitials.test(sInitials)) {
 		   Log.warning("Initials should consist of only 1,2 or 3 latin letters", this);
 		   // if there is no actual type or the actual type is initials but they are not valid, set the actual type to icon
-		   if (!this._sActualType || this._sActualType === AvatarType.Initials) {
-			   this._sActualType = AvatarType.Icon;
-		   }
-		   this._bIsDefaultIcon = true;
 		   return false;
 	   }
 
@@ -590,32 +601,45 @@ sap.ui.define([
    };
 
 	/**
-	 * Validates the <code>src</code> parameter, and sets the actual type appropriately.
+	 * Returns the validity state of the initials.
 	 *
-	 * @param {string} sSrc
-	 * @returns {this}
+	 * @returns {boolean}
 	 * @private
 	 */
-	Avatar.prototype._validateSrc = function (sSrc) {
-		if (!sSrc) {
-			return this;
-		}
+	Avatar.prototype._getInitialsValid = function() {
+		return this._bInitialsValid;
+	};
 
+	/**
+	 * Sets the validity state of the initials.
+	 *
+	 * @param {boolean} bValue - The validity state to set
+	 * @private
+	 */
+	Avatar.prototype._setInitialsValid = function (bValue) {
+		this._bInitialsValid = bValue;
+	};
+
+	/**
+	 * Returns the actual display type of avatar depending on the <code>src</code> parameter - either Icon or Image.
+	 *
+	 * @param {string} sSrc
+	 * @returns {sap.m.AvatarType} either Icon or Image
+	 * @private
+	 */
+	Avatar.prototype._getActualTypeBySrc = function (sSrc) {
 		if (IconPool.isIconURI(sSrc)) {
-			this._sActualType = AvatarType.Icon;
-			this._bIsDefaultIcon = IconPool.getIconInfo(sSrc) ? false : true;
+			return AvatarType.Icon;
 		} else {
-			this._sActualType = AvatarType.Image;
-
 			// we perform this action in order to validate the image source and
 			// take further actions depending on that
 			this.preloadedImage = new window.Image();
 			this.preloadedImage.src = sSrc;
 			this.preloadedImage.onload = this._onImageLoad.bind(this);
 			this.preloadedImage.onerror = this._onImageError.bind(this, sSrc);
-		}
 
-		return this;
+			return AvatarType.Image;
+		}
 	};
 
 	/**
@@ -634,26 +658,60 @@ sap.ui.define([
 	};
 
 	/**
-	 * Validates the entered parameters, and returns what the actual display type parameter would be.
+	 * Validates the entered parameters, and sets what the actual display type parameter would be.
+	 *
+	 * @returns {sap.m.AvatarType}
+	 * @private
+	 */
+	Avatar.prototype._setActualDisplayType = function () {
+		var sSrc = this._getAvatarSrc(),
+			sInitials = this.getInitials();
+
+		if (sSrc) {
+			this._sActualType = this._getActualTypeBySrc(sSrc);
+		} else if (sInitials && this._getInitialsValid()) {
+			this._sActualType = AvatarType.Initials;
+		} else {
+			Log.warning("No src and initials were provided or initials are provided, but are not valid", this);
+			this._sActualType = AvatarType.Icon;
+			this._setUseDefaultIcon(true);
+		}
+
+		return this._sActualType;
+	};
+
+	/**
+	 * Returns the actual display type of avatar
 	 *
 	 * @returns {sap.m.AvatarType}
 	 * @private
 	 */
 	Avatar.prototype._getActualDisplayType = function () {
-		var sSrc = this._getAvatarSrc(),
-			sInitials = this.getInitials();
-
-		if (sSrc) {
-			return this._sActualType;
-		} else if (sInitials && this._areInitialsValid(sInitials)) {
-			this._sActualType = AvatarType.Initials;
-		} else {
-			Log.warning("No src and initials were provided", this);
-			this._sActualType = AvatarType.Icon;
-			this._bIsDefaultIcon = true;
+		if (!this._sActualType) {
+			this._setActualDisplayType();
 		}
 
 		return this._sActualType;
+	};
+
+	/**
+	 * Sets whether default icon should be used
+	 *
+	 * @param {boolean} bValue
+	 * @private
+	 */
+	Avatar.prototype._setUseDefaultIcon = function (bValue) {
+		this._bUseDefaultIcon = bValue;
+	};
+
+	/**
+	 * Returns whether the default icon should be used.
+	 *
+	 * @returns {boolean} whether the default icon should be used
+	 * @private
+	 */
+	Avatar.prototype._getUseDefaultIcon = function () {
+		return this._bUseDefaultIcon;
 	};
 
 	/**
@@ -665,7 +723,7 @@ sap.ui.define([
 	Avatar.prototype._getImageFallbackType = function () {
 		var sInitials = this.getInitials();
 
-		this._sImageFallbackType = sInitials && this._areInitialsValid(sInitials) ?
+		this._sImageFallbackType = sInitials && this._getInitialsValid() ?
 			AvatarType.Initials : AvatarType.Icon;
 
 		return this._sImageFallbackType;
@@ -707,7 +765,7 @@ sap.ui.define([
 			bIsIconURI = IconPool.isIconURI(sSrc),
 			sDefaultIconPath = this._getDefaultIconPath(sDisplayShape);
 
-		if (this._bIsDefaultIcon) {
+		if (this._getUseDefaultIcon()) {
 			sSrc = sDefaultIconPath;
 		}
 
@@ -808,8 +866,8 @@ sap.ui.define([
 	 */
 	Avatar.prototype._onImageLoad = function() {
 		//we need to remove fallback content
-		if (this._bIsDefaultIcon) {
-			this._bIsDefaultIcon = false;
+		if (this._getUseDefaultIcon()) {
+			this._setUseDefaultIcon(false);
 			this.getDetailBox() && this.invalidate();
 		}
 		this._bImageLoadError = false;
@@ -828,8 +886,8 @@ sap.ui.define([
 
 	   this._cleanCSS();
 
-	   if (!this._bIsDefaultIcon) {
-		   this._bIsDefaultIcon = true;
+	   if (!this._getUseDefaultIcon()) {
+		   this._setUseDefaultIcon(true);
 		   this.getDetailBox() && this.invalidate();
 	   }
 	   delete this.preloadedImage;
@@ -993,7 +1051,6 @@ sap.ui.define([
 	 */
 	Avatar.prototype.refreshAvatarCacheBusting = function () {
 		this._setNewCacheBustingValue();
-		this._validateSrc(this._getAvatarSrc());
 		this.invalidate();
 	};
 

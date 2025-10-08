@@ -376,6 +376,29 @@ sap.ui.define([
 	}
 
 	//*****************************************************************************************
+["$auto"/*TODO, "$direct"*/].forEach((sGroupId) => {
+	QUnit.test("ODataModel: 4.01 w/ " + sGroupId, async function (assert) {
+		const oModel = new ODataModel({
+			earlyRequests : true,
+			groupId : sGroupId,
+			odataVersion : "4.01",
+			serviceUrl : "/analytics/"
+		});
+		const oListBinding = oModel.bindList("/Bookings");
+
+		const aContexts = await oListBinding.requestContexts(0, 1);
+
+		// Note: Anti-pattern ahead! Don't try this at home, kids!
+		const oContextBinding = oModel.bindContext(aContexts[0].getPath());
+
+		const oResult = await oContextBinding.getBoundContext().requestObject();
+
+		assert.strictEqual(oResult["@odata.context"], "$metadata#Bookings/$entity",
+			"control information translated back to 4.0");
+	});
+});
+
+	//*****************************************************************************************
 	QUnit.test("ODataContextBinding: Action import on navigation property", function () {
 		var oModel = new ODataModel({serviceUrl : sServiceUrl}),
 			oBinding = oModel.bindContext("EMPLOYEE_2_TEAM/"

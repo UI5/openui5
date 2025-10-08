@@ -10,7 +10,7 @@
 				"uri": "/analytics/",
 				"type": "OData",
 				"settings": {
-					"odataVersion": "4.0"
+					"odataVersion": "4.01"
 				}
 			}
 		},

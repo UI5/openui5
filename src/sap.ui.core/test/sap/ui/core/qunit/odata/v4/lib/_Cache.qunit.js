@@ -1918,14 +1918,14 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-["@mediaReadLink", "@odata.mediaReadLink"].forEach(function (sMediaReadLink) {
-	QUnit.test("_Cache#drillDown: stream property w/ " + sMediaReadLink, function (assert) {
+	QUnit.test("_Cache#drillDown: stream property w/ @odata.mediaReadLink", function (assert) {
 		var oCache = new _Cache(this.oRequestor, "Products"),
 			oData = [{
-				productPicture : {}
+				productPicture : {
+					"picture@odata.mediaReadLink" : "/~/my/Picture"
+				}
 			}];
 
-		oData[0].productPicture["picture" + sMediaReadLink] = "/~/my/Picture";
 		oData.$byPredicate = {"('42')" : oData[0]};
 
 		this.mock(_Helper).expects("getMetaPath")
@@ -1938,7 +1938,6 @@ sap.ui.define([
 		assert.strictEqual(oCache.drillDown(oData, "('42')/productPicture/picture").getResult(),
 			"/~/my/Picture");
 	});
-});
 
 	//*********************************************************************************************
 [false, true].forEach(function (bSingle) {
@@ -2248,9 +2247,6 @@ sap.ui.define([
 	oResponse : {"Picture@odata.mediaReadLink" : "~odata.mediaReadLink~"},
 	sResult : "~odata.mediaReadLink~"
  }, {
-	oResponse : {"Picture@mediaReadLink" : "~mediaReadLink~"},
-	sResult : "~mediaReadLink~"
-  }, {
 	oResponse : {Picture : "~somePicture~"},
 	sResult : "~somePicture~"
 }].forEach(function (oFixture) {
@@ -4036,7 +4032,6 @@ sap.ui.define([
 			oData = {
 				id : "1",
 				"picture1@odata.mediaReadLink" : "img_1.jpg",
-				"picture2@mediaReadLink" : "img_2.jpg", // OData V4.01 format
 				messages : [{
 					longtextUrl : "Longtext(1)"
 				}]
@@ -4063,7 +4058,6 @@ sap.ui.define([
 		oCache.visitResponse(oData, mTypeForMetaPath);
 
 		assert.strictEqual(oData["picture1@odata.mediaReadLink"], "/~/EntitySet('42')/img_1.jpg");
-		assert.strictEqual(oData["picture2@mediaReadLink"], "/~/EntitySet('42')/img_2.jpg");
 	});
 
 	//*********************************************************************************************
