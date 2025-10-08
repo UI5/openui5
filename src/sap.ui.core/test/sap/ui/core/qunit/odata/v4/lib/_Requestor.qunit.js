@@ -249,12 +249,21 @@ sap.ui.define([
 
 		// code under test
 		oRequestor = _Requestor.create(sServiceUrl, oModelInterface, mHeaders, mQueryParams,
-			/*sODataVersion*/undefined, bWithCredentials);
+			"~sODataVersion~", bWithCredentials);
 
 		assert.deepEqual(oRequestor.mBatchQueue, {});
+		assert.strictEqual(oRequestor.isBatchSent(), false);
 		assert.strictEqual(oRequestor.mHeaders, mHeaders);
 		assert.deepEqual(oRequestor.aLockedGroupLocks, []);
 		assert.strictEqual(oRequestor.oModelInterface, oModelInterface);
+		assert.strictEqual(oRequestor.sODataVersion, "~sODataVersion~");
+		assert.strictEqual(oRequestor.oOptimisticBatch, null);
+		assert.deepEqual(oRequestor.mPredefinedRequestHeaders, {
+			Accept : "application/json;odata.metadata=minimal;IEEE754Compatible=true",
+			"OData-MaxVersion" : "4.0",
+			"OData-Version" : "4.0",
+			"X-CSRF-Token" : "Fetch"
+		}, "unchanged");
 		assert.strictEqual(oRequestor.sQueryParams, "?~");
 		assert.deepEqual(oRequestor.mRunningChangeRequests, {});
 		assert.strictEqual(oRequestor.oSecurityTokenPromise, null);
@@ -262,8 +271,6 @@ sap.ui.define([
 		assert.strictEqual(oRequestor.iSerialNumber, 0);
 		assert.strictEqual(oRequestor.sServiceUrl, sServiceUrl);
 		assert.strictEqual(oRequestor.vStatistics, bStatistics ? vStatistics : undefined);
-		assert.strictEqual(oRequestor.oOptimisticBatch, null);
-		assert.strictEqual(oRequestor.isBatchSent(), false);
 		assert.ok("vStatistics" in oRequestor);
 		assert.strictEqual(oRequestor.bWithCredentials, bWithCredentials);
 
@@ -279,19 +286,59 @@ sap.ui.define([
 });
 
 	//*********************************************************************************************
+	QUnit.test("constructor, 4.01", function (assert) {
+		this.mock(_Helper).expects("buildQuery").withExactArgs(null).returns("?~");
+
+		// code under test
+		const oRequestor
+			= _Requestor.create(sServiceUrl, oModelInterface, "~mHeaders~", null, "4.01");
+
+		assert.deepEqual(oRequestor.mBatchQueue, {});
+		assert.strictEqual(oRequestor.isBatchSent(), false);
+		assert.strictEqual(oRequestor.mHeaders, "~mHeaders~");
+		assert.deepEqual(oRequestor.aLockedGroupLocks, []);
+		assert.strictEqual(oRequestor.oModelInterface, oModelInterface);
+		assert.strictEqual(oRequestor.sODataVersion, "4.01");
+		assert.strictEqual(oRequestor.oOptimisticBatch, null);
+		assert.deepEqual(oRequestor.mPredefinedRequestHeaders, {
+			Accept : "application/json;odata.metadata=minimal;IEEE754Compatible=true",
+			"OData-MaxVersion" : "4.01",
+			"OData-Version" : "4.01",
+			"X-CSRF-Token" : "Fetch"
+		}, "unchanged");
+		assert.strictEqual(oRequestor.sQueryParams, "?~");
+		assert.deepEqual(oRequestor.mRunningChangeRequests, {});
+		assert.strictEqual(oRequestor.oSecurityTokenPromise, null);
+		assert.strictEqual(oRequestor.iSessionTimer, 0);
+		assert.strictEqual(oRequestor.iSerialNumber, 0);
+		assert.strictEqual(oRequestor.sServiceUrl, sServiceUrl);
+		assert.strictEqual(oRequestor.vStatistics, null);
+		assert.ok("vStatistics" in oRequestor);
+		assert.strictEqual(oRequestor.bWithCredentials, undefined);
+
+		assert.throws(function () {
+			// code under test
+			oRequestor.mPredefinedRequestHeaders.foo = "bar";
+		}, new TypeError("Cannot add property foo, object is not extensible"));
+	});
+
+	//*********************************************************************************************
 	QUnit.test("frozen", function (assert) {
 		assert.throws(function () {
 			// code under test
 			_Requestor.prototype.mFinalHeaders.foo = "bar";
 		}, new TypeError("Cannot add property foo, object is not extensible"));
+
 		assert.throws(function () {
 			// code under test
 			_Requestor.prototype.mPredefinedPartHeaders.foo = "bar";
 		}, new TypeError("Cannot add property foo, object is not extensible"));
+
 		assert.throws(function () {
 			// code under test
 			_Requestor.prototype.mPredefinedRequestHeaders.foo = "bar";
 		}, new TypeError("Cannot add property foo, object is not extensible"));
+
 		assert.throws(function () {
 			// code under test
 			_Requestor.prototype.mReservedHeaders.foo = "bar";
@@ -315,6 +362,129 @@ sap.ui.define([
 
 		// code under test
 		assert.strictEqual(oRequestor.getServiceUrl(), sServiceUrl);
+	});
+
+	//*********************************************************************************************
+	QUnit.test("reviver", function (assert) {
+		assert.strictEqual(
+			// code under test
+			_Requestor.reviver("foo", "bar"),
+			"bar");
+
+		assert.strictEqual(
+			// code under test
+			_Requestor.reviver("foo@namespace.Annotation", "bar"),
+			"bar");
+
+		const oObject = {
+			"@context" : "http://host/service/$metadata#Customers/$entity",
+			"@type" : "#Model.VipCustomer",
+			"DynamicValue@type" : "Date",
+			"foo@control" : "bar",
+			"foreign@type" : "http://host/alternate/$metadata#Model.VipCustomer"
+		};
+
+		assert.strictEqual(
+			// code under test
+			_Requestor.reviver.call(oObject, "foo@control", "bar"),
+			undefined);
+
+		assert.deepEqual(oObject, {
+			"@context" : "http://host/service/$metadata#Customers/$entity",
+			"@type" : "#Model.VipCustomer",
+			"DynamicValue@type" : "Date",
+			"foo@control" : "bar",
+			"foo@odata.control" : "bar",
+			"foreign@type" : "http://host/alternate/$metadata#Model.VipCustomer"
+		});
+
+		assert.strictEqual(
+			// code under test
+			_Requestor.reviver.call(oObject, "@context", oObject["@context"]),
+			undefined);
+
+		assert.deepEqual(oObject, {
+			"@context" : "http://host/service/$metadata#Customers/$entity",
+			"@odata.context" : "http://host/service/$metadata#Customers/$entity",
+			"@type" : "#Model.VipCustomer",
+			"DynamicValue@type" : "Date",
+			"foo@control" : "bar",
+			"foo@odata.control" : "bar",
+			"foreign@type" : "http://host/alternate/$metadata#Model.VipCustomer"
+		});
+
+		assert.strictEqual(
+			// code under test
+			_Requestor.reviver.call(oObject, "@type", oObject["@type"]),
+			undefined);
+
+		assert.deepEqual(oObject, {
+			"@context" : "http://host/service/$metadata#Customers/$entity",
+			"@odata.context" : "http://host/service/$metadata#Customers/$entity",
+			"@type" : "#Model.VipCustomer",
+			"@odata.type" : "#Model.VipCustomer",
+			"DynamicValue@type" : "Date",
+			"foo@control" : "bar",
+			"foo@odata.control" : "bar",
+			"foreign@type" : "http://host/alternate/$metadata#Model.VipCustomer"
+		});
+
+		assert.strictEqual(
+			// code under test
+			_Requestor.reviver.call(oObject, "DynamicValue@type", "Date"),
+			undefined);
+
+		assert.deepEqual(oObject, {
+			"@context" : "http://host/service/$metadata#Customers/$entity",
+			"@odata.context" : "http://host/service/$metadata#Customers/$entity",
+			"@type" : "#Model.VipCustomer",
+			"@odata.type" : "#Model.VipCustomer",
+			"DynamicValue@type" : "Date",
+			"DynamicValue@odata.type" : "#Date",
+			"foo@control" : "bar",
+			"foo@odata.control" : "bar",
+			"foreign@type" : "http://host/alternate/$metadata#Model.VipCustomer"
+		});
+
+		assert.strictEqual(
+			// code under test
+			_Requestor.reviver.call(oObject, "foreign@type", oObject["foreign@type"]),
+			undefined);
+
+		assert.deepEqual(oObject, {
+			"@context" : "http://host/service/$metadata#Customers/$entity",
+			"@odata.context" : "http://host/service/$metadata#Customers/$entity",
+			"@type" : "#Model.VipCustomer",
+			"@odata.type" : "#Model.VipCustomer",
+			"DynamicValue@type" : "Date",
+			"DynamicValue@odata.type" : "#Date",
+			"foo@control" : "bar",
+			"foo@odata.control" : "bar",
+			"foreign@type" : "http://host/alternate/$metadata#Model.VipCustomer",
+			"foreign@odata.type" : "http://host/alternate/$metadata#Model.VipCustomer"
+		});
+	});
+
+	//*********************************************************************************************
+	QUnit.test("reviver via JSON.parse", function (assert) {
+		const sJSON = JSON.stringify({
+			"@context" : "http://host/service/$metadata#Customers/$entity",
+			"@type" : "#Model.VipCustomer",
+			"DynamicValue@type" : "Date",
+			"foo@control" : "bar",
+			"foreign@type" : "http://host/alternate/$metadata#Model.VipCustomer"
+		});
+
+		// code under test
+		const oResult = JSON.parse(sJSON, _Requestor.reviver);
+
+		assert.deepEqual(oResult, {
+			"@odata.context" : "http://host/service/$metadata#Customers/$entity",
+			"@odata.type" : "#Model.VipCustomer",
+			"DynamicValue@odata.type" : "#Date",
+			"foo@odata.control" : "bar",
+			"foreign@odata.type" : "http://host/alternate/$metadata#Model.VipCustomer"
+		});
 	});
 
 	//*********************************************************************************************
@@ -2152,6 +2322,7 @@ sap.ui.define([
 			oBatchResponseReceivedExpectation,
 			oCleanUpChangeSetsExpectation,
 			sGroupId = "group1",
+			oJSONMock = this.mock(JSON),
 			aPromises = [],
 			oRequestor = _Requestor.create("/Service/", oModelInterface,
 				{"Accept-Language" : "ab-CD"}),
@@ -2343,6 +2514,35 @@ sap.ui.define([
 			}), sGroupId, "~bHasChanges~")
 			.resolves(aBatchResults);
 		this.mock(oModelInterface).expects("onHttpResponse").exactly(5);
+		oRequestorMock.expects("doCheckVersionHeader")
+			.withExactArgs(sinon.match.func, "~Customers", true).returns(undefined);
+		oJSONMock.expects("parse").withExactArgs(aBatchResults[0][0].responseText, undefined)
+			.returns(aResults[1]);
+		oRequestorMock.expects("doConvertResponse").withExactArgs(aResults[1], undefined)
+			.returnsArg(0);
+		oRequestorMock.expects("reportHeaderMessages")
+			.withExactArgs("~Customers", undefined, aResults[1]);
+		oRequestorMock.expects("reportHeaderMessages")
+			.withExactArgs("~SalesOrders('42')", undefined, aResults[2]);
+		oRequestorMock.expects("doCheckVersionHeader")
+			.withExactArgs(sinon.match.func, "~Products('23')", true).returns("4.0");
+		oJSONMock.expects("parse").withExactArgs(aBatchResults[1].responseText, undefined)
+			.returns(aResults[0]);
+		oRequestorMock.expects("doConvertResponse").withExactArgs(aResults[0], "~metaPath~")
+			.returnsArg(0);
+		oRequestorMock.expects("reportHeaderMessages")
+			.withExactArgs("~sOriginalResourcePath~", undefined, aResults[0]);
+		oRequestorMock.expects("reportHeaderMessages")
+			.withExactArgs("~Products('4711')", undefined, null);
+		oRequestorMock.expects("doCheckVersionHeader")
+			.withExactArgs(sinon.match.func, "~Products('onSubmit')", true).returns("4.01");
+		oJSONMock.expects("parse")
+			.withExactArgs(aBatchResults[3].responseText, sinon.match.same(_Requestor.reviver))
+			.returns(aResults[3]);
+		oRequestorMock.expects("doConvertResponse").withExactArgs(aResults[3], undefined)
+			.returnsArg(0);
+		oRequestorMock.expects("reportHeaderMessages")
+			.withExactArgs("~Products('onSubmit')", undefined, aResults[3]);
 		oBatchResponseReceivedExpectation = oRequestorMock.expects("batchResponseReceived")
 			.withExactArgs(sGroupId, sinon.match(function (aRequests) {
 				return aRequests === aMergedRequests;
@@ -4469,8 +4669,11 @@ sap.ui.define([
 					return oFixture.mHeaders[sHeaderKey];
 				});
 
-			// code under test
-			oRequestor.doCheckVersionHeader(fnGetHeader, "Foo('42')/Bar", true);
+			assert.strictEqual(
+				// code under test
+				oRequestor.doCheckVersionHeader(fnGetHeader, "Foo('42')/Bar", true),
+				oFixture.mHeaders["OData-Version"]
+			);
 
 			assert.strictEqual(fnGetHeader.calledWithExactly("OData-Version"), true);
 			if (oFixture.iCallCount === 2) {
@@ -4479,6 +4682,25 @@ sap.ui.define([
 			assert.strictEqual(fnGetHeader.callCount, oFixture.iCallCount);
 		});
 	});
+
+	//*********************************************************************************************
+["4.0", "4.01"].forEach(function (sODataVersion) {
+	QUnit.test("doCheckVersionHeader, 4.01 vs. " + sODataVersion, function (assert) {
+		var oRequestor = _Requestor.create("/", null, {}, {}, "4.01"),
+			fnGetHeader = this.spy(function () {
+				return sODataVersion;
+			});
+
+		assert.strictEqual(
+			// code under test
+			oRequestor.doCheckVersionHeader(fnGetHeader, "Foo('42')/Bar", true),
+			sODataVersion
+		);
+
+		assert.strictEqual(fnGetHeader.calledWithExactly("OData-Version"), true);
+		assert.strictEqual(fnGetHeader.callCount, 1);
+	});
+});
 
 	//*********************************************************************************************
 	[{
@@ -4495,7 +4717,7 @@ sap.ui.define([
 		mHeaders : {DataServiceVersion : "baz"}
 	}].forEach(function (oFixture, i) {
 		QUnit.test("doCheckVersionHeader, error cases - " + i, function (assert) {
-			var oRequestor = _Requestor.create("/"),
+			var oRequestor = _Requestor.create("/", null, {}, {}, "4.0"),
 				fnGetHeader = this.spy(function (sHeaderKey) {
 					return oFixture.mHeaders[sHeaderKey];
 				});
@@ -6465,6 +6687,5 @@ sap.ui.define([
 		assert.strictEqual(oRequestor.hasOnlyPatchesWithoutSideEffects("$auto"), false);
 	});
 });
-// TODO: continue-on-error? -> flag on model
 // TODO: cancelChanges: what about existing GET requests in deferred queue (delete or not)?
 // TODO: tests for doConvertSystemQueryOptions missing. Only tested indirectly

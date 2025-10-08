@@ -170,7 +170,22 @@ sap.ui.define([
 		return this._invisibleText;
 	};
 
+	NavigationListItem.prototype._getInvisibleDescriptionLinkText = function () {
+		if (!this._invisibleDescriptionLinkText) {
+			this._invisibleDescriptionLinkText = new InvisibleText({id: this.getId() + "-invDescribedbyText",text: this._resourceBundleTnt.getText("NAVIGATION_LIST_KEYBOARD_NAVIGATION") + " " + this.getText()}).toStatic();
+		}
+		return this._invisibleDescriptionLinkText;
+	};
 
+
+	NavigationListItem.prototype.exit = function () {
+		if (this._invisibleDescriptionLinkText) {
+			this._invisibleDescriptionLinkText.destroy();
+			this._invisibleDescriptionLinkText = null;
+		}
+
+		NavigationListItemBase.prototype.exit.apply(this, arguments);
+	};
 	/**
 	 * Creates a popup list.
 	 *
@@ -526,7 +541,7 @@ sap.ui.define([
 			oLinkAriaProps.roledescription = this._resourceBundleTnt.getText("NAVIGATION_LIST_ITEM_ROLE_DESCRIPTION_MENUITEM");
 		} else {
 			if (this.getSelectable() && this.getItems().length) {
-				oLinkAriaProps.description = this._resourceBundleTnt.getText("NAVIGATION_LIST_KEYBOARD_NAVIGATION") + " " + this.getText();
+				oLinkAriaProps.describedby = this._getInvisibleDescriptionLinkText().getId();
 			}
 
 			oLinkAriaProps.role = "treeitem";

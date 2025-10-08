@@ -89,7 +89,7 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	["4.0", "2.0"].forEach(function (sODataVersion) {
+	["4.01", "4.0", "2.0"].forEach(function (sODataVersion) {
 		QUnit.test("read: success, sODataVersion=" + sODataVersion, function (assert) {
 			var oExpectedJson = {},
 				oExpectedXml = "xml",
@@ -110,10 +110,14 @@ sap.ui.define([
 					method : "GET",
 					xhrFields : {withCredentials : true}
 				}).returns(createMock(oExpectedXml));
-			if (sODataVersion === "4.0") {
+			if (sODataVersion !== "2.0") {
 				this.mock(_V4MetadataConverter.prototype).expects("convertXMLMetadata").twice()
 					.withExactArgs(sinon.match.same(oExpectedXml), sUrl, false)
-					.returns(oExpectedJson);
+					.callsFake(function () {
+						assert.strictEqual(this.odataVersion, sODataVersion,
+							"c'tor called as expected");
+						return oExpectedJson;
+					});
 				this.mock(_V2MetadataConverter.prototype).expects("convertXMLMetadata").never();
 			} else {
 				this.mock(_V2MetadataConverter.prototype).expects("convertXMLMetadata")
@@ -121,7 +125,11 @@ sap.ui.define([
 					.returns(oExpectedJson);
 				this.mock(_V4MetadataConverter.prototype).expects("convertXMLMetadata")
 					.withExactArgs(sinon.match.same(oExpectedXml), sUrl, false)
-					.returns(oExpectedJson);
+					.callsFake(function () {
+						assert.strictEqual(this.odataVersion, sODataVersion,
+							"c'tor called as expected");
+						return oExpectedJson;
+					});
 			}
 
 			// code under test

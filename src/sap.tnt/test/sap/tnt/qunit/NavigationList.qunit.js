@@ -731,9 +731,16 @@ sap.ui.define([
 
 	QUnit.test('Anchors inside NavigationListItems should have correct roles and aria-role', async function (assert) {
 		var groupItem = this.navigationList.getItems()[0];
+		const groupItem2 = this.navigationList.getItems()[1];
 
 		var groupItemAnchorElement = groupItem.getDomRef().getElementsByTagName("a")[0];
+		const groupItem2AnchorElement = groupItem2.getDomRef().getElementsByTagName("a")[0],
+			sExpectedAriaDescribedby = Library.getResourceBundleFor("sap.tnt")
+				.getText("NAVIGATION_LIST_KEYBOARD_NAVIGATION"),
+			invisibleTextId = groupItem2AnchorElement.getAttribute("aria-describedby");
+
 		assert.equal(groupItemAnchorElement.getAttribute("role"), 'treeitem', "The anchor is with correct role");
+		assert.ok(document.getElementById(invisibleTextId).innerText.indexOf(sExpectedAriaDescribedby) >= 0, "The describedby is correct");
 
 		var secondLevelItemAnchorElement = groupItem.getDomRef().getElementsByTagName("a")[1];
 		assert.equal(secondLevelItemAnchorElement.getAttribute("role"), 'treeitem', "The anchor is with correct role");

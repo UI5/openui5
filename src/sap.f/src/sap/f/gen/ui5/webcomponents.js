@@ -10,7 +10,7 @@ sap.ui.define(
     const pkg = {
       _ui5metadata: {
         name: "sap/f/gen/ui5/webcomponents",
-        version: "2.15.0-rc.3",
+        version: "2.15.0",
         dependencies: ["sap.ui.core"],
         types: [
           "sap.f.gen.ui5.webcomponents.AvatarColorScheme",

@@ -216,12 +216,12 @@ sap.ui.define([
 	//*********************************************************************************************
 	QUnit.test("unsupported OData version", function (assert) {
 		assert.throws(function () {
-			this.createModel("", {odataVersion : "foo"});
-		}, new Error("Unsupported value for parameter odataVersion: foo"));
+			this.createModel("", {odataVersion : "4.02"});
+		}, new Error("Unsupported value for parameter odataVersion: 4.02"));
 	});
 
 	//*********************************************************************************************
-	["2.0", "4.0"].forEach(function (sODataVersion) {
+	["2.0", "4.0", "4.01"].forEach(function (sODataVersion) {
 		QUnit.test("create requestors for odataVersion: " + sODataVersion, function (assert) {
 			var oMetadataRequestorCreateExpectation, oModel, oRequestorCreateExpectation;
 
@@ -1624,6 +1624,7 @@ sap.ui.define([
 	["apply", "compute", "count", "expand", "filter", "format", "id", "index", "levels", "orderby",
 		"schemaversion", "search", "select", "skip", "top"].forEach((sName) => {
 		QUnit.test("buildQueryOptions with 4.01 conflict: " + sName, function (assert) {
+			const oModel = this.createModel("", {odataVersion : "4.0"});
 			const sFunnyName = sName.replace(/./g, (sChar, i) => (i % 2 ? sChar : sChar.toUpperCase()));
 			const sUpperName = sName.toUpperCase();
 			const mParameters = Object.freeze({
@@ -1631,17 +1632,35 @@ sap.ui.define([
 				[sName] : "conflict",
 				[sUpperName] : "conflict"
 			});
-
 			[sFunnyName, sName, sUpperName].forEach((sVariant) => {
 				this.oLogMock.expects("warning")
 					.withExactArgs("[FUTURE FATAL] Custom query option " + sVariant
-						+ " will not be supported with OData 4.01, see"
+						+ " not supported with OData 4.01, see"
 						+ " https://sdk.openui5.org/topic/cda632b01c1e4a988ccecab759d19380",
 						undefined, sClassName);
 			});
 
 			// code under test
-			assert.deepEqual(ODataModel.prototype.buildQueryOptions(mParameters), mParameters);
+			assert.deepEqual(oModel.buildQueryOptions(mParameters), mParameters);
+		});
+	});
+
+	//*********************************************************************************************
+	["apply", "compute", "count", "expand", "filter", "format", "id", "index", "levels", "orderby",
+		"schemaversion", "search", "select", "skip", "top"].forEach((sName) => {
+		QUnit.test("buildQueryOptions with 4.01 error: " + sName, function (assert) {
+			const oModel = this.createModel("", {odataVersion : "4.01"});
+			const sFunnyName = sName.replace(/./g, (sChar, i) => (i % 2 ? sChar : sChar.toUpperCase()));
+			const sUpperName = sName.toUpperCase();
+			[sFunnyName, sName, sUpperName].forEach((sVariant) => {
+				assert.throws(function () {
+					// code under test
+					oModel.buildQueryOptions({[sVariant] : "error"});
+				}, new Error("Custom query option " + sVariant
+						+ " not supported with OData 4.01, see"
+						+ " https://sdk.openui5.org/topic/cda632b01c1e4a988ccecab759d19380")
+				);
+			});
 		});
 	});
 

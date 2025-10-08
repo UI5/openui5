@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<edmx:Edmx Version="4.0" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+<edmx:Edmx Version="4.01" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx" xmlns="http://docs.oasis-open.org/odata/ns/edm">
 	<edmx:DataServices>
 		<Schema Namespace="special.cases" Alias="MySchema">
 			<EntityType Name="ArtistsType">
@@ -47,7 +47,7 @@
 					<PropertyRef Name="PublicationID" />
 				</Key>
 				<Property Name="PublicationID" Type="Edm.String" Nullable="false" />
-				<Property Name="Price" Type="Edm.Decimal" Precision="13" Scale="variable" />
+				<Property Name="Price" Type="Edm.Decimal" Precision="13" Scale="floating" />
 				<Property Name="CurrencyCode" Type="Edm.String" MaxLength="5" DefaultValue="$MD"/>
 				<Property Name="Messages" Type="Collection(special.cases.Message)" />
 				<Annotation Term="com.sap.vocabularies.Common.v1.Messages" Path="Messages" />

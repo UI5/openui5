@@ -66,14 +66,16 @@ sap.ui.define([
 	 * @param {string} sServiceUrl
 	 *   URL of the service document to request the CSRF token from; also used to resolve
 	 *   relative resource paths (see {@link #request})
-	 * @param {object} oModelInterface
-	 *   An interface allowing to call back to the owning model (see {@link .create})
 	 * @param {object} [mHeaders={}]
 	 *   Map of default headers; may be overridden with request-specific headers; certain
 	 *   predefined OData V4 headers are added by default, but may be overridden
 	 * @param {object} [mQueryParams={}]
 	 *   A map of query parameters as described in
 	 *   {@link sap.ui.model.odata.v4.lib._Helper.buildQuery}; used only to request the CSRF token
+	 * @param {object} oModelInterface
+	 *   An interface allowing to call back to the owning model (see {@link .create})
+	 * @param {string} sODataVersion
+	 *   The version of the OData service. Supported values are "2.0", "4.0", and "4.01".
 	 * @param {boolean} [bWithCredentials]
 	 *   Whether the XHR should be called with <code>withCredentials</code>
 	 *
@@ -81,12 +83,14 @@ sap.ui.define([
 	 * @constructor
 	 * @private
 	 */
-	function _Requestor(sServiceUrl, oModelInterface, mHeaders, mQueryParams, bWithCredentials) {
+	function _Requestor(sServiceUrl, mHeaders, mQueryParams, oModelInterface, sODataVersion,
+			bWithCredentials) {
 		this.mBatchQueue = {};
 		this.bBatchSent = false;
 		this.mHeaders = mHeaders || {};
 		this.aLockedGroupLocks = [];
 		this.oModelInterface = oModelInterface;
+		this.sODataVersion = sODataVersion;
 		this.oOptimisticBatch = null; // optimistic batch processing off
 		this.sQueryParams = _Helper.buildQuery(mQueryParams); // Used for $batch and CSRF token only
 		this.mRunningChangeRequests = {}; // map from group ID to a SyncPromise[]
@@ -96,6 +100,14 @@ sap.ui.define([
 		this.vStatistics = mQueryParams && mQueryParams["sap-statistics"];
 		this.bWithCredentials = bWithCredentials;
 		this.processSecurityTokenHandlers(); // sets this.oSecurityTokenPromise
+
+		if (sODataVersion === "4.01") {
+			this.mPredefinedRequestHeaders = Object.freeze({
+				...this.mPredefinedRequestHeaders,
+				"OData-MaxVersion" : "4.01",
+				"OData-Version" : "4.01"
+			});
+		}
 	}
 
 	/**
@@ -123,8 +135,8 @@ sap.ui.define([
 	 */
 	_Requestor.prototype.mPredefinedRequestHeaders = Object.freeze({
 		Accept : "application/json;odata.metadata=minimal;IEEE754Compatible=true",
-		"OData-MaxVersion" : "4.0",
-		"OData-Version" : "4.0",
+		"OData-MaxVersion" : "4.0", // Note: may be "overridden" in c'tor
+		"OData-Version" : "4.0", // dito
 		"X-CSRF-Token" : "Fetch"
 	});
 
@@ -763,7 +775,7 @@ sap.ui.define([
 	};
 
 	/**
-	 * Checks whether the "OData-Version" header is set to "4.0" otherwise an error is thrown.
+	 * Checks whether the "OData-Version" header is as expected, otherwise an error is thrown.
 	 *
 	 * @param {function} fnGetHeader
 	 *   A callback function to get a header attribute for a given header name with case-insensitive
@@ -773,7 +785,8 @@ sap.ui.define([
 	 * @param {boolean} [bVersionOptional]
 	 *   Indicates whether the OData service version is optional, which is the case for responses
 	 *   contained in a response for a $batch request
-	 * @throws {Error} If the "OData-Version" header is not "4.0"
+	 * @returns {string} The response's "OData-Version" header value
+	 * @throws {Error} If the "OData-Version" header is not as expected
 	 *
 	 * @private
 	 */
@@ -787,8 +800,9 @@ sap.ui.define([
 				+ " 'DataServiceVersion' header with value '" + vDataServiceVersion
 				+ "' in response for " + this.sServiceUrl + sResourcePath);
 		}
-		if (sODataVersion === "4.0" || !sODataVersion && bVersionOptional) {
-			return;
+		if (!sODataVersion && bVersionOptional || sODataVersion === this.sODataVersion
+				|| sODataVersion === "4.0") {
+			return sODataVersion;
 		}
 		throw new Error("Expected 'OData-Version' header with value '4.0' but received value '"
 			+ sODataVersion + "' in response for " + this.sServiceUrl + sResourcePath);
@@ -1419,9 +1433,13 @@ sap.ui.define([
 					that.oModelInterface.onHttpResponse(vResponse.headers);
 					if (vResponse.responseText) {
 						try {
-							that.doCheckVersionHeader(getResponseHeader.bind(vResponse),
-								vRequest.url, true);
-							oResponse = that.doConvertResponse(JSON.parse(vResponse.responseText),
+							const sODataVersion = that.doCheckVersionHeader(
+								getResponseHeader.bind(vResponse), vRequest.url, true);
+							const fnReviver = sODataVersion === "4.01"
+								? _Requestor.reviver
+								: undefined;
+							oResponse = that.doConvertResponse(
+								JSON.parse(vResponse.responseText, fnReviver),
 								vRequest.$metaPath);
 						} catch (oErr) {
 							vRequest.$reject(oErr);
@@ -2451,8 +2469,8 @@ sap.ui.define([
 	 *   A map of query parameters as described in
 	 *   {@link sap.ui.model.odata.v4.lib._Helper.buildQuery}; used only to request the CSRF
 	 *   token
-	 * @param {string} [sODataVersion="4.0"]
-	 *   The version of the OData service. Supported values are "2.0" and "4.0".
+	 * @param {string} sODataVersion
+	 *   The version of the OData service. Supported values are "2.0", "4.0", and "4.01".
 	 * @param {boolean} [bWithCredentials]
 	 *   Whether the XHR should be called with <code>withCredentials</code>
 	 * @returns {object}
@@ -2462,14 +2480,38 @@ sap.ui.define([
 	 */
 	_Requestor.create = function (sServiceUrl, oModelInterface, mHeaders, mQueryParams,
 			sODataVersion, bWithCredentials) {
-		var oRequestor = new _Requestor(sServiceUrl, oModelInterface, mHeaders, mQueryParams,
-			bWithCredentials);
+		var oRequestor = new _Requestor(sServiceUrl, mHeaders, mQueryParams, oModelInterface,
+			sODataVersion, bWithCredentials);
 
 		if (sODataVersion === "2.0") {
 			asV2Requestor(oRequestor);
 		}
 
 		return oRequestor;
+	};
+
+	/**
+	 * A "reviver" function to be used by JSON.parse in order to transform 4.01 control information
+	 * back to 4.0 format by adding missing "odata." infixes and missing hashes for "@odata.type".
+	 *
+	 * @param {string} sProperty - The current property's name
+	 * @param {any} vPropertyValue - The current property's value
+	 * @returns {any|undefined}
+	 *   The current property's value or <code>undefined</code> in order to ignore delete it
+	 *
+	 * @private
+	 */
+	_Requestor.reviver = function (sProperty, vPropertyValue) {
+		if (sProperty.includes("@") && !sProperty.includes(".")) {
+			// control information w/o "odata."
+			if (sProperty.endsWith("@type") && !vPropertyValue.includes("#")) {
+				// "built-in primitive type value"
+				vPropertyValue = "#" + vPropertyValue;
+			}
+			this[sProperty.replace("@", "@odata.")] = vPropertyValue;
+			return undefined; // "delete this[sProperty]"
+		}
+		return vPropertyValue;
 	};
 
 	return _Requestor;

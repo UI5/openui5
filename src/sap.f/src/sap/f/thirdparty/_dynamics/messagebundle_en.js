@@ -247,7 +247,7 @@ sap.ui.define(['exports'], (function (exports) { 'use strict';
 	var TABLE_COLUMNHEADER_SELECTALL_DESCRIPTION = "Contains Select All Checkbox";
 	var TABLE_COLUMNHEADER_SELECTALL_CHECKED = "Checked";
 	var TABLE_COLUMNHEADER_SELECTALL_NOT_CHECKED = "Not Checked";
-	var TABLE_COLUMNHEADER_CLEARALL_DESCRIPTION = "Contains Clear All Button";
+	var TABLE_COLUMNHEADER_CLEARALL_DESCRIPTION = "Clear All Button";
 	var TABLE_COLUMNHEADER_CLEARALL_DISABLED = "Disabled";
 	var TABLE_ROW_POPIN = "Row Popin";
 	var TABLE_MORE = "More";

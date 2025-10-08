@@ -497,7 +497,13 @@ sap.ui.define([
 		}
 
 		if (oItem) {
-			oInputDomRef.setAttribute("aria-activedescendant", oItem.getId());
+			// First remove aria-activedescendant to interrupt JAWS reading previous item
+			oInputDomRef.removeAttribute("aria-activedescendant");
+
+			// Use setTimeout to force JAWS to stop reading and then announce the new item
+			setTimeout(function() {
+				oInputDomRef.setAttribute("aria-activedescendant", oItem.getId());
+			}, 0);
 			return;
 		}
 	};

@@ -357,6 +357,7 @@ sap.ui.define([
 
 		localTest("Precision", "8", 8);
 		localTest("Scale", "2", 2);
+		localTest("Scale", "floating", "floating");
 		localTest("Scale", "variable", "variable");
 		localTest("Unicode", "false", false);
 		localTest("Unicode", "true", undefined);
@@ -563,6 +564,8 @@ sap.ui.define([
 								<Parameter Name="p1" Type="f.Bar" Nullable="false"/>\
 								<Parameter Name="p2" Type="Collection(f.Bar)" MaxLength="10"\
 									Precision="2" Scale="variable" SRID="42"/>\
+								<Parameter Name="p3" Type="Edm.Decimal"\
+									Precision="2" Scale="floating"/>\
 								<ReturnType Type="Collection(Edm.String)" Nullable="false"\
 									MaxLength="10" Precision="2" Scale="variable" SRID="42"/>\
 							</' + sRunnable + ">\
@@ -589,6 +592,11 @@ sap.ui.define([
 							$Precision : 2,
 							$Scale : "variable",
 							$SRID : "42"
+						}, {
+							$Name : "p3",
+							$Type : "Edm.Decimal",
+							$Precision : 2,
+							$Scale : "floating"
 						}],
 						$ReturnType : {
 							$isCollection : true,
@@ -1206,6 +1214,17 @@ sap.ui.define([
 		assert.throws(function () {
 			new _V4MetadataConverter().convertXMLMetadata(oXML, sUrl);
 		}, new Error(sUrl + ": Unsupported OData version 4.01"));
+	});
+
+	//*********************************************************************************************
+	QUnit.test("4.01", function (assert) {
+		const oXML = xml(assert,
+			'<Edmx Version="4.01" xmlns="http://docs.oasis-open.org/odata/ns/edmx"/>');
+
+		assert.deepEqual(
+			// code under test
+			new _V4MetadataConverter("4.01").convertXMLMetadata(oXML, "n/a"),
+			{$Version : "4.01"});
 	});
 
 	//*********************************************************************************************

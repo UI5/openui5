@@ -8257,7 +8257,7 @@ sap.ui.define([
 
 		// Act
 		qutils.triggerKeydown(this.oInput.getDomRef(), KeyCodes.ARROW_DOWN);
-
+		this.clock.tick(10); // Allow setTimeout in updateAriaActiveDescendant to execute
 		// Assert
 		assert.strictEqual(this.oInput.getFocusDomRef().getAttribute('aria-activedescendant'), sInvisibleTextId, "Input has aria-activedescendant attribute set");
 		assert.strictEqual(aVisibleItems.length, 3, "The correct number of items is displayed");

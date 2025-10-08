@@ -1481,11 +1481,11 @@ sap.ui.define([
 						switch (oDataSource.type) {
 							case 'OData':
 								sODataVersion = oDataSource.settings && oDataSource.settings.odataVersion;
-								if (sODataVersion === "4.0") {
-									oModelConfig.type = 'sap.ui.model.odata.v4.ODataModel';
-								} else if (!sODataVersion || sODataVersion === "2.0") {
+								if (!sODataVersion || sODataVersion === "2.0") {
 									// 2.0 is the default in case no version is provided
 									oModelConfig.type = 'sap.ui.model.odata.v2.ODataModel';
+								} else if (sODataVersion.startsWith("4.")) {
+									oModelConfig.type = 'sap.ui.model.odata.v4.ODataModel';
 								} else {
 									throw new Error(
 										`${sLogComponentName}: Component Manifest: Provided OData version "${sODataVersion}" in dataSource "${oModelConfig.dataSource}" for model "${sModelName}" is unknown. ["sap.app"]["dataSources"]["${oModelConfig.dataSource}"].`
