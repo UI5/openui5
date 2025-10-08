@@ -1058,17 +1058,23 @@ sap.ui.define([
 		"hierarchy-node-descendant-count-for" : "foo"
 	}
 }].forEach(function (oFixture, i) {
-	QUnit.test("_applyAdapter: with tree annotations, " + i, function () {
+	QUnit.test("_applyAdapter: with tree annotations, " + i, function (assert) {
 		var oAdapter = {apply : function () {}},
 			oMetadata = {_getEntityTypeByPath : function () {}},
 			oBinding = {
 				getResolvedPath : function () {},
 				bHasTreeAnnotations : true,
 				oModel : {
+					createCustomParams() {},
 					oMetadata : oMetadata
 				},
 				sOperationMode : oFixture.sOperationMode,
-				mParameters : {},
+				mParameters : {
+					select : "foo",
+					custom : {
+						search : "bar"
+					}
+				},
 				oTreeProperties : oFixture.oTreeProperties
 			},
 			oEntityType = {property : []},
@@ -1085,9 +1091,23 @@ sap.ui.define([
 		this.mock(oAdapter).expects("apply").withExactArgs(sinon.match.same(oBinding));
 		this.mock(oEventProvider).expects("fnFireEvent").withExactArgs();
 		oExpectation.callsArgWith(1, oAdapter);
+		const bTreeBindingFlatIsUsed = oFixture.sModuleName === "sap/ui/model/odata/ODataTreeBindingFlat";
+		if (bTreeBindingFlatIsUsed) {
+			const oModelMock = this.mock(oBinding.oModel);
+			oModelMock.expects("createCustomParams")
+				.withExactArgs(oBinding.mParameters)
+				.returns("$select=foo&search=bar");
+			oModelMock.expects("createCustomParams")
+				.withExactArgs(oBinding.mParameters, true)
+				.returns("search=bar");
+		}
 
 		// code under test
 		ODataTreeBinding.prototype._applyAdapter.call(oBinding, oEventProvider.fnFireEvent);
+
+		assert.strictEqual(oBinding.sCustomParams, bTreeBindingFlatIsUsed ? "$select=foo&search=bar" : undefined);
+		assert.strictEqual(oBinding.sCustomParams4CountRequest, bTreeBindingFlatIsUsed ? "search=bar" : undefined);
+
 	});
 });
 
@@ -1574,7 +1594,8 @@ sap.ui.define([
 	QUnit.test("_getCountForCollection: calls _getHeaders", function () {
 		const oBinding = {
 			sCountMode: CountMode.Inline,
-			sCustomParams : "foo=bar",
+			sCustomParams: "$expand=foo&$select=foo&bar=baz",
+			sCustomParams4CountRequest: "bar=baz",
 			bHasTreeAnnotations: true,
 			oModel: {
 				read() {}
@@ -1591,17 +1612,20 @@ sap.ui.define([
 				groupId: undefined, // not relevant for this test
 				headers: "~headers",
 				success: sinon.match.func,
-				urlParameters: ["$top=0", "$inlinecount=allpages", "foo=bar"]
+				urlParameters: ["$top=0", "$inlinecount=allpages", "$expand=foo&$select=foo&bar=baz"]
 			});
 
 		// code under test
 		ODataTreeBinding.prototype._getCountForCollection.call(oBinding);
 	});
 	/** @deprecated As of version 1.120.0, reason OperationMode.Auto */
-	QUnit.test("_getCountForCollection: don't call _getHeaders for $count request", function () {
+[CountMode.Request, CountMode.Both].forEach((sCountMode) => {
+	const sTitle = "_getCountForCollection: don't call _getHeaders for $count request, count mode: " + sCountMode;
+	QUnit.test(sTitle, function () {
 		const oBinding = {
-			sCountMode: CountMode.Request,
+			sCountMode: sCountMode,
 			bHasTreeAnnotations: true,
+			sCustomParams4CountRequest: "foo=bar",
 			oModel: {
 				read() {}
 			},
@@ -1613,7 +1637,35 @@ sap.ui.define([
 			.withExactArgs("~sAbsolutePath/$count", {
 				error: sinon.match.func,
 				groupId: undefined, // not relevant for this test
-				headers: undefined,
+				headers: undefined,  // not relevant for this test
+				success: sinon.match.func,
+				urlParameters: ["foo=bar"]
+			});
+
+		// code under test
+		ODataTreeBinding.prototype._getCountForCollection.call(oBinding);
+	});
+});
+	//*********************************************************************************************
+	/** @deprecated As of version 1.120.0, reason OperationMode.Auto */
+	QUnit.test("_getCountForCollection: if custom params are empty, they are not added to separate $count request",
+			function () {
+		const oBinding = {
+			sCountMode: CountMode.Request,
+			bHasTreeAnnotations: true,
+			sCustomParams4CountRequest: "", // falsy value returned by v2.ODataModel.createCustomParams
+			oModel: {
+				read() {}
+			},
+			sOperationMode: OperationMode.Auto,
+			getResolvedPath() {}
+		};
+		this.mock(oBinding).expects("getResolvedPath").withExactArgs().returns("~sAbsolutePath");
+		this.mock(oBinding.oModel).expects("read")
+			.withExactArgs("~sAbsolutePath/$count", {
+				error: sinon.match.func,
+				groupId: undefined, // not relevant for this test
+				headers: undefined, // not relevant for this test
 				success: sinon.match.func,
 				urlParameters: []
 			});
@@ -1651,7 +1703,7 @@ sap.ui.define([
 			oModel: {
 				read() {}
 			},
-			sCustomParams: bHasCustomParams ? "foo=bar" : undefined,
+			sCustomParams4CountRequest: bHasCustomParams ? "bar=baz" : undefined,
 			getFilterParams() {}
 		};
 		this.mock(oBinding).expects("getFilterParams").withExactArgs().returns(undefined);
@@ -1661,7 +1713,7 @@ sap.ui.define([
 				groupId: undefined, // not relevant for this test
 				sorters: undefined, // not relevant for this test
 				success: sinon.match.func,
-				urlParameters: bHasCustomParams ? ["foo=bar"] : []
+				urlParameters: bHasCustomParams ? ["bar=baz"] : []
 			});
 
 		// code under test
@@ -1706,5 +1758,36 @@ sap.ui.define([
 		assert.strictEqual(oBinding.oKeys.sPath, aData);
 		assert.strictEqual(oBinding.oLengths.sPath, aData.length);
 		assert.strictEqual(oBinding.oFinalLengths.sPath, true);
+	});
+
+	//*********************************************************************************************
+	QUnit.test("_processSelectParameters: creates custom parameters for count request", function (assert) {
+			const oBinding = {
+				oModel: {
+					createCustomParams() {}
+				},
+				mParameters: {
+					expand: "foo",
+					select: "bar,baz",
+					custom: {
+						search: "bar"
+					}
+				},
+				bHasTreeAnnotations: true
+			};
+
+			const oModelMock = this.mock(oBinding.oModel);
+			oModelMock.expects("createCustomParams")
+				.withExactArgs(oBinding.mParameters)
+				.returns("~ExpandSelectCustomParams");
+			oModelMock.expects("createCustomParams")
+				.withExactArgs(oBinding.mParameters, true)
+				.returns("~OnlyCustomParams");
+
+		// code under test
+		ODataTreeBinding.prototype._processSelectParameters.call(oBinding);
+
+		assert.strictEqual(oBinding.sCustomParams, "~ExpandSelectCustomParams");
+		assert.strictEqual(oBinding.sCustomParams4CountRequest, "~OnlyCustomParams");
 	});
 });

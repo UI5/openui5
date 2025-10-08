@@ -10152,4 +10152,20 @@ sap.ui.define([
 	});
 	});
 });
+
+	//*********************************************************************************************
+[true, false].forEach((bIgnoreExpandSelect) => {
+	const sTitle = `createCustomParams: ${bIgnoreExpandSelect ? "ignores" : "does not ignore"} $expand and $select`;
+	QUnit.test(sTitle,  function (assert) {
+		// code under test
+		assert.strictEqual(ODataModel.prototype.createCustomParams.call({}, {
+				expand: "foo",
+				select: "bar",
+				custom: {
+					search: "baz"
+				}
+			}, /* bIgnoreExpandSelect */ bIgnoreExpandSelect),
+			bIgnoreExpandSelect ? "search=baz" : "$expand=foo&$select=bar&search=baz");
+	});
+});
 });
