@@ -253,6 +253,10 @@ sap.ui.define([
 			const oFlexData = Utils.getEmptyFlexDataResponse();
 			assert.notOk(Utils.isStorageResponseFilled(oFlexData), "the response is considered not filled");
 		});
+
+		QUnit.test("when isStorageResponseFilled is called without flex data", function(assert) {
+			assert.notOk(Utils.isStorageResponseFilled(), "then the response is considered not filled");
+		});
 	});
 
 	QUnit.module("Given a KeyUserConnector and PersonalizationConnector is configured", {

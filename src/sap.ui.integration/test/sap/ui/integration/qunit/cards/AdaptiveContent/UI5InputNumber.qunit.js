@@ -58,18 +58,18 @@ function (
 			//Arrange
 			this.oAdaptiveContent.placeAt(DOM_RENDER_LOCATION);
 			await nextUIUpdate();
-			var oNumberInput = document.querySelector("#WithValue ui5-step-input");
-			var oLabel = document.querySelector("#WithValue ui5-label");
-			var oNumInputWithoutValue = document.querySelector("#ValueNotSpecified ui5-step-input");
+			var oNumberInput = document.querySelector("#WithValue [ui5-step-input]");
+			var oLabel = document.querySelector("#WithValue [ui5-label]");
+			var oNumInputWithoutValue = document.querySelector("#ValueNotSpecified [ui5-step-input]");
 			var oValueStateMessage = document.querySelector("#WithValue div[slot]");
 
 
 			//Assert
-			assert.strictEqual(oNumberInput.tagName.toLowerCase(), "ui5-step-input", "ui5-step-input webcomponent is rendered");
+			assert.ok(oNumberInput.hasAttribute("ui5-step-input"), "ui5-step-input webcomponent is rendered");
 			assert.ok(oNumberInput, "The number input is created");
 			assert.strictEqual(oNumberInput.placeholder, "", "The placeholder is not specified");
 			assert.strictEqual(oNumberInput.value, 1, "The initial value is correct");
-			assert.strictEqual(oLabel.tagName.toLowerCase(), "ui5-label", "ui5-label webcomponent is rendered");
+			assert.ok(oLabel.hasAttribute("ui5-label"), "ui5-label webcomponent is rendered");
 			assert.strictEqual(oLabel.textContent, "Number", "Label text is correctly mapped");
 			assert.ok(oNumberInput.required, "required attribute is set on the ui5-select");
 			assert.strictEqual(oNumberInput.getAttribute("accessible-name-ref"), oLabel.id, "accessibleNameRef refers to the id of the label");
@@ -88,6 +88,6 @@ function (
 			oDomRef = oNumberInput.internalRender();
 
 		//Assert
-		assert.strictEqual(oDomRef.tagName.toLowerCase(), "ui5-step-input", "ui5-step-input webcomponent is rendered");
+		assert.ok(oDomRef.tagName.toLowerCase().includes("ui5-step-input"), "ui5-step-input webcomponent is rendered");
 	});
 });

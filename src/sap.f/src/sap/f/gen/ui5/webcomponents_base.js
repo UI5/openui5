@@ -53,31 +53,31 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents_base AnimationMode
      *
-     * @public
+     * @private
      */
     pkg["AnimationMode"] = {
       /**
        * Full
        *
-       * @public
+       * @private
        */
       Full: "Full",
       /**
        * Basic
        *
-       * @public
+       * @private
        */
       Basic: "Basic",
       /**
        * Minimal
        *
-       * @public
+       * @private
        */
       Minimal: "Minimal",
       /**
        * None
        *
-       * @public
+       * @private
        */
       None: "None"
     };
@@ -91,37 +91,37 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents_base CalendarType
      *
-     * @public
+     * @private
      */
     pkg["CalendarType"] = {
       /**
        * Gregorian
        *
-       * @public
+       * @private
        */
       Gregorian: "Gregorian",
       /**
        * Islamic
        *
-       * @public
+       * @private
        */
       Islamic: "Islamic",
       /**
        * Japanese
        *
-       * @public
+       * @private
        */
       Japanese: "Japanese",
       /**
        * Buddhist
        *
-       * @public
+       * @private
        */
       Buddhist: "Buddhist",
       /**
        * Persian
        *
-       * @public
+       * @private
        */
       Persian: "Persian"
     };
@@ -135,19 +135,19 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents_base ItemNavigationBehavior
      *
-     * @public
+     * @private
      */
     pkg["ItemNavigationBehavior"] = {
       /**
        * Static behavior: navigations stops at the first or last item.
        *
-       * @public
+       * @private
        */
       Static: "Static",
       /**
        * Cycling behavior: navigating past the last item continues with the first and vice versa.
        *
-       * @public
+       * @private
        */
       Cyclic: "Cyclic"
     };
@@ -164,25 +164,25 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents_base MovePlacement
      *
-     * @public
+     * @private
      */
     pkg["MovePlacement"] = {
       /**
        * On
        *
-       * @public
+       * @private
        */
       On: "On",
       /**
        * Before
        *
-       * @public
+       * @private
        */
       Before: "Before",
       /**
        * After
        *
-       * @public
+       * @private
        */
       After: "After"
     };
@@ -196,31 +196,31 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents_base NavigationMode
      *
-     * @public
+     * @private
      */
     pkg["NavigationMode"] = {
       /**
        * Auto
        *
-       * @public
+       * @private
        */
       Auto: "Auto",
       /**
        * Vertical
        *
-       * @public
+       * @private
        */
       Vertical: "Vertical",
       /**
        * Horizontal
        *
-       * @public
+       * @private
        */
       Horizontal: "Horizontal",
       /**
        * Paging
        *
-       * @public
+       * @private
        */
       Paging: "Paging"
     };
@@ -237,25 +237,25 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents_base SortOrder
      *
-     * @public
+     * @private
      */
     pkg["SortOrder"] = {
       /**
        * Sorting is not applied.
        *
-       * @public
+       * @private
        */
       None: "None",
       /**
        * Sorting is applied in ascending order.
        *
-       * @public
+       * @private
        */
       Ascending: "Ascending",
       /**
        * Sorting is applied in descending order.
        *
-       * @public
+       * @private
        */
       Descending: "Descending"
     };
@@ -269,37 +269,37 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents_base ValueState
      *
-     * @public
+     * @private
      */
     pkg["ValueState"] = {
       /**
        * None
        *
-       * @public
+       * @private
        */
       None: "None",
       /**
        * Positive
        *
-       * @public
+       * @private
        */
       Positive: "Positive",
       /**
        * Critical
        *
-       * @public
+       * @private
        */
       Critical: "Critical",
       /**
        * Negative
        *
-       * @public
+       * @private
        */
       Negative: "Negative",
       /**
        * Information
        *
-       * @public
+       * @private
        */
       Information: "Information"
     };

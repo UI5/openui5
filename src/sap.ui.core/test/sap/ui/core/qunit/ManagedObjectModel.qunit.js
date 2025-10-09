@@ -18,7 +18,7 @@ sap.ui.define([
 	"sap/ui/model/Filter",
 	"sap/ui/model/FilterOperator"
 ], function(CustomListItem, DatePicker, Input, List, Select, Text, VBox, Element, Item, Library, XMLView, ManagedObjectModel, JSONModel, BooleanType, DateType, Context, Filter, FilterOperator) {
-	/*global QUnit */
+	/*global QUnit sinon */
 	/*eslint no-warning-comments: 0 */
 	"use strict";
 
@@ -1672,5 +1672,53 @@ sap.ui.define([
 		assert.equal(150, oPropertyPageList.getItems(true).length, "After paging there are 150 items");
 
 		oPropertyPageList.destroy();
+	});
+
+	QUnit.test("Filtering against aggregation should reflect correct length", function (assert) {
+		const oBoundList = new List({
+			models: this.oMOModel,
+			items: {
+				path: "/paging",
+				template: new CustomListItem({
+					content: [
+						new Text( {text: "{text}" })
+					]
+				})
+			}
+		});
+
+		oBoundList.getBinding("items").filter(new Filter("key", FilterOperator.EQ, "10"));
+
+		assert.ok(oBoundList.getBinding("items").isA("sap.ui.model.base.ManagedObjectModelAggregationBinding"), "The binding is a ManagedObjectModelAggregationBinding");
+		assert.strictEqual(oBoundList.getBinding("items").getLength(), 1, "The length of the filtered binding is correct");
+
+		oBoundList.destroy();
+	});
+
+	QUnit.test("Filtering against aggregation should reflect correct isLengthFinal", function (assert) {
+		const oBoundList = new List({
+			models: this.oMOModel,
+			items: {
+				path: "/paging",
+				template: new CustomListItem({
+					content: [
+						new Text( {text: "{text}" })
+					]
+				})
+			}
+		});
+
+		const oInnerListBinding = oBoundList.getBinding("items")._oOriginMO.getBinding("paging");
+		const oIsLengthFinalStub = sinon.stub(oInnerListBinding, "isLengthFinal").returns(false);
+
+		assert.ok(oBoundList.getBinding("items").isA("sap.ui.model.base.ManagedObjectModelAggregationBinding"), "The binding is a ManagedObjectModelAggregationBinding");
+		assert.notOk(oBoundList.getBinding("items").isLengthFinal(), "The length of the unfiltered binding is not final");
+
+		oBoundList.getBinding("items").filter(new Filter("key", FilterOperator.EQ, "10"));
+
+		assert.ok(oBoundList.getBinding("items").isLengthFinal(), "The length of the filtered binding is final");
+
+		oIsLengthFinalStub.restore();
+		oBoundList.destroy();
 	});
 });

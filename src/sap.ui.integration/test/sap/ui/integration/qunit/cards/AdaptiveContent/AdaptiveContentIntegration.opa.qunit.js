@@ -25,7 +25,7 @@ sap.ui.define([
 			return this.waitFor({
 				controlType: "sap.ui.integration.widgets.Card",
 				matchers: function (oNode) {
-					return oNode.$().find("ui5-button");
+					return oNode.$().find("[ui5-button]");
 				},
 				success: function () {
 					Opa5.assert.ok("AdaptiveCard", "The AdaptiveCard has loaded its content");
@@ -45,8 +45,8 @@ sap.ui.define([
 						oData = oEvent.getParameter("parameters").data;
 					});
 
-					oCard.$().find("ui5-input")[0].value = "value";
-					oCard.$().find("ui5-button").eq(21).trigger("click");
+					oCard.$().find("[ui5-input]")[0].value = "value";
+					oCard.$().find("[ui5-button]").eq(21).trigger("click");
 				},
 				success: function () {
 					Opa5.assert.strictEqual(oEventType, "Submit", "The action type is Submit");
@@ -65,7 +65,7 @@ sap.ui.define([
 						oData = oEvent.getParameter("parameters");
 						oEvent.preventDefault();
 					});
-					oCard.$().find("ui5-button").eq(23).trigger("click");
+					oCard.$().find("[ui5-button]").eq(23).trigger("click");
 				},
 				success: function () {
 					Opa5.assert.strictEqual(oEventType, "Navigation", "The action type is Navigation");
@@ -86,14 +86,14 @@ sap.ui.define([
 						aRadioButtonsContainer =  $oCard.find("#SingleSelectVal .sapFCardAdaptiveContentChoiceSetWrapper"),
 						aRadioButtons = aRadioButtonsContainer.children();
 
-					Opa5.assert.strictEqual($oCard.find("#SimpleVal ui5-input").val(), oData["SimpleVal"], "The value is correct");
-					Opa5.assert.strictEqual($oCard.find("#UrlVal ui5-input").val(), oData["UrlVal"], "The value is correct");
-					Opa5.assert.strictEqual($oCard.find("#EmailVal ui5-input").val(), oData["EmailVal"], "The value is correct");
-					Opa5.assert.strictEqual($oCard.find("#TelVal ui5-input").val(), oData["TelVal"], "The value is correct");
-					Opa5.assert.strictEqual($oCard.find("#MultiLineVal ui5-textarea").val(), oData["MultiLineVal"], "The value is correct");
-					Opa5.assert.strictEqual($oCard.find("#NumVal ui5-step-input").val(), parseInt(oData["NumVal"]), "The value is correct");
-					Opa5.assert.strictEqual($oCard.find("#DateVal ui5-date-picker").val(), oData["DateVal"], "The value is correct");
-					Opa5.assert.strictEqual($oCard.find("#TimeVal ui5-time-picker").val(), oData["TimeVal"], "The value is correct");
+					Opa5.assert.strictEqual($oCard.find("#SimpleVal [ui5-input]").val(), oData["SimpleVal"], "The value is correct");
+					Opa5.assert.strictEqual($oCard.find("#UrlVal [ui5-input]").val(), oData["UrlVal"], "The value is correct");
+					Opa5.assert.strictEqual($oCard.find("#EmailVal [ui5-input]").val(), oData["EmailVal"], "The value is correct");
+					Opa5.assert.strictEqual($oCard.find("#TelVal [ui5-input]").val(), oData["TelVal"], "The value is correct");
+					Opa5.assert.strictEqual($oCard.find("#MultiLineVal [ui5-textarea]").val(), oData["MultiLineVal"], "The value is correct");
+					Opa5.assert.strictEqual($oCard.find("#NumVal [ui5-step-input]").val(), parseInt(oData["NumVal"]), "The value is correct");
+					Opa5.assert.strictEqual($oCard.find("#DateVal [ui5-date-picker]").val(), oData["DateVal"], "The value is correct");
+					Opa5.assert.strictEqual($oCard.find("#TimeVal [ui5-time-picker]").val(), oData["TimeVal"], "The value is correct");
 
 					for (var i = 0; i < aRadioButtons.length; i++) {
 						if (aRadioButtons[i].selected) {

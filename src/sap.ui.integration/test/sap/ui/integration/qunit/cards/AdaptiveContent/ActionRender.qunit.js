@@ -89,7 +89,7 @@ function (
 			assert.strictEqual(aButtons.length, 3, "Three buttons have to be rendered");
 
 			for (var i = 0; i < aButtons.length; i++) {
-				assert.strictEqual(aButtons[i].tagName.toLowerCase(), "ui5-button", "ui5-button webcomponent has to be rendered for an action button");
+				assert.ok(aButtons[i].hasAttribute("ui5-button"), "ui5-button webcomponent has to be rendered for an action button");
 			}
 
 			assert.strictEqual(oSubmitAction.getAttribute('aria-label'), 'Action.Submit', "Button for submit action");

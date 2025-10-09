@@ -12,8 +12,6 @@ sap.ui.require([
 
 	var CardDataMode = integrationLibrary.CardDataMode;
 
-	delete Document.prototype.adoptedStyleSheets;
-
 	var oCard = new Card("AdaptiveCard", {
 			manifest: "./adaptivecardvisualtests-manifest.json",
 			dataMode: CardDataMode.Active

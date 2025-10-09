@@ -65,17 +65,17 @@ function (
 			//Arrange
 			this.oAdaptiveContent.placeAt(DOM_RENDER_LOCATION);
 			await nextUIUpdate();
-			var oTimeInput = document.querySelector("#TimeVal ui5-time-picker");
-			var oLabel = document.querySelector("#TimeVal ui5-label");
-			var oTimeInputWithMinMaxValues = document.querySelector("#TimeInputWithMinMaxValues ui5-time-picker");
+			var oTimeInput = document.querySelector("#TimeVal [ui5-time-picker]");
+			var oLabel = document.querySelector("#TimeVal [ui5-label]");
+			var oTimeInputWithMinMaxValues = document.querySelector("#TimeInputWithMinMaxValues [ui5-time-picker]");
 			var oValueStateMessage = document.querySelector("#TimeVal div[slot]");
 
 			//Assert
-			assert.strictEqual(oTimeInput.tagName.toLowerCase(), "ui5-time-picker", "ui5-time-picker webcomponent is rendered");
+			assert.ok(oTimeInput.hasAttribute("ui5-time-picker"), "ui5-time-picker webcomponent is rendered");
 			assert.ok(oTimeInput, "The time input is created");
 			assert.strictEqual(oTimeInput.value, "", "There is no initial value set");
 			assert.strictEqual(oTimeInput.formatPattern, "HH:mm", "The formatPattern should be HH:mm");
-			assert.strictEqual(oLabel.tagName.toLowerCase(), "ui5-label", "ui5-label webcomponent is rendered");
+			assert.ok(oLabel.hasAttribute("ui5-label"), "ui5-label webcomponent is rendered");
 			assert.strictEqual(oLabel.textContent, "Time", "Label text is correctly mapped");
 			assert.ok(oTimeInput.required, "required attribute is set");
 			assert.strictEqual(oTimeInput.getAttribute("aria-labelledby"), oLabel.id, "aria-labelledby refers to the id of the label");
@@ -94,6 +94,6 @@ function (
 			oDomRef = oToggleInput.internalRender();
 
 		//Assert
-		assert.strictEqual(oDomRef.tagName.toLowerCase(), "ui5-time-picker", "ui5-time-picker webcomponent is rendered");
+		assert.ok(oDomRef.tagName.toLowerCase().includes("ui5-time-picker"), "ui5-time-picker webcomponent is rendered");
 	});
 });

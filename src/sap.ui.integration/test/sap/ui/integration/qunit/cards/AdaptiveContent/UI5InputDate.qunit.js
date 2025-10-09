@@ -59,19 +59,19 @@ function (
 			await nextUIUpdate();
 
 			//Arrange
-			var oDateInput = document.querySelector("#DateVal ui5-date-picker");
-			var oLabel = document.querySelector("#DateVal ui5-label");
-			var oDateInputWithPlaceholder = document.querySelector("#DateInputWithPlaceholder ui5-date-picker");
+			var oDateInput = document.querySelector("#DateVal [ui5-date-picker]");
+			var oLabel = document.querySelector("#DateVal [ui5-label]");
+			var oDateInputWithPlaceholder = document.querySelector("#DateInputWithPlaceholder [ui5-date-picker]");
 			var oValueStateMessage = document.querySelector("#DateVal div[slot]");
 
 
 			//Assert
-			assert.strictEqual(oDateInput.tagName.toLowerCase(), "ui5-date-picker", "ui5-date-picker webcomponent is rendered");
+			assert.ok(oDateInput.hasAttribute("ui5-date-picker"), "ui5-date-picker webcomponent is rendered");
 			assert.ok(oDateInput, "The date input is created");
 			assert.strictEqual(oDateInput.placeholder, undefined, "There is no placeholder");
 			assert.strictEqual(oDateInput.value, "", "The is no initial value set");
 			assert.strictEqual(oDateInput.formatPattern, "yyyy-MM-dd", "The correct date format is used");
-			assert.strictEqual(oLabel.tagName.toLowerCase(), "ui5-label", "ui5-label webcomponent is rendered");
+			assert.ok(oLabel.hasAttribute("ui5-label"), "ui5-label webcomponent is rendered");
 			assert.strictEqual(oLabel.textContent, "Date", "Label text is correctly mapped");
 			assert.ok(oDateInput.required, "required attribute is set");
 			assert.strictEqual(oDateInput.getAttribute("accessible-name-ref"), oLabel.id, "accessibleNameRef refers to the id of the label");
@@ -92,6 +92,6 @@ function (
 			oDomRef = oToggleInput.internalRender();
 
 		//Assert
-		assert.strictEqual(oDomRef.tagName.toLowerCase(), "ui5-date-picker", "ui5-date-picker webcomponent is rendered");
+		assert.ok(oDomRef.tagName.toLowerCase().includes("ui5-date-picker"), "ui5-date-picker webcomponent is rendered");
 	});
 });

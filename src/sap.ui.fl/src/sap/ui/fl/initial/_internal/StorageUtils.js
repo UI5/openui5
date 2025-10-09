@@ -370,7 +370,7 @@ sap.ui.define([
 	 * @returns {boolean} Indicated if storage response contains flex objects
 	 * @ui5-restricted sap.ui.fl
 	 */
-	StorageUtils.isStorageResponseFilled = function(oResponse) {
+	StorageUtils.isStorageResponseFilled = function(oResponse = {}) {
 		const oUI2Available = !isEmptyObject(oResponse.ui2personalization);
 		return oUI2Available || StorageUtils.getAllFlexObjectNamespaces().some(function(sKey) {
 			return ObjectPath.get(sKey, oResponse)?.length > 0;

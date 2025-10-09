@@ -66,9 +66,6 @@ sap.ui.define([
 			return;
 		}
 
-		// propagetes any inherited models from the card before move
-		BindingHelper.propagateModels(oHeader, oHeader);
-
 		oDialog.setCustomHeader(oHeader);
 		oChildCard.setAssociation("dialogHeader", oHeader);
 
@@ -133,8 +130,11 @@ sap.ui.define([
 		oParentCard.addDependent(oDialog);
 
 		oChildCard.attachEvent("_ready", () => {
-			_setDialogHeader(oDialog, oChildCard);
+			oDialog.bindObject(oChildCard.getBindingContext()?.getPath() ?? "/");
+			BindingHelper.propagateModels(oChildCard, oDialog);
+
 			_setAriaAttributes(oDialog, oChildCard);
+			_setDialogHeader(oDialog, oChildCard);
 
 			if (!oChildCard._isComponentCard()) {
 				oDialog.open();

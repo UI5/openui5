@@ -36,7 +36,7 @@ sap.ui.define([
 	UI5InputText.prototype.internalRender = function () {
 		//when this.isMultiline is true, we have to render an ui5-textarea instead of ui5-input
 		if (this.isMultiline) {
-			var oTextArea = document.createElement("ui5-textarea");
+			var oTextArea = document.createElement("ui5-textarea-ac");
 			oTextArea.id = this.id;
 			oTextArea.placeholder = this.placeholder || "";
 			oTextArea.value = this.defaultValue || "";
@@ -49,7 +49,7 @@ sap.ui.define([
 			}.bind(this));
 			return oTextArea;
 		}
-		var oInput = document.createElement("ui5-input");
+		var oInput = document.createElement("ui5-input-ac");
 		switch (this.style) {
 			case 1:
 				oInput.type = "Tel";
@@ -82,7 +82,7 @@ sap.ui.define([
 
 	UI5InputText.prototype.showValidationErrorMessage = function () {
 		if (this.renderedInputControlElement) {
-			this.renderedInputControlElement.valueState = "Error";
+			this.renderedInputControlElement.valueState = "Negative";
 		}
 	};
 

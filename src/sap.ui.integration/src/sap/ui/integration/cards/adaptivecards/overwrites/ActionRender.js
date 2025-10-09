@@ -10,7 +10,7 @@ sap.ui.define(["sap/ui/integration/thirdparty/adaptivecards"], function (Adaptiv
 		}
 		// Cache hostConfig for perf
 		var hostConfig = this.parent.hostConfig;
-		var buttonElement = document.createElement("ui5-button");
+		var buttonElement = document.createElement("ui5-button-ac");
 		this.addCssClasses(buttonElement);
 		buttonElement.setAttribute("aria-label", this.title);
 		buttonElement.type = "button";

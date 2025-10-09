@@ -6,7 +6,6 @@ sap.ui.define([
 	"sap/ui/mdc/table/GridTableType",
 	"sap/ui/mdc/table/TreeTableType",
 	"sap/ui/mdc/table/ResponsiveTableType",
-	"sap/ui/mdc/table/ResponsiveColumnSettings",
 	"sap/ui/mdc/table/Column",
 	"sap/ui/mdc/enums/TableMultiSelectMode",
 	"sap/ui/mdc/enums/TableSelectionMode",
@@ -14,6 +13,7 @@ sap.ui.define([
 	"sap/ui/mdc/enums/ConditionValidated",
 	"sap/ui/mdc/enums/OperatorName",
 	"sap/ui/mdc/util/FilterUtil",
+	"sap/ui/mdc/p13n/StateUtil",
 	"sap/m/Text",
 	"sap/m/plugins/PluginBase",
 	"sap/ui/test/utils/nextUIUpdate",
@@ -31,7 +31,6 @@ sap.ui.define([
 	GridTableType,
 	TreeTableType,
 	ResponsiveTableType,
-	ResponsiveColumnSettings,
 	Column,
 	MultiSelectMode,
 	SelectionMode,
@@ -39,6 +38,7 @@ sap.ui.define([
 	ConditionValidated,
 	OperatorName,
 	FilterUtil,
+	StateUtil,
 	Text,
 	PluginBase,
 	nextUIUpdate,
@@ -104,10 +104,6 @@ sap.ui.define([
 						propertyKey: "Name",
 						header: new Text({
 							text: "Column A"
-						}),
-						hAlign: "Begin",
-						extendedSettings: new ResponsiveColumnSettings({
-							importance: "High"
 						}),
 						template: new Text({
 							text: "Column A"
@@ -613,5 +609,65 @@ sap.ui.define([
 			await nextBindingChange();
 			testSelection();
 		}
+	});
+
+	QUnit.module("Rebind with invalid state", {
+		afterEach: function() {
+			this.oTable?.destroy();
+		},
+		createTable: function(mSettings) {
+			this.oTable = new Table({
+				autoBindOnInit: false,
+				delegate: {
+					name: "sap/ui/mdc/TableDelegate",
+					payload: {
+						collectionPath: "/foo",
+						propertyInfo: [{
+							name: "Name",
+							path: "Name_Path",
+							label: "Name_Label",
+							dataType: "String"
+						}]
+					}
+				},
+				sortConditions: {
+					sorters: [{name: "DoesNotExist"}]
+				},
+				filterConditions: {
+					DoesNotExist: [{operator: "EQ", values: [30]}]
+				},
+				groupConditions: {
+					groupLevels: [{name: "DoesNotExist"}]
+				},
+				aggregateConditions: {
+					DoesNotExist: {}
+				},
+				columns: [
+					new Column({
+						propertyKey: "Name",
+						header: new Text({
+							text: "Column A"
+						}),
+						template: new Text({
+							text: "Column A"
+						})
+					})
+				],
+				models: new JSONModel(),
+				...mSettings
+			});
+		}
+	});
+
+	Object.values(TableType).forEach((sTableType) => {
+		QUnit.test(sTableType, async function(assert) {
+			this.createTable({
+				type: sTableType
+			});
+			await this.oTable.rebind();
+
+			assert.ok(true, "Rebind did not fail");
+			assert.ok(this.oTable.getRowBinding(), "Table has a row binding");
+		});
 	});
 });

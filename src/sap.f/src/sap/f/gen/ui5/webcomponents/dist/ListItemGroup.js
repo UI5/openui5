@@ -22,7 +22,7 @@ sap.ui.define(
      *
      * @extends sap.ui.core.webc.WebComponent
      * @constructor
-     * @public
+     * @private
      * @alias module:sap/f/gen/ui5/webcomponents/dist/ListItemGroup
      */
 

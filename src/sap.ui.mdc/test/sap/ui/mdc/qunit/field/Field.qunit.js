@@ -18,6 +18,7 @@ sap.ui.define([
 	"sap/ui/mdc/enums/OperatorName",
 	"sap/ui/mdc/field/ConditionsType",
 	"sap/ui/mdc/field/FieldInput",
+	"sap/ui/mdc/ValueHelp",
 	// make sure delegate is loaded (test delegate loading in FieldBase test)
 	"delegates/odata/v4/FieldBaseDelegate",
 	"sap/m/Label",
@@ -63,6 +64,7 @@ sap.ui.define([
 	OperatorName,
 	ConditionsType,
 	FieldInput,
+	ValueHelp,
 	FieldBaseDelegate,
 	Label,
 	Input,
@@ -1449,6 +1451,70 @@ sap.ui.define([
 
 				aMessages = Messaging.getMessageModel().getObject("/");
 				assert.equal(aMessages?.length, 0, "No Message in MessageModel");
+				fnDone();
+			}, 0);
+		}, 0);
+
+	});
+
+	QUnit.test("ValidationError & ValidationSuccess handling with ValueHelp", (assert) => {
+
+		oField.focus(); // to have the focus initially somewhere else than on tested control
+		const oValueHelp = new ValueHelp("F1-H", {validateInput: false});
+		oField3.setValueHelp(oValueHelp);
+		Messaging.registerObject(oField3, true); // to test valueState
+
+		const aContent = oField3.getAggregation("_content");
+		const oContent = aContent?.length > 0 && aContent[0];
+		oContent.focus();
+		jQuery(oContent.getFocusDomRef()).val("A1");
+		qutils.triggerKeydown(oContent.getFocusDomRef().id, KeyCodes.ENTER, false, false, false);
+		assert.equal(iValidationError, 1, "ValidationError fired"); // details tested in above test
+
+		// select previous value again
+		const oCondition = Condition.createItemCondition("A", "Text A");
+		oValueHelp.fireSelect({ conditions: [oCondition] });
+
+		assert.equal(iValidationSuccess, 1, "ValidationSuccess fired");
+		assert.equal(oValidationSuccessParameters?.element, oField3, "ValidationSuccess fired for Field");
+		assert.equal(oValidationSuccessParameters?.property, "value", "ValidationSuccess 'property'");
+		assert.equal(oValidationSuccessParameters?.type, oType3, "ValidationSuccess 'type'");
+
+		const fnDone = assert.async();
+		setTimeout(() => { // to wait for valueStateMessage
+			assert.equal(oField3.getValueState(), ValueState.None, "Field: ValueState");
+			assert.equal(oField3.getValueStateText(), "", "Field: ValueStateText");
+			assert.equal(oContent.getValueState(), ValueState.None, "Content: ValueState");
+			assert.equal(oContent.getValueStateText(), "", "Content: ValueStateText");
+
+			let aMessages = Messaging.getMessageModel().getObject("/");
+			assert.equal(aMessages?.length, 0, "No Message in MessageModel");
+
+			jQuery(oContent.getFocusDomRef()).val("A1");
+			qutils.triggerKeydown(oContent.getFocusDomRef().id, KeyCodes.ENTER, false, false, false);
+			assert.equal(iValidationError, 1, "ValidationError fired"); // details tested in above test
+			iValidationSuccess = 0;
+			oValidationSuccessParameters = null;
+
+			// select previous value again, but with different additionalValue
+			const oCondition = Condition.createItemCondition("A", "AAA");
+			oValueHelp.fireSelect({ conditions: [oCondition] });
+
+			assert.equal(iValidationSuccess, 1, "ValidationSuccess fired");
+			assert.equal(oValidationSuccessParameters?.element, oField3, "ValidationSuccess fired for Field");
+			assert.equal(oValidationSuccessParameters?.property, "value", "ValidationSuccess 'property'");
+			assert.equal(oValidationSuccessParameters?.type, oType3, "ValidationSuccess 'type'");
+
+			setTimeout(() => { // to wait for valueStateMessage
+				assert.equal(oField3.getValueState(), ValueState.None, "Field: ValueState");
+				assert.equal(oField3.getValueStateText(), "", "Field: ValueStateText");
+				assert.equal(oContent.getValueState(), ValueState.None, "Content: ValueState");
+				assert.equal(oContent.getValueStateText(), "", "Content: ValueStateText");
+
+				aMessages = Messaging.getMessageModel().getObject("/");
+				assert.equal(aMessages?.length, 0, "No Message in MessageModel");
+				oValueHelp.destroy();
+
 				fnDone();
 			}, 0);
 		}, 0);

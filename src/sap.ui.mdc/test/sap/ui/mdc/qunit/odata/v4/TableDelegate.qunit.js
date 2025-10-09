@@ -3140,4 +3140,67 @@ sap.ui.define([
 		});
 		assert.deepEqual(this.oTable.getSelectedContexts().map((oContext) => oContext.getPath()), [], "Selected contexts");
 	});
+
+	QUnit.module("Rebind with invalid state", {
+		afterEach: function() {
+			this.oTable?.destroy();
+		},
+		createTable: function(mSettings) {
+			this.oTable = new Table({
+				autoBindOnInit: false,
+				delegate: {
+					name: "odata.v4.TestDelegate",
+					payload: {
+						collectionPath: "/Products",
+						propertyInfo: [{
+							name: "Name",
+							path: "Name_Path",
+							label: "Name_Label",
+							dataType: "String"
+						}]
+					}
+				},
+				sortConditions: {
+					sorters: [{name: "DoesNotExist"}]
+				},
+				filterConditions: {
+					DoesNotExist: [{operator: "EQ", values: [30]}]
+				},
+				groupConditions: {
+					groupLevels: [{name: "DoesNotExist"}]
+				},
+				aggregateConditions: {
+					DoesNotExist: {}
+				},
+				columns: [
+					new Column({
+						propertyKey: "Name",
+						header: new Text({
+							text: "Column A"
+						}),
+						template: new Text({
+							text: "Column A"
+						})
+					})
+				],
+				models: new ODataModel({
+					serviceUrl: "serviceUrl/",
+					operationMode: "Server"
+				}),
+				...mSettings
+			});
+		}
+	});
+
+	Object.values(TableType).forEach((sTableType) => {
+		QUnit.test(sTableType, async function(assert) {
+			this.createTable({
+				type: sTableType
+			});
+			await this.oTable.rebind();
+
+			assert.ok(true, "Rebind did not fail");
+			assert.ok(this.oTable.getRowBinding(), "Table has a row binding");
+		});
+	});
 });

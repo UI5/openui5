@@ -30,7 +30,7 @@ sap.ui.define([
 		};
 
 		UI5InputTime.prototype.internalRender = function () {
-			var sWCElement = "ui5-time-picker";
+			var sWCElement = "ui5-time-picker-ac";
 			this._timeInputElement = document.createElement(sWCElement);
 			this._timeInputElement.id = this.id;
 			this._timeInputElement.value = this.defaultValue || "";
@@ -52,7 +52,7 @@ sap.ui.define([
 
 		UI5InputTime.prototype.showValidationErrorMessage = function () {
 			if (this.renderedInputControlElement) {
-				this.renderedInputControlElement.valueState = "Error";
+				this.renderedInputControlElement.valueState = "Negative";
 			}
 		};
 

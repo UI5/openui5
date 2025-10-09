@@ -53,7 +53,7 @@ sap.ui.define([
 	 * @public
 	 */
 
-	 /*
+	/*
 	 * restricted for sap.fe (there's no way to make a property of a type private, therefore it's defined outside of the typedef)
 	 * TODO: Rename to "contextDefiningProperties" before making it public.
 	 * property {string[]} [extension.additionalProperties]
@@ -836,6 +836,10 @@ sap.ui.define([
 
 		for (const sPropertyKey of aVisiblePropertyKeys) {
 			const oProperty = oPropertyHelper.getProperty(sPropertyKey);
+
+			if (!oProperty) {
+				continue;
+			}
 
 			if (oProperty.extension.technicallyGroupable) {
 				addGroupablePropertyTo$$Aggregation(mAggregation, oTable, oProperty);

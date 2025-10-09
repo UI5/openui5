@@ -719,6 +719,44 @@
 					}
 				}
 			}
+		},
+		"header_binding": {
+			"_version": "1.78.0",
+			"sap.app": {
+				"id": "artic.product.card",
+				"type": "card",
+				"title": "Art Institute Product Card",
+				"applicationVersion": {
+					"version": "1.0.0"
+				}
+			},
+			"sap.ui": {
+				"technology": "UI5",
+				"deviceTypes": {
+					"desktop": true,
+					"tablet": true,
+					"phone": true
+				}
+			},
+			"sap.card": {
+				"type": "Object",
+				"configuration": {
+					"editor": "./dt/Configuration"
+				},
+				"data": {
+					"request": {
+						"url": "https://api.artic.edu/api/v1/products/291542"
+					},
+					"path": "/data"
+				},
+				"header": {
+					"title": "{title}",
+					"subtitle": "Card header inherits binding path",
+					"icon": {
+						"src": "{image_url}"
+					}
+				}
+			}
 		}
 	},
 	"splitter": {

@@ -58,7 +58,7 @@ sap.ui.define([
 			return;
 		}
 
-		var oLabel = document.createElement("ui5-label");
+		var oLabel = document.createElement("ui5-label-ac");
 
 		oLabel.id = oAdaptiveCardElement._renderedLabelElement.id;
 		oLabel.innerText = oAdaptiveCardElement.label;

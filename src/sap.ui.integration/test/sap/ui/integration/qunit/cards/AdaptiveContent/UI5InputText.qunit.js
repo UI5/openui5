@@ -81,18 +81,18 @@ function (
 			//Arrange
 			this.oAdaptiveContent.placeAt(DOM_RENDER_LOCATION);
 			await nextUIUpdate();
-			var oTextInput = document.querySelector("#TextInput ui5-input");
-			var oLabel = document.querySelector("#TextInput ui5-label");
+			var oTextInput = document.querySelector("#TextInput [ui5-input]");
+			var oLabel = document.querySelector("#TextInput [ui5-label]");
 			var oValueStateMessage = document.querySelector("#TextInput div[slot]");
 
 			//Assert
-			assert.strictEqual(oTextInput.tagName.toLowerCase(), "ui5-input", "ui5-input webcomponent is rendered");
+			assert.ok(oTextInput.hasAttribute("ui5-input"), "ui5-input webcomponent is rendered");
 			assert.ok(oTextInput, "The text input is created");
 			assert.strictEqual(oTextInput.placeholder, "", "The placeholder is not specified");
 			assert.strictEqual(oTextInput.type, "Text", "The input type is text");
 			assert.strictEqual(oTextInput.maxlength, 40, "The maximum length is set.");
 			assert.strictEqual(oTextInput.value, "Some text", "The initial value is correct");
-			assert.strictEqual(oLabel.tagName.toLowerCase(), "ui5-label", "ui5-label webcomponent is rendered");
+			assert.ok(oLabel.hasAttribute("ui5-label"), "ui5-label webcomponent is rendered");
 			assert.strictEqual(oLabel.textContent, "Text", "Label text is correctly mapped");
 			assert.ok(oTextInput.required, "required attribute is set");
 			assert.strictEqual(oTextInput.getAttribute("accessible-name-ref"), oLabel.id, "accessibleNameRef refers to the id of the label");
@@ -114,10 +114,10 @@ function (
 			//Arrange
 			this.oAdaptiveContent.placeAt(DOM_RENDER_LOCATION);
 			await nextUIUpdate();
-			var oTextArea = document.querySelector("#TextArea ui5-textarea");
+			var oTextArea = document.querySelector("#TextArea [ui5-textarea]");
 
 			//Assert
-			assert.strictEqual(oTextArea.tagName.toLowerCase(), "ui5-textarea", "ui5-textarea webcomponent is rendered");
+			assert.ok(oTextArea.hasAttribute("ui5-textarea"), "ui5-textarea webcomponent is rendered");
 			assert.ok(oTextArea, "The text input is created");
 			assert.strictEqual(oTextArea.placeholder, "Comments", "The placeholder is mapped correctly");
 			assert.notOk(oTextArea.maxlength, "The maximum length is  not specified.");
@@ -138,10 +138,10 @@ function (
 			//Arrange
 			this.oAdaptiveContent.placeAt(DOM_RENDER_LOCATION);
 			await nextUIUpdate();
-			var oTelInput = document.querySelector("#TelVal ui5-input");
+			var oTelInput = document.querySelector("#TelVal [ui5-input]");
 
 			//Assert
-			assert.strictEqual(oTelInput.tagName.toLowerCase(), "ui5-input", "ui5-input webcomponent is rendered");
+			assert.ok(oTelInput.hasAttribute("ui5-input"), "ui5-input webcomponent is rendered");
 			assert.ok(oTelInput, "The text input is created");
 			assert.strictEqual(oTelInput.placeholder, "Phone", "The placeholder is mapped correctly");
 			assert.strictEqual(oTelInput.value, "123456789", "The initial value is correct");
@@ -161,10 +161,10 @@ function (
 			//Arrange
 			this.oAdaptiveContent.placeAt(DOM_RENDER_LOCATION);
 			await nextUIUpdate();
-			var oUrlInput = document.querySelector("#UrlVal ui5-input");
+			var oUrlInput = document.querySelector("#UrlVal [ui5-input]");
 
 			//Assert
-			assert.strictEqual(oUrlInput.tagName.toLowerCase(), "ui5-input", "ui5-input webcomponent is rendered");
+			assert.ok(oUrlInput.hasAttribute("ui5-input"), "ui5-input webcomponent is rendered");
 			assert.ok(oUrlInput, "The text input is created");
 			assert.strictEqual(oUrlInput.placeholder, "Homepage", "The placeholder is mapped correctly");
 			assert.strictEqual(oUrlInput.value, "https://www.google.com", "The initial value is correct");
@@ -184,10 +184,10 @@ function (
 			//Arrange
 			this.oAdaptiveContent.placeAt(DOM_RENDER_LOCATION);
 			await nextUIUpdate();
-			var oUrlInput = document.querySelector("#EmailVal ui5-input");
+			var oUrlInput = document.querySelector("#EmailVal [ui5-input]");
 
 			//Assert
-			assert.strictEqual(oUrlInput.tagName.toLowerCase(), "ui5-input", "ui5-input webcomponent is rendered");
+			assert.ok(oUrlInput.hasAttribute("ui5-input"), "ui5-input webcomponent is rendered");
 			assert.ok(oUrlInput, "The text input is created");
 			assert.strictEqual(oUrlInput.placeholder, "Email", "The placeholder is mapped correctly");
 			assert.strictEqual(oUrlInput.value, "123@gmail.com", "The initial value is correct");
@@ -203,6 +203,6 @@ function (
 			oDomRef = oTextInput.internalRender();
 
 		//Assert
-		assert.strictEqual(oDomRef.tagName.toLowerCase(), "ui5-input", "ui5-input webcomponent is rendered");
+		assert.ok(oDomRef.tagName.toLowerCase().includes("ui5-input"), "ui5-input webcomponent is rendered");
 	});
 });

@@ -3135,6 +3135,9 @@ sap.ui.define([
 
 			if (!bError) {
 				this.setProperty("conditions", aConditions, true); // do not invalidate whole field
+				if (this.shouldFireValidationSuccessOnConditionUpdate(aConditions)) {
+					_fireValidationSuccessForContent.call(this, oContent);
+				}
 			}
 
 			if (!FilterOperatorUtil.compareConditionsArray(aConditions, aConditionsOld)) { // update only if real change
@@ -3143,26 +3146,8 @@ sap.ui.define([
 				_triggerChange.call(this, aConditions, true);
 			}
 		} else if (bChangeAfterError) { // last valid value choosen again
+			_fireValidationSuccessForContent.call(this, oContent);
 			_triggerChange.call(this, aConditions, true);
-
-			if (oContent) { // fire validation success on content directly, as triggered only after ENTER or Focusout. (As we don't know the internal content behaviour we cannot just fake ENTER or Focusout)
-				for (const sProperty in oContent.getMetadata().getAllProperties()) {
-					if (oContent.getBindingPath(sProperty) === "/conditions") {
-						const oBinding = oContent.getBinding(sProperty);
-						const oType = oBinding?.getType();
-						if (oType instanceof ConditionsType) {
-							oContent.fireValidationSuccess({
-									element: oContent,
-									property: sProperty,
-									type: oType,
-									newValue: oContent.getDOMValue?.(),
-									oldValue: oContent.getProperty(sProperty)
-								}, false, true); // bAllowPreventDefault, bEnableEventBubbling
-							break;
-						}
-					}
-				}
-			}
 		}
 	}
 
@@ -4081,6 +4066,46 @@ sap.ui.define([
 		return oParameter;
 
 	};
+
+	/**
+	 * Checks if a condition update needs to fire a <code>ValidationSuccess</code> event.
+	 *
+	 * This is required in {@link sap.ui.mdc.field.Field Field} if the condition update doesn't lead to an update of the
+	 * {@link sap.ui.mdc.field.Field#setValue value} property. (If only description or payload is changed.)
+	 *
+	 * @param {sap.ui.mdc.condition.ConditionObject[]} aConditions Current conditions
+	 * @returns {boolean} <code>true</code> if the <code>ValidationSuccess</code> event is fired
+	 * @protected
+	 * @since 1.142.0
+	 */
+	FieldBase.prototype.shouldFireValidationSuccessOnConditionUpdate = function (aConditions) {
+
+		return false;
+
+	};
+
+	function _fireValidationSuccessForContent(oContent) {
+
+			if (oContent) { // fire validation success on content directly, as triggered only after ENTER or Focusout. (As we don't know the internal content behaviour we cannot just fake ENTER or Focusout)
+				for (const sProperty in oContent.getMetadata().getAllProperties()) {
+					if (oContent.getBindingPath(sProperty) === "/conditions") {
+						const oBinding = oContent.getBinding(sProperty);
+						const oType = oBinding?.getType();
+						if (oType instanceof ConditionsType) {
+							oContent.fireValidationSuccess({
+									element: oContent,
+									property: sProperty,
+									type: oType,
+									newValue: oContent.getDOMValue?.(),
+									oldValue: oContent.getProperty(sProperty)
+								}, false, true); // bAllowPreventDefault, bEnableEventBubbling
+							break;
+						}
+					}
+				}
+			}
+
+	}
 
 	/**
 	 * Sets the ValueState for content controls

@@ -124,26 +124,26 @@ function (
 			//Arrange
 			this.oAdaptiveContent.placeAt(DOM_RENDER_LOCATION);
 			await nextUIUpdate();
-			var oSelect = document.querySelector("#CompactSelectValWithValue ui5-select"),
-				oLabel = document.querySelector("#CompactSelectValWithValue ui5-label"),
+			var oSelect = document.querySelector("#CompactSelectValWithValue [ui5-select]"),
+				oLabel = document.querySelector("#CompactSelectValWithValue [ui5-label]"),
 				aOptions = oSelect.children,
 				oSelectedOption = aOptions[0],
 				iCount = oSelect.childElementCount;
 
 			//Assert
-			assert.strictEqual(oSelect.tagName.toLowerCase(), "ui5-select", "ui5-select webcomponent is rendered");
+			assert.ok(oSelect.hasAttribute("ui5-select"), "ui5-select webcomponent is rendered");
 			assert.strictEqual(iCount, 3, "There are three choices");
 			assert.ok(oSelectedOption.selected, "The correct option is selected");
 			assert.strictEqual(oSelectedOption.innerHTML, "Red", "The choice title is mapped correctly");
 			assert.strictEqual(oSelectedOption.value, "1", "The choice value is mapped correctly");
-			assert.strictEqual(oLabel.tagName.toLowerCase(), "ui5-label", "ui5-label webcomponent is rendered");
+			assert.ok(oLabel.hasAttribute("ui5-label"), "ui5-label webcomponent is rendered");
 			assert.strictEqual(oLabel.textContent, "Select", "Label text is correctly mapped");
 			assert.ok(oSelect.required, "required attribute is set on the ui5-select");
 			assert.strictEqual(oSelect.getAttribute("accessible-name-ref"), oLabel.id, "accessibleNameRef refers to the id of the label");
 
 			for (var i = 0; i < aOptions.length; i++) {
 				var oOption = aOptions[i];
-				assert.strictEqual(oOption.tagName.toLowerCase(), "ui5-option", "ui5-option web component is used for the choices");
+				assert.ok(oOption.hasAttribute("ui5-option"), "ui5-option web component is used for the choices");
 			}
 
 			done();
@@ -161,7 +161,7 @@ function (
 			this.oAdaptiveContent.placeAt(DOM_RENDER_LOCATION);
 			await nextUIUpdate();
 			var oRBContainer = document.querySelector("#SingleSelectVal .sapFCardAdaptiveContentChoiceSetWrapper"),
-				oLabel = document.querySelector("#SingleSelectVal ui5-label"),
+				oLabel = document.querySelector("#SingleSelectVal [ui5-label]"),
 				aRadioButtons = oRBContainer.children,
 				aToggleInputs = this.oAdaptiveContent.adaptiveCardInstance._items[3]._toggleInputs,
 				oSelectedRB = aRadioButtons[1];
@@ -172,7 +172,7 @@ function (
 			assert.strictEqual(oSelectedRB.text, "Green", "The choice title is mapped correctly");
 			assert.strictEqual(oSelectedRB.value, "2", "The choice value is mapped correctly");
 			assert.ok(aToggleInputs.length === aRadioButtons.length, "The options are correctly mapped");
-			assert.strictEqual(oLabel.tagName.toLowerCase(), "ui5-label", "ui5-label webcomponent is rendered");
+			assert.ok(oLabel.hasAttribute("ui5-label"), "ui5-label webcomponent is rendered");
 			assert.strictEqual(oLabel.textContent, "Radiobuttons", "Label text is correctly mapped");
 			assert.ok(oRBContainer.getAttribute("aria-required"), "aria-required attribute is set on the wrapper");
 			assert.ok(oRBContainer.getAttribute("role"), "radiogroup", "role is set on the wrapper");
@@ -181,7 +181,7 @@ function (
 
 			for (var i = 0; i < aRadioButtons.length; i++) {
 				var oRB = aRadioButtons[i];
-				assert.strictEqual(oRB.tagName.toLowerCase(), "ui5-radio-button", "the container contains only ui5-radio-button web components");
+				assert.ok(oRB.hasAttribute("ui5-radio-button"), "the container contains only ui5-radio-button web components");
 				assert.strictEqual(oRB.wrappingType, "Normal", "The long text should wrap at some point");
 			}
 
@@ -200,7 +200,7 @@ function (
 			this.oAdaptiveContent.placeAt(DOM_RENDER_LOCATION);
 			await nextUIUpdate();
 			var oCBContainer = document.querySelector("#MultiSelectVal .sapFCardAdaptiveContentChoiceSetWrapper"),
-				oLabel = document.querySelector("#MultiSelectVal ui5-label"),
+				oLabel = document.querySelector("#MultiSelectVal [ui5-label]"),
 				aCheckBoxs = oCBContainer.children,
 				aToggleInputs = this.oAdaptiveContent.adaptiveCardInstance._items[5]._toggleInputs,
 				oFirstCheckedCB = aCheckBoxs[0],
@@ -215,7 +215,7 @@ function (
 			assert.strictEqual(oFirstCheckedCB.value, "1", "The choice value is mapped correctly");
 			assert.strictEqual(oSecondCheckedCB.text, "Blue", "The choice title is mapped correctly");
 			assert.strictEqual(oSecondCheckedCB.value, "3", "The choice value is mapped correctly");
-			assert.strictEqual(oLabel.tagName.toLowerCase(), "ui5-label", "ui5-label webcomponent is rendered");
+			assert.ok(oLabel.hasAttribute("ui5-label"), "ui5-label webcomponent is rendered");
 			assert.strictEqual(oLabel.textContent, "Checkboxes", "Label text is correctly mapped");
 			assert.ok(oCBContainer.getAttribute("aria-describedby"), "aria-describedby attribute is set on the wrapper");
 			assert.ok(oCBContainer.getAttribute("role"), "group", "role is set on the wrapper");
@@ -223,7 +223,7 @@ function (
 
 			for (var i = 0; i < aCheckBoxs.length; i++) {
 				var oCB = aCheckBoxs[i];
-				assert.strictEqual(oCB.tagName.toLowerCase(), "ui5-checkbox", "the container contains only ui5-checkbox web components");
+				assert.ok(oCB.hasAttribute("ui5-checkbox"), "the container contains only ui5-checkbox web components");
 				assert.strictEqual(oCB.wrappingType, "Normal", "The long text should wrap at some point");
 			}
 
@@ -237,6 +237,6 @@ function (
 			oDomRef = oChoiceSet.internalRender();
 
 		//Assert
-		assert.strictEqual(oDomRef.tagName.toLowerCase(), "ui5-select", "container is rendered");
+		assert.ok(oDomRef.tagName.toLowerCase().includes("ui5-select"), "container is rendered");
 	});
 });
