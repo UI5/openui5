@@ -27,6 +27,7 @@ sap.ui.define([
 	"sap/m/IllustratedMessageType",
 	"sap/ui/core/Control",
 	"sap/ui/core/library",
+	"sap/ui/core/Theming",
 	"sap/m/library",
 	"sap/ui/mdc/odata/TypeMap",
 	"test-resources/sap/m/qunit/p13n/TestModificationHandler",
@@ -86,6 +87,7 @@ sap.ui.define([
 	IllustratedMessageType,
 	Control,
 	CoreLibrary,
+	Theming,
 	MLibrary,
 	ODataTypeMap,
 	TestModificationHandler,
@@ -125,6 +127,8 @@ sap.ui.define([
 	const HasPopup = CoreLibrary.aria.HasPopup;
 	const aTestedTypes = ["Table", "ResponsiveTable"];
 	const sDelegatePath = "test-resources/sap/ui/mdc/delegates/TableDelegate";
+	const ButtonType = MLibrary.ButtonType;
+	const ToolbarDesign = MLibrary.ToolbarDesign;
 
 	const CustomFilterControl = Control.extend("sap.ui.mdc.table.qunit.CustomFilterControl", {
 		metadata: {
@@ -4191,50 +4195,6 @@ sap.ui.define([
 		}.bind(this));
 	});
 
-	QUnit.test("Export Button ButtonType for different Themes", function (assert) {
-		const iTimeout = QUnit.config.testTimeout;
-		QUnit.config.testTimeout = 120000; // Prevent timeout during multiple theme changes
-		const done = assert.async();
-		//Default theme must not be first
-		const aThemes = ["sap_horizon", "sap_horizon_dark", "sap_horizon_hcb", "sap_horizon_hcw", "sap_fiori_3"];
-		const fnGetExpectedTheme = function (sTheme) {
-			switch (sTheme) {
-				case "sap_horizon":
-				case "sap_horizon_dark":
-				case "sap_horizon_hcw":
-				case "sap_horizon_hcb":
-					return MLibrary.ButtonType["Transparent"];
-				default:
-					return MLibrary.ButtonType["Ghost"];
-			}
-		};
-
-		assert.expect(aThemes.length);
-
-		this.oTable.destroy();
-		this.oTable = new Table({
-			enableExport: true
-		});
-		this.oTable._createToolbar();
-
-		const fnThemeChanged = function (oEvent) {
-			const sTheme = oEvent.getParameter("theme");
-			assert.deepEqual(this.oTable._oExportButton.getType(), fnGetExpectedTheme(sTheme), "Export button ButtonType equals to expected Theme styling, Theme: " + sTheme);
-			if (sTheme === aThemes.at(-1)){
-				Core.detachThemeChanged(fnThemeChanged);
-				QUnit.config.testTimeout = iTimeout;
-				done();
-			} else {
-				const iPosition = aThemes.indexOf(sTheme);
-				Core.applyTheme(aThemes[iPosition + 1]);
-			}
-		}.bind(this);
-
-		Core.attachThemeChanged(fnThemeChanged);
-
-		Core.applyTheme(aThemes[0]);
-	});
-
 	QUnit.test("Export button state should be checked for bindingChange, if a row is added to the table", function(assert) {
 		this.oTable.destroy();
 		this.oTable = new Table({
@@ -6390,4 +6350,72 @@ sap.ui.define([
 			assert.deepEqual(aErrors, [], "No uncaught errors detected");
 		});
 	});
+
+	QUnit.module("Theming", {
+		before: function() {
+			this.sDefaultTheme = Theming.getTheme();
+		},
+		beforeEach: async function() {
+			this.oTable = new Table({
+				delegate: {
+					name: sDelegatePath,
+					payload: {
+						collectionPath: "/testPath"
+					}
+				},
+				enableExport: true
+			});
+			await this.oTable.initialized();
+		},
+		afterEach: function() {
+			this.oTable.destroy();
+		},
+		after: async function() {
+			await this.applyTheme(this.sDefaultTheme);
+		},
+		applyTheme: async function(sTheme) {
+			const oThemeApplied = new Deferred();
+			const fnThemeApplied = function() {
+				Theming.detachApplied(fnThemeApplied);
+				oThemeApplied.resolve();
+			};
+
+			Theming.setTheme(sTheme);
+			Theming.attachApplied(fnThemeApplied);
+
+			await oThemeApplied.promise;
+		}
+	});
+
+	for (const sTheme of [
+		"sap_horizon",
+		"sap_horizon_dark",
+		"sap_horizon_hcb",
+		"sap_horizon_hcw",
+		"sap_fiori_3",
+		"sap_belize"
+	]) {
+		QUnit.test(sTheme + "; Export button", async function(assert) {
+			let sExpectedButtontype;
+
+			switch (sTheme) {
+				case "sap_horizon":
+				case "sap_horizon_dark":
+				case "sap_horizon_hcw":
+				case "sap_horizon_hcb":
+					sExpectedButtontype = ButtonType.Transparent;
+					break;
+				default:
+					sExpectedButtontype = ButtonType.Ghost;
+			}
+
+			await this.applyTheme(sTheme);
+			assert.deepEqual(this.oTable._oExportButton.getType(), sExpectedButtontype, "buttonType property");
+		});
+
+		QUnit.test(sTheme + "; Toolbar", async function(assert) {
+			await this.applyTheme(sTheme);
+			assert.deepEqual(this.oTable._oToolbar.getDesign(), ToolbarDesign.Transparent, "design property");
+		});
+	}
 });
