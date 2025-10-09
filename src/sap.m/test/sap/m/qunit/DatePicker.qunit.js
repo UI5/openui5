@@ -16,6 +16,8 @@ sap.ui.define([
 	"sap/ui/core/CalendarType",
 	"sap/ui/events/KeyCodes",
 	"sap/ui/Device",
+	"sap/ui/table/Table",
+	"sap/ui/table/Column",
 	"sap/ui/core/InvisibleText",
 	"sap/ui/core/mvc/XMLView",
 	"sap/ui/unified/library",
@@ -55,6 +57,8 @@ sap.ui.define([
 	CalendarType,
 	KeyCodes,
 	Device,
+	Table,
+	Column,
 	InvisibleText,
 	XMLView,
 	unifiedLibrary,
@@ -3157,5 +3161,56 @@ sap.ui.define([
 				done();
 			});
 		});
+	});
+
+	QUnit.module("Binding");
+
+	QUnit.test("DatePicker closes when binding context changes", function(assert) {
+		// Prepare
+		var oModel = new JSONModel({
+			items: [
+					{ id: 1, date: UI5Date.getInstance(2020, 0, 1) },
+					{ id: 2, date: UI5Date.getInstance(2020, 1, 2) },
+					{ id: 3, date: UI5Date.getInstance(2020, 2, 3) }
+				]
+			}),
+		oTable = new Table({
+			visibleRowCount: 2,
+			rows: "{/items}",
+			columns: [
+			new Column({
+				template: new DatePicker({
+					dateValue: "{date}"
+				})
+			})
+			]
+		}),
+		oDatePicker;
+
+		oTable.setModel(oModel);
+		oTable.placeAt("qunit-fixture");
+		oCore.applyChanges();
+
+		// Get the first DatePicker instance
+		oDatePicker = oTable.getRows()[0].getCells()[0];
+
+		// Act - Open the DatePicker
+		oDatePicker.toggleOpen();
+		oCore.applyChanges();
+
+		// Assert picker is open
+		assert.ok(oDatePicker.isOpen(), "DatePicker is initially open");
+
+		// Act - Change the binding context (simulate scrolling in table)
+		// This simulates what happens when scrolling changes the visible rows
+		var oNewContext = oModel.getContext("/items/2");
+		oDatePicker.setBindingContext(oNewContext);
+		oCore.applyChanges();
+
+		// Assert - DatePicker should close when binding context changes
+		assert.notOk(oDatePicker.isOpen(), "DatePicker closes when binding context changes");
+
+		// Cleanup
+		oTable.destroy();
 	});
 });
