@@ -984,6 +984,10 @@ sap.ui.define([
 
 		Control.prototype.applySettings.call(this, mSettings, oScope);
 		this.initControlDelegate();
+
+		// onModification is not called if changes are applied during XML preprocessing. For the initial validation, this call leads to duplicate log
+		// entries if changes are applied on runtime (onModification is called).
+		validateStateAgainstPropertyInfo(this);
 	};
 
 	Table.prototype._setToolbarBetween = function(oToolBar) {
@@ -1387,7 +1391,50 @@ sap.ui.define([
 			await this.finalizePropertyHelper();
 			await this.rebind();
 		}
+
+		await validateStateAgainstPropertyInfo(this);
 	};
+
+	/**
+	 * Validates the current state of the table against the available property info, and logs a warning in case of invalid state.
+	 *
+	 * If the property info is not final, the state is validated against the <code>propertyInfo</code> property if defined, otherwise validation is
+	 * scheduled after the property info is finalized after being fetched from the delegate.
+	 *
+	 * Validation succeeds if a state, such as a sort condition, was added and removed in the same change application, even if the property does not
+	 * exist.
+	 *
+	 * Columns are not validated. ItemBaseFlex throws an error if Delegate.addItem does not create a column for a property. This should be the case
+	 * if a property does not exist. However, if the delegate just makes something up and creates a column anyway, no validation error occurs
+	 * anywhere.
+	 *
+	 * @param {sap.ui.mdc.Table} oTable Instance of the table
+	 * @returns {Promise} Promise that resolves when validation is done
+	 */
+	async function validateStateAgainstPropertyInfo(oTable) {
+		const oXConfig = oTable._getXConfig();
+		const mState = {
+			Sort: oTable._getSortedProperties().map((oSortCondition) => oSortCondition.name),
+			Filter: getFilteredProperties(oTable.getFilterConditions()),
+			"Group level": oTable._getGroupedProperties().map((oGroupCondition) => oGroupCondition.name),
+			Aggregation: Object.keys(oTable._getAggregatedProperties()),
+			"Column width": Object.keys(oXConfig?.aggregations?.columns || {}).filter((sKey) => oXConfig.aggregations.columns[sKey].width)
+		};
+		const oPropertyHelper = await oTable.awaitPropertyHelper();
+
+		if (oTable.isPropertyHelperFinal() || oPropertyHelper.getProperties().length > 0) {
+			for (const sStateType in mState) {
+				for (const sPropertyKey of mState[sStateType]) {
+					if (!oPropertyHelper.hasProperty(sPropertyKey)) {
+						Log.error(`Invalid state: ${sStateType} modification exists for non-existent property '${sPropertyKey}'`, oTable);
+					}
+				}
+			}
+		} else {
+			await oTable.propertiesFinalized();
+			await validateStateAgainstPropertyInfo(oTable);
+		}
+	}
 
 	Table.prototype.setP13nMode = function(aMode) {
 		const aOldP13nMode = this.getP13nMode();

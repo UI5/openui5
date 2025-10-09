@@ -3,22 +3,28 @@
  */
 
 sap.ui.define([
-	'./SortFlex',
-	'./ColumnFlex',
-	'./ConditionFlex',
-	'./GroupFlex',
-	'./AggregateFlex',
-	'./xConfigFlex',
-	'sap/ui/fl/changeHandler/condenser/Classification'
-], (SortFlex, ColumnFlex, ConditionFlex, GroupFlex, AggregateFlex, xConfigFlex, CondenserClassification) => {
+	"./SortFlex",
+	"./ColumnFlex",
+	"./ConditionFlex",
+	"./GroupFlex",
+	"./AggregateFlex",
+	"./xConfigFlex"
+], (
+	SortFlex,
+	ColumnFlex,
+	ConditionFlex,
+	GroupFlex,
+	AggregateFlex,
+	xConfigFlex
+) => {
 	"use strict";
 
 	return {
 		"hideControl": "default",
 		"unhideControl": "default",
-		addColumn: ColumnFlex.createAddChangeHandler(),
-		removeColumn: ColumnFlex.createRemoveChangeHandler(),
-		moveColumn: ColumnFlex.createMoveChangeHandler(),
+		addColumn: ColumnFlex.addColumn,
+		removeColumn: ColumnFlex.removeColumn,
+		moveColumn: ColumnFlex.moveColumn,
 		removeSort: SortFlex.removeSort,
 		addSort: SortFlex.addSort,
 		moveSort: SortFlex.moveSort,

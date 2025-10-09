@@ -60,12 +60,12 @@ function (
 			//Arrange
 			this.oAdaptiveContent.placeAt(DOM_RENDER_LOCATION);
 			await nextUIUpdate();
-			var oUncheckedToggleInput = document.querySelector("#ValueOffValueOn ui5-checkbox"),
-				oCheckedToggleInput = document.querySelector("#Checked ui5-checkbox"),
-				oLabel = document.querySelector("#Checked ui5-label");
+			var oUncheckedToggleInput = document.querySelector("#ValueOffValueOn [ui5-checkbox]"),
+				oCheckedToggleInput = document.querySelector("#Checked [ui5-checkbox]"),
+				oLabel = document.querySelector("#Checked [ui5-label]");
 
 			//Assert
-			assert.strictEqual(oUncheckedToggleInput.tagName.toLowerCase(), "ui5-checkbox", "ui5-checkbox webcomponent is rendered");
+			assert.ok(oUncheckedToggleInput.hasAttribute("ui5-checkbox"), "ui5-checkbox webcomponent is rendered");
 			assert.ok(oUncheckedToggleInput, "The toggle input is created");
 			assert.strictEqual(oUncheckedToggleInput.text, "Unchecked toggle input with value 'Truethy value' when checked and 'Falsy value' when not", "The title is mapped correctly");
 			assert.strictEqual(oUncheckedToggleInput.checked, false, "The checkbox is not checked, since value is different from valueOn.");
@@ -74,7 +74,7 @@ function (
 			assert.strictEqual(oCheckedToggleInput.wrappingType, "Normal", "The checkbox label should wrap at some point.");
 			assert.strictEqual(oCheckedToggleInput.checked, true, "The checkbox is not checked, since value is the same as valueOn.");
 			assert.strictEqual(oCheckedToggleInput.text, "", "There is no text set initially.");
-			assert.strictEqual(oLabel.tagName.toLowerCase(), "ui5-label", "ui5-label webcomponent is rendered");
+			assert.ok(oLabel.hasAttribute("ui5-label"), "ui5-label webcomponent is rendered");
 			assert.strictEqual(oLabel.textContent, "Choice", "Label text is correctly mapped");
 			assert.ok(oCheckedToggleInput.required, "required attribute is set");
 			assert.strictEqual(oCheckedToggleInput.getAttribute("aria-labelledby"), oLabel.id, "aria-labelledby refers to the id of the label");
@@ -89,6 +89,6 @@ function (
 			oDomRef = oToggleInput.internalRender();
 
 		//Assert
-		assert.strictEqual(oDomRef.tagName.toLowerCase(), "ui5-checkbox", "ui5-checkbox webcomponent is rendered");
+		assert.ok(oDomRef.tagName.toLowerCase().includes("ui5-checkbox"), "ui5-checkbox webcomponent is rendered");
 	});
 });

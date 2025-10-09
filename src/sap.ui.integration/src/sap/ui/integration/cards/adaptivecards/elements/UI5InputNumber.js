@@ -34,7 +34,7 @@ sap.ui.define([
 	};
 
 	UI5InputNumber.prototype.internalRender = function () {
-		this._numberInputElement = document.createElement("ui5-step-input");
+		this._numberInputElement = document.createElement("ui5-step-input-ac");
 
 		this._numberInputElement.id = this.id;
 		this._numberInputElement.placeholder = this.placeholder || "";
@@ -65,7 +65,7 @@ sap.ui.define([
 
 	UI5InputNumber.prototype.showValidationErrorMessage = function () {
 		if (this.renderedInputControlElement) {
-			this.renderedInputControlElement.valueState = "Error";
+			this.renderedInputControlElement.valueState = "Negative";
 		}
 	};
 

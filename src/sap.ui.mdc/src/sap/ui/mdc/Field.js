@@ -732,6 +732,21 @@ sap.ui.define([
 
 	};
 
+	Field.prototype.shouldFireValidationSuccessOnConditionUpdate = function (aConditions) {
+
+		const vOldValue = this.getValue();
+		let vValue = this.getResultForChangePromise(aConditions);
+		vValue = _updateEmptyValue.call(this, vValue, vOldValue);
+
+		if (_compareValues.call(this, vValue, vOldValue, true)) {
+			// value will not be updated, therefore ValidationSuccess need to be fired manually
+			return true;
+		}
+
+		return false;
+
+	};
+
 	const HANDLEDBYMIXIN = Symbol("sap.ui.core.message.MessageMixin");
 	Field.prototype.refreshDataState = function (sName, oDataState) {
 

@@ -459,7 +459,7 @@ sap.ui.define([
 				// Thе timeout is needed to delay the check if UI5 WebComponents gets loaded from elsewhere.
 				// This detection relies on the assumption that there's the full bundle and the ui5-button is present.
 				setTimeout(function(){
-					if (window.customElements.get("ui5-button")) {
+					if (window.customElements.get("ui5-button-ac")) {
 						resolve();
 						return;
 					}

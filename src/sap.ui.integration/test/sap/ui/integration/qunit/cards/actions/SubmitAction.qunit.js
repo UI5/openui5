@@ -51,7 +51,7 @@ sap.ui.define([
 			this.oServer.restore();
 		},
 		_pressSubmitButton: function () {
-			var oButton = Array.from(this.oCard.getDomRef().querySelectorAll("ui5-button"))
+			var oButton = Array.from(this.oCard.getDomRef().querySelectorAll("[ui5-button]"))
 				.find(function (el) {
 					return el.textContent === "Send to backend";
 				});

@@ -124,13 +124,13 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori FCLLayout
      *
-     * @public
+     * @private
      */
     pkg["FCLLayout"] = {
       /**
        * The layout will display 1 column.
        *
-       * @public
+       * @private
        */
       OneColumn: "OneColumn",
       /**
@@ -141,7 +141,7 @@ sap.ui.define(
        *
        * Use to display both a list and a detail page when the user should focus on the list page.
        *
-       * @public
+       * @private
        */
       TwoColumnsStartExpanded: "TwoColumnsStartExpanded",
       /**
@@ -151,7 +151,7 @@ sap.ui.define(
        *
        * Use to display both a list and a detail page when the user should focus on the detail page.
        *
-       * @public
+       * @private
        */
       TwoColumnsMidExpanded: "TwoColumnsMidExpanded",
       /**
@@ -161,7 +161,7 @@ sap.ui.define(
        *
        * Use to display all three pages (list, detail, detail-detail) when the user should focus on the detail.
        *
-       * @public
+       * @private
        */
       ThreeColumnsMidExpanded: "ThreeColumnsMidExpanded",
       /**
@@ -171,7 +171,7 @@ sap.ui.define(
        *
        * Use to display all three pages (list, detail, detail-detail) when the user should focus on the detail-detail.
        *
-       * @public
+       * @private
        */
       ThreeColumnsEndExpanded: "ThreeColumnsEndExpanded",
       /**
@@ -182,7 +182,7 @@ sap.ui.define(
        * Use to display the list and detail pages when the user should focus on the list.
        * The detail-detail is still loaded and easily accessible by dragging the columns-separator
        *
-       * @public
+       * @private
        */
       ThreeColumnsStartExpandedEndHidden: "ThreeColumnsStartExpandedEndHidden",
       /**
@@ -193,7 +193,7 @@ sap.ui.define(
        * Use to display the list and detail pages when the user should focus on the detail.
        * The detail-detail is still loaded and easily accessible by dragging the columns-separator
        *
-       * @public
+       * @private
        */
       ThreeColumnsMidExpandedEndHidden: "ThreeColumnsMidExpandedEndHidden",
       /**
@@ -203,7 +203,7 @@ sap.ui.define(
        *
        * Use to display the Mid and End columns while the Start column is hidden.
        *
-       * @public
+       * @private
        */
       ThreeColumnsStartHiddenMidExpanded: "ThreeColumnsStartHiddenMidExpanded",
       /**
@@ -213,7 +213,7 @@ sap.ui.define(
        *
        * Use to display the Mid column and expanded End column while the grip of the separator is not visible.
        *
-       * @public
+       * @private
        */
       ThreeColumnsStartHiddenEndExpanded: "ThreeColumnsStartHiddenEndExpanded",
       /**
@@ -223,7 +223,7 @@ sap.ui.define(
        *
        * Use to display a detail page only, when the user should focus entirely on it.
        *
-       * @public
+       * @private
        */
       MidColumnFullScreen: "MidColumnFullScreen",
       /**
@@ -233,7 +233,7 @@ sap.ui.define(
        *
        * Use to display a detail-detail page only, when the user should focus entirely on it.
        *
-       * @public
+       * @private
        */
       EndColumnFullScreen: "EndColumnFullScreen"
     };
@@ -247,7 +247,7 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori IllustrationMessageDesign
      *
-     * @public
+     * @private
      */
     pkg["IllustrationMessageDesign"] = {
       /**
@@ -258,7 +258,7 @@ sap.ui.define(
        * the available container width. If any other &#x60;IllustratedMessageSize&#x60; is chosen, it remains
        * until changed by the app developer.
        *
-       * @public
+       * @private
        */
       Auto: "Auto",
       /**
@@ -266,55 +266,55 @@ sap.ui.define(
        *
        * **Note:** When &#x60;Base&#x60; is in use, no illustration is displayed.
        *
-       * @public
+       * @private
        */
       Base: "Base",
       /**
        * Dot &lt;code&gt;Illustration&lt;/code&gt; size (XS breakpoint). Suitable for table rows.
        *
-       * @public
+       * @private
        */
       Dot: "Dot",
       /**
        * Spot &lt;code&gt;Illustration&lt;/code&gt; size (S breakpoint). Suitable for cards (four columns).
        *
-       * @public
+       * @private
        */
       Spot: "Spot",
       /**
        * Dialog &#x60;Illustration&#x60; size (M breakpoint). Suitable for dialogs.
        *
-       * @public
+       * @private
        */
       Dialog: "Dialog",
       /**
        * Scene &#x60;Illustration&#x60; size (L breakpoint). Suitable for a &#x60;Page&#x60; or a table.
        *
-       * @public
+       * @private
        */
       Scene: "Scene",
       /**
        * ExtraSmall &lt;code&gt;Illustration&lt;/code&gt; size (XS breakpoint). Suitable for table rows.
        *
-       * @public
+       * @private
        */
       ExtraSmall: "ExtraSmall",
       /**
        * Small &lt;code&gt;Illustration&lt;/code&gt; size (S breakpoint). Suitable for cards (four columns).
        *
-       * @public
+       * @private
        */
       Small: "Small",
       /**
        * Medium &#x60;Illustration&#x60; size (M breakpoint). Suitable for dialogs.
        *
-       * @public
+       * @private
        */
       Medium: "Medium",
       /**
        * Large &#x60;Illustration&#x60; size (L breakpoint). Suitable for a &#x60;Page&#x60; or a table.
        *
-       * @public
+       * @private
        */
       Large: "Large"
     };
@@ -331,715 +331,715 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori IllustrationMessageType
      *
-     * @public
+     * @private
      */
     pkg["IllustrationMessageType"] = {
       /**
        * &quot;Achievement&quot; illustration type.
        *
-       * @public
+       * @private
        */
       Achievement: "Achievement",
       /**
        * &quot;Adding Columns&quot; illustration type.
        *
-       * @public
+       * @private
        */
       AddingColumns: "AddingColumns",
       /**
        * &quot;Add People To Calendar&quot; illustration type.
        *
-       * @public
+       * @private
        */
       AddPeopleToCalendar: "AddPeopleToCalendar",
       /**
        * &quot;Before Search&quot; illustration type.
        *
-       * @public
+       * @private
        */
       BeforeSearch: "BeforeSearch",
       /**
        * &quot;Drag Files To Upload&quot; illustration type.
        *
-       * @public
+       * @private
        */
       DragFilesToUpload: "DragFilesToUpload",
       /**
        * &quot;Filtering Columns&quot; illustration type.
        *
-       * @public
+       * @private
        */
       FilteringColumns: "FilteringColumns",
       /**
        * &quot;Grouping Columns&quot; illustration type.
        *
-       * @public
+       * @private
        */
       GroupingColumns: "GroupingColumns",
       /**
        * &quot;New Mail&quot; illustration type.
        *
-       * @public
+       * @private
        */
       NewMail: "NewMail",
       /**
        * &quot;No Activities&quot; illustration type.
        *
-       * @public
+       * @private
        */
       NoActivities: "NoActivities",
       /**
        * &quot;No Columns Set&quot; illustration type.
        *
-       * @public
+       * @private
        */
       NoColumnsSet: "NoColumnsSet",
       /**
        * &quot;No Data&quot; illustration type.
        *
-       * @public
+       * @private
        */
       NoData: "NoData",
       /**
        * &quot;No Email&quot; illustration type.
        *
-       * @public
+       * @private
        */
       NoMail: "NoMail",
       /**
        * &quot;No Email v1&quot; illustration type.
        *
-       * @public
+       * @private
        */
       NoMail_v1: "NoMail_v1",
       /**
        * &quot;No Entries&quot; illustration type.
        *
-       * @public
+       * @private
        */
       NoEntries: "NoEntries",
       /**
        * &quot;No Notifications&quot; illustration type.
        *
-       * @public
+       * @private
        */
       NoNotifications: "NoNotifications",
       /**
        * &quot;No Saved Items&quot; illustration type.
        *
-       * @public
+       * @private
        */
       NoSavedItems: "NoSavedItems",
       /**
        * &quot;No Saved Items v1&quot; illustration type.
        *
-       * @public
+       * @private
        */
       NoSavedItems_v1: "NoSavedItems_v1",
       /**
        * &quot;No Search Results&quot; illustration type.
        *
-       * @public
+       * @private
        */
       NoSearchResults: "NoSearchResults",
       /**
        * &quot;No Tasks&quot; illustration type.
        *
-       * @public
+       * @private
        */
       NoTasks: "NoTasks",
       /**
        * &quot;No Tasks v1&quot; illustration type.
        *
-       * @public
+       * @private
        */
       NoTasks_v1: "NoTasks_v1",
       /**
        * &quot;No Dimensions Set&quot; illustration type.
        *
-       * @public
+       * @private
        */
       NoDimensionsSet: "NoDimensionsSet",
       /**
        * &quot;Unable To Load&quot; illustration type.
        *
-       * @public
+       * @private
        */
       UnableToLoad: "UnableToLoad",
       /**
        * &quot;Unable To Load Image&quot; illustration type.
        *
-       * @public
+       * @private
        */
       UnableToLoadImage: "UnableToLoadImage",
       /**
        * &quot;Unable To Upload&quot; illustration type.
        *
-       * @public
+       * @private
        */
       UnableToUpload: "UnableToUpload",
       /**
        * &quot;Upload To Cloud&quot; illustration type.
        *
-       * @public
+       * @private
        */
       UploadToCloud: "UploadToCloud",
       /**
        * &quot;Add Column&quot; illustration type.
        *
-       * @public
+       * @private
        */
       AddColumn: "AddColumn",
       /**
        * &quot;Add People&quot; illustration type.
        *
-       * @public
+       * @private
        */
       AddPeople: "AddPeople",
       /**
        * &quot;Add Dimensions&quot; illustration type.
        *
-       * @public
+       * @private
        */
       AddDimensions: "AddDimensions",
       /**
        * &quot;Balloon Sky&quot; illustration type.
        *
-       * @public
+       * @private
        */
       BalloonSky: "BalloonSky",
       /**
        * &quot;Connection&quot; illustration type.
        *
-       * @public
+       * @private
        */
       Connection: "Connection",
       /**
        * &quot;Empty Calendar&quot; illustration type.
        *
-       * @public
+       * @private
        */
       EmptyCalendar: "EmptyCalendar",
       /**
        * &quot;Empty List&quot; illustration type.
        *
-       * @public
+       * @private
        */
       EmptyList: "EmptyList",
       /**
        * &quot;Empty Planning Calendar&quot; illustration type.
        *
-       * @public
+       * @private
        */
       EmptyPlanningCalendar: "EmptyPlanningCalendar",
       /**
        * &quot;Error Screen&quot; illustration type.
        *
-       * @public
+       * @private
        */
       ErrorScreen: "ErrorScreen",
       /**
        * &quot;Filter Table&quot; illustration type.
        *
-       * @public
+       * @private
        */
       FilterTable: "FilterTable",
       /**
        * &quot;Group Table&quot; illustration type.
        *
-       * @public
+       * @private
        */
       GroupTable: "GroupTable",
       /**
        * &quot;Key Task&quot; illustration type.
        *
-       * @public
+       * @private
        */
       KeyTask: "KeyTask",
       /**
        * &quot;No Chart Data&quot; illustration type.
        *
-       * @public
+       * @private
        */
       NoChartData: "NoChartData",
       /**
        * &quot;No Filter Results&quot; illustration type.
        *
-       * @public
+       * @private
        */
       NoFilterResults: "NoFilterResults",
       /**
        * &quot;Page Not Found&quot; illustration type.
        *
-       * @public
+       * @private
        */
       PageNotFound: "PageNotFound",
       /**
        * &quot;Reload Screen&quot; illustration type.
        *
-       * @public
+       * @private
        */
       ReloadScreen: "ReloadScreen",
       /**
        * &quot;Resize Column&quot; illustration type.
        *
-       * @public
+       * @private
        */
       ResizeColumn: "ResizeColumn",
       /**
        * &quot;Resizing Columns&quot; illustration type.
        *
-       * @public
+       * @private
        */
       ResizingColumns: "ResizingColumns",
       /**
        * &quot;Receive Appreciation&quot; illustration type.
        *
-       * @public
+       * @private
        */
       ReceiveAppreciation: "ReceiveAppreciation",
       /**
        * &quot;Search Earth&quot; illustration type.
        *
-       * @public
+       * @private
        */
       SearchEarth: "SearchEarth",
       /**
        * &quot;Search Folder&quot; illustration type.
        *
-       * @public
+       * @private
        */
       SearchFolder: "SearchFolder",
       /**
        * &quot;Sign Out&quot; illustration type.
        *
-       * @public
+       * @private
        */
       SignOut: "SignOut",
       /**
        * &quot;Simple Balloon&quot; illustration type.
        *
-       * @public
+       * @private
        */
       SimpleBalloon: "SimpleBalloon",
       /**
        * &quot;Simple Bell&quot; illustration type.
        *
-       * @public
+       * @private
        */
       SimpleBell: "SimpleBell",
       /**
        * &quot;Simple Calendar&quot; illustration type.
        *
-       * @public
+       * @private
        */
       SimpleCalendar: "SimpleCalendar",
       /**
        * &quot;Simple CheckMark&quot; illustration type.
        *
-       * @public
+       * @private
        */
       SimpleCheckMark: "SimpleCheckMark",
       /**
        * &quot;Simple Connection&quot; illustration type.
        *
-       * @public
+       * @private
        */
       SimpleConnection: "SimpleConnection",
       /**
        * &quot;Simple Empty Doc&quot; illustration type.
        *
-       * @public
+       * @private
        */
       SimpleEmptyDoc: "SimpleEmptyDoc",
       /**
        * &quot;Simple Empty List&quot; illustration type.
        *
-       * @public
+       * @private
        */
       SimpleEmptyList: "SimpleEmptyList",
       /**
        * &quot;Simple Error&quot; illustration type.
        *
-       * @public
+       * @private
        */
       SimpleError: "SimpleError",
       /**
        * &quot;Simple Magnifier&quot; illustration type.
        *
-       * @public
+       * @private
        */
       SimpleMagnifier: "SimpleMagnifier",
       /**
        * &quot;Simple Mail&quot; illustration type.
        *
-       * @public
+       * @private
        */
       SimpleMail: "SimpleMail",
       /**
        * &quot;Simple No Saved Items&quot; illustration type.
        *
-       * @public
+       * @private
        */
       SimpleNoSavedItems: "SimpleNoSavedItems",
       /**
        * &quot;Simple Not Found Magnifier&quot; illustration type.
        *
-       * @public
+       * @private
        */
       SimpleNotFoundMagnifier: "SimpleNotFoundMagnifier",
       /**
        * &quot;Simple Reload&quot; illustration type.
        *
-       * @public
+       * @private
        */
       SimpleReload: "SimpleReload",
       /**
        * &quot;Simple Task&quot; illustration type.
        *
-       * @public
+       * @private
        */
       SimpleTask: "SimpleTask",
       /**
        * &quot;Sleeping Bell&quot; illustration type.
        *
-       * @public
+       * @private
        */
       SleepingBell: "SleepingBell",
       /**
        * &quot;Sort Column&quot; illustration type.
        *
-       * @public
+       * @private
        */
       SortColumn: "SortColumn",
       /**
        * &quot;Sorting Columns&quot; illustration type.
        *
-       * @public
+       * @private
        */
       SortingColumns: "SortingColumns",
       /**
        * &quot;Success Balloon&quot; illustration type.
        *
-       * @public
+       * @private
        */
       SuccessBalloon: "SuccessBalloon",
       /**
        * &quot;Success CheckMark&quot; illustration type.
        *
-       * @public
+       * @private
        */
       SuccessCheckMark: "SuccessCheckMark",
       /**
        * &quot;Success HighFive&quot; illustration type.
        *
-       * @public
+       * @private
        */
       SuccessHighFive: "SuccessHighFive",
       /**
        * &quot;Success Screen&quot; illustration type.
        *
-       * @public
+       * @private
        */
       SuccessScreen: "SuccessScreen",
       /**
        * &quot;Survey&quot; illustration type.
        *
-       * @public
+       * @private
        */
       Survey: "Survey",
       /**
        * &quot;Tent&quot; illustration type.
        *
-       * @public
+       * @private
        */
       Tent: "Tent",
       /**
        * &quot;Upload Collection&quot; illustration type.
        *
-       * @public
+       * @private
        */
       UploadCollection: "UploadCollection",
       /**
        * &quot;User Has Signed Up&quot; illustration type.
        *
-       * @public
+       * @private
        */
       UserHasSignedUp: "UserHasSignedUp",
       /**
        * &quot;TntAvatar&quot; illustration type.
        *
-       * @public
+       * @private
        */
       TntAvatar: "TntAvatar",
       /**
        * &quot;TntCalculator&quot; illustration type.
        *
-       * @public
+       * @private
        */
       TntCalculator: "TntCalculator",
       /**
        * &quot;TntChartArea&quot; illustration type.
        *
-       * @public
+       * @private
        */
       TntChartArea: "TntChartArea",
       /**
        * &quot;TntChartArea2&quot; illustration type.
        *
-       * @public
+       * @private
        */
       TntChartArea2: "TntChartArea2",
       /**
        * &quot;TntChartBar&quot; illustration type.
        *
-       * @public
+       * @private
        */
       TntChartBar: "TntChartBar",
       /**
        * &quot;TntChartBPMNFlow&quot; illustration type.
        *
-       * @public
+       * @private
        */
       TntChartBPMNFlow: "TntChartBPMNFlow",
       /**
        * &quot;TntChartBullet&quot; illustration type.
        *
-       * @public
+       * @private
        */
       TntChartBullet: "TntChartBullet",
       /**
        * &quot;TntChartDoughnut&quot; illustration type.
        *
-       * @public
+       * @private
        */
       TntChartDoughnut: "TntChartDoughnut",
       /**
        * &quot;TntChartFlow&quot; illustration type.
        *
-       * @public
+       * @private
        */
       TntChartFlow: "TntChartFlow",
       /**
        * &quot;TntChartGantt&quot; illustration type.
        *
-       * @public
+       * @private
        */
       TntChartGantt: "TntChartGantt",
       /**
        * &quot;TntChartOrg&quot; illustration type.
        *
-       * @public
+       * @private
        */
       TntChartOrg: "TntChartOrg",
       /**
        * &quot;TntChartPie&quot; illustration type.
        *
-       * @public
+       * @private
        */
       TntChartPie: "TntChartPie",
       /**
        * &quot;TntCodePlaceholder&quot; illustration type.
        *
-       * @public
+       * @private
        */
       TntCodePlaceholder: "TntCodePlaceholder",
       /**
        * &quot;TntCompany&quot; illustration type.
        *
-       * @public
+       * @private
        */
       TntCompany: "TntCompany",
       /**
        * &quot;TntCompass&quot; illustration type.
        *
-       * @public
+       * @private
        */
       TntCompass: "TntCompass",
       /**
        * &quot;TntComponents&quot; illustration type.
        *
-       * @public
+       * @private
        */
       TntComponents: "TntComponents",
       /**
        * &quot;TntDialog&quot; illustration type.
        *
-       * @public
+       * @private
        */
       TntDialog: "TntDialog",
       /**
        * &quot;TntEmptyContentPane&quot; illustration type.
        *
-       * @public
+       * @private
        */
       TntEmptyContentPane: "TntEmptyContentPane",
       /**
        * &quot;TntExternalLink&quot; illustration type.
        *
-       * @public
+       * @private
        */
       TntExternalLink: "TntExternalLink",
       /**
        * &quot;TntFaceID&quot; illustration type.
        *
-       * @public
+       * @private
        */
       TntFaceID: "TntFaceID",
       /**
        * &quot;TntFingerprint&quot; illustration type.
        *
-       * @public
+       * @private
        */
       TntFingerprint: "TntFingerprint",
       /**
        * &quot;TntHandshake&quot; illustration type.
        *
-       * @public
+       * @private
        */
       TntHandshake: "TntHandshake",
       /**
        * &quot;TntHelp&quot; illustration type.
        *
-       * @public
+       * @private
        */
       TntHelp: "TntHelp",
       /**
        * &quot;TntLock&quot; illustration type.
        *
-       * @public
+       * @private
        */
       TntLock: "TntLock",
       /**
        * &quot;TntMission&quot; illustration type.
        *
-       * @public
+       * @private
        */
       TntMission: "TntMission",
       /**
        * &quot;TntMissionFailed&quot; illustration type.
        *
-       * @public
+       * @private
        */
       TntMissionFailed: "TntMissionFailed",
       /**
        * &quot;TntNoApplications&quot; illustration type.
        *
-       * @public
+       * @private
        */
       TntNoApplications: "TntNoApplications",
       /**
        * &quot;TntNoFlows&quot; illustration type.
        *
-       * @public
+       * @private
        */
       TntNoFlows: "TntNoFlows",
       /**
        * &quot;TntNoUsers&quot; illustration type.
        *
-       * @public
+       * @private
        */
       TntNoUsers: "TntNoUsers",
       /**
        * &quot;TntRadar&quot; illustration type.
        *
-       * @public
+       * @private
        */
       TntRadar: "TntRadar",
       /**
        * &quot;TntRoadMap&quot; illustration type.
        *
-       * @public
+       * @private
        */
       TntRoadMap: "TntRoadMap",
       /**
        * &quot;TntSecrets&quot; illustration type.
        *
-       * @public
+       * @private
        */
       TntSecrets: "TntSecrets",
       /**
        * &quot;TntServices&quot; illustration type.
        *
-       * @public
+       * @private
        */
       TntServices: "TntServices",
       /**
        * &quot;TntSessionExpired&quot; illustration type.
        *
-       * @public
+       * @private
        */
       TntSessionExpired: "TntSessionExpired",
       /**
        * &quot;TntSessionExpiring&quot; illustration type.
        *
-       * @public
+       * @private
        */
       TntSessionExpiring: "TntSessionExpiring",
       /**
        * &quot;TntSettings&quot; illustration type.
        *
-       * @public
+       * @private
        */
       TntSettings: "TntSettings",
       /**
        * &quot;TntSuccess&quot; illustration type.
        *
-       * @public
+       * @private
        */
       TntSuccess: "TntSuccess",
       /**
        * &quot;TntSuccessfulAuth&quot; illustration type.
        *
-       * @public
+       * @private
        */
       TntSuccessfulAuth: "TntSuccessfulAuth",
       /**
        * &quot;TntSystems&quot; illustration type.
        *
-       * @public
+       * @private
        */
       TntSystems: "TntSystems",
       /**
        * &quot;TntTeams&quot; illustration type.
        *
-       * @public
+       * @private
        */
       TntTeams: "TntTeams",
       /**
        * &quot;TntTools&quot; illustration type.
        *
-       * @public
+       * @private
        */
       TntTools: "TntTools",
       /**
        * &quot;TntTutorials&quot; illustration type.
        *
-       * @public
+       * @private
        */
       TntTutorials: "TntTutorials",
       /**
        * &quot;TntUnableToLoad&quot; illustration type.
        *
-       * @public
+       * @private
        */
       TntUnableToLoad: "TntUnableToLoad",
       /**
        * &quot;TntUnlock&quot; illustration type.
        *
-       * @public
+       * @private
        */
       TntUnlock: "TntUnlock",
       /**
        * &quot;TntUnsuccessfulAuth&quot; illustration type.
        *
-       * @public
+       * @private
        */
       TntUnsuccessfulAuth: "TntUnsuccessfulAuth",
       /**
        * &quot;TntUser2&quot; illustration type.
        *
-       * @public
+       * @private
        */
       TntUser2: "TntUser2"
     };
@@ -1056,7 +1056,7 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori MediaGalleryItemLayout
      *
-     * @public
+     * @private
      */
     pkg["MediaGalleryItemLayout"] = {
       /**
@@ -1064,7 +1064,7 @@ sap.ui.define(
        *
        * When a thumbnail is selected, it makes the corresponding enlarged content appear in a square display area.
        *
-       * @public
+       * @private
        */
       Square: "Square",
       /**
@@ -1073,7 +1073,7 @@ sap.ui.define(
        * When a thumbnail is selected, it makes the corresponding enlarged content appear in a wide display area
        * (stretched to fill all of the available width) for optimal user experiance.
        *
-       * @public
+       * @private
        */
       Wide: "Wide"
     };
@@ -1090,25 +1090,25 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori MediaGalleryLayout
      *
-     * @public
+     * @private
      */
     pkg["MediaGalleryLayout"] = {
       /**
        * The layout is determined automatically.
        *
-       * @public
+       * @private
        */
       Auto: "Auto",
       /**
        * Displays the layout as a vertical split between the thumbnails list and the selected image.
        *
-       * @public
+       * @private
        */
       Vertical: "Vertical",
       /**
        * Displays the layout as a horizontal split between the thumbnails list and the selected image.
        *
-       * @public
+       * @private
        */
       Horizontal: "Horizontal"
     };
@@ -1125,19 +1125,19 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori MediaGalleryMenuHorizontalAlign
      *
-     * @public
+     * @private
      */
     pkg["MediaGalleryMenuHorizontalAlign"] = {
       /**
        * Displays the menu on the left side of the target.
        *
-       * @public
+       * @private
        */
       Left: "Left",
       /**
        * Displays the menu on the right side of the target.
        *
-       * @public
+       * @private
        */
       Right: "Right"
     };
@@ -1154,19 +1154,19 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori MediaGalleryMenuVerticalAlign
      *
-     * @public
+     * @private
      */
     pkg["MediaGalleryMenuVerticalAlign"] = {
       /**
        * Displays the menu at the top of the reference control.
        *
-       * @public
+       * @private
        */
       Top: "Top",
       /**
        * Displays the menu at the bottom of the reference control.
        *
-       * @public
+       * @private
        */
       Bottom: "Bottom"
     };
@@ -1183,26 +1183,26 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori NavigationLayoutMode
      *
-     * @public
+     * @private
      */
     pkg["NavigationLayoutMode"] = {
       /**
        * Automatically calculates the navigation layout mode based on the screen device type.
        * &#x60;Expanded&#x60; on desktop and &#x60;Collapsed&#x60; on tablet and phone.
        *
-       * @public
+       * @private
        */
       Auto: "Auto",
       /**
        * Collapsed side navigation.
        *
-       * @public
+       * @private
        */
       Collapsed: "Collapsed",
       /**
        * Expanded side navigation.
        *
-       * @public
+       * @private
        */
       Expanded: "Expanded"
     };
@@ -1219,19 +1219,19 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori NotificationListItemImportance
      *
-     * @public
+     * @private
      */
     pkg["NotificationListItemImportance"] = {
       /**
        * Standard
        *
-       * @public
+       * @private
        */
       Standard: "Standard",
       /**
        * Important
        *
-       * @public
+       * @private
        */
       Important: "Important"
     };
@@ -1248,25 +1248,25 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori PageBackgroundDesign
      *
-     * @public
+     * @private
      */
     pkg["PageBackgroundDesign"] = {
       /**
        * Page background color when a List is set as the Page content.
        *
-       * @public
+       * @private
        */
       List: "List",
       /**
        * A solid background color dependent on the theme.
        *
-       * @public
+       * @private
        */
       Solid: "Solid",
       /**
        * Transparent background for the page.
        *
-       * @public
+       * @private
        */
       Transparent: "Transparent"
     };
@@ -1283,19 +1283,19 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori SearchMode
      *
-     * @public
+     * @private
      */
     pkg["SearchMode"] = {
       /**
        * Search field with default appearance.
        *
-       * @public
+       * @private
        */
       Default: "Default",
       /**
        * Search field with additional scope select.
        *
-       * @public
+       * @private
        */
       Scoped: "Scoped"
     };
@@ -1309,31 +1309,31 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori SideContentFallDown
      *
-     * @public
+     * @private
      */
     pkg["SideContentFallDown"] = {
       /**
        * Side content falls down on breakpoints below XL
        *
-       * @public
+       * @private
        */
       BelowXL: "BelowXL",
       /**
        * Side content falls down on breakpoints below L
        *
-       * @public
+       * @private
        */
       BelowL: "BelowL",
       /**
        * Side content falls down on breakpoints below M
        *
-       * @public
+       * @private
        */
       BelowM: "BelowM",
       /**
        * Side content falls down on breakpoint M and the minimum width for the side content
        *
-       * @public
+       * @private
        */
       OnMinimumWidth: "OnMinimumWidth"
     };
@@ -1350,21 +1350,21 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori SideContentPosition
      *
-     * @public
+     * @private
      */
     pkg["SideContentPosition"] = {
       /**
        * The side content is on the right side of the main container
        * in left-to-right mode and on the left side in right-to-left mode.
        *
-       * @public
+       * @private
        */
       End: "End",
       /**
        * The side content is on the left side of the main container
        * in left-to-right mode and on the right side in right-to-left mode.
        *
-       * @public
+       * @private
        */
       Start: "Start"
     };
@@ -1381,37 +1381,37 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori SideContentVisibility
      *
-     * @public
+     * @private
      */
     pkg["SideContentVisibility"] = {
       /**
        * Show the side content on any breakpoint
        *
-       * @public
+       * @private
        */
       AlwaysShow: "AlwaysShow",
       /**
        * Show the side content on XL breakpoint
        *
-       * @public
+       * @private
        */
       ShowAboveL: "ShowAboveL",
       /**
        * Show the side content on L and XL breakpoints
        *
-       * @public
+       * @private
        */
       ShowAboveM: "ShowAboveM",
       /**
        * Show the side content on M, L and XL breakpoints
        *
-       * @public
+       * @private
        */
       ShowAboveS: "ShowAboveS",
       /**
        * Don&#x27;t show the side content on any breakpoints
        *
-       * @public
+       * @private
        */
       NeverShow: "NeverShow"
     };
@@ -1428,13 +1428,13 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori SideNavigationItemDesign
      *
-     * @public
+     * @private
      */
     pkg["SideNavigationItemDesign"] = {
       /**
        * Design for items that perform navigation, contain navigation child items, or both.
        *
-       * @public
+       * @private
        */
       Default: "Default",
       /**
@@ -1444,7 +1444,7 @@ sap.ui.define(
        *
        * **Note:** Items that open a dialog must set &#x60;hasPopup&#x3D;&quot;dialog&quot;&#x60; via &#x60;accessibilityAttributes&#x60; property.
        *
-       * @public
+       * @private
        */
       Action: "Action"
     };
@@ -1461,26 +1461,26 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori TimelineGrowingMode
      *
-     * @public
+     * @private
      */
     pkg["TimelineGrowingMode"] = {
       /**
        * Event &#x60;load-more&#x60; is fired
        * upon pressing a &quot;More&quot; button at the end.
        *
-       * @public
+       * @private
        */
       Button: "Button",
       /**
        * Event &#x60;load-more&#x60; is fired upon scroll.
        *
-       * @public
+       * @private
        */
       Scroll: "Scroll",
       /**
        * The growing feature is not enabled.
        *
-       * @public
+       * @private
        */
       None: "None"
     };
@@ -1497,20 +1497,20 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori TimelineLayout
      *
-     * @public
+     * @private
      */
     pkg["TimelineLayout"] = {
       /**
        * Vertical layout
        * Default type
        *
-       * @public
+       * @private
        */
       Vertical: "Vertical",
       /**
        * Horizontal layout
        *
-       * @public
+       * @private
        */
       Horizontal: "Horizontal"
     };
@@ -1527,45 +1527,45 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori UploadCollectionSelectionMode
      *
-     * @public
+     * @private
      */
     pkg["UploadCollectionSelectionMode"] = {
       /**
        * Default mode (no selection).
        *
-       * @public
+       * @private
        */
       None: "None",
       /**
        * Right-positioned single selection mode (only one list item can be selected).
        *
-       * @public
+       * @private
        */
       Single: "Single",
       /**
        * Left-positioned single selection mode (only one list item can be selected).
        *
-       * @public
+       * @private
        */
       SingleStart: "SingleStart",
       /**
        * Selected item is highlighted but no selection element is visible
        * (only one list item can be selected).
        *
-       * @public
+       * @private
        */
       SingleEnd: "SingleEnd",
       /**
        * Selected item is highlighted and selection is changed upon arrow navigation
        * (only one list item can be selected - this is always the focused item).
        *
-       * @public
+       * @private
        */
       SingleAuto: "SingleAuto",
       /**
        * Multi selection mode (more than one list item can be selected).
        *
-       * @public
+       * @private
        */
       Multiple: "Multiple"
     };
@@ -1582,31 +1582,31 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori UploadState
      *
-     * @public
+     * @private
      */
     pkg["UploadState"] = {
       /**
        * The file has been uploaded successfully.
        *
-       * @public
+       * @private
        */
       Complete: "Complete",
       /**
        * The file cannot be uploaded due to an error.
        *
-       * @public
+       * @private
        */
       Error: "Error",
       /**
        * The file is awaiting an explicit command to start being uploaded.
        *
-       * @public
+       * @private
        */
       Ready: "Ready",
       /**
        * The file is currently being uploaded.
        *
-       * @public
+       * @private
        */
       Uploading: "Uploading"
     };
@@ -1620,25 +1620,25 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori ViewSettingsDialogMode
      *
-     * @public
+     * @private
      */
     pkg["ViewSettingsDialogMode"] = {
       /**
        * Default type
        *
-       * @public
+       * @private
        */
       Sort: "Sort",
       /**
        * Filter type
        *
-       * @public
+       * @private
        */
       Filter: "Filter",
       /**
        * Group type
        *
-       * @public
+       * @private
        */
       Group: "Group"
     };
@@ -1655,19 +1655,19 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori WizardContentLayout
      *
-     * @public
+     * @private
      */
     pkg["WizardContentLayout"] = {
       /**
        * Display the content of the &#x60;ui5-wizard&#x60; as multiple steps in a scroll section.
        *
-       * @public
+       * @private
        */
       MultipleSteps: "MultipleSteps",
       /**
        * Display the content of the &#x60;ui5-wizard&#x60; as single step.
        *
-       * @public
+       * @private
        */
       SingleStep: "SingleStep"
     };
@@ -1686,7 +1686,7 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori IMediaGalleryItem
      *
-     * @public
+     * @private
      */
     /**
      * Interface for components that may be slotted inside `ui5-product-switch` as items
@@ -1697,7 +1697,7 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori IProductSwitchItem
      *
-     * @public
+     * @private
      */
     /**
      * Interface for components that may be slotted inside a `ui5-search`
@@ -1708,7 +1708,7 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori ISearchScope
      *
-     * @public
+     * @private
      */
     /**
      * Interface for components that may be slotted inside `ui5-timeline` as items
@@ -1719,7 +1719,7 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori ITimelineItem
      *
-     * @public
+     * @private
      */
 
     return pkg;

@@ -172,7 +172,7 @@ sap.ui.define([
 
 	NavigationListItem.prototype._getInvisibleDescriptionLinkText = function () {
 		if (!this._invisibleDescriptionLinkText) {
-			this._invisibleDescriptionLinkText = new InvisibleText({id: this.getId() + "-invDescribedbyText",text: this._resourceBundleTnt.getText("NAVIGATION_LIST_KEYBOARD_NAVIGATION") + " " + this.getText()}).toStatic();
+			this._invisibleDescriptionLinkText = new InvisibleText({ id: this.getId() + "-invDescribedbyText", text: this._resourceBundleTnt.getText("NAVIGATION_LIST_KEYBOARD_NAVIGATION", this.getText())}).toStatic();
 		}
 		return this._invisibleDescriptionLinkText;
 	};

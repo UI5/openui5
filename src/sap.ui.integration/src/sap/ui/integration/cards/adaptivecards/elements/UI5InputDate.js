@@ -35,7 +35,7 @@ sap.ui.define([
 	};
 
 	UI5InputDate.prototype.internalRender = function () {
-		this._dateInputElement = document.createElement("ui5-date-picker");
+		this._dateInputElement = document.createElement("ui5-date-picker-ac");
 
 		this._dateInputElement.id = this.id;
 		this._dateInputElement.placeholder = this.placeholder;
@@ -60,7 +60,7 @@ sap.ui.define([
 
 	UI5InputDate.prototype.showValidationErrorMessage = function () {
 		if (this.renderedInputControlElement) {
-			this.renderedInputControlElement.valueState = "Error";
+			this.renderedInputControlElement.valueState = "Negative";
 		}
 	};
 

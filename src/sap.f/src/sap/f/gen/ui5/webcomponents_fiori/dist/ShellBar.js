@@ -39,7 +39,7 @@ sap.ui.define(
      *
      * @extends sap.ui.core.webc.WebComponent
      * @constructor
-     * @public
+     * @private
      * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/ShellBar
      */
 
@@ -584,7 +584,7 @@ sap.ui.define(
           getters: [
             /**
              * Returns the `logo` DOM ref.
-             * @public
+             * @private
              * @name module:sap/f/gen/ui5/webcomponents_fiori/dist/ShellBar#getLogoDomRef
              * @function
              */
@@ -592,7 +592,7 @@ sap.ui.define(
             "logoDomRef",
             /**
              * Returns the `notifications` icon DOM ref.
-             * @public
+             * @private
              * @name module:sap/f/gen/ui5/webcomponents_fiori/dist/ShellBar#getNotificationsDomRef
              * @function
              */
@@ -600,7 +600,7 @@ sap.ui.define(
             "notificationsDomRef",
             /**
              * Returns the `overflow` icon DOM ref.
-             * @public
+             * @private
              * @name module:sap/f/gen/ui5/webcomponents_fiori/dist/ShellBar#getOverflowDomRef
              * @function
              */
@@ -608,7 +608,7 @@ sap.ui.define(
             "overflowDomRef",
             /**
              * Returns the `profile` icon DOM ref.
-             * @public
+             * @private
              * @name module:sap/f/gen/ui5/webcomponents_fiori/dist/ShellBar#getProfileDomRef
              * @function
              */
@@ -616,7 +616,7 @@ sap.ui.define(
             "profileDomRef",
             /**
              * Returns the `product-switch` icon DOM ref.
-             * @public
+             * @private
              * @name module:sap/f/gen/ui5/webcomponents_fiori/dist/ShellBar#getProductSwitchDomRef
              * @function
              */
@@ -628,7 +628,7 @@ sap.ui.define(
             /**
              * Closes the overflow area.
              * Useful to manually close the overflow after having suppressed automatic closing with preventDefault() of ShellbarItem's press event
-             * @public
+             * @private
              * @name module:sap/f/gen/ui5/webcomponents_fiori/dist/ShellBar#closeOverflow
              * @function
              */
@@ -636,7 +636,7 @@ sap.ui.define(
             "closeOverflow",
             /**
              * Returns the `search` icon DOM ref.
-             * @public
+             * @private
              * @name module:sap/f/gen/ui5/webcomponents_fiori/dist/ShellBar#getSearchButtonDomRef
              * @function
              */

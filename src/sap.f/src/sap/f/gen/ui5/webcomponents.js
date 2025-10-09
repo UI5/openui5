@@ -232,85 +232,85 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents AvatarColorScheme
      *
-     * @public
+     * @private
      */
     pkg["AvatarColorScheme"] = {
       /**
        * Auto
        *
-       * @public
+       * @private
        */
       Auto: "Auto",
       /**
        * Accent1
        *
-       * @public
+       * @private
        */
       Accent1: "Accent1",
       /**
        * Accent2
        *
-       * @public
+       * @private
        */
       Accent2: "Accent2",
       /**
        * Accent3
        *
-       * @public
+       * @private
        */
       Accent3: "Accent3",
       /**
        * Accent4
        *
-       * @public
+       * @private
        */
       Accent4: "Accent4",
       /**
        * Accent5
        *
-       * @public
+       * @private
        */
       Accent5: "Accent5",
       /**
        * Accent6
        *
-       * @public
+       * @private
        */
       Accent6: "Accent6",
       /**
        * Accent7
        *
-       * @public
+       * @private
        */
       Accent7: "Accent7",
       /**
        * Accent8
        *
-       * @public
+       * @private
        */
       Accent8: "Accent8",
       /**
        * Accent9
        *
-       * @public
+       * @private
        */
       Accent9: "Accent9",
       /**
        * Accent10
        *
-       * @public
+       * @private
        */
       Accent10: "Accent10",
       /**
        * Placeholder
        *
-       * @public
+       * @private
        */
       Placeholder: "Placeholder",
       /**
        * Transparent
        *
-       * @public
+       * @private
        */
       Transparent: "Transparent"
     };
@@ -327,19 +327,19 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents AvatarGroupType
      *
-     * @public
+     * @private
      */
     pkg["AvatarGroupType"] = {
       /**
        * The avatars are displayed as partially overlapped on top of each other and the entire group has one click or tap area.
        *
-       * @public
+       * @private
        */
       Group: "Group",
       /**
        * The avatars are displayed side-by-side and each avatar has its own click or tap area.
        *
-       * @public
+       * @private
        */
       Individual: "Individual"
     };
@@ -353,19 +353,19 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents AvatarShape
      *
-     * @public
+     * @private
      */
     pkg["AvatarShape"] = {
       /**
        * Circular shape.
        *
-       * @public
+       * @private
        */
       Circle: "Circle",
       /**
        * Square shape.
        *
-       * @public
+       * @private
        */
       Square: "Square"
     };
@@ -379,42 +379,42 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents AvatarSize
      *
-     * @public
+     * @private
      */
     pkg["AvatarSize"] = {
       /**
        * component size - 2rem
        * font size - 1rem
        *
-       * @public
+       * @private
        */
       XS: "XS",
       /**
        * component size - 3rem
        * font size - 1.5rem
        *
-       * @public
+       * @private
        */
       S: "S",
       /**
        * component size - 4rem
        * font size - 2rem
        *
-       * @public
+       * @private
        */
       M: "M",
       /**
        * component size - 5rem
        * font size - 2.5rem
        *
-       * @public
+       * @private
        */
       L: "L",
       /**
        * component size - 7rem
        * font size - 3rem
        *
-       * @public
+       * @private
        */
       XL: "XL"
     };
@@ -428,25 +428,25 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents BackgroundDesign
      *
-     * @public
+     * @private
      */
     pkg["BackgroundDesign"] = {
       /**
        * A solid background color dependent on the theme.
        *
-       * @public
+       * @private
        */
       Solid: "Solid",
       /**
        * Transparent background.
        *
-       * @public
+       * @private
        */
       Transparent: "Transparent",
       /**
        * A translucent background depending on the opacity value of the theme.
        *
-       * @public
+       * @private
        */
       Translucent: "Translucent"
     };
@@ -463,19 +463,19 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents BarAccessibleRole
      *
-     * @public
+     * @private
      */
     pkg["BarAccessibleRole"] = {
       /**
        * Represents the ARIA role &quot;toolbar&quot;.
        *
-       * @public
+       * @private
        */
       Toolbar: "Toolbar",
       /**
        * Represents the ARIA role &quot;none&quot;.
        *
-       * @public
+       * @private
        */
       None: "None"
     };
@@ -492,31 +492,31 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents BarDesign
      *
-     * @public
+     * @private
      */
     pkg["BarDesign"] = {
       /**
        * Default type
        *
-       * @public
+       * @private
        */
       Header: "Header",
       /**
        * Subheader type
        *
-       * @public
+       * @private
        */
       Subheader: "Subheader",
       /**
        * Footer type
        *
-       * @public
+       * @private
        */
       Footer: "Footer",
       /**
        * Floating Footer type - there is visible border on all sides
        *
-       * @public
+       * @private
        */
       FloatingFooter: "FloatingFooter"
     };
@@ -530,19 +530,19 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents BorderDesign
      *
-     * @public
+     * @private
      */
     pkg["BorderDesign"] = {
       /**
        * A solid border color dependent on the theme.
        *
-       * @public
+       * @private
        */
       Solid: "Solid",
       /**
        * Specifies no border.
        *
-       * @public
+       * @private
        */
       None: "None"
     };
@@ -556,20 +556,20 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents BreadcrumbsDesign
      *
-     * @public
+     * @private
      */
     pkg["BreadcrumbsDesign"] = {
       /**
        * Shows the current page as the last item in the trail.
        * The last item contains only plain text and is not a link.
        *
-       * @public
+       * @private
        */
       Standard: "Standard",
       /**
        * All items are displayed as links.
        *
-       * @public
+       * @private
        */
       NoCurrentPage: "NoCurrentPage"
     };
@@ -586,43 +586,43 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents BreadcrumbsSeparator
      *
-     * @public
+     * @private
      */
     pkg["BreadcrumbsSeparator"] = {
       /**
        * The separator appears as &quot;/&quot;.
        *
-       * @public
+       * @private
        */
       Slash: "Slash",
       /**
        * The separator appears as &quot;\&quot;.
        *
-       * @public
+       * @private
        */
       BackSlash: "BackSlash",
       /**
        * The separator appears as &quot;\\&quot;.
        *
-       * @public
+       * @private
        */
       DoubleBackSlash: "DoubleBackSlash",
       /**
        * The separator appears as &quot;&gt;&gt;&quot;.
        *
-       * @public
+       * @private
        */
       DoubleGreaterThan: "DoubleGreaterThan",
       /**
        * The separator appears as &quot;//&quot; .
        *
-       * @public
+       * @private
        */
       DoubleSlash: "DoubleSlash",
       /**
        * The separator appears as &quot;&gt;&quot;.
        *
-       * @public
+       * @private
        */
       GreaterThan: "GreaterThan"
     };
@@ -639,25 +639,25 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents BusyIndicatorSize
      *
-     * @public
+     * @private
      */
     pkg["BusyIndicatorSize"] = {
       /**
        * small size
        *
-       * @public
+       * @private
        */
       S: "S",
       /**
        * medium size
        *
-       * @public
+       * @private
        */
       M: "M",
       /**
        * large size
        *
-       * @public
+       * @private
        */
       L: "L"
     };
@@ -674,19 +674,19 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents BusyIndicatorTextPlacement
      *
-     * @public
+     * @private
      */
     pkg["BusyIndicatorTextPlacement"] = {
       /**
        * The text will be displayed on top of the busy indicator.
        *
-       * @public
+       * @private
        */
       Top: "Top",
       /**
        * The text will be displayed at the bottom of the busy indicator.
        *
-       * @public
+       * @private
        */
       Bottom: "Bottom"
     };
@@ -703,19 +703,19 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents ButtonAccessibleRole
      *
-     * @public
+     * @private
      */
     pkg["ButtonAccessibleRole"] = {
       /**
        * Represents Default (button) ARIA role.
        *
-       * @public
+       * @private
        */
       Button: "Button",
       /**
        * Represents the ARIA role &quot;link&quot;.
        *
-       * @public
+       * @private
        */
       Link: "Link"
     };
@@ -732,13 +732,13 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents ButtonBadgeDesign
      *
-     * @public
+     * @private
      */
     pkg["ButtonBadgeDesign"] = {
       /**
        * The badge is displayed after the text, inside the button.
        *
-       * @public
+       * @private
        */
       InlineText: "InlineText",
       /**
@@ -746,13 +746,13 @@ sap.ui.define(
        *
        * **Note:** According to design guidance, the OverlayText design mode is best used in cozy density to avoid potential visual issues in compact.
        *
-       * @public
+       * @private
        */
       OverlayText: "OverlayText",
       /**
        * The badge is displayed as an attention dot.
        *
-       * @public
+       * @private
        */
       AttentionDot: "AttentionDot"
     };
@@ -769,43 +769,43 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents ButtonDesign
      *
-     * @public
+     * @private
      */
     pkg["ButtonDesign"] = {
       /**
        * default type (no special styling)
        *
-       * @public
+       * @private
        */
       Default: "Default",
       /**
        * accept type (green button)
        *
-       * @public
+       * @private
        */
       Positive: "Positive",
       /**
        * reject style (red button)
        *
-       * @public
+       * @private
        */
       Negative: "Negative",
       /**
        * transparent type
        *
-       * @public
+       * @private
        */
       Transparent: "Transparent",
       /**
        * emphasized type
        *
-       * @public
+       * @private
        */
       Emphasized: "Emphasized",
       /**
        * attention type
        *
-       * @public
+       * @private
        */
       Attention: "Attention"
     };
@@ -819,25 +819,25 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents ButtonType
      *
-     * @public
+     * @private
      */
     pkg["ButtonType"] = {
       /**
        * The button does not do anything special when inside a form
        *
-       * @public
+       * @private
        */
       Button: "Button",
       /**
        * The button acts as a submit button (submits a form)
        *
-       * @public
+       * @private
        */
       Submit: "Submit",
       /**
        * The button acts as a reset button (resets a form)
        *
-       * @public
+       * @private
        */
       Reset: "Reset"
     };
@@ -851,145 +851,145 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents CalendarLegendItemType
      *
-     * @public
+     * @private
      */
     pkg["CalendarLegendItemType"] = {
       /**
        * Set when no type is set.
        *
-       * @public
+       * @private
        */
       None: "None",
       /**
        * Represents the &quot;Working&quot; item in the calendar legend.
        *
-       * @public
+       * @private
        */
       Working: "Working",
       /**
        * Represents the &quot;NonWorking&quot; item in the calendar legend.
        *
-       * @public
+       * @private
        */
       NonWorking: "NonWorking",
       /**
        * Represents the &quot;Type01&quot; item in the calendar legend.
        *
-       * @public
+       * @private
        */
       Type01: "Type01",
       /**
        * Represents the &quot;Type02&quot; item in the calendar legend.
        *
-       * @public
+       * @private
        */
       Type02: "Type02",
       /**
        * Represents the &quot;Type03&quot; item in the calendar legend.
        *
-       * @public
+       * @private
        */
       Type03: "Type03",
       /**
        * Represents the &quot;Type04&quot; item in the calendar legend.
        *
-       * @public
+       * @private
        */
       Type04: "Type04",
       /**
        * Represents the &quot;Type05&quot; item in the calendar legend.
        *
-       * @public
+       * @private
        */
       Type05: "Type05",
       /**
        * Represents the &quot;Type06&quot; item in the calendar legend.
        *
-       * @public
+       * @private
        */
       Type06: "Type06",
       /**
        * Represents the &quot;Type07&quot; item in the calendar legend.
        *
-       * @public
+       * @private
        */
       Type07: "Type07",
       /**
        * Represents the &quot;Type08&quot; item in the calendar legend.
        *
-       * @public
+       * @private
        */
       Type08: "Type08",
       /**
        * Represents the &quot;Type09&quot; item in the calendar legend.
        *
-       * @public
+       * @private
        */
       Type09: "Type09",
       /**
        * Represents the &quot;Type10&quot; item in the calendar legend.
        *
-       * @public
+       * @private
        */
       Type10: "Type10",
       /**
        * Represents the &quot;Type11&quot; item in the calendar legend.
        *
-       * @public
+       * @private
        */
       Type11: "Type11",
       /**
        * Represents the &quot;Type12&quot; item in the calendar legend.
        *
-       * @public
+       * @private
        */
       Type12: "Type12",
       /**
        * Represents the &quot;Type13&quot; item in the calendar legend.
        *
-       * @public
+       * @private
        */
       Type13: "Type13",
       /**
        * Represents the &quot;Type14&quot; item in the calendar legend.
        *
-       * @public
+       * @private
        */
       Type14: "Type14",
       /**
        * Represents the &quot;Type15&quot; item in the calendar legend.
        *
-       * @public
+       * @private
        */
       Type15: "Type15",
       /**
        * Represents the &quot;Type16&quot; item in the calendar legend.
        *
-       * @public
+       * @private
        */
       Type16: "Type16",
       /**
        * Represents the &quot;Type17&quot; item in the calendar legend.
        *
-       * @public
+       * @private
        */
       Type17: "Type17",
       /**
        * Represents the &quot;Type18&quot; item in the calendar legend.
        *
-       * @public
+       * @private
        */
       Type18: "Type18",
       /**
        * Represents the &quot;Type19&quot; item in the calendar legend.
        *
-       * @public
+       * @private
        */
       Type19: "Type19",
       /**
        * Represents the &quot;Type20&quot; item in the calendar legend.
        *
-       * @public
+       * @private
        */
       Type20: "Type20"
     };
@@ -1006,25 +1006,25 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents CalendarSelectionMode
      *
-     * @public
+     * @private
      */
     pkg["CalendarSelectionMode"] = {
       /**
        * Only one date can be selected at a time
        *
-       * @public
+       * @private
        */
       Single: "Single",
       /**
        * Several dates can be selected
        *
-       * @public
+       * @private
        */
       Multiple: "Multiple",
       /**
        * A range defined by a start date and an end date can be selected
        *
-       * @public
+       * @private
        */
       Range: "Range"
     };
@@ -1044,7 +1044,7 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents CalendarWeekNumbering
      *
-     * @public
+     * @private
      */
     pkg["CalendarWeekNumbering"] = {
       /**
@@ -1054,21 +1054,21 @@ sap.ui.define(
        * active format locale. Future versions of ui5-webcomponents might select a different week numbering
        * scheme.
        *
-       * @public
+       * @private
        */
       Default: "Default",
       /**
        * Official calendar week numbering in most of Europe (ISO 8601 standard):
        * Monday is first day of the week, the week containing January 4th is first week of the year.
        *
-       * @public
+       * @private
        */
       ISO_8601: "ISO_8601",
       /**
        * Official calendar week numbering in much of the Middle East (Middle Eastern calendar):
        * Saturday is first day of the week, the week containing January 1st is first week of the year.
        *
-       * @public
+       * @private
        */
       MiddleEastern: "MiddleEastern",
       /**
@@ -1076,7 +1076,7 @@ sap.ui.define(
        * other countries (Western traditional calendar):
        * Sunday is first day of the week, the week containing January 1st is first week of the year.
        *
-       * @public
+       * @private
        */
       WesternTraditional: "WesternTraditional"
     };
@@ -1093,19 +1093,19 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents CarouselArrowsPlacement
      *
-     * @public
+     * @private
      */
     pkg["CarouselArrowsPlacement"] = {
       /**
        * Carousel arrows are placed on the sides of the current Carousel page.
        *
-       * @public
+       * @private
        */
       Content: "Content",
       /**
        * Carousel arrows are placed on the sides of the page indicator of the Carousel.
        *
-       * @public
+       * @private
        */
       Navigation: "Navigation"
     };
@@ -1122,20 +1122,20 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents CarouselPageIndicatorType
      *
-     * @public
+     * @private
      */
     pkg["CarouselPageIndicatorType"] = {
       /**
        * The page indicator will be visualized as dots if there are fewer than 9 pages.
        * If there are more pages, the page indicator will switch to displaying the current page and the total number of pages. (e.g. X of Y)
        *
-       * @public
+       * @private
        */
       Default: "Default",
       /**
        * The page indicator will display the current page and the total number of pages. (e.g. X of Y)
        *
-       * @public
+       * @private
        */
       Numeric: "Numeric"
     };
@@ -1152,31 +1152,31 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents ComboBoxFilter
      *
-     * @public
+     * @private
      */
     pkg["ComboBoxFilter"] = {
       /**
        * Defines filtering by first symbol of each word of item&#x27;s text.
        *
-       * @public
+       * @private
        */
       StartsWithPerTerm: "StartsWithPerTerm",
       /**
        * Defines filtering by starting symbol of item&#x27;s text.
        *
-       * @public
+       * @private
        */
       StartsWith: "StartsWith",
       /**
        * Defines contains filtering.
        *
-       * @public
+       * @private
        */
       Contains: "Contains",
       /**
        * Removes any filtering applied while typing
        *
-       * @public
+       * @private
        */
       None: "None"
     };
@@ -1190,19 +1190,19 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents ExpandableTextOverflowMode
      *
-     * @public
+     * @private
      */
     pkg["ExpandableTextOverflowMode"] = {
       /**
        * Overflowing text is appended in-place.
        *
-       * @public
+       * @private
        */
       InPlace: "InPlace",
       /**
        * Full text is displayed in a popover.
        *
-       * @public
+       * @private
        */
       Popover: "Popover"
     };
@@ -1219,19 +1219,19 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents FormItemSpacing
      *
-     * @public
+     * @private
      */
     pkg["FormItemSpacing"] = {
       /**
        * Normal spacing (smaller vertical space between form items).
        *
-       * @public
+       * @private
        */
       Normal: "Normal",
       /**
        * Large spacing (larger vertical space between form items).
        *
-       * @public
+       * @private
        */
       Large: "Large"
     };
@@ -1245,37 +1245,37 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents Highlight
      *
-     * @public
+     * @private
      */
     pkg["Highlight"] = {
       /**
        * None
        *
-       * @public
+       * @private
        */
       None: "None",
       /**
        * Positive
        *
-       * @public
+       * @private
        */
       Positive: "Positive",
       /**
        * Critical
        *
-       * @public
+       * @private
        */
       Critical: "Critical",
       /**
        * Negative
        *
-       * @public
+       * @private
        */
       Negative: "Negative",
       /**
        * Information
        *
-       * @public
+       * @private
        */
       Information: "Information"
     };
@@ -1289,55 +1289,55 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents IconDesign
      *
-     * @public
+     * @private
      */
     pkg["IconDesign"] = {
       /**
        * Contrast design
        *
-       * @public
+       * @private
        */
       Contrast: "Contrast",
       /**
        * Critical design
        *
-       * @public
+       * @private
        */
       Critical: "Critical",
       /**
        * Default design (brand design)
        *
-       * @public
+       * @private
        */
       Default: "Default",
       /**
        * info type
        *
-       * @public
+       * @private
        */
       Information: "Information",
       /**
        * Negative design
        *
-       * @public
+       * @private
        */
       Negative: "Negative",
       /**
        * Neutral design
        *
-       * @public
+       * @private
        */
       Neutral: "Neutral",
       /**
        * Design that indicates an icon which isn&#x27;t interactive
        *
-       * @public
+       * @private
        */
       NonInteractive: "NonInteractive",
       /**
        * Positive design
        *
-       * @public
+       * @private
        */
       Positive: "Positive"
     };
@@ -1351,14 +1351,14 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents IconMode
      *
-     * @public
+     * @private
      */
     pkg["IconMode"] = {
       /**
        * Image mode (by default).
        * Configures the component to internally render role&#x3D;&quot;img&quot;.
        *
-       * @public
+       * @private
        */
       Image: "Image",
       /**
@@ -1366,7 +1366,7 @@ sap.ui.define(
        * Configures the component to internally render role&#x3D;&quot;presentation&quot; and aria-hidden&#x3D;&quot;true&quot;,
        * making it purely decorative without semantic content or interactivity.
        *
-       * @public
+       * @private
        */
       Decorative: "Decorative",
       /**
@@ -1374,7 +1374,7 @@ sap.ui.define(
        * Configures the component to internally render role&#x3D;&quot;button&quot;.
        * This mode also supports focus and press handling to enhance interactivity.
        *
-       * @public
+       * @private
        */
       Interactive: "Interactive"
     };
@@ -1388,49 +1388,49 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents InputType
      *
-     * @public
+     * @private
      */
     pkg["InputType"] = {
       /**
        * Defines a one-line text input field:
        *
-       * @public
+       * @private
        */
       Text: "Text",
       /**
        * Used for input fields that must contain an e-mail address.
        *
-       * @public
+       * @private
        */
       Email: "Email",
       /**
        * Defines a numeric input field.
        *
-       * @public
+       * @private
        */
       Number: "Number",
       /**
        * Defines a password field.
        *
-       * @public
+       * @private
        */
       Password: "Password",
       /**
        * Used for input fields that should contain a telephone number.
        *
-       * @public
+       * @private
        */
       Tel: "Tel",
       /**
        * Used for input fields that should contain a URL address.
        *
-       * @public
+       * @private
        */
       URL: "URL",
       /**
        * Used for input fields that should contain a search term.
        *
-       * @public
+       * @private
        */
       Search: "Search"
     };
@@ -1444,19 +1444,19 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents InteractiveAreaSize
      *
-     * @public
+     * @private
      */
     pkg["InteractiveAreaSize"] = {
       /**
        * The default target area size (the area taken by the component itself without any extra invisible touch area).
        *
-       * @public
+       * @private
        */
       Normal: "Normal",
       /**
        * Enlarged target area size (up to 24px in height) provides users with an enhanced dedicated space to interact with the component.
        *
-       * @public
+       * @private
        */
       Large: "Large"
     };
@@ -1473,19 +1473,19 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents LinkAccessibleRole
      *
-     * @public
+     * @private
      */
     pkg["LinkAccessibleRole"] = {
       /**
        * Represents Default (link) ARIA role.
        *
-       * @public
+       * @private
        */
       Link: "Link",
       /**
        * Represents the ARIA role &quot;button&quot;.
        *
-       * @public
+       * @private
        */
       Button: "Button"
     };
@@ -1502,25 +1502,25 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents LinkDesign
      *
-     * @public
+     * @private
      */
     pkg["LinkDesign"] = {
       /**
        * default type (no special styling)
        *
-       * @public
+       * @private
        */
       Default: "Default",
       /**
        * subtle type (appears as regular text, rather than a link)
        *
-       * @public
+       * @private
        */
       Subtle: "Subtle",
       /**
        * emphasized type
        *
-       * @public
+       * @private
        */
       Emphasized: "Emphasized"
     };
@@ -1534,31 +1534,31 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents ListAccessibleRole
      *
-     * @public
+     * @private
      */
     pkg["ListAccessibleRole"] = {
       /**
        * Represents the ARIA role &quot;list&quot;. (by default)
        *
-       * @public
+       * @private
        */
       List: "List",
       /**
        * Represents the ARIA role &quot;menu&quot;.
        *
-       * @public
+       * @private
        */
       Menu: "Menu",
       /**
        * Represents the ARIA role &quot;tree&quot;.
        *
-       * @public
+       * @private
        */
       Tree: "Tree",
       /**
        * Represents the ARIA role &quot;listbox&quot;.
        *
-       * @public
+       * @private
        */
       ListBox: "ListBox"
     };
@@ -1575,26 +1575,26 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents ListGrowingMode
      *
-     * @public
+     * @private
      */
     pkg["ListGrowingMode"] = {
       /**
        * Component&#x27;s &quot;load-more&quot; is fired upon pressing a &quot;More&quot; button.
        * at the bottom.
        *
-       * @public
+       * @private
        */
       Button: "Button",
       /**
        * Component&#x27;s &quot;load-more&quot; is fired upon scroll.
        *
-       * @public
+       * @private
        */
       Scroll: "Scroll",
       /**
        * Component&#x27;s growing is not enabled.
        *
-       * @public
+       * @private
        */
       None: "None"
     };
@@ -1608,37 +1608,37 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents ListItemAccessibleRole
      *
-     * @public
+     * @private
      */
     pkg["ListItemAccessibleRole"] = {
       /**
        * Represents the ARIA role &quot;listitem&quot;. (by default)
        *
-       * @public
+       * @private
        */
       ListItem: "ListItem",
       /**
        * Represents the ARIA role &quot;menuitem&quot;.
        *
-       * @public
+       * @private
        */
       MenuItem: "MenuItem",
       /**
        * Represents the ARIA role &quot;treeitem&quot;.
        *
-       * @public
+       * @private
        */
       TreeItem: "TreeItem",
       /**
        * Represents the ARIA role &quot;option&quot;.
        *
-       * @public
+       * @private
        */
       Option: "Option",
       /**
        * Represents the ARIA role &quot;none&quot;.
        *
-       * @public
+       * @private
        */
       None: "None"
     };
@@ -1655,31 +1655,31 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents ListItemType
      *
-     * @public
+     * @private
      */
     pkg["ListItemType"] = {
       /**
        * Indicates the list item does not have any active feedback when item is pressed.
        *
-       * @public
+       * @private
        */
       Inactive: "Inactive",
       /**
        * Indicates that the item is clickable via active feedback when item is pressed.
        *
-       * @public
+       * @private
        */
       Active: "Active",
       /**
        * Enables detail button of the list item that fires detail-click event.
        *
-       * @public
+       * @private
        */
       Detail: "Detail",
       /**
        * Enables the type of navigation, which is specified to add an arrow at the end of the items and fires navigate-click event.
        *
-       * @public
+       * @private
        */
       Navigation: "Navigation"
     };
@@ -1693,51 +1693,51 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents ListSelectionMode
      *
-     * @public
+     * @private
      */
     pkg["ListSelectionMode"] = {
       /**
        * Default mode (no selection).
        *
-       * @public
+       * @private
        */
       None: "None",
       /**
        * Right-positioned single selection mode (only one list item can be selected).
        *
-       * @public
+       * @private
        */
       Single: "Single",
       /**
        * Left-positioned single selection mode (only one list item can be selected).
        *
-       * @public
+       * @private
        */
       SingleStart: "SingleStart",
       /**
        * Selected item is highlighted but no selection element is visible
        * (only one list item can be selected).
        *
-       * @public
+       * @private
        */
       SingleEnd: "SingleEnd",
       /**
        * Selected item is highlighted and selection is changed upon arrow navigation
        * (only one list item can be selected - this is always the focused item).
        *
-       * @public
+       * @private
        */
       SingleAuto: "SingleAuto",
       /**
        * Multi selection mode (more than one list item can be selected).
        *
-       * @public
+       * @private
        */
       Multiple: "Multiple",
       /**
        * Delete mode (only one list item can be deleted via provided delete button)
        *
-       * @public
+       * @private
        */
       Delete: "Delete"
     };
@@ -1754,26 +1754,26 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents ListSeparator
      *
-     * @public
+     * @private
      */
     pkg["ListSeparator"] = {
       /**
        * Separators between the items including the last and the first one.
        *
-       * @public
+       * @private
        */
       All: "All",
       /**
        * Separators between the items.
        * Note: This enumeration depends on the theme.
        *
-       * @public
+       * @private
        */
       Inner: "Inner",
       /**
        * No item separators.
        *
-       * @public
+       * @private
        */
       None: "None"
     };
@@ -1787,25 +1787,25 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents MenuItemGroupCheckMode
      *
-     * @public
+     * @private
      */
     pkg["MenuItemGroupCheckMode"] = {
       /**
        * default type (items in a group cannot be checked)
        *
-       * @public
+       * @private
        */
       None: "None",
       /**
        * Single item check mode (only one item in a group can be checked at a time)
        *
-       * @public
+       * @private
        */
       Single: "Single",
       /**
        * Multiple items check mode (multiple items in a group can be checked at a time)
        *
-       * @public
+       * @private
        */
       Multiple: "Multiple"
     };
@@ -1822,43 +1822,43 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents MessageStripDesign
      *
-     * @public
+     * @private
      */
     pkg["MessageStripDesign"] = {
       /**
        * Message should be just an information
        *
-       * @public
+       * @private
        */
       Information: "Information",
       /**
        * Message is a success message
        *
-       * @public
+       * @private
        */
       Positive: "Positive",
       /**
        * Message is an error
        *
-       * @public
+       * @private
        */
       Negative: "Negative",
       /**
        * Message is a warning
        *
-       * @public
+       * @private
        */
       Critical: "Critical",
       /**
        * Message uses custom color set 1
        *
-       * @public
+       * @private
        */
       ColorSet1: "ColorSet1",
       /**
        * Message uses custom color set 2
        *
-       * @public
+       * @private
        */
       ColorSet2: "ColorSet2"
     };
@@ -1875,20 +1875,20 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents NotificationListGrowingMode
      *
-     * @public
+     * @private
      */
     pkg["NotificationListGrowingMode"] = {
       /**
        * Component&#x27;s &quot;load-more&quot; is fired upon pressing a &quot;More&quot; button.
        * at the bottom.
        *
-       * @public
+       * @private
        */
       Button: "Button",
       /**
        * Component&#x27;s growing is not enabled.
        *
-       * @public
+       * @private
        */
       None: "None"
     };
@@ -1905,19 +1905,19 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents OverflowMode
      *
-     * @public
+     * @private
      */
     pkg["OverflowMode"] = {
       /**
        * End type is used if there should be only one overflow with hidden the tabs at the end of the tab container.
        *
-       * @public
+       * @private
        */
       End: "End",
       /**
        * StartAndEnd type is used if there should be two overflows on both ends of the tab container.
        *
-       * @public
+       * @private
        */
       StartAndEnd: "StartAndEnd"
     };
@@ -1931,28 +1931,28 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents PanelAccessibleRole
      *
-     * @public
+     * @private
      */
     pkg["PanelAccessibleRole"] = {
       /**
        * Represents the ARIA role &quot;complementary&quot;.
        * A section of the page, designed to be complementary to the main content at a similar level in the DOM hierarchy.
        *
-       * @public
+       * @private
        */
       Complementary: "Complementary",
       /**
        * Represents the ARIA role &quot;Form&quot;.
        * A landmark region that contains a collection of items and objects that, as a whole, create a form.
        *
-       * @public
+       * @private
        */
       Form: "Form",
       /**
        * Represents the ARIA role &quot;Region&quot;.
        * A section of a page, that is important enough to be included in a page summary or table of contents.
        *
-       * @public
+       * @private
        */
       Region: "Region"
     };
@@ -1969,31 +1969,31 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents PopoverHorizontalAlign
      *
-     * @public
+     * @private
      */
     pkg["PopoverHorizontalAlign"] = {
       /**
        * Popover is centered.
        *
-       * @public
+       * @private
        */
       Center: "Center",
       /**
        * Popover is aligned with the start of the target.
        *
-       * @public
+       * @private
        */
       Start: "Start",
       /**
        * Popover is aligned with the end of the target.
        *
-       * @public
+       * @private
        */
       End: "End",
       /**
        * Popover is stretched.
        *
-       * @public
+       * @private
        */
       Stretch: "Stretch"
     };
@@ -2010,31 +2010,31 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents PopoverPlacement
      *
-     * @public
+     * @private
      */
     pkg["PopoverPlacement"] = {
       /**
        * Popover will be placed at the start of the reference element.
        *
-       * @public
+       * @private
        */
       Start: "Start",
       /**
        * Popover will be placed at the end of the reference element.
        *
-       * @public
+       * @private
        */
       End: "End",
       /**
        * Popover will be placed at the top of the reference element.
        *
-       * @public
+       * @private
        */
       Top: "Top",
       /**
        * Popover will be placed at the bottom of the reference element.
        *
-       * @public
+       * @private
        */
       Bottom: "Bottom"
     };
@@ -2051,31 +2051,31 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents PopoverVerticalAlign
      *
-     * @public
+     * @private
      */
     pkg["PopoverVerticalAlign"] = {
       /**
        * Center
        *
-       * @public
+       * @private
        */
       Center: "Center",
       /**
        * Popover will be placed at the top of the reference control.
        *
-       * @public
+       * @private
        */
       Top: "Top",
       /**
        * Popover will be placed at the bottom of the reference control.
        *
-       * @public
+       * @private
        */
       Bottom: "Bottom",
       /**
        * Popover will be streched
        *
-       * @public
+       * @private
        */
       Stretch: "Stretch"
     };
@@ -2092,25 +2092,25 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents PopupAccessibleRole
      *
-     * @public
+     * @private
      */
     pkg["PopupAccessibleRole"] = {
       /**
        * Represents no ARIA role.
        *
-       * @public
+       * @private
        */
       None: "None",
       /**
        * Represents the ARIA role &quot;dialog&quot;.
        *
-       * @public
+       * @private
        */
       Dialog: "Dialog",
       /**
        * Represents the ARIA role &quot;alertdialog&quot;.
        *
-       * @public
+       * @private
        */
       AlertDialog: "AlertDialog"
     };
@@ -2127,31 +2127,31 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents Priority
      *
-     * @public
+     * @private
      */
     pkg["Priority"] = {
       /**
        * High priority.
        *
-       * @public
+       * @private
        */
       High: "High",
       /**
        * Medium priority.
        *
-       * @public
+       * @private
        */
       Medium: "Medium",
       /**
        * Low priority.
        *
-       * @public
+       * @private
        */
       Low: "Low",
       /**
        * Default, none priority.
        *
-       * @public
+       * @private
        */
       None: "None"
     };
@@ -2166,26 +2166,26 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents RatingIndicatorSize
      *
-     * @public
+     * @private
      */
     pkg["RatingIndicatorSize"] = {
       /**
        * Small size for compact layouts.
        *
-       * @public
+       * @private
        */
       S: "S",
       /**
        * Medium size, used as the default option.
        * Offers a balanced appearance for most scenarios.
        *
-       * @public
+       * @private
        */
       M: "M",
       /**
        * Large size for prominent or spacious layouts.
        *
-       * @public
+       * @private
        */
       L: "L"
     };
@@ -2202,19 +2202,19 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents SegmentedButtonSelectionMode
      *
-     * @public
+     * @private
      */
     pkg["SegmentedButtonSelectionMode"] = {
       /**
        * There is always one selected. Selecting one deselects the previous one.
        *
-       * @public
+       * @private
        */
       Single: "Single",
       /**
        * Multiple items can be selected at a time. All items can be deselected.
        *
-       * @public
+       * @private
        */
       Multiple: "Multiple"
     };
@@ -2231,37 +2231,37 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents SemanticColor
      *
-     * @public
+     * @private
      */
     pkg["SemanticColor"] = {
       /**
        * Default color (brand color)
        *
-       * @public
+       * @private
        */
       Default: "Default",
       /**
        * Positive color
        *
-       * @public
+       * @private
        */
       Positive: "Positive",
       /**
        * Negative color
        *
-       * @public
+       * @private
        */
       Negative: "Negative",
       /**
        * Critical color
        *
-       * @public
+       * @private
        */
       Critical: "Critical",
       /**
        * Neutral color.
        *
-       * @public
+       * @private
        */
       Neutral: "Neutral"
     };
@@ -2275,19 +2275,19 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents SwitchDesign
      *
-     * @public
+     * @private
      */
     pkg["SwitchDesign"] = {
       /**
        * Defines the Switch as Textual
        *
-       * @public
+       * @private
        */
       Textual: "Textual",
       /**
        * Defines the Switch as Graphical
        *
-       * @public
+       * @private
        */
       Graphical: "Graphical"
     };
@@ -2301,19 +2301,19 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents TabLayout
      *
-     * @public
+     * @private
      */
     pkg["TabLayout"] = {
       /**
        * Inline type, the tab &quot;main text&quot; and &quot;additionalText&quot; are displayed horizotally.
        *
-       * @public
+       * @private
        */
       Inline: "Inline",
       /**
        * Standard type, the tab &quot;main text&quot; and &quot;additionalText&quot; are displayed vertically.
        *
-       * @public
+       * @private
        */
       Standard: "Standard"
     };
@@ -2327,37 +2327,37 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents TableCellHorizontalAlign
      *
-     * @public
+     * @private
      */
     pkg["TableCellHorizontalAlign"] = {
       /**
        * Left
        *
-       * @public
+       * @private
        */
       Left: "Left",
       /**
        * Start
        *
-       * @public
+       * @private
        */
       Start: "Start",
       /**
        * Right
        *
-       * @public
+       * @private
        */
       Right: "Right",
       /**
        * End
        *
-       * @public
+       * @private
        */
       End: "End",
       /**
        * Center
        *
-       * @public
+       * @private
        */
       Center: "Center"
     };
@@ -2374,13 +2374,13 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents TableGrowingMode
      *
-     * @public
+     * @private
      */
     pkg["TableGrowingMode"] = {
       /**
        * Renders a growing button, which can be pressed to load more data.
        *
-       * @public
+       * @private
        */
       Button: "Button",
       /**
@@ -2388,7 +2388,7 @@ sap.ui.define(
        *
        * **Note:** If the table is not scrollable, a growing button will be rendered instead to ensure growing functionality.
        *
-       * @public
+       * @private
        */
       Scroll: "Scroll"
     };
@@ -2405,19 +2405,19 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents TableOverflowMode
      *
-     * @public
+     * @private
      */
     pkg["TableOverflowMode"] = {
       /**
        * Shows a scrollbar, when the table cannot fit all columns.
        *
-       * @public
+       * @private
        */
       Scroll: "Scroll",
       /**
        * Pops in columns, that do not fit into the table anymore.
        *
-       * @public
+       * @private
        */
       Popin: "Popin"
     };
@@ -2434,13 +2434,13 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents TableSelectionBehavior
      *
-     * @public
+     * @private
      */
     pkg["TableSelectionBehavior"] = {
       /**
        * Rows can only be selected by using the row selector column.
        *
-       * @public
+       * @private
        */
       RowSelector: "RowSelector",
       /**
@@ -2448,7 +2448,7 @@ sap.ui.define(
        *
        * **Note:** In this mode, the &#x60;row-click&#x60; event of the &#x60;ui5-table&#x60; component is not fired.
        *
-       * @public
+       * @private
        */
       RowOnly: "RowOnly"
     };
@@ -2465,25 +2465,25 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents TableSelectionMode
      *
-     * @public
+     * @private
      */
     pkg["TableSelectionMode"] = {
       /**
        * Default mode (no selection).
        *
-       * @public
+       * @private
        */
       None: "None",
       /**
        * Single selection mode (only one table row can be selected).
        *
-       * @public
+       * @private
        */
       Single: "Single",
       /**
        * Multi selection mode (more than one table row can be selected).
        *
-       * @public
+       * @private
        */
       Multiple: "Multiple"
     };
@@ -2500,19 +2500,19 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents TableSelectionMultiHeaderSelector
      *
-     * @public
+     * @private
      */
     pkg["TableSelectionMultiHeaderSelector"] = {
       /**
        * Renders a checkbox in the table header row that toggles the selection of all rows.
        *
-       * @public
+       * @private
        */
       SelectAll: "SelectAll",
       /**
        * Renders an icon in the table header row that removes the selection of all rows.
        *
-       * @public
+       * @private
        */
       ClearAll: "ClearAll"
     };
@@ -2529,49 +2529,49 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents TagDesign
      *
-     * @public
+     * @private
      */
     pkg["TagDesign"] = {
       /**
        * Set1 of generic indication colors that are intended for industry-specific use cases
        *
-       * @public
+       * @private
        */
       Set1: "Set1",
       /**
        * Set2 of generic indication colors that are intended for industry-specific use cases
        *
-       * @public
+       * @private
        */
       Set2: "Set2",
       /**
        * Neutral design
        *
-       * @public
+       * @private
        */
       Neutral: "Neutral",
       /**
        * Information design
        *
-       * @public
+       * @private
        */
       Information: "Information",
       /**
        * Positive design
        *
-       * @public
+       * @private
        */
       Positive: "Positive",
       /**
        * Negative design
        *
-       * @public
+       * @private
        */
       Negative: "Negative",
       /**
        * Critical design
        *
-       * @public
+       * @private
        */
       Critical: "Critical"
     };
@@ -2585,19 +2585,19 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents TagSize
      *
-     * @public
+     * @private
      */
     pkg["TagSize"] = {
       /**
        * Small size of the tag
        *
-       * @public
+       * @private
        */
       S: "S",
       /**
        * Large size of the tag
        *
-       * @public
+       * @private
        */
       L: "L"
     };
@@ -2611,19 +2611,19 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents TextEmptyIndicatorMode
      *
-     * @public
+     * @private
      */
     pkg["TextEmptyIndicatorMode"] = {
       /**
        * Empty indicator is never rendered.
        *
-       * @public
+       * @private
        */
       Off: "Off",
       /**
        * Empty indicator is rendered always when the component&#x27;s content is empty.
        *
-       * @public
+       * @private
        */
       On: "On"
     };
@@ -2640,43 +2640,43 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents TitleLevel
      *
-     * @public
+     * @private
      */
     pkg["TitleLevel"] = {
       /**
        * Renders &#x60;h1&#x60; tag.
        *
-       * @public
+       * @private
        */
       H1: "H1",
       /**
        * Renders &#x60;h2&#x60; tag.
        *
-       * @public
+       * @private
        */
       H2: "H2",
       /**
        * Renders &#x60;h3&#x60; tag.
        *
-       * @public
+       * @private
        */
       H3: "H3",
       /**
        * Renders &#x60;h4&#x60; tag.
        *
-       * @public
+       * @private
        */
       H4: "H4",
       /**
        * Renders &#x60;h5&#x60; tag.
        *
-       * @public
+       * @private
        */
       H5: "H5",
       /**
        * Renders &#x60;h6&#x60; tag.
        *
-       * @public
+       * @private
        */
       H6: "H6"
     };
@@ -2690,62 +2690,62 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents ToastPlacement
      *
-     * @public
+     * @private
      */
     pkg["ToastPlacement"] = {
       /**
        * Toast is placed at the &#x60;TopStart&#x60; position of its container.
        *
-       * @public
+       * @private
        */
       TopStart: "TopStart",
       /**
        * Toast is placed at the &#x60;TopCenter&#x60; position of its container.
        *
-       * @public
+       * @private
        */
       TopCenter: "TopCenter",
       /**
        * Toast is placed at the &#x60;TopEnd&#x60; position of its container.
        *
-       * @public
+       * @private
        */
       TopEnd: "TopEnd",
       /**
        * Toast is placed at the &#x60;MiddleStart&#x60; position of its container.
        *
-       * @public
+       * @private
        */
       MiddleStart: "MiddleStart",
       /**
        * Toast is placed at the &#x60;MiddleCenter&#x60; position of its container.
        *
-       * @public
+       * @private
        */
       MiddleCenter: "MiddleCenter",
       /**
        * Toast is placed at the &#x60;MiddleEnd&#x60; position of its container.
        *
-       * @public
+       * @private
        */
       MiddleEnd: "MiddleEnd",
       /**
        * Toast is placed at the &#x60;BottomStart&#x60; position of its container.
        *
-       * @public
+       * @private
        */
       BottomStart: "BottomStart",
       /**
        * Toast is placed at the &#x60;BottomCenter&#x60; position of its container.
        * Default placement (no selection)
        *
-       * @public
+       * @private
        */
       BottomCenter: "BottomCenter",
       /**
        * Toast is placed at the &#x60;BottomEnd&#x60; position of its container.
        *
-       * @public
+       * @private
        */
       BottomEnd: "BottomEnd"
     };
@@ -2759,19 +2759,19 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents ToolbarAlign
      *
-     * @public
+     * @private
      */
     pkg["ToolbarAlign"] = {
       /**
        * Toolbar items are situated at the &#x60;start&#x60; of the Toolbar
        *
-       * @public
+       * @private
        */
       Start: "Start",
       /**
        * Toolbar items are situated at the &#x60;end&#x60; of the Toolbar
        *
-       * @public
+       * @private
        */
       End: "End"
     };
@@ -2785,19 +2785,19 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents ToolbarDesign
      *
-     * @public
+     * @private
      */
     pkg["ToolbarDesign"] = {
       /**
        * The toolbar and its content will be displayed with solid background.
        *
-       * @public
+       * @private
        */
       Solid: "Solid",
       /**
        * The toolbar and its content will be displayed with transparent background.
        *
-       * @public
+       * @private
        */
       Transparent: "Transparent"
     };
@@ -2811,25 +2811,25 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents ToolbarItemOverflowBehavior
      *
-     * @public
+     * @private
      */
     pkg["ToolbarItemOverflowBehavior"] = {
       /**
        * The item is presented inside the toolbar and goes in the popover, when there is not enough space.
        *
-       * @public
+       * @private
        */
       Default: "Default",
       /**
        * When set, the item will never go to the overflow popover.
        *
-       * @public
+       * @private
        */
       NeverOverflow: "NeverOverflow",
       /**
        * When set, the item will be always part of the overflow part of ui5-toolbar.
        *
-       * @public
+       * @private
        */
       AlwaysOverflow: "AlwaysOverflow"
     };
@@ -2846,19 +2846,19 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents WrappingType
      *
-     * @public
+     * @private
      */
     pkg["WrappingType"] = {
       /**
        * The text will be truncated with an ellipsis.
        *
-       * @public
+       * @private
        */
       None: "None",
       /**
        * The text will wrap. The words will not be broken based on hyphenation.
        *
-       * @public
+       * @private
        */
       Normal: "Normal"
     };
@@ -2874,7 +2874,7 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents IAvatarGroupItem
      *
-     * @public
+     * @private
      */
     /**
      * Interface for components that may be used as a button inside numerous higher-order components
@@ -2885,7 +2885,7 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents IButton
      *
-     * @public
+     * @private
      */
     /**
      * Interface for components that may be slotted inside a `ui5-calendar`.
@@ -2898,7 +2898,7 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents ICalendarSelectedDates
      *
-     * @public
+     * @private
      */
     /**
      * Interface for components that may be used inside a `ui5-color-palette` or `ui5-color-palette-popover`
@@ -2909,7 +2909,7 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents IColorPaletteItem
      *
-     * @public
+     * @private
      */
     /**
      * Interface for components that may be slotted inside a `ui5-combobox`
@@ -2920,7 +2920,7 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents IComboBoxItem
      *
-     * @public
+     * @private
      */
     /**
      * Represents a dynamic date range option used by the `ui5-dynamic-date-range` component.
@@ -2949,7 +2949,7 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents IDynamicDateRangeOption
      *
-     * @public
+     * @private
      */
     /**
      * Interface for components that can be slotted inside `ui5-form` as items.
@@ -2960,7 +2960,7 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents IFormItem
      *
-     * @public
+     * @private
      */
     /**
      * Interface for components that represent an icon, usable in numerous higher-order components
@@ -2971,7 +2971,7 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents IIcon
      *
-     * @public
+     * @private
      */
     /**
      * Interface for components that represent a suggestion item, usable in `ui5-input`
@@ -2982,7 +2982,7 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents IInputSuggestionItem
      *
-     * @public
+     * @private
      */
     /**
      * Interface for components that may be slotted inside a `ui5-menu`.
@@ -2995,7 +2995,7 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents IMenuItem
      *
-     * @public
+     * @private
      */
     /**
      * Interface for components that may be slotted inside a `ui5-multi-combobox` as items
@@ -3006,7 +3006,7 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents IMultiComboBoxItem
      *
-     * @public
+     * @private
      */
     /**
      * Interface for components that may be slotted inside `ui5-segmented-button` as items
@@ -3017,7 +3017,7 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents ISegmentedButtonItem
      *
-     * @public
+     * @private
      */
     /**
      * Interface for components that may be slotted inside `ui5-select` as options
@@ -3028,7 +3028,7 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents IOption
      *
-     * @public
+     * @private
      */
     /**
      * Interface for components that may be slotted inside `ui5-tabcontainer` as items
@@ -3041,7 +3041,7 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents ITab
      *
-     * @public
+     * @private
      */
     /**
      * Interface for components that can be slotted inside the `features` slot of the `ui5-table`.
@@ -3052,7 +3052,7 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents ITableFeature
      *
-     * @public
+     * @private
      */
     /**
      * Interface for components that can be slotted inside the `features` slot of the `ui5-table`
@@ -3064,7 +3064,7 @@ sap.ui.define(
      *
      * @ui5-module-override sap/f/gen/ui5/webcomponents ITableGrowing
      *
-     * @public
+     * @private
      */
 
     return pkg;

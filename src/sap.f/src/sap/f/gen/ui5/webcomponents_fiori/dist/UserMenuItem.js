@@ -29,7 +29,7 @@ sap.ui.define(
      *
      * @extends module:sap/f/gen/ui5/webcomponents/dist/MenuItem
      * @constructor
-     * @public
+     * @private
      * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/UserMenuItem
      */
 

@@ -177,16 +177,17 @@ sap.ui.define([
 	 * @protected
 	 */
 	TableDelegate.getGroupSorter = function(oTable) {
+		const oPropertyHelper = oTable.getPropertyHelper();
 		const oGroupLevel = oTable._getGroupedProperties()[0];
 
-		if (!oGroupLevel || !oTable._isOfType(TableType.ResponsiveTable)) {
+		if (!oGroupLevel || !oTable._isOfType(TableType.ResponsiveTable) || !oPropertyHelper.hasProperty(oGroupLevel.name)) {
 			return undefined;
 		}
 
 		const oSortedProperty = oTable._getSortedProperties().find((oSortCondition) => {
 			return oSortCondition.name === oGroupLevel.name;
 		});
-		const sPath = oTable.getPropertyHelper().getProperty(oGroupLevel.name).path;
+		const sPath = oPropertyHelper.getProperty(oGroupLevel.name).path;
 		const bDescending = oSortedProperty ? oSortedProperty.descending : false;
 
 		if (!oTable._mFormatGroupHeaderInfo || oTable._mFormatGroupHeaderInfo.propertyKey !== oGroupLevel.name) {

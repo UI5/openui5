@@ -135,6 +135,11 @@
 				manifest="{manifests>/defaultHeader/actionableHeader}"
 				width="320px"
 				class="sapUiSmallMargin" />
+			<w:Card
+				id="header_binding"
+				manifest="{manifests>/defaultHeader/header_binding}"
+				width="320px"
+				class="sapUiSmallMargin" />
 		</Panel>
 	</Page>
 </mvc:View>

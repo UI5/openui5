@@ -359,7 +359,7 @@ Contained in: src/sap.ui.documentation/src/sap/ui/documentation/sdk/thirdparty/D
 
 Library: sap.ui.integration:
 
-Component: UI5 Web Components, version: 1.7.0
+Component: UI5 Web Components, version: 2.15.0
 Copyright: SAP
 License: Apache-2.0
 License Text: https://github.com/UI5/openui5/blob/master/LICENSES/Apache-2.0.txt

@@ -42,6 +42,8 @@ sap.ui.define([
 	"sap/ui/core/message/Message",
 	"sap/ui/core/Theming",
 	"sap/ui/core/theming/Parameters",
+	"sap/ui/core/CustomData",
+	"sap/base/Log",
 	"sap/ui/mdc/table/RowActionItem",
 	"sap/ui/mdc/table/RowSettings",
 	"sap/ui/thirdparty/jquery",
@@ -96,6 +98,8 @@ sap.ui.define([
 	Message,
 	Theming,
 	ThemeParameters,
+	CustomData,
+	Log,
 	RowActionItem,
 	RowSettings,
 	jQuery,
@@ -4695,6 +4699,50 @@ n = 0;
 			assert.equal(this.oFinalizePropertyHelperSpy.callCount, 1, "Table#finalizePropertyHelper called");
 			assert.equal(this.oTable.getColumns()[2].getInnerColumn().getWidth(), "23.0625rem", "Inner column width");
 		}.bind(this));
+	});
+
+	QUnit.test("State validation against property infos", async function(assert) {
+		await this.createTable({
+			sortConditions: {
+				sorters: [{name: "DoesNotExist"}]
+			},
+			filterConditions: {
+				DoesNotExist: [{operator: "EQ", values: [30]}]
+			},
+			groupConditions: {
+				groupLevels: [{name: "DoesNotExist"}]
+			},
+			aggregateConditions: {
+				DoesNotExist: {}
+			},
+			customData: [
+				new CustomData({
+					key: "xConfig",
+					value: `\\{
+						"aggregations": \\{
+							"columns": \\{
+								"DoesNotExist": \\{"width": "100px"\\}
+							\\}
+						\\}
+					\\}`
+				})
+			]
+		});
+
+		const aLogs = Log.getLogEntries().filter((oLogEntry) =>
+			oLogEntry.details === this.oTable.toString() && oLogEntry.message.includes("Invalid state:")
+		);
+		const matchLogEntry = (oLogEntry, sStateType, sPropertyKey) => {
+			return oLogEntry.message === `Invalid state: ${sStateType} modification exists for non-existent property '${sPropertyKey}'`
+				&& oLogEntry.level === Log.Level.ERROR;
+		};
+
+		assert.ok(aLogs.find((oLogEntry) => matchLogEntry(oLogEntry, "Sort", "DoesNotExist")), "Error log found for sort");
+		assert.ok(aLogs.find((oLogEntry) => matchLogEntry(oLogEntry, "Filter", "DoesNotExist")), "Error log found for filter");
+		assert.ok(aLogs.find((oLogEntry) => matchLogEntry(oLogEntry, "Group level", "DoesNotExist")), "Error log found for group level");
+		assert.ok(aLogs.find((oLogEntry) => matchLogEntry(oLogEntry, "Aggregation", "DoesNotExist")), "Error log found for aggregation");
+		assert.ok(aLogs.find((oLogEntry) => matchLogEntry(oLogEntry, "Column width", "DoesNotExist")), "Error log found for column width");
+		assert.equal(aLogs.length, 5, "Log entry count");
 	});
 
 	QUnit.module("expand/collapse all", {

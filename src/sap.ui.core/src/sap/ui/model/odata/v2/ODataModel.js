@@ -6747,6 +6747,10 @@ sap.ui.define([
 	 * {@link #setDeferredGroups deferred}, changes could be submitted with {@link #submitChanges}.
 	 * Otherwise the change will be submitted directly.
 	 *
+	 * Consecutive calls of this method which update bindings <em>synchronously</em> may cause performance issues; see
+	 * {@link topic:6c47b2b39db9404582994070ec3d57a2#loioadd47c3966dd40489e952bb4f5f74a7c Accessing Data from an OData Model}
+	 * for details.
+	 *
 	 * @param {string} sPath
 	 *   Path of the property to set
 	 * @param {any} oValue
@@ -6754,7 +6758,7 @@ sap.ui.define([
 	 * @param {sap.ui.model.Context} [oContext=null]
 	 *   The context which will be used to set the property
 	 * @param {boolean} [bAsyncUpdate]
-	 *   Whether to update other bindings dependent on this property asynchronously
+	 *   Whether to update bindings dependent on this property asynchronously
 	 * @returns {boolean}
 	 *   <code>true</code> if the value was set correctly and <code>false</code> if errors occurred
 	 *   like the entry was not found or another entry was already updated.

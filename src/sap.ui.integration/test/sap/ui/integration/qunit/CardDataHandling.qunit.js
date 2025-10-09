@@ -952,6 +952,77 @@ function(
 		assert.strictEqual(sHeaderTitle, "Some Title", "Should have correct header title.");
 	});
 
+	QUnit.test("Header inheriting data path", async function (assert) {
+		// Arrange
+		var oManifest = {
+			"sap.app": {
+				"id": "artic.product.card"
+			},
+			"sap.card": {
+				"data": {
+					"json": {
+						"data": {
+							"title": "Some Title"
+						}
+					},
+					"path": "/data"
+				},
+				"header": {
+					"title": "{title}"
+				}
+			}
+		};
+
+		// Act
+		this.oCard.setManifest(oManifest);
+
+		await nextCardReadyEvent(this.oCard);
+		await nextUIUpdate();
+
+		var sHeaderBindingContextPath = this.oCard.getCardHeader().getBindingContext().getPath();
+		var sHeaderTitle = this.oCard.getAggregation("_header").getTitle();
+
+		// Assert
+		assert.strictEqual(sHeaderBindingContextPath, "/data", "Should have correct binding context path for header.");
+		assert.strictEqual(sHeaderTitle, "Some Title", "Should have correct header title.");
+	});
+
+	QUnit.test("Numeric Header inheriting data path", async function (assert) {
+		// Arrange
+		var oManifest = {
+			"sap.app": {
+				"id": "artic.product.card"
+			},
+			"sap.card": {
+				"data": {
+					"json": {
+						"data": {
+							"title": "Some Title"
+						}
+					},
+					"path": "/data"
+				},
+				"header": {
+					"type": "Numeric",
+					"title": "{title}"
+				}
+			}
+		};
+
+		// Act
+		this.oCard.setManifest(oManifest);
+
+		await nextCardReadyEvent(this.oCard);
+		await nextUIUpdate();
+
+		var sHeaderBindingContextPath = this.oCard.getCardHeader().getBindingContext().getPath();
+		var sHeaderTitle = this.oCard.getAggregation("_header").getTitle();
+
+		// Assert
+		assert.strictEqual(sHeaderBindingContextPath, "/data", "Should have correct binding context path for header.");
+		assert.strictEqual(sHeaderTitle, "Some Title", "Should have correct header title.");
+	});
+
 	QUnit.module("Data request depending on expression binding", {
 		beforeEach: function () {
 			var fnFake = function () {

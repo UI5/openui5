@@ -288,6 +288,11 @@ sap.ui.define([
 			sPath = "/",
 			oModel;
 
+		if (!oDataSettings) {
+			this.fireEvent("_dataReady");
+			return;
+		}
+
 		if (oDataSettings && oDataSettings.path) {
 			sPath = BindingResolver.resolveValue(oDataSettings.path, this.getCardInstance());
 		}

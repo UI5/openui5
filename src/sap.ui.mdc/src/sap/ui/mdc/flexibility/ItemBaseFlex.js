@@ -185,7 +185,7 @@ sap.ui.define([
 				// 3) Check & insert the item in the controls according aggregation
 				.then((oControlAggregationItem) => {
 					if (!oControlAggregationItem) {
-						throw new Error("No item in" + oAggregation.name + "  created. Change to " + this._getChangeTypeText(!bIsRevert) + "cannot be " + this._getOperationText(bIsRevert) + "at this moment");
+						throw new Error(`No item in ${oAggregation.name} created. Change to ${this._getChangeTypeText(!bIsRevert)} cannot be ${this._getOperationText(bIsRevert)} at this moment`);
 					}
 
 					if (aDefaultAggregation.indexOf(oControlAggregationItem) < 0) {

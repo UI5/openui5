@@ -35,7 +35,7 @@ sap.ui.define([
 
 	UI5InputToggle.prototype.internalRender = function () {
 
-		this._checkboxInputElement = document.createElement("ui5-checkbox");
+		this._checkboxInputElement = document.createElement("ui5-checkbox-ac");
 		this._checkboxInputElement.id = this.id;
 		this._checkboxInputElement.text = this.title || "";
 		this._checkboxInputElement.wrappingType = this.wrap ? "Normal" : "None";
@@ -62,7 +62,7 @@ sap.ui.define([
 
 	UI5InputToggle.prototype.showValidationErrorMessage = function () {
 		if (this._checkboxInputElement) {
-			this._checkboxInputElement.valueState = "Error";
+			this._checkboxInputElement.valueState = "Negative";
 		}
 	};
 

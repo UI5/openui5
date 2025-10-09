@@ -2,8 +2,8 @@
  * ${copyright}
  */
 sap.ui.define([
-	'../json/JSONModel', '../json/JSONPropertyBinding', '../json/JSONListBinding', 'sap/ui/base/ManagedObject', 'sap/ui/base/ManagedObjectObserver', '../Context', '../ChangeReason', "sap/base/util/uid", "sap/base/Log", "sap/base/util/isPlainObject", "sap/base/util/deepClone", "sap/base/util/deepEqual"
-], function (JSONModel, JSONPropertyBinding, JSONListBinding, ManagedObject, ManagedObjectObserver, Context, ChangeReason, uid, Log, isPlainObject, deepClone, deepEqual) {
+	'../json/JSONModel', '../json/JSONPropertyBinding', '../json/JSONListBinding', 'sap/ui/base/ManagedObject', 'sap/ui/base/ManagedObjectObserver', '../Context', '../ChangeReason', "sap/base/util/uid", "sap/base/Log", "sap/base/util/isPlainObject", "sap/base/util/deepClone", "sap/base/util/deepEqual", "sap/ui/model/FilterType"
+], function (JSONModel, JSONPropertyBinding, JSONListBinding, ManagedObject, ManagedObjectObserver, Context, ChangeReason, uid, Log, isPlainObject, deepClone, deepEqual, FilterType) {
 	"use strict";
 
 	var CUSTOMDATAKEY = "@custom",
@@ -268,7 +268,9 @@ sap.ui.define([
 			}
 		},
 		getLength: function() {
-			if (this._aPartsInJSON.length == 0) {
+			// Note: Only use the original bindings length, if no filters are applied.
+			const aFilters = [...this.getFilters(FilterType.Application), ...this.getFilters(FilterType.Control)];
+			if (this._aPartsInJSON.length == 0 && aFilters.length == 0) {
 				//this is only valid if the binding points directly to the member of the Managed Object
 				var oInnerListBinding = this._oOriginMO.getBinding(this._sMember);
 
@@ -281,7 +283,8 @@ sap.ui.define([
 			return JSONListBinding.prototype.getLength.apply(this, arguments);
 		},
 		isLengthFinal: function() {
-			if (this._aPartsInJSON.length == 0) {
+			const aFilters = [...this.getFilters(FilterType.Application), ...this.getFilters(FilterType.Control)];
+			if (this._aPartsInJSON.length == 0 && aFilters.length == 0) {
 				//this is only valid if the binding points directly to the member of the Managed Object
 				var oInnerListBinding = this._oOriginMO.getBinding(this._sMember);
 

@@ -2,42 +2,122 @@
  * ${copyright}
  */
 sap.ui.define([
-	"sap/ui/support/library"
-], function(SupportLibrary) {
+	"sap/ui/support/library",
+	"sap/base/Log"
+], (
+	SupportLibrary,
+	Log
+) => {
 	"use strict";
 
-	const Categories = SupportLibrary.Categories;
-	const Severity = SupportLibrary.Severity;
-    const Audiences = SupportLibrary.Audiences;
+	const {Categories, Severity, Audiences} = SupportLibrary;
 
-    const oHeaderVisibleFalseAndHiddenToolbar = {
-		id : "HeaderVisibleDisabled",
+	const oHeaderVisibleWhenToolbarHidden = {
+		id: "HeaderVisibleWhenToolbarHidden",
 		audiences: [Audiences.Control],
 		categories: [Categories.Accessibility],
 		enabled: true,
 		minversion: "1.121",
-		title: "Header visibility",
-		description: "Checks whether 'headerVisible' is set to false when the toolbar is hidden",
-		resolution: "Set the header visibility of the table to false using the 'headerVisible' property of the 'sap.ui.mdc.Table'",
+		title: "Header visibility when the toolbar is hidden",
+		description: "Checks 'headerVisible' when the toolbar is hidden",
+		resolution: "Set the 'headerVisible' property of the 'sap.ui.mdc.Table' to false",
 		resolutionurls: [],
 		check: function (oIssueManager, oCoreFacade, oScope) {
-			oScope.getElementsByClassName("sap.ui.mdc.Table")
-				.forEach(function(oElement) {
-					if (oElement && oElement.getHideToolbar() && oElement.getHeaderVisible()) {
-						oIssueManager.addIssue({
-							severity: Severity.High,
-							details: "HeaderVisible is true but toolbar is hidden. Set headerVisible to false.",
-							context: {
-								id: oElement.getId()
-							}
-						});
-					}
-				});
+			oScope.getElementsByClassName("sap.ui.mdc.Table").forEach((oTable) => {
+				if (oTable.getHideToolbar() && oTable.getHeaderVisible()) {
+					oIssueManager.addIssue({
+						severity: Severity.High,
+						details: "'headerVisible' is true but toolbar is hidden.",
+						context: {
+							id: oTable.getId()
+						}
+					});
+				}
+			});
 		}
 	};
 
-	const oHeaderSet = {
-		id : "HeaderPropertySet",
+	const oShowRowCountWhenToolbarHidden = {
+		id: "ShowRowCountWhenToolbarHidden",
+		audiences: [Audiences.Control],
+		categories: [Categories.Accessibility],
+		enabled: true,
+		minversion: "1.121",
+		title: "Showing row count when the toolbar is hidden",
+		description: "Checks 'showRowCount' when the toolbar is hidden",
+		resolution: "Set the 'showRowCount' property of the 'sap.ui.mdc.Table' to false",
+		resolutionurls: [],
+		check: function(oIssueManager, oCoreFacade, oScope) {
+			oScope.getElementsByClassName("sap.ui.mdc.Table").forEach((oTable) => {
+				if (oTable.getHideToolbar() && oTable.getShowRowCount()) {
+					oIssueManager.addIssue({
+						severity: Severity.Low,
+						details: "'showRowCount' is true but toolbar is hidden.",
+						context: {
+							id: oTable.getId()
+						}
+					});
+				}
+			});
+		}
+	};
+
+	const oEnableExportWhenToolbarHidden = {
+		id: "EnableExportWhenToolbarHidden",
+		audiences: [Audiences.Control],
+		categories: [Categories.Accessibility],
+		enabled: true,
+		minversion: "1.121",
+		title: "Export when the toolbar is hidden",
+		description: "Checks 'enableExport' when the toolbar is hidden",
+		resolution: "Set the 'enableExport' property of the 'sap.ui.mdc.Table' to false",
+		resolutionurls: [],
+		check: function (oIssueManager, oCoreFacade, oScope) {
+			oScope.getElementsByClassName("sap.ui.mdc.Table").forEach((oTable) => {
+				if (oTable.getHideToolbar() && oTable.getEnableExport()) {
+					oIssueManager.addIssue({
+						severity: Severity.Low,
+						details: "'enableExport' is true but toolbar is hidden.",
+						context: {
+							id: oTable.getId()
+						}
+					});
+				}
+			});
+		}
+	};
+
+	const oToolbarElementsWhenToolbarHidden = {
+		id: "ToolbarElementsWhenToolbarHidden",
+		audiences: [Audiences.Control],
+		categories: [Categories.Accessibility],
+		enabled: true,
+		minversion: "1.121",
+		title: "Actions, quickFilter, and a table-related VariantManagement when the toolbar is hidden",
+		description: "Checks whether the 'actions', 'quickFilter', and 'variant' aggregations are used when the toolbar is hidden",
+		resolution: "Remove 'actions', 'quickFilter', and 'variants' aggregations from the 'sap.ui.mdc.Table'",
+		resolutionurls: [],
+		check: function (oIssueManager, oCoreFacade, oScope) {
+			oScope.getElementsByClassName("sap.ui.mdc.Table").forEach((oTable) => {
+				const bActions = (oTable.getActions() !== undefined && oTable.getActions() !== null && oTable.getActions().length !== 0);
+				const bVariant = (oTable.getVariant() !== undefined && oTable.getVariant() !== null && oTable.getVariant().length !== 0);
+				const bQuickFilter = (oTable.getQuickFilter() !== undefined && oTable.getQuickFilter() !== null && oTable.getQuickFilter().length !== 0);
+
+				if (oTable.getHideToolbar() && (bActions || bVariant || bQuickFilter)) {
+					oIssueManager.addIssue({
+						severity: Severity.High,
+						details: "'actions', 'quickFilter', and 'variant' aggregations are not empty.",
+						context: {
+							id: oTable.getId()
+						}
+					});
+				}
+			});
+		}
+	};
+
+	const oHeader = {
+		id: "Header",
 		audiences: [Audiences.Control],
 		categories: [Categories.Accessibility],
 		enabled: true,
@@ -47,23 +127,22 @@ sap.ui.define([
 		resolution: "Set a table title via the 'header' property of the 'sap.ui.mdc.Table'",
 		resolutionurls: [],
 		check: function (oIssueManager, oCoreFacade, oScope) {
-			oScope.getElementsByClassName("sap.ui.mdc.Table")
-				.forEach(function(oElement) {
-					if (oElement && !oElement.getHeader()) {
-						oIssueManager.addIssue({
-							severity: Severity.High,
-							details: "Header isn't set. Set a title in the header property.",
-							context: {
-								id: oElement.getId()
-							}
-						});
-					}
-				});
+			oScope.getElementsByClassName("sap.ui.mdc.Table").forEach((oTable) => {
+				if (!oTable.getHeader()) {
+					oIssueManager.addIssue({
+						severity: Severity.High,
+						details: "Header isn't set. Set a title in the header property.",
+						context: {
+							id: oTable.getId()
+						}
+					});
+				}
+			});
 		}
 	};
 
 	const oIllustratedMessageForNoData = {
-		id : "IllustratedMessageForNoData",
+		id: "IllustratedMessageForNoData",
 		audiences: [Audiences.Control],
 		categories: [Categories.Accessibility],
 		enabled: true,
@@ -76,104 +155,56 @@ sap.ui.define([
 			href: "https://experience.sap.com/fiori-design-web/illustrated-message/"
 		}],
 		check: function (oIssueManager, oCoreFacade, oScope) {
-			oScope.getElementsByClassName("sap.ui.mdc.Table")
-				.forEach(function(oElement) {
-					if (oElement && oElement.getHideToolbar() && (!oElement.getNoData() || !oElement.getNoData().isA("sap.m.IllustratedMessage"))) {
-						oIssueManager.addIssue({
-							severity: Severity.High,
-							details: "'noData' aggregation is either not set or no 'sap.m.IllustratedMessage' control is used.",
-							context: {
-								id: oElement.getId()
-							}
-						});
-					}
-				});
+			oScope.getElementsByClassName("sap.ui.mdc.Table").forEach((oTable) => {
+				if (oTable.getHideToolbar() && (!oTable.getNoData() || !oTable.getNoData().isA("sap.m.IllustratedMessage"))) {
+					oIssueManager.addIssue({
+						severity: Severity.High,
+						details: "'noData' aggregation is either not set or no 'sap.m.IllustratedMessage' control is used.",
+						context: {
+							id: oTable.getId()
+						}
+					});
+				}
+			});
 		}
 	};
 
-	const oRowCountDisabled = {
-		id : "RowCountDisabled",
+	const oStateValidation = {
+		id: "StateValidation",
 		audiences: [Audiences.Control],
-		categories: [Categories.Accessibility],
+		categories: [Categories.Functionality],
 		enabled: true,
-		minversion: "1.121",
-		title: "showRowCount disabled",
-		description: "Checks whether the 'showRowCount' is disabled when the toolbar is hidden",
-		resolution: "Set the 'showRowCount' property of the 'sap.ui.mdc.Table' to false",
-		resolutionurls: [],
-		check: function (oIssueManager, oCoreFacade, oScope) {
-			oScope.getElementsByClassName("sap.ui.mdc.Table")
-				.forEach(function(oElement) {
-					if (oElement && oElement.getHideToolbar() && oElement.getShowRowCount()) {
-						oIssueManager.addIssue({
-							severity: Severity.Low,
-							details: "'showRowCount' property of table is true but should be false.",
-							context: {
-								id: oElement.getId()
-							}
-						});
-					}
+		minversion: "1.141",
+		title: "Table reports invalid state modifications",
+		description: "The table contains state modifications, for example sort conditions, for non-existent PropertyInfo properties",
+		resolution: "Remove the invalid state modifications or add the missing PropertyInfo properties",
+		check: function(oIssueManager, oCoreFacade, oScope) {
+			oScope.getElementsByClassName("sap.ui.mdc.Table").forEach((oTable) => {
+				Log.getLogEntries().filter((oLogEntry) =>
+					oLogEntry.details === oTable.toString()
+					&& oLogEntry.level === Log.Level.ERROR
+					&& oLogEntry.message.startsWith("Invalid state:")
+				).forEach((oLogEntry) => {
+					oIssueManager.addIssue({
+						severity: Severity.High,
+						details: oLogEntry.message,
+						context: {
+							id: oTable.getId()
+						}
+					});
 				});
+			});
 		}
 	};
 
-	const oActionsAndVariantsAndQuickFilterNotUsed = {
-		id : "ActionAndVariantsNotUsed",
-		audiences: [Audiences.Control],
-		categories: [Categories.Accessibility],
-		enabled: true,
-		minversion: "1.121",
-		title: "Actions, quickFilter, and a table-related VariantManagement not used",
-		description: "Checks whether the 'actions', 'quickFilter', and 'variant' aggregations are used when the toolbar is hidden",
-		resolution: "Remove 'actions', 'quickFilter', and 'variants' aggregations from your 'sap.ui.mdc.Table'",
-		resolutionurls: [],
-		check: function (oIssueManager, oCoreFacade, oScope) {
-			oScope.getElementsByClassName("sap.ui.mdc.Table")
-				.forEach(function(oElement) {
-
-					const bActions = (oElement.getActions() !== undefined && oElement.getActions() !== null && oElement.getActions().length !== 0),
-						bVariant = (oElement.getVariant() !== undefined && oElement.getVariant() !== null && oElement.getVariant().length !== 0),
-						bQuickFilter = (oElement.getQuickFilter() !== undefined && oElement.getQuickFilter() !== null && oElement.getQuickFilter().length !== 0);
-
-					if (oElement && oElement.getHideToolbar() && (bActions || bVariant || bQuickFilter)) {
-						oIssueManager.addIssue({
-							severity: Severity.High,
-							details: "'actions', 'quickFilter', and 'variant' aggregations are not empty.",
-							context: {
-								id: oElement.getId()
-							}
-						});
-					}
-				});
-		}
-	};
-
-	const oExportDisabled = {
-		id : "ExportDisabled",
-		audiences: [Audiences.Control],
-		categories: [Categories.Accessibility],
-		enabled: true,
-		minversion: "1.121",
-		title: "enableExport disabled",
-		description: "Checks if 'enableExport' is set to true when the toolbar is hidden",
-		resolution: "Set the 'enableExport' property of the 'sap.ui.mdc.Table' to false",
-		resolutionurls: [],
-		check: function (oIssueManager, oCoreFacade, oScope) {
-			oScope.getElementsByClassName("sap.ui.mdc.Table")
-				.forEach(function(oElement) {
-					if (oElement && oElement.getHideToolbar() && oElement.getEnableExport()) {
-						oIssueManager.addIssue({
-							severity: Severity.Low,
-							details: "'enableExport' property of table is true but should be false because of the hidden toolbar.",
-							context: {
-								id: oElement.getId()
-							}
-						});
-					}
-				});
-		}
-	};
-
-	return [oHeaderVisibleFalseAndHiddenToolbar, oHeaderSet, oIllustratedMessageForNoData, oRowCountDisabled, oActionsAndVariantsAndQuickFilterNotUsed, oExportDisabled];
+	return [
+		oHeaderVisibleWhenToolbarHidden,
+		oShowRowCountWhenToolbarHidden,
+		oEnableExportWhenToolbarHidden,
+		oToolbarElementsWhenToolbarHidden,
+		oHeader,
+		oIllustratedMessageForNoData,
+		oStateValidation
+	];
 
 });

@@ -22,7 +22,7 @@ sap.ui.define(
      *
      * @extends module:sap/f/gen/ui5/webcomponents/dist/ListItemBase
      * @constructor
-     * @public
+     * @private
      * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/SearchItem
      */
 
