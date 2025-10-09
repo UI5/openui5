@@ -11371,6 +11371,66 @@ sap.ui.define([
 			oSelect.destroy();
 		});
 
+		QUnit.test("it should apply 'sapMPickerWrappedItems' class when picker is created with wrapItemsText already set to true", function (assert) {
+			fnToDesktopMode(); // Enter desktop mode
+
+			// system under test - create Select with wrapItemsText: true
+			var oSelect = new Select({
+				items: [
+					new Item({ key: "1", text: "item 1" }),
+					new Item({ key: "2", text: "item 2" })
+				],
+				wrapItemsText: true
+			});
+
+			// act - get the picker (this triggers createPicker)
+			var oPicker = oSelect.getPicker();
+
+			// assert - verify the class is applied even though picker was created after property was set
+			assert.ok(oPicker.hasStyleClass("sapMPickerWrappedItems"),
+				'sapMPickerWrappedItems class is applied when picker is created with wrapItemsText=true');
+
+			// cleanup
+			oSelect.destroy();
+		});
+
+		QUnit.test("it should toggle 'sapMPickerWrappedItems' class when wrapItemsText property is changed", function (assert) {
+			fnToDesktopMode(); // Enter desktop mode
+
+			// system under test - create Select without wrapItemsText
+			var oSelect = new Select({
+				items: [
+					new Item({ key: "1", text: "item 1" }),
+					new Item({ key: "2", text: "item 2" })
+				],
+				wrapItemsText: false
+			});
+
+			// act - get the picker first
+			var oPicker = oSelect.getPicker();
+
+			// assert - initially should not have the class
+			assert.notOk(oPicker.hasStyleClass("sapMPickerWrappedItems"),
+				'sapMPickerWrappedItems class is not present initially');
+
+			// act - set wrapItemsText to true
+			oSelect.setWrapItemsText(true);
+
+			// assert - class should now be present
+			assert.ok(oPicker.hasStyleClass("sapMPickerWrappedItems"),
+				'sapMPickerWrappedItems class is added when wrapItemsText is set to true');
+
+			// act - set wrapItemsText back to false
+			oSelect.setWrapItemsText(false);
+
+			// assert - class should be removed
+			assert.notOk(oPicker.hasStyleClass("sapMPickerWrappedItems"),
+				'sapMPickerWrappedItems class is removed when wrapItemsText is set to false');
+
+			// cleanup
+			oSelect.destroy();
+		});
+
 		QUnit.module("Select in OverflowToolbar", {
 			beforeEach: function () {
 				this.oSelect = new Select({
