@@ -279,7 +279,8 @@ sap.ui.define([
 			"sap/ui/thirdparty/jquery",
 			"sap/ui/thirdparty/hasher",
 			"sap/ui/core/routing/History",
-			"sap/ui/core/routing/HashChanger"
+			"sap/ui/core/routing/HashChanger",
+			"sap/ui/events/FocusEventFix"
 		], function (
 			Log,
 			OpaPlugin,
@@ -290,6 +291,7 @@ sap.ui.define([
 			hasher,
 			History,
 			HashChanger
+			/* FocusEventFix */
 		) {
 			_OpaLogger.setLevel(sOpaLogLevel);
 			oFramePlugin = new OpaPlugin();

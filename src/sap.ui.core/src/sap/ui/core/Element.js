@@ -2314,7 +2314,8 @@ sap.ui.define([
 	Element.getActiveElement = () => {
 		try {
 			var $Act = jQuery(document.activeElement);
-			if ($Act.is(":focus")) {
+			// do not check ":focus" when the browser window is not focused
+			if (!document.hasFocus() || $Act.is(":focus")) {
 				return Element.closestTo($Act[0]);
 			}
 		} catch (err) {
