@@ -1674,6 +1674,63 @@ sap.ui.define([
 		oTable.getRows()[Math.min(iIndex, iTotalRowCount - 1) - iFirstRenderedRowIndex]._setFocus(bFirstInteractiveElement);
 	}
 
+	/**
+	 * Scrolls to the specified row index. If the <code>iIndex</code> is not in the visible area,
+	 * it scrolls the row into view.
+	 *
+	 * If the given index is already in the visible area, it resolves the promise immediately without scrolling.
+	 *
+	 * @param {number} iIndex The index of the row to scroll into the visible area
+	 *
+	 * @private
+	 * @ui5-restricted sap.ui.mdc
+	 * @returns {Promise} A <code>Promise</code> that resolves after scrolling is finished if scrolling was required
+	 * @throws {Error} If the table has fixed top rows
+	 * @throws {Error} If the index is not a number or less than -1
+	 */
+	Table.prototype._scrollToIndex = function(iIndex) {
+		const mRowCounts = this._getRowCounts();
+
+		if (mRowCounts.fixedTop > 0) {
+			throw new Error("The table has fixed top rows. Scrolling to a specific row index is not supported in this case.");
+		}
+
+		if (typeof iIndex !== "number" || iIndex < -1) {
+			throw new Error("Invalid index: " + iIndex);
+		}
+
+		const iRowCount = this._getRowCounts().count;
+
+		if (iRowCount === 0) {
+			return Promise.resolve();
+		}
+
+		if (iIndex === -1) {
+			// Instead of _getMaxFirstVisibleRowIndex() we use _getTotalRowCount() here.
+			// Scenario: The table displays 5 rows, the first visible row is 7, the total row count is 16.
+			// Rows 7 to 11 are displayed. The user calls _scrollToIndex(-1) to scroll to the last row.
+			// _getMaxFirstVisibleRowIndex() would return 11. Since 11 is currently the last visible row, no scrolling would happen.
+			iIndex = this._getTotalRowCount();
+		}
+
+		const iFirstVisibleRow = this.getFirstVisibleRow();
+
+		if (iIndex >= iFirstVisibleRow && iIndex <= iFirstVisibleRow + iRowCount) {
+			return Promise.resolve();
+		}
+
+		const bExpectRowsUpdated = this._setFirstVisibleRowIndex(iIndex);
+
+		return new Promise((resolve) => {
+			this.attachEventOnce("_rowsUpdated", () => {
+				if (!bExpectRowsUpdated) {
+					this._scrollToIndex(iIndex);
+				}
+				resolve();
+			});
+		});
+	};
+
 	// enable calling 'bindAggregation("rows")' without a factory
 	Table.getMetadata().getAggregation("rows")._doesNotRequireFactory = true;
 

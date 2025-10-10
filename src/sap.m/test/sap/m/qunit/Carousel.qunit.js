@@ -926,18 +926,18 @@ sap.ui.define([
 		qutils.triggerKeydown(this.oCarousel.$("keyTestPage2-slide"), KeyCodes.ARROW_UP);
 
 		// Assert
-		assert.strictEqual(this.oCarousel.getActivePage(), "keyTestPage3", "active page is keyTestPage1");
+		assert.strictEqual(this.oCarousel.getActivePage(), "keyTestPage1", "active page is keyTestPage1");
 	});
 
-	QUnit.test("Arrow Down first page", function (assert) {
+	QUnit.test("Arrow Down last page", function (assert) {
 		// Arrange
-		this.oCarousel.setActivePage("keyTestPage1");
+		this.oCarousel.setActivePage("keyTestPage12");
 
 		// Act
 		qutils.triggerKeydown(this.oCarousel.$("keyTestPage1-slide"), KeyCodes.ARROW_DOWN);
 
 		// Assert
-		assert.strictEqual(this.oCarousel.getActivePage(), "keyTestPage1", "active page stays keyTestPage1");
+		assert.strictEqual(this.oCarousel.getActivePage(), "keyTestPage12", "active page stays keyTestPage4");
 	});
 
 	QUnit.test("Arrow Left", function (assert) {
@@ -970,7 +970,7 @@ sap.ui.define([
 		qutils.triggerKeydown(this.oCarousel.$("keyTestPage2-slide"), KeyCodes.ARROW_DOWN);
 
 		// Assert
-		assert.strictEqual(this.oCarousel.getActivePage(), "keyTestPage1", "active page is keyTestPage3");
+		assert.strictEqual(this.oCarousel.getActivePage(), "keyTestPage3", "active page is keyTestPage3");
 	});
 
 	QUnit.test("Arrow Up on first page", function (assert) {
@@ -981,7 +981,7 @@ sap.ui.define([
 		qutils.triggerKeydown(this.oCarousel.$("keyTestPage1-slide"), KeyCodes.ARROW_UP);
 
 		// Assert
-		assert.strictEqual(this.oCarousel.getActivePage(), "keyTestPage2", "active page stays keyTestPage1");
+		assert.strictEqual(this.oCarousel.getActivePage(), "keyTestPage1", "active page stays keyTestPage1");
 	});
 
 	QUnit.test("HOME", function (assert) {
@@ -1946,28 +1946,10 @@ sap.ui.define([
 		}
 	});
 
-	QUnit.test("aria-selected should be set correctly", function (assert) {
-		// Assert
-		assert.strictEqual(document.getElementById("crsl-text1-slide").getAttribute("aria-selected"), "true", "Active page should have aria-selected = true");
-		assert.strictEqual(document.getElementById("crsl-text1-slide").getAttribute("aria-posinset"), "1", "Posinset should be 1");
-		assert.strictEqual(document.getElementById("crsl-text1-slide").getAttribute("aria-setsize"), "3", "Setsize should be 3");
-		assert.strictEqual(document.getElementById("crsl-text1-slide").getAttribute("aria-hidden"), "false", "Displayed page should have aria-hidden = false");
-
-
-		// Act
-		this.oCarousel.next();
-
-		// Assert
-		assert.strictEqual(document.getElementById("crsl-text1-slide").getAttribute("aria-selected"), "false", "Non active page should have aria-selected = false");
-		assert.strictEqual(document.getElementById("crsl-text1-slide").getAttribute("aria-hidden"), "true", "Not displayed page should have aria-hidden = true");
-		assert.strictEqual(document.getElementById("crsl-text2-slide").getAttribute("aria-selected"), "true", "Active page should have aria-selected = true");
-		assert.strictEqual(document.getElementById("crsl-text2-slide").getAttribute("aria-posinset"), "2", "Posinset should be 2");
-		assert.strictEqual(document.getElementById("crsl-text2-slide").getAttribute("aria-hidden"), "false", "Displayed page should have aria-hidden = false");
-	});
-
 	QUnit.test("Carousel should have correct roles", function (assert) {
 		// Assert
-		assert.strictEqual(document.getElementById("crsl").getAttribute("role"), "list", "Role of a carousel should be list");
+		assert.strictEqual(document.getElementById("crsl").getAttribute("role"), "region", "Role of a carousel should be region");
+		assert.strictEqual(document.getElementsByClassName("sapMCrslList")[0].getAttribute("role"), "list", "Role of a carousel should have a list inside");
 		assert.strictEqual(document.getElementById("crsl-text1-slide").getAttribute("role"), "listitem", "Role of a carousel item should be listitem");
 
 		const oRb = Library.getResourceBundleFor("sap.m");
@@ -1989,6 +1971,7 @@ sap.ui.define([
 		var sExpectedLabel = oAccInfo.type + " " + oAccInfo.description;
 
 		// assert
+		assert.strictEqual(oNoData.getAttribute("role"), "listitem", "'No Data' element should have role 'listitem'");
 		assert.strictEqual(oNoData.getAttribute("tabIndex"), "0", "'No Data' element should be focusable");
 		assert.strictEqual(oNoData.getAttribute("aria-label"), sExpectedLabel, "'aria-label' should be correct");
 	});

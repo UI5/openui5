@@ -604,8 +604,8 @@ sap.ui.define([
 		 *       status code 412 and response header "Preference-Applied:handling=strict"
 		 *   </ul>
 		 * @see <a href=
-		 * "https://docs.oasis-open.org/odata/odata-json-format/v4.0/odata-json-format-v4.0.html#_Representing_Errors_in"
-		 * >"19 Error Response"</a>
+		 * "https://docs.oasis-open.org/odata/odata-json-format/v4.01/odata-json-format-v4.01.html#sec_ErrorResponse"
+		 * >"21.1 Error Response"</a>
 		 *
 		 * @public
 		 */
@@ -1236,12 +1236,12 @@ sap.ui.define([
 		 * Formats a given internal value into a literal suitable for usage in URLs.
 		 *
 		 * @param {any} vValue
-		 *   The value according to "OData JSON Format Version 4.0" section "7.1 Primitive Value"
+		 *   The value according to "OData JSON Format Version 4.01" section "7.1 Primitive Value"
 		 * @param {string} sType
 		 *   The OData Edm type, e.g. "Edm.String"
 		 * @returns {string}
-		 *   The literal according to "OData Version 4.0 Part 2: URL Conventions" section
-		 *   "5.1.1.6.1 Primitive Literals"
+		 *   The literal according to "OData Version 4.01 Part 2: URL Conventions" section
+		 *   "5.1.1.14.1 Primitive Literals"
 		 * @throws {Error}
 		 *   If the value is undefined or the type is not supported
 		 *
@@ -2014,8 +2014,8 @@ sap.ui.define([
 		 *   A read-only map of query options as returned by
 		 *   {@link sap.ui.model.odata.v4.ODataModel#buildQueryOptions}
 		 * @param {string[]} aPaths
-		 *   The "14.5.11 Expression edm:NavigationPropertyPath" or
-		 *   "14.5.13 Expression edm:PropertyPath" strings describing which properties need to be
+		 *   The "14.4.1.5 Expression edm:NavigationPropertyPath" or
+		 *   "14.4.1.6 Expression edm:PropertyPath" strings describing which properties need to be
 		 *   loaded because they may have changed due to side effects of a previous update; must not
 		 *   be empty; "*" means all structural properties
 		 * @param {function} fnFetchMetadata

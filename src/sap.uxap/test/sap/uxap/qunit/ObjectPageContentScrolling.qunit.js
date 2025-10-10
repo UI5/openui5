@@ -1185,6 +1185,43 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 		}.bind(this));
 	});
 
+	QUnit.test("Scroll-padding-top of scrolling container", function (assert) {
+		var oObjectPage = this.oObjectPageContentScrollingView.byId("ObjectPageLayout"),
+			oSelectedSection = oObjectPage.getSections()[1],
+			iPaddingTop,
+			done = assert.async();
+
+		oObjectPage.attachEventOnce("onAfterRenderingDOMReady", function() {
+			iPaddingTop = parseInt(oObjectPage._$opWrapper.css("scroll-padding-top"));
+			// Check
+			assert.strictEqual(iPaddingTop, oObjectPage._$titleArea.get(0).getBoundingClientRect().height,
+				"scroll-padding-top is equal to the title area height");
+
+			oObjectPage.setSelectedSection(oSelectedSection);
+			setTimeout(function() {
+				iPaddingTop = parseInt(oObjectPage._$opWrapper.css("scroll-padding-top"));
+				// Check
+				assert.strictEqual(iPaddingTop, oObjectPage._$titleArea.get(0).getBoundingClientRect().height,
+					"when ObjectPage is scrolled to the top of the Section, scroll-padding-top is still equal to the title area height");
+
+				// Act - scroll a bit more to make the header of the Section stickied
+				oObjectPage._scrollTo(oObjectPage._oScrollContainerLastState.iScrollTop + 10);
+
+				setTimeout(function() {
+					iPaddingTop = parseInt(oObjectPage._$opWrapper.css("scroll-padding-top"));
+					// Check
+					assert.strictEqual(iPaddingTop,
+						(oObjectPage._$titleArea.get(0).getBoundingClientRect().height || 0) +
+						(oSelectedSection?.$().find(".sapUxAPObjectPageSectionHeader").outerHeight() || 0),
+						"when ObjectPage is scrolled to make the header of the Section stickied, scroll-padding-top is equal to the header height + title area height");
+
+					done();
+				}, 1000); //scroll delay
+
+			}, 1000); //scroll delay
+		});
+	});
+
 	QUnit.module("ObjectPage scrolling without view");
 
 	QUnit.test("auto-scroll on resize of last section", async function(assert) {

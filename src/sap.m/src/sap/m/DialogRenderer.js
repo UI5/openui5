@@ -159,6 +159,7 @@ sap.ui.define([
 			// In that case, the controller will focus the last focusable element.
 			oRM.openStart("span", sId + "-firstfe")
 				.class("sapMDialogFirstFE")
+				.class("sapUiSkipFocusFail")
 				.attr("role", "none")
 				.attr("tabindex", "0")
 				.openEnd()
@@ -255,6 +256,7 @@ sap.ui.define([
 			// In that case, the controller will focus the first focusable element.
 			oRM.openStart("span", sId + "-lastfe")
 				.class("sapMDialogLastFE")
+				.class("sapUiSkipFocusFail")
 				.attr("role", "none")
 				.attr("tabindex", "0")
 				.openEnd()

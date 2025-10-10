@@ -1574,9 +1574,9 @@ sap.ui.define([
 	 * @param {string} sGroupId
 	 *   The group ID to be used for requesting side effects
 	 * @param {string[]} aPaths
-	 *   The "14.5.11 Expression edm:NavigationPropertyPath" or
-	 *   "14.5.13 Expression edm:PropertyPath" strings describing which properties need to be loaded
-	 *   because they may have changed due to side effects of a previous update
+	 *   The "14.4.1.5  Expression edm:NavigationPropertyPath" or
+	 *   "14.4.1.6 Expression edm:PropertyPath" strings describing which properties need to be
+	 *   loaded because they may have changed due to side effects of a previous update
 	 * @param {sap.ui.model.odata.v4.Context} [oContext]
 	 *   The context for which to request side effects; if missing, the whole binding is affected
 	 * @param {Promise[]} aPromises

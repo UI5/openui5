@@ -3,6 +3,7 @@
 	xmlns:mvc="sap.ui.core.mvc"
 	xmlns:f="sap.f"
 	xmlns:cards="sap.f.cards"
+	xmlns:card="sap.f.cards"
 	xmlns:w="sap.ui.integration.widgets"
 	controllerName="sap.f.cardsdemo.controller.NumericHeader"
 	displayBlock="true">
@@ -17,6 +18,52 @@
 
 		<Panel>
 			<f:GridContainer>
+				<w:Card id="cardWithActionStatusAndTimestampWithTextAndIconBadge" manifest="{manifests>/kpiManifests/cardWithActionStatusAndTimestamp}" width="320px" class="sapUiSmallMargin" baseUrl="{cardsPlayground>/playgroundBaseUrl}">
+					<w:customData>
+						<card:CardBadgeCustomData value="New" visibilityMode="Persist" announcementText="The card is pinned on top."/>
+						<card:CardBadgeCustomData icon="sap-icon://pushpin-off" visibilityMode="Persist" announcementText="The card is pinned on top."/>
+					</w:customData>
+					<w:layoutData>
+						<f:GridContainerItemLayoutData columns="4" />
+					</w:layoutData>
+				</w:Card>
+
+				<w:Card id="cardWithActionStatusAndTimestampWithBadge" manifest="{manifests>/kpiManifests/cardWithActionStatusAndTimestamp}" width="320px" class="sapUiSmallMargin" baseUrl="{cardsPlayground>/playgroundBaseUrl}">
+					<w:customData>
+						<card:CardBadgeCustomData icon="sap-icon://pushpin-off" value="New" visibilityMode="Persist" announcementText="The card is pinned on top."/>
+					</w:customData>
+					<w:layoutData>
+						<f:GridContainerItemLayoutData columns="4" />
+					</w:layoutData>
+				</w:Card>
+
+				<w:Card id="cardWithActionStatusAndTimestampWithIconBadge" manifest="{manifests>/kpiManifests/cardWithActionStatusAndTimestamp}" width="320px" class="sapUiSmallMargin" baseUrl="{cardsPlayground>/playgroundBaseUrl}">
+					<w:customData>
+						<card:CardBadgeCustomData icon="sap-icon://pushpin-off" visibilityMode="Persist" announcementText="The card is pinned on top."/>
+					</w:customData>
+					<w:layoutData>
+						<f:GridContainerItemLayoutData columns="4" />
+					</w:layoutData>
+				</w:Card>
+
+				<w:Card id="cardWithActionStatusAndTimestampWithTextBadge" manifest="{manifests>/kpiManifests/cardWithActionStatusAndTimestamp}" width="320px" class="sapUiSmallMargin" baseUrl="{cardsPlayground>/playgroundBaseUrl}">
+					<w:customData>
+						<card:CardBadgeCustomData value="New" visibilityMode="Persist" announcementText="The card is pinned on top."/>
+					</w:customData>
+					<w:layoutData>
+						<f:GridContainerItemLayoutData columns="4" />
+					</w:layoutData>
+				</w:Card>
+
+				<w:Card id="cardWithActionStatusAndTimestampWithTruncatedTextBadge" manifest="{manifests>/kpiManifests/cardWithActionStatusAndTimestamp}" width="320px" class="sapUiSmallMargin" baseUrl="{cardsPlayground>/playgroundBaseUrl}">
+					<w:customData>
+						<card:CardBadgeCustomData value="A very very very long badge text that should showcase truncation" visibilityMode="Persist" announcementText="The card is pinned on top."/>
+					</w:customData>
+					<w:layoutData>
+						<f:GridContainerItemLayoutData columns="4" />
+					</w:layoutData>
+				</w:Card>
+
 				<w:Card id="cardWithActionStatusAndTimestamp" manifest="{manifests>/kpiManifests/cardWithActionStatusAndTimestamp}" width="320px" class="sapUiSmallMargin" baseUrl="{cardsPlayground>/playgroundBaseUrl}">
 					<w:layoutData>
 						<f:GridContainerItemLayoutData columns="4" />

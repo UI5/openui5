@@ -522,26 +522,13 @@ sap.ui.define([
 	};
 
 	GridTableType.prototype.scrollToIndex = function(iIndex) {
-		const oTable = this.getTable();
 		const oGridTable = this.getInnerTable();
 
 		if (!oGridTable) {
 			return Promise.reject();
 		}
 
-		return new Promise((resolve) => {
-			if (iIndex === -1) {
-				iIndex = MTableUtil.isEmpty(oTable.getRowBinding()) ? 0 : oTable.getRowBinding().getLength();
-			}
-
-			if (oGridTable._setFirstVisibleRowIndex(iIndex)) {
-				oGridTable.attachEventOnce("rowsUpdated", () => {
-					resolve();
-				});
-			} else {
-				resolve();
-			}
-		});
+		return oGridTable._scrollToIndex(iIndex);
 	};
 
 	GridTableType.prototype.getRowBinding = function() {

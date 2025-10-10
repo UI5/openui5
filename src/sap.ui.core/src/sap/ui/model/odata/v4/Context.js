@@ -872,11 +872,12 @@ sap.ui.define([
 
 	/**
 	 * Returns the "canonical path" of the entity for this context. According to <a href=
-	 * "https://docs.oasis-open.org/odata/odata/v4.0/odata-v4.0-part2-url-conventions.html#canonical-urlurl4.1.1"
-	 * >"4.3.1 Canonical URL"</a> of the specification "OData Version 4.0 Part 2: URL Conventions",
-	 * this is the "name of the entity set associated with the entity followed by the key predicate
-	 * identifying the entity within the collection". Use the canonical path in
-	 * {@link sap.ui.core.Element#bindElement} to create an element binding.
+	 * "https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part2-url-conventions.html#_Toc31360932"
+	 * >"4.3.1 Canonical URL"</a> of the specification
+	 * "OData Version 4.01. Part 2: URL Conventions", this is the "name of the entity set associated
+	 * with the entity followed by the key predicate identifying the entity within the collection".
+	 * Use the canonical path in {@link sap.ui.core.Element#bindElement} to create an element
+	 * binding.
 	 *
 	 * Note: For a transient context (see {@link #isTransient}) a wrong path is returned unless all
 	 * key properties are available within the initial data.
@@ -1026,8 +1027,8 @@ sap.ui.define([
 	 * Returns the value for the given path relative to this context. The function allows access to
 	 * the complete data the context points to (if <code>sPath</code> is "") or any part thereof.
 	 * The data is a JSON structure as described in
-	 * <a href="https://docs.oasis-open.org/odata/odata-json-format/v4.0/">
-	 * "OData JSON Format Version 4.0"</a>.
+	 * <a href="https://docs.oasis-open.org/odata/odata-json-format/v4.01/">
+	 * "OData JSON Format Version 4.01"</a>.
 	 * Note that the function clones the result. Modify values via
 	 * {@link sap.ui.model.odata.v4.ODataPropertyBinding#setValue}.
 	 *
@@ -1185,8 +1186,8 @@ sap.ui.define([
 	 * Returns the value for the given path. The function allows access to the complete data the
 	 * context points to (if <code>sPath</code> is "") or any part thereof. The data is a JSON
 	 * structure as described in
-	 * <a href="https://docs.oasis-open.org/odata/odata-json-format/v4.0/">
-	 * "OData JSON Format Version 4.0"</a>.
+	 * <a href="https://docs.oasis-open.org/odata/odata-json-format/v4.01/">
+	 * "OData JSON Format Version 4.01"</a>.
 	 * Note that the function returns the cache instance. Do not modify the result, use
 	 * {@link sap.ui.model.odata.v4.ODataPropertyBinding#setValue} instead.
 	 *
@@ -1686,11 +1687,12 @@ sap.ui.define([
 	/**
 	 * Returns a promise for the "canonical path" of the entity for this context. According to
 	 * <a href=
-	 * "https://docs.oasis-open.org/odata/odata/v4.0/odata-v4.0-part2-url-conventions.html#canonical-urlurl4.1.1"
-	 * >"4.3.1 Canonical URL"</a> of the specification "OData Version 4.0 Part 2: URL Conventions",
-	 * this is the "name of the entity set associated with the entity followed by the key predicate
-	 * identifying the entity within the collection". Use the canonical path in
-	 * {@link sap.ui.core.Element#bindElement} to create an element binding.
+	 * "https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part2-url-conventions.html#_Toc31360932"
+	 * >"4.3.1 Canonical URL"</a> of the specification
+	 * "OData Version 4.01. Part 2: URL Conventions", this is the "name of the entity set associated
+	 * with the entity followed by the key predicate identifying the entity within the collection".
+	 * Use the canonical path in {@link sap.ui.core.Element#bindElement} to create an element
+	 * binding.
 	 *
 	 * Note: For a transient context (see {@link #isTransient}) a wrong path is returned unless all
 	 * key properties are available within the initial data.
@@ -1711,8 +1713,8 @@ sap.ui.define([
 	 * Returns a promise on the value for the given path relative to this context. The function
 	 * allows access to the complete data the context points to (if <code>sPath</code> is "") or
 	 * any part thereof. The data is a JSON structure as described in
-	 * <a href="https://docs.oasis-open.org/odata/odata-json-format/v4.0/">
-	 * "OData JSON Format Version 4.0"</a>.
+	 * <a href="https://docs.oasis-open.org/odata/odata-json-format/v4.01/">
+	 * "OData JSON Format Version 4.01"</a>.
 	 * Note that the function clones the result. Modify values via {@link #setProperty}.
 	 *
 	 * The header context of a list binding only delivers <code>$count</code> and
@@ -1892,7 +1894,7 @@ sap.ui.define([
 
 	/**
 	 * Loads side effects for this context using the given
-	 * "14.5.11 Expression edm:NavigationPropertyPath" or "14.5.13 Expression edm:PropertyPath"
+	 * "14.4.1.5 Expression edm:NavigationPropertyPath" or "14.4.1.6 Expression edm:PropertyPath"
 	 * objects. Use this method to explicitly load side effects in case implicit loading is switched
 	 * off via the binding-specific parameter <code>$$patchWithoutSideEffects</code>. The method
 	 * can be called on
@@ -1934,8 +1936,8 @@ sap.ui.define([
 	 * </ul>
 	 *
 	 * @param {Array<sap.ui.model.odata.v4.ts.NavigationPropertyPathExpression|sap.ui.model.odata.v4.ts.PropertyPathExpression|string>} aPathExpressions
-	 *   The "14.5.11 Expression edm:NavigationPropertyPath" or
-	 *   "14.5.13 Expression edm:PropertyPath" objects describing which properties need to be
+	 *   The "14.4.1.5 Expression edm:NavigationPropertyPath" or
+	 *   "14.4.1.6 Expression edm:PropertyPath" objects describing which properties need to be
 	 *   loaded because they may have changed due to side effects of a previous update, for example
 	 *   <code>[{$PropertyPath : "TEAM_ID"}, {$NavigationPropertyPath : "EMPLOYEE_2_MANAGER"},
 	 *   {$PropertyPath : "EMPLOYEE_2_TEAM/Team_Id"}]</code>. An empty navigation property path
@@ -1948,7 +1950,7 @@ sap.ui.define([
 	 *   Since 1.82.0, absolute paths are supported. Absolute paths must start with the entity
 	 *   container (example "/com.sap.gateway.default.iwbep.tea_busi.v0001.Container/TEAMS") of the
 	 *   service. All (navigation) properties in the complete model matching such an absolute path
-	 *   are updated. Since 1.85.0, "14.4.11 Expression edm:String" is accepted as well.
+	 *   are updated. Since 1.85.0, "14.3.11 Expression edm:String" is accepted as well.
 	 *
 	 *   Since 1.108.8, a property path matching the "com.sap.vocabularies.Common.v1.Messages"
 	 *   annotation of a list binding's entity type is treated specially for a row context of a list
@@ -1974,8 +1976,8 @@ sap.ui.define([
 	 *   <ul>
 	 *     <li> metadata has not yet been loaded
 	 *     <li> <code>aPathExpressions</code> contains objects other than
-	 *       "14.4.11 Expression edm:String", "14.5.11 Expression edm:NavigationPropertyPath" or
-	 *       "14.5.13 Expression edm:PropertyPath"
+	 *       "14.3.11 Expression edm:String", "14.4.1.5 Expression edm:NavigationPropertyPath" or
+	 *       "14.4.1.6 Expression edm:PropertyPath"
 	 *     <li> a path contains a "*", except for a property path as its sole or last segment
 	 *     <li> this context is not supported
 	 *     <li> the root binding of this context's binding is suspended (see {@link #getBinding} and

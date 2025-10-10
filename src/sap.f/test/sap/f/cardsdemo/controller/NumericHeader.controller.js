@@ -11,6 +11,11 @@ sap.ui.define([
 			const oCard7 = this.getView().byId("kpicard7");
 			const oCard8 = this.getView().byId("kpicard8");
 			const oMyCard = this.getView().byId("cardWithActionStatusAndTimestamp");
+			const oMyCardWithBadge = this.getView().byId("cardWithActionStatusAndTimestampWithBadge");
+			const oMyCardWithIconBadge = this.getView().byId("cardWithActionStatusAndTimestampWithIconBadge");
+			const oMyCardWithTextBadge = this.getView().byId("cardWithActionStatusAndTimestampWithTextBadge");
+			const oMyCardWithTextAndIconBadge = this.getView().byId("cardWithActionStatusAndTimestampWithTextAndIconBadge");
+			const oMyCardWithLongTextBadge = this.getView().byId("cardWithActionStatusAndTimestampWithTruncatedTextBadge");
 
 			oCard6.attachManifestReady(function () {
 				oCard6.addActionDefinition(new ActionDefinition({
@@ -28,6 +33,51 @@ sap.ui.define([
 
 			oCard8.attachManifestReady(function () {
 				oCard8.addActionDefinition(new ActionDefinition({
+					type: "Custom",
+					text: "Button"
+				}));
+			});
+
+			oMyCardWithLongTextBadge.getCustomData()[0].setVisible(true);
+
+			oMyCardWithLongTextBadge.attachManifestReady(function () {
+				oMyCardWithLongTextBadge.addActionDefinition(new ActionDefinition({
+					type: "Custom",
+					text: "Button"
+				}));
+			});
+
+			oMyCardWithBadge.getCustomData()[0].setVisible(true);
+
+			oMyCardWithBadge.attachManifestReady(function () {
+				oMyCardWithBadge.addActionDefinition(new ActionDefinition({
+					type: "Custom",
+					text: "Button"
+				}));
+			});
+
+			oMyCardWithTextBadge.getCustomData()[0].setVisible(true);
+
+			oMyCardWithTextBadge.attachManifestReady(function () {
+				oMyCardWithTextBadge.addActionDefinition(new ActionDefinition({
+					type: "Custom",
+					text: "Button"
+				}));
+			});
+
+			oMyCardWithTextAndIconBadge.getCustomData()[0].setVisible(true);
+
+			oMyCardWithTextAndIconBadge.attachManifestReady(function () {
+				oMyCardWithTextAndIconBadge.addActionDefinition(new ActionDefinition({
+					type: "Custom",
+					text: "Button"
+				}));
+			});
+
+			oMyCardWithIconBadge.getCustomData()[0].setVisible(true);
+
+			oMyCardWithIconBadge.attachManifestReady(function () {
+				oMyCardWithIconBadge.addActionDefinition(new ActionDefinition({
 					type: "Custom",
 					text: "Button"
 				}));

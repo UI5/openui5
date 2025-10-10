@@ -1209,7 +1209,7 @@ sap.ui.define([
 				sName, // what "@sapui.name" refers to: OData or annotation name
 				bODataMode, // OData navigation mode with scope lookup etc.
 				bOpenType, // schema child is an open (entity or complex) type
-				// parent for next "17.2 SimpleIdentifier"...
+				// parent for next "15.2 SimpleIdentifier"...
 				// (normally the schema child containing the current object)
 				oSchemaChild, // ...as object
 				sSchemaChildName, // ...as qualified name
@@ -1283,7 +1283,7 @@ sap.ui.define([
 				}
 
 				// "the annotation applies to all overloads of the action or function or all
-				// parameters of that name across all overloads" [OData-Part3]
+				// parameters of that name across all overloads" [OData-CSDL-XML-v4.01]
 				sTarget += sSuffix;
 				// any object (no array!) should do here to skip repeated handling of overloads
 				vResult = mScope;
@@ -1587,7 +1587,7 @@ sap.ui.define([
 							if (bSplitSegment) {
 								// no special preparations needed, but handle overloads below!
 							} else if (sSegment[0] !== "@" && sSegment.includes(".", 1)) {
-								// "17.3 QualifiedName": scope lookup
+								// "15.3 QualifiedName": scope lookup
 								return scopeLookup(sSegment);
 							} else if (bResultIsObject && "$Type" in vResult) {
 								// implicit $Type insertion, e.g. at (navigation) property
@@ -1610,7 +1610,7 @@ sap.ui.define([
 								}
 								vBindingParameterType = UNBOUND;
 							} else if (!i) {
-								// "17.2 SimpleIdentifier" (or placeholder):
+								// "15.2 SimpleIdentifier" (or placeholder):
 								// lookup inside schema child (which is determined lazily)
 								sTarget = sName = sSchemaChildName
 									??= mScope.$EntityContainer;
@@ -1621,7 +1621,7 @@ sap.ui.define([
 									}
 									if (isParameter(sSegment, vResult[0])) {
 										// path evaluation relative to an operation overload
-										// @see [OData-CSDL-JSON-v4.01] "14.4.1.2 Path Evaluation"
+										// @see [OData-CSDL-XML-v4.01] "14.4.1.2 Path Evaluation"
 										// or ".../@$ui5.overload/0/$Parameter/<i>/$Name/$" to refer
 										// back to (overloaded) operation's parameter
 										return true;
@@ -1772,8 +1772,8 @@ sap.ui.define([
 					oEntitySetOrSingleton = undefined;
 					sSomePath = sSomePath.slice(1);
 				} else if (oEntitySetOrSingleton) {
-					// "14.5.12 Expression edm:Path" within an annotation targeting an entity set or
-					// a singleton
+					// "14.4.1.7 Expression edm:Path" within an annotation targeting an entity set
+					// or a singleton
 					if (!sSomePath) { // "an empty path resolves to the entity set or singleton"
 						vResult = oEntitySetOrSingleton;
 						oEntitySetOrSingleton = vLocation = undefined;
@@ -3061,16 +3061,14 @@ sap.ui.define([
 	 * </pre>
 	 *
 	 * The basic idea is that every path described in <a href=
-	 * "https://docs.oasis-open.org/odata/odata/v4.0/odata-v4.0-part3-csdl.html#_Attribute_Target"
-	 * >"14.2.1 Attribute Target"</a> in specification "OData Version 4.0 Part 3: Common Schema
-	 * Definition Language" is a valid absolute path within the metadata model if a leading slash is
-	 * added; for example
+	 * "https://docs.oasis-open.org/odata/odata-csdl-xml/v4.01/odata-csdl-xml-v4.01.html#_Toc38530407"
+	 * >"14.2.2 Target"</a> in specification "OData Common Schema Definition Language (CSDL)
+	 * XML Representation Version 4.01" is a valid absolute path within the metadata model if a
+	 * leading slash is added; for example
 	 * "/" + "MySchema.MyEntityContainer/MyEntitySet/MyComplexProperty/MyNavigationProperty". Also,
-	 * every path described in "14.5.2 Expression edm:AnnotationPath",
-	 * "14.5.11 Expression edm:NavigationPropertyPath", "14.5.12 Expression edm:Path", and
-	 * "14.5.13 Expression edm:PropertyPath" is a valid relative path within the metadata model
-	 * if a suitable prefix is added which addresses an entity container, entity set, singleton,
-	 * complex type, entity type, or property; for example
+	 * every path described in "14.4.1.1 Path Syntax" is a valid relative path within the metadata
+	 * model if a suitable prefix is added which addresses an entity container, entity set,
+	 * singleton, complex type, entity type, or property; for example
 	 * "/MySchema.MyEntityType/MyProperty" + "@vCard.Address#work/FullName".
 	 *
 	 * The absolute path is split into segments and followed step-by-step, starting at the global
@@ -3111,25 +3109,24 @@ sap.ui.define([
 	 * this, a path must not continue if it comes across a non-object value. Such a string value can
 	 * be a qualified name (example path "/$EntityContainer/..."), a simple identifier (example path
 	 * "/TEAMS/$NavigationPropertyBinding/TEAM_2_EMPLOYEES/...") including the special name
-	 * "$ReturnType" (since 1.71.0), or even a path according to "14.5.12 Expression edm:Path" etc.
+	 * "$ReturnType" (since 1.71.0), or even a path according to "14.4.1.1 Path Syntax"
 	 * (example path "/TEAMS/@com.sap.vocabularies.UI.v1.LineItem/0/Value/$Path/...".
 	 *
 	 * Segments starting with an "@" character, for example "@com.sap.vocabularies.Common.v1.Label",
 	 * address annotations at the current object. As the first segment, they refer to the single
-	 * entity container. For objects which can only be annotated inline (see "14.3 Element
-	 * edm:Annotation" minus "14.2.1 Attribute Target"), the object already contains the
-	 * annotations as a property. For objects which can (only or also) be annotated via external
-	 * targeting, the object does not contain any annotation as a property. Such annotations MUST
-	 * be accessed via a path. Such objects include operations (that is, actions and functions) and
-	 * their parameters, which can be annotated for a single overload or for all overloads at the
-	 * same time.
+	 * entity container. For objects which can only be annotated inline (see "14.2 Annotation" minus
+	 * "14.2.2 Target"), the object already contains the annotations as a property. For objects
+	 * which can (only or also) be annotated via external targeting, the object does not contain any
+	 * annotation as a property. Such annotations MUST be accessed via a path. Such objects include
+	 * operations (that is, actions and functions) and their parameters, which can be annotated for
+	 * a single overload or for all overloads at the same time.
 	 *
 	 * Segments starting with an OData name followed by an "@" character, for example
 	 * "/TEAMS@Org.OData.Capabilities.V1.TopSupported", address annotations at an entity set,
 	 * singleton, or property, not at the corresponding type. In contrast,
 	 * "/TEAMS/@com.sap.vocabularies.Common.v1.Deletable" (note the separating slash) addresses an
 	 * annotation at the entity set's type. This is in line with the special rule of
-	 * "14.5.12 Expression edm:Path" regarding annotations at a navigation property itself.
+	 * "14.4.1.2 Path Evaluation" regarding annotations at a navigation property itself.
 	 *
 	 * "@" can be used as a segment to address a map of all annotations of the current object. This
 	 * is useful for iteration, for example via
@@ -3141,14 +3138,14 @@ sap.ui.define([
 	 * annotation can have a qualifier, for example "@first#foo@second#bar". Note: If the first
 	 * annotation's value is a record, a separate segment addresses an annotation of that record,
 	 * not an annotation of the first annotation itself.
-	 * In a similar way, annotations of "7.2 Element edm:ReferentialConstraint",
-	 * "7.3 Element edm:OnDelete", "10.2 Element edm:Member" and
-	 * "14.5.14.2 Element edm:PropertyValue" are addressed by segments like
-	 * "&lt;7.2.1 Attribute Property>@...", "$OnDelete@...", "&lt;10.2.1 Attribute Name>@..." and
-	 * "&lt;14.5.14.2.1 Attribute Property>@..." (where angle brackets denote a variable part and
+	 * In a similar way, annotations of "8.5 Element edm:ReferentialConstraint",
+	 * "8.6 Element edm:OnDelete", "10.3 Element edm:Member" and
+	 * "14.4.12 Element edm:PropertyValue" are addressed by segments like
+	 * "&lt;8.5 Attribute Property>@...", "$OnDelete@...", "&lt;10.3 Attribute Name>@..." and
+	 * "&lt;14.4.12 Attribute Property>@..." (where angle brackets denote a variable part and
 	 * sections refer to specification <a href=
-	 * "https://docs.oasis-open.org/odata/odata/v4.0/odata-v4.0-part3-csdl.html"
-	 * >"OData Version 4.0 Part 3: Common Schema Definition Language"</a>).
+	 * "https://docs.oasis-open.org/odata/odata-csdl-xml/v4.01/odata-csdl-xml-v4.01.html"
+	 * >"OData Common Schema Definition Language (CSDL) XML Representation Version 4.01"</a>).
 	 *
 	 * Annotations starting with "@@", for example
 	 * "@@sap.ui.model.odata.v4.AnnotationHelper.isMultiple" or "@@.AH.isMultiple" or
@@ -3450,7 +3447,7 @@ sap.ui.define([
 	 *   this method. If the value list model is the data model associated with this meta model,
 	 *   this flag has no effect. Supported since 1.68.0
 	 * @param {sap.ui.model.odata.v4.Context} [oContext]
-	 *   Context to resolve "14.5.12 Expression edm:Path" references contained in a
+	 *   Context to resolve "14.4.1.7 Expression edm:Path" references contained in a
 	 *   "com.sap.vocabularies.Common.v1.ValueListRelevantQualifiers" annotation. Supported since
 	 *   1.84.0
 	 * @returns {Promise<Object<object>>}

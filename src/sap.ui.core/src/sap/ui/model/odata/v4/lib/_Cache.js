@@ -3876,9 +3876,9 @@ sap.ui.define([
 	 *   A lock for the ID of the group that is associated with the request;
 	 *   see {@link sap.ui.model.odata.v4.lib._Requestor#request} for details
 	 * @param {string[]} aPaths
-	 *   The "14.5.11 Expression edm:NavigationPropertyPath" or
-	 *   "14.5.13 Expression edm:PropertyPath" strings describing which properties need to be loaded
-	 *   because they may have changed due to side effects of a previous update
+	 *   The "14.4.1.5 Expression edm:NavigationPropertyPath" or
+	 *   "14.4.1.6 Expression edm:PropertyPath" strings describing which properties need to be
+	 *   loaded because they may have changed due to side effects of a previous update
 	 * @param {string[]} aPredicates
 	 *   The key predicates of the root elements to request side effects for
 	 * @param {boolean} bSingle
@@ -4619,9 +4619,9 @@ sap.ui.define([
 	 *   A lock for the ID of the group that is associated with the request;
 	 *   see {@link sap.ui.model.odata.v4.lib._Requestor#request} for details
 	 * @param {string[]} aPaths
-	 *   The "14.5.11 Expression edm:NavigationPropertyPath" or
-	 *   "14.5.13 Expression edm:PropertyPath" strings describing which properties need to be loaded
-	 *   because they may have changed due to side effects of a previous update
+	 *   The "14.4.1.5 Expression edm:NavigationPropertyPath" or
+	 *   "14.4.1.6 Expression edm:PropertyPath" strings describing which properties need to be
+	 *   loaded because they may have changed due to side effects of a previous update
 	 * @param {string} [sResourcePath=this.sResourcePath]
 	 *   A resource path relative to the service URL; it must not contain a query string
 	 * @returns {sap.ui.base.SyncPromise<void>}

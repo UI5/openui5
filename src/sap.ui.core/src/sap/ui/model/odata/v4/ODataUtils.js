@@ -12,7 +12,7 @@ sap.ui.define([
 ], function (CalendarType, DateFormat, BaseODataUtils, _Batch, _Helper) {
 	"use strict";
 
-	// see https://docs.oasis-open.org/odata/odata/v4.0/errata03/os/complete/abnf/
+	// see https://docs.oasis-open.org/odata/odata/v4.01/os/abnf/
 	var oDateFormatter,
 		oDateTimeOffsetFormatter,
 		sDateValue = "\\d{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12]\\d|3[01])",
@@ -138,15 +138,15 @@ sap.ui.define([
 			 *
 			 * @param {any} vValue
 			 *   The value according to <a href=
-			 *   "https://docs.oasis-open.org/odata/odata-json-format/v4.0/odata-json-format-v4.0.html#_Primitive_Value"
-			 *   >"OData JSON Format Version 4.0" section "7.1 Primitive Value"</a>
+			 *   "https://docs.oasis-open.org/odata/odata-json-format/v4.01/odata-json-format-v4.01.html#sec_PrimitiveValue"
+			 *   >"OData JSON Format Version 4.01" section "7.1 Primitive Value"</a>
 			 * @param {string} sType
 			 *   The OData primitive type, for example "Edm.String"
 			 * @returns {string}
 			 *   The literal according to <a href=
-			 *   "https://docs.oasis-open.org/odata/odata/v4.0/odata-v4.0-part2-url-conventions.html"
-			 *   >"OData Version 4.0 Part 2: URL Conventions"</a> section
-			 *   "5.1.1.11.1 Primitive Literals"
+			 *   "https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part2-url-conventions.html#_Toc31361028"
+			 *   >"OData Version 4.01. Part 2: URL Conventions"</a> section
+			 *   "5.1.1.14.1 Primitive Literals"
 			 * @throws {Error}
 			 *   If the value is undefined or the type is not supported
 			 *

@@ -26,7 +26,7 @@
     "@ui5/webcomponents-icons-tnt": "2.15.0",
     "@ui5/cli": "4.0.30",
     "fs-extra": "11.3.2",
-    "ui5-tooling-modules": "3.32.0"
+    "ui5-tooling-modules": "3.32.2"
   },
   "scripts": {
     "pregenerate-webcomponents": "node -e \"const fsx = require('fs-extra'); fsx.emptyDirSync('src/sap/f/gen'); fsx.emptyDirSync('src/sap/f/thirdparty');\"",

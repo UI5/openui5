@@ -1614,6 +1614,83 @@ sap.ui.define([
 			oList.setSticky(["ColumnHeaders", "GroupHeaders", "HeaderToolbar", "InfoToolbar"]);
 			return testScroll(0);
 		}).then(function() {
+			return new Promise(function(resolve) {
+				oList.scrollToIndex(20).then(function() {
+					assert.ok(oSpy.called, "The scroll delegate was called");
+					assert.ok(oSpy.calledOnce, "The scroll delegate was called exactly once");
+					assert.ok(oSpy.calledWithExactly(oList.getVisibleItems()[20].getDomRef(), null, [0, oList._getStickyAreaHeight() * -1], true),
+						"Scroll delegate was called with correct parameters");
+
+					const oTarget = oList.getVisibleItems()[20].getDomRef();
+					const oRoot = oList.getDomRef();
+
+					new Promise(function (resolve) {
+						const io = new IntersectionObserver(function (entries, observer) {
+							entries.forEach(function (entry) {
+								if (entry.target === oTarget && entry.isIntersecting) {
+									observer.disconnect();
+									assert.ok(entry.isIntersecting, "The list item at index 20 is scrolled into the viewport");
+									resolve();
+								}
+							});
+						}, { root: oRoot, threshold: 0 });
+
+						io.observe(oTarget);
+					}).then(function () {
+						oSpy.resetHistory();
+						resolve();
+					});
+				});
+			});
+		}).then(function() {
+			const aListItems = [];
+			aListItems.push(createListItem());
+			oList = new List({
+				items: []
+			});
+			oScrollContainer = new ScrollContainer({
+				vertical: true,
+				content: oList
+			});
+
+			oScrollContainer.placeAt("qunit-fixture");
+			return new Promise(function(resolve) {
+				const oScrollSpy = sinon.spy(oList, "scrollToIndex");
+				oList.scrollToIndex(100)
+					.then(function() {
+						assert.ok(false, "The scrollToIndex promise should be rejected");
+						resolve();
+				}).catch(function() {
+					assert.notOk(oSpy.called, "The scroll delegate was not called");
+					assert.ok(oScrollSpy.calledTwice, "The scrollToIndex was called exactly twice");
+					assert.deepEqual(oScrollSpy.getCall(1).args, [100, true], "The second call was with index 100 and lastChance=true");
+					oSpy.resetHistory();
+					resolve();
+				});
+
+				// In this case it's necessary to fake the updateFinished event since the list is not updating
+				setTimeout(function() {
+					oList.fireEvent("updateFinished");
+				}, 500);
+			});
+		}).then(function() {
+			const aListItems = [];
+			aListItems.push(createListItem());
+			oList = new List({
+				items: []
+			});
+			oScrollContainer = new ScrollContainer({
+				vertical: true,
+				content: oList
+			});
+			return new Promise(function(resolve) {
+				oList.scrollToIndex(-1, true).catch(function() {
+					assert.notOk(oSpy.called, "The scroll delegate was not called");
+					oSpy.resetHistory();
+					resolve();
+				});
+			});
+		}).then(function() {
 			oSpy.restore();
 			oScrollContainer.destroy();
 			done();

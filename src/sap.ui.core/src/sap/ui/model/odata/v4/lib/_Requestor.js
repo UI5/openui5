@@ -952,12 +952,12 @@ sap.ui.define([
 	 * Formats a given internal value into a literal suitable for usage in URLs.
 	 *
 	 * @param {any} vValue
-	 *   The value according to "OData JSON Format Version 4.0" section "7.1 Primitive Value"
+	 *   The value according to "OData JSON Format Version 4.01" section "7.1 Primitive Value"
 	 * @param {object} oProperty
 	 *   The OData property
 	 * @returns {string}
-	 *   The literal according to "OData Version 4.0 Part 2: URL Conventions" section
-	 *   "5.1.1.6.1 Primitive Literals"
+	 *   The literal according to "OData Version 4.01 Part 2: URL Conventions" section
+	 *   "5.1.1.14.1 Primitive Literals"
 	 * @throws {Error}
 	 *   If the value is undefined or the type is not supported
 	 *

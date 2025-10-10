@@ -128,8 +128,8 @@ sap.ui.define([
 	 *
 	 * Note: * is an item in <code>$select</code> and <code>$expand</code> just as others, that is
 	 * it must be part of the array of items and one must not ignore the other items if * is
-	 * provided. See "5.1.2 System Query Option $expand" and "5.1.3 System Query Option $select" in
-	 * specification "OData Version 4.0 Part 2: URL Conventions".
+	 * provided. See "5.1.3 System Query Option $expand" and "5.1.4 System Query Option $select" in
+	 * specification "OData Version 4.01. Part 2: URL Conventions".
 	 *
 	 * @param {object} mQueryOptions - The query options to be merged
 	 * @param {string} sBaseMetaPath - This binding's meta path
@@ -1359,9 +1359,9 @@ sap.ui.define([
 	 * @param {string} sGroupId
 	 *   The group ID to be used for requesting side effects
 	 * @param {string[]} aPaths
-	 *   The "14.5.11 Expression edm:NavigationPropertyPath" or
-	 *   "14.5.13 Expression edm:PropertyPath" strings describing which properties need to be loaded
-	 *   because they may have changed due to side effects of a previous update
+	 *   The "14.4.1.5 Expression edm:NavigationPropertyPath" or
+	 *   "14.4.1.6 Expression edm:PropertyPath" strings describing which properties need to be
+	 *   loaded because they may have changed due to side effects of a previous update
 	 * @param {sap.ui.model.odata.v4.Context} [oContext]
 	 *   The context for which to request side effects; if this parameter is missing or if it is the
 	 *   header context of a list binding, the whole binding is affected

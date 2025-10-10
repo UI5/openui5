@@ -355,6 +355,9 @@ sap.ui.define([
 	 * <code>sPath</code> and <code>oContext</code>. Once the new model value has been set, all
 	 * interested parties are informed.
 	 *
+	 * Consecutive calls of this method which update bindings <em>synchronously</em> may cause performance issues; see
+	 * {@link topic:18a76b577b144bc2b9b424e39d379c06 Performance Impact of Model Updates} for details.
+	 *
 	 * @param {string} sPath
 	 *   The path of the property to set
 	 * @param {any} oValue
