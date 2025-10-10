@@ -1954,7 +1954,7 @@ sap.ui.define([
 		"/T€AMS/Team_Id@" : mScope.$Annotations["tea_busi.TEAM/Team_Id"],
 		"/name.space.OverloadedAction/_it@"
 			: mScope.$Annotations["name.space.OverloadedAction/_it"],
-		// "14.5.12 Expression edm:Path" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		// "14.4.1.7 Expression edm:Path" - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		// Note: see integration test "{field>Value/$Path@com.sap.vocabularies.Common.v1.Label}"
 		"/T€AMS/@UI.LineItem/0/Value/$Path@Common.Text"
 			: mScope.$Annotations["tea_busi.TEAM/Team_Id"]["@Common.Text"],
@@ -1964,7 +1964,7 @@ sap.ui.define([
 			: mScope.$Annotations["tea_busi.TEAM/Team_Id"]["@Common.Text"],
 		"/OverloadedAction/@$ui5.overload@Core.OperationAvailable#1/$Path/$"
 			: aOverloadedAction[2].$ReturnType,
-		// "14.5.2 Expression edm:AnnotationPath"
+		// "14.4.1.3 Expression edm:AnnotationPath"
 		"/EMPLOYEES/@UI.Facets/0/Target/$AnnotationPath/"
 			: mScope.$Annotations["tea_busi.Worker"]["@UI.LineItem"],
 		"/EMPLOYEES/@UI.Facets/1/Target/$AnnotationPath/"

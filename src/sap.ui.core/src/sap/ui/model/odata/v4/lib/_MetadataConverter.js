@@ -501,7 +501,8 @@ sap.ui.define([
 			sQualifiedName = oAnnotatable.prefix + "@"
 				+ this.resolveAlias(oElement.getAttribute("Term")),
 			// oAnnotatable.qualifier can only come from <Annotations>. If such a qualifier is
-			// set, <Annotation> itself MUST NOT supply a qualifier. (see spec Part 3, 14.3.2)
+			// set, <Annotation> itself MUST NOT supply a qualifier.
+			// (see [OData-CSDL-XML-v4.01], 14.2.1)
 			sQualifier = oAnnotatable.qualifier || oElement.getAttribute("Qualifier");
 
 		if (sQualifier) {

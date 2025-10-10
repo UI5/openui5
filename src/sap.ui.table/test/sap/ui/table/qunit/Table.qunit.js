@@ -5063,4 +5063,156 @@ sap.ui.define([
 
 		FixedRowMode.prototype.init.restore();
 	});
+
+	QUnit.module("Scroll to index", {
+		afterEach: function() {
+			this.oTable?.destroy();
+		},
+		createTable: function(mSettings) {
+			this.oTable?.destroy();
+			this.oTable = TableQUnitUtils.createTable(mSettings);
+		}
+	});
+
+	QUnit.test("Basic scrolling", async function(assert) {
+		this.createTable({
+			models: TableQUnitUtils.createJSONModelWithEmptyRows(17),
+			rowMode: new FixedRowMode({
+				rowCount: 5
+			}),
+			columns: [
+				TableQUnitUtils.createTextColumn()
+			],
+			rows: "{/}"
+		});
+		assert.strictEqual(this.oTable.getRowMode().getRowCount(), 5, "rowCount is 5");
+		assert.strictEqual(this.oTable.getBinding().getLength(), 17, "binding length is 17");
+		await this.oTable._scrollToIndex(8);
+		assert.strictEqual(this.oTable.getFirstVisibleRow(), 8, "firstVisibleRow is 8 after scrolling to index 8");
+		await this.oTable._scrollToIndex(10);
+		assert.strictEqual(this.oTable.getFirstVisibleRow(), 8, "No scrolling happened");
+		await this.oTable._scrollToIndex(-1);
+		assert.strictEqual(this.oTable.getFirstVisibleRow(), 12, "firstVisibleRow is 12 after scrolling to index -1");
+		await this.oTable._scrollToIndex(0);
+		assert.strictEqual(this.oTable.getFirstVisibleRow(), 0, "firstVisibleRow is 0 after scrolling to index 0");
+		await this.oTable._scrollToIndex(10000);
+		assert.strictEqual(this.oTable.getFirstVisibleRow(), 12, "firstVisibleRow is 12 after scrolling to index 10000");
+	});
+
+	QUnit.test("Scroll with fixed top row", async function(assert) {
+		const mSettings = {
+			rowMode: new FixedRowMode({
+				rowCount: 10,
+				fixedTopRowCount: 2
+			})
+		};
+		this.createTable(mSettings);
+		assert.strictEqual(this.oTable.getRowMode(), mSettings.rowMode, "value of 'rowMode' aggregation");
+		try {
+			await this.oTable._scrollToIndex(5);
+			assert.ok(false, "_scrollToIndex should have failed");
+		} catch (e) {
+			const sExpectedMessage = "The table has fixed top rows. Scrolling to a specific row index is not supported in this case.";
+			assert.equal(e.message, sExpectedMessage, "Scroll to index failed");
+		}
+	});
+
+	QUnit.test("Scroll with wrong index", async function(assert) {
+		this.createTable();
+
+		try {
+			await this.oTable._scrollToIndex('5');
+			assert.ok(false, "_scrollToIndex should have failed");
+		} catch (e) {
+			const sExpectedMessage = "Invalid index: 5";
+			assert.equal(e.message, sExpectedMessage, "Scroll to index failed with string");
+		}
+
+		try {
+			await this.oTable._scrollToIndex(-2);
+			assert.ok(false, "_scrollToIndex should have failed");
+		} catch (e) {
+			const sExpectedMessage = "Invalid index: -2";
+			assert.equal(e.message, sExpectedMessage, "Scroll to index failed, index out of range");
+		}
+	});
+
+	QUnit.test("Scroll while rowCount is 0", async function(assert) {
+		this.createTable({
+			rowMode: new FixedRowMode({
+				rowCount: 0
+			})
+		});
+		assert.strictEqual(this.oTable.getRowMode().getRowCount(), 0, "rowCount is 0");
+		await this.oTable._scrollToIndex(5);
+		assert.ok(true, "Scroll to index resolved");
+	});
+
+	QUnit.test("Scroll to the end of the table", async function(assert) {
+		this.createTable({
+			models: TableQUnitUtils.createJSONModelWithEmptyRows(10),
+			rowMode: new FixedRowMode({
+				rowCount: 5
+			}),
+			columns: [
+				TableQUnitUtils.createTextColumn()
+			],
+			rows: "{/}"
+		});
+		assert.strictEqual(this.oTable.getRowMode().getRowCount(), 5, "rowCount is 5");
+		assert.strictEqual(this.oTable.getBinding().getLength(), 10, "binding length is 10");
+		await this.oTable._scrollToIndex(-1);
+		assert.strictEqual(this.oTable.getFirstVisibleRow(), 5, "firstVisibleRow is 5 after scrolling to index 9");
+	});
+
+	QUnit.test("Scroll to an already visible index", async function(assert) {
+		this.createTable({
+			models: TableQUnitUtils.createJSONModelWithEmptyRows(10),
+			rowMode: new FixedRowMode({
+				rowCount: 5
+			}),
+			columns: [
+				TableQUnitUtils.createTextColumn()
+			],
+			rows: "{/}"
+		});
+		assert.strictEqual(this.oTable.getFirstVisibleRow(), 0, "firstVisibleRow is 0.");
+		await this.oTable._scrollToIndex(2);
+		assert.strictEqual(this.oTable.getFirstVisibleRow(), 0, "It was not scrolled. Thus firstVisibleRow is still the same.");
+	});
+
+	QUnit.test("Scroll without binding", async function(assert) {
+		this.createTable({
+			rowMode: new FixedRowMode({
+				rowCount: 5
+			}),
+			rows: {suspended: true},
+			columns: [
+				TableQUnitUtils.createTextColumn()
+			]
+		});
+
+		assert.strictEqual(this.oTable.getRowMode().getRowCount(), 5, "rowCount is 5");
+		assert.strictEqual(this.oTable.getBinding(), undefined, "There is no binding");
+
+		let bResolved = false;
+		const oScrollSpy = sinon.spy(this.oTable, "_scrollToIndex");
+		const oSetFirstVisibleRowIndexSpy = sinon.spy(this.oTable, "_setFirstVisibleRowIndex");
+		this.oTable._scrollToIndex(7).then(function() {
+			bResolved = true;
+		});
+		await TableQUnitUtils.wait(100);
+		this.oTable.setModel(TableQUnitUtils.createJSONModelWithEmptyRows(10));
+		this.oTable.bindRows("/");
+
+		assert.ok(!bResolved, "The promise is still pending");
+		assert.equal(oSetFirstVisibleRowIndexSpy.returnValues[0], false, "_setFirstVisibleRowIndex returned 5");
+		await this.oTable.qunit.whenRenderingFinished();
+
+		assert.ok(this.oTable.getBinding(), "Binding is now present");
+		assert.strictEqual(this.oTable.getBinding().getLength(), 10, "binding is now present and length is 10");
+		assert.ok(bResolved, "The promise is resolved");
+		assert.strictEqual(this.oTable.getFirstVisibleRow(), 5, "getFirstVisibleRow returns 5");
+		assert.strictEqual(oScrollSpy.callCount, 2, "_scrollToIndex was called twice");
+	});
 });

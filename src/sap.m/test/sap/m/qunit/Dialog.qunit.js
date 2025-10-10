@@ -1488,6 +1488,47 @@ sap.ui.define([
 		});
 	});
 
+	QUnit.test("Dialog - F6 and Shift+F6 focus navigation", function (assert) {
+		var oDialog = new Dialog({
+			title: "Input Dialog",
+			content: [
+				new Input({
+					placeholder: "Enter first value"
+				})
+			],
+			buttons: [
+				new Button({
+					text: "OK",
+					press: function () {
+						oDialog.close();
+					}
+				}),
+				new Button({
+					text: "Cancel",
+					press: function () {
+						oDialog.close();
+					}
+				})
+			]
+		});
+
+		oDialog.open();
+		this.clock.tick(400);
+
+		var oFocusedControl = Element.closestTo(document.activeElement);
+		assert.ok(oFocusedControl.isA("sap.m.Input"), "Initial focus should be on the Input field");
+
+		qutils.triggerKeydown(oFocusedControl.getDomRef(), KeyCodes.F6);
+		oFocusedControl = Element.closestTo(document.activeElement);
+		assert.ok(oFocusedControl.isA("sap.m.Button"), "After F6, focus should move to the first footer Button (OK)");
+
+		qutils.triggerKeydown(Element.closestTo(document.activeElement).getDomRef(), KeyCodes.F6, true);
+		oFocusedControl = Element.closestTo(document.activeElement);
+		assert.ok(oFocusedControl.isA("sap.m.Input"), "After Shift+F6, focus should return to the Input field");
+
+		oDialog.destroy();
+	});
+
 	QUnit.test("Container Padding Classes", function (assert) {
 		// System under Test + Act
 		var oContainer = new Dialog(),

@@ -2,10 +2,12 @@
 
 sap.ui.define([
 	"sap/ui/table/qunit/TableQUnitUtils.ODataV4",
-	"sap/ui/model/odata/v4/ODataListBinding"
+	"sap/ui/model/odata/v4/ODataListBinding",
+	"sap/ui/table/rowmodes/Fixed"
 ], function(
 	TableQUnitUtils,
-	ODataListBinding
+	ODataListBinding,
+	FixedRowMode
 ) {
 	"use strict";
 
@@ -93,4 +95,40 @@ sap.ui.define([
 		assert.ok(this.fnBindingGetContextSpy.notCalled, "Hide table and suspend binding: Binding#getContexts not called");
 		assert.notOk(this.oTable.getRows()[0].getBindingContext(), "Hide table and suspend binding: Table doesn't have rows with bindingcontext");
 	});
+
+	QUnit.module("Scroll to index", {
+		afterEach: function() {
+			this.oTable?.destroy();
+		}
+	});
+
+    QUnit.test("scroll without binding and scroll after resume binding", async function(assert) {
+        this.oTable = TableQUnitUtils.createTable(TableQUnitUtils.createSettingsForList({
+            tableSettings: {
+                rowMode: new FixedRowMode({rowCount: 5}),
+                rows: {suspended: true},
+                visible: false
+            }
+        }));
+
+        assert.ok(this.oTable.getBinding().getLength() === 0, "Binding length is 0");
+
+        let bResolved = false;
+        this.oTable._scrollToIndex(7).then(function() {
+            bResolved = true;
+        });
+
+        await TableQUnitUtils.wait(100);
+
+        this.oTable.setVisible(true);
+        this.oTable.getBinding().resume();
+
+		assert.ok(!bResolved, "Promise still pending");
+        await this.oTable.qunit.whenBindingChange();
+        await this.oTable.qunit.whenRenderingFinished();
+
+        assert.ok(this.oTable.getBinding().getLength() > 0, "Binding length > 0");
+		assert.ok(bResolved, "Promise resolved");
+		assert.strictEqual(this.oTable.getFirstVisibleRow(), 7, "firstVisibleRow is 7 after promise resolved");
+    });
 });

@@ -488,7 +488,7 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test("value: 14.5.1 Comparison and Logical Operators", function (assert) {
+	QUnit.test("value: 14.4.2 Comparison and Logical Operators", function (assert) {
 		check(assert, {
 			$And : [{
 				$And : [
@@ -514,7 +514,7 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test("value: 14.5.3.1.2 Function odata.fillUriTemplate", function (assert) {
+	QUnit.test("value: 14.4.4.2 Function odata.fillUriTemplate", function (assert) {
 		var oMetaModel = {
 				fetchObject : function () {}
 			},

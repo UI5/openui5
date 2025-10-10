@@ -73,7 +73,7 @@ sap.ui.define([
 			var oValue = {};
 
 			function testIt(oRawValue, sProperty, vConstantValue0) {
-				QUnit.test("14.4.x Constant Expression: " + JSON.stringify(oRawValue),
+				QUnit.test("14.3.x Constant Expression: " + JSON.stringify(oRawValue),
 					function (assert) {
 						var oBasics = this.mock(Basics),
 							oModel = {},
@@ -887,7 +887,7 @@ sap.ui.define([
 		assertRejected(assert, Expression.expression(oPathValue), oError);
 	});
 	//TODO $Cast, $IsOf, $LabeledElement, $LabeledElementReference, $UrlRef
-	//TODO 14.5.5 Expression Collection, 14.5.14 Expression Record
+	//TODO "14.4.6 Expression edm:Collection", "14.4.12 Expression edm:Record"
 
 	//*********************************************************************************************
 	QUnit.test("String constants {@i18n>...} turned into a binding", function (assert) {

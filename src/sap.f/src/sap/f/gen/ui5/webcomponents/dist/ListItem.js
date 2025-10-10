@@ -29,6 +29,8 @@ sap.ui.define(
 
           namespace: "sap.f.gen.ui5.webcomponents",
 
+          library: "sap.f",
+
           designtime: "sap/f/gen/ui5/webcomponents/designtime/ListItem.designtime",
 
           interfaces: [],

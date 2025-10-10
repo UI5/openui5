@@ -53,6 +53,8 @@ sap.ui.define(
 
           namespace: "sap.f.gen.ui5.webcomponents_fiori",
 
+          library: "sap.f",
+
           designtime:
             "sap/f/gen/ui5/webcomponents_fiori/designtime/NotificationListGroupItem.designtime",
 
