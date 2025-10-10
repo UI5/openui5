@@ -15,7 +15,8 @@ sap.ui.define([
 	'sap/tnt/NavigationListGroup',
 	'sap/tnt/NavigationListMenuItem',
 	'sap/ui/qunit/utils/nextUIUpdate',
-	'sap/ui/qunit/utils/waitForThemeApplied'
+	'sap/ui/qunit/utils/waitForThemeApplied',
+	'sap/ui/qunit/utils/createAndAppendDiv'
 ], function(
 	Log,
 	Element,
@@ -31,7 +32,8 @@ sap.ui.define([
 	NavigationListGroup,
 	NavigationListMenuItem,
 	nextUIUpdate,
-	waitForThemeApplied
+	waitForThemeApplied,
+	createAndAppendDiv
 ) {
 	'use strict';
 
@@ -942,14 +944,18 @@ sap.ui.define([
 
 	QUnit.module("Interaction", {
 		beforeEach: async function () {
+			this.oContainer = createAndAppendDiv("container");
+			this.oContainer.style.position = "fixed";
+			this.oContainer.style.top = "0";
 			this.navigationList = getNavigationList();
-			this.navigationList.placeAt("qunit-fixture");
+			this.navigationList.placeAt(this.oContainer);
 
 			await nextUIUpdate();
 
 			this.clock = sinon.useFakeTimers();
 		},
 		afterEach: async function () {
+			this.oContainer.remove();
 			this.navigationList.destroy();
 			this.navigationList = null;
 
