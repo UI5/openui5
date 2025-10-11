@@ -1256,9 +1256,8 @@ sap.ui.define([
 	/**
 	 * Determines if the content is scrollable.
 	 * <code>Note:</code>
-	 * For IE and Edge we use 1px threshold,
-	 * because the clientHeight returns results in 1px difference compared to the scrollHeight,
-	 * the reason is not defined.
+	 * We use 1px threshold, because the clientHeight sometimes returns results in 1px
+	 * difference compared to the scrollHeight, the reason is not defined.
 	 *
 	 * @returns {boolean}
 	 * @private

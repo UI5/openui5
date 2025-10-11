@@ -781,7 +781,9 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-base', 'sap/f/thirdpar
         */
         _handleTabNext(e) {
             t(e.target);
-            return;
+            {
+                return;
+            }
         }
         _handleHome() {
             if (!this.growsWithButton) {

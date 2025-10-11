@@ -120,10 +120,7 @@ sap.ui.define([
 	_BrowserLogCollector._LEVELS = LEVELS;
 
 	function getConsole() {
-		// in IE and Edge, logging is only enabled when devtools are open
-		// console.log is a different function when dev tools are open (__BROWSERTOOLS_CONSOLE_SAFEFUNC vs log() { [native code] })
-		// hijack the prototype's function to make sure we capture logs with closed devtools
-		return Object.getPrototypeOf(console).log ? Object.getPrototypeOf(console) : console;
+		return globalThis.console;
 	}
 
 	function getConsoleMessage(aArgs) {

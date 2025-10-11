@@ -1,0 +1,188 @@
+<mvc:View
+    height="100%"
+    displayBlock="true"
+    xmlns="sap.ui.table"
+    xmlns:m="sap.m"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:f="sap.f"
+    xmlns:core="sap.ui.core"
+    xmlns:upload="sap.m.upload"
+    controllerName="sap.m.sample.UploadSetwithTablePlugin.TreeTableWithFolderHierarchy.controller.Page"
+>
+    <f:DynamicPage id="page">
+        <f:content>
+            <TreeTable
+                id="table-uploadSet"
+                rows="{documents>/items}"
+                selectionMode="MultiToggle"
+                rowSelectionChange="onSelectionChange"
+                toggleOpenState="onToggleOpenState"
+            >
+                <extension>
+                    <m:OverflowToolbar style="Clear">
+                        <!-- Breadcrumbs for folder navigation -->
+                        <m:Breadcrumbs
+                            id="breadcrumbs"
+                            currentLocationText="{documents>/currentLocationText}"
+                            links="{documents>/history}"
+                        >
+                            <m:Link
+                                press="onBreadcrumbPress"
+                                text="{documents>name}"
+                            />
+                        </m:Breadcrumbs>
+
+                        <!-- Upload button placeholder -->
+                        <upload:ActionsPlaceholder
+                            id="uploadButton"
+                            placeholderFor="UploadButtonPlaceholder"
+                        />
+
+                        <m:Button
+                            id="downloadSelectedButton"
+                            text="Download"
+                            enabled="false"
+                            press="onDownloadFiles"
+                        />
+
+                        <m:Button
+                            id="addFolderButton"
+                            text="Add Folder"
+                            press="onCreateFolder"
+                            icon="sap-icon://add-folder"
+                        />
+
+                        <m:Button
+                            id="renameButton"
+                            text="Rename"
+                            enabled="false"
+                            press="onRenameItem"
+                        />
+
+                        <m:Button
+                            id="removeAllButton"
+                            text="Remove All"
+                            enabled="false"
+                            press="onRemoveAllHandler"
+                        />
+                    </m:OverflowToolbar>
+                </extension>
+
+                <dependents>
+                    <m:plugins.UploadSetwithTable
+                        id="uploadPlugin"
+                        uploadUrl="./uploadFiles"
+                        cloudFilePickerEnabled="false"
+                        multiple="true"
+                        uploadEnabled="true"
+                        instantUpload="false"
+                        httpRequestMethod="POST"
+                        beforeUploadStarts="onBeforeUploadStarts"
+                        uploadCompleted="onUploadCompleted"
+                        itemRenamed="onDocumentRenamedSuccess"
+                        onActivated="onPluginActivated"
+                        actions="uploadButton"
+                    >
+                        <m:upload.UploadItemConfiguration
+                            fileNamePath="fileName"
+                            mediaTypePath="mimeType"
+                            urlPath="url"
+                            fileSizePath="size"
+                            isDirectoryPath="isDirectory"
+                            previewablePath="previewable"
+                        />
+                    </m:plugins.UploadSetwithTable>
+                </dependents>
+
+                <rowSettingsTemplate>
+                    <RowSettings
+                        highlight="{= ${documents>uploadState} === 'Complete' ? 'Indication05' : null }"
+                    />
+                </rowSettingsTemplate>
+
+                <columns>
+                    <Column width="40%">
+                        <m:Label text="File Name" />
+                        <template>
+                            <m:HBox
+                                class="sapUiSmallMarginTop sapUiTinyMarginBottom"
+                            >
+                                <m:Image
+                                    src="{documents>imageUrl}"
+                                    class="sapMUSTItemImage sapMUSTItemIcon"
+                                    visible="{= ${documents>imageUrl} !== undefined}"
+                                />
+                                <core:Icon
+                                    src="{parts: ['documents>mimeType', 'documents>fileName', 'documents>isDirectory'], formatter: '.getIconSrc' }"
+                                    visible="{= ${documents>imageUrl} === undefined || ${documents>imageUrl} === '' }"
+                                    class="sapMUSTItemIcon"
+                                    color="{= ${documents>isDirectory} ? ${documents>color} : '' }"
+                                    backgroundColor="{= ${documents>isDirectory} ? ${documents>bgColor} : '' }"
+                                />
+                                <m:VBox
+                                    class="sapUiTinyMargin sapUiSmallMarginBegin"
+                                >
+                                    <m:Link
+                                        text="{documents>fileName}"
+                                        press="onItemPress"
+                                        class="sapUiSmallMarginBottom"
+                                        visible="{= ${documents>isDirectory} === true }"
+                                    />
+                                    <m:Link
+                                        text="{documents>fileName}"
+                                        press="openPreview"
+                                        class="sapUiTinyMarginBottom"
+                                        visible="{= ${documents>isDirectory} === false }"
+                                    />
+                                    <m:Text text="{documents>documentType}" />
+                                </m:VBox>
+                            </m:HBox>
+                        </template>
+                    </Column>
+
+                    <Column>
+                        <m:Label text="Status" />
+                        <template>
+                            <m:Text text="{documents>status}" />
+                        </template>
+                    </Column>
+
+                    <Column>
+                        <m:Label text="File Size" />
+                        <template>
+                            <m:Text
+                                text="{parts: ['documents>size'], formatter: '.formatFileSize'}"
+                            />
+                        </template>
+                    </Column>
+
+                    <Column>
+                        <m:Label text="Last Modified" />
+                        <template>
+                            <m:VBox>
+                                <m:Text text="{documents>uploadedBy}" />
+                                <m:Text
+                                    class="sapUiTinyMarginTop"
+                                    text="{documents>uploadedDate}"
+                                />
+                            </m:VBox>
+                        </template>
+                    </Column>
+
+                    <Column>
+                        <template>
+                            <m:Button
+                                class="sapUiTinyMarginBegin"
+                                type="Transparent"
+                                icon="sap-icon://decline"
+                                press="onRemoveItemHandler"
+                                visible="{= ${documents>isDirectory} === false }"
+                                tooltip="Delete File"
+                            />
+                        </template>
+                    </Column>
+                </columns>
+            </TreeTable>
+        </f:content>
+    </f:DynamicPage>
+</mvc:View>

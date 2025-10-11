@@ -2935,6 +2935,7 @@ sap.ui.define([
 		 /**
 		  * Right-positioned single selection mode (only one list item can be selected).
 		  * @public
+		  * As of version 1.142, replaced by {@link sap.m.ListMode.SingleSelectLeft}.
 		  */
 		 SingleSelect : "SingleSelect",
 
@@ -4304,7 +4305,6 @@ sap.ui.define([
 		  * The grid width for each table popin is small, hence this allows more content to be rendered in a single popin row.
 		  * This value defines small grid width for the table popins.
 		  *
-		  * <b>Note:</b> This feature is currently not supported with Internet Explorer and Edge (version lower than 16) browsers.
 		  * @public
 		  * @since 1.52
 		  */
@@ -4314,7 +4314,6 @@ sap.ui.define([
 		  * Sets grid layout for rendering the table popins.
 		  * The grid width for each table popin is comparatively larger than <code>GridSmall</code>, hence this allows less content to be rendered in a single popin row.
 		  *
-		  * <b>Note:</b> This feature is currently not supported with Internet Explorer and Edge (version lower than 16) browsers.
 		  * @public
 		  * @since 1.52
 		  */

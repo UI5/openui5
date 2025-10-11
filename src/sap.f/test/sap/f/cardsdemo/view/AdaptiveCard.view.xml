@@ -42,6 +42,34 @@
 				width="700px"
 				height="auto"
 				class="sapUiSmallMargin" />
+			<w:Card
+				id="adaptivecard5_containerStyles"
+				manifest="{manifests>/adaptiveCard/adaptive5_containerStyles}"
+				baseUrl="{cardsPlayground>/playgroundBaseUrl}"
+				width="700px"
+				height="auto"
+				class="sapUiSmallMargin" />
+			<w:Card
+				id="adaptivecard6_foregroundColors"
+				manifest="{manifests>/adaptiveCard/adaptive6_foregroundColors}"
+				baseUrl="{cardsPlayground>/playgroundBaseUrl}"
+				width="700px"
+				height="auto"
+				class="sapUiSmallMargin" />
+			<w:Card
+				id="adaptivecard7_fontSizes"
+				manifest="{manifests>/adaptiveCard/adaptive7_fontSizes}"
+				baseUrl="{cardsPlayground>/playgroundBaseUrl}"
+				width="700px"
+				height="auto"
+				class="sapUiSmallMargin" />
+			<w:Card
+				id="adaptivecard8_separators"
+				manifest="{manifests>/adaptiveCard/adaptive8_separators}"
+				baseUrl="{cardsPlayground>/playgroundBaseUrl}"
+				width="700px"
+				height="auto"
+				class="sapUiSmallMargin" />
 		</Panel>
 	</Page>
 </mvc:View>

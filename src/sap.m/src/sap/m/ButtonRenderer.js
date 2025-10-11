@@ -56,7 +56,6 @@ ButtonRenderer.render = function(oRm, oButton) {
 	var sTooltip = oButton._getTooltip();
 	var sText = oButton._getText();
 	var sTextDir = oButton.getTextDirection();
-	// render bdi tag only if the browser is different from IE and Edge since it is not supported there
 	var bRenderBDI = (sTextDir === TextDirection.Inherit);
 
 	// get icon from icon pool

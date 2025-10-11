@@ -354,58 +354,19 @@ sap.ui.define([
 	 * @private
 	 */
 	Bar.prototype._getBarContainerWidth = function($Container) {
-		var i,
-			iContainerWidth = 0,
+		var iContainerWidth = 0,
 			aContainerChildren = $Container.children(),
 			iContainerChildrenTotalWidth = 0;
 
 		// Chrome browser has a problem in providing the correct div size when image inside does not have width explicitly set
-		//since ff version 24 the calculation is correct, since we don't support older versions we won't check it
-		// Edge also works correctly with this calculation unlike IE
-		if (Device.browser.webkit || Device.browser.firefox) {
+		for (let i = 0; i < aContainerChildren.length; i++) {
 
-			for (i = 0; i < aContainerChildren.length; i++) {
-
-				iContainerChildrenTotalWidth += jQuery(aContainerChildren[i]).outerWidth(true);
-
-			}
-
-			iContainerWidth = $Container.outerWidth(true);
-
-		} else {
-
-			// IE has a rounding issue with jQuery.outerWidth
-			var oContainerChildrenStyle;
-
-			for (i = 0; i < aContainerChildren.length; i++) {
-
-				oContainerChildrenStyle = window.getComputedStyle(aContainerChildren[i]);
-
-				if (oContainerChildrenStyle.width == "auto") {
-
-					iContainerChildrenTotalWidth += jQuery(aContainerChildren[i]).width() + 1; //add an additional 1 pixel because of rounding issue.
-
-				} else {
-
-					iContainerChildrenTotalWidth += parseFloat(oContainerChildrenStyle.width);
-
-				}
-
-				iContainerChildrenTotalWidth += parseFloat(oContainerChildrenStyle.marginLeft);
-				iContainerChildrenTotalWidth += parseFloat(oContainerChildrenStyle.marginRight);
-				iContainerChildrenTotalWidth += parseFloat(oContainerChildrenStyle.paddingLeft);
-				iContainerChildrenTotalWidth += parseFloat(oContainerChildrenStyle.paddingRight);
-			}
-
-			var oContainerComputedStyle = window.getComputedStyle($Container[0]);
-
-			iContainerWidth += parseFloat(oContainerComputedStyle.width);
-			iContainerWidth += parseFloat(oContainerComputedStyle.marginLeft);
-			iContainerWidth += parseFloat(oContainerComputedStyle.marginRight);
-			iContainerWidth += parseFloat(oContainerComputedStyle.paddingLeft);
-			iContainerWidth += parseFloat(oContainerComputedStyle.paddingRight);
+			iContainerChildrenTotalWidth += jQuery(aContainerChildren[i]).outerWidth(true);
 
 		}
+
+		iContainerWidth = $Container.outerWidth(true);
+
 
 		if (iContainerWidth < iContainerChildrenTotalWidth) {
 

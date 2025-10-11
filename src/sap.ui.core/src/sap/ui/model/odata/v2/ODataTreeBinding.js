@@ -826,8 +826,8 @@ sap.ui.define([
 			aParams.push(sFilterParams);
 		}
 
-		if (this.sCustomParams) {
-			aParams.push(this.sCustomParams);
+		if (this.sCustomParams4CountRequest) {
+			aParams.push(this.sCustomParams4CountRequest);
 		}
 
 		// Only send request, if path is defined
@@ -2263,6 +2263,8 @@ sap.ui.define([
 						}
 					}
 					this.sCustomParams = this.oModel.createCustomParams(this.mParameters);
+					this.sCustomParams4CountRequest = this.oModel.createCustomParams(this.mParameters,
+						/* bIgnoreExpandSelect */ true);
 				}
 				sAdapterModuleName = "sap/ui/model/odata/ODataTreeBindingFlat";
 			}
@@ -2318,6 +2320,8 @@ sap.ui.define([
 			}
 
 			this.sCustomParams = this.oModel.createCustomParams(this.mParameters);
+			this.sCustomParams4CountRequest = this.oModel.createCustomParams(this.mParameters,
+				/* bIgnoreExpandSelect */ true);
 		}
 
 		//after parameter processing:

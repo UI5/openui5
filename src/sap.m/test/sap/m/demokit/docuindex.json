@@ -1799,6 +1799,7 @@
 					"sap.m.sample.UploadSetwithTablePlugin.FilePreviewCustomPageContent",
 					"sap.m.sample.UploadSetwithTablePlugin.GridTableSimple",
 					"sap.m.sample.UploadSetwithTablePlugin.TreeTableSimple",
+					"sap.m.sample.UploadSetwithTablePlugin.TreeTableWithFolderHierarchy",
 					"sap.m.sample.UploadSetwithTablePlugin.ResponsiveTableProgressIndicator",
 					"sap.m.sample.UploadSetwithTablePlugin.MultiplePluginInstances",
 					"sap.m.sample.UploadSetwithTablePlugin.FileNameValidationSample"
@@ -4046,6 +4047,11 @@
 				"id": "sap.m.sample.UploadSetwithTablePlugin.TreeTableSimple",
 				"name": "Plugin for Tree Table (sap.ui.table.TreeTable)",
 				"description": "This example demonstrates the usage of UploadSetwithTable plugin for tree table with the features of upload, download, drag & drop, remove and rename of files. It also demonstrates how the uploaded files can be displayed in a table."
+			},
+			{
+				"id": "sap.m.sample.UploadSetwithTablePlugin.TreeTableWithFolderHierarchy",
+				"name": "Plugin for Tree Table with folder hierarchy & folder uploads",
+				"description": "This example demonstrates the usage of UploadSetwithTable plugin with a tree table featuring folder hierarchy, folder creation, folder uploads, folder navigation with breadcrumbs and folder management"
 			}
 		]
 	}

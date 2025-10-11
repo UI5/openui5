@@ -323,6 +323,7 @@ sap.ui.define([
 		}
 		// determine the actual display type of the avatar before rendering
 		this._setActualDisplayType();
+		this._setUseDefaultIcon();
 	};
 
 	Avatar.prototype.onAfterRendering = function() {
@@ -340,8 +341,8 @@ sap.ui.define([
 		this._bImageLoadError = false;
 
 		this.setProperty("src", sSrc);
-		this._setUseDefaultIcon(IconPool.getIconInfo(sSrc) ? false : true);
 		this._handleDetailBoxPress(bIsIconURI, oLightBox);
+		this._loadImage(sSrc);
 
 		return this;
 	};
@@ -349,10 +350,6 @@ sap.ui.define([
 	Avatar.prototype.setInitials = function (sInitials) {
 		this.setProperty("initials", sInitials);
 		this._setInitialsValid(this._areInitialsValid(sInitials));
-
-		if (!this._getInitialsValid()) {
-			this._setUseDefaultIcon(true);
-		}
 
 		return this;
 	};
@@ -582,6 +579,25 @@ sap.ui.define([
 	};
 
 	/**
+	 * Loads the image from the given source.
+	 *
+	 * @param {string} sSrc - The source of the image to load
+	 * @private
+	 */
+	Avatar.prototype._loadImage = function (sSrc) {
+		if (IconPool.isIconURI(sSrc)) {
+			return;
+		}
+
+		// we perform this action in order to validate the image source and
+		// take further actions depending on that
+		this.preloadedImage = new window.Image();
+		this.preloadedImage.src = sSrc;
+		this.preloadedImage.onload = this._onImageLoad.bind(this);
+		this.preloadedImage.onerror = this._onImageError.bind(this, sSrc);
+	};
+
+	/**
 	 * Checks the validity of the <code>initials</code> parameter and returns <code>true</code> if the
 	 * initials are correct.
 	 *
@@ -631,13 +647,6 @@ sap.ui.define([
 		if (IconPool.isIconURI(sSrc)) {
 			return AvatarType.Icon;
 		} else {
-			// we perform this action in order to validate the image source and
-			// take further actions depending on that
-			this.preloadedImage = new window.Image();
-			this.preloadedImage.src = sSrc;
-			this.preloadedImage.onload = this._onImageLoad.bind(this);
-			this.preloadedImage.onerror = this._onImageError.bind(this, sSrc);
-
 			return AvatarType.Image;
 		}
 	};
@@ -674,7 +683,6 @@ sap.ui.define([
 		} else {
 			Log.warning("No src and initials were provided or initials are provided, but are not valid", this);
 			this._sActualType = AvatarType.Icon;
-			this._setUseDefaultIcon(true);
 		}
 
 		return this._sActualType;
@@ -700,8 +708,23 @@ sap.ui.define([
 	 * @param {boolean} bValue
 	 * @private
 	 */
-	Avatar.prototype._setUseDefaultIcon = function (bValue) {
-		this._bUseDefaultIcon = bValue;
+	Avatar.prototype._setUseDefaultIcon = function () {
+		var sSrc = this.getSrc();
+
+		if (!sSrc) {
+			// No source: use default only if initials are invalid
+			this._bUseDefaultIcon = !this._getInitialsValid();
+			return;
+		}
+
+		if (IconPool.isIconURI(sSrc)) {
+			// Icon URI: use default if NOT found in IconPool
+			this._bUseDefaultIcon = !IconPool.getIconInfo(sSrc);
+			return;
+		}
+
+		// Regular image source: use default if image failed to load
+		this._bUseDefaultIcon = this._bImageLoadError;
 	};
 
 	/**
@@ -865,12 +888,13 @@ sap.ui.define([
 	 * @private
 	 */
 	Avatar.prototype._onImageLoad = function() {
+		this._bImageLoadError = false;
+
 		//we need to remove fallback content
 		if (this._getUseDefaultIcon()) {
-			this._setUseDefaultIcon(false);
+			this._setUseDefaultIcon();
 			this.getDetailBox() && this.invalidate();
 		}
-		this._bImageLoadError = false;
 		delete this.preloadedImage;
 	};
 
@@ -884,14 +908,15 @@ sap.ui.define([
 		   return;
 	   }
 
+	   this._bImageLoadError = true;
+
 	   this._cleanCSS();
 
 	   if (!this._getUseDefaultIcon()) {
-		   this._setUseDefaultIcon(true);
+		   this._setUseDefaultIcon();
 		   this.getDetailBox() && this.invalidate();
 	   }
 	   delete this.preloadedImage;
-	   this._bImageLoadError = true;
    };
 
 	Avatar.prototype._cleanCSS = function () {

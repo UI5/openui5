@@ -237,6 +237,24 @@ sap.ui.define([
 		assert.ok($oAvatar.hasClass("sapFAvatarIcon"), sPreAvatarType + "Icon");
 	});
 
+	QUnit.test("Avatar with src leading to a valid icon and empty string for initials", async function (assert) {
+		this.oAvatar.setSrc(sIconPath);
+		this.oAvatar.setInitials("");
+		await nextUIUpdate();
+
+		var oIcon = this.oAvatar._getIcon();
+		assert.strictEqual(oIcon.getSrc(), sIconPath, "The icon src is correct");
+	});
+
+	QUnit.test("Avatar with src leading to a valid icon and invalid (too long) initials", async function (assert) {
+		this.oAvatar.setSrc(sIconPath);
+		this.oAvatar.setInitials("SRLAADADADADA");
+		await nextUIUpdate();
+
+		var oIcon = this.oAvatar._getIcon();
+		assert.strictEqual(oIcon.getSrc(), sIconPath, "The icon src is correct");
+	});
+
 	QUnit.test("Avatar with src leading to an image", async function (assert) {
 		this.oAvatar.setSrc(sImagePath);
 		await nextUIUpdate();
@@ -279,9 +297,9 @@ sap.ui.define([
 			fnDone = assert.async(),
 			that = this,
 			$oAvatarImageHolder,
-			oStub = this.stub(this.oAvatar, "_onImageLoad").callsFake(function(sSrc) {
+			oStub = this.stub(this.oAvatar, "_onImageError").callsFake(function(sSrc) {
 				oStub.restore(); // avoid endless recursion
-				that.oAvatar._onImageLoad(sSrc);
+				that.oAvatar._onImageError(sSrc);
 				$oAvatarImageHolder = that.oAvatar.$().find('.sapFAvatarImageHolder').get(0);
 				assert.strictEqual($oAvatarImageHolder.style.backgroundImage, sExpectedOutputImage, "correct style value");
 				assert.ok(that.oAvatar.$().hasClass("sapFAvatarImage"), "Avatar has image class");
@@ -561,7 +579,7 @@ sap.ui.define([
 		var sAvatarUrl = this.oAvatar.$().find(".sapFAvatarImageHolder")[0].style.backgroundImage;
 
 		// based on internal state re-run src validating function so that image is preloaded
-		this.oAvatar._getActualTypeBySrc(this.oAvatar._getAvatarSrc());
+		this.oAvatar._loadImage(this.oAvatar._getAvatarSrc());
 
 
 		if (this.oAvatar.preloadedImage) {

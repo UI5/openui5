@@ -1,0 +1,222 @@
+{
+	"currentLocationText": "Attachments",
+	"history": [],
+	"items": [
+		{
+			"type": "folder",
+			"isDirectory": true,
+			"documentId": "folder-1",
+			"fileName": "My Documents",
+			"mimeType": "",
+			"thumbnailUrl": "sap-icon://folder-blank",
+			"url": "",
+			"size": 0,
+			"uploadedDate": "2023-01-15",
+			"uploadedBy": "System",
+			"status": "Active",
+			"documentType": "Folder",
+			"color": "#ffffff",
+			"bgColor": "#30914c",
+			"items": [
+				{
+					"type": "folder",
+					"isDirectory": true,
+					"documentId": "folder-images",
+					"fileName": "Images",
+					"mimeType": "",
+					"thumbnailUrl": "sap-icon://folder-blank",
+					"url": "",
+					"size": 0,
+					"uploadedDate": "2023-02-10",
+					"uploadedBy": "User",
+					"status": "Active",
+					"documentType": "Folder",
+					"color": "#ffffff",
+					"bgColor": "#30914c",
+					"items": [
+						{
+							"documentId": "img-001",
+							"fileName": "Animation.gif",
+							"mimeType": "image/gif",
+							"thumbnailUrl": "",
+							"url": "test-resources/sap/m/UploadSetwithTableSampleFiles/Animation.gif",
+							"size": 1048576,
+							"uploadedDate": "2023-03-05",
+							"uploadedBy": "John Doe",
+							"isDirectory": false,
+							"status": "Complete",
+							"documentType": "Image",
+							"previewable": true
+						},
+						{
+							"type": "folder",
+							"isDirectory": true,
+							"documentId": "folder-screenshots",
+							"fileName": "Screenshots",
+							"mimeType": "",
+							"thumbnailUrl": "sap-icon://folder-blank",
+							"url": "",
+							"size": 0,
+							"uploadedDate": "2023-04-01",
+							"uploadedBy": "User",
+							"status": "Active",
+							"documentType": "Folder",
+							"color": "#ffffff",
+							"bgColor": "#30914c",
+							"items": [
+								{
+									"documentId": "screenshot-001",
+									"fileName": "Video.mp4",
+									"mimeType": "video/mp4",
+									"thumbnailUrl": "",
+									"url": "test-resources/sap/m/UploadSetwithTableSampleFiles/Video.mp4",
+									"size": 42000000,
+									"uploadedDate": "2023-04-01",
+									"uploadedBy": "Current User",
+									"isDirectory": false,
+									"status": "Complete",
+									"documentType": "Video",
+									"previewable": true
+								}
+							]
+						}
+					]
+				},
+				{
+					"type": "folder",
+					"isDirectory": true,
+					"documentId": "folder-reports",
+					"fileName": "Reports",
+					"mimeType": "",
+					"thumbnailUrl": "sap-icon://folder-blank",
+					"url": "",
+					"size": 0,
+					"uploadedDate": "2023-02-15",
+					"uploadedBy": "Admin",
+					"status": "Active",
+					"documentType": "Folder",
+					"color": "#ffffff",
+					"bgColor": "#30914c",
+					"items": [
+						{
+							"documentId": "report-001",
+							"fileName": "Instructions.pdf",
+							"mimeType": "application/pdf",
+							"thumbnailUrl": "",
+							"url": "test-resources/sap/m/UploadSetwithTableSampleFiles/Instructions.pdf",
+							"size": 30000,
+							"uploadedDate": "2023-04-01",
+							"uploadedBy": "Finance Team",
+							"isDirectory": false,
+							"status": "Complete",
+							"documentType": "Document",
+							"previewable": true
+						},
+						{
+							"documentId": "report-002",
+							"fileName": "Business Plan Agenda.doc",
+							"mimeType": "application/msword",
+							"thumbnailUrl": "",
+							"url": "test-resources/sap/m/UploadSetwithTableSampleFiles/Business Plan Agenda.doc",
+							"size": 200000,
+							"uploadedDate": "2023-04-02",
+							"uploadedBy": "Planning Team",
+							"isDirectory": false,
+							"status": "Complete",
+							"documentType": "Document",
+							"previewable": true
+						}
+					]
+				},
+				{
+					"documentId": "doc-002",
+					"fileName": "Third Quarter Results.ppt",
+					"mimeType": "application/vnd.ms-powerpoint",
+					"thumbnailUrl": "",
+					"url": "test-resources/sap/m/UploadSetwithTableSampleFiles/Third Quarter Results.ppt",
+					"size": 3145728,
+					"uploadedDate": "2023-03-15",
+					"uploadedBy": "Support Team",
+					"isDirectory": false,
+					"status": "Complete",
+					"documentType": "Presentation",
+					"previewable": true
+				}
+			]
+		},
+		{
+					"documentId": "doc-001",
+					"fileName": "Document.txt",
+					"mimeType": "text/plain",
+					"thumbnailUrl": "",
+					"url": "test-resources/sap/m/UploadSetwithTableSampleFiles/Document.txt",
+					"size": 420,
+					"uploadedDate": "2023-02-20",
+					"uploadedBy": "User",
+					"isDirectory": false,
+					"status": "Complete",
+					"documentType": "Document",
+					"previewable": true
+		},
+		{
+			"documentId": "doc-003",
+			"fileName": "Business Plan Topics.xls",
+			"mimeType": "application/vnd.ms-excel",
+			"thumbnailUrl": "",
+			"url": "test-resources/sap/m/UploadSetwithTableSampleFiles/Business Plan Topics.xls",
+			"size": 1048576,
+			"uploadedDate": "2023-03-20",
+			"uploadedBy": "Marketing",
+			"isDirectory": false,
+			"status": "In work",
+			"documentType": "Spreadsheet",
+			"previewable": true
+		},
+		{
+			"documentId": "doc-004",
+			"fileName": "sample-zip-file.zip",
+			"mimeType": "application/zip",
+			"thumbnailUrl": "",
+			"url": "test-resources/sap/m/UploadSetwithTableSampleFiles/sample-zip-file.zip",
+			"size": 42000,
+			"uploadedDate": "2023-03-25",
+			"uploadedBy": "Development Team",
+			"isDirectory": false,
+			"status": "Complete",
+			"documentType": "Archive",
+			"previewable": false
+		},
+		{
+			"type": "folder",
+			"isDirectory": true,
+			"documentId": "folder-temp",
+			"fileName": "Temporary Files",
+			"mimeType": "",
+			"thumbnailUrl": "sap-icon://folder-blank",
+			"url": "",
+			"size": 0,
+			"uploadedDate": "2023-04-01",
+			"uploadedBy": "System",
+			"status": "Active",
+			"documentType": "Folder",
+			"color": "#ffffff",
+			"bgColor": "#30914c",
+			"items": [
+				{
+					"documentId": "temp-001",
+					"fileName": "Notes.txt",
+					"mimeType": "text/plain",
+					"thumbnailUrl": "",
+					"url": "test-resources/sap/m/UploadSetwithTableSampleFiles/Notes.txt",
+					"size": 2048,
+					"uploadedDate": "2023-04-01",
+					"uploadedBy": "System",
+					"isDirectory": false,
+					"status": "Complete",
+					"documentType": "Document",
+					"previewable": true
+				}
+			]
+		}
+	]
+}

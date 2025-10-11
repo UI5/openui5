@@ -1,0 +1,14 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
+    <Dialog title="Create New Folder" class="sapUiMediumMargin">
+        <content>
+            <VBox class="sapUiMediumMargin">
+                <Label text="Folder name:" />
+                <Input id="folderNameInput" value="" placeholder="Enter folder name" />
+            </VBox>
+        </content>
+        <buttons>
+            <Button text="Create" type="Emphasized" press="onCreateFolderDialogPress" />
+            <Button text="Cancel" press="onCreateFolderDialogCancel" />
+        </buttons>
+    </Dialog>
+</core:FragmentDefinition>
