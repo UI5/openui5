@@ -215,7 +215,7 @@
 			</l:BlockLayout>
 		</Panel>
 
-		<Panel visible="{=! (${device>/system/phone} || ${device>/browser/msie}) }"
+		<Panel visible="{=!${device>/system/phone}}"
 			accessibleRole="Region"
 			backgroundDesign="Transparent"
 			class="sapUiNoContentPadding">

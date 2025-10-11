@@ -2770,6 +2770,312 @@
 						]
 				}
 			}
+		},
+		"adaptive5_containerStyles": {
+			"_version": "1.17.0",
+			"sap.app": {
+				"id": "adaptivecard.adaptive5",
+				"type": "card"
+			},
+			"sap.card": {
+				"type": "AdaptiveCard",
+				"content": {
+					"$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+					"type": "AdaptiveCard",
+					"version": "1.3",
+					"body": [
+						{
+							"type": "TextBlock",
+							"text": "Container Styles & Background Colors Test",
+							"weight": "Bolder",
+							"size": "Large",
+							"horizontalAlignment": "Center"
+						},
+						{
+							"type": "Container",
+							"style": "default",
+							"items": [
+								{
+									"type": "TextBlock",
+									"text": "Default Container (transparent background)",
+									"weight": "Bolder"
+								}
+							]
+						},
+						{
+							"type": "Container",
+							"style": "emphasis",
+							"items": [
+								{
+									"type": "TextBlock",
+									"text": "Emphasis Container (--sapTile_Background)",
+									"weight": "Bolder"
+								}
+							]
+						},
+						{
+							"type": "Container",
+							"style": "accent",
+							"items": [
+								{
+									"type": "TextBlock",
+									"text": "Accent Container (--sapInformationBackground)",
+									"weight": "Bolder"
+								}
+							]
+						},
+						{
+							"type": "Container",
+							"style": "good",
+							"items": [
+								{
+									"type": "TextBlock",
+									"text": "Good Container (--sapSuccessBackground)",
+									"weight": "Bolder"
+								}
+							]
+						},
+						{
+							"type": "Container",
+							"style": "attention",
+							"items": [
+								{
+									"type": "TextBlock",
+									"text": "Attention Container (--sapErrorBackground)",
+									"weight": "Bolder"
+								}
+							]
+						},
+						{
+							"type": "Container",
+							"style": "warning",
+							"items": [
+								{
+									"type": "TextBlock",
+									"text": "Warning Container (--sapWarningBackground)",
+									"weight": "Bolder"
+								}
+							]
+						}
+					]
+				}
+			}
+		},
+		"adaptive6_foregroundColors": {
+			"_version": "1.17.0",
+			"sap.app": {
+				"id": "adaptivecard.adaptive6",
+				"type": "card"
+			},
+			"sap.card": {
+				"type": "AdaptiveCard",
+				"content": {
+					"$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+					"type": "AdaptiveCard",
+					"version": "1.3",
+					"body": [
+						{
+							"type": "TextBlock",
+							"text": "Foreground Colors & Text Colors Test",
+							"weight": "Bolder",
+							"size": "Large",
+							"horizontalAlignment": "Center"
+						},
+						{
+							"type": "Container",
+							"style": "default",
+							"items": [
+								{
+									"type": "TextBlock",
+									"text": "Default Text Color (--sapTextColor)",
+									"color": "Default"
+								},
+								{
+									"type": "TextBlock",
+									"text": "Accent Text Color (--sapInformativeTextColor)",
+									"color": "Accent"
+								},
+								{
+									"type": "TextBlock",
+									"text": "Attention Text Color (--sapNegativeTextColor)",
+									"color": "Attention"
+								},
+								{
+									"type": "TextBlock",
+									"text": "Good Text Color (--sapPositiveTextColor)",
+									"color": "Good"
+								},
+								{
+									"type": "TextBlock",
+									"text": "Warning Text Color (--sapCriticalTextColor)",
+									"color": "Warning"
+								}
+							]
+						},
+						{
+							"type": "Container",
+							"style": "emphasis",
+							"items": [
+								{
+									"type": "TextBlock",
+									"text": "Colors in Emphasis Container:",
+									"weight": "Bolder"
+								},
+								{
+									"type": "TextBlock",
+									"text": "Default in emphasis",
+									"color": "Default"
+								},
+								{
+									"type": "TextBlock",
+									"text": "Accent in emphasis",
+									"color": "Accent"
+								},
+								{
+									"type": "TextBlock",
+									"text": "Attention in emphasis",
+									"color": "Attention"
+								},
+								{
+									"type": "TextBlock",
+									"text": "Good in emphasis",
+									"color": "Good"
+								},
+								{
+									"type": "TextBlock",
+									"text": "Warning in emphasis",
+									"color": "Warning"
+								}
+							]
+						}
+					]
+				}
+			}
+		},
+		"adaptive7_fontSizes": {
+			"_version": "1.17.0",
+			"sap.app": {
+				"id": "adaptivecard.adaptive7",
+				"type": "card"
+			},
+			"sap.card": {
+				"type": "AdaptiveCard",
+				"content": {
+					"$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+					"type": "AdaptiveCard",
+					"version": "1.3",
+					"body": [
+						{
+							"type": "TextBlock",
+							"text": "Font Family & Font Sizes Test",
+							"weight": "Bolder",
+							"size": "Large",
+							"horizontalAlignment": "Center"
+						},
+						{
+							"type": "TextBlock",
+							"text": "Font Family: Uses --sapFontFamily CSS variable",
+							"wrap": true
+						},
+						{
+							"type": "TextBlock",
+							"text": "Small Size Font (12px)",
+							"size": "Small"
+						},
+						{
+							"type": "TextBlock",
+							"text": "Default Size Font (14px)",
+							"size": "Default"
+						},
+						{
+							"type": "TextBlock",
+							"text": "Medium Size Font (14px)",
+							"size": "Medium"
+						},
+						{
+							"type": "TextBlock",
+							"text": "Large Size Font (16px)",
+							"size": "Large"
+						},
+						{
+							"type": "TextBlock",
+							"text": "ExtraLarge Size Font (20px)",
+							"size": "ExtraLarge"
+						},
+						{
+							"type": "TextBlock",
+							"text": "This text demonstrates various font weights and styles",
+							"weight": "Bolder",
+							"isSubtle": true
+						}
+					]
+				}
+			}
+		},
+		"adaptive8_separators": {
+			"_version": "1.17.0",
+			"sap.app": {
+				"id": "adaptivecard.adaptive8",
+				"type": "card"
+			},
+			"sap.card": {
+				"type": "AdaptiveCard",
+				"content": {
+					"$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+					"type": "AdaptiveCard",
+					"version": "1.3",
+					"body": [
+						{
+							"type": "TextBlock",
+							"text": "Separators Test",
+							"weight": "Bolder",
+							"size": "Large",
+							"horizontalAlignment": "Center"
+						},
+						{
+							"type": "TextBlock",
+							"text": "Section 1: Content above separator",
+							"wrap": true
+						},
+						{
+							"type": "TextBlock",
+							"text": "Separator uses --sapToolbar_SeparatorColor CSS variable",
+							"separator": true,
+							"wrap": true
+						},
+						{
+							"type": "TextBlock",
+							"text": "Section 2: Content below separator",
+							"wrap": true
+						},
+						{
+							"type": "Container",
+							"style": "accent",
+							"separator": true,
+							"items": [
+								{
+									"type": "TextBlock",
+									"text": "Container with separator above it"
+								}
+							]
+						},
+						{
+							"type": "FactSet",
+							"separator": true,
+							"facts": [
+								{
+									"title": "Separator Color:",
+									"value": "--sapToolbar_SeparatorColor"
+								},
+								{
+									"title": "Line Thickness:",
+									"value": "1px"
+								}
+							]
+						}
+					]
+				}
+			}
 		}
 	},
 	"calendarCard": {

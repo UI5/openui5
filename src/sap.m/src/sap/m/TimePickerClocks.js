@@ -12,6 +12,7 @@ sap.ui.define([
 	"./ToggleButtonRenderer",
 	"sap/ui/core/Renderer",
 	"sap/ui/events/KeyCodes",
+	'sap/ui/Device',
 	'sap/ui/core/library',
 	"sap/ui/thirdparty/jquery",
 	'sap/ui/core/date/UI5Date'
@@ -26,6 +27,7 @@ sap.ui.define([
 		ToggleButtonRenderer,
 		Renderer,
 		KeyCodes,
+		Device,
 		coreLibrary,
 		jQuery,
 		UI5Date
@@ -112,9 +114,7 @@ sap.ui.define([
 				sTooltip = oButton._getTooltip(),
 				sText = oButton._getText(),
 				sTextDir = oButton.getTextDirection(),
-				bIE_Edge = false,
-				// render bdi tag only if the browser is different from IE and Edge since it is not supported there
-				bRenderBDI = (sTextDir === TextDirection.Inherit) && !bIE_Edge;
+				bRenderBDI = (sTextDir === TextDirection.Inherit);
 
 			// start button tag
 			oRm.openStart("div", oButton);
@@ -170,10 +170,6 @@ sap.ui.define([
 			// check if button is focusable (not disabled)
 			if (bEnabled) {
 				oRm.class("sapMFocusable");
-				// special focus handling for IE
-				if (bIE_Edge) {
-					oRm.class("sapMIE");
-				}
 			}
 
 			if (sText) {
@@ -211,14 +207,6 @@ sap.ui.define([
 				if (bRenderBDI) {
 					oRm.close("bdi");
 				}
-				oRm.close("span");
-			}
-
-			// special handling for IE focus outline
-			if (bIE_Edge && bEnabled) {
-				oRm.openStart("span");
-				oRm.class("sapMBtnFocusDiv");
-				oRm.openEnd();
 				oRm.close("span");
 			}
 

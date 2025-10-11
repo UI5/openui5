@@ -159,13 +159,6 @@ function(
 				 * Determines which part of the control will remain fixed at the top of the page during vertical scrolling
 				 * as long as the control is in the viewport.
 				 *
-				 * <b>Note:</b> Limited browser support. Browsers which do not support this feature:
-				 * <ul>
-				 * 	<li>Microsoft Internet Explorer</li>
-				 * 	<li>Microsoft Edge lower than version 41 (EdgeHTML 16)</li>
-				 * 	<li>Mozilla Firefox lower than version 59</li>
-				 * </ul>
-				 *
 				 * @since 1.62
 				 */
 				stickyMode: {type: "sap.m.PlanningCalendarStickyMode", group: "Behavior", defaultValue: PlanningCalendarStickyMode.None},

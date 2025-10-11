@@ -6,7 +6,6 @@ sap.ui.define([
 	"sap/m/library",
 	"sap/m/Toolbar",
 	"sap/m/Label",
-	"sap/ui/Device",
 	"sap/m/Title",
 	"sap/m/OverflowToolbar",
 	"sap/ui/thirdparty/jquery",
@@ -20,7 +19,6 @@ sap.ui.define([
 	mobileLibrary,
 	Toolbar,
 	Label,
-	Device,
 	Title,
 	OverflowToolbar,
 	jQuery,
@@ -742,7 +740,6 @@ sap.ui.define([
 	});
 
 	QUnit.test("Expandable panel with headerText and header toolbar", async function(assert) {
-		this.stub(Device, "browser").value({ msie: false });
 		this.oPanel.setExpandable(true);
 		this.oPanel.setAccessibleRole(PanelAccessibleRole.Region);
 		this.oPanel.setAggregation("headerToolbar", this.createToolbar());
@@ -755,7 +752,6 @@ sap.ui.define([
 	});
 
 	QUnit.test("Expandable panel with headerText and reinitialized header toolbar", async function(assert) {
-		this.stub(Device, "browser").value({ msie: false });
 		var sHeaderToolbarTitleId, sNewHeaderToolbarTitleId;
 
 		this.oPanel.setExpandable(true);

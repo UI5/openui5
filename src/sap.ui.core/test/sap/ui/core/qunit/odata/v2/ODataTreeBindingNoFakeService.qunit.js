@@ -1029,17 +1029,23 @@ sap.ui.define([
 			"hierarchy-node-descendant-count-for" : "foo"
 		}
 	}].forEach(function (oFixture, i) {
-		QUnit.test("_applyAdapter: with tree annotations, " + i, function () {
+		QUnit.test("_applyAdapter: with tree annotations, " + i, function (assert) {
 			var oAdapter = {apply : function () {}},
 				oMetadata = {_getEntityTypeByPath : function () {}},
 				oBinding = {
 					getResolvedPath : function () {},
 					bHasTreeAnnotations : true,
 					oModel : {
+						createCustomParams() {},
 						oMetadata : oMetadata
 					},
 					sOperationMode : oFixture.sOperationMode,
-					mParameters : {},
+					mParameters : {
+						select : "foo",
+						custom : {
+							search : "bar"
+						}
+					},
 					oTreeProperties : oFixture.oTreeProperties
 				},
 				oEntityType = {property : []},
@@ -1056,9 +1062,23 @@ sap.ui.define([
 			this.mock(oAdapter).expects("apply").withExactArgs(sinon.match.same(oBinding));
 			this.mock(oEventProvider).expects("fnFireEvent").withExactArgs();
 			oExpectation.callsArgWith(1, oAdapter);
+			const bTreeBindingFlatIsUsed = oFixture.sModuleName === "sap/ui/model/odata/ODataTreeBindingFlat";
+			if (bTreeBindingFlatIsUsed) {
+				const oModelMock = this.mock(oBinding.oModel);
+				oModelMock.expects("createCustomParams")
+					.withExactArgs(oBinding.mParameters)
+					.returns("$select=foo&search=bar");
+				oModelMock.expects("createCustomParams")
+					.withExactArgs(oBinding.mParameters, true)
+					.returns("search=bar");
+			}
 
 			// code under test
 			ODataTreeBinding.prototype._applyAdapter.call(oBinding, oEventProvider.fnFireEvent);
+
+			assert.strictEqual(oBinding.sCustomParams, bTreeBindingFlatIsUsed ? "$select=foo&search=bar" : undefined);
+			assert.strictEqual(oBinding.sCustomParams4CountRequest, bTreeBindingFlatIsUsed ? "search=bar" : undefined);
+
 		});
 	});
 
@@ -1570,7 +1590,7 @@ sap.ui.define([
 				oModel: {
 					read() {}
 				},
-				sCustomParams: bHasCustomParams ? "foo=bar" : undefined,
+				sCustomParams4CountRequest: bHasCustomParams ? "bar=baz" : undefined,
 				getFilterParams() {}
 			};
 			this.mock(oBinding).expects("getFilterParams").withExactArgs().returns(undefined);
@@ -1580,7 +1600,7 @@ sap.ui.define([
 					groupId: undefined, // not relevant for this test
 					sorters: undefined, // not relevant for this test
 					success: sinon.match.func,
-					urlParameters: bHasCustomParams ? ["foo=bar"] : []
+					urlParameters: bHasCustomParams ? ["bar=baz"] : []
 				});
 
 			// code under test
@@ -1854,5 +1874,36 @@ sap.ui.define([
 			assert.deepEqual(oBinding.oLengths["null"], 1);
 			assert.deepEqual(oBinding.oFinalLengths["null"], true);
 		});
+	});
+
+	QUnit.test("_processSelectParameters: creates custom parameters for count request", function (assert) {
+			const oBinding = {
+				oModel: {
+					createCustomParams() {}
+				},
+				mParameters: {
+					expand: "foo",
+					select: "bar,baz",
+					custom: {
+						search: "bar"
+					}
+				},
+				bHasTreeAnnotations: true
+			};
+
+			const oModelMock = this.mock(oBinding.oModel);
+			oModelMock.expects("createCustomParams")
+				.withExactArgs(oBinding.mParameters)
+				.returns("~ExpandSelectCustomParams");
+			oModelMock.expects("createCustomParams")
+				.withExactArgs(oBinding.mParameters, true)
+				.returns("~OnlyCustomParams");
+
+		// code under test
+		ODataTreeBinding.prototype._processSelectParameters.call(oBinding);
+
+		assert.strictEqual(oBinding.sCustomParams, "~ExpandSelectCustomParams");
+		assert.strictEqual(oBinding.sCustomParams4CountRequest, "~OnlyCustomParams");
+
 	});
 });

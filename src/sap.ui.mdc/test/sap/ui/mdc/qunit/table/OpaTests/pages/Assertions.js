@@ -1009,7 +1009,7 @@ sap.ui.define([
 		 * Checks if the focus is on the given control
 		 *
 		 * @param {sap.ui.core.Control|string} vControl control instance or control ID
-		 * @returns {Promsie} OPA waitFor
+		 * @returns {Promise} OPA waitFor
 		 */
 		iShouldSeeFocusOnControl: function(vControl) {
 			const sControlId = typeof vControl === "string" ? vControl : vControl.getId();
