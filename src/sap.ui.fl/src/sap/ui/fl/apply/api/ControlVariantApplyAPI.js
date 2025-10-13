@@ -21,6 +21,27 @@ sap.ui.define([
 ) {
 	"use strict";
 
+	function onModelContextChange(oEvent, mPropertyBag) {
+		var oAppComponent = oEvent.getSource();
+		var oVariantModel = oAppComponent.getModel(Utils.VARIANT_MODEL_NAME);
+		if (oVariantModel) {
+			oAppComponent.detachModelContextChange(mPropertyBag, onModelContextChange, this);
+			mPropertyBag.resolve(oVariantModel);
+		}
+	}
+
+	function waitForVariantModel(oControl) {
+		var oAppComponent = Utils.getAppComponentForControl(oControl);
+		var oVariantModel = oAppComponent.getModel(Utils.VARIANT_MODEL_NAME);
+		return new Promise(function(resolve) {
+			if (oVariantModel) {
+				resolve(oVariantModel);
+			} else {
+				oAppComponent.attachModelContextChange({resolve: resolve}, onModelContextChange, this);
+			}
+		});
+	}
+
 	/**
 	 * Provides an API for applications to work with control variants. See also {@link sap.ui.fl.variants.VariantManagement}.
 	 *
@@ -147,19 +168,25 @@ sap.ui.define([
 		 * @param {string} mPropertyBag.vmControlId - ID of the variant management control
 		 * @param {function} mPropertyBag.callback - Callback that will be called after a variant has been applied
 		 * @param {boolean} [mPropertyBag.callAfterInitialVariant] - The callback will also be called after the initial variant is applied
+		 * @returns {Promise} Resolves after the callback has been attached
 		 *
 		 * @public
 		 */
 		attachVariantApplied: function(mPropertyBag) {
 			var oControl = mPropertyBag.selector.id && sap.ui.getCore().byId(mPropertyBag.selector.id) || mPropertyBag.selector;
-			var oAppComponent = Utils.getAppComponentForControl(oControl);
-			var oVariantModel = oAppComponent.getModel(Utils.VARIANT_MODEL_NAME);
 
-			oVariantModel.attachVariantApplied({
-				vmControlId: mPropertyBag.vmControlId,
-				control: oControl,
-				callback: mPropertyBag.callback,
-				callAfterInitialVariant: mPropertyBag.callAfterInitialVariant
+			// wait for the model to be attached to the appComponent
+			return waitForVariantModel(oControl)
+			.then(function(oVariantModel) {
+				oVariantModel.attachVariantApplied({
+					vmControlId: mPropertyBag.vmControlId,
+					control: oControl,
+					callback: mPropertyBag.callback,
+					callAfterInitialVariant: mPropertyBag.callAfterInitialVariant
+				});
+			})
+			.catch(function(oError) {
+				throw oError;
 			});
 		},
 
