@@ -1,0 +1,16 @@
+<core:FragmentDefinition 
+	xmlns="sap.m"
+	xmlns:core="sap.ui.core"
+	xmlns:form="sap.ui.layout.form">
+	<Dialog id="treeTableTypeDialog" title="Tree Table Configuration" class="sapUiSmallMargin" afterClose=".closeDialog">
+		<content>
+		  <form:SimpleForm editable="true" id="configForm">
+				<core:Fragment fragmentName="sap.ui.mdc.acc.table.fragment.TableCommonConfig"/>
+				<core:Fragment fragmentName="sap.ui.mdc.acc.table.fragment.GridTableCommonConfig"/>
+		  </form:SimpleForm>
+		</content>
+		<endButton>
+		  <Button id="btnClose" text="Close" press=".closeDialog" />
+		</endButton>
+	  </Dialog>
+</core:FragmentDefinition>

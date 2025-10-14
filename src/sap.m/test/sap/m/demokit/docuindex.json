@@ -119,6 +119,17 @@
 				"config": "test-resources/sap/m/demokit/sample/UXCIntegration/demoapp.json"
 			},
 			{
+				"icon": "sap-ui5",
+				"text": "AI Integration",
+				"ref": "https://sap-samples.github.io/ai-seamless-integration/",
+				"desc": "This sample project demonstrates the seamless integration of UI5 Web Components into the OpenUI5 framework showing AI use cases",
+				"links": {
+					"View Source Code": "https://github.com/SAP-samples/ai-seamless-integration"
+				},
+				"category": "Showcase",
+				"config": "test-resources/sap/m/demokit/sample/AIIntegration/demoapp.json"
+			},
+			{
 				"icon": "source-code",
 				"text": "TypeScript Hello World",
 				"ref": "https://sap-samples.github.io/ui5-typescript-helloworld/",
@@ -712,7 +723,8 @@
 				"category": "User Input",
 				"since": "1.133",
 				"samples": [
-					"sap.m.sample.TokenizerBasic"
+					"sap.m.sample.TokenizerBasic",
+					"sap.m.sample.TokenizerMultiLine"
 				]
 			},
 			{
@@ -1239,7 +1251,8 @@
 					"sap.m.sample.SegmentedButton",
 					"sap.m.sample.SegmentedButtonVSD",
 					"sap.m.sample.SegmentedButtonDialog",
-					"sap.m.sample.SegmentedButtonLI"
+					"sap.m.sample.SegmentedButtonLI",
+					"sap.m.sample.SegmentedButtonContentModes"
 				]
 			},
 			{
@@ -1827,6 +1840,18 @@
 				"samples": [
 					"sap.m.sample.TsHelloWorld"
 				]
+			},
+			{
+				"id": "sap.m.sample.AIIntegration",
+				"name": "AI Integration",
+				"category": "Showcase",
+				"since": "1.142",
+				"formFactors": "-",
+				"description": "This sample project demonstrates the seamless integration of UI5 Web Components into the OpenUI5 framework showing AI use cases",
+				"samples": [
+					"sap.m.sample.AIIntegration"
+				],
+				"hidden": true
 			}
 		],
 		"samples": [
@@ -2661,6 +2686,11 @@
 				"description": "Segmented Button used in Input List Item component"
 			},
 			{
+				"id": "sap.m.sample.SegmentedButtonContentModes",
+				"name": "Segmented Button Content Modes",
+				"description": "Segmented Button different Content Modes"
+			},
+			{
 				"id": "sap.m.sample.Select",
 				"name": "Select",
 				"description": "Illustrates the usage of a Select in header, footer and content of a page. Note the different display options."
@@ -2764,6 +2794,11 @@
 				"id": "sap.m.sample.TokenizerBasic",
 				"name": "Basic Tokenizer",
 				"description": "Basic Tokenizer with tokens"
+			},
+			{
+				"id": "sap.m.sample.TokenizerMultiLine",
+				"name": "Tokenizer Multi-line and Clear All",
+				"description": "Tokenizer with Multi-line support and Clear All button"
 			},
 			{
 				"id": "sap.m.sample.OverflowToolbarTokenizer",
@@ -4052,6 +4087,15 @@
 				"id": "sap.m.sample.UploadSetwithTablePlugin.TreeTableWithFolderHierarchy",
 				"name": "Plugin for Tree Table with folder hierarchy & folder uploads",
 				"description": "This example demonstrates the usage of UploadSetwithTable plugin with a tree table featuring folder hierarchy, folder creation, folder uploads, folder navigation with breadcrumbs and folder management"
+			},
+			{
+				"id": "sap.m.sample.AIIntegration",
+				"name": "AI Integration",
+				"description": "This sample project demonstrates the seamless integration of UI5 Web Components into the OpenUI5 framework showing AI use cases",
+				"external": true,
+				"externalAppRef": "https://sap-samples.github.io/ai-seamless-integration/",
+				"externalSourceRef": "https://github.com/SAP-samples/ai-seamless-integration",
+				"externalResourceRef": "https://github.com/SAP-samples/ai-seamless-integration/archive/refs/heads/main.zip"
 			}
 		]
 	}

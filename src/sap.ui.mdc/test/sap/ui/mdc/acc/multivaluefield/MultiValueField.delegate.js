@@ -16,7 +16,7 @@ sap.ui.define([
         return ODataTypeMap;
     };
 
-    MyMultiValueFieldDelegate.updateItems = function(oPayload, aConditions, oMultiValueField) {
+    MyMultiValueFieldDelegate.updateItemsFromConditions = function(oMultiValueField, aConditions) {
 
         const oListBinding = oMultiValueField.getBinding("items");
 

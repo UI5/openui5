@@ -10,7 +10,7 @@ sap.ui.define([
 
     const MultiValueFieldDelegate = Object.assign({}, BaseDelegate);
 
-    MultiValueFieldDelegate.updateItems = function(oPayload, aConditions, oMultiValueField) {
+    MultiValueFieldDelegate.updateItemsFromConditions = function(oMultiValueField, aConditions) {
 
         const oListBinding = oMultiValueField.getBinding("items");
 

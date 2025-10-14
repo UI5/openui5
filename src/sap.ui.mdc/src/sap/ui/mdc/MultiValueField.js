@@ -81,7 +81,7 @@ sap.ui.define([
 				 * Items of the <code>MultiValueField</code> control.
 				 *
 				 * The items are not updated by user input or value help selection automatically. That's because an aggregation binding can only be updated by the model,
-				 * not by the bound aggregation. Therefore, the {@link module:sap/ui/mdc/field/MultiValueFieldDelegate.updateItems MultiValueFieldDelegate.updateItems} function needs to be implemented
+				 * not by the bound aggregation. Therefore, the {@link module:sap/ui/mdc/field/MultiValueFieldDelegate.updateItemsFromConditions MultiValueFieldDelegate.updateItemsFromConditions} function needs to be implemented
 				 * to update the items after a user interaction.
 				 */
 				items: {
@@ -286,7 +286,7 @@ sap.ui.define([
 			return;
 		}
 
-		this.getControlDelegate().updateItems(this.getPayload(), aConditions, this);
+		this.getControlDelegate().updateItemsFromConditions(this, aConditions);
 
 	}
 

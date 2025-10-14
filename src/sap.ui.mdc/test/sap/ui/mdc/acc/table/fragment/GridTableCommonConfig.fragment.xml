@@ -1,0 +1,8 @@
+<core:FragmentDefinition 
+	xmlns="sap.m"
+	xmlns:core="sap.ui.core">
+	<Label text="Row Count Mode"/>
+	<Select id="selectRowCountMode" items="{tableConfig>/enums/rowCountModes}" selectedKey="{tableConfig>/gridType/rowCountMode}">
+		<core:Item key="{tableConfig>value}" text="{tableConfig>value}"></core:Item>
+	</Select>
+</core:FragmentDefinition>

@@ -362,7 +362,7 @@ sap.ui.define([
 	QUnit.module("user interaction", {
 		beforeEach: async () => {
 			_initModel();
-			sinon.stub(MultiValueFieldDelegate, "updateItems").callsFake((oPayload, aConditions, oMultiValueField) => {
+			sinon.stub(MultiValueFieldDelegate, "updateItemsFromConditions").callsFake((oPayload, aConditions, oMultiValueField) => {
 				const aItems = [];
 				for (let i = 0; i < aConditions.length; i++) {
 					const oCondition = aConditions[i];
@@ -391,7 +391,7 @@ sap.ui.define([
 			oField = undefined;
 			_cleanupModel();
 			_cleanupEvents();
-			MultiValueFieldDelegate.updateItems.restore();
+			MultiValueFieldDelegate.updateItemsFromConditions.restore();
 		}
 	});
 
@@ -403,8 +403,8 @@ sap.ui.define([
 		oValueHelp.fireSelect({ conditions: [oCondition], add: false, close: true });
 
 		setTimeout(() => { // async model update
-			assert.ok(MultiValueFieldDelegate.updateItems.calledOnce, "MultiValueFieldDelegate.updateItems called once");
-			assert.ok(MultiValueFieldDelegate.updateItems.calledWith({}, [oCondition], oField), "MultiValueFieldDelegate.updateItems arguments");
+			assert.ok(MultiValueFieldDelegate.updateItemsFromConditions.calledOnce, "MultiValueFieldDelegate.updateItemsFromConditions called once");
+			assert.ok(MultiValueFieldDelegate.updateItemsFromConditions.calledWith(oField, [oCondition]), "MultiValueFieldDelegate.updateItemsFromConditions arguments");
 			assert.equal(iCount, 1, "Change event fired once");
 			assert.equal(sId, "F1", "Change event fired on Field");
 			assert.equal(aChangeItems.length, 1, "Change event: items");
@@ -617,6 +617,16 @@ sap.ui.define([
 			}, 300);
 		}, 300);
 
+	});
+
+	/**
+	 *  @deprecated As of version 1.142
+	 */
+	QUnit.test("MultiValueFieldDelegate: updateItemsFromConditions calls deprecated updateItems", (assert) => {
+		sinon.spy(MultiValueFieldDelegate, "updateItems");
+		MultiValueFieldDelegate.updateItemsFromConditions({getPayload: () => {}}, [], oField);
+		assert.ok(MultiValueFieldDelegate.updateItems.calledOnce, "MultiValueFieldDelegate.updateItems called once");
+		MultiValueFieldDelegate.updateItems.restore();
 	});
 
 });

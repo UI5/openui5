@@ -72,10 +72,8 @@
                     <m:plugins.UploadSetwithTable
                         id="uploadPlugin"
                         uploadUrl="./uploadFiles"
-                        cloudFilePickerEnabled="false"
                         multiple="true"
                         uploadEnabled="true"
-                        instantUpload="false"
                         httpRequestMethod="POST"
                         beforeUploadStarts="onBeforeUploadStarts"
                         uploadCompleted="onUploadCompleted"

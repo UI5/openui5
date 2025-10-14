@@ -120,6 +120,14 @@
 	height: 100%;
 }
 
+.sapMTokenizerMultiLineContainer {
+	display: flex;
+	height: 100%;
+	flex-wrap: wrap;
+	overflow-y: auto;
+	overflow-x: hidden;
+}
+
 .sapMTokenizer.sapMTokenizerOneLongToken .sapMTokenizerScrollContainer {
 	width: 100%;
 	overflow: hidden;
@@ -146,7 +154,29 @@
 	}
 }
 
+.sapMTokenizerClearAll {
+	margin-top: 0.5rem;
+	color: @sapUiLink;
+	font-size: @sapMFontMediumSize;
+	cursor: pointer;
+	outline: none;
+
+	&:hover {
+		color: @sapUiLinkHoverColor;
+		text-decoration: @sapUiLinkHoverTextDecoration;
+	}
+
+	&:active {
+		color: @sapUiLinkActiveColor;
+		text-decoration: @sapUiLinkActiveTextDecoration;
+	}
+}
+
 .sapUiSizeCompact {
+
+	.sapMTokenizerClearAll {
+		margin-top: 0.25rem;
+	}
 
 	.sapMTokenizerTokensPopup,
 	&.sapMTokenizerTokensPopup {

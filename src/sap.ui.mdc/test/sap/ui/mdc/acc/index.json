@@ -76,6 +76,17 @@
 				"title": "ACC test for sap.ui.mdc.Chart",
 				"module": "./mdc/Chart.qunit"
 			}
+		},
+		{
+			"control": "sap.ui.mdc.Table",
+			"url": "./table/Table.html",
+			"desc": "A table with basic configuration and enabled personalization",
+			"appComponent": "CA-UI5-TBL",
+			"accTest": {
+				"name": "sap.ui.mdc.Table",
+				"title": "ACC test for sap.ui.mdc.Table",
+				"module": "./mdc/Table.qunit"
+			}
 		}
 	]
 }

@@ -167,7 +167,19 @@ sap.ui.define([
 					 * Contains a comma-separated list of all token texts for form processing.
 					 * @private
 					 */
-					_semanticFormValue: {type: "string", group: "Behavior", defaultValue: "", visibility: "hidden"}
+					_semanticFormValue: {type: "string", group: "Behavior", defaultValue: "", visibility: "hidden"},
+
+					/**
+					 * Defines whether tokens are displayed on multiple lines.
+					 * @experimental since 1.142
+					 */
+					multiLine: {type: "boolean", group: "Misc", defaultValue: false},
+
+					/**
+					 * Defines whether "Clear All" button is present. Ensure `multiLine` is enabled, otherwise `showClearAll` will have no effect.
+					 * @experimental since 1.142
+					 */
+					showClearAll: {type: "boolean", group: "Misc", defaultValue: false}
 
 				},
 				defaultAggregation : "tokens",
@@ -710,6 +722,16 @@ sap.ui.define([
 				iLabelWidth, iFreeSpace,
 				iCounter, iFirstTokenToHide = -1;
 
+			if (this.getMultiLine()) {
+				aTokens.forEach(function (oToken) {
+					const iTokenWidth = iTokenizerWidth - this._oTokensWidthMap[oToken.getId()];
+					if (iTokenWidth <= 0) {
+						oToken.setTruncated(true);
+					}
+				}, this);
+				return;
+			}
+
 			// find the index of the first overflowing token
 			aTokens.some(function (oToken, iIndex) {
 				iTokenizerWidth = iTokenizerWidth - this._oTokensWidthMap[oToken.getId()];
@@ -943,7 +965,7 @@ sap.ui.define([
 		Tokenizer.prototype.onBeforeRendering = function() {
 			var aTokens = this.getTokens();
 
-			if (aTokens.length !== 1) {
+			if (aTokens.length !== 1 && !this.getMultiLine()) {
 				this.setFirstTokenTruncated(false);
 			}
 
@@ -1439,7 +1461,7 @@ sap.ui.define([
 				this._oSelectionOrigin = oFocusedToken;
 			}
 
-			if (oTargetToken && this.hasOneTruncatedToken()) {
+			if (oTargetToken && this.hasOneTruncatedToken() && !this.getMultiLine()) {
 				this._handleNMoreIndicatorPress();
 				return;
 			}
@@ -1705,6 +1727,19 @@ sap.ui.define([
 			if (this._nMoreIndicatorPressed) {
 				this._handleNMoreIndicatorPress();
 			}
+
+			const _bClearAllPressed = oEvent.target.classList.contains("sapMTokenizerClearAll");
+
+			if (_bClearAllPressed) {
+				this._handleClearAll();
+			}
+
+			const bMultiLineTruncatedTokenPressed = (oEvent.target.classList.contains("sapMTokenTruncated") && !this.hasStyleClass("sapMTokenizerIndicatorDisabled")) && this.getMultiLine();
+
+			if (bMultiLineTruncatedTokenPressed) {
+				this.setProperty("opener", oEvent.target.id);
+				this._togglePopup(this.getTokensPopup());
+			}
 		};
 
 		/**
@@ -1900,6 +1935,41 @@ sap.ui.define([
 			}
 
 			return this._handleDelete(iIndex, fnFallback);
+		};
+
+		/**
+		 * Handler for clear all button click.
+		 *
+		 * @private
+		 */
+		Tokenizer.prototype._handleClearAll = function() {
+			this.fireTokenDelete({
+				tokens: this.getTokens()
+			});
+		};
+
+		/**
+		 * Determines if the clear all button should be displayed.
+		 *
+		 * @private
+		 * @returns {boolean} True if clear all button should be displayed
+		 */
+		Tokenizer.prototype.showEffectiveClearAll = function() {
+			return this.getShowClearAll() &&
+				this.getMultiLine() &&
+				this.getTokens().length > 0 &&
+				this.getEditable() &&
+				this.getEnabled();
+		};
+
+		/**
+		 * Returns text for the clear all button.
+		 *
+		 * @private
+		 * @returns {string} Text for the clear all button
+		 */
+		Tokenizer.prototype._getClearAllText = function() {
+			return Library.getResourceBundleFor("sap.m").getText("TOKENIZER_CLEAR_ALL");
 		};
 
 		Tokenizer.TokenChangeType = {

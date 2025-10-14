@@ -1,4 +1,4 @@
-/*global QUnit */
+/*global QUnit, sinon*/
 sap.ui.define([
 	"sap/ui/core/Lib",
 	"sap/ui/test/utils/nextUIUpdate",
@@ -11672,11 +11672,298 @@ sap.ui.define([
 			// act
 			qutils.triggerKeydown(oHierarchicalSelect.getDomRef(), KeyCodes.ENTER);
 
-			// assert
-			assert.strictEqual(fnEnterSpy.callCount, 1, "onsapenter() method was called exactly once");
-			assert.strictEqual(fnCloseSpy.callCount, 1, "close() method was called exactly once");
+		// assert
+		assert.strictEqual(fnEnterSpy.callCount, 1, "onsapenter() method was called exactly once");
+		assert.strictEqual(fnCloseSpy.callCount, 1, "close() method was called exactly once");
+
+		// cleanup
+		oHierarchicalSelect.destroy();
+	});
+
+		QUnit.module("Accessibility - Initial Highlighted Item Selection", {
+			beforeEach: function () {
+				this.clock = sinon.useFakeTimers();
+			},
+			afterEach: function () {
+				this.clock.restore();
+			}
+		});
+
+		QUnit.test("forceSelection=false: Enter key should select initially highlighted item", function (assert) {
+			// system under test
+			var oSelect = new Select({
+				forceSelection: false,
+				items: [
+					new Item({ key: "1", text: "Item 1" }),
+					new Item({ key: "2", text: "Item 2" }),
+					new Item({ key: "3", text: "Item 3" })
+				]
+			});
+
+			// arrange
+			oSelect.placeAt("content");
+			nextUIUpdate.runSync()/*fake timer is used in module*/;
+			oSelect.focus();
+
+			// act - open dropdown
+			oSelect.open();
+			this.clock.tick(1000);
+
+			// assert - first item should be highlighted
+			assert.ok(oSelect._oInitialHighlightedItem, "Initial highlighted item is tracked");
+			assert.strictEqual(oSelect._oInitialHighlightedItem.getText(), "Item 1", "First item is the initial highlighted item");
+			assert.strictEqual(oSelect.getSelectedItem(), null, "No item is selected yet");
+
+			var fnChangeSpy = this.spy(oSelect, "fireChange");
+
+			// act - press Enter key
+			qutils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ENTER);
+			this.clock.tick(500);
+
+			// assert - first item should be selected
+			assert.strictEqual(fnChangeSpy.callCount, 1, "Change event is fired once");
+			assert.strictEqual(oSelect.getSelectedItem().getText(), "Item 1", "First item is now selected");
+			assert.strictEqual(oSelect._oInitialHighlightedItem, null, "Initial highlighted item is cleared after selection");
 
 			// cleanup
-			oHierarchicalSelect.destroy();
+			oSelect.destroy();
 		});
-	});
+
+		QUnit.test("forceSelection=false: Space key should select initially highlighted item", function (assert) {
+			// system under test
+			var oSelect = new Select({
+				forceSelection: false,
+				items: [
+					new Item({ key: "1", text: "Item 1" }),
+					new Item({ key: "2", text: "Item 2" }),
+					new Item({ key: "3", text: "Item 3" })
+				]
+			});
+
+			// arrange
+			oSelect.placeAt("content");
+			nextUIUpdate.runSync()/*fake timer is used in module*/;
+			oSelect.focus();
+
+			// act - open dropdown
+			oSelect.open();
+			this.clock.tick(1000);
+
+			// assert - first item should be highlighted
+			assert.ok(oSelect._oInitialHighlightedItem, "Initial highlighted item is tracked");
+			assert.strictEqual(oSelect.getSelectedItem(), null, "No item is selected yet");
+
+			var fnChangeSpy = this.spy(oSelect, "fireChange");
+
+			// act - press Space key
+			qutils.triggerKeydown(oSelect.getDomRef(), KeyCodes.SPACE);
+			qutils.triggerKeyup(oSelect.getDomRef(), KeyCodes.SPACE);
+			this.clock.tick(500);
+
+			// assert - first item should be selected
+			assert.strictEqual(fnChangeSpy.callCount, 1, "Change event is fired once");
+			assert.strictEqual(oSelect.getSelectedItem().getText(), "Item 1", "First item is now selected");
+			assert.strictEqual(oSelect._oInitialHighlightedItem, null, "Initial highlighted item is cleared after selection");
+
+			// cleanup
+			oSelect.destroy();
+		});
+
+		QUnit.test("forceSelection=false: Arrow navigation should clear initial highlight state", function (assert) {
+			// system under test
+			var oSelect = new Select({
+				forceSelection: false,
+				items: [
+					new Item({ key: "1", text: "Item 1" }),
+					new Item({ key: "2", text: "Item 2" }),
+					new Item({ key: "3", text: "Item 3" })
+				]
+			});
+
+			// arrange
+			oSelect.placeAt("content");
+			nextUIUpdate.runSync()/*fake timer is used in module*/;
+			oSelect.focus();
+
+			// act - open dropdown
+			oSelect.open();
+			this.clock.tick(1000);
+
+			// assert - initial state
+			assert.ok(oSelect._oInitialHighlightedItem, "Initial highlighted item is tracked");
+
+			// act - navigate down with arrow key
+			qutils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
+			this.clock.tick(100);
+
+			// assert - initial highlight state should be cleared
+			assert.strictEqual(oSelect._oInitialHighlightedItem, null, "Initial highlighted item is cleared after navigation");
+
+			// cleanup
+			oSelect.destroy();
+		});
+
+		QUnit.test("forceSelection=false: Arrow up navigation should clear initial highlight state", function (assert) {
+			// system under test
+			var oSelect = new Select({
+				forceSelection: false,
+				items: [
+					new Item({ key: "1", text: "Item 1" }),
+					new Item({ key: "2", text: "Item 2" }),
+					new Item({ key: "3", text: "Item 3" })
+				]
+			});
+
+			// arrange
+			oSelect.placeAt("content");
+			nextUIUpdate.runSync()/*fake timer is used in module*/;
+			oSelect.focus();
+
+			// act - open dropdown
+			oSelect.open();
+			this.clock.tick(1000);
+
+			// assert - initial state
+			assert.ok(oSelect._oInitialHighlightedItem, "Initial highlighted item is tracked");
+
+			// act - navigate up with arrow key
+			qutils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_UP);
+			this.clock.tick(100);
+
+			// assert - initial highlight state should be cleared
+			assert.strictEqual(oSelect._oInitialHighlightedItem, null, "Initial highlighted item is cleared after navigation");
+
+			// cleanup
+			oSelect.destroy();
+		});
+
+		QUnit.test("forceSelection=false: Closing dropdown should clear initial highlight state", function (assert) {
+			// system under test
+			var oSelect = new Select({
+				forceSelection: false,
+				items: [
+					new Item({ key: "1", text: "Item 1" }),
+					new Item({ key: "2", text: "Item 2" }),
+					new Item({ key: "3", text: "Item 3" })
+				]
+			});
+
+			// arrange
+			oSelect.placeAt("content");
+			nextUIUpdate.runSync()/*fake timer is used in module*/;
+			oSelect.focus();
+
+			// act - open dropdown
+			oSelect.open();
+			this.clock.tick(1000);
+
+			// assert - initial state
+			assert.ok(oSelect._oInitialHighlightedItem, "Initial highlighted item is tracked");
+
+			// act - close dropdown without selection
+			oSelect.close();
+			this.clock.tick(500);
+
+			// assert - initial highlight state should be cleared
+			assert.strictEqual(oSelect._oInitialHighlightedItem, null, "Initial highlighted item is cleared on close");
+
+			// cleanup
+			oSelect.destroy();
+		});
+
+		QUnit.test("forceSelection=true: Should NOT track initial highlighted item", function (assert) {
+			// system under test
+			var oSelect = new Select({
+				forceSelection: true, // explicitly set to true
+				items: [
+					new Item({ key: "1", text: "Item 1" }),
+					new Item({ key: "2", text: "Item 2" }),
+					new Item({ key: "3", text: "Item 3" })
+				]
+			});
+
+			// arrange
+			oSelect.placeAt("content");
+			nextUIUpdate.runSync()/*fake timer is used in module*/;
+			oSelect.focus();
+
+			// act - open dropdown
+			oSelect.open();
+			this.clock.tick(1000);
+
+			// assert - should NOT track initial highlighted item when forceSelection=true
+			assert.strictEqual(oSelect._oInitialHighlightedItem, undefined, "Initial highlighted item is NOT tracked when forceSelection=true");
+
+			// cleanup
+			oSelect.destroy();
+		});
+
+		QUnit.test("forceSelection=false: Enter after navigation should use normal behavior", function (assert) {
+			// system under test
+			var oSelect = new Select({
+				forceSelection: false,
+				items: [
+					new Item({ key: "1", text: "Item 1" }),
+					new Item({ key: "2", text: "Item 2" }),
+					new Item({ key: "3", text: "Item 3" })
+				]
+			});
+
+			// arrange
+			oSelect.placeAt("content");
+			nextUIUpdate.runSync()/*fake timer is used in module*/;
+			oSelect.focus();
+
+			// act - open dropdown
+			oSelect.open();
+			this.clock.tick(1000);
+
+			// act - navigate down to second item
+			qutils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ARROW_DOWN);
+			this.clock.tick(100);
+
+			// assert - initial highlight cleared
+			assert.strictEqual(oSelect._oInitialHighlightedItem, null, "Initial highlighted item cleared after navigation");
+
+			var fnChangeSpy = this.spy(oSelect, "fireChange");
+
+			// act - press Enter
+			qutils.triggerKeydown(oSelect.getDomRef(), KeyCodes.ENTER);
+			this.clock.tick(500);
+
+			// assert - second item selected (normal behavior after navigation)
+			assert.strictEqual(fnChangeSpy.callCount, 1, "Change event is fired once");
+			assert.strictEqual(oSelect.getSelectedItem().getText(), "Item 1", "Selection follows normal keyboard navigation");
+
+			// cleanup
+			oSelect.destroy();
+		});
+
+		QUnit.test("forceSelection=false: ARIA activedescendant should be set on first item", function (assert) {
+			// system under test
+			var oSelect = new Select({
+				forceSelection: false,
+				items: [
+					new Item({ key: "1", text: "Item 1" }),
+					new Item({ key: "2", text: "Item 2" })
+				]
+			});
+
+			// arrange
+			oSelect.placeAt("content");
+			nextUIUpdate.runSync()/*fake timer is used in module*/;
+			oSelect.focus();
+
+			// act - open dropdown
+			oSelect.open();
+			this.clock.tick(1000);
+
+			// assert - aria-activedescendant should be set
+			var sAriaActiveDescendant = oSelect.getFocusDomRef().getAttribute("aria-activedescendant");
+			var oFirstItem = oSelect.getItems()[0];
+			assert.strictEqual(sAriaActiveDescendant, oFirstItem.getId(), "aria-activedescendant is set to first item");
+
+			// cleanup
+			oSelect.destroy();
+		});
+});

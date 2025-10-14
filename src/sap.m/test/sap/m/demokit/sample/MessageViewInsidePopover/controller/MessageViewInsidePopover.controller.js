@@ -74,6 +74,7 @@ sap.ui.define([
 					showDetailsPageHeader: false,
 					itemSelect: function () {
 						oBackButton.setVisible(true);
+						that.oPopoverTitle.setText("Message Details");
 					},
 					items: {
 						path: "/",
@@ -87,10 +88,15 @@ sap.ui.define([
 						that.oMessageView.navigateBack();
 						that._oPopover.focus();
 						this.setVisible(false);
+						that.oPopoverTitle.setText("Messages");
 					}
 				});
 
 			this.oMessageView.setModel(oModel);
+
+			this.oPopoverTitle = new Title({
+				text: "Messages"
+			});
 
 			var oCloseButton =  new Button({
 					text: "Close",
@@ -104,7 +110,7 @@ sap.ui.define([
 				oPopoverBar = new Bar({
 					contentLeft: [oBackButton],
 					contentMiddle: [
-						new Title({text: "Messages"})
+						this.oPopoverTitle
 					]
 				});
 

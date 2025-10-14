@@ -1,0 +1,64 @@
+<mvc:View
+    controllerName="sap.m.sample.TokenizerMultiLine.C"
+    height="100%"
+	xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+	xmlns:l="sap.ui.layout"
+	xmlns:core="sap.ui.core">
+	<Page title="Button with Badge">
+		<content>
+			<l:VerticalLayout class="sapUiContentPadding" width="100%">
+				<Toolbar>
+					<content>
+						<Title text="Tokenizer Multi-line and Clear All"/>
+					</content>
+				</Toolbar>
+
+				<l:VerticalLayout class="sapUiContentPadding" width="420px">
+
+					<Text
+						wrapping="true"
+						text="With multiLine enabled, tokens are displayed across multiple lines for improved readability."/>
+
+					<Text
+						wrapping="true"
+						text="The showClearAll option adds a convenient 'Clear All' button, allowing users to remove all tokens at once."/>
+
+				</l:VerticalLayout>
+
+				<l:VerticalLayout width="360px">
+					<Tokenizer
+						id="tokenizerMultiLine"
+						class="sapUiTinyMarginBeginEnd"
+						width="100%"
+						tokenDelete=".onTokenDelete"
+						multiLine="true"
+						showClearAll="true">
+						<tokens>
+							<Token text="Andora" key="1" />
+							<Token text="Argentina" key="2" />
+							<Token text="Brazil" key="3" />
+							<Token text="Bulgaria" key="4" />
+							<Token text="Canada" key="5" />
+							<Token text="China" key="6" />
+							<Token text="Denmark" key="7" />
+							<Token text="Estonia" key="8" />
+							<Token text="The United Kingdom of Great Britain and Northern Ireland" key="9" />
+							<Token text="Finland" key="10" />
+							<Token text="Germany" key="11" />
+							<Token text="Hungary" key="12" />
+							<Token text="Ireland" key="13" />
+							<Token text="Norway" key="14" />
+							<Token text="Japan" key="15" />
+							<Token text="Korea" key="16" />
+							<Token text="Latvia" key="17" />
+							<Token text="Independent and Sovereign Republic of Kiribati" key="18" />
+							<Token text="Italy" key="19" />
+						</tokens>
+					</Tokenizer>
+				</l:VerticalLayout>
+
+			</l:VerticalLayout>
+		</content>
+	</Page>
+</mvc:View>
