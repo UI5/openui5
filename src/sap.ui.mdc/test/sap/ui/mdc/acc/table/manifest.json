@@ -1,0 +1,45 @@
+{
+	"_version": "2.0.0",
+	"sap.app": {
+		"id": "Employees",
+		"version": "1.0",
+		"type": "application",
+		"title": "MDC Sample",
+		"description": "MDC Sample Application",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
+	},
+	"sap.ui": {
+		"technology": "UI5",
+		"deviceTypes": {
+			"desktop": true,
+			"tablet": true,
+			"phone": true
+		}
+	},
+	"sap.ui5": {
+		"handleValidation": true,
+		"rootView": {
+			"viewName": "sap.ui.mdc.acc.table.Table",
+			"id": "MyView",
+			"height": "100%"
+		},
+		"dependencies": {
+			"minUI5Version": "2.0.0",
+			"libs": {
+				"sap.ui.core": {},
+				"sap.ui.mdc": {},
+				"sap.m": {},
+				"sap.ui.table": {},
+				"sap.ui.fl": {}
+			}
+		},
+		"models": {
+			"": {
+				"type": "sap.ui.model.json.JSONModel",
+				"uri": "mockdata/employees.json"
+			}
+		}
+	}
+}

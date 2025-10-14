@@ -1,0 +1,87 @@
+<mvc:View 
+	controllerName="sap.ui.mdc.acc.table.Table"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:m="sap.m"
+	xmlns:mdc="sap.ui.mdc"
+	xmlns:mdct="sap.ui.mdc.table"
+	xmlns:core="sap.ui.core">
+
+	<m:App id="MyApp" defaultTransitionName="show">
+		<m:Page id="MyPage" title="Table Sample" titleLevel="H1">
+			<m:headerContent>
+				<m:Select id="selectType" change=".onTableTypeChange" selectedKey="GridTableType">
+					<core:Item key="GridTableType" text="GridTable"></core:Item>
+					<core:Item key="ResponsiveTableType" text="ResponsiveTable"></core:Item>
+					<core:Item key="TreeTableType" text="TreeTable"></core:Item>
+				</m:Select>
+				<m:Button id="btnConfig" text="Table Configuration" press="openConfigurationDialog"></m:Button>
+			</m:headerContent>
+			<mdc:Table
+				id="mdcTable"
+				header="Employees"
+				p13nMode="Column,Sort,Group,Filter"
+				useColumnLabelsAsTooltips="true"
+				enableExport="true"
+				delegate="{
+					name: 'sap/ui/mdc/acc/table/delegates/TableDelegate',
+					payload: {
+						bindingPath: '/employees'
+					}
+				}"
+				selectionMode="{tableConfig>/selectionMode}">
+				<mdc:rowSettings>
+					<mdct:RowSettings
+						highlight="{path: 'hireDate', formatter: '.formatHighlight'}"
+						highlightText="{path: 'hireDate', formatter: '.formatHighlightText'}"
+						navigated="{= ${tableConfig>/navigatedRowId} === ${id} }">
+					</mdct:RowSettings>
+				</mdc:rowSettings>
+				<mdc:noData>
+					<m:IllustratedMessage/>
+				</mdc:noData>
+				<mdct:Column
+					propertyKey="id"
+					header="ID">
+					<m:Text text="{id}"/>
+					<mdct:extendedSettings>
+						<mdct:ResponsiveColumnSettings importance="High" />
+					</mdct:extendedSettings>
+				</mdct:Column>
+				<mdct:Column
+					propertyKey="name"
+					header="Name">
+					<m:Text text="{name}"/>
+					<mdct:extendedSettings>
+						<mdct:ResponsiveColumnSettings importance="High" />
+					</mdct:extendedSettings>
+				</mdct:Column>
+				<mdct:Column
+					propertyKey="position"
+					header="Position"
+					minWidth="12rem">
+					<m:Text text="{position}"/>
+				</mdct:Column>
+				<mdct:Column
+					propertyKey="location"
+					header="Location">
+					<m:ObjectStatus text="{location}" state="{= ${location} === 'Headquarters' ? 'Success' : 'Warning' }"/>
+				</mdct:Column>
+				<mdct:Column
+					propertyKey="hireDate"
+					header="Hire Date">
+					<m:Text text="{hireDate}"/>
+				</mdct:Column>
+				<mdct:Column
+					propertyKey="email"
+					header="E-Mail"
+					minWidth="20rem">
+					<m:Link text="{email}" href="mailto:{email}"/>
+					<mdct:extendedSettings>
+						<mdct:ResponsiveColumnSettings importance="Low" />
+					</mdct:extendedSettings>
+				</mdct:Column>
+			</mdc:Table>
+		</m:Page>
+
+	</m:App>
+</mvc:View>

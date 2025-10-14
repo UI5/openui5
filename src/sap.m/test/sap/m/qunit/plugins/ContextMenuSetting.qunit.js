@@ -211,7 +211,13 @@ sap.ui.define([
 		this.checkNoStyleClassOnItems(assert);
 	});
 
-	QUnit.test("Scope Selection", function(assert) {
+	QUnit.test("Scope Selection", async function(assert) {
+		this.oTable.getColumns().forEach(function(oCol) {
+			oCol.setDemandPopin(true);
+			oCol.setMinScreenWidth("48000px");
+		});
+		await nextUIUpdate();
+
 		this.oTable.addDependent(new ContextMenuSetting({scope: "Selection"}));
 		this.oTable.getItems()[0].setSelected(true);
 		this.oTable.getItems()[2].setSelected(true);
@@ -234,8 +240,12 @@ sap.ui.define([
 		this.oTable.getItems().forEach((oListItem) => {
 			if (oListItem.getId() === oItem.getId()) {
 				assert.notOk(oListItem.hasStyleClass("sapMContextMenuSettingContentOpacity"), "Clicked Item does not have style class for opacity");
+				assert.ok(oListItem.getPopin && (oListItem.getPopin() !== undefined), "Popin exists");
+				assert.equal(getComputedStyle(oListItem.getPopin().getDomRef()).opacity, getComputedStyle(oListItem.getDomRef()).opacity, "ListItem and Popin area of selected item do have same opacity");
 			} else {
 				assert.ok(oListItem.hasStyleClass("sapMContextMenuSettingContentOpacity"), "Other Item have style class for opacity");
+				assert.ok(oListItem.getPopin && oListItem.getPopin(), "Popin exists");
+				assert.equal(getComputedStyle(oListItem.getPopin().getDomRef()).opacity, getComputedStyle(oListItem.getDomRef()).opacity, "ListItem and Popin area of non-selected item do have same opacity");
 			}
 		});
 

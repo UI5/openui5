@@ -28,7 +28,7 @@ sap.ui.define([
 			UIComponent.getRouterFor(this).getRoute("authordetails").attachPatternMatched(this._onRouteMatched, this);
 
 			// fake own delegate implementation
-			MultiValueFieldDelegate.updateItems = function(oPayload, aConditions, oMultiValueField) {
+			MultiValueFieldDelegate.updateItemsFromConditions = function(oMultiValueField, aConditions) {
 
 				var oListBinding = oMultiValueField.getBinding("items");
 

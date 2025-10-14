@@ -229,6 +229,20 @@ sap.ui.define([
 		afterEach: teardownFunction
 	});
 
+	QUnit.test("Avatar with null src should not call onImageError", async function (assert) {
+		var oOnImageErrorSpy = this.spy(this.oAvatar, "_onImageError"),
+			done = assert.async();
+
+		assert.expect(1);
+		this.oAvatar.setSrc(null);
+		await nextUIUpdate();
+
+		setTimeout(function() {
+			assert.ok(oOnImageErrorSpy.notCalled, "onImageError should not be called");
+			done();
+		}, 100);
+	});
+
 	QUnit.test("Avatar with src leading to an icon", async function (assert) {
 		this.oAvatar.setSrc(sIconPath);
 		await nextUIUpdate();

@@ -1,0 +1,5 @@
+{
+    "name": "AI Integration",
+    "external": true,
+    "externalResourceRef": "https://github.com/SAP-samples/ai-seamless-integration/archive/refs/heads/main.zip"
+}

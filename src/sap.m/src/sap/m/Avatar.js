@@ -320,6 +320,7 @@ sap.ui.define([
 	Avatar.prototype.onBeforeRendering = function () {
 		if (this._getImageCustomData() && !this._iCacheBustingValue) {
 			this._setNewCacheBustingValue();
+			this._loadImage(this._getAvatarSrc());
 		}
 		// determine the actual display type of the avatar before rendering
 		this._setActualDisplayType();
@@ -342,7 +343,7 @@ sap.ui.define([
 
 		this.setProperty("src", sSrc);
 		this._handleDetailBoxPress(bIsIconURI, oLightBox);
-		this._loadImage(sSrc);
+		this._loadImage(this._getAvatarSrc());
 
 		return this;
 	};
@@ -585,7 +586,7 @@ sap.ui.define([
 	 * @private
 	 */
 	Avatar.prototype._loadImage = function (sSrc) {
-		if (IconPool.isIconURI(sSrc)) {
+		if (!sSrc || IconPool.isIconURI(sSrc)) {
 			return;
 		}
 
@@ -1076,6 +1077,7 @@ sap.ui.define([
 	 */
 	Avatar.prototype.refreshAvatarCacheBusting = function () {
 		this._setNewCacheBustingValue();
+		this._loadImage(this._getAvatarSrc());
 		this.invalidate();
 	};
 

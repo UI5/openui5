@@ -1,0 +1,26 @@
+<mvc:View
+    controllerName="sap.m.sample.SegmentedButton.Page"
+	height="100%"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m">
+	<Page
+		showHeader="false"
+		class="sapUiContentPadding">
+			<SegmentedButton contentMode="ContentFit">
+				<items>
+					<SegmentedButtonItem text="This is a very large text for demonstration purposes" />
+					<SegmentedButtonItem text="Medium text" />
+					<SegmentedButtonItem text="Small" />
+					<SegmentedButtonItem icon="sap-icon://lab" />
+				</items>
+			</SegmentedButton>
+			<SegmentedButton contentMode="EqualSized">
+				<items>
+					<SegmentedButtonItem text="This is a very large text for demonstration purposes" />
+					<SegmentedButtonItem text="Medium text" />
+					<SegmentedButtonItem text="Small" />
+					<SegmentedButtonItem icon="sap-icon://lab" />
+				</items>
+			</SegmentedButton>
+	</Page>
+</mvc:View>

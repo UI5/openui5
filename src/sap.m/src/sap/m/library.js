@@ -3763,6 +3763,28 @@ sap.ui.define([
 	 };
 
 	 /**
+	  * Different SegmentedButton items sizing modes.
+	  * @public
+	  * @enum {string}
+	 */
+	 thisLib.SegmentedButtonContentMode = {
+
+		 /**
+		  * Each item fits its content and extra space is placed after the last item.
+		  * @public
+		  * @since 1.42
+		 */
+		 ContentFit: "ContentFit",
+
+		 /**
+		  * All items are sized equally to fill the available space.
+		  * @public
+		  * @since 1.42
+		 */
+		 EqualSized: "EqualSized"
+	 };
+
+	 /**
 	  * The option keys of all the standard options of a DynamicDateRange control.
 	  *
 	  * @public
@@ -6241,6 +6263,7 @@ sap.ui.define([
 	 DataType.registerEnum("sap.m.QuickViewGroupElementType", thisLib.QuickViewGroupElementType);
 	 DataType.registerEnum("sap.m.RatingIndicatorVisualMode", thisLib.RatingIndicatorVisualMode);
 	 DataType.registerEnum("sap.m.ReactiveAreaMode", thisLib.ReactiveAreaMode);
+	 DataType.registerEnum("sap.m.SegmentedButtonContentMode", thisLib.SegmentedButtonContentMode);
 	 DataType.registerEnum("sap.m.ScreenSize", thisLib.ScreenSize);
 	 DataType.registerEnum("sap.m.CarouselScrollMode", thisLib.CarouselScrollMode);
 	 DataType.registerEnum("sap.m.SelectColumnRatio", thisLib.SelectColumnRatio);

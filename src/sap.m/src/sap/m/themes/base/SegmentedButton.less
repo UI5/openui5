@@ -9,11 +9,19 @@
 	-webkit-tap-highlight-color: rgba(255, 255, 255, 0);
 	border: none;
 	white-space: nowrap;
-	display: inline-block;
 	box-sizing: border-box;
 	height: 3rem;
 	vertical-align: top;
 	position: relative;
+}
+
+.sapMSegBEqualSized {
+	display: inline-block;
+}
+
+.sapMSegBContentFit {
+	display: inline-flex;
+	width: 100%;
 }
 
 .sapMSegB:focus {
@@ -26,6 +34,18 @@
 	display: inline-block;
 	padding: 0.250rem 0;
 	outline: none;
+}
+
+.sapMSegBContentFit .sapMSegBBtn {
+	overflow: hidden;
+}
+
+.sapMSegBContentFit .sapMSegBBtn:first-child .sapMSegBBtnInner {
+    padding-left: 0.5rem;
+}
+
+.sapMSegBContentFit .sapMSegBBtnIcon {
+	overflow: visible;
 }
 
 .sapMSegB .sapMSegBBtn {

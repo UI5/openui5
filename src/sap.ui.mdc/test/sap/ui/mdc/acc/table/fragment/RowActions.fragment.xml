@@ -1,0 +1,25 @@
+<core:FragmentDefinition 
+	xmlns="sap.m"
+	xmlns:mdct="sap.ui.mdc.table"
+	xmlns:core="sap.ui.core">
+	<mdct:RowActionItem
+		type="Navigation"
+		text="Details"
+		press=".onRowDetailsPress"
+		visible="{tableConfig>/showRowActions}"/>
+	<mdct:RowActionItem
+		icon="sap-icon://edit"
+		text="Edit Position"
+		press=".onRowActionPress"
+		visible="{= ${position} !== 'CEO' }"/>
+	<mdct:RowActionItem
+		icon="sap-icon://line-chart"
+		text="Analyze"
+		press=".onRowActionPress"
+		visible="{tableConfig>/showRowActions}"/>
+	<mdct:RowActionItem
+		icon="sap-icon://map-2"
+		text="Relocate"
+		press=".onRowActionPress"
+		visible="{= ${location} === 'Regional Office' }"/>
+</core:FragmentDefinition>

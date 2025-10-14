@@ -116,6 +116,7 @@
 						multiple="true"
 						beforeUploadStarts="onBeforeUploadStarts"
 						itemRenamed="onDocumentRenamedSuccess"
+						itemRenameCanceled="onDocumentRenameCancel"
 						uploadCompleted="onUploadCompleted"
 						onActivated="onPluginActivated"
 						cloudFilePickerEnabled="true"

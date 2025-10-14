@@ -154,6 +154,10 @@ sap.ui.define([
 			// Toast for sucessful rename.
 			MessageToast.show("Document Renamed.", {duration: 2000});
 		},
+		onDocumentRenameCancel: function(oEvent) {
+			// Toast for sucessful rename.
+			MessageToast.show("Document Rename Cancelled.", {duration: 2000});
+		},
 		openAddOrEditDialog: function () {
 			if (!this._addViaUrlFragment){
 				Fragment.load({

@@ -37,6 +37,7 @@ function(
 
 	// lazy dependency to sap/m/Image
 	var Image;
+	var SegmentedButtonContentMode = library.SegmentedButtonContentMode;
 
 	/**
 	 * Constructor for a new <code>SegmentedButton</code>.
@@ -79,6 +80,7 @@ function(
 
 				/**
 				 * Defines the width of the SegmentedButton control. If not set, it uses the minimum required width to make all buttons inside of the same size (based on the biggest button).
+				 * <b>Note:</b> This property functions only when the {@link sap.m.SegmentedButton#getContentMode contentMode} is set to EqualSized.
 				 *
 				 */
 				width : {type : "sap.ui.core.CSSSize", group : "Misc", defaultValue : null},
@@ -92,7 +94,19 @@ function(
 				 * Key of the selected item. If no item to this key is found in the items aggregation, no changes will apply. Only the items aggregation is affected. If duplicate keys exist, the first item matching the key is used.
 				 * @since 1.28.0
 				 */
-				selectedKey: { type: "string", group: "Data", defaultValue: "", bindable: "bindable" }
+				selectedKey: { type: "string", group: "Data", defaultValue: "", bindable: "bindable" },
+
+				/**
+				 * Defines how the content of the SegmentedButton is sized.
+				 * Possible values:
+				 * <ul>
+				 *	<li><strong>ContentFit</strong>: Each button is sized according to its content.</li>
+				 *	<li><strong>EqualSized</strong>: All buttons have equal width, regardless of their content.</li>
+				 * </ul>
+				 * @public
+				 * @since 1.42.0
+				 */
+				contentMode: {type: "sap.m.SegmentedButtonContentMode", group: "Appearance", defaultValue: SegmentedButtonContentMode.EqualSized}
 			},
 
 			aggregations : {
@@ -377,19 +391,20 @@ function(
 	SegmentedButton.prototype._updateWidth = function () {
 		// If this method is called before the dom is rendered or sapUiSegmentedButtonNoAutoWidth style class is applied
 		// we skip width calculations
-		if (this.$().length === 0 || this.hasStyleClass("sapMSegmentedButtonNoAutoWidth")) {
+		const sContentMode = this.getContentMode();
+		if (this.$().length === 0 || this.hasStyleClass("sapMSegmentedButtonNoAutoWidth") || sContentMode === SegmentedButtonContentMode.ContentFit) {
 			return;
 		}
 
-		var sControlWidth = this.getWidth(),
+		const sControlWidth = this.getWidth(),
 			aButtons = this._getVisibleButtons(),
 			iButtonsCount = aButtons.length,
 			iMaxWidth = (this._aWidths.length > 0) ? Math.max.apply(Math, this._aWidths) : 0,
 			iButtonWidthPercent = (100 / iButtonsCount),
 			iParentWidth = this.$().parent().innerWidth(),
-			sWidth = this._getButtonWidth(aButtons),
-			iCurrentWidth,
-			oButton,
+			sWidth = this._getButtonWidth(aButtons);
+
+		let oButton,
 			i;
 
 		if (!sControlWidth) {
@@ -417,7 +432,7 @@ function(
 			}
 		}
 
-		iCurrentWidth = Math.floor(this.getDomRef().getBoundingClientRect().width);
+		const iCurrentWidth = Math.floor(this.getDomRef().getBoundingClientRect().width);
 
 		if (this._previousWidth !== undefined && iCurrentWidth !== this._previousWidth && !this._bInOverflow) {
 			this.fireEvent("_containerWidthChanged");

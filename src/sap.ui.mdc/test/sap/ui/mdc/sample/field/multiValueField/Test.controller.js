@@ -49,7 +49,7 @@ sap.ui.define([
 			oView.setModel(oViewModel, "view");
 
 			// fake own delegate implementation
-			MultiValueFieldDelegate.updateItems = function(oPayload, aConditions, oMultiValueField) {
+			MultiValueFieldDelegate.updateItemsFromConditions = function(oMultiValueField, aConditions) {
 
 				var oListBinding = oMultiValueField.getBinding("items");
 
@@ -103,8 +103,7 @@ sap.ui.define([
 
 			};
 
-			MultiValueFieldODataV2Delegate.updateItems = MultiValueFieldDelegate.updateItems;
-
+			MultiValueFieldODataV2Delegate.updateItemsFromConditions = MultiValueFieldDelegate.updateItemsFromConditions;
 		},
 
 		handleChange: function(oEvent) {

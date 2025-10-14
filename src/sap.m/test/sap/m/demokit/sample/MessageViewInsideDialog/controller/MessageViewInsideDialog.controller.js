@@ -85,6 +85,7 @@ sap.ui.define([
 				showDetailsPageHeader: false,
 				itemSelect: function () {
 					oBackButton.setVisible(true);
+					that.oDialogTitle.setText("Message Details");
 				},
 				items: {
 					path: "/",
@@ -101,12 +102,18 @@ sap.ui.define([
 					press: function () {
 						that.oMessageView.navigateBack();
 						this.setVisible(false);
+						that.oDialogTitle.setText("Messages");
 					}
 				});
 
 
 
 			this.oMessageView.setModel(oModel);
+
+			this.oDialogTitle = new Title({
+				text: "Messages",
+				level: TitleLevel.H1
+			});
 
 			this.oDialog = new Dialog({
 				resizable: true,
@@ -121,10 +128,7 @@ sap.ui.define([
 				customHeader: new Bar({
 					contentLeft: [oBackButton],
 					contentMiddle: [
-						new Title({
-							text: "Messages",
-							level: TitleLevel.H1
-						})
+						this.oDialogTitle
 					]
 				}),
 				contentHeight: "50%",

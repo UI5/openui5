@@ -2207,4 +2207,73 @@ sap.ui.define([
 
 		oTokenizer.destroy();
 	});
+
+	QUnit.module("MultiLine & Clear All", {
+		beforeEach: async function () {
+			this.oTokenizer = new Tokenizer({
+				width: "320px",
+				multiLine: true,
+				showClearAll: true
+			});
+			this.oTokenizer.addToken(new Token({ text: "Bulgaria" }));
+			this.oTokenizer.addToken(new Token({ text: "Argentina" }));
+			this.oTokenizer.addToken(new Token({ text: "Brazil" }));
+			this.oTokenizer.addToken(new Token({ text: "Italy" }));
+			this.oTokenizer.addToken(new Token({ text: "Canada" }));
+			this.oTokenizer.addToken(new Token({ text: "Denmark" }));
+			this.oTokenizer.addToken(new Token({ text: "Denmark" }));
+			this.oTokenizer.addToken(new Token({ text: "Ireland" }));
+			this.oTokenizer.addToken(new Token({ text: "Norway" }));
+			this.oTokenizer.addToken(new Token({ text: "Latvia" }));
+			this.oTokenizer.addToken(new Token({ text: "Korea" }));
+			this.oTokenizer.placeAt("content");
+			await nextUIUpdate();
+		},
+		afterEach: function () {
+			this.oTokenizer.destroy();
+		}
+	});
+
+	QUnit.test("renders multi-line container and classes when multiLine is enabled", function (assert) {
+		assert.ok(this.oTokenizer.$().hasClass("sapMTokenizerMultiLine"), "Tokenizer has sapMTokenizerMultiLine class");
+	});
+
+	QUnit.test("renders clear-all button when multiLine and showClearAll is true", function (assert) {
+		const oClearAllButton = this.oTokenizer.$().find(".sapMTokenizerClearAll")[0];
+		assert.ok(oClearAllButton, true, "Clear All button is added.");
+		assert.strictEqual(oClearAllButton.innerHTML, oRb.getText("TOKENIZER_CLEAR_ALL"), "Clear All text is correct.");
+	});
+
+	QUnit.test("Clear All click fires tokenDelete", async function (assert) {
+		const oTokenDeleteSpy = this.spy(this.oTokenizer, "fireTokenDelete");
+		const oClearAllButton = this.oTokenizer.$().find(".sapMTokenizerClearAll")[0];
+		const iTokensNum = this.oTokenizer.getTokens().length;
+
+		qutils.triggerEvent("click", oClearAllButton);
+		await nextUIUpdate();
+
+		assert.strictEqual(oTokenDeleteSpy.called, true, "Token Delete event should be called once");
+		const oCall = oTokenDeleteSpy.getCalls()[0];
+
+		assert.equal(oCall.args[0].tokens.length, iTokensNum, "All tokens were removed");
+	});
+
+	QUnit.test("Click on truncated token in multi-line opens popup and sets opener", async function (assert) {
+		const oLongToken = new Token({ text: "Mexico Mexico Mexico Mexico Mexico Mexico Mexico Mexico Mexico Mexico Mexico Mexico Mexico" });
+		this.oTokenizer.addToken(oLongToken);
+		await nextUIUpdate();
+		this.oTokenizer._adjustTokensVisibility();
+		await nextUIUpdate();
+
+		const oToggleSpy = this.spy(this.oTokenizer, "_togglePopup");
+		const oLongTokenDomRef = oLongToken.getDomRef();
+
+		assert.ok(oLongTokenDomRef.classList.contains("sapMTokenTruncated"), "Token marked truncated");
+
+		qutils.triggerEvent("click", oLongTokenDomRef);
+		await nextUIUpdate();
+
+		assert.strictEqual(document.getElementById(this.oTokenizer.getProperty("opener")), oLongTokenDomRef, "Opener set to token id");
+		assert.ok(oToggleSpy.calledOnce, "_togglePopup called once");
+	});
 });
