@@ -26,10 +26,11 @@
     "@ui5/webcomponents-icons-tnt": "2.15.0",
     "@ui5/cli": "4.0.30",
     "fs-extra": "11.3.2",
-    "ui5-tooling-modules": "3.32.2"
+    "ui5-tooling-modules": "3.33.0"
   },
   "scripts": {
-    "pregenerate-webcomponents": "node -e \"const fsx = require('fs-extra'); fsx.emptyDirSync('src/sap/f/gen'); fsx.emptyDirSync('src/sap/f/thirdparty');\"",
-    "generate-webcomponents": "ui5 build --dest ./src/sap/f --output-style flat --config ui5-build.yaml --exclude-task \\* --include-task ui5-tooling-modules-task"
+    "build-webcomponents": "ui5 build --dest ./src/sap/f --output-style flat --config ui5-build.yaml --exclude-task \\* --include-task ui5-tooling-modules-task",
+    "clean-webcomponents": "node -e \"const fsx = require('fs-extra'); fsx.emptyDirSync('src/sap/f/gen'); fsx.emptyDirSync('src/sap/f/thirdparty');\"",
+    "generate-webcomponents": "npm run clean-webcomponents && npm run build-webcomponents"
   }
 }

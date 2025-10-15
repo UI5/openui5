@@ -346,6 +346,14 @@ sap.ui.define([
 					propertyInfo: GenericTestCollection.ExcludeReason.SetterNeedsSpecificSettings
 				}
 			},
+            "sap.ui.mdc.Geomap": {
+                properties: {
+                    delegate: GenericTestCollection.ExcludeReason.NotChangeableAfterInit,
+                    sortConditions: GenericTestCollection.ExcludeReason.SetterNeedsSpecificSettings,
+                    filterConditions: GenericTestCollection.ExcludeReason.SetterNeedsSpecificSettings,
+                    propertyInfo: GenericTestCollection.ExcludeReason.SetterNeedsSpecificSettings
+                }
+            },
 			"sap.ui.mdc.table.ColumnHeaderLabel": {
 				moduleName: "sap/ui/mdc/table/Column"
 			}

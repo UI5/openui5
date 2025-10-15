@@ -9,10 +9,11 @@ sap.ui.define([
 	'./BindingMode',
 	'./Context',
 	'./Filter',
+	"sap/base/Log",
 	"sap/base/util/deepEqual",
 	"sap/base/util/each"
 ],
-	function(MessageProcessor, ManagedObjectBindingSupport, BindingMode, Context, Filter, deepEqual,
+	function(MessageProcessor, ManagedObjectBindingSupport, BindingMode, Context, Filter, Log, deepEqual,
 		each) {
 		"use strict";
 
@@ -88,6 +89,12 @@ sap.ui.define([
 				this.mUnsupportedFilterOperators = {};
 				// the id of the timeout for calling #checkUpdate
 				this.sUpdateTimer = null;
+				// the number of consecutive synchronous calls to #setProperty
+				this.iSyncSetPropertyCalls = 0;
+				// the overall number of bindings affected by consecutive sync #setProperty calls
+				this.iUpdatedBindings = 0;
+				// the id of timeout for performance check in #setProperty
+				this.iTimeoutId = undefined;
 			},
 
 			metadata : {
@@ -938,6 +945,9 @@ sap.ui.define([
 		 *   bindings
 		 * @param {boolean} [bAsync=false]
 		 *   Whether this function is called in a new task via <code>setTimeout</code>
+		 * @returns {number|undefined}
+		 *   The number of bindings which were checked synchronously for updates; 0 if <code>bAsync</code> is set.
+		 *   Subclasses overwriting this method may also return <code>undefined</code>.
 		 *
 		 * @private
 		 */
@@ -949,7 +959,7 @@ sap.ui.define([
 						this.checkUpdate(this.bForceUpdate);
 					}.bind(this), 0);
 				}
-				return;
+				return 0;
 			}
 			bForceUpdate = this.bForceUpdate || bForceUpdate;
 			if (this.sUpdateTimer) {
@@ -961,6 +971,45 @@ sap.ui.define([
 			each(aBindings, function(iIndex, oBinding) {
 				oBinding.checkUpdate(bForceUpdate);
 			});
+
+			return aBindings.length;
+		};
+
+		/**
+		 * Checks if the sum of bindings updated by consecutive synchronous calls exceeds the threshold of 100,000 and log
+		 * a warning in this case if there is more than one synchronous call. Does nothing if called with bAsyncUpdate=true.
+		 *
+		 * @param {number} iUpdatedBindings The number of synchronously updated bindings
+		 * @param {boolean} [bAsyncUpdate] Whether the bindings are updated asynchronously
+		 *
+		 * @private
+		 */
+		Model.prototype.checkPerformanceOfUpdate = function (iUpdatedBindings, bAsyncUpdate) {
+			if (bAsyncUpdate) {
+				return;
+			}
+
+			this.iSyncSetPropertyCalls += 1;
+			this.iUpdatedBindings += iUpdatedBindings;
+			if (this.iTimeoutId) {
+				return;
+			}
+
+			const fnCheck = () => {
+				if (this.iSyncSetPropertyCalls > 1 && this.iUpdatedBindings > 100000) {
+					const sModelName = this.getMetadata().getName();
+					Log.warning(`Performance issue: ${this.iUpdatedBindings} (more than 100000) bindings are affected by `
+						+ `${this.iSyncSetPropertyCalls} consecutive synchronous calls to `
+						+ `${sModelName.slice(sModelName.lastIndexOf(".") + 1)}#setProperty; `
+						+ `see API documentation for details`,
+					undefined, sModelName);
+				}
+				this.iTimeoutId = undefined;
+				this.iSyncSetPropertyCalls = 0;
+				this.iUpdatedBindings = 0;
+			};
+
+			this.iTimeoutId = setTimeout(fnCheck, 0);
 		};
 
 		/**

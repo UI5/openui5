@@ -1,6 +1,7 @@
 /*global QUnit, sinon */
 sap.ui.define([
 	"./data/JSONModelFakeService",
+	"sap/base/Log",
 	"sap/m/Label",
 	"sap/m/List",
 	"sap/m/StandardListItem",
@@ -9,8 +10,10 @@ sap.ui.define([
 	"sap/ui/model/Context",
 	"sap/ui/model/json/JSONModel",
 	"sap/ui/thirdparty/jquery"
-], function (fakeService, Label, List, ListItem, UI5Date, VerticalLayout, Context, JSONModel, jQuery) {
+], function (fakeService, Log, Label, List, ListItem, UI5Date, VerticalLayout, Context, JSONModel, jQuery) {
 	"use strict";
+
+	const sClassName = "sap.ui.model.json.JSONModel";
 
 	QUnit.module("sap.ui.model.json.JSONModel", {
 		afterEach: function () {
@@ -263,6 +266,40 @@ sap.ui.define([
 		// modify model value
 		oModel.setProperty("1/firstName", "Petri", oLabel.getBindingContext());
 		assert.equal(oLabel.getText(), "Petri", "new text value from model");
+	});
+
+	QUnit.test("setProperty calls checkPerformanceOfUpdate", function (assert) {
+		const oModel = new JSONModel({foo: 0});
+
+		this.mock(oModel).expects("checkUpdate").withExactArgs(false, "~bAsyncUpdate").returns("~iUpdatedBindings");
+		this.mock(oModel).expects("checkPerformanceOfUpdate").withExactArgs("~iUpdatedBindings", "~bAsyncUpdate");
+
+		// code under test
+		oModel.setProperty("/foo", 1, /*oContext*/ null, "~bAsyncUpdate");
+
+		// code under test - no call for non-existing path
+		oModel.setProperty("/doesNotExist/bar", 123, /*oContext*/ null, "~bAsyncUpdate2");
+	});
+
+	QUnit.test("checkPerformanceOfUpdate", async function (assert) {
+		const oModel = new JSONModel();
+		const oLogMock = this.mock(Log);
+
+		const waitForLog = () => {
+			const {promise: oWaitForLog, resolve: fnResolve} = Promise.withResolvers();
+			setTimeout(fnResolve, 0); // wait for warning logged in setTimeout after last setProperty call
+			return oWaitForLog;
+		};
+
+		oLogMock.expects("warning").withExactArgs("Performance issue: 100004 (more than 100000) bindings are affected "
+				+ "by 2 consecutive synchronous calls to JSONModel#setProperty; see API documentation for details",
+			undefined, sClassName);
+
+		// code under test - more than 100,000 bindings affected => warning with updated counters
+		oModel.checkPerformanceOfUpdate(50002);
+		oModel.checkPerformanceOfUpdate(50002);
+
+		await waitForLog();
 	});
 
 	QUnit.test("test model setProperty onlabel with bindingContext and absolute path", function(assert) {

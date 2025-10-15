@@ -140,13 +140,101 @@
 					</tbody>
 				</table>
 			</div>
+
+			<h3 id="dateTimeWithTimezone">dateTimeWithTimezone</h3>
+			<p><code>format.dateTimeWithTimezone(date, options?, timezone?, locale?)</code></p>
+			<div class="tableWrapper">
+				<table>
+					<tbody>
+						<tr>
+							<th>Param</th>
+							<th>Type</th>
+							<th>Required</th>
+							<th>Description</th>
+							<th>Since</th>
+						</tr>
+						<tr>
+							<td>date</td>
+							<td>string|integer|Date|Array&lt;string|integer|Date&gt;</td>
+							<td>Yes</td>
+
+<!--
+							The date to be formatted. Starting with version 1.109, an array of dates can be used for options requiring multiple
+							dates, such as for interval settings. Each date in the array can be provided in various forms:
+
+							A date string that is compatible with the Date.parse() method.
+							An integer representing the number of milliseconds since January 1, 1970, 00:00:00 UTC.
+							A Date object instance.
+							In essence, you can use any valid single parameter of the JavaScript Date constructor. For more information, see <a
+								href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/Date"
+								rel="noopener noreferrer" target="_blank">Date() constructor</a>. -->
+							<td>
+								The date to be formatted.
+								Starting with version 1.109, an array of dates can be used for options requiring multiple
+								dates, such as for <code>interval</code> settings.
+								<br>
+								Each date in the array can be provided in various forms:
+								<ul>
+									<li>A date string that is compatible with the
+										<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/parse" rel="noopener noreferrer" target="_blank">Date.parse()</a> method.
+									</li>
+									<li>An integer representing the number of milliseconds since January 1, 1970, 00:00:00 UTC.
+									</li>
+									<li>A <code>Date</code> object instance.
+									</li>
+								</ul> In essence, you can use any valid single parameter of the JavaScript Date constructor. For more information, see <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/Date" rel="noopener noreferrer" target="_blank">Date() constructor</a>.
+							</td>
+							<td>1.143</td>
+
+						</tr>
+						<tr>
+							<td>options</td>
+							<td>object</td>
+							<td>No</td>
+							<td><a data-demokit-href="#/api/sap.ui.core.format.DateFormat/methods/sap.ui.core.format.DateFormat.getDateTimeWithTimezoneInstance" target="_blank">Formatting options.</a></td>
+							<td>1.143</td>
+						</tr>
+						<tr>
+							<td>timezone</td>
+							<td>string</td>
+							<td>No</td>
+							<td>The IANA timezone ID in which the date will be calculated and formatted e.g. "America/New_York". If the parameter is
+							omitted, null or an empty string, the timezone will be taken from <a data-demokit-href="#/api/sap.base.i18n.Localization/methods/sap.base.i18n.format.Localization.getTimezone" target="_blank">Localization.getTimezone.</a>  For an invalid IANA time
+							zone ID, an empty string will be returned.</td>
+							<td>1.143</td>
+						</tr>
+						<tr>
+							<td>locale</td>
+							<td>string</td>
+							<td>No</td>
+							<td>A string representing the locale code. If no locale is given the current user locale is used.</td>
+							<td>1.143</td>
+						</tr>
+					</tbody>
+					<tbody>
+						<tr>
+							<th>Returns</th>
+							<th></th>
+							<th></th>
+							<th></th>
+							<th></th>
+						</tr>
+						<tr>
+							<td></td>
+							<td>string</td>
+							<td></td>
+							<td>The formatted date and time with timezone.</td>
+							<td>1.143</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
 			<p>
-				The <code>options</code> and <code>locale</code> parameters are optional and can be omitted. If only
-				<code>options</code> is omitted the <code>locale</code> will be shifted in its place.
+				The <code>options</code>, <code>timezone</code> and <code>locale</code> parameters are optional and can be omitted. If any of these parameters are not provided, the subsequent ones will self-adjust to replace the missing one/s.
 			</p>
 			<p>
 				The <code>date</code> parameter can come from different places including
-				<code>{parameters>/TODAY_ISO}}</code>, <code>{parameters>/NOW_ISO}}</code>,
+				<code>{parameters>/TODAY_ISO}</code>, <code>{parameters>/NOW_ISO}</code>,
 				data binding, <code>Date.now()</code> and many more.
 			</p>
 

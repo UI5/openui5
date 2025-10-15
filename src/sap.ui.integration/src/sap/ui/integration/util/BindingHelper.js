@@ -66,6 +66,7 @@ sap.ui.define([
 	var mFormatters = {
 		date: DateTimeFormatter.date,
 		dateTime: DateTimeFormatter.dateTime,
+		dateTimeWithTimezone: DateTimeFormatter.dateTimeWithTimezone,
 		currency: NumberFormatter.currency,
 		"float": NumberFormatter.float,
 		integer: NumberFormatter.integer,

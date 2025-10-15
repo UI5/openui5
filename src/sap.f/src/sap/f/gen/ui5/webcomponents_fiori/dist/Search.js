@@ -114,13 +114,11 @@ sap.ui.define(
           aggregations: {
             /**
              * Defines the Search suggestion items.
-             *
              * @type module:sap/ui/core/webc/WebComponent
              */
             items: { type: "sap.ui.core.webc.WebComponent", multiple: true },
             /**
              * Defines the popup footer action button.
-             *
              * @type module:sap/f/gen/ui5/webcomponents/dist/Button
              */
             action: {
@@ -130,7 +128,6 @@ sap.ui.define(
             },
             /**
              * Defines the illustrated message to be shown in the popup.
-             *
              * @type module:sap/f/gen/ui5/webcomponents_fiori/dist/IllustratedMessage
              */
             illustration: {
@@ -140,7 +137,6 @@ sap.ui.define(
             },
             /**
              * Defines the illustrated message to be shown in the popup.
-             *
              * @type module:sap/f/gen/ui5/webcomponents_fiori/dist/SearchMessageArea
              */
             messageArea: {
@@ -150,7 +146,6 @@ sap.ui.define(
             },
             /**
              * Defines the component scope options.
-             *
              * @type module:sap/f/gen/ui5/webcomponents_fiori.ISearchScope
              */
             scopes: {
@@ -163,7 +158,6 @@ sap.ui.define(
              * This slot is intended for passing a `ui5-button` with a filter icon to provide extended filtering options.
              *
              * **Note:** Scope button and Filter button are mutually exclusive.
-             *
              * @type module:sap/f/gen/ui5/webcomponents/dist/Button
              */
             filterButton: {

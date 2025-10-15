@@ -5,6 +5,7 @@
 sap.ui.define([
 	"../../TableDelegate",
 	"../../table/ODataV4PropertyHelper",
+	"sap/ui/table/Table",
 	"sap/ui/mdc/enums/TableP13nMode",
 	"sap/ui/mdc/enums/TableType",
 	"sap/ui/mdc/enums/TableSelectionMode",
@@ -17,6 +18,7 @@ sap.ui.define([
 ], (
 	TableDelegate,
 	ODataV4PropertyHelper,
+	Table,
 	P13nMode,
 	TableType,
 	SelectionMode,
@@ -328,6 +330,21 @@ sap.ui.define([
 				oRootBinding.resume();
 			}
 		}
+	};
+
+	/**
+	 * @inheritDoc
+	 */
+	Delegate.rebind = function(oTable, oBindingInfo) {
+		Table._addBindingListener(oBindingInfo, "createActivate", () => {
+			Promise.resolve().then(() => { // The count is updated after the event is fired
+				oTable._updateRowCountForHeader();
+			});
+		});
+		Table._addBindingListener(oBindingInfo, "createCompleted", () => {
+			oTable._updateRowCountForHeader();
+		});
+		TableDelegate.rebind.apply(this, arguments);
 	};
 
 	Delegate.fetchExpandAndCollapseConfiguration = function(oTable) {

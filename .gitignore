@@ -45,10 +45,16 @@ web.config
 # Ignore Visual Studio Code project and settings files
 .vscode/
 
+# Ignore local caches
+.ui5-tooling-modules
+
 # Ignore yarn files
 yarn-error.log*
 yarn-debug.log*
 .yarn-integrity
+
+# Ignore UI5 tooling assets
+.ui5-tooling-modules
 
 # Ignore documentation artifacts
 src/testsuite/src/main/webapp/docs/

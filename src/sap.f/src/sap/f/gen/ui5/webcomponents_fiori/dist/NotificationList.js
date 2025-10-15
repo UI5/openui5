@@ -82,7 +82,6 @@ sap.ui.define(
           aggregations: {
             /**
              * Defines the items of the component.
-             *
              * @type module:sap/f/gen/ui5/webcomponents_fiori/dist/NotificationListItemBase
              */
             items: {

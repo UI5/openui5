@@ -13,6 +13,8 @@ sap.ui.define([
 	/*eslint max-nested-callbacks: 0*/
 	"use strict";
 
+	const sClassName = "sap.ui.model.Model";
+
 	//*********************************************************************************************
 	QUnit.module("sap.ui.model.Model", {
 		before() {
@@ -44,6 +46,10 @@ sap.ui.define([
 			{"OneWay": true, "TwoWay": true, "OneTime": true});
 		assert.deepEqual(oModel.mUnsupportedFilterOperators, {});
 		assert.strictEqual(oModel.sUpdateTimer, null);
+		assert.strictEqual(oModel.iSyncSetPropertyCalls, 0);
+		assert.strictEqual(oModel.iUpdatedBindings, 0);
+		assert.ok(oModel.hasOwnProperty("iTimeoutId"));
+		assert.strictEqual(oModel.iTimeoutId, undefined);
 	});
 
 	//*********************************************************************************************
@@ -175,13 +181,13 @@ sap.ui.define([
 		});
 
 		// code under test
-		oModel.checkUpdate(bForceUpdate0, /*bAsync*/true);
+		assert.strictEqual(oModel.checkUpdate(bForceUpdate0, /*bAsync*/true), 0, "returns 0 for async updates");
 
 		sUpdateTimer = oModel.sUpdateTimer;
 		assert.notStrictEqual(sUpdateTimer, null);
 
 		// code under test
-		oModel.checkUpdate(bForceUpdate1, /*bAsync*/true);
+		assert.strictEqual(oModel.checkUpdate(bForceUpdate1, /*bAsync*/true), 0);
 
 		assert.strictEqual(oModel.sUpdateTimer, sUpdateTimer);
 	});
@@ -207,7 +213,7 @@ sap.ui.define([
 
 		// code under test
 		oModel.sUpdateTimer = vUpdateTimer;
-		oModel.checkUpdate(bForceUpdate);
+		assert.strictEqual(oModel.checkUpdate(bForceUpdate), 1, "1 binding synchronously updated");
 
 		assert.strictEqual(oModel.bForceUpdate, undefined);
 		assert.strictEqual(oModel.sUpdateTimer, null);
@@ -231,14 +237,14 @@ sap.ui.define([
 		oBindingMock.expects("checkUpdate").never();
 
 		// code under test
-		oModel.checkUpdate(true, true);
+		assert.strictEqual(oModel.checkUpdate(true, true), 0);
 
 		oWindowMock.expects("clearTimeout").withExactArgs(oModel.sUpdateTimer).callThrough();
 		oModelMock.expects("getBindings").withExactArgs().returns([oBinding]);
 		oBindingMock.expects("checkUpdate").withExactArgs(true);
 
 		// code under test
-		oModel.checkUpdate();
+		assert.strictEqual(oModel.checkUpdate(), 1);
 
 		assert.strictEqual(oModel.bForceUpdate, undefined);
 		assert.strictEqual(oModel.sUpdateTimer, null);
@@ -281,5 +287,55 @@ sap.ui.define([
 		assert.throws(function () {
 			oModel.checkFilter(oFilter);
 		}, new Error("Filter instances contain an unsupported FilterOperator: EQ"));
+	});
+
+	//*********************************************************************************************
+	QUnit.test("checkPerformanceOfUpdate", async function (assert) {
+		const oModel = new Model();
+		const waitForLog = () => {
+			const {promise: oWaitForLog, resolve: fnResolve} = Promise.withResolvers();
+			setTimeout(fnResolve, 0); // wait for warning logged in setTimeout after last setProperty call
+			return oWaitForLog;
+		};
+		const oModelMetadata = oModel.getMetadata();
+		const oModelMetadataMock = this.mock(oModelMetadata);
+		const oModelMock = this.mock(oModel);
+		oModelMock.expects("getMetadata").withExactArgs().callThrough();
+		oModelMetadataMock.expects("getName").callThrough();
+		this.oLogMock.expects("warning").withExactArgs("Performance issue: 150003 (more than 100000) bindings are affected "
+				+ "by 3 consecutive synchronous calls to Model#setProperty; see API documentation for details",
+			undefined, sClassName);
+
+		// code under test - more than one sync call, more than 100,000 bindings affected => warning
+		oModel.checkPerformanceOfUpdate(50001, false);
+		oModel.checkPerformanceOfUpdate(50001); // test: only last sync call exceeding threshold logs a warning
+		oModel.checkPerformanceOfUpdate(999, true); // test: async updates do not count
+		oModel.checkPerformanceOfUpdate(50001);
+
+		await waitForLog();
+
+		oModelMock.expects("getMetadata").withExactArgs().callThrough();
+		oModelMetadataMock.expects("getName").callThrough();
+		this.oLogMock.expects("warning").withExactArgs("Performance issue: 100004 (more than 100000) bindings are affected "
+				+ "by 2 consecutive synchronous calls to Model#setProperty; see API documentation for details",
+			undefined, sClassName);
+
+		// code under test - more than 100,000 bindings affected => warning with updated counters
+		oModel.checkPerformanceOfUpdate(50002);
+		oModel.checkPerformanceOfUpdate(50002);
+
+		await waitForLog();
+
+		// code under test - only *one* sync call, more than 100,000 bindings affected => no warning
+		oModel.checkPerformanceOfUpdate(100003);
+
+		await waitForLog();
+
+		// code under test - only async call does not set timeout for warning check
+		oModel.checkPerformanceOfUpdate(0, true);
+
+		assert.strictEqual(oModel.iTimeoutId, undefined, "async update only: no timeout is set for warning check");
+
+		await waitForLog();
 	});
 });

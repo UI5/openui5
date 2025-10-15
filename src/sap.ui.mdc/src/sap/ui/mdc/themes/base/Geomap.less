@@ -1,0 +1,50 @@
+@_sap_ui_mdc_Chart_ToolbarDesign: ~"Transparent";
+
+.sapUiMDCGeomap {
+  background: @sapUiChartBackgroundColor;
+  border-radius: @sapUiElementBorderCornerRadius;
+  padding-bottom: 1rem;
+  display: grid;
+}
+
+.sapUiMDCGeomapTempTextOuter{
+  grid-template-rows: auto 1fr;
+}
+
+.sapUiMDCChartTempText {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.sapUiMDCGeomapGrid{
+  grid-template-rows: auto auto 1fr;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+
+.sapUiMDCGeomap .sapUiMDCGeomapBreadcrumbs {
+  margin-left: 1rem;
+  margin-top: 0.5rem;
+  max-width: 85%;
+}
+
+.sapUiMDCGeomap .sapMIBar.sapMTBHeader-CTX {
+  border-top-right-radius: @sapUiElementBorderCornerRadius;
+  border-top-left-radius: @sapUiElementBorderCornerRadius;
+}
+
+.sapUiMDCGeomap .sapUiMDCChartTempInnerText {
+  justify-content: center;
+  align-content: center;
+}
+
+.sapUiMDCSelectionButton.sapMPopover .sapMIBar.sapMSubHeader-CTX {
+  border-top-left-radius: @sapUiElementBorderCornerRadius;
+  border-top-right-radius: @sapUiElementBorderCornerRadius;;
+}
+
+.sapUiMDCGeomapInternal {
+  width: 100%;
+  padding: 1.25rem
+}

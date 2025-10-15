@@ -175,7 +175,6 @@ sap.ui.define(
           aggregations: {
             /**
              * Defines the assistant slot.
-             *
              * @type module:sap/f/gen/ui5/webcomponents.IButton
              */
             assistant: {
@@ -189,7 +188,6 @@ sap.ui.define(
              * Content placed here takes precedence over the `primaryTitle` property and the `logo` content slot.
              *
              * **Note:** The `branding` slot is in an experimental state and is a subject to change.
-             *
              * @type module:sap/f/gen/ui5/webcomponents_fiori/dist/ShellBarBranding
              */
             branding: {
@@ -202,7 +200,6 @@ sap.ui.define(
              *
              * **Note:**
              * You can use the `<ui5-shellbar-item></ui5-shellbar-item>`.
-             *
              * @type module:sap/f/gen/ui5/webcomponents_fiori/dist/ShellBarItem
              */
             items: {
@@ -215,7 +212,6 @@ sap.ui.define(
              *
              * **Note:** We recommend not using the `size` attribute of `ui5-avatar` because
              * it should have specific size by design in the context of `ui5-shellbar` profile.
-             *
              * @type module:sap/ui/core/Control
              */
             profile: {
@@ -226,7 +222,6 @@ sap.ui.define(
             /**
              * Defines the logo of the `ui5-shellbar`.
              * For example, you can use `ui5-avatar` or `img` elements as logo.
-             *
              * @type module:sap/ui/core/Control
              */
             logo: { type: "sap.ui.core.Control", multiple: true, slot: "logo" },
@@ -234,7 +229,6 @@ sap.ui.define(
              * Defines the items displayed in menu after a click on a start button.
              *
              * **Note:** You can use the  `<ui5-li></ui5-li>` and its ancestors.
-             *
              * @type module:sap/f/gen/ui5/webcomponents/dist/ListItemBase
              */
             menuItems: {
@@ -250,7 +244,6 @@ sap.ui.define(
              * Defines a `ui5-button` in the bar that will be placed in the beginning.
              * We encourage this slot to be used for a menu button.
              * It gets overstyled to match ShellBar's styling.
-             *
              * @type module:sap/f/gen/ui5/webcomponents.IButton
              */
             startButton: {
@@ -265,7 +258,6 @@ sap.ui.define(
              * Lower values will be hidden first.
              *
              * **Note:** The `content` slot is in an experimental state and is a subject to change.
-             *
              * @type module:sap/ui/core/Control
              */
             content: {
@@ -586,6 +578,7 @@ sap.ui.define(
           getters: [
             /**
              * Returns the `logo` DOM ref.
+             *
              * @private
              * @name module:sap/f/gen/ui5/webcomponents_fiori/dist/ShellBar#getLogoDomRef
              * @function
@@ -594,6 +587,7 @@ sap.ui.define(
             "logoDomRef",
             /**
              * Returns the `notifications` icon DOM ref.
+             *
              * @private
              * @name module:sap/f/gen/ui5/webcomponents_fiori/dist/ShellBar#getNotificationsDomRef
              * @function
@@ -602,6 +596,7 @@ sap.ui.define(
             "notificationsDomRef",
             /**
              * Returns the `overflow` icon DOM ref.
+             *
              * @private
              * @name module:sap/f/gen/ui5/webcomponents_fiori/dist/ShellBar#getOverflowDomRef
              * @function
@@ -610,6 +605,7 @@ sap.ui.define(
             "overflowDomRef",
             /**
              * Returns the `profile` icon DOM ref.
+             *
              * @private
              * @name module:sap/f/gen/ui5/webcomponents_fiori/dist/ShellBar#getProfileDomRef
              * @function
@@ -618,6 +614,7 @@ sap.ui.define(
             "profileDomRef",
             /**
              * Returns the `product-switch` icon DOM ref.
+             *
              * @private
              * @name module:sap/f/gen/ui5/webcomponents_fiori/dist/ShellBar#getProductSwitchDomRef
              * @function
@@ -630,6 +627,7 @@ sap.ui.define(
             /**
              * Closes the overflow area.
              * Useful to manually close the overflow after having suppressed automatic closing with preventDefault() of ShellbarItem's press event
+             *
              * @private
              * @name module:sap/f/gen/ui5/webcomponents_fiori/dist/ShellBar#closeOverflow
              * @function
@@ -638,6 +636,7 @@ sap.ui.define(
             "closeOverflow",
             /**
              * Returns the `search` icon DOM ref.
+             *
              * @private
              * @name module:sap/f/gen/ui5/webcomponents_fiori/dist/ShellBar#getSearchButtonDomRef
              * @function

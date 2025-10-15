@@ -44,7 +44,6 @@ sap.ui.define(
              *
              * **Note:** When set to `Active` or `Navigation`, the item will provide visual response upon press and hover,
              * while with type `Inactive` and `Detail` - will not.
-             *
              * @type module:sap/f/gen/ui5/webcomponents.ListItemType
              */
             type: {
@@ -79,7 +78,6 @@ sap.ui.define(
             /**
              * Defines the highlight state of the list items.
              * Available options are: `"None"` (by default), `"Positive"`, `"Critical"`, `"Information"` and `"Negative"`.
-             *
              * @type module:sap/f/gen/ui5/webcomponents.Highlight
              */
             highlight: {
@@ -98,15 +96,7 @@ sap.ui.define(
             /**
              * The text-content of the Web Component.
              */
-            text: { type: "string", mapping: "textContent" },
-            /**
-             * The 'width' of the Web Component in <code>sap.ui.core.CSSSize</code>.
-             */
-            width: { type: "sap.ui.core.CSSSize", mapping: "style" },
-            /**
-             * The 'height' of the Web Component in <code>sap.ui.core.CSSSize</code>.
-             */
-            height: { type: "sap.ui.core.CSSSize", mapping: "style" }
+            text: { type: "string", mapping: "textContent" }
           },
 
           aggregations: {
@@ -115,7 +105,6 @@ sap.ui.define(
              * **Note:** While the slot allows custom buttons, to match
              * design guidelines, please use the `ui5-button` component.
              * **Note:** When the slot is not present, a built-in delete button will be displayed.
-             *
              * @type module:sap/f/gen/ui5/webcomponents.IButton
              */
             deleteButton: {

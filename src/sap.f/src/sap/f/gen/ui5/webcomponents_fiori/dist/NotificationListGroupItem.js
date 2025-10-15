@@ -74,7 +74,6 @@ sap.ui.define(
             /**
              * Defines whether the component will have growing capability by pressing a `More` button.
              * When button is pressed `load-more` event will be fired.
-             *
              * @type module:sap/f/gen/ui5/webcomponents.NotificationListGrowingMode
              */
             growing: {
@@ -108,14 +107,21 @@ sap.ui.define(
               type: "float",
               mapping: "property",
               defaultValue: 1000
-            }
+            },
+            /**
+             * The 'width' of the Web Component in <code>sap.ui.core.CSSSize</code>.
+             */
+            width: { type: "sap.ui.core.CSSSize", mapping: "style" },
+            /**
+             * The 'height' of the Web Component in <code>sap.ui.core.CSSSize</code>.
+             */
+            height: { type: "sap.ui.core.CSSSize", mapping: "style" }
           },
 
           aggregations: {
             /**
              * Defines the items of the `ui5-li-notification-group`,
              * usually `ui5-li-notification` items.
-             *
              * @type module:sap/f/gen/ui5/webcomponents_fiori/dist/NotificationListItem
              */
             items: {

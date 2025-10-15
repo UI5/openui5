@@ -1924,6 +1924,10 @@ sap.ui.define([
 	 *   Map of changed entities
 	 * @param {boolean} bMetaModelOnly
 	 *   Whether to only update metamodel bindings
+	 * @returns {number|undefined}
+	 *   The number of bindings which were checked synchronously for updates; 0 if <code>bAsync</code> is set.
+	 *   Subclasses overwriting this method may also return <code>undefined</code>.
+	 *
 	 * @private
 	 */
 	ODataModel.prototype.checkUpdate = function(bForceUpdate, bAsync, mChangedEntities, bMetaModelOnly) {
@@ -1935,7 +1939,7 @@ sap.ui.define([
 					this.checkUpdate(this.bForceUpdate, false, this.mChangedEntities4checkUpdate);
 				}.bind(this), 0);
 			}
-			return;
+			return 0;
 		}
 		bForceUpdate = this.bForceUpdate || bForceUpdate;
 		if (this.sUpdateTimer) {
@@ -1951,6 +1955,8 @@ sap.ui.define([
 			}
 		}.bind(this));
 		this._processAfterUpdate();
+
+		return aBindings.length;
 	};
 
 	/**
@@ -2184,6 +2190,7 @@ sap.ui.define([
 	 *     or provided via <code>treeAnnotationProperties.hierarchyNodeDescendantCountFor</code></li>
 	 *   <li>The <code>"hierarchy-preorder-rank-for"</code> annotation must be present in the service metadata or
 	 *     provided via <code>treeAnnotationProperties.hierarchyPreorderRankFor</code></li>
+	 *   <li>The hierarchy maintenance is performed on the client side</li>
 	 *   </ul>
 	 * @param {sap.ui.model.odata.CountMode} [mParameters.countMode]
 	 *   Defines the count mode of this binding; if not specified, the default count mode of the
@@ -6927,7 +6934,8 @@ sap.ui.define([
 		});
 
 		mChangedEntities[sKey] = true;
-		this.checkUpdate(false, bAsyncUpdate, mChangedEntities);
+		const iUpdatedBindings = this.checkUpdate(false, bAsyncUpdate, mChangedEntities);
+		this.checkPerformanceOfUpdate(iUpdatedBindings, bAsyncUpdate);
 		return true;
 	};
 

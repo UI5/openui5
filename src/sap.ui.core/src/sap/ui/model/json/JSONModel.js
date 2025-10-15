@@ -54,6 +54,7 @@ sap.ui.define([
 	var JSONModel = ClientModel.extend("sap.ui.model.json.JSONModel", /** @lends sap.ui.model.json.JSONModel.prototype */ {
 
 		constructor : function(oData, bObserve) {
+			// init promise before ClientModel c'tor as it calls #loadData
 			this.pSequentialImportCompleted = Promise.resolve();
 			ClientModel.apply(this, arguments);
 
@@ -365,7 +366,7 @@ sap.ui.define([
 	 * @param {sap.ui.model.Context} [oContext]
 	 *   The context used to set the property
 	 * @param {boolean} [bAsyncUpdate]
-	 *   Whether to update other bindings dependent on this property asynchronously
+	 *   Whether to update bindings dependent on this property asynchronously
 	 * @return {boolean}
 	 *   <code>true</code> if the value was set correctly, and <code>false</code> if errors
 	 *   occurred, for example if the entry was not found.
@@ -394,7 +395,8 @@ sap.ui.define([
 		var oObject = this._getObject(sObjectPath);
 		if (oObject) {
 			oObject[sProperty] = oValue;
-			this.checkUpdate(false, bAsyncUpdate);
+			const iUpdatedBindings = this.checkUpdate(false, bAsyncUpdate);
+			this.checkPerformanceOfUpdate(iUpdatedBindings, bAsyncUpdate);
 			return true;
 		}
 		return false;

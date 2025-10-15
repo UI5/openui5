@@ -76,14 +76,21 @@ sap.ui.define(
             /**
              * Defines the scope of the search item
              */
-            scopeName: { type: "string", mapping: "property" }
+            scopeName: { type: "string", mapping: "property" },
+            /**
+             * The 'width' of the Web Component in <code>sap.ui.core.CSSSize</code>.
+             */
+            width: { type: "sap.ui.core.CSSSize", mapping: "style" },
+            /**
+             * The 'height' of the Web Component in <code>sap.ui.core.CSSSize</code>.
+             */
+            height: { type: "sap.ui.core.CSSSize", mapping: "style" }
           },
 
           aggregations: {
             /**
              * **Note:** While the slot allows the option of setting a custom avatar, to comply with the
              * design guidelines, use the `ui5-avatar` with size - XS.
-             *
              * @type module:sap/ui/core/Control
              */
             image: {

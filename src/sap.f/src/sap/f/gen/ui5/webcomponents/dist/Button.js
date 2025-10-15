@@ -35,8 +35,8 @@ sap.ui.define(
      * ### ES6 Module Import
      *
      * `import "sap/f/gen/ui5/webcomponents/dist/Button.js";`
-     * @implements module:sap/f/gen/ui5/webcomponents.IButton
      *
+     * @implements module:sap/f/gen/ui5/webcomponents.IButton
      * @extends sap.ui.core.webc.WebComponent
      * @constructor
      * @private
@@ -62,7 +62,6 @@ sap.ui.define(
           properties: {
             /**
              * Defines the component design.
-             *
              * @type module:sap/f/gen/ui5/webcomponents.ButtonDesign
              */
             design: {
@@ -150,7 +149,6 @@ sap.ui.define(
              * Defines whether the button has special form-related functionality.
              *
              * **Note:** This property is only applicable within the context of an HTML Form element.
-             *
              * @type module:sap/f/gen/ui5/webcomponents.ButtonType
              */
             type: {
@@ -162,7 +160,6 @@ sap.ui.define(
              * Describes the accessibility role of the button.
              *
              * **Note:** Use <code>ButtonAccessibleRole.Link</code> role only with a press handler, which performs a navigation. In all other scenarios the default button semantics are recommended.
-             *
              * @type module:sap/f/gen/ui5/webcomponents.ButtonAccessibleRole
              */
             accessibleRole: {
@@ -205,7 +202,6 @@ sap.ui.define(
           aggregations: {
             /**
              * Adds a badge to the button.
-             *
              * @type module:sap/f/gen/ui5/webcomponents/dist/ButtonBadge
              */
             badge: {

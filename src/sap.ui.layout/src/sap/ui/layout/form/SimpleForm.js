@@ -587,10 +587,6 @@ sap.ui.define([
 					oFormContainer = oParent.getParent();
 					oFormElement = oParent;
 					oLayoutData = _getFieldLayoutData.call(this, oElement);
-					if (oLayoutData && oLayoutData.isA("sap.ui.layout.ResponsiveFlowLayoutData") && false &&
-							!_isMyLayoutData.call(this, oLayoutData) && oLayoutData.getLinebreak()) {
-						oFormElement = _addFormElement.call(this, oFormContainer);
-					}
 				} else if (oParent instanceof FormContainer) {
 					oFormContainer = oParent;
 					oFormElement = _addFormElement.call(this, oFormContainer);
@@ -778,9 +774,6 @@ sap.ui.define([
 				if (aFormElements.length == 0) {
 					// FormContainer has no FormElements -> create one
 					oFormElement = _addFormElement.call(this, oFormContainer);
-				} else if (oLayoutData && oLayoutData.isA("sap.ui.layout.ResponsiveFlowLayoutData") && false &&
-									 !_isMyLayoutData.call(this, oLayoutData) && oLayoutData.getLinebreak()) {
-					oFormElement = _addFormElement.call(this, oFormContainer);
 				} else {
 					oFormElement = aFormElements[aFormElements.length - 1];
 				}
@@ -795,9 +788,6 @@ sap.ui.define([
 				if (iElementIndex == 0) {
 					// it's already the first FormElement -> insert a new one before
 					oFormElement = _insertFormElement.call(this, oFormContainer, null, 0);
-				} else if (oLayoutData && oLayoutData.isA("sap.ui.layout.ResponsiveFlowLayoutData") && false &&
-									 !_isMyLayoutData.call(this, oLayoutData) && oLayoutData.getLinebreak()) {
-					oFormElement = _insertFormElement.call(this, oFormContainer, null, iElementIndex);
 				} else {
 					aFormElements = oFormContainer.getFormElements();
 					oFormElement = aFormElements[iElementIndex - 1];
@@ -807,24 +797,7 @@ sap.ui.define([
 				// insert new field into same FormElement before old field
 				oFormElement = oOldElement.getParent();
 				iFieldIndex = oFormElement.indexOfField(oOldElement);
-				if (oLayoutData && oLayoutData.isA("sap.ui.layout.ResponsiveFlowLayoutData") && false &&
-						!_isMyLayoutData.call(this, oLayoutData) && oLayoutData.getLinebreak() && iFieldIndex > 0) {
-					// split FormElement
-					oFormContainer = oFormElement.getParent();
-					iElementIndex = oFormContainer.indexOfFormElement(oFormElement);
-					_markFormElementForUpdate(this._changedFormElements, oFormElement);
-					aFields = oFormElement.getFields();
-					oFormElement = _insertFormElement.call(this, oFormContainer, undefined, iElementIndex + 1);
-					oFormElement.addField(oElement);
-
-					// move all Fields after index into new FormElement
-					for ( i = iFieldIndex; i < aFields.length; i++) {
-						oField = aFields[i];
-						oFormElement.addField(oField);
-					}
-				} else {
-					oFormElement.insertField(oElement, iFieldIndex);
-				}
+				oFormElement.insertField(oElement, iFieldIndex);
 			}
 			_markFormElementForUpdate(this._changedFormElements, oFormElement);
 
@@ -1540,15 +1513,12 @@ sap.ui.define([
 	 * @private
 	 */
 	SimpleForm.prototype._resize = function(oEvent){
-
 		this._bChangedByMe = true;
 		if (this._iCurrentWidth == oEvent.size.width) {
 			return;
 		}
 		this._iCurrentWidth = oEvent.size.width;
-		this._applyLinebreaks();
 		this._bChangedByMe = false;
-
 	};
 
 	function _removeResize() {

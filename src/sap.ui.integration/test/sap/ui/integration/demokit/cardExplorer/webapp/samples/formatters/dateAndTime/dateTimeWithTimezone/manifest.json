@@ -1,0 +1,75 @@
+{
+	"_version": "1.59.0",
+	"sap.app": {
+		"id": "card.explorer.format.dateTime",
+		"type": "card",
+		"title": "Sample for DateTime Formatters",
+		"subTitle": "Sample for DateTime Formatters",
+		"applicationVersion": {
+			"version": "1.0.0"
+		},
+		"shortTitle": "A short title for this Card",
+		"info": "Additional information about this Card",
+		"description": "A long description for this Card",
+		"tags": {
+			"keywords": [
+				"Date",
+				"Time",
+				"Formatter",
+				"Card",
+				"Sample"
+			]
+		}
+	},
+	"sap.card": {
+		"type": "List",
+		"header": {
+			"title": "World Times",
+			"icon": {
+				"src": "sap-icon://time-account"
+			},
+			"status": {
+				"text": "5 of 5"
+			}
+		},
+		"content": {
+			"data": {
+				"json": [
+					{
+						"Name": "Berlin:",
+						"Image": "sap-icon://in-progress",
+						"Timezone": "Europe/Berlin"
+					},
+					{
+						"Name": "Sofia:",
+						"Image": "sap-icon://in-progress",
+						"Timezone": "Europe/Sofia"
+					},
+					{
+						"Name": "London:",
+						"Image": "sap-icon://in-progress",
+						"Timezone": "Europe/London"
+					},
+					{
+						"Name": "New York:",
+						"Image": "sap-icon://in-progress",
+						"Timezone": "America/New_York"
+					},
+					{
+						"Name": "Tokyo:",
+						"Image": "sap-icon://in-progress",
+						"Timezone": "Asia/Tokyo"
+					}
+				]
+			},
+			"maxItems": 5,
+			"item": {
+				"title": "{Name}",
+				"description": "{= format.dateTimeWithTimezone(Date.now(), { style: 'short', showTimezone: false, showDate: false }, ${Timezone}) }",
+				"icon": {
+					"src": "{Image}"
+				}
+			}
+		}
+	}
+}

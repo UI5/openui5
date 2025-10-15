@@ -97,6 +97,8 @@ sap.ui.define([
 					.attr("title", oResourceBundle.getText("FCL_SEPARATOR_MOVE"))
 					.attr("aria-orientation", "vertical")
 					.attr("tabindex", 0)
+					.attr("aria-valuemin", 0)
+					.attr("aria-valuemax", 100)
 					.class("sapFFCLColumnSeparator")
 					.class("sapContrastPlus")
 					.class(sClass)

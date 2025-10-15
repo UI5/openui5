@@ -1,5 +1,6 @@
 /*global QUnit, sinon */
 sap.ui.define([
+	"sap/base/Log",
 	"sap/base/util/each",
 	"sap/base/util/isEmptyObject",
 	"sap/ui/core/date/UI5Date",
@@ -23,7 +24,7 @@ sap.ui.define([
 	"sap/ui/test/utils/nextUIUpdate",
 	"sap/ui/table/Table",
 	"sap/ui/table/Column"
-], function (each, isEmptyObject, UI5Date, DateTimePicker, Input, Label, List, Panel, ListItem,
+], function (Log, each, isEmptyObject, UI5Date, DateTimePicker, Input, Label, List, Panel, ListItem,
 		Messaging, Message, MessageType, MockServer, ChangeReason, Filter, Sorter, UpdateMethod,
 		ODataModel, DateTime, createAndAppendDiv, nextUIUpdate, Table, Column
 ) {
@@ -829,6 +830,25 @@ sap.ui.define([
 				assert.ok(false, "request failed");
 			}
 		});
+	});
+
+
+	QUnit.test("checkPerformanceOfUpdate", async function(assert) {
+		const oLogMock = this.mock(Log);
+		const waitForLog = () => {
+			const {promise: oWaitForLog, resolve: fnResolve} = Promise.withResolvers();
+			setTimeout(fnResolve, 0); // wait for warning logged in setTimeout after last setProperty call
+			return oWaitForLog;
+		};
+		oLogMock.expects("warning").withExactArgs("Performance issue: 100004 (more than 100000) bindings are affected "
+				+ "by 2 consecutive synchronous calls to ODataModel#setProperty; see API documentation for details",
+			undefined, "sap.ui.model.odata.v2.ODataModel");
+
+		// code under test - more than 100,000 bindings affected => warning with updated counters
+		oModel.checkPerformanceOfUpdate(50002);
+		oModel.checkPerformanceOfUpdate(50002);
+
+		await waitForLog();
 	});
 
 	QUnit.module("ODataModelV2 write", {

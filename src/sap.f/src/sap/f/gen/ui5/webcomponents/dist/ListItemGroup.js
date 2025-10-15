@@ -63,7 +63,6 @@ sap.ui.define(
              * Available options are:
              * - `None` (default) - The text will truncate with an ellipsis.
              * - `Normal` - The text will wrap (without truncation).
-             *
              * @type module:sap/f/gen/ui5/webcomponents.WrappingType
              */
             wrappingType: {
@@ -88,7 +87,6 @@ sap.ui.define(
           aggregations: {
             /**
              * Defines the items of the <code>ui5-li-group</code>.
-             *
              * @type module:sap/f/gen/ui5/webcomponents/dist/ListItemBase
              */
             items: {
@@ -99,7 +97,6 @@ sap.ui.define(
              * Defines the header of the component.
              *
              * **Note:** Using this slot, the default header text of group and the value of `headerText` property will be overwritten.
-             *
              * @type module:sap/f/gen/ui5/webcomponents/dist/ListItemBase
              */
             header: {

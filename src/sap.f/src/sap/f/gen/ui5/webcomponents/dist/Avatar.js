@@ -28,8 +28,8 @@ sap.ui.define(
      *
      * ### ES6 Module Import
      * `import "sap/f/gen/ui5/webcomponents/dist/Avatar.js";`
-     * @implements module:sap/f/gen/ui5/webcomponents.IAvatarGroupItem
      *
+     * @implements module:sap/f/gen/ui5/webcomponents.IAvatarGroupItem
      * @extends sap.ui.core.webc.WebComponent
      * @constructor
      * @private
@@ -124,7 +124,6 @@ sap.ui.define(
             initials: { type: "string", mapping: "property" },
             /**
              * Defines the shape of the component.
-             *
              * @type module:sap/f/gen/ui5/webcomponents.AvatarShape
              */
             shape: {
@@ -134,7 +133,6 @@ sap.ui.define(
             },
             /**
              * Defines predefined size of the component.
-             *
              * @type module:sap/f/gen/ui5/webcomponents.AvatarSize
              */
             size: {
@@ -145,7 +143,6 @@ sap.ui.define(
             /**
              * Defines the background color of the desired image.
              * If `colorScheme` is set to `Auto`, the avatar will be displayed with the `Accent6` color.
-             *
              * @type module:sap/f/gen/ui5/webcomponents.AvatarColorScheme
              */
             colorScheme: {
@@ -192,7 +189,6 @@ sap.ui.define(
              * `ui5-avatar:not(:defined) {`<br/>
              * &nbsp;&nbsp;&nbsp;&nbsp;`visibility: hidden;`<br/>
              * `}`
-             *
              * @type module:sap/ui/core/Control
              */
             image: { type: "sap.ui.core.Control", multiple: true },
@@ -202,7 +198,6 @@ sap.ui.define(
              * **Note:** While the slot allows for custom badges, to achieve
              * the Fiori design, you can use the `ui5-tag` with `ui5-icon`
              * in the corresponding `icon` slot, without text nodes.
-             *
              * @type module:sap/ui/core/Control
              */
             badge: {
