@@ -85,7 +85,7 @@ sap.ui.define(["sap/base/i18n/Localization", "sap/ui/core/Renderer", "sap/ui/cor
 				rm.openStart(sCellTag, sIdPrefix + sType + sIdSuffix);
 				sType == "Head" && rm.class("sapMTableTH");
 				rm.class(sClassPrefix + sClassSuffix);
-				rm.attr("role", "presentation");
+				rm.attr("role", "none");
 				rm.openEnd();
 				rm.close(sCellTag);
 				iIndex++;
@@ -258,17 +258,23 @@ sap.ui.define(["sap/base/i18n/Localization", "sap/ui/core/Renderer", "sap/ui/cor
 		if (iActionCount > 0) {
 			openStartCell("Actions", "ActionsCol", "TABLE_ROW_ACTION");
 			rm.class(`sapMTable${iActionCount}ActionsCol`);
-			rm.openEnd().close(sCellTag);
+			rm.openEnd();
+			this.hideFromScreenReader(rm, "TABLE_ROW_ACTION");
+			rm.close(sCellTag);
 			iIndex++;
 		}
 
 		if (oTable.doItemsNeedTypeColumn()) {
-			openStartCell("Nav", "NavCol", "TABLE_ROW_ACTION").openEnd().close(sCellTag);
+			openStartCell("Nav", "NavCol").openEnd();
+			this.hideFromScreenReader(rm, "TABLE_ROW_ACTION");
+			rm.close(sCellTag);
 			iIndex++;
 		}
 
 		if (iActionCount === -1 && iModeOrder == 1) {
-			openStartCell("ModeCol", "SelCol", sMode == "Delete" ? "TABLE_ROW_ACTION" : "TABLE_SELECTION_COLUMNHEADER").openEnd().close(sCellTag);
+			openStartCell("ModeCol", "SelCol").openEnd();
+			this.hideFromScreenReader(rm, sMode == "Delete" ? "TABLE_ROW_ACTION" : "TABLE_SELECTION_COLUMNHEADER");
+			rm.close(sCellTag);
 			iIndex++;
 		}
 
@@ -289,8 +295,8 @@ sap.ui.define(["sap/base/i18n/Localization", "sap/ui/core/Renderer", "sap/ui/cor
 				rm.class("sapMListTblHeaderNone");
 				rm.attr("role", sType == "Head" ? "columnheader" : "gridcell");
 				rm.attr("aria-colindex", aAriaOwns.push(sPopinColumnHeaderId));
-				rm.attr("aria-label", Library.getResourceBundleFor("sap.m").getText("TABLE_COLUMNHEADER_POPIN"));
 				rm.openEnd();
+				this.hideFromScreenReader(rm, "TABLE_COLUMNHEADER_POPIN");
 				rm.close("div");
 			}
 			rm.close("td");
@@ -401,7 +407,7 @@ sap.ui.define(["sap/base/i18n/Localization", "sap/ui/core/Renderer", "sap/ui/cor
 
 		const bHasVisibleColumns = oControl.getColumns().some((oColumn) => oColumn.getVisible());
 		if (bHasVisibleColumns) {
-			rm.openStart("td").attr("role", "presentation").class("sapMListTblHighlightCell").openEnd().close("td");
+			rm.openStart("td").attr("role", "none").class("sapMListTblHighlightCell").openEnd().close("td");
 		}
 
 		var bRenderDummyColumn = oControl.shouldRenderDummyColumn();
@@ -436,6 +442,12 @@ sap.ui.define(["sap/base/i18n/Localization", "sap/ui/core/Renderer", "sap/ui/cor
 		}
 
 		rm.close("tr");
+	};
+
+	TableRenderer.hideFromScreenReader = function(rm, sBundleKey) {
+		rm.openStart("div").class("sapMTableScreenReaderOnly").openEnd();
+		rm.text(Library.getResourceBundleFor("sap.m").getText(sBundleKey));
+		rm.close("div");
 	};
 
 	return TableRenderer;

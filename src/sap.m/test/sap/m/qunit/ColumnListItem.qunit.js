@@ -322,7 +322,9 @@ sap.ui.define([
 		const fnFocusSpy = sinon.spy(oListItem, "focus");
 		bHasSelection = false;
 		assert.equal(window.getSelection().toString(), "");
-		oListItem.$("sub").trigger("tap");
+		oListItem._oPopin.getFocusDomRef().focus();
+		oListItem._oPopin.ontouchend();
+		oListItem._oPopin.$().trigger("tap");
 		this.clock.tick(0);
 		assert.ok(fnPress.called, "Press event fired");
 		assert.ok(fnFocusSpy.calledWith({ preventScroll: true }), "Focus event called with preventScroll param");

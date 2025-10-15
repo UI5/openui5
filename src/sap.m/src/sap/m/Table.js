@@ -668,7 +668,7 @@ sap.ui.define([
 	Table.prototype.onmousedown = function(oEvent) {
 		this._bMouseDown = true;
 		var sOldTabIndex;
-		var oFocusableCell = oEvent.target.closest(".sapMTblCellFocusable:not([aria-haspopup])");
+		var oFocusableCell = oEvent.target.closest(".sapMTblCellFocusable:not([aria-haspopup],.sapMListTblSubCnt)");
 		if (oFocusableCell && !document.activeElement.classList.contains("sapMTblCellFocusable")) {
 			sOldTabIndex = oFocusableCell.getAttribute("tabindex");
 			oFocusableCell.removeAttribute("tabindex");

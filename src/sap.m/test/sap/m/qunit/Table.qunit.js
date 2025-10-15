@@ -452,15 +452,19 @@ sap.ui.define([
 		await nextUIUpdate();
 
 		assert.ok(sut.hasPopin(), "Table has popins");
-		assert.equal(sut.getVisibleItems()[0].$Popin().attr("tabindex"), "-1", "Popin row has the tabindex=1. this is needed for the text selection");
+		assert.notOk(sut.getVisibleItems()[0].$Popin().attr("tabindex"), "Popin row should not have tabindex since its role must be presentation to hide the acc semantics of the tr element");
+		assert.equal(sut.getVisibleItems()[0].$Popin().attr("role"), "none", "The role of the popin row must presentation to hide the acc semantics of the tr element");
+		assert.equal(sut.getVisibleItems()[0].getDomRef("subcell").role, "none", "The role of the popin cell must presentation to hide the acc semantics of the td element");
+
+		sut.getVisibleItems()[0].getDomRef("subcont").focus();
+		sut.getVisibleItems()[0]._oPopin.ontouchend();
+		assert.equal(document.activeElement, sut.getVisibleItems()[0].getFocusDomRef(), "The focus is moved from popin to the main row after touch end");
 
 		let aVisibleColumns = sut.getColumns().filter(function(oCol) {
 			return oCol.getVisible() && !oCol.isPopin();
 		});
 		assert.strictEqual(aVisibleColumns.length, 2, "There are 2 visible columns that are not in the popin area");
 		assert.strictEqual(parseInt(sut.getVisibleItems()[0].$Popin().find(".sapMListTblSubRowCell").attr("colspan")), aVisibleColumns.length, "Correct colspan=2 attribute set on the popin, since there are 2 visible columns");
-		assert.notOk(sut.getVisibleItems()[0].$Popin().attr("role"), "No role is set for the popin row");
-
 
 		// hide a column
 		sut.getColumns()[2].setVisible(false);
@@ -776,7 +780,7 @@ sap.ui.define([
 		await nextUIUpdate();
 
 		assert.notOk(oTable.$().find("table").hasClass("sapMListTblHasNav"), "Type column is not visible by default");
-		assert.strictEqual(oTable.$().find("th").last().attr("role"), "presentation", "role=presentation is set correctly");
+		assert.strictEqual(oTable.$().find("th").last().attr("role"), "none", "role=presentation is set correctly");
 
 		oTable.getItems()[0].setType("Navigation");
 		await nextUIUpdate();
@@ -827,11 +831,11 @@ sap.ui.define([
 		assert.ok(oTable.$().find("table").hasClass("sapMListNavigated"), "Navigated class added");
 		const $oNavigatedCol = oTable.$().find(".sapMListTblNavigatedCol");
 		assert.ok($oNavigatedCol.length > 0, "Navigated column is visible");
-		assert.equal($oNavigatedCol.attr("role"), "presentation", "presentation role is set correctly");
+		assert.equal($oNavigatedCol.attr("role"), "none", "presentation role is set correctly");
 
 		const $oFirstItem = oFirstItem.$().find(".sapMListTblNavigatedCell");
 		assert.ok($oFirstItem.length > 0, "Navigated cell class added");
-		assert.equal($oFirstItem.attr("role"), "presentation", "presentation role is set correctly");
+		assert.equal($oFirstItem.attr("role"), "none", "presentation role is set correctly");
 		assert.notOk($oFirstItem.attr("aria-hidden"), "aria-hidden attribute is not set since role=presentation is enough");
 		assert.ok($oFirstItem.children().hasClass("sapMLIBNavigated"), "navigated indicator rendered");
 
@@ -857,7 +861,7 @@ sap.ui.define([
 		await nextUIUpdate();
 
 		const oNavigatedIndicator = oFirstItem.getPopin().getDomRef().childNodes[2];
-		assert.equal(oNavigatedIndicator.getAttribute("role"), "presentation", "presentation role is set correctly");
+		assert.equal(oNavigatedIndicator.getAttribute("role"), "none", "presentation role is set correctly");
 		assert.notOk(oNavigatedIndicator.getAttribute("aria-hidden"), "aria-hidden attribute is not set since role=presentation is enough");
 		assert.ok(oNavigatedIndicator.firstChild.classList.contains("sapMLIBNavigated"), "navigated indicator also rendered in popin row");
 
@@ -1468,7 +1472,7 @@ sap.ui.define([
 			$Scope.find(sCellType).each(function(idx, cell) {
 				const bHidden = idx < 1 || idx >= 3 + sut.getColumns().length;
 				if (bHidden) {
-					assert.equal(jQuery(cell).attr("role"), "presentation", sCellType + " has correct ARIA role: " + idx);
+					assert.equal(jQuery(cell).attr("role"), "none", sCellType + " has correct ARIA role: " + idx);
 				} else {
 					assert.equal(jQuery(cell).attr("role") || "", sCellType === "th" ? "columnheader" : "gridcell", sCellType + " has correct ARIA role: " + idx);
 				}
@@ -4222,8 +4226,8 @@ sap.ui.define([
 			assert.equal(oTableHeaderRow.getAttribute("tabindex"), "-1");
 			assert.ok(oTableHeaderRow.classList.contains("sapMLIBFocusable"));
 			assert.ok(oTableHeaderRow.classList.contains("sapMTableRowCustomFocus"));
-			assert.equal(oTable.getDomRef("tblHeadHighlight").getAttribute("role"), "presentation");
-			assert.equal(oTable.getDomRef("tblHeadNavigated").getAttribute("role"), "presentation");
+			assert.equal(oTable.getDomRef("tblHeadHighlight").getAttribute("role"), "none");
+			assert.equal(oTable.getDomRef("tblHeadNavigated").getAttribute("role"), "none");
 			aColumnsNotInPopin.forEach((oColumn, iIndex) => {
 				this.testHeaderCell(oColumn.getDomRef(), FORMER_COLUMN_COUNT + iIndex + 1);
 			});
@@ -4235,9 +4239,9 @@ sap.ui.define([
 			assert.equal(oTableFooterRow.getAttribute("tabindex"), "-1");
 			assert.ok(oTableFooterRow.classList.contains("sapMLIBFocusable"));
 			assert.ok(oTableFooterRow.classList.contains("sapMTableRowCustomFocus"));
-			assert.equal(oTable.getDomRef("tblFootHighlight").getAttribute("role"), "presentation");
+			assert.equal(oTable.getDomRef("tblFootHighlight").getAttribute("role"), "none");
 			assert.notOk(oTable.getDomRef("tblFootHighlight").hasAttribute("aria-hidden"));
-			assert.equal(oTable.getDomRef("tblFootNavigated").getAttribute("role"), "presentation");
+			assert.equal(oTable.getDomRef("tblFootNavigated").getAttribute("role"), "none");
 			assert.notOk(oTable.getDomRef("tblFootNavigated").hasAttribute("aria-hidden"));
 			aColumnsNotInPopin.forEach((oColumn, iIndex) => {
 				const oColumnFooterDomRef = document.getElementById(oTable.getId() + "-tblFoot" + oColumn.getId() + "-footer");
@@ -4252,9 +4256,9 @@ sap.ui.define([
 				assert.ok(oItemDomRef.classList.contains("sapMLIBFocusable"));
 				assert[oTable.hasPopin() ? "ok" : "notOk"](oItemDomRef.getAttribute("aria-owns"));
 				assert.equal(oItemDomRef.getAttribute("aria-rowindex"), oTable.indexOfItem(oItem) + !!oTableHeaderRow + 1);
-				assert.equal(oItemDomRef.querySelector(".sapMListTblHighlightCell").getAttribute("role"), "presentation");
+				assert.equal(oItemDomRef.querySelector(".sapMListTblHighlightCell").getAttribute("role"), "none");
 				assert.notOk(oItemDomRef.querySelector(".sapMListTblHighlightCell").hasAttribute("aria-hidden"));
-				assert.equal(oItemDomRef.querySelector(".sapMListTblNavigatedCell").getAttribute("role"), "presentation");
+				assert.equal(oItemDomRef.querySelector(".sapMListTblNavigatedCell").getAttribute("role"), "none");
 				assert.notOk(oItemDomRef.querySelector(".sapMListTblNavigatedCell").hasAttribute("aria-hidden"));
 				aColumns.forEach((oColumn, iIndex) => {
 					if (!oColumn.isPopin() && oColumn.getVisible()) {
@@ -4332,8 +4336,8 @@ sap.ui.define([
 		this.testCell(this.o1stItem.getDomRef("ModeCell"), iColumnsLength + 2);
 		this.testCell(this.oTable.getDomRef("tblFootModeCol"), iColumnsLength + 2);
 
-		assert.equal(this.oTable.getDomRef("tblHeadModeCol").getAttribute("aria-label"), this.oRB.getText("TABLE_ROW_ACTION"));
-		assert.equal(this.oTable.getDomRef("tblHeadModeCol").getAttribute("aria-label"), this.oRB.getText("TABLE_ROW_ACTION"));
+		assert.equal(this.oTable.getDomRef("tblHeadModeCol").textContent, this.oRB.getText("TABLE_ROW_ACTION"));
+		assert.ok(this.oTable.getDomRef("tblHeadModeCol").querySelector(".sapMTableScreenReaderOnly"), "sapMTableScreenReaderOnly class is added‚");
 	});
 
 
@@ -4507,8 +4511,9 @@ sap.ui.define([
 	});
 
 	QUnit.test("Rendering", async function(assert) {
+		const ROW_ACTION = Library.getResourceBundleFor("sap.m").getText("TABLE_ROW_ACTION");
 		assert.ok(this.oTable.getDomRef("tblHeadActions"), "Actions column header is rendered");
-		assert.equal(this.oTable.getDomRef("tblHeadActions").getAttribute("aria-label"), "Row Action", "aria-label is set for the actions column header");
+		assert.equal(this.oTable.getDomRef("tblHeadActions").textContent, ROW_ACTION, "Actions column header label is set");
 		assert.ok(this.oTable.getDomRef("tblHeadActions").classList.contains("sapMTable2ActionsCol"), "2 actions column header class is added");
 		assert.ok(this.oTable.getDomRef("tblHeadNav"), "Navigation column header is rendered since type is Navigation");
 		assert.notOk(this.oTable.getDomRef("tblHeadModeCol"), "Delete column is not rendered since custom row actions are enabled");
@@ -4538,5 +4543,6 @@ sap.ui.define([
 		assert.notOk(this.oItem1.getDomRef("Actions"), "There is no more actions to render");
 		assert.ok(this.oTable.getDomRef("tblHeadNav"), "Navigation column header is still rendered");
 		assert.ok(this.oTable.getDomRef("tblHeadModeCol"), "Delete column is now rendered");
+		assert.equal(this.oTable.getDomRef("tblHeadModeCol").textContent, ROW_ACTION, "Delete column header label is set");
 	});
 });
