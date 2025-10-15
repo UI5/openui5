@@ -104,7 +104,7 @@ function(
 				 *	<li><strong>EqualSized</strong>: All buttons have equal width, regardless of their content.</li>
 				 * </ul>
 				 * @public
-				 * @since 1.42.0
+				 * @since 1.142.0
 				 */
 				contentMode: {type: "sap.m.SegmentedButtonContentMode", group: "Appearance", defaultValue: SegmentedButtonContentMode.EqualSized}
 			},

@@ -3788,11 +3788,11 @@ sap.ui.define([
 
 	QUnit.module("contentMode property", {
 		beforeEach: function () {
-			this.oSegmentedButton = new sap.m.SegmentedButton({
-				buttons: [
-					new sap.m.Button({ text: "Short" }),
-					new sap.m.Button({ text: "A much longer button text" }),
-					new sap.m.Button({ text: "Medium" })
+			this.oSegmentedButton = new SegmentedButton({
+				items: [
+					new SegmentedButtonItem({ text: "Short" }),
+					new SegmentedButtonItem({ text: "A much longer button text" }),
+					new SegmentedButtonItem({ text: "Medium" })
 				]
 			});
 			this.oSegmentedButton.placeAt("qunit-fixture");

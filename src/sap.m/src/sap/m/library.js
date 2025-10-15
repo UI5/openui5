@@ -4034,14 +4034,14 @@ sap.ui.define([
 		/**
 	 	 * Each item fits its content and extra space is placed after the last item.
 	 	 * @public
-		 * @since 1.42
+		 * @since 1.142.0
 	 	*/
 		ContentFit: "ContentFit",
 
 		/**
 	 	 * All items are sized equally to fill the available space.
 	 	 * @public
-		 * @since 1.42
+		 * @since 1.142.0
 	 	*/
 		EqualSized: "EqualSized"
 	};
