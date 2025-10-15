@@ -360,6 +360,16 @@ sap.ui.define(["sap/m/library", "sap/base/security/encodeCSS", "sap/ui/core/Conf
 			if (!(isHalfFrame && isContentPresent) && oControl.getSubheader()) {
 				this._renderSubheader(oRm, oControl);
 			}
+			var aTileContents = oControl.getTileContent();
+			var oTileContent = Array.isArray(aTileContents) && aTileContents[0];
+			var oContentPriorityBadge = oTileContent && oTileContent._getPriorityBadge();
+
+			// Render Content Priority Badge - only in ArticleMode
+			if (bIsArticleMode && oContentPriorityBadge) {
+				oRm.openStart("div", oControl.getId() + "-content-priority-badge").class("sapMGTBackgroundBadge").openEnd();
+				oRm.renderControl(oContentPriorityBadge);
+				oRm.close("div");
+			}
 				oRm.close("div");
 
 			if ( !oControl._isIconMode() ) { //Restrict creation of Footer for IconMode
