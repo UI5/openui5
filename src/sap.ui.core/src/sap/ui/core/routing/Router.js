@@ -741,6 +741,15 @@ sap.ui.define([
 			},
 
 			/**
+			 * @typedef {object} sap.ui.core.routing.ComponentTargetParameters
+			 * @property {string} route The name of the route which should be matched after this navTo call.
+			 * @property {Object.<string, string|Object.<string, string>>} [parameters] The parameters for the route
+			 * @property {Object.<string, sap.ui.core.routing.ComponentTargetParameters>} [componentTargetInfo]
+			 *  Information for deeper nested component targets
+			 * @public
+			 */
+
+			/**
 			 * Navigates to a specific route defining a set of parameters.
 			 *
 			 * The parameters will be URI encoded - the characters ; , / ? : @ & = + $ are reserved and will not be encoded.
@@ -763,40 +772,29 @@ sap.ui.define([
 			 *
 			 * @param {string} sName The name of the route
 			 * @param {object} [oParameters] The parameters for the route.
-			 * 				As of Version 1.75 the recommendation is naming the query parameter with a leading "?" character,
-			 * 				which is identical to the definition in the route's pattern. The old syntax without a leading
-			 * 				"?" character is deprecated.
-			 * 				e.g. <b>Route:</b> <code>{parameterName1}/:parameterName2:/{?queryParameterName}</code>
-			 *				<b>Parameter:</b>
-			 *				<pre>
-			 *				{
-			 *					parameterName1: "parameterValue1",
-			 *					parameterName2: "parameterValue2",
-			 * 					"?queryParameterName": {
-			 * 						queryParameterName1: "queryParameterValue1"
-			 * 					}
-			 * 				}
-			 * 				</pre>
-			 * @param {object} [oComponentTargetInfo]
-			 *             Information for route name and parameters of the router in nested components. When any target
-			 *             of the route which is specified with the <code>sName</code> parameter loads a component and a
-			 *             route of this component whose pattern is different than an empty string should be matched
-			 *             directly with this navTo call, the route name and its parameters can be given by using this
-			 *             parameter. Information for deeper nested component target can be given within the
-			 *             <code>componentTargetInfo</code> property which contains the same properties as the top
-			 *             level.
-			 * @param {object} [oComponentTargetInfo.anyName] The name of a target which loads a component. This target is
-			 *  used in the Route which is specified by <code>sName</code>.
-			 * @param {string} [oComponentTargetInfo.anyName.route] The name of the route which should be matched after this
-			 *  navTo call.
-			 * @param {object} [oComponentTargetInfo.anyName.parameters] The parameters for the route. See the
-			 * 				documentation of the <code>oParameters</code>.
-			 * @param {object} [oComponentTargetInfo.anyName.componentTargetInfo] The information for the targets within a
-			 *  nested component. This shares the same structure with the <code>oComponentTargetInfo</code> parameter.
+			 *     As of Version 1.75 the recommendation is naming the query parameter with a leading "?" character,
+			 *     which is identical to the definition in the route's pattern. The old syntax without a leading
+			 *     "?" character is deprecated.
+			 *     e.g. <b>Route:</b> <code>{parameterName1}/:parameterName2:/{?queryParameterName}</code>
+			 *     <b>Parameter:</b>
+			 *     <pre>
+			 *     {
+			 *     	parameterName1: "parameterValue1",
+			 *     	parameterName2: "parameterValue2",
+			 *     	"?queryParameterName": {
+			 *     		queryParameterName1: "queryParameterValue1"
+			 *     	}
+			 *     }
+			 *     </pre>
+			 * @param {Object.<string, sap.ui.core.routing.ComponentTargetParameters>} [oComponentTargetInfo]
+			 *     Defines routing information for nested component targets. For each nested component target, you can
+			 *     specify the route name and its parameters of the nested router. This allows matching a non-empty
+			 *     route pattern in the nested component directly during this <code>navTo</code> call. The same
+			 *     structure can be used recursively for deeper levels of nested component targets.
 			 * @param {boolean} [bReplace=false]
-			 *             If set to <code>true</code>, the hash is replaced, and there will be no entry in the browser
-			 *             history. If set to <code>false</code>, the hash is set and the entry is stored in the browser
-			 *             history.
+			 *     If set to <code>true</code>, the hash is replaced, and there will be no entry in the browser
+			 *     history. If set to <code>false</code>, the hash is set and the entry is stored in the browser
+			 *     history.
 			 * @ui5-omissible-params oComponentTargetInfo
 			 * @public
 			 * @returns {this} this for chaining.

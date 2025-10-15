@@ -2258,7 +2258,7 @@ sap.ui.define([
 		assert.equal(oCall.args[0].tokens.length, iTokensNum, "All tokens were removed");
 	});
 
-	QUnit.test("Click on truncated token in multi-line opens popup and sets opener", async function (assert) {
+	QUnit.test("Click on truncated token in multi-line opens popup", async function (assert) {
 		const oLongToken = new Token({ text: "Mexico Mexico Mexico Mexico Mexico Mexico Mexico Mexico Mexico Mexico Mexico Mexico Mexico" });
 		this.oTokenizer.addToken(oLongToken);
 		await nextUIUpdate();
@@ -2273,7 +2273,6 @@ sap.ui.define([
 		qutils.triggerEvent("click", oLongTokenDomRef);
 		await nextUIUpdate();
 
-		assert.strictEqual(document.getElementById(this.oTokenizer.getProperty("opener")), oLongTokenDomRef, "Opener set to token id");
 		assert.ok(oToggleSpy.calledOnce, "_togglePopup called once");
 	});
 });

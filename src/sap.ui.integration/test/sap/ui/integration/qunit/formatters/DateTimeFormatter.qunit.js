@@ -75,4 +75,41 @@ sap.ui.define([
 		assert.ok(Log.error.notCalled, "There should be no console error");
 	});
 
+	QUnit.module("DateTimeFormatter - dateAndTimeWithTimezone");
+
+	QUnit.test("Should produce the same result as DateFormat#getDateInstance", function (assert) {
+		const sResult = DateTimeFormatter.dateTimeWithTimezone(UI5Date.getInstance(1995, 11, 11, 12, 30), "Europe/Sofia");
+		const sExpected = CoreDateFormat.getDateTimeWithTimezoneInstance().format(UI5Date.getInstance(1995, 11, 11, 12, 30), "Europe/Sofia");
+
+		assert.strictEqual(sResult, sExpected, "Date is formatted correctly");
+	});
+
+	QUnit.test("dateTime() and dateTimeWtTimezone() produce different results", function (assert) {
+		const sDateResult = DateTimeFormatter.dateTimeWithTimezone(UI5Date.getInstance(1993, 11, 11, 12, 30), "Europe/Sofia");
+		const sDateTimeResult = DateTimeFormatter.dateTime(UI5Date.getInstance(1993, 11, 11, 12, 30));
+
+		assert.notStrictEqual(sDateResult, sDateTimeResult, "Results should differ in time");
+	});
+
+	QUnit.test("Invalid timezone", function (assert) {
+		const sDateResult = DateTimeFormatter.dateTimeWithTimezone(UI5Date.getInstance(1995, 11, 11, 12, 30), "Invalid/Timezone");
+		const sExpected = CoreDateFormat.getDateTimeWithTimezoneInstance().format(UI5Date.getInstance(1995, 11, 11, 12, 30), "Invalid/Timezone");
+
+		assert.strictEqual(sDateResult, sExpected, "Date is formatted correctly if invalid timezone is provided");
+	});
+
+	QUnit.test("Undefined timezone", function (assert) {
+		const sDateResult = DateTimeFormatter.dateTimeWithTimezone(UI5Date.getInstance(1995, 11, 11, 12, 30));
+		const sExpected = CoreDateFormat.getDateTimeWithTimezoneInstance().format(UI5Date.getInstance(1995, 11, 11, 12, 30));
+
+		assert.strictEqual(sDateResult, sExpected, "Date is formatted correctly if no timezone is provided");
+	});
+
+	QUnit.test("Format undefined date", function (assert) {
+		this.spy(Log, "error");
+		DateTimeFormatter.dateTimeWithTimezone(undefined);
+
+		assert.ok(Log.error.notCalled, "There should be no console error");
+	});
+
 });

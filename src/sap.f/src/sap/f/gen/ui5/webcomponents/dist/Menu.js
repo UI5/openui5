@@ -82,7 +82,6 @@ sap.ui.define(
             open: { type: "boolean", mapping: "property", defaultValue: false },
             /**
              * Determines the horizontal alignment of the menu relative to its opener control.
-             *
              * @type module:sap/f/gen/ui5/webcomponents.PopoverHorizontalAlign
              */
             horizontalAlign: {
@@ -110,7 +109,6 @@ sap.ui.define(
              * Defines the ID or DOM Reference of the element at which the menu is shown.
              * When using this attribute in a declarative way, you must only use the `id` (as a string) of the element at which you want to show the popover.
              * You can only set the `opener` attribute to a DOM Reference when using JavaScript.
-             *
              * @type module:sap/ui/core/Control
              */
             opener: { type: "sap.ui.core.Control", mapping: "property" },
@@ -133,7 +131,6 @@ sap.ui.define(
              * Defines the items of this component.
              *
              * **Note:** Use `ui5-menu-item` and `ui5-menu-separator` for their intended design.
-             *
              * @type module:sap/f/gen/ui5/webcomponents.IMenuItem
              */
             items: { type: "sap.f.gen.ui5.webcomponents.IMenuItem", multiple: true }

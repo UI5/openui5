@@ -103,7 +103,6 @@ sap.ui.define(
              *
              * As `IllustratedMessage` adapts itself around the `Illustration`, the other
              * elements of the component are displayed differently on the different breakpoints/illustration designs.
-             *
              * @type module:sap/f/gen/ui5/webcomponents_fiori.IllustrationMessageDesign
              */
             design: {
@@ -154,7 +153,6 @@ sap.ui.define(
              * Defines the title of the component.
              *
              * **Note:** Using this slot, the default title text of illustration and the value of `title` property will be overwritten.
-             *
              * @type module:sap/ui/core/Control
              */
             title: {
@@ -166,7 +164,6 @@ sap.ui.define(
              * Defines the subtitle of the component.
              *
              * **Note:** Using this slot, the default subtitle text of illustration and the value of `subtitleText` property will be overwritten.
-             *
              * @type module:sap/ui/core/Control
              */
             subtitle: {
@@ -178,7 +175,6 @@ sap.ui.define(
              * Defines the component actions.
              *
              * **Note:** Not displayed when the `design` property is set to `Base`.
-             *
              * @type module:sap/f/gen/ui5/webcomponents.IButton
              */
             actions: { type: "sap.f.gen.ui5.webcomponents.IButton", multiple: true }

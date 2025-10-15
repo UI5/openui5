@@ -1737,7 +1737,6 @@ sap.ui.define([
 			const bMultiLineTruncatedTokenPressed = (oEvent.target.classList.contains("sapMTokenTruncated") && !this.hasStyleClass("sapMTokenizerIndicatorDisabled")) && this.getMultiLine();
 
 			if (bMultiLineTruncatedTokenPressed) {
-				this.setProperty("opener", oEvent.target.id);
 				this._togglePopup(this.getTokensPopup());
 			}
 		};

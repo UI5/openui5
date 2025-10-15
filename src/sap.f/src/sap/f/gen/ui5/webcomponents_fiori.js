@@ -119,11 +119,8 @@ sap.ui.define(
      * Different types of FCLLayout.
      *
      * @enum {string}
-     *
      * @alias module:sap/f/gen/ui5/webcomponents_fiori.FCLLayout
-     *
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori FCLLayout
-     *
      * @private
      */
     pkg["FCLLayout"] = {
@@ -242,11 +239,8 @@ sap.ui.define(
      * Different types of IllustrationMessageDesign.
      *
      * @enum {string}
-     *
      * @alias module:sap/f/gen/ui5/webcomponents_fiori.IllustrationMessageDesign
-     *
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori IllustrationMessageDesign
-     *
      * @private
      */
     pkg["IllustrationMessageDesign"] = {
@@ -326,11 +320,8 @@ sap.ui.define(
      * Different illustration types of Illustrated Message.
      *
      * @enum {string}
-     *
      * @alias module:sap/f/gen/ui5/webcomponents_fiori.IllustrationMessageType
-     *
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori IllustrationMessageType
-     *
      * @private
      */
     pkg["IllustrationMessageType"] = {
@@ -1051,11 +1042,8 @@ sap.ui.define(
      * Defines the layout of the content displayed in the `ui5-media-gallery-item`.
      *
      * @enum {string}
-     *
      * @alias module:sap/f/gen/ui5/webcomponents_fiori.MediaGalleryItemLayout
-     *
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori MediaGalleryItemLayout
-     *
      * @private
      */
     pkg["MediaGalleryItemLayout"] = {
@@ -1085,11 +1073,8 @@ sap.ui.define(
      * Defines the layout type of the thumbnails list of the `ui5-media-gallery` component.
      *
      * @enum {string}
-     *
      * @alias module:sap/f/gen/ui5/webcomponents_fiori.MediaGalleryLayout
-     *
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori MediaGalleryLayout
-     *
      * @private
      */
     pkg["MediaGalleryLayout"] = {
@@ -1120,11 +1105,8 @@ sap.ui.define(
      * Defines the horizontal alignment of the thumbnails menu of the `ui5-media-gallery` component.
      *
      * @enum {string}
-     *
      * @alias module:sap/f/gen/ui5/webcomponents_fiori.MediaGalleryMenuHorizontalAlign
-     *
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori MediaGalleryMenuHorizontalAlign
-     *
      * @private
      */
     pkg["MediaGalleryMenuHorizontalAlign"] = {
@@ -1149,11 +1131,8 @@ sap.ui.define(
      * Types for the vertical alignment of the thumbnails menu of the `ui5-media-gallery` component.
      *
      * @enum {string}
-     *
      * @alias module:sap/f/gen/ui5/webcomponents_fiori.MediaGalleryMenuVerticalAlign
-     *
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori MediaGalleryMenuVerticalAlign
-     *
      * @private
      */
     pkg["MediaGalleryMenuVerticalAlign"] = {
@@ -1178,11 +1157,8 @@ sap.ui.define(
      * Specifies the navigation layout mode.
      *
      * @enum {string}
-     *
      * @alias module:sap/f/gen/ui5/webcomponents_fiori.NavigationLayoutMode
-     *
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori NavigationLayoutMode
-     *
      * @private
      */
     pkg["NavigationLayoutMode"] = {
@@ -1214,11 +1190,8 @@ sap.ui.define(
      * Different types of NotificationListItemImportance.
      *
      * @enum {string}
-     *
      * @alias module:sap/f/gen/ui5/webcomponents_fiori.NotificationListItemImportance
-     *
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori NotificationListItemImportance
-     *
      * @private
      */
     pkg["NotificationListItemImportance"] = {
@@ -1243,11 +1216,8 @@ sap.ui.define(
      * Available Page Background Design.
      *
      * @enum {string}
-     *
      * @alias module:sap/f/gen/ui5/webcomponents_fiori.PageBackgroundDesign
-     *
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori PageBackgroundDesign
-     *
      * @private
      */
     pkg["PageBackgroundDesign"] = {
@@ -1278,11 +1248,8 @@ sap.ui.define(
      * Search mode options.
      *
      * @enum {string}
-     *
      * @alias module:sap/f/gen/ui5/webcomponents_fiori.SearchMode
-     *
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori SearchMode
-     *
      * @private
      */
     pkg["SearchMode"] = {
@@ -1304,11 +1271,8 @@ sap.ui.define(
      * SideContent FallDown options.
      *
      * @enum {string}
-     *
      * @alias module:sap/f/gen/ui5/webcomponents_fiori.SideContentFallDown
-     *
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori SideContentFallDown
-     *
      * @private
      */
     pkg["SideContentFallDown"] = {
@@ -1345,11 +1309,8 @@ sap.ui.define(
      * Side Content position options.
      *
      * @enum {string}
-     *
      * @alias module:sap/f/gen/ui5/webcomponents_fiori.SideContentPosition
-     *
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori SideContentPosition
-     *
      * @private
      */
     pkg["SideContentPosition"] = {
@@ -1376,11 +1337,8 @@ sap.ui.define(
      * Side Content visibility options.
      *
      * @enum {string}
-     *
      * @alias module:sap/f/gen/ui5/webcomponents_fiori.SideContentVisibility
-     *
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori SideContentVisibility
-     *
      * @private
      */
     pkg["SideContentVisibility"] = {
@@ -1423,11 +1381,8 @@ sap.ui.define(
      * SideNavigationItem designs.
      *
      * @enum {string}
-     *
      * @alias module:sap/f/gen/ui5/webcomponents_fiori.SideNavigationItemDesign
-     *
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori SideNavigationItemDesign
-     *
      * @private
      */
     pkg["SideNavigationItemDesign"] = {
@@ -1456,11 +1411,8 @@ sap.ui.define(
      * Timeline growing modes.
      *
      * @enum {string}
-     *
      * @alias module:sap/f/gen/ui5/webcomponents_fiori.TimelineGrowingMode
-     *
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori TimelineGrowingMode
-     *
      * @private
      */
     pkg["TimelineGrowingMode"] = {
@@ -1492,11 +1444,8 @@ sap.ui.define(
      * Available Timeline layout orientation
      *
      * @enum {string}
-     *
      * @alias module:sap/f/gen/ui5/webcomponents_fiori.TimelineLayout
-     *
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori TimelineLayout
-     *
      * @private
      */
     pkg["TimelineLayout"] = {
@@ -1522,11 +1471,8 @@ sap.ui.define(
      * Different UploadCollection selection modes.
      *
      * @enum {string}
-     *
      * @alias module:sap/f/gen/ui5/webcomponents_fiori.UploadCollectionSelectionMode
-     *
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori UploadCollectionSelectionMode
-     *
      * @private
      */
     pkg["UploadCollectionSelectionMode"] = {
@@ -1577,11 +1523,8 @@ sap.ui.define(
      * Different types of UploadState.
      *
      * @enum {string}
-     *
      * @alias module:sap/f/gen/ui5/webcomponents_fiori.UploadState
-     *
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori UploadState
-     *
      * @private
      */
     pkg["UploadState"] = {
@@ -1615,11 +1558,8 @@ sap.ui.define(
      * Different types of ViewSettings.
      *
      * @enum {string}
-     *
      * @alias module:sap/f/gen/ui5/webcomponents_fiori.ViewSettingsDialogMode
-     *
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori ViewSettingsDialogMode
-     *
      * @private
      */
     pkg["ViewSettingsDialogMode"] = {
@@ -1650,11 +1590,8 @@ sap.ui.define(
      * Enumeration for different content layouts of the `ui5-wizard`.
      *
      * @enum {string}
-     *
      * @alias module:sap/f/gen/ui5/webcomponents_fiori.WizardContentLayout
-     *
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori WizardContentLayout
-     *
      * @private
      */
     pkg["WizardContentLayout"] = {
@@ -1681,44 +1618,32 @@ sap.ui.define(
      * Interface for components that can be slotted inside `ui5-media-gallery` as items.
      *
      * @interface
-     *
      * @name module:sap/f/gen/ui5/webcomponents_fiori.IMediaGalleryItem
-     *
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori IMediaGalleryItem
-     *
      * @private
      */
     /**
      * Interface for components that may be slotted inside `ui5-product-switch` as items
      *
      * @interface
-     *
      * @name module:sap/f/gen/ui5/webcomponents_fiori.IProductSwitchItem
-     *
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori IProductSwitchItem
-     *
      * @private
      */
     /**
      * Interface for components that may be slotted inside a `ui5-search`
      *
      * @interface
-     *
      * @name module:sap/f/gen/ui5/webcomponents_fiori.ISearchScope
-     *
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori ISearchScope
-     *
      * @private
      */
     /**
      * Interface for components that may be slotted inside `ui5-timeline` as items
      *
      * @interface
-     *
      * @name module:sap/f/gen/ui5/webcomponents_fiori.ITimelineItem
-     *
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori ITimelineItem
-     *
      * @private
      */
 

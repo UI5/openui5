@@ -41,15 +41,7 @@ sap.ui.define(
             /**
              * The text-content of the Web Component.
              */
-            text: { type: "string", mapping: "textContent" },
-            /**
-             * The 'width' of the Web Component in <code>sap.ui.core.CSSSize</code>.
-             */
-            width: { type: "sap.ui.core.CSSSize", mapping: "style" },
-            /**
-             * The 'height' of the Web Component in <code>sap.ui.core.CSSSize</code>.
-             */
-            height: { type: "sap.ui.core.CSSSize", mapping: "style" }
+            text: { type: "string", mapping: "textContent" }
           },
 
           aggregations: {},

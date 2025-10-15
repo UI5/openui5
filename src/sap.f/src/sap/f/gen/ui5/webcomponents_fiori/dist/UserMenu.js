@@ -53,7 +53,6 @@ sap.ui.define(
              * Defines the ID or DOM Reference of the element at which the user menu is shown.
              * When using this attribute in a declarative way, you must only use the `id` (as a string) of the element at which you want to show the popover.
              * You can only set the `opener` attribute to a DOM Reference when using JavaScript.
-             *
              * @type module:sap/ui/core/Control
              */
             opener: { type: "sap.ui.core.Control", mapping: "property" },
@@ -106,7 +105,6 @@ sap.ui.define(
           aggregations: {
             /**
              * Defines the menu items.
-             *
              * @type module:sap/f/gen/ui5/webcomponents_fiori/dist/UserMenuItem
              */
             menuItems: {
@@ -118,7 +116,6 @@ sap.ui.define(
              *
              * **Note:** If one item is used, it will be shown as the selected one. If more than one item is used, the first one will be shown as selected unless
              * there is an item with `selected` property set to `true`.
-             *
              * @type module:sap/f/gen/ui5/webcomponents_fiori/dist/UserMenuAccount
              */
             accounts: {

@@ -57,7 +57,6 @@ sap.ui.define(
              * Defines the items of this component.
              *
              * **Note:** Use `ui5-user-menu-item` for the intended design.
-             *
              * @type module:sap/f/gen/ui5/webcomponents_fiori/dist/UserMenuItem
              */
             items: {

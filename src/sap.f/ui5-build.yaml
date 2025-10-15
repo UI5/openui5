@@ -28,6 +28,7 @@ customConfiguration:
       - "@ui5/webcomponents-fiori/dist/ShellBarItem"
       - "@ui5/webcomponents-fiori/dist/SearchItem"
       - "@ui5/webcomponents-fiori/dist/SearchItemGroup"
+      - "@ui5/webcomponents-fiori/dist/SearchItemShowMore"
       - "@ui5/webcomponents-fiori/dist/SearchMessageArea"
       - "@ui5/webcomponents-fiori/dist/SearchScope"
       - "@ui5/webcomponents-fiori/dist/ShellBarSpacer"

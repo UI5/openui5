@@ -2985,6 +2985,18 @@ sap.ui.define([
 										editable: true
 									}
 								]
+							},
+							{
+								key: 'dateAndTimeWithTimezone',
+								title: 'Date and Time With Timezone',
+								files: [
+									{
+										url: '/samples/formatters/dateAndTime/dateTimeWithTimezone/manifest.json',
+										name: 'manifest.json',
+										key: 'manifest.json',
+										editable: true
+									}
+								]
 							}
 						]
 					},

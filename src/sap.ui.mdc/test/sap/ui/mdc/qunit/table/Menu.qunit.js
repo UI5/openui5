@@ -7,6 +7,7 @@ sap.ui.define([
 	"sap/ui/mdc/Table",
 	"sap/ui/mdc/table/Column",
 	"sap/ui/mdc/table/utils/Personalization",
+	"sap/ui/mdc/enums/TableType",
 	"test-resources/sap/ui/mdc/delegates/TableDelegate",
 	"sap/m/Text",
 	"sap/m/plugins/ColumnResizer",
@@ -19,6 +20,7 @@ sap.ui.define([
 	Table,
 	Column,
 	PersonalizationUtils,
+	TableType,
 	TableDelegate,
 	Text,
 	ColumnResizer,
@@ -116,6 +118,43 @@ sap.ui.define([
 		await nextUIUpdate();
 
 		assert.notOk(this.oTable._oColumnHeaderMenu, "The ColumnMenu is not initialized when there are no active p13n modes and no column resizing");
+	});
+
+	QUnit.test("Update", async function(assert) {
+		const oTable = this.oTable;
+		const oColumn = oTable.getColumns()[0].getInnerColumn();
+		let oColumnHeaderMenu;
+
+		assert.ok(oTable._oColumnHeaderMenu, "The column menu is created because enableColumnResize is true");
+		assert.ok(oColumn.getDomRef().getAttribute("aria-haspopup"), "The column does have the aria-haspopup attribute");
+
+		oColumnHeaderMenu = oTable._oColumnHeaderMenu;
+		oTable.setEnableColumnResize(false);
+		assert.notOk(oTable._oColumnHeaderMenu, "No column menu when enableColumnResize is set to false and no active p13nMode");
+		assert.ok(oColumnHeaderMenu.isDestroyed(), "The old column menu is destroyed");
+		await nextUIUpdate();
+		assert.notOk(oColumn.getDomRef().getAttribute("aria-haspopup"), "The column does not have the aria-haspopup attribute");
+
+		oTable.setP13nMode(["Sort"]);
+		assert.ok(oTable._oColumnHeaderMenu, "The column menu is created when p13nMode is set");
+		await nextUIUpdate();
+		assert.ok(oColumn.getDomRef().getAttribute("aria-haspopup"), "The column has the aria-haspopup attribute");
+
+		oColumnHeaderMenu = oTable._oColumnHeaderMenu;
+		this.stub(oTable.getControlDelegate(), "getSupportedFeatures").returns({p13nModes: []});
+		oTable.setType(TableType.ResponsiveTable);
+		await oTable.initialized();
+		assert.notOk(oTable._oColumnHeaderMenu, "Column menu is updated when the table type is set");
+		assert.ok(oColumnHeaderMenu.isDestroyed(), "The old column menu is destroyed");
+		await nextUIUpdate();
+		assert.notOk(oColumn.getDomRef().getAttribute("aria-haspopup"), "The column does not have the aria-haspopup attribute");
+
+		oTable.getControlDelegate().getSupportedFeatures.restore();
+		oTable.setType(TableType.Table);
+		await oTable.initialized();
+		assert.ok(oTable._oColumnHeaderMenu, "Column menu is updated when the table type is set");
+		await nextUIUpdate();
+		assert.ok(oColumn.getDomRef().getAttribute("aria-haspopup"), "The column has the aria-haspopup attribute");
 	});
 
 	QUnit.test("Open menu before the table is fully initialized", function(assert) {

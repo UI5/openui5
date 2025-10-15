@@ -51,7 +51,7 @@
 
     <!-- Thirdparty references -->
     <thirdparty xmlns="http://www.sap.com/ui5/buildext/thirdparty">
-        <lib name="ui5-web-components" displayName="UI5 Web Components" npmName="@ui5/webcomponents" version="2.15.0" homepage="https://ui5.github.io/webcomponents/" id="73554900106100139112">
+        <lib name="ui5-web-components" displayName="UI5 Web Components" npmName="@ui5/webcomponents" version="2.15.0" homepage="https://ui5.github.io/webcomponents/" id="73555000106100326641">
             <license url="https://github.com/UI5/webcomponents/blob/-/LICENSE.txt" type="Apache-2.0"></license>
             <copyright>SAP</copyright>
             <pattern>sap/ui/integration/thirdparty/webcomponents/**</pattern>

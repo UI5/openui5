@@ -2836,6 +2836,37 @@ function(
 		assert.strictEqual(iSeparatorValuenow, 0.00, "valuenow attribute shows mid column is shrinked to the min");
 	});
 
+	QUnit.module("ScreenReader other aria attributes on separators");
+
+	QUnit.test("begin separator in two-column layouts", function (assert) {
+		this.oFCL = oFactory.createFCL({
+			layout: LT.TwoColumnsBeginExpanded,
+			beginColumnPages: [new Page()]
+		});
+
+		// assert
+		assert.strictEqual(this.oFCL._oColumnSeparators.begin.get(0).getAttribute("aria-valuemin"), "0", "aria-valuemin attribute is correct (0)");
+		assert.strictEqual(this.oFCL._oColumnSeparators.begin.get(0).getAttribute("aria-valuemax"), "100", "aria-valuemax attribute is correct (100)");
+
+		// clean up
+		this.oFCL.destroy();
+	});
+
+	QUnit.test("end separator in three-column layouts", function (assert) {
+		this.oFCL = oFactory.createFCL({
+			layout: LT.ThreeColumnsMidExpanded,
+			beginColumnPages: [new Page()],
+			endColumnPages: [new Page()]
+		});
+
+		// assert
+		assert.strictEqual(this.oFCL._oColumnSeparators.end.get(0).getAttribute("aria-valuemin"), "0", "aria-valuemin attribute is correct (0)");
+		assert.strictEqual(this.oFCL._oColumnSeparators.end.get(0).getAttribute("aria-valuemax"), "100", "aria-valuemax attribute is correct (100)");
+
+		// clean up
+		this.oFCL.destroy();
+	});
+
 	QUnit.module("FlexibleColumnLayoutData", {
 		beforeEach: async function () {
 				this.oFCL = new FlexibleColumnLayout({

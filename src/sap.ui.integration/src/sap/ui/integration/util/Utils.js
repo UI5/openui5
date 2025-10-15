@@ -9,7 +9,8 @@ sap.ui.define([
 	"sap/base/Log",
 	"sap/ui/core/date/UI5Date",
 	"sap/base/i18n/Localization",
-	"sap/base/util/deepClone"
+	"sap/base/util/deepClone",
+	"sap/base/i18n/date/TimezoneUtils"
 ], function(
 	Locale,
 	formatMessage,
@@ -17,7 +18,8 @@ sap.ui.define([
 	Log,
 	UI5Date,
 	Localization,
-	deepClone
+	deepClone,
+	TimezoneUtils
 ) {
 	"use strict";
 
@@ -426,6 +428,41 @@ sap.ui.define([
 		}
 
 		return process(oData);
+	};
+
+	/**
+	 * Shifts formatter options, timezone and locale.
+	 * @param {object} oFormatOptions The format options.
+	 * @param {string} sTimezone The timezone
+	 * @param {string} sLocale Custom locale
+	 * @returns {object} arguments
+	 */
+	Utils.processDateTimeWithTimezoneFormatArguments = function (oFormatOptions, sTimezone, sLocale) {
+		// If oFormatOptions is a string and is a valid timezone, use it as sTimezone
+		if (typeof oFormatOptions === "string" && !sTimezone && !sLocale) {
+			sTimezone = oFormatOptions;
+			oFormatOptions = {};
+		} else if (!isPlainObject(oFormatOptions)) {
+			oFormatOptions = {};
+		}
+		sLocale = sLocale && new Locale(sLocale);
+
+		// If sTimezone looks like a locale, swap
+		if (sTimezone && typeof sTimezone === "string" && !TimezoneUtils.isValidTimezone(sTimezone)) {
+			try {
+				sLocale = new Locale(sTimezone);
+				sTimezone = null;
+				Log.warning("No timezone provided or the provided timezone is not valid and will be ignored.");
+			} catch (error) {
+				sLocale = sLocale && new Locale(sLocale);
+			}
+		}
+
+		return {
+			formatOptions: oFormatOptions,
+			timezone: sTimezone,
+			locale: sLocale
+		};
 	};
 
 	return Utils;

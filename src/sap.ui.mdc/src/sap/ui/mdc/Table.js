@@ -957,7 +957,8 @@ sap.ui.define([
 
 		this._oManagedObjectModel = new ManagedObjectModel(this, {
 			hasGrandTotal: false,
-			activeP13nModes: createActiveP13nModesMap(this)
+			activeP13nModes: createActiveP13nModesMap(this),
+			rowCount: undefined
 		});
 		this._oManagedObjectModel.setDefaultBindingMode(BindingMode.OneWay);
 		this.setModel(this._oManagedObjectModel, "$sap.ui.mdc.Table");
@@ -1292,21 +1293,13 @@ sap.ui.define([
 	};
 
 	Table.prototype.setHeaderLevel = function(sLevel) {
-		if (this.getHeaderLevel() === sLevel) {
-			return this;
-		}
 		this.setProperty("headerLevel", sLevel, true);
-		this._oTitle?.setLevel(sLevel);
 		this._updateVariantManagementStyle();
 		return this;
 	};
 
 	Table.prototype.setHeaderStyle = function(sStyle) {
-		if (this.getHeaderStyle() === sStyle) {
-			return this;
-		}
 		this.setProperty("headerStyle", sStyle, true);
-
 		const sHeaderStyle = this.getHeaderStyle() || TitleLevel[ThemeParameters.get({name: "_sap_ui_mdc_Table_HeaderStyle"})];
 		this._oTitle?.setTitleStyle(sHeaderStyle);
 		this._updateVariantManagementStyle();
@@ -1359,6 +1352,7 @@ sap.ui.define([
 		if (this.getEnableColumnResize() !== bOldEnableColumnResize) {
 			this._updateColumnResize();
 			this._updateAdaptation();
+			updateColumnMenu(this);
 		}
 
 		return this;
@@ -1472,6 +1466,8 @@ sap.ui.define([
 
 		if (!deepEqual(aOldP13nMode.sort(), this.getP13nMode().sort())) {
 			updateP13nSettings(this);
+			updateColumnMenu(this);
+			this.invalidate(); // Inner columns must update aria-haspopup
 		}
 
 		return this;
@@ -1516,6 +1512,16 @@ sap.ui.define([
 
 		this.getEngine().register(this, oRegisterConfig);
 	};
+
+	function updateColumnMenu(oTable) {
+		const bIsColumnMenuEnabled = oTable.getActiveP13nModes().length > 0 || oTable.getEnableColumnResize();
+
+		if (bIsColumnMenuEnabled) {
+			oTable._createColumnHeaderMenu();
+		} else {
+			oTable._destroyColumnHeaderMenu();
+		}
+	}
 
 	function updateP13nSettings(oTable) {
 		oTable._updateP13nButton();
@@ -1912,17 +1918,8 @@ sap.ui.define([
 		});
 	};
 
-	Table.prototype.setHeader = function(sText) {
-		this.setProperty("header", sText, true);
-		this._updateHeaderText();
-		return this;
-	};
-
 	Table.prototype.setHeaderVisible = function(bVisible) {
 		this.setProperty("headerVisible", bVisible, true);
-		if (this._oTitle) {
-			this._oTitle.setWidth(this.getHeaderVisible() ? undefined : "0px");
-		}
 		this._updateInvisibleTitle();
 		this._updateVariantManagementStyle();
 		return this;
@@ -1942,12 +1939,6 @@ sap.ui.define([
 		} else if (this._oInvisibleTitle && !this._oTable.getAriaLabelledBy().includes(this.getId() + "-invisibleTitle")) {
 			this._oTable.addAriaLabelledBy(this.getId() + "-invisibleTitle");
 		}
-	};
-
-	Table.prototype.setShowRowCount = function(bShowCount) {
-		this.setProperty("showRowCount", bShowCount, true);
-		this._updateHeaderText();
-		return this;
 	};
 
 	Table.prototype.setEnableExport = function(bEnableExport) {
@@ -2010,11 +2001,29 @@ sap.ui.define([
 		}
 
 		if (!this._oToolbar) {
-			// Create Title
 			this._oTitle = new Title(this.getId() + "-title", {
-				text: this.getHeader(),
-				width: this.getHeaderVisible() ? undefined : "0px",
-				level: this.getHeaderLevel(),
+				text: {
+					parts: [
+						{path: "$sap.ui.mdc.Table>/header"},
+						{path: "$sap.ui.mdc.Table>/showRowCount"},
+						{path: "$sap.ui.mdc.Table>/@custom/rowCount"}
+					],
+					formatter: (sHeader, bShowRowCount, iRowCount) => {
+						if (this._bAnnounceTableUpdate && !this._bSkipAnnounceTableUpdate) {
+							this._bAnnounceTableUpdate = false;
+							MTableUtil.announceTableUpdate(sHeader, bShowRowCount ? iRowCount : undefined);
+						}
+
+						if (bShowRowCount && iRowCount > 0) {
+							this._oNumberFormatInstance ??= NumberFormat.getIntegerInstance({groupingEnabled: true});
+							sHeader += ` (${this._oNumberFormatInstance.format(iRowCount)})`;
+						}
+
+						return sHeader;
+					}
+				},
+				width: "{= ${$sap.ui.mdc.Table>/headerVisible} ? undefined : '0px' }",
+				level: "{$sap.ui.mdc.Table>/headerLevel}",
 				titleStyle: this.getHeaderStyle() || TitleLevel[ThemeParameters.get({name: "_sap_ui_mdc_Table_HeaderStyle"})]
 			});
 			// Create Toolbar
@@ -2784,25 +2793,33 @@ sap.ui.define([
 			insertFilterInfoBar(this);
 		}
 
-		if (this._isColumnMenuEnabled() && !this._oColumnHeaderMenu) {
-			this._oQuickActionContainer = new QuickActionContainer({table: this});
-			this._oColumnHeaderMenu = new ColumnMenu({
-				id: this.getId() + "-columnHeaderMenu",
-				showTableSettingsButton: true
-			});
-			this._oColumnHeaderMenu.addAggregation("_quickActions", this._oQuickActionContainer);
-			this.addDependent(this._oColumnHeaderMenu);
-
-			FESRHelper.setSemanticStepname(this._oColumnHeaderMenu, "beforeOpen", "mdc:tbl:p13n:col");
-
-			this._oColumnHeaderMenu.attachBeforeOpen(this._createColumnMenuContent, this);
-		}
+		updateColumnMenu(this);
 
 		this._updateInvisibleTitle();
 	};
 
-	Table.prototype._isColumnMenuEnabled = function() {
-		return this.getActiveP13nModes().length > 0 || this.getEnableColumnResize();
+	Table.prototype._createColumnHeaderMenu = function() {
+		if (this._oColumnHeaderMenu) {
+			return;
+		}
+
+		this._oQuickActionContainer = new QuickActionContainer({table: this});
+		this._oColumnHeaderMenu = new ColumnMenu({
+			id: this.getId() + "-columnHeaderMenu",
+			showTableSettingsButton: true
+		});
+		this._oColumnHeaderMenu.addAggregation("_quickActions", this._oQuickActionContainer);
+		this.addDependent(this._oColumnHeaderMenu);
+
+		FESRHelper.setSemanticStepname(this._oColumnHeaderMenu, "beforeOpen", "mdc:tbl:p13n:col");
+
+		this._oColumnHeaderMenu.attachBeforeOpen(this._createColumnMenuContent, this);
+	};
+
+	Table.prototype._destroyColumnHeaderMenu = function() {
+		this._oColumnHeaderMenu?.destroy();
+		delete this._oColumnHeaderMenu;
+		delete this._oQuickActionContainer;
 	};
 
 	Table.prototype._createColumnMenuContent = function(oEvent) {
@@ -3047,8 +3064,8 @@ sap.ui.define([
 	 *
 	 * @private
 	 */
-	Table.prototype._onDataRequested = function() {
-		this._bIgnoreChange = true;
+	Table.prototype._onBindingDataRequested = function() {
+		this._bSkipAnnounceTableUpdate = true;
 	};
 
 	/**
@@ -3056,20 +3073,9 @@ sap.ui.define([
 	 *
 	 * @private
 	 */
-	Table.prototype._onDataReceived = function() {
-		this._bIgnoreChange = false;
-		this._updateTableHeaderState();
-	};
-
-	/**
-	 * Event handler for binding createActivate
-	 *
-	 * @private
-	 */
-	Table.prototype._onCreateActivate = function() {
-		Promise.resolve().then(() => {
-			this._updateTableHeaderState();
-		});
+	Table.prototype._onBindingDataReceived = function() {
+		this._bSkipAnnounceTableUpdate = false;
+		this._updateRowCountForHeader();
 	};
 
 	/**
@@ -3079,54 +3085,14 @@ sap.ui.define([
 	 */
 	Table.prototype._onBindingChange = function() {
 		this.fireEvent("_bindingChange"); // consumed by sap.ui.mdc.valuehelp.content.MDCTable
-
 		this._updateExpandAllButton();
 		this._updateCollapseAllButton();
 		this._updateExportButton();
-
-		/* skip calling of _updateHeaderText till data is received otherwise MTableUtil.announceTableUpdate
-		will be called to early and the user gets an incorrect announcement via screen reader of the actual table state*/
-		if (this._bIgnoreChange) {
-			return;
-		}
-		this._updateTableHeaderState();
+		this._updateRowCountForHeader();
 	};
 
-	/**
-	 * Updates the table header states, like the header text and the export button.
-	 *
-	 * @private
-	 */
-	Table.prototype._updateTableHeaderState = function() {
-		this._updateHeaderText();
-	};
-
-	Table.prototype._updateHeaderText = function() {
-		let sHeader;
-		let iRowCount;
-
-		if (!this._oNumberFormatInstance) {
-			this._oNumberFormatInstance = NumberFormat.getFloatInstance();
-		}
-
-		if (this._oTitle && this.getHeader()) {
-			sHeader = this.getHeader();
-			if (this.getShowRowCount()) {
-				iRowCount = this.getRowBinding() ? this.getRowBinding().getCount() : 0;
-				if (iRowCount > 0) {
-					const sValue = this._oNumberFormatInstance.format(iRowCount);
-					sHeader += " (" + sValue + ")";
-				}
-			}
-
-			this._oTitle.setText(sHeader);
-		}
-
-		if (!this._bIgnoreChange && this._bAnnounceTableUpdate) {
-			this._bAnnounceTableUpdate = false;
-			// iRowCount is undefined, if this.getShowRowCount() returns false
-			MTableUtil.announceTableUpdate(this.getHeader(), iRowCount);
-		}
+	Table.prototype._updateRowCountForHeader = function() {
+		this._oManagedObjectModel.setProperty("/@custom/rowCount", this.getRowBinding().getCount());
 	};
 
 	Table.prototype._updateColumnsBeforeBinding = function() {
@@ -3223,9 +3189,8 @@ sap.ui.define([
 			delete oBindingInfo.template;
 		}
 
-		Table._addBindingListener(oBindingInfo, "dataRequested", this._onDataRequested.bind(this));
-		Table._addBindingListener(oBindingInfo, "dataReceived", this._onDataReceived.bind(this));
-		Table._addBindingListener(oBindingInfo, "createActivate", this._onCreateActivate.bind(this));
+		Table._addBindingListener(oBindingInfo, "dataRequested", this._onBindingDataRequested.bind(this));
+		Table._addBindingListener(oBindingInfo, "dataReceived", this._onBindingDataReceived.bind(this));
 		Table._addBindingListener(oBindingInfo, "change", this._onBindingChange.bind(this));
 	};
 

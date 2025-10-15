@@ -870,107 +870,6 @@ sap.ui.define([
 		}.bind(this));
 	});
 
-	QUnit.test("bindRows with rowCount without wrapping dataReceived", function(assert) {
-		this.oTable.destroy();
-		this.oTable = new Table({
-			header: "Test",
-			showRowCount: true,
-			type: TableType.ResponsiveTable,
-			delegate: {
-				name: sDelegatePath,
-				payload: {
-					collectionPath: "/testPath"
-				}
-			}
-		});
-
-		return TableQUnitUtils.waitForBindingInfo(this.oTable).then(function() {
-			const oBindingInfo = this.oTable._oTable.getBindingInfo("items");
-			const fDataReceived = oBindingInfo.events["dataReceived"];
-
-			sinon.stub(this.oTable._oTable, "getBinding");
-
-			const iCurrentLength = 10;
-			const bIsLengthFinal = true;
-			const oRowBinding = {
-				getLength: function() {
-					return iCurrentLength;
-				},
-				getCount: function() {
-					return iCurrentLength;
-				},
-				isLengthFinal: function() {
-					return bIsLengthFinal;
-				},
-				isA: function() {
-					// Is not a TreeBinding
-					return false;
-				}
-			};
-			this.oTable._oTable.getBinding.returns(oRowBinding);
-
-			assert.equal(this.oTable._oTitle.getText(), "Test");
-
-			fDataReceived();
-			assert.equal(this.oTable._oTitle.getText(), "Test (10)");
-		}.bind(this));
-	});
-
-	QUnit.test("bindRows with rowCount with wrapping dataReceived", function(assert) {
-		const fCustomDataReceived = sinon.spy();
-		let fnOriginalUpdateBindingInfo;
-
-		this.oTable.destroy();
-		this.oTable = new Table({
-			header: "Test",
-			showRowCount: true,
-			type: TableType.Table,
-			delegate: {
-				name: sDelegatePath,
-				payload: {
-					collectionPath: "/testPath"
-				}
-			}
-		});
-
-		return this.oTable.initialized().then(function() {
-			fnOriginalUpdateBindingInfo = this.oTable.getControlDelegate().updateBindingInfo;
-			this.oTable.getControlDelegate().updateBindingInfo = function(oTable, oBindingInfo) {
-				fnOriginalUpdateBindingInfo.apply(this, arguments);
-				oBindingInfo.events = {
-					dataReceived: fCustomDataReceived
-				};
-			};
-			return TableQUnitUtils.waitForBindingInfo(this.oTable);
-		}.bind(this)).then(function() {
-			const oRowBinding = sinon.createStubInstance(ODataListBinding);
-
-			oRowBinding.isLengthFinal.returns(true);
-			oRowBinding.getContexts.returns([]);
-
-			sinon.stub(this.oTable._oTable, "getBinding");
-			this.oTable._oTable.getBinding.returns(oRowBinding);
-
-			const oBindingInfo = this.oTable._oTable.getBindingInfo("rows");
-			const fDataReceived = oBindingInfo.events["dataReceived"];
-			assert.equal(this.oTable._oTitle.getText(), "Test");
-
-			assert.equal(this.oTable._oTitle.getText(), "Test");
-			assert.ok(fCustomDataReceived.notCalled);
-
-			oRowBinding.getCount.returns(undefined);
-			fDataReceived(new UI5Event("dataReceived", oRowBinding));
-			assert.equal(this.oTable._oTitle.getText(), "Test");
-
-			oRowBinding.getCount.returns(10);
-			fDataReceived(new UI5Event("dataReceived", oRowBinding));
-			assert.equal(this.oTable._oTitle.getText(), "Test (10)");
-			assert.ok(fCustomDataReceived.calledTwice);
-
-			this.oTable.getControlDelegate().updateBindingInfo = fnOriginalUpdateBindingInfo;
-		}.bind(this));
-	});
-
 	QUnit.test("check for initial column index", function(assert) {
 		this.oTable.destroy();
 		this.oTable = new Table({
@@ -1229,77 +1128,6 @@ sap.ui.define([
 			assert.equal(this.oTable._oTable.getAriaLabelledBy()[0], oTitle.getId(), "ARIA labelling for inner table points to title");
 
 			done();
-		}.bind(this));
-	});
-
-	QUnit.test("Header count display", function(assert) {
-		const done = assert.async();
-		this.oTable.setShowRowCount(false);
-
-		let iCount = 5;
-		const oRowBinding = {
-			getCount: function() {
-				return iCount;
-			}
-		};
-		const fnGetRowBindingStub = sinon.stub(this.oTable, "getRowBinding");
-		fnGetRowBindingStub.returns(oRowBinding);
-
-		this.oTable.initialized().then(function() {
-			const oTitle = this.oTable._oTitle;
-			const sHeaderText = "myTestHeader";
-			this.oTable.setHeader(sHeaderText);
-			assert.equal(oTitle.getText(), sHeaderText, "Header text is correct.");
-
-			this.oTable.setShowRowCount(true);
-
-			assert.equal(this.oTable.getHeader(), sHeaderText, "Header Property has not changed");
-			assert.equal(oTitle.getText(), sHeaderText + " (5)", "Header has to contain row count");
-
-			iCount = 0;
-			this.oTable._updateHeaderText();
-			assert.equal(oTitle.getText(), sHeaderText, "Header text does not contain row count when it is 0");
-
-			fnGetRowBindingStub.restore();
-			done();
-		}.bind(this));
-	});
-
-	QUnit.test("Update RowCount on 'activateCreate' Event from Binding", function(assert) {
-		const done = assert.async();
-		const sHeaderText = "myTestHeader";
-
-		let iCount = 5;
-		const oRowBinding = {
-			getCount: function() {
-				return iCount;
-			}
-		};
-
-		const fnGetRowBindingStub = sinon.stub(this.oTable, "getRowBinding");
-		fnGetRowBindingStub.returns(oRowBinding);
-
-		this.oTable.initialized().then(function() {
-			this.oTable.setHeader(sHeaderText);
-			this.oTable.setShowRowCount(true);
-			this.oTable._updateHeaderText();
-
-			const oTitle = this.oTable._oTitle;
-			assert.equal(oTitle.getText(), sHeaderText + " (5)", "Header shows the right row count");
-
-			const oBindingInfo = {};
-			this.oTable._finalizeBindingInfo(oBindingInfo);
-			assert.ok(oBindingInfo.events.createActivate, "createActivate event is registered");
-			oBindingInfo.events.createActivate();
-			iCount = 6;
-			assert.equal(oTitle.getText(), sHeaderText + " (5)", "Header shows the right row count");
-
-			Promise.resolve().then(() => {
-				assert.equal(oTitle.getText(), sHeaderText + " (6)", "Header shows the right row count");
-				fnGetRowBindingStub.restore();
-				done();
-			});
-
 		}.bind(this));
 	});
 
@@ -3024,13 +2852,104 @@ sap.ui.define([
 		});
 	});
 
-	QUnit.test("_bindingChange", function(assert) {
-		sinon.spy(this.oTable, "fireEvent");
-		return this.oTable._fullyInitialized().then(() => {
-			this.oTable._onBindingChange();
-			assert.ok(this.oTable.fireEvent.calledWith("_bindingChange"), "Table fires expected event '_bindingChange'");
-			this.oTable.fireEvent.restore();
+	QUnit.test("_bindingChange", async function(assert) {
+		const oBindingChangeSpy = this.spy();
+
+		this.oTable.setModel(new JSONModel());
+		await TableQUnitUtils.waitForBinding(this.oTable);
+		this.oTable.attachEvent("_bindingChange", oBindingChangeSpy);
+		this.oTable.getRowBinding().fireEvent("change");
+		assert.equal(oBindingChangeSpy.callCount, 1, "When the binding fires the change event, the table fires the _bindingChange event");
+	});
+
+	QUnit.module("Row count in header text", {
+		beforeEach: function() {
+			this.oTable = new Table({
+				header: "MyTestHeader",
+				delegate: {
+					name: sDelegatePath,
+					payload: {
+						collectionPath: "/testPath"
+					}
+				},
+				models: new JSONModel({
+					testPath: new Array(10).fill({value: "A"})
+				})
+			});
+			return TableQUnitUtils.waitForBinding(this.oTable);
+		},
+		afterEach: function() {
+			this.oTable.destroy();
+		}
+	});
+
+	QUnit.test("Initial header text", function(assert) {
+		const oTitle = this.oTable._oTitle;
+		assert.equal(oTitle.getText(), "MyTestHeader (10)", "Header text contains row count");
+	});
+
+	QUnit.test("Update on binding event 'dataReceived'", function(assert) {
+		const oBinding = this.oTable.getRowBinding();
+		const oTitle = this.oTable._oTitle;
+
+		this.stub(oBinding, "getCount").returns(0);
+		oBinding.fireEvent("dataReceived");
+		assert.equal(oTitle.getText(), "MyTestHeader", "Binding#getCount returns 0");
+
+		oBinding.getCount.returns(10);
+		oBinding.fireEvent("dataReceived");
+		assert.equal(oTitle.getText(), "MyTestHeader (10)", "Binding#getCount returns 10");
+	});
+
+	QUnit.test("Update on binding event 'dataReceived' with application-defined listener", async function(assert) {
+		const oDataReceivedStub = this.stub();
+		const oTitle = this.oTable._oTitle;
+
+		this.stub(this.oTable.getControlDelegate(), "updateBindingInfo").callsFake(function(oTable, oBindingInfo) {
+			this.updateBindingInfo.wrappedMethod.apply(this, arguments);
+			oBindingInfo.events = {
+				dataReceived: oDataReceivedStub
+			};
 		});
+		await this.oTable.rebind();
+
+		const oBinding = this.oTable.getRowBinding();
+
+		this.stub(oBinding, "getCount").returns(undefined);
+		oBinding.fireEvent("dataReceived");
+		assert.equal(oTitle.getText(), "MyTestHeader", "Binding#getCount returns undefined");
+		assert.ok(oDataReceivedStub.called, "Application-defined listener called");
+
+		oDataReceivedStub.resetHistory();
+		oBinding.getCount.returns(10);
+		oBinding.fireEvent("dataReceived");
+		assert.equal(oTitle.getText(), "MyTestHeader (10)", "Binding#getCount returns 10");
+		assert.ok(oDataReceivedStub.called, "Application-defined listener called");
+	});
+
+	QUnit.test("Update on binding event 'change'", function(assert) {
+		const oBinding = this.oTable.getRowBinding();
+		const oTitle = this.oTable._oTitle;
+
+		this.stub(oBinding, "getCount").returns(0);
+		oBinding.fireEvent("change");
+		assert.equal(oTitle.getText(), "MyTestHeader", "Binding#getCount returns 0");
+
+		oBinding.getCount.returns(10);
+		oBinding.fireEvent("change");
+		assert.equal(oTitle.getText(), "MyTestHeader (10)", "Binding#getCount returns 10");
+
+		oBinding.getCount.returns(undefined);
+		oBinding.fireEvent("change");
+		assert.equal(this.oTable._oTitle.getText(), "MyTestHeader", "Binding#getCount returns undefined");
+	});
+
+	QUnit.test("Change 'showRowCount' property", function(assert) {
+		this.oTable.setShowRowCount(false);
+		assert.equal(this.oTable._oTitle.getText(), "MyTestHeader", "showRowCount set to false");
+
+		this.oTable.setShowRowCount(true);
+		assert.equal(this.oTable._oTitle.getText(), "MyTestHeader (10)", "showRowCount set to true");
 	});
 
 	QUnit.module("Bind/Rebind", {
@@ -4489,24 +4408,30 @@ sap.ui.define([
 		this.oTable.setFilter(oFilter);
 
 		return TableQUnitUtils.waitForBinding(this.oTable).then(function() {
-			oFilter.fireSearch();
-			assert.ok(true, "Search is triggered.");
-			assert.equal(this.oTable._bAnnounceTableUpdate, true, "Table internal flag _bAnnounceTableUpdate is set to true");
-
-			this.oTable.getRowBinding().fireDataReceived(); // invoke event handler manually since we have a JSONModel
-			assert.ok(fnAnnounceTableUpdate.calledOnce, "MTableUtil.announceTableUpdate is called once.");
-
-			this.oTable.getRowBinding().fireDataReceived();
-			assert.ok(fnAnnounceTableUpdate.calledOnce,
-				"MTableUtil.announceTableUpdate is not called if the dataReceived is not caused by a filterbar search.");
+			const oBinding = this.oTable.getRowBinding();
 
 			oFilter.fireSearch();
 			assert.ok(true, "Search is triggered.");
 			assert.equal(this.oTable._bAnnounceTableUpdate, true, "Table internal flag _bAnnounceTableUpdate is set to true");
-			this.oTable.getRowBinding()._fireChange();
+			this.stub(oBinding, "getCount").returns(1);
+			oBinding.fireDataReceived(); // invoke event handler manually since we have a JSONModel
+			assert.equal(fnAnnounceTableUpdate.callCount, 1, "MTableUtil.announceTableUpdate call");
+
+			fnAnnounceTableUpdate.resetHistory();
+			oBinding.getCount.returns(2);
+			oBinding.fireDataReceived();
+			assert.equal(fnAnnounceTableUpdate.callCount, 0,
+				"MTableUtil.announceTableUpdate call if the dataReceived is not caused by a filterbar search.");
+
+			fnAnnounceTableUpdate.resetHistory();
+			oFilter.fireSearch();
+			assert.ok(true, "Search is triggered.");
+			assert.equal(this.oTable._bAnnounceTableUpdate, true, "Table internal flag _bAnnounceTableUpdate is set to true");
+			oBinding.getCount.returns(3);
+			oBinding.fireEvent("change");
 			// in some cases OData V4 doesn't trigger a data request, but the binding context changes and the item count has to be announced
-			assert.ok(fnAnnounceTableUpdate.calledTwice,
-				"MTableUtil.announceTableUpdate is called on binding change even if no data request is sent.");
+			assert.equal(fnAnnounceTableUpdate.callCount, 1,
+				"MTableUtil.announceTableUpdate call on binding change even if no data request is sent.");
 			fnAnnounceTableUpdate.restore();
 		}.bind(this));
 	});
@@ -4545,7 +4470,7 @@ sap.ui.define([
 			})
 		});
 		const oFilter = new FilterBar();
-		const fnOnDataReceived = sinon.spy(this.oTable, "_onDataReceived");
+		const fnOnDataReceived = sinon.spy(this.oTable, "_onBindingDataReceived");
 		const fnAnnounceTableUpdate = sinon.spy(MTableUtil, "announceTableUpdate");
 
 		this.oTable.setFilter(oFilter);

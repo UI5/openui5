@@ -2763,7 +2763,7 @@ sap.ui.define([
 			this.mock(oModel).expects("_processAfterUpdate").withExactArgs();
 
 			// code under test
-			ODataModel.prototype.checkUpdate.call(oModel, bForceUpdate, false, mChangedEntities);
+			assert.strictEqual(ODataModel.prototype.checkUpdate.call(oModel, bForceUpdate, false, mChangedEntities), 1);
 
 			assert.deepEqual(oModel.mChangedEntities4checkUpdate, {});
 			assert.strictEqual(oModel.bForceUpdate, undefined);
@@ -2793,7 +2793,7 @@ sap.ui.define([
 		oModelMock.expects("_processAfterUpdate").never();
 
 		// code under test
-		ODataModel.prototype.checkUpdate.call(oModel, true, true);
+		assert.strictEqual(ODataModel.prototype.checkUpdate.call(oModel, true, true), 0);
 
 		oWindowMock.expects("clearTimeout").withExactArgs(oModel.sUpdateTimer).callThrough();
 		oModelMock.expects("getBindings").withExactArgs().returns([oBinding]);
@@ -2801,7 +2801,7 @@ sap.ui.define([
 		oModelMock.expects("_processAfterUpdate").withExactArgs();
 
 		// code under test
-		ODataModel.prototype.checkUpdate.call(oModel);
+		assert.strictEqual(ODataModel.prototype.checkUpdate.call(oModel), 1);
 
 		assert.strictEqual(oModel.bForceUpdate, undefined);
 		assert.strictEqual(oModel.sUpdateTimer, null);
@@ -7748,6 +7748,7 @@ sap.ui.define([
 				},
 				mRequests: "~mRequests",
 				checkUpdate: function () {},
+				checkPerformanceOfUpdate() {},
 				getEntityByPath: function () {},
 				_getObject: function () {},
 				_getRefreshAfterChange: function () {},
@@ -7785,7 +7786,10 @@ sap.ui.define([
 			.withExactArgs(undefined, "~groupId")
 			.returns("~bRefreshAfterChange");
 		this.mock(oModel.oMetadata).expects("loaded").withExactArgs().returns(oMetadataLoadedPromise);
-		oModelMock.expects("checkUpdate").withExactArgs(false, "~bAsyncUpdate", {"~key": true});
+		oModelMock.expects("checkUpdate")
+			.withExactArgs(false, "~bAsyncUpdate", {"~key": true})
+			.returns("~iUpdatedBindings");
+		this.mock(oModel).expects("checkPerformanceOfUpdate").withExactArgs("~iUpdatedBindings", "~bAsyncUpdate");
 		oRequestQueuedPromise = oMetadataLoadedPromise.then(function () {
 			oModelMock.expects("_pushToRequestQueue")
 				.withExactArgs("~mDeferredRequests", "~groupId", "~changeSetId", {key: "~key"}, /*success*/ undefined,
@@ -7825,6 +7829,7 @@ sap.ui.define([
 				},
 				mRequests: "~mRequests",
 				checkUpdate: function () {},
+				checkPerformanceOfUpdate() {},
 				getEntityByPath: function () {},
 				_getObject: function () {},
 				_getRefreshAfterChange: function () {},
@@ -7872,7 +7877,10 @@ sap.ui.define([
 		oModelMock.expects("_getRefreshAfterChange")
 			.withExactArgs(undefined, "~groupId")
 			.returns("~bRefreshAfterChange");
-		oModelMock.expects("checkUpdate").withExactArgs(false, "~bAsyncUpdate", {"~key": true});
+		oModelMock.expects("checkUpdate")
+			.withExactArgs(false, "~bAsyncUpdate", {"~key": true})
+			.returns("~iUpdatedBindings");
+		this.mock(oModel).expects("checkPerformanceOfUpdate").withExactArgs("~iUpdatedBindings", "~bAsyncUpdate");
 		oRequestQueuedPromise = oMetadataLoadedPromise.then(function () {
 			oModelMock.expects("_pushToRequestQueue")
 				.withExactArgs("~mDeferredRequests", "~groupId", "~changeSetId", {key: "~key"}, /*success*/ undefined,
@@ -7939,6 +7947,7 @@ sap.ui.define([
 					},
 					mRequests : "~mRequests",
 					checkUpdate : function () {},
+					checkPerformanceOfUpdate() {},
 					getEntityByPath : function () {},
 					_getObject : function () {},
 					_getRefreshAfterChange : function () {},
@@ -8004,7 +8013,9 @@ sap.ui.define([
 				.exactly(oFixture.createdContextFound ? 1 : 0)
 				.returns(false);
 			oModelMock.expects("checkUpdate")
-				.withExactArgs(false, "~bAsyncUpdate", {"key" : true});
+				.withExactArgs(false, "~bAsyncUpdate", {"key" : true})
+				.returns("~iUpdatedBindings");
+			this.mock(oModel).expects("checkPerformanceOfUpdate").withExactArgs("~iUpdatedBindings", "~bAsyncUpdate");
 
 			// code under test
 			assert.strictEqual(
@@ -8045,6 +8056,7 @@ sap.ui.define([
 				},
 				mRequests : "~mRequests",
 				checkUpdate : function () {},
+				checkPerformanceOfUpdate() {},
 				getEntityByPath : function () {},
 				_getObject : function () {},
 				_getRefreshAfterChange : function () {},
@@ -8116,7 +8128,9 @@ sap.ui.define([
 			.withExactArgs()
 			.returns(oActivatedPromise);
 		oModelMock.expects("checkUpdate")
-			.withExactArgs(false, "~bAsyncUpdate", {"key" : true});
+			.withExactArgs(false, "~bAsyncUpdate", {"key" : true})
+			.returns("~iUpdatedBindings");
+		this.mock(oModel).expects("checkPerformanceOfUpdate").withExactArgs("~iUpdatedBindings", "~bAsyncUpdate");
 		oActivatedPromise.then(function () {
 			bActivatedPromiseResolved = true;
 		});

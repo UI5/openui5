@@ -325,6 +325,11 @@ sap.ui.define(['./util/EnvHelper', "sap/base/util/merge"], function (EnvHelper, 
                     group: "Testsuite",
                     page: "test-resources/sap/ui/mdc/qunit/chart/testsuite.chart.qunit.html"
                 },
+                "Geomap Testsuite" : {
+                    title: "Geomap Testsuite",
+                    group: "Testsuite",
+                    page: "test-resources/sap/ui/mdc/qunit/geomap/testsuite.geomap.qunit.html"
+                },
 				/* TO-Do: Check whether this is still needed with new MDC Chart
 				"ChartFlex": {
 					group: "Chart",

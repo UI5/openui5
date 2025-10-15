@@ -78,7 +78,6 @@ sap.ui.define(
              *
              * **Note:** by default the `titleText` and `description`,
              * and a `ShowMore/Less` button would be displayed.
-             *
              * @type module:sap/f/gen/ui5/webcomponents.WrappingType
              */
             wrappingType: {
@@ -88,7 +87,6 @@ sap.ui.define(
             },
             /**
              * Defines the status indicator of the item.
-             *
              * @type module:sap/ui/core/ValueState
              */
             state: {
@@ -109,7 +107,6 @@ sap.ui.define(
             },
             /**
              * Defines the `Important` label of the item.
-             *
              * @type module:sap/f/gen/ui5/webcomponents_fiori.NotificationListItemImportance
              */
             importance: {
@@ -143,7 +140,15 @@ sap.ui.define(
               type: "float",
               mapping: "property",
               defaultValue: 1000
-            }
+            },
+            /**
+             * The 'width' of the Web Component in <code>sap.ui.core.CSSSize</code>.
+             */
+            width: { type: "sap.ui.core.CSSSize", mapping: "style" },
+            /**
+             * The 'height' of the Web Component in <code>sap.ui.core.CSSSize</code>.
+             */
+            height: { type: "sap.ui.core.CSSSize", mapping: "style" }
           },
 
           aggregations: {
@@ -155,7 +160,6 @@ sap.ui.define(
              * **Note:** In order to be complaint with the UX guidlines and for best experience,
              * we recommend using avatars with 2rem X 2rem in size (32px X 32px). In case you are using the `ui5-avatar`
              * you can set its `size` property to `XS` to get the required size - `<ui5-avatar size="XS"></ui5-avatar>`.
-             *
              * @type module:sap/ui/core/Control
              */
             avatar: {
@@ -169,13 +173,11 @@ sap.ui.define(
              * **Note:** Use this for implementing actions.
              *
              * **Note:** Should be used instead `u5-notification-action`, which is deprecated as of version 2.0.
-             *
              * @type module:sap/ui/core/Control
              */
             menu: { type: "sap.ui.core.Control", multiple: true, slot: "menu" },
             /**
              * Defines the elements, displayed in the footer of the of the component.
-             *
              * @type module:sap/ui/core/Control
              */
             footnotes: {
@@ -188,7 +190,6 @@ sap.ui.define(
              * usually a description of the notification.
              *
              * **Note:** Although this slot accepts HTML Elements, it is strongly recommended that you only use text in order to preserve the intended design.
-             *
              * @type module:sap/ui/core/Control
              */
             description: { type: "sap.ui.core.Control", multiple: true }

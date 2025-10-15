@@ -85,14 +85,12 @@ sap.ui.define(
              * Defines the title for the ui5-shellbar-branding component.
              *
              * **Note:** Although this slot accepts HTML Elements, it is strongly recommended that you only use text in order to preserve the intended design.
-             *
              * @type module:sap/ui/core/Control
              */
             content: { type: "sap.ui.core.Control", multiple: true },
             /**
              * Defines the logo of the `ui5-shellbar`.
              * For example, you can use `ui5-avatar` or `img` elements as logo.
-             *
              * @type module:sap/ui/core/Control
              */
             logo: { type: "sap.ui.core.Control", multiple: true, slot: "logo" }

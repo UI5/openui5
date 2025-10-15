@@ -27,8 +27,8 @@ sap.ui.define(
      * ### ES6 Module Import
      *
      * `import "sap/f/gen/ui5/webcomponents/dist/MenuItem.js";`
-     * @implements module:sap/f/gen/ui5/webcomponents.IMenuItem
      *
+     * @implements module:sap/f/gen/ui5/webcomponents.IMenuItem
      * @extends module:sap/f/gen/ui5/webcomponents/dist/ListItem
      * @constructor
      * @private
@@ -143,7 +143,6 @@ sap.ui.define(
              *
              * **Note:** When set to `Active` or `Navigation`, the item will provide visual response upon press and hover,
              * while with type `Inactive` and `Detail` - will not.
-             *
              * @type module:sap/f/gen/ui5/webcomponents.ListItemType
              */
             type: {
@@ -163,7 +162,6 @@ sap.ui.define(
             /**
              * Defines the highlight state of the list items.
              * Available options are: `"None"` (by default), `"Positive"`, `"Critical"`, `"Information"` and `"Negative"`.
-             *
              * @type module:sap/f/gen/ui5/webcomponents.Highlight
              */
             highlight: {
@@ -178,7 +176,15 @@ sap.ui.define(
               type: "boolean",
               mapping: "property",
               defaultValue: false
-            }
+            },
+            /**
+             * The 'width' of the Web Component in <code>sap.ui.core.CSSSize</code>.
+             */
+            width: { type: "sap.ui.core.CSSSize", mapping: "style" },
+            /**
+             * The 'height' of the Web Component in <code>sap.ui.core.CSSSize</code>.
+             */
+            height: { type: "sap.ui.core.CSSSize", mapping: "style" }
           },
 
           aggregations: {
@@ -193,7 +199,6 @@ sap.ui.define(
              *
              * The priority of what will be displayed at the end of the menu item is as follows:
              * sub-menu arrow (if there are items added in `items` slot) -> components added in `endContent` -> text set to `additionalText`.
-             *
              * @type module:sap/f/gen/ui5/webcomponents.IMenuItem
              */
             items: { type: "sap.f.gen.ui5.webcomponents.IMenuItem", multiple: true },
@@ -211,7 +216,6 @@ sap.ui.define(
              * Application developers are responsible for ensuring that interactive elements placed in the `endContent` slot
              * have the correct accessibility behaviour, including their enabled or disabled states.
              * The menu does not manage these aspects when the menu item state changes.
-             *
              * @type module:sap/ui/core/Control
              */
             endContent: {
@@ -224,7 +228,6 @@ sap.ui.define(
              * **Note:** While the slot allows custom buttons, to match
              * design guidelines, please use the `ui5-button` component.
              * **Note:** When the slot is not present, a built-in delete button will be displayed.
-             *
              * @type module:sap/f/gen/ui5/webcomponents.IButton
              */
             deleteButton: {

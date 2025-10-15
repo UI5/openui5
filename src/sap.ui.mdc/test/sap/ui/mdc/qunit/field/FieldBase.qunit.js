@@ -3889,9 +3889,14 @@ sap.ui.define([
 	});
 
 
-	QUnit.test("requestShowTypeahead - ValueHelp should open on focus", (assert) => {
+	QUnit.test("requestShowTypeahead - ValueHelp should open on focus", async (assert) => {
 		const oIcon = new Icon("I3", { src: "sap-icon://sap-ui5", decorative: false, press: (oEvent) => {} }).placeAt("content"); // just dummy handler to make Icon focusable
+		await nextUIUpdate();
+
 		const oValueHelp = Element.getElementById(oField.getValueHelp());
+		const aContent = oField.getAggregation("_content");
+		const oContent = aContent?.length > 0 && aContent[0];
+		const oToken = oContent?.getTokens()?.[0];
 
 		sinon.stub(oValueHelp, "requestShowTypeahead").returns(Promise.resolve(true));
 		sinon.spy(oValueHelp, "toggleOpen");
@@ -3900,16 +3905,12 @@ sap.ui.define([
 			return this.toggleOpen.called;
 		});
 
-		const aContent = oField.getAggregation("_content");
-		const oContent = aContent?.length > 0 && aContent[0];
-		const oToken = oContent?.getTokens()?.[0];
-
 		oToken.focus(); // focussing Token should not open ValueHelp
 		assert.ok(oValueHelp.requestShowTypeahead.notCalled, "requestShowTypeahead not called");
 
 		oIcon.focus(); // to have focus outside
 
-		return new Promise((resolve, reject) => {
+		await new Promise((resolve, reject) => {
 			setTimeout(() => { // as focussing token rebind tokens - wait until finished
 				oValueHelp.close.resetHistory();
 				oField.focus();

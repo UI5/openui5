@@ -77,7 +77,6 @@ sap.ui.define(
              * Defines how the text of a component will be displayed when there is not enough space.
              *
              * **Note:** for option "Normal" the text will wrap and the words will not be broken based on hyphenation.
-             *
              * @type module:sap/f/gen/ui5/webcomponents.WrappingType
              */
             wrappingType: {
