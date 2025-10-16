@@ -138,6 +138,12 @@
 		}
 	}
 
+	&.sapMDialog header {
+		.sapMBarLeft:not(:empty) ~ .sapMBarMiddle > .sapMBarPH {
+			padding-left: 0.25rem;
+		}
+	}
+
 	.sapMMenuItemIcon > .sapUiIcon {
 		line-height: @_sap_m_Menu_ItmHeightCozy;
 		font-size: @_sap_m_Menu_ItmHeightCozy / 2 - 0.125rem;

@@ -74,7 +74,6 @@
                         uploadUrl="./uploadFiles"
                         multiple="true"
                         uploadEnabled="true"
-                        httpRequestMethod="POST"
                         beforeUploadStarts="onBeforeUploadStarts"
                         uploadCompleted="onUploadCompleted"
                         itemRenamed="onDocumentRenamedSuccess"
