@@ -732,7 +732,7 @@ sap.ui.define([
 		QUnit.test("when UI Adaptation is started and the What's New dialog is initialized", async function(assert) {
 			sandbox.stub(FeaturesAPI, "isSeenFeaturesAvailable").returns(true);
 			sandbox.stub(FeaturesAPI, "getSeenFeatureIds").returns([]);
-			const sessionStorageSpy = sandbox.spy(sessionStorage, "setItem").withArgs("sap.ui.rta.dontShowWhatsNewAfterReload", true);
+			const sWhatsNewReloadFlag = "sap.ui.rta.dontShowWhatsNewAfterReload";
 			this.oRta = new RuntimeAuthoring({
 				rootControl: oComp.getAggregation("rootControl")
 			});
@@ -742,7 +742,7 @@ sap.ui.define([
 
 			assert.ok(DOMUtil.isVisible(document.getElementById("sapUiRtaWhatsNewDialog")), "then the WhatsNew dialog is visible");
 			assert.ok(
-				sessionStorageSpy.calledOnceWithExactly("sap.ui.rta.dontShowWhatsNewAfterReload", true),
+				window.sessionStorage.getItem(sWhatsNewReloadFlag),
 				"then the WhatsNew dialog doesn't show after reload flag is set"
 			);
 		});

@@ -5,7 +5,7 @@
 sap.ui.define([
 	"../../TableDelegate",
 	"../../table/ODataV4PropertyHelper",
-	"sap/ui/table/Table",
+	"sap/ui/mdc/Table",
 	"sap/ui/mdc/enums/TableP13nMode",
 	"sap/ui/mdc/enums/TableType",
 	"sap/ui/mdc/enums/TableSelectionMode",
