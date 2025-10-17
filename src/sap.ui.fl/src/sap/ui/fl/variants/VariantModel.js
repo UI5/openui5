@@ -9,16 +9,13 @@ sap.ui.define([
 	"sap/base/util/isEmptyObject",
 	"sap/base/util/merge",
 	"sap/ui/core/util/reflection/JsControlTreeModifier",
-	"sap/ui/core/BusyIndicator",
 	"sap/ui/core/Lib",
 	"sap/ui/fl/apply/_internal/controlVariants/URLHandler",
 	"sap/ui/fl/apply/_internal/controlVariants/Utils",
 	"sap/ui/fl/apply/_internal/flexObjects/FlexObjectFactory",
 	"sap/ui/fl/apply/_internal/flexState/changes/DependencyHandler",
-	"sap/ui/fl/apply/_internal/flexState/controlVariants/Switcher",
 	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
 	"sap/ui/fl/apply/_internal/flexState/FlexObjectState",
-	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/initial/_internal/Settings",
 	"sap/ui/fl/Layer",
@@ -34,16 +31,13 @@ sap.ui.define([
 	isEmptyObject,
 	merge,
 	JsControlTreeModifier,
-	BusyIndicator,
 	Lib,
 	URLHandler,
 	VariantUtil,
 	FlexObjectFactory,
 	DependencyHandler,
-	Switcher,
 	VariantManagementState,
 	FlexObjectState,
-	ControlVariantApplyAPI,
 	ManifestUtils,
 	Settings,
 	Layer,
@@ -59,24 +53,6 @@ sap.ui.define([
 	const { SharingMode } = mobileLibrary;
 
 	/**
-	 * Adds the passed function to the variant switch promise and returns the whole promise chain.
-	 *
-	 * @param {function():Promise} fnCallback - Callback function returning a promise
-	 * @param {string} sFlexReference - Flex reference of the app
-	 * @param {string} sVMReference - Variant Management reference
-	 * @returns {Promise} Resolves when the variant model is not busy anymore
-	 * @private
-	 */
-	function executeAfterSwitch(fnCallback, sFlexReference, sVMReference) {
-		// if there are multiple switches triggered very quickly this makes sure that they are being executed one after another
-		const oNewPromise = VariantManagementState.waitForVariantSwitch(sFlexReference, sVMReference)
-		.catch(function() {})
-		.then(fnCallback);
-		VariantManagementState.setVariantSwitchPromise(sFlexReference, sVMReference, oNewPromise);
-		return oNewPromise;
-	}
-
-	/**
 	 * Saves the specified Unified Shell service on the model
 	 *
 	 * @param {string} sServiceName Name of the ushell service (e.g. "URLParsing")
@@ -84,23 +60,6 @@ sap.ui.define([
 	 */
 	function setUShellService(sServiceName, oService) {
 		_mUShellServices[sServiceName] = oService;
-	}
-
-	function switchVariantAndUpdateModel(mPropertyBag, sScenario) {
-		return Switcher.switchVariant(mPropertyBag)
-		.then(function() {
-			// update current variant in model
-			if (this.oData[mPropertyBag.vmReference].updateVariantInURL) {
-				URLHandler.updateVariantInURL({
-					vmReference: mPropertyBag.vmReference,
-					newVReference: mPropertyBag.newVReference,
-					model: this
-				});
-			}
-
-			// tell listeners that variant switch has happened
-			this.callVariantSwitchListeners(mPropertyBag.vmReference, mPropertyBag.newVReference, undefined, sScenario);
-		}.bind(this));
 	}
 
 	function updatePersonalVariantPropertiesWithFlpSettings(oVariant) {
@@ -231,7 +190,7 @@ sap.ui.define([
 	VariantModel.prototype.updateData = function() {
 		const oNewVariantsMap = this.oDataSelector.get({ reference: this.sFlexReference });
 		const oCurrentData = { ...this.getData() };
-		Object.entries(oNewVariantsMap).forEach(function(aVariants) {
+		Object.entries(oNewVariantsMap).forEach((aVariants) => {
 			const sVariantManagementKey = aVariants[0];
 			const oVariantMapEntry = { ...aVariants[1] };
 			oCurrentData[sVariantManagementKey] ||= {};
@@ -242,6 +201,25 @@ sap.ui.define([
 				});
 				return { ...(oCurrentVariantData || {}), ...oVariant };
 			});
+			const sOldCurrentVariant = oCurrentData[sVariantManagementKey].currentVariant;
+			// Currently the VariantModel is still created independent of the existence of a VM control
+			// It is likely that the control was created if sOldCurrentVariant is set but there are edge cases,
+			// e.g. when creating the standard variant from a source variant directly in the FlexState
+			// In such cases the switch was not triggered by a user though and thus must not be reflected in
+			// the url, making it safe to ignore
+			const oVMControl = VariantUtil.getVariantManagementControlByVMReference(sVariantManagementKey, this.oAppComponent);
+			if (
+				oVMControl
+				&& oVMControl.getUpdateVariantInURL()
+				&& sOldCurrentVariant
+				&& sOldCurrentVariant !== oVariantMapEntry.currentVariant
+			) {
+				URLHandler.updateVariantInURL({
+					vmReference: sVariantManagementKey,
+					newVReference: oVariantMapEntry.currentVariant,
+					model: this
+				});
+			}
 			oCurrentData[sVariantManagementKey].currentVariant = oVariantMapEntry.currentVariant;
 			oCurrentData[sVariantManagementKey].defaultVariant = oVariantMapEntry.defaultVariant;
 			oCurrentData[sVariantManagementKey].modified = oVariantMapEntry.modified;
@@ -267,38 +245,6 @@ sap.ui.define([
 			// initialize hash data - variants map & model should exist at this point (set on constructor)
 			URLHandler.initialize({ model: this });
 		}.bind(this));
-	};
-
-	/**
-	 * Updates the storage of the current variant for a given variant management control.
-	 * @param {object} mPropertyBag - Object with parameters as properties
-	 * @param {string} mPropertyBag.variantManagementReference - Variant management reference
-	 * @param {string} mPropertyBag.newVariantReference - Newly selected variant reference
-	 * @param {sap.ui.core.Component} [mPropertyBag.appComponent] - Application component responsible for the variant management reference
-	 * @param {boolean} [mPropertyBag.internallyCalled] - If set variant model is not set to busy explicitly
-	 * @param {string} [mPropertyBag.scenario] - The current scenario, e.g. 'saveAs'
-	 *
-	 * @returns {Promise} Promise that resolves after the variant is updated
-	 * @private
-	 */
-	VariantModel.prototype.updateCurrentVariant = function(mPropertyBag) {
-		var mProperties = {
-			vmReference: mPropertyBag.variantManagementReference,
-			currentVReference: this.getCurrentVariantReference(mPropertyBag.variantManagementReference),
-			newVReference: mPropertyBag.newVariantReference,
-			appComponent: mPropertyBag.appComponent || this.oAppComponent,
-			modifier: JsControlTreeModifier,
-			reference: this.sFlexReference
-		};
-
-		if (mPropertyBag.internallyCalled) {
-			return switchVariantAndUpdateModel.call(this, mProperties, mPropertyBag.scenario);
-		}
-		return executeAfterSwitch(
-			switchVariantAndUpdateModel.bind(this, mProperties, mPropertyBag.scenario),
-			this.sFlexReference,
-			mPropertyBag.variantManagementReference
-		);
 	};
 
 	/**
@@ -337,31 +283,6 @@ sap.ui.define([
 			this.oData[sVMReference].variants,
 			sVariantReference
 		);
-	};
-
-	/**
-	 * Searches for the variant and returns the current title.
-	 *
-	 * @param {string} sVariantReference - Variant reference
-	 * @param {string} sVMReference - Variant management reference
-	 * @returns {string} Title of the variant
-	 */
-	VariantModel.prototype.getVariantTitle = function(sVariantReference, sVMReference) {
-		return getVariant(this.oData[sVMReference].variants, sVariantReference).title;
-	};
-
-	VariantModel.prototype.callVariantSwitchListeners = function(sVMReference, sNewVariantReference, fnCallback, sScenario) {
-		const oVMControl = ControlVariantApplyAPI.getVariantManagementControlByVMReference(sVMReference, this.oAppComponent);
-		const oVariant = getVariant(this.oData[sVMReference].variants, sNewVariantReference);
-		if (sScenario) {
-			oVariant.createScenario = sScenario;
-		}
-
-		if (fnCallback) {
-			fnCallback(oVariant);
-		} else {
-			oVMControl._executeAllVariantAppliedListeners(oVariant);
-		}
 	};
 
 	function createNewVariant(oSourceVariant, mPropertyBag) {
@@ -549,7 +470,7 @@ sap.ui.define([
 	/**
 	 * Sets the passed properties on a variant for the passed variant management reference and
 	 * returns the content for change creation
-	 * @param {sap.ui.fl.variants.VariantManagement} sVariantManagementReference - Variant management reference
+	 * @param {string} sVariantManagementReference - Variant management reference
 	 * @param {object} mPropertyBag - Map of properties
 	 * @param {string} mPropertyBag.variantReference - Variant reference for which properties should be set
 	 * @param {string} mPropertyBag.changeType - Change type due to which properties are being set
@@ -561,7 +482,6 @@ sap.ui.define([
 	 * @param {boolean} [mPropertyBag.favorite] - New favorite value for <code>setFavorite</code> change type
 	 * @param {boolean} [mPropertyBag.executeOnSelect] - New executeOnSelect value for <code>setExecuteOnSelect</code> change type
 	 * @param {string} [mPropertyBag.defaultVariant] - New default variant for <code>setDefault</code> change type
-	 * @param {boolean} [bUpdateCurrentVariant] - Update current variant
 	 * @returns {{title: string} | {favorite: boolean} | {executeOnSelect: boolean} | {visible: boolean, createdByReset: boolean} | {contexts: object} | {defaultVariant: string}} Additional content for change creation
 	 * @private
 	 * @ui5-restricted
@@ -570,6 +490,7 @@ sap.ui.define([
 		// TODO: this function needs refactoring
 		var oData = this.getData();
 		var oVariantInstance = this.getVariant(mPropertyBag.variantReference, sVariantManagementReference).instance;
+		const oVMControl = VariantUtil.getVariantManagementControlByVMReference(sVariantManagementReference, this.oAppComponent);
 
 		var mAdditionalChangeContent = {};
 
@@ -599,7 +520,7 @@ sap.ui.define([
 				mAdditionalChangeContent.defaultVariant = mPropertyBag.defaultVariant;
 				// Update hash data
 				var aHashParameters = URLHandler.getStoredHashParams({model: this});
-				if (aHashParameters && this.oData[sVariantManagementReference].updateVariantInURL) {
+				if (aHashParameters && oVMControl.getUpdateVariantInURL()) {
 					if (
 						oData[sVariantManagementReference].defaultVariant !== oData[sVariantManagementReference].currentVariant
 						&& aHashParameters.indexOf(oData[sVariantManagementReference].currentVariant) === -1
@@ -655,7 +576,7 @@ sap.ui.define([
 		}
 	};
 
-	VariantModel.prototype.setModelPropertiesForControl = function(sVariantManagementReference, bDesignTimeModeToBeSet, oControl) {
+	VariantModel.prototype.setModelPropertiesForControl = function(sVariantManagementReference, bDesignTimeModeToBeSet, oVMControl) {
 		this.oData[sVariantManagementReference].showFavorites = true;
 
 		// this._bDesignTime is undefined initially
@@ -665,7 +586,7 @@ sap.ui.define([
 
 			if (bDesignTimeModeToBeSet) {
 				URLHandler.clearAllVariantURLParameters({model: this});
-			} else if (bOriginalMode && this.oData[sVariantManagementReference].updateVariantInURL) {
+			} else if (bOriginalMode && oVMControl.getUpdateVariantInURL()) {
 				// use case: switch from end user -> key user with a restart; the initial hash data is empty
 				URLHandler.update({
 					parameters: URLHandler.getStoredHashParams({model: this}),
@@ -679,9 +600,9 @@ sap.ui.define([
 		if (!(typeof this.fnManageClick === "function" && typeof this.fnManageClickRta === "function")) {
 			this._initializeManageVariantsEvents();
 		}
-		oControl.detachManage(this.fnManageClick, this); /* attach done below */
+		oVMControl.detachManage(this.fnManageClick, this); /* attach done below */
 
-		if (bDesignTimeModeToBeSet && this.oData[sVariantManagementReference]._isEditable) {
+		if (bDesignTimeModeToBeSet && oVMControl.getEditable()) {
 			// Key user adaptation settings
 			this.oData[sVariantManagementReference].variantsEditable = false;
 
@@ -692,8 +613,8 @@ sap.ui.define([
 				oVariant.sharing = this.sharing.PUBLIC;
 				oVariant.remove = isVariantValidForRemove(oVariant, sVariantManagementReference, bDesignTimeModeToBeSet);
 			}.bind(this));
-		} else if (this.oData[sVariantManagementReference]._isEditable) { // Personalization settings
-			oControl.attachManage({
+		} else if (oVMControl.getEditable()) { // Personalization settings
+			oVMControl.attachManage({
 				variantManagementReference: sVariantManagementReference
 			}, this.fnManageClick, this);
 
@@ -764,28 +685,6 @@ sap.ui.define([
 		return JsControlTreeModifier.getSelector(sId, oAppComponent).id;
 	};
 
-	VariantModel.prototype.switchToDefaultForVariantManagement = function(sVariantManagementReference) {
-		if (this.oData[sVariantManagementReference].currentVariant !== this.oData[sVariantManagementReference].defaultVariant) {
-			BusyIndicator.show(200);
-			this.updateCurrentVariant({
-				variantManagementReference: sVariantManagementReference,
-				newVariantReference: this.oData[sVariantManagementReference].defaultVariant
-			}).then(function() {
-				BusyIndicator.hide();
-			});
-		}
-	};
-
-	VariantModel.prototype.switchToDefaultForVariant = function(sVariantId) {
-		Object.keys(this.oData).forEach(function(sVariantManagementReference) {
-			// set default variant only if passed variant id matches the current variant, or
-			// if no variant id passed, set to default variant
-			if (!sVariantId || this.oData[sVariantManagementReference].currentVariant === sVariantId) {
-				this.switchToDefaultForVariantManagement(sVariantManagementReference);
-			}
-		}.bind(this));
-	};
-
 	function resolveTitleBindingsAndCreateVariantChanges(oVariantManagementControl, sVariantManagementReference) {
 		this.oData[sVariantManagementReference].variants.forEach(function(oVariant) {
 			// Find model and key from patterns like {i18n>TextKey} or {i18n>namespace.TextKey} - only resource models are supported
@@ -824,9 +723,6 @@ sap.ui.define([
 		// ensure standard variants are mocked, if no variants are present in the changes.variantSection response from the backend
 		this._ensureStandardVariantExists(sVariantManagementReference);
 
-		// original setting of control parameter 'editable' is needed
-		this.oData[sVariantManagementReference]._isEditable = oVariantManagementControl.getEditable();
-
 		// only attachVariantApplied will set this to true
 		oVariantManagementControl.setShowExecuteOnSelection(false);
 
@@ -846,10 +742,7 @@ sap.ui.define([
 		// set model's properties specific to control's appearance
 		this.setModelPropertiesForControl(sVariantManagementReference, false, oVariantManagementControl);
 
-		// control property updateVariantInURL set initially
-		const bUpdateURL = oVariantManagementControl.getUpdateVariantInURL(); // default false
-		this.oData[sVariantManagementReference].updateVariantInURL = bUpdateURL;
-		if (bUpdateURL) {
+		if (oVariantManagementControl.getUpdateVariantInURL()) {
 			URLHandler.registerControl({
 				vmReference: sVariantManagementReference,
 				updateURL: true,
@@ -857,7 +750,8 @@ sap.ui.define([
 			});
 			URLHandler.handleModelContextChange({
 				model: this,
-				vmControl: oVariantManagementControl
+				vmControl: oVariantManagementControl,
+				appComponent: this.oAppComponent
 			});
 		}
 

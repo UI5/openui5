@@ -105,7 +105,7 @@ sap.ui.define([
 			const oOverlay = new ElementOverlay({element: this.oVariantManagement});
 			sandbox.stub(OverlayRegistry, "getOverlay").returns(oOverlay);
 			sandbox.stub(oOverlay, "getVariantManagement").returns("idMain1--variantManagementOrdersTable");
-			sandbox.stub(this.oVariantManagement, "getCurrentVariantKey").returns("variant00");
+			sandbox.stub(this.oVariantManagement, "getCurrentVariantReference").returns("variant00");
 			sandbox.stub(VariantManager, "getControlChangesForVariant")
 			.withArgs("Dummy", "variantMgmtId1", "variant00")
 			.returns([this.oChange1, this.oChange2]);

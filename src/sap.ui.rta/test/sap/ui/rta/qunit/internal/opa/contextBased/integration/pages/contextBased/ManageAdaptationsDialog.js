@@ -288,7 +288,7 @@ sap.ui.define([
 						}
 					});
 				},
-				iShouldSeeCorrectDateFormat(sDate, iColumnRow, sPropertyPath) {
+				iShouldSeeCorrectDateFormat(sExpectedDate, sExpectedTime, iColumnRow, sPropertyPath) {
 					return this.waitFor({
 						controlType: "sap.m.Text",
 						bindingPath: {
@@ -299,7 +299,10 @@ sap.ui.define([
 						searchOpenDialogs: true,
 						success(vControls) {
 							var oControl = vControls[0] || vControls;
-							Opa5.assert.strictEqual(oControl.getText().endsWith(sDate), true, "Contains the correct DateFormat");
+							Opa5.assert.ok(
+								oControl.getText().includes(sExpectedDate) &&
+								oControl.getText().includes(sExpectedTime),
+								"Contains the correct DateFormat");
 						}
 					});
 				},

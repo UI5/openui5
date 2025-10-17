@@ -102,6 +102,20 @@ sap.ui.define([
 
 		getAllVariantManagementControlIds(oElement) {
 			return getVariantManagementControlIds(oElement);
+		},
+
+		/**
+		 * Returns the variant management control instance for a variant management reference.
+		 *
+		 * @param {string} sVariantManagementReference - Variant management reference
+		 * @param {sap.ui.core.Component} oAppComponent - Application component
+		 * @returns {sap.ui.fl.variants.VariantManagement} The variant management control instance
+		 */
+		getVariantManagementControlByVMReference(sVariantManagementReference, oAppComponent) {
+			const sVMControlId = oAppComponent.byId(sVariantManagementReference)
+				? oAppComponent.createId(sVariantManagementReference)
+				: sVariantManagementReference;
+			return Element.getElementById(sVMControlId);
 		}
 	};
 

@@ -4,7 +4,6 @@ sap.ui.define([
 	"sap/base/util/LoaderExtensions",
 	"sap/ui/core/Control",
 	"sap/ui/core/Lib",
-	"sap/ui/core/Manifest",
 	"sap/ui/fl/apply/_internal/controlVariants/URLHandler",
 	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
 	"sap/ui/fl/apply/_internal/flexState/FlexState",
@@ -22,13 +21,13 @@ sap.ui.define([
 	"sap/ui/fl/Utils",
 	"sap/ui/model/json/JSONModel",
 	"sap/ui/thirdparty/sinon-4",
-	"test-resources/sap/ui/fl/qunit/FlQUnitUtils"
+	"test-resources/sap/ui/fl/qunit/FlQUnitUtils",
+	"test-resources/sap/ui/rta/qunit/RtaQunitUtils"
 ], function(
 	deepClone,
 	LoaderExtensions,
 	Control,
 	Lib,
-	Manifest,
 	URLHandler,
 	VariantManagementState,
 	FlexState,
@@ -46,7 +45,8 @@ sap.ui.define([
 	Utils,
 	JSONModel,
 	sinon,
-	FlQUnitUtils
+	FlQUnitUtils,
+	RtaQunitUtils
 ) {
 	"use strict";
 
@@ -1869,34 +1869,9 @@ sap.ui.define([
 	QUnit.module("When ContextBasedAdaptationsAPI.canMigrate and migrate are called", {
 		before() {
 			this.oResourceBundle = Lib.getResourceBundleFor("sap.ui.fl");
-			var oManifestObj = {
-				"_version": "2.0.0",
-
-				"sap.app": {
-					id: "com.sap.test.app"
-				}
-			};
-			this.oManifest = new Manifest(oManifestObj);
-			this.oAppComponent = {
-				getManifest: function() {
-					return this.oManifest;
-				}.bind(this),
-				getManifestObject() {
-					return oManifestObj;
-				},
-				getId() {
-					return "sComponentId";
-				},
-				getComponentData() {
-					return {
-						startupParameters: []
-					};
-				},
-				getLocalId() {}
-			};
 		},
 		beforeEach() {
-			sandbox.stub(Utils, "getAppComponentForControl").returns(this.oAppComponent);
+			this.oAppComponent = RtaQunitUtils.createAndStubAppComponent(sandbox, "com.sap.test.app");
 			sandbox.stub(ManifestUtils, "getFlexReference").returns("com.sap.app");
 			sandbox.stub(ManifestUtils, "getFlexReferenceForControl").returns("com.sap.app");
 			sandbox.stub(URLHandler, "attachHandlers");
@@ -1934,6 +1909,7 @@ sap.ui.define([
 		afterEach() {
 			FlexState.clearState();
 			ContextBasedAdaptationsAPI.clearInstances(this.mPropertyBag);
+			this.oAppComponent.destroy();
 			sandbox.restore();
 		}
 	}, function() {

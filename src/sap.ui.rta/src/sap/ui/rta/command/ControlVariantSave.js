@@ -43,7 +43,7 @@ sap.ui.define([
 		this._aControlChanges = VariantManager.getControlChangesForVariant(
 			this.sFlexReference,
 			oVMControl.getVariantManagementReference(),
-			oVMControl.getCurrentVariantKey()
+			oVMControl.getCurrentVariantReference()
 		);
 		this._aDirtyChanges = VariantManager.getDirtyChangesFromVariantChanges(this._aControlChanges, this.sFlexReference);
 		this._aDirtyChanges.forEach((oChange) => {

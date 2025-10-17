@@ -484,7 +484,7 @@ sap.ui.define([
 		const sVariantManagementReference = oOverlay.getVariantManagement();
 
 		return this.getCommandFactory().getCommandFor(oVMControl, "saveAs", {
-			sourceVariantReference: oVMControl.getCurrentVariantKey()
+			sourceVariantReference: oVMControl.getCurrentVariantReference()
 		}, oDesignTimeMetadata, sVariantManagementReference)
 		.then(function(oSaveAsCommand) {
 			this.fireElementModified({
@@ -617,7 +617,7 @@ sap.ui.define([
 		}
 
 		if (this.isVariantSwitchAvailable(oElementOverlay)) {
-			const oCurrentVariant = oVMControl.getVariantByKey(oVMControl.getCurrentVariantKey());
+			const oCurrentVariant = oVMControl.getVariantByKey(oVMControl.getCurrentVariantReference());
 			const aSubmenuItems = oVMControl.getVariants().reduce(function(aReducedVariants, oVariant) {
 				if (oVariant.getVisible()) {
 					const bCurrentItem = oCurrentVariant.getKey() === oVariant.getKey();

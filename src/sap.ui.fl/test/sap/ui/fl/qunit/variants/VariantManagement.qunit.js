@@ -16,6 +16,7 @@ sap.ui.define([
 	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/initial/_internal/Settings",
 	"sap/ui/fl/variants/VariantManagement",
+	"sap/ui/fl/variants/VariantManager",
 	"sap/ui/fl/variants/VariantModel",
 	"sap/ui/fl/Layer",
 	"sap/ui/fl/Utils",
@@ -39,6 +40,7 @@ sap.ui.define([
 	ManifestUtils,
 	flSettings,
 	VariantManagement,
+	VariantManager,
 	VariantModel,
 	Layer,
 	Utils,
@@ -138,7 +140,8 @@ sap.ui.define([
 				{},
 				{
 					appComponent: {
-						getId: () => "foo"
+						getId: () => "foo",
+						byId: () => null
 					}
 				}
 			);
@@ -382,7 +385,7 @@ sap.ui.define([
 
 			// Switch variant
 			this.oVariantManagement.setCurrentVariantKey("v4");
-			await RtaQunitUtils.waitForMethodCall(sandbox, VariantManagementState, "setCurrentVariant");
+			await RtaQunitUtils.waitForMethodCall(sandbox, VariantManager, "handleSelectVariant");
 			assert.notOk(this._oVM.oVariantSaveBtn.getVisible());
 			assert.notOk(this.oVariantManagement.getModified());
 			assert.ok(this._oVM.oVariantSaveAsBtn.getVisible());
@@ -400,7 +403,7 @@ sap.ui.define([
 
 			// Switch to same variant
 			this.oVariantManagement.setCurrentVariantKey("v4");
-			await RtaQunitUtils.waitForMethodCall(sandbox, FlexState, "removeDirtyFlexObjects");
+			await RtaQunitUtils.waitForMethodCall(sandbox, VariantManager, "handleSelectVariant");
 			assert.notOk(this._oVM.oVariantSaveBtn.getVisible());
 			assert.notOk(this.oVariantManagement.getModified());
 
@@ -413,6 +416,28 @@ sap.ui.define([
 			);
 			this._oVM.setShowSaveAs(false);
 			assert.notOk(this._oVM.oVariantSaveAsBtn.getVisible());
+		});
+
+		QUnit.test("Current variant reference handling during switch", async function(assert) {
+			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
+
+			this.oVariantManagement.setCurrentVariantKey("v4");
+			assert.strictEqual(
+				this.oVariantManagement.getCurrentVariantKey(),
+				"v4",
+				"then current variant key is set immediately"
+			);
+			assert.strictEqual(
+				this.oVariantManagement.getCurrentVariantReference(),
+				"One",
+				"then current variant reference still reflects the actually applied variant"
+			);
+			await RtaQunitUtils.waitForMethodCall(sandbox, VariantManager, "handleSelectVariant");
+			assert.strictEqual(
+				this.oVariantManagement.getCurrentVariantReference(),
+				"v4",
+				"then current variant reference is updated after the variant was applied"
+			);
 		});
 
 		QUnit.test("Create Variants List with favorited Standard", function(assert) {

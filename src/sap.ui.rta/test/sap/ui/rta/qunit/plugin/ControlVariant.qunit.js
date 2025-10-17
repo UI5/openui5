@@ -712,7 +712,7 @@ sap.ui.define([
 			const configureDone = assert.async();
 			const switchDone = assert.async();
 			this.oVariantManagementControl.setModified(true);
-			sandbox.stub(this.oVariantManagementControl, "getCurrentVariantKey").returns("variant1");
+			sandbox.stub(this.oVariantManagementControl, "getCurrentVariantReference").returns("variant1");
 			sandbox.stub(this.oVariantManagementControl, "getVariantByKey").withArgs("variant1").returns({
 				getKey: () => "variant1"
 			});
@@ -1107,7 +1107,7 @@ sap.ui.define([
 
 			await nextUIUpdate();
 
-			sandbox.stub(this.oVariantManagementControl, "getCurrentVariantKey").returns("variant1");
+			sandbox.stub(this.oVariantManagementControl, "getCurrentVariantReference").returns("variant1");
 			sandbox.stub(this.oVariantManagementControl, "getVariantByKey").withArgs("variant1").returns({
 				getKey: () => "variant1"
 			});

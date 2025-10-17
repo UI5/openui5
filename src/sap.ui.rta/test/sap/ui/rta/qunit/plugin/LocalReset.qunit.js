@@ -265,7 +265,7 @@ sap.ui.define([
 			sandbox.stub(ControlVariantApplyAPI, "getVariantManagementControlByVMReference")
 			.withArgs("variantManagement1", this.oMockedAppComponent)
 			.returns({
-				getCurrentVariantKey() {
+				getCurrentVariantReference() {
 					return "variant1";
 				}
 			});

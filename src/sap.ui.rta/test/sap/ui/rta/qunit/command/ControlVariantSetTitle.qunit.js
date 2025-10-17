@@ -34,7 +34,7 @@ sap.ui.define([
 			const sNewText = "Test";
 			const oAddChangeStub = sandbox.stub(VariantManager, "addVariantChange").resolves("setTitleChange");
 			const oDeleteStub = sandbox.stub(VariantManager, "deleteVariantChange").resolves();
-			sandbox.stub(this.oVariantManagement, "getCurrentVariantKey").returns("variant0");
+			sandbox.stub(this.oVariantManagement, "getCurrentVariantReference").returns("variant0");
 			sandbox.stub(this.oVariantManagement, "getVariantByKey").returns({
 				getTitle() { return "variant A"; }
 			});

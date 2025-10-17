@@ -33,7 +33,7 @@ sap.ui.define([
 	QUnit.module("ControlVariantConfigure, when calling command factory for configure and undo", {
 		beforeEach() {
 			this.oVariantManagement = new VariantManagement("variantMgmtId1");
-			sandbox.stub(this.oVariantManagement, "getCurrentVariantKey").returns("variant1");
+			sandbox.stub(this.oVariantManagement, "getCurrentVariantReference").returns("variant1");
 			this.oAddVariantChangeStub = sandbox.stub(VariantManager, "addVariantChange").returnsArg(1);
 			this.oDeleteVariantChangeStub = sandbox.stub(VariantManager, "deleteVariantChange");
 			this.oActivateVariantStub = sandbox.stub(ControlVariantApplyAPI, "activateVariant").resolves();

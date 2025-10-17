@@ -610,7 +610,7 @@ sap.ui.define([
 
 		QUnit.test("Execute 1 'Remove' command and 1 'ControlVariantSwitch' command and save commands", function(assert) {
 			const oSaveChangeSpy = sandbox.spy(PersistenceWriteAPI, "save");
-			sandbox.stub(this.oVM, "getCurrentVariantKey").returns("variantReference");
+			sandbox.stub(this.oVM, "getCurrentVariantReference").returns("variantReference");
 			return CommandFactory.getCommandFor(this.oVM, "switch", {
 				targetVariantReference: "variantReference",
 				sourceVariantReference: "variantReference"
@@ -635,7 +635,7 @@ sap.ui.define([
 
 		QUnit.test("Execute 1 'Remove' command, 1 'ControlVariantSwitch' command, undo and call saveCommands", function(assert) {
 			const oSaveChangeSpy = sandbox.spy(PersistenceWriteAPI, "save");
-			sandbox.stub(this.oVM, "getCurrentVariantKey").returns("variantReference");
+			sandbox.stub(this.oVM, "getCurrentVariantReference").returns("variantReference");
 			return CommandFactory.getCommandFor(this.oInput1, "Remove", {
 				removedElement: this.oInput1
 			}, this.oInputDesignTimeMetadata)

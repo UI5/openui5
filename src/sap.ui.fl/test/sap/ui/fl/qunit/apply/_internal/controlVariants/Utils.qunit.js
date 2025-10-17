@@ -16,9 +16,12 @@ sap.ui.define([
 	Element,
 	UIComponent,
 	VariantUtils,
-	FlexObjectFactory
+	FlexObjectFactory,
+	sinon
 ) {
 	"use strict";
+
+	const sandbox = sinon.createSandbox();
 
 	function assertVMControlFound(sLocalControlId, sLocalVMControlId, aVMControlIds, assert) {
 		var oControl = Element.getElementById(`testComponent2---mockview--${sLocalControlId}`);
@@ -97,6 +100,9 @@ sap.ui.define([
 
 			oViewPromise.then(done);
 		},
+		afterEach() {
+			sandbox.reset();
+		},
 		after() {
 			this.oComp.destroy();
 			this.oCompContainer.destroy();
@@ -126,6 +132,20 @@ sap.ui.define([
 			assert.strictEqual(bBelongsToVM1, true, "true is returned for the first variant management control");
 			assert.strictEqual(bBelongsToVM2, true, "true is returned for the second variant management control");
 			assert.strictEqual(bBelongsToVM3, false, "false is returned for the control not belonging to a variant management control");
+		});
+
+		QUnit.test("When getVariantManagementControlByVMReference is called", function(assert) {
+			const oVM = { id: "myVMRef" };
+			const oAppComponent = {
+				byId() { return oVM; },
+				createId(sId) { return `view--${sId}`; }
+			};
+			sandbox.stub(Element, "getElementById").withArgs(`view--${oVM.id}`).returns(oVM);
+			assert.strictEqual(
+				VariantUtils.getVariantManagementControlByVMReference(oVM.id, oAppComponent),
+				oVM,
+				"Then it returns the VM control for the given reference"
+			);
 		});
 	});
 

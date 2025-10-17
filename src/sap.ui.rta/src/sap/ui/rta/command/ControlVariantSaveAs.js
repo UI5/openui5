@@ -146,6 +146,7 @@ sap.ui.define([
 				variant: this._oVariantChange,
 				sourceVariantReference: this.getSourceVariantReference(),
 				variantManagementReference: this.sVariantManagementReference,
+				vmControl: this.getElement(),
 				appComponent: this.oAppComponent
 			};
 

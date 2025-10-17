@@ -12,6 +12,7 @@ sap.ui.define([
 	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
 	"sap/ui/fl/apply/_internal/flexState/FlexObjectState",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
+	"sap/ui/fl/variants/VariantManager",
 	"sap/ui/fl/Utils",
 	"sap/ui/fl/apply/_internal/init"
 ], function(
@@ -24,6 +25,7 @@ sap.ui.define([
 	VariantManagementState,
 	FlexObjectState,
 	ManifestUtils,
+	VariantManager,
 	Utils
 ) {
 	"use strict";
@@ -151,10 +153,7 @@ sap.ui.define([
 		 * @returns {sap.ui.fl.variants.VariantManagement} The variant management control instance
 		 */
 		getVariantManagementControlByVMReference(sVariantManagementReference, oAppComponent) {
-			const sVMControlId = oAppComponent.byId(sVariantManagementReference)
-				? oAppComponent.createId(sVariantManagementReference)
-				: sVariantManagementReference;
-			return Element.getElementById(sVMControlId);
+			return VariantUtil.getVariantManagementControlByVMReference(sVariantManagementReference, oAppComponent);
 		},
 
 		/**
@@ -244,11 +243,6 @@ sap.ui.define([
 				);
 			}
 
-			const oVariantModel = oAppComponent.getModel(VARIANT_MODEL_NAME);
-			if (!oVariantModel) {
-				logAndThrowError(Error("No variant management model found for the passed control or application component"));
-			}
-
 			if (mPropertyBag.standardVariant && !oElement.isA("sap.ui.fl.variants.VariantManagement")) {
 				logAndThrowError(
 					Error("With using standardVariant and no variantReference, a variant management control must be passed as element")
@@ -295,10 +289,11 @@ sap.ui.define([
 			await oVMControl.waitForInit();
 
 			try {
-				await oVariantModel.updateCurrentVariant({
+				await VariantManager.updateCurrentVariant({
 					variantManagementReference: sVariantManagementReference,
 					newVariantReference: sVariantReference,
-					appComponent: oAppComponent
+					appComponent: oAppComponent,
+					vmControl: oVMControl
 				});
 			} catch (oError) {
 				logAndThrowError(oError);
@@ -350,8 +345,9 @@ sap.ui.define([
 				});
 			}
 
-			// first check if the passed vmControlId is correct, then save the callback
-			// for this check the control has to be in the control tree already
+			// First, check if the passed vmControlId is correct, then save the callback.
+			// For this check the affected control has to be in the control tree already to find the
+			// relevant variant management control
 			await waitForControlToBeRendered(oControl);
 			if (VariantUtil.getRelevantVariantManagementControlId(oControl) === mPropertyBag.vmControlId) {
 				// showExecuteOnSelection is only relevant when a control can react to the variant applied event

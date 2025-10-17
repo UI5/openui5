@@ -80,7 +80,7 @@ sap.ui.define([
 		if (this.getChanges().some((oChange) => {
 			if (
 				oChange.visible === false
-				&& oChange.variantReference === oVariantManagementControl.getCurrentVariantKey()
+				&& oChange.variantReference === oVariantManagementControl.getCurrentVariantReference()
 			) {
 				this._sOldVReference = oChange.variantReference;
 				return true;

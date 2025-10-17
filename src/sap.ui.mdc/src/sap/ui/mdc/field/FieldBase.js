@@ -116,7 +116,14 @@ sap.ui.define([
 	 */
 	const FieldBase = Control.extend("sap.ui.mdc.field.FieldBase", /* @lends sap.ui.mdc.field.FieldBase.prototype */ {
 		metadata: {
-			interfaces: ["sap.ui.core.IFormContent", "sap.ui.core.ISemanticFormContent", "sap.m.IOverflowToolbarContent", "sap.ui.core.ILabelable"],
+			interfaces: [
+				"sap.ui.core.IFormContent",
+				"sap.ui.core.ISemanticFormContent",
+				"sap.m.IOverflowToolbarContent",
+				"sap.ui.core.ILabelable",
+				"sap.m.IToolbarInteractiveControl"
+			],
+
 			designtime: "sap/ui/mdc/designtime/field/FieldBase.designtime",
 			library: "sap.ui.mdc",
 
@@ -1663,6 +1670,25 @@ sap.ui.define([
 				"valueStateText"
 			] // only add properties that are normally changed during livetime
 		};
+	};
+
+	/**
+	 * Returns whether the control is interactive or not.
+	 *
+	 * @returns {boolean} Whether it is an interactive Control
+	 * @private
+	 */
+	FieldBase.prototype._getToolbarInteractive = function() {
+		let bHasInteractiveContent = false;
+
+		const aContent = this.getCurrentContent();
+		if (aContent.length > 0) {
+			bHasInteractiveContent = aContent.reduce((bInteractive, oContent) => {
+				return bInteractive || oContent._getToolbarInteractive?.();
+			}, bHasInteractiveContent);
+		}
+
+		return bHasInteractiveContent;
 	};
 
 	/*

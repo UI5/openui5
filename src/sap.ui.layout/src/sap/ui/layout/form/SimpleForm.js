@@ -34,10 +34,8 @@ sap.ui.define([
 	// shortcut for sap.ui.layout.form.SimpleFormLayout
 	var SimpleFormLayout = library.form.SimpleFormLayout;
 
-	var ResponsiveLayout;
 	var ResponsiveGridLayout;
 	var ColumnLayout;
-	var ResizeHandler;
 
 
 	/**
@@ -381,7 +379,6 @@ sap.ui.define([
 	});
 
 	SimpleForm.prototype.init = function() {
-
 		this._iMaxWeight = 8;
 		this._iLabelWeight = 3;
 		this._iCurrentWidth = 0;
@@ -414,47 +411,26 @@ sap.ui.define([
 			}
 		};
 
-		oForm._origOnLayoutDataChange = oForm.onLayoutDataChange;
-		oForm.onLayoutDataChange = function(oEvent) {
-			this._origOnLayoutDataChange(oEvent);
-
-			var oSimpleForm = this.getParent();
-			if (oSimpleForm) {
-				oSimpleForm._onLayoutDataChange(oEvent);
-			}
-		};
-
 		this.setAggregation("form",oForm);
 		this._aElements = null;
-		this._aLayouts = [];
 		this._changedFormContainers = [];
 		this._changedFormElements = [];
 
 		this._oObserver = new ManagedObjectObserver(_observeChanges.bind(this));
-
 	};
 
 	SimpleForm.prototype.exit = function() {
-
 		var oForm = this.getAggregation("form");
 		oForm.invalidate = oForm._origInvalidate;
 
 		_removeResize.call(this);
 
-		for (var i = 0; i < this._aLayouts.length; i++) {
-			var oLayout = Element.getElementById(this._aLayouts[i]);
-			if (oLayout && oLayout.destroy) {
-				oLayout.destroy();
-			}
-		}
-		this._aLayouts = [];
 		this._aElements = null;
 		this._changedFormContainers = [];
 		this._changedFormElements = [];
 
 		this._oObserver.disconnect();
 		this._oObserver = undefined;
-
 	};
 
 	/*
@@ -1052,23 +1028,10 @@ sap.ui.define([
 
 		for ( var i = 0; i < aContent.length; i++) {
 			var oElement = aContent[i];
-			var oLayoutData = oElement.getLayoutData();
 			this._oObserver.unobserve(oElement);
 			var oElementClone = oElement.clone(sIdSuffix);
 			this._oObserver.observe(oElement, {properties: ["visible"]});
-			if (oLayoutData) {
-				// mark private LayoutData
-				if (oLayoutData.isA("sap.ui.core.VariantLayoutData")) {
-					var aLayoutData = oLayoutData.getMultipleLayoutData();
-					for ( var j = 0; j < aLayoutData.length; j++) {
-						if (_isMyLayoutData.call(this, aLayoutData[j])) {
-							oClone._aLayouts.push(oElementClone.getLayoutData().getMultipleLayoutData()[j].getId());
-						}
-					}
-				} else if (_isMyLayoutData.call(this, oLayoutData)) {
-					oClone._aLayouts.push(oElementClone.getLayoutData().getId());
-				}
-			}
+
 			oClone.addContent(oElementClone);
 		}
 
@@ -1166,78 +1129,6 @@ sap.ui.define([
 
 	}
 
-	function _removeOldLayoutData() {
-
-		this._bChangedByMe = true;
-		var oForm = this.getAggregation("form");
-		var aContainers = oForm.getFormContainers();
-
-		for ( var i = 0; i < aContainers.length; i++) {
-			var oContainer = aContainers[i];
-			_markFormElementForUpdate(this._changedFormContainers, oContainer);
-			if (oContainer.getLayoutData()) {
-				oContainer.destroyLayoutData();
-			}
-
-			var aElements = oContainer.getFormElements();
-			for ( var j = 0; j < aElements.length; j++) {
-				var oElement = aElements[j];
-				_markFormElementForUpdate(this._changedFormElements, oElement);
-				if (oElement.getLayoutData()) {
-					oElement.destroyLayoutData();
-				}
-
-				var oLabel = oElement.getLabel();
-				if (oLabel) {
-					_removeLayoutData.call(this, oLabel);
-				}
-
-				var aFields = oElement.getFields();
-				for ( var k = 0; k < aFields.length; k++) {
-					var oField = aFields[k];
-					_removeLayoutData.call(this, oField);
-				}
-			}
-		}
-
-		this._bChangedByMe = false;
-
-	}
-
-	function _addLayoutData() {
-
-		this._bChangedByMe = true;
-		var oForm = this.getAggregation("form");
-		var aContainers = oForm.getFormContainers();
-
-		for ( var i = 0; i < aContainers.length; i++) {
-			var oContainer = aContainers[i];
-			_markFormElementForUpdate(this._changedFormContainers, oContainer);
-			_createContainerLayoutData.call(this, oContainer);
-
-			var aElements = oContainer.getFormElements();
-			for ( var j = 0; j < aElements.length; j++) {
-				var oElement = aElements[j];
-				_markFormElementForUpdate(this._changedFormElements, oElement);
-				_createElementLayoutData.call(this, oElement);
-
-				var oLabel = oElement.getLabel();
-				if (oLabel) {
-					_createFieldLayoutData.call(this, oLabel, this._iLabelWeight, false, true, 192);
-				}
-
-				var aFields = oElement.getFields();
-				for ( var k = 0; k < aFields.length; k++) {
-					var oField = aFields[k];
-					_createFieldLayoutData.call(this, oField, 5, false, true);
-				}
-			}
-		}
-
-		this._bChangedByMe = false;
-
-	}
-
 	/*
 	 * Updates the Layout and corresponding layoutData of the SimpleForm.
 	 */
@@ -1286,20 +1177,6 @@ sap.ui.define([
 	}
 
 	/*
-	 * Checks whether the given LayoutData is created and added by this SimpleForm
-	 * @param { sap.ui.layout.ResponsiveFlowLayoutData} optional (interface) The layout data
-	 * @returns {boolean} Whether the given layout was created by this SimpleForm
-	 * @private
-	 */
-	function _isMyLayoutData(oLayoutData) {
-
-		var sId = oLayoutData.getId(),
-		sLayouts = " " + this._aLayouts.join(" ") + " ";
-		return sLayouts.indexOf(" " + sId + " ") >  -1;
-
-	}
-
-	/*
 	 * There may be VariantLayoutData used -> so get the right one for the used Layout
 	 */
 	function _getFieldLayoutData(oField){
@@ -1317,41 +1194,6 @@ sap.ui.define([
 		}
 
 		return oLayoutData;
-
-	}
-
-	function _createFieldLayoutData(oField, iWeight, bLinebreak, bLinebreakable, iMinWidth) {
-		return;
-	}
-
-	function _createElementLayoutData(oElement) {
-		return;
-	}
-
-	function _createContainerLayoutData(oContainer) {
-		this.getLayout();
-		return;
-	}
-
-	function _removeLayoutData(oElement) {
-
-		this._bLayoutDataChangedByMe = true;
-
-		var oLayout = _getFieldLayoutData.call(this, oElement);
-		if (oLayout) {
-			var sLayoutId = oLayout.getId();
-
-			for ( var i = 0; i < this._aLayouts.length; i++) {
-				var sId = this._aLayouts[i];
-				if (sLayoutId == sId) {
-					oLayout.destroy(); // is removed from parent during destroy
-					this._aLayouts.splice(i, 1);
-					break;
-				}
-			}
-		}
-
-		this._bLayoutDataChangedByMe = false;
 
 	}
 
@@ -1392,11 +1234,6 @@ sap.ui.define([
 			mSettings["label"] = oLabel;
 		} else {
 			sId = oFormContainer.getId() + "--FE-NoLabel"; // There can be only one FormElement without Label in a FomContainer (first one)
-			if (Element.getElementById(sId)) {
-				// if ResponsiveLayout and ResponsiveFlowLayoutdata with Linebreak is used multiple FormElements without Label can exist
-				// as already deprecated just keep generatied ID in this very special case.
-				sId = undefined;
-			}
 		}
 
 		var oElement = new FormElement(sId, mSettings);
@@ -1460,73 +1297,6 @@ sap.ui.define([
 		};
 
 		return oContainer;
-
-	}
-
-	/*
-	 * Applies the linebreaks of FormContainers according to the minWidth and maxContainerCol settings of the SimpleForm
-	 * @private
-	 */
-	SimpleForm.prototype._applyLinebreaks = function(){
-
-		if (!ResponsiveLayout || this._bResponsiveLayoutRequested) {
-			// Responsive Layout (and LayoutData) not loaded until now -> do it after it is loaded
-			return;
-		}
-
-		this._bLayoutDataChangedByMe = true;
-		var oForm = this.getAggregation("form"),
-		aContainers = oForm.getFormContainers();
-		// set linebreak on every FormContainer if Form is smaller than getMinWidth pixel
-		// and reset it if it's larger
-		var oDomRef = this.getDomRef();
-		var o$ = this.$();
-		for (var i = 1; i < aContainers.length; i++) {
-			var oContainer = aContainers[i],
-			oLayoutData = oContainer.getLayoutData();
-			if (!oDomRef || o$.outerWidth(true) > -1) {
-				// if not already rendered use default values according to column number
-				if (i % this.getMaxContainerCols() == 0) {
-					oLayoutData.setLinebreak(true);
-				} else {
-					oLayoutData.setLinebreak(false);
-				}
-			} else {
-				oLayoutData.setLinebreak(true);
-			}
-		}
-		if (oDomRef && o$.css("visibility") == "hidden") {
-			var that = this;
-			setTimeout(function() {
-				if (that.getDomRef()) {
-					that.$().css("visibility", "");
-				}
-			},10);
-		}
-
-		this._bLayoutDataChangedByMe = false;
-
-	};
-
-	/*
-	 * Handles the resize event
-	 * @private
-	 */
-	SimpleForm.prototype._resize = function(oEvent){
-		this._bChangedByMe = true;
-		if (this._iCurrentWidth == oEvent.size.width) {
-			return;
-		}
-		this._iCurrentWidth = oEvent.size.width;
-		this._bChangedByMe = false;
-	};
-
-	function _removeResize() {
-
-		if (this._sResizeListenerId) {
-			ResizeHandler.deregister(this._sResizeListenerId);
-			this._sResizeListenerId = null;
-		}
 
 	}
 
@@ -1639,16 +1409,6 @@ sap.ui.define([
 					var oElement = aContent[i];
 					this.addContent(oElement);
 				}
-			}
-		}
-
-	};
-
-	SimpleForm.prototype._onLayoutDataChange = function(oEvent){
-
-		if (!this._bLayoutDataChangedByMe && !this._bIsBeingDestroyed) {
-			switch (this.getLayout()) {
-
 			}
 		}
 

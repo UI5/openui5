@@ -93,7 +93,7 @@ sap.ui.define([
 				oRelevantElement,
 				{
 					layer: this.getCommandFactory().getFlexSettings().layer,
-					currentVariant: oVMControl?.getCurrentVariantKey()
+					currentVariant: oVMControl?.getCurrentVariantReference()
 				}
 			)
 		);
@@ -127,7 +127,7 @@ sap.ui.define([
 		const sVariantManagementReference = this.getVariantManagementReference(oOverlay);
 		const oAppComponent = FlUtils.getAppComponentForControl(oElement);
 		const oVMControl = ControlVariantApplyAPI.getVariantManagementControlByVMReference(sVariantManagementReference, oAppComponent);
-		const sCurrentVariantKey = oVMControl?.getCurrentVariantKey();
+		const sCurrentVariantKey = oVMControl?.getCurrentVariantReference();
 		const bHasVariant = !!sCurrentVariantKey;
 		const oVariantManagementControl = bHasVariant
 			? oAppComponent.byId(sVariantManagementReference) || Element.getElementById(sVariantManagementReference)

@@ -91,7 +91,7 @@ sap.ui.define([
 							validatorFunction(sNewText) {
 								// Avoid duplicate titles
 								return !oVariantManagement.getVariants().some(function(oVariant) {
-									if (oVariant.getKey() === oVariantManagement.getCurrentVariantKey()) {
+									if (oVariant.getKey() === oVariantManagement.getCurrentVariantReference()) {
 										return false;
 									}
 									return sNewText.toLowerCase() === oVariant.getTitle().toLowerCase() && oVariant.getVisible();
