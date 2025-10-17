@@ -10,7 +10,9 @@ sap.ui.define([
 	"sap/ui/core/Control",
 	"sap/ui/core/Lib",
 	"sap/ui/core/library",
+	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
 	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
+	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/initial/_internal/Settings",
 	"sap/ui/fl/Utils",
 	"sap/ui/model/Context",
@@ -23,7 +25,9 @@ sap.ui.define([
 	Control,
 	Lib,
 	coreLibrary,
+	VariantManagementState,
 	ControlVariantApplyAPI,
+	ManifestUtils,
 	flSettings,
 	Utils,
 	Context,
@@ -770,11 +774,6 @@ sap.ui.define([
 		this._oVM.openSaveAsDialog(sClass, oRolesComponentContainer);
 	};
 
-	VariantManagement.prototype.setEditable = function(bValue) {
-		this._oVM.setProperty("showFooter", bValue);
-		return this;
-	};
-
 	/**
 	 * Sets the new selected variant.
 	 * @public
@@ -785,12 +784,24 @@ sap.ui.define([
 	};
 
 	/**
-	 * Gets the currently selected variant key.
+	 * Gets the variant key that is currently selected in the VM control.
+	 * Can be different to the actually selected variant in the state during a variant switch.
 	 * @public
 	 * @returns {string|null} Key of the currently selected variant. In case the model is not yet set <code>null</code> will be returned
 	 */
 	VariantManagement.prototype.getCurrentVariantKey = function() {
 		return this._oVM.getSelectedKey();
+	};
+
+	/**
+	 * Gets the reference of the currently selected variant in the state.
+	 * @returns {string} Reference of the currently selected variant
+	 */
+	VariantManagement.prototype.getCurrentVariantReference = function() {
+		return VariantManagementState.getCurrentVariantReference({
+			reference: ManifestUtils.getFlexReferenceForControl(this),
+			vmReference: this.getVariantManagementReference()
+		});
 	};
 
 	VariantManagement.prototype.setDefaultVariantKey = function(sKey) {
@@ -1122,6 +1133,7 @@ sap.ui.define([
 
 	/**
 	 * Returns the reference of the variant management control.
+	 *
 	 * @returns {string} The reference of the variant management control
 	 */
 	VariantManagement.prototype.getVariantManagementReference = function() {

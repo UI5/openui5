@@ -7072,4 +7072,46 @@ sap.ui.define([
 
 	});
 
+	QUnit.module("IToolbarInteractiveControl interface", {
+		beforeEach: async () => {
+			oField = new FieldBase("F1", {
+				tooltip: "My Tooltip",
+				width: "200px"
+			});
+			oField.placeAt("content");
+			await nextUIUpdate();
+		},
+		afterEach() {
+			oField.destroy();
+			oField = undefined;
+			FieldBase._init();
+			FocusHandler.oLastFocusedControlInfo = null; // prevent restore of last focus
+		}
+	});
+
+	QUnit.test("#_getToolbarInteractive - non-interactive content should return false", (assert) => {
+		oField.setContent(new Text({ text: "My Label"}));
+		assert.notOk(oField._getToolbarInteractive(), "Field with non-interactive content is not interactive");
+	});
+
+	QUnit.test("#_getToolbarInteractive - interactive content should return true", (assert) => {
+		oField.setContent(new Input({ value: "My Label"}));
+		assert.ok(oField._getToolbarInteractive(), "Field with interactive content is interactive");
+	});
+
+	QUnit.test("#_getToolbarInteractive - currency field should return true", async (assert) => {
+		oField.setDataType("sap.ui.model.type.Currency");
+		oField.placeAt("content");
+		await nextUIUpdate();
+
+		assert.equal(oField.getAggregation("_content").length, 2, "Field has two controls");
+		assert.ok(oField._getToolbarInteractive(), "Field with interactive content is interactive");
+	});
+
+	QUnit.test("#_getToolbarInteractive - mixed content should return true", (assert) => {
+		oField.insertAggregation("_content", new Text({ text: "My Label"}));
+
+		assert.equal(oField.getAggregation("_content").length, 2, "Field has three controls");
+		assert.ok(oField._getToolbarInteractive(), "Field with interactive content is interactive");
+	});
 });

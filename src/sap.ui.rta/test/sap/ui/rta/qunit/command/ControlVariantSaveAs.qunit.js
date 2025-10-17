@@ -133,7 +133,8 @@ sap.ui.define([
 				variant: aChanges[0],
 				sourceVariantReference: "mySourceReference",
 				variantManagementReference: "variantMgmtId1",
-				appComponent: oMockedAppComponent
+				appComponent: oMockedAppComponent,
+				vmControl: this.oVariantManagement
 			};
 			assert.strictEqual(oRemoveStub.callCount, 1, "removeVariant was called");
 			assert.deepEqual(oRemoveStub.firstCall.args[0], mExpectedProperties, "the correct properties were passed-1");

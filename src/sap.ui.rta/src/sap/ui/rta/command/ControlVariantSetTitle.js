@@ -68,7 +68,7 @@ sap.ui.define([
 
 		this.oAppComponent = flUtils.getAppComponentForControl(oVariantManagementControl);
 		this.sVariantManagementReference = oVariantManagementControl.getVariantManagementReference();
-		this.sCurrentVariantKey = oVariantManagementControl.getCurrentVariantKey();
+		this.sCurrentVariantKey = oVariantManagementControl.getCurrentVariantReference();
 
 		const sCurrentTitle = oVariantManagementControl.getVariantByKey(this.sCurrentVariantKey).getTitle();
 		this.setOldText(sCurrentTitle);

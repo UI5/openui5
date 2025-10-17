@@ -12,6 +12,7 @@ sap.ui.define([
 	"sap/ui/core/Component",
 	"sap/ui/fl/apply/_internal/controlVariants/Utils",
 	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
+	"sap/ui/fl/variants/VariantManager",
 	"sap/ui/thirdparty/hasher"
 ], function(
 	deepEqual,
@@ -23,6 +24,7 @@ sap.ui.define([
 	Component,
 	VariantUtil,
 	VariantManagementState,
+	VariantManager,
 	hasher
 ) {
 	"use strict";
@@ -479,7 +481,7 @@ sap.ui.define([
 	 * @param {object} mPropertyBag - Property bag
 	 * @param {sap.ui.fl.variants.VariantManagement} mPropertyBag.vmControl - Variant management control
 	 * @param {sap.ui.fl.variants.VariantModel} mPropertyBag.model - Variant model
-	 *
+	 * @param {sap.ui.core.Component} mPropertyBag.appComponent - App Component
 	 * @private
 	 * @ui5-restricted sap.ui.fl.variants.VariantModel
 	 */
@@ -499,7 +501,16 @@ sap.ui.define([
 							vmReference: sVariantManagementToBeReset,
 							model: mPropertyBag.model
 						}).index === -1) {
-							oParams.model.switchToDefaultForVariantManagement(sVariantManagementToBeReset);
+							const oAffectedVMControl = VariantUtil.getVariantManagementControlByVMReference(
+								sVariantManagementToBeReset,
+								mPropertyBag.appComponent
+							);
+							VariantManager.updateCurrentVariant({
+								variantManagementReference: sVariantManagementToBeReset,
+								newVariantReference: oAffectedVMControl.getDefaultVariantKey(),
+								vmControl: oAffectedVMControl,
+								appComponent: mPropertyBag.appComponent
+							});
 						}
 					}
 				);

@@ -18,6 +18,7 @@ sap.ui.define([
 	"sap/ui/dt/Util",
 	"sap/ui/events/KeyCodes",
 	"sap/ui/fl/apply/api/FlexRuntimeInfoAPI",
+	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/initial/api/Version",
 	"sap/ui/fl/write/api/ContextBasedAdaptationsAPI",
 	"sap/ui/fl/write/api/ControlPersonalizationWriteAPI",
@@ -65,6 +66,7 @@ sap.ui.define([
 	DtUtil,
 	KeyCodes,
 	FlexRuntimeInfoAPI,
+	ManifestUtils,
 	Version,
 	ContextBasedAdaptationsAPI,
 	ControlPersonalizationWriteAPI,
@@ -1056,11 +1058,14 @@ sap.ui.define([
 		const bIsContextBasedAdaptationAvailable = await FeaturesAPI.isContextBasedAdaptationAvailable(sLayer);
 		const oAppLifeCycleService = await FlexUtils.getUShellService("AppLifeCycle");
 		const bIsHomePage = oAppLifeCycleService?.getCurrentApplication()?.homePage || false;
+		const oManifest = FlexUtils.getAppDescriptor(oRootControl);
+		// context based adaptation is not supported for overview pages
+		const bIsContextBasedAdaptationSupported = oManifest && !ManifestUtils.getOvpEntry(oManifest);
 
 		return {
 			publishAvailable: bIsPublishAvailable,
 			saveAsAvailable: !bIsHomePage && bIsPublishAvailable && bIsSaveAsAvailable,
-			contextBasedAdaptationAvailable: !bIsHomePage && bIsContextBasedAdaptationAvailable
+			contextBasedAdaptationAvailable: !bIsHomePage && bIsContextBasedAdaptationSupported && bIsContextBasedAdaptationAvailable
 		};
 	}
 

@@ -7,7 +7,6 @@ sap.ui.define([
 	"sap/m/Button",
 	"sap/ui/core/mvc/XMLView",
 	"sap/ui/core/ComponentContainer",
-	"sap/ui/core/Element",
 	"sap/ui/core/UIComponent",
 	"sap/ui/fl/apply/_internal/changes/Reverter",
 	"sap/ui/fl/apply/_internal/controlVariants/URLHandler",
@@ -19,10 +18,10 @@ sap.ui.define([
 	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/variants/VariantManagement",
+	"sap/ui/fl/variants/VariantManager",
 	"sap/ui/fl/variants/VariantModel",
 	"sap/ui/fl/write/_internal/flexState/FlexObjectManager",
 	"sap/ui/fl/Layer",
-	"sap/ui/fl/LayerUtils",
 	"sap/ui/fl/Utils",
 	"sap/ui/test/utils/nextUIUpdate",
 	"sap/ui/thirdparty/hasher",
@@ -34,7 +33,6 @@ sap.ui.define([
 	Button,
 	XMLView,
 	ComponentContainer,
-	Element,
 	Component,
 	Reverter,
 	URLHandler,
@@ -46,10 +44,10 @@ sap.ui.define([
 	ControlVariantApplyAPI,
 	ManifestUtils,
 	VariantManagement,
+	VariantManager,
 	VariantModel,
 	FlexObjectManager,
 	Layer,
-	LayerUtils,
 	Utils,
 	nextUIUpdate,
 	hasher,
@@ -92,22 +90,23 @@ sap.ui.define([
 		}.bind(this));
 	}
 
-	function stubUpdateCurrentVariant() {
-		sandbox.stub(this.oModel, "updateCurrentVariant").resolves();
-	}
-
 	function checkUpdateCurrentVariantCalled(assert, sVariantManagement, sVariant) {
-		assert.ok(this.oModel.updateCurrentVariant.calledOnce, "then variantModel.updateCurrentVariant called once");
-		assert.ok(this.oModel.updateCurrentVariant.calledWithExactly({
+		assert.ok(this.oUpdateCurrentVariantStub.calledOnce, "then updateCurrentVariant called once");
+		assert.ok(this.oUpdateCurrentVariantStub.calledWithExactly({
 			variantManagementReference: sVariantManagement,
 			newVariantReference: sVariant,
-			appComponent: this.oAppComponent
-		}), "then variantModel.updateCurrentVariant called to activate the target variant");
+			appComponent: this.oAppComponent,
+			vmControl: this.oDummyControl
+		}), "then updateCurrentVariant called to activate the target variant");
 	}
 
 	function checkActivateVariantErrorResponse(assert, sExpectedError, sReceivedError) {
-		assert.equal(sReceivedError, sExpectedError, "then Promise.reject() with the appropriate error message returned");
-		assert.equal(this.oModel.updateCurrentVariant.callCount, 0, "then variantModel.updateCurrentVariant not called");
+		assert.strictEqual(
+			sReceivedError,
+			sExpectedError,
+			"then Promise.reject() with the appropriate error message returned"
+		);
+		assert.ok(this.oUpdateCurrentVariantStub.notCalled, "then updateCurrentVariant is not called");
 	}
 
 	QUnit.module("Given an instance of VariantModel", {
@@ -144,6 +143,8 @@ sap.ui.define([
 			this.getVMRefForVariantStub = sandbox.stub(VariantManagementState, "getVariantManagementReferenceForVariant")
 			.withArgs("myReference", "variant1").returns("variantMgmtId1");
 			sandbox.stub(this.oDummyControl, "waitForInit").resolves();
+			this.oUpdateCurrentVariantStub = sandbox.stub(VariantManager, "updateCurrentVariant").resolves();
+
 			this.oModel = new VariantModel(this.oData, {
 				appComponent: this.oAppComponent
 			});
@@ -194,8 +195,6 @@ sap.ui.define([
 		});
 
 		QUnit.test("when calling 'activateVariant' with a control id", function(assert) {
-			stubUpdateCurrentVariant.call(this);
-
 			return ControlVariantApplyAPI.activateVariant({
 				element: "variantMgmtId1",
 				variantReference: "variant1"
@@ -207,8 +206,6 @@ sap.ui.define([
 		});
 
 		QUnit.test("when calling 'activateVariant' with a control", function(assert) {
-			stubUpdateCurrentVariant.call(this);
-
 			return ControlVariantApplyAPI.activateVariant({
 				element: this.oDummyControl,
 				variantReference: "variant1"
@@ -219,8 +216,6 @@ sap.ui.define([
 		});
 
 		QUnit.test("when calling 'activateVariant' with a component id", function(assert) {
-			stubUpdateCurrentVariant.call(this);
-
 			return ControlVariantApplyAPI.activateVariant({
 				element: this.oComponent.getId(),
 				variantReference: "variant1"
@@ -231,8 +226,6 @@ sap.ui.define([
 		});
 
 		QUnit.test("when calling 'activateVariant' with a component", function(assert) {
-			stubUpdateCurrentVariant.call(this);
-
 			return ControlVariantApplyAPI.activateVariant({
 				element: this.oComponent,
 				variantReference: "variant1"
@@ -243,8 +236,6 @@ sap.ui.define([
 		});
 
 		QUnit.test("when calling 'activateVariant' with an invalid variant reference", function(assert) {
-			stubUpdateCurrentVariant.call(this);
-
 			return ControlVariantApplyAPI.activateVariant({
 				element: this.oComponent,
 				variantReference: "variantInvalid"
@@ -263,8 +254,6 @@ sap.ui.define([
 		});
 
 		QUnit.test("when calling 'activateVariant' with a random object", function(assert) {
-			stubUpdateCurrentVariant.call(this);
-
 			return ControlVariantApplyAPI.activateVariant({
 				element: {},
 				variantReference: "variant1"
@@ -283,8 +272,6 @@ sap.ui.define([
 		});
 
 		QUnit.test("when calling 'activateVariant' with an invalid id", function(assert) {
-			stubUpdateCurrentVariant.call(this);
-
 			return ControlVariantApplyAPI.activateVariant({
 				element: "invalidId",
 				variantReference: "variant1"
@@ -302,29 +289,7 @@ sap.ui.define([
 			}.bind(this));
 		});
 
-		QUnit.test("when calling 'activateVariant' with a control with an invalid variantModel", function(assert) {
-			stubUpdateCurrentVariant.call(this);
-			this.oAppComponent.setModel(null, ControlVariantApplyAPI.getVariantModelName());
-
-			return ControlVariantApplyAPI.activateVariant({
-				element: this.oDummyControl,
-				variantReference: "variant1"
-			})
-			.then(function() {
-				assert.ok(false, "should not resolve");
-			})
-			.catch(function(oError) {
-				checkActivateVariantErrorResponse.call(
-					this,
-					assert,
-					"No variant management model found for the passed control or application component",
-					oError.message
-				);
-			}.bind(this));
-		});
-
 		QUnit.test("when calling 'activateVariant' with an unavailable variant", async function(assert) {
-			stubUpdateCurrentVariant.call(this);
 			const oLazyLoadStub = sandbox.stub(VariantManagementState, "loadVariant").callsFake((mPropertyBag) => {
 				assert.strictEqual(mPropertyBag.reference, "myReference", "then the reference is passed");
 				assert.deepEqual(mPropertyBag.variantReference, "notYetLoadedVariant", "then the variant reference is passed");
@@ -343,7 +308,6 @@ sap.ui.define([
 
 		QUnit.test("when calling 'activateVariant' with an unavailable variant, but the variant can't be loaded", async function(assert) {
 			assert.expect(4);
-			const oUpdateVariantStub = sandbox.stub(this.oModel, "updateCurrentVariant");
 			const oLazyLoadStub = sandbox.stub(VariantManagementState, "loadVariant")
 			.rejects(new Error("Variant with reference 'notYetLoadedVariant' could not be found"));
 			const bLogStub = sandbox.stub(Log, "error");
@@ -362,12 +326,10 @@ sap.ui.define([
 				assert.strictEqual(bLogStub.callCount, 1, "then an error is logged");
 			}
 			assert.strictEqual(oLazyLoadStub.callCount, 1, "then the variant loading is triggered");
-			assert.strictEqual(oUpdateVariantStub.callCount, 0, "then the variant is not activated");
+			assert.strictEqual(this.oUpdateCurrentVariantStub.callCount, 0, "then the variant is not activated");
 		});
 
 		QUnit.test("when calling 'activateVariant' with standardVariant set", async function(assert) {
-			stubUpdateCurrentVariant.call(this);
-
 			await ControlVariantApplyAPI.activateVariant({
 				element: this.oDummyControl,
 				variantReference: "variant1",
@@ -379,7 +341,6 @@ sap.ui.define([
 
 		QUnit.test("when calling 'activateVariant' with standardVariant set without VM control passed", async function(assert) {
 			const oLogStub = sandbox.stub(Log, "error");
-			stubUpdateCurrentVariant.call(this);
 
 			try {
 				await ControlVariantApplyAPI.activateVariant({
@@ -462,7 +423,6 @@ sap.ui.define([
 				};
 				oData[this.sVMReference].variants.push(this.oVariant1);
 				oData[this.sVMReference].variants.push(this.oVariant2);
-				this.oUpdateCurrentVariantStub = sandbox.stub(this.oVariantModel, "updateCurrentVariant").resolves();
 				sandbox.stub(VariantManagementState, "getCurrentVariantReference").returns("variant1");
 				sandbox.stub(VariantManagementState, "getControlChangesForVariant").returns([]);
 				sandbox.stub(FlexObjectManager, "deleteFlexObjects");
@@ -477,6 +437,9 @@ sap.ui.define([
 					vmReference: this.sVMReference,
 					vReference: "variant2"
 				}).returns(this.oVariant2);
+				sandbox.stub(VariantManagementState, "getVariantManagementReferenceForVariant")
+				.withArgs("MockController", "variant1").returns(this.sVMReference)
+				.withArgs("MockController", "variant2").returns(this.sVMReference);
 				this.oGetDirtyFlexObjectsStub = sandbox.stub(FlexObjectState, "getDirtyFlexObjects");
 				sandbox.stub(Switcher, "switchVariant").resolves();
 				sandbox.stub(Reverter, "revertMultipleChanges").resolves();
@@ -507,10 +470,8 @@ sap.ui.define([
 		}
 
 		QUnit.test("when 'attachVariantApplied' is called with callAfterInitialVariant=false", async function(assert) {
-			const sVMReference1 = "mockview--VariantManagement1";
 			const fnCallback1 = sandbox.stub();
 			const fnCallback2 = sandbox.stub();
-			const fnCallback3 = sandbox.stub();
 			const oErrorStub = sandbox.stub(Log, "error");
 			const setShowExecuteOnSelectionSpy = sandbox.spy(this.oVMControl, "setShowExecuteOnSelection");
 
@@ -531,16 +492,12 @@ sap.ui.define([
 			assert.strictEqual(fnCallback1.callCount, 0, "the callback was not called yet");
 			assert.strictEqual(fnCallback2.callCount, 0, "the callback was not called yet");
 
-			this.oVariantModel.callVariantSwitchListeners(sVMReference1, "variant1");
+			await ControlVariantApplyAPI.activateVariant({
+				element: this.oVMControl,
+				variantReference: "variant1"
+			});
 			assert.strictEqual(fnCallback1.callCount, 1, "the callback was called once");
 			assert.deepEqual(fnCallback1.lastCall.args[0], this.oVariant1, "the new variant is passed as parameter");
-			assert.strictEqual(fnCallback2.callCount, 0, "the callback was not called");
-
-			this.oVariantModel.callVariantSwitchListeners(sVMReference1, "variant1", fnCallback3, "scenario");
-			assert.strictEqual(fnCallback3.callCount, 1, "the callback was called once");
-			assert.strictEqual(fnCallback3.lastCall.args[0].key, this.oVariant1.key, "the new variant is passed as parameter");
-			assert.strictEqual(fnCallback3.lastCall.args[0].createScenario, "scenario", "the scenario was saved in the variant");
-			assert.strictEqual(fnCallback1.callCount, 1, "the callback was not called");
 			assert.strictEqual(fnCallback2.callCount, 0, "the callback was not called");
 
 			await ControlVariantApplyAPI.attachVariantApplied({
@@ -550,7 +507,10 @@ sap.ui.define([
 				callAfterInitialVariant: false
 			});
 
-			this.oVariantModel.callVariantSwitchListeners(sVMReference1, "variant2");
+			await ControlVariantApplyAPI.activateVariant({
+				element: this.oVMControl,
+				variantReference: "variant2"
+			});
 			assert.strictEqual(fnCallback1.callCount, 1, "the callback was not called again");
 			assert.strictEqual(fnCallback2.callCount, 1, "the callback was called once");
 			assert.deepEqual(fnCallback2.lastCall.args[0], this.oVariant2, "the new variant is passed as parameter");
@@ -562,7 +522,10 @@ sap.ui.define([
 				callAfterInitialVariant: false
 			});
 
-			this.oVariantModel.callVariantSwitchListeners(sVMReference1, "variant2");
+			await ControlVariantApplyAPI.activateVariant({
+				element: this.oVMControl,
+				variantReference: "variant2"
+			});
 			assert.strictEqual(fnCallback1.callCount, 2, "the callback was called again");
 			assert.strictEqual(fnCallback2.callCount, 2, "the callback was called again");
 
@@ -571,7 +534,10 @@ sap.ui.define([
 				selector: this.oView.byId("MainForm")
 			});
 
-			this.oVariantModel.callVariantSwitchListeners(sVMReference1, "variant2");
+			await ControlVariantApplyAPI.activateVariant({
+				element: this.oVMControl,
+				variantReference: "variant2"
+			});
 			assert.strictEqual(fnCallback1.callCount, 3, "the callback was called again");
 			assert.strictEqual(fnCallback2.callCount, 2, "the callback was not called again");
 
@@ -580,7 +546,10 @@ sap.ui.define([
 				selector: this.oView.byId("ObjectPageSection1")
 			});
 
-			this.oVariantModel.callVariantSwitchListeners(sVMReference1, "variant2");
+			await ControlVariantApplyAPI.activateVariant({
+				element: this.oVMControl,
+				variantReference: "variant2"
+			});
 			assert.strictEqual(fnCallback1.callCount, 3, "the callback was not called again");
 			assert.strictEqual(fnCallback2.callCount, 2, "the callback was not called again");
 		});
@@ -623,10 +592,13 @@ sap.ui.define([
 					callAfterInitialVariant: false
 				})
 			])
-			.then(() => {
+			.then(async () => {
 				assert.ok(fnCallback3.notCalled, "Callback for control with callAfterInitialVariant=false is not called before the switch");
 
-				this.oVariantModel.callVariantSwitchListeners(this.sVMReference, "variant1");
+				await ControlVariantApplyAPI.activateVariant({
+					element: this.oVMControl,
+					variantReference: "variant1"
+				});
 				assert.strictEqual(fnCallback1.callCount, 2, "callback for first control with callAfterInitialVariant was called twice");
 				assert.strictEqual(
 					fnCallback2.callCount,
@@ -831,18 +803,6 @@ sap.ui.define([
 				assert.strictEqual(oModel, oFakeModel, "Resolves with the correct model");
 				done();
 			});
-		});
-
-		QUnit.test("getVariantManagementControlByVMReference returns the correct control instance", function(assert) {
-			const oFakeControl = { id: "myVMRef" };
-			const oAppComponent = {
-				byId() { return true; },
-				createId(sId) { return sId; }
-			};
-			const getElementByIdStub = sinon.stub(Element, "getElementById").returns(oFakeControl);
-			const result = ControlVariantApplyAPI.getVariantManagementControlByVMReference("myVMRef", oAppComponent);
-			assert.strictEqual(result, oFakeControl, "Returns the correct control instance");
-			getElementByIdStub.restore();
 		});
 
 		QUnit.test("getVariantModel waits for ModelContextChange event if model is not yet loaded", function(assert) {

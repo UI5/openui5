@@ -3,12 +3,13 @@
 sap.ui.define([
 	"sap/base/Log",
 	"sap/ui/base/ManagedObjectObserver",
-	"sap/ui/core/Component",
+	"sap/ui/core/UIComponent",
 	"sap/ui/fl/apply/_internal/controlVariants/URLHandler",
 	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
 	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/variants/VariantManagement",
+	"sap/ui/fl/variants/VariantManager",
 	"sap/ui/fl/variants/VariantModel",
 	"sap/ui/fl/Layer",
 	"sap/ui/thirdparty/hasher",
@@ -16,12 +17,13 @@ sap.ui.define([
 ], function(
 	Log,
 	ManagedObjectObserver,
-	Component,
+	UIComponent,
 	URLHandler,
 	VariantManagementState,
 	ControlVariantApplyAPI,
 	ManifestUtils,
 	VariantManagement,
+	VariantManager,
 	VariantModel,
 	Layer,
 	hasher,
@@ -34,7 +36,7 @@ sap.ui.define([
 
 	QUnit.module("Given an instance of VariantModel", {
 		beforeEach() {
-			this.oAppComponent = new Component("appComponent");
+			this.oAppComponent = new UIComponent("appComponent");
 			sandbox.stub(ManifestUtils, "getFlexReferenceForControl").returns(sFlexReference);
 			this.oModel = new VariantModel({}, { appComponent: this.oAppComponent });
 			this.fnDestroyObserverSpy = sandbox.spy(ManagedObjectObserver.prototype, "observe");
@@ -42,7 +44,7 @@ sap.ui.define([
 			this.oGetUShellServiceStub = sandbox.stub(this.oModel, "getUShellService");
 		},
 		afterEach() {
-			if (this.oAppComponent instanceof Component) {
+			if (this.oAppComponent instanceof UIComponent) {
 				this.oAppComponent.destroy();
 			}
 			sandbox.restore();
@@ -313,7 +315,7 @@ sap.ui.define([
 
 	QUnit.module("Given multiple variant management controls", {
 		beforeEach() {
-			this.oAppComponent = new Component("appComponent");
+			this.oAppComponent = new UIComponent("appComponent");
 			this.oRegisterNavigationFilterStub = sandbox.stub();
 			this.oDeRegisterNavigationFilterStub = sandbox.stub();
 
@@ -380,7 +382,7 @@ sap.ui.define([
 
 			return this.oModel.initialize()
 			.then(function() {
-				this.oSwitchToDefaultVariantStub = sandbox.stub(this.oModel, "switchToDefaultForVariantManagement");
+				this.oSwitchToDefaultVariantStub = sandbox.stub(VariantManager, "updateCurrentVariant");
 
 				// variant management controls
 				this.oVariantManagement1 = new VariantManagement("variantMgmtId1", {updateVariantInURL: true});
@@ -407,7 +409,7 @@ sap.ui.define([
 			this.oVariantManagement1.destroy();
 			this.oVariantManagement2.destroy();
 			this.oVariantManagement3.destroy();
-			if (this.oAppComponent instanceof Component) {
+			if (this.oAppComponent instanceof UIComponent) {
 				this.oAppComponent.destroy();
 			}
 		}
@@ -423,25 +425,25 @@ sap.ui.define([
 
 		QUnit.test("when event 'modelContextChange' is fired on a control rendered at position 1, out of 3 controls", function(assert) {
 			this.oVariantManagement1.fireEvent("modelContextChange");
-			assert.equal(
+			assert.strictEqual(
 				this.oSwitchToDefaultVariantStub.callCount,
 				3,
-				"the VariantModel.switchToDefaultForVariantManagement() is called three times"
+				"then the variant switch is called three times"
 			);
-			assert.equal(
-				this.oSwitchToDefaultVariantStub.args[0][0],
-				"variantMgmtId1",
-				"then first VM control was reset to default variant"
+			assert.strictEqual(
+				this.oSwitchToDefaultVariantStub.args[0][0].newVariantReference,
+				"variant1",
+				"then the first VM control was reset to default variant"
 			);
-			assert.equal(
-				this.oSwitchToDefaultVariantStub.args[1][0],
+			assert.strictEqual(
+				this.oSwitchToDefaultVariantStub.args[1][0].newVariantReference,
 				"variantMgmtId2",
-				"then second VM control was reset to default variant"
+				"then the second VM control was reset to default variant"
 			);
-			assert.equal(
-				this.oSwitchToDefaultVariantStub.args[2][0],
+			assert.strictEqual(
+				this.oSwitchToDefaultVariantStub.args[2][0].newVariantReference,
 				"variantMgmtId3",
-				"then third VM control was reset to default variant"
+				"then the third VM control was reset to default variant"
 			);
 		});
 
@@ -462,64 +464,64 @@ sap.ui.define([
 			}.bind(this));
 
 			this.oVariantManagement1.fireEvent("modelContextChange");
-			assert.equal(
+			assert.strictEqual(
 				this.oSwitchToDefaultVariantStub.callCount,
 				2,
-				"the VariantModel.switchToDefaultForVariantManagement() is called two times"
+				"then the variant switch is called twice"
 			);
-			assert.equal(
-				this.oSwitchToDefaultVariantStub.args[0][0],
+			assert.strictEqual(
+				this.oSwitchToDefaultVariantStub.args[0][0].newVariantReference,
 				"variantMgmtId2",
-				"then second VM control was reset to default variant"
+				"then the second VM control was reset to default variant"
 			);
-			assert.equal(
-				this.oSwitchToDefaultVariantStub.args[1][0],
+			assert.strictEqual(
+				this.oSwitchToDefaultVariantStub.args[1][0].newVariantReference,
 				"variantMgmtId3",
-				"then third VM control was reset to default variant"
+				"then the third VM control was reset to default variant"
 			);
 		});
 
 		QUnit.test("when event 'modelContextChange' is fired on a control rendered at position 2, out of 3 controls", function(assert) {
 			assert.ok(this.oVariantManagement1.getResetOnContextChange(), "then by default 'resetOnContextChange' is set to true");
 			this.oVariantManagement2.fireEvent("modelContextChange");
-			assert.equal(
+			assert.strictEqual(
 				this.oSwitchToDefaultVariantStub.callCount,
 				2,
-				"then VariantModel.switchToDefaultForVariantManagement() is called twice"
+				"then the variant switch is called twice"
 			);
-			assert.equal(
-				this.oSwitchToDefaultVariantStub.args[0][0],
+			assert.strictEqual(
+				this.oSwitchToDefaultVariantStub.args[0][0].newVariantReference,
 				"variantMgmtId2",
-				"then second VM control was reset to default variant"
+				"then the second VM control was reset to default variant"
 			);
-			assert.equal(
-				this.oSwitchToDefaultVariantStub.args[1][0],
+			assert.strictEqual(
+				this.oSwitchToDefaultVariantStub.args[1][0].newVariantReference,
 				"variantMgmtId3",
-				"then third VM control was reset to default variant"
+				"then the third VM control was reset to default variant"
 			);
 		});
 
 		QUnit.test("when event 'modelContextChange' is fired on a control rendered at position 3, out of 3 controls", function(assert) {
 			this.oVariantManagement3.fireEvent("modelContextChange");
-			assert.equal(
+			assert.strictEqual(
 				this.oSwitchToDefaultVariantStub.callCount,
 				1,
-				"then VariantModel.switchToDefaultForVariantManagement() is called once"
+				"then the variant switch is called once"
 			);
-			assert.equal(
-				this.oSwitchToDefaultVariantStub.args[0][0],
+			assert.strictEqual(
+				this.oSwitchToDefaultVariantStub.args[0][0].newVariantReference,
 				"variantMgmtId3",
-				"then third VM control was reset to default variant"
+				"then the third VM control was reset to default variant"
 			);
 		});
 
 		QUnit.test("when event 'modelContextChange' is fired on a control which is not there in the hash register", function(assert) {
 			this.oModel._oHashData.variantControlIds.splice(1, 1);
 			this.oVariantManagement2.fireEvent("modelContextChange");
-			assert.equal(
+			assert.strictEqual(
 				this.oSwitchToDefaultVariantStub.callCount,
 				0,
-				"then VariantModel.switchToDefaultForVariantManagement() is not called"
+				"then the variant switch is not called"
 			);
 		});
 
