@@ -145,6 +145,7 @@ sap.ui.define([
 			ariaLabelledBy: this.getId()
 		});
 		oAdditionalInfoButton.setTooltip(oMenuItem.additionalInfo);
+		oAdditionalInfoButton.setEnabled(false);
 		return oAdditionalInfoButton;
 	}
 

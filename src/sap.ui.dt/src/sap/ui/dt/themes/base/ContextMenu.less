@@ -5,6 +5,7 @@
 @_sap_ui_dt_ContextMenu_MnuItemIconColor: var(--sapContent_NonInteractiveIconColor); // #111
 @_sap_ui_dt_ContextMenu_PrpgtedMnuItemBGColor: var(--sapList_AlternatingBackground); // darken(#111, 10);
 @_sap_ui_dt_ContextMenu_PrpgtedTitleBorderColor: var(--sapShell_BorderColor); // #111
+@_sap_ui_dt_ContextMenu_EnabledOpacity: 1;
 
 .sapUiDtContextMenu.sapMMenu {
 	.sapMMenuList {
@@ -26,6 +27,9 @@
 						background-color: transparent;
 						border-color: transparent;
 					}
+					&.sapMBtnDisabled{
+						opacity: @_sap_ui_dt_ContextMenu_EnabledOpacity;
+					}
 					&:focus-visible > .sapMFocusable,
 					&:focus > .sapMFocusable{
 						&::before{
@@ -39,12 +43,12 @@
 			}
 
 			&.sapMMenuItemDisabled {
-				opacity: 0.5;
+				opacity: var(--sapContent_DisabledOpacity);
 			}
 
 			// style for control names
 			&.sapUiDtContextMenuControlTitle {
-				opacity: 1;
+				opacity: @_sap_ui_dt_ContextMenu_EnabledOpacity;
 				height: 1.5rem;
 				.sapMMenuItemIcon {
 					display: none;
@@ -57,7 +61,7 @@
 
 			// Style for title "Extended Actions"
 			&.sapUiDtContextMenuExtendedActionsTitle {
-				opacity: 1;
+				opacity: @_sap_ui_dt_ContextMenu_EnabledOpacity;
 				height: 2rem;
 				text-align: center;
 				background-color: @_sap_ui_dt_ContextMenu_PrpgtedMnuItemBGColor;
@@ -75,7 +79,7 @@
 
 			// style for names of propagated controls
 			&.sapUiDtContextMenuPropagatedControlTitle {
-				opacity: 1;
+				opacity: @_sap_ui_dt_ContextMenu_EnabledOpacity;
 				height: 1.5rem;
 				background-color: @_sap_ui_dt_ContextMenu_PrpgtedMnuItemBGColor;
 				margin: 0!important;
