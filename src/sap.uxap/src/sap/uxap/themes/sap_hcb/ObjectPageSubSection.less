@@ -3,17 +3,9 @@
 /* High Contrast Black theme                      */
 /* ============================================== */
 
-.sapUxAPObjectPageSubSectionFocusable:focus,
-.sapUxAPObjectPageSubSectionHeaderTitle:focus {
+.sapUxAPObjectPageSubSectionFocusable:focus {
 	outline: 0.125rem dotted @sapUiContentFocusColor;
 	outline-offset: -0.125rem;
 	border-color: transparent;
 	border-radius: 0;
-}
-
-/* IE ignores outline-offset. Use an overlay: */
-html[data-sap-ui-browser^="ie"] .sapUxAPObjectPageSubSection, .sapUxAPObjectPageSubSectionHeaderTitle {
-	&:focus:before {
-		border-width: 0.125rem;
-	}
 }
