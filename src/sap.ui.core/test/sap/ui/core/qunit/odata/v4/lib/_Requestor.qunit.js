@@ -17,6 +17,7 @@ sap.ui.define([
 	"use strict";
 
 	var sClassName = "sap.ui.model.odata.v4.lib._Requestor",
+		rFrozen = /^TypeError: .* property .* [Oo]bject.* is not extensible/,
 		oModelInterface = {
 			fetchMetadata : mustBeMocked,
 			fireSessionTimeout : function () {},
@@ -326,7 +327,7 @@ sap.ui.define([
 		assert.throws(function () {
 			// code under test
 			oRequestor.mPredefinedRequestHeaders.foo = "bar";
-		}, new TypeError("Cannot add property foo, object is not extensible"));
+		}, rFrozen);
 	});
 
 	//*********************************************************************************************
@@ -334,22 +335,22 @@ sap.ui.define([
 		assert.throws(function () {
 			// code under test
 			_Requestor.prototype.mFinalHeaders.foo = "bar";
-		}, new TypeError("Cannot add property foo, object is not extensible"));
+		}, rFrozen);
 
 		assert.throws(function () {
 			// code under test
 			_Requestor.prototype.mPredefinedPartHeaders.foo = "bar";
-		}, new TypeError("Cannot add property foo, object is not extensible"));
+		}, rFrozen);
 
 		assert.throws(function () {
 			// code under test
 			_Requestor.prototype.mPredefinedRequestHeaders.foo = "bar";
-		}, new TypeError("Cannot add property foo, object is not extensible"));
+		}, rFrozen);
 
 		assert.throws(function () {
 			// code under test
 			_Requestor.prototype.mReservedHeaders.foo = "bar";
-		}, new TypeError("Cannot add property foo, object is not extensible"));
+		}, rFrozen);
 	});
 
 	//*********************************************************************************************
