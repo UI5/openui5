@@ -4277,7 +4277,7 @@ sap.ui.define([
 			assert.equal(Element.getElementById(sLabelledBy).getText(), "Test", "Accessbility text is set correctly");
 		});
 
-		QUnit.module("Actions", {
+		QUnit.module("Custom Actions", {
 			beforeEach: async function() {
 				this.oItem1 = new StandardListItem({
 					title: "Item 1",
@@ -4301,6 +4301,10 @@ sap.ui.define([
 		});
 
 		QUnit.test("Rendering", async function(assert) {
+			const oRB = Library.getResourceBundleFor("sap.m");
+			const ONE_ACTION_AVAILABLE = oRB.getText("LIST_ITEM_SINGLE_ACTION");
+			const TWO_ACTIONS_AVAILABLE = oRB.getText("LIST_ITEM_MULTIPLE_ACTIONS", [2]);
+			const oInvisibleText = ListBase.getInvisibleText();
 			const oAction1 = this.oItem1.getActions()[0];
 			const oAction2 = this.oItem1.getActions()[1];
 			assert.notOk(this.oItem1.getDomRef("actions"), "By default no actions are rendered");
@@ -4319,6 +4323,9 @@ sap.ui.define([
 			assert.equal(oFirstAction.getTooltip_AsString(), "Edit", "First action edit has correct tooltup");
 			assert.equal(oSecondAction.getIcon(), "sap-icon://decline", "Second action delete has correct icon");
 			assert.equal(oSecondAction.getTooltip_AsString(), "Delete", "Second action delete has correct tooltup");
+
+			this.oItem1.focus();
+			assert.ok(oInvisibleText.getText().endsWith(TWO_ACTIONS_AVAILABLE), "Two actions available");
 
 			this.oList.attachItemActionPress((oEvent) => {
 				assert.step(oEvent.getParameter("action").getType());
@@ -4347,6 +4354,10 @@ sap.ui.define([
 			this.oList.setItemActionCount(1);
 			await nextUIUpdate();
 
+			document.activeElement.blur();
+			this.oItem1.focus();
+			assert.ok(oInvisibleText.getText().endsWith(ONE_ACTION_AVAILABLE), "One action available");
+
 			const $Overflow = this.oItem1.$("overflow");
 			assert.ok($Overflow[0], "Overflow button is rendered");
 			assert.notOk($Overflow[0].nextSibling || $Overflow[0].previousSibling, "Overflow button is the only rendered action");
@@ -4368,6 +4379,11 @@ sap.ui.define([
 
 			this.oList.setItemActionCount(2);
 			await nextUIUpdate();
+
+			document.activeElement.blur();
+			this.oItem1.focus();
+			assert.ok(oInvisibleText.getText().endsWith(TWO_ACTIONS_AVAILABLE), "Two actions available");
+
 			assert.equal($Overflow[0].previousSibling.id, oFirstAction.getId(), "First action is rendered before overflow button");
 			assert.notOk($Overflow[0].nextSibling, "Overflow button is the last rendered action");
 			$Overflow.trigger("tap");

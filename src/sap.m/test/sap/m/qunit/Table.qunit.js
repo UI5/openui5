@@ -4477,7 +4477,7 @@ sap.ui.define([
 		}.bind(this));
 	});
 
-	QUnit.module("Actions", {
+	QUnit.module("Custom Actions", {
 		beforeEach: async function() {
 			this.oItem1 = new ColumnListItem({
 				type: "Navigation",
@@ -4511,7 +4511,13 @@ sap.ui.define([
 	});
 
 	QUnit.test("Rendering", async function(assert) {
-		const ROW_ACTION = Library.getResourceBundleFor("sap.m").getText("TABLE_ROW_ACTION");
+		const oRB = Library.getResourceBundleFor("sap.m");
+		const ROW_ACTION = oRB.getText("TABLE_ROW_ACTION");
+		const CONTROL_EMPTY = oRB.getText("CONTROL_EMPTY");
+		const ONE_ACTION_AVAILABLE = oRB.getText("LIST_ITEM_SINGLE_ACTION");
+		const TWO_ACTIONS_AVAILABLE = oRB.getText("LIST_ITEM_MULTIPLE_ACTIONS", [2]);
+		const oInvisibleText = ListBase.getInvisibleText();
+
 		assert.ok(this.oTable.getDomRef("tblHeadActions"), "Actions column header is rendered");
 		assert.equal(this.oTable.getDomRef("tblHeadActions").textContent, ROW_ACTION, "Actions column header label is set");
 		assert.ok(this.oTable.getDomRef("tblHeadActions").classList.contains("sapMTable2ActionsCol"), "2 actions column header class is added");
@@ -4522,11 +4528,25 @@ sap.ui.define([
 		assert.ok(this.oItem1.getDomRef("actions"), "Actions cell content is rendered for the item");
 		assert.equal(this.oItem1.getDomRef("actions").childElementCount, 2, "There are two actions");
 
+		this.oItem1.getDomRef("Actions").focus();
+		assert.ok(oInvisibleText.getText().endsWith(TWO_ACTIONS_AVAILABLE), "Two actions available");
+
 		this.oItem1.getActions()[1].setVisible(false);
 		await nextUIUpdate();
 		assert.ok(this.oItem1.getDomRef().querySelector(".sapMLIBActionHidden"), "There hidden class is added for the hidden action");
 		assert.equal(this.oItem1.getDomRef().querySelector(".sapMLIBActionHidden"), this.oItem1.getDomRef("actions").lastChild);
 
+		document.activeElement.blur();
+		this.oItem1.getDomRef("Actions").focus();
+		assert.ok(oInvisibleText.getText().endsWith(ONE_ACTION_AVAILABLE), "One action available");
+
+		this.oItem1.getActions()[0].setVisible(false);
+		await nextUIUpdate();
+		document.activeElement.blur();
+		this.oItem1.getDomRef("Actions").focus();
+		assert.ok(oInvisibleText.getText().endsWith(CONTROL_EMPTY), "No actions available");
+
+		this.oItem1.getActions()[0].setVisible(true);
 		this.oTable.setItemActionCount(1);
 		await nextUIUpdate();
 		assert.ok(this.oTable.getDomRef("tblHeadActions").classList.contains("sapMTable1ActionsCol"), "1 action column header class is added");

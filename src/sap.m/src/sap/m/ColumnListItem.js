@@ -326,12 +326,13 @@ sap.ui.define([
 
 		if (oTarget.classList.contains("sapMListTblCell")) {
 			const oColumn = Element.getElementById(oTarget.getAttribute("data-sap-ui-column"));
-
 			sInvisibleText = this.getContentAnnouncementOfCell(oColumn);
 		} else if (oTarget.classList.contains("sapMListTblSubCnt")) {
 			sInvisibleText = this.getContentAnnouncementOfPopin();
 		} else if (oTarget.classList.contains("sapMListTblNavCol")) {
 			sInvisibleText = this.getContentAnnouncementOfRowAction();
+		} else if (oTarget.classList.contains("sapMListTblActionsCol")) {
+			sInvisibleText = this._getCustomActionsAnnouncement(true);
 		}
 
 		if (sInvisibleText) {
