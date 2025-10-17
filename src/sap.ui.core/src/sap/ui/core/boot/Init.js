@@ -16,6 +16,9 @@ sap.ui.define([
 
 	return {
 		run: () => {
+			// inform native JavaScript that UI5 is initialized
+			document.dispatchEvent(new CustomEvent("sap-ui-core-ready"));
+
 			let pOnInit = Promise.resolve();
 			if (sInitModule) {
 				const aParts = sInitModule.split("@");

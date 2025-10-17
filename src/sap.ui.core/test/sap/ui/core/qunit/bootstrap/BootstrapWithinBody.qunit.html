@@ -10,12 +10,22 @@
 		<script src="../../../../../../resources/sap/ui/thirdparty/qunit-2.js"></script>
 		<script src="../../../../../../resources/sap/ui/qunit/qunit-junit.js"></script>
 		<script src="../../../../../../resources/sap/ui/qunit/qunit-coverage-istanbul.js"></script>
+		<script src="../../attachCoreReadyEvent.js"></script>
 		<script src="_checkCoreAndLibraryBooted.qunit.js"></script>
 	</head>
 	<body class="sapUiBody">
 		<div id="qunit"></div>
 		<script src="../../shared-config.js"></script>
-		<script id="sap-ui-bootstrap" src="../../../../../../resources/sap-ui-core.js" data-sap-ui-libs="sap.m" data-sap-ui-async="true">
+		<script
+			id="sap-ui-bootstrap"
+			src="../../../../../../resources/sap-ui-core.js"
+			data-sap-ui-libs="sap.m"
+			data-sap-ui-async="true"
+			data-sap-ui-on-init="module:test-resources/sap/ui/core/qunit/bootstrap/_testNativeCoreReadyEvent.qunit"
+			data-sap-ui-resource-roots='{
+				"test-resources": "../../../../../../test-resources/",
+				"fixture": "fixture/"
+			}'>
 		</script>
 	</body>
 </html>
