@@ -423,8 +423,6 @@ sap.ui.define([
 		var oForm = this.getAggregation("form");
 		oForm.invalidate = oForm._origInvalidate;
 
-		_removeResize.call(this);
-
 		this._aElements = null;
 		this._changedFormContainers = [];
 		this._changedFormElements = [];
@@ -437,9 +435,6 @@ sap.ui.define([
 	 * Update FormContainers, FormElements and LayoutData before controls are rendered
 	 */
 	SimpleForm.prototype.onBeforeRendering = function() {
-
-		_removeResize.call(this);
-
 		var oForm = this.getAggregation("form");
 		var sLayout = this.getLayout();
 		if (!this._bResponsiveGridLayoutRequested && sLayout === SimpleFormLayout.ResponsiveGridLayout ||
@@ -454,7 +449,6 @@ sap.ui.define([
 				_updateLayout.call(this);
 			}
 		}
-
 	};
 
 	SimpleForm.prototype.onAfterRendering = function() {};
@@ -574,8 +568,6 @@ sap.ui.define([
 				this._changedFormContainers.push(oFormContainer);
 				oFormElement = _addFormElement.call(this, oFormContainer);
 			}
-
-			_createFieldLayoutData.call(this, oElement, 5, false, true);
 
 			oFormElement.addField(oElement);
 			_markFormElementForUpdate(this._changedFormElements, oFormElement);
@@ -729,7 +721,8 @@ sap.ui.define([
 				}
 			}
 			this._changedFormElements.push(oFormElement);
-		} else { // new field
+		} else {
+			// new field
 			oLayoutData = _getFieldLayoutData.call(this, oElement);
 			if (oOldElement.isA(["sap.ui.core.Title", "sap.ui.core.Toolbar"])) {
 				// add new Field to last FormElement of previous FormContainer
@@ -776,8 +769,6 @@ sap.ui.define([
 				oFormElement.insertField(oElement, iFieldIndex);
 			}
 			_markFormElementForUpdate(this._changedFormElements, oFormElement);
-
-			_createFieldLayoutData.call(this, oElement, 5, false, true);
 		}
 
 		this._aElements.splice(iNewIndex, 0, oElement);
@@ -919,7 +910,6 @@ sap.ui.define([
 			this._aElements.splice(iIndex, 1);
 			oElement.setParent(null);
 			this._oObserver.unobserve(oElement);
-			_removeLayoutData.call(this, oElement);
 
 			this.invalidate();
 			this._bChangedByMe = false;
@@ -953,7 +943,6 @@ sap.ui.define([
 
 			for (i = 0; i < this._aElements.length; i++) {
 				var oElement = this._aElements[i];
-				_removeLayoutData.call(this, oElement);
 				this._oObserver.unobserve(oElement);
 			}
 			var aElements = this._aElements;
@@ -996,25 +985,16 @@ sap.ui.define([
 	 * Set the FormLayout to the Form. If a FormLayout is already set, just set a new one.
 	 */
 	SimpleForm.prototype.setLayout = function(sLayout) {
-
 		var sOldLayout = this.getLayout();
 		var bDefault = this.isPropertyInitial("layout"); // if default is used and layout not defined setLayout is not called
-		if (sLayout != sOldLayout) {
-			_removeOldLayoutData.call(this);
-		}
 
 		this.setProperty("layout", sLayout);
 
-		if (sLayout != sOldLayout || bDefault) { // Layout changed or default set explicit -> we know what layout is used and can create the Control
-			var bSet = _setFormLayout.call(this);
-
-			if (bSet) {
-				_addLayoutData.call(this);
-			}
+		if (sLayout != sOldLayout || bDefault) {
+			_setFormLayout.call(this);
 		}
 
 		return this;
-
 	};
 
 	/*
@@ -1046,7 +1026,6 @@ sap.ui.define([
 			if (oForm.getLayout()) {
 				this._bChangedByMe = true;
 				oForm.destroyLayout();
-				_removeResize.call(this);
 				this._bChangedByMe = false;
 			}
 
@@ -1117,7 +1096,7 @@ sap.ui.define([
 
 		if (!this._bIsBeingDestroyed) {
 			_setFormLayout.call(this);
-			_addLayoutData.call(this);
+
 			if (this.getDomRef()) {
 				_updateLayout.call(this);
 				var oForm = this.getAggregation("form");
@@ -1221,23 +1200,18 @@ sap.ui.define([
 	}
 
 	function _createFormElement(oLabel, oFormContainer) {
-
 		var sId;
 		var mSettings = {};
 
 		if (oLabel) {
 			sId = this.getId() + "--" + oLabel.getId() + "--FE";
 			oLabel.addStyleClass("sapUiFormLabel-CTX");
-			if (!_getFieldLayoutData.call(this, oLabel)) {
-				_createFieldLayoutData.call(this, oLabel, this._iLabelWeight, false, true, 192);
-			}
 			mSettings["label"] = oLabel;
 		} else {
 			sId = oFormContainer.getId() + "--FE-NoLabel"; // There can be only one FormElement without Label in a FomContainer (first one)
 		}
 
 		var oElement = new FormElement(sId, mSettings);
-		_createElementLayoutData.call(this, oElement);
 
 		oElement.isVisible = function(){
 
@@ -1258,7 +1232,6 @@ sap.ui.define([
 		};
 
 		return oElement;
-
 	}
 
 	/*
@@ -1268,7 +1241,6 @@ sap.ui.define([
 	 * @private
 	 */
 	function _createFormContainer(oTitle) {
-
 		var sId;
 		var mSettings = {};
 
@@ -1284,7 +1256,6 @@ sap.ui.define([
 		}
 
 		var oContainer = new FormContainer(sId, mSettings);
-		_createContainerLayoutData.call(this, oContainer);
 
 		oContainer.getAriaLabelledBy = function() {
 			// use aria-label of toolbar
@@ -1297,7 +1268,6 @@ sap.ui.define([
 		};
 
 		return oContainer;
-
 	}
 
 	function _markFormElementForUpdate(aFormElements, oFormElement){

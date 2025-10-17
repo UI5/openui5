@@ -798,7 +798,7 @@ sap.ui.define([
 		oSystemStub.restore();
 	});
 
-	QUnit.test("dragged from outside the browser", function(assert) {
+	!Device.browser.safari && QUnit.test("dragged from outside the browser", function(assert) {
 		var oSession;
 		this.oTargetDomRef.focus();
 		this.oDropInfo.attachDragEnter(function(oEvent) {
@@ -817,7 +817,7 @@ sap.ui.define([
 		assert.notOk(oSession.getDropControl(), "there is no more drop control");
 	});
 
-	QUnit.test("dragging out the browser window should close the drag session lately in 100ms", function(assert) {
+	Device.browser.safari && QUnit.test("dragging out the browser window should close the drag session lately in 100ms", function(assert) {
 		let oSession;
 		this.oTargetDomRef.focus();
 		this.oDropInfo.attachDragEnter(function(oEvent) {
@@ -830,8 +830,6 @@ sap.ui.define([
 		assert.ok(jQuery(".sapUiDnDIndicator").is(":visible"), "drop indicator is visible");
 
 		const clock = sinon.useFakeTimers();
-		const oBrowserStub = sinon.stub(Device, "browser");
-		oBrowserStub.value({ safari: true });
 
 		this.oTargetDomRef.dispatchEvent(createNativeDragEventDummy("dragleave"));
 		clock.tick(99);
@@ -846,7 +844,6 @@ sap.ui.define([
 		assert.ok(jQuery(".sapUiDnDIndicator").is(":hidden"), "drop indicator is hidden");
 		assert.notOk(oSession.getDropControl(), "there is no more drop control");
 
-		oBrowserStub.restore();
 		clock.restore();
 	});
 

@@ -283,6 +283,9 @@ sap.ui.define([
 					"AdditionalInfo_enabledBtn1",
 					"then the additional info on the enabled item is set correctly"
 				);
+				assert.notOk(
+					oEnabledButton1Item.getEndContent()[0].getEnabled(),
+					"then the additional info Button is disabled (not clickable)");
 				assert.strictEqual(
 					oDisabledButton1Item.getEndContent()[0].getTooltip(),
 					"AdditionalInfo_disabledBtn1",
