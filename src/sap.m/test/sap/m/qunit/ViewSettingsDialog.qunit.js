@@ -4332,4 +4332,50 @@ sap.ui.define([
 		// cleanup
 		oVSD.destroy();
 	});
+
+	QUnit.test("Sort list items have ListType.Active type", function (assert) {
+		var done = assert.async();
+		var ListType = mobileLibrary.ListType;
+		var oVSD = new ViewSettingsDialog();
+
+		oVsdConfig.addSortItems(oVSD);
+		oVSD.placeAt("qunit-fixture");
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		// Act: Open the dialog
+		oVSD.open();
+
+		setTimeout(function() {
+			// Assert: Check that sort list items have the correct type
+			var oSortList = oVSD._sortList;
+			assert.ok(oSortList, "Sort list should exist");
+
+			var aSortItems = oSortList.getItems();
+			assert.ok(aSortItems.length > 0, "Sort list should have items");
+
+			// Check each sort item (excluding group header)
+			aSortItems.forEach(function(oItem) {
+				if (!oItem.isA("sap.m.GroupHeaderListItem")) {
+					assert.strictEqual(oItem.getType(), ListType.Active,
+						"Sort list item '" + oItem.getTitle() + "' should have ListType.Active");
+				}
+			});
+
+			// Also check sort order items
+			var oSortOrderList = oVSD._sortOrderList;
+			if (oSortOrderList) {
+				var aSortOrderItems = oSortOrderList.getItems();
+				aSortOrderItems.forEach(function(oItem) {
+					if (!oItem.isA("sap.m.GroupHeaderListItem")) {
+						assert.strictEqual(oItem.getType(), ListType.Active,
+							"Sort order item '" + oItem.getTitle() + "' should have ListType.Active");
+					}
+				});
+			}
+
+			oVSD._getDialog().close();
+			oVSD.destroy();
+			done();
+		}, 100);
+	});
 });

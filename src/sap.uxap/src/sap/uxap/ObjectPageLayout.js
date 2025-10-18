@@ -3495,6 +3495,7 @@ sap.ui.define([
 		//don't apply parallax effects if there are not enough space for it
 		if (!bShouldPreserveHeaderInTitleArea && ((oHeader && this.getShowHeaderContent()) || this.getShowAnchorBar())) {
 			this._toggleHeader(bShouldStick, !!(oEvent && oEvent.type === "scroll"));
+			this._scrollTo(iScrollTop); // to avoid snap/unsnap caused by the change in header height when there is a difference between the snapped and expanded title heights
 		}
 
 		if (!bShouldPreserveHeaderInTitleArea) {

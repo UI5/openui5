@@ -676,7 +676,7 @@ sap.ui.define([
 	 * @returns {boolean} whether the xConfig state should be shown
 	 */
 	ResponsiveTableType.prototype.showXConfigState = function() {
-		return this._oShowDetailsButton?.getVisible();
+		return this.getShowDetailsButton();
 	};
 
 	ResponsiveTableType.prototype.exit = function() {

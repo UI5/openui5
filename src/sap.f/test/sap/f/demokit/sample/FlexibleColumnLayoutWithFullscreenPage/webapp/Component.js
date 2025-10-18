@@ -47,7 +47,7 @@ sap.ui.define([
 			// to prevent the view being temporarily shown aside the next view (during the transition to the next route)
 			// if the views for both routes do not match semantically
 			if (this.currentRouteName === "list") { // last viewed route was list
-				var oListView = null;
+				var oListView = this.oRouter.getView("sap.f.FlexibleColumnLayoutWithFullscreenPage.view.List");
 				this.getRootControl().byId("fcl").removeBeginColumnPage(oListView);
 			}
 

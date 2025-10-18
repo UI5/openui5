@@ -526,6 +526,48 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 		});
 	});
 
+	QUnit.module("ObjectPage Content scrolling with snap", {
+		beforeEach: function (assert) {
+			var done = assert.async();
+			XMLView.create({
+				id: "UxAP-ObjectPageContentScrollingWithSnap",
+				viewName: "view.UxAP-ObjectPageContentScrollingWithSnap"
+			}).then(async function(oView) {
+				this.oObjectPageContentScrollingView = oView;
+				this.oObjectPageContentScrollingView.placeAt('qunit-fixture');
+				await nextUIUpdate();
+				done();
+			}.bind(this));
+		},
+		afterEach: function () {
+			this.oObjectPageContentScrollingView.destroy();
+		}
+	});
+
+	QUnit.test("Scroll position readjusted when header is snapped", function (assert) {
+		var fnDone = assert.async(),
+			iScrollPosition,
+			oSpy;
+
+		this.oObjectPage = this.oObjectPageContentScrollingView.byId("ObjectPageLayout");
+		this.oObjectPage.attachEventOnce("onAfterRenderingDOMReady", function() {
+
+			iScrollPosition = this.oObjectPage._getSnapPosition() - 10;
+
+			// Act - scroll to a position just after snap
+			this.oObjectPage._scrollTo(iScrollPosition);
+			oSpy = this.spy(this.oObjectPage, "_scrollTo");
+
+			// simulate scroll event fired immediately after the scrollTo call
+			this.oObjectPage._onScroll({target: {scrollTop: iScrollPosition}});
+
+			// Assert
+			assert.strictEqual(oSpy.callCount, 1, "scrollTo is called once - for the readjusted scroll position");
+			assert.strictEqual(oSpy.getCall(0).args[0], iScrollPosition, "scroll position is readjusted to scroll position");
+			fnDone();
+		}.bind(this));
+	});
+
 	QUnit.module("ObjectPage Content scrolling", {
 		beforeEach: function (assert) {
 			var done = assert.async();
