@@ -533,7 +533,7 @@ function(
 						/**
 						 * The list item action that fired the event
 						 */
-						itemAction : {type : "sap.m.ListItemAction"},
+						action : {type : "sap.m.ListItemAction"},
 
 						/**
 						 * The list item in which the action was performed

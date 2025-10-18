@@ -1,0 +1,80 @@
+<mvc:View xmlns:mvc="sap.ui.core.mvc"
+		   xmlns="sap.uxap"
+		   xmlns:layout="sap.ui.layout"
+		   xmlns:m="sap.m"
+		   height="100%">
+	<ObjectPageLayout id="ObjectPageLayout"
+		enableLazyLoading="true"
+		useIconTabBar="true"
+		showTitleInHeaderContent="true"
+		upperCaseAnchorBar="false">
+		<headerTitle>
+			<ObjectPageDynamicHeaderTitle>
+				<expandedHeading>
+					<m:Title text="Denise Smith" wrapping="true"/>
+				</expandedHeading>
+
+				<snappedHeading>
+					<m:FlexBox fitContainer="true" alignItems="Center">
+						<m:Title text="Denise Smith" wrapping="true" />
+					</m:FlexBox>
+				</snappedHeading>
+
+				<expandedContent>
+					<m:Text text="Senior UI Developer"/>
+				</expandedContent>
+
+				<snappedContent>
+					<m:Text text="Senior UI Developer"/>
+				</snappedContent>
+
+				<snappedTitleOnMobile>
+					<m:Title text="Senior UI Developer"/>
+				</snappedTitleOnMobile>
+
+				<actions>
+					<m:Button text="Edit" type="Emphasized"/>
+					<m:Button type="Transparent" text="Delete"/>
+					<m:Button type="Transparent" text="Copy"/>
+					<m:OverflowToolbarButton icon="sap-icon://action" type="Transparent" text="Share" tooltip="action"/>
+				</actions>
+			</ObjectPageDynamicHeaderTitle>
+		</headerTitle>
+
+		<headerContent>
+			<m:FlexBox wrap="Wrap" fitContainer="true" >
+
+				<layout:VerticalLayout class="sapUiSmallMarginBeginEnd">
+					<m:Link text="+33 6 4512 5158"/>
+					<m:Link text="DeniseSmith@sap.com"/>
+				</layout:VerticalLayout>
+
+				<layout:VerticalLayout class="sapUiSmallMarginBeginEnd">
+					<m:Label text="Hello! I am Denise and I use UxAP"/>
+					<m:VBox>
+						<m:Label text="Achieved goals"/>
+						<m:ProgressIndicator percentValue="30" displayValue="30%"/>
+					</m:VBox>
+				</layout:VerticalLayout>
+
+				<layout:VerticalLayout class="sapUiSmallMarginBeginEnd">
+					<m:Label text="San Jose, USA"/>
+				</layout:VerticalLayout>
+			</m:FlexBox>
+		</headerContent>
+
+		<sections>
+			<ObjectPageSection titleUppercase="false" id="goals" title="2014 Goals Plan">
+			<subSections>
+				<ObjectPageSubSection id="goalsSS1" titleUppercase="false">
+					<blocks>
+						<m:Panel height="1200px" headerText="Goal 1">
+							<m:Text text="Description of Goal 1"/>
+						</m:Panel>
+					</blocks>
+				</ObjectPageSubSection>
+			</subSections>
+			</ObjectPageSection>
+		</sections>
+	</ObjectPageLayout>
+</mvc:View>

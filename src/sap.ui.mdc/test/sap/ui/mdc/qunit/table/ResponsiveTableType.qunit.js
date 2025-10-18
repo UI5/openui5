@@ -261,6 +261,16 @@ sap.ui.define([
 		}
 	});
 
+	QUnit.test("showXConfigState with showDetailsButton not visible and no xConfig", function(assert) {
+		const oType = this.oTable.getType();
+
+		assert.ok(oType.getShowDetailsButton(), "showDetails button is enabled");
+		assert.notOk(oType._oShowDetailsButton.getVisible(), "showDetails button is not visible");
+		assert.deepEqual(this.oTable._getXConfig(), {}, "xConfig is empty {}");
+
+		assert.ok(oType.showXConfigState(), "showXConfigState() returns true even when xConfig is missing");
+	});
+
 	QUnit.test("Button creation", async function(assert) {
 		const oRb = Lib.getResourceBundleFor("sap.ui.mdc");
 
