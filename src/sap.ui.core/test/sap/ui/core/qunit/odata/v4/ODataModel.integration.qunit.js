@@ -50880,6 +50880,10 @@ make root = ${bMakeRoot}`;
 	// report and must be inherited by the action.
 	// Check that for all GET requests including late property requests the dataRequested and
 	// dataReceived events are fired at the model (JIRA: CPOUI5ODATAV4-1671)
+	//
+	// Refresh a kept-alive context before it is transferred from a temporary binding to its actual
+	// resolved binding.
+	// SNOW: DINC0637489
 // list, page: the step number in which they are initialized;
 // patchNo: the batchNo of the $batch with the PATCH and the side effect request
 [
@@ -50962,33 +50966,35 @@ make root = ${bMakeRoot}`;
 		 * @returns {Promise} - The promise of the requestProperty for "HasDraftEntity"
 		 */
 		function initializeObjectPage(iBatchNo, bLate) {
-			var oResponse = {
-					"@odata.etag" : "etag.active1",
-					HasDraftEntity : false,
-					Messages : [{
-						message : "Active message",
-						numericSeverity : 2,
-						target : "defaultChannel"
-					}],
-					lastUsedChannel : "Channel 2"
-				};
+			const oLateResponse = {
+				"@odata.etag" : "etag.active1",
+				HasDraftEntity : false,
+				Messages : [{
+					message : "Active message",
+					numericSeverity : 2,
+					target : "defaultChannel"
+				}],
+				lastUsedChannel : "Channel 2"
+			};
+			const oResponse = {
+				...oLateResponse,
+				ArtistID : "A1",
+				IsActiveEntity : true,
+				Name : "Artist 1",
+				defaultChannel : "Channel 1"
+			};
 
 			if (bLate) {
 				that.expectRequest("Artists(ArtistID='A1',IsActiveEntity=true)"
 						+ "?$select=HasDraftEntity,Messages,lastUsedChannel",
-						oResponse);
+						oLateResponse);
 			} else { // if not late, the list's properties are also part of the request
 				that.expectRequest({
 						batchNo : iBatchNo,
 						url : "Artists(ArtistID='A1',IsActiveEntity=true)"
 							+ "?$select=ArtistID,HasDraftEntity,IsActiveEntity,Messages,Name,"
 							+ "defaultChannel,lastUsedChannel"
-					}, Object.assign(oResponse, {
-						ArtistID : "A1",
-						IsActiveEntity : true,
-						Name : "Artist 1",
-						defaultChannel : "Channel 1"
-					}));
+					}, oResponse);
 			}
 			that.expectRequest("Artists(ArtistID='A1',IsActiveEntity=true)/_Publication"
 					+ "?$select=PublicationID&$skip=0&$top=100",
@@ -51010,7 +51016,27 @@ make root = ${bMakeRoot}`;
 				{$$patchWithoutSideEffects : true});
 			oObjectPage.setBindingContext(oActiveContext);
 
-			return oActiveContext.requestProperty("HasDraftEntity");
+			return oActiveContext.requestProperty("HasDraftEntity").then(function () {
+				that.expectRequest("Artists(ArtistID='A1',IsActiveEntity=true)"
+						+ "?$select=ArtistID,HasDraftEntity,IsActiveEntity,Messages,Name"
+						+ ",defaultChannel,lastUsedChannel"
+						+ (oFixture.list === 1 ? ",sendsAutographs" : ""), {
+						...oResponse,
+						...(oFixture.list === 1 && {sendsAutographs : true})
+					})
+					.expectRequest("Artists(ArtistID='A1',IsActiveEntity=true)/_Publication"
+						+ "?$select=PublicationID&$skip=0&$top=100",
+						{value : [{PublicationID : "P1"}]}
+					);
+
+				// do not observe events and batchNo of these requests (not relevant)
+				iDataRequestedCount -= 2;
+				iDataReceivedCount -= 2;
+				that.iBatchNo -= 1;
+
+				// code under test (SNOW: DINC0637489)
+				return oActiveContext.requestRefresh();
+			});
 		}
 
 		this.expectChange("listName", [])
