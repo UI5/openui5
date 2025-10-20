@@ -2183,6 +2183,10 @@ sap.ui.define([
 				oTable._oTable.attachEventOnce("updateFinished", resolve);
 			});
 		}).then(function() {
+			return new Promise(function(resolve) {
+				window.requestAnimationFrame(resolve);
+			});
+		}).then(function() {
 			checkRowPress(true, oTable, oTable._oTable.getItems()[0]);
 			oTable.setType("Table");
 			return oTable._fullyInitialized();
