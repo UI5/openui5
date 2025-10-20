@@ -1644,7 +1644,7 @@ sap.ui.define([
 
 		return pReady.then(function() {
 			oTable.getBinding("rows").refresh();
-		}).then(oTable.qunit.whenRenderingFinished).then(function() {
+		}).then(oTable.qunit.whenBindingChange).then(oTable.qunit.whenRenderingFinished).then(function() {
 			assert.ok(oGetContextsSpy.calledTwice, "Binding#getContexts was called 2 times"); // refreshRows, updateRows
 			assert.ok(oGetContextsSpy.getCall(0).calledWithExactly(0, 20, 100),
 				"The first call to Binding#getContexts considers the device height for the length");
