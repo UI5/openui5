@@ -1927,5 +1927,15 @@
         "text": " sap.m.Button: has correct css parameters for active Emphasized"
       }
     ]
+  },
+  "1.108.46": {
+    "date": "October 2025",
+    "notes": [
+      {
+        "id": "80841bfd8e86de5e7629a51e09c28d8dc9cfde45",
+        "type": "FIX",
+        "text": " sap.m.DatePicker: close picker on context change"
+      }
+    ]
   }
 }
