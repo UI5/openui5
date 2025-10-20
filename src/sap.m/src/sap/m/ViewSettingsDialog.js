@@ -2296,10 +2296,12 @@ function(
 		this._sortOrderList.addItem(new GroupHeaderListItem({title: this._rb.getText("VIEWSETTINGS_SORT_BY")}));
 
 		this._sortOrderList.addItem(new StandardListItem({
-			title : this._rb.getText("VIEWSETTINGS_ASCENDING_ITEM")
+			title : this._rb.getText("VIEWSETTINGS_ASCENDING_ITEM"),
+			type : ListType.Active
 		}).data("item", false).setSelected(true));
 		this._sortOrderList.addItem(new StandardListItem({
-			title : this._rb.getText("VIEWSETTINGS_DESCENDING_ITEM")
+			title : this._rb.getText("VIEWSETTINGS_DESCENDING_ITEM"),
+			type : ListType.Active
 		}).data("item", true));
 
 		// Aria - used to label the sort list
@@ -2394,10 +2396,12 @@ function(
 
 		this._groupOrderList.addItem(new GroupHeaderListItem({title: this._rb.getText("VIEWSETTINGS_GROUP_BY")}));
 		this._groupOrderList.addItem(new StandardListItem({
-			title : this._rb.getText("VIEWSETTINGS_ASCENDING_ITEM")
+			title : this._rb.getText("VIEWSETTINGS_ASCENDING_ITEM"),
+			type : ListType.Active
 		}).data("item", false).setSelected(true));
 		this._groupOrderList.addItem(new StandardListItem({
-			title : this._rb.getText("VIEWSETTINGS_DESCENDING_ITEM")
+			title : this._rb.getText("VIEWSETTINGS_DESCENDING_ITEM"),
+			type : ListType.Active
 		}).data("item", true));
 
 		// Aria - used to label the group list
@@ -2452,6 +2456,7 @@ function(
 			oListItem = new StandardListItem({
 				id: this._presetFilterList.getId() + "-none" + LIST_ITEM_SUFFIX,
 				title : this._rb.getText("VIEWSETTINGS_NONE_ITEM_FILTER"),
+				type : ListType.Active,
 				selected : !!this.getSelectedPresetFilterItem()
 			});
 			this._presetFilterList.addItem(oListItem);
