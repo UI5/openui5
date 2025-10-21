@@ -24,21 +24,9 @@ sap.ui.require([
 				text: 'Lorem Ipsum'
 			})
 		})],
-
-		flexContent: new Carousel({
-			pages: [new Image({
-				src: "../../../../sap/ui/documentation/sdk/images/HT-6100-large.jpg",
-				alt: "item HT-6100",
-				decorative: false,
-				tooltip: "HT-6100"
-			}), new Image({
-				src: "../../../../sap/ui/documentation/sdk/images/HT-1112.jpg",
-				alt: "item HT-1112",
-				decorative: false,
-				tooltip: "HT-1112"
-			})]
+		flexContent: new Text({
+			text:"This container is flexible and it will adapt its size to fill the remaining size in the FixFlex control"
 		})
-
 	});
 
 	var page1 = new Page('page1', {

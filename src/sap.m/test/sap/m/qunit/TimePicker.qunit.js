@@ -318,14 +318,6 @@ sap.ui.define([
 		assert.strictEqual(this.oTimePicker.getDisplayFormat(), newFormat, "the format property was changed");
 	});
 
-	 QUnit.test("After changing the displayFormat property the format help text is updated", function (assert) {
-		var oFormatHelp = this.oTimePicker._createFormatHelp();
-		assert.strictEqual(oFormatHelp.getText(), this.oTimePicker.getDisplayFormat(), "initial text matches");
-
-		this.oTimePicker.setDisplayFormat("HH:mm");
-		assert.strictEqual(oFormatHelp.getText(), "HH:mm", "format help text updated after setDisplayFormat");
-	});
-
 	QUnit.test("ValueHelp icon is not visible when timepicker is not editable", function (assert) {
 		// arrange
 		var oTimePicker = new DatePicker({ editable: false }),
@@ -1856,17 +1848,6 @@ sap.ui.define([
 
 		// Assert
 		assert.strictEqual(oTP.getRenderer().getAriaRole() , "", "The role attribute is empty");
-	});
-
-	QUnit.test("_createFormatHelp creates InvisibleText and attaches it as ariaDescribedBy", function (assert) {
-		var oFormatHelp = this.oTP._createFormatHelp();
-
-		assert.ok(oFormatHelp, "format help instance created");
-		assert.strictEqual(oFormatHelp.getText(), this.oTP.getDisplayFormat(), "format help text equals displayFormat");
-
-		var aDescribedBy = this.oTP.getAriaDescribedBy();
-		assert.ok(Array.isArray(aDescribedBy), "ariaDescribedBy is an array");
-		assert.ok(aDescribedBy.indexOf(oFormatHelp.getId()) !== -1, "format help id is present in ariaDescribedBy");
 	});
 
 	QUnit.module("MaskInput integration", {
