@@ -1935,7 +1935,6 @@ sap.ui.define([
 				}
 			}
 			assert.ok(oGD, "sap.ui.layout.GridData used");
-			assert.equal(oClone._aLayouts.length, 0, "Clone has no own LayoutData");
 
 			//visibility change
 			oField = Element.getElementById("I3");

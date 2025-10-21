@@ -430,8 +430,6 @@ function(
 
 			this.setDisplayFormat(getDefaultDisplayFormat());
 
-			this._createFormatHelp();
-
 			this._oResourceBundle = Library.getResourceBundleFor("sap.m");
 
 			// marks if the value is valid or not
@@ -511,11 +509,6 @@ function(
 			if (this._invisibleLabelText) {
 				this._invisibleLabelText.destroy();
 				this._invisibleLabelText = null;
-			}
-
-			if (this._formatHelp) {
-				this._formatHelp.destroy();
-				this._formatHelp = null;
 			}
 
 			MaskEnabler.exit.apply(this, arguments);
@@ -1034,10 +1027,6 @@ function(
 			this.setProperty("displayFormat", sDisplayFormat, true); // no rerendering
 
 			this._initMask();
-
-			if (this._formatHelp) {
-				this._formatHelp.setText(sDisplayFormat);
-			}
 
 			if (oClocks) {
 				oClocks.setValueFormat(sDisplayFormat);
@@ -1756,24 +1745,6 @@ function(
 
 			return this._invisibleLabelText;
 		};
-
-		/**
-		 * Returns the invisible format text for the TimePicker.
-		 * @private
-		 * @returns {sap.ui.core.InvisibleText} The invisible placeholder text
-		 */
-		TimePicker.prototype._createFormatHelp = function () {
-			if (!this._formatHelp) {
-				var sPattern = this.getDisplayFormat();
-				this._formatHelp = new InvisibleText({
-					text: sPattern
-				}).toStatic();
-
-				this.addAriaDescribedBy(this._formatHelp.getId());
-
-			}
-            return this._formatHelp;
-        };
 
 		/**
 		 * Returns the accessible name for the TimePicker.
