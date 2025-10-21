@@ -447,6 +447,12 @@ sap.ui.define([
 			let sText = "";
 			if (oInfo) {
 				sText = oInfo.description;
+				if (bIsTreeColumnCell && !bHidden) {
+					const sExpandCollapseButtonText = oTableInstances.row.isExpanded() ?
+						TableUtils.getResourceText("TBL_COLLAPSE_BUTTON") : TableUtils.getResourceText("TBL_EXPAND_BUTTON");
+
+					sText = sExpandCollapseButtonText.concat(" ", oInfo.description);
+				}
 				if (TableUtils.getInteractiveElements($Cell) !== null) {
 					sText = TableUtils.getResourceText("TBL_CELL_INCLUDES", [sText]);
 				}
