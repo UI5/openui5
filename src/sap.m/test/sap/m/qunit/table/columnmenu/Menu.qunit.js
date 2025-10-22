@@ -615,6 +615,13 @@ sap.ui.define([
 		}
 	});
 
+	QUnit.test("ariaLabelledBy for the menu popover", async function(assert) {
+		this.oColumnMenu.openBy(this.oButton);
+		await nextUIUpdate();
+
+		assert.equal(this.oColumnMenu._oPopover.getAriaLabelledBy(), this.oColumnMenu.getId() + "-title", "Popover has correct aria-labelledby");
+	});
+
 	QUnit.test("ARIA label for quick actions", async function(assert) {
 		const checkARIA = (oItem, sExpectedControl) => {
 			assert.equal(oItem.getLabel(), sText, "Quick action has correct label");

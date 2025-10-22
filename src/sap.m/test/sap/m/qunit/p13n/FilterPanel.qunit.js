@@ -12,18 +12,28 @@ sap.ui.define([
         return [
             {
                 active: false,
+                key: "key1",
                 name: "key1",
                 label: "Field 1"
             },
             {
                 active: false,
+                key: "key2",
                 name: "key2",
                 label: "Field 2"
             },
             {
                 active: false,
-                name: "key1",
-                label: "Field 3"
+                key: "key3",
+                name: "key3",
+                label: "Field 3",
+                tooltip: "Some tooltip"
+            },
+            {
+                active: false,
+                key: "key4",
+                name: "key4",
+                label: "Field 4"
             }
         ];
     };
@@ -169,5 +179,69 @@ sap.ui.define([
         this.oFilterPanel._setLabelForOnBox(oFilterItem, oFieldBox);
         const sLabelFor = Element.getElementById(oFieldBox.getItems()[0].getLabelFor()).getIdForLabel();
         assert.equal(sLabelFor, "testAccInput", "Correct 'labelFor' reference on label control");
+    });
+
+    QUnit.test("Check tooltip functionality on field labels", function(assert){
+        const aTestData = getTestData();
+        // Activate the field with tooltip (key3/Field 3 has tooltip "Some tooltip")
+        aTestData[2].active = true;
+        this.oFilterPanel.setP13nData(aTestData);
+
+        const aRows = this.oFilterPanel._oListControl.getItems();
+        assert.equal(aRows.length, 2, "One active row and one empty row are present");
+
+        // Get the label from the first active row (the field box contains the label)
+        const oFieldBox = aRows[0].getContent()[0].getContent()[0];
+        const oLabel = oFieldBox.getItems()[0];
+
+        assert.equal(oLabel.getTooltip(), "Some tooltip", "Tooltip is correctly set on the field label");
+        assert.equal(oLabel.getText(), "Field 3", "Label text is correct");
+    });
+
+    QUnit.test("Check tooltip functionality when selecting field via ComboBox", function(assert){
+        const done = assert.async();
+        const aTestData = getTestData();
+        this.oFilterPanel.setP13nData(aTestData);
+
+        let aRows = this.oFilterPanel._oListControl.getItems();
+        const oComboBox = aRows[0].getContent()[0].getContent()[0];
+
+        // Select the field with tooltip (key3/Field 3)
+        oComboBox.setSelectedKey("key3");
+        oComboBox.fireSelectionChange({
+            source: oComboBox
+        });
+        oComboBox.fireChange({
+            source: oComboBox,
+            newValue: "Field 3"
+        });
+
+        // Wait for the async operations to complete
+        setTimeout(() => {
+            aRows = this.oFilterPanel._oListControl.getItems();
+
+            // Get the newly created field box and its label
+            const oFieldBox = aRows[0].getContent()[0].getContent()[0];
+            const oLabel = oFieldBox.getItems()[0];
+
+            assert.equal(oLabel.getTooltip(), "Some tooltip", "Tooltip is correctly applied when field is selected via ComboBox");
+            assert.equal(oLabel.getText(), "Field 3", "Label text is correct for selected field");
+
+            done();
+        }, 100);
+    });
+
+    QUnit.test("Check tooltip functionality with field without tooltip", function(assert){
+        const aTestData = getTestData();
+        // Activate field without tooltip (key4/Field 4)
+        aTestData[3].active = true;
+        this.oFilterPanel.setP13nData(aTestData);
+
+        const aRows = this.oFilterPanel._oListControl.getItems();
+        const oFieldBox = aRows[0].getContent()[0].getContent()[0];
+        const oLabel = oFieldBox.getItems()[0];
+
+        assert.notOk(oLabel.getTooltip(), "No tooltip is set for field without tooltip property");
+        assert.equal(oLabel.getText(), "Field 4", "Label text is correct for field without tooltip");
     });
 });

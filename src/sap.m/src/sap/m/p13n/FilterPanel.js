@@ -121,7 +121,7 @@ sap.ui.define([
 
 	FilterPanel.prototype._createQueryRowGrid = function(oItem) {
 
-		const oRowContent = oItem.name ? this._createRowContainer(oItem.label, oItem.key) : this._createKeySelect(oItem.name);
+		const oRowContent = oItem.name ? this._createRowContainer(oItem.label, oItem.key, oItem.tooltip) : this._createKeySelect(oItem.name);
 
 		const aContent = [oRowContent];
 		if (oItem.name) {
@@ -182,10 +182,11 @@ sap.ui.define([
 		return oRemoveBtn;
 	};
 
-	FilterPanel.prototype._createRowContainer = (sText, sKey) => {
+	FilterPanel.prototype._createRowContainer = (sText, sKey, sTooltip) => {
 		// var sKey = oSelect._key;
 		const oLabel = new Label({
 			text: sText,
+			tooltip: sTooltip ?? undefined,
 			showColon: true,
 			wrapping: true,
 			wrappingType: WrappingType.Hyphenated
@@ -220,8 +221,9 @@ sap.ui.define([
 				oQueryRowGrid.removeContent(oSelect);
 
 				const sText = sKey ? oComboBox.getSelectedItem().getText() : "";
+				const sTooltip = this.getP13nData().find((oItem) => oItem.key === oComboBox.getSelectedItem().getKey())?.tooltip ?? undefined;
 
-				const oFieldBox = this._createRowContainer(sText, sKey); //Create a container with a VBox and a label with some padding inside and insert it in the grid
+				const oFieldBox = this._createRowContainer(sText, sKey, sTooltip); //Create a container with a VBox and a label with some padding inside and insert it in the grid
 				oQueryRowGrid.insertContent(oFieldBox, 0);
 
 				oFilterItem = this._createFactoryControl({
@@ -239,8 +241,8 @@ sap.ui.define([
 					this._oListControl.setKeyboardMode(ListKeyboardMode.Edit);
 				}
 
-                                // Note: the control in mdc is wrapped in a filter group layout, hence it needs to be checked if the item is in mdc context to
-                                // properly set the focus. In comp and freestyle, the item itself is the filterable control
+				// Note: the control in mdc is wrapped in a filter group layout, hence it needs to be checked if the item is in mdc context to
+				// properly set the focus. In comp and freestyle, the item itself is the filterable control
 				const oControlForFocus = oFilterItem?.getMetadata().getName().includes("sap.ui.mdc") ? oFilterItem.getItems()?.[0] : oFilterItem;
 				oControlForFocus?.focus();
 			}, 20);
