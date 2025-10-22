@@ -909,10 +909,40 @@ sap.ui.define([
 		this.oMessagePopover.openBy(this.oButton);
 		var oDomRef = this.oMessagePopover.getDomRef(),
 			sInvisibleHeadingLabelId = this.oMessagePopover.getId() + "-messageView-HeadingDescr",
-			sActualAriaLabelledBy = oDomRef.getAttribute("aria-labelledby");
+			sActualAriaLabelledBy = oDomRef.getAttribute("aria-labelledby"),
+			oAriaLabelledByElement = document.getElementById(sInvisibleHeadingLabelId);
 
 		assert.ok(sActualAriaLabelledBy !== null, "should be present");
 		assert.ok(sActualAriaLabelledBy.indexOf(sInvisibleHeadingLabelId) !== -1, "should have a reference to the hidden text with heading messages description");
+		assert.ok(oAriaLabelledByElement !== null, "The hidden text element should be present in the DOM");
+	});
+
+	QUnit.test("aria-labelledby attribute for message popover with segmented buttons", async function (assert) {
+		var oMessagePopover = new MessagePopover();
+
+		oMessagePopover.addItem(new MessageItem({
+			type: MessageType.Error,
+			title: "Error message"
+		}));
+		oMessagePopover.addItem(new MessageItem({
+			type: MessageType.Warning,
+			title: "Warning message"
+		}));
+
+		oMessagePopover.placeAt("qunit-fixture");
+		await nextUIUpdate();
+		oMessagePopover.openBy(this.oButton);
+
+		var oDomRef = oMessagePopover.getDomRef(),
+			sInvisibleHeadingLabelId = oMessagePopover.getId() + "-messageView-HeadingDescr",
+			sActualAriaLabelledBy = oDomRef.getAttribute("aria-labelledby"),
+			oAriaLabelledByElement = document.getElementById(sInvisibleHeadingLabelId);
+
+		assert.ok(sActualAriaLabelledBy !== null, "should be present");
+		assert.ok(sActualAriaLabelledBy.indexOf(sInvisibleHeadingLabelId) !== -1, "should have a reference to the hidden text with heading messages description");
+		assert.ok(oAriaLabelledByElement !== null, "The hidden text element should be present in the DOM");
+
+		oMessagePopover.destroy();
 	});
 
 	QUnit.test("MessagePopover's behavior in different screens on Desktop", async function (assert) {
