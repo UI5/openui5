@@ -289,7 +289,7 @@
         	<license url="https://github.com/wycats/handlebars.js/" type="MIT License" file="../thirdparty/licenses/handlebars-MIT-LICENSE.txt" />
         </lib>
         <lib name="requirejs" displayName="requireJS" homepage="http://requirejs.org">
-        	<license url="https://github.com/jrburke/requirejs/blob/master/LICENSE" type="MIT License" file="../thirdparty/licenses/requireJS-MIT-LICENSE.txt" />
+        	<license url="https://github.com/requirejs/requirejs/blob/master/LICENSE" type="MIT License" file="../thirdparty/licenses/requireJS-MIT-LICENSE.txt" />
         </lib>
         <lib name="crossroadsjs" displayName="crossroads.js" homepage="https://github.com/millermedeiros/crossroads.js">
         	<license url="http://opensource.org/licenses/mit-license.php" type="MIT License" file="../thirdparty/licenses/crossroads-MIT-LICENSE.txt" />
