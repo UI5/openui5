@@ -11,6 +11,7 @@ sap.ui.define([
 	"sap/ui/table/library",
 	"sap/m/IllustratedMessage",
 	"sap/m/Label",
+	"sap/m/plugins/CellSelector",
 	"sap/ui/core/Control",
 	"sap/ui/core/ControlBehavior",
 	"sap/ui/core/library",
@@ -31,6 +32,7 @@ sap.ui.define([
 	library,
 	IllustratedMessage,
 	Label,
+	CellSelector,
 	Control,
 	ControlBehavior,
 	coreLibrary,
@@ -1258,6 +1260,17 @@ sap.ui.define([
 		await this.oTable.qunit.whenRenderingFinished();
 
 		assert.notOk(oRow.getDomRef("rowselectText"), `SelectionMode ${this.oTable.getSelectionMode()} - Empty row`);
+	});
+
+	QUnit.test("Expand/collapse text with CellSelector plugin", function(assert) {
+		assert.equal(this.oTable.$("rowexpandtext").text(), TableUtils.getResourceText("TBL_ROW_EXPAND_KEY"), "Expand text is correct");
+		assert.equal(this.oTable.$("rowcollapsetext").text(), TableUtils.getResourceText("TBL_ROW_COLLAPSE_KEY"), "Collapse text is correct");
+
+		this.oTable.addDependent(new CellSelector());
+		assert.equal(this.oTable.$("rowexpandtext").text(), TableUtils.getResourceText("TBL_ROW_EXPAND_KEY_ALTERNATIVE"),
+			"Expand text is correct with CellSelector");
+		assert.equal(this.oTable.$("rowcollapsetext").text(), TableUtils.getResourceText("TBL_ROW_COLLAPSE_KEY_ALTERNATIVE"),
+			"Collapse text is correct with CellSelector");
 	});
 
 	QUnit.module("Row Actions", {

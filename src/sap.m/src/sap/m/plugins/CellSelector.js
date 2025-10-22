@@ -8,8 +8,9 @@ sap.ui.define([
 	"sap/ui/events/KeyCodes",
 	"sap/ui/core/Element",
 	"sap/m/library",
+	"sap/ui/core/Lib",
 	"sap/ui/core/InvisibleRenderer"
-], function (PluginBase, Localization, deepEqual, KeyCodes, Element, library, InvisibleRenderer) {
+], function (PluginBase, Localization, deepEqual, KeyCodes, Element, library, Lib, InvisibleRenderer) {
 	"use strict";
 
 	const ListMode = library.ListMode;
@@ -1181,10 +1182,18 @@ sap.ui.define([
 			onActivate: function(oTable, oPlugin) {
 				oTable.attachEvent("_change", oPlugin, this._onPropertyChange);
 				oTable.attachEvent("EventHandlerChange", oPlugin, this._onEventHandlerChange);
+
+				oTable.$("rowexpandtext").text(Lib.getResourceBundleFor("sap.ui.table").getText("TBL_ROW_EXPAND_KEY_ALTERNATIVE"));
+				oTable.$("rowcollapsetext").text(Lib.getResourceBundleFor("sap.ui.table").getText("TBL_ROW_COLLAPSE_KEY_ALTERNATIVE"));
 			},
 			onDeactivate: function(oTable, oPlugin) {
 				oTable.detachEvent("_change", this._onPropertyChange);
 				oTable.detachEvent("EventHandlerChange", this._onEventHandlerChange);
+
+				oTable._getAccExtension().getSelectionTexts = this._getSelectionTexts;
+
+				oTable.$("rowexpandtext").text(Lib.getResourceBundleFor("sap.ui.table").getText("TBL_ROW_EXPAND_KEY"));
+				oTable.$("rowcollapsetext").text(Lib.getResourceBundleFor("sap.ui.table").getText("TBL_ROW_COLLAPSE_KEY"));
 			},
 			_onPropertyChange: function(oEvent, oPlugin) {
 				oEvent.getParameter("name") == "selectionBehavior" && oPlugin._onSelectableChange();
