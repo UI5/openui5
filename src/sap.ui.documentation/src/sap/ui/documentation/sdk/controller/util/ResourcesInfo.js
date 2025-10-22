@@ -10,6 +10,12 @@ sap.ui.define([],
 		var aResources = [
 			// #1 Category: Featured
 			{
+				"id": "fioriDevPortal",
+				"text": "SAP Fiori Development Portal",
+				"href": "test-resources/sap/fe/core/fpmExplorer/index.html",
+				"isDistributionScope": true
+			},
+			{
 				"id": "iconExplorer",
 				"text": "Icon Explorer",
 				"href": "test-resources/sap/m/demokit/iconExplorer/webapp/index.html"
@@ -40,12 +46,6 @@ sap.ui.define([],
 				"id": "linter",
 				"text": "UI5 linter",
 				"href": "https://github.com/SAP/ui5-linter"
-			},
-			{
-				"id": "fpmExplorer",
-				"text": "Flexible Programming Model Explorer",
-				"href": "test-resources/sap/fe/core/fpmExplorer/index.html#/overview/introduction",
-				"isDistributionScope": true
 			},
 			{
 				"id": "businessAppStudio",
