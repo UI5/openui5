@@ -1,0 +1,87 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:custom="sap.ui.documentation"
+    xmlns:l="sap.ui.layout">
+    <Panel visible="{=!${versionData>/isOpenUI5}}"
+        accessibleRole="Region"
+        backgroundDesign="Transparent"
+        class="sapUiNoContentPadding">
+        <headerToolbar>
+            <Toolbar class="headlineCell">
+                <Title width="100%"
+                    text="{i18n>WELCOME_FIORI_DESIGN_DEVELOPMENT}"
+                    level="H1"
+                    titleStyle="H1"
+                    class="sapUiMediumMarginTopBottom" />
+            </Toolbar>
+        </headerToolbar>
+        <l:BlockLayout>
+            <l:BlockLayoutRow>
+                <l:BlockLayoutCell
+                    backgroundColorSet="ColorSet10"
+                    backgroundColorShade="ShadeA">
+                    <l:Grid
+                        defaultSpan="L6 M12 S12"
+                        hSpacing="0"
+                        vSpacing="0">
+                        <l:VerticalLayout width="100%">
+                            <custom:DivContainer class="sapUIDisclaimerLink sapUiSmallMarginBottom">
+                                <custom:TitleLink
+                                    href="https://experience.sap.com/fiori-design/"
+                                    text="{i18n>WELCOME_BLOCK_5_TITLE}"
+                                    titleStyle="H2"
+                                    target="_blank" />
+                                <Image
+                                    src="./resources/sap/ui/documentation/sdk/images/link-sap.png"
+                                    tooltip="{i18n>LEGAL_DISCLAIMER_EXTERNAL_TOOLTIP}"
+                                    width="1.25rem"
+                                    press="onDisclaimerLinkPress" />
+                            </custom:DivContainer>
+                            <Text
+                                text="{i18n>WELCOME_BLOCK_5_TEXT}"
+                                class="sapUiSmallMarginBottom" />
+                        </l:VerticalLayout>
+                        <Image
+                            src="./resources/sap/ui/documentation/sdk/images/Fiori_design_examples.png"
+                            alt="{i18n>WELCOME_BLOCK_5_IMG_ALT}"
+                            densityAware="false"
+                            width="100%">
+                            <layoutData>
+                                <l:GridData span="L6 M12 S12" />
+                            </layoutData>
+                        </Image>
+                    </l:Grid>
+                </l:BlockLayoutCell>
+
+                <l:BlockLayoutCell
+                    backgroundColorSet="ColorSet10"
+                    backgroundColorShade="ShadeA">
+                    <l:Grid
+                        defaultSpan="L6 M12 S12"
+                        hSpacing="0"
+                        vSpacing="0">
+                        <l:VerticalLayout
+                            width="100%">
+                            <custom:TitleLink
+                                href="topic/50eadaac8d2e49ee8996dc2b560cb76b"
+                                text="{i18n>WELCOME_BLOCK_14_TITLE}"
+                                titleStyle="H2"
+                                class="sapUiSmallMarginBottom" />
+                            <Text text="{i18n>WELCOME_BLOCK_14_TEXT}" class="sapUiSmallMarginBottom" />
+                        </l:VerticalLayout>
+                        <Image
+                            src="./resources/sap/ui/documentation/sdk/images/Fiori_dev_portal.png"
+                            alt="{i18n>WELCOME_BLOCK_14_IMG_ALT}"
+                            densityAware="false"
+                            width="100%">
+                            <layoutData>
+                                <l:GridData span="L6 M12 S12" />
+                            </layoutData>
+                        </Image>
+                    </l:Grid>
+                </l:BlockLayoutCell>
+            </l:BlockLayoutRow>
+        </l:BlockLayout>
+    </Panel>
+</core:FragmentDefinition>

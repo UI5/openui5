@@ -89,6 +89,33 @@
 								</grid:GridResponsiveLayout>
 							</grid:customLayout>
 
+							<!-- SAP Fiori Development Portal -->
+							<f:Card class="sapUiDemoKitResourcesRegularCard"
+								visible="{
+									path: 'resources>/fioriDevPortal',
+									formatter: '.formatter.formatResourceCardVisibility'
+								}">
+								<f:header>
+									<card:Header title="{i18n>RESOURCES_CARD_TITLE_FIORI_DEV_PORTAL}" iconSrc="sap-icon://explorer" />
+								</f:header>
+								<f:content>
+									<VBox class="sapUiDemoKitResourcesCardContentSpacing" wrap="Wrap">
+										<Text text="{i18n>RESOURCES_CARD_DESC_FIORI_DEV_PORTAL}">
+											<layoutData>
+												<FlexItemData growFactor="1" />
+											</layoutData>
+										</Text>
+										<Link
+											class="sapUiDemoKitResourcesCardLink"
+											href="{resources>/fioriDevPortal/href}"
+											target="_blank"
+											text="{i18n>RESOURCES_CARD_LINK_FIORI_DEV_PORTAL}"
+											tooltip="{i18n>RESOURCES_CARD_LINK_TOOLTIP}"
+											wrapping="true" />
+									</VBox>
+								</f:content>
+							</f:Card>
+
 							<!-- Icon Explorer -->
 							<f:Card class="sapUiDemoKitResourcesRegularCard">
 								<f:header>
@@ -287,33 +314,6 @@
 											href="{resources>/mcpserver/href}"
 											target="_blank"
 											text="{i18n>RESOURCES_CARD_LINK_MCPSERVER}"
-											tooltip="{i18n>RESOURCES_CARD_LINK_TOOLTIP}"
-											wrapping="true" />
-									</VBox>
-								</f:content>
-							</f:Card>
-
-							<!-- Flexible Programming Model Explorer -->
-							<f:Card class="sapUiDemoKitResourcesRegularCard"
-								visible="{
-									path: 'resources>/fpmExplorer',
-									formatter: '.formatter.formatResourceCardVisibility'
-								}">
-								<f:header>
-									<card:Header title="{i18n>RESOURCES_CARD_TITLE_FPM_EXPLORER}" iconSrc="sap-icon://explorer" />
-								</f:header>
-								<f:content>
-									<VBox class="sapUiDemoKitResourcesCardContentSpacing" wrap="Wrap">
-										<Text text="{i18n>RESOURCES_CARD_DESC_FPM_EXPLORER}">
-											<layoutData>
-												<FlexItemData growFactor="1" />
-											</layoutData>
-										</Text>
-										<Link
-											class="sapUiDemoKitResourcesCardLink"
-											href="{resources>/fpmExplorer/href}"
-											target="_blank"
-											text="{i18n>RESOURCES_CARD_LINK_FPM_EXPLORER}"
 											tooltip="{i18n>RESOURCES_CARD_LINK_TOOLTIP}"
 											wrapping="true" />
 									</VBox>
