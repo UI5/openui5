@@ -1279,6 +1279,17 @@ sap.ui.define([
 		assert.equal(oRowSelectorText.innerText, sSelectedText, "selected row");
 	});
 
+	QUnit.test("Expand/collapse text with CellSelector plugin", function(assert) {
+		assert.equal(this.oTable.$("rowexpandtext").text(), TableUtils.getResourceText("TBL_ROW_EXPAND_KEY"), "Expand text is correct");
+		assert.equal(this.oTable.$("rowcollapsetext").text(), TableUtils.getResourceText("TBL_ROW_COLLAPSE_KEY"), "Collapse text is correct");
+
+		this.oTable.addDependent(new CellSelector());
+		assert.equal(this.oTable.$("rowexpandtext").text(), TableUtils.getResourceText("TBL_ROW_EXPAND_KEY_ALTERNATIVE"),
+			"Expand text is correct with CellSelector");
+		assert.equal(this.oTable.$("rowcollapsetext").text(), TableUtils.getResourceText("TBL_ROW_COLLAPSE_KEY_ALTERNATIVE"),
+			"Collapse text is correct with CellSelector");
+	});
+
 	QUnit.module("Row Actions", {
 		beforeEach: async function() {
 			this.oTable = TableQUnitUtils.createTable({
