@@ -477,12 +477,12 @@ License: MIT License
 <year> = unspecified
 <copyright holders> = jQuery Foundation and other contributors
 
-Component: requirejs 2.1.8
-Licensor: The Dojo Foundation
-Website: http://github.com/jrburke/requirejs/
+Component: requirejs 2.3.7
+Copyright: jQuery Foundation and other contributors
+Website: https://github.com/requirejs/requirejs
 License: MIT License
-<year> = 2010-2011
-<copyright holders> = The Dojo Foundation
+<year> = 2010-2024
+<copyright holders> = jQuery Foundation and other contributors
 
 Component: sinon-qunit 2.0.0
 Licensor: Christian Johansen
