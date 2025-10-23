@@ -45,7 +45,7 @@ sap.ui.define([
 	 * If there is enough space, the labels are beside the fields, otherwise above the fields.
 	 *
 	 * The default size of a content control of a {@link sap.ui.layout.form.FormElement FormElement} element can be overwritten
-	 * using {@link sap.ui.layout.form.ColumnElementData ColumnElementData} as <code>LayoutData</code>.
+	 * using {@link sap.ui.layout.form.ColumnElementData ColumnElementData} as {@link sap.ui.core.Element#setLayoutData LayoutData}.
 	 * If one control assigned to a {@link sap.ui.layout.form.FormElement FormElement} element has {@link sap.ui.layout.form.ColumnElementData ColumnElementData} set,
 	 * the size calculation of the other controls assigned to the {@link sap.ui.layout.form.FormElement FormElement} element
 	 * might not lead to the expected result.
@@ -56,7 +56,7 @@ sap.ui.define([
 	 *
 	 * <b>Note:</b>
 	 * This control cannot be used stand-alone, it just renders a {@link sap.ui.layout.form.Form Form} control,
-	 * so it must be assigned to a {@link sap.ui.layout.form.Form Form} control using the <code>layout</code> aggregation.
+	 * so it must be assigned to a {@link sap.ui.layout.form.Form Form} control using the {@link sap.ui.layout.form.FormE#setLayout layout} aggregation.
 	 * @extends sap.ui.layout.form.FormLayout
 	 * @version ${version}
 	 *

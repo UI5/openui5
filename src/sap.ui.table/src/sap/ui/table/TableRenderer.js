@@ -428,14 +428,6 @@ sap.ui.define([
 			}
 		}
 
-		if (TableUtils.hasRowHeader(oTable) && oTable.getSelectionMode() === library.SelectionMode.None) {
-			rm.openStart("span", oTable.getId() + "-rowselecthdr");
-			rm.class("sapUiPseudoInvisibleText");
-			rm.openEnd();
-			rm.text(TableUtils.getResourceText("TBL_ROW_SELECTION_COLUMN_LABEL"));
-			rm.close("span");
-		}
-
 		rm.close("div").close("div").close("div");
 	};
 

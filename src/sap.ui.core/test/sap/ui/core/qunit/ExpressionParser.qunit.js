@@ -679,13 +679,22 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	QUnit.test("odata.fillUriTemplate, URITemplate is loaded", function (assert) {
-		const oOriginalExpand = URI.expand;
+		class oURITemplate {
+			constructor(sExpression) {this.sExpression = sExpression;}
+			expand() {}
+		}
+		let oURITemplateInstance;
 		// ui5lint-disable-next-line no-globals
 		const oSapUiMock = this.mock(sap.ui);
-		const oURI = {expand() {}};
-		this.mock(oURI).expects("expand").withExactArgs("http://foo/{t},{m}", {m : "tel", t : "mail"})
-			.returns("http://foo/mail,tel");
-		URI.expand = oURI.expand;
+		oSapUiMock.expects("require").withExactArgs("sap/ui/thirdparty/URITemplate").returns(oURITemplate);
+		this.mock(oURITemplate.prototype).expects("expand")
+			.withExactArgs({m : "tel", t : "mail"})
+			.callsFake(function () {
+				// eslint-disable-next-line consistent-this
+				oURITemplateInstance = this;
+
+				return "http://foo/mail,tel";
+			});
 		// While destroying the control used in the check function, require is sometimes called
 		oSapUiMock.expects("require").withExactArgs("sap/ui/core/ResizeHandler").atLeast(0).callThrough();
 		oSapUiMock.expects("require").withExactArgs("sap/ui/core/FocusHandler").atLeast(0).callThrough();
@@ -695,16 +704,14 @@ sap.ui.define([
 		check(assert, "{=odata.fillUriTemplate('http://foo/{t},{m}', {'t': ${/mail}, 'm': ${/tel}})}",
 			"http://foo/mail,tel");
 
-		// cleanup
-		URI.expand = oOriginalExpand;
+		assert.strictEqual(oURITemplateInstance.sExpression, "http://foo/{t},{m}", "URITemplate c'tor is called");
 	});
 
 	//*********************************************************************************************
 	QUnit.test("odata.fillUriTemplate throws error if URITemplate is not loaded", function (assert) {
-		const oOriginalExpand = URI.expand;
 		// ui5lint-disable-next-line no-globals
 		const oSapUiMock = this.mock(sap.ui);
-		URI.expand = undefined;
+		oSapUiMock.expects("require").withExactArgs("sap/ui/thirdparty/URITemplate").returns(undefined);
 		// While destroying the control used in the check function, require is sometimes called
 		oSapUiMock.expects("require").withExactArgs("sap/ui/core/ResizeHandler").atLeast(0).callThrough();
 		oSapUiMock.expects("require").withExactArgs("sap/ui/core/FocusHandler").atLeast(0).callThrough();
@@ -717,9 +724,6 @@ sap.ui.define([
 
 		// code under test
 		check(assert,sExpression, "");
-
-		// cleanup
-		URI.expand = oOriginalExpand;
 	});
 
 	//*********************************************************************************************

@@ -2935,7 +2935,7 @@ sap.ui.define([
 		 /**
 		  * Right-positioned single selection mode (only one list item can be selected).
 		  * @public
-		  * As of version 1.142, replaced by {@link sap.m.ListMode.SingleSelectLeft}.
+		  * @deprecated As of version 1.143, replaced by {@link sap.m.ListMode.SingleSelectLeft}.
 		  */
 		 SingleSelect : "SingleSelect",
 

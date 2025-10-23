@@ -1256,6 +1256,17 @@ sap.ui.define([
 		assert.equal(oRowSelectorText.innerText, sSelectedText, "selected row");
 	});
 
+	QUnit.test("Expand/collapse text with CellSelector plugin", function(assert) {
+		assert.equal(this.oTable.$("rowexpandtext").text(), TableUtils.getResourceText("TBL_ROW_EXPAND_KEY"), "Expand text is correct");
+		assert.equal(this.oTable.$("rowcollapsetext").text(), TableUtils.getResourceText("TBL_ROW_COLLAPSE_KEY"), "Collapse text is correct");
+
+		this.oTable.addDependent(new CellSelector());
+		assert.equal(this.oTable.$("rowexpandtext").text(), TableUtils.getResourceText("TBL_ROW_EXPAND_KEY_ALTERNATIVE"),
+			"Expand text is correct with CellSelector");
+		assert.equal(this.oTable.$("rowcollapsetext").text(), TableUtils.getResourceText("TBL_ROW_COLLAPSE_KEY_ALTERNATIVE"),
+			"Collapse text is correct with CellSelector");
+	});
+
 	QUnit.module("Row Actions", {
 		beforeEach: async function() {
 			this.oTable = TableQUnitUtils.createTable({
@@ -1465,7 +1476,7 @@ sap.ui.define([
 		checkAriaSelected(this.oTable.qunit.getRowActionCell(1).getAttribute("aria-selected"), false, assert);
 	});
 
-	QUnit.module("SelectAll", {
+	QUnit.module("Header Selector", {
 		beforeEach: async function() {
 			await createTables();
 			await _modifyTables();
@@ -1475,7 +1486,27 @@ sap.ui.define([
 		}
 	});
 
-	QUnit.test("aria-labelledby without Focus", function(assert) {
+	QUnit.test("Cell: role", function(assert) {
+		const oCell = getSelectAll().parent()[0];
+		assert.strictEqual(oCell.getAttribute("role"), "columnheader");
+	});
+
+	QUnit.test("Cell: aria-label", async function(assert) {
+		const oCell = getSelectAll().parent()[0];
+
+		assert.strictEqual(oCell.getAttribute("aria-label"), TableUtils.getResourceText("TBL_TABLE_SELECTION_COLUMNHEADER"), "Selection enabled");
+
+		oTable.setSelectionMode(SelectionMode.None);
+		await nextUIUpdate();
+		assert.strictEqual(oCell.getAttribute("aria-label"), null, "Selection disabled");
+
+		TableUtils.Grouping.setHierarchyMode(oTable, TableUtils.Grouping.HierarchyMode.Group);
+		await nextUIUpdate();
+		assert.strictEqual(oCell.getAttribute("aria-label"), TableUtils.getResourceText("TBL_ROW_SELECTION_COLUMN_LABEL"),
+			"Selection disabled. Hierarchy mode set to 'Group'");
+	});
+
+	QUnit.test("Cell content: aria-labelledby without Focus", function(assert) {
 		TableQUnitUtils.setFocusOutsideOfTable(assert);
 		const $Cell = getSelectAll(false, assert);
 		assert.strictEqual(($Cell.attr("aria-labelledby") || "").trim(),
@@ -1483,7 +1514,7 @@ sap.ui.define([
 		TableQUnitUtils.setFocusOutsideOfTable(assert);
 	});
 
-	QUnit.test("aria-describedby with Focus", function(assert) {
+	QUnit.test("Cell content: aria-describedby with Focus", function(assert) {
 		const done = assert.async();
 		const $Cell = getSelectAll(true, assert);
 		assert.strictEqual(($Cell.attr("aria-describedby") || "").trim(), "", "aria-describedby of select all");
@@ -1493,14 +1524,14 @@ sap.ui.define([
 		}, 100);
 	});
 
-	QUnit.test("aria-describedby without Focus", function(assert) {
+	QUnit.test("Cell content: aria-describedby without Focus", function(assert) {
 		TableQUnitUtils.setFocusOutsideOfTable(assert);
 		const $Cell = getSelectAll(false, assert);
 		assert.strictEqual(($Cell.attr("aria-describedby") || "").trim(), "", "aria-describedby of select all");
 		TableQUnitUtils.setFocusOutsideOfTable(assert);
 	});
 
-	QUnit.test("Other ARIA attributes of select all cell", async function(assert) {
+	QUnit.test("Cell content: Other ARIA attributes", async function(assert) {
 		let $Elem = getSelectAll(false);
 		assert.strictEqual($Elem.attr("role"), "checkbox", "role");
 		assert.strictEqual($Elem.attr("aria-checked"), "false", "aria-checked");
@@ -1944,6 +1975,19 @@ sap.ui.define([
 		$Cell = getCell(1, 1, true, null, oTreeTable);
 		assert.ok((oTreeTable.$("cellacc").text()).indexOf($Cell.text()) > -1,
 			"TreeTable: HiddenText cellacc is properly set after the first column is grouped");
+
+		$Cell = getCell(1, 0, true, null, oTreeTable);
+		const sExpandButtonText = TableUtils.getResourceText("TBL_EXPAND_BUTTON");
+		let sCellAccText = TableUtils.getResourceText("TBL_CELL_INCLUDES", sExpandButtonText).concat(" TYPE_A2 DESCRIPTION_A2 Read Only");
+		assert.equal(oTreeTable.$("cellacc").text(), sCellAccText, "TreeTable: HiddenText cellacc for collapsed row is correct");
+
+		oTreeTable.getRows()[1].expand();
+		await nextUIUpdate();
+		$Cell = getCell(1, 0, true, null, oTreeTable);
+		await TableQUnitUtils.wait(100);
+		const sCollapseButtonText = TableUtils.getResourceText("TBL_COLLAPSE_BUTTON");
+		sCellAccText = TableUtils.getResourceText("TBL_CELL_INCLUDES", sCollapseButtonText).concat(" TYPE_A2 DESCRIPTION_A2 Read Only");
+		assert.equal(oTreeTable.$("cellacc").text(), sCellAccText, "TreeTable: HiddenText cellacc for expanded row is correct");
 	});
 
 	QUnit.test("Highlight texts", async function(assert) {

@@ -262,7 +262,7 @@ sap.ui.define([
 			sContentMode = ContentMode.EditMultiLine;
 		} else if (bRestrictedToFixedValues || oDefaultHelp?.restrictedToFixedValues) {
 			sContentMode = ContentMode.EditSelect;
-		} else if (this.getField()._getValueHelp()) { // if ValueHelp assigned use control supporting help
+		} else if (this.getField().getValueHelp()) { // if ValueHelp assigned use control supporting help
 			sContentMode = ContentMode.EditForHelp;
 		} else if (aOperators.length === 1 && oContentType.getEditOperator() && oContentType.getEditOperator()[aOperators[0]]) {
 			this._sOperator = aOperators[0];
@@ -322,6 +322,9 @@ sap.ui.define([
 		return sEditMode === FieldEditMode.Editable;
 	};
 
+	/**
+	 * @returns {sap.ui.mdc.field.FieldBase}
+	 */
 	ContentFactory.prototype.getField = function() {
 		return this._oField;
 	};

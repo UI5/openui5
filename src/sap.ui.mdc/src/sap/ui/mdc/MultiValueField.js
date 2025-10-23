@@ -31,9 +31,9 @@ sap.ui.define([
 	 *
 	 * <ul>
 	 * <li>In display mode, usually a {@link sap.m.Tokenizer Tokenizer} control is rendered.</li>
-	 * <li>If <code>multipleLines</code> is set, an {@link sap.m.ExpandableText ExpandableText} control is rendered.</li>
+	 * <li>If {@link sap.ui.mdc.field.FieldBase#getMultipleLines multipleLines} is set, an {@link sap.m.ExpandableText ExpandableText} control is rendered.</li>
 	 * <li>In edit mode, usually a {@link sap.m.MultiInput MultiInput} control is rendered.</li>
-	 * <li>If <code>multipleLines</code> is set, a {@link sap.m.TextArea TextArea} control is rendered.</li>
+	 * <li>If {@link sap.ui.mdc.field.FieldBase#getMultipleLines multipleLines} is set, a {@link sap.m.TextArea TextArea} control is rendered.</li>
 	 * </ul>
 	 *
 	 * @extends sap.ui.mdc.field.FieldBase
@@ -94,7 +94,7 @@ sap.ui.define([
 			defaultAggregation: "items",
 			events: {
 				/**
-				 * This event is fired when the <code>items</code> aggregation of the field is changed by user interaction.
+				 * This event is fired when the {@link #getItems items} aggregation of the field is changed by user interaction.
 				 *
 				 * <b>Note</b> This event is only triggered if the used content control has a change event.
 				 */
@@ -104,7 +104,7 @@ sap.ui.define([
 						/**
 						 * The new items of the <code>MultiValueField</code> control.
 						 *
-						 * If a <code>ValueHelp</code> element is assigned to the <code>MultiValueField</code> control, the <code>key</code> of the items is used as key for the <code>ValueHelp</code> items.
+						 * If a {@link sap.ui.mdc.field.FieldBase#getValueHelp ValueHelp} element is assigned to the <code>MultiValueField</code> control, the {@link sap.ui.mdc.field.MultiValueFieldItem#getKey key} of the items is used as key for the {@link sap.ui.mdc.field.FieldBase#getValueHelp ValueHelp} items.
 						 */
 						items: { type: "sap.ui.mdc.field.MultiValueFieldItem[]" },
 

@@ -5687,7 +5687,7 @@ sap.ui.define([
 			ODataModel.prototype._parseResponse.call(oModel, "~oResponse", "~oRequest", "~mGetEntities",
 				"~mChangeEntities");
 
-			assert.strictEqual(oModel.oMessageParser._serviceUrl, "/service/");
+			assert.strictEqual(oModel.oMessageParser._sRelativeServerUrl, "/service/");
 			assert.strictEqual(oModel.oMessageParser._metadata, "~oMetadata");
 			assert.strictEqual(oModel.oMessageParser._bPersistTechnicalMessages, oFixture.bExpected);
 		});
@@ -10043,5 +10043,18 @@ sap.ui.define([
 				}, /* bIgnoreExpandSelect */ bIgnoreExpandSelect),
 				bIgnoreExpandSelect ? "search=baz" : "$expand=foo&$select=bar&search=baz");
 		});
+	});
+
+	//*********************************************************************************************
+	QUnit.test("_getServerUrl", function (assert) {
+		const oModel = {sServiceUrl: "/foo/bar/baz/TEST_SERVICE"};
+		const oURLStub = this.stub(window, "URL");
+
+		// code under test
+		ODataModel.prototype._getServerUrl.call(oModel);
+
+		assert.strictEqual(oURLStub.callCount, 2);
+		assert.deepEqual(oURLStub.firstCall.args, [oModel.sServiceUrl, document.baseURI]);
+		assert.deepEqual(oURLStub.secondCall.args, ["/", oURLStub.firstCall.returnValue]);
 	});
 });

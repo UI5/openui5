@@ -143,6 +143,9 @@ sap.ui.define([
 
 	function _formatConditions(aConditions) {
 
+		/**
+		 * @type {sap.ui.mdc.field.FieldBase}
+		 */
 		const oField = this.getParent();
 
 		if (!oField?.isA("sap.ui.mdc.field.FieldBase")) { // called from generic tests
@@ -151,7 +154,7 @@ sap.ui.define([
 
 		const oFormatOptions = merge({}, oField.getFormatOptions());
 		oFormatOptions.display = oField.getDisplay();
-		oFormatOptions.valueHelpID = oField._getValueHelp() || oField?._sDefaultValueHelp;
+		oFormatOptions.valueHelpID = oField.getValueHelp() || oField?._sDefaultValueHelp;
 
 		if (this._oConditionsType) {
 			this._oConditionsType.setFormatOptions(oFormatOptions); // as FormatOptions might be updated in Field
@@ -436,8 +439,11 @@ sap.ui.define([
 
 	function _getValueHelp() {
 
+		/**
+		 * @type {sap.ui.mdc.field.FieldBase}
+		 */
 		const oField = this.getParent();
-		let sId = oField?._getValueHelp();
+		let sId = oField?.getValueHelp();
 		let oValueHelp;
 
 		if (!sId && oField?._sDefaultValueHelp) {
