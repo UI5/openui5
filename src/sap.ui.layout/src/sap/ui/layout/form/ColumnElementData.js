@@ -16,9 +16,9 @@ sap.ui.define([
 	 * @param {object} [mSettings] Initial settings for the new control
 	 *
 	 * @class
-	 * The <code>ColumnLayout</code>-specific layout data for the <code>FormElement</code> content fields.
+	 * The {@link sap.ui.layout.form.ColumnLayout ColumnLayout}-specific layout data for the {@link sap.ui.layout.form.Form Form} content fields.
 	 *
-	 * One <code>FormElement</code> element contains 12 cells and has two sizes, small and large.
+	 * One {@link sap.ui.layout.form.FormElement FormElement} element contains 12 cells and has two sizes, small and large.
 	 * Using <code>ColumnElementData</code>, the default calculation of the cells used for a field or label
 	 * can be overwritten.
 	 * @extends sap.ui.core.LayoutData
@@ -37,18 +37,18 @@ sap.ui.define([
 		properties : {
 
 			/**
-			 * Number of cells used by a field if the <code>FormElement</code> element is large.
+			 * Number of cells used by a field if the {@link sap.ui.layout.form.FormElement FormElement} element is large.
 			 * The label is then beside the fields per default.
 			 *
-			 * If set to <code>12</code>, the full size of the <code>FormElement</code> element is used.
+			 * If set to <code>12</code>, the full size of the {@link sap.ui.layout.form.FormElement FormElement} element is used.
 			 */
 			cellsLarge : {type : "sap.ui.layout.form.ColumnCells", group : "Appearance", defaultValue : 8},
 
 			/**
-			 * Number of cells used by a field if the <code>FormElement</code> element is small.
+			 * Number of cells used by a field if the {@link sap.ui.layout.form.FormElement FormElement} element is small.
 			 * The label is then above the fields per default.
 			 *
-			 * If set to <code>12</code>, the full size of the <code>FormElement</code> is used.
+			 * If set to <code>12</code>, the full size of the {@link sap.ui.layout.form.FormElement FormElement} is used.
 			 */
 			cellsSmall : {type : "sap.ui.layout.form.ColumnCells", group : "Appearance", defaultValue : 12}
 		}

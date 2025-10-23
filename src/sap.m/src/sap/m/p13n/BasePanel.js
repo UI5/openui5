@@ -231,6 +231,12 @@ sap.ui.define([
 
 		const oModel = new JSONModel({});
 		this.setModel(oModel, this.LOCALIZATION_MODEL);
+
+		// relevant for RangeSelect handling:
+		// if RangeSelect is performed using Shift+ArrowKeys
+		// and the focus is outside the table,
+		// resetting the _bShiftKeyPressed flag could not work correctly
+		document.addEventListener("keyup", this._keyupHandler.bind(this));
 	};
 
 	BasePanel.prototype.onAfterRendering = function() {
@@ -508,8 +514,16 @@ sap.ui.define([
 			oRow.addEventDelegate({
 				onmouseover: this._hoverHandler.bind(this),
 				onfocusin: this._focusHandler.bind(this),
-				onkeydown: this._keydownHandler.bind(this)
+				onkeydown: this._keydownHandler.bind(this),
+				onkeyup: this._keyupHandler.bind(this)
 			});
+		}
+	};
+
+
+	BasePanel.prototype._keyupHandler = function(oEvent) {
+		if (oEvent.key === "Shift") {
+			this._bShiftKeyPressed = false;
 		}
 	};
 
@@ -523,6 +537,10 @@ sap.ui.define([
 		}
 
 		// Log.info("onKeyDown", oEvent.ctrlKey  + " | " + oEvent.which + " | " + oEvent.key);
+
+		if (oEvent.key === "Shift" || oEvent.shiftKey) {
+			this._bShiftKeyPressed = true;
+		}
 
 		if ((oEvent.metaKey || oEvent.ctrlKey)) {
 			let oButton;
@@ -806,7 +824,7 @@ sap.ui.define([
 			sSpecialChangeReason = this.CHANGE_REASON_SELECTALL;
 		} else if (!bSelectAll && aListItems.length > 1 && !aListItems[0].getSelected()) {
 			sSpecialChangeReason = this.CHANGE_REASON_DESELECTALL;
-		} else if (aListItems.length > 1 && aListItems.length < this._oListControl.getItems().length) {
+		} else if (aListItems.length < this._oListControl.getItems().length && (aListItems.length > 1 || (aListItems.length >= 1 && (this._bShiftKeyPressed ?? false)))) {
 			sSpecialChangeReason = this.CHANGE_REASON_RANGESELECT;
 		}
 
@@ -987,6 +1005,8 @@ sap.ui.define([
 		this._oMoveDownButton = null;
 		this._oMoveBottomButton = null;
 		this._oSearchField = null;
+
+		document.removeEventListener("keyup", this._keyupHandler.bind(this));
 	};
 
 	return BasePanel;

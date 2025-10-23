@@ -608,7 +608,6 @@ sap.ui.define([
 					_getReducedPath : function () {},
 					_isCollection : function () {}
 				},
-				_parseUrl : function () {},
 				_processor : {
 					resolve : function () {}
 				}
@@ -618,15 +617,14 @@ sap.ui.define([
 				response : {},
 				url : "~requestURL"
 			},
-			oTargetInfo,
-			mUrlData = {url : "~parsedUrl"};
+			oTargetInfo;
 
 		this.mock(ODataMessageParser).expects("_isResponseForCreate")
 			.withExactArgs(sinon.match.same(mRequestInfo))
 			.returns(undefined);
-		this.mock(oODataMessageParser).expects("_parseUrl")
+		this.mock(ODataMessageParser).expects("_removeParametersAndHash")
 			.withExactArgs("~requestURL")
-			.returns(mUrlData);
+			.returns("~parsedUrl");
 		this.mock(oODataMessageParser._metadata).expects("_isCollection")
 			.withExactArgs("/~parsedUrl")
 			.returns(false);
@@ -669,7 +667,6 @@ sap.ui.define([
 					_getReducedPath : function () {},
 					_isCollection : function () {}
 				},
-				_parseUrl : function () {},
 				_processor : {
 					resolve : function () {}
 				}
@@ -679,15 +676,14 @@ sap.ui.define([
 				response : {},
 				url : "~requestURL"
 			},
-			oTargetInfo,
-			mUrlData = {url : "~parsedUrl"};
+			oTargetInfo;
 
 		this.mock(ODataMessageParser).expects("_isResponseForCreate")
 			.withExactArgs(sinon.match.same(mRequestInfo))
 			.returns(undefined);
-		this.mock(oODataMessageParser).expects("_parseUrl")
+		this.mock(ODataMessageParser).expects("_removeParametersAndHash")
 			.withExactArgs("~requestURL")
-			.returns(mUrlData);
+			.returns("~parsedUrl");
 		this.mock(oODataMessageParser._metadata).expects("_isCollection")
 			.withExactArgs("/~parsedUrl")
 			.returns(false);
@@ -717,7 +713,6 @@ sap.ui.define([
 					_getReducedPath : function () {},
 					_isCollection : function () {}
 				},
-				_parseUrl : function () {},
 				_processor : {
 					resolve : function () {}
 				}
@@ -727,15 +722,14 @@ sap.ui.define([
 				response : {},
 				url : "~requestURL"
 			},
-			oTargetInfo,
-			mUrlData = {url : "~parsedUrl('key')"};
+			oTargetInfo;
 
 		this.mock(ODataMessageParser).expects("_isResponseForCreate")
 			.withExactArgs(sinon.match.same(mRequestInfo))
 			.returns(undefined);
-		this.mock(oODataMessageParser).expects("_parseUrl")
+		this.mock(ODataMessageParser).expects("_removeParametersAndHash")
 			.withExactArgs("~requestURL")
-			.returns(mUrlData);
+			.returns("~parsedUrl('key')");
 		this.mock(oODataMessageParser._metadata).expects("_isCollection").never();
 		this.mock(oODataMessageParser._processor).expects("resolve")
 			.withExactArgs("/~parsedUrl('key')/~target", undefined, true)
@@ -784,7 +778,6 @@ sap.ui.define([
 					_getReducedPath : function () {},
 					_isCollection : function () {}
 				},
-				_parseUrl : function () {},
 				_processor : {
 					resolve : function () {}
 				}
@@ -795,15 +788,14 @@ sap.ui.define([
 				response : {},
 				url : "BusinessPartnerSet('2')"
 			},
-			oTargetInfo,
-			mUrlData = {url : "BusinessPartnerSet('2')"};
+			oTargetInfo;
 
 		this.mock(ODataMessageParser).expects("_isResponseForCreate")
 			.withExactArgs(sinon.match.same(mRequestInfo))
 			.returns(undefined);
-		this.mock(oODataMessageParser).expects("_parseUrl")
+		this.mock(ODataMessageParser).expects("_removeParametersAndHash")
 			.withExactArgs("BusinessPartnerSet('2')")
-			.returns(mUrlData);
+			.returns("BusinessPartnerSet('2')");
 		this.mock(oODataMessageParser._metadata).expects("_isCollection").never();
 		oFixture.resolveCalls.forEach(function (oResolveCall) {
 			oProcessorMock.expects("resolve")
@@ -834,7 +826,6 @@ sap.ui.define([
 					_getReducedPath : function () {},
 					_isCollection : function () {}
 				},
-				_parseUrl : function () {},
 				_processor : {
 					resolve : function () {}
 				}
@@ -850,13 +841,12 @@ sap.ui.define([
 				response : {},
 				url : "~requestURL"
 			},
-			oTargetInfo,
-			mUrlData = {url : "~parsedUrl"};
+			oTargetInfo;
 
 		this.mock(ODataMessageParser).expects("_isResponseForCreate")
 			.withExactArgs(sinon.match.same(mRequestInfo)).returns(undefined);
-		this.mock(oODataMessageParser).expects("_parseUrl").withExactArgs("~requestURL")
-			.returns(mUrlData);
+		this.mock(ODataMessageParser).expects("_removeParametersAndHash").withExactArgs("~requestURL")
+			.returns("~parsedUrl");
 		this.mock(oODataMessageParser._metadata).expects("_isCollection")
 			.withExactArgs("/~functionTarget").returns(false);
 		this.mock(oODataMessageParser._processor).expects("resolve")
@@ -883,7 +873,6 @@ sap.ui.define([
 					_getReducedPath : function () {},
 					_isCollection : function () {}
 				},
-				_parseUrl : function () {},
 				_processor : {
 					resolve : function () {}
 				}
@@ -897,13 +886,12 @@ sap.ui.define([
 				response : {},
 				url : "~requestURL"
 			},
-			oTargetInfo,
-			mUrlData = {url : "~parsedUrl"};
+			oTargetInfo;
 
 		this.mock(ODataMessageParser).expects("_isResponseForCreate")
 			.withExactArgs(sinon.match.same(mRequestInfo)).returns(undefined);
-		this.mock(oODataMessageParser).expects("_parseUrl").withExactArgs("~requestURL")
-			.returns(mUrlData);
+		this.mock(ODataMessageParser).expects("_removeParametersAndHash").withExactArgs("~requestURL")
+			.returns("~parsedUrl");
 		this.mock(oODataMessageParser._metadata).expects("_isCollection")
 			.withExactArgs("/~parsedUrl").returns(false);
 		this.mock(oODataMessageParser._processor).expects("resolve")
@@ -925,12 +913,11 @@ sap.ui.define([
 	//*********************************************************************************************
 	QUnit.test("_createTarget: created entity", function (assert) {
 		var oODataMessageParser = {
-				_serviceUrl : "~serviceUrl",
+				_sRelativeServerUrl : "~serviceUrl",
 				_metadata : {
 					_getReducedPath : function () {},
 					_isCollection : function () {}
 				},
-				_parseUrl : function () {},
 				_processor : {
 					resolve : function () {}
 				}
@@ -942,15 +929,14 @@ sap.ui.define([
 				},
 				url : "~requestURL"
 			},
-			oTargetInfo,
-			mUrlData = {url : "https://foo.com/~serviceUrl/~parsedUrl"};
+			oTargetInfo;
 
 		this.mock(ODataMessageParser).expects("_isResponseForCreate")
 			.withExactArgs(sinon.match.same(mRequestInfo))
 			.returns(true);
-		this.mock(oODataMessageParser).expects("_parseUrl")
+		this.mock(ODataMessageParser).expects("_removeParametersAndHash")
 			.withExactArgs("https://foo.com/~serviceUrl/~uriFromLocation")
-			.returns(mUrlData);
+			.returns("https://foo.com/~serviceUrl/~parsedUrl");
 		this.mock(oODataMessageParser._metadata).expects("_isCollection")
 			.withExactArgs("/~parsedUrl")
 			.returns(true);
@@ -980,7 +966,6 @@ sap.ui.define([
 					_getReducedPath : function () {},
 					_isCollection : function () {}
 				},
-				_parseUrl : function () {},
 				_processor : {
 					resolve : function () {}
 				}
@@ -994,15 +979,14 @@ sap.ui.define([
 				},
 				response : {statusCode : 400}
 			},
-			oTargetInfo,
-			mUrlData = {url : "~parsedUrl"};
+			oTargetInfo;
 
 		this.mock(ODataMessageParser).expects("_isResponseForCreate")
 			.withExactArgs(sinon.match.same(mRequestInfo))
 			.returns(false);
-		this.mock(oODataMessageParser).expects("_parseUrl")
+		this.mock(ODataMessageParser).expects("_removeParametersAndHash")
 			.withExactArgs("~tempKey")
-			.returns(mUrlData);
+			.returns("~parsedUrl");
 		this.mock(oODataMessageParser._metadata).expects("_isCollection")
 			.withExactArgs("/~parsedUrl")
 			.returns(false);
@@ -1819,8 +1803,7 @@ sap.ui.define([
 				_metadata : {
 					_getEntitySetByPath : function () {}
 				},
-				_parseUrl : function () {},
-				_serviceUrl : "serviceUrl"
+				_sRelativeServerUrl : "serviceUrl"
 			},
 			mRequestInfo = {
 				request : oFixture.oRequest || {},
@@ -1828,8 +1811,8 @@ sap.ui.define([
 			},
 			that = this;
 
-		this.mock(oODataMessageParser).expects("_parseUrl").withExactArgs("url")
-			.returns({url : oFixture.sUrl || "requestTarget"});
+		this.mock(ODataMessageParser).expects("_removeParametersAndHash").withExactArgs("url")
+			.returns(oFixture.sUrl || "requestTarget");
 		this.mock(oODataMessageParser._metadata).expects("_getEntitySetByPath")
 			.withExactArgs("requestTarget")
 			.returns(oFixture.oEntitySet);
@@ -1854,13 +1837,17 @@ sap.ui.define([
 
 	//**********************************************************************************************
 	QUnit.test("ODataMessageParser constructor", function (assert) {
-		this.mock(ODataMessageParser.prototype).expects("_parseUrl").withExactArgs("url")
-			.returns({url : "/service/"});
+		this.mock(ODataMessageParser).expects("_removeParametersAndHash")
+			.withExactArgs("url")
+			.returns("~serviceUrl");
+		this.mock(ODataMessageParser).expects("getRelativeServerUrl")
+			.withExactArgs("~serviceUrl")
+			.returns("~relativeServerUrl");
 
 		// code under test
 		var oMessageParser = new ODataMessageParser("url", "~oMetadata", "~persist");
 
-		assert.strictEqual(oMessageParser._serviceUrl, "/service/");
+		assert.strictEqual(oMessageParser._sRelativeServerUrl, "~relativeServerUrl");
 		assert.strictEqual(oMessageParser._metadata, "~oMetadata");
 		assert.strictEqual(oMessageParser._processor, null);
 		assert.strictEqual(oMessageParser._headerField, "sap-message");
@@ -2334,4 +2321,23 @@ sap.ui.define([
 
 		assert.ok(oJSONSpy.calledWith(aExpectedMessageLogDetails));
 	});
+
+	//*********************************************************************************************
+	QUnit.test("getRelativeServerUrl", function (assert) {
+		const oURLStub = this.stub(window, "URL");
+
+		// code under test;
+		ODataMessageParser.getRelativeServerUrl("/foo/bar/ODataService");
+
+		assert.strictEqual(oURLStub.callCount, 1);
+		assert.deepEqual(oURLStub.firstCall.args, ["/foo/bar/ODataService", document.baseURI]);
+	});
+
+	//*********************************************************************************************
+["foo/bar", "foo/bar?query=string", "foo/bar#hash", "foo/bar?query=string#hash"].forEach((sUrl) => {
+	QUnit.test("_removeParametersAndHash: " + sUrl, function (assert) {
+		// code under test;
+		assert.strictEqual(ODataMessageParser._removeParametersAndHash(sUrl), "foo/bar" );
+	});
+});
 });

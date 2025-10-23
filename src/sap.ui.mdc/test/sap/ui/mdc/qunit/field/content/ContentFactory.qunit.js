@@ -49,7 +49,7 @@ sap.ui.define([
 		getDataTypeFormatOptions: () => {return null;},
 		getAdditionalDataTypeConfiguration: () => {return null;},
 		isFieldDestroyed: () => {return false;},
-		_getValueHelp: () => {return undefined;},
+		getValueHelp: () => {return undefined;},
 		isSearchField: () => {return false;},
 		getMaxConditions: () => {return -1;},
 		getFieldInfo: () => {return undefined;},
@@ -395,14 +395,14 @@ sap.ui.define([
 		assert.equal(this.oContentFactory.getContentMode(DateContent, null, 1, false, [OperatorName.EQ]), ContentMode.EditOperator, "ContentMode 'EditOperator' returned.");
 
 		/* ContentMode EditForHelp */
-		sinon.stub(oFakeField, "_getValueHelp").returns("X");
+		sinon.stub(oFakeField, "getValueHelp").returns("X");
 		assert.equal(this.oContentFactory.getContentMode(null, FieldEditMode.Editable, 1, false, []), ContentMode.EditForHelp, "ContentMode 'EditForHelp' returned.");
 
 		/* ContentMode EditSelect */
 		const oValueHelp = new ValueHelp("X");
 		sinon.stub(oValueHelp, "isRestrictedToFixedValues").returns(true);
 		assert.equal(this.oContentFactory.getContentMode(null, FieldEditMode.Editable, 1, false, [], false, true), ContentMode.EditSelect, "ContentMode 'EditSelect' returned.");
-		oFakeField._getValueHelp.restore();
+		oFakeField.getValueHelp.restore();
 		oValueHelp.destroy();
 		assert.equal(this.oContentFactory.getContentMode(BooleanContent, FieldEditMode.Editable, 1, false, [], true, false), ContentMode.EditSelect, "ContentMode 'EditSelect' returned.");
 	});

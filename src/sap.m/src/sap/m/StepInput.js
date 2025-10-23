@@ -740,7 +740,7 @@ function(
 				bHasValidationErrorListeners = false,
 				oEventProvider;
 
-			if (oBindingValueState) {
+			if (oBindingValueState && oBindingValueState.oValue) {
 				return;
 			}
 

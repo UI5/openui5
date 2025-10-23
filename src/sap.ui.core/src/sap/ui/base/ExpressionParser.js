@@ -6,9 +6,8 @@ sap.ui.define([
 	"sap/base/strings/escapeRegExp",
 	"sap/base/util/deepEqual",
 	"sap/base/util/JSTokenizer",
-	"sap/ui/performance/Measurement",
-	"sap/ui/thirdparty/URI"
-], function (Log, escapeRegExp, deepEqual, JSTokenizer, Measurement, URI) {
+	"sap/ui/performance/Measurement"
+], function (Log, escapeRegExp, deepEqual, JSTokenizer, Measurement) {
 	"use strict";
 
 	//SAP's Independent Implementation of "Top Down Operator Precedence" by Vaughan R. Pratt,
@@ -54,12 +53,14 @@ sap.ui.define([
 					return oODataUtils.compare.apply(oODataUtils, arguments);
 				},
 				"fillUriTemplate": function (sExpression, mData) {
-					if (!URI.expand) {
+					const URITemplate = sap.ui.require("sap/ui/thirdparty/URITemplate");
+
+					if (!URITemplate) {
 						throw new TypeError("Expression uses 'odata.fillUriTemplate' which requires"
 							+ " to import 'sap/ui/thirdparty/URITemplate' in advance");
 					}
 
-					return URI.expand(sExpression.trim(), mData).toString();
+					return new URITemplate(sExpression.trim()).expand(mData);
 				},
 				"uriEncode": function () {
 					var oODataUtils = sap.ui.require("sap/ui/model/odata/ODataUtils");

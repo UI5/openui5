@@ -280,6 +280,7 @@
 									width="auto"
 									maxWidth="400px"
 									change="onSizeUnitChange"
+									tooltip="{i18n>IFRAME_ADDIFRAME_DIALOG_UNIT_TOOLTIP}"
 								>
 									<core:ListItem key="{dialogInfo>unit}" text="{dialogInfo>unit}" additionalText="{dialogInfo>descriptionText}"/>
 									<layoutData>
@@ -322,7 +323,9 @@
 									columnRatio="1:5"
 									width="auto"
 									maxWidth="400px"
-									change="onSizeUnitChange">
+									change="onSizeUnitChange"
+									tooltip="{i18n>IFRAME_ADDIFRAME_DIALOG_UNIT_TOOLTIP}"
+								>
 										<core:ListItem key="{dialogInfo>unit}" text="{= ${dialogInfo>unit} === 'vh' ? '%' : ${dialogInfo>unit}}" additionalText="{dialogInfo>descriptionText}"/>
 										<layoutData>
 											<form:ColumnElementData cellsLarge="5" cellsSmall="5" />

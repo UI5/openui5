@@ -16,11 +16,11 @@ sap.ui.define([
 	 * @param {object} [mSettings] Initial settings for the new control
 	 *
 	 * @class
-	 * The <code>ColumnLayout</code>-specific layout data for the <code>FormContainer</code> element.
+	 * The {@link sap.ui.layout.form.ColumnLayout ColumnLayout}-specific layout data for the {@link sap.ui.layout.form.FormContainer FormContainer} element.
 	 *
-	 * Depending on its size, the <code>Form</code> control is divided into 1, 2, 3 or 4 columns
-	 * by the <code>ColumnLayout</code> control.
-	 * Using <code>ColumnContainerData</code>, the size of the <code>FormContainer</code> element can be influenced.
+	 * Depending on its size, the {@link sap.ui.layout.form.Form Form} control is divided into 1, 2, 3 or 4 columns
+	 * by the {@link sap.ui.layout.form.ColumnLayout ColumnLayout} control.
+	 * Using <code>ColumnContainerData</code>, the size of the {@link sap.ui.layout.form.FormContainer FormContainer} element can be influenced.
 	 * @extends sap.ui.core.LayoutData
 	 *
 	 * @author SAP SE
@@ -37,21 +37,21 @@ sap.ui.define([
 		properties : {
 
 			/**
-			 * Number of columns the <code>FormContainer</code> element uses if the <code>Form</code> control has extra-large size.
+			 * Number of columns the {@link sap.ui.layout.form.FormContainer FormContainer} element uses if the {@link sap.ui.layout.form.Form Form} control has extra-large size.
 			 *
 			 * The number of columns for extra-large size must not be smaller than the number of columns for large size.
 			 */
 			columnsXL : {type : "sap.ui.layout.form.ColumnsXL", group : "Appearance", defaultValue : 2},
 
 			/**
-			 * Number of columns the <code>FormContainer</code> element uses if the <code>Form</code> control has large size.
+			 * Number of columns the {@link sap.ui.layout.form.FormContainer FormContainer} element uses if the {@link sap.ui.layout.form.Form Form} control has large size.
 			 *
 			 * The number of columns for large size must not be smaller than the number of columns for medium size.
 			 */
 			columnsL : {type : "sap.ui.layout.form.ColumnsL", group : "Appearance", defaultValue : 2},
 
 			/**
-			 * Number of columns the <code>FormContainer</code> element uses if the <code>Form</code> control has medium size.
+			 * Number of columns the {@link sap.ui.layout.form.FormContainer FormContainer} element uses if the {@link sap.ui.layout.form.Form Form} control has medium size.
 			 */
 			columnsM : {type : "sap.ui.layout.form.ColumnsM", group : "Appearance", defaultValue : 1}
 		}

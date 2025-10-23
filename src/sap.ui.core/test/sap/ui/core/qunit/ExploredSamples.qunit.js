@@ -16,7 +16,6 @@ sap.ui.define([
 			// the following apps all fail due to issue about coexistence of mockserver and
 			// sinon.FakeXMLHttpRequest, see also BCP: 1680005252
 			'sap.ui.core.sample.ViewTemplate.types',
-			'sap.ui.core.sample.odata.v4.ConsumeV2Service',
 			'sap.ui.core.sample.odata.v4.ListBinding',
 			'sap.ui.core.sample.odata.v4.SalesOrders',
 			'sap.ui.core.sample.odata.v4.SalesOrdersTemplate',

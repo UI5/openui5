@@ -51,13 +51,12 @@ sap.ui.define([
 	"sap/ui/model/odata/OperationMode",
 	"sap/ui/model/odata/UpdateMethod",
 	"sap/ui/thirdparty/datajs",
-	"sap/ui/thirdparty/URI",
 	"sap/ui/util/isCrossOriginURL"
 ], function(_CreatedContextsCache, Context, ODataAnnotations, ODataContextBinding, ODataListBinding, ODataTreeBinding,
 		assert, Log, Localization, encodeURL, deepEqual, deepExtend, each, extend, isEmptyObject, isPlainObject, merge,
 		uid, SyncPromise, Messaging, Message, MessageParser, MessageType, Supportability, _Helper, BindingMode,
 		BaseContext, FilterProcessor, Model, CountMode, MessageScope, ODataMetadata, ODataMetaModel, ODataMessageParser,
-		ODataPropertyBinding, ODataUtils, OperationMode, UpdateMethod, OData, URI, isCrossOriginURL
+		ODataPropertyBinding, ODataUtils, OperationMode, UpdateMethod, OData, isCrossOriginURL
 ) {
 	"use strict";
 
@@ -1352,15 +1351,13 @@ sap.ui.define([
 	};
 
 	/**
-	 * Extracts the server base URL from the service URL
+	 * Computes and returns the server base URL from the service URL.
+	 *
 	 * @returns {string} The server base URL
 	 * @private
 	 */
-	ODataModel.prototype._getServerUrl = function() {
-		var oServiceURI, sURI;
-		oServiceURI = new URI(this.sServiceUrl).absoluteTo(document.baseURI);
-		sURI = new URI("/").absoluteTo(oServiceURI).toString();
-		return sURI;
+	ODataModel.prototype._getServerUrl = function () {
+		return new URL("/", new URL(this.sServiceUrl, document.baseURI)).href;
 	};
 
 	/**

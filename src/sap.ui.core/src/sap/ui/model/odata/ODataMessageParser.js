@@ -6,14 +6,13 @@ sap.ui.define([
 	"sap/ui/core/Lib",
 	"sap/ui/model/odata/ODataMetadata",
 	"sap/ui/model/odata/ODataUtils",
-	"sap/ui/thirdparty/URI",
 	"sap/ui/core/Messaging",
 	"sap/ui/core/message/MessageParser",
 	"sap/ui/core/message/Message",
 	"sap/ui/core/message/MessageType",
 	"sap/base/Log"
 ],
-	function(Library, ODataMetadata, ODataUtils, URI, Messaging, MessageParser, Message, MessageType,  Log) {
+	function(Library, ODataMetadata, ODataUtils, Messaging, MessageParser, Message, MessageType, Log) {
 	"use strict";
 
 var sClassName = "sap.ui.model.odata.ODataMessageParser",
@@ -26,6 +25,8 @@ var sClassName = "sap.ui.model.odata.ODataMessageParser",
 		"success" : MessageType.Success,
 		"warning" : MessageType.Warning
 	};
+
+const rQuestionMarkOrHash = /[?#]/;
 
 /**
  * A plain error object as returned by the server. Either "@sap-severity"- or "severity"-property
@@ -46,15 +47,6 @@ var sClassName = "sap.ui.model.odata.ODataMessageParser",
  * @property {string} url - The URL of the request
  * @property {object} request - The request object
  * @property {object} response - The response object
- */
-
-/**
- * A map containing a parsed URL
- *
- * @typedef {object} ODataMessageParser~UrlInfo
- * @property {string} url - The URL, stripped of query and hash
- * @property {Object<string,string>} parameters - A map of the query parameters
- * @property {string} hash - The hash value of the URL
  */
 
 
@@ -91,7 +83,8 @@ var ODataMessageParser = MessageParser.extend("sap.ui.model.odata.ODataMessagePa
 
 	constructor: function(sServiceUrl, oMetadata, bPersistTechnicalMessages) {
 		MessageParser.apply(this);
-		this._serviceUrl = getRelativeServerUrl(this._parseUrl(sServiceUrl).url);
+		this._sRelativeServerUrl = ODataMessageParser.getRelativeServerUrl(
+			ODataMessageParser._removeParametersAndHash(sServiceUrl));
 		this._metadata = oMetadata;
 		this._headerField = "sap-message"; // Default header field
 		this._lastMessages = [];
@@ -217,14 +210,14 @@ ODataMessageParser.prototype._getAffectedTargets = function (aMessages, mRequest
 	// unbound messages are always affected => add target ""
 	var mAffectedTargets = Object.assign({"" : true}, mGetEntities, mChangeEntities),
 		oEntitySet,
-		sRequestTarget = this._parseUrl(mRequestInfo.url).url;
+		sRequestTarget = ODataMessageParser._removeParametersAndHash(mRequestInfo.url);
 
 	if (mRequestInfo.request.key && mRequestInfo.request.created){
 		mAffectedTargets[mRequestInfo.request.key] = true;
 	}
 
-	if (sRequestTarget.startsWith(this._serviceUrl)) {
-		sRequestTarget = sRequestTarget.slice(this._serviceUrl.length + 1);
+	if (sRequestTarget.startsWith(this._sRelativeServerUrl)) {
+		sRequestTarget = sRequestTarget.slice(this._sRelativeServerUrl.length + 1);
 	}
 	oEntitySet = this._metadata._getEntitySetByPath(sRequestTarget);
 	if (oEntitySet) {
@@ -461,7 +454,7 @@ ODataMessageParser._isResponseForCreate = function (mRequestInfo) {
 ODataMessageParser.prototype._createTarget = function (sODataTarget, mRequestInfo, bIsTechnical,
 		bODataTransition) {
 	var sCanonicalTarget, bCreate, sDeepPath, iPos, sPreviousCanonicalTarget, sRequestTarget, sUrl,
-		mUrlData, sUrlForTargetCalculation,
+		sUrlForTargetCalculation,
 		oRequest = mRequestInfo.request,
 		oResponse = mRequestInfo.response;
 
@@ -487,11 +480,10 @@ ODataMessageParser.prototype._createTarget = function (sODataTarget, mRequestInf
 		} else {
 			sUrlForTargetCalculation = mRequestInfo.url;
 		}
-		mUrlData = this._parseUrl(sUrlForTargetCalculation);
-		sUrl = mUrlData.url;
-		iPos = sUrl.indexOf(this._serviceUrl);
+		sUrl = ODataMessageParser._removeParametersAndHash(sUrlForTargetCalculation);
+		iPos = sUrl.indexOf(this._sRelativeServerUrl);
 		if (iPos > -1) {
-			sRequestTarget = sUrl.slice(iPos + this._serviceUrl.length);
+			sRequestTarget = sUrl.slice(iPos + this._sRelativeServerUrl.length);
 		} else { // e.g. within $batch responses
 			sRequestTarget = "/" + sUrl;
 		}
@@ -828,35 +820,16 @@ ODataMessageParser.prototype._parseBodyJSON = function(oResponse, mRequestInfo) 
 };
 
 /**
- * Parses the URL into an info map containing the url, the parameters and the has in its properties
+ * Removes the parameters and the hash from the given URL.
  *
- * @param {string} sUrl - The URL to be stripped
- * @returns {ODataMessageParser~UrlInfo} An info map about the parsed URL
+ * @param {string} sUrl
+ *   The URL from which the parameters and the hash should be removed
+ * @returns {string}
+ *   The URL without the parameters and the hash
  * @private
  */
-ODataMessageParser.prototype._parseUrl = function(sUrl) {
-	var mUrlData = {
-		url: sUrl,
-		parameters: {},
-		hash: ""
-	};
-
-	var iPos = -1;
-
-	iPos = sUrl.indexOf("#");
-	if (iPos > -1) {
-		mUrlData.hash = mUrlData.url.substr(iPos + 1);
-		mUrlData.url = mUrlData.url.substr(0, iPos);
-	}
-
-	iPos = sUrl.indexOf("?");
-	if (iPos > -1) {
-		var sParameters = mUrlData.url.substr(iPos + 1);
-		mUrlData.parameters = URI.parseQuery(sParameters);
-		mUrlData.url = mUrlData.url.substr(0, iPos);
-	}
-
-	return mUrlData;
+ODataMessageParser._removeParametersAndHash = function(sUrl) {
+	return sUrl.split(rQuestionMarkOrHash)[0];
 };
 
 /**
@@ -868,6 +841,17 @@ ODataMessageParser.prototype._parseUrl = function(sUrl) {
  */
 ODataMessageParser.prototype._setPersistTechnicalMessages = function (bPersistTechnicalMessages) {
 	this._bPersistTechnicalMessages = bPersistTechnicalMessages;
+};
+
+/**
+ * Returns the URL relative to the host (i.e. the absolute path on the server) for the given URL
+ *
+ * @param {string} sUrl - The URL to be converted
+ * @returns {string} The server-relative URL
+ * @private
+ */
+ODataMessageParser.getRelativeServerUrl = function (sUrl) {
+	return new URL(sUrl, document.baseURI).pathname;
 };
 
 ///////////////////////////////////////// Hidden Functions /////////////////////////////////////////
@@ -890,23 +874,6 @@ function getContentType(oResponse) {
 		}
 	}
 	return false;
-}
-
-/**
- * Local helper element used to determine the path of a URL relative to the server
- *
- * @type {HTMLAnchorElement}
- */
-var oLinkElement = document.createElement("a");
-/**
- * Returns the URL relative to the host (i.e. the absolute path on the server) for the given URL
- *
- * @param {string} sUrl - The URL to be converted
- * @returns {string} The server-relative URL
- */
-function getRelativeServerUrl(sUrl) {
-	oLinkElement.href = sUrl;
-	return URI.parse(oLinkElement.href).path;
 }
 
 /**

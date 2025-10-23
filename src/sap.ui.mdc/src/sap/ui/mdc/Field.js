@@ -48,10 +48,10 @@ sap.ui.define([
 	 *
 	 * <ul>
 	 * <li>In display mode, usually a {@link sap.m.Text Text} control is rendered.</li>
-	 * <li>If <code>multipleLines</code> is set, an {@link sap.m.ExpandableText ExpandableText} control is rendered.</li>
-	 * <li>If <code>fieldInfo</code> is set and it is configured to be triggerable, a {@link sap.m.Link Link} control is rendered. The <code>multipleLines</code> property is forwarded to the <code>wrapping</code> property of the {@link sap.m.Link Link} control.</li>
+	 * <li>If {@link sap.ui.mdc.field.FieldBase#getMultipleLines multipleLines} is set, an {@link sap.m.ExpandableText ExpandableText} control is rendered.</li>
+	 * <li>If {@link sap.ui.mdc.field.FieldBase#getFieldInfo fieldInfo} is set and it is configured to be triggerable, a {@link sap.m.Link Link} control is rendered. The {@link sap.ui.mdc.field.FieldBase#getMultipleLines multipleLines} property is forwarded to the {@link sap.m.Link#setWrapping wrapping} property of the {@link sap.m.Link Link} control.</li>
 	 * <li>In edit mode, usually an {@link sap.m.Input Input} control is rendered.</li>
-	 * <li>If <code>multipleLines</code> is set, a {@link sap.m.TextArea TextArea} control is rendered.</li>
+	 * <li>If {@link sap.ui.mdc.field.FieldBase#getMultipleLines multipleLines} is set, a {@link sap.m.TextArea TextArea} control is rendered.</li>
 	 * <li>If a date type is used, a {@link sap.m.DatePicker DatePicker} control is rendered.</li>
 	 * <li>If a date/time type is used, a {@link sap.m.DateTimePicker DateTimePicker} control is rendered.</li>
 	 * <li>If a time type is used, a {@link sap.m.TimePicker TimePicker} control is rendered.</li>
@@ -109,7 +109,7 @@ sap.ui.define([
 			},
 			events: {
 				/**
-				 * This event is fired when the <code>value</code> property of the field is changed by user interaction.
+				 * This event is fired when the {@link #getValue value} property of the field is changed by user interaction.
 				 *
 				 * <b>Note</b> This event is only triggered if the used content control has a change event.
 				 */
@@ -119,7 +119,7 @@ sap.ui.define([
 						/**
 						 * The new value of the <code>Field</code>.
 						 *
-						 * If a <code>ValueHelp</code> is assigned to the <code>Field</code>, the <code>value</code> is used as key for the <code>ValueHelp</code> items.
+						 * If a {@link sap.ui.mdc.field.FieldBase#getValueHelp ValueHelp} is assigned to the <code>Field</code>, the <code>value</code> is used as key for the {@link sap.ui.mdc.field.FieldBase#getValueHelp ValueHelp} items.
 						 */
 						value: { type: "string" },
 
@@ -263,7 +263,7 @@ sap.ui.define([
 				// BindingContextChanged -> if parsing error trigger update to remove valueState and wrong input
 				this._oBindingContext = oBindingContext;
 				this.getContentFactory().updateConditionType();
-				if (this.isInvalidInput() || this._getValueHelp()) { // In ValueHelp case InParameters might need an update
+				if (this.isInvalidInput() || this.getValueHelp()) { // In ValueHelp case InParameters might need an update
 					if (this._oManagedObjectModel) {
 						this._oManagedObjectModel.checkUpdate(true, true); // async. to reduce updates
 					}

@@ -367,9 +367,10 @@ sap.ui.define([
 			horizontalScrolling: false,
 			verticalScrolling: true,
 			afterClose: [this._onPopoverAfterClose, this],
+			ariaLabelledBy: this.getId() + "-title",
 			customHeader: new OverflowToolbar({
 				content: [
-					new Title({text: this._getResourceText("table.COLUMNMENU_TITLE")}),
+					new Title({id: this.getId() + "-title", text: this._getResourceText("table.COLUMNMENU_TITLE")}),
 					new ToolbarSpacer(),
 					new Button({
 						icon: "sap-icon://decline",

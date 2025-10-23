@@ -407,6 +407,58 @@ sap.ui.define([
 		});
 	});
 
+	QUnit.test("RangeSelect reason with keyboard (DINC0662913)", function(assert){
+		// SNOW: DINC0662913
+		const done = assert.async();
+
+		this.oBasePanel.attachChange(function(oEvt){
+			assert.equal(oEvt.getParameter("item")[0].name, "test3", "correct item found");
+			assert.equal(oEvt.getParameter("reason"), this.oBasePanel.CHANGE_REASON_RANGESELECT);
+			done();
+		}.bind(this));
+
+		const oThirdItem = this.oBasePanel._oListControl.getItems()[2];
+		oThirdItem.setSelected(true);
+
+		const oFakePressEvent = {
+			isMarked: () => false,
+			key: "Shift"
+		};
+		this.oBasePanel._keydownHandler(oFakePressEvent);
+
+		const aEventRangeParameterFake = [oThirdItem];
+
+		this.oBasePanel._oListControl.fireSelectionChange({
+			selectAll: false,
+			listItems: aEventRangeParameterFake
+		});
+
+		// clean up
+		this.oBasePanel._keyupHandler(oFakePressEvent);
+	});
+
+	QUnit.test("RangeSelect reason with keyboard (DINC0662913) 2", function(assert){
+		// SNOW: DINC0662913
+		const done = assert.async();
+
+		this.oBasePanel.attachChange(function(oEvt){
+			assert.equal(oEvt.getParameter("item").name, "test4", "correct item found");
+			assert.notEqual(oEvt.getParameter("reason"), this.oBasePanel.CHANGE_REASON_RANGESELECT);
+			done();
+		}.bind(this));
+
+		const oFourthItem = this.oBasePanel._oListControl.getItems()[3];
+		oFourthItem.setSelected(true);
+
+		const aEventRangeParameterFake = [oFourthItem];
+
+		this.oBasePanel._oListControl.fireSelectionChange({
+			selectAll: false,
+			listItems: aEventRangeParameterFake
+		});
+
+	});
+
 	QUnit.test("Announcement on SearchField change", function(assert){
 		const oTableUtiLSpy = sinon.spy(TableUtil, "announceTableUpdate");
 		const oSearchField = this.oBasePanel._getSearchField();

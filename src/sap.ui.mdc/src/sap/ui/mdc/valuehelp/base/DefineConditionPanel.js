@@ -251,6 +251,7 @@ sap.ui.define([
 				conditionProcessed: {}
 			}
 		},
+
 		_oManagedObjectModel: null,
 
 		renderer: {
@@ -738,13 +739,6 @@ sap.ui.define([
 			const aContent = oGrid.getContent();
 			const oCtrl = aContent[2] ? aContent[2] : aContent[0]; // If value field exist take it, otherwise operator
 			return oCtrl;
-		},
-
-		// TODO: remove this function and replace by getValueHelp once FieldHelp association is completetly removed.
-		_getValueHelp: function() {
-
-			return this.getValueHelp() || (undefined); // as getFieldHelp not exist in legacy-free UI5
-
 		}
 	});
 
@@ -855,6 +849,9 @@ sap.ui.define([
 		// return aValueHelpSupportedOperators.length === 0 || aValueHelpSupportedOperators.indexOf(sKey) >= 0;
 	}
 
+	/**
+	 * @this {sap.ui.mdc.valuehelp.base.DefineConditionPanel}
+	 */
 	function _operatorChanged(oField, sKey, sOldKey) {
 		oField._sOldKey = sOldKey; // to know in change event
 
@@ -895,7 +892,7 @@ sap.ui.define([
 			let sValueHelp;
 			if (sKey && _operatorSupportsValueHelp(sKey)) {
 				// enable the ValueHelp for the used value fields
-				sValueHelp = this._getValueHelp();
+				sValueHelp = this.getValueHelp();
 			}
 			oValue0Field?.setValueHelp?.(sValueHelp);
 			oValue1Field?.setValueHelp?.(sValueHelp);
@@ -944,6 +941,9 @@ sap.ui.define([
 		this.onChange(undefined);
 	}
 
+	/**
+	 * @this {sap.ui.mdc.valuehelp.base.DefineConditionPanel}
+	 */
 	function _createControl(oCondition, iIndex, sId, oBindingContext) {
 
 		const oOperator = FilterOperatorUtil.getOperator(oCondition.operator);
@@ -966,7 +966,7 @@ sap.ui.define([
 				editMode: { parts: [{ path: "$condition>operator" }, { path: "$condition>invalid" }], formatter: _getEditModeFromOperator },
 				multipleLines: false,
 				width: "100%",
-				valueHelp: _operatorSupportsValueHelp(oCondition.operator) ? this._getValueHelp() : null
+				valueHelp: _operatorSupportsValueHelp(oCondition.operator) ? this.getValueHelp() : null
 				//display: should always be FieldDisplay.Value
 			});
 		}
@@ -1756,6 +1756,9 @@ sap.ui.define([
 		}
 	}
 
+	/**
+	 * @this {sap.ui.mdc.valuehelp.base.DefineConditionPanel}
+	 */
 	function _updateRow(oCondition, oGrid, iIndex, oBindingContext, iRow) {
 
 		const sIdPrefix = this.getId() + "--" + iRow;
@@ -1787,7 +1790,7 @@ sap.ui.define([
 		let oValue0Field = aGridContent[iIndex];
 		let oValue1Field;
 		if (oValue0Field.hasOwnProperty("_iValueIndex") && oValue0Field._iValueIndex === 0) {
-			oValue0Field.setValueHelp?.(_operatorSupportsValueHelp(oCondition.operator) && this._getValueHelp());
+			oValue0Field.setValueHelp?.(_operatorSupportsValueHelp(oCondition.operator) && this.getValueHelp());
 			if (oCondition.values.length > 0) {
 				oValueBindingContext = this._oManagedObjectModel.getContext(oBindingContext.getPath() + "values/0/");
 				oValue0Field.setBindingContext(oValueBindingContext, "$this");
