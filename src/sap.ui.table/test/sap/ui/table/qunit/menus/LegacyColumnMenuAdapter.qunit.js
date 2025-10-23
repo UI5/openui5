@@ -201,7 +201,7 @@ sap.ui.define([
 	QUnit.test("Open Menu", function(assert) {
 		const done = assert.async();
 		const aColumns = this.oTable.getColumns();
-		const aColumnHeaders = document.querySelectorAll('[role="columnheader"]');
+		const aColumnHeaders = document.querySelectorAll('td[role="columnheader"]');
 
 		function triggerClick(oCellDomRef) {
 			qutils.triggerMouseEvent(oCellDomRef, "mousedown", null, null, null, null, 0);
@@ -212,9 +212,9 @@ sap.ui.define([
 			TableQUnitUtils.wait(0).then(function() {
 				const oMenuOpenSpy = sinon.stub(ColumnMenu.prototype, "open");
 
-				for (let i = 0; i < 6; i++) {
-					triggerClick(aColumnHeaders[i + 1]);
-					if (aColumnHeaders[i + 1].getAttribute("colspan")) {
+				for (let i = 0; i < 5; i++) {
+					triggerClick(aColumnHeaders[i]);
+					if (aColumnHeaders[i].getAttribute("colspan")) {
 						assert.ok(oMenuOpenSpy.notCalled, "Menu#open not called because of the colspan attribute");
 					} else {
 						assert.ok(oMenuOpenSpy.calledOnceWithExactly(
@@ -228,6 +228,6 @@ sap.ui.define([
 				done();
 			});
 		});
-		triggerClick(aColumnHeaders[4]);
+		triggerClick(aColumnHeaders[3]);
 	});
 });
