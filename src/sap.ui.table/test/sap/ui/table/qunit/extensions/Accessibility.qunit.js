@@ -1692,7 +1692,7 @@ sap.ui.define([
 			return aAriaOwns.join(" ");
 		}
 
-		assert.strictEqual($Elem.attr("aria-owns"), getExpectedAriaOwnsForRow(0), "aria-owns");
+		assert.strictEqual($Elem.attr("aria-owns"), undefined, "aria-owns is not set for the fixed part of the row");
 		checkAriaSelected($Elem.attr("aria-selected"), true, assert);
 		$Elem = getCell(0, 1, false, assert).parent();
 		assert.strictEqual($Elem.attr("role"), "row", "role");
@@ -1700,7 +1700,7 @@ sap.ui.define([
 		checkAriaSelected($Elem.attr("aria-selected"), true, assert);
 		$Elem = getCell(1, 0, false, assert).parent();
 		assert.strictEqual($Elem.attr("role"), "row", "role");
-		assert.strictEqual($Elem.attr("aria-owns"), getExpectedAriaOwnsForRow(1), "aria-owns");
+		assert.strictEqual($Elem.attr("aria-owns"), undefined, "aria-owns");
 		checkAriaSelected($Elem.attr("aria-selected"), false, assert);
 		$Elem = getCell(1, 1, false, assert).parent();
 		assert.strictEqual($Elem.attr("role"), "row", "role");
@@ -1843,7 +1843,7 @@ sap.ui.define([
 		const sTableId = oTable.getId();
 
 		//Heading + Extension + Footer + 2xTable + Row Selector + 2xColumn Headers + NoData Container = 8
-		assert.strictEqual($OverlayCoveredElements.length, 9, "Number of potentionally covered elements");
+		assert.strictEqual($OverlayCoveredElements.length, 8, "Number of potentionally covered elements");
 		$OverlayCoveredElements.each(function() {
 			assert.ok(!jQuery(this).attr("aria-hidden"), "No aria-hidden");
 		});
@@ -1882,7 +1882,7 @@ sap.ui.define([
 		await nextUIUpdate();
 
 		//Heading + Extension + Footer + 2xTable + Row Selector + 2xColumn Headers + NoData Container = 8
-		assert.strictEqual($OverlayCoveredElements.length, 9, "Number of potentionally covered elements");
+		assert.strictEqual($OverlayCoveredElements.length, 8, "Number of potentionally covered elements");
 		$OverlayCoveredElements.each(function() {
 			assert.ok(!jQuery(this).attr("aria-hidden"), "No aria-hidden");
 		});
