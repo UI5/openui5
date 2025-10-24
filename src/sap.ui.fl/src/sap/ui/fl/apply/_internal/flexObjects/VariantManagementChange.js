@@ -35,7 +35,6 @@ sap.ui.define([
 			}
 		},
 
-		// eslint-disable-next-line object-shorthand
 		constructor: function(...aArgs) {
 			FlexObject.apply(this, aArgs);
 			this.setFileType("ctrl_variant_management_change");

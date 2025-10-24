@@ -21,7 +21,7 @@
 
 				<headerContent>
 					<layout:VerticalLayout>
-						<m:Text text="This log includes the library notes for the libraries listed below."/>
+						<m:Text text="This log includes the library notes for the libraries listed below. The distribution patch information shows when changes were delivered in SAPUI5. The version shown after each change indicates the library version where the change was first included."/>
 						<m:Select id="VersionSelect" items="{select>/items}" change="handleVersionChange" visible="false">
 							<core:Item text="{select>value}" key="{select>key}"/>
 						</m:Select>
@@ -34,13 +34,14 @@
 						<ObjectPageSubSection titleUppercase="false">
 							<layout:VerticalLayout content="{path: 'versions', templateShareable: false}" width="100%">
 								<m:Panel
-									headerText="{version}"
-									content="{path: 'notes', templateShareable: false}"
+									headerText="{distributionPatch}"
 									expandable="true"
 									expanded="true"
 									class="sapUxAPObjectPageSubSectionAlignContent"
 									width="auto">
-									<m:Text width="100%" text="[{type}] {text}"/>
+									<layout:VerticalLayout content="{path: 'notes', templateShareable: false}" width="100%">
+										<m:Text width="100%" text="[{type}] {text} (included in {version})"/>
+									</layout:VerticalLayout>
 								</m:Panel>
 							</layout:VerticalLayout>
 						</ObjectPageSubSection>

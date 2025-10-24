@@ -192,7 +192,6 @@ sap.ui.define([
 				}
 			}
 		},
-		// eslint-disable-next-line object-shorthand
 		constructor: function(...aArgs) {
 			this._aStyleClasses = this._aStyleClasses.slice(0);
 			this._oScrollbarSynchronizers = new Map();

@@ -10,7 +10,6 @@ sap.ui.define([
 			manifest: "json"
 		},
 
-		// eslint-disable-next-line object-shorthand
 		constructor: function(...aArgs) {
 			UIComponent.prototype.constructor.apply(this, aArgs);
 		},

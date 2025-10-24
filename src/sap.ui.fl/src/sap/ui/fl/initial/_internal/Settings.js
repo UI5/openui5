@@ -72,7 +72,6 @@ sap.ui.define([
 				versioning: { type: "object", defaultValue: {} }
 			}
 		},
-		// eslint-disable-next-line object-shorthand
 		constructor: function(...aArgs) {
 			ManagedObject.apply(this, aArgs);
 

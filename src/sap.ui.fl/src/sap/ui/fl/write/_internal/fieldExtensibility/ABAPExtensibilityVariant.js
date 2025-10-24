@@ -32,7 +32,6 @@ sap.ui.define([
 		 * @param {map} mServiceInfo - map containing <code>serviceName</code>, <code>serviceVersion</code> and <code>serviceType</code>
 		 * @param {map} mBindingInfo - map containing <code>entitySetName</code> and <code>entityTypeName</code>
 		 */
-		// eslint-disable-next-line object-shorthand
 		constructor: function(sServiceUri, mServiceInfo, mBindingInfo) {
 			this._sServiceUri = sServiceUri;
 			this._mBindingInfo = mBindingInfo;

@@ -64,7 +64,6 @@ sap.ui.define([
 	}
 
 	return Controller.extend("sap.ui.rta.plugin.iframe.AddIFrameDialogController", {
-		// eslint-disable-next-line object-shorthand
 		constructor: function(oJSONModel, mSettings) {
 			this._oJSONModel = oJSONModel;
 			this._importSettings(mSettings);

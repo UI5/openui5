@@ -56,7 +56,7 @@
 		"prefer-template": "error",
 		"rest-spread-spacing": ["error", "never"],
 		"template-curly-spacing": "error",
-		"object-shorthand": ["error", "always", { "ignoreConstructors": false, "avoidQuotes": true }],
+		"object-shorthand": ["error", "always", { "ignoreConstructors": true, "avoidQuotes": true, "methodsIgnorePattern": "^constructor$" }],
 		"prefer-destructuring": ["error", {
 			"VariableDeclarator": {
 				"array": false,

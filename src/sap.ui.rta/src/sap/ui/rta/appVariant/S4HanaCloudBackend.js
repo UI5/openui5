@@ -20,7 +20,6 @@ sap.ui.define([
 		metadata: {
 			library: "sap.ui.rta"
 		},
-		// eslint-disable-next-line object-shorthand
 		constructor: function(...aArgs) {
 			ManagedObject.apply(this, aArgs);
 		}

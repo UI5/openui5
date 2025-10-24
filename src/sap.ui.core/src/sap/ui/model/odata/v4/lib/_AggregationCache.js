@@ -543,7 +543,7 @@ sap.ui.define([
 		if (sParentPath) { // add @odata.bind to POST body only
 			_Helper.getPrivateAnnotation(oEntityData, "postBody")
 				[this.oAggregation.$ParentNavigationProperty + "@odata.bind"]
-					= _Helper.makeRelativeUrl("/" + sParentPath, "/" + this.sResourcePath);
+					= _Helper.makeRelativePath("/" + sParentPath, "/" + this.sResourcePath);
 		}
 
 		const bParentIsLeaf = oParentNode && oParentNode["@$ui5.node.isExpanded"] === undefined;

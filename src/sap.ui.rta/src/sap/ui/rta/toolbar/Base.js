@@ -69,7 +69,6 @@ sap.ui.define([
 				textResources: "object"
 			}
 		},
-		// eslint-disable-next-line object-shorthand
 		constructor: function(...aArgs) {
 			// call parent constructor
 			HBox.apply(this, aArgs);

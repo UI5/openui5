@@ -23,7 +23,6 @@ sap.ui.define([
 			manifest: "json"
 		},
 
-		// eslint-disable-next-line object-shorthand
 		constructor: function(...aArgs) {
 			var sCurrentVariantFromURL = FlUtils.getUrlParameter(URLHandler.variantTechnicalParameterName);
 			if (sCurrentVariantFromURL) {

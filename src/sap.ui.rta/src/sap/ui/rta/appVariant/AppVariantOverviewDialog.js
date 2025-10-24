@@ -36,7 +36,6 @@ sap.ui.define([
 				cancel: {}
 			}
 		},
-		// eslint-disable-next-line object-shorthand
 		constructor: function(...aArgs) {
 			Dialog.prototype.constructor.apply(this, aArgs);
 			this._oTextResources = Lib.getResourceBundleFor("sap.ui.rta");
