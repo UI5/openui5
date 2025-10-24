@@ -540,7 +540,11 @@ function(
 						/**
 						 * The end date as a UI5Date or JavaScript Date object of the focused grid cell.
 						 */
-						endDate: {type: "object"}
+						endDate: {type: "object"},
+						/**
+						 * The original browser event.
+						 */
+						originalEvent: {type: "object"}
 					}
 				},
 
@@ -1369,7 +1373,8 @@ function(
 		var fnHandleCellPress = function(oEvent) {
 			this.fireEvent("cellPress", {
 				startDate: oEvent.getParameter("startDate"),
-				endDate: oEvent.getParameter("endDate")
+				endDate: oEvent.getParameter("endDate"),
+				originalEvent: oEvent.getParameter("originalEvent")
 			});
 		};
 		var fnHandleMoreLinkPress = function(oEvent) {
