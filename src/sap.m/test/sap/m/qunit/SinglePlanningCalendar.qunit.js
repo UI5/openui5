@@ -1178,6 +1178,7 @@ sap.ui.define([
 		assert.ok(fnFireGridCellFocusSpy.calledWithExactly("cellPress", {
 			startDate: UI5Date.getInstance(2018, 6 , 8, 3),
 			endDate: UI5Date.getInstance(2018, 6, 8, 4),
+			originalEvent: undefined,
 			id: oSPC.getId()
 		}), "Event was fired with the correct parameters");
 
@@ -1209,6 +1210,7 @@ sap.ui.define([
 		assert.ok(fnFireGridCellFocusSpy.calledWithExactly("cellPress", {
 			startDate: UI5Date.getInstance(2018, 7, 1),
 			endDate: UI5Date.getInstance(2018, 7, 2),
+			originalEvent: undefined,
 			id: oSPC.getId()
 		}), "Event was fired with the correct parameters");
 
