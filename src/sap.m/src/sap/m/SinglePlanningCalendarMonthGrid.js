@@ -191,7 +191,11 @@ sap.ui.define([
 							/**
 							 * The end date as a UI5Date or JavaScript Date object of the focused grid cell.
 							 */
-							endDate: { type: "object" }
+							endDate: { type: "object" },
+							/**
+							 * The original browser event.
+							 */
+							originalEvent: {type: "object"}
 						}
 					},
 					/**
@@ -565,7 +569,7 @@ sap.ui.define([
 					this.fireEvent("selectDate", {startDate: oStartDate, endDate: oEndDate});
 				}
 
-				this.fireEvent("cellPress", {startDate: oStartDate, endDate: oEndDate});
+				this.fireEvent("cellPress", {startDate: oStartDate, endDate: oEndDate, originalEvent: oEvent.originalEvent});
 				this.fireAppointmentSelect({
 					appointment: undefined,
 					appointments: this._toggleAppointmentSelection(undefined, true)
