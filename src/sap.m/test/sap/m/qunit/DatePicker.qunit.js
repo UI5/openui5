@@ -3188,6 +3188,45 @@ sap.ui.define([
 		oDP.destroy();
 	});
 
+	QUnit.test("Placeholder behaviour for the non binded values of the date picker", async function(assert) {
+			// Prepare
+			var sOriginalLanguage = Localization.getLanguage();
+			Localization.setLanguage("de");
+
+			var sPlaceholderPrefix = Library.getResourceBundleFor("sap.ui.core").getText("date.placeholder").split("{")[0],
+				iFullYear = UI5Date.getInstance().getFullYear(),
+				sExpectedPlaceholder = sPlaceholderPrefix + "31.12." + iFullYear;
+
+			var oDP1 = new DatePicker("oDP1", {}).placeAt("qunit-fixture");
+
+			var oDP2 = new DatePicker("oDP2", {
+				valueFormat: "yyyy-MM-dd"
+			}).placeAt("qunit-fixture");
+
+			var oDP3 = new DatePicker("oDP3", {
+				displayFormat: "dd.MM.yyyy",
+				valueFormat: "yyyy-MM-dd"
+			}).placeAt("qunit-fixture");
+
+			// Act
+			await nextUIUpdate();
+
+			// Assert
+			if (Device.support.input.placeholder) {
+				assert.equal(jQuery("#oDP1").find("input").attr("placeholder") , sExpectedPlaceholder, "Placeholder is correct for DatePicker with default formats");
+				assert.equal(jQuery("#oDP2").find("input").attr("placeholder"), sExpectedPlaceholder, "Placeholder is correct for DatePicker with set only valueFormat");
+				assert.equal(jQuery("#oDP3").find("input").attr("placeholder"), sExpectedPlaceholder, "Placeholder is correct for DatePicker with set displayFormat and valueFormat");
+			} else {
+				assert.ok(!jQuery("#DTP1").find("input").attr("placeholder"), "No placeholder attribute");
+			}
+
+			// Clean up
+			Localization.setLanguage(sOriginalLanguage);
+			oDP1.destroy();
+			oDP2.destroy();
+			oDP3.destroy();
+		});
+
 	QUnit.module("Different application timezone", {
 		//test with Etc/GMT-12 -> +12, except when it is the local timezone
 		before: async function() {

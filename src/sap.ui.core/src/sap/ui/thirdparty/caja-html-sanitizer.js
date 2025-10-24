@@ -713,6 +713,12 @@ var cssSchema = (function () {
         'cssPropBits': 0,
         'cssLitGroup': [ L[ 18 ], L[ 47 ], L[ 54 ] ]
       },
+      // ##### BEGIN: MODIFIED BY SAP
+      'text-decoration-line': {
+        'cssPropBits': 0,
+        'cssLitGroup': [ L[ 18 ], L[ 47 ], L[ 54 ] ]
+      },
+      // ##### END: MODIFIED BY SAP
       'text-indent': {
         'cssPropBits': 5,
         'cssLitGroup': [ L[ 47 ] ]

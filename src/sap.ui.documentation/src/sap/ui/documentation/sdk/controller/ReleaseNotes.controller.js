@@ -47,7 +47,7 @@ sap.ui.define([
 					return;
 				}
 
-				oVersion = Version(oAppInfo.version);
+				oVersion = new Version(oAppInfo.version);
 				iMajor = oVersion.getMajor();
 				iMinor = oVersion.getMinor();
 
@@ -83,7 +83,7 @@ sap.ui.define([
 
 				this.appendPageTitle(this.getModel("i18n").getProperty("RELEASE_NOTES_TITLE"));
 			},
-			_processLibInfo: function (aLibs, oLibInfos) {
+			_processLibInfo: function (aLibs, oLibInfos, oAppInfo) {
 				var iReleaseNotes,
 					aReturnLibs = [],
 					iLength = Array.isArray(aLibs) ? aLibs.length : 0,
@@ -91,26 +91,56 @@ sap.ui.define([
 					i;
 
 				fnProcessLib = function(sVersion, oValue) {
+					// Ensure notes array exists before processing
+					if (!oValue.notes || !Array.isArray(oValue.notes)) {
+						return;
+					}
+
 					iReleaseNotes += oValue.notes.length;
 
-					aLibs[i].versions.push({
-						version : sVersion,
-						notes : oValue.notes
+					// Enhance each note with version information
+					var aEnhancedNotes = oValue.notes.map(function(oNote) {
+						return {
+							type: oNote.type,
+							text: oNote.text,
+							version: sVersion
+						};
 					});
 
-					aLibs[i].versions.sort(function(a, b) {
-						return Version(b.version).compareTo(a.version);
+					// Check if version already exists
+					var oExistingVersion = aLibs[i].versions.find(function(v) {
+						return v.version === sVersion;
 					});
-				};
+
+					if (oExistingVersion) {
+						// Append notes to existing version
+						oExistingVersion.notes = oExistingVersion.notes.concat(aEnhancedNotes);
+					} else {
+						// Create new version entry
+						aLibs[i].versions.push({
+							version : sVersion,
+							notes : aEnhancedNotes,
+							distributionPatch: this._getDistributionPatch(oAppInfo, aLibs[i].library, sVersion)
+						});
+					}
+
+				}.bind(this);
 
 				for (i = 0; i < iLength; i++) {
-
+					var sLibraryName = aLibs[i]; // Preserve library name
 					aLibs[i] = oLibInfos[aLibs[i]];
+					aLibs[i].library = sLibraryName; // Store library name
 					aLibs[i].versions = [];
 
 					if (aLibs[i].relnotes) {
 						iReleaseNotes = 0;
 						jQuery.each(aLibs[i].relnotes, fnProcessLib);
+
+						// Sort versions after all have been processed
+						aLibs[i].versions.sort(function(a, b) {
+							return new Version(b.version).compareTo(a.version);
+						});
+
 						// We publish the library in the model only if there are release notes available
 						if (iReleaseNotes > 0) {
 							aReturnLibs.push(aLibs[i]);
@@ -145,11 +175,13 @@ sap.ui.define([
 			},
 			/**
 			 * Compares 2 UI5 version strings taking into account only major and minor version info
-			 * @returns {boolean}
+			 * @param {string} sVersionA First version string to compare
+			 * @param {string} sVersionB Second version string to compare
+			 * @returns {boolean} True if major.minor versions are equal, false otherwise
 			 */
 			_compareUI5Versions: function (sVersionA, sVersionB) {
-				var oVA = Version(sVersionA),
-					oVB = Version(sVersionB);
+				var oVA = new Version(sVersionA),
+					oVB = new Version(sVersionB);
 
 				return (oVA.getMajor() + "." + oVA.getMinor()) === (oVB.getMajor() + "." + oVB.getMinor());
 			},
@@ -192,6 +224,38 @@ sap.ui.define([
 				this._showBusyIndicator();
 				library._loadAllLibInfo("", "_getLibraryInfoAndReleaseNotes", sVersion,
 					this._processLibInfo.bind(this));
+			},
+
+			/**
+			 * Simplified distribution patch mapping using already available version info
+			 * @param {object} oAppInfo - Version info already loaded by the system
+			 * @param {string} sLibraryName - Library name
+			 * @param {string} sLibraryVersion - Library version
+			 * @returns {string} Distribution patch version or library version if no mapping found
+			 * @private
+			 */
+			_getDistributionPatch: function(oAppInfo, sLibraryName, sLibraryVersion) {
+				if (!oAppInfo || !oAppInfo.libraries) {
+					return sLibraryVersion;
+				}
+
+				var oLibrary = oAppInfo.libraries.find(function(lib) {
+					return lib.name === sLibraryName;
+				});
+
+				if (!oLibrary || !oLibrary.patchHistory) {
+					return sLibraryVersion;
+				}
+
+				// Find the patch where this library version was first shipped
+				for (var patch in oLibrary.patchHistory) {
+					if (oLibrary.patchHistory[patch] === sLibraryVersion) {
+						var oVersion = new Version(oAppInfo.version);
+						return oVersion.getMajor() + "." + oVersion.getMinor() + "." + patch;
+					}
+				}
+
+				return sLibraryVersion;
 			},
 
 			_showBusyIndicator: function () {

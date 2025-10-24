@@ -136,7 +136,6 @@ sap.ui.define([
 				}
 			}
 		},
-		// eslint-disable-next-line object-shorthand
 		constructor: function(...aArgs) {
 			ManagedObject.apply(this, aArgs);
 			var oFlexObjectMetadata = this.getFlexObjectMetadata();

@@ -353,7 +353,6 @@ sap.ui.define([
 				oRm.close("div");
 			}
 		},
-		// eslint-disable-next-line object-shorthand
 		constructor: function(...aArgs) {
 			Control.prototype.constructor.apply(this, aArgs); // Call base class constructor
 			this._oInitPromise = new Promise((resolve) => {

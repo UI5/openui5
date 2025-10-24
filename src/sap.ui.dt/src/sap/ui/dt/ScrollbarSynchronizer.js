@@ -48,7 +48,6 @@ function(
 			}
 		},
 		_bSyncing: false,
-		// eslint-disable-next-line object-shorthand
 		constructor: function(...aArgs) {
 			this._scrollEventHandler = this._scrollEventHandler.bind(this);
 			ManagedObject.apply(this, aArgs);

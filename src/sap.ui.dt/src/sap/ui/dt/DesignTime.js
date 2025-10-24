@@ -255,7 +255,6 @@ sap.ui.define([
 				syncFailed: {}
 			}
 		},
-		// eslint-disable-next-line object-shorthand
 		constructor: function(...aArgs) {
 			// Storage for promises of pending overlays (overlays that are in creation phase)
 			this._sStatus = DesignTimeStatus.SYNCED;

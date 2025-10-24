@@ -5,10 +5,9 @@
 
 .sapMSliderTooltip {
 	background: var(--sapField_Focus_Background);
-	border-radius: 0.5rem;
+	border-radius: 0.0625rem;
 	border: none;
 	box-shadow: var(--sapContent_Shadow1);
-	height: 1.375rem;
 	min-width: 2rem;
 	padding: 0.25rem;
 	font-size: var(--sapFontSmallSize);
@@ -26,8 +25,13 @@
 }
 
 .sapMSliderTooltip.sapMSliderTooltipNonEditableWrapper {
-	height: 0.875rem;
+	height: 1rem;
 	padding: 0.25rem;
 	font-size: var(--sapFontSmallSize);
 	color: var(--sapContent_LabelColor);
+	background: var(--sapBackgroundColor);
+
+		.sapMSliderTooltipInput {
+			background: var(--sapBackgroundColor);
+		}
 }

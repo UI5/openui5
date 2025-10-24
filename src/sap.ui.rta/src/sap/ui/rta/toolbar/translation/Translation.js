@@ -66,7 +66,6 @@ sap.ui.define([
 				}
 			}
 		},
-		// eslint-disable-next-line object-shorthand
 		constructor: function(...aArgs) {
 			ManagedObject.prototype.constructor.apply(this, aArgs);
 			this._oTranslationModel = new JSONModel(getInitialTranslationModelData());

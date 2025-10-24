@@ -31,7 +31,6 @@ sap.ui.define([
 			}
 		},
 
-		// eslint-disable-next-line object-shorthand
 		constructor: function(...aArgs) {
 			FlexObject.apply(this, aArgs);
 			this.setFileType("annotation_change");

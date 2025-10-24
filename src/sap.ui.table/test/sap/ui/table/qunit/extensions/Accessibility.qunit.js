@@ -1978,7 +1978,7 @@ sap.ui.define([
 
 		$Cell = getCell(1, 0, true, null, oTreeTable);
 		const sExpandButtonText = TableUtils.getResourceText("TBL_EXPAND_BUTTON");
-		let sCellAccText = TableUtils.getResourceText("TBL_CELL_INCLUDES", sExpandButtonText).concat(" TYPE_A2 DESCRIPTION_A2 Read Only");
+		let sCellAccText = TableUtils.getResourceText("TBL_CELL_INCLUDES", [sExpandButtonText]).concat(" TYPE_A2 DESCRIPTION_A2 Read Only");
 		assert.equal(oTreeTable.$("cellacc").text(), sCellAccText, "TreeTable: HiddenText cellacc for collapsed row is correct");
 
 		oTreeTable.getRows()[1].expand();
@@ -1986,7 +1986,7 @@ sap.ui.define([
 		$Cell = getCell(1, 0, true, null, oTreeTable);
 		await TableQUnitUtils.wait(100);
 		const sCollapseButtonText = TableUtils.getResourceText("TBL_COLLAPSE_BUTTON");
-		sCellAccText = TableUtils.getResourceText("TBL_CELL_INCLUDES", sCollapseButtonText).concat(" TYPE_A2 DESCRIPTION_A2 Read Only");
+		sCellAccText = TableUtils.getResourceText("TBL_CELL_INCLUDES", [sCollapseButtonText]).concat(" TYPE_A2 DESCRIPTION_A2 Read Only");
 		assert.equal(oTreeTable.$("cellacc").text(), sCellAccText, "TreeTable: HiddenText cellacc for expanded row is correct");
 	});
 

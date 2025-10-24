@@ -57,7 +57,6 @@ sap.ui.define([
 				}
 			}
 		},
-		// eslint-disable-next-line object-shorthand
 		constructor: function(...aArgs) {
 			Element.apply(this, aArgs);
 

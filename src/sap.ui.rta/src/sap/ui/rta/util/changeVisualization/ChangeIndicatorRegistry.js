@@ -56,7 +56,6 @@ sap.ui.define([
 				}
 			}
 		},
-		// eslint-disable-next-line object-shorthand
 		constructor: function(...aArgs) {
 			ManagedObject.prototype.constructor.apply(this, aArgs);
 

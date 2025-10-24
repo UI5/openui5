@@ -34,7 +34,6 @@ sap.ui.define([
 		metadata: {
 			library: "sap.ui.fl"
 		},
-		// eslint-disable-next-line object-shorthand
 		constructor: function(mPropertyBag) {
 			ManagedObject.apply(this);
 			if (!isPlainObject(mPropertyBag)) {

@@ -5811,7 +5811,7 @@ sap.ui.define([
 						});
 					});
 				});
-			oHelperMock.expects("makeRelativeUrl").exactly(bCreateRoot ? 0 : 1)
+			oHelperMock.expects("makeRelativePath").exactly(bCreateRoot ? 0 : 1)
 				.withExactArgs("/Foo('42')", "/Foo").returns("~relativeUrl~");
 			oCacheMock.expects("addElements")
 				.withExactArgs(sinon.match.same(oEntityData), bCreateRoot ? 0 : 3,
@@ -6017,7 +6017,7 @@ sap.ui.define([
 						});
 					});
 				});
-			oHelperMock.expects("makeRelativeUrl").exactly(bCreateRoot ? 0 : 1)
+			oHelperMock.expects("makeRelativePath").exactly(bCreateRoot ? 0 : 1)
 				.withExactArgs("/Foo('42')", "/Foo").returns("~relativeUrl~");
 			const oExpandExpectation = this.mock(oCache.oTreeState).expects("expand")
 				.exactly(bExpandTreeState ? 1 : 0)

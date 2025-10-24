@@ -63,7 +63,6 @@ sap.ui.define([
 				}
 			}
 		},
-		// eslint-disable-next-line object-shorthand
 		constructor: function(...aArgs) {
 			const [mPropertyBag] = aArgs;
 			Variant.apply(this, aArgs);

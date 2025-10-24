@@ -42,7 +42,6 @@ sap.ui.define([
 				}
 			}
 		},
-		// eslint-disable-next-line object-shorthand
 		constructor: function(...aArgs) {
 			let [sId, mSettings] = aArgs;
 			if (typeof sId !== "string" && sId !== undefined) {

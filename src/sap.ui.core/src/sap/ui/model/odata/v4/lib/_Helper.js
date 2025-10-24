@@ -13,9 +13,10 @@ sap.ui.define([
 	"sap/ui/base/SyncPromise",
 	"sap/ui/model/Filter",
 	"sap/ui/model/FilterOperator",
-	"sap/ui/thirdparty/URI"
+	"sap/ui/thirdparty/URI",
+	"sap/ui/util/_URL"
 ], function (_Parser, Log, deepEqual, isEmptyObject, merge, uid, SyncPromise, Filter,
-		FilterOperator, URI) {
+		FilterOperator, URI, _URL) {
 	"use strict";
 
 	var rAmpersand = /&/g,
@@ -2285,20 +2286,20 @@ sap.ui.define([
 		},
 
 		/**
-		 * Make the given absolute URL relative to the given base URL. The URLs must not contain a
-		 * host or protocol part. Ensures that key predicates are not %-encoded.
+		 * Make the given absolute path relative to the given base path. The paths must be OData
+		 * resource paths (ABNF rule resourcePath).
 		 *
-		 * @param {string} sUrl
-		 *   The URL
+		 * @param {string} sPath
+		 *   The absolute path
 		 * @param {string} sBase
-		 *   The base URL
+		 *   The base path
 		 * @returns {string}
-		 *   The relative URL
+		 *   The relative path
 		 *
 		 * @public
 		 */
-		makeRelativeUrl : function (sUrl, sBase) {
-			return preserveKeyPredicates(new URI(sUrl).relativeTo(sBase).toString());
+		makeRelativePath : function (sPath, sBase) {
+			return new _URL(sPath).relativeTo(new _URL(sBase));
 		},
 
 		/**

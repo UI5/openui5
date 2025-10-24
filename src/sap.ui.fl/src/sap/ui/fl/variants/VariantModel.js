@@ -152,7 +152,6 @@ sap.ui.define([
 	 * @alias sap.ui.fl.variants.VariantModel
 	 */
 	var VariantModel = JSONModel.extend("sap.ui.fl.variants.VariantModel", /** @lends sap.ui.fl.variants.VariantModel.prototype */ {
-		// eslint-disable-next-line object-shorthand
 		constructor: function(oData, mPropertyBag) {
 			// JSON model internal properties
 			this.pSequentialImportCompleted = Promise.resolve();

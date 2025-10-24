@@ -124,7 +124,6 @@ sap.ui.define([
 	 * @alias sap.ui.rta.plugin.additionalElements.AdditionalElementsPlugin
 	 */
 	const AdditionalElementsPlugin = Plugin.extend("sap.ui.rta.plugin.additionalElements.AdditionalElementsPlugin", {
-		// eslint-disable-next-line object-shorthand
 		constructor: function(...aArgs) {
 			this._getMenuItemsPromise = Promise.resolve();
 			const [oPropertyBag] = aArgs;

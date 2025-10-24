@@ -115,6 +115,26 @@ sap.ui.define([
 		assert.equal(sanitizeHTML(input3), input3, "display:inline flow-root is preserved");
 	});
 
+	QUnit.test("text-decoration-line CSS property", function(assert) {
+		var inputUnderline = '<span style="text-decoration-line: underline">Underlined text</span>';
+		assert.equal(sanitizeHTML(inputUnderline), inputUnderline, "text-decoration-line: underline is preserved");
+
+		var inputOverline = '<span style="text-decoration-line: overline">Overlined text</span>';
+		assert.equal(sanitizeHTML(inputOverline), inputOverline, "text-decoration-line: overline is preserved");
+
+		var inputLineThrough = '<span style="text-decoration-line: line-through">Strikethrough text</span>';
+		assert.equal(sanitizeHTML(inputLineThrough), inputLineThrough, "text-decoration-line: line-through is preserved");
+
+		var inputNone = '<span style="text-decoration-line: none">No decoration</span>';
+		assert.equal(sanitizeHTML(inputNone), inputNone, "text-decoration-line: none is preserved");
+
+		var inputMultiple = '<span style="text-decoration-line: underline overline">Multiple decorations</span>';
+		assert.equal(sanitizeHTML(inputMultiple), inputMultiple, "text-decoration-line with multiple values is preserved");
+
+		var inputInvalid = '<span style="text-decoration-line: invalid-value">Invalid decoration</span>';
+		assert.equal(sanitizeHTML(inputInvalid), '<span style="text-decoration-line: ">Invalid decoration</span>', "invalid text-decoration-line value is stripped");
+	});
+
 	QUnit.module("Sanitizer Performance", {
 		before: function(assert) {
 			// add a custom assertion "lower than"

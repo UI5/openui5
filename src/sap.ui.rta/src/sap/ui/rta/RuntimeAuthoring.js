@@ -229,7 +229,6 @@ sap.ui.define([
 		_dependents: null,
 		_sStatus: STOPPED,
 		_bNavigationModeWarningShown: false,
-		// eslint-disable-next-line object-shorthand
 		constructor: function(...aArgs) {
 			ManagedObject.apply(this, aArgs);
 
