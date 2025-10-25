@@ -53,7 +53,7 @@ sap.ui.define([
 	 * @ui5-restricted sap.ui.fl, sap.ui.rta
 	 */
 	FlexTestAPI.getDirtyChanges = function(mPropertyBag) {
-		const sReference = FlexRuntimeInfoAPI.getFlexReference({element: mPropertyBag.selector});
+		const sReference = FlexRuntimeInfoAPI.getFlexReference({ element: mPropertyBag.selector });
 		return FlexObjectState.getDirtyFlexObjects(sReference);
 	};
 

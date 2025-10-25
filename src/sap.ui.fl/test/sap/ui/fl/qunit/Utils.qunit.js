@@ -237,7 +237,7 @@ sap.ui.define([
 		QUnit.test("getAppComponentForControl can determine the OVP special case", function(assert) {
 			const oComponent = new UIComponent();
 			const oAppComponent = new UIComponent();
-			oComponent.oComponentData = {appComponent: oAppComponent};
+			oComponent.oComponentData = { appComponent: oAppComponent };
 
 			const oDeterminedAppComponent = Utils.getAppComponentForControl(oComponent);
 
@@ -272,31 +272,31 @@ sap.ui.define([
 		});
 
 		QUnit.test("indexOfObject with array containing object", function(assert) {
-			const oObject = {a: 1, b: 2, c: 3};
-			let aArray = [{a: 4, b: 5, c: 6}, {a: 1, b: 2, c: 3}, {a: 7, b: 8, c: 9}];
+			const oObject = { a: 1, b: 2, c: 3 };
+			let aArray = [{ a: 4, b: 5, c: 6 }, { a: 1, b: 2, c: 3 }, { a: 7, b: 8, c: 9 }];
 			assert.equal(Utils.indexOfObject(aArray, oObject), 1, "the function returns the correct index");
 
-			aArray = [{a: 4, b: 5, c: 6}, {a: 7, b: 8, c: 9}, {b: 2, c: 3, a: 1}];
+			aArray = [{ a: 4, b: 5, c: 6 }, { a: 7, b: 8, c: 9 }, { b: 2, c: 3, a: 1 }];
 			assert.equal(Utils.indexOfObject(aArray, oObject), 2, "the function returns the correct index");
 		});
 
 		QUnit.test("indexOfObject with array not containing object", function(assert) {
-			let oObject = {a: 1, b: 2, c: 3};
-			let aArray = [{b: 2, c: 3}, {a: 4, b: 5, c: 6}, {a: 7, b: 8, c: 9}];
+			let oObject = { a: 1, b: 2, c: 3 };
+			let aArray = [{ b: 2, c: 3 }, { a: 4, b: 5, c: 6 }, { a: 7, b: 8, c: 9 }];
 			assert.equal(Utils.indexOfObject(aArray, oObject), -1, "the function returns the correct index");
 
-			oObject = {1: 1, b: 2};
-			aArray = [{a: 1, b: 2, c: 3}, {a: 4, b: 5, c: 6}, {a: 7, b: 8, c: 9}];
+			oObject = { 1: 1, b: 2 };
+			aArray = [{ a: 1, b: 2, c: 3 }, { a: 4, b: 5, c: 6 }, { a: 7, b: 8, c: 9 }];
 			assert.equal(Utils.indexOfObject(aArray, oObject), -1, "the function returns the correct index");
 		});
 
 		QUnit.test("indexOfObject with array containing null or undefined objects", function(assert) {
-			let oObject = {a: undefined, b: 2, c: 3};
-			let aArray = [undefined, {a: 4, b: 5, c: 6}, {a: 7, b: 8, c: 9}];
+			let oObject = { a: undefined, b: 2, c: 3 };
+			let aArray = [undefined, { a: 4, b: 5, c: 6 }, { a: 7, b: 8, c: 9 }];
 			assert.equal(Utils.indexOfObject(aArray, oObject), -1, "the function returns the correct index (not found)");
 
 			oObject = undefined;
-			aArray = [{a: 1, b: 2, c: 3}, undefined, {a: 7, b: 8, c: 9}];
+			aArray = [{ a: 1, b: 2, c: 3 }, undefined, { a: 7, b: 8, c: 9 }];
 			assert.equal(Utils.indexOfObject(aArray, oObject), 1, "the function returns the correct index");
 		});
 	});
@@ -373,30 +373,30 @@ sap.ui.define([
 		QUnit.test("can handle corrupt manifest", function(assert) {
 			assert.equal(false, Utils.isApplication({
 				"_version": "2.0.0",
-				"sap.app": {id: "id"}
+				"sap.app": { id: "id" }
 			}, true), "false if no type node in sap.app");
 			assert.equal(false, Utils.isApplication({
 				"_version": "2.0.0",
 
-				"sap.ui5": {dependencies: {
+				"sap.ui5": { dependencies: {
 					minUI5Version: "2.0.0",
 					libs: 1
-				}}
+				} }
 			}, true), "false if no sap.app node");
 		});
 
 		QUnit.test("can determine if manifest is of type application", function(assert) {
 			assert.equal(true, Utils.isApplication({
 				"_version": "2.0.0",
-				"sap.app": {type: "application"}
+				"sap.app": { type: "application" }
 			}, true));
 			assert.equal(true, Utils.isApplication({
 				"_version": "2.0.0",
-				"sap.app": {type: "application"}
+				"sap.app": { type: "application" }
 			}, true));
 			assert.equal(false, Utils.isApplication({
 				"_version": "2.0.0",
-				"sap.app": {type: "component"}
+				"sap.app": { type: "component" }
 			}, true));
 		});
 	});

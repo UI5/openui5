@@ -24,7 +24,7 @@ sap.ui.define([
 	 * IFrame renderer.
 	 * @namespace
 	 */
-	var IFrameRenderer = {apiVersion: 2};
+	var IFrameRenderer = { apiVersion: 2 };
 
 	/**
 	 * Renders the HTML for the given control, using the provided

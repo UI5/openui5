@@ -97,7 +97,7 @@ sap.ui.define([
 				]
 			});
 			this.oEmptyLayout = new VerticalLayout();
-			this.oParentLayout = new VerticalLayout({content: [this.oLayout, this.oEmptyLayout]});
+			this.oParentLayout = new VerticalLayout({ content: [this.oLayout, this.oEmptyLayout] });
 
 			this.oParentLayout.placeAt("qunit-fixture");
 			await nextUIUpdate();

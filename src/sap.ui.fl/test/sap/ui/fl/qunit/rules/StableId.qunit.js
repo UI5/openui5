@@ -50,19 +50,19 @@ sap.ui.define([
 				this.oDialog = new Dialog({
 					id: this.oComponent.createId("DialogWithComponent"),
 					showHeader: false,
-					content: [this.oButton0 = new Button({text: "button inside dialog with unstable id"})],
+					content: [this.oButton0 = new Button({ text: "button inside dialog with unstable id" })],
 					contentHeight: "800px",
 					contentWidth: "600px"
 				});
 				this.oPopover = new Popover({
-					content: [new Button({text: "button inside popover with unstable id"})],
+					content: [new Button({ text: "button inside popover with unstable id" })],
 					showHeader: false,
 					contentWidth: "270px"
 				});
 				// popup with adaptation disabled
 				this.oPopoverAdaptationDisabled = new Popover({
 					id: this.oComponent.createId("PopoverAdaptationDisabled"),
-					content: [new Button({text: "button inside popover with unstable id"})],
+					content: [new Button({ text: "button inside popover with unstable id" })],
 					showHeader: false,
 					contentWidth: "270px"
 				});
@@ -77,7 +77,7 @@ sap.ui.define([
 			// popup without component
 			this.oDialogWithoutComponent = new Dialog({
 				showHeader: false,
-				content: [this.oButton1 = new Button({text: "button inside dialog with unstable id"})],
+				content: [this.oButton1 = new Button({ text: "button inside dialog with unstable id" })],
 				contentHeight: "800px",
 				contentWidth: "600px"
 			});
@@ -117,7 +117,7 @@ sap.ui.define([
 		}
 	}, function() {
 		QUnit.test("stableId check", function(assert) {
-			return RuleAnalyzer.analyze({type: "global"},
+			return RuleAnalyzer.analyze({ type: "global" },
 				[{
 					libName: "sap.ui.fl",
 					ruleId: "stableId"

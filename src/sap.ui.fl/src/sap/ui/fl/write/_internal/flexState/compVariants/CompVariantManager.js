@@ -692,7 +692,7 @@ sap.ui.define([
 	 * @returns {sap.ui.fl.apply._internal.flexObjects.CompVariant} The reverted variant
 	 */
 	CompVariantManager.revert = function(mPropertyBag) {
-		const oVariant = CompVariantManagementState.getVariant(Object.assign({includeDeleted: true}, mPropertyBag));
+		const oVariant = CompVariantManagementState.getVariant(Object.assign({ includeDeleted: true }, mPropertyBag));
 
 		const oVariantRevertData = oVariant.getRevertData().pop();
 		oVariant.removeRevertData(oVariantRevertData);

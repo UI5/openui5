@@ -72,7 +72,7 @@ sap.ui.define([
 	 */
 	CutPaste.prototype.init = function(...aArgs) {
 		ControlCutPaste.prototype.init.apply(this, aArgs);
-		this.setElementMover(new RTAElementMover({commandFactory: this.getCommandFactory()}));
+		this.setElementMover(new RTAElementMover({ commandFactory: this.getCommandFactory() }));
 	};
 
 	/**

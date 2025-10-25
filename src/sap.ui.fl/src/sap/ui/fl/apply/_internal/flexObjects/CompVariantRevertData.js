@@ -22,7 +22,7 @@ sap.ui.define([
 	return RevertData.extend("sap.ui.fl.apply._internal.flexObjects.CompVariantRevertData", {
 		metadata: {
 			properties: {
-				change: {type: "object" } // "sap.ui.fl.apply._internal.flexObjects.FlexObject"
+				change: { type: "object" } // "sap.ui.fl.apply._internal.flexObjects.FlexObject"
 			}
 		}
 	});

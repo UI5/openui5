@@ -85,11 +85,11 @@ sap.ui.define([
 				oParent.addContent(
 					new VBox(`box${i}`, {
 						items: [
-							new Label(`Label${i}`, {text: `Control ${i}`}),
+							new Label(`Label${i}`, { text: `Control ${i}` }),
 							new DatePicker(`DatePicker${i}`),
 							new Slider(`Slider${i}`),
 							new RatingIndicator(`RatingIndicator${i}`),
-							new Button(`Button${i}`, {text: `Control ${i}`})
+							new Button(`Button${i}`, { text: `Control ${i}` })
 						]
 					})
 				);

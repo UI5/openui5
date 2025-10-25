@@ -16,7 +16,7 @@ sap.ui.define([
 	var sandbox = sinon.createSandbox();
 
 	// shortcut for sap.ui.core.ValueState
-	var {ValueState} = coreLibrary;
+	var { ValueState } = coreLibrary;
 
 	QUnit.module("sap.ui.fl.write._internal.transport.TransportDialog", {
 		beforeEach() {
@@ -42,7 +42,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("setLrepObject", function(assert) {
-			this.oDialog.setLrepObject({type: "variant", name: "id_1414740501651_318", namespace: ""});
+			this.oDialog.setLrepObject({ type: "variant", name: "id_1414740501651_318", namespace: "" });
 			assert.equal(this.oDialog.getProperty("lrepObject").name, "id_1414740501651_318");
 		});
 
@@ -95,7 +95,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("_onPackageChangeSuccess - localonly flag", function(assert) {
-			this.oDialog._onPackageChangeSuccess({localonly: true});
+			this.oDialog._onPackageChangeSuccess({ localonly: true });
 			assert.equal(this.oDialog._oTransport.getEnabled(), false);
 		});
 
@@ -345,7 +345,7 @@ sap.ui.define([
 
 		QUnit.test("_oPackage - liveChange - changing transport button", function(assert) {
 			assert.equal(this.oDialog._oTransport.getEnabled(), false);
-			this.oDialog._oPackage.fireLiveChange({liveValue: "live"});
+			this.oDialog._oPackage.fireLiveChange({ liveValue: "live" });
 			assert.equal(this.oDialog._oTransport.getEnabled(), true);
 		});
 

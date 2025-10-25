@@ -34,14 +34,14 @@ sap.ui.define([
 	"use strict";
 
 	// shortcut for sap.ui.core.TitleLevel
-	var {TitleLevel} = coreLibrary;
+	var { TitleLevel } = coreLibrary;
 
 	var initFormWithGivenLayout = async function(assert, oLayout) {
 		var fnDone = assert.async();
 
 		this.oElement1 = new FormElement({
-			label: new Label({text: "Label0"}),
-			fields: [new Input({required: true})]
+			label: new Label({ text: "Label0" }),
+			fields: [new Input({ required: true })]
 		});
 
 		this.oFormContainer1 = new FormContainer({
@@ -49,8 +49,8 @@ sap.ui.define([
 			formElements: [
 				this.oElement1,
 				new FormElement({
-					label: new Label({text: "Label1"}),
-					fields: [new Input({required: true})]
+					label: new Label({ text: "Label1" }),
+					fields: [new Input({ required: true })]
 				})
 			]
 		});
@@ -60,28 +60,28 @@ sap.ui.define([
 			formElements: [
 				new FormElement({
 					label: "Label0",
-					fields: [new Input({required: true})]
+					fields: [new Input({ required: true })]
 				}),
 				new FormElement({
-					label: new Label({text: "Label1"}),
-					fields: [new Input({required: true})]
+					label: new Label({ text: "Label1" }),
+					fields: [new Input({ required: true })]
 				})
 			]
 		});
 
 		this.oFormContainer3 = new FormContainer({
-			title: new Title({text: "Container3", level: TitleLevel.H3}),
+			title: new Title({ text: "Container3", level: TitleLevel.H3 }),
 			tooltip: "Container tooltip",
 			expandable: true,
 			formElements: [
 				new FormElement({
 					fields: [
-						new CheckBox({text: "one"}),
-						new CheckBox({text: "two"})
+						new CheckBox({ text: "one" }),
+						new CheckBox({ text: "two" })
 					]
 				}),
 				new FormElement({
-					fields: [new CheckBox({text: "three"})]
+					fields: [new CheckBox({ text: "three" })]
 				})
 			]
 		});

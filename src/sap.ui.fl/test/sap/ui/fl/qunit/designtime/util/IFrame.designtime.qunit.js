@@ -38,7 +38,7 @@ sap.ui.define([
 					allowSameOrigin: true
 				}
 			});
-			this.oLabel = new Label("labelId", {text: "myInitialTitle"});
+			this.oLabel = new Label("labelId", { text: "myInitialTitle" });
 			this.oIFrame.placeAt("qunit-fixture");
 		},
 		afterEach() {

@@ -139,11 +139,11 @@ sap.ui.define([
 				]
 			};
 			sandbox.stub(FlexConfiguration, "getFlexibilityServices").returns([
-				{connector: "KeyUserConnector", layers: [Layer.CUSTOMER], url: "/flexKeyUser"}
+				{ connector: "KeyUserConnector", layers: [Layer.CUSTOMER], url: "/flexKeyUser" }
 			]);
 
 			var sUrl = "/flexKeyUser/flex/keyuser/v2/translation/sourcelanguages/reference";
-			var oStubSendRequest = sandbox.stub(InitialConnector, "sendRequest").resolves({response: aReturnedLanguages});
+			var oStubSendRequest = sandbox.stub(InitialConnector, "sendRequest").resolves({ response: aReturnedLanguages });
 			sandbox.stub(FlUtils, "getAppComponentForControl").returns(this.oAppComponent);
 			sandbox.stub(ManifestUtils, "getFlexReferenceForControl").returns("reference");
 
@@ -166,12 +166,12 @@ sap.ui.define([
 				layer: Layer.CUSTOMER
 			};
 			sandbox.stub(FlexConfiguration, "getFlexibilityServices").returns([
-				{connector: "KeyUserConnector", layers: [Layer.CUSTOMER], url: "/flexKeyUser"}
+				{ connector: "KeyUserConnector", layers: [Layer.CUSTOMER], url: "/flexKeyUser" }
 			]);
 
 			var sUrl = "/flexKeyUser/flex/keyuser/v2/translation/texts/reference?sourceLanguage=en-US&targetLanguage=de-DE";
 			sandbox.stub(ManifestUtils, "getFlexReferenceForControl").returns("reference");
-			var oStubSendRequest = sandbox.stub(InitialConnector, "sendRequest").resolves({response: {}});
+			var oStubSendRequest = sandbox.stub(InitialConnector, "sendRequest").resolves({ response: {} });
 			return TranslationAPI.getTexts(mPropertyBag).then(function() {
 				assert.equal(oStubSendRequest.getCall(0).args[0], sUrl, "the request has the correct url");
 				assert.equal(oStubSendRequest.getCall(0).args[1], "GET", "the method is correct");
@@ -185,11 +185,11 @@ sap.ui.define([
 				payload: {}
 			};
 			sandbox.stub(FlexConfiguration, "getFlexibilityServices").returns([
-				{connector: "KeyUserConnector", layers: [Layer.CUSTOMER], url: "/flexKeyUser"}
+				{ connector: "KeyUserConnector", layers: [Layer.CUSTOMER], url: "/flexKeyUser" }
 			]);
 
 			var sUrl = "/flexKeyUser/flex/keyuser/v2/translation/texts";
-			var oStubSendRequest = sandbox.stub(InitialConnector, "sendRequest").resolves({response: {}});
+			var oStubSendRequest = sandbox.stub(InitialConnector, "sendRequest").resolves({ response: {} });
 			return TranslationAPI.uploadTranslationTexts(mPropertyBag).then(function() {
 				assert.equal(oStubSendRequest.getCall(0).args[0], sUrl, "the request has the correct url");
 				assert.equal(oStubSendRequest.getCall(0).args[1], "POST", "the method is correct");

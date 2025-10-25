@@ -26,15 +26,18 @@
 		},
 		"models": {
 			"": {
-				"type": "sap.ui.model.json.JSONModel"
+				"type": "sap.ui.model.json.JSONModel",
+				"preload": true
 			},
 			"myV2Model": {
 				"type": "sap.ui.model.odata.v2.ODataModel",
-				"uri": "./some/odata/service/"
+				"uri": "./some/odata/service/",
+				"preload": true
 			},
 			"myV4Model": {
 				"type": "sap.ui.model.odata.v4.ODataModel",
-				"uri": "./some/odata/service/"
+				"uri": "./some/odata/service/",
+				"preload": true
 			}
 		}
 	}

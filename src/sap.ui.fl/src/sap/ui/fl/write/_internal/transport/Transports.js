@@ -55,7 +55,7 @@ sap.ui.define([
 			if (FlexUtils.getClient()) {
 				mParameters["sap-client"] = FlexUtils.getClient();
 			}
-			var sGetTransportsUrl = InitialUtils.getUrl(ROUTES.ACTION_GET_TRANSPORTS, {url: FlexUtils.getLrepUrl()}, mParameters);
+			var sGetTransportsUrl = InitialUtils.getUrl(ROUTES.ACTION_GET_TRANSPORTS, { url: FlexUtils.getLrepUrl() }, mParameters);
 			// decode url before sending to ABAP back end which does not expect encoded special character such as "/" in the package name
 			sGetTransportsUrl = decodeURIComponent(sGetTransportsUrl);
 			return InitialUtils.sendRequest(sGetTransportsUrl, "GET").then(function(oResponse) {
@@ -92,10 +92,10 @@ sap.ui.define([
 			if (!mParameters.reference) {
 				return Promise.reject(new Error("no reference provided as attribute of mParameters"));
 			}
-			var mUrlParams = FlexUtils.getClient() ? {"sap-client": FlexUtils.getClient()} : {};
+			var mUrlParams = FlexUtils.getClient() ? { "sap-client": FlexUtils.getClient() } : {};
 
-			var sMakeChangesTransportableUrl = InitialUtils.getUrl(ROUTES.ACTION_MAKE_CHANGE_TRANSPORTABLE, {url: FlexUtils.getLrepUrl()}, mUrlParams);
-			var sTokenUrl = InitialUtils.getUrl(ROUTES.ACTION_GET_TOKEN, {url: FlexUtils.getLrepUrl()});
+			var sMakeChangesTransportableUrl = InitialUtils.getUrl(ROUTES.ACTION_MAKE_CHANGE_TRANSPORTABLE, { url: FlexUtils.getLrepUrl() }, mUrlParams);
+			var sTokenUrl = InitialUtils.getUrl(ROUTES.ACTION_GET_TOKEN, { url: FlexUtils.getLrepUrl() });
 			var oRequestOption = WriteUtils.getRequestOptions(
 				ApplyLrepConnector,
 				sTokenUrl,

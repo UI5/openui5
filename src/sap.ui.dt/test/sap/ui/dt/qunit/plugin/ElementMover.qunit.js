@@ -45,43 +45,43 @@ sap.ui.define([
 		}
 	}, function() {
 		QUnit.test("Calling a _compareSourceAndTarget method, when the aggregation property of the source and target is same", function(assert) {
-			assert.strictEqual(this.oElementMover._compareSourceAndTarget({aggregation: "formElements"}, {aggregation: "formElements"}), true, "then there is no move operation and the command stack is empty");
+			assert.strictEqual(this.oElementMover._compareSourceAndTarget({ aggregation: "formElements" }, { aggregation: "formElements" }), true, "then there is no move operation and the command stack is empty");
 		});
 
 		QUnit.test("Calling a _compareSourceAndTarget method, when the aggregation property of the source and target is not same", function(assert) {
-			assert.strictEqual(this.oElementMover._compareSourceAndTarget({aggregation: "formElements"}, {aggregation: "content"}), false, "then there is a move operation and the command stack has been pushed with a move operation");
+			assert.strictEqual(this.oElementMover._compareSourceAndTarget({ aggregation: "formElements" }, { aggregation: "content" }), false, "then there is a move operation and the command stack has been pushed with a move operation");
 		});
 
 		QUnit.test("Calling a _compareSourceAndTarget method, when the index of the source and target is same", function(assert) {
-			assert.strictEqual(this.oElementMover._compareSourceAndTarget({index: 0}, {index: 0}), true, "then there is no move operation and the command stack is empty");
+			assert.strictEqual(this.oElementMover._compareSourceAndTarget({ index: 0 }, { index: 0 }), true, "then there is no move operation and the command stack is empty");
 		});
 
 		QUnit.test("Calling a _compareSourceAndTarget method, when the index of the source and target is not same", function(assert) {
-			assert.strictEqual(this.oElementMover._compareSourceAndTarget({index: 0}, {index: 1}), false, "then there is a move operation and the command stack has been pushed with a move operation");
+			assert.strictEqual(this.oElementMover._compareSourceAndTarget({ index: 0 }, { index: 1 }), false, "then there is a move operation and the command stack has been pushed with a move operation");
 		});
 
 		QUnit.test("Calling a _compareSourceAndTarget method, when the parent of GroupElement is same", function(assert) {
-			assert.strictEqual(this.oElementMover._compareSourceAndTarget({parent: this.oGroup1}, {parent: this.oGroup1}), true, "then there is no move operation and the command stack is empty");
+			assert.strictEqual(this.oElementMover._compareSourceAndTarget({ parent: this.oGroup1 }, { parent: this.oGroup1 }), true, "then there is no move operation and the command stack is empty");
 		});
 
 		QUnit.test("Calling a _compareSourceAndTarget method, when the parent of GroupElement is not same", function(assert) {
-			assert.strictEqual(this.oElementMover._compareSourceAndTarget({parent: this.oGroup1}, {parent: this.oGroup2}), false, "then there is a move operation and the command stack has been pushed with a move operation");
+			assert.strictEqual(this.oElementMover._compareSourceAndTarget({ parent: this.oGroup1 }, { parent: this.oGroup2 }), false, "then there is a move operation and the command stack has been pushed with a move operation");
 		});
 
 		QUnit.test("Calling a _compareSourceAndTarget method, when the publicAggregation aggregation property of the source and target is same", function(assert) {
-			assert.strictEqual(this.oElementMover._compareSourceAndTarget({publicAggregation: "formElements"}, {publicAggregation: "formElements"}), true, "then there is no move operation and the command stack is empty");
+			assert.strictEqual(this.oElementMover._compareSourceAndTarget({ publicAggregation: "formElements" }, { publicAggregation: "formElements" }), true, "then there is no move operation and the command stack is empty");
 		});
 
 		QUnit.test("Calling a _compareSourceAndTarget method, when the publicAggregation property of the source and target is not same", function(assert) {
-			assert.strictEqual(this.oElementMover._compareSourceAndTarget({publicAggregation: "formElements"}, {publicAggregation: "content"}), false, "then there is a move operation and the command stack has been pushed with a move operation");
+			assert.strictEqual(this.oElementMover._compareSourceAndTarget({ publicAggregation: "formElements" }, { publicAggregation: "content" }), false, "then there is a move operation and the command stack has been pushed with a move operation");
 		});
 
 		QUnit.test("Calling a _compareSourceAndTarget method, when the publicParent of GroupElement is same", function(assert) {
-			assert.strictEqual(this.oElementMover._compareSourceAndTarget({publicParent: this.oGroup1}, {publicParent: this.oGroup1}), true, "then there is no move operation and the command stack is empty");
+			assert.strictEqual(this.oElementMover._compareSourceAndTarget({ publicParent: this.oGroup1 }, { publicParent: this.oGroup1 }), true, "then there is no move operation and the command stack is empty");
 		});
 
 		QUnit.test("Calling a _compareSourceAndTarget method, when the publicParent of GroupElement is not same", function(assert) {
-			assert.strictEqual(this.oElementMover._compareSourceAndTarget({publicParent: this.oGroup1}, {publicParent: this.oGroup2}), false, "then there is a move operation and the command stack has been pushed with a move operation");
+			assert.strictEqual(this.oElementMover._compareSourceAndTarget({ publicParent: this.oGroup1 }, { publicParent: this.oGroup2 }), false, "then there is a move operation and the command stack has been pushed with a move operation");
 		});
 
 		QUnit.test("Calling a _compareSourceAndTarget method, when all the properties of source and target are same", function(assert) {

@@ -149,7 +149,7 @@ sap.ui.define([
 					}
 				});
 				const oStorageStub = sandbox.stub(Storage, "getSeenFeatureIds").resolves(["feature1"]);
-				const oSeenFeatures = await FeaturesAPI.getSeenFeatureIds({layer: Layer.CUSTOMER});
+				const oSeenFeatures = await FeaturesAPI.getSeenFeatureIds({ layer: Layer.CUSTOMER });
 				assert.deepEqual(oSeenFeatures, bValueToBeSet ? ["feature1"] : [], "then the correct seen features are returned");
 				if (bValueToBeSet) {
 					assert.strictEqual(oStorageStub.getCall(0).args[0].layer, Layer.CUSTOMER, "the correct layer is passed");

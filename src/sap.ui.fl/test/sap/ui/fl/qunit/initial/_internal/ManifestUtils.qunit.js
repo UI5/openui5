@@ -48,13 +48,13 @@ sap.ui.define([
 		});
 
 		QUnit.test("with a ComponentSelector", function(assert) {
-			const sFlexReference = ManifestUtils.getFlexReferenceForSelector({appId: "myFancyAppId"});
+			const sFlexReference = ManifestUtils.getFlexReferenceForSelector({ appId: "myFancyAppId" });
 			assert.strictEqual(sFlexReference, "myFancyAppId", "the appId is returned as is");
 		});
 
 		QUnit.test("with an ElementSelector", function(assert) {
 			sandbox.stub(ManifestUtils, "getFlexReferenceForControl").returnsArg(0);
-			const sFlexReference = ManifestUtils.getFlexReferenceForSelector({appComponent: "myFancyAppId"});
+			const sFlexReference = ManifestUtils.getFlexReferenceForSelector({ appComponent: "myFancyAppId" });
 			assert.strictEqual(sFlexReference, "myFancyAppId", "the appComponent is passed to getFlexReferenceForControl");
 		});
 

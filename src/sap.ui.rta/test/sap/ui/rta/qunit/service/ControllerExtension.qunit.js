@@ -79,7 +79,7 @@ sap.ui.define([
 			this.oCreateChangeParameter = mPropertyBag.changeSpecificData;
 			return {
 				convertToFileContent() {
-					return {definition: "definition"};
+					return { definition: "definition" };
 				}
 			};
 		}.bind(this));
@@ -122,7 +122,7 @@ sap.ui.define([
 				scenario: "scenario"
 			});
 			return this.oControllerExtension.add("coding/foo.js", this.oView.getId()).then(function(oDefinition) {
-				assert.deepEqual(oDefinition, {definition: "definition"}, "the function returns the definition of the change");
+				assert.deepEqual(oDefinition, { definition: "definition" }, "the function returns the definition of the change");
 				assert.strictEqual(this.iCreateChangeCounter, 1, "and ChangesWriteAPI.create was called once");
 				assert.strictEqual(this.iAddChangeCounter, 1, "and PersistenceWriteAPI.add was called once");
 				assert.strictEqual(this.oCreateChangeParameter.changeType, "codeExt", "the changeType was set correctly");
@@ -152,7 +152,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("with correct parameters and developer mode = false", function(assert) {
-			this.oRta.setFlexSettings({developerMode: false});
+			this.oRta.setFlexSettings({ developerMode: false });
 			assert.expect(3);
 
 			return this.oControllerExtension.add("foo.js").then(function() {
@@ -208,7 +208,7 @@ sap.ui.define([
 				scenario: "scenario"
 			});
 			const oDefinition = await this.oControllerExtension.add("coding/foo.js", this.oView.getId());
-			assert.deepEqual(oDefinition, {definition: "definition"}, "the function returns the definition of the change");
+			assert.deepEqual(oDefinition, { definition: "definition" }, "the function returns the definition of the change");
 			assert.strictEqual(
 				this.oCreateChangeParameter.controllerName,
 				"module:testdata/TestController.controller",
@@ -271,7 +271,7 @@ sap.ui.define([
 			const sPath = "sap/ui/rta/service/ControllerExtension";
 			sandbox.stub(this.oViewOverlay.getDesignTimeMetadata(), "getControllerExtensionTemplate").returns(sPath);
 			const sUrl = `${sap.ui.require.toUrl(sPath)}-dbg.js`;
-			fakeFetch(this.oFetchStub, [{path: sUrl, value: "abc"}, {}]);
+			fakeFetch(this.oFetchStub, [{ path: sUrl, value: "abc" }, {}]);
 			return this.oControllerExtension.getTemplate(this.oView.getId()).then(function(sTemplate) {
 				assert.equal(sTemplate, "abc", "the service returned the template");
 			});
@@ -281,8 +281,8 @@ sap.ui.define([
 			const sPath = "sap/ui/rta/service/ControllerExtension";
 			sandbox.stub(this.oViewOverlay.getDesignTimeMetadata(), "getControllerExtensionTemplate").returns(sPath);
 			fakeFetch(this.oFetchStub, [
-				{path: `${sap.ui.require.toUrl(sPath)}-dbg.js`, status: 400},
-				{path: `${sap.ui.require.toUrl(sPath)}.js`, value: "def"}
+				{ path: `${sap.ui.require.toUrl(sPath)}-dbg.js`, status: 400 },
+				{ path: `${sap.ui.require.toUrl(sPath)}.js`, value: "def" }
 			]);
 
 			return this.oControllerExtension.getTemplate(this.oView.getId()).then(function(sTemplate) {
@@ -302,8 +302,8 @@ sap.ui.define([
 		QUnit.test("with template available that can't be found", function(assert) {
 			sandbox.stub(this.oViewOverlay.getDesignTimeMetadata(), "getControllerExtensionTemplate").returns("undefined");
 			fakeFetch(this.oFetchStub, [
-				{path: `${sap.ui.require.toUrl("undefined")}-dbg.js`, status: 404},
-				{path: `${sap.ui.require.toUrl("undefined")}.js`, status: 404}
+				{ path: `${sap.ui.require.toUrl("undefined")}-dbg.js`, status: 404 },
+				{ path: `${sap.ui.require.toUrl("undefined")}.js`, status: 404 }
 			]);
 			return this.oControllerExtension.getTemplate(this.oView.getId())
 			.then(function() {

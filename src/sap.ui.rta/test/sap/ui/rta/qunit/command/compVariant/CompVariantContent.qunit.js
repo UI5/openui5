@@ -70,7 +70,7 @@ sap.ui.define([
 					return [];
 				},
 				getContent() {
-					return { myKey: {content: "oldContent"} };
+					return { myKey: { content: "oldContent" } };
 				},
 				getDirtyStatus() {
 					return false;
@@ -79,7 +79,7 @@ sap.ui.define([
 			var mExpectedProperties = {
 				id: "myId",
 				control: this.oControl,
-				content: {myKey: this.oNewContent},
+				content: { myKey: this.oNewContent },
 				generator: "sap.ui.rta.command",
 				command: "compVariantContent",
 				layer: Layer.CUSTOMER
@@ -102,14 +102,14 @@ sap.ui.define([
 				assert.equal(oSetModifiedStub.callCount, 1, "the setModified was called..");
 				assert.equal(oSetModifiedStub.lastCall.args[0], true, "and set to true");
 				assert.equal(oCommand.getIsModifiedBefore(), false, "isModifiedBefore value stored correctly");
-				assertApplyVariantByPersistencyKeyCalled.call(this, assert, oCommand, {myKey: this.oNewContent});
+				assertApplyVariantByPersistencyKeyCalled.call(this, assert, oCommand, { myKey: this.oNewContent });
 
 				return oCommand.undo();
 			}.bind(this)).then(function() {
 				assert.equal(oUndoVariantFlAPIStub.callCount, 1, "the undo function was called");
 				assert.equal(oSetModifiedStub.callCount, 2, "the setModified was called again..");
 				assert.equal(oSetModifiedStub.lastCall.args[0], false, "and set to false");
-				assertApplyVariantByPersistencyKeyCalled.call(this, assert, oCommand, {myKey: this.oOldContent});
+				assertApplyVariantByPersistencyKeyCalled.call(this, assert, oCommand, { myKey: this.oOldContent });
 
 				return oCommand.execute();
 			}.bind(this)).then(function() {
@@ -118,7 +118,7 @@ sap.ui.define([
 				assert.equal(oSetModifiedStub.callCount, 3, "the setModified was called again..");
 				assert.equal(oSetModifiedStub.lastCall.args[0], true, "and set to true");
 				assert.equal(oCommand.getIsModifiedBefore(), false, "isModifiedBefore value stored correctly");
-				assertApplyVariantByPersistencyKeyCalled.call(this, assert, oCommand, {myKey: this.oNewContent});
+				assertApplyVariantByPersistencyKeyCalled.call(this, assert, oCommand, { myKey: this.oNewContent });
 			}.bind(this));
 		});
 
@@ -132,7 +132,7 @@ sap.ui.define([
 					return [];
 				},
 				getContent() {
-					return { content: "oldContent"};
+					return { content: "oldContent" };
 				},
 				getDirtyStatus() {
 					return false;

@@ -79,7 +79,7 @@ sap.ui.define([
 			}
 
 			return oResultantParameters;
-		}, {updateRequired: false, parameters: []});
+		}, { updateRequired: false, parameters: [] });
 	}
 
 	function checkAndUpdateURLParameters(oModel, sHash) {
@@ -233,7 +233,7 @@ sap.ui.define([
 	 * @private
 	 */
 	function getVariantIndexInURL(mPropertyBag) {
-		var mReturnObject = {index: -1};
+		var mReturnObject = { index: -1 };
 		var oModel = mPropertyBag.model;
 
 		// if ushell container is not present an empty object is returned
@@ -273,7 +273,7 @@ sap.ui.define([
 			mReturnObject,
 			mURLParameters
 			&& mURLParameters[VariantUtil.VARIANT_TECHNICAL_PARAMETER]
-			&& {parameters: mURLParameters[VariantUtil.VARIANT_TECHNICAL_PARAMETER]}
+			&& { parameters: mURLParameters[VariantUtil.VARIANT_TECHNICAL_PARAMETER] }
 		);
 	}
 
@@ -402,7 +402,7 @@ sap.ui.define([
 			// which will also destroy the variant model anyway,
 			// but this is just to ensure the model is in sync with the variants state (which is persisted)
 			mPropertyBag.model.destroy();
-			mPropertyBag.model.oComponentDestroyObserver.unobserve(mPropertyBag.model.oAppComponent, {destroy: true});
+			mPropertyBag.model.oComponentDestroyObserver.unobserve(mPropertyBag.model.oAppComponent, { destroy: true });
 			mPropertyBag.model.oComponentDestroyObserver.destroy();
 		}
 
@@ -411,7 +411,7 @@ sap.ui.define([
 
 		if (!mPropertyBag.model.oComponentDestroyObserver && mPropertyBag.model.oAppComponent instanceof Component) {
 			mPropertyBag.model.oComponentDestroyObserver = new ManagedObjectObserver(observerHandler.bind(null));
-			mPropertyBag.model.oComponentDestroyObserver.observe(mPropertyBag.model.oAppComponent, {destroy: true});
+			mPropertyBag.model.oComponentDestroyObserver.observe(mPropertyBag.model.oAppComponent, { destroy: true });
 		}
 	};
 
@@ -519,18 +519,18 @@ sap.ui.define([
 
 		var oControlPropertyObserver = new ManagedObjectObserver(function(oEvent) {
 			if (oEvent.current === true && oEvent.old === false) {
-				oEvent.object.attachEvent(sContextChangeEvent, {model: mPropertyBag.model}, handleContextChange);
+				oEvent.object.attachEvent(sContextChangeEvent, { model: mPropertyBag.model }, handleContextChange);
 			} else if (oEvent.current === false && oEvent.old === true) {
 				oEvent.object.detachEvent(sContextChangeEvent, handleContextChange);
 			}
 		});
 
-		oControlPropertyObserver.observe(mPropertyBag.vmControl, {properties: ["resetOnContextChange"]});
+		oControlPropertyObserver.observe(mPropertyBag.vmControl, { properties: ["resetOnContextChange"] });
 
 		mPropertyBag.model._oHashData.controlPropertyObservers.push(oControlPropertyObserver);
 
 		if (mPropertyBag.vmControl.getResetOnContextChange() !== false) {
-			mPropertyBag.vmControl.attachEvent(sContextChangeEvent, {model: mPropertyBag.model}, handleContextChange);
+			mPropertyBag.vmControl.attachEvent(sContextChangeEvent, { model: mPropertyBag.model }, handleContextChange);
 		}
 	};
 

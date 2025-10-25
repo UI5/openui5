@@ -648,7 +648,7 @@ sap.ui.define([
 
 			this.toggleStyleClass("sapUiDtOverlaySelectable", bSelectable);
 			this.setProperty("selectable", bSelectable);
-			this.fireSelectableChange({selectable: bSelectable});
+			this.fireSelectableChange({ selectable: bSelectable });
 		}
 		this.setFocusable(bSelectable);
 		return this;
@@ -716,7 +716,7 @@ sap.ui.define([
 			this.toggleStyleClass("sapUiDtOverlayMovable", bMovable);
 
 			this.setProperty("movable", bMovable);
-			this.fireMovableChange({movable: bMovable});
+			this.fireMovableChange({ movable: bMovable });
 
 			this.getDomRef()?.[bMovable ? "setAttribute" : "removeAttribute"]("draggable", bMovable);
 		}
@@ -832,7 +832,7 @@ sap.ui.define([
 	 */
 	ElementOverlay.prototype._onElementDestroyed = function(oEvent) {
 		var sElementId = oEvent.getSource().getTarget();
-		this.fireElementDestroyed({targetId: sElementId});
+		this.fireElementDestroyed({ targetId: sElementId });
 		if (this._bInit) {
 			this.destroy();
 		} else {

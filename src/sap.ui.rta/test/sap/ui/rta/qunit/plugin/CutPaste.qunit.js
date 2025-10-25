@@ -95,7 +95,7 @@ function(
 			var oMockOverlay = {
 				getDesignTimeMetadata() {}
 			};
-			var oResponsibleElementOverlay = {type: "responsibleElementOverlay"};
+			var oResponsibleElementOverlay = { type: "responsibleElementOverlay" };
 
 			sandbox.stub(this.CutPastePlugin, "isResponsibleElementActionAvailable").returns(true);
 			sandbox.stub(this.CutPastePlugin, "getResponsibleElementOverlay").returns(oResponsibleElementOverlay);

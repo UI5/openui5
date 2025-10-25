@@ -56,7 +56,7 @@ sap.ui.define([
 
 		async getSeenFeatureIds(mPropertyBag) {
 			const sUrl = InitialUtils.getUrl(this.ROUTES.SEEN_FEATURES, mPropertyBag);
-			const oResult = await InitialUtils.sendRequest(sUrl, "GET", {initialConnector: InitialConnector});
+			const oResult = await InitialUtils.sendRequest(sUrl, "GET", { initialConnector: InitialConnector });
 			return oResult.response?.seenFeatureIds;
 		},
 

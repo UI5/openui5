@@ -311,7 +311,7 @@ sap.ui.define([
 		// the modified flag might be changed before the dialog is closed, so it has to be saved here already
 		var bIsModified = oVariantManagementControl.getModified();
 
-		return oAction.handler(oControl, {styleClass: Utils.getRtaStyleClassName()}).then(function(aChangeContentData) {
+		return oAction.handler(oControl, { styleClass: Utils.getRtaStyleClassName() }).then(function(aChangeContentData) {
 			if (aChangeContentData && aChangeContentData.length) {
 				var sPersistencyKey = aChangeContentData[0].changeSpecificData.content.persistencyKey;
 				var aVariants = oVariantManagementControl.getAllVariants();

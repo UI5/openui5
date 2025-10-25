@@ -56,8 +56,8 @@ sap.ui.define([
 				commandFactory: new CommandFactory()
 			});
 
-			this.oButton = new Button("button", {text: "Button"});
-			this.oButtonNoStableID = new Button({text: "Button without stable id"});
+			this.oButton = new Button("button", { text: "Button" });
+			this.oButtonNoStableID = new Button({ text: "Button without stable id" });
 			this.oVerticalLayout = new VerticalLayout({
 				content: [this.oButton, this.oButtonNoStableID]
 			}).placeAt("qunit-fixture");

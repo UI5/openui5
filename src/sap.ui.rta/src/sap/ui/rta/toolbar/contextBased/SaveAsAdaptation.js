@@ -34,7 +34,7 @@ sap.ui.define([
 	"use strict";
 
 	// shortcut for sap.ui.core.ValueState
-	var {ValueState} = coreLibrary;
+	var { ValueState } = coreLibrary;
 
 	/**
 	 * Controller for the <code>sap.ui.rta.toolbar.contextBased.SaveAsAdaptation</code> controls.
@@ -122,7 +122,7 @@ sap.ui.define([
 			roles: oDisplayedAdaptation.contexts.role
 		};
 		this.getToolbar().getControl("addAdaptationDialog--saveAdaptation-title-input").setValue(this._mEditProperties.title);
-		this._oContextComponentInstance.setSelectedContexts({role: this._mEditProperties.roles});
+		this._oContextComponentInstance.setSelectedContexts({ role: this._mEditProperties.roles });
 	}
 
 	// ------ formatting ------
@@ -198,7 +198,7 @@ sap.ui.define([
 				contextBasedAdaptation: oContextBasedAdaptation
 			}).then(function() {
 				BusyIndicator.hide();
-				this.getToolbar().fireEvent("switchAdaptation", {adaptationId: oContextBasedAdaptation.id, trigger: "SaveAs"});
+				this.getToolbar().fireEvent("switchAdaptation", { adaptationId: oContextBasedAdaptation.id, trigger: "SaveAs" });
 				Measurement.end("onCBASaveAsAdaptation");
 				Measurement.getActive() && Log.info(`onCBASaveAsAdaptation: ${Measurement.getMeasurement("onCBASaveAsAdaptation").time} ms`);
 			}.bind(this)).catch(function(oError) {

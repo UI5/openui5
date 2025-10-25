@@ -50,7 +50,7 @@ sap.ui.define([
 
 			// add draft
 			if (!_doesDraftExistInVersions(aVersions) && bDraftAvailable) {
-				aVersions.splice(0, 0, {version: Version.Number.Draft, type: Version.Type.Draft, filenames: [], isPublished: false});
+				aVersions.splice(0, 0, { version: Version.Number.Draft, type: Version.Type.Draft, filenames: [], isPublished: false });
 			}
 
 			// remove draft

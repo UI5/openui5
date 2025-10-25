@@ -26,7 +26,7 @@ sap.ui.require([
 			height: "2000px"
 		});
 		oPanel.placeAt("content");
-		const oLastElement = new Button("button", {text: "sampleButton"});
+		const oLastElement = new Button("button", { text: "sampleButton" });
 		PerformanceTestUtil.createNestedPanels(oPanel, "content", 50, oLastElement);
 		await nextUIUpdate();
 		window.fnResolve(PerformanceTestUtil.startDesignTime(oPanel, "button"));

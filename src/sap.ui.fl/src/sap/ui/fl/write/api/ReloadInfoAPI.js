@@ -287,7 +287,7 @@ sap.ui.define([
 		 */
 		initialDraftGotActivated(oReloadInfo) {
 			if (oReloadInfo.versioningEnabled) {
-				var bHasVersionParameter = this.hasVersionStorage({value: Version.Number.Draft}, oReloadInfo.selector);
+				var bHasVersionParameter = this.hasVersionStorage({ value: Version.Number.Draft }, oReloadInfo.selector);
 				return !VersionsAPI.isDraftAvailable({
 					control: oReloadInfo.selector,
 					layer: oReloadInfo.layer

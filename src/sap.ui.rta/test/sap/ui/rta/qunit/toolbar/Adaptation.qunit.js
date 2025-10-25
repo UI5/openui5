@@ -261,10 +261,10 @@ sap.ui.define([
 
 		QUnit.test("Given two context-based adaptation are available and the displayed adaptation is default (context-free) ", function(assert) {
 			this.oAdaptationsModel = new JSONModel({
-				allAdaptations: [{title: "Sales"}, {title: "Manager"}, {title: ""}],
-				adaptations: [{title: "Sales"}, {title: "Manager"}],
+				allAdaptations: [{ title: "Sales" }, { title: "Manager" }, { title: "" }],
+				adaptations: [{ title: "Sales" }, { title: "Manager" }],
 				count: 2,
-				displayedAdaptation: {title: ""}
+				displayedAdaptation: { title: "" }
 			});
 
 			this.oToolbar.setModel(this.oAdaptationsModel, "contextBasedAdaptations");
@@ -284,10 +284,10 @@ sap.ui.define([
 
 		QUnit.test("Given two context-based adaptation are available", function(assert) {
 			this.oAdaptationsModel = new JSONModel({
-				allAdaptations: [{title: "Sales"}, {title: "Manager"}, {title: ""}],
-				adaptations: [{title: "Sales"}, {title: "Manager"}],
+				allAdaptations: [{ title: "Sales" }, { title: "Manager" }, { title: "" }],
+				adaptations: [{ title: "Sales" }, { title: "Manager" }],
 				count: 2,
-				displayedAdaptation: {title: "Sales"}
+				displayedAdaptation: { title: "Sales" }
 			});
 
 			this.oToolbar.setModel(this.oAdaptationsModel, "contextBasedAdaptations");
@@ -600,7 +600,7 @@ sap.ui.define([
 			var oAdaptationsModel = ContextBasedAdaptationsAPI.createModel(aAdaptations, aAdaptations[0], true);
 
 			sandbox.stub(FlexState, "update");
-			sandbox.stub(ContextBasedAdaptationsAPI, "remove").resolves({status: 204});
+			sandbox.stub(ContextBasedAdaptationsAPI, "remove").resolves({ status: 204 });
 			sandbox.stub(ContextBasedAdaptationsAPI, "getAdaptationsModel").returns(oAdaptationsModel);
 			sandbox.stub(Utils, "showMessageBox").resolves(MessageBox.Action.OK);
 			sandbox.stub(ReloadManager, "triggerReload");
@@ -985,7 +985,7 @@ sap.ui.define([
 	}, function() {
 		QUnit.test("when being on a system with LocalStorageConnector", function(assert) {
 			sandbox.stub(FlexRuntimeInfoAPI, "getConfiguredFlexServices").returns([
-				{connector: "LocalStorageConnector"}
+				{ connector: "LocalStorageConnector" }
 			]);
 			return createAndStartRTA.call(this).then(function() {
 				assert.notOk(

@@ -209,7 +209,7 @@ sap.ui.define([
 
 		QUnit.test("When navigating through all steps until completion", async function(assert) {
 			const oPopover = Element.getElementById("guidedTourMarker--guidedTourMarkerPopover");
-			const {oSteps} = this;
+			const { oSteps } = this;
 			const oStepWithListContent = oSteps.find((oStep) => oStep.listContent && oStep.listContent.length > 0);
 			const oList = Element.getElementById("guidedTourMarker--navigationList");
 			let currentStepIndex = 0;

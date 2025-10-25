@@ -403,7 +403,7 @@ sap.ui.define([
 			if (sAction !== MessageBox.Action.CANCEL) {
 				if (bDirty) {
 					return new Promise(function(resolve) {
-						this.fireEvent("save", {callback: resolve});
+						this.fireEvent("save", { callback: resolve });
 					}.bind(this))
 					.then(function() {
 						return performMigration.call(this, oRtaInformation);
@@ -431,7 +431,7 @@ sap.ui.define([
 		}))
 		.then(function() {
 			return new Promise(function(resolve) {
-				this.fireEvent("switchAdaptation", {adaptationId: "DEFAULT", callback: resolve});
+				this.fireEvent("switchAdaptation", { adaptationId: "DEFAULT", callback: resolve });
 			}.bind(this));
 		}.bind(this))
 		.catch(function(oError) {
@@ -472,7 +472,7 @@ sap.ui.define([
 
 	function handleError(oError) {
 		if (oError !== "cancel") {
-			Utils.showMessageBox("error", "MSG_LREP_TRANSFER_ERROR", {error: oError});
+			Utils.showMessageBox("error", "MSG_LREP_TRANSFER_ERROR", { error: oError });
 			Log.error(`sap.ui.rta: ${oError.stack || oError.message || oError}`);
 		}
 	}
@@ -490,7 +490,7 @@ sap.ui.define([
 	}
 
 	function onSwitchAdaptations(sAdaptationId) {
-		this.fireEvent("switchAdaptation", {adaptationId: sAdaptationId});
+		this.fireEvent("switchAdaptation", { adaptationId: sAdaptationId });
 	}
 
 	function formatAdaptationsMenuText(iCount, sTitle) {

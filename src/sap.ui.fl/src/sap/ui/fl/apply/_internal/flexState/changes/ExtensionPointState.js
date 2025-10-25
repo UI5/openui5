@@ -71,9 +71,9 @@ sap.ui.define([
 			if (bOriginalSelectorNeedsToBeAdjusted) {
 				oChange.originalSelectorToBeAdjusted = mOriginalSelector;
 			} else {
-				oChange.setDependentSelectors({originalSelector: mOriginalSelector});
+				oChange.setDependentSelectors({ originalSelector: mOriginalSelector });
 			}
-			oChange.setContent({boundAggregation: oExtensionPoint.closestAggregationBinding});
+			oChange.setContent({ boundAggregation: oExtensionPoint.closestAggregationBinding });
 		} else {
 			mSelector = merge(mSelector, {
 				id: oExtensionPoint.targetControl.getId(),

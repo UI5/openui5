@@ -528,7 +528,7 @@ sap.ui.define([
 				generator: mPropertyBag.generator,
 				layer: Layer.USER,
 				reference: oVariantModel.sFlexReference,
-				content: {favorite: true}
+				content: { favorite: true }
 			};
 			aChanges.push(FlexObjectFactory.createVariantChange(oChangeProperties));
 		}

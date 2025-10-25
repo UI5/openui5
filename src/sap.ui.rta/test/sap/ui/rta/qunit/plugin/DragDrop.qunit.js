@@ -46,9 +46,9 @@ sap.ui.define([
 		// 		contentMiddle
 		// 			[oMiddleButton1, oMiddleButton2]
 		beforeEach(assert) {
-			this.oLeftButton = new Button({id: "LeftButton", visible: true, text: "Left"});
-			this.oMiddleButton1 = new Button({id: "MiddleButton1", visible: true, text: "Middle1"});
-			this.oMiddleButton2 = new Button({id: "MiddleButton2", visible: true, text: "Middle2"});
+			this.oLeftButton = new Button({ id: "LeftButton", visible: true, text: "Left" });
+			this.oMiddleButton1 = new Button({ id: "MiddleButton1", visible: true, text: "Middle1" });
+			this.oMiddleButton2 = new Button({ id: "MiddleButton2", visible: true, text: "Middle2" });
 
 			this.oBar = new Bar({
 				id: "bar",

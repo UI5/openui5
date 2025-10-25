@@ -84,7 +84,7 @@ function(
 					elements: mTestData.formElementActionObjects
 				}
 			};
-			oSimpleFormWithJSONModel.setModel(new JSONModel({elements: "foo"}));
+			oSimpleFormWithJSONModel.setModel(new JSONModel({ elements: "foo" }));
 
 			return AdditionalElementsAnalyzer.enhanceInvisibleElements(oSimpleFormWithJSONModel, mActionsObject).then(function(aAdditionalElements) {
 				assert.equal(aAdditionalElements.length, 5, "then there are 5 invisible Elements that are not enhanced with oDataProperty properties");
@@ -107,7 +107,7 @@ function(
 				label: "Some Label",
 				visible: false,
 				fields: [
-					new Input({value: `{${sModelName}>Property02}`})
+					new Input({ value: `{${sModelName}>Property02}` })
 				]
 			});
 			var oForm = new Form({
@@ -124,7 +124,7 @@ function(
 							new FormElement({
 								id: "visible",
 								fields: [
-									new Input({value: `{${sModelName}>Property01}`})
+									new Input({ value: `{${sModelName}>Property01}` })
 								]
 							}),
 							oInvisibleElement

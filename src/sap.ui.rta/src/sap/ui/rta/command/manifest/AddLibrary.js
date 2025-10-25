@@ -42,7 +42,7 @@ sap.ui.define([
 	AddLibrary.prototype.execute = function() {
 		if (this.getParameters().libraries) {
 			const aLibraries = Object.keys(this.getParameters().libraries);
-			return Promise.all(aLibraries.map((sLibrary) => Lib.load({name: sLibrary})));
+			return Promise.all(aLibraries.map((sLibrary) => Lib.load({ name: sLibrary })));
 		}
 
 		return Promise.resolve();

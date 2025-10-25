@@ -362,9 +362,9 @@ sap.ui.define([
 
 			this.oShowMessageBoxStub = sandbox.stub(Utils, "showMessageBox").resolves();
 
-			this.oButton = new Button({text: "Button", id: "button"});
-			this.oLabel = new Label({text: "Label", id: "label"});
-			this.oInnerButton = new Button({text: "innerButton", id: "innerButton"});
+			this.oButton = new Button({ text: "Button", id: "button" });
+			this.oLabel = new Label({ text: "Label", id: "label" });
+			this.oInnerButton = new Button({ text: "innerButton", id: "innerButton" });
 			this.oInnerVerticalLayout = new VerticalLayout({
 				id: "innerLayout",
 				content: [this.oInnerButton],

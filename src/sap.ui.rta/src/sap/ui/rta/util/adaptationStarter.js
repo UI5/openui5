@@ -148,13 +148,13 @@ sap.ui.define([
 				if (vError.reason === "isKeyUser" || vError.reason === "pseudoAppVariant") {
 					showMessageBox(
 						vError.message,
-						{title: oRtaResourceBundle.getText("MSG_ADAPTATION_COULD_NOT_START")},
+						{ title: oRtaResourceBundle.getText("MSG_ADAPTATION_COULD_NOT_START") },
 						"error"
 					);
 				} else {
 					showMessageBox(
 						oRtaResourceBundle.getText("MSG_GENERIC_ERROR_MESSAGE", [vError.message]),
-						{title: oRtaResourceBundle.getText("MSG_ADAPTATION_COULD_NOT_START")},
+						{ title: oRtaResourceBundle.getText("MSG_ADAPTATION_COULD_NOT_START") },
 						"error"
 					);
 				}

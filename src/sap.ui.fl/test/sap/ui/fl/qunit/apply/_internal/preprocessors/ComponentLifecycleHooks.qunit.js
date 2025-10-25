@@ -174,7 +174,7 @@ sap.ui.define([
 		}
 	}, function() {
 		QUnit.test("Obtains the componentId from component instance and propagates even if there are no changes for the component", function(assert) {
-			return ComponentLifecycleHooks.instanceCreatedHook(this.oAppComponent, {asyncHints: true, id: "differentComponentId"})
+			return ComponentLifecycleHooks.instanceCreatedHook(this.oAppComponent, { asyncHints: true, id: "differentComponentId" })
 			.then(function() {
 				assert.strictEqual(this.oAddPropagationListenerStub.callCount, 1, "propagation was triggered");
 				assert.strictEqual(this.oInitializeStub.callCount, 1, "FlexState was initialized");
@@ -188,7 +188,7 @@ sap.ui.define([
 
 		QUnit.test("when getChangesAndPropagate() is called for an embedded component with a preexisting VariantModel on its application component", function(assert) {
 			assert.expect(3);
-			var oExistingModel = {id: "existingVariantModel"};
+			var oExistingModel = { id: "existingVariantModel" };
 			var oEmbeddedComponent = {
 				name: "embeddedComponent",
 				setModel(oModelSet, sModelName) {
@@ -372,7 +372,7 @@ sap.ui.define([
 					}
 				}
 			});
-			sandbox.stub(Utils, "getParsedURLHash").returns({params: {}});
+			sandbox.stub(Utils, "getParsedURLHash").returns({ params: {} });
 			return ComponentLifecycleHooks.instanceCreatedHook(this.oAppComponent, {})
 			.then(function() {
 				assert.equal(this.oLoadLibStub.callCount, 0, "rta functionality is not requested");
@@ -391,7 +391,7 @@ sap.ui.define([
 				}
 			]);
 			sandbox.stub(Utils, "getUshellContainer").returns(undefined);
-			sandbox.stub(Utils, "getParsedURLHash").returns({params: {}});
+			sandbox.stub(Utils, "getParsedURLHash").returns({ params: {} });
 			this.oAppComponent.rootControlLoaded = sandbox.stub().resolves();
 			return ComponentLifecycleHooks.instanceCreatedHook(this.oAppComponent, {})
 			.then(function() {
@@ -424,7 +424,7 @@ sap.ui.define([
 					}
 				}
 			});
-			sandbox.stub(Utils, "getParsedURLHash").returns({params: {}});
+			sandbox.stub(Utils, "getParsedURLHash").returns({ params: {} });
 			return ComponentLifecycleHooks.instanceCreatedHook(this.oAppComponent, {})
 			.then(function() {
 				assert.equal(this.oLoadLibStub.callCount, 0, "rta library is not requested");
@@ -443,7 +443,7 @@ sap.ui.define([
 				}
 			]);
 			sandbox.stub(Utils, "getUshellContainer").returns(undefined);
-			sandbox.stub(Utils, "getParsedURLHash").returns({params: {}});
+			sandbox.stub(Utils, "getParsedURLHash").returns({ params: {} });
 			this.oAppComponent.rootControlLoaded = sandbox.stub().resolves();
 			return ComponentLifecycleHooks.instanceCreatedHook(this.oAppComponent, {})
 			.then(function() {
@@ -458,7 +458,7 @@ sap.ui.define([
 			window.sessionStorage.setItem("sap.ui.rta.restart.CUSTOMER", true);
 			var fnStartRtaStub = sandbox.stub();
 			sandbox.stub(Utils, "getUshellContainer").returns(undefined);
-			sandbox.stub(Utils, "getParsedURLHash").returns({params: {}});
+			sandbox.stub(Utils, "getParsedURLHash").returns({ params: {} });
 			var sError = "Root Control didn't load";
 			this.oAppComponent.rootControlLoaded = sandbox.stub().rejects(new Error(sError));
 			return ComponentLifecycleHooks.instanceCreatedHook(this.oAppComponent, {})
@@ -484,7 +484,7 @@ sap.ui.define([
 			});
 
 			sandbox.stub(Utils, "getUshellContainer").returns(undefined);
-			sandbox.stub(Utils, "getParsedURLHash").returns({params: {}});
+			sandbox.stub(Utils, "getParsedURLHash").returns({ params: {} });
 			ComponentLifecycleHooks.instanceCreatedHook(this.oAppComponent, {})
 			.then(function() {
 				assert.equal(this.oLoadLibStub.callCount, 0, "rta library is requested");
@@ -512,7 +512,7 @@ sap.ui.define([
 						}
 					]
 				},
-				messagebundle: {i_123: "translatedKey"}
+				messagebundle: { i_123: "translatedKey" }
 			});
 
 			await ComponentLifecycleHooks.instanceCreatedHook(this.oAppComponent, {});
@@ -528,7 +528,7 @@ sap.ui.define([
 						}
 					]
 				},
-				messagebundle: {i_123: "translatedKey"}
+				messagebundle: { i_123: "translatedKey" }
 			});
 
 			await ComponentLifecycleHooks.instanceCreatedHook(this.oAppComponent, {});
@@ -554,7 +554,7 @@ sap.ui.define([
 	QUnit.module("modelCreatedHook", {
 		beforeEach() {
 			this.oAppComponent = RtaQunitUtils.createAndStubAppComponent(sandbox, "componentId");
-			sandbox.stub(this.oAppComponent, "getComponentData").returns({foo: "bar"});
+			sandbox.stub(this.oAppComponent, "getComponentData").returns({ foo: "bar" });
 			ChangeHandlerRegistration.registerAnnotationChangeHandler({
 				isDefaultChangeHandler: true,
 				changeHandler: ChangeAnnotation
@@ -604,33 +604,33 @@ sap.ui.define([
 		}
 	}, function() {
 		QUnit.test("hook gets called with annotation changes available", async function(assert) {
-			const oAsyncHints = {foobar: "baz"};
+			const oAsyncHints = { foobar: "baz" };
 			const oLogStub = sandbox.stub(Log, "error");
 			ComponentLifecycleHooks.modelCreatedHook({
 				model: this.oFakeModel1,
 				modelId: "someModelId",
-				factoryConfig: {id: this.oAppComponent.getId(), asyncHints: oAsyncHints, componentData: {foo: "bar"}},
+				factoryConfig: { id: this.oAppComponent.getId(), asyncHints: oAsyncHints, componentData: { foo: "bar" } },
 				ownerId: undefined,
 				manifest: this.oAppComponent.getManifest()
 			});
 			ComponentLifecycleHooks.modelCreatedHook({
 				model: this.oFakeModel2,
 				modelId: "someModelId",
-				factoryConfig: {id: this.oAppComponent.getId(), asyncHints: oAsyncHints, settings: {componentData: {foo: "bar"}}},
+				factoryConfig: { id: this.oAppComponent.getId(), asyncHints: oAsyncHints, settings: { componentData: { foo: "bar" } } },
 				ownerId: undefined,
 				manifest: this.oAppComponent.getManifest()
 			});
 			ComponentLifecycleHooks.modelCreatedHook({
 				model: this.oFakeModel3,
 				modelId: "someModelId",
-				factoryConfig: {id: this.oAppComponent.getId(), asyncHints: oAsyncHints, settings: {componentData: {foo: "bar"}}},
+				factoryConfig: { id: this.oAppComponent.getId(), asyncHints: oAsyncHints, settings: { componentData: { foo: "bar" } } },
 				ownerId: undefined,
 				manifest: this.oAppComponent.getManifest()
 			});
 
 			assert.strictEqual(this.oFlexStateInitStub.callCount, 3, "FlexState was initialized 3 times");
 			assert.deepEqual(this.oFlexStateInitStub.getCall(0).args[0], {
-				componentData: {foo: "bar"},
+				componentData: { foo: "bar" },
 				asyncHints: oAsyncHints,
 				componentId: this.oAppComponent.getId(),
 				reference: this.oAppComponent.getId(),
@@ -672,21 +672,21 @@ sap.ui.define([
 		});
 
 		QUnit.test("hook gets called with a model on an embedded component", async function(assert) {
-			const oAsyncHints = {foobar: "baz"};
+			const oAsyncHints = { foobar: "baz" };
 			ComponentLifecycleHooks.modelCreatedHook({
 				model: this.oFakeModel1,
 				modelId: "someModelId",
-				factoryConfig: {id: "embeddedId"},
+				factoryConfig: { id: "embeddedId" },
 				owner: {
 					id: this.oAppComponent.getId(),
-					config: {asyncHints: oAsyncHints}
+					config: { asyncHints: oAsyncHints }
 				},
-				manifest: {foo: "bar"}
+				manifest: { foo: "bar" }
 			});
 
 			assert.strictEqual(this.oFlexStateInitStub.callCount, 1, "FlexState was initialized once");
 			assert.deepEqual(this.oFlexStateInitStub.getCall(0).args[0], {
-				componentData: {foo: "bar"},
+				componentData: { foo: "bar" },
 				asyncHints: oAsyncHints,
 				componentId: this.oAppComponent.getId(),
 				reference: this.oAppComponent.getId(),
@@ -710,7 +710,7 @@ sap.ui.define([
 			ComponentLifecycleHooks.modelCreatedHook({
 				model: this.oFakeModel1,
 				modelId: "someModelId",
-				factoryConfig: {id: this.oAppComponent.getId(), componentData: {foo: "bar"}},
+				factoryConfig: { id: this.oAppComponent.getId(), componentData: { foo: "bar" } },
 				ownerId: undefined,
 				manifest: this.oAppComponent.getManifest()
 			});

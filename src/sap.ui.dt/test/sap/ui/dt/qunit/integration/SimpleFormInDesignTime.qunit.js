@@ -27,24 +27,24 @@ sap.ui.define([
 
 	QUnit.module("Given that a DesignTime is created for a SimpleForm and designTimeMetadata for SimpleForm hidden form is provided", {
 		async beforeEach(assert) {
-			this.oLabel = new Label({text: "Name"});
+			this.oLabel = new Label({ text: "Name" });
 
 			this.oSimpleForm = new SimpleForm("Form1", {
 				maxContainerCols: 2,
 				editable: true,
 				layout: "ColumnLayout",
 				content: [
-					new Title({text: "Person"}),
+					new Title({ text: "Person" }),
 					this.oLabel,
-					new Input({value: "Max"}),
-					new Input({value: "Mustermann"}),
-					new Label({text: "Date of birth"}),
-					new DatePicker({valueFormat: "yyyyMMdd", value: "19990909"}),
-					new Label({text: "Gender"})
+					new Input({ value: "Max" }),
+					new Input({ value: "Mustermann" }),
+					new Label({ text: "Date of birth" }),
+					new DatePicker({ valueFormat: "yyyyMMdd", value: "19990909" }),
+					new Label({ text: "Gender" })
 				]
 			});
 
-			this.oVerticalLayout = new VerticalLayout({content: [this.oSimpleForm, this.oLabel]});
+			this.oVerticalLayout = new VerticalLayout({ content: [this.oSimpleForm, this.oLabel] });
 
 			this.oVerticalLayout.placeAt("qunit-fixture");
 			await nextUIUpdate();
@@ -85,7 +85,7 @@ sap.ui.define([
 
 		QUnit.test("when the content is added to a SimpleForm ...", async function(assert) {
 			var fnDone = assert.async();
-			this.oButton = new Button("button1", {text: "Button"});
+			this.oButton = new Button("button1", { text: "Button" });
 			this.oSimpleForm.addContent(this.oButton);
 			await nextUIUpdate();
 

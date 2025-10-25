@@ -331,7 +331,7 @@ sap.ui.define([
 		}
 
 		if (bDataUpdated) {
-			oFlexObjectsDataSelector.checkUpdate({ reference: sReference});
+			oFlexObjectsDataSelector.checkUpdate({ reference: sReference });
 		}
 	}
 

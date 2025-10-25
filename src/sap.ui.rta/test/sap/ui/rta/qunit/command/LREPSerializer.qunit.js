@@ -92,7 +92,7 @@ sap.ui.define([
 			});
 		},
 		async afterEach() {
-			await this.oSerializer.saveCommands({saveAsDraft: false});
+			await this.oSerializer.saveCommands({ saveAsDraft: false });
 			this.oCommandStack.destroy();
 			this.oSerializer.destroy();
 			this.oPanel.destroy();
@@ -154,7 +154,7 @@ sap.ui.define([
 				assert.equal(oAddChangeSpy.callCount, 3, "only one more change got added");
 				assert.equal(oRemoveChangeSpy.callCount, 1, "only one change got deleted");
 
-				return this.oSerializer.saveCommands({saveAsDraft: false});
+				return this.oSerializer.saveCommands({ saveAsDraft: false });
 			}.bind(this))
 
 			.then(function() {
@@ -187,7 +187,7 @@ sap.ui.define([
 				assert.equal(oAddChangeSpy.lastCall.args[0].flexObjects.length, 0, "no change got added");
 			})
 
-			.then(this.oSerializer.saveCommands.bind(this.oSerializer, {saveAsDraft: false}))
+			.then(this.oSerializer.saveCommands.bind(this.oSerializer, { saveAsDraft: false }))
 
 			.then(function() {
 				assert.ok(oSaveChangeSpy.called, "then 'save' is called on the persistence");
@@ -220,7 +220,7 @@ sap.ui.define([
 				assert.equal(oAddChangeSpy.callCount, 2, "now 2. change got added directly after execute");
 			})
 
-			.then(this.oSerializer.saveCommands.bind(this.oSerializer, {saveAsDraft: false}))
+			.then(this.oSerializer.saveCommands.bind(this.oSerializer, { saveAsDraft: false }))
 
 			.then(function() {
 				assert.ok(oSaveChangeSpy.called, "then 'save' is called on the persistence");
@@ -244,7 +244,7 @@ sap.ui.define([
 
 			.then(this.oCommandStack.pushAndExecute.bind(this.oCommandStack))
 
-			.then(this.oSerializer.saveCommands.bind(this.oSerializer, {saveAsDraft: false}))
+			.then(this.oSerializer.saveCommands.bind(this.oSerializer, { saveAsDraft: false }))
 
 			.then(function() {
 				assert.ok(oSaveChangeSpy.called, "then 'save' is called on the persistence");
@@ -268,7 +268,7 @@ sap.ui.define([
 				assert.strictEqual(aCommands[0].getElement(), undefined, "then oInput1 cannot be found");
 				assert.strictEqual(aCommands[0].getSelector().id, "input1", "then oRemoveCommand1 selector was set");
 
-				return this.oSerializer.saveCommands({saveAsDraft: false});
+				return this.oSerializer.saveCommands({ saveAsDraft: false });
 			}.bind(this))
 
 			.then(function() {
@@ -297,7 +297,7 @@ sap.ui.define([
 					}
 				},
 				appComponent: oMockedAppComponent
-			}, {}, {layer: Layer.CUSTOMER}))
+			}, {}, { layer: Layer.CUSTOMER }))
 
 			.then(this.oCommandStack.pushAndExecute.bind(this.oCommandStack))
 
@@ -312,11 +312,11 @@ sap.ui.define([
 					}
 				},
 				appComponent: oMockedAppComponent
-			}, {}, {layer: Layer.CUSTOMER}))
+			}, {}, { layer: Layer.CUSTOMER }))
 
 			.then(this.oCommandStack.pushAndExecute.bind(this.oCommandStack))
 
-			.then(this.oSerializer.saveCommands.bind(this.oSerializer, {saveAsDraft: false}))
+			.then(this.oSerializer.saveCommands.bind(this.oSerializer, { saveAsDraft: false }))
 
 			.then(function() {
 				assert.ok(oSaveChangeSpy.called, "then 'save' is called on the persistence");
@@ -355,7 +355,7 @@ sap.ui.define([
 					}
 				},
 				appComponent: oMockedAppComponent
-			}, {}, {layer: Layer.CUSTOMER}))
+			}, {}, { layer: Layer.CUSTOMER }))
 
 			.then(function(oCommand) {
 				oAddLibraryCommand = oCommand;
@@ -374,7 +374,7 @@ sap.ui.define([
 
 			.then(this.oCommandStack.undo.bind(this.oCommandStack))
 
-			.then(this.oSerializer.saveCommands.bind(this.oSerializer, {saveAsDraft: false}))
+			.then(this.oSerializer.saveCommands.bind(this.oSerializer, { saveAsDraft: false }))
 			.then(function() {
 				assert.ok(oSaveChangeSpy.called, "then 'save' is called on the persistence");
 				assert.ok(true, "then the promise for LREPSerializer.saveCommands() gets resolved");
@@ -401,13 +401,13 @@ sap.ui.define([
 					}
 				},
 				appComponent: oMockedAppComponent
-			}, {}, {layer: Layer.CUSTOMER}))
+			}, {}, { layer: Layer.CUSTOMER }))
 
 			.then(this.oCommandStack.pushAndExecute.bind(this.oCommandStack))
 
 			.then(this.oCommandStack.undo.bind(this.oCommandStack))
 
-			.then(this.oSerializer.saveCommands.bind(this.oSerializer, {saveAsDraft: false}))
+			.then(this.oSerializer.saveCommands.bind(this.oSerializer, { saveAsDraft: false }))
 
 			.then(function() {
 				assert.ok(oSaveChangeSpy.called, "then 'save' is called on the persistence");
@@ -432,7 +432,7 @@ sap.ui.define([
 					}
 				},
 				appComponent: oMockedAppComponent
-			}, {}, {layer: Layer.CUSTOMER})
+			}, {}, { layer: Layer.CUSTOMER })
 
 			.then(function(oAddLibraryCommand) {
 				oCreateAndStoreChangeSpy = sandbox.spy(oAddLibraryCommand, "createAndStoreChange");
@@ -451,7 +451,7 @@ sap.ui.define([
 
 			.then(function() {
 				assert.equal(oCreateAndStoreChangeSpy.callCount, 2, "now manifest change got created directly after redo");
-				return this.oSerializer.saveCommands({saveAsDraft: false});
+				return this.oSerializer.saveCommands({ saveAsDraft: false });
 			}.bind(this))
 
 			.then(function() {
@@ -481,13 +481,13 @@ sap.ui.define([
 					}
 				},
 				appComponent: oMockedAppComponent
-			}, {}, {layer: Layer.CUSTOMER}))
+			}, {}, { layer: Layer.CUSTOMER }))
 
 			.then(this.oCommandStack.pushAndExecute.bind(this.oCommandStack))
 
 			.then(this.oCommandStack.undo.bind(this.oCommandStack))
 
-			.then(this.oSerializer.saveCommands.bind(this.oSerializer, {saveAsDraft: false}))
+			.then(this.oSerializer.saveCommands.bind(this.oSerializer, { saveAsDraft: false }))
 
 			.then(function() {
 				assert.notOk(true, "then return promise shouldn't be resolved");
@@ -501,7 +501,7 @@ sap.ui.define([
 			.then(function() {
 				// clean up dirty changes
 				oSaveChangesStub.restore();
-				this.oSerializer.saveCommands({saveAsDraft: false});
+				this.oSerializer.saveCommands({ saveAsDraft: false });
 			}.bind(this));
 		});
 
@@ -512,7 +512,7 @@ sap.ui.define([
 				removedElement: this.oInput1
 			}, this.oInputDesignTimeMetadata)
 			.then(this.oCommandStack.pushAndExecute.bind(this.oCommandStack))
-			.then(this.oSerializer.saveCommands.bind(this.oSerializer, {saveAsDraft: false, condenseAnyLayer: true}))
+			.then(this.oSerializer.saveCommands.bind(this.oSerializer, { saveAsDraft: false, condenseAnyLayer: true }))
 			.then(function() {
 				assert.ok(true, "then the promise for LREPSerializer.saveCommands() gets resolved");
 				assert.strictEqual(oSaveChangesStub.getCall(0).args[0].condenseAnyLayer, true, "then the condense parameter is passed");
@@ -526,7 +526,7 @@ sap.ui.define([
 				removedElement: this.oInput1
 			}, this.oInputDesignTimeMetadata)
 			.then(this.oCommandStack.pushAndExecute.bind(this.oCommandStack))
-			.then(this.oSerializer.saveCommands.bind(this.oSerializer, {saveAsDraft: true, version: Version.Number.Draft}))
+			.then(this.oSerializer.saveCommands.bind(this.oSerializer, { saveAsDraft: true, version: Version.Number.Draft }))
 			.then(function() {
 				assert.ok(true, "then the promise for LREPSerializer.saveCommands() gets resolved");
 				assert.equal(oSaveChangesStub.getCall(0).args[0].draft, true, "then the save on the persistence API is called with a draft flag");
@@ -566,7 +566,7 @@ sap.ui.define([
 					}
 				},
 				appComponent: oMockedAppComponent
-			}, {}, {layer: Layer.CUSTOMER}))
+			}, {}, { layer: Layer.CUSTOMER }))
 
 			.then(this.oCommandStack.pushAndExecute.bind(this.oCommandStack))
 
@@ -595,7 +595,7 @@ sap.ui.define([
 					}
 				},
 				appComponent: oMockedAppComponent
-			}, {}, {layer: Layer.CUSTOMER}))
+			}, {}, { layer: Layer.CUSTOMER }))
 
 			.then(this.oCommandStack.pushAndExecute.bind(this.oCommandStack))
 
@@ -624,7 +624,7 @@ sap.ui.define([
 
 			.then(this.oCommandStack.pushAndExecute.bind(this.oCommandStack))
 
-			.then(this.oSerializer.saveCommands.bind(this.oSerializer, {saveAsDraft: false}))
+			.then(this.oSerializer.saveCommands.bind(this.oSerializer, { saveAsDraft: false }))
 
 			.then(function() {
 				assert.ok(oSaveChangeSpy.called, "then 'save' is called on the persistence");
@@ -651,7 +651,7 @@ sap.ui.define([
 
 			.then(this.oCommandStack.undo.bind(this.oCommandStack))
 
-			.then(this.oSerializer.saveCommands.bind(this.oSerializer, {saveAsDraft: false}))
+			.then(this.oSerializer.saveCommands.bind(this.oSerializer, { saveAsDraft: false }))
 
 			.then(function() {
 				assert.ok(oSaveChangeSpy.called, "then 'save' is called on the persistence");
@@ -692,7 +692,7 @@ sap.ui.define([
 					oChange.setFlexObjectMetadata(oFlexObjectMetadata);
 				});
 
-				return PersistenceWriteAPI.save({selector: oMockedAppComponent, skipUpdateCache: true});
+				return PersistenceWriteAPI.save({ selector: oMockedAppComponent, skipUpdateCache: true });
 			})
 
 			.then(function() {
@@ -739,7 +739,7 @@ sap.ui.define([
 					oChange.setFlexObjectMetadata(oFlexObjectMetadata);
 				});
 
-				return PersistenceWriteAPI.save({selector: oMockedAppComponent, skipUpdateCache: true});
+				return PersistenceWriteAPI.save({ selector: oMockedAppComponent, skipUpdateCache: true });
 			})
 
 			.then(function() {

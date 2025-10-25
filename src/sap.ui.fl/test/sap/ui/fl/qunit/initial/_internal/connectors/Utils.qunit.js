@@ -21,7 +21,7 @@ sap.ui.define([
 	}, function() {
 		QUnit.test("when addLanguageInfo is called", function(assert) {
 			var mParameters = {};
-			var mExpectedValue = {"sap-language": "en"};
+			var mExpectedValue = { "sap-language": "en" };
 			sandbox.stub(Localization, "getLanguage").returns("en");
 			Utils.addLanguageInfo(mParameters);
 			assert.deepEqual(mParameters, mExpectedValue, "the sap language property is set");
@@ -30,7 +30,7 @@ sap.ui.define([
 
 		QUnit.test("when addSAPLogonLanguageInfo is called", function(assert) {
 			var mParameters = {};
-			var mExpectedValue = {"sap-language": "EN"};
+			var mExpectedValue = { "sap-language": "EN" };
 			sandbox.stub(Localization, "getSAPLogonLanguage").returns("EN");
 			Utils.addSAPLogonLanguageInfo(mParameters);
 			assert.deepEqual(mParameters, mExpectedValue, "the sap language property is set");
@@ -83,7 +83,7 @@ sap.ui.define([
 			var oRequestPayloadSpy = sandbox.spy(XMLHttpRequest.prototype, "send");
 
 			this.server.respondWith("GET", "/flexKeyuser/flex/keyuser/v2/data/sap.ui.demoapps.rta.fiorielements.Component?sap-language=de-DE",
-				[200, {"Content-Type": "string"}, "GET request successful"]);
+				[200, { "Content-Type": "string" }, "GET request successful"]);
 
 			var sExpectedResult = {
 				response: "GET request successful",
@@ -109,7 +109,7 @@ sap.ui.define([
 			mPropertyBag.cacheable = true;
 
 			this.server.respondWith("GET", "/flexKeyuser/flex/keyuser/v2/data/sap.ui.demoapps.rta.fiorielements.Component?sap-language=de-DE",
-				[200, {"Content-Type": "application/json"}, '{ "message": "GET request successful"}']);
+				[200, { "Content-Type": "application/json" }, '{ "message": "GET request successful"}']);
 
 			return Utils.sendRequest(sUrl, sMethod, mPropertyBag).then(function(oResponse) {
 				assert.equal(oSetRequestHeaderSpy.callCount, 3, "");
@@ -131,7 +131,7 @@ sap.ui.define([
 			mPropertyBag.initialConnector.xsrfToken = "84343258f9d94804-gaFfTNfclP5uThxHR7StXFwu_GU";
 
 			this.server.respondWith("POST", "/flexKeyuser/flex/keyuser/v2/data/sap.ui.demoapps.rta.fiorielements.Component?sap-language=de-DE",
-				[200, {"Content-Type": "string"}, "POST request successful"]);
+				[200, { "Content-Type": "string" }, "POST request successful"]);
 
 			return Utils.sendRequest(sUrl, sMethod, mPropertyBag).then(function() {
 				assert.ok(oSetRequestHeaderSpy.calledOnce, "");
@@ -147,7 +147,7 @@ sap.ui.define([
 			mPropertyBag.initialConnector = {};
 
 			this.server.respondWith("HEAD", "/flexKeyuser/flex/keyuser/v2/data/sap.ui.demoapps.rta.fiorielements.Component?sap-language=de-DE",
-				[204, {"Content-Type": "application/json", "X-CSRF-Token": "84343258f9d94804-gaFfTNfclP5uThxHR7StXFwu_GU", Etag: "Etag"},
+				[204, { "Content-Type": "application/json", "X-CSRF-Token": "84343258f9d94804-gaFfTNfclP5uThxHR7StXFwu_GU", Etag: "Etag" },
 					'{ "message": "POST request successful", "status": 204 }']);
 
 			return Utils.sendRequest(sUrl, sMethod, mPropertyBag).then(function(oResponse) {
@@ -186,7 +186,7 @@ sap.ui.define([
 			var mPropertyBag = {};
 
 			this.server.respondWith("GET", "/flexKeyuser/flex/keyuser/v2/data/sap.ui.demoapps.rta.fiorielements.Component?sap-language=de-DE",
-				[500, {"Content-Type": "application/json" },
+				[500, { "Content-Type": "application/json" },
 					'{ "messages": [{"severity": "Error", "text": "Internal Server Error" }]}']);
 			return Utils.sendRequest(sUrl, sMethod, mPropertyBag).catch(function(oError) {
 				assert.equal(oError.status, 500, "");
@@ -200,7 +200,7 @@ sap.ui.define([
 			var mPropertyBag = {};
 
 			this.server.respondWith("GET", "/flexKeyuser/flex/keyuser/v2/data/sap.ui.demoapps.rta.fiorielements.Component?sap-language=de-DE",
-				[400, {"Content-Type": "string" }, "Bad Request"]);
+				[400, { "Content-Type": "string" }, "Bad Request"]);
 			return Utils.sendRequest(sUrl, sMethod, mPropertyBag).catch(function(oError) {
 				assert.equal(oError.status, 400, "");
 				assert.equal(oError.userMessage, "", "");

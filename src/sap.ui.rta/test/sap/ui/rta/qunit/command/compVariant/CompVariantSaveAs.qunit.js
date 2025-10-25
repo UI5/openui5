@@ -70,7 +70,7 @@ sap.ui.define([
 							texts: {
 								variantName: "myText"
 							},
-							content: {foo: "bar"},
+							content: { foo: "bar" },
 							executeOnSelection: false,
 							favorite: true,
 							contexts: {
@@ -97,7 +97,7 @@ sap.ui.define([
 						newVariantProperties: {
 							type: "myType",
 							text: "myText",
-							content: {foo: "bar"},
+							content: { foo: "bar" },
 							executeOnSelection: false,
 							contexts: {
 								role: ["someRole"]

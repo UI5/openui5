@@ -455,7 +455,7 @@ sap.ui.define([
 
 		// If the binding is found on an API parent (with a forwarded aggregation),
 		// the templateId is directly retrieved from it (the stack only has the element itself)
-		var {aAPIParentInfos} = oElement;
+		var { aAPIParentInfos } = oElement;
 		if (aAPIParentInfos && aAPIParentInfos.length > 0) {
 			bBindingFound = aAPIParentInfos.some(function(mParentInfo) {
 				oParent = mParentInfo.parent;

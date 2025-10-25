@@ -65,7 +65,7 @@ sap.ui.define([
 				}
 				const aExtensionData = [
 					{ businessContext: `${sEntityTypeName} EntityTypeContext`, description: "Other BusinessContext description" },
-					{ businessContext: `${sEntitySetName} EntitySetContext`, description: "Some BusinessContext description"}
+					{ businessContext: `${sEntitySetName} EntitySetContext`, description: "Some BusinessContext description" }
 				];
 				return Promise.resolve({
 					extensionData: aExtensionData,

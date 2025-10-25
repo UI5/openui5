@@ -247,7 +247,7 @@ function(
 			this.setProperty("targetZone", bTargetZone);
 			this.toggleStyleClass("sapUiDtOverlayTargetZone", bTargetZone);
 
-			this.fireTargetZoneChange({targetZone: bTargetZone});
+			this.fireTargetZoneChange({ targetZone: bTargetZone });
 		}
 
 		return this;

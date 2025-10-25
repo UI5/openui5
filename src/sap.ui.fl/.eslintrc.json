@@ -73,6 +73,7 @@
 		"prefer-rest-params": "error",
 		"prefer-spread": "error",
 		"logical-assignment-operators":["error", "always", { "enforceForIfStatements": true } ],
-		"require-await": "error"
+		"require-await": "error",
+		"object-curly-spacing": ["error", "always"]
 	}
 }

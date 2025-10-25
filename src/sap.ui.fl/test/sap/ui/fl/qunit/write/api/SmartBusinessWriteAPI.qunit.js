@@ -147,7 +147,7 @@ sap.ui.define([
 			})
 			.then(function(oDescriptorInlineChange) {
 				// Adds a descriptor change to its own persistence
-				return SmartBusinessWriteAPI.add({change: oDescriptorInlineChange, appId: "reference.app"});
+				return SmartBusinessWriteAPI.add({ change: oDescriptorInlineChange, appId: "reference.app" });
 			})
 			.then(function() {
 				return SmartBusinessWriteAPI.createDescriptorInlineChanges({
@@ -157,7 +157,7 @@ sap.ui.define([
 			}.bind(this))
 			.then(function(oDescriptorInlineChange) {
 				// Adds a descriptor change to its own persistence
-				return SmartBusinessWriteAPI.add({change: oDescriptorInlineChange, appId: "reference.app"});
+				return SmartBusinessWriteAPI.add({ change: oDescriptorInlineChange, appId: "reference.app" });
 			})
 			.then(function() {
 				assert.strictEqual(
@@ -225,7 +225,7 @@ sap.ui.define([
 			})
 			.then(function(oDescriptorInlineChange) {
 				// Adds a descriptor change to its own persistence
-				return SmartBusinessWriteAPI.add({change: oDescriptorInlineChange, appId: "reference.app"});
+				return SmartBusinessWriteAPI.add({ change: oDescriptorInlineChange, appId: "reference.app" });
 			})
 			.then(function() {
 				assert.strictEqual(
@@ -269,7 +269,7 @@ sap.ui.define([
 		QUnit.test("(S4/Hana onPremise system) when create is called with a descriptor change already added into own persistence and submitting app variant to backend in VENDOR layer in a valid package failed", function(assert) {
 			simulateSystemConfig(false);
 
-			const oNewConnectorCall = sandbox.stub(WriteUtils, "sendRequest").rejects({message: "App variant failed to save"});
+			const oNewConnectorCall = sandbox.stub(WriteUtils, "sendRequest").rejects({ message: "App variant failed to save" });
 
 			sandbox.stub(Log, "error")
 			.callThrough()
@@ -282,7 +282,7 @@ sap.ui.define([
 			})
 			.then(function(oDescriptorInlineChange) {
 				// Adds a descriptor change to its own persistence
-				return SmartBusinessWriteAPI.add({change: oDescriptorInlineChange, appId: "reference.app"});
+				return SmartBusinessWriteAPI.add({ change: oDescriptorInlineChange, appId: "reference.app" });
 			})
 			.then(function() {
 				assert.strictEqual(
@@ -339,7 +339,7 @@ sap.ui.define([
 			})
 			.then(function(oDescriptorInlineChange) {
 				// Adds a descriptor change to its own persistence
-				return SmartBusinessWriteAPI.add({change: oDescriptorInlineChange, appId: "reference.app"});
+				return SmartBusinessWriteAPI.add({ change: oDescriptorInlineChange, appId: "reference.app" });
 			})
 			.then(function() {
 				assert.strictEqual(
@@ -386,7 +386,7 @@ sap.ui.define([
 			})
 			.then(function(oDescriptorInlineChange) {
 				// Adds a descriptor change to its own persistence
-				return SmartBusinessWriteAPI.add({change: oDescriptorInlineChange, appId: "reference.app"});
+				return SmartBusinessWriteAPI.add({ change: oDescriptorInlineChange, appId: "reference.app" });
 			})
 			.then(function() {
 				assert.strictEqual(
@@ -442,7 +442,7 @@ sap.ui.define([
 			})
 			.then(function(oDescriptorInlineChange) {
 				// Adds a descriptor change to its own persistence
-				return SmartBusinessWriteAPI.add({change: oDescriptorInlineChange, appId: "reference.app"});
+				return SmartBusinessWriteAPI.add({ change: oDescriptorInlineChange, appId: "reference.app" });
 			})
 			.then(function() {
 				assert.strictEqual(
@@ -555,7 +555,7 @@ sap.ui.define([
 			})
 			.then(function(oDescriptorInlineChange) {
 				// Adds a first descriptor change to its own persistence
-				return SmartBusinessWriteAPI.add({change: oDescriptorInlineChange, appId: "customer.reference.app.id"});
+				return SmartBusinessWriteAPI.add({ change: oDescriptorInlineChange, appId: "customer.reference.app.id" });
 			}).then(function() {
 				return SmartBusinessWriteAPI.update(mPropertyBag);
 			})

@@ -241,7 +241,7 @@ sap.ui.define([
 				const oMetaModel = oModel.getMetaModel();
 				if (oMetaModel && oMetaModel.loaded) {
 					await oMetaModel.loaded();
-					this.evaluateEditable([oOverlay], {onRegistration: true});
+					this.evaluateEditable([oOverlay], { onRegistration: true });
 				}
 			}
 			Plugin.prototype.registerElementOverlay.apply(this, aArgs);

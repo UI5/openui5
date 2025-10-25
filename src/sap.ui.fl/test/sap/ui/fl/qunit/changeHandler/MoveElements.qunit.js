@@ -198,7 +198,7 @@ sap.ui.define([
 			content: this.mSingleMoveChangeContentWithLocalId
 		});
 
-		return MoveElements.applyChange(oChange, this.oObjectHeader, {modifier: JsControlTreeModifier, appComponent: oComponent})
+		return MoveElements.applyChange(oChange, this.oObjectHeader, { modifier: JsControlTreeModifier, appComponent: oComponent })
 		.then(function() {
 			assert.equal(this.oObjectHeader.getAttributes().length, 1, "object attribute is removed from the header");
 			assert.equal(this.oObjectHeader.getAttributes()[0].getId(), this.oObjectAttribute2.getId(),
@@ -216,7 +216,7 @@ sap.ui.define([
 			content: this.mSingleMoveChangeContentWithGlobalId
 		});
 
-		return MoveElements.applyChange(oChange, this.oObjectHeader, {modifier: JsControlTreeModifier})
+		return MoveElements.applyChange(oChange, this.oObjectHeader, { modifier: JsControlTreeModifier })
 		.then(function() {
 			assert.equal(this.oObjectHeader.getAttributes().length, 1, "object attribute is removed from the header");
 			assert.equal(this.oObjectHeader.getAttributes()[0].getId(), this.oObjectAttribute2.getId(), "object attribute 2 is still in the header");
@@ -232,7 +232,7 @@ sap.ui.define([
 			content: this.mMultiMoveChangeContentWithLocalId
 		});
 
-		return MoveElements.applyChange(oChange, this.oObjectHeader, {modifier: JsControlTreeModifier, appComponent: oComponent})
+		return MoveElements.applyChange(oChange, this.oObjectHeader, { modifier: JsControlTreeModifier, appComponent: oComponent })
 		.then(function() {
 			assert.equal(this.oObjectHeader.getAttributes().length, 0, "both object attributes removed from the header");
 			assert.equal(this.oLayout.getContent()[0].getId(), this.oObjectHeader.getId(), "object header is still at 1. position");
@@ -248,7 +248,7 @@ sap.ui.define([
 			content: this.mMultiMoveChangeContentWithGlobalId
 		});
 
-		return MoveElements.applyChange(oChange, this.oObjectHeader, {modifier: JsControlTreeModifier})
+		return MoveElements.applyChange(oChange, this.oObjectHeader, { modifier: JsControlTreeModifier })
 		.then(function() {
 			assert.equal(this.oObjectHeader.getAttributes().length, 0, "both object attributes removed from the header");
 			assert.equal(this.oLayout.getContent()[0].getId(), this.oObjectHeader.getId(), "object header is still at 1. position");
@@ -266,7 +266,7 @@ sap.ui.define([
 			content: this.mMultiMoveChangeContentWithGlobalId
 		});
 
-		return MoveElements.applyChange(oChange, this.oObjectHeader, {modifier: JsControlTreeModifier})
+		return MoveElements.applyChange(oChange, this.oObjectHeader, { modifier: JsControlTreeModifier })
 		.catch(function(oError) {
 			assert.equal(oError.message, "No source aggregation supplied via selector for move", "missing source aggregation error captured");
 			oChange = new UIChange({
@@ -282,7 +282,7 @@ sap.ui.define([
 					}]
 				}
 			});
-			return MoveElements.applyChange(oChange, this.oObjectHeader, {modifier: JsControlTreeModifier});
+			return MoveElements.applyChange(oChange, this.oObjectHeader, { modifier: JsControlTreeModifier });
 		}.bind(this))
 		.catch(function(oError) {
 			assert.equal(oError.message, "No target supplied for move", "missing target error captured");
@@ -304,7 +304,7 @@ sap.ui.define([
 					}
 				}
 			});
-			return MoveElements.applyChange(oChange, this.oObjectHeader, {modifier: JsControlTreeModifier});
+			return MoveElements.applyChange(oChange, this.oObjectHeader, { modifier: JsControlTreeModifier });
 		}.bind(this))
 		.catch(function(oError) {
 			assert.equal(oError.message, "Move target parent not found", "unkown target error captured");
@@ -325,7 +325,7 @@ sap.ui.define([
 					}
 				}
 			});
-			return MoveElements.applyChange(oChange, this.oObjectHeader, {modifier: JsControlTreeModifier});
+			return MoveElements.applyChange(oChange, this.oObjectHeader, { modifier: JsControlTreeModifier });
 		}.bind(this))
 		.catch(function(oError) {
 			assert.equal(oError.message, "No target aggregation supplied for move", "missing target aggregation error captured");
@@ -340,7 +340,7 @@ sap.ui.define([
 					}
 				}
 			});
-			return MoveElements.applyChange(oChange, this.oObjectHeader, {modifier: JsControlTreeModifier});
+			return MoveElements.applyChange(oChange, this.oObjectHeader, { modifier: JsControlTreeModifier });
 		}.bind(this))
 		.catch(function(oError) {
 			assert.equal(oError.message, "Change format invalid", "missing moved elements error captured");
@@ -361,7 +361,7 @@ sap.ui.define([
 					}
 				}
 			});
-			return MoveElements.applyChange(oChange, this.oObjectHeader, {modifier: JsControlTreeModifier});
+			return MoveElements.applyChange(oChange, this.oObjectHeader, { modifier: JsControlTreeModifier });
 		}.bind(this))
 		.catch(function(oError) {
 			assert.equal(
@@ -378,7 +378,7 @@ sap.ui.define([
 			content: this.mSingleMoveChangeContentWithLocalId
 		});
 
-		return MoveElements.applyChange(oChange, this.oXmlObjectHeader, {modifier: XmlTreeModifier, appComponent: oComponent, view: this.oXmlView})
+		return MoveElements.applyChange(oChange, this.oXmlObjectHeader, { modifier: XmlTreeModifier, appComponent: oComponent, view: this.oXmlView })
 		.then(function() {
 			assert.equal(this.oXmlObjectHeader.childNodes.length, 1, "object attribute is removed from the header");
 			assert.equal(this.oXmlObjectHeader.childNodes[0].getAttribute("id"), this.oObjectAttribute2.getId(), "object attribute 2 is still in the header");
@@ -394,7 +394,7 @@ sap.ui.define([
 			content: this.mSingleMoveChangeContentWithGlobalId
 		});
 
-		return MoveElements.applyChange(oChange, this.oXmlObjectHeader, {modifier: XmlTreeModifier, view: this.oXmlView})
+		return MoveElements.applyChange(oChange, this.oXmlObjectHeader, { modifier: XmlTreeModifier, view: this.oXmlView })
 		.then(function() {
 			assert.equal(this.oXmlObjectHeader.childNodes.length, 1, "object attribute is removed from the header");
 			assert.equal(this.oXmlObjectHeader.childNodes[0].getAttribute("id"), this.oObjectAttribute2.getId(), "object attribute 2 is still in the header");
@@ -410,7 +410,7 @@ sap.ui.define([
 			content: this.mMultiMoveChangeContentWithLocalId
 		});
 
-		return MoveElements.applyChange(oChange, this.oXmlObjectHeader, {modifier: XmlTreeModifier, appComponent: oComponent, view: this.oXmlView})
+		return MoveElements.applyChange(oChange, this.oXmlObjectHeader, { modifier: XmlTreeModifier, appComponent: oComponent, view: this.oXmlView })
 		.then(function() {
 			assert.equal(this.oXmlObjectHeader.childNodes.length, 0, "both object attributes removed from the header");
 			assert.equal(this.oXmlLayout.childNodes[0].childNodes[0].getAttribute("id"), this.oObjectHeader.getId(), "object header is still at 1. position");
@@ -426,7 +426,7 @@ sap.ui.define([
 			content: this.mMultiMoveChangeContentWithGlobalId
 		});
 
-		return MoveElements.applyChange(oChange, this.oXmlObjectHeader, {modifier: XmlTreeModifier, view: this.oXmlView})
+		return MoveElements.applyChange(oChange, this.oXmlObjectHeader, { modifier: XmlTreeModifier, view: this.oXmlView })
 		.then(function() {
 			assert.equal(this.oXmlObjectHeader.childNodes.length, 0, "both object attributes removed from the header");
 			assert.equal(this.oXmlLayout.childNodes[0].childNodes[0].getAttribute("id"), this.oObjectHeader.getId(), "object header is still at 1. position");

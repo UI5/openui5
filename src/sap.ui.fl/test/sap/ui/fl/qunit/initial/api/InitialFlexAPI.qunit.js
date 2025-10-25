@@ -30,13 +30,13 @@ sap.ui.define([
 		});
 
 		QUnit.test("getFlexVersion - flex info session exists with version", function(assert) {
-			FlexInfoSession.setByReference({version: "1"}, sReference);
-			assert.equal(InitialFlexAPI.getFlexVersion({reference: sReference}), "1", "version exists");
+			FlexInfoSession.setByReference({ version: "1" }, sReference);
+			assert.equal(InitialFlexAPI.getFlexVersion({ reference: sReference }), "1", "version exists");
 		});
 
 		QUnit.test("getFlexVersion - no flex info session exists", function(assert) {
 			FlexInfoSession.removeByReference(sReference);
-			assert.equal(InitialFlexAPI.getFlexVersion({reference: sReference}), undefined, "version doesn't exists");
+			assert.equal(InitialFlexAPI.getFlexVersion({ reference: sReference }), undefined, "version doesn't exists");
 		});
 	});
 

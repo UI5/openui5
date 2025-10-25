@@ -41,7 +41,7 @@ sap.ui.define([
 		},
 
 		switchToAdaptionMode() {
-			startKeyUserAdaptation({rootControl: this.getOwnerComponent()});
+			startKeyUserAdaptation({ rootControl: this.getOwnerComponent() });
 		},
 
 		isDataReady() {

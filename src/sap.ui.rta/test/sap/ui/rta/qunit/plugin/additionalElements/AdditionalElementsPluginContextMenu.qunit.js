@@ -74,7 +74,7 @@ sap.ui.define([
 					aElementsArray = [{
 						aggregation: sAggregationName,
 						elements: [
-							{elementId: "DummyElement"}
+							{ elementId: "DummyElement" }
 						]
 					}];
 				}
@@ -146,8 +146,8 @@ sap.ui.define([
 						{
 							aggregation: sAggregationName,
 							elements: [
-								{elementId: "DummyElement"},
-								{elementId: "DummyElement2"}
+								{ elementId: "DummyElement" },
+								{ elementId: "DummyElement2" }
 							]
 						}
 					];
@@ -243,14 +243,14 @@ sap.ui.define([
 					aElementsArray = [{
 						aggregation: sSiblingAggregationName,
 						elements: [
-							{elementId: "DummySiblingElement"}
+							{ elementId: "DummySiblingElement" }
 						]
 					}];
 				} else {
 					aElementsArray = [{
 						aggregation: sChildAggregationName,
 						elements: [
-							{elementId: "DummyChildElement"}
+							{ elementId: "DummyChildElement" }
 						]
 					}];
 				}
@@ -349,12 +349,12 @@ sap.ui.define([
 					aElementsArray = [{
 						aggregation: sFirstChildAggregationName,
 						elements: [
-							{elementId: "DummyChildElement"}
+							{ elementId: "DummyChildElement" }
 						]
 					}, {
 						aggregation: sSecondChildAggregationName,
 						elements: [
-							{elementId: "DummyChildElement2"}
+							{ elementId: "DummyChildElement2" }
 						]
 					}];
 				}
@@ -472,19 +472,19 @@ sap.ui.define([
 					aElementsArray = [{
 						aggregation: sSiblingAggregationName,
 						elements: [
-							{elementId: "DummySiblingElement"}
+							{ elementId: "DummySiblingElement" }
 						]
 					}];
 				} else {
 					aElementsArray = [{
 						aggregation: sFirstChildAggregationName,
 						elements: [
-							{elementId: "DummyChildElement"}
+							{ elementId: "DummyChildElement" }
 						]
 					}, {
 						aggregation: sSecondChildAggregationName,
 						elements: [
-							{elementId: "DummyChildElement2"}
+							{ elementId: "DummyChildElement2" }
 						]
 					}];
 				}

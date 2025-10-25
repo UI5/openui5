@@ -37,9 +37,9 @@ sap.ui.define([
 	}, function() {
 		QUnit.test("When prepareUpdate is called one after another and backend responses are simulated differently", function(assert) {
 			var fnNewConnectorCall = sandbox.stub(WriteUtils, "sendRequest");
-			fnNewConnectorCall.onFirstCall().resolves({response: '{ "id": "id.string", "reference":"base.id", "content": [] }'});
-			fnNewConnectorCall.onSecondCall().resolves({response: '{ "id": "id.json", "reference":"base.id", "content": [] }'});
-			fnNewConnectorCall.onThirdCall().resolves({response: '{ "id": "id.refVer", "reference":"base.id", "referenceVersion":"1.1", "content": [] }'});
+			fnNewConnectorCall.onFirstCall().resolves({ response: '{ "id": "id.string", "reference":"base.id", "content": [] }' });
+			fnNewConnectorCall.onSecondCall().resolves({ response: '{ "id": "id.json", "reference":"base.id", "content": [] }' });
+			fnNewConnectorCall.onThirdCall().resolves({ response: '{ "id": "id.refVer", "reference":"base.id", "referenceVersion":"1.1", "content": [] }' });
 			return AppVariantFactory.prepareUpdate({
 				id: "id.string"
 			}).then(function(oVariant) {
@@ -83,7 +83,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("When prepareUpdate is called and failure happens", function(assert) {
-			sandbox.stub(WriteUtils, "sendRequest").rejects({message: "lalala"});
+			sandbox.stub(WriteUtils, "sendRequest").rejects({ message: "lalala" });
 
 			return AppVariantFactory.prepareUpdate({
 				id: "a.id"
@@ -104,12 +104,12 @@ sap.ui.define([
 					content: []
 				})
 			});
-			var oStubOpenTransportSelection = sandbox.stub(TransportSelection.prototype, "openTransportSelection").resolves({transport: ""});
-			const oVariant = await AppVariantFactory.prepareUpdate({id: "a.id"});
+			var oStubOpenTransportSelection = sandbox.stub(TransportSelection.prototype, "openTransportSelection").resolves({ transport: "" });
+			const oVariant = await AppVariantFactory.prepareUpdate({ id: "a.id" });
 			await oVariant.addDescriptorInlineChange(await AppVariantInlineChangeFactory.create_ui_generic_app_changePageConfiguration({
 				changeType: "appdescr_ui_generic_app_changePageConfiguration",
 				content: {
-					parentPage: {component: "dummy", entitySet: "dummy"},
+					parentPage: { component: "dummy", entitySet: "dummy" },
 					entityPropertyChange: {
 						propertyPath: "a",
 						operation: "UPSERT",
@@ -134,7 +134,7 @@ sap.ui.define([
 				{
 					changeType: "appdescr_ui_generic_app_changePageConfiguration",
 					content: {
-						parentPage: {component: "dummy", entitySet: "dummy"},
+						parentPage: { component: "dummy", entitySet: "dummy" },
 						entityPropertyChange: {
 							propertyPath: "a",
 							operation: "UPSERT",
@@ -155,7 +155,7 @@ sap.ui.define([
 					packageName: "$TMP"
 				})
 			});
-			var oStubOpenTransportSelection = sandbox.stub(TransportSelection.prototype, "openTransportSelection").resolves({transport: ""});
+			var oStubOpenTransportSelection = sandbox.stub(TransportSelection.prototype, "openTransportSelection").resolves({ transport: "" });
 			return AppVariantFactory.prepareUpdate({
 				id: "a.id"
 			}).then(function(oVariant) {
@@ -183,7 +183,7 @@ sap.ui.define([
 					layer: Layer.CUSTOMER
 				})
 			});
-			var oStubOpenTransportSelection = sandbox.stub(TransportSelection.prototype, "openTransportSelection").resolves({transport: "aTransport"});
+			var oStubOpenTransportSelection = sandbox.stub(TransportSelection.prototype, "openTransportSelection").resolves({ transport: "aTransport" });
 			return AppVariantFactory.prepareUpdate({
 				id: "a.id"
 			}).then(function(oVariant) {
@@ -240,7 +240,7 @@ sap.ui.define([
 					packageName: ""
 				})
 			});
-			var oStubOpenTransportSelection = sandbox.stub(TransportSelection.prototype, "openTransportSelection").resolves({transport: ""});
+			var oStubOpenTransportSelection = sandbox.stub(TransportSelection.prototype, "openTransportSelection").resolves({ transport: "" });
 			return AppVariantFactory.prepareDelete({
 				id: "a.id"
 			}).then(function(oVariant) {
@@ -265,7 +265,7 @@ sap.ui.define([
 					packageName: ""
 				})
 			});
-			var oStubOpenTransportSelection = sandbox.stub(TransportSelection.prototype, "openTransportSelection").resolves({transport: "aTransport"});
+			var oStubOpenTransportSelection = sandbox.stub(TransportSelection.prototype, "openTransportSelection").resolves({ transport: "aTransport" });
 			return AppVariantFactory.prepareDelete({
 				id: "a.id"
 			}).then(function(oVariant) {
@@ -314,14 +314,14 @@ sap.ui.define([
 				parsedHash: {
 					semanticObject: "testSemanticObject",
 					action: "testAction",
-					params: {par: "testpar"}
+					params: { par: "testpar" }
 				},
 				reference: "a.reference"
 			}).then(function(oVariant) {
 				assert.deepEqual(oVariant.getParsedHash(), {
 					semanticObject: "testSemanticObject",
 					action: "testAction",
-					params: {par: "testpar"}
+					params: { par: "testpar" }
 				});
 			});
 		});
@@ -475,7 +475,7 @@ sap.ui.define([
 				parsedHash: {
 					semanticObject: "testSemanticObject",
 					action: "testAction",
-					params: {par: "testpar"}
+					params: { par: "testpar" }
 				},
 				reference: "a.reference"
 			}).then(function(oVariant) {
@@ -484,7 +484,7 @@ sap.ui.define([
 				assert.deepEqual(oVariant.getParsedHash(), {
 					semanticObject: "testSemanticObject",
 					action: "testAction",
-					params: {par: "testpar"}
+					params: { par: "testpar" }
 				});
 				assert.equal(oVariant.getReference(), "a.reference");
 				assert.equal(oVariant.getMode(), "NEW");
@@ -582,7 +582,7 @@ sap.ui.define([
 					parsedHash: {
 						semanticObject: "testSemanticObject",
 						action: "testAction",
-						params: {par: "testpar"}
+						params: { par: "testpar" }
 					},
 					reference: "a.reference",
 					layer: Layer.CUSTOMER
@@ -593,7 +593,7 @@ sap.ui.define([
 				parsedHash: {
 					semanticObject: "testSemanticObject",
 					action: "testAction",
-					params: {par: "testpar"}
+					params: { par: "testpar" }
 				},
 				reference: "a.reference"
 			}).then(function(oAppVariant) {
@@ -612,7 +612,7 @@ sap.ui.define([
 					parsedHash: {
 						semanticObject: "testSemanticObject",
 						action: "testAction",
-						params: {par: "testpar"}
+						params: { par: "testpar" }
 					},
 					reference: "a.reference",
 					layer: Layer.CUSTOMER
@@ -623,7 +623,7 @@ sap.ui.define([
 				parsedHash: {
 					semanticObject: "testSemanticObject",
 					action: "testAction",
-					params: {par: "testpar"}
+					params: { par: "testpar" }
 				},
 				reference: "a.reference",
 				referenceVersion: "1.1"
@@ -645,7 +645,7 @@ sap.ui.define([
 					layer: Layer.CUSTOMER
 				})
 			});
-			var oStubOpenTransportSelection = sandbox.stub(TransportSelection.prototype, "openTransportSelection").resolves({transport: ""});
+			var oStubOpenTransportSelection = sandbox.stub(TransportSelection.prototype, "openTransportSelection").resolves({ transport: "" });
 			return AppVariantFactory.prepareUpdate({
 				id: "a.id"
 			}).then(function(oAppVariant) {
@@ -666,7 +666,7 @@ sap.ui.define([
 					layer: Layer.CUSTOMER
 				})
 			});
-			var oStubOpenTransportSelection = sandbox.stub(TransportSelection.prototype, "openTransportSelection").resolves({transport: "aTransport"});
+			var oStubOpenTransportSelection = sandbox.stub(TransportSelection.prototype, "openTransportSelection").resolves({ transport: "aTransport" });
 			return AppVariantFactory.prepareUpdate({
 				id: "a.id"
 			}).then(function(oAppVariant) {
@@ -687,7 +687,7 @@ sap.ui.define([
 					layer: Layer.CUSTOMER
 				})
 			});
-			var oStubOpenTransportSelection = sandbox.stub(TransportSelection.prototype, "openTransportSelection").resolves({transport: ""});
+			var oStubOpenTransportSelection = sandbox.stub(TransportSelection.prototype, "openTransportSelection").resolves({ transport: "" });
 			return AppVariantFactory.prepareDelete({
 				id: "a.id"
 			}).then(function(oAppVariant) {
@@ -707,7 +707,7 @@ sap.ui.define([
 					layer: Layer.CUSTOMER
 				})
 			});
-			var oStubOpenTransportSelection = sandbox.stub(TransportSelection.prototype, "openTransportSelection").resolves({transport: "aTransport"});
+			var oStubOpenTransportSelection = sandbox.stub(TransportSelection.prototype, "openTransportSelection").resolves({ transport: "aTransport" });
 			return AppVariantFactory.prepareDelete({
 				id: "a.id"
 			}).then(function(oDescriptorVariant) {
@@ -743,7 +743,7 @@ sap.ui.define([
 					parsedHash: {
 						semanticObject: "testSemanticObject",
 						action: "testAction",
-						params: {par: "testpar"}
+						params: { par: "testpar" }
 					},
 					reference: "a.reference",
 					layer: Layer.CUSTOMER,
@@ -755,7 +755,7 @@ sap.ui.define([
 				parsedHash: {
 					semanticObject: "testSemanticObject",
 					action: "testAction",
-					params: {par: "testpar"}
+					params: { par: "testpar" }
 				},
 				reference: "a.reference"
 			}).then(function(oVariant) {
@@ -774,7 +774,7 @@ sap.ui.define([
 					parsedHash: {
 						semanticObject: "testSemanticObject",
 						action: "testAction",
-						params: {par: "testpar"}
+						params: { par: "testpar" }
 					},
 					reference: "a.reference",
 					layer: Layer.CUSTOMER,
@@ -786,7 +786,7 @@ sap.ui.define([
 				parsedHash: {
 					semanticObject: "testSemanticObject",
 					action: "testAction",
-					params: {par: "testpar"}
+					params: { par: "testpar" }
 				},
 				reference: "a.reference",
 				parentVersion: "versionGUID"
@@ -847,7 +847,7 @@ sap.ui.define([
 					layer: Layer.CUSTOMER
 				})
 			});
-			var oSpyOpenTransportSelection = sandbox.stub(TransportSelection.prototype, "openTransportSelection").resolves({transport: ""});
+			var oSpyOpenTransportSelection = sandbox.stub(TransportSelection.prototype, "openTransportSelection").resolves({ transport: "" });
 			return AppVariantFactory.prepareDelete({
 				id: "a.id"
 			}).then(function(oVariant) {

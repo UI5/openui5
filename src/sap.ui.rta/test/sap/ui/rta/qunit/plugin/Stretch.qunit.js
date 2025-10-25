@@ -292,7 +292,7 @@ sap.ui.define([
 					}
 				}.bind(this));
 			}.bind(this));
-			var oConfig = { attributes: true, childList: false, characterData: false, subtree: true};
+			var oConfig = { attributes: true, childList: false, characterData: false, subtree: true };
 			oObserver.observe(document.getElementById("qunit-fixture"), oConfig);
 
 			this.oLayout.setWidth("300px");
@@ -340,7 +340,7 @@ sap.ui.define([
 			sandbox.stub(this.oStretchPlugin, "isBusy").returns(true);
 			this.oStretchPlugin.removeStretchCandidate(this.oVBoxOverlay1);
 			assert.notOk(isStretched(this.oVBoxOverlay1), "the style class removed before element gets modified");
-			this.oVBoxOverlay1.fireEvent("elementModified", {type: "afterRendering"});
+			this.oVBoxOverlay1.fireEvent("elementModified", { type: "afterRendering" });
 			setTimeout(function() {
 				assert.notOk(isStretched(this.oVBoxOverlay1), "the style class is not placed again");
 				done();
@@ -371,7 +371,7 @@ sap.ui.define([
 				done();
 			}, this);
 
-			this.oStretchPlugin.getDesignTime().fireEvent(sEventName, {id: "destroyedOverlayId"});
+			this.oStretchPlugin.getDesignTime().fireEvent(sEventName, { id: "destroyedOverlayId" });
 		}
 	});
 
@@ -632,7 +632,7 @@ sap.ui.define([
 					}
 				}.bind(this));
 			}.bind(this));
-			var oConfig = { attributes: true, childList: false, characterData: false, subtree: true};
+			var oConfig = { attributes: true, childList: false, characterData: false, subtree: true };
 			oObserver.observe(document.getElementById("qunit-fixture"), oConfig);
 
 			this.oHBox2.setVisible(true);
@@ -793,7 +793,7 @@ sap.ui.define([
 			var done = assert.async();
 
 			this.oFormElement = new FormElement("groupElement1", {
-				fields: [new Button({text: "fooooo"})],
+				fields: [new Button({ text: "fooooo" })],
 				label: "element1"
 			});
 			this.oFormContainer = new FormContainer("group1", {
@@ -839,7 +839,7 @@ sap.ui.define([
 			const done = assert.async();
 
 			this.oFormElement = new FormElement("groupElement1", {
-				fields: [new Button({text: "fooooo"})],
+				fields: [new Button({ text: "fooooo" })],
 				label: "element1"
 			});
 			this.oFormContainer = new FormContainer("group1", {

@@ -37,7 +37,7 @@ sap.ui.define([
 				layer: sLayer || Layer.USER,
 				reference: "appComponentReference",
 				namespace: "namespace",
-				selector: oSelector || {id: "control1"},
+				selector: oSelector || { id: "control1" },
 				variantReference: sVariantReference || ""
 			}
 		);

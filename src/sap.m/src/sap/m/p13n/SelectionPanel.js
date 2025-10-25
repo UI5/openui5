@@ -461,7 +461,11 @@ sap.ui.define([
 			aFilter.push(oSearchFilter);
 		}
 
-		this._oListControl.getBinding("items").filter(new Filter(aFilter, true));
+		let vFilter = [];
+		if (aFilter.length > 0) {
+			vFilter = new Filter(aFilter, true);
+		}
+		this._oListControl.getBinding("items").filter(vFilter);
 	};
 
 	SelectionPanel.prototype._onSearchFieldLiveChange = function(oEvent) {

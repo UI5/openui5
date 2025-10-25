@@ -230,7 +230,7 @@ sap.ui.define([
 	Settings.prototype.handler = function(aElementOverlays, mPropertyBag, oSettingsAction) {
 		mPropertyBag ||= {};
 		const oElement = aElementOverlays[0].getElement();
-		let {fnHandler} = mPropertyBag;
+		let { fnHandler } = mPropertyBag;
 
 		fnHandler ||= aElementOverlays[0].getDesignTimeMetadata().getAction("settings").handler;
 		if (!fnHandler) {

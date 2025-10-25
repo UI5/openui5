@@ -82,7 +82,7 @@ sap.ui.define([
 		}
 	}, function() {
 		QUnit.test("with a failing connector", function(assert) {
-			const oLrepConnectorLoadFeaturesStub = sandbox.stub(LrepConnector, "loadFeatures").resolves({isKeyUser: true});
+			const oLrepConnectorLoadFeaturesStub = sandbox.stub(LrepConnector, "loadFeatures").resolves({ isKeyUser: true });
 			delete PersonalizationConnector.loadFeatures;
 			const oJsObjectConnectorLoadFeaturesStub = sandbox.stub(JsObjectConnector, "loadFeatures").rejects({});
 
@@ -123,24 +123,24 @@ sap.ui.define([
 			const sUrl = "/some/url";
 
 			sandbox.stub(FlexConfiguration, "getFlexibilityServices").returns([
-				{connector: "LrepConnector", url: sUrl},
-				{connector: "JsObjectConnector"}
+				{ connector: "LrepConnector", url: sUrl },
+				{ connector: "JsObjectConnector" }
 			]);
 
 			return Storage.loadFeatures().then(function() {
 				assert.strictEqual(oLrepConnectorLoadFeaturesStub.callCount, 1, "the loadFeatures was triggered once");
 				const oLrepConnectorCallArgs = oLrepConnectorLoadFeaturesStub.getCall(0).args[0];
-				assert.deepEqual(oLrepConnectorCallArgs, {url: sUrl}, "the url was passed");
+				assert.deepEqual(oLrepConnectorCallArgs, { url: sUrl }, "the url was passed");
 				assert.strictEqual(oJsObjectConnectorLoadFeaturesStub.callCount, 1, "the loadFeatures was triggered once");
 				const oJsObjectConnectorCallArgs = oJsObjectConnectorLoadFeaturesStub.getCall(0).args[0];
-				assert.deepEqual(oJsObjectConnectorCallArgs, {url: undefined}, "no url was passed");
+				assert.deepEqual(oJsObjectConnectorCallArgs, { url: undefined }, "no url was passed");
 			});
 		});
 
 		QUnit.test("then merges the response of the connectors", function(assert) {
 			sandbox.stub(FlexConfiguration, "getFlexibilityServices").returns([
-				{connector: "LrepConnector", url: this.url},
-				{connector: "JsObjectConnector"}
+				{ connector: "LrepConnector", url: this.url },
+				{ connector: "JsObjectConnector" }
 			]);
 
 			sandbox.stub(LrepConnector, "loadFeatures").resolves({
@@ -158,8 +158,8 @@ sap.ui.define([
 
 		QUnit.test("then higher layer overrule the lower layer", function(assert) {
 			sandbox.stub(FlexConfiguration, "getFlexibilityServices").returns([
-				{connector: "LrepConnector", url: this.url},
-				{connector: "JsObjectConnector"}
+				{ connector: "LrepConnector", url: this.url },
+				{ connector: "JsObjectConnector" }
 			]);
 
 			sandbox.stub(LrepConnector, "loadFeatures").resolves({
@@ -195,7 +195,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("with a failing connector", function(assert) {
-			const oLrepConnectorLoadFeaturesStub = sandbox.stub(LrepConnector, "loadVariantsAuthors").resolves({id1: "name1"});
+			const oLrepConnectorLoadFeaturesStub = sandbox.stub(LrepConnector, "loadVariantsAuthors").resolves({ id1: "name1" });
 			const oJsObjectConnectorLoadFeaturesStub = sandbox.stub(JsObjectConnector, "loadVariantsAuthors").rejects({});
 			delete PersonalizationConnector.loadVariantsAuthors;
 
@@ -229,8 +229,8 @@ sap.ui.define([
 
 		QUnit.test("then merges the response of the connectors", function(assert) {
 			sandbox.stub(FlexConfiguration, "getFlexibilityServices").returns([
-				{connector: "LrepConnector", url: this.url},
-				{connector: "JsObjectConnector"}
+				{ connector: "LrepConnector", url: this.url },
+				{ connector: "JsObjectConnector" }
 			]);
 
 			const oLrepConnectorLoadFeaturesStub = sandbox.stub(LrepConnector, "loadVariantsAuthors").resolves({
@@ -249,7 +249,7 @@ sap.ui.define([
 			return Storage.loadVariantsAuthors("reference").then(function(oResponse) {
 				assert.strictEqual(oLrepConnectorLoadFeaturesStub.callCount, 1, "the loadVariantsAuthors was triggered once");
 				const oLrepConnectorCallArgs = oLrepConnectorLoadFeaturesStub.getCall(0).args[0];
-				assert.deepEqual(oLrepConnectorCallArgs, {url: this.url, reference: "reference"}, "the url was passed");
+				assert.deepEqual(oLrepConnectorCallArgs, { url: this.url, reference: "reference" }, "the url was passed");
 				assert.strictEqual(oJsObjectConnectorLoadFeaturesStub.callCount, 1, "the loadVariantsAuthors was triggered once");
 				const oJsObjectConnectorCallArgs = oJsObjectConnectorLoadFeaturesStub.getCall(0).args[0];
 				assert.deepEqual(oJsObjectConnectorCallArgs.url, undefined, "no url was passed");
@@ -269,8 +269,8 @@ sap.ui.define([
 			sandbox.stub(JsObjectConnector, "loadFlexData").resolves(StorageUtils.getEmptyFlexDataResponse());
 			sandbox.stub(LrepConnector, "loadFlexData").resolves(StorageUtils.getEmptyFlexDataResponse());
 
-			return Storage.loadFlexData({reference: sFlexReference}).then(function(oResult) {
-				assert.deepEqual(oResult, merge(StorageUtils.getEmptyFlexDataResponse(), {cacheKey: null}));
+			return Storage.loadFlexData({ reference: sFlexReference }).then(function(oResult) {
+				assert.deepEqual(oResult, merge(StorageUtils.getEmptyFlexDataResponse(), { cacheKey: null }));
 			});
 		});
 
@@ -279,7 +279,7 @@ sap.ui.define([
 			const oJsObjectConnectorStub = sandbox.stub(JsObjectConnector, "loadFlexData").resolves(StorageUtils.getEmptyFlexDataResponse());
 			const oLrepConnectorStub = sandbox.stub(LrepConnector, "loadFlexData").resolves(StorageUtils.getEmptyFlexDataResponse());
 
-			await Storage.loadFlexData({reference: sFlexReference, skipLoadBundle: true});
+			await Storage.loadFlexData({ reference: sFlexReference, skipLoadBundle: true });
 			assert.strictEqual(oStaticFileConnectorStub.callCount, 0, "the StaticFileConnector.loadFlexData was not called");
 			assert.strictEqual(oJsObjectConnectorStub.callCount, 1, "the JsObjectConnector.loadFlexData was called once");
 			assert.strictEqual(oLrepConnectorStub.callCount, 1, "the LrepConnector.loadFlexData was called once");
@@ -287,27 +287,27 @@ sap.ui.define([
 
 		QUnit.test("Given 2 connectors provide their own cacheKey values", function(assert) {
 			sandbox.stub(FlexConfiguration, "getFlexibilityServices").returns([
-				{connector: "KeyUserConnector", layers: [Layer.CUSTOMER]},
-				{connector: "PersonalizationConnector", layers: [Layer.USER]}
+				{ connector: "KeyUserConnector", layers: [Layer.CUSTOMER] },
+				{ connector: "PersonalizationConnector", layers: [Layer.USER] }
 			]);
-			sandbox.stub(KeyUserConnector, "loadFlexData").resolves(merge(StorageUtils.getEmptyFlexDataResponse(), {cacheKey: "abc"}));
-			sandbox.stub(PersonalizationConnector, "loadFlexData").resolves(merge(StorageUtils.getEmptyFlexDataResponse(), {cacheKey: "123"}));
+			sandbox.stub(KeyUserConnector, "loadFlexData").resolves(merge(StorageUtils.getEmptyFlexDataResponse(), { cacheKey: "abc" }));
+			sandbox.stub(PersonalizationConnector, "loadFlexData").resolves(merge(StorageUtils.getEmptyFlexDataResponse(), { cacheKey: "123" }));
 
-			return Storage.loadFlexData({reference: sFlexReference}).then(function(oResult) {
-				assert.deepEqual(oResult, merge(StorageUtils.getEmptyFlexDataResponse(), {cacheKey: "abc123"}));
+			return Storage.loadFlexData({ reference: sFlexReference }).then(function(oResult) {
+				assert.deepEqual(oResult, merge(StorageUtils.getEmptyFlexDataResponse(), { cacheKey: "abc123" }));
 				FlexConfiguration.getFlexibilityServices.restore();
 			});
 		});
 
 		QUnit.test("Given 2 connectors provide url and path properties", function(assert) {
 			sandbox.stub(FlexConfiguration, "getFlexibilityServices").returns([
-				{connector: "ObjectPathConnector", path: "path/to/data"},
-				{connector: "PersonalizationConnector", url: "url/to/something"}
+				{ connector: "ObjectPathConnector", path: "path/to/data" },
+				{ connector: "PersonalizationConnector", url: "url/to/something" }
 			]);
 			const oObjectStorageStub = sandbox.stub(ObjectPathConnector, "loadFlexData").resolves(StorageUtils.getEmptyFlexDataResponse());
 			const oPersoStub = sandbox.stub(PersonalizationConnector, "loadFlexData").resolves(StorageUtils.getEmptyFlexDataResponse());
 
-			return Storage.loadFlexData({reference: sFlexReference, cacheKey: "cache"}).then(function() {
+			return Storage.loadFlexData({ reference: sFlexReference, cacheKey: "cache" }).then(function() {
 				assert.equal(oObjectStorageStub.lastCall.args[0].path, "path/to/data", "the path parameter was passed");
 				assert.equal(oPersoStub.lastCall.args[0].url, "url/to/something", "the url parameter was passed");
 				FlexConfiguration.getFlexibilityServices.restore();
@@ -318,7 +318,7 @@ sap.ui.define([
 			sandbox.stub(StaticFileConnector, "loadFlexData").resolves(StorageUtils.getEmptyFlexDataResponse());
 			const oLrepStub = sandbox.stub(LrepConnector, "loadFlexData").resolves(StorageUtils.getEmptyFlexDataResponse());
 
-			return Storage.loadFlexData({reference: sFlexReference, cacheKey: "cache", version: "version"}).then(function() {
+			return Storage.loadFlexData({ reference: sFlexReference, cacheKey: "cache", version: "version" }).then(function() {
 				assert.notOk(oLrepStub.lastCall.args[0].cacheKey, "the cache key was removed");
 			});
 		});
@@ -368,7 +368,7 @@ sap.ui.define([
 			const mChange2 = oChange2.convertToFileContent();
 			JsObjectConnector.storage.setItem(ObjectStorageUtils.createFlexObjectKey(mChange2), mChange2);
 
-			return Storage.loadFlexData({reference: sFlexReference}).then(function(oResult) {
+			return Storage.loadFlexData({ reference: sFlexReference }).then(function(oResult) {
 				assert.equal(oResult.changes.length, 1, "only the UI change was added to the result");
 				assert.deepEqual(oResult.changes[0], mChange2, "the 2. change is in the response");
 				assert.equal(oResult.variants.length, 1, "then the returned response has the variant");
@@ -382,35 +382,35 @@ sap.ui.define([
 			sandbox.stub(StaticFileConnector, "loadFlexData").resolves(StorageUtils.getEmptyFlexDataResponse());
 			sandbox.stub(LrepConnector, "loadFlexData").resolves(StorageUtils.getEmptyFlexDataResponse());
 
-			return Storage.loadFlexData({reference: sFlexReference}).then(function(oResult) {
-				assert.deepEqual(oResult, merge(StorageUtils.getEmptyFlexDataResponse(), {cacheKey: null}));
+			return Storage.loadFlexData({ reference: sFlexReference }).then(function(oResult) {
+				assert.deepEqual(oResult, merge(StorageUtils.getEmptyFlexDataResponse(), { cacheKey: null }));
 			});
 		});
 
 		QUnit.test("Given allContextsProvided false", function(assert) {
 			sandbox.stub(StaticFileConnector, "loadFlexData").resolves(StorageUtils.getEmptyFlexDataResponse());
-			sandbox.stub(LrepConnector, "loadFlexData").resolves(merge(StorageUtils.getEmptyFlexDataResponse(), {info: {allContextsProvided: false}}));
+			sandbox.stub(LrepConnector, "loadFlexData").resolves(merge(StorageUtils.getEmptyFlexDataResponse(), { info: { allContextsProvided: false } }));
 
-			return Storage.loadFlexData({reference: sFlexReference}).then(function(oResult) {
-				assert.deepEqual(oResult, merge(StorageUtils.getEmptyFlexDataResponse(), {cacheKey: null, info: {allContextsProvided: false}}));
+			return Storage.loadFlexData({ reference: sFlexReference }).then(function(oResult) {
+				assert.deepEqual(oResult, merge(StorageUtils.getEmptyFlexDataResponse(), { cacheKey: null, info: { allContextsProvided: false } }));
 			});
 		});
 
 		QUnit.test("Given allContextsProvided true", function(assert) {
 			sandbox.stub(StaticFileConnector, "loadFlexData").resolves(StorageUtils.getEmptyFlexDataResponse());
-			sandbox.stub(LrepConnector, "loadFlexData").resolves(merge(StorageUtils.getEmptyFlexDataResponse(), {info: {allContextsProvided: true}}));
+			sandbox.stub(LrepConnector, "loadFlexData").resolves(merge(StorageUtils.getEmptyFlexDataResponse(), { info: { allContextsProvided: true } }));
 
-			return Storage.loadFlexData({reference: sFlexReference}).then(function(oResult) {
-				assert.deepEqual(oResult, merge(StorageUtils.getEmptyFlexDataResponse(), {cacheKey: null, info: {allContextsProvided: true}}));
+			return Storage.loadFlexData({ reference: sFlexReference }).then(function(oResult) {
+				assert.deepEqual(oResult, merge(StorageUtils.getEmptyFlexDataResponse(), { cacheKey: null, info: { allContextsProvided: true } }));
 			});
 		});
 
 		QUnit.test("Given info.adaptationId and info.isEndUserAdaptation is filled", function(assert) {
 			sandbox.stub(StaticFileConnector, "loadFlexData").resolves(StorageUtils.getEmptyFlexDataResponse());
-			sandbox.stub(LrepConnector, "loadFlexData").resolves(merge(StorageUtils.getEmptyFlexDataResponse(), {info: {adaptationId: "id_1234", isEndUserAdaptation: true}}));
+			sandbox.stub(LrepConnector, "loadFlexData").resolves(merge(StorageUtils.getEmptyFlexDataResponse(), { info: { adaptationId: "id_1234", isEndUserAdaptation: true } }));
 
-			return Storage.loadFlexData({reference: sFlexReference}).then(function(oResult) {
-				assert.deepEqual(oResult, merge(StorageUtils.getEmptyFlexDataResponse(), {cacheKey: null, info: {adaptationId: "id_1234", isEndUserAdaptation: true}}));
+			return Storage.loadFlexData({ reference: sFlexReference }).then(function(oResult) {
+				assert.deepEqual(oResult, merge(StorageUtils.getEmptyFlexDataResponse(), { cacheKey: null, info: { adaptationId: "id_1234", isEndUserAdaptation: true } }));
 			});
 		});
 
@@ -418,8 +418,8 @@ sap.ui.define([
 			sandbox.stub(StaticFileConnector, "loadFlexData").resolves(StorageUtils.getEmptyFlexDataResponse());
 			sandbox.stub(LrepConnector, "loadFlexData").resolves(StorageUtils.getEmptyFlexDataResponse());
 
-			return Storage.loadFlexData({reference: sFlexReference}).then(function(oResult) {
-				assert.deepEqual(oResult, merge(StorageUtils.getEmptyFlexDataResponse(), {cacheKey: null}));
+			return Storage.loadFlexData({ reference: sFlexReference }).then(function(oResult) {
+				assert.deepEqual(oResult, merge(StorageUtils.getEmptyFlexDataResponse(), { cacheKey: null }));
 			});
 		});
 
@@ -452,10 +452,10 @@ sap.ui.define([
 			};
 
 			sandbox.stub(StaticFileConnector, "loadFlexData").resolves(oStaticFileConnectorResponse);
-			sandbox.stub(LrepConnector, "loadFlexData").resolves({changes: []});
+			sandbox.stub(LrepConnector, "loadFlexData").resolves({ changes: [] });
 
-			return Storage.loadFlexData({reference: sFlexReference}).then(function(oResult) {
-				assert.deepEqual(oResult, merge(oExpectedStorageResponse, {cacheKey: null}), "then the expected result is returned");
+			return Storage.loadFlexData({ reference: sFlexReference }).then(function(oResult) {
+				assert.deepEqual(oResult, merge(oExpectedStorageResponse, { cacheKey: null }), "then the expected result is returned");
 				assert.equal(Object.keys(oResult).length, 10, "ten entries are in the result");
 			});
 		});
@@ -516,8 +516,8 @@ sap.ui.define([
 				}
 			});
 
-			return Storage.loadFlexData({reference: sFlexReference}).then(function(oResult) {
-				assert.deepEqual(oResult, merge(oExpectedStorageResponse, {cacheKey: null}), "then the expected result is returned");
+			return Storage.loadFlexData({ reference: sFlexReference }).then(function(oResult) {
+				assert.deepEqual(oResult, merge(oExpectedStorageResponse, { cacheKey: null }), "then the expected result is returned");
 				assert.deepEqual(oResult.ui2personalization, oUI2PersonalizationResponse, "then the UI2 personalization change is correct");
 				assert.deepEqual(oResult.variants[0], oVariantContent, "then the variant change is correct");
 				assert.equal(Object.keys(oResult).length, 10, "ten entries are in the result");
@@ -561,8 +561,8 @@ sap.ui.define([
 				ui2personalization: oUI2PersonalizationResponse
 			});
 
-			return Storage.loadFlexData({reference: sFlexReference}).then(function(oResult) {
-				assert.deepEqual(oResult, merge(oExpectedStorageResponse, {cacheKey: null}), "then the expected result is returned");
+			return Storage.loadFlexData({ reference: sFlexReference }).then(function(oResult) {
+				assert.deepEqual(oResult, merge(oExpectedStorageResponse, { cacheKey: null }), "then the expected result is returned");
 				assert.deepEqual(oResult.ui2personalization, oUI2PersonalizationResponse, "then the UI2 personalization change is correct");
 				assert.equal(Object.keys(oResult).length, 10, "ten entries are in the result");
 			});
@@ -606,8 +606,8 @@ sap.ui.define([
 				variantSection: {}
 			});
 
-			return Storage.loadFlexData({reference: sFlexReference}).then(function(oResult) {
-				assert.deepEqual(oResult, merge(oExpectedStorageResponse, {cacheKey: null}), "then the expected result is returned");
+			return Storage.loadFlexData({ reference: sFlexReference }).then(function(oResult) {
+				assert.deepEqual(oResult, merge(oExpectedStorageResponse, { cacheKey: null }), "then the expected result is returned");
 				assert.deepEqual(oResult.ui2personalization, oUI2PersonalizationResponse, "then the UI2 personalization change is correct");
 				assert.equal(Object.keys(oResult).length, 10, "ten entries are in the result");
 			});
@@ -651,8 +651,8 @@ sap.ui.define([
 				variantSection: {}
 			});
 
-			return Storage.loadFlexData({reference: sFlexReference}).then(function(oResult) {
-				assert.deepEqual(oResult, merge(oExpectedStorageResponse, {cacheKey: null}), "then the expected result is returned");
+			return Storage.loadFlexData({ reference: sFlexReference }).then(function(oResult) {
+				assert.deepEqual(oResult, merge(oExpectedStorageResponse, { cacheKey: null }), "then the expected result is returned");
 				assert.deepEqual(oResult.ui2personalization, oUI2PersonalizationResponse, "then the UI2 personalization change is correct");
 				assert.equal(Object.keys(oResult).length, 10, "ten entries are in the result");
 			});
@@ -697,8 +697,8 @@ sap.ui.define([
 				variants: [oVariant1.content, oVariant2.content]
 			};
 
-			return Storage.loadFlexData({reference: sFlexReference}).then(function(oResult) {
-				assert.deepEqual(oResult, merge(oExpectedStorageResponse, {cacheKey: null}), "then the expected result is returned");
+			return Storage.loadFlexData({ reference: sFlexReference }).then(function(oResult) {
+				assert.deepEqual(oResult, merge(oExpectedStorageResponse, { cacheKey: null }), "then the expected result is returned");
 				assert.equal(Object.keys(oResult).length, 10, "ten entries are in the result");
 			});
 		});
@@ -728,7 +728,7 @@ sap.ui.define([
 			sandbox.stub(StaticFileConnector, "loadFlexData").resolves(oStaticFileConnectorResponse);
 			sandbox.stub(LrepConnector, "loadFlexData").resolves(oLrepConnectorResponse);
 
-			return Storage.loadFlexData({reference: sFlexReference}).then(function(oResult) {
+			return Storage.loadFlexData({ reference: sFlexReference }).then(function(oResult) {
 				assert.equal(oResult.changes.length, 1, "only one change was returned");
 			});
 		});
@@ -745,8 +745,8 @@ sap.ui.define([
 		QUnit.test("completeFlexData with mocked partialFlexData", function(assert) {
 			sandbox.stub(StaticFileConnector, "loadFlexData").resolves(StorageUtils.getEmptyFlexDataResponse());
 
-			return Storage.completeFlexData({reference: sFlexReference, partialFlexData: StorageUtils.getEmptyFlexDataResponse()}).then(function(oResult) {
-				assert.deepEqual(oResult, merge(StorageUtils.getEmptyFlexDataResponse(), {cacheKey: null}));
+			return Storage.completeFlexData({ reference: sFlexReference, partialFlexData: StorageUtils.getEmptyFlexDataResponse() }).then(function(oResult) {
+				assert.deepEqual(oResult, merge(StorageUtils.getEmptyFlexDataResponse(), { cacheKey: null }));
 			});
 		});
 
@@ -754,8 +754,8 @@ sap.ui.define([
 			sandbox.stub(StaticFileConnector, "loadFlexData").resolves(StorageUtils.getEmptyFlexDataResponse());
 			sandbox.stub(LrepConnector, "loadFlexData").resolves(StorageUtils.getEmptyFlexDataResponse());
 
-			return Storage.loadFlexData({reference: sFlexReference}).then(function(oResult) {
-				assert.deepEqual(oResult, merge(StorageUtils.getEmptyFlexDataResponse(), {cacheKey: null}));
+			return Storage.loadFlexData({ reference: sFlexReference }).then(function(oResult) {
+				assert.deepEqual(oResult, merge(StorageUtils.getEmptyFlexDataResponse(), { cacheKey: null }));
 			});
 		});
 
@@ -814,8 +814,8 @@ sap.ui.define([
 			const oExpectedResponse = merge({}, StorageUtils.getEmptyFlexDataResponse(), {
 				variants: [oResponse1.variants[0], oResponse2.variantSection.variantManagement1.variants[0].content]
 			});
-			return Storage.loadFlexData({reference: sFlexReference}).then(function(oResult) {
-				assert.deepEqual(oResult, merge(oExpectedResponse, {cacheKey: null}), "then the expected result is returned");
+			return Storage.loadFlexData({ reference: sFlexReference }).then(function(oResult) {
+				assert.deepEqual(oResult, merge(oExpectedResponse, { cacheKey: null }), "then the expected result is returned");
 			});
 		});
 
@@ -888,17 +888,17 @@ sap.ui.define([
 				key2: "value2"
 			};
 			oExpectedResponse.cacheKey = "key1key2";
-			return Storage.loadFlexData({reference: sFlexReference}).then(function(oResult) {
+			return Storage.loadFlexData({ reference: sFlexReference }).then(function(oResult) {
 				assert.deepEqual(oResult, oExpectedResponse, "then the expected result is returned");
 			});
 		});
 
 		QUnit.test("Given two connectors are provided and one is in charge of all layers and a draft layer is set", function(assert) {
 			sandbox.stub(FlexConfiguration, "getFlexibilityServices").returns([
-				{connector: "JsObjectConnector", layers: []},
-				{connector: "LrepConnector", layers: ["ALL"]}
+				{ connector: "JsObjectConnector", layers: [] },
+				{ connector: "LrepConnector", layers: ["ALL"] }
 			]);
-			FlexInfoSession.setByReference({version: Version.Number.Draft, initialAllContexts: true, maxLayer: Layer.CUSTOMER, saveChangeKeepSession: false}, sFlexReference);
+			FlexInfoSession.setByReference({ version: Version.Number.Draft, initialAllContexts: true, maxLayer: Layer.CUSTOMER, saveChangeKeepSession: false }, sFlexReference);
 
 			const oStaticFileConnectorStub = sandbox.stub(StaticFileConnector, "loadFlexData").resolves();
 			const oLrepConnectorStub = sandbox.stub(LrepConnector, "loadFlexData").resolves();
@@ -919,27 +919,27 @@ sap.ui.define([
 
 		QUnit.test("Given a maxLayer set for VENDOR", async function(assert) {
 			sandbox.stub(FlexConfiguration, "getFlexibilityServices").returns([
-				{connector: "JsObjectConnector", layers: []}
+				{ connector: "JsObjectConnector", layers: [] }
 			]);
 			sandbox.stub(JsObjectConnector, "loadFlexData").resolves();
-			FlexInfoSession.setByReference({maxLayer: Layer.VENDOR}, sFlexReference);
+			FlexInfoSession.setByReference({ maxLayer: Layer.VENDOR }, sFlexReference);
 			window.sessionStorage.setItem("sap.ui.rta.restart.VENDOR", true);
 			const oSetInfoSessionSpy = sandbox.spy(FlexInfoSession, "setByReference");
-			await Storage.loadFlexData({reference: sFlexReference});
+			await Storage.loadFlexData({ reference: sFlexReference });
 			assert.equal(oSetInfoSessionSpy.callCount, 0, "then the FlexInfoSession is not updated");
 		});
 
 		QUnit.test("Given two connectors are provided and one is in charge of a draft layer provided by flex info session", function(assert) {
 			sandbox.stub(FlexConfiguration, "getFlexibilityServices").returns([
-				{connector: "KeyUserConnector", layers: [Layer.CUSTOMER]},
-				{connector: "JsObjectConnector", layers: [Layer.USER]}
+				{ connector: "KeyUserConnector", layers: [Layer.CUSTOMER] },
+				{ connector: "JsObjectConnector", layers: [Layer.USER] }
 			]);
 
 			const oStaticFileConnectorStub = sandbox.stub(StaticFileConnector, "loadFlexData").resolves();
 			const oKeyUserConnectorStub = sandbox.stub(KeyUserConnector, "loadFlexData").resolves();
 			const oJsObjectConnectorStub = sandbox.stub(JsObjectConnector, "loadFlexData").resolves();
 
-			FlexInfoSession.setByReference({version: Version.Number.Draft}, sFlexReference);
+			FlexInfoSession.setByReference({ version: Version.Number.Draft }, sFlexReference);
 			window.sessionStorage.setItem("sap.ui.rta.restart.CUSTOMER", true);
 
 			return Storage.loadFlexData({
@@ -953,15 +953,15 @@ sap.ui.define([
 
 		QUnit.test("Given two connectors are provided and one is in charge of all layers and a draft layer provided by flex info session", function(assert) {
 			sandbox.stub(FlexConfiguration, "getFlexibilityServices").returns([
-				{connector: "JsObjectConnector", layers: []},
-				{connector: "LrepConnector", layers: ["ALL"]}
+				{ connector: "JsObjectConnector", layers: [] },
+				{ connector: "LrepConnector", layers: ["ALL"] }
 			]);
 
 			const oStaticFileConnectorStub = sandbox.stub(StaticFileConnector, "loadFlexData").resolves();
 			const oLrepConnectorStub = sandbox.stub(LrepConnector, "loadFlexData").resolves();
 			const oJsObjectConnectorStub = sandbox.stub(JsObjectConnector, "loadFlexData").resolves();
 
-			FlexInfoSession.setByReference({version: Version.Number.Draft}, sFlexReference);
+			FlexInfoSession.setByReference({ version: Version.Number.Draft }, sFlexReference);
 			window.sessionStorage.setItem("sap.ui.rta.restart.CUSTOMER", true);
 
 			return Storage.loadFlexData({
@@ -975,13 +975,13 @@ sap.ui.define([
 
 		QUnit.test("Given one connector are provided version parameter are not set in flex info session and saveChangeKeepSession is set", function(assert) {
 			sandbox.stub(FlexConfiguration, "getFlexibilityServices").returns([
-				{connector: "KeyUserConnector", layers: [Layer.CUSTOMER]}
+				{ connector: "KeyUserConnector", layers: [Layer.CUSTOMER] }
 			]);
 
 			const oStaticFileConnectorStub = sandbox.stub(StaticFileConnector, "loadFlexData").resolves();
 			const oKeyUserConnectorStub = sandbox.stub(KeyUserConnector, "loadFlexData").resolves();
 
-			FlexInfoSession.setByReference({maxLayer: Layer.CUSTOMER, saveChangeKeepSession: true}, sFlexReference);
+			FlexInfoSession.setByReference({ maxLayer: Layer.CUSTOMER, saveChangeKeepSession: true }, sFlexReference);
 
 			return Storage.loadFlexData({
 				reference: sFlexReference
@@ -1028,8 +1028,8 @@ sap.ui.define([
 					variants: [oVariant1, oVariant2]
 				}
 			});
-			return Storage.loadFlexData({reference: sFlexReference}).then(function(oResult) {
-				assert.deepEqual(oResult, merge(oExpectedResponse, {cacheKey: null}), "then the expected result is returned");
+			return Storage.loadFlexData({ reference: sFlexReference }).then(function(oResult) {
+				assert.deepEqual(oResult, merge(oExpectedResponse, { cacheKey: null }), "then the expected result is returned");
 			});
 		});
 	});
@@ -1038,7 +1038,7 @@ sap.ui.define([
 		beforeEach() {
 			sandbox.stub(FlexConfiguration, "getFlexibilityServices").returns([{
 				loadConnector: "my/connectors/BrokenInitialConnector",
-				layers: []}
+				layers: [] }
 			]);
 			// enforce the bundle loading by simulating the no-preload scenario
 			sandbox.stub(Component, "getComponentPreloadMode").returns("off");
@@ -1057,9 +1057,9 @@ sap.ui.define([
 		});
 
 		QUnit.test("given the BrokenConnector is registered and a changes-bundle.json is present for the application when Connector.loadFlexData is called", function(assert) {
-			return Storage.loadFlexData({reference: "test.app", componentName: "test.app"}).then(function(oResult) {
+			return Storage.loadFlexData({ reference: "test.app", componentName: "test.app" }).then(function(oResult) {
 				assert.equal(oResult.changes.length, 1, "then one change is returned");
-				assert.deepEqual(oResult.changes[0], {dummy: true}, "and the data from the changes bundle is included");
+				assert.deepEqual(oResult.changes[0], { dummy: true }, "and the data from the changes bundle is included");
 			});
 		});
 	});
@@ -1086,16 +1086,16 @@ sap.ui.define([
 				}
 			]);
 			sandbox.stub(BtpServiceConnector, "loadFlVariant").resolves({
-				variants: [{fileName: "variant1"}],
-				variantDependentControlChanges: [{fileName: "change1"}, {fileName: "change2"}],
-				variantChanges: [{fileName: "variantChange1"}, {fileName: "variantChange2"}],
-				changes: [{fileName: "change1"}]
+				variants: [{ fileName: "variant1" }],
+				variantDependentControlChanges: [{ fileName: "change1" }, { fileName: "change2" }],
+				variantChanges: [{ fileName: "variantChange1" }, { fileName: "variantChange2" }],
+				changes: [{ fileName: "change1" }]
 			});
-			const oResult = await Storage.loadFlVariant({reference: sFlexReference, variantReference: "variant1"});
+			const oResult = await Storage.loadFlVariant({ reference: sFlexReference, variantReference: "variant1" });
 			assert.deepEqual(oResult, {
-				variants: [{fileName: "variant1"}],
-				variantDependentControlChanges: [{fileName: "change1"}, {fileName: "change2"}],
-				variantChanges: [{fileName: "variantChange1"}, {fileName: "variantChange2"}]
+				variants: [{ fileName: "variant1" }],
+				variantDependentControlChanges: [{ fileName: "change1" }, { fileName: "change2" }],
+				variantChanges: [{ fileName: "variantChange1" }, { fileName: "variantChange2" }]
 			}, "the result is correct");
 		});
 	});

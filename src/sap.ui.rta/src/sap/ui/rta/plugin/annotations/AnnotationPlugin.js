@@ -39,7 +39,7 @@ sap.ui.define([
 				{
 					changeType: oAction.changeType,
 					serviceUrl: oChange.serviceUrl,
-					content: {...oChange.content, objectTemplateInfo: oAction.objectTemplateInfo},
+					content: { ...oChange.content, objectTemplateInfo: oAction.objectTemplateInfo },
 					// aLegacyRenameChanges is only passed for singleRename scenarios, where there is only one annotation change to be saved
 					// so we can simply add it in the loop
 					changesToDelete: aLegacyRenameChanges

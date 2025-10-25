@@ -55,7 +55,7 @@ sap.ui.define([
 		if (!oAggregationDefinition) {
 			throw Error(`The given Aggregation is not available in the given control: ${oModifier.getId(oControl)}`);
 		}
-		let sFragment = await LoaderExtensions.loadResource(sModuleName, {dataType: "text"}); // complete xml fragment as string
+		let sFragment = await LoaderExtensions.loadResource(sModuleName, { dataType: "text" }); // complete xml fragment as string
 
 		const oAdjustFragmentHandlers = DelegateMediator.getAddXMLAdjustFragmentHandlers();
 		if (oAdjustFragmentHandlers) {

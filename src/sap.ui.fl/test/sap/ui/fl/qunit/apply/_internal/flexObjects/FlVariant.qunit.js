@@ -142,7 +142,7 @@ sap.ui.define([
 			assert.strictEqual(oVariant.getId(), "myId", "the Id is properly set");
 			assert.strictEqual(oVariant.getVariantReference(), "myVariantReference", "the VariantReference is properly set");
 			assert.strictEqual(oVariant.getVariantManagementReference(), "myVariantManagementReference", "the VariantManagementReference is properly set");
-			assert.deepEqual(oVariant.getContexts(), {foo: "bar"}, "the contexts are properly set");
+			assert.deepEqual(oVariant.getContexts(), { foo: "bar" }, "the contexts are properly set");
 			assert.ok(oVariant.hasContexts(), "then the variant has contexts");
 		});
 

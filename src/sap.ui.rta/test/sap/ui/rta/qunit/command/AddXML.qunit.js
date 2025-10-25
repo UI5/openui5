@@ -211,13 +211,13 @@ sap.ui.define([
 			this.oComponent = RtaQunitUtils.createAndStubAppComponent(sandbox);
 			sandbox.stub(LayerUtils, "getCurrentLayer").returns(Layer.VENDOR);
 
-			var aTexts = [{text: "Text 1"}, {text: "Text 2"}, {text: "Text 3"}];
+			var aTexts = [{ text: "Text 1" }, { text: "Text 2" }, { text: "Text 3" }];
 			var oModel = new JSONModel({
 				texts: aTexts
 			});
 
 			this.oItemTemplate = new CustomListItem("item", {
-				content: new Text("text", {text: "{text}"})
+				content: new Text("text", { text: "{text}" })
 			});
 			this.oList = new List("list", {
 				items: {

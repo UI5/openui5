@@ -79,8 +79,8 @@ sap.ui.define([
 		}
 
 		const bState = await new Promise((resolve) => {
-			this.oVariantManagementControl.attachSave({resolve}, storeEventParameters, this);
-			this.oVariantManagementControl.attachCancel({resolve}, handleCancel, this);
+			this.oVariantManagementControl.attachSave({ resolve }, storeEventParameters, this);
+			this.oVariantManagementControl.attachCancel({ resolve }, handleCancel, this);
 			this.oVariantManagementControl.openSaveAsDialogForKeyUser(
 				rtaUtils.getRtaStyleClassName(),
 				ContextSharingAPI.createComponent(mComponentPropertyBag)

@@ -35,15 +35,15 @@ sap.ui.define([
 
 	function _createJSONModel() {
 		return new JSONModel([
-			{text: "item1-bound"},
-			{text: "item2-bound"}
+			{ text: "item1-bound" },
+			{ text: "item2-bound" }
 		]);
 	}
 
 	async function createTable(oModel) {
 		var oTable = new Table({
 			extension: [
-				new Title({text: "Example Table"})
+				new Title({ text: "Example Table" })
 			],
 			rowMode: new FixedRowMode({
 				rowCount: 5
@@ -59,28 +59,28 @@ sap.ui.define([
 		await nextUIUpdate();
 
 		oTable.addColumn(new Column({
-			label: new Label({text: "Last Name"}),
+			label: new Label({ text: "Last Name" }),
 			width: "200px",
-			template: new Label({id: "text-1", text: "{text}"})
+			template: new Label({ id: "text-1", text: "{text}" })
 		}));
 		oTable.addColumn(new Column({
-			label: new Label({text: "First Name"}),
+			label: new Label({ text: "First Name" }),
 			width: "100px",
-			template: new Label({id: "text-2", text: "{text}"})
+			template: new Label({ id: "text-2", text: "{text}" })
 		}));
 		oTable.addColumn(new Column({
-			label: new Label({text: "Checked"}),
+			label: new Label({ text: "Checked" }),
 			width: "75px",
-			template: new Button({id: "button-1", text: "{text}"})
+			template: new Button({ id: "button-1", text: "{text}" })
 		}));
 		oTable.addColumn(new Column({
-			label: new Label({text: "Web Site"}),
-			template: new Button({id: "button-2", text: "{text}"})
+			label: new Label({ text: "Web Site" }),
+			template: new Button({ id: "button-2", text: "{text}" })
 		}));
 		oTable.addColumn(new Column({
-			label: new Label({text: "Image"}),
+			label: new Label({ text: "Image" }),
 			width: "75px",
-			template: new Label({text: "{dummy}"})
+			template: new Label({ text: "{dummy}" })
 		}));
 		return oTable;
 	}
@@ -165,7 +165,7 @@ sap.ui.define([
 
 			this.oTable = new AnalyticalTable({
 				extension: [
-					new Title({text: "Example Table"})
+					new Title({ text: "Example Table" })
 				],
 				rowMode: new FixedRowMode({
 					rowCount: 5
@@ -178,30 +178,30 @@ sap.ui.define([
 			await nextUIUpdate();
 
 			this.oColumn = new AnalyticalColumn({
-				label: new Label({text: "Last Name"}),
+				label: new Label({ text: "Last Name" }),
 				width: "200px",
-				template: new Label({text: "{dummy}"})
+				template: new Label({ text: "{dummy}" })
 			});
 
 			this.oTable.addColumn(this.oColumn);
 			this.oTable.addColumn(new AnalyticalColumn({
-				label: new Label({text: "First Name"}),
+				label: new Label({ text: "First Name" }),
 				width: "100px",
-				template: new Label({text: "{dummy}"})
+				template: new Label({ text: "{dummy}" })
 			}));
 			this.oTable.addColumn(new AnalyticalColumn({
-				label: new Label({text: "Checked"}),
+				label: new Label({ text: "Checked" }),
 				width: "75px",
-				template: new Label({text: "{dummy}"})
+				template: new Label({ text: "{dummy}" })
 			}));
 			this.oTable.addColumn(new AnalyticalColumn({
-				label: new Label({text: "Web Site"}),
-				template: new Label({text: "{dummy}"})
+				label: new Label({ text: "Web Site" }),
+				template: new Label({ text: "{dummy}" })
 			}));
 			this.oTable.addColumn(new AnalyticalColumn({
-				label: new Label({text: "Image"}),
+				label: new Label({ text: "Image" }),
 				width: "75px",
-				template: new Label({text: "{dummy}"})
+				template: new Label({ text: "{dummy}" })
 			}));
 
 			this.oDesignTime = new DesignTime({

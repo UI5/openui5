@@ -34,7 +34,7 @@ sap.ui.define([
 				name: "testComponentAsync",
 				id: "testComponentAsync"
 			});
-			this.mPropertyBag = {modifier: JsControlTreeModifier, appComponent: this.oComponent};
+			this.mPropertyBag = { modifier: JsControlTreeModifier, appComponent: this.oComponent };
 		},
 		beforeEach: () => {
 			this.oButton = new Button(this.oComponent.createId("myButton"));
@@ -130,13 +130,13 @@ sap.ui.define([
 			[this.oXmlButton] = this.oXmlLayout.childNodes[0].childNodes;
 
 			await this.oDefaultRenameChangeHandler.completeChangeContent(this.oChange, this.mSpecificChangeInfo, this.mPropertyBag);
-			await this.oDefaultRenameChangeHandler.applyChange(this.oChange, this.oXmlButton, {modifier: XmlTreeModifier});
+			await this.oDefaultRenameChangeHandler.applyChange(this.oChange, this.oXmlButton, { modifier: XmlTreeModifier });
 			assert.strictEqual(
 				this.oXmlButton.getAttribute("text"),
 				this.mSpecificChangeInfo.content.value,
 				"then the button text changes"
 			);
-			await this.oDefaultRenameChangeHandler.revertChange(this.oChange, this.oXmlButton, {modifier: XmlTreeModifier});
+			await this.oDefaultRenameChangeHandler.revertChange(this.oChange, this.oXmlButton, { modifier: XmlTreeModifier });
 			assert.strictEqual(this.oXmlButton.getAttribute("text"), "Initial Text", "then the button text doesn't change");
 			this.oLayout.destroy();
 		});
@@ -170,19 +170,19 @@ sap.ui.define([
 
 			try {
 				await this.oDefaultRenameChangeHandler.completeChangeContent(this.oChange, this.mSpecificChangeInfo, this.mPropertyBag);
-				await this.oDefaultRenameChangeHandler.applyChange(this.oChange, this.oXmlButton, {modifier: XmlTreeModifier});
+				await this.oDefaultRenameChangeHandler.applyChange(this.oChange, this.oXmlButton, { modifier: XmlTreeModifier });
 				assert.strictEqual(
 					this.oXmlButton.getAttribute("text"),
 					this.mSpecificChangeInfo.content.value,
 					"then the button text changes"
 				);
-				await this.oDefaultRenameChangeHandler.revertChange(this.oChange, this.oXmlButton, {modifier: XmlTreeModifier});
+				await this.oDefaultRenameChangeHandler.revertChange(this.oChange, this.oXmlButton, { modifier: XmlTreeModifier });
 			} catch (oError) {
 				assert.ok(oError, "revert on XML throws an error because XML only supports strings as properties");
 
 				// the revert data are saved on the change; set button text also on button control
 				this.oButton.setText(this.mSpecificChangeInfo.content.value);
-				await this.oDefaultRenameChangeHandler.revertChange(this.oChange, this.oButton, {modifier: JsControlTreeModifier});
+				await this.oDefaultRenameChangeHandler.revertChange(this.oChange, this.oButton, { modifier: JsControlTreeModifier });
 				assert.strictEqual(this.oButton.getText(), "Initial Text", "the text binding got reset and the value is correct");
 
 				this.oLayout.destroy();

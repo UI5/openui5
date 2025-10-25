@@ -52,25 +52,25 @@ sap.ui.define([
 			Utils.isVariantByStartupParameter.restore();
 			sandbox.stub(Utils, "isVariantByStartupParameter").returns(true);
 
-			const vCacheKey = await XmlPreprocessor.getCacheKey({componentId: "validComponent"});
+			const vCacheKey = await XmlPreprocessor.getCacheKey({ componentId: "validComponent" });
 			assert.strictEqual(vCacheKey, undefined, "then caching is disabled");
 		});
 
 		QUnit.test("with no appComponent found for the component", async function(assert) {
-			const vCacheKey = await XmlPreprocessor.getCacheKey({componentId: "invalidComponent"});
+			const vCacheKey = await XmlPreprocessor.getCacheKey({ componentId: "invalidComponent" });
 			assert.strictEqual(vCacheKey, XmlPreprocessor.NOTAG, "the correct cache key is returned");
 		});
 
 		QUnit.test("with no cacheKey returned from the backend", async function(assert) {
 			sandbox.stub(Loader, "getCachedFlexData").returns({});
-			const vCacheKey = await XmlPreprocessor.getCacheKey({componentId: "validComponent"});
+			const vCacheKey = await XmlPreprocessor.getCacheKey({ componentId: "validComponent" });
 			assert.strictEqual(vCacheKey, XmlPreprocessor.NOTAG, "the correct cache key is returned");
 		});
 
 		QUnit.test("with cacheKey but without variants", async function(assert) {
 			sandbox.stub(Loader, "getCachedFlexData").returns({ cacheKey: 'W/"abc123"', changes: { changes: ["foo"] } });
 			sandbox.stub(VariantManagementState, "getAllCurrentVariants").returns([]);
-			const vCacheKey = await XmlPreprocessor.getCacheKey({componentId: "validComponent"});
+			const vCacheKey = await XmlPreprocessor.getCacheKey({ componentId: "validComponent" });
 			assert.strictEqual(vCacheKey, "abc123", "the correct cache key is returned");
 		});
 
@@ -90,7 +90,7 @@ sap.ui.define([
 					getStandardVariant: () => true
 				}
 			]);
-			const vCacheKey = await XmlPreprocessor.getCacheKey({componentId: "validComponent"});
+			const vCacheKey = await XmlPreprocessor.getCacheKey({ componentId: "validComponent" });
 			assert.strictEqual(vCacheKey, "abc123-otherVariant-otherVariant1", "the correct cache key is returned");
 		});
 	});
@@ -196,7 +196,7 @@ sap.ui.define([
 				{ getSelector: () => { return { id: "testView1-bar" }; } }
 			]);
 			sandbox.stub(StorageUtils, "isStorageResponseFilled").returns(true);
-			await XmlPreprocessor.process({sId: "testView"}, {
+			await XmlPreprocessor.process({ sId: "testView" }, {
 				id: "testView",
 				componentId: sReference
 			});
@@ -214,11 +214,11 @@ sap.ui.define([
 			const oAppComponent = RtaQunitUtils.createAndStubAppComponent(sandbox, sReference);
 			const oApplierStub = sandbox.stub(Applier, "applyAllChangesForXMLView");
 			const oWaitForInitStub = sandbox.stub(FlexState, "waitForInitialization");
-			const oView = await XmlPreprocessor.process({sId: "testView"}, {
+			const oView = await XmlPreprocessor.process({ sId: "testView" }, {
 				id: "testView",
 				componentId: sReference
 			});
-			assert.deepEqual(oView, {sId: "testView"}, "the original view is returned");
+			assert.deepEqual(oView, { sId: "testView" }, "the original view is returned");
 			assert.strictEqual(oWaitForInitStub.callCount, 0, "the FlexState is not called");
 			assert.strictEqual(oApplierStub.callCount, 0, "the Applier is not called");
 			assert.strictEqual(StorageUtils.isStorageResponseFilled.callCount, 1, "the StorageUtils is called");

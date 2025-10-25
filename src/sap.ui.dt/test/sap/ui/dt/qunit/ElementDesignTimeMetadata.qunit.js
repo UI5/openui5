@@ -38,10 +38,10 @@ sap.ui.define([
 									changeType: "secondChangeType"
 								},
 								action3(oElement) {
-									return {changeType: oElement.name};
+									return { changeType: oElement.name };
 								},
 								action4(oElement, foo, bar) {
-									return {changeType: oElement.name + foo + bar};
+									return { changeType: oElement.name + foo + bar };
 								},
 								action5: {
 									subAction: {
@@ -50,7 +50,7 @@ sap.ui.define([
 								},
 								action6: {
 									subAction(oElement, foo, bar) {
-										return {changeType: oElement.name + foo + bar};
+										return { changeType: oElement.name + foo + bar };
 									}
 								}
 							},
@@ -163,7 +163,7 @@ sap.ui.define([
 
 		QUnit.test("when creating aggregation dt metadata", function(assert) {
 			var oAggregationDesignTimeMetadata = this.oElementDesignTimeMetadata
-			.createAggregationDesignTimeMetadata({testData: "TestData"});
+			.createAggregationDesignTimeMetadata({ testData: "TestData" });
 			assert.equal(
 				oAggregationDesignTimeMetadata.getMetadata().getName(),
 				"sap.ui.dt.AggregationDesignTimeMetadata",
@@ -175,38 +175,38 @@ sap.ui.define([
 			assert.deepEqual(
 				this.oElementDesignTimeMetadata.getActionDataFromAggregations("action1"),
 				[
-					{changeType: "firstChangeType", aggregation: "testAggregation"},
-					{changeType: "firstChangeType-aggregation2", aggregation: "testAggregation2"}
+					{ changeType: "firstChangeType", aggregation: "testAggregation" },
+					{ changeType: "firstChangeType-aggregation2", aggregation: "testAggregation2" }
 				],
 				"for string action, the correct object is returned"
 			);
 			assert.deepEqual(
 				this.oElementDesignTimeMetadata.getActionDataFromAggregations("action2"),
-				[{changeType: "secondChangeType", aggregation: "testAggregation"}],
+				[{ changeType: "secondChangeType", aggregation: "testAggregation" }],
 				"for object action, the correct object is returned"
 			);
 			assert.deepEqual(
-				this.oElementDesignTimeMetadata.getActionDataFromAggregations("action3", {name: "thirdChangeType"}),
-				[{changeType: "thirdChangeType", aggregation: "testAggregation"}],
+				this.oElementDesignTimeMetadata.getActionDataFromAggregations("action3", { name: "thirdChangeType" }),
+				[{ changeType: "thirdChangeType", aggregation: "testAggregation" }],
 				"for function action, the correct object is returned"
 			);
 			assert.deepEqual(
-				this.oElementDesignTimeMetadata.getActionDataFromAggregations("action4", {name: "fourthChangeType"}, ["foo", "bar"]),
-				[{changeType: "fourthChangeTypefoobar", aggregation: "testAggregation"}],
+				this.oElementDesignTimeMetadata.getActionDataFromAggregations("action4", { name: "fourthChangeType" }, ["foo", "bar"]),
+				[{ changeType: "fourthChangeTypefoobar", aggregation: "testAggregation" }],
 				"for function action with parameters , the correct object is returned"
 			);
 			assert.deepEqual(
 				this.oElementDesignTimeMetadata.getActionDataFromAggregations(
-					"action5", {name: "subChangeType"}, ["foo", "bar"], "subAction"
+					"action5", { name: "subChangeType" }, ["foo", "bar"], "subAction"
 				),
-				[{changeType: "subChangeType", aggregation: "testAggregation"}],
+				[{ changeType: "subChangeType", aggregation: "testAggregation" }],
 				"when the function was called with an action, a sub-action and parameters, then the correct object is returned"
 			);
 			assert.deepEqual(
 				this.oElementDesignTimeMetadata.getActionDataFromAggregations(
-					"action6", {name: "subChangeType"}, ["foo", "bar"], "subAction"
+					"action6", { name: "subChangeType" }, ["foo", "bar"], "subAction"
 				),
-				[{changeType: "subChangeTypefoobar", aggregation: "testAggregation"}],
+				[{ changeType: "subChangeTypefoobar", aggregation: "testAggregation" }],
 				"for function action with a function action, a sub-action and parameters, then the correct object is returned"
 			);
 		});
@@ -439,7 +439,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("when calling isAggregationIgnored", function(assert) {
-			var oElement = {foo: "bar"};
+			var oElement = { foo: "bar" };
 			assert.strictEqual(
 				this.oElementDesignTimeMetadata.isAggregationIgnored(oElement, "testAggregation"),
 				false,
@@ -537,7 +537,7 @@ sap.ui.define([
 		}, function() {
 			QUnit.test("when 'getScrollContainers' is called multiple times", function(assert) {
 				var fnUpdate = sandbox.stub();
-				var oElement = {foo: "bar"};
+				var oElement = { foo: "bar" };
 				this.oGetAggregationsStub.returns(["a"]);
 				var oExpectedScrollContainer = {
 					domRef: "foo",

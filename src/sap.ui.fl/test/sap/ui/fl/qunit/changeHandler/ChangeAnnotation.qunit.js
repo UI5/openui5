@@ -35,8 +35,8 @@ sap.ui.define([
 			value: vValue
 		}, "applyChange returns the correct result");
 
-		const oDummyAppComponent = {foo: "bar"};
-		const oCondenserInfo = ChangeAnnotation.getCondenserInfo(oChange, {appComponent: oDummyAppComponent});
+		const oDummyAppComponent = { foo: "bar" };
+		const oCondenserInfo = ChangeAnnotation.getCondenserInfo(oChange, { appComponent: oDummyAppComponent });
 		assert.deepEqual(oCondenserInfo, {
 			affectedControl: oDummyAppComponent,
 			classification: Classification.LastOneWins,
@@ -63,7 +63,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("completeChangeContent / applyChange / getCondenserInfo with value of type object", function(assert) {
-			completeAndApplyChange(assert, this.oAnnotationChange, "somePath", {EnumMember: "com.sap.TextArrangementType/TextOnly"});
+			completeAndApplyChange(assert, this.oAnnotationChange, "somePath", { EnumMember: "com.sap.TextArrangementType/TextOnly" });
 		});
 
 		QUnit.test("with translatable texts", function(assert) {
@@ -111,7 +111,7 @@ sap.ui.define([
 			const oApplyChangeResult = ChangeAnnotation.applyChange(this.oAnnotationChange);
 			assert.deepEqual(oApplyChangeResult, {
 				path: "somePath",
-				value: {String: "someValue"}
+				value: { String: "someValue" }
 			}, "applyChange returns the correct result");
 		});
 
@@ -138,7 +138,7 @@ sap.ui.define([
 			const oApplyChangeResult = ChangeAnnotation.applyChange(this.oAnnotationChange);
 			assert.deepEqual(oApplyChangeResult, {
 				path: "somePath",
-				value: {String: "someTextValue"}
+				value: { String: "someTextValue" }
 			}, "applyChange returns the correct result");
 		});
 
@@ -165,7 +165,7 @@ sap.ui.define([
 			const oApplyChangeResult = ChangeAnnotation.applyChange(this.oAnnotationChange);
 			assert.deepEqual(oApplyChangeResult, {
 				path: "somePath",
-				value: {String: 'valueWithQuote"', anotherProperty: 'valueWithQuote"'}
+				value: { String: 'valueWithQuote"', anotherProperty: 'valueWithQuote"' }
 			}, "applyChange returns the correct result");
 		});
 	});

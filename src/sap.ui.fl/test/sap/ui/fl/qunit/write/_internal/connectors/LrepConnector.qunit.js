@@ -113,9 +113,9 @@ sap.ui.define([
 					}
 				]
 			};
-			fnReturnData(500, {"Content-Type": "application/json"}, JSON.stringify(oExpectedResponse));
+			fnReturnData(500, { "Content-Type": "application/json" }, JSON.stringify(oExpectedResponse));
 
-			var mPropertyBag = {url: "/sap/bc/lrep", reference: "reference", layer: Layer.VENDOR};
+			var mPropertyBag = { url: "/sap/bc/lrep", reference: "reference", layer: Layer.VENDOR };
 			return WriteLrepConnector.getFlexInfo(mPropertyBag).catch(function(oError) {
 				assert.equal(oError.userMessage, "Error text 1\nError text 2\n", "Correct user message is returned in the error object");
 				assert.equal(oError.status, "500", "Correct status is returned in the error object");
@@ -128,9 +128,9 @@ sap.ui.define([
 				isResetEnabled: false,
 				isPublishEnabled: false
 			};
-			fnReturnData(200, {"Content-Type": "application/json"}, JSON.stringify(oExpectedResponse));
+			fnReturnData(200, { "Content-Type": "application/json" }, JSON.stringify(oExpectedResponse));
 
-			var mPropertyBag = {url: "/sap/bc/lrep", reference: "reference", layer: Layer.VENDOR};
+			var mPropertyBag = { url: "/sap/bc/lrep", reference: "reference", layer: Layer.VENDOR };
 			var sUrl = "/sap/bc/lrep/flex/info/reference?layer=VENDOR";
 			return WriteLrepConnector.getFlexInfo(mPropertyBag).then(function(oResponse) {
 				assert.equal(sandbox.server.getRequest(0).method, "GET", "request method is GET");
@@ -153,9 +153,9 @@ sap.ui.define([
 				],
 				lastHitReached: true
 			};
-			fnReturnData(200, {"Content-Type": "application/json"}, JSON.stringify(oExpectedResponse));
+			fnReturnData(200, { "Content-Type": "application/json" }, JSON.stringify(oExpectedResponse));
 
-			var mPropertyBag = {url: "/sap/bc/lrep", type: "role", $skip: 100, $filter: "SAP"};
+			var mPropertyBag = { url: "/sap/bc/lrep", type: "role", $skip: 100, $filter: "SAP" };
 			var sUrl = "/sap/bc/lrep/flex/contexts/?type=role&%24skip=100&%24filter=SAP";
 			return WriteLrepConnector.getContexts(mPropertyBag).then(function(oResponse) {
 				assert.equal(sandbox.server.getRequest(0).method, "GET", "request method is GET");
@@ -178,9 +178,9 @@ sap.ui.define([
 				],
 				lastHitReached: true
 			};
-			fnReturnData(200, {"Content-Type": "application/json"}, JSON.stringify(oExpectedResponse));
+			fnReturnData(200, { "Content-Type": "application/json" }, JSON.stringify(oExpectedResponse));
 
-			var mPropertyBag = {url: "/sap/bc/lrep", flexObjects: {role: ["/IWBEP/RT_MGW_DSP"]}};
+			var mPropertyBag = { url: "/sap/bc/lrep", flexObjects: { role: ["/IWBEP/RT_MGW_DSP"] } };
 			var sUrl = "/sap/bc/lrep/flex/contexts/?sap-language=EN";
 			return WriteLrepConnector.loadContextDescriptions(mPropertyBag).then(function(oResponse) {
 				assert.equal(sandbox.server.getRequest(0).method, "HEAD", "first request method is HEAD");
@@ -282,7 +282,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("when calling condense successfully", function(assert) {
-			var oStubSendRequest = sinon.stub(WriteUtils, "sendRequest").resolves({response: []});
+			var oStubSendRequest = sinon.stub(WriteUtils, "sendRequest").resolves({ response: [] });
 
 			// Simulate allChanges with namespaces for the delete actions
 			var allChanges = [
@@ -290,25 +290,25 @@ sap.ui.define([
 					getId: () => "change3",
 					getNamespace: () => "namespace0",
 					getFileType: () => "change",
-					convertToFileContent: () => ({namespace: "namespace0", fileName: "change3"})
+					convertToFileContent: () => ({ namespace: "namespace0", fileName: "change3" })
 				},
 				{
 					getId: () => "change4",
 					getNamespace: () => "namespace0",
 					getFileType: () => "change",
-					convertToFileContent: () => ({namespace: "namespace0", fileName: "change4"})
+					convertToFileContent: () => ({ namespace: "namespace0", fileName: "change4" })
 				},
 				{
 					getId: () => "change5",
 					getNamespace: () => "namespace0",
 					getFileType: () => "change",
-					convertToFileContent: () => ({namespace: "namespace0", fileName: "change5"})
+					convertToFileContent: () => ({ namespace: "namespace0", fileName: "change5" })
 				},
 				{
 					getId: () => "change6",
 					getNamespace: () => "namespace1",
 					getFileType: () => "change",
-					convertToFileContent: () => ({namespace: "namespace1", fileName: "change6"})
+					convertToFileContent: () => ({ namespace: "namespace1", fileName: "change6" })
 				}
 			];
 
@@ -391,7 +391,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("when condense is called with single namespace and multiple actions", function(assert) {
-			var oStubSendRequest = sinon.stub(WriteUtils, "sendRequest").resolves({response: []});
+			var oStubSendRequest = sinon.stub(WriteUtils, "sendRequest").resolves({ response: [] });
 
 			// Simulate allChanges with a single namespace for all actions
 			var allChanges = [
@@ -399,13 +399,13 @@ sap.ui.define([
 					getId: () => "change1",
 					getNamespace: () => "namespace1",
 					getFileType: () => "change",
-					convertToFileContent: () => ({namespace: "namespace1", fileName: "change1"})
+					convertToFileContent: () => ({ namespace: "namespace1", fileName: "change1" })
 				},
 				{
 					getId: () => "change2",
 					getNamespace: () => "namespace1",
 					getFileType: () => "change",
-					convertToFileContent: () => ({namespace: "namespace1", fileName: "change2"})
+					convertToFileContent: () => ({ namespace: "namespace1", fileName: "change2" })
 				}
 			];
 
@@ -483,7 +483,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("when condense is called with multiple namespaces, reorder and update actions", function(assert) {
-			var oStubSendRequest = sinon.stub(WriteUtils, "sendRequest").resolves({response: []});
+			var oStubSendRequest = sinon.stub(WriteUtils, "sendRequest").resolves({ response: [] });
 
 			// Simulate allChanges with namespaces for the delete and reorder actions
 			var allChanges = [
@@ -491,13 +491,13 @@ sap.ui.define([
 					getId: () => "change7",
 					getNamespace: () => "namespace2",
 					getFileType: () => "change",
-					convertToFileContent: () => ({namespace: "namespace2", fileName: "change7"})
+					convertToFileContent: () => ({ namespace: "namespace2", fileName: "change7" })
 				},
 				{
 					getId: () => "change8",
 					getNamespace: () => "namespace3",
 					getFileType: () => "change",
-					convertToFileContent: () => ({namespace: "namespace3", fileName: "change8", content: {something: "new_content"}})
+					convertToFileContent: () => ({ namespace: "namespace3", fileName: "change8", content: { something: "new_content" } })
 				}
 			];
 
@@ -514,7 +514,7 @@ sap.ui.define([
 							layer: "CUSTOMER",
 							fileName: "change8",
 							namespace: "namespace3",
-							content: {something: "new_content"}
+							content: { something: "new_content" }
 						}
 					}]
 				}
@@ -538,7 +538,7 @@ sap.ui.define([
 								layer: "CUSTOMER",
 								fileName: "change8",
 								namespace: "namespace3",
-								content: {something: "new_content"}
+								content: { something: "new_content" }
 							}
 						}]
 					}
@@ -675,8 +675,8 @@ sap.ui.define([
 			};
 			var oAdjustedResponse = {
 				response: [
-					{fileName: "c1"},
-					{fileName: "c2"}
+					{ fileName: "c1" },
+					{ fileName: "c2" }
 				]
 			};
 			sandbox.stub(Settings, "getInstance").resolves(new Settings(oSetting));
@@ -684,7 +684,7 @@ sap.ui.define([
 			sandbox.spy(BusyIndicator, "show");
 			var fnOpenTransportSelectionStub = sandbox.stub(TransportSelection.prototype, "openTransportSelection").returns(Promise.resolve(oMockTransportInfo));
 			var sUrl = "/sap/bc/lrep/changes/?reference=flexReference&layer=VENDOR&changelist=transportId&generator=Change.createInitialFileContent";
-			var oStubSendRequest = sinon.stub(WriteUtils, "sendRequest").resolves({response: [{name: "c1"}, {name: "c2"}]});
+			var oStubSendRequest = sinon.stub(WriteUtils, "sendRequest").resolves({ response: [{ name: "c1" }, { name: "c2" }] });
 			return WriteLrepConnector.reset({
 				url: "/sap/bc/lrep",
 				layer: Layer.VENDOR,
@@ -755,7 +755,7 @@ sap.ui.define([
 			sandbox.stub(Settings, "getInstance").resolves(new Settings(oSetting));
 			var fnOpenTransportSelectionStub = sandbox.stub(TransportSelection.prototype, "openTransportSelection").returns(Promise.resolve(oMockTransportInfo));
 			var sUrl = "/sap/bc/lrep/changes/?reference=flexReference&layer=VENDOR&changelist=transportId&selector=abc123&changeType=labelChange";
-			var oStubSendRequest = sinon.stub(WriteUtils, "sendRequest").resolves({response: []});
+			var oStubSendRequest = sinon.stub(WriteUtils, "sendRequest").resolves({ response: [] });
 
 			return WriteLrepConnector.reset({
 				url: "/sap/bc/lrep",
@@ -841,7 +841,7 @@ sap.ui.define([
 			sandbox.stub(Settings, "getInstance").resolves(new Settings(oSetting));
 			var fnOpenTransportSelectionStub = sandbox.stub(TransportSelection.prototype, "openTransportSelection").resolves(oMockTransportInfo);
 			var sUrl = "/sap/bc/lrep/changes/?reference=flexReference&layer=CUSTOMER&changelist=ATO_NOTIFICATION&generator=Change.createInitialFileContent";
-			var oStubSendRequest = sinon.stub(WriteUtils, "sendRequest").resolves({response: []});
+			var oStubSendRequest = sinon.stub(WriteUtils, "sendRequest").resolves({ response: [] });
 
 			return WriteLrepConnector.reset({
 				url: "/sap/bc/lrep",
@@ -868,7 +868,7 @@ sap.ui.define([
 			};
 			sandbox.stub(Settings, "getInstance").resolves(new Settings(oSetting));
 			var sUrl = "/sap/bc/lrep/changes/?reference=flexReference&layer=CUSTOMER&selector=view--control1,feview--control2";
-			var oStubSendRequest = sinon.stub(WriteUtils, "sendRequest").resolves({response: []});
+			var oStubSendRequest = sinon.stub(WriteUtils, "sendRequest").resolves({ response: [] });
 
 			var aControlIds = [
 				"view--control1",
@@ -899,7 +899,7 @@ sap.ui.define([
 			};
 			sandbox.stub(Settings, "getInstance").resolves(new Settings(oSetting));
 			var sUrl = "/sap/bc/lrep/changes/?reference=flexReference&layer=USER&generator=Change.createInitialFileContent&selector=view--control1,feview--control2";
-			var oStubSendRequest = sinon.stub(WriteUtils, "sendRequest").resolves({response: []});
+			var oStubSendRequest = sinon.stub(WriteUtils, "sendRequest").resolves({ response: [] });
 			var aControlIds = [
 				"view--control1",
 				"feview--control2"
@@ -1135,7 +1135,7 @@ sap.ui.define([
 			};
 			var oExpectedResponse = true;
 			var sUrl = "/sap/bc/ui2/app_index/ui5_app_mani_first_supported/?id=test.app.id";
-			fnReturnData(200, {"Content-Type": "application/json"}, JSON.stringify(oExpectedResponse));
+			fnReturnData(200, { "Content-Type": "application/json" }, JSON.stringify(oExpectedResponse));
 
 			return WriteLrepConnector.appVariant.getManifirstSupport(mPropertyBag).then(function(oResponse) {
 				assert.equal(oResponse, true);
@@ -1364,7 +1364,7 @@ sap.ui.define([
 				}
 			};
 			var sUrl = "/sap/bc/lrep/appdescr_variants/someAppVariantId?changelist=aTransport&sap-language=EN";
-			var oStubOpenTransportSelection = sinon.stub(TransportSelection.prototype, "openTransportSelection").resolves({transport: "aTransport"});
+			var oStubOpenTransportSelection = sinon.stub(TransportSelection.prototype, "openTransportSelection").resolves({ transport: "aTransport" });
 			return WriteLrepConnector.appVariant.update(mPropertyBag).then(function() {
 				assert.ok(oStubOpenTransportSelection.calledOnce);
 				assert.equal(oStubOpenTransportSelection.getCalls()[0].args[0].package, "", "no package information is sent to get transport info");
@@ -1450,7 +1450,7 @@ sap.ui.define([
 				}
 			};
 			var sUrl = "/sap/bc/lrep/appdescr_variants/someAppVariantId?changelist=aTransport";
-			var oStubOpenTransportSelection = sinon.stub(TransportSelection.prototype, "openTransportSelection").resolves({transport: "aTransport"});
+			var oStubOpenTransportSelection = sinon.stub(TransportSelection.prototype, "openTransportSelection").resolves({ transport: "aTransport" });
 			return WriteLrepConnector.appVariant.remove(mPropertyBag).then(function() {
 				assert.ok(oStubOpenTransportSelection.calledOnce);
 				assert.ok(this.oStubSendRequest.calledWith(sUrl, "DELETE", {
@@ -1552,7 +1552,7 @@ sap.ui.define([
 
 			this.oStubWriteSendRequest = sandbox.stub(WriteUtils, "sendRequest").resolves();
 			this.oStubInitialUtilsSendRequest = sandbox.stub(InitialUtils, "sendRequest").callsFake(function() {
-				return Promise.resolve({response: {}});
+				return Promise.resolve({ response: {} });
 			});
 		},
 		afterEach() {
@@ -1650,7 +1650,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("Given a mock server, when contextBasedAdaptation.reorder is triggered", function(assert) {
-			var oFlexObject = {priorities: ["id_9188277817982_0210", "id_877748372927_9812", "id_8837817291721_8271"]};
+			var oFlexObject = { priorities: ["id_9188277817982_0210", "id_877748372927_9812", "id_8837817291721_8271"] };
 
 			var mPropertyBag = {
 				flexObject: oFlexObject,
@@ -1741,7 +1741,7 @@ sap.ui.define([
 					versionId: "versionGUID"
 				}]
 			};
-			var oStubSendRequest = sandbox.stub(WriteUtils, "sendRequest").resolves({response: aReturnedVersions});
+			var oStubSendRequest = sandbox.stub(WriteUtils, "sendRequest").resolves({ response: aReturnedVersions });
 			return WriteLrepConnector.versions.load(mPropertyBag).then(function(oResponse) {
 				assert.deepEqual(oResponse, [{
 					version: Version.Number.Draft
@@ -1803,7 +1803,7 @@ sap.ui.define([
 			var oActivatedVersion = {
 				versionId: "versionGUID"
 			};
-			var oStubSendRequest = sandbox.stub(WriteUtils, "sendRequest").resolves({response: oActivatedVersion});
+			var oStubSendRequest = sandbox.stub(WriteUtils, "sendRequest").resolves({ response: oActivatedVersion });
 			return WriteLrepConnector.versions.activate(mPropertyBag).then(function(oResponse) {
 				assert.deepEqual(oResponse, {
 					version: "versionGUID"
@@ -1834,7 +1834,7 @@ sap.ui.define([
 			var oActivatedVersion = {
 				versionId: "versionGUID"
 			};
-			var oStubSendRequest = sandbox.stub(WriteUtils, "sendRequest").resolves({response: oActivatedVersion});
+			var oStubSendRequest = sandbox.stub(WriteUtils, "sendRequest").resolves({ response: oActivatedVersion });
 			return WriteLrepConnector.versions.activate(mPropertyBag).then(function(oResponse) {
 				assert.deepEqual(oResponse, {
 					version: "versionGUID"
@@ -1865,7 +1865,7 @@ sap.ui.define([
 			var oActivatedVersion = {
 				versionId: "versionGUID"
 			};
-			var oStubSendRequest = sandbox.stub(WriteUtils, "sendRequest").resolves({response: oActivatedVersion});
+			var oStubSendRequest = sandbox.stub(WriteUtils, "sendRequest").resolves({ response: oActivatedVersion });
 			return WriteLrepConnector.versions.activate(mPropertyBag).then(function(oResponse) {
 				assert.deepEqual(oResponse, {
 					version: "versionGUID"
@@ -1990,7 +1990,7 @@ sap.ui.define([
 		QUnit.test("getSeenFeatureIds", async function(assert) {
 			sandbox.stub(FlexUtils, "getUrlParameter").returns("120");
 			const oStubSendRequest = sandbox.stub(InitialUtils, "sendRequest").resolves(
-				{response: {seenFeatureIds: ["feature1", "feature2"]}}
+				{ response: { seenFeatureIds: ["feature1", "feature2"] } }
 			);
 			const oResult = await WriteLrepConnector.getSeenFeatureIds({
 				layer: Layer.CUSTOMER, url: "/sap/bc/lrep"
@@ -2005,7 +2005,7 @@ sap.ui.define([
 		QUnit.test("getSeenFeatureIds returning an empty string", async function(assert) {
 			sandbox.stub(FlexUtils, "getUrlParameter").returns("120");
 			const oStubSendRequest = sandbox.stub(InitialUtils, "sendRequest").resolves(
-				{response: ""}
+				{ response: "" }
 			);
 			const oResult = await WriteLrepConnector.getSeenFeatureIds({
 				layer: Layer.CUSTOMER, url: "/sap/bc/lrep"
@@ -2020,7 +2020,7 @@ sap.ui.define([
 		QUnit.test("setSeenFeatureIds", async function(assert) {
 			sandbox.stub(FlexUtils, "getUrlParameter").returns("120");
 			const oStubSendRequest = sandbox.stub(WriteUtils, "sendRequest").resolves(
-				{response: {seenFeatureIds: ["feature1", "feature2", "feature3"]}}
+				{ response: { seenFeatureIds: ["feature1", "feature2", "feature3"] } }
 			);
 			const oResult = await WriteLrepConnector.setSeenFeatureIds({
 				layer: Layer.CUSTOMER, seenFeatureIds: ["feature1", "feature2", "feature3"], url: "/sap/bc/lrep"
@@ -2029,7 +2029,7 @@ sap.ui.define([
 			assert.ok(oStubSendRequest.calledWith(sUrl, "PUT", {
 				initialConnector: InitialLrepConnector,
 				tokenUrl: "/sap/bc/lrep/actions/getcsrftoken/",
-				payload: JSON.stringify({seenFeatureIds: ["feature1", "feature2", "feature3"]}),
+				payload: JSON.stringify({ seenFeatureIds: ["feature1", "feature2", "feature3"] }),
 				dataType: "json",
 				contentType: "application/json; charset=utf-8"
 			}), "a PUT request with correct parameters is sent");

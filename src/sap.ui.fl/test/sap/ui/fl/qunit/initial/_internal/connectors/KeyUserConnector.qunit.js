@@ -25,9 +25,9 @@ sap.ui.define([
 			var mPropertyBag = {
 				url: "/flexKeyuser"
 			};
-			sandbox.stub(Utils, "sendRequest").resolves({response: {someFeature: true}});
+			sandbox.stub(Utils, "sendRequest").resolves({ response: { someFeature: true } });
 			return KeyUserConnector.loadFeatures(mPropertyBag).then(function(oResponse) {
-				assert.deepEqual(oResponse, {isContextSharingEnabled: true, someFeature: true}, "the settings object is returned correctly");
+				assert.deepEqual(oResponse, { isContextSharingEnabled: true, someFeature: true }, "the settings object is returned correctly");
 			});
 		});
 
@@ -40,7 +40,7 @@ sap.ui.define([
 				isVariantAdaptationEnabled: false
 			};
 
-			sandbox.stub(Utils, "sendRequest").resolves({response: oSettingsResponse});
+			sandbox.stub(Utils, "sendRequest").resolves({ response: oSettingsResponse });
 			return KeyUserConnector.loadFeatures(mPropertyBag).then(function(oResponse) {
 				assert.equal(oResponse.isPublicLayerAvailable, false, "the isPublicLayerAvailable is correct");
 				assert.equal(oResponse.isVariantAdaptationEnabled, false, "the isVariantAdaptationEnabled is correct");
@@ -56,7 +56,7 @@ sap.ui.define([
 				isVariantAdaptationEnabled: true
 			};
 
-			sandbox.stub(Utils, "sendRequest").resolves({response: oSettingsResponse});
+			sandbox.stub(Utils, "sendRequest").resolves({ response: oSettingsResponse });
 			return KeyUserConnector.loadFeatures(mPropertyBag).then(function(oResponse) {
 				assert.equal(oResponse.isPublicLayerAvailable, false, "the isPublicLayerAvailable is correct");
 				assert.equal(oResponse.isVariantAdaptationEnabled, true, "the isVariantAdaptationEnabled is correct");
@@ -72,7 +72,7 @@ sap.ui.define([
 				isVariantAdaptationEnabled: false
 			};
 
-			sandbox.stub(Utils, "sendRequest").resolves({response: oSettingsResponse});
+			sandbox.stub(Utils, "sendRequest").resolves({ response: oSettingsResponse });
 			return KeyUserConnector.loadFeatures(mPropertyBag).then(function(oResponse) {
 				assert.equal(oResponse.isPublicLayerAvailable, true, "the isPublicLayerAvailable is correct");
 				assert.equal(oResponse.isVariantAdaptationEnabled, false, "the isVariantAdaptationEnabled is correct");
@@ -88,7 +88,7 @@ sap.ui.define([
 				isVariantAdaptationEnabled: true
 			};
 
-			sandbox.stub(Utils, "sendRequest").resolves({response: oSettingsResponse});
+			sandbox.stub(Utils, "sendRequest").resolves({ response: oSettingsResponse });
 			return KeyUserConnector.loadFeatures(mPropertyBag).then(function(oResponse) {
 				assert.equal(oResponse.isPublicLayerAvailable, true, "the isPublicLayerAvailable is correct");
 				assert.equal(oResponse.isVariantAdaptationEnabled, true, "the isVariantAdaptationEnabled is correct");
@@ -99,11 +99,11 @@ sap.ui.define([
 			var mPropertyBag = {
 				url: "/flexKeyuser"
 			};
-			var oStubSendRequest = sandbox.stub(Utils, "sendRequest").resolves({response: "something"});
-			KeyUserConnector.settings = {isKeyUser: true};
+			var oStubSendRequest = sandbox.stub(Utils, "sendRequest").resolves({ response: "something" });
+			KeyUserConnector.settings = { isKeyUser: true };
 			return KeyUserConnector.loadFeatures(mPropertyBag).then(function(oResponse) {
 				assert.ok(oStubSendRequest.notCalled, "no request is sent to back end");
-				assert.deepEqual(oResponse.response, {isKeyUser: true}, "the settings object is obtain from apply connector correctly");
+				assert.deepEqual(oResponse.response, { isKeyUser: true }, "the settings object is obtain from apply connector correctly");
 			});
 		});
 	});
@@ -157,7 +157,7 @@ sap.ui.define([
 				assert.equal(oStubSendRequest.getCall(0).args[1], "GET", "with correct method");
 				assert.equal(oStubSendRequest.getCall(0).args[2].xsrfToken, undefined, "with correct token");
 				assert.equal(oStubSendRequest.getCall(0).args[2].cacheable, true, "with correct cacheable value");
-				assert.deepEqual(KeyUserConnector.settings, { isKeyUser: true, isVariantSharingEnabled: true}, "new settings is stored");
+				assert.deepEqual(KeyUserConnector.settings, { isKeyUser: true, isVariantSharingEnabled: true }, "new settings is stored");
 				assert.equal(oFlexData[0].changes.length, 2, "two entries are in the customer change section");
 				assert.equal(oFlexData[0].changes[0], 1, "the change entry is contained");
 				assert.equal(oFlexData[0].changes[1], 3, "the compVariant entry is contained");

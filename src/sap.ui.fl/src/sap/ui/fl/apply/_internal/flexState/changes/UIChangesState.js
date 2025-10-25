@@ -78,11 +78,11 @@ sap.ui.define([
 	});
 
 	UIChangesState.getVMIndependentCompleteDependencyMap = function(sReference) {
-		return oVMIndependentCompleteDependencyMapDataSelector.get({reference: sReference});
+		return oVMIndependentCompleteDependencyMapDataSelector.get({ reference: sReference });
 	};
 
 	UIChangesState.getVariantIndependentUIChanges = function(sReference) {
-		return oVMIndependentUIChangesDataSelector.get({reference: sReference});
+		return oVMIndependentUIChangesDataSelector.get({ reference: sReference });
 	};
 
 	/**
@@ -92,7 +92,7 @@ sap.ui.define([
 	 * @returns {sap.ui.fl.apply._internal.flexObjects.FlexObject[]} All UI Changes
 	 */
 	UIChangesState.getAllUIChanges = function(sReference) {
-		return oAllUIChangesDataSelector.get({reference: sReference});
+		return oAllUIChangesDataSelector.get({ reference: sReference });
 	};
 
 	return UIChangesState;

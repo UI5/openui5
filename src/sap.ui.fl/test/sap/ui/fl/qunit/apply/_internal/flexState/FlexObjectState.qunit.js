@@ -167,7 +167,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("getLiveDependencyMap", function(assert) {
-			const oDependencyMap = {foo: "bar"};
+			const oDependencyMap = { foo: "bar" };
 			const oGetStub = sandbox.stub(FlexState, "getRuntimeOnlyData").returns({
 				liveDependencyMap: oDependencyMap
 			});
@@ -247,7 +247,7 @@ sap.ui.define([
 				FlexObjectFactory.createVariantManagementChange({
 					fileName: "setDefaultChange",
 					fileType: "ctrl_variant_management_change",
-					selector: { id: "foo"},
+					selector: { id: "foo" },
 					changeType: "setDefault"
 				}),
 				FlexObjectFactory.createVariantChange({
@@ -277,7 +277,7 @@ sap.ui.define([
 
 		QUnit.test("getDirtyFlexObjects", function(assert) {
 			const oDataSelector = FlexState.getFlexObjectsDataSelector();
-			const aFlexObjects = oDataSelector.get({reference: sReference});
+			const aFlexObjects = oDataSelector.get({ reference: sReference });
 			assert.strictEqual(FlexObjectState.getDirtyFlexObjects(sReference).length, 0, "initially there are no dirty changes");
 			aFlexObjects[0].setState(States.LifecycleState.DELETED);
 			aFlexObjects[2].setState(States.LifecycleState.NEW);
@@ -288,7 +288,7 @@ sap.ui.define([
 
 		QUnit.test("getDirtyFlexObjects with a deleted compVariant", function(assert) {
 			const oDataSelector = FlexState.getFlexObjectsDataSelector();
-			const aFlexObjects = oDataSelector.get({reference: sReference});
+			const aFlexObjects = oDataSelector.get({ reference: sReference });
 			assert.strictEqual(FlexObjectState.getDirtyFlexObjects(sReference).length, 0, "initially there are no dirty changes");
 			aFlexObjects[0].setState(States.LifecycleState.DELETED);
 			aFlexObjects[1].setState(States.LifecycleState.DELETED);
@@ -301,7 +301,7 @@ sap.ui.define([
 
 		QUnit.test("getDirtyFlexObjects with created and delete in one session", function(assert) {
 			const oDataSelector = FlexState.getFlexObjectsDataSelector();
-			const aFlexObjects = oDataSelector.get({reference: sReference});
+			const aFlexObjects = oDataSelector.get({ reference: sReference });
 			assert.strictEqual(FlexObjectState.getDirtyFlexObjects(sReference).length, 0, "initially there are no dirty changes");
 			aFlexObjects[0].setState(States.LifecycleState.DELETED);
 			aFlexObjects[0]._sPreviousState = States.LifecycleState.NEW;
@@ -385,7 +385,7 @@ sap.ui.define([
 	}, function() {
 		QUnit.test("with no changes for the given control", async function(assert) {
 			const oControlWithoutChange = new Control("noChange");
-			await FlexObjectState.waitForFlexObjectsToBeApplied([{selector: {id: "noChange"}}]);
+			await FlexObjectState.waitForFlexObjectsToBeApplied([{ selector: { id: "noChange" } }]);
 			assert.strictEqual(this.oWaitForChangeApplySpy.callCount, 0, "no change was waited for");
 			oControlWithoutChange.destroy();
 		});
@@ -406,22 +406,22 @@ sap.ui.define([
 
 			Applier.applyAllChangesForControl(oAppComponent, sReference, this.oControl1);
 
-			await FlexObjectState.waitForFlexObjectsToBeApplied([{selector: this.oControl1}]);
+			await FlexObjectState.waitForFlexObjectsToBeApplied([{ selector: this.oControl1 }]);
 			assert.strictEqual(this.oAddAppliedCustomDataSpy.callCount, 2, "addCustomData was called 2 times");
 		});
 
 		QUnit.test("twice with 3 queued changes", async function(assert) {
 			Applier.applyAllChangesForControl(oAppComponent, sReference, this.oControl1);
 
-			FlexObjectState.waitForFlexObjectsToBeApplied([{selector: this.oControl1}]);
-			await FlexObjectState.waitForFlexObjectsToBeApplied([{selector: this.oControl1}]);
+			FlexObjectState.waitForFlexObjectsToBeApplied([{ selector: this.oControl1 }]);
+			await FlexObjectState.waitForFlexObjectsToBeApplied([{ selector: this.oControl1 }]);
 			assert.strictEqual(this.oAddAppliedCustomDataSpy.callCount, 3, "addCustomData was called 3 times");
 			assert.strictEqual(this.oWaitForChangeApplySpy.callCount, 6, "all changes were waited for");
 		});
 
 		QUnit.test("with 3 queued changes dependent on each other with an unavailable control dependency", async function(assert) {
 			Applier.applyAllChangesForControl(oAppComponent, sReference, this.oControl1);
-			await FlexObjectState.waitForFlexObjectsToBeApplied([{selector: this.oControl4}]);
+			await FlexObjectState.waitForFlexObjectsToBeApplied([{ selector: this.oControl4 }]);
 			assert.strictEqual(this.oAddAppliedCustomDataSpy.callCount, 0, "addCustomData was not called");
 			assert.strictEqual(this.oWaitForChangeApplySpy.callCount, 0, "no change was waited for");
 		});
@@ -429,7 +429,7 @@ sap.ui.define([
 		QUnit.test("with 3 queued changes depending on one another and the last change already failed", async function(assert) {
 			await Applier.applyAllChangesForControl(oAppComponent, sReference, this.oControl1);
 			FlexObjectState.getAllApplicableUIChanges(sReference).find((oChange) => oChange.getId() === "fileNameChange3").markFailed("");
-			await FlexObjectState.waitForFlexObjectsToBeApplied([{selector: this.oControl1}]);
+			await FlexObjectState.waitForFlexObjectsToBeApplied([{ selector: this.oControl1 }]);
 			assert.strictEqual(this.oWaitForChangeApplySpy.callCount, 0, "no change was waited for");
 		});
 
@@ -453,7 +453,7 @@ sap.ui.define([
 
 			Applier.applyAllChangesForControl(oAppComponent, sReference, this.oControl1);
 
-			await FlexObjectState.waitForFlexObjectsToBeApplied([{selector: this.oControl1}]);
+			await FlexObjectState.waitForFlexObjectsToBeApplied([{ selector: this.oControl1 }]);
 			assert.strictEqual(this.oAddAppliedCustomDataSpy.callCount, 2, "two changes were applied");
 			assert.strictEqual(this.oWaitForChangeApplySpy.callCount, 3, "all changes were waited for");
 		});
@@ -470,21 +470,21 @@ sap.ui.define([
 				appCOmponent: oAppComponent,
 				modifier: JsControlTreeModifier
 			});
-			await FlexObjectState.waitForFlexObjectsToBeApplied([{selector: this.oControl1}]);
+			await FlexObjectState.waitForFlexObjectsToBeApplied([{ selector: this.oControl1 }]);
 			assert.strictEqual(this.oDestroyAppliedCustomDataSpy.callCount, 3, "all three changes got reverted");
 			assert.strictEqual(this.oWaitForChangeApplySpy.callCount, 3, "all changes were waited for");
 		});
 
 		QUnit.test("with a change type filter and 3 queued changes - 1", async function(assert) {
 			Applier.applyAllChangesForControl(oAppComponent, sReference, this.oControl1);
-			await FlexObjectState.waitForFlexObjectsToBeApplied([{selector: this.oControl1, changeTypes: ["changeType1"]}]);
+			await FlexObjectState.waitForFlexObjectsToBeApplied([{ selector: this.oControl1, changeTypes: ["changeType1"] }]);
 			assert.strictEqual(this.oWaitForChangeApplySpy.callCount, 2, "only two changes were waited for");
 		});
 
 		QUnit.test("with a change type filter and 3 queued changes - 2", async function(assert) {
 			// the last change should be waited for, but because of dependencies all changes need to be waited for
 			Applier.applyAllChangesForControl(oAppComponent, sReference, this.oControl1);
-			await FlexObjectState.waitForFlexObjectsToBeApplied([{selector: this.oControl1, changeTypes: ["changeType2"]}]);
+			await FlexObjectState.waitForFlexObjectsToBeApplied([{ selector: this.oControl1, changeTypes: ["changeType2"] }]);
 			assert.strictEqual(this.oWaitForChangeApplySpy.callCount, 3, "all changes was waited for");
 		});
 	});

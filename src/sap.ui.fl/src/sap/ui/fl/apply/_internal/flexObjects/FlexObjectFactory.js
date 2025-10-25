@@ -171,7 +171,7 @@ sap.ui.define([
 	};
 
 	FlexObjectFactory.createFlexObject = function(mPropertyBag) {
-		const mProperties = createBasePropertyBag({...mPropertyBag, ...{packageName: mPropertyBag.packageName || "$TMP"}});
+		const mProperties = createBasePropertyBag({ ...mPropertyBag, ...{ packageName: mPropertyBag.packageName || "$TMP" } });
 		return new FlexObject(mProperties);
 	};
 

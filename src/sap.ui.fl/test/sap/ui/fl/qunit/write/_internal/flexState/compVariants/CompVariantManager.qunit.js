@@ -343,7 +343,7 @@ sap.ui.define([
 				reference: sComponentId,
 				persistencyKey: sPersistencyKey,
 				changeSpecificData: {
-					content: {filter: "second update"},
+					content: { filter: "second update" },
 					isVariant: true,
 					type: "filterVariant"
 				},
@@ -359,9 +359,9 @@ sap.ui.define([
 			aCompVariants = CompVariantManagementState.assembleVariantList(mPropertyBag);
 			assert.strictEqual(aCompVariants.length, 3, "then another entity was stored");
 			assert.strictEqual(aCompVariants[1], oAddedObjectSecond, "which is the returned entity");
-			assert.deepEqual(aCompVariants[1].getContent(), {filter: "second update"}, "content of second variant is correct");
+			assert.deepEqual(aCompVariants[1].getContent(), { filter: "second update" }, "content of second variant is correct");
 			assert.strictEqual(aCompVariants[0].getRevertData().length, 3, "first variant contain correct number of revert data");
-			assert.deepEqual(aCompVariants[0].getContent(), {filter: "first update"}, "content of first variant is correct");
+			assert.deepEqual(aCompVariants[0].getContent(), { filter: "first update" }, "content of first variant is correct");
 		});
 	});
 
@@ -395,7 +395,7 @@ sap.ui.define([
 			const sPersistencyKey = "persistency.key";
 			const sVariantId = "added_variant";
 			assert.equal(
-				FlexObjectManager.hasDirtyFlexObjects({reference: sComponentId}),
+				FlexObjectManager.hasDirtyFlexObjects({ reference: sComponentId }),
 				false,
 				"hasDirtyFlexObjects is false at beginning"
 			);
@@ -415,7 +415,7 @@ sap.ui.define([
 				}
 			});
 			assert.equal(
-				FlexObjectManager.hasDirtyFlexObjects({reference: sComponentId}),
+				FlexObjectManager.hasDirtyFlexObjects({ reference: sComponentId }),
 				true,
 				"hasDirtyFlexObjects is true after add a new variant"
 			);
@@ -443,7 +443,7 @@ sap.ui.define([
 				persistencyKey: sPersistencyKey
 			});
 			assert.equal(
-				FlexObjectManager.hasDirtyFlexObjects({reference: sComponentId}),
+				FlexObjectManager.hasDirtyFlexObjects({ reference: sComponentId }),
 				true,
 				"hasDirtyFlexObjects is true after update variant"
 			);
@@ -461,7 +461,7 @@ sap.ui.define([
 				persistencyKey: sPersistencyKey
 			});
 
-			assert.equal(FlexObjectManager.hasDirtyFlexObjects({reference: sComponentId}), false, "hasDirtyFlexObjects is false after persisting all changes");
+			assert.equal(FlexObjectManager.hasDirtyFlexObjects({ reference: sComponentId }), false, "hasDirtyFlexObjects is false after persisting all changes");
 			assert.strictEqual(oWriteStub.callCount, 2, "then the write method was called 2 times,");
 			assert.strictEqual(oUpdateStub.callCount, 0, "no update was called");
 			assert.strictEqual(oRemoveStub.callCount, 0, "and no delete was called");
@@ -473,7 +473,7 @@ sap.ui.define([
 			);
 			assert.strictEqual(aCompEntities[0].getLayer(), Layer.PUBLIC, "it is a public variant");
 			assert.strictEqual(aCompEntities[0].getFavorite(), false, "with favorite set to false");
-			assert.deepEqual(aCompEntities[0].getContent(), {filter: "abc"}, "with correct content");
+			assert.deepEqual(aCompEntities[0].getContent(), { filter: "abc" }, "with correct content");
 
 			assert.strictEqual(
 				aCompEntities[1].getState(),
@@ -487,7 +487,7 @@ sap.ui.define([
 			);
 			assert.deepEqual(
 				aCompEntities[1].getContent(),
-				{favorite: false},
+				{ favorite: false },
 				"with favorite set to false"
 			);
 		});
@@ -500,7 +500,7 @@ sap.ui.define([
 				persistencyKey: sPersistencyKey
 			});
 
-			assert.equal(FlexObjectManager.hasDirtyFlexObjects({reference: sComponentId}), false, "hasDirtyChanges is false at beginning");
+			assert.equal(FlexObjectManager.hasDirtyFlexObjects({ reference: sComponentId }), false, "hasDirtyChanges is false at beginning");
 			var oVariant = CompVariantManager.addVariant({
 				changeSpecificData: {
 					type: "pageVariant",
@@ -521,7 +521,7 @@ sap.ui.define([
 				persistencyKey: sPersistencyKey
 			};
 
-			assert.equal(FlexObjectManager.hasDirtyFlexObjects({reference: sComponentId}), true, "hasDirtyChanges is true after add a new variant");
+			assert.equal(FlexObjectManager.hasDirtyFlexObjects({ reference: sComponentId }), true, "hasDirtyChanges is true after add a new variant");
 			CompVariantManager.updateVariant({
 				id: oVariant.getVariantId(),
 				isUserDependent: true,
@@ -529,14 +529,14 @@ sap.ui.define([
 				reference: sComponentId,
 				persistencyKey: sPersistencyKey
 			});
-			assert.equal(FlexObjectManager.hasDirtyFlexObjects({reference: sComponentId}), true, "hasDirtyChanges is true after update variant");
+			assert.equal(FlexObjectManager.hasDirtyFlexObjects({ reference: sComponentId }), true, "hasDirtyChanges is true after update variant");
 			CompVariantManager.setDefault({
 				reference: sComponentId,
 				persistencyKey: sPersistencyKey,
 				defaultVariantId: "id_123_pageVariant",
 				conntent: {}
 			});
-			assert.equal(FlexObjectManager.hasDirtyFlexObjects({reference: sComponentId}), true, "hasDirtyChanges is true after setDefault variant");
+			assert.equal(FlexObjectManager.hasDirtyFlexObjects({ reference: sComponentId }), true, "hasDirtyChanges is true after setDefault variant");
 			let aCompVariants = CompVariantManagementState.assembleVariantList(mPropertyBag);
 
 			var oWriteStub = sandbox.stub(Storage, "write").resolves();
@@ -548,7 +548,7 @@ sap.ui.define([
 			await CompVariantManager.persist(mPropertyBag);
 
 			assert.equal(
-				FlexObjectManager.hasDirtyFlexObjects({reference: sComponentId}),
+				FlexObjectManager.hasDirtyFlexObjects({ reference: sComponentId }),
 				false,
 				"hasDirtyChanges is false after persisting all changes"
 			);
@@ -599,9 +599,9 @@ sap.ui.define([
 			assert.strictEqual(aCompVariants.length, 1, "the variant is cleared and only the standard variant is left");
 			assert.strictEqual(oFlexStateUpdateStub.callCount, 2, "and flexState update was called twice");
 			assert.strictEqual(oFlexStateUpdateStub.firstCall.args[0], sComponentId, "the first update call was for the correct reference");
-			assert.deepEqual(oFlexStateUpdateStub.firstCall.args[1], [{type: "delete", flexObject: oVariant.convertToFileContent()}], "the first update call was for the correct object");
+			assert.deepEqual(oFlexStateUpdateStub.firstCall.args[1], [{ type: "delete", flexObject: oVariant.convertToFileContent() }], "the first update call was for the correct object");
 			assert.strictEqual(oFlexStateUpdateStub.secondCall.args[0], sComponentId, "the second update call was for the correct reference");
-			assert.deepEqual(oFlexStateUpdateStub.secondCall.args[1], [{type: "delete", flexObject: aSetDefaultChanges[0].convertToFileContent()}], "the second update call was for the correct object");
+			assert.deepEqual(oFlexStateUpdateStub.secondCall.args[1], [{ type: "delete", flexObject: aSetDefaultChanges[0].convertToFileContent() }], "the second update call was for the correct object");
 			assert.strictEqual(
 				aVariantChange.getState(),
 				States.LifecycleState.PERSISTED,
@@ -632,7 +632,7 @@ sap.ui.define([
 				}
 			});
 			assert.equal(
-				FlexObjectManager.hasDirtyFlexObjects({reference: sComponentId}),
+				FlexObjectManager.hasDirtyFlexObjects({ reference: sComponentId }),
 				true,
 				"hasDirtyChanges is true after add variant"
 			);
@@ -643,7 +643,7 @@ sap.ui.define([
 				layer: Layer.CUSTOMER
 			});
 			assert.equal(
-				FlexObjectManager.hasDirtyFlexObjects({reference: sComponentId}),
+				FlexObjectManager.hasDirtyFlexObjects({ reference: sComponentId }),
 				true,
 				"hasDirtyChanges is still true after remove variant as they are part of the flexstate"
 			);
@@ -920,7 +920,7 @@ sap.ui.define([
 				favorite: false,
 				layer: Layer.VENDOR,
 				executeOnSelection: true,
-				contexts: {foo: "bar"},
+				contexts: { foo: "bar" },
 				name: "newName",
 				visible: false
 			});
@@ -940,7 +940,7 @@ sap.ui.define([
 				favorite: false,
 				layer: Layer.VENDOR,
 				executeOnSelection: true,
-				contexts: {foo: "bar"},
+				contexts: { foo: "bar" },
 				name: "newName",
 				visible: false,
 				adaptationId: "test-AdaptationId1",
@@ -967,19 +967,19 @@ sap.ui.define([
 				favorite: false,
 				layer: Layer.USER,
 				executeOnSelection: true,
-				contexts: {foo: "bar"},
+				contexts: { foo: "bar" },
 				name: "newName"
 			});
 			assert.strictEqual(CompVariantManagementState.getVariantChanges(this.oVariant).length, 1, "then one variant change was created");
 			assert.equal(this.oVariant.getRevertData().length, 1, "then the change is applied on the variant");
 			assert.strictEqual(this.oVariant.getFavorite(), false, "the favorite was changed in the variant by the applied change");
 			assert.strictEqual(this.oVariant.getName(), "newName", "the variant name is correct");
-			assert.deepEqual(this.oVariant.getContexts(), {foo: "bar"}, "the contexts are correct");
+			assert.deepEqual(this.oVariant.getContexts(), { foo: "bar" }, "the contexts are correct");
 			assert.strictEqual(this.oVariant.getExecuteOnSelection(), true, "the executeOnSelection is correct");
 		});
 
 		QUnit.test("Given updateVariant is called on a non-updatable variant (different layer) and an updatable change", function(assert) {
-			var oUpdatedContent = {test: "wee"};
+			var oUpdatedContent = { test: "wee" };
 			CompVariantManager.updateVariant({
 				reference: sComponentId,
 				persistencyKey: this.sPersistencyKey,
@@ -987,12 +987,12 @@ sap.ui.define([
 				favorite: false,
 				layer: Layer.USER,
 				executeOnSelection: true,
-				contexts: {foo: "bar"},
+				contexts: { foo: "bar" },
 				name: "newName"
 			});
 			assert.strictEqual(this.oVariant.getFavorite(), false, "the favorite is first set to false by the applied change");
 			assert.strictEqual(this.oVariant.getName(), "newName", "the variant name is correct");
-			assert.deepEqual(this.oVariant.getContexts(), {foo: "bar"}, "the contexts are correct");
+			assert.deepEqual(this.oVariant.getContexts(), { foo: "bar" }, "the contexts are correct");
 			assert.strictEqual(this.oVariant.getExecuteOnSelection(), true, "the executeOnSelection is correct");
 			CompVariantManager.updateVariant({
 				reference: sComponentId,
@@ -1020,12 +1020,12 @@ sap.ui.define([
 				favorite: false,
 				layer: Layer.CUSTOMER,
 				executeOnSelection: true,
-				contexts: {foo: "bar"},
+				contexts: { foo: "bar" },
 				name: "newName"
 			});
 			assert.strictEqual(this.oVariant.getFavorite(), false, "the favorite is first set to false by the non-updatable change");
 			assert.strictEqual(this.oVariant.getName(), "newName", "the variant name is correct");
-			assert.deepEqual(this.oVariant.getContexts(), {foo: "bar"}, "the contexts are correct");
+			assert.deepEqual(this.oVariant.getContexts(), { foo: "bar" }, "the contexts are correct");
 			assert.strictEqual(this.oVariant.getExecuteOnSelection(), true, "the executeOnSelection is correct");
 			// because the update is within another layer, the previous change cannot be updated
 			CompVariantManager.updateVariant({
@@ -1061,12 +1061,12 @@ sap.ui.define([
 				favorite: true,
 				layer: Layer.PUBLIC,
 				executeOnSelection: true,
-				contexts: {foo: "bar"},
+				contexts: { foo: "bar" },
 				name: "newName"
 			});
 			assert.strictEqual(oPublicVariant.getFavorite(), false, "and favorite is always set to false");
 			assert.strictEqual(oPublicVariant.getName(), "newName", "and the variant name is correct");
-			assert.deepEqual(oPublicVariant.getContexts(), {foo: "bar"}, "and the contexts are correct");
+			assert.deepEqual(oPublicVariant.getContexts(), { foo: "bar" }, "and the contexts are correct");
 			assert.strictEqual(oPublicVariant.getExecuteOnSelection(), true, "and executeOnSelection is correct");
 		});
 	});
@@ -1805,7 +1805,7 @@ sap.ui.define([
 				CompVariantManager.operationType.StateUpdate,
 				"it is stored that the state was updated ..."
 			);
-			assert.deepEqual(oLastRevertData.getContent(), {previousState: States.LifecycleState.PERSISTED}, "... from PERSISTED");
+			assert.deepEqual(oLastRevertData.getContent(), { previousState: States.LifecycleState.PERSISTED }, "... from PERSISTED");
 
 			CompVariantManager.revert({
 				reference: sComponentId,
@@ -2067,7 +2067,7 @@ sap.ui.define([
 
 		QUnit.test("Given persist is called with parentVersion", async function(assert) {
 			var sParentVersion = "GUIDParentVersion";
-			const {sPersistencyKey} = this;
+			const { sPersistencyKey } = this;
 			var oVersionsModel = new JSONModel({
 				persistedVersion: sParentVersion,
 				draftFilenames: [this.oVariant.getId()],
@@ -2159,8 +2159,8 @@ sap.ui.define([
 				persistedVersion: sParentVersion,
 				draftFilenames: [this.oVariant.getId()],
 				versions: [
-					{version: Version.Number.Draft},
-					{version: 1}]
+					{ version: Version.Number.Draft },
+					{ version: 1 }]
 			});
 			sandbox.stub(Versions, "getVersionsModel").returns(oVersionsModel);
 			var oResponse = {
@@ -2201,7 +2201,7 @@ sap.ui.define([
 			assert.equal(oUpdateStub.callCount, 0, "no update was called");
 			assert.equal(oRemoveStub.callCount, 1, "and one deletes were called");
 			assert.equal(oRemoveStub.getCalls()[0].args[0].parentVersion, sParentVersion, "and parentVersion is set correct in delete");
-			var mPropertyBag = {reference: sComponentId, layer: Layer.CUSTOMER};
+			var mPropertyBag = { reference: sComponentId, layer: Layer.CUSTOMER };
 			var oVersionModel = Versions.getVersionsModel(mPropertyBag);
 			assert.equal(oVersionModel.getProperty("/draftFilenames").length, 0, "and no draft filename in version model");
 			assert.equal(oVersionModel.getProperty("/versions").length, 1, "and only one version left in version model");

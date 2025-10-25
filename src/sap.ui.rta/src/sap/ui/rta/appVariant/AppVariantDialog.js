@@ -57,9 +57,9 @@ sap.ui.define([
 	"use strict";
 
 	// shortcut for sap.ui.layout.form.SimpleFormLayout
-	var {SimpleFormLayout} = layoutLibrary.form;
+	var { SimpleFormLayout } = layoutLibrary.form;
 
-	var {ValueState} = coreLibrary;
+	var { ValueState } = coreLibrary;
 
 	var oResources = Lib.getResourceBundleFor("sap.ui.rta");
 	var oDataSet;

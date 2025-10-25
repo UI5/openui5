@@ -134,7 +134,7 @@ sap.ui.define([
 
 			this.oChange = createAddXMLAtExtensionPointChange(sFragmentPath, this.sExtensionName);
 			this.oChangeSpecificContent = {
-				content: {fragmentPath: "fragments/Fragment"}
+				content: { fragmentPath: "fragments/Fragment" }
 			};
 		},
 		afterEach() {
@@ -222,7 +222,7 @@ sap.ui.define([
 			);
 			var oChange3 = createAddXMLAtExtensionPointChange(sThirdFragmentPath, "ExtensionPoint1");
 			var oChangeSpecificContent3 = {
-				content: {fragmentPath: "fragments/ThirdFragment"}
+				content: { fragmentPath: "fragments/ThirdFragment" }
 			};
 			this.oChangeHandler.completeChangeContent(oChange3, oChangeSpecificContent3);
 			var oHBoxItems = this.oHBox.childNodes[0];
@@ -283,7 +283,7 @@ sap.ui.define([
 		QUnit.test("When applying changes on extension point with default value in xml control tree", function(assert) {
 			var oChange4 = createAddXMLAtExtensionPointChange(sThirdFragmentPath, "ExtensionPoint4");
 			var oChangeSpecificContent4 = {
-				content: {fragmentPath: "fragments/ThirdFragment"}
+				content: { fragmentPath: "fragments/ThirdFragment" }
 			};
 			this.oChangeHandler.completeChangeContent(oChange4, oChangeSpecificContent4);
 			var oPanelContent = this.oPanel.childNodes[0];

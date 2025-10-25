@@ -355,8 +355,8 @@ sap.ui.define([
 		// changedTouches will have the information related to the moved finger, because it’s what caused the event "touchmove"
 		var aTouches = oEvent.touches || oEvent.changedTouches;
 
-		var {pageX} = aTouches[0];
-		var {pageY} = aTouches[0];
+		var { pageX } = aTouches[0];
+		var { pageY } = aTouches[0];
 
 		var oTargetOverlay = this._findTargetOverlayFromCoordinates(pageX, pageY);
 

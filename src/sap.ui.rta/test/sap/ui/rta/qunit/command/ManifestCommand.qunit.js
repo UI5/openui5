@@ -112,7 +112,7 @@ sap.ui.define([
 				texts: this.mTexts,
 				changeType: this.sChangeType,
 				appComponent: this.oMockedAppComponent
-			}, {}, {layer: this.mFlexSettings.layer})
+			}, {}, { layer: this.mFlexSettings.layer })
 
 			.then(function(oManifestCommand) {
 				assert.ok(oManifestCommand, "App Descriptor command exists for element");
@@ -172,7 +172,7 @@ sap.ui.define([
 				texts: this.mTexts,
 				changeType: this.sChangeType,
 				appComponent: this.oMockedAppComponent
-			}, {}, {layer: this.mFlexSettings.layer})
+			}, {}, { layer: this.mFlexSettings.layer })
 
 			.then(function(oManifestCommand) {
 				assert.ok(oManifestCommand, "Manifest command exists for element");
@@ -195,7 +195,7 @@ sap.ui.define([
 				texts: this.mTexts,
 				changeType: "appdescr_ui5_addLibraries",
 				appComponent: this.oMockedAppComponent
-			}, {}, {layer: this.sLayer})
+			}, {}, { layer: this.sLayer })
 			.then(function(oManifestCommand) {
 				oManifestCommand.setCompositeId(sCompositeCommandId);
 				assert.ok(oManifestCommand, "Manifest command exists for element");
@@ -220,7 +220,7 @@ sap.ui.define([
 				texts: this.mTexts,
 				changeType: sChangeType,
 				appComponent: this.oMockedAppComponent
-			}, {}, {layer: this.sLayer})
+			}, {}, { layer: this.sLayer })
 			.then(function(oManifestCommand) {
 				oManifestCommand.setCompositeId(sCompositeCommandId);
 				assert.ok(oManifestCommand, "Manifest command exists for element");
@@ -239,7 +239,7 @@ sap.ui.define([
 			const done = assert.async();
 			this.sChangeType = "appdescr_ui_generic_app_changePageConfiguration";
 			this.mParameters = {
-				parentPage: {component: "dummy", entitySet: "dummy"},
+				parentPage: { component: "dummy", entitySet: "dummy" },
 				entityPropertyChange: {
 					propertyPath: "a",
 					operation: "UPSERT",
@@ -254,7 +254,7 @@ sap.ui.define([
 				texts: this.mTexts,
 				changeType: this.sChangeType,
 				appComponent: this.oMockedAppComponent
-			}, {}, {layer: this.sLayer})
+			}, {}, { layer: this.sLayer })
 			.then(function(oManifestCommand) {
 				assert.ok(oManifestCommand, "Manifest command exists for element");
 				assert.ok(oManifestCommand.needsReload, "Manifest commands need restart to be applied");

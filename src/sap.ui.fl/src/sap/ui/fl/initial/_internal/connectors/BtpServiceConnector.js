@@ -74,7 +74,7 @@ sap.ui.define([
 				InitialUtils.addLanguageInfo(mParameters);
 			}
 			const sVariantDataUrl = InitialUtils.getUrl(this.ROUTES.VARIANTDATA, mPropertyBag, mParameters);
-			return InitialUtils.sendRequest(sVariantDataUrl, "GET", {initialConnector: this}).then(function(oResult) {
+			return InitialUtils.sendRequest(sVariantDataUrl, "GET", { initialConnector: this }).then(function(oResult) {
 				return oResult.response;
 			});
 		}

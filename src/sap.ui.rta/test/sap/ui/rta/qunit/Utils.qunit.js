@@ -46,7 +46,7 @@ sap.ui.define([
 	"use strict";
 
 	// shortcut for sap.uxap.ObjectPageSubSectionLayout
-	var {ObjectPageSubSectionLayout} = uxapLibrary;
+	var { ObjectPageSubSectionLayout } = uxapLibrary;
 
 	var sandbox = sinon.createSandbox();
 
@@ -62,9 +62,9 @@ sap.ui.define([
 			//			ObjectPageSubSection3
 			//				Label3
 
-			this.oLabel1 = new Label({text: "Label1" });
-			this.oLabel2 = new Label({text: "Label2" });
-			this.oLabel3 = new Label({text: "Label3" });
+			this.oLabel1 = new Label({ text: "Label1" });
+			this.oLabel2 = new Label({ text: "Label2" });
+			this.oLabel3 = new Label({ text: "Label3" });
 			this.oObjectPageSubSection1 = new ObjectPageSubSection({
 				title: "objectpageSubSection1",
 				blocks: this.oLabel1
@@ -192,11 +192,11 @@ sap.ui.define([
 			//				SubSection2
 			//					Button3
 
-			this.oButton0 = new Button("button0", {text: "button0"});
-			this.oButton1 = new Button("button1", {text: "button1"});
-			this.oButton2 = new Button("button2", {text: "button2"});
-			this.oButton3 = new Button("button3", {text: "button3"});
-			this.oButton4 = new Button("button4", {text: "button4"});
+			this.oButton0 = new Button("button0", { text: "button0" });
+			this.oButton1 = new Button("button1", { text: "button1" });
+			this.oButton2 = new Button("button2", { text: "button2" });
+			this.oButton3 = new Button("button3", { text: "button3" });
+			this.oButton4 = new Button("button4", { text: "button4" });
 			this.oSubSection0 = new ObjectPageSubSection("subsection0", {
 				blocks: [this.oButton0]
 			});
@@ -382,8 +382,8 @@ sap.ui.define([
 	// One model with EntityType01 and EntityType02 (default) + one i18n model ("i18n")
 	QUnit.module("Given a complex test view with oData Model...", {
 		beforeEach() {
-			this.oSource = new Label({text: "Label1" });
-			this.oTarget = new Label({text: "Label2" });
+			this.oSource = new Label({ text: "Label1" });
+			this.oTarget = new Label({ text: "Label2" });
 		},
 
 		afterEach() {

@@ -31,7 +31,7 @@ sap.ui.define([
 	"use strict";
 
 	// shortcut for sap.ui.core.ValueState
-	var {ValueState} = coreLibrary;
+	var { ValueState } = coreLibrary;
 
 	/**
 	 * Constructor for a new transport/TransportDialog.
@@ -55,27 +55,27 @@ sap.ui.define([
 				/**
 				 * An ABAP package that can be used as default for the ABAP package selection.
 				 */
-				pkg: {type: "string", group: "Misc", defaultValue: null},
+				pkg: { type: "string", group: "Misc", defaultValue: null },
 
 				/**
 				 * The set of ABAP transport requests that can be selected by a user.
 				 */
-				transports: {type: "any", group: "Misc", defaultValue: null},
+				transports: { type: "any", group: "Misc", defaultValue: null },
 
 				/**
 				 * The LREP object for which as transport request has to be selected.
 				 */
-				lrepObject: {type: "any", group: "Misc", defaultValue: null},
+				lrepObject: { type: "any", group: "Misc", defaultValue: null },
 
 				/**
 				 * Flag if the "Local Object" button should be visible.
 				 */
-				localObjectVisible: {type: "boolean", group: "Misc", defaultValue: true},
+				localObjectVisible: { type: "boolean", group: "Misc", defaultValue: true },
 
 				/**
 				 * Flag indicating whether the selection of an ABAP package is to be hidden or not.
 				 */
-				hidePackage: {type: "boolean", group: "Misc", defaultValue: null}
+				hidePackage: { type: "boolean", group: "Misc", defaultValue: null }
 			},
 			events: {
 

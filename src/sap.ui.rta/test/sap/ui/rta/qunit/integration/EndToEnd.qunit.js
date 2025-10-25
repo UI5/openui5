@@ -104,7 +104,7 @@ sap.ui.define([
 		QUnit.test("when adding a group element via context menu (expanded context menu - reveal)", function(assert) {
 			const fnDone = assert.async();
 
-			let iDirtyChangesCount = FlexTestAPI.getDirtyChanges({selector: this.oCompanyCodeField}).length;
+			let iDirtyChangesCount = FlexTestAPI.getDirtyChanges({ selector: this.oCompanyCodeField }).length;
 			assert.strictEqual(iDirtyChangesCount, 0, "then there are no dirty changes in the flex persistence");
 			const oCommandStack = this.oRta.getCommandStack();
 			oCommandStack.attachEventOnce("modified", function() {
@@ -148,7 +148,7 @@ sap.ui.define([
 										oFieldToAdd.label,
 										"the new field is the one that got deleted"
 									);
-									iDirtyChangesCount = FlexTestAPI.getDirtyChanges({selector: this.oCompanyCodeField}).length;
+									iDirtyChangesCount = FlexTestAPI.getDirtyChanges({ selector: this.oCompanyCodeField }).length;
 									assert.strictEqual(iDirtyChangesCount, 3, "then there are three dirty changes in the flex persistence");
 									stubShowMessageBoxOnRtaClose(this.oRta);
 									await this.oRta.stop();
@@ -182,7 +182,7 @@ sap.ui.define([
 		QUnit.test("when adding a group element via context menu (expanded context menu - addViaDelegate)", function(assert) {
 			const fnDone = assert.async();
 
-			const iDirtyChangesCount = FlexTestAPI.getDirtyChanges({selector: this.oCompanyCodeField}).length;
+			const iDirtyChangesCount = FlexTestAPI.getDirtyChanges({ selector: this.oCompanyCodeField }).length;
 			assert.strictEqual(iDirtyChangesCount, 0, "then there are no dirty changes in the flex persistence");
 			const oDialog = this.oRta.getPlugins().additionalElements.getDialog();
 			this.oCompanyCodeFieldOverlay.focus();
@@ -209,7 +209,7 @@ sap.ui.define([
 						if (bLabelIsInitialized) {
 							assert.equal(oGroupElement.getLabelText(), sFieldToAddText, "the added element is at the correct position");
 							assert.ok(oGroupElement.getVisible(), "the new field is visible");
-							const iDirtyChangesCount = FlexTestAPI.getDirtyChanges({selector: this.oCompanyCodeField}).length;
+							const iDirtyChangesCount = FlexTestAPI.getDirtyChanges({ selector: this.oCompanyCodeField }).length;
 							assert.strictEqual(iDirtyChangesCount, 1, "then there is one dirty change in the flex persistence");
 							oObserver.disconnect();
 							stubShowMessageBoxOnRtaClose(this.oRta);
@@ -222,7 +222,7 @@ sap.ui.define([
 						}
 					}.bind(this));
 
-					const oConfig = {attributes: false, childList: true, characterData: false, subtree: true};
+					const oConfig = { attributes: false, childList: true, characterData: false, subtree: true };
 					oObserver.observe(this.oForm.getDomRef(), oConfig);
 
 					// select the field in the list and close the dialog with OK
@@ -244,14 +244,14 @@ sap.ui.define([
 		QUnit.test("when removing a field,", function(assert) {
 			const fnDone = assert.async();
 			const oCommandStack = this.oRta.getCommandStack();
-			let iDirtyChangesCount = FlexTestAPI.getDirtyChanges({selector: this.oVictim}).length;
+			let iDirtyChangesCount = FlexTestAPI.getDirtyChanges({ selector: this.oVictim }).length;
 			assert.strictEqual(iDirtyChangesCount, 0, "then there are no dirty changes in the flex persistence");
 
 			oCommandStack.attachModified(function() {
 				const oFirstExecutedCommand = oCommandStack.getAllExecutedCommands()[0];
 				if (oFirstExecutedCommand && oFirstExecutedCommand.getName() === "remove") {
 					assert.strictEqual(this.oVictim.getVisible(), false, " then field is not visible");
-					iDirtyChangesCount = FlexTestAPI.getDirtyChanges({selector: this.oVictim}).length;
+					iDirtyChangesCount = FlexTestAPI.getDirtyChanges({ selector: this.oVictim }).length;
 					assert.strictEqual(iDirtyChangesCount, 1, "then there is one dirty change in the flex persistence");
 					stubShowMessageBoxOnRtaClose(this.oRta);
 					return this.oRta.stop()
@@ -273,7 +273,7 @@ sap.ui.define([
 		QUnit.test("when moving a field (via cut and paste),", function(assert) {
 			const fnDone = assert.async();
 			const oCommandStack = this.oRta.getCommandStack();
-			let iDirtyChangesCount = FlexTestAPI.getDirtyChanges({selector: this.oCompanyCodeField}).length;
+			let iDirtyChangesCount = FlexTestAPI.getDirtyChanges({ selector: this.oCompanyCodeField }).length;
 			assert.strictEqual(iDirtyChangesCount, 0, "then there are no dirty changes in the flex persistence");
 
 			oCommandStack.attachModified(function() {
@@ -286,7 +286,7 @@ sap.ui.define([
 						this.oCompanyCodeField.getId(),
 						" then the field is moved to first place"
 					);
-					iDirtyChangesCount = FlexTestAPI.getDirtyChanges({selector: this.oCompanyCodeField}).length;
+					iDirtyChangesCount = FlexTestAPI.getDirtyChanges({ selector: this.oCompanyCodeField }).length;
 					assert.strictEqual(iDirtyChangesCount, 1, "then there is one dirty change in the flex persistence");
 					stubShowMessageBoxOnRtaClose(this.oRta);
 					return this.oRta.stop()
@@ -309,7 +309,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("when adding a SimpleForm Field via context menu (expanded context menu) - reveal", function(assert) {
-			let iDirtyChangesCount = FlexTestAPI.getDirtyChanges({selector: this.oCompanyCodeField}).length;
+			let iDirtyChangesCount = FlexTestAPI.getDirtyChanges({ selector: this.oCompanyCodeField }).length;
 			assert.strictEqual(iDirtyChangesCount, 0, "then there are no dirty changes in the flex persistence");
 
 			const fnDone = assert.async();
@@ -332,7 +332,7 @@ sap.ui.define([
 						if (aCommands && aCommands.length === 1) {
 							await nextUIUpdate();
 
-							iDirtyChangesCount = FlexTestAPI.getDirtyChanges({selector: this.oCompanyCodeField}).length;
+							iDirtyChangesCount = FlexTestAPI.getDirtyChanges({ selector: this.oCompanyCodeField }).length;
 							assert.strictEqual(iDirtyChangesCount, 1, "then there are three dirty changes in the flex persistence");
 							stubShowMessageBoxOnRtaClose(this.oRta);
 							return this.oRta.stop()
@@ -371,7 +371,7 @@ sap.ui.define([
 			const oCommandStack = this.oRta.getCommandStack();
 			const oCutPastePlugin = this.oRta.getPlugins().cutPaste;
 			assert.strictEqual(
-				FlexTestAPI.getDirtyChanges({selector: this.oCompanyCodeField}).length,
+				FlexTestAPI.getDirtyChanges({ selector: this.oCompanyCodeField }).length,
 				0,
 				"then there are no dirty changes in the flex persistence"
 			);
@@ -487,13 +487,13 @@ sap.ui.define([
 			const oCombinedElement = Element.getElementById("Comp1---idMain1--Dates.BoundButton35");
 			const oCombinedElementOverlay = OverlayRegistry.getOverlay(oCombinedElement);
 
-			let iDirtyChangesCount = FlexTestAPI.getDirtyChanges({selector: oCombinedElement}).length;
+			let iDirtyChangesCount = FlexTestAPI.getDirtyChanges({ selector: oCombinedElement }).length;
 			assert.strictEqual(iDirtyChangesCount, 0, "then there are no changes to publish in the flex persistence");
 
 			const oCommandStack = this.oRta.getCommandStack();
 			oCommandStack.attachEventOnce("modified", async function() {
 				await nextUIUpdate();
-				iDirtyChangesCount = FlexTestAPI.getDirtyChanges({selector: oCombinedElement}).length;
+				iDirtyChangesCount = FlexTestAPI.getDirtyChanges({ selector: oCombinedElement }).length;
 				assert.strictEqual(iDirtyChangesCount, 1, "then there is one dirty change in the flex persistence");
 				stubShowMessageBoxOnRtaClose(this.oRta);
 				return this.oRta.stop()
@@ -508,7 +508,7 @@ sap.ui.define([
 			oCombinedElementOverlay.focus();
 			oCombinedElementOverlay.setSelected(true);
 
-			const {oContextMenuControl} = this.oRta.getPlugins().contextMenu;
+			const { oContextMenuControl } = this.oRta.getPlugins().contextMenu;
 			this.oRta.getPlugins().contextMenu.attachEventOnce("openedContextMenu", async function() {
 				const oContextMenuItem = oContextMenuControl.getItems().filter(function(oItem) {
 					return oItem.getText() === "Split";

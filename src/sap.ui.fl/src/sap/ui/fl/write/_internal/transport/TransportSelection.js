@@ -54,7 +54,7 @@ sap.ui.define([
 	TransportSelection.prototype.selectTransport = function(oObjectInfo, fOkay, fError, bCompactMode, oControl, sStyleClass, bLocalObjectVisible) {
 		// No transport selection unless Lrep connector is available
 		if (!FlUtils.getLrepUrl()) {
-			fOkay(this._createEventObject(oObjectInfo, {transportId: ""}));
+			fOkay(this._createEventObject(oObjectInfo, { transportId: "" }));
 			return;
 		}
 		var retrieveTransportInfo = function(oObjectInfo, fOkay, fError, bCompactMode, sStyleClass, bATOActive) {

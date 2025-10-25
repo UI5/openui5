@@ -651,15 +651,15 @@ sap.ui.define([
 				createMockChange("testChange1", undefined, "ctdbutton1", {
 					changeType: "someRenameChangeType",
 					dependentSelector: {
-						ctdbutton1: {id: "ctdbutton1"}
+						ctdbutton1: { id: "ctdbutton1" }
 					}
 				}),
 				// For case 2:
 				createMockChange("testChange2", undefined, "nestedContainer1", {
 					changeType: "someAddChangeType",
 					dependentSelector: {
-						ctdbutton2: {id: "ctdbutton2"},
-						nestedContainer1: {id: "nestedContainer1"}
+						ctdbutton2: { id: "ctdbutton2" },
+						nestedContainer1: { id: "nestedContainer1" }
 					}
 				}),
 				// For case 3:
@@ -667,8 +667,8 @@ sap.ui.define([
 					changeType: "someMoveChangeType",
 					// nestedContainer2 is not part of the dependent selectors
 					dependentSelector: {
-						ctdbutton3: {id: "ctdbutton3"},
-						nestedContainer1: {id: "nestedContainer1"}
+						ctdbutton3: { id: "ctdbutton3" },
+						nestedContainer1: { id: "nestedContainer1" }
 					}
 				})
 			]);
@@ -802,7 +802,7 @@ sap.ui.define([
 				this.oRta.setMode("adaptation");
 				const oElement = Element.getElementById(sElementId);
 				const oParent = oElement.getParent();
-				const {sParentAggregationName} = oElement;
+				const { sParentAggregationName } = oElement;
 				oElement.destroy();
 				oParent.addAggregation(sParentAggregationName, new Button(sElementId));
 				const oDesignTimePromise = new Promise(function(fnResolve) {
@@ -1268,7 +1268,7 @@ sap.ui.define([
 						fnDone();
 					});
 				}.bind(this));
-				document.getElementById("Comp1---idMain1--mainPage-cont").scroll({top: 800});
+				document.getElementById("Comp1---idMain1--mainPage-cont").scroll({ top: 800 });
 			}.bind(this));
 		});
 

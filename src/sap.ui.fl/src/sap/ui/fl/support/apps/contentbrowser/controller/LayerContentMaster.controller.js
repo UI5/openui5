@@ -148,7 +148,7 @@ sap.ui.define([
 			} else {
 				// navigation to a namespace
 				this.sNamespace += `${sContentName}/`;
-				oRouter.navTo("LayerContentMaster", {layer: this.sLayer, namespace: encodeURIComponent(this.sNamespace)});
+				oRouter.navTo("LayerContentMaster", { layer: this.sLayer, namespace: encodeURIComponent(this.sNamespace) });
 			}
 		},
 
@@ -165,7 +165,7 @@ sap.ui.define([
 				var sSplittedNamespace = this.sNamespace.split("/");
 				sSplittedNamespace.splice(-2, 1);
 				var sTargetNamespace = sSplittedNamespace.join("/");
-				oRouter.navTo("LayerContentMaster", {layer: this.sLayer, namespace: encodeURIComponent(sTargetNamespace)}, true);
+				oRouter.navTo("LayerContentMaster", { layer: this.sLayer, namespace: encodeURIComponent(sTargetNamespace) }, true);
 			}
 		},
 

@@ -314,7 +314,7 @@ sap.ui.define([
 			sandbox.stub(this.oRta, "canSave").returns(true);
 			sandbox.stub(Utils, "showMessageBox").resolves(MessageBox.Action.CANCEL);
 			this.oRta._oVersionsModel.setProperty("/displayedVersion", this.nVersionParameter);
-			this.oRta._oContextBasedAdaptationsModel.setProperty("/displayedAdaptation", {id: this.sAdaptationId});
+			this.oRta._oContextBasedAdaptationsModel.setProperty("/displayedAdaptation", { id: this.sAdaptationId });
 
 			this.oRta.getToolbar().fireDeleteAdaptation();
 
@@ -358,7 +358,7 @@ sap.ui.define([
 			sandbox.stub(this.oRta, "canSave").returns(false);
 			sandbox.stub(Utils, "showMessageBox").resolves(MessageBox.Action.CANCEL);
 			this.oRta._oVersionsModel.setProperty("/displayedVersion", this.nVersionParameter);
-			this.oRta._oContextBasedAdaptationsModel.setProperty("/displayedAdaptation", {id: this.sAdaptationId});
+			this.oRta._oContextBasedAdaptationsModel.setProperty("/displayedAdaptation", { id: this.sAdaptationId });
 
 			this.oRta.getToolbar().fireDeleteAdaptation();
 

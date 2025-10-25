@@ -49,7 +49,7 @@ sap.ui.define([
 								fileType: "ctrl_variant",
 								layer: Layer.VENDOR,
 								variantManagementReference: "variantManagement1",
-								creation: "2019-07-22T10:32:19.7491090Z"},
+								creation: "2019-07-22T10:32:19.7491090Z" },
 							controlChanges: [],
 							variantChanges: {}
 						}, {
@@ -93,7 +93,7 @@ sap.ui.define([
 			assert.equal(0, oFlexDataResponse.variantDependentControlChanges.length, "and the variantDependentControlChanges array of the first response object is empty");
 			assert.equal(0, oFlexDataResponse.variantManagementChanges.length, "and the variantManagementChanges array of the first response object is empty");
 			assert.equal("abc123", oFlexDataResponse.cacheKey, "the cacheKey is kept in the first response");
-			assert.deepEqual({key: "value"}, oFlexDataResponse.ui2personalization, "the ui2personalization is kept in the first response");
+			assert.deepEqual({ key: "value" }, oFlexDataResponse.ui2personalization, "the ui2personalization is kept in the first response");
 			// CUSTOMER response object
 			[, oFlexDataResponse] = aResponses;
 			assert.equal(2, oFlexDataResponse.variants.length, "and the second response object is for the CUSTOMER layer and contains the variants (but not the standard variant) sorted by creation timestamp in ascending order");
@@ -241,15 +241,15 @@ sap.ui.define([
 		});
 
 		QUnit.test("Given storageResultDisassemble is called for a response with empty changes array and a variant section with a CUSTOMER variant that has CUSTOMER and USER control changes", function(assert) {
-			var oResponse = {changes: [], variantSection: {}};
-			oResponse.variantSection = {variantManagement1: {variantManagementChanges: {}, variants: []}};
-			var oVariant = {content: {fileName: "variant1", fileType: "ctrl_variant", layer: Layer.CUSTOMER, variantManagementReference: "variantManagement1", creation: "2019-07-22T10:33:19.7491090Z"}, controlChanges: [], variantChanges: {}};
+			var oResponse = { changes: [], variantSection: {} };
+			oResponse.variantSection = { variantManagement1: { variantManagementChanges: {}, variants: [] } };
+			var oVariant = { content: { fileName: "variant1", fileType: "ctrl_variant", layer: Layer.CUSTOMER, variantManagementReference: "variantManagement1", creation: "2019-07-22T10:33:19.7491090Z" }, controlChanges: [], variantChanges: {} };
 			oResponse.variantSection.variantManagement1.variants.push(oVariant);
 			var aControlChanges = oVariant.controlChanges;
-			aControlChanges.push({fileName: "change2", fileType: "change", layer: Layer.CUSTOMER, variantReference: "variant1", creation: "2019-07-22T10:33:19.7491090Z"});
-			aControlChanges.push({fileName: "change1", fileType: "change", layer: Layer.CUSTOMER, variantReference: "variant1", creation: "2019-07-22T10:33:18.7491090Z"});
-			aControlChanges.push({fileName: "change4", fileType: "change", layer: Layer.USER, variantReference: "variant1", creation: "2019-07-22T10:33:21.7491090Z"});
-			aControlChanges.push({fileName: "change3", fileType: "change", layer: Layer.USER, variantReference: "variant1", creation: "2019-07-22T10:33:20.7491090Z"});
+			aControlChanges.push({ fileName: "change2", fileType: "change", layer: Layer.CUSTOMER, variantReference: "variant1", creation: "2019-07-22T10:33:19.7491090Z" });
+			aControlChanges.push({ fileName: "change1", fileType: "change", layer: Layer.CUSTOMER, variantReference: "variant1", creation: "2019-07-22T10:33:18.7491090Z" });
+			aControlChanges.push({ fileName: "change4", fileType: "change", layer: Layer.USER, variantReference: "variant1", creation: "2019-07-22T10:33:21.7491090Z" });
+			aControlChanges.push({ fileName: "change3", fileType: "change", layer: Layer.USER, variantReference: "variant1", creation: "2019-07-22T10:33:20.7491090Z" });
 			// test
 			var aResponses = storageResultDisassemble(oResponse);
 			assert.equal(2, aResponses.length, "then an array with two response objects is returned");
@@ -281,12 +281,12 @@ sap.ui.define([
 						fileName: "change1",
 						fileType: "change",
 						layer: Layer.VENDOR,
-						creation: "2019-07-22T10:32:19.7491090Z"},
+						creation: "2019-07-22T10:32:19.7491090Z" },
 					{
 						fileName: "change1",
 						fileType: "change",
 						layer: Layer.VENDOR,
-						creation: "2019-07-22T10:32:19.7491090Z"}
+						creation: "2019-07-22T10:32:19.7491090Z" }
 				],
 				variantSection: {}
 			};

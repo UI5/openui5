@@ -442,7 +442,7 @@ sap.ui.define([
 			const fnAfterOpen = () => {
 				const oToggleAllPropertiesSwitch = Element.getElementById("sapUiRtaChangeAnnotationDialog_toggleShowAllPropertiesSwitch");
 				// Show changed properties only for preexisting changes
-				oToggleAllPropertiesSwitch.fireChange({ state: true});
+				oToggleAllPropertiesSwitch.fireChange({ state: true });
 				const oList = Element.getElementById("sapUiRtaChangeAnnotationDialog_propertyList");
 				assert.strictEqual(oList.getFormElements().length, 1, "then only one form element is displayed");
 				assert.strictEqual(

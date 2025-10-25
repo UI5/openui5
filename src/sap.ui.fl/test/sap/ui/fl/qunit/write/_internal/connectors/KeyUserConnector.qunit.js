@@ -36,12 +36,12 @@ sap.ui.define([
 		}
 	}, function() {
 		QUnit.test("given a mock server, when write is triggered for single change", function(assert) {
-			const mPropertyBag = {url: "/flexKeyuser", flexObjects: []};
+			const mPropertyBag = { url: "/flexKeyuser", flexObjects: [] };
 			const sUrl = "/flexKeyuser/flex/keyuser/v2/changes/?sap-language=en";
 			const oChange = {
 				fileName: "change1"
 			};
-			const oStubSendRequest = sandbox.stub(WriteUtils, "sendRequest").resolves({response: oChange});
+			const oStubSendRequest = sandbox.stub(WriteUtils, "sendRequest").resolves({ response: oChange });
 			return KeyUserConnector.write(mPropertyBag).then(function(oResponse) {
 				assert.ok(oStubSendRequest.calledWith(sUrl, "POST", {
 					tokenUrl: "/flexKeyuser/flex/keyuser/v2/settings",
@@ -56,7 +56,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("given a mock server, when write is triggered for multiple change", function(assert) {
-			const mPropertyBag = {url: "/flexKeyuser", flexObjects: []};
+			const mPropertyBag = { url: "/flexKeyuser", flexObjects: [] };
 			const sUrl = "/flexKeyuser/flex/keyuser/v2/changes/?sap-language=en";
 			const oChange1 = {
 				fileName: "change1"
@@ -64,7 +64,7 @@ sap.ui.define([
 			const oChange2 = {
 				fileName: "change2"
 			};
-			const oStubSendRequest = sandbox.stub(WriteUtils, "sendRequest").resolves({response: [oChange1, oChange2]});
+			const oStubSendRequest = sandbox.stub(WriteUtils, "sendRequest").resolves({ response: [oChange1, oChange2] });
 			return KeyUserConnector.write(mPropertyBag).then(function(oResponse) {
 				assert.ok(oStubSendRequest.calledWith(sUrl, "POST", {
 					tokenUrl: "/flexKeyuser/flex/keyuser/v2/settings",
@@ -80,12 +80,12 @@ sap.ui.define([
 		});
 
 		QUnit.test("given a mock server, when write is triggered for a draft", function(assert) {
-			const mPropertyBag = {url: "/flexKeyuser", flexObjects: [], parentVersion: 1};
+			const mPropertyBag = { url: "/flexKeyuser", flexObjects: [], parentVersion: 1 };
 			const sExpectedUrl = "/flexKeyuser/flex/keyuser/v2/changes/?parentVersion=1&sap-language=en";
 			const oChange = {
 				fileName: "change1"
 			};
-			const oStubSendRequest = sandbox.stub(WriteUtils, "sendRequest").resolves({response: oChange});
+			const oStubSendRequest = sandbox.stub(WriteUtils, "sendRequest").resolves({ response: oChange });
 			return KeyUserConnector.write(mPropertyBag).then(function() {
 				const aArgs = oStubSendRequest.getCall(0).args;
 				const sUrl = aArgs[0];
@@ -98,7 +98,7 @@ sap.ui.define([
 				fileType: "change",
 				fileName: "myFileName"
 			};
-			const mPropertyBag = {url: "/flexKeyuser", flexObject: oFlexObject};
+			const mPropertyBag = { url: "/flexKeyuser", flexObject: oFlexObject };
 			const sUrl = "/flexKeyuser/flex/keyuser/v2/changes/myFileName?sap-language=en";
 			const oStubSendRequest = sandbox.stub(WriteUtils, "sendRequest").resolves();
 			return KeyUserConnector.update(mPropertyBag).then(function() {
@@ -160,7 +160,7 @@ sap.ui.define([
 	QUnit.module("KeyUserConnector.translation", {
 		beforeEach() {
 			sandbox.stub(FlexConfiguration, "getFlexibilityServices").returns([
-				{connector: "KeyUserConnector", layers: [Layer.CUSTOMER], url: "/flexKeyuser"}
+				{ connector: "KeyUserConnector", layers: [Layer.CUSTOMER], url: "/flexKeyuser" }
 			]);
 		},
 		afterEach() {
@@ -206,7 +206,7 @@ sap.ui.define([
 				layer: Layer.CUSTOMER
 			};
 			const sUrl = "/flexKeyuser/flex/keyuser/v2/translation/texts/reference?sourceLanguage=en-US&targetLanguage=de-DE";
-			const oStubSendRequest = sandbox.stub(InitialUtils, "sendRequest").resolves({response: {}});
+			const oStubSendRequest = sandbox.stub(InitialUtils, "sendRequest").resolves({ response: {} });
 			return Storage.translation.getTexts(mPropertyBag)
 			.then(function() {
 				assert.equal(oStubSendRequest.getCall(0).args[0], sUrl, "the request has the correct url");
@@ -218,7 +218,7 @@ sap.ui.define([
 		QUnit.test("JSON: given a mock server, when getTexts is triggered", function(assert) {
 			this.xhr = sandbox.useFakeXMLHttpRequest();
 			this.xhr.onCreate = function(oRequest) {
-				const oHeaders = {"Content-Type": "application/xml"};
+				const oHeaders = { "Content-Type": "application/xml" };
 				oRequest.addEventListener("loadstart", function(oEvent) {
 					oEvent.target.responseType = "";
 					this.oXHR = oRequest;
@@ -249,7 +249,7 @@ sap.ui.define([
 				layer: Layer.CUSTOMER
 			};
 			const sUrl = "/flexKeyuser/flex/keyuser/v2/translation/texts";
-			const oStubSendRequest = sandbox.stub(InitialUtils, "sendRequest").resolves({response: {}});
+			const oStubSendRequest = sandbox.stub(InitialUtils, "sendRequest").resolves({ response: {} });
 			return Storage.translation.postTranslationTexts(mPropertyBag)
 			.then(function() {
 				assert.equal(oStubSendRequest.getCall(0).args[0], sUrl, "the request has the correct url");
@@ -287,7 +287,7 @@ sap.ui.define([
 			};
 
 			const sUrl = "/flexKeyuser/flex/keyuser/v2/contexts/?type=role&%24skip=100&%24filter=SAP";
-			const oStubSendRequest = sandbox.stub(InitialUtils, "sendRequest").resolves({response: aReturnedContexts});
+			const oStubSendRequest = sandbox.stub(InitialUtils, "sendRequest").resolves({ response: aReturnedContexts });
 			return KeyUserConnector.getContexts(mPropertyBag).then(function(oResponse) {
 				assert.deepEqual(oResponse, aReturnedContexts, "the contexts are returned correctly");
 				assert.equal(oStubSendRequest.getCall(0).args[0], sUrl, "the request has the correct url");
@@ -300,7 +300,7 @@ sap.ui.define([
 			};
 
 			const sUrl = "/flexKeyuser/flex/keyuser/v2/contexts/";
-			const oStubSendRequest = sandbox.stub(InitialUtils, "sendRequest").resolves({response: aReturnedContexts});
+			const oStubSendRequest = sandbox.stub(InitialUtils, "sendRequest").resolves({ response: aReturnedContexts });
 			return KeyUserConnector.getContexts(mPropertyBag).then(function(oResponse) {
 				assert.deepEqual(oResponse, aReturnedContexts, "the contexts are returned correctly");
 				assert.equal(oStubSendRequest.getCall(0).args[0], sUrl, "the request has the correct url");
@@ -315,18 +315,18 @@ sap.ui.define([
 	}, function() {
 		const aReturnedContexts = {
 			role: [
-				{id: "ZSOME_ROLE_ONE", description: "Some role one description"},
-				{id: "ZSOME_ROLE_TWO", description: "Some role two description"}
+				{ id: "ZSOME_ROLE_ONE", description: "Some role one description" },
+				{ id: "ZSOME_ROLE_TWO", description: "Some role two description" }
 			]
 		};
 
 		QUnit.test("given a mock server, when loadContextDescriptions is triggered", function(assert) {
 			const mPropertyBag = {
 				url: "/flexKeyuser",
-				flexObjects: { role: ["ZSOME_ROLE_ONE", "ZSOME_ROLE_TWO"]}
+				flexObjects: { role: ["ZSOME_ROLE_ONE", "ZSOME_ROLE_TWO"] }
 			};
 			const sUrl = "/flexKeyuser/flex/keyuser/v2/contexts/?sap-language=en";
-			const oStubSendRequest = sandbox.stub(WriteUtils, "sendRequest").resolves({response: aReturnedContexts});
+			const oStubSendRequest = sandbox.stub(WriteUtils, "sendRequest").resolves({ response: aReturnedContexts });
 			return KeyUserConnector.loadContextDescriptions(mPropertyBag).then(function(oResponse) {
 				const call = oStubSendRequest.getCall(0);
 				assert.deepEqual(oResponse, aReturnedContexts, "the contexts are returned correctly");
@@ -351,11 +351,11 @@ sap.ui.define([
 			InitialConnector.xsrfToken = "oldToken123";
 
 			const oStubSendRequest = sandbox.stub(InitialUtils, "sendRequest");
-			oStubSendRequest.onCall(0).rejects({status: 403});
-			oStubSendRequest.onCall(1).resolves({xsrfToken: newToken});
-			oStubSendRequest.onCall(2).resolves({response: "something"});
+			oStubSendRequest.onCall(0).rejects({ status: 403 });
+			oStubSendRequest.onCall(1).resolves({ xsrfToken: newToken });
+			oStubSendRequest.onCall(2).resolves({ response: "something" });
 
-			const mPropertyBag = {url: "/flexKeyuser", flexObjects: []};
+			const mPropertyBag = { url: "/flexKeyuser", flexObjects: [] };
 			return KeyUserConnector.write(mPropertyBag).then(function() {
 				assert.equal(oStubSendRequest.callCount, 3, "three request were sent");
 				assert.equal(oStubSendRequest.getCall(0).args[1], "POST", "the first request was a POST request");
@@ -371,10 +371,10 @@ sap.ui.define([
 			InitialConnector.xsrfToken = undefined;
 
 			const oStubSendRequest = sandbox.stub(InitialUtils, "sendRequest");
-			oStubSendRequest.onCall(0).resolves({xsrfToken: newToken});
-			oStubSendRequest.onCall(1).resolves({response: "something"});
+			oStubSendRequest.onCall(0).resolves({ xsrfToken: newToken });
+			oStubSendRequest.onCall(1).resolves({ response: "something" });
 
-			const mPropertyBag = {url: "/flexKeyuser", flexObjects: []};
+			const mPropertyBag = { url: "/flexKeyuser", flexObjects: [] };
 			return KeyUserConnector.write(mPropertyBag).then(function() {
 				assert.equal(oStubSendRequest.callCount, 2, "two request were sent");
 				assert.equal(oStubSendRequest.getCall(0).args[1], "HEAD", "the first request was a HEAD request");
@@ -386,7 +386,7 @@ sap.ui.define([
 	QUnit.module("KeyUserConnector.versions.load", {
 		beforeEach() {
 			sandbox.stub(FlexConfiguration, "getFlexibilityServices").returns([
-				{connector: "KeyUserConnector", layers: [Layer.CUSTOMER], url: "/flexKeyuser"}
+				{ connector: "KeyUserConnector", layers: [Layer.CUSTOMER], url: "/flexKeyuser" }
 			]);
 		},
 		afterEach() {
@@ -410,7 +410,7 @@ sap.ui.define([
 			}, {
 				versionNumber: 1
 			}];
-			const oStubSendRequest = sandbox.stub(InitialUtils, "sendRequest").resolves({response: {versions: aReturnedVersions}});
+			const oStubSendRequest = sandbox.stub(InitialUtils, "sendRequest").resolves({ response: { versions: aReturnedVersions } });
 			return Storage.versions.load(mPropertyBag)
 			.then(function(oResponse) {
 				assert.deepEqual(oResponse, [{
@@ -428,7 +428,7 @@ sap.ui.define([
 	QUnit.module("KeyUserConnector.versions.activate", {
 		beforeEach() {
 			sandbox.stub(FlexConfiguration, "getFlexibilityServices").returns([
-				{connector: "KeyUserConnector", layers: [Layer.CUSTOMER], url: "/flexKeyuser"}
+				{ connector: "KeyUserConnector", layers: [Layer.CUSTOMER], url: "/flexKeyuser" }
 			]);
 		},
 		afterEach() {
@@ -457,7 +457,7 @@ sap.ui.define([
 			const oActivatedVersion = {
 				versionNumber: 1
 			};
-			const oStubSendRequest = sandbox.stub(WriteUtils, "sendRequest").resolves({response: oActivatedVersion});
+			const oStubSendRequest = sandbox.stub(WriteUtils, "sendRequest").resolves({ response: oActivatedVersion });
 			return Storage.versions.activate(mPropertyBag)
 			.then(function(oResponse) {
 				assert.deepEqual(oResponse, {
@@ -491,7 +491,7 @@ sap.ui.define([
 			const oActivatedVersion = {
 				versionNumber: 1
 			};
-			const oStubSendRequest = sandbox.stub(WriteUtils, "sendRequest").resolves({response: oActivatedVersion});
+			const oStubSendRequest = sandbox.stub(WriteUtils, "sendRequest").resolves({ response: oActivatedVersion });
 			return Storage.versions.activate(mPropertyBag)
 			.then(function(oResponse) {
 				assert.deepEqual(oResponse, {
@@ -525,7 +525,7 @@ sap.ui.define([
 			const oActivatedVersion = {
 				versionNumber: 1
 			};
-			const oStubSendRequest = sandbox.stub(WriteUtils, "sendRequest").resolves({response: oActivatedVersion});
+			const oStubSendRequest = sandbox.stub(WriteUtils, "sendRequest").resolves({ response: oActivatedVersion });
 			return Storage.versions.activate(mPropertyBag)
 			.then(function(oResponse) {
 				assert.deepEqual(oResponse, {
@@ -541,7 +541,7 @@ sap.ui.define([
 	QUnit.module("KeyUserConnector.versions.discardDraft", {
 		beforeEach() {
 			sandbox.stub(FlexConfiguration, "getFlexibilityServices").returns([
-				{connector: "KeyUserConnector", layers: [Layer.CUSTOMER], url: "/flexKeyuser"}
+				{ connector: "KeyUserConnector", layers: [Layer.CUSTOMER], url: "/flexKeyuser" }
 			]);
 		},
 		afterEach() {
@@ -572,7 +572,7 @@ sap.ui.define([
 	QUnit.module("KeyUserConnector.versions.publish", {
 		beforeEach() {
 			sandbox.stub(FlexConfiguration, "getFlexibilityServices").returns([
-				{connector: "KeyUserConnector", layers: [Layer.CUSTOMER], url: "/flexKeyuser"}
+				{ connector: "KeyUserConnector", layers: [Layer.CUSTOMER], url: "/flexKeyuser" }
 			]);
 		},
 		afterEach() {

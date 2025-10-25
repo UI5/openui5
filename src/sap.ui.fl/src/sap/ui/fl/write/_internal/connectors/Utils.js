@@ -23,7 +23,7 @@ sap.ui.define([
 		if (mPropertyBag.initialConnector) {
 			delete mPropertyBag.initialConnector.xsrfToken;
 		}
-		return Utils.sendRequest(mPropertyBag.tokenUrl, "HEAD", {initialConnector: mPropertyBag.initialConnector})
+		return Utils.sendRequest(mPropertyBag.tokenUrl, "HEAD", { initialConnector: mPropertyBag.initialConnector })
 		.then(Utils.sendRequest.bind(undefined, sUrl, sMethod, mPropertyBag));
 	}
 

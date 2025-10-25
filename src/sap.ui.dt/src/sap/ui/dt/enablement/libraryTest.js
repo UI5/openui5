@@ -51,7 +51,7 @@ sap.ui.define([
 	 */
 	var LibraryTest = function(sTestLibrary) {
 		return new Promise(function(resolve) {
-			Lib.load({name: sTestLibrary}).then(function(oLibrary) {
+			Lib.load({ name: sTestLibrary }).then(function(oLibrary) {
 				var aElements = oLibrary.controls.concat(oLibrary.elements);
 				sLibrary = sTestLibrary;
 				sap.ui.require(aElements.map(function(s) {

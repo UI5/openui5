@@ -66,7 +66,7 @@ sap.ui.define([
 			sVersion = oVersionsBindingContext.getProperty("version");
 		}
 
-		this.getToolbar().fireEvent("switchVersion", {version: sVersion});
+		this.getToolbar().fireEvent("switchVersion", { version: sVersion });
 	}
 
 	function doesActiveVersionExists(aVersions) {
@@ -244,7 +244,7 @@ sap.ui.define([
 					onConfirmVersioningDialog: function() {
 						var sVersionTitle = this.getToolbar().getControl("activateVersionDialog--versionTitleInput").getValue();
 						if (sVersionTitle.length > 0) {
-							this.getToolbar().fireEvent("activate", {versionTitle: sVersionTitle});
+							this.getToolbar().fireEvent("activate", { versionTitle: sVersionTitle });
 							this._oActivateVersionDialog.close();
 						}
 					}.bind(this),

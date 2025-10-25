@@ -132,7 +132,7 @@ sap.ui.define([
 				assert.equal(this.fnAddLibrarySpy.callCount, 3, "AddLibrary.applyChange is called three times");
 				// last change wins!
 				var oNewLib = oNewManifest["sap.ui5"].dependencies.libs["descriptor.mocha133"];
-				var oExpectedNewLib = {minVersion: "1.60.9"};
+				var oExpectedNewLib = { minVersion: "1.60.9" };
 				assert.equal(oNewLib.minVersion, oExpectedNewLib.minVersion, "minVersion is correct");
 				assert.equal(oNewLib.lazy, oExpectedNewLib.lazy, "lazy is correct");
 			}.bind(this));
@@ -159,7 +159,7 @@ sap.ui.define([
 							propertyValue: "newuri"
 						}
 					}
-				}, {// buildtime change
+				}, { // buildtime change
 					changeType: "appdescr_ui5_addNewModelEnhanceWith",
 					content: {
 						modelId: "ppm"
@@ -167,7 +167,7 @@ sap.ui.define([
 					texts: {
 						i18n: "resources/i18n/i18n.properties"
 					}
-				}, {// buildtime change
+				}, { // buildtime change
 					changeType: "appdescr_ui5_addComponentUsages",
 					content: {
 						componentUsages: {

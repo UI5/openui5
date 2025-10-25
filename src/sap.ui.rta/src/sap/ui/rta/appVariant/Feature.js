@@ -76,7 +76,7 @@ sap.ui.define([
 			if (!Array.isArray(oResult.response.CatalogIds) || oResult.response.CatalogIds.length === 0) {
 				const sMessage = AppVariantUtils.getText("MSG_BASE_APP_CATALOGS_NOT_FOUND", sAppVariantId);
 				const sTitle = AppVariantUtils.getText("HEADER_SAVE_APP_VARIANT_FAILED");
-				showMessageBox(sMessage, {title: sTitle}, "error");
+				showMessageBox(sMessage, { title: sTitle }, "error");
 				return Promise.reject();
 			}
 			return oAppVariantManager.notifyKeyUserWhenPublishingIsReady(oResult.response.IAMId, sAppVariantId, true);

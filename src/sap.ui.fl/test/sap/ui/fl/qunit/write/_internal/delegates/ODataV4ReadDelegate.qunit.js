@@ -179,7 +179,7 @@ sap.ui.define(["sap/ui/fl/write/_internal/delegates/ODataV4ReadDelegate"], funct
 	}
 
 	QUnit.test("Delegate: getPropertyInfo: fields", function(assert) {
-		var {oTestContext} = this;
+		var { oTestContext } = this;
 		var done = assert.async();
 		var oTestMetadata1 = {
 			$Type: "testService1.TestEntityT1",

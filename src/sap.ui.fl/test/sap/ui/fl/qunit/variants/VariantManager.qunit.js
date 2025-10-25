@@ -230,15 +230,15 @@ sap.ui.define([
 			var aDummyChanges = [
 				{
 					fileName: "c1",
-					getSelector() { return {id: "control"}; }
+					getSelector() { return { id: "control" }; }
 				},
 				{
 					fileName: "c2",
-					getSelector() { return {id: "control"}; }
+					getSelector() { return { id: "control" }; }
 				}
 			];
 			const oAddChangesStub = sandbox.stub(UIChangeManager, "addDirtyChanges").returnsArg(1);
-			var oApplyChangeStub = sandbox.stub(Applier, "applyChangeOnControl").resolves({success: true});
+			var oApplyChangeStub = sandbox.stub(Applier, "applyChangeOnControl").resolves({ success: true });
 			sandbox.stub(JsControlTreeModifier, "getControlIdBySelector");
 
 			await VariantManager.addAndApplyChangesOnVariant(aDummyChanges, oComponent);
@@ -252,7 +252,7 @@ sap.ui.define([
 				sandbox.stub(Settings, "getInstanceOrUndef").returns({
 					getUserId() {return "test user";}
 				});
-				sandbox.stub(JsControlTreeModifier, "getSelector").returns({id: sVMReference});
+				sandbox.stub(JsControlTreeModifier, "getSelector").returns({ id: sVMReference });
 				var oAddDirtyChangesSpy = sandbox.spy(FlexObjectManager, "addDirtyFlexObjects");
 
 				var mPropertyBag = {
@@ -310,7 +310,7 @@ sap.ui.define([
 			const oAddDirtyFlexObjectsStub = sandbox.stub(FlexObjectManager, "addDirtyFlexObjects").returnsArg(1);
 
 			sandbox.stub(this.oModel, "_duplicateVariant").returns(oVariantData);
-			sandbox.stub(JsControlTreeModifier, "getSelector").returns({id: sVMReference});
+			sandbox.stub(JsControlTreeModifier, "getSelector").returns({ id: sVMReference });
 			sandbox.stub(VariantManager, "updateCurrentVariant").resolves();
 
 			var mPropertyBag = {
@@ -326,7 +326,7 @@ sap.ui.define([
 			assert.strictEqual(aChanges.length, 2, "then there are 2 changes");
 			assert.strictEqual(aChanges[0].getLayer(), Layer.USER, "the first change is a user layer change");
 			assert.strictEqual(aChanges[0].getChangeType(), "setFavorite", "with changeType 'setFavorite'");
-			assert.deepEqual(aChanges[0].getContent(), {favorite: true}, "and favorite set to true");
+			assert.deepEqual(aChanges[0].getContent(), { favorite: true }, "and favorite set to true");
 			assert.strictEqual(aChanges[1].getLayer(), Layer.PUBLIC, "then the second change is a public layer change");
 			assert.strictEqual(
 				aChanges[1].getId(),
@@ -449,7 +449,7 @@ sap.ui.define([
 					getSource: () => this.oVMControl,
 					getParameter: () => undefined
 				},
-				{variantManagementReference: sVMReference},
+				{ variantManagementReference: sVMReference },
 				this.oModel
 			);
 			assert.strictEqual(oSaveStub.callCount, 1, "then saveDirtyChanges is called once");
@@ -471,7 +471,7 @@ sap.ui.define([
 				}
 			};
 			const sUserName = "testUser";
-			const oResponse = {response: [{fileName: sCopyVariantName, fileType: "ctrl_variant", support: {user: sUserName}}]};
+			const oResponse = { response: [{ fileName: sCopyVariantName, fileType: "ctrl_variant", support: { user: sUserName } }] };
 
 			sandbox.stub(this.oModel, "getLocalId").returns(sVMReference);
 			const oSaveStub = sandbox.stub(FlexObjectManager, "saveFlexObjects").resolves(oResponse);
@@ -548,7 +548,7 @@ sap.ui.define([
 				}
 			};
 			const sUserName = "testUser";
-			const oResponse = {response: [{fileName: sCopyVariantName, fileType: "ctrl_variant", support: {user: sUserName}}]};
+			const oResponse = { response: [{ fileName: sCopyVariantName, fileType: "ctrl_variant", support: { user: sUserName } }] };
 
 			sandbox.stub(this.oModel, "getLocalId").returns(sVMReference);
 			const oSaveStub = sandbox.stub(FlexObjectManager, "saveFlexObjects").resolves(oResponse);
@@ -631,7 +631,7 @@ sap.ui.define([
 			};
 
 			var oSaveStub = sandbox.stub(FlexObjectManager, "saveFlexObjects").resolves({
-				response: [{fileName: "change1"}, {fileName: "change2"}, {fileName: "change3"}]
+				response: [{ fileName: "change1" }, { fileName: "change2" }, { fileName: "change3" }]
 			});
 			var oCopyVariantSpy = sandbox.spy(VariantManager, "copyVariant");
 			var oSetVariantPropertiesSpy = sandbox.spy(this.oModel, "setVariantProperties");
@@ -655,10 +655,10 @@ sap.ui.define([
 				execute: true
 			};
 			var sUserName = "testUser";
-			var oResponse = {response: [
-				{fileName: "id_123_setFavorite", fileType: "setFavorite"},
-				{fileName: sCopyVariantName, fileType: "ctrl_variant", support: {user: sUserName}}
-			]};
+			var oResponse = { response: [
+				{ fileName: "id_123_setFavorite", fileType: "setFavorite" },
+				{ fileName: sCopyVariantName, fileType: "ctrl_variant", support: { user: sUserName } }
+			] };
 
 			sandbox.stub(this.oModel, "getLocalId").returns(sVMReference);
 			var oCopyVariantSpy = sandbox.spy(VariantManager, "copyVariant");
@@ -686,7 +686,7 @@ sap.ui.define([
 				}
 			};
 			const sUserName = "testUser";
-			const oResponse = {response: [{fileName: sCopyVariantName, fileType: "ctrl_variant", support: {user: sUserName}}]};
+			const oResponse = { response: [{ fileName: sCopyVariantName, fileType: "ctrl_variant", support: { user: sUserName } }] };
 
 			sandbox.stub(this.oModel, "getLocalId").returns(sVMReference);
 			const oSaveStub = sandbox.stub(FlexObjectManager, "saveFlexObjects").resolves(oResponse);
@@ -766,10 +766,10 @@ sap.ui.define([
 				}
 			};
 			const sUserName = "testUser";
-			const oResponse = {response: [
-				{fileName: "id_123_setFavorite", fileType: "setFavorite"},
-				{fileName: sCopyVariantName, fileType: "ctrl_variant", support: {user: sUserName}}
-			]};
+			const oResponse = { response: [
+				{ fileName: "id_123_setFavorite", fileType: "setFavorite" },
+				{ fileName: sCopyVariantName, fileType: "ctrl_variant", support: { user: sUserName } }
+			] };
 
 			sandbox.stub(this.oModel, "getLocalId").returns(sVMReference);
 			const oSaveStub = sandbox.stub(FlexObjectManager, "saveFlexObjects").resolves(oResponse);
@@ -853,7 +853,7 @@ sap.ui.define([
 				checkUpdate: oCheckUpdateStub
 			});
 			VariantManager.updateVariantManagementMap(sFlexReference);
-			assert.ok(oCheckUpdateStub.calledWith({reference: sFlexReference}), "then the invalidate method was called for the reference");
+			assert.ok(oCheckUpdateStub.calledWith({ reference: sFlexReference }), "then the invalidate method was called for the reference");
 		});
 
 		QUnit.test("getControlChangesForVariant", function(assert) {

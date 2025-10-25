@@ -76,16 +76,16 @@ sap.ui.define([
 					new HBox({
 						id: this.oComponent.createId("container1"),
 						items: [
-							new Button(this.oComponent.createId("innerBtn11"), {text: "innerBtn11"}),
-							new Button(this.oComponent.createId("innerBtn12"), {text: "innerBtn12"}),
-							new Text(this.oComponent.createId("innerTxt13"), {text: "innerTxt13"})
+							new Button(this.oComponent.createId("innerBtn11"), { text: "innerBtn11" }),
+							new Button(this.oComponent.createId("innerBtn12"), { text: "innerBtn12" }),
+							new Text(this.oComponent.createId("innerTxt13"), { text: "innerTxt13" })
 						]
 					}),
-					new Button(this.oComponent.createId("btnOutsideContainer"), {text: "btnOutsideContainer"}),
+					new Button(this.oComponent.createId("btnOutsideContainer"), { text: "btnOutsideContainer" }),
 					new HBox({
 						id: this.oComponent.createId("container2"),
 						items: [
-							new Button(this.oComponent.createId("innerBtn21"), {text: "innerBtn21"})
+							new Button(this.oComponent.createId("innerBtn21"), { text: "innerBtn21" })
 						]
 					}),
 					new Bar(this.oComponent.createId("othercontainer3")),
@@ -95,14 +95,14 @@ sap.ui.define([
 							new VBox({
 								id: this.oComponent.createId("innerVBox1"),
 								items: [
-									new Text(this.oComponent.createId("innerVBox1Txt"), {text: "innerVBox1Txt"})
+									new Text(this.oComponent.createId("innerVBox1Txt"), { text: "innerVBox1Txt" })
 								]
 							}),
 							new VBox({
 								id: this.oComponent.createId("innerVBox2"),
 								items: [
-									new Text(this.oComponent.createId("innerVBox2Txt"), {text: "innerVBox2Txt"}),
-									new Button(this.oComponent.createId("innerVBox2Btn"), {text: "innerVBox2Btn"})
+									new Text(this.oComponent.createId("innerVBox2Txt"), { text: "innerVBox2Txt" }),
+									new Button(this.oComponent.createId("innerVBox2Btn"), { text: "innerVBox2Btn" })
 								]
 							})
 						]
@@ -115,9 +115,9 @@ sap.ui.define([
 			this.oDesignTime = new DesignTime({
 				plugins: [
 					this.oSelectionPlugin,
-					new Remove({commandFactory: this.oCommandFactory}),
-					new Combine({commandFactory: this.oCommandFactory}),
-					new Rename({commandFactory: this.oCommandFactory})
+					new Remove({ commandFactory: this.oCommandFactory }),
+					new Combine({ commandFactory: this.oCommandFactory }),
+					new Rename({ commandFactory: this.oCommandFactory })
 				],
 				rootElements: [this.oVBox],
 				designTimeMetadata: {
@@ -597,7 +597,7 @@ sap.ui.define([
 			const oOverlay = OverlayRegistry.getOverlay(this.oComponent.createId("innerBtn12"));
 			oOverlay.setEditable(false);
 			oOverlay.setSelectable(false);
-			this.oCommandFactory.setProperty("flexSettings", {layer: Layer.CUSTOMER, developerMode: true});
+			this.oCommandFactory.setProperty("flexSettings", { layer: Layer.CUSTOMER, developerMode: true });
 			this.oSelectionPlugin.attachEventOnce("elementEditableChange", function() {
 				assert.ok(true, "elementEditableChange event was called");
 				fnDone();

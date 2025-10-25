@@ -51,7 +51,7 @@ sap.ui.define([
 				oOnStopStub
 			).then(function(oRta) {
 				assert.ok(oLoadPluginsStub.calledOnce, "then the passed plugin modifier function is called");
-				assert.deepEqual(oRta.getFlexSettings(), {layer: Layer.USER, developerMode: false}, "the flexSettings are correct");
+				assert.deepEqual(oRta.getFlexSettings(), { layer: Layer.USER, developerMode: false }, "the flexSettings are correct");
 				assert.ok(
 					oAttachEventSpy.calledWith("start", oOnStartStub),
 					"then the passed on start handler is registered as event handler"
@@ -88,7 +88,7 @@ sap.ui.define([
 				assert.ok(oLoadPluginsStub.calledOnce, "then the passed plugin modifier function is called");
 				assert.deepEqual(
 					oRta.getFlexSettings(),
-					{layer: Layer.CUSTOMER, developerMode: false},
+					{ layer: Layer.CUSTOMER, developerMode: false },
 					"the default flexSettings are passed"
 				);
 				assert.ok(

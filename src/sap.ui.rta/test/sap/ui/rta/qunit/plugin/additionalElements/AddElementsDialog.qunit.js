@@ -186,9 +186,9 @@ sap.ui.define([
 			});
 			var oExtensibilityInfo = {
 				extensionData: [
-					{description: "Business Context 1"},
-					{description: "Business Context 2"},
-					{description: "Business Context 3"}
+					{ description: "Business Context 1" },
+					{ description: "Business Context 2" },
+					{ description: "Business Context 3" }
 				],
 				UITexts: {
 					headerText: "extensibilityHeaderText",
@@ -234,9 +234,9 @@ sap.ui.define([
 			this.oAddElementsDialog.setCustomFieldButtonVisible(true);
 			var oExtensibilityInfo = {
 				extensionData: [
-					{description: "Business Context 1"},
-					{description: "Business Context 2"},
-					{description: "Business Context 3"}
+					{ description: "Business Context 1" },
+					{ description: "Business Context 2" },
+					{ description: "Business Context 3" }
 				],
 				UITexts: {
 					headerText: "extensibilityHeaderText",
@@ -263,7 +263,7 @@ sap.ui.define([
 			const oButtonText = oTextResources.getText("BTN_ADDITIONAL_ELEMENTS_CREATE_CUSTOM_FIELDS");
 			const oExtensibilityInfo = {
 				extensionData: [
-					{description: "Business Context 1"}
+					{ description: "Business Context 1" }
 				],
 				UITexts: {
 					headerText: "extensibilityHeaderText",
@@ -315,7 +315,7 @@ sap.ui.define([
 			var done = assert.async();
 			var oExtensibilityInfo = {
 				extensionData: [
-					{description: "Business Context 1"}
+					{ description: "Business Context 1" }
 				],
 				UITexts: {
 					headerText: "extensibilityHeaderText",
@@ -371,7 +371,7 @@ sap.ui.define([
 			var done = assert.async(2);
 			var oExtensibilityInfo = {
 				extensionData: [
-					{description: "Business Context 1"}
+					{ description: "Business Context 1" }
 				],
 				UITexts: {
 					headerText: "extensibilityHeaderText",
@@ -490,19 +490,19 @@ sap.ui.define([
 
 			this.oAddElementsDialog.attachOpened(function() {
 				assert.equal(this._oList.getItems().length, 5, "then initially 5 entries are there");
-				this._updateModelFilter({getParameter() {return "2";}});
+				this._updateModelFilter({ getParameter() {return "2";} });
 				assert.equal(this._oList.getItems().length, 1, "when filtering for '2' then 1 entry is shown");
-				this._updateModelFilter({getParameter() {return null;}});
+				this._updateModelFilter({ getParameter() {return null;} });
 				assert.equal(this._oList.getItems().length, 5, "then after clearing 5 entries are there");
-				this._updateModelFilter({getParameter() {return "complex";}});
+				this._updateModelFilter({ getParameter() {return "complex";} });
 				assert.equal(this._oList.getItems().length, 1, "when filtering for 'complex' then 1 entry is shown");
 				assert.equal(
 					this._oList.getItems()[0].getContent()[0].getItems()[0].getText(),
 					"label4 (duplicateComplexPropName)",
 					"then only label4 where complex is part of the label (duplicateName)"
 				);
-				this._updateModelFilter({getParameter() {return null;}});
-				this._updateModelFilter({getParameter() {return "orig";}});
+				this._updateModelFilter({ getParameter() {return null;} });
+				this._updateModelFilter({ getParameter() {return "orig";} });
 				assert.equal(this._oList.getItems().length, 1, "when filtering for 'orig' then 1 entry is shown");
 				assert.equal(
 					this._oList.getItems()[0].getContent()[0].getItems()[0].getText(),

@@ -160,7 +160,7 @@ sap.ui.define([
 	}, function() {
 		QUnit.test("when _isPersonalizationMode is called", function(assert) {
 			assert.notOk(this.oControlVariantPlugin._isPersonalizationMode(), "then _isPersonalizationMode for CUSTOMER layer is false");
-			sandbox.stub(this.oControlVariantPlugin.getCommandFactory(), "getFlexSettings").returns({layer: Layer.USER});
+			sandbox.stub(this.oControlVariantPlugin.getCommandFactory(), "getFlexSettings").returns({ layer: Layer.USER });
 			assert.ok(this.oControlVariantPlugin._isPersonalizationMode(), "then _isPersonalizationMode for USER layer is true");
 		});
 
@@ -208,7 +208,7 @@ sap.ui.define([
 			this.oToolHooksPlugin.registerElementOverlay(this.oVariantManagementOverlay);
 			this.oControlVariantPlugin.registerElementOverlay(this.oVariantManagementOverlay);
 
-			this.oLayoutOuter.addContent(new Button("dynamicallyCreatedButton", {text: "Dynamically Created Button"}));
+			this.oLayoutOuter.addContent(new Button("dynamicallyCreatedButton", { text: "Dynamically Created Button" }));
 			await DtUtil.waitForSynced(this.oDesignTime)();
 			const oNewButtonOverlay = OverlayRegistry.getOverlay("dynamicallyCreatedButton");
 
@@ -410,8 +410,8 @@ sap.ui.define([
 			const fnDone = assert.async();
 
 			sandbox.stub(this.oVariantManagementControl, "getVariants").returns([
-				{getKey: () => "variant1", getTitle: () => "Variant 1"},
-				{getKey: () => "variant2", getTitle: () => "Variant 2"}
+				{ getKey: () => "variant1", getTitle: () => "Variant 1" },
+				{ getKey: () => "variant2", getTitle: () => "Variant 2" }
 			]);
 			this.oControlVariantPlugin.registerElementOverlay(this.oVariantManagementOverlay);
 			this.oVariantManagementOverlay.setSelectable(true);
@@ -761,8 +761,8 @@ sap.ui.define([
 				return "varMgtKey";
 			};
 			const aExpectedSubmenu = [
-				{id: "variant1", text: "Variant 1", icon: "sap-icon://accept", enabled: false},
-				{id: "variant2", text: "Variant 2", icon: "blank", enabled: true}
+				{ id: "variant1", text: "Variant 1", icon: "sap-icon://accept", enabled: false },
+				{ id: "variant2", text: "Variant 2", icon: "blank", enabled: true }
 			];
 
 			sandbox.stub(this.oControlVariantPlugin, "switchVariant")
@@ -988,8 +988,8 @@ sap.ui.define([
 			assert.expect(2);
 
 			sandbox.stub(this.oVariantManagementControl, "getVariants").returns([
-				{getKey: () => "variant1", getTitle: () => "Variant 1"},
-				{getKey: () => "variant2", getTitle: () => "Variant 2"}
+				{ getKey: () => "variant1", getTitle: () => "Variant 1" },
+				{ getKey: () => "variant2", getTitle: () => "Variant 2" }
 			]);
 
 			this.oControlVariantPlugin.attachElementModified((oEvent) => {

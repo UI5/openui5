@@ -43,7 +43,7 @@ sap.ui.define([
 
 	function getIdIsLocalTrueObject(vSelector) {
 		if (typeof vSelector === "string") {
-			vSelector = {id: vSelector};
+			vSelector = { id: vSelector };
 		}
 		vSelector.idIsLocal = true;
 

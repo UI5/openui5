@@ -318,8 +318,8 @@ sap.ui.define([
 			mPropertyBag.variants?.map((oVariant) => {
 				oVariant.reference = mPropertyBag.reference;
 				oVariant.fileName = escapeSpecialIdCharacters(oVariant.id); // external oData Variants may have an invalid ID for ManagedObjects
-				oVariant.selector = {persistencyKey: mPropertyBag.persistencyKey};
-				oVariant.texts = {variantName: {value: oVariant.name}};
+				oVariant.selector = { persistencyKey: mPropertyBag.persistencyKey };
+				oVariant.texts = { variantName: { value: oVariant.name } };
 				return oVariant;
 			})
 			.map((oVariant) => FlexObjectFactory.createFromFileContent(oVariant, CompVariant, true))

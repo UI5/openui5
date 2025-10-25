@@ -91,7 +91,7 @@ sap.ui.define([
 				reference: this.sReference,
 				parameters: { libraries: this.mLibraries },
 				appComponent: this.oMockedAppComponent
-			}, {}, {layer: this.sLayer})
+			}, {}, { layer: this.sLayer })
 
 			.then(function(oCommand) {
 				oAddLibraryCommand = oCommand;
@@ -115,7 +115,7 @@ sap.ui.define([
 			return CommandFactory.getCommandFor(this.oButton, "addLibrary", {
 				reference: this.sReference,
 				parameters: { libraries: this.mLibraries }
-			}, {}, {layer: this.sLayer})
+			}, {}, { layer: this.sLayer })
 			.then(function(oAddLibraryCommand) {
 				assert.ok(oAddLibraryCommand, "addLibrary command exists for element");
 				return oAddLibraryCommand.execute();

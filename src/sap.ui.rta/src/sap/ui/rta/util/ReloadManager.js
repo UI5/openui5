@@ -146,7 +146,7 @@ sap.ui.define([
 	 * @param {sap.ui.core.Control} oRootControl - Root control for which key user adaptation was started
 	 */
 	ReloadManager.enableAutomaticStart = function(sLayer, oRootControl) {
-		const sFlexReference = FlexRuntimeInfoAPI.getFlexReference({element: oRootControl});
+		const sFlexReference = FlexRuntimeInfoAPI.getFlexReference({ element: oRootControl });
 		const vParameter = sFlexReference || true;
 		window.sessionStorage.setItem(`sap.ui.rta.restart.${sLayer}`, vParameter);
 	};

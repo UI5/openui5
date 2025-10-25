@@ -221,7 +221,7 @@ sap.ui.define([
 	QUnit.module("Given a group element, overlays, RTAElementMover", {
 		async beforeEach(assert) {
 			this.oSmartGroupElement = new GroupElement("stableField", {
-				elements: [new Button("button1", {text: "mybutton"})]
+				elements: [new Button("button1", { text: "mybutton" })]
 			});
 
 			this.oSmartForm1 = new SmartForm("form1", {
@@ -853,8 +853,8 @@ sap.ui.define([
 			var fnDone = assert.async();
 			// create list with bound items
 			var oData = [
-				{text: "item1-bound"},
-				{text: "item2-bound"}
+				{ text: "item1-bound" },
+				{ text: "item2-bound" }
 			];
 			var oModel = new JSONModel(oData);
 			this.oCustomListItemTemplate = new CustomListItem("boundListItem",
@@ -863,8 +863,8 @@ sap.ui.define([
 						new VerticalLayout("verticalLayoutInTemplate",
 							{
 								content: [
-									new Button("boundListItemBoundButton", {text: "{text}"}),
-									new Button("bounListItemUnboundButton", {text: "UnboundButton"})
+									new Button("boundListItemBoundButton", { text: "{text}" }),
+									new Button("bounListItemUnboundButton", { text: "UnboundButton" })
 								]
 							}
 						)

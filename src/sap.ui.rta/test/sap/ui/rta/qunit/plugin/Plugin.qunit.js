@@ -248,7 +248,7 @@ sap.ui.define([
 		QUnit.test("when evaluateEditable is called for elements", function(assert) {
 			var oModifyPluginListSpy = sandbox.spy(this.oPlugin, "_modifyPluginList");
 
-			this.oPlugin.evaluateEditable([this.oLayoutOverlay], {onRegistration: false});
+			this.oPlugin.evaluateEditable([this.oLayoutOverlay], { onRegistration: false });
 			assert.equal(oModifyPluginListSpy.callCount, 1, "_modifyPluginList was called once");
 			assert.equal(oModifyPluginListSpy.lastCall.args[0], this.oLayoutOverlay, "first parameter is the overlay");
 		});
@@ -257,7 +257,7 @@ sap.ui.define([
 			sandbox.stub(this.oLayoutOverlay.getDesignTimeMetadata(), "markedAsNotAdaptable").returns(true);
 			var oModifyPluginListSpy = sandbox.spy(this.oPlugin, "_modifyPluginList");
 
-			this.oPlugin.evaluateEditable([this.oLayoutOverlay], {onRegistration: false});
+			this.oPlugin.evaluateEditable([this.oLayoutOverlay], { onRegistration: false });
 			assert.equal(oModifyPluginListSpy.callCount, 1, "_modifyPluginList was called once");
 			assert.equal(oModifyPluginListSpy.lastCall.args[0], this.oLayoutOverlay, "first parameter is the overlay");
 			assert.equal(oModifyPluginListSpy.lastCall.args[1], false, "then editable is false");
@@ -266,9 +266,9 @@ sap.ui.define([
 		QUnit.test("when evaluateEditable is called with getStableElements in DTMD returning a selector", function(assert) {
 			var oModifyPluginListSpy = sandbox.spy(this.oPlugin, "_modifyPluginList");
 			var oSetProcessingStatusSpy = sandbox.spy(this.oPlugin, "setProcessingStatus");
-			sandbox.stub(this.oLayoutOverlay.getDesignTimeMetadata(), "getStableElements").returns([{id: "id"}]);
+			sandbox.stub(this.oLayoutOverlay.getDesignTimeMetadata(), "getStableElements").returns([{ id: "id" }]);
 
-			this.oPlugin.evaluateEditable([this.oLayoutOverlay], {onRegistration: false});
+			this.oPlugin.evaluateEditable([this.oLayoutOverlay], { onRegistration: false });
 			assert.equal(oSetProcessingStatusSpy.firstCall.args[0], true, "the plugin switched to processing state on first");
 			assert.equal(oModifyPluginListSpy.lastCall.args[1], true, "the _modifyPluginList function is called");
 			assert.equal(oSetProcessingStatusSpy.lastCall.args[0], false, "the plugin switched the processing state off again");
@@ -279,10 +279,10 @@ sap.ui.define([
 			var fnDone = assert.async();
 			var oModifyPluginListSpy = sandbox.spy(this.oPlugin, "_modifyPluginList");
 			var oSetProcessingStatusSpy = sandbox.spy(this.oPlugin, "setProcessingStatus");
-			sandbox.stub(this.oLayoutOverlay.getDesignTimeMetadata(), "getStableElements").returns([{id: "id"}]);
+			sandbox.stub(this.oLayoutOverlay.getDesignTimeMetadata(), "getStableElements").returns([{ id: "id" }]);
 			sandbox.stub(this.oPlugin, "_isEditable").resolves(true);
 
-			this.oPlugin.evaluateEditable([this.oLayoutOverlay], {onRegistration: false});
+			this.oPlugin.evaluateEditable([this.oLayoutOverlay], { onRegistration: false });
 			assert.equal(oSetProcessingStatusSpy.firstCall.args[0], true, "the plugin switched to processing state on first");
 			this.oPlugin.attachEventOnce("processingStatusChange", function() {
 				assert.equal(oModifyPluginListSpy.lastCall.args[1], true, "the _modifyPluginList function is called");
@@ -316,7 +316,7 @@ sap.ui.define([
 
 			this.oPlugin.attachEvent("processingStatusChange", fnProcessingFinishCallBack);
 
-			this.oPlugin.evaluateEditable([this.oLayoutOverlay], {onRegistration: false});
+			this.oPlugin.evaluateEditable([this.oLayoutOverlay], { onRegistration: false });
 		});
 
 		QUnit.test("when evaluateEditable is called for an element overlay with a disabled action and a responsible element", function(assert) {
@@ -340,7 +340,7 @@ sap.ui.define([
 
 			this.oPlugin.attachEvent("processingStatusChange", fnProcessingFinishCallBack);
 
-			this.oPlugin.evaluateEditable([this.oLayoutOverlay], {onRegistration: false});
+			this.oPlugin.evaluateEditable([this.oLayoutOverlay], { onRegistration: false });
 		});
 	});
 
@@ -400,8 +400,8 @@ sap.ui.define([
 	QUnit.module("Given the Designtime is initialized with 2 Plugins with _isEditable stubbed asynchronous", {
 		async beforeEach(assert) {
 			var done = assert.async();
-			var oModel = new JSONModel([{text: "item1"}, {text: "item2"}, {text: "item3"}]);
-			this.oCustomListItemTemplate = new CustomListItem("boundListItem", {content: [new Button("boundListItem-btn", {text: "{text}"})]});
+			var oModel = new JSONModel([{ text: "item1" }, { text: "item2" }, { text: "item3" }]);
+			this.oCustomListItemTemplate = new CustomListItem("boundListItem", { content: [new Button("boundListItem-btn", { text: "{text}" })] });
 			this.oBoundList = new List("boundlist").setModel(oModel);
 			this.oBoundList.bindAggregation("items", {
 				path: "/",
@@ -571,7 +571,7 @@ sap.ui.define([
 			assert.equal(oSetRelevantSpy.callCount, 0, "then setRelevantOverlays is not called");
 			assert.equal(oGetRelevantSpy.callCount, 0, "then getRelevantOverlays is not called");
 			assert.equal(oEvaluateSpy.callCount, 1, "then only evaluateEditable is called");
-			assert.deepEqual(oEvaluateSpy.args[0], [[this.oLayoutOverlay], {onRegistration: false}], "then evaluateEditable is called with the correct parameters");
+			assert.deepEqual(oEvaluateSpy.args[0], [[this.oLayoutOverlay], { onRegistration: false }], "then evaluateEditable is called with the correct parameters");
 		});
 
 		QUnit.test("when _getRelevantOverlays is called for an Overlay that is part of a binding template", function(assert) {
@@ -737,9 +737,9 @@ sap.ui.define([
 
 	QUnit.module("Given the Plugin is initialized.", {
 		async beforeEach() {
-			this.oTitle0 = new Title({id: "Title0"});
-			this.oLabel0 = new Label({id: "Label0"});
-			this.oInput0 = new Input({id: "Input0"});
+			this.oTitle0 = new Title({ id: "Title0" });
+			this.oLabel0 = new Label({ id: "Label0" });
+			this.oInput0 = new Input({ id: "Input0" });
 			this.oSimpleForm = new SimpleForm("SimpleForm", {
 				layout: "ResponsiveGridLayout",
 				title: "Simple Form",

@@ -848,7 +848,7 @@ sap.ui.define([
 			});
 		});
 
-		return Controller.create({name: sController});
+		return Controller.create({ name: sController });
 	}
 
 	QUnit.module("Given that xmlView with table and extensionPoint (RuntimeAuthoring and outline service are started) - Template case", {

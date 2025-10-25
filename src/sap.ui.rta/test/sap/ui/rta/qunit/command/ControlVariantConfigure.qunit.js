@@ -121,7 +121,7 @@ sap.ui.define([
 				control: this.oVariantManagement,
 				changes: aChanges,
 				deletedVariants: aDeletedVariants
-			}, {}, {layer: Layer.CUSTOMER});
+			}, {}, { layer: Layer.CUSTOMER });
 
 			await oConfigureCommand.execute();
 
@@ -180,7 +180,7 @@ sap.ui.define([
 				control: this.oVariantManagement,
 				changes: [oVisibleChange],
 				deletedVariants: ["variant1"]
-			}, {}, {layer: Layer.CUSTOMER});
+			}, {}, { layer: Layer.CUSTOMER });
 
 			sandbox.stub(ChangesWriteAPI, "restoreDeletedFlexObjects");
 			sandbox.stub(ChangesWriteAPI, "deleteVariantsAndRelatedObjects");

@@ -756,7 +756,8 @@ sap.ui.define([
 			if (typeof sValue === "string") {
 				sValue = sValue.toUpperCase();
 			}
-			return oFilter.getTest()(sValue);
+			// If a Filter is build like this, "new Filter([], true)" it won't have a test function. As fallback, true should be returned, as an "empty" filter matches everything.
+			return oFilter.getTest()?.(sValue) ?? true;
 		}
 	}
 

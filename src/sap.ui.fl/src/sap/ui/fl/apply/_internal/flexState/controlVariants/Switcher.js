@@ -112,8 +112,8 @@ sap.ui.define([
 				}
 			});
 
-			await Reverter.revertMultipleChanges(mChangesToBeSwitched.changesToBeReverted, {...mPropertyBag, skipSetQueued: true});
-			await Applier.applyMultipleChanges(mChangesToBeSwitched.changesToBeApplied, {...mPropertyBag, skipSetQueued: true});
+			await Reverter.revertMultipleChanges(mChangesToBeSwitched.changesToBeReverted, { ...mPropertyBag, skipSetQueued: true });
+			await Applier.applyMultipleChanges(mChangesToBeSwitched.changesToBeApplied, { ...mPropertyBag, skipSetQueued: true });
 			VariantManagementState.setCurrentVariant(mPropertyBag);
 		}
 

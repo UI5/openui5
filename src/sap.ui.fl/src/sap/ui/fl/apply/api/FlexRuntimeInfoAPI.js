@@ -94,7 +94,7 @@ sap.ui.define([
 			}
 
 			const sFlexReference = ManifestUtils.getFlexReferenceForControl(oAppComponent);
-			const aFlexObjects = FlexState.getFlexObjectsDataSelector().get({reference: sFlexReference})
+			const aFlexObjects = FlexState.getFlexObjectsDataSelector().get({ reference: sFlexReference })
 			.filter(filterByValidFileType)
 			.filter(filterByLayer)
 			.filter(filterBySelectors.bind(this, oAppComponent, mPropertyBag.selectors))

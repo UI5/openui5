@@ -53,7 +53,7 @@ sap.ui.define([
 		const oAppComponent = this.getAppComponent();
 		const sControllerName = oView.getControllerModuleName() ? `module:${oView.getControllerModuleName()}` : oView.getController()?.getMetadata().getName();
 		// Calculate moduleName for code extension
-		const sReference = FlexRuntimeInfoAPI.getFlexReference({element: oAppComponent});
+		const sReference = FlexRuntimeInfoAPI.getFlexReference({ element: oAppComponent });
 		const sModuleName = `${sReference.replace(/\.Component/g, "").replace(/\./g, "/")}/changes/${sCodeRef.replace(/\.js/g, "")}`;
 
 		const oChangeSpecificData = {

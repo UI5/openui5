@@ -38,7 +38,7 @@ sap.ui.define([
 	AppVariantUtils._newAppVariantId = null;
 
 	AppVariantUtils.getManifirstSupport = function(sRunningAppId) {
-		return LrepConnector.appVariant.getManifirstSupport({appId: sRunningAppId});
+		return LrepConnector.appVariant.getManifirstSupport({ appId: sRunningAppId });
 	};
 
 	AppVariantUtils.getNewAppVariantId = function() {
@@ -297,7 +297,7 @@ sap.ui.define([
 			oChangeSpecificData.texts = oPropertyChange.texts;
 		}
 
-		return ChangesWriteAPI.create({changeSpecificData: oChangeSpecificData, selector: vSelector});
+		return ChangesWriteAPI.create({ changeSpecificData: oChangeSpecificData, selector: vSelector });
 	};
 
 	AppVariantUtils.addChangesToPersistence = function(aAllInlineChanges, vSelector) {
@@ -543,7 +543,7 @@ sap.ui.define([
 			})
 			.then(function(oCrossAppNav) {
 				if (oCrossAppNav && oCrossAppNav.navigate) {
-					oCrossAppNav.navigate({target: {shellHash: "#"}}, oComponentInstance);
+					oCrossAppNav.navigate({ target: { shellHash: "#" } }, oComponentInstance);
 				}
 			})
 			.catch(function(vError) {
@@ -567,7 +567,7 @@ sap.ui.define([
 
 	AppVariantUtils.showMessage = function(sMessageKey) {
 		var sMessage = AppVariantUtils.getText(sMessageKey);
-		var oInfo = { text: sMessage, copyId: false};
+		var oInfo = { text: sMessage, copyId: false };
 		return AppVariantUtils.showRelevantDialog(oInfo, true);
 	};
 

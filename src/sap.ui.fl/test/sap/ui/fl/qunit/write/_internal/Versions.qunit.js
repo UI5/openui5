@@ -60,7 +60,7 @@ sap.ui.define([
 		}
 	}, function() {
 		QUnit.test("Given Versions.initialize is called and versioning is NOT enabled", function(assert) {
-			setVersioningEnabled({CUSTOMER: false});
+			setVersioningEnabled({ CUSTOMER: false });
 
 			var mPropertyBag = {
 				layer: Layer.CUSTOMER,
@@ -113,7 +113,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("Given Versions.initialize is called multiple times for the same reference and layer", function(assert) {
-			setVersioningEnabled({CUSTOMER: true});
+			setVersioningEnabled({ CUSTOMER: true });
 
 			var mPropertyBag = {
 				layer: Layer.CUSTOMER,
@@ -139,7 +139,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("Given Versions.initialize is called multiple times for different references", function(assert) {
-			setVersioningEnabled({CUSTOMER: true});
+			setVersioningEnabled({ CUSTOMER: true });
 
 			var mPropertyBag1 = {
 				layer: Layer.CUSTOMER,
@@ -173,7 +173,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("Given Versions.initialize is called multiple times for different layers where only one is versioning enabled", function(assert) {
-			setVersioningEnabled({CUSTOMER: true, USER: false});
+			setVersioningEnabled({ CUSTOMER: true, USER: false });
 			var mPropertyBag1 = {
 				layer: Layer.CUSTOMER,
 				reference: "com.sap.app"
@@ -193,7 +193,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("Given Versions.initialize is called multiple times for different layers where all are versioning enabled", function(assert) {
-			setVersioningEnabled({CUSTOMER: true, USER: true});
+			setVersioningEnabled({ CUSTOMER: true, USER: true });
 			var mPropertyBag1 = {
 				layer: Layer.CUSTOMER,
 				reference: "com.sap.app"
@@ -215,9 +215,9 @@ sap.ui.define([
 
 	QUnit.module("Calling the Storage: Given Versions.initialize is called", {
 		beforeEach() {
-			setVersioningEnabled({CUSTOMER: true});
+			setVersioningEnabled({ CUSTOMER: true });
 			sandbox.stub(FlexConfiguration, "getFlexibilityServices").returns([
-				{connector: "KeyUserConnector", layers: [Layer.CUSTOMER], url: "/flexKeyUser"}
+				{ connector: "KeyUserConnector", layers: [Layer.CUSTOMER], url: "/flexKeyUser" }
 			]);
 			this.oAppComponent = {
 				getManifest() {
@@ -290,7 +290,7 @@ sap.ui.define([
 		QUnit.test("with setDirtyChange(false) and a connector is configured which returns a list of versions with entries while an older version is displayed", function(assert) {
 			var sActiveVersion = "2";
 			// set displayedVersion to draft
-			FlexInfoSession.setByReference({version: Version.Number.Draft}, this.sReference);
+			FlexInfoSession.setByReference({ version: Version.Number.Draft }, this.sReference);
 			var mPropertyBag = {
 				layer: Layer.CUSTOMER,
 				reference: this.sReference,
@@ -416,9 +416,9 @@ sap.ui.define([
 			this.sReference = "com.sap.app";
 		},
 		beforeEach() {
-			setVersioningEnabled({CUSTOMER: true});
+			setVersioningEnabled({ CUSTOMER: true });
 			sandbox.stub(FlexConfiguration, "getFlexibilityServices").returns([
-				{connector: "KeyUserConnector", layers: [Layer.CUSTOMER], url: "/flexKeyUser"}
+				{ connector: "KeyUserConnector", layers: [Layer.CUSTOMER], url: "/flexKeyUser" }
 			]);
 		},
 		afterEach() {
@@ -430,7 +430,7 @@ sap.ui.define([
 		QUnit.test("and a connector is configured which returns a list of versions while a draft exists", function(assert) {
 			var sActiveVersion = 2;
 			// set displayedVersion to draft
-			FlexInfoSession.setByReference({version: Version.Number.Draft}, this.sReference);
+			FlexInfoSession.setByReference({ version: Version.Number.Draft }, this.sReference);
 			var mPropertyBag = {
 				layer: Layer.CUSTOMER,
 				reference: this.sReference,
@@ -452,7 +452,7 @@ sap.ui.define([
 			};
 
 			var aReturnedVersions = [
-				{version: Version.Number.Draft},
+				{ version: Version.Number.Draft },
 				oSecondVersion,
 				oFirstVersion
 			];
@@ -495,7 +495,7 @@ sap.ui.define([
 		QUnit.test("to reactivate an old version and a connector is configured which returns a list of versions while a draft does NOT exists", function(assert) {
 			var sActiveVersion = "3";
 			// set displayedVersion to 1
-			FlexInfoSession.setByReference({version: "1"}, this.sReference);
+			FlexInfoSession.setByReference({ version: "1" }, this.sReference);
 			var mPropertyBag = {
 				layer: Layer.CUSTOMER,
 				reference: this.sReference,
@@ -651,9 +651,9 @@ sap.ui.define([
 			};
 		},
 		beforeEach() {
-			setVersioningEnabled({CUSTOMER: true});
+			setVersioningEnabled({ CUSTOMER: true });
 			sandbox.stub(FlexConfiguration, "getFlexibilityServices").returns([
-				{connector: "KeyUserConnector", layers: [Layer.CUSTOMER], url: "/flexKeyUser"}
+				{ connector: "KeyUserConnector", layers: [Layer.CUSTOMER], url: "/flexKeyUser" }
 			]);
 		},
 		afterEach() {
@@ -738,7 +738,7 @@ sap.ui.define([
 			};
 
 			var aReturnedVersions = [
-				{version: Version.Number.Draft},
+				{ version: Version.Number.Draft },
 				oFirstVersion
 			];
 
@@ -788,7 +788,7 @@ sap.ui.define([
 			};
 
 			var aReturnedVersions = [
-				{version: Version.Number.Draft},
+				{ version: Version.Number.Draft },
 				oFirstVersion,
 				oSecondVersion
 			];
@@ -934,9 +934,9 @@ sap.ui.define([
 			this.sReference = "com.sap.app";
 		},
 		beforeEach() {
-			setVersioningEnabled({CUSTOMER: true});
+			setVersioningEnabled({ CUSTOMER: true });
 			sandbox.stub(FlexConfiguration, "getFlexibilityServices").returns([
-				{connector: "LrepConnector", layers: ["ALL"], url: "/sap/bc/lrep"}
+				{ connector: "LrepConnector", layers: ["ALL"], url: "/sap/bc/lrep" }
 			]);
 		},
 		afterEach() {
@@ -947,7 +947,7 @@ sap.ui.define([
 	}, function() {
 		QUnit.test("to publish a version", function(assert) {
 			// set displayedVersion to 2
-			FlexInfoSession.setByReference({version: "2"}, this.sReference);
+			FlexInfoSession.setByReference({ version: "2" }, this.sReference);
 			var mPropertyBag = {
 				layer: Layer.CUSTOMER,
 				reference: this.sReference,
@@ -1019,9 +1019,9 @@ sap.ui.define([
 			};
 		},
 		beforeEach() {
-			setVersioningEnabled({CUSTOMER: true});
+			setVersioningEnabled({ CUSTOMER: true });
 			sandbox.stub(FlexConfiguration, "getFlexibilityServices").returns([
-				{connector: "LrepConnector", layers: ["ALL"], url: "/sap/bc/lrep"}
+				{ connector: "LrepConnector", layers: ["ALL"], url: "/sap/bc/lrep" }
 			]);
 		},
 		afterEach() {
@@ -1127,7 +1127,7 @@ sap.ui.define([
 		},
 		beforeEach() {
 			sandbox.stub(FlexConfiguration, "getFlexibilityServices").returns([
-				{connector: "LrepConnector", layers: ["ALL"], url: "/sap/bc/lrep"}
+				{ connector: "LrepConnector", layers: ["ALL"], url: "/sap/bc/lrep" }
 			]);
 			this.oStorageLoadVersionsStub = sandbox.stub(Storage.versions, "load");
 		},
@@ -1231,8 +1231,8 @@ sap.ui.define([
 				layer: Layer.CUSTOMER,
 				backendResponse: {
 					response: [
-						{fileName: "filename1"},
-						{fileName: "filename2"}
+						{ fileName: "filename1" },
+						{ fileName: "filename2" }
 					]
 				}
 			});

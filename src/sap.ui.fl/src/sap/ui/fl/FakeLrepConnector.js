@@ -27,9 +27,9 @@ sap.ui.define([
 		var aConnectorConfig = [];
 		if (sInitialComponentJsonPath) {
 			ObjectPathConnector.setJsonPath(sInitialComponentJsonPath);
-			aConnectorConfig.push({connector: "ObjectPathConnector"});
+			aConnectorConfig.push({ connector: "ObjectPathConnector" });
 		}
-		aConnectorConfig.push({connector: sStorageConnectorName});
+		aConnectorConfig.push({ connector: sStorageConnectorName });
 		FlexConfiguration.setFlexibilityServices(aConnectorConfig);
 		FlexState.clearState();
 	};
@@ -50,7 +50,7 @@ sap.ui.define([
 
 	FakeLrepConnector.forTesting = {
 		getNumberOfChanges(oConnector, sReference) {
-			return oConnector.loadFlexData({reference: sReference})
+			return oConnector.loadFlexData({ reference: sReference })
 			.then(function(aResponses) {
 				return aResponses.reduce(function(iNumberOfChanges, oResponse) {
 					return iNumberOfChanges + oResponse.changes.length;

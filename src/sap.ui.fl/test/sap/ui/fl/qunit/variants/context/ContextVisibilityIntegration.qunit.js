@@ -30,8 +30,8 @@ sap.ui.define([
 	async function renderComponent(aSelectedRoles) {
 		this.oComp = new ContextVisibilityComponent("test");
 		this.oComp.showMessageStrip(true);
-		this.oComp.setSelectedContexts({role: aSelectedRoles});
-		this.oCompCont = new ComponentContainer({ component: this.oComp, id: "comp"});
+		this.oComp.setSelectedContexts({ role: aSelectedRoles });
+		this.oCompCont = new ComponentContainer({ component: this.oComp, id: "comp" });
 		this.oCompCont.placeAt("qunit-fixture");
 		await nextUIUpdate();
 		this.oRootControl = this.oCompCont.getComponentInstance().getRootControl();
@@ -169,7 +169,7 @@ sap.ui.define([
 		before() {
 			QUnit.config.fixture = null;
 			this.oMockResponse = duplicateRoles(51, oDuplicates);
-			this.oMockSearchResponse = {values: [{ id: "KPI", description: "KPI Framework"}]};
+			this.oMockSearchResponse = { values: [{ id: "KPI", description: "KPI Framework" }] };
 		},
 		after() {
 			QUnit.config.fixture = "";
@@ -178,10 +178,10 @@ sap.ui.define([
 		async beforeEach() {
 			this.fnLoadContextDescriptionStub = sandbox.stub(WriteStorage, "loadContextDescriptions").resolves(oDescriptionResponse);
 			this.fnGetContextsStub = sandbox.stub(WriteStorage, "getContexts");
-			this.fnGetContextsStub.withArgs({layer: Layer.CUSTOMER, type: "role"}).resolves(this.oMockResponse);
-			this.fnGetContextsStub.withArgs({layer: Layer.CUSTOMER, type: "role", $filter: "KPI"}).resolves(this.oMockSearchResponse);
-			var oMockDoubledResponse = { values: this.oMockResponse.values.concat(oDuplicates), lastHitReached: true};
-			this.fnGetContextsStub.withArgs({layer: Layer.CUSTOMER, type: "role", $skip: 106}).resolves(oMockDoubledResponse);
+			this.fnGetContextsStub.withArgs({ layer: Layer.CUSTOMER, type: "role" }).resolves(this.oMockResponse);
+			this.fnGetContextsStub.withArgs({ layer: Layer.CUSTOMER, type: "role", $filter: "KPI" }).resolves(this.oMockSearchResponse);
+			var oMockDoubledResponse = { values: this.oMockResponse.values.concat(oDuplicates), lastHitReached: true };
+			this.fnGetContextsStub.withArgs({ layer: Layer.CUSTOMER, type: "role", $skip: 106 }).resolves(oMockDoubledResponse);
 
 			await renderComponent.call(this, ["Random Test ID", "REMOTE"]);
 			setInitialControls.call(this);
@@ -200,7 +200,7 @@ sap.ui.define([
 			var oFirstItem = this.oSelectedRolesList.getItems()[0];
 			var oSecondItem = this.oSelectedRolesList.getItems()[1];
 			assert.equal(this.fnLoadContextDescriptionStub.callCount, 1, "back end is called once to retrieve description");
-			var mExpectedProperties = {layer: "CUSTOMER", flexObjects: {role: ["Random Test ID", "REMOTE"]}};
+			var mExpectedProperties = { layer: "CUSTOMER", flexObjects: { role: ["Random Test ID", "REMOTE"] } };
 			assert.ok(this.fnLoadContextDescriptionStub.calledWith(mExpectedProperties), "back end is called with correct input");
 			assert.equal(oFirstItem.getTooltip(), "Test Description", "tooltip is taken from backend");
 			assert.equal(oSecondItem.getTooltip(), "No description available", "tooltip is not available so fallback i18n description is used");
@@ -325,7 +325,7 @@ sap.ui.define([
 
 		beforeEach() {
 			this.fnGetContextsStub = sandbox.stub(WriteStorage, "getContexts").resolves(this.oMockResponse);
-			this.fnLoadContextDescriptionStub = sandbox.stub(WriteStorage, "loadContextDescriptions").resolves({role: []});
+			this.fnLoadContextDescriptionStub = sandbox.stub(WriteStorage, "loadContextDescriptions").resolves({ role: [] });
 			return renderComponent.call(this, ["Random Test ID", "REMOTE"]).then(setInitialControls.bind(this));
 		},
 		afterEach() {
@@ -346,7 +346,7 @@ sap.ui.define([
 		QUnit.test("when rendering and back end returns empty list of tooltips", function(assert) {
 			assert.equal(this.oSelectedRolesList.getItems().length, 2, "selected roles still contains all entries");
 			assert.equal(this.fnLoadContextDescriptionStub.callCount, 1, "back end is called once to retrieve description");
-			var mExpectedProperties = {layer: "CUSTOMER", flexObjects: {role: ["Random Test ID", "REMOTE"]}};
+			var mExpectedProperties = { layer: "CUSTOMER", flexObjects: { role: ["Random Test ID", "REMOTE"] } };
 			assert.ok(this.fnLoadContextDescriptionStub.calledWith(mExpectedProperties), "back end is called with correct input");
 			assert.equal(this.oSelectedRolesList.getItems()[0].getTooltip(), "No description available", "fallback tooltip is used");
 			assert.equal(this.oSelectedRolesList.getItems()[1].getTooltip(), "No description available", "fallback tooltip is used");

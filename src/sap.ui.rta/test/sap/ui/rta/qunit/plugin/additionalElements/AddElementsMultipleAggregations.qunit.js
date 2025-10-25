@@ -52,12 +52,12 @@ sap.ui.define([
 	//      contentRight
 	// 			[oVisibleRightButton, oInvisibleRightButton]
 	async function givenBarWithButtons() {
-		this.oVisibleLeftButton = new Button({id: "VisibleLeftButton", visible: true, text: "VisibleLeft"});
-		this.oInvisibleLeftButton = new Button({id: "InvisibleLeftButton", visible: false, text: "InvisibleLeft"});
-		this.oVisibleMiddleButton1 = new Button({id: "VisibleMiddleButton1", visible: true, text: "VisibleMiddle1"});
-		this.oVisibleMiddleButton2 = new Button({id: "VisibleMiddleButton2", visible: true, text: "VisibleMiddle2"});
-		this.oVisibleRightButton = new Button({id: "VisibleRightButton", visible: true, text: "VisibleRight"});
-		this.oInvisibleRightButton = new Button({id: "InvisibleRightButton", visible: false, text: "InvisibleRight"});
+		this.oVisibleLeftButton = new Button({ id: "VisibleLeftButton", visible: true, text: "VisibleLeft" });
+		this.oInvisibleLeftButton = new Button({ id: "InvisibleLeftButton", visible: false, text: "InvisibleLeft" });
+		this.oVisibleMiddleButton1 = new Button({ id: "VisibleMiddleButton1", visible: true, text: "VisibleMiddle1" });
+		this.oVisibleMiddleButton2 = new Button({ id: "VisibleMiddleButton2", visible: true, text: "VisibleMiddle2" });
+		this.oVisibleRightButton = new Button({ id: "VisibleRightButton", visible: true, text: "VisibleRight" });
+		this.oInvisibleRightButton = new Button({ id: "InvisibleRightButton", visible: false, text: "InvisibleRight" });
 		this.oBar = new Bar({
 			id: "bar",
 			contentLeft: [this.oVisibleLeftButton, this.oInvisibleLeftButton],
@@ -413,11 +413,11 @@ sap.ui.define([
 	//			ObjectPageSection - invisible
 	//			ObjectPageSection - visible
 	async function givenObjectPageWithHeaderAndSections() {
-		this.oHeaderButton = new Button({id: "HeaderContentButton", text: "HeaderContentButton"});
+		this.oHeaderButton = new Button({ id: "HeaderContentButton", text: "HeaderContentButton" });
 
 		this.oSubSection = new ObjectPageSubSection({
 			id: "subsection1",
-			blocks: [new Button({text: "abc"})]
+			blocks: [new Button({ text: "abc" })]
 		});
 
 		this.oObjectPageSection1 = new ObjectPageSection({

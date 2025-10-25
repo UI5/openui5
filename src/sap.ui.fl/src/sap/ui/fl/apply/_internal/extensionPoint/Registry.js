@@ -91,7 +91,7 @@ sap.ui.define([
 				aggregations: [sAggregationName]
 			};
 		} else {
-			var bIsObserved = mObservers[sParentId].observer.isObserved(oParent, {aggregations: [sAggregationName]});
+			var bIsObserved = mObservers[sParentId].observer.isObserved(oParent, { aggregations: [sAggregationName] });
 			if (!bIsObserved) {
 				mObservers[sParentId].aggregations.push(sAggregationName);
 				mObservers[sParentId].observer.observe(oParent, {

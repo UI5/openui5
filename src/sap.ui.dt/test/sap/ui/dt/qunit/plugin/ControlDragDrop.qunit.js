@@ -23,9 +23,9 @@ sap.ui.define([
 		async beforeEach(assert) {
 			this.oButton0 = new Button();
 			this.oButton1 = new Button();
-			this.oLayout = new VerticalLayout({content: [this.oButton0, this.oButton1]});
+			this.oLayout = new VerticalLayout({ content: [this.oButton0, this.oButton1] });
 			this.oEmptyLayout = new VerticalLayout();
-			this.oParentLayout = new VerticalLayout({content: [this.oLayout, this.oEmptyLayout]});
+			this.oParentLayout = new VerticalLayout({ content: [this.oLayout, this.oEmptyLayout] });
 			this.oParentLayout.placeAt("qunit-fixture");
 			await nextUIUpdate();
 

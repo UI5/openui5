@@ -41,11 +41,11 @@ sap.ui.define([
 
 			oControl.setVisible(false);
 
-			return this.oChangeHandler.applyChange(this.oChange, oControl, {modifier: JsControlTreeModifier})
+			return this.oChangeHandler.applyChange(this.oChange, oControl, { modifier: JsControlTreeModifier })
 			.then(function() {
 				assert.equal(oControl.getVisible(), true);
 				oControl.setVisible(true);
-				return this.oChangeHandler.applyChange(this.oChange, oControl, {modifier: JsControlTreeModifier});
+				return this.oChangeHandler.applyChange(this.oChange, oControl, { modifier: JsControlTreeModifier });
 			}.bind(this))
 			.then(function() {
 				assert.equal(oControl.getVisible(), true);
@@ -57,9 +57,9 @@ sap.ui.define([
 
 			oControl.setVisible(true);
 
-			return this.oChangeHandler.applyChange(this.oChange, oControl, {modifier: JsControlTreeModifier})
+			return this.oChangeHandler.applyChange(this.oChange, oControl, { modifier: JsControlTreeModifier })
 			.then(function() {
-				this.oChangeHandler.revertChange(this.oChange, oControl, {modifier: JsControlTreeModifier});
+				this.oChangeHandler.revertChange(this.oChange, oControl, { modifier: JsControlTreeModifier });
 				assert.equal(oControl.getVisible(), true, "should be visible");
 			}.bind(this));
 		});
@@ -69,7 +69,7 @@ sap.ui.define([
 			var oXmlDocument = oDOMParser.parseFromString(`<Button xmlns='sap.m' text='${this.OLD_VALUE}' enabled='true' />`, "application/xml");
 			[this.oXmlButton] = oXmlDocument.childNodes;
 
-			return this.oChangeHandler.applyChange(this.oChange, this.oXmlButton, {modifier: XmlTreeModifier})
+			return this.oChangeHandler.applyChange(this.oChange, this.oXmlButton, { modifier: XmlTreeModifier })
 			.then(function() {
 				assert.strictEqual(this.oXmlButton.getAttribute("visible"), null, "xml button node has no longer the visible attribute");
 			}.bind(this));
@@ -77,7 +77,7 @@ sap.ui.define([
 
 		QUnit.test("applyChange throws an error if the change is not applyable", function(assert) {
 			var oElement = new Element();
-			return this.oChangeHandler.applyChange(this.oChange, oElement, {modifier: JsControlTreeModifier})
+			return this.oChangeHandler.applyChange(this.oChange, oElement, { modifier: JsControlTreeModifier })
 			.catch(function(oError) {
 				assert.equal(oError.message,
 					"Provided control instance has no setVisible method",

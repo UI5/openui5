@@ -89,7 +89,7 @@ sap.ui.define([
 				this.oAnotherControl = new Control("someOtherId");
 			}.bind(this));
 			this.oApplyChangeOnControlStub = sandbox.stub(Applier, "applyChangeOnControl").callsFake(function() {
-				return Promise.resolve({success: true});
+				return Promise.resolve({ success: true });
 			});
 			this.oAppComponent = new UIComponent("appComponent");
 			sandbox.stub(FlUtils, "getAppComponentForControl").callThrough().withArgs(this.oControl).returns(this.oAppComponent);
@@ -153,7 +153,7 @@ sap.ui.define([
 
 		QUnit.test("synchronously add the changes to the queue", function(assert) {
 			this.oApplyChangeOnControlStub.restore();
-			this.oApplyChangeOnControlStub = sandbox.stub(Applier, "applyChangeOnControl").resolves({success: true});
+			this.oApplyChangeOnControlStub = sandbox.stub(Applier, "applyChangeOnControl").resolves({ success: true });
 			const oChange0 = FlexObjectFactory.createFromFileContent(getLabelChangeContent("a"));
 			const oSetQueuedForApplySpy = sandbox.spy(oChange0, "setQueuedForApply");
 			sandbox.stub(FlexObjectState, "getLiveDependencyMap").returns(getInitialDependencyMap({
@@ -171,7 +171,7 @@ sap.ui.define([
 
 		QUnit.test("does not add to queue and apply the changes to the queue if _ignoreOnce is set", function(assert) {
 			this.oApplyChangeOnControlStub.restore();
-			this.oApplyChangeOnControlStub = sandbox.stub(Applier, "applyChangeOnControl").resolves({success: true});
+			this.oApplyChangeOnControlStub = sandbox.stub(Applier, "applyChangeOnControl").resolves({ success: true });
 			const oChange0 = FlexObjectFactory.createFromFileContent(getLabelChangeContent("a"));
 			oChange0._ignoreOnce = true;
 			sandbox.stub(FlexObjectState, "getLiveDependencyMap").returns(getInitialDependencyMap({
@@ -188,7 +188,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("updates change status if change was already applied (viewCache)", function(assert) {
-			const oRevertData = {foo: "bar"};
+			const oRevertData = { foo: "bar" };
 			const oChange0 = FlexObjectFactory.createFromFileContent(getLabelChangeContent("a"));
 			const oChange1 = FlexObjectFactory.createFromFileContent(getLabelChangeContent("a"));
 			sandbox.stub(FlexObjectState, "getLiveDependencyMap").returns(getInitialDependencyMap({
@@ -219,7 +219,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("updates change status if change was already applied (viewCache) and control template is affected", function(assert) {
-			const oRevertData = {foo: "bar"};
+			const oRevertData = { foo: "bar" };
 			const oChange0 = FlexObjectFactory.createFromFileContent(getLabelChangeContent("a"));
 			const oChange1 = FlexObjectFactory.createFromFileContent(getLabelChangeContent("a"));
 			sandbox.stub(FlexObjectState, "getLiveDependencyMap").returns(getInitialDependencyMap({
@@ -789,7 +789,7 @@ sap.ui.define([
 			return Applier.applyAllChangesForControl(this.oAppComponent, "DummyFlexReference", this.oControl).then(function() {
 				const oOriginalSelector = oChange0.getDependentControl(
 					"originalSelector",
-					{modifier: JsControlTreeModifier, appComponent: this.oAppComponent}
+					{ modifier: JsControlTreeModifier, appComponent: this.oAppComponent }
 				);
 				assert.strictEqual(oOriginalSelector.getId(), "actualTemplate", "the originalSelector was set to the correct template");
 				assert.ok(oGetBindingInfoStub.calledWith("boundAggregationName"), "the template from the correct aggregation was used");
@@ -837,7 +837,7 @@ sap.ui.define([
 			return Applier.applyAllChangesForControl(this.oAppComponent, "DummyFlexReference", this.oControl).then(function() {
 				const oOriginalSelector = oChange0.getDependentControl(
 					"originalSelector",
-					{modifier: JsControlTreeModifier, appComponent: this.oAppComponent}
+					{ modifier: JsControlTreeModifier, appComponent: this.oAppComponent }
 				);
 				assert.strictEqual(oOriginalSelector.getId(), "actualTemplate", "the originalSelector was set to the correct template");
 				assert.ok(oGetBindingInfoStub.calledWith("boundAggregationName"), "the template from the correct aggregation was used");
@@ -1080,7 +1080,7 @@ sap.ui.define([
 
 		QUnit.test("adds custom data on the first async change applied on a control", function(assert) {
 			this.oChangeHandlerApplyChangeStub.callsFake(function() {
-				this.oChange.setRevertData({foo: "bar"});
+				this.oChange.setRevertData({ foo: "bar" });
 				return Promise.resolve();
 			}.bind(this));
 
@@ -1194,7 +1194,7 @@ sap.ui.define([
 
 		QUnit.test("adds custom data on the first change applied on a control", function(assert) {
 			this.oChangeHandlerApplyChangeStub.callsFake(function() {
-				this.oChange.setRevertData({foo: "bar"});
+				this.oChange.setRevertData({ foo: "bar" });
 			}.bind(this));
 
 			return Applier.applyChangeOnControl(this.oChange, this.oControl, this.mPropertyBag).then(function() {
@@ -1224,7 +1224,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("with asynchronous changeHandler stub for a label", function(assert) {
-			this.oChange.setRevertData({foo: "bar"});
+			this.oChange.setRevertData({ foo: "bar" });
 
 			this.oChangeHandlerApplyChangeStub.resolves(true);
 			return Applier.applyChangeOnControl(this.oChange, this.oControl, this.mPropertyBag).then(function() {
@@ -1286,7 +1286,7 @@ sap.ui.define([
 		}
 	}, function() {
 		QUnit.test("when change can be applied", function(assert) {
-			this.oApplyChangeOnControlStub.resolves({success: true});
+			this.oApplyChangeOnControlStub.resolves({ success: true });
 
 			return Applier.applyAllChangesForXMLView(this.mPropertyBag, [this.oChange]).then(function(oResult) {
 				assert.strictEqual(this.oApplyChangeOnControlStub.callCount, 1, "the change handler was called");
@@ -1295,7 +1295,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("the same view gets created twice", function(assert) {
-			this.oApplyChangeOnControlStub.resolves({success: true});
+			this.oApplyChangeOnControlStub.resolves({ success: true });
 			const oSetQueueSpy = sandbox.spy(this.oChange, "setQueuedForApply");
 			const oMarkFinishedSpy = sandbox.spy(this.oChange, "markFinished");
 			return Applier.applyAllChangesForXMLView(this.mPropertyBag, [this.oChange]).then(function() {
@@ -1333,7 +1333,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("when change for an extension point can be applied", function(assert) {
-			this.oApplyChangeOnControlStub.resolves({success: true});
+			this.oApplyChangeOnControlStub.resolves({ success: true });
 
 			return Applier.applyAllChangesForXMLView(this.mPropertyBag, [this.oExtensionPointChange]).then(function(oResult) {
 				assert.strictEqual(this.oApplyChangeOnControlStub.callCount, 1, "the change handler was called");
@@ -1394,7 +1394,7 @@ sap.ui.define([
 			const oChange1 = FlexObjectFactory.createFromFileContent({
 				selector: {}
 			});
-			this.oApplyChangeOnControlStub.resolves({success: true});
+			this.oApplyChangeOnControlStub.resolves({ success: true });
 
 			return Applier.applyAllChangesForXMLView(this.mPropertyBag, [oChange1, this.oChange]).then(function() {
 				assert.strictEqual(this.oApplyChangeOnControlStub.callCount, 1, "one change was processed");
@@ -1404,7 +1404,7 @@ sap.ui.define([
 
 		QUnit.test("continues the processing if an error occurs during change applying", function(assert) {
 			const oChange2 = FlexObjectFactory.createFromFileContent(getLabelChangeContent("fileName", "hbox"));
-			this.oApplyChangeOnControlStub.resolves({success: false});
+			this.oApplyChangeOnControlStub.resolves({ success: false });
 
 			return Applier.applyAllChangesForXMLView(this.mPropertyBag, [this.oChange, oChange2]).then(function() {
 				assert.strictEqual(this.oApplyChangeOnControlStub.callCount, 2, "all changes were processed");
@@ -1413,7 +1413,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("updates change status if change was already applied (viewCache)", function(assert) {
-			this.oApplyChangeOnControlStub.resolves({success: true});
+			this.oApplyChangeOnControlStub.resolves({ success: true });
 			sandbox.stub(FlexCustomData, "hasChangeApplyFinishedCustomData").returns(true);
 			sandbox.stub(FlexCustomData, "getParsedRevertDataFromCustomData").returns({});
 			const oMarkFinishedSpy = sandbox.spy(this.oChange, "markFinished");
@@ -1426,7 +1426,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("resets change status if change is not applied anymore", function(assert) {
-			this.oApplyChangeOnControlStub.resolves({success: true});
+			this.oApplyChangeOnControlStub.resolves({ success: true });
 			sandbox.stub(FlexCustomData, "hasChangeApplyFinishedCustomData").returns(false);
 			this.oChange.markFinished();
 			const oSetInitialStateStub = sandbox.stub(this.oChange, "setInitialApplyState");
@@ -1447,7 +1447,7 @@ sap.ui.define([
 
 			sandbox.stub(XmlTreeModifier, "bySelectorTypeIndependent").withArgs(sinon.match.defined).resolves(this.oXmlLabel);
 			sandbox.stub(XmlTreeModifier, "getControlType").returns("aType");
-			this.oApplyChangeOnControlStub.resolves({success: true});
+			this.oApplyChangeOnControlStub.resolves({ success: true });
 
 			return Applier.applyAllChangesForXMLView(this.mPropertyBag, [oChange1, oChange2, oChange3]).then(function() {
 				assert.strictEqual(this.oApplyChangeOnControlStub.callCount, 3, "the change handler was called 3 times");
@@ -1466,9 +1466,9 @@ sap.ui.define([
 			const oChange33 = FlexObjectFactory.createFromFileContent(getLabelChangeContent("a3", "labelId"));
 
 			this.oApplyChangeOnControlStub
-			.onCall(0).resolves({success: true})
+			.onCall(0).resolves({ success: true })
 			.onCall(1).rejects("error")
-			.onCall(2).resolves({success: true});
+			.onCall(2).resolves({ success: true });
 
 			return Applier.applyAllChangesForXMLView(this.mPropertyBag, [oChange1, oChange2, oChange3]).then(function() {
 				assert.notOk(this.mPropertyBag.failedSelectors, "the failedSelectors were removed from the propertyBag");
@@ -1479,7 +1479,7 @@ sap.ui.define([
 				assert.strictEqual(this.oWarningStub.callCount, 2, "two warnings were logged");
 
 				this.oApplyChangeOnControlStub.reset();
-				this.oApplyChangeOnControlStub.resolves({success: true});
+				this.oApplyChangeOnControlStub.resolves({ success: true });
 
 				return Applier.applyAllChangesForXMLView(this.mPropertyBag, [oChange11, oChange22, oChange33]);
 			}.bind(this))
@@ -1502,8 +1502,8 @@ sap.ui.define([
 
 			this.oApplyChangeOnControlStub
 			.onCall(0).rejects("error")
-			.onCall(1).resolves({success: true})
-			.onCall(2).resolves({success: true});
+			.onCall(1).resolves({ success: true })
+			.onCall(2).resolves({ success: true });
 
 			return Applier.applyAllChangesForXMLView(this.mPropertyBag, [oChange1, oChange2, oChange3]).then(function() {
 				assert.notOk(this.mPropertyBag.failedSelectors, "the failedSelectors were removed from the propertyBag");
@@ -1534,7 +1534,7 @@ sap.ui.define([
 					'<Label id="label2" />' +
 				"</mvc:View>";
 			const oView = new DOMParser().parseFromString(oXmlString, "application/xml").documentElement;
-			this.oApplyChangeOnControlStub = sandbox.stub(Applier, "applyChangeOnControl").resolves({success: true});
+			this.oApplyChangeOnControlStub = sandbox.stub(Applier, "applyChangeOnControl").resolves({ success: true });
 			this.mPropertyBag = {
 				modifier: XmlTreeModifier,
 				view: oView

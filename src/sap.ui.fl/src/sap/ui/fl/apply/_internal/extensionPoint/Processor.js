@@ -101,7 +101,7 @@ sap.ui.define([
 	function applyExtensionPoint(oExtensionPoint, bSkipInsertContent) {
 		var oAppComponent = Utils.getAppComponentForControl(oExtensionPoint.targetControl);
 		var mPropertyBag = {};
-		var mExtensionPointInfo = merge({defaultContent: []}, oExtensionPoint);
+		var mExtensionPointInfo = merge({ defaultContent: [] }, oExtensionPoint);
 		mPropertyBag.appComponent = oAppComponent;
 		mPropertyBag.modifier = JsControlTreeModifier;
 		mPropertyBag.viewId = oExtensionPoint.view.getId();

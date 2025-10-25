@@ -94,7 +94,7 @@ sap.ui.define([
 					}
 				}
 			];
-			sandbox.stub(AppVariantWriteAPI, "listAllAppVariants").resolves({response: {items: aAppVariantOverviewAttributes}});
+			sandbox.stub(AppVariantWriteAPI, "listAllAppVariants").resolves({ response: { items: aAppVariantOverviewAttributes } });
 		},
 		afterEach() {
 			this.oAppVariantOverviewDialog.destroy();

@@ -43,7 +43,7 @@ sap.ui.define([
 		}
 	}, function() {
 		QUnit.test("execute and undo", async function(assert) {
-			const mFlexSettings = {layer: Layer.CUSTOMER};
+			const mFlexSettings = { layer: Layer.CUSTOMER };
 			const oSourceVariantReference = "mySourceReference";
 			sandbox.stub(this.oVariantManagement, "getDefaultVariantKey").returns("variantMgmtId1");
 			const oCreateComponentStub = sandbox.stub(ContextSharingAPI, "createComponent").returns("myContextSharing");
@@ -60,7 +60,7 @@ sap.ui.define([
 				});
 			}.bind(this));
 			const aChanges = [
-				new FlVariant("foo", {flexObjectMetadata: {reference: "myReference"}}),
+				new FlVariant("foo", { flexObjectMetadata: { reference: "myReference" } }),
 				RtaQunitUtils.createUIChange({
 					fileName: "change1",
 					reference: "Dummy",

@@ -43,7 +43,7 @@ sap.ui.define([
 	}, function() {
 		QUnit.test("applies the change after the recreation of the changed control - Promises is intercepted", function(assert) {
 			var oNewFieldInstance;
-			var sFlexReference = ManifestUtils.getFlexReference({manifest: this.oComponent.getManifest()});
+			var sFlexReference = ManifestUtils.getFlexReference({ manifest: this.oComponent.getManifest() });
 			var oComponentContainer = this.oComponent.getRootControl();
 			var sEmbeddedComponentId = oComponentContainer.getAssociation("component");
 			var oEmbeddedComponent = Component.getComponentById(sEmbeddedComponentId);

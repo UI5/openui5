@@ -100,7 +100,7 @@ sap.ui.define([
 
 		QUnit.test("When checking a backend response for an IAM app to see if the app status is unpublished with one published catalog ,", function(assert) {
 			// Response of ODATA service
-			var response = {data: { results: [{ ActualStatus: 2}]}};
+			var response = { data: { results: [{ ActualStatus: 2 }] } };
 			assert.equal(
 				S4HanaCloudBackend._isAppReady(response),
 				false,
@@ -110,7 +110,7 @@ sap.ui.define([
 
 		QUnit.test("When checking a backend response for an IAM app to see if the app status is unpublished with one catalog that is in the process of being unpublished,", function(assert) {
 			// Response of ODATA service
-			var response = {data: { results: [{ ActualStatus: 3}]}};
+			var response = { data: { results: [{ ActualStatus: 3 }] } };
 			assert.equal(
 				S4HanaCloudBackend._isAppReady(response),
 				false,
@@ -120,7 +120,7 @@ sap.ui.define([
 
 		QUnit.test("When checking a backend response for an IAM app to see if the app status is unpublished with one catalog that has an error status for app var creation", function(assert) {
 			// Response of ODATA service
-			var response = {data: { results: [{ ActualStatus: 5}]}};
+			var response = { data: { results: [{ ActualStatus: 5 }] } };
 
 			try {
 				S4HanaCloudBackend._isAppReady(response, true);
@@ -132,7 +132,7 @@ sap.ui.define([
 
 		QUnit.test("When checking a backend response for an IAM app to see if the app status is unpublished with one catalog that has a locked status for app var deletion", function(assert) {
 			// Response of ODATA service
-			var response = {data: { results: [{ ActualStatus: 4}]}};
+			var response = { data: { results: [{ ActualStatus: 4 }] } };
 
 			try {
 				S4HanaCloudBackend._isAppReady(response, false);
@@ -144,7 +144,7 @@ sap.ui.define([
 
 		QUnit.test("When checking a backend response for an IAM app to see if the app status is unpublished with one catalog published and one catalog unpublished,", function(assert) {
 			// Response of ODATA service
-			var response = {data: { results: [{ ActualStatus: 2}, { ActualStatus: 1}]}};
+			var response = { data: { results: [{ ActualStatus: 2 }, { ActualStatus: 1 }] } };
 			assert.equal(
 				S4HanaCloudBackend._isAppReady(response),
 				false,
@@ -154,7 +154,7 @@ sap.ui.define([
 
 		QUnit.test("When checking a backend response for an IAM app to see if the app status is unpublished with two unpublished catalogs ,", function(assert) {
 			// Response of ODATA service
-			var response = {data: { results: [{ ActualStatus: 1}, { ActualStatus: 1}]}};
+			var response = { data: { results: [{ ActualStatus: 1 }, { ActualStatus: 1 }] } };
 			assert.equal(
 				S4HanaCloudBackend._isAppReady(response),
 				true,

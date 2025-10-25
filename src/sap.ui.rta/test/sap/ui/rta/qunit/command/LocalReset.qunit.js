@@ -30,7 +30,7 @@ sap.ui.define([
 	QUnit.module("Given a SimpleForm with designtime metadata for localReset ...", {
 		beforeEach() {
 			this.oSimpleForm = new Control();
-			var oOverlay = new ElementOverlay({element: this.oSimpleForm});
+			var oOverlay = new ElementOverlay({ element: this.oSimpleForm });
 			sandbox.stub(OverlayRegistry, "getOverlay").returns(oOverlay);
 			this.oLogStub = sandbox.stub(Log, "error");
 		},
@@ -44,25 +44,25 @@ sap.ui.define([
 				fileName: "change1",
 				fileType: "change",
 				layer: Layer.CUSTOMER,
-				selector: {id: "id1"}
+				selector: { id: "id1" }
 			});
 			var oChange2 = RtaQunitUtils.createUIChange({
 				fileName: "change2",
 				fileType: "change",
 				layer: Layer.CUSTOMER,
-				selector: {id: "id2"}
+				selector: { id: "id2" }
 			});
 			var oChange3 = RtaQunitUtils.createUIChange({
 				fileName: "change3",
 				fileType: "change",
 				layer: Layer.CUSTOMER,
-				selector: {id: "id3"}
+				selector: { id: "id3" }
 			});
 			var oChange4 = RtaQunitUtils.createUIChange({
 				fileName: "change4",
 				fileType: "change",
 				layer: Layer.CUSTOMER,
-				selector: {id: "id4"}
+				selector: { id: "id4" }
 			});
 			var aChanges = [oChange1, oChange2, oChange3, oChange4];
 			sandbox.stub(LocalResetAPI, "getNestedUIChangesForControl").returns(aChanges);

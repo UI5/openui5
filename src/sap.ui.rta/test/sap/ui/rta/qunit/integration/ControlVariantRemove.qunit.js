@@ -149,7 +149,7 @@ sap.ui.define([
 				const [oSetTitleChange] = oVariantEntry.variantChanges;
 				assert.strictEqual(oSetTitleChange.getChangeType(), "setTitle", "then the setTitle change remains");
 				assert.strictEqual(oSetTitleChange.getState(), States.LifecycleState.DELETED, "then the setTitle is in state DELETED");
-				const aVariantManagementChanges = VariantManagementState.getVariantManagementChanges({reference: sReference});
+				const aVariantManagementChanges = VariantManagementState.getVariantManagementChanges({ reference: sReference });
 				assert.strictEqual(aVariantManagementChanges.length, 1, "then one variant management remains");
 				assert.strictEqual(aVariantManagementChanges[0].getState(), States.LifecycleState.DELETED, "and it is DELETED");
 			};
@@ -194,7 +194,7 @@ sap.ui.define([
 				States.LifecycleState.NEW,
 				"then the second setTitle is in state NEW"
 			);
-			const aVMChangesAfterUndo = VariantManagementState.getVariantManagementChanges({reference: sReference});
+			const aVMChangesAfterUndo = VariantManagementState.getVariantManagementChanges({ reference: sReference });
 			assert.strictEqual(aVMChangesAfterUndo.length, 1, "then one variant management remains");
 			assert.strictEqual(aVMChangesAfterUndo[0].getState(), States.LifecycleState.PERSISTED, "and it is PERSISTED");
 

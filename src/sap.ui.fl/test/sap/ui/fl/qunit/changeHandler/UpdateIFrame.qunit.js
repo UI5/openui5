@@ -40,7 +40,7 @@ sap.ui.define([
 	var sBoundUrl = "{model>/protocol}://{model>/flavor}/";
 	var sDefaultSize = "500px";
 
-	var mPropertyBag = {modifier: JsControlTreeModifier, appComponent: oComponent};
+	var mPropertyBag = { modifier: JsControlTreeModifier, appComponent: oComponent };
 
 	QUnit.module("Given that update change handlers for an IFrame is created", {
 		before() {
@@ -208,10 +208,10 @@ sap.ui.define([
 			[this.oXmlIFrame] = this.oXmlLayout.childNodes[0].childNodes;
 			UpdateIFrame.completeChangeContent(this.oChange, this.mSapUI5UrlChange, mPropertyBag);
 
-			return UpdateIFrame.applyChange(this.oChange, this.oXmlIFrame, {modifier: XmlTreeModifier})
+			return UpdateIFrame.applyChange(this.oChange, this.oXmlIFrame, { modifier: XmlTreeModifier })
 			.then(function() {
 				assert.equal(this.oXmlIFrame.getAttribute("url"), sSapUI5Url, "then the IFrame url changes");
-				return UpdateIFrame.revertChange(this.oChange, this.oXmlIFrame, {modifier: XmlTreeModifier});
+				return UpdateIFrame.revertChange(this.oChange, this.oXmlIFrame, { modifier: XmlTreeModifier });
 			}.bind(this))
 			.then(function() {
 				assert.equal(this.oXmlIFrame.getAttribute("url"), sOpenUI5Url, "then the IFrame url does not change");

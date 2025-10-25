@@ -71,14 +71,14 @@ sap.ui.define([
 				},
 				setSupportInformation() {}
 			});
-			sandbox.stub(ChangesWriteAPI, "apply").resolves({success: true});
+			sandbox.stub(ChangesWriteAPI, "apply").resolves({ success: true });
 
 			this.oCommandStack = new Stack();
 			this.oSettingsPlugin = new SettingsPlugin({
 				commandFactory: new CommandFactory(),
 				commandStack: this.oCommandStack
 			});
-			this.oButton = new Button("button", {text: "Button"});
+			this.oButton = new Button("button", { text: "Button" });
 			this.oVerticalLayout = new VerticalLayout({
 				content: [this.oButton]
 			}).placeAt("qunit-fixture");
@@ -517,7 +517,7 @@ sap.ui.define([
 					aSelectedOverlays,
 					{ eventItem: {}, contextElement: this.oButton },
 					// eslint-disable-next-line camelcase
-					{CAUTION_variantIndependent: bVariantIndependent}
+					{ CAUTION_variantIndependent: bVariantIndependent }
 				);
 			});
 		});
@@ -1057,7 +1057,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("when retrieving the context menu items for two 'settings' actions, but one is disabled", async function(assert) {
-			const {oButton} = this;
+			const { oButton } = this;
 
 			const oButtonOverlay = createOverlayWithSettingsAction(this.oButton, {
 				"Button Settings 1": {

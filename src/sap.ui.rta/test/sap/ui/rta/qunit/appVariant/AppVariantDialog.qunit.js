@@ -103,7 +103,7 @@ sap.ui.define([
 				};
 
 				oSelectDialog.attachSearch(fnOnSearch);
-				oSelectDialog.fireSearch({value: "wrench"});
+				oSelectDialog.fireSearch({ value: "wrench" });
 			});
 
 			oSelectInput.fireValueHelpRequest();
@@ -144,7 +144,7 @@ sap.ui.define([
 
 				oSelectDialog.attachSearch(fnOnSearch);
 				oSelectDialog.attachConfirm(fnOnConfirm);
-				oSelectDialog.fireSearch({value: "add filter"});
+				oSelectDialog.fireSearch({ value: "add filter" });
 			});
 
 			oSelectInput.fireValueHelpRequest();

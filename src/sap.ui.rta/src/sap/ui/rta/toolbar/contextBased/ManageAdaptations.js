@@ -108,7 +108,7 @@ sap.ui.define([
 			this.oAdaptationsModel.updateAdaptations(oAdaptations.adaptations);
 			this.oReferenceAdaptationsData = JSON.parse(JSON.stringify(this.oAdaptationsModel.getProperty("/adaptations")));
 			this._oOriginAdaptationsData = JSON.parse(JSON.stringify(this.oAdaptationsModel.getProperty("/allAdaptations")));
-			this._oControlConfigurationModel = new JSONModel({isTableItemSelected: false});
+			this._oControlConfigurationModel = new JSONModel({ isTableItemSelected: false });
 			this._oManageAdaptationDialog.setModel(this.oAdaptationsModel, "contextBased");
 			this._oManageAdaptationDialog.setModel(this._oControlConfigurationModel, "controlConfiguration");
 			getAdaptationsTable.call(this).attachSelectionChange(onSelectionChange.bind(this));
@@ -368,7 +368,7 @@ sap.ui.define([
 			return ContextBasedAdaptationsAPI.reorder({
 				control: oRtaInformation.rootControl,
 				layer: oRtaInformation.flexSettings.layer,
-				parameters: {priorities: aAdaptationPriorities}
+				parameters: { priorities: aAdaptationPriorities }
 			});
 		}.bind(this)).then(function() {
 			const oAllUpdatedAdaptations = _union(
@@ -380,7 +380,7 @@ sap.ui.define([
 		}.bind(this))
 		.catch(function(oError) {
 			if (oError !== "cancel") {
-				Utils.showMessageBox("error", "MSG_LREP_TRANSFER_ERROR", { titleKey: "BTN_MANAGE_APP_CTX", error: oError});
+				Utils.showMessageBox("error", "MSG_LREP_TRANSFER_ERROR", { titleKey: "BTN_MANAGE_APP_CTX", error: oError });
 				Log.error(`sap.ui.rta: ${oError.stack || oError.message || oError}`);
 			}
 		});

@@ -30,7 +30,7 @@ sap.ui.define([
 		QUnit.test("mergeResults with different responses", function(assert) {
 			var oResponse1 = {
 				layers: [],
-				features: {isProductiveSystem: false, isVariantAuthorNameAvailable: true}
+				features: { isProductiveSystem: false, isVariantAuthorNameAvailable: true }
 			};
 			var oResponse2 = {
 				layers: [Layer.CUSTOMER],
@@ -39,7 +39,7 @@ sap.ui.define([
 			};
 			var oResponse3 = {
 				layers: [],
-				features: {newKey: true}
+				features: { newKey: true }
 			};
 			var aResponse = [oResponse1, oResponse2, oResponse3];
 
@@ -56,15 +56,15 @@ sap.ui.define([
 		QUnit.test("mergeResults handles the versioning flags", function(assert) {
 			var oResponse1 = {
 				layers: [Layer.VENDOR, Layer.CUSTOMER_BASE],
-				features: {isVersioningEnabled: false}
+				features: { isVersioningEnabled: false }
 			};
 			var oResponse2 = {
 				layers: [Layer.CUSTOMER],
-				features: {isVersioningEnabled: true}
+				features: { isVersioningEnabled: true }
 			};
 			var oResponse3 = {
 				layers: [Layer.USER],
-				features: {isVersioningEnabled: false}
+				features: { isVersioningEnabled: false }
 			};
 			var aResponse = [oResponse1, oResponse2, oResponse3];
 

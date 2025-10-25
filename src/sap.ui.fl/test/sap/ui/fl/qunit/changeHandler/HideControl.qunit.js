@@ -32,7 +32,7 @@ function(
 			this.oXmlDocument = oDOMParser.parseFromString(this.oXmlString, "application/xml").documentElement;
 
 			this.oChange = new UIChange({
-				selector: {id: "key"}
+				selector: { id: "key" }
 			});
 		},
 		afterEach() {
@@ -43,7 +43,7 @@ function(
 		QUnit.test("applyChange on a js control tree", function(assert) {
 			var oControl = new Control();
 			oControl.setVisible(true);
-			return this.oChangeHandler.applyChange(this.oChange, oControl, {modifier: JsControlTreeModifier})
+			return this.oChangeHandler.applyChange(this.oChange, oControl, { modifier: JsControlTreeModifier })
 			.then(function() {
 				assert.equal(oControl.getVisible(), false);
 			});
@@ -52,7 +52,7 @@ function(
 		QUnit.test("applyChange on a js control tree throws an exception if the change is not applicable", function(assert) {
 			var oElement = new Element();
 
-			return this.oChangeHandler.applyChange(this.oChange, oElement, {modifier: JsControlTreeModifier})
+			return this.oChangeHandler.applyChange(this.oChange, oElement, { modifier: JsControlTreeModifier })
 			.catch(function(oError) {
 				assert.equal(oError.message,
 					"Provided control instance has no getVisible method",
@@ -64,8 +64,8 @@ function(
 			var oControl = new Control();
 			oControl.setVisible(false);
 
-			return this.oChangeHandler.applyChange(this.oChange, oControl, {modifier: JsControlTreeModifier})
-			.then(this.oChangeHandler.revertChange.bind(this.oChangeHandler, this.oChange, oControl, {modifier: JsControlTreeModifier}))
+			return this.oChangeHandler.applyChange(this.oChange, oControl, { modifier: JsControlTreeModifier })
+			.then(this.oChangeHandler.revertChange.bind(this.oChangeHandler, this.oChange, oControl, { modifier: JsControlTreeModifier }))
 			.then(function() {
 				assert.equal(oControl.getVisible(), false, "should be invisible");
 			});

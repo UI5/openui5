@@ -96,7 +96,7 @@ sap.ui.define([
 			assert.strictEqual(iCounter, 3, "all 3 data selectors are invalidated");
 			iCounter = 0;
 
-			FlexState.addDirtyFlexObjects(sReference, [FlexObjectFactory.createUIChange({variantReference: "foo"})]);
+			FlexState.addDirtyFlexObjects(sReference, [FlexObjectFactory.createUIChange({ variantReference: "foo" })]);
 			UIChangesState.getVMIndependentCompleteDependencyMap(sReference);
 			assert.strictEqual(iCounter, 1, "only 1 data selectors are invalidated");
 			iCounter = 0;
@@ -116,7 +116,7 @@ sap.ui.define([
 			FlexState.addDirtyFlexObjects(sReference, [FlexObjectFactory.createAppDescriptorChange({})]);
 			assert.strictEqual(UIChangesState.getAllUIChanges(sReference).length, 7, "the app descriptor change is not returned");
 
-			FlexState.addDirtyFlexObjects(sReference, [FlexObjectFactory.createUIChange({variantReference: "foo"})]);
+			FlexState.addDirtyFlexObjects(sReference, [FlexObjectFactory.createUIChange({ variantReference: "foo" })]);
 			assert.strictEqual(UIChangesState.getAllUIChanges(sReference).length, 8, "the var dependent change is returned");
 		});
 

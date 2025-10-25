@@ -147,7 +147,7 @@ sap.ui.define([
 					},
 					dtMetadataProperty3: {
 						// dt-metadata property not serializable
-						mockKey3: {subProp() {}} // NOT_SERIALIZABLE inside sup property
+						mockKey3: { subProp() {} } // NOT_SERIALIZABLE inside sup property
 					},
 					metadataProperty2: {
 					// metadata property ignored
@@ -209,7 +209,7 @@ sap.ui.define([
 						possibleValues(oControl) {
 							if (oControl.getId() === "mockControl") {
 								var mPossibleValues1 = new Map();
-								mPossibleValues1.set("possibleKey4", {displayName: "Possible Value 4"});
+								mPossibleValues1.set("possibleKey4", { displayName: "Possible Value 4" });
 								var oPossibleValues2 = {
 									possibleKey5: {
 										displayName: "Possible Value 5"
@@ -229,7 +229,7 @@ sap.ui.define([
 						nullable: false,
 						get() {
 							var mMap = new Map();
-							mMap.set("prop", {subProp() {}});
+							mMap.set("prop", { subProp() {} });
 							return mMap; // NOT_SERIALIZABLE inside map
 						},
 						possibleValues(oControl) {
@@ -305,7 +305,7 @@ sap.ui.define([
 			sandbox.stub(this.oControl, "getProperty")
 			.withArgs("metadataProperty1").returns("metadataPropertyValue1")
 			.withArgs("metadataProperty2").returns("metadataPropertyValue2")
-			.withArgs("metadataProperty3").returns({subProp() {}}); // NOT_SERIALIZABLE inside sub property
+			.withArgs("metadataProperty3").returns({ subProp() {} }); // NOT_SERIALIZABLE inside sub property
 
 			// control metadata properties
 			sandbox.stub(mControlMetadata, "getAllProperties").returns({

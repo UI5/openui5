@@ -229,7 +229,7 @@ sap.ui.define([
 			const mChangesMap = FlexObjectState.getLiveDependencyMap(sFlexReference);
 			let aPromises = [];
 			const mDependencies = { ...mChangesMap.mDependencies };
-			const {mChanges} = mChangesMap;
+			const { mChanges } = mChangesMap;
 			const aChangesForControl = mChanges[oControl.getId()] || [];
 
 			// filter out already applied changes and, if given, filter by change type
@@ -271,7 +271,7 @@ sap.ui.define([
 		}
 
 		return oAllDirtyFlexObjectsDataSelector
-		.get({reference: sReference})
+		.get({ reference: sReference })
 		.filter((oFlexObject) => isNewChangeDeleted(oFlexObject));
 	};
 

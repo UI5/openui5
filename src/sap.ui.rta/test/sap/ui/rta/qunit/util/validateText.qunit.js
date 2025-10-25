@@ -30,7 +30,7 @@ function(
 
 		QUnit.test("When the text is an empty string (default validator)", function(assert) {
 			var sEmptyTextKey = "\xa0";
-			var oAction = {validators: ["noEmptyText"]};
+			var oAction = { validators: ["noEmptyText"] };
 			assert.throws(
 				validateText.bind(this, sEmptyTextKey, "Test", oAction),
 				Error("Please enter a name."),

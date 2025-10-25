@@ -43,7 +43,7 @@ sap.ui.define([
 			id: "testComponentAsync"
 		}).then(function(oComponent) {
 			this.oComponent = oComponent;
-			this.mPropertyBag = {modifier: JsControlTreeModifier, appComponent: oComponent};
+			this.mPropertyBag = { modifier: JsControlTreeModifier, appComponent: oComponent };
 			this.mSpecificChangeInfo = {
 				content: {
 					newControlId: "someControlId",
@@ -60,7 +60,7 @@ sap.ui.define([
 		sandbox.stub(Utils, "getAppComponentForControl").returns(this.oComponent);
 		this.oGetWriteDelegateForControlStub = sandbox.stub(DelegateMediatorAPI, "getWriteDelegateForControl")
 		.callsFake(function() {
-			return Promise.resolve({instance: this.oDelegate});
+			return Promise.resolve({ instance: this.oDelegate });
 		}.bind(this));
 
 		this.oForm = new Form({
@@ -168,13 +168,13 @@ sap.ui.define([
 		const oChangeHandler = createChangeHandler(false, oAddPropertyStub);
 		this.oDelegate = {
 			createLayout() {
-				this.oNewButton = new Button("someControlId", {text: "someText"});
+				this.oNewButton = new Button("someControlId", { text: "someText" });
 				return {
 					control: this.oNewButton
 				};
 			}
 		};
-		const oExistingButton = new Button("someControlId", {text: "someText"});
+		const oExistingButton = new Button("someControlId", { text: "someText" });
 		oChangeHandler.completeChangeContent(this.oChange, this.mSpecificChangeInfo, this.mPropertyBag);
 		try {
 			await oChangeHandler.applyChange(this.oChange, this.oForm, this.mPropertyBag);

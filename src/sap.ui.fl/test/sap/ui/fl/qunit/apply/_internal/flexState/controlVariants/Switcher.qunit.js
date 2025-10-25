@@ -40,7 +40,7 @@ sap.ui.define([
 			];
 			this.aTargetControlChangesForVariant[1].isApplyProcessFinished = sandbox.stub().returns(true);
 
-			this.oAppComponent = {type: "appComponent"};
+			this.oAppComponent = { type: "appComponent" };
 
 			this.mPropertyBag = {
 				vmReference: "variantManagementReference",

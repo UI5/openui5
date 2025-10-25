@@ -250,7 +250,7 @@ sap.ui.define([
 			const oParsedHash = {
 				semanticObject: "testSemanticObject",
 				action: "testAction",
-				params: {par: "testpar"}
+				params: { par: "testpar" }
 			};
 			var oAppComponent = createAppComponent();
 			simulateSystemConfig(false);
@@ -262,7 +262,7 @@ sap.ui.define([
 			}));
 			var oNewConnectorCall = sandbox.stub(WriteUtils, "sendRequest").resolves();
 
-			return AppVariantWriteAPI.saveAs({selector: oAppComponent, id: "customer.reference.app.id", parsedHash: oParsedHash, version: "1.0.0", layer: Layer.CUSTOMER})
+			return AppVariantWriteAPI.saveAs({ selector: oAppComponent, id: "customer.reference.app.id", parsedHash: oParsedHash, version: "1.0.0", layer: Layer.CUSTOMER })
 			.then(function() {
 				var oAppVariant = JSON.parse(oNewConnectorCall.firstCall.args[2].payload);
 				assert.strictEqual(oAppVariant.packageName, "", "then the app variant will be saved with an empty package");
@@ -303,43 +303,43 @@ sap.ui.define([
 
 			var oUIChange;
 			// Creates a first descriptor change
-			return ChangesWriteAPI.create({changeSpecificData: this.oDescrChangeSpecificData1, selector: oAppComponent})
+			return ChangesWriteAPI.create({ changeSpecificData: this.oDescrChangeSpecificData1, selector: oAppComponent })
 			.then(function(oDescriptorInlineChange) {
 				// Adds a first descriptor change to its own persistence
-				return PersistenceWriteAPI.add({change: oDescriptorInlineChange, selector: oAppComponent});
+				return PersistenceWriteAPI.add({ change: oDescriptorInlineChange, selector: oAppComponent });
 			})
 			.then(function() {
 				// Creates a second descriptor change
-				return ChangesWriteAPI.create({changeSpecificData: this.oDescrChangeSpecificData2, selector: oAppComponent});
+				return ChangesWriteAPI.create({ changeSpecificData: this.oDescrChangeSpecificData2, selector: oAppComponent });
 			}.bind(this))
 			.then(function(oDescriptorInlineChange) {
 				// Adds a second descriptor change to its own persistence
-				return PersistenceWriteAPI.add({change: oDescriptorInlineChange, selector: oAppComponent});
+				return PersistenceWriteAPI.add({ change: oDescriptorInlineChange, selector: oAppComponent });
 			})
 			.then(function() {
 				// Creates a third descriptor change
-				return ChangesWriteAPI.create({changeSpecificData: this.oDescrChangeSpecificData3, selector: oAppComponent});
+				return ChangesWriteAPI.create({ changeSpecificData: this.oDescrChangeSpecificData3, selector: oAppComponent });
 			}.bind(this))
 			.then(function(oDescriptorInlineChange) {
 				// Adds a third descriptor change to its own persistence
-				return PersistenceWriteAPI.add({change: oDescriptorInlineChange, selector: oAppComponent});
+				return PersistenceWriteAPI.add({ change: oDescriptorInlineChange, selector: oAppComponent });
 			})
 			.then(function() {
 				// Creates a fourth descriptor change
-				return ChangesWriteAPI.create({changeSpecificData: this.oDescrChangeSpecificData4, selector: oAppComponent});
+				return ChangesWriteAPI.create({ changeSpecificData: this.oDescrChangeSpecificData4, selector: oAppComponent });
 			}.bind(this))
 			.then(function(oDescriptorInlineChange) {
 				// Adds a fourth descriptor change to its own persistence
-				return PersistenceWriteAPI.add({change: oDescriptorInlineChange, selector: oAppComponent});
+				return PersistenceWriteAPI.add({ change: oDescriptorInlineChange, selector: oAppComponent });
 			})
 			.then(function() {
 				// Creates a UI change
-				return ChangesWriteAPI.create({changeSpecificData: this.oUIChangeSpecificData, selector: oAppComponent});
+				return ChangesWriteAPI.create({ changeSpecificData: this.oUIChangeSpecificData, selector: oAppComponent });
 			}.bind(this))
 			.then(function(oCreatedUIChange) {
 				oUIChange = oCreatedUIChange;
 				// Adds a UI change to its own persistence
-				return PersistenceWriteAPI.add({change: oUIChange, selector: oAppComponent});
+				return PersistenceWriteAPI.add({ change: oUIChange, selector: oAppComponent });
 			})
 			.then(function() {
 				assert.strictEqual(
@@ -347,7 +347,7 @@ sap.ui.define([
 					5,
 					"then five dirty changes have been added to the state"
 				);
-				return AppVariantWriteAPI.saveAs({selector: oAppComponent, id: "customer.reference.app.id", version: "1.0.0", layer: Layer.CUSTOMER})
+				return AppVariantWriteAPI.saveAs({ selector: oAppComponent, id: "customer.reference.app.id", version: "1.0.0", layer: Layer.CUSTOMER })
 				.then(function() {
 					var oFlexObjectMetadata = oUIChange.getFlexObjectMetadata();
 					assert.equal(oFlexObjectMetadata.reference, "customer.reference.app.id", "the reference of the UI Change has been changed with the app variant id");
@@ -386,7 +386,7 @@ sap.ui.define([
 				}
 			});
 
-			sandbox.stub(WriteUtils, "sendRequest").rejects({message: "App variant failed to save"});
+			sandbox.stub(WriteUtils, "sendRequest").rejects({ message: "App variant failed to save" });
 
 			sandbox.stub(Log, "error").callThrough().withArgs("the app variant could not be created.", "App variant failed to save").returns();
 
@@ -394,43 +394,43 @@ sap.ui.define([
 
 			var oUIChange;
 			// Creates a first descriptor change
-			return ChangesWriteAPI.create({changeSpecificData: this.oDescrChangeSpecificData1, selector: oAppComponent})
+			return ChangesWriteAPI.create({ changeSpecificData: this.oDescrChangeSpecificData1, selector: oAppComponent })
 			.then(function(oDescriptorInlineChange) {
 				// Adds a first descriptor change to its own persistence
-				return PersistenceWriteAPI.add({change: oDescriptorInlineChange, selector: oAppComponent});
+				return PersistenceWriteAPI.add({ change: oDescriptorInlineChange, selector: oAppComponent });
 			})
 			.then(function() {
 				// Creates a second descriptor change
-				return ChangesWriteAPI.create({changeSpecificData: this.oDescrChangeSpecificData2, selector: oAppComponent});
+				return ChangesWriteAPI.create({ changeSpecificData: this.oDescrChangeSpecificData2, selector: oAppComponent });
 			}.bind(this))
 			.then(function(oDescriptorInlineChange) {
 				// Adds a second descriptor change to its own persistence
-				return PersistenceWriteAPI.add({change: oDescriptorInlineChange, selector: oAppComponent});
+				return PersistenceWriteAPI.add({ change: oDescriptorInlineChange, selector: oAppComponent });
 			})
 			.then(function() {
 				// Creates a third descriptor change
-				return ChangesWriteAPI.create({changeSpecificData: this.oDescrChangeSpecificData3, selector: oAppComponent});
+				return ChangesWriteAPI.create({ changeSpecificData: this.oDescrChangeSpecificData3, selector: oAppComponent });
 			}.bind(this))
 			.then(function(oDescriptorInlineChange) {
 				// Adds a third descriptor change to its own persistence
-				return PersistenceWriteAPI.add({change: oDescriptorInlineChange, selector: oAppComponent});
+				return PersistenceWriteAPI.add({ change: oDescriptorInlineChange, selector: oAppComponent });
 			})
 			.then(function() {
 				// Creates a fourth descriptor change
-				return ChangesWriteAPI.create({changeSpecificData: this.oDescrChangeSpecificData4, selector: oAppComponent});
+				return ChangesWriteAPI.create({ changeSpecificData: this.oDescrChangeSpecificData4, selector: oAppComponent });
 			}.bind(this))
 			.then(function(oDescriptorInlineChange) {
 				// Adds a fourth descriptor change to its own persistence
-				return PersistenceWriteAPI.add({change: oDescriptorInlineChange, selector: oAppComponent});
+				return PersistenceWriteAPI.add({ change: oDescriptorInlineChange, selector: oAppComponent });
 			})
 			.then(function() {
 				// Creates a UI change
-				return ChangesWriteAPI.create({changeSpecificData: this.oUIChangeSpecificData, selector: oAppComponent});
+				return ChangesWriteAPI.create({ changeSpecificData: this.oUIChangeSpecificData, selector: oAppComponent });
 			}.bind(this))
 			.then(function(oCreatedUIChange) {
 				oUIChange = oCreatedUIChange;
 				// Adds a UI change to its own persistence
-				return PersistenceWriteAPI.add({change: oUIChange, selector: oAppComponent});
+				return PersistenceWriteAPI.add({ change: oUIChange, selector: oAppComponent });
 			})
 			.then(function() {
 				assert.strictEqual(
@@ -438,7 +438,7 @@ sap.ui.define([
 					5,
 					"then five dirty changes have been added to the state"
 				);
-				return AppVariantWriteAPI.saveAs({selector: oAppComponent, id: "customer.reference.app.id", version: "1.0.0", layer: Layer.CUSTOMER})
+				return AppVariantWriteAPI.saveAs({ selector: oAppComponent, id: "customer.reference.app.id", version: "1.0.0", layer: Layer.CUSTOMER })
 				.catch(function(oError) {
 					assert.ok("then the promise got rejected");
 					assert.equal(oError.messageKey, "MSG_SAVE_APP_VARIANT_FAILED", "then the messagekey is correct");
@@ -482,43 +482,43 @@ sap.ui.define([
 
 			var oUIChange;
 			// Creates a first descriptor change
-			return ChangesWriteAPI.create({changeSpecificData: this.oDescrChangeSpecificData1, selector: oAppComponent})
+			return ChangesWriteAPI.create({ changeSpecificData: this.oDescrChangeSpecificData1, selector: oAppComponent })
 			.then(function(oDescriptorInlineChange) {
 				// Adds a first descriptor change to its own persistence
-				return PersistenceWriteAPI.add({change: oDescriptorInlineChange, selector: oAppComponent});
+				return PersistenceWriteAPI.add({ change: oDescriptorInlineChange, selector: oAppComponent });
 			})
 			.then(function() {
 				// Creates a second descriptor change
-				return ChangesWriteAPI.create({changeSpecificData: this.oDescrChangeSpecificData2, selector: oAppComponent});
+				return ChangesWriteAPI.create({ changeSpecificData: this.oDescrChangeSpecificData2, selector: oAppComponent });
 			}.bind(this))
 			.then(function(oDescriptorInlineChange) {
 				// Adds a second descriptor change to its own persistence
-				return PersistenceWriteAPI.add({change: oDescriptorInlineChange, selector: oAppComponent});
+				return PersistenceWriteAPI.add({ change: oDescriptorInlineChange, selector: oAppComponent });
 			})
 			.then(function() {
 				// Creates a third descriptor change
-				return ChangesWriteAPI.create({changeSpecificData: this.oDescrChangeSpecificData3, selector: oAppComponent});
+				return ChangesWriteAPI.create({ changeSpecificData: this.oDescrChangeSpecificData3, selector: oAppComponent });
 			}.bind(this))
 			.then(function(oDescriptorInlineChange) {
 				// Adds a third descriptor change to its own persistence
-				return PersistenceWriteAPI.add({change: oDescriptorInlineChange, selector: oAppComponent});
+				return PersistenceWriteAPI.add({ change: oDescriptorInlineChange, selector: oAppComponent });
 			})
 			.then(function() {
 				// Creates a fourth descriptor change
-				return ChangesWriteAPI.create({changeSpecificData: this.oDescrChangeSpecificData4, selector: oAppComponent});
+				return ChangesWriteAPI.create({ changeSpecificData: this.oDescrChangeSpecificData4, selector: oAppComponent });
 			}.bind(this))
 			.then(function(oDescriptorInlineChange) {
 				// Adds a fourth descriptor change to its own persistence
-				return PersistenceWriteAPI.add({change: oDescriptorInlineChange, selector: oAppComponent});
+				return PersistenceWriteAPI.add({ change: oDescriptorInlineChange, selector: oAppComponent });
 			})
 			.then(function() {
 				// Creates a UI change
-				return ChangesWriteAPI.create({changeSpecificData: this.oUIChangeSpecificData, selector: oAppComponent});
+				return ChangesWriteAPI.create({ changeSpecificData: this.oUIChangeSpecificData, selector: oAppComponent });
 			}.bind(this))
 			.then(function(oCreatedUIChange) {
 				oUIChange = oCreatedUIChange;
 				// Adds a UI change to its own persistence
-				return PersistenceWriteAPI.add({change: oUIChange, selector: oAppComponent});
+				return PersistenceWriteAPI.add({ change: oUIChange, selector: oAppComponent });
 			})
 			.then(function() {
 				assert.strictEqual(
@@ -526,7 +526,7 @@ sap.ui.define([
 					5,
 					"then five dirty changes have been added to the state"
 				);
-				return AppVariantWriteAPI.saveAs({selector: oAppComponent, id: "customer.reference.app.id", version: "1.0.0", layer: Layer.CUSTOMER})
+				return AppVariantWriteAPI.saveAs({ selector: oAppComponent, id: "customer.reference.app.id", version: "1.0.0", layer: Layer.CUSTOMER })
 				.catch(function(oError) {
 					assert.ok("then the promise got rejected");
 					assert.equal(oError.messageKey, "MSG_COPY_UNSAVED_CHANGES_FAILED", "then the messagekey is correct");
@@ -539,7 +539,7 @@ sap.ui.define([
 					assert.equal(oFlexObjectMetadata.reference, "customer.reference.app.id", "the reference of the UI Change has been changed with the app variant id");
 					assert.equal(oFlexObjectMetadata.namespace, "apps/customer.reference.app.id/changes/", "the namespace of the UI Change has been changed");
 					assert.ok(oConnectorCall.calledWith("/sap/bc/lrep/changes/", "POST"), "then backend call is triggered with correct parameters");
-					assert.ok(fnDeleteAppVarSpy.calledWithExactly({referenceAppId: "customer.reference.app.id"}), "then deleteAppVar call is called with correct parameters");
+					assert.ok(fnDeleteAppVarSpy.calledWithExactly({ referenceAppId: "customer.reference.app.id" }), "then deleteAppVar call is called with correct parameters");
 				});
 			});
 		});
@@ -569,19 +569,19 @@ sap.ui.define([
 
 			var oUIChange;
 			// Creates a descriptor change
-			return ChangesWriteAPI.create({changeSpecificData: this.oDescrChangeSpecificData1, selector: oAppComponent})
+			return ChangesWriteAPI.create({ changeSpecificData: this.oDescrChangeSpecificData1, selector: oAppComponent })
 			.then(function(oDescriptorInlineChange) {
 				// Adds a descriptor change to its own persistence
-				return PersistenceWriteAPI.add({change: oDescriptorInlineChange, selector: oAppComponent});
+				return PersistenceWriteAPI.add({ change: oDescriptorInlineChange, selector: oAppComponent });
 			})
 			.then(function() {
 				// Creates a UI change
-				return ChangesWriteAPI.create({changeSpecificData: this.oUIChangeSpecificData, selector: oAppComponent});
+				return ChangesWriteAPI.create({ changeSpecificData: this.oUIChangeSpecificData, selector: oAppComponent });
 			}.bind(this))
 			.then(function(oCreatedUIChange) {
 				oUIChange = oCreatedUIChange;
 				// Adds a UI change to its own persistence
-				return PersistenceWriteAPI.add({change: oUIChange, selector: oAppComponent});
+				return PersistenceWriteAPI.add({ change: oUIChange, selector: oAppComponent });
 			})
 			.then(function() {
 				assert.strictEqual(
@@ -589,7 +589,7 @@ sap.ui.define([
 					2,
 					"then two dirty changes have been added to the state"
 				);
-				return AppVariantWriteAPI.saveAs({selector: oAppComponent, id: "customer.reference.app.id", version: "1.0.0", layer: Layer.CUSTOMER})
+				return AppVariantWriteAPI.saveAs({ selector: oAppComponent, id: "customer.reference.app.id", version: "1.0.0", layer: Layer.CUSTOMER })
 				.then(function() {
 					var oFlexObjectMetadata = oUIChange.getFlexObjectMetadata();
 					assert.equal(oFlexObjectMetadata.reference, "customer.reference.app.id", "the reference of the UI Change has been changed with the app variant id");
@@ -664,7 +664,7 @@ sap.ui.define([
 
 			var oOpenDialogStub = sandbox.stub(TransportSelection.prototype, "_openDialog").callsFake(fnSimulateDialogSelectionAndOk);
 
-			return AppVariantWriteAPI.deleteAppVariant({selector: oAppComponent, layer: Layer.CUSTOMER})
+			return AppVariantWriteAPI.deleteAppVariant({ selector: oAppComponent, layer: Layer.CUSTOMER })
 			.then(function() {
 				assert.ok(oNewConnectorCall.calledWith("/sap/bc/lrep/appdescr_variants/customer.reference.app.id", "GET"), "then the parameters are correct");
 				assert.equal(oNewApplyConnectorCall.getCall(0).args[0], "/sap/bc/lrep/actions/gettransports/?package=&namespace=namespace1&name=fileName1&type=fileType1", "then the parameters are correct");
@@ -717,7 +717,7 @@ sap.ui.define([
 
 			var oOpenDialogStub = sandbox.stub(TransportSelection.prototype, "_openDialog").callsFake(fnSimulateDialogSelectionAndCancel);
 
-			return AppVariantWriteAPI.deleteAppVariant({selector: oAppComponent, layer: Layer.CUSTOMER})
+			return AppVariantWriteAPI.deleteAppVariant({ selector: oAppComponent, layer: Layer.CUSTOMER })
 			.catch(function() {
 				assert.ok(oNewConnectorCall.firstCall.calledWith("/sap/bc/lrep/appdescr_variants/customer.reference.app.id", "GET"), "then the parameters are correct");
 				assert.equal(oNewApplyConnectorCall.getCall(0).args[0], "/sap/bc/lrep/actions/gettransports/?package=&namespace=namespace1&name=fileName1&type=fileType1", "then the parameters are correct");
@@ -751,7 +751,7 @@ sap.ui.define([
 			sandbox.stub(InitialUtils, "sendRequest").resolves(oTransportResponse);
 
 			var oNewConnectorCall = sandbox.stub(WriteUtils, "sendRequest");
-			oNewConnectorCall.onFirstCall().rejects({message: "Loading app variant failed"}); // Get Descriptor variant call
+			oNewConnectorCall.onFirstCall().rejects({ message: "Loading app variant failed" }); // Get Descriptor variant call
 			oNewConnectorCall.onSecondCall().resolves(); // Delete call to backend
 
 			sandbox.stub(Log, "error").callThrough().withArgs("the app variant could not be deleted.", "Loading app variant failed").returns();
@@ -773,7 +773,7 @@ sap.ui.define([
 
 			var oOpenDialogStub = sandbox.stub(TransportSelection.prototype, "_openDialog").callsFake(fnSimulateDialogSelectionAndOk);
 
-			return AppVariantWriteAPI.deleteAppVariant({selector: oAppComponent, layer: Layer.CUSTOMER})
+			return AppVariantWriteAPI.deleteAppVariant({ selector: oAppComponent, layer: Layer.CUSTOMER })
 			.catch(function(oError) {
 				assert.ok("then the promise got rejected");
 				assert.equal(oError.messageKey, "MSG_LOAD_APP_VARIANT_FAILED", "then the messagekey is correct");
@@ -815,7 +815,7 @@ sap.ui.define([
 
 			var oNewConnectorCall = sandbox.stub(WriteUtils, "sendRequest");
 			oNewConnectorCall.onFirstCall().resolves(mAppVariant); // Get Descriptor variant call
-			oNewConnectorCall.onSecondCall().rejects({message: "Deletion error"}); // Delete call to backend
+			oNewConnectorCall.onSecondCall().rejects({ message: "Deletion error" }); // Delete call to backend
 
 			sandbox.stub(Log, "error").callThrough().withArgs("the app variant could not be deleted.", "Deletion error").returns();
 
@@ -836,7 +836,7 @@ sap.ui.define([
 
 			var oOpenDialogStub = sandbox.stub(TransportSelection.prototype, "_openDialog").callsFake(fnSimulateDialogSelectionAndOk);
 
-			return AppVariantWriteAPI.deleteAppVariant({selector: oAppComponent, layer: Layer.CUSTOMER})
+			return AppVariantWriteAPI.deleteAppVariant({ selector: oAppComponent, layer: Layer.CUSTOMER })
 			.catch(function(oError) {
 				assert.ok("then the promise got rejected");
 				assert.equal(oError.messageKey, "MSG_DELETE_APP_VARIANT_FAILED", "then the messagekey is correct");
@@ -886,7 +886,7 @@ sap.ui.define([
 
 			var oOpenDialogStub = sandbox.stub(TransportSelection.prototype, "_openDialog");
 
-			return AppVariantWriteAPI.deleteAppVariant({selector: oAppComponent, layer: Layer.CUSTOMER})
+			return AppVariantWriteAPI.deleteAppVariant({ selector: oAppComponent, layer: Layer.CUSTOMER })
 			.then(function() {
 				assert.ok(oNewConnectorCall.calledWith("/sap/bc/lrep/appdescr_variants/customer.reference.app.id", "GET"), "then the parameters are correct");
 				assert.ok(oNewConnectorCall.calledWith("/sap/bc/lrep/appdescr_variants/customer.reference.app.id", "DELETE"), "then the parameters are correct");
@@ -932,7 +932,7 @@ sap.ui.define([
 
 			var oOpenDialogStub = sandbox.stub(TransportSelection.prototype, "_openDialog");
 
-			return AppVariantWriteAPI.deleteAppVariant({selector: oAppComponent, layer: Layer.CUSTOMER})
+			return AppVariantWriteAPI.deleteAppVariant({ selector: oAppComponent, layer: Layer.CUSTOMER })
 			.then(function() {
 				assert.equal(oNewApplyConnectorCall.getCall(0).args[0], "/sap/bc/lrep/actions/gettransports/?package=&namespace=namespace1&name=fileName1&type=fileType1", "then the parameters are correct");
 				assert.ok(oNewConnectorCall.calledWith("/sap/bc/lrep/appdescr_variants/customer.reference.app.id", "GET"), "then the parameters are correct");
@@ -979,7 +979,7 @@ sap.ui.define([
 
 			var oOpenDialogStub = sandbox.stub(TransportSelection.prototype, "_openDialog");
 
-			return AppVariantWriteAPI.deleteAppVariant({selector: oAppComponent, layer: Layer.CUSTOMER})
+			return AppVariantWriteAPI.deleteAppVariant({ selector: oAppComponent, layer: Layer.CUSTOMER })
 			.then(function() {
 				assert.ok(oNewApplyConnectorCall.getCall(0).args[0], "/sap/bc/lrep/actions/gettransports/?namespace=namespace1&name=fileName1&type=fileType1", "then the parameters are correct");
 				assert.ok(oNewConnectorCall.calledWith("/sap/bc/lrep/appdescr_variants/customer.reference.app.id", "GET"), "then the parameters are correct");
@@ -1257,35 +1257,35 @@ sap.ui.define([
 			};
 
 			// Creates a first descriptor change
-			return ChangesWriteAPI.create({changeSpecificData: this.oDescrChangeSpecificData1, selector: oAppComponent})
+			return ChangesWriteAPI.create({ changeSpecificData: this.oDescrChangeSpecificData1, selector: oAppComponent })
 			.then(function(oDescriptorInlineChange) {
 				// Adds a first descriptor change to its own persistence
-				return PersistenceWriteAPI.add({change: oDescriptorInlineChange, selector: oAppComponent});
+				return PersistenceWriteAPI.add({ change: oDescriptorInlineChange, selector: oAppComponent });
 			})
 			.then(function() {
 				// Creates a second descriptor change
-				return ChangesWriteAPI.create({changeSpecificData: this.oDescrChangeSpecificData2, selector: oAppComponent});
+				return ChangesWriteAPI.create({ changeSpecificData: this.oDescrChangeSpecificData2, selector: oAppComponent });
 			}.bind(this))
 			.then(function(oDescriptorInlineChange) {
 				// Adds a second descriptor change to its own persistence
-				return PersistenceWriteAPI.add({change: oDescriptorInlineChange, selector: oAppComponent});
+				return PersistenceWriteAPI.add({ change: oDescriptorInlineChange, selector: oAppComponent });
 			})
 			.then(function() {
 				// Creates a third descriptor change
-				return ChangesWriteAPI.create({changeSpecificData: this.oDescrChangeSpecificData3, selector: oAppComponent});
+				return ChangesWriteAPI.create({ changeSpecificData: this.oDescrChangeSpecificData3, selector: oAppComponent });
 			}.bind(this))
 			.then(function(oDescriptorInlineChange) {
 				// Adds a third descriptor change to its own persistence
-				return PersistenceWriteAPI.add({change: oDescriptorInlineChange, selector: oAppComponent});
+				return PersistenceWriteAPI.add({ change: oDescriptorInlineChange, selector: oAppComponent });
 			})
 			.then(function() {
 				// Creates a UI change
-				return ChangesWriteAPI.create({changeSpecificData: this.oUIChangeSpecificData, selector: oAppComponent});
+				return ChangesWriteAPI.create({ changeSpecificData: this.oUIChangeSpecificData, selector: oAppComponent });
 			}.bind(this))
 			.then(function(oCreatedUIChange) {
 				oUIChange = oCreatedUIChange;
 				// Adds a UI change to its own persistence
-				return PersistenceWriteAPI.add({change: oUIChange, selector: oAppComponent});
+				return PersistenceWriteAPI.add({ change: oUIChange, selector: oAppComponent });
 			})
 			.then(function() {
 				assert.strictEqual(
@@ -1293,7 +1293,7 @@ sap.ui.define([
 					0,
 					"then no dirty changes have been added to the state"
 				);
-				return AppVariantWriteAPI.saveAs({selector: vSelector, id: "customer.reference.app.variant.id_456789", version: "1.0.0", layer: Layer.CUSTOMER})
+				return AppVariantWriteAPI.saveAs({ selector: vSelector, id: "customer.reference.app.variant.id_456789", version: "1.0.0", layer: Layer.CUSTOMER })
 				.then(function() {
 					assert.strictEqual(
 						FlexObjectState.getDirtyFlexObjects(vSelector.appId).length,

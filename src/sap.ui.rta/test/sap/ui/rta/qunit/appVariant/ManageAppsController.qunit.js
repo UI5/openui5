@@ -272,7 +272,7 @@ sap.ui.define([
 
 		QUnit.test("when onMenuAction is called and copy id is pressed", function(assert) {
 			var oEmptyEvent = new Event("emptyEventId", new Menu(), {
-				item: new MenuItem({text: "Copy ID"})
+				item: new MenuItem({ text: "Copy ID" })
 			});
 
 			const fnCopyID = sandbox.stub(this.oManageAppsController, "copyId");
@@ -283,7 +283,7 @@ sap.ui.define([
 
 		QUnit.test("when onMenuAction is called and handleUiAdaptation is pressed", function(assert) {
 			var oEmptyEvent = new Event("emptyEventId", new Menu(), {
-				item: new MenuItem({text: "Adapt UI"})
+				item: new MenuItem({ text: "Adapt UI" })
 			});
 
 			const fnHandleUiAdaptation = sandbox.stub(this.oManageAppsController, "handleUiAdaptation");
@@ -294,7 +294,7 @@ sap.ui.define([
 
 		QUnit.test("when onMenuAction is called and deleteAppVariant is pressed", function(assert) {
 			var oEmptyEvent = new Event("emptyEventId", new Menu(), {
-				item: new MenuItem({text: "Delete App Variant"})
+				item: new MenuItem({ text: "Delete App Variant" })
 			});
 
 			const fnDeleteAppVariant = sandbox.stub(this.oManageAppsController, "deleteAppVariant");

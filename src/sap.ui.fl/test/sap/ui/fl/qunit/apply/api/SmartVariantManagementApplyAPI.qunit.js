@@ -97,7 +97,7 @@ sap.ui.define([
 				reference: sReference,
 				fileType: "variant"
 			};
-			await FlexState.initialize({reference: sReference, componentId: "AppComponent21"});
+			await FlexState.initialize({ reference: sReference, componentId: "AppComponent21" });
 			const oResponse = await SmartVariantManagementApplyAPI.loadVariants({
 				control: this.oControl,
 				standardVariant: oStandardVariant,
@@ -241,7 +241,7 @@ sap.ui.define([
 				content: {}
 			}];
 
-			await FlexState.initialize({reference: "sap.ui.core", componentId: "AppComponent21"});
+			await FlexState.initialize({ reference: "sap.ui.core", componentId: "AppComponent21" });
 			const oResponse = await SmartVariantManagementApplyAPI.loadVariants({
 				control: this.oControl,
 				standardVariant: oStandardVariant,

@@ -265,12 +265,12 @@ sap.ui.define([
 			this.oDataSelector.get({ sampleKey: "foo" });
 			this.oDataSelector.get({ sampleKey: "baz" });
 			assert.strictEqual(
-				this.oExecuteStub.withArgs(undefined, {sampleKey: "foo"}).callCount,
+				this.oExecuteStub.withArgs(undefined, { sampleKey: "foo" }).callCount,
 				2,
 				"then the cache is cleared for the provided parameter"
 			);
 			assert.strictEqual(
-				this.oExecuteStub.withArgs(undefined, {sampleKey: "baz"}).callCount,
+				this.oExecuteStub.withArgs(undefined, { sampleKey: "baz" }).callCount,
 				1,
 				"then the cache is not cleared for other parameters"
 			);
@@ -482,7 +482,7 @@ sap.ui.define([
 
 			// execute selectors
 			this.oParentDataSelector.get({ grandParentSampleKey: "foo", parentSampleKey: "bar" });
-			this.oDataSelector.get({ grandParentSampleKey: "foo", parentSampleKey: "qux", sampleKey: "thud"});
+			this.oDataSelector.get({ grandParentSampleKey: "foo", parentSampleKey: "qux", sampleKey: "thud" });
 			this.oParentDataSelector.get({ grandParentSampleKey: "foo", parentSampleKey: "fred" });
 			this.oGrandParentDataSelector.get({ grandParentSampleKey: "baz" });
 		},

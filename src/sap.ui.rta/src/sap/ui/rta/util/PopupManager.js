@@ -421,7 +421,7 @@ sap.ui.define([
 	 */
 	PopupManager.prototype._applyPopupPatch = function(oPopupElement) {
 		const oOverlayContainer = Overlay.getOverlayContainer();
-		const {oPopup} = oPopupElement;
+		const { oPopup } = oPopupElement;
 		const aAutoCloseAreas = [
 			oPopup.oContent.getDomRef(),
 			oOverlayContainer
@@ -557,7 +557,7 @@ sap.ui.define([
 	 * @private
 	 */
 	PopupManager.prototype._removePopupPatch = function(oPopupElement) {
-		const {oPopup} = oPopupElement;
+		const { oPopup } = oPopupElement;
 		oPopup[this._getFocusEventName("add")]();
 		if (this.fnOriginalPopupOnAfterRendering) {
 			oPopup.onAfterRendering = this.fnOriginalPopupOnAfterRendering;

@@ -19,7 +19,7 @@ sap.ui.define([], function() {
 		}
 
 		return new Promise(function(fnResolve) {
-			oElement.addEventListener("transitionend", fnResolve, {once: true});
+			oElement.addEventListener("transitionend", fnResolve, { once: true });
 
 			// perform animation in the next animation frame, normally 16-17ms later.
 			let iTimestampInitial;

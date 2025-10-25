@@ -121,7 +121,7 @@ sap.ui.define([
 		return FeaturesAPI.isContextBasedAdaptationAvailable(sLayer)
 		.then(function(bContextBasedAdaptationsEnabledResponse) {
 			bContextBasedAdaptationsEnabled = bContextBasedAdaptationsEnabledResponse;
-			return bContextBasedAdaptationsEnabled ? ContextBasedAdaptationsAPI.load(mPropertyBag) : Promise.resolve({adaptations: []});
+			return bContextBasedAdaptationsEnabled ? ContextBasedAdaptationsAPI.load(mPropertyBag) : Promise.resolve({ adaptations: [] });
 		})
 		.then(function(oAdaptations) {
 			// Determine displayed adaptation
@@ -321,7 +321,7 @@ sap.ui.define([
 	ContextBasedAdaptationsAPI.adaptationExists = function(mPropertyBag) {
 		var sReference = mPropertyBag.reference;
 		var sLayer = mPropertyBag.layer;
-		return this.hasAdaptationsModel({reference: sReference, layer: sLayer}) && _mInstances[sReference][sLayer].getProperty("/count") > 0;
+		return this.hasAdaptationsModel({ reference: sReference, layer: sLayer }) && _mInstances[sReference][sLayer].getProperty("/count") > 0;
 	};
 
 	ContextBasedAdaptationsAPI.clearInstances = function() {
@@ -456,7 +456,7 @@ sap.ui.define([
 				}
 			}
 		});
-		return {uniqueContexts: mUniqueContexts, unrestrictedViews: aUnrestrictedViews};
+		return { uniqueContexts: mUniqueContexts, unrestrictedViews: aUnrestrictedViews };
 	}
 
 	/**
@@ -824,7 +824,7 @@ sap.ui.define([
 			return Promise.resolve();
 		})
 		.then(function() {
-			return this.refreshAdaptationModel({control: mPropertyBag.control, layer: mPropertyBag.layer});
+			return this.refreshAdaptationModel({ control: mPropertyBag.control, layer: mPropertyBag.layer });
 		}.bind(this));
 	};
 

@@ -60,7 +60,7 @@ sap.ui.define([
 	function stubTechnicalParameterValues(aUrlTechnicalParameters) {
 		sandbox.stub(this.oModel, "getLocalId").withArgs(this.oDummyControl.getId(), this.oAppComponent).returns("variantMgmtId1");
 		sandbox.spy(URLHandler, "update");
-		sandbox.stub(this.oModel, "getVariant").withArgs("variant1", "variantMgmtId1").returns({simulate: "foundVariant"});
+		sandbox.stub(this.oModel, "getVariant").withArgs("variant1", "variantMgmtId1").returns({ simulate: "foundVariant" });
 		sandbox.stub(hasher, "replaceHash");
 		this.fnParseShellHashStub = sandbox.stub().callsFake(function() {
 			if (!this.bCalled) {
@@ -81,9 +81,9 @@ sap.ui.define([
 						constructShellHash() {return "constructedHash";}
 					};
 				case "ShellNavigationInternal":
-					return {registerNavigationFilter() {}, unregisterNavigationFilter() {}};
+					return { registerNavigationFilter() {}, unregisterNavigationFilter() {} };
 				case "Navigation":
-					return {navigate() {}};
+					return { navigate() {} };
 				default:
 					return undefined;
 			}
@@ -170,7 +170,7 @@ sap.ui.define([
 			var aUrlTechnicalParameters = ["fakevariant", "variant1"];
 			stubTechnicalParameterValues.call(this, aUrlTechnicalParameters);
 
-			ControlVariantApplyAPI.clearVariantParameterInURL({control: this.oDummyControl});
+			ControlVariantApplyAPI.clearVariantParameterInURL({ control: this.oDummyControl });
 
 			assert.ok(this.fnParseShellHashStub.calledTwice, "then variant parameter values were requested; once for read and write each");
 			assert.deepEqual(_omit(URLHandler.update.getCall(0).args[0], "model"), {
@@ -185,7 +185,7 @@ sap.ui.define([
 			sandbox.stub(Log, "error");
 			sandbox.stub(this.oAppComponent, "getModel").returns(undefined);
 			sandbox.spy(URLHandler, "update");
-			ControlVariantApplyAPI.clearVariantParameterInURL({control: this.oDummyControl});
+			ControlVariantApplyAPI.clearVariantParameterInURL({ control: this.oDummyControl });
 			assert.strictEqual(URLHandler.update.callCount, 0, "the URLHandler was not called");
 			assert.strictEqual(
 				Log.error.lastCall.args[0],
@@ -388,7 +388,7 @@ sap.ui.define([
 					}
 				});
 
-				this.oComp = new MockComponent({id: "testComponent"});
+				this.oComp = new MockComponent({ id: "testComponent" });
 				this.oView = oView;
 				this.oVariantModel = new VariantModel({}, {
 					appComponent: this.oComp
@@ -558,9 +558,9 @@ sap.ui.define([
 			const fnCallback1 = sandbox.stub();
 			const fnCallback2 = sandbox.stub();
 			const fnCallback3 = sandbox.stub();
-			const oNewControl1 = new Button("newControl1", {text: "foo"});
-			const oNewControl2 = new Button("newControl2", {text: "foo"});
-			const oNewControl3 = new Button("newControl3", {text: "foo"});
+			const oNewControl1 = new Button("newControl1", { text: "foo" });
+			const oNewControl2 = new Button("newControl2", { text: "foo" });
+			const oNewControl3 = new Button("newControl3", { text: "foo" });
 			const oLogStub = sandbox.stub(Log, "error");
 
 			Promise.all([

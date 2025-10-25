@@ -155,7 +155,7 @@ sap.ui.define([
 		const aRequiredLibraries = Object.keys(mRequiredLibraries || {});
 		try {
 			for (const sLibrary of aRequiredLibraries) {
-				await Lib.load({name: sLibrary});
+				await Lib.load({ name: sLibrary });
 			}
 			return true;
 		} catch (vError) {
@@ -282,7 +282,7 @@ sap.ui.define([
 		]);
 		// join and condense all action data
 		const mAllActions = merge(oRevealAction, oAddViaDelegateAction);
-		oSourceElementOverlay._mAddActions ||= {asSibling: {}, asChild: {}};
+		oSourceElementOverlay._mAddActions ||= { asSibling: {}, asChild: {} };
 		oSourceElementOverlay._mAddActions[sSiblingOrChild] = mAllActions;
 		return mAllActions;
 	};

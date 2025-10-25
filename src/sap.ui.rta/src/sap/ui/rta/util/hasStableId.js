@@ -14,7 +14,7 @@ sap.ui.define([
 	"use strict";
 
 	function isCloneFromAggregationBinding(oControl) {
-		const {sParentAggregationName} = oControl;
+		const { sParentAggregationName } = oControl;
 		const oParent = oControl.getParent();
 
 		if (oParent && sParentAggregationName) {

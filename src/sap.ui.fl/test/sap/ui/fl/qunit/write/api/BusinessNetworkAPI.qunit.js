@@ -43,7 +43,7 @@ sap.ui.define([
 	}, function() {
 		QUnit.test("when createAndSaveVariant is called", async function(assert) {
 			sandbox.stub(Storage, "condense").callsFake((mProperties) => {
-				return Promise.resolve({response: mProperties.allChanges.map((oChange) => oChange.convertToFileContent())});
+				return Promise.resolve({ response: mProperties.allChanges.map((oChange) => oChange.convertToFileContent()) });
 			});
 			const oResponse = await BusinessNetworkAPI.createAndSaveVariant({
 				variantManagementReference: "vmReference",
@@ -119,7 +119,7 @@ sap.ui.define([
 			const oUserVariantChange = aChanges[1];
 			assert.strictEqual(oUserVariantChange.getChangeType(), "setDefault", "then the change type is set to setDefault");
 			assert.strictEqual(oUserVariantChange.getLayer(), Layer.USER, "then the layer is USER");
-			assert.deepEqual(oUserVariantChange.getSelector(), {id: sVMR, idIsLocal: true}, "then the selector is set");
+			assert.deepEqual(oUserVariantChange.getSelector(), { id: sVMR, idIsLocal: true }, "then the selector is set");
 			assert.deepEqual(oUserVariantChange.getContent(), { defaultVariant: sVMR }, "then the content is set");
 
 			const sResponse = await BusinessNetworkAPI.save(oControl);
@@ -129,7 +129,7 @@ sap.ui.define([
 
 		QUnit.test("when disablePersonalization is called with a valid reference", function(assert) {
 			const sReference = "sap.ui.rta.test";
-			window.sessionStorage.setItem(`sap.ui.fl.info.${sReference}`, JSON.stringify({maxLayer: "CUSTOMER"}));
+			window.sessionStorage.setItem(`sap.ui.fl.info.${sReference}`, JSON.stringify({ maxLayer: "CUSTOMER" }));
 			BusinessNetworkAPI.disablePersonalization(sReference);
 
 			const oFlexInfoSession = FlexInfoSession.getByReference(sReference);

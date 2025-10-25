@@ -63,32 +63,32 @@ sap.ui.define([
 				/**
 				 * Determines the URL of the content.
 				 */
-				url: {type: "sap.ui.core.URI", group: "Misc", defaultValue: "about:blank" },
+				url: { type: "sap.ui.core.URI", group: "Misc", defaultValue: "about:blank" },
 
 				/**
 				 * Defines the <code>IFrame</code> width.
 				 */
-				width: {type: "sap.ui.core.CSSSize", group: "Misc", defaultValue: "100%"},
+				width: { type: "sap.ui.core.CSSSize", group: "Misc", defaultValue: "100%" },
 
 				/**
 				 * Defines the <code>IFrame</code> height.
 				 */
-				height: {type: "sap.ui.core.CSSSize", group: "Misc", defaultValue: "35vh"},
+				height: { type: "sap.ui.core.CSSSize", group: "Misc", defaultValue: "35vh" },
 
 				/**
 				 * Defines the title of the item.
 				 */
-				title: {type: "string", group: "Misc", defaultValue: undefined},
+				title: { type: "string", group: "Misc", defaultValue: undefined },
 
 				/**
 				 * Defines whether the <code>IFrame</code> was added as a new container.
 				 */
-				asContainer: {type: "boolean", group: "Misc", defaultValue: undefined},
+				asContainer: { type: "boolean", group: "Misc", defaultValue: undefined },
 
 				/**
 				 * Defines the information required for handling rename of <code>IFrame</code> containers.
 				 */
-				renameInfo: {type: "object", group: "Data", defaultValue: null},
+				renameInfo: { type: "object", group: "Data", defaultValue: null },
 
 				/**
 				 * Contains the Iframe sandbox attributes

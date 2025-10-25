@@ -82,7 +82,7 @@ sap.ui.define([
 
 			return new Promise(function(resolve, reject) {
 				Promise.all([
-					Lib.load({name: "sap.ui.rta"}),
+					Lib.load({ name: "sap.ui.rta" }),
 					oComponent.rootControlLoaded()
 				])
 				.then(function() {

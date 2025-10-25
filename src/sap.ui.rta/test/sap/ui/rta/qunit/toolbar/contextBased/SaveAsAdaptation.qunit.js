@@ -220,13 +220,13 @@ sap.ui.define([
 				this.clock.tick(100); // wait for event onAdaptationTitleChange
 				assert.notOk(oSaveButton.getEnabled(), "save button is not enabled");
 				oPrioritySelect.setSelectedItem(oPrioritySelect.getItemAt(2));
-				oPrioritySelect.fireChange({selectedItem: oPrioritySelect.getItemAt(2)});
+				oPrioritySelect.fireChange({ selectedItem: oPrioritySelect.getItemAt(2) });
 				assert.strictEqual(
 					oPrioritySelect.getSelectedItem().getText(),
 					this.aPriorityList[2].title,
 					"the correct priority is selected"
 				);
-				contextVisibilityComponent.getComponentInstance().setSelectedContexts({role: ["Role 1", "Role 2"]});
+				contextVisibilityComponent.getComponentInstance().setSelectedContexts({ role: ["Role 1", "Role 2"] });
 				oContextsList.fireUpdateFinished();
 				this.clock.tick(100); // wait for event onContextRoleChange
 				assert.ok(oSaveButton.getEnabled(), "save button is enabled");
@@ -299,13 +299,13 @@ sap.ui.define([
 				this.clock.tick(100); // wait for event onAdaptationTitleChange
 				assert.notOk(oSaveButton.getEnabled(), "save button is not enabled");
 				oPrioritySelect.setSelectedItem(oPrioritySelect.getItemAt(2));
-				oPrioritySelect.fireChange({selectedItem: oPrioritySelect.getItemAt(2)});
+				oPrioritySelect.fireChange({ selectedItem: oPrioritySelect.getItemAt(2) });
 				assert.strictEqual(
 					oPrioritySelect.getSelectedItem().getText(),
 					this.aPriorityList[2].title,
 					"the correct priority is selected"
 				);
-				contextVisibilityComponent.getComponentInstance().setSelectedContexts({role: ["Role 1", "Role 2"]});
+				contextVisibilityComponent.getComponentInstance().setSelectedContexts({ role: ["Role 1", "Role 2"] });
 				oContextsList.fireUpdateFinished();
 				this.clock.tick(100); // wait for event onContextRoleChange
 				assert.ok(oSaveButton.getEnabled(), "save button is enabled");
@@ -324,13 +324,13 @@ sap.ui.define([
 				const oContextsList = Element.getElementById("contextSharing---ContextVisibility--selectedContextsList");
 				assert.ok(oContextVisibility.getVisible(), "context visibility container is visible");
 				oPrioritySelect.setSelectedItem(oPrioritySelect.getItemAt(2));
-				oPrioritySelect.fireChange({selectedItem: oPrioritySelect.getItemAt(2)});
+				oPrioritySelect.fireChange({ selectedItem: oPrioritySelect.getItemAt(2) });
 				assert.strictEqual(
 					oPrioritySelect.getSelectedItem().getText(),
 					this.aPriorityList[2].title,
 					"the correct priority is selected"
 				);
-				contextVisibilityComponent.getComponentInstance().setSelectedContexts({role: ["Role 1", "Role 2"]});
+				contextVisibilityComponent.getComponentInstance().setSelectedContexts({ role: ["Role 1", "Role 2"] });
 				oContextsList.fireUpdateFinished();
 				this.clock.tick(100); // wait for event onContextRoleChange
 				assert.strictEqual(oTitleInput.getValueState(), ValueState.None, "the value state is initially none");
@@ -472,7 +472,7 @@ sap.ui.define([
 				const oSaveButton = getToolbarRelatedControl(this.oToolbar, "saveAdaptation-saveButton");
 				const oPrioritySelect = getToolbarRelatedControl(this.oToolbar, "saveAdaptation-rank-select");
 				oPrioritySelect.setSelectedItem(oPrioritySelect.getItemAt(2));
-				oPrioritySelect.fireChange({selectedItem: oPrioritySelect.getItemAt(2)});
+				oPrioritySelect.fireChange({ selectedItem: oPrioritySelect.getItemAt(2) });
 				this.clock.tick(100); // wait for event onPriorityChange
 				assert.ok(oSaveButton.getEnabled(), "save button is enabled");
 			});
@@ -481,7 +481,7 @@ sap.ui.define([
 				const oContextsList = Element.getElementById("contextSharing---ContextVisibility--selectedContextsList");
 				const oSaveButton = getToolbarRelatedControl(this.oToolbar, "saveAdaptation-saveButton");
 				const contextVisibilityComponent = getControl("contextSharingContainer");
-				contextVisibilityComponent.getComponentInstance().setSelectedContexts({role: ["Role 1", "Role 2"]});
+				contextVisibilityComponent.getComponentInstance().setSelectedContexts({ role: ["Role 1", "Role 2"] });
 				oContextsList.fireUpdateFinished();
 				this.clock.tick(100); // wait for event onContextRoleChange
 				assert.ok(oSaveButton.getEnabled(), "save button is enabled");
@@ -560,7 +560,7 @@ sap.ui.define([
 				this.clock.tick(100); // wait for event onAdaptationTitleChange
 				assert.notOk(oSaveButton.getEnabled(), "save button is not enabled");
 
-				contextVisibilityComponent.getComponentInstance().setSelectedContexts({role: ["Role 1", "Role 2"]});
+				contextVisibilityComponent.getComponentInstance().setSelectedContexts({ role: ["Role 1", "Role 2"] });
 				oContextsList.fireUpdateFinished();
 				this.clock.tick(100); // wait for event onContextRoleChange
 				assert.ok(oSaveButton.getEnabled(), "save button is enabled");
