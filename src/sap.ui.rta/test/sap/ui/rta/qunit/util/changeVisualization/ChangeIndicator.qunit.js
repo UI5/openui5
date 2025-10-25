@@ -603,7 +603,7 @@ sap.ui.define([
 			sandbox.stub(RenameVisualization, "getDescription").callsFake(function(mPayloadParameter, sElementLabel) {
 				assert.deepEqual(mPayload, mPayloadParameter, "getDescription is called with the right payload");
 				assert.strictEqual(sElementLabel, "TestButton", "getDescription is called with the right element label");
-				return { descriptionText: "Test Description", descriptionTooltip: "tooltip"};
+				return { descriptionText: "Test Description", descriptionTooltip: "tooltip" };
 			});
 
 			this.oChangeIndicator.getModel().setData({

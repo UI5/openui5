@@ -32,7 +32,7 @@ sap.ui.define([
 			var sLayerName = oLayerModelData[sLayerBindingPath].name;
 
 			var oRouter = UIComponent.getRouterFor(this);
-			oRouter.navTo("LayerContentMaster", {layer: sLayerName});
+			oRouter.navTo("LayerContentMaster", { layer: sLayerName });
 		},
 
 		/**

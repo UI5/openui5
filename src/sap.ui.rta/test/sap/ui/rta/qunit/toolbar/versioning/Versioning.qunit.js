@@ -243,7 +243,7 @@ sap.ui.define([
 
 				// set version title
 				oVersionTitleInput.setValue("myVersionName");
-				oVersionTitleInput.fireLiveChange({value: "myVersionName"});
+				oVersionTitleInput.fireLiveChange({ value: "myVersionName" });
 				assert.strictEqual(oConfirmButton.getEnabled(), true, "the confirm button is enabled");
 
 				this.oToolbar.attachEventOnce("activate", function(oEvent) {

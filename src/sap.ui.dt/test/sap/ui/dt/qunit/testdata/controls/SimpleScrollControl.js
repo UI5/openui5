@@ -35,12 +35,12 @@ sap.ui.define([
 				}
 			},
 			aggregations: {
-				content1: {type: "sap.ui.core.Control", multiple: true, singularName: "content1"},
-				content2: {type: "sap.ui.core.Control", multiple: true, singularName: "content2"},
-				content3: {type: "sap.ui.core.Control", multiple: true, singularName: "content3"},
-				content4: {type: "sap.ui.core.Control", multiple: true, singularName: "content4"},
-				content5: {type: "sap.ui.core.Control", multiple: true, singularName: "content5"},
-				footer: {type: "sap.ui.core.Control", multiple: true, singularName: "footer"}
+				content1: { type: "sap.ui.core.Control", multiple: true, singularName: "content1" },
+				content2: { type: "sap.ui.core.Control", multiple: true, singularName: "content2" },
+				content3: { type: "sap.ui.core.Control", multiple: true, singularName: "content3" },
+				content4: { type: "sap.ui.core.Control", multiple: true, singularName: "content4" },
+				content5: { type: "sap.ui.core.Control", multiple: true, singularName: "content5" },
+				footer: { type: "sap.ui.core.Control", multiple: true, singularName: "footer" }
 			},
 			designtime: {
 				aggregations: {
@@ -164,7 +164,7 @@ sap.ui.define([
 		} else {
 			this.setUseAlternateScrollContainer(true);
 		}
-		this._updateFunction({index: 1});
+		this._updateFunction({ index: 1 });
 	};
 
 	return SimpleScrollControl;

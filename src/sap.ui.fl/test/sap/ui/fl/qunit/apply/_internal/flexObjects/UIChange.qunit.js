@@ -73,7 +73,7 @@ sap.ui.define([
 			const oExpectedFileContent = { ...oFileContent, dependentSelector: {} };
 			oExpectedFileContent.support.user = "userId";
 			assert.strictEqual(oUIChange.getApplyState(), States.ApplyState.INITIAL, "the apply state is set to initial");
-			assert.deepEqual(oUIChange.getSelector(), {id: "bar", idIsLocal: true}, "the selector is part of the instance");
+			assert.deepEqual(oUIChange.getSelector(), { id: "bar", idIsLocal: true }, "the selector is part of the instance");
 			assert.deepEqual(oUIChange.getDependentSelectors(), {}, "the dependent selector cannot be set initially via this function");
 			assert.strictEqual(oUIChange.getVariantReference(), "myVariantReference", "the variant reference is part of the instance");
 			assert.deepEqual(oUIChange.convertToFileContent(), oExpectedFileContent, "the change is converted back to file content");
@@ -96,14 +96,14 @@ sap.ui.define([
 		});
 
 		QUnit.test("FlexObjectFactory.createUIChange in customer layer and user already set", function(assert) {
-			const oUIChange = FlexObjectFactory.createUIChange({ ...oFileContent, user: "myFancyUser"});
+			const oUIChange = FlexObjectFactory.createUIChange({ ...oFileContent, user: "myFancyUser" });
 			assert.strictEqual(oUIChange.getSupportInformation().user, "myFancyUser", "the user is set correctly");
 		});
 
 		QUnit.test("FlexObjectFactory.createFromFileContent", function(assert) {
 			const oUIChange = FlexObjectFactory.createFromFileContent({ ...oFileContent });
 			assert.strictEqual(oUIChange.getApplyState(), States.ApplyState.INITIAL, "the apply state is set to initial");
-			assert.deepEqual(oUIChange.getSelector(), {id: "bar", idIsLocal: true}, "the selector is part of the instance");
+			assert.deepEqual(oUIChange.getSelector(), { id: "bar", idIsLocal: true }, "the selector is part of the instance");
 			assert.deepEqual(oUIChange.getDependentSelectors(), { origin: { id: "foobar", idIsLocal: true } }, "the dependent selector is part of the instance");
 			assert.strictEqual(oUIChange.getVariantReference(), "myVariantReference", "the variant reference is part of the instance");
 			assert.deepEqual(oUIChange.convertToFileContent(), oFileContent, "the change is converted back to file content");
@@ -359,7 +359,7 @@ sap.ui.define([
 		QUnit.test("getIdForCondensing with affectedControl", (assert) => {
 			const oUIChange = FlexObjectFactory.createUIChange({ ...oFileContent });
 			assert.strictEqual(
-				oUIChange.getIdForCondensing({affectedControl: "controlId"}, "appComponent"),
+				oUIChange.getIdForCondensing({ affectedControl: "controlId" }, "appComponent"),
 				"controlId",
 				"the ID is correct"
 			);

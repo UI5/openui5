@@ -136,7 +136,7 @@ sap.ui.define([
 			const oAppDescriptorChange = FlexObjectFactory.createFromFileContent(oChangeDefinition);
 			assert.ok(oAppDescriptorChange.canBeCondensed(), "the change can be condensed");
 
-			const oNotCondensable = FlexObjectFactory.createFromFileContent({...oChangeDefinition, changeType: "notCondensable"});
+			const oNotCondensable = FlexObjectFactory.createFromFileContent({ ...oChangeDefinition, changeType: "notCondensable" });
 			assert.notOk(oNotCondensable.canBeCondensed(), "the change can't be condensed");
 		});
 	});

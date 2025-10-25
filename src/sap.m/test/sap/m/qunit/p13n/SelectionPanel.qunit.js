@@ -866,6 +866,41 @@ sap.ui.define([
 		assert.equal(aSelectedItems[4].getCells()[0].getItems()[0].getText(), "Field 6", "Field 6 is correctly selected");
 	});
 
+	QUnit.test("Check 'Select All' with unfiltered items, updates count correctly", async function(assert) {
+		// Arrange: Set up panel with 4 items, only 1 will be shown after filtering
+		this.oSelectionPanel.setP13nData([
+			...this.getTestData().map((oItem) => {
+				oItem.visible = false;
+				return oItem;
+			})
+		]);
+		this.oSelectionPanel.setMultiSelectMode(MultiSelectMode.SelectAll);
+		await nextUIUpdate();
+
+		// Filter so that everything is visible
+		this.oSelectionPanel._oListControl.getBinding("items").filter([], "Control");
+		await nextUIUpdate();
+
+		return new Promise((resolve) => {
+			this.oSelectionPanel.attachChange(async (oEvt) => {
+				const aChangedItems = oEvt.getParameter("item");
+
+				// Only the filtered item should be selected
+				assert.equal(aChangedItems.length, 6, "All items are affected by select all");
+				assert.ok(aChangedItems.every((oItem) => oItem.visible), "All items are selected");
+
+				await nextUIUpdate();
+
+				const oP13nModel = this.oSelectionPanel._getP13nModel();
+				assert.equal(oP13nModel.getProperty("/selectedItems"), 6, "Length is correct");
+
+				resolve();
+			});
+
+			this.oSelectionPanel._oListControl.selectAll(true);
+		});
+	});
+
 	QUnit.test("Check 'Deselect All' after filtering", async function(assert) {
 		// Arrange
 		this.oSelectionPanel.setP13nData([

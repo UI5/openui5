@@ -63,7 +63,7 @@ sap.ui.define([
 			});
 
 			sandbox.spy(URLHandler, "attachHandlers");
-			var mPropertyBag = {model: this.oModel};
+			var mPropertyBag = { model: this.oModel };
 			URLHandler.initialize(mPropertyBag);
 			var oHashRegister = {
 				hashParams: [],
@@ -71,13 +71,13 @@ sap.ui.define([
 				variantControlIds: []
 			};
 
-			this.oModel.oComponentDestroyObserver.unobserve(this.oAppComponent, {destroy: true}); // remove component observer
+			this.oModel.oComponentDestroyObserver.unobserve(this.oAppComponent, { destroy: true }); // remove component observer
 			assert.ok(URLHandler.attachHandlers.calledWith(mPropertyBag), "then required handlers and observers were subscribed");
 			assert.deepEqual(this.oModel._oHashData, oHashRegister, "then hash register object initialized");
 
 			this.oModel._oHashData.hashParams = ["expectedParameter1", "expectedParameter2"];
 			assert.deepEqual(
-				URLHandler.getStoredHashParams({model: this.oModel}),
+				URLHandler.getStoredHashParams({ model: this.oModel }),
 				["expectedParameter1", "expectedParameter2"],
 				"then expected parameters are returned"
 			);
@@ -85,13 +85,13 @@ sap.ui.define([
 
 		QUnit.test("when registerControl is called for a variant management control's local id", function(assert) {
 			var sVariantManagementReference = "sLocalControlId";
-			URLHandler.initialize({model: this.oModel});
-			URLHandler.registerControl({vmReference: sVariantManagementReference, updateURL: true, model: this.oModel});
+			URLHandler.initialize({ model: this.oModel });
+			URLHandler.registerControl({ vmReference: sVariantManagementReference, updateURL: true, model: this.oModel });
 			var aCallArgs = this.fnDestroyObserverSpy.getCall(0).args;
 			assert.deepEqual(aCallArgs[0], this.oAppComponent, "then ManagedObjectObserver observers the AppComponent");
 			assert.strictEqual(aCallArgs[1].destroy, true, "then ManagedObjectObserver observers the destroy() method");
 
-			this.oModel.oComponentDestroyObserver.unobserve(this.oAppComponent, {destroy: true}); // remove component observer
+			this.oModel.oComponentDestroyObserver.unobserve(this.oAppComponent, { destroy: true }); // remove component observer
 			assert.deepEqual(
 				this.oModel._oHashData.variantControlIds,
 				[sVariantManagementReference],
@@ -100,17 +100,17 @@ sap.ui.define([
 		});
 
 		QUnit.test("when attachHandlers() is called", function(assert) {
-			URLHandler.initialize({model: this.oModel});
+			URLHandler.initialize({ model: this.oModel });
 
 			// first call
-			URLHandler.attachHandlers({vmReference: "mockControlId1", updateURL: false, model: this.oModel});
+			URLHandler.attachHandlers({ vmReference: "mockControlId1", updateURL: false, model: this.oModel });
 			var aCallArgs = this.fnDestroyObserverSpy.getCall(0).args;
 			assert.deepEqual(aCallArgs[0], this.oAppComponent, "then ManagedObjectObserver observers the AppComponent");
 			assert.strictEqual(aCallArgs[1].destroy, true, "then ManagedObjectObserver observers the destroy() method");
-			this.oModel.oComponentDestroyObserver.unobserve(this.oAppComponent, {destroy: true}); // remove component observer
+			this.oModel.oComponentDestroyObserver.unobserve(this.oAppComponent, { destroy: true }); // remove component observer
 
 			// second call
-			URLHandler.attachHandlers({vmReference: "mockControlId2", updateURL: false, model: this.oModel});
+			URLHandler.attachHandlers({ vmReference: "mockControlId2", updateURL: false, model: this.oModel });
 			assert.ok(this.fnDestroyObserverSpy.calledOnce, "then no new observers were listening to Component.destroy()");
 		});
 
@@ -127,13 +127,13 @@ sap.ui.define([
 				parseShellHash() {}
 			});
 
-			URLHandler.initialize({model: this.oModel});
+			URLHandler.initialize({ model: this.oModel });
 
 			this.oModel.destroy = sandbox.stub().callsFake(function() {
 				assert.ok(true, "then the passed VariantModel is destroyed");
 			});
 			URLHandler.attachHandlers(
-				{vmReference: sVariantManagementReference, updateURL: true, model: this.oModel}
+				{ vmReference: sVariantManagementReference, updateURL: true, model: this.oModel }
 			); // app component's destroy handlers are attached here
 
 			var fnVariantSwitchPromiseStub = sandbox.stub();
@@ -171,7 +171,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("when update() is called to update the URL with a hash register update", function(assert) {
-			URLHandler.initialize({model: this.oModel});
+			URLHandler.initialize({ model: this.oModel });
 			assert.expect(2);
 			var mPropertyBag = {
 				parameters: ["testParam1,testParam2"],
@@ -182,7 +182,7 @@ sap.ui.define([
 
 			this.oGetUShellServiceStub.withArgs("URLParsing").returns({
 				parseShellHash() {
-					return {params: {}};
+					return { params: {} };
 				}
 			});
 
@@ -201,7 +201,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("when update() is called to update the URL without a hash register update", function(assert) {
-			URLHandler.initialize({model: this.oModel});
+			URLHandler.initialize({ model: this.oModel });
 			assert.expect(2);
 			var mPropertyBag = {
 				parameters: ["testParam1,testParam2"],
@@ -212,7 +212,7 @@ sap.ui.define([
 
 			this.oGetUShellServiceStub.withArgs("URLParsing").returns({
 				parseShellHash() {
-					return {params: {}};
+					return { params: {} };
 				}
 			});
 
@@ -242,7 +242,7 @@ sap.ui.define([
 
 			this.oGetUShellServiceStub.withArgs("URLParsing").returns({
 				parseShellHash() {
-					return {params: {}};
+					return { params: {} };
 				}
 			});
 
@@ -260,7 +260,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("when update() is called to update hash register without a URL update", function(assert) {
-			URLHandler.initialize({model: this.oModel});
+			URLHandler.initialize({ model: this.oModel });
 			var mPropertyBag = {
 				parameters: ["testParam1,testParam2"],
 				updateHashEntry: true,
@@ -276,7 +276,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("when update() is called to update hash register with a URL update, but the parameters didn't change", function(assert) {
-			URLHandler.initialize({model: this.oModel});
+			URLHandler.initialize({ model: this.oModel });
 			var mPropertyBag = {
 				parameters: ["testParam1,testParam2"],
 				updateHashEntry: true,
@@ -284,7 +284,7 @@ sap.ui.define([
 				model: this.oModel
 			};
 
-			var oReturnObject = {params: {}};
+			var oReturnObject = { params: {} };
 			oReturnObject.params[URLHandler.variantTechnicalParameterName] = ["testParam1,testParam2"];
 			this.oGetUShellServiceStub.withArgs("URLParsing").returns({
 				parseShellHash() {
@@ -308,7 +308,7 @@ sap.ui.define([
 			parseShellHash: () => {
 				const params = {};
 				params[URLHandler.variantTechnicalParameterName] = aParameterValues;
-				return {params};
+				return { params };
 			}
 		});
 	}
@@ -385,11 +385,11 @@ sap.ui.define([
 				this.oSwitchToDefaultVariantStub = sandbox.stub(VariantManager, "updateCurrentVariant");
 
 				// variant management controls
-				this.oVariantManagement1 = new VariantManagement("variantMgmtId1", {updateVariantInURL: true});
+				this.oVariantManagement1 = new VariantManagement("variantMgmtId1", { updateVariantInURL: true });
 				this.oVariantManagement1.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
-				this.oVariantManagement2 = new VariantManagement("variantMgmtId2", {updateVariantInURL: true});
+				this.oVariantManagement2 = new VariantManagement("variantMgmtId2", { updateVariantInURL: true });
 				this.oVariantManagement2.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
-				this.oVariantManagement3 = new VariantManagement("variantMgmtId3", {updateVariantInURL: true});
+				this.oVariantManagement3 = new VariantManagement("variantMgmtId3", { updateVariantInURL: true });
 				this.oVariantManagement3.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
 
 				// mock property bag for URLHandler.update
@@ -448,7 +448,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("when event 'modelContextChange' is fired on a control rendered at position 1 with a URL parameter, out of 3 controls", function(assert) {
-			var oReturnObject = {params: {}};
+			var oReturnObject = { params: {} };
 			oReturnObject.params[URLHandler.variantTechnicalParameterName] = [this.oVariantManagement1.getId()];
 
 			this.oGetUShellServiceStub.withArgs("URLParsing").returns({
@@ -458,7 +458,7 @@ sap.ui.define([
 			});
 			sandbox.stub(this.oModel, "getVariant").callsFake(function(sVReference, sVMReference) {
 				if (sVMReference === this.oVariantManagement1.getId() && sVReference === this.oVariantManagement1.getId()) {
-					return {simulate: "foundVariant"};
+					return { simulate: "foundVariant" };
 				}
 				return undefined;
 			}.bind(this));
@@ -857,7 +857,7 @@ sap.ui.define([
 			};
 
 			var aModifiedUrlTechnicalParameters = ["variant0"];
-			sandbox.stub(this.oModel, "getVariant").withArgs("variantMgmtId1", "variantMgmtId1").returns({simulate: "foundVariant"});
+			sandbox.stub(this.oModel, "getVariant").withArgs("variantMgmtId1", "variantMgmtId1").returns({ simulate: "foundVariant" });
 			this.oGetUShellServiceStub.withArgs("URLParsing").returns({
 				parseShellHash() {
 					return oParameters;
@@ -907,7 +907,7 @@ sap.ui.define([
 			});
 			assert.ok(this.oGetUShellServiceStub.called, "then url parameters requested");
 
-			var oVariantIndexInURLReturn = {parameters: ["variantMgmtId1"], index: -1};
+			var oVariantIndexInURLReturn = { parameters: ["variantMgmtId1"], index: -1 };
 			oVariantIndexInURLReturn.parameters = [aExistingParameters[0]];
 			assert.deepEqual(
 				URLHandler.removeURLParameterForVariantManagement.returnValues[0],
@@ -932,7 +932,7 @@ sap.ui.define([
 				return encodeURIComponent(sExistingParameter);
 			});
 
-			sandbox.stub(this.oModel, "getVariant").withArgs("variantMgmtId1", "variantMgmtId1").returns({simulate: "foundVariant"});
+			sandbox.stub(this.oModel, "getVariant").withArgs("variantMgmtId1", "variantMgmtId1").returns({ simulate: "foundVariant" });
 			this.oGetUShellServiceStub.withArgs("URLParsing").returns({
 				parseShellHash() {
 					return oParameters;
@@ -947,7 +947,7 @@ sap.ui.define([
 			});
 			assert.ok(this.oGetUShellServiceStub.called, "then url parameters requested");
 
-			var oVariantIndexInURLReturn = {parameters: {}, index: 1};
+			var oVariantIndexInURLReturn = { parameters: {}, index: 1 };
 			oVariantIndexInURLReturn.parameters = [aExistingParameters[0]];
 			assert.deepEqual(
 				URLHandler.removeURLParameterForVariantManagement.returnValues[0],
@@ -1000,7 +1000,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("when called for the default variant with a valid variant URL parameter for the same variant management", function(assert) {
-			var oReturnObject = {params: {}};
+			var oReturnObject = { params: {} };
 			oReturnObject.params[URLHandler.variantTechnicalParameterName] = ["Dummy", "variantMgmtId1", "Dummy1"];
 			this.oGetUShellServiceStub.withArgs("URLParsing").returns({
 				parseShellHash() {
@@ -1008,7 +1008,7 @@ sap.ui.define([
 				}
 			});
 
-			sandbox.stub(this.oModel, "getVariant").withArgs("variantMgmtId1", "variantMgmtId1").returns({simulate: "foundVariant"});
+			sandbox.stub(this.oModel, "getVariant").withArgs("variantMgmtId1", "variantMgmtId1").returns({ simulate: "foundVariant" });
 
 			URLHandler.updateVariantInURL({
 				vmReference: "variantMgmtId1",
@@ -1028,12 +1028,12 @@ sap.ui.define([
 			// to verify ushell
 			this.oGetUShellServiceStub.withArgs("URLParsing").returns({
 				parseShellHash() {
-					return {params: {}};
+					return { params: {} };
 				}
 			});
 			// return parameters saved at the current index of the hash register
 			sandbox.stub(URLHandler, "getStoredHashParams").returns(["Dummy", "variantMgmtId1", "Dummy1"]);
-			sandbox.stub(this.oModel, "getVariant").withArgs("variantMgmtId1", "variantMgmtId1").returns({simulate: "foundVariant"});
+			sandbox.stub(this.oModel, "getVariant").withArgs("variantMgmtId1", "variantMgmtId1").returns({ simulate: "foundVariant" });
 			this.oModel._bDesignTimeMode = true;
 
 			URLHandler.updateVariantInURL({
@@ -1054,7 +1054,7 @@ sap.ui.define([
 			// to verify ushell
 			this.oGetUShellServiceStub.withArgs("URLParsing").returns({
 				parseShellHash() {
-					return {params: {}};
+					return { params: {} };
 				}
 			});
 			this.oModel._bDesignTimeMode = true;
@@ -1077,7 +1077,7 @@ sap.ui.define([
 			// to verify ushell
 			this.oGetUShellServiceStub.withArgs("URLParsing").returns({
 				parseShellHash() {
-					return {params: {}};
+					return { params: {} };
 				}
 			});
 			this.oModel._bDesignTimeMode = true;
@@ -1139,7 +1139,7 @@ sap.ui.define([
 
 			this.oGetUShellServiceStub.withArgs("URLParsing").returns(oMockedURLParser);
 
-			URLHandler.update({model: this.oModel, parameters: aNewParamValues, updateURL: true, silent: true});
+			URLHandler.update({ model: this.oModel, parameters: aNewParamValues, updateURL: true, silent: true });
 
 			assert.ok(hasher.replaceHash.calledWith(sConstructedHashValue), "then hasher.replaceHash is called with the correct hash");
 			assert.ok(Log.warning.calledWith(
@@ -1188,7 +1188,7 @@ sap.ui.define([
 
 			this.oGetUShellServiceStub.withArgs("URLParsing").returns(oMockedURLParser);
 
-			URLHandler.update({model: this.oModel, parameters: aNewParamValues, updateURL: true, silent: true});
+			URLHandler.update({ model: this.oModel, parameters: aNewParamValues, updateURL: true, silent: true });
 
 			assert.ok(hasher.replaceHash.calledWith(sConstructedHashValue), "then hasher.replaceHash is called with the correct hash");
 			assert.deepEqual(
@@ -1250,7 +1250,7 @@ sap.ui.define([
 			};
 			oExpectedResult.params[URLHandler.variantTechnicalParameterName] = aNewParamValues;
 
-			URLHandler.update({model: this.oModel, parameters: aNewParamValues, updateURL: true});
+			URLHandler.update({ model: this.oModel, parameters: aNewParamValues, updateURL: true });
 
 			assert.deepEqual(
 				this.oModel.oAppComponent.getComponentData().technicalParameters[URLHandler.variantTechnicalParameterName],
@@ -1277,7 +1277,7 @@ sap.ui.define([
 			this.oGetUShellServiceStub.withArgs("URLParsing").returns(oMockedURLParser);
 
 			var oUpdateStub = sandbox.stub(URLHandler, "update");
-			URLHandler.clearAllVariantURLParameters({model: this.oModel});
+			URLHandler.clearAllVariantURLParameters({ model: this.oModel });
 			assert.strictEqual(oUpdateStub.callCount, 0, "the update function was not called");
 		});
 	});

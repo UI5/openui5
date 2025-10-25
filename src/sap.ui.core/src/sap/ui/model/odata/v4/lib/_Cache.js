@@ -3790,7 +3790,9 @@ sap.ui.define([
 	 */
 	_CollectionCache.prototype.requestSeparateProperties = async function (iStart, iEnd,
 			oMainPromise, fnSeparateReceived) {
-		if (!this.aSeparateProperties.length) {
+		const oExpand = this.mQueryOptions.$expand || {};
+		const aProperties = this.aSeparateProperties.filter((sProperty) => sProperty in oExpand);
+		if (!aProperties.length) {
 			return;
 		}
 
@@ -3800,7 +3802,7 @@ sap.ui.define([
 		// This function resolves at no defined point in time as it is not (yet) relevant for the
 		// function caller. This may changes in the future. The completion of each separate property
 		// can be observed with the below oReadRange.promise
-		this.aSeparateProperties.forEach(async (sProperty) => {
+		aProperties.forEach(async (sProperty) => {
 			let fnResolve;
 			let fnReject;
 			const oReadRange = {

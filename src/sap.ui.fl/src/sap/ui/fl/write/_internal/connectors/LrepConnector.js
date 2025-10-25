@@ -95,7 +95,7 @@ sap.ui.define([
 		} else {
 			sRoute = ROUTES.CHANGES;
 		}
-		var mParameters = mPropertyBag.transport ? {changelist: mPropertyBag.transport} : {};
+		var mParameters = mPropertyBag.transport ? { changelist: mPropertyBag.transport } : {};
 		if (mPropertyBag.skipIam) {
 			mParameters.skipIam = mPropertyBag.skipIam;
 		}
@@ -140,7 +140,7 @@ sap.ui.define([
 	var _selectTransportForAppVariant = function(mPropertyBag) {
 		var oTransportSelectionPromise;
 		if (mPropertyBag.transport) {
-			oTransportSelectionPromise = Promise.resolve({transport: mPropertyBag.transport});
+			oTransportSelectionPromise = Promise.resolve({ transport: mPropertyBag.transport });
 		} else if (mPropertyBag.isForSmartBusiness) {
 			return Promise.resolve();
 		} else {
@@ -327,7 +327,7 @@ sap.ui.define([
 			InitialConnector._addClientInfo(mParameters);
 
 			var sDataUrl = InitialUtils.getUrl(ROUTES.FLEX_INFO, mPropertyBag, mParameters);
-			return InitialUtils.sendRequest(sDataUrl, "GET", {initialConnector: InitialConnector}).then(function(oResult) {
+			return InitialUtils.sendRequest(sDataUrl, "GET", { initialConnector: InitialConnector }).then(function(oResult) {
 				return oResult.response;
 			});
 		},
@@ -348,7 +348,7 @@ sap.ui.define([
 			InitialConnector._addClientInfo(mParameters);
 
 			var sContextsUrl = InitialUtils.getUrl(ROUTES.CONTEXTS, mPropertyBag, mParameters);
-			return InitialUtils.sendRequest(sContextsUrl, "GET", {initialConnector: InitialConnector}).then(function(oResult) {
+			return InitialUtils.sendRequest(sContextsUrl, "GET", { initialConnector: InitialConnector }).then(function(oResult) {
 				return oResult.response;
 			});
 		},
@@ -378,7 +378,7 @@ sap.ui.define([
 			const mParameters = {};
 			InitialConnector._addClientInfo(mParameters);
 			const sUrl = InitialUtils.getUrl(ROUTES.SEEN_FEATURES, mPropertyBag, mParameters);
-			const oResult = await InitialUtils.sendRequest(sUrl, "GET", {initialConnector: InitialConnector});
+			const oResult = await InitialUtils.sendRequest(sUrl, "GET", { initialConnector: InitialConnector });
 			// The ABAP backend returns an empty string if no seen feature ids are available instead of { seenFeatureIds: [] }
 			return oResult.response?.seenFeatureIds || [];
 		},
@@ -552,7 +552,7 @@ sap.ui.define([
 		appVariant: {
 			getManifirstSupport(mPropertyBag) {
 				var sManifirstUrl = `${ROUTES.MANI_FIRST_SUPPORTED}/?id=${mPropertyBag.appId}`;
-				return InitialUtils.sendRequest(sManifirstUrl, "GET", {initialConnector: InitialConnector}).then(function(oResponse) {
+				return InitialUtils.sendRequest(sManifirstUrl, "GET", { initialConnector: InitialConnector }).then(function(oResponse) {
 					return oResponse.response;
 				});
 			},
@@ -691,7 +691,7 @@ sap.ui.define([
 				InitialConnector._addClientInfo(mParameters);
 				mPropertyBag.reference = mPropertyBag.appId + ADAPTATIONS_SEGMENTATION;
 				var sDataUrl = InitialUtils.getUrl(ROUTES.CONTEXT_BASED_ADAPTATION, mPropertyBag, mParameters);
-				return InitialUtils.sendRequest(sDataUrl, "GET", {initialConnector: InitialConnector}).then(function(oResult) {
+				return InitialUtils.sendRequest(sDataUrl, "GET", { initialConnector: InitialConnector }).then(function(oResult) {
 					return oResult.response;
 				});
 			},
@@ -747,11 +747,11 @@ sap.ui.define([
 				var oRequestOption = WriteUtils.getRequestOptions(
 					InitialConnector,
 					InitialUtils.getUrl(ROUTES.TOKEN, mPropertyBag),
-					{title: mPropertyBag.title},
+					{ title: mPropertyBag.title },
 					"application/json; charset=utf-8",
 					"json"
 				);
-				var mParameters = {version: mPropertyBag.version};
+				var mParameters = { version: mPropertyBag.version };
 				InitialUtils.addSAPLogonLanguageInfo(mParameters);
 				var sVersionsUrl = InitialUtils.getUrl(ROUTES.VERSIONS.ACTIVATE, mPropertyBag, mParameters);
 				return WriteUtils.sendRequest(sVersionsUrl, "POST", oRequestOption).then(function(oResult) {
@@ -808,7 +808,7 @@ sap.ui.define([
 							url: Utils.getLrepUrl(),
 							reference: mPropertyBag.reference
 						}, mParameters);
-						var sTokenUrl = InitialUtils.getUrl(ROUTES.TOKEN, {url: Utils.getLrepUrl()});
+						var sTokenUrl = InitialUtils.getUrl(ROUTES.TOKEN, { url: Utils.getLrepUrl() });
 
 						var oRequestOption = WriteUtils.getRequestOptions(
 							InitialConnector,

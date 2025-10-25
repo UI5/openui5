@@ -304,7 +304,7 @@ sap.ui.define([
 			this.oPlugin.getActionName = function() {
 				return "dummyAction";
 			};
-			var oResponsibleElementOverlay = {type: "responsibleElementOverlay"};
+			var oResponsibleElementOverlay = { type: "responsibleElementOverlay" };
 			sandbox.stub(OverlayRegistry, "getOverlay").withArgs(oResponsibleElement).returns(oResponsibleElementOverlay);
 
 			this.fnGetResponsibleElement = function(oElement) {
@@ -318,7 +318,7 @@ sap.ui.define([
 		QUnit.test("when getResponsibleElementOverlay() is called for an element overlay, with a responsible element and action derived from the passed parameter", function(assert) {
 			assert.expect(2);
 			var oResponsibleElement = new Button("responsibleElement");
-			var oResponsibleElementOverlay = {type: "responsibleElementOverlay"};
+			var oResponsibleElementOverlay = { type: "responsibleElementOverlay" };
 			sandbox.stub(OverlayRegistry, "getOverlay").withArgs(oResponsibleElement).returns(oResponsibleElementOverlay);
 
 			this.fnGetResponsibleElement = function(oElement) {
@@ -332,7 +332,7 @@ sap.ui.define([
 
 		QUnit.test("when getResponsibleElementOverlay() is called for an element overlay, with no designTimeMetadata", function(assert) {
 			var oResponsibleElement = "responsibleElement";
-			var oResponsibleElementOverlay = {type: "responsibleElementOverlay"};
+			var oResponsibleElementOverlay = { type: "responsibleElementOverlay" };
 			sandbox.stub(OverlayRegistry, "getOverlay").withArgs(oResponsibleElement).returns(oResponsibleElementOverlay);
 			assert.deepEqual(this.oPlugin.getResponsibleElementOverlay(this.oOverlay, "dummyAction"), this.oOverlay, "then the source overlay is returned");
 		});
@@ -414,7 +414,7 @@ sap.ui.define([
 				return sName;
 			};
 
-			const mMenuItem = (await this.oPlugin._getMenuItems([this.oOverlay], {pluginId: "dummyPluginId", rank: 10}))[0];
+			const mMenuItem = (await this.oPlugin._getMenuItems([this.oOverlay], { pluginId: "dummyPluginId", rank: 10 }))[0];
 
 			assert.equal(mMenuItem.id, "dummyPluginId", "the method returns the right ID for the menu item");
 			assert.equal(mMenuItem.text, "dummyActionName", "the method returns the right text when it is defined in DT Metadata");
@@ -429,7 +429,7 @@ sap.ui.define([
 			};
 
 			assert.equal(
-				(await this.oPlugin._getMenuItems([this.oOverlay], {pluginId: "CTX_RENAME"}))[0].text,
+				(await this.oPlugin._getMenuItems([this.oOverlay], { pluginId: "CTX_RENAME" }))[0].text,
 				Lib.getResourceBundleFor("sap.ui.rta").getText("CTX_RENAME"),
 				"then default text is returned in the menu item"
 			);
@@ -445,7 +445,7 @@ sap.ui.define([
 			};
 
 			assert.equal(
-				(await this.oPlugin._getMenuItems([this.oOverlay], {pluginId: "CTX_DUMMY_ID"}))[0].text,
+				(await this.oPlugin._getMenuItems([this.oOverlay], { pluginId: "CTX_DUMMY_ID" }))[0].text,
 				"dummyElementname",
 				"then correct text is returned in the menu item"
 			);
@@ -459,7 +459,7 @@ sap.ui.define([
 				return false;
 			};
 			assert.equal(
-				(await this.oPlugin._getMenuItems([this.oOverlay], {pluginId: "CTX_DUMMY_ID"})).length,
+				(await this.oPlugin._getMenuItems([this.oOverlay], { pluginId: "CTX_DUMMY_ID" })).length,
 				0,
 				"then no menu items are returned"
 			);
@@ -499,7 +499,7 @@ sap.ui.define([
 			.withArgs([this.oOverlay]).returns(true)
 			.withArgs([oResponsibleElementOverlay]).returns(true);
 
-			const aMenuItems = await this.oPlugin._getMenuItems([this.oOverlay], {pluginId: "CTX_RENAME"});
+			const aMenuItems = await this.oPlugin._getMenuItems([this.oOverlay], { pluginId: "CTX_RENAME" });
 			assert.equal(
 				aMenuItems[0].text,
 				Lib.getResourceBundleFor("sap.ui.rta").getText("CTX_RENAME"),
@@ -539,7 +539,7 @@ sap.ui.define([
 			.withArgs([oResponsibleElementOverlay]).returns(true)
 			.withArgs([this.oOverlay]).returns(false);
 
-			var aMenuItems = await this.oPlugin._getMenuItems([this.oOverlay], {pluginId: "CTX_RENAME"});
+			var aMenuItems = await this.oPlugin._getMenuItems([this.oOverlay], { pluginId: "CTX_RENAME" });
 			assert.strictEqual(aMenuItems.length, 0, "then the action is not available");
 		});
 
@@ -556,7 +556,7 @@ sap.ui.define([
 				return Promise.resolve();
 			});
 
-			const aMenuItems = (await this.oPlugin._getMenuItems([this.oOverlay], {pluginId: "dummyPluginId", rank: 10}));
+			const aMenuItems = (await this.oPlugin._getMenuItems([this.oOverlay], { pluginId: "dummyPluginId", rank: 10 }));
 			assert.strictEqual(oEvaluateEditableStub.callCount, 1, "then the evaluateEditable check is executed");
 			assert.strictEqual(aMenuItems.length, 1, "then the action is available");
 		});
@@ -576,7 +576,7 @@ sap.ui.define([
 				return "dummyAdditionalInformation";
 			};
 
-			const mMenuItem = (await this.oPlugin._getMenuItems([this.oOverlay], {pluginId: "dummyPluginId", rank: 10}))[0];
+			const mMenuItem = (await this.oPlugin._getMenuItems([this.oOverlay], { pluginId: "dummyPluginId", rank: 10 }))[0];
 
 			assert.strictEqual(
 				mMenuItem.additionalInfo,
@@ -600,7 +600,7 @@ sap.ui.define([
 				return undefined;
 			};
 
-			const mMenuItem = (await this.oPlugin._getMenuItems([this.oOverlay], {pluginId: "dummyPluginId", rank: 10}))[0];
+			const mMenuItem = (await this.oPlugin._getMenuItems([this.oOverlay], { pluginId: "dummyPluginId", rank: 10 }))[0];
 
 			assert.strictEqual(
 				mMenuItem.additionalInfo,
@@ -623,7 +623,7 @@ sap.ui.define([
 			});
 			const mMenuItem = (await this.oPlugin._getMenuItems(
 				[this.oOverlay],
-				{pluginId: "dummyPluginId", rank: 10, additionalInfoKey: "ADDITIONAL_INFORMATION_KEY"}
+				{ pluginId: "dummyPluginId", rank: 10, additionalInfoKey: "ADDITIONAL_INFORMATION_KEY" }
 			))[0];
 			assert.strictEqual(
 				mMenuItem.additionalInfo,
@@ -646,7 +646,7 @@ sap.ui.define([
 			});
 			const mMenuItem = (await this.oPlugin._getMenuItems(
 				[this.oOverlay],
-				{pluginId: "dummyPluginId", rank: 10, additionalInfoKey: "ADDITIONAL_INFORMATION_KEY"}
+				{ pluginId: "dummyPluginId", rank: 10, additionalInfoKey: "ADDITIONAL_INFORMATION_KEY" }
 			))[0];
 			assert.strictEqual(
 				mMenuItem.additionalInfo,
@@ -676,7 +676,7 @@ sap.ui.define([
 			});
 			const mMenuItem = (await this.oPlugin._getMenuItems(
 				[this.oOverlay],
-				{pluginId: "dummyPluginId", rank: 10, additionalInfoKey: "ADDITIONAL_INFORMATION_KEY_FROM_PLUGIN"}
+				{ pluginId: "dummyPluginId", rank: 10, additionalInfoKey: "ADDITIONAL_INFORMATION_KEY_FROM_PLUGIN" }
 			))[0];
 			assert.strictEqual(
 				mMenuItem.additionalInfo,

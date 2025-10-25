@@ -28,7 +28,7 @@ sap.ui.define([
 		QUnit.test("Update in the Save scenario", function(assert) {
 			var oUpdateCommand;
 			var sVariantId = "variantId";
-			var oContent = {foo: "bar"};
+			var oContent = { foo: "bar" };
 
 			var oUpdateControlStub = sandbox.stub();
 			this.oControl.updateVariant = oUpdateControlStub;

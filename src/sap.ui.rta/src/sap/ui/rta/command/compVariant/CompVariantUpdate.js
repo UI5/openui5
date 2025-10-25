@@ -91,7 +91,7 @@ sap.ui.define([
 			each(this.getNewVariantProperties(), (sVariantId, oValue) => {
 				if (oValue.deleted) {
 					callFlAPIFunction.call(this, "removeVariant", sVariantId, {});
-					this.getElement().removeVariant({variantId: sVariantId});
+					this.getElement().removeVariant({ variantId: sVariantId });
 					// Redo of delete command without direct UI interaction in VM dialog can keep deleted variant in the control.
 					// In this case we need to reactivate the *standard* variant
 					if (this.getElement().getCurrentVariantId() === sVariantId) {
@@ -103,7 +103,7 @@ sap.ui.define([
 				}
 			});
 			if (this.getNewDefaultVariantId()) {
-				callFlAPIFunction.call(this, "setDefaultVariantId", undefined, {defaultVariantId: this.getNewDefaultVariantId()});
+				callFlAPIFunction.call(this, "setDefaultVariantId", undefined, { defaultVariantId: this.getNewDefaultVariantId() });
 				this.getElement().setDefaultVariantId(this.getNewDefaultVariantId());
 			}
 		}

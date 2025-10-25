@@ -77,8 +77,8 @@ sap.ui.define([
 	//  	contentLeft
 	//      	[oVisibleLeftButton, oInvisibleLeftButton]
 	async function givenBarWithButtons() {
-		this.oVisibleLeftButton = new Button({id: "VisibleLeftButton", visible: true, text: "VisibleLeft"});
-		this.oInvisibleLeftButton = new Button({id: "InvisibleLeftButton", visible: false, text: "InvisibleLeft"});
+		this.oVisibleLeftButton = new Button({ id: "VisibleLeftButton", visible: true, text: "VisibleLeft" });
+		this.oInvisibleLeftButton = new Button({ id: "InvisibleLeftButton", visible: false, text: "InvisibleLeft" });
 		this.oBar = new Bar({
 			id: "bar",
 			contentLeft: [this.oVisibleLeftButton, this.oInvisibleLeftButton]

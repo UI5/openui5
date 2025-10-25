@@ -53,7 +53,7 @@ sap.ui.define([
 		oOverlay
 		.getDesignTimeMetadata()
 		.getToolHooks()
-		.stop(oOverlay.getElement(), {versionWasActivated: this.getVersionWasActivated()});
+		.stop(oOverlay.getElement(), { versionWasActivated: this.getVersionWasActivated() });
 	};
 
 	return ToolHooks;

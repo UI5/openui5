@@ -267,29 +267,29 @@ sap.ui.define([
 					}
 				}
 			};
-			var oChange = new UIChange({selector: JsControlTreeModifier.getSelector(mSpecificChangeInfo.content.target.id, oComponent)});
+			var oChange = new UIChange({ selector: JsControlTreeModifier.getSelector(mSpecificChangeInfo.content.target.id, oComponent) });
 
 			return MoveControlsHandler.completeChangeContent(
 				oChange,
 				mSpecificChangeInfo,
-				{modifier: JsControlTreeModifier, appComponent: oComponent}
+				{ modifier: JsControlTreeModifier, appComponent: oComponent }
 			)
 			.then(function() {
 				assert.deepEqual(oChange.getSelector(), this.mSelectorWithLocalId, "the change SELECTOR is filled correctly");
 				assert.deepEqual(oChange.getContent(), this.mSingleMoveChangeContentWithLocalId, "the change CONTENT is filled correctly");
 
 				assert.strictEqual(
-					oChange.getDependentControl("source", {modifier: JsControlTreeModifier, appComponent: oComponent}).getId(),
+					oChange.getDependentControl("source", { modifier: JsControlTreeModifier, appComponent: oComponent }).getId(),
 					this.oObjectHeader.getId(),
 					"source is part of dependent selector"
 				);
 				assert.strictEqual(
-					oChange.getDependentControl("target", {modifier: JsControlTreeModifier, appComponent: oComponent}).getId(),
+					oChange.getDependentControl("target", { modifier: JsControlTreeModifier, appComponent: oComponent }).getId(),
 					this.oLayout.getId(),
 					"target is part of dependent selector"
 				);
 				assert.strictEqual(
-					oChange.getDependentControl("movedElements", {modifier: JsControlTreeModifier, appComponent: oComponent})[0].getId(),
+					oChange.getDependentControl("movedElements", { modifier: JsControlTreeModifier, appComponent: oComponent })[0].getId(),
 					this.oObjectAttribute.getId(),
 					"movedElements array is part of dependent selector"
 				);
@@ -302,7 +302,7 @@ sap.ui.define([
 				content: this.mSingleMoveChangeContentWithLocalId
 			});
 
-			return MoveControlsHandler.applyChange(oChange, this.oObjectHeader, {modifier: JsControlTreeModifier, appComponent: oComponent})
+			return MoveControlsHandler.applyChange(oChange, this.oObjectHeader, { modifier: JsControlTreeModifier, appComponent: oComponent })
 			.then(function() {
 				assert.strictEqual(this.oObjectHeader.getAttributes().length, 1, "object attribute is removed from the header");
 				assert.strictEqual(
@@ -328,7 +328,7 @@ sap.ui.define([
 				return MoveControlsHandler.revertChange(
 					oChange,
 					this.oObjectHeader,
-					{modifier: JsControlTreeModifier, appComponent: oComponent}
+					{ modifier: JsControlTreeModifier, appComponent: oComponent }
 				);
 			}.bind(this))
 			.then(function() {
@@ -343,12 +343,12 @@ sap.ui.define([
 			});
 
 			// the second .applyChange call overwrites the revert data and simulates the change already being done on the UI
-			return MoveControlsHandler.applyChange(oChange, this.oObjectHeader, {modifier: JsControlTreeModifier, appComponent: oComponent})
+			return MoveControlsHandler.applyChange(oChange, this.oObjectHeader, { modifier: JsControlTreeModifier, appComponent: oComponent })
 			.then(MoveControlsHandler.applyChange.bind(
 				MoveControlsHandler,
 				oChange,
 				this.oObjectHeader,
-				{modifier: JsControlTreeModifier, appComponent: oComponent}
+				{ modifier: JsControlTreeModifier, appComponent: oComponent }
 			))
 			.then(function() {
 				assert.strictEqual(this.oObjectHeader.getAttributes().length, 1, "object attribute is removed from the header");
@@ -372,7 +372,7 @@ sap.ui.define([
 				return MoveControlsHandler.revertChange(
 					oChange,
 					this.oObjectHeader,
-					{modifier: JsControlTreeModifier, appComponent: oComponent}
+					{ modifier: JsControlTreeModifier, appComponent: oComponent }
 				);
 			}.bind(this))
 			.then(assertInitialState.bind(this, assert));
@@ -384,7 +384,7 @@ sap.ui.define([
 				content: this.mSingleMoveChangeContentWithGlobalId
 			});
 
-			return MoveControlsHandler.applyChange(oChange, this.oObjectHeader, {modifier: JsControlTreeModifier})
+			return MoveControlsHandler.applyChange(oChange, this.oObjectHeader, { modifier: JsControlTreeModifier })
 			.then(function() {
 				assert.strictEqual(this.oObjectHeader.getAttributes().length, 1, "object attribute is removed from the header");
 				assert.strictEqual(
@@ -407,7 +407,7 @@ sap.ui.define([
 					this.oObjectAttribute.getId(),
 					"object attribute is inserted at the 3. position"
 				);
-				return MoveControlsHandler.revertChange(oChange, this.oObjectHeader, {modifier: JsControlTreeModifier});
+				return MoveControlsHandler.revertChange(oChange, this.oObjectHeader, { modifier: JsControlTreeModifier });
 			}.bind(this))
 			.then(assertInitialState.bind(this, assert));
 		});
@@ -418,7 +418,7 @@ sap.ui.define([
 				content: this.mSingleMoveChangeContentWithLocalIdWA
 			});
 
-			return MoveControlsHandler.applyChange(oChange, this.oObjectHeader, {modifier: JsControlTreeModifier, appComponent: oComponent})
+			return MoveControlsHandler.applyChange(oChange, this.oObjectHeader, { modifier: JsControlTreeModifier, appComponent: oComponent })
 			.then(function() {
 				assert.strictEqual(this.oObjectHeader.getAttributes().length, 1, "object attribute is removed from the header");
 				assert.strictEqual(
@@ -444,7 +444,7 @@ sap.ui.define([
 				return MoveControlsHandler.revertChange(
 					oChange,
 					this.oObjectHeader,
-					{modifier: JsControlTreeModifier, appComponent: oComponent}
+					{ modifier: JsControlTreeModifier, appComponent: oComponent }
 				);
 			}.bind(this))
 			.then(assertInitialState.bind(this, assert));
@@ -456,7 +456,7 @@ sap.ui.define([
 				content: this.mMultiMoveChangeContentWithLocalId
 			});
 
-			return MoveControlsHandler.applyChange(oChange, this.oObjectHeader, {modifier: JsControlTreeModifier, appComponent: oComponent})
+			return MoveControlsHandler.applyChange(oChange, this.oObjectHeader, { modifier: JsControlTreeModifier, appComponent: oComponent })
 			.then(function() {
 				assert.strictEqual(this.oObjectHeader.getAttributes().length, 0, "both object attributes removed from the header");
 				assert.strictEqual(
@@ -482,7 +482,7 @@ sap.ui.define([
 				return MoveControlsHandler.revertChange(
 					oChange,
 					this.oObjectHeader,
-					{modifier: JsControlTreeModifier, appComponent: oComponent}
+					{ modifier: JsControlTreeModifier, appComponent: oComponent }
 				);
 			}.bind(this))
 			.then(assertInitialState.bind(this, assert));
@@ -494,7 +494,7 @@ sap.ui.define([
 				content: this.mMultiMoveChangeContentWithGlobalId
 			});
 
-			return MoveControlsHandler.applyChange(oChange, this.oObjectHeader, {modifier: JsControlTreeModifier})
+			return MoveControlsHandler.applyChange(oChange, this.oObjectHeader, { modifier: JsControlTreeModifier })
 			.then(function() {
 				assert.strictEqual(this.oObjectHeader.getAttributes().length, 0, "both object attributes removed from the header");
 				assert.strictEqual(
@@ -517,7 +517,7 @@ sap.ui.define([
 					this.oObjectAttribute2.getId(),
 					"object attribute 2 is inserted at the 4. position"
 				);
-				return MoveControlsHandler.revertChange(oChange, this.oObjectHeader, {modifier: JsControlTreeModifier});
+				return MoveControlsHandler.revertChange(oChange, this.oObjectHeader, { modifier: JsControlTreeModifier });
 			}.bind(this))
 			.then(assertInitialState.bind(this, assert));
 		});
@@ -633,7 +633,7 @@ sap.ui.define([
 				}
 			});
 
-			return MoveControlsHandler.applyChange(oChange, this.oObjectHeader, {modifier: JsControlTreeModifier})
+			return MoveControlsHandler.applyChange(oChange, this.oObjectHeader, { modifier: JsControlTreeModifier })
 			.catch(function(oError) {
 				assert.strictEqual(oError.message, "No source supplied for move", "missing source error captured");
 				oChange = new UIChange({
@@ -655,7 +655,7 @@ sap.ui.define([
 						}
 					}
 				});
-				return MoveControlsHandler.applyChange(oChange, this.oObjectHeader, {modifier: JsControlTreeModifier});
+				return MoveControlsHandler.applyChange(oChange, this.oObjectHeader, { modifier: JsControlTreeModifier });
 			}.bind(this))
 			.catch(function(oError) {
 				assert.strictEqual(oError.message, "No target supplied for move", "missing target error captured");
@@ -683,7 +683,7 @@ sap.ui.define([
 						}
 					}
 				});
-				return MoveControlsHandler.applyChange(oChange, this.oObjectHeader, {modifier: JsControlTreeModifier});
+				return MoveControlsHandler.applyChange(oChange, this.oObjectHeader, { modifier: JsControlTreeModifier });
 			}.bind(this))
 			.catch(function(oError) {
 				assert.strictEqual(oError.message, "Move source parent not found", "unknown source error captured");
@@ -711,7 +711,7 @@ sap.ui.define([
 						}
 					}
 				});
-				return MoveControlsHandler.applyChange(oChange, this.oObjectHeader, {modifier: JsControlTreeModifier});
+				return MoveControlsHandler.applyChange(oChange, this.oObjectHeader, { modifier: JsControlTreeModifier });
 			}.bind(this))
 			.catch(function(oError) {
 				assert.strictEqual(oError.message, "Move target parent not found", "unknown target error captured");
@@ -738,7 +738,7 @@ sap.ui.define([
 						}
 					}
 				});
-				return MoveControlsHandler.applyChange(oChange, this.oObjectHeader, {modifier: JsControlTreeModifier});
+				return MoveControlsHandler.applyChange(oChange, this.oObjectHeader, { modifier: JsControlTreeModifier });
 			}.bind(this))
 			.catch(function(oError) {
 				assert.strictEqual(oError.message, "No source aggregation supplied for move", "missing source aggregation error captured");
@@ -766,7 +766,7 @@ sap.ui.define([
 						}
 					}
 				});
-				return MoveControlsHandler.applyChange(oChange, this.oObjectHeader, {modifier: JsControlTreeModifier});
+				return MoveControlsHandler.applyChange(oChange, this.oObjectHeader, { modifier: JsControlTreeModifier });
 			}.bind(this))
 			.catch(function(oError) {
 				assert.strictEqual(oError.message, "No target aggregation supplied for move", "missing target aggregation error captured");
@@ -781,7 +781,7 @@ sap.ui.define([
 						}
 					}
 				});
-				return MoveControlsHandler.applyChange(oChange, this.oObjectHeader, {modifier: JsControlTreeModifier});
+				return MoveControlsHandler.applyChange(oChange, this.oObjectHeader, { modifier: JsControlTreeModifier });
 			}.bind(this))
 			.catch(function(oError) {
 				assert.strictEqual(oError.message, "Change format invalid", "missing moved elements error captured");
@@ -808,7 +808,7 @@ sap.ui.define([
 						}
 					}
 				});
-				return MoveControlsHandler.applyChange(oChange, this.oObjectHeader, {modifier: JsControlTreeModifier});
+				return MoveControlsHandler.applyChange(oChange, this.oObjectHeader, { modifier: JsControlTreeModifier });
 			}.bind(this))
 			.catch(function(oError) {
 				var sError = `Missing targetIndex for element with id '${this.oObjectAttribute.getId()
@@ -838,7 +838,7 @@ sap.ui.define([
 						}
 					}
 				});
-				return MoveControlsHandler.applyChange(oChange, this.oObjectHeader, {modifier: JsControlTreeModifier});
+				return MoveControlsHandler.applyChange(oChange, this.oObjectHeader, { modifier: JsControlTreeModifier });
 			}.bind(this))
 			.catch(function(oError) {
 				var sError = `Control to move was not found. Id: '${this.oObjectAttribute.getId()}foo` + "'";
@@ -969,7 +969,7 @@ sap.ui.define([
 			return MoveControlsHandler.applyChange(
 				oChange,
 				this.oGlobalObjectHeader,
-				{modifier: XmlTreeModifier, appComponent: this.oRootControl, view: this.oXmlView}
+				{ modifier: XmlTreeModifier, appComponent: this.oRootControl, view: this.oXmlView }
 			)
 			.then(function() {
 				assert.strictEqual(this.oXmlObjectHeader.childNodes.length, 1, "object attribute is removed from the header");
@@ -996,7 +996,7 @@ sap.ui.define([
 				return MoveControlsHandler.revertChange(
 					oChange,
 					this.oGlobalObjectHeader,
-					{modifier: XmlTreeModifier, appComponent: this.oRootControl, view: this.oXmlView}
+					{ modifier: XmlTreeModifier, appComponent: this.oRootControl, view: this.oXmlView }
 				);
 			}.bind(this))
 			.then(assertOriginalStateXML.bind(this, assert));
@@ -1008,7 +1008,7 @@ sap.ui.define([
 				content: this.mSingleMoveChangeContentWithGlobalId
 			});
 
-			return MoveControlsHandler.applyChange(oChange, this.oXmlObjectHeader, {modifier: XmlTreeModifier, view: this.oXmlView})
+			return MoveControlsHandler.applyChange(oChange, this.oXmlObjectHeader, { modifier: XmlTreeModifier, view: this.oXmlView })
 			.then(function() {
 				assert.strictEqual(
 					this.oXmlObjectHeader.childNodes.length,
@@ -1038,7 +1038,7 @@ sap.ui.define([
 				return MoveControlsHandler.revertChange(
 					oChange,
 					this.oGlobalObjectHeader,
-					{modifier: XmlTreeModifier, view: this.oXmlView}
+					{ modifier: XmlTreeModifier, view: this.oXmlView }
 				);
 			}.bind(this))
 			.then(assertOriginalStateXML.bind(this, assert));
@@ -1053,7 +1053,7 @@ sap.ui.define([
 			return MoveControlsHandler.applyChange(
 				oChange,
 				this.oXmlObjectHeader,
-				{modifier: XmlTreeModifier, appComponent: this.oRootControl, view: this.oXmlView}
+				{ modifier: XmlTreeModifier, appComponent: this.oRootControl, view: this.oXmlView }
 			)
 			.then(function() {
 				assert.strictEqual(this.oXmlObjectHeader.childNodes.length, 0, "both object attributes removed from the header");
@@ -1080,7 +1080,7 @@ sap.ui.define([
 				return MoveControlsHandler.revertChange(
 					oChange,
 					this.oGlobalObjectHeader,
-					{modifier: XmlTreeModifier, appComponent: this.oRootControl, view: this.oXmlView}
+					{ modifier: XmlTreeModifier, appComponent: this.oRootControl, view: this.oXmlView }
 				);
 			}.bind(this))
 			.then(assertOriginalStateXML.bind(this, assert));
@@ -1092,7 +1092,7 @@ sap.ui.define([
 				content: this.mMultiMoveChangeContentWithGlobalId
 			});
 
-			return MoveControlsHandler.applyChange(oChange, this.oXmlObjectHeader, {modifier: XmlTreeModifier, view: this.oXmlView})
+			return MoveControlsHandler.applyChange(oChange, this.oXmlObjectHeader, { modifier: XmlTreeModifier, view: this.oXmlView })
 			.then(function() {
 				assert.strictEqual(this.oXmlObjectHeader.childNodes.length, 0, "both object attributes removed from the header");
 				assert.strictEqual(
@@ -1118,7 +1118,7 @@ sap.ui.define([
 				return MoveControlsHandler.revertChange(
 					oChange,
 					this.oGlobalObjectHeader,
-					{modifier: XmlTreeModifier, view: this.oXmlView}
+					{ modifier: XmlTreeModifier, view: this.oXmlView }
 				);
 			}.bind(this))
 			.then(assertOriginalStateXML.bind(this, assert));
@@ -1192,7 +1192,7 @@ sap.ui.define([
 			return MoveControlsHandler.applyChange(
 				oAlreadyPerformedChange,
 				this.oBar,
-				{modifier: JsControlTreeModifier, appComponent: oComponent}
+				{ modifier: JsControlTreeModifier, appComponent: oComponent }
 			)
 			.then(function() {
 				assert.strictEqual(oMoveAggSpy.callCount, 0, "the ChangeHandler did not change the aggregations");
@@ -1237,7 +1237,7 @@ sap.ui.define([
 			return MoveControlsHandler.applyChange(
 				oAlreadyPerformedChange,
 				this.oBar,
-				{modifier: JsControlTreeModifier, appComponent: oComponent}
+				{ modifier: JsControlTreeModifier, appComponent: oComponent }
 			)
 			.then(function() {
 				assert.strictEqual(oMoveAggSpy.callCount, 1, "the ChangeHandler changed the aggregation");

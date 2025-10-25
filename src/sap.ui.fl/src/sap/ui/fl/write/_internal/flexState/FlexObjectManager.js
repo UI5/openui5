@@ -136,7 +136,7 @@ sap.ui.define([
 			}
 		});
 		if (aUpdates.length) {
-			FlexState.getFlexObjectsDataSelector().checkUpdate({reference: sReference});
+			FlexState.getFlexObjectsDataSelector().checkUpdate({ reference: sReference });
 			FlexState.update(sReference, aUpdates);
 		}
 	}
@@ -148,7 +148,7 @@ sap.ui.define([
 
 		// Only consider changes that are persisted, on the same layer, part of the current draft (if applicable)
 		// and have the same reference (relevant for app variants)
-		const aRelevantChanges = FlexState.getFlexObjectsDataSelector().get({reference: sReference})
+		const aRelevantChanges = FlexState.getFlexObjectsDataSelector().get({ reference: sReference })
 		.filter((oChange) => {
 			if (sLayer === Layer.CUSTOMER && aDraftFilenames) {
 				return oChange.getState() === States.LifecycleState.PERSISTED && aDraftFilenames.includes(oChange.getId());
@@ -201,7 +201,7 @@ sap.ui.define([
 		if (aUpdates.length) {
 			FlexState.update(sReference, aUpdates);
 		}
-		FlexState.getFlexObjectsDataSelector().checkUpdate({reference: sReference});
+		FlexState.getFlexObjectsDataSelector().checkUpdate({ reference: sReference });
 		return oCollectedResponse;
 	}
 
@@ -371,7 +371,7 @@ sap.ui.define([
 		// will add all variants, all variant management changes, and all UIChanges of all initial variants
 		if (!mPropertyBag.includeCtrlVariants) {
 			aRelevantFlexObjects = aRelevantFlexObjects.concat(
-				VariantManagementState.getInitialUIChanges({reference: mPropertyBag.reference, includeDirtyChanges: true})
+				VariantManagementState.getInitialUIChanges({ reference: mPropertyBag.reference, includeDirtyChanges: true })
 			);
 		} else if (!mPropertyBag.onlyCurrentVariants) {
 			aRelevantFlexObjects = aRelevantFlexObjects.concat(
@@ -379,7 +379,7 @@ sap.ui.define([
 			);
 		} else {
 			aRelevantFlexObjects = aRelevantFlexObjects.concat(
-				VariantManagementState.getAllCurrentFlexObjects({reference: mPropertyBag.reference})
+				VariantManagementState.getAllCurrentFlexObjects({ reference: mPropertyBag.reference })
 			);
 		}
 

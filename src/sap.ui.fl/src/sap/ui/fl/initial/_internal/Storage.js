@@ -123,7 +123,7 @@ sap.ui.define([
 					layers: oConnectorConfig.layers
 				}, oConnectorConfig, "loadFeatures"));
 			}
-			return oConnectorConfig.loadConnectorModule.loadFeatures({url: oConnectorConfig.url})
+			return oConnectorConfig.loadConnectorModule.loadFeatures({ url: oConnectorConfig.url })
 			.then(function(oFeatures) {
 				return {
 					features: oFeatures,

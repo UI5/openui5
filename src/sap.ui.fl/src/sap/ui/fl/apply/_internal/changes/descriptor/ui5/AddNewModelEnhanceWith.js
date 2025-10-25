@@ -87,7 +87,7 @@ sap.ui.define([
 					const sI18n = oChange.getTexts()?.i18n;
 					const oEnhanceWith = oModel.settings.enhanceWith;
 					if (sI18n) {
-						oEnhanceWith.push({bundleName: ApplyUtil.formatBundleName(sAppId, sI18n)});
+						oEnhanceWith.push({ bundleName: ApplyUtil.formatBundleName(sAppId, sI18n) });
 						return oManifest;
 					}
 					if (hasBundleUrlAndNotBundleName(oChangeContent)) {

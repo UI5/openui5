@@ -190,12 +190,12 @@ sap.ui.define([
 
 			undo(oStack)
 			.then(function() {
-				MessageToast.show("All changes undone", {duration: 1000});
+				MessageToast.show("All changes undone", { duration: 1000 });
 
 				return redo(oStack);
 			})
 			.then(function() {
-				MessageToast.show("All changes redone", {duration: 1000});
+				MessageToast.show("All changes redone", { duration: 1000 });
 			});
 		},
 
@@ -231,7 +231,7 @@ sap.ui.define([
 							this.destroy();
 						}
 					}).then(function() {
-						MessageToast.show("Rta is started with all changes from local storage added to the command stack. Undo might already by enabled.\n To test the visual editor usage of our stack, there is a undoRedoStack() function in console available", {duration: 10000});
+						MessageToast.show("Rta is started with all changes from local storage added to the command stack. Undo might already by enabled.\n To test the visual editor usage of our stack, there is a undoRedoStack() function in console available", { duration: 10000 });
 					});
 				}.bind(this));
 			}.bind(this));

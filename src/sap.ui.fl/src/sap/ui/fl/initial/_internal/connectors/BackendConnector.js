@@ -47,7 +47,7 @@ sap.ui.define([
 			return InitialUtils.sendRequest(sDataUrl, "GET", {
 				initialConnector: this,
 				xsrfToken: this.xsrfToken,
-				cacheable: mPropertyBag.cacheable}
+				cacheable: mPropertyBag.cacheable }
 			).then(function(oResult) {
 				var oResponse = oResult.response;
 				if (oResult.etag) {
@@ -67,10 +67,10 @@ sap.ui.define([
 		 */
 		loadFeatures(mPropertyBag) {
 			if (this.settings) {
-				return Promise.resolve({response: this.settings});
+				return Promise.resolve({ response: this.settings });
 			}
 			var sFeaturesUrl = InitialUtils.getUrl(this.ROUTES.SETTINGS, mPropertyBag);
-			return InitialUtils.sendRequest(sFeaturesUrl, "GET", {initialConnector: this}).then(function(oResult) {
+			return InitialUtils.sendRequest(sFeaturesUrl, "GET", { initialConnector: this }).then(function(oResult) {
 				return oResult.response;
 			});
 		},

@@ -53,7 +53,7 @@ sap.ui.define([
 			events: {
 				processingStatusChange: {
 					parameters: {
-						processing: {type: "boolean"}
+						processing: { type: "boolean" }
 					}
 				}
 			}
@@ -494,7 +494,7 @@ sap.ui.define([
 				return true;
 			}
 		}.bind(this));
-		return { ...oMenuItem, ...(bEnhanceMenuItem && {responsible: aResponsibleElementOverlays}) };
+		return { ...oMenuItem, ...(bEnhanceMenuItem && { responsible: aResponsibleElementOverlays }) };
 	};
 
 	return Plugin;

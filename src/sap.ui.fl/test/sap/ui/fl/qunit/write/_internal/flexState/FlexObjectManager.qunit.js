@@ -418,7 +418,7 @@ sap.ui.define([
 
 		QUnit.test("hasDirtyObjects - Given flex objects and dirty changes are present in the ChangePersistence", function(assert) {
 			const oGetDirtyFlexObjectsStub = sandbox.stub(FlexObjectState, "getDirtyFlexObjects").returns(["mockDirty"]);
-			const bHasDirtyFlexObjects = FlexObjectManager.hasDirtyFlexObjects({selector: this.oAppComponent});
+			const bHasDirtyFlexObjects = FlexObjectManager.hasDirtyFlexObjects({ selector: this.oAppComponent });
 			assert.equal(bHasDirtyFlexObjects, true, "hasDirtyFlexObjects returns true");
 			assert.strictEqual(oGetDirtyFlexObjectsStub.callCount, 1, "getDirtyFlexObjects is called once");
 		});
@@ -437,7 +437,7 @@ sap.ui.define([
 				fileName: "ChangeFileName1",
 				fileType: "change",
 				changeType: "hideControl",
-				selector: {id: "control1"},
+				selector: { id: "control1" },
 				layer: Layer.CUSTOMER
 			};
 
@@ -445,7 +445,7 @@ sap.ui.define([
 				fileName: "ChangeFileName2",
 				fileType: "change",
 				changeType: "hideControl",
-				selector: {id: "control1"},
+				selector: { id: "control1" },
 				layer: Layer.CUSTOMER
 			};
 			this.aChanges = UIChangeManager.addDirtyChanges(sReference, [oChangeContent1, oChangeContent2], this.oAppComponent);
@@ -960,7 +960,7 @@ sap.ui.define([
 
 		QUnit.test("when calling removeDirtyFlexObjects with a generator and a change is in a different layer and localIDs", function(assert) {
 			const sGenerator = "some generator";
-			const oVendorChange1 = createChange("c1", Layer.VENDOR, {id: "abc123", idIsLocal: true}, sGenerator);
+			const oVendorChange1 = createChange("c1", Layer.VENDOR, { id: "abc123", idIsLocal: true }, sGenerator);
 			const oVendorChange2 = createChange("c2", Layer.VENDOR, {}, sGenerator);
 			FlexObjectManager.addDirtyFlexObjects(sReference, [oVendorChange1, oVendorChange2]);
 			FlexObjectManager.removeDirtyFlexObjects({

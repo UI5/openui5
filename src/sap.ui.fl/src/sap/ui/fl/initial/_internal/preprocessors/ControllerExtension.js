@@ -112,7 +112,7 @@ sap.ui.define([
 
 				const FlexState = await requireAsync("sap/ui/fl/apply/_internal/flexState/FlexState");
 				await FlexState.waitForInitialization(sFlexReference);
-				const aFlexObjects = FlexState.getFlexObjectsDataSelector().get({reference: sFlexReference});
+				const aFlexObjects = FlexState.getFlexObjectsDataSelector().get({ reference: sFlexReference });
 				var aExtensionModules = aFlexObjects.filter(function(oChange) {
 					return isCodeExt(oChange) && isForController(sControllerName, oChange);
 				}).map(function(oChange) {

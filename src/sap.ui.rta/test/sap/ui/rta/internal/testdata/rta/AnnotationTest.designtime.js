@@ -11,10 +11,10 @@ sap.ui.define([
 	"use strict";
 
 	const oTextArrangementTypes = {
-		TextOnly: {EnumMember: "com.sap.vocabularies.UI.v1.TextArrangementType/TextOnly"},
-		TextFirst: {EnumMember: "com.sap.vocabularies.UI.v1.TextArrangementType/TextFirst"},
-		IDOnly: {EnumMember: "com.sap.vocabularies.UI.v1.TextArrangementType/IDOnly"},
-		IDFirst: {EnumMember: "com.sap.vocabularies.UI.v1.TextArrangementType/IDFirst"}
+		TextOnly: { EnumMember: "com.sap.vocabularies.UI.v1.TextArrangementType/TextOnly" },
+		TextFirst: { EnumMember: "com.sap.vocabularies.UI.v1.TextArrangementType/TextFirst" },
+		IDOnly: { EnumMember: "com.sap.vocabularies.UI.v1.TextArrangementType/IDOnly" },
+		IDFirst: { EnumMember: "com.sap.vocabularies.UI.v1.TextArrangementType/IDFirst" }
 	};
 
 	const oTextArrangementLabels = {

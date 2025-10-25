@@ -263,8 +263,8 @@ sap.ui.define([
 		beforeEach() {
 			this.oGetConnectorsSpy = sandbox.spy(Utils, "getConnectors");
 			this.oConfigurationStub = sandbox.stub(FlexConfiguration, "getFlexibilityServices").returns([
-				{connector: "KeyUserConnector"},
-				{connector: "PersonalizationConnector", layers: [Layer.USER]}
+				{ connector: "KeyUserConnector" },
+				{ connector: "PersonalizationConnector", layers: [Layer.USER] }
 			]);
 		},
 		afterEach() {
@@ -302,7 +302,7 @@ sap.ui.define([
 		beforeEach() {
 			this.oGetConnectorsSpy = sandbox.spy(Utils, "getConnectors");
 			this.oConfigurationStub = sandbox.stub(FlexConfiguration, "getFlexibilityServices").returns([
-				{connector: "NeoLrepConnector", layers: [Layer.ALL]}
+				{ connector: "NeoLrepConnector", layers: [Layer.ALL] }
 			]);
 		},
 		afterEach() {
@@ -325,7 +325,7 @@ sap.ui.define([
 		beforeEach() {
 			this.oGetConnectorsSpy = sandbox.spy(Utils, "getConnectors");
 			this.oConfigurationStub = sandbox.stub(FlexConfiguration, "getFlexibilityServices").returns([
-				{connector: "BtpServiceConnector"}
+				{ connector: "BtpServiceConnector" }
 			]);
 		},
 		afterEach() {
@@ -357,7 +357,7 @@ sap.ui.define([
 		beforeEach() {
 			this.oGetConnectorsSpy = sandbox.spy(Utils, "getConnectors");
 			this.oConfigurationStub = sandbox.stub(FlexConfiguration, "getFlexibilityServices").returns([
-				{applyConnector: "apply/someConnector", writeConnector: "write/someConnector", layers: [Layer.ALL]}
+				{ applyConnector: "apply/someConnector", writeConnector: "write/someConnector", layers: [Layer.ALL] }
 			]);
 			this.oRequireStub = FlQUnitUtils.stubSapUiRequireDynamically(sandbox, checkModuleName);
 		},
@@ -393,7 +393,7 @@ sap.ui.define([
 		beforeEach() {
 			this.oGetConnectorsSpy = sandbox.spy(Utils, "getConnectors");
 			this.oConfigurationStub = sandbox.stub(FlexConfiguration, "getFlexibilityServices").returns([
-				{loadConnector: "apply/someConnector", writeConnector: "write/someConnector", layers: [Layer.ALL]}
+				{ loadConnector: "apply/someConnector", writeConnector: "write/someConnector", layers: [Layer.ALL] }
 			]);
 			this.oRequireStub = FlQUnitUtils.stubSapUiRequireDynamically(sandbox, checkModuleName);
 		},
@@ -429,7 +429,7 @@ sap.ui.define([
 		beforeEach() {
 			this.oGetConnectorsSpy = sandbox.spy(Utils, "getConnectors");
 			this.oConfigurationStub = sandbox.stub(FlexConfiguration, "getFlexibilityServices").returns([
-				{loadConnector: "apply/someConnector", layers: [Layer.ALL]}
+				{ loadConnector: "apply/someConnector", layers: [Layer.ALL] }
 			]);
 			this.oRequireStub = FlQUnitUtils.stubSapUiRequireDynamically(sandbox, checkModuleName);
 		},

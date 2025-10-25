@@ -108,12 +108,12 @@ sap.ui.define([
 		}
 	}, function() {
 		QUnit.test("when maxLayer is CUSTOMER", function(assert) {
-			sandbox.stub(FlexInfoSession, "getByReference").returns({maxLayer: Layer.CUSTOMER});
+			sandbox.stub(FlexInfoSession, "getByReference").returns({ maxLayer: Layer.CUSTOMER });
 			assert.equal(LayerUtils.isLayerFilteringRequired(), true, "maxLayer is not equal topLayer");
 		});
 
 		QUnit.test("when maxLayer is USER", function(assert) {
-			sandbox.stub(FlexInfoSession, "getByReference").returns({maxLayer: Layer.USER});
+			sandbox.stub(FlexInfoSession, "getByReference").returns({ maxLayer: Layer.USER });
 			assert.equal(LayerUtils.isLayerFilteringRequired(), false, "maxLayer is equal topLayer");
 		});
 	});
@@ -171,10 +171,10 @@ sap.ui.define([
 	QUnit.module("LayerUtils.filterChangeOrChangeDefinitionsByCurrentLayer", {
 		beforeEach() {
 			this.vChanges = [
-				{layer: Layer.USER},
-				{layer: Layer.CUSTOMER},
-				new FlexObject({layer: Layer.USER}),
-				new FlexObject({layer: Layer.CUSTOMER})
+				{ layer: Layer.USER },
+				{ layer: Layer.CUSTOMER },
+				new FlexObject({ layer: Layer.USER }),
+				new FlexObject({ layer: Layer.CUSTOMER })
 			];
 		}
 	}, function() {

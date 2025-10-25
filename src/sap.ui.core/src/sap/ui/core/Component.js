@@ -997,7 +997,7 @@ sap.ui.define([
 		}
 
 		// create all models which are not created, yet.
-		var mCreatedModels = _createManifestModels(mModelConfigurations, this._componentConfig, this.getManifestObject());
+		var mCreatedModels = _createManifestModels(mModelConfigurations, this._componentConfig, this.getManifestObject(), Component.getOwnerIdFor(this));
 		for (sModelName in mCreatedModels) {
 			// keep the model instance to be able to destroy the created models on component destroy
 			this._mManifestModels[sModelName] = mCreatedModels[sModelName];
@@ -1945,7 +1945,7 @@ sap.ui.define([
 	 * @returns {object} key-value map with model name as key and model instance as value
 	 * @private
 	 */
-	function _createManifestModels(mModelConfigurations, oConfig, oManifest) {
+	function _createManifestModels(mModelConfigurations, oConfig, oManifest, sOwnerId) {
 		var mModels = {};
 		for (var sModelName in mModelConfigurations) {
 			var oModelConfig = mModelConfigurations[sModelName];
@@ -1977,10 +1977,10 @@ sap.ui.define([
 					model: oModel,
 					modelId: sModelName
 				};
-				const oOwnerComponent = Component.getComponentById(getCurrentOwnerId());
+				const oOwnerComponent = Component.getComponentById(sOwnerId);
 				if (oOwnerComponent) {
 					oInfo.owner = {
-						id: getCurrentOwnerId(),
+						id: sOwnerId,
 						config: oOwnerComponent._componentConfig
 					};
 				}
@@ -3012,6 +3012,7 @@ sap.ui.define([
 
 			// create "afterPreload" models in parallel to loading the component preload (below)
 			if (mOptions.createModels) {
+				const sOwnerId = getCurrentOwnerId();
 				collect(oManifest.then(async function(oManifest) {
 					var sComponentName = oManifest.getComponentName();
 					// Calculate configurations of preloaded models once the manifest is available
@@ -3032,7 +3033,7 @@ sap.ui.define([
 							activeTerminologies: aActiveTerminologies
 						});
 
-						mModels = _createManifestModels(mAllModelConfigurations, oConfig, oManifest);
+						mModels = _createManifestModels(mAllModelConfigurations, oConfig, oManifest, sOwnerId);
 					}
 
 					return oManifest;

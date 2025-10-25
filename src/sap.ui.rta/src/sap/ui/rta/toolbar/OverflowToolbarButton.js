@@ -36,7 +36,7 @@ sap.ui.define([
 				"sap.m.IOverflowToolbarContent"
 			],
 			properties: {
-				visibleIcon: {type: "string", defaultValue: ""}
+				visibleIcon: { type: "string", defaultValue: "" }
 			}
 		},
 		renderer: ButtonRenderer

@@ -71,7 +71,7 @@ sap.ui.define([
 			var mParameters = _pick(mPropertyBag, aParameters);
 
 			var sContextsUrl = InitialUtils.getUrl(this.ROUTES.CONTEXTS, mPropertyBag, mParameters);
-			return InitialUtils.sendRequest(sContextsUrl, "GET", {initialConnector: InitialConnector}).then(function(oResult) {
+			return InitialUtils.sendRequest(sContextsUrl, "GET", { initialConnector: InitialConnector }).then(function(oResult) {
 				return oResult.response;
 			});
 		},
@@ -130,7 +130,7 @@ sap.ui.define([
 		activate(mPropertyBag) {
 			_enhancePropertyBagWithTokenInfo.call(this, mPropertyBag);
 			_enhancePropertyBagForDraftActivation(mPropertyBag);
-			var mParameters = {version: mPropertyBag.version};
+			var mParameters = { version: mPropertyBag.version };
 			InitialUtils.addLanguageInfo(mParameters);
 			var sVersionsUrl = InitialUtils.getUrl(this.ROUTES.VERSIONS.ACTIVATE, mPropertyBag, mParameters);
 			return WriteUtils.sendRequest(sVersionsUrl, "POST", mPropertyBag).then(function(oResult) {
@@ -158,7 +158,7 @@ sap.ui.define([
 				return "Error";
 			};
 			_enhancePropertyBagWithTokenInfo.call(this, mPropertyBag);
-			var mParameters = {version: mPropertyBag.version};
+			var mParameters = { version: mPropertyBag.version };
 			var sVersionsUrl = InitialUtils.getUrl(this.ROUTES.VERSIONS.PUBLISH, mPropertyBag, mParameters);
 			return WriteUtils.sendRequest(sVersionsUrl, "POST", mPropertyBag).then(function() {
 				BusyIndicator.hide();

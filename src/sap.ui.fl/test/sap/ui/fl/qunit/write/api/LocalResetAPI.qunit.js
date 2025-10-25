@@ -101,7 +101,7 @@ sap.ui.define([
 			return LocalResetAPI.resetChanges(aNestedChanges, this.oComponent)
 			.then(function() {
 				assert.ok(
-					oRemoveStub.calledWith({flexObjects: aNestedChanges.reverse(), selector: this.oComponent}),
+					oRemoveStub.calledWith({ flexObjects: aNestedChanges.reverse(), selector: this.oComponent }),
 					"Then all changes are removed"
 				);
 				assert.strictEqual(oRevertStub.callCount, 2, "Then all changes are reverted");
@@ -122,7 +122,7 @@ sap.ui.define([
 			await LocalResetAPI.resetChanges(aNestedChanges, this.oComponent, true);
 
 			assert.ok(
-				oRemoveStub.calledWith({flexObjects: aNestedChanges.slice().reverse(), selector: this.oComponent}),
+				oRemoveStub.calledWith({ flexObjects: aNestedChanges.slice().reverse(), selector: this.oComponent }),
 				"Then all changes are removed"
 			);
 			assert.strictEqual(oRevertStub.callCount, 0, "no changes are reverted");
@@ -234,7 +234,7 @@ sap.ui.define([
 		}
 	}, function() {
 		QUnit.test("when the checked control is the selector of a change", function(assert) {
-			var aChanges = [createChange("foo", "element"), createChange("bar", "element", {layer: Layer.USER})];
+			var aChanges = [createChange("foo", "element"), createChange("bar", "element", { layer: Layer.USER })];
 			sandbox.stub(UIChangesState, "getAllUIChanges").returns(aChanges);
 			var aNestedChanges = LocalResetAPI.getNestedUIChangesForControl(this.oElement, {
 				layer: Layer.CUSTOMER

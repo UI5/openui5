@@ -45,8 +45,8 @@ sap.ui.define([
 			sandbox.stub(ChangesWriteAPI, "getChangeHandler").resolves();
 
 			this.oCommandStack = new CommandStack();
-			this.oInput1 = new Input({id: "input1"});
-			this.oInput2 = new Input({id: "input2"});
+			this.oInput1 = new Input({ id: "input1" });
+			this.oInput2 = new Input({ id: "input2" });
 			this.oPanel = new Panel({
 				id: "panel",
 				content: [this.oInput1, this.oInput2]
@@ -116,7 +116,7 @@ sap.ui.define([
 					oRtaResourceBundle.getText("MSG_GENERIC_ERROR_MESSAGE", ["My Error"]),
 					"then the message text is correct"
 				);
-				assert.deepEqual(mOptions, {title: oRtaResourceBundle.getText("HEADER_ERROR")}, "then the message title is correct");
+				assert.deepEqual(mOptions, { title: oRtaResourceBundle.getText("HEADER_ERROR") }, "then the message title is correct");
 				fnDone();
 			});
 			// Create commands
@@ -145,7 +145,7 @@ sap.ui.define([
 					"My Error",
 					"then only the actual error message is shown without the generic error message prefix"
 				);
-				assert.deepEqual(mOptions, {title: oRtaResourceBundle.getText("HEADER_ERROR")}, "then the message title is correct");
+				assert.deepEqual(mOptions, { title: oRtaResourceBundle.getText("HEADER_ERROR") }, "then the message title is correct");
 				fnDone();
 			});
 			// Create commands
@@ -355,7 +355,7 @@ sap.ui.define([
 				}
 			};
 
-			this.oControl = {id: "a Control"};
+			this.oControl = { id: "a Control" };
 		},
 		afterEach() {
 			this.oComponent.destroy();

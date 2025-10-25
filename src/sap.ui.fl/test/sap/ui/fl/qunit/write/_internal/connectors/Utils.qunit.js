@@ -29,9 +29,9 @@ sap.ui.define([
 				}
 			};
 
-			const oStubSendRequest = sandbox.stub(InitialUtils, "sendRequest").resolves({response: "something"});
+			const oStubSendRequest = sandbox.stub(InitialUtils, "sendRequest").resolves({ response: "something" });
 			return WriteUtils.sendRequest(sUrl, sMethod, mPropertyBag).then(function(oResponse) {
-				assert.deepEqual(oResponse, {response: "something"}, "correct response is returned");
+				assert.deepEqual(oResponse, { response: "something" }, "correct response is returned");
 				assert.ok(oStubSendRequest.calledWith(sUrl, sMethod, mPropertyBag), "there is one request sent");
 			});
 		});
@@ -60,7 +60,7 @@ sap.ui.define([
 				}
 			};
 
-			const oStubSendRequest = sandbox.stub(InitialUtils, "sendRequest").rejects({status: 500});
+			const oStubSendRequest = sandbox.stub(InitialUtils, "sendRequest").rejects({ status: 500 });
 			return WriteUtils.sendRequest(sUrl, sMethod, mPropertyBag).catch(function(oError) {
 				assert.equal(oError.status, 500, "correct error is returned");
 				assert.ok(oStubSendRequest.calledWith(sUrl, sMethod, mPropertyBag), "there is one request sent");
@@ -81,15 +81,15 @@ sap.ui.define([
 			};
 
 			const oStubSendRequest = sandbox.stub(InitialUtils, "sendRequest");
-			oStubSendRequest.onCall(0).rejects({status: 403});
-			oStubSendRequest.onCall(1).resolves({xsrfToken: "newToken"});
-			oStubSendRequest.onCall(2).resolves({response: "something"});
+			oStubSendRequest.onCall(0).rejects({ status: 403 });
+			oStubSendRequest.onCall(1).resolves({ xsrfToken: "newToken" });
+			oStubSendRequest.onCall(2).resolves({ response: "something" });
 			return WriteUtils.sendRequest(sUrl, sMethod, mPropertyBag).then(function(oResponse) {
-				assert.deepEqual(oResponse, {response: "something"}, "correct response is returned");
+				assert.deepEqual(oResponse, { response: "something" }, "correct response is returned");
 				assert.equal(oStubSendRequest.callCount, 3, "there are 3 requests sent in total");
 				assert.ok(oStubSendRequest.getCall(0).calledWith(sUrl, sMethod, mPropertyBag),
 					"first request has correct parameters");
-				assert.ok(oStubSendRequest.getCall(1).calledWith(sTokenUrl, "HEAD", {initialConnector: {}}),
+				assert.ok(oStubSendRequest.getCall(1).calledWith(sTokenUrl, "HEAD", { initialConnector: {} }),
 					"second request has correct parameters, existing token removed from initial connector");
 				assert.ok(oStubSendRequest.getCall(2).calledWith(sUrl, sMethod, mPropertyBag),
 					"third request has correct parameters");
@@ -110,15 +110,15 @@ sap.ui.define([
 			};
 
 			const oStubSendRequest = sandbox.stub(InitialUtils, "sendRequest");
-			oStubSendRequest.onCall(0).rejects({status: 403});
-			oStubSendRequest.onCall(1).resolves({xsrfToken: "newToken"});
-			oStubSendRequest.onCall(2).rejects({status: 500});
+			oStubSendRequest.onCall(0).rejects({ status: 403 });
+			oStubSendRequest.onCall(1).resolves({ xsrfToken: "newToken" });
+			oStubSendRequest.onCall(2).rejects({ status: 500 });
 			return WriteUtils.sendRequest(sUrl, sMethod, mPropertyBag).catch(function(oError) {
 				assert.equal(oError.status, 500, "correct error is returned");
 				assert.equal(oStubSendRequest.callCount, 3, "there are 3 requests sent in total");
 				assert.ok(oStubSendRequest.getCall(0).calledWith(sUrl, sMethod, mPropertyBag),
 					"first request has correct parameters");
-				assert.ok(oStubSendRequest.getCall(1).calledWith(sTokenUrl, "HEAD", {initialConnector: {}}),
+				assert.ok(oStubSendRequest.getCall(1).calledWith(sTokenUrl, "HEAD", { initialConnector: {} }),
 					"second request has correct parameters");
 				assert.ok(oStubSendRequest.getCall(2).calledWith(sUrl, sMethod, mPropertyBag),
 					"third request has correct parameters");
@@ -138,15 +138,15 @@ sap.ui.define([
 			};
 
 			const oStubSendRequest = sandbox.stub(InitialUtils, "sendRequest");
-			oStubSendRequest.onCall(0).rejects({status: 403});
-			oStubSendRequest.onCall(1).rejects({status: 500});
+			oStubSendRequest.onCall(0).rejects({ status: 403 });
+			oStubSendRequest.onCall(1).rejects({ status: 500 });
 			return WriteUtils.sendRequest(sUrl, sMethod, mPropertyBag).catch(function(oError) {
 				assert.equal(oError.status, 500, "correct error is returned");
 				assert.equal(mPropertyBag.initialConnector.xsrfToken, undefined, "new token is not passed in the second sendRequest");
 				assert.equal(oInitialConnector.xsrfToken, undefined, "token is removed from apply connector");
 				assert.equal(oStubSendRequest.callCount, 2, "there are 2 requests sent in total");
 				assert.ok(oStubSendRequest.getCall(0).calledWith(sUrl, sMethod, mPropertyBag), "first request has correct parameters");
-				assert.ok(oStubSendRequest.getCall(1).calledWith(sTokenUrl, "HEAD", {initialConnector: {}}),
+				assert.ok(oStubSendRequest.getCall(1).calledWith(sTokenUrl, "HEAD", { initialConnector: {} }),
 					"second request has correct parameters");
 			});
 		});
@@ -159,7 +159,7 @@ sap.ui.define([
 				tokenUrl: sTokenUrl,
 				initialConnector: {}
 			};
-			const oStubSendRequest = sandbox.stub(InitialUtils, "sendRequest").resolves({response: "{xsrfToken: 'newToken'}"});
+			const oStubSendRequest = sandbox.stub(InitialUtils, "sendRequest").resolves({ response: "{xsrfToken: 'newToken'}" });
 			return WriteUtils.sendRequest(sUrl, sMethod, mPropertyBag)
 			.then(() => {
 				assert.equal(oStubSendRequest.callCount, 2, "there are 2 requests sent in total");
@@ -167,7 +167,7 @@ sap.ui.define([
 					oStubSendRequest.getCall(0).calledWith(
 						sTokenUrl,
 						"HEAD",
-						{initialConnector: {}}
+						{ initialConnector: {} }
 					),
 					"first request tries to get a new token"
 				);
@@ -194,17 +194,17 @@ sap.ui.define([
 		});
 
 		QUnit.test("just one response available", function(assert) {
-			const oResponse = {a: 1};
+			const oResponse = { a: 1 };
 			const oResults = WriteUtils.mergeResults([oResponse]);
 			assert.deepEqual(oResults, oResponse, "the result is returned as is");
 		});
 
 		QUnit.test("multiple responses available", function(assert) {
 			const oResponses = [
-				{a: 1, b: 2, c: ["foo"], e: 3, d: {e: 4}},
-				{a: 5, c: ["bar"], d: {e: 6}, f: 7}
+				{ a: 1, b: 2, c: ["foo"], e: 3, d: { e: 4 } },
+				{ a: 5, c: ["bar"], d: { e: 6 }, f: 7 }
 			];
-			const oExpectedResult = {a: 5, b: 2, c: ["foo", "bar"], d: {e: 6}, e: 3, f: 7};
+			const oExpectedResult = { a: 5, b: 2, c: ["foo", "bar"], d: { e: 6 }, e: 3, f: 7 };
 
 			const oResults = WriteUtils.mergeResults(oResponses);
 			assert.deepEqual(oResults, oExpectedResult, "the responses are merged into the result");

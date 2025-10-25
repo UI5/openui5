@@ -46,7 +46,7 @@ sap.ui.define([
 	function createChangeList(iChangesCount, bInInitialState, sExtensionPointName) {
 		var aChanges = [];
 		while (iChangesCount-- > 0) {
-			var oChange = new UIChange({ selector: { name: sExtensionPointName }});
+			var oChange = new UIChange({ selector: { name: sExtensionPointName } });
 			if (!bInInitialState) {
 				oChange.markFinished();
 			}
@@ -58,7 +58,7 @@ sap.ui.define([
 	QUnit.module("Given 'enhanceExtensionPointChanges' is called", {
 		beforeEach() {
 			this.oPanel = new Panel("PanelId");
-			this.mExtensionPointInfo = createExtensionPoint({id: "ViewId"}, "ExtensionPointName", this.oPanel, "content", 0);
+			this.mExtensionPointInfo = createExtensionPoint({ id: "ViewId" }, "ExtensionPointName", this.oPanel, "content", 0);
 			this.mPropertyBag = {
 				targetControl: this.oPanel,
 				reference: sReference
@@ -136,7 +136,7 @@ sap.ui.define([
 	QUnit.module("Given 'getChangesForExtensionPoint' is called", {
 		beforeEach() {
 			this.oPanel = new Panel("PanelId");
-			this.mExtensionPointInfo = createExtensionPoint({id: "ViewId"}, "ExtensionPointName", this.oPanel, "content", 0);
+			this.mExtensionPointInfo = createExtensionPoint({ id: "ViewId" }, "ExtensionPointName", this.oPanel, "content", 0);
 			this.mPropertyBag = {
 				extensionPointName: this.mExtensionPointInfo.name
 			};

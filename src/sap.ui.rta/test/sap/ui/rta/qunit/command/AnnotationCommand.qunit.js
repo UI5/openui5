@@ -55,12 +55,12 @@ sap.ui.define([
 		});
 
 		QUnit.test("execute / undo with changesToDelete without localResetEnabled", async function(assert) {
-			const oDeactivateChange = {fileName: "deactivateChange"};
+			const oDeactivateChange = { fileName: "deactivateChange" };
 			sandbox.stub(ChangesWriteAPI, "create")
 			.onCall(0).returns(oDeactivateChange)
 			.onCall(1).returns();
 
-			const aChanges = [RtaQunitUtils.createUIChange({fileName: "change1"}), RtaQunitUtils.createUIChange({fileName: "change2"})];
+			const aChanges = [RtaQunitUtils.createUIChange({ fileName: "change1" }), RtaQunitUtils.createUIChange({ fileName: "change2" })];
 			this.oAnnotationCommand = new AnnotationCommand({
 				changesToDelete: aChanges,
 				selector: {
@@ -70,11 +70,11 @@ sap.ui.define([
 					annotationPath: "path"
 				}
 			});
-			await this.oAnnotationCommand.prepare({layer: "USER", generator: "myGenerator"});
+			await this.oAnnotationCommand.prepare({ layer: "USER", generator: "myGenerator" });
 			assert.ok(ChangesWriteAPI.create.calledWith({
 				changeSpecificData: {
 					changeType: "deactivateChanges",
-					content: {changeIds: ["change1", "change2"]},
+					content: { changeIds: ["change1", "change2"] },
 					generator: "myGenerator",
 					layer: "USER"
 				},
@@ -104,12 +104,12 @@ sap.ui.define([
 
 		QUnit.test("execute / undo with changesToDelete (including developer changes) with localResetEnabled", async function(assert) {
 			const aKeyUserChanges = [
-				RtaQunitUtils.createUIChange({fileName: "change1", layer: Layer.CUSTOMER}),
-				RtaQunitUtils.createUIChange({fileName: "change2", layer: Layer.CUSTOMER})
+				RtaQunitUtils.createUIChange({ fileName: "change1", layer: Layer.CUSTOMER }),
+				RtaQunitUtils.createUIChange({ fileName: "change2", layer: Layer.CUSTOMER })
 			];
 			const aDeveloperChanges = [
-				RtaQunitUtils.createUIChange({fileName: "change3", layer: Layer.CUSTOMER_BASE}),
-				RtaQunitUtils.createUIChange({fileName: "change4", layer: Layer.VENDOR})
+				RtaQunitUtils.createUIChange({ fileName: "change3", layer: Layer.CUSTOMER_BASE }),
+				RtaQunitUtils.createUIChange({ fileName: "change4", layer: Layer.VENDOR })
 			];
 			this.oAnnotationCommand = new AnnotationCommand({
 				changesToDelete: aKeyUserChanges.concat(aDeveloperChanges),
@@ -126,7 +126,7 @@ sap.ui.define([
 			const oPersonalizationApiAddStub = sandbox.stub(PersistenceWriteAPI, "add").resolves();
 			const oPersonalizationApiRemoveStub = sandbox.stub(PersistenceWriteAPI, "remove").resolves();
 
-			await this.oAnnotationCommand.prepare({layer: Layer.CUSTOMER, generator: "myGenerator"});
+			await this.oAnnotationCommand.prepare({ layer: Layer.CUSTOMER, generator: "myGenerator" });
 			await this.oAnnotationCommand.execute();
 			assert.ok(oResetStub.calledWith(aKeyUserChanges, "appComponent", true), "reset was called with the correct parameters");
 			assert.strictEqual(oPersonalizationApiAddStub.callCount, 1, "PersistenceWriteAPI.add was called once");
@@ -170,8 +170,8 @@ sap.ui.define([
 
 		QUnit.test("execute / undo with changesToDelete with localResetEnabled", async function(assert) {
 			const aChanges = [
-				RtaQunitUtils.createUIChange({fileName: "change1", layer: Layer.CUSTOMER}),
-				RtaQunitUtils.createUIChange({fileName: "change2", layer: Layer.CUSTOMER})
+				RtaQunitUtils.createUIChange({ fileName: "change1", layer: Layer.CUSTOMER }),
+				RtaQunitUtils.createUIChange({ fileName: "change2", layer: Layer.CUSTOMER })
 			];
 			this.oAnnotationCommand = new AnnotationCommand({
 				changesToDelete: aChanges,
@@ -188,7 +188,7 @@ sap.ui.define([
 			const oPersonalizationApiAddStub = sandbox.stub(PersistenceWriteAPI, "add").resolves();
 			const oPersonalizationApiRemoveStub = sandbox.stub(PersistenceWriteAPI, "remove").resolves();
 
-			await this.oAnnotationCommand.prepare({layer: Layer.CUSTOMER, generator: "myGenerator"});
+			await this.oAnnotationCommand.prepare({ layer: Layer.CUSTOMER, generator: "myGenerator" });
 			await this.oAnnotationCommand.execute();
 			assert.ok(oResetStub.calledWith(aChanges, "appComponent", true), "resetChanges was called with the correct parameters");
 			assert.strictEqual(oPersonalizationApiAddStub.callCount, 0, "PersistenceWriteAPI.add was not called");
@@ -212,7 +212,7 @@ sap.ui.define([
 			const oPersonalizationApiAddStub = sandbox.stub(PersistenceWriteAPI, "add").resolves();
 			const oPersonalizationApiRemoveStub = sandbox.stub(PersistenceWriteAPI, "remove").resolves();
 
-			await this.oAnnotationCommand.prepare({layer: Layer.CUSTOMER, generator: "myGenerator"});
+			await this.oAnnotationCommand.prepare({ layer: Layer.CUSTOMER, generator: "myGenerator" });
 			await this.oAnnotationCommand.execute();
 			assert.strictEqual(oResetStub.callCount, 0, "the LocalResetAPI.resetChanges was not called");
 			assert.strictEqual(oPersonalizationApiAddStub.callCount, 0, "the PersistenceWriteAPI.add was not called");

@@ -317,7 +317,7 @@ sap.ui.define([
 			this.oAddIFrameDialog.attachOpened(async () => {
 				await setTextAreaValue(this.oAddIFrameDialog._oDialog, "someUrl");
 
-				const sUrl = this.oAddIFrameDialog._oController._addURLParameter({key: "{firstParameter}"});
+				const sUrl = this.oAddIFrameDialog._oController._addURLParameter({ key: "{firstParameter}" });
 				this.oAddIFrameDialog._oJSONModel.setProperty("/frameUrl/value", sUrl);
 				assert.strictEqual(sUrl, "someUrl{firstParameter}", "Found firstParameter");
 
@@ -330,7 +330,7 @@ sap.ui.define([
 			this.oAddIFrameDialog.attachOpened(async () => {
 				await setTextAreaValue(this.oAddIFrameDialog._oDialog, "someUrl");
 
-				const sUrl = this.oAddIFrameDialog._oController._addURLParameter({key: "{stringParameter}", type: "Edm.String"});
+				const sUrl = this.oAddIFrameDialog._oController._addURLParameter({ key: "{stringParameter}", type: "Edm.String" });
 				this.oAddIFrameDialog._oJSONModel.setProperty("/frameUrl/value", sUrl);
 				assert.strictEqual(sUrl, "someUrl{stringParameter}", "Found stringParameter");
 
@@ -343,7 +343,7 @@ sap.ui.define([
 			this.oAddIFrameDialog.attachOpened(async () => {
 				await setTextAreaValue(this.oAddIFrameDialog._oDialog, "someUrl");
 
-				const sUrl = this.oAddIFrameDialog._oController._addURLParameter({key: "{booleanParameter}", type: "Edm.Boolean"});
+				const sUrl = this.oAddIFrameDialog._oController._addURLParameter({ key: "{booleanParameter}", type: "Edm.Boolean" });
 				this.oAddIFrameDialog._oJSONModel.setProperty("/frameUrl/value", sUrl);
 				assert.strictEqual(sUrl, "someUrl{path:'booleanParameter',targetType:'any'}", "URL parameter is built correctly");
 
@@ -402,7 +402,7 @@ sap.ui.define([
 				await setTextAreaValue(this.oAddIFrameDialog._oDialog, "someUrl");
 
 				function checkParam(oParam) {
-					sUrl = this.oAddIFrameDialog._oController._addURLParameter({key: oParam.key});
+					sUrl = this.oAddIFrameDialog._oController._addURLParameter({ key: oParam.key });
 					this.oAddIFrameDialog._oJSONModel.setProperty("/frameUrl/value", sUrl);
 				}
 				this.oDialogSettings.parameters.forEach(checkParam.bind(this));

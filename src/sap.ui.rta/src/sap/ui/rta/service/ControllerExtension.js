@@ -81,7 +81,7 @@ sap.ui.define([
 					var oAppComponent = FlexUtils.getAppComponentForControl(oView);
 					var sControllerName = oView.getControllerModuleName() ? `module:${oView.getControllerModuleName()}` : oView.getController()?.getMetadata().getName();
 					// Calculate moduleName for code extension
-					var sReference = FlexRuntimeInfoAPI.getFlexReference({element: oAppComponent});
+					var sReference = FlexRuntimeInfoAPI.getFlexReference({ element: oAppComponent });
 					var sModuleName = sReference.replace(/\.Component/g, "").replace(/\./g, "/");
 					sModuleName += "/changes/";
 					sModuleName += sCodeRef.replace(/\.js/g, "");
@@ -96,8 +96,8 @@ sap.ui.define([
 						generator: "rta.service.ControllerExtension"
 					};
 
-					var oPreparedChange = ChangesWriteAPI.create({changeSpecificData: oChangeSpecificData, selector: oAppComponent});
-					PersistenceWriteAPI.add({change: oPreparedChange, selector: oAppComponent});
+					var oPreparedChange = ChangesWriteAPI.create({ changeSpecificData: oChangeSpecificData, selector: oAppComponent });
+					PersistenceWriteAPI.add({ change: oPreparedChange, selector: oAppComponent });
 					return oPreparedChange.convertToFileContent();
 				},
 

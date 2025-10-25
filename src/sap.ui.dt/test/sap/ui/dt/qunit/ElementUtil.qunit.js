@@ -66,7 +66,7 @@ sap.ui.define([
 	var sandbox = sinon.createSandbox();
 
 	var fnCreateMinimumControls = function() {
-		this.oButton = new Button("testButton1", {text: "Button"});
+		this.oButton = new Button("testButton1", { text: "Button" });
 		this.oIconTabFilter = new IconTabFilter("icontabfilter", {
 			text: "Orders"
 		});
@@ -83,16 +83,16 @@ sap.ui.define([
 		fnCreateMinimumControls.call(this);
 		this.oHorizontalLayoutChild = new HorizontalLayout({
 			content: [
-				new Button({text: "Button"}),
+				new Button({ text: "Button" }),
 				this.oButton
 			]
 		});
 		this.oVerticalLayout = new VerticalLayout("verticalLayout", {
 			content: [
-				new Button({text: "Button"}),
-				new Button({text: "Button"}),
-				new Button({text: "Button"}),
-				new Button({text: "Button"}),
+				new Button({ text: "Button" }),
+				new Button({ text: "Button" }),
+				new Button({ text: "Button" }),
+				new Button({ text: "Button" }),
 				this.oHorizontalLayoutChild
 			]
 		});
@@ -108,23 +108,23 @@ sap.ui.define([
 	var fnCreateMoreControls = function() {
 		this.oHorizontalLayoutChild1 = new HorizontalLayout({
 			content: [
-				new Input({value: "11"}),
-				new Button({text: "12"})
+				new Input({ value: "11" }),
+				new Button({ text: "12" })
 			]
 		});
 		this.oHorizontalLayoutChild2 = new HorizontalLayout({
 			content: [
-				new Button({text: "21"}),
-				new Text({text: "22"})
+				new Button({ text: "21" }),
+				new Text({ text: "22" })
 			]
 		});
 		this.oVerticalLayout2 = new VerticalLayout({
 			content: [
-				new Button({text: "Button"}),
+				new Button({ text: "Button" }),
 				this.oHorizontalLayoutChild1,
-				new Button({text: "Button"}),
+				new Button({ text: "Button" }),
 				this.oHorizontalLayoutChild2,
-				new Button({text: "Button"})
+				new Button({ text: "Button" })
 			]
 		});
 	};
@@ -399,7 +399,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("when a control is not a successor of another control", function(assert) {
-			var oButton = new Button({text: "Button"});
+			var oButton = new Button({ text: "Button" });
 			assert.equal(ElementUtil.hasAncestor(oButton, this.oVerticalLayout), false, "then static method 'hasAncestor' returns false");
 		});
 
@@ -647,7 +647,7 @@ sap.ui.define([
 		}
 	}, function() {
 		QUnit.test("when a child control is added to an aggregation", function(assert) {
-			var oButton = new Button({text: "Button"});
+			var oButton = new Button({ text: "Button" });
 			var iLengthBefore = this.oVerticalLayout.getContent().length;
 			ElementUtil.addAggregation(this.oVerticalLayout, "content", oButton);
 			var iLengthAfter = this.oVerticalLayout.getContent().length;
@@ -685,7 +685,7 @@ sap.ui.define([
 		}
 	}, function() {
 		QUnit.test("when a child control is added to an aggregation at a certain position", function(assert) {
-			var oButton = new Button({text: "Button"});
+			var oButton = new Button({ text: "Button" });
 			var iLengthBefore = this.oVerticalLayout.getContent().length;
 			ElementUtil.insertAggregation(this.oVerticalLayout, "content", oButton, 3);
 			var iLengthAfter = this.oVerticalLayout.getContent().length;
@@ -772,7 +772,7 @@ sap.ui.define([
 	}, function() {
 		QUnit.test("when an element is checked if it is valid for an aggregation of a parent", function(assert) {
 			assert.equal(
-				ElementUtil.isValidForAggregation(this.oVerticalLayout, "content", new Button({text: "Button"})),
+				ElementUtil.isValidForAggregation(this.oVerticalLayout, "content", new Button({ text: "Button" })),
 				true,
 				"then the static method 'isValidForAggregation' returns true"
 			);
@@ -803,7 +803,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("when a control has non-multiple aggregations with existing items", function(assert) {
-			var oFormElement = new FormElement({label: "InputLabel"});
+			var oFormElement = new FormElement({ label: "InputLabel" });
 			var oLabel = new Label();
 			assert.equal(ElementUtil.isValidForAggregation(oFormElement, "label", oLabel), false,
 				"then the static method 'isValidForAggregation' returns false");
@@ -988,11 +988,11 @@ sap.ui.define([
 	QUnit.module("Given adjustIndexForMove()", {
 	}, function() {
 		QUnit.test("when adjustIndexForMove is called with non-similar source and target containers", function(assert) {
-			assert.strictEqual(ElementUtil.adjustIndexForMove({value: "sourceContainer"}, {value: "targetContainer"}, 5, 10)
+			assert.strictEqual(ElementUtil.adjustIndexForMove({ value: "sourceContainer" }, { value: "targetContainer" }, 5, 10)
 				, 10, "then the passed target index is returned");
 		});
 		QUnit.test("when adjustIndexForMove is called with similar source and target containers, and source index lower than the target index", function(assert) {
-			var oContainer = {value: "sameContainer"};
+			var oContainer = { value: "sameContainer" };
 			assert.strictEqual(
 				ElementUtil.adjustIndexForMove(oContainer, oContainer, 5, 10),
 				9,
@@ -1000,7 +1000,7 @@ sap.ui.define([
 			);
 		});
 		QUnit.test("when adjustIndexForMove is called with similar source and target containers, and source index greater than the target index", function(assert) {
-			var oContainer = {value: "sameContainer"};
+			var oContainer = { value: "sameContainer" };
 			assert.strictEqual(
 				ElementUtil.adjustIndexForMove(oContainer, oContainer, 15, 10),
 				10,
@@ -1008,7 +1008,7 @@ sap.ui.define([
 			);
 		});
 		QUnit.test("when adjustIndexForMove is called with similar source and target containers, and source index is not greater than -1", function(assert) {
-			var oContainer = {value: "sameContainer"};
+			var oContainer = { value: "sameContainer" };
 			assert.strictEqual(
 				ElementUtil.adjustIndexForMove(oContainer, oContainer, -1, 10),
 				10,
@@ -1019,7 +1019,7 @@ sap.ui.define([
 
 	QUnit.module("Given a bound list control", {
 		async beforeEach() {
-			var aTexts = [{text: "Text 1"}, {text: "Text 2"}, {text: "Text 3"}];
+			var aTexts = [{ text: "Text 1" }, { text: "Text 2" }, { text: "Text 3" }];
 			var oModel = new JSONModel({
 				texts: aTexts
 			});
@@ -1032,7 +1032,7 @@ sap.ui.define([
 								items: [
 									new VBox("vbox3", {
 										items: [
-											new Text("text", {text: "{text}"})
+											new Text("text", { text: "{text}" })
 										]
 									})
 								]
@@ -1131,7 +1131,7 @@ sap.ui.define([
 
 	QUnit.module("Given a bound list control and a control inside of the list which is not in the template", {
 		async beforeEach() {
-			var aTexts = [{text: "Text 1"}, {text: "Text 2"}, {text: "Text 3"}];
+			var aTexts = [{ text: "Text 1" }, { text: "Text 2" }, { text: "Text 3" }];
 			var oModel = new JSONModel({
 				texts: aTexts
 			});
@@ -1167,7 +1167,7 @@ sap.ui.define([
 								items: [
 									new VBox("vbox6", {
 										items: [
-											new Button("evil-btn1", {text: "{text}"})
+											new Button("evil-btn1", { text: "{text}" })
 										]
 									})
 								]
@@ -1213,14 +1213,14 @@ sap.ui.define([
 		async beforeEach() {
 			// create list with bound items
 			var oData = [
-				{text: "item1-bound"},
-				{text: "item2-bound"}
+				{ text: "item1-bound" },
+				{ text: "item2-bound" }
 			];
 			var oModel = new JSONModel(oData);
 			this.oBoundList = new List("boundlist").setModel(oModel);
 			this.oBoundList.bindAggregation("items", {
 				path: "/",
-				template: new CustomListItem("item", {content: [new Button("item-btn", {text: "{text}"})]}),
+				template: new CustomListItem("item", { content: [new Button("item-btn", { text: "{text}" })] }),
 				templateShareable: false
 			});
 
@@ -1228,14 +1228,14 @@ sap.ui.define([
 			this.oFactoryBoundList.bindAggregation("items", {
 				path: "/",
 				factory(sId) {
-					return new CustomListItem(sId, {content: [new Button(`${sId}-btn`, {text: "{text}"})]});
+					return new CustomListItem(sId, { content: [new Button(`${sId}-btn`, { text: "{text}" })] });
 				}
 			});
 
 			// create list with unbound items
 			this.oUnboundList = new List("unboundlist");
-			this.oUnboundList.addItem(new CustomListItem("unboundlist-0", {content: [new Button("item1-btn", {text: "item1-unbound"})]}));
-			this.oUnboundList.addItem(new CustomListItem("unboundlist-1", {content: [new Button("item2-btn", {text: "item2-unbound"})]}));
+			this.oUnboundList.addItem(new CustomListItem("unboundlist-0", { content: [new Button("item1-btn", { text: "item1-unbound" })] }));
+			this.oUnboundList.addItem(new CustomListItem("unboundlist-1", { content: [new Button("item2-btn", { text: "item2-unbound" })] }));
 
 			// create a HorizontalLayout containing the two lists
 			this.oVerticalLayout = new VerticalLayout("verticalLayout0", {
@@ -1355,11 +1355,11 @@ sap.ui.define([
 
 	QUnit.module("Given a bound list control with a bound Select control inside it", {
 		async beforeEach() {
-			var aTexts = [{text: "Text 1"}, {text: "Text 2"}, {text: "Text 3"}];
+			var aTexts = [{ text: "Text 1" }, { text: "Text 2" }, { text: "Text 3" }];
 			var aItemTexts = [
-				{key: "item1", text: "Item Text 1"},
-				{key: "item2", text: "Item Text 2"},
-				{key: "item3", text: "Item Text 3"}
+				{ key: "item1", text: "Item Text 1" },
+				{ key: "item2", text: "Item Text 2" },
+				{ key: "item3", text: "Item Text 3" }
 			];
 			var oModel = new JSONModel({
 				texts: aTexts,
@@ -1375,12 +1375,12 @@ sap.ui.define([
 				content: [
 					new VBox("vbox1", {
 						items: [
-							new Button("button", {text: "{text}"}),
-							new Select("select", {items: {
+							new Button("button", { text: "{text}" }),
+							new Select("select", { items: {
 								path: "/itemTexts",
 								template: this.oSelectItemTemplate,
 								templateShareable: false
-							}})
+							} })
 						]
 					})
 				]

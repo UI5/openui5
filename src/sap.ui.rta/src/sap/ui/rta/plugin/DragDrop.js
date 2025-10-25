@@ -73,7 +73,7 @@ function(
 	 */
 	DragDrop.prototype.init = function(...aArgs) {
 		ControlDragDrop.prototype.init.apply(this, aArgs);
-		this.setElementMover(new RTAElementMover({commandFactory: this.getCommandFactory()}));
+		this.setElementMover(new RTAElementMover({ commandFactory: this.getCommandFactory() }));
 	};
 
 	DragDrop.prototype.setCommandFactory = function(oCommandFactory) {
@@ -209,7 +209,7 @@ function(
 			aRelevantOverlays = aRelevantOverlays.filter(function(oRelevantOverlay, iIndex, aSource) {
 				return iIndex === aSource.indexOf(oRelevantOverlay);
 			});
-			this.evaluateEditable(aRelevantOverlays, {onRegistration: false});
+			this.evaluateEditable(aRelevantOverlays, { onRegistration: false });
 		}
 	};
 

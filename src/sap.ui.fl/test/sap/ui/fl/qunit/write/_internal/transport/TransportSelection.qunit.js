@@ -77,7 +77,7 @@ sap.ui.define([
 				"{ \"localonly\":true, \"transports\":[{\"transportId\":\"4711\",\"owner\":\"TESTUSER\",\"description\":\"test transport1\",\"locked\" : true}] }"
 			]);
 			this.oServer.autoRespond = true;
-			var oObject = {name: "testname", type: "variant"};
+			var oObject = { name: "testname", type: "variant" };
 
 			var fOkay = function(oResult) {
 				assert.equal(oResult.getParameters().selectedTransport, "");
@@ -122,7 +122,7 @@ sap.ui.define([
 
 		QUnit.test("sap.ui.fl.write._internal.transport.TransportSelection.selectTransport when LrepConnector is not available", function(assert) {
 			var done = assert.async();
-			var oObject = {name: "", type: "variant"};
+			var oObject = { name: "", type: "variant" };
 			sandbox.stub(FlUtils, "getLrepUrl").returns("");
 			var fOkay = function(oResult) {
 				assert.equal(oResult.getParameters().selectedTransport, "");
@@ -164,7 +164,7 @@ sap.ui.define([
 			assert.ok(this.oTransportSelection.checkTransportInfo(oMockTransportInfo), "then true is returned for a valid transport info");
 			assert.notOk(this.oTransportSelection.checkTransportInfo(oMockTransportInfoInvalid), "then false is returned for an invalid transport info");
 
-			return this.oTransportSelection._prepareChangesForTransport(oMockTransportInfo, aMockLocalChanges, null, {reference: "aReference"}).then(function() {
+			return this.oTransportSelection._prepareChangesForTransport(oMockTransportInfo, aMockLocalChanges, null, { reference: "aReference" }).then(function() {
 				assert.equal(aMockLocalChanges[0].getFlexObjectMetadata().packageName, "aPackage", "then the transported local change is not updated");
 				assert.equal(aMockLocalChanges[1].getFlexObjectMetadata().packageName, oMockTransportInfo.packageName, "but the new local change is updated");
 			});
@@ -194,7 +194,7 @@ sap.ui.define([
 			sandbox.stub(FlUtils, "getClient").returns("");
 			sandbox.stub(WriteUtils, "sendRequest").resolves();
 			assert.ok(this.oTransportSelection.checkTransportInfo(oMockTransportInfo), "then true is returned for a valid transport info");
-			return this.oTransportSelection._prepareChangesForTransport(oMockTransportInfo, aMockLocalChanges, aAppVariantDescriptors, {reference: "aReference"}).then(function() {
+			return this.oTransportSelection._prepareChangesForTransport(oMockTransportInfo, aMockLocalChanges, aAppVariantDescriptors, { reference: "aReference" }).then(function() {
 				assert.equal(aAppVariantDescriptors[0].getPackage(), "$TMP", "but the app variant descriptor should not be updated");
 				assert.equal(aMockLocalChanges[0].getFlexObjectMetadata().packageName, oMockTransportInfo.packageName, "but the new local change is updated");
 			});
@@ -236,7 +236,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("_createEventObject", function(assert) {
-			var oEvent = this.oTransportSelection._createEventObject({"package": "$TMP"}, {transportId: "1234"});
+			var oEvent = this.oTransportSelection._createEventObject({ "package": "$TMP" }, { transportId: "1234" });
 			assert.equal(oEvent.mParameters.selectedPackage, "$TMP");
 			assert.equal(oEvent.mParameters.selectedTransport, "1234");
 			assert.equal(oEvent.getParameter("selectedPackage"), "$TMP");
@@ -254,7 +254,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("_getTransport", function(assert) {
-			var oEvent = this.oTransportSelection._getTransport({transports: [{locked: true, transportId: "1234"}]});
+			var oEvent = this.oTransportSelection._getTransport({ transports: [{ locked: true, transportId: "1234" }] });
 			assert.equal(oEvent.transportId, "1234");
 		});
 
@@ -264,7 +264,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("_hasLock - with locked transport ", function(assert) {
-			var oEvent = this.oTransportSelection._hasLock([{locked: true, transportId: "1234"}]);
+			var oEvent = this.oTransportSelection._hasLock([{ locked: true, transportId: "1234" }]);
 			assert.equal(oEvent.transportId, "1234");
 		});
 
@@ -347,7 +347,7 @@ sap.ui.define([
 				errorCode: "",
 				localonly: false,
 				transports: [
-					{transportId: "ABC123", owner: "aPerson", description: "text here", locked: false},
+					{ transportId: "ABC123", owner: "aPerson", description: "text here", locked: false },
 					{
 						transportId: sSecondTransportId,
 						owner: "someone",
@@ -376,8 +376,8 @@ sap.ui.define([
 			var sSecondTransportId = "ABC456";
 
 			var aTransports = [
-				{transportId: "ABC123", owner: "aPerson", description: "text here", locked: false},
-				{transportId: sSecondTransportId, owner: "someone", description: "more text there", locked: false}
+				{ transportId: "ABC123", owner: "aPerson", description: "text here", locked: false },
+				{ transportId: sSecondTransportId, owner: "someone", description: "more text there", locked: false }
 			];
 			var oTransportResponse = Promise.resolve({
 				errorCode: "",
@@ -442,7 +442,7 @@ sap.ui.define([
 				errorCode: "",
 				localonly: false,
 				transports: [
-					{transportId: "ABC123", owner: "aPerson", description: "text here", locked: false},
+					{ transportId: "ABC123", owner: "aPerson", description: "text here", locked: false },
 					{
 						transportId: sSecondTransportId,
 						owner: "someone",

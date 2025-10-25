@@ -45,7 +45,7 @@ sap.ui.define([
 
 			const oModifier = mPropertyBag.modifier;
 			const oView = mPropertyBag.view;
-			const sFragment = mPropertyBag.fragment || LoaderExtensions.loadResource(sModuleName, {dataType: "text"});
+			const sFragment = mPropertyBag.fragment || LoaderExtensions.loadResource(sModuleName, { dataType: "text" });
 
 			try {
 				return await oModifier.instantiateFragment(sFragment, sIdPrefix, oView);

@@ -177,7 +177,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("Save with modified variant", function(assert) {
-			var oContent = {foo: "bar"};
+			var oContent = { foo: "bar" };
 			sandbox.stub(this.oVariantManagementControl, "currentVariantGetModified").returns(true);
 			sandbox.stub(this.oVariantManagementControl, "getPresentVariantContent").resolves(oContent);
 
@@ -282,7 +282,7 @@ sap.ui.define([
 				assert.deepEqual(oCommand.getSourceVariantId(), "id2", "the sourceVariantId property is set");
 			});
 
-			oMenuItem.handler([this.oVariantManagementOverlay], {eventItem: oEvent});
+			oMenuItem.handler([this.oVariantManagementOverlay], { eventItem: oEvent });
 			return pReturn;
 		});
 
@@ -332,7 +332,7 @@ sap.ui.define([
 
 			sandbox.stub(MessageBox, "warning").callsFake(fnDialogCheck.bind(this));
 
-			oMenuItem.handler([this.oVariantManagementOverlay], {eventItem: oEvent});
+			oMenuItem.handler([this.oVariantManagementOverlay], { eventItem: oEvent });
 			return pReturn;
 		}
 
@@ -388,7 +388,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("SaveAs with return value from the dialog", function(assert) {
-			var oContent = {foo: "bar"};
+			var oContent = { foo: "bar" };
 			var sPreviousDefaultVarId = "previousDefaultVariantId";
 			var sName = "myFancyName";
 			var sType = "myType";
@@ -436,7 +436,7 @@ sap.ui.define([
 			var sNewDefaultVarId = "newDefaultVar";
 			sandbox.stub(this.oVariantManagementControl, "getDefaultVariantId").returns(sPreviousDefaultVarId);
 			sandbox.stub(this.oVariantManagementControl, "getCurrentVariantId").returns(sPreviousSelectedVarId);
-			var oNewVariantProperties = {foo: "bar"};
+			var oNewVariantProperties = { foo: "bar" };
 			var oCreateComponentSpy = sandbox.spy(ContextSharingAPI, "createComponent");
 			sandbox.stub(this.oVariantManagementControl, "openManageViewsDialogForKeyUser").callsFake(function(mPropertyBag, fnCallback) {
 				assert.strictEqual(mPropertyBag.rtaStyleClass, Utils.getRtaStyleClassName(), "the style class is set");
@@ -549,7 +549,7 @@ sap.ui.define([
 					changeSpecificData: {
 						content: {
 							key: "myKey",
-							content: {foo: "myContent"},
+							content: { foo: "myContent" },
 							persistencyKey: "myPersistencyKey"
 						}
 					}
@@ -559,7 +559,7 @@ sap.ui.define([
 			var pReturn = waitForCommandToBeCreated(this.oPlugin).then(function(oParameters) {
 				var oCommand = oParameters.command;
 				assert.strictEqual(oCommand.getVariantId(), "myKey", "the key is set");
-				assert.deepEqual(oCommand.getNewContent(), {foo: "myContent"}, "the new content is set");
+				assert.deepEqual(oCommand.getNewContent(), { foo: "myContent" }, "the new content is set");
 				assert.strictEqual(oCommand.getPersistencyKey(), "myPersistencyKey", "the persistency key is set");
 				assert.strictEqual(oCommand.getElement().getId(), "svm", "the SVM is passed as element key is set");
 				assert.strictEqual(oCommand.getIsModifiedBefore(), false, "the modified flag is passed");
@@ -598,7 +598,7 @@ sap.ui.define([
 					changeSpecificData: {
 						content: {
 							key: "id1",
-							content: {foo: "myContent"},
+							content: { foo: "myContent" },
 							persistencyKey: "myPersistencyKey"
 						}
 					}
@@ -610,7 +610,7 @@ sap.ui.define([
 				fnCallback({
 					"default": true,
 					executeOnSelection: false,
-					content: {foo: "bar"},
+					content: { foo: "bar" },
 					type: "sType",
 					text: "sName",
 					contexts: []
@@ -629,7 +629,7 @@ sap.ui.define([
 				var oNewVariantProperties = {
 					"default": true,
 					executeOnSelection: false,
-					content: {foo: "bar"},
+					content: { foo: "bar" },
 					type: "sType",
 					text: "sName",
 					contexts: []
@@ -654,7 +654,7 @@ sap.ui.define([
 					changeSpecificData: {
 						content: {
 							key: "id1",
-							content: {foo: "myContent"},
+							content: { foo: "myContent" },
 							persistencyKey: "myPersistencyKey"
 						}
 					}
@@ -683,7 +683,7 @@ sap.ui.define([
 					changeSpecificData: {
 						content: {
 							key: "id1",
-							content: {foo: "myContent"},
+							content: { foo: "myContent" },
 							persistencyKey: "myPersistencyKey"
 						}
 					}
@@ -695,7 +695,7 @@ sap.ui.define([
 				fnCallback({
 					"default": true,
 					executeOnSelection: false,
-					content: {foo: "bar"},
+					content: { foo: "bar" },
 					type: "sType",
 					text: "sName",
 					contexts: []

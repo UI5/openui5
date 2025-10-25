@@ -1391,7 +1391,7 @@ sap.ui.define([
 			sinon.stub(this._oVM, "_isInErrorContexts").returns(false);
 
 			var oComponentPromise = new Promise(function(resolve) {
-				resolve(new Text({ text: "SAVE_AS"}));
+				resolve(new Text({ text: "SAVE_AS" }));
 			});
 
 			this._oVM._createSaveAsDialog();

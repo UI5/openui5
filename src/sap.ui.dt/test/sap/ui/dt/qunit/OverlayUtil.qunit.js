@@ -197,7 +197,7 @@ sap.ui.define([
 
 		QUnit.test("when getParentInformation is requested for a control with no parent ", function(assert) {
 			var oButton = new Button();
-			var oOverlay = new ElementOverlay({element: oButton});
+			var oOverlay = new ElementOverlay({ element: oButton });
 
 			var oParentInformation = OverlayUtil.getParentInformation(oOverlay);
 
@@ -286,15 +286,15 @@ sap.ui.define([
 			//							Button6 RelevantContainer: oSubSection2
 			//							Button7 RelevantContainer: oSubSection2
 
-			this.oButton0 = new Button("button0", {text: "button0"});
-			this.oButton1 = new Button("button1", {text: "button1"});
-			this.oButton2 = new Button("button2", {text: "button2"});
-			this.oButton3 = new Button("button3", {text: "button3"});
-			this.oButton4 = new Button("button4", {text: "button4"});
-			this.oButton5 = new Button("button5", {text: "button5"});
-			this.oButton6 = new Button("button6", {text: "button6"});
-			this.oButton7 = new Button("button7", {text: "button7"});
-			this.oButton8 = new Button("button8", {text: "button8"});
+			this.oButton0 = new Button("button0", { text: "button0" });
+			this.oButton1 = new Button("button1", { text: "button1" });
+			this.oButton2 = new Button("button2", { text: "button2" });
+			this.oButton3 = new Button("button3", { text: "button3" });
+			this.oButton4 = new Button("button4", { text: "button4" });
+			this.oButton5 = new Button("button5", { text: "button5" });
+			this.oButton6 = new Button("button6", { text: "button6" });
+			this.oButton7 = new Button("button7", { text: "button7" });
+			this.oButton8 = new Button("button8", { text: "button8" });
 			this.oVBox2 = new VBox("VBox2", {
 				items: [this.oButton6, this.oButton7]
 			});

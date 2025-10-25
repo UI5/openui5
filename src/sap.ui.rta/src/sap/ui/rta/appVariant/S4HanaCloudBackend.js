@@ -70,7 +70,7 @@ sap.ui.define([
 				}).catch(function(oError) {
 					var sText = bAppVarCreation ? "creation" : "deletion";
 					Log.error(`Catalog publishing failed for app variant ${sText}. AppVarStatus is ${oError.message}`);
-					reject({ iamAppId: sIamAppId, error: oError.message});
+					reject({ iamAppId: sIamAppId, error: oError.message });
 				});
 			}
 
@@ -136,7 +136,7 @@ sap.ui.define([
 				reject(oError);
 			};
 
-			oModel.read(`/aps_iam_app_ddl('${sIamAppId}')/to_BusinessCatalogAssignment`, {success: fnSuccess, error: fnFailure});
+			oModel.read(`/aps_iam_app_ddl('${sIamAppId}')/to_BusinessCatalogAssignment`, { success: fnSuccess, error: fnFailure });
 		});
 	};
 

@@ -75,7 +75,7 @@ sap.ui.define([
 			customFieldButtonVisible: false,
 			businessContextVisible: false,
 			customFieldButtonTooltip: "",
-			businessContextTexts: [{text: ""}], // empty element in first place to be replaced by the headerText (see: addExtensibilityInfo)
+			businessContextTexts: [{ text: "" }], // empty element in first place to be replaced by the headerText (see: addExtensibilityInfo)
 			extensibilityMenuButtonActive: false,
 			extensibilityMenuButtonText: "",
 			extensibilityMenuButtonTooltip: "",
@@ -84,7 +84,7 @@ sap.ui.define([
 
 		this._oDialogPromise.then(function(oDialog) {
 			oDialog.setModel(this._oDialogModel);
-			oRTAResourceModel ||= new ResourceModel({bundleName: "sap.ui.rta.messagebundle"});
+			oRTAResourceModel ||= new ResourceModel({ bundleName: "sap.ui.rta.messagebundle" });
 			oDialog.setModel(oRTAResourceModel, "i18n");
 
 			oDialog.addStyleClass(Utils.getRtaStyleClassName());
@@ -217,7 +217,7 @@ sap.ui.define([
 	 * @private
 	 */
 	AddElementsDialog.prototype._redirectToExtensibilityAction = function(sActionKey) {
-		this.fireTriggerExtensibilityAction({actionKey: sActionKey});
+		this.fireTriggerExtensibilityAction({ actionKey: sActionKey });
 		this._oDialogPromise.then(function(oDialog) {
 			oDialog.close();
 		});

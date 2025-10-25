@@ -20,19 +20,19 @@ sap.ui.define([
 			this.sVariantKey1 = ObjectStorageUtils.createFlexKey("id3");
 			this.sVariantKey2 = ObjectStorageUtils.createFlexKey("id4");
 			this.oStorage = {};
-			this.oStorage[this.sChangeKey1] = JSON.stringify({reference: "sap.ui.fl.test", layer: Layer.USER, name: "change1"});
-			this.oStorage[this.sChangeKey2] = JSON.stringify({reference: "sap.ui.fl.test.Component", layer: Layer.USER, name: "change2"});
-			this.oStorage[this.sVariantKey1] = JSON.stringify({reference: "sap.ui.fl.test.2", layer: Layer.CUSTOMER, name: "variant1"});
-			this.oStorage[this.sVariantKey2] = JSON.stringify({reference: "sap.ui.fl.test.3", layer: Layer.CUSTOMER, name: "variant2"});
-			this.oStorage.foo = JSON.stringify({name: "bar"});
-			this.oStorage.bar = JSON.stringify({name: "foobar"});
+			this.oStorage[this.sChangeKey1] = JSON.stringify({ reference: "sap.ui.fl.test", layer: Layer.USER, name: "change1" });
+			this.oStorage[this.sChangeKey2] = JSON.stringify({ reference: "sap.ui.fl.test.Component", layer: Layer.USER, name: "change2" });
+			this.oStorage[this.sVariantKey1] = JSON.stringify({ reference: "sap.ui.fl.test.2", layer: Layer.CUSTOMER, name: "variant1" });
+			this.oStorage[this.sVariantKey2] = JSON.stringify({ reference: "sap.ui.fl.test.3", layer: Layer.CUSTOMER, name: "variant2" });
+			this.oStorage.foo = JSON.stringify({ name: "bar" });
+			this.oStorage.bar = JSON.stringify({ name: "foobar" });
 		},
 		afterEach() {
 			delete this.oStorage;
 		}
 	}, function() {
 		QUnit.test("forEachObjectInStorage with various changes and variants", function(assert) {
-			return ObjectStorageUtils.forEachObjectInStorage({storage: this.oStorage}, function(mFlexObject) {
+			return ObjectStorageUtils.forEachObjectInStorage({ storage: this.oStorage }, function(mFlexObject) {
 				mFlexObject.changeDefinition.name += "called";
 				this.oStorage[mFlexObject.key] = (JSON.stringify(mFlexObject.changeDefinition));
 			}.bind(this))

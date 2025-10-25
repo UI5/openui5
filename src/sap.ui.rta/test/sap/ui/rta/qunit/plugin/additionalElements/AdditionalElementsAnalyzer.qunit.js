@@ -51,16 +51,16 @@ sap.ui.define([
 					reveal: {
 						elements: [{
 							element: oGroupElement1,
-							action: {depthOfRelevantBindings: bUseDepthOfRelevantBindings ? 0 : null}
+							action: { depthOfRelevantBindings: bUseDepthOfRelevantBindings ? 0 : null }
 						}, {
 							element: oGroupElement2,
-							action: {depthOfRelevantBindings: bUseDepthOfRelevantBindings ? 0 : null}
+							action: { depthOfRelevantBindings: bUseDepthOfRelevantBindings ? 0 : null }
 						}, {
 							element: oGroupElement3,
-							action: {depthOfRelevantBindings: bUseDepthOfRelevantBindings ? 0 : null}
+							action: { depthOfRelevantBindings: bUseDepthOfRelevantBindings ? 0 : null }
 						}, {
 							element: oGroupElement4,
-							action: {depthOfRelevantBindings: bUseDepthOfRelevantBindings ? 0 : null}
+							action: { depthOfRelevantBindings: bUseDepthOfRelevantBindings ? 0 : null }
 						}]
 					},
 					addViaDelegate: {
@@ -783,8 +783,8 @@ sap.ui.define([
 				}
 			};
 
-			this.sandbox.stub(oGroup, "getBindingContext").returns({ getPath() { return "/fake/binding/path/group"; }});
-			this.sandbox.stub(oGroupElement1, "getBindingContext").returns({ getPath() { return "/fake/binding/path/groupElement1"; }});
+			this.sandbox.stub(oGroup, "getBindingContext").returns({ getPath() { return "/fake/binding/path/group"; } });
+			this.sandbox.stub(oGroupElement1, "getBindingContext").returns({ getPath() { return "/fake/binding/path/groupElement1"; } });
 			this.sandbox.stub(BindingsExtractor, "getBindings").returns(["fakeBinding"]);
 
 			return AdditionalElementsAnalyzer.enhanceInvisibleElements(oGroup, oActionsObject)

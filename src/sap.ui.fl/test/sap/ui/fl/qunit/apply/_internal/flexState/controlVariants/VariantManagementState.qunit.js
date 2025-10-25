@@ -221,7 +221,7 @@ sap.ui.define([
 				"then the variant changes are applied on the variant map"
 			);
 			assert.strictEqual(
-				VariantManagementState.getVariantDependentFlexObjects({reference: sReference}).length, 3,
+				VariantManagementState.getVariantDependentFlexObjects({ reference: sReference }).length, 3,
 				"all changes are returned"
 			);
 		});
@@ -321,7 +321,7 @@ sap.ui.define([
 				"then 2 changes are returned as part of the variant management map"
 			);
 			assert.strictEqual(
-				VariantManagementState.getVariantDependentFlexObjects({reference: sReference}).length, 7,
+				VariantManagementState.getVariantDependentFlexObjects({ reference: sReference }).length, 7,
 				"all changes are returned"
 			);
 			const aCurrentVariantIds = VariantManagementState.getAllCurrentVariants(sReference).map((oVariant) => oVariant.getId());
@@ -675,8 +675,8 @@ sap.ui.define([
 			oDataSelector.checkUpdate(
 				{ reference: sReference },
 				[
-					{ type: "removeFlexObject", updatedObject: oUIChangeWithVariantReference},
-					{ type: "anotherType", updatedObject: oUIChangeWithoutVariantReference}
+					{ type: "removeFlexObject", updatedObject: oUIChangeWithVariantReference },
+					{ type: "anotherType", updatedObject: oUIChangeWithoutVariantReference }
 				]
 			);
 			assert.strictEqual(oClearCacheSpy.callCount, 1, "then the cache has been invalidated");
@@ -1011,7 +1011,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("when the initial current variant was set via technical parameters", function(assert) {
-			const oComponentData = {technicalParameters: {}};
+			const oComponentData = { technicalParameters: {} };
 			oComponentData.technicalParameters[VariantUtil.VARIANT_TECHNICAL_PARAMETER] = ["customVariant"];
 			sandbox.stub(FlexState, "getComponentData").returns(oComponentData);
 			stubFlexObjectsSelector([
@@ -1029,7 +1029,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("when the technical parameter contains entries for multiple references", function(assert) {
-			const oComponentData = {technicalParameters: {}};
+			const oComponentData = { technicalParameters: {} };
 			oComponentData.technicalParameters[VariantUtil.VARIANT_TECHNICAL_PARAMETER] = ["customVariant,customVariantForSecondVM"];
 			sandbox.stub(FlexState, "getComponentData").returns(oComponentData);
 			stubFlexObjectsSelector([
@@ -1066,7 +1066,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("when the technical parameters contain entries for multiple references - legacy: multiple parameters on URL", function(assert) {
-			const oComponentData = {technicalParameters: {}};
+			const oComponentData = { technicalParameters: {} };
 			oComponentData.technicalParameters[VariantUtil.VARIANT_TECHNICAL_PARAMETER] = ["customVariant", "customVariantForSecondVM"];
 			sandbox.stub(FlexState, "getComponentData").returns(oComponentData);
 			stubFlexObjectsSelector([
@@ -1103,7 +1103,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("when the initial current variant was set via technical parameters but is invalid", function(assert) {
-			const oComponentData = {technicalParameters: {}};
+			const oComponentData = { technicalParameters: {} };
 			oComponentData.technicalParameters[VariantUtil.VARIANT_TECHNICAL_PARAMETER] = ["someInvalidVariant"];
 			sandbox.stub(FlexState, "getComponentData").returns(oComponentData);
 
@@ -1115,7 +1115,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("when the initial current variant was set via technical parameters but is hidden", function(assert) {
-			const oComponentData = {technicalParameters: {}};
+			const oComponentData = { technicalParameters: {} };
 			oComponentData.technicalParameters[VariantUtil.VARIANT_TECHNICAL_PARAMETER] = ["customVariant"];
 			sandbox.stub(FlexState, "getComponentData").returns(oComponentData);
 
@@ -1135,7 +1135,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("when the initial current variant was set via technical parameters and setDefault changes exist", function(assert) {
-			const oComponentData = {technicalParameters: {}};
+			const oComponentData = { technicalParameters: {} };
 			oComponentData.technicalParameters[VariantUtil.VARIANT_TECHNICAL_PARAMETER] = ["customVariant"];
 			sandbox.stub(FlexState, "getComponentData").returns(oComponentData);
 
@@ -1379,7 +1379,7 @@ sap.ui.define([
 				"then the persisted UI change is still returned"
 			);
 			assert.strictEqual(
-				VariantManagementState.getVariantDependentFlexObjects({reference: sReference}).length, 4,
+				VariantManagementState.getVariantDependentFlexObjects({ reference: sReference }).length, 4,
 				"all four changes are returned"
 			);
 		});
@@ -1635,8 +1635,8 @@ sap.ui.define([
 	}, function() {
 		QUnit.test("without any hidden variants", function(assert) {
 			const aFlexObjects = [
-				createVariant({fileName: sVariantManagementReference}),
-				createVariant({variantReference: sVariantManagementReference, fileName: "variant2"}),
+				createVariant({ fileName: sVariantManagementReference }),
+				createVariant({ variantReference: sVariantManagementReference, fileName: "variant2" }),
 				FlexObjectFactory.createUIChange({
 					id: "uiChange",
 					layer: Layer.CUSTOMER,
@@ -1661,8 +1661,8 @@ sap.ui.define([
 
 		QUnit.test("with hidden variants", function(assert) {
 			const aFlexObjects = [
-				createVariant({fileName: sVariantManagementReference}),
-				createVariant({variantReference: sVariantManagementReference, fileName: "variant2"}),
+				createVariant({ fileName: sVariantManagementReference }),
+				createVariant({ variantReference: sVariantManagementReference, fileName: "variant2" }),
 				FlexObjectFactory.createUIChange({
 					id: "uiChange",
 					layer: Layer.CUSTOMER,

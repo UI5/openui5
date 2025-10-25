@@ -52,7 +52,7 @@ sap.ui.define([
 	 async	beforeEach(assert) {
 			const done = assert.async();
 			this.oButton1 = new Button("button1");
-			this.oButton2 = new Button("button2", {text: "Button 2 text"});
+			this.oButton2 = new Button("button2", { text: "Button 2 text" });
 			this.oButtonUnselectable = new Button();
 			this.oLayout = new VerticalLayout({
 				content: [
@@ -226,7 +226,7 @@ sap.ui.define([
 			});
 
 			const onOpenedContextMenuAgain = function(oEvent) {
-				const {oContextMenuControl} = oEvent.getSource();
+				const { oContextMenuControl } = oEvent.getSource();
 				// check if the Menu is called with correct parameters (Keyboard event)
 				const oEventParameter = this.oMenuSpy.getCall(1).args[0];
 				const oOpenerRefParameter = this.oMenuSpy.getCall(1).args[1];
@@ -251,7 +251,7 @@ sap.ui.define([
 			};
 
 			const onOpenedContextMenu = async function(oEvent) {
-				const {oContextMenuControl} = oEvent.getSource();
+				const { oContextMenuControl } = oEvent.getSource();
 				// check if the Menu is called with correct parameters (Mouse event)
 				const oEventParameter = this.oMenuSpy.getCall(0).args[0];
 				const oOpenerRefParameter = this.oMenuSpy.getCall(0).args[1];
@@ -365,7 +365,7 @@ sap.ui.define([
 				this.oPropagatedMenuEntries.propagatedBtn3
 			]);
 			this.oContextMenuPlugin.attachEventOnce("openedContextMenu", function(oEvent) {
-				const {oContextMenuControl} = oEvent.getSource();
+				const { oContextMenuControl } = oEvent.getSource();
 				const aItems = oContextMenuControl.getItems();
 				const oRenameMenuItem = aItems.find((oItem) => {
 					return oItem.getText() === "Rename for button 1";
@@ -447,7 +447,7 @@ sap.ui.define([
 				this.oPropagatedMenuEntries.propagatedBtn4
 			]);
 			this.oContextMenuPlugin.attachEventOnce("openedContextMenu", function(oEvent) {
-				const {oContextMenuControl} = oEvent.getSource();
+				const { oContextMenuControl } = oEvent.getSource();
 				const aItems = oContextMenuControl.getItems();
 				const oRenameMenuItem = aItems.find((oItem) => {
 					return oItem.getText() === "Rename for button 1";
@@ -505,7 +505,7 @@ sap.ui.define([
 				this.oPropagatedMenuEntries.propagatedBtn4
 			]);
 			this.oContextMenuPlugin.attachEventOnce("openedContextMenu", function(oEvent) {
-				const {oContextMenuControl} = oEvent.getSource();
+				const { oContextMenuControl } = oEvent.getSource();
 				const aItems = oContextMenuControl.getItems();
 				const oRenameMenuItem = aItems.find((oItem) => {
 					return oItem.getText() === "Rename for button 1";
@@ -583,7 +583,7 @@ sap.ui.define([
 				this.oPropagatedMenuEntries.propagatedBtn1
 			]);
 			this.oContextMenuPlugin.attachEventOnce("openedContextMenu", function(oEvent) {
-				const {oContextMenuControl} = oEvent.getSource();
+				const { oContextMenuControl } = oEvent.getSource();
 				const aItems = oContextMenuControl.getItems();
 				const oControlTitleItem = aItems.find((oItem) => {
 					return oItem.getId() === "CTX_CONTROL_NAME";

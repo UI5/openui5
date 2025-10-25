@@ -708,7 +708,7 @@ sap.ui.define([
 			var fnDone = assert.async();
 
 			var oButton = new Button();
-			var oLayout = new VerticalLayout({content: [oButton]});
+			var oLayout = new VerticalLayout({ content: [oButton] });
 
 			var bSyncingCalled = false;
 			this.oDesignTime.attachEventOnce("syncing", function() {
@@ -832,13 +832,13 @@ sap.ui.define([
 			.then(function() {
 				assert.equal(oRegisterElementOverlay.callCount, 4,
 					"then the plugin registration is called before designtime is synced");
-				assert.equal(oTaskManagerAddSpy.calledWith({ type: "pluginInProcess", plugin: oToolHooksPlugin.getMetadata().getName()}), true,
+				assert.equal(oTaskManagerAddSpy.calledWith({ type: "pluginInProcess", plugin: oToolHooksPlugin.getMetadata().getName() }), true,
 					"then on addPlugin the taskManager is used with tasks from 'pluginInProcess' type");
 				this.oDesignTime.insertPlugin(oContextMenuPlugin, 0);
 				return DtUtil.waitForSynced(this.oDesignTime, done)();
 			}.bind(this))
 			.then(function() {
-				assert.equal(oTaskManagerAddSpy.calledWith({ type: "pluginInProcess", plugin: oContextMenuPlugin.getMetadata().getName()}), true,
+				assert.equal(oTaskManagerAddSpy.calledWith({ type: "pluginInProcess", plugin: oContextMenuPlugin.getMetadata().getName() }), true,
 					"then on insertPlugin the taskManager is used with tasks from 'pluginInProcess' type");
 				this.oDesignTime.insertPlugin(oDragDropPlugin, 1);
 				return DtUtil.waitForSynced(this.oDesignTime, done)();
@@ -937,7 +937,7 @@ sap.ui.define([
 
 			this.oInnerLayout.removeContent(this.oButton1); // triggers setParent modified
 			this.oButton1.destroy(); // triggers overlay removal
-			this.oInnerLayout.addContent(new Button({ id: sElementId, text: "recreated"})); // triggers overlay being added
+			this.oInnerLayout.addContent(new Button({ id: sElementId, text: "recreated" })); // triggers overlay being added
 		});
 
 		// TODO: check after DesignTime API Enhancement
@@ -1276,7 +1276,7 @@ sap.ui.define([
 	function getJsonModelWithData(iCount, sIdPrefix, sIdSuffix) {
 		var oData = [];
 		for (var i = 0, n = iCount; i < n; i++) {
-			oData.push({text: (sIdPrefix || "item") + i + (sIdSuffix || "-bound")});
+			oData.push({ text: (sIdPrefix || "item") + i + (sIdSuffix || "-bound") });
 		}
 		return new JSONModel(oData);
 	}
@@ -1287,7 +1287,7 @@ sap.ui.define([
 			const oModel = getJsonModelWithData(2);
 			this.oCustomListItemTemplate = new CustomListItem(
 				"boundListItem",
-				{content: [new Button("boundListItem-btn", {text: "{text}"})]}
+				{ content: [new Button("boundListItem-btn", { text: "{text}" })] }
 			);
 			this.oBoundList = new List("boundlist").setModel(oModel);
 			this.oBoundList.bindAggregation("items", {
@@ -1298,8 +1298,8 @@ sap.ui.define([
 
 			// create list with unbound items
 			this.oUnboundList = new List("unboundlist");
-			this.oUnboundList.addItem(new CustomListItem("unboundlist-0", {content: [new Button("item1-btn", {text: "item1-unbound"})]}));
-			this.oUnboundList.addItem(new CustomListItem("unboundlist-1", {content: [new Button("item2-btn", {text: "item2-unbound"})]}));
+			this.oUnboundList.addItem(new CustomListItem("unboundlist-0", { content: [new Button("item1-btn", { text: "item1-unbound" })] }));
+			this.oUnboundList.addItem(new CustomListItem("unboundlist-1", { content: [new Button("item2-btn", { text: "item2-unbound" })] }));
 
 			// create a HorizontalLayout containing the two lists
 			this.oHorizontalLayout = new HorizontalLayout("horLyout", {
@@ -1325,7 +1325,7 @@ sap.ui.define([
 		const fnDone = assert.async();
 		const oCustomListItemTemplate = new CustomListItem(
 			"boundListItem-2",
-			{content: [new Button("boundListItem-btn-2", {text: "{text}"})]}
+			{ content: [new Button("boundListItem-btn-2", { text: "{text}" })] }
 		);
 		this.oDesignTime.attachEventOnce("synced", function() {
 			const oBoundListItemOverlay = OverlayRegistry.getOverlay(oCustomListItemTemplate);
@@ -1400,7 +1400,7 @@ sap.ui.define([
 			const oModel = getJsonModelWithData(2);
 			this.oCustomListItemTemplate = new CustomListItem(
 				"boundListItem",
-				{content: [new Button("boundListItem-btn", {text: "{text}"})]}
+				{ content: [new Button("boundListItem-btn", { text: "{text}" })] }
 			);
 			this.oBoundList = new List("boundlist").setModel(oModel);
 			this.oBoundList.bindAggregation("items", {
@@ -1550,7 +1550,7 @@ sap.ui.define([
 			var oInnerModel = getJsonModelWithData(3, "inner", "");
 
 			this.oInnerTemplate = new CustomListItem("inner-template", {
-				content: [new Button("deep-button", {text: "deep"})]
+				content: [new Button("deep-button", { text: "deep" })]
 			});
 			this.oInnerList = new List("inner-list").setModel(oInnerModel);
 			this.oInnerList.bindAggregation("items", {
@@ -1561,14 +1561,14 @@ sap.ui.define([
 
 			this.oOuterTemplate = new CustomListItem("outer-template", {
 				content: [
-					new Button("inner-top-button", {text: "inner-top"}),
+					new Button("inner-top-button", { text: "inner-top" }),
 					this.oInnerList,
-					new Button("inner-bottom-button", {text: "inner-bottom"})
+					new Button("inner-bottom-button", { text: "inner-bottom" })
 				]
 			});
 
 			this.oToolbar = new Toolbar("external-toolbar", {
-				content: [new Button("external-button", {text: "external"})]
+				content: [new Button("external-button", { text: "external" })]
 			});
 
 			this.oRootList = new List("root-list", {

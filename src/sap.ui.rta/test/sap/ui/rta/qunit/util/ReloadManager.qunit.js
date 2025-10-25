@@ -234,7 +234,7 @@ sap.ui.define([
 	}, function() {
 		QUnit.test("with no reload reason", function(assert) {
 			this.oGetReloadReasonsStub.resolves({});
-			return ReloadManager.handleReloadOnStart({foo: "bar"}).then(function(bResult) {
+			return ReloadManager.handleReloadOnStart({ foo: "bar" }).then(function(bResult) {
 				var oExpectedProperties = {
 					ignoreMaxLayerParameter: false,
 					includeCtrlVariants: true,
@@ -247,8 +247,8 @@ sap.ui.define([
 		});
 
 		QUnit.test("in the developer mode with a reload reason", function(assert) {
-			this.oGetReloadReasonsStub.resolves({hasHigherLayerChanges: true});
-			return ReloadManager.handleReloadOnStart({developerMode: true}).then(function(bResult) {
+			this.oGetReloadReasonsStub.resolves({ hasHigherLayerChanges: true });
+			return ReloadManager.handleReloadOnStart({ developerMode: true }).then(function(bResult) {
 				assert.strictEqual(bResult, true, "the function returns true");
 				assert.strictEqual(this.oAutoStartStub.callCount, 1, "auto start was set");
 				assert.strictEqual(this.oReloadStub.callCount, 1, "reload was triggered");
@@ -258,32 +258,32 @@ sap.ui.define([
 		});
 
 		QUnit.test("with versioning and with a reload reason", function(assert) {
-			this.oGetReloadReasonsStub.resolves({hasHigherLayerChanges: true});
+			this.oGetReloadReasonsStub.resolves({ hasHigherLayerChanges: true });
 			this.oReloadStub.callsFake(function() {
 				assert.ok(this.oLoadVersionStubFinished, "then calls are properly chained");
 				return Promise.resolve();
 			}.bind(this));
-			return ReloadManager.handleReloadOnStart({versioningEnabled: true}).then(function() {
+			return ReloadManager.handleReloadOnStart({ versioningEnabled: true }).then(function() {
 				assert.strictEqual(this.oLoadDraftStub.callCount, 0, "the draft was not loaded");
 				assert.strictEqual(this.oLoadVersionStub.callCount, 1, "the version was loaded");
 			}.bind(this));
 		});
 
 		QUnit.test("with versioning and a draft and with a reload reason", function(assert) {
-			this.oGetReloadReasonsStub.resolves({isDraftAvailable: true});
+			this.oGetReloadReasonsStub.resolves({ isDraftAvailable: true });
 			this.oReloadStub.callsFake(function() {
 				assert.ok(this.oLoadVersionStubFinished, "then calls are properly chained");
 				return Promise.resolve();
 			}.bind(this));
-			return ReloadManager.handleReloadOnStart({versioningEnabled: true}).then(function() {
+			return ReloadManager.handleReloadOnStart({ versioningEnabled: true }).then(function() {
 				assert.strictEqual(this.oLoadDraftStub.callCount, 1, "the draft was loaded");
 				assert.strictEqual(this.oLoadVersionStub.callCount, 0, "the version was not loaded");
 			}.bind(this));
 		});
 
 		QUnit.test("with versioning and a draft and all context not provided and with a reload reason", function(assert) {
-			this.oGetReloadReasonsStub.resolves({isDraftAvailable: true, allContexts: true});
-			return ReloadManager.handleReloadOnStart({versioningEnabled: true}).then(function() {
+			this.oGetReloadReasonsStub.resolves({ isDraftAvailable: true, allContexts: true });
+			return ReloadManager.handleReloadOnStart({ versioningEnabled: true }).then(function() {
 				assert.strictEqual(this.oLoadDraftStub.callCount, 1, "the draft was loaded");
 				assert.strictEqual(this.oLoadDraftStub.getCall(0).args[0].allContexts, true, "with allContext=true parameter");
 				assert.strictEqual(this.oLoadVersionStub.callCount, 0, "the version was not loaded");
@@ -291,8 +291,8 @@ sap.ui.define([
 		});
 
 		QUnit.test("with versioning and a draft and all context and adaptationId and with a reload reason", function(assert) {
-			this.oGetReloadReasonsStub.resolves({isDraftAvailable: true, allContexts: true, adaptationId: "id_1234"});
-			return ReloadManager.handleReloadOnStart({versioningEnabled: true}).then(function() {
+			this.oGetReloadReasonsStub.resolves({ isDraftAvailable: true, allContexts: true, adaptationId: "id_1234" });
+			return ReloadManager.handleReloadOnStart({ versioningEnabled: true }).then(function() {
 				assert.strictEqual(this.oLoadDraftStub.callCount, 1, "the draft was loaded");
 				var oLoadDraftPropertyBag = this.oLoadDraftStub.getCall(0).args[0];
 				assert.strictEqual(oLoadDraftPropertyBag.allContexts, true, "with allContext=true parameter");
@@ -302,8 +302,8 @@ sap.ui.define([
 		});
 
 		QUnit.test("with versioning and all context and adaptationId and with a reload reason", function(assert) {
-			this.oGetReloadReasonsStub.resolves({hasHigherLayerChanges: true, allContexts: true, adaptationId: "id_1234"});
-			return ReloadManager.handleReloadOnStart({versioningEnabled: true}).then(function() {
+			this.oGetReloadReasonsStub.resolves({ hasHigherLayerChanges: true, allContexts: true, adaptationId: "id_1234" });
+			return ReloadManager.handleReloadOnStart({ versioningEnabled: true }).then(function() {
 				assert.strictEqual(this.oLoadDraftStub.callCount, 0, "the draft was loaded");
 				assert.strictEqual(this.oLoadVersionStub.callCount, 1, "the version was not loaded");
 				var oLoadVersionPropertyBag = this.oLoadVersionStub.getCall(0).args[0];
@@ -400,7 +400,7 @@ sap.ui.define([
 			});
 			this.oReloadCurrentAppStub = sandbox.stub();
 			ReloadManager.setUShellServices({
-				AppLifeCycle: {reloadCurrentApp: this.oReloadCurrentAppStub}
+				AppLifeCycle: { reloadCurrentApp: this.oReloadCurrentAppStub }
 			});
 		},
 		afterEach() {
@@ -408,7 +408,7 @@ sap.ui.define([
 		}
 	}, function() {
 		QUnit.test("onStart with changed params", function(assert) {
-			FlexInfoSession.setByReference({version: "1"});
+			FlexInfoSession.setByReference({ version: "1" });
 			this.oHandleReloadInfoOnStartStub.callsFake(function() {
 				return true;
 			});

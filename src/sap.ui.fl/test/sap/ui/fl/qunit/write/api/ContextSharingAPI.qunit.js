@@ -44,7 +44,7 @@ sap.ui.define([
 			};
 			sandbox.stub(Settings, "getInstance").resolves(new Settings(oSettings));
 
-			return ContextSharingAPI.createComponent({layer: Layer.CUSTOMER}).then(function(oCompContainer) {
+			return ContextSharingAPI.createComponent({ layer: Layer.CUSTOMER }).then(function(oCompContainer) {
 				this.oCompCont = oCompContainer;
 				assert.equal(oCompContainer, undefined, "then component is undefined");
 			}.bind(this));
@@ -56,7 +56,7 @@ sap.ui.define([
 			};
 			sandbox.stub(Settings, "getInstance").resolves(new Settings(oSettings));
 
-			return ContextSharingAPI.createComponent({layer: Layer.CUSTOMER})
+			return ContextSharingAPI.createComponent({ layer: Layer.CUSTOMER })
 			.then(renderComponentContainer.bind(this))
 			.then(function() {
 				assert.deepEqual(this.oCompCont.getComponentInstance().getSelectedContexts().role, [], "then component data for selected roles is correct");
@@ -70,7 +70,7 @@ sap.ui.define([
 			sandbox.stub(Settings, "getInstance").resolves(new Settings(oSettings));
 			sandbox.stub(ContextBasedAdaptationsAPI, "adaptationExists").returns(true);
 
-			return ContextSharingAPI.createComponent({layer: Layer.CUSTOMER, reference: "id"}).then(function(oCompContainer) {
+			return ContextSharingAPI.createComponent({ layer: Layer.CUSTOMER, reference: "id" }).then(function(oCompContainer) {
 				this.oCompCont = oCompContainer;
 				assert.equal(oCompContainer, undefined, "then component is undefined");
 			}.bind(this));
@@ -83,7 +83,7 @@ sap.ui.define([
 			sandbox.stub(Settings, "getInstance").resolves(new Settings(oSettings));
 			sandbox.stub(ContextBasedAdaptationsAPI, "adaptationExists").returns(false);
 
-			return ContextSharingAPI.createComponent({layer: Layer.CUSTOMER, reference: "id"})
+			return ContextSharingAPI.createComponent({ layer: Layer.CUSTOMER, reference: "id" })
 			.then(renderComponentContainer.bind(this))
 			.then(function() {
 				assert.deepEqual(this.oCompCont.getComponentInstance().getSelectedContexts().role, [], "then component data for selected roles is correct");
@@ -96,12 +96,12 @@ sap.ui.define([
 			};
 			sandbox.stub(Settings, "getInstance").resolves(new Settings(oSettings));
 
-			return ContextSharingAPI.createComponent({layer: Layer.CUSTOMER})
+			return ContextSharingAPI.createComponent({ layer: Layer.CUSTOMER })
 			.then(renderComponentContainer.bind(this))
 			.then(function() {
 				assert.deepEqual(this.oCompCont.getComponentInstance().getSelectedContexts().role, [], "then component data for selected roles is correct");
 			}.bind(this)).then(function() {
-				return ContextSharingAPI.createComponent({layer: Layer.CUSTOMER});
+				return ContextSharingAPI.createComponent({ layer: Layer.CUSTOMER });
 			});
 		});
 	});

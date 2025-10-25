@@ -283,7 +283,7 @@ sap.ui.define([
 			await nextUIUpdate();
 			assert.ok(oSetSeenFeatureIdsSpy.calledOnce, "then the setSeenFeatureIds function is called");
 			assert.ok(
-				oSetSeenFeatureIdsSpy.calledWith({seenFeatureIds: aFeatureIdList, layer: sLayer}),
+				oSetSeenFeatureIdsSpy.calledWith({ seenFeatureIds: aFeatureIdList, layer: sLayer }),
 				"then the setSeenFeatureIds function is called with the correct parameters"
 			);
 		});

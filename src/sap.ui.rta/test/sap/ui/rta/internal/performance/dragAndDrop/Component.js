@@ -25,7 +25,7 @@ sap.ui.define([
 ) {
 	"use strict";
 
-	const {FlexWrap} = mobileLibrary;
+	const { FlexWrap } = mobileLibrary;
 
 	return UIComponent.extend("rta.performance.dragAndDrop.Component", {
 		metadata: {

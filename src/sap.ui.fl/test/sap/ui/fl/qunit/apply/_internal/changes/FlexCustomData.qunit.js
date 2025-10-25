@@ -135,7 +135,7 @@ sap.ui.define([
 			var oCustomData = new CustomData({
 				key: createCustomDataKey(this.oChange, sAppliedKey)
 			});
-			oCustomData.setValue(JSON.stringify({value: "revert"}));
+			oCustomData.setValue(JSON.stringify({ value: "revert" }));
 			this.oControl.addCustomData(oCustomData);
 			this.oControl.addCustomData(new CustomData({
 				key: createCustomDataKey(this.oChange2, sNotApplicableKey),
@@ -187,7 +187,7 @@ sap.ui.define([
 
 		QUnit.test("getParsedRevertDataFromCustomData with js control tree modifier", function(assert) {
 			var oParsedRevertData = FlexCustomData.getParsedRevertDataFromCustomData(this.oControl, this.oChange, this.mPropertyBag.modifier);
-			assert.deepEqual(oParsedRevertData, {value: "revert"}, "the parsed data is correct");
+			assert.deepEqual(oParsedRevertData, { value: "revert" }, "the parsed data is correct");
 		});
 
 		QUnit.test("getParsedRevertDataFromCustomData with js control tree modifier without custom data", function(assert) {

@@ -461,7 +461,7 @@ sap.ui.define([
 			const oFlexInfoSession = PersistenceWriteAPI.getResetAndPublishInfoFromSession(oRootControl);
 			this.bInitialResetEnabled = !!oFlexInfoSession.isResetEnabled;
 
-			this._oSerializer = new LREPSerializer({commandStack: this.getCommandStack(), rootControl: this.getRootControl()});
+			this._oSerializer = new LREPSerializer({ commandStack: this.getCommandStack(), rootControl: this.getRootControl() });
 
 			this.getPluginManager().preparePlugins(
 				this.getFlexSettings(),
@@ -556,7 +556,7 @@ sap.ui.define([
 				this.destroy();
 			} else {
 				this._sStatus = FAILED;
-				this.fireFailed({vError: vError.message});
+				this.fireFailed({ vError: vError.message });
 			}
 			throw vError;
 		}
@@ -580,7 +580,7 @@ sap.ui.define([
 			// RTA Visual Improvements
 			document.body.classList.add("sapUiRtaMode");
 			this._oDesignTime.getSelectionManager().attachChange(function(oEvent) {
-				this.fireSelectionChange({selection: oEvent.getParameter("selection")});
+				this.fireSelectionChange({ selection: oEvent.getParameter("selection") });
 			}, this);
 
 			this._oDesignTime.attachEventOnce("synced", function() {
@@ -622,7 +622,7 @@ sap.ui.define([
 		let bUserCancelled;
 		checkToolbarAndExecuteFunction.call(this, "setBusy", true);
 		try {
-			bSkipSave ||= !PersistenceWriteAPI.hasDirtyChanges({selector: this.getRootControlInstance()});
+			bSkipSave ||= !PersistenceWriteAPI.hasDirtyChanges({ selector: this.getRootControlInstance() });
 			await waitForPendingActions.call(this);
 			if (!bSkipSave && this.canSave() && !bSkipUnsavedChangesPrompt) {
 				const sAction = await showSaveConfirmation.call(this);
@@ -760,7 +760,7 @@ sap.ui.define([
 
 			this._oToolbarControlsModel.setProperty("/modeSwitcher", sNewMode);
 			this.setProperty("mode", sNewMode);
-			this.fireModeChanged({mode: sNewMode});
+			this.fireModeChanged({ mode: sNewMode });
 		}
 	};
 
@@ -1161,10 +1161,10 @@ sap.ui.define([
 				const bCanSave = oCommandStack.canSave();
 				const bWasSaved = oCommandStack.getSaved();
 				const bTranslationRelevantDirtyChange = this._oToolbarControlsModel.getProperty("/translation/visible") &&
-					TranslationAPI.hasTranslationRelevantDirtyChanges({layer: Layer.CUSTOMER, selector: this.getRootControlInstance()});
+					TranslationAPI.hasTranslationRelevantDirtyChanges({ layer: Layer.CUSTOMER, selector: this.getRootControlInstance() });
 
 				// TODO: move to the setter to the ChangesState
-				this._oVersionsModel.setDirtyChanges(PersistenceWriteAPI.hasDirtyChanges({selector: this.getRootControlInstance()}));
+				this._oVersionsModel.setDirtyChanges(PersistenceWriteAPI.hasDirtyChanges({ selector: this.getRootControlInstance() }));
 				this._oToolbarControlsModel.setProperty("/undo/enabled", bCanUndo);
 				this._oToolbarControlsModel.setProperty("/redo/enabled", bCanRedo);
 				this._oToolbarControlsModel.setProperty("/save/enabled", bCanSave);
@@ -1349,7 +1349,7 @@ sap.ui.define([
 			this._oToolbarControlsModel.setProperty("/restore/enabled", true);
 			this.getCommandStack().removeAllCommands();
 		} catch (oError) {
-			Utils.showMessageBox("error", "MSG_DRAFT_ACTIVATION_FAILED", {error: oError});
+			Utils.showMessageBox("error", "MSG_DRAFT_ACTIVATION_FAILED", { error: oError });
 		}
 	}
 
@@ -1468,7 +1468,7 @@ sap.ui.define([
 			}
 		})
 		.catch(function(oError) {
-			Utils.showMessageBox("error", "MSG_SWITCH_ADAPTATION_FAILED", {error: oError});
+			Utils.showMessageBox("error", "MSG_SWITCH_ADAPTATION_FAILED", { error: oError });
 			Log.error(`sap.ui.rta: ${oError.stack || oError.message || oError}`);
 		});
 	}
@@ -1493,7 +1493,7 @@ sap.ui.define([
 			switchVersion.bind(this, this._sSwitchToVersion))
 		.then(fnCallback)
 		.catch(function(oError) {
-			Utils.showMessageBox("error", "MSG_SWITCH_VERSION_FAILED", {error: oError.stack});
+			Utils.showMessageBox("error", "MSG_SWITCH_VERSION_FAILED", { error: oError.stack });
 			Log.error(`sap.ui.rta: ${oError.stack || oError.message || oError}`);
 		});
 	}
@@ -1697,7 +1697,7 @@ sap.ui.define([
 
 		if (bTranslationAvailable) {
 			TranslationAPI.getSourceLanguages(
-				{selector: this.getRootControlInstance(), layer: this.getLayer()}
+				{ selector: this.getRootControlInstance(), layer: this.getLayer() }
 			).then(function(aSourceLanguages) {
 				this.bPersistedDataTranslatable = aSourceLanguages.length > 0;
 				this._oToolbarControlsModel.setProperty("/translation/enabled", this.bPersistedDataTranslatable);
@@ -1736,7 +1736,7 @@ sap.ui.define([
 		}.bind(this))
 		.catch(function(oError) {
 			if (oError !== "cancel") {
-				Utils.showMessageBox("error", "MSG_RESTORE_FAILED", {error: oError});
+				Utils.showMessageBox("error", "MSG_RESTORE_FAILED", { error: oError });
 			}
 		});
 	}
@@ -1787,7 +1787,7 @@ sap.ui.define([
 				// Error handling when a command fails is done in the Stack
 				.catch(function(oError) {
 					if (oError?.message?.indexOf?.("The following Change cannot be applied because of a dependency") > -1) {
-						Utils.showMessageBox("error", "MSG_DEPENDENCY_ERROR", {error: oError});
+						Utils.showMessageBox("error", "MSG_DEPENDENCY_ERROR", { error: oError });
 					}
 					Log.error("sap.ui.rta:", oError.message, oError.stack);
 				});

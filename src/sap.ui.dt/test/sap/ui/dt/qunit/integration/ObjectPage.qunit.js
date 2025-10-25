@@ -38,12 +38,12 @@ function(
 		async beforeEach(assert) {
 			const fnDone = assert.async();
 
-			this.oButton = new Button({text: "foo"});
+			this.oButton = new Button({ text: "foo" });
 			this.oSubSection = new ObjectPageSubSection("subsection", {
 				blocks: [this.oButton]
 			});
 			this.oSubSection2 = new ObjectPageSubSection("subsection2", {
-				blocks: [new Button({text: "bar"})]
+				blocks: [new Button({ text: "bar" })]
 			});
 			this.oSection = new ObjectPageSection("section", {
 				visible: false,
@@ -56,7 +56,7 @@ function(
 				height: "600px",
 				sections: [this.oSection, this.oSection2],
 				headerTitle: new ObjectPageDynamicHeaderTitle({
-					heading: new Title({ text: "Title"})
+					heading: new Title({ text: "Title" })
 				})
 			});
 			this.oVBox = new VBox({

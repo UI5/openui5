@@ -467,7 +467,7 @@ sap.ui.define([
 		);
 		assert.deepEqual(
 			mWriteDelegateInfo.payload,
-			{someProperty: "some_payload"},
+			{ someProperty: "some_payload" },
 			"then the instance specific write delegate info contains the registered payload"
 		);
 	});

@@ -21,7 +21,7 @@ sap.ui.define([
 	}, function() {
 		QUnit.test("when json path is set", function(assert) {
 			const sPath = "/somePath";
-			const oReturnObj = {returnObjProp: "return"};
+			const oReturnObj = { returnObjProp: "return" };
 			ObjectPathConnector.setJsonPath(sPath);
 			sandbox.stub(LoaderExtensions, "loadResource")
 			.callThrough()
@@ -44,7 +44,7 @@ sap.ui.define([
 
 		QUnit.test("when json path is passed", function(assert) {
 			const sPath = "/somePath";
-			const oReturnObj = {returnObjProp: "return"};
+			const oReturnObj = { returnObjProp: "return" };
 			sandbox.stub(LoaderExtensions, "loadResource")
 			.callThrough()
 			.withArgs({
@@ -54,7 +54,7 @@ sap.ui.define([
 			})
 			.resolves(oReturnObj);
 
-			return ObjectPathConnector.loadFlexData({path: sPath})
+			return ObjectPathConnector.loadFlexData({ path: sPath })
 			.then(function(oResponse) {
 				assert.deepEqual(
 					oResponse,
@@ -97,7 +97,7 @@ sap.ui.define([
 			})
 			.resolves(oReturnedJson);
 
-			return ObjectPathConnector.loadFeatures({path: sPath})
+			return ObjectPathConnector.loadFeatures({ path: sPath })
 			.then(function(oSettings) {
 				assert.deepEqual(oSettings, oReturnedSettings, "the settings are correct");
 			});
@@ -117,7 +117,7 @@ sap.ui.define([
 			})
 			.resolves(oReturnedJson);
 
-			return ObjectPathConnector.loadFeatures({path: sPath})
+			return ObjectPathConnector.loadFeatures({ path: sPath })
 			.then(function(oSettings) {
 				assert.deepEqual(oSettings, oReturnedSettings, "the settings are correct");
 			});

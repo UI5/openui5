@@ -45,9 +45,9 @@ sap.ui.define([
 				]
 			});
 
-			this.oView = new View({content: [
+			this.oView = new View({ content: [
 				this.oHBox
-			]});
+			] });
 
 			var mExpectedSelector = {
 				id: this.oHBox.getId(),

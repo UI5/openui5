@@ -29,7 +29,7 @@ sap.ui.define([
 	"use strict";
 
 	// shortcut for sap.ui.core.ValueState
-	var {ValueState} = coreLibrary;
+	var { ValueState } = coreLibrary;
 
 	const _oTextResources = Lib.getResourceBundleFor("sap.ui.rta");
 
@@ -52,7 +52,7 @@ sap.ui.define([
 
 	function multiInputValidator(oValue) {
 		const sText = oValue.text;
-		return new Token({key: sText, text: sText});
+		return new Token({ key: sText, text: sText });
 	}
 
 	function setNewPreviewSize(sPropertyName) {
@@ -156,7 +156,7 @@ sap.ui.define([
 				this._oJSONModel.setProperty("/previousFrameUrl/value", sReturnedURL);
 				this._oJSONModel.setProperty("/settingsUpdate/value", false);
 
-				oIFrame.applySettings({ url: sURL, advancedSettings: {...this._oJSONModel.getProperty("/advancedSettings/value")} });
+				oIFrame.applySettings({ url: sURL, advancedSettings: { ...this._oJSONModel.getProperty("/advancedSettings/value") } });
 				// Use the URL from the IFrame to ensure that the complete path is shown
 				this._oJSONModel.setProperty("/previewUrl/value", oIFrame.getUrl());
 				// Prevent the URL preview link (next element in the DOM) from getting the focus because it looks bad

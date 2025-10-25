@@ -49,7 +49,7 @@ sap.ui.define([
 			var oMainModel = this.oView.getModel();
 			var oGroup = this.oView.byId("GroupEntityType01");
 			var oGroupElement = this.oView.byId("EntityType01.Prop1");
-			var aBindings = BindingsExtractor.getBindings({element: oGroup, model: oMainModel});
+			var aBindings = BindingsExtractor.getBindings({ element: oGroup, model: oMainModel });
 
 			assert.equal(
 				hasBindingPath(aBindings, oGroupElement.getFields()[0].getBindingPath("value")),
@@ -62,7 +62,7 @@ sap.ui.define([
 			var oI18Model = this.oView.getModel("i18n");
 			var oGroup = this.oView.byId("GroupEntityType01");
 			var oGroupElement = this.oView.byId("EntityType02.BoundButton34");
-			var aBindings = BindingsExtractor.getBindings({element: oGroup, model: oI18Model});
+			var aBindings = BindingsExtractor.getBindings({ element: oGroup, model: oI18Model });
 			assert.equal(
 				hasBindingPath(aBindings, oGroupElement.getFields()[0].getBindingPath("text")),
 				true,
@@ -73,7 +73,7 @@ sap.ui.define([
 		QUnit.test("when getting the Bindings for the Text Area bound to EntityType02_Property03 & EntityType02_Complex/ComplexProperty02", function(assert) {
 			var oMainModel = this.oView.getModel();
 			var oGroupElement = this.oView.byId("ComplexBindingCase");
-			var aBindings = BindingsExtractor.getBindings({element: oGroupElement, model: oMainModel});
+			var aBindings = BindingsExtractor.getBindings({ element: oGroupElement, model: oMainModel });
 			assert.equal(
 				hasBindingPath(aBindings, oGroupElement.getFields()[0].getBindingInfo("value").parts[0].path),
 				true,
@@ -89,14 +89,14 @@ sap.ui.define([
 		QUnit.test("when getting the Bindings for the Group Element with absolute binding", function(assert) {
 			var oMainModel = this.oView.getModel();
 			var oGroupElement = this.oView.byId("EntityType02.AbsoluteBinding");
-			var aBindings = BindingsExtractor.getBindings({element: oGroupElement, model: oMainModel});
+			var aBindings = BindingsExtractor.getBindings({ element: oGroupElement, model: oMainModel });
 			assert.equal(aBindings.length, 0, "then the binding is not returned");
 		});
 
 		QUnit.test("when getting the Bindings for a navigation binding", function(assert) {
 			var oMainModel = this.oView.getModel();
 			var oGroupElement = this.oView.byId("EntityType02.NavigationProperty");
-			var aBindings = BindingsExtractor.getBindings({element: oGroupElement, model: oMainModel});
+			var aBindings = BindingsExtractor.getBindings({ element: oGroupElement, model: oMainModel });
 			assert.equal(
 				hasBindingPath(aBindings, oGroupElement.getFields()[0].getBindingPath("value")),
 				true,
@@ -107,7 +107,7 @@ sap.ui.define([
 		QUnit.test("when getting the Bindings for a navigation binding relative to the parent form", function(assert) {
 			var oMainModel = this.oView.getModel();
 			var oGroupElement = this.oView.byId("ObjectPageSubSectionForNavigation").getBlocks()[0].getGroups()[0].getGroupElements()[0];
-			var aBindings = BindingsExtractor.getBindings({element: oGroupElement, model: oMainModel});
+			var aBindings = BindingsExtractor.getBindings({ element: oGroupElement, model: oMainModel });
 			assert.equal(
 				hasBindingPath(aBindings, oGroupElement.getFields()[0].getBindingPath("value")),
 				true,
@@ -118,14 +118,14 @@ sap.ui.define([
 		QUnit.test("when getting the Bindings for a field bound to non-existent model", function(assert) {
 			var oMainModel = this.oView.getModel();
 			var oGroupElement = this.oView.byId("NonExistentModel");
-			var aBindings = BindingsExtractor.getBindings({element: oGroupElement, model: oMainModel});
+			var aBindings = BindingsExtractor.getBindings({ element: oGroupElement, model: oMainModel });
 			assert.strictEqual(aBindings.length, 0, "then no binding is found");
 		});
 
 		QUnit.test("when getting the Bindings for a form element containing a control with a binding for the same model and another with a different data model", function(assert) {
 			var oMainModel = this.oView.getModel();
 			var oElement = this.oView.byId("FormActivationElement");
-			var aBindings = BindingsExtractor.getBindings({element: oElement, model: oMainModel});
+			var aBindings = BindingsExtractor.getBindings({ element: oElement, model: oMainModel });
 			assert.strictEqual(aBindings.length, 1, "then only one binding is found");
 			assert.strictEqual(aBindings[0].getPath(), "Property01", "then only the binding from the same model (Property01) is found");
 		});
@@ -133,14 +133,14 @@ sap.ui.define([
 		QUnit.test("when getting the Bindings for a form element containing a control with only bindings inside a template with different data model", function(assert) {
 			var oMainModel = this.oView.getModel();
 			var oElement = this.oView.byId("FormActivationElementAlone");
-			var aBindings = BindingsExtractor.getBindings({element: oElement, model: oMainModel});
+			var aBindings = BindingsExtractor.getBindings({ element: oElement, model: oMainModel });
 			assert.strictEqual(aBindings.length, 0, "then no bindings are found, because they belong to a different data model");
 		});
 
 		QUnit.test("when getting the Bindings for a table where a column has a control with bindings inside a template with different data model", function(assert) {
 			var oMainModel = this.oView.getModel();
 			var oElement = this.oView.byId("table");
-			var aBindings = BindingsExtractor.getBindings({element: oElement, model: oMainModel});
+			var aBindings = BindingsExtractor.getBindings({ element: oElement, model: oMainModel });
 			assert.strictEqual(aBindings.length, 4, "then only the bindings belonging to the same data model are found");
 		});
 

@@ -893,8 +893,8 @@ sap.ui.define([
 				}, "then the correct parameters were passed");
 				return Promise.resolve();
 			});
-			var oFlexInfoResponse = {allContextsProvided: true, isResetEnabled: false, isPublishEnabled: false};
-			var sFlexReference = FlexRuntimeInfoAPI.getFlexReference({element: oComp});
+			var oFlexInfoResponse = { allContextsProvided: true, isResetEnabled: false, isPublishEnabled: false };
+			var sFlexReference = FlexRuntimeInfoAPI.getFlexReference({ element: oComp });
 			window.sessionStorage.setItem(`sap.ui.fl.info.${sFlexReference}`, JSON.stringify(oFlexInfoResponse));
 
 			return this.oRta.restore().then(function() {
@@ -921,9 +921,9 @@ sap.ui.define([
 		});
 
 		QUnit.test("when calling restore and there is an error", function(assert) {
-			var sFlexReference = FlexRuntimeInfoAPI.getFlexReference({element: oComp});
+			var sFlexReference = FlexRuntimeInfoAPI.getFlexReference({ element: oComp });
 			var sInfoSessionName = `sap.ui.fl.info.${sFlexReference}`;
-			var oFlexInfoResponse = {allContextsProvided: true, isResetEnabled: false, isPublishEnabled: false};
+			var oFlexInfoResponse = { allContextsProvided: true, isResetEnabled: false, isPublishEnabled: false };
 			window.sessionStorage.setItem(sInfoSessionName, JSON.stringify(oFlexInfoResponse));
 
 			sandbox.stub(PersistenceWriteAPI, "reset").returns(Promise.reject("Error"));
@@ -938,9 +938,9 @@ sap.ui.define([
 		});
 
 		QUnit.test("when calling restore and reset is cancelled", function(assert) {
-			var sFlexReference = FlexRuntimeInfoAPI.getFlexReference({element: oComp});
+			var sFlexReference = FlexRuntimeInfoAPI.getFlexReference({ element: oComp });
 			var sInfoSessionName = `sap.ui.fl.info.${sFlexReference}`;
-			var oFlexInfoResponse = {allContextsProvided: true, isResetEnabled: false, isPublishEnabled: false};
+			var oFlexInfoResponse = { allContextsProvided: true, isResetEnabled: false, isPublishEnabled: false };
 			window.sessionStorage.setItem(sInfoSessionName, JSON.stringify(oFlexInfoResponse));
 
 			sandbox.stub(PersistenceWriteAPI, "reset").returns(Promise.reject("cancel"));

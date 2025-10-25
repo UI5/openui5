@@ -124,7 +124,7 @@ sap.ui.define([
 				iCounter++;
 				oFlexObject.setCreation(new Date(nCreationTimestamp).toISOString());
 			}
-			aReturn.push({key: sKey, value: oFlexObject});
+			aReturn.push({ key: sKey, value: oFlexObject });
 		});
 
 		return aReturn;
@@ -142,7 +142,7 @@ sap.ui.define([
 					return true;
 				}
 			});
-			aReturn.push({key: sKey, value: oUpdatedFlexObject});
+			aReturn.push({ key: sKey, value: oUpdatedFlexObject });
 		});
 
 		return aReturn;
@@ -173,7 +173,7 @@ sap.ui.define([
 						var oNewDateTime = oCurrentDate.getTime() + 1;
 						oNextFlexObject.setCreation(new Date(oNewDateTime).toISOString());
 						var sKey = ObjectStorageUtils.createFlexKey(oNextFlexObject.getId());
-						aReturn.push({key: sKey, value: oNextFlexObject});
+						aReturn.push({ key: sKey, value: oNextFlexObject });
 					}
 				}
 			});
@@ -193,12 +193,12 @@ sap.ui.define([
 							const oChangeDeleteVersion = aFlexObjects.find(
 								(oFlexObjectVersion) => oFlexObjectVersion.fileType === "version" && oFlexObjectVersion.id === oFlexObject.version);
 							if (oChangeDeleteVersion === undefined || oChangeDeleteVersion.isDraft) {
-								aReturn.push({key: sKey, value: "delete"});
+								aReturn.push({ key: sKey, value: "delete" });
 							} else {
 								const oFlexObjectNew = { ...oFlexObject };
 								oFlexObjectNew.fileName += "_hide";
 								delete (oFlexObjectNew.content);
-								aReturn.push({key: `${sKey}_hide`, value: oFlexObjectNew});
+								aReturn.push({ key: `${sKey}_hide`, value: oFlexObjectNew });
 							}
 						}
 					});
@@ -452,7 +452,7 @@ sap.ui.define([
 				}
 			}
 			return Promise.all(aPromises).then(function() {
-				return Promise.resolve({response: aResponse});
+				return Promise.resolve({ response: aResponse });
 			});
 		},
 

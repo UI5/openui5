@@ -248,7 +248,7 @@ sap.ui.define([
 				{ version: "1" }
 			];
 			sandbox.stub(Storage.versions, "load").resolves(aReturnedVersions);
-			var oLoadStub = sandbox.stub(Storage.contextBasedAdaptation, "load").resolves({adaptations: []});
+			var oLoadStub = sandbox.stub(Storage.contextBasedAdaptation, "load").resolves({ adaptations: [] });
 
 			return ContextBasedAdaptationsAPI.initialize(this.mPropertyBag).then(function(oModel) {
 				assert.equal(oLoadStub.callCount, 0, "contextBasedAdaptations.load was called once");
@@ -280,12 +280,12 @@ sap.ui.define([
 				{ version: "1" }
 			];
 			sandbox.stub(Storage.versions, "load").resolves(aReturnedVersions);
-			sandbox.stub(FlexInfoSession, "getByReference").returns({adaptationId: "not_existing" });
-			var oLoadStub = sandbox.stub(Storage.contextBasedAdaptation, "load").resolves({adaptations: [
+			sandbox.stub(FlexInfoSession, "getByReference").returns({ adaptationId: "not_existing" });
+			var oLoadStub = sandbox.stub(Storage.contextBasedAdaptation, "load").resolves({ adaptations: [
 				{ id: "id-1591275572834-1", type: "" },
 				{ id: "id-1591275572835-1", type: "" },
 				{ id: "DEFAULT", type: "DEFAULT" }
-			]});
+			] });
 
 			return ContextBasedAdaptationsAPI.initialize(this.mPropertyBag).then(function(oModel) {
 				assert.strictEqual(oLoadStub.callCount, 1, "contextBasedAdaptations.load was called once");
@@ -326,12 +326,12 @@ sap.ui.define([
 				{ version: "1" }
 			];
 			sandbox.stub(Storage.versions, "load").resolves(aReturnedVersions);
-			sandbox.stub(FlexInfoSession, "getByReference").returns({adaptationId: "id-1591275572835-1" });
-			var oLoadStub = sandbox.stub(Storage.contextBasedAdaptation, "load").resolves({adaptations: [
+			sandbox.stub(FlexInfoSession, "getByReference").returns({ adaptationId: "id-1591275572835-1" });
+			var oLoadStub = sandbox.stub(Storage.contextBasedAdaptation, "load").resolves({ adaptations: [
 				{ id: "id-1591275572834-1", type: "" },
 				{ id: "id-1591275572835-1", type: "" },
 				{ id: "DEFAULT", type: "DEFAULT" }
-			]});
+			] });
 
 			return ContextBasedAdaptationsAPI.initialize(this.mPropertyBag).then(function(oModel) {
 				assert.equal(oLoadStub.callCount, 1, "contextBasedAdaptations.load was called once");
@@ -346,7 +346,7 @@ sap.ui.define([
 				assert.deepEqual(oModel.getData(), {
 					allAdaptations: [
 						{ id: "id-1591275572834-1", type: "", rank: 1 },
-						{ id: "id-1591275572835-1", type: "", rank: 2},
+						{ id: "id-1591275572835-1", type: "", rank: 2 },
 						{ id: "DEFAULT", type: "DEFAULT", rank: 3 }
 					],
 					adaptations: [
@@ -372,7 +372,7 @@ sap.ui.define([
 				{ version: "1" }
 			];
 			sandbox.stub(Storage.versions, "load").resolves(aReturnedVersions);
-			var oLoadStub = sandbox.stub(Storage.contextBasedAdaptation, "load").resolves({adaptations: [{ id: "DEFAULT", type: "DEFAULT" }]});
+			var oLoadStub = sandbox.stub(Storage.contextBasedAdaptation, "load").resolves({ adaptations: [{ id: "DEFAULT", type: "DEFAULT" }] });
 
 			return ContextBasedAdaptationsAPI.initialize(this.mPropertyBag).then(function(oModel) {
 				assert.strictEqual(oLoadStub.callCount, 1, "contextBasedAdaptations.load was called once");
@@ -537,7 +537,7 @@ sap.ui.define([
 				},
 				title: "German Admin"
 			};
-			var oExpectedInsertedData = {allAdaptations: [oNewAdaptation, this.oDefaultAdaptation], adaptations: [oNewAdaptation], count: 1, displayedAdaptation: oNewAdaptation, contextBasedAdaptationsEnabled: true};
+			var oExpectedInsertedData = { allAdaptations: [oNewAdaptation, this.oDefaultAdaptation], adaptations: [oNewAdaptation], count: 1, displayedAdaptation: oNewAdaptation, contextBasedAdaptationsEnabled: true };
 			oModel.insertAdaptation(oNewAdaptation);
 			oModel.switchDisplayedAdaptation(oNewAdaptation.id);
 			assert.deepEqual(oModel.getData(), oExpectedInsertedData, "then the adaptations model is updated correctly");
@@ -826,7 +826,7 @@ sap.ui.define([
 				},
 				contextBasedAdaptationsEnabled: true
 			};
-			sandbox.stub(Storage.contextBasedAdaptation, "load").resolves({adaptations: oExpectedFilledData.allAdaptations});
+			sandbox.stub(Storage.contextBasedAdaptation, "load").resolves({ adaptations: oExpectedFilledData.allAdaptations });
 			return ContextBasedAdaptationsAPI.initialize(this.mPropertyBag).then(function() {
 				assert.ok(ContextBasedAdaptationsAPI.hasAdaptationsModel(this.mPropertyBag), "there is an adaptations model for this reference and layer");
 				var oModel = ContextBasedAdaptationsAPI.getAdaptationsModel(this.mPropertyBag);
@@ -928,7 +928,7 @@ sap.ui.define([
 				},
 				contextBasedAdaptationsEnabled: true
 			};
-			sandbox.stub(Storage.contextBasedAdaptation, "load").resolves({adaptations: oExpectedFilledData.allAdaptations});
+			sandbox.stub(Storage.contextBasedAdaptation, "load").resolves({ adaptations: oExpectedFilledData.allAdaptations });
 			return ContextBasedAdaptationsAPI.initialize(this.mPropertyBag).then(function() {
 				assert.ok(ContextBasedAdaptationsAPI.hasAdaptationsModel(this.mPropertyBag), "there is an adaptations model for this reference and layer");
 				var oModel = ContextBasedAdaptationsAPI.getAdaptationsModel(this.mPropertyBag);
@@ -1031,7 +1031,7 @@ sap.ui.define([
 					type: "DEFAULT"
 				}
 			];
-			sandbox.stub(Storage.contextBasedAdaptation, "load").resolves({adaptations: aAdaptations});
+			sandbox.stub(Storage.contextBasedAdaptation, "load").resolves({ adaptations: aAdaptations });
 			return ContextBasedAdaptationsAPI.initialize(this.mPropertyBag).then(function(oModel) {
 				this.oModel = oModel;
 			}.bind(this));
@@ -1041,7 +1041,7 @@ sap.ui.define([
 		}
 	}, function() {
 		QUnit.test("when the displayed adaptation is still available", function(assert) {
-			sandbox.stub(FlexInfoSession, "getByReference").returns({adaptationId: "id-1591275572836-1" });
+			sandbox.stub(FlexInfoSession, "getByReference").returns({ adaptationId: "id-1591275572836-1" });
 			this.oModel.switchDisplayedAdaptation("id-1591275572836-1");
 			return ContextBasedAdaptationsAPI.refreshAdaptationModel(this.mPropertyBag).then(function(sDisplayedAdaptationId) {
 				assert.strictEqual(sDisplayedAdaptationId, "id-1591275572836-1",
@@ -1050,7 +1050,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("when the displayed adaptation is not available anymore", function(assert) {
-			sandbox.stub(FlexInfoSession, "getByReference").returns({adaptationId: "not_existing" });
+			sandbox.stub(FlexInfoSession, "getByReference").returns({ adaptationId: "not_existing" });
 			this.oModel.getProperty("/allAdaptations").splice(0, 1); // simulate first adaptation is not available anymore
 			return ContextBasedAdaptationsAPI.refreshAdaptationModel(this.mPropertyBag).then(function(sDisplayedAdaptationId) {
 				assert.strictEqual(sDisplayedAdaptationId, "id-1591275572835-1",
@@ -1058,7 +1058,7 @@ sap.ui.define([
 			});
 		});
 		QUnit.test("when the displayed adaptation is not available anymore and only default is left", function(assert) {
-			sandbox.stub(FlexInfoSession, "getByReference").returns({adaptationId: "not_existing" });
+			sandbox.stub(FlexInfoSession, "getByReference").returns({ adaptationId: "not_existing" });
 			this.oModel.getProperty("/allAdaptations").splice(0, 3); // simulate all are gone except default
 			return ContextBasedAdaptationsAPI.refreshAdaptationModel(this.mPropertyBag).then(function(sDisplayedAdaptationId) {
 				assert.strictEqual(sDisplayedAdaptationId, "DEFAULT",
@@ -1173,7 +1173,7 @@ sap.ui.define([
 				{ version: "1" }
 			];
 			sandbox.stub(Storage.versions, "load").resolves(aReturnedVersions);
-			var oCreateStub = sandbox.stub(Storage.contextBasedAdaptation, "create").resolves({status: 201});
+			var oCreateStub = sandbox.stub(Storage.contextBasedAdaptation, "create").resolves({ status: 201 });
 
 			return ContextBasedAdaptationsAPI.create(this.mPropertyBag).then(function(sResult) {
 				var [oArgs] = oCreateStub.getCall(0).args;
@@ -1206,7 +1206,7 @@ sap.ui.define([
 				{ version: "1" }
 			];
 			sandbox.stub(Storage.versions, "load").resolves(aReturnedVersions);
-			var oStorageCreateStub = sandbox.stub(Storage.contextBasedAdaptation, "create").resolves({status: 201});
+			var oStorageCreateStub = sandbox.stub(Storage.contextBasedAdaptation, "create").resolves({ status: 201 });
 
 			return ContextBasedAdaptationsAPI.create(this.mPropertyBag).then(function(sResult) {
 				var oArgs = oStorageCreateStub.getCall(0).args[0];
@@ -1257,7 +1257,7 @@ sap.ui.define([
 			};
 			stubSettings(sandbox);
 			sandbox.stub(Utils, "getAppComponentForControl").returns(this.oAppComponent);
-			sandbox.stub(Storage.contextBasedAdaptation, "load").resolves({adaptations: [{ id: "DEFAULT", type: "DEFAULT" }]});
+			sandbox.stub(Storage.contextBasedAdaptation, "load").resolves({ adaptations: [{ id: "DEFAULT", type: "DEFAULT" }] });
 			this.oOnAllChangesSavedStub = sandbox.stub(Versions, "onAllChangesSaved");
 			this.oWriteChangesStub = sandbox.stub(Storage, "write").resolves("Success");
 			ContextBasedAdaptationsAPI.clearInstances();
@@ -1349,7 +1349,7 @@ sap.ui.define([
 
 				sandbox.stub(Storage.versions, "load").resolves(mSetup.aReturnedVersions);
 				await FlQUnitUtils.initializeFlexStateWithData(sandbox, "com.sap.test.app", mSetup.stubResponse);
-				var oStorageCreateStub = sandbox.stub(Storage.contextBasedAdaptation, "create").resolves({status: 201});
+				var oStorageCreateStub = sandbox.stub(Storage.contextBasedAdaptation, "create").resolves({ status: 201 });
 
 				assert.notOk(ContextBasedAdaptationsAPI.hasAdaptationsModel(this.mPropertyBag),
 					 "there is no adaptations model for this reference and layer");
@@ -1478,7 +1478,7 @@ sap.ui.define([
 				}
 			});
 
-			var oReorderStub = sandbox.stub(Storage.contextBasedAdaptation, "reorder").resolves({status: 204});
+			var oReorderStub = sandbox.stub(Storage.contextBasedAdaptation, "reorder").resolves({ status: 204 });
 			return ContextBasedAdaptationsAPI.reorder(this.mPropertyBag).then(function(sResult) {
 				var oArgs = oReorderStub.getCall(0).args[0];
 				assert.deepEqual(oArgs.flexObjects, this.mPropertyBag.parameters, "then the correct parameters with priority list is used");
@@ -1616,7 +1616,7 @@ sap.ui.define([
 				assert.strictEqual(oArgs.version, 1, "then the correct version is used");
 				assert.strictEqual(oArgs.appId, "com.sap.test.app", "then correct reference is used");
 				assert.strictEqual(sResult.adaptations.length, 0, "then the correct data length is returned");
-				assert.deepEqual(sResult, {adaptations: []}, "then the correct data is returned");
+				assert.deepEqual(sResult, { adaptations: [] }, "then the correct data is returned");
 			});
 		});
 	});
@@ -1738,7 +1738,7 @@ sap.ui.define([
 				}
 			});
 
-			var oUpdateStub = sandbox.stub(Storage.contextBasedAdaptation, "update").resolves({status: 200});
+			var oUpdateStub = sandbox.stub(Storage.contextBasedAdaptation, "update").resolves({ status: 200 });
 			return ContextBasedAdaptationsAPI.update(this.mPropertyBag).then(function(sResult) {
 				var oArgs = oUpdateStub.getCall(0).args[0];
 				assert.deepEqual(oArgs.flexObjects, this.mPropertyBag.parameters, "then the correct parameters with priority list is used");
@@ -1849,7 +1849,7 @@ sap.ui.define([
 					}.bind(this), 0);
 				}.bind(this));
 			}.bind(this));
-			var oRemoveStub = sandbox.stub(Storage.contextBasedAdaptation, "remove").resolves({status: 204});
+			var oRemoveStub = sandbox.stub(Storage.contextBasedAdaptation, "remove").resolves({ status: 204 });
 			return ContextBasedAdaptationsAPI.remove(this.mPropertyBag).then(function(sResult) {
 				var oArgs = oRemoveStub.getCall(0).args[0];
 				assert.deepEqual(oArgs.flexObjects, this.mPropertyBag.parameters, "then the correct parameters with priority list is used");
@@ -1901,7 +1901,7 @@ sap.ui.define([
 			];
 			sandbox.stub(Storage.versions, "load").resolves(aReturnedVersions);
 			stubSettings(sandbox);
-			sandbox.stub(Storage.contextBasedAdaptation, "load").resolves({adaptations: [{ id: "DEFAULT", type: "DEFAULT" }]});
+			sandbox.stub(Storage.contextBasedAdaptation, "load").resolves({ adaptations: [{ id: "DEFAULT", type: "DEFAULT" }] });
 			this.oOnAllChangesSavedStub = sandbox.stub(Versions, "onAllChangesSaved");
 
 			return Promise.all([ContextBasedAdaptationsAPI.initialize(this.mPropertyBag), this.oModel.initialize()]);
@@ -1954,7 +1954,7 @@ sap.ui.define([
 			});
 			oCompVariantFlexDataResponse.comp.changes.forEach(function(oChange) {
 				if (oChange.changeType === "updateVariant") {
-					oChange.content.contexts = {role: []};
+					oChange.content.contexts = { role: [] };
 				}
 			});
 			await FlQUnitUtils.initializeFlexStateWithData(sandbox, "com.sap.app", oCompVariantFlexDataResponse);
@@ -2061,7 +2061,7 @@ sap.ui.define([
 				async: false
 			});
 			await FlQUnitUtils.initializeFlexStateWithData(sandbox, "com.sap.app", oCompVariantFlexDataResponse);
-			this.oCreateContextBasedAdaptationStub = sandbox.stub(Storage.contextBasedAdaptation, "create").resolves({status: 201});
+			this.oCreateContextBasedAdaptationStub = sandbox.stub(Storage.contextBasedAdaptation, "create").resolves({ status: 201 });
 			this.oWriteChangesStub = sandbox.stub(Storage, "write").resolves("Success");
 
 			const bCanMigrate = await ContextBasedAdaptationsAPI.canMigrate(this.mPropertyBag);
@@ -2163,7 +2163,7 @@ sap.ui.define([
 				async: false
 			});
 			await FlQUnitUtils.initializeFlexStateWithData(sandbox, "com.sap.app", oFLVariantFlexDataResponse);
-			this.oCreateContextBasedAdaptationStub = sandbox.stub(Storage.contextBasedAdaptation, "create").resolves({status: 201});
+			this.oCreateContextBasedAdaptationStub = sandbox.stub(Storage.contextBasedAdaptation, "create").resolves({ status: 201 });
 			this.oWriteChangesStub = sandbox.stub(Storage, "write").resolves("Success");
 
 			return ContextBasedAdaptationsAPI.canMigrate(this.mPropertyBag).then(function(bCanMigrate) {

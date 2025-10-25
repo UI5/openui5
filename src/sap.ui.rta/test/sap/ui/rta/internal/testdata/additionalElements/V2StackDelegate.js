@@ -242,7 +242,7 @@ sap.ui.define([
 				mPropertyBag.appComponent,
 				mPropertyBag.view,
 				mPropertyBag.fieldSelector,
-				{value: `{${mPropertyBag.bindingPath}}`},
+				{ value: `{${mPropertyBag.bindingPath}}` },
 				ASYNC
 			).then(function(oSmartField) {
 				return {

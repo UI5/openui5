@@ -71,17 +71,17 @@ sap.ui.define([
 		QUnit.test("when getAction is called...", function(assert) {
 			assert.propEqual(
 				this.oDesignTimeMetadata.getAction("action1"),
-				{changeType: "firstChangeType"},
+				{ changeType: "firstChangeType" },
 				"...for string action, the string is returned"
 			);
 			assert.propEqual(
 				this.oDesignTimeMetadata.getAction("action2"),
-				{changeType: "secondChangeType"},
+				{ changeType: "secondChangeType" },
 				"...for object action, the object is returned"
 			);
 			assert.propEqual(
-				this.oDesignTimeMetadata.getAction("action3", {name: "thirdChangeType"}),
-				{changeType: "thirdChangeType"},
+				this.oDesignTimeMetadata.getAction("action3", { name: "thirdChangeType" }),
+				{ changeType: "thirdChangeType" },
 				"...for function action, the correct string is returned"
 			);
 		});
@@ -89,7 +89,7 @@ sap.ui.define([
 		QUnit.test("when getAction is called for a sub action", function(assert) {
 			assert.propEqual(
 				this.oDesignTimeMetadata.getAction("actionWithASubAction", undefined, "subAction"),
-				{changeType: "subActionChangeType"},
+				{ changeType: "subActionChangeType" },
 				"then the sub action was returned"
 			);
 			assert.strictEqual(
@@ -98,8 +98,8 @@ sap.ui.define([
 				"then for an invalid sub action undefined is returned"
 			);
 			assert.propEqual(
-				this.oDesignTimeMetadata.getAction("actionWithASubActionInsideFunction", {name: "subActionChangeType"}, "subAction"),
-				{changeType: "subActionChangeType"},
+				this.oDesignTimeMetadata.getAction("actionWithASubActionInsideFunction", { name: "subActionChangeType" }, "subAction"),
+				{ changeType: "subActionChangeType" },
 				"then the sub action was returned for a function action"
 			);
 		});
@@ -116,7 +116,7 @@ sap.ui.define([
 				"...for object action, then the proper command name is returned"
 			);
 			assert.strictEqual(
-				this.oDesignTimeMetadata.getCommandName("thirdChangeType", {name: "thirdChangeType"}),
+				this.oDesignTimeMetadata.getCommandName("thirdChangeType", { name: "thirdChangeType" }),
 				"action3",
 				"...for function action, then the proper command name is returned"
 			);
@@ -290,7 +290,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("when getPropagateActions is called", function(assert) {
-			this.oPropagateActionObject = { action: "anotherAction", isActive: () => true};
+			this.oPropagateActionObject = { action: "anotherAction", isActive: () => true };
 			this.oDesignTimeMetadata = new DesignTimeMetadata({
 				data: {
 					actions: {
@@ -541,9 +541,9 @@ sap.ui.define([
 
 	QUnit.module("Given a dedicated rendered control and an AggregationDesignTimeMetadata is created for a control", {
 		beforeEach() {
-			this.oTitle0 = new Title({id: "Title0", text: "Title 0"});
-			this.oLabel0 = new Label({id: "Label0", text: "Label 0"});
-			this.oInput0 = new Input({id: "Input0"});
+			this.oTitle0 = new Title({ id: "Title0", text: "Title 0" });
+			this.oLabel0 = new Label({ id: "Label0", text: "Label 0" });
+			this.oInput0 = new Input({ id: "Input0" });
 
 			this.oSimpleForm = new SimpleForm("form", {
 				id: "SimpleForm",
@@ -625,7 +625,7 @@ sap.ui.define([
 		}
 	}, function() {
 		QUnit.test("then getResponsibleElement is called", function(assert) {
-			var oResponsibleElement = {type: "responsibleElement"};
+			var oResponsibleElement = { type: "responsibleElement" };
 			assert.deepEqual(
 				this.oDesignTimeMetadataWithResponsibleElement.getResponsibleElement(oResponsibleElement),
 				oResponsibleElement,

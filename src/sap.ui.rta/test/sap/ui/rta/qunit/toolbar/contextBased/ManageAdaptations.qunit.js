@@ -100,7 +100,7 @@ sap.ui.define([
 	}, function() {
 		QUnit.module("the manage adaptations dialog is created with empty ", {
 			beforeEach() {
-				sandbox.stub(ContextBasedAdaptationsAPI, "load").resolves({adaptations: [DEFAULT_ADAPTATION]});
+				sandbox.stub(ContextBasedAdaptationsAPI, "load").resolves({ adaptations: [DEFAULT_ADAPTATION] });
 				this.oFragmentLoadSpy = sandbox.spy(Fragment, "load");
 				return this.oManageAdaptations.openManageAdaptationDialog()
 				.then(function(oDialog) {
@@ -251,7 +251,7 @@ sap.ui.define([
 					var mCalledProps = oReorderStub.getCall(0).args[0];
 					assert.strictEqual(mCalledProps.layer, "CUSTOMER", "reorder stub is called with correct layer");
 					assert.strictEqual(mCalledProps.control, this.oRootControl, "reorder stub is called with correct rootControl");
-					assert.deepEqual(mCalledProps.parameters, {priorities: ["id-1591275572835-1", "id-1591275572834-1"]}, "reorder stub is called with correct priorities");
+					assert.deepEqual(mCalledProps.parameters, { priorities: ["id-1591275572835-1", "id-1591275572834-1"] }, "reorder stub is called with correct priorities");
 					assert.deepEqual(getRanks(this.oManageAdaptations.oAdaptationsModel), [1, 2], "ranks are updated correctly");
 				}.bind(this));
 			});

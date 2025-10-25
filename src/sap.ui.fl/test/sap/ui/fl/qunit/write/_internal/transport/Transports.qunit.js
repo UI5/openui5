@@ -81,7 +81,7 @@ sap.ui.define([
 		this.oServer.respondWith([204, {}, ""]);
 		this.oServer.autoRespond = true;
 
-		oParams = {transportId: "testtransport1"};
+		oParams = { transportId: "testtransport1" };
 
 		return Transports.makeChangesTransportable(oParams).catch(function() {
 			assert.ok(true);

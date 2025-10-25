@@ -128,7 +128,7 @@ sap.ui.define([
 			// Don't await the initialization here because in real apps the getControllerExtensions flow
 			// might be called before the FlexState is fully initialized and thus should be able to take
 			// care of waiting for it
-			FlQUnitUtils.initializeFlexStateWithData(sandbox, sReference, {changes: [oChange]});
+			FlQUnitUtils.initializeFlexStateWithData(sandbox, sReference, { changes: [oChange] });
 			sandbox.stub(Utils, "getAppComponentForControl").returns(oAppComponent);
 			sandbox.stub(ManifestUtils, "getFlexReferenceForControl").returns(sReference);
 
@@ -253,7 +253,7 @@ sap.ui.define([
 						codeRef: "myCodeRef.js"
 					}
 				});
-				FlQUnitUtils.initializeFlexStateWithData(sandbox, sReference, {changes: [oChange]});
+				FlQUnitUtils.initializeFlexStateWithData(sandbox, sReference, { changes: [oChange] });
 				sandbox.stub(Utils, "getAppComponentForControl").returns(oAppComponent);
 				sandbox.stub(ManifestUtils, "getFlexReferenceForControl").returns(sReference);
 

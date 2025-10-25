@@ -105,7 +105,7 @@ sap.ui.define([
 			let sMsg = `applyChange on a JsControlTreeModifier for a change in the Layer: ${sLayer}`;
 			QUnit.test(sMsg, async function(assert) {
 				const oChange = new UIChange(oChangeDefinition);
-				await this.oChangeHandler.applyChange(oChange, this.oControl2, {modifier: JsControlTreeModifier});
+				await this.oChangeHandler.applyChange(oChange, this.oControl2, { modifier: JsControlTreeModifier });
 
 				if (sLayer === Layer.CUSTOMER) {
 					assert.strictEqual(this.oSetStashedSpy.callCount, 0, "the setStashed function was not called");
@@ -113,7 +113,7 @@ sap.ui.define([
 					assert.strictEqual(this.oSetStashedSpy.callCount, 1, "the setStashed function was called");
 				}
 				assert.strictEqual(this.oControl2.getVisible(), false, "then the control's visible property is set to false");
-				assert.deepEqual(oChange.getRevertData(), {originalValue: false, originalIndex: 1}, "then revert data was set correctly");
+				assert.deepEqual(oChange.getRevertData(), { originalValue: false, originalIndex: 1 }, "then revert data was set correctly");
 				assert.deepEqual(this.oChangeHandler.getCondenserInfo(oChange), {
 					classification: Classification.Reverse,
 					affectedControl: oChange.getSelector(),
@@ -129,12 +129,12 @@ sap.ui.define([
 			QUnit.test(sMsg, async function(assert) {
 				const oChange = new UIChange(oChangeDefinition);
 				const oMoveSpy = sandbox.spy(JsControlTreeModifier, "moveAggregation");
-				await this.oChangeHandler.applyChange(oChange, this.oControl2, {modifier: JsControlTreeModifier});
+				await this.oChangeHandler.applyChange(oChange, this.oControl2, { modifier: JsControlTreeModifier });
 
 				// by destroying the control before the stashed control the stashed control has to be moved back to the original position
 				this.oControl1.destroy();
 
-				await this.oChangeHandler.revertChange(oChange, this.oControl2, {modifier: JsControlTreeModifier});
+				await this.oChangeHandler.revertChange(oChange, this.oControl2, { modifier: JsControlTreeModifier });
 
 				assert.strictEqual(this.oControl2.getVisible(), true, "then the control is set back to visible");
 				if (sLayer === Layer.CUSTOMER) {
@@ -148,8 +148,8 @@ sap.ui.define([
 			sMsg = `revertChange on an initially invisible control using JsControlTreeModifier in the Layer: ${sLayer}`;
 			QUnit.test(sMsg, async function(assert) {
 				const oChange = new UIChange(oChangeDefinition);
-				await this.oChangeHandler.applyChange(oChange, this.oControlInvisible, {modifier: JsControlTreeModifier});
-				await this.oChangeHandler.revertChange(oChange, this.oControlInvisible, {modifier: JsControlTreeModifier});
+				await this.oChangeHandler.applyChange(oChange, this.oControlInvisible, { modifier: JsControlTreeModifier });
+				await this.oChangeHandler.revertChange(oChange, this.oControlInvisible, { modifier: JsControlTreeModifier });
 
 				assert.strictEqual(this.oControlInvisible.getVisible(), false, "then the control is still invisible");
 				if (sLayer === Layer.CUSTOMER) {
@@ -162,7 +162,7 @@ sap.ui.define([
 			sMsg = `applyChange on a XMLTreeModifier for a change in the Layer: ${sLayer}`;
 			QUnit.test(sMsg, async function(assert) {
 				const oChange = new UIChange(oChangeDefinition);
-				await this.oChangeHandler.applyChange(oChange, this.oXmlNodeControl0, {modifier: XmlTreeModifier});
+				await this.oChangeHandler.applyChange(oChange, this.oXmlNodeControl0, { modifier: XmlTreeModifier });
 
 				if (sLayer === Layer.CUSTOMER) {
 					assert.notOk(this.oXmlNodeControl0.getAttribute("stashed"), "xml button node has the stashed attribute added and set to true");
@@ -175,8 +175,8 @@ sap.ui.define([
 			sMsg = `revertChange on an XMLTreeModifier in the Layer: ${sLayer}`;
 			QUnit.test(sMsg, async function(assert) {
 				const oChange = new UIChange(oChangeDefinition);
-				await this.oChangeHandler.applyChange(oChange, this.oXmlNodeControl0, {modifier: XmlTreeModifier});
-				await this.oChangeHandler.revertChange(oChange, this.oXmlNodeControl0, {modifier: XmlTreeModifier});
+				await this.oChangeHandler.applyChange(oChange, this.oXmlNodeControl0, { modifier: XmlTreeModifier });
+				await this.oChangeHandler.revertChange(oChange, this.oXmlNodeControl0, { modifier: XmlTreeModifier });
 
 				assert.notOk(this.oXmlNodeControl0.getAttribute("stashed"), "then the stashed attribute is set back the original value");
 				if (sLayer === Layer.CUSTOMER) {
@@ -189,16 +189,16 @@ sap.ui.define([
 			assert.strictEqual(this.oXmlNodeToBeStashed.getAttribute("stashed"), null, "ToBeStashed node is not yet stashed (before XML modification)");
 
 			// to simulate StashControl.applyChange() during XML pre-processing, where the XML node's control is not created
-			await this.oChangeHandler.applyChange(this.oChange, this.oXmlNodeToBeStashed, {modifier: XmlTreeModifier, appComponent: oMockUIComponent});
+			await this.oChangeHandler.applyChange(this.oChange, this.oXmlNodeToBeStashed, { modifier: XmlTreeModifier, appComponent: oMockUIComponent });
 
 			assert.strictEqual(this.oXmlNodeToBeStashed.getAttribute("stashed"), "true", "ToBeStashed node is now stashed (after XML modification)");
 			// check XML after modification
-			const oView = await XMLView.create({definition: new XMLSerializer().serializeToString(this.xmlDocument)});
+			const oView = await XMLView.create({ definition: new XMLSerializer().serializeToString(this.xmlDocument) });
 			// a StashedControl is created with the XML node's ID instead
 
 			// to simulate StashControl.revertChange() by the JSControlTreeModifier, where the StashedControl is replaced
 			const oStashedControl = oView.byId("toBeStashed");
-			await this.oChangeHandler.revertChange(this.oChange, oStashedControl, {modifier: JsControlTreeModifier, appComponent: oMockUIComponent});
+			await this.oChangeHandler.revertChange(this.oChange, oStashedControl, { modifier: JsControlTreeModifier, appComponent: oMockUIComponent });
 
 			const aContentAfterRevert = oView.byId("verticalLayout").getContent();
 			assert.strictEqual(aContentAfterRevert.length, 4, "then the VerticalLayout has 4 controls after revert");

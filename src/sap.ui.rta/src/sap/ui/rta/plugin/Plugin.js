@@ -212,17 +212,17 @@ sap.ui.define([
 			aRelevantOverlays = this._getRelevantOverlays(oOverlay);
 			if (oParams.value === true) {
 				this.executeWhenVisible(oOverlay, function() {
-					this.evaluateEditable(aRelevantOverlays, {onRegistration: false});
+					this.evaluateEditable(aRelevantOverlays, { onRegistration: false });
 				}.bind(this));
 			} else {
-				this.evaluateEditable(aRelevantOverlays, {onRegistration: false});
+				this.evaluateEditable(aRelevantOverlays, { onRegistration: false });
 			}
 		} else if (oParams.type === "afterRendering") {
 			if (this.getDesignTime().getStatus() === "synced") {
-				this.evaluateEditable([oOverlay], {onRegistration: false});
+				this.evaluateEditable([oOverlay], { onRegistration: false });
 			} else {
 				this.getDesignTime().attachEventOnce("synced", function() {
-					this.evaluateEditable([oOverlay], {onRegistration: false});
+					this.evaluateEditable([oOverlay], { onRegistration: false });
 				}, this);
 			}
 		} else if (
@@ -231,7 +231,7 @@ sap.ui.define([
 		) {
 			debounceFunction(this._mDebounceFunctions.insertOrRemove, oOverlay, oParams.name, function() {
 				aRelevantOverlays = this._getRelevantOverlays(oOverlay, oParams.name);
-				this.evaluateEditable(aRelevantOverlays, {onRegistration: false});
+				this.evaluateEditable(aRelevantOverlays, { onRegistration: false });
 			}.bind(this));
 		} else if (oParams.type === "addOrSetAggregation") {
 			debounceFunction(this._mDebounceFunctions.addOrSet, oOverlay, oParams.name, function() {
@@ -244,11 +244,11 @@ sap.ui.define([
 
 				if (oDesignTime.getStatus() === "synced") {
 					aRelevantOverlays = this._getRelevantOverlays(oOverlay, oParams.name);
-					this.evaluateEditable(aRelevantOverlays, {onRegistration: false});
+					this.evaluateEditable(aRelevantOverlays, { onRegistration: false });
 				} else {
 					oDesignTime.attachEventOnce("synced", function() {
 						aRelevantOverlays = this._getRelevantOverlays(oOverlay, oParams.name);
-						this.evaluateEditable(aRelevantOverlays, {onRegistration: false});
+						this.evaluateEditable(aRelevantOverlays, { onRegistration: false });
 					}, this);
 				}
 			}.bind(this));
@@ -346,7 +346,7 @@ sap.ui.define([
 
 	BasePlugin.prototype.registerElementOverlay = function(oOverlay) {
 		this.executeWhenVisible(oOverlay, function() {
-			this.evaluateEditable([oOverlay], {onRegistration: true});
+			this.evaluateEditable([oOverlay], { onRegistration: true });
 			oOverlay.attachElementModified(_onElementModified, this);
 		}.bind(this));
 	};

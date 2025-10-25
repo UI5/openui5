@@ -41,7 +41,7 @@ sap.ui.define([
 
 			const oSetTitleCommand = await CommandFactory.getCommandFor(this.oVariantManagement, "setTitle", {
 				newText: sNewText
-			}, null, {layer: Layer.CUSTOMER});
+			}, null, { layer: Layer.CUSTOMER });
 
 			await oSetTitleCommand.execute();
 			assert.strictEqual(oSetTitleCommand.getOldText(), "variant A", "the old text was set in the command");

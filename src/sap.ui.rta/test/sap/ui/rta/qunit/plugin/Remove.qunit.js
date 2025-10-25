@@ -43,8 +43,8 @@ sap.ui.define([
 			this.oRemovePlugin = new RemovePlugin({
 				commandFactory: new CommandFactory()
 			});
-			this.oButton = new Button("button", {text: "Button"});
-			this.oButton1 = new Button("button1", {text: "Button1"});
+			this.oButton = new Button("button", { text: "Button" });
+			this.oButton1 = new Button("button1", { text: "Button1" });
 			this.oVerticalLayout = new VerticalLayout({
 				content: [this.oButton, this.oButton1]
 			}).placeAt("qunit-fixture");
@@ -486,9 +486,9 @@ sap.ui.define([
 		async beforeEach(assert) {
 			var done = assert.async();
 			sandbox.stub(ChangesWriteAPI, "getChangeHandler").resolves();
-			this.oButton1 = new Button("button1", {text: "Button1"});
-			this.oButton2 = new Button("button2", {text: "Button2"});
-			this.oButton3 = new Button("button3", {text: "Button3"});
+			this.oButton1 = new Button("button1", { text: "Button1" });
+			this.oButton2 = new Button("button2", { text: "Button2" });
+			this.oButton3 = new Button("button3", { text: "Button3" });
 			this.oVerticalLayout = new VerticalLayout({
 				content: [this.oButton1, this.oButton2, this.oButton3]
 			}).placeAt("qunit-fixture");

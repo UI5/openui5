@@ -51,7 +51,7 @@ sap.ui.define([
 				}
 			});
 
-			this.oTranslation = new Translation({toolbar: this.oToolbar});
+			this.oTranslation = new Translation({ toolbar: this.oToolbar });
 
 			this.oToolbarControlsModel = RtaQunitUtils.createToolbarControlsModel();
 			this.oToolbarControlsModel.setProperty("/translation/enabled", true);
@@ -269,7 +269,7 @@ sap.ui.define([
 					var oModel = oDialog.getModel("translation");
 
 					// simulate user file selection
-					var oFileBlob = new Blob([JSON.stringify("<xml />", null, 2)], {type: "application/xml"});
+					var oFileBlob = new Blob([JSON.stringify("<xml />", null, 2)], { type: "application/xml" });
 					oModel.setProperty("/filePath", "C:\\myFolder\\en-EN_de-DE_TranslationXLIFF.xml");
 					oModel.setProperty("/file", oFileBlob);
 					var oUploadButton = getUploadDialogControl(this.oToolbar, "uploadTranslation");
@@ -293,7 +293,7 @@ sap.ui.define([
 					var oModel = oDialog.getModel("translation");
 
 					// simulate user file selection
-					var oFileBlob = new Blob([JSON.stringify("<xml />", null, 2)], {type: "application/xml"});
+					var oFileBlob = new Blob([JSON.stringify("<xml />", null, 2)], { type: "application/xml" });
 					oModel.setProperty("/filePath", "C:\\myFolder\\en-EN_de-DE_TranslationXLIFF.xml");
 					oModel.setProperty("/file", oFileBlob);
 
@@ -313,7 +313,7 @@ sap.ui.define([
 					var oModel = oDialog.getModel("translation");
 
 					// simulate user file selection
-					var oFileBlob = new Blob([JSON.stringify("<xml />", null, 2)], {type: "application/xml"});
+					var oFileBlob = new Blob([JSON.stringify("<xml />", null, 2)], { type: "application/xml" });
 					oModel.setProperty("/filePath", "C:\\myFolder\\en-EN_de-DE_TranslationXLIFF.xml");
 					oModel.setProperty("/file", oFileBlob);
 
@@ -336,7 +336,7 @@ sap.ui.define([
 					var oModel = oDialog.getModel("translation");
 
 					// simulate user file selection
-					var oFileBlob = new Blob([JSON.stringify("<xml />", null, 2)], {type: "application/xml"});
+					var oFileBlob = new Blob([JSON.stringify("<xml />", null, 2)], { type: "application/xml" });
 					oModel.setProperty("/filePath", "C:\\myFolder\\en-EN_de-DE_TranslationXLIFF.xml");
 					oModel.setProperty("/file", oFileBlob);
 

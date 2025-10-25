@@ -136,14 +136,14 @@ sap.ui.define([
 		// as it's only relevant for viewCache at the moment
 		await FlexCustomData.addAppliedCustomData(mControl.control, oChange, mPropertyBag, isXmlModifier(mPropertyBag));
 		// if a change was reverted previously remove the flag as it is not reverted anymore
-		const oResult = {success: true};
+		const oResult = { success: true };
 		oChange.markSuccessful(oResult);
 		return oResult;
 	}
 
 	async function handleAfterApplyError(oError, oChange, mControl, mPropertyBag) {
 		const bXmlModifier = isXmlModifier(mPropertyBag);
-		const oResult = {success: false, error: oError};
+		const oResult = { success: false, error: oError };
 
 		const sChangeId = oChange.getId();
 		const sLogMessage = "Change ''{0}'' could not be applied.";
@@ -345,7 +345,7 @@ sap.ui.define([
 			}
 
 			// make sure that everything that goes with finishing the apply process is done, even though the change was already applied
-			const oResult = {success: true};
+			const oResult = { success: true };
 			oChange.markSuccessful(oResult);
 			return oResult;
 		} catch (oError) {
@@ -380,7 +380,7 @@ sap.ui.define([
 				try {
 					oResult = await Applier.applyChangeOnControl(oChange, oControl, mPropertyBag);
 				} catch (oError) {
-					oResult = {success: false};
+					oResult = { success: false };
 				}
 				if (oResult.success && !mPropertyBag.skipSetQueued) {
 					DependencyHandler.addRuntimeChangeToMap(oChange, mPropertyBag.appComponent, oLiveDependencyMap);

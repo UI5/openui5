@@ -21,14 +21,14 @@ sap.ui.define([
 			};
 			this.oManifestEmpty = {};
 
-			this.oChange = new AppDescriptorChange({ content: { ach: "CA-UI5-ABA-AIDX"} });
+			this.oChange = new AppDescriptorChange({ content: { ach: "CA-UI5-ABA-AIDX" } });
 			this.oChangeEmpty = new AppDescriptorChange({ content: { } });
 			this.oChangeError = new AppDescriptorChange({ content: { otherProperty: "test" } });
 			this.oChangeObject = new AppDescriptorChange({ content: { ach: {} } });
 			this.oChangeArray = new AppDescriptorChange({ content: { ach: [] } });
 			this.oChangeInt = new AppDescriptorChange({ content: { ach: 1 } });
 			this.oChangeBoolean = new AppDescriptorChange({ content: { ach: true } });
-			this.oChangeUnsupported = new AppDescriptorChange({ content: { ach: "NOT-SUPPORTED-ACH"} });
+			this.oChangeUnsupported = new AppDescriptorChange({ content: { ach: "NOT-SUPPORTED-ACH" } });
 		},
 		afterEach() {
 			sandbox.restore();

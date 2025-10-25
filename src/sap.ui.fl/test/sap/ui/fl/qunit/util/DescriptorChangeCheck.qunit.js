@@ -26,21 +26,21 @@ sap.ui.define([
 
 	QUnit.module("sap.ui.fl.DescriptorChangeCheck.checkIdNamespaceCompliance", {}, function() {
 		QUnit.test("Target is CUSTOMER layer", function(assert) {
-			var oChange = new AppDescriptorChange({layer: Layer.CUSTOMER});
+			var oChange = new AppDescriptorChange({ layer: Layer.CUSTOMER });
 			DescriptorChangeCheck.checkIdNamespaceCompliance("customer.myid", oChange);
 			assertMissing("myid", oChange, "customer.", assert);
 			assertMissing("partner.myid", oChange, "customer.", assert);
 		});
 
 		QUnit.test("Target is CUSTOMER_BASE layer", function(assert) {
-			var oChange = new AppDescriptorChange({layer: Layer.CUSTOMER_BASE});
+			var oChange = new AppDescriptorChange({ layer: Layer.CUSTOMER_BASE });
 			DescriptorChangeCheck.checkIdNamespaceCompliance("customer.myid", oChange);
 			assertMissing("myid", oChange, "customer.", assert);
 			assertMissing("partner.myid", oChange, "customer.", assert);
 		});
 
 		QUnit.test("Target is VENDOR layer", function(assert) {
-			var oChange = new AppDescriptorChange({layer: Layer.VENDOR});
+			var oChange = new AppDescriptorChange({ layer: Layer.VENDOR });
 			DescriptorChangeCheck.checkIdNamespaceCompliance("myid", oChange);
 			assertReserverd("customer.myid", oChange, "customer.", assert);
 			assertReserverd("partner.myid", oChange, "partner.", assert);
@@ -50,9 +50,9 @@ sap.ui.define([
 			var oChange = new AppDescriptorChange({});
 			assertNotCompliant("any", oChange, "Mandatory layer parameter is not provided.", "throws error that layer is missing", assert);
 
-			oChange = new AppDescriptorChange({layer: Layer.USER});
+			oChange = new AppDescriptorChange({ layer: Layer.USER });
 			assertNotCompliant("any", oChange, "Layer USER not supported.", "throws error that layer is missing", assert);
-			oChange = new AppDescriptorChange({layer: "any"});
+			oChange = new AppDescriptorChange({ layer: "any" });
 			assertNotCompliant("any", oChange, "Layer any not supported.", "throws error that layer is missing", assert);
 		});
 	});

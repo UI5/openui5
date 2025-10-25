@@ -19,8 +19,8 @@ sap.ui.define([
 
 	QUnit.module("Given that a DesignTime is created for a SplitContainer with 2 pages, one is hidden and one is visible", {
 		async beforeEach(assert) {
-			this.oButton1 = new Button("button1", {text: "button"});
-			this.oButton2 = new Button("button2", {text: "button"});
+			this.oButton1 = new Button("button1", { text: "button" });
+			this.oButton2 = new Button("button2", { text: "button" });
 
 			this.oPage1 = new Page("page1", {
 				content: [

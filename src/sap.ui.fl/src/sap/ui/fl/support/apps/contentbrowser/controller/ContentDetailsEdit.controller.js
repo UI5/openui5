@@ -30,7 +30,7 @@ sap.ui.define([
 	"use strict";
 
 	// shortcut for sap.m.ButtonType
-	var {ButtonType} = mobileLibrary;
+	var { ButtonType } = mobileLibrary;
 
 	/**
 	 * Controller for editing content in Content Browser.
@@ -178,13 +178,13 @@ sap.ui.define([
 				this._saveFile(sLayer, oContentData.namespace, oContentData.fileName, oContentData.fileType, oContentData.data, sTransportId, sPackageName, bOnActivatedVersion);
 			} else {
 				var isPackageVisible = !!(sLayer === Layer.VENDOR || sLayer === Layer.CUSTOMER_BASE);
-				var oPackageInput = new Input({visible: isPackageVisible, placeholder: "Package name (Only necessary for cross client content)" });
-				var oTransportInput = new Input({placeholder: "Transport ID or ATO_NOTIFICATION" });
+				var oPackageInput = new Input({ visible: isPackageVisible, placeholder: "Package name (Only necessary for cross client content)" });
+				var oTransportInput = new Input({ placeholder: "Transport ID or ATO_NOTIFICATION" });
 				var oDialog = new Dialog({
 					title: "{i18n>transportInput}",
 					type: "Message",
 					content: [
-						new Text({text: "{i18n>transportInputDescription}"}),
+						new Text({ text: "{i18n>transportInputDescription}" }),
 						oPackageInput,
 						oTransportInput],
 					beginButton: new Button({

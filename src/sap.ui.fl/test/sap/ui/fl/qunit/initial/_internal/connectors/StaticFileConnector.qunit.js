@@ -23,7 +23,7 @@ sap.ui.define([
 		}
 	}, function() {
 		QUnit.test("given no static flexibility-bundle.json and changes-bundle.json placed for 'reference' resource roots, when loading flex data", function(assert) {
-			return StaticFileConnector.loadFlexData({reference: "reference"}).then(function(oResult) {
+			return StaticFileConnector.loadFlexData({ reference: "reference" }).then(function(oResult) {
 				assert.deepEqual(oResult, undefined, "no data was returned");
 			});
 		});
@@ -36,7 +36,7 @@ sap.ui.define([
 			var oLogSpy = sandbox.spy(Log, "error");
 			var oLogWarning = sandbox.spy(Log, "warning");
 
-			return StaticFileConnector.loadFlexData({reference: "test.app.broken", componentName: "test.app.broken"}).then(function(oResult) {
+			return StaticFileConnector.loadFlexData({ reference: "test.app.broken", componentName: "test.app.broken" }).then(function(oResult) {
 				assert.deepEqual(oResult, undefined, "no data was returned");
 				if (oLogSpy.callCount !== 1) {
 					assert.equal(oLogWarning.callCount, 1, "an error or warning was logged");
@@ -49,7 +49,7 @@ sap.ui.define([
 				"test/app/changes/flexibility-bundle.json": '{"changes":[{"dummy":true}],"compVariants":[]}'
 			});
 
-			return StaticFileConnector.loadFlexData({reference: "some.other.id", componentName: "test.app"}).then(function(oResult) {
+			return StaticFileConnector.loadFlexData({ reference: "some.other.id", componentName: "test.app" }).then(function(oResult) {
 				assert.equal(oResult.changes.length, 1, "one change was loaded");
 				var oChange = oResult.changes[0];
 				assert.equal(oChange.dummy, true, "the change dummy data is correctly loaded");
@@ -61,7 +61,7 @@ sap.ui.define([
 				"test/app/changes/flexibility-bundle.json": '[changes:{"dummy":true},"compVariants":[]]'
 			});
 
-			return StaticFileConnector.loadFlexData({reference: "test.app"}).then(function(oResult) {
+			return StaticFileConnector.loadFlexData({ reference: "test.app" }).then(function(oResult) {
 				assert.equal(oResult.changes.length, 1, "one change was loaded");
 				var oChange = oResult.changes[0];
 				assert.equal(oChange.dummy, true, "the change dummy data is correctly loaded");
@@ -73,7 +73,7 @@ sap.ui.define([
 				"test/app/changes/changes-bundle.json": '[{"dummy":true},"compVariants":[]]'
 			});
 
-			return StaticFileConnector.loadFlexData({reference: "some.other.id", componentName: "test.app"}).then(function(oResult) {
+			return StaticFileConnector.loadFlexData({ reference: "some.other.id", componentName: "test.app" }).then(function(oResult) {
 				assert.equal(oResult.changes.length, 1, "one change was loaded");
 				var oChange = oResult.changes[0];
 				assert.equal(oChange.dummy, true, "the change dummy data is correctly loaded");
@@ -84,7 +84,7 @@ sap.ui.define([
 			sap.ui.require.preload({
 				"test/app/changes/changes-bundle.json": '[{"dummy":true},"compVariants":[]]'
 			});
-			return StaticFileConnector.loadFlexData({reference: "test.app", componentName: "test.app"}).then(function(oResult) {
+			return StaticFileConnector.loadFlexData({ reference: "test.app", componentName: "test.app" }).then(function(oResult) {
 				assert.equal(oResult.changes.length, 1, "one change was loaded");
 				var oChange = oResult.changes[0];
 				assert.equal(oChange.dummy, true, "the change dummy data is correctly loaded");
@@ -95,7 +95,7 @@ sap.ui.define([
 			sandbox.stub(Supportability, "isDebugModeEnabled").returns(true);
 			var loadResourceStub = sandbox.stub(LoaderExtensions, "loadResource");
 
-			return StaticFileConnector.loadFlexData({reference: "test.app.not.preloaded", componentName: "test.app.not.preloaded"}).then(function() {
+			return StaticFileConnector.loadFlexData({ reference: "test.app.not.preloaded", componentName: "test.app.not.preloaded" }).then(function() {
 				assert.equal(loadResourceStub.callCount, 2, "two resources were requested");
 				assert.ok(loadResourceStub.calledWith("test/app/not/preloaded/changes/flexibility-bundle.json"), "the flexibility-bundle was requested");
 				assert.ok(loadResourceStub.calledWith("test/app/not/preloaded/changes/changes-bundle.json"), "the changes-bundle was requested");
@@ -106,7 +106,7 @@ sap.ui.define([
 			sandbox.stub(Supportability, "isPreloadDisabled").returns(true);
 			var loadResourceStub = sandbox.stub(LoaderExtensions, "loadResource");
 
-			return StaticFileConnector.loadFlexData({reference: "test.app.not.preloaded", componentName: "test.app.not.preloaded"}).then(function() {
+			return StaticFileConnector.loadFlexData({ reference: "test.app.not.preloaded", componentName: "test.app.not.preloaded" }).then(function() {
 				assert.equal(loadResourceStub.callCount, 2, "two resources were requested");
 				assert.ok(loadResourceStub.calledWith("test/app/not/preloaded/changes/flexibility-bundle.json"), "the flexibility-bundle was requested");
 				assert.ok(loadResourceStub.calledWith("test/app/not/preloaded/changes/changes-bundle.json"), "the changes-bundle was requested");
@@ -126,7 +126,7 @@ sap.ui.define([
 					"}"
 			});
 
-			return StaticFileConnector.loadFlexData({reference: "test.app2", componentName: "test.app2"}).then(function(oResult) {
+			return StaticFileConnector.loadFlexData({ reference: "test.app2", componentName: "test.app2" }).then(function(oResult) {
 				assert.equal(oResult.changes.length, 2, "one entries are in the changes property");
 				assert.equal(oResult.changes[0].dummy1, true, "the change dummy data is correctly loaded");
 				assert.equal(oResult.changes[1].dummy2, true, "the compVariant dummy data is correctly loaded and merged into the changes");

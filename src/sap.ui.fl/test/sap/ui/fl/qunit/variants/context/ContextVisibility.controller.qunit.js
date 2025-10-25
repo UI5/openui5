@@ -93,7 +93,7 @@ sap.ui.define([
 			sandbox.stub(oController, "byId").returns(oRadioButtonGroup);
 			sandbox.stub(oController, "getOwnerComponent").returns({
 				getSelectedContexts() {
-					return {role: ["TEST"]};
+					return { role: ["TEST"] };
 				}
 			});
 			var sText = "No roles selected.";
@@ -121,7 +121,7 @@ sap.ui.define([
 			sandbox.stub(oController, "byId").returns(oRadioButtonGroup);
 			sandbox.stub(oController, "getOwnerComponent").returns({
 				getSelectedContexts() {
-					return {role: []};
+					return { role: [] };
 				}
 			});
 			var sText = "No roles selected.";
@@ -146,7 +146,7 @@ sap.ui.define([
 		QUnit.test("when the 'Add Contexts' button is pressed ", function(assert) {
 			var oConnectorCall = sandbox.stub(WriteStorage, "getContexts").resolves(this.oRoles);
 			oController.oContextsModel = new JSONModel({});
-			oController.oSelectedContextsModel = new JSONModel({selected: []});
+			oController.oSelectedContextsModel = new JSONModel({ selected: [] });
 			sandbox.stub(oController, "getView").returns({
 				addDependent() {},
 				getId() {}
@@ -162,7 +162,7 @@ sap.ui.define([
 
 		QUnit.test("when 'More' button is pressed and more data can be fetched from the back end", function(assert) {
 			var oConnectorCall = sandbox.stub(WriteStorage, "getContexts").resolves(this.oRoles);
-			oController.oContextsModel = new JSONModel({ values: [{id: "1", description: "test"}], lastHitReached: false});
+			oController.oContextsModel = new JSONModel({ values: [{ id: "1", description: "test" }], lastHitReached: false });
 
 			var oEvent = {
 				getParameter() {
@@ -178,7 +178,7 @@ sap.ui.define([
 
 		QUnit.test("when 'More' button is pressed but there is no more data that can be fetched from the back end", function(assert) {
 			var oConnectorCall = sandbox.stub(WriteStorage, "getContexts").resolves(this.oRoles);
-			oController.oContextsModel = new JSONModel({ values: [{id: "1", description: "test"}], lastHitReached: true});
+			oController.oContextsModel = new JSONModel({ values: [{ id: "1", description: "test" }], lastHitReached: true });
 
 			var oEvent = {
 				getParameter() {
@@ -231,7 +231,7 @@ sap.ui.define([
 			aMockData.forEach((oRoles, index) => oConnectorCall.onCall(index).resolves(oRoles));
 
 			oController.oContextsModel = new JSONModel({});
-			oController.oSelectedContextsModel = new JSONModel({selected: []});
+			oController.oSelectedContextsModel = new JSONModel({ selected: [] });
 
 			sandbox.stub(oController, "getView").returns({
 				addDependent() {},
@@ -292,7 +292,7 @@ sap.ui.define([
 			const oFormatTooltipSpy = sandbox.spy(ContextVisibility.prototype, "formatTooltip");
 
 			oController.oContextsModel = new JSONModel(oContextsResponse);
-			oController.oSelectedContextsModel = new JSONModel({selected: []});
+			oController.oSelectedContextsModel = new JSONModel({ selected: [] });
 
 			sandbox.stub(oController, "getView").returns({
 				addDependent() {},
@@ -348,10 +348,10 @@ sap.ui.define([
 		});
 
 		QUnit.test("when deleting one context from selected contexts list", function(assert) {
-			oController.oSelectedContextsModel = new JSONModel({selected: this.oRoles.values});
+			oController.oSelectedContextsModel = new JSONModel({ selected: this.oRoles.values });
 			var oEvent = {
 				getParameter() {
-					return new StandardListItem({title: "ADMIN"});
+					return new StandardListItem({ title: "ADMIN" });
 				},
 				getSource() {
 					return new List();
@@ -364,16 +364,16 @@ sap.ui.define([
 		});
 
 		QUnit.test("when deciding whether items should be selected", function(assert) {
-			var oItem1 = {id: "ADMIN"};
-			var oItem2 = {id: "RANDOM"};
-			var aSelectedItems = [{id: "ADMIN"}, {id: "TEST"}];
+			var oItem1 = { id: "ADMIN" };
+			var oItem2 = { id: "RANDOM" };
+			var aSelectedItems = [{ id: "ADMIN" }, { id: "TEST" }];
 			assert.equal(oController.isSelected(oItem1, aSelectedItems), true, "then item is selected");
 			assert.equal(oController.isSelected(oItem2, aSelectedItems), false, "then item is not selected");
 		});
 
 		QUnit.test("when clicking confirm on select roles list", function(assert) {
-			oController.oSelectedContextsModel = new JSONModel({selected: []});
-			oController.oCurrentSelection = [{ id: "REMOTE", description: "Role for accessing remote system"}];
+			oController.oSelectedContextsModel = new JSONModel({ selected: [] });
+			oController.oCurrentSelection = [{ id: "REMOTE", description: "Role for accessing remote system" }];
 
 			sandbox.stub(oController, "getView").returns({
 				getId() {}
@@ -388,7 +388,7 @@ sap.ui.define([
 
 			var oEvent = {
 				getParameter(sId) {
-					return sId === "selected" ? true : new StandardListItem({title: "REMOTE", description: "TEST"});
+					return sId === "selected" ? true : new StandardListItem({ title: "REMOTE", description: "TEST" });
 				}
 			};
 
@@ -398,11 +398,11 @@ sap.ui.define([
 		});
 
 		QUnit.test("when removing a new selection in add roles dialog", function(assert) {
-			oController.oCurrentSelection = [{id: "REMOTE", description: "TEST"}, {id: "TEST", description: "TEST"}];
+			oController.oCurrentSelection = [{ id: "REMOTE", description: "TEST" }, { id: "TEST", description: "TEST" }];
 
 			var oEvent = {
 				getParameter(sId) {
-					return sId === "selected" ? false : new StandardListItem({title: "REMOTE", description: "TEST"});
+					return sId === "selected" ? false : new StandardListItem({ title: "REMOTE", description: "TEST" });
 				}
 			};
 

@@ -9,7 +9,7 @@ sap.ui.define([
 
 	const mContent = {
 		index: 4,
-		addElementInfo: {info: "myFancyAddElementInfo"},
+		addElementInfo: { info: "myFancyAddElementInfo" },
 		aggregationName: "myFancyAggregationName",
 		customItemId: "myFancyCustomItemId"
 	};

@@ -22,7 +22,7 @@ sap.ui.define([
 	}
 
 	function assignDescriptionsToSelectedRoles(oSelectedRoles) {
-		var mPropertyBag = {layer: Layer.CUSTOMER, flexObjects: oSelectedRoles};
+		var mPropertyBag = { layer: Layer.CUSTOMER, flexObjects: oSelectedRoles };
 		return WriteStorage.loadContextDescriptions(mPropertyBag).then(function(oResponse) {
 			if (oResponse.role && oResponse.role.length === oSelectedRoles.role.length) {
 				this.oSelectedContextsModel.setProperty("/selected", oResponse.role);
@@ -54,7 +54,7 @@ sap.ui.define([
 	}
 
 	function itemToJson(oItem) {
-		return {id: oItem.getTitle(), description: oItem.getDescription()};
+		return { id: oItem.getTitle(), description: oItem.getDescription() };
 	}
 
 	return Controller.extend("sap.ui.fl.variants.context.controller.ContextVisibility", {
@@ -109,7 +109,7 @@ sap.ui.define([
 		_appendDataFromBackend() {
 			var oRoles = this.oContextsModel.getProperty("/values");
 			if (this.oContextsModel.getProperty("/lastHitReached") === false) {
-				var mConfig = {$skip: oRoles.length};
+				var mConfig = { $skip: oRoles.length };
 				return getData.call(this, mConfig, oRoles);
 			}
 			return Promise.resolve(oRoles);
@@ -161,7 +161,7 @@ sap.ui.define([
 		 */
 		onSearch(oEvent) {
 			oEvent.getSource().clearSelection();
-			var mConfig = {$filter: oEvent.getParameter("value")};
+			var mConfig = { $filter: oEvent.getParameter("value") };
 			return getData.call(this, mConfig);
 		},
 

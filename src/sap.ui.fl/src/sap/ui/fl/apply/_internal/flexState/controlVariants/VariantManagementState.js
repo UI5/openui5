@@ -416,11 +416,11 @@ sap.ui.define([
 	});
 
 	VariantManagementState.getDependencyMap = function(sReference) {
-		return oUIChangesDependencyMapDataSelector.get({reference: sReference});
+		return oUIChangesDependencyMapDataSelector.get({ reference: sReference });
 	};
 
 	VariantManagementState.getVariantDependentFlexObjects = function(sReference) {
-		return oVariantDependentFlexObjectsDataSelector.get({reference: sReference});
+		return oVariantDependentFlexObjectsDataSelector.get({ reference: sReference });
 	};
 
 	VariantManagementState.getChangeInformationProvider = function(oFlexObject) {
@@ -819,7 +819,7 @@ sap.ui.define([
 		);
 		oVariantManagementMapDataSelector.checkUpdate(
 			{ reference: mPropertyBag.reference },
-			[{ type: "switchVariant"}]
+			[{ type: "switchVariant" }]
 		);
 	};
 

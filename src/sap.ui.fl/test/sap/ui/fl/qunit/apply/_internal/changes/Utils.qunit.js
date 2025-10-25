@@ -136,7 +136,7 @@ sap.ui.define([
 				}
 			});
 			sandbox.stub(ChangeHandlerStorage, "getAnnotationChangeHandler")
-			.withArgs({changeType: "myAnnotationChangeType"})
+			.withArgs({ changeType: "myAnnotationChangeType" })
 			.resolves("myAnnotationChangeHandler");
 		},
 		afterEach() {

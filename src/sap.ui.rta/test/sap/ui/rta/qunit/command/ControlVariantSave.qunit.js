@@ -102,7 +102,7 @@ sap.ui.define([
 		}
 	}, function() {
 		QUnit.test("when calling command factory for save variants and undo", async function(assert) {
-			const oOverlay = new ElementOverlay({element: this.oVariantManagement});
+			const oOverlay = new ElementOverlay({ element: this.oVariantManagement });
 			sandbox.stub(OverlayRegistry, "getOverlay").returns(oOverlay);
 			sandbox.stub(oOverlay, "getVariantManagement").returns("idMain1--variantManagementOrdersTable");
 			sandbox.stub(this.oVariantManagement, "getCurrentVariantReference").returns("variant00");
@@ -111,8 +111,8 @@ sap.ui.define([
 			.returns([this.oChange1, this.oChange2]);
 			const oInvalidationStub = sandbox.stub(VariantManager, "updateVariantManagementMap").withArgs("Dummy");
 
-			const oDesignTimeMetadata = new ElementDesignTimeMetadata({data: {}});
-			const mFlexSettings = {layer: Layer.CUSTOMER};
+			const oDesignTimeMetadata = new ElementDesignTimeMetadata({ data: {} });
+			const mFlexSettings = { layer: Layer.CUSTOMER };
 			const oControlVariantSaveCommand = await CommandFactory.getCommandFor(
 				this.oVariantManagement, "save", {}, oDesignTimeMetadata, mFlexSettings
 			);

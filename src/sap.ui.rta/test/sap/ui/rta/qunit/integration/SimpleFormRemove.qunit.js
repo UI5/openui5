@@ -27,7 +27,7 @@ sap.ui.define([
 ) {
 	"use strict";
 
-	var {SimpleFormLayout} = layoutLibrary.form;
+	var { SimpleFormLayout } = layoutLibrary.form;
 	var sandbox = sinon.createSandbox();
 
 	function fnParamerizedTest(oSimpleFormLayout) {

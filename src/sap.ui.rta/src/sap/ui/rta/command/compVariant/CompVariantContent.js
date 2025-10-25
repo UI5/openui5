@@ -83,7 +83,7 @@ sap.ui.define([
 	CompVariantContent.prototype.execute = function() {
 		this.getElement().setModified(true);
 		const oNewVariantContent = setVariantContent.call(this, this.getNewContent());
-		callFlAPIFunction.call(this, "updateVariantContent", this.getVariantId(), {content: oNewVariantContent});
+		callFlAPIFunction.call(this, "updateVariantContent", this.getVariantId(), { content: oNewVariantContent });
 		return Promise.resolve();
 	};
 

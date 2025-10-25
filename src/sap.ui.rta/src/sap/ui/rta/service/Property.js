@@ -116,11 +116,11 @@ sap.ui.define([
 			)
 			.then(function(aPromiseResults) {
 				return {
-					...(aPromiseResults[0] && !isEmptyObject(aPromiseResults[0]) && {annotations: aPromiseResults[0]}),
-					...(aPromiseResults[1] && {properties: aPromiseResults[1]}),
-					...(aPromiseResults[2] && {label: validate(aPromiseResults[2])}),
-					...(oDesignTimeMetadataData.name && {name: oDesignTimeMetadata.getName(oElement)}),
-					...(!isEmptyObject(aPromiseResults[3]) && {links: aPromiseResults[3]})
+					...(aPromiseResults[0] && !isEmptyObject(aPromiseResults[0]) && { annotations: aPromiseResults[0] }),
+					...(aPromiseResults[1] && { properties: aPromiseResults[1] }),
+					...(aPromiseResults[2] && { label: validate(aPromiseResults[2]) }),
+					...(oDesignTimeMetadataData.name && { name: oDesignTimeMetadata.getName(oElement) }),
+					...(!isEmptyObject(aPromiseResults[3]) && { links: aPromiseResults[3] })
 				};
 			});
 		};
@@ -153,7 +153,7 @@ sap.ui.define([
 				var mBindingInfo = oProperty._getBindingInfo(sKey, oElement);
 				Object.assign(
 					mFiltered[sKey],
-					mBindingInfo && {binding: mBindingInfo}
+					mBindingInfo && { binding: mBindingInfo }
 				);
 				return mFiltered;
 			}, {});
@@ -236,9 +236,9 @@ sap.ui.define([
 			.then(function(vPossibleValues) {
 				Object.assign(
 					mEvaluatedProperty[sPropertyName],
-					mBindingInfo && {binding: mBindingInfo},
-					vPossibleValues && {possibleValues: validate(vPossibleValues)},
-					typeof mDtObj[sPropertyName].nullable === "boolean" && {nullable: mDtObj[sPropertyName].nullable} // nullable property
+					mBindingInfo && { binding: mBindingInfo },
+					vPossibleValues && { possibleValues: validate(vPossibleValues) },
+					typeof mDtObj[sPropertyName].nullable === "boolean" && { nullable: mDtObj[sPropertyName].nullable } // nullable property
 				);
 
 				return mEvaluatedProperty;

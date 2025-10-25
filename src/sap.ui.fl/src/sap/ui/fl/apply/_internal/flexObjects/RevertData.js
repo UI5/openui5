@@ -20,8 +20,8 @@ sap.ui.define([
 	return ManagedObject.extend("sap.ui.fl.apply._internal.flexObjects.RevertData", {
 		metadata: {
 			properties: {
-				type: {type: "string"},
-				content: {type: "object"}
+				type: { type: "string" },
+				content: { type: "object" }
 			}
 		}
 	});

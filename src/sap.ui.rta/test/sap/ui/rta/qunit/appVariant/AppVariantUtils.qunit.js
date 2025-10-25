@@ -42,7 +42,7 @@ sap.ui.define([
 						return {
 							semanticObject: "testSemanticObject",
 							action: "testAction",
-							params: {par: "testpar"}
+							params: { par: "testpar" }
 						};
 					}
 				});
@@ -110,18 +110,18 @@ sap.ui.define([
 		});
 
 		QUnit.test("When getInlineChangeInputIcon() method is called", function(assert) {
-			assert.deepEqual(AppVariantUtils.getInlineChangeInputIcon("testIcon"), {content: {icon: "testIcon"}}, "then the content of icon inline change is correct");
+			assert.deepEqual(AppVariantUtils.getInlineChangeInputIcon("testIcon"), { content: { icon: "testIcon" } }, "then the content of icon inline change is correct");
 		});
 
 		QUnit.test("When prepareRemoveAllInboundsExceptOneChange() method is called", function(assert) {
-			assert.deepEqual(AppVariantUtils.prepareRemoveAllInboundsExceptOneChange("testInbound"), {content: {inboundId: "testInbound"}}, "then the content of remove inbound inline change is correct");
+			assert.deepEqual(AppVariantUtils.prepareRemoveAllInboundsExceptOneChange("testInbound"), { content: { inboundId: "testInbound" } }, "then the content of remove inbound inline change is correct");
 		});
 
 		QUnit.test("When getParsedHash() is called", function(assert) {
 			const oExpectedParsedHash = {
 				action: "testAction",
 				semanticObject: "testSemanticObject",
-				params: {par: "testpar"}
+				params: { par: "testpar" }
 			};
 			return AppVariantUtils.getParsedHash()
 			.then(function(oParsedHash) {
@@ -177,7 +177,7 @@ sap.ui.define([
 				}
 			};
 
-			return AppVariantUtils.prepareAddNewInboundChange("customer.savedAsAppVariant", "appVariantId", {title: "Test Title", subTitle: "Test Subtitle", icon: "Test icon", referenceAppId: "referenceId"})
+			return AppVariantUtils.prepareAddNewInboundChange("customer.savedAsAppVariant", "appVariantId", { title: "Test Title", subTitle: "Test Subtitle", icon: "Test icon", referenceAppId: "referenceId" })
 			.then(function(oPreparedInboundChange) {
 				assert.deepEqual(oPreparedInboundChange, oInboundPropertyChange, "then the addNewInbound change structure is correct");
 			});
@@ -234,7 +234,7 @@ sap.ui.define([
 				}
 			};
 
-			assert.deepEqual(AppVariantUtils.prepareChangeInboundChange("customer.savedAsAppVariant", "appVariantId", {title: "Test Title", subTitle: "Test Subtitle", icon: "Test icon", referenceAppId: "referenceId"}), oInboundPropertyChange, "then the addNewInbound change structure is correct");
+			assert.deepEqual(AppVariantUtils.prepareChangeInboundChange("customer.savedAsAppVariant", "appVariantId", { title: "Test Title", subTitle: "Test Subtitle", icon: "Test icon", referenceAppId: "referenceId" }), oInboundPropertyChange, "then the addNewInbound change structure is correct");
 		});
 
 		QUnit.test("When getInlineChangeForInboundPropertySaveAs() method is called", function(assert) {
@@ -284,9 +284,9 @@ sap.ui.define([
 
 		QUnit.test("When deleteAppVariant() method is called", function(assert) {
 			const fnDeleteAppVariantStub = sandbox.stub(AppVariantWriteAPI, "deleteAppVariant").resolves();
-			const vAppIdSelector = {appId: "customer.appvar.id"};
+			const vAppIdSelector = { appId: "customer.appvar.id" };
 			return AppVariantUtils.deleteAppVariant(vAppIdSelector, Layer.CUSTOMER).then(function() {
-				assert.ok(fnDeleteAppVariantStub.calledWithExactly({selector: vAppIdSelector, layer: Layer.CUSTOMER}));
+				assert.ok(fnDeleteAppVariantStub.calledWithExactly({ selector: vAppIdSelector, layer: Layer.CUSTOMER }));
 			});
 		});
 
@@ -337,7 +337,7 @@ sap.ui.define([
 			assert.strictEqual(sErrorMessage, oError.userMessage, "then the userMessage error is returned");
 			delete oError.userMessage;
 
-			oError.messages = [{text: "this is"}, {text: "a test error"}];
+			oError.messages = [{ text: "this is" }, { text: "a test error" }];
 			sErrorMessage = AppVariantUtils._getErrorMessageText(oError);
 			assert.strictEqual(sErrorMessage, oError.messages.map(function(oError) {
 				return oError.text;
@@ -582,7 +582,7 @@ sap.ui.define([
 				parsedHash: {
 					action: "testAction",
 					semanticObject: "testSemanticObject",
-					params: {par: "testpar"}
+					params: { par: "testpar" }
 				}
 			})
 			.then(function(oAppVariant) {
@@ -604,7 +604,7 @@ sap.ui.define([
 				parsedHash: {
 					action: "testAction",
 					semanticObject: "testSemanticObject",
-					params: {par: "testpar"}
+					params: { par: "testpar" }
 				}
 			})
 			.then(function(oAppVariant) {
@@ -648,8 +648,8 @@ sap.ui.define([
 	}, function() {
 		QUnit.test("When createAppVariant() method is called", function(assert) {
 			const fnSaveAsAppVariantStub = sandbox.stub(AppVariantWriteAPI, "saveAs").resolves();
-			return AppVariantUtils.createAppVariant(this.oAppComponent, {id: "customer.appvar.id", layer: Layer.CUSTOMER}).then(function() {
-				assert.ok(fnSaveAsAppVariantStub.calledWithExactly({selector: this.oAppComponent, id: "customer.appvar.id", layer: Layer.CUSTOMER, version: "1.0.0"}));
+			return AppVariantUtils.createAppVariant(this.oAppComponent, { id: "customer.appvar.id", layer: Layer.CUSTOMER }).then(function() {
+				assert.ok(fnSaveAsAppVariantStub.calledWithExactly({ selector: this.oAppComponent, id: "customer.appvar.id", layer: Layer.CUSTOMER, version: "1.0.0" }));
 			}.bind(this));
 		});
 

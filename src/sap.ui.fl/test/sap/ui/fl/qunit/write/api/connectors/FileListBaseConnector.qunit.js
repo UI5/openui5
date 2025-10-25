@@ -31,7 +31,7 @@ sap.ui.define([
 	}, function() {
 		QUnit.test("When loadFledData is called", function(assert) {
 			assert.throws(
-				FileListBaseConnector.loadFlexData({reference: "app.id"}),
+				FileListBaseConnector.loadFlexData({ reference: "app.id" }),
 				"the call is rejected"
 			);
 		});
@@ -43,7 +43,7 @@ sap.ui.define([
 		}
 	}, function() {
 		QUnit.test("When", function(assert) {
-			return oConnectorImplementation.loadFlexData({reference: "app.id"}).then(function(oFlexData) {
+			return oConnectorImplementation.loadFlexData({ reference: "app.id" }).then(function(oFlexData) {
 				assert.equal(oFlexData[0].changes.length, 2, "two changes were loaded");
 				// just check a single property to ensure the correct file loading and sorting
 				assert.equal(oFlexData[0].changes[0].fileName, "id_1445501120486_26", "the file was loaded correct");

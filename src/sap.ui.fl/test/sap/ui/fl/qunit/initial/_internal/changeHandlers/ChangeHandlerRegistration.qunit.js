@@ -24,7 +24,7 @@ sap.ui.define([
 		}
 	}, function() {
 		QUnit.test("the registry can identify flexChangeHandlers from already loaded libraries", function(assert) {
-			var oFlChangeHandlerObject = {foo: "bar"};
+			var oFlChangeHandlerObject = { foo: "bar" };
 
 			var aLoadedLibraries = [
 				{
@@ -63,7 +63,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("the registry can identify flexChangeHandlers from loaded libraries after fl was loaded", function(assert) {
-			var oFlChangeHandlerObject = {foo: "bar"};
+			var oFlChangeHandlerObject = { foo: "bar" };
 			var oMockedLibraryChangedEvent = {
 				parameters: {
 					operation: "add",
@@ -91,7 +91,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("the registry does nothing if a library was changes, but not added", function(assert) {
-			var oFlChangeHandlerObject = {foo: "bar"};
+			var oFlChangeHandlerObject = { foo: "bar" };
 			var oMockedLibraryChangedEvent = {
 				parameters: {
 					operation: "changed",
@@ -148,7 +148,7 @@ sap.ui.define([
 			QUnit.test(sMsg, function(assert) {
 				var done = assert.async();
 				var sKey = "myFancyName";
-				var oFlChangeHandlerObject = {foo: "bar"};
+				var oFlChangeHandlerObject = { foo: "bar" };
 				var oMockedLibraryChangedEvent = {
 					parameters: {
 						operation: "add",

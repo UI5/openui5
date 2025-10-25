@@ -46,7 +46,7 @@ sap.ui.define([
 			const sReference = ManifestUtils.getFlexReferenceForControl(mPropertyBag.variantManagementControl);
 			const oSettings = await Settings.getInstance();
 			const bIsEnabled = oSettings.getIsContextSharingEnabled()
-				&& !ContextBasedAdaptationsAPI.adaptationExists({reference: sReference, layer: Layer.CUSTOMER});
+				&& !ContextBasedAdaptationsAPI.adaptationExists({ reference: sReference, layer: Layer.CUSTOMER });
 			return bIsEnabled;
 		},
 
@@ -72,9 +72,9 @@ sap.ui.define([
 						name: "sap.ui.fl.variants.context", id: "contextSharing"
 					});
 					oComponent.showMessageStrip(true);
-					oComponent.setSelectedContexts({role: []});
+					oComponent.setSelectedContexts({ role: [] });
 					// Ensure view is fully loaded
-					oComponentContainer = new ComponentContainer("contextSharingContainer", {component: oComponent});
+					oComponentContainer = new ComponentContainer("contextSharingContainer", { component: oComponent });
 					await oComponent.getRootControl().oAsyncState.promise;
 					return oComponentContainer;
 				});

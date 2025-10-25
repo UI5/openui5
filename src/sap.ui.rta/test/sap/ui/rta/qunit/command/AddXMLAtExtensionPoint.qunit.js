@@ -45,7 +45,7 @@ sap.ui.define([
 						"</content>" +
 					"</Panel>" +
 				"</mvc:View>";
-			return XMLView.create({id: "testapp---view", definition: oXmlString})
+			return XMLView.create({ id: "testapp---view", definition: oXmlString })
 			.then(function(oXMLView) {
 				this.oXMLView = oXMLView;
 				this.mExtensionPointReference = {

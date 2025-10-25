@@ -175,7 +175,7 @@ sap.ui.define([
 
 			const oLiveDependencyMap = FlexObjectState.getLiveDependencyMap(this.sFlexReference);
 			VariantManagementState.getInitialUIChanges(
-				{reference: this.sFlexReference},
+				{ reference: this.sFlexReference },
 				this.oAppComponent.getId(),
 				this.sFlexReference
 			).forEach((oFlexObject) => {
@@ -231,7 +231,7 @@ sap.ui.define([
 	};
 
 	VariantModel.prototype.invalidateMap = function() {
-		this.oDataSelector.checkUpdate({reference: this.sFlexReference});
+		this.oDataSelector.checkUpdate({ reference: this.sFlexReference });
 	};
 
 	/**
@@ -394,7 +394,7 @@ sap.ui.define([
 			});
 		};
 
-		oEvent.getParameter("renamed")?.forEach(({key: sVariantKey, name: sNewTitle}) => {
+		oEvent.getParameter("renamed")?.forEach(({ key: sVariantKey, name: sNewTitle }) => {
 			const oVariant = findVariant(sVariantKey);
 			fnAddPreparedChange(
 				oVariant,
@@ -405,7 +405,7 @@ sap.ui.define([
 				}
 			);
 		});
-		oEvent.getParameter("fav")?.forEach(({key: sVariantKey, visible: bNewIsFavorite}) => {
+		oEvent.getParameter("fav")?.forEach(({ key: sVariantKey, visible: bNewIsFavorite }) => {
 			const oVariant = findVariant(sVariantKey);
 			fnAddPreparedChange(
 				oVariant,
@@ -416,7 +416,7 @@ sap.ui.define([
 				}
 			);
 		});
-		oEvent.getParameter("exe")?.forEach(({key: sVariantKey, exe: bNewExecuteOnSelect}) => {
+		oEvent.getParameter("exe")?.forEach(({ key: sVariantKey, exe: bNewExecuteOnSelect }) => {
 			const oVariant = findVariant(sVariantKey);
 			fnAddPreparedChange(
 				oVariant,
@@ -438,7 +438,7 @@ sap.ui.define([
 			);
 			aVariantsToBeDeleted.push(sVariantKey);
 		});
-		oEvent.getParameter("contexts")?.forEach(({key: sVariantKey, contexts: aNewContexts}) => {
+		oEvent.getParameter("contexts")?.forEach(({ key: sVariantKey, contexts: aNewContexts }) => {
 			const oVariant = findVariant(sVariantKey);
 			fnAddPreparedChange(
 				oVariant,
@@ -518,7 +518,7 @@ sap.ui.define([
 			case "setDefault":
 				mAdditionalChangeContent.defaultVariant = mPropertyBag.defaultVariant;
 				// Update hash data
-				var aHashParameters = URLHandler.getStoredHashParams({model: this});
+				var aHashParameters = URLHandler.getStoredHashParams({ model: this });
 				if (aHashParameters && oVMControl.getUpdateVariantInURL()) {
 					if (
 						oData[sVariantManagementReference].defaultVariant !== oData[sVariantManagementReference].currentVariant
@@ -584,11 +584,11 @@ sap.ui.define([
 			this._bDesignTimeMode = bDesignTimeModeToBeSet;
 
 			if (bDesignTimeModeToBeSet) {
-				URLHandler.clearAllVariantURLParameters({model: this});
+				URLHandler.clearAllVariantURLParameters({ model: this });
 			} else if (bOriginalMode && oVMControl.getUpdateVariantInURL()) {
 				// use case: switch from end user -> key user with a restart; the initial hash data is empty
 				URLHandler.update({
-					parameters: URLHandler.getStoredHashParams({model: this}),
+					parameters: URLHandler.getStoredHashParams({ model: this }),
 					updateURL: true,
 					updateHashEntry: false,
 					model: this
@@ -829,7 +829,7 @@ sap.ui.define([
 			}
 		});
 		sap.ui.require(["sap/ui/fl/write/_internal/flexState/FlexObjectManager"], (FlexObjectManager) => {
-			FlexObjectManager.deleteFlexObjects({reference: this.sFlexReference, flexObjects: aDirtyChanges});
+			FlexObjectManager.deleteFlexObjects({ reference: this.sFlexReference, flexObjects: aDirtyChanges });
 		});
 
 		this.oDataSelector.removeUpdateListener(this.fnUpdateListener);

@@ -17,7 +17,7 @@ sap.ui.define([
 	var sandbox = sinon.createSandbox();
 
 	function createFakeControl(sId) {
-		return { getId() { return sId; }};
+		return { getId() { return sId; } };
 	}
 
 	function createAndRegisterExtensionPoint(oView, sExtensionPointName, oParent, sAggregationName, iIndex) {
@@ -80,22 +80,22 @@ sap.ui.define([
 	}, function() {
 		QUnit.test("with valid parameters", function(assert) {
 			assert.deepEqual(
-				ExtensionPointRegistryAPI.getExtensionPointInfo({name: this.sExtensionPointName1, view: this.oView1}),
+				ExtensionPointRegistryAPI.getExtensionPointInfo({ name: this.sExtensionPointName1, view: this.oView1 }),
 				this.mExtensionPointInfo1,
 				"the correct extension point info is returned"
 			);
 			assert.deepEqual(
-				ExtensionPointRegistryAPI.getExtensionPointInfo({name: this.sExtensionPointName2, view: this.oView1}),
+				ExtensionPointRegistryAPI.getExtensionPointInfo({ name: this.sExtensionPointName2, view: this.oView1 }),
 				this.mExtensionPointInfo2,
 				"the correct extension point info is returned"
 			);
 			assert.deepEqual(
-				ExtensionPointRegistryAPI.getExtensionPointInfo({name: this.sExtensionPointName3, view: this.oView1}),
+				ExtensionPointRegistryAPI.getExtensionPointInfo({ name: this.sExtensionPointName3, view: this.oView1 }),
 				this.mExtensionPointInfo3,
 				"the correct extension point info is returned"
 			);
 			assert.deepEqual(
-				ExtensionPointRegistryAPI.getExtensionPointInfo({name: this.sExtensionPointName4, view: this.oView1}),
+				ExtensionPointRegistryAPI.getExtensionPointInfo({ name: this.sExtensionPointName4, view: this.oView1 }),
 				this.mExtensionPointInfo4,
 				"the correct extension point info is returned"
 			);
@@ -103,13 +103,13 @@ sap.ui.define([
 
 		QUnit.test("without valid view provided as parameter", function(assert) {
 			assert.throws(function() {
-				ExtensionPointRegistryAPI.getExtensionPointInfo({name: this.sExtensionPointName1, view: {}});
+				ExtensionPointRegistryAPI.getExtensionPointInfo({ name: this.sExtensionPointName1, view: {} });
 			}, "then an exception is thrown when there is no correct view object.");
 		});
 
 		QUnit.test("with not registered extension point name as parameter", function(assert) {
 			assert.deepEqual(
-				ExtensionPointRegistryAPI.getExtensionPointInfo({name: "not_registered_EP", view: this.oView1}),
+				ExtensionPointRegistryAPI.getExtensionPointInfo({ name: "not_registered_EP", view: this.oView1 }),
 				undefined,
 				"undefined is returned for an invalid extension point name"
 			);
@@ -117,7 +117,7 @@ sap.ui.define([
 
 		QUnit.test("with an unregistered view as parameter", function(assert) {
 			assert.deepEqual(
-				ExtensionPointRegistryAPI.getExtensionPointInfo({name: this.sExtensionPointName2, view: this.oView2}),
+				ExtensionPointRegistryAPI.getExtensionPointInfo({ name: this.sExtensionPointName2, view: this.oView2 }),
 				undefined,
 				"undefined is returned for a not registered view name"
 			);
@@ -154,7 +154,7 @@ sap.ui.define([
 		QUnit.test("with valid parameters", function(assert) {
 			var sParentId = this.mExtensionPointInfo2.targetControl.getId();
 			assert.deepEqual(
-				ExtensionPointRegistryAPI.getExtensionPointInfoByParentId({parentId: sParentId}),
+				ExtensionPointRegistryAPI.getExtensionPointInfoByParentId({ parentId: sParentId }),
 				[this.mExtensionPointInfo2, this.mExtensionPointInfo3],
 				"the correct extension point info into an array is returned"
 			);
@@ -162,7 +162,7 @@ sap.ui.define([
 
 		QUnit.test("with invalid parent id as parameter", function(assert) {
 			assert.deepEqual(
-				ExtensionPointRegistryAPI.getExtensionPointInfoByParentId({parentId: "invalidParentId"}),
+				ExtensionPointRegistryAPI.getExtensionPointInfoByParentId({ parentId: "invalidParentId" }),
 				[],
 				"then an empty array is returned"
 			);
@@ -197,13 +197,13 @@ sap.ui.define([
 		}
 	}, function() {
 		QUnit.test("with valid parameters", function(assert) {
-			var mExtensionPointInfoMap = ExtensionPointRegistryAPI.getExtensionPointInfoByViewId({viewId: this.oView1.getId()});
+			var mExtensionPointInfoMap = ExtensionPointRegistryAPI.getExtensionPointInfoByViewId({ viewId: this.oView1.getId() });
 			assert.deepEqual(Object.keys(mExtensionPointInfoMap), [this.sExtensionPointName2, this.sExtensionPointName3],
 				"the correct extension point info into an map is returned");
 		});
 
 		QUnit.test("with invalid view id as parameter", function(assert) {
-			assert.deepEqual(ExtensionPointRegistryAPI.getExtensionPointInfoByViewId({viewId: "invalidViewId"}),
+			assert.deepEqual(ExtensionPointRegistryAPI.getExtensionPointInfoByViewId({ viewId: "invalidViewId" }),
 				{}, "then an empty map is returned");
 		});
 	});

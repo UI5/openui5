@@ -82,7 +82,7 @@ sap.ui.define([
 	}
 
 	function cleanInfoSessionStorage() {
-		var sFlexReference = FlexRuntimeInfoAPI.getFlexReference({element: oComp});
+		var sFlexReference = FlexRuntimeInfoAPI.getFlexReference({ element: oComp });
 		window.sessionStorage.removeItem(`sap.ui.fl.info.${sFlexReference}`);
 	}
 
@@ -520,7 +520,7 @@ sap.ui.define([
 		QUnit.test("when saving changes and versioning and cba is enabled and condenseAnyLayer true", function(assert) {
 			this.oRta._oVersionsModel.setProperty("/versioningEnabled", true);
 			this.oRta._oContextBasedAdaptationsModel.setProperty("/contextBasedAdaptationsEnabled", true);
-			this.oRta._oContextBasedAdaptationsModel.setProperty("/displayedAdaptation", {id: "ad123"});
+			this.oRta._oContextBasedAdaptationsModel.setProperty("/displayedAdaptation", { id: "ad123" });
 			var oSaveStub = sandbox.stub(PersistenceWriteAPI, "save").resolves();
 
 			return this.oRta._serializeToLrep(true)
@@ -550,7 +550,7 @@ sap.ui.define([
 		QUnit.test("when stopping rta with saving changes and versioning and cba is enabled and condenseAnyLayer true", function(assert) {
 			this.oRta._oVersionsModel.setProperty("/versioningEnabled", true);
 			this.oRta._oContextBasedAdaptationsModel.setProperty("/contextBasedAdaptationsEnabled", true);
-			this.oRta._oContextBasedAdaptationsModel.setProperty("/displayedAdaptation", {id: "ad123"});
+			this.oRta._oContextBasedAdaptationsModel.setProperty("/displayedAdaptation", { id: "ad123" });
 			var oSaveStub = sandbox.stub(PersistenceWriteAPI, "save").resolves();
 
 			return this.oRta._serializeToLrep(true, true)
@@ -660,7 +660,7 @@ sap.ui.define([
 
 		QUnit.test("when RTA is started with crested versions from the user", async function(assert) {
 			sandbox.stub(FlexRuntimeInfoAPI, "getUserId").returns("testUser");
-			sandbox.stub(VersionsAPI, "getCreatedVersionsByUser").returns([{versionId: "testVersion"}]);
+			sandbox.stub(VersionsAPI, "getCreatedVersionsByUser").returns([{ versionId: "testVersion" }]);
 			sandbox.stub(PersistenceWriteAPI, "_getFlexObjectsForUser").returns([]);
 			this.oRta = new RuntimeAuthoring({
 				rootControl: oComp.getAggregation("rootControl")
@@ -685,7 +685,7 @@ sap.ui.define([
 
 		QUnit.test("when RTA is started with changes from the user", async function(assert) {
 			sandbox.stub(FlexRuntimeInfoAPI, "getUserId").returns("testUser");
-			sandbox.stub(PersistenceWriteAPI, "_getFlexObjectsForUser").returns([{changeId: "testChange"}]);
+			sandbox.stub(PersistenceWriteAPI, "_getFlexObjectsForUser").returns([{ changeId: "testChange" }]);
 			sandbox.stub(VersionsAPI, "getCreatedVersionsByUser").returns([]);
 			this.oRta = new RuntimeAuthoring({
 				rootControl: oComp.getAggregation("rootControl")

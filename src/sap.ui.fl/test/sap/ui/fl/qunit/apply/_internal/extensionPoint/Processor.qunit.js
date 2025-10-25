@@ -41,7 +41,7 @@ sap.ui.define([
 		oSpyAddXMLAtExtensionPointApply = sandbox.spy(AddXMLAtExtensionPoint, "applyChange");
 		oSpyRegisterExtensionPoint = sandbox.spy(ExtensionPointRegistry, "registerExtensionPoint");
 		await FlQUnitUtils.initializeFlexStateWithData(sandbox, "sap.ui.fl.qunit.extensionPoint.testApp",
-			{changes: createChanges("sap.ui.fl.qunit.extensionPoint.testApp.async")});
+			{ changes: createChanges("sap.ui.fl.qunit.extensionPoint.testApp.async") });
 		oComponent = await Component.create({
 			name: "sap.ui.fl.qunit.extensionPoint.testApp",
 			id: "sap.ui.fl.qunit.extensionPoint.testApp.async",
@@ -72,7 +72,7 @@ sap.ui.define([
 				projectId: "testProject",
 				selector: {
 					name: sEpName,
-					viewSelector: { id: `${sReference}---mainView--${sViewName}`, idIsLocal: false}
+					viewSelector: { id: `${sReference}---mainView--${sViewName}`, idIsLocal: false }
 				},
 				layer: sLayer,
 				support: {},
@@ -153,7 +153,7 @@ sap.ui.define([
 
 		var checkChangesContent = function(sReference) {
 			var aChanges = UIChangesState.getAllUIChanges("sap.ui.fl.qunit.extensionPoint.testApp");
-			const mChanges = aChanges.reduce((oAccumulator, oChange) => Object.assign(oAccumulator, {[oChange.getId()]: oChange}), {});
+			const mChanges = aChanges.reduce((oAccumulator, oChange) => Object.assign(oAccumulator, { [oChange.getId()]: oChange }), {});
 			// Changes on async view carries no ep info
 			assert.equal(mChanges[`${sReference}_EP1_async_VENDOR_addXMLAtExtensionPoint`].getExtensionPointInfo(), null, "oChange1 carries no extension point info");
 			assert.equal(mChanges[`${sReference}_EP3_async_VENDOR_addXMLAtExtensionPoint`].getExtensionPointInfo(), null, "oChange3 carries no extension point info");

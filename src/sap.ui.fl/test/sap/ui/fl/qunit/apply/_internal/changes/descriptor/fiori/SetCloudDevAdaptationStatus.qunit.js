@@ -21,16 +21,16 @@ sap.ui.define([
 			};
 			this.oManifestEmpty = {};
 
-			this.oChangeReleased = new AppDescriptorChange({ content: { cloudDevAdaptationStatus: "released"} });
-			this.oChangeDeprecated = new AppDescriptorChange({ content: { cloudDevAdaptationStatus: "deprecated"} });
-			this.oChangeObsolete = new AppDescriptorChange({ content: { cloudDevAdaptationStatus: "obsolete"} });
+			this.oChangeReleased = new AppDescriptorChange({ content: { cloudDevAdaptationStatus: "released" } });
+			this.oChangeDeprecated = new AppDescriptorChange({ content: { cloudDevAdaptationStatus: "deprecated" } });
+			this.oChangeObsolete = new AppDescriptorChange({ content: { cloudDevAdaptationStatus: "obsolete" } });
 			this.oChangeEmpty = new AppDescriptorChange({ content: { } });
 			this.oChangeError = new AppDescriptorChange({ content: { otherProperty: "test" } });
 			this.oChangeObject = new AppDescriptorChange({ content: { cloudDevAdaptationStatus: {} } });
 			this.oChangeArray = new AppDescriptorChange({ content: { cloudDevAdaptationStatus: [] } });
 			this.oChangeInt = new AppDescriptorChange({ content: { cloudDevAdaptationStatus: 1 } });
 			this.oChangeBoolean = new AppDescriptorChange({ content: { cloudDevAdaptationStatus: true } });
-			this.oChangeUnsupported = new AppDescriptorChange({ content: { cloudDevAdaptationStatus: "rElEaSeD"} });
+			this.oChangeUnsupported = new AppDescriptorChange({ content: { cloudDevAdaptationStatus: "rElEaSeD" } });
 		},
 		afterEach() {
 			sandbox.restore();

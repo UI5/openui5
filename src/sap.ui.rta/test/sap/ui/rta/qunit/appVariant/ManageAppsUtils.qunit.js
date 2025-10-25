@@ -34,7 +34,7 @@ sap.ui.define([
 				getServiceAsync() {
 					return Promise.resolve({
 						getLinks() {
-							return Promise.resolve([[{result: "success"}]]);
+							return Promise.resolve([[{ result: "success" }]]);
 						}
 					});
 				},

@@ -83,7 +83,7 @@ sap.ui.define([
 
 	function prepareAndExecute(oFlexCommand) {
 		return Promise.resolve()
-		.then(oFlexCommand.prepare.bind(oFlexCommand, {generator: "myFancyGenerator", layer: Layer.CUSTOMER}))
+		.then(oFlexCommand.prepare.bind(oFlexCommand, { generator: "myFancyGenerator", layer: Layer.CUSTOMER }))
 		.then(oFlexCommand.execute.bind(oFlexCommand));
 	}
 
@@ -1100,8 +1100,8 @@ sap.ui.define([
 				changeType: "hideControl"
 			});
 			this.fnApplyChangeSpy = sandbox.spy(FlexCommand.prototype, "_applyChange");
-			sandbox.stub(ChangesWriteAPI, "apply").resolves({success: true});
-			this.oWriteAPIRevertStub = sandbox.stub(ChangesWriteAPI, "revert").resolves({success: true});
+			sandbox.stub(ChangesWriteAPI, "apply").resolves({ success: true });
+			this.oWriteAPIRevertStub = sandbox.stub(ChangesWriteAPI, "revert").resolves({ success: true });
 		},
 		afterEach() {
 			sandbox.restore();
@@ -1118,7 +1118,7 @@ sap.ui.define([
 			this.oCommandStack.push(this.oFlexCommand);
 
 			return Promise.resolve()
-			.then(this.oFlexCommand.prepare.bind(this.oFlexCommand, {layer: Layer.CUSTOMER}))
+			.then(this.oFlexCommand.prepare.bind(this.oFlexCommand, { layer: Layer.CUSTOMER }))
 			.then(this.oCommandStack.execute.bind(this.oCommandStack))
 			.then(function() {
 				var oChange = this.oFlexCommand.getPreparedChange();
@@ -1128,7 +1128,7 @@ sap.ui.define([
 				return this.oCommandStack.undo()
 				.then(function() {
 					assert.ok(true, "then a Promise.resolve() is returned on Stack.undo()");
-					assert.ok(this.oWriteAPIRevertStub.calledWithExactly({change: oChange, element: this.oButton}), "then PersistenceWriteAPI.remove called with required parameters");
+					assert.ok(this.oWriteAPIRevertStub.calledWithExactly({ change: oChange, element: this.oButton }), "then PersistenceWriteAPI.remove called with required parameters");
 				}.bind(this));
 			}.bind(this));
 		});
@@ -1151,7 +1151,7 @@ sap.ui.define([
 
 			var done = assert.async();
 
-			var aTexts = [{text1: "Text 1", text2: "More Text 1"}, {text1: "Text 2", text2: "More Text 2"}, {text1: "Text 3", text2: "More Text 3"}];
+			var aTexts = [{ text1: "Text 1", text2: "More Text 1" }, { text1: "Text 2", text2: "More Text 2" }, { text1: "Text 3", text2: "More Text 3" }];
 			var oModel = new JSONModel({
 				texts: aTexts
 			});
@@ -1163,8 +1163,8 @@ sap.ui.define([
 							items: [
 								new VBox("vbox3", {
 									items: [
-										new Text("text1", {text: "{text1}"}),
-										new Text("text2", {text: "{text2}"})
+										new Text("text1", { text: "{text1}" }),
+										new Text("text2", { text: "{text2}" })
 									]
 								})
 							]
@@ -1402,8 +1402,8 @@ sap.ui.define([
 
 			var done = assert.async();
 
-			var aInnerTexts = [{text: "More Text 1"}, {text: "More Text 2"}, {text: "More Text 3"}];
-			var aTexts1 = [{text: "Text 1", inner: aInnerTexts}, {text: "Text 2", inner: aInnerTexts}, {text: "Text 3", inner: aInnerTexts}];
+			var aInnerTexts = [{ text: "More Text 1" }, { text: "More Text 2" }, { text: "More Text 3" }];
+			var aTexts1 = [{ text: "Text 1", inner: aInnerTexts }, { text: "Text 2", inner: aInnerTexts }, { text: "Text 3", inner: aInnerTexts }];
 			var oModel = new JSONModel({
 				texts1: aTexts1
 			});
@@ -1411,11 +1411,11 @@ sap.ui.define([
 			this.oItemTemplate = new CustomListItem("item", { // binding context /texts1
 				content: new VBox(oMockedAppComponent.createId("vbox1"), {
 					items: [
-						new Text({id: oMockedAppComponent.createId("text"), text: "{text}"}), // binding context /texts1
+						new Text({ id: oMockedAppComponent.createId("text"), text: "{text}" }), // binding context /texts1
 						new VBox(oMockedAppComponent.createId("vbox2"), {
 							items: {
 								path: "inner",
-								template: new Text({id: oMockedAppComponent.createId("inner-text"), text: "{text}"}), // binding context /texts1/inner
+								template: new Text({ id: oMockedAppComponent.createId("inner-text"), text: "{text}" }), // binding context /texts1/inner
 								templateShareable: false
 							}
 						})
@@ -1481,7 +1481,7 @@ sap.ui.define([
 
 			var done = assert.async();
 
-			var aTexts = [{text1: "Text 1", text2: "More Text 1"}, {text1: "Text 2", text2: "More Text 2"}, {text1: "Text 3", text2: "More Text 3"}];
+			var aTexts = [{ text1: "Text 1", text2: "More Text 1" }, { text1: "Text 2", text2: "More Text 2" }, { text1: "Text 3", text2: "More Text 3" }];
 			var oModel = new JSONModel({
 				texts: aTexts
 			});
@@ -1493,8 +1493,8 @@ sap.ui.define([
 					oItem = new CustomListItem(sId, {
 						content: new VBox(`${sId}--vbox`, {
 							items: [
-								new Text(`${sId}--text1`, {text: "{text1}"}),
-								new Text(`${sId}--text2`, {text: "{text2}"})
+								new Text(`${sId}--text1`, { text: "{text1}" }),
+								new Text(`${sId}--text2`, { text: "{text2}" })
 							]
 						})
 					});
@@ -1502,8 +1502,8 @@ sap.ui.define([
 					oItem = new CustomListItem(sId, {
 						content: new VBox(`${sId}--vbox`, {
 							items: [
-								new Button(`${sId}--button1`, {text: "{text1}"}),
-								new Button(`${sId}--button2`, {text: "{text2}"})
+								new Button(`${sId}--button1`, { text: "{text1}" }),
+								new Button(`${sId}--button2`, { text: "{text2}" })
 							]
 						})
 					});

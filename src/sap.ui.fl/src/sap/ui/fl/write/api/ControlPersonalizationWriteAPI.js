@@ -118,7 +118,7 @@ sap.ui.define([
 				|| mPropertyBag.changes[0].selectorControl
 			);
 			const oAppComponent = Utils.getAppComponentForControl(oReferenceControl);
-			const sFlexReference = FlexRuntimeInfoAPI.getFlexReference({element: oReferenceControl});
+			const sFlexReference = FlexRuntimeInfoAPI.getFlexReference({ element: oReferenceControl });
 			const oVariantModel = oAppComponent.getModel(ControlVariantApplyAPI.getVariantModelName());
 			const sLayer = Layer.USER;
 			const aSuccessfulChanges = [];
@@ -297,8 +297,8 @@ sap.ui.define([
 				return Promise.reject("App Component could not be determined");
 			}
 
-			const sReference = FlexRuntimeInfoAPI.getFlexReference({element: mPropertyBag.selector});
-			if (FlexState.isInitialized({control: oAppComponent})) {
+			const sReference = FlexRuntimeInfoAPI.getFlexReference({ element: mPropertyBag.selector });
+			if (FlexState.isInitialized({ control: oAppComponent })) {
 				// limit the deletion to the passed selector control only
 				const aRemovedChanges = FlexObjectManager.removeDirtyFlexObjects({
 					reference: sReference,
@@ -342,7 +342,7 @@ sap.ui.define([
 				throw Error("App Component could not be determined");
 			}
 
-			const sReference = FlexRuntimeInfoAPI.getFlexReference({element: mPropertyBag.selector});
+			const sReference = FlexRuntimeInfoAPI.getFlexReference({ element: mPropertyBag.selector });
 			var aDirtyFlexObjects = FlexObjectState.getDirtyFlexObjects(sReference);
 
 			return aDirtyFlexObjects.some(function(oFlexObject) {
@@ -381,7 +381,7 @@ sap.ui.define([
 				return logAndReject("App Component could not be determined");
 			}
 
-			if (FlexState.isInitialized({control: oAppComponent})) {
+			if (FlexState.isInitialized({ control: oAppComponent })) {
 				return FlexObjectManager.saveFlexObjects({ flexObjects: mPropertyBag.changes, selector: oAppComponent });
 			}
 			return Promise.resolve();
@@ -435,7 +435,7 @@ sap.ui.define([
 		 * @sapui5-restricted sap.ui.rta
 		 */
 		attachChangeCreation(oControl, fnCallback) {
-			var sFlexReference = FlexRuntimeInfoAPI.getFlexReference({element: oControl});
+			var sFlexReference = FlexRuntimeInfoAPI.getFlexReference({ element: oControl });
 			mChangeCreationListeners[sFlexReference] = (mChangeCreationListeners[sFlexReference] || []).concat(fnCallback);
 		},
 
@@ -448,7 +448,7 @@ sap.ui.define([
 		 * @sapui5-restricted sap.ui.rta
 		 */
 		detachChangeCreation(oControl, fnCallback) {
-			var sFlexReference = FlexRuntimeInfoAPI.getFlexReference({element: oControl});
+			var sFlexReference = FlexRuntimeInfoAPI.getFlexReference({ element: oControl });
 			if (Array.isArray(mChangeCreationListeners[sFlexReference])) {
 				mChangeCreationListeners[sFlexReference] = mChangeCreationListeners[sFlexReference].filter(function(fnRegisteredCallback) {
 					return fnRegisteredCallback !== fnCallback;
@@ -465,7 +465,7 @@ sap.ui.define([
 		 */
 		detachAllChangeCreationListeners(oControl) {
 			if (oControl) {
-				var sFlexReference = FlexRuntimeInfoAPI.getFlexReference({element: oControl});
+				var sFlexReference = FlexRuntimeInfoAPI.getFlexReference({ element: oControl });
 				delete mChangeCreationListeners[sFlexReference];
 			} else {
 				mChangeCreationListeners = {};

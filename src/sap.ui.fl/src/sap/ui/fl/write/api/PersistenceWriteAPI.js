@@ -80,7 +80,7 @@ sap.ui.define([
 	 * @returns {Promise<boolean>} Promise that resolves to a boolean indicating if changes exist
 	 */
 	function hasChanges(mPropertyBag) {
-		return PersistenceWriteAPI._getUIChanges({...mPropertyBag, includeCtrlVariants: true})
+		return PersistenceWriteAPI._getUIChanges({ ...mPropertyBag, includeCtrlVariants: true })
 		.then(function(aChanges) {
 			return aChanges.length > 0;
 		});
@@ -402,14 +402,14 @@ sap.ui.define([
 				&& oSettingsInstance.getSystem()
 				&& oSettingsInstance.getClient();
 			const bHasNoChanges = aChanges.length === 0;
-			let oChangesWarning = {showWarning: false};
+			let oChangesWarning = { showWarning: false };
 
 			if (bHasChangesFromOtherSystem) {
-				oChangesWarning = {showWarning: true, warningType: "mixedChangesWarning"};
+				oChangesWarning = { showWarning: true, warningType: "mixedChangesWarning" };
 			}
 
 			if (isProductiveSystemWithTransports && bHasNoChanges) {
-				oChangesWarning = {showWarning: true, warningType: "noChangesAndPSystemWarning"};
+				oChangesWarning = { showWarning: true, warningType: "noChangesAndPSystemWarning" };
 			}
 			return oChangesWarning;
 		});

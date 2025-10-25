@@ -71,7 +71,7 @@ sap.ui.define([
 	QUnit.module("Given that a DragDrop is initialized ", {
 		async beforeEach(assert) {
 			this.oButton = new Button();
-			this.oLayout = new VerticalLayout({content: [this.oButton]});
+			this.oLayout = new VerticalLayout({ content: [this.oButton] });
 			this.oLayout.placeAt("qunit-fixture");
 			await nextUIUpdate();
 
@@ -294,8 +294,8 @@ sap.ui.define([
 	QUnit.module("Given that DragDrop touchevents are initialized ", {
 		async beforeEach(assert) {
 			this.oButton = new Button();
-			this.oLayout1 = new VerticalLayout({content: [this.oButton]});
-			this.oLayout2 = new VerticalLayout({content: [this.oLayout1]});
+			this.oLayout1 = new VerticalLayout({ content: [this.oButton] });
+			this.oLayout2 = new VerticalLayout({ content: [this.oLayout1] });
 			this.oLayout2.placeAt("qunit-fixture");
 			await nextUIUpdate();
 

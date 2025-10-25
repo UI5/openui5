@@ -90,8 +90,8 @@ sap.ui.define([
 		async beforeEach(assert) {
 			var fnDone = assert.async();
 
-			this.oButton1 = new Button({text: "button1"});
-			this.oButton2 = new Button({text: "button2"});
+			this.oButton1 = new Button({ text: "button1" });
+			this.oButton2 = new Button({ text: "button2" });
 			this.oPage = new Page({
 				content: [
 					this.oButton1,
@@ -289,8 +289,8 @@ sap.ui.define([
 
 			this.oAggregationOverlay.attachEventOnce("afterRendering", function(oEvent) {
 				assert.ok(true, "then AggregationOverlay is rendered");
-				oEvent.getSource().getDomRef().dispatchEvent(new CustomEvent(sEventName, { detail: sMockText1}));
-				oEvent.getSource().getDomRef().dispatchEvent(new CustomEvent(sEventName, { detail: sMockText2}));
+				oEvent.getSource().getDomRef().dispatchEvent(new CustomEvent(sEventName, { detail: sMockText1 }));
+				oEvent.getSource().getDomRef().dispatchEvent(new CustomEvent(sEventName, { detail: sMockText2 }));
 			});
 
 			this.oAggregationOverlay.attachBrowserEvent(sEventName, fnEventHandler, this.oAggregationOverlay);

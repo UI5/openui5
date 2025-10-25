@@ -36,7 +36,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("when 'getDefaultPlugins' function is called correctly", function(assert) {
-			const defaultPlugins = this.oPluginManager.getDefaultPlugins({layer: Layer.CUSTOMER});
+			const defaultPlugins = this.oPluginManager.getDefaultPlugins({ layer: Layer.CUSTOMER });
 
 			const pluginsToCheck = [
 				"addIFrame",
@@ -124,7 +124,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("when 'preparePlugins' function is called with specific plugins defined", function(assert) {
-			const oDefaultRenamePlugin = this.oPluginManager.getDefaultPlugins({layer: Layer.CUSTOMER}).rename;
+			const oDefaultRenamePlugin = this.oPluginManager.getDefaultPlugins({ layer: Layer.CUSTOMER }).rename;
 			const oGetDefaultPluginsSpy = sandbox.spy(this.oPluginManager, "getDefaultPlugins");
 			const oDestroyDefaultPluginsSpy = sandbox.spy(this.oPluginManager, "_destroyDefaultPlugins");
 			this.oPluginManager.setPlugins({
@@ -176,20 +176,20 @@ sap.ui.define([
 		QUnit.test("when 'getDefaultPlugins' function is called with localReset plugin defined but with local reset unavailable", function(assert) {
 			sandbox.stub(FeaturesAPI, "isVariantAdaptationEnabled").returns(true);
 			sandbox.stub(FeaturesAPI, "isLocalResetEnabled").returns(false);
-			const oDefaultLocalResetPlugin = this.oPluginManager.getDefaultPlugins({layer: Layer.CUSTOMER}).localReset;
+			const oDefaultLocalResetPlugin = this.oPluginManager.getDefaultPlugins({ layer: Layer.CUSTOMER }).localReset;
 			assert.equal(oDefaultLocalResetPlugin, undefined, "then the localReset plugin is not available");
 		});
 
 		QUnit.test("when 'getDefaultPlugins' function is called with localReset plugin defined and with local reset available", function(assert) {
 			sandbox.stub(FeaturesAPI, "isVariantAdaptationEnabled").returns(true);
 			sandbox.stub(FeaturesAPI, "isLocalResetEnabled").returns(true);
-			const oDefaultLocalResetPlugin = this.oPluginManager.getDefaultPlugins({layer: Layer.CUSTOMER}).localReset;
+			const oDefaultLocalResetPlugin = this.oPluginManager.getDefaultPlugins({ layer: Layer.CUSTOMER }).localReset;
 			assert.notEqual(oDefaultLocalResetPlugin, undefined, "then the localReset plugin is available");
 		});
 
 		QUnit.test("when 'getDefaultPlugins' function is called with annotation changes disabled", function(assert) {
 			sandbox.stub(FeaturesAPI, "areAnnotationChangesEnabled").returns(false);
-			const oAnnotationPlugin = this.oPluginManager.getDefaultPlugins({layer: Layer.CUSTOMER}).annotation;
+			const oAnnotationPlugin = this.oPluginManager.getDefaultPlugins({ layer: Layer.CUSTOMER }).annotation;
 			assert.strictEqual(oAnnotationPlugin, undefined, "then the annotation plugin is not available");
 		});
 	});

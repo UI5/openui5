@@ -318,7 +318,7 @@ sap.ui.define([
 							oError.message : oRtaResourceBundle.getText("MSG_GENERIC_ERROR_MESSAGE", [oError.message]);
 						showMessageBox(
 							sErrorMessage,
-							{title: oRtaResourceBundle.getText("HEADER_ERROR")},
+							{ title: oRtaResourceBundle.getText("HEADER_ERROR") },
 							"error"
 						);
 						throw oError;

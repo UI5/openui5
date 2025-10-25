@@ -184,16 +184,16 @@ sap.ui.define([
 				elementOverlayAdded: {
 					parameters: {
 						// id of the added overlay
-						id: {type: "string"},
+						id: { type: "string" },
 
 						// index of element overlay in the target aggregation overlay
-						targetIndex: {type: "int"},
+						targetIndex: { type: "int" },
 
 						// id of target aggregation overlay
-						targetId: {type: "string"},
+						targetId: { type: "string" },
 
 						// aggregation where element overlay is inserted
-						targetAggregation: {type: "string"}
+						targetAggregation: { type: "string" }
 					}
 				},
 
@@ -203,16 +203,16 @@ sap.ui.define([
 				elementOverlayMoved: {
 					parameters: {
 						// id of the moved overlay
-						id: {type: "string"},
+						id: { type: "string" },
 
 						// index of element overlay in the target aggregation overlay
-						targetIndex: {type: "int"},
+						targetIndex: { type: "int" },
 
 						// id of target aggregation overlay
-						targetId: {type: "string"},
+						targetId: { type: "string" },
 
 						// aggregation where element overlay is inserted
-						targetAggregation: {type: "string"}
+						targetAggregation: { type: "string" }
 					}
 				},
 
@@ -221,9 +221,9 @@ sap.ui.define([
 				 */
 				elementOverlayEditableChanged: {
 					parameters: {
-						id: {type: "string"},
-						elementId: {type: "string"},
-						editable: {type: "boolean"}
+						id: { type: "string" },
+						elementId: { type: "string" },
+						editable: { type: "boolean" }
 					}
 				},
 
@@ -232,10 +232,10 @@ sap.ui.define([
 				 */
 				elementPropertyChanged: {
 					parameters: {
-						id: {type: "string"},
-						name: {type: "string"},
-						oldValue: {type: "any"},
-						value: {type: "any"}
+						id: { type: "string" },
+						name: { type: "string" },
+						oldValue: { type: "any" },
+						value: { type: "any" }
 					}
 				},
 

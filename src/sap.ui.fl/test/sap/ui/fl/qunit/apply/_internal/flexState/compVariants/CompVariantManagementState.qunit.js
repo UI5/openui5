@@ -104,7 +104,7 @@ sap.ui.define([
 			});
 			stubFlexObjectsSelector([oSetDefaultChange1, oSetDefaultChange2]);
 			assert.deepEqual(CompVariantManagementState.getDefaultChanges(
-				{reference: "myApp", persistencyKey: sPersistencyKey}), [oSetDefaultChange1], "the first set default change gets returned");
+				{ reference: "myApp", persistencyKey: sPersistencyKey }), [oSetDefaultChange1], "the first set default change gets returned");
 		});
 
 		QUnit.test("with one stored setDefaultVariant change and another variant change for the same persistency key", function(assert) {
@@ -131,7 +131,7 @@ sap.ui.define([
 			});
 			stubFlexObjectsSelector([oSetDefaultChange1, oSetDefaultChange2]);
 			assert.deepEqual(CompVariantManagementState.getDefaultChanges(
-				{reference: "myApp", persistencyKey: sPersistencyKey}), [oSetDefaultChange1], "the first set default change gets returned");
+				{ reference: "myApp", persistencyKey: sPersistencyKey }), [oSetDefaultChange1], "the first set default change gets returned");
 		});
 
 		QUnit.test("with one stored setDefaultVariant change with an empty string as persistency key", function(assert) {
@@ -147,7 +147,7 @@ sap.ui.define([
 			});
 			stubFlexObjectsSelector([oSetDefaultChange1]);
 			assert.deepEqual(CompVariantManagementState.getDefaultChanges(
-				{reference: "myApp", persistencyKey: sPersistencyKey}), [oSetDefaultChange1], "the set default change gets returned");
+				{ reference: "myApp", persistencyKey: sPersistencyKey }), [oSetDefaultChange1], "the set default change gets returned");
 		});
 	});
 
@@ -213,7 +213,7 @@ sap.ui.define([
 			stubFlexObjectsSelector([oUIChange]);
 			const oDataSelector = CompVariantManagementState.getSetDefaultDataSelector();
 			const oClearCacheSpy = sandbox.spy(oDataSelector, "_clearCache");
-			oDataSelector.checkUpdate({reference: sReference, persistencyKey: sPersistencyKey});
+			oDataSelector.checkUpdate({ reference: sReference, persistencyKey: sPersistencyKey });
 			assert.strictEqual(oClearCacheSpy.callCount, 1, "then the update happened");
 		});
 
@@ -233,7 +233,7 @@ sap.ui.define([
 				reference: sReference,
 				persistencyKey: sPersistencyKey
 			};
-			oDataSelector.checkUpdate(mParameters, [{type: "addFlexObject", updatedObject: oUIChange}]);
+			oDataSelector.checkUpdate(mParameters, [{ type: "addFlexObject", updatedObject: oUIChange }]);
 			assert.strictEqual(oClearCacheSpy.callCount, 1, "then the cache has been invalidated");
 		});
 
@@ -241,8 +241,8 @@ sap.ui.define([
 			const oDataSelector = CompVariantManagementState.getSetDefaultDataSelector();
 			const oClearCacheSpy = sandbox.spy(oDataSelector, "_clearCache");
 			oDataSelector.checkUpdate(
-				{reference: sReference},
-				[{type: "addFlexObject"}]
+				{ reference: sReference },
+				[{ type: "addFlexObject" }]
 			);
 			assert.strictEqual(oClearCacheSpy.callCount, 0, "then the cache has not been invalidated");
 		});
@@ -260,10 +260,10 @@ sap.ui.define([
 			const oDataSelector = CompVariantManagementState.getSetDefaultDataSelector();
 			const oClearCacheSpy = sandbox.spy(oDataSelector, "_clearCache");
 			oDataSelector.checkUpdate(
-				{reference: sReference, persistencyKey: sPersistencyKey},
+				{ reference: sReference, persistencyKey: sPersistencyKey },
 				[
-					{type: "addFlexObject", updatedObject: oDefaultVariantChange},
-					{type: "removeFlexObject", updatedObject: oDefaultVariantChange}
+					{ type: "addFlexObject", updatedObject: oDefaultVariantChange },
+					{ type: "removeFlexObject", updatedObject: oDefaultVariantChange }
 				]
 			);
 			assert.equal(oClearCacheSpy.callCount, 1, "then the cache has been invalidated");
@@ -277,10 +277,10 @@ sap.ui.define([
 			const oDataSelector = CompVariantManagementState.getSetDefaultDataSelector();
 			const oClearCacheSpy = sandbox.spy(oDataSelector, "_clearCache");
 			oDataSelector.checkUpdate(
-				{reference: sReference},
+				{ reference: sReference },
 				[
-					{type: "justAnotherType", updatedObject: oUIChangeWithoutVariantReference},
-					{type: "anotherType"}
+					{ type: "justAnotherType", updatedObject: oUIChangeWithoutVariantReference },
+					{ type: "anotherType" }
 				]
 			);
 			assert.equal(oClearCacheSpy.callCount, 0, "then the cache has not been invalidated");

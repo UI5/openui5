@@ -26,7 +26,7 @@ sap.ui.define([
 		constructor: function(...aArgs) {
 			var sCurrentVariantFromURL = FlUtils.getUrlParameter(URLHandler.variantTechnicalParameterName);
 			if (sCurrentVariantFromURL) {
-				aArgs[0].componentData = {technicalParameters: {}};
+				aArgs[0].componentData = { technicalParameters: {} };
 				aArgs[0].componentData.technicalParameters[URLHandler.variantTechnicalParameterName] = [sCurrentVariantFromURL];
 			}
 			UIComponent.prototype.constructor.apply(this, aArgs);

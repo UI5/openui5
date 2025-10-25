@@ -13,7 +13,7 @@ sap.ui.define(
 		"use strict";
 
 		// shortcut for sap.ui.core.ValueState
-		var {ValueState} = coreLibrary;
+		var { ValueState } = coreLibrary;
 
 		var arrangements = new Opa5({
 			iStartMyApp() {

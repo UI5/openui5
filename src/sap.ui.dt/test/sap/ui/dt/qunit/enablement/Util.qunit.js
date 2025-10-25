@@ -18,7 +18,7 @@ function(
 
 	QUnit.module("Given that a sap.mButton is tested", {
 		async beforeEach(assert) {
-			this.oButton = new Button({text: "my button"});
+			this.oButton = new Button({ text: "my button" });
 			this.oButton.placeAt("qunit-fixture");
 			await nextUIUpdate();
 
@@ -84,7 +84,7 @@ function(
 
 	QUnit.module("Given that a sap.ui.layout.VerticalLayout with content is tested", {
 		async beforeEach(assert) {
-			this.oButton = new Button({text: "my button"});
+			this.oButton = new Button({ text: "my button" });
 			this.oVerticalLayout = new VerticalLayout({
 				content: [this.oButton]
 			});

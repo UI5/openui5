@@ -380,7 +380,7 @@ sap.ui.define([
 			// of non-PUBLIC enabled back end and UI5 version. Therefore, only a layer parameter set in the url leads to a transport selection
 			oTransportSelection.selectTransport = function(oObjectInfo, fOkay, fError, bCompactMode, oControl, sStyleClass) {
 				if (!transportSelectionRequired()) {
-					fOkay(oTransportSelection._createEventObject(oObjectInfo, {transportId: ""}));
+					fOkay(oTransportSelection._createEventObject(oObjectInfo, { transportId: "" }));
 					return;
 				}
 				TransportSelection.prototype.selectTransport.call(this, oObjectInfo, fOkay, fError, bCompactMode, oControl, sStyleClass);

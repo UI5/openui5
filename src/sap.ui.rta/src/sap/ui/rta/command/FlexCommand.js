@@ -225,7 +225,7 @@ sap.ui.define([
 			oChange.addDependentControl(
 				mFlexSettings.originalSelector,
 				"originalSelector",
-				{modifier: JsControlTreeModifier, appComponent: this.getAppComponent()}
+				{ modifier: JsControlTreeModifier, appComponent: this.getAppComponent() }
 			);
 			oChange.setSelector({
 				...oChange.getSelector(),
@@ -243,7 +243,7 @@ sap.ui.define([
 		const vControl = this.getElement() || JsControlTreeModifier.bySelector(this.getSelector());
 		const oChange = this.getPreparedChange();
 
-		return ChangesWriteAPI.revert({change: oChange, element: vControl});
+		return ChangesWriteAPI.revert({ change: oChange, element: vControl });
 	};
 
 	/**

@@ -56,7 +56,7 @@ sap.ui.define([
 		},
 
 		switchToAdaptionMode() {
-			startKeyUserAdaptation({rootControl: this.getOwnerComponent()});
+			startKeyUserAdaptation({ rootControl: this.getOwnerComponent() });
 		},
 
 		createChanges(oEvent) {
@@ -107,7 +107,7 @@ sap.ui.define([
 									changeType: "stashControl"
 								}
 							};
-							ControlPersonalizationWriteAPI.add({changes: [oMoveChangeData, oRemoveChangeData]});
+							ControlPersonalizationWriteAPI.add({ changes: [oMoveChangeData, oRemoveChangeData] });
 							this.iCounter++;
 						} else if (this.iCounter === 1) {
 							// on second press of "Personalization Changes button"
@@ -131,7 +131,7 @@ sap.ui.define([
 								}
 							};
 
-							ControlPersonalizationWriteAPI.add({changes: [oMoveChangeData2]});
+							ControlPersonalizationWriteAPI.add({ changes: [oMoveChangeData2] });
 
 							oButton.setEnabled(false);
 							this.iCounter++;
@@ -144,7 +144,7 @@ sap.ui.define([
 		loadVariant() {
 			// eslint-disable-next-line no-alert
 			const sId = window.prompt("Please enter the variant ID");
-			ControlVariantApplyAPI.activateVariant({element: this.byId("variantManagementOrdersTable"), variantReference: sId});
+			ControlVariantApplyAPI.activateVariant({ element: this.byId("variantManagementOrdersTable"), variantReference: sId });
 		},
 
 		isDataReady() {

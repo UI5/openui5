@@ -245,7 +245,7 @@ sap.ui.define([
 					}
 				}
 			]);
-			var oControl = {foo: "bar"};
+			var oControl = { foo: "bar" };
 			var mChangeHandlers = {
 				myFancyControl: {
 					hideControl: {

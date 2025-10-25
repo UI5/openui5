@@ -41,7 +41,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("sending a GET request and getting a success answer leads to the resolving of the promise", function(assert) {
-			var oData = {some: "data"};
+			var oData = { some: "data" };
 			sandbox.stub(jQuery, "ajax").yieldsTo("success", oData);
 			var oStubbedResolve = sandbox.stub();
 			var oStubbedReject = sandbox.stub();
@@ -54,7 +54,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("sending a GET request and getting a erroneous answer leads to the rejection of the promise", function(assert) {
-			var oData = {some: "data"};
+			var oData = { some: "data" };
 			sandbox.stub(jQuery, "ajax").yieldsTo("error", oData);
 			var oStubbedResolve = sandbox.stub();
 			var oStubbedReject = sandbox.stub();
@@ -68,7 +68,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("sending a GET request for a file content will leads to a correct data type of ajax request and the resolving of the promise", function(assert) {
-			var oData = {some: "data"};
+			var oData = { some: "data" };
 			var oStubbedAjaxRequest = sandbox.stub(jQuery, "ajax").yieldsTo("success", oData);
 			var oStubbedResolve = sandbox.stub();
 			var oStubbedReject = sandbox.stub();
@@ -82,7 +82,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("sending a PUT request and getting a success answer leads to the resolving of the promise", function(assert) {
-			var oData = {some: "data"};
+			var oData = { some: "data" };
 			sandbox.stub(jQuery, "ajax").yieldsTo("success", oData);
 			var oStubbedResolve = sandbox.stub();
 			var ostubbedReject = sandbox.stub();
@@ -94,7 +94,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("sending a PUT request and getting a erroneous answer leads to the rejection of the promise", function(assert) {
-			var oData = {some: "data"};
+			var oData = { some: "data" };
 			sandbox.stub(jQuery, "ajax").yieldsTo("error", oData);
 			var oStubbedResolve = sandbox.stub();
 			var ostubbedReject = sandbox.stub();
@@ -108,7 +108,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("sending a PUT request with correct url, no support", function(assert) {
-			var oData = {some: "data"};
+			var oData = { some: "data" };
 			sandbox.stub(jQuery, "ajax").yieldsTo("success", oData);
 			var oStubbedSendPutRequest = sandbox.stub(LRepConnector, "_getTokenAndSendPutRequest");
 
@@ -119,7 +119,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("sending a PUT request with correct url, with support", function(assert) {
-			var oData = {some: "data"};
+			var oData = { some: "data" };
 			sandbox.stub(jQuery, "ajax").yieldsTo("success", oData);
 			var oStubbedSendPutRequest = sandbox.stub(LRepConnector, "_getTokenAndSendPutRequest");
 
@@ -130,7 +130,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("sending a DELETE request and getting a success answer leads to the resolving of the promise", function(assert) {
-			var oData = {some: "data"};
+			var oData = { some: "data" };
 			sandbox.stub(jQuery, "ajax").yieldsTo("success", oData);
 			var oStubbedResolve = sandbox.stub();
 			var ostubbedReject = sandbox.stub();
@@ -142,7 +142,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("sending a DELETE request and getting a erroneous answer leads to the rejection of the promise", function(assert) {
-			var oData = {some: "data"};
+			var oData = { some: "data" };
 			sandbox.stub(jQuery, "ajax").yieldsTo("error", oData);
 			var oStubbedResolve = sandbox.stub();
 			var ostubbedReject = sandbox.stub();
@@ -156,7 +156,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("sending a DELETE request with correct url, without support", function(assert) {
-			var oData = {some: "data"};
+			var oData = { some: "data" };
 			sandbox.stub(jQuery, "ajax").yieldsTo("success", oData);
 			var oStubbedSendDeleteRequest = sandbox.stub(LRepConnector, "_getTokenAndSendDeletionRequest");
 
@@ -167,7 +167,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("sending a DELETE request with correct url, with support", function(assert) {
-			var oData = {some: "data"};
+			var oData = { some: "data" };
 			sandbox.stub(jQuery, "ajax").yieldsTo("success", oData);
 			var oStubbedSendDeleteRequest = sandbox.stub(LRepConnector, "_getTokenAndSendDeletionRequest");
 

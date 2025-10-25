@@ -128,7 +128,7 @@ sap.ui.define([
 
 		QUnit.test("when create is called and no change handler is available", function(assert) {
 			const mPropertyBag = {
-				changeSpecificData: {type: "changeSpecificData", name: "foo", layer: Layer.CUSTOMER},
+				changeSpecificData: { type: "changeSpecificData", name: "foo", layer: Layer.CUSTOMER },
 				selector: this.vSelector
 			};
 			sandbox.stub(ChangeHandlerStorage, "getChangeHandler").rejects(Error("no CHandler"));
@@ -145,7 +145,7 @@ sap.ui.define([
 				sandbox.stub(ContextBasedAdaptationsAPI, "hasAdaptationsModel").returns(bCBA);
 				const oControl = new Element("controlId");
 				const mPropertyBag = {
-					changeSpecificData: {changeType: "changeSpecificData", name: "foo", layer: Layer.CUSTOMER},
+					changeSpecificData: { changeType: "changeSpecificData", name: "foo", layer: Layer.CUSTOMER },
 					selector: oControl
 				};
 				this.aObjectsToDestroy.push(oControl);
@@ -170,7 +170,7 @@ sap.ui.define([
 			QUnit.test(`${sName} with an extension point selector ${sCBASuffix}`, function(assert) {
 				sandbox.stub(ContextBasedAdaptationsAPI, "hasAdaptationsModel").returns(bCBA);
 				const mPropertyBag = {
-					changeSpecificData: {changeType: "addXMLAtExtensionPoint", name: "foo"},
+					changeSpecificData: { changeType: "addXMLAtExtensionPoint", name: "foo" },
 					selector: {
 						name: "extensionPointName",
 						view: new View("viewId")
@@ -201,7 +201,7 @@ sap.ui.define([
 			QUnit.test(`${sName} with a component ${sCBASuffix}`, function(assert) {
 				sandbox.stub(ContextBasedAdaptationsAPI, "hasAdaptationsModel").returns(bCBA);
 				const mPropertyBag = {
-					changeSpecificData: {changeType: "changeSpecificData"},
+					changeSpecificData: { changeType: "changeSpecificData" },
 					selector: new Component()
 				};
 				this.aObjectsToDestroy.push(mPropertyBag.selector);
@@ -454,10 +454,10 @@ sap.ui.define([
 			var oElement = new Element();
 			this.aObjectsToDestroy.push(oElement);
 			var mPropertyBag = {
-				change: {type: "change"},
+				change: { type: "change" },
 				element: new Element()
 			};
-			var oAppComponent = {type: "appComponent"};
+			var oAppComponent = { type: "appComponent" };
 
 			sandbox.stub(FlexUtils, "getAppComponentForSelector")
 			.withArgs(mPropertyBag.element)
@@ -480,7 +480,7 @@ sap.ui.define([
 
 		QUnit.test("when revert is called with an invalid element", function(assert) {
 			var mPropertyBag = {
-				change: {type: "change"},
+				change: { type: "change" },
 				element: null
 			};
 			sandbox.stub(FlexUtils, "getAppComponentForSelector");
@@ -502,10 +502,10 @@ sap.ui.define([
 			var oElement = new Element();
 			this.aObjectsToDestroy.push(oElement);
 			var mPropertyBag = {
-				change: [{type: "change"}],
+				change: [{ type: "change" }],
 				element: new Element()
 			};
-			var oAppComponent = {type: "appComponent"};
+			var oAppComponent = { type: "appComponent" };
 
 			sandbox.stub(FlexUtils, "getAppComponentForSelector")
 			.withArgs(mPropertyBag.element)
@@ -531,10 +531,10 @@ sap.ui.define([
 			var oElement = new Element();
 			this.aObjectsToDestroy.push(oElement);
 			var mPropertyBag = {
-				change: [{id: "change1", type: "change"}, {id: "change2", type: "change"}],
+				change: [{ id: "change1", type: "change" }, { id: "change2", type: "change" }],
 				element: new Element()
 			};
-			var oAppComponent = {type: "appComponent"};
+			var oAppComponent = { type: "appComponent" };
 
 			sandbox.stub(FlexUtils, "getAppComponentForSelector")
 			.withArgs(mPropertyBag.element)
@@ -565,10 +565,10 @@ sap.ui.define([
 			var oElement = new Element();
 			this.aObjectsToDestroy.push(oElement);
 			var mPropertyBag = {
-				change: [{id: "change1", type: "change"}, {id: "change2", type: "change"}],
+				change: [{ id: "change1", type: "change" }, { id: "change2", type: "change" }],
 				element: new Element()
 			};
-			var oAppComponent = {type: "appComponent"};
+			var oAppComponent = { type: "appComponent" };
 
 			sandbox.stub(FlexUtils, "getAppComponentForSelector")
 			.withArgs(mPropertyBag.element)
@@ -596,7 +596,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("when getChangeHandler is called", async function(assert) {
-			const oModifier = {getControlType: sandbox.stub().returns("myFancyControlType")};
+			const oModifier = { getControlType: sandbox.stub().returns("myFancyControlType") };
 			const mPropertyBag = {
 				element: "myFancyElement",
 				modifier: oModifier,
@@ -663,7 +663,7 @@ sap.ui.define([
 			const oVariantManagement = new VariantManagement("vmId");
 			this.aObjectsToDestroy.push(oVariantManagement);
 			sandbox.stub(FeaturesAPI, "isVersioningEnabled").resolves(true);
-			sandbox.stub(JsControlTreeModifier, "getSelector").returns({id: "vmReference"});
+			sandbox.stub(JsControlTreeModifier, "getSelector").returns({ id: "vmReference" });
 			sandbox.stub(VariantManagementState, "getVariant").returns({
 				layer: Layer.CUSTOMER
 			});
@@ -696,7 +696,7 @@ sap.ui.define([
 			const oVariantManagement = new VariantManagement("vmId");
 			this.aObjectsToDestroy.push(oVariantManagement);
 			sandbox.stub(FeaturesAPI, "isVersioningEnabled").resolves(true);
-			sandbox.stub(JsControlTreeModifier, "getSelector").returns({id: "vmReference"});
+			sandbox.stub(JsControlTreeModifier, "getSelector").returns({ id: "vmReference" });
 			sandbox.stub(VariantManagementState, "getVariant").returns({
 				layer: Layer.CUSTOMER
 			});
@@ -729,7 +729,7 @@ sap.ui.define([
 		QUnit.test("when deleteVariantsAndRelatedObjects is called with a variant in another layer", function(assert) {
 			const oVariantManagement = new VariantManagement("vmId");
 			this.aObjectsToDestroy.push(oVariantManagement);
-			sandbox.stub(JsControlTreeModifier, "getSelector").returns({id: "vmReference"});
+			sandbox.stub(JsControlTreeModifier, "getSelector").returns({ id: "vmReference" });
 			sandbox.stub(ManifestUtils, "getFlexReferenceForControl").returns("flexReference");
 			sandbox.stub(VariantManagementState, "getVariant").returns({
 				layer: Layer.CUSTOMER
@@ -768,7 +768,7 @@ sap.ui.define([
 		QUnit.test("when deleteVariantsAndRelatedObjects is called with an invalid variant", function(assert) {
 			const oVariantManagement = new VariantManagement("vmId");
 			this.aObjectsToDestroy.push(oVariantManagement);
-			sandbox.stub(JsControlTreeModifier, "getSelector").returns({id: "vmReference"});
+			sandbox.stub(JsControlTreeModifier, "getSelector").returns({ id: "vmReference" });
 			sandbox.stub(ManifestUtils, "getFlexReferenceForControl").returns("flexReference");
 			sandbox.stub(VariantManagementState, "getVariant").returns({
 				layer: Layer.CUSTOMER
@@ -801,9 +801,9 @@ sap.ui.define([
 
 		QUnit.test("when restoreDeletedFlexObjects is called", function(assert) {
 			const oRestoreDeletedFlexObjectsStub = sandbox.stub(FlexObjectManager, "restoreDeletedFlexObjects");
-			ChangesWriteAPI.restoreDeletedFlexObjects({reference: "reference", flexObjects: ["flexObject"]});
+			ChangesWriteAPI.restoreDeletedFlexObjects({ reference: "reference", flexObjects: ["flexObject"] });
 			assert.ok(
-				oRestoreDeletedFlexObjectsStub.calledWith({reference: "reference", flexObjects: ["flexObject"]}),
+				oRestoreDeletedFlexObjectsStub.calledWith({ reference: "reference", flexObjects: ["flexObject"] }),
 				"then the restoreDeletedFlexObjects function is called with the correct parameters"
 			);
 		});

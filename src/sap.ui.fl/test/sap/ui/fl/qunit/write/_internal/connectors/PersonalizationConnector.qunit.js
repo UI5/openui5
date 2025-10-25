@@ -36,7 +36,7 @@ sap.ui.define([
 			var sExpectedUrl = "/flexPersonalization/flex/personalization/v1/changes/";
 			var sExpectedMethod = "POST";
 
-			var oStubSendRequest = sandbox.stub(InitialUtils, "sendRequest").resolves({response: {}});
+			var oStubSendRequest = sandbox.stub(InitialUtils, "sendRequest").resolves({ response: {} });
 			var oSpyGetUrl = sandbox.spy(InitialUtils, "getUrl");
 
 			return WritePersonalizationConnector.write(mPropertyBag).then(function(oResponse) {
@@ -58,7 +58,7 @@ sap.ui.define([
 				fileType: "change",
 				fileName: "myFileName"
 			};
-			var mPropertyBag = {url: "/flexPersonalization", flexObject: oFlexObject};
+			var mPropertyBag = { url: "/flexPersonalization", flexObject: oFlexObject };
 			var sUrl = "/flexPersonalization/flex/personalization/v1/changes/myFileName";
 			var oStubSendRequest = sinon.stub(WriteUtils, "sendRequest").resolves();
 			return WritePersonalizationConnector.update(mPropertyBag).then(function() {
@@ -160,11 +160,11 @@ sap.ui.define([
 			InitialPersonalizationConnector.xsrfToken = "oldToken123";
 
 			var oStubSendRequest = sinon.stub(InitialUtils, "sendRequest");
-			oStubSendRequest.onCall(0).rejects({status: 403});
-			oStubSendRequest.onCall(1).resolves({xsrfToken: newToken});
-			oStubSendRequest.onCall(2).resolves({response: "something"});
+			oStubSendRequest.onCall(0).rejects({ status: 403 });
+			oStubSendRequest.onCall(1).resolves({ xsrfToken: newToken });
+			oStubSendRequest.onCall(2).resolves({ response: "something" });
 
-			var mPropertyBag = {url: "/flexPersonalization", flexObjects: []};
+			var mPropertyBag = { url: "/flexPersonalization", flexObjects: [] };
 			return WritePersonalizationConnector.write(mPropertyBag).then(function() {
 				assert.equal(oStubSendRequest.callCount, 3, "three request were sent");
 				assert.equal(oStubSendRequest.getCall(0).args[1], "POST", "the first request was a POST request");
@@ -179,10 +179,10 @@ sap.ui.define([
 			InitialPersonalizationConnector.xsrfToken = undefined;
 
 			var oStubSendRequest = sinon.stub(InitialUtils, "sendRequest");
-			oStubSendRequest.onCall(0).resolves({xsrfToken: newToken});
-			oStubSendRequest.onCall(1).resolves({response: "something"});
+			oStubSendRequest.onCall(0).resolves({ xsrfToken: newToken });
+			oStubSendRequest.onCall(1).resolves({ response: "something" });
 
-			var mPropertyBag = {url: "/flexPersonalization", flexObjects: []};
+			var mPropertyBag = { url: "/flexPersonalization", flexObjects: [] };
 			return WritePersonalizationConnector.write(mPropertyBag).then(function() {
 				assert.equal(oStubSendRequest.callCount, 2, "two request were sent");
 				assert.equal(oStubSendRequest.getCall(0).args[1], "HEAD", "the first request was a HEAD request");

@@ -943,7 +943,8 @@ sap.ui.define([
 	 *   list becoming available faster, while the separate properties are merged as soon as the
 	 *   data is received. Note that the separate properties must be single valued and part of the
 	 *   '$expand' system query option, either automatically via the "autoExpandSelect" model
-	 *   parameter (see {@link #constructor}) or manually. The <code>$$separate</code> parameter
+	 *   parameter (see {@link #constructor}) or manually. Separate properties that are not part
+	 *   of the '$expand' system query option are ignored. The <code>$$separate</code> parameter
 	 *   must not be combined with <code>$$aggregation</code>.
 	 * @param {boolean} [mParameters.$$sharedRequest]
 	 *   Whether multiple bindings for the same resource path share the data, so that it is

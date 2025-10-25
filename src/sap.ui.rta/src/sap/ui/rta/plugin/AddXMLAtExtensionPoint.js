@@ -74,10 +74,10 @@ sap.ui.define([
 		const oElementId = oElement.getId();
 		// determine a list of extension points for the given element. In case the element is a view
 		// all extension points available for the view are returned
-		const aExtensionPointInfo = ExtensionPointRegistryAPI.getExtensionPointInfoByParentId({parentId: oElementId});
+		const aExtensionPointInfo = ExtensionPointRegistryAPI.getExtensionPointInfoByParentId({ parentId: oElementId });
 		return aExtensionPointInfo.length
 			? aExtensionPointInfo
-			: values(ExtensionPointRegistryAPI.getExtensionPointInfoByViewId({viewId: oElementId}));
+			: values(ExtensionPointRegistryAPI.getExtensionPointInfoByViewId({ viewId: oElementId }));
 	}
 
 	function hasExtensionPoints(oElement) {

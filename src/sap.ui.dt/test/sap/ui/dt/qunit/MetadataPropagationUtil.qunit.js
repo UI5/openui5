@@ -590,7 +590,7 @@ sap.ui.define([
 					MetadataTestUtil.createPropagationInfoObject(null, this.oElement, this.mPropagateMetadata.propagateMetadata)
 				]
 			};
-			this.mElementData = MetadataTestUtil.buildMetadataObject({ actions: { myAction: "testAction" }}).data;
+			this.mElementData = MetadataTestUtil.buildMetadataObject({ actions: { myAction: "testAction" } }).data;
 		},
 		afterEach() {
 			this.oElement.destroy();
@@ -641,7 +641,7 @@ sap.ui.define([
 					MetadataTestUtil.createPropagationInfoObject(null, this.oElement, this.mPropagateMetadata.propagateMetadata)
 				]
 			};
-			this.mElementData = MetadataTestUtil.buildMetadataObject({ actions: { myAction: "testAction" }}).data;
+			this.mElementData = MetadataTestUtil.buildMetadataObject({ actions: { myAction: "testAction" } }).data;
 		},
 		afterEach() {
 			this.oElement.destroy();

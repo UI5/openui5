@@ -32,7 +32,7 @@ sap.ui.define([
 			var mParameters = {};
 
 			var sFeaturesUrl = Utils.getUrl(ROUTES.SETTINGS, mPropertyBag, mParameters);
-			return Utils.sendRequest(sFeaturesUrl, "GET", {initialConnector: this}).then(function(oResult) {
+			return Utils.sendRequest(sFeaturesUrl, "GET", { initialConnector: this }).then(function(oResult) {
 				oResult.response.isContextSharingEnabled = false;
 				oResult.response.isAnnotationChangeEnabled = false;
 				return oResult.response;

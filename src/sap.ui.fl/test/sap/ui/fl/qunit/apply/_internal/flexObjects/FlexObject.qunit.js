@@ -217,14 +217,14 @@ sap.ui.define([
 		QUnit.test("isChangeFromOtherSystem - when in settings no system and client info is maintained", function(assert) {
 			const oSettingsStub = sandbox.stub(Settings, "getInstanceOrUndef").returns(new Settings({}));
 			assert.notOk(this.oFlexObject.isChangeFromOtherSystem(), "then isChangeFromOtherSystem returns false");
-			oSettingsStub.returns(new Settings({client: "someClient"}));
+			oSettingsStub.returns(new Settings({ client: "someClient" }));
 			assert.notOk(this.oFlexObject.isChangeFromOtherSystem(), "then isChangeFromOtherSystem returns false");
-			oSettingsStub.returns(new Settings({system: "someSystem"}));
+			oSettingsStub.returns(new Settings({ system: "someSystem" }));
 			assert.notOk(this.oFlexObject.isChangeFromOtherSystem(), "then isChangeFromOtherSystem returns false");
 		});
 
 		QUnit.test("isChangeFromOtherSystem shall return false when change has no source system/client info", function(assert) {
-			sandbox.stub(Settings, "getInstanceOrUndef").returns(new Settings({system: "someSystem", client: "someClient"}));
+			sandbox.stub(Settings, "getInstanceOrUndef").returns(new Settings({ system: "someSystem", client: "someClient" }));
 			this.oFlexObject.update({
 				sourceSystem: undefined,
 				sourceClient: undefined
@@ -233,7 +233,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("isChangeFromOtherSystem shall return true when there is a mismatch between system/client info in the settings and the source system/client of the change", function(assert) {
-			sandbox.stub(Settings, "getInstanceOrUndef").returns(new Settings({system: "someSystem", client: "someClient"}));
+			sandbox.stub(Settings, "getInstanceOrUndef").returns(new Settings({ system: "someSystem", client: "someClient" }));
 			// mismatch between system in settings and source system of change
 			this.oFlexObject.update({
 				sourceSystem: "XXX",
@@ -243,7 +243,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("isChangeFromOtherSystem shall return false when system/client info in the settings and the source system/client of the change match", function(assert) {
-			sandbox.stub(Settings, "getInstanceOrUndef").returns(new Settings({system: "someSystem", client: "someClient"}));
+			sandbox.stub(Settings, "getInstanceOrUndef").returns(new Settings({ system: "someSystem", client: "someClient" }));
 			assert.notOk(this.oFlexObject.isChangeFromOtherSystem(), "then isChangeFromOtherSystem returns false");
 		});
 

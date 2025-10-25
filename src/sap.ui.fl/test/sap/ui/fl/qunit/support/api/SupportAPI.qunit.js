@@ -76,7 +76,7 @@ sap.ui.define([
 					"sap/ui/fl/initial/_internal/ManifestUtils",
 					"sap/ui/fl/apply/_internal/flexState/changes/UIChangesState"
 				], (FlUtils, ManifestUtils, UIChangesState) => {
-					resolve({FlUtils, ManifestUtils, UIChangesState});
+					resolve({ FlUtils, ManifestUtils, UIChangesState });
 				});
 			});
 			sandbox.stub(oInsideIFrameModules.FlUtils, "getUShellService").resolves({

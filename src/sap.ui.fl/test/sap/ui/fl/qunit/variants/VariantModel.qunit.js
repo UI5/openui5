@@ -236,7 +236,7 @@ sap.ui.define([
 		QUnit.test("when initializing a variant model instance", function(assert) {
 			assert.ok(URLHandler.initialize.calledOnce, "then URLHandler.initialize() called once");
 			assert.ok(
-				URLHandler.initialize.calledWith({model: this.oModel}),
+				URLHandler.initialize.calledWith({ model: this.oModel }),
 				"then URLHandler.initialize() called with the the VariantModel"
 			);
 
@@ -687,7 +687,7 @@ sap.ui.define([
 					sandbox.stub(ContextBasedAdaptationsAPI, "getDisplayedAdaptationId").returns("id_12345");
 				}
 				var oVariantInstance = createVariant(this.oModel.oData[sVMReference].variants[2]);
-				sandbox.stub(this.oModel, "getVariant").returns({instance: oVariantInstance});
+				sandbox.stub(this.oModel, "getVariant").returns({ instance: oVariantInstance });
 
 				var oChange = VariantManager.addVariantChange(sVMReference, oTestParams.inputParams);
 				if (oTestParams.textKey) {
@@ -746,7 +746,7 @@ sap.ui.define([
 		[true, false].forEach(function(bUpdateVariantInURL) {
 			const sTitle = `when calling 'setVariantProperties' for 'setDefault' with different current and default variants, in UI adaptation mode ${bUpdateVariantInURL ? "with" : "without"} updateVariantInURL`;
 			QUnit.test(sTitle, function(assert) {
-				sandbox.stub(this.oModel, "getVariant").returns({instance: createVariant(this.oModel.oData[sVMReference].variants[2])});
+				sandbox.stub(this.oModel, "getVariant").returns({ instance: createVariant(this.oModel.oData[sVMReference].variants[2]) });
 				var mPropertyBag = {
 					changeType: "setDefault",
 					defaultVariant: "variant1",
@@ -783,7 +783,7 @@ sap.ui.define([
 
 			const sTitle1 = `when calling 'setVariantProperties' for 'setDefault' with same current and default variants, in personalization mode ${bUpdateVariantInURL ? "with" : "without"} updateVariantInURL`;
 			QUnit.test(sTitle1, function(assert) {
-				sandbox.stub(this.oModel, "getVariant").returns({instance: createVariant(this.oModel.oData[sVMReference].variants[2])});
+				sandbox.stub(this.oModel, "getVariant").returns({ instance: createVariant(this.oModel.oData[sVMReference].variants[2]) });
 				var mPropertyBag = {
 					changeType: "setDefault",
 					defaultVariant: "variant1",
@@ -818,7 +818,7 @@ sap.ui.define([
 
 			const sTitle2 = `when calling 'setVariantProperties' for 'setDefault' with different current and default variants, in personalization mode ${bUpdateVariantInURL ? "with" : "without"} updateVariantInURL`;
 			QUnit.test(sTitle2, function(assert) {
-				sandbox.stub(this.oModel, "getVariant").returns({instance: createVariant(this.oModel.oData[sVMReference].variants[2])});
+				sandbox.stub(this.oModel, "getVariant").returns({ instance: createVariant(this.oModel.oData[sVMReference].variants[2]) });
 				var mPropertyBag = {
 					changeType: "setDefault",
 					defaultVariant: "variant1",
@@ -942,7 +942,7 @@ sap.ui.define([
 		QUnit.test("when calling 'manageVariants' in Adaptation mode with changes", function(assert) {
 			const sLayer = Layer.CUSTOMER;
 			const sDummyClass = "DummyClass";
-			const oFakeComponentContainerPromise = {property: "fake"};
+			const oFakeComponentContainerPromise = { property: "fake" };
 
 			const sVariant1Key = this.oModel.oData[sVMReference].variants[1].key;
 			const oManageParameters = {
@@ -968,7 +968,7 @@ sap.ui.define([
 			const oOpenManagementDialogStub = sandbox.stub(this.oVMControl, "openManagementDialog")
 			.callsFake(() => this.oVMControl.fireManage(oManageParameters));
 			const oVariantInstance = createVariant(this.oModel.oData[sVMReference].variants[1]);
-			sandbox.stub(this.oModel, "getVariant").returns({instance: oVariantInstance});
+			sandbox.stub(this.oModel, "getVariant").returns({ instance: oVariantInstance });
 
 			this.oModel.setModelPropertiesForControl(sVMReference, true, this.oVMControl);
 
@@ -1005,7 +1005,7 @@ sap.ui.define([
 				assert.deepEqual(aChanges[4], {
 					variantReference: "variant2",
 					changeType: "setContexts",
-					contexts: {foo: "bar"},
+					contexts: { foo: "bar" },
 					originalContexts: {},
 					layer: Layer.CUSTOMER
 				}, "the setContexts change is correct");
@@ -1031,7 +1031,7 @@ sap.ui.define([
 		QUnit.test("when the VM Control fires the manage event in Personalization mode with dirty VM changes and UI Changes", function(assert) {
 			const done = assert.async();
 			const oVariantInstance = createVariant(this.oModel.getData()[sVMReference].variants[1]);
-			sandbox.stub(this.oModel, "getVariant").returns({instance: oVariantInstance});
+			sandbox.stub(this.oModel, "getVariant").returns({ instance: oVariantInstance });
 			const oDeleteVariantSpy = sandbox.stub(ControlVariantWriteUtils, "deleteVariant");
 
 			const sVariantKey = this.oModel.getData()[sVMReference].variants[1].key;
@@ -1066,13 +1066,13 @@ sap.ui.define([
 				done();
 			});
 
-			this.oVMControl.fireManage(oManageParameters, {variantManagementReference: sVMReference});
+			this.oVMControl.fireManage(oManageParameters, { variantManagementReference: sVMReference });
 		});
 
 		QUnit.test("when the VM Control fires the manage event in Personalization mode with deleting the current variant", function(assert) {
 			const done = assert.async();
 			const oVariantInstance = createVariant(this.oModel.getData()[sVMReference].variants[2]);
-			sandbox.stub(this.oModel, "getVariant").returns({instance: oVariantInstance});
+			sandbox.stub(this.oModel, "getVariant").returns({ instance: oVariantInstance });
 
 			this.oModel.getData()[sVMReference].variants[2].visible = false;
 			const oManageParameters = {
@@ -1095,7 +1095,7 @@ sap.ui.define([
 				done();
 			});
 
-			this.oVMControl.fireManage(oManageParameters, {variantManagementReference: sVMReference});
+			this.oVMControl.fireManage(oManageParameters, { variantManagementReference: sVMReference });
 		});
 
 		QUnit.test("when the VM Control fires the manage event in Personalization mode deleting a USER and a PUBLIC layer variant", function(assert) {
@@ -1172,13 +1172,13 @@ sap.ui.define([
 			sandbox.stub(Settings, "getInstance").resolves({});
 			sandbox.stub(ManifestUtils, "getFlexReferenceForControl").returns("foo");
 			this.oModel = new VariantModel({}, {
-				appComponent: {getId() {}}
+				appComponent: { getId() {} }
 			});
 
 			var oChange0 = FlexObjectFactory.createFromFileContent({
 				fileName: "change0",
 				adaptationId: "id_12345",
-				selector: {id: "abc123"},
+				selector: { id: "abc123" },
 				variantReference: "variant0",
 				layer: Layer.CUSTOMER,
 				support: {},
@@ -1187,7 +1187,7 @@ sap.ui.define([
 			});
 			var oChange1 = FlexObjectFactory.createFromFileContent({
 				fileName: "change1",
-				selector: {id: "abc123"},
+				selector: { id: "abc123" },
 				variantReference: "variant0",
 				layer: Layer.USER,
 				reference: "test"
@@ -1238,7 +1238,7 @@ sap.ui.define([
 			assert.strictEqual(oDuplicateVariant.instance.getName(), "variant A Copy", "the name is correct");
 			assert.strictEqual(oDuplicateVariant.instance.getId(), "newVariant", "the id is correct");
 			assert.strictEqual(oDuplicateVariant.instance.getLayer(), Layer.CUSTOMER, "the layer is correct");
-			assert.deepEqual(oDuplicateVariant.instance.getContexts(), {role: ["testRole2"]}, "the contexts object is correct");
+			assert.deepEqual(oDuplicateVariant.instance.getContexts(), { role: ["testRole2"] }, "the contexts object is correct");
 			assert.strictEqual(oDuplicateVariant.instance.getVariantReference(), "variantReference", "the variantReference is correct");
 			assert.strictEqual(oDuplicateVariant.controlChanges.length, 2, "both changes were copied");
 			assert.strictEqual(oDuplicateVariant.instance.getExecuteOnSelection(), true, "apply automatically is true");
@@ -1275,7 +1275,7 @@ sap.ui.define([
 			assert.strictEqual(oDuplicateVariant.instance.getName(), "variant A Copy", "the name is correct");
 			assert.strictEqual(oDuplicateVariant.instance.getId(), "newVariant", "the id is correct");
 			assert.strictEqual(oDuplicateVariant.instance.getLayer(), Layer.USER, "the layer is correct");
-			assert.deepEqual(oDuplicateVariant.instance.getContexts(), {role: ["testRole2"]}, "the contexts object is correct");
+			assert.deepEqual(oDuplicateVariant.instance.getContexts(), { role: ["testRole2"] }, "the contexts object is correct");
 			assert.strictEqual(oDuplicateVariant.instance.getVariantReference(), "variant0", "the variantReference is correct");
 			assert.strictEqual(oDuplicateVariant.instance.getExecuteOnSelection(), false, "apply automatically is false");
 			assert.strictEqual(oDuplicateVariant.controlChanges.length, 1, "one change was copied");
@@ -1304,7 +1304,7 @@ sap.ui.define([
 			assert.strictEqual(oDuplicateVariant.instance.getName(), "variant A Copy", "the name is correct");
 			assert.strictEqual(oDuplicateVariant.instance.getId(), "newVariant", "the id is correct");
 			assert.strictEqual(oDuplicateVariant.instance.getLayer(), Layer.PUBLIC, "the layer is correct");
-			assert.deepEqual(oDuplicateVariant.instance.getContexts(), {role: ["testRole2"]}, "the contexts object is correct");
+			assert.deepEqual(oDuplicateVariant.instance.getContexts(), { role: ["testRole2"] }, "the contexts object is correct");
 			assert.strictEqual(oDuplicateVariant.instance.getVariantReference(), "variantReference", "the variantReference is correct");
 			assert.strictEqual(oDuplicateVariant.controlChanges.length, 1, "one change was copied");
 			assert.strictEqual(
@@ -1333,7 +1333,7 @@ sap.ui.define([
 			assert.strictEqual(oDuplicateVariant.instance.getName(), "variant A Copy", "the name is correct");
 			assert.strictEqual(oDuplicateVariant.instance.getId(), "newVariant", "the id is correct");
 			assert.strictEqual(oDuplicateVariant.instance.getLayer(), Layer.USER, "the layer is correct");
-			assert.deepEqual(oDuplicateVariant.instance.getContexts(), {role: ["testRole2"]}, "the contexts object is correct");
+			assert.deepEqual(oDuplicateVariant.instance.getContexts(), { role: ["testRole2"] }, "the contexts object is correct");
 			assert.strictEqual(oDuplicateVariant.instance.getVariantReference(), "variant0", "the variantReference is correct");
 			assert.strictEqual(oDuplicateVariant.controlChanges.length, 1, "one change was copied");
 			assert.strictEqual(
@@ -1373,7 +1373,7 @@ sap.ui.define([
 			assert.strictEqual(oDuplicateVariant.instance.getName(), "variant A Copy", "the name is correct");
 			assert.strictEqual(oDuplicateVariant.instance.getId(), "newVariant", "the id is correct");
 			assert.strictEqual(oDuplicateVariant.instance.getLayer(), Layer.PUBLIC, "the layer is correct");
-			assert.deepEqual(oDuplicateVariant.instance.getContexts(), {role: ["testRole2"]}, "the contexts object is correct");
+			assert.deepEqual(oDuplicateVariant.instance.getContexts(), { role: ["testRole2"] }, "the contexts object is correct");
 			assert.strictEqual(
 				oDuplicateVariant.instance.getVariantReference(),
 				"publicVariantReference",
@@ -1417,7 +1417,7 @@ sap.ui.define([
 			this.oRegisterControlStub = sandbox.stub(URLHandler, "registerControl");
 			sandbox.stub(VariantManagementState, "getInitialUIChanges").returns([FlexObjectFactory.createUIChange({
 				changeType: "foo",
-				selector: {id: this.sVMReference}
+				selector: { id: this.sVMReference }
 			})]);
 			sandbox.stub(FlexObjectState, "waitForFlexObjectsToBeApplied").resolves();
 
@@ -1546,7 +1546,7 @@ sap.ui.define([
 		QUnit.test("when variant management controls are initialized with with 'updateVariantInURL' property set and default (false)", function(assert) {
 			this.oRegisterControlStub.resetHistory();
 			const oVariantManagementWithoutURLUpdate = new VariantManagement("varMgmtRef1");
-			const oVariantManagementWithURLUpdate = new VariantManagement("varMgmtRef2", {updateVariantInURL: true});
+			const oVariantManagementWithURLUpdate = new VariantManagement("varMgmtRef2", { updateVariantInURL: true });
 			oVariantManagementWithoutURLUpdate.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
 			oVariantManagementWithURLUpdate.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
 			assert.strictEqual(this.oRegisterControlStub.callCount, 1, "then URLHandler.attachHandlers was called once");
@@ -1611,7 +1611,7 @@ sap.ui.define([
 		}
 
 		QUnit.test("when there is a variant with a resource model key as its title", function(assert) {
-			var oResourceModel = new ResourceModel({bundleUrl: oResourceBundle.oUrlInfo.url});
+			var oResourceModel = new ResourceModel({ bundleUrl: oResourceBundle.oUrlInfo.url });
 			this.oVariantManagement.setModel(oResourceModel, "i18n");
 			var sTitleBinding = "{i18n>VARIANT_MANAGEMENT_AUTHOR}";
 			stubFlexObjectsSelector(createTranslationVariants.call(this, sTitleBinding));
@@ -1631,7 +1631,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("when there is a variant with a resource model key with dots as its title", function(assert) {
-			var oResourceModel = new ResourceModel({bundleUrl: oResourceBundle.oUrlInfo.url});
+			var oResourceModel = new ResourceModel({ bundleUrl: oResourceBundle.oUrlInfo.url });
 			oResourceModel._oResourceBundle.aPropertyFiles[0].mProperties["test.with.dots"] = "Text From Key With Dots";
 			this.oVariantManagement.setModel(oResourceModel, "i18n");
 			var sTitleBinding = "{i18n>test.with.dots}";
@@ -1648,7 +1648,7 @@ sap.ui.define([
 
 		QUnit.test("when there is a variant with a resource model key as its title but the model was not yet set", function(assert) {
 			var fnDone = assert.async();
-			var oResourceModel = new ResourceModel({bundleUrl: oResourceBundle.oUrlInfo.url});
+			var oResourceModel = new ResourceModel({ bundleUrl: oResourceBundle.oUrlInfo.url });
 			this.oVariantManagement.setModel(oResourceModel, "i18n");
 			var sTitleBinding = "{anotherResourceModel>VARIANT_MANAGEMENT_AUTHOR}";
 			stubFlexObjectsSelector(createTranslationVariants.call(this, sTitleBinding));
@@ -1789,7 +1789,7 @@ sap.ui.define([
 					}
 				});
 
-				this.oComp = new MockComponent({id: "testComponent"});
+				this.oComp = new MockComponent({ id: "testComponent" });
 				this.oView = oView;
 				this.oVariantModel = new VariantModel({}, {
 					appComponent: this.oComp

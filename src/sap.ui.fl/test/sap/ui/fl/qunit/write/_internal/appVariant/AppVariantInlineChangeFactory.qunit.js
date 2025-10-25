@@ -353,8 +353,8 @@ sap.ui.define([
 				assert.notEqual(_oVariant.getDefinition().content, null);
 				assert.equal(_oVariant.getDefinition().content.length, 1);
 				assert.equal(_oVariant.getDefinition().content[0].changeType, "changeType");
-				assert.deepEqual(_oVariant.getDefinition().content[0].content, {param: "value"});
-				assert.deepEqual(_oVariant.getDefinition().content[0].texts, {a: "b"});
+				assert.deepEqual(_oVariant.getDefinition().content[0].content, { param: "value" });
+				assert.deepEqual(_oVariant.getDefinition().content[0].texts, { a: "b" });
 			});
 		});
 

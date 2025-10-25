@@ -629,7 +629,7 @@ sap.ui.define([
 				changeAdaptationId: undefined,
 				variantAdaptationId: undefined
 			}
-		}, {// no real use case for user layer setContext change
+		}, { // no real use case for user layer setContext change
 			details: "contexts are set user dependent, but the variant does not belong to to the same layer",
 			updateVariantPropertyBag: {
 				isUserDependent: true,
@@ -1317,7 +1317,7 @@ sap.ui.define([
 			assert.equal(aRevertData.length, 1, "revertData was stored");
 			const oLastRevertData = aRevertData[0];
 			assert.equal(oLastRevertData.getType(), CompVariantManager.operationType.StateUpdate, "it is stored that the state was updated ...");
-			assert.deepEqual(oLastRevertData.getContent(), {previousState: States.LifecycleState.PERSISTED}, "... to PERSISTED");
+			assert.deepEqual(oLastRevertData.getContent(), { previousState: States.LifecycleState.PERSISTED }, "... to PERSISTED");
 
 			SmartVariantManagementWriteAPI.revert({
 				reference: sReference,
@@ -1401,7 +1401,7 @@ sap.ui.define([
 			assert.equal(aRevertData.length, 1, "revertData was stored");
 			const oLastRevertData = aRevertData[0];
 			assert.equal(oLastRevertData.getType(), CompVariantManager.operationType.StateUpdate, "it is stored that the state was updated ...");
-			assert.deepEqual(oLastRevertData.getContent(), {previousState: States.LifecycleState.PERSISTED}, "... to PERSISTED");
+			assert.deepEqual(oLastRevertData.getContent(), { previousState: States.LifecycleState.PERSISTED }, "... to PERSISTED");
 
 			SmartVariantManagementWriteAPI.revert({
 				reference: sReference,

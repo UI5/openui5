@@ -14089,8 +14089,9 @@ sap.ui.define([
 		+ bMainSuccessful;
 
 	QUnit.test(sTitle, async function (assert) {
-		const oCache = _Cache.create(this.oRequestor, "SalesOrders");
-		oCache.setSeparate(["foo", "bar"]);
+		const oCache = _Cache.create(this.oRequestor, "SalesOrders",
+			{$expand : {bar : {}, foo : {}}});
+		oCache.setSeparate(["foo", "bar", "ignored"]);
 
 		let fnHandleMainPromise;
 		const oMainPromise = new Promise(function (resolve, reject) {
@@ -14146,7 +14147,8 @@ sap.ui.define([
 
 		assert.deepEqual(oCache.mSeparateProperty2ReadRequests, {
 			foo : [{start : 3, end : 5}, "~range~"],
-			bar : ["~range~", {start : 3, end : 5}]
+			bar : ["~range~", {start : 3, end : 5}],
+			ignored : []
 		});
 
 		const oBarResult = {value : [{bar : "~bar0~"}, {bar : "~bar1~"}]};
@@ -14187,7 +14189,8 @@ sap.ui.define([
 
 		assert.deepEqual(oCache.mSeparateProperty2ReadRequests, {
 			foo : [{start : 3, end : 5}, "~range~"],
-			bar : ["~range~"]
+			bar : ["~range~"],
+			ignored : []
 		});
 		if (bMainSuccessful) {
 			sinon.assert.callOrder(oVisitResponseMock0, oUpdateSelectedMock0, oUpdateSelectedMock1,
@@ -14226,7 +14229,8 @@ sap.ui.define([
 
 		assert.deepEqual(oCache.mSeparateProperty2ReadRequests, {
 			foo : ["~range~"],
-			bar : ["~range~"]
+			bar : ["~range~"],
+			ignored : []
 		});
 		if (bMainSuccessful) {
 			sinon.assert.callOrder(oVisitResponseMock1, oUpdateSelectedMock2, fnSeparateReceived);
@@ -14250,7 +14254,7 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	QUnit.test("CollectionCache#requestSeparateProperties: ETag changed", async function (assert) {
-		const oCache = _Cache.create(this.oRequestor, "SalesOrders");
+		const oCache = _Cache.create(this.oRequestor, "SalesOrders", {$expand : {foo : {}}});
 		oCache.aElements.$byPredicate = {
 			"(0)" : {"@odata.etag" : "old.0"},
 			"(1)" : {"@odata.etag" : "same.1"},
@@ -14331,7 +14335,8 @@ sap.ui.define([
 	//*********************************************************************************************
 	QUnit.test("CollectionCache#requestSeparateProperties: separate failed",
 			async function (assert) {
-		const oCache = _Cache.create(this.oRequestor, "SalesOrders");
+		const oCache = _Cache.create(this.oRequestor, "SalesOrders",
+			{$expand : {bar : {}, foo : {}}});
 		oCache.setSeparate(["foo", "bar"]);
 
 		const oCacheMock = this.mock(oCache);
@@ -14420,7 +14425,7 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	QUnit.test("CollectionCache#requestSeparateProperties: skip import", async function (assert) {
-		const oCache = _Cache.create(this.oRequestor, "SalesOrders");
+		const oCache = _Cache.create(this.oRequestor, "SalesOrders", {$expand : {separate : {}}});
 		oCache.setSeparate(["separate"]);
 
 		this.mock(oCache).expects("fetchTypes").withExactArgs().resolves("n/a");
@@ -14460,19 +14465,26 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test("CollectionCache#requestSeparateProperties, no requests", function (assert) {
-		const oCache = _Cache.create(this.oRequestor, "SalesOrders");
+[undefined, {$expand : {baz : {}}}].forEach(function (mQueryOptions, i) {
+	const sTitle = "CollectionCache#requestSeparateProperties, no requests, #" + i;
+
+	QUnit.test(sTitle, async function (assert) {
+		const oCache = _Cache.create(this.oRequestor, "SalesOrders", mQueryOptions);
 
 		this.mock(oCache).expects("fetchTypes").never();
 		this.mock(oCache.oRequestor).expects("request").never();
 
 		assert.deepEqual(oCache.aSeparateProperties, []);
 
-		// code under test
-		const oResult = oCache.requestSeparateProperties(3, 5, "~oMainPromise~");
+		// code under test - no separate properties
+		await oCache.requestSeparateProperties(3, 5, "~oMainPromise~");
 
-		return oResult;
+		oCache.setSeparate(["foo", "bar"]);
+
+		// code under test - separate properties are not expanded
+		await oCache.requestSeparateProperties(3, 5, "~oMainPromise~");
 	});
+});
 
 	//*********************************************************************************************
 	QUnit.test("CollectionCache#setSeparate", function (assert) {

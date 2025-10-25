@@ -33,7 +33,7 @@ sap.ui.define([
 			beforeEach(assert) {
 				var done = assert.async();
 
-				XMLView.create({id: "testView", viewName: "dt.view.TestSimpleForm"})
+				XMLView.create({ id: "testView", viewName: "dt.view.TestSimpleForm" })
 				.then(async function(oView) {
 					this.oView = oView;
 					var oSimpleForm = Element.getElementById("testView--SimpleForm0");
@@ -168,7 +168,7 @@ sap.ui.define([
 	}
 
 	// shortcut for sap.ui.layout.form.SimpleFormLayout
-	var {SimpleFormLayout} = layoutLibrary.form;
+	var { SimpleFormLayout } = layoutLibrary.form;
 
 	parameterizedTest(SimpleFormLayout.ResponsiveGridLayout);
 	parameterizedTest(SimpleFormLayout.ColumnLayout);

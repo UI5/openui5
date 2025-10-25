@@ -18,7 +18,7 @@ sap.ui.define([
 	QUnit.module("Given a ContextVisibility component is given", {
 		beforeEach() {
 			this.oComp = new ContextVisibilityComponent("test");
-			this.oComp.setSelectedContexts({role: []});
+			this.oComp.setSelectedContexts({ role: [] });
 			sandbox.stub(WriteStorage, "loadContextDescriptions").resolves({});
 			// Ensure view is fully loaded
 			return this.oComp.getRootControl().oAsyncState.promise;
@@ -42,7 +42,7 @@ sap.ui.define([
 
 		QUnit.test("when setting selected contexts", function(assert) {
 			var aSelectedContexts = ["TEST1", "TEST2"];
-			this.oComp.setSelectedContexts({role: aSelectedContexts });
+			this.oComp.setSelectedContexts({ role: aSelectedContexts });
 			assert.equal(this.oComp.getSelectedContexts().role.length, 2, "then selected contexts array has two entries");
 		});
 	});

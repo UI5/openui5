@@ -25,7 +25,7 @@ sap.ui.define([
 
 	QUnit.module("getPersonalization", {
 		async beforeEach() {
-			await FlQUnitUtils.initializeFlexStateWithData(sandbox, sReference, {ui2personalization: oFlexStatePers});
+			await FlQUnitUtils.initializeFlexStateWithData(sandbox, sReference, { ui2personalization: oFlexStatePers });
 		},
 		afterEach() {
 			FlexState.clearState();

@@ -44,7 +44,7 @@ sap.ui.define([
 	var FlexPerformanceTestUtil = {};
 
 	function areAllChangesApplied() {
-		const {aChanges} = FlexObjectState.getLiveDependencyMap("fl.performance.flexApplyChanges");
+		const { aChanges } = FlexObjectState.getLiveDependencyMap("fl.performance.flexApplyChanges");
 		return !aChanges.some(function(oChange) {
 			return !oChange.isSuccessfullyApplied();
 		});
@@ -98,7 +98,7 @@ sap.ui.define([
 	 */
 	function createControlForRename(sControlId) {
 		var oLayout = Element.getElementById("idMain1--Layout");
-		var oControl = new Label(sControlId, {text: sControlId});
+		var oControl = new Label(sControlId, { text: sControlId });
 		oLayout.addContent(oControl);
 		return oControl;
 	}
@@ -118,12 +118,12 @@ sap.ui.define([
 	 */
 	function createControlsForDiverse(sControlId) {
 		var oLayout = Element.getElementById("idMain1--Layout");
-		var oTitleLabel = new Label(`${sControlId}.title`, {text: `${sControlId}.title`});
-		var oInnerLabel = new Label(`${sControlId}.label`, {text: `${sControlId}.label`});
+		var oTitleLabel = new Label(`${sControlId}.title`, { text: `${sControlId}.title` });
+		var oInnerLabel = new Label(`${sControlId}.label`, { text: `${sControlId}.label` });
 		var oDatePicker = new DatePicker(`${sControlId}.datePicker`);
 		var oSlider = new Slider(`${sControlId}.slider`);
 		var oRatingIndicator = new RatingIndicator(`${sControlId}.ratingIndicator`);
-		var oButton = new Button(`${sControlId}.button`, {text: `${sControlId}.button`});
+		var oButton = new Button(`${sControlId}.button`, { text: `${sControlId}.button` });
 		var oVBox = new VBox(`${sControlId}.vbox`, {
 			items: [
 				oInnerLabel,
@@ -166,7 +166,7 @@ sap.ui.define([
 		var oComponent = FlUtils.getAppComponentForControl(Element.getElementById("idMain1--Layout"));
 		var oControlToBeChanged = Element.getElementById("idMain1--dependencyScenarioControl.vbox");
 
-		return FlexRuntimeInfoAPI.waitForChanges({element: oControlToBeChanged})
+		return FlexRuntimeInfoAPI.waitForChanges({ element: oControlToBeChanged })
 		.then(function() {
 			FlexPerformanceTestUtil.startMeasurement();
 			return FlexPerformanceTestUtil.updateVariant(oComponent);
@@ -252,7 +252,7 @@ sap.ui.define([
 	};
 
 	FlexPerformanceTestUtil.waitForChangesAndWriteData = function(oControlToBeChanged) {
-		return FlexRuntimeInfoAPI.waitForChanges({element: oControlToBeChanged}).then(function() {
+		return FlexRuntimeInfoAPI.waitForChanges({ element: oControlToBeChanged }).then(function() {
 			writeData();
 		});
 	};

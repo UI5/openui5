@@ -130,7 +130,7 @@ sap.ui.define([
 	 */
 	Base.prototype.getExtension = function(sName, Extension) {
 		if (!Object.keys(this._oExtensions).includes(sName)) {
-			this._oExtensions[sName] = new Extension({toolbar: this});
+			this._oExtensions[sName] = new Extension({ toolbar: this });
 		}
 		return this._oExtensions[sName];
 	};

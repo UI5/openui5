@@ -33,7 +33,7 @@ sap.ui.define([
 		QUnit.test("when calling '_applyChange' without sap.fiori/registraionIds node in manifest", function(assert) {
 			var oManifest = {
 				"_version": "2.0.0",
-				"sap.app": { id: "test.app"}
+				"sap.app": { id: "test.app" }
 			};
 			var oNewManifest = SetRegistrationIds.applyChange(oManifest, this.oChange1);
 			assert.deepEqual(oNewManifest["sap.fiori"].registrationIds, ["F0001"], "sap.fiori/registraionIds is created correctly.");
@@ -42,8 +42,8 @@ sap.ui.define([
 		QUnit.test("when calling '_applyChange' with sap.fiori/registraionIds node in manifest", function(assert) {
 			var oManifest = {
 				"_version": "2.0.0",
-				"sap.app": { id: "test.app"},
-				"sap.fiori": {registraionIds: ["random"]}
+				"sap.app": { id: "test.app" },
+				"sap.fiori": { registraionIds: ["random"] }
 			};
 			var oNewManifest = SetRegistrationIds.applyChange(oManifest, this.oChange2);
 			assert.deepEqual(oNewManifest["sap.fiori"].registrationIds, ["F0002", "F0003"], "sap.fiori/registraionIds is overwritten correctly.");

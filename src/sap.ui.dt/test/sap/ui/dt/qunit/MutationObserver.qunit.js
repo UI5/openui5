@@ -114,7 +114,7 @@ sap.ui.define([
 
 		QUnit.test("when an open shadow root node is added to the observer and then modified", function(assert) {
 			var fnDone = assert.async();
-			var oShadowRoot = this.oNode.attachShadow({mode: "open"});
+			var oShadowRoot = this.oNode.attachShadow({ mode: "open" });
 			this.oMutationObserver.addNode(oShadowRoot);
 			this.oMutationObserver.registerHandler(this.sNodeId, function(mParameters) {
 				assert.ok(mParameters.type.includes("MutationObserver"), "then domChanged callback is called with the host node");
