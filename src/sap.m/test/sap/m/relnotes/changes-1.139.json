@@ -278,5 +278,15 @@
         "text": " sap.m.Avatar: Fix image not visible, when initials are incorrect"
       }
     ]
+  },
+  "1.139.2": {
+    "date": "October 2025",
+    "notes": [
+      {
+        "id": "41fed13c38fc5760dce8abd227819c1a9d122384",
+        "type": "FIX",
+        "text": " sap.m.ComboBox: Picker now closes on table scroll"
+      }
+    ]
   }
 }

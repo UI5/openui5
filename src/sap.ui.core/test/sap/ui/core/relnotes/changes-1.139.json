@@ -88,5 +88,20 @@
         "text": " Make the experimental new bootstrap the productive one"
       }
     ]
+  },
+  "1.139.2": {
+    "date": "October 2025",
+    "notes": [
+      {
+        "id": "cdf4f8f2fb1a34d11ae04165130d91e11ff442e0",
+        "type": "FIX",
+        "text": " qunit/Ownstatics.qunit: enhance the error message check for Safari"
+      },
+      {
+        "id": "b48730881e776be0d1e3c7b7bc038afdbab0b67a",
+        "type": "FIX",
+        "text": " sap/ui/model/odata/v2/ODataTreeBinding: $count requests must not contain $expand or $select"
+      }
+    ]
   }
 }

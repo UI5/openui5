@@ -48,5 +48,15 @@
         "text": " Field: error handling if Currency/Unit chosen that don't meet number"
       }
     ]
+  },
+  "1.139.2": {
+    "date": "October 2025",
+    "notes": [
+      {
+        "id": "48e489129a620460b74af8c1e3b1410ed4698587",
+        "type": "FIX",
+        "text": " SortFlex: Take sortOrder into account for affectedControl during condensing"
+      }
+    ]
   }
 }
