@@ -1326,5 +1326,20 @@
         "text": " m.VariantManagement: add aria-expanded & aria-haspopup"
       }
     ]
+  },
+  "1.120.38": {
+    "date": "October 2025",
+    "notes": [
+      {
+        "id": "890bc40ccd598f8740e82c629f6446b3cf3aff4e",
+        "type": "FIX",
+        "text": " sap.m.ComboBox: Picker now closes on table scroll"
+      },
+      {
+        "id": "97a937407d4247b71fd99bf4dd30ffe4fa151a65",
+        "type": "FIX",
+        "text": " sap.m.ViewSettingsDialog: add a view settings dialog items active announcement"
+      }
+    ]
   }
 }

@@ -295,5 +295,15 @@
         "text": " sap.f.FlexibleColumnLayout: prevent animation when initially shown"
       }
     ]
+  },
+  "1.120.38": {
+    "date": "October 2025",
+    "notes": [
+      {
+        "id": "8755109dd5287130ce26d1cf3a0d2b596901300f",
+        "type": "FIX",
+        "text": " sap.f.DynamicPage: Header visibility issue fixed"
+      }
+    ]
   }
 }

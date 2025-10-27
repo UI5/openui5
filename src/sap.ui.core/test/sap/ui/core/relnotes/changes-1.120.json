@@ -1053,5 +1053,15 @@
         "text": " routing/History: avoid creating history entry when same hash is applied"
       }
     ]
+  },
+  "1.120.38": {
+    "date": "October 2025",
+    "notes": [
+      {
+        "id": "37dd7adf885b88ac302ae9e13b337072d533ab8e",
+        "type": "FIX",
+        "text": " sap/ui/model/odata/v2/ODataTreeBinding: $count requests must not contain $expand or $select"
+      }
+    ]
   }
 }
