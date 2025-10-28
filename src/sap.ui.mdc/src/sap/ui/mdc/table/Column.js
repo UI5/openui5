@@ -411,10 +411,6 @@ sap.ui.define([
 				if (this._oTemplateClone.setWrapping) {
 					this._oTemplateClone.setWrapping(false);
 				}
-
-				if (this._oTemplateClone.setRenderWhitespace) {
-					this._oTemplateClone.setRenderWhitespace(false);
-				}
 			}
 		}
 
@@ -431,10 +427,6 @@ sap.ui.define([
 			if (!oTable._isOfType(TableType.ResponsiveTable)) {
 				if (this._oCreationTemplateClone.setWrapping) {
 					this._oCreationTemplateClone.setWrapping(false);
-				}
-
-				if (this._oCreationTemplateClone.setRenderWhitespace) {
-					this._oCreationTemplateClone.setRenderWhitespace(false);
 				}
 			}
 		}
