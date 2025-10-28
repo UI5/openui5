@@ -43,5 +43,15 @@
         "text": " sap.m.IconTabBar: focus outline is fixed for high contrast themes"
       }
     ]
+  },
+  "1.136.8": {
+    "date": "October 2025",
+    "notes": [
+      {
+        "id": "330b91ee821e0ec9e88249ce35709b7632b51789",
+        "type": "FIX",
+        "text": " sap.uxap.ObjectPageSection: fix header buttons visibility"
+      }
+    ]
   }
 }

@@ -333,5 +333,15 @@
         "text": " core/interaction: Cache failed requests to avoid retry attempts"
       }
     ]
+  },
+  "1.136.8": {
+    "date": "October 2025",
+    "notes": [
+      {
+        "id": "635a6b0d002dd71915a6263886f8205329794189",
+        "type": "FIX",
+        "text": " sap/ui/model/odata/v2/ODataTreeBinding: $count requests must not contain $expand or $select"
+      }
+    ]
   }
 }

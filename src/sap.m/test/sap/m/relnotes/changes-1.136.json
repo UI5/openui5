@@ -428,5 +428,25 @@
         "text": " sap.m.IllustratedMessage: correct CSS variable references"
       }
     ]
+  },
+  "1.136.8": {
+    "date": "October 2025",
+    "notes": [
+      {
+        "id": "56a6cbbb47653da670648f1b730a55e9482fcb0d",
+        "type": "FIX",
+        "text": " sap.m.MessageToast: Message positions logic is now updated"
+      },
+      {
+        "id": "02978ae17fac0f6fea3bd40755aba408f01175dc",
+        "type": "FIX",
+        "text": " sap.m.ComboBox: Picker now closes on table scroll"
+      },
+      {
+        "id": "fdd861da225ac7c6f1f8294d12ba357a773a0112",
+        "type": "FIX",
+        "text": " m.VariantManagement: add aria-expanded & aria-haspopup"
+      }
+    ]
   }
 }

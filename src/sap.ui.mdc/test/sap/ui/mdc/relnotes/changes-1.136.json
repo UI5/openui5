@@ -83,5 +83,15 @@
         "text": " MultiValueField not working after upgrading to 1.136.1"
       }
     ]
+  },
+  "1.136.8": {
+    "date": "October 2025",
+    "notes": [
+      {
+        "id": "337aa1bacfb72396c0d48772635ce493037a5782",
+        "type": "FIX",
+        "text": " SortFlex: Take sortOrder into account for affectedControl during condensing"
+      }
+    ]
   }
 }
