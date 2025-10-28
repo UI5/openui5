@@ -10,14 +10,14 @@ sap.ui.define([
 	'sap/ui/core/ValueStateSupport',
 	'sap/ui/core/IndicationColorSupport',
 	'sap/ui/core/library',
-	'sap/ui/core/_IconRegistry',
+	'sap/ui/core/IconPool',
 	'sap/ui/base/DataType',
 	'./ObjectStatusRenderer',
 	'sap/m/ImageHelper',
 	'sap/ui/core/LabelEnablement',
 	"sap/ui/events/KeyCodes"
 ],
-	function(library, Control, Library, ValueStateSupport, IndicationColorSupport, coreLibrary, _IconRegistry, DataType, ObjectStatusRenderer, ImageHelper, LabelEnablement, KeyCodes) {
+	function(library, Control, Library, ValueStateSupport, IndicationColorSupport, coreLibrary, IconPool, DataType, ObjectStatusRenderer, ImageHelper, LabelEnablement, KeyCodes) {
 	"use strict";
 
 
@@ -217,6 +217,16 @@ sap.ui.define([
 		}
 	};
 
+	ObjectStatus.prototype.onBeforeRendering = function() {
+		if (this.getIcon()) {
+			this._getImageControl();
+			if (!this.getText() && !this._isActive()) {
+				var sTooltip = this.getTooltip_AsString() ? this.getTooltip_AsString() : this._getAriaIconTitle();
+				this._oImageControl.setTooltip(sTooltip);
+			}
+		}
+	};
+
 	/**
 	 * Lazy loads feed icon image.
 	 *
@@ -224,27 +234,29 @@ sap.ui.define([
 	 * @private
 	 */
 	ObjectStatus.prototype._getImageControl = function() {
-		var sImgId = this.getId() + '-icon',
-			bUseIconTooltip = !this.getText() && !this.getTitle() && !this.getTooltip(),
-			mProperties = {
-				src : this.getIcon(),
-				densityAware : this.getIconDensityAware(),
-				useIconTooltip : bUseIconTooltip,
-				decorative: !this.getActive()
-			};
+		if (!this._oImageControl || this.getTooltip()) {
+			var sImgId = this.getId() + '-icon',
+				bIsIconOnly = !this.getText() && !this.getTitle(),
+				bUseIconTooltip = !this.getText() && !this.getTitle() && !this.getTooltip(),
+				mProperties = {
+					src : this.getIcon(),
+					densityAware : this.getIconDensityAware(),
+					useIconTooltip : bUseIconTooltip,
+					decorative: !this.getActive() && !bIsIconOnly
+				};
 
-		this._oImageControl = ImageHelper.getImageControl(sImgId, this._oImageControl, this, mProperties);
-
+			this._oImageControl = ImageHelper.getImageControl(sImgId, this._oImageControl, this, mProperties);
+		}
 		return this._oImageControl;
 	};
 
 	ObjectStatus.prototype._getAriaIconTitle = function() {
 		var vIconInfo;
 		if (this._oImageControl.isA("sap.ui.core.Icon")) {
-			vIconInfo = _IconRegistry.getIconInfo(this._oImageControl.getSrc(), undefined, "mixed");
+			vIconInfo = IconPool.getIconInfo(this._oImageControl.getSrc(), undefined, "mixed");
 		}
 
-		return vIconInfo ? vIconInfo.text : Library.getResourceBundleFor("sap.m").getText("OBJECT_STATUS_ICON");
+		return (vIconInfo && vIconInfo.text != "") ? vIconInfo.text : Library.getResourceBundleFor("sap.m").getText("OBJECT_STATUS_ICON");
 	};
 
 	/**

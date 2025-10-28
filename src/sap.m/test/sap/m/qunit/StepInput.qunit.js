@@ -2439,6 +2439,15 @@ sap.ui.define([
 
 		//Assert
 		assert.equal(fResult, 15, "..should result in next value that folds into the step");
+
+		this.stepInput.setLargerStep(2.5);
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		//Act
+		fResult = this.stepInput._calculateNewValue(2.5, true);
+
+		//Assert
+		assert.equal(fResult, 13.5, "..should result in next value that folds into the step");
 	});
 
 	QUnit.test("_calculateNewValue: previous value when current value does not fold into a mandatory step(StepMode.MultiplicationAndDivision)" +

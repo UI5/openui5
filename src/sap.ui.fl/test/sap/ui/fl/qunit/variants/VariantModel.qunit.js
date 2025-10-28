@@ -1521,7 +1521,8 @@ sap.ui.define([
 				variantReference: this.sVMReference
 			});
 			const oPromise = new Deferred();
-			const oRequireStub = sandbox.stub(sap.ui, "require").withArgs(["sap/ui/fl/write/_internal/flexState/FlexObjectManager"])
+			const oRequireStub = sandbox.stub(sap.ui, "require");
+			oRequireStub.withArgs(["sap/ui/fl/write/_internal/flexState/FlexObjectManager"])
 			.callsFake((...aArgs) => {
 				aArgs[1](FlexObjectManager);
 				oPromise.resolve();

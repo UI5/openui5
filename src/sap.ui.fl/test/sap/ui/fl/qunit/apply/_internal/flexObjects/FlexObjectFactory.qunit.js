@@ -41,6 +41,7 @@ sap.ui.define([
 					originalControlType: "sap.m.Label"
 				},
 				layer: Layer.CUSTOMER,
+				persistencyKey: "",
 				namespace: "apps/sap.ui.demoapps.rta.fiorielements/changes/",
 				support: {
 					sapui5Version: "1.100.0-SNAPSHOT"
@@ -92,9 +93,78 @@ sap.ui.define([
 			);
 		});
 
+		QUnit.test('when a CompVariant with "" as persistencyKey is created', function(assert) {
+			const oFileContent = {
+				fileName: "foo",
+				fileType: "variant",
+				variantId: "variant1",
+				contexts: {},
+				favorite: false,
+				persisted: false,
+				layer: Layer.CUSTOMER,
+				persistencyKey: "",
+				executeOnSelection: false,
+				namespace: "apps/sap.ui.demoapps.rta.fiorielements/changes/",
+				support: {
+					sapui5Version: "1.100.0-SNAPSHOT"
+				},
+				someUnknownProperty: "shouldNotLeadToProblems"
+			};
+			var oFlexObject = FlexObjectFactory.createCompVariant(oFileContent);
+			assert.ok(oFlexObject instanceof CompVariant, "then the factory chooses the proper class based on the fileType");
+			assert.strictEqual(
+				oFlexObject.getLayer(),
+				oFileContent.layer,
+				"then root level properties are set"
+			);
+			assert.strictEqual(
+				oFlexObject.getId(),
+				oFileContent.fileName,
+				"then root level properties are properly mapped"
+			);
+			assert.strictEqual(oFlexObject.getPersistencyKey(), oFileContent.persistencyKey, "then the persistencyKey is set correctly");
+		});
+
+		QUnit.test("when a CompVariant with a normal persistencyKey is created", function(assert) {
+			const oFileContent = {
+				fileName: "foo",
+				fileType: "variant",
+				variantId: "variant1",
+				contexts: {},
+				favorite: false,
+				persisted: false,
+				layer: Layer.CUSTOMER,
+				persistencyKey: "fooKey",
+				executeOnSelection: false,
+				namespace: "apps/sap.ui.demoapps.rta.fiorielements/changes/",
+				support: {
+					sapui5Version: "1.100.0-SNAPSHOT"
+				},
+				someUnknownProperty: "shouldNotLeadToProblems"
+			};
+			var oFlexObject = FlexObjectFactory.createCompVariant(oFileContent);
+			assert.ok(oFlexObject instanceof CompVariant, "then the factory chooses the proper class based on the fileType");
+			assert.strictEqual(
+				oFlexObject.getLayer(),
+				oFileContent.layer,
+				"then root level properties are set"
+			);
+			assert.strictEqual(
+				oFlexObject.getId(),
+				oFileContent.fileName,
+				"then root level properties are properly mapped"
+			);
+			assert.strictEqual(oFlexObject.getPersistencyKey(), oFileContent.persistencyKey, "then the persistencyKey is set correctly");
+		});
+
 		[{
 			fileType: "variant",
-			expectedType: CompVariant
+			expectedType: CompVariant,
+			persistencyKey: "myPersistencyKey"
+		}, {
+			fileType: "variant",
+			expectedType: CompVariant,
+			persistencyKey: ""
 		}, {
 			fileType: "ctrl_variant",
 			expectedType: FlVariant

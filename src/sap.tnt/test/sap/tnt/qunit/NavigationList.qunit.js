@@ -15,7 +15,8 @@ sap.ui.define([
 	'sap/tnt/NavigationListGroup',
 	'sap/tnt/NavigationListMenuItem',
 	"sap/ui/test/utils/nextUIUpdate",
-	"sap/ui/test/utils/waitForThemeApplied"
+	"sap/ui/test/utils/waitForThemeApplied",
+	'sap/ui/qunit/utils/createAndAppendDiv'
 ], function(
 	Log,
 	Element,
@@ -31,7 +32,8 @@ sap.ui.define([
 	NavigationListGroup,
 	NavigationListMenuItem,
 	nextUIUpdate,
-	waitForThemeApplied
+	waitForThemeApplied,
+	createAndAppendDiv
 ) {
 	'use strict';
 
@@ -736,7 +738,7 @@ sap.ui.define([
 		var groupItemAnchorElement = groupItem.getDomRef().getElementsByTagName("a")[0];
 		const groupItem2AnchorElement = groupItem2.getDomRef().getElementsByTagName("a")[0],
 			sExpectedAriaDescribedby = Library.getResourceBundleFor("sap.tnt")
-				.getText("NAVIGATION_LIST_KEYBOARD_NAVIGATION"),
+				.getText("NAVIGATION_LIST_KEYBOARD_NAVIGATION", [groupItem.getText()]),
 			invisibleTextId = groupItem2AnchorElement.getAttribute("aria-describedby");
 
 		assert.equal(groupItemAnchorElement.getAttribute("role"), 'treeitem', "The anchor is with correct role");
@@ -942,14 +944,18 @@ sap.ui.define([
 
 	QUnit.module("Interaction", {
 		beforeEach: async function () {
+			this.oContainer = createAndAppendDiv("container");
+			this.oContainer.style.position = "fixed";
+			this.oContainer.style.top = "0";
 			this.navigationList = getNavigationList();
-			this.navigationList.placeAt("qunit-fixture");
+			this.navigationList.placeAt(this.oContainer);
 
 			await nextUIUpdate();
 
 			this.clock = sinon.useFakeTimers();
 		},
 		afterEach: async function () {
+			this.oContainer.remove();
 			this.navigationList.destroy();
 			this.navigationList = null;
 

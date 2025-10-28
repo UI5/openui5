@@ -5559,6 +5559,66 @@ sap.ui.define([
 		assert.equal(Math.abs(oBoundingRect.top - oBoundingRectVertical.top), OFFSET, "top updated");
 		assert.equal(Math.abs(oBoundingRectVertical.bottom - oBoundingRect.bottom), OFFSET, "bottom updated");
 	});
+
+	QUnit.module("GenericTile width tests (TwoByOne / TwoByHalf)", {
+        beforeEach: async function() {
+            // TwoByOne Tile
+            var oTileContent1 = new TileContent({
+                content: new NewsContent({ contentText: "TwoByOne tile content" })
+            });
+            this.oTileTwoByOne = new GenericTile({
+                id: "tile-twobyone",
+                header: "TwoByOne Tile",
+                frameType: "TwoByOne",
+                tileContent: [oTileContent1]
+            });
+
+            // TwoByHalf Tile
+            var oTileContent2 = new TileContent({
+                content: new NewsContent({ contentText: "TwoByHalf tile content" })
+            });
+            this.oTileTwoByHalf = new GenericTile({
+                id: "tile-twobyhalf",
+                header: "TwoByHalf Tile",
+                frameType: "TwoByHalf",
+                tileContent: [oTileContent2]
+            });
+            this.oParent = document.createElement("div");
+            this.oParent.id = "genericTileParent";
+            document.body.appendChild(this.oParent);
+            this.oTileTwoByOne.placeAt("genericTileParent");
+            this.oTileTwoByHalf.placeAt("genericTileParent");
+            // Wait for rendering
+            await nextUIUpdate();
+        },
+        afterEach: function() {
+          this.oTileTwoByOne.destroy();
+          this.oTileTwoByHalf.destroy();
+          document.body.removeChild(this.oParent);
+        }
+    });
+
+	QUnit.test("TwoByOne and TwoByHalf widths", async function(assert) {
+        this.oParent.classList.add("sapUshellSection");
+        await nextUIUpdate();
+
+        // Function to get numeric width of a GenericTile by ID
+        function getTileWidth(sTileId) {
+            var oElement = document.getElementById(sTileId);
+            return oElement ? oElement.getBoundingClientRect().width : null;
+        }
+
+        // Compute rem in pixels for comparison
+        var fPixels = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+        var fExpectedWidth = 23 * fPixels;
+
+        var fTwoByOne = getTileWidth("tile-twobyone");
+        var fTwoByHalf = getTileWidth("tile-twobyhalf");
+
+        assert.equal(fTwoByOne, fExpectedWidth, "Correct width applied for two by one");
+        assert.equal(fTwoByHalf, fExpectedWidth, "Correct width applied for two by half");
+    });
+
 	QUnit.module("GenericTile when linkTileContent is used", {
 		beforeEach: async function () {
 			this.oGenericTile = new GenericTile({

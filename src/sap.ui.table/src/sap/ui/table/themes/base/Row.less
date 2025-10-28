@@ -5,10 +5,6 @@
 
 @_sap_ui_table_Row_Color: var(--sapList_TextColor);
 @_sap_ui_table_Row_ColorHovered: @_sap_ui_table_Row_Color;
-@_sap_ui_table_Row_AlternateBackground: darken(@sapUiListBackground, 2);
-@_sap_ui_table_Row_AlternateBackgroundHovered: darken(@sapUiListHoverBackground, 3);
-@_sap_ui_table_Row_AlternateBackgroundSelected: darken(@sapUiListSelectionBackgroundColor, 2);
-@_sap_ui_table_Row_AlternateBackgroundSelectedHovered: darken(@sapUiListSelectionHoverBackground, 2);
 @_sap_ui_table_Row_NavigationIndicatorColor: var(--sapList_SelectionBorderColor);
 
 .sapUiTableHeaderRow {
@@ -20,19 +16,7 @@
 	background-color: var(--sapList_Background);
 
 	&.sapUiTableRowAlternate {
-		background-color: @_sap_ui_table_Row_AlternateBackground;
-
-		&.sapUiTableRowHvr {
-			background-color: @_sap_ui_table_Row_AlternateBackgroundHovered;
-		}
-
-		&.sapUiTableRowSel {
-			background-color: @_sap_ui_table_Row_AlternateBackgroundSelected;
-
-			&.sapUiTableRowHvr {
-				background-color: @_sap_ui_table_Row_AlternateBackgroundSelectedHovered;
-			}
-		}
+		background-color: var(--sapList_AlternatingBackground);
 	}
 
 	&.sapUiTableRowSel {
@@ -50,7 +34,7 @@
 	}
 
 	&.sapUiTableRowSel.sapUiTableRowHvr {
-		background-color: @sapUiListSelectionHoverBackground;
+		background-color: var(--sapList_Hover_SelectionBackground);
 	}
 
 	.sapUiTableRowActionScr & {

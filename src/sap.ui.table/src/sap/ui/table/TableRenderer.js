@@ -82,6 +82,7 @@ sap.ui.define([
 		}
 
 		const oScrollExtension = oTable._getScrollExtension();
+		const oAccRenderExtension = oTable._getAccRenderExtension();
 		if (oScrollExtension.isVerticalScrollbarRequired() && !oScrollExtension.isVerticalScrollbarExternal()) {
 			rm.class("sapUiTableVScr"); // show vertical scrollbar
 		}
@@ -157,7 +158,7 @@ sap.ui.define([
 		this.renderTabElement(rm, "sapUiTableCtrlBefore", bDummyTabbable ? "0" : "-1");
 
 		rm.openStart("div", oTable.getId() + "-sapUiTableGridCnt");
-		oTable._getAccRenderExtension().writeAriaAttributesFor(rm, oTable, "Content");
+		oAccRenderExtension.writeAriaAttributesFor(rm, oTable, "Content");
 		rm.openEnd();
 
 		this.renderColRsz(rm, oTable);
@@ -177,12 +178,12 @@ sap.ui.define([
 		this.renderHSbBackground(rm, oTable);
 		this.renderHSb(rm, oTable);
 
-		oTable._getAccRenderExtension().writeHiddenAccTexts(rm, oTable);
+		oAccRenderExtension.writeHiddenAccTexts(rm, oTable);
 
 		rm.openStart("div", oTable.getId() + "-overlay");
 		rm.class("sapUiTableOverlayArea");
 		rm.attr("tabindex", "0");
-		oTable._getAccRenderExtension().writeAriaAttributesFor(rm, oTable, "Overlay");
+		oAccRenderExtension.writeAriaAttributesFor(rm, oTable, "Overlay");
 		rm.openEnd();
 		rm.close("div");
 
@@ -370,12 +371,28 @@ sap.ui.define([
 		let bEnabled = false;
 		let bSelAll = false;
 		const mRenderConfig = oTable._getSelectionPlugin().getRenderConfig();
+		const oAccRenderExtension = oTable._getAccRenderExtension();
 
 		rm.openStart("div");
-		oTable._getAccRenderExtension().writeAriaAttributesFor(rm, oTable, "ColumnRowHeaderRow");
+		oAccRenderExtension.writeAriaAttributesFor(rm, oTable, "ColumnRowHeaderRow");
 		rm.openEnd();
-		rm.openStart("div", oTable.getId() + "-rowcolhdr");
-		oTable._getAccRenderExtension().writeAriaAttributesFor(rm, oTable, "ColumnRowHeaderCell");
+
+		const iHeaderRowCount = TableUtils.getHeaderRowCount(oTable);
+		if (iHeaderRowCount > 1) {
+			// In multi label scenario extra hidden cells are rendered in order to maintain correct aria-ownns relationship for each header row. They
+			// are rendered in the same row which does not affect the announcement because the row has aria-hidden.
+			for (let i = 0; i < iHeaderRowCount - 1; i++) {
+				rm.openStart("div", oTable.getId() + "-rowcolhdr" + i);
+				oAccRenderExtension.writeAriaAttributesFor(rm, oTable, "ColumnRowHeaderCell", {bLabel: false});
+				rm.openEnd();
+				rm.close("div");
+			}
+			rm.openStart("div", oTable.getId() + "-rowcolhdr" + (iHeaderRowCount - 1));
+		} else {
+			rm.openStart("div", oTable.getId() + "-rowcolhdr");
+		}
+
+		oAccRenderExtension.writeAriaAttributesFor(rm, oTable, "ColumnRowHeaderCell", {bLabel: true});
 		rm.openEnd();
 		rm.openStart("div", oTable.getId() + "-selall");
 
@@ -413,7 +430,7 @@ sap.ui.define([
 			enabled: bEnabled,
 			checked: bSelAll
 		};
-		oTable._getAccRenderExtension().writeAriaAttributesFor(rm, oTable, "ColumnRowHeader", oParams);
+		oAccRenderExtension.writeAriaAttributesFor(rm, oTable, "ColumnRowHeader", oParams);
 
 		rm.openEnd();
 
@@ -563,11 +580,12 @@ sap.ui.define([
 	// =============================================================================
 
 	TableRenderer.renderRowHdr = function(rm, oTable) {
+		const oAccRenderExtension = oTable._getAccRenderExtension();
 		rm.openStart("div", oTable.getId() + "-sapUiTableRowHdrScr");
-		oTable._getAccRenderExtension().writeAriaAttributesFor(rm, oTable, "Presentation");
+		oAccRenderExtension.writeAriaAttributesFor(rm, oTable, "Presentation");
 		rm.class("sapUiTableRowHdrScr");
 		rm.class("sapUiTableNoOpacity");
-		oTable._getAccRenderExtension().writeAriaAttributesFor(rm, oTable, "RowHeaderCol");
+		oAccRenderExtension.writeAriaAttributesFor(rm, oTable, "RowHeaderCol");
 		rm.openEnd();
 
 		// start with the first current top visible row
@@ -624,9 +642,10 @@ sap.ui.define([
 
 	TableRenderer.renderRowAddon = function(rm, oTable, oRow, iRowIndex, bHeader) {
 		const bRowSelected = oRow._isSelected();
+		const oAccRenderExtension = oTable._getAccRenderExtension();
 
 		rm.openStart("div");
-		oTable._getAccRenderExtension().writeAriaAttributesFor(rm, oTable, "RowAddon");
+		oAccRenderExtension.writeAriaAttributesFor(rm, oTable, "RowAddon");
 
 		rm.attr("data-sap-ui-related", oRow.getId());
 		rm.attr("data-sap-ui-rowindex", iRowIndex);
@@ -661,7 +680,7 @@ sap.ui.define([
 			rowSelected: bRowSelected,
 			rowHidden: oRow.isEmpty()
 		};
-		oTable._getAccRenderExtension().writeAriaAttributesFor(rm, oTable, bHeader ? "RowHeader" : "RowAction", oParams);
+		oAccRenderExtension.writeAriaAttributesFor(rm, oTable, bHeader ? "RowHeader" : "RowAction", oParams);
 
 		rm.openEnd();
 		if (bHeader) {
@@ -760,7 +779,8 @@ sap.ui.define([
 			rm.class(sClass);
 		});
 
-		oTable._getAccRenderExtension().writeAriaAttributesFor(rm, oTable, bHeader ? "Presentation" : "Table");
+		const oAccRenderExtension = oTable._getAccRenderExtension();
+		oAccRenderExtension.writeAriaAttributesFor(rm, oTable, bHeader ? "Presentation" : "Table");
 
 		rm.class("sapUiTableCtrl");
 		if (bHeader) {
@@ -826,7 +846,7 @@ sap.ui.define([
 			if (oColParam.shouldRender) {
 				if (iStartRow === 0) {
 					rm.openStart("th", oTable.getId() + sSuffix + iCol);
-					oTable._getAccRenderExtension().writeAriaAttributesFor(rm, oTable, "Th", {column: oColumn});
+					oAccRenderExtension.writeAriaAttributesFor(rm, oTable, "Th", {column: oColumn});
 				} else {
 					rm.openStart("th");
 				}
@@ -851,7 +871,7 @@ sap.ui.define([
 		// dummy column to fill the table width
 		if (bRenderDummyColumn) {
 			rm.openStart("th", bHeader && oTable.getId() + "-dummycolhdr");
-			oTable._getAccRenderExtension().writeAriaAttributesFor(rm, oTable, "Presentation");
+			oAccRenderExtension.writeAriaAttributesFor(rm, oTable, "Presentation");
 			rm.openEnd().close("th");
 		}
 
@@ -952,7 +972,8 @@ sap.ui.define([
 		rm.class("sapUiTableRow");
 		rm.class("sapUiTableHeaderRow");
 		rm.class("sapUiTableColHdrTr");
-		oTable._getAccRenderExtension().writeAriaAttributesFor(rm, oTable, "ColumnHeaderRow", {rowIndex: iRow});
+		const oAccRenderExtension = oTable._getAccRenderExtension();
+		oAccRenderExtension.writeAriaAttributesFor(rm, oTable, "ColumnHeaderRow", {rowIndex: iRow, fixedCol: bFixedTable});
 		rm.openEnd();
 
 		//
@@ -1004,7 +1025,7 @@ sap.ui.define([
 
 		if (!bFixedTable && bHasOnlyFixedColumns && aColumns.length > 0) {
 			rm.openStart("td").class("sapUiTableCellDummy");
-			oTable._getAccRenderExtension().writeAriaAttributesFor(rm, oTable, "Presentation");
+			oAccRenderExtension.writeAriaAttributesFor(rm, oTable, "Presentation");
 			rm.openEnd().close("td");
 		}
 		rm.close("tr");
@@ -1054,7 +1075,8 @@ sap.ui.define([
 			fixedCol: bFixedTable,
 			rowNavigated: oRowSettings ? oRowSettings.getNavigated() : false
 		};
-		oTable._getAccRenderExtension().writeAriaAttributesFor(rm, oTable, "Tr", oParams);
+		const oAccRenderExtension = oTable._getAccRenderExtension();
+		oAccRenderExtension.writeAriaAttributesFor(rm, oTable, "Tr", oParams);
 
 		rm.openEnd();
 
@@ -1066,14 +1088,14 @@ sap.ui.define([
 		}
 		if (!bFixedTable && bHasOnlyFixedColumns && aCells.length > 0) {
 			rm.openStart("td").class("sapUiTableCellDummy");
-			oTable._getAccRenderExtension().writeAriaAttributesFor(rm, oTable, "Presentation");
+			oAccRenderExtension.writeAriaAttributesFor(rm, oTable, "Presentation");
 			rm.openEnd();
 			rm.close("td");
 		}
 		rm.close("tr");
 	};
 
-	TableRenderer.renderTableCell = function(rm, oTable, oRow, oCell, iCellIndex, bFixedTable, iStartColumn, iEndColumn, aVisibleColumns, iLastFixedColumnIndex, bSelected) {
+	TableRenderer.renderTableCell = function(rm, oTable, oRow, oCell, iCellIndex, bFixedTable, iStartColumn, iEndColumn, aVisibleColumns, iLastFixedColumnIndex) {
 		const oColumn = Column.ofCell(oCell);
 		const iColIndex = oColumn.getIndex();
 
@@ -1089,10 +1111,7 @@ sap.ui.define([
 			const bIsLastFixedColumn = bFixedTable && iLastFixedColumnIndex === iColIndex;
 
 			const oParams = {
-				column: oColumn,
-				row: oRow,
-				fixed: bFixedTable,
-				rowSelected: bSelected
+				column: oColumn
 			};
 			oTable._getAccRenderExtension().writeAriaAttributesFor(rm, oTable, "DataCell", oParams);
 

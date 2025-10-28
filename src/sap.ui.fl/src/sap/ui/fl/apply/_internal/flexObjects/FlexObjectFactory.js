@@ -318,8 +318,12 @@ sap.ui.define([
 		mCompVariantContent.contexts = oFileContentClone.contexts;
 		mCompVariantContent.favorite = oFileContentClone.favorite;
 		mCompVariantContent.persisted = oFileContentClone.persisted;
-		mCompVariantContent.persistencyKey = oFileContentClone.persistencyKey ||
-			ObjectPath.get("selector.persistencyKey", oFileContentClone);
+		// Persistency key can be an empty string, so we need to check for undefined
+		if (oFileContentClone.persistencyKey !== undefined) {
+			mCompVariantContent.persistencyKey = oFileContentClone.persistencyKey;
+		} else {
+			mCompVariantContent.persistencyKey = ObjectPath.get("selector.persistencyKey", oFileContentClone);
+		}
 
 		if (oFileContentClone.layer === Layer.VENDOR || oFileContentClone.layer === Layer.CUSTOMER_BASE) {
 			mCompVariantContent.favorite = true;
