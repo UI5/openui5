@@ -51,6 +51,7 @@ sap.ui.define([
 
 		// system query options for collection responses, but not inside $expand
 	var rCollection = /[?&]\$(?:count|filter|orderby|search|skip|top)/,
+		sCommon = "/sap/opu/odata4/sap/zui5_testv4/default/iwbep/common/0001/",
 		sContext = "sap.ui.model.odata.v4.Context",
 		rCountTrue = /[?&]\$count=true/, // $count=true, but not inside $expand
 		rCountUrl = /\/\$count(?:\?|$)/, // URL for ".../$count?..."
@@ -9393,6 +9394,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// canonical path differs. See that a targeted message in the header "sap-messages" is resolved
 	// correctly and added to the input field's value state.
 	// SNOW: DINC0238556
+	//
+	// Use a longtextUrl relative to the request(!) URL (SNOW: CS20250010884391)
 ["$auto", "$direct"].forEach(function (sGroupId) {
 	QUnit.test(`DINC0238556: groupId=${sGroupId}`, async function (assert) {
 		const oModel = this.createTeaBusiModel({autoExpandSelect : true, groupId : sGroupId});
@@ -9413,23 +9416,31 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 		await this.createView(assert, sView, oModel);
 
+		const oOriginalMessage = {
+			code : "CODE",
+			// "code under test" (SNOW: CS20250010884391)
+			longtextUrl : "../../../../../../sap/zui5_testv4/default/iwbep/common/0001/"
+				+ "T100Longtexts('0815')", // Note: key predicate simplified unrealistically
+			message : "Just a message",
+			target : "Name",
+			numericSeverity : 2
+		};
 		this.expectChange("name", "Team*")
 			.expectRequest({
 				url : "PATCH TEAMS('TEAM')",
 				payload : {Name : "Team*"}
 			}, undefined, {
-				"sap-messages" : JSON.stringify([{
-					code : "CODE",
-					message : "Just a message",
-					target : "Name",
-					numericSeverity : 2
-				}])
+				"sap-messages" : JSON.stringify([oOriginalMessage])
 			})
 			.expectMessages([{
 				code : "CODE",
+				descriptionUrl : sCommon + "T100Longtexts('0815')", // SNOW: CS20250010884391
 				message : "Just a message",
 				persistent : true,
 				target : "/EMPLOYEES('1')/EMPLOYEE_2_TEAM/Name",
+				technicalDetails : {
+					originalMessage : oOriginalMessage // Note: MUST be unchanged
+				},
 				type : "Information"
 			}]);
 
@@ -9895,7 +9906,6 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// JIRA: CPOUI5ODATAV4-2812
 	QUnit.test('503, "Retry-After" handling: code lists', async function (assert) {
 		let bAnswerWith503 = false;
-		const sCommon = "/sap/opu/odata4/sap/zui5_testv4/default/iwbep/common/0001/";
 		const oModel = this.createSalesOrdersModel({autoExpandSelect : true}, {
 			[sCommon + "$metadata"] : {source : "odata/v4/data/metadata_codelist.xml"},
 			["GET " + sCommon + "Currencies?$select=CurrencyCode,DecimalPlaces,Text,ISOCode"] : [{
@@ -53625,10 +53635,6 @@ make root = ${bMakeRoot}`;
 	<Text id="id" text="{ID}"/>\
 </FlexBox>';
 
-			function withTransition(oObject) {
-				return Object.assign({}, {transition : true}, oObject);
-			}
-
 			this.expectRequest("TEAMS('42')/TEAM_2_MANAGER?custom=foo", {ID : "23"}, {
 					"sap-messages" : JSON.stringify(aMessages)
 				})
@@ -53638,7 +53644,7 @@ make root = ${bMakeRoot}`;
 					message : "text0",
 					persistent : true,
 					technicalDetails : {
-						originalMessage : withTransition(aMessages[0])
+						originalMessage : aMessages[0]
 					},
 					type : "Warning"
 				}, {
@@ -53646,7 +53652,7 @@ make root = ${bMakeRoot}`;
 					message : "text1",
 					persistent : true,
 					technicalDetails : {
-						originalMessage : withTransition(aMessages[1])
+						originalMessage : aMessages[1]
 					},
 					type : "Information"
 				}, {
@@ -53655,7 +53661,7 @@ make root = ${bMakeRoot}`;
 					persistent : true,
 					target : "/TEAMS('42')/TEAM_2_MANAGER",
 					technicalDetails : {
-						originalMessage : withTransition(aMessages[2])
+						originalMessage : aMessages[2]
 					},
 					type : "Success"
 				}, {
@@ -53664,7 +53670,7 @@ make root = ${bMakeRoot}`;
 					persistent : true,
 					target : "/TEAMS('42')/TEAM_2_MANAGER/Name",
 					technicalDetails : {
-						originalMessage : withTransition(aMessages[3])
+						originalMessage : aMessages[3]
 					},
 					type : "Success"
 				}])
@@ -73702,10 +73708,6 @@ make root = ${bMakeRoot}`;
 <Text id="id" text="{Team_Id}"/>\
 </FlexBox>';
 
-		function withTransition(oObject) {
-			return Object.assign({}, {transition : true}, oObject);
-		}
-
 		this.expectRequest("TEAMS('42')?$select=Team_Id", {Team_Id : "23"}, {
 				"sap-messages" : JSON.stringify(aMessages)
 			})
@@ -73716,7 +73718,7 @@ make root = ${bMakeRoot}`;
 				target : "/TEAMS('42')/TEAM_2_EMPLOYEES('1')"
 					+ "/EMPLOYEE_2_EQUIPMENTS(Category='Electronics',ID='33')/Name",
 				technicalDetails : {
-					originalMessage : withTransition(aMessages[0])
+					originalMessage : aMessages[0]
 				},
 				type : "Success"
 			}])
