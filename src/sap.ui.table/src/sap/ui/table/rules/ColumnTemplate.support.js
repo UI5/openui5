@@ -45,9 +45,9 @@ sap.ui.define([
 		minversion: "1.38",
 		categories: [Categories.Usage],
 		title: "Column template validation - 'sap.m.Text'",
-		description: "The 'wrapping' and/or 'renderWhitespace' property of the control 'sap.m.Text' is set to 'true' "
+		description: "The 'wrapping' property of the control 'sap.m.Text' is set to 'true' "
 					 + "although the control is used as a column template.",
-		resolution: "Set the 'wrapping' and 'renderWhitespace' property of the control 'sap.m.Text' to 'false' if the "
+		resolution: "Set the 'wrapping' property of the control 'sap.m.Text' to 'false' if the "
 					+ "control is used as a column template.",
 		check: function(oIssueManager, oCoreFacade, oScope) {
 			checkColumnTemplate(function(oTable, oColumn, oMTextTemplate) {
@@ -56,11 +56,6 @@ sap.ui.define([
 				if (oMTextTemplate.isBound("wrapping") || (!oMTextTemplate.isBound("wrapping") && oMTextTemplate.getWrapping())) {
 					SupportHelper.reportIssue(oIssueManager, "Column '" + sColumnId + "' of table '" + oTable.getId() + "' uses an "
 															 + "'sap.m.Text' control with wrapping enabled.", Severity.High, sColumnId);
-				}
-				if (oMTextTemplate.isBound("renderWhitespace") || (!oMTextTemplate.isBound("renderWhitespace")
-																   && oMTextTemplate.getRenderWhitespace())) {
-					SupportHelper.reportIssue(oIssueManager, "Column '" + sColumnId + "' of table '" + oTable.getId() + "' uses an "
-															 + "'sap.m.Text' control with renderWhitespace enabled.", Severity.High, sColumnId);
 				}
 			}, oScope, "sap.m.Text");
 		}
