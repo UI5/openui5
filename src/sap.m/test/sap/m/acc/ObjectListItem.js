@@ -270,7 +270,7 @@ sap.ui.define([
 		intro: "On behalf of John Smith",
 		title: "First status using icon font",
 		number: "3.62449",
-		firstStatus: new ObjectStatus({icon: IconPool.getIconURI("inbox")}).setTooltip("inbox")
+		firstStatus: new ObjectStatus({icon: IconPool.getIconURI("download")})
 	});
 	list.addItem(withFirstStatusIcon);
 

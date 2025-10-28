@@ -1250,13 +1250,16 @@ function(
 		StepInput.prototype._getRealValuePrecision = function () {
 			var sDigitsValue = this.getValue().toString().split("."),
 				sDigitsStep = this.getStep().toString().split("."),
+				sDigitsLargerStep = this.getLargerStep().toString().split("."),
 				iDigitsValueL,
-				iDigitsStepL;
+				iDigitsStepL,
+				iDigitsLargerStepL;
 
 			iDigitsValueL = (!sDigitsValue[1]) ? 0 : sDigitsValue[1].length;
 			iDigitsStepL = (!sDigitsStep[1]) ? 0 : sDigitsStep[1].length;
+			iDigitsLargerStepL = (!sDigitsLargerStep[1]) ? 0 : sDigitsLargerStep[1].length;
 
-			return (iDigitsValueL > iDigitsStepL) ? iDigitsValueL : iDigitsStepL;
+			return Math.max(iDigitsValueL, iDigitsStepL, iDigitsLargerStepL);
 		};
 
 		/**

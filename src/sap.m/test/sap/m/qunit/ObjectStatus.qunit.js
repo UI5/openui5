@@ -741,8 +741,8 @@ sap.ui.define([
 		$oInternalIcon = oObjectStatus._oImageControl.$();
 
 		// Assert
-		assert.strictEqual($oInternalIcon.attr("role"), "presentation", "Icon is decorative in icon-only ObjectStatus");
-		assert.strictEqual($oInternalIcon.attr("aria-label"), "status-inactive",
+		assert.strictEqual($oInternalIcon.attr("role"), "img", "Icon has img role in icon-only ObjectStatus");
+		assert.strictEqual($oInternalIcon.attr("aria-label"), Library.getResourceBundleFor("sap.m").getText("OBJECT_STATUS_ICON"),
 			"Icon has alternative text in icon-only ObjectStatus");
 
 		// Cleanup
@@ -759,7 +759,7 @@ sap.ui.define([
 		await nextUIUpdate();
 
 		// Assert
-		assert.strictEqual(document.getElementById("imgStatus-icon-title").innerHTML, Library.getResourceBundleFor("sap.m").getText("OBJECT_STATUS_ICON"), "Icon has alternative text in icon-only ObjectStatus");
+		assert.strictEqual(document.getElementById("imgStatus-icon").alt, Library.getResourceBundleFor("sap.m").getText("OBJECT_STATUS_ICON"), "Icon has alternative text in icon-only ObjectStatus");
 
 		// Cleanup
 		oObjectStatus.destroy();
@@ -769,14 +769,17 @@ sap.ui.define([
 		// Arrange
 		var oObjectStatus = new ObjectStatus("iconTooltipStatus", {
 			icon: "sap-icon://download"
-		});
+		}),
+		oInternalIcon;
 
 		oObjectStatus.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
+		oInternalIcon = oObjectStatus._oImageControl.$();
+
 		// Assert
 		assert.ok(Element.getElementById("iconTooltipStatus-icon").getUseIconTooltip(), "Default icon tooltip is used");
-		assert.strictEqual(document.getElementById("iconTooltipStatus-icon-title").innerHTML, "Download", "Icon tooltip is set as alternative text in icon-only ObjectStatus");
+		assert.strictEqual(oInternalIcon.attr("aria-label"), "Download", "Icon tooltip is set as alternative text in icon-only ObjectStatus");
 
 		// Act
 		oObjectStatus.setTooltip("Custom tooltip");
@@ -784,22 +787,6 @@ sap.ui.define([
 
 		// Assert
 		assert.notOk(Element.getElementById("iconTooltipStatus-icon").getUseIconTooltip(), "Custom tooltip is set as alternative text in icon-only ObjectStatus");
-
-		// Cleanup
-		oObjectStatus.destroy();
-	});
-
-	QUnit.test("Internal icon ARIA for icon-only ObjectStatus that can't be find in the Icon Registry", async function (assert) {
-		// Arrange
-		var oObjectStatus = new ObjectStatus("iconTooltipStatus", {
-				icon: "sap-icon://test"
-			});
-
-		oObjectStatus.placeAt("qunit-fixture");
-		await nextUIUpdate();
-
-		// Assert
-		assert.strictEqual(document.getElementById("iconTooltipStatus-icon-title").innerHTML, Library.getResourceBundleFor("sap.m").getText("OBJECT_STATUS_ICON"), "Icon has alternative text if it is not found in the IconRegistry");
 
 		// Cleanup
 		oObjectStatus.destroy();

@@ -677,6 +677,41 @@ sap.ui.define([
 		assert.ok(oFirstBullet.classList.contains("sapMSTActive"), "The first bullet is active");
 	});
 
+	QUnit.module("SlideTile width checks", {
+        beforeEach: async function() {
+            var oNewsTileContent = new TileContent({
+                content: new NewsContent()
+            });
+            var oGenericTile = new GenericTile({
+                frameType: "TwoByOne",
+                tileContent: [oNewsTileContent]
+            });
+            this.oSlideTile = new SlideTile("st-news", {
+                tiles: [oGenericTile]
+            });
+            this.oParent = document.createElement("div");
+            this.oParent.id = "slideTileParent";
+            document.body.appendChild(this.oParent);
+
+            this.oSlideTile.placeAt("slideTileParent");
+            await nextUIUpdate();
+        },
+        afterEach: function() {
+            this.oSlideTile.destroy();
+            document.body.removeChild(this.oParent);
+        }
+    });
+
+    QUnit.test("Width should be 23rem when parent has sapUshellSection class", async function(assert) {
+        this.oParent.classList.add("sapUshellSection");
+        await nextUIUpdate();
+
+        var sWidth = this.oSlideTile.$().css("width");
+        var fWidthInPx = parseFloat(sWidth);
+        var fExpectedPx = 23 * 16;
+        assert.equal(fWidthInPx,fExpectedPx,"Correct width applied");
+    });
+
 	QUnit.module("SlideTile has GenericTile with NewsContent", {
 		beforeEach: async function() {
 			var oNewsTileContent = new TileContent({

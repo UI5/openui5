@@ -47,7 +47,9 @@ sap.ui.define([
 			}
 		}
 
-		return utils.whenDOMReady().then(function() {
+		return utils.whenDOMReady()
+			.then(() => requireP("sap/ui/events/FocusEventFix"))
+			.then(function() {
 			/* Prepare body: Add QUnit DOM if missing, add CSS, ... */
 			insertDIV("qunit");
 			insertDIV("qunit-fixture");

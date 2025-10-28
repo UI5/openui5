@@ -142,6 +142,8 @@ sap.ui.define([
 		 *   "cross-service references". Supported since 1.81.0
 		 * @param {string} [mParameters.odataVersion="4.0"]
 		 *   The version of the OData service. Supported values are "2.0", "4.0", and "4.01".
+		 *   <b>Note:</b> "2.0" is deprecated since 1.143.0; migrate your service to OData V4 if
+		 *   possible.
 		 * @param {sap.ui.model.odata.OperationMode} [mParameters.operationMode]
 		 *   The operation mode for filtering and sorting. Since 1.39.0, the operation mode
 		 *   {@link sap.ui.model.odata.OperationMode.Server} is supported. All other operation modes

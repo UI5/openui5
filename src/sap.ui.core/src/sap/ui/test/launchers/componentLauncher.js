@@ -4,8 +4,9 @@
 sap.ui.define([
 	"sap/base/util/uid",
 	"sap/ui/core/Component",
-	"sap/ui/core/ComponentContainer"
-], function(uid, Component, ComponentContainer) {
+	"sap/ui/core/ComponentContainer",
+	"sap/ui/events/FocusEventFix"
+], function(uid, Component, ComponentContainer/*, FocusEventFix */) {
 	"use strict";
 
 	var _loadingStarted = false,
