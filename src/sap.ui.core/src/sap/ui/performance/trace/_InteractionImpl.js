@@ -2,7 +2,6 @@
  * ${copyright}
  */
 
-/*global HTMLScriptElement */
 sap.ui.define([
 	"sap/ui/performance/Measurement",
 	"sap/ui/performance/XHRInterceptor",
@@ -24,11 +23,18 @@ sap.ui.define([
 		bPerfectMatch = false,
 		bMatched = false,
 		iInteractionStepTimer,
+		iRenderingCounter = 0,
+		iRequestCounter = 0,
 		iInteractionCounter = 0,
 		bIdle = false,
 		bInteractionActive = false,
 		FESR,
-		oBrowserElement;
+		oBrowserElement,
+		lastHash;
+
+	const UI5_URL_SYMBOL = Symbol("ui5Url");
+	const UI5_REQUEST_INFO_SYMBOL = Symbol("ui5Url");
+	const mRequestInfo = new Map();
 
 	const mCompressedMimeTypes = {
 			"application/zip": true,
@@ -41,14 +47,9 @@ sap.ui.define([
 		},
 		sCompressedExtensions = "zip,rar,arj,z,gz,tar,lzh,cab,hqx,ace,jar,ear,war,jpg,jpeg,pdf,gzip";
 
-	function hexToAscii(sValue) {
-		var hex = sValue.toString();
-		var str = '';
-		for (var n = 0; n < hex.length; n += 2) {
-			str += String.fromCharCode(parseInt(hex.substr(n, 2), 16));
-		}
-		return str.trim();
-	}
+	let oAggregatedTiming;
+	let oValidAggregatedTiming;
+	let aTimingCache = [];
 
 	function createMeasurement(iTime) {
 		return {
@@ -56,7 +57,8 @@ sap.ui.define([
 			trigger: "undetermined", // control which triggered interaction
 			component: "undetermined", // component or app identifier
 			appVersion: "undetermined", // application version as from app descriptor
-			start: iTime || performance.timeOrigin, // interaction start - page timeOrigin if initial
+			start: iTime, // interaction start - page timeOrigin if initial
+			preliminaryEnd: 0,
 			end: 0, // interaction end
 			navigation: 0, // sum over all navigation times
 			roundtrip: 0, // time from first request sent to last received response end - without gaps and ignored overlap
@@ -73,7 +75,10 @@ sap.ui.define([
 			busyDuration: 0, // summed GlobalBusyIndicator duration during this interaction
 			id: uid(), //Interaction ID
 			passportAction: "undetermined_startup_0", //default PassportAction for startup
-			rootId: undefined // root context ID
+			rootId: undefined, // root context ID
+			fesrecTime: 0, // sum over all backend times as reported by sap-perf-fesrec header
+			fesrecRequestTime: 0, // sum over all requests which have sap-perf-fesrec header
+			fesrecRequestCount: 0 // number of requests which have sap-perf-fesrec header
 		};
 	}
 
@@ -97,82 +102,107 @@ sap.ui.define([
 	 */
 	function isValidInteractionXHR(oRequestTiming) {
 		// if the request has been completed it has complete timing figures)
-		var bComplete = oRequestTiming.startTime > 0 &&
-			oRequestTiming.startTime <= oRequestTiming.requestStart &&
-			oRequestTiming.requestStart <= oRequestTiming.responseEnd;
+		const bPartOfInteraction = oPendingInteraction.start - performance.timeOrigin <= oRequestTiming.startTime
+			&& oPendingInteraction.end - performance.timeOrigin >= oRequestTiming.responseEnd;
+		const bStartsInInteraction = oPendingInteraction.start - performance.timeOrigin <= oRequestTiming.startTime;
+		const oRequestInfo = oRequestTiming[UI5_REQUEST_INFO_SYMBOL];
+		const bCached = oRequestTiming.transferSize === 0 && oRequestTiming.decodedBodySize > 0;
+		const bIsValid = !bCached && !isCrossOriginURL(oRequestTiming.name) && oRequestInfo && bPartOfInteraction && oRequestTiming.initiatorType === "xmlhttprequest";
 
-		var bPartOfInteraction = oPendingInteraction.start <= (performance.timeOrigin + oRequestTiming.requestStart) &&
-			oPendingInteraction.end >= (performance.timeOrigin + oRequestTiming.responseEnd);
+		// calculate navigation and roundtrip time for all requests to calculate client CPU time
+		if (bStartsInInteraction) {
+			oAggregatedTiming ??= {
+				navigation: 0,
+				roundtrip: 0,
+				// for CPU calculation consider requests starting at interaction start to include index loading...
+				roundtripLowerLimit: oPendingInteraction.start - performance.timeOrigin ? oRequestTiming.startTime : 0,
+				roundtripHigherLimit: oRequestTiming.responseEnd
+			};
+			aggregateRequestTiming(oRequestTiming, oAggregatedTiming);
+		}
 
-		return bPartOfInteraction && bComplete && oRequestTiming.initiatorType === "xmlhttprequest";
+		// calculate navigation and roundtrip time for all non CORS requests
+		if (bIsValid) {
+			oValidAggregatedTiming ??= {
+				navigation: 0,
+				roundtrip: 0,
+				roundtripLowerLimit: oRequestTiming.startTime,
+				roundtripHigherLimit: oRequestTiming.responseEnd
+			};
+			aggregateRequestTiming(oRequestTiming, oValidAggregatedTiming);
+			// collect bytes and network time for valid requests
+			oPendingInteraction.bytesReceived += oRequestInfo.bytesReceived;
+			oPendingInteraction.bytesSent += oRequestInfo.bytesSent;
+			// this should be true only if all responses are compressed
+			oPendingInteraction.requestCompression = oRequestInfo.requestCompression && (oPendingInteraction.requestCompression !== false);
+			// sum up request time as a grand total over all requests
+			oPendingInteraction.requestTime += (oRequestTiming.responseEnd - oRequestTiming.startTime);
+			if (oRequestInfo.fesrecTime) {
+				// sap-perf-fesrec header contains milliseconds
+				oPendingInteraction.fesrecTime += oRequestInfo.fesrecTime;
+				oPendingInteraction.fesrecRequestTime += (oRequestTiming.responseEnd - oRequestTiming.startTime);
+				oPendingInteraction.fesrecRequestCount++;
+			}
+		}
+		return bIsValid;
 	}
 
-	function aggregateRequestTiming(oRequest) {
-		// aggregate navigation and roundtrip with respect to requests overlapping and times w/o requests (gaps)
-		this.end = oRequest.responseEnd > this.end ? oRequest.responseEnd : this.end;
-		// sum up request time as a grand total over all requests
-		oPendingInteraction.requestTime += (oRequest.responseEnd - oRequest.startTime);
-
-		// if there is a gap between requests we add the times to the aggrgate and shift the lower limits
-		if (this.roundtripHigherLimit <= oRequest.startTime) {
-			oPendingInteraction.navigation += (this.navigationHigherLimit - this.navigationLowerLimit);
-			oPendingInteraction.roundtrip += (this.roundtripHigherLimit - this.roundtripLowerLimit);
-			this.navigationLowerLimit = oRequest.startTime;
-			this.roundtripLowerLimit = oRequest.startTime;
+	function aggregateRequestTiming(oRequest, oTiming) {
+		if (oRequest.responseEnd <= oPendingInteraction.end - performance.timeOrigin) { // request is completely within interaction time
+			// if there is a gap between requests we add the times to the aggregate and shift the limits
+			if (oTiming.roundtripHigherLimit <= oRequest.startTime) {
+				oTiming.roundtrip += (oTiming.roundtripHigherLimit - oTiming.roundtripLowerLimit);
+				oTiming.roundtripLowerLimit = oRequest.startTime;
+				oTiming.roundtripHigherLimit = oRequest.responseEnd;
+			} else if (oRequest.responseEnd > oTiming.roundtripHigherLimit) { // no gap
+				// shift the limits if the request was completed later than the earlier requests
+				oTiming.roundtripHigherLimit = oRequest.responseEnd;
+			}
+		} else if (oRequest.startTime < oPendingInteraction.end - performance.timeOrigin) { // request was only partially within interaction time
+			// shift limit to end of interaction for CPU time calculation
+			oTiming.roundtripHigherLimit = oPendingInteraction.end - performance.timeOrigin;
 		}
-
-		// shift the limits if this request was completed later than the earlier requests
-		if (oRequest.responseEnd > this.roundtripHigherLimit) {
-			this.roundtripHigherLimit = oRequest.responseEnd;
-		}
-		if (oRequest.requestStart > this.navigationHigherLimit) {
-			this.navigationHigherLimit = oRequest.requestStart;
-		}
-	}
-
-	function aggregateRequestTimings(aRequests) {
-		var oTimings = {
-			start: aRequests[0].startTime,
-			end: aRequests[0].responseEnd,
-			navigationLowerLimit: aRequests[0].startTime,
-			navigationHigherLimit: aRequests[0].requestStart,
-			roundtripLowerLimit: aRequests[0].startTime,
-			roundtripHigherLimit: aRequests[0].responseEnd
-		};
-
-		// aggregate all timings by operating on the oTimings object
-		aRequests.forEach(aggregateRequestTiming, oTimings);
-		oPendingInteraction.navigation += (oTimings.navigationHigherLimit - oTimings.navigationLowerLimit);
-		oPendingInteraction.roundtrip += (oTimings.roundtripHigherLimit - oTimings.roundtripLowerLimit);
-
-		// calculate average network time per request
-		if (oPendingInteraction.networkTime) {
-			var iTotalNetworkTime = oPendingInteraction.requestTime - oPendingInteraction.networkTime;
-			oPendingInteraction.networkTime = iTotalNetworkTime / aRequests.length;
-		} else {
-			oPendingInteraction.networkTime = 0;
-		}
+		oTiming.navigation += oRequest.requestStart ? oRequest.requestStart - oRequest.startTime : 0;
 	}
 
 	function finalizeInteraction(iTime) {
 		if (oPendingInteraction) {
-			var aAllRequestTimings = performance.getEntriesByType("resource");
-			var oFinshedInteraction;
-			oPendingInteraction.end = iTime;
-			oPendingInteraction.processing = iTime - oPendingInteraction.start;
-			oPendingInteraction.duration = oPendingInteraction.processing;
-			oPendingInteraction.requests = aAllRequestTimings.filter(isValidInteractionXHR);
+			let oFinshedInteraction;
+			oPendingInteraction.legacyEndTime = oPendingInteraction.legacyEndTime || now(); //ts
+			oPendingInteraction.legacyDuration = oPendingInteraction.legacyEndTime - oPendingInteraction.start; //ms
+			oPendingInteraction.end = iTime; //ts
+			oPendingInteraction.duration = oPendingInteraction.end - oPendingInteraction.start; //ms
+			// copy missing entries into cache
+			aTimingCache.push(...performance.getEntriesByType("resource"));
+			// sort by start time like done in performance.getEntriesByType
+			aTimingCache.sort((a, b) => {
+				return a.startTime - b.startTime;
+			});
+			oPendingInteraction.requests = aTimingCache.filter(isValidInteractionXHR);
+
+			// calculate the roundtrip time for all valid requests
+			oPendingInteraction.roundtrip = oValidAggregatedTiming ? oValidAggregatedTiming.roundtrip + (oValidAggregatedTiming.roundtripHigherLimit - oValidAggregatedTiming.roundtripLowerLimit) : 0;
+			// set navigation time for all valid requests
+			oPendingInteraction.navigation = oValidAggregatedTiming ? oValidAggregatedTiming.navigation : 0;
+
+			// calculate the last roundtrip time for all requests to calculate CPU time correctly
+			oPendingInteraction.roundtripAllRequests = oAggregatedTiming ? oAggregatedTiming.roundtrip + (oAggregatedTiming.roundtripHigherLimit - oAggregatedTiming.roundtripLowerLimit) : 0;
+
+			// calculate average network time per request
+			if (oPendingInteraction.fesrecTime) {
+				const iTotalNetworkTime = oPendingInteraction.fesrecRequestTime - oPendingInteraction.fesrecTime;
+				oPendingInteraction.networkTime = iTotalNetworkTime / oPendingInteraction.fesrecRequestCount;
+			} else {
+				oPendingInteraction.networkTime = 0;
+			}
+
 			oPendingInteraction.completeRoundtrips = 0;
 			oPendingInteraction.measurements = Measurement.filterMeasurements(isCompleteMeasurement, true);
-			if (oPendingInteraction.requests.length > 0) {
-				aggregateRequestTimings(oPendingInteraction.requests);
-			}
 			oPendingInteraction.completeRoundtrips = oPendingInteraction.requests.length;
 
-			// calculate real processing time if any processing took place
-			// cannot be negative as then requests took longer than processing
-			var iProcessing = oPendingInteraction.processing - oPendingInteraction.navigation - oPendingInteraction.roundtrip;
-			oPendingInteraction.processing = iProcessing > -1 ? iProcessing : 0;
+			// calculate CPU exclusive time if all neccessary infos are available. Otherwise set it to -1
+			const iProcessing = oPendingInteraction.duration - oPendingInteraction.roundtripAllRequests;
+			oPendingInteraction.processing = iRequestCounter > 0 ? -1 : iProcessing;
 
 			oPendingInteraction.completed = true;
 
@@ -189,29 +219,32 @@ sap.ui.define([
 				FESR.onInteractionFinished(oFinshedInteraction);
 			}
 			Object.freeze(oPendingInteraction);
+			oAggregatedTiming = null;
+			oValidAggregatedTiming = null;
 			oPendingInteraction = null;
 			oCurrentBrowserEvent = null;
 			bIsNavigation = false;
 			bMatched = false;
 			bPerfectMatch = false;
+			aTimingCache = [];
 			clearTimeout(iResetCurrentBrowserEventTimer);
 		}
 	}
 
 	// component determination - heuristic
 	function createOwnerComponentInfo(oSrcElement) {
-		var sId, sVersion;
+		let sName, sId, sVersion;
 		if (oSrcElement) {
-			var Component, oComponent;
-			Component = sap.ui.require("sap/ui/core/Component");
+			const Component = sap.ui.require("sap/ui/core/Component");
 			if (Component) {
 				while (oSrcElement && oSrcElement.getParent) {
-					oComponent = Component.getOwnerComponentFor(oSrcElement);
+					let oComponent = Component.getOwnerComponentFor(oSrcElement);
 					if (oComponent || oSrcElement instanceof Component) {
 						oComponent = oComponent || oSrcElement;
-						var oApp = oComponent.getManifestEntry("sap.app");
+						const oApp = oComponent.getManifestEntry("sap.app");
 						// get app id or module name for FESR
-						sId = oApp && oApp.id || oComponent.getMetadata().getName();
+						sId = oComponent.getId();
+						sName = oApp && oApp.id || oComponent.getMetadata().getName();
 						sVersion = oApp && oApp.applicationVersion && oApp.applicationVersion.version;
 					}
 					oSrcElement = oSrcElement.getParent();
@@ -219,7 +252,8 @@ sap.ui.define([
 			}
 		}
 		return {
-			id: sId ? sId : "undetermined",
+			id: sId,
+			name: sName ? sName : "undetermined",
 			version: sVersion ? sVersion : ""
 		};
 	}
@@ -237,7 +271,7 @@ sap.ui.define([
 				var fnDone;
 
 				if (!this.dataset.sapUiCoreInteractionHandled) {
-					fnDone = _InteractionImpl.notifyAsyncStep();
+					fnDone = _InteractionImpl.notifyAsyncStep("request");
 					this.addEventListener("load", function() {
 						fnDone();
 					});
@@ -255,61 +289,34 @@ sap.ui.define([
 	function registerXHROverrides() {
 		// store the byte size of the body
 		XHRInterceptor.register("INTERACTION", "send" ,function() {
-			if (this.oPendingInteraction) {
+			if (this.oPendingInteraction && !isCrossOriginURL(this[UI5_URL_SYMBOL])) {
 				// double string length for byte length as in js characters are stored as 16 bit ints
-				this.oPendingInteraction.bytesSent += arguments[0] ? arguments[0].length : 0;
+				mRequestInfo.get(this._id).bytesSent += arguments[0] ? arguments[0].length : 0;
 			}
 		});
 
 		// store request header size
 		XHRInterceptor.register("INTERACTION", "setRequestHeader", function(sHeader, sValue) {
-			// count request header length consistent to what getAllResponseHeaders().length would return
-			if (!this.requestHeaderLength) {
-				this.requestHeaderLength = 0;
+			if (oPendingInteraction && !isCrossOriginURL(this[UI5_URL_SYMBOL])) {
+				mRequestInfo.get(this._id).bytesSent += (sHeader + "").length + (sValue + "").length;
 			}
-			// assume request header byte size
-			this.requestHeaderLength += (sHeader + "").length + (sValue + "").length;
-
 		});
 
 		// register the response handler for data collection
 		XHRInterceptor.register("INTERACTION", "open", function (sMethod, sUrl, bAsync) {
-			var sEpp,
-				sAction,
-				sRootContextID;
 
-			function handleInteraction(fnDone) {
-				if (this.readyState === 4) {
-					fnDone();
-				}
-			}
-			// we only need to take care of requests when we have a running interaction
-			if (oPendingInteraction) {
-				var bIsNoCorsRequest = !isCrossOriginURL(sUrl);
+			// remember url for later use in handleResponse/setRequestHeader
+			this[UI5_URL_SYMBOL] = new URL(sUrl, document.baseURI).href;
+
+			if (oPendingInteraction && !isCrossOriginURL(this[UI5_URL_SYMBOL])) {
 				// only use Interaction for non CORS requests
-				if (bIsNoCorsRequest) {
-					//only track if FESR.clientID == EPP.Action && FESR.rootContextID == EPP.rootContextID
-					sEpp = FESR?.passportHeader.get(this);
-					if (sEpp && sEpp.length >= 370) {
-						sAction = hexToAscii(sEpp.substring(150, 230));
-						if (parseInt(sEpp.substring(8, 10), 16) > 2) { // version number > 2 --> extended passport
-							sRootContextID = sEpp.substring(372, 404);
-						}
-					}
-					if (!sEpp || sAction && sRootContextID && oPendingInteraction.passportAction.endsWith(sAction)) {
-						this.addEventListener("readystatechange", handleResponse.bind(this,  oPendingInteraction.id));
-					}
-				}
-				// arguments at position 2 is indicatior whether request is async or not
-				// readystatechange must not be used for sync CORS request since it does not work properly
-				// this is especially necessary in case request was not started by LoaderExtension
-				// bAsync is by default true, therefore we need to check eplicitly for value 'false'
-				if (bIsNoCorsRequest || bAsync !== false) {
-					// notify async step for all XHRs (even CORS requests)
-					this.addEventListener("readystatechange", handleInteraction.bind(this, _InteractionImpl.notifyAsyncStep()));
-				}
+				this.addEventListener("readystatechange", handleResponse.bind(this, oPendingInteraction.id, _InteractionImpl.notifyAsyncStep("request")));
+				const oRequestInfo = Object.create(null);
+				// init bytesSent
+				oRequestInfo.bytesSent = 0;
 				// assign the current interaction to the xhr for later response header retrieval.
-				this.oPendingInteraction = oPendingInteraction;
+				oRequestInfo.pendingInteraction = oPendingInteraction;
+				mRequestInfo.set(this._id, oRequestInfo);
 			}
 		});
 
@@ -332,33 +339,42 @@ sap.ui.define([
 	}
 
 	// response handler which uses the custom properties we added to the xhr to retrieve information from the response headers
-	function handleResponse(sId) {
+	function handleResponse(sId, fnDone) {
 		if (this.readyState === 4) {
-			if (this.oPendingInteraction && !this.oPendingInteraction.completed && oPendingInteraction.id === sId) {
-				// enrich interaction with information
-				var sContentLength = this.getResponseHeader("content-length"),
-					bCompressed = checkCompression(this.responseURL, this.getResponseHeader("content-encoding"), this.getResponseHeader("content-type"), sContentLength),
-					sFesrec = this.getResponseHeader("sap-perf-fesrec");
-				this.oPendingInteraction.bytesReceived += sContentLength ? parseInt(sContentLength) : 0;
-				this.oPendingInteraction.bytesReceived += this.getAllResponseHeaders().length;
-				this.oPendingInteraction.bytesSent += this.requestHeaderLength || 0;
-				// this should be true only if all responses are compressed
-				this.oPendingInteraction.requestCompression = bCompressed && (this.oPendingInteraction.requestCompression !== false);
-				// sap-perf-fesrec header contains milliseconds
-				this.oPendingInteraction.networkTime += sFesrec ? Math.round(parseFloat(sFesrec, 10) / 1000) : 0;
-				var sSapStatistics = this.getResponseHeader("sap-statistics");
-				if (sSapStatistics) {
-					var aTimings = performance.getEntriesByType("resource");
-					this.oPendingInteraction.sapStatistics.push({
-						// add response url for mapping purposes
-						url: this.responseURL,
-						statistics: sSapStatistics,
-						timing: aTimings ? aTimings[aTimings.length - 1] : undefined
+			const oRequestInfo = mRequestInfo.get(this._id);
+			let aTimings = performance.getEntriesByType("resource");
+			aTimingCache.push(...aTimings);
+			performance.clearResourceTimings();
+			if (!oPendingInteraction?.completed && oPendingInteraction?.id === sId) {
+				if (oRequestInfo) {
+					aTimings = aTimings.filter((timing) => {
+						return timing.name === this[UI5_URL_SYMBOL];
 					});
+					// enrich interaction with information
+					const sContentLength = this.getResponseHeader("content-length"),
+						bCompressed = checkCompression(this.responseURL, this.getResponseHeader("content-encoding"), this.getResponseHeader("content-type"), sContentLength),
+						sFesrec = this.getResponseHeader("sap-perf-fesrec");
+
+					oRequestInfo.bytesReceived = sContentLength ? parseInt(sContentLength) : 0;
+					oRequestInfo.bytesReceived = this.getAllResponseHeaders().length;
+					// this should be true only if all responses are compressed
+					oRequestInfo.requestCompression = bCompressed;
+
+					// sap-perf-fesrec header contains milliseconds
+					oRequestInfo.fesrecTime = sFesrec ? Math.round(parseFloat(sFesrec, 10) / 1000) : 0;
+					const sSapStatistics = this.getResponseHeader("sap-statistics");
+					aTimings[0][UI5_REQUEST_INFO_SYMBOL] = oRequestInfo;
+					if (sSapStatistics) {
+						oRequestInfo.pendingInteraction.sapStatistics.push({
+							// add response url for mapping purposes
+							url: this.responseURL,
+							statistics: sSapStatistics,
+							timing: aTimings ? aTimings[aTimings.length - 1] : undefined
+						});
+					}
 				}
-				delete this.requestHeaderLength;
-				delete this.oPendingInteraction;
 			}
+			fnDone();
 		}
 	}
 
@@ -392,7 +408,7 @@ sap.ui.define([
 		},
 
 		start : function(sType, oSrcElement) {
-			var iTime = now();
+			const iTime = sType === "startup" ? performance.timeOrigin : now();
 
 			if (oPendingInteraction) {
 				finalizeInteraction(iTime);
@@ -404,18 +420,22 @@ sap.ui.define([
 			}
 
 			iInteractionCounter = 0;
+			iRenderingCounter = 0;
+			iRequestCounter = 0;
 
 			// clear request timings for new interaction
-			if (performance.clearResourceTimings) {
+			if (sType !== "startup" && performance.clearResourceTimings) {
 				performance.clearResourceTimings();
 			}
 
-			var oComponentInfo = createOwnerComponentInfo(oSrcElement);
-
 			// setup new pending interaction
 			oPendingInteraction = createMeasurement(iTime);
+
+			const oComponentInfo = createOwnerComponentInfo(oSrcElement);
+			oPendingInteraction.componentId = oComponentInfo.id;
+			oPendingInteraction.component = oComponentInfo.name;
+
 			oPendingInteraction.event = sType;
-			oPendingInteraction.component = oComponentInfo.id;
 			oPendingInteraction.appVersion = oComponentInfo.version;
 			if (oSrcElement && oSrcElement.getId) {
 				oPendingInteraction.trigger = oSrcElement.getId();
@@ -557,18 +577,26 @@ sap.ui.define([
 			}
 		},
 
-		notifyAsyncStep : function(sStepName) {
+		notifyControlRendering : function(sOwnerId, sStepName) {
 			if (oPendingInteraction) {
-				/*eslint-disable no-console */
-				if (Log.isLoggable(null, "sap.ui.Performance") && sStepName) {
-					console.time(sStepName);
+				iRenderingCounter++;
+				if (Log.isLoggable()) {
+					Log.debug("Interaction relevant step started - Number of pending steps: " + (iInteractionCounter + iRenderingCounter + iRequestCounter));
 				}
-				/*eslint-enable no-console */
-				var sInteractionId = oPendingInteraction.id;
-				delete oPendingInteraction.preliminaryEnd; // Delete prelimanry end to force current timestamp of finalization
-				_InteractionImpl.notifyAsyncStepStart();
 				return function() {
-					_InteractionImpl.notifyAsyncStepEnd(sInteractionId);
+					iRenderingCounter--;
+					const a2aComponentId = _InteractionImpl._a2aNavInfo.get(oPendingInteraction.hash);
+					if (oPendingInteraction.componentId) {
+						if (a2aComponentId && a2aComponentId === sOwnerId || sOwnerId === oPendingInteraction.componentId) {
+							_InteractionImpl.end(); // set preliminary end time
+						}
+					} else {
+						_InteractionImpl.end(); // set preliminary end time
+					}
+					_InteractionImpl.notifyStepEnd(true);
+					if (Log.isLoggable()) {
+						Log.debug("Interaction relevant step stopped - Number of pending steps: " + (iInteractionCounter + iRenderingCounter + iRequestCounter));
+					}
 					/*eslint-disable no-console */
 					if (Log.isLoggable(null, "sap.ui.Performance") && sStepName) {
 						console.timeEnd(sStepName);
@@ -580,30 +608,61 @@ sap.ui.define([
 			}
 		},
 
-		notifyAsyncStepStart : function() {
+		notifyAsyncStep : function(sType, sStepName) {
 			if (oPendingInteraction) {
-				iInteractionCounter++;
+				/*eslint-disable no-console */
+				if (Log.isLoggable(null, "sap.ui.Performance") && sStepName) {
+					console.time(sStepName);
+				}
+				/*eslint-enable no-console */
+				var sInteractionId = oPendingInteraction.id;
+				_InteractionImpl.notifyAsyncStepStart(sType);
+				return function() {
+					_InteractionImpl.notifyAsyncStepEnd(sType, sInteractionId);
+					/*eslint-disable no-console */
+					if (Log.isLoggable(null, "sap.ui.Performance") && sStepName) {
+						console.timeEnd(sStepName);
+					}
+					/*eslint-enable no-console */
+				};
+			} else {
+				return function() {};
+			}
+		},
+
+		notifyAsyncStepStart : function(sType) {
+			if (oPendingInteraction) {
+				if (sType === "request") {
+					iRequestCounter++;
+				} else {
+					iInteractionCounter++;
+				}
 				clearTimeout(iInteractionStepTimer);
+				delete oPendingInteraction.legacyEndTime;
 				bIdle = false;
 				if (Log.isLoggable()) {
-					Log.debug("Interaction relevant step started - Number of pending steps: " + iInteractionCounter);
+					Log.debug("Interaction relevant step started - Number of pending steps: " + (iInteractionCounter + iRenderingCounter + iRequestCounter));
 				}
 			}
 		},
 
-		notifyAsyncStepEnd : function(sId) {
+		notifyAsyncStepEnd : function(sType, sId) {
 			if (oPendingInteraction && sId === oPendingInteraction.id) {
-				iInteractionCounter--;
+				if (sType === "request") {
+					iRequestCounter--;
+				} else {
+					iInteractionCounter--;
+				}
 				_InteractionImpl.notifyStepEnd(true);
 				if (Log.isLoggable()) {
-					Log.debug("Interaction relevant step stopped - Number of pending steps: " + iInteractionCounter);
+					Log.debug("Interaction relevant step stopped - Number of pending steps: " + (iInteractionCounter + iRenderingCounter + iRequestCounter));
 				}
 			}
 		},
 
 		notifyStepEnd : function(bCheckIdle) {
 			if (bInteractionActive) {
-				if (iInteractionCounter === 0 || !bCheckIdle) {
+				if ((iInteractionCounter === 0 && iRenderingCounter === 0 && iRequestCounter === 0) || !bCheckIdle) {
 					if (bIdle || !bCheckIdle) {
 						_InteractionImpl.end(true);
 						if (Log.isLoggable()) {
@@ -611,7 +670,7 @@ sap.ui.define([
 						}
 						bIdle = false;
 					} else {
-						_InteractionImpl.end(); //set preliminary end time
+						oPendingInteraction.legacyEndTime = now();
 						bIdle = true;
 						if (iInteractionStepTimer) {
 							clearTimeout(iInteractionStepTimer);
@@ -621,7 +680,7 @@ sap.ui.define([
 						// with 301ms to end the Interaction after execution of the debounced event
 						iInteractionStepTimer = setTimeout(_InteractionImpl.notifyStepEnd, 301);
 						if (Log.isLoggable()) {
-							Log.debug("Interaction check for bIdle time - Number of pending steps: " + iInteractionCounter);
+							Log.debug("Interaction check for bIdle time - Number of pending steps: " + (iInteractionCounter + iRenderingCounter + iRequestCounter));
 						}
 					}
 				}
@@ -680,18 +739,45 @@ sap.ui.define([
 			bInteractionActive = bActive;
 			if (bActive) {
 				_InteractionImpl.notifyStepStart("startup", "startup", true);
+				// listen to hash changes. If the first degment changes we guess its an A2A navigation
+				globalThis.addEventListener('hashchange', function() {
+					// Get the hash from the current URL
+					const hash = globalThis.location.hash;
+
+					// Regular expression to extract the first segment of the hash
+					const match = hash.match(/#([^&/]+)/);
+
+					if (match?.[0]) {
+						if (!lastHash) {
+							lastHash = match[0];
+						} else if (lastHash !== match[0]) {
+							if (this.getPending() && !this.getPending().maybeA2A) {
+								// mark pending interaction as A2A navigation
+								this.getPending().maybeA2A = match[0];
+							}
+							lastHash = match[0];
+						}
+					}
+				}.bind(this));
+				// Get the initial hash from the current URL
+				lastHash = lastHash || globalThis.location.hash.match(/#([^&/]+)/)?.[0];
 			}
 		},
 
 		_setFESR: function(oFESR) {
 			FESR = oFESR;
-		}
+		},
+
+		_a2aNavInfo: new Map(),
+
+		_createOwnerComponentInfo: createOwnerComponentInfo
+
 	};
 
 	registerXHROverrides();
 	interceptScripts();
 
-	LoaderExtensions.notifyResourceLoading = _InteractionImpl.notifyAsyncStep;
+	LoaderExtensions.notifyResourceLoading = _InteractionImpl.notifyAsyncStep.bind(this, "request");
 
 	return _InteractionImpl;
 });

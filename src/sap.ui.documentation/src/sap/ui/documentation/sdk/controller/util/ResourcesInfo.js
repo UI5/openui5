@@ -9,6 +9,12 @@ sap.ui.define([], function () {
 	var aResources = [
 		// #1 Category: Featured
 		{
+			"id": "fioriDevPortal",
+			"text": "SAP Fiori Development Portal",
+			"href": "test-resources/sap/fe/core/fpmExplorer/index.html",
+			"isDistributionScope": true
+		},
+		{
 			"id": "iconExplorer",
 			"text": "Icon Explorer",
 			"href": "test-resources/sap/m/demokit/iconExplorer/webapp/index.html"
@@ -44,12 +50,6 @@ sap.ui.define([], function () {
 			"id": "mcpserver",
 			"text": "UI5 MCP server",
 			"href": "https://github.com/UI5/mcp-server"
-		},
-		{
-			"id": "fpmExplorer",
-			"text": "Flexible Programming Model Explorer",
-			"href": "test-resources/sap/fe/core/fpmExplorer/index.html#/overview/introduction",
-			"isDistributionScope": true
 		},
 		{
 			"id": "businessAppStudio",

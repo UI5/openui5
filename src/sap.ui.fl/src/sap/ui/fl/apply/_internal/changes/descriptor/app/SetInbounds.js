@@ -19,8 +19,8 @@ sap.ui.define([
 	};
 
 	/**
-	* Descriptor change merger for change type <code>appdescr_app_addNewInbound</code>.
-	* Adds a new inbound <code>sap.app/crossNavigation/inbounds</code> to the app.
+	* Descriptor change merger for change type <code>appdescr_app_setInbounds</code>.
+	* Overwrites all existing inbounds with new inbounds <code>sap.app/crossNavigation/inbounds</code> to the app.
 	*
 	* Available for build {@link sap.ui.fl.apply._internal.changes.descriptor.RegistrationBuild}.
 	*
@@ -30,16 +30,16 @@ sap.ui.define([
 	* @private
 	* @ui5-restricted sap.ui.fl.apply._internal
 	*/
-	const AddNewInbound = /** @lends sap.ui.fl.apply._internal.changes.descriptor.app.AddNewInbound */ {
+	const SetInbounds = /** @lends sap.ui.fl.apply._internal.changes.descriptor.app.SetInbounds */ {
 
 		/**
-		* Method to apply the  <code>appdescr_app_addNewInbound</code> change to the manifest.
+		* Method to apply the  <code>appdescr_app_setInbounds</code> change to the manifest.
 		*
 		* @param {object} oManifest - Original manifest
-		* @param {sap.ui.fl.apply._internal.flexObjects.AppDescriptorChange} oChange - Change with type <code>appdescr_app_addNewInbound</code>
+		* @param {sap.ui.fl.apply._internal.flexObjects.AppDescriptorChange} oChange - Change with type <code>appdescr_app_setInbounds</code>
 		* @param {object} oChange.content - Details of the change
-		* @param {object} oChange.content.inbound - Inbound <code>content.inbound</code> that is being added
-		* @returns {object} Updated manifest with new inbound <code>sap.app/crossNavigation/inbounds/<new_inbound_id></code>
+		* @param {object} oChange.content.inbounds - Inbounds <code>content.inbounds</code> that is being added
+		* @returns {object} Updated manifest with new inbounds <code>sap.app/crossNavigation/inbounds/<new_inbound_id></code>
 		*
 		* @private
 		* @ui5-restricted sap.ui.fl.apply._internal
@@ -49,24 +49,23 @@ sap.ui.define([
 			oManifest["sap.app"].crossNavigation.inbounds ||= {};
 
 			const oChangeContent = oChange.getContent();
-			const sInboundId = DescriptorChangeCheck.getAndCheckContentObject(oChangeContent, {
-				sKey: "inbound",
+			const aInboundIds = DescriptorChangeCheck.getAndCheckContentObject(oChangeContent, {
+				sKey: "inbounds",
 				sChangeType: oChange.getChangeType(),
-				iMaxNumberOfKeys: 1,
+				iMaxNumberOfKeys: -1, // unlimited entries
 				aMandatoryProperties: MANDATORY_PROPERTIES,
 				aSupportedProperties: SUPPORTED_PROPERTIES,
 				oSupportedPropertyPattern: PROPERTIES_PATTERNS
 			});
-			const oInboundInManifest = oManifest["sap.app"].crossNavigation.inbounds[sInboundId];
-			if (!oInboundInManifest) {
+			aInboundIds.forEach((sInboundId) => {
 				DescriptorChangeCheck.checkIdNamespaceCompliance(sInboundId, oChange);
-				oManifest["sap.app"].crossNavigation.inbounds[sInboundId] = oChangeContent.inbound[sInboundId];
-			} else {
-				throw new Error(`Inbound with ID "${sInboundId}" already exist.`);
-			}
+			});
+			// Overwrite all inbounds with the new ones
+			oManifest["sap.app"].crossNavigation.inbounds = oChangeContent.inbounds;
+
 			return oManifest;
 		}
 	};
 
-	return AddNewInbound;
+	return SetInbounds;
 });

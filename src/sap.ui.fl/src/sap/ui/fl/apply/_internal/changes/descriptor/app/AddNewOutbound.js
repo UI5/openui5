@@ -49,7 +49,14 @@ sap.ui.define([
 			oManifest["sap.app"].crossNavigation.outbounds ||= {};
 
 			const oChangeContent = oChange.getContent();
-			const sOutboundId = DescriptorChangeCheck.getAndCheckContentObject(oChangeContent, "outbound", oChange.getChangeType(), MANDATORY_PROPERTIES, SUPPORTED_PROPERTIES, PROPERTIES_PATTERNS);
+			const sOutboundId = DescriptorChangeCheck.getAndCheckContentObject(oChangeContent, {
+				sKey: "outbound",
+				sChangeType: oChange.getChangeType(),
+				iMaxNumberOfKeys: 1,
+				aMandatoryProperties: MANDATORY_PROPERTIES,
+				aSupportedProperties: SUPPORTED_PROPERTIES,
+				oSupportedPropertyPattern: PROPERTIES_PATTERNS
+			});
 			const oOutboundInManifest = oManifest["sap.app"].crossNavigation.outbounds[sOutboundId];
 			if (!oOutboundInManifest) {
 				DescriptorChangeCheck.checkIdNamespaceCompliance(sOutboundId, oChange);

@@ -209,7 +209,7 @@ sap.ui.define([
 					}
 				});
 				AddNewOutbound.applyChange(this.oManifest, this.oChangeMoreThenOneOutbound);
-			}, Error("It is not allowed to add more than one outbound: contactCreate, someOutbound."),
+			}, Error("It is not allowed to add more than 1 appdescr_app_addNewOutbound. Provided keys are: contactCreate, someOutbound."),
 			"throws error that you are not allowed to add more than one outbound");
 		});
 

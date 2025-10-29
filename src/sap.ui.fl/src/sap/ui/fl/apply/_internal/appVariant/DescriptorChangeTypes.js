@@ -15,6 +15,7 @@ sap.ui.define([
 				"appdescr_ovp_changeCard",
 				"appdescr_app_addNewInbound",
 				"appdescr_app_changeInbound",
+				"appdescr_app_setInbounds",
 				"appdescr_app_removeInbound",
 				"appdescr_app_removeAllInboundsExceptOne",
 				"appdescr_app_addNewOutbound",

@@ -173,7 +173,7 @@ function(
 
 			assert.throws(function() {
 				AddNewDataSource.applyChange(this.oManifestDataSourcesEmpty, oChange);
-			}, Error("It is not allowed to add more than two data sources to manifest."),
+			}, Error("It is not allowed to add more than 2 appdescr_app_addNewDataSource. Provided keys are: customer.fancy_dataSource, customer.fancy_dataSource2, customer.fancy_dataSource3."),
 			"throws error that more then two data sources are not allowed to be added");
 		});
 
