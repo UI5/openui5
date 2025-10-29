@@ -378,8 +378,7 @@ sap.ui.define([
 
 		var sPlaceholder = this.getPlaceholder(),
 			oBinding = this.getBinding("value"),
-			oBindingType = oBinding && oBinding.getType && oBinding.getType(),
-			bDisplayFormat;
+			oBindingType = oBinding && oBinding.getType && oBinding.getType();
 
 		if (!sPlaceholder) {
 			if (oBindingType instanceof SimpleDateType) {
@@ -390,9 +389,8 @@ sap.ui.define([
 				return oBindingType.oFormat.getPlaceholderText();
 			}
 
-			bDisplayFormat = !!this._getDisplayFormatPattern();
-
-			sPlaceholder = this._getFormatter(bDisplayFormat).getPlaceholderText();
+			// always get placeholder from the display format
+			sPlaceholder = this._getFormatter(true).getPlaceholderText();
 		}
 
 		return sPlaceholder;
