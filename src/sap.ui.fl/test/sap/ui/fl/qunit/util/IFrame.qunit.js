@@ -365,6 +365,12 @@ sap.ui.define([
 			const iFrame = this.myView.byId("iframe6");
 			assert.strictEqual(iFrame.getUrl(), "about:blank", "URL remains default (about:blank)");
 		});
+		QUnit.test("Binding resolving to empty string with previously valid value", function(assert) {
+			var iFrame = this.myView.byId("iframe1");
+			assert.strictEqual(iFrame.getUrl(), sOpenUI5Url, "then initially a valid url is set");
+			iFrame.setUrl("");
+			assert.strictEqual(iFrame.getUrl(), "about:blank", "then setting an empty string results in about:blank");
+		});
 	});
 
 	QUnit.module("URL validation", {
@@ -393,9 +399,14 @@ sap.ui.define([
 		});
 
 		QUnit.test("when embedding a protocol that is blocked by the URLListValidator", function(assert) {
-			const { result, error } = IFrame.isValidUrl("about:blank");
+			const { result, error } = IFrame.isValidUrl("file://someFile");
 			assert.strictEqual(result, false);
 			assert.strictEqual(error, IFrame.VALIDATION_ERROR.FORBIDDEN_URL);
+		});
+
+		QUnit.test("when embedding about:blank", function(assert) {
+			const { result } = IFrame.isValidUrl("about:blank");
+			assert.strictEqual(result, true);
 		});
 
 		QUnit.test("when allowing the javascript pseudo protocol in the URLListValidator", function(assert) {

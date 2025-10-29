@@ -738,7 +738,7 @@ sap.ui.define([
 		var groupItemAnchorElement = groupItem.getDomRef().getElementsByTagName("a")[0];
 		const groupItem2AnchorElement = groupItem2.getDomRef().getElementsByTagName("a")[0],
 			sExpectedAriaDescribedby = Library.getResourceBundleFor("sap.tnt")
-				.getText("NAVIGATION_LIST_KEYBOARD_NAVIGATION", [groupItem.getText()]),
+				.getText("NAVIGATION_LIST_KEYBOARD_NAVIGATION", [groupItem2.getText()]),
 			invisibleTextId = groupItem2AnchorElement.getAttribute("aria-describedby");
 
 		assert.equal(groupItemAnchorElement.getAttribute("role"), 'treeitem', "The anchor is with correct role");

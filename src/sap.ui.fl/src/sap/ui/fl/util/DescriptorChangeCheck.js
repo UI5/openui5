@@ -9,7 +9,25 @@ sap.ui.define([
 ) {
 	"use strict";
 
-	function checkObjectProperties(oChangeObject, aObjects, aMandatoryProperties, aSupportedProperties, oSupportedPropertyPattern, oSupportedPropertyTypes) {
+	/**
+	 * This method checks the properties of an object in the change content.
+	 * Iterates through the provided properties and checks whether the mandatory properties are present,
+	 * only supported properties are present, the property types are correct and the property values adhere to provided patterns.
+	 * @param {Object} oChangeObject - The change from where to derive the layer
+	 * @param {Object} oPropertyBag - Path to the property
+	 * @param {Array} oPropertyBag.aObjects - keys of the change content object
+	 * @param {Array} oPropertyBag.aMandatoryProperties - Array of mandatory properties
+	 * @param {Array} oPropertyBag.aSupportedProperties - Array of supported properties
+	 * @param {Object} oPropertyBag.oSupportedPropertyPattern - Object with supported pattern as regex
+	 * @param {Object} oPropertyBag.oSupportedPropertyTypes - Object with supported property types
+	 */
+	function checkObjectProperties(oChangeObject, oPropertyBag) {
+		const aObjects = oPropertyBag.aObjects || [];
+		const aMandatoryProperties = oPropertyBag.aMandatoryProperties || [];
+		const aSupportedProperties = oPropertyBag.aSupportedProperties || [];
+		const oSupportedPropertyPattern = oPropertyBag.oSupportedPropertyPattern || {};
+		const oSupportedPropertyTypes = oPropertyBag.oSupportedPropertyTypes || {};
+
 		aObjects.forEach(function(sObject) {
 			const oSetOfProperties = new Set(Object.keys(oChangeObject[sObject]));
 			if (aMandatoryProperties) {
@@ -30,7 +48,7 @@ sap.ui.define([
 				});
 				if (notSupportedProperties.length > 0) {
 					const sText1 = notSupportedProperties.length > 1 ? `Properties ${notSupportedProperties.join("|")} are not supported. ` : `Property ${notSupportedProperties.join("|")} is not supported. `;
-					const sText2 = aSupportedProperties.length > 1 ? `Supported properties are ${aSupportedProperties.join("|")}.` : `Supported property is $${aSupportedProperties.join("|")}.`;
+					const sText2 = aSupportedProperties.length > 1 ? `Supported properties are ${aSupportedProperties.join("|")}.` : `Supported property is ${aSupportedProperties.join("|")}.`;
 					throw new Error(sText1 + sText2);
 				}
 			}
@@ -58,8 +76,30 @@ sap.ui.define([
 		});
 	}
 
-	function getAndCheckContentObject(oChangeContent, sKey, sChangeType, aMandatoryProperties, aSupportedProperties, oSupportedPropertyPattern, oSupportedPropertyTypes) {
+	/**
+	 * This method is especially for entity property changes.
+	 * Iterates through the array which has cleared generic paths and checks whether these paths start with sPropertyPath.
+	 * If this is the case then true will be returned otherwise false.
+	 * @param {sap.ui.fl.apply._internal.flexObjects.FlexObject} oChangeContent - The change from where to derive the layer
+	 * @param {Object} oPropertyBag - Path to the property
+	 * @param {string} oPropertyBag.sKey - Key of the change content object
+	 * @param {string} oPropertyBag.sChangeType - Change type of the change
+	 * @param {integer} oPropertyBag.iMaxNumberOfKeys - Maximum number of keys of the change content object
+	 * @param {Array} oPropertyBag.aMandatoryProperties - Array of mandatory properties
+	 * @param {Array} oPropertyBag.aSupportedProperties - Array of supported properties
+	 * @param {Object} oPropertyBag.oSupportedPropertyPattern - Object with supported pattern as regex
+	 * @param {Object} oPropertyBag.oSupportedPropertyTypes - Object with supported property types
+	 * @returns {string|Array<string>} Keys of the change content object
+	 */
+	function getAndCheckContentObject(oChangeContent, oPropertyBag) {
+		const sKey = oPropertyBag.sKey || "";
+		const sChangeType = oPropertyBag.sChangeType || "";
+		const iMaxNumberOfKeys = oPropertyBag.iMaxNumberOfKeys || 1;
 		const aObjectKeyNames = Object.keys(oChangeContent);
+
+		if (iMaxNumberOfKeys === 0 || iMaxNumberOfKeys < -1) {
+			throw new Error(`The parameter 'iMaxNumberOfKeys' is invalid for change '${sChangeType}'. It must be either -1 (no limit) or a positive integer.`);
+		}
 		if (aObjectKeyNames.length > 1) {
 			throw new Error("It is not allowed to add more than one object under change object 'content'.");
 		}
@@ -71,14 +111,8 @@ sap.ui.define([
 		}
 
 		const aObjectKeys = Object.keys(oChangeContent[sKey]);
-		if (aObjectKeys.length > 1) {
-			if (sKey === "dataSource") {
-				if (aObjectKeys.length !== 2) {
-					throw new Error("It is not allowed to add more than two data sources to manifest.");
-				}
-			} else {
-				throw new Error(`It is not allowed to add more than one ${sKey}: ${aObjectKeys.join(", ")}.`);
-			}
+		if (aObjectKeys.length > iMaxNumberOfKeys && iMaxNumberOfKeys !== -1) {
+			throw new Error(`It is not allowed to add more than ${iMaxNumberOfKeys} ${sChangeType}. Provided keys are: ${aObjectKeys.join(", ")}.`);
 		}
 		if (aObjectKeys.length < 1) {
 			throw new Error(`There is no ${sKey} provided. Please provide an ${sKey}.`);
@@ -87,8 +121,14 @@ sap.ui.define([
 		if (aObjectKeys.includes("")) {
 			throw new Error(`The ID of your ${sKey} is empty.`);
 		}
-		checkObjectProperties(oChangeContent[sKey], aObjectKeys, aMandatoryProperties, aSupportedProperties, oSupportedPropertyPattern, oSupportedPropertyTypes);
-		return (sKey !== "dataSource") ? aObjectKeys[aObjectKeys.length - 1] : aObjectKeys;
+		checkObjectProperties(oChangeContent[sKey], {
+			aObjects: aObjectKeys,
+			aMandatoryProperties: oPropertyBag.aMandatoryProperties,
+			aSupportedProperties: oPropertyBag.aSupportedProperties,
+			oSupportedPropertyPattern: oPropertyBag.oSupportedPropertyPattern,
+			oSupportedPropertyTypes: oPropertyBag.oSupportedPropertyTypes
+		});
+		return (iMaxNumberOfKeys === 1) ? aObjectKeys[0] : aObjectKeys;
 	}
 
 	function checkChange(oEntityPropertyChange, aSupportedProperties, aSupportedOperations, oSupportedPropertyPattern, aNotAllowedToBeDeleteProperties, oSupportedPropertyTypes) {

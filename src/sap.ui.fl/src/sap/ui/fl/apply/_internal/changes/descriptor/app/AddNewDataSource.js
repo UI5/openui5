@@ -131,7 +131,15 @@ sap.ui.define([
 			oManifest["sap.app"].dataSources ||= {};
 			const oChangeContent = oChange.getContent();
 
-			const aDataSources = DescriptorChangeCheck.getAndCheckContentObject(oChangeContent, "dataSource", oChange.getChangeType(), MANDATORY_PROPERTIES, SUPPORTED_PROPERTIES, PROPERTIES_PATTERNS, SUPPORTED_TYPES);
+			const aDataSources = DescriptorChangeCheck.getAndCheckContentObject(oChangeContent, {
+				sKey: "dataSource",
+				sChangeType: oChange.getChangeType(),
+				iMaxNumberOfKeys: 2,
+				aMandatoryProperties: MANDATORY_PROPERTIES,
+				aSupportedProperties: SUPPORTED_PROPERTIES,
+				oSupportedPropertyPattern: PROPERTIES_PATTERNS,
+				oSupportedPropertyTypes: SUPPORTED_TYPES
+			});
 
 			aDataSources.forEach(function(sDataSource) {
 				DescriptorChangeCheck.checkIdNamespaceCompliance(sDataSource, oChange);

@@ -41,6 +41,8 @@ sap.ui.define([
 	"use strict";
 	/*global SVGElement*/
 
+	const mOwnerInfo = new Map();
+
 	var Element;
 
 	var aCommonMethods = ["renderControl", "cleanupControlWithoutRendering", "accessibilityState", "icon"];
@@ -961,6 +963,13 @@ sap.ui.define([
 				return this;
 			}
 
+			if (oControl._sOwnerId && !mOwnerInfo.get(oControl._sOwnerId)) {
+				mOwnerInfo.set(oControl._sOwnerId, Interaction.createOwnerComponentInfo(oControl)?.id);
+			}
+			const sAppComponentId = mOwnerInfo.get(oControl._sOwnerId);
+
+			const fnDone = Interaction.notifyControlRendering?.(sAppComponentId);
+
 			var oDomRef, oRenderer;
 			var bTriggerBeforeRendering = true;
 
@@ -1051,6 +1060,8 @@ sap.ui.define([
 					aBuffer = [];
 				}
 			}
+
+			fnDone?.();
 
 			return this;
 		};
@@ -1369,7 +1380,7 @@ sap.ui.define([
 					}
 
 				}
-			}, fnDone, oTargetDomNode);
+			}, () => {fnDone(); mOwnerInfo.clear();}, oTargetDomNode);
 		};
 
 		/**

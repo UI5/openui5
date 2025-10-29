@@ -1,11 +1,11 @@
 /* global QUnit */
 
 sap.ui.define([
-	"sap/ui/fl/apply/_internal/changes/descriptor/app/AddNewInbound",
+	"sap/ui/fl/apply/_internal/changes/descriptor/app/SetInbounds",
 	"sap/ui/fl/apply/_internal/flexObjects/AppDescriptorChange",
 	"sap/ui/fl/Layer"
 ], function(
-	AddNewInbound,
+	SetInbounds,
 	AppDescriptorChange,
 	Layer
 ) {
@@ -33,17 +33,24 @@ sap.ui.define([
 
 			this.oChangeLayerCustomer = new AppDescriptorChange({
 				flexObjectMetadata: {
-					changeType: "appdescr_app_addNewInbound"
+					changeType: "appdescr_app_SetInboundss"
 				},
 				layer: Layer.CUSTOMER,
 				content: {
-					inbound: {
+					inbounds: {
 						"customer.contactCreate": {
 							semanticObject: "Contact",
 							action: "create",
 							icon: "sap-icon://add-contact",
 							title: "Title",
 							subTitle: "SubTitle"
+						},
+						  "customer.contactDisplay": {
+							semanticObject: "Contact",
+							action: "display",
+							icon: "sap-icon://display-contact",
+							title: "Title 2",
+							subTitle: "SubTitle 2"
 						}
 					}
 				}
@@ -51,13 +58,14 @@ sap.ui.define([
 		}
 	}, function() {
 		QUnit.test("when calling '_applyChange' adding a new inbound in a manifest from customer", function(assert) {
-			var oNewManifest = AddNewInbound.applyChange(this.oManifest, this.oChangeLayerCustomer);
+			const oNewManifest = SetInbounds.applyChange(this.oManifest, this.oChangeLayerCustomer);
 			assert.equal(Object.keys(oNewManifest["sap.app"].crossNavigation.inbounds).length, 2, "expected inbounds size is correct");
-			assert.ok(oNewManifest["sap.app"].crossNavigation.inbounds["Risk-configure"], "Risk-configure still exits");
+			assert.notOk(oNewManifest["sap.app"].crossNavigation.inbounds["Risk-configure"], "Risk-configure still exits");
 			assert.ok(oNewManifest["sap.app"].crossNavigation.inbounds["customer.contactCreate"], "new inbound is added correctly");
+			assert.ok(oNewManifest["sap.app"].crossNavigation.inbounds["customer.contactDisplay"], "new inbound is added correctly");
 		});
 
-		QUnit.test("when calling '_applyChange' adding a new inbound in an empty inbounds manifest", function(assert) {
+		QUnit.test("when calling '_applyChange' adding a new inbounds in an empty inbounds manifest", function(assert) {
 			this.oManifestNoInbounds = {
 				"_version": "2.0.0",
 
@@ -68,12 +76,13 @@ sap.ui.define([
 					}
 				}
 			};
-			var oNewManifest = AddNewInbound.applyChange(this.oManifestNoInbounds, this.oChangeLayerCustomer);
-			assert.equal(Object.keys(oNewManifest["sap.app"].crossNavigation.inbounds).length, 1, "expected inbounds size is correct");
+			const oNewManifest = SetInbounds.applyChange(this.oManifestNoInbounds, this.oChangeLayerCustomer);
+			assert.equal(Object.keys(oNewManifest["sap.app"].crossNavigation.inbounds).length, 2, "expected inbounds size is correct");
 			assert.ok(oNewManifest["sap.app"].crossNavigation.inbounds["customer.contactCreate"], "new inbound is added correctly");
+			assert.ok(oNewManifest["sap.app"].crossNavigation.inbounds["customer.contactDisplay"], "new inbound is added correctly");
 		});
 
-		QUnit.test("when calling '_applyChange' adding a new inbound in a manifest which has path sap.app/crossNavigation but no inbounds", function(assert) {
+		QUnit.test("when calling '_applyChange' adding a new inbounds in a manifest which has path sap.app/crossNavigation but no inbounds", function(assert) {
 			this.oManifestNoPathToInbounds2 = {
 				"_version": "2.0.0",
 
@@ -81,19 +90,21 @@ sap.ui.define([
 					crossNavigation: {}
 				}
 			};
-			var oNewManifest = AddNewInbound.applyChange(this.oManifestNoPathToInbounds2, this.oChangeLayerCustomer);
-			assert.equal(Object.keys(oNewManifest["sap.app"].crossNavigation.inbounds).length, 1, "expected inbounds size is correct");
+			const oNewManifest = SetInbounds.applyChange(this.oManifestNoPathToInbounds2, this.oChangeLayerCustomer);
+			assert.equal(Object.keys(oNewManifest["sap.app"].crossNavigation.inbounds).length, 2, "expected inbounds size is correct");
 			assert.ok(oNewManifest["sap.app"].crossNavigation.inbounds["customer.contactCreate"], "new inbound is added correctly");
+			assert.ok(oNewManifest["sap.app"].crossNavigation.inbounds["customer.contactDisplay"], "new inbound is added correctly");
 		});
 
-		QUnit.test("when calling '_applyChange' adding a new inbound in a manifest which has path sap.app/ but no crossNavigation", function(assert) {
+		QUnit.test("when calling '_applyChange' adding a new inbounds in a manifest which has path sap.app/ but no crossNavigation", function(assert) {
 			this.oManifestNoPathToInbounds1 = {
 				"_version": "2.0.0",
 				"sap.app": {}
 			};
-			var oNewManifest = AddNewInbound.applyChange(this.oManifestNoPathToInbounds1, this.oChangeLayerCustomer);
-			assert.equal(Object.keys(oNewManifest["sap.app"].crossNavigation.inbounds).length, 1, "expected inbounds size is correct");
+			const oNewManifest = SetInbounds.applyChange(this.oManifestNoPathToInbounds1, this.oChangeLayerCustomer);
+			assert.equal(Object.keys(oNewManifest["sap.app"].crossNavigation.inbounds).length, 2, "expected inbounds size is correct");
 			assert.ok(oNewManifest["sap.app"].crossNavigation.inbounds["customer.contactCreate"], "new inbound is added correctly");
+			assert.ok(oNewManifest["sap.app"].crossNavigation.inbounds["customer.contactDisplay"], "new inbound is added correctly");
 		});
 
 		QUnit.test("when calling '_applyChange' adding a new inbound in a manifest with empty inboud id", function(assert) {
@@ -101,11 +112,11 @@ sap.ui.define([
 				// Empty inbound id
 				this.oChangeEmptyInboundId = new AppDescriptorChange({
 					flexObjectMetadata: {
-						changeType: "appdescr_app_addNewInbound"
+						changeType: "appdescr_app_SetInbounds"
 					},
 					layer: Layer.CUSTOMER,
 					content: {
-						inbound: {
+						inbounds: {
 							"": {
 								semanticObject: "Contact",
 								action: "create",
@@ -116,9 +127,9 @@ sap.ui.define([
 						}
 					}
 				});
-				AddNewInbound.applyChange(this.oManifest, this.oChangeEmptyInboundId);
-			}, Error("The ID of your inbound is empty."),
-			"throws error that the id of the inbound must not be empty");
+				SetInbounds.applyChange(this.oManifest, this.oChangeEmptyInboundId);
+			}, Error("The ID of your inbounds is empty."),
+			"throws error that the id of the inbounds must not be empty");
 		});
 
 		QUnit.test("when calling '_applyChange' without an inbound", function(assert) {
@@ -126,41 +137,39 @@ sap.ui.define([
 				// Empty inbound
 				this.oChangeNoInbound = new AppDescriptorChange({
 					flexObjectMetadata: {
-						changeType: "appdescr_app_addNewInbound"
+						changeType: "appdescr_app_SetInbounds"
 					},
 					layer: Layer.CUSTOMER,
 					content: {
-						inbound: {}
+						inbounds: {}
 					}
 				});
-				AddNewInbound.applyChange(this.oManifest, this.oChangeNoInbound);
-			}, Error("There is no inbound provided. Please provide an inbound."),
+				SetInbounds.applyChange(this.oManifest, this.oChangeNoInbound);
+			}, Error("There is no inbounds provided. Please provide an inbounds."),
 			 "throws an error that the change does not have an inbound");
 		});
 
 		QUnit.test("when calling '_applyChange' adding a new inbound which already exist in the manifest", function(assert) {
-			assert.throws(function() {
-				// Already existing inbound
-				this.oChangeAlreadyExistingInbound = new AppDescriptorChange({
-					flexObjectMetadata: {
-						changeType: "appdescr_app_addNewInbound"
-					},
-					layer: Layer.VENDOR,
-					content: {
-						inbound: {
-							"Risk-configure": {
-								semanticObject: "Contact",
-								action: "create",
-								icon: "sap-icon://add-contact",
-								title: "Title",
-								subTitle: "SubTitle"
-							}
+			this.oChangeAlreadyExistingInbound = new AppDescriptorChange({
+				flexObjectMetadata: {
+					changeType: "appdescr_app_SetInbounds"
+				},
+				layer: Layer.VENDOR,
+				content: {
+					inbounds: {
+						"Risk-configure": {
+							semanticObject: "Contact",
+							action: "create",
+							icon: "sap-icon://add-contact",
+							title: "Title",
+							subTitle: "SubTitle"
 						}
 					}
-				});
-				AddNewInbound.applyChange(this.oManifest, this.oChangeAlreadyExistingInbound);
-			}, Error("Inbound with ID \"Risk-configure\" already exist."),
-			"throws error that the inbound id already exists in the manifest");
+				}
+			});
+			const oNewManifest = SetInbounds.applyChange(this.oManifest, this.oChangeAlreadyExistingInbound);
+			assert.equal(Object.keys(oNewManifest["sap.app"].crossNavigation.inbounds).length, 1, "expected inbounds size is correct");
+			assert.ok(oNewManifest["sap.app"].crossNavigation.inbounds["Risk-configure"], "new inbound is added correctly");
 		});
 
 		QUnit.test("when calling '_applyChange' adding a new inbound in a manifest from customer layer with no prefix", function(assert) {
@@ -168,11 +177,11 @@ sap.ui.define([
 				// Layer check
 				this.oChangeLayerCustomerVendorNoPrefix = new AppDescriptorChange({
 					flexObjectMetadata: {
-						changeType: "appdescr_app_addNewInbound"
+						changeType: "appdescr_app_SetInbounds"
 					},
 					layer: Layer.CUSTOMER,
 					content: {
-						inbound: {
+						inbounds: {
 							contactCreate: {
 								semanticObject: "Contact",
 								action: "create",
@@ -183,67 +192,9 @@ sap.ui.define([
 						}
 					}
 				});
-				AddNewInbound.applyChange(this.oManifest, this.oChangeLayerCustomerVendorNoPrefix);
+				SetInbounds.applyChange(this.oManifest, this.oChangeLayerCustomerVendorNoPrefix);
 			}, Error("Id contactCreate must start with customer."),
 			"throws error that the namespace is not compliance");
-		});
-
-		QUnit.test("when calling '_applyChange' adding more than one inbound in a manifest", function(assert) {
-			assert.throws(function() {
-				// More than one inbound
-				this.oChangeMoreThenOneInbound = new AppDescriptorChange({
-					flexObjectMetadata: {
-						changeType: "appdescr_app_addNewInbound"
-					},
-					layer: Layer.CUSTOMER,
-					content: {
-						inbound: {
-							contactCreate: {
-								semanticObject: "Contact",
-								action: "create",
-								icon: "sap-icon://add-contact",
-								title: "Title",
-								subTitle: "SubTitle"
-							},
-							someInbound: {
-								semanticObject: "SomeInbound",
-								action: "create",
-								icon: "sap-icon://add-someInbound",
-								title: "SomeInboundTitle",
-								subTitle: "SomeInbountSubTitle"
-							}
-						}
-					}
-				});
-				AddNewInbound.applyChange(this.oManifest, this.oChangeMoreThenOneInbound);
-			}, Error("It is not allowed to add more than 1 appdescr_app_addNewInbound. Provided keys are: contactCreate, someInbound."),
-			"throws error that you are not allowed to add more than one inbound");
-		});
-
-		QUnit.test("when calling '_applyChange' adding a change which has more then one object under content", function(assert) {
-			assert.throws(function() {
-				// More than one objects under change object content
-				this.oChangeMoreThenOneObjectUnderContent = new AppDescriptorChange({
-					flexObjectMetadata: {
-						changeType: "appdescr_app_addNewInbound"
-					},
-					layer: Layer.CUSTOMER,
-					content: {
-						inbound: {
-							"customer.contactCreate": {
-								semanticObject: "Contact",
-								action: "create",
-								icon: "sap-icon://add-contact",
-								title: "Title",
-								subTitle: "SubTitle"
-							}
-						},
-						anotherChangeObject: {	}
-					}
-				});
-				AddNewInbound.applyChange(this.oManifest, this.oChangeMoreThenOneObjectUnderContent);
-			}, Error("It is not allowed to add more than one object under change object 'content'."),
-			"throws error that the change object is not compliant");
 		});
 
 		QUnit.test("when calling '_applyChange' adding a change which has no object under content", function(assert) {
@@ -251,13 +202,13 @@ sap.ui.define([
 				// No object under change object content
 				this.oChangeNoObjectUnderContent = new AppDescriptorChange({
 					flexObjectMetadata: {
-						changeType: "appdescr_app_addNewInbound"
+						changeType: "appdescr_app_SetInbounds"
 					},
 					layer: Layer.CUSTOMER,
 					content: {	}
 				});
-				AddNewInbound.applyChange(this.oManifest, this.oChangeNoObjectUnderContent);
-			}, Error("The change object 'content' cannot be empty. Please provide the necessary property, as outlined in the change schema for 'appdescr_app_addNewInbound'."),
+				SetInbounds.applyChange(this.oManifest, this.oChangeNoObjectUnderContent);
+			}, Error("The change object 'content' cannot be empty. Please provide the necessary property, as outlined in the change schema for 'appdescr_app_SetInbounds'."),
 			"throws error that the change object is not compliant");
 		});
 
@@ -266,7 +217,7 @@ sap.ui.define([
 				// Not supported object under change object content
 				this.oChangeNotSupportedObjectUnderContent = new AppDescriptorChange({
 					flexObjectMetadata: {
-						changeType: "appdescr_app_addNewInbound"
+						changeType: "appdescr_app_SetInbounds"
 					},
 					layer: Layer.CUSTOMER,
 					content: {
@@ -281,8 +232,8 @@ sap.ui.define([
 						}
 					}
 				});
-				AddNewInbound.applyChange(this.oManifest, this.oChangeNotSupportedObjectUnderContent);
-			}, Error("The provided property 'notSupportedObject' is not supported. Supported property for change 'appdescr_app_addNewInbound' is 'inbound'."),
+				SetInbounds.applyChange(this.oManifest, this.oChangeNotSupportedObjectUnderContent);
+			}, Error("The provided property 'notSupportedObject' is not supported. Supported property for change 'appdescr_app_SetInbounds' is 'inbounds'."),
 			"throws error that the change object is not compliant");
 		});
 
@@ -291,11 +242,11 @@ sap.ui.define([
 				// Mandatory property missing
 				this.oChangeMandatoryParameterMissing = new AppDescriptorChange({
 					flexObjectMetadata: {
-						changeType: "appdescr_app_addNewInbound"
+						changeType: "appdescr_app_SetInbounds"
 					},
 					layer: Layer.CUSTOMER,
 					content: {
-						inbound: {
+						inbounds: {
 							"customer.contactCreate": {
 								semanticObject: "Contact",
 								icon: "sap-icon://add-contact",
@@ -306,7 +257,7 @@ sap.ui.define([
 						}
 					}
 				});
-				AddNewInbound.applyChange(this.oManifest, this.oChangeMandatoryParameterMissing);
+				SetInbounds.applyChange(this.oManifest, this.oChangeMandatoryParameterMissing);
 			}, Error("Mandatory property 'action' is missing. Mandatory properties are semanticObject|action."),
 			"throws error that the change object is missing mandatory parameters");
 		});
@@ -316,11 +267,11 @@ sap.ui.define([
 				// Having not supported properties
 				this.oChangeNotHavingSupportedProperties = new AppDescriptorChange({
 					flexObjectMetadata: {
-						changeType: "appdescr_app_addNewInbound"
+						changeType: "appdescr_app_SetInbounds"
 					},
 					layer: Layer.CUSTOMER,
 					content: {
-						inbound: {
+						inbounds: {
 							"customer.contactCreate": {
 								semanticObject: "Contact",
 								action: "create",
@@ -333,7 +284,7 @@ sap.ui.define([
 						}
 					}
 				});
-				AddNewInbound.applyChange(this.oManifest, this.oChangeNotHavingSupportedProperties);
+				SetInbounds.applyChange(this.oManifest, this.oChangeNotHavingSupportedProperties);
 			}, Error("Property additionalParameters is not supported. Supported properties are semanticObject|action|hideLauncher|icon|title|shortTitle|subTitle|info|indicatorDataSource|deviceTypes|displayMode|signature."),
 			"throws error that the change object has not supported properties");
 		});
@@ -343,11 +294,11 @@ sap.ui.define([
 				// Property Value does not match to regular expression
 				this.oChangeRegExNotMatchForSemanticObject = new AppDescriptorChange({
 					flexObjectMetadata: {
-						changeType: "appdescr_app_addNewInbound"
+						changeType: "appdescr_app_SetInbounds"
 					},
 					layer: Layer.CUSTOMER,
 					content: {
-						inbound: {
+						inbounds: {
 							"customer.contactCreate": {
 								semanticObject: "Not-Match-RegEx",
 								action: "create",
@@ -359,7 +310,7 @@ sap.ui.define([
 						}
 					}
 				});
-				AddNewInbound.applyChange(this.oManifest, this.oChangeRegExNotMatchForSemanticObject);
+				SetInbounds.applyChange(this.oManifest, this.oChangeRegExNotMatchForSemanticObject);
 			}, Error("The property has disallowed values. Supported values for 'semanticObject' should adhere to regular expression /^[\\w\\*]{0,30}$/."),
 			"throws error that the change property does not match to regular expression");
 		});
@@ -369,11 +320,11 @@ sap.ui.define([
 				// Property Value does not match to regular expression
 				this.oChangeRegExNotMatchForAction = new AppDescriptorChange({
 					flexObjectMetadata: {
-						changeType: "appdescr_app_addNewInbound"
+						changeType: "appdescr_app_SetInbounds"
 					},
 					layer: Layer.CUSTOMER,
 					content: {
-						inbound: {
+						inbounds: {
 							"customer.contactCreate": {
 								semanticObject: "Contact",
 								action: "Not-Match-RegEx",
@@ -385,7 +336,7 @@ sap.ui.define([
 						}
 					}
 				});
-				AddNewInbound.applyChange(this.oManifest, this.oChangeRegExNotMatchForAction);
+				SetInbounds.applyChange(this.oManifest, this.oChangeRegExNotMatchForAction);
 			}, Error("The property has disallowed values. Supported values for 'action' should adhere to regular expression /^[\\w\\*]{0,60}$/."),
 			"throws error that the change property does not match to regular expression");
 		});
