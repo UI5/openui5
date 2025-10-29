@@ -215,67 +215,8 @@
 			</l:BlockLayout>
 		</Panel>
 
-		<Panel visible="{=!${device>/system/phone}}"
-			accessibleRole="Region"
-			backgroundDesign="Transparent"
-			class="sapUiNoContentPadding">
-			<headerToolbar>
-				<Toolbar class="headlineCell">
-					<Title width="100%"
-						text="{i18n>WELCOME_START_CODING}"
-						level="H1"
-						titleStyle="H1"
-						class="sapUiMediumMarginTopBottom"/>
-				</Toolbar>
-			</headerToolbar>
-			<l:BlockLayout>
-				<l:BlockLayoutRow>
-					<l:BlockLayoutCell backgroundColorSet="ColorSet10"
-									   backgroundColorShade="ShadeA">
-						<l:layoutData>
-							<l:BlockLayoutCellData sSize="1" mSize="2" lSize="3" xlSize="3"/>
-						</l:layoutData>
-
-						<HBox alignItems="Center" justifyContent="Center" width="100%" height="100%">
-
-							<Image
-								src="./resources/sap/ui/documentation/sdk/images/Home_laptop.png"
-								densityAware="false"
-								class="sapUiTinyMarginBeginEnd"
-								width="100%"
-								alt="{i18n>WELCOME_BLOCK_7_ALT}">
-								<layoutData>
-									<FlexItemData maxWidth="37.5rem" />
-								</layoutData>
-							</Image>
-						</HBox>
-
-					</l:BlockLayoutCell>
-
-					<l:BlockLayoutCell
-						class="welcomeBlock"
-						backgroundColorSet="ColorSet10"
-						backgroundColorShade="ShadeA">
-
-						<l:layoutData>
-							<l:BlockLayoutCellData sSize="1" mSize="2" lSize="3" xlSize="3"/>
-						</l:layoutData>
-
-						<HBox direction="Column" justifyContent="Center" width="100%" height="100%">
-							<custom:TitleLink
-							href="topic/8b49fc198bf04b2d9800fc37fecbb218"
-							text="{i18n>WELCOME_BLOCK_6_TITLE}"
-							titleStyle="H2"/>
-							<Text class="sapUiMediumMarginTop" text="{i18n>WELCOME_BLOCK_6_TEXT_1}"/>
-							<HBox width="100%">
-								<Text class="sapUiSmallMarginTop" text="{i18n>WELCOME_BLOCK_6_TEXT_2}"/>
-								<Link class="liveEditorLink sapUiSmallMarginTop" text="Live Editor" href="liveEditor" />
-							</HBox>
-						</HBox>
-					</l:BlockLayoutCell>
-				</l:BlockLayoutRow>
-			</l:BlockLayout>
-		</Panel>
+		<core:Fragment fragmentName="sap.ui.documentation.sdk.view.StartCodingRowOpenUI5" type="XML" />
+		<core:Fragment fragmentName="sap.ui.documentation.sdk.view.FioriDevelopmentRowSAPUI5" type="XML" />
 
 		<Panel	accessibleRole="Region"
 			backgroundDesign="Transparent"
