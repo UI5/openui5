@@ -139,12 +139,10 @@ sap.ui.define([
 		setUrl(sUrl) {
 			// Could contain special characters from bindings that need to be encoded
 			// Make sure that it was not encoded before
-			var sEncodedUrl = decodeURI(sUrl) === sUrl ? encodeURI(sUrl) : sUrl;
+			let sEncodedUrl = decodeURI(sUrl) === sUrl ? encodeURI(sUrl) : sUrl;
 
 			// Falsy values coming from bindings can lead to unexpected relative navigation
-			if (!sEncodedUrl) {
-				return this;
-			}
+			sEncodedUrl ||= "about:blank";
 
 			if (IFrame.isValidUrl(sEncodedUrl).result) {
 				// Set by replacing the last entry
@@ -257,6 +255,14 @@ sap.ui.define([
 
 	IFrame.isValidUrl = function(sUrl) {
 		try {
+			// Explicitly allow about:blank as a way to reset the iframe content
+			// e.g. if the control is reused and no valid URL is provided
+			if (sUrl === "about:blank") {
+				return {
+					result: true
+				};
+			}
+
 			const oUrl = IFrame._toUrl(sUrl);
 
 			// Forbid dangerous javascript pseudo protocol
