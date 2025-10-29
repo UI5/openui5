@@ -1555,7 +1555,7 @@ sap.ui.define([
 		oCore.applyChanges();
 
 		// assert
-		assert.equal(oDTP.getDomRef().querySelector(".sapMDTPTimezoneLabel").innerText, "Etc/GMT-8",
+		assert.equal(oDTP.getDomRef().querySelector(".sapMDTPTimezoneLabel").innerText.trim(), "Etc/GMT-8",
 			"Timezone ID is displayed");
 
 		// clean
