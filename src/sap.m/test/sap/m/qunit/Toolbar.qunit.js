@@ -19,7 +19,8 @@ sap.ui.define([
 	"sap/m/ToolbarRenderer",
 	"sap/m/ToolbarSpacer",
 	"sap/ui/core/Core",
-	"sap/ui/core/library"
+	"sap/ui/core/library",
+	"sap/ui/qunit/utils/nextUIUpdate"
 ], function(
 	QUtils,
 	Toolbar,
@@ -40,7 +41,8 @@ sap.ui.define([
 	ToolbarRenderer,
 	ToolbarSpacer,
 	Core,
-	coreLibrary
+	coreLibrary,
+	nextUIUpdate
 ) {
 	"use strict";
 
@@ -986,5 +988,169 @@ sap.ui.define([
 
 		// Cleanup
 		oTB.destroy();
+	});
+
+	QUnit.module("Active Button Text Content");
+
+	QUnit.test("Active button should receive text content from toolbar", async function(assert) {
+		// Arrange
+		var oLabel = new Label({text: "Label Text"});
+		var oTitle = new Title({text: "Title Text"});
+		var oButton = new Button({text: "Button Text"});
+
+		var oToolbar = new Toolbar({
+			active: true,
+			content: [oLabel, oTitle, oButton]
+		});
+
+		oToolbar.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		// Act
+		var oActiveButton = oToolbar._getActiveButton();
+
+		// Assert
+		assert.strictEqual(oActiveButton.getText(), "Label Text Title Text Button Text",
+			"Active button text should contain concatenated text from all content controls");
+
+		// Cleanup
+		oToolbar.destroy();
+	});
+
+	QUnit.test("Active button text should be updated when content changes", async function(assert) {
+		// Arrange
+		var oLabel = new Label({text: "Original Text"});
+		var oToolbar = new Toolbar({
+			active: true,
+			content: [oLabel]
+		});
+
+		oToolbar.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		var oActiveButton = oToolbar._getActiveButton();
+		assert.strictEqual(oActiveButton.getText(), "Original Text", "Initial text is correct");
+
+		// Act - Change label text
+		oLabel.setText("Updated Text");
+		await nextUIUpdate();
+
+		// Assert
+		assert.strictEqual(oActiveButton.getText(), "Updated Text",
+			"Active button text should be updated when content text changes");
+
+		// Cleanup
+		oToolbar.destroy();
+	});
+
+	QUnit.test("Active button text should be updated when content is added/removed", async function(assert) {
+		// Arrange
+		var oLabel = new Label({text: "Label Text"});
+		var oToolbar = new Toolbar({
+			active: true,
+			content: [oLabel]
+		});
+
+		oToolbar.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		var oActiveButton = oToolbar._getActiveButton();
+		assert.strictEqual(oActiveButton.getText(), "Label Text", "Initial text is correct");
+
+		// Act - Add new content
+		var oTitle = new Title({text: "Title Text"});
+		oToolbar.addContent(oTitle);
+		await nextUIUpdate();
+
+		// Assert
+		assert.strictEqual(oActiveButton.getText(), "Label Text Title Text",
+			"Active button text should be updated when content is added");
+
+		// Act - Remove content
+		oToolbar.removeContent(oLabel);
+		await nextUIUpdate();
+
+		// Assert
+		assert.strictEqual(oActiveButton.getText(), "Title Text",
+			"Active button text should be updated when content is removed");
+
+		// Cleanup
+		oToolbar.destroy();
+	});
+
+	QUnit.test("Active button should handle invisible content correctly", async function(assert) {
+		// Arrange
+		var oVisibleLabel = new Label({text: "Visible Text"});
+		var oInvisibleLabel = new Label({text: "Invisible Text", visible: false});
+
+		var oToolbar = new Toolbar({
+			active: true,
+			content: [oVisibleLabel, oInvisibleLabel]
+		});
+
+		oToolbar.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		// Act
+		var oActiveButton = oToolbar._getActiveButton();
+
+		// Assert
+		assert.strictEqual(oActiveButton.getText(), "Visible Text",
+			"Active button should only include text from visible controls");
+
+		// Act - Make invisible control visible
+		oInvisibleLabel.setVisible(true);
+		await nextUIUpdate();
+
+		// Assert
+		assert.strictEqual(oActiveButton.getText(), "Visible Text Invisible Text",
+			"Active button text should be updated when control visibility changes");
+
+		// Cleanup
+		oToolbar.destroy();
+	});
+
+	QUnit.test("Active button text should handle empty content gracefully", async function(assert) {
+		// Arrange
+		var oToolbar = new Toolbar({
+			active: true,
+			content: []
+		});
+
+		oToolbar.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		// Act
+		var oActiveButton = oToolbar._getActiveButton();
+
+		// Assert
+		assert.strictEqual(oActiveButton.getText(), "",
+			"Active button should have empty text when toolbar has no content");
+
+		// Cleanup
+		oToolbar.destroy();
+	});
+
+	QUnit.test("Active button text should handle controls with tooltip when no text available", async function(assert) {
+		// Arrange
+		var oButton = new Button({tooltip: "Button Tooltip"});
+
+		var oToolbar = new Toolbar({
+			active: true,
+			content: [oButton]
+		});
+
+		oToolbar.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		// Act
+		var oActiveButton = oToolbar._getActiveButton();
+
+		// Assert
+		assert.strictEqual(oActiveButton.getText(), "Button Tooltip",
+			"Active button should use tooltip text when no other text is available");
+
+		// Cleanup
+		oToolbar.destroy();
 	});
 });
