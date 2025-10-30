@@ -2646,7 +2646,7 @@ function(
 		});
 	});
 
-	QUnit.test("DynamicPage _shouldAutoExpandHeaderOnResize() when user cannot scroll to expand", function (assert) {
+	QUnit.test("DynamicPage _shouldAutoExpandHeaderOnResize() when user cannot scroll to expand after page resize", function (assert) {
 		// Arrange
 		var oDynamicPage = this.oDynamicPage;
 		oDynamicPage.setToggleHeaderOnTitleClick(false);
@@ -2655,6 +2655,23 @@ function(
 		this.stub(oDynamicPage, "_canSnapHeaderOnScroll").returns(false);
 
 		assert.ok(oDynamicPage._shouldAutoExpandHeaderOnResize({ target: oDynamicPage.getDomRef()}), "should auto expand header on resize");
+	});
+
+	QUnit.test("DynamicPage _shouldAutoExpandHeaderOnResize() when user cannot scroll to expand after page-content resized", function (assert) {
+		// Arrange
+		var oDynamicPage = this.oDynamicPage,
+			oSpy = this.spy(oDynamicPage, "_shouldAutoExpandHeaderOnResize"),
+			oMockContentResizeEvent = { target: oDynamicPage.$contentFitContainer.get(0)};
+
+		oDynamicPage.setToggleHeaderOnTitleClick(false);
+
+		oDynamicPage._snapHeader(true, true /* userInteraction */);
+		this.stub(oDynamicPage, "_canSnapHeaderOnScroll").returns(false);
+
+		oDynamicPage._onChildControlsHeightChange(oMockContentResizeEvent);
+
+		assert.strictEqual(oSpy.callCount, 1, "_shouldAutoExpandHeaderOnResize is called once");
+		assert.ok(oSpy.returned(true), "should auto expand header on resize");
 	});
 
 	QUnit.test("DynamicPage _shouldAutoExpandHeaderOnResize() when user can scroll to expand", function (assert) {
