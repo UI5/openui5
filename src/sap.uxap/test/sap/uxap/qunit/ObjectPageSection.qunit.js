@@ -867,6 +867,51 @@ function(Element, nextUIUpdate, jQuery, XMLView, library, ObjectPageLayout, Obje
 		assert.equal(oInvalidateSpy.callCount, 1, "section is invalidated");
 	});
 
+	QUnit.test("_setAriaLabelledByAnchorButton does not lead to infinite rerendering loop", function(assert) {
+		// Arrange
+		var done = assert.async();
+		var iRenderCount = 0;
+		var oSubSection = new ObjectPageSubSection({
+			title: "Original Title",
+			blocks: [new Text({text: "test"})]
+		});
+
+		var oSection = new ObjectPageSection({
+			title: "Test Section",
+			subSections: [oSubSection]
+		});
+
+		var oObjectPageLayout = new ObjectPageLayout({
+			sections: [oSection]
+		});
+
+		// Add the delegate that would cause infinite loop with the old implementation
+		oSubSection.addEventDelegate({
+			onAfterRendering: function() {
+				// Change the title in onAfterRendering delegate
+				// With the old implementation, this would cause infinite rerendering
+				oSubSection.setTitle("Title Changed by Event Delegate!");
+				iRenderCount++;
+			}
+		});
+
+		// Place component in DOM
+		oObjectPageLayout.placeAt('qunit-fixture');
+
+		// Wait for the layout to render and stabilize
+		setTimeout(function() {
+			// Assert
+			assert.strictEqual(iRenderCount, 2, "SubSection rendered two times (initial render + one re-render after title change)");
+
+			// Verify subsection title was changed by delegate
+			assert.strictEqual(oSubSection.getTitle(), "Title Changed by Event Delegate!", "SubSection title was changed by delegate");
+
+			// Clean up
+			oObjectPageLayout.destroy();
+			done();
+		}, 1000); // Give enough time for any potential rerender loop to occur
+	});
+
 	QUnit.module("Private methods", {
 		beforeEach: async function() {
 			this.oObjectPageLayout = new ObjectPageLayout("page", {

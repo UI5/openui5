@@ -389,11 +389,12 @@ sap.ui.define([
 	 * @param {boolean} bInvalidate Whether to invalidate the control or not
 	 * @private
 	 */
-	ObjectPageSection.prototype._setAriaLabelledByAnchorButton = function (oAnchorButton, bInvalidate) {
-		this._sAriaLabelledByAnchorButton = oAnchorButton?.getId();
-		if (bInvalidate) {
+	ObjectPageSection.prototype._setAriaLabelledByAnchorButton = function (oAnchorButton) {
+		if (this._sAriaLabelledByAnchorButton && this._sAriaLabelledByAnchorButton !== oAnchorButton?.getId()) {
 			this.invalidate();
 		}
+
+		this._sAriaLabelledByAnchorButton = oAnchorButton?.getId();
 	};
 
 	/**
