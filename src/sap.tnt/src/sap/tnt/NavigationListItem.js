@@ -747,8 +747,14 @@ sap.ui.define([
 	NavigationListItem.prototype._renderText = function (oRM) {
 		oRM.openStart("span")
 			.class("sapMText")
-			.class("sapTntNLIText")
-			.class("sapMTextNoWrap");
+			.class("sapTntNLIText");
+
+		const bIsActionItem = this.getDesign() === NavigationListItemDesign.Action;
+		const bIsNavigationListExpanded = this._isListExpanded();
+
+		if (bIsActionItem || !bIsNavigationListExpanded) {
+			oRM.class("sapMTextNoWrap");
+		}
 
 		const sTextDir = this.getTextDirection();
 		if (sTextDir !== TextDirection.Inherit) {

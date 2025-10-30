@@ -1,0 +1,54 @@
+<mvc:View
+	controllerName="sap.tnt.sample.SideNavigationWrapping.C"
+	xmlns="sap.m"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:tnt="sap.tnt"
+	height="100%">
+	<VBox renderType="Bare" alignItems="Start" height="100%">
+		<Button
+			text="Toggle Collapse/Expand"
+			icon="sap-icon://menu2"
+			press=".onCollapseExpandPress" />
+
+		<tnt:SideNavigation width="20rem" id="sideNavigation" selectedKey="home" expanded="true">
+			<tnt:NavigationList>
+				<tnt:NavigationListItem text="Home" key="home" icon="sap-icon://home" />
+				<tnt:NavigationListGroup text="System &amp; Administration Management">
+					<tnt:NavigationListItem text="Business Analytics" icon="sap-icon://bar-chart" />
+					<tnt:NavigationListItem text="SAP Training Portal and Learning Management System" icon="sap-icon://course-book" href="https://sap.com" target="_blank" selectable="false" />
+					<tnt:NavigationListItem text="System Administration and Configuration Management" icon="sap-icon://manager-insight" >
+						<tnt:NavigationListItem text="User Management and Access Control Administration" />
+						<tnt:NavigationListItem text="Audit Log and Security Monitoring Dashboard" />
+					</tnt:NavigationListItem>
+					<tnt:NavigationListItem text="Service Management and Customer Support Operations" icon="sap-icon://customer-and-supplier" expanded="false" selectable="false" >
+						<tnt:NavigationListItem text="Service Tickets and Customer Issue Resolution" />
+						<tnt:NavigationListItem text="Field Service" />
+						<tnt:NavigationListItem text="Service Contracts and Agreement Management" />
+					</tnt:NavigationListItem>
+					<tnt:NavigationListItem text="Financial Reports" icon="sap-icon://money-bills" expanded="false" selectable="false" >
+						<tnt:NavigationListItem text="Sales Reports" />
+						<tnt:NavigationListItem text="Customer Analysis Reports and Behavioral Insights" />
+					</tnt:NavigationListItem>
+					<tnt:NavigationListItem text="Notifications and Alerts" icon="sap-icon://message-information" />
+				</tnt:NavigationListGroup>
+				<tnt:NavigationListGroup text="Business operations">
+					<tnt:NavigationListItem text="Resource Planning and Business Management Solutions My Area" icon="sap-icon://business-one" />
+					<tnt:NavigationListItem text="Sales Management and Revenue Operations" icon="sap-icon://crm-sales" />
+					<tnt:NavigationListItem text="SAP Best Practices" icon="sap-icon://learning-assistant" />
+					<tnt:NavigationListItem text="Customer Relationship Management" icon="sap-icon://account" selectable="false" >
+						<tnt:NavigationListItem text="Contact Information and Communication History" />
+						<tnt:NavigationListItem text="Business Partners" />
+						<tnt:NavigationListItem text="Strategic Relationships" />
+					</tnt:NavigationListItem>
+				</tnt:NavigationListGroup>
+			</tnt:NavigationList>
+			<tnt:fixedItem>
+				<tnt:NavigationList>
+					<tnt:NavigationListItem ariaHasPopup="Dialog" id="quickCreate" press=".quickActionPress" text="Quick Create" icon="sap-icon://write-new"  design="Action" selectable="false" />
+					<tnt:NavigationListItem text="Settings" icon="sap-icon://settings" />
+					<tnt:NavigationListItem selectable="false" href="https://sap.com" target="_blank" text="SAP Support" icon="sap-icon://attachment" />
+				</tnt:NavigationList>
+			</tnt:fixedItem>
+		</tnt:SideNavigation>
+	</VBox>
+</mvc:View>

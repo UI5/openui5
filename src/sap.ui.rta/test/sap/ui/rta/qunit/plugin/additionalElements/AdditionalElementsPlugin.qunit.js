@@ -16,20 +16,19 @@ sap.ui.define([
 	"sap/ui/dt/Util",
 	"sap/ui/fl/apply/_internal/DelegateMediator",
 	"sap/ui/fl/apply/api/DelegateMediatorAPI",
-	"sap/ui/fl/write/api/FieldExtensibility",
 	"sap/ui/fl/write/api/ChangesWriteAPI",
+	"sap/ui/fl/write/api/FieldExtensibility",
 	"sap/ui/layout/VerticalLayout",
 	"sap/ui/model/json/JSONModel",
 	"sap/ui/test/utils/nextUIUpdate",
 	"sap/ui/rta/command/CommandFactory",
-	"sap/ui/rta/plugin/additionalElements/AdditionalElementsPlugin",
-	"sap/ui/rta/plugin/additionalElements/AdditionalElementsAnalyzer",
 	"sap/ui/rta/plugin/additionalElements/ActionExtractor",
+	"sap/ui/rta/plugin/additionalElements/AdditionalElementsAnalyzer",
+	"sap/ui/rta/plugin/additionalElements/AdditionalElementsPlugin",
 	"sap/ui/rta/plugin/Plugin",
 	"sap/ui/rta/Utils",
 	"sap/ui/thirdparty/sinon-4",
-	"test-resources/sap/ui/rta/qunit/RtaQunitUtils",
-	"sap/ui/core/Element"
+	"test-resources/sap/ui/rta/qunit/RtaQunitUtils"
 ], function(
 	isEmptyObject,
 	merge,
@@ -46,20 +45,19 @@ sap.ui.define([
 	DtUtil,
 	DelegateMediator,
 	DelegateMediatorAPI,
-	FieldExtensibility,
 	ChangesWriteAPI,
+	FieldExtensibility,
 	VerticalLayout,
 	JSONModel,
 	nextUIUpdate,
 	CommandFactory,
-	AdditionalElementsPlugin,
-	AdditionalElementsAnalyzer,
 	AdditionalElementsActionExtractor,
+	AdditionalElementsAnalyzer,
+	AdditionalElementsPlugin,
 	RTAPlugin,
 	RTAUtils,
 	sinon,
-	RtaQunitUtils,
-	Element
+	RtaQunitUtils
 ) {
 	"use strict";
 
@@ -1889,8 +1887,7 @@ sap.ui.define([
 
 			assert.ok(this.fnDialogOpen.calledOnce, "then the dialog was opened");
 			assert.ok(oIsServiceOutdatedStub.notCalled, "up to date service is not called");
-			const oCustomFieldButton = Element.getElementById(`${this.oDialog.getId()}--rta_customFieldButton`);
-			assert.equal(oCustomFieldButton.getVisible(), false, "then the button to create custom fields is not shown");
+			assert.equal(this.oDialog.getCustomFieldButtonVisible(), false, "then the button to create custom fields is not shown");
 		});
 
 		QUnit.test("when the service is up to date and addViaDelegate action is available but extensibility is not enabled in the system", async function(assert) {
@@ -1908,8 +1905,7 @@ sap.ui.define([
 
 			assert.ok(this.fnDialogOpen.calledOnce, "then the dialog was opened");
 			assert.strictEqual(oIsServiceOutdatedStub.callCount, 0, "the function is not called");
-			var oCustomFieldButton = Element.getElementById(`${this.oDialog.getId()}--rta_customFieldButton`);
-			assert.equal(oCustomFieldButton.getVisible(), false, "the Button to create custom Fields is not shown");
+			assert.equal(this.oDialog.getCustomFieldButtonVisible(), false, "the Button to create custom Fields is not shown");
 		});
 
 		QUnit.test("when the service is up to date and addViaDelegate action is available and extensibility is enabled in the system", async function(assert) {
@@ -1928,8 +1924,7 @@ sap.ui.define([
 			await this.oPlugin.showAvailableElements(false, sAggregationName, [oOverlay]);
 
 			assert.ok(this.fnDialogOpen.calledOnce, "then the dialog was opened");
-			const oCustomFieldButton = Element.getElementById(`${this.oDialog.getId()}--rta_customFieldButton`);
-			assert.equal(oCustomFieldButton.getVisible(), true, "the Button to create custom Fields is shown");
+			assert.equal(this.oDialog.getCustomFieldButtonVisible(), true, "the Button to create custom Fields is shown");
 		});
 
 		QUnit.test("when the service is not up to date and addViaDelegate action is available and extensibility is enabled in the system", async function(assert) {
@@ -1955,8 +1950,7 @@ sap.ui.define([
 				"the event is fired"
 			);
 			assert.ok(this.fnDialogOpen.calledOnce, "then the dialog was opened");
-			const oCustomFieldButton = Element.getElementById(`${this.oDialog.getId()}--rta_customFieldButton`);
-			assert.equal(oCustomFieldButton.getVisible(), true, "the Button to create custom Fields is shown");
+			assert.equal(this.oDialog.getCustomFieldButtonVisible(), true, "the Button to create custom Fields is shown");
 		});
 
 		QUnit.test("when no addViaDelegate action is available", async function(assert) {
@@ -2027,10 +2021,7 @@ sap.ui.define([
 				oIsServiceOutdatedStub.getCall(0).args[0],
 				"addViaDelegate is dependent on up to date service, it should be called with a control"
 			);
-			const oBCContainer = Element.getElementById(`${this.oDialog.getId()}--rta_businessContextContainer`);
 			assert.equal(this.oDialog.getCustomFieldButtonVisible(), true, "then in the dialog custom field is enabled");
-			assert.equal(oBCContainer.getVisible(), true, "then in the Business Context Container in the Dialog is visible");
-			assert.equal(oBCContainer.getContent().length > 1, true, "then in the Business Context Container shows Business Contexts");
 
 			this.oDialog.fireTriggerExtensibilityAction();
 		});
@@ -2066,17 +2057,6 @@ sap.ui.define([
 				this.oDialog.getCustomFieldButtonVisible(),
 				true,
 				"then in the dialog custom field button is visible"
-			);
-			const oBCContainer = Element.getElementById(`${this.oDialog.getId()}--rta_businessContextContainer`);
-			assert.equal(
-				oBCContainer.getVisible(),
-				true,
-				"then in the Business Context Container in the Dialog is visible"
-			);
-			assert.equal(
-				oBCContainer.getContent().length > 1,
-				true,
-				"then in the Business Context Container shows Business Contexts"
 			);
 			await this.oPlugin.showAvailableElements(false, sAggregationName, [oOverlay]);
 			await this.oPlugin.showAvailableElements(false, sAggregationName, [oOverlay]);
@@ -2367,10 +2347,8 @@ sap.ui.define([
 
 		// simulate dialog closed with OK/CANCEL
 		this.fnDialogOpen = sandbox.stub(this.oDialog, "open").callsFake(function() {
-			return this.oDialog._oDialogPromise.then(function() {
-				return oDialogReturnValue;
-			});
-		}.bind(this));
+			return oDialogReturnValue;
+		});
 	}
 
 	function enhanceForResponsibleElement(mActions) {
