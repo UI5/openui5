@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head><meta charset="utf-8">
+	<title>Developing Cards</title>
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<script src="../../scripts/boot.js"></script>
+</head>
+
+<body class="sapUiBody topicBody">
+	<div class="topic">
+		<div class="content">
+
+			<h1 id="suppertedPlatforms">Supported Platforms</h1>
+
+			<h2 id="web">Web-Based Platforms</h2>
+			<p>UI Integration Cards provide comprehensive support for web-based applications across desktop and mobile browsers.</p>
+
+			<h3 id="featureSupport">Feature Support</h3>
+			<ul>
+				<li><strong>Complete Feature Set:</strong> All card features are fully supported in web environments, including data binding, actions, filtering, and interactive elements</li>
+				<li><strong>Responsive Design:</strong> Cards automatically adapt to different screen sizes and orientations.</li>
+				<li><strong>Cross-Browser Compatibility:</strong> Consistent experience across modern browsers</li>
+			</ul>
+	
+			<h3 id="browserRequirements">Browser Requirements</h3>
+			<p>For detailed browser support information, refer to the <a href="https://sapui5.hana.ondemand.com/#/topic/74b59efa0eef48988d3b716bd0ecc933" target="_blank">browser-support</a> documentation of the OpenUI5 framework.</p>
+
+
+			<h2 id="native">Mobile Native Platforms</h2>
+			<p>
+				True to the “Write once, use everywhere” principle, the UI Integration Cards are supported on mobile native platforms.<br>
+				The mobile native implementation of UI Integration Cards features a built-in JavaScript engine capable of interpreting the same JSON manifest files used in web applications.<br>
+				This embedded runtime processes the card definitions uniformly across platforms, ensuring consistent behavior and appearance.<br>
+				As a result, developers can maintain a single card definition while achieving native performance and applying platform-specific optimizations on mobile devices.<br>
+			</p>
+
+			<h3 id="nativeCards">What are Mobile Native Cards?</h3>
+			<p>Mobile native cards are UI Integration Cards that run within native Android and iOS applications.</p>
+
+			<h3 id="supportedApplications">Supported Applications</h3>
+			<ul>
+				<li><strong>SAP Mobile Start:</strong> Enterprise mobile portal that hosts and displays cards alongside other business content.</li>
+				<li><strong>Joule for Mobile:</strong> AI-powered digital assistant that leverages cards for interactive business insights.</li>
+			</ul>
+
+			<h3 id="limitations">Feature Parity and Limitations</h3>
+			<p>Most card properties are supported on mobile native platforms, with a few exceptions. These exceptions are marked throughout the documentation and fall into one of the following categories:</p><p>
+			</p><ul>
+				<li>“Not applicable for mobile native cards.” - has no effect for mobile native integration cards.</li>
+				<li>“Not yet implemented for mobile native cards.” - this feature is currently not implemented, but might be implemented in the future.</li>
+				<li>“Not supported for mobile native cards.” - this feature can not be supported on mobile native platforms.</li>
+			</ul>
+
+			<h3 id="considerations">Additional Considerations for Mobile Native Platforms</h3>
+			<ul>
+				<li>Only declarative card types are supported. Cards of type Adaptive, Component and WebPage are not supported.</li>
+				<li>JS Extensions are generally supported, but they must adhere to the basic card facade API provided within the extension.<br> 
+					The extension must be tested on a mobile native platform before it is productively released.</li>
+				<li>Certain web-specific APIs may not be available.</li>
+				<li>Some advanced animations or transitions may be simplified.</li>
+				<li>Network requests adhere to mobile application security guidelines.</li>
+			</ul>
+
+			<p class="note">Mobile native cards prioritize a native user experience while maintaining the core card functionality and consistent theming and design representation.</p>
+
+		</div>
+	</div>
+</body>
+
+</html>

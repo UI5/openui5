@@ -106,7 +106,7 @@ sap.ui.define([
 			&& oPendingInteraction.end - performance.timeOrigin >= oRequestTiming.responseEnd;
 		const bStartsInInteraction = oPendingInteraction.start - performance.timeOrigin <= oRequestTiming.startTime;
 		const oRequestInfo = oRequestTiming[UI5_REQUEST_INFO_SYMBOL];
-		const bCached = oRequestTiming.transferSize === 0 && oRequestTiming.decodedBodySize > 0;
+		const bCached = oRequestTiming.transferSize === 0 && oRequestTiming.decodedBodySize >= 0;
 		const bIsValid = !bCached && !isCrossOriginURL(oRequestTiming.name) && oRequestInfo && bPartOfInteraction && oRequestTiming.initiatorType === "xmlhttprequest";
 
 		// calculate navigation and roundtrip time for all requests to calculate client CPU time
@@ -345,7 +345,7 @@ sap.ui.define([
 			let aTimings = performance.getEntriesByType("resource");
 			aTimingCache.push(...aTimings);
 			performance.clearResourceTimings();
-			if (!oPendingInteraction?.completed && oPendingInteraction?.id === sId) {
+			if (aTimings.length && !oPendingInteraction?.completed && oPendingInteraction?.id === sId) {
 				if (oRequestInfo) {
 					aTimings = aTimings.filter((timing) => {
 						return timing.name === this[UI5_URL_SYMBOL];

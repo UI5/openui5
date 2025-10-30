@@ -25,6 +25,12 @@ sap.ui.define([
 				key: "developingCards"
 			},
 			{
+				title: "Supported Platforms",
+				icon: "sap-icon://desktop-mobile",
+				target: "overview",
+				key: "supportedPlatforms"
+			},
+			{
 				title: "References",
 				icon: "sap-icon://list",
 				target: "overview",

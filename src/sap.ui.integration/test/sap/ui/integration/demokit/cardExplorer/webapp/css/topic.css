@@ -110,6 +110,19 @@
 	width: 450px;
 }
 
+.mobileNoteIcon {
+  color: var(--sapAccentColor10);
+  line-height: 1;
+}
+
+.mobileNoteIcon::before {
+  content: "\e27d";
+  font-family: 'SAP-icons';
+  font-size: 1em;
+  align-items: center;
+  vertical-align: middle;
+}
+
 /* table styles */
 
 .topic table {

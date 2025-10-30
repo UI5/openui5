@@ -1,17 +1,15 @@
 /* global QUnit */
 
 sap.ui.define([
-	"sap/ui/fl/write/api/FieldExtensibility",
-	"sap/ui/rta/plugin/additionalElements/AddElementsDialog",
-	"sap/ui/thirdparty/sinon-4",
 	"sap/ui/core/Element",
-	"sap/ui/core/Lib"
+	"sap/ui/core/Lib",
+	"sap/ui/rta/plugin/additionalElements/AddElementsDialog",
+	"sap/ui/thirdparty/sinon-4"
 ], function(
-	FieldExtensibility,
-	AddElementsDialog,
-	sinon,
 	Element,
-	Lib
+	Lib,
+	AddElementsDialog,
+	sinon
 ) {
 	"use strict";
 
@@ -87,8 +85,8 @@ sap.ui.define([
 				})[0];
 			}
 
-			this.oAddElementsDialog._oDialogPromise.then(function() {
-				const oList = Element.getElementById(`${this.oAddElementsDialog.getId()}--rta_addElementsDialogList`);
+			this.oAddElementsDialog.attachOpened(function() {
+				const oList = Element.getElementById(`${this.getId()}--rta_addElementsDialogList`);
 				var sBindingPath = oList.getItems()[0].getBindingContext().getPath();
 
 				function checkList() {
@@ -97,17 +95,15 @@ sap.ui.define([
 					done();
 				}
 
-				this.oAddElementsDialog.attachOpened(function() {
-					var oTargetItem = getItemByPath(oList.getItems(), sBindingPath);
-					oTargetItem.getDomRef().focus();
-					assert.strictEqual(document.activeElement, oTargetItem.getDomRef());
-					oTargetItem.getDomRef().dispatchEvent(new Event("touchstart"));
+				var oTargetItem = getItemByPath(oList.getItems(), sBindingPath);
+				oTargetItem.getDomRef().focus();
+				assert.strictEqual(document.activeElement, oTargetItem.getDomRef());
+				oTargetItem.getDomRef().dispatchEvent(new Event("touchstart"));
 
-					// Wait until list is re-rendered
-					setTimeout(checkList);
-				});
-				this.oAddElementsDialog.open();
-			}.bind(this));
+				// Wait until list is re-rendered
+				setTimeout(checkList);
+			});
+			this.oAddElementsDialog.open();
 		});
 
 		QUnit.test("when AddElementsDialog gets initialized and open is called,", function(assert) {
@@ -134,6 +130,12 @@ sap.ui.define([
 			var done = assert.async();
 
 			this.oAddElementsDialog.setCustomFieldButtonVisible(true);
+			this.oAddElementsDialog.addExtensibilityInfo({
+				UITexts: {
+					headerText: "extensibilityHeaderText",
+					tooltip: "extensibilityTooltip"
+				}
+			});
 			this.oAddElementsDialog.attachOpened(function() {
 				const oBCContainer = Element.getElementById(`${this.getId()}--rta_businessContextContainer`);
 				assert.ok(oBCContainer.getVisible(), "then the Business Context Container is visible");
@@ -146,22 +148,25 @@ sap.ui.define([
 				);
 				done();
 			});
-			this.oAddElementsDialog._oDialogPromise
-			.then(function() {
-				this.oAddElementsDialog.addExtensibilityInfo({
-					UITexts: {
-						headerText: "extensibilityHeaderText",
-						tooltip: "extensibilityTooltip"
-					}
-				});
-				this.oAddElementsDialog.open();
-			}.bind(this));
+			this.oAddElementsDialog.open();
 		});
 
 		QUnit.test("when AddElementsDialog gets initialized with customFieldButtonVisible set and three Business Contexts are available", function(assert) {
 			var done = assert.async();
 
 			this.oAddElementsDialog.setCustomFieldButtonVisible(true);
+			var oExtensibilityInfo = {
+				extensionData: [
+					{ description: "Business Context 1" },
+					{ description: "Business Context 2" },
+					{ description: "Business Context 3" }
+				],
+				UITexts: {
+					headerText: "extensibilityHeaderText",
+					tooltip: "extensibilityTooltip"
+				}
+			};
+			this.oAddElementsDialog.addExtensibilityInfo(oExtensibilityInfo);
 			this.oAddElementsDialog.attachOpened(function() {
 				const oBCContainer = Element.getElementById(`${this.getId()}--rta_businessContextContainer`);
 				assert.ok(oBCContainer.getVisible(), "then the Business Context Container is visible");
@@ -184,32 +189,20 @@ sap.ui.define([
 				);
 				done();
 			});
-			var oExtensibilityInfo = {
-				extensionData: [
-					{ description: "Business Context 1" },
-					{ description: "Business Context 2" },
-					{ description: "Business Context 3" }
-				],
-				UITexts: {
-					headerText: "extensibilityHeaderText",
-					tooltip: "extensibilityTooltip"
-				}
-			};
-			this.oAddElementsDialog._oDialogPromise
-			.then(function() {
-				this.oAddElementsDialog.addExtensibilityInfo(oExtensibilityInfo);
-				this.oAddElementsDialog.open();
-			}.bind(this));
+			this.oAddElementsDialog.open();
 		});
 
-		QUnit.test("when AddElementsDialog gets closed and opened again with customFieldButtonVisible set and available Business Contexts", function(assert) {
-			var done = assert.async();
-
+		QUnit.test("when AddElementsDialog gets closed and opened again with customFieldButtonVisible set and available Business Contexts", async function(assert) {
 			function fnOnClose() {
 				this.oAddElementsDialog.attachEventOnce("opened", fnOnOpen);
 			}
+
+			function fnFirstOpen() {
+				this.oAddElementsDialog._submitDialog();
+			}
+
 			function fnOnOpen() {
-				const oBCContainer = Element.getElementById(`${this.getId()}--rta_businessContextContainer`);
+				const oBCContainer = Element.getElementById(`${this.oAddElementsDialog.getId()}--rta_businessContextContainer`);
 				assert.ok(oBCContainer.getVisible(), "then the Business Context Container is visible");
 				assert.equal(oBCContainer.getContent().length, 4, "and the Business Context Container has four entries");
 				assert.equal(oBCContainer.getContent()[0].getText(), "extensibilityHeaderText", "and the first entry is the Title");
@@ -228,7 +221,7 @@ sap.ui.define([
 					"Business Context 3",
 					"and the fourth entry is the Third Business Context"
 				);
-				done();
+				this.oAddElementsDialog._submitDialog();
 			}
 
 			this.oAddElementsDialog.setCustomFieldButtonVisible(true);
@@ -244,18 +237,18 @@ sap.ui.define([
 				}
 			};
 			this.oAddElementsDialog.addExtensibilityInfo(oExtensibilityInfo);
-			this.oAddElementsDialog._oDialogPromise.then(function(oDialog) {
-				oDialog.attachEventOnce("afterClose", fnOnClose, this);
-			}.bind(this));
+			this.oAddElementsDialog.attachEventOnce("afterClose", fnOnClose, this);
+			this.oAddElementsDialog.attachEventOnce("opened", fnFirstOpen, this);
 
 			// Open the first time and close it
-			this.oAddElementsDialog.open();
-			this.oAddElementsDialog._submitDialog();
+			await this.oAddElementsDialog.open();
 
 			// Add Business Context again
+			this.oAddElementsDialog = createDialog();
+			this.oAddElementsDialog.attachEventOnce("opened", fnOnOpen, this);
 			this.oAddElementsDialog.addExtensibilityInfo(oExtensibilityInfo);
 			// Open the second time
-			this.oAddElementsDialog.open();
+			await this.oAddElementsDialog.open();
 		});
 
 		QUnit.test("when AddElementsDialog gets initialized with legacy extensibility", function(assert) {
@@ -275,6 +268,7 @@ sap.ui.define([
 						}]
 				}
 			};
+			this.oAddElementsDialog.setExtensibilityOptions(oExtensibilityInfo);
 			this.oAddElementsDialog.attachOpened(function() {
 				const oButton = Element.getElementById(`${this.getId()}--rta_customFieldButton`);
 				const oRedirectToCustomFieldCreationStub = sandbox.stub(AddElementsDialog.prototype, "_redirectToExtensibilityAction");
@@ -304,11 +298,7 @@ sap.ui.define([
 				});
 				oButton.firePress();
 			});
-			this.oAddElementsDialog._oDialogPromise
-			.then(function() {
-				this.oAddElementsDialog.setExtensibilityOptions(oExtensibilityInfo);
-				this.oAddElementsDialog.open();
-			}.bind(this));
+			this.oAddElementsDialog.open();
 		});
 
 		QUnit.test("when AddElementsDialog gets initialized with one extensibility option", function(assert) {
@@ -330,6 +320,7 @@ sap.ui.define([
 					]
 				}
 			};
+			this.oAddElementsDialog.setExtensibilityOptions(oExtensibilityInfo);
 			this.oAddElementsDialog.attachOpened(function() {
 				const oButton = Element.getElementById(`${this.getId()}--rta_customFieldButton`);
 				const oRedirectToCustomFieldCreationStub = sandbox.stub(AddElementsDialog.prototype, "_redirectToExtensibilityAction");
@@ -359,12 +350,7 @@ sap.ui.define([
 				});
 				oButton.firePress();
 			});
-
-			this.oAddElementsDialog._oDialogPromise
-			.then(function() {
-				this.oAddElementsDialog.setExtensibilityOptions(oExtensibilityInfo);
-				this.oAddElementsDialog.open();
-			}.bind(this));
+			this.oAddElementsDialog.open();
 		});
 
 		QUnit.test("when AddElementsDialog gets initialized with multiple extensibility options", function(assert) {
@@ -391,6 +377,7 @@ sap.ui.define([
 					]
 				}
 			};
+			this.oAddElementsDialog.setExtensibilityOptions(oExtensibilityInfo);
 			this.oAddElementsDialog.attachOpened(function() {
 				const oMenuButton = Element.getElementById(`${this.getId()}--rta_customFieldMenuButton`);
 				const aMenuItems = oMenuButton.getMenu().getItems();
@@ -455,12 +442,7 @@ sap.ui.define([
 				aMenuItems[0].firePress();
 				aMenuItems[1].firePress();
 			});
-
-			this.oAddElementsDialog._oDialogPromise
-			.then(function() {
-				this.oAddElementsDialog.setExtensibilityOptions(oExtensibilityInfo);
-				this.oAddElementsDialog.open();
-			}.bind(this));
+			this.oAddElementsDialog.open();
 		});
 
 		QUnit.test("when on opened AddElementsDialog OK is pressed,", function(assert) {

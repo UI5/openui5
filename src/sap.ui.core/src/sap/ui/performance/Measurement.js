@@ -135,7 +135,7 @@ sap.ui.define([
 				return;
 			}
 			bActive = bOn;
-			if (bActive) {
+			if (bActive && !XHRInterceptor.isRegistered("MEASUREMENT", "open")) {
 
 				//activate method implementations once
 				for (var sName in mMethods) {
@@ -152,7 +152,7 @@ sap.ui.define([
 					this.addEventListener("loadend", fnEnd.bind(null, sMeasureId));
 
 				});
-			} else {
+			} else if (XHRInterceptor.isRegistered("MEASUREMENT", "open")) {
 				XHRInterceptor.unregister("MEASUREMENT", "open");
 			}
 

@@ -2081,10 +2081,17 @@ sap.ui.define([
 				]
 			});
 
+			this.oActionItem = new NavigationListItem({
+				id: "actionItem",
+				text: 'Action lorem ipsum dolor sit amet',
+				design: "Action"
+			});
+
 			this.navigationList = new NavigationList({
 				width: "100px",
 				items: [
-					this.oItem
+					this.oItem,
+					this.oActionItem
 				]
 			});
 			this.navigationList.placeAt("content");
@@ -2096,15 +2103,28 @@ sap.ui.define([
 		}
 	});
 
-	QUnit.test("Tooltip should be available for long text on mouseover", function (assert) {
-		const oTarget = this.oItem.getDomRef().querySelector("#parentItem-a .sapMText"),
-			oTooltipElement = this.oItem._getTooltipElement();
+	QUnit.test("Action items should have tooltips for long text on mouseover", function (assert) {
+		const oTarget = this.oActionItem.getDomRef().querySelector("#actionItem-a .sapMText"),
+			oTooltipElement = this.oActionItem._getTooltipElement();
 
 		QUnitUtils.triggerEvent("mouseover", oTarget);
-		assert.strictEqual(oTooltipElement.getAttribute("title"), "Parent lorem ipsum dolor sit amet", "The tooltip is present");
+		assert.strictEqual(oTooltipElement.getAttribute("title"), "Action lorem ipsum dolor sit amet", "The tooltip is present for action items");
 
 		QUnitUtils.triggerEvent("mouseout", oTarget);
 		assert.notOk(oTooltipElement.getAttribute("title"), "The tooltip removed");
+	});
+
+	QUnit.test("Regular items should wrap text and not have automatic tooltips", function (assert) {
+		const oTarget = this.oItem.getDomRef().querySelector("#parentItem-a .sapMText"),
+			oTooltipElement = this.oItem._getTooltipElement();
+
+		assert.notOk(oTarget.classList.contains("sapMTextNoWrap"), "Regular items should not have nowrap class when expanded");
+
+		QUnitUtils.triggerEvent("mouseover", oTarget);
+		assert.notOk(oTooltipElement.getAttribute("title"), "No automatic tooltip for regular items that can wrap");
+
+		QUnitUtils.triggerEvent("mouseout", oTarget);
+		assert.notOk(oTooltipElement.getAttribute("title"), "No tooltip after mouseout");
 	});
 
 	QUnit.test("Extended tooltip should be available for long text on mouseover", async function (assert) {

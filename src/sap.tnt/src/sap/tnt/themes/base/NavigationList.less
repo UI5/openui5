@@ -14,6 +14,8 @@
 @_sap_tnt_NavigationList_ItemBorderWidth: 0;
 @_sap_tnt_NavigationList_ItemHeight: 3rem;
 @_sap_tnt_NavigationList_ItemHeightCompact: 2rem;
+@_sap_tnt_NavigationList_ItemTextMargin: 0.875rem;
+@_sap_tnt_NavigationList_ItemTextMarginCompact: 0.5rem;
 @_sap_tnt_NavigationList_LastItemBorderStyleColor: none;
 @_sap_tnt_NavigationList_ItemBorderRadius: 0;
 @_sap_tnt_NavigationList_ItemBottomMargin: 0;
@@ -181,6 +183,16 @@
 		display: flex;
 		align-items: center;
 		box-sizing: border-box;
+	}
+}
+
+.sapTntNL:not(.sapTntNLCollapsed) .sapTntNLI:not(.sapTntNLIAction):not(.sapTntNLIInPopover) {
+	height: auto;
+	min-height: @_sap_tnt_NavigationList_ItemHeight;
+
+	a {
+		padding-top: @_sap_tnt_NavigationList_ItemTextMargin;
+		padding-bottom: @_sap_tnt_NavigationList_ItemTextMargin;
 	}
 }
 
@@ -539,8 +551,7 @@ html[dir=rtl] .sapTntNLISelected:not(.sapTntNLIDisabled) {
 		font-size: @sapFontSize;
 		font-family: @sapFontFamily;
 		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
+		margin: @_sap_tnt_NavigationList_ItemTextMargin 0;
 	}
 
 	.sapTntNLGroupIcon {
@@ -781,6 +792,16 @@ html[dir=rtl] .sapTntNLISelected:not(.sapTntNLIDisabled) {
 		height: @_sap_tnt_NavigationList_ItemHeightCompact;
 	}
 
+	.sapTntNL:not(.sapTntNLCollapsed) .sapTntNLI:not(.sapTntNLIAction):not(.sapTntNLIInPopover) {
+		height: auto;
+		min-height: @_sap_tnt_NavigationList_ItemHeightCompact;
+
+		a {
+			padding-top: @_sap_tnt_NavigationList_ItemTextMarginCompact;
+			padding-bottom: @_sap_tnt_NavigationList_ItemTextMarginCompact;
+		}
+	}
+
 	.sapTntNLMenu.sapMMenu .sapUiIcon {
 		line-height: @_sap_tnt_NavigationList_ItemHeightCompact;
 	}
@@ -800,6 +821,10 @@ html[dir=rtl] .sapTntNLISelected:not(.sapTntNLIDisabled) {
 
 	.sapTntNLPopup .sapTntNLISecondLevel .sapMText{
 		padding-left: 0;
+	}
+
+	.sapTntNLGroupText {
+		margin: @_sap_tnt_NavigationList_ItemTextMarginCompact 0;
 	}
 
 	.sapTntNLCollapsed {

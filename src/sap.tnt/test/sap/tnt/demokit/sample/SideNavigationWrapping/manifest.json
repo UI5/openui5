@@ -1,0 +1,40 @@
+{
+	"_version": "2.0.0",
+	"sap.app": {
+		"id": "sap.tnt.sample.SideNavigationWrapping",
+		"applicationVersion": {
+			"version": "1.0.0"
+		},
+		"type": "application",
+		"title": "Application 'SideNavigationWrapping'"
+	},
+	"sap.ui": {
+		"technology": "UI5",
+		"deviceTypes": {
+			"desktop": true,
+			"tablet": true,
+			"phone": true
+		}
+	},
+	"sap.ui5": {
+		"rootView": "sap.tnt.sample.SideNavigationWrapping.V",
+		"dependencies": {
+			"minUI5Version": "2.0.0",
+			"libs": {
+				"sap.ui.core": {},
+				"sap.tnt": {},
+				"sap.m": {}
+			}
+		},
+		"config": {
+			"sample": {
+				"stretch": true,
+				"files": [
+					"V.view.xml",
+					"C.controller.js",
+					"manifest.json"
+				]
+			}
+		}
+	}
+}

@@ -55,20 +55,12 @@ sap.ui.define([
 		}
 	});
 
-	let oRTAResourceModel;
-
 	/**
 	 * Initialize the Dialog
 	 *
 	 * @private
 	 */
 	AddElementsDialog.prototype.init = function() {
-		this._oDialogPromise = Fragment.load({
-			id: this.getId(),
-			name: "sap.ui.rta.plugin.additionalElements.AddElementsDialog",
-			controller: this
-		});
-
 		this._oDialogModel = new JSONModel({
 			elements: [],
 			customFieldButtonText: "",
@@ -82,30 +74,62 @@ sap.ui.define([
 			extensibilityOptions: []
 		});
 
-		this._oDialogPromise.then(function(oDialog) {
-			oDialog.setModel(this._oDialogModel);
-			oRTAResourceModel ||= new ResourceModel({ bundleName: "sap.ui.rta.messagebundle" });
-			oDialog.setModel(oRTAResourceModel, "i18n");
-
-			oDialog.addStyleClass(Utils.getRtaStyleClassName());
-
-			this._oDialogModel.setProperty("/listNoDataText", oRTAResourceModel.getProperty("MSG_NO_FIELDS").toLowerCase());
-
-			// retrieve List to set the sorting for the 'items' aggregation, since sap.ui.model.Sorter
-			// does not support binding to a model property...
-			this._oList = Element.getElementById(`${this.getId()}--rta_addElementsDialogList`);
-			this._bDescendingSortOrder = false;
-		}.bind(this));
+		this._bDescendingSortOrder = false;
+		this.oRTAResourceModel = new ResourceModel({ bundleName: "sap.ui.rta.messagebundle" });
 	};
 
 	AddElementsDialog.prototype.exit = function(...aArgs) {
-		this._oDialogPromise.then(function(oDialog) {
-			oDialog.destroy();
-		});
+		if (this._oDialog) {
+			this._oDialog.destroy();
+		}
 
 		if (ManagedObject.prototype.exit) {
 			ManagedObject.prototype.exit.apply(this, aArgs);
 		}
+	};
+
+	/**
+	 * Create the Add Elements Dialog
+	 *
+	 * @private
+	 */
+	AddElementsDialog.prototype._createDialog = function() {
+		Fragment.load({
+			id: this.getId(),
+			name: "sap.ui.rta.plugin.additionalElements.AddElementsDialog",
+			controller: this
+		}).then(function(oDialog) {
+			this._oDialog = oDialog;
+			this._oDialog.addStyleClass(Utils.getRtaStyleClassName());
+			this._oDialog.setModel(this._oDialogModel);
+			this._oDialog.setModel(this.oRTAResourceModel, "i18n");
+
+			this._oDialogModel.setProperty("/listNoDataText", this.oRTAResourceModel.getProperty("MSG_NO_FIELDS").toLowerCase());
+
+			// retrieve List to set the sorting for the 'items' aggregation, since sap.ui.model.Sorter
+			// does not support binding to a model property...
+			this._oList = Element.getElementById(`${this.getId()}--rta_addElementsDialogList`);
+			this._openDialog();
+		}.bind(this));
+	};
+
+	/**
+	 * Open and set up Add Elements Dialog
+	 *
+	 * @private
+	 */
+	AddElementsDialog.prototype._openDialog = function() {
+		this._oDialog.attachAfterOpen(function() {
+			this.fireOpened();
+		}.bind(this));
+
+		this._oDialog.attachAfterClose(function() {
+			this._oDialog.destroy();
+			this._oDialog = null;
+			// The resolve/reject is handled by the specific dialog close methods (_submitDialog/_cancelDialog)
+		}.bind(this));
+
+		this._oDialog.open();
 	};
 
 	AddElementsDialog.prototype.setCustomFieldButtonVisible = function(bVisible) {
@@ -118,26 +142,22 @@ sap.ui.define([
 
 	/**
 	 * Close the dialog.
-	 * @returns {Promise} a Promise that resolves (to nothing) once the dialog is loaded and closed
 	 */
-	AddElementsDialog.prototype._submitDialog = async function() {
-		const oDialog = await this._oDialogPromise;
-		oDialog.close();
+	AddElementsDialog.prototype._submitDialog = function() {
+		this._oDialog.close();
 		this._fnResolveOnDialogConfirm();
 		// indicate that the dialog has been closed and the selected fields (if any) are to be added to the UI
 	};
 
 	/**
-	 * Close dialog. All sections will be reverted
+	 * Close dialog. Dialog is destroyed.
 	 */
 	AddElementsDialog.prototype._cancelDialog = function() {
 		// clear all selections
 		this._oDialogModel.getObject("/elements").forEach(function(oElem) {
 			oElem.selected = false;
 		});
-		this._oDialogPromise.then(function(oDialog) {
-			oDialog.close();
-		});
+		this._oDialog.close();
 		// indicate that the dialog has been closed without choosing to add any fields (canceled)
 		this._fnRejectOnDialogCancel();
 	};
@@ -159,20 +179,14 @@ sap.ui.define([
 	/**
 	 * Open the Field Repository Dialog
 	 *
-	 * @returns {Promise} promise that resolves once the Fragment is loaded and the dialog is opened
+	 * @returns {Promise} Promise that resolves once the dialog is opened
 	 * @public
 	 */
 	AddElementsDialog.prototype.open = function() {
 		return new Promise(function(resolve, reject) {
 			this._fnResolveOnDialogConfirm = resolve;
 			this._fnRejectOnDialogCancel = reject;
-
-			this._oDialogPromise.then(function(oDialog) {
-				oDialog.attachAfterOpen(function() {
-					this.fireOpened();
-				}.bind(this));
-				oDialog.open();
-			}.bind(this));
+			this._createDialog();
 		}.bind(this));
 	};
 
@@ -218,15 +232,14 @@ sap.ui.define([
 	 */
 	AddElementsDialog.prototype._redirectToExtensibilityAction = function(sActionKey) {
 		this.fireTriggerExtensibilityAction({ actionKey: sActionKey });
-		this._oDialogPromise.then(function(oDialog) {
-			oDialog.close();
-		});
+		this._oDialog.close();
 	};
 
-	AddElementsDialog.prototype.setTitle = async function(sTitle) {
+	AddElementsDialog.prototype.setTitle = function(sTitle) {
 		ManagedObject.prototype.setProperty.call(this, "title", sTitle, true);
-		const oDialog = await this._oDialogPromise;
-		oDialog.setTitle(sTitle);
+		if (this._oDialog) {
+			this._oDialog.setTitle(sTitle);
+		}
 	};
 
 	/**
@@ -291,7 +304,7 @@ sap.ui.define([
 		} else {
 			// Message "none" when no extension data is available
 			aBusinessContextTexts.push({
-				text: oRTAResourceModel.getProperty("MSG_NO_BUSINESS_CONTEXTS")
+				text: this.oRTAResourceModel.getProperty("MSG_NO_BUSINESS_CONTEXTS")
 			});
 		}
 		// set the container visible
