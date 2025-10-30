@@ -101,6 +101,20 @@
 	}
 }
 
+/* When wrapItemsText is true, make the picker fit its content width */
+.sapMSltPicker-CTX.sapMPickerWrappedItems {
+	max-width: max-content;
+	width: fit-content;
+
+	.sapMSelectList.sapMSelectListWrappedItems {
+		width: fit-content;
+
+		.sapMSelectListTableLayout {
+			width: auto;
+		}
+	}
+}
+
 /* defines the ratio of columns inside selectList, when text is truncated */
 .sapMSltPicker-CTX .sapMSelectList:not(.sapMSelectListWrappedItems) {
 
