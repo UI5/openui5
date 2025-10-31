@@ -119,7 +119,7 @@ sap.ui.define([
 				defaultVariant: mProperties.variantReference
 			}
 		}));
-		FlexObjectManager.addDirtyFlexObjects(sReference, aFlexObjects);
+		FlexObjectManager.addDirtyFlexObjects(sReference, oAppComponent.getId(), aFlexObjects);
 		return aFlexObjects;
 	};
 

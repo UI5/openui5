@@ -421,12 +421,13 @@ sap.ui.define([
 	 * Adds new dirty flex objects.
 	 *
 	 * @param {string} sReference - Flex reference of the application
+	 * @param {string} sComponentId - ID of the component
 	 * @param {object[]} aFlexObjects - JSON object representation of flex objects or flex object instances
 	 * @returns {sap.ui.fl.apply._internal.flexObjects.FlexObject[]} The prepared flex objects
 	 * @public
 	 */
-	FlexObjectManager.addDirtyFlexObjects = function(sReference, aFlexObjects) {
-		return FlexState.addDirtyFlexObjects(sReference, aFlexObjects.map(getOrCreateFlexObject));
+	FlexObjectManager.addDirtyFlexObjects = function(sReference, sComponentId, aFlexObjects) {
+		return FlexState.addDirtyFlexObjects(sReference, aFlexObjects.map(getOrCreateFlexObject), sComponentId);
 	};
 
 	/**
@@ -544,7 +545,7 @@ sap.ui.define([
 			removeFlexObjectFromDependencyHandler(mPropertyBag.reference, oFlexObject);
 		});
 		FlexState.removeDirtyFlexObjects(mPropertyBag.reference, aToBeRemovedDirtyFlexObjects);
-		const aAddedFlexObjects = FlexObjectManager.addDirtyFlexObjects(mPropertyBag.reference, aToBeDeletedFlexObjects);
+		const aAddedFlexObjects = FlexObjectManager.addDirtyFlexObjects(mPropertyBag.reference, mPropertyBag.componentId, aToBeDeletedFlexObjects);
 		if (!aToBeRemovedDirtyFlexObjects.length && !aAddedFlexObjects.length) {
 			const oFlexObjectsDataSelector = FlexState.getFlexObjectsDataSelector();
 			oFlexObjectsDataSelector.checkUpdate({
@@ -575,7 +576,7 @@ sap.ui.define([
 		const aDirtyFlexObjectsToBeAdded = aDeletedFlexObjects.filter((oFlexObject) => (
 			oFlexObject.getState() !== States.LifecycleState.PERSISTED
 		));
-		FlexObjectManager.addDirtyFlexObjects(mPropertyBag.reference, aDirtyFlexObjectsToBeAdded);
+		FlexObjectManager.addDirtyFlexObjects(mPropertyBag.reference, mPropertyBag.componentId, aDirtyFlexObjectsToBeAdded);
 	};
 
 	/**

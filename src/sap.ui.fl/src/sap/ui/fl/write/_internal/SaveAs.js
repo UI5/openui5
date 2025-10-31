@@ -8,8 +8,8 @@ sap.ui.define([
 	"sap/base/Log",
 	"sap/ui/fl/apply/_internal/appVariant/DescriptorChangeTypes",
 	"sap/ui/fl/apply/_internal/flexState/FlexObjectState",
-	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/apply/api/FlexRuntimeInfoAPI",
+	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/initial/_internal/Settings",
 	"sap/ui/fl/write/_internal/appVariant/AppVariantFactory",
 	"sap/ui/fl/write/_internal/appVariant/AppVariantInlineChangeFactory",
@@ -22,8 +22,8 @@ sap.ui.define([
 	Log,
 	DescriptorChangeTypes,
 	FlexObjectState,
-	ManifestUtils,
 	FlexRuntimeInfoAPI,
+	ManifestUtils,
 	Settings,
 	AppVariantFactory,
 	AppVariantInlineChangeFactory,
@@ -151,7 +151,8 @@ sap.ui.define([
 	}
 
 	function _deleteDescrChangesFromPersistence(vSelector) {
-		const sReference = ManifestUtils.getFlexReferenceForSelector(vSelector);
+		const oAppComponent = Utils.getAppComponentForSelector(vSelector);
+		const sReference = ManifestUtils.getFlexReferenceForSelector(oAppComponent);
 		var aChangesToBeDeleted = [];
 		// In case of app variant, both persistencies hold descriptor changes and have to be removed from one of the persistencies
 		_getDirtyDescrChanges(vSelector).forEach(function(oChange) {
@@ -162,6 +163,7 @@ sap.ui.define([
 		});
 		FlexObjectManager.deleteFlexObjects({
 			reference: sReference,
+			componentId: oAppComponent.getId(),
 			flexObjects: aChangesToBeDeleted
 		});
 	}

@@ -677,6 +677,7 @@ sap.ui.define([
 		beforeEach() {
 			stubUshellContainer();
 			this.oAppComponent = RtaQunitUtils.createAndStubAppComponent(sandbox);
+			sandbox.stub(FlUtils, "getComponentForControl").returns(this.oAppComponent);
 		},
 		afterEach() {
 			sandbox.restore();

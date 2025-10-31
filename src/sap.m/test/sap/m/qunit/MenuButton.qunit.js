@@ -851,6 +851,69 @@ sap.ui.define([
 
 		fnStopPropagationSpy.restore();
 	});
+
+	QUnit.test("Open with keyboard in split mode", function(assert) {
+		var fnHandleButtonPress = sinon.spy(this.sut, "_handleButtonPress"),
+			oEvent = {
+				preventDefault: function() {},
+				stopImmediatePropagation: function() {}
+			},
+			fnPreventDefaultSpy = sinon.spy(oEvent, "preventDefault"),
+			fnStopPropagationSpy = sinon.spy(oEvent, "stopImmediatePropagation");
+
+		this.sut.setButtonMode("Split");
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		var oSplitButton = this.sut._getButtonControl(),
+			oArrowButton = oSplitButton._getArrowButton(),
+			fnArrowButtonPress = sinon.spy(oArrowButton, "firePress");
+
+		// Test onsapup
+		oSplitButton.onsapup(oEvent);
+		assert.ok(fnArrowButtonPress.calledOnce, "Arrow button press fired for onsapup");
+		assert.ok(fnHandleButtonPress.calledOnce, "_handleButtonPress called after onsapup");
+
+		fnArrowButtonPress.resetHistory();
+		fnHandleButtonPress.resetHistory();
+
+		// Test onsapdown
+		oSplitButton.onsapdown(oEvent);
+		assert.ok(fnArrowButtonPress.calledOnce, "Arrow button press fired for onsapdown");
+		assert.ok(fnHandleButtonPress.calledOnce, "_handleButtonPress called after onsapdown");
+
+		fnArrowButtonPress.resetHistory();
+		fnHandleButtonPress.resetHistory();
+
+		// Test onsapupmodifiers
+		oSplitButton.onsapupmodifiers(oEvent);
+		assert.ok(fnArrowButtonPress.calledOnce, "Arrow button press fired for onsapupmodifiers");
+		assert.ok(fnHandleButtonPress.calledOnce, "_handleButtonPress called after onsapupmodifiers");
+
+		fnArrowButtonPress.resetHistory();
+		fnHandleButtonPress.resetHistory();
+
+		// Test onsapdownmodifiers
+		oSplitButton.onsapdownmodifiers(oEvent);
+		assert.ok(fnArrowButtonPress.calledOnce, "Arrow button press fired for onsapdownmodifiers");
+		assert.ok(fnHandleButtonPress.calledOnce, "_handleButtonPress called after onsapdownmodifiers");
+		assert.equal(fnStopPropagationSpy.callCount, 1, "'stopImmediatePropagation' called after onsapdownmodifiers event");
+
+		fnArrowButtonPress.resetHistory();
+		fnHandleButtonPress.resetHistory();
+
+		// Test onsapshow
+		oSplitButton.onsapshow(oEvent);
+		assert.ok(fnArrowButtonPress.calledOnce, "Arrow button press fired for onsapshow");
+		assert.ok(fnHandleButtonPress.calledOnce, "_handleButtonPress called after onsapshow");
+
+		assert.equal(fnPreventDefaultSpy.callCount, 1, "'preventDefault' called after onsapshow event");
+
+		// Cleanup
+		fnPreventDefaultSpy.restore();
+		fnStopPropagationSpy.restore();
+		fnArrowButtonPress.restore();
+		fnHandleButtonPress.restore();
+	});
 /*
 	QUnit.test("Menu opens again when opened by SPACE after closing by ESCAPE or TAB", function(assert) {
 		var oEvent = new jQuery.Event(),
@@ -1312,7 +1375,7 @@ sap.ui.define([
 		assert.strictEqual(oSpyArrowButtonPress.callCount, 3, "Arrow button firePress called");
 
 		//Act
-		this.sut.onsapdownmodifiers();
+		this.sut.onsapdownmodifiers({ stopImmediatePropagation: function() {} });
 
 		//Assert
 		assert.strictEqual(oSpyTextButtonPress.callCount, 2, "Main button firePress not called");

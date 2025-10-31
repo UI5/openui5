@@ -93,7 +93,8 @@ sap.ui.define([
 			sandbox.stub(FlexObjectManager, "saveFlexObjects").resolves("saveReturn");
 			sandbox.stub(FlexObjectManager, "addDirtyFlexObjects");
 			sandbox.stub(Utils, "getAppComponentForControl").returns({
-				getLocalId: () => sVMR
+				getLocalId: () => sVMR,
+				getId: () => "appComponentId"
 			});
 			sandbox.stub(ManifestUtils, "getFlexReferenceForControl").returns("flexReference");
 

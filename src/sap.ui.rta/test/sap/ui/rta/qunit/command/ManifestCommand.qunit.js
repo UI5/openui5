@@ -1,29 +1,32 @@
 /* global QUnit */
 
 sap.ui.define([
-	"sap/ui/fl/Layer",
-	"sap/ui/fl/write/api/ContextBasedAdaptationsAPI",
-	"sap/ui/fl/write/_internal/appVariant/AppVariantInlineChangeFactory",
-	"sap/ui/fl/descriptorRelated/api/DescriptorChange",
-	"sap/ui/fl/descriptorRelated/api/DescriptorChangeFactory",
-	"sap/ui/rta/command/CommandFactory",
 	"sap/m/Button",
 	"sap/ui/base/ManagedObject",
+	"sap/ui/fl/descriptorRelated/api/DescriptorChange",
+	"sap/ui/fl/descriptorRelated/api/DescriptorChangeFactory",
+	"sap/ui/fl/write/_internal/appVariant/AppVariantInlineChangeFactory",
+	"sap/ui/fl/write/api/ContextBasedAdaptationsAPI",
+	"sap/ui/fl/Layer",
+	"sap/ui/fl/Utils",
+	"sap/ui/rta/command/CommandFactory",
 	"sap/ui/thirdparty/sinon-4",
 	"test-resources/sap/ui/rta/qunit/RtaQunitUtils"
 ], function(
-	Layer,
-	ContextBasedAdaptationsAPI,
-	AppVariantInlineChangeFactory,
-	DescriptorChange,
-	DescriptorChangeFactory,
-	CommandFactory,
 	Button,
 	ManagedObject,
+	DescriptorChange,
+	DescriptorChangeFactory,
+	AppVariantInlineChangeFactory,
+	ContextBasedAdaptationsAPI,
+	Layer,
+	Utils,
+	CommandFactory,
 	sinon,
 	RtaQunitUtils
 ) {
 	"use strict";
+	const sandbox = sinon.createSandbox();
 
 	QUnit.module("Given the parameters required to create an manifest change...", {
 		before() {
@@ -35,6 +38,7 @@ sap.ui.define([
 			this.oMockedAppComponent.destroy();
 		},
 		beforeEach() {
+			sandbox.stub(Utils, "getComponentForControl").returns(this.oMockedAppComponent);
 			this.mFlexSettings = {
 				layer: Layer.CUSTOMER
 			};
@@ -64,6 +68,7 @@ sap.ui.define([
 			this.oButton = new Button("myButton");
 		},
 		afterEach() {
+			sandbox.restore();
 			this.oButton.destroy();
 		}
 	}, function() {

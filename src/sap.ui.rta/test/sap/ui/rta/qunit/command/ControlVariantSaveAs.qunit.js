@@ -5,6 +5,7 @@ sap.ui.define([
 	"sap/ui/fl/variants/VariantManagement",
 	"sap/ui/fl/variants/VariantManager",
 	"sap/ui/fl/write/api/ContextSharingAPI",
+	"sap/ui/fl/write/api/PersistenceWriteAPI",
 	"sap/ui/fl/Layer",
 	"sap/ui/rta/command/CommandFactory",
 	"sap/ui/rta/library",
@@ -16,6 +17,7 @@ sap.ui.define([
 	VariantManagement,
 	VariantManager,
 	ContextSharingAPI,
+	PersistenceWriteAPI,
 	Layer,
 	CommandFactory,
 	rtaLibrary,
@@ -95,6 +97,7 @@ sap.ui.define([
 			.returns(aExistingChanges);
 			const oRemoveStub = sandbox.stub(VariantManager, "removeVariant").resolves();
 			const oApplyChangeStub = sandbox.stub(VariantManager, "addAndApplyChangesOnVariant");
+			const oPersistencyStub = sandbox.stub(PersistenceWriteAPI, "remove").resolves();
 
 			const oSaveAsCommand = await CommandFactory.getCommandFor(this.oVariantManagement, "saveAs", {
 				sourceVariantReference: oSourceVariantReference
@@ -139,6 +142,9 @@ sap.ui.define([
 			assert.strictEqual(oRemoveStub.callCount, 1, "removeVariant was called");
 			assert.deepEqual(oRemoveStub.firstCall.args[0], mExpectedProperties, "the correct properties were passed-1");
 			assert.deepEqual(oRemoveStub.firstCall.args[1], true, "the correct properties were passed-2");
+			assert.strictEqual(oPersistencyStub.callCount, 1, "remove was called");
+			assert.deepEqual(oPersistencyStub.firstCall.args[0].flexObjects, [aChanges[2]], "the correct changes were passed");
+			assert.deepEqual(oPersistencyStub.firstCall.args[0].selector, oMockedAppComponent, "the correct app component was passed");
 			assert.strictEqual(oApplyChangeStub.callCount, 1, "one change was applied again");
 			assert.strictEqual(oApplyChangeStub.lastCall.args[0].length, 1, "only one change get added");
 			assert.strictEqual(oApplyChangeStub.lastCall.args[0][0].getId(), "change3", "the correct change got added");
@@ -150,8 +156,7 @@ sap.ui.define([
 			}.bind(this));
 
 			const oSaveCommand = await CommandFactory.getCommandFor(this.oVariantManagement, "saveAs", {
-				sourceVariantReference: "mySourceReference",
-				model: this.oModel
+				sourceVariantReference: "mySourceReference"
 			});
 
 			assert.notOk(oSaveCommand, "no command was created");

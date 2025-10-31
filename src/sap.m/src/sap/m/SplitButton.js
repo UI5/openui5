@@ -260,6 +260,10 @@ function(
 			return sText.charAt(0).toUpperCase() + sText.slice(1);
 		}
 
+		SplitButton.prototype._fireKeyboardArrowPress = function() {
+			this._getArrowButton().firePress({keyboard: true});
+		};
+
 		SplitButton.prototype.onkeydown = function(oEvent) {
 			if (oEvent.which === KeyCodes.SPACE) {
 				oEvent.preventDefault();
@@ -273,19 +277,20 @@ function(
 		};
 
 		SplitButton.prototype.onsapup = function(oEvent) {
-			this._getArrowButton().firePress({keyboard: true});
+			this._fireKeyboardArrowPress();
 		};
 
 		SplitButton.prototype.onsapdown = function(oEvent) {
-			this._getArrowButton().firePress({keyboard: true});
+			this._fireKeyboardArrowPress();
 		};
 
 		SplitButton.prototype.onsapupmodifiers = function(oEvent) {
-			this._getArrowButton().firePress({keyboard: true});
+			this._fireKeyboardArrowPress();
 		};
 
 		SplitButton.prototype.onsapdownmodifiers = function(oEvent) {
-			this._getArrowButton().firePress({keyboard: true});
+			this._fireKeyboardArrowPress();
+			oEvent.stopImmediatePropagation();
 		};
 
 		//F4

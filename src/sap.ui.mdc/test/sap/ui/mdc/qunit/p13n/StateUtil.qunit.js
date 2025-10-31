@@ -15,7 +15,8 @@ sap.ui.define([
 	"sap/base/util/merge",
 	"sap/ui/mdc/odata/v4/TypeMap",
 	"sap/ui/mdc/table/ResponsiveTableType",
-	"sap/ui/mdc/table/GridTableType"
+	"sap/ui/mdc/table/GridTableType",
+	"test-resources/sap/ui/fl/api/FlexTestAPI"
 ], function (
 	Engine,
 	createAppEnvironment,
@@ -32,7 +33,8 @@ sap.ui.define([
 	merge,
 	TypeMap,
 	ResponsiveTableType,
-	GridTableType
+	GridTableType,
+	FlexTestAPI
 ) {
 	"use strict";
 
@@ -98,6 +100,7 @@ sap.ui.define([
 			this.oUiComponentContainer = null;
 			this.oView = null;
 			this.oFilterBar = null;
+			FlexTestAPI.reset();
 		}
 	});
 

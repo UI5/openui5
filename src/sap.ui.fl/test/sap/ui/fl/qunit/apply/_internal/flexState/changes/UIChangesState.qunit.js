@@ -91,17 +91,17 @@ sap.ui.define([
 				}
 			});
 
-			FlexState.addDirtyFlexObjects(sReference, [FlexObjectFactory.createUIChange({})]);
+			FlexState.addDirtyFlexObjects(sReference, [FlexObjectFactory.createUIChange({})], sReference);
 			UIChangesState.getVMIndependentCompleteDependencyMap(sReference);
 			assert.strictEqual(iCounter, 3, "all 3 data selectors are invalidated");
 			iCounter = 0;
 
-			FlexState.addDirtyFlexObjects(sReference, [FlexObjectFactory.createUIChange({ variantReference: "foo" })]);
+			FlexState.addDirtyFlexObjects(sReference, [FlexObjectFactory.createUIChange({ variantReference: "foo" })], sReference);
 			UIChangesState.getVMIndependentCompleteDependencyMap(sReference);
 			assert.strictEqual(iCounter, 1, "only 1 data selectors are invalidated");
 			iCounter = 0;
 
-			FlexState.addDirtyFlexObjects(sReference, [FlexObjectFactory.createAppDescriptorChange({})]);
+			FlexState.addDirtyFlexObjects(sReference, [FlexObjectFactory.createAppDescriptorChange({})], sReference);
 			UIChangesState.getVMIndependentCompleteDependencyMap(sReference);
 			assert.strictEqual(iCounter, 0, "no data selectors is invalidated");
 			iCounter = 0;
@@ -110,13 +110,13 @@ sap.ui.define([
 		QUnit.test("getAllUIChanges", function(assert) {
 			assert.strictEqual(UIChangesState.getAllUIChanges(sReference).length, 6, "all changes are returned");
 
-			FlexState.addDirtyFlexObjects(sReference, [FlexObjectFactory.createUIChange({})]);
+			FlexState.addDirtyFlexObjects(sReference, [FlexObjectFactory.createUIChange({})], sReference);
 			assert.strictEqual(UIChangesState.getAllUIChanges(sReference).length, 7, "the dirty change is now also part of the return");
 
-			FlexState.addDirtyFlexObjects(sReference, [FlexObjectFactory.createAppDescriptorChange({})]);
+			FlexState.addDirtyFlexObjects(sReference, [FlexObjectFactory.createAppDescriptorChange({})], sReference);
 			assert.strictEqual(UIChangesState.getAllUIChanges(sReference).length, 7, "the app descriptor change is not returned");
 
-			FlexState.addDirtyFlexObjects(sReference, [FlexObjectFactory.createUIChange({ variantReference: "foo" })]);
+			FlexState.addDirtyFlexObjects(sReference, [FlexObjectFactory.createUIChange({ variantReference: "foo" })], sReference);
 			assert.strictEqual(UIChangesState.getAllUIChanges(sReference).length, 8, "the var dependent change is returned");
 		});
 

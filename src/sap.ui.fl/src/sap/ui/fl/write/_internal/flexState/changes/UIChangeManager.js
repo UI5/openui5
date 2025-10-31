@@ -77,7 +77,7 @@ sap.ui.define([
 	 * @public
 	 */
 	UIChangeManager.addDirtyChanges = function(sReference, aChanges, oAppComponent) {
-		const aAddedChanges = FlexState.addDirtyFlexObjects(sReference, aChanges.map(getOrCreateFlexObject));
+		const aAddedChanges = FlexState.addDirtyFlexObjects(sReference, aChanges.map(getOrCreateFlexObject), oAppComponent.getId());
 		aAddedChanges.forEach((oChange) => {
 			finalizeChangeCreation(sReference, oChange, oAppComponent);
 		});

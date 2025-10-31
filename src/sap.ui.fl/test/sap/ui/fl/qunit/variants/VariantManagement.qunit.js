@@ -134,7 +134,7 @@ sap.ui.define([
 					user: "Z",
 					layer: Layer.USER
 				})
-			]);
+			], "componentId");
 
 			this.oModel = new VariantModel(
 				{},
@@ -377,7 +377,8 @@ sap.ui.define([
 				sFlexReference,
 				[FlexObjectFactory.createUIChange({
 					variantReference: this.oVariantManagement.getStandardVariantKey()
-				})]
+				})],
+				"componentId"
 			);
 			assert.ok(this.oVariantManagement.getModified());
 			assert.notOk(this._oVM.oVariantSaveBtn.getVisible());
@@ -395,7 +396,8 @@ sap.ui.define([
 				sFlexReference,
 				[FlexObjectFactory.createUIChange({
 					variantReference: "v4"
-				})]
+				})],
+				"componentId"
 			);
 			assert.ok(this.oVariantManagement.getModified());
 			assert.ok(this._oVM.oVariantSaveBtn.getVisible());
@@ -412,7 +414,8 @@ sap.ui.define([
 				sFlexReference,
 				[FlexObjectFactory.createUIChange({
 					variantReference: "v4"
-				})]
+				})],
+				"componentId"
 			);
 			this._oVM.setShowSaveAs(false);
 			assert.notOk(this._oVM.oVariantSaveAsBtn.getVisible());

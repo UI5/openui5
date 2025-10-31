@@ -15,6 +15,7 @@ sap.ui.define([
 	"sap/ui/fl/write/api/LocalResetAPI",
 	"sap/ui/fl/write/api/PersistenceWriteAPI",
 	"sap/ui/fl/Layer",
+	"sap/ui/fl/Utils",
 	"sap/ui/thirdparty/sinon-4"
 ], function(
 	VBox,
@@ -31,11 +32,13 @@ sap.ui.define([
 	LocalResetAPI,
 	PersistenceWriteAPI,
 	Layer,
+	Utils,
 	sinon
 ) {
 	"use strict";
 
 	var sandbox = sinon.createSandbox();
+	const sReference = "MyComponent";
 
 	function createChange(sChangeId, sSelectorId, oCustomDef) {
 		return FlexObjectFactory.createFromFileContent({
@@ -60,15 +63,16 @@ sap.ui.define([
 				]
 			});
 			this.oComponent = {
-				name: "MyComponent"
+				getId: () => sReference
 			};
 			var aChanges = [
 				createChange("foo", "fooElement"),
 				createChange("foo2", "fooElement")
 			];
+			sandbox.stub(ManifestUtils, "getFlexReferenceForControl").returns(sReference);
+			sandbox.stub(Utils, "getAppComponentForControl").returns(this.oComponent);
+			FlexState.addDirtyFlexObjects(sReference, aChanges, sReference);
 			aChanges[0].setState(States.LifecycleState.PERSISTED);
-			sandbox.stub(ManifestUtils, "getFlexReferenceForControl").withArgs(this.oComponent).returns(this.oComponent.name);
-			sandbox.stub(UIChangesState, "getAllUIChanges").returns(aChanges);
 		},
 		afterEach() {
 			FlexState.clearState();
@@ -142,7 +146,7 @@ sap.ui.define([
 			sandbox.stub(PersistenceWriteAPI, "remove").callsFake(function(aArguments) {
 				// Simulate deletion to validate that the state is restored
 				FlexObjectManager.deleteFlexObjects({
-					reference: "MyComponent",
+					reference: sReference,
 					flexObjects: aArguments.flexObjects
 				});
 				return Promise.resolve();
@@ -155,7 +159,7 @@ sap.ui.define([
 
 				return LocalResetAPI.restoreChanges(aNestedChanges, this.oComponent).then(function() {
 					assert.ok(
-						oRestoreStub.calledWith("MyComponent", aNestedChanges, this.oComponent),
+						oRestoreStub.calledWith(sReference, aNestedChanges, this.oComponent),
 						"Then all changes are restored"
 					);
 					assert.strictEqual(oApplyStub.callCount, 2, "Then all changes are applied again");
@@ -172,7 +176,7 @@ sap.ui.define([
 						"then the original change states are restored"
 					);
 					assert.notOk(
-						FlexObjectState.getDirtyFlexObjects("MyComponent").includes(aNestedChanges[0]),
+						FlexObjectState.getDirtyFlexObjects(sReference).includes(aNestedChanges[0]),
 						"then dirty changes from deletion are removed"
 					);
 				}.bind(this));
@@ -224,7 +228,7 @@ sap.ui.define([
 				]
 			});
 			var oComponent = {
-				name: "MyComponent"
+				name: sReference
 			};
 			sandbox.stub(ManifestUtils, "getFlexReferenceForControl").withArgs(oComponent).returns(oComponent.name);
 		},

@@ -602,6 +602,9 @@ sap.ui.define([
 	};
 
 	ObjectPageSectionBase.prototype.setTitle = function (sValue, bSuppressInvalidate) {
+		if (this.getTitle() === sValue) {
+			return this;
+		}
 
 		this.setProperty("title", sValue, bSuppressInvalidate);
 		this._notifyObjectPageLayout();

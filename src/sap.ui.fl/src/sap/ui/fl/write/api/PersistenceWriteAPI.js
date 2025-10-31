@@ -287,7 +287,7 @@ sap.ui.define([
 			if (oFlexObject instanceof UIChange) {
 				return UIChangeManager.addDirtyChanges(sFlexReference, [oFlexObject], oAppComponent)?.[0];
 			}
-			return FlexObjectManager.addDirtyFlexObjects(sFlexReference, [oFlexObject])?.[0];
+			return FlexObjectManager.addDirtyFlexObjects(sFlexReference, oAppComponent.getId(), [oFlexObject])?.[0];
 		}
 
 		if (mPropertyBag.change && mPropertyBag.flexObjects) {
@@ -318,7 +318,7 @@ sap.ui.define([
 			}
 		});
 
-		const aAddedFlexObjects = FlexObjectManager.addDirtyFlexObjects(sFlexReference, aFlexObjects);
+		const aAddedFlexObjects = FlexObjectManager.addDirtyFlexObjects(sFlexReference, oAppComponent.getId(), aFlexObjects);
 		const aAddedUIChanges = UIChangeManager.addDirtyChanges(sFlexReference, aUIChanges, oAppComponent);
 
 		// Ensure that the added changes are returned in the same order as they were passed

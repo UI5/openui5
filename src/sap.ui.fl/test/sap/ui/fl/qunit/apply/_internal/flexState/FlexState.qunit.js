@@ -155,7 +155,7 @@ sap.ui.define([
 			});
 			var oDummyFlexObject = FlexObjectFactory.createUIChange({ id: "dummyChange" });
 			this.oCheckUpdateSelectorStub.reset();
-			FlexState.addDirtyFlexObjects(sReference, [oDummyFlexObject]);
+			FlexState.addDirtyFlexObjects(sReference, [oDummyFlexObject], sComponentId);
 			assert.deepEqual(
 				FlexState.getFlexObjectsDataSelector().get({ reference: sReference })[0],
 				oDummyFlexObject,
@@ -172,7 +172,7 @@ sap.ui.define([
 				"then the selector is updated after adding a flexObject"
 			);
 
-			FlexState.addDirtyFlexObjects(sReference, [oDummyFlexObject]);
+			FlexState.addDirtyFlexObjects(sReference, [oDummyFlexObject], sComponentId);
 			assert.strictEqual(
 				FlexState.getFlexObjectsDataSelector().get({ reference: sReference }).length,
 				1,
@@ -230,7 +230,7 @@ sap.ui.define([
 				FlexObjectFactory.createUIChange({ id: "dummyChange2" })
 			];
 			this.oCheckUpdateSelectorStub.reset();
-			FlexState.addDirtyFlexObjects(sReference, aDummyFlexObjects);
+			FlexState.addDirtyFlexObjects(sReference, aDummyFlexObjects, sComponentId);
 			assert.deepEqual(
 				FlexState.getFlexObjectsDataSelector().get({ reference: sReference }),
 				aDummyFlexObjects,
@@ -270,7 +270,7 @@ sap.ui.define([
 			];
 			this.oCheckUpdateSelectorStub.reset();
 			sandbox.stub(FlexInfoSession, "getByReference").returns({ adaptationLayer: Layer.CUSTOMER });
-			FlexState.addDirtyFlexObjects(sReference, aDummyFlexObjects);
+			FlexState.addDirtyFlexObjects(sReference, aDummyFlexObjects, sComponentId);
 			assert.deepEqual(
 				FlexState.getFlexObjectsDataSelector().get({ reference: sReference }),
 				[],
@@ -305,7 +305,7 @@ sap.ui.define([
 			];
 			this.oCheckUpdateSelectorStub.reset();
 			sandbox.stub(FlexInfoSession, "getByReference").returns({ adaptationLayer: Layer.VENDOR });
-			FlexState.addDirtyFlexObjects(sReference, aDummyFlexObjects);
+			FlexState.addDirtyFlexObjects(sReference, aDummyFlexObjects, sComponentId);
 			assert.deepEqual(
 				FlexState.getFlexObjectsDataSelector().get({ reference: sReference }),
 				[aDummyFlexObjects[1]],
@@ -338,7 +338,7 @@ sap.ui.define([
 				{ test: "test" },
 				{ test2: "test2" }
 			];
-			FlexState.addDirtyFlexObjects(sReference, aDummyFlexObjects);
+			FlexState.addDirtyFlexObjects(sReference, aDummyFlexObjects, sComponentId);
 			this.oCheckUpdateSelectorStub.reset();
 
 			FlexState.removeDirtyFlexObjects(sReference, [{ test: "someOtherFlexObject" }]);
@@ -936,7 +936,7 @@ sap.ui.define([
 					layer: LayerUtils.getCurrentLayer()
 				});
 				oNewChange.setRevertData("revertData");
-				FlexState.addDirtyFlexObjects(sReference, [oNewChange]);
+				FlexState.addDirtyFlexObjects(sReference, [oNewChange], this.sComponentId);
 
 				// Change gets additional information from storage response (user)
 				mockLoader({
@@ -984,7 +984,7 @@ sap.ui.define([
 					persistencyKey: this.sPersistencyKey
 				}
 			});
-			FlexState.addDirtyFlexObjects(sReference, [oNewChange]);
+			FlexState.addDirtyFlexObjects(sReference, [oNewChange], this.sComponentId);
 
 			// The new change gets additional information from storage response (user)
 			mockLoader({
@@ -1208,7 +1208,7 @@ sap.ui.define([
 						persistencyKey: this.sPersistencyKey
 					}
 				});
-				FlexState.addDirtyFlexObjects(sReference, [oNewChange]);
+				FlexState.addDirtyFlexObjects(sReference, [oNewChange], this.sComponentId);
 
 				// The new change is returned together with an unknown change
 				mockLoader({
@@ -1263,7 +1263,7 @@ sap.ui.define([
 				fileName: "change1",
 				fileType: "change"
 			});
-			FlexState.addDirtyFlexObjects(sReference, [oNewChange]);
+			FlexState.addDirtyFlexObjects(sReference, [oNewChange], this.sComponentId);
 
 			// The new change is returned together with an unknown change
 			mockLoader({
@@ -1342,7 +1342,8 @@ sap.ui.define([
 			});
 			assert.strictEqual(this.oCreateFlexObjectSpy.callCount, 1, "one flexObject is created");
 			await FlexState.lazyLoadFlVariant({
-				reference: sReference
+				reference: sReference,
+				componentId: this.sComponentId
 			});
 			const aAllFlexObjects = FlexState.getFlexObjectsDataSelector().get({ reference: sReference });
 			assert.strictEqual(aAllFlexObjects.length, 35, "all flex objects are loaded");
@@ -1358,7 +1359,8 @@ sap.ui.define([
 			});
 			assert.strictEqual(this.oCreateFlexObjectSpy.callCount, 1, "one flexObject is created");
 			await FlexState.lazyLoadFlVariant({
-				reference: sReference
+				reference: sReference,
+				componentId: this.sComponentId
 			});
 			const aAllFlexObjects = FlexState.getFlexObjectsDataSelector().get({ reference: sReference });
 			assert.strictEqual(aAllFlexObjects.length, 31, "all flex objects are loaded");
@@ -1367,7 +1369,8 @@ sap.ui.define([
 
 		QUnit.test("without an initialized state", async function(assert) {
 			await FlexState.lazyLoadFlVariant({
-				reference: sReference
+				reference: sReference,
+				componentId: "componentId"
 			});
 			const aAllFlexObjects = FlexState.getFlexObjectsDataSelector().get({ reference: sReference });
 			assert.strictEqual(aAllFlexObjects.length, 34, "all flex objects are loaded");
@@ -1380,7 +1383,7 @@ sap.ui.define([
 			sandbox.stub(Storage, "loadFlexData").resolves(StorageUtils.getEmptyFlexDataResponse());
 			await FlexState.initialize({
 				reference: sReference,
-				componentId: "componentId",
+				componentId: sComponentId,
 				skipLoadBundle: true
 			});
 			// initial data
@@ -1398,7 +1401,7 @@ sap.ui.define([
 					}
 				})
 			];
-			FlexState.addDirtyFlexObjects(sReference, aInitialChanges);
+			FlexState.addDirtyFlexObjects(sReference, aInitialChanges, sComponentId);
 			FlexState.update(sReference, aInitialChanges.map((flexObject) => ({
 				type: "add",
 				flexObject: flexObject.convertToFileContent()
@@ -1451,7 +1454,7 @@ sap.ui.define([
 				this.oCompChange
 			];
 			aNewChanges.forEach(function(oFlexObject) {
-				FlexState.addDirtyFlexObjects(sReference, [oFlexObject]);
+				FlexState.addDirtyFlexObjects(sReference, [oFlexObject], sComponentId);
 			});
 			FlexState.update(sReference, [
 				...aNewChanges.map((flexObject) => ({
@@ -1564,7 +1567,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("when updating the storage response", function(assert) {
-			FlexState.addDirtyFlexObjects(sReference, [this.oUIChange]);
+			FlexState.addDirtyFlexObjects(sReference, [this.oUIChange], sComponentId);
 			FlexState.update(sReference, [
 				{ type: "add", flexObject: this.oUIChange.convertToFileContent() }
 			]);

@@ -536,6 +536,7 @@ sap.ui.define([
 		// sets copied variant and associated changes as dirty
 		aChanges = FlexObjectManager.addDirtyFlexObjects(
 			oVariantModel.sFlexReference,
+			mPropertyBag.appComponent.getId(),
 			aChanges
 			.concat([oDuplicateVariantData.instance]
 			.concat(oDuplicateVariantData.controlChanges)
@@ -593,7 +594,7 @@ sap.ui.define([
 	VariantManager.addVariantChange = function(sVariantManagementReference, mPropertyBag) {
 		const oVariantModel = getVariantModel(mPropertyBag.appComponent);
 		var oChange = VariantManager.createVariantChange(sVariantManagementReference, mPropertyBag);
-		FlexObjectManager.addDirtyFlexObjects(oVariantModel.sFlexReference, [oChange]);
+		FlexObjectManager.addDirtyFlexObjects(oVariantModel.sFlexReference, mPropertyBag.appComponent.getId(), [oChange]);
 
 		return oChange;
 	};
@@ -609,7 +610,7 @@ sap.ui.define([
 		var aChanges = aChangePropertyMaps.map(function(mProperties) {
 			return VariantManager.createVariantChange(sVariantManagementReference, mProperties);
 		});
-		FlexObjectManager.addDirtyFlexObjects(oVariantModel.sFlexReference, aChanges);
+		FlexObjectManager.addDirtyFlexObjects(oVariantModel.sFlexReference, aChangePropertyMaps[0].appComponent.getId(), aChanges);
 
 		return aChanges;
 	};

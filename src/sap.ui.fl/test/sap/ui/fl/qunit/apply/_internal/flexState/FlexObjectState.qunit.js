@@ -255,7 +255,7 @@ sap.ui.define([
 					fileType: "ctrl_variant_change",
 					changeType: "setFavorite"
 				})
-			]);
+			], sReference);
 			const aAllApplicableUIChanges = FlexObjectState.getAllApplicableUIChanges(sReference);
 			assert.strictEqual(aAllApplicableUIChanges.length, 5, "all UIChanges are returned");
 		});

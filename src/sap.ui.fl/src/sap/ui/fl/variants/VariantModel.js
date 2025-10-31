@@ -6,8 +6,10 @@ sap.ui.define([
 	"sap/base/util/restricted/_difference",
 	"sap/base/util/restricted/_isEqual",
 	"sap/base/util/restricted/_omit",
+	"sap/base/util/Deferred",
 	"sap/base/util/isEmptyObject",
 	"sap/base/util/merge",
+	"sap/m/library",
 	"sap/ui/core/util/reflection/JsControlTreeModifier",
 	"sap/ui/core/Lib",
 	"sap/ui/fl/apply/_internal/controlVariants/URLHandler",
@@ -22,14 +24,15 @@ sap.ui.define([
 	"sap/ui/fl/LayerUtils",
 	"sap/ui/fl/Utils",
 	"sap/ui/model/json/JSONModel",
-	"sap/ui/model/BindingMode",
-	"sap/m/library"
+	"sap/ui/model/BindingMode"
 ], function(
 	_difference,
 	_isEqual,
 	_omit,
+	Deferred,
 	isEmptyObject,
 	merge,
+	mobileLibrary,
 	JsControlTreeModifier,
 	Lib,
 	URLHandler,
@@ -44,8 +47,7 @@ sap.ui.define([
 	LayerUtils,
 	Utils,
 	JSONModel,
-	BindingMode,
-	mobileLibrary
+	BindingMode
 ) {
 	"use strict";
 
@@ -828,8 +830,15 @@ sap.ui.define([
 				DependencyHandler.removeChangeFromDependencies(oLiveDependencyMap, oChange.getId());
 			}
 		});
+		// this promise can be used in tests to properly wait for the asynchronous logic of the destroy function
+		this.oDestroyPromise = new Deferred();
 		sap.ui.require(["sap/ui/fl/write/_internal/flexState/FlexObjectManager"], (FlexObjectManager) => {
-			FlexObjectManager.deleteFlexObjects({ reference: this.sFlexReference, flexObjects: aDirtyChanges });
+			FlexObjectManager.deleteFlexObjects({
+				reference: this.sFlexReference,
+				flexObjects: aDirtyChanges,
+				componentId: this.oAppComponent.getId()
+			});
+			this.oDestroyPromise.resolve();
 		});
 
 		this.oDataSelector.removeUpdateListener(this.fnUpdateListener);
@@ -847,7 +856,7 @@ sap.ui.define([
 			}
 		});
 		if (aFakeVariantsToBeAdded.length) {
-			VariantManagementState.addRuntimeOnlyFlexObjects(this.sFlexReference, aFakeVariantsToBeAdded);
+			VariantManagementState.addRuntimeOnlyFlexObjects(this.sFlexReference, this.oAppComponent.getId(), aFakeVariantsToBeAdded);
 		}
 
 		VariantManagementState.clearRuntimeSteadyObjects(this.sFlexReference, this.oAppComponent.getId());
