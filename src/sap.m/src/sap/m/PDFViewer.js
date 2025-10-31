@@ -342,19 +342,11 @@ sap.ui.define([
 				if (PDFViewerRenderer._isPdfPluginEnabled()) {
 					var bContinue = true;
 					var oTarget = jQuery(oEvent.target);
-					try {
-						// Try to access children of the iframe document body
-						var aTargetChildren = oTarget[0]?.contentWindow?.document?.body?.children;
-					} catch (error) {
-						// If access fails, log warning and treat as no children
-						aTargetChildren = [];
-						Log.warning("Error in fetching children entity for given source of PDFViewer.");
-					}
-					// If children exist, check for embed tag
-					if (aTargetChildren?.length) {
-						var aEmbeds = oTarget[0].contentWindow.document.embeds;
-						bContinue = !!aEmbeds && aEmbeds.length === 1;
-					}
+
+					//Check for embed tag
+					var aEmbeds = oTarget[0].contentWindow.document.embeds;
+					bContinue = !!aEmbeds && aEmbeds.length === 1;
+
 					// If valid PDF rendering, fire loaded event; else, fire error event
 					if (bContinue) {
 						this._fireLoadedEvent();
