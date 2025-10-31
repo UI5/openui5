@@ -5,11 +5,11 @@ sap.ui.define([
 	"sap/base/util/Deferred",
 	"sap/ui/core/util/reflection/JsControlTreeModifier",
 	"sap/ui/core/Control",
-	"sap/ui/core/Element",
 	"sap/ui/fl/apply/_internal/changes/Applier",
 	"sap/ui/fl/apply/_internal/changes/Reverter",
 	"sap/ui/fl/apply/_internal/flexObjects/FlexObjectFactory",
 	"sap/ui/fl/apply/_internal/flexState/controlVariants/Switcher",
+	"sap/ui/fl/apply/_internal/flexState/changes/DependencyHandler",
 	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
 	"sap/ui/fl/apply/_internal/flexState/FlexObjectState",
 	"sap/ui/fl/apply/_internal/flexState/FlexState",
@@ -29,11 +29,11 @@ sap.ui.define([
 	Deferred,
 	JsControlTreeModifier,
 	Control,
-	Element,
 	Applier,
 	Reverter,
 	FlexObjectFactory,
 	Switcher,
+	DependencyHandler,
 	VariantManagementState,
 	FlexObjectState,
 	FlexState,
@@ -81,7 +81,7 @@ sap.ui.define([
 			},
 			variantReference: sVariantReference || "variant1"
 		});
-		return FlexObjectManager.addDirtyFlexObjects(sReference, [oChange1, oChange2, oChange3]);
+		return FlexObjectManager.addDirtyFlexObjects(sReference, sReference, [oChange1, oChange2, oChange3]);
 	}
 
 	function createVariant(mVariantProperties) {
@@ -106,8 +106,8 @@ sap.ui.define([
 		oFlexObjectsSelector.checkUpdate();
 	}
 
-	QUnit.module("Basic functionality", {
-		beforeEach() {
+	QUnit.module("VariantManager", {
+		async beforeEach() {
 			stubFlexObjectsSelector([
 				createVariant({
 					author: ControlVariantWriteUtils.DEFAULT_AUTHOR,
@@ -192,12 +192,17 @@ sap.ui.define([
 				appComponent: oComponent
 			});
 			oComponent.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
+			await FlexState.initialize({
+				reference: sReference,
+				componentId: sReference
+			});
 			return this.oModel.initialize();
 		},
-		afterEach() {
+		async afterEach() {
 			sandbox.restore();
 			this.oVMControl.destroy();
 			this.oModel.destroy();
+			await this.oModel.oDestroyPromise.promise;
 			FlexState.clearState();
 			FlexState.clearRuntimeSteadyObjects(sReference, sReference);
 		}
@@ -250,7 +255,7 @@ sap.ui.define([
 		[true, false].forEach(function(bVendorLayer) {
 			QUnit.test(bVendorLayer ? "when calling 'copyVariant' in VENDOR layer" : "when calling 'copyVariant'", async function(assert) {
 				sandbox.stub(Settings, "getInstanceOrUndef").returns({
-					getUserId() {return "test user";}
+					getUserId: () => "test user"
 				});
 				sandbox.stub(JsControlTreeModifier, "getSelector").returns({ id: sVMReference });
 				var oAddDirtyChangesSpy = sandbox.spy(FlexObjectManager, "addDirtyFlexObjects");
@@ -307,7 +312,7 @@ sap.ui.define([
 				controlChanges: [],
 				variantChanges: {}
 			};
-			const oAddDirtyFlexObjectsStub = sandbox.stub(FlexObjectManager, "addDirtyFlexObjects").returnsArg(1);
+			const oAddDirtyFlexObjectsStub = sandbox.stub(FlexObjectManager, "addDirtyFlexObjects").returnsArg(2);
 
 			sandbox.stub(this.oModel, "_duplicateVariant").returns(oVariantData);
 			sandbox.stub(JsControlTreeModifier, "getSelector").returns({ id: sVMReference });
@@ -334,7 +339,7 @@ sap.ui.define([
 				"then the returned variant is the duplicate variant"
 			);
 			assert.equal(
-				oAddDirtyFlexObjectsStub.firstCall.args[1].length,
+				oAddDirtyFlexObjectsStub.firstCall.args[2].length,
 				2,
 				"then both changes are added as dirty changes"
 			);
@@ -474,6 +479,7 @@ sap.ui.define([
 			const oResponse = { response: [{ fileName: sCopyVariantName, fileType: "ctrl_variant", support: { user: sUserName } }] };
 
 			sandbox.stub(this.oModel, "getLocalId").returns(sVMReference);
+			sandbox.stub(DependencyHandler, "addChangeAndUpdateDependencies");
 			const oSaveStub = sandbox.stub(FlexObjectManager, "saveFlexObjects").resolves(oResponse);
 			const oDeleteFlexObjectsSpy = sandbox.spy(FlexObjectManager, "deleteFlexObjects");
 			const oCopyVariantSpy = sandbox.spy(VariantManager, "copyVariant");
@@ -551,6 +557,7 @@ sap.ui.define([
 			const oResponse = { response: [{ fileName: sCopyVariantName, fileType: "ctrl_variant", support: { user: sUserName } }] };
 
 			sandbox.stub(this.oModel, "getLocalId").returns(sVMReference);
+			sandbox.stub(DependencyHandler, "addChangeAndUpdateDependencies");
 			const oSaveStub = sandbox.stub(FlexObjectManager, "saveFlexObjects").resolves(oResponse);
 			const oDeleteFlexObjectsSpy = sandbox.spy(FlexObjectManager, "deleteFlexObjects");
 			const oCopyVariantSpy = sandbox.spy(VariantManager, "copyVariant");
@@ -661,6 +668,7 @@ sap.ui.define([
 			] };
 
 			sandbox.stub(this.oModel, "getLocalId").returns(sVMReference);
+			sandbox.stub(DependencyHandler, "addChangeAndUpdateDependencies");
 			var oCopyVariantSpy = sandbox.spy(VariantManager, "copyVariant");
 			sandbox.stub(FlexObjectManager, "saveFlexObjects").resolves(oResponse);
 
@@ -689,6 +697,7 @@ sap.ui.define([
 			const oResponse = { response: [{ fileName: sCopyVariantName, fileType: "ctrl_variant", support: { user: sUserName } }] };
 
 			sandbox.stub(this.oModel, "getLocalId").returns(sVMReference);
+			sandbox.stub(DependencyHandler, "addChangeAndUpdateDependencies");
 			const oSaveStub = sandbox.stub(FlexObjectManager, "saveFlexObjects").resolves(oResponse);
 			const oDeleteFlexObjectsSpy = sandbox.spy(FlexObjectManager, "deleteFlexObjects");
 			const oCopyVariantSpy = sandbox.spy(VariantManager, "copyVariant");
@@ -772,6 +781,7 @@ sap.ui.define([
 			] };
 
 			sandbox.stub(this.oModel, "getLocalId").returns(sVMReference);
+			sandbox.stub(DependencyHandler, "addChangeAndUpdateDependencies");
 			const oSaveStub = sandbox.stub(FlexObjectManager, "saveFlexObjects").resolves(oResponse);
 			const oDeleteFlexObjectsSpy = sandbox.spy(FlexObjectManager, "deleteFlexObjects");
 			const oCopyVariantSpy = sandbox.spy(VariantManager, "copyVariant");

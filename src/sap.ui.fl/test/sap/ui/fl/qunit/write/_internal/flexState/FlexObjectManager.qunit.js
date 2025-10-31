@@ -102,7 +102,7 @@ sap.ui.define([
 	}
 
 	function addDirtyChanges() {
-		FlexObjectManager.addDirtyFlexObjects(sReference, [createChange(), createChange()]);
+		FlexObjectManager.addDirtyFlexObjects(sReference, sComponentId, [createChange(), createChange()]);
 	}
 
 	QUnit.module("getFlexObjects", {
@@ -303,7 +303,11 @@ sap.ui.define([
 			assert.ok(aNames.indexOf("change2") > -1, "the 2nd change in changePersistence is present");
 		});
 
-		QUnit.test("Get - Given flex objects of different layers are present in the CompVariantState and currentLayer set", function(assert) {
+		QUnit.test("Get - Given flex objects of different layers are present in the CompVariantState and currentLayer set", async function(assert) {
+			await FlexState.initialize({
+				reference: sReference,
+				componentId: sComponentId
+			});
 			const sPersistencyKey = "persistency.key";
 			const sVariantId = "variantId1";
 
@@ -347,17 +351,19 @@ sap.ui.define([
 				}
 			});
 
-			return FlexObjectManager.getFlexObjects({
+			const aFlexObjects = await FlexObjectManager.getFlexObjects({
 				selector: this.oAppComponent,
 				currentLayer: Layer.CUSTOMER
-			})
-			.then(function(aFlexObjects) {
-				assert.strictEqual(aFlexObjects.length, 1, "an array with one entry is returned");
-				assert.strictEqual(aFlexObjects[0].getChangeType(), "updateVariant", "the change from the compVariantState is present");
 			});
+			assert.strictEqual(aFlexObjects.length, 1, "an array with one entry is returned");
+			assert.strictEqual(aFlexObjects[0].getChangeType(), "updateVariant", "the change from the compVariantState is present");
 		});
 
-		QUnit.test("Get - Given flex objects of different layers are present in the CompVariantState and currentLayer not set", function(assert) {
+		QUnit.test("Get - Given flex objects of different layers are present in the CompVariantState and currentLayer not set", async function(assert) {
+			await FlexState.initialize({
+				reference: sReference,
+				componentId: sComponentId
+			});
 			const sPersistencyKey = "persistency.key";
 			const sVariantId = "variantId1";
 
@@ -397,12 +403,10 @@ sap.ui.define([
 				persistencyKey: sPersistencyKey
 			});
 
-			return FlexObjectManager.getFlexObjects({
+			const aFlexObjects = await FlexObjectManager.getFlexObjects({
 				selector: this.oAppComponent
-			})
-			.then(function(aFlexObjects) {
-				assert.strictEqual(aFlexObjects.length, 3, "an array with three entries is returned");
 			});
+			assert.strictEqual(aFlexObjects.length, 3, "an array with three entries is returned");
 		});
 
 		QUnit.test("Get - Given flex objects and dirty changes are present ", async function(assert) {
@@ -845,7 +849,7 @@ sap.ui.define([
 			addDirtyChanges();
 			assert.strictEqual(FlexObjectState.getDirtyFlexObjects(sReference).length, 2, "two dirty changes are present");
 
-			FlexObjectManager.addDirtyFlexObjects(sReference, [
+			FlexObjectManager.addDirtyFlexObjects(sReference, sComponentId, [
 				{
 					fileType: "change",
 					fileName: "newChange1",
@@ -875,8 +879,8 @@ sap.ui.define([
 				changeType: "dirtyRenameField1",
 				layer: Layer.USER
 			};
-			FlexObjectManager.addDirtyFlexObjects(sReference, [oChangeContent]);
-			const aAddedChangesOnSecondCall = FlexObjectManager.addDirtyFlexObjects(sReference, [oChangeContent]);
+			FlexObjectManager.addDirtyFlexObjects(sReference, sComponentId, [oChangeContent]);
+			const aAddedChangesOnSecondCall = FlexObjectManager.addDirtyFlexObjects(sReference, sComponentId, [oChangeContent]);
 
 			const aDirtyFlexObjects = FlexObjectState.getDirtyFlexObjects(sReference);
 			assert.strictEqual(aDirtyFlexObjects.length, 1, "then only one flex object is added to the state");
@@ -886,7 +890,7 @@ sap.ui.define([
 		QUnit.test("when calling removeDirtyFlexObjects without generator, selector IDs and change types specified", function(assert) {
 			const oVendorChange = createChange("c1", Layer.VENDOR);
 			const oCustomerChange = createChange("c2", Layer.CUSTOMER);
-			FlexObjectManager.addDirtyFlexObjects(sReference, [oVendorChange, oCustomerChange]);
+			FlexObjectManager.addDirtyFlexObjects(sReference, sComponentId, [oVendorChange, oCustomerChange]);
 
 			const aChangesToBeRemoved = FlexObjectManager.removeDirtyFlexObjects({
 				reference: sReference,
@@ -905,7 +909,7 @@ sap.ui.define([
 			const oVendorChange = createChange("c1", Layer.VENDOR);
 			const oCustomerChange = createChange("c2", Layer.CUSTOMER);
 			const oUserChange = createChange("c3", Layer.USER);
-			FlexObjectManager.addDirtyFlexObjects(sReference, [oVendorChange, oUserChange, oCustomerChange]);
+			FlexObjectManager.addDirtyFlexObjects(sReference, sComponentId, [oVendorChange, oUserChange, oCustomerChange]);
 
 			const aChangesToBeRemoved = FlexObjectManager.removeDirtyFlexObjects({
 				reference: sReference,
@@ -925,7 +929,7 @@ sap.ui.define([
 			const oVendorChange = createChange("c1", Layer.VENDOR);
 			const oCustomerChange = createChange("c2", Layer.CUSTOMER);
 			const oUserChange = createChange("c3", Layer.USER);
-			FlexObjectManager.addDirtyFlexObjects(sReference, [oVendorChange, oUserChange, oCustomerChange]);
+			FlexObjectManager.addDirtyFlexObjects(sReference, sComponentId, [oVendorChange, oUserChange, oCustomerChange]);
 
 			const aChangesToBeRemoved = FlexObjectManager.removeDirtyFlexObjects({
 				reference: sReference
@@ -937,7 +941,7 @@ sap.ui.define([
 			const sGenerator = "some generator";
 			const oVendorChange = createChange("c1", Layer.VENDOR, {}, sGenerator);
 			const oCustomerChange = createChange("c2", Layer.CUSTOMER, {}, sGenerator);
-			FlexObjectManager.addDirtyFlexObjects(sReference, [oVendorChange, oCustomerChange]);
+			FlexObjectManager.addDirtyFlexObjects(sReference, sComponentId, [oVendorChange, oCustomerChange]);
 
 			FlexObjectManager.removeDirtyFlexObjects({
 				reference: sReference,
@@ -962,7 +966,7 @@ sap.ui.define([
 			const sGenerator = "some generator";
 			const oVendorChange1 = createChange("c1", Layer.VENDOR, { id: "abc123", idIsLocal: true }, sGenerator);
 			const oVendorChange2 = createChange("c2", Layer.VENDOR, {}, sGenerator);
-			FlexObjectManager.addDirtyFlexObjects(sReference, [oVendorChange1, oVendorChange2]);
+			FlexObjectManager.addDirtyFlexObjects(sReference, sComponentId, [oVendorChange1, oVendorChange2]);
 			FlexObjectManager.removeDirtyFlexObjects({
 				reference: sReference,
 				layers: [Layer.VENDOR],
@@ -986,7 +990,7 @@ sap.ui.define([
 			const sGenerator = "some generator";
 			const oVENDORChange1 = createChange("c1", Layer.VENDOR);
 			const oVENDORChange2 = createChange("c2", Layer.VENDOR, {}, sGenerator);
-			FlexObjectManager.addDirtyFlexObjects(sReference, [oVENDORChange1, oVENDORChange2]);
+			FlexObjectManager.addDirtyFlexObjects(sReference, sComponentId, [oVENDORChange1, oVENDORChange2]);
 			FlexObjectManager.removeDirtyFlexObjects({
 				reference: sReference,
 				layers: [Layer.VENDOR],
@@ -1011,7 +1015,7 @@ sap.ui.define([
 			const oVENDORChange1 = createChange("c1", Layer.VENDOR);
 			const oVENDORChange2 = createChange("c2", Layer.VENDOR, {}, sGenerator);
 			const oVENDORChange3 = createChange("c3", Layer.VENDOR, { id: "abc123", idIsLocal: false }, sGenerator);
-			FlexObjectManager.addDirtyFlexObjects(sReference, [oVENDORChange1, oVENDORChange2, oVENDORChange3]);
+			FlexObjectManager.addDirtyFlexObjects(sReference, sComponentId, [oVENDORChange1, oVENDORChange2, oVENDORChange3]);
 
 			FlexObjectManager.removeDirtyFlexObjects({
 				reference: sReference,
@@ -1218,7 +1222,7 @@ sap.ui.define([
 					layer: Layer.USER
 				}]
 			});
-			FlexObjectManager.addDirtyFlexObjects(sReference, [this.oFlexObject1, this.oFlexObject2]);
+			FlexObjectManager.addDirtyFlexObjects(sReference, sComponentId, [this.oFlexObject1, this.oFlexObject2]);
 		},
 		afterEach() {
 			sandbox.restore();
@@ -1268,7 +1272,7 @@ sap.ui.define([
 					layer: Layer.USER
 				}]
 			});
-			FlexObjectManager.addDirtyFlexObjects(sReference, [this.oFlexObject1, this.oFlexObject2]);
+			FlexObjectManager.addDirtyFlexObjects(sReference, sComponentId, [this.oFlexObject1, this.oFlexObject2]);
 		},
 		afterEach() {
 			sandbox.restore();

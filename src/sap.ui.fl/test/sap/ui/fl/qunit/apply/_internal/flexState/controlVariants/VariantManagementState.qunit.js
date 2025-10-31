@@ -1707,7 +1707,8 @@ sap.ui.define([
 			sandbox.stub(Storage, "loadFlVariant").resolves(oJson);
 			await VariantManagementState.loadVariant({
 				reference: sReference,
-				variantReference: sVariantManagementReference
+				variantReference: sVariantManagementReference,
+				sReference
 			});
 			assert.ok(oUpdateSpy.calledOnce, "then the storage response is updated");
 			assert.strictEqual(oUpdateSpy.lastCall.args[0].reference, sReference, "with the correct reference");
@@ -1757,10 +1758,10 @@ sap.ui.define([
 		});
 
 		QUnit.test("addRuntimeOnlyFlexObjects", function(assert) {
-			assert.strictEqual(FlexState.getRuntimeOnlyData(sReference).flexObjects.length, 0, "then initially no flex objects are there");
+			assert.strictEqual(FlexState.getRuntimeOnlyData(sReference), undefined, "then initially no flex objects are there");
 			const oUIChange = "foo";
 			const oClearCacheSpy = sandbox.spy(FlexState.getFlexObjectsDataSelector(), "clearCachedResult");
-			VariantManagementState.addRuntimeOnlyFlexObjects(sReference, [oUIChange]);
+			VariantManagementState.addRuntimeOnlyFlexObjects(sReference, sReference, [oUIChange]);
 			assert.strictEqual(FlexState.getRuntimeOnlyData(sReference).flexObjects.length, 1, "the new UIChange is added");
 			assert.strictEqual(FlexState.getRuntimeOnlyData(sReference).flexObjects[0], "foo", "the correct UIChange is added");
 			assert.deepEqual(FlexState.getFlexObjectsDataSelector().get({ reference: sReference }), ["foo"], "the selector is updated");

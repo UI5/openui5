@@ -375,12 +375,15 @@ sap.ui.define([
 		}
 	}
 
-	function initializeEmptyState(sReference) {
+	function initializeEmptyState(sReference, sComponentId) {
+		if (!sComponentId) {
+			throw new Error(`No FlexState instance created for reference ${sReference} - missing component ID`);
+		}
 		_mInstances[sReference] = {
 			emptyState: true,
 			// this makes sure that a proper initialize will still work as expected
 			reInitialize: true,
-			componentId: ""
+			componentId: sComponentId
 		};
 		const oNewInitPromise = new Deferred();
 		_mInitPromises[sReference] = oNewInitPromise;
@@ -390,10 +393,14 @@ sap.ui.define([
 	}
 
 	FlexState.getRuntimeOnlyData = function(sReference) {
+		return _mInstances[sReference]?.runtimePersistence?.runtimeOnlyData;
+	};
+
+	FlexState.addFlexObjectsToRuntimeOnlyData = function(sReference, sComponentId, aFlexObjects) {
 		if (!_mInstances[sReference]) {
-			initializeEmptyState(sReference);
+			initializeEmptyState(sReference, sComponentId);
 		}
-		return _mInstances[sReference].runtimePersistence.runtimeOnlyData;
+		_mInstances[sReference].runtimePersistence.runtimeOnlyData.flexObjects.push(...aFlexObjects);
 	};
 
 	/**
@@ -474,11 +481,12 @@ sap.ui.define([
 	 *
 	 * @param {object} mPropertyBag - Contains additional data needed for reading and storing changes
 	 * @param {string} mPropertyBag.reference - Flex reference of the app
+	 * @param {string} mPropertyBag.componentId - ID of the component
 	 * @param {string} mPropertyBag.variantReference - The reference of the variant to load.
 	 */
 	FlexState.lazyLoadFlVariant = async function(mPropertyBag) {
 		if (!_mInstances[mPropertyBag.reference]) {
-			initializeEmptyState(mPropertyBag.reference);
+			initializeEmptyState(mPropertyBag.reference, mPropertyBag.componentId);
 		}
 		const oResult = await Loader.loadFlVariant(mPropertyBag);
 		const oInstance = _mInstances[mPropertyBag.reference];
@@ -645,11 +653,12 @@ sap.ui.define([
 	 *
 	 * @param {string} sReference - Flexibility reference of the app
 	 * @param {array.<sap.ui.fl.apply._internal.flexObjects.FlexObject>} aFlexObjects - Flex objects
+	 * @param {string} [sComponentId] - ID of the component, required if an empty state needs to be initialized
 	 * @returns {sap.ui.fl.apply._internal.flexObjects.FlexObject[]} The flex objects that were added
 	 */
-	FlexState.addDirtyFlexObjects = function(sReference, aFlexObjects) {
+	FlexState.addDirtyFlexObjects = function(sReference, aFlexObjects, sComponentId) {
 		if (!_mInstances[sReference]) {
-			initializeEmptyState(sReference);
+			initializeEmptyState(sReference, sComponentId);
 		}
 		const sAdaptationLayer = FlexInfoSession.getByReference(sReference).adaptationLayer;
 		const aFilteredFlexObjects = aFlexObjects

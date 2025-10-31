@@ -268,7 +268,8 @@ sap.ui.define([
 					try {
 						await VariantManagementState.loadVariant({
 							reference: sFlexReference,
-							variantReference: sVariantReference
+							variantReference: sVariantReference,
+							componentId: oAppComponent.getId()
 						});
 
 						sVariantManagementReference = VariantManagementState.getVariantManagementReferenceForVariant(

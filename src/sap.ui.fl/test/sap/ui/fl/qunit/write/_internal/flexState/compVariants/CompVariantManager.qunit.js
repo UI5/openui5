@@ -720,10 +720,14 @@ sap.ui.define([
 	});
 
 	QUnit.module("setDefault", {
-		before() {
+		async beforeEach() {
 			this.sPersistencyKey = "persistency.key";
 			this.sVariantId1 = "variantId1";
 			this.sVariantId2 = "variantId2";
+			await FlexState.initialize({
+				reference: sComponentId,
+				componentId: sComponentId
+			});
 		},
 		afterEach() {
 			FlexState.clearState(sComponentId);
@@ -883,7 +887,11 @@ sap.ui.define([
 	});
 
 	QUnit.module("updateVariant", {
-		beforeEach() {
+		async beforeEach() {
+			await FlexState.initialize({
+				reference: sComponentId,
+				componentId: sComponentId
+			});
 			this.sPersistencyKey = "persistency.key";
 			this.oVariantData = {
 				changeSpecificData: {
@@ -1072,7 +1080,11 @@ sap.ui.define([
 	});
 
 	QUnit.module("discardVariantContent", {
-		beforeEach() {
+		async beforeEach() {
+			await FlexState.initialize({
+				reference: sComponentId,
+				componentId: sComponentId
+			});
 			sandbox.stub(Settings, "getInstanceOrUndef").returns({
 				getUserId() {return "test user";},
 				isPublicLayerAvailable() {return false;}
@@ -1421,7 +1433,11 @@ sap.ui.define([
 	});
 
 	QUnit.module("revert", {
-		beforeEach() {
+		async beforeEach() {
+			await FlexState.initialize({
+				reference: sComponentId,
+				componentId: sComponentId
+			});
 			this.sPersistencyKey = "persistency.key";
 			this.oVariantData = {
 				changeSpecificData: {
@@ -1878,7 +1894,7 @@ sap.ui.define([
 					executeOnSelect: bExecuteOnSelect
 				}
 			});
-			FlexState.addDirtyFlexObjects(sComponentId, [oMockedStandardVariant]);
+			FlexState.addDirtyFlexObjects(sComponentId, [oMockedStandardVariant], sComponentId);
 			return oMockedStandardVariant;
 		}
 
@@ -1960,7 +1976,11 @@ sap.ui.define([
 	});
 
 	QUnit.module("Versioning is enabled", {
-		beforeEach() {
+		async beforeEach() {
+			await FlexState.initialize({
+				reference: sComponentId,
+				componentId: sComponentId
+			});
 			sandbox.stub(Versions, "hasVersionsModel").returns(true);
 			this.sPersistencyKey = "persistency.key";
 			var oVariantData = {

@@ -10,6 +10,7 @@ sap.ui.define([
 	"sap/ui/fl/write/api/ChangesWriteAPI",
 	"sap/ui/fl/write/api/PersistenceWriteAPI",
 	"sap/ui/fl/Layer",
+	"sap/ui/fl/Utils",
 	"sap/ui/rta/command/CommandFactory",
 	"sap/ui/rta/command/LREPSerializer",
 	"sap/ui/rta/command/Stack",
@@ -25,6 +26,7 @@ sap.ui.define([
 	ChangesWriteAPI,
 	PersistenceWriteAPI,
 	Layer,
+	Utils,
 	CommandFactory,
 	CommandSerializer,
 	CommandStack,
@@ -67,6 +69,8 @@ sap.ui.define([
 		},
 		beforeEach() {
 			sandbox.stub(ChangesWriteAPI, "getChangeHandler").resolves();
+			sandbox.stub(Utils, "getComponentForControl").returns(oMockedAppComponent);
+
 			this.oCommandStack = new CommandStack();
 			this.oInput1 = new Input("input1");
 			this.oInput2 = new Input("input2");

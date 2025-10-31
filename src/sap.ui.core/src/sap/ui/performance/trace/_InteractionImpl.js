@@ -348,29 +348,31 @@ sap.ui.define([
 			if (aTimings.length && !oPendingInteraction?.completed && oPendingInteraction?.id === sId) {
 				if (oRequestInfo) {
 					aTimings = aTimings.filter((timing) => {
-						return timing.name === this[UI5_URL_SYMBOL];
+						return timing.name === this[UI5_URL_SYMBOL] && timing.decodedBodySize !== 0 && timing.transferSize !== 0;
 					});
-					// enrich interaction with information
-					const sContentLength = this.getResponseHeader("content-length"),
-						bCompressed = checkCompression(this.responseURL, this.getResponseHeader("content-encoding"), this.getResponseHeader("content-type"), sContentLength),
-						sFesrec = this.getResponseHeader("sap-perf-fesrec");
+					if (aTimings.length) {
+						// enrich interaction with information
+						const sContentLength = this.getResponseHeader("content-length"),
+							bCompressed = checkCompression(this.responseURL, this.getResponseHeader("content-encoding"), this.getResponseHeader("content-type"), sContentLength),
+							sFesrec = this.getResponseHeader("sap-perf-fesrec");
 
-					oRequestInfo.bytesReceived = sContentLength ? parseInt(sContentLength) : 0;
-					oRequestInfo.bytesReceived = this.getAllResponseHeaders().length;
-					// this should be true only if all responses are compressed
-					oRequestInfo.requestCompression = bCompressed;
+						oRequestInfo.bytesReceived = sContentLength ? parseInt(sContentLength) : 0;
+						oRequestInfo.bytesReceived = this.getAllResponseHeaders().length;
+						// this should be true only if all responses are compressed
+						oRequestInfo.requestCompression = bCompressed;
 
-					// sap-perf-fesrec header contains milliseconds
-					oRequestInfo.fesrecTime = sFesrec ? Math.round(parseFloat(sFesrec, 10) / 1000) : 0;
-					const sSapStatistics = this.getResponseHeader("sap-statistics");
-					aTimings[0][UI5_REQUEST_INFO_SYMBOL] = oRequestInfo;
-					if (sSapStatistics) {
-						oRequestInfo.pendingInteraction.sapStatistics.push({
-							// add response url for mapping purposes
-							url: this.responseURL,
-							statistics: sSapStatistics,
-							timing: aTimings ? aTimings[aTimings.length - 1] : undefined
-						});
+						// sap-perf-fesrec header contains milliseconds
+						oRequestInfo.fesrecTime = sFesrec ? Math.round(parseFloat(sFesrec, 10) / 1000) : 0;
+						const sSapStatistics = this.getResponseHeader("sap-statistics");
+						aTimings[0][UI5_REQUEST_INFO_SYMBOL] = oRequestInfo;
+						if (sSapStatistics) {
+							oRequestInfo.pendingInteraction.sapStatistics.push({
+								// add response url for mapping purposes
+								url: this.responseURL,
+								statistics: sSapStatistics,
+								timing: aTimings ? aTimings[aTimings.length - 1] : undefined
+							});
+						}
 					}
 				}
 			}

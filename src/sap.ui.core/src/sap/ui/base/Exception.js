@@ -6,9 +6,10 @@
 sap.ui.define(function() {
 	"use strict";
 
-
 	/**
-	 * Exception class
+	 * @class
+	 *
+	 * Exception class.
 	 *
 	 * This is the base exception class. In contrary to the Error an Exception
 	 * should be thrown in cases, where the exception can, and should, be handled
@@ -17,17 +18,18 @@ sap.ui.define(function() {
 	 * The try/catch statement in JavaScript cannot catch specific exceptions, so
 	 * when catching internal exceptions you should make sure to rethrow other errors:
 	 *
+	 * <pre>
+	 * // Exception imported from sap/ui/base/Exception
 	 * try {
 	 *     ...
-	 * }
-	 * catch (oException) {
-	 *     if (oException instanceof sap.ui.base.Exception) {
+	 * } catch (oException) {
+	 *     if (oException instanceof Exception) {
 	 *         ... handle exception ...
-	 *     }
-	 *     else {
+	 *     } else {
 	 *         throw oException;
 	 *     }
 	 * }
+	 * </pre>
 	 *
 	 * @param {string} message Message explaining what went wrong
 	 * @alias sap.ui.base.Exception

@@ -3790,8 +3790,8 @@ sap.ui.define([
 	 */
 	_CollectionCache.prototype.requestSeparateProperties = async function (iStart, iEnd,
 			oMainPromise, fnSeparateReceived) {
-		const oExpand = this.mQueryOptions.$expand || {};
-		const aProperties = this.aSeparateProperties.filter((sProperty) => sProperty in oExpand);
+		const mExpand = this.mQueryOptions.$expand ?? {};
+		const aProperties = this.aSeparateProperties.filter((sProperty) => sProperty in mExpand);
 		if (!aProperties.length) {
 			return;
 		}

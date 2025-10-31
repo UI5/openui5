@@ -2488,7 +2488,7 @@ sap.ui.define([
 		 *   The HTTP method, see also "vRequest.url"
 		 * @param {object} [vRequest.payload]
 		 *   The payload of the request; in case of a "POST" request the "payload" is defaulted to
-		 *   an empty object if no "payload" property is given
+		 *   an empty object
 		 * @param {string} vRequest.url
 		 *   The request URL in the following format "#<batchNo>.<changeSetNo> <method> <URL>";
 		 *   "#<batchNo>.<changeSetNo> ", ".<changeSetNo>" and "<method> " are optional;
@@ -2509,7 +2509,7 @@ sap.ui.define([
 		 * @returns {object} The test instance for chaining
 		 * @throws {Error} In case some sanity check fails, for example around "@odata.count" and
 		 *   $count, or in case the response is missing or unexpected (depending on the method and
-		 *   "Prefer" header)
+		 *   "Prefer" header), or if an empty payload object is given for a POST request
 		 */
 		expectRequest : function (vRequest, vResponse, mResponseHeaders) {
 			var iCount,
@@ -2554,12 +2554,14 @@ sap.ui.define([
 			if (aURLParts) {
 				[, vRequest.method, vRequest.url] = aURLParts;
 			}
-			if (vRequest.method === "POST" && !("payload" in vRequest)) {
-				vRequest.payload = {};
+			if (vRequest.method === "POST" && vRequest.payload
+					&& _Helper.isEmptyObject(vRequest.payload)) {
+				throw new Error(`Unexpected empty payload object for POST ${vRequest.url}`);
 			}
 			// ensure that these properties are defined (required for deepEqual)
 			vRequest.method ??= "GET";
-			vRequest.payload ??= undefined;
+			vRequest.payload ??= vRequest.method === "POST" && this.oModel.sODataVersion !== "2.0"
+				? {} : undefined;
 			vRequest.responseHeaders = mResponseHeaders || {};
 			vRequest.response = vResponse;
 			vRequest.url = TestUtils.encodeReadableUrl(vRequest.url);
@@ -19516,12 +19518,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		return this.createView(assert, "", oModel).then(function () {
 			oContextBinding = oModel.bindContext("/__FAKE__ActionImport(...)");
 
-			that.expectRequest({
-					payload : undefined,
-					url : "POST __FAKE__ActionImport?carrid='AA'"
+			that.expectRequest("POST __FAKE__ActionImport?carrid='AA'"
 					+ "&guid=guid'0050568D-393C-1ED4-9D97-E65F0F3FCC23'"
-					+ "&fldate=datetime'2017-08-10T00:00:00'&flightTime=42"
-				}, {
+					+ "&fldate=datetime'2017-08-10T00:00:00'&flightTime=42", {
 					d : {
 						__metadata : {type : "RMTSAMPLEFLIGHT.Flight"},
 						carrid : "AA",
@@ -19584,10 +19583,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		return this.createView(assert, sView, oModel).then(function () {
 			var oContextBinding = that.oView.byId("action").getObjectBinding();
 
-			that.expectRequest({
-					payload : undefined,
-					url : "POST SalesOrder_Confirm?SalesOrderID='0815'"
-				}, {
+			that.expectRequest("POST SalesOrder_Confirm?SalesOrderID='0815'", {
 					d : {
 						__metadata : {type : "GWSAMPLE_BASIC.SalesOrder"},
 						SalesOrderID : "08/15",
@@ -50897,11 +50893,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						$select : "Address/City,ArtistID,IsActiveEntity,Name,Messages"
 					});
 
-				that.expectRequest({
-					url : oFixture.method + " " + sRequestPath
-						+ "?$select=Address/City,ArtistID,IsActiveEntity,Messages,Name",
-					payload : oFixture.method === "GET" ? undefined : {}
-				}, {
+				that.expectRequest(oFixture.method + " " + sRequestPath
+						+ "?$select=Address/City,ArtistID,IsActiveEntity,Messages,Name", {
 					Address : {City : "Liverpool"},
 					ArtistID : "42",
 					IsActiveEntity : false,
@@ -52681,8 +52674,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						method : bAction ? "POST" : "GET",
 						url : "Artists(ArtistID='42',IsActiveEntity=true)/special.cases."
 							+ sDraftOperation + (bAction ? "" : "()")
-							+ "?$select=ArtistID,IsActiveEntity,Messages,Name",
-						payload : bAction ? {} : undefined
+							+ "?$select=ArtistID,IsActiveEntity,Messages,Name"
 					}, {
 						"@odata.etag" : "inactivETag",
 						ArtistID : "42",
@@ -64238,7 +64230,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				return Promise.resolve(false);
 			}
 
-				// No `Prefer : "handling=strict"` header
+			// No `Prefer : "handling=strict"` header
 			that.expectRequest("POST SalesOrderList('42')/" + sConfirmAction, {
 					LifecycleStatus : "C",
 					SalesOrderID : "42",

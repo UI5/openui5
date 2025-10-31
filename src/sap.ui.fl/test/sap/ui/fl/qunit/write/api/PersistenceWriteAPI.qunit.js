@@ -321,7 +321,7 @@ sap.ui.define([
 				},
 				selector: this.vSelector
 			};
-			sandbox.stub(FlexObjectManager, "addDirtyFlexObjects").returnsArg(1);
+			sandbox.stub(FlexObjectManager, "addDirtyFlexObjects").returnsArg(2);
 
 			assert.strictEqual(
 				PersistenceWriteAPI.add(mPropertyBag),
@@ -339,7 +339,7 @@ sap.ui.define([
 				selector: this.vSelector
 			};
 			sandbox.stub(UIChangeManager, "addDirtyChanges").returnsArg(1);
-			sandbox.stub(FlexObjectManager, "addDirtyFlexObjects").returnsArg(1);
+			sandbox.stub(FlexObjectManager, "addDirtyFlexObjects").returnsArg(2);
 
 			assert.deepEqual(
 				PersistenceWriteAPI.add(mPropertyBag),
@@ -367,7 +367,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("when add is called with an annotation change", function(assert) {
-			sandbox.stub(FlexObjectManager, "addDirtyFlexObjects").returnsArg(1);
+			sandbox.stub(FlexObjectManager, "addDirtyFlexObjects").returnsArg(2);
 
 			PersistenceWriteAPI.add({
 				change: FlexObjectFactory.createAnnotationChange({
@@ -457,7 +457,7 @@ sap.ui.define([
 				selector: this.vSelector
 			};
 			sandbox.stub(UIChangeManager, "addDirtyChanges").returnsArg(1);
-			sandbox.stub(FlexObjectManager, "addDirtyFlexObjects").returnsArg(1);
+			sandbox.stub(FlexObjectManager, "addDirtyFlexObjects").returnsArg(2);
 
 			const aAddResult = PersistenceWriteAPI.add(mPropertyBag);
 			assert.deepEqual(
@@ -491,7 +491,7 @@ sap.ui.define([
 				selector: this.vSelector
 			};
 			sandbox.stub(UIChangeManager, "addDirtyChanges").returnsArg(1);
-			sandbox.stub(FlexObjectManager, "addDirtyFlexObjects").returnsArg(1);
+			sandbox.stub(FlexObjectManager, "addDirtyFlexObjects").returnsArg(2);
 
 			const aAddResult = PersistenceWriteAPI.add(mPropertyBag);
 			assert.strictEqual(aAddResult[0], mPropertyBag.flexObjects[0], "then addDirtyChanges was called first");
@@ -514,7 +514,7 @@ sap.ui.define([
 				selector: this.vSelector
 			};
 			const oElement = { type: "element" };
-			const oAppComponent = { id: sReference };
+			const oAppComponent = { getId: () => sReference };
 
 			sandbox.stub(Utils, "getAppComponentForSelector")
 			.withArgs(mPropertyBag.selector)
@@ -614,7 +614,7 @@ sap.ui.define([
 				selector: this.vSelector
 			};
 			const oElement = { type: "element" };
-			const oAppComponent = { id: sReference };
+			const oAppComponent = { getId: () => sReference };
 
 			sandbox.stub(Utils, "getAppComponentForSelector")
 			.withArgs(mPropertyBag.selector)

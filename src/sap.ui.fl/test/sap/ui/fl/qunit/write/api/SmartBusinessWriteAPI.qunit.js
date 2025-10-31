@@ -1,34 +1,41 @@
 /* global QUnit */
 
 sap.ui.define([
-	"sap/base/Log",
 	"sap/base/util/restricted/_omit",
+	"sap/base/Log",
 	"sap/ui/fl/apply/_internal/flexState/FlexObjectState",
 	"sap/ui/fl/initial/_internal/connectors/Utils",
-	"sap/ui/fl/Layer",
+	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/initial/_internal/Settings",
 	"sap/ui/fl/write/_internal/appVariant/AppVariantFactory",
 	"sap/ui/fl/write/_internal/connectors/LrepConnector",
 	"sap/ui/fl/write/_internal/connectors/Utils",
+	"sap/ui/fl/write/_internal/flexState/FlexObjectManager",
 	"sap/ui/fl/write/api/SmartBusinessWriteAPI",
+	"sap/ui/fl/Layer",
+	"sap/ui/fl/Utils",
 	"sap/ui/thirdparty/sinon-4"
 ], function(
-	Log,
 	_omit,
+	Log,
 	FlexObjectState,
 	InitialUtils,
-	Layer,
+	ManifestUtils,
 	Settings,
 	AppVariantFactory,
 	LrepConnector,
 	WriteUtils,
+	FlexObjectManager,
 	SmartBusinessWriteAPI,
+	Layer,
+	Utils,
 	sinon
 ) {
 	"use strict";
 
 	document.getElementById("qunit-fixture").style.display = "none";
 	const sandbox = sinon.createSandbox();
+	const sReference = "reference.app";
 
 	function simulateSystemConfig(bIsCloudSystem) {
 		sandbox.stub(Settings, "getInstance").resolves(
@@ -42,6 +49,15 @@ sap.ui.define([
 
 	QUnit.module("Given SmartBusinessWriteAPI", {
 		beforeEach() {
+			const oAppComponent = {
+				getId: () => "componentId",
+				getManifestObject: () => ({}),
+				getComponentData: () => ({})
+			};
+			sandbox.stub(Utils, "getAppComponentForControl").returns(oAppComponent);
+			sandbox.stub(Utils, "getAppComponentForSelector").returns(oAppComponent);
+			sandbox.stub(Utils, "getComponentForControl").returns(oAppComponent);
+
 			this.oDescrChangeSpecificData1 = {
 				changeType: "appdescr_ovp_addNewCard",
 				content: {
@@ -105,9 +121,9 @@ sap.ui.define([
 				fileName: "id_1584608199136_1961_appdescr_app_setTitle",
 				fileType: "change",
 				moduleName: "",
-				reference: "reference.app",
+				reference: sReference,
 				namespace: "apps/reference.app/changes/",
-				projectId: "reference.app",
+				projectId: sReference,
 				creation: "",
 				originalLanguage: "EN"
 			};
@@ -124,9 +140,9 @@ sap.ui.define([
 				fileName: "id_1584608199136_1961_appdescr_app_changeInbound",
 				fileType: "change",
 				moduleName: "",
-				reference: "reference.app",
+				reference: sReference,
 				namespace: "apps/reference.app/changes/",
-				projectId: "reference.app",
+				projectId: sReference,
 				creation: "",
 				originalLanguage: "EN"
 			};
@@ -136,6 +152,7 @@ sap.ui.define([
 		}
 	}, function() {
 		QUnit.test("(S4/Hana onPremise system) when create is called to save an app variant in CUSTOMER layer, with a descriptor change already added into persistence", function(assert) {
+			sandbox.stub(ManifestUtils, "getFlexReferenceForControl").returns(sReference);
 			simulateSystemConfig(false);
 
 			const oNewConnectorCall = sandbox.stub(WriteUtils, "sendRequest").resolves();
@@ -143,31 +160,31 @@ sap.ui.define([
 			// Creates a descriptor change
 			return SmartBusinessWriteAPI.createDescriptorInlineChanges({
 				changeSpecificData: this.oDescrChangeSpecificData1,
-				appId: "reference.app"
+				appId: sReference
 			})
 			.then(function(oDescriptorInlineChange) {
 				// Adds a descriptor change to its own persistence
-				return SmartBusinessWriteAPI.add({ change: oDescriptorInlineChange, appId: "reference.app" });
+				return SmartBusinessWriteAPI.add({ change: oDescriptorInlineChange, appId: sReference });
 			})
 			.then(function() {
 				return SmartBusinessWriteAPI.createDescriptorInlineChanges({
 					changeSpecificData: this.oDescrChangeSpecificData2,
-					appId: "reference.app"
+					appId: sReference
 				});
 			}.bind(this))
 			.then(function(oDescriptorInlineChange) {
 				// Adds a descriptor change to its own persistence
-				return SmartBusinessWriteAPI.add({ change: oDescriptorInlineChange, appId: "reference.app" });
+				return SmartBusinessWriteAPI.add({ change: oDescriptorInlineChange, appId: sReference });
 			})
 			.then(function() {
 				assert.strictEqual(
-					FlexObjectState.getDirtyFlexObjects("reference.app").length,
+					FlexObjectState.getDirtyFlexObjects(sReference).length,
 					2,
 					"then 2 descriptor changes have been added to the state"
 				);
 				return SmartBusinessWriteAPI.create({
 					selector: {
-						appId: "reference.app"
+						appId: sReference
 					},
 					id: "customer.reference.app.id",
 					"package": "TEST_PACKAGE",
@@ -177,14 +194,14 @@ sap.ui.define([
 			})
 			.then(function() {
 				assert.strictEqual(
-					FlexObjectState.getDirtyFlexObjects("reference.app").length,
+					FlexObjectState.getDirtyFlexObjects(sReference).length,
 					0,
 					"then a descriptor change has been removed from the state"
 				);
 				// Get the app variant to be saved to backend
 				const oAppVariant = JSON.parse(oNewConnectorCall.firstCall.args[2].payload);
 				assert.strictEqual(oAppVariant.packageName, "TEST_PACKAGE", "then the app variant will be saved with a provided package");
-				assert.strictEqual(oAppVariant.reference, "reference.app", "then the reference app id is correct");
+				assert.strictEqual(oAppVariant.reference, sReference, "then the reference app id is correct");
 				assert.strictEqual(oAppVariant.id, "customer.reference.app.id", "then the reference app id is correct");
 				assert.strictEqual(oAppVariant.content[0].changeType, "appdescr_ovp_addNewCard", "then it is a correct changetype");
 				assert.strictEqual(oAppVariant.content[1].changeType, "appdescr_app_setTitle", "then it is a correct changetype");
@@ -214,6 +231,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("(S4/Hana Cloud system) when create is called to save an app variant in CUSTOMER with descriptor change already added into own persistence", function(assert) {
+			sandbox.stub(ManifestUtils, "getFlexReferenceForControl").returns(sReference);
 			simulateSystemConfig(true);
 
 			const oNewConnectorCall = sandbox.stub(WriteUtils, "sendRequest").resolves();
@@ -221,21 +239,21 @@ sap.ui.define([
 			// Creates a descriptor change
 			return SmartBusinessWriteAPI.createDescriptorInlineChanges({
 				changeSpecificData: this.oDescrChangeSpecificData1,
-				appId: "reference.app"
+				appId: sReference
 			})
 			.then(function(oDescriptorInlineChange) {
 				// Adds a descriptor change to its own persistence
-				return SmartBusinessWriteAPI.add({ change: oDescriptorInlineChange, appId: "reference.app" });
+				return SmartBusinessWriteAPI.add({ change: oDescriptorInlineChange, appId: sReference });
 			})
 			.then(function() {
 				assert.strictEqual(
-					FlexObjectState.getDirtyFlexObjects("reference.app").length,
+					FlexObjectState.getDirtyFlexObjects(sReference).length,
 					1,
 					"then 1 descriptor change has been added to the state"
 				);
 				return SmartBusinessWriteAPI.create({
 					selector: {
-						appId: "reference.app"
+						appId: sReference
 					},
 					id: "customer.reference.app.id",
 					layer: Layer.CUSTOMER
@@ -243,14 +261,14 @@ sap.ui.define([
 			})
 			.then(function() {
 				assert.strictEqual(
-					FlexObjectState.getDirtyFlexObjects("reference.app").length,
+					FlexObjectState.getDirtyFlexObjects(sReference).length,
 					0,
 					"then all descriptor changes have been removed from the state"
 				);
 				// Get the app variant to be saved to backend
 				const oAppVariant = JSON.parse(oNewConnectorCall.firstCall.args[2].payload);
 				assert.strictEqual(oAppVariant.packageName, "", "then the app variant will be saved with an empty package");
-				assert.strictEqual(oAppVariant.reference, "reference.app", "then the reference app id is correct");
+				assert.strictEqual(oAppVariant.reference, sReference, "then the reference app id is correct");
 				assert.strictEqual(oAppVariant.id, "customer.reference.app.id", "then the reference app id is correct");
 				assert.strictEqual(
 					oAppVariant.content[0].changeType,
@@ -267,6 +285,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("(S4/Hana onPremise system) when create is called with a descriptor change already added into own persistence and submitting app variant to backend in VENDOR layer in a valid package failed", function(assert) {
+			sandbox.stub(ManifestUtils, "getFlexReferenceForControl").returns(sReference);
 			simulateSystemConfig(false);
 
 			const oNewConnectorCall = sandbox.stub(WriteUtils, "sendRequest").rejects({ message: "App variant failed to save" });
@@ -278,21 +297,21 @@ sap.ui.define([
 			// Creates a descriptor change
 			return SmartBusinessWriteAPI.createDescriptorInlineChanges({
 				changeSpecificData: this.oDescrChangeSpecificData1,
-				appId: "reference.app"
+				appId: sReference
 			})
 			.then(function(oDescriptorInlineChange) {
 				// Adds a descriptor change to its own persistence
-				return SmartBusinessWriteAPI.add({ change: oDescriptorInlineChange, appId: "reference.app" });
+				return SmartBusinessWriteAPI.add({ change: oDescriptorInlineChange, appId: sReference });
 			})
 			.then(function() {
 				assert.strictEqual(
-					FlexObjectState.getDirtyFlexObjects("reference.app").length,
+					FlexObjectState.getDirtyFlexObjects(sReference).length,
 					1,
 					"then 1 descriptor change has been added to the state"
 				);
 				return SmartBusinessWriteAPI.create({
 					selector: {
-						appId: "reference.app"
+						appId: sReference
 					},
 					id: "customer.reference.app.id",
 					"package": "TEST_PACKAGE",
@@ -302,14 +321,14 @@ sap.ui.define([
 			})
 			.catch(function() {
 				assert.strictEqual(
-					FlexObjectState.getDirtyFlexObjects("reference.app").length,
+					FlexObjectState.getDirtyFlexObjects(sReference).length,
 					0,
 					"then all descriptor changes have been removed from the state"
 				);
 				// Get the app variant to be saved to backend
 				const oAppVariant = JSON.parse(oNewConnectorCall.firstCall.args[2].payload);
 				assert.strictEqual(oAppVariant.packageName, "TEST_PACKAGE", "then the app variant will be saved with a provided package");
-				assert.strictEqual(oAppVariant.reference, "reference.app", "then the reference app id is correct");
+				assert.strictEqual(oAppVariant.reference, sReference, "then the reference app id is correct");
 				assert.strictEqual(oAppVariant.id, "customer.reference.app.id", "then the app variant id is correct");
 				assert.strictEqual(
 					oAppVariant.content[0].changeType,
@@ -324,6 +343,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("(S4/Hana onPremise system) when create is called with a descriptor change already added into own persistence and submitting app variant to backend in VENDOR layer in an empty package failed", function(assert) {
+			sandbox.stub(ManifestUtils, "getFlexReferenceForControl").returns(sReference);
 			simulateSystemConfig(false);
 
 			const oNewConnectorCall = sandbox.stub(WriteUtils, "sendRequest");
@@ -335,21 +355,21 @@ sap.ui.define([
 			// Creates a descriptor change
 			return SmartBusinessWriteAPI.createDescriptorInlineChanges({
 				changeSpecificData: this.oDescrChangeSpecificData1,
-				appId: "reference.app"
+				appId: sReference
 			})
 			.then(function(oDescriptorInlineChange) {
 				// Adds a descriptor change to its own persistence
-				return SmartBusinessWriteAPI.add({ change: oDescriptorInlineChange, appId: "reference.app" });
+				return SmartBusinessWriteAPI.add({ change: oDescriptorInlineChange, appId: sReference });
 			})
 			.then(function() {
 				assert.strictEqual(
-					FlexObjectState.getDirtyFlexObjects("reference.app").length,
+					FlexObjectState.getDirtyFlexObjects(sReference).length,
 					1,
 					"then 1 descriptor change has been added to the state"
 				);
 				return SmartBusinessWriteAPI.create({
 					selector: {
-						appId: "reference.app"
+						appId: sReference
 					},
 					id: "customer.reference.app.id",
 					"package": "",
@@ -362,7 +382,7 @@ sap.ui.define([
 			})
 			.catch(function() {
 				assert.strictEqual(
-					FlexObjectState.getDirtyFlexObjects("reference.app").length,
+					FlexObjectState.getDirtyFlexObjects(sReference).length,
 					0,
 					"then all descriptor changes have been removed from the state"
 				);
@@ -371,6 +391,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("(S4/Hana onPremise system) when create is called with a descriptor change already added into own persistence, no transport passed and submitting app variant to backend in VENDOR layer as a local object", function(assert) {
+			sandbox.stub(ManifestUtils, "getFlexReferenceForControl").returns(sReference);
 			simulateSystemConfig(false);
 
 			const oNewConnectorCall = sandbox.stub(WriteUtils, "sendRequest").resolves();
@@ -382,21 +403,21 @@ sap.ui.define([
 			// Creates a descriptor change
 			return SmartBusinessWriteAPI.createDescriptorInlineChanges({
 				changeSpecificData: this.oDescrChangeSpecificData1,
-				appId: "reference.app"
+				appId: sReference
 			})
 			.then(function(oDescriptorInlineChange) {
 				// Adds a descriptor change to its own persistence
-				return SmartBusinessWriteAPI.add({ change: oDescriptorInlineChange, appId: "reference.app" });
+				return SmartBusinessWriteAPI.add({ change: oDescriptorInlineChange, appId: sReference });
 			})
 			.then(function() {
 				assert.strictEqual(
-					FlexObjectState.getDirtyFlexObjects("reference.app").length,
+					FlexObjectState.getDirtyFlexObjects(sReference).length,
 					1,
 					"then 1 descriptor change has been added to the state"
 				);
 				return SmartBusinessWriteAPI.create({
 					selector: {
-						appId: "reference.app"
+						appId: sReference
 					},
 					id: "customer.reference.app.id",
 					"package": "$TMP",
@@ -405,14 +426,14 @@ sap.ui.define([
 			})
 			.then(function() {
 				assert.strictEqual(
-					FlexObjectState.getDirtyFlexObjects("reference.app").length,
+					FlexObjectState.getDirtyFlexObjects(sReference).length,
 					0,
 					"then all descriptor changes have been removed from the state"
 				);
 				// Get the app variant to be saved to backend
 				const oAppVariant = JSON.parse(oNewConnectorCall.firstCall.args[2].payload);
 				assert.strictEqual(oAppVariant.packageName, "$TMP", "then the app variant will be saved with an empty package");
-				assert.strictEqual(oAppVariant.reference, "reference.app", "then the reference app id is correct");
+				assert.strictEqual(oAppVariant.reference, sReference, "then the reference app id is correct");
 				assert.strictEqual(oAppVariant.id, "customer.reference.app.id", "then the app variant id is correct");
 				assert.strictEqual(
 					oAppVariant.content[0].changeType,
@@ -427,6 +448,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("(S4/Hana onPremise system) when create is called with a descriptor change already added into own persistence and submitting app variant to backend in CUSTOMER_BASE layer in an empty package failed", function(assert) {
+			sandbox.stub(ManifestUtils, "getFlexReferenceForControl").returns(sReference);
 			simulateSystemConfig(false);
 
 			const oNewConnectorCall = sandbox.stub(WriteUtils, "sendRequest");
@@ -438,21 +460,21 @@ sap.ui.define([
 			// Creates a descriptor change
 			return SmartBusinessWriteAPI.createDescriptorInlineChanges({
 				changeSpecificData: this.oDescrChangeSpecificData1,
-				appId: "reference.app"
+				appId: sReference
 			})
 			.then(function(oDescriptorInlineChange) {
 				// Adds a descriptor change to its own persistence
-				return SmartBusinessWriteAPI.add({ change: oDescriptorInlineChange, appId: "reference.app" });
+				return SmartBusinessWriteAPI.add({ change: oDescriptorInlineChange, appId: sReference });
 			})
 			.then(function() {
 				assert.strictEqual(
-					FlexObjectState.getDirtyFlexObjects("reference.app").length,
+					FlexObjectState.getDirtyFlexObjects(sReference).length,
 					1,
 					"then 1 descriptor change has been added to the state"
 				);
 				return SmartBusinessWriteAPI.create({
 					selector: {
-						appId: "reference.app"
+						appId: sReference
 					},
 					id: "customer.reference.app.id",
 					"package": "",
@@ -465,7 +487,7 @@ sap.ui.define([
 			})
 			.catch(function() {
 				assert.strictEqual(
-					FlexObjectState.getDirtyFlexObjects("reference.app").length,
+					FlexObjectState.getDirtyFlexObjects(sReference).length,
 					0,
 					"then all descriptor changes have been removed from the state"
 				);
@@ -474,6 +496,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("(S4/Hana Cloud system) when update is called to update a published app variant in CUSTOMER layer", function(assert) {
+			sandbox.stub(FlexObjectManager, "deleteFlexObjects");
 			simulateSystemConfig(true);
 			const mPropertyBag = {
 				appId: "customer.reference.app.id"
@@ -482,7 +505,7 @@ sap.ui.define([
 			const mAppVariant = {
 				response: {
 					id: "customer.reference.app.id",
-					reference: "reference.app",
+					reference: sReference,
 					fileName: "fileName1",
 					namespace: "namespace1",
 					layer: Layer.CUSTOMER,
@@ -521,6 +544,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("(S4/Hana Cloud system) when update is called to update a published app variant (having a new inline change) in CUSTOMER layer ", function(assert) {
+			sandbox.stub(FlexObjectManager, "deleteFlexObjects");
 			simulateSystemConfig(true);
 			const mPropertyBag = {
 				appId: "customer.reference.app.id"
@@ -529,7 +553,7 @@ sap.ui.define([
 			const mAppVariant = {
 				response: {
 					id: "customer.reference.app.id",
-					reference: "reference.app",
+					reference: sReference,
 					fileName: "fileName1",
 					namespace: "namespace1",
 					layer: Layer.CUSTOMER,
@@ -597,6 +621,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("(S4/Hana onPremise system) when update is called to update a local app variant ($TMP) in CUSTOMER layer", function(assert) {
+			sandbox.stub(FlexObjectManager, "deleteFlexObjects");
 			simulateSystemConfig(false);
 			const mPropertyBag = {
 				appId: "customer.reference.app.id"
@@ -605,7 +630,7 @@ sap.ui.define([
 			const mAppVariant = {
 				response: {
 					id: "customer.reference.app.id",
-					reference: "reference.app",
+					reference: sReference,
 					fileName: "fileName1",
 					namespace: "namespace1",
 					layer: Layer.CUSTOMER,
@@ -639,6 +664,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("(S4/Hana onPremise system) when update is called to update an app variant with empty package in CUSTOMER layer", function(assert) {
+			sandbox.stub(FlexObjectManager, "deleteFlexObjects");
 			simulateSystemConfig(false);
 			const mPropertyBag = {
 				appId: "customer.reference.app.id"
@@ -647,7 +673,7 @@ sap.ui.define([
 			const mAppVariant = {
 				response: {
 					id: "customer.reference.app.id",
-					reference: "reference.app",
+					reference: sReference,
 					fileName: "fileName1",
 					namespace: "namespace1",
 					layer: Layer.CUSTOMER,
@@ -684,6 +710,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("(S4/Hana onPremise system) when update is called to update a published app variant in CUSTOMER layer", function(assert) {
+			sandbox.stub(FlexObjectManager, "deleteFlexObjects");
 			simulateSystemConfig(false);
 			const mPropertyBag = {
 				transport: "TRANSPORT123",
@@ -693,7 +720,7 @@ sap.ui.define([
 			const mAppVariant = {
 				response: {
 					id: "customer.reference.app.id",
-					reference: "reference.app",
+					reference: sReference,
 					fileName: "fileName1",
 					namespace: "namespace1",
 					layer: "layer1",
@@ -834,7 +861,7 @@ sap.ui.define([
 
 			return SmartBusinessWriteAPI.createDescriptorChangeString({
 				changeSpecificData: this.oDescrChangeSpecificData2,
-				appId: "reference.app"
+				appId: sReference
 			})
 			.then(function(sChange) {
 				assert.equal(sChange, sExpected, "then the DescriptorChange will be returned as string");
@@ -855,7 +882,7 @@ sap.ui.define([
 
 			return SmartBusinessWriteAPI.createDescriptorChangeString({
 				changeSpecificData: this.oDescrChangeSpecificData1,
-				appId: "reference.app"
+				appId: sReference
 			})
 			.then(function(sChange) {
 				assert.equal(sChange, sExpected, "then the DescriptorChange will be returned as string");
@@ -868,7 +895,7 @@ sap.ui.define([
 
 			return SmartBusinessWriteAPI.createDescriptorChangeString({
 				changeSpecificData: this.oDescrChangeSpecificData3,
-				appId: "reference.app"
+				appId: sReference
 			})
 			.then(function(sChange) {
 				assert.equal(sChange, sExpected, "then the DescriptorChange will be returned as string without property texts");
@@ -878,7 +905,7 @@ sap.ui.define([
 		QUnit.test("negative tests for create function", function(assert) {
 			const mPropertyBag = {
 				selector: {
-					appId: "reference.app"
+					appId: sReference
 				},
 				id: "customer.reference.app.id",
 				layer: Layer.CUSTOMER
@@ -922,7 +949,7 @@ sap.ui.define([
 		QUnit.test("negative tests for createDescriptorChangeString function", function(assert) {
 			const mPropertyBag = {
 				changeSpecificData: this.oDescrChangeSpecificData1,
-				appId: "reference.app"
+				appId: sReference
 			};
 			return SmartBusinessWriteAPI.createDescriptorChangeString(_omit(mPropertyBag, ["changeSpecificData"]))
 			.catch((oError) => {
@@ -939,7 +966,7 @@ sap.ui.define([
 
 		QUnit.test("negative test for add function", function(assert) {
 			const mPropertyBag = {
-				appId: "reference.app",
+				appId: sReference,
 				change: { id: "fakeChange" }
 			};
 			return SmartBusinessWriteAPI.add(_omit(mPropertyBag, ["appId"]))
@@ -957,7 +984,7 @@ sap.ui.define([
 
 		QUnit.test("getDesignTimeVariant function call", function(assert) {
 			const mPropertyBag = {
-				appId: "reference.app",
+				appId: sReference,
 				id: "customer.reference.app.id"
 			};
 			const oAppvariantFactoryLoadStub = sandbox.stub(AppVariantFactory, "load").resolves({});
@@ -973,7 +1000,7 @@ sap.ui.define([
 
 		QUnit.test("getRunTimeVariant function call", function(assert) {
 			const mPropertyBag = {
-				appId: "reference.app",
+				appId: sReference,
 				id: "customer.reference.app.id"
 			};
 			const oLrepConnectorGetManifestStub = sandbox.stub(LrepConnector.appVariant, "getManifest").resolves({});

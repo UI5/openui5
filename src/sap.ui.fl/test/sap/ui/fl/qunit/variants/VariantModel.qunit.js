@@ -114,7 +114,7 @@ sap.ui.define([
 			this.oComponent = RtaQunitUtils.createAndStubAppComponent(sandbox, sReference);
 			return FlexState.initialize({
 				reference: sReference,
-				componentId: "RTADemoAppMD",
+				componentId: sReference,
 				componentData: {},
 				manifest: {}
 			}).then(function() {
@@ -271,6 +271,7 @@ sap.ui.define([
 		QUnit.test("when there is an update from the DataSelector", function(assert) {
 			FlexObjectManager.addDirtyFlexObjects(
 				this.oModel.sFlexReference,
+				this.oModel.sFlexReference,
 				[
 					FlexObjectFactory.createVariantManagementChange({
 						id: "setDefaultVariantChange",
@@ -293,6 +294,7 @@ sap.ui.define([
 			});
 			FlexObjectManager.addDirtyFlexObjects(
 				this.oModel.sFlexReference,
+				this.oModel.sFlexReference,
 				[
 					FlexObjectFactory.createVariantChange({
 						id: "setFavoriteChange",
@@ -308,6 +310,7 @@ sap.ui.define([
 			);
 			FlexObjectManager.addDirtyFlexObjects(
 				this.oModel.sFlexReference,
+				this.oModel.sFlexReference,
 				[
 					FlexObjectFactory.createUIChange({
 						id: "someUIChange",
@@ -317,6 +320,7 @@ sap.ui.define([
 				]
 			);
 			FlexObjectManager.addDirtyFlexObjects(
+				this.oModel.sFlexReference,
 				this.oModel.sFlexReference,
 				[
 					FlexObjectFactory.createVariantChange({
@@ -333,6 +337,7 @@ sap.ui.define([
 			);
 			FlexObjectManager.addDirtyFlexObjects(
 				this.oModel.sFlexReference,
+				this.oModel.sFlexReference,
 				[
 					FlexObjectFactory.createVariantChange({
 						id: "setTitleChange",
@@ -348,6 +353,7 @@ sap.ui.define([
 			);
 			FlexObjectManager.addDirtyFlexObjects(
 				this.oModel.sFlexReference,
+				this.oModel.sFlexReference,
 				[
 					FlexObjectFactory.createVariantChange({
 						id: "setVisibleChange",
@@ -362,6 +368,7 @@ sap.ui.define([
 				]
 			);
 			FlexObjectManager.addDirtyFlexObjects(
+				this.oModel.sFlexReference,
 				this.oModel.sFlexReference,
 				[
 					FlexObjectFactory.createVariantChange({
@@ -722,7 +729,7 @@ sap.ui.define([
 					"then the new change created with 'ctrl_variant_change' as fileType"
 				);
 				assert.deepEqual(
-					oAddDirtyFlexObjectsStub.firstCall.args[1],
+					oAddDirtyFlexObjectsStub.firstCall.args[2],
 					[oChange],
 					"then 'addDirtyFlexObjects' called with the newly created change"
 				);
@@ -1475,7 +1482,7 @@ sap.ui.define([
 				variantReference: this.sVMReference,
 				variantManagementReference: this.sVMReference
 			});
-			FlexObjectManager.addDirtyFlexObjects(sReference, [oVariant]);
+			FlexObjectManager.addDirtyFlexObjects(sReference, sReference, [oVariant]);
 			this.oModel.destroy();
 			assert.strictEqual(oAddRuntimeOnlySpy.callCount, 1, "then the fake Standard variant is added to the runtimeOnlyData");
 
@@ -1495,7 +1502,7 @@ sap.ui.define([
 				layer: Layer.CUSTOMER,
 				variantReference: this.sVMReference
 			});
-			FlexObjectManager.addDirtyFlexObjects(this.oModel.sFlexReference, [oUIChange]);
+			FlexObjectManager.addDirtyFlexObjects(this.oModel.sFlexReference, this.oModel.sFlexReference, [oUIChange]);
 			oUIChange.setState(States.LifecycleState.PERSISTED);
 			this.oModel.destroy();
 			const oFlexObjects = FlexState.getFlexObjectsDataSelector().get({ reference: sReference });
@@ -1528,7 +1535,7 @@ sap.ui.define([
 				oPromise.resolve();
 			});
 			oRequireStub.callThrough();
-			FlexObjectManager.addDirtyFlexObjects(this.oModel.sFlexReference, [oUIChange]);
+			FlexObjectManager.addDirtyFlexObjects(this.oModel.sFlexReference, this.oModel.sFlexReference, [oUIChange]);
 			this.oModel.destroy();
 			await oPromise.promise;
 			assert.strictEqual(oDeleteChangeSpy.callCount, 1, "then the change was removed from the FlexObjectManager");

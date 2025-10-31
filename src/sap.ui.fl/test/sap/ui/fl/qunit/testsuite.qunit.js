@@ -1089,13 +1089,6 @@ sap.ui.define([
 				}
 			},
 
-			"write/_internal/fieldExtensibility/cap/dialog/CustomFieldCAPDialog": {
-				group: "Write Internal",
-				coverage: {
-					only: ["sap/ui/fl/write/_internal/fieldExtensibility/cap/dialog/CustomFieldCAPDialog"]
-				}
-			},
-
 			"write/_internal/appVariant/AppVariantFactory": {
 				group: "Internal app variant related APIs",
 				coverage: {

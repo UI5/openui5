@@ -578,6 +578,40 @@ sap.ui.define([
 		}
 	});
 
+	const TestCompositeControl1 = Control.extend("TestCompositeControl1", {
+		metadata: {
+			aggregations: {
+				_content: {
+					type: "sap.ui.core.Control",
+					multiple: false,
+					visibility: "hidden"
+				}
+			}
+		},
+		renderer: {
+			apiVersion: 2,
+			render: function(oRm, oControl) {
+				const oContent = oControl.getAggregation("_content");
+				oRm.openStart("div", oControl);
+				if (oContent) {
+					oRm.renderControl(oContent);
+				}
+				oRm.close("div");
+			}
+		},
+
+		onBeforeRendering: function() {
+			if (!this.getAggregation("_content")) {
+				const oInput = new Input(this.getId() + "-inner", {});
+				this.setAggregation("_content", oInput);
+			}
+		},
+
+		getIdForLabel: function() {
+			return this.getId() + "-inner";
+		}
+	});
+
 	QUnit.module("labelFor with composite control");
 
 	QUnit.test("Composite Control that set the labelled control to its internally aggregated control", async function(assert) {
@@ -687,6 +721,36 @@ sap.ui.define([
 
 		await nextUIUpdate();
 		assert.equal(oLabel.getDomRef().getAttribute("for"), undefined, "The 'for' attribute is not set because the control is not labellable");
+
+		oLabel.destroy();
+		oCompositeControl.destroy();
+	});
+
+	QUnit.test("Composite Control that creates its internal content in onBeforeRendering", async function(assert) {
+		let oCompositeControl = new TestCompositeControl1("c1").placeAt("content");
+		let oLabel = new Label("l1", {
+			text: "Label",
+			labelFor: oCompositeControl
+		}).placeAt("content");
+
+		await nextUIUpdate();
+		let sExpectedForId = oCompositeControl.getAggregation("_content").getIdForLabel();
+
+		assert.equal(oLabel.getDomRef().getAttribute("for"), sExpectedForId, "The 'for' attribute is set correctly for the label");
+
+		oLabel.destroy("KeepDom");
+		oCompositeControl.destroy("KeepDom");
+
+		oCompositeControl = new TestCompositeControl1("c1").placeAt("content");
+		oLabel = new Label("l1", {
+			text: "Label",
+			labelFor: oCompositeControl
+		}).placeAt("content");
+
+		await nextUIUpdate();
+		sExpectedForId = oCompositeControl.getAggregation("_content").getIdForLabel();
+
+		assert.equal(oLabel.getDomRef().getAttribute("for"), sExpectedForId, "The 'for' attribute is set correctly for the label");
 
 		oLabel.destroy();
 		oCompositeControl.destroy();

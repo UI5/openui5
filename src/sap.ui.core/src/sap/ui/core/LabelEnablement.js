@@ -59,9 +59,11 @@ function findLabelForControl(oLabel, fnOnAfterRendering) {
 				oControl.addEventDelegate(oDelegate);
 			} else {
 				const oControlForLabel = Element.closestTo(oDomForLabel);
-				const sInnerControlId = oControlForLabel.getId();
-				if (sInnerControlId !== sId) {
-					oRes.innerControlId = sInnerControlId;
+				if (oControlForLabel) {
+					const sInnerControlId = oControlForLabel.getId();
+					if (sInnerControlId !== sId) {
+						oRes.innerControlId = sInnerControlId;
+					}
 				}
 			}
 		}

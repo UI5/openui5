@@ -477,8 +477,8 @@ sap.ui.define([
 	 * @param {string} sReference - Flex reference of the app
 	 * @param {sap.ui.fl.apply._internal.flexObjects.FlexObject} aFlexObjects - Flex objects to be added as runtime-only
 	 */
-	VariantManagementState.addRuntimeOnlyFlexObjects = function(sReference, aFlexObjects) {
-		aFlexObjects.forEach((oFlexObject) => FlexState.getRuntimeOnlyData(sReference).flexObjects.push(oFlexObject));
+	VariantManagementState.addRuntimeOnlyFlexObjects = function(sReference, sComponentId, aFlexObjects) {
+		FlexState.addFlexObjectsToRuntimeOnlyData(sReference, sComponentId, aFlexObjects);
 		// Only called during destruction, no need to recalculate new state immediately
 		FlexState.getFlexObjectsDataSelector().clearCachedResult({ reference: sReference });
 	};
@@ -493,7 +493,8 @@ sap.ui.define([
 	VariantManagementState.loadVariant = async function(mPropertyBag) {
 		await FlexState.lazyLoadFlVariant({
 			variantReference: mPropertyBag.variantReference,
-			reference: mPropertyBag.reference
+			reference: mPropertyBag.reference,
+			componentId: mPropertyBag.componentId
 		});
 	};
 

@@ -162,7 +162,7 @@ sap.ui.define([
 	 * @returns {object} Dependency Map
 	 */
 	FlexObjectState.getLiveDependencyMap = function(sReference) {
-		return FlexState.getRuntimeOnlyData(sReference).liveDependencyMap || DependencyHandler.createEmptyDependencyMap();
+		return FlexState.getRuntimeOnlyData(sReference)?.liveDependencyMap || DependencyHandler.createEmptyDependencyMap();
 	};
 
 	/**
