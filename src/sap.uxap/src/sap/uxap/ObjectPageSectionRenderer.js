@@ -40,8 +40,9 @@ sap.ui.define(["sap/ui/core/ControlBehavior"], function (ControlBehavior) {
 		if (bWrapTitle) {
 			oRm.class("sapUxAPObjectPageSectionWrapTitle");
 		}
-
-		oRm.attr("role", "region");
+		if (bTitleVisible || oLabelledByTitleID) {
+			oRm.attr("role", "region");
+		}
 
 		if (bAccessibilityOn && oLabelledByTitleID) {
 			oRm.attr("aria-labelledby", oLabelledByTitleID);
