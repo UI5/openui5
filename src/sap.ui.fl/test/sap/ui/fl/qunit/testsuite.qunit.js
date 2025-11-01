@@ -488,10 +488,10 @@ sap.ui.define([
 				}
 			},
 
-			"apply/_internal/changes/descriptor/Preprocessor": {
+			"apply/_internal/changes/descriptor/RawApplier": {
 				group: "Apply Internal - Descriptor Change Merger",
 				coverage: {
-					only: ["sap/ui/fl/apply/_internal/changes/descriptor/Preprocessor"]
+					only: ["sap/ui/fl/apply/_internal/changes/descriptor/RawApplier"]
 				}
 			},
 
@@ -499,13 +499,6 @@ sap.ui.define([
 				group: "Apply Internal - Descriptor Change Merger",
 				coverage: {
 					only: ["sap/ui/fl/apply/_internal/changes/descriptor/Applier"]
-				}
-			},
-
-			"apply/_internal/changes/descriptor/InlineApplier": {
-				group: "Apply Internal - Descriptor Change Merger",
-				coverage: {
-					only: ["sap/ui/fl/apply/_internal/changes/descriptor/InlineApplier"]
 				}
 			},
 
@@ -1507,6 +1500,27 @@ sap.ui.define([
 				group: "Support",
 				coverage: {
 					only: ["sap/ui/fl/support"]
+				}
+			},
+
+			"support/diagnostics/Flexibility.controller": {
+				group: "Support",
+				coverage: {
+					only: ["sap/ui/fl/support/diagnostics/Flexibility.controller"]
+				}
+			},
+
+			"support/diagnostics/FlexibilityPlugin": {
+				group: "Support",
+				coverage: {
+					only: ["sap/ui/fl/support/diagnostics/FlexibilityPlugin"]
+				}
+			},
+
+			"support/diagnostics/FlexibilityDataExtractor": {
+				group: "Support",
+				coverage: {
+					only: ["sap/ui/fl/support/diagnostics/FlexibilityDataExtractor"]
 				}
 			},
 

@@ -900,7 +900,48 @@ sap.ui.define([
 		assert.strictEqual(oSwitch.getState(), true, "After the space key is pressed, the switch state must change");
 		assert.strictEqual(fnFireChangeSpy.callCount, 1, "The change event was fired");
 
+		fnFireChangeSpy.restore();
+		fnFireChangeSpy = this.spy(oSwitch, "fireChange");
+
+		var oSpaceDownEvent = {
+			which: KeyCodes.SPACE,
+			preventDefault: this.spy(),
+			stopPropagation: this.spy()
+		};
+
+		var oEscapeDownEvent = {
+			which: KeyCodes.ESCAPE,
+			preventDefault: this.spy(),
+			stopPropagation: this.spy()
+		};
+
+		var oShiftDownEvent = {
+			which: KeyCodes.SHIFT,
+			preventDefault: this.spy(),
+			stopPropagation: this.spy()
+		};
+
+		// act
+		oSwitch.onkeydown(oSpaceDownEvent);
+		oSwitch.onkeydown(oShiftDownEvent);
+
+		// assert
+		assert.strictEqual(oSwitch.getState(), true, "After the space key is pressed + Shift, the switch state must not change");
+		assert.strictEqual(fnFireChangeSpy.callCount, 0, "The change event was not fired");
+
+		fnFireChangeSpy.restore();
+		fnFireChangeSpy = this.spy(oSwitch, "fireChange");
+
+		// act
+		oSwitch.onkeydown(oSpaceDownEvent);  // Space pressed first
+		oSwitch.onkeydown(oEscapeDownEvent); // Then Escape while Space is held
+
+		// assert
+		assert.strictEqual(oSwitch.getState(), true, "After the space key is pressed + Escape, the switch state must not change");
+		assert.strictEqual(fnFireChangeSpy.callCount, 0, "The change event was not fired");
+
 		// cleanup
+		fnFireChangeSpy.restore();
 		oSwitch.destroy();
 	});
 

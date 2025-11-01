@@ -4,15 +4,21 @@ sap.ui.define([
 	"rta/qunit/RtaQunitUtils",
 	"sap/base/Log",
 	"sap/ui/core/Lib",
+	"sap/ui/core/Manifest",
+	"sap/ui/fl/apply/_internal/changes/descriptor/ui5/AddLibrary",
+	"sap/ui/fl/apply/_internal/changes/descriptor/Applier",
 	"sap/ui/fl/apply/_internal/changes/descriptor/ApplyStrategyFactory",
-	"sap/ui/fl/apply/_internal/changes/descriptor/InlineApplier",
 	"sap/ui/fl/apply/_internal/flexObjects/FlexObjectFactory",
 	"sap/ui/fl/apply/_internal/flexState/FlexState",
-	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/apply/_internal/preprocessors/ComponentLifecycleHooks",
 	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
 	"sap/ui/fl/changeHandler/ChangeAnnotation",
 	"sap/ui/fl/initial/_internal/changeHandlers/ChangeHandlerRegistration",
+	"sap/ui/fl/initial/_internal/Loader",
+	"sap/ui/fl/initial/_internal/ManifestUtils",
+	"sap/ui/fl/initial/_internal/Settings",
+	"sap/ui/fl/initial/_internal/Storage",
+	"sap/ui/fl/initial/_internal/StorageUtils",
 	"sap/ui/fl/Layer",
 	"sap/ui/fl/Utils",
 	"sap/ui/thirdparty/sinon-4"
@@ -20,15 +26,21 @@ sap.ui.define([
 	RtaQunitUtils,
 	Log,
 	Lib,
+	Manifest,
+	AddLibrary,
+	Applier,
 	ApplyStrategyFactory,
-	InlineApplier,
 	FlexObjectFactory,
 	FlexState,
-	ManifestUtils,
 	ComponentLifecycleHooks,
 	ControlVariantApplyAPI,
 	ChangeAnnotation,
 	ChangeHandlerRegistration,
+	Loader,
+	ManifestUtils,
+	Settings,
+	Storage,
+	StorageUtils,
 	Layer,
 	Utils,
 	sinon
@@ -61,6 +73,7 @@ sap.ui.define([
 				_version: "2.0.0",
 
 				"sap.app": {
+					id: "myReference",
 					type: "application"
 				},
 
@@ -68,12 +81,18 @@ sap.ui.define([
 					return this[key];
 				}
 			};
-			this.oInitializeStub = sandbox.stub(FlexState, "initialize");
+			this.oInitializeSpy = sandbox.spy(FlexState, "initialize");
+			this.oLoaderSpy = sandbox.spy(Loader, "getFlexData");
+			this.oStorageStub = sandbox.stub(Storage, "loadFlexData");
 			this.oGetStrategyStub = sandbox.stub(ApplyStrategyFactory, "getRuntimeStrategy").returns("foobar");
-			this.oApplyManifestChangesStub = sandbox.stub(InlineApplier, "applyChanges");
+			this.oApplyManifestChangesStub = sandbox.stub(Applier, "applyInlineChanges");
+			sandbox.stub(Settings, "getInstance").resolves({
+				getIsVariantAuthorNameAvailable: () => false
+			});
 		},
 		afterEach() {
 			sandbox.restore();
+			Loader.clearCache();
 		}
 	}, function() {
 		[{
@@ -113,40 +132,75 @@ sap.ui.define([
 			manifest: this.oManifest
 		}].forEach(function(oTestInput) {
 			var sName = `componentLoadedHook does nothing if ${oTestInput.text}`;
-			QUnit.test(sName, function(assert) {
-				ComponentLifecycleHooks.componentLoadedHook(oTestInput.config, oTestInput.manifest);
-				assert.strictEqual(this.oInitializeStub.callCount, 0, "then flex state was not initialized");
+			QUnit.test(sName, async function(assert) {
+				await ComponentLifecycleHooks.componentLoadedHook(oTestInput.config, oTestInput.manifest);
+				assert.strictEqual(this.oLoaderSpy.callCount, 0, "then the loader was not called");
 				assert.strictEqual(this.oApplyManifestChangesStub.callCount, 0, "then no AppDescriptorChanges were applied");
 			});
 		});
 
-		QUnit.test("with all necessary information and componentData and settings", function(assert) {
-			ComponentLifecycleHooks.componentLoadedHook(this.oConfig, this.oManifest);
-			assert.strictEqual(this.oInitializeStub.callCount, 1, "the flexState was initialized");
-			assert.deepEqual(this.oInitializeStub.lastCall.args[0], {
+		QUnit.test("with all necessary information and componentData and settings and without changes", async function(assert) {
+			this.oStorageStub.resolves({ ...StorageUtils.getEmptyFlexDataResponse() });
+			await ComponentLifecycleHooks.componentLoadedHook(this.oConfig, this.oManifest);
+			assert.strictEqual(this.oLoaderSpy.callCount, 1, "the Loader was called once");
+			assert.deepEqual(this.oLoaderSpy.lastCall.args[0], {
+				componentData: this.oConfig.componentData,
+				asyncHints: this.oConfig.asyncHints,
+				manifest: this.oManifest
+			}, "the passed object is correct");
+			assert.strictEqual(this.oApplyManifestChangesStub.callCount, 0, "the Applier was not called");
+			assert.strictEqual(this.oInitializeSpy.callCount, 0, "the flex state was not initialized");
+		});
+
+		QUnit.test("with all necessary information and settings", async function(assert) {
+			this.oStorageStub.resolves({ ...StorageUtils.getEmptyFlexDataResponse() });
+			delete this.oConfig.componentData;
+			await ComponentLifecycleHooks.componentLoadedHook(this.oConfig, this.oManifest);
+			assert.strictEqual(this.oLoaderSpy.callCount, 1, "the Loader was called once");
+			assert.deepEqual(this.oLoaderSpy.lastCall.args[0], {
+				componentData: this.oConfig.settings.componentData,
+				asyncHints: this.oConfig.asyncHints,
+				manifest: this.oManifest
+			}, "the passed object is correct");
+			assert.strictEqual(this.oApplyManifestChangesStub.callCount, 0, "the AppDescriptorChanges were not applied");
+			assert.strictEqual(this.oInitializeSpy.callCount, 0, "the flex state was not initialized");
+		});
+
+		QUnit.test("with all necessary information and changes, but no inline manifest changes", async function(assert) {
+			this.oStorageStub.resolves({
+				...StorageUtils.getEmptyFlexDataResponse(),
+				changes: [
+					{
+						fileName: "change1",
+						changeType: "rename"
+					}
+				]
+			});
+			await ComponentLifecycleHooks.componentLoadedHook(this.oConfig, this.oManifest);
+			assert.strictEqual(this.oLoaderSpy.callCount, 2, "the loader was called twice");
+			assert.strictEqual(this.oInitializeSpy.callCount, 1, "the flex state was initialized once");
+			assert.deepEqual(this.oInitializeSpy.lastCall.args[0], {
 				componentData: this.oConfig.componentData,
 				asyncHints: this.oConfig.asyncHints,
 				manifest: this.oManifest,
 				componentId: this.oConfig.id
 			}, "the passed object is correct");
-			assert.strictEqual(this.oApplyManifestChangesStub.callCount, 1, "the AppDescriptorChanges were applied");
-			assert.deepEqual(this.oApplyManifestChangesStub.lastCall.args[0], this.oManifest, "the manifest was passed");
-			assert.deepEqual(this.oApplyManifestChangesStub.lastCall.args[1], "foobar", "the strategy was passed");
+			assert.strictEqual(this.oApplyManifestChangesStub.callCount, 0, "the AppDescriptorChanges were not applied");
 		});
 
-		QUnit.test("with all necessary information and settings", function(assert) {
-			delete this.oConfig.componentData;
-			ComponentLifecycleHooks.componentLoadedHook(this.oConfig, this.oManifest);
-			assert.strictEqual(this.oInitializeStub.callCount, 1, "the flexState was initialized");
-			assert.deepEqual(this.oInitializeStub.lastCall.args[0], {
-				componentData: this.oConfig.settings.componentData,
-				asyncHints: this.oConfig.asyncHints,
-				manifest: this.oManifest,
-				componentId: this.oConfig.id
-			}, "the passed object is correct");
-			assert.strictEqual(this.oApplyManifestChangesStub.callCount, 1, "the AppDescriptorChanges were applied");
-			assert.deepEqual(this.oApplyManifestChangesStub.lastCall.args[0], this.oManifest, "the manifest was passed");
-			assert.deepEqual(this.oApplyManifestChangesStub.lastCall.args[1], "foobar", "the strategy was passed");
+		QUnit.test("with all necessary information and no changes, but inline manifest changes", async function(assert) {
+			const oRawManifest = await fetch("test-resources/sap/ui/fl/qunit/testResources/descriptorChanges/InlineApplierManifest.json");
+			const oRawManifestJson = await oRawManifest.json();
+			const aChanges = oRawManifestJson["$sap.ui.fl.changes"].descriptor;
+			this.oManifest = new Manifest(oRawManifestJson);
+			this.oStorageStub.resolves({ ...StorageUtils.getEmptyFlexDataResponse() });
+			await ComponentLifecycleHooks.componentLoadedHook(this.oConfig, this.oManifest);
+			assert.strictEqual(this.oLoaderSpy.callCount, 1, "the loader was called once");
+			assert.strictEqual(this.oInitializeSpy.callCount, 0, "the flex state was not initialized");
+			assert.strictEqual(this.oApplyManifestChangesStub.callCount, 1, "the AppDescriptorChanges were applied once");
+			assert.deepEqual(this.oApplyManifestChangesStub.lastCall.args[0], this.oManifest.getJson(), "the raw manifest was passed");
+			assert.deepEqual(this.oApplyManifestChangesStub.lastCall.args[1], aChanges, "the changes were passed");
+			assert.notOk(this.oManifest.getEntry("$sap.ui.fl.changes"), "the manifest changes were deleted from the manifest");
 		});
 	});
 
@@ -192,7 +246,11 @@ sap.ui.define([
 			var oEmbeddedComponent = {
 				name: "embeddedComponent",
 				setModel(oModelSet, sModelName) {
-					assert.strictEqual(sModelName, ControlVariantApplyAPI.getVariantModelName(), "then VariantModel was set on the embedded component with the correct name");
+					assert.strictEqual(
+						sModelName,
+						ControlVariantApplyAPI.getVariantModelName(),
+						"then VariantModel was set on the embedded component with the correct name"
+					);
 					assert.deepEqual(oModelSet, oExistingModel, "then the correct model was set");
 				},
 				getManifestObject() {},
@@ -203,7 +261,11 @@ sap.ui.define([
 				getComponentData() {}
 			};
 			sandbox.stub(this.oAppComponent, "getModel").callsFake(function(sModelName) {
-				assert.strictEqual(sModelName, ControlVariantApplyAPI.getVariantModelName(), "then variant model called on the app component");
+				assert.strictEqual(
+					sModelName,
+					ControlVariantApplyAPI.getVariantModelName(),
+					"then variant model called on the app component"
+				);
 				return oExistingModel;
 			});
 
@@ -221,21 +283,33 @@ sap.ui.define([
 				sandbox.stub(ManifestUtils, "getFlexReferenceForControl");
 				var oExistingModel;
 				sandbox.stub(this.oAppComponent, "setModel").callsFake(function(oModel, sModelName) {
-					assert.strictEqual(sModelName, ControlVariantApplyAPI.getVariantModelName(), "then VariantModel was set on the AppComponent with the correct name");
+					assert.strictEqual(
+						sModelName,
+						ControlVariantApplyAPI.getVariantModelName(),
+						"then VariantModel was set on the AppComponent with the correct name"
+					);
 					if (oExistingModel) {
 						assert.notOk(true, "should only go here once");
 					}
 					oExistingModel = oModel;
 				});
 				sandbox.stub(this.oAppComponent, "getModel").callsFake(function(sModelName) {
-					assert.strictEqual(sModelName, ControlVariantApplyAPI.getVariantModelName(), "then variant model called on the app component");
+					assert.strictEqual(
+						sModelName,
+						ControlVariantApplyAPI.getVariantModelName(),
+						"then variant model called on the app component"
+					);
 					return oExistingModel;
 				});
 
 				var oComponent = {
 					name: "embeddedComponent",
 					setModel(oModel, sModelName) {
-						assert.strictEqual(sModelName, ControlVariantApplyAPI.getVariantModelName(), "then VariantModel was set on the embedded component with the correct name");
+						assert.strictEqual(
+							sModelName,
+							ControlVariantApplyAPI.getVariantModelName(),
+							"then VariantModel was set on the embedded component with the correct name"
+						);
 						assert.deepEqual(oModel, oExistingModel, "then the correct model was set");
 					},
 					getManifestObject() {},
@@ -256,7 +330,7 @@ sap.ui.define([
 						ComponentLifecycleHooks.instanceCreatedHook(this.oAppComponent, {})
 					];
 				return Promise.all(aPromises).then(function() {
-					assert.equal(this.oAddPropagationListenerStub.callCount, 1, "should only be called once");
+					assert.strictEqual(this.oAddPropagationListenerStub.callCount, 1, "should only be called once");
 				}.bind(this));
 			});
 		});
@@ -267,9 +341,20 @@ sap.ui.define([
 
 			var oComponent = {
 				setModel: function(oModelSet, sModelName) {
-					assert.strictEqual(sModelName, ControlVariantApplyAPI.getVariantModelName(), "then variant model called on the app component");
-					assert.ok(this.oAddPropagationListenerStub.calledOnce, "then addPropagationListener was called for the app component");
-					assert.strictEqual(sModelName, ControlVariantApplyAPI.getVariantModelName(), "then VariantModel was set on the embedded component with the correct name");
+					assert.strictEqual(
+						sModelName,
+						ControlVariantApplyAPI.getVariantModelName(),
+						"then variant model called on the app component"
+					);
+					assert.ok(
+						this.oAddPropagationListenerStub.calledOnce,
+						"then addPropagationListener was called for the app component"
+					);
+					assert.strictEqual(
+						sModelName,
+						ControlVariantApplyAPI.getVariantModelName(),
+						"then VariantModel was set on the embedded component with the correct name"
+					);
 				}.bind(this),
 				getManifestObject() {},
 				addPropagationListener() {
@@ -290,7 +375,10 @@ sap.ui.define([
 				getComponentData() {}
 			};
 
-			assert.notOk(this.oAppComponent.getModel(ControlVariantApplyAPI.getVariantModelName()), "then initially no variant model exists for the app component");
+			assert.notOk(
+				this.oAppComponent.getModel(ControlVariantApplyAPI.getVariantModelName()),
+				"then initially no variant model exists for the app component"
+			);
 
 			return Promise.all([
 				ComponentLifecycleHooks.instanceCreatedHook(oComponent, {}),
@@ -315,7 +403,7 @@ sap.ui.define([
 			sandbox.stub(Utils, "isApplicationComponent").returns(false);
 
 			return ComponentLifecycleHooks.instanceCreatedHook(oComponent, {}).then(function() {
-				assert.equal(oComponent.setModel.callCount, 0, "setModel was not called");
+				assert.strictEqual(oComponent.setModel.callCount, 0, "setModel was not called");
 			});
 		});
 	});
@@ -342,7 +430,7 @@ sap.ui.define([
 		QUnit.test("when no restart from rta should be triggered and no draft is requested", function(assert) {
 			return ComponentLifecycleHooks.instanceCreatedHook(this.oAppComponent, {})
 			.then(function() {
-				assert.equal(this.oLoadLibStub.callCount, 0, "then no rta functionality is requested");
+				assert.strictEqual(this.oLoadLibStub.callCount, 0, "then no rta functionality is requested");
 			}.bind(this));
 		});
 
@@ -350,7 +438,7 @@ sap.ui.define([
 			sandbox.stub(Utils, "getUshellContainer").returns(false);
 			return ComponentLifecycleHooks.instanceCreatedHook(this.oAppComponent, {})
 			.then(function() {
-				assert.equal(this.oLoadLibStub.callCount, 0, "then no rta functionality is requested");
+				assert.strictEqual(this.oLoadLibStub.callCount, 0, "then no rta functionality is requested");
 			}.bind(this));
 		});
 
@@ -375,8 +463,12 @@ sap.ui.define([
 			sandbox.stub(Utils, "getParsedURLHash").returns({ params: {} });
 			return ComponentLifecycleHooks.instanceCreatedHook(this.oAppComponent, {})
 			.then(function() {
-				assert.equal(this.oLoadLibStub.callCount, 0, "rta functionality is not requested");
-				assert.equal(window.sessionStorage.getItem("sap.ui.rta.restart.VENDOR"), "MockCompName", "and the restart parameter was NOT removed from the sessionStorage");
+				assert.strictEqual(this.oLoadLibStub.callCount, 0, "rta functionality is not requested");
+				assert.strictEqual(
+					window.sessionStorage.getItem("sap.ui.rta.restart.VENDOR"),
+					"MockCompName",
+					"and the restart parameter was NOT removed from the sessionStorage"
+				);
 			}.bind(this));
 		});
 
@@ -427,8 +519,8 @@ sap.ui.define([
 			sandbox.stub(Utils, "getParsedURLHash").returns({ params: {} });
 			return ComponentLifecycleHooks.instanceCreatedHook(this.oAppComponent, {})
 			.then(function() {
-				assert.equal(this.oLoadLibStub.callCount, 0, "rta library is not requested");
-				assert.equal(fnStartRtaStub.callCount, 0, "and rta is not started");
+				assert.strictEqual(this.oLoadLibStub.callCount, 0, "rta library is not requested");
+				assert.strictEqual(fnStartRtaStub.callCount, 0, "and rta is not started");
 			}.bind(this));
 		});
 
@@ -463,9 +555,9 @@ sap.ui.define([
 			this.oAppComponent.rootControlLoaded = sandbox.stub().rejects(new Error(sError));
 			return ComponentLifecycleHooks.instanceCreatedHook(this.oAppComponent, {})
 			.catch(function(oError) {
-				assert.equal(this.oLoadLibStub.callCount, 1, "rta library is requested");
-				assert.equal(fnStartRtaStub.callCount, 0, "but rta is not started");
-				assert.equal(oError.message, sError, "and the promise is rejected with the right error");
+				assert.strictEqual(this.oLoadLibStub.callCount, 1, "rta library is requested");
+				assert.strictEqual(fnStartRtaStub.callCount, 0, "but rta is not started");
+				assert.strictEqual(oError.message, sError, "and the promise is rejected with the right error");
 			}.bind(this));
 		});
 
@@ -487,7 +579,7 @@ sap.ui.define([
 			sandbox.stub(Utils, "getParsedURLHash").returns({ params: {} });
 			ComponentLifecycleHooks.instanceCreatedHook(this.oAppComponent, {})
 			.then(function() {
-				assert.equal(this.oLoadLibStub.callCount, 0, "rta library is requested");
+				assert.strictEqual(this.oLoadLibStub.callCount, 0, "rta library is requested");
 			}.bind(this));
 		});
 	});
@@ -730,6 +822,187 @@ sap.ui.define([
 			const aAnnoChangesModel = await this.oSetAnnotationChangeStub1.getCall(0).args[0];
 			assert.strictEqual(aAnnoChangesModel.length, 0, "the model was set with no annotation change");
 			assert.strictEqual(Log.error.callCount, 1, "an error was logged");
+		});
+	});
+
+	QUnit.module("preprocessManifest", {
+		async beforeEach() {
+			this.oConfig = {
+				componentData: {},
+				asyncHints: {
+					requests: [
+						{
+							cachebusterToken: "abc",
+							name: "sap.ui.fl.changes",
+							reference: "sap.app.descriptor.test",
+							url: "/sap/bc/lrep/flex/data/~abc=~/sap.app.descriptor.test"
+						}
+					]
+				},
+				id: "componentId"
+			};
+			const oResponse = await fetch("test-resources/sap/ui/fl/qunit/testResources/descriptorChanges/TestApplierManifest.json");
+			const oManifestResponseJSON = await oResponse.json();
+			this.oManifest = oManifestResponseJSON;
+			this.oFlexStateSpy = sandbox.spy(FlexState, "initialize");
+			this.oLoaderSpy = sandbox.spy(Loader, "getFlexData");
+			this.oStorageStub = sandbox.stub(Storage, "loadFlexData");
+			this.oApplyAddLibrarySpy = sandbox.spy(AddLibrary, "applyChange");
+			this.oApplierSpy = sandbox.spy(Applier, "applyChanges");
+			sandbox.stub(Settings, "getInstance").resolves({
+				getIsVariantAuthorNameAvailable: () => false
+			});
+		},
+		afterEach() {
+			sandbox.restore();
+			Loader.clearCache();
+		}
+	}, function() {
+		QUnit.test("when calling 'preprocessManifest' with three 'appdescr_ui5_addLibraries' changes ", async function(assert) {
+			const aChanges = [
+				{
+					fileName: "change1",
+					changeType: "appdescr_ui5_addLibraries",
+					content: {
+						libraries: {
+							"descriptor.mocha133": {
+								minVersion: "1.44"
+							}
+						}
+					},
+					appDescriptorChange: true
+				}, {
+					fileName: "change2",
+					changeType: "appdescr_ui5_addLibraries",
+					content: {
+						libraries: {
+							"descriptor.mocha133": {
+								minVersion: "1.40.0"
+							}
+						}
+					},
+					appDescriptorChange: true
+				}, {
+					fileName: "change3",
+					changeType: "appdescr_ui5_addLibraries",
+					content: {
+						libraries: {
+							"descriptor.mocha133": {
+								minVersion: "1.60.9"
+							}
+						}
+					},
+					appDescriptorChange: true
+				}
+			];
+
+			this.oStorageStub.resolves({
+				...StorageUtils.getEmptyFlexDataResponse(),
+				appDescriptorChanges: aChanges
+			});
+
+			const oManifest = await ComponentLifecycleHooks.preprocessManifest(this.oManifest, this.oConfig);
+			assert.strictEqual(this.oFlexStateSpy.callCount, 1, "FlexState was initialized once");
+			assert.deepEqual(this.oFlexStateSpy.getCall(0).args[0], {
+				...this.oConfig,
+				rawManifest: oManifest,
+				componentId: "componentId",
+				reference: "sap.app.descriptor.test",
+				skipLoadBundle: true
+			}, "FlexState was initialized with the correct parameters");
+			assert.strictEqual(this.oApplierSpy.callCount, 1, "Applier.applyChanges is called once");
+			assert.strictEqual(this.oApplyAddLibrarySpy.callCount, 3, "AddLibrary.applyChange is called three times");
+			assert.strictEqual(
+				oManifest["sap.ui5"].dependencies.libs["descriptor.mocha133"].minVersion, "1.60.9",
+				"the highest version is set in the manifest"
+			);
+		});
+
+		QUnit.test("when calling 'preprocessManifest' without changes", async function(assert) {
+			this.oStorageStub.resolves({ ...StorageUtils.getEmptyFlexDataResponse() });
+			const oManifest = await ComponentLifecycleHooks.preprocessManifest(this.oManifest, this.oConfig);
+			assert.deepEqual(oManifest, this.oManifest, "the manifest is returned");
+			assert.strictEqual(this.oLoaderSpy.callCount, 1, "Loader was initialized once");
+			assert.deepEqual(this.oLoaderSpy.getCall(0).args[0], {
+				componentData: this.oConfig.componentData,
+				asyncHints: this.oConfig.asyncHints,
+				manifest: oManifest,
+				skipLoadBundle: true
+			}, "Loader was initialized with the correct parameters");
+			assert.strictEqual(this.oFlexStateSpy.callCount, 0, "FlexState was not initialized");
+			assert.strictEqual(this.oApplierSpy.callCount, 0, "the Applier was not called");
+		});
+
+		QUnit.test("when calling 'preprocessManifest' with manifest of type 'component'", async function(assert) {
+			const oManifest = {
+				"_version": "2.0.0",
+				"sap.app": { type: "component" }
+			};
+			const oNewManifest = await ComponentLifecycleHooks.preprocessManifest(oManifest, this.oConfig);
+			assert.strictEqual(this.oFlexStateSpy.callCount, 0, "FlexState was initialized once");
+			assert.strictEqual(this.oApplierSpy.callCount, 0, "ApplierUtils.applyChanges is not called");
+			assert.strictEqual(this.oApplyAddLibrarySpy.callCount, 0, "AddLibrary.applyChange is not called");
+			assert.strictEqual(oManifest, oNewManifest, "manifest is resolved and not changed");
+		});
+
+		QUnit.test("when calling 'preprocessManifest' with a fl-asyncHint", async function(assert) {
+			this.oConfig.asyncHints = {
+				requests: [
+					{
+						name: "sap.ui.fl.changes",
+						reference: "sap.app.descriptor.test",
+						url: "/sap/bc/lrep/flex/data/sap.app.descriptor.test"
+					}
+				]
+			};
+			this.oStorageStub.resolves({ ...StorageUtils.getEmptyFlexDataResponse() });
+			const oManifest = await ComponentLifecycleHooks.preprocessManifest(this.oManifest, this.oConfig);
+			assert.deepEqual(oManifest, this.oManifest, "the manifest is returned");
+			assert.strictEqual(this.oLoaderSpy.callCount, 1, "Loader was initialized once");
+			assert.deepEqual(this.oLoaderSpy.getCall(0).args[0], {
+				componentData: this.oConfig.componentData,
+				asyncHints: this.oConfig.asyncHints,
+				manifest: oManifest,
+				skipLoadBundle: true
+			}, "Loader was initialized with the correct parameters");
+			assert.strictEqual(this.oFlexStateSpy.callCount, 0, "FlexState was not initialized");
+			assert.strictEqual(this.oApplierSpy.callCount, 0, "the Applier was not called");
+		});
+
+		QUnit.test("when calling 'preprocessManifest' with a fl-asyncHint and a change", async function(assert) {
+			this.oConfig.asyncHints = {
+				requests: [
+					{
+						name: "sap.ui.fl.changes",
+						reference: "sap.app.descriptor.test",
+						url: "/sap/bc/lrep/flex/data/sap.app.descriptor.test"
+					}
+				]
+			};
+			const aChanges = [
+				{
+					fileName: "change1",
+					changeType: "appdescr_ui5_addLibraries",
+					content: {
+						libraries: {
+							"descriptor.mocha133": {
+								minVersion: "1.44"
+							}
+						}
+					},
+					appDescriptorChange: true
+				}
+			];
+
+			this.oStorageStub.resolves({
+				...StorageUtils.getEmptyFlexDataResponse(),
+				appDescriptorChanges: aChanges
+			});
+			const oManifest = await ComponentLifecycleHooks.preprocessManifest(this.oManifest, this.oConfig);
+			assert.deepEqual(oManifest, this.oManifest, "the manifest is returned");
+			assert.strictEqual(this.oLoaderSpy.callCount, 2, "Loader was initialized twice");
+			assert.strictEqual(this.oFlexStateSpy.callCount, 1, "FlexState was initialized once");
+			assert.strictEqual(this.oApplierSpy.callCount, 0, "the Applier was not called");
 		});
 	});
 

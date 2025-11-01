@@ -75,7 +75,7 @@ sap.ui.define([
 		// default to 'CUSTOMER'
 		mPropertyBag.layer = sLayer || "CUSTOMER";
 
-		return Promise.resolve(new DescriptorChange(mPropertyBag, oInlineChange));
+		return Promise.resolve(new DescriptorChange(mPropertyBag, oInlineChange, oAppComponent));
 	};
 
 	return DescriptorChangeFactory;

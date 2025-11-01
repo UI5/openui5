@@ -6,15 +6,16 @@ sap.ui.define([
 	"sap/base/Log",
 	"sap/ui/core/Component",
 	"sap/ui/core/Lib",
-	"sap/ui/fl/apply/_internal/changes/descriptor/ApplyStrategyFactory",
-	"sap/ui/fl/apply/_internal/changes/descriptor/InlineApplier",
 	"sap/ui/fl/apply/_internal/changes/Applier",
 	"sap/ui/fl/apply/_internal/flexState/FlexState",
 	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
 	"sap/ui/fl/initial/_internal/changeHandlers/ChangeHandlerRegistration",
+	"sap/ui/fl/initial/_internal/Loader",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
+	"sap/ui/fl/initial/_internal/StorageUtils",
 	"sap/ui/fl/variants/VariantModel",
 	"sap/ui/fl/Layer",
+	"sap/ui/fl/requireAsync",
 	"sap/ui/fl/Utils",
 	"sap/ui/model/json/JSONModel",
 	"sap/ui/model/odata/ODataUtils",
@@ -23,15 +24,16 @@ sap.ui.define([
 	Log,
 	Component,
 	Lib,
-	ApplyStrategyFactory,
-	InlineApplier,
 	ChangesApplier,
 	FlexState,
 	ControlVariantApplyAPI,
 	ChangeHandlerRegistration,
+	Loader,
 	ManifestUtils,
+	StorageUtils,
 	VariantModel,
 	Layer,
+	requireAsync,
 	Utils,
 	JSONModel,
 	ODataUtils,
@@ -54,6 +56,13 @@ sap.ui.define([
 	// if the same instance is initialized twice the promise is replaced
 	ComponentLifecycleHooks._componentInstantiationPromises = new WeakMap();
 	var oEmbeddedComponentsPromises = {};
+
+	async function checkForChangesAndInitializeFlexState(oConfig, oFlexData) {
+		if (StorageUtils.isStorageResponseFilled(oFlexData.data.changes)) {
+			const FlexState = await requireAsync("sap/ui/fl/apply/_internal/flexState/FlexState");
+			await FlexState.initialize(oConfig);
+		}
+	}
 
 	/**
 	 * The fl library must ensure a proper rta startup by a lazy loading of the rta library and starting RTA accordingly.
@@ -144,8 +153,8 @@ sap.ui.define([
 		// if component's manifest is of type 'component' then no flex controller and change persistence instances are created.
 		// The variant model is fetched from the outer app component and applied on this component type.
 		if (Utils.isApplicationComponent(oComponent)) {
-			var sComponentId = oComponent.getId();
-			var oReturnPromise = FlexState.initialize({
+			const sComponentId = oComponent.getId();
+			const oReturnPromise = FlexState.initialize({
 				componentId: sComponentId,
 				asyncHints: vConfig.asyncHints
 			})
@@ -180,23 +189,30 @@ sap.ui.define([
 		return Promise.resolve();
 	}
 
-	function onLoadComponent(oConfig, oManifest) {
+	async function onLoadComponent(oConfig, oManifest) {
 		// stop processing if the component is not of the type application or component ID is missing
-		if (!Utils.isApplication(oManifest) || !oConfig.id) {
-			return Promise.resolve();
+		if (Utils.isApplication(oManifest) && oConfig.id) {
+			const mPropertyBag = {
+				manifest: oManifest,
+				componentData: oConfig.componentData || (oConfig.settings?.componentData),
+				asyncHints: oConfig.asyncHints
+			};
+			const oFlexData = await Loader.getFlexData(mPropertyBag);
+
+			await checkForChangesAndInitializeFlexState({ ...mPropertyBag, componentId: oConfig.id }, oFlexData);
+
+			// manifest descriptor changes for ABAP mixed mode can only be applied in this hook,
+			// because at this point all libs have been loaded (in contrast to the first Component(s) 'onPreprocessManifest' hook),
+			// but the manifest is still adaptable
+			const sChangesNamespace = "$sap.ui.fl.changes";
+			const aAppDescriptorChangesRaw = oManifest?.getEntry?.(sChangesNamespace)?.descriptor || [];
+			if (aAppDescriptorChangesRaw.length) {
+				const oManifestJSON = oManifest.getJson();
+				const DescriptorApplier = await requireAsync("sap/ui/fl/apply/_internal/changes/descriptor/Applier");
+				await DescriptorApplier.applyInlineChanges(oManifestJSON, aAppDescriptorChangesRaw);
+				delete oManifestJSON[sChangesNamespace];
+			}
 		}
-
-		FlexState.initialize({
-			componentData: oConfig.componentData || (oConfig.settings && oConfig.settings.componentData),
-			asyncHints: oConfig.asyncHints,
-			manifest: oManifest,
-			componentId: oConfig.id
-		});
-
-		// manifest descriptor changes for ABAP mixed mode can only be applied in this hook,
-		// because at this point all libs have been loaded (in contrast to the first Component(s) 'onPreprocessManifest' hook),
-		// but the manifest is still adaptable
-		return InlineApplier.applyChanges(oManifest, ApplyStrategyFactory.getRuntimeStrategy());
 	}
 
 	// the current sinon version used in UI5 does not support stubbing the constructor
@@ -299,6 +315,68 @@ sap.ui.define([
 	 */
 	ComponentLifecycleHooks.modelCreatedHook = function(oPropertyBag) {
 		oPropertyBag.model.setAnnotationChangePromise(fetchModelChanges(oPropertyBag));
+	};
+
+	/**
+	 * Preprocesses the manifest by applying descriptor changes.
+	 * The processing is only done for components of the type "application".
+	 *
+	 * @param {object} oManifest - Raw manifest provided by core Component
+	 * @param {object} oConfig - Copy of the configuration of loaded component
+	 * @param {object} oConfig.id - Id of the loaded component
+	 * @param {object} oConfig.asyncHints - Async hints passed from the app index to the core Component processing
+	 * @param {object} [oConfig.componentData] - Component Data from the Component processing
+	 * @param {object} [oConfig.settings] - Object containing the componentData
+	 * @returns {Promise<object>} - Processed manifest
+	 */
+	ComponentLifecycleHooks.preprocessManifest = async function(oManifest, oConfig) {
+		// stop processing if the component is not of the type application or component ID is missing
+		if (!Utils.isApplication(oManifest, true) || !oConfig.id) {
+			return Promise.resolve(oManifest);
+		}
+
+		const oComponentData = oConfig.componentData || {};
+		const sReference = ManifestUtils.getFlexReference({
+			manifest: oManifest,
+			componentData: oComponentData
+		});
+
+		// skipLoadBundle has to be true as there is no guarantee that the flex bundle is already available at this point
+		const oFlexData = await Loader.getFlexData({
+			componentData: oConfig.componentData || oConfig.settings?.componentData,
+			asyncHints: oConfig.asyncHints,
+			manifest: oManifest,
+			skipLoadBundle: true
+		});
+		const bFlexObjectAvailable = StorageUtils.isStorageResponseFilled(oFlexData.data.changes);
+
+		// in case the asyncHints already mention that there is no change for the manifest, just trigger the loading
+		if (!ManifestUtils.getChangeManifestFromAsyncHints(oConfig.asyncHints, sReference)) {
+			checkForChangesAndInitializeFlexState({
+				...oConfig,
+				rawManifest: oManifest,
+				componentId: oConfig.id,
+				reference: sReference,
+				skipLoadBundle: true
+			}, oFlexData);
+
+			return Promise.resolve(oManifest);
+		}
+
+		if (bFlexObjectAvailable) {
+			await checkForChangesAndInitializeFlexState({
+				...oConfig,
+				rawManifest: oManifest,
+				componentId: oConfig.id,
+				reference: sReference,
+				skipLoadBundle: true
+			}, oFlexData);
+			const oManifestCopy = { ...oManifest };
+			const Applier = await requireAsync("sap/ui/fl/apply/_internal/changes/descriptor/Applier");
+			return Applier.applyChanges(oManifestCopy);
+		}
+
+		return Promise.resolve(oManifest);
 	};
 
 	return ComponentLifecycleHooks;

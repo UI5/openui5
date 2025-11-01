@@ -4,11 +4,19 @@
  */
 
 sap.ui.define([
-	"sap/base/util/isEmptyObject",
-	"sap/ui/fl/apply/_internal/changes/Utils"
+	"sap/ui/fl/apply/_internal/changes/descriptor/ApplyStrategyFactory",
+	"sap/ui/fl/apply/_internal/changes/descriptor/RawApplier",
+	"sap/ui/fl/apply/_internal/changes/Utils",
+	"sap/ui/fl/apply/_internal/flexObjects/FlexObjectFactory",
+	"sap/ui/fl/apply/_internal/flexState/FlexState",
+	"sap/ui/fl/initial/_internal/ManifestUtils"
 ], function(
-	isEmptyObject,
-	Utils
+	ApplyStrategyFactory,
+	RawApplier,
+	Utils,
+	FlexObjectFactory,
+	FlexState,
+	ManifestUtils
 ) {
 	"use strict";
 
@@ -17,33 +25,34 @@ sap.ui.define([
 		 * Applies all descriptor changes to raw manifest.
 		 *
 		 * @param {object} oUpdatedManifest - Raw manifest provided by sap.ui.core.Component
-		 * @param {Array<sap.ui.fl.apply._internal.flexObjects.AppDescriptorChange>} aAppDescriptorChanges - Array of descriptor changes
-		 * @param {object} mStrategy - Strategy for runtime or for buildtime merging
-		 * @param {object} mStrategy.registry - Change handler registry
-		 * @param {function} mStrategy.handleError - Error handling strategy
-		 * @param {function} mStrategy.processTexts - Text postprocessing strategy
+		 * @param {Array<sap.ui.fl.apply._internal.flexObjects.AppDescriptorChange>} [aPassedAppDescriptorChanges] - Array of descriptor changes
+		 * @param {object} [mStrategy] - Strategy for runtime or for buildtime merging
+		 * @param {object} [mStrategy.registry] - Change handler registry
+		 * @param {function} [mStrategy.handleError] - Error handling strategy
+		 * @param {function} [mStrategy.processTexts] - Text postprocessing strategy
 		 * @returns {Promise<object>} - Processed manifest with descriptor changes
 		 */
-		async applyChanges(oUpdatedManifest, aAppDescriptorChanges, mStrategy) {
+		async applyChanges(oUpdatedManifest, aPassedAppDescriptorChanges, mStrategy) {
+			const sReference = ManifestUtils.getFlexReference({
+				manifest: oUpdatedManifest
+			});
+			const aAppDescriptorChanges = aPassedAppDescriptorChanges || FlexState.getAppDescriptorChanges(sReference);
+			const oStrategy = mStrategy || ApplyStrategyFactory.getRuntimeStrategy();
 			const aChangeHandlers = [];
 			for (const oAppDescriptorChange of aAppDescriptorChanges) {
 				aChangeHandlers.push(await Utils.getChangeHandler({
 					flexObject: oAppDescriptorChange,
-					strategy: mStrategy
+					strategy: oStrategy
 				}));
 			}
-			aChangeHandlers.forEach(function(oChangeHandler, iIndex) {
-				try {
-					const oChange = aAppDescriptorChanges[iIndex];
-					oUpdatedManifest = oChangeHandler.applyChange(oUpdatedManifest, oChange);
-					if (!oChangeHandler.skipPostprocessing && !isEmptyObject(oChange.getTexts())) {
-						oUpdatedManifest = mStrategy.processTexts(oUpdatedManifest, oChange.getTexts());
-					}
-				} catch (oError) {
-					mStrategy.handleError(oError);
-				}
+			return RawApplier.applyChanges(aChangeHandlers, oUpdatedManifest, aAppDescriptorChanges, oStrategy);
+		},
+
+		applyInlineChanges(oManifest, aAppDescriptorChangesRaw) {
+			const aAppDescriptorChanges = aAppDescriptorChangesRaw.map(function(oChange) {
+				return FlexObjectFactory.createAppDescriptorChange(oChange);
 			});
-			return oUpdatedManifest;
+			return Applier.applyChanges(oManifest, aAppDescriptorChanges);
 		}
 	};
 

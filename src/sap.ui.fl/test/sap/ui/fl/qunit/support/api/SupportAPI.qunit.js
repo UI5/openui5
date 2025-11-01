@@ -1,6 +1,7 @@
 /* global QUnit */
 
 sap.ui.define([
+	"sap/base/Log",
 	"sap/ui/core/Component",
 	"sap/ui/core/ComponentContainer",
 	"sap/ui/fl/apply/_internal/flexState/changes/UIChangesState",
@@ -15,6 +16,7 @@ sap.ui.define([
 	"sap/ui/fl/Utils",
 	"sap/ui/thirdparty/sinon-4"
 ], function(
+	Log,
 	Component,
 	ComponentContainer,
 	UIChangesState,
@@ -33,12 +35,12 @@ sap.ui.define([
 
 	const sandbox = sinon.createSandbox();
 
-	QUnit.module("When the SupportAPI is called with the app running in an iframe", {
-		async beforeEach() {
+	function setupIFrameTest({ id, setDataHelpId }, bSkipInsideModuleStubs) {
+		return async function() {
 			this.oIFrame = new IFrame({
 				url: "support/api/testPage.html",
 				title: "myIFrame",
-				id: "application-semanticObject-action"
+				id
 			});
 			this.oIFrame.placeAt("qunit-fixture");
 			sandbox.stub(Utils, "getUshellContainer").returns(true);
@@ -69,7 +71,14 @@ sap.ui.define([
 				}
 			} while (!bReady);
 
+			if (setDataHelpId) {
+				this.oIFrame.getDomRef().setAttribute("data-help-id", "application-semanticObject-action");
+			}
+
 			// stub the modules inside the iframe
+			if (bSkipInsideModuleStubs) {
+				return;
+			}
 			const oInsideIFrameModules = await new Promise((resolve) => {
 				this.oIFrame.getDomRef().contentWindow.sap.ui.require([
 					"sap/ui/fl/Utils",
@@ -94,15 +103,29 @@ sap.ui.define([
 			});
 			sandbox.stub(oInsideIFrameModules.ManifestUtils, "getFlexReferenceForControl").returns("myInsideIFrameFlexReference");
 			sandbox.stub(oInsideIFrameModules.UIChangesState, "getAllUIChanges").resolves(["myInsideIFrameChange"]);
-		},
+		};
+	}
+
+	QUnit.module("When the SupportAPI is called with the app running in an iframe", {
 		afterEach() {
 			sandbox.restore();
 			this.oIFrame.destroy();
 		}
 	}, function() {
-		QUnit.test("when getAllUIChanges is called", async function(assert) {
+		QUnit.test("when getAllUIChanges is called (retrieved by id)", async function(assert) {
+			await setupIFrameTest({ id: "application-semanticObject-action", setDataHelpId: false }).call(this);
 			const aAllChanges = await SupportAPI.getAllUIChanges();
-			assert.deepEqual(aAllChanges, ["myInsideIFrameChange"], "then the change from the iFrame is returned");
+			assert.deepEqual(aAllChanges, ["myInsideIFrameChange"], "then the change from the iFrame (retrieved by id) is returned");
+		});
+
+		QUnit.test("when getAllUIChanges is called (retrieved by data-help-id)", async function(assert) {
+			await setupIFrameTest({ id: "not-the-expected-id", setDataHelpId: true }).call(this);
+			const aAllChanges = await SupportAPI.getAllUIChanges();
+			assert.deepEqual(
+				aAllChanges,
+				["myInsideIFrameChange"],
+				"then the change from the iFrame (retrieved by data-help-id) is returned"
+			);
 		});
 	});
 
@@ -310,6 +333,12 @@ sap.ui.define([
 				"then the dependency map is returned"
 			);
 		});
+
+		QUnit.test("when getApplicationComponent is called", async function(assert) {
+			const oComponent = await SupportAPI.getApplicationComponent();
+			assert.strictEqual(oComponent.getId(), "testComponentAsync", "then the correct component is returned");
+			assert.ok(oComponent, "then a component is returned");
+		});
 	});
 
 	QUnit.module("When the SupportAPI is called without an app but available FLP sandbox", {
@@ -327,6 +356,7 @@ sap.ui.define([
 					};
 				}
 			});
+			this.oLogErrorStub = sandbox.stub(Log, "error");
 		},
 		afterEach() {
 			sandbox.restore();
@@ -338,7 +368,22 @@ sap.ui.define([
 			.catch(function(oError) {
 				assert.strictEqual(oError.message, "Possible cFLP scenario, but the iFrame can't be found", "then an error is thrown");
 				assert.strictEqual(oGetAllChangesStub.callCount, 0, "then no changes are fetched");
-			});
+				assert.ok(
+					this.oLogErrorStub.calledWith("Possible cFLP scenario, but the iFrame can't be found"),
+					"then an error is logged"
+				);
+			}.bind(this));
+		});
+
+		QUnit.test("when getApplicationComponent is called", function(assert) {
+			return SupportAPI.getApplicationComponent()
+			.catch(function(oError) {
+				assert.strictEqual(oError.message, "Possible cFLP scenario, but the iFrame can't be found", "then an error is thrown");
+				assert.ok(
+					this.oLogErrorStub.calledWith("Possible cFLP scenario, but the iFrame can't be found"),
+					"then an error is logged"
+				);
+			}.bind(this));
 		});
 	});
 
@@ -359,6 +404,76 @@ sap.ui.define([
 	}, function() {
 		QUnit.test("when getAllUIChanges is called", function(assert) {
 			return SupportAPI.getAllUIChanges()
+			.catch(function(oError) {
+				assert.strictEqual(oError.message, "No application component found", "then an error is thrown");
+			});
+		});
+
+		QUnit.test("when getApplicationComponent is called", function(assert) {
+			return SupportAPI.getApplicationComponent()
+			.catch(function(oError) {
+				assert.strictEqual(oError.message, "No application component found", "then an error is thrown");
+			});
+		});
+	});
+
+	QUnit.module("When the SupportAPI is called with cFLP scenario but component in iFrame is null", {
+		afterEach() {
+			this.oIFrame?.destroy();
+			sandbox.restore();
+		}
+	}, function() {
+		QUnit.test("when getAllUIChanges is called and component in iFrame is null", async function(assert) {
+			await setupIFrameTest({ id: "application-semanticObject-action" }, true).call(this);
+
+			// Stub the Utils module inside the iFrame to return null componentInstance
+			const oIFrameWindow = this.oIFrame.getDomRef().contentWindow;
+			const oInsideIFrameModules = await new Promise((resolve) => {
+				oIFrameWindow.sap.ui.require([
+					"sap/ui/fl/Utils"
+				], (FlUtils) => {
+					resolve({ FlUtils });
+				});
+			});
+
+			// Override the existing stub to return null componentInstance
+			sandbox.stub(oInsideIFrameModules.FlUtils, "getUShellService").resolves({
+				getCurrentApplication: () => {
+					return {
+						componentInstance: null
+					};
+				}
+			});
+
+			return SupportAPI.getAllUIChanges()
+			.catch(function(oError) {
+				assert.strictEqual(oError.message, "No application component found", "then an error is thrown");
+			});
+		});
+
+		QUnit.test("when getApplicationComponent is called and component in iFrame is null", async function(assert) {
+			await setupIFrameTest({ id: "application-semanticObject-action" }, true).call(this);
+
+			// Stub the Utils module inside the iFrame to return null componentInstance
+			const oIFrameWindow = this.oIFrame.getDomRef().contentWindow;
+			const oInsideIFrameModules = await new Promise((resolve) => {
+				oIFrameWindow.sap.ui.require([
+					"sap/ui/fl/Utils"
+				], (FlUtils) => {
+					resolve({ FlUtils });
+				});
+			});
+
+			// Override the existing stub to return null componentInstance
+			sandbox.stub(oInsideIFrameModules.FlUtils, "getUShellService").resolves({
+				getCurrentApplication: () => {
+					return {
+						componentInstance: null
+					};
+				}
+			});
+
+			return SupportAPI.getApplicationComponent()
 			.catch(function(oError) {
 				assert.strictEqual(oError.message, "No application component found", "then an error is thrown");
 			});

@@ -103,7 +103,7 @@ sap.ui.define([
 				mPropertyBag.changeSpecificData.reference,
 				oAppDescriptorChangeContent,
 				sLayer,
-				undefined,
+				mPropertyBag.appComponent,
 				mPropertyBag.generator
 			);
 		})

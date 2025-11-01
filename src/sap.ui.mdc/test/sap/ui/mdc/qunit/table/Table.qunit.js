@@ -610,13 +610,10 @@ sap.ui.define([
 
 			assert.equal(aInnerColumns[0].getTemplate().getText(), "Test", "column0: template is correct");
 			assert.equal(aInnerColumns[0].getTemplate().getWrapping(), false, "column0: template wrapping is disabled");
-			assert.equal(aInnerColumns[0].getTemplate().getRenderWhitespace(), false, "column0: template renderWhitespace is disabled");
 			assert.equal(aInnerColumns[1].getTemplate().getText(), "Test1", "column1: template is correct");
 			assert.equal(aInnerColumns[0].getCreationTemplate(), null, "column0: creationTemplate is correct");
 			assert.equal(aInnerColumns[1].getCreationTemplate().getText(), "Test1", "column1: creationTemplate is correct");
 			assert.equal(aInnerColumns[1].getCreationTemplate().getWrapping(), false, "column1: creationTemplate wrapping is disabled");
-			assert.equal(aInnerColumns[1].getCreationTemplate().getRenderWhitespace(), false,
-				"column1: creationTemplate renderWhitespace is disabled");
 		}.bind(this));
 	});
 
@@ -1622,13 +1619,10 @@ sap.ui.define([
 			assert.equal(aInnerColumns[2].getLabel().getText(), "Test3", "column1: label is correct");
 			assert.equal(aInnerColumns[0].getTemplate().getText(), "Test2", "column0: template is correct");
 			assert.equal(aInnerColumns[0].getTemplate().getWrapping(), false, "column0: template wrapping is disabled");
-			assert.equal(aInnerColumns[0].getTemplate().getRenderWhitespace(), false, "column0: template renderWhitespace is disabled");
 			assert.equal(aInnerColumns[1].getTemplate().getText(), "Test", "column1: template is correct");
 			assert.equal(aInnerColumns[0].getCreationTemplate(), null, "column0: creationTemplate is correct");
 			assert.equal(aInnerColumns[1].getCreationTemplate().getText(), "Test", "column1: creationTemplate is correct");
 			assert.equal(aInnerColumns[1].getCreationTemplate().getWrapping(), false, "column1: creationTemplate wrapping is disabled");
-			assert.equal(aInnerColumns[1].getCreationTemplate().getRenderWhitespace(), false,
-				"column1: creationTemplate renderWhitespace is disabled");
 
 			aMDCColumns = oTable2.getColumns();
 			aInnerColumns = oTable2._oTable.getColumns();

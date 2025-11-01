@@ -7022,6 +7022,49 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
+	QUnit.test("isAggregated: no $leafLevelAggregated", function (assert) {
+		const oCache = _AggregationCache.create(this.oRequestor, "Foo", "", {}, {
+			hierarchyQualifier : "X"
+		});
+
+		// code under test
+		assert.strictEqual(oCache.isAggregated(/*no oEntity*/), false);
+	});
+
+	//*********************************************************************************************
+	QUnit.test("isAggregated: $leafLevelAggregated : true", function (assert) {
+		const oCache = _AggregationCache.create(this.oRequestor, "Foo", "", {}, {
+			// Note: a single group level would define the leaf level (JIRA: CPOUI5ODATAV4-2755)
+			groupLevels : ["a", "b"],
+			$leafLevelAggregated : true
+		});
+
+		// code under test
+		assert.strictEqual(oCache.isAggregated(/*no oEntity*/), true);
+	});
+
+	//*********************************************************************************************
+	[undefined, true, false].forEach((bExpanded) => {
+		const sTitle = "isAggregated: $leafLevelAggregated : false,  bExpanded : " + bExpanded;
+
+		QUnit.test(sTitle, function (assert) {
+			// false for leaves, true for expanded or collapsed inner nodes
+			const bExpectedResult = typeof bExpanded === "boolean";
+			const oCache = _AggregationCache.create(this.oRequestor, "Foo", "", {}, {
+				// Note: a single group level would define the leaf level (JIRA: CPOUI5ODATAV4-2755)
+				groupLevels : ["a", "b"],
+				$leafLevelAggregated : false
+			});
+			const oEntity = {
+				"@$ui5.node.isExpanded" : bExpanded
+			};
+
+			// code under test
+			assert.strictEqual(oCache.isAggregated(oEntity), bExpectedResult);
+		});
+	});
+
+	//*********************************************************************************************
 	QUnit.test("getSiblingIndex: group level", function (assert) {
 		const oCache = _AggregationCache.create(this.oRequestor, "Foo", "", {}, {
 			// expandTo : 1, // @see _AggregationHelper.buildApply4Hierarchy

@@ -998,6 +998,7 @@ sap.ui.define([
 								: SyncPromise.resolve(null),
 							oContext : {},
 							doFetchOrGetQueryOptions : function () {},
+							// NO getHeaderContext
 							oModel : {
 								getMetaModel : function () { return oMetaModel; },
 								oInterface : {
@@ -1027,6 +1028,9 @@ sap.ui.define([
 					oModelMock.expects("resolve")
 						.withExactArgs("childPath", sinon.match.same(oContext))
 						.returns("/resolved/child/path");
+					oHelperMock.expects("isDataAggregation")
+						.withExactArgs(sinon.match.same(oBinding.mParameters)).returns(true);
+					this.mock(oContext).expects("isAggregated").withExactArgs().returns(false);
 					oHelperMock.expects("getMetaPath").withExactArgs("/Set('2')").returns("/Set");
 					oHelperMock.expects("getMetaPath").withExactArgs("/resolved/child/path")
 						.returns("/resolved/child/metaPath");
@@ -1145,6 +1149,9 @@ sap.ui.define([
 			oModelMock.expects("resolve")
 				.withExactArgs("childPath", sinon.match.same(oContext))
 				.returns("/resolved/child/path");
+			oHelperMock.expects("isDataAggregation")
+				.withExactArgs(sinon.match.same(oBinding.mParameters)).returns(false);
+			this.mock(oContext).expects("isAggregated").never();
 			oHelperMock.expects("getMetaPath").withExactArgs("/Set('2')").returns("/Set");
 			oHelperMock.expects("getMetaPath").withExactArgs("/resolved/child/path")
 				.returns("/resolved/child/metaPath");
@@ -1304,6 +1311,9 @@ sap.ui.define([
 		oModelMock.expects("resolve")
 			.withExactArgs("childPath", sinon.match.same(oContext))
 			.returns("/resolved/child/path");
+		oHelperMock.expects("isDataAggregation")
+			.withExactArgs(sinon.match.same(oBinding.mParameters)).returns(false);
+		this.mock(oContext).expects("isAggregated").never();
 		oHelperMock.expects("getMetaPath").withExactArgs("/Set('1')/navigation('2')")
 			.returns("/Set/navigation");
 		oHelperMock.expects("getMetaPath").withExactArgs("/resolved/child/path")
@@ -1427,6 +1437,9 @@ sap.ui.define([
 		oModelMock.expects("resolve")
 			.withExactArgs("childPath@foo.bar", sinon.match.same(oContext))
 			.returns("/resolved/child/path@foo.bar");
+		oHelperMock.expects("isDataAggregation")
+			.withExactArgs(sinon.match.same(oBinding.mParameters)).returns(false);
+		this.mock(oContext).expects("isAggregated").never();
 		oHelperMock.expects("getMetaPath").withExactArgs("/Set('2')").returns("/Set");
 		oHelperMock.expects("getMetaPath").withExactArgs("/resolved/child/path@foo.bar")
 			.returns("/resolved/child/metaPath@foo.bar");
@@ -1525,6 +1538,9 @@ sap.ui.define([
 		oModelMock.expects("resolve")
 			.withExactArgs("", sinon.match.same(oContext))
 			.returns("/resolved/child/path");
+		oHelperMock.expects("isDataAggregation")
+			.withExactArgs(sinon.match.same(oBinding.mParameters)).returns(false);
+		this.mock(oContext).expects("isAggregated").never();
 		oHelperMock.expects("getMetaPath").withExactArgs("/Set/~").returns("/Set");
 		oHelperMock.expects("getMetaPath").withExactArgs("/resolved/child/path")
 			.returns("/resolved/child/metaPath");
@@ -1614,6 +1630,9 @@ sap.ui.define([
 			oModelMock.expects("resolve")
 				.withExactArgs(sPath, sinon.match.same(oContext))
 				.returns("/resolved/child/path");
+			oHelperMock.expects("isDataAggregation")
+				.withExactArgs(sinon.match.same(oBinding.mParameters)).returns(false);
+			this.mock(oContext).expects("isAggregated").never();
 			oHelperMock.expects("getMetaPath").withExactArgs("/Set('2')").returns("/Set");
 			oHelperMock.expects("getMetaPath").withExactArgs("/resolved/child/path")
 				.returns("/resolved/child/metaPath");
@@ -1686,6 +1705,9 @@ sap.ui.define([
 
 		this.mock(oBinding).expects("getBaseForPathReduction")
 			.withExactArgs().returns("/base/path");
+		oHelperMock.expects("isDataAggregation")
+			.withExactArgs(sinon.match.same(oBinding.mParameters)).returns(false);
+		this.mock(oContext).expects("isAggregated").never();
 		oHelperMock.expects("getMetaPath").withExactArgs("/Set('2')").returns("/Set");
 		this.mock(oBinding.oModel).expects("resolve")
 			.withExactArgs(sPath, sinon.match.same(oContext))
@@ -1748,6 +1770,9 @@ sap.ui.define([
 		this.mock(oBinding).expects("getHeaderContext").withExactArgs().returns(oContext);
 		this.mock(oBinding).expects("getBaseForPathReduction").withExactArgs()
 			.returns("/base/path");
+		oHelperMock.expects("isDataAggregation")
+			.withExactArgs(sinon.match.same(oBinding.mParameters)).returns(false);
+		this.mock(oContext).expects("isAggregated").never();
 		this.mock(oBinding.oModel).expects("resolve")
 			.withExactArgs(sChildPath, sinon.match.same(oContext))
 			.returns("/resolved/child/path");
@@ -1785,10 +1810,15 @@ sap.ui.define([
 });
 
 	//*********************************************************************************************
-	QUnit.test("fetchIfChildCanUseCache: $$aggregation", function (assert) {
+[false, true].forEach((bWithHeaderContext) => {
+	const sTitle = "fetchIfChildCanUseCache: "
+		+ (bWithHeaderContext ? "$$aggregation with header context" : "isAggregated");
+
+	QUnit.test(sTitle, function (assert) {
 		var mParameters = {/*$$aggregation : {.../}*/},
 			oBinding = new ODataParentBinding({
 				oContext : {},
+				getHeaderContext : mustBeMocked,
 				oModel : {
 					getMetaModel : function () { return {}; },
 					resolve : function () {}
@@ -1798,14 +1828,22 @@ sap.ui.define([
 			}),
 			oContext = {
 				getIndex : function () {},
-				getPath : function () { return "/foo/bar/path"; }
+				getPath : function () { return "/foo/bar/path"; },
+				isAggregated : mustBeMocked
 			};
 
 		this.mock(oBinding).expects("getBaseForPathReduction").withExactArgs().returns("n/a");
 		this.mock(oBinding.oModel).expects("resolve")
 			.withExactArgs("childPath", sinon.match.same(oContext))
 			.returns("/resolved/child/path");
-		this.mock(_Helper).expects("isDataAggregation").withExactArgs(sinon.match.same(mParameters))
+		this.mock(oBinding).expects("isRootBindingSuspended").withExactArgs().returns(false);
+		this.mock(_Helper).expects("isDataAggregation")
+			.withExactArgs(sinon.match.same(mParameters))
+			.returns(true);
+		this.mock(oBinding).expects("getHeaderContext").withExactArgs()
+			.returns(bWithHeaderContext ? oContext : {/*any other context*/});
+		this.mock(oContext).expects("isAggregated").withExactArgs()
+			.exactly(bWithHeaderContext ? 0 : 1)
 			.returns(true);
 
 		assert.strictEqual(
@@ -1817,6 +1855,7 @@ sap.ui.define([
 		assert.deepEqual(oBinding.aChildCanUseCachePromises, [], "unchanged");
 		assert.deepEqual(oBinding.mCanUseCachePromiseByChildPath, {}, "unchanged");
 	});
+});
 
 	//*********************************************************************************************
 	QUnit.test("fetchIfChildCanUseCache: operation binding or dependent", function (assert) {
@@ -1831,6 +1870,7 @@ sap.ui.define([
 			oContext = {
 				getIndex : function () {},
 				getPath : function () { return "/Foo/operation(...)/Bar/path"; }
+				// NO isAggregated
 			},
 			oModelMock = this.mock(oBinding.oModel);
 
@@ -1891,6 +1931,9 @@ sap.ui.define([
 		oModelMock.expects("resolve")
 			.withExactArgs(sPath, sinon.match.same(oContext))
 			.returns("/Set('2')/operation(...)/$Parameter/foo/bar");
+		oHelperMock.expects("isDataAggregation")
+			.withExactArgs(sinon.match.same(oBinding.mParameters)).returns(false);
+		this.mock(oContext).expects("isAggregated").never();
 		oHelperMock.expects("getMetaPath").withExactArgs("/Set('2')/operation(...)/$Parameter")
 			.returns("/Set/operation/$Parameter");
 		oHelperMock.expects("getMetaPath")
@@ -1957,6 +2000,9 @@ sap.ui.define([
 		oModelMock.expects("resolve")
 			.withExactArgs(sChildPath, sinon.match.same(oContext))
 			.returns("/resolved/child/path");
+		this.mock(_Helper).expects("isDataAggregation")
+			.withExactArgs(sinon.match.same(oBinding.mParameters)).returns(false);
+		this.mock(oContext).expects("isAggregated").never();
 		this.mock(_Helper).expects("fetchPropertyAndType")
 			.withExactArgs(sinon.match.same(fnFetchMetadata), "/resolved/child/path")
 			.returns(SyncPromise.resolve([{$isBound : true, $kind : "Function"}]));
@@ -2015,6 +2061,9 @@ sap.ui.define([
 		oModelMock.expects("resolve")
 			.withExactArgs(sChildPath, sinon.match.same(oContext))
 			.returns("/resolved/child/path");
+		this.mock(_Helper).expects("isDataAggregation")
+			.withExactArgs(sinon.match.same(oBinding.mParameters)).returns(false);
+		this.mock(oContext).expects("isAggregated").never();
 		this.mock(_Helper).expects("fetchPropertyAndType")
 			.withExactArgs(sinon.match.same(fnFetchMetadata), "/resolved/child/path")
 			.returns(SyncPromise.resolve({$isCollection : true, $Type : "some.EntityType"}));
@@ -2062,6 +2111,7 @@ sap.ui.define([
 			oContext = {
 				getIndex : function () {},
 				getPath : function () { return "/TEAMS"; }
+				// NO isAggregated
 			},
 			oModelMock = this.mock(oBinding.oModel);
 
@@ -2125,6 +2175,9 @@ sap.ui.define([
 		oModelMock.expects("resolve")
 			.withExactArgs("SOITEMS_2_SO/Note", sinon.match.same(oContext))
 			.returns("/SalesOrderList('42')/SO_2_SOITEMS('23')/SOITEMS_2_SO/Note");
+		oHelperMock.expects("isDataAggregation")
+			.withExactArgs(sinon.match.same(oBinding.mParameters)).returns(false);
+		this.mock(oContext).expects("isAggregated").never();
 		oHelperMock.expects("getMetaPath")
 			.withExactArgs("/SalesOrderList('42')/SO_2_SOITEMS('23')")
 			.returns("/SalesOrderList/SO_2_SOITEMS");
@@ -2208,7 +2261,8 @@ sap.ui.define([
 			}),
 			oContext = {
 				getIndex : function () {},
-				getPath : function () { return "/TEAMS"; }
+				getPath : function () { return "/TEAMS"; },
+				isAggregated : mustBeMocked
 			},
 			sExpectedReducedPath = o.sOldReducedPath ? "/resolved/child/path" : undefined,
 			oHelperMock = this.mock(_Helper),
@@ -2222,7 +2276,9 @@ sap.ui.define([
 			.withExactArgs(o.sChildPath, sinon.match.same(oContext))
 			.returns("/resolved/child/path");
 		this.mock(oBinding).expects("isRootBindingSuspended").withExactArgs().returns(false);
-		this.mock(_Helper).expects("isDataAggregation").withExactArgs(undefined).returns(false);
+		oHelperMock.expects("isDataAggregation")
+			.withExactArgs(sinon.match.same(oBinding.mParameters)).returns(false);
+		this.mock(oContext).expects("isAggregated").never();
 		oHelperMock.expects("getMetaPath").never();
 		if (o.sChildPath === "child/path") {
 			oHelperMock.expects("getMetaPath").withExactArgs(o.sOldReducedPath).returns("A");

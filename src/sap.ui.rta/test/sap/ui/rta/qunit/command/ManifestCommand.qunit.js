@@ -81,7 +81,8 @@ sap.ui.define([
 			};
 
 			const oMockManifestChange = new DescriptorChange({});
-			oMockManifestChange.store = function() {
+			oMockManifestChange.store = function(oAppComponent) {
+				assert.ok(oAppComponent, "the app component is passed to the store function");
 				assert.ok(true, "the manifest change was submitted");
 				const mPassedSettings = fnAssertSpy.getCall(0).args[0];
 				const bHasSelector = Object.keys(mPassedSettings).some(function(sKey) {

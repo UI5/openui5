@@ -7,15 +7,13 @@ sap.ui.define([
 	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
 	"sap/ui/fl/apply/_internal/flexState/FlexObjectState",
 	"sap/ui/fl/apply/_internal/flexState/FlexState",
-	"sap/ui/fl/initial/_internal/ManifestUtils",
-	"sap/ui/fl/Utils"
+	"sap/ui/fl/initial/_internal/ManifestUtils"
 ], function(
 	UIChangesState,
 	VariantManagementState,
 	FlexObjectState,
 	FlexState,
-	ManifestUtils,
-	Utils
+	ManifestUtils
 ) {
 	"use strict";
 
@@ -42,13 +40,7 @@ sap.ui.define([
 		};
 	}
 
-	return async function(oAppComponent) {
-		// in most scenarios the appComponent will already be passed, but in iFrame cases (like cFLP) the appComponent is not available
-		// outside of the iFrame. In this case the function is called from inside the iFrame and has to fetch the appComponent
-		if (!oAppComponent) {
-			const oAppLifeCycleService = await Utils.getUShellService("AppLifeCycle");
-			return getFlexObjectInfos(oAppLifeCycleService.getCurrentApplication().componentInstance);
-		}
-		return getFlexObjectInfos(oAppComponent);
+	return function(oAppComponent) {
+		return Promise.resolve(getFlexObjectInfos(oAppComponent));
 	};
 });

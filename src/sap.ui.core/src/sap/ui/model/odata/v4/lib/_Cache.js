@@ -801,7 +801,7 @@ sap.ui.define([
 							oEntity = oData;
 							iEntityPathLength = 0;
 						}
-						if (oEntity && !bAgain) {
+						if (oEntity && !bAgain && !that.isAggregated?.(oEntity)) {
 							vResult = that.fetchLateProperty(oGroupLock, oEntity,
 								aSegments.slice(0, iEntityPathLength).join("/"),
 								aSegments.slice(iEntityPathLength).join("/"));

@@ -307,6 +307,7 @@ sap.ui.define([
 	 * @throws {Error}
 	 *   If no recursive hierarchy is used
 	 *
+	 * @protected
 	 * @see sap.ui.model.odata.v4.lib._CollectionCache#requestSideEffects
 	 */
 	_AggregationCache.prototype.beforeRequestSideEffects = function (mQueryOptions) {
@@ -328,6 +329,7 @@ sap.ui.define([
 	 * @param {object} oNewValue - The new value, which usually just contains parts of the old
 	 * @throws {Error} In case of a structural change
 	 *
+	 * @protected
 	 * @see sap.ui.model.odata.v4.lib._CollectionCache#requestSideEffects
 	 */
 	_AggregationCache.prototype.beforeUpdateSelected = function (sPredicate, oNewValue) {
@@ -1447,6 +1449,24 @@ sap.ui.define([
 		// poor man's #replaceElement to replace undefined w/ oParent
 		this.oFirstLevel.removeElement(iRank);
 		this.oFirstLevel.restoreElement(iRank, oNode);
+	};
+
+	/**
+	 * Returns whether the given entity represents aggregated data.
+	 *
+	 * @param {object} oEntity - An entity
+	 * @returns {boolean} Whether the given entity is aggregated
+	 *
+	 * @protected
+	 * @see sap.ui.model.odata.v4.lib._Cache#drillDown
+	 * @see sap.ui.model.odata.v4.Context#isAggregated
+	 */
+	_AggregationCache.prototype.isAggregated = function (oEntity) {
+		const bAggregated = this.oAggregation.$leafLevelAggregated;
+		if (bAggregated === undefined) {
+			return false;
+		}
+		return bAggregated || oEntity["@$ui5.node.isExpanded"] !== undefined;
 	};
 
 	/**

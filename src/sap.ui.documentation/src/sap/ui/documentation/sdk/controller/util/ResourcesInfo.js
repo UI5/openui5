@@ -11,7 +11,7 @@ sap.ui.define([], function () {
 		{
 			"id": "fioriDevPortal",
 			"text": "SAP Fiori Development Portal",
-			"href": "test-resources/sap/fe/core/fpmExplorer/index.html",
+			"href": "test-resources/sap/fe/core/fpmExplorer/index.html#/topic/introduction",
 			"isDistributionScope": true
 		},
 		{

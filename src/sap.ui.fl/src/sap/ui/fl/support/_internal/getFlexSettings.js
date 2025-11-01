@@ -3,11 +3,9 @@
  */
 
 sap.ui.define([
-	"sap/ui/fl/initial/_internal/Settings",
-	"sap/ui/fl/Utils"
+	"sap/ui/fl/initial/_internal/Settings"
 ], function(
-	Settings,
-	Utils
+	Settings
 ) {
 	"use strict";
 
@@ -34,16 +32,11 @@ sap.ui.define([
 	 * @since 1.99
 	 * @version ${version}
 	 * @param {sap.ui.core.UIComponent} oAppComponent - Application Component
+	 * @returns {Promise<Object>} Promise resolving with the flex settings
 	 * @private
 	 * @ui5-restricted sap.ui.fl.support.api.SupportAPI
 	 */
-	return async function(oAppComponent) {
-		// in most scenarios the appComponent will already be passed, but in iFrame cases (like cFLP) the appComponent is not available
-		// outside of the iFrame. In this case the function is called from inside the iFrame and has to fetch the appComponent
-		if (!oAppComponent) {
-			const oAppLifeCycleService = await Utils.getUShellService("AppLifeCycle");
-			return getSettings(oAppLifeCycleService.getCurrentApplication().componentInstance);
-		}
+	return function(oAppComponent) {
 		return getSettings(oAppComponent);
 	};
 });

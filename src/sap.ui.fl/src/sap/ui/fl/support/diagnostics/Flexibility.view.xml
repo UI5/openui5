@@ -1,0 +1,29 @@
+
+<mvc:View
+	xmlns="sap.m"
+	xmlns:core="sap.ui.core"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:l="sap.ui.layout"
+	controllerName="sap.ui.fl.support.diagnostics.Flexibility"
+>
+	<l:VerticalLayout>
+		<Text
+			text="You can download the flexibility data of the current application in JSON format."
+			class="sapUiSmallMarginBottom sapUiSmallMarginTop"/>
+		<MessageStrip
+			text="Before sharing the file with others, please review its contents for any personal data."
+			type="Information"
+			showIcon="true"
+			class="sapUiSmallMarginBottom"/>
+		<CheckBox
+			id="anonymizeUsersCheckbox"
+			text="Anonymize User IDs"
+			selected="{flexToolSettings>/anonymizeData}"
+			class="sapUiSmallMarginBottom"/>
+		<Button
+			id="downloadButton"
+			text="Download Flexibility Data"
+			press="onDownloadPress"
+			class="sapUiSmallMarginBottom"/>
+	</l:VerticalLayout>
+</mvc:View>

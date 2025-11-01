@@ -147,22 +147,20 @@ sap.ui.define([
 	 *
 	 * @param {object} mPropertyBag - Contains additional data needed for loading changes
 	 * @param {object} mPropertyBag.manifest - ManifestObject that belongs to current component
-	 * @param {string} mPropertyBag.reference - Flex Reference
 	 * @param {object} mPropertyBag.componentData - Component data of the current component
+	 * @param {string} [mPropertyBag.reference] - Flex Reference
 	 * @param {boolean} [mPropertyBag.reInitialize] - Flag if the application is reinitialized even if it was loaded before
 	 * @param {object} [mPropertyBag.asyncHints] - Async hints passed from the app index to the component processing
 	 * @param {boolean} [mPropertyBag.skipLoadBundle=false] - If true only the partial flex data is loaded, without the bundle
 	 * @returns {Promise<object>} Resolves with the change file for the given component from the Storage
 	 */
 	Loader.getFlexData = async function(mPropertyBag) {
+		const sReference = mPropertyBag.reference || ManifestUtils.getFlexReference(mPropertyBag);
 		// the FlexInfoSession is used to adjust the parameters of the request
-		let oFlexInfoSession = FlexInfoSession.getByReference(mPropertyBag.reference);
-		const mPropertyBagCopy = merge({}, mPropertyBag, {
-			version: oFlexInfoSession.version,
-			adaptationId: oFlexInfoSession.displayedAdaptationId,
-			allContextsProvided: oFlexInfoSession.allContextsProvided
-		});
-		const sReference = mPropertyBagCopy.reference;
+		let oFlexInfoSession = FlexInfoSession.getByReference(sReference);
+		const sVersion = oFlexInfoSession.version;
+		const sAdaptationId = oFlexInfoSession.displayedAdaptationId;
+		const bAllContextsProvided = oFlexInfoSession.allContextsProvided;
 
 		const oOldInitPromise = _mInitPromises[sReference];
 		const oNewInitPromise = new Deferred();
@@ -174,17 +172,17 @@ sap.ui.define([
 
 		const bRequiresNewLoadRequest =
 			mPropertyBag.reInitialize
-			|| !_mCachedFlexData[mPropertyBag.reference]
+			|| !_mCachedFlexData[sReference]
 			|| _mCachedFlexData[sReference].parameters.emptyState
-			|| _mCachedFlexData[sReference].parameters.version !== mPropertyBagCopy.version
-			|| _mCachedFlexData[sReference].parameters.allContextsProvided !== mPropertyBagCopy.allContextsProvided
-			|| _mCachedFlexData[sReference].parameters.adaptationId !== mPropertyBagCopy.adaptationId;
+			|| _mCachedFlexData[sReference].parameters.version !== sVersion
+			|| _mCachedFlexData[sReference].parameters.allContextsProvided !== bAllContextsProvided
+			|| _mCachedFlexData[sReference].parameters.adaptationId !== sAdaptationId;
 
 		const bRequiresOnlyCompletion =
 			_mCachedFlexData[sReference]
 			&& !_mCachedFlexData[sReference].parameters.emptyState
 			&& _mCachedFlexData[sReference].parameters.bundleNotLoaded
-			&& !mPropertyBagCopy.skipLoadBundle;
+			&& !mPropertyBag.skipLoadBundle;
 
 		if (!bRequiresNewLoadRequest && !bRequiresOnlyCompletion) {
 			oNewInitPromise.resolve();
@@ -196,23 +194,23 @@ sap.ui.define([
 
 		let oFlexData;
 		let oAuthors;
-		const sComponentName = ManifestUtils.getBaseComponentNameFromManifest(mPropertyBagCopy.manifest);
+		const sComponentName = ManifestUtils.getBaseComponentNameFromManifest(mPropertyBag.manifest);
 		if (bRequiresNewLoadRequest) {
 			// the cache key cannot be used in case of a reinitialization
-			const sCacheKey = mPropertyBagCopy.reInitialize
+			const sCacheKey = mPropertyBag.reInitialize
 				? undefined
-				: ManifestUtils.getCacheKeyFromAsyncHints(sReference, mPropertyBagCopy.asyncHints);
+				: ManifestUtils.getCacheKeyFromAsyncHints(sReference, mPropertyBag.asyncHints);
 
 			oFlexData = await Storage.loadFlexData({
-				preview: ManifestUtils.getPreviewSectionFromAsyncHints(mPropertyBagCopy.asyncHints),
+				preview: ManifestUtils.getPreviewSectionFromAsyncHints(mPropertyBag.asyncHints),
 				reference: sReference,
 				componentName: sComponentName,
 				cacheKey: sCacheKey,
-				siteId: getSideId(mPropertyBagCopy.componentData),
-				appDescriptor: mPropertyBagCopy.manifest.getRawJson ? mPropertyBagCopy.manifest.getRawJson() : mPropertyBagCopy.manifest,
-				version: mPropertyBagCopy.version,
-				adaptationId: mPropertyBagCopy.adaptationId,
-				skipLoadBundle: mPropertyBagCopy.skipLoadBundle
+				siteId: getSideId(mPropertyBag.componentData),
+				appDescriptor: mPropertyBag.manifest.getRawJson ? mPropertyBag.manifest.getRawJson() : mPropertyBag.manifest,
+				version: sVersion,
+				adaptationId: sAdaptationId,
+				skipLoadBundle: mPropertyBag.skipLoadBundle
 			});
 			const oSettings = await Settings.getInstance();
 			oAuthors = oSettings.getIsVariantAuthorNameAvailable() ? await Storage.loadVariantsAuthors(sReference) : {};
@@ -228,7 +226,7 @@ sap.ui.define([
 		const oFlexDataCopy = Object.assign({}, oFlexData);
 		applyDeactivateChanges(oFlexDataCopy);
 		filterInvalidFileNames(oFlexDataCopy);
-		migrateOVPSelectorFlags(mPropertyBagCopy.manifest, oFlexDataCopy);
+		migrateOVPSelectorFlags(mPropertyBag.manifest, oFlexDataCopy);
 
 		const oFormattedFlexData = {
 			changes: oFlexDataCopy,
@@ -239,10 +237,10 @@ sap.ui.define([
 		_mCachedFlexData[sReference] = {
 			data: oFormattedFlexData,
 			parameters: {
-				bundleNotLoaded: !!mPropertyBagCopy.skipLoadBundle,
-				version: mPropertyBagCopy.version,
-				allContextsProvided: mPropertyBagCopy.allContextsProvided,
-				adaptationId: mPropertyBagCopy.adaptationId
+				bundleNotLoaded: !!mPropertyBag.skipLoadBundle,
+				version: sVersion,
+				allContextsProvided: bAllContextsProvided,
+				adaptationId: sAdaptationId
 			}
 		};
 

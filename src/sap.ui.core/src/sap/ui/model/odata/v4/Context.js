@@ -1267,6 +1267,7 @@ sap.ui.define([
 	 */
 	Context.prototype.isAggregated = function () {
 		this.oBinding.checkSuspended();
+		// see _AggregationCache#isAggregated
 		const bAggregated = this.oBinding.mParameters.$$aggregation?.$leafLevelAggregated;
 		if (bAggregated === undefined) {
 			return false;

@@ -68,22 +68,6 @@ sap.ui.define([
 				{ key: "isLocalResetEnabled", value: false }
 			]);
 		});
-
-		QUnit.test("without passing a component", async function(assert) {
-			sandbox.stub(Utils, "getUShellService").resolves({
-				getCurrentApplication() {
-					return {
-						componentInstance: "dummyComponent"
-					};
-				}
-			});
-			const aSettings = await getFlexSettings();
-			checkPropertiesInSettings(assert, aSettings, [
-				{ key: "versioning", value: false },
-				{ key: "isKeyUser", value: true },
-				{ key: "isLocalResetEnabled", value: false }
-			]);
-		});
 	});
 
 	QUnit.done(function() {
