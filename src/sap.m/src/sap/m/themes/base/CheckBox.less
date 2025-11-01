@@ -256,8 +256,8 @@ html[data-sap-ui-browser^=ff] .sapMCbBg > input {
 }
 
 /* Condensed size */
-.sapUiSizeCondensed.sapUiTable,
-.sapUiSizeCondensed .sapUiTable {
+html.sap-desktop .sapUiSizeCondensed.sapUiTable,
+html.sap-desktop .sapUiSizeCondensed .sapUiTable {
 
 	.sapMCb {
 		height: 1.5rem;
@@ -271,8 +271,8 @@ html[data-sap-ui-browser^=ff] .sapMCbBg > input {
 	}
 
 	.sapMCbBg { /* check box itself */
-		left: 0.25rem;
-		top: 0.25rem;
+		left: 0.5rem;
+		top: 0.375rem; /* vertically center: (1.5rem - 0.75rem) / 2 = 0.375rem */
 		height: 0.75rem;
 		width: 0.75rem;
 		line-height: 0.75rem;

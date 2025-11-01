@@ -1686,6 +1686,7 @@ sap.ui.define([
 			}];
 
 		oData.$byPredicate = {"('42')" : oData[0]};
+		oCache.isAggregated = mustBeMocked;
 
 		this.mock(_Helper).expects("getMetaPath").exactly(bGotIt ? 1 : 2)
 			.withExactArgs("('42')/entity/foo/bar").returns("entity/foo/bar");
@@ -1698,6 +1699,8 @@ sap.ui.define([
 		this.mock(_Helper).expects("getAnnotationKey").exactly(bGotIt ? 1 : 2)
 			.withExactArgs(sinon.match.same(oData[0].entity.foo), ".Permissions", "bar")
 			.returns(undefined);
+		this.mock(oCache).expects("isAggregated") // MUST not be repeated!
+			.withExactArgs(sinon.match.same(oData[0].entity)).returns(false);
 		this.mock(oCache).expects("fetchLateProperty") // MUST not be repeated!
 			.withExactArgs("~oGroupLock~", sinon.match.same(oData[0].entity),
 				"('42')/entity", "foo/bar/baz")
@@ -1719,6 +1722,41 @@ sap.ui.define([
 			});
 	});
 });
+
+	//*********************************************************************************************
+	QUnit.test("_Cache#drillDown: no late property when aggregated", function (assert) {
+		const oCache = new _Cache(this.oRequestor, "Products");
+		oCache.isAggregated = mustBeMocked;
+		this.mock(_Helper).expects("getMetaPath")
+			.withExactArgs("('42')/entity/foo/bar").returns("entity/foo/bar");
+		this.oModelInterfaceMock.expects("fetchMetadata")
+			.withExactArgs("/Products/entity/foo/bar")
+			.returns(SyncPromise.resolve({
+				$kind : "Property",
+				$Type : "some.ComplexType"
+			}));
+		const oData = [{
+				entity : {
+					"@$ui5._" : {predicate : "(23)"}, // required for fetchLateProperty
+					foo : {}
+				}
+			}];
+		oData.$byPredicate = {"('42')" : oData[0]};
+		this.mock(_Helper).expects("getAnnotationKey")
+			.withExactArgs(sinon.match.same(oData[0].entity.foo), ".Permissions", "bar")
+			.returns(undefined);
+		this.mock(oCache).expects("isAggregated")
+			.withExactArgs(sinon.match.same(oData[0].entity)).returns(true);
+		this.mock(oCache).expects("fetchLateProperty").never();
+		this.oLogMock.expects("error").withExactArgs(
+			"Failed to drill-down into ('42')/entity/foo/bar/baz, invalid segment: bar",
+			"/~/Products", sClassName);
+
+		assert.strictEqual(
+			// code under test
+			oCache.drillDown(oData, "('42')/entity/foo/bar/baz", "~oGroupLock~").getResult(),
+			undefined);
+	});
 
 	//*********************************************************************************************
 [false, true].forEach(function (bAsInfo) {

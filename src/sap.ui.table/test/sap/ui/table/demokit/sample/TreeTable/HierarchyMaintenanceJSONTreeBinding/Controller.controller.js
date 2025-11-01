@@ -68,6 +68,8 @@ sap.ui.define([
 				oNewParent.categories = []; // Initialize the children array.
 			}
 
+			oTreeTable.clearSelection();
+
 			for (let i = 0; i < aDraggedRowContexts.length; i++) {
 				if (oNewParentContext.getPath().indexOf(aDraggedRowContexts[i].getPath()) === 0) {
 					// Avoid moving a node into one of its child nodes.
@@ -91,6 +93,8 @@ sap.ui.define([
 				MessageToast.show("Select at least one row first.");
 				return;
 			}
+
+			oTreeTable.clearSelection();
 
 			// Cut the data.
 			for (let i = 0; i < aSelectedIndices.length; i++) {

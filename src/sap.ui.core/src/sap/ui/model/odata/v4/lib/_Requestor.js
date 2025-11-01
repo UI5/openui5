@@ -1451,7 +1451,7 @@ sap.ui.define([
 						oResponse = vRequest.method === "GET" ? null : {};
 					}
 					that.reportHeaderMessages(vRequest.$resourcePath,
-						getResponseHeader.call(vResponse, "sap-messages"), oResponse);
+						getResponseHeader.call(vResponse, "sap-messages"), oResponse, vRequest.url);
 					sETag = getResponseHeader.call(vResponse, "ETag");
 					if (sETag) {
 						oResponse["@odata.etag"] = sETag;
@@ -1805,7 +1805,8 @@ sap.ui.define([
 
 	/**
 	 * Reports OData messages from the "sap-messages" response header (or forwards them via the
-	 * response object).
+	 * response object). When reporting, the longtext URL is already resolved w.r.t. the request URL
+	 * and the original message is preserved early on.
 	 *
 	 * @param {string} sResourcePath
 	 *   The resource path of the request whose response contained the messages, see also
@@ -1815,15 +1816,24 @@ sap.ui.define([
 	 * @param {object} oResponse
 	 *   The response object, needed in case <code>sResourcePath === "R#V#C"</code> as described
 	 *   at {@link #request}
+	 * @param {string} [sRequestUrl]
+	 *   A resource path relative to the service URL for which this requestor has been created
 	 *
 	 * @private
 	 */
-	_Requestor.prototype.reportHeaderMessages = function (sResourcePath, sMessages, oResponse) {
+	_Requestor.prototype.reportHeaderMessages = function (sResourcePath, sMessages, oResponse,
+			sRequestUrl) {
 		if (sMessages) {
 			const aMessages = JSON.parse(sMessages);
 			if (sResourcePath === "R#V#C") {
 				_Helper.setPrivateAnnotation(oResponse, "headerMessages", aMessages);
 			} else {
+				const sAbsoluteRequestUrl = this.sServiceUrl + sRequestUrl;
+				aMessages.forEach((oMessage) => {
+					oMessage["@$ui5.originalMessage"] = _Helper.clone(oMessage);
+					oMessage.longtextUrl
+						&&= _Helper.makeAbsolute(oMessage.longtextUrl, sAbsoluteRequestUrl);
+				});
 				this.oModelInterface.reportTransitionMessages(aMessages, sResourcePath);
 			}
 		}
@@ -2015,7 +2025,8 @@ sap.ui.define([
 				// Note: "text/plain" used for $count
 				typeof oResponse.body === "string" ? JSON.parse(oResponse.body) : oResponse.body,
 				sMetaPath);
-			that.reportHeaderMessages(sOriginalResourcePath, oResponse.messages, oResult);
+			that.reportHeaderMessages(sOriginalResourcePath, oResponse.messages, oResult,
+				sResourcePath);
 			return oResult;
 		});
 	};

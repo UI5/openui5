@@ -2,32 +2,34 @@
 
 sap.ui.define([
 	"sap/base/util/restricted/_omit",
+	"sap/base/Log",
+	"sap/ui/fl/apply/_internal/changes/descriptor/app/ChangeDataSource",
+	"sap/ui/fl/apply/_internal/changes/descriptor/app/SetDescription",
+	"sap/ui/fl/apply/_internal/changes/descriptor/app/SetTitle",
+	"sap/ui/fl/apply/_internal/changes/descriptor/ui5/AddComponentUsages",
+	"sap/ui/fl/apply/_internal/changes/descriptor/ui5/AddLibrary",
+	"sap/ui/fl/apply/_internal/changes/descriptor/ui5/AddNewModelEnhanceWith",
 	"sap/ui/fl/apply/_internal/changes/descriptor/Applier",
 	"sap/ui/fl/apply/_internal/changes/descriptor/ApplyStrategyFactory",
-	"sap/ui/fl/apply/_internal/changes/descriptor/ui5/AddLibrary",
-	"sap/ui/fl/apply/_internal/changes/descriptor/ui5/AddComponentUsages",
-	"sap/ui/fl/apply/_internal/changes/descriptor/app/SetTitle",
-	"sap/ui/fl/apply/_internal/changes/descriptor/app/SetDescription",
-	"sap/ui/fl/apply/_internal/changes/descriptor/app/ChangeDataSource",
-	"sap/ui/fl/apply/_internal/changes/descriptor/ui5/AddNewModelEnhanceWith",
 	"sap/ui/fl/apply/_internal/flexObjects/AppDescriptorChange",
-	"sap/base/Log",
-	"sap/ui/thirdparty/sinon-4",
-	"sap/ui/fl/requireAsync"
+	"sap/ui/fl/apply/_internal/flexState/FlexState",
+	"sap/ui/fl/requireAsync",
+	"sap/ui/thirdparty/sinon-4"
 ], function(
 	_omit,
+	Log,
+	ChangeDataSource,
+	SetDescription,
+	SetTitle,
+	AddComponentUsages,
+	AddLibrary,
+	AddNewModelEnhanceWith,
 	Applier,
 	ApplyStrategyFactory,
-	AddLibrary,
-	AddComponentUsages,
-	SetTitle,
-	SetDescription,
-	ChangeDataSource,
-	AddNewModelEnhanceWith,
 	AppDescriptorChange,
-	Log,
-	sinon,
-	requireAsync
+	FlexState,
+	requireAsync,
+	sinon
 ) {
 	"use strict";
 
@@ -75,7 +77,7 @@ sap.ui.define([
 			sandbox.restore();
 		}
 	}, function() {
-		QUnit.test("when calling 'applyChange' with one runtime descriptor change ", function(assert) {
+		QUnit.test("when calling 'applyChange' with one runtime descriptor change ", async function(assert) {
 			var aChanges = [{
 				changeType: "appdescr_ui5_addLibraries",
 				content: {
@@ -89,9 +91,36 @@ sap.ui.define([
 
 			aChanges = convertChanges(aChanges);
 
-			return Applier.applyChanges(this.oManifest, aChanges, this.RuntimeStrategy).then(function() {
-				assert.equal(this.fnAddLibrarySpy.callCount, 1, "AddLibrary.applyChange is called once");
-			}.bind(this));
+			const oGetChangeStub = sandbox.stub(FlexState, "getAppDescriptorChanges").returns(aChanges);
+			const oGetStrategySpy = sandbox.spy(ApplyStrategyFactory, "getRuntimeStrategy");
+
+			await Applier.applyChanges(this.oManifest, aChanges, this.RuntimeStrategy);
+			assert.strictEqual(this.fnAddLibrarySpy.callCount, 1, "AddLibrary.applyChange is called once");
+			assert.strictEqual(oGetChangeStub.callCount, 0, "getAppDescriptorChanges is not called");
+			assert.strictEqual(oGetStrategySpy.callCount, 0, "getRuntimeStrategy is not called");
+		});
+
+		QUnit.test("when calling 'applyChange' without strategy and changes", async function(assert) {
+			const aChanges = convertChanges(
+				[{
+					changeType: "appdescr_ui5_addLibraries",
+					content: {
+						libraries: {
+							"descriptor.mocha133": {
+								minVersion: "1.44"
+							}
+						}
+					}
+				}]
+			);
+
+			const oGetChangeStub = sandbox.stub(FlexState, "getAppDescriptorChanges").returns(aChanges);
+			const oGetStrategySpy = sandbox.spy(ApplyStrategyFactory, "getRuntimeStrategy");
+			await Applier.applyChanges(this.oManifest);
+			assert.strictEqual(this.fnLogSpy.callCount, 0, "no error is logged");
+			assert.strictEqual(this.fnAddLibrarySpy.callCount, 1, "AddLibrary.applyChange is called once");
+			assert.strictEqual(oGetChangeStub.callCount, 1, "getAppDescriptorChanges is called once");
+			assert.strictEqual(oGetStrategySpy.callCount, 1, "getRuntimeStrategy is called once");
 		});
 
 		QUnit.test("when calling 'applyChange' with three conflicting runtime 'appdescr_ui5_addLibraries' changes ", function(assert) {
@@ -392,6 +421,28 @@ sap.ui.define([
 				assert.equal(oNewManifest["sap.app"].description, sExpectedDescription, "runtime changes applied correctly");
 				assert.equal(oNewManifest["sap.ui5"].dependencies.minUI5Version, "1.132.1", "build changes applied correctly");
 			});
+		});
+
+		QUnit.test("when calling 'applyInlineChanges'", async function(assert) {
+			const aRawChanges = [{
+				changeType: "appdescr_ui5_addLibraries",
+				content: {
+					libraries: {
+						"descriptor.mocha133": {
+							minVersion: "1.44"
+						}
+					}
+				}
+			}];
+			const aChanges = convertChanges(aRawChanges).map((oChange) => oChange.convertToFileContent());
+			const oGetChangeStub = sandbox.stub(FlexState, "getAppDescriptorChanges").returns(aChanges);
+			const oGetStrategySpy = sandbox.spy(ApplyStrategyFactory, "getRuntimeStrategy");
+
+			await Applier.applyInlineChanges(this.oManifest, aChanges);
+
+			assert.strictEqual(this.fnAddLibrarySpy.callCount, 1, "AddLibrary.applyChange is called once");
+			assert.strictEqual(oGetChangeStub.callCount, 0, "getAppDescriptorChanges is not called");
+			assert.strictEqual(oGetStrategySpy.callCount, 1, "getRuntimeStrategy is called once");
 		});
 	});
 

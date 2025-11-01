@@ -4,12 +4,10 @@
 
 sap.ui.define([
 	"sap/ui/fl/apply/_internal/flexState/changes/UIChangesState",
-	"sap/ui/fl/initial/_internal/ManifestUtils",
-	"sap/ui/fl/Utils"
+	"sap/ui/fl/initial/_internal/ManifestUtils"
 ], function(
 	UIChangesState,
-	ManifestUtils,
-	Utils
+	ManifestUtils
 ) {
 	"use strict";
 
@@ -29,13 +27,7 @@ sap.ui.define([
 		return UIChangesState.getAllUIChanges(sReference);
 	}
 
-	return async function(oAppComponent) {
-		// in most scenarios the appComponent will already be passed, but in iFrame cases (like cFLP) the appComponent is not available
-		// outside of the iFrame. In this case the function is called from inside the iFrame and has to fetch the appComponent
-		if (!oAppComponent) {
-			const oAppLifeCycleService = await Utils.getUShellService("AppLifeCycle");
-			return getAllUIChangesFromChangesState(oAppLifeCycleService.getCurrentApplication().componentInstance);
-		}
-		return getAllUIChangesFromChangesState(oAppComponent);
+	return function(oAppComponent) {
+		return Promise.resolve(getAllUIChangesFromChangesState(oAppComponent));
 	};
 });

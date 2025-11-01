@@ -3,11 +3,9 @@
  */
 
 sap.ui.define([
-	"sap/ui/fl/support/_internal/extractChangeDependencies",
-	"sap/ui/fl/Utils"
+	"sap/ui/fl/support/_internal/extractChangeDependencies"
 ], function(
-	extractChangeDependencies,
-	Utils
+	extractChangeDependencies
 ) {
 	"use strict";
 
@@ -27,13 +25,7 @@ sap.ui.define([
 		return extractChangeDependencies.extract(oAppComponent);
 	}
 
-	return async function(oAppComponent) {
-		// in most scenarios the appComponent will already be passed, but in iFrame cases (like cFLP) the appComponent is not available
-		// outside of the iFrame. In this case the function is called from inside the iFrame and has to fetch the appComponent
-		if (!oAppComponent) {
-			const oAppLifeCycleService = await Utils.getUShellService("AppLifeCycle");
-			return getChangeDependencies(oAppLifeCycleService.getCurrentApplication().componentInstance);
-		}
-		return getChangeDependencies(oAppComponent);
+	return function(oAppComponent) {
+		return Promise.resolve(getChangeDependencies(oAppComponent));
 	};
 });

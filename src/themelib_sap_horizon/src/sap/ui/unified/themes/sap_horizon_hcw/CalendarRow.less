@@ -73,6 +73,8 @@ html.sap-desktop .sapUiCalendarApp:hover:not(:active) > .sapUiCalendarAppCont{
 }
 
 html.sap-desktop .sapUiCalendarApp.sapUiCalendarAppSel:hover:not(:active),
+html.sap-desktop .sapUiCalendarApp.sapUiCalendarAppSel:focus:not(:active) > .sapUiCalendarAppCont,
+html.sap-desktop .sapUiCalendarAppSel:focus:not(:active),
 html.sap-desktop .sapUiCalendarApp.sapUiCalendarAppSel:focus:not(:active){
 	background-color: @sapUiContentSelectedHoverBackground;
 	color: @sapUiContentSelectedTextColor;
@@ -141,6 +143,6 @@ html.sap-desktop .sapUiCalendarApp.sapUiCalendarAppSel:hover:not(:active)  > .sa
 	border-top-color: darken(@sapUiListBorderColor, 15);
 	border-right-color: darken(@sapUiListBorderColor, 15);
 	border-bottom-color: darken(@sapUiListBorderColor, 15);
-	background-color: lighten(@sapUiAccent1, 50);
+	background-color: purple;//lighten(@sapUiAccent1, 50);
 	color: @sapUiListTextColor;
 }
