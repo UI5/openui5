@@ -6299,5 +6299,15 @@
         "text": " sap.m.FormattedText: Formatting issue fixed"
       }
     ]
+  },
+  "1.38.66": {
+    "date": "November 2025",
+    "notes": [
+      {
+        "id": "e2c53374bb1679330fecdb6d3d0728b65aded3ab",
+        "type": "FIX",
+        "text": " sap.m ScrollContainer: unstable QUnit tests are now skipped"
+      }
+    ]
   }
 }

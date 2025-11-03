@@ -360,5 +360,15 @@
         ]
       }
     ]
+  },
+  "1.38.66": {
+    "date": "November 2025",
+    "notes": [
+      {
+        "id": "b93f73b291ee80bb40da63c92ea5138bcf5697bd",
+        "type": "FIX",
+        "text": " sap.uxap.BlockBase: Error with duplicate ID prevented"
+      }
+    ]
   }
 }
