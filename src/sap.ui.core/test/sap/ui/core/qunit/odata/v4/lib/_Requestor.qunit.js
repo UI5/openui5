@@ -1321,6 +1321,9 @@ sap.ui.define([
 					foo : "URL params are ignored for normal requests"
 				}),
 				oResponse = {body : {}, messages : {}, resourcePath : "Employees?custom=value"},
+				sResourcePath = vStatistics
+					? "~Employees~?custom=value&sap-statistics=false"
+					: "~Employees~?custom=value",
 				fnSubmit = this.spy();
 
 			oRequestor.vStatistics = vStatistics;
@@ -1331,10 +1334,7 @@ sap.ui.define([
 				.withExactArgs("Employees?custom=value")
 				.returns("~Employees~?custom=value");
 			this.mock(oRequestor).expects("sendRequest")
-				.withExactArgs("METHOD",
-					vStatistics
-						? "~Employees~?custom=value&sap-statistics=false"
-						: "~Employees~?custom=value",
+				.withExactArgs("METHOD", sResourcePath,
 					{
 						header : "value",
 						"Content-Type" : "application/json;charset=UTF-8;IEEE754Compatible=true"
@@ -1345,7 +1345,7 @@ sap.ui.define([
 				.returns("~oConvertedResponse~");
 			this.mock(oRequestor).expects("reportHeaderMessages")
 				.withExactArgs("~Employees~?custom=value", sinon.match.same(oResponse.messages),
-					"~oConvertedResponse~");
+					"~oConvertedResponse~", sResourcePath);
 			this.mock(oRequestor).expects("submitBatch").never();
 
 			// code under test
@@ -1621,7 +1621,7 @@ sap.ui.define([
 			.withExactArgs(42, undefined).returns("~result~");
 		// Note: in case of "1a", JSON.parse throws (see below) and this call is not reached
 		this.mock(oRequestor).expects("reportHeaderMessages").exactly(sCount === "42" ? 1 : 0)
-			.withExactArgs("~sResourcePath~", "~messages~", "~result~");
+			.withExactArgs("~sResourcePath~", "~messages~", "~result~", "~sResourcePath~");
 
 		// code under test
 		return oRequestor.request("GET", "Employees").then(function (oResult) {
@@ -1644,7 +1644,7 @@ sap.ui.define([
 				sOriginalPath)
 			.returns(Promise.resolve({}));
 		this.mock(oRequestor).expects("reportHeaderMessages")
-			.withExactArgs(sOriginalPath, undefined, undefined);
+			.withExactArgs(sOriginalPath, undefined, undefined, "EMPLOYEES");
 
 		// code under test
 		return oRequestor.request("POST", "EMPLOYEES", this.createGroupLock("$direct"), {}, {},
@@ -1665,7 +1665,7 @@ sap.ui.define([
 		this.mock(oRequestor).expects("doConvertResponse").withExactArgs(undefined, undefined)
 			.returns("~oResult~");
 		this.mock(oRequestor).expects("reportHeaderMessages")
-			.withExactArgs("R#V#C", undefined, "~oResult~");
+			.withExactArgs("R#V#C", undefined, "~oResult~", "converted/EMPLOYEES");
 
 		assert.strictEqual(
 			// code under test
@@ -2529,9 +2529,9 @@ sap.ui.define([
 		oRequestorMock.expects("doConvertResponse").withExactArgs(aResults[1], undefined)
 			.returnsArg(0);
 		oRequestorMock.expects("reportHeaderMessages")
-			.withExactArgs("~Customers", undefined, aResults[1]);
+			.withExactArgs("~Customers", undefined, aResults[1], "~Customers");
 		oRequestorMock.expects("reportHeaderMessages")
-			.withExactArgs("~SalesOrders('42')", undefined, aResults[2]);
+			.withExactArgs("~SalesOrders('42')", undefined, aResults[2], "~SalesOrders('42')");
 		oRequestorMock.expects("doCheckVersionHeader")
 			.withExactArgs(sinon.match.func, "~Products('23')", true).returns("4.0");
 		oJSONMock.expects("parse").withExactArgs(aBatchResults[1].responseText, undefined)
@@ -2539,9 +2539,9 @@ sap.ui.define([
 		oRequestorMock.expects("doConvertResponse").withExactArgs(aResults[0], "~metaPath~")
 			.returnsArg(0);
 		oRequestorMock.expects("reportHeaderMessages")
-			.withExactArgs("~sOriginalResourcePath~", undefined, aResults[0]);
+			.withExactArgs("~sOriginalResourcePath~", undefined, aResults[0], "~Products('23')");
 		oRequestorMock.expects("reportHeaderMessages")
-			.withExactArgs("~Products('4711')", undefined, null);
+			.withExactArgs("~Products('4711')", undefined, null, "~Products('4711')");
 		oRequestorMock.expects("doCheckVersionHeader")
 			.withExactArgs(sinon.match.func, "~Products('onSubmit')", true).returns("4.01");
 		oJSONMock.expects("parse")
@@ -2550,7 +2550,8 @@ sap.ui.define([
 		oRequestorMock.expects("doConvertResponse").withExactArgs(aResults[3], undefined)
 			.returnsArg(0);
 		oRequestorMock.expects("reportHeaderMessages")
-			.withExactArgs("~Products('onSubmit')", undefined, aResults[3]);
+			.withExactArgs("~Products('onSubmit')", undefined, aResults[3],
+				"~Products('onSubmit')");
 		oBatchResponseReceivedExpectation = oRequestorMock.expects("batchResponseReceived")
 			.withExactArgs(sGroupId, sinon.match(function (aRequests) {
 				return aRequests === aMergedRequests;
@@ -2897,7 +2898,7 @@ sap.ui.define([
 			.withExactArgs(sinon.match.same(mHeaders));
 		this.mock(oRequestor).expects("reportHeaderMessages")
 			.withExactArgs("original/resource/path", sinon.match.same(mHeaders["SAP-Messages"]),
-				{id : 42});
+				{id : 42}, "Products(42)");
 
 		return Promise.all([
 			oRequestPromise,
@@ -2917,7 +2918,8 @@ sap.ui.define([
 		this.mock(oModelInterface).expects("onHttpResponse")
 			.withExactArgs(sinon.match.same(mHeaders));
 		this.mock(oRequestor).expects("reportHeaderMessages")
-			.withExactArgs("Products(42)", sinon.match.same(mHeaders["SAP-Messages"]), {});
+			.withExactArgs("Products(42)", sinon.match.same(mHeaders["SAP-Messages"]), {},
+				"Products(42)");
 
 		return Promise.all([
 			oRequestPromise,
@@ -2939,7 +2941,8 @@ sap.ui.define([
 		this.mock(oModelInterface).expects("onHttpResponse")
 			.withExactArgs(sinon.match.same(mHeaders));
 		this.mock(oRequestor).expects("reportHeaderMessages")
-			.withExactArgs("Products(42)", sinon.match.same(mHeaders["SAP-Messages"]), {});
+			.withExactArgs("Products(42)", sinon.match.same(mHeaders["SAP-Messages"]), {},
+				"Products(42)");
 
 		return Promise.all([
 			oRequestPromise,
@@ -4845,22 +4848,46 @@ sap.ui.define([
 
 	//*****************************************************************************************
 	QUnit.test("reportHeaderMessages", function () {
-		var aMessages = [{code : "42", message : "Test"}, {code : "43", type : "Warning"}],
+		var oHelperMock = this.mock(_Helper),
+			aMessages = [{
+				code : "42",
+				message : "Test"
+			}, {
+				code : "43",
+				longtextUrl : "~longtextUrl~",
+				type : "Warning"
+			}],
 			sMessages = JSON.stringify(aMessages),
-			oRequestor = _Requestor.create("/", oModelInterface),
+			oRequestor = _Requestor.create("/sServiceUrl/", oModelInterface),
 			sResourcePath = "Product(42)/to_bar";
 
+		oHelperMock.expects("clone").withExactArgs(aMessages[0]).returns("~clone0~");
+		oHelperMock.expects("clone").withExactArgs(aMessages[1]).returns("~clone1~");
+		oHelperMock.expects("makeAbsolute")
+			.withExactArgs("~longtextUrl~", "/sServiceUrl/~sRequestUrl~")
+			.returns("~absolute longtextUrl~");
 		this.mock(oModelInterface).expects("reportTransitionMessages")
-			.withExactArgs(aMessages, sResourcePath);
+			.withExactArgs([{
+				"@$ui5.originalMessage" : "~clone0~",
+				code : "42",
+				message : "Test"
+			}, {
+				"@$ui5.originalMessage" : "~clone1~",
+				code : "43",
+				longtextUrl : "~absolute longtextUrl~",
+				type : "Warning"
+			}], sResourcePath);
 
 		// code under test
-		oRequestor.reportHeaderMessages(sResourcePath, sMessages);
+		oRequestor.reportHeaderMessages(sResourcePath, sMessages, null, "~sRequestUrl~");
 	});
 
 	//*****************************************************************************************
 	QUnit.test("reportHeaderMessages without messages", function () {
 		var oRequestor = _Requestor.create("/", oModelInterface);
 
+		this.mock(_Helper).expects("clone").never();
+		this.mock(_Helper).expects("makeAbsolute").never();
 		this.mock(oModelInterface).expects("reportTransitionMessages").never();
 
 		// code under test
@@ -4870,6 +4897,8 @@ sap.ui.define([
 	//*****************************************************************************************
 	QUnit.test("reportHeaderMessages for 'R#V#C'", function () {
 		const oRequestor = _Requestor.create("/", oModelInterface);
+		this.mock(_Helper).expects("clone").never();
+		this.mock(_Helper).expects("makeAbsolute").never();
 		this.mock(oModelInterface).expects("reportTransitionMessages").never();
 		const aMessages = [{code : "42", message : "Test"}, {code : "43", type : "Warning"}];
 		const sMessages = JSON.stringify(aMessages);
