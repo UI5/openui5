@@ -64,7 +64,7 @@
                         <l:VerticalLayout
                             width="100%">
                             <custom:TitleLink
-                                href="topic/50eadaac8d2e49ee8996dc2b560cb76b"
+                                href="test-resources/sap/fe/core/fpmExplorer/index.html#/topic/introduction"
                                 text="{i18n>WELCOME_BLOCK_14_TITLE}"
                                 titleStyle="H2"
                                 class="sapUiSmallMarginBottom" />
