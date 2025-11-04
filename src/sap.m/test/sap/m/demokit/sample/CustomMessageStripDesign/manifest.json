@@ -1,0 +1,41 @@
+{
+	"_version": "2.0.0",
+	"sap.app": {
+		"id": "sap.m.sample.CustomMessageStripDesign",
+		"applicationVersion": {
+			"version": "1.0.0"
+		},
+		"type": "application",
+		"title": "Application 'CustomMessageStripDesign'"
+	},
+	"sap.ui": {
+		"technology": "UI5",
+		"deviceTypes": {
+			"desktop": true,
+			"tablet": true,
+			"phone": true
+		}
+	},
+	"sap.ui5": {
+		"rootView": "sap.m.sample.CustomMessageStripDesign.V",
+		"dependencies": {
+			"minUI5Version": "2.0.0",
+			"libs": {
+				"sap.m": {},
+				"sap.ui.core": {},
+				"sap.ui.layout": {}
+			}
+		},
+		"config": {
+			"sample": {
+				"stretch": true,
+				"files": [
+					"V.view.xml",
+					"C.controller.js",
+					"Component.js",
+					"manifest.json"
+				]
+			}
+		}
+	}
+}

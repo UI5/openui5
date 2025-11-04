@@ -599,4 +599,203 @@ sap.ui.define([
 		// Cleanup
 		oMessageStrip.destroy();
 	});
+
+	QUnit.module("Custom Color Properties", {
+		beforeEach: async function() {
+			this.oMessageStrip = new MessageStrip({
+				text: "Test message"
+			});
+
+			this.oMessageStrip.placeAt(DOM_RENDER_LOCATION);
+			await nextUIUpdate();
+		},
+		afterEach: function() {
+			this.oMessageStrip.destroy();
+		}
+	});
+
+	QUnit.test("Default colorSet and colorScheme values", function(assert) {
+		// Assert
+		assert.strictEqual(this.oMessageStrip.getColorSet(), "Default", "colorSet should be Default by default");
+		assert.strictEqual(this.oMessageStrip.getColorScheme(), 1, "colorScheme should be 1 by default");
+	});
+
+	QUnit.test("Setting colorSet property", async function(assert) {
+		// Act
+		this.oMessageStrip.setColorSet("ColorSet1");
+		await nextUIUpdate();
+
+		// Assert
+		assert.strictEqual(this.oMessageStrip.getColorSet(), "ColorSet1", "colorSet should be set to ColorSet1");
+		assert.ok(this.oMessageStrip.$().hasClass("sapMMsgStripColorSet1"), "should add sapMMsgStripColorSet1 CSS class");
+	});
+
+	QUnit.test("Setting colorSet to ColorSet2", async function(assert) {
+		// Act
+		this.oMessageStrip.setColorSet("ColorSet2");
+		await nextUIUpdate();
+
+		// Assert
+		assert.strictEqual(this.oMessageStrip.getColorSet(), "ColorSet2", "colorSet should be set to ColorSet2");
+		assert.ok(this.oMessageStrip.$().hasClass("sapMMsgStripColorSet2"), "should add sapMMsgStripColorSet2 CSS class");
+	});
+
+	QUnit.test("Changing colorSet should remove old CSS class", async function(assert) {
+		// Arrange
+		this.oMessageStrip.setColorSet("ColorSet1");
+		await nextUIUpdate();
+
+		// Act
+		this.oMessageStrip.setColorSet("ColorSet2");
+		await nextUIUpdate();
+
+		// Assert
+		assert.notOk(this.oMessageStrip.$().hasClass("sapMMsgStripColorSet1"), "should remove sapMMsgStripColorSet1 CSS class");
+		assert.ok(this.oMessageStrip.$().hasClass("sapMMsgStripColorSet2"), "should add sapMMsgStripColorSet2 CSS class");
+	});
+
+	QUnit.test("Setting colorScheme property", async function(assert) {
+		// Arrange - first set a colorSet that will use colorScheme
+		this.oMessageStrip.setColorSet("ColorSet1");
+		await nextUIUpdate();
+
+		// Act
+		this.oMessageStrip.setColorScheme(5);
+		await nextUIUpdate();
+
+		// Assert
+		assert.strictEqual(this.oMessageStrip.getColorScheme(), 5, "colorScheme should be set to 5");
+		assert.ok(this.oMessageStrip.$().hasClass("sapMMsgStripColorScheme5"), "should add sapMMsgStripColorScheme5 CSS class");
+	});
+
+	QUnit.test("Setting different colorScheme values", async function(assert) {
+		// Arrange - set colorSet so colorScheme will be applied
+		this.oMessageStrip.setColorSet("ColorSet1");
+		await nextUIUpdate();
+
+		for (var i = 1; i <= 10; i++) {
+			// Act
+			this.oMessageStrip.setColorScheme(i);
+			await nextUIUpdate();
+
+			// Assert
+			assert.strictEqual(this.oMessageStrip.getColorScheme(), i, "colorScheme should be set to " + i);
+			assert.ok(this.oMessageStrip.$().hasClass("sapMMsgStripColorScheme" + i), "should add sapMMsgStripColorScheme" + i + " CSS class");
+		}
+	});
+
+	QUnit.test("Changing colorScheme should remove old CSS class", async function(assert) {
+		// Arrange - set colorSet first so colorScheme classes are applied
+		this.oMessageStrip.setColorSet("ColorSet1");
+		this.oMessageStrip.setColorScheme(3);
+		await nextUIUpdate();
+
+		// Act
+		this.oMessageStrip.setColorScheme(7);
+		await nextUIUpdate();
+
+		// Assert
+		assert.notOk(this.oMessageStrip.$().hasClass("sapMMsgStripColorScheme3"), "should remove sapMMsgStripColorScheme3 CSS class");
+		assert.ok(this.oMessageStrip.$().hasClass("sapMMsgStripColorScheme7"), "should add sapMMsgStripColorScheme7 CSS class");
+	});
+
+	QUnit.test("Both colorSet and colorScheme applied together", async function(assert) {
+		// Act
+		this.oMessageStrip.setColorSet("ColorSet1");
+		this.oMessageStrip.setColorScheme(4);
+		await nextUIUpdate();
+
+		// Assert
+		assert.ok(this.oMessageStrip.$().hasClass("sapMMsgStripColorSet1"), "should have sapMMsgStripColorSet1 CSS class");
+		assert.ok(this.oMessageStrip.$().hasClass("sapMMsgStripColorScheme4"), "should have sapMMsgStripColorScheme4 CSS class");
+	});
+
+	QUnit.test("Clearing colorSet should remove CSS class", async function(assert) {
+		// Arrange
+		this.oMessageStrip.setColorSet("ColorSet1");
+		await nextUIUpdate();
+
+		// Act
+		this.oMessageStrip.setColorSet("Default");
+		await nextUIUpdate();
+
+		// Assert
+		assert.strictEqual(this.oMessageStrip.getColorSet(), "Default", "colorSet should be default again");
+		assert.notOk(this.oMessageStrip.$().hasClass("sapMMsgStripColorSet1"), "should remove sapMMsgStripColorSet1 CSS class");
+	});
+
+	QUnit.test("Resetting colorScheme to default should update CSS class", async function(assert) {
+		// Arrange - set colorSet first so colorScheme classes are applied
+		this.oMessageStrip.setColorSet("ColorSet1");
+		this.oMessageStrip.setColorScheme(8);
+		await nextUIUpdate();
+
+		// Act
+		this.oMessageStrip.setColorScheme(1);
+		await nextUIUpdate();
+
+		// Assert
+		assert.strictEqual(this.oMessageStrip.getColorScheme(), 1, "colorScheme should be reset to 1");
+		assert.notOk(this.oMessageStrip.$().hasClass("sapMMsgStripColorScheme8"), "should remove sapMMsgStripColorScheme8 CSS class");
+		assert.ok(this.oMessageStrip.$().hasClass("sapMMsgStripColorScheme1"), "should add sapMMsgStripColorScheme1 CSS class");
+	});
+
+	QUnit.test("ColorSet and colorScheme with different message types", async function(assert) {
+		var aTypes = ["Information", "Success", "Warning", "Error"];
+
+		for (var i = 0; i < aTypes.length; i++) {
+		// Act
+		this.oMessageStrip.setType(aTypes[i]);
+		this.oMessageStrip.setColorSet("ColorSet2");
+		this.oMessageStrip.setColorScheme(6);
+		await nextUIUpdate();
+
+		// Assert
+		assert.ok(this.oMessageStrip.$().hasClass("sapMMsgStripColorSet2"),
+			"should have colorSet CSS class with " + aTypes[i] + " type");
+		assert.ok(this.oMessageStrip.$().hasClass("sapMMsgStripColorScheme6"),
+			"should have colorScheme CSS class with " + aTypes[i] + " type");
+		assert.notOk(this.oMessageStrip.$().hasClass("sapMMsgStrip" + aTypes[i]),
+			"should not maintain message type CSS class");
+		}
+	});
+
+	QUnit.test("ColorSet and colorScheme persistence after re-rendering", async function(assert) {
+		// Arrange
+		this.oMessageStrip.setColorSet("ColorSet1");
+		this.oMessageStrip.setColorScheme(9);
+		await nextUIUpdate();
+
+		// Act - trigger re-rendering by changing text
+		this.oMessageStrip.setText("New text content");
+		await nextUIUpdate();
+
+		// Assert
+		assert.ok(this.oMessageStrip.$().hasClass("sapMMsgStripColorSet1"),
+			"colorSet CSS class should persist after re-rendering");
+		assert.ok(this.oMessageStrip.$().hasClass("sapMMsgStripColorScheme9"),
+			"colorScheme CSS class should persist after re-rendering");
+	});
+
+	QUnit.test("ColorScheme with invalid values should be handled", async function(assert) {
+		this.oMessageStrip.setColorSet("ColorSet1");
+
+		// Act - test with value outside valid range
+		this.oMessageStrip.setColorScheme(15);
+		await nextUIUpdate();
+
+		// Assert
+		assert.ok(this.oMessageStrip.$().hasClass("sapMMsgStripColorScheme1"),
+			"should add default CSS class based on invalid value");
+
+		// Act - test with negative value
+		this.oMessageStrip.setColorScheme(-2);
+		await nextUIUpdate();
+
+		// Assert
+		assert.strictEqual(this.oMessageStrip.getColorScheme(), -2,
+			"should accept negative integer values");
+		assert.ok(this.oMessageStrip.$().hasClass("sapMMsgStripColorScheme1"),
+			"should add default CSS class based on invalid value");
+	});
 });

@@ -1997,11 +1997,11 @@ sap.ui.define([
 	  */
 
 	 /**
-	  * Marker interface for controls that can be used as content of <code>sap.ui.layout.form.Form</code>
-	  * or <code>sap.ui.layout.form.SimpleForm</code>.
+	  * Marker interface for controls that can be used as content of {@link sap.ui.layout.form.Form}
+	  * or {@link sap.ui.layout.form.SimpleForm}.
 	  *
-	  * If the control's width must not be adjusted by the <code>Form</code> control to meet the cell's width, the
-	  * control must implement the <code>getFormDoNotAdjustWidth</code> function and return <code>true</code>.
+	  * If the control's width must not be adjusted by the {@link sap.ui.layout.form.Form Form} control to meet the cell's width, the
+	  * control must implement the {@link sap.ui.core.IFormContent.getFormDoNotAdjustWidth getFormDoNotAdjustWidth} function and return <code>true</code>.
 	  *
 	  * @since 1.48.0
 	  * @name sap.ui.core.IFormContent
@@ -2022,15 +2022,15 @@ sap.ui.define([
 
 
 	 /**
-	  * Whether a control wants to keep its original width even when used in a <code>Form</code>.
+	  * Whether a control wants to keep its original width even when used in a {@link sap.ui.layout.form.Form Form}.
 	  *
-	  * In the <code>Form</code> control, all content controls are positioned on a grid cell base. By default,
+	  * In the {@link sap.ui.layout.form.Form Form} control, all content controls are positioned on a grid cell base. By default,
 	  * the controls use the full width of the used grid cell. But for some controls (like image controls),
 	  * this is not the desired behavior. In this case the control must keep its original width.
 	  *
 	  * This is an optional method. When not defined, the width of the control might be adjusted.
 	  *
-	  * @returns {boolean} true if the <code>Form</code> is not allowed to adjust the width of the control to use the cell's width
+	  * @returns {boolean} <code>true</code> if the {@link sap.ui.layout.form.Form Form} is not allowed to adjust the width of the control to use the cell's width
 	  * @since 1.48.0
 	  * @public
 	  * @function
@@ -2040,7 +2040,7 @@ sap.ui.define([
 	 /**
 	  * Marker interface for controls that can be used as content of {@link sap.ui.layout.form.SemanticFormElement SemanticFormElement}.
 	  *
-	  * If the value-holding property of the control is not <code>value</code or <code>text</code>, the name of the
+	  * If the value-holding property of the control is not <code>value</code> or <code>text</code>, the name of the
 	  * value-holding property must be returned in the {@link sap.ui.core.ISemanticFormContent.getFormValueProperty getFormValueProperty} function.
 	  *
 	  * If the value of the control needs some special output formatting (to show a description instead of a key), this

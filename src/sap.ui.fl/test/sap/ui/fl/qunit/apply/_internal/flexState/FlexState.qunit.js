@@ -824,6 +824,7 @@ sap.ui.define([
 		beforeEach() {
 			sComponentId = "componentId";
 			this.sReference = "flexReference";
+			this.sSecondReference = "secondReference";
 			this.oVariant = FlexObjectFactory.createFlVariant({
 				id: "myStandardVariant",
 				reference: this.sReference
@@ -841,9 +842,10 @@ sap.ui.define([
 			this.oAppComponent.destroy();
 			FlexState.rebuildFilteredResponse(this.sReference);
 			FlexState.clearRuntimeSteadyObjects(this.sReference, sComponentId);
+			FlexState.clearRuntimeSteadyObjects(this.sSecondReference, sComponentId);
 		}
 	}, function() {
-		QUnit.test("when a fake standard variant is added", function(assert) {
+		QUnit.test("when a fake standard variant is added to an initialized state", function(assert) {
 			assert.strictEqual(
 				FlexState.getFlexObjectsDataSelector().get({ reference: this.sReference }).length,
 				0,
@@ -852,6 +854,32 @@ sap.ui.define([
 
 			FlexState.addRuntimeSteadyObject(this.sReference, sComponentId, this.oVariant);
 			var aFlexObjects = FlexState.getFlexObjectsDataSelector().get({ reference: this.sReference });
+			assert.strictEqual(
+				aFlexObjects.length,
+				1,
+				"then the standard variant flex object is added"
+			);
+			assert.deepEqual(
+				aFlexObjects[0],
+				this.oVariant,
+				"then the standard variant is returned by the data selector"
+			);
+			assert.strictEqual(
+				aFlexObjects[0].getState(),
+				States.LifecycleState.PERSISTED,
+				"the standard variant state is set to persisted"
+			);
+		});
+
+		QUnit.test("when a fake standard variant is added without an initialized state", function(assert) {
+			assert.strictEqual(
+				FlexState.getFlexObjectsDataSelector().get({ reference: this.sSecondReference }).length,
+				0,
+				"then initially no variants flex objects are part of the flex state"
+			);
+
+			FlexState.addRuntimeSteadyObject(this.sSecondReference, sComponentId, this.oVariant);
+			var aFlexObjects = FlexState.getFlexObjectsDataSelector().get({ reference: this.sSecondReference });
 			assert.strictEqual(
 				aFlexObjects.length,
 				1,

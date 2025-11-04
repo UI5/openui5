@@ -217,7 +217,6 @@ function(
 
 			this.destroyTokens();
 			this.updateAggregation("tokens");
-
 		};
 
 		// Override "focusfail" handler, see sap.ui.core.Element#onfocusfail
@@ -285,6 +284,7 @@ function(
 
 			this.updateFormValueProperty();
 			this.invalidate();
+			this._updateFilterSelectedButtonState();
 		}.bind(this));
 
 		this._oTokenizerObserver.observe(oTokenizer, {
@@ -2097,6 +2097,28 @@ function(
 	 */
 	MultiInput.prototype.updateFormValueProperty = function () {
 		this.setProperty("_semanticFormValue", this.getFormFormattedValue(), true);
+	};
+
+	/**
+	 * Updates the state of the mobile dialog's filter-selected button
+	 * @private
+	 */
+	MultiInput.prototype._updateFilterSelectedButtonState = function() {
+		const oSuggestionsPopover = this._getSuggestionsPopover();
+		if (!this.isMobileDevice() || !oSuggestionsPopover) {
+			return;
+		}
+
+		const oButton = oSuggestionsPopover.getFilterSelectedButton();
+		if (!oButton) {
+			return;
+		}
+
+		const iHasTokens = this.getTokens().length > 0;
+
+		if (oButton.getEnabled() !== iHasTokens) {
+			oButton.setEnabled(iHasTokens);
+		}
 	};
 
 	return MultiInput;

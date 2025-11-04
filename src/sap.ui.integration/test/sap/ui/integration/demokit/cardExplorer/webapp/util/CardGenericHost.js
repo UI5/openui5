@@ -15,6 +15,8 @@ sap.ui.define(["sap/ui/integration/Host"], function (Host) {
 					return Promise.resolve("https://services.odata.org/V4/Northwind/Northwind.svc");
 				case "ProductsMockServer":
 					return Promise.resolve("/SEPMRA_PROD_MAN/");
+				case "GraphQLMockServer":
+					return Promise.resolve("/graphql/");
 				default:
 					return null;
 			}

@@ -1518,7 +1518,7 @@ sap.ui.define([
 						"title": "Company Details",
 						"items": [{
 							"icon": {
-								"src": "/images/grass.jpg",
+								"src": "images/grass.jpg",
 								"fitType": "Contain"
 							}
 						}]
@@ -1679,7 +1679,7 @@ sap.ui.define([
 						"items": [
 							{
 								"icon": {
-									"src": "/images/grass.jpg",
+									"src": "images/grass.jpg",
 									"fitType": "Contain"
 								}
 							}
@@ -1918,13 +1918,13 @@ sap.ui.define([
 		var oCardData = {
 			team: [
 				{
-					"iconSrc": "/images/grass.jpg"
+					"iconSrc": "images/grass.jpg"
 				},
 				{
-					"iconSrc": "/images/grass.jpg"
+					"iconSrc": "images/grass.jpg"
 				},
 				{
-					"iconSrc": "/some/invalid/path.jpg"
+					"iconSrc": "some/invalid/path.jpg"
 				}
 			]
 		};
@@ -3289,7 +3289,7 @@ sap.ui.define([
 								"items": [
 									{
 										"type": "Image",
-										"src": "/images/grass.jpg",
+										"src": "images/grass.jpg",
 										"alt": "Picture of grass",
 										"tooltip": "Green grass",
 										"fullWidth": true,
@@ -3309,7 +3309,7 @@ sap.ui.define([
 									},
 									{
 										"type": "Image",
-										"src": "/images/grass.jpg",
+										"src": "images/grass.jpg",
 										"overlay": {
 											"title": "Hello, John",
 											"background": "rgb(34, 38, 43, 0.4)",
@@ -3318,7 +3318,7 @@ sap.ui.define([
 									},
 									{
 										"type": "Image",
-										"src": "/images/grass.jpg",
+										"src": "images/grass.jpg",
 										"overlay": {
 											"title": "Hello, John",
 											"background": "rgb(34, 38, 43, 0.4)",
@@ -3327,7 +3327,7 @@ sap.ui.define([
 									},
 									{
 										"type": "Image",
-										"src": "/images/grass.jpg",
+										"src": "images/grass.jpg",
 										"overlay": {
 											"title": "Hello, John",
 											"background": "rgb(34, 38, 43, 0.4)"
@@ -3335,8 +3335,8 @@ sap.ui.define([
 									},
 									{
 										"type": "Image",
-										"src": "/some/invalid/path.jpg",
-										"fallbackSrc": "/images/grass.jpg",
+										"src": "some/invalid/path.jpg",
+										"fallbackSrc": "images/grass.jpg",
 										"overlay": {
 											"title": "Hello, John",
 											"background": "rgb(34, 38, 43, 0.4)"

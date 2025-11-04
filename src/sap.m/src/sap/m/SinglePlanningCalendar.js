@@ -1362,7 +1362,8 @@ function(
 		var fnHandleCellPress = function(oEvent) {
 			this.fireEvent("cellPress", {
 				startDate: oEvent.getParameter("startDate"),
-				endDate: oEvent.getParameter("endDate")
+				endDate: oEvent.getParameter("endDate"),
+				originalEvent: oEvent.getParameter("originalEvent")
 			});
 		};
 		var fnHandleMoreLinkPress = function(oEvent) {

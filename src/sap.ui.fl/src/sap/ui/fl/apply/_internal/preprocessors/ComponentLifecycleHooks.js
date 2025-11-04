@@ -6,7 +6,6 @@ sap.ui.define([
 	"sap/base/Log",
 	"sap/ui/core/Component",
 	"sap/ui/core/Lib",
-	"sap/ui/fl/apply/_internal/changes/Applier",
 	"sap/ui/fl/apply/_internal/flexState/FlexState",
 	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
 	"sap/ui/fl/initial/_internal/changeHandlers/ChangeHandlerRegistration",
@@ -18,13 +17,11 @@ sap.ui.define([
 	"sap/ui/fl/requireAsync",
 	"sap/ui/fl/Utils",
 	"sap/ui/model/json/JSONModel",
-	"sap/ui/model/odata/ODataUtils",
-	"sap/ui/performance/Measurement"
+	"sap/ui/model/odata/ODataUtils"
 ], function(
 	Log,
 	Component,
 	Lib,
-	ChangesApplier,
 	FlexState,
 	ControlVariantApplyAPI,
 	ChangeHandlerRegistration,
@@ -36,8 +33,7 @@ sap.ui.define([
 	requireAsync,
 	Utils,
 	JSONModel,
-	ODataUtils,
-	Measurement
+	ODataUtils
 ) {
 	"use strict";
 
@@ -55,7 +51,7 @@ sap.ui.define([
 	// in this object a promise is stored for every application component instance
 	// if the same instance is initialized twice the promise is replaced
 	ComponentLifecycleHooks._componentInstantiationPromises = new WeakMap();
-	var oEmbeddedComponentsPromises = {};
+	ComponentLifecycleHooks._embeddedComponents = {};
 
 	async function checkForChangesAndInitializeFlexState(oConfig, oFlexData) {
 		if (StorageUtils.isStorageResponseFilled(oFlexData.data.changes)) {
@@ -115,78 +111,63 @@ sap.ui.define([
 	 * Binds a json model to the component if a vendor change is loaded. This will enable the translation for those changes.
 	 * Used on the NEO stack
 	 * @param {sap.ui.core.Component} oAppComponent - Component instance
+	 * @param {object} oFlexData - Flex Data containing the changes and the messagebundle
 	 */
-	function createVendorTranslationModelIfNecessary(oAppComponent) {
-		const sReference = ManifestUtils.getFlexReferenceForControl(oAppComponent);
-		const oStorageResponse = FlexState.getStorageResponse(sReference);
+	function createVendorTranslationModelIfNecessary(oAppComponent, oFlexData) {
 		if (
-			oStorageResponse.messagebundle
+			oFlexData.messagebundle
 			&& !oAppComponent.getModel("i18nFlexVendor")
-			&& oStorageResponse.changes?.changes?.some((oChange) => {
+			&& oFlexData?.changes?.some((oChange) => {
 				return oChange.layer === Layer.VENDOR;
 			})
 		) {
-			oAppComponent.setModel(new JSONModel(oStorageResponse.messagebundle), "i18nFlexVendor");
+			oAppComponent.setModel(new JSONModel(oFlexData.messagebundle), "i18nFlexVendor");
 		}
 	}
 
-	async function propagateChangesForAppComponent(oAppComponent) {
-		// only manifest with type = "application" will fetch changes
-		const sReference = ManifestUtils.getFlexReferenceForControl(oAppComponent);
-		var oVariantModel;
-		var fnPropagationListener = ChangesApplier.applyAllChangesForControl.bind(
-			ChangesApplier,
+	async function propagateChangesForAppComponent(oAppComponent, sReference) {
+		const Applier = await requireAsync("sap/ui/fl/apply/_internal/changes/Applier");
+		const fnPropagationListener = Applier.applyAllChangesForControl.bind(
+			Applier,
 			oAppComponent,
 			sReference
 		);
 		fnPropagationListener._bIsFlexApplyChangesFunction = true;
 		oAppComponent.addPropagationListener(fnPropagationListener);
-		oVariantModel = ComponentLifecycleHooks._createVariantModel(oAppComponent);
-		await oVariantModel.initialize();
-		Measurement.end("flexProcessing");
-		oAppComponent.setModel(oVariantModel, ControlVariantApplyAPI.getVariantModelName());
-		await checkForRtaStartOnDraftAndReturnResult(oAppComponent);
 	}
 
-	function getChangesAndPropagate(oComponent, vConfig) {
-		// if component's manifest is of type 'application' then only a flex controller and change persistence instances are created.
-		// if component's manifest is of type 'component' then no flex controller and change persistence instances are created.
-		// The variant model is fetched from the outer app component and applied on this component type.
-		if (Utils.isApplicationComponent(oComponent)) {
-			const sComponentId = oComponent.getId();
-			const oReturnPromise = FlexState.initialize({
+	async function handleAppComponentInstanceCreated(oComponent, vConfig) {
+		const sReference = ManifestUtils.getFlexReferenceForControl(oComponent);
+		const oFlexData = await Loader.getFlexData({
+			componentData: oComponent.getComponentData(),
+			asyncHints: vConfig.asyncHints,
+			manifest: oComponent.getManifestObject(),
+			reference: sReference
+		});
+		const sComponentId = oComponent.getId();
+		if (StorageUtils.isStorageResponseFilled(oFlexData.data.changes)) {
+			const FlexState = await requireAsync("sap/ui/fl/apply/_internal/flexState/FlexState");
+			await FlexState.initialize({
 				componentId: sComponentId,
 				asyncHints: vConfig.asyncHints
-			})
-			.then(propagateChangesForAppComponent.bind(this, oComponent))
-			.then(createVendorTranslationModelIfNecessary.bind(this, oComponent))
-			.then(function() {
-				// update any potential embedded component waiting for this app component
-				if (oEmbeddedComponentsPromises[sComponentId]) {
-					oEmbeddedComponentsPromises[sComponentId].forEach(function(oEmbeddedComponent) {
-						var oVariantModel = oComponent.getModel(ControlVariantApplyAPI.getVariantModelName());
-						oEmbeddedComponent.setModel(oVariantModel, ControlVariantApplyAPI.getVariantModelName());
-					});
-					delete oEmbeddedComponentsPromises[sComponentId];
-				}
 			});
-			ComponentLifecycleHooks._componentInstantiationPromises.set(oComponent, oReturnPromise);
-
-			return oReturnPromise;
-		} else if (Utils.isEmbeddedComponent(oComponent)) {
-			var oAppComponent = Utils.getAppComponentForControl(oComponent);
-			// once the VModel is set to the outer component it also has to be set to any embedded component
-			if (ComponentLifecycleHooks._componentInstantiationPromises.has(oAppComponent)) {
-				return ComponentLifecycleHooks._componentInstantiationPromises.get(oAppComponent).then(function() {
-					var oVariantModel = oAppComponent.getModel(ControlVariantApplyAPI.getVariantModelName());
-					oComponent.setModel(oVariantModel, ControlVariantApplyAPI.getVariantModelName());
-				});
-			}
-			oEmbeddedComponentsPromises[oAppComponent.getId()] = oEmbeddedComponentsPromises[oAppComponent.getId()] || [];
-			oEmbeddedComponentsPromises[oAppComponent.getId()].push(oComponent);
-			return Promise.resolve();
+			await propagateChangesForAppComponent(oComponent, sReference);
+			createVendorTranslationModelIfNecessary(oComponent, oFlexData.data.changes);
 		}
-		return Promise.resolve();
+
+		const oVariantModel = ComponentLifecycleHooks._createVariantModel(oComponent);
+		await oVariantModel.initialize();
+		oComponent.setModel(oVariantModel, ControlVariantApplyAPI.getVariantModelName());
+
+		if (ComponentLifecycleHooks._embeddedComponents[sComponentId]) {
+			ComponentLifecycleHooks._embeddedComponents[sComponentId].forEach(function(oEmbeddedComponent) {
+				const oVariantModel = oComponent.getModel(ControlVariantApplyAPI.getVariantModelName());
+				oEmbeddedComponent.setModel(oVariantModel, ControlVariantApplyAPI.getVariantModelName());
+			});
+			delete ComponentLifecycleHooks._embeddedComponents[sComponentId];
+		}
+		// if there are only changes in the draft, RTA restart is relevant even without changes in the current storage response
+		await checkForRtaStartOnDraftAndReturnResult(oComponent);
 	}
 
 	async function onLoadComponent(oConfig, oManifest) {
@@ -229,8 +210,26 @@ sap.ui.define([
 	 * @param {object} vConfig - Configuration of loaded component
 	 * @returns {Promise} Promise which resolves when all relevant tasks for changes propagation have been processed
 	 */
-	ComponentLifecycleHooks.instanceCreatedHook = function(...aArgs) {
-		return getChangesAndPropagate(...aArgs);
+	ComponentLifecycleHooks.instanceCreatedHook = async function(oComponent, vConfig) {
+		// if component's manifest is of type 'application' then only a flex controller and change persistence instances are created.
+		// if component's manifest is of type 'component' then no flex controller and change persistence instances are created.
+		// The variant model is fetched from the outer app component and applied on this component type.
+		if (Utils.isApplicationComponent(oComponent)) {
+			const oReturnPromise = await handleAppComponentInstanceCreated(oComponent, vConfig);
+			ComponentLifecycleHooks._componentInstantiationPromises.set(oComponent, oReturnPromise);
+			return oReturnPromise;
+		} else if (Utils.isEmbeddedComponent(oComponent)) {
+			const oAppComponent = Utils.getAppComponentForControl(oComponent);
+			// once the VModel is set to the outer component it also has to be set to any embedded component
+			if (ComponentLifecycleHooks._componentInstantiationPromises.has(oAppComponent)) {
+				await ComponentLifecycleHooks._componentInstantiationPromises.get(oAppComponent);
+				const oVariantModel = oAppComponent.getModel(ControlVariantApplyAPI.getVariantModelName());
+				oComponent.setModel(oVariantModel, ControlVariantApplyAPI.getVariantModelName());
+			}
+			ComponentLifecycleHooks._embeddedComponents[oAppComponent.getId()] ||= [];
+			ComponentLifecycleHooks._embeddedComponents[oAppComponent.getId()].push(oComponent);
+		}
+		return undefined;
 	};
 
 	/**

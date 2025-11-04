@@ -214,7 +214,7 @@ sap.ui.define([
 			vBody,
 			sMethod = oRequestConfig.method && oRequestConfig.method.toUpperCase() || "GET";
 
-		if ( !sUrl.startsWith("/")) {
+		if (!sUrl.startsWith("/")) {
 			sUrl = this._getRuntimeUrl(oRequestConfig.url);
 		}
 

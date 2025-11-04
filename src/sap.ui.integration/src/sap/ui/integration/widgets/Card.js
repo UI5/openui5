@@ -1755,6 +1755,7 @@ sap.ui.define([
 	 *
 	 * @example
 	 * oCard.getRuntimeUrl("images/Avatar.png") === "{cardBaseUrl}/images/Avatar.png"
+	 * oCard.getRuntimeUrl("/images/Avatar.png") === "/images/Avatar.png" (remains relative to host root)
 	 * oCard.getRuntimeUrl("http://www.someurl.com/Avatar.png") === "http://www.someurl.com/Avatar.png"
 	 * oCard.getRuntimeUrl("https://www.someurl.com/Avatar.png") === "https://www.someurl.com/Avatar.png"
 	 *
@@ -1763,11 +1764,11 @@ sap.ui.define([
 	 * @returns {string} The resolved URL.
 	 */
 	Card.prototype.getRuntimeUrl = function (sUrl) {
+		if (!sUrl) {
+			sUrl = "";
+		}
 
-		var sAppId = this._oCardManifest ? this._oCardManifest.get("/sap.app/id") : null,
-			sAppName,
-			sSanitizedUrl = sUrl && sUrl.trim().replace(/^\//, "");
-
+		const sAppId = this._oCardManifest ? this._oCardManifest.get("/sap.app/id") : null;
 		if (sAppId === null) {
 			Log.error("The manifest is not ready so the URL can not be resolved. Consider using the 'manifestReady' event.", "sap.ui.integration.widgets.Card");
 			return null;
@@ -1780,7 +1781,13 @@ sap.ui.define([
 			return sUrl;
 		}
 
-		sAppName = sAppId.replace(/\./g, "/");
+		if (sUrl.startsWith("/")) {
+			// urls which are absolute to the server root are not changed
+			return sUrl;
+		}
+
+		const sSanitizedUrl = sUrl && sUrl.trim().replace(/^\//, "");
+		const sAppName = sAppId.replace(/\./g, "/");
 
 		// do not use sap.ui.require.toUrl(sAppName + "/" + sSanitizedUrl)
 		// because it doesn't work when the sSanitizedUrl starts with ".."
@@ -3354,7 +3361,7 @@ sap.ui.define([
 			}
 		} else {
 			oChildCard.setManifest(vManifest);
-			oChildCard.setBaseUrl(sBaseUrl || this.getRuntimeUrl("/"));
+			oChildCard.setBaseUrl(sBaseUrl || this.getRuntimeUrl());
 		}
 
 		return oChildCard;

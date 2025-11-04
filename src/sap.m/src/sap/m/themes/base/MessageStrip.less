@@ -16,6 +16,216 @@
 	&[data-sap-ui-ms-closable='true'] > .sapMMsgStripMessage {
 		margin-right: 1.25rem;
 	}
+
+	/* ColorSet1 styles - Using SAP Indication Colors 1-10 */
+	&.sapMMsgStripColorSet1 {
+		&.sapMMsgStripColorScheme1 {
+			background-color: var(--sapIndicationColor_1_Background);
+			border-color: var(--sapIndicationColor_1_BorderColor);
+		}
+
+		&.sapMMsgStripColorScheme2 {
+			background-color: var(--sapIndicationColor_2_Background);
+			border-color: var(--sapIndicationColor_2_BorderColor);
+		}
+
+		&.sapMMsgStripColorScheme3 {
+			background-color: var(--sapIndicationColor_3_Background);
+			border-color: var(--sapIndicationColor_3_BorderColor);
+		}
+
+		&.sapMMsgStripColorScheme4 {
+			background-color: var(--sapIndicationColor_4_Background);
+			border-color: var(--sapIndicationColor_4_BorderColor);
+		}
+
+		&.sapMMsgStripColorScheme5 {
+			background-color: var(--sapIndicationColor_5_Background);
+			border-color: var(--sapIndicationColor_5_BorderColor);
+		}
+
+		&.sapMMsgStripColorScheme6 {
+			background-color: var(--sapIndicationColor_6_Background);
+			border-color: var(--sapIndicationColor_6_BorderColor);
+		}
+
+		&.sapMMsgStripColorScheme7 {
+			background-color: var(--sapIndicationColor_7_Background);
+			border-color: var(--sapIndicationColor_7_BorderColor);
+		}
+
+		&.sapMMsgStripColorScheme8 {
+			background-color: var(--sapIndicationColor_8_Background);
+			border-color: var(--sapIndicationColor_8_BorderColor);
+		}
+
+		&.sapMMsgStripColorScheme9 {
+			background-color: var(--sapIndicationColor_9_Background);
+			border-color: var(--sapIndicationColor_9_BorderColor);
+		}
+
+		&.sapMMsgStripColorScheme10 {
+			background-color: var(--sapIndicationColor_10_Background);
+			border-color: var(--sapIndicationColor_10_BorderColor);
+		}
+
+		/* Text styles for ColorSet1 */
+		.sapMText {
+			color: var(--sapContent_ContrastTextColor);
+			text-shadow: var(--sapContent_ContrastTextShadow);
+		}
+
+		/* Link styles for ColorSet1 */
+		.sapLink,
+		.sapLink:hover,
+		.sapLink:focus,
+		.sapLink:active,
+		.sapMMsgStripMessage > .sapMLnk:not(.sapMLnkDsbl) {
+			color: var(--sapContent_ContrastTextColor) !important;
+			text-decoration: underline !important;
+			text-shadow: var(--sapContent_ContrastTextShadow);
+		}
+
+		/* Icon styles for ColorSet1 */
+		.sapMMsgStripIcon,
+		.sapMBtnIcon::before,
+		.sapMBtn:hover > .sapMBtnHoverable {
+			color: var(--sapContent_ContrastIconColor);
+			text-shadow: var(--sapContent_ContrastTextShadow);
+		}
+
+		/* Button HOVER styles in ColorSet1 */
+		.sapMBtn:hover > .sapMBtnHoverable {
+			background-color: var(--sapMessage_Button_Hover_Background);
+			border-color: var(--sapContent_ContrastIconColor);
+		}
+
+		/* Button FOCUS styles in ColorSet1 */
+		.sapMBtn:focus-visible > .sapMFocusable:not(.sapMBadgeIndicator)::before,
+		.sapMBtn:focus > .sapMFocusable:not(.sapMBadgeIndicator)::before {
+			border-color: var(--sapContent_ContrastFocusColor) !important;
+		}
+
+		/* Button DOWN STATE styles in ColorSet1 */
+		:not(.sapMBtnDisabled) > .sapMBtnBack.sapMBtnActive,
+		:not(.sapMBtnDisabled):hover > .sapMBtnBack.sapMBtnActive,
+		:not(.sapMBtnDisabled) > .sapMBtnTransparent.sapMBtnActive,
+		:not(.sapMBtnDisabled):hover > .sapMBtnTransparent.sapMBtnActive,
+		:not(.sapMBtnDisabled) > .sapMBtnGhost.sapMBtnActive,
+		:not(.sapMBtnDisabled):hover > .sapMBtnGhost.sapMBtnActive {
+			color: var(--sapContent_ContrastIconColor);
+			text-shadow: var(--sapContent_ContrastTextShadow);
+			background: none;
+			border-color: var(--sapContent_ContrastIconColor);
+		}
+	}
+
+	/* ColorSet2 styles - Using SAP Indication Color "b" variants for different colors */
+	&.sapMMsgStripColorSet2 {
+		&.sapMMsgStripColorScheme1 {
+			background-color: var(--sapIndicationColor_1b_Background);
+			border-color: var(--sapIndicationColor_1b_BorderColor);
+		}
+
+		&.sapMMsgStripColorScheme2 {
+			background-color: var(--sapIndicationColor_2b_Background);
+			border-color: var(--sapIndicationColor_2b_BorderColor);
+		}
+
+		&.sapMMsgStripColorScheme3 {
+			background-color: var(--sapIndicationColor_3b_Background);
+			border-color: var(--sapIndicationColor_3b_BorderColor);
+		}
+
+		&.sapMMsgStripColorScheme4 {
+			background-color: var(--sapIndicationColor_4b_Background);
+			border-color: var(--sapIndicationColor_4b_BorderColor);
+		}
+
+		&.sapMMsgStripColorScheme5 {
+			background-color: var(--sapIndicationColor_5b_Background);
+			border-color: var(--sapIndicationColor_5b_BorderColor);
+		}
+
+		&.sapMMsgStripColorScheme6 {
+			background-color: var(--sapIndicationColor_6b_Background);
+			border-color: var(--sapIndicationColor_6b_BorderColor);
+		}
+
+		&.sapMMsgStripColorScheme7 {
+			background-color: var(--sapIndicationColor_7b_Background);
+			border-color: var(--sapIndicationColor_7b_BorderColor);
+		}
+
+		&.sapMMsgStripColorScheme8 {
+			background-color: var(--sapIndicationColor_8b_Background);
+			border-color: var(--sapIndicationColor_8b_BorderColor);
+		}
+
+		&.sapMMsgStripColorScheme9 {
+			background-color: var(--sapIndicationColor_9b_Background);
+			border-color: var(--sapIndicationColor_9b_BorderColor);
+		}
+
+		&.sapMMsgStripColorScheme10 {
+			background-color: var(--sapIndicationColor_10b_Background);
+			border-color: var(--sapIndicationColor_10b_BorderColor);
+		}
+
+		/* Text styles for ColorSet2 */
+		.sapMText {
+			color: var(--sapTextColor);
+			text-shadow: none !important;
+		}
+
+		/* Link styles for ColorSet2 */
+		.sapLink,
+		.sapLink:hover,
+		.sapLink:focus,
+		.sapLink:active,
+		.sapMMsgStripMessage > .sapMLnk:not(.sapMLnkDsbl) {
+			color: var(--sapLink_SubtleColor) !important;
+			text-decoration: underline !important;
+			text-shadow: none !important;
+		}
+
+		/* Icon styles for ColorSet2 */
+		.sapMMsgStripIcon,
+		.sapMBtnIcon::before,
+		.sapMBtn:hover > .sapMBtnHoverable {
+			color: var(--sapContent_IconColor);
+		}
+
+		/* Button HOVER styles in ColorSet2 */
+		.sapMBtn:hover > .sapMBtnHoverable {
+			background-color: var(--sapMessage_Button_Hover_Background);
+			border-color: var(--sapContent_IconColor);
+		}
+
+		/* Button FOCUS styles in ColorSet2 */
+		.sapMBtn:focus-visible > .sapMFocusable:not(.sapMBadgeIndicator)::before,
+		.sapMBtn:focus > .sapMFocusable:not(.sapMBadgeIndicator)::before {
+			border-color: var(--sapContent_FocusColor) !important;
+			background: none !important;
+		}
+
+		.sapMLnk:not(.sapMLnkDsbl):focus {
+			color: var(--sapContent_ContrastFocusColor) !important;
+		}
+
+		/* Button DOWN STATE styles in ColorSet2 */
+		:not(.sapMBtnDisabled) > .sapMBtnBack.sapMBtnActive,
+		:not(.sapMBtnDisabled):hover > .sapMBtnBack.sapMBtnActive,
+		:not(.sapMBtnDisabled) > .sapMBtnTransparent.sapMBtnActive,
+		:not(.sapMBtnDisabled):hover > .sapMBtnTransparent.sapMBtnActive,
+		:not(.sapMBtnDisabled) > .sapMBtnGhost.sapMBtnActive,
+		:not(.sapMBtnDisabled):hover > .sapMBtnGhost.sapMBtnActive {
+			color: var(--sapContent_IconColor);
+			text-shadow: none;
+			background: none;
+			border-color: var(--sapContent_IconColor);
+		}
+	}
 }
 
 html[data-sap-ui-animation='on'] {
@@ -40,7 +250,7 @@ html[data-sap-ui-animation='on'] {
 	font-size: 1rem;
 	text-align: center;
 
-	& ~ .sapMMsgStripMessage {
+	&~.sapMMsgStripMessage {
 		margin-left: 1.5rem;
 	}
 }

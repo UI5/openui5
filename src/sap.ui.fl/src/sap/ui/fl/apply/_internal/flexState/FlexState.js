@@ -12,6 +12,7 @@ sap.ui.define([
 	"sap/ui/core/Component",
 	"sap/ui/fl/apply/_internal/flexObjects/FlexObjectFactory",
 	"sap/ui/fl/apply/_internal/flexObjects/States",
+	"sap/ui/fl/apply/_internal/flexState/changes/DependencyHandler",
 	"sap/ui/fl/apply/_internal/flexState/DataSelector",
 	"sap/ui/fl/apply/_internal/flexState/InitialPrepareFunctions",
 	"sap/ui/fl/initial/_internal/Loader",
@@ -30,6 +31,7 @@ sap.ui.define([
 	Component,
 	FlexObjectFactory,
 	States,
+	DependencyHandler,
 	DataSelector,
 	InitialPrepareFunctions,
 	Loader,
@@ -224,6 +226,7 @@ sap.ui.define([
 		var oRuntimePersistence = {
 			flexObjects: createFlexObjects(oStorageResponse),
 			runtimeOnlyData: {
+				liveDependencyMap: DependencyHandler.createEmptyDependencyMap(),
 				flexObjects: []
 			}
 		};
@@ -603,6 +606,9 @@ sap.ui.define([
 	 * @param {object} oFlexObject - Flex object to be added as runtime-steady
 	 */
 	FlexState.addRuntimeSteadyObject = function(sReference, sComponentId, oFlexObject) {
+		if (!_mInstances[sReference]) {
+			initializeEmptyState(sReference, sComponentId);
+		}
 		// with setting the state to persisted it is made sure that they not show up as a dirty flex object
 		oFlexObject.setState(States.LifecycleState.PERSISTED);
 		_mExternalData.flexObjects[sReference] ||= {};
