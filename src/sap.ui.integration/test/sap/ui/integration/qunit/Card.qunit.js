@@ -881,7 +881,7 @@ sap.ui.define([
 			await nextCardReadyEvent(oCard);
 
 			// Assert
-			assert.strictEqual(oCard.getRuntimeUrl("/"), "http://someurltest/", "The given baseUrl is used for card base url.");
+			assert.strictEqual(oCard.getRuntimeUrl(), "http://someurltest/", "The given baseUrl is used for card base url.");
 
 			// Clean up
 			oCard.destroy();
@@ -1108,8 +1108,8 @@ sap.ui.define([
 					["./", sBaseUrl + "/./"],
 					["./images/Avatar.png", sBaseUrl + "/./images/Avatar.png"],
 
-					["/", sBaseUrl + "/"],
-					["/some.json", sBaseUrl + "/some.json"],
+					["/", "/"],
+					["/some.json", "/some.json"],
 
 					["../some.json", sBaseUrl + "/../some.json"],
 

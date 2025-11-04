@@ -36,7 +36,7 @@
 		},
 		"header": {
 			"icon": {
-				"src": "./../../images/DonnaMoore.png"
+				"src": "./images/DonnaMoore.png"
 			},
 			"title": "Donna Moore",
 			"subtitle": "Purchase Requisition"

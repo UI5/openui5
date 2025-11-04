@@ -1,0 +1,138 @@
+<mvc:View
+	controllerName="sap.m.sample.CustomMessageStripDesign.C"
+	xmlns:l="sap.ui.layout"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:core="sap.ui.core"
+	xmlns="sap.m">
+
+	<l:VerticalLayout
+		class="sapUiContentPadding"
+		id="oVerticalContent"
+		width="100%">
+		<l:content>
+
+			<!-- Control Panel -->
+			<Panel headerText="ColorSet Configuration" class="sapUiMediumMarginBottom">
+				<content>
+					<l:HorizontalLayout>
+						<l:content>
+							<Label text="ColorSet:" class="sapUiSmallMarginEnd sapUiSmallMarginTop"/>
+							<Select id="colorSetSelect" class="sapUiMediumMarginEnd" change="onColorSetChange">
+								<items>
+									<core:Item key="1" text="ColorSet 1"/>
+									<core:Item key="2" text="ColorSet 2"/>
+								</items>
+							</Select>
+						</l:content>
+					</l:HorizontalLayout>
+				</content>
+			</Panel>
+
+			<!-- MessageStrip Examples -->
+			<Panel headerText="All Color Schemes (1-10)" class="sapUiMediumMarginBottom">
+				<content>
+					<MessageStrip
+						id="messageStrip_scheme1"
+						text="Color Scheme 1 - Information message"
+						type="Information"
+						colorSet="ColorSet1"
+						colorScheme="1"
+						showIcon="true"
+						showCloseButton="true"
+						class="sapUiSmallMarginBottom"/>
+
+					<MessageStrip
+						id="messageStrip_scheme2"
+						text="Color Scheme 2 - Success message"
+						type="Success"
+						colorSet="ColorSet1"
+						colorScheme="2"
+						showIcon="true"
+						showCloseButton="true"
+						class="sapUiSmallMarginBottom"/>
+
+					<MessageStrip
+						id="messageStrip_scheme3"
+						text="Color Scheme 3 - Warning message"
+						type="Warning"
+						colorSet="ColorSet1"
+						colorScheme="3"
+						showIcon="true"
+						showCloseButton="true"
+						class="sapUiSmallMarginBottom"/>
+
+					<MessageStrip
+						id="messageStrip_scheme4"
+						text="Color Scheme 4 - Error message"
+						type="Error"
+						colorSet="ColorSet1"
+						colorScheme="4"
+						showIcon="true"
+						showCloseButton="true"
+						class="sapUiSmallMarginBottom"/>
+
+					<MessageStrip
+						id="messageStrip_scheme5"
+						text="Color Scheme 5 - Information message"
+						type="Information"
+						colorSet="ColorSet1"
+						colorScheme="5"
+						showIcon="true"
+						showCloseButton="true"
+						class="sapUiSmallMarginBottom"/>
+
+					<MessageStrip
+						id="messageStrip_scheme6"
+						text="Color Scheme 6 - Success message"
+						type="Success"
+						colorSet="ColorSet1"
+						colorScheme="6"
+						showIcon="true"
+						showCloseButton="true"
+						class="sapUiSmallMarginBottom"/>
+
+					<MessageStrip
+						id="messageStrip_scheme7"
+						text="Color Scheme 7 - Warning message"
+						type="Warning"
+						colorSet="ColorSet1"
+						colorScheme="7"
+						showIcon="true"
+						showCloseButton="true"
+						class="sapUiSmallMarginBottom"/>
+
+					<MessageStrip
+						id="messageStrip_scheme8"
+						text="Color Scheme 8 - Error message"
+						type="Error"
+						colorSet="ColorSet1"
+						colorScheme="8"
+						showIcon="true"
+						showCloseButton="true"
+						class="sapUiSmallMarginBottom"/>
+
+					<MessageStrip
+						id="messageStrip_scheme9"
+						text="Color Scheme 9 - Information message"
+						type="Information"
+						colorSet="ColorSet1"
+						colorScheme="9"
+						showIcon="true"
+						showCloseButton="true"
+						class="sapUiSmallMarginBottom"/>
+
+					<MessageStrip
+						id="messageStrip_scheme10"
+						text="Color Scheme 10 - Success message"
+						type="Success"
+						colorSet="ColorSet1"
+						colorScheme="10"
+						showIcon="true"
+						showCloseButton="true"
+						class="sapUiSmallMarginBottom"/>
+				</content>
+			</Panel>
+
+		</l:content>
+	</l:VerticalLayout>
+</mvc:View>

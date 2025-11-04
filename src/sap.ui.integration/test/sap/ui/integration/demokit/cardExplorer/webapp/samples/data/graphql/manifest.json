@@ -27,11 +27,16 @@
 					"value": "100000000",
 					"type": "string"
 				}
+			},
+			"destinations": {
+				"GraphQLMockServer": {
+					"name": "GraphQLMockServer"
+				}
 			}
 		},
 		"data": {
 			"request": {
-				"url": "/graphql",
+				"url": "{{destinations.GraphQLMockServer}}",
 				"method": "POST",
 				"headers": {
 					"Content-Type": "application/json"

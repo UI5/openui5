@@ -39,6 +39,9 @@ sap.ui.define([
 	// shortcut for sap.m.ButtonType
 	var ButtonType = library.ButtonType;
 
+	// shortcut for sap.m.MessageStripColorSet enum
+	var MessageStripColorSet = library.MessageStripColorSet;
+
 	/**
 	 * Constructor for a new MessageStrip.
 	 *
@@ -49,6 +52,7 @@ sap.ui.define([
 	 * MessageStrip is a control that enables the embedding of application-related messages in the application.
 	 * <h3>Overview</h3>
 	 * The message strip displays 4 types of messages, each with a corresponding semantic color and icon: Information, Success, Warning and Error.
+	 * Additionally, it supports custom color schemes through ColorSet1 and ColorSet2 design types, each providing 10 predefined color variations.
 	 *
 	 * Each message can have a close button, so that it can be removed from the UI if needed.
 	 *
@@ -65,10 +69,14 @@ sap.ui.define([
 	 * <li>&lt;br&gt;</li>
 	 * </ul>
 	 *
+	 * <h3>Color Schemes</h3>
+	 * When using ColorSet1 or ColorSet2 as the design type, you can specify a <code>colorScheme</code> from "1" to "10" to apply different color variations.
+	 * This allows for better visual categorization and theming flexibility while maintaining accessibility standards.
+	 *
 	 * <h3>Dynamically generated Message Strip</h3>
 	 * To meet the accessibility requirements when using dynamically generated Message Strip you must implement it alongside <code>sap.ui.core.InvisibleMessage</code>.
 	 * This will allow screen readers to announce it in real time. We suggest such dynamically generated message strips to be announced as Information Bar,
-	 * as shown in our “Dynamic Message Strip Generator sample.”
+	 * as shown in our "Dynamic Message Strip Generator sample."
 	 *
 	 * <h3>Usage</h3>
 	 * <h4>When to use</h4>
@@ -109,8 +117,34 @@ sap.ui.define([
 				type: { type: "sap.ui.core.message.MessageType", group: "Appearance", defaultValue: MessageType.Information },
 
 				/**
+				 * Determines the color set variant of the MessageStrip.
+				 * Available options:
+				 * <ul>
+				 * <li><b>Default</b> - Uses standard semantic colors based on the type property (Information, Success, Warning, Error)</li>
+				 * <li><b>ColorSet1</b> - Uses a custom color palette with 10 predefined color schemes</li>
+				 * <li><b>ColorSet2</b> - Uses an alternative custom color palette with 10 predefined color schemes</li>
+				 * </ul>
+				 * When ColorSet1 or ColorSet2 is selected, the <code>colorScheme</code> property determines which of the 10 color variations is applied.
+				 *
+				 * <b>Note:</b> When using ColorSet1 or ColorSet2 designs, the type property is still used for semantic purposes but will be ignored for visual styling.
+				 *
+				 * @since 1.143.0
+				 */
+				colorSet: { type: "sap.m.MessageStripColorSet", group: "Appearance", defaultValue: MessageStripColorSet.Default },
+
+				/**
+				 * Determines the color scheme when using ColorSet1 or ColorSet2 colorSet variants.
+				 * Available values are 1 through 10, each providing a different color variation.
+				 * This property is only effective when <code>colorSet</code> is set to "ColorSet1" or "ColorSet2".
+				 *
+				 * @since 1.143.0
+				 */
+				colorScheme: { type: "int", group: "Appearance", defaultValue: 1 },
+
+				/**
 				 * Determines a custom icon which is displayed.
 				 * If none is set, the default icon for this message type is used.
+				 * <b>Note</b>: For ColorSet1 and ColorSet2 designs, no default icon is displayed unless explicitly provided.
 				 */
 				customIcon: { type: "sap.ui.core.URI", group: "Appearance", defaultValue: "" },
 
@@ -357,6 +391,36 @@ sap.ui.define([
 		return this.getId() + "-info" + " " + sTextId;
 	};
 
+	/**
+	 * Gets the CSS class for the current colorSet type and color scheme.
+	 * @returns {string} The CSS class name
+	 * @private
+	 */
+	MessageStrip.prototype._getColorSetClass = function () {
+		var sColorSet = this.getColorSet();
+		var iColorScheme = this.getColorScheme();
+		var sType = this.getType();
+		var sRootClass = MSUtils.CLASSES.ROOT;
+
+		if (iColorScheme < 1 || iColorScheme > 10) {
+			Log.warning("sap.m.MessageStrip: colorScheme value is set to the default value of 1. Provided value should be between 1 and 10");
+			iColorScheme = 1;
+		}
+
+		// ColorSet-based classes
+		var mColorSetClasses = {
+			[MessageStripColorSet.Default]: `${sRootClass}${sType}`,
+			[MessageStripColorSet.ColorSet1]: `${sRootClass}ColorSet1 ${sRootClass}ColorScheme${iColorScheme}`,
+			[MessageStripColorSet.ColorSet2]: `${sRootClass}ColorSet2 ${sRootClass}ColorScheme${iColorScheme}`
+		};
+
+		if (!mColorSetClasses[sColorSet]) {
+			// Fallback to Default colorSet if an unsupported colorSet is provided
+			sColorSet = MessageStripColorSet.Default;
+		}
+
+		return `${sRootClass} ${mColorSetClasses[sColorSet]}`;
+	};
 
 	MessageStrip.prototype.exit = function () {
 		if (this._oInvisibleText) {

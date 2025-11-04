@@ -140,9 +140,11 @@
 						<td>string</td>
 						<td>Yes</td>
 						<td></td>
-						<td>The URL of the request. Relative paths like
-							"data.json", "./data.json" and "../data.json"
-							are going to be resolved relatively to the manifest base path.
+						<td>
+							The URL of the request.<br>
+							It is recommended to use a <a target="_parent" href="../../../index.html#/learn/configuration/destinations">destination</a> or an absolute URL.<br>
+							Relative paths, such as "data.json" and "./data.json", will be resolved relative to the card's base folder.<br>
+							<b>Note:</b> Do not use paths that are relative to the host root, such as "/data.json".
 						</td>
 						<td>1.14.0</td>
 						<td>1.65</td>

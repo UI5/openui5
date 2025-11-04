@@ -41,8 +41,7 @@ MessageStripRenderer.render = function(oRm, oControl) {
 
 MessageStripRenderer.startMessageStrip = function (oRm, oControl) {
 	oRm.openStart("div", oControl);
-	oRm.class(MSUtils.CLASSES.ROOT);
-	oRm.class(MSUtils.CLASSES.ROOT + oControl.getType());
+	oRm.class(oControl._getColorSetClass());
 
 	oRm.attr(MSUtils.ATTRIBUTES.CLOSABLE, oControl.getShowCloseButton());
 	oRm.accessibilityState(oControl, this.getAccessibilityState.call(oControl));

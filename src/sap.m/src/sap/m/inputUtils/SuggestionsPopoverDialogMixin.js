@@ -280,7 +280,8 @@ sap.ui.define([
 
 			return new ToggleButton({
 				icon: sIconURI,
-				tooltip: sSelectedItemsIconText
+				tooltip: sSelectedItemsIconText,
+				enabled: false
 			});
 		}
 

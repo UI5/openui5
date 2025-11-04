@@ -15,7 +15,6 @@ sap.ui.define([
 	"sap/ui/fl/changeHandler/ChangeAnnotation",
 	"sap/ui/fl/initial/_internal/changeHandlers/ChangeHandlerRegistration",
 	"sap/ui/fl/initial/_internal/Loader",
-	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/initial/_internal/Settings",
 	"sap/ui/fl/initial/_internal/Storage",
 	"sap/ui/fl/initial/_internal/StorageUtils",
@@ -37,7 +36,6 @@ sap.ui.define([
 	ChangeAnnotation,
 	ChangeHandlerRegistration,
 	Loader,
-	ManifestUtils,
 	Settings,
 	Storage,
 	StorageUtils,
@@ -47,11 +45,22 @@ sap.ui.define([
 ) {
 	"use strict";
 	var sandbox = sinon.createSandbox();
+	const sReference = "componentId";
+
+	function cleanup() {
+		if (this.oAppComponent) {
+			this.oAppComponent.destroy();
+			ComponentLifecycleHooks._componentInstantiationPromises.delete(this.oAppComponent);
+		}
+		Loader.clearCache();
+		ComponentLifecycleHooks._embeddedComponents = {};
+		sandbox.restore();
+	}
 
 	QUnit.module("componentLoadedHook", {
 		beforeEach() {
 			this.oConfig = {
-				id: "componentId",
+				id: sReference,
 				componentData: {
 					foo: "bar"
 				},
@@ -91,8 +100,7 @@ sap.ui.define([
 			});
 		},
 		afterEach() {
-			sandbox.restore();
-			Loader.clearCache();
+			cleanup.call(this);
 		}
 	}, function() {
 		[{
@@ -206,38 +214,42 @@ sap.ui.define([
 
 	QUnit.module("instanceCreatedHook", {
 		beforeEach() {
-			this.oAppComponent = RtaQunitUtils.createAndStubAppComponent(sandbox, "componentId");
+			this.oAppComponent = RtaQunitUtils.createAndStubAppComponent(sandbox, sReference);
 			this.oAddPropagationListenerStub = sandbox.stub(this.oAppComponent, "addPropagationListener");
 			this.oVMInitStub = sandbox.stub().resolves();
 			this.oCreateVariantModelStub = sandbox.stub(ComponentLifecycleHooks, "_createVariantModel").returns({
 				initialize: this.oVMInitStub
 			});
+			this.oLoaderSpy = sandbox.spy(Loader, "getFlexData");
 			this.oInitializeStub = sandbox.stub(FlexState, "initialize").resolves();
 			sandbox.stub(Utils, "isEmbeddedComponent").callsFake(function(oComponent) {
-				return oComponent.getId() !== "componentId";
+				return oComponent.getId() !== sReference;
 			});
 			sandbox.stub(Utils, "isApplicationComponent").callsFake(function(oComponent) {
-				return oComponent.getId() === "componentId";
+				return oComponent.getId() === sReference;
+			});
+			this.oLoadFlexDataStub = sandbox.stub(Storage, "loadFlexData");
+			this.oLoadFlexDataStub.resolves(StorageUtils.getEmptyFlexDataResponse());
+			sandbox.stub(Settings, "getInstance").resolves({
+				getIsVariantAuthorNameAvailable: () => false
 			});
 		},
 		afterEach() {
-			ComponentLifecycleHooks._componentInstantiationPromises.delete(this.oAppComponent);
-			this.oAppComponent._restoreGetAppComponentStub();
-			this.oAppComponent.destroy();
-			sandbox.restore();
+			cleanup.call(this);
 		}
 	}, function() {
-		QUnit.test("Obtains the componentId from component instance and propagates even if there are no changes for the component", function(assert) {
-			return ComponentLifecycleHooks.instanceCreatedHook(this.oAppComponent, { asyncHints: true, id: "differentComponentId" })
-			.then(function() {
-				assert.strictEqual(this.oAddPropagationListenerStub.callCount, 1, "propagation was triggered");
-				assert.strictEqual(this.oInitializeStub.callCount, 1, "FlexState was initialized");
-				assert.ok(this.oInitializeStub.calledWith({
-					componentId: this.oAppComponent.getId(),
-					asyncHints: true
-				}), "FlexState was initialized with the correct parameters");
-				assert.strictEqual(this.oVMInitStub.callCount, 1, "the VModel was initialized");
-			}.bind(this));
+		QUnit.test("when there are no changes for the component", async function(assert) {
+			await ComponentLifecycleHooks.instanceCreatedHook(this.oAppComponent, { asyncHints: true, id: sReference });
+			assert.strictEqual(this.oAddPropagationListenerStub.callCount, 0, "propagation was not triggered");
+			assert.strictEqual(this.oInitializeStub.callCount, 0, "FlexState was not initialized");
+			assert.strictEqual(this.oLoaderSpy.callCount, 1, "the loader was called once");
+			assert.ok(this.oLoaderSpy.calledWith({
+				componentData: this.oAppComponent.getComponentData(),
+				manifest: this.oAppComponent.getManifestObject(),
+				asyncHints: true,
+				reference: sReference
+			}), "Loader was called with the correct parameters");
+			assert.strictEqual(this.oVMInitStub.callCount, 1, "the VModel was initialized");
 		});
 
 		QUnit.test("when getChangesAndPropagate() is called for an embedded component with a preexisting VariantModel on its application component", function(assert) {
@@ -280,12 +292,20 @@ sap.ui.define([
 			var sName = `when an outer and an inner component are initialized at the same time, ${sFirstComponent} component being first`;
 			QUnit.test(sName, function(assert) {
 				assert.expect(5);
-				sandbox.stub(ManifestUtils, "getFlexReferenceForControl");
-				var oExistingModel;
+				this.oLoadFlexDataStub.reset();
+				this.oLoadFlexDataStub.resolves({
+					...StorageUtils.getEmptyFlexDataResponse(),
+					changes: [
+						{
+							fileName: "change1",
+							changeType: "rename"
+						}
+					]
+				});
+				let oExistingModel;
 				sandbox.stub(this.oAppComponent, "setModel").callsFake(function(oModel, sModelName) {
 					assert.strictEqual(
-						sModelName,
-						ControlVariantApplyAPI.getVariantModelName(),
+						sModelName, ControlVariantApplyAPI.getVariantModelName(),
 						"then VariantModel was set on the AppComponent with the correct name"
 					);
 					if (oExistingModel) {
@@ -295,19 +315,17 @@ sap.ui.define([
 				});
 				sandbox.stub(this.oAppComponent, "getModel").callsFake(function(sModelName) {
 					assert.strictEqual(
-						sModelName,
-						ControlVariantApplyAPI.getVariantModelName(),
+						sModelName, ControlVariantApplyAPI.getVariantModelName(),
 						"then variant model called on the app component"
 					);
 					return oExistingModel;
 				});
 
-				var oComponent = {
+				const oComponent = {
 					name: "embeddedComponent",
 					setModel(oModel, sModelName) {
 						assert.strictEqual(
-							sModelName,
-							ControlVariantApplyAPI.getVariantModelName(),
+							sModelName, ControlVariantApplyAPI.getVariantModelName(),
 							"then VariantModel was set on the embedded component with the correct name"
 						);
 						assert.deepEqual(oModel, oExistingModel, "then the correct model was set");
@@ -335,24 +353,18 @@ sap.ui.define([
 			});
 		});
 
-		QUnit.test("when getChangesAndPropagate() is called for two embedded components in parallel with no preexisting VariantModel on its application component", function(assert) {
+		QUnit.test("when getChangesAndPropagate() is called for two embedded components in parallel with no preexisting VariantModel on its application component and without changes", async function(assert) {
 			assert.expect(6);
 			sandbox.spy(this.oAppComponent, "setModel");
-
 			var oComponent = {
 				setModel: function(oModelSet, sModelName) {
 					assert.strictEqual(
-						sModelName,
-						ControlVariantApplyAPI.getVariantModelName(),
+						sModelName, ControlVariantApplyAPI.getVariantModelName(),
 						"then variant model called on the app component"
 					);
-					assert.ok(
-						this.oAddPropagationListenerStub.calledOnce,
-						"then addPropagationListener was called for the app component"
-					);
+					assert.strictEqual(this.oAddPropagationListenerStub.callCount, 0, "then addPropagationListener was not called");
 					assert.strictEqual(
-						sModelName,
-						ControlVariantApplyAPI.getVariantModelName(),
+						sModelName, ControlVariantApplyAPI.getVariantModelName(),
 						"then VariantModel was set on the embedded component with the correct name"
 					);
 				}.bind(this),
@@ -380,18 +392,84 @@ sap.ui.define([
 				"then initially no variant model exists for the app component"
 			);
 
-			return Promise.all([
+			await Promise.all([
 				ComponentLifecycleHooks.instanceCreatedHook(oComponent, {}),
 				ComponentLifecycleHooks.instanceCreatedHook(oComponent2, {}),
 				ComponentLifecycleHooks.instanceCreatedHook(this.oAppComponent, {})
-			])
-			.then(function() {
-				assert.strictEqual(this.oAppComponent.setModel.callCount, 1, "then the model is only set on the app component once");
-				assert.ok(oComponent2SetModelStub.called, "then the model is also set on the second embedded component");
-			}.bind(this));
+			]);
+			assert.strictEqual(this.oAppComponent.setModel.callCount, 1, "then the model is only set on the app component once");
+			assert.ok(oComponent2SetModelStub.called, "then the model is also set on the second embedded component");
 		});
 
-		QUnit.test("when getChangesAndPropagate() is called for an embedded component with a component not of type application", function(assert) {
+		QUnit.test("when getChangesAndPropagate() is called for two embedded components in parallel with no preexisting VariantModel on its application component", async function(assert) {
+			assert.expect(6);
+			sandbox.spy(this.oAppComponent, "setModel");
+			this.oLoadFlexDataStub.reset();
+			this.oLoadFlexDataStub.resolves({
+				...StorageUtils.getEmptyFlexDataResponse(),
+				changes: [
+					{
+						fileName: "change1",
+						changeType: "rename"
+					}
+				]
+			});
+			var oComponent = {
+				setModel: function(oModelSet, sModelName) {
+					assert.strictEqual(
+						sModelName, ControlVariantApplyAPI.getVariantModelName(),
+						"then variant model called on the app component"
+					);
+					assert.ok(this.oAddPropagationListenerStub.calledOnce, "then addPropagationListener was called for the app component");
+					assert.strictEqual(
+						sModelName, ControlVariantApplyAPI.getVariantModelName(),
+						"then VariantModel was set on the embedded component with the correct name"
+					);
+				}.bind(this),
+				getManifestObject() {},
+				addPropagationListener() {
+					assert.notOk(true, "addPropagationListener shouldn't be called for an embedded component");
+				},
+				getId() {},
+				getComponentData() {}
+			};
+
+			var oComponent2SetModelStub = sandbox.stub();
+			var oComponent2 = {
+				setModel: oComponent2SetModelStub,
+				getManifestObject() {},
+				addPropagationListener() {
+					assert.notOk(true, "addPropagationListener shouldn't be called for an embedded component");
+				},
+				getId() {},
+				getComponentData() {}
+			};
+
+			assert.notOk(
+				this.oAppComponent.getModel(ControlVariantApplyAPI.getVariantModelName()),
+				"then initially no variant model exists for the app component"
+			);
+
+			await Promise.all([
+				ComponentLifecycleHooks.instanceCreatedHook(oComponent, {}),
+				ComponentLifecycleHooks.instanceCreatedHook(oComponent2, {}),
+				ComponentLifecycleHooks.instanceCreatedHook(this.oAppComponent, {})
+			]);
+			assert.strictEqual(this.oAppComponent.setModel.callCount, 1, "then the model is only set on the app component once");
+			assert.ok(oComponent2SetModelStub.called, "then the model is also set on the second embedded component");
+		});
+
+		QUnit.test("when getChangesAndPropagate() is called for an embedded component with a component not of type application", async function(assert) {
+			this.oLoadFlexDataStub.reset();
+			this.oLoadFlexDataStub.resolves({
+				...StorageUtils.getEmptyFlexDataResponse(),
+				changes: [
+					{
+						fileName: "change1",
+						changeType: "rename"
+					}
+				]
+			});
 			var oComponent = {
 				setModel: sandbox.stub(),
 				getManifestObject: sandbox.stub(),
@@ -402,9 +480,8 @@ sap.ui.define([
 			Utils.isApplicationComponent.restore();
 			sandbox.stub(Utils, "isApplicationComponent").returns(false);
 
-			return ComponentLifecycleHooks.instanceCreatedHook(oComponent, {}).then(function() {
-				assert.strictEqual(oComponent.setModel.callCount, 0, "setModel was not called");
-			});
+			await ComponentLifecycleHooks.instanceCreatedHook(oComponent, {});
+			assert.equal(oComponent.setModel.callCount, 0, "setModel was not called");
 		});
 	});
 
@@ -422,9 +499,8 @@ sap.ui.define([
 			this.oLoadLibStub = sandbox.stub(Lib, "load").resolves();
 		},
 		afterEach() {
+			cleanup.call(this);
 			window.sessionStorage.removeItem("sap.ui.rta.restart.CUSTOMER");
-			this.oAppComponent.destroy();
-			sandbox.restore();
 		}
 	}, function() {
 		QUnit.test("when no restart from rta should be triggered and no draft is requested", function(assert) {
@@ -588,22 +664,24 @@ sap.ui.define([
 		beforeEach() {
 			const sMockComponentName = "MockCompName";
 			this.oAppComponent = RtaQunitUtils.createAndStubAppComponent(sandbox, sMockComponentName);
-			sandbox.stub(FlexState, "initialize").resolves();
+			this.oLoadFlexDataStub = sandbox.stub(Storage, "loadFlexData");
+			sandbox.stub(Settings, "getInstance").resolves({
+				getIsVariantAuthorNameAvailable: () => false
+			});
 		},
 		afterEach() {
-			this.oAppComponent.destroy();
-			sandbox.restore();
+			cleanup.call(this);
 		}
 	}, function() {
 		QUnit.test("with messagebundle and a vendor change", async function(assert) {
-			sandbox.stub(FlexState, "getStorageResponse").returns({
-				changes: {
-					changes: [
-						{
-							layer: Layer.VENDOR
-						}
-					]
-				},
+			this.oLoadFlexDataStub.resolves({
+				...StorageUtils.getEmptyFlexDataResponse(),
+				changes: [
+					{
+						layer: Layer.VENDOR,
+						fileName: "foo"
+					}
+				],
 				messagebundle: { i_123: "translatedKey" }
 			});
 
@@ -612,14 +690,14 @@ sap.ui.define([
 		});
 
 		QUnit.test("with messagebundle and no vendor change", async function(assert) {
-			sandbox.stub(FlexState, "getStorageResponse").returns({
-				changes: {
-					changes: [
-						{
-							layer: Layer.CUSTOMER
-						}
-					]
-				},
+			this.oLoadFlexDataStub.resolves({
+				...StorageUtils.getEmptyFlexDataResponse(),
+				changes: [
+					{
+						layer: Layer.CUSTOMER,
+						fileName: "foo"
+					}
+				],
 				messagebundle: { i_123: "translatedKey" }
 			});
 
@@ -628,14 +706,14 @@ sap.ui.define([
 		});
 
 		QUnit.test("with no messagebundle and a vendor change", async function(assert) {
-			sandbox.stub(FlexState, "getStorageResponse").returns({
-				changes: {
-					changes: [
-						{
-							layer: Layer.VENDOR
-						}
-					]
-				}
+			this.oLoadFlexDataStub.resolves({
+				...StorageUtils.getEmptyFlexDataResponse(),
+				changes: [
+					{
+						layer: Layer.VENDOR,
+						fileName: "foo"
+					}
+				]
 			});
 
 			await ComponentLifecycleHooks.instanceCreatedHook(this.oAppComponent, {});
@@ -645,7 +723,7 @@ sap.ui.define([
 
 	QUnit.module("modelCreatedHook", {
 		beforeEach() {
-			this.oAppComponent = RtaQunitUtils.createAndStubAppComponent(sandbox, "componentId");
+			this.oAppComponent = RtaQunitUtils.createAndStubAppComponent(sandbox, sReference);
 			sandbox.stub(this.oAppComponent, "getComponentData").returns({ foo: "bar" });
 			ChangeHandlerRegistration.registerAnnotationChangeHandler({
 				isDefaultChangeHandler: true,
@@ -691,8 +769,7 @@ sap.ui.define([
 			};
 		},
 		afterEach() {
-			this.oAppComponent.destroy();
-			sandbox.restore();
+			cleanup.call(this);
 		}
 	}, function() {
 		QUnit.test("hook gets called with annotation changes available", async function(assert) {
@@ -839,7 +916,7 @@ sap.ui.define([
 						}
 					]
 				},
-				id: "componentId"
+				id: sReference
 			};
 			const oResponse = await fetch("test-resources/sap/ui/fl/qunit/testResources/descriptorChanges/TestApplierManifest.json");
 			const oManifestResponseJSON = await oResponse.json();
@@ -854,8 +931,7 @@ sap.ui.define([
 			});
 		},
 		afterEach() {
-			sandbox.restore();
-			Loader.clearCache();
+			cleanup.call(this);
 		}
 	}, function() {
 		QUnit.test("when calling 'preprocessManifest' with three 'appdescr_ui5_addLibraries' changes ", async function(assert) {

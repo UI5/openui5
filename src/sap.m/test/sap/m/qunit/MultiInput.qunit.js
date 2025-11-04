@@ -2071,7 +2071,7 @@ sap.ui.define([
 		oMI.destroy();
 	});
 
-	QUnit.module("Mobile: Closing behaviour of the Dialog", {
+	QUnit.module("Mobile: Dialog and Interactions", {
 		beforeEach: async function() {
 			this.clock = sinon.useFakeTimers();
 			this.oDeviceStub = this.stub(Device, "system").value({
@@ -2333,6 +2333,35 @@ sap.ui.define([
 
 		// Assert
 		assert.strictEqual(sOpenState === OpenState.OPEN || sOpenState === OpenState.OPENING, true, "The dialog is not closed if no value is provided");
+	});
+
+	QUnit.test("Filter-selected button state changes when tokens are added/removed", async function (assert) {
+		// Setup
+		this.oMultiInput._openSuggestionsPopover();
+		this.clock.tick(nPopoverAnimationTick);
+
+		var oSuggestionsPopover = this.oMultiInput._getSuggestionsPopover();
+		var oToken = new Token({ text: "Test Token" });
+
+		// Assert
+		assert.strictEqual(oSuggestionsPopover.getFilterSelectedButton().getEnabled(), false,
+			"Button is initially disabled");
+
+		// Act
+		this.oMultiInput.addToken(oToken);
+		await nextUIUpdate(this.clock);
+
+		// Assert
+		assert.strictEqual(oSuggestionsPopover.getFilterSelectedButton().getEnabled(), true,
+			"Button is enabled after adding a token");
+
+		// Act
+		this.oMultiInput.removeToken(oToken);
+		await nextUIUpdate(this.clock);
+
+		// Assert
+		assert.strictEqual(oSuggestionsPopover.getFilterSelectedButton().getEnabled(), false,
+			"Button is disabled after removing all tokens");
 	});
 
 	QUnit.module("Events", {
