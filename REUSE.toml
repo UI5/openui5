@@ -385,7 +385,7 @@ SPDX-FileComment = "these files belong to: handlebars"
 [[annotations]]
 path = "src/sap.ui.core/src/sap/ui/thirdparty/require.js"
 precedence = "aggregate"
-SPDX-FileCopyrightText = "2010-2012, The Dojo Foundation"
+SPDX-FileCopyrightText = "2010-2024, jQuery Foundation and other contributors"
 SPDX-License-Identifier = "MIT"
 SPDX-FileComment = "these files belong to: requireJS"
 
