@@ -1,0 +1,68 @@
+<mvc:View
+	class="sapUiSizeCompact"
+	controllerName="sap.ui.core.sample.odata.v4.Create.Main"
+	xmlns="sap.m"
+	xmlns:form="sap.ui.layout.form"
+	xmlns:mvc="sap.ui.core.mvc">
+	<App>
+	<Page showHeader="false">
+		<Table growing="true" growingThreshold="5" id="salesOrderList" items="{/SalesOrderList}">
+			<headerToolbar>
+				<Toolbar>
+					<Title text="Create Sales Order"/>
+					<Button icon="sap-icon://add" press=".onCreateSalesOrder"
+						tooltip="Create Sales Order"/>
+					<dependents>
+						<Dialog id="createDialog" title="Create New Sales Order">
+							<buttons>
+								<Button press=".onSaveSalesOrder" text="Save" type="Emphasized"/>
+								<Button press=".onCancelSalesOrder" text="Cancel"/>
+							</buttons>
+							<form:SimpleForm backgroundDesign="Transparent" editable="true" >
+								<Label labelFor="inputBuyerID" text="Buyer ID"/>
+								<Input id="inputBuyerID" value="{BuyerID}"/>
+								<Label labelFor="inputCurrency" text="Currency" />
+								<Input id="inputCurrency" value="{CurrencyCode}"/>
+								<Label labelFor="inputNote" text="Note"/>
+								<Input id="inputNote" value="{Note}"/>
+							</form:SimpleForm>
+						</Dialog>
+					</dependents>
+				</Toolbar>
+			</headerToolbar>
+			<columns>
+				<Column>
+					<Text text="Sales Order ID"/>
+				</Column>
+				<Column>
+					<Text text="Buyer"/>
+				</Column>
+				<Column>
+					<Text text="Gross Amount"/>
+				</Column>
+				<Column>
+					<Text text="Currency"/>
+				</Column>
+				<Column>
+					<Text text="Note"/>
+				</Column>
+				<Column>
+					<Text text="Lifecycle Status"/>
+				</Column>
+				<Column>
+					<Text text="Created At"/>
+				</Column>
+			</columns>
+			<ColumnListItem>
+				<Text text="{SalesOrderID}"/>
+				<Text text="{SO_2_BP/CompanyName} ({BuyerID})"/>
+				<Text text="{GrossAmount}"/>
+				<Text text="{CurrencyCode}"/>
+				<Text text="{Note}"/>
+				<Text text="{LifecycleStatusDesc}"/>
+				<Text text="{CreatedAt}"/>
+			</ColumnListItem>
+		</Table>
+	</Page>
+	</App>
+</mvc:View>

@@ -149,7 +149,8 @@ sap.ui.define([
 			const FlexState = await requireAsync("sap/ui/fl/apply/_internal/flexState/FlexState");
 			await FlexState.initialize({
 				componentId: sComponentId,
-				asyncHints: vConfig.asyncHints
+				asyncHints: vConfig.asyncHints,
+				forceInvalidation: oFlexData.cacheInvalidated
 			});
 			await propagateChangesForAppComponent(oComponent, sReference);
 			createVendorTranslationModelIfNecessary(oComponent, oFlexData.data.changes);
@@ -180,7 +181,14 @@ sap.ui.define([
 			};
 			const oFlexData = await Loader.getFlexData(mPropertyBag);
 
-			await checkForChangesAndInitializeFlexState({ ...mPropertyBag, componentId: oConfig.id }, oFlexData);
+			await checkForChangesAndInitializeFlexState(
+				{
+					...mPropertyBag,
+					componentId: oConfig.id,
+					forceInvalidation: oFlexData.cacheInvalidated
+				},
+				oFlexData
+			);
 
 			// manifest descriptor changes for ABAP mixed mode can only be applied in this hook,
 			// because at this point all libs have been loaded (in contrast to the first Component(s) 'onPreprocessManifest' hook),
@@ -356,7 +364,8 @@ sap.ui.define([
 				rawManifest: oManifest,
 				componentId: oConfig.id,
 				reference: sReference,
-				skipLoadBundle: true
+				skipLoadBundle: true,
+				forceInvalidation: oFlexData.cacheInvalidated
 			}, oFlexData);
 
 			return Promise.resolve(oManifest);
