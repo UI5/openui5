@@ -2328,6 +2328,11 @@ sap.ui.define([
 
 		oFocusedDate.setYear(oStartDate.getYear() + iRangeSize / 2);
 		oStartDate.setMonth(0, 1); // always use the first of the month to have stable year in Japanese calendar
+		if (oFocusedDate.isBefore(this._oMinDate)) {
+			oFocusedDate = new CalendarDate(this._oMinDate, this.getPrimaryCalendarType());
+		} else if (oFocusedDate.isAfter(this._oMaxDate)){
+			oFocusedDate = new CalendarDate(this._oMaxDate, this.getPrimaryCalendarType());
+		}
 		this._setFocusedDate(oFocusedDate);
 
 		this._showYearPicker();
