@@ -69,6 +69,7 @@ sap.ui.define([
 		rSkip = /&\$skip=(\d+)/, // $skip=<number>
 		rStartsWithMethod = /^(DELETE|GET|PATCH|POST|PUT) (.*)$/,
 		sTeaBusi = "/sap/opu/odata4/IWBEP/TEA/default/IWBEP/TEA_BUSI/0001/",
+		sTeaBusiProduct = "/sap/opu/odata4/IWBEP/TEA/default/iwbep/tea_busi_product/0001/",
 		// the timeout for the tests and for waitForChanges in millseconds, 0 = keep defaults
 		iTestTimeout = parseInt(new URLSearchParams(window.location.search).get("timeout")),
 		rTop = /&\$top=(\d+)/, // $top=<number>
@@ -1618,7 +1619,7 @@ sap.ui.define([
 		createSalesOrdersModel : function (mModelParameters, mAdditionalFixture, aRegExps) {
 			return this.createModel(sSalesOrderService, mModelParameters,
 				Object.assign({
-					"/sap/opu/odata4/sap/zui5_testv4/default/sap/zui5_epm_sample/0002/$metadata"
+					[sSalesOrderService + "$metadata"]
 						: {source : "odata/v4/data/metadata_zui5_epm_sample.xml"}
 				}, mAdditionalFixture), aRegExps);
 		},
@@ -1631,7 +1632,7 @@ sap.ui.define([
 		 */
 		createSalesOrdersModel123 : function (mModelParameters) {
 			return this.createModel(sSalesOrderService + "?sap-client=123", mModelParameters, {
-					"/sap/opu/odata4/sap/zui5_testv4/default/sap/zui5_epm_sample/0002/$metadata?sap-client=123"
+					[sSalesOrderService + "$metadata?sap-client=123"]
 						: {source : "odata/v4/data/metadata_zui5_epm_sample.xml"}
 				});
 		},
@@ -1647,7 +1648,7 @@ sap.ui.define([
 		createTeaBusiModel : function (mModelParameters, mAdditionalFixture) {
 			return this.createModel(sTeaBusi, mModelParameters, Object.assign({
 					[sTeaBusi + "$metadata"] : {source : "odata/v4/data/metadata.xml"},
-					"/sap/opu/odata4/IWBEP/TEA/default/iwbep/tea_busi_product/0001/$metadata"
+					[sTeaBusiProduct + "$metadata"]
 						: {source : "odata/v4/data/metadata_tea_busi_product.xml"},
 					"/sap/opu/odata4/IWBEP/TEA/default/iwbep/tea_busi_supplier/0001/$metadata"
 						: {source : "odata/v4/data/metadata_tea_busi_supplier.xml"}
@@ -1664,7 +1665,7 @@ sap.ui.define([
 			return this.createModel(sTeaBusi + "?sap-client=123", mModelParameters, {
 					[sTeaBusi + "$metadata?sap-client=123"]
 						: {source : "odata/v4/data/metadata.xml"},
-					"/sap/opu/odata4/IWBEP/TEA/default/iwbep/tea_busi_product/0001/$metadata?sap-client=123"
+					[sTeaBusiProduct + "$metadata?sap-client=123"]
 						: {source : "odata/v4/data/metadata_tea_busi_product.xml"}
 				});
 		},
@@ -4475,7 +4476,7 @@ sap.ui.define([
 		oModel = this.createModel(sSalesOrderService + "?sap-client=123", {
 			autoExpandSelect : true
 		}, {
-			"/sap/opu/odata4/sap/zui5_testv4/default/sap/zui5_epm_sample/0002/$metadata?sap-client=123"
+			[sSalesOrderService + "$metadata?sap-client=123"]
 				: {source : "odata/v4/data/metadata_zui5_epm_sample.xml"}
 		});
 
@@ -5763,7 +5764,7 @@ sap.ui.define([
 
 		oModel = this.createModel(sTeaBusi + "?c1=a&c2=b", {}, {
 			[sTeaBusi + "$metadata?c1=a&c2=b"] : {source : "odata/v4/data/metadata.xml"},
-			"/sap/opu/odata4/IWBEP/TEA/default/iwbep/tea_busi_product/0001/$metadata?c1=a&c2=b"
+			[sTeaBusiProduct + "$metadata?c1=a&c2=b"]
 				: {source : "odata/v4/data/metadata_tea_busi_product.xml"}
 		});
 
@@ -9874,7 +9875,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		const oModel = this.createModel(sTeaBusi, {}, {
 			// initial GET works just fine
 			[sTeaBusi + "$metadata"] : {source : "odata/v4/data/metadata.xml"},
-			"/sap/opu/odata4/IWBEP/TEA/default/iwbep/tea_busi_product/0001/$metadata"
+			[sTeaBusiProduct + "$metadata"]
 				: [{ // cross-service reference may fail at first try
 					code : 503,
 					headers : {"Retry-After" : "42"},
@@ -9926,8 +9927,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 		await oCallbackPromise;
 
-		const sExpectedRequestLine
-			= "GET /sap/opu/odata4/IWBEP/TEA/default/iwbep/tea_busi_product/0001/$metadata";
+		const sExpectedRequestLine = "GET " + sTeaBusiProduct + "$metadata";
 		assert.strictEqual(aBatchPayloads.shift(), sExpectedRequestLine,
 			"cross-service reference $metadata failed at first try");
 		assert.deepEqual(aBatchPayloads, []);
@@ -10048,8 +10048,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// JIRA: CPOUI5ODATAV4-2812
 	QUnit.test('503, "Retry-After" handling: code lists, destroyed', async function (assert) {
 		await this.createView(assert, "", this.createSalesOrdersModel(null, {
-			"/sap/opu/odata4/sap/zui5_testv4/default/iwbep/common/0001/$metadata"
-				: {source : "odata/v4/data/metadata_codelist.xml"}
+			[sCommon + "$metadata"] : {source : "odata/v4/data/metadata_codelist.xml"}
 		}));
 
 		this.expectRequest("Currencies?$select=CurrencyCode,DecimalPlaces,Text,ISOCode", {
@@ -13802,7 +13801,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// messages are not deleted.
 	// The navigation property is necessary so that read path and patch path are different.
 	QUnit.test("Read a sales order line item, enter an invalid quantity", function (assert) {
-		var oError = createError({
+		var oErrorResponse = {
 				code : "top",
 				message : "Error occurred while processing the request",
 				details : [{
@@ -13817,7 +13816,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					code : "unbound",
 					message : "Some unbound warning"
 				}]
-			}),
+			},
+			oError = createError(oErrorResponse),
 			oExpectedMessage = {
 				code : "23",
 				message : "Enter a minimum quantity of 2",
@@ -13874,22 +13874,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						technical : true,
 						technicalDetails : {
 							httpStatus : 500, // CPOUI5ODATAV4-428
-							originalMessage : {
-								code : "top",
-								details : [{
-									"@Common.longtextUrl" : "../Messages(1)/LongText",
-									"@Common.numericSeverity" : 4,
-									code : "bound",
-									message : "Value must be greater than 0",
-									target : "Quantity"
-								}, {
-									"@Common.longtextUrl" : "",
-									"@Common.numericSeverity" : 3,
-									code : "unbound",
-									message : "Some unbound warning"
-								}],
-								message : "Error occurred while processing the request"
-							}
+							originalMessage : oErrorResponse
 						},
 						type : "Error"
 					}, {
@@ -13898,12 +13883,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						persistent : true,
 						technicalDetails : {
 							httpStatus : 500, // CPOUI5ODATAV4-428
-							originalMessage : {
-								"@Common.longtextUrl" : "",
-								"@Common.numericSeverity" : 3,
-								code : "unbound",
-								message : "Some unbound warning"
-							}
+							originalMessage : oErrorResponse.details[1]
 						},
 						type : "Warning"
 					}, {
@@ -13915,13 +13895,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 							"/BusinessPartnerList('1')/BP_2_SO('42')/SO_2_SOITEM('0010')/Quantity",
 						technicalDetails : {
 							httpStatus : 500, // CPOUI5ODATAV4-428
-							originalMessage : {
-								"@Common.longtextUrl" : "../Messages(1)/LongText",
-								"@Common.numericSeverity" : 4,
-								code : "bound",
-								message : "Value must be greater than 0",
-								target : "Quantity"
-							}
+							originalMessage : oErrorResponse.details[0]
 						},
 						type : "Error"
 					}
@@ -14203,8 +14177,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			}]);
 
 		this.oLogMock.expects("error") // from TestUtils
-			.withExactArgs("PATCH /sap/opu/odata4/sap/zui5_testv4/default/sap/zui5_epm_sample/0002"
-				+ "/SalesOrderList('42')",
+			.withExactArgs("PATCH " + sSalesOrderService + "SalesOrderList('42')",
 				sinon.match(function (vDetails) {
 					return vDetails instanceof Error && vDetails.message === "failed intentionally";
 				}),
@@ -17518,9 +17491,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			oPayload = Object.assign({}, oInitialData, {"@complexAnnotation" : {sub : "bar*"}}),
 			that = this;
 
-		oModel = this.createModel(
-			"/sap/opu/odata4/IWBEP/TEA/default/iwbep/tea_busi_product/0001/", {}, {
-				"/sap/opu/odata4/IWBEP/TEA/default/iwbep/tea_busi_product/0001/$metadata"
+		oModel = this.createModel(sTeaBusiProduct, {}, {
+				[sTeaBusiProduct + "$metadata"]
 					: {source : "odata/v4/data/metadata_tea_busi_product.xml"}
 			});
 
@@ -56551,9 +56523,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			that.oView.byId("detail").setBindingContext(oContext);
 			return that.waitForChanges(assert);
 		}).then(function () {
-			that.oLogMock.expects("error").withArgs("Failed to get contexts for"
-				+ " /sap/opu/odata4/sap/zui5_testv4/default/sap/zui5_epm_sample/0002/SalesOrderList"
-				+ " with start index 0 and length 100");
+			that.oLogMock.expects("error").withArgs("Failed to get contexts for "
+				+ sSalesOrderService + "SalesOrderList with start index 0 and length 100");
 			that.oLogMock.expects("error")
 				.withArgs(sinon.match.string, sinon.match(sPreviousFailed));
 			that.expectRequest("SalesOrderList?$select=SalesOrderID&$skip=0&$top=100",
@@ -56618,9 +56589,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			that.oLogMock.expects("error")
 				.withArgs(sinon.match.string, sinon.match(sPreviousFailed));
 			that.oLogMock.expects("error")
-				.withArgs("Failed to get contexts for /sap/opu/odata4/sap/zui5_testv4/default/sap"
-					+ "/zui5_epm_sample/0002/SalesOrderList('42')/SO_2_SOITEM"
-					+ " with start index 0 and length 100");
+				.withArgs("Failed to get contexts for " + sSalesOrderService
+					+ "SalesOrderList('42')/SO_2_SOITEM with start index 0 and length 100");
 			that.expectRequest("SalesOrderList('42')/SO_2_SOITEM?$select=ItemPosition,SalesOrderID"
 					+ "&$skip=0&$top=100",
 					createErrorInsideBatch({
@@ -56745,9 +56715,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 			return that.waitForChanges(assert, "setBindingContext: R.V.C.");
 		}).then(function () {
-			that.oLogMock.expects("error").withArgs("Failed to get contexts for"
-				+ " /sap/opu/odata4/sap/zui5_testv4/default/sap/zui5_epm_sample/0002"
-				+ "/SalesOrderList('1')/SO_2_SOITEM with start index 0 and length 100");
+			that.oLogMock.expects("error").withArgs("Failed to get contexts for "
+				+ sSalesOrderService
+				+ "SalesOrderList('1')/SO_2_SOITEM with start index 0 and length 100");
 			that.oLogMock.expects("error").withArgs("Failed to read path /SalesOrderList('1')"
 				+ "/com.sap.gateway.default.zui5_epm_sample.v0002.SalesOrder_Confirm(...)");
 			that.oLogMock.expects("error")
@@ -58092,9 +58062,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				autoExpandSelect : true,
 				metadataUrlParams : {"sap-context-token" : "foo", "sap-language" : "EN"}
 			}, {
-				"/sap/opu/odata4/sap/zui5_testv4/default/sap/zui5_epm_sample/0002/$metadata?sap-client=123&sap-context-token=foo&sap-language=EN"
+				[sSalesOrderService
+					+ "$metadata?sap-client=123&sap-context-token=foo&sap-language=EN"]
 					: {source : "odata/v4/data/metadata_zui5_epm_sample.xml"},
-				"/sap/opu/odata4/sap/zui5_testv4/default/iwbep/common/0001/$metadata?sap-language=EN"
+				[sCommon + "$metadata?sap-language=EN"]
 					: {source : "odata/v4/data/metadata_codelist.xml"}
 			}),
 			sView = '\
@@ -58280,9 +58251,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				autoExpandSelect : true,
 				metadataUrlParams : {"sap-context-token" : "foo", "sap-language" : "EN"}
 			}, {
-				"/sap/opu/odata4/sap/zui5_testv4/default/sap/zui5_epm_sample/0002/$metadata?sap-client=123&sap-context-token=foo&sap-language=EN"
+				[sSalesOrderService
+					+ "$metadata?sap-client=123&sap-context-token=foo&sap-language=EN"]
 					: {source : "odata/v4/data/metadata_zui5_epm_sample.xml"},
-				"/sap/opu/odata4/sap/zui5_testv4/default/iwbep/common/0001/$metadata?sap-language=EN"
+				[sCommon + "$metadata?sap-language=EN"]
 					: {source : "odata/v4/data/metadata_codelist.xml"}
 			}),
 			sView = '\
@@ -58448,10 +58420,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		const oModel0 = this.createModel(sSalesOrderService, {
 			autoExpandSelect : true
 		}, {
-			"/sap/opu/odata4/sap/zui5_testv4/default/sap/zui5_epm_sample/0002/$metadata"
+			[sSalesOrderService + "$metadata"]
 				: {source : "odata/v4/data/metadata_zui5_epm_sample.xml"},
-			"/sap/opu/odata4/sap/zui5_testv4/default/iwbep/common/0001/$metadata"
-				: {source : "odata/v4/data/metadata_codelist.xml"}
+			[sCommon + "$metadata"] : {source : "odata/v4/data/metadata_codelist.xml"}
 		});
 		const oModel1 = new ODataModel({
 			serviceUrl : sSalesOrderService
@@ -66622,7 +66593,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			[`HEAD ${sTeaBusi}?sap-client=279`] : {},
 			[sTeaBusi + "$metadata?sap-client=279&sap-context-token=20200716120000&sap-language=EN"]
 				: {source : "odata/v4/data/metadata.xml"},
-			"/sap/opu/odata4/IWBEP/TEA/default/iwbep/tea_busi_product/0001/$metadata?sap-client=279&sap-language=EN"
+			[sTeaBusiProduct + "$metadata?sap-client=279&sap-language=EN"]
 				: {source : "odata/v4/data/metadata_tea_busi_product.xml"}
 		});
 
@@ -71296,8 +71267,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			.expectChange("picture", undefined);
 
 		return this.createView(assert, sView, this.createModel(
-			"/sap/opu/odata4/IWBEP/TEA/default/iwbep/tea_busi_product/0001/", {}, {
-				"/sap/opu/odata4/IWBEP/TEA/default/iwbep/tea_busi_product/0001/$metadata"
+			sTeaBusiProduct, {}, {
+				[sTeaBusiProduct + "$metadata"]
 					: {source : "odata/v4/data/metadata_tea_busi_product.xml"}
 			}));
 	});

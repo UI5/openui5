@@ -490,6 +490,25 @@ sap.ui.define([
 			});
 		});
 
+		QUnit.test("when initialize is called with forceInvalidation = true", async function(assert) {
+			assert.notOk(FlexState.isInitialized({ reference: sReference }), "FlexState is not initialized at beginning");
+			assert.notOk(FlexState.isInitialized({ control: this.oAppComponent }), "FlexState is not initialized at beginning");
+
+			await FlexState.initialize({
+				reference: sReference,
+				componentId: sComponentId
+			});
+			assert.ok(FlexState.isInitialized({ reference: sReference }), "FlexState has been initialized");
+
+			const oDataSelectorCheckUpdateSpy = sandbox.spy(FlexState.getFlexObjectsDataSelector(), "checkUpdate");
+			await FlexState.initialize({
+				reference: sReference,
+				componentId: sComponentId,
+				forceInvalidation: true
+			});
+			assert.ok(oDataSelectorCheckUpdateSpy.calledOnce, "the DataSelector was updated during initialization with forceInvalidation");
+		});
+
 		QUnit.test("when initialize is called without a reference and with a componentID", function(assert) {
 			const oMockResponse = { changes: merge(StorageUtils.getEmptyFlexDataResponse(), { foo: "FlexResponse" }), authors: {} };
 			this.oLoadFlexDataStub = mockLoader(oMockResponse);

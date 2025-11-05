@@ -417,7 +417,8 @@ sap.ui.define([
 	 * @param {object} [mPropertyBag.rawManifest] - Raw JSON manifest that belongs to current component
 	 * @param {string} [mPropertyBag.componentData] - Component data of the current component
 	 * @param {object} [mPropertyBag.asyncHints] - Async hints passed from the app index to the component processing
-	 * @param {boolean} [mPropertyBag.skipLoadBundle=false] - if true state is initialized partially and does not include flex bundles
+	 * @param {boolean} [mPropertyBag.skipLoadBundle=false] - If true state is initialized partially and does not include flex bundles
+	 * @param {boolean} [mPropertyBag.forceInvalidation=false] - Make sure that the cache is invalidated during initialization
 	 * @returns {Promise<undefined>} Resolves a promise as soon as FlexState is initialized
 	 */
 	FlexState.initialize = async function(mPropertyBag) {
@@ -438,6 +439,7 @@ sap.ui.define([
 		if (
 			!_mInstances[mProperties.reference]?.storageResponse
 			|| oFlexData.cacheInvalidated
+			|| mProperties.forceInvalidation
 			|| checkComponentIdChanged(mProperties)
 		) {
 			prepareNewInstance(mProperties);
