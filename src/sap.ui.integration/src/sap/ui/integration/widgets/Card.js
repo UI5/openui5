@@ -570,7 +570,14 @@ sap.ui.define([
 				 * @private
 				 * @ui5-private
 				 */
-				dialogHeader: { visibility: "hidden" }
+				dialogHeader: { visibility: "hidden" },
+
+				/**
+				 * The child card which is openned for pagination or different show more.
+				 * @private
+				 * @ui5-private
+				 */
+				showMoreChildCard: { visibility: "hidden" }
 			}
 		},
 		renderer: CardRenderer
@@ -1329,6 +1336,11 @@ sap.ui.define([
 
 		if (oFilterBar) {
 			oFilterBar.refreshData();
+		}
+
+		const oShowMoreChildCard = Element.getElementById(this.getAssociation("showMoreChildCard"));
+		if (oShowMoreChildCard) {
+			oShowMoreChildCard.refreshData();
 		}
 	};
 

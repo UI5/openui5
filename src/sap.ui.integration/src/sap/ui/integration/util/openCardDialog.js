@@ -185,6 +185,10 @@ sap.ui.define([
 			oChildCard = oParentCard._createChildCard(oParameters);
 		}
 
+		if (oParameters.isPaginationCard) {
+			oParentCard.setAssociation("showMoreChildCard", oChildCard);
+		}
+
 		return _openDialog(oChildCard, oParentCard, oParameters);
 	}
 

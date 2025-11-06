@@ -15,9 +15,13 @@ sap.ui.define([
 	/**
 	 * Constructor for a primitive type <code>Edm.DateTimeOffset</code>.
 	 *
-	 * @class This class represents the OData primitive type <a
-	 *   href="http://www.odata.org/documentation/odata-version-2-0/overview#AbstractTypeSystem">
-	 *   <code>Edm.DateTimeOffset</code></a>.
+	 * @class This class represents the OData primitive type <code>Edm.DateTimeOffset</code>, see
+	 *   <a
+	 *   href="https://docs.oasis-open.org/odata/odata-csdl-xml/v4.01/odata-csdl-xml-v4.01.html#_Toc38530338">
+	 *   type definition for OData V4.01</a> or
+	 *   <a
+	 *   href="https://www.odata.org/documentation/odata-version-2-0/overview#AbstractTypeSystem">
+	 *   type definition for OData V2</a>.
 	 *
 	 *   In {@link sap.ui.model.odata.v2.ODataModel} this type is represented as a
 	 *   <code>Date</code> instance in local time. In {@link sap.ui.model.odata.v4.ODataModel} this

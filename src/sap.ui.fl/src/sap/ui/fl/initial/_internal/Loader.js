@@ -27,6 +27,41 @@ sap.ui.define([
 ) {
 	"use strict";
 
+	/*
+	 * Static cache for loaded Flex Data per reference
+	 * {
+	 * 	<reference>: {
+	 * 		data: {
+	 * 			changes: {
+	 * 				annotationChanges: [...],
+	 * 				appDescriptorChanges: [...],
+	 * 				changes: [...],
+	 * 				comp: {
+	 * 					variants: [...],
+	 * 					changes: [...],
+	 * 					defaultVariants: [...],
+	 * 					standardVariants: [...]
+	 * 				}
+	 * 				variants: [...],
+	 * 				variantChanges: [...],
+	 * 				variantDependentControlChanges: [...],
+	 * 				variantManagementChanges: [...],
+	 * 				ui2personalization: {...},
+	 * 				info: {...}, // content of the flex/info request
+	 * 				messagebundle: {...}, // used for translation of VENDOR layer changes, only applicable for the legacy NEO stack
+	 * 			},
+	 * 			cacheKey: <cacheKey>,
+	 * 			authors: {...} // map of variant author names
+	 * 		},
+	 * 		parameters: {
+	 * 			version: <version>,
+	 * 			allContextsProvided: <boolean>,
+	 * 			adaptationId: <adaptationId>,
+	 * 			bundleNotLoaded: <boolean>
+	 * 		}
+	 * 	}
+	 * }
+	 */
 	const _mCachedFlexData = {};
 	const _mInitPromises = {};
 

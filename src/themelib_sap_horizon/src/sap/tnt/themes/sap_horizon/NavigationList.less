@@ -1,17 +1,17 @@
 /* ======================================= */
 /* CSS for control sap.tnt/NavigationList  */
-/* Horizon theme                           */
+/* Morning Horizon theme                   */
 /* ======================================= */
 
 @_sap_tnt_NavigationList_CollapsedWidth: 4rem;
-@_sap_tnt_NavigationList_IconColor: @sapUiListTextColor;
-@_sap_tnt_NavigationList_ExpandIconColor: @sapUiListTextColor;
+@_sap_tnt_NavigationList_IconColor: var(--sapList_TextColor);
+@_sap_tnt_NavigationList_ExpandIconColor: var(--sapList_TextColor);
 @_sap_tnt_NavigationList_GroupBorderStyleColor: none;
 @_sap_tnt_NavigationList_ItemHeight: 2.75rem;
 @_sap_tnt_NavigationList_ItemBorderRadius: 0.375rem;
 @_sap_tnt_NavigationList_ItemBottomMargin: 0.25rem;
 @_sap_tnt_NavigationList_ItemBottomMarginInOverflowPopup: 0.25rem;
-@_sap_tnt_NavigationList_ItemFocusBorderOffset: -@sapUiContentFocusWidth;
+@_sap_tnt_NavigationList_ItemFocusBorderOffset: ~"calc(-1 * var(--sapContent_FocusWidth))";
 @_sap_tnt_NavigationList_ItemFocusBorderRadius: @_sap_tnt_NavigationList_ItemBorderRadius + @sapUiContentFocusWidth;
 @_sap_tnt_NavigationList_ItemTransition: background-color 0.3s ease-in-out, max-width 0.3s ease-in-out;
 @_sap_tnt_NavigationList_SelectedBorderStyleColor: none;
@@ -38,15 +38,15 @@
 @_sap_tnt_NavigationList_Collapsed_HoverOrFocusItemPaddingCompact: @_sap_tnt_NavigationList_Collapsed_HoverOrFocusItemPadding;
 @_sap_tnt_NavigationList_CollapsedIconPaddingLeft: 0.25rem;
 @_sap_tnt_NavigationList_CollapsedHiddenExpanderPadding: 1rem;
-@_sap_tnt_NavigationList_NavigationIndicator: "\E066";
+@_sap_tnt_NavigationList_NavigationIndicator: '\E066';
 @_sap_tnt_NavigationList_ExpandIconWidth: 2.25rem;
 @_sap_tnt_NavigationList_ExpandIconMarginRight: 0.375rem;
 @_sap_tnt_NavigationList_ExpandIconMarginLeft: 0.25rem;
 @_sap_tnt_NavigationList_ExpandIconPaddingLeft: 0.25rem;
 @_sap_tnt_NavigationList_ExpandIconFontSize: 1rem;
-@_sap_tnt_NavigationList_Collapsed_SelectedItemBackground: ~"0 100% / 0.188rem 100%" no-repeat linear-gradient(0deg, @sapUiListHighlightColor, @sapUiListHighlightColor), @sapUiListSelectionBackgroundColor;
+@_sap_tnt_NavigationList_Collapsed_SelectedItemBackground: ~"0 100% / 0.188rem 100%" no-repeat linear-gradient(0deg, @sapUiListHighlightColor, @sapUiListHighlightColor), var(--sapList_SelectionBackgroundColor);
 @_sap_tnt_NavigationList_Collapsed_SelectedItemBackgroundHover: @sapUiListSelectionHoverBackground;
-@_sap_tnt_NavigationList_Collapsed_SelectedItemBackgroundRTL: ~"100% 0 / 0.188rem 100%" no-repeat linear-gradient(0deg, @sapUiListHighlightColor, @sapUiListHighlightColor), @sapUiListSelectionBackgroundColor;
+@_sap_tnt_NavigationList_Collapsed_SelectedItemBackgroundRTL: ~"100% 0 / 0.188rem 100%" no-repeat linear-gradient(0deg, @sapUiListHighlightColor, @sapUiListHighlightColor), var(--sapList_SelectionBackgroundColor);
 @_sap_tnt_NavigationList_ActionItemBorderHover: @_sap_tnt_NavigationList_ActionItemBorder;
 @_sap_tnt_NavigationList_ActionItemBorderPosition: -1px;
 @_sap_tnt_NavigationList_ActionItemBorderHeight: auto;

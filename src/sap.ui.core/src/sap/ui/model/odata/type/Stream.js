@@ -48,7 +48,7 @@ sap.ui.define([
 	 * @alias sap.ui.model.odata.type.Stream
 	 * @author SAP SE
 	 * @class This class represents the OData V4 primitive type {@link
-	 *   http://docs.oasis-open.org/odata/odata/v4.0/errata02/os/complete/part3-csdl/odata-v4.0-errata02-os-part3-csdl-complete.html#_The_edm:Documentation_Element
+	 *   https://docs.oasis-open.org/odata/odata-csdl-xml/v4.01/odata-csdl-xml-v4.01.html#_Toc38530338
 	 *   <code>Edm.Stream</code>}. The values for stream properties do not appear in the entity
 	 *   payload. Instead, the values are read or written through URLs.
 	 *

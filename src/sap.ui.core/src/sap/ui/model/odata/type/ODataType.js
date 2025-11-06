@@ -5,10 +5,9 @@
 /**
  * The types in this namespace are {@link sap.ui.model.SimpleType simple types} corresponding
  * to OData primitive types for both
- * {@link http://www.odata.org/documentation/odata-version-2-0/overview#AbstractTypeSystem OData V2}
+ * {@link https://docs.oasis-open.org/odata/odata-csdl-xml/v4.01/odata-csdl-xml-v4.01.html#_Toc38530338 OData V4.01}
  * and
- * {@link http://docs.oasis-open.org/odata/odata/v4.0/odata-v4.0-part3-csdl.html OData V4} (see
- * "4.4 Primitive Types").
+ * {@link https://www.odata.org/documentation/odata-version-2-0/overview#AbstractTypeSystem OData V2}.
  *
  * They can be used in any place where simple types are allowed (and the model representation
  * matches), but they are of course most valuable when used in bindings to a
@@ -90,9 +89,9 @@ sap.ui.define([
 	 * Constructor for a new <code>ODataType</code>.
 	 *
 	 * @class This class is an abstract base class for all OData primitive types (see {@link
-	 * http://docs.oasis-open.org/odata/odata/v4.0/errata02/os/complete/part3-csdl/odata-v4.0-errata02-os-part3-csdl-complete.html#_The_edm:Documentation_Element
-	 * OData V4 Edm Types} and
-	 * {@link http://www.odata.org/documentation/odata-version-2-0/overview#AbstractTypeSystem
+	 * https://docs.oasis-open.org/odata/odata-csdl-xml/v4.01/odata-csdl-xml-v4.01.html#_Toc38530338
+	 * OData V4.01 Edm Types} and
+	 * {@link https://www.odata.org/documentation/odata-version-2-0/overview#AbstractTypeSystem
 	 * OData V2 Edm Types}). All subtypes implement the interface of
 	 * {@link sap.ui.model.SimpleType}. That means they implement next to the constructor:
 	 * <ul>

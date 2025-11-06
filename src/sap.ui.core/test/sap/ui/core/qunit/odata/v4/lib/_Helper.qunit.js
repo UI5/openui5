@@ -10,10 +10,8 @@ sap.ui.define([
 	"sap/ui/model/Filter",
 	"sap/ui/model/FilterOperator",
 	"sap/ui/model/odata/v4/lib/_Helper",
-	"sap/ui/model/odata/v4/lib/_Parser",
-	"sap/ui/thirdparty/URI"
-], function (Log, deepEqual, merge, uid, SyncPromise, Filter, FilterOperator, _Helper, _Parser,
-		URI) {
+	"sap/ui/model/odata/v4/lib/_Parser"
+], function (Log, deepEqual, merge, uid, SyncPromise, Filter, FilterOperator, _Helper, _Parser) {
 	/*eslint no-sparse-arrays: 0 */
 	"use strict";
 
@@ -570,26 +568,24 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test("buildQuery and decoding via URI.js", function (assert) {
+	QUnit.test("buildQuery and decoding", function (assert) {
 		var sComplexString = "",
 			i,
-			mParameters = {},
 			sUri;
 
 		for (i = 32; i < 127; i += 1) {
 			sComplexString += String.fromCharCode(i);
 		}
 
-		sUri = "/" + _Helper.buildQuery({foo : sComplexString});
+		// code under test
+		sUri = _Helper.buildQuery({foo : sComplexString});
 
-		// decode via URI.js
-		assert.strictEqual(new URI(sUri).search(true).foo, sComplexString);
+		assert.strictEqual(decodeURIComponent(sUri), `?foo=${sComplexString}`);
 
-		mParameters[sComplexString] = "foo";
-		sUri = "/" + _Helper.buildQuery(mParameters);
+		// code under test
+		sUri = _Helper.buildQuery({[sComplexString] : "foo"});
 
-		// decode via URI.js
-		assert.strictEqual(new URI(sUri).search(true)[sComplexString], "foo");
+		assert.strictEqual(decodeURIComponent(sUri), `?${sComplexString}=foo`);
 	});
 
 	//*********************************************************************************************

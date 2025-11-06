@@ -830,25 +830,6 @@ sap.ui.define([
 		assert.equal(aFields[0].getText && aFields[0].getText(), "Text 1 / Text 2", "rendered text");
 	});
 
-	QUnit.test("two fields one control don't support control rendering", async function(assert) {
-		var oLabel = new Label("L1", {text: "Test"});
-		oFormElement.setLabel(oLabel);
-		var oField1 = new Link("F1", {text: "Text 1"});
-		var oField2 = new Link("F2", {text: "Text 2"});
-		sinon.stub(oField2, "getFormRenderAsControl").returns(false);
-		oFormElement.addField(oField1);
-
-		await nextUIUpdate(); // to test change of renderinng mode
-
-		oFormElement.addField(oField2);
-		var aFields = oFormElement.getFieldsForRendering();
-		await nextUIUpdate();
-
-		assert.equal(aFields.length, 1, "1 control rendered");
-		assert.ok(aFields[0].isA("sap.m.Text"), "Text control rendered");
-		assert.equal(aFields[0].getText && aFields[0].getText(), "Text 1 / Text 2", "rendered text");
-	});
-
 	QUnit.test("_updateDisplayText doesn't fail without _displayField", async function(assert) {
 		var oLabel = new Label("L1", {text: "Test"});
 		oFormElement.setLabel(oLabel);

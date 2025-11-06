@@ -91,11 +91,6 @@ sap.ui.define([
 
 	TableTypeBase.prototype.getTableSettings = function() {
 		const oTable = this.getTable();
-
-		if (!oTable) {
-			return {};
-		}
-
 		const oDragDropInfo = new DragDropInfo({
 			sourceAggregation: "columns",
 			targetAggregation: "columns",
@@ -107,9 +102,44 @@ sap.ui.define([
 		oDragDropInfo.bIgnoreMetadataCheck = true;
 
 		return {
+			id: oTable.getId() + "-innerTable",
 			dragDropConfig: [oDragDropInfo],
-			busyIndicatorDelay: oTable.getBusyIndicatorDelay(),
+			busyIndicatorDelay: "{$sap.ui.mdc.Table>/busyIndicatorDelay}",
 			paste: [this._onPaste, this]
+		};
+	};
+
+	TableTypeBase.prototype.getColumnSettings = function(oColumn) {
+		const oTable = this.getTable();
+
+		return {
+			id: oColumn.getId() + "-innerColumn",
+			width: {
+				parts: [
+					{path: "$sap.ui.mdc.table.Column>/width"},
+					{path: "$sap.ui.mdc.table.Column>/@custom/calculatedWidth"},
+					{path: "$sap.ui.mdc.table.Column>/@custom/p13nWidth"}
+				],
+				formatter: function(sWidth, sCalculatedWidth, sP13nWidth) {
+					return sP13nWidth || sCalculatedWidth || sWidth;
+				}
+			},
+			tooltip: {
+				parts: [
+					{path: "$sap.ui.mdc.table.Column>/tooltip"},
+					{path: "$sap.ui.mdc.table.Column>/header"},
+					{path: "$sap.ui.mdc.table.Column>/headerVisible"},
+					{path: "$sap.ui.mdc.Table>/useColumnLabelsAsTooltips"}
+				],
+				formatter: function(sTooltip, sHeader, bHeaderVisible, bUseColumnLabelsAsTooltips) {
+					if (sTooltip || !bUseColumnLabelsAsTooltips) {
+						return sTooltip;
+					}
+					return bHeaderVisible ? sHeader : "";
+				}
+			},
+			hAlign: "{$sap.ui.mdc.table.Column>/hAlign}",
+			headerMenu: oTable.getId() + "-columnHeaderMenu"
 		};
 	};
 
@@ -166,7 +196,8 @@ sap.ui.define([
 	TableTypeBase.prototype.updateRowSettings = function() {};
 	TableTypeBase.prototype.prepareRowPress = function() {};
 	TableTypeBase.prototype.cleanupRowPress = function() {};
-	TableTypeBase.prototype.createTable = function(sId) {};
+	TableTypeBase.prototype.createTable = function() { };
+	TableTypeBase.prototype.createColumn = function(oColumn) { };
 	TableTypeBase.prototype.getRowBinding = function() {};
 	TableTypeBase.prototype.bindRows = function(oBindingInfo) {};
 	TableTypeBase.prototype.isTableBound = function() {};

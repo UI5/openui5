@@ -197,6 +197,41 @@ sap.ui.define([
 		vBox.destroy();
 	});
 
+	QUnit.test("Refresh of the main card refreshes the snack card", async function (assert) {
+		// Arrange
+		const oCard = this.oCard;
+		oCard.setHeight("100%");
+
+		const vBox = new VBox({
+			height: "150px",
+			renderType: "Bare",
+			items: [oCard]
+		});
+
+		vBox.placeAt(DOM_RENDER_LOCATION);
+		await nextCardReadyEvent(oCard);
+
+		const oFooter = oCard.getCardFooter();
+		await fnNextFooterAfterRendered(oFooter);
+
+		oFooter.getAggregation("_showMore").firePress();
+
+		const oDialog = this.oCard.getDependents()[0];
+		const oSnackCard = oDialog.getContent()[0];
+
+		await nextDialogAfterOpenEvent(oDialog);
+
+		// Act
+		const fnRefreshDataSpy = this.spy(oSnackCard, "refreshData");
+		oCard.refreshData();
+
+		// Assert
+		assert.ok(fnRefreshDataSpy.calledOnce, "Snack card refreshData is called when main card refreshData is called");
+
+		// Clean up
+		vBox.destroy();
+	});
+
 	QUnit.test("When space is enough", async function (assert) {
 		// Arrange
 		const oCard = this.oCard;

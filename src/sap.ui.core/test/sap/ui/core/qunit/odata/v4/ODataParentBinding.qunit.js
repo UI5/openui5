@@ -1006,7 +1006,13 @@ sap.ui.define([
 								},
 								resolve : function () {}
 							},
-							mParameters : {},
+							mParameters : {
+								$$aggregation : {
+									aggregate : oFixture.metadata.$kind === "Property"
+									? {childPath : {/* NO "name" here! */}}
+									: {}
+								}
+							},
 							sPath : "path"
 						}),
 						oBindingMock = this.mock(oBinding),
@@ -1810,12 +1816,28 @@ sap.ui.define([
 });
 
 	//*********************************************************************************************
-[false, true].forEach((bWithHeaderContext) => {
-	const sTitle = "fetchIfChildCanUseCache: "
-		+ (bWithHeaderContext ? "$$aggregation with header context" : "isAggregated");
+[{
+	bHeaderContext : true,
+	sTitle : "$$aggregation with header context"
+}, {
+	bAggregated : true,
+	sTitle : "isAggregated"
+}, {
+	mParameters : {
+		$$aggregation : {
+			aggregate : {
+				childPath : {
+					name : "name"
+				}
+			}
+		}
+	},
+	sTitle : "dynamic property"
+}].forEach((oFixture) => {
+	const sTitle = "fetchIfChildCanUseCache: " + oFixture.sTitle;
 
 	QUnit.test(sTitle, function (assert) {
-		var mParameters = {/*$$aggregation : {.../}*/},
+		var mParameters = oFixture.mParameters ?? {/*$$aggregation : {.../}*/},
 			oBinding = new ODataParentBinding({
 				oContext : {},
 				getHeaderContext : mustBeMocked,
@@ -1841,10 +1863,10 @@ sap.ui.define([
 			.withExactArgs(sinon.match.same(mParameters))
 			.returns(true);
 		this.mock(oBinding).expects("getHeaderContext").withExactArgs()
-			.returns(bWithHeaderContext ? oContext : {/*any other context*/});
+			.returns(oFixture.bHeaderContext ? oContext : {/*any other context*/});
 		this.mock(oContext).expects("isAggregated").withExactArgs()
-			.exactly(bWithHeaderContext ? 0 : 1)
-			.returns(true);
+			.exactly(oFixture.bHeaderContext ? 0 : 1)
+			.returns(oFixture.bAggregated);
 
 		assert.strictEqual(
 			// code under test

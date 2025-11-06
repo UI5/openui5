@@ -1224,6 +1224,33 @@ function(
         assert.ok(true);
     });
 
+
+	QUnit.test("Should set correct vizProperties on the inner chart", function (assert) {
+		const done = assert.async();
+		const oChart = new Chart("IdChart", {delegate: {
+			name: sDelegatePath,
+			aCustomStyleClasses: ["sapUiMDCChartTempText"],
+			inResultDimensions: ["Dimension2"],
+			payload: {
+				collectionPath: "/testPath"
+		}}});
+
+		ChartDelegate._setInnerStructure(oChart, new ChartImplementationContainer(oChart.getId() + "--implementationContainer", {}));
+		ChartDelegate.createInnerChartContent(oChart).then(() => {
+
+			const oInnerChart = ChartDelegate._getChart(oChart);
+
+			assert.ok(oInnerChart, "Inner chart is created");
+
+			const oVizProperties = oInnerChart.getVizProperties();
+			assert.ok(oVizProperties, "vizProperties are set");
+			assert.strictEqual(oVizProperties.tooltip.formatString, null, "Tooltip formatString is null");
+			assert.strictEqual(oVizProperties.valueAxis.label.formatString, null, "Value axis label formatString is null");
+
+			done();
+		});
+	});
+
     QUnit.test("_performInitialBind", function(assert) {
         const oMockChart = {bindData: function(){}};
         ChartDelegate._setState(this.oMDCChart, {innerChart: oMockChart, dataLoadedCallback: function(){}, innerStructure: new ChartImplementationContainer()});

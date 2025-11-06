@@ -85,5 +85,7 @@ sap.ui.define([
 		const oChidlCardFilterValue = oChildManifest["sap.card"].configuration.filters.productCategory.value;
 
 		assert.strictEqual(oExpectedFilterValue, oChidlCardFilterValue, "The filter value is correct.");
+
+		assert.strictEqual(oCard.getAssociation("showMoreChildCard"), oChildCard.getId(), "The child card is assosicated with the main card.");
 	});
 });

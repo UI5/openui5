@@ -1,5 +1,6 @@
 /*global QUnit, sinon */
 sap.ui.define([
+	"sap/base/i18n/Localization",
 	"sap/base/util/merge",
 	"sap/ui/Device",
 	"sap/ui/core/Element",
@@ -17,6 +18,7 @@ sap.ui.define([
 	"sap/ui/events/KeyCodes",
 	"sap/ui/test/utils/nextUIUpdate"
 ], function(
+	Localization,
 	merge,
 	Device,
 	Element,
@@ -1195,6 +1197,103 @@ sap.ui.define([
 		// Cleanup
 		oButton.destroy();
 		oButton = null;
+	});
+
+	QUnit.test("'openAsContextMenu' positions menu properly when different type of objects are provided (RTL)", async function (assert) {
+		var oOffsetCoordinates = { offsetX: 100, offsetY: 200 },
+			oWrongCoordinates1 = { offsetX: 100, pageY: 40 },
+			oWrongCoordinates2 = { offsetY: 200, pageX: 20 },
+			oOpener,
+			bOriginalRTL = Localization.getRTL();
+
+		// enable RTL for the test
+		Localization.setRTL(true);
+
+		// Act
+		this.oMenu.openAsContextMenu(oOffsetCoordinates);
+		await nextUIUpdate(this.clock);
+		oOpener = this.oMenu._getPopover()._oControl._getOpenByDomRef();
+
+		// Assert - insetInlineStart/insetBlockStart should reflect offsetX/offsetY in RTL as well
+		assert.strictEqual(oOpener.style.insetInlineStart, oOffsetCoordinates.offsetX + "px", "[offsetX/offsetY only] X coordinate is set correctly (RTL)");
+		assert.strictEqual(oOpener.style.insetBlockStart, oOffsetCoordinates.offsetY + "px", "[offsetX/offsetY only] Y coordinate is set correctly (RTL)");
+
+		// Act - malformed objects should fall back to 0px
+		this.oMenu.openAsContextMenu(oWrongCoordinates1);
+		await nextUIUpdate(this.clock);
+		oOpener = this.oMenu._getPopover()._oControl._getOpenByDomRef();
+
+		// Assert
+		assert.strictEqual(oOpener.style.insetInlineStart, "0px", "object containing just offsetX  - X coordinate is set to 0px (RTL)");
+		assert.strictEqual(oOpener.style.insetBlockStart, "0px", "object containing just offsetX  - Y coordinate is set to 0px (RTL)");
+
+		// Act
+		this.oMenu.openAsContextMenu(oWrongCoordinates2);
+		await nextUIUpdate(this.clock);
+		oOpener = this.oMenu._getPopover()._oControl._getOpenByDomRef();
+
+		// Assert
+		assert.strictEqual(oOpener.style.insetInlineStart, "0px", "object containing just offsetY  - X coordinate is set to 0px (RTL)");
+		assert.strictEqual(oOpener.style.insetBlockStart, "0px", "object containing just offsetY  - Y coordinate is set to 0px (RTL)");
+
+		// restore original RTL setting
+		Localization.setRTL(bOriginalRTL);
+	});
+
+	QUnit.test("'openAsContextMenu' positions menu properly when PointerEvent object is provided (RTL)", async function (assert) {
+		var oButton = new Button({
+					text: "Button"
+				}),
+			oPointerEvent = {
+				type: "contextmenu",
+				button: 2 // right click
+			},
+			oButtonDomRef,
+			oOpener,
+			oQunitFixture = document.getElementById("qunit-fixture"),
+			bOriginalRTL = Localization.getRTL();
+
+		// Arrange
+		oQunitFixture.style.top = "0px";
+		oQunitFixture.style.left = "0px";
+
+		oButton.placeAt("qunit-fixture");
+		await nextUIUpdate(this.clock);
+		oButtonDomRef = oButton.getDomRef();
+
+		// Simulate a right-click at specific coordinates relative to the button
+		oPointerEvent.target = oButtonDomRef;
+		oPointerEvent.pageX = 10;
+		oPointerEvent.pageY = 10;
+		oPointerEvent.clientX = 10;
+		oPointerEvent.clientY = 10;
+
+		// enable RTL for the test
+		Localization.setRTL(true);
+
+		// Act
+		this.oMenu.openAsContextMenu(oPointerEvent);
+		await nextUIUpdate(this.clock);
+
+		// Get the internal opener element of the popover
+		oOpener = this.oMenu._getPopover()._oControl._getOpenByDomRef();
+
+		// Compute expected values according to RTL calculation in the implementation
+		var oOpenerData = oButtonDomRef.getBoundingClientRect(),
+			iScrollX = document.documentElement.scrollLeft || document.body.scrollLeft,
+			iScrollY = document.documentElement.scrollTop || document.body.scrollTop,
+			iPageX = (oPointerEvent.pageX || oPointerEvent.clientX) + iScrollX,
+			iPageY = (oPointerEvent.pageY || oPointerEvent.clientY) + iScrollY,
+			// RTL expected: distance from opener's right edge to pointer
+			iExpectedX = document.getElementById("qunit-fixture").getBoundingClientRect().width - Math.round(iPageX - (oOpenerData.right + iScrollX)),
+			iExpectedY = Math.round(iPageY - (oOpenerData.top + iScrollY));
+
+		assert.strictEqual(oOpener.style.insetInlineStart, iExpectedX + "px", "X coordinate is set correctly (RTL)");
+		assert.strictEqual(oOpener.style.insetBlockStart, iExpectedY + "px", "Y coordinate is set correctly (RTL)");
+
+		// Cleanup & restore RTL
+		oButton.destroy();
+		Localization.setRTL(bOriginalRTL);
 	});
 
 	QUnit.test("focus management", async function (assert) {

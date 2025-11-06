@@ -26,7 +26,7 @@
     "@ui5/webcomponents-icons-tnt": "2.15.0",
     "@ui5/cli": "4.0.33",
     "fs-extra": "11.3.2",
-    "ui5-tooling-modules": "3.33.0"
+    "ui5-tooling-modules": "3.33.2"
   },
   "scripts": {
     "build-webcomponents": "ui5 build --dest ./src/sap/f --output-style flat --config ui5-build.yaml --exclude-task \\* --include-task ui5-tooling-modules-task",

@@ -84,7 +84,7 @@ sap.ui.define([
 	 * @alias sap.ui.model.odata.type.TimeOfDay
 	 * @author SAP SE
 	 * @class This class represents the OData V4 primitive type {@link
-	 *   http://docs.oasis-open.org/odata/odata/v4.0/errata02/os/complete/part3-csdl/odata-v4.0-errata02-os-part3-csdl-complete.html#_The_edm:Documentation_Element
+	 *   https://docs.oasis-open.org/odata/odata-csdl-xml/v4.01/odata-csdl-xml-v4.01.html#_Toc38530338
 	 *   <code>Edm.TimeOfDay</code>}.
 	 *   In {@link sap.ui.model.odata.v4.ODataModel} this type is represented as a
 	 *   <code>string</code>.

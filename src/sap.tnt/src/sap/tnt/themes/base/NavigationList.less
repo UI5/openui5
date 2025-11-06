@@ -4,11 +4,11 @@
 /* ======================================= */
 
 @_sap_tnt_NavigationList_CollapsedWidth: 3rem;
-@_sap_tnt_NavigationList_IconColor: @sapUiContentIconColor;
-@_sap_tnt_NavigationList_ExpandIconColor: @sapUiContentIconColor;
+@_sap_tnt_NavigationList_IconColor: var(--sapContent_IconColor);
+@_sap_tnt_NavigationList_ExpandIconColor: var(--sapContent_IconColor);
 @_sap_tnt_NavigationList_HoverBorderStyleColor: none;
 @_sap_tnt_NavigationList_HoverBorderWidth: 0;
-@_sap_tnt_NavigationList_GroupBorderStyleColor: solid @sapUiListBorderColor;
+@_sap_tnt_NavigationList_GroupBorderStyleColor: solid var(--sapList_BorderColor);
 @_sap_tnt_NavigationList_GroupBorderWidth: 0 0 0.0625rem 0;
 @_sap_tnt_NavigationList_ItemBorderStyleColor: none;
 @_sap_tnt_NavigationList_ItemBorderWidth: 0;
@@ -27,10 +27,10 @@
 @_sap_tnt_NavigationList_NoIconsNestedItemPadding: 1rem;
 @_sap_tnt_NavigationList_ItemFocusBorderOffset: 1px;
 @_sap_tnt_NavigationList_ItemFocusBorderRadius: @_sap_tnt_NavigationList_ItemBorderRadius;
-@_sap_tnt_NavigationList_Collapsed_SelectedItemBackground: ~"0 100% / 100% 0.125rem" no-repeat linear-gradient(0deg, @sapUiListSelectionBorderColor, @sapUiListSelectionBorderColor), @sapUiListSelectionBackgroundColor;
+@_sap_tnt_NavigationList_Collapsed_SelectedItemBackground: ~"0 100% / 100% 0.125rem" no-repeat linear-gradient(0deg, var(--sapList_SelectionBorderColor), var(--sapList_SelectionBorderColor)), var(--sapList_SelectionBackgroundColor);
 @_sap_tnt_NavigationList_Collapsed_SelectedItemBackgroundHover: @_sap_tnt_NavigationList_Collapsed_SelectedItemBackground;
 @_sap_tnt_NavigationList_Collapsed_SelectedItemBackgroundRTL: @_sap_tnt_NavigationList_Collapsed_SelectedItemBackground;
-@_sap_tnt_NavigationList_SelectedItemBorderColor: @sapUiListSelectionBorderColor;
+@_sap_tnt_NavigationList_SelectedItemBorderColor: var(--sapList_SelectionBorderColor);
 @_sap_tnt_NavigationList_SelectedBorderStyleColor: solid @_sap_tnt_NavigationList_SelectedItemBorderColor;
 @_sap_tnt_NavigationList_SelectedBorderWidth: 0 0 0.0625rem 0;
 @_sap_tnt_NavigationList_SelectedAndFocusedBorderStyleColor: @_sap_tnt_NavigationList_SelectedBorderStyleColor;
@@ -71,7 +71,7 @@
 @_sap_tnt_NavigationList_ActionItemBorderPosition: auto;
 @_sap_tnt_NavigationList_ActionItemBorderHeight: 100%;
 @_sap_tnt_NavigationList_ActionItemBorderPaddingLeft: @_sap_tnt_NavigationList_Collapsed_HoverOrFocusItemPadding;
-@_sap_tnt_NavigationList_ActionItemBorder: @sapUiButtonBorderWidth solid @sapUiButtonBorderColor;
+@_sap_tnt_NavigationList_ActionItemBorder: var(--sapButton_BorderWidth) solid var(--sapButton_BorderColor);
 
 .sapTntNL {
 	margin: 0;
@@ -86,7 +86,7 @@
 }
 
 .sapTntSideNavigation:not(.sapTntSideNavigationNotExpanded) .sapTntSideNavigationFixed .sapTntNLI.sapTntNLIFirstLevel:first-of-type {
-	// add 2px margin to make focus border visible
+	/* add 2px margin to make focus border visible */
 	margin-top: 0.125rem;
 }
 
@@ -123,15 +123,15 @@
 	height: @_sap_tnt_NavigationList_ItemHeight;
 	box-sizing: border-box;
 	cursor: pointer;
-	background-color: @sapUiListBackground;
+	background-color: var(--sapUiListBackground);
 	border-radius: @_sap_tnt_NavigationList_ItemBorderRadius;
 
-	// borders are drawn using a pseudo element.
-	// in some themes, the border is drawn only on the bottom.
-	// in high contrast themes the border is on all sides and there is extra border on hover
+	/* borders are drawn using a pseudo element. */
+	/* in some themes, the border is drawn only on the bottom. */
+	/* in high contrast themes the border is on all sides and there is extra border on hover */
 	&::before {
 		pointer-events: none;
-		content: "";
+		content: '';
 		position: absolute;
 		inset: 0;
 	}
@@ -145,7 +145,7 @@
 
 		span {
 			cursor: default;
-			opacity: @sapUiContentDisabledOpacity;
+			opacity: var(--sapContent_DisabledOpacity);
 		}
 	}
 
@@ -158,7 +158,7 @@
 	}
 
 	.sapMText {
-		color: @sapUiListTextColor;
+		color: var(--sapList_TextColor);
 		font-family: @_sap_tnt_NavigationList_ItemTextFontFamily;
 	}
 
@@ -197,14 +197,16 @@
 }
 
 .sapTntNL.sapTntNLCollapsed {
+
 	.sapTntNLI a {
 		justify-content: center;
 		transition: none;
 	}
 }
 
-// defines the styles for border when selected, border when hovering (hover used in high contrast themes)
+/* defines the styles for border when selected, border when hovering (hover used in high contrast themes) */
 .sapTntNL li .sapTntNLI:not(.sapTntNLIDisabled):not(.sapTntNLIAction) {
+
 	&.sapTntNLISelected::before {
 		border: @_sap_tnt_NavigationList_SelectedBorderStyleColor;
 		border-width: @_sap_tnt_NavigationList_SelectedBorderWidth;
@@ -214,7 +216,8 @@
 	&:active,
 	.sapTntNLPopover &:last-child:hover,
 	.sapTntNLPopover &:last-child:active {
-		&:not(.sapTntNLISelected):not(.sapTntNLIAction):before {
+
+		&:not(.sapTntNLISelected):not(.sapTntNLIAction)::before {
 			border: @_sap_tnt_NavigationList_HoverBorderStyleColor;
 			border-width: @_sap_tnt_NavigationList_HoverBorderWidth;
 		}
@@ -222,7 +225,8 @@
 }
 
 .sapTntNL .sapTntNLI:not(.sapTntNLIDisabled).sapTntNLISelected [tabindex]:focus {
-// .sapTntNL .sapTntNLI:not(.sapTntNLIDisabled).sapTntNLISelected:focus {
+/* .sapTntNL .sapTntNLI:not(.sapTntNLIDisabled).sapTntNLISelected:focus { */
+
 	&::before {
 		border: @_sap_tnt_NavigationList_SelectedAndFocusedBorderStyleColor;
 	}
@@ -246,9 +250,10 @@
 	border: none;
 }
 
-// When a group is expanded, defines the border of the group and of its last item
+/* When a group is expanded, defines the border of the group and of its last item */
 .sapTntNL:not(.sapTntNLPopup) {
-	.sapTntNLIFirstLevel[aria-expanded="true"]::before {
+
+	.sapTntNLIFirstLevel[aria-expanded='true']::before {
 		border-width: @_sap_tnt_NavigationList_GroupExpandedBorderWidth;
 	}
 
@@ -292,6 +297,7 @@
 }
 
 .sapTntNL {
+
 	span.sapTntNLIIcon {
 		outline: none;
 		-webkit-user-select: none; /* Chrome all / Safari all */
@@ -365,6 +371,7 @@
 	}
 
 	.sapTntNLI:not(.sapTntNLIDisabled):not(.sapTntNLIActive):not(.sapTntNLINoHoverEffect) {
+
 		[tabindex]:hover,
 		[tabindex]:focus {
 			position: @_sap_tnt_NavigationList_Collapsed_HoverOrFocusItemPosition;
@@ -394,10 +401,11 @@
 		}
 
 		&.sapTntNLIAction {
+
 			[tabindex]:not(:focus):hover {
 				border: @_sap_tnt_NavigationList_ActionItemBorderHover;
 
-				//border should be considered for the positioning in Horizon - the following styles are used to keep the icon in the same position when the border is added
+				/* border should be considered for the positioning in Horizon - the following styles are used to keep the icon in the same position when the border is added */
 				top: @_sap_tnt_NavigationList_ActionItemBorderPosition;
 				bottom: @_sap_tnt_NavigationList_ActionItemBorderPosition;
 				left: @_sap_tnt_NavigationList_ActionItemBorderPosition;
@@ -412,6 +420,7 @@
 		}
 
 		&.sapTntNLITwoClickAreas:not(.sapTntNLIWithExpander) {
+
 			[tabindex]:hover,
 			[tabindex]:focus {
 				padding-right: @_sap_tnt_NavigationList_CollapsedHiddenExpanderPadding;
@@ -425,7 +434,7 @@
 }
 
 .sapTntNLI:not(.sapTntNLIDisabled, .sapTntNLIFirstLevel.sapTntNLIInPopover.sapTntNLIUnselectable):hover {
-	background-color: @sapUiListHoverBackground;
+	background-color: var(--sapList_Hover_Background);
 }
 
 .sapTntNLI:not(.sapTntNLIDisabled).sapTntNLIActive:not(:hover),
@@ -435,7 +444,7 @@
 .sapTntNL .sapTntNLIFirstLevel.sapTntNLI:not(.sapTntNLIDisabled, .sapTntNLIInPopover.sapTntNLIUnselectable):not(.sapTntNLIAction):active,
 .sapTntNL .sapTntNLISecondLevel.sapTntNLI:not(.sapTntNLIDisabled):not(.sapTntNLIAction):active,
 .sapTntNL .sapTntNLISecondLevel.sapTntNLI:not(.sapTntNLIDisabled):not(.sapTntNLIAction).sapTntNLIActive {
-	background: @sapUiListActiveBackground;
+	background: var(--sapList_Active_Background);
 
 	&::before {
 		border: @_sap_tnt_NavigationList_SelectedBorderStyleColor;
@@ -444,11 +453,11 @@
 
 	.sapMText,
 	.sapTntNLGroupText {
-		color: @sapUiListActiveTextColor;
+		color: var(--sapList_Active_TextColor);
 	}
 
 	.sapUiIcon {
-		color: @sapUiListActiveTextColor;
+		color: var(--sapList_Active_TextColor);
 	}
 }
 
@@ -456,11 +465,11 @@
 .sapTntNLISelected .sapTntNLIFirstLevel,
 .sapTntNLISelected.sapTntNLISecondLevel,
 .sapTntNLISelected.sapTntNLISecondLevel.sapTntNLI {
-	background-color: @sapUiListSelectionBackgroundColor;
+	background-color: var(--sapList_SelectionBackgroundColor);
 }
 
 .sapTntSideNavigationNotExpanded .sapTntNLIFirstLevel.sapTntNLIWithExpander .sapUiIcon {
-	padding-left: @_sap_tnt_NavigationList_CollapsedIconPaddingLeft; // to center the icon. Value is the width of the expander.
+	padding-left: @_sap_tnt_NavigationList_CollapsedIconPaddingLeft; /* to center the icon. Value is the width of the expander. */
 }
 
 
@@ -479,10 +488,11 @@
 
 .sapTntNLIAction .sapMText,
 .sapTntNLIAction .sapUiIcon {
-	color: @sapButton_Lite_TextColor;
+	color: var(--sapButton_Lite_TextColor);
 }
 
 .sapTntNLIFirstLevel:not(.sapTntNLIWithExpander) {
+
 	.sapTntNLISelectionIndicator {
 		margin: 0 0.5rem;
 	}
@@ -493,16 +503,16 @@
 }
 
 .sapTntNLIWithExpander.sapTntNLITwoClickAreas .sapUiIcon:last-of-type {
-	height: @sapUiElementCondensedHeight;
-	line-height: @sapUiElementCondensedHeight;
+	height: var(--sapElement_Condensed_Height);
+	line-height: var(--sapElement_Condensed_Height);
 }
 
 .sapTntNL:not(.sapTntNLCollapsed) .sapTntNLIWithExpander.sapTntNLITwoClickAreas .sapUiIcon:last-of-type {
-	border-left: 0.0625rem solid @sapTextColor;
+	border-left: 0.0625rem solid var(--sapTextColor);
 }
 
 .sapTntNLIWithExpander.sapTntNLITwoClickAreas .sapUiIcon:last-of-type::before {
-	line-height: @sapUiElementCondensedHeight;
+	line-height: var(--sapElement_Condensed_Height);
 }
 
 .sapTntNLISecondLevel .sapTntNLISelectionIndicator {
@@ -535,7 +545,7 @@ html[dir=rtl] .sapTntNLISelected:not(.sapTntNLIDisabled) {
 	padding-inline-start: 1rem;
 	border-radius: @_sap_tnt_NavigationList_ItemBorderRadius;
 	transition: @_sap_tnt_NavigationList_ItemTransition;
-	color: @sapUiContentLabelColor;
+	color: var(--sapContent_LabelColor);
 	display: flex;
 	cursor: pointer;
 	box-sizing: border-box;
@@ -549,7 +559,7 @@ html[dir=rtl] .sapTntNLISelected:not(.sapTntNLIDisabled) {
 	.sapTntNLGroupText {
 		flex: 1 1 auto;
 		font-size: @sapFontSize;
-		font-family: @sapFontFamily;
+		font-family: var(--sapFontFamily);
 		overflow: hidden;
 		margin: @_sap_tnt_NavigationList_ItemTextMargin 0;
 	}
@@ -572,11 +582,12 @@ html[dir=rtl] .sapTntNLISelected:not(.sapTntNLIDisabled) {
 }
 
 .sapTntNL .sapTntNLI:not(.sapTntNLIFirstLevel.sapTntNLIInPopover.sapTntNLIUnselectable) {
+
 	&[tabindex]:focus::after,
 	[tabindex]:focus::after {
-		border: @sapUiContentFocusWidth @sapUiContentFocusStyle @sapUiContentFocusColor;
+		border: var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);
 		position: absolute;
-		content: "";
+		content: '';
 		inset: @_sap_tnt_NavigationList_ItemFocusBorderOffset;
 		z-index: 2;
 		pointer-events: none;
@@ -584,7 +595,7 @@ html[dir=rtl] .sapTntNLISelected:not(.sapTntNLIDisabled) {
 	}
 }
 
-// NavigationList with icons
+/* NavigationList with icons */
 .sapTntNL:not(.sapTntNLNoIcons) span.sapTntNLIIcon {
 	min-width: @_sap_tnt_NavigationList_GroupIconWidth;
 }
@@ -595,20 +606,21 @@ html[dir=rtl] .sapTntNLISelected:not(.sapTntNLIDisabled) {
 	margin-right: @_sap_tnt_NavigationList_GroupIconMarginRight
 }
 
-// NavigationList without icons
+/* NavigationList without icons */
 .sapTntNL.sapTntNLNoIcons:not(.sapTntNLPopup) {
 
 	.sapTntNLIFirstLevel .sapMText {
 		padding-left: @_sap_tnt_NavigationList_NoIconsGroupPadding;
 	}
 
-	// nested items
+	/* nested items */
 	.sapTntNLISecondLevel .sapMText {
 		padding-left: @_sap_tnt_NavigationList_NoIconsNestedItemPadding;
 	}
 }
 
 .sapTntNLMenu.sapMMenu {
+
 	&:not(.sapMSubmenu) .sapMMenuList {
 		padding: @_sap_tnt_NavigationList_PopupPadding;
 	}
@@ -618,11 +630,12 @@ html[dir=rtl] .sapTntNLISelected:not(.sapTntNLIDisabled) {
 		padding-inline-end: initial;
 	}
 
-	// parent menu
+	/* parent menu */
 	&:not(.sapMSubmenu) .sapMMenuList .sapMMenuItem  {
 		font-family: @_sap_tnt_NavigationList_ParentItemTextFontFamily;
 
 		.sapMMenuItemIcon {
+
 			.sapUiIcon {
 				color: @_sap_tnt_NavigationList_IconColor;
 				display: block;
@@ -630,7 +643,7 @@ html[dir=rtl] .sapTntNLISelected:not(.sapTntNLIDisabled) {
 		}
 
 		.sapMMenuItemSubMenu {
-			position: static; // default one
+			position: static; /* default one */
 			display: flex;
 			align-items: center;
 			justify-content: center;
@@ -646,7 +659,7 @@ html[dir=rtl] .sapTntNLISelected:not(.sapTntNLIDisabled) {
 			}
 
 			.sapUiIconMirrorInRTL::after {
-				content: "\e1ed";
+				content: '\e1ed';
 				font-size: @_sap_tnt_NavigationList_ExpandIconFontSize;
 				color: @_sap_tnt_NavigationList_IconColor;
 			}
@@ -655,11 +668,11 @@ html[dir=rtl] .sapTntNLISelected:not(.sapTntNLIDisabled) {
 		&.sapMMenuItemSubMenuOpen,
 		&.sapMMenuItemSubMenuOpen:hover {
 			border-bottom: none;
-			background-color: @sapUiListHoverBackground;
+			background-color: var(--sapList_Hover_Background);
 
 			&::before {
 				position: absolute;
-				content: "";
+				content: '';
 				inset: 0;
 				border: @_sap_tnt_NavigationList_SelectedBorderStyleColor;
 				border-width: @_sap_tnt_NavigationList_SelectedBorderWidth;
@@ -668,6 +681,7 @@ html[dir=rtl] .sapTntNLISelected:not(.sapTntNLIDisabled) {
 	}
 
 	.sapMMenuList {
+
 		li.sapMMenuItem {
 			display: flex;
 			align-items: center;
@@ -687,7 +701,7 @@ html[dir=rtl] .sapTntNLISelected:not(.sapTntNLIDisabled) {
 			}
 
 			&:focus {
-				outline: @sapUiContentFocusStyle @sapUiContentFocusWidth @sapUiContentFocusColor;
+				outline: var(--sapContent_FocusStyle) var(--sapContent_FocusWidth) var(--sapContent_FocusColor);
 			}
 
 			&:not(:last-child) {
@@ -713,15 +727,16 @@ html[dir=rtl] .sapTntNLISelected:not(.sapTntNLIDisabled) {
 			}
 
 			.sapMMenuItemText {
-				color: @sapUiListTextColor;
+				color: var(--sapList_TextColor);
 			}
 
 			&.sapMMenuItemDisabled {
+
 				.sapMMenuItemIcon,
 				.sapMMenuItemText,
 				.sapTntNLIExpandIcon,
 				.sapTntNLIExternalLinkIcon {
-					opacity: @sapUiContentDisabledOpacity;
+					opacity: var(--sapContent_DisabledOpacity);
 				}
 			}
 		}
@@ -829,6 +844,7 @@ html[dir=rtl] .sapTntNLISelected:not(.sapTntNLIDisabled) {
 
 	.sapTntNLCollapsed {
 		.sapTntNLI:not(.sapTntNLIDisabled):not(.sapTntNLIActive):not(.sapTntNLINoHoverEffect) {
+
 			[tabindex]:hover,
 			[tabindex]:focus {
 				padding: @_sap_tnt_NavigationList_Collapsed_HoverOrFocusItemPaddingCompact;

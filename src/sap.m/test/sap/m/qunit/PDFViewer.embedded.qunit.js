@@ -24,16 +24,14 @@ sap.ui.define([
 		}
 	});
 
-	function createMockEvent(iEmbedCount, bCanAccessChildren, bIsChildrenPresent) {
+	function createMockEvent(iEmbedCount, bCanAccessChildren) {
 		var aEmbedsArray = new Array(iEmbedCount).fill({});
-		var bodyObj = {};
-		if (bIsChildrenPresent !== false) {
-			bodyObj.children = bCanAccessChildren ? [{}] : undefined;
-		}
 		var oMockContentWindow = {
 			document: {
 				embeds: aEmbedsArray,
-				body: bodyObj
+				body: {
+					children: bCanAccessChildren ? [{}] : undefined
+				}
 			}
 		};
 		return {
@@ -99,21 +97,6 @@ sap.ui.define([
 		oPdfViewer._fireLoadedEvent = function() { bLoadedCalled = true; };
 		oPdfViewer._fireErrorEvent = function() { bErrorCalled = true; };
 		var oEvent = createMockEvent(1, false);
-		oPdfViewer._onLoadListener(oEvent);
-
-		assert.ok(bLoadedCalled, "Loaded event should not be fired");
-		assert.notOk(bErrorCalled, "Error event should be fired");
-	});
-
-	QUnit.test("Handle error when children is not present", function(assert) {
-		oPdfViewer = TestUtils.createPdfViewer({});
-		var bLoadedCalled = false;
-		var bErrorCalled = false;
-
-		PDFViewerRenderer._isPdfPluginEnabled = function() { return true; };
-		oPdfViewer._fireLoadedEvent = function() { bLoadedCalled = true; };
-		oPdfViewer._fireErrorEvent = function() { bErrorCalled = true; };
-		var oEvent = createMockEvent(1, false, false);
 		oPdfViewer._onLoadListener(oEvent);
 
 		assert.ok(bLoadedCalled, "Loaded event should not be fired");

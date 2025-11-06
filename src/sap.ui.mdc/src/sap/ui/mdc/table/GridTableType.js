@@ -6,16 +6,16 @@ sap.ui.define([
 	"./TableTypeBase",
 	"./menus/GroupHeaderRowContextMenu",
 	"../enums/TableRowCountMode",
-	"sap/m/table/Util",
 	"./utils/Personalization",
+	"sap/m/library",
 	"sap/ui/model/json/JSONModel",
 	"sap/ui/core/Lib"
 ], (
 	TableTypeBase,
 	GroupHeaderRowContextMenu,
 	TableRowCountMode,
-	MTableUtil,
 	PersonalizationUtils,
+	MLibrary,
 	JSONModel,
 	Library
 ) => {
@@ -254,14 +254,14 @@ sap.ui.define([
 		});
 	};
 
-	GridTableType.prototype.createTable = function(sId) {
+	GridTableType.prototype.createTable = function() {
 		const oTable = this.getTable();
 
 		if (!oTable || !InnerTable) {
 			return null;
 		}
 
-		const oGridTable = new InnerTable(sId, this.getTableSettings());
+		const oGridTable = new InnerTable(this.getTableSettings());
 
 		oGridTable.setAggregation("groupHeaderRowContextMenu", new GroupHeaderRowContextMenu());
 
@@ -275,6 +275,7 @@ sap.ui.define([
 		};
 		const mRowSettingsConfig = this.getRowSettingsConfig();
 		const mSettings = {
+			...TableTypeBase.prototype.getTableSettings.apply(this, arguments),
 			enableBusyIndicator: true,
 			enableColumnReordering: false,
 			threshold: {
@@ -315,7 +316,7 @@ sap.ui.define([
 			mSettings.cellClick = [onCellClick, this];
 		}
 
-		return Object.assign({}, TableTypeBase.prototype.getTableSettings.apply(this, arguments), mSettings);
+		return mSettings;
 	};
 
 	function onCellClick(oEvent) {
@@ -339,8 +340,28 @@ sap.ui.define([
 		});
 	}
 
-	GridTableType.createColumn = function(sId, mSettings) {
-		return new InnerColumn(sId, mSettings);
+	GridTableType.prototype.createColumn = function(oColumn) {
+		const oGridTableColumn = new InnerColumn(this.getColumnSettings(oColumn));
+
+		oGridTableColumn.setCreationTemplate(oColumn.getCreationTemplate()?.clone()?.setWrapping?.(false));
+
+		return oGridTableColumn;
+	};
+
+	GridTableType.prototype.getColumnSettings = function(oColumn) {
+		return {
+			...TableTypeBase.prototype.getColumnSettings.apply(this, arguments),
+			label: oColumn.getHeaderLabel({wrapping: false}),
+			template: oColumn.getTemplateClone()?.setWrapping?.(false),
+			minWidth: {
+				path: "$sap.ui.mdc.table.Column>/minWidth",
+				formatter: function(fMinWidth) {
+					return Math.round(fMinWidth * parseFloat(MLibrary.BaseFontSize));
+				}
+			},
+			resizable: "{$sap.ui.mdc.Table>/enableColumnResize}",
+			autoResizable: "{$sap.ui.mdc.Table>/enableColumnResize}"
+		};
 	};
 
 	GridTableType.prototype.enableColumnResize = function() {
