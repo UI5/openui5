@@ -27,7 +27,7 @@ sap.ui.define(
      * - [Shift] - If [Space] is pressed, pressing [Shift] releases the component without triggering the click event.
      *
      * ### ES6 Module Import
-     * `import "sap/f/gen/ui5/webcomponents/dist/Avatar.js";`
+     * `import "@ui5/webcomponents/dist/Avatar.js";`
      *
      * @implements module:sap/f/gen/ui5/webcomponents.IAvatarGroupItem
      * @extends sap.ui.core.webc.WebComponent
@@ -40,7 +40,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents.dist.Avatar",
       {
         metadata: {
-          tag: "ui5-avatar-87689b96",
+          tag: "ui5-avatar-cc48984a",
 
           namespace: "sap.f.gen.ui5.webcomponents",
 

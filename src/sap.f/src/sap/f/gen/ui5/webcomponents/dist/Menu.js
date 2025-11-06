@@ -47,7 +47,7 @@ sap.ui.define(
      *
      * ### ES6 Module Import
      *
-     * `import "sap/f/gen/ui5/webcomponents/dist/Menu.js";`
+     * `import "@ui5/webcomponents/dist/Menu.js";`
      *
      * @extends sap.ui.core.webc.WebComponent
      * @constructor
@@ -59,7 +59,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents.dist.Menu",
       {
         metadata: {
-          tag: "ui5-menu-87689b96",
+          tag: "ui5-menu-cc48984a",
 
           namespace: "sap.f.gen.ui5.webcomponents",
 
@@ -106,13 +106,6 @@ sap.ui.define(
               defaultValue: 1000
             },
             /**
-             * Defines the ID or DOM Reference of the element at which the menu is shown.
-             * When using this attribute in a declarative way, you must only use the `id` (as a string) of the element at which you want to show the popover.
-             * You can only set the `opener` attribute to a DOM Reference when using JavaScript.
-             * @type module:sap/ui/core/Control
-             */
-            opener: { type: "sap.ui.core.Control", mapping: "property" },
-            /**
              * The text-content of the Web Component.
              */
             text: { type: "string", mapping: "textContent" },
@@ -136,7 +129,14 @@ sap.ui.define(
             items: { type: "sap.f.gen.ui5.webcomponents.IMenuItem", multiple: true }
           },
 
-          associations: {},
+          associations: {
+            /**
+             * Defines the ID or DOM Reference of the element at which the menu is shown.
+             * When using this attribute in a declarative way, you must only use the `id` (as a string) of the element at which you want to show the popover.
+             * You can only set the `opener` attribute to a DOM Reference when using JavaScript.
+             */
+            opener: { mapping: { type: "property", to: "opener" } }
+          },
 
           events: {
             /**
