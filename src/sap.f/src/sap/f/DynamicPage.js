@@ -672,16 +672,31 @@ sap.ui.define([
 		this._headerBiggerThanAllowedHeight = this._headerBiggerThanAllowedToBeFixed();
 		bChange = bOldValue !== this._headerBiggerThanAllowedHeight;
 
-		if (!this._headerBiggerThanAllowedHeight || !bChange) {
+		if (!bChange) {
 			return;
 		}
-		//move the header to content
+
+		this._repositionHeaderBasedOnHeight();
+
+		this._adjustStickyContent();
+		this._updateTitlePositioning();
+	};
+
+	DynamicPage.prototype._repositionHeaderBasedOnHeight = function () {
+		var bMoveHeaderToContent = this._headerBiggerThanAllowedHeight;
 		if (this.getHeaderExpanded()) {
+			this._repositionExpandedHeader(bMoveHeaderToContent);
+		} else {
+			this._repositionSnappedHeader(); // will automatically move to content if possible
+		}
+	};
+
+	DynamicPage.prototype._repositionExpandedHeader = function (bMoveHeaderToContent) {
+		if (bMoveHeaderToContent) {
 			this._moveHeaderToContentArea();
 		} else {
-			this._adjustSnap(); // moves the snapped header to content if possible
+			this._moveHeaderToTitleArea();
 		}
-		this._updateTitlePositioning();
 	};
 
 	/**
@@ -1791,7 +1806,7 @@ sap.ui.define([
 	 * (2) snapping with hiding the header - when not enough content is available to allow snap header on scroll
 	 * @private
 	 */
-	DynamicPage.prototype._adjustSnap = function () {
+	DynamicPage.prototype._repositionSnappedHeader = function () {
 		var oDynamicPageHeader,
 			bIsSnapped,
 			bCanSnapWithScroll,
@@ -1900,7 +1915,7 @@ sap.ui.define([
 			this._toggleScrollingStyles(bNeedsVerticalScrollBar);
 		}
 
-		this._adjustSnap();
+		this._repositionSnappedHeader();
 
 		if (!this._bExpandingWithAClick) {
 			this._updateTitlePositioning();
@@ -1940,7 +1955,7 @@ sap.ui.define([
 
 		this._expandHeaderIfNeeded(oEvent);
 
-		this._adjustSnap();
+		this._repositionSnappedHeader();
 		this._updateTitlePositioning();
 		this._updateMedia(iCurrentWidth);
 	};
