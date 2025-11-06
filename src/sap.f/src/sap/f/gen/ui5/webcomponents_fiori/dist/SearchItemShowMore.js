@@ -18,7 +18,7 @@ sap.ui.define(
      *
      * ### ES6 Module Import
      *
-     * `import "sap/f/gen/ui5/webcomponents_fiori/dist/SearchItemShowMore.js";`
+     * `import "@ui5/webcomponents-fiori/dist/SearchItemShowMore.js";`
      *
      * @extends module:sap/f/gen/ui5/webcomponents/dist/ListItemBase
      * @constructor
@@ -30,7 +30,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents_fiori.dist.SearchItemShowMore",
       {
         metadata: {
-          tag: "ui5-search-item-show-more-87689b96",
+          tag: "ui5-search-item-show-more-cc48984a",
 
           namespace: "sap.f.gen.ui5.webcomponents_fiori",
 

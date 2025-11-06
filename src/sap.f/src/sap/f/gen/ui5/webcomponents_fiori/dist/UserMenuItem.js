@@ -25,7 +25,7 @@ sap.ui.define(
      *
      * ### ES6 Module Import
      *
-     * `import "sap/f/gen/ui5/webcomponents_fiori/dist/UserMenuItem.js";`
+     * `import "@ui5/webcomponents-fiori/dist/UserMenuItem.js";`
      *
      * @extends module:sap/f/gen/ui5/webcomponents/dist/MenuItem
      * @constructor
@@ -37,7 +37,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents_fiori.dist.UserMenuItem",
       {
         metadata: {
-          tag: "ui5-user-menu-item-87689b96",
+          tag: "ui5-user-menu-item-cc48984a",
 
           namespace: "sap.f.gen.ui5.webcomponents_fiori",
 

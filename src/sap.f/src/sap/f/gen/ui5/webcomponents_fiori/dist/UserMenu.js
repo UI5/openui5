@@ -18,9 +18,9 @@ sap.ui.define(
      * and allows the user to easily see information and settings for the current user and all other logged in accounts.
      *
      * ### ES6 Module Import
-     * `import "sap/f/gen/ui5/webcomponents_fiori/dist/UserMenu.js";`
+     * `import "@ui5/webcomponents-fiori/dist/UserMenu.js";`
      *
-     * `import "sap/f/gen/ui5/webcomponents_fiori/dist/UserMenuItem.js";` (for `ui5-user-menu-item`)
+     * `import "@ui5/webcomponents-fiori/dist/UserMenuItem.js";` (for `ui5-user-menu-item`)
      *
      * @extends sap.ui.core.webc.WebComponent
      * @constructor
@@ -32,7 +32,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents_fiori.dist.UserMenu",
       {
         metadata: {
-          tag: "ui5-user-menu-87689b96",
+          tag: "ui5-user-menu-cc48984a",
 
           namespace: "sap.f.gen.ui5.webcomponents_fiori",
 
@@ -49,13 +49,6 @@ sap.ui.define(
              * Defines if the User Menu is opened.
              */
             open: { type: "boolean", mapping: "property", defaultValue: false },
-            /**
-             * Defines the ID or DOM Reference of the element at which the user menu is shown.
-             * When using this attribute in a declarative way, you must only use the `id` (as a string) of the element at which you want to show the popover.
-             * You can only set the `opener` attribute to a DOM Reference when using JavaScript.
-             * @type module:sap/ui/core/Control
-             */
-            opener: { type: "sap.ui.core.Control", mapping: "property" },
             /**
              * Defines if the User Menu shows the Manage Account option.
              */
@@ -125,7 +118,14 @@ sap.ui.define(
             }
           },
 
-          associations: {},
+          associations: {
+            /**
+             * Defines the ID or DOM Reference of the element at which the user menu is shown.
+             * When using this attribute in a declarative way, you must only use the `id` (as a string) of the element at which you want to show the popover.
+             * You can only set the `opener` attribute to a DOM Reference when using JavaScript.
+             */
+            opener: { mapping: { type: "property", to: "opener" } }
+          },
 
           events: {
             /**

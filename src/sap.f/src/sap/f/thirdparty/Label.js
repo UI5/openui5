@@ -1,4 +1,4 @@
-sap.ui.define(['sap/f/thirdparty/webcomponents-base', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/parameters-bundle.css2', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/Icons'], (function (webcomponentsBase, webcomponents, parametersBundle_css$1, parametersBundle_css, i18nDefaults, Icons) { 'use strict';
+sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/parameters-bundle.css2', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/Icons'], (function (webcomponentsBase, parametersBundle_css$1, parametersBundle_css, i18nDefaults, Icons) { 'use strict';
 
     function LabelTemplate() {
         return (parametersBundle_css.jsxs("label", { class: "ui5-label-root", onClick: this._onclick, children: [parametersBundle_css.jsx("span", { class: "ui5-label-text-wrapper", children: parametersBundle_css.jsx("slot", {}) }), parametersBundle_css.jsx("span", { "aria-hidden": "true", class: "ui5-label-required-colon", "data-ui5-colon": this._colonSymbol })] }));
