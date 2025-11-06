@@ -1853,7 +1853,7 @@ sap.ui.define([
 		for (var i = 0; i < aSections.length; i++) {
 			var oSection = aSections[i];
 			if (oSection._getInternalVisible()) {
-				oSection._setAriaLabelledByAnchorButton(aAnchorBarItems[i], bInvalidate);
+				oSection._setAriaLabelledByAnchorButton(aAnchorBarItems[i]);
 			}
 		}
 
