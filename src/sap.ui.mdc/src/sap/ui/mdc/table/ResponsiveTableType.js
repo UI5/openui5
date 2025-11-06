@@ -5,25 +5,27 @@
 sap.ui.define([
 	"./TableTypeBase",
 	"./utils/Personalization",
+	"sap/ui/mdc/enums/TableGrowingMode",
+	"sap/ui/mdc/enums/TableRowActionType",
+	"sap/ui/mdc/enums/TablePopinDisplay",
 	"sap/m/plugins/ColumnResizer",
 	"sap/m/SegmentedButton",
 	"sap/m/SegmentedButtonItem",
 	"sap/ui/Device",
 	"sap/ui/core/Element",
-	"sap/ui/core/Lib",
-	"sap/ui/mdc/enums/TableGrowingMode",
-	"sap/ui/mdc/enums/TableRowActionType"
+	"sap/ui/core/Lib"
 ], (
 	TableTypeBase,
 	PersonalizationUtils,
+	GrowingMode,
+	RowActionType,
+	PopinDisplay,
 	ColumnResizer,
 	SegmentedButton,
 	SegmentedButtonItem,
 	Device,
 	Element,
-	Library,
-	GrowingMode,
-	RowActionType
+	Library
 ) => {
 	"use strict";
 
@@ -96,6 +98,16 @@ sap.ui.define([
 					type: "sap.m.PopinLayout",
 					group: "Appearance",
 					defaultValue: "Block"
+				},
+				/**
+				 * Defines how the pop-in content is displayed.
+				 *
+				 * @since 1.143
+				 */
+				popinDisplay: {
+					type: "sap.ui.mdc.enums.TablePopinDisplay",
+					group: "Appearance",
+					defaultValue: PopinDisplay.Inline
 				}
 			}
 		}
@@ -163,20 +175,20 @@ sap.ui.define([
 		}
 	};
 
-	ResponsiveTableType.prototype.createTable = function(sId) {
+	ResponsiveTableType.prototype.createTable = function() {
 		const oTable = this.getTable();
 
 		if (!oTable || !InnerTable) {
 			return null;
 		}
 
-		return new InnerTable(sId, this.getTableSettings());
+		return new InnerTable(this.getTableSettings());
 	};
 
 	ResponsiveTableType.prototype.getTableSettings = function() {
 		const oTable = this.getTable();
-
 		const mSettings = {
+			...TableTypeBase.prototype.getTableSettings.apply(this, arguments),
 			autoPopinMode: true,
 			contextualWidth: "Auto",
 			growing: true,
@@ -197,7 +209,7 @@ sap.ui.define([
 			mSettings.itemPress = [onItemPress, this];
 		}
 
-		return Object.assign({}, TableTypeBase.prototype.getTableSettings.apply(this, arguments), mSettings);
+		return mSettings;
 	};
 
 	function onItemPress(oEvent) {
@@ -221,8 +233,72 @@ sap.ui.define([
 		});
 	}
 
-	ResponsiveTableType.createColumn = function(sId, mSettings) {
-		return new InnerColumn(sId, mSettings);
+	ResponsiveTableType.prototype.createColumn = function(oColumn) {
+		return new InnerColumn(this.getColumnSettings(oColumn));
+	};
+
+	ResponsiveTableType.prototype.getColumnSettings = function(oColumn) {
+		const mSettings = TableTypeBase.prototype.getColumnSettings.apply(this, arguments);
+
+		mSettings.header = oColumn.getHeaderLabel({
+			tooltip: mSettings.tooltip,
+			wrapping: {
+				parts: [
+					{path: "$sap.ui.mdc.table.Column>/headerVisible"},
+					{path: "$sap.ui.mdc.Table>/enableColumnResize"}
+				],
+				formatter: function(bHeaderVisible, bResizable) {
+					return bHeaderVisible && !bResizable;
+				}
+			},
+			wrappingType: "Hyphenated"
+		});
+		delete mSettings.tooltip;
+
+		return {
+			...mSettings,
+			autoPopinWidth: "{$sap.ui.mdc.table.Column>/minWidth}",
+			importance: {
+				parts: [
+					{path: "$sap.ui.mdc.table.Column>/extendedSettings/@className"},
+					{path: "$sap.ui.mdc.table.Column>/extendedSettings/importance"},
+					{path: "$sap.ui.mdc.table.Column>/importance"}
+				],
+				formatter: function(sExtendedSettingsType, sImportance, sLegacyImportance) {
+					if (sExtendedSettingsType === "sap.ui.mdc.table.ResponsiveColumnSettings") {
+						return sImportance;
+					}
+					return sLegacyImportance;
+				}
+			},
+			popinDisplay: {
+				parts: [
+					{path: "$sap.ui.mdc.table.Column>/headerVisible"},
+					{path: "$sap.ui.mdc.Table#type>/popinDisplay"}
+				],
+				formatter: function(bHeaderVisible, sPopinDisplay) {
+					return bHeaderVisible ? sPopinDisplay : "WithoutHeader";
+				}
+			},
+			mergeDuplicates: {
+				parts: [
+					{path: "$sap.ui.mdc.table.Column>/extendedSettings/@className"},
+					{path: "$sap.ui.mdc.table.Column>/extendedSettings/mergeFunction"}
+				],
+				formatter: function(sExtendedSettingsType, sMergeFunction) {
+					return sExtendedSettingsType === "sap.ui.mdc.table.ResponsiveColumnSettings" && !!sMergeFunction;
+				}
+			},
+			mergeFunctionName: {
+				parts: [
+					{path: "$sap.ui.mdc.table.Column>/extendedSettings/@className"},
+					{path: "$sap.ui.mdc.table.Column>/extendedSettings/mergeFunction"}
+				],
+				formatter: function(sExtendedSettingsType, sMergeFunction) {
+					return sExtendedSettingsType === "sap.ui.mdc.table.ResponsiveColumnSettings" ? sMergeFunction : null;
+				}
+			}
+		};
 	};
 
 	ResponsiveTableType.prototype.createRowTemplate = function(sId) {

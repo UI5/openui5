@@ -483,6 +483,8 @@
 			<Input value="{path: 'Decimal', type: 'DecimalType', constraints: {scale: 3}}" id="I26"/>
 			<Label text="precision: 10, scale: &quot;variable&quot;, nullable: false"  labelFor="I27"/>
 			<Input value="{path: 'Decimal', type: 'DecimalType', constraints: {nullable: false, precision: 10, scale: 'variable'}}" id="I27"/>
+			<Label text="precision: 10, scale: &quot;floating&quot;, nullable: false"  labelFor="I90"/>
+			<Input value="{path: 'Decimal', type: 'DecimalType', constraints: {nullable: false, precision: 10, scale: 'floating'}}" id="I90"/>
 			<Label text="precision:10, scale: 3" labelFor="I28"/>
 			<Input value="{path: 'Decimal', type: 'DecimalType', constraints: {precision: 10, scale: 3}}" id="I28"/>
 			<Label text="scale: default (0), nullable: false"  labelFor="I29"/>

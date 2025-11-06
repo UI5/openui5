@@ -75,9 +75,13 @@ sap.ui.define([
 	/**
 	 * Constructor for an OData primitive type <code>Edm.Boolean</code>.
 	 *
-	 * @class This class represents the OData primitive type <a
-	 * href="http://www.odata.org/documentation/odata-version-2-0/overview#AbstractTypeSystem">
-	 * <code>Edm.Boolean</code></a>.
+	 * @class This class represents the OData primitive type <code>Edm.Boolean</code>, see
+	 * <a
+	 * href="https://docs.oasis-open.org/odata/odata-csdl-xml/v4.01/odata-csdl-xml-v4.01.html#_Toc38530338">
+	 * type definition for OData V4.01</a> or
+	 * <a
+	 * href="https://www.odata.org/documentation/odata-version-2-0/overview#AbstractTypeSystem">
+	 * type definition for OData V2</a>.
 	 *
 	 * In both {@link sap.ui.model.odata.v2.ODataModel} and {@link sap.ui.model.odata.v4.ODataModel}
 	 * this type is represented as a <code>boolean</code>.

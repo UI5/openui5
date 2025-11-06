@@ -282,7 +282,9 @@ sap.ui.define([
 				asyncHints: oPropertyBag.owner?.config.asyncHints || oPropertyBag.factoryConfig.asyncHints,
 				componentId: sAppComponentId,
 				reference: sReference,
-				skipLoadBundle: true
+				skipLoadBundle: true,
+				// Temporary workaround to ensure the FlexState is up-to-date until fetchModelChanges is properly adjusted
+				forceInvalidation: true
 			});
 			const sServiceUrl = ODataUtils.removeOriginSegmentParameters(oPropertyBag.model.getServiceUrl());
 			const aRelevantAnnotationChanges = FlexState.getAnnotationChanges(sReference)

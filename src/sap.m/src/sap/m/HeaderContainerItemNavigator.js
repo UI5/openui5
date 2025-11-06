@@ -9,10 +9,6 @@ sap.ui.define([
 
 	/**
 	 * Creates an instance of HeaderContainerItemNavigator.
-	 *
-	 * @param {string} [sId] ID for the new control, generated automatically if no ID is given
-	 * @param {object} [mSettings] Initial settings for the new control
-	 *
 	 * @class The header container item navigator is an extension of the {@link sap.ui.core.delegate.ItemNavigation} for {@link sap.m.HeaderContainer}.
 	 * @extends sap.ui.core.delegate.ItemNavigation
 	 * @since 1.67.0

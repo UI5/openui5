@@ -441,18 +441,31 @@ sap.ui.define([
 			oPointerElement.className = "sapMMenuContextMenuPointer";
 
 			// if the opener DOM ref is provided, we should get its position data
-			const oOpenerData = oOpenerDomRef ? oOpenerDomRef.getBoundingClientRect() : null;
+			const oOpenerData = oOpenerDomRef ? oOpenerDomRef.getBoundingClientRect() : null,
+				iScrollX = document.documentElement.scrollLeft || document.body.scrollLeft,
+				iScrollY = document.documentElement.scrollTop || document.body.scrollTop,
+				isRTL = Localization.getRTL();
 
 			// calculate the position of the pointer element
 			if ((!oOriginalEvent || bOpenerCoordinates) && oOpenerData) {
 				// opener is provided, no event is provided, or there are missing important coordinates in the event,
 				// we should use the opener's position data
-				iX = oOpenerData.left + (oOpenerData.width / 2) + (document.documentElement.scrollLeft || document.body.scrollLeft);
-				iY = oOpenerData.top + (oOpenerData.height / 2) + (document.documentElement.scrollTop || document.body.scrollTop);
+				const iPointerPageX = oOpenerData.left + (oOpenerData.width / 2) + iScrollX;
+				const iPointerPageY = oOpenerData.top + (oOpenerData.height / 2) + iScrollY;
+
+				// compute inline-start offset (start = left in LTR, right in RTL)
+				if (isRTL) {
+					// distance from opener's right edge to pointer
+					iX = (oOpenerData.right + iScrollX) - iPointerPageX;
+				} else {
+					// distance from opener's left edge to pointer
+					iX = iPointerPageX - (oOpenerData.left + iScrollX);
+				}
+				iY = iPointerPageY - (oOpenerData.top + iScrollY);
 			} else if (oOriginalEvent && bPageCoordinates) {
 				// the event with coordinates is provided, we should use them
-				const iPageX = (oOriginalEvent.pageX || oOriginalEvent.clientX) + (document.documentElement.scrollLeft || document.body.scrollLeft);
-				const iPageY = (oOriginalEvent.pageY || oOriginalEvent.clientY) + (document.documentElement.scrollTop || document.body.scrollTop);
+				const iPageX = (oOriginalEvent.pageX || oOriginalEvent.clientX) + iScrollX;
+				const iPageY = (oOriginalEvent.pageY || oOriginalEvent.clientY) + iScrollY;
 
 				if (oOpenerDomRef.tagName && oOpenerDomRef.tagName.toLowerCase() === "tr") {
 					oPointerParent = oOpenerDomRef.firstChild ? oOpenerDomRef.firstChild : oOpenerDomRef;
@@ -462,11 +475,18 @@ sap.ui.define([
 					oPointerSibling = oOpenerDomRef.firstChild ? oOpenerDomRef.firstChild : null;
 				}
 
-				iX = (iPageX - oOpenerData.left - window.scrollX);
-				iY = (iPageY - oOpenerData.top - window.scrollY);
-
-				if (Localization.getRTL()) {
-					iX = document.body.clientWidth - iX;
+				// compute inline-start offset relative to opener considering RTL
+				if (oOpenerData) {
+					if (isRTL) {
+						iX = (oOpenerData.right + iScrollX) - iPageX;
+					} else {
+						iX = iPageX - (oOpenerData.left + iScrollX);
+					}
+					iY = iPageY - (oOpenerData.top + iScrollY);
+				} else {
+					// fallback if no opener data: use page coordinates
+					iX = iPageX;
+					iY = iPageY;
 				}
 			} else if (bOffsetCoordinates) {
 				// offsetX/offsetY coordinates are provided, we should use specified position

@@ -4,19 +4,19 @@
 /* ======================================= */
 
 @_sap_tnt_NavigationList_CollapsedWidth: 4rem;
-@_sap_tnt_NavigationList_ExpandIconColor: @sapUiContentNonInteractiveIconColor;
+@_sap_tnt_NavigationList_ExpandIconColor: var(--sapContent_NonInteractiveIconColor);
 @_sap_tnt_NavigationList_ItemHeight: 2.75rem;
-@_sap_tnt_NavigationList_ItemBorderStyleColor: solid @sapUiListBorderColor;
+@_sap_tnt_NavigationList_ItemBorderStyleColor: solid var(--sapList_BorderColor);
 @_sap_tnt_NavigationList_ItemBorderWidth: 0 0 0.0625rem 0;
 @_sap_tnt_NavigationList_ItemFocusBorderOffset: 0;
 @_sap_tnt_NavigationList_LastItemBorderStyleColor: solid transparent;
-@_sap_tnt_NavigationList_HoverBorderStyleColor: solid @sapUiListSelectionBorderColor;
+@_sap_tnt_NavigationList_HoverBorderStyleColor: solid var(--sapList_SelectionBorderColor);
 @_sap_tnt_NavigationList_HoverBorderWidth: 0.0625rem;
 @_sap_tnt_NavigationList_SelectedBorderWidth: 0.0625rem;
 @_sap_tnt_NavigationList_SelectedAndFocusedBorderStyleColor: none;
-@_sap_tnt_NavigationList_Collapsed_SelectedItemBackground: ~"0 100% / 0.188rem 100%" no-repeat linear-gradient(0deg, @sapUiListHighlightColor, @sapUiListHighlightColor), @sapUiListSelectionBackgroundColor;
+@_sap_tnt_NavigationList_Collapsed_SelectedItemBackground: ~"0 100% / 0.188rem 100%" no-repeat linear-gradient(0deg, @sapUiListHighlightColor, @sapUiListHighlightColor), var(--sapList_SelectionBackgroundColor);
 @_sap_tnt_NavigationList_Collapsed_SelectedItemBackgroundHover: @sapUiListSelectionHoverBackground;
-@_sap_tnt_NavigationList_Collapsed_SelectedItemBackgroundRTL: ~"100% 0 / 0.188rem 100%" no-repeat linear-gradient(0deg, @sapUiListHighlightColor, @sapUiListHighlightColor), @sapUiListSelectionBackgroundColor;
+@_sap_tnt_NavigationList_Collapsed_SelectedItemBackgroundRTL: ~"100% 0 / 0.188rem 100%" no-repeat linear-gradient(0deg, @sapUiListHighlightColor, @sapUiListHighlightColor), var(--sapList_SelectionBackgroundColor);
 @_sap_tnt_NavigationList_ItemBottomMargin: 0.25rem;
 @_sap_tnt_NavigationList_ItemBottomMarginInOverflowPopup: 0.25rem;
 @_sap_tnt_NavigationList_ParentItemBottomMarginInPopup: 0.5rem;
@@ -41,7 +41,7 @@
 @_sap_tnt_NavigationList_Collapsed_HoverOrFocusItemPaddingCompact: @_sap_tnt_NavigationList_Collapsed_HoverOrFocusItemPadding;
 @_sap_tnt_NavigationList_CollapsedIconPaddingLeft: 0.25rem;
 @_sap_tnt_NavigationList_CollapsedHiddenExpanderPadding: 1rem;
-@_sap_tnt_NavigationList_NavigationIndicator: "\E066";
+@_sap_tnt_NavigationList_NavigationIndicator: '\E066';
 @_sap_tnt_NavigationList_ExpandIconWidth: 2.25rem;
 @_sap_tnt_NavigationList_ExpandIconMarginRight: 0.375rem;
 @_sap_tnt_NavigationList_ExpandIconMarginLeft: 0.25rem;

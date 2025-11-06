@@ -1,10 +1,20 @@
-/* global QUnit, sinon */
+/* global QUnit */
 sap.ui.define([
-	"sap/ui/mdc/Table", "sap/ui/mdc/table/Column", "sap/m/Text", "sap/ui/core/TooltipBase"
-], function(Table, Column, Text, TooltipBase) {
+	"sap/ui/mdc/Table",
+	"sap/ui/mdc/table/Column",
+	"sap/m/Text",
+	"sap/ui/core/TooltipBase",
+	"sap/ui/test/utils/nextUIUpdate"
+], function(
+	Table,
+	Column,
+	Text,
+	TooltipBase,
+	nextUIUpdate
+) {
 	"use strict";
 
-	QUnit.module("Lifecycle", {
+	QUnit.module("Initialization", {
 		beforeEach: function() {
 			this.oColumn = new Column();
 		},
@@ -20,7 +30,16 @@ sap.ui.define([
 		}, "Skip propagation is correctly initialized for template aggregations");
 	});
 
-	QUnit.test("Inner column", async function(assert) {
+	QUnit.module("API", {
+		beforeEach: function() {
+			this.oColumn = new Column();
+		},
+		afterEach: function() {
+			this.oColumn.destroy();
+		}
+	});
+
+	QUnit.test("getInnerColumn", async function(assert) {
 		const oTable = new Table();
 		let oInnerColumn;
 
@@ -49,256 +68,131 @@ sap.ui.define([
 		assert.notOk(!!this.oColumn.getInnerColumn(), "#getInnerColumn does not return a column");
 	});
 
-	QUnit.module("Templates", {
-		beforeEach: function() {
-			this.oColumn = new Column();
-		},
-		afterEach: function() {
-			this.oColumn.destroy();
-		}
-	});
+	QUnit.test("getTemplateClone", function(assert) {
+		this.oColumn.setTemplate(new Text());
 
-	QUnit.test("Clones", function(assert) {
 		assert.ok(!this.oColumn._oTemplateClone, "No template clone exists initially");
-		assert.ok(!this.oColumn._oCreationTemplateClone, "No creationTemplate clone exists initially");
 
-		const oTemplate = new Text({text: "foo"});
-		const oCreationTemplate = new Text({text: "bar"});
-
-		this.oColumn.setTemplate(oTemplate);
-		this.oColumn.setCreationTemplate(oCreationTemplate);
-
-		assert.strictEqual(this.oColumn.getTemplateClone(), undefined, "No template clone created if not a child of a table");
-		assert.strictEqual(this.oColumn.getCreationTemplateClone(), undefined, "No creation template clone created if not a child of a table");
-
-		const oTable = new Table({columns: this.oColumn});
 		const oTemplateClone = this.oColumn.getTemplateClone();
-		const oCreationTemplateClone = this.oColumn.getCreationTemplateClone();
-		const oTemplateCloneDestroySpy = sinon.spy(oTemplateClone, "destroy");
-		const oCreationTemplateCloneDestroySpy = sinon.spy(oCreationTemplateClone, "destroy");
-
 		assert.strictEqual(this.oColumn._oTemplateClone, oTemplateClone, "Reference to the template clone is saved");
 		assert.strictEqual(this.oColumn.getTemplateClone(), oTemplateClone, "Existing template clone is returned");
-		assert.strictEqual(this.oColumn.getTemplate(), oTemplate, "Template is returned");
 		assert.notStrictEqual(this.oColumn.getTemplate(), oTemplateClone, "Template and clone are different instances");
 
-		assert.strictEqual(this.oColumn._oCreationTemplateClone, oCreationTemplateClone, "Reference to the creationTemplate clone is saved");
-		assert.strictEqual(this.oColumn.getCreationTemplateClone(), oCreationTemplateClone, "Existing creationTemplate clone is returned");
-		assert.strictEqual(this.oColumn.getCreationTemplate(), oCreationTemplate, "CreationTemplate is returned");
-		assert.notStrictEqual(this.oColumn.getCreationTemplate(), oCreationTemplateClone, "CreationTemplate and clone are different instances");
+		this.oColumn.destroy();
+		assert.ok(oTemplateClone.isDestroyed(), "The template clone was destroyed");
+		assert.ok(!this.oColumn._oTemplateClone, "Reference to the template clone is removed");
+	});
+
+	QUnit.test("getHeaderLabel", function(assert) {
+		assert.ok(!this.oColumn._oColumnHeaderLabel, "No header label exists initially");
+
+		const oHeaderLabel = this.oColumn.getHeaderLabel();
+
+		assert.ok(oHeaderLabel.isA("sap.ui.mdc.table.ColumnHeaderLabel"), "Returns an instance of sap.ui.mdc.table.ColumnHeaderLabel");
+		assert.strictEqual(this.oColumn._oColumnHeaderLabel, oHeaderLabel, "Reference to the header label is saved");
+		assert.strictEqual(this.oColumn.getHeaderLabel(), oHeaderLabel, "Existing header label is returned");
+
+		oHeaderLabel.destroy();
+		const oNewHeaderLabel = this.oColumn.getHeaderLabel({text: "myLabelText"});
+		assert.notStrictEqual(oNewHeaderLabel, oHeaderLabel, "A new header label is created after destroying the old one");
+		assert.strictEqual(this.oColumn._oColumnHeaderLabel, oNewHeaderLabel, "Reference to the new header label is saved");
+		assert.equal(oNewHeaderLabel.getLabel().getText(), "myLabelText", "Settings (here 'text') are passed to the label control");
 
 		this.oColumn.destroy();
-
-		assert.ok(oTemplateCloneDestroySpy.calledOnce, "The template clone was destroyed");
-		assert.ok(oCreationTemplateCloneDestroySpy.calledOnce, "The creationTemplate clone was destroyed");
-		assert.ok(!this.oColumn._oTemplateClone, "Reference to the template clone is removed");
-		assert.ok(!this.oColumn._oCreationTemplateClone, "Reference to the creationTemplate clone is removed");
-
-		oTable.destroy();
+		assert.ok(oNewHeaderLabel.isDestroyed(), "Column destroyed: The header label was destroyed");
+		assert.ok(!this.oColumn._oColumnHeaderLabel, "Column destroyed: Reference to the header label is removed");
 	});
 
-	QUnit.module("Inner column settings", {
-		beforeEach: function() {
-			this.oColumn = new Column();
-		},
-		afterEach: function() {
-			this.oColumn.destroy();
-		}
-	});
-
-	QUnit.test("GridTable", async function(assert) {
-		const oTable = new Table({columns: this.oColumn});
-		await oTable.initialized();
-
-		const oInnerColumn = this.oColumn.getInnerColumn();
-		const oColumnHeaderLabel = oInnerColumn.getLabel().getLabel();
-
-		assert.strictEqual(oInnerColumn.getId(), this.oColumn.getId() + "-innerColumn", "Inner column Id");
-		assert.strictEqual(oInnerColumn.getTooltip(), null, "Initial: Inner column 'tooltip'");
-		assert.strictEqual(oInnerColumn.getResizable(), true, "Initial: Inner column 'resizable'");
-		assert.strictEqual(oInnerColumn.getAutoResizable(), true, "Initial: Inner column 'autoResizable'");
-		assert.strictEqual(oInnerColumn.getWidth(), "", "Initial: Inner column 'width'");
-		assert.strictEqual(oColumnHeaderLabel.getText(), "", "Initial: Label control 'text'");
-		assert.strictEqual(oColumnHeaderLabel.getTextAlign(), "Begin", "Initial: Label control 'textAlign'");
-		assert.strictEqual(oColumnHeaderLabel.getWrapping(), false, "Initial: Label control 'wrapping'");
-		assert.strictEqual(oColumnHeaderLabel.getWrappingType(), "Normal", "Initial: Label control 'wrappingType'");
-		assert.strictEqual(oColumnHeaderLabel.getWidth(), "100%", "Initial: Label control 'width'");
-		assert.strictEqual(oColumnHeaderLabel.getRequired(), false, "Initial: Label control 'required'");
-		assert.strictEqual(oColumnHeaderLabel.getTooltip(), null, "Initial: Label control 'tooltip'");
-		assert.strictEqual(oColumnHeaderLabel._isInColumnHeaderContext, true, "Label is in column header context");
-
-		this.oColumn.setWidth("100px");
-		assert.strictEqual(oInnerColumn.getWidth(), "100px", "Change 'width': Inner column 'width'");
-
-		this.oColumn.setHeader("Text1");
-		assert.strictEqual(oColumnHeaderLabel.getText(), "Text1", "Change 'text': Label control 'text'");
-
-		this.oColumn.setHAlign("End");
-		assert.strictEqual(oColumnHeaderLabel.getTextAlign(), "End", "Change 'hAlign': Label control 'hAlign'");
-
-		this.oColumn.setRequired(true);
-		assert.strictEqual(oColumnHeaderLabel.getRequired(), true, "Change 'required': Label control 'required'");
-
-		this.oColumn.setHeaderVisible(false);
-		assert.strictEqual(oInnerColumn.getWidth(), "100px", "Set 'headerVisible' to false: Inner column 'width'");
-		assert.strictEqual(oColumnHeaderLabel.getWidth(), "0px", "Set 'headerVisible' to false: Label control 'width'");
-		assert.strictEqual(oColumnHeaderLabel.getWrapping(), false, "Set 'headerVisible' to false: Label control 'wrapping'");
-
-		oTable.setEnableColumnResize(false);
-		assert.strictEqual(oInnerColumn.getResizable(), false, "Set table's 'enableColumnResize' to false: Inner column 'resizable'");
-		assert.strictEqual(oInnerColumn.getAutoResizable(), false, "Set table's 'enableColumnResize' to false: Inner column 'autoResizable'");
-		assert.strictEqual(oColumnHeaderLabel.getWrapping(), false, "Set table's 'enableColumnResize' to false: Label control 'wrapping'");
-
-		this.oColumn.setHeaderVisible(true);
-		assert.strictEqual(oInnerColumn.getWidth(), "100px", "Set 'headerVisible' to false: Inner column 'width'");
-		assert.strictEqual(oColumnHeaderLabel.getWidth(), "100%", "Set 'headerVisible' to false: Label control 'width'");
-		assert.strictEqual(oColumnHeaderLabel.getWrapping(), false, "Set 'headerVisible' to true: Label control 'wrapping'");
-
-		oTable.setEnableColumnResize(true);
-		assert.strictEqual(oInnerColumn.getResizable(), true, "Set table's 'enableColumnResize' to false: Inner column 'resizable'");
-		assert.strictEqual(oInnerColumn.getAutoResizable(), true, "Set table's 'enableColumnResize' to false: Inner column 'autoResizable'");
-		assert.strictEqual(oColumnHeaderLabel.getWrapping(), false, "Set table's 'enableColumnResize' to true: Label control 'wrapping'");
-
-		oTable.destroy();
-	});
-
-	QUnit.test("ResponsiveTable", async function(assert) {
-		const oTable = new Table({type: "ResponsiveTable", columns: this.oColumn});
-		await oTable.initialized();
-
-		const oInnerColumn = this.oColumn.getInnerColumn();
-		const oColumnHeaderLabel = oInnerColumn.getHeader().getLabel();
-
-		assert.strictEqual(oInnerColumn.getId(), this.oColumn.getId() + "-innerColumn", "Inner column Id");
-		assert.strictEqual(oInnerColumn.getTooltip(), null, "Initial: Inner column 'tooltip'");
-		assert.strictEqual(oInnerColumn.getWidth(), "", "Initial: Inner column 'width'");
-		assert.strictEqual(oColumnHeaderLabel.getText(), "", "Initial: Label control 'text'");
-		assert.strictEqual(oColumnHeaderLabel.getTextAlign(), "Begin", "Initial: Label control 'textAlign'");
-		assert.strictEqual(oColumnHeaderLabel.getWrapping(), false, "Initial: Label control 'wrapping'");
-		assert.strictEqual(oColumnHeaderLabel.getWrappingType(), "Hyphenated", "Initial: Label control 'wrappingType'");
-		assert.strictEqual(oColumnHeaderLabel.getWidth(), "100%", "Initial: Label control 'width'");
-		assert.strictEqual(oColumnHeaderLabel.getRequired(), false, "Initial: Label control 'required'");
-		assert.strictEqual(oColumnHeaderLabel.getTooltip(), null, "Initial: Label control 'tooltip'");
-		assert.strictEqual(oColumnHeaderLabel._isInColumnHeaderContext, true, "Label is in column header context");
-
-		this.oColumn.setWidth("100px");
-		assert.strictEqual(oInnerColumn.getWidth(), "100px", "Change 'width': Inner column 'width'");
-
-		this.oColumn.setHeader("Text1");
-		assert.strictEqual(oColumnHeaderLabel.getText(), "Text1", "Change 'text': Label control 'text'");
-
-		this.oColumn.setHAlign("End");
-		assert.strictEqual(oColumnHeaderLabel.getTextAlign(), "End", "Change 'hAlign': Label control 'hAlign'");
-
-		this.oColumn.setRequired(true);
-		assert.strictEqual(oColumnHeaderLabel.getRequired(), true, "Change 'required': Label control 'required'");
-
-		this.oColumn.setHeaderVisible(false);
-		assert.strictEqual(oInnerColumn.getWidth(), "100px", "Set 'headerVisible' to false: Inner column 'width'");
-		assert.strictEqual(oColumnHeaderLabel.getWidth(), "0px", "Set 'headerVisible' to false: Label control 'width'");
-		assert.strictEqual(oColumnHeaderLabel.getWrapping(), false, "Set 'headerVisible' to false: Label control 'wrapping'");
-
-		oTable.setEnableColumnResize(false);
-		assert.strictEqual(oColumnHeaderLabel.getWrapping(), false, "Set table's 'enableColumnResize' to false: Label control 'wrapping'");
-
-		this.oColumn.setHeaderVisible(true);
-		assert.strictEqual(oInnerColumn.getWidth(), "100px", "Set 'headerVisible' to false: Inner column 'width'");
-		assert.strictEqual(oColumnHeaderLabel.getWidth(), "100%", "Set 'headerVisible' to false: Label control 'width'");
-		assert.strictEqual(oColumnHeaderLabel.getWrapping(), true, "Set 'headerVisible' to true: Label control 'wrapping'");
-
-		oTable.setEnableColumnResize(true);
-		assert.strictEqual(oColumnHeaderLabel.getWrapping(), false, "Set table's 'enableColumnResize' to true: Label control 'wrapping'");
-
-		oTable.destroy();
-	});
-
-	QUnit.module("Inner column settings - Tooltip", {
-		beforeEach: function() {
-			this.oColumn = new Column();
-		},
-		afterEach: function() {
-			this.oColumn.destroy();
-		}
-	});
-
-	QUnit.test("TooltipBase", function(assert) {
+	QUnit.test("setTooltip", function(assert) {
 		const oTooltip = new TooltipBase();
+
 		this.oColumn.setTooltip(oTooltip);
-		assert.strictEqual(this.oColumn.getTooltip(), null, "TooltipBase tooltips are not supported");
+		assert.equal(this.oColumn.getTooltip(), null, "TooltipBase is not supported");
+
 		oTooltip.destroy();
 	});
 
-	QUnit.test("GridTable", async function(assert) {
+	QUnit.module("sap.ui.mdc.table.ColumnHeaderLabel", {
+		beforeEach: function() {
+			this.oColumn = new Column();
+		},
+		afterEach: function() {
+			this.oColumn.destroy();
+		}
+	});
+
+	QUnit.test("API", function(assert) {
+		const oHeaderLabel = this.oColumn.getHeaderLabel();
+		const oLabel = oHeaderLabel.getLabel();
+
+		assert.ok(oLabel.isA("sap.m.Label"), "Label control is a sap.m.Label");
+
+		this.stub(oLabel, "getText").returns("myHeaderText");
+		this.stub(oLabel, "clone").returns("myClone");
+		this.stub(oLabel, "getRequired").returns("myRequired");
+		this.stub(oLabel, "getAccessibilityInfo").returns("myAccInfo");
+		this.spy(oLabel, "setIsInColumnHeaderContext");
+
+		assert.strictEqual(oHeaderLabel.getText(), "myHeaderText", "#getText calls Label#getText");
+		assert.strictEqual(oHeaderLabel.clone(), "myClone", "#clone calls Label#clone");
+		assert.strictEqual(oHeaderLabel.getRequired(), "myRequired", "#getRequired calls Label#getRequired");
+		assert.deepEqual(oHeaderLabel.getAccessibilityInfo(), "myAccInfo", "#getAccessibilityInfo calls Label#getAccessibilityInfo");
+		oHeaderLabel.setIsInColumnHeaderContext(true);
+		assert.ok(oLabel.setIsInColumnHeaderContext.calledWithExactly(true), "Label#setIsInColumnHeaderContext called with true");
+
+		oHeaderLabel.destroy();
+		assert.strictEqual(oHeaderLabel.getText(), undefined, "Destroyed: #getText call");
+		assert.strictEqual(oHeaderLabel.clone(), undefined, "Destroyed: #clone call");
+		assert.strictEqual(oHeaderLabel.getRequired(), undefined, "Destroyed: #getRequired call");
+		assert.deepEqual(oHeaderLabel.getAccessibilityInfo(), undefined, "Destroyed: #getAccessibilityInfo call");
+		oHeaderLabel.setIsInColumnHeaderContext(true); // Should not throw error
+	});
+
+	QUnit.test("Label settings with default column settings", async function(assert) {
 		const oTable = new Table({columns: this.oColumn});
 		await oTable.initialized();
 
-		const oInnerColumn = this.oColumn.getInnerColumn();
-		const oColumnHeaderLabel = oInnerColumn.getLabel().getLabel();
+		const oLabel = this.oColumn.getHeaderLabel().getLabel();
 
-		this.oColumn.setTooltip("Tooltip1");
-		assert.strictEqual(oInnerColumn.getTooltip(), "Tooltip1", "Set 'tooltip': Inner column 'tooltip'");
-		assert.strictEqual(oColumnHeaderLabel.getTooltip(), null, "Set 'tooltip': Label control 'tooltip'");
+		assert.ok(oLabel.isA("sap.m.Label"), "Label control is a sap.m.Label");
+		assert.equal(oLabel.getWidth(), "100%", "width");
+		assert.equal(oLabel.getText(), "", "text");
+		assert.equal(oLabel.getTextAlign(), "Begin", "textAlign");
+		assert.equal(oLabel.getRequired(), false, "required");
+	});
 
-		this.oColumn.setTooltip();
-		assert.strictEqual(oInnerColumn.getTooltip(), null, "Remove 'tooltip': Inner column 'tooltip'");
+	QUnit.test("Label settings after changing column properties", async function(assert) {
+		const oTable = new Table({columns: this.oColumn});
+		await oTable.initialized();
+
+		const oLabel = this.oColumn.getHeaderLabel().getLabel();
 
 		this.oColumn.setHeader("Text1");
-		oTable.setUseColumnLabelsAsTooltips(true);
-		assert.strictEqual(oInnerColumn.getTooltip(), "Text1", "Set table's 'useColumnLabelsAsTooltips' to true: Inner column 'tooltip'");
-		assert.strictEqual(oColumnHeaderLabel.getTooltip(), null, "Set table's 'useColumnLabelsAsTooltips' to true: Label control 'tooltip'");
+		assert.equal(oLabel.getText(), "Text1", "Change 'header': text");
 
-		oTable.setUseColumnLabelsAsTooltips(false);
-		assert.strictEqual(oInnerColumn.getTooltip(), null, "Set table's 'useColumnLabelsAsTooltips' to false: Inner column 'tooltip'");
+		this.oColumn.setHAlign("Center");
+		assert.equal(oLabel.getTextAlign(), "Center", "Change 'hAlign': textAlign");
 
-		this.oColumn.setTooltip("Tooltip1");
-		oTable.setUseColumnLabelsAsTooltips(true);
-		assert.strictEqual(oInnerColumn.getTooltip(), "Tooltip1", "'tooltip' takes precedence over 'header'");
+		this.oColumn.setRequired(true);
+		assert.equal(oLabel.getRequired(), true, "Change 'required': required");
 
 		this.oColumn.setHeaderVisible(false);
-		assert.strictEqual(oInnerColumn.getTooltip(), "Tooltip1",
-			"tooltip is set, headerVisible=false, useColumnLabelsAsTooltips=true: Inner column 'tooltip'");
+		assert.equal(oLabel.getWidth(), "0px", "Set 'headerVisible' to false: width");
 
-		this.oColumn.setTooltip();
-		assert.strictEqual(oInnerColumn.getTooltip(), null,
-			"tooltip not set, headerVisible=false, useColumnLabelsAsTooltips=true: Inner column 'tooltip'");
+		this.oColumn.setHeaderVisible(true);
+		assert.equal(oLabel.getWidth(), "100%", "Set 'headerVisible' to true: width");
 
 		oTable.destroy();
 	});
 
-	QUnit.test("ResponsiveTable", async function(assert) {
-		const oTable = new Table({type: "ResponsiveTable", columns: this.oColumn});
-		await oTable.initialized();
+	QUnit.test("Rendering", async function(assert) {
+		const oHeaderLabel = this.oColumn.getHeaderLabel();
 
-		const oInnerColumn = this.oColumn.getInnerColumn();
-		const oColumnHeaderLabel = oInnerColumn.getHeader().getLabel();
+		oHeaderLabel.placeAt("qunit-fixture");
+		await nextUIUpdate();
 
-		this.oColumn.setTooltip("Tooltip1");
-		assert.strictEqual(oInnerColumn.getTooltip(), null, "Set 'tooltip': Inner column 'tooltip'");
-		assert.strictEqual(oColumnHeaderLabel.getTooltip(), "Tooltip1", "Set 'tooltip': Label control 'tooltip'");
-
-		this.oColumn.setTooltip();
-		assert.strictEqual(oInnerColumn.getTooltip(), null, "Remove 'tooltip': Inner column 'tooltip'");
-
-		this.oColumn.setHeader("Text1");
-		oTable.setUseColumnLabelsAsTooltips(true);
-		assert.strictEqual(oInnerColumn.getTooltip(), null, "Set table's 'useColumnLabelsAsTooltips' to true: Inner column 'tooltip'");
-		assert.strictEqual(oColumnHeaderLabel.getTooltip(), "Text1", "Set table's 'useColumnLabelsAsTooltips' to true: Label control 'tooltip'");
-
-		oTable.setUseColumnLabelsAsTooltips(false);
-		assert.strictEqual(oColumnHeaderLabel.getTooltip(), null, "Set table's 'useColumnLabelsAsTooltips' to false: Label control 'tooltip'");
-
-		this.oColumn.setTooltip("Tooltip1");
-		oTable.setUseColumnLabelsAsTooltips(true);
-		assert.strictEqual(oColumnHeaderLabel.getTooltip(), "Tooltip1", "'tooltip' takes precedence over 'header'");
-
-		this.oColumn.setHeaderVisible(false);
-		assert.strictEqual(oColumnHeaderLabel.getTooltip(), "Tooltip1",
-			"tooltip is set, headerVisible=false, useColumnLabelsAsTooltips=true: Label control 'tooltip'");
-
-		this.oColumn.setTooltip();
-		assert.strictEqual(oColumnHeaderLabel.getTooltip(), null,
-			"tooltip not set, headerVisible=false, useColumnLabelsAsTooltips=true: Label control 'tooltip'");
-
-		oTable.destroy();
+		assert.ok(oHeaderLabel.getDomRef(), "Header label is rendered");
+		assert.ok(oHeaderLabel.getDomRef().contains(this.oColumn.getDomRef()), "Column is rendered in header label");
+		assert.ok(oHeaderLabel.getDomRef().contains(oHeaderLabel.getLabel().getDomRef()), "Label is rendered in header label");
 	});
 });

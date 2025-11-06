@@ -612,6 +612,23 @@ sap.ui.define([
 		assert.strictEqual(oPaginatorModel.getProperty("/size"), 5, "initial value of '/size' should be correct");
 	});
 
+
+	QUnit.test("Pagination - data refreshes if main card refreshData is called", async function (assert) {
+		const oCard = this.oCard;
+		oCard.setManifest(oManifestServerSide);
+
+		await nextCardReadyEvent(this.oCard);
+		await nextUIUpdate();
+
+		// Act
+		const oPaginatedCard = await openPaginationCard(this.oCard);
+		const fnRefreshDataSpy = this.spy(oPaginatedCard, "refreshData");
+
+		oCard.refreshData();
+
+		assert.ok(fnRefreshDataSpy.calledOnce, "Paginated card refreshData is called when main card refreshData is called");
+	});
+
 	QUnit.test("Pagination - server side with single page", async function (assert) {
 		this.oCard.setManifest(oManifestServerSideSinglePage);
 

@@ -11,6 +11,7 @@ sap.ui.define([
 	"sap/ui/mdc/table/RowActionItem",
 	"sap/ui/mdc/enums/TableRowCountMode",
 	"sap/ui/mdc/enums/TableRowActionType",
+	"sap/m/library",
 	"sap/m/Label",
 	"sap/m/Text",
 	"sap/m/Menu",
@@ -28,6 +29,7 @@ sap.ui.define([
 	RowActionItem,
 	RowCountMode,
 	RowActionType,
+	MLibrary,
 	Label,
 	Text,
 	Menu,
@@ -39,7 +41,7 @@ sap.ui.define([
 
 	const sDelegatePath = "test-resources/sap/ui/mdc/delegates/TableDelegate";
 
-	QUnit.module("Inner table settings", {
+	QUnit.module("Inner table", {
 		beforeEach: async function() {
 			this.oTable = new Table({
 				type: new GridTableType()
@@ -137,6 +139,123 @@ sap.ui.define([
 		assert.equal(oInnerTable.getRowMode().getHideEmptyRows(), true, `Type.rowCountMode=Fixed.hideEmptyRows: ${true}`);
 
 		oCreationRowStub.restore();
+	});
+
+	QUnit.module("Inner column", {
+		beforeEach: async function() {
+			this.oColumn = new Column({
+				template: new Text({text: "MyTemplate", wrapping: true}),
+				creationTemplate: new Text({text: "MyCreationTemplate", wrapping: true})
+			});
+			this.oTable = new Table({
+				type: new GridTableType(),
+				columns: [this.oColumn]
+			});
+			await this.oTable.initialized();
+		},
+		afterEach: function() {
+			this.oTable.destroy();
+		}
+	});
+
+	QUnit.test("Control types", function(assert) {
+		const oInnerColumn = this.oTable._oTable.getColumns()[0];
+
+		assert.ok(oInnerColumn.isA("sap.ui.table.Column"), "Inner column type is sap.ui.table.Column");
+		assert.equal(oInnerColumn.getLabel(), this.oColumn.getHeaderLabel(), "Inner column label is the columns header label instance");
+	});
+
+	QUnit.test("Default settings", function(assert) {
+		const oInnerColumn = this.oTable._oTable.getColumns()[0];
+
+		assert.equal(oInnerColumn.getId(), this.oTable.getColumns()[0].getId() + "-innerColumn", "Id");
+		assert.equal(oInnerColumn.getTooltip(), null, "tooltip");
+		assert.equal(oInnerColumn.getResizable(), true, "resizable");
+		assert.equal(oInnerColumn.getAutoResizable(), true, "autoResizable");
+		assert.equal(oInnerColumn.getWidth(), "", "width");
+		assert.equal(oInnerColumn.getMinWidth(), 8 * parseFloat(MLibrary.BaseFontSize), "minWidth");
+		assert.equal(oInnerColumn.getHeaderMenu(), this.oTable.getId() + "-columnHeaderMenu", "headerMenu");
+		assert.equal(oInnerColumn.getHAlign(), "Begin", "hAlign");
+		assert.equal(oInnerColumn.getTemplate().getText(), "MyTemplate", "template: text");
+		assert.equal(oInnerColumn.getTemplate().getWrapping(), false, "template: wrapping");
+		assert.equal(oInnerColumn.getCreationTemplate().getText(), "MyCreationTemplate", "creationTemplate: text");
+		assert.equal(oInnerColumn.getCreationTemplate().getWrapping(), false, "creationTemplate: wrapping");
+		assert.equal(oInnerColumn.getLabel().getLabel().getWrapping(), false, "label: wrapping");
+	});
+
+	QUnit.test("Initial settings", function(assert) {
+		this.oTable.setEnableColumnResize(false);
+		this.oTable.insertColumn(new Column({
+			tooltip: "MyColumnTooltip",
+			width: "200px",
+			minWidth: 10,
+			hAlign: "Center"
+		}), 0);
+
+		const oInnerColumn = this.oTable._oTable.getColumns()[0];
+
+		assert.equal(oInnerColumn.getId(), this.oTable.getColumns()[0].getId() + "-innerColumn", "Id");
+		assert.equal(oInnerColumn.getTooltip(), "MyColumnTooltip", "tooltip");
+		assert.equal(oInnerColumn.getResizable(), false, "resizable");
+		assert.equal(oInnerColumn.getAutoResizable(), false, "autoResizable");
+		assert.equal(oInnerColumn.getWidth(), "200px", "width");
+		assert.equal(oInnerColumn.getMinWidth(), 10 * parseFloat(MLibrary.BaseFontSize), "minWidth");
+		assert.equal(oInnerColumn.getHAlign(), "Center", "hAlign");
+	});
+
+	QUnit.test("Change width", function(assert) {
+		this.oColumn.setWidth("100px");
+		assert.equal(this.oTable._oTable.getColumns()[0].getWidth(), "100px", "Set 'width': Inner column 'width'");
+
+		this.oColumn.setWidth();
+		assert.equal(this.oTable._oTable.getColumns()[0].getWidth(), "", "Remove 'width': Inner column 'width'");
+	});
+
+	QUnit.test("Change minWidth", function(assert) {
+		this.oColumn.setMinWidth(10);
+		assert.equal(this.oTable._oTable.getColumns()[0].getMinWidth(), 10 * parseFloat(MLibrary.BaseFontSize),
+			"Set 'minWidth': Inner column 'minWidth'");
+
+		this.oColumn.setMinWidth();
+		assert.equal(this.oTable._oTable.getColumns()[0].getMinWidth(), 8 * parseFloat(MLibrary.BaseFontSize),
+			"Remove 'minWidth': Inner column 'minWidth'");
+	});
+
+	QUnit.test("Change hAlign", function(assert) {
+		this.oColumn.setHAlign("End");
+		assert.equal(this.oTable._oTable.getColumns()[0].getHAlign(), "End", "Set 'hAlign': Inner column 'hAlign'");
+
+		this.oColumn.setHAlign();
+		assert.equal(this.oTable._oTable.getColumns()[0].getHAlign(), "Begin", "Remove 'hAlign': Inner column 'hAlign'");
+	});
+
+	QUnit.test("Change tooltip", function(assert) {
+		const oInnerColumn = this.oTable._oTable.getColumns()[0];
+
+		this.oColumn.setTooltip("MyTooltip");
+		assert.equal(oInnerColumn.getTooltip(), "MyTooltip", "Set 'tooltip': Inner column 'tooltip'");
+
+		this.oColumn.setTooltip();
+		assert.equal(oInnerColumn.getTooltip(), null, "Remove 'tooltip': Inner column 'tooltip'");
+
+		this.oColumn.setHeader("MyHeaderText");
+		this.oTable.setUseColumnLabelsAsTooltips(true);
+		assert.equal(oInnerColumn.getTooltip(), "MyHeaderText", "Set table's 'useColumnLabelsAsTooltips' to true: Inner column 'tooltip'");
+
+		this.oTable.setUseColumnLabelsAsTooltips(false);
+		assert.equal(oInnerColumn.getTooltip(), null, "Set table's 'useColumnLabelsAsTooltips' to false: Inner column 'tooltip'");
+
+		this.oColumn.setTooltip("MyTooltip");
+		this.oTable.setUseColumnLabelsAsTooltips(true);
+		assert.equal(oInnerColumn.getTooltip(), "MyTooltip", "'tooltip' takes precedence over 'header'");
+
+		this.oColumn.setHeaderVisible(false);
+		assert.equal(oInnerColumn.getTooltip(), "MyTooltip",
+			"tooltip is set, headerVisible=false, useColumnLabelsAsTooltips=true: Inner column 'tooltip'");
+
+		this.oColumn.setTooltip();
+		assert.equal(oInnerColumn.getTooltip(), null,
+			"tooltip not set, headerVisible=false, useColumnLabelsAsTooltips=true: Inner column 'tooltip'");
 	});
 
 	QUnit.module("API", {

@@ -98,9 +98,6 @@ sap.ui.define([
 		return TableUtils.isA(oParent, "sap.ui.table.RowAction") ? oParent : null;
 	};
 
-	/**
-	 * @inheritDoc
-	 */
 	Item.prototype.setIcon = function(sIcon) {
 		this.setProperty("icon", sIcon, true);
 		if (this._oIcon) {
@@ -109,9 +106,6 @@ sap.ui.define([
 		return this;
 	};
 
-	/**
-	 * @inheritDoc
-	 */
 	Item.prototype.setText = function(sText) {
 		this.setProperty("text", sText, true);
 		if (this._oIcon) {

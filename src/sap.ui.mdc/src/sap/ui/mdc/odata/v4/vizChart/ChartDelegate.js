@@ -1105,6 +1105,14 @@ sap.ui.define([
 				vizProperties: {
 					plotArea: {
 						scrollbar: { forceToShowInMobile: true }
+					},
+					tooltip: {
+						formatString: null
+					},
+					valueAxis: {
+						label: {
+							formatString: null
+						}
 					}
 				}
 			}));

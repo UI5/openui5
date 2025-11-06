@@ -6,6 +6,7 @@ sap.ui.define([
 	"sap/ui/test/utils/nextUIUpdate",
 	"sap/ui/mdc/Table",
 	"sap/ui/mdc/table/Column",
+	"sap/ui/mdc/table/ColumnSettings",
 	"sap/ui/mdc/table/ResponsiveTableType",
 	"sap/ui/mdc/table/ResponsiveColumnSettings",
 	"sap/ui/mdc/table/RowSettings",
@@ -13,6 +14,7 @@ sap.ui.define([
 	"sap/ui/mdc/enums/TableRowActionType",
 	"sap/m/Text",
 	"sap/m/Menu",
+	"sap/m/plugins/ColumnResizer",
 	"sap/ui/model/json/JSONModel",
 	"sap/ui/core/Lib",
 	"sap/ui/core/Icon",
@@ -25,6 +27,7 @@ sap.ui.define([
 	nextUIUpdate,
 	Table,
 	Column,
+	ColumnSettingsBase,
 	ResponsiveTableType,
 	ResponsiveColumnSettings,
 	RowSettings,
@@ -32,6 +35,7 @@ sap.ui.define([
 	RowActionType,
 	Text,
 	Menu,
+	ColumnResizer,
 	JSONModel,
 	Lib,
 	Icon,
@@ -44,7 +48,7 @@ sap.ui.define([
 
 	const sDelegatePath = "test-resources/sap/ui/mdc/delegates/TableDelegate";
 
-	QUnit.module("Inner table settings", {
+	QUnit.module("Inner table", {
 		beforeEach: async function() {
 			this.oTable = new Table({
 				type: new ResponsiveTableType()
@@ -82,6 +86,19 @@ sap.ui.define([
 		assert.deepEqual(oInnerTable.getAriaLabelledBy(), [this.oTable._oTitle.getId()], "ariaLabelledBy");
 		assert.equal(oInnerTable.getHeaderToolbar(), this.oTable._oToolbar, "headerToolbar");
 		assert.equal(oInnerTable.getEnableBusyIndicator(), true, "enableBusyIndicator");
+	});
+
+	QUnit.test("Column resizing", function(assert) {
+		const oColumnResizer = ColumnResizer.findOn(this.oTable._oTable);
+
+		assert.ok(oColumnResizer, "ColumnResizer plugin is found on inner table");
+		assert.ok(oColumnResizer.getEnabled(), "ColumnResizer plugin is enabled");
+
+		this.oTable.setEnableColumnResize(false);
+		assert.notOk(oColumnResizer.getEnabled(), "Setting table's 'enableColumnResize' to false disables the ColumnResizer plugin");
+
+		this.oTable.setEnableColumnResize(true);
+		assert.ok(oColumnResizer.getEnabled(), "Setting table's 'enableColumnResize' to true enables the ColumnResizer plugin");
 	});
 
 	QUnit.test("Initial settings", async function(assert) {
@@ -125,6 +142,232 @@ sap.ui.define([
 
 		this.oTable.setThreshold(30);
 		assert.equal(oInnerTable.getGrowingThreshold(), 30, "Table.threshold=30: growingThreshold");
+	});
+
+	QUnit.module("Inner column", {
+		beforeEach: async function() {
+			this.oColumn = new Column();
+			this.oTable = new Table({
+				type: new ResponsiveTableType(),
+				columns: [this.oColumn]
+			});
+			await this.oTable.initialized();
+		},
+		afterEach: function() {
+			this.oTable.destroy();
+		}
+	});
+
+	QUnit.test("Control types", function(assert) {
+		const oInnerColumn = this.oTable._oTable.getColumns()[0];
+
+		assert.ok(oInnerColumn.isA("sap.m.Column"), "Inner column type is sap.m.Column");
+		assert.equal(oInnerColumn.getHeader(), this.oColumn.getHeaderLabel(), "Inner column label is the columns header label instance");
+	});
+
+	QUnit.test("Default settings", function(assert) {
+		const oInnerColumn = this.oTable._oTable.getColumns()[0];
+
+		assert.equal(oInnerColumn.getId(), this.oTable.getColumns()[0].getId() + "-innerColumn", "Id");
+		assert.equal(oInnerColumn.getTooltip(), null, "tooltip");
+		assert.equal(oInnerColumn.getHeader().getLabel().getTooltip(), null, "Label control: tooltip");
+		assert.equal(oInnerColumn.getWidth(), "", "width");
+		assert.equal(oInnerColumn.getAutoPopinWidth(), 8, "autoPopinWidth");
+		assert.equal(oInnerColumn.getHeaderMenu(), this.oTable.getId() + "-columnHeaderMenu", "headerMenu");
+		assert.equal(oInnerColumn.getHAlign(), "Begin", "hAlign");
+		assert.equal(oInnerColumn.getImportance(), "None", "importance");
+		assert.equal(oInnerColumn.getPopinDisplay(), "Inline", "popinDisplay");
+		assert.equal(oInnerColumn.getMergeDuplicates(), false, "mergeDuplicates");
+		assert.equal(oInnerColumn.getMergeFunctionName(), "getText", "mergeFunctionName");
+		assert.equal(oInnerColumn.getHeader().getLabel().getWrapping(), false, "header: wrapping");
+		assert.equal(oInnerColumn.getHeader().getLabel().getWrappingType(), "Hyphenated", "header: wrappingType");
+	});
+
+	QUnit.test("Initial settings", function(assert) {
+		this.oTable.insertColumn(new Column({
+			header: "MyHeaderText",
+			headerVisible: false,
+			width: "200px",
+			minWidth: 10,
+			tooltip: "MyColumnTooltip",
+			hAlign: "Center",
+			extendedSettings: new ResponsiveColumnSettings({
+				importance: "High",
+				mergeFunction: "myMergeFunction"
+			})
+		}), 0);
+
+		const oInnerColumn = this.oTable._oTable.getColumns()[0];
+
+		assert.equal(oInnerColumn.getId(), this.oTable.getColumns()[0].getId() + "-innerColumn", "Id");
+		assert.equal(oInnerColumn.getTooltip(), null, "tooltip");
+		assert.equal(oInnerColumn.getHeader().getLabel().getTooltip(), "MyColumnTooltip", "header: tooltip");
+		assert.equal(oInnerColumn.getHeader().getLabel().getWrapping(), false, "header: wrapping");
+		assert.equal(oInnerColumn.getWidth(), "200px", "width");
+		assert.equal(oInnerColumn.getAutoPopinWidth(), 10, "autoPopinWidth");
+		assert.equal(oInnerColumn.getHAlign(), "Center", "hAlign");
+		assert.equal(oInnerColumn.getImportance(), "High", "importance");
+		assert.equal(oInnerColumn.getPopinDisplay(), "WithoutHeader", "popinDisplay");
+		assert.equal(oInnerColumn.getMergeDuplicates(), true, "mergeDuplicates");
+		assert.equal(oInnerColumn.getMergeFunctionName(), "myMergeFunction", "mergeFunctionName");
+	});
+
+	QUnit.test("Change width", function(assert) {
+		this.oColumn.setWidth("100px");
+		assert.equal(this.oTable._oTable.getColumns()[0].getWidth(), "100px", "Set 'width': Inner column 'width'");
+
+		this.oColumn.setWidth();
+		assert.equal(this.oTable._oTable.getColumns()[0].getWidth(), "", "Remove 'width': Inner column 'width'");
+	});
+
+	QUnit.test("Change minWidth", function(assert) {
+		this.oColumn.setMinWidth(10);
+		assert.equal(this.oTable._oTable.getColumns()[0].getAutoPopinWidth(), 10, "Set 'minWidth': Inner column 'autoPopinWidth'");
+
+		this.oColumn.setMinWidth();
+		assert.equal(this.oTable._oTable.getColumns()[0].getAutoPopinWidth(), 8, "Remove 'minWidth': Inner column 'autoPopinWidth'");
+	});
+
+	QUnit.test("Change hAlign", function(assert) {
+		this.oColumn.setHAlign("End");
+		assert.equal(this.oTable._oTable.getColumns()[0].getHAlign(), "End", "Set 'hAlign': Inner column 'hAlign'");
+
+		this.oColumn.setHAlign();
+		assert.equal(this.oTable._oTable.getColumns()[0].getHAlign(), "Begin", "Remove 'hAlign': Inner column 'hAlign'");
+	});
+
+	QUnit.test("Change tooltip", function(assert) {
+		const oInnerColumn = this.oTable._oTable.getColumns()[0];
+		const oInnerColumnHeaderLabel = oInnerColumn.getHeader().getLabel();
+
+		this.oColumn.setTooltip("MyTooltip");
+		assert.equal(oInnerColumn.getTooltip(), null, "Set 'tooltip': Inner column 'tooltip'");
+		assert.equal(oInnerColumnHeaderLabel.getTooltip(), "MyTooltip", "Set 'tooltip': header 'tooltip'");
+
+		this.oColumn.setTooltip();
+		assert.equal(oInnerColumn.getTooltip(), null, "Remove 'tooltip': Inner column 'tooltip'");
+		assert.equal(oInnerColumnHeaderLabel.getTooltip(), null, "Remove 'tooltip': header 'tooltip'");
+
+		this.oColumn.setHeader("MyHeaderText");
+		this.oTable.setUseColumnLabelsAsTooltips(true);
+		assert.equal(oInnerColumn.getTooltip(), null, "Set table's 'useColumnLabelsAsTooltips' to true: Inner column 'tooltip'");
+		assert.equal(oInnerColumnHeaderLabel.getTooltip(), "MyHeaderText",
+			"Set table's 'useColumnLabelsAsTooltips' to true: header 'tooltip'");
+
+		this.oTable.setUseColumnLabelsAsTooltips(false);
+		assert.equal(oInnerColumn.getTooltip(), null, "Set table's 'useColumnLabelsAsTooltips' to false: Inner column 'tooltip'");
+		assert.equal(oInnerColumnHeaderLabel.getTooltip(), null, "Set table's 'useColumnLabelsAsTooltips' to false: header 'tooltip'");
+
+		this.oColumn.setTooltip("MyTooltip");
+		this.oTable.setUseColumnLabelsAsTooltips(true);
+		assert.equal(oInnerColumn.getTooltip(), null, "'tooltip' takes precedence over 'header': Inner column 'tooltip");
+		assert.equal(oInnerColumnHeaderLabel.getTooltip(), "MyTooltip", "'tooltip' takes precedence over 'header': header 'tooltip'");
+
+		this.oColumn.setHeaderVisible(false);
+		assert.equal(oInnerColumn.getTooltip(), null,
+			"tooltip is set, headerVisible=false, useColumnLabelsAsTooltips=true: Inner column 'tooltip'");
+		assert.equal(oInnerColumnHeaderLabel.getTooltip(), "MyTooltip",
+			"tooltip is set, headerVisible=false, useColumnLabelsAsTooltips=true: header 'tooltip'");
+
+		this.oColumn.setTooltip();
+		assert.equal(oInnerColumn.getTooltip(), null,
+			"tooltip not set, headerVisible=false, useColumnLabelsAsTooltips=true: Inner column 'tooltip'");
+		assert.equal(oInnerColumnHeaderLabel.getTooltip(), null,
+			"tooltip not set, headerVisible=false, useColumnLabelsAsTooltips=true: header 'tooltip'");
+	});
+
+	QUnit.test("Change wrapping", function(assert) {
+		const oInnerColumnHeaderLabel = this.oTable._oTable.getColumns()[0].getHeader().getLabel();
+
+		this.oTable.setEnableColumnResize(false);
+		assert.equal(oInnerColumnHeaderLabel.getWrapping(), true, "Set 'enableColumnResize' to false: header 'wrapping'");
+
+		this.oColumn.setHeaderVisible(false);
+		assert.equal(oInnerColumnHeaderLabel.getWrapping(), false, "Set 'headerVisible' to false: header 'wrapping'");
+
+		this.oTable.setEnableColumnResize(true);
+		assert.equal(oInnerColumnHeaderLabel.getWrapping(), false, "Set 'enableColumnResize' to true: header 'wrapping'");
+
+		this.oColumn.setHeaderVisible(true);
+		assert.equal(oInnerColumnHeaderLabel.getWrapping(), false, "Set 'headerVisible' to true: header 'wrapping'");
+	});
+
+	QUnit.test("Change popinDisplay", function(assert) {
+		const oInnerColumn = this.oTable._oTable.getColumns()[0];
+
+		this.oTable.getType().setPopinDisplay("Block");
+		assert.equal(oInnerColumn.getPopinDisplay(), "Block", "Set 'popinDisplay': Inner column 'popinDisplay'");
+
+		this.oColumn.setHeaderVisible(false);
+		assert.equal(oInnerColumn.getPopinDisplay(), "WithoutHeader", "Set 'headerVisible' to false: Inner column 'popinDisplay'");
+
+		this.oColumn.setHeaderVisible(true);
+		assert.equal(oInnerColumn.getPopinDisplay(), "Block", "Set 'headerVisible' to true: Inner column 'popinDisplay'");
+
+		this.oTable.getType().setPopinDisplay();
+		assert.equal(oInnerColumn.getPopinDisplay(), "Inline", "Remove 'popinDisplay' Inner column 'popinDisplay'");
+
+		this.oColumn.setHeaderVisible(false);
+		assert.equal(oInnerColumn.getPopinDisplay(), "WithoutHeader", "Set 'headerVisible' to false: Inner column 'popinDisplay'");
+
+		this.oColumn.setHeaderVisible(true);
+		assert.equal(oInnerColumn.getPopinDisplay(), "Inline", "Set 'headerVisible' to true: Inner column 'popinDisplay'");
+	});
+
+	QUnit.test("Change extendedSettings.importance", function(assert) {
+		const oInnerColumn = this.oTable._oTable.getColumns()[0];
+
+		this.oColumn.setExtendedSettings(new ResponsiveColumnSettings());
+		assert.equal(oInnerColumn.getImportance(), "None", "Set extended settings without 'importance': Inner column 'importance'");
+
+		this.oColumn.getExtendedSettings().setImportance("Medium");
+		assert.equal(oInnerColumn.getImportance(), "Medium", "Set extended settings 'importance': Inner column 'importance'");
+
+		this.oColumn.destroyExtendedSettings();
+		assert.equal(oInnerColumn.getImportance(), "None", "After destroying extended settings: Inner column 'importance'");
+
+		this.oColumn.setExtendedSettings(new (ColumnSettingsBase.extend("sap.ui.mdc.test.TestColumnSettings", {
+			metadata: {
+				properties: {
+					importance: {type: "sap.ui.core.Priority", defaultValue: "Medium"}
+				}
+			}
+		}))());
+		assert.equal(oInnerColumn.getImportance(), "None", "Extended Settings not of type ResponsiveColumnSettings: Inner column 'importance'");
+	});
+
+	QUnit.test("Change extendedSettings.mergeFunction", function(assert) {
+		const oInnerColumn = this.oTable._oTable.getColumns()[0];
+
+		this.oColumn.setExtendedSettings(new ResponsiveColumnSettings());
+		assert.equal(oInnerColumn.getMergeDuplicates(), false,
+			"Set extended settings without 'mergeFunction': Inner column 'mergeDuplicates'");
+		assert.equal(oInnerColumn.getMergeFunctionName(), "getText",
+			"Set extended settings without 'mergeFunction': Inner column 'mergeFunctionName'");
+
+		this.oColumn.getExtendedSettings().setMergeFunction("myMergeFunction");
+		assert.equal(oInnerColumn.getMergeDuplicates(), true,
+			"Set extended settings 'mergeFunction': Inner column 'mergeDuplicates'");
+		assert.equal(oInnerColumn.getMergeFunctionName(), "myMergeFunction",
+			"Set extended settings 'mergeFunction': Inner column 'mergeFunctionName'");
+
+		this.oColumn.destroyExtendedSettings();
+		assert.equal(oInnerColumn.getMergeDuplicates(), false,
+			"After destroying extended settings: Inner column 'mergeDuplicates'");
+		assert.equal(oInnerColumn.getMergeFunctionName(), "getText",
+			"After destroying extended settings: Inner column 'mergeFunctionName'");
+
+		this.oColumn.setExtendedSettings(new (ColumnSettingsBase.extend("sap.ui.mdc.test.TestColumnSettings", {
+			metadata: {
+				properties: {
+					mergeFunction: {type: "string", defaultValue: "someMergeFunction"}
+				}
+			}
+		}))());
+		assert.equal(oInnerColumn.getMergeDuplicates(), false,
+			"Extended Settings not of type ResponsiveColumnSettings: Inner column 'mergeDuplicates'");
+		assert.equal(oInnerColumn.getMergeFunctionName(), "getText",
+			"Extended Settings not of type ResponsiveColumnSettings: Inner column 'mergeFunctionName'");
 	});
 
 	QUnit.module("API", {

@@ -822,13 +822,14 @@ sap.ui.define([
 		if (bDependsOnOperation && !sResolvedChildPath.includes("/$Parameter/")
 				|| this.isRootBindingSuspended()
 				|| _Helper.isDataAggregation(this.mParameters)
-					&& (oContext === this.getHeaderContext?.() || oContext.isAggregated())) {
+					&& (oContext === this.getHeaderContext?.() || oContext.isAggregated()
+						|| this.mParameters.$$aggregation.aggregate[sChildPath]?.name)) {
 			// In general there is no need for auto-$expand/$select, if the given context is a
 			// header context. But exiting here always, if a header context is used, changes the
 			// timing.
-			// With data aggregation, no auto-$expand/$select is needed for a header context or a
-			// context referencing aggregated data, but the child may still use the parent's cache;
-			// in case of a single record auto-$expand/$select is used.
+			// With data aggregation, no auto-$expand/$select is needed for a header context, a
+			// context referencing aggregated data, or a dynamic property, but the child may still
+			// use the parent's cache; in case of a single record auto-$expand/$select is used.
 			// Note: Operation bindings do not support auto-$expand/$select yet
 			return SyncPromise.resolve(sResolvedChildPath);
 		}

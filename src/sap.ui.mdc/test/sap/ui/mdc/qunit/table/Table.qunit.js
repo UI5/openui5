@@ -189,16 +189,6 @@ sap.ui.define([
 		}
 	}
 
-	function getInnerColumnLabel(oColumn) {
-		if (oColumn.isA("sap.ui.table.Column")) {
-			return oColumn.getLabel().getLabel();
-		} else if (oColumn.isA("sap.m.Column")) {
-			return oColumn.getHeader().getLabel();
-		} else {
-			return oColumn._oColumnHeaderLabel.getLabel();
-		}
-	}
-
 	const aToolbarEndOrderSuffix = ["copy", "paste", "showHideDetails", "collapseAll", "expandAll", "settings", "export"];
 	const fnActionToolbarValidateAggregation = ActionToolbar.prototype.validateAggregation;
 
@@ -597,23 +587,6 @@ sap.ui.define([
 			const aMDCColumns = this.oTable.getColumns();
 			const aInnerColumns = this.oTable._oTable.getColumns();
 			assert.equal(aMDCColumns.length, aInnerColumns.length);
-			assert.equal(aMDCColumns[0].getHeader(), aInnerColumns[0].getLabel().getText());
-			assert.equal(aInnerColumns[0].getLabel().getText(), "Test", "column0: label is correct");
-			assert.equal(aInnerColumns[0].getMinWidth(), 136, "column0: minWidth is correct");
-
-			assert.equal(aInnerColumns[1].getLabel().getText(), "Test1", "column1: label is correct");
-			assert.equal(aInnerColumns[1].getMinWidth(), 134, "column1: minWidth is correct");
-
-			assert.ok(aInnerColumns[1].getLabel().getLabel().isRequired(), "column1: is required");
-			assert.equal(aInnerColumns[2].getLabel().getText(), "Test2", "column1: label is correct");
-			assert.equal(aInnerColumns[2].getMinWidth(), 128, "column2: minWidth is correct (default value)");
-
-			assert.equal(aInnerColumns[0].getTemplate().getText(), "Test", "column0: template is correct");
-			assert.equal(aInnerColumns[0].getTemplate().getWrapping(), false, "column0: template wrapping is disabled");
-			assert.equal(aInnerColumns[1].getTemplate().getText(), "Test1", "column1: template is correct");
-			assert.equal(aInnerColumns[0].getCreationTemplate(), null, "column0: creationTemplate is correct");
-			assert.equal(aInnerColumns[1].getCreationTemplate().getText(), "Test1", "column1: creationTemplate is correct");
-			assert.equal(aInnerColumns[1].getCreationTemplate().getWrapping(), false, "column1: creationTemplate wrapping is disabled");
 		}.bind(this));
 	});
 
@@ -677,116 +650,6 @@ sap.ui.define([
 			this.oTable.invalidate();
 
 			assert.equal(oInnerTableInvalidate.callCount, 0, "Inner table is not invalidated if the MDC Table is invalidated");
-		}.bind(this));
-	});
-
-	QUnit.test("Columns added to inner ResponsiveTable", async function(assert) {
-		const done = assert.async();
-		// Destroy the old/default table
-		this.oTable.destroy();
-		this.oTable = new Table({
-			type: TableType.ResponsiveTable
-		});
-		// place the table at the dom
-		this.oTable.placeAt("qunit-fixture");
-		await nextUIUpdate();
-
-		this.oTable.addColumn(
-			new Column({
-				header: "Test",
-				template: new Text({
-					text: "Test"
-				}),
-				required: true,
-				extendedSettings: new ResponsiveColumnSettings({
-					importance: "High"
-				})
-			})
-		);
-
-		this.oTable.addColumn(
-			new Column({
-				header: "Test3",
-				template: new Text({
-					text: "Test3"
-				}),
-				extendedSettings: new ResponsiveColumnSettings({
-					importance: "Low"
-				})
-			})
-		);
-
-		this.oTable.insertColumn(new Column({
-			header: "Test2",
-			minWidth: 8.5,
-			template: new Text({
-				text: "Test2"
-			})
-		}), 1);
-
-		this.oTable.initialized().then(function() {
-			const aMDCColumns = this.oTable.getColumns();
-			const aInnerColumns = this.oTable._oTable.getColumns();
-			assert.equal(aMDCColumns.length, aInnerColumns.length);
-			assert.equal(aMDCColumns[0].getHeader(), aInnerColumns[0].getHeader().getText());
-			assert.equal(aInnerColumns[0].getHeader().getText(), "Test");
-			assert.ok(aInnerColumns[0].getHeader().getLabel().getRequired(), "First column is required");
-			assert.equal(getInnerColumnLabel(aInnerColumns[0]).getWrappingType(), "Hyphenated");
-			assert.equal(aInnerColumns[0].getImportance(), "High");
-			assert.equal(aInnerColumns[0].getAutoPopinWidth(), 8, "minWidth is not set, default value is 8");
-			assert.equal(aInnerColumns[1].getHeader().getText(), "Test2");
-			assert.equal(aInnerColumns[1].getImportance(), "None", "importance is not set, default value is None");
-			assert.equal(aInnerColumns[1].getAutoPopinWidth(), 8.5, "autoPopinWidth is set properly");
-			assert.equal(aInnerColumns[2].getHeader().getText(), "Test3");
-			assert.equal(aInnerColumns[2].getImportance(), "Low");
-			done();
-		}.bind(this));
-	});
-
-	QUnit.test("Columns added to inner ResponsiveTable - one by one E.g. pers", async function(assert) {
-		// Destroy the old/default table
-		this.oTable.destroy();
-		this.oTable = new Table({
-			type: TableType.ResponsiveTable
-		});
-		// place the table at the dom
-		this.oTable.placeAt("qunit-fixture");
-		await nextUIUpdate();
-
-		this.oTable.addColumn(new Column({
-			header: "Test",
-			template: new Text({
-				text: "Test"
-			})
-		}));
-
-		return this.oTable.initialized().then(function() {
-			let aMDCColumns = this.oTable.getColumns();
-			let aInnerColumns = this.oTable._oTable.getColumns();
-			assert.equal(aMDCColumns.length, aInnerColumns.length);
-			assert.equal(aMDCColumns[0].getHeader(), aInnerColumns[0].getHeader().getText());
-
-			this.oTable.insertColumn(new Column({
-				header: "Test2",
-				template: new Text({
-					text: "Test2"
-				})
-			}), 0);
-
-			this.oTable.addColumn(new Column({
-				header: "Test3",
-				template: new Text({
-					text: "Test3"
-				})
-			}));
-
-			aMDCColumns = this.oTable.getColumns();
-			aInnerColumns = this.oTable._oTable.getColumns();
-			assert.equal(aMDCColumns.length, aInnerColumns.length);
-			assert.equal(aMDCColumns[0].getHeader(), aInnerColumns[0].getHeader().getText());
-			assert.equal("Test2", aInnerColumns[0].getHeader().getText());
-			assert.equal(aMDCColumns[2].getHeader(), aInnerColumns[2].getHeader().getText());
-			assert.equal("Test3", aInnerColumns[2].getHeader().getText());
 		}.bind(this));
 	});
 
@@ -1610,36 +1473,10 @@ sap.ui.define([
 			let aMDCColumns = this.oTable.getColumns();
 			let aInnerColumns = this.oTable._oTable.getColumns();
 			assert.equal(aMDCColumns.length, aInnerColumns.length);
-			assert.equal(aMDCColumns[0].getHeader(), aInnerColumns[0].getLabel().getText());
-			assert.equal(aInnerColumns[0].isA("sap.ui.table.Column"), true);
-			assert.equal(aInnerColumns[0].getLabel().getText(), "Test2", "column0: label is correct");
-			assert.equal(aInnerColumns[1].isA("sap.ui.table.Column"), true);
-			assert.equal(aInnerColumns[1].getLabel().getText(), "Test", "column1: label is correct");
-			assert.equal(aInnerColumns[2].isA("sap.ui.table.Column"), true);
-			assert.equal(aInnerColumns[2].getLabel().getText(), "Test3", "column1: label is correct");
-			assert.equal(aInnerColumns[0].getTemplate().getText(), "Test2", "column0: template is correct");
-			assert.equal(aInnerColumns[0].getTemplate().getWrapping(), false, "column0: template wrapping is disabled");
-			assert.equal(aInnerColumns[1].getTemplate().getText(), "Test", "column1: template is correct");
-			assert.equal(aInnerColumns[0].getCreationTemplate(), null, "column0: creationTemplate is correct");
-			assert.equal(aInnerColumns[1].getCreationTemplate().getText(), "Test", "column1: creationTemplate is correct");
-			assert.equal(aInnerColumns[1].getCreationTemplate().getWrapping(), false, "column1: creationTemplate wrapping is disabled");
 
 			aMDCColumns = oTable2.getColumns();
 			aInnerColumns = oTable2._oTable.getColumns();
 			assert.equal(aMDCColumns.length, aInnerColumns.length);
-			assert.equal(aMDCColumns[0].getHeader(), aInnerColumns[0].getHeader().getText());
-			assert.equal(aInnerColumns[0].isA("sap.m.Column"), true);
-			assert.equal(aInnerColumns[0].getHeader().getText(), "Test2", "column0: label is correct");
-			assert.equal(getInnerColumnLabel(aInnerColumns[0]).getWrapping(), false);
-			assert.equal(getInnerColumnLabel(aInnerColumns[0]).getWrappingType(), "Hyphenated");
-			assert.equal(aInnerColumns[1].isA("sap.m.Column"), true);
-			assert.equal(aInnerColumns[1].getHeader().getText(), "Test", "column1: label is correct");
-			assert.equal(getInnerColumnLabel(aInnerColumns[1]).getWrapping(), false);
-			assert.equal(getInnerColumnLabel(aInnerColumns[1]).getWrappingType(), "Hyphenated");
-			assert.equal(aInnerColumns[2].isA("sap.m.Column"), true);
-			assert.equal(aInnerColumns[2].getHeader().getText(), "Test3", "column1: label is correct");
-			assert.equal(getInnerColumnLabel(aInnerColumns[2]).getWrapping(), false);
-			assert.equal(getInnerColumnLabel(aInnerColumns[2]).getWrappingType(), "Hyphenated");
 		}.bind(this));
 	});
 
@@ -4200,14 +4037,6 @@ sap.ui.define([
 			assert.ok(oTable._oTable.getDependents()[0].isA("sap.m.plugins.ColumnResizer"),
 				"ColumnResizer plugin is added to the ResponsiveTable by default");
 
-			oTable.setEnableColumnResize(false);
-			assert.notOk(oTable._oTable.getDependents()[0].getEnabled(), "Disabling column resize disables the ColumnResizer plugin");
-			assert.strictEqual(getInnerColumnLabel(oTable.getColumns()[0]).getWrapping(), true, "Wrapping enabled on column label control");
-
-			oTable.setEnableColumnResize(true);
-			assert.ok(oTable._oTable.getDependents()[0].getEnabled(), "Enabling column resize enables the ColumnResizer plugin");
-			assert.strictEqual(getInnerColumnLabel(oTable.getColumns()[0]).getWrapping(), false, "Wrapping disabled on column label control");
-
 			oTable._oColumnHeaderMenu.openBy(oTable._oTable.getColumns()[0]);
 			return oTable._fullyInitialized().then(function() {
 				return oTable.finalizePropertyHelper();
@@ -4221,36 +4050,6 @@ sap.ui.define([
 		}).finally(function() {
 			ColumnResizer._isInTouchMode.restore();
 		});
-	});
-
-	QUnit.test("Enable/Disable column resize with GridTable with enableColumnResize=true initially", function(assert) {
-		return this.oTable.initialized().then(function() {
-			assert.ok(this.oTable._oTable.getColumns()[0].getResizable(), "Resizable property of the inner column is set to true");
-			assert.ok(this.oTable._oTable.getColumns()[0].getAutoResizable(), "AutoResizable property of the inner column is set to true");
-			assert.strictEqual(getInnerColumnLabel(this.oTable.getColumns()[0]).getWrapping(), false, "Wrapping disabled on column label control");
-
-			this.oTable.setEnableColumnResize(false);
-			assert.notOk(this.oTable._oTable.getColumns()[0].getAutoResizable(), "AutoResizable property of the inner column is set to false");
-			assert.notOk(this.oTable._oTable.getColumns()[0].getResizable(), "Resizable property of the inner column is set to false");
-			assert.strictEqual(getInnerColumnLabel(this.oTable.getColumns()[0]).getWrapping(), false, "Wrapping disabled on column label control");
-		}.bind(this));
-	});
-
-	QUnit.test("Enable/Disable column resize with GridTable with enableColumnResize=false initially", function(assert) {
-		this.destroyTestObjects();
-
-		return this.createTestObjects({enableColumnResize: false}).then(function() {
-			return this.oTable.initialized();
-		}.bind(this)).then(function() {
-			assert.notOk(this.oTable._oTable.getColumns()[0].getAutoResizable(), "AutoResizable property of the inner column is set to false");
-			assert.notOk(this.oTable._oTable.getColumns()[0].getResizable(), "Resizable property of the inner column is set to false");
-			assert.strictEqual(getInnerColumnLabel(this.oTable.getColumns()[0]).getWrapping(), false, "Wrapping disabled on column label control");
-
-			this.oTable.setEnableColumnResize(true);
-			assert.ok(this.oTable._oTable.getColumns()[0].getResizable(), "Resizable property of the inner column is set to true");
-			assert.ok(this.oTable._oTable.getColumns()[0].getAutoResizable(), "AutoResizable property of the inner column is set to true");
-			assert.strictEqual(getInnerColumnLabel(this.oTable.getColumns()[0]).getWrapping(), false, "Wrapping disabled on column label control");
-		}.bind(this));
 	});
 
 	QUnit.test("Apply initial column width changes", function(assert) {
@@ -5478,7 +5277,6 @@ sap.ui.define([
 		let oProperty = oPropertyHelper.getProperty(sPropertyName);
 
 		const sWidth = oPropertyHelper._calcColumnWidth(oProperty, aColumns[3]);
-		assert.equal(sWidth, aColumns[3]._oSettingsModel.getProperty("/calculatedWidth"), "calculatedWidth for numberValue width is " + sWidth);
 		assert.equal(sWidth, getInnerColumnWidth(aColumns[3]), "Column numberValue width is " + sWidth);
 
 		// 5th column is in correct range due of type boolean

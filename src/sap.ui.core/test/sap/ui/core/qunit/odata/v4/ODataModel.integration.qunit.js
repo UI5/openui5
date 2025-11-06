@@ -27162,6 +27162,67 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	});
 
 	//*********************************************************************************************
+	// Scenario: Binding-specific parameter $$aggregation is used; no visual grouping, but single
+	// records where properties are "renamed" using with/as.
+	// SNOW: DINC0687517
+	QUnit.test("Data Aggregation: single records using with/as", function (assert) {
+		const oModel = this.createAggregationModel({autoExpandSelect : true});
+		const sView = `
+<t:Table id="table" rows="{
+			path : '/BusinessPartners',
+			parameters : {
+				$$aggregation : {
+					aggregate : {
+						SalesAmountSum : {
+							name : 'SalesAmount',
+							unit : 'Currency',
+							with : 'sum'
+						}
+					},
+					group : {
+						Id : {
+							additionally : ['Name']
+						}
+					}
+				},
+				$orderby : 'SalesAmountSum desc'
+			}
+		}" threshold="0" visibleRowCount="3">
+	<Text id="id" text="{Id}"/>
+	<Text id="name" text="{Name}"/>
+	<Text id="salesAmountSum" text="{= %{SalesAmountSum} }"/>
+	<Text id="currency" text="{Currency}"/>
+</t:Table>`;
+
+		this.expectRequest("BusinessPartners?$orderby=SalesAmountSum desc&$apply="
+				+ "groupby((Id,Name),aggregate(SalesAmount with sum as SalesAmountSum,Currency))"
+				+ "&$skip=0&$top=3", {
+				value : [{
+					Currency : "EUR",
+					Id : 26,
+					Name : "Dr. Z",
+					SalesAmountSum : "3"
+				}, {
+					Currency : "EUR",
+					Id : 25,
+					Name : "Mrs. Y",
+					SalesAmountSum : "2"
+				}, {
+					Currency : "EUR",
+					Id : 24,
+					Name : "Mr. X",
+					SalesAmountSum : "1"
+				}]
+			})
+			.expectChange("id", ["26", "25", "24"])
+			.expectChange("name", ["Dr. Z", "Mrs. Y", "Mr. X"])
+			.expectChange("salesAmountSum", ["3", "2", "1"])
+			.expectChange("currency", ["EUR", "EUR", "EUR"]);
+
+		return this.createView(assert, sView, oModel);
+	});
+
+	//*********************************************************************************************
 	// Scenario: Calling the API functions filter, sort, changeParameters, setAggregation on an
 	// unresolved binding are stored. As soon as the binding gets resolved and requests data
 	// they reflect inside the request.

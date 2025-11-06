@@ -3,31 +3,21 @@
  */
 
 sap.ui.define([
-	"./GridTableType",
-	"./ResponsiveTableType",
-	"sap/base/Log",
-	"sap/m/library",
 	"sap/m/Label",
-	"sap/ui/core/Element",
-	"sap/ui/model/json/JSONModel",
 	"sap/ui/model/base/ManagedObjectModel",
 	"sap/ui/model/BindingMode",
+	"sap/m/plugins/PluginBase",
+	"sap/ui/core/Element",
 	"sap/ui/core/Control",
-	"sap/ui/mdc/enums/TableType",
-	"sap/m/plugins/PluginBase"
+	"sap/base/Log"
 ], (
-	GridTableType,
-	ResponsiveTableType,
-	Log,
-	MLibrary,
 	Label,
-	Element,
-	JSONModel,
 	ManagedObjectModel,
 	BindingMode,
+	PluginBase,
+	Element,
 	Control,
-	TableType,
-	PluginBase
+	Log
 ) => {
 	"use strict";
 
@@ -186,9 +176,7 @@ sap.ui.define([
 			creationTemplate: true
 		};
 
-		this._oManagedObjectModel = new ManagedObjectModel(this);
-		this._oSettingsModel = new JSONModel({
-			width: this.getWidth(),
+		this._oManagedObjectModel = new ManagedObjectModel(this, {
 			calculatedWidth: null,
 			p13nWidth: null
 		});
@@ -204,105 +192,14 @@ sap.ui.define([
 		const oTable = this.getTable();
 
 		if (oTable && (!this._oInnerColumn || this._oInnerColumn.isDestroyed())) {
-			this._oInnerColumn = this._createInnerColumn();
+			this._oInnerColumn = oTable._getType().createColumn(this);
+			// XConfig might not have been available on init - depends on the order settings are applied in Table#applySettings.
+			this._readP13nValues();
+			this._oInnerColumn.setModel(this._oManagedObjectModel, "$sap.ui.mdc.table.Column");
+			this._oInnerColumnReady.resolve();
 		}
 
 		return this._oInnerColumn;
-	};
-
-	Column.prototype._createInnerColumn = function() {
-		const oTable = this.getTable();
-		let oColumn;
-
-		const oWidthBindingInfo = {
-			parts: [
-				{path: "$this>/width"}, {path: "$columnSettings>/calculatedWidth"}, {path: "$columnSettings>/p13nWidth"}
-			],
-			formatter: function(sWidth, sCalculatedWidth, sP13nWidth) {
-				return sP13nWidth || sCalculatedWidth || sWidth;
-			}
-		};
-
-		const oTooltipBindingInfo = {
-			parts: [
-				{path: "$this>/tooltip"},
-				{path: "$this>/header"},
-				{path: "$this>/headerVisible"},
-				{path: "$sap.ui.mdc.Table>/useColumnLabelsAsTooltips"}
-			],
-			formatter: function(sTooltip, sHeader, bHeaderVisible, bUseColumnLabelsAsTooltips) {
-				if (sTooltip || !bUseColumnLabelsAsTooltips) {
-					return sTooltip;
-				}
-				return bHeaderVisible ? sHeader : "";
-			}
-		};
-
-		this._readP13nValues(); // XConfig might not have been available on init - depends on the order settings are applied in Table#applySettings.
-
-		if (oTable._isOfType(TableType.ResponsiveTable)) {
-			oColumn = ResponsiveTableType.createColumn(this.getId() + "-innerColumn", {
-				width: oWidthBindingInfo,
-				autoPopinWidth: "{$this>/minWidth}",
-				hAlign: "{$this>/hAlign}",
-				header: this._getColumnHeaderLabel(oTooltipBindingInfo),
-				importance: {
-					parts: [
-						{path: "$this>/importance"}, {path: "$this>/extendedSettings/importance"}, {path: "$this>/extendedSettings/@className"}
-					],
-					formatter: function(sLegacyImportance, sImportance, sClassName) {
-						if (sImportance && sClassName === "sap.ui.mdc.table.ResponsiveColumnSettings") {
-							return sImportance;
-						} else {
-							return sLegacyImportance;
-						}
-					}
-				},
-				popinDisplay: "{= ${$this>/headerVisible} ? 'Inline' : 'WithoutHeader' }",
-				mergeDuplicates: {
-					parts: [
-						{path: "$this>/extendedSettings/mergeFunction"}, {path: "$this>/extendedSettings/@className"}
-					],
-					formatter: function(sMergeFunction, sClassName) {
-						return sMergeFunction && sClassName === "sap.ui.mdc.table.ResponsiveColumnSettings";
-					}
-				},
-				mergeFunctionName: {
-					parts: [
-						{path: "$this>/extendedSettings/mergeFunction"}, {path: "$this>/extendedSettings/@className"}
-					],
-					formatter: function(sMergeFunction, sClassName) {
-						if (sClassName === "sap.ui.mdc.table.ResponsiveColumnSettings") {
-							return sMergeFunction;
-						}
-					}
-				}
-			});
-		} else {
-			oColumn = GridTableType.createColumn(this.getId() + "-innerColumn", {
-				width: oWidthBindingInfo,
-				minWidth: {
-					path: "$this>/minWidth",
-					formatter: function(fMinWidth) {
-						return Math.round(fMinWidth * parseFloat(MLibrary.BaseFontSize));
-					}
-				},
-				hAlign: "{$this>/hAlign}",
-				label: this._getColumnHeaderLabel(),
-				resizable: "{$sap.ui.mdc.Table>/enableColumnResize}",
-				autoResizable: "{$sap.ui.mdc.Table>/enableColumnResize}",
-				tooltip: oTooltipBindingInfo,
-				template: this.getTemplateClone()
-			});
-			oColumn.setCreationTemplate(this.getCreationTemplateClone());
-		}
-
-		oColumn.setModel(this._oManagedObjectModel, "$this");
-		oColumn.setModel(this._oSettingsModel, "$columnSettings");
-		oColumn.setHeaderMenu(oTable.getId() + "-columnHeaderMenu");
-
-		this._oInnerColumnReady.resolve();
-		return oColumn;
 	};
 
 	// The purpose of this control is to render the MDC column in the inner table column header, for example to support tools that allow the user to
@@ -328,93 +225,60 @@ sap.ui.define([
 				oRm.close("div");
 			}
 		},
-		setIsInColumnHeaderContext: function(bIsInColumnHeaderContext) {
-			this.getLabel()?.setIsInColumnHeaderContext(bIsInColumnHeaderContext);
-		},
 		getText: function() { // Used by inner table for the fieldHelpInfo, and by tests in MDC and FE.
-			return this.getLabel().getText();
+			return this.getLabel()?.getText();
 		},
 		clone: function() { // For ResponsiveTable popin.
-			return this.getLabel().clone();
+			return this.getLabel()?.clone();
 		},
 		// Used by inner table for accessibility support.
 		getRequired: function() {
-			return this.getLabel().getRequired();
+			return this.getLabel()?.getRequired();
 		},
 		getAccessibilityInfo: function() {
-			return this.getLabel().getAccessibilityInfo();
+			return this.getLabel()?.getAccessibilityInfo();
+		},
+		setIsInColumnHeaderContext: function(bIsInColumnHeaderContext) {
+			this.getLabel()?.setIsInColumnHeaderContext(bIsInColumnHeaderContext);
 		}
 	});
 
 	/**
-	 * Creates and returns the column header control.
+	 * Creates and returns the column header control. If the control is already created, the existing instance is returned. The settings are not
+	 * updated. To create a new instance with new settings, first destroy the old instance.
 	 * If <code>headerVisible=false</code> then <code>width=0px</code> is applied to the <code>sap.m.Label</code> control for accessibility purposes.
 	 *
-	 * @param {object} oTooltipBindingInfo The binding info to be usd for the tooltip of the created column header control.
-	 *
-	 * @returns {object} The column header control
+	 * @param {object} [mLabelSettings] Additional settings for the inner <code>sap.m.Label</code>
+	 * @returns {sap.ui.mdc.table.ColumnHeaderLabel} The column header control
 	 * @private
 	 */
-	Column.prototype._getColumnHeaderLabel = function(oTooltipBindingInfo) {
-		const oTable = this.getTable();
-
-		if (oTable && (!this._oColumnHeaderLabel || this._oColumnHeaderLabel.isDestroyed())) {
-			this._oColumnHeaderLabel = new ColumnHeaderLabel({
-				column: this,
-				label: new Label({
-					width: "{= ${$this>/headerVisible} ? '100%' : '0px' }",
-					text: "{$this>/header}",
-					textAlign: "{$this>/hAlign}",
-					tooltip: oTooltipBindingInfo ? oTooltipBindingInfo : "",
-					wrapping: {
-						parts: [
-							{path: "$this>/headerVisible"}, {path: "$sap.ui.mdc.Table>/enableColumnResize"}
-						],
-						formatter: function(bHeaderVisible, bResizable) {
-							return oTable._isOfType(TableType.ResponsiveTable) && bHeaderVisible && !bResizable;
-						}
-					},
-					wrappingType: oTable._isOfType(TableType.ResponsiveTable) ? "Hyphenated" : null,
-					required: "{$this>/required}"
-				})
-			});
+	Column.prototype.getHeaderLabel = function(mLabelSettings) {
+		if (this._oColumnHeaderLabel?.isDestroyed()) {
+			delete this._oColumnHeaderLabel;
 		}
+
+		this._oColumnHeaderLabel ??= new ColumnHeaderLabel({
+			column: this,
+			label: new Label({
+				width: "{= ${$sap.ui.mdc.table.Column>/headerVisible} ? '100%' : '0px' }",
+				text: "{$sap.ui.mdc.table.Column>/header}",
+				textAlign: "{$sap.ui.mdc.table.Column>/hAlign}",
+				required: "{$sap.ui.mdc.table.Column>/required}",
+				...mLabelSettings
+			})
+		});
 
 		return this._oColumnHeaderLabel;
 	};
 
 	Column.prototype.getTemplateClone = function() {
-		const oTable = this.getTable();
 		const oTemplate = this.getTemplate();
 
-		if (oTable && oTemplate && (!this._oTemplateClone || this._oTemplateClone.isDestroyed())) {
+		if (oTemplate && (!this._oTemplateClone || this._oTemplateClone.isDestroyed())) {
 			this._oTemplateClone = oTemplate.clone();
-
-			if (!oTable._isOfType(TableType.ResponsiveTable)) {
-				if (this._oTemplateClone.setWrapping) {
-					this._oTemplateClone.setWrapping(false);
-				}
-			}
 		}
 
 		return this._oTemplateClone;
-	};
-
-	Column.prototype.getCreationTemplateClone = function() {
-		const oTable = this.getTable();
-		const oCreationTemplate = this.getCreationTemplate();
-
-		if (oTable && oCreationTemplate && (!this._oCreationTemplateClone || this._oCreationTemplateClone.isDestroyed())) {
-			this._oCreationTemplateClone = oCreationTemplate.clone();
-
-			if (!oTable._isOfType(TableType.ResponsiveTable)) {
-				if (this._oCreationTemplateClone.setWrapping) {
-					this._oCreationTemplateClone.setWrapping(false);
-				}
-			}
-		}
-
-		return this._oCreationTemplateClone;
 	};
 
 	Column.prototype.setHeader = function(sHeader) {
@@ -504,7 +368,7 @@ sap.ui.define([
 
 		if (oPropertyHelper) {
 			oPropertyHelper.calculateColumnWidth(this).then((sWidth) => {
-				this._oSettingsModel.setProperty("/calculatedWidth", sWidth);
+				this._oManagedObjectModel.setProperty("/@custom/calculatedWidth", sWidth);
 			});
 		} else {
 			oTable._fullyInitialized().then(this._calculateColumnWidth.bind(this));
@@ -517,7 +381,7 @@ sap.ui.define([
 		const oXConfig = oTable._getXConfig();
 		const oColumnConfig = oXConfig?.aggregations?.columns?.[sPropertyKey];
 
-		this._oSettingsModel.setProperty("/p13nWidth", oColumnConfig?.width);
+		this._oManagedObjectModel.setProperty("/@custom/p13nWidth", oColumnConfig?.width);
 	};
 
 	Column.prototype.getTable = function() {
@@ -530,10 +394,8 @@ sap.ui.define([
 		this._oInnerColumnReady = null;
 		[
 			"_oManagedObjectModel",
-			"_oSettingsModel",
 			"_oInnerColumn",
 			"_oTemplateClone",
-			"_oCreationTemplateClone",
 			"_oColumnHeaderLabel"
 		].forEach(function(sObject) {
 			if (this[sObject]) {

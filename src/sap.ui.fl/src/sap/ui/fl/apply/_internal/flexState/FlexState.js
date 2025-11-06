@@ -51,23 +51,7 @@ sap.ui.define([
 	 *
 	 *	{
 	 * 		storageResponse: {
-	 * 			changes: {
-	 * 				annotationChanges: [...],
-	 * 				appDescriptorChanges: [...],
-	 * 				changes: [...],
-	 * 				comp: {
-	 * 					variants: [...],
-	 * 					changes: [...],
-	 * 					defaultVariants: [...],
-	 * 					standardVariants: [...]
-	 * 				}
-	 * 				variants: [...],
-	 * 				variantChanges: [...],
-	 * 				variantDependentControlChanges: [...],
-	 * 				variantManagementChanges: [...],
-	 * 				ui2personalization: {...}
-	 * 			},
-	 * 			loadModules: <boolean>
+	 * 			changes: {...}, // see Loader.js
 	 * 		},
 	 * 		runtimePersistence: {
 	 * 			flexObjects: [...],

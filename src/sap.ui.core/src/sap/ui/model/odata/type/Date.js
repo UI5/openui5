@@ -86,7 +86,7 @@ sap.ui.define([
 	 *   if <code>true</code>, the value <code>null</code> is accepted
 	 * @public
 	 * @since 1.37.0
-	 * @see http://docs.oasis-open.org/odata/odata/v4.0/odata-v4.0-part3-csdl.html
+	 * @see https://docs.oasis-open.org/odata/odata-csdl-xml/v4.01/odata-csdl-xml-v4.01.html#_Toc38530338
 	 */
 	var EdmDate = ODataType.extend("sap.ui.model.odata.type.Date",
 			/** @lends sap.ui.model.odata.type.Date.prototype */
