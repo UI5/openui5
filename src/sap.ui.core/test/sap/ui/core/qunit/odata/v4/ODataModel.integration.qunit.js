@@ -9780,6 +9780,67 @@ sap.ui.define([
 });
 
 	//*********************************************************************************************
+	// Scenario: A model w/ "earlyRequests" is still fetching its security token when a value list
+	// model is created and then sends a $batch of its own. The security token should be forwarded
+	// to the value list model and used for the $batch in order to avoid both a 403 and a 2nd HEAD
+	// request.
+	// SNOW: DINC0687843
+[false, true].forEach((bAwait) => {
+	QUnit.test("DINC0687843, bAwait=" + bAwait, async function (assert) {
+		let bNew = false;
+		const sVH_ProductTypeCode = "/sap/opu/odata4/sap/zui5_testv4/f4/sap/d_pr_type-fv/0001"
+			+ ";ps=%27default-zui5_epm_sample-0002%27"
+			+ ";va=%27com.sap.gateway.default.zui5_epm_sample.v0002.ET-PRODUCT.TYPE_CODE%27/";
+		const oModel = this.createSalesOrdersModel({
+			autoExpandSelect : true,
+			earlyRequests : true
+		}, {
+			["HEAD " + sSalesOrderService] : [{
+				code : 200,
+				headers : {"X-CSRF-Token" : "old"},
+				ifMatch : () => !bNew
+			}, {
+				code : 200,
+				headers : {"X-CSRF-Token" : "new"},
+				ifMatch : () => bNew
+			}],
+			[sVH_ProductTypeCode + "$metadata"] : {source : "odata/v4/data/VH_ProductTypeCode.xml"},
+			[sVH_ProductTypeCode + "D_PR_TYPE_FV_Set?$skip=0&$top=10"] : {
+				ifMatch : (oRequest) => {
+					assert.strictEqual(oRequest.requestHeaders["X-CSRF-Token"], "new",
+						"new security token MUST be used");
+					return true;
+				},
+				message : {
+					value : [{
+						DESCRIPTION : "unresolved",
+						FIELD_VALUE : "XY"
+					}]
+				}
+			}
+		});
+		oModel.$keepSend = true; // do not stub sendBatch/-Request
+
+		await this.createView(assert, "", oModel);
+
+		bNew = true;
+		const oSecurityTokenPromise = oModel.oRequestor.refreshSecurityToken("old");
+		if (bAwait) { // Note: this already worked before!
+			await oSecurityTokenPromise;
+		}
+
+		// code under test
+		const mQualifier2ValueListType = await oModel.getMetaModel()
+			.requestValueListInfo("/ProductList/TypeCode");
+
+		const oValueListModel = mQualifier2ValueListType[""].$model;
+		const oValueListBinding = oValueListModel.bindList("/D_PR_TYPE_FV_Set");
+
+		await oValueListBinding.requestContexts(0, 10);
+	});
+});
+
+	//*********************************************************************************************
 	// Scenario: "Retry-After" handling: expired X-CSRF-Token runs into 503 "Retry-After" error
 	// 1) Initial $batch data request fails with 403 (token required)
 	// 2) Token HEAD request fails with 503, token remains unchanged
@@ -65005,7 +65066,7 @@ make root = ${bMakeRoot}`;
 <FlexBox binding="{/ProductList(\'1\')}">\
 	<Text id="typeCode1" text="{TypeCode}"/>\
 	<List id="list1"\
-		items="{path : \'/D_PR_TYPE_FV_SET\', suspended : true}">\
+		items="{path : \'/D_PR_TYPE_FV_Set\', suspended : true}">\
 		<CustomListItem>\
 			<Text id="description1" text="{DESCRIPTION}"/>\
 		</CustomListItem>\
@@ -65014,7 +65075,7 @@ make root = ${bMakeRoot}`;
 <FlexBox binding="{/ProductList(\'2\')}">\
 	<Text id="typeCode2" text="{TypeCode}"/>\
 	<List id="list2"\
-		items="{path : \'/D_PR_TYPE_FV_SET\', suspended : true}">\
+		items="{path : \'/D_PR_TYPE_FV_Set\', suspended : true}">\
 		<CustomListItem>\
 			<Text id="description2" text="{DESCRIPTION}"/>\
 		</CustomListItem>\
@@ -65057,7 +65118,7 @@ make root = ${bMakeRoot}`;
 				oValueListModel.setAnnotationChangePromise(Promise.resolve([]));
 			}, new Error("Too late"), "cannot set key user changes at the value list model");
 
-			that.expectRequest("D_PR_TYPE_FV_SET?"
+			that.expectRequest("D_PR_TYPE_FV_Set?"
 					+ (bAutoExpandSelect ? "$select=DESCRIPTION,FIELD_VALUE&" : "")
 					+ "$skip=0&$top=100", {
 					value : [{
@@ -65097,7 +65158,7 @@ make root = ${bMakeRoot}`;
 			]);
 		}).then(async function () {
 			const mValueListInfo = await oValueListModel.getMetaModel()
-				.requestValueListInfo("/D_PR_TYPE_FV_SET/FIELD_VALUE");
+				.requestValueListInfo("/D_PR_TYPE_FV_Set/FIELD_VALUE");
 			const oNestedValueListModel = mValueListInfo[""].$model;
 			const sLabel = await oNestedValueListModel.getMetaModel()
 				.requestObject("/com.sap.gateway.f4.FIELD_VALUE.v0001.D_PR_TYPE_FV/DESCRIPTION"

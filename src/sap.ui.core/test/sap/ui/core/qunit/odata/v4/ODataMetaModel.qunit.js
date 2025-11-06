@@ -25,12 +25,13 @@ sap.ui.define([
 	"sap/ui/model/odata/v4/ValueListType",
 	"sap/ui/model/odata/v4/lib/_Helper",
 	"sap/ui/model/odata/v4/lib/_MetadataRequestor",
+	"sap/ui/model/odata/v4/lib/_Requestor",
 	"sap/ui/test/TestUtils",
 	"sap/ui/thirdparty/URI"
 ], function (Log, Localization, JSTokenizer, SyncPromise, BindingMode, ChangeReason,
 		ClientListBinding, BaseContext, ContextBinding, Filter, FilterOperator, MetaModel, Model,
 		PropertyBinding, Sorter, OperationMode, AnnotationHelper, Context, ODataMetaModel,
-		ODataModel, ValueListType, _Helper, _MetadataRequestor, TestUtils, URI) {
+		ODataModel, ValueListType, _Helper, _MetadataRequestor, _Requestor, TestUtils, URI) {
 	"use strict";
 
 	// Common := com.sap.vocabularies.Common.v1
@@ -5661,8 +5662,10 @@ sap.ui.define([
 				.withExactArgs(bHasMetaModelForAnnotations
 					? "~oMetaModelForAnnotations~"
 					: sinon.match.same(oMetaModel));
-		const oExpectation = this.mock(ODataModel.prototype).expects("setRetryAfterHandler")
-			.withExactArgs(sinon.match.func);
+		const oRetryAfterHandlerExpectation = this.mock(ODataModel.prototype)
+			.expects("setRetryAfterHandler").withExactArgs(sinon.match.func);
+		const oCopySecurityTokenPromiseExpectation = this.mock(_Requestor.prototype)
+			.expects("copySecurityTokenPromise").withExactArgs(sinon.match.same(oModel.oRequestor));
 
 		// code under test
 		oSharedModel = oMetaModel.getOrCreateSharedModel("../ValueListService/$metadata",
@@ -5678,7 +5681,8 @@ sap.ui.define([
 		if (bCopyAnnotations) {
 			assert.ok(oCopyAnnotationsExpectation.calledOn(oSharedModel.getMetaModel()));
 		}
-		assert.ok(oExpectation.calledOn(oSharedModel));
+		assert.ok(oRetryAfterHandlerExpectation.calledOn(oSharedModel));
+		assert.ok(oCopySecurityTokenPromiseExpectation.calledOn(oSharedModel.oRequestor));
 		assert.deepEqual(oMetaModel.mSharedModelByUrl, bDestroyed ? undefined : {
 			foo : "~bar~",
 			[`${bAutoExpandSelect}/Foo/ValueListService/`] : oSharedModel
@@ -5699,7 +5703,7 @@ sap.ui.define([
 			.returns("~oPromise~");
 
 		// code under test
-		assert.strictEqual(oExpectation.args[0][0]("~oError~"), "~oPromise~");
+		assert.strictEqual(oRetryAfterHandlerExpectation.args[0][0]("~oError~"), "~oPromise~");
 	});
 			});
 		});

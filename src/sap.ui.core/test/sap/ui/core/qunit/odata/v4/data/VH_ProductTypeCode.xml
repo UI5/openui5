@@ -22,12 +22,12 @@
 				<Property Name="DESCRIPTION" Type="Edm.String" Nullable="false" />
 			</EntityType>
 			<EntityContainer Name="Container">
-				<EntitySet Name="D_PR_TYPE_FV_SET" EntityType="com.sap.gateway.f4.d_pr_type-fv.v0001.D_PR_TYPE_FV" />
+				<EntitySet Name="D_PR_TYPE_FV_Set" EntityType="com.sap.gateway.f4.d_pr_type-fv.v0001.D_PR_TYPE_FV" />
 			</EntityContainer>
 			<Annotations Target="ParentService.Product/TypeCode">
 				<Annotation Term="SAP__common.ValueListMapping">
 					<Record>
-						<PropertyValue Property="CollectionPath" String="D_PR_TYPE_FV_SET" />
+						<PropertyValue Property="CollectionPath" String="D_PR_TYPE_FV_Set" />
 						<PropertyValue Property="Parameters">
 							<Collection>
 								<Record Type="SAP__common.ValueListParameterInOut">
