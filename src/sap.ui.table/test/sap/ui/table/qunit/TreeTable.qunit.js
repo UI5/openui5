@@ -124,7 +124,7 @@ sap.ui.define([
 	QUnit.test("Insert and remove a row", function(assert) {
 		const done = assert.async();
 		const that = this;
-		const oData = that.table.getModel().getData();
+		let oData = JSON.parse(JSON.stringify(that.table.getModel().getData()));
 
 		this.testAsync({
 			act: function() {
@@ -140,6 +140,7 @@ sap.ui.define([
 		}).then(function() {
 			that.testAsync({
 				act: function() {
+					oData = JSON.parse(JSON.stringify(oData));
 					delete oData.root[3];
 					that.table.getModel().setData(oData);
 				},

@@ -4,11 +4,12 @@ sap.ui.define([
 	"sap/ui/mdc/table/ResponsiveTableType",
 	"sap/ui/mdc/enums/TableRowCountMode",
 	"sap/ui/mdc/enums/TableGrowingMode",
+	"sap/ui/mdc/enums/TablePopinDisplay",
 	"sap/m/library",
 	"sap/ui/core/library",
 	"sap/ui/core/Fragment",
 	"sap/ui/model/json/JSONModel"
-], function(Controller, GridTableType, ResponsiveTableType, TableRowCountMode, TableGrowingMode, mLibrary, coreLibrary, Fragment, JSONModel) {
+], function(Controller, GridTableType, ResponsiveTableType, TableRowCountMode, TableGrowingMode, TablePopinDisplay, mLibrary, coreLibrary, Fragment, JSONModel) {
 	"use strict";
 
 	const PopinLayout = mLibrary.PopinLayout;
@@ -24,6 +25,7 @@ sap.ui.define([
 					detailsButtonSetting: [Priority.High],
 					growingMode: TableGrowingMode.Basic,
 					popinLayout: PopinLayout.Block,
+					popinDisplay: TablePopinDisplay.Inline,
 					showDetailsButton: true
 				},
 				gridType: {
@@ -38,6 +40,7 @@ sap.ui.define([
 					rowCountMode: this.enumToObject(TableRowCountMode),
 					growingMode: this.enumToObject(TableGrowingMode),
 					popinLayout: this.enumToObject(PopinLayout),
+					popinDisplay: this.enumToObject(TablePopinDisplay),
 					priority: this.enumToObject(Priority)
 				}
 			});
@@ -73,6 +76,7 @@ sap.ui.define([
 					detailsButtonSetting: "{view>/respType/detailsButtonSetting}",
 					growingMode: "{view>/respType/growingMode}",
 					popinLayout: "{view>/respType/popinLayout}",
+					popinDisplay: "{view>/respType/popinDisplay}",
 					showDetailsButton: "{view>/respType/showDetailsButton}"
 				});
 			}

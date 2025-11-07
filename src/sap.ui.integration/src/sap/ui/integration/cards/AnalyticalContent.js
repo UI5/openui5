@@ -247,6 +247,60 @@ sap.ui.define([
 			feeds: this._getFeeds(oResolvedConfiguration),
 			vizType: ChartTypes[oResolvedConfiguration.chartType] || oResolvedConfiguration.chartType
 		});
+
+		this._onChartFullyLoaded(oChart);
+	};
+
+	/**
+	 * Called when the analytical chart is fully loaded and ready.
+	 *
+	 * @private
+	 * @param {sap.viz.ui5.controls.VizFrame} oChart The VizFrame chart instance
+	 */
+	AnalyticalContent.prototype._onChartFullyLoaded = function (oChart) {
+
+		if (!this._bChartHandlersAttached) {
+			const oCard = this.getCardInstance();
+
+			oChart.attachRenderComplete(function() {
+				const oDomRef = oChart.getDomRef();
+				if (!oDomRef) {
+					return;
+				}
+
+				const oSvgElement = oDomRef.querySelector("svg");
+				if (!oSvgElement) {
+					return;
+				}
+
+				// The chart shouldn't be focused when it has no action.
+				// In all other cases (actionableArea is "Full" or "Content") the chart should be focusable
+				if (!this._bActions && this.getCardInstance().isRoleListItem()) {
+					const sCardDescriptionId = oCard.getDomRef().getAttribute("aria-describedby");
+					const sChartLabelId = oSvgElement.getAttribute("aria-labelledby");
+
+					// Make SVG non-focusable
+					oSvgElement.setAttribute("tabindex", "");
+					// Also remove focus capability from the SVG
+					oSvgElement.setAttribute("focusable", "false");
+
+					// Add the aria-describedby from the chart to the card if it is not added already
+					if (sCardDescriptionId && !sCardDescriptionId.endsWith(sChartLabelId)) {
+						oCard.getDomRef().setAttribute("aria-describedby", sCardDescriptionId + " " + sChartLabelId);
+					} else if (!sCardDescriptionId) {
+						oCard.getDomRef().setAttribute("aria-describedby", sChartLabelId);
+					}
+
+					if (oCard.isInteractive()) {
+						oSvgElement.classList.add("sapUiIntegrationAnalyticalForcePointer");
+					}
+				} else if (this._bActions && !this._bChartsInteractive) {
+					oSvgElement.classList.add("sapUiIntegrationAnalyticalForcePointer");
+				}
+			}.bind(this));
+
+			this._bChartHandlersAttached = true;
+		}
 	};
 
 	AnalyticalContent.prototype._attachActions = function (oConfiguration) {
@@ -348,9 +402,10 @@ sap.ui.define([
 		};
 
 		if (oResolvedConfiguration.actions || oResolvedConfiguration.popover) {
-			var bChartsInteractive = oResolvedConfiguration.actionableArea === ActionableArea.Chart
+			this._bChartsInteractive = oResolvedConfiguration.actionableArea === ActionableArea.Chart
 									|| oResolvedConfiguration.popover && oResolvedConfiguration.popover.active;
-			oVizProperties.interaction.noninteractiveMode = !bChartsInteractive;
+			this._bActions = oResolvedConfiguration.actions;
+			oVizProperties.interaction.noninteractiveMode = !this._bChartsInteractive;
 		}
 
 		if (oTitle) {
@@ -469,8 +524,8 @@ sap.ui.define([
 	};
 
 	AnalyticalContent.prototype.getFocusDomRef = function () {
-		return this.getAggregation("_content").getDomRef().querySelector(".v-info") || this.getDomRef();
-	};
+        return this.getAggregation("_content").getDomRef().querySelector(".v-m-root") || this.getDomRef();
+    };
 
 	return AnalyticalContent;
 });

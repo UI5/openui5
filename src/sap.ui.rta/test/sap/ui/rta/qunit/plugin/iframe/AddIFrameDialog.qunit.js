@@ -2,7 +2,6 @@
 
 sap.ui.define([
 	"sap/m/Button",
-	"sap/ui/base/Event",
 	"sap/ui/core/Element",
 	"sap/ui/core/Lib",
 	"sap/ui/core/library",
@@ -18,7 +17,6 @@ sap.ui.define([
 	"sap/ui/thirdparty/sinon-4"
 ], function(
 	Button,
-	Event,
 	Element,
 	Lib,
 	coreLibrary,
@@ -508,12 +506,18 @@ sap.ui.define([
 				oAllowFormsSwitch.setState(true);
 				this.oAddIFrameDialog._oController.onPreviewPress();
 				await nextUIUpdate();
-				assert.strictEqual(oPreviewIframe.getDomRef().sandbox.contains("allow-forms"), true, "then the property is set correctly");
+				assert.ok(
+					oPreviewIframe.getIFrameDomRef().sandbox.contains("allow-forms"),
+					"then the property is set correctly"
+				);
 				oAllowFormsSwitch.setState(false);
 				oAllowFormsSwitch.fireChange();
 				this.oAddIFrameDialog._oController.onPreviewPress();
 				await nextUIUpdate();
-				assert.strictEqual(oPreviewIframe.getDomRef().sandbox.contains("allow-forms"), false, "then the property is set correctly");
+				assert.notOk(
+					oPreviewIframe.getIFrameDomRef().sandbox.contains("allow-forms"),
+					"then the property is set correctly"
+				);
 				clickOnCancel();
 			});
 			return this.oAddIFrameDialog.open(this.oDialogSettings, oReferenceControl);

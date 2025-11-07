@@ -563,7 +563,7 @@ sap.ui.define([
 		assert.strictEqual(oTree.getItems().length, 10, "initial length is 10.");
 
 		oTree.getModel().setSizeLimit(6);
-		oTree.getModel().refresh();
+		oTree.getModel().refresh(true);
 
 		assert.strictEqual(oTree.getItems().length, 6, "new length is 6.");
 	});

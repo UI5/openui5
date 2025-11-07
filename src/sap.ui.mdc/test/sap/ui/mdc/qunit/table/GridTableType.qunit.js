@@ -3,7 +3,6 @@
 sap.ui.define([
 	"./QUnitUtils",
 	"sap/ui/test/utils/nextUIUpdate",
-	"sap/ui/core/Element",
 	"sap/ui/mdc/Table",
 	"sap/ui/mdc/table/Column",
 	"sap/ui/mdc/table/GridTableType",
@@ -15,13 +14,14 @@ sap.ui.define([
 	"sap/m/Label",
 	"sap/m/Text",
 	"sap/m/Menu",
+	"sap/ui/core/Element",
+	"sap/ui/core/Control",
 	"sap/ui/model/json/JSONModel",
 	"sap/ui/fl/variants/VariantManagement",
 	"test-resources/sap/m/qunit/p13n/TestModificationHandler"
 ], function(
 	TableQUnitUtils,
 	nextUIUpdate,
-	Element,
 	Table,
 	Column,
 	GridTableType,
@@ -33,6 +33,8 @@ sap.ui.define([
 	Label,
 	Text,
 	Menu,
+	Element,
+	Control,
 	JSONModel,
 	VariantManagement,
 	TestModificationHandler
@@ -176,11 +178,47 @@ sap.ui.define([
 		assert.equal(oInnerColumn.getMinWidth(), 8 * parseFloat(MLibrary.BaseFontSize), "minWidth");
 		assert.equal(oInnerColumn.getHeaderMenu(), this.oTable.getId() + "-columnHeaderMenu", "headerMenu");
 		assert.equal(oInnerColumn.getHAlign(), "Begin", "hAlign");
-		assert.equal(oInnerColumn.getTemplate().getText(), "MyTemplate", "template: text");
-		assert.equal(oInnerColumn.getTemplate().getWrapping(), false, "template: wrapping");
-		assert.equal(oInnerColumn.getCreationTemplate().getText(), "MyCreationTemplate", "creationTemplate: text");
-		assert.equal(oInnerColumn.getCreationTemplate().getWrapping(), false, "creationTemplate: wrapping");
 		assert.equal(oInnerColumn.getLabel().getLabel().getWrapping(), false, "label: wrapping");
+	});
+
+	QUnit.test("Template", function(assert) {
+		let oInnerColumn = this.oTable._oTable.getColumns()[0];
+		let oInnerTemplate = oInnerColumn.getTemplate();
+		let oInnerCreationTemplate = oInnerColumn.getCreationTemplate();
+
+		assert.ok(oInnerTemplate.isA("sap.m.Text"), "template: type");
+		assert.ok(oInnerTemplate !== this.oColumn.getTemplate(), "template: different instance than column template");
+		assert.equal(oInnerTemplate.getText(), "MyTemplate", "template: text");
+		assert.equal(oInnerTemplate.getWrapping(), false, "template: wrapping");
+		assert.ok(oInnerCreationTemplate.isA("sap.m.Text"), "creationTemplate: type");
+		assert.ok(oInnerCreationTemplate !== this.oColumn.getCreationTemplate(), "creationTemplate: different instance than column creationTemplate");
+		assert.equal(oInnerCreationTemplate.getText(), "MyCreationTemplate", "creationTemplate: text");
+		assert.equal(oInnerCreationTemplate.getWrapping(), false, "creationTemplate: wrapping");
+
+		// Template without wrapping property
+		const MyControl = Control.extend("sap.ui.mdc.test.MyControl");
+		this.oTable.addColumn(new Column({
+			template: new MyControl({text: "NoWrappingProperty"}),
+			creationTemplate: new MyControl({text: "NoWrappingProperty"})
+		}));
+		oInnerColumn = this.oTable._oTable.getColumns()[1];
+		oInnerTemplate = oInnerColumn.getTemplate();
+		oInnerCreationTemplate = oInnerColumn.getCreationTemplate();
+
+		assert.ok(oInnerTemplate.isA("sap.ui.mdc.test.MyControl"), "template without wrapping: type");
+		assert.ok(oInnerTemplate !== this.oTable.getColumns()[1].getTemplate(), "template without wrapping: different instance than column template");
+		assert.ok(oInnerCreationTemplate.isA("sap.ui.mdc.test.MyControl"), "creationTemplate without wrapping: type");
+		assert.ok(oInnerCreationTemplate !== this.oTable.getColumns()[1].getCreationTemplate(),
+			"creationTemplate without wrapping: different instance than column creationTemplate");
+
+		// No template
+		this.oTable.addColumn(new Column());
+		oInnerColumn = this.oTable._oTable.getColumns()[2];
+		oInnerTemplate = oInnerColumn.getTemplate();
+		oInnerCreationTemplate = oInnerColumn.getCreationTemplate();
+
+		assert.equal(oInnerTemplate, null, "no template: template is null");
+		assert.equal(oInnerCreationTemplate, null, "no creationTemplate: creationTemplate is null");
 	});
 
 	QUnit.test("Initial settings", function(assert) {

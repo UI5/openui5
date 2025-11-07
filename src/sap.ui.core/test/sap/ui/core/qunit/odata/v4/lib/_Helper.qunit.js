@@ -2245,12 +2245,74 @@ sap.ui.define([
 });
 
 	//*********************************************************************************************
-	QUnit.test("makeAbsolute", function (assert) {
-		assert.strictEqual(_Helper.makeAbsolute("/foo/bar", "/baz"), "/foo/bar");
-		assert.strictEqual(_Helper.makeAbsolute("baz", "/foo/bar"), "/foo/baz");
-		assert.strictEqual(_Helper.makeAbsolute("Foo('1')/Bar(baz='2',qux=3)", "/service/"),
-			"/service/Foo('1')/Bar(baz='2',qux=3)");
+[{ // current directory relative, key predicates are not encoded
+	sUrl : "Foo('1')/Bar(baz='2',qux=3)",
+	sBase : "/service/",
+	sResult : "/service/Foo('1')/Bar(baz='2',qux=3)"
+}, { // parent-directory relative
+	sUrl : "../qux",
+	sBase : "/service/",
+	sResult : "/qux"
+}, { // root relative
+	sUrl : "/foo/bar",
+	sBase : "/service/",
+	sResult : "/foo/bar"
+}, { // absolute sUrl overrules sBase
+	sUrl : "http://host:1234/alternative/bar",
+	sBase : "/service/",
+	sResult : "http://host:1234/alternative/bar"
+}, { // absolute sUrl, don't care about default ports (removed by URL API)
+	sUrl : "http://host:80/alternative/bar",
+	sBase : "/service/",
+	sResult : "http://host/alternative/bar"
+}, { // CORS base URL, current directory relative, key predicates are not encoded
+	sUrl : "Foo('1')/Bar(baz='2',qux=3)",
+	sBase : "http://host:1234/service/",
+	sResult : "http://host:1234/service/Foo('1')/Bar(baz='2',qux=3)"
+}, { // CORS base URL, parent-directory relative
+	sUrl : "../qux",
+	sBase : "http://host:1234/service/",
+	sResult : "http://host:1234/qux"
+}, { // CORS base URL, root relative
+	sUrl : "/foo/bar",
+	sBase : "http://host:1234/service/",
+	sResult : "http://host:1234/foo/bar"
+}, { // CORS base URL, absolute sUrl overrules sBase
+	sUrl : "http://host-b:1234/alternative/bar",
+	sBase : "https://host-a:4321/service/",
+	sResult : "http://host-b:1234/alternative/bar"
+}, {
+	// absolute sUrl has baseURI as origin, don't care about a baseURI-prefix because it is
+	// equivalent to a root relative URL (origin part can be removed)
+	sUrl : document.baseURI + "alternative/bar",
+	sBase : "/service/",
+	sResult : "/alternative/bar"
+}, {
+	// root relative but sBase has baseURI as origin, don't care about a baseURI-prefix because
+	// it is equivalent to a root relative URL (origin part can be removed)
+    sUrl : "/alternative/bar",
+    sBase : document.baseURI + "service/",
+    sResult : "/alternative/bar"
+}].forEach(function (oFixture, i) {
+	QUnit.test("makeAbsolute #" + i, function (assert) {
+		const sSuffix = "?custom=a%20b#hash/c";
+
+		assert.strictEqual(
+			// code under test: query options and hash of sBase are ignored
+			_Helper.makeAbsolute(oFixture.sUrl, oFixture.sBase + sSuffix),
+			oFixture.sResult);
+
+		assert.strictEqual(
+			// code under test: query options and hash of sUrl are kept
+			_Helper.makeAbsolute(oFixture.sUrl + sSuffix, oFixture.sBase),
+			oFixture.sResult + sSuffix);
+
+		assert.strictEqual(
+			// code under test: query options and hash of sUrl and sBase are not mixed
+			_Helper.makeAbsolute(oFixture.sUrl + sSuffix, oFixture.sBase + "?d=e#f"),
+			oFixture.sResult + sSuffix);
 	});
+});
 
 	//*********************************************************************************************
 	QUnit.test("makeRelativePath", function (assert) {

@@ -6,7 +6,6 @@ sap.ui.define([
 	"sap/base/Log",
 	"sap/ui/core/Component",
 	"sap/ui/core/Lib",
-	"sap/ui/fl/apply/_internal/flexState/FlexState",
 	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
 	"sap/ui/fl/initial/_internal/changeHandlers/ChangeHandlerRegistration",
 	"sap/ui/fl/initial/_internal/Loader",
@@ -22,7 +21,6 @@ sap.ui.define([
 	Log,
 	Component,
 	Lib,
-	FlexState,
 	ControlVariantApplyAPI,
 	ChangeHandlerRegistration,
 	Loader,
@@ -271,36 +269,45 @@ sap.ui.define([
 		const oComponentData = oOwnerComponent?.getComponentData()
 			|| oPropertyBag.factoryConfig.componentData
 			|| oPropertyBag.factoryConfig.settings?.componentData;
+		const oManifest = oOwnerComponent?.getManifest() || oPropertyBag.manifest;
 		const sReference = ManifestUtils.getFlexReference({
-			manifest: oOwnerComponent?.getManifest() || oPropertyBag.manifest,
+			manifest: oManifest,
 			componentData: oComponentData
 		});
 		try {
+			const aReturn = [];
 			// skipLoadBundle has to be true as there is no guarantee that the flex bundle is already available at this point
-			await FlexState.initialize({
+			const mProperties = {
 				componentData: oComponentData,
 				asyncHints: oPropertyBag.owner?.config.asyncHints || oPropertyBag.factoryConfig.asyncHints,
 				componentId: sAppComponentId,
 				reference: sReference,
 				skipLoadBundle: true,
-				// Temporary workaround to ensure the FlexState is up-to-date until fetchModelChanges is properly adjusted
-				forceInvalidation: true
-			});
-			const sServiceUrl = ODataUtils.removeOriginSegmentParameters(oPropertyBag.model.getServiceUrl());
-			const aRelevantAnnotationChanges = FlexState.getAnnotationChanges(sReference)
-			.filter((oAnnotationChange) => oAnnotationChange.getServiceUrl() === sServiceUrl);
+				manifest: oManifest
+			};
+			const oFlexData = await Loader.getFlexData(mProperties);
+			if (StorageUtils.isStorageResponseFilled(oFlexData.data.changes)) {
+				const FlexState = await requireAsync("sap/ui/fl/apply/_internal/flexState/FlexState");
+				await FlexState.initialize({
+					...mProperties,
+					forceInvalidation: oFlexData.cacheInvalidated
+				});
 
-			const aReturn = [];
-			for (const oAnnotationChange of aRelevantAnnotationChanges) {
-				try {
-					const oChangeHandler = await ChangeHandlerRegistration.getAnnotationChangeHandler({
-						changeType: oAnnotationChange.getChangeType()
-					});
-					aReturn.push(await oChangeHandler.applyChange(oAnnotationChange));
-					oAnnotationChange._appliedOnModel = true;
-				} catch (oError) {
-					// Continue with next change
-					Log.error(`Annotation change with id ${oAnnotationChange.getId()} could not be applied to the model`, oError);
+				const sServiceUrl = ODataUtils.removeOriginSegmentParameters(oPropertyBag.model.getServiceUrl());
+				const aRelevantAnnotationChanges = FlexState.getAnnotationChanges(sReference)
+				.filter((oAnnotationChange) => oAnnotationChange.getServiceUrl() === sServiceUrl);
+
+				for (const oAnnotationChange of aRelevantAnnotationChanges) {
+					try {
+						const oChangeHandler = await ChangeHandlerRegistration.getAnnotationChangeHandler({
+							changeType: oAnnotationChange.getChangeType()
+						});
+						aReturn.push(await oChangeHandler.applyChange(oAnnotationChange));
+						oAnnotationChange._appliedOnModel = true;
+					} catch (oError) {
+						// Continue with next change
+						Log.error(`Annotation change with id ${oAnnotationChange.getId()} could not be applied to the model`, oError);
+					}
 				}
 			}
 			return aReturn;
@@ -379,7 +386,8 @@ sap.ui.define([
 				rawManifest: oManifest,
 				componentId: oConfig.id,
 				reference: sReference,
-				skipLoadBundle: true
+				skipLoadBundle: true,
+				forceInvalidation: oFlexData.cacheInvalidated
 			}, oFlexData);
 			const oManifestCopy = { ...oManifest };
 			const Applier = await requireAsync("sap/ui/fl/apply/_internal/changes/descriptor/Applier");

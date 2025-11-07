@@ -4,7 +4,6 @@
 
 // Provides control sap.ui.fl.util.IFrame
 sap.ui.define([
-	"sap/base/util/uid",
 	"sap/ui/core/Control",
 	"sap/ui/model/json/JSONModel",
 	"sap/ui/fl/util/getContainerUserInfo",
@@ -15,7 +14,6 @@ sap.ui.define([
 	// The iFrame control does not need to require its library module because no DataTypes are defined in fl library and the control
 	// doesn't require any CSS from the library.css
 ], function(
-	uid,
 	Control,
 	JSONModel,
 	getContainerUserInfo,
@@ -144,65 +142,22 @@ sap.ui.define([
 			// Falsy values coming from bindings can lead to unexpected relative navigation
 			sEncodedUrl ||= "about:blank";
 
-			if (IFrame.isValidUrl(sEncodedUrl).result) {
-				// Set by replacing the last entry
-				const oNewUrl = IFrame._toUrl(sEncodedUrl);
-				const oOldUrl = IFrame._toUrl(this.getUrl());
-				if (oOldUrl.searchParams.has("sap-ui-xx-fl-forceEmbeddedContentRefresh")) {
-					// Always keep the refresh parameter and update it to avoid false negatives
-					// when the URL doesn't change except for the refresh parameter itself + hash
-					oNewUrl.searchParams.set("sap-ui-xx-fl-forceEmbeddedContentRefresh", uid().substring(3));
-				} else if (
-					oOldUrl.origin === oNewUrl.origin
-					&& oOldUrl.pathname === oNewUrl.pathname
-					&& oOldUrl.search === oNewUrl.search
-					&& oOldUrl.hash !== oNewUrl.hash
-				) {
-					// Only the hash changed, site is not going to reload automatically
-					// Set an artificial search parameter to force a refresh
-					oNewUrl.searchParams.append("sap-ui-xx-fl-forceEmbeddedContentRefresh", uid().substring(3));
-				}
-				this.setProperty("url", oNewUrl.toString());
-			} else {
+			if (!IFrame.isValidUrl(sEncodedUrl).result) {
 				Log.error("Provided URL is not valid as an IFrame src");
+				return this;
 			}
+
+			const oNewUrl = IFrame._toUrl(sEncodedUrl);
+			this.setProperty("url", oNewUrl.toString());
 			return this;
 		},
 
-		// Used for testing since retrieving or spying on the Iframe location
-		// is not possible due to cross-origin restrictions
-		_replaceIframeLocation(sNewUrl) {
-			// If the embedded content is doing internal same-origin navigation (e.g. hash change),
-			// Safari might ignore the location replacement in favor of the internal navigation
-			// This can e.g. happen when an embedded UI5 app crashes due to missing parameters and redirects to the FLP Home
-			// To prevent this, try to stop all ongoing loading of resources in the iframe and avoid such race conditions
-			try {
-				this.getDomRef().contentWindow.stop();
-			} catch (oError) {
-				// Cross-origin restrictions
-			}
-
-			this.getDomRef().contentWindow.location.replace(sNewUrl);
+		getIFrameDomRef() {
+			return this.getDomRef()?.querySelector("iframe");
 		},
 
-		onAfterRendering() {
-			this._replaceIframeLocation(this.getUrl());
-
-			// The contentWindow might change without causing a rerender, e.g.
-			// when the parent element changes due to an appendChild call
-			// This will cause the iframe src to change and we need to replace the
-			// location again to ensure the correct content
-			this._oLastContentWindow = this.getDomRef().contentWindow;
-			this.getDomRef().addEventListener("load", () => {
-				if (!this.getDomRef()) {
-					// The iframe was removed before the load event was triggered
-					return;
-				}
-				if (this._oLastContentWindow !== this.getDomRef().contentWindow) {
-					this._oLastContentWindow = this.getDomRef().contentWindow;
-					this._replaceIframeLocation(this.getUrl());
-				}
-			});
+		getFocusDomRef() {
+			return this.getIFrameDomRef();
 		},
 
 		applySettings(mSettings, ...aOtherArgs) {

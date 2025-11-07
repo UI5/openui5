@@ -49,7 +49,7 @@ sap.ui.define([], async () => {
 			window['sap-ui-documentation-hideApiSection'] = true;
 		}
 		if ( typeof config.docuPath === 'string' ) {
-			SDKComponent.getMetadata().getManifest()["sap.ui5"]["config"]["docuPath"] = config.docuPath;
+			null["sap.ui5"]["config"]["docuPath"] = config.docuPath;
 		} else {
 			window['sap-ui-documentation-hideTopicSection'] = true;
 		}
