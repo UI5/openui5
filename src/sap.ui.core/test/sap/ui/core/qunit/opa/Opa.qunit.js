@@ -248,7 +248,9 @@ sap.ui.define([
 
 		//check for faster polling
 		this.clock.tick(1000);
-		assert.strictEqual(oSecondCheckSpy.callCount, 11, "Did apply the polling of the waitFor");
+		// Safari has different timing due to the timing adjustments above
+		var expectedSecondCheckCount = Device.browser.safari ? 10 : 11;
+		assert.strictEqual(oSecondCheckSpy.callCount, expectedSecondCheckCount, "Did apply the polling of the waitFor");
 
 		bSecondCheck = true;
 
