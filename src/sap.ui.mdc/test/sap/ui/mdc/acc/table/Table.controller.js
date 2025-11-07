@@ -5,9 +5,11 @@ sap.ui.define([
 	"sap/ui/mdc/table/TreeTableType",
 	"sap/ui/mdc/enums/TableRowCountMode",
 	"sap/ui/mdc/enums/TableSelectionMode",
+	"sap/ui/mdc/enums/TablePopinDisplay",
 	"sap/ui/mdc/enums/TableType",
 	"sap/ui/core/library",
 	"sap/ui/core/Fragment",
+	"sap/ui/core/message/MessageType",
 	"sap/ui/model/json/JSONModel",
 	"sap/m/Dialog",
 	"sap/m/Text",
@@ -19,15 +21,18 @@ sap.ui.define([
 	TreeTableType,
 	TableRowCountMode,
 	TableSelectionMode,
+	TablePopinDisplay,
 	TableType,
 	coreLibrary,
 	Fragment,
 	JSONModel,
+	MessageType,
 	Dialog,
 	Text,
 	Button
 ) {
 	"use strict";
+
 	const Priority = coreLibrary.Priority;
 
 	return Controller.extend("sap.ui.mdc.acc.table.Table", {
@@ -38,6 +43,7 @@ sap.ui.define([
 					rowCountMode: TableRowCountMode.Auto
 				},
 				respType: {
+					popinDisplay: TablePopinDisplay.Inline
 				},
 				treeType: {
 					rowCountMode: TableRowCountMode.Auto
@@ -46,7 +52,8 @@ sap.ui.define([
 				enums: {
 					selectionModes: this.enumToObject(TableSelectionMode),
 					rowCountModes: this.enumToObject(TableRowCountMode),
-					priority: this.enumToObject(Priority)
+					priority: this.enumToObject(Priority),
+					popinDisplay: this.enumToObject(TablePopinDisplay)
 				}
 			});
 
@@ -54,7 +61,7 @@ sap.ui.define([
 			this.getView().setModel(oTableConfigModel, "tableConfig");
 		},
 		formatHighlight: function(dHireDate) {
-			return new Date(dHireDate).getFullYear() === new Date().getFullYear() - 10 ? coreLibrary.MessageType.Information : coreLibrary.MessageType.None;
+			return new Date(dHireDate).getFullYear() === new Date().getFullYear() - 10 ? MessageType.Information : MessageType.None;
 		},
 		formatHighlightText: function(dHireDate) {
 			return new Date(dHireDate).getFullYear() === new Date().getFullYear() - 10 ? "10 years job anniversary" : null;
@@ -121,7 +128,8 @@ sap.ui.define([
 		},
 		getResponsiveTableType: function() {
 			return new ResponsiveTableType({
-				showDetailsButton: true
+				showDetailsButton: true,
+				popinDisplay: "{tableConfig>/respType/popinDisplay}"
 			});
 		},
 		getTreeTableType: function() {

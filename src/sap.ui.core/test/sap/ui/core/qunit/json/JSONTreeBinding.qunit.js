@@ -1098,4 +1098,112 @@ sap.ui.define([
 		oBinding.filter(new Filter("name", FilterOperator.Contains, "in"));
 		assert.strictEqual(oBinding.getCount(), 3, "filtered data");
 	});
+
+	//*********************************************************************************************
+	// Scenario: JSONModel & JSONTreeBinding: checkUpdate fires change event only if data of the
+	// bound subtree has changed.
+	// SNOW: DINC0640723
+	QUnit.test("checkUpdate: fires change event only if data changes", async function (assert) {
+		const oEventHandler = {
+			onChange() {}
+		};
+		const oEventHandlerMock = this.mock(oEventHandler);
+		let oTreeBinding;
+
+		const fnExpectChangeEvent = (bIsExpected) => {
+			oEventHandlerMock.expects("onChange").exactly(bIsExpected ? 1 : 0);
+
+			oTreeBinding.attachChange(oEventHandler.onChange);
+
+			return new Promise((resolve) => {
+				setTimeout(() => {
+					oTreeBinding.detachChange(oEventHandler.onChange);
+					resolve();
+				}, 0);
+			});
+		};
+
+		const oInitialData = {
+			children: [{
+				name: "John Wallace"
+			}],
+			contextA: {
+				children: [{
+					name: "Frank Wallace"
+				}]
+			},
+			contextB: {
+				children: [{
+					name: "Gina Rush"
+				}]
+			}
+		};
+		const oChangedData = {
+			children: [{
+				name: "John Wallace Updated"
+			}]
+		};
+		const oModel = new JSONModel(oInitialData);
+		oTreeBinding = oModel.bindTree("/children");
+
+		let oChangeEventPromise = fnExpectChangeEvent(true);
+
+		// code under test - changing bound data: change event
+		oModel.setProperty("/children", oChangedData.children);
+
+		await oChangeEventPromise;
+
+		oChangeEventPromise = fnExpectChangeEvent(false);
+
+		// code under test - changing bound data: change event
+		oModel.setProperty("/children/0/name", "John Wallace Updated #2");
+
+		await oChangeEventPromise;
+
+		oChangeEventPromise = fnExpectChangeEvent(false);
+
+		// code under test - changing unrelated data: NO change event
+		oModel.setProperty("/otherBranch", "~foo");
+
+		await oChangeEventPromise;
+
+		// tests for setContext: change events fire only if the data of the bound subtree changes.
+		oTreeBinding = oModel.bindTree("children");
+		const oContextA = oModel.createBindingContext("/contextA");
+		oChangeEventPromise = fnExpectChangeEvent(true);
+
+		// code under test - new context A and therefore new subtree: change event
+		oTreeBinding.setContext(oContextA);
+
+		await oChangeEventPromise;
+
+		oChangeEventPromise = fnExpectChangeEvent(false);
+
+		// code under test - unbound data of unrelated context changed: NO change event
+		oModel.setProperty("/contextB/children/0/name", "Gina Rush Changed");
+
+		await oChangeEventPromise;
+
+		const oContextB = oModel.createBindingContext("/contextB");
+		oChangeEventPromise = fnExpectChangeEvent(true);
+
+		// code under test - switch to Context B: change event
+		oTreeBinding.setContext(oContextB);
+
+		await oChangeEventPromise;
+
+		oChangeEventPromise = fnExpectChangeEvent(false);
+
+		// code under test - no data changes: NO change event
+		oTreeBinding.checkUpdate();
+
+		await oChangeEventPromise;
+
+		oChangeEventPromise = fnExpectChangeEvent(true);
+
+		// code under test - bForceUpdate: change event
+		oTreeBinding.checkUpdate(true);
+
+		await oChangeEventPromise;
+	});
 });

@@ -342,17 +342,23 @@ sap.ui.define([
 
 	GridTableType.prototype.createColumn = function(oColumn) {
 		const oGridTableColumn = new InnerColumn(this.getColumnSettings(oColumn));
+		const oCreationTemplate = oColumn.getCreationTemplate()?.clone();
 
-		oGridTableColumn.setCreationTemplate(oColumn.getCreationTemplate()?.clone()?.setWrapping?.(false));
+		oCreationTemplate?.setWrapping?.(false);
+		oGridTableColumn.setCreationTemplate(oCreationTemplate);
 
 		return oGridTableColumn;
 	};
 
 	GridTableType.prototype.getColumnSettings = function(oColumn) {
+		const oTemplate = oColumn.getTemplateClone();
+
+		oTemplate?.setWrapping?.(false);
+
 		return {
 			...TableTypeBase.prototype.getColumnSettings.apply(this, arguments),
 			label: oColumn.getHeaderLabel({wrapping: false}),
-			template: oColumn.getTemplateClone()?.setWrapping?.(false),
+			template: oTemplate,
 			minWidth: {
 				path: "$sap.ui.mdc.table.Column>/minWidth",
 				formatter: function(fMinWidth) {

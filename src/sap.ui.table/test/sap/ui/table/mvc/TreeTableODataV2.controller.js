@@ -468,7 +468,7 @@ sap.ui.define([
 		 * Cut out logic
 		 */
 		onCut: function() {
-			const iSelectedIndex = -1;
+			const iSelectedIndex = oTable.getSelectedIndex();
 			const oBinding = oTable.getBinding();
 			const oModel = oBinding.getModel();
 
@@ -578,7 +578,7 @@ sap.ui.define([
 		onExpandNodeToLevel4: function() {
 			const oBinding = oTable.getBinding();
 
-			const iSelectedIndex = -1;
+			const iSelectedIndex = oTable.getSelectedIndex();
 			MessageToast.show("Expanding node with index " + iSelectedIndex + " to level 4...");
 			oBinding.expandNodeToLevel(iSelectedIndex, 4).then(function() {
 				MessageToast.show("Expanded node with index " + iSelectedIndex + " to level 4.");
@@ -624,7 +624,7 @@ sap.ui.define([
 				const oTreeHandle = this._mTreeHandles[sKey];
 
 				// insert in currently selected index
-				const iSelectedIndex = -1;
+				const iSelectedIndex = oTable.getSelectedIndex();
 				if (iSelectedIndex !== -1 && oTreeHandle) {
 					const oBinding = oTable.getBinding();
 					const oNewParentContext = oTable.getContextByIndex(iSelectedIndex);

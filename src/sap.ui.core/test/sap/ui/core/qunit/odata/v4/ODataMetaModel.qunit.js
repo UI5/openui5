@@ -4982,6 +4982,18 @@ sap.ui.define([
 		// simulate a previous reference to a schema with the _same_ reference URI, already loaded
 		this.oMetaModel.mSchema2MetadataUrl["C."] = {"/C/$metadata" : true};
 
+		const oHelperMock = this.mock(_Helper);
+		oHelperMock.expects("makeAbsolute").withExactArgs("/A/$metadata", this.oMetaModel.sUrl)
+			.returns("/A/$metadata");
+		oHelperMock.expects("makeAbsolute").withExactArgs("/B/$metadata", this.oMetaModel.sUrl)
+			.returns("/B/$metadata");
+		oHelperMock.expects("makeAbsolute").withExactArgs("/C/$metadata", this.oMetaModel.sUrl)
+			.returns("/C/$metadata");
+		oHelperMock.expects("makeAbsolute")
+			.withExactArgs("../../../../default/iwbep/tea_busi_product/0001/$metadata",
+				this.oMetaModel.sUrl)
+			.returns("/a/default/iwbep/tea_busi_product/0001/$metadata");
+
 		// code under test
 		assert.strictEqual(this.oMetaModel.validate(sUrl, mScope0), mScope0);
 

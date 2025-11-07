@@ -38,6 +38,11 @@ sap.ui.define([
 			sExpectedUrl,
 			sDescription || "then the url is properly updated"
 		);
+		assert.strictEqual(
+			oIFrame.getIFrameDomRef().src,
+			sExpectedUrl,
+			"then the iframe src is properly updated"
+		);
 	}
 
 	QUnit.module("Basic properties", {
@@ -55,49 +60,56 @@ sap.ui.define([
 			sandbox.restore();
 		}
 	}, function() {
-		QUnit.test("when trying to set the url to an invalid value", function(assert) {
+		QUnit.test("when trying to set the url to an invalid value", async function(assert) {
 			const oErrorStub = sandbox.stub(Log, "error");
 			// eslint-disable-next-line no-script-url
 			this.oIFrame.setUrl("javascript:someJs");
+			await nextUIUpdate();
 			assert.ok(oErrorStub.calledOnce, "then an error is logged");
 			checkUrl(assert, this.oIFrame, sOpenUI5Url, "then the value is rejected");
 		});
 
 		QUnit.test("when changing a navigation parameter only", async function(assert) {
-			const sNewUrl = `${sOpenUI5Url}#someNavParameter`;
-			const oReplaceLocationSpy = sandbox.spy(this.oIFrame, "_replaceIframeLocation");
-			this.oIFrame.setUrl(sNewUrl);
-			const sTestUrlRegex = new RegExp(`${sOpenUI5Url}\\?sap-ui-xx-fl-forceEmbeddedContentRefresh=([\\d-]+)#someNavParameter`);
-			assert.ok(
-				sTestUrlRegex.test(this.oIFrame.getUrl()),
-				"then the url is properly updated"
-			);
-			const [, sFrameRefreshSearchParameter] = sTestUrlRegex.exec(this.oIFrame.getUrl());
 			await nextUIUpdate();
-			assert.strictEqual(oReplaceLocationSpy.callCount, 1, "then the iframe location is properly replaced");
-			assert.ok(
-				sTestUrlRegex.test(oReplaceLocationSpy.lastCall.args[0]),
-				"then the proper url is loaded and a frame refresh search parameter is added"
+			const sNewUrl = `${sOpenUI5Url}#someNavParameter`;
+			const oOldIframeDomRef = this.oIFrame.getIFrameDomRef();
+			this.oIFrame.setUrl(sNewUrl);
+			await nextUIUpdate();
+			checkUrl(assert, this.oIFrame, sNewUrl);
+			const oNewIframeDomRef = this.oIFrame.getIFrameDomRef();
+			assert.notStrictEqual(
+				oOldIframeDomRef,
+				oNewIframeDomRef,
+				"then a fresh iframe was created"
+			);
+			assert.notStrictEqual(
+				oOldIframeDomRef.getAttribute("id"),
+				oNewIframeDomRef.getAttribute("id"),
+				"then the iframe has a new id"
 			);
 
 			// Change the navigation parameter again
 			this.oIFrame.setUrl(`${sOpenUI5Url}#someNavParameter,someOtherNavParameter`);
-			assert.ok(
-				sTestUrlRegex.test(this.oIFrame.getUrl()),
-				"then the url still contains a frame refresh search parameter"
-			);
-			const [, sNewFrameRefreshSearchParameter] = sTestUrlRegex.exec(this.oIFrame.getUrl());
+			await nextUIUpdate();
+
+			await checkUrl(assert, this.oIFrame, `${sOpenUI5Url}#someNavParameter,someOtherNavParameter`);
+			const oNewestIframeDomRef = this.oIFrame.getIFrameDomRef();
 			assert.notStrictEqual(
-				sFrameRefreshSearchParameter,
-				sNewFrameRefreshSearchParameter,
-				"then the frame refresh search parameter is updated"
+				oNewIframeDomRef,
+				oNewestIframeDomRef,
+				"then a fresh iframe was created again"
+			);
+			assert.notStrictEqual(
+				oNewIframeDomRef.getAttribute("id"),
+				oNewestIframeDomRef.getAttribute("id"),
+				"then the iframe has a new id again"
 			);
 		});
 
 		QUnit.test("when iframe is created with default advanced settings", async function(assert) {
 			await nextUIUpdate();
 			assert.strictEqual(
-				this.oIFrame.getDomRef().sandbox.value,
+				this.oIFrame.getIFrameDomRef().sandbox.value,
 				"allow-forms allow-popups allow-scripts allow-modals allow-same-origin",
 				"then the default sandbox attributes are set correctly"
 			);
@@ -114,7 +126,7 @@ sap.ui.define([
 			});
 			await nextUIUpdate();
 			assert.strictEqual(
-				this.oIFrame.getDomRef().sandbox.value,
+				this.oIFrame.getIFrameDomRef().sandbox.value,
 				"allow-forms allow-presentation",
 				"then the custom sandbox attributes are set correctly"
 			);
@@ -122,7 +134,6 @@ sap.ui.define([
 
 		QUnit.test("when the iframe parent changes resulting in the re-creation of the contentWindow", async function(assert) {
 			await nextUIUpdate();
-			const oReplaceLocationSpy = sandbox.spy(this.oIFrame, "_replaceIframeLocation");
 
 			// Move the iframe to a new parent
 			const oNewDiv = document.createElement("div");
@@ -131,14 +142,9 @@ sap.ui.define([
 			await nextUIUpdate();
 
 			assert.strictEqual(
-				oReplaceLocationSpy.lastCall.args[0],
+				this.oIFrame.getIFrameDomRef().src,
 				sOpenUI5Url,
-				"then the iframe retains its url"
-			);
-			assert.strictEqual(
-				oReplaceLocationSpy.callCount,
-				1,
-				"then the iframe location is only set again once"
+				"then the iframe src is still correct"
 			);
 		});
 	});
@@ -216,20 +222,12 @@ sap.ui.define([
 			assert.strictEqual(oIframe, oFocusDomRef, "Returns the iframe DOM element");
 		});
 
-		QUnit.test("URL should refresh if bound to a changing model without rewriting the iframe", async function(assert) {
-			const oFocusDomRef = this.oIFrame.getFocusDomRef();
+		QUnit.test("URL should refresh if bound to a changing model", async function(assert) {
 			const sSapUI5Url = `${sProtocol}://sapui5/`;
-			const oReplaceLocationSpy = sandbox.spy(this.oIFrame, "_replaceIframeLocation");
 			this.oModel.setProperty("/flavor", "sapui5");
 
-			checkUrl(assert, this.oIFrame, sSapUI5Url);
 			await nextUIUpdate();
-			assert.strictEqual(this.oIFrame.getFocusDomRef(), oFocusDomRef, "iframe DOM reference did not change");
-			assert.strictEqual(
-				oReplaceLocationSpy.lastCall.args[0],
-				sSapUI5Url,
-				"iframe src has changed to the expected one"
-			);
+			checkUrl(assert, this.oIFrame, sSapUI5Url);
 		});
 	});
 
@@ -340,10 +338,11 @@ sap.ui.define([
 			);
 			assert.strictEqual(iFrame.get_settings().url, `${sOpenUI5Url}?fullName={$user>/fullName}`, "Settings' URL is correct");
 		});
-		QUnit.test("when a passed  url is already encoded", function(assert) {
+		QUnit.test("when a passed  url is already encoded", async function(assert) {
 			var iFrame = this.myView.byId("iframe2");
 			var sEncodedUrl = encodeURI(`${sOpenUI5Url}?someParameter=${sUserFullName}`);
 			iFrame.setUrl(sEncodedUrl);
+			await nextUIUpdate();
 			checkUrl(assert, iFrame, sEncodedUrl, "then it is not encoded again");
 		});
 		QUnit.test("Simple binding URL (with unexpected reference) should be reverted back to binding in settings", function(assert) {

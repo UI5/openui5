@@ -747,10 +747,18 @@ sap.ui.define([
 				})
 			];
 			this.oFlexStateInitStub = sandbox.stub(FlexState, "initialize").resolves();
+			this.oLoaderInitStub = sandbox.stub(Loader, "getFlexData").resolves({ data: {}, cacheInvalidated: true });
+			this.oChangesAvailableStub = sandbox.stub(StorageUtils, "isStorageResponseFilled");
 			sandbox.stub(FlexState, "getAnnotationChanges").returns(this.oAnnotationChanges);
-			this.oSetAnnotationChangeStub1 = sandbox.stub();
-			this.oSetAnnotationChangeStub2 = sandbox.stub();
-			this.oSetAnnotationChangeStub3 = sandbox.stub();
+			this.oSetAnnotationChangeStub1 = sandbox.stub().callsFake((oFetchModelChangesPromise) => {
+				this.oFetchModelChangesPromise1 = oFetchModelChangesPromise;
+			});
+			this.oSetAnnotationChangeStub2 = sandbox.stub().callsFake((oFetchModelChangesPromise) => {
+				this.oFetchModelChangesPromise2 = oFetchModelChangesPromise;
+			});
+			this.oSetAnnotationChangeStub3 = sandbox.stub().callsFake((oFetchModelChangesPromise) => {
+				this.oFetchModelChangesPromise3 = oFetchModelChangesPromise;
+			});
 			this.oFakeModel1 = {
 				setAnnotationChangePromise: this.oSetAnnotationChangeStub1,
 				getServiceUrl() {
@@ -775,6 +783,7 @@ sap.ui.define([
 		}
 	}, function() {
 		QUnit.test("hook gets called with annotation changes available", async function(assert) {
+			this.oChangesAvailableStub.returns(true);
 			const oAsyncHints = { foobar: "baz" };
 			const oLogStub = sandbox.stub(Log, "error");
 			ComponentLifecycleHooks.modelCreatedHook({
@@ -784,21 +793,25 @@ sap.ui.define([
 				ownerId: undefined,
 				manifest: this.oAppComponent.getManifest()
 			});
+			await this.oFetchModelChangesPromise1;
 			ComponentLifecycleHooks.modelCreatedHook({
 				model: this.oFakeModel2,
-				modelId: "someModelId",
+				modelId: "someModelId2",
 				factoryConfig: { id: this.oAppComponent.getId(), asyncHints: oAsyncHints, settings: { componentData: { foo: "bar" } } },
 				ownerId: undefined,
 				manifest: this.oAppComponent.getManifest()
 			});
+			await this.oFetchModelChangesPromise2;
 			ComponentLifecycleHooks.modelCreatedHook({
 				model: this.oFakeModel3,
-				modelId: "someModelId",
+				modelId: "someModelId3",
 				factoryConfig: { id: this.oAppComponent.getId(), asyncHints: oAsyncHints, settings: { componentData: { foo: "bar" } } },
 				ownerId: undefined,
 				manifest: this.oAppComponent.getManifest()
 			});
+			await this.oFetchModelChangesPromise3;
 
+			assert.strictEqual(this.oLoaderInitStub.callCount, 3, "Loader was initialized 3 times");
 			assert.strictEqual(this.oFlexStateInitStub.callCount, 3, "FlexState was initialized 3 times");
 			assert.deepEqual(this.oFlexStateInitStub.getCall(0).args[0], {
 				componentData: { foo: "bar" },
@@ -806,7 +819,8 @@ sap.ui.define([
 				componentId: this.oAppComponent.getId(),
 				reference: this.oAppComponent.getId(),
 				skipLoadBundle: true,
-				forceInvalidation: true // temporary workaround
+				forceInvalidation: true,
+				manifest: this.oAppComponent.getManifest()
 			}, "FlexState was initialized with the correct parameters");
 			assert.deepEqual(this.oFlexStateInitStub.getCall(0).args[0], this.oFlexStateInitStub.getCall(1).args[0]);
 			assert.deepEqual(this.oFlexStateInitStub.getCall(1).args[0], this.oFlexStateInitStub.getCall(2).args[0]);
@@ -844,6 +858,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("hook gets called with a model on an embedded component", async function(assert) {
+			this.oChangesAvailableStub.returns(true);
 			const oAsyncHints = { foobar: "baz" };
 			ComponentLifecycleHooks.modelCreatedHook({
 				model: this.oFakeModel1,
@@ -853,8 +868,9 @@ sap.ui.define([
 					id: this.oAppComponent.getId(),
 					config: { asyncHints: oAsyncHints }
 				},
-				manifest: { foo: "bar" }
+				manifest: this.oAppComponent.getManifest()
 			});
+			await this.oFetchModelChangesPromise1;
 
 			assert.strictEqual(this.oFlexStateInitStub.callCount, 1, "FlexState was initialized once");
 			assert.deepEqual(this.oFlexStateInitStub.getCall(0).args[0], {
@@ -863,7 +879,8 @@ sap.ui.define([
 				componentId: this.oAppComponent.getId(),
 				reference: this.oAppComponent.getId(),
 				skipLoadBundle: true,
-				forceInvalidation: true // temporary workaround
+				manifest: this.oAppComponent.getManifest(),
+				forceInvalidation: true
 			}, "FlexState was initialized with the correct parameters");
 
 			assert.ok(this.oSetAnnotationChangeStub1.calledOnce, "the promise was set on the first model");
@@ -877,6 +894,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("hook gets called with an error occurring inside the callback", async function(assert) {
+			this.oChangesAvailableStub.returns(true);
 			sandbox.stub(Log, "error");
 			this.oFlexStateInitStub.reset();
 			this.oFlexStateInitStub.rejects(new Error("Error"));
@@ -893,6 +911,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("hook gets called for an improperly created component", async function(assert) {
+			this.oChangesAvailableStub.returns(true);
 			sandbox.stub(Log, "error");
 			ComponentLifecycleHooks.modelCreatedHook({
 				model: this.oFakeModel1,
@@ -988,7 +1007,8 @@ sap.ui.define([
 				rawManifest: oManifest,
 				componentId: "componentId",
 				reference: "sap.app.descriptor.test",
-				skipLoadBundle: true
+				skipLoadBundle: true,
+				forceInvalidation: true
 			}, "FlexState was initialized with the correct parameters");
 			assert.strictEqual(this.oApplierSpy.callCount, 1, "Applier.applyChanges is called once");
 			assert.strictEqual(this.oApplyAddLibrarySpy.callCount, 3, "AddLibrary.applyChange is called three times");

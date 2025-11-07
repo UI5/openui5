@@ -3759,7 +3759,7 @@ sap.ui.define([
 		for (sReferenceUri in mScope.$Reference) {
 			oReference = mScope.$Reference[sReferenceUri];
 			// interpret reference URI relative to metadata URL
-			sReferenceUri = new URI(sReferenceUri).absoluteTo(this.sUrl).toString();
+			sReferenceUri = _Helper.makeAbsolute(sReferenceUri, this.sUrl);
 
 			if ("$IncludeAnnotations" in oReference) {
 				this._reportAndThrowError("Unsupported IncludeAnnotations", sUrl);

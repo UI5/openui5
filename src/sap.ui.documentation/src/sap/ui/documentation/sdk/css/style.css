@@ -1823,3 +1823,17 @@ table.cookieList td {
 	padding: 1rem;
 	border-bottom: 2px solid var(--sapList_BorderColor);
 }
+
+.sapUiCommunityLinkLogo {
+	margin-top: 1rem;
+}
+
+.sapUiCommunityLinkTitle {
+	font-size: 2rem;
+}
+
+@media (max-width: 59.375em) {
+	.sapUiCommunityLinkTitle {
+		font-size: 1.325rem;
+	}
+}

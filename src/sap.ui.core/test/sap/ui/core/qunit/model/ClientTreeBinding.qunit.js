@@ -3,10 +3,11 @@
  */
 sap.ui.define([
 	"sap/base/Log",
+	"sap/ui/model/ChangeReason",
 	"sap/ui/model/ClientTreeBinding",
 	"sap/ui/model/FilterProcessor",
 	"sap/ui/model/FilterType"
-], function (Log, ClientTreeBinding, FilterProcessor, FilterType) {
+], function (Log, ChangeReason, ClientTreeBinding, FilterProcessor, FilterType) {
 	"use strict";
 	/*global QUnit, sinon */
 
@@ -24,7 +25,7 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	QUnit.test("getCount: unresolved", function (assert) {
-		var oBinding = new ClientTreeBinding({/*oModel*/}, "~path");
+		var oBinding = new ClientTreeBinding({_getObject() {}}, "~path");
 
 		this.mock(oBinding).expects("isResolved").withExactArgs().returns(false);
 
@@ -39,7 +40,7 @@ sap.ui.define([
 	{mParameters : {arrayNames : "~arrayNames"}, aArrayNames : "~arrayNames"}
 ].forEach(function (oFixture, i) {
 	QUnit.test("getCount: no filters set, #" + i, function (assert) {
-		var oModel = {getObject : function () {}},
+		var oModel = {_getObject() {/*in c'tor*/}, getObject() {}},
 			oBinding = new ClientTreeBinding(oModel, "~path", /*oContext*/undefined,
 				/*aApplicationFilters*/undefined, oFixture.mParameters);
 
@@ -57,7 +58,7 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	QUnit.test("getCount: with filters", function (assert) {
-		var oBinding = new ClientTreeBinding({/*oModel*/}, "~path");
+		var oBinding = new ClientTreeBinding({_getObject() {}}, "~path");
 
 		oBinding.oCombinedFilter = "~oCombinedFilter";
 		oBinding.filterInfo.iMatches = "~iMatches";
@@ -162,7 +163,7 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	QUnit.test("constructor: filter info and combined filter; no filter", function (assert) {
-		var oBinding = new ClientTreeBinding({/*oModel*/}, "~path"); // code under test
+		var oBinding = new ClientTreeBinding({_getObject() {}}, "~path"); // code under test
 
 		assert.deepEqual(oBinding.filterInfo, {
 			aFilteredContexts : [],
@@ -177,8 +178,8 @@ sap.ui.define([
 		var oBinding,
 			aFilters = ["~anyFilter"],
 			oModel = {
-				_getObject : function () {},
-				checkFilter : function () {}
+				_getObject() {},
+				checkFilter() {}
 			};
 
 		this.mock(oModel).expects("checkFilter").withExactArgs(sinon.match.same(aFilters));
@@ -201,7 +202,7 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	QUnit.test("applyFilter: resets iMatches before applying filters", function (assert) {
-		var oBinding = new ClientTreeBinding({/*oModel*/}, "~path"),
+		var oBinding = new ClientTreeBinding({_getObject() {}}, "~path"),
 			oFilterInfo = {
 				aFilteredContexts : "~aFilteredContexts",
 				iMatches : "~iMatches",
@@ -227,7 +228,7 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	QUnit.test("_applyFilterRecursive: update iMatches while applying filters", function (assert) {
-		var oBinding = new ClientTreeBinding({/*oModel*/}, "~path"),
+		var oBinding = new ClientTreeBinding({_getObject() {}}, "~path"),
 			oBindingMock = this.mock(oBinding),
 			oContext0 = {},
 			oContext1 = {},
@@ -282,4 +283,61 @@ sap.ui.define([
 			oParentContext : /*oParentContext*/undefined
 		});
 	});
+
+	//*********************************************************************************************
+[
+	{oNew: {foo: "baz"}, bForce: undefined, bFires: true, bUpdated: true},
+	{oNew: {foo: "bar"}, bForce: undefined, bFires: false, bUpdated: false},
+	{oNew: {foo: "bar"}, bForce: true, bFires: true, bUpdated: true}
+].forEach(({oNew, bForce, bFires, bUpdated}, i) => {
+	QUnit.test("checkUpdate: " + i, function (assert) {
+		const oModel = {_getObject() {}};
+		const oContext = {/*oContext*/};
+		const oBinding = new ClientTreeBinding(oModel, "~path", oContext);
+		const oOldTreeData = {foo: "bar"};
+		oBinding.oTreeData = oOldTreeData;
+		this.mock(oModel).expects("_getObject")
+			.withExactArgs("~path", sinon.match.same(oContext))
+			.returns(oNew);
+		const oBindingMock = this.mock(oBinding);
+		oBindingMock.expects("applyFilter").withExactArgs();
+		oBindingMock.expects("_fireChange")
+			.withExactArgs({reason: ChangeReason.Change})
+			.exactly(bFires ? 1 : 0);
+
+		// code under test
+		oBinding.checkUpdate(bForce);
+
+		assert.deepEqual(oBinding._mLengthsCache, {});
+		assert.strictEqual(oBinding.oTreeData, bUpdated ? oNew : oOldTreeData);
+	});
+});
+
+	//*********************************************************************************************
+[undefined/*context unchanged*/, false/*changed, absolute*/, true/*changed, relative*/].forEach((bRelative, i) => {
+	QUnit.test("setContext: " + i, function (assert) {
+		const oModel = {_getObject() {}};
+		const oContext = {};
+		const oNewContext = bRelative !== undefined ? {} : oContext;
+		const oBinding = new ClientTreeBinding(oModel, "~path", oContext);
+		const oTreeData = {};
+		const oNewTreeData = {foo: "baz"};
+		oBinding.oTreeData = oTreeData;
+
+		this.mock(oBinding).expects("isRelative")
+			.withExactArgs()
+			.exactly(bRelative !== undefined ? 1 : 0)
+			.returns(bRelative);
+		this.mock(oModel).expects("_getObject")
+			.withExactArgs("~path", sinon.match.same(oNewContext))
+			.exactly(bRelative ? 1 : 0)
+			.returns(oNewTreeData);
+
+		// code under test
+		oBinding.setContext(oNewContext);
+
+		assert.strictEqual(oBinding.oContext, oNewContext);
+		assert.strictEqual(oBinding.oTreeData, bRelative ? oNewTreeData : oTreeData);
+	});
+});
 });

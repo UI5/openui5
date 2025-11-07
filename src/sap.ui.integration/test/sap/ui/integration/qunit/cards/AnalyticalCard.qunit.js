@@ -6,6 +6,7 @@ sap.ui.define([
 	"sap/ui/integration/cards/actions/NavigationAction",
 	"sap/ui/integration/widgets/Card",
 	"sap/ui/integration/cards/actions/CardActions",
+	"sap/ui/qunit/QUnitUtils",
 	"sap/ui/test/utils/nextUIUpdate",
 	"qunit/testResources/nextCardReadyEvent",
 	"../services/SampleServices"
@@ -15,6 +16,7 @@ sap.ui.define([
 	NavigationAction,
 	Card,
 	CardActions,
+	QUnitUtils,
 	nextUIUpdate,
 	nextCardReadyEvent,
 	SampleServices
@@ -347,6 +349,163 @@ sap.ui.define([
 			}
 		}
 	};
+
+	var oManifest_Analytical_wholeCardAction_NoChartActions = {
+		"sap.app": {
+			"id": "test.cards.analytical.card10"
+		},
+		"sap.card": {
+			"type": "Analytical",
+			"actions": [
+				{
+					"type": "Navigation",
+					"parameters": {
+						"url": "https://sap.com?revenue={Revenue}&storeName={Store Name}"
+					}
+				}
+			],
+			"content": {
+				"chartType": "Donut",
+				"measureAxis": "size",
+				"dimensionAxis": "color",
+				"dimensions": [
+					{
+						"label": "Store Name",
+						"value": "{Store Name}"
+					}
+				],
+				"measures": [
+					{
+						"label": "Revenue",
+						"value": "{Revenue}"
+					}
+				],
+				"data": {
+					"json": [
+						{
+							"Store Name": "24-Seven",
+							"Revenue": 345292.06
+						},
+						{
+							"Store Name": "A&A",
+							"Revenue": 1564235.29
+						}
+					]
+				}
+			}
+		}
+	};
+
+	var oManifest_Analytical_wholeCardAction_ChartActions_Chart = {
+		"sap.app": {
+			"id": "test.cards.analytical.card10"
+		},
+		"sap.card": {
+			"type": "Analytical",
+			"actions": [
+				{
+					"type": "Navigation",
+					"parameters": {
+						"url": "https://sap.com?revenue={Revenue}&storeName={Store Name}"
+					}
+				}
+			],
+			"content": {
+				"chartType": "Donut",
+				"measureAxis": "size",
+				"dimensionAxis": "color",
+				"dimensions": [
+					{
+						"label": "Store Name",
+						"value": "{Store Name}"
+					}
+				],
+				"measures": [
+					{
+						"label": "Revenue",
+						"value": "{Revenue}"
+					}
+				],
+				"actionableArea": "Chart",
+				"actions": [
+					{
+						"type": "Navigation",
+						"parameters": {
+							"url": "https://sap.com?revenue={Revenue}&storeName={Store Name}"
+						}
+					}
+				],
+				"data": {
+					"json": [
+						{
+							"Store Name": "24-Seven",
+							"Revenue": 345292.06
+						},
+						{
+							"Store Name": "A&A",
+							"Revenue": 1564235.29
+						}
+					]
+				}
+			}
+		}
+	};
+
+	var oManifest_Analytical_wholeCardAction_ChartActions_Full = {
+		"sap.app": {
+			"id": "test.cards.analytical.card10"
+		},
+		"sap.card": {
+			"type": "Analytical",
+			"actions": [
+				{
+					"type": "Navigation",
+					"parameters": {
+						"url": "https://sap.com?revenue={Revenue}&storeName={Store Name}"
+					}
+				}
+			],
+			"content": {
+				"chartType": "Donut",
+				"measureAxis": "size",
+				"dimensionAxis": "color",
+				"dimensions": [
+					{
+						"label": "Store Name",
+						"value": "{Store Name}"
+					}
+				],
+				"measures": [
+					{
+						"label": "Revenue",
+						"value": "{Revenue}"
+					}
+				],
+				"actionableArea": "Full",
+				"actions": [
+					{
+						"type": "Navigation",
+						"parameters": {
+							"url": "https://sap.com?revenue={Revenue}&storeName={Store Name}"
+						}
+					}
+				],
+				"data": {
+					"json": [
+						{
+							"Store Name": "24-Seven",
+							"Revenue": 345292.06
+						},
+						{
+							"Store Name": "A&A",
+							"Revenue": 1564235.29
+						}
+					]
+				}
+			}
+		}
+	};
+
 
 	var oManifest_Analytical_Popover = {
 		"sap.app": {
@@ -932,7 +1091,7 @@ sap.ui.define([
 			await nextUIUpdate();
 
 			//Assert
-			assert.strictEqual(oActionSpy.callCount, 0, "Card Content and header are clicked and action event is fired twice");
+			assert.strictEqual(oActionSpy.callCount, 0, "Card Content and header are clicked and action event is not fired");
 
 			// Cleanup
 			oStubOpenUrl.restore();
@@ -998,6 +1157,116 @@ sap.ui.define([
 
 			// Cleanup
 			oStubOpenUrl.restore();
+		});
+
+		QUnit.module("Whole Card Interactive - Analytical Content", {
+			beforeEach: function () {
+				this.oCard = new Card({
+					width: "400px",
+					height: "600px",
+					baseUrl: "test-resources/sap/ui/integration/qunit/testResources/"
+				});
+				this.oCard.placeAt(DOM_RENDER_LOCATION);
+			},
+			afterEach: function () {
+				this.oCard.destroy();
+				this.oCard = null;
+			}
+		});
+
+
+		QUnit.test("No action on the chart", async function (assert) {
+
+			// Act
+			this.oCard.setManifest(oManifest_Analytical_wholeCardAction_NoChartActions);
+			this.oCard.setSemanticRole("ListItem");
+
+			await nextCardReadyEvent(this.oCard);
+
+			var oCardContent = this.oCard.getCardContent();
+
+			await new Promise((resolve) => {
+				oCardContent.getAggregation("_content").attachEventOnce("renderComplete", resolve);
+			});
+
+			// Focus on the card
+			this.oCard.focus();
+			await nextUIUpdate();
+
+			// Assert
+			assert.strictEqual(document.activeElement, this.oCard.getDomRef(), "Card should be focused");
+
+			// Focus on the chart's svg
+			var oSvg = oCardContent.getDomRef().querySelector("svg");
+			oSvg.focus();
+			await nextUIUpdate();
+
+			// Assert
+			assert.strictEqual(document.activeElement, this.oCard.getDomRef(), "Card should STILL be focused");
+
+
+			assert.strictEqual(this.oCard.getDomRef().ariaDescribedByElements.length, 3, "Card should have the ACC text from the chart.");
+			assert.ok(this.oCard.getDomRef().ariaDescribedByElements[2].id.startsWith("UIComp"), "Card should have the ACC text from the chart.");
+		});
+
+		QUnit.test("Action on the chart with actionableArea 'Chart'", async function (assert) {
+			// Act
+			this.oCard.setManifest(oManifest_Analytical_wholeCardAction_ChartActions_Chart);
+
+			await nextCardReadyEvent(this.oCard);
+
+			var oCardContent = this.oCard.getCardContent();
+
+			await new Promise((resolve) => {
+				oCardContent.getAggregation("_content").attachEventOnce("renderComplete", resolve);
+			});
+
+			// Focus on the card
+			this.oCard.focus();
+			await nextUIUpdate();
+
+			// Assert
+			assert.strictEqual(document.activeElement, this.oCard.getDomRef(), "Card should be focused");
+
+			// Focus on the chart's svg
+			var oSvg = this.oCard.getCardContent().getDomRef().querySelector("svg");
+			oSvg.focus();
+			await nextUIUpdate();
+
+			// Assert
+			assert.strictEqual(document.activeElement, oSvg, "Card's content should be focused");
+
+			assert.strictEqual(this.oCard.getDomRef().ariaDescribedByElements.length, 1, "Card should not have the ACC text from the chart.");
+		});
+
+		QUnit.test("Action on the chart with actionableArea 'Full'", async function (assert) {
+			// Act
+			this.oCard.setManifest(oManifest_Analytical_wholeCardAction_ChartActions_Full);
+
+			await nextCardReadyEvent(this.oCard);
+
+			var oCardContent = this.oCard.getCardContent();
+
+			await new Promise((resolve) => {
+				oCardContent.getAggregation("_content").attachEventOnce("renderComplete", resolve);
+			});
+
+			// Focus on the card
+			this.oCard.focus();
+			await nextUIUpdate();
+
+			// Assert
+			assert.strictEqual(document.activeElement, this.oCard.getDomRef(), "Card should be focused");
+
+			// Focus on the chart's svg
+			var oSvg = oCardContent.getDomRef().querySelector("svg");
+			oSvg.focus();
+			await nextUIUpdate();
+
+			// Assert
+			assert.strictEqual(document.activeElement, oSvg, "Card's content should be focused");
+
+			assert.strictEqual(this.oCard.getDomRef().ariaDescribedByElements.length, 1, "Card should not have the ACC text from the chart.");
 		});
 
 		QUnit.module("Popover", {
@@ -1069,6 +1338,236 @@ sap.ui.define([
 			assert.ok(oStubOpenUrl.calledWith("https://www.sap.com/A&A"), "Url is resolved with correct path");
 
 			oStubOpenUrl.restore();
+		});
+
+		QUnit.module("_onChartFullyLoaded Method", {
+			beforeEach: function () {
+				this.oCard = new Card({
+					width: "400px",
+					height: "600px",
+					baseUrl: "test-resources/sap/ui/integration/qunit/testResources/"
+				});
+				this.oCard.placeAt(DOM_RENDER_LOCATION);
+			},
+			afterEach: function () {
+				this.oCard.destroy();
+				this.oCard = null;
+			}
+		});
+
+		QUnit.test("Handler attachment", async function (assert) {
+			// Arrange
+			this.oCard.setManifest(oManifest_AnalyticalCard);
+			await nextCardReadyEvent(this.oCard);
+
+			const oCardContent = this.oCard.getCardContent();
+			const oChart = oCardContent.getAggregation("_content");
+			const oAttachRenderCompleteSpy = sinon.spy(oChart, "attachRenderComplete");
+
+			// Act - Call _onChartFullyLoaded
+			oCardContent._onChartFullyLoaded(oChart);
+
+			// Assert
+			assert.strictEqual(oCardContent._bChartHandlersAttached, true, "_bChartHandlersAttached flag should be set to true");
+
+			// Cleanup
+			oAttachRenderCompleteSpy.restore();
+		});
+
+		QUnit.test("Non-interactive chart with no actions - SVG attributes and accessibility", async function (assert) {
+			// Arrange
+			this.oCard.setManifest(oManifest_AnalyticalCard);
+			this.oCard.setSemanticRole("ListItem");
+			await nextCardReadyEvent(this.oCard);
+
+			const oCardContent = this.oCard.getCardContent();
+			const oChart = oCardContent.getAggregation("_content");
+
+			// Mock DOM structure
+			const oMockSvg = document.createElement("svg");
+			oMockSvg.setAttribute("aria-labelledby", "chart-label-123");
+			oMockSvg.setAttribute("tabindex", "0");
+			oMockSvg.setAttribute("focusable", "true");
+
+			const oMockChartDomRef = document.createElement("div");
+			oMockChartDomRef.appendChild(oMockSvg);
+
+			const oMockCardDomRef = document.createElement("div");
+
+			sinon.stub(oChart, "getDomRef").returns(oMockChartDomRef);
+			sinon.stub(this.oCard, "getDomRef").returns(oMockCardDomRef);
+			sinon.stub(this.oCard, "isInteractive").returns(false);
+
+			// Set up the content to be non-interactive
+			oCardContent._bFullInteractive = false;
+			oCardContent._bChartsInteractive = false;
+
+			// Act
+			oCardContent._onChartFullyLoaded(oChart);
+
+			// Trigger the render complete handler
+			await new Promise((resolve) => {
+				oChart.attachRenderComplete(resolve);
+				oChart.fireRenderComplete();
+			});
+
+			// Assert
+			assert.strictEqual(oMockSvg.getAttribute("tabindex"), "", "SVG tabindex should be set to empty string");
+			assert.strictEqual(oMockSvg.getAttribute("focusable"), "false", "SVG focusable should be set to false");
+			assert.strictEqual(oMockCardDomRef.getAttribute("aria-describedby"), "chart-label-123", "Card should have aria-describedby with chart label");
+			assert.notOk(oMockSvg.classList.contains("sapUiIntegrationAnalyticalForcePointer"), "SVG should not have the clickable class when card is not interactive");
+		});
+
+		QUnit.test("Non-interactive chart with interactive card - SVG styling", async function (assert) {
+			// Arrange
+			this.oCard.setManifest(oManifest_AnalyticalCard);
+			this.oCard.setSemanticRole("ListItem");
+			await nextCardReadyEvent(this.oCard);
+
+			const oCardContent = this.oCard.getCardContent();
+			const oChart = oCardContent.getAggregation("_content");
+
+			// Mock DOM structure
+			const oMockSvg = document.createElement("svg");
+			oMockSvg.setAttribute("aria-labelledby", "chart-label-123");
+
+			const oMockChartDomRef = document.createElement("div");
+			oMockChartDomRef.appendChild(oMockSvg);
+
+			const oMockCardDomRef = document.createElement("div");
+			oMockCardDomRef.setAttribute("aria-labelledby", "card-label-456");
+
+			sinon.stub(oChart, "getDomRef").returns(oMockChartDomRef);
+			sinon.stub(this.oCard, "getDomRef").returns(oMockCardDomRef);
+			sinon.stub(this.oCard, "isInteractive").returns(true);
+
+			// Set up the content to be non-interactive
+			oCardContent._bFullInteractive = false;
+			oCardContent._bChartsInteractive = false;
+
+			// Act
+			oCardContent._onChartFullyLoaded(oChart);
+
+			// Trigger the render complete handler
+			await new Promise((resolve) => {
+				oChart.attachRenderComplete(resolve);
+				oChart.fireRenderComplete();
+			});
+
+			// Assert
+			assert.ok(oMockSvg.classList.contains("sapUiIntegrationAnalyticalForcePointer"), "SVG should have the clickable class when card is interactive");
+		});
+
+		QUnit.test("Full interactive chart - SVG styling", async function (assert) {
+			// Arrange
+			this.oCard.setManifest(oManifest_Analytical_wholeCardAction_ChartActions_Full);
+			await nextCardReadyEvent(this.oCard);
+
+			const oCardContent = this.oCard.getCardContent();
+			const oChart = oCardContent.getAggregation("_content");
+
+			// Mock DOM structure
+			const oMockSvg = document.createElement("svg");
+			oMockSvg.setAttribute("aria-labelledby", "chart-label-123");
+
+			const oMockChartDomRef = document.createElement("div");
+			oMockChartDomRef.appendChild(oMockSvg);
+
+			sinon.stub(oChart, "getDomRef").returns(oMockChartDomRef);
+
+			// Set up the content to be full interactive
+			oCardContent._bFullInteractive = true;
+			oCardContent._bChartsInteractive = false;
+
+			// Act
+			oCardContent._onChartFullyLoaded(oChart);
+
+			// Trigger the render complete handler
+			await new Promise((resolve) => {
+				oChart.attachRenderComplete(resolve);
+				oChart.fireRenderComplete();
+			});
+
+			// Assert
+			assert.ok(oMockSvg.classList.contains("sapUiIntegrationAnalyticalForcePointer"), "SVG should have the clickable class when content is full interactive");
+		});
+
+		QUnit.test("Non interactive card label handling with existing aria-describedby", async function (assert) {
+			// Arrange
+			this.oCard.setManifest(oManifest_AnalyticalCard);
+			await nextCardReadyEvent(this.oCard);
+
+			const oCardContent = this.oCard.getCardContent();
+			const oChart = oCardContent.getAggregation("_content");
+
+			// Mock DOM structure
+			const oMockSvg = document.createElement("svg");
+			oMockSvg.setAttribute("aria-labelledby", "chart-label-123");
+
+			const oMockChartDomRef = document.createElement("div");
+			oMockChartDomRef.appendChild(oMockSvg);
+
+			const oMockCardDomRef = document.createElement("div");
+			oMockCardDomRef.setAttribute("aria-describedby", "existing-desc-789");
+
+			sinon.stub(oChart, "getDomRef").returns(oMockChartDomRef);
+			sinon.stub(this.oCard, "getDomRef").returns(oMockCardDomRef);
+			sinon.stub(this.oCard, "isInteractive").returns(false);
+
+			// Set up the content to be non-interactive
+			oCardContent._bFullInteractive = false;
+			oCardContent._bChartsInteractive = false;
+
+			// Act
+			oCardContent._onChartFullyLoaded(oChart);
+
+			// Trigger the render complete handler
+			await new Promise((resolve) => {
+				oChart.attachRenderComplete(resolve);
+				oChart.fireRenderComplete();
+			});
+
+			// Assert
+			assert.strictEqual(oMockCardDomRef.getAttribute("aria-describedby"), "existing-desc-789", "Card should preserve existing aria-descrbedby and don't add chart label");
+		});
+
+		QUnit.test("Non interactive card label handling without existing aria-describedby", async function (assert) {
+			// Arrange
+			this.oCard.setManifest(oManifest_AnalyticalCard);
+			await nextCardReadyEvent(this.oCard);
+
+			const oCardContent = this.oCard.getCardContent();
+			const oChart = oCardContent.getAggregation("_content");
+
+			// Mock DOM structure
+			const oMockSvg = document.createElement("svg");
+			oMockSvg.setAttribute("aria-labelledby", "chart-label-123");
+
+			const oMockChartDomRef = document.createElement("div");
+			oMockChartDomRef.appendChild(oMockSvg);
+
+			const oMockCardDomRef = document.createElement("div");
+			// No aria-labelledby attribute
+
+			sinon.stub(oChart, "getDomRef").returns(oMockChartDomRef);
+			sinon.stub(this.oCard, "getDomRef").returns(oMockCardDomRef);
+			sinon.stub(this.oCard, "isInteractive").returns(false);
+
+			// Set up the content to be non-interactive
+			oCardContent._bFullInteractive = false;
+			oCardContent._bChartsInteractive = false;
+
+			// Act
+			oCardContent._onChartFullyLoaded(oChart);
+
+			// Trigger the render complete handler
+			await new Promise((resolve) => {
+				oChart.attachRenderComplete(resolve);
+				oChart.fireRenderComplete();
+			});
+
+			// Assert
+			assert.strictEqual(oMockCardDomRef.getAttribute("aria-describedby"), null, "Card should not have aria-describedby");
 		});
 
 	}).catch(function () {

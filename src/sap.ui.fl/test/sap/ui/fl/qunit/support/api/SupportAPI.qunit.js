@@ -4,30 +4,30 @@ sap.ui.define([
 	"sap/base/Log",
 	"sap/ui/core/Component",
 	"sap/ui/core/ComponentContainer",
+	"sap/ui/core/HTML",
 	"sap/ui/fl/apply/_internal/flexState/changes/UIChangesState",
 	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
 	"sap/ui/fl/apply/_internal/flexState/FlexObjectState",
 	"sap/ui/fl/apply/_internal/flexState/FlexState",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
-	"sap/ui/fl/support/_internal/extractChangeDependencies",
 	"sap/ui/fl/initial/_internal/Settings",
+	"sap/ui/fl/support/_internal/extractChangeDependencies",
 	"sap/ui/fl/support/api/SupportAPI",
-	"sap/ui/fl/util/IFrame",
 	"sap/ui/fl/Utils",
 	"sap/ui/thirdparty/sinon-4"
 ], function(
 	Log,
 	Component,
 	ComponentContainer,
+	HTML,
 	UIChangesState,
 	VariantManagementState,
 	FlexObjectState,
 	FlexState,
 	ManifestUtils,
-	extractChangeDependencies,
 	Settings,
+	extractChangeDependencies,
 	SupportAPI,
-	IFrame,
 	Utils,
 	sinon
 ) {
@@ -37,10 +37,9 @@ sap.ui.define([
 
 	function setupIFrameTest({ id, setDataHelpId }, bSkipInsideModuleStubs) {
 		return async function() {
-			this.oIFrame = new IFrame({
-				url: "support/api/testPage.html",
-				title: "myIFrame",
-				id
+			const sUrl = new URL("support/api/testPage.html", document.location.href).toString();
+			this.oIFrame = new HTML(id, {
+				content: `<iframe src="${sUrl}"></iframe>`
 			});
 			this.oIFrame.placeAt("qunit-fixture");
 			sandbox.stub(Utils, "getUshellContainer").returns(true);
@@ -56,7 +55,6 @@ sap.ui.define([
 					};
 				}
 			});
-			await this.oIFrame.waitForInit();
 
 			// wait for the app inside the iframe to be ready
 			let bReady = false;

@@ -13,19 +13,15 @@ sap.ui.define([
 	"sap/ui/base/SyncPromise",
 	"sap/ui/model/Filter",
 	"sap/ui/model/FilterOperator",
-	"sap/ui/thirdparty/URI",
 	"sap/ui/util/_URL"
 ], function (_Parser, Log, deepEqual, isEmptyObject, merge, uid, SyncPromise, Filter,
-		FilterOperator, URI, _URL) {
+		FilterOperator, _URL) {
 	"use strict";
 
 	var rAmpersand = /&/g,
 		rApplicationGroupID = /^\w+$/,
 		sClassName = "sap.ui.model.odata.v4.lib._Helper",
 		rEquals = /\=/g,
-		rEscapedCloseBracket = /%29/g,
-		rEscapedOpenBracket = /%28/g,
-		rEscapedTick = /%27/g,
 		rGroupID = /^(\$auto(\.\w+)?|\$direct|\w+)$/,
 		rHash = /#/g,
 		// matches the rest of a segment after '(' and any segment that consists only of a number
@@ -38,18 +34,6 @@ sap.ui.define([
 		 * @alias sap.ui.model.odata.v4.lib._Helper
 		 */
 		_Helper;
-
-	/**
-	 * Ensures that the key predicates in the given URL are not %-encoded.
-	 *
-	 * @param {string} sUrl - The URL
-	 * @returns {string} The converted URL
-	 */
-	function preserveKeyPredicates(sUrl) {
-		return sUrl.replace(rEscapedTick, "'")
-			.replace(rEscapedOpenBracket, "(")
-			.replace(rEscapedCloseBracket, ")");
-	}
 
 	_Helper = {
 		/**
@@ -2269,20 +2253,27 @@ sap.ui.define([
 		},
 
 		/**
-		 * Make the given URL absolute using the given base URL. The URLs must not contain a host
-		 * or protocol part. Ensures that key predicates are not %-encoded.
+		 * Resolves the given URL with the given base URL to create either a root-relative (relative
+		 * to the origin, e.g. "/service") or an absolute (including the origin, e.g.
+		 * "protocol://host:port/service") URL. If <code>sBase</code> is a cross-origin URL, the
+		 * result will be an absolute URL, otherwise a root-relative URL is returned. Note that an
+		 * absolute <code>sUrl</code> overrules the <code>sBase</code>, and a root-relative
+		 * <code>sUrl</code> only takes the origin of <code>sBase</code> into account.
 		 *
 		 * @param {string} sUrl
 		 *   The URL
 		 * @param {string} sBase
-		 *   The base URL
+		 *   The absolute or root-relative base URL
 		 * @returns {string}
-		 *   The absolute URL
+		 *   The resolved absolute or root-relative URL
 		 *
 		 * @public
 		 */
 		makeAbsolute : function (sUrl, sBase) {
-			return preserveKeyPredicates(new URI(sUrl).absoluteTo(sBase).toString());
+			const oUrl = new URL(sUrl, new URL(sBase, document.baseURI));
+			return oUrl.origin === new URL(document.baseURI).origin
+				? oUrl.toString().slice(oUrl.origin.length)
+				: oUrl.toString();
 		},
 
 		/**

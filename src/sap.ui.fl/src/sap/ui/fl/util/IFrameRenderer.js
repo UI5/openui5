@@ -3,7 +3,9 @@
  */
 
 sap.ui.define([
+	"sap/base/util/uid"
 ], function(
+	uid
 ) {
 	"use strict";
 
@@ -37,30 +39,34 @@ sap.ui.define([
 	 *            The iframe to be rendered
 	 */
 	IFrameRenderer.render = function(oRm, oIFrame) {
-		oRm.openStart("iframe", oIFrame);
+		oRm.openStart("div", oIFrame);
+		// Render dimensions on container to avoid flickering
+		_setDimensionAsStyle(oRm, "width", oIFrame.getWidth());
+		_setDimensionAsStyle(oRm, "height", oIFrame.getHeight());
+		oRm.openEnd();
 
+		// Assign a unique id to render a fresh dom element for the iframe on every rerender
+		// This will avoid that src changes add to the history as the src is always the initial value of the new element
+		oRm.openStart("iframe", `${oIFrame.getId()}-${uid()}`);
 		_setDimensionAsStyle(oRm, "width", oIFrame.getWidth());
 		_setDimensionAsStyle(oRm, "height", oIFrame.getHeight());
 		oRm.style("display", "block");
 		oRm.style("border", "none");
 
+		const sTitle = oIFrame.getTitle();
 		const oAdvancedSettings = oIFrame.getAdvancedSettings();
 		const { additionalSandboxParameters: aAdditionalSandboxParameters, ...oFilteredAdvancedSettings } = oAdvancedSettings;
 		const sAdditionalSandboxParameters = aAdditionalSandboxParameters?.join(" ");
 		const sSandboxAttributes = createsSandboxAttributesString(oFilteredAdvancedSettings);
 		const sCombinedSandboxAttributes = sAdditionalSandboxParameters ? `${sSandboxAttributes} ${sAdditionalSandboxParameters}` : sSandboxAttributes;
-		oRm.attr("sandbox", sCombinedSandboxAttributes);
-		// Always set the src to about:blank to avoid adding history entries when parameters are resolved
-		oRm.attr("src", "about:blank");
-
-		var sTitle = oIFrame.getTitle();
+		oRm.attr("src", oIFrame.getUrl());
 		if (sTitle) {
 			oRm.attr("title", sTitle);
 		}
-
+		oRm.attr("sandbox", sCombinedSandboxAttributes);
 		oRm.openEnd();
-
 		oRm.close("iframe");
+		oRm.close("div");
 	};
 
 	return IFrameRenderer;

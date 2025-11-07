@@ -31,6 +31,15 @@
 					value="{view>/respType/popinLayout}">
 					<core:Item key="{view>value}" text="{view>value}"></core:Item>
 				</Input>
+
+				<Label text="popinDisplay (Inline | Block)" />
+				<Input
+					id="popinDisplay"
+					showSuggestion="true"
+					suggestionItems="{view>/enums/popinDisplay}"
+					value="{view>/respType/popinDisplay}">
+					<core:Item key="{view>value}" text="{view>value}"></core:Item>
+				</Input>
 		  </form:SimpleForm>
 		</content>
 		<endButton>
