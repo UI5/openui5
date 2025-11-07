@@ -3167,6 +3167,10 @@ sap.ui.define([
 			return;
 		}
 
+		if (ResizeHandler.isSuspended(this._$titleArea.get(0), this._adjustTitlePositioning.bind(this))) {
+			return;
+		}
+
 		var oWrapperElement = this._$opWrapper.get(0),
 			oTitleElement = this._$titleArea.get(0),
 			iTitleHeight = oTitleElement.getBoundingClientRect().height,
