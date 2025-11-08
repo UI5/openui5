@@ -1819,6 +1819,22 @@ sap.ui.define([
 		},
 
 		/**
+		 * Parses the URL parameters from a given query string. Takes care of array parameters.
+		 *
+		 * @param {string} sQuery - A query string
+		 * @returns {object} - A map of URL parameters
+		 */
+		getUrlParameters : function (sQuery) {
+			const mUrlParameters = {};
+			const oUrlParams = new URLSearchParams(sQuery);
+			for (const sKey of oUrlParams.keys()) {
+				const aValues = oUrlParams.getAll(sKey);
+				mUrlParameters[sKey] = aValues.length > 1 ? aValues : aValues[0];
+			}
+			return mUrlParameters;
+		},
+
+		/**
 		 * Tells whether <code>sPath</code> has <code>sBasePath</code> as path prefix. It returns
 		 * <code>true</code> iff {@link .getRelativePath} does not return <code>undefined</code>.
 		 *

@@ -1,13 +1,13 @@
 /* global QUnit */
 sap.ui.define([
 	"sap/base/Log",
-	"sap/ui/fl/support/diagnostics/FlexibilityDataExtractor",
 	"sap/ui/fl/support/api/SupportAPI",
+	"sap/ui/fl/support/diagnostics/FlexibilityDataExtractor",
 	"sap/ui/thirdparty/sinon-4"
 ], function(
 	Log,
-	FlexibilityDataExtractor,
 	SupportAPI,
+	FlexibilityDataExtractor,
 	sinon
 ) {
 	"use strict";
@@ -128,6 +128,35 @@ sap.ui.define([
 		assert.strictEqual(oResult.flexObjectInfos[0].user, "USER_1", "User in flex object infos is anonymized consistently");
 		assert.strictEqual(oResult.flexObjectInfos[1].user, "USER_3",
 			"Different user in flex object infos gets different anonymized value");
+	});
+
+	QUnit.test("extractFlexibilityData - no mutation of original data during anonymization", async function(assert) {
+		const oMockManifestObject = {
+			getEntry: oSandbox.stub()
+			.withArgs("/sap.app/applicationVersion/version").returns("1.2.3")
+			.withArgs("/sap.app/ach").returns("FI-GL")
+		};
+		const oMockAppComponent = {
+			getManifestObject: oSandbox.stub().returns(oMockManifestObject)
+		};
+
+		const aFlexObjects = [
+			// Simulate serializable object with prototype
+			Object.create({})
+		];
+		aFlexObjects[0].user = "JohnDoesEmail";
+
+		oSandbox.stub(SupportAPI, "getApplicationComponent").resolves(oMockAppComponent);
+		oSandbox.stub(SupportAPI, "getFlexSettings").resolves([]);
+		// Change dependencies and flex object infos share same object reference
+		// Anonymization must not touch the same object reference twice
+		oSandbox.stub(SupportAPI, "getChangeDependencies").resolves(aFlexObjects);
+		oSandbox.stub(SupportAPI, "getFlexObjectInfos").resolves(aFlexObjects);
+
+		const oResult = await FlexibilityDataExtractor.extractFlexibilityData(true);
+		assert.strictEqual(oResult.changeDependencies[0].user, "USER_1", "User in dependencies is anonymized");
+		assert.strictEqual(oResult.flexObjectInfos[0].user, "USER_1", "User in flex object infos is anonymized consistently");
+		assert.strictEqual(aFlexObjects[0].user, "JohnDoesEmail", "Original object is not touched");
 	});
 
 	QUnit.test("extractFlexibilityData - logs error and returns empty object when no application component found", async function(assert) {

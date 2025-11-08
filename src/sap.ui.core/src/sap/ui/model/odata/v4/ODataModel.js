@@ -39,9 +39,8 @@ sap.ui.define([
 	"sap/ui/model/BindingMode",
 	"sap/ui/model/Context",
 	"sap/ui/model/Model",
-	"sap/ui/model/odata/OperationMode",
-	"sap/ui/thirdparty/URI"
-], function(ODataContextBinding, ODataListBinding, ODataMetaModel, ODataPropertyBinding, SubmitMode, _GroupLock, _Helper, _MetadataRequestor, _Parser, _Requestor, Log, Localization, SyncPromise, Messaging, Rendering, Supportability, CacheManager, Message, MessageType, BindingMode, BaseContext, Model, OperationMode, URI) {
+	"sap/ui/model/odata/OperationMode"
+], function(ODataContextBinding, ODataListBinding, ODataMetaModel, ODataPropertyBinding, SubmitMode, _GroupLock, _Helper, _MetadataRequestor, _Parser, _Requestor, Log, Localization, SyncPromise, Messaging, Rendering, Supportability, CacheManager, Message, MessageType, BindingMode, BaseContext, Model, OperationMode) {
 	"use strict";
 
 	var a401DenyList = ["apply", "compute", "count", "expand", "filter", "format", "id", "index",
@@ -258,8 +257,8 @@ sap.ui.define([
 			sParameter,
 			mQueryParams,
 			sServiceUrl,
-			oUri,
 			mUriParameters,
+			sUrlParameters,
 			that = this;
 
 		// do not pass any parameters to Model
@@ -279,8 +278,10 @@ sap.ui.define([
 		if (!sServiceUrl) {
 			throw new Error("Missing service root URL");
 		}
-		oUri = new URI(sServiceUrl);
-		if (oUri.path()[oUri.path().length - 1] !== "/") {
+		// we don't expect the sServiceUrl to contain a "#" hash part, because it is not relevant
+		// for OData requests
+		[sServiceUrl, sUrlParameters] = sServiceUrl.split("?");
+		if (sServiceUrl.at(-1) !== "/") {
 			throw new Error("Service root URL must end with '/'");
 		}
 		if (mParameters.operationMode && mParameters.operationMode !== OperationMode.Server) {
@@ -288,15 +289,16 @@ sap.ui.define([
 				+ mParameters.operationMode);
 		}
 		this.sOperationMode = mParameters.operationMode;
+		mUriParameters = _Helper.getUrlParameters(sUrlParameters);
 		// Note: strict checking for model's URI parameters, but "sap-*" is allowed
-		mUriParameters = this.buildQueryOptions(oUri.query(true), false, true);
+		mUriParameters = this.buildQueryOptions(mUriParameters, false, true);
 		// BEWARE: these are shared across all bindings!
 		this.mUriParameters = mUriParameters;
 		if (Supportability.isStatisticsEnabled()) {
 			// Note: this way, "sap-statistics" is not sent within $batch
 			mUriParameters = Object.assign({"sap-statistics" : true}, mUriParameters);
 		}
-		this.sServiceUrl = oUri.query("").toString();
+		this.sServiceUrl = sServiceUrl;
 		this.sGroupId = mParameters.groupId;
 		if (this.sGroupId === undefined) {
 			this.sGroupId = "$auto";

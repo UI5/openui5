@@ -16,7 +16,8 @@ sap.ui.define([
 		moduleName: "AP/controller/extension/changes/coding/foo",
 		reference: "AP.controller.extension",
 		content: {
-			codeRef: "coding/foo.js"
+			codeRef: "coding/foo.js",
+			viewId: "someViewId"
 		},
 		selector: {
 			controllerName: "sap.ui.rta.controller.ProductDetail"
@@ -41,12 +42,17 @@ sap.ui.define([
 				namespace: oChangeDefinition.namespace,
 				reference: oChangeDefinition.reference,
 				moduleName: oChangeDefinition.moduleName,
-				generator: "my.fancy.generator"
+				generator: "my.fancy.generator",
+				viewId: oChangeDefinition.content.viewId
 			};
 			var oCEChange = FlexObjectFactory.createControllerExtensionChange(mPropertyBag);
 
 			assert.ok(oCEChange.isA("sap.ui.fl.apply._internal.flexObjects.ControllerExtensionChange"), "the correct change was created");
-			assert.deepEqual(_omit(oCEChange.convertToFileContent(), "creation", "fileName"), _omit(oChangeDefinition, "creation", "fileName"), "the convert function is correct");
+			assert.deepEqual(
+				_omit(oCEChange.convertToFileContent(), "creation", "fileName"),
+				_omit(oChangeDefinition, "creation", "fileName"),
+				"the convert function is correct"
+			);
 		});
 
 		QUnit.test("createFromFileContent", function(assert) {

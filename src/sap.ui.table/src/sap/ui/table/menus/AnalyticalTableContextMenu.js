@@ -56,7 +56,7 @@ sap.ui.define([
 		const bExtendedMenu = !!oTable.getProperty("extendedGroupHeaderMenu");
 
 		if (!oRow.isGroupHeader()) {
-			this._mItems.values().forEach((oMenuItem) => oMenuItem.setVisible(false));
+			this._mItems.forEach((oMenuItem) => oMenuItem.setVisible(false));
 			return;
 		}
 

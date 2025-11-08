@@ -82,10 +82,11 @@ sap.ui.define([
 	 * @param {string} sControllerName - Name of the controller
 	 * @param {string} sComponentId - Unique id for the running controller - unique as well for manifest first
 	 * @param {boolean} bAsync - Flag whether <code>Promise</code> should be returned or not (async=true)
+	 * @param {string} sViewId - The view ID which is used to distinguish instance-specific controller extensions
 	 * @returns {Promise|Array} An empty array in case of a sync processing or a Promise with all successful loaded controller extensions
 	 * @see sap.ui.core.mvc.Controller for an overview of the available functions on controllers.
 	 */
-	ControllerExtension.prototype.getControllerExtensions = function(sControllerName, sComponentId, bAsync) {
+	ControllerExtension.prototype.getControllerExtensions = function(sControllerName, sComponentId, bAsync, sViewId) {
 		if (bAsync) {
 			if (!sComponentId) {
 				// always return a promise if async
@@ -113,9 +114,22 @@ sap.ui.define([
 				const FlexState = await requireAsync("sap/ui/fl/apply/_internal/flexState/FlexState");
 				await FlexState.waitForInitialization(sFlexReference);
 				const aFlexObjects = FlexState.getFlexObjectsDataSelector().get({ reference: sFlexReference });
-				var aExtensionModules = aFlexObjects.filter(function(oChange) {
+				const aExtensionChanges = aFlexObjects.filter(function(oChange) {
 					return isCodeExt(oChange) && isForController(sControllerName, oChange);
-				}).map(function(oChange) {
+				});
+				// Filter changes by view ID to distinguish instance-specific controller extensions
+				const aBaseExtensionChanges = [];
+				const aInstanceSpecificChanges = aExtensionChanges.filter(function(oChange) {
+					const sChangeViewId = oChange.getContent().viewId;
+					if (!sChangeViewId) {
+						aBaseExtensionChanges.push(oChange);
+						return false;
+					}
+					return sChangeViewId === sViewId;
+				});
+				// Base extensions should be applied first
+				const aExtensionModules = aBaseExtensionChanges.concat(aInstanceSpecificChanges)
+				.map(function(oChange) {
 					return oChange.getModuleName();
 				});
 

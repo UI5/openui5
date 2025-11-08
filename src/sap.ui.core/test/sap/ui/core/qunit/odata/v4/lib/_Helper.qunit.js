@@ -5937,4 +5937,16 @@ sap.ui.define([
 		// code under test
 		_Helper.registerChangeListener(oOwner, "~path~");
 	});
+
+	//*********************************************************************************************
+	QUnit.test("getUrlParameters", function (assert) {
+		assert.deepEqual(
+			_Helper.getUrlParameters("foo=bar&baz&array=A&encoded=ID%20eq%20'1'&array=C&array=B"),
+			{
+				array : ["A", "C", "B"],
+				baz : "",
+				encoded : "ID eq '1'",
+				foo : "bar"
+			});
+	});
 });

@@ -262,6 +262,111 @@ sap.ui.define([
 				assert.strictEqual(aCodeExtensions[0], "foo", "the correct module is returned");
 			});
 		});
+
+		QUnit.test("Given a Controller Extension with matching viewId and sViewId parameter", async function(assert) {
+			const sModuleName = "sap/ui/fl/qunit/ControllerExtension/1.0.0/codeExtensions/viewSpecificExtension";
+			FlQUnitUtils.stubSapUiRequire(sandbox, [{
+				name: [sModuleName],
+				stub: "viewSpecificExtension"
+			}]);
+			const oChange = createCodeExtChangeContent({
+				moduleName: sModuleName,
+				content: {
+					codeRef: "viewSpecificExtension.js",
+					viewId: "myViewId"
+				}
+			});
+			FlQUnitUtils.initializeFlexStateWithData(sandbox, sReference, { changes: [oChange] });
+			sandbox.stub(Utils, "getAppComponentForControl").returns(oAppComponent);
+			sandbox.stub(ManifestUtils, "getFlexReferenceForControl").returns(sReference);
+
+			const aCodeExtensions = await this.oExtensionProvider.getControllerExtensions(sControllerName, "myId", true, "myViewId");
+			assert.strictEqual(aCodeExtensions.length, 1, "one view-specific extension should be returned");
+			assert.strictEqual(aCodeExtensions[0], "viewSpecificExtension", "the view-specific extension module is returned");
+		});
+
+		QUnit.test("Given a Controller Extension with non-matching viewId and sViewId parameter", async function(assert) {
+			const sModuleName = "sap/ui/fl/qunit/ControllerExtension/1.0.0/codeExtensions/otherViewExtension";
+			FlQUnitUtils.stubSapUiRequire(sandbox, [{
+				name: [sModuleName],
+				stub: "otherViewExtension"
+			}]);
+			const oChange = createCodeExtChangeContent({
+				moduleName: sModuleName,
+				content: {
+					codeRef: "otherViewExtension.js",
+					viewId: "otherViewId"
+				}
+			});
+			FlQUnitUtils.initializeFlexStateWithData(sandbox, sReference, { changes: [oChange] });
+			sandbox.stub(Utils, "getAppComponentForControl").returns(oAppComponent);
+			sandbox.stub(ManifestUtils, "getFlexReferenceForControl").returns(sReference);
+
+			const aCodeExtensions = await this.oExtensionProvider.getControllerExtensions(sControllerName, "myId", true, "myViewId");
+			assert.strictEqual(aCodeExtensions.length, 0, "no extensions should be returned for non-matching viewId");
+		});
+
+		QUnit.test("Given multiple Controller Extensions with mixed viewIds and sViewId parameter", async function(assert) {
+			const sBaseModuleName = "sap/ui/fl/qunit/ControllerExtension/1.0.0/codeExtensions/baseExtension";
+			const sBaseModuleName2 = "sap/ui/fl/qunit/ControllerExtension/1.0.0/codeExtensions/baseExtension2";
+			const sViewSpecificModuleName = "sap/ui/fl/qunit/ControllerExtension/1.0.0/codeExtensions/viewSpecificExtension";
+			const sOtherViewModuleName = "sap/ui/fl/qunit/ControllerExtension/1.0.0/codeExtensions/otherViewExtension";
+
+			FlQUnitUtils.stubSapUiRequire(sandbox, [
+				{
+					name: [sBaseModuleName, sBaseModuleName2, sViewSpecificModuleName],
+					stub: ["baseExtension", "baseExtension2", "viewSpecificExtension"]
+				}
+			]);
+
+			const oBaseChange = createCodeExtChangeContent({
+				fileName: "baseChange",
+				moduleName: sBaseModuleName,
+				content: {
+					codeRef: "baseExtension.js"
+					// Note: no viewId in content
+				}
+			});
+
+			const oBaseChange2 = createCodeExtChangeContent({
+				fileName: "baseChange2",
+				moduleName: sBaseModuleName2,
+				content: {
+					codeRef: "baseExtension2.js"
+					// Note: no viewId in content
+				}
+			});
+
+			const oViewSpecificChange = createCodeExtChangeContent({
+				fileName: "viewSpecificChange",
+				moduleName: sViewSpecificModuleName,
+				content: {
+					codeRef: "viewSpecificExtension.js",
+					viewId: "myViewId"
+				}
+			});
+
+			const oOtherViewChange = createCodeExtChangeContent({
+				fileName: "otherViewChange",
+				moduleName: sOtherViewModuleName,
+				content: {
+					codeRef: "otherViewExtension.js",
+					viewId: "otherViewId"
+				}
+			});
+
+			FlQUnitUtils.initializeFlexStateWithData(sandbox, sReference, {
+				changes: [oBaseChange, oBaseChange2, oViewSpecificChange, oOtherViewChange]
+			});
+			sandbox.stub(Utils, "getAppComponentForControl").returns(oAppComponent);
+			sandbox.stub(ManifestUtils, "getFlexReferenceForControl").returns(sReference);
+
+			const aCodeExtensions = await this.oExtensionProvider.getControllerExtensions(sControllerName, "myId", true, "myViewId");
+			assert.strictEqual(aCodeExtensions.length, 3, "three extensions should be returned - both for base and one view-specific");
+			assert.strictEqual(aCodeExtensions[0], "baseExtension", "the base extension should be first");
+			assert.strictEqual(aCodeExtensions[1], "baseExtension2", "the second base extension should be second");
+			assert.strictEqual(aCodeExtensions[2], "viewSpecificExtension", "the view-specific extension should be third");
+		});
 	});
 
 	QUnit.done(function() {

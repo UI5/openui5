@@ -13,6 +13,8 @@ sap.ui.define([
 
 	/**
 	 * Returns an array with all UI Changes for the application.
+	 * WARNING: No deep clone - Returns original object references to ensure that prototype methods
+	 * stay intact. Do not mutate.
 	 *
 	 * @namespace sap.ui.fl.support._internal.getAllUIChanges
 	 * @since 1.121

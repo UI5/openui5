@@ -27,7 +27,7 @@ sap.ui.define([
 
 	QUnit.module("Get contexts", {
 		before: function() {
-			this.oMockServer = TableQUnitUtils.startMockServer(200);
+			this.oMockServer = TableQUnitUtils.startMockServer(500);
 			this.oDataModel = TableQUnitUtils.createODataModel();
 			this.oGetContextsSpy = sinon.spy(Table.prototype, "_getContexts");
 			this.iOriginalDeviceHeight = Device.resize.height;
@@ -115,10 +115,12 @@ sap.ui.define([
 	});
 
 	QUnit.test("Initialization; Variable row heights", function(assert) {
+		window.breaky = true;
 		this.createTable({_bVariableRowHeightEnabled: true});
 
 		// refreshRows, auto rerender, updateRows
 		return this.oTable.qunit.whenRenderingFinished().then(() => {
+			window.breaky = false;
 			assert.equal(this.oGetContextsSpy.callCount, 3, "Call count of method to get contexts");
 			sinon.assert.calledWithExactly(this.oGetContextsSpy.getCall(0), 0, iComputedRequestLength, 100);
 			sinon.assert.calledWithExactly(this.oGetContextsSpy.getCall(1), 0, iComputedRequestLength, 100);

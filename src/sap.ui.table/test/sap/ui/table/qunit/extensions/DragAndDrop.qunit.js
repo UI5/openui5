@@ -172,7 +172,7 @@ sap.ui.define([
 		window.pageYOffset = iOriginalPageYOffset;
 	});
 
-	QUnit.test("Scrolling & Indicator size - dragover", function(assert) {
+	QUnit.test("Scrolling & Indicator size - dragover", async function(assert) {
 		const oFakeIndicator = jQuery("<div></div>").attr("style", "width: 0; height: 0; left: 0; right: 0");
 		const oFakeEvent = {
 			dragSession: {
@@ -202,36 +202,34 @@ sap.ui.define([
 			}
 		};
 		const iThreshold = 50;
-		const that = this;
 
-		function testScrolling(oEvent, iPageY, iPageX, iExpectedScrollPosition) {
-			oEvent.pageY = iPageY;
-			oEvent.pageX = iPageX;
+		const testScrolling = async (iPageY, iPageX, iExpectedScrollPosition, bExpectScrolling = true) => {
+			oFakeEvent.pageY = iPageY;
+			oFakeEvent.pageX = iPageX;
 
 			// Multiple dragover events must not increase the scroll speed.
-			that.oDragAndDropExtension._ExtensionDelegate.ondragover.call(that.oTable, oFakeEvent);
-			that.oDragAndDropExtension._ExtensionDelegate.ondragover.call(that.oTable, oFakeEvent);
-			that.oDragAndDropExtension._ExtensionDelegate.ondragover.call(that.oTable, oFakeEvent);
-			that.oDragAndDropExtension._ExtensionDelegate.ondragover.call(that.oTable, oFakeEvent);
+			this.oDragAndDropExtension._ExtensionDelegate.ondragover.call(this.oTable, oFakeEvent);
+			this.oDragAndDropExtension._ExtensionDelegate.ondragover.call(this.oTable, oFakeEvent);
+			this.oDragAndDropExtension._ExtensionDelegate.ondragover.call(this.oTable, oFakeEvent);
+			this.oDragAndDropExtension._ExtensionDelegate.ondragover.call(this.oTable, oFakeEvent);
 
-			return Promise.race([
-				that.oTable.qunit.whenVSbScrolled(),
-				new Promise(function(resolve) {
-					setTimeout(resolve, 500);
-				})
-			]).then(that.oTable.qunit.whenRenderingFinished).then(function() {
-				const oScrollExtension = that.oTable._getScrollExtension();
-				const oVSb = oScrollExtension.getVerticalScrollbar();
-				const oHSb = oScrollExtension.getHorizontalScrollbar();
-				assert.strictEqual(oVSb.scrollTop, iExpectedScrollPosition, "The vertical scroll position is correct: " + iExpectedScrollPosition);
-				assert.strictEqual(oHSb.scrollLeft, iExpectedScrollPosition, "The horizontal scroll position is correct: " + iExpectedScrollPosition);
-			});
-		}
+			if (bExpectScrolling) {
+				await this.oTable.qunit.whenVSbScrolled();
+			} else {
+				await TableQUnitUtils.wait(500);
+			}
 
-		function testIndicatorSize(oEvent, iExpectedWidth, iExpectedHeight, iExpectedLeft, iExpectedRight) {
-			that.oDragAndDropExtension._ExtensionDelegate.ondragover.call(that.oTable, oEvent);
+			const oScrollExtension = this.oTable._getScrollExtension();
+			const oVSb = oScrollExtension.getVerticalScrollbar();
+			const oHSb = oScrollExtension.getHorizontalScrollbar();
+			assert.strictEqual(oVSb.scrollTop, iExpectedScrollPosition, "Vertical scroll position: " + iExpectedScrollPosition);
+			assert.strictEqual(oHSb.scrollLeft, iExpectedScrollPosition, "Horizontal scroll position: " + iExpectedScrollPosition);
+		};
 
-			const oIndicator = oEvent.dragSession.getIndicator();
+		const testIndicatorSize = (iExpectedWidth, iExpectedHeight, iExpectedLeft, iExpectedRight) => {
+			this.oDragAndDropExtension._ExtensionDelegate.ondragover.call(this.oTable, oFakeEvent);
+
+			const oIndicator = oFakeEvent.dragSession.getIndicator();
 
 			assert.strictEqual(oIndicator.style.width, iExpectedWidth + "px",
 				"The style \"width\" of the indicator has the expected value");
@@ -241,12 +239,12 @@ sap.ui.define([
 				"The style \"left\" of the indicator has the expected value");
 			assert.strictEqual(oIndicator.style.right, iExpectedRight + "px",
 				"The style \"right\" of the indicator has the expected value");
-		}
+		};
 
 		oFakeEvent.dragSession.setComplexData("sap.ui.table-" + this.oTable.getId(), {
 			verticalScrollEdge: {
-				top: 600,
-				bottom: 300
+				top: 300,
+				bottom: 600
 			},
 			horizontalScrollEdge: {
 				left: 300,
@@ -255,52 +253,47 @@ sap.ui.define([
 		});
 
 		// Scroll down and to the right simultaneously.
-		return testScrolling(oFakeEvent, 300 - iThreshold - 1, 600 - iThreshold - 1, 0).then(function() {
-			return testScrolling(oFakeEvent, 300, 600, 25);
-		}).then(function() {
-			return testScrolling(oFakeEvent, 300 + iThreshold, 600 + iThreshold, 75);
-		}).then(function() {
-			return testScrolling(oFakeEvent, 300 + iThreshold + 1, 600 + iThreshold + 1, 75);
+		await testScrolling(600 - iThreshold - 1, 600 - iThreshold - 1, 0, false);
+		await testScrolling(600 - iThreshold, 600 - iThreshold, 2); // Minimum scroll distance is 2
+		await testScrolling(600, 600, 27);
+		await testScrolling(600 + iThreshold, 600 + iThreshold, 77);
+		await testScrolling(600 + iThreshold + 1, 600 + iThreshold + 1, 77, false);
+		await testScrolling(600 + iThreshold, 600 + iThreshold, 127);
 
-			// Scroll up and to the left simultaneously.
-		}).then(function() {
-			return testScrolling(oFakeEvent, 600 + iThreshold + 1, 300 + iThreshold + 1, 75);
-		}).then(function() {
-			return testScrolling(oFakeEvent, 600 + iThreshold, 300 + iThreshold, 73);
-		}).then(function() {
-			return testScrolling(oFakeEvent, 600, 300, 48);
-		}).then(function() {
-			return testScrolling(oFakeEvent, 600 - iThreshold - 1, 300 - iThreshold - 1, 48);
-		}).then(function() {
-			return testScrolling(oFakeEvent, 600 - iThreshold, 300 - iThreshold, 0);
-		}).then(function() {
-			// If the drop target is the table, no scrolling should be performed.
-			oFakeEvent.dragSession.dropControl = that.oTable;
-			return testScrolling(oFakeEvent, 300 - iThreshold, 600 - iThreshold, 0);
-		}).then(function() {
-			/* Resize and reposition the indicator */
+		// Scroll up and to the left simultaneously.
+		await testScrolling(300 + iThreshold, 300 + iThreshold, 125); // Minimum scroll distance is 2
+		await testScrolling(300, 300, 100);
+		await testScrolling(300 - iThreshold, 300 - iThreshold, 50);
+		await testScrolling(300 - iThreshold - 1, 300 - iThreshold - 1, 50, false);
+		await testScrolling(300 - iThreshold, 300 - iThreshold, 0);
 
-			// If there is no drop target, there is no need to modify the indicator.
-			oFakeEvent.dragSession.dropControl = null;
-			oFakeEvent.dragSession.setIndicatorConfig({
-				width: 500
-			});
-			testIndicatorSize(oFakeEvent, 0, 0, 0, 0);
+		// If the drop target is the table, no scrolling should be performed.
+		oFakeEvent.dragSession.dropControl = this.oTable;
+		await testScrolling(600 - iThreshold, 600 - iThreshold, 0, false);
 
-			// If there is an indicator size in the drag session, the indicator should be modified accordingly.
-			oFakeEvent.dragSession.dropControl = "a control which needs indicator modification";
-			oFakeEvent.dragSession.setIndicatorConfig({
-				width: 500,
-				height: 50,
-				left: 33,
-				right: 222
-			});
-			testIndicatorSize(oFakeEvent, 500, 50, 33, 222);
+		/* Resize and reposition the indicator */
 
-			// Not all controls need indicator modifications, so there might be no indicator size. In this case the indicator should not be modified.
-			oFakeEvent.dragSession.setIndicatorConfig();
-			testIndicatorSize(oFakeEvent, 500, 50, 33, 222);
+		// If there is no drop target, there is no need to modify the indicator.
+		oFakeEvent.dragSession.dropControl = null;
+		oFakeEvent.dragSession.setIndicatorConfig({
+			width: 500
 		});
+		testIndicatorSize(0, 0, 0, 0);
+
+		// If there is an indicator size in the drag session, the indicator should be modified accordingly.
+		oFakeEvent.dragSession.dropControl = "a control which needs indicator modification";
+		oFakeEvent.dragSession.setIndicatorConfig({
+			width: 500,
+			height: 50,
+			left: 33,
+			right: 222
+		});
+		testIndicatorSize(500, 50, 33, 222);
+
+		// Not all controls need indicator modifications, so there might be no indicator size. In this case the indicator should not be modified.
+		oFakeEvent.dragSession.setIndicatorConfig();
+		testIndicatorSize(500, 50, 33, 222);
+		return Promise.resolve();
 	});
 
 	QUnit.module("Rows", {

@@ -54,10 +54,11 @@ sap.ui.define([
 				 * @param {string} sCodeRef - Name of the file, without path, with the extension <code>.js</code>. Must comply to UI5 module naming convention.
 				 * 							Has to be unique and must not conflict with other already defined modules.
 				 * @param {string} sViewId - ID of the view whose controller should be extended
+				 * @param {boolean} bIncludeViewId - Whether the change should include the view ID in the selector - for instance-specific controller extensions
 				 * @return {object} Definition of the newly created change
 				 * @public
 				 */
-				add(sCodeRef, sViewId) {
+				add(sCodeRef, sViewId, bIncludeViewId) {
 					var oFlexSettings = oRta.getFlexSettings();
 					if (!oFlexSettings.developerMode) {
 						throw DtUtil.createError(
@@ -95,6 +96,10 @@ sap.ui.define([
 						moduleName: sModuleName,
 						generator: "rta.service.ControllerExtension"
 					};
+
+					if (bIncludeViewId) {
+						oChangeSpecificData.viewId = sViewId;
+					}
 
 					var oPreparedChange = ChangesWriteAPI.create({ changeSpecificData: oChangeSpecificData, selector: oAppComponent });
 					PersistenceWriteAPI.add({ change: oPreparedChange, selector: oAppComponent });

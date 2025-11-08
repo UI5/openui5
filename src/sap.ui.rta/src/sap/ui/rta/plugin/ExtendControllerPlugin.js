@@ -128,6 +128,8 @@ sap.ui.define([
 
 			const oElementOverlay = aElementOverlays[0];
 
+			// If the data returned from the handler has the property instanceSpecific = true,
+			// it refers to an instance-specific controller extension. In this case, the view ID will be added to the change content.
 			const mExtendControllerData = await fnControllerHandler(oElementOverlay);
 
 			const oExtendControllerCommand = await this.getCommandFactory().getCommandFor(

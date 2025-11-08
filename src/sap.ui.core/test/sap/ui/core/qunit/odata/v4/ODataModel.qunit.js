@@ -101,8 +101,10 @@ sap.ui.define([
 				oMetaModel,
 				oModel;
 
+			this.mock(_Helper).expects("getUrlParameters").withExactArgs(undefined)
+				.returns("~mUriParameters~");
 			this.mock(ODataModel.prototype).expects("buildQueryOptions")
-				.withExactArgs({}, false, true).returns({"sap-client" : "279"});
+				.withExactArgs("~mUriParameters~", false, true).returns({"sap-client" : "279"});
 			this.mock(Supportability).expects("isStatisticsEnabled")
 				.withExactArgs().returns(bStatistics);
 			const oExpectation = this.mock(_MetadataRequestor).expects("create")
@@ -153,8 +155,10 @@ sap.ui.define([
 				"sap-context-token" : "n/a"
 			};
 
+		this.mock(_Helper).expects("getUrlParameters").withExactArgs(undefined)
+			.returns("~mUriParameters~");
 		this.mock(ODataModel.prototype).expects("buildQueryOptions")
-			.withExactArgs({}, false, true).returns(mUriParameters);
+			.withExactArgs("~mUriParameters~", false, true).returns(mUriParameters);
 		this.mock(_MetadataRequestor).expects("create")
 			.withExactArgs({"Accept-Language" : "ab-CD"}, "4.0", true, {
 				"sap-client" : "279",
@@ -254,8 +258,10 @@ sap.ui.define([
 		var oModel,
 			mUriParameters = {};
 
+		this.mock(_Helper).expects("getUrlParameters").withExactArgs("sap-client=111")
+			.returns("~mUriParameters~");
 		this.mock(ODataModel.prototype).expects("buildQueryOptions")
-			.withExactArgs({"sap-client" : "111"}, false, true)
+			.withExactArgs("~mUriParameters~", false, true)
 			.returns(mUriParameters);
 
 		// code under test

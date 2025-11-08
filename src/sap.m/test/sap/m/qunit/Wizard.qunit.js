@@ -7,6 +7,7 @@ sap.ui.define([
 	"sap/m/WizardStep",
 	"sap/m/Button",
 	"sap/m/Input",
+	"sap/m/Toolbar",
 	"sap/ui/base/ObjectPool",
 	"sap/m/library",
 	"sap/ui/core/Lib",
@@ -14,7 +15,7 @@ sap.ui.define([
 	"sap/ui/qunit/QUnitUtils",
 	"sap/ui/events/KeyCodes",
 	"sap/ui/thirdparty/jquery"
-], function(Log, DesignTime, nextUIUpdate, Wizard, WizardStep, Button, Input, ObjectPool, library, Library, coreLibrary, qutils, KeyCodes, jQuery) {
+], function(Log, DesignTime, nextUIUpdate, Wizard, WizardStep, Button, Input, Toolbar, ObjectPool, library, Library, coreLibrary, qutils, KeyCodes, jQuery) {
 	"use strict";
 
 	// shortcut for sap.ui.core.TitleLevel
@@ -143,7 +144,17 @@ sap.ui.define([
 			]
 		});
 
+		// Create a fastnavgroup element outside the wizard for testing external navigation
+		const oExternalToolbar = new Toolbar("external-toolbar", {
+			content: [
+				new Button({ text: "External Button 1" }),
+				new Button({ text: "External Button 2" })
+			]
+		});
+
+		// Place external toolbar before wizard to test external navigation
 		oWizard.placeAt("qunit-fixture");
+		oExternalToolbar.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
 		this.clock = sinon.useFakeTimers();
@@ -151,6 +162,7 @@ sap.ui.define([
 		let oNextButton = oWizard._getNextButton();
 		const oButtonStep2 = oWizard.getSteps()[1].getContent()[0];
 		const oInputStep2 = oWizard.getSteps()[1].getContent()[1];
+		const oExternalButton1 = oExternalToolbar.getContent()[0];
 
 		// act
 		oNextButton.focus();
@@ -180,9 +192,22 @@ sap.ui.define([
 		qutils.triggerKeydown(oButtonStep2.getDomRef(), KeyCodes.F6);
 
 		// assert
-		assert.strictEqual(document.activeElement, oWizard._getNextButton().getFocusDomRef(), "Focus should move to the Next Step button after pressing F6 from the current interactive element.");
+		assert.strictEqual(document.activeElement, oNextButton.getFocusDomRef(), "Focus should move to the Next Step button after pressing F6 from the current interactive element.");
+
+		// act - test F6 from external fastnavgroup back to wizard
+		qutils.triggerKeydown(oNextButton.getDomRef(), KeyCodes.F6);
+
+		// assert
+		assert.strictEqual(document.activeElement, oExternalButton1.getFocusDomRef(), "When F6 is pressed from the Next button, focus should move to the external fastnavgroup (toolbar).");
+
+		// act - test Shift+F6 from progress navigator to external fastnavgroup
+		qutils.triggerKeydown(oWizard.getDomRef(), KeyCodes.F6, true, false, false);
+
+		// assert
+		assert.strictEqual(document.activeElement, oNextButton.getFocusDomRef(), "When Shift+F6 is pressed from external toolbar, focus should move to the Next button in the wizard.");
 
 		oWizard.destroy();
+		oExternalToolbar.destroy();
 		runAllTimersAndRestore(this.clock);
 	});
 

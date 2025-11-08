@@ -10,13 +10,12 @@ sap.ui.define([
 	"./WizardStepRenderer",
 	"./Button",
 	"sap/ui/events/F6Navigation",
-	"sap/ui/thirdparty/jquery",
 	"./TitlePropagationSupport",
 	"sap/base/Log",
 	"sap/ui/core/Lib",
 	"sap/ui/core/library"
 ],
-	function(library, Control, Element, InvisibleText, WizardStepRenderer, Button, F6Navigation, jQuery, TitlePropagationSupport, Log, Library, coreLibrary) {
+	function(library, Control, Element, InvisibleText, WizardStepRenderer, Button, F6Navigation, TitlePropagationSupport, Log, Library, coreLibrary) {
 
 	"use strict";
 
@@ -157,6 +156,7 @@ sap.ui.define([
 			press: this._complete.bind(this)
 		}).addStyleClass("sapMWizardNextButton");
 
+		this._oNextButton.data("sap-ui-fastnavgroup", "true", true);
 		this.setAggregation("_nextButton", this._oNextButton);
 	};
 
@@ -217,24 +217,6 @@ sap.ui.define([
 		}
 
 		return this;
-	};
-
-	/**
-	 * Handler for F6 Navigation.
-	 *
-	 * @param {Object} oEvent - The event object
-	 */
-	WizardStep.prototype.onsapskipforward = function(oEvent) {
-		oEvent.preventDefault();
-		const oEventF6 = new jQuery.Event("keydown");
-		oEventF6.target = oEvent.target;
-		oEventF6.key = 'F6';
-
-		if (!this._oNextButton.hasStyleClass("sapMWizardNextButtonHidden")) {
-			this._oNextButton.focus();
-		} else {
-			F6Navigation.handleF6GroupNavigation(oEventF6);
-		}
 	};
 
 	/**

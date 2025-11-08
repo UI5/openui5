@@ -39,6 +39,9 @@ sap.ui.define([
 				},
 				viewId: {
 					type: "string"
+				},
+				instanceSpecific: {
+					type: "boolean"
 				}
 			},
 			associations: {},
@@ -65,6 +68,10 @@ sap.ui.define([
 			moduleName: sModuleName,
 			generator: "sap.ui.rta.command.ExtendControllerCommand"
 		};
+
+		if (this.getInstanceSpecific()) {
+			oChangeSpecificData.viewId = sViewId;
+		}
 
 		return ChangesWriteAPI.create({
 			changeSpecificData: oChangeSpecificData,

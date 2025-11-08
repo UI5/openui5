@@ -215,11 +215,59 @@ sap.ui.define([
 			this.oExtendControllerPlugin.attachEventOnce("elementModified", function(oEvent) {
 				const oCommand = oEvent.getParameter("command");
 				assert.ok(oCommand instanceof ExtendControllerCommand, "then the command is created");
-				assert.strictEqual(oCommand.getSelector().id, "myView--panel", "then the viewId is set correctly");
+				assert.strictEqual(oCommand.getSelector().id, "myView--panel", "then the selector is set correctly");
 				assert.strictEqual(
 					oCommand.getPreparedChange().mProperties.content.codeRef,
 					"TestCodeRef",
 					"then the codeRef is set correctly"
+				);
+				assert.notOk(
+					oCommand.getPreparedChange().mProperties.content.viewId,
+					"then the viewId is not set in the change content"
+				);
+				assert.strictEqual(
+					oCommand.getPreparedChange().mProperties.flexObjectMetadata.moduleName,
+					"testComponent/changes/TestCodeRef",
+					"then the moduleName is set correctly"
+				);
+
+				fnDone();
+			});
+
+			this.oExtendControllerPlugin.handler([this.oPanelOverlay], mPropertyBag);
+		});
+
+		QUnit.test("When the handler function is called and the fragment handler and it returns instanceSpecific = true", function(assert) {
+			const fnDone = assert.async();
+
+			const mPropertyBag = {
+				handlerFunction: (...aArgs) => {
+					assert.deepEqual(
+						aArgs[0],
+						this.oPanelOverlay,
+						"then the overlay is passed to the fragment handler"
+					);
+					return {
+						viewId: "myView",
+						codeRef: "TestCodeRef",
+						instanceSpecific: true
+					};
+				}
+			};
+
+			this.oExtendControllerPlugin.attachEventOnce("elementModified", function(oEvent) {
+				const oCommand = oEvent.getParameter("command");
+				assert.ok(oCommand instanceof ExtendControllerCommand, "then the command is created");
+				assert.strictEqual(oCommand.getSelector().id, "myView--panel", "then the selector is set correctly");
+				assert.strictEqual(
+					oCommand.getPreparedChange().mProperties.content.codeRef,
+					"TestCodeRef",
+					"then the codeRef is set correctly"
+				);
+				assert.strictEqual(
+					oCommand.getPreparedChange().mProperties.content.viewId,
+					"myView",
+					"then the viewId is set correctly in the change content"
 				);
 				assert.strictEqual(
 					oCommand.getPreparedChange().mProperties.flexObjectMetadata.moduleName,
