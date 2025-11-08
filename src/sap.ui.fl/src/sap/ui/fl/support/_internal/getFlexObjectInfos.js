@@ -19,6 +19,8 @@ sap.ui.define([
 
 	/**
 	 * Returns an array with several FlexObject infos for the application.
+	 * WARNING: No deep clone - Returns original object references to ensure that prototype methods
+	 * stay intact. Do not mutate.
 	 *
 	 * @namespace sap.ui.fl.support._internal.getFlexObjectInfos
 	 * @since 1.128

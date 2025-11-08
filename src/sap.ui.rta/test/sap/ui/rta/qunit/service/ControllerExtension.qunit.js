@@ -159,7 +159,11 @@ sap.ui.define([
 				assert.ok(false, "should never go here");
 			})
 			.catch(function(oError) {
-				assert.equal(oError.message, "code extensions can only be created in developer mode", "then ControllerExtension.add throws an error");
+				assert.equal(
+					oError.message,
+					"code extensions can only be created in developer mode",
+					"then ControllerExtension.add throws an error"
+				);
 				assert.equal(this.iCreateChangeCounter, 0, "and ChangesWriteAPI.create was not called");
 				assert.equal(this.iAddChangeCounter, 0, "and PersistenceWriteAPI.add was not called");
 			}.bind(this));
@@ -171,7 +175,11 @@ sap.ui.define([
 				assert.ok(false, "should never go here");
 			})
 			.catch(function(oError) {
-				assert.equal(oError.message, "can't create controller extension without codeRef", "then ControllerExtension.add throws an error");
+				assert.equal(
+					oError.message,
+					"can't create controller extension without codeRef",
+					"then ControllerExtension.add throws an error"
+				);
 				assert.equal(this.iCreateChangeCounter, 0, "and ChangesWriteAPI.create was not called");
 				assert.equal(this.iAddChangeCounter, 0, "and PersistenceWriteAPI.add was not called");
 			}.bind(this));
@@ -186,6 +194,47 @@ sap.ui.define([
 				assert.equal(oError.message, "codeRef has to end with 'js'", "then ControllerExtension.add throws an error");
 				assert.equal(this.iCreateChangeCounter, 0, "and ChangesWriteAPI.create was not called");
 				assert.equal(this.iAddChangeCounter, 0, "and PersistenceWriteAPI.add was not called");
+			}.bind(this));
+		});
+
+		QUnit.test("with bIncludeViewId = true", function(assert) {
+			sandbox.stub(FlexUtils, "buildLrepRootNamespace").returns("my/namespace/");
+			this.oRta.setFlexSettings({
+				developerMode: true,
+				scenario: "scenario"
+			});
+			return this.oControllerExtension.add("coding/foo.js", this.oView.getId(), true).then(function(oDefinition) {
+				assert.deepEqual(oDefinition, { definition: "definition" }, "the function returns the definition of the change");
+				assert.strictEqual(this.iCreateChangeCounter, 1, "and ChangesWriteAPI.create was called once");
+				assert.strictEqual(this.iAddChangeCounter, 1, "and PersistenceWriteAPI.add was called once");
+				assert.strictEqual(this.oCreateChangeParameter.changeType, "codeExt", "the changeType was set correctly");
+				assert.strictEqual(
+					this.oCreateChangeParameter.controllerName,
+					"module:testdata/TestController.controller",
+					"the controllerName was set correctly"
+				);
+				assert.strictEqual(this.oCreateChangeParameter.codeRef, "coding/foo.js", "the codeRef was set correctly");
+				assert.strictEqual(
+					this.oCreateChangeParameter.moduleName,
+					"sap/ui/rta/service/controllerExtension/changes/coding/foo",
+					"the moduleName was set correctly"
+				);
+				assert.strictEqual(this.oCreateChangeParameter.namespace, "my/namespace/changes/", "the namespace was set correctly");
+				assert.strictEqual(
+					this.oCreateChangeParameter.reference,
+					"sap.ui.rta.service.controllerExtension",
+					"the reference was set correctly"
+				);
+				assert.strictEqual(
+					this.oCreateChangeParameter.generator,
+					"rta.service.ControllerExtension",
+					"the generator was set correctly"
+				);
+				assert.strictEqual(
+					this.oCreateChangeParameter.viewId,
+					this.oView.getId(),
+					"the viewId was set correctly when bIncludeViewId is true"
+				);
 			}.bind(this));
 		});
 	});
@@ -295,7 +344,11 @@ sap.ui.define([
 				assert.ok(false, "should never go here");
 			})
 			.catch(function(oError) {
-				assert.equal(oError.message, "no overlay found for the given view ID", "then ControllerExtension.getTemplate throws an error");
+				assert.equal(
+					oError.message,
+					"no overlay found for the given view ID",
+					"then ControllerExtension.getTemplate throws an error"
+				);
 			});
 		});
 

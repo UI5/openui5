@@ -12,6 +12,8 @@ sap.ui.define([
 	/**
 	 * Provides an object with the changes for the current application as well as
 	 * further information. I.e. if the changes were applied and their dependencies.
+	 * WARNING: No deep clone - Returns original object references to ensure that prototype methods
+	 * stay intact. Do not mutate.
 	 *
 	 * @namespace sap.ui.fl.support._internal.getChangeDependencies
 	 * @since 1.98

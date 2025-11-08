@@ -59,12 +59,12 @@ sap.ui.define([
 		scrollVertically: TableUtils.throttle(function(oTable, bDown, iBase, iPercentage) {
 			const oVerticalScrollbar = oTable._getScrollExtension().getVerticalScrollbar();
 			oVerticalScrollbar.scrollTop += this.calculateScrollDistance(iBase, iPercentage) * (bDown ? 1 : -1);
-		}, 50),
+		}, 50, {leading: false}),
 
 		scrollHorizontally: TableUtils.throttle(function(oTable, bRight, iBase, iPercentage) {
 			const oHorizontalScrollbar = oTable._getScrollExtension().getHorizontalScrollbar();
 			oHorizontalScrollbar.scrollLeft += this.calculateScrollDistance(iBase, iPercentage) * (bRight ? 1 : -1);
-		}, 50),
+		}, 50, {leading: false}),
 
 		calculateScrollDistance: function(iBase, iPercentage) {
 			const iMinDistance = 2;

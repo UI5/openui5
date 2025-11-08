@@ -39,6 +39,9 @@ sap.ui.define([
 				if (oStubInformation.error) {
 					fnError(oStubInformation.stub);
 				} else {
+					if (Array.isArray(oStubInformation.stub)) {
+						fnSuccess(...oStubInformation.stub);
+					}
 					fnSuccess(oStubInformation.stub);
 				}
 			});

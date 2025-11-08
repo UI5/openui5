@@ -79,11 +79,19 @@ sap.ui.define([
 			oFlexData.appVersion = oAppComponent.getManifestObject().getEntry("/sap.app/applicationVersion/version");
 			oFlexData.appACH = oAppComponent.getManifestObject().getEntry("/sap.app/ach");
 
-			[oFlexData.flexSettings, oFlexData.changeDependencies, oFlexData.flexObjectInfos] = await Promise.all([
+			const aCollectedFlexData = await Promise.all([
 				SupportAPI.getFlexSettings(),
 				SupportAPI.getChangeDependencies(),
 				SupportAPI.getFlexObjectInfos()
 			]);
+			// Clone to ensure the original objects are not modified during anonymization
+			// Use JSON instead of deepClone as these objects are not plain and still
+			// have a prototype
+			[
+				oFlexData.flexSettings,
+				oFlexData.changeDependencies,
+				oFlexData.flexObjectInfos
+			] = JSON.parse(JSON.stringify((aCollectedFlexData)));
 
 			if (bAnonymizeUsers) {
 				anonymizeFlexibilityData(oFlexData);

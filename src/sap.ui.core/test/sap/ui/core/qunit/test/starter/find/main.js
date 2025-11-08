@@ -10,30 +10,58 @@
 sap.ui.define([
 	"sap/m/App",
 	"sap/m/Bar",
+	"sap/m/Button",
 	"sap/m/HBox",
 	"sap/m/Label",
 	"sap/m/Link",
+	"sap/m/MessageToast",
 	"sap/m/Page",
 	"sap/m/SearchField",
 	"sap/m/SegmentedButton",
 	"sap/m/SegmentedButtonItem",
 	"sap/m/Text",
-	"sap/m/Toolbar",
 	"sap/ui/core/Core",
 	"sap/ui/core/Element",
+	"sap/ui/core/Lib",
+	"sap/ui/dom/includeStylesheet",
 	"sap/ui/table/Table",
 	"sap/ui/table/Column",
 	"sap/ui/table/rowmodes/Auto",
 	"sap/ui/model/Filter",
 	"sap/ui/model/json/JSONModel",
-	"sap/base/Log",
-	"sap/ui/dom/includeStylesheet",
-	"sap/ui/util/Storage",
 	"sap/ui/test/starter/_utils",
+	"sap/ui/util/Storage",
 	"require",
 	"./discovery",
 	"./filter"
-], function(App, Bar, HBox, Label, Link, Page, SearchField, SegmentedButton, SegmentedButtonItem, Text, Toolbar, Core, Element, Table, Column, AutoRowMode, Filter, JSONModel, Log, includeStylesheet, Storage, _utils, require, discovery, makeFilterFunction) {
+], function(
+	App,
+	Bar,
+	Button,
+	HBox,
+	Label,
+	Link,
+	MessageToast,
+	Page,
+	SearchField,
+	SegmentedButton,
+	SegmentedButtonItem,
+	Text,
+	Core,
+	Element,
+	Lib,
+	includeStylesheet,
+	Table,
+	Column,
+	AutoRowMode,
+	Filter,
+	JSONModel,
+	_utils,
+	Storage,
+	require,
+	discovery,
+	makeFilterFunction
+) {
 	"use strict";
 
 	function compare(s1,s2) {
@@ -62,7 +90,7 @@ sap.ui.define([
 			let path = removeWebContext(url.pathname);
 
 			search.delete("hidepassed");
-			if ( path.includes("resources/sap/ui/test/starter/Test.qunit.html") && search.has("testsuite") && search.has("test") ) {
+			if ( path.endsWith(".html") && search.has("testsuite") && search.has("test") ) {
 				path = search.get("testsuite") + "/" + search.get("test");
 				search.delete("testsuite");
 				search.delete("test");
@@ -201,7 +229,11 @@ sap.ui.define([
 										enabled: false
 									})
 								]
-							}).addStyleClass("sapUiSmallMarginBottom")
+							}).addStyleClass("sapUiSmallMarginBottom"),
+							new Button({
+								text: "Export",
+								press: exportDataToSpreadsheet
+							})
 						]
 					}),
 					content: [
@@ -297,6 +329,93 @@ sap.ui.define([
 
 	function saveData() {
 		store.put("data", oModel.oData);
+	}
+
+	function exportDataToSpreadsheet() {
+
+		const pExportLibLoaded = Lib.load("sap.ui.export");
+
+		const columnConfig = [
+			{
+				label: 'Page',
+				property: 'fullpage',
+				type: 'string'
+			},
+			{
+				label: 'Module',
+				property: 'module',
+				type: 'string'
+			},
+			{
+				label: 'Testsuite',
+				property: 'testsuite',
+				type: 'string'
+			},
+			{
+				label: 'QUnit',
+				property: 'qunit',
+				type: 'string'
+			},
+			{
+				label: 'Sinon',
+				property: 'sinon',
+				type: 'string'
+			}
+		];
+
+		function extractVersion(key, versions) {
+			if (key === undefined || key === "") {
+				return "unknown";
+			}
+			if (key === null || key === false) {
+				return "-";
+			}
+			while (key in versions && !isFinite(key)) {
+				key = versions[key];
+			}
+			if (isFinite(key)) {
+				return "v" + key;
+			}
+			return "?" + key;
+		}
+
+		const data = oModel.getData().tests.map(
+			(test) => {
+				return {
+					fullpage: makeNameFromURL(test.fullpage),
+					module: formatModules(test.module),
+					testsuite: test.testsuite,
+					qunit: extractVersion(test.qunit?.version, test.qunit?.versions),
+					sinon: extractVersion(test.sinon?.version, test.sinon?.versions)
+				};
+			}
+		);
+
+		const oSettings = {
+			workbook: {
+				columns: columnConfig,
+				context: {
+					title: "Exported Test Collection",
+					sheetName: "Test Collection"
+				}
+			},
+			dataSource: data,
+			fileName: "AllTests.xlsx"
+		};
+
+		pExportLibLoaded.then(() => {
+			sap.ui.require([
+				"sap/ui/export/Spreadsheet"
+			], function(Spreadsheet) {
+				new Spreadsheet(oSettings)
+					.build()
+					.then(function () {
+						MessageToast.show("Spreadsheet export has finished");
+					});
+			});
+		}, (oErr) => {
+			MessageToast.show("Could not load sap.ui.export Lib: " + oErr);
+		});
 	}
 
 	function cleanURL(urlStr) {

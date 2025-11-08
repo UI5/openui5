@@ -76,7 +76,8 @@ sap.ui.define([
 			assert.ok(oPreparedChange, "then the change is prepared");
 			assert.strictEqual(oPreparedChange.getChangeType(), "codeExt", "then the change type is set correctly");
 			assert.strictEqual(oPreparedChange.getLayer(), Layer.CUSTOMER_BASE, "then the layer is set correctly");
-			assert.strictEqual(oPreparedChange.getContent().codeRef, "TestCodeRef", "then the codeRef is set correctly");
+			assert.strictEqual(oPreparedChange.getContent().codeRef, "TestCodeRef", "then the codeRef is set correctly in the content");
+			assert.notOk(oPreparedChange.getContent().viewId, "then the view id is not set in the content");
 			assert.strictEqual(
 				oPreparedChange.getControllerName(),
 				"module:test.controller.TestController",
@@ -92,6 +93,25 @@ sap.ui.define([
 				"apps/someName/changes/",
 				"then the namespace is set correctly"
 			);
+		});
+
+		QUnit.test("when getting an extend controller command for the change with instanceSpecific = true ...", async function(assert) {
+			sandbox.stub(this.oView, "getControllerModuleName").returns("test.controller.TestController");
+
+			const oExtendControllerCommand = await this.oCommandFactory.getCommandFor(
+				this.oButton,
+				"codeExt",
+				{
+					codeRef: "TestCodeRef",
+					viewId: this.sViewId,
+					instanceSpecific: true
+				}
+			);
+
+			assert.ok(oExtendControllerCommand, "then command is available");
+			const oPreparedChange = oExtendControllerCommand.getPreparedChange();
+			assert.ok(oPreparedChange, "then the change is prepared");
+			assert.strictEqual(oPreparedChange.getContent().viewId, this.sViewId, "then the view id is set correctly in the content");
 		});
 
 		QUnit.test("when getting an extend controller command for the change with legacy controller notation on the view...", async function(assert) {

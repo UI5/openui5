@@ -27,6 +27,8 @@ sap.ui.define([
 
 	/**
 	 * Provides an object with the flex Settings.
+	 * WARNING: No deep clone - Returns original object references to ensure that prototype methods
+	 * stay intact. Do not mutate.
 	 *
 	 * @namespace sap.ui.fl.support._internal.getFlexSettings
 	 * @since 1.99

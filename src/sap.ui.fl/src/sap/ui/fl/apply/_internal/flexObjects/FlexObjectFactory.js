@@ -230,6 +230,7 @@ sap.ui.define([
 	 * @param {string} mPropertyBag.reference - See {@link sap.ui.fl.apply._internal.flexObjects.FlexObject.FlexObjectMetadata}
 	 * @param {string} mPropertyBag.moduleName - Location of the extension file
 	 * @param {string} mPropertyBag.generator - See {@link sap.ui.fl.apply._internal.flexObjects.FlexObject.SupportInformation}
+	 * @param {string} [mPropertyBag.viewId] - ID of the view which is used to distinguish instance-specific controller extensions
 	 * @returns {sap.ui.fl.apply._internal.flexObjects.ControllerExtensionChange} Created ControllerExtensionChange instance
 	 */
 	FlexObjectFactory.createControllerExtensionChange = function(mPropertyBag) {
@@ -238,6 +239,10 @@ sap.ui.define([
 		mPropertyBag.content = {
 			codeRef: mPropertyBag.codeRef
 		};
+
+		if (mPropertyBag.viewId) {
+			mPropertyBag.content.viewId = mPropertyBag.viewId;
+		}
 
 		const mProperties = createBasePropertyBag(mPropertyBag);
 		mProperties.flexObjectMetadata.moduleName = mPropertyBag.moduleName;
