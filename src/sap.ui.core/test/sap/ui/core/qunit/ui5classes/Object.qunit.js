@@ -164,7 +164,7 @@ sap.ui.define([
 
 		const FinalClass = BaseObject.extend("FinalClass", {
 			metadata: {
-				final: true
+				"final": true
 			}
 		});
 		assert.ok(FinalClass.extend == null, "Final class does not inherit the static `extend` method");

@@ -2,13 +2,14 @@
 QUnit.config.autostart = false;
 
 globalThis.fnInit = () => {
+	"use strict";
+
 	sap.ui.require([
 		"sap/m/Text",
 		"sap/ui/test/gherkin/qUnitTestHarness",
 		"sap/ui/test/gherkin/opa5TestHarness",
 		"test/testHarnessAmbiguousSteps"
 	], function(Text, qUnitTestHarness, opa5TestHarness, Steps) {
-		"use strict";
 
 		// Test with either qunit or opa5 test harness depending on how page is called
 		var sTestHarness = new URLSearchParams(window.location.search).get("harness");
@@ -33,4 +34,4 @@ globalThis.fnInit = () => {
 		});
 		QUnit.start();
 	});
-}
+};

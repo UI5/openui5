@@ -1,7 +1,7 @@
 /*global QUnit */
 QUnit.config.autostart = false;
 
-function main() {
+globalThis.main = function() {
 	"use strict";
 
 	QUnit.test("After loading sap-ui-core-nojQuery.js ...", function(assert) {
@@ -23,4 +23,4 @@ function main() {
 	});
 
 	QUnit.start();
-}
+};

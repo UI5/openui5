@@ -1,4 +1,4 @@
-/* global QUnit, sinon, globalThis */
+/* global QUnit, sinon */
 
 sap.ui.define([
 	"sap/base/Event",

@@ -1,10 +1,19 @@
 {
+	"_version": "2.0.0",
+	"sap.app": {
+		"id": "cardWithDependencies.innerLibs.lib2",
+		"type": "library",
+		"title": "Library 'cardWithDependencies.innerLibs.lib2'",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
+	},
 	"sap.ui5": {
 		"dependencies": {
 			"libs": {}
 		},
-        "library": {
-            "css": false
-        }
+		"library": {
+			"css": false
+		}
 	}
 }

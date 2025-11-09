@@ -1,4 +1,13 @@
 {
+	"_version": "1.71.0",
+	"sap.app": {
+		"id": "sap.ui.testLibrary",
+		"type": "library",
+		"title": "Library 'sap.ui.testLibrary'",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
+	},
 	"sap.ui5": {
 		"dependencies": {
 			"libs": {}
