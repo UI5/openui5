@@ -1,0 +1,12 @@
+{
+  "1.71.74": {
+    "date": "November 2025",
+    "notes": [
+      {
+        "id": "9ddd8268f7d084ba331391d162754ff1c07fa8b4",
+        "type": "FIX",
+        "text": " sap/ui/thirdparty: bump RequireJS to 2.3.7"
+      }
+    ]
+  }
+}
