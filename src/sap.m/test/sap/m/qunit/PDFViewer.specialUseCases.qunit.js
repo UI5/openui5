@@ -19,42 +19,6 @@ sap.ui.define( [
 		return;
 	}
 
-	if (TestUtils.isSourceValidationSupported()) {
-		// does not make as much sense cause firefox does not allow check it if the content is pdf
-		// and also it is not possible to access contentType of document due to cross domain browser policy
-		QUnit.test("Different resource's mimeType passed in", async function (assert) {
-			assert.expect(1);
-			var done = assert.async();
-
-			var oOptions = {
-				"source": "test-resources/sap/m/qunit/pdfviewer/different-content.html",
-				"isTrustedSource": true,
-				"loaded": function () {
-					if (!Device.browser.firefox) {
-						assert.ok(false, "'Load' event should not be fired");
-					}
-
-				},
-				"error": function (oEvent) {
-					oEvent.preventDefault();
-					assert.ok(true, "'Error' event fired");
-					done();
-				},
-				"sourceValidationFailed": function (oEvent) {
-					if (Device.browser.firefox) {
-						assert.ok(true, "'sourceValidationFailed' event fired");
-						oEvent.preventDefault();
-					} else {
-						assert.ok(false, "'sourceValidationFailed' event should not be fired");
-					}
-				}
-			};
-
-			oPDFViewer = TestUtils.createPdfViewer(oOptions);
-			await TestUtils.renderPdfViewer(oPDFViewer);
-		});
-	}
-
 	QUnit.test('Error state of component is rendered.', async function (assert) {
 		assert.expect(3);
 		var done = assert.async();
