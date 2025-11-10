@@ -1,10 +1,16 @@
 {
+	"_version": "2.0.0",
 	"sap.app": {
 		"type": "card",
-		"id": "card.explorer.extension.sharedFetchExtension"
+		"id": "card.explorer.extension.sharedFetchExtension",
+		"title": "Card 'sharedFetchExtension'",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
 	},
 	"sap.ui5": {
 		"dependencies": {
+			"minUI5Version": "2.0.0",
 			"libs": {
 				"shared.lib": {}
 			}

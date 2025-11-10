@@ -1,4 +1,5 @@
 {
+	"_version": "2.0.0",
 	"sap.app": {
 		"id": "sap.cardsdemo.ui.integration.samples.cards.sac.sample2",
 		"type": "card",
@@ -48,11 +49,11 @@
 			},
 			"options": {
 				"attributes": {
-				  "enableInteraction": true,
-				  "enableUndoRedo": true,
-				  "enableMenus": true,
-				  "showHeader": true,
-				  "showFooter": true
+					"enableInteraction": true,
+					"enableUndoRedo": true,
+					"enableMenus": true,
+					"showHeader": true,
+					"showFooter": true
 				}
 			}
 		}

@@ -1,8 +1,12 @@
 {
-	"_version": "1.8.0",
+	"_version": "2.0.0",
 	"sap.app": {
 		"id": "cardsdemo.navigationService.card3",
-		"type": "card"
+		"type": "card",
+		"title": "Card 'cardsdemo.navigationService.card3'",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
 	},
 	"sap.ui5": {
 		"services": {

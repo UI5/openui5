@@ -1,8 +1,12 @@
 {
-	"_version": "1.8.0",
+	"_version": "2.0.0",
 	"sap.app": {
 		"id": "cardsdemo.navigationService.card4",
-		"type": "card"
+		"type": "card",
+		"title": "Card 'cardsdemo.navigationService.card4'",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
 	},
 	"sap.ui5": {
 		"services": {
@@ -23,80 +27,80 @@
 			}
 		},
 		"content": {
-				"data": {
-					"json": [
-						{
-							"Name": "Comfort Easy",
-							"Category": "PDA & Organizers",
-							"url": "https://www.sap.com",
-							"identifierUrl": "https://www.sap.com/corporate/en/company/innovation.html"
-						},
-						{
-							"Name": "ITelO Vault",
-							"Category": "PDA & Organizers",
-							"url": "https://www.sap.com"
-						},
-						{
-							"Name": "Notebook Professional 15",
-							"Category": "Notebooks",
-							"url": "https://www.sap.com"
-						},
-						{
-							"Name": "Ergo Screen E-I",
-							"Category": "Monitors",
-							"identifierUrl": "https://www.sap.com/corporate/en/company/innovation.html"
-						},
-						{
-							"Name": "Laser Professional Eco",
-							"Category": "Printers",
-							"identifierUrl": "https://www.sap.com/corporate/en/company/innovation.html"
-						}
-					]
-				},
-				"row": {
-					"columns": [
-						{
-							"title": "Name",
-							"value": "{Name}"
-						},
-						{
-							"title": "Category",
-							"value": "{Category}",
-							"actions": [
-								{
-									"type": "Navigation",
-									"enabled": true,
-									"parameters": {
-										"url": "{url}"
-									}
+			"data": {
+				"json": [
+					{
+						"Name": "Comfort Easy",
+						"Category": "PDA & Organizers",
+						"url": "https://www.sap.com",
+						"identifierUrl": "https://www.sap.com/corporate/en/company/innovation.html"
+					},
+					{
+						"Name": "ITelO Vault",
+						"Category": "PDA & Organizers",
+						"url": "https://www.sap.com"
+					},
+					{
+						"Name": "Notebook Professional 15",
+						"Category": "Notebooks",
+						"url": "https://www.sap.com"
+					},
+					{
+						"Name": "Ergo Screen E-I",
+						"Category": "Monitors",
+						"identifierUrl": "https://www.sap.com/corporate/en/company/innovation.html"
+					},
+					{
+						"Name": "Laser Professional Eco",
+						"Category": "Printers",
+						"identifierUrl": "https://www.sap.com/corporate/en/company/innovation.html"
+					}
+				]
+			},
+			"row": {
+				"columns": [
+					{
+						"title": "Name",
+						"value": "{Name}"
+					},
+					{
+						"title": "Category",
+						"value": "{Category}",
+						"actions": [
+							{
+								"type": "Navigation",
+								"enabled": true,
+								"parameters": {
+									"url": "{url}"
 								}
-							]
-						},
-						{
-							"title": "Number",
-							"value": "356865544",
-							"identifier": true,
-							"actions": [
-								{
-									"type": "Navigation",
-									"enabled": "{= ${identifierUrl}}",
-									"parameters": {
-										"url": "{identifierUrl}"
-									}
-								}
-							]
-						}
-					],
-					"actions": [
-						{
-							"type": "Navigation",
-							"service": "IntentBasedNavigation",
-							"parameters": {
-								"url": "{url}"
 							}
+						]
+					},
+					{
+						"title": "Number",
+						"value": "356865544",
+						"identifier": true,
+						"actions": [
+							{
+								"type": "Navigation",
+								"enabled": "{= ${identifierUrl}}",
+								"parameters": {
+									"url": "{identifierUrl}"
+								}
+							}
+						]
+					}
+				],
+				"actions": [
+					{
+						"type": "Navigation",
+						"service": "IntentBasedNavigation",
+						"parameters": {
+							"url": "{url}"
 						}
-					]
-				}
+					}
+				]
+			}
 		}
 	}
 }

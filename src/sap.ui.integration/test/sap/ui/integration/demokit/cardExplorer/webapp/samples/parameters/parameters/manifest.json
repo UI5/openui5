@@ -1,5 +1,5 @@
 {
-	"_version": "1.15.0",
+	"_version": "2.0.0",
 	"sap.app": {
 		"id": "card.explorer.parameters.table.card",
 		"type": "card",
@@ -93,9 +93,9 @@
 				"path": "/value/"
 			},
 			"maxItems": "{parameters>/maxNumberOfOrders/value}",
-
 			"row": {
-				"columns": [{
+				"columns": [
+					{
 						"title": "City",
 						"value": "{ShipCity}",
 						"identifier": true

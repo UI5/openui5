@@ -1,7 +1,12 @@
 {
+	"_version": "2.0.0",
 	"sap.app": {
 		"id": "cardsdemo.object.justImageWithOverlayNotFullWidth",
-		"type": "card"
+		"type": "card",
+		"title": "Card 'justImageWithOverlayNotFullWidth'",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
 	},
 	"sap.card": {
 		"type": "Object",

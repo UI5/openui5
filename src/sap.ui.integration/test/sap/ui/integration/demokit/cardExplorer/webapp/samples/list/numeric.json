@@ -1,5 +1,5 @@
 {
-	"_version": "1.14.0",
+	"_version": "2.0.0",
 	"sap.app": {
 		"id": "card.explorer.numeric.list.card",
 		"type": "card",
@@ -76,7 +76,8 @@
 		},
 		"content": {
 			"data": {
-				"json": [{
+				"json": [
+					{
 						"Name": "Comfort Easy",
 						"Description": "32 GB Digital Assistant with high-resolution color screen",
 						"Sales": "150",

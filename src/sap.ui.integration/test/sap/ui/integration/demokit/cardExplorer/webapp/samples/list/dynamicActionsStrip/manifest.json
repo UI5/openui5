@@ -1,7 +1,12 @@
 {
+	"_version": "2.0.0",
 	"sap.app": {
 		"type": "card",
-		"id": "card.explorer.dynamicActionsStrip"
+		"id": "card.explorer.dynamicActionsStrip",
+		"title": "Card 'dynamicActionsStrip'",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
 	},
 	"sap.card": {
 		"type": "List",

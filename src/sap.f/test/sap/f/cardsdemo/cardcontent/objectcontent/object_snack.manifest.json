@@ -1,6 +1,5 @@
-
 {
-	"_version": "1.15.0",
+	"_version": "2.0.0",
 	"sap.app": {
 		"id": "card.explorer.object.card",
 		"type": "card",
@@ -143,13 +142,15 @@
 							"state": "Information",
 							"type": "Status",
 							"showStateIcon": true,
-							"actions": [{
-								"type": "Navigation",
-								"parameters": {
-									"url": "https://www.sap.com",
-									"target": "_blank"
+							"actions": [
+								{
+									"type": "Navigation",
+									"parameters": {
+										"url": "https://www.sap.com",
+										"target": "_blank"
+									}
 								}
-							}]
+							]
 						},
 						{
 							"value": "Information - custom state icon",

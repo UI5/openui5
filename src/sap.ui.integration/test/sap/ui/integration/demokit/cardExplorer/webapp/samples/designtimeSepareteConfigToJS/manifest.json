@@ -1,5 +1,5 @@
 {
-	"_version": "1.18.0",
+	"_version": "2.0.0",
 	"sap.app": {
 		"id": "sap.ui5.test.editor.listcard.separateconfigtojs",
 		"type": "card",
@@ -21,8 +21,7 @@
 		"extension": "DataExtensionImpl",
 		"configuration": {
 			"editor": "./dt/Configuration",
-			"parameters": {
-			},
+			"parameters": {},
 			"destinations": {
 				"northwind": {
 					"name": "Northwind_V4"

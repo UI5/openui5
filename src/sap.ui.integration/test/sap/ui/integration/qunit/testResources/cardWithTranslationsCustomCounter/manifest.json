@@ -1,8 +1,13 @@
 {
+	"_version": "2.0.0",
 	"sap.app": {
 		"type": "card",
 		"i18n": "i18n/i18n.properties",
-		"id": "test.manifest.translation.card2"
+		"id": "test.manifest.translation.card2",
+		"title": "Card 'test.manifest.translation.card2'",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
 	},
 	"sap.card": {
 		"data": {

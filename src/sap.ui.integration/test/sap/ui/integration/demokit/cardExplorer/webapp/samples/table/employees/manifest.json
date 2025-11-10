@@ -1,5 +1,5 @@
 {
-	"_version": "1.25.0",
+	"_version": "2.0.0",
 	"sap.app": {
 		"id": "card.explorer.sample.table.card.employees",
 		"title": "Employees",
@@ -9,7 +9,7 @@
 		"type": "card"
 	},
 	"sap.ui": {
-		"deviceTypes":{
+		"deviceTypes": {
 			"desktop": true,
 			"phone": true,
 			"tablet": true

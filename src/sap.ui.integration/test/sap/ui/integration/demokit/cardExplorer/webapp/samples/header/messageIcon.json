@@ -1,5 +1,5 @@
 {
-	"_version": "1.79.0",
+	"_version": "2.0.0",
 	"sap.app": {
 		"id": "card.explorer.header.message.icon.card",
 		"type": "card",
@@ -47,7 +47,8 @@
 		},
 		"content": {
 			"data": {
-				"json": [{
+				"json": [
+					{
 						"Name": "Comfort Easy",
 						"Description": "32 GB Digital Assistant with high-resolution color screen",
 						"Highlight": "Error"

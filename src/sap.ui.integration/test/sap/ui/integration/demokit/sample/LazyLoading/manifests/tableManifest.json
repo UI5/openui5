@@ -1,45 +1,48 @@
 {
+	"_version": "2.0.0",
 	"sap.app": {
-		"type": "card"
+		"type": "card",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
 	},
 	"sap.card": {
-	  "data": {
-		"request": {
-		  "url": "sap/ui/integration/sample/LazyLoading/manifests/tableData.json"
-		}
-	  },
-		"type": "Table",
-	  "header": {
-		"type": "Numeric",
 		"data": {
-		  "path": "/header"
+			"request": {
+				"url": "sap/ui/integration/sample/LazyLoading/manifests/tableData.json"
+			}
 		},
-		"title": "Table Card ",
-		"subtitle": "{revenue}",
-		"unitOfMeasurement": "EUR",
-		"mainIndicator": {
-		  "number": "{number}",
-		  "unit": "{unit}",
-		  "trend": "{trend}",
-		  "state": "{state}"
+		"type": "Table",
+		"header": {
+			"type": "Numeric",
+			"data": {
+				"path": "/header"
+			},
+			"title": "Table Card ",
+			"subtitle": "{revenue}",
+			"unitOfMeasurement": "EUR",
+			"mainIndicator": {
+				"number": "{number}",
+				"unit": "{unit}",
+				"trend": "{trend}",
+				"state": "{state}"
+			},
+			"details": "{details}",
+			"sideIndicators": [
+				{
+					"title": "Target",
+					"number": "{target/number}",
+					"unit": "{target/unit}"
+				},
+				{
+					"title": "Deviation",
+					"number": "{deviation/number}",
+					"unit": "%"
+				}
+			]
 		},
-		"details": "{details}",
-		"sideIndicators": [
-		  {
-			"title": "Target",
-			"number": "{target/number}",
-			"unit": "{target/unit}"
-		  },
-		  {
-			"title": "Deviation",
-			"number": "{deviation/number}",
-			"unit": "%"
-		  }
-		]
-	  },
 		"content": {
 			"data": {
-
 				"path": "/content"
 			},
 			"maxItems": 9,

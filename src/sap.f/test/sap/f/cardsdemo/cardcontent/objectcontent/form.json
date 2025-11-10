@@ -1,5 +1,5 @@
-
 {
+	"_version": "2.0.0",
 	"sap.app": {
 		"id": "cardsdemo.object.form.sample1",
 		"type": "card",
@@ -120,7 +120,9 @@
 							"type": "DateRange",
 							"value": {
 								"option": "date",
-								"values": ["2005-10-20"]
+								"values": [
+									"2005-10-20"
+								]
 							}
 						}
 					]

@@ -1,13 +1,19 @@
 {
+	"_version": "2.0.0",
 	"sap.app": {
 		"type": "card",
-		"id": "cardWithSharedExtension2"
+		"id": "cardWithSharedExtension2",
+		"title": "Card 'cardWithSharedExtension2'",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
 	},
 	"sap.ui5": {
 		"dependencies": {
-		  "libs": {
-			"sap/cardsdemo": {}
-		  }
+			"minUI5Version": "2.0.0",
+			"libs": {
+				"sap/cardsdemo": {}
+			}
 		}
 	},
 	"sap.card": {
@@ -27,7 +33,12 @@
 		"data": {
 			"extension": {
 				"method": "getData",
-				"args": ["{parameters>/city/value}", "arg2", "arg3", "arg4"]
+				"args": [
+					"{parameters>/city/value}",
+					"arg2",
+					"arg3",
+					"arg4"
+				]
 			}
 		},
 		"type": "List",

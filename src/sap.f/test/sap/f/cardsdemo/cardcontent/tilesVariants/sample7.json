@@ -1,7 +1,12 @@
 {
+	"_version": "2.0.0",
 	"sap.app": {
 		"id": "cardsdemo.tilesVariants.sample7",
-		"type": "card"
+		"type": "card",
+		"title": "Card 'sample7'",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
 	},
 	"sap.card": {
 		"type": "List",
@@ -9,7 +14,7 @@
 			"data": {
 				"request": {
 					"url": "./data7.json"
-					}
+				}
 			},
 			"title": "{title}",
 			"subtitle": "{subtitle}",
@@ -25,7 +30,8 @@
 		},
 		"content": {
 			"data": {
-				"json": [{
+				"json": [
+					{
 						"Name": "Comfort Easy"
 					}
 				]

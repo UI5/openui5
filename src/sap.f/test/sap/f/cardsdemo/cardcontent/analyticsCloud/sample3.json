@@ -1,4 +1,5 @@
 {
+	"_version": "2.0.0",
 	"sap.app": {
 		"id": "sap.cardsdemo.ui.integration.samples.cards.sac.sample3",
 		"type": "card",

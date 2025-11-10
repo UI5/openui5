@@ -1,7 +1,12 @@
 {
+	"_version": "2.0.0",
 	"sap.app": {
 		"id": "tableCard2",
-		"type": "card"
+		"type": "card",
+		"title": "Card 'tableCard2'",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
 	},
 	"sap.card": {
 		"type": "Table",
@@ -17,7 +22,8 @@
 		},
 		"content": {
 			"data": {
-				"json": [{
+				"json": [
+					{
 						"Name": "Comfort Easy",
 						"Category": "PDA & Organizers"
 					},
@@ -40,7 +46,8 @@
 				]
 			},
 			"row": {
-				"columns": [{
+				"columns": [
+					{
 						"title": "Name",
 						"value": "{Name}"
 					},

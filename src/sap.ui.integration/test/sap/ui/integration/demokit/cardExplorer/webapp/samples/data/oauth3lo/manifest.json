@@ -1,5 +1,5 @@
 {
-	"_version": "1.14.0",
+	"_version": "2.0.0",
 	"sap.app": {
 		"id": "card.explorer.data.3lo.card",
 		"type": "card",

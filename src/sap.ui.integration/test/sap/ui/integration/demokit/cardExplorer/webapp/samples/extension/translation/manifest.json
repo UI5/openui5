@@ -1,8 +1,13 @@
 {
+	"_version": "2.0.0",
 	"sap.app": {
 		"type": "card",
 		"i18n": "i18n/i18n.properties",
-		"id": "card.explorer.extension.translation"
+		"id": "card.explorer.extension.translation",
+		"title": "Card 'translation'",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
 	},
 	"sap.card": {
 		"extension": "./TranslationExtension",
@@ -11,10 +16,22 @@
 		},
 		"data": {
 			"json": [
-				{ "training": "Scrum", "isOnline": true },
-				{ "training": "Quality Management", "isOnline": false },
-				{ "training": "Test Driven Development", "isOnline": false },
-				{ "training": "Integration Cards Training", "isOnline": true }
+				{
+					"training": "Scrum",
+					"isOnline": true
+				},
+				{
+					"training": "Quality Management",
+					"isOnline": false
+				},
+				{
+					"training": "Test Driven Development",
+					"isOnline": false
+				},
+				{
+					"training": "Integration Cards Training",
+					"isOnline": true
+				}
 			]
 		},
 		"type": "List",

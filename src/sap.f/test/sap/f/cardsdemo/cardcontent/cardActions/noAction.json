@@ -1,11 +1,12 @@
 {
-	"_version": "1.14.0",
+	"_version": "2.0.0",
 	"sap.app": {
 		"id": "list.card",
 		"type": "card",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Card 'list.card'"
 	},
 	"sap.ui": {
 		"technology": "UI5",
@@ -14,70 +15,70 @@
 		}
 	},
 	"sap.card": {
-	  "type": "List",
-	  "data": {
-		"json": {
-		  "items": [
-			{
-			  "title": "Item 1"
-			},
-			{
-			  "title": "Item 2"
-			},
-			{
-			  "title": "Item 3"
-			},
-			{
-			  "title": "Item 4"
-			}
-		  ]
-		}
-	  },
-	  "header": {
-		"title": "No actions on card",
-		"subtitle": "sematicRole - listitem",
-		"titleMaxLines": 1
-	  },
-	  "content": {
+		"type": "List",
 		"data": {
-		  "path": "/items"
+			"json": {
+				"items": [
+					{
+						"title": "Item 1"
+					},
+					{
+						"title": "Item 2"
+					},
+					{
+						"title": "Item 3"
+					},
+					{
+						"title": "Item 4"
+					}
+				]
+			}
 		},
-		"item": {
-		  "title": "{title}"
+		"header": {
+			"title": "No actions on card",
+			"subtitle": "sematicRole - listitem",
+			"titleMaxLines": 1
 		},
-		"maxItems": 4
-	  },
-	  "footer": {
-		"actionsStrip": [
-		  {
-			"type": "ToolbarSpacer"
-		  },
-		  {
-			"type": "Link",
-			"text": "Agenda",
-			"icon": "sap-icon://action",
-			"actions": [
-			  {
-				"type": "Navigation",
-				"parameters": {
-				  "url": "{agendaUrl}"
+		"content": {
+			"data": {
+				"path": "/items"
+			},
+			"item": {
+				"title": "{title}"
+			},
+			"maxItems": 4
+		},
+		"footer": {
+			"actionsStrip": [
+				{
+					"type": "ToolbarSpacer"
+				},
+				{
+					"type": "Link",
+					"text": "Agenda",
+					"icon": "sap-icon://action",
+					"actions": [
+						{
+							"type": "Navigation",
+							"parameters": {
+								"url": "{agendaUrl}"
+							}
+						}
+					]
+				},
+				{
+					"text": "Approve",
+					"overflowPriority": "High",
+					"actions": [
+						{
+							"type": "Custom",
+							"parameters": {
+								"method": "approve"
+							}
+						}
+					]
 				}
-			  }
 			]
-		  },
-		  {
-			"text": "Approve",
-			"overflowPriority": "High",
-			"actions": [
-			  {
-				"type": "Custom",
-				"parameters": {
-				  "method": "approve"
-				}
-			  }
-			]
-		  }
-		]
-	  }
+		}
 	}
 }

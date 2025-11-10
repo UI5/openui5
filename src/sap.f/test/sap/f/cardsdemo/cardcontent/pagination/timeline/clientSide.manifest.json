@@ -1,5 +1,5 @@
 {
-	"_version": "1.15.0",
+	"_version": "2.0.0",
 	"sap.app": {
 		"id": "sap.f.cardsDemo.pagination.timeline.clientSide",
 		"type": "card",

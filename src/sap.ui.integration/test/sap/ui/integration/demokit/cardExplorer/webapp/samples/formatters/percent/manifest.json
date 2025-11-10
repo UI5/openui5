@@ -1,5 +1,5 @@
 {
-	"_version": "1.17.0",
+	"_version": "2.0.0",
 	"sap.app": {
 		"id": "card.explorer.format.percent",
 		"type": "card",
@@ -58,7 +58,7 @@
 					{
 						"Name": "Laser Professional Eco",
 						"image": "sap-icon://keyboard-and-mouse",
-						"Discount": 0.40
+						"Discount": 0.4
 					}
 				]
 			},

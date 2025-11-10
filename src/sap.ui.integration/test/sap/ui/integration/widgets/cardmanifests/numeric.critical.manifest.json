@@ -1,7 +1,12 @@
 {
+	"_version": "2.0.0",
 	"sap.app": {
 		"id": "listCard2",
-		"type": "card"
+		"type": "card",
+		"title": "Card 'listCard2'",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
 	},
 	"sap.card": {
 		"type": "List",
@@ -48,7 +53,8 @@
 				}
 			},
 			"details": "{details}",
-			"sideIndicators": [{
+			"sideIndicators": [
+				{
 					"title": "Target",
 					"number": "{target/number}",
 					"unit": "{target/unit}"

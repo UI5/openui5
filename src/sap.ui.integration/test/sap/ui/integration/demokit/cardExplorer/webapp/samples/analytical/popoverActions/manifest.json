@@ -1,5 +1,5 @@
 {
-	"_version": "1.34.0",
+	"_version": "2.0.0",
 	"sap.app": {
 		"id": "card.explorer.analytical.popover.actions.card",
 		"type": "card",
@@ -93,15 +93,19 @@
 			"actionableArea": "Chart",
 			"popover": {
 				"active": true,
-				"actionsStrip": [{
-					"text": "Action for {Week}",
-					"actions": [{
-						"type": "Navigation",
-						"parameters": {
-							"url": "https://sap.com?id={Week}"
-						}
-					}]
-				}]
+				"actionsStrip": [
+					{
+						"text": "Action for {Week}",
+						"actions": [
+							{
+								"type": "Navigation",
+								"parameters": {
+									"url": "https://sap.com?id={Week}"
+								}
+							}
+						]
+					}
+				]
 			},
 			"dimensions": [
 				{

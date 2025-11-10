@@ -1,5 +1,5 @@
 {
-	"_version": "1.17.0",
+	"_version": "2.0.0",
 	"sap.app": {
 		"id": "card.explorer.features.dateRange",
 		"type": "card",
@@ -74,7 +74,8 @@
 			},
 			"maxItems": "{parameters>/maxItems/value}",
 			"row": {
-				"columns": [{
+				"columns": [
+					{
 						"title": "Customer",
 						"value": "{ShipName}"
 					},

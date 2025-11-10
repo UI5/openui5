@@ -1,8 +1,13 @@
 {
+	"_version": "2.0.0",
 	"sap.app": {
 		"id": "objectCard2",
 		"type": "card",
-		"i18n": "i18n/i18n.properties"
+		"i18n": "i18n/i18n.properties",
+		"title": "Card 'objectCard2'",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
 	},
 	"sap.card": {
 		"type": "Object",
@@ -19,9 +24,11 @@
 			"subtitle": "{position}"
 		},
 		"content": {
-			"groups": [{
+			"groups": [
+				{
 					"title": "Details",
-					"items": [{
+					"items": [
+						{
 							"label": "Firstname",
 							"value": "{firstName}"
 						},
@@ -37,17 +44,20 @@
 				},
 				{
 					"title": "Organization",
-					"items": [{
-						"label": "Manager",
-						"value": "{manager/firstName} {manager/lastName}",
-						"icon": {
-							"src": "{manager/photo}"
+					"items": [
+						{
+							"label": "Manager",
+							"value": "{manager/firstName} {manager/lastName}",
+							"icon": {
+								"src": "{manager/photo}"
+							}
 						}
-					}]
+					]
 				},
 				{
 					"title": "Company Details",
-					"items": [{
+					"items": [
+						{
 							"label": "Company Name",
 							"value": "{company/name}"
 						},

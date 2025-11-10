@@ -1,5 +1,5 @@
 {
-	"_version": "1.60.0",
+	"_version": "2.0.0",
 	"sap.app": {
 		"id": "sap.ui.CardCSRFToken.sameToken.withExtension",
 		"type": "card",
@@ -29,7 +29,7 @@
 	"sap.card": {
 		"type": "List",
 		"extension": "./Extension2",
-		"configuration" : {
+		"configuration": {
 			"csrfTokens": {
 				"token1": {
 					"data": {

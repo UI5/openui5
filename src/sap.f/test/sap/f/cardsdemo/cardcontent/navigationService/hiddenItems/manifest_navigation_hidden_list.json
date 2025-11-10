@@ -1,8 +1,12 @@
 {
-	"_version": "1.8.0",
+	"_version": "2.0.0",
 	"sap.app": {
 		"id": "cardsdemo.hiddenItems.list",
-		"type": "card"
+		"type": "card",
+		"title": "Card 'cardsdemo.hiddenItems.list'",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
 	},
 	"sap.ui5": {
 		"services": {

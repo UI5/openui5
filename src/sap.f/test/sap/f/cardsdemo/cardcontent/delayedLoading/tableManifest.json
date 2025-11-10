@@ -1,46 +1,50 @@
 {
+	"_version": "2.0.0",
 	"sap.app": {
 		"id": "cardsdemo.samples.table1",
-		"type": "card"
+		"type": "card",
+		"title": "Card 'table1'",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
 	},
 	"sap.card": {
-	  "data": {
-		"request": {
-		  "url": "./tableData.json"
-		}
-	  },
-		"type": "Table",
-	  "header": {
-		"type": "Numeric",
 		"data": {
-		  "path": "/header"
+			"request": {
+				"url": "./tableData.json"
+			}
 		},
-		"title": "Table Card ",
-		"subtitle": "{revenue}",
-		"unitOfMeasurement": "EUR",
-		"mainIndicator": {
-		  "number": "{number}",
-		  "unit": "{unit}",
-		  "trend": "{trend}",
-		  "state": "{state}"
+		"type": "Table",
+		"header": {
+			"type": "Numeric",
+			"data": {
+				"path": "/header"
+			},
+			"title": "Table Card ",
+			"subtitle": "{revenue}",
+			"unitOfMeasurement": "EUR",
+			"mainIndicator": {
+				"number": "{number}",
+				"unit": "{unit}",
+				"trend": "{trend}",
+				"state": "{state}"
+			},
+			"details": "{details}",
+			"sideIndicators": [
+				{
+					"title": "Target",
+					"number": "{target/number}",
+					"unit": "{target/unit}"
+				},
+				{
+					"title": "Deviation",
+					"number": "{deviation/number}",
+					"unit": "%"
+				}
+			]
 		},
-		"details": "{details}",
-		"sideIndicators": [
-		  {
-			"title": "Target",
-			"number": "{target/number}",
-			"unit": "{target/unit}"
-		  },
-		  {
-			"title": "Deviation",
-			"number": "{deviation/number}",
-			"unit": "%"
-		  }
-		]
-	  },
 		"content": {
 			"data": {
-
 				"path": "/content"
 			},
 			"maxItems": 9,

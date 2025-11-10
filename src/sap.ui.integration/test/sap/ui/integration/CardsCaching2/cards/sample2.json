@@ -1,5 +1,5 @@
 {
-	"_version": "1.15.0",
+	"_version": "2.0.0",
 	"sap.app": {
 		"id": "card.explorer.table.card",
 		"type": "card",
@@ -43,7 +43,8 @@
 		},
 		"content": {
 			"row": {
-				"columns": [{
+				"columns": [
+					{
 						"title": "Sales Order",
 						"value": "{salesOrder}",
 						"identifier": true

@@ -1,4 +1,5 @@
 {
+	"_version": "2.0.0",
 	"sap.app": {
 		"type": "card",
 		"id": "cardWithExtensionLegacyActions",
@@ -7,6 +8,10 @@
 				"uri": "https://services.odata.org/V3/Northwind/Northwind.svc",
 				"type": "OData"
 			}
+		},
+		"title": "Card 'cardWithExtensionLegacyActions'",
+		"applicationVersion": {
+			"version": "1.0.0"
 		}
 	},
 	"sap.card": {
@@ -26,7 +31,12 @@
 		"data": {
 			"extension": {
 				"method": "getData",
-				"args": ["{parameters>/city/value}", "arg2","arg3", "arg4"]
+				"args": [
+					"{parameters>/city/value}",
+					"arg2",
+					"arg3",
+					"arg4"
+				]
 			}
 		},
 		"type": "List",

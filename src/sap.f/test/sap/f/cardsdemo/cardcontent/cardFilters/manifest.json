@@ -1,8 +1,12 @@
 {
+	"_version": "2.0.0",
 	"sap.app": {
 		"id": "card.resolver.filters",
 		"type": "card",
-		"title": "Sample of a Card with Filters"
+		"title": "Sample of a Card with Filters",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
 	},
 	"sap.card": {
 		"configuration": {
@@ -71,7 +75,7 @@
 					"value": "{ShipCountry}"
 				}
 			},
-			"maxItems" : "{parameters>/maxOrdersShown/value}"
+			"maxItems": "{parameters>/maxOrdersShown/value}"
 		}
 	}
 }

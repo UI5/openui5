@@ -1,4 +1,5 @@
 {
+	"_version": "2.0.0",
 	"sap.app": {
 		"id": "sap.ui.layout.sample.card.logonRequests",
 		"type": "card",
@@ -15,7 +16,8 @@
 				"Card",
 				"Sample"
 			]
-		}
+		},
+		"title": "Card 'logonRequests'"
 	},
 	"sap.ui": {
 		"technology": "UI5",

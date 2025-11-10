@@ -1,9 +1,10 @@
 {
+	"_version": "2.0.0",
 	"sap.app": {
 		"id": "sap.f.cardsdemo.webpage.cardFooter",
 		"type": "card",
 		"title": "Sample of a WebPage Card",
-		"subTitle" :"Sample of a WebPage Card with Footer",
+		"subTitle": "Sample of a WebPage Card with Footer",
 		"applicationVersion": {
 			"version": "1.0.0"
 		},
@@ -23,7 +24,7 @@
 	},
 	"sap.card": {
 		"type": "WebPage",
-        "extension": "./FooterExtension",
+		"extension": "./FooterExtension",
 		"configuration": {
 			"parameters": {
 				"minHeight": {
@@ -33,7 +34,7 @@
 				}
 			}
 		},
-        "data": {
+		"data": {
 			"json": {
 				"email": "my@mymail.com",
 				"agendaUrl": "https://www.sap.com",
@@ -53,7 +54,7 @@
 			"src": "https://openui5.org/events",
 			"minHeight": "{parameters>/minHeight/value}"
 		},
-        "footer": {
+		"footer": {
 			"actionsStrip": [
 				{
 					"type": "Link",

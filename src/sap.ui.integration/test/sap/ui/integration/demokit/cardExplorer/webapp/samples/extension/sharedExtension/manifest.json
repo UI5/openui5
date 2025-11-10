@@ -1,10 +1,16 @@
 {
+	"_version": "2.0.0",
 	"sap.app": {
 		"type": "card",
-		"id": "card.explorer.extension.sharedExtension"
+		"id": "card.explorer.extension.sharedExtension",
+		"title": "Card 'sharedExtension'",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
 	},
 	"sap.ui5": {
 		"dependencies": {
+			"minUI5Version": "2.0.0",
 			"libs": {
 				"shared.lib": {}
 			}
@@ -34,7 +40,7 @@
 		"content": {
 			"item": {
 				"title": "{= extension.formatters.toUpperCase(${training}) }",
-				"description":  "{= extension.formatters.appendSuffix(${location}) }"
+				"description": "{= extension.formatters.appendSuffix(${location}) }"
 			}
 		}
 	}

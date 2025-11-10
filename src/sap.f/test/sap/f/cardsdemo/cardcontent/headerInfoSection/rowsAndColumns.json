@@ -1,11 +1,12 @@
 {
-	"_version": "1.14.0",
+	"_version": "2.0.0",
 	"sap.app": {
 		"id": "list.card",
 		"type": "card",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Card 'list.card'"
 	},
 	"sap.ui": {
 		"technology": "UI5",

@@ -1,7 +1,12 @@
 {
+	"_version": "2.0.0",
 	"sap.app": {
 		"id": "card.explorer.dataSources.topProducts",
-		"type": "card"
+		"type": "card",
+		"title": "Card 'topProducts'",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
 	},
 	"sap.card": {
 		"configuration": {
@@ -17,7 +22,7 @@
 					"type": "string",
 					"label": "Category",
 					"description": "Filter the products by category.",
-					"items":  [
+					"items": [
 						{
 							"title": "Flat Screen Monitors",
 							"key": "flat_screens"
@@ -33,7 +38,7 @@
 					"type": "string",
 					"label": "City",
 					"description": "Filter the products by city.",
-					"items":  [
+					"items": [
 						{
 							"title": "Vienna",
 							"key": "vienna"
