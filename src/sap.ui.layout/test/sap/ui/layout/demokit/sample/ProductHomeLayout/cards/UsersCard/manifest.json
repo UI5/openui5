@@ -1,4 +1,5 @@
 {
+	"_version": "2.0.0",
 	"sap.app": {
 		"id": "sap.ui.layout.sample.card.users",
 		"type": "card",
@@ -15,7 +16,8 @@
 				"Card",
 				"Sample"
 			]
-		}
+		},
+		"title": "Card 'sap.ui.layout.sample.card.users'"
 	},
 	"sap.ui": {
 		"technology": "UI5",

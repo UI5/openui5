@@ -1,5 +1,5 @@
 {
-	"_version": "1.18.0",
+	"_version": "2.0.0",
 	"sap.app": {
 		"id": "sap.ui5.test.cardeditor.listcard",
 		"type": "card",
@@ -23,30 +23,34 @@
 		"configuration": {
 			"editor": "dt",
 			"filters": {
-                "country": {
-                    "selectedKey": "FR",
-                    "type": "ComboBox",
-                    "label": "Country",
-                    "placeholder": "Country",
-                    "data": {
-                        "request": {
-                            "url": "../countries.json"
-                        }
-                    },
-                    "item": {
-                        "path": "/",
-                        "template": {
-                            "key": "{key}",
-                            "title": "{text}",
-                            "additionalText": "{key}"
-                        }
-                    }
-                }
-            },
+				"country": {
+					"selectedKey": "FR",
+					"type": "ComboBox",
+					"label": "Country",
+					"placeholder": "Country",
+					"data": {
+						"request": {
+							"url": "../countries.json"
+						}
+					},
+					"item": {
+						"path": "/",
+						"template": {
+							"key": "{key}",
+							"title": "{text}",
+							"additionalText": "{key}"
+						}
+					}
+				}
+			},
 			"parameters": {
 				"checkItemWithTabNotEditable": {
 					"value": {
-						"text": "text01", "key": "key01", "url": "https://sap.com/06", "icon": "sap-icon://accept", "editable": true
+						"text": "text01",
+						"key": "key01",
+						"url": "https://sap.com/06",
+						"icon": "sap-icon://accept",
+						"editable": true
 					}
 				},
 				"contextModelSyntax": {
@@ -232,7 +236,9 @@
 					"value": []
 				},
 				"CustomersWithFilterParameter": {
-					"value": ["ALFKI"]
+					"value": [
+						"ALFKI"
+					]
 				},
 				"CustomersWithFilterInURL": {
 					"value": []
@@ -373,11 +379,11 @@
 			},
 			"status": {
 				"text": {
-				 	 "format": {
+					"format": {
 						"translationKey": "i18n>CARD.COUNT_X_OF_Y",
 						"parts": [
-					  		"activities",
-					  		"count"
+							"activities",
+							"count"
 						]
 					}
 				}
@@ -386,7 +392,9 @@
 		"data1": {
 			"extension": {
 				"method": "getData",
-				"args": ["{filters>/country/value}"]
+				"args": [
+					"{filters>/country/value}"
+				]
 			},
 			"path": "/values"
 		},

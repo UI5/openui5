@@ -1,42 +1,47 @@
 {
-  "sap.app": {
-    "id": "cardsdemo.samples.list4",
-    "type": "card"
-  },
-  "sap.card": {
-    "type": "List",
-    "header": {
-      "data": {
-        "request": {
-          "url": "./listData2.json"
-        },
-        "path": "/header"
-      },
-      "title": "{title}",
-      "subtitle": "Subtitle",
-      "status": {
-        "text": "2 of {count}"
-      },
-      "icon": {
-        "src": "{src}"
-      }
-    },
-    "content": {
-      "maxItems": 8,
-      "data": {
-        "request": {
-          "url": "../someitems.json"
-        }
-      },
-      "item": {
-        "title": {
-          "label": "Title",
-          "value": "{Name}"
-        },
-        "description": {
-          "value": "{Name}"
-        }
-      }
-    }
-  }
+	"_version": "2.0.0",
+	"sap.app": {
+		"id": "cardsdemo.samples.list4",
+		"type": "card",
+		"title": "Card 'cardsdemo.samples.list4'",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
+	},
+	"sap.card": {
+		"type": "List",
+		"header": {
+			"data": {
+				"request": {
+					"url": "./listData2.json"
+				},
+				"path": "/header"
+			},
+			"title": "{title}",
+			"subtitle": "Subtitle",
+			"status": {
+				"text": "2 of {count}"
+			},
+			"icon": {
+				"src": "{src}"
+			}
+		},
+		"content": {
+			"maxItems": 8,
+			"data": {
+				"request": {
+					"url": "../someitems.json"
+				}
+			},
+			"item": {
+				"title": {
+					"label": "Title",
+					"value": "{Name}"
+				},
+				"description": {
+					"value": "{Name}"
+				}
+			}
+		}
+	}
 }

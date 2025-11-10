@@ -1,5 +1,5 @@
 {
-	"_version": "1.18.0",
+	"_version": "2.0.0",
 	"sap.app": {
 		"id": "sap.ui5.test.editor.listcard",
 		"type": "card",
@@ -185,7 +185,9 @@
 					"value": []
 				},
 				"CustomersWithFilterParameter": {
-					"value": ["ALFKI"]
+					"value": [
+						"ALFKI"
+					]
 				},
 				"CustomersWithFilterInURL": {
 					"value": []
@@ -325,11 +327,11 @@
 			},
 			"status": {
 				"text": {
-				 	 "format": {
+					"format": {
 						"translationKey": "i18n>CARD.COUNT_X_OF_Y",
 						"parts": [
-					  		"activities",
-					  		"count"
+							"activities",
+							"count"
 						]
 					}
 				}

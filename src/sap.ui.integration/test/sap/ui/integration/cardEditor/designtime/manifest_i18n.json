@@ -1,20 +1,20 @@
 {
-	"_version": "1.18.0",
+	"_version": "2.0.0",
 	"sap.app": {
 		"id": "sap.ui5.test.cardeditor.listcard",
 		"type": "card",
 		"i18n": {
-            "bundleUrl": "../i18n/i18n.properties",
-            "supportedLocales": [
-                "",
+			"bundleUrl": "../i18n/i18n.properties",
+			"supportedLocales": [
+				"",
 				"en",
-                "ar",
+				"ar",
 				"ru",
-                "zh_CN",
-                "zh_TW"
-            ],
-            "fallbackLocale": "en"
-        },
+				"zh_CN",
+				"zh_TW"
+			],
+			"fallbackLocale": "en"
+		},
 		"title": "Test Card for Parameters",
 		"subTitle": "Test Card for Parameters",
 		"applicationVersion": {
@@ -36,7 +36,11 @@
 			"parameters": {
 				"checkItemWithTabNotEditable": {
 					"value": {
-						"text": "text01", "key": "key01", "url": "https://sap.com/06", "icon": "sap-icon://accept", "editable": true
+						"text": "text01",
+						"key": "key01",
+						"url": "https://sap.com/06",
+						"icon": "sap-icon://accept",
+						"editable": true
 					}
 				},
 				"contextModelSyntax": {
@@ -219,7 +223,9 @@
 					"value": []
 				},
 				"CustomersWithFilterParameter": {
-					"value": ["ALFKI"]
+					"value": [
+						"ALFKI"
+					]
 				},
 				"CustomersWithFilterInURL": {
 					"value": []
@@ -359,11 +365,11 @@
 			},
 			"status": {
 				"text": {
-				 	 "format": {
+					"format": {
 						"translationKey": "i18n>CARD.COUNT_X_OF_Y",
 						"parts": [
-					  		"activities",
-					  		"count"
+							"activities",
+							"count"
 						]
 					}
 				}

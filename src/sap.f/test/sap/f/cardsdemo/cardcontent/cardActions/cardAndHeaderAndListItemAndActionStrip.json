@@ -1,11 +1,12 @@
 {
-	"_version": "1.14.0",
+	"_version": "2.0.0",
 	"sap.app": {
 		"id": "list.card",
 		"type": "card",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Card 'list.card'"
 	},
 	"sap.ui": {
 		"technology": "UI5",
@@ -14,36 +15,46 @@
 		}
 	},
 	"sap.card": {
-		"actions": [{
-			"type": "Navigation",
-			"parameters": {
-				"url": "https://sap.com",
-				"target": "_blank"
+		"actions": [
+			{
+				"type": "Navigation",
+				"parameters": {
+					"url": "https://sap.com",
+					"target": "_blank"
+				}
 			}
-		}],
+		],
 		"type": "List",
 		"data": {
 			"json": {
 				"items": [
-					{"title": "Item 1"},
-					{"title": "Item 2"},
-					{"title": "Item 3"},
-					{"title": "Item 4"}
+					{
+						"title": "Item 1"
+					},
+					{
+						"title": "Item 2"
+					},
+					{
+						"title": "Item 3"
+					},
+					{
+						"title": "Item 4"
+					}
 				]
 			}
 		},
 		"header": {
-		  "title": "Card and Header and List Item with Action Strip",
-		  "subtitle": "sematicRole - listitem",
-		  "actions": [
-			{
-			  "type": "Navigation",
-			  "parameters": {
-				"url": "https://sap.com",
-				"target": "_blank"
-			  }
-			}
-		  ]
+			"title": "Card and Header and List Item with Action Strip",
+			"subtitle": "sematicRole - listitem",
+			"actions": [
+				{
+					"type": "Navigation",
+					"parameters": {
+						"url": "https://sap.com",
+						"target": "_blank"
+					}
+				}
+			]
 		},
 		"content": {
 			"data": {
@@ -52,75 +63,75 @@
 			"item": {
 				"title": "{title}",
 				"actions": [
-				  {
-					"type": "Navigation",
-					"parameters": {
-					  "url": "https://sap.com",
-					  "target": "_blank"
+					{
+						"type": "Navigation",
+						"parameters": {
+							"url": "https://sap.com",
+							"target": "_blank"
+						}
 					}
-				  }
 				],
 				"actionsStrip": [
-				  {
-					"text": "Add to Favorites",
-					"actions": [
-					  {
-						"type": "Custom",
-						"parameters": {
-						  "method": "addToFavorites",
-						  "id": "{Id}"
-						}
-					  }
-					]
-				  },
-				  {
-					"buttonType": "Transparent",
-					"text": "Remove",
-					"actions": [
-					  {
-						"type": "Custom",
-						"parameters": {
-						  "method": "remove",
-						  "id": "{Id}"
-						}
-					  }
-					]
-				  }
-			  ]
+					{
+						"text": "Add to Favorites",
+						"actions": [
+							{
+								"type": "Custom",
+								"parameters": {
+									"method": "addToFavorites",
+									"id": "{Id}"
+								}
+							}
+						]
+					},
+					{
+						"buttonType": "Transparent",
+						"text": "Remove",
+						"actions": [
+							{
+								"type": "Custom",
+								"parameters": {
+									"method": "remove",
+									"id": "{Id}"
+								}
+							}
+						]
+					}
+				]
 			},
 			"maxItems": 4
 		},
 		"footer": {
-		  "actionsStrip": [
-			{
-			  "type": "ToolbarSpacer"
-			},
-			{
-			  "type": "Link",
-			  "text": "Agenda",
-			  "icon": "sap-icon://action",
-			  "actions": [
+			"actionsStrip": [
 				{
-				  "type": "Navigation",
-				  "parameters": {
-					"url": "{agendaUrl}"
-				  }
-				}
-			  ]
-			},
-			{
-			  "text": "Approve",
-			  "overflowPriority": "High",
-			  "actions": [
+					"type": "ToolbarSpacer"
+				},
 				{
-				  "type": "Custom",
-				  "parameters": {
-					"method": "approve"
-				  }
+					"type": "Link",
+					"text": "Agenda",
+					"icon": "sap-icon://action",
+					"actions": [
+						{
+							"type": "Navigation",
+							"parameters": {
+								"url": "{agendaUrl}"
+							}
+						}
+					]
+				},
+				{
+					"text": "Approve",
+					"overflowPriority": "High",
+					"actions": [
+						{
+							"type": "Custom",
+							"parameters": {
+								"method": "approve"
+							}
+						}
+					]
 				}
-			  ]
-			}
-		  ]
+			]
 		}
 	}
 }

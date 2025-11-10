@@ -1,8 +1,12 @@
 {
+	"_version": "2.0.0",
 	"sap.app": {
 		"id": "card.explorer.data.modelSizeLimit",
 		"type": "card",
-		"title": "Sample of Card with Model Size Limit"
+		"title": "Sample of Card with Model Size Limit",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
 	},
 	"sap.card": {
 		"extension": "./DataExtension",
@@ -36,7 +40,9 @@
 			"data": {
 				"extension": {
 					"method": "getOrdersData",
-					"args": ["{filters>/shipper/selectedItem/title}"]
+					"args": [
+						"{filters>/shipper/selectedItem/title}"
+					]
 				}
 			},
 			"item": {

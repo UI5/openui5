@@ -1,5 +1,5 @@
 {
-	"_version": "1.48.0",
+	"_version": "2.0.0",
 	"sap.app": {
 		"id": "card.explorer.format.text.card",
 		"type": "card",
@@ -23,27 +23,27 @@
 	"sap.card": {
 		"data": {
 			"json": {
-			    "title": "{i18n>title}",
-			    "description": "{i18n>description}"
+				"title": "{i18n>title}",
+				"description": "{i18n>description}"
 			}
-	    },
-        "type": "AdaptiveCard",
-        "header": {
+		},
+		"type": "AdaptiveCard",
+		"header": {
 			"title": "{title}",
 			"icon": {
 				"src": "sap-icon://translate"
 			}
-        },
-        "content": {
-        "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
-        "type": "AdaptiveCard",
-        "version": "1.0",
-        "body": [
+		},
+		"content": {
+			"$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+			"type": "AdaptiveCard",
+			"version": "1.0",
+			"body": [
 				{
 					"type": "TextBlock",
 					"text": "${description}"
 				}
-            ]
+			]
 		}
 	}
 }

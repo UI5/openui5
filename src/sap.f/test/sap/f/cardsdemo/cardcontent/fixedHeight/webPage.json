@@ -1,7 +1,12 @@
 {
+	"_version": "2.0.0",
 	"sap.app": {
 		"id": "cardsdemo.samples.fixedHeight.webPage",
-		"type": "card"
+		"type": "card",
+		"title": "Card 'webPage'",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
 	},
 	"sap.card": {
 		"type": "WebPage",

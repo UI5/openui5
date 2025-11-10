@@ -1,5 +1,5 @@
 {
-	"_version": "1.15.0",
+	"_version": "2.0.0",
 	"sap.app": {
 		"id": "card.explorer.object.card",
 		"type": "card",
@@ -79,7 +79,7 @@
 						{
 							"label": "Phone",
 							"value": "{phone}",
-							"tooltip":  "{phoneTooltip}",
+							"tooltip": "{phoneTooltip}",
 							"actions": [
 								{
 									"type": "Navigation",
@@ -92,7 +92,7 @@
 						{
 							"label": "Email",
 							"value": "{email}",
-							"tooltip":  "{emailTooltip}",
+							"tooltip": "{emailTooltip}",
 							"actions": [
 								{
 									"type": "Navigation",
@@ -105,7 +105,7 @@
 						{
 							"label": "Agenda",
 							"value": "Book a meeting",
-							"tooltip":  "{agendaTooltip}",
+							"tooltip": "{agendaTooltip}",
 							"actions": [
 								{
 									"type": "Navigation",
@@ -132,7 +132,7 @@
 						{
 							"label": "Email",
 							"value": "{company/email}",
-							"tooltip":  "{company/emailTooltip}",
+							"tooltip": "{company/emailTooltip}",
 							"actions": [
 								{
 									"type": "Navigation",

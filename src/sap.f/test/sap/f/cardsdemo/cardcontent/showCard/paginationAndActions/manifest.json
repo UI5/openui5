@@ -1,7 +1,12 @@
 {
+	"_version": "2.0.0",
 	"sap.app": {
 		"id": "sap.f.cardsdemo.showCard.paginationAndActions",
-		"type": "card"
+		"type": "card",
+		"title": "Card 'paginationAndActions'",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
 	},
 	"sap.ui": {
 		"technology": "UI5",
@@ -21,10 +26,22 @@
 		"content": {
 			"data": {
 				"json": [
-					{ "training": "Scrum", "location": "Online" },
-					{ "training": "Quality Management", "location": "Classroom Attendance" },
-					{ "training": "Test Driven Development", "location": "Classroom Attendance" },
-					{ "training": "Integration Cards Training", "location": "Online" }
+					{
+						"training": "Scrum",
+						"location": "Online"
+					},
+					{
+						"training": "Quality Management",
+						"location": "Classroom Attendance"
+					},
+					{
+						"training": "Test Driven Development",
+						"location": "Classroom Attendance"
+					},
+					{
+						"training": "Integration Cards Training",
+						"location": "Online"
+					}
 				]
 			},
 			"item": {

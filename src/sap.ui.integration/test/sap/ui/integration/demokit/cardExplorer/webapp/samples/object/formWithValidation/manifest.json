@@ -1,4 +1,5 @@
 {
+	"_version": "2.0.0",
 	"sap.app": {
 		"id": "card.explorer.object.form",
 		"i18n": "i18n/i18n.properties",
@@ -169,7 +170,6 @@
 								}
 							],
 							"placeholder": "Select date"
-
 						}
 					]
 				}

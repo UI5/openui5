@@ -1,7 +1,12 @@
 {
+	"_version": "2.0.0",
 	"sap.app": {
 		"type": "card",
-		"id": "listCard1"
+		"id": "listCard1",
+		"title": "Card 'listCard1'",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
 	},
 	"sap.card": {
 		"type": "List",
@@ -17,7 +22,8 @@
 		},
 		"content": {
 			"data": {
-				"json": [{
+				"json": [
+					{
 						"Name": "Notebook Basic 15",
 						"Description": "Notebook Basic 15 with 2,80 GHz quad core, 15\" LCD, 4 GB DDR3 RAM, 500 GB Hard Disc, Windows 8 Pro",
 						"Id": "HT-1000",
@@ -48,7 +54,6 @@
 						"SubCategoryId": "Notebooks",
 						"icon": "../images/Woman_avatar_01.png",
 						"highlight": "Information"
-
 					},
 					{
 						"Name": "ITelO Vault",

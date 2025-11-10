@@ -1,11 +1,12 @@
 {
-	"_version": "1.14.0",
+	"_version": "2.0.0",
 	"sap.app": {
 		"id": "list.card1",
 		"type": "card",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Card 'list.card1'"
 	},
 	"sap.ui": {
 		"technology": "UI5",
@@ -14,13 +15,15 @@
 		}
 	},
 	"sap.card": {
-		"actions": [{
-			"type": "Navigation",
-			"parameters": {
-				"url": "https://sap.com",
-				"target": "_blank"
+		"actions": [
+			{
+				"type": "Navigation",
+				"parameters": {
+					"url": "https://sap.com",
+					"target": "_blank"
+				}
 			}
-		}],
+		],
 		"type": "Object",
 		"data": {
 			"json": {

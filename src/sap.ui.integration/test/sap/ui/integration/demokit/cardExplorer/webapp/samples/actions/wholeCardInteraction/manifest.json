@@ -1,4 +1,5 @@
 {
+	"_version": "2.0.0",
 	"sap.app": {
 		"id": "card.explorer.actions.wholeCardInteraction",
 		"type": "card",

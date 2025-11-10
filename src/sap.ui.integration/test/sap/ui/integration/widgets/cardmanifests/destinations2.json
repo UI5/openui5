@@ -1,5 +1,5 @@
 {
-	"_version": "1.17.0",
+	"_version": "2.0.0",
 	"sap.app": {
 		"id": "card.explorer.features.dateRange",
 		"type": "card",
@@ -38,7 +38,7 @@
 			"title": "Destinations sample 2",
 			"subtitle": "Data in body. No host associated so defaultUrl is used",
 			"status": {
-			    "text": "top {{parameters.maxItems}}"
+				"text": "top {{parameters.maxItems}}"
 			}
 		},
 		"content": {

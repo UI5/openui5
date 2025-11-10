@@ -1,5 +1,5 @@
 {
-	"_version": "1.14.0",
+	"_version": "2.0.0",
 	"sap.app": {
 		"id": "card.explorer.data.list.card",
 		"type": "card",
@@ -93,7 +93,7 @@
 						{
 							"enabled": "{parameters>/actionDisabled/value}",
 							"type": "Custom",
-							"parameters": { }
+							"parameters": {}
 						}
 					]
 				},
@@ -103,7 +103,7 @@
 						{
 							"enabled": "{parameters>/actionEnabled/value}",
 							"type": "Custom",
-							"parameters": { }
+							"parameters": {}
 						}
 					]
 				},
@@ -113,7 +113,7 @@
 						{
 							"enabled": true,
 							"type": "Custom",
-							"parameters": { }
+							"parameters": {}
 						}
 					]
 				},
@@ -123,7 +123,7 @@
 						{
 							"enabled": false,
 							"type": "Custom",
-							"parameters": { }
+							"parameters": {}
 						}
 					]
 				}

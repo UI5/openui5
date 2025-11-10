@@ -1,14 +1,19 @@
 {
+	"_version": "2.0.0",
 	"sap.app": {
 		"id": "cardsdemo.manifestLoading.card1",
-		"type": "card"
+		"type": "card",
+		"title": "Card 'cardsdemo.manifestLoading.card1'",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
 	},
 	"sap.card": {
 		"type": "List",
 		"header": {
 			"title": "Request List Content Card",
 			"subtitle": "Card Subtitle",
-			"icon":  {
+			"icon": {
 				"src": "sap-icon://accept"
 			},
 			"status": "100 of 200"

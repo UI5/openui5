@@ -1,6 +1,10 @@
 {
+	"_version": "2.0.0",
 	"sap.app": {
-		"type": "card"
+		"type": "card",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
 	},
 	"sap.card": {
 		"type": "List",
@@ -14,12 +18,11 @@
 			"title": "{title}",
 			"subtitle": "Subtitle",
 			"status": {
-			  "text": "2 of {count}"
+				"text": "2 of {count}"
 			},
-		  "icon": {
-			"src": "{src}"
-		  }
-
+			"icon": {
+				"src": "{src}"
+			}
 		},
 		"content": {
 			"maxItems": 8,

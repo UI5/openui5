@@ -1,8 +1,12 @@
 {
-	"_version": "1.8.0",
+	"_version": "2.0.0",
 	"sap.app": {
 		"id": "cardsdemo.hiddenItems.timeline",
-		"type": "card"
+		"type": "card",
+		"title": "Card 'timeline'",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
 	},
 	"sap.ui5": {
 		"services": {
@@ -24,24 +28,24 @@
 			"data": {
 				"json": [
 					{
-					  "Title": "Weekly sync: Marketplace / Design Stream",
-					  "Description": "MRR WDF18 C3.2(GLASSBOX)",
-					  "Icon": "sap-icon://appointment-2",
-					  "Time": "10:00 - 10:30",
-					  "url": "www.sap.com"
+						"Title": "Weekly sync: Marketplace / Design Stream",
+						"Description": "MRR WDF18 C3.2(GLASSBOX)",
+						"Icon": "sap-icon://appointment-2",
+						"Time": "10:00 - 10:30",
+						"url": "www.sap.com"
 					},
 					{
-					  "Title": "Video Conference for FLP@SF, S4,Hybris",
-					  "Icon": "sap-icon://my-view",
-					  "Time": "14:00 - 15:30",
-					  "url": "www.google.com"
+						"Title": "Video Conference for FLP@SF, S4,Hybris",
+						"Icon": "sap-icon://my-view",
+						"Time": "14:00 - 15:30",
+						"url": "www.google.com"
 					},
 					{
-					  "Title": "Call 'Project Nimbus'",
-					  "Icon": "sap-icon://outgoing-call",
-					  "Time": "16:00 - 16:30"
+						"Title": "Call 'Project Nimbus'",
+						"Icon": "sap-icon://outgoing-call",
+						"Time": "16:00 - 16:30"
 					}
-				  ]
+				]
 			},
 			"item": {
 				"dateTime": {
@@ -61,14 +65,14 @@
 				},
 				"actions": [
 					{
-					  "type": "Navigation",
-					  "service": "Navigation2",
-					  "enabled": "{= ${url}}",
-					  "parameters": {
-						"hidden": "{url}"
-					  }
+						"type": "Navigation",
+						"service": "Navigation2",
+						"enabled": "{= ${url}}",
+						"parameters": {
+							"hidden": "{url}"
+						}
 					}
-				  ]
+				]
 			}
 		}
 	}

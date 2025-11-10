@@ -1,9 +1,12 @@
 {
-	"_version": "1.35.0",
+	"_version": "2.0.0",
 	"sap.app": {
 		"id": "cardsdemo.bundles.analytical.smallDonut",
 		"type": "card",
-		"title": "Overrun Phases"
+		"title": "Overrun Phases",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
 	},
 	"sap.card": {
 		"type": "Analytical",
@@ -11,12 +14,14 @@
 			"type": "Default",
 			"title": "minHeight of content should be 10rem",
 			"subtitle": "",
-			"actions": [{
-				"type": "Navigation",
-				"parameters": {
-					"url": "/quickLinks"
+			"actions": [
+				{
+					"type": "Navigation",
+					"parameters": {
+						"url": "/quickLinks"
+					}
 				}
-			}]
+			]
 		},
 		"content": {
 			"minHeight": "10rem",
@@ -71,19 +76,32 @@
 						"end": "lastDataPoint"
 					},
 					"dataPointStyle": {
-						"rules": [{
-								"dataContext": { "PhaseCode": "Preparation" },
-								"properties": { "color": "#fcc3a7" },
+						"rules": [
+							{
+								"dataContext": {
+									"PhaseCode": "Preparation"
+								},
+								"properties": {
+									"color": "#fcc3a7"
+								},
 								"displayName": "Preparation"
 							},
 							{
-								"dataContext": { "PhaseCode": "Execution" },
-								"properties": { "color": "#f3716c" },
+								"dataContext": {
+									"PhaseCode": "Execution"
+								},
+								"properties": {
+									"color": "#f3716c"
+								},
 								"displayName": "Execution"
 							},
 							{
-								"dataContext": { "PhaseCode": "PostProcessing" },
-								"properties": { "color": "#f29b1d" },
+								"dataContext": {
+									"PhaseCode": "PostProcessing"
+								},
+								"properties": {
+									"color": "#f29b1d"
+								},
 								"displayName": "Post Processing"
 							}
 						]
@@ -105,31 +123,41 @@
 					}
 				}
 			},
-			"dimensions": [{
-				"label": "PhaseCode",
-				"value": "{PhaseCode}"
-			}],
-			"feeds": [{
+			"dimensions": [
+				{
+					"label": "PhaseCode",
+					"value": "{PhaseCode}"
+				}
+			],
+			"feeds": [
+				{
 					"uid": "color",
 					"type": "Dimension",
-					"values": ["PhaseCode"]
+					"values": [
+						"PhaseCode"
+					]
 				},
 				{
 					"uid": "size",
 					"type": "Measure",
-					"values": ["NumRecords"]
+					"values": [
+						"NumRecords"
+					]
 				}
 			],
-			"measures": [{
-				"label": "NumRecords",
-				"value": "{NumRecords}"
-			}],
+			"measures": [
+				{
+					"label": "NumRecords",
+					"value": "{NumRecords}"
+				}
+			],
 			"actionableArea": "Chart",
-			"actions": [{
-				"type": "Navigation",
-				"parameters": {}
-			}]
+			"actions": [
+				{
+					"type": "Navigation",
+					"parameters": {}
+				}
+			]
 		}
 	}
-
 }

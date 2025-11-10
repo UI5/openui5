@@ -1,7 +1,12 @@
 {
+	"_version": "2.0.0",
 	"sap.app": {
 		"type": "card",
-		"id": "quickActionsExtension"
+		"id": "quickActionsExtension",
+		"title": "Card 'quickActionsExtension'",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
 	},
 	"sap.card": {
 		"extension": "./QuickActionsExtension",

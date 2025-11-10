@@ -1,7 +1,12 @@
 {
+	"_version": "2.0.0",
 	"sap.app": {
 		"type": "card",
-		"id": "card.explorer.designtime.linkedParameter"
+		"id": "card.explorer.designtime.linkedParameter",
+		"title": "Card 'linkedParameter'",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
 	},
 	"sap.card": {
 		"configuration": {

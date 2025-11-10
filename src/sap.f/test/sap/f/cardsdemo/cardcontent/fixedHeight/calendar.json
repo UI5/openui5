@@ -1,7 +1,12 @@
 {
+	"_version": "2.0.0",
 	"sap.app": {
 		"id": "cardsdemo.samples.fixedHeight.calendar",
-		"type": "card"
+		"type": "card",
+		"title": "Card 'calendar'",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
 	},
 	"sap.card": {
 		"type": "Calendar",

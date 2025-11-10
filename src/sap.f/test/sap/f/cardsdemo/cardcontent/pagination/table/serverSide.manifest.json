@@ -1,5 +1,5 @@
 {
-	"_version": "1.14.0",
+	"_version": "2.0.0",
 	"sap.app": {
 		"id": "sap.f.cardsDemo.pagination.table.serverSide",
 		"type": "card",
@@ -56,13 +56,11 @@
 						"title": "Unit Price",
 						"value": "{UnitPrice}",
 						"visible": "{= size('wide') || size('regular') || size('extraWide')}"
-
 					},
 					{
 						"title": "Discontinued",
 						"value": "{Discontinued}",
 						"visible": "{= size('wide') || size('regular') || size('extraWide')}"
-
 					}
 				]
 			}

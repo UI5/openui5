@@ -1,5 +1,5 @@
 {
-	"_version": "1.15.0",
+	"_version": "2.0.0",
 	"sap.app": {
 		"id": "card.explorer.highlight.table.card",
 		"type": "card",
@@ -29,7 +29,8 @@
 	"sap.card": {
 		"type": "Table",
 		"data": {
-			"json": [{
+			"json": [
+				{
 					"product": "DVD player",
 					"salesOrder": "5000010050",
 					"customerName": "Robert Brown Entertainment",
@@ -120,7 +121,8 @@
 			"maxItems": 9,
 			"row": {
 				"highlight": "{statusState}",
-				"columns": [{
+				"columns": [
+					{
 						"title": "Product",
 						"value": "{product}",
 						"additionalText": "{salesOrder}",

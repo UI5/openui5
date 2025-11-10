@@ -1,13 +1,19 @@
 {
+	"_version": "2.0.0",
 	"sap.app": {
 		"type": "card",
-		"id": "card.explorer.designtime.sharedDataExtension"
+		"id": "card.explorer.designtime.sharedDataExtension",
+		"title": "Card 'sharedDataExtension'",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
 	},
 	"sap.ui5": {
 		"dependencies": {
-		  "libs": {
-			"sap/ui/demo/cardExplorer/testLib": {}
-		  }
+			"minUI5Version": "2.0.0",
+			"libs": {
+				"sap/ui/demo/cardExplorer/testLib": {}
+			}
 		}
 	},
 	"sap.card": {

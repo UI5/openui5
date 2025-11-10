@@ -1,7 +1,12 @@
 {
+	"_version": "2.0.0",
 	"sap.app": {
 		"id": "cardsdemo.tilesVariants.sample1",
-		"type": "card"
+		"type": "card",
+		"title": "Card 'sample1'",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
 	},
 	"sap.card": {
 		"type": "List",
@@ -37,7 +42,7 @@
 		"configuration": {
 			"editor": "dt/Configuration",
 			"parameters": {
-				"title" : {
+				"title": {
 					"value": "List Card with Top {{parameters.maxItems}} Products and a Long Title which Truncates when on Several Lines"
 				},
 				"subtitle": {
@@ -59,7 +64,8 @@
 		},
 		"content": {
 			"data": {
-				"json": [{
+				"json": [
+					{
 						"Name": "Comfort Easy",
 						"Description": "32 GB Digital Assistant with high-resolution color screen",
 						"Highlight": "Error"

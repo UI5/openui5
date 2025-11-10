@@ -1,5 +1,5 @@
-
 {
+	"_version": "2.0.0",
 	"sap.app": {
 		"id": "card.explorer.object.messages",
 		"type": "card",
@@ -80,7 +80,8 @@
 							}
 						}
 					]
-				},{
+				},
+				{
 					"text": "Success",
 					"buttonType": "Transparent",
 					"actions": [
@@ -136,7 +137,6 @@
 						}
 					]
 				}
-
 			]
 		}
 	}

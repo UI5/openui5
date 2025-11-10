@@ -1,9 +1,10 @@
 {
+	"_version": "2.0.0",
 	"sap.app": {
 		"id": "sap.f.cardsdemo.webpage.errorCard1",
 		"type": "card",
 		"title": "Sample of a WebPage Card",
-		"subTitle" :"Sample of a WebPage Card",
+		"subTitle": "Sample of a WebPage Card",
 		"applicationVersion": {
 			"version": "1.0.0"
 		},

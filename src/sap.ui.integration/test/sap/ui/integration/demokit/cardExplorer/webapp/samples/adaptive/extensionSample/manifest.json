@@ -1,9 +1,10 @@
 {
+	"_version": "2.0.0",
 	"sap.app": {
 		"type": "card",
 		"id": "card.explorer.adaptive.extensionSample",
 		"i18n": "i18n/i18n.properties",
-		"title":"Extension, Adaptive Card",
+		"title": "Extension, Adaptive Card",
 		"subtitle": "Extension, Adaptive Card, Submit and Error handling",
 		"applicationVersion": {
 			"version": "1.0.0"
@@ -75,11 +76,11 @@
 					"isMultiSelect": false,
 					"value": "${product.CategoryID}",
 					"choices": [
-					  {
-						"$data": "${categories}",
-						"title": "${CategoryName}",
-						"value": "${CategoryID}"
-					  }
+						{
+							"$data": "${categories}",
+							"title": "${CategoryName}",
+							"value": "${CategoryID}"
+						}
 					]
 				},
 				{
