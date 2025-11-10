@@ -78,7 +78,8 @@ sap.ui.define([
 			interfaces : [
 				"sap.ui.core.IFormContent",
 				"sap.f.IShellBar",
-				"sap.m.IToolbarInteractiveControl"
+				"sap.m.IToolbarInteractiveControl",
+				"sap.m.IOverflowToolbarContent"
 			],
 			library : "sap.m",
 			properties : {
@@ -916,6 +917,23 @@ sap.ui.define([
 	 */
 	SearchField.prototype.getPopupAnchorDomRef = function() {
 		return this.getDomRef("F"); // the form element inside the search  field is the anchor
+	};
+
+	/**
+	 * Enables the <code>sap.m.SearchField</code> to be used inside sap.m.OverflowToolbar.
+	 * Required by the {@link sap.m.IOverflowToolbarContent} interface.
+	 *
+	 * @public
+	 * @returns {sap.m.OverflowToolbarConfig} Configuration information for the <code>sap.m.IOverflowToolbarContent</code> interface.
+	 */
+	SearchField.prototype.getOverflowToolbarConfig = function() {
+		const oConfig = {
+			canOverflow: true,
+			autoCloseEvents: ["search"],
+			propsUnrelatedToSize: ["enabled", "value", "selectOnFocus"]
+		};
+
+		return oConfig;
 	};
 
 	/**

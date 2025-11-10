@@ -176,11 +176,6 @@ sap.ui.define([
 				listenForEvents: [],
 				noInvalidationProps: ["enabled", "value", "selectedItemId", "selectedKey", "open", "_open", "effectiveShowClearIcon"]
 			},
-			"sap.m.SearchField": {
-				canOverflow: true,
-				listenForEvents: ["search"],
-				noInvalidationProps: ["enabled", "value", "selectOnFocus"]
-			},
 			"sap.m.Input": {
 				canOverflow: true,
 				listenForEvents: [],
