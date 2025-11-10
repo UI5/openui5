@@ -29,12 +29,16 @@ sap.ui.define([
 		await themeApplied();
 
 		var aLinksInitial = document.querySelectorAll("link[id^=sap-ui-theme-]");
-		assert.equal(aLinksInitial.length, 2, "There should be 2 library themes included");
+		assert.equal(aLinksInitial.length, 4, "There should be 4 library themes included");
 
 		const oLinkSapUiCore = document.getElementById("sap-ui-theme-sap.ui.core");
 		const oLinkSapM = document.getElementById("sap-ui-theme-sap.m");
+		const oLinkSapUiLayout = document.getElementById("sap-ui-theme-sap.ui.layout");
+		const oLinkSapUiUnified = document.getElementById("sap-ui-theme-sap.ui.unified");
 		assert.ok(oLinkSapUiCore, "there should be element for sap.ui.core");
 		assert.ok(oLinkSapM, "there should be element for sap.m");
+		assert.ok(oLinkSapUiLayout, "there should be element for sap.ui.layout");
+		assert.ok(oLinkSapUiUnified, "there should be element for sap.ui.unified");
 
 		assert.equal(
 			Theming.getTheme(),
@@ -44,6 +48,10 @@ sap.ui.define([
 		assert.equal(oLinkSapUiCore.href, `${sPath}/sap/ui/core/themes/sap_fiori_3/library.css?sap-ui-dist-version=${sCoreVersion}`,
 			"sap.ui.core stylesheet href should be correct");
 		assert.equal(oLinkSapM.href, `${sPath}/sap/m/themes/sap_fiori_3/library.css?sap-ui-dist-version=${sCoreVersion}`,
+			"sap.m stylesheet href should be correct");
+		assert.equal(oLinkSapUiLayout.href, `${sPath}/sap/ui/layout/themes/sap_fiori_3/library.css?sap-ui-dist-version=${sCoreVersion}`,
+			"sap.ui.core stylesheet href should be correct");
+		assert.equal(oLinkSapUiUnified.href, `${sPath}/sap/ui/unified/themes/sap_fiori_3/library.css?sap-ui-dist-version=${sCoreVersion}`,
 			"sap.m stylesheet href should be correct");
 	});
 
@@ -63,12 +71,16 @@ sap.ui.define([
 		await themeApplied();
 
 		var aLinksInitial = document.querySelectorAll("link[id^=sap-ui-theme-]");
-		assert.equal(aLinksInitial.length, 2, "There should be 2 library themes included");
+		assert.equal(aLinksInitial.length, 4, "There should be 4 library themes included");
 
 		const oLinkSapUiCore = document.getElementById("sap-ui-theme-sap.ui.core");
 		const oLinkSapM = document.getElementById("sap-ui-theme-sap.m");
+		const oLinkSapUiLayout = document.getElementById("sap-ui-theme-sap.ui.layout");
+		const oLinkSapUiUnified = document.getElementById("sap-ui-theme-sap.ui.unified");
 		assert.ok(oLinkSapUiCore, "there should be element for sap.ui.core");
 		assert.ok(oLinkSapM, "there should be element for sap.m");
+		assert.ok(oLinkSapUiLayout, "there should be element for sap.ui.layout");
+		assert.ok(oLinkSapUiUnified, "there should be element for sap.ui.unified");
 
 		assert.equal(
 			Theming.getTheme(),
@@ -79,6 +91,10 @@ sap.ui.define([
 		assert.equal(oLinkSapUiCore.href, `${sPath}/sap/ui/core/themes/sap_horizon_hcw/library.css?sap-ui-dist-version=${sCoreVersion}`,
 			"sap.ui.core stylesheet href should be correct");
 		assert.equal(oLinkSapM.href, `${sPath}/sap/m/themes/sap_horizon_hcw/library.css?sap-ui-dist-version=${sCoreVersion}`,
+			"sap.m stylesheet href should be correct");
+		assert.equal(oLinkSapUiLayout.href, `${sPath}/sap/ui/layout/themes/sap_horizon_hcw/library.css?sap-ui-dist-version=${sCoreVersion}`,
+			"sap.ui.core stylesheet href should be correct");
+		assert.equal(oLinkSapUiUnified.href, `${sPath}/sap/ui/unified/themes/sap_horizon_hcw/library.css?sap-ui-dist-version=${sCoreVersion}`,
 			"sap.m stylesheet href should be correct");
 	});
 });

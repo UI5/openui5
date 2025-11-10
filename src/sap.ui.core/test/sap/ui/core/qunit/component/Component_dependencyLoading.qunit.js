@@ -31,9 +31,9 @@ sap.ui.define([
 
 			// Check for the expected libraries to be loaded
 			assert.strictEqual(this.oLoadLibrarySpy.callCount, 3, "Library._load() called 3 times");
-			assert.ok(this.oLoadLibrarySpy.getCall(0).calledWithExactly("sap.m", { sync: false }), "First Library._load() call with arguments: 'sap.m', { sync: false }");
-			assert.ok(this.oLoadLibrarySpy.getCall(1).calledWithExactly("sap.tnt", { sync: false }), "Second Library._load() call with arguments: 'sap.tnt', { sync: false }");
-			assert.ok(this.oLoadLibrarySpy.getCall(2).calledWithExactly("sap.ui.core", { sync: false }), "Third Library._load() call with arguments: 'sap.ui.core', { sync: false }");
+			assert.ok(this.oLoadLibrarySpy.getCall(0).calledWithExactly("sap.m"), "First Library._load() call with arguments: 'sap.m'");
+			assert.ok(this.oLoadLibrarySpy.getCall(1).calledWithExactly("sap.tnt"), "Second Library._load() call with arguments: 'sap.tnt'");
+			assert.ok(this.oLoadLibrarySpy.getCall(2).calledWithExactly("sap.ui.core"), "Third Library._load() call with arguments: 'sap.ui.core'");
 
 			// Cleanup
 			oComponent.destroy();
@@ -51,11 +51,11 @@ sap.ui.define([
 
 			// Check for the expected libraries to be loaded
 			assert.strictEqual(this.oLoadLibrarySpy.callCount, 4, "Library._load() called 4 times");
-			assert.ok(this.oLoadLibrarySpy.getCall(0).calledWithExactly(["sap.m", "sap.ui.core", "sap.ui.table"], { sync: false }), "First Library._load() call with arguments: '['sap.m', 'sap.ui.core', 'sap.ui.table'], { sync: false }'==> preload dependencies");
+			assert.ok(this.oLoadLibrarySpy.getCall(0).calledWithExactly(["sap.m", "sap.ui.core", "sap.ui.table"]), "First Library._load() call with arguments: '['sap.m', 'sap.ui.core', 'sap.ui.table']'==> preload dependencies");
 
-			assert.ok(this.oLoadLibrarySpy.getCall(1).calledWithExactly("sap.m", { sync: false }), "Second Library._load() call with arguments: 'sap.m', { sync: false }");
-			assert.ok(this.oLoadLibrarySpy.getCall(2).calledWithExactly("sap.ui.core", { sync: false }), "Third Library._load() call with arguments: 'sap.ui.core', { sync: false }");
-			assert.ok(this.oLoadLibrarySpy.getCall(3).calledWithExactly("sap.ui.table", { sync: false }), "Fourth Library._load() call with arguments: 'sap.ui.table', { sync: false }");
+			assert.ok(this.oLoadLibrarySpy.getCall(1).calledWithExactly("sap.m"), "Second Library._load() call with arguments: 'sap.m'");
+			assert.ok(this.oLoadLibrarySpy.getCall(2).calledWithExactly("sap.ui.core"), "Third Library._load() call with arguments: 'sap.ui.core'");
+			assert.ok(this.oLoadLibrarySpy.getCall(3).calledWithExactly("sap.ui.table"), "Fourth Library._load() call with arguments: 'sap.ui.table'");
 
 			// Cleanup
 			oComponent.destroy();
@@ -73,16 +73,16 @@ sap.ui.define([
 
 			// Check for the expected libraries to be loaded
 			assert.strictEqual(this.oLoadLibrarySpy.callCount, 9, "Library._load() called nine times");
-			assert.ok(this.oLoadLibrarySpy.getCall(0).calledWithExactly("sap.m", { sync: false }), "First Library._load() call with arguments: 'sap.m', { sync: false }");
-			assert.ok(this.oLoadLibrarySpy.getCall(1).calledWithExactly("sap.tnt", { sync: false }), "Second Library._load() call with arguments: 'sap.tnt', { sync: false }");
-			assert.ok(this.oLoadLibrarySpy.getCall(2).calledWithExactly("sap.ui.core", { sync: false }), "Third Library._load() call with arguments: 'sap.ui.core', { sync: false }");
+			assert.ok(this.oLoadLibrarySpy.getCall(0).calledWithExactly("sap.m"), "First Library._load() call with arguments: 'sap.m'");
+			assert.ok(this.oLoadLibrarySpy.getCall(1).calledWithExactly("sap.tnt"), "Second Library._load() call with arguments: 'sap.tnt'");
+			assert.ok(this.oLoadLibrarySpy.getCall(2).calledWithExactly("sap.ui.core"), "Third Library._load() call with arguments: 'sap.ui.core'");
 
-			assert.ok(this.oLoadLibrarySpy.getCall(3).calledWithExactly("sap.m", { sync: false }), "Fourth Library._load() call with arguments: 'sap.m', { sync: false }");
-			assert.ok(this.oLoadLibrarySpy.getCall(4).calledWithExactly("sap.ui.core", { sync: false }), "Fifth Library._load() call with arguments: 'sap.ui.core', { sync: false }");
-			assert.ok(this.oLoadLibrarySpy.getCall(5).calledWithExactly("sap.ui.layout", { sync: false }), "Sixth Library._load() call with arguments: 'sap.ui.layout', { sync: false }");
-			assert.ok(this.oLoadLibrarySpy.getCall(6).calledWithExactly("sap.m", { sync: false }), "Seventh Library._load() call with arguments: 'sap.m', { sync: false }");
-			assert.ok(this.oLoadLibrarySpy.getCall(7).calledWithExactly("sap.ui.core", { sync: false }), "Eighth Library._load() call with arguments: 'sap.ui.core', { sync: false }");
-			assert.ok(this.oLoadLibrarySpy.getCall(8).calledWithExactly("sap.ui.table", { sync: false }), "Ninth Library._load() call with arguments: 'sap.ui.table', { sync: false }");
+			assert.ok(this.oLoadLibrarySpy.getCall(3).calledWithExactly("sap.m"), "Fourth Library._load() call with arguments: 'sap.m'");
+			assert.ok(this.oLoadLibrarySpy.getCall(4).calledWithExactly("sap.ui.core"), "Fifth Library._load() call with arguments: 'sap.ui.core'");
+			assert.ok(this.oLoadLibrarySpy.getCall(5).calledWithExactly("sap.ui.layout"), "Sixth Library._load() call with arguments: 'sap.ui.layout'");
+			assert.ok(this.oLoadLibrarySpy.getCall(6).calledWithExactly("sap.m"), "Seventh Library._load() call with arguments: 'sap.m'");
+			assert.ok(this.oLoadLibrarySpy.getCall(7).calledWithExactly("sap.ui.core"), "Eighth Library._load() call with arguments: 'sap.ui.core'");
+			assert.ok(this.oLoadLibrarySpy.getCall(8).calledWithExactly("sap.ui.table"), "Ninth Library._load() call with arguments: 'sap.ui.table'");
 
 			var aCssDomElements = document.querySelectorAll("link[data-sap-ui-manifest-uid");
 			assert.strictEqual(aCssDomElements.length, 2, "Two CSS files with expected criteria found in DOM");

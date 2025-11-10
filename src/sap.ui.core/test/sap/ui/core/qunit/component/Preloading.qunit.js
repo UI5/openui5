@@ -663,10 +663,9 @@ sap.ui.define([
 			sinon.assert.calledWithExactly(this.oLoadLibrarySpy,
 			[
 				"sap.test.lib2",
+				"sap.test.lib3",
 				"sap.test.lib4"
-			], {
-				sync: false
-			});
+			]);
 
 			// Verify that all expected components have been preloaded
 			assert.ok(hasBeenLoadedAndExecuted("sap/test/manifestcomp/Component-preload.js"));
@@ -705,8 +704,9 @@ sap.ui.define([
 
 			// Verify that all expected libraries have been preloaded
 			// "sap.test.lib3" is declared as "lazy" and shouldn't get preloaded initially
-			sinon.assert.calledWithExactly(this.oLoadLibrarySpy, "sap.test.lib2", { sync: false });
-			sinon.assert.calledWithExactly(this.oLoadLibrarySpy, "sap.test.lib4", { sync: false });
+			sinon.assert.calledWithExactly(this.oLoadLibrarySpy, "sap.test.lib2");
+			sinon.assert.calledWithExactly(this.oLoadLibrarySpy, "sap.test.lib3");
+			sinon.assert.calledWithExactly(this.oLoadLibrarySpy, "sap.test.lib4");
 
 			// Verify that all expected components have been preloaded
 			assert.ok(hasBeenLoadedAndExecuted("sap/test/manifestcomp/Component-preload.js"));
@@ -905,8 +905,8 @@ sap.ui.define([
 				// lib10 is loaded with a separate request and not part of the initial loadLibraries call
 				sinon.assert.calledWith(privateLoaderAPI.loadJSResourceAsync, sinon.match(/scenario15\/lib10\/library-preload\.js$/));
 
-				// lib5 is not requested --> lazy: true
-				sinon.assert.neverCalledWith(privateLoaderAPI.loadJSResourceAsync, sinon.match(/scenario15\/lib5\/library-preload\.js$/));
+				// lib5 is loaded with a separate request and not part of the initial loadLibraries call
+				sinon.assert.calledWith(privateLoaderAPI.loadJSResourceAsync, sinon.match(/scenario15\/lib5\/library-preload\.js$/));
 			});
 		}.bind(this)).finally(function () {
 			this.oPreloadDisabledStub.restore();

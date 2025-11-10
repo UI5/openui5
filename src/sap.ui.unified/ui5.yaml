@@ -10,20 +10,3 @@ metadata:
 resources:
   configuration:
     propertiesFileSourceEncoding: ISO-8859-1
-builder:
-  bundles:
-    - bundleDefinition:
-        name: sap/ui/unified/library-preload-lazy.js
-        sections:
-          - mode: bundleInfo
-            name: sap/ui/unified/library-preload.js
-            filters:
-              - sap/ui/unified/
-              - sap/ui/unified/manifest.json
-              - "!sap/ui/unified/*-preload.js"
-              - "!sap/ui/unified/**/*.designtime.js"
-              - "!sap/ui/unified/**/designtime/"
-              - "!sap/ui/unified/**/*.support.js"
-            resolve: false
-      bundleOptions:
-        optimize: true

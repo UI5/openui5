@@ -534,10 +534,8 @@ sap.ui.define([
 				var mLibraries = oDep["libs"];
 				if (mLibraries) {
 					for (var sLib in mLibraries) {
-						if (!mLibraries[sLib].lazy) {
-							Log.info("Component \"" + sComponentName + "\" is loading library: \"" + sLib + "\"");
-							aPromises.push(Library._load(sLib, {sync: false}));
-						}
+						Log.info("Component \"" + sComponentName + "\" is loading library: \"" + sLib + "\"");
+						aPromises.push(Library._load(sLib));
 					}
 				}
 

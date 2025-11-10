@@ -78,19 +78,6 @@ sap.ui.define([
 	var mGuessedLibrariesNegative = {};
 
 	/**
-	 * Set of libraries that provide a bundle info file (library-preload-lazy.js).
-	 *
-	 * The file will be loaded, when a lazy dependency to the library is encountered.
-	 * @private
-	 */
-	var oLibraryWithBundleInfo = new Set([
-		"sap.suite.ui.generic.template",
-		"sap.ui.comp",
-		"sap.ui.layout",
-		"sap.ui.unified"
-	]);
-
-	/**
 	 * Retrieves the module path.
 	 * @param {string} sModuleName module name.
 	 * @param {string} sSuffix is used untouched (dots are not replaced with slashes).
@@ -153,31 +140,6 @@ sap.ui.define([
 			version: oLib.version || oLib.oManifest?.["sap.app"]?.applicationVersion?.version
 		});
 		oLib.cssLoaded = true;
-	}
-
-	/**
-	 * filter/normalize given dependencies
-	 * @param {Array<{name:string, lazy:boolean}>} aDependencies
-	 * @returns {Array<{name:string, lazy:boolean}>}
-	 * @private
-	 */
-	function filterDependencies(aDependencies) {
-		const aResults = [];
-		if (aDependencies) {
-			aDependencies.forEach(function(oDependency) {
-				if (!oDependency.lazy) {
-					aResults.push({
-						name: oDependency.name
-					});
-				} else if (oLibraryWithBundleInfo.has(oDependency.name)) {
-					aResults.push({
-						name: oDependency.name,
-						lazy: true
-					});
-				}
-			});
-		}
-		return aResults;
 	}
 
 	/**
@@ -344,8 +306,6 @@ sap.ui.define([
 		 *
 		 * @param {object} [mOptions] The options object that contains the following properties
 		 * @param {string} [mOptions.url] URL to load the library from
-		 * @param {boolean} [mOptions.lazy] Whether the library-preload-lazy bundle should be loaded instead of the
-		 *  library-preload bundle
 		 * @returns {Promise<sap.ui.core.Lib>} A promise that resolves with the library instance
 		 * @private
 		 */
@@ -354,7 +314,7 @@ sap.ui.define([
 				throw new Error("The 'preload' function of class sap/ui/core/Lib only supports preloading a library asynchronously.");
 			}
 
-			return this._preload(["url", "lazy"].reduce(function(acc, sProperty) {
+			return this._preload(["url"].reduce(function(acc, sProperty) {
 				if (mOptions && mOptions.hasOwnProperty(sProperty)) {
 					acc[sProperty] = mOptions[sProperty];
 				}
@@ -365,14 +325,13 @@ sap.ui.define([
 		/**
 		 * Internal function for preloading a library:
 		 *
-		 * @param [mOptions] The options object that contains the following properties
-		 * @param [mOptions.url] URL to load the library from
-		 * @param [mOptions.lazy] Whether the library-preload-lazy bundle should be loaded instead of the
-		 *  library-preload bundle
+		 * @param {object} [mOptions] The options object that contains the following properties
+		 * @param {string} [mOptions.url] URL to load the library from
 		 * @returns {Promise<Lib>} A promise that resolves with the library instance
 		 * @private
 		 */
 		_preload: async function(mOptions) {
+			const aAllPromises = [];
 			mOptions = mOptions || {};
 
 			if (this._loadingStatus?.promise) {
@@ -390,31 +349,16 @@ sap.ui.define([
 
 			// A library should load dependencies first to ensure correct css order. Therefore a deferred is needed to delay the library promise resolve.
 			this._loadingStatus.cssLoaded = new Deferred();
-			await this.loadManifest();
 
-			if (mOptions.lazy) {
-				// For selected lazy dependencies, we load a library-preload-lazy module.
-				// Errors are ignored and the library is not marked as pending in the bookkeeping
-				// (but the loader avoids double loading).
-				Log.debug("Lazy dependency to '" + this.name + "' encountered, loading library-preload-lazy.js");
-
-				this._loadingStatus.cssLoaded.resolve();
-				return sap.ui.loader._.loadJSResourceAsync(
-					this.namespace + '/library-preload-lazy.js', /* ignoreErrors = */ true);
+			if (!bEntryModuleExists && !Supportability.isPreloadDisabled()) {
+				// first preload code, resolves with list of dependencies (or undefined)
+				aAllPromises.push(this._loadLibraryPreload());
 			}
+			await this.loadManifest();
 
 			// otherwise mark as pending
 			this._loadingStatus.pending = true;
 			this._loadingStatus.async = true;
-
-			const aAllPromises = [];
-
-			if (bEntryModuleExists) {
-				aAllPromises.push(Promise.resolve(this));
-			} else if (!Supportability.isPreloadDisabled()) {
-				// first preload code, resolves with list of dependencies (or undefined)
-				aAllPromises.push(this._loadLibraryPreload());
-			}
 
 			//css loading promises of dependent libs
 			const aDependentLibCss = [];
@@ -427,22 +371,20 @@ sap.ui.define([
 			var mDependencies = oManifest?.["sap.ui5"]?.dependencies?.libs;
 			if (mDependencies) {
 				aDependencies = Object.keys(mDependencies).map((sDependency) => {
-					return  {
-						name: sDependency,
-						lazy: mDependencies[sDependency].lazy || false
+					return {
+						name: sDependency
 					};
 				});
 			}
 
 			if (aDependencies && aDependencies.length) {
 
-				let aAllDependencies = VersionInfo._getTransitiveDependencyForLibraries(aDependencies);
-				aAllDependencies = filterDependencies(aAllDependencies);
+				const aAllDependencies = VersionInfo._getTransitiveDependencyForLibraries(aDependencies);
 
-				aAllDependencies.forEach((oDependency) => {
-					let oLibrary = Library._get(oDependency.name);
+				aAllDependencies.forEach((sDependencyName) => {
+					let oLibrary = Library._get(sDependencyName);
 					if (oLibrary && oLibrary._loadingStatus) {
-						if (!this._loadingStatus.initiator.has(oDependency.name)) {
+						if (!this._loadingStatus.initiator.has(sDependencyName)) {
 							aAllPromises.push(oLibrary._loadingStatus.promise);
 							aDependentLibCss.push(oLibrary._loadingStatus.cssLoaded.promise);
 						} else {
@@ -450,10 +392,8 @@ sap.ui.define([
 						}
 						oLibrary._loadingStatus.initiator = new Set([...oLibrary._loadingStatus.initiator, ...this._loadingStatus.initiator]);
 					} else {
-						oLibrary = Library._get(oDependency.name, true/* bCreate */);
-						aAllPromises.push(oLibrary._preload({
-							lazy: oDependency.lazy
-						}));
+						oLibrary = Library._get(sDependencyName, true/* bCreate */);
+						aAllPromises.push(oLibrary._preload());
 						// We must process all dependent manifests first to ensure the correct css order. Then we could resolve the Lib itself with the deferred.
 						aDependentLibCss.push(oLibrary._loadingStatus.cssLoaded.promise);
 					}
@@ -1105,7 +1045,6 @@ sap.ui.define([
 	 * <ul>
 	 * <li>loading multiple libraries: libraries are preloaded firstly and their entry modules are executed within a
 	 * single <code>sap.ui.require</code> call after their preloads are finished</li>
-	 * <li><code>mOptions.sync</code>: load the preload file in sync mode</li>
 	 * <li><code>mOptions.preloadOnly</code>: load the preload file in sync mode</li>
 	 * </ul>
 	 *
@@ -1114,7 +1053,6 @@ sap.ui.define([
 	 * @param {string} vLibConfigs.name The name of the library
 	 * @param {string} [vLibConfigs.url] URL to load the library from
 	 * @param {object} [mOptions] The options object that contains the following properties
-	 * @param {boolean} [mOptions.sync] Whether to load the preload bundle(s) in sync mode
 	 * @param {boolean} [mOptions.preloadOnly] Whether to skip executing the entry module(s) after preloading the
 	 *  library/libraries
 	 * @return {Promise<Array<sap.ui.core.Lib>>|Array<sap.ui.core.Lib>} A promise that resolves with an
@@ -1140,10 +1078,6 @@ sap.ui.define([
 				aAllLibraries.push({name: vLibrary});
 			}
 		});
-
-		if (!mOptions.sync) {
-			aAllLibraries = filterDependencies(VersionInfo._getTransitiveDependencyForLibraries(aAllLibraries));
-		}
 
 		var aLibs = aAllLibraries.map(function(oLibrary) {
 			var oLib = Library._get(oLibrary.name, true /* bCreate */);
