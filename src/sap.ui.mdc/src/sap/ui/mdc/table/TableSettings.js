@@ -13,7 +13,9 @@ sap.ui.define([
 	"sap/ui/Device",
 	"sap/ui/core/ShortcutHintsMixin",
 	"sap/ui/core/theming/Parameters",
-	"sap/ui/performance/trace/FESRHelper"
+	"sap/ui/performance/trace/FESRHelper",
+	"sap/ui/mdc/enums/TableActionPosition",
+	"./ActionLayoutData"
 ], (
 	OverflowToolbarButton,
 	MLibrary,
@@ -25,7 +27,9 @@ sap.ui.define([
 	Device,
 	ShortcutHintsMixin,
 	ThemeParameters,
-	FESRHelper
+	FESRHelper,
+	TableActionPosition,
+	ActionLayoutData
 ) => {
 	"use strict";
 
@@ -50,7 +54,10 @@ sap.ui.define([
 				text: oRb.getText("table.SETTINGS"),
 				press: aEventInfo,
 				tooltip: oRb.getText("table.SETTINGS"),
-				ariaHasPopup: HasPopup.Dialog
+				ariaHasPopup: HasPopup.Dialog,
+				layoutData: new ActionLayoutData({
+					position: TableActionPosition.PersonalizationActionsSettings
+				})
 			});
 
 			FESRHelper.setSemanticStepname(oBtn, "press", "mdc:tbl:p13n");
@@ -63,8 +70,20 @@ sap.ui.define([
 
 			return oBtn;
 		},
+		createCopyButton: function(sIdPrefix, oCopyProvider) {
+			return oCopyProvider.getCopyButton({
+				id: sIdPrefix + "-copy",
+				layoutData: new ActionLayoutData({
+					position: TableActionPosition.ModificationActionsCopy
+				})
+			});
+		},
 		createPasteButton: function(sIdPrefix) {
-			const oPasteButton = this._createButton(sIdPrefix + "-paste");
+			const oPasteButton = this._createButton(sIdPrefix + "-paste", {
+				layoutData: new ActionLayoutData({
+					position: TableActionPosition.ModificationActionsPaste
+				})
+			});
 
 			FESRHelper.setSemanticStepname(oPasteButton, "press", "mdc:tbl:paste");
 
@@ -88,7 +107,10 @@ sap.ui.define([
 				type: MLibrary.ButtonType[sButtonType],
 				buttonMode: MLibrary.MenuButtonMode.Split,
 				useDefaultActionOnly: true,
-				defaultAction: mEventInfo.default
+				defaultAction: mEventInfo.default,
+				layoutData: new ActionLayoutData({
+					position: TableActionPosition.ExportActionsExport
+				})
 			});
 
 			const oMenu = new Menu({
@@ -127,7 +149,10 @@ sap.ui.define([
 				icon: bIsExpand ? "sap-icon://expand-all" : "sap-icon://collapse-all",
 				text: sText,
 				press: fnPressEvent,
-				tooltip: sText
+				tooltip: sText,
+				layoutData: new ActionLayoutData({
+					position: bIsExpand ? TableActionPosition.PersonalizationActionsExpandAll : TableActionPosition.PersonalizationActionsCollapseAll
+				})
 			});
 
 			FESRHelper.setSemanticStepname(oButton, "press", "mdc:tbl:" + (bIsExpand ? "expandAll" : "collapseAll"));
@@ -151,9 +176,11 @@ sap.ui.define([
 						new MenuItem({text: sTree, press: mItemEventInfo.tree}),
 						new MenuItem({text: sNode, press: mItemEventInfo.node})
 					]
+				}),
+				layoutData: new ActionLayoutData({
+					position: bIsExpand ? TableActionPosition.PersonalizationActionsExpandAll : TableActionPosition.PersonalizationActionsCollapseAll
 				})
 			});
-
 			return oMenuButton;
 		},
 		_createButton: function(sId, mSettings) {

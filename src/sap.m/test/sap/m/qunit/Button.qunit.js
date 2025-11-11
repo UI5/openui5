@@ -76,7 +76,7 @@ sap.ui.define([
 
 
 
-	var b1, b2, b4, b5, b6, b7, b8, b9, b10, b11, b12, b13, b14, b15, msg;
+	var b1, b2, b4, b5, b6, b7, b8, b9, b10, b11, b12, b13, b14, msg;
 
 	var sText = "Button Text",
 		sButtonTypeDefault = ButtonType.Default,
@@ -1098,11 +1098,9 @@ sap.ui.define([
 
 	QUnit.module("Tap Event Checking", {
 		beforeEach : function() {
-			b15 = Element.getElementById("b15");
+			Element.getElementById("b15");
 		},
-		afterEach : function() {
-			b15 = null;
-		}
+		afterEach : function() {}
 	});
 
 	QUnit.module("Determining ACC type", {

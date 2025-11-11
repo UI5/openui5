@@ -930,7 +930,6 @@ sap.ui.define([
 				sStyleClasses = "",
 				aCustomData = [],
 				mCustomSettings = null,
-				sSupportData = null,
 				// for stashed nodes we need to ignore the following type of attributes:
 				// 1. Aggregations
 				//    -> might lead to the creation of bindings; also the aggregation template is removed anyway
@@ -1052,9 +1051,7 @@ sap.ui.define([
 									key: sLocalName,
 									value: parseScalarType("any", sValue, sLocalName, oView._oContainingView.oController, oRequireModules, aTypePromises, mAdditionalBindableValues)
 								}));
-							} else if (sNamespace === SUPPORT_INFO_NAMESPACE) {
-								sSupportData = sValue;
-							} else if (sNamespace && sNamespace.startsWith(PREPROCESSOR_NAMESPACE_PREFIX)) {
+							} else if (sNamespace === SUPPORT_INFO_NAMESPACE) {} else if (sNamespace && sNamespace.startsWith(PREPROCESSOR_NAMESPACE_PREFIX)) {
 								Log.debug(oView + ": XMLView parser ignored preprocessor attribute '" + sName + "' (value: '" + sValue + "')");
 							} else if (sNamespace === UI5_INTERNAL_NAMESPACE && localName(attr) === "invisible") {
 								oInfo = mKnownSettings.visible;

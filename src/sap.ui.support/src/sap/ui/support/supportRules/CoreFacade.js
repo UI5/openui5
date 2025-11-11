@@ -11,8 +11,6 @@ sap.ui.define([
 ], function (ComponentRegistry, UIAreaRegistry) {
 	"use strict";
 
-	var coreInstance = null;
-
 	/**
 	 * The CoreFacade interface allows rule developers to access the metadata, models, UI areas and components of the Core.
 	 *
@@ -26,8 +24,6 @@ sap.ui.define([
 	 * @public
 	 */
 	function CoreFacade(oCore) {
-		coreInstance = oCore;
-
 		return (
 			/** @lends sap.ui.support.CoreFacade.prototype */ {
 				/**
@@ -54,5 +50,4 @@ sap.ui.define([
 	}
 
 	return CoreFacade;
-
 });

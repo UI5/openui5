@@ -22,8 +22,6 @@ sap.ui.define([
 	/*eslint no-warning-comments: 0 */
 	"use strict";
 
-	var enclosingContext;
-
 	var oController = {
 			mytype : String,
 			myformatter : function($) { return $; },
@@ -42,12 +40,10 @@ sap.ui.define([
 				formatter : function($) { return $; },
 				check : function(iValue) { return iValue > 100; },
 				fn: function() {
-					enclosingContext = this;
 					return "fn";
 				},
 				ns: {
 					fn: function() {
-						enclosingContext = this;
 						return "ns";
 					}
 				}
@@ -71,7 +67,6 @@ sap.ui.define([
 			eventHandler: function () {},
 			ns: {
 				global: function() {
-					enclosingContext = this;
 					return "global";
 				}
 			}

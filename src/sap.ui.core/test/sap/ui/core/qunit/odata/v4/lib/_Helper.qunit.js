@@ -2282,11 +2282,10 @@ sap.ui.define([
 	sBase : "https://host-a:4321/service/",
 	sResult : "http://host-b:1234/alternative/bar"
 }, {
-	// absolute sUrl has baseURI as origin, don't care about a baseURI-prefix because it is
-	// equivalent to a root relative URL (origin part can be removed)
+	// absolute sUrl has pathname part of baseURI as prefix
 	sUrl : document.baseURI + "alternative/bar",
 	sBase : "/service/",
-	sResult : "/alternative/bar"
+	sResult : new URL(document.baseURI).pathname + "alternative/bar"
 }, {
 	// root relative but sBase has baseURI as origin, don't care about a baseURI-prefix because
 	// it is equivalent to a root relative URL (origin part can be removed)

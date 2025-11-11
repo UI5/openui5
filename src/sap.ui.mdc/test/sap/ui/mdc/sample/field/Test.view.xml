@@ -82,8 +82,8 @@
 				</mdc:Field>
 
 				<m:Label text="Link"></m:Label>
-				<mdc:Field id="F12" value="Url" additionalValue="{= '../../../../../../' + ${ProductPicUrl}}" editMode="Display" change="handleChange" liveChange="handleLiveChange" press="handlePress" submit="handleSubmit">
-					<m:Link text="{path: '$field>/conditions', type: 'sap.ui.mdc.field.ConditionsType'}" href="{path:'$field>/additionalValue', type:'sap.ui.model.type.String'}" />
+				<mdc:Field id="F12" value="Url" additionalValue="{path: 'ProductPicUrl', type:'sap.ui.model.type.String'}" editMode="Display" change="handleChange" liveChange="handleLiveChange" press="handlePress" submit="handleSubmit">
+					<m:Link id="F12-Link" text="{path: '$field>/conditions', type: 'sap.ui.mdc.field.ConditionsType'}" href="{= '../../../../../../' + ${$field>/additionalValue}}" />
 				</mdc:Field>
 
 				<c:Title text="different types"></c:Title>
@@ -1733,8 +1733,8 @@
 						</mdc:Field>
 						<mdc:Field id="T-F2" value="{Name}" editMode="{= ${view>/editMode} ? 'Editable' : 'Display' }" change="handleChange" liveChange="handleLiveChange" submit="handleSubmit" width="100%"></mdc:Field>
 						<mdc:Field id="T-F3" value="{Description}" multipleLines="true" editMode="{= ${view>/editMode} ? 'Editable' : 'Display' }" change="handleChange" liveChange="handleLiveChange" submit="handleSubmit" width="100%"></mdc:Field>
-						<mdc:Field id="T-F4" value="{= '../../../../../../' + ${ProductPicUrl}}" change="handleChange" liveChange="handleLiveChange" submit="handleSubmit" width="100%">
-							<m:Image src="{path: '$field>/conditions', type: 'sap.ui.mdc.field.ConditionsType'}" height="1rem"/>
+						<mdc:Field id="T-F4" value="{= '../../../../../../' + ${ProductPicUrl}}" editMode="Display" change="handleChange" liveChange="handleLiveChange" submit="handleSubmit" width="100%">
+							<m:Image id="T-F4-Image" src="{path: '$field>/conditions', type: 'sap.ui.mdc.field.ConditionsType'}" height="1rem"/>
 						</mdc:Field>
 						<mdc:Field id="T-F5" value="{DateTime}" dataType="Edm.DateTimeOffset" delegate='\{"name": "sap/ui/mdc/sample/field/FieldBaseODataV2.delegate"\}' editMode="{= ${view>/editMode} ? 'Editable' : 'Display' }" change="handleChange" liveChange="handleLiveChange" submit="handleSubmit" width="100%"></mdc:Field>
 						<mdc:Field id="T-F6" value="{Status}" display="Description" valueHelp="T-F6-H" editMode="{= ${view>/editMode} ? 'Editable' : 'Display' }" change="handleChange" liveChange="handleLiveChange" submit="handleSubmit" width="100%"></mdc:Field>
@@ -1827,8 +1827,8 @@
 								</mdcField:CustomFieldInfo>
 							</mdc:fieldInfo>
 						</mdc:Field>
-						<mdc:Field id="F4-17" value="Url" additionalValue="{= '../../../../../../' + ${ProductPicUrl}}" editMode="{= ${view>/editModeSemantic} ? 'Editable' : 'Display' }" change="handleChange" liveChange="handleLiveChange" press="handlePress" submit="handleSubmit" multipleLines="false">
-							<m:Link text="{path: '$field>/conditions', type: 'sap.ui.mdc.field.ConditionsType'}" href="{path:'$field>/additionalValue', type:'sap.ui.model.type.String'}" />
+						<mdc:Field id="F4-17" value="Url" additionalValue="{path: 'ProductPicUrl', type:'sap.ui.model.type.String'}" editMode="{= ${view>/editModeSemantic} ? 'Editable' : 'Display' }" change="handleChange" liveChange="handleLiveChange" press="handlePress" submit="handleSubmit" multipleLines="false">
+							<m:Link id="F4-17-Link" text="{path: '$field>/conditions', type: 'sap.ui.mdc.field.ConditionsType'}" href="{= '../../../../../../' + ${$field>/additionalValue}}" />
 						</mdc:Field>
 					</form:SemanticFormElement>
 					<form:SemanticFormElement >

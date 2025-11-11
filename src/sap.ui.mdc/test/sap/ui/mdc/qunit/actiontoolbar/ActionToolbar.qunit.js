@@ -1,7 +1,7 @@
 /* global QUnit, sinon */
 sap.ui.define([
-	"sap/ui/mdc/ActionToolbar", "sap/m/Button", "sap/m/Title", "sap/m/Text", "sap/ui/mdc/actiontoolbar/ActionToolbarAction", "sap/ui/mdc/enums/ActionToolbarActionAlignment", "sap/ui/test/utils/nextUIUpdate"
-], function(ActionToolbar, Button, Title, Text, ActionToolbarAction, ActionToolbarActionAlignment, nextUIUpdate) {
+	"sap/ui/core/Element", "sap/ui/base/DataType", "sap/ui/mdc/ActionToolbar", "sap/m/OverflowToolbarLayoutData", "sap/m/Button", "sap/m/Title", "sap/m/Text", "sap/m/Link", "sap/ui/mdc/actiontoolbar/ActionToolbarAction", "sap/ui/mdc/enums/ActionToolbarActionAlignment", "sap/ui/test/utils/nextUIUpdate"
+], function(Element, DataType, ActionToolbar, OverflowToolbarLayoutData, Button, Title, Text, Link, ActionToolbarAction, ActionToolbarActionAlignment, nextUIUpdate) {
 	"use strict";
 
 	QUnit.module("sap.ui.mdc.ActionToolbar - General", {
@@ -802,50 +802,183 @@ sap.ui.define([
 		checkAggregation(assert, this.oToolbarDestroyAggregation, "end", [], "After destroyEnd");
 	});
 
-	QUnit.module("_endOrder Property");
+	QUnit.module("controlActions positioning", {
+		before: function () {
+			this.GroupCount = 3;
+			this.ActionsCount = 2;
+			this.MyActionPosition = {};
+			for (let i = 1; i <= this.GroupCount; i++) {
+				for (let j = 1; j <= this.ActionsCount; j++) {
+					const sActionPosition = `G${i}ActionsA${j}`;
+					this.MyActionPosition[sActionPosition] = sActionPosition;
+				}
+			}
 
-	QUnit.test("aggregation order", async function(assert) {
-		const sText = "ABCDEFGHI";
-		const aOrder = [...sText];
-
-		for (let i = 0; i < 10; i++) {
-			const aRandomOrder1 = aOrder.slice().sort(() => Math.random() - 0.5);
-			const oToolbar = new ActionToolbar({
-				end: aRandomOrder1.map((sLetter) => new Button(sLetter, { text: sLetter }))
+			DataType.registerEnum("sap.ui.mdc.enums.MyActionPosition", this.MyActionPosition);
+			this.MyActionLayoutData = OverflowToolbarLayoutData.extend("sap.ui.mdc.table.MyActionLayoutData", {
+				metadata: {
+					library: "sap.ui.mdc",
+					interfaces: ["sap.ui.mdc.IActionLayoutData"],
+					properties: {
+						position: {type: "sap.ui.mdc.enums.MyActionPosition", defaultValue: `G${this.GroupCount}ActionsA${this.ActionsCount}`}
+					}
+				}
 			});
-
-			oToolbar.setProperty("_endOrder", aOrder);
-			oToolbar.placeAt("qunit-fixture");
-			await nextUIUpdate();
-			assert.equal(oToolbar.getDomRef().textContent, sText, `End aggregation in the constructor: ${aRandomOrder1} => ${aOrder}`);
-			oToolbar.destroyEnd();
-
-			const aRandomOrder2 = aOrder.slice().sort(() => Math.random() - 0.5);
-			aRandomOrder2.forEach((sLetter) => oToolbar.insertEnd(new Button(sLetter, { text: sLetter }), 0));
-			await nextUIUpdate();
-			assert.equal(oToolbar.getDomRef().textContent, sText, `End aggregation filled by insertEnd: ${aRandomOrder2} => ${aOrder}`);
-			oToolbar.destroyEnd();
-
-			const aRandomOrder3 = aOrder.concat("X").sort(() => Math.random() - 0.5);
-			aRandomOrder3.forEach((sLetter) => oToolbar.addEnd(new Button(sLetter, { text: sLetter })));
-			await nextUIUpdate();
-			assert.equal(oToolbar.getDomRef().textContent, sText + "X", `Unknown button X is at the end: ${aRandomOrder3} => ${aOrder},X`);
-			oToolbar.destroyEnd();
-
-			const aRandomOrder4 = aOrder.slice().sort(() => Math.random() - 0.5);
-			const sRemovedLetter = aRandomOrder4.pop();
-			const sNewText = sText.replace(sRemovedLetter, "");
-			aRandomOrder4.forEach((sLetter) => oToolbar.addEnd(new Button(sLetter, { text: sLetter })));
-			await nextUIUpdate();
-			assert.equal(oToolbar.getDomRef().textContent, sNewText, `Button ${sRemovedLetter} removed: ${aRandomOrder4} => ${sNewText}`);
-
-			const aRandomOrder5 = aRandomOrder4.slice().sort(() => Math.random() - 0.5);
-			const sRandomOrder5 = aRandomOrder5.join("");
-			oToolbar.setProperty("_endOrder", aRandomOrder5);
-			await nextUIUpdate();
-			assert.equal(oToolbar.getDomRef().textContent, sRandomOrder5, `_endOrder changed without aggregation change: ${aRandomOrder5}`);
-			oToolbar.destroy();
+		},
+		createActionsWithPosition: function () {
+			this.aActionsWithPosition = [];
+			for (let i = 1; i <= this.GroupCount; i++) {
+				for (let j = 1; j <= this.ActionsCount; j++) {
+					const sActionPosition = `G${i}ActionsA${j}`;
+					const oAction = new Link({
+						id: sActionPosition,
+						text: sActionPosition,
+						layoutData: new this.MyActionLayoutData({
+							position: sActionPosition
+						})
+					});
+					this.aActionsWithPosition.push(oAction);
+				}
+			}
+			return this.aActionsWithPosition;
+		},
+		beforeEach: function () {
+		},
+		afterEach: function () {
 		}
+	});
+
+	QUnit.test("controlActions and end actions must be sorted according to enum sequence", async function(assert) {
+		for (let i = 0; i < 10; i++) {
+			const aShuffledActions = this.createActionsWithPosition().sort(() => Math.random() - 0.5);
+			const iSliceIndex = Math.floor(Math.random() * aShuffledActions.length);
+			const aControlActions = aShuffledActions.slice(0, iSliceIndex);
+			const aEndActions = aShuffledActions.slice(iSliceIndex);
+
+			const oToolbar = new ActionToolbar({
+				controlActions: aControlActions,
+				end: aEndActions
+			}).placeAt("qunit-fixture");
+			await nextUIUpdate();
+			assert.equal(
+				oToolbar.$().text(),
+				Object.keys(this.MyActionPosition).join(""),
+				`actions are in correct order: ${aShuffledActions.map((a) => a.getId())}`
+			);
+
+			const aClonedControlActions = aControlActions.map((a) => a.clone());
+			const aClonedEndActions = aEndActions.map((a) => a.clone());
+			aClonedControlActions.forEach(oToolbar.addControlAction, oToolbar);
+			aClonedEndActions.forEach(oToolbar.addEnd, oToolbar);
+			await nextUIUpdate();
+			assert.equal(
+				oToolbar.$().text(),
+				Object.keys(this.MyActionPosition).flatMap((sPosition) => [sPosition, sPosition]).join(""),
+				`after adding cloned actions again, actions are in correct order: ${aShuffledActions.map((a) => a.getId())}`
+			);
+
+			oToolbar.destroy();
+			await nextUIUpdate();
+		}
+	});
+
+	QUnit.test("controlActions without position must be placed at the end", async function(assert) {
+		const aControlActionsWithPosition = this.createActionsWithPosition().sort(() => Math.random() - 0.5);
+		const oToolbar = new ActionToolbar({
+			controlActions: [
+				new Button({ text: "L1" }),
+				new Button({ text: "L2" }),
+				...aControlActionsWithPosition,
+				new Button({ text: "L3" }),
+				new Button({ text: "L4" })
+			]
+		}).placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		assert.equal(
+			oToolbar.$().text(),
+			[...Object.keys(this.MyActionPosition), "L1", "L2", "L3", "L4"].join(""),
+			`actions are in correct order: ${aControlActionsWithPosition.map((a) => a.getId())}`
+		);
+		oToolbar.destroy();
+	});
+
+	QUnit.test("separators should be rendered between groups and updated correctly", async function(assert) {
+		ActionToolbar.ShowGroupSeparators = true;
+		const aControlActionsWithPosition = this.createActionsWithPosition().sort(() => Math.random() - 0.5);
+		const oToolbar = new ActionToolbar("TB", {
+			controlActions: aControlActionsWithPosition
+		}).placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		const oDomRef = oToolbar.getDomRef();
+		assert.equal(oToolbar.$().find(".sapMTBSeparator").length, this.GroupCount - 1, "correct number of group separators are rendered");
+		assert.ok(oDomRef.querySelector("#G1ActionsA2 + #TB-G1-separator + #G2ActionsA1"), "G1 separator is rendered between G1ActionsA2 and G2ActionsA1");
+		assert.ok(oDomRef.querySelector("#G2ActionsA2 + #TB-G2-separator + #G3ActionsA1"), "G2 separator is rendered between G2ActionsA2 and G3ActionsA1");
+		assert.notOk(oDomRef.querySelector("#TB-G3-separator"), "G3 separator is not rendered");
+
+		const o1stActionOfG2 = Element.getElementById("G2ActionsA1");
+		const o2ndActionOfG2 = Element.getElementById("G2ActionsA2");
+
+		oToolbar.removeControlAction(o2ndActionOfG2);
+		await nextUIUpdate();
+		assert.ok(oDomRef.querySelector("#G2ActionsA1 + #TB-G2-separator + #G3ActionsA1"), "G2 separator is rendered between G2ActionsA1 and G3ActionsA1");
+		assert.ok(oDomRef.querySelector("#TB-G1-separator + #G2ActionsA1 + #TB-G2-separator"), "1st action of G2 is rendered between G1 and G2 separators");
+
+		oToolbar.removeControlAction(o1stActionOfG2);
+		await nextUIUpdate();
+		assert.equal(oDomRef.querySelectorAll(".sapMTBSeparator").length, 1, "There is only one group separator since group 2 is completely removed");
+		assert.ok(oDomRef.querySelector("#G1ActionsA2 + #TB-G1-separator + #G3ActionsA1"), "G1 separator is rendered between G1ActionsA2 and G3ActionsA1");
+
+		oToolbar.addControlAction(o2ndActionOfG2);
+		await nextUIUpdate();
+		assert.ok(oDomRef.querySelector("#G2ActionsA2 + #TB-G2-separator + #G3ActionsA1"), "G2 separator is rendered between G2ActionsA2 and G3ActionsA1");
+		assert.ok(oDomRef.querySelector("#TB-G1-separator + #G2ActionsA2 + #TB-G2-separator"), "2nd action of G2 is rendered between G1 and G2 separators");
+
+		o2ndActionOfG2.setVisible(false);
+		await nextUIUpdate();
+		assert.equal(oDomRef.querySelectorAll(".sapMTBSeparator").length, 1, "There is only one group separator since group 2 is completely invisible");
+		assert.notOk(oDomRef.querySelector("#TB-G2-separator"), "G2 separator is not rendered since all actions of group 2 are invisible");
+
+		o2ndActionOfG2.setVisible(true);
+		await nextUIUpdate();
+		assert.ok(oDomRef.querySelector("#G2ActionsA2 + #TB-G2-separator + #G3ActionsA1"), "G2 separator is rendered between G2ActionsA2 and G3ActionsA1 again");
+		assert.ok(oDomRef.querySelector("#TB-G1-separator + #G2ActionsA2 + #TB-G2-separator"), "2nd action of G2 is rendered between G1 and G2 separators again");
+
+		o2ndActionOfG2.getLayoutData().setPosition("G1ActionsA2");
+		await nextUIUpdate();
+		assert.ok(oDomRef.querySelector("#G1ActionsA2 + #G2ActionsA2 + #TB-G1-separator"), "The 2nd action of G2 is now rendered as the last action of G1");
+		assert.notOk(oDomRef.querySelector("#TB-G2-separator"), "G2 separator is not rendered since after position change there is no action left in G2");
+		assert.equal(oDomRef.querySelectorAll(".sapMTBSeparator").length, 1, "There is only one group separator after the position of the only action in G2 is changed to G1");
+		assert.ok(oDomRef.querySelector("#G2ActionsA2 + #TB-G1-separator + #G3ActionsA1"), "G1 separator is now rendered between G2ActionsA2 and G3ActionsA1 after position change");
+
+		o2ndActionOfG2.setLayoutData(undefined);
+		await nextUIUpdate();
+		assert.ok(oDomRef.querySelector("#TB-G3-separator"), "G3 separator is rendered since layout data of the action is removed and the action goes to the end as a new group");
+		assert.ok(oDomRef.querySelector("#G3ActionsA2 + #TB-G3-separator + #G2ActionsA2"), "G3 separator is rendered between the last action of G3 and the action without layout data");
+
+		o2ndActionOfG2.setLayoutData(new this.MyActionLayoutData({ position: "G2ActionsA2" }));
+		await nextUIUpdate();
+		assert.ok(oDomRef.querySelector("#G2ActionsA2 + #TB-G2-separator + #G3ActionsA1"), "G2 separator is rendered between G2ActionsA2 and G3ActionsA1 again after position is set back to G2");
+		assert.notOk(oDomRef.querySelector("#TB-G3-separator"), "G3 separator is not rendered anymore");
+
+		oToolbar.getControlActions().forEach((oAction) => {
+			if (!oAction.getId().startsWith("G3")) {
+				oToolbar.removeControlAction(oAction);
+			}
+		});
+		await nextUIUpdate();
+		assert.equal(oDomRef.querySelectorAll(".sapMTBSeparator").length, 0, "There is no group separator when only one group(G3) of actions is available");
+
+		o1stActionOfG2.setLayoutData(undefined);
+		o2ndActionOfG2.setLayoutData(undefined);
+		oToolbar.addEnd(o1stActionOfG2);
+		oToolbar.addEnd(o2ndActionOfG2);
+		await nextUIUpdate();
+		assert.equal(oDomRef.querySelectorAll(".sapMTBSeparator").length, 1, "G3 separator is rendered again since layout data of the actions are removed and the action goes to the end as a new group");
+
+		oToolbar.destroy();
+		ActionToolbar.ShowGroupSeparators = false;
 	});
 
 	QUnit.module("sap.ui.mdc.ActionToolbar - _updateSeparators", {

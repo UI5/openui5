@@ -249,6 +249,25 @@ sap.ui.define([
 
 		});
 
+		QUnit.test("_updateAlphaBackground is called on alpha slider move", async function (oAssert) {
+			// Arrange
+			var oSpy = sinon.spy(this.oCP, "_updateAlphaBackground");
+
+			this.oCP.placeAt("qunit-fixture");
+			await nextUIUpdate();
+
+			// Act - set value to alpha slider - this will trigger rendering update like when user moves the slider
+			this.oCP.oAlphaSlider.setValue(0.5);
+			await nextUIUpdate();
+
+			// Assert
+			// First two calls are from the initial rendering of the color picker and the slider
+			oAssert.ok(oSpy.callCount === 3, "_updateAlphaBackground should be called when alpha slider changes");
+
+			// Cleanup
+			oSpy.restore();
+		});
+
 		QUnit.module("Accessibility", {
 			beforeEach: async function () {
 				this.oCP = new ColorPicker().placeAt("qunit-fixture");
