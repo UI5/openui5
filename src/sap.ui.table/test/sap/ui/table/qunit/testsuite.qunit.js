@@ -143,7 +143,10 @@ sap.ui.define([
 				group: "Utils"
 			},
 			"TableColumnUtils": {
-				group: "Utils"
+				group: "Utils",
+				ui5: {
+					"xx-waitForTheme": "init"
+				}
 			},
 			"TableMenuUtils": {
 				group: "Utils"

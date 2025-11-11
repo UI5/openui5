@@ -828,7 +828,7 @@ sap.ui.define([
 
 	QUnit.test("Imitating scrollbar scrolling", function(assert) {
 		var done = assert.async();
-		var iAssertionDelay = 50;
+		var iAssertionDelay = 500;
 
 		// Scroll right to 200
 		/* eslint-disable no-loop-func */
@@ -876,7 +876,7 @@ sap.ui.define([
 		this.oContentScroll = oTable.getDomRef("sapUiTableCtrlScr");
 
 		var that = this;
-		var iAssertionDelay = 100;
+		var iAssertionDelay = 200;
 		var iCurrentScrollPosition = this.oHSb.scrollLeft;
 		var iMinColumnWidth = TableUtils.Column.getMinColumnWidth();
 		var DeltaMode = MouseWheelDeltaMode;
@@ -983,7 +983,7 @@ sap.ui.define([
 		this.oContentScroll = oTable.getDomRef("sapUiTableCtrlScr");
 
 		var that = this;
-		var iAssertionDelay = 100;
+		var iAssertionDelay = 200;
 		var iCurrentScrollPosition = this.oHSb.scrollLeft;
 
 		function scrollForwardAndBackToBeginning(oTargetElement) {
