@@ -88,8 +88,7 @@ sap.ui.define([
 		 */
 		createModel : function (sQuery, mParameters, bAllowPrerenderingTasks) {
 			var oModel = new ODataModel(Object.assign({}, mParameters, {
-					serviceUrl : getServiceUrl() + (sQuery || ""),
-					synchronizationMode : "None"
+					serviceUrl : getServiceUrl() + (sQuery || "")
 				}));
 
 			if (!bAllowPrerenderingTasks) {
@@ -104,20 +103,22 @@ sap.ui.define([
 		var oModel;
 
 		assert.throws(function () {
-			return new ODataModel();
+			return new ODataModel({synchronizationMode : undefined});
 		}, new Error("Synchronization mode must be 'None'"));
 		assert.throws(function () {
-			return new ODataModel({synchronizationMode : "None"});
+			return new ODataModel({synchronizationMode : "Nope"});
+		}, new Error("Synchronization mode must be 'None'"));
+		assert.throws(function () {
+			return new ODataModel();
 		}, new Error("Missing service root URL"));
 		assert.throws(function () {
-			return new ODataModel({serviceUrl : "/foo", synchronizationMode : "None"});
+			return new ODataModel({serviceUrl : "/foo"});
 		}, new Error("Service root URL must end with '/'"));
 		assert.throws(function () {
-			return new ODataModel({synchronizationMode : "None", useBatch : true});
+			return new ODataModel({useBatch : true});
 		}, new Error("Unsupported parameter: useBatch"));
 		assert.throws(function () {
-			return new ODataModel({operationMode : OperationMode.Auto, serviceUrl : "/foo/",
-				synchronizationMode : "None"});
+			return new ODataModel({operationMode : OperationMode.Auto, serviceUrl : "/foo/"});
 		}, new Error("Unsupported operation mode: Auto"), "Unsupported OperationMode");
 
 		this.mock(ODataModel.prototype).expects("initializeSecurityToken").never();
