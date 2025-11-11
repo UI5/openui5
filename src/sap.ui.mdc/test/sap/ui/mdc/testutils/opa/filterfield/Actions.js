@@ -8,14 +8,18 @@ sap.ui.define([
 	"./waitForFilterField",
 	"sap/ui/events/KeyCodes",
 	"../Utils",
-	"../actions/TriggerEvent"
+	"../actions/TriggerEvent",
+	"sap/ui/test/matchers/PropertyStrictEquals",
+	"sap/ui/test/actions/Press"
 ], function(
 	Opa5,
 	EnterText,
 	waitForFilterField,
 	KeyCodes,
 	Utils,
-	TriggerEvent
+	TriggerEvent,
+	PropertyStrictEquals,
+	Press
 ) {
     "use strict";
 
@@ -78,7 +82,20 @@ sap.ui.define([
 					}));
 				}
 			}));
-        }
+        },
+		iSelectDisplayListItem: function(sValue) {
+			return this.waitFor({
+				controlType: "sap.m.DisplayListItem",
+				matchers: new PropertyStrictEquals({
+				name: "label",
+				value: sValue
+				}),
+				success: function(oDisplayListItems) {
+					new Press().executeOn(oDisplayListItems[0]);
+				},
+				errorMessage: "The value [" + sValue + "] was not found in the ValueHelp"
+			});
+		}
 	};
 
 	return oActions;

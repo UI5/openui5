@@ -38,6 +38,7 @@ sap.ui.define([
 	  "sap.ui.mdc.TableP13Mode"
 	 ],
 	 interfaces: [
+		 "sap.ui.mdc.IActionLayoutData",
 		 "sap.ui.mdc.IFilterSource",
 		 "sap.ui.mdc.IFilter",
 		 "sap.ui.mdc.IxState",
@@ -71,6 +72,7 @@ sap.ui.define([
 	  "sap.ui.mdc.table.GridTableType",
 	  "sap.ui.mdc.table.ResponsiveTableType",
 	  "sap.ui.mdc.table.RowSettings",
+	  "sap.ui.mdc.table.ActionLayoutData",
 	  "sap.ui.mdc.chart.Item",
 	  "sap.ui.mdc.chart.ChartSelectionDetails",
 	  "sap.ui.mdc.chart.SelectionButton",
@@ -709,6 +711,17 @@ sap.ui.define([
   * @public
   */
 
+ /**
+  * Interface for subclasses of {@link sap.m.OverflowToolbarLayoutData} that position actions within the toolbar and configure the overflow menu.
+  * Classes implementing this interface must provide a <code>position</code> property, which uses an enumeration to define the relative order of the actions.
+  * The sequence of the enumeration values determines the placement of the actions.
+  * Enumeration values can be organized into groups by using the same prefix ending with the <code>Actions</code> keyword, such as <code>ClipboardActionsCopy</code> and <code>ClipboardActionsPaste</code>.
+  *
+  * @since 1.143
+  * @name sap.ui.mdc.IActionLayoutData
+  * @interface
+  * @public
+  */
 
  /**
   *

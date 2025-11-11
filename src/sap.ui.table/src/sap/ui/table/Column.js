@@ -775,14 +775,10 @@ sap.ui.define([
 		for (let i = 0, l = aCols.length; i < l; i++) {
 			const oCol = aCols[i];
 			let oFilter;
-			let sState;
 
 			try {
 				oFilter = oCol._getFilter();
-				sState = ValueState.None;
-			} catch (e) {
-				sState = ValueState.Error;
-			}
+			} catch (e) {}
 
 			if (oFilter) {
 				aFilters.push(oFilter);

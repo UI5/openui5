@@ -135,7 +135,6 @@ sap.ui.define([
 		title : "Detail Page",
 		titleLevel: "H1",
 		showNavButton : true,
-		navButtonText : "Back",
 		navButtonPress : function() {
 			app.back();
 		}
@@ -177,7 +176,6 @@ sap.ui.define([
 		title : "Standard List Thumb",
 		titleLevel: "H1",
 		showNavButton : true,
-		navButtonText : "Back",
 		navButtonPress : function() {
 			app.back();
 		},
@@ -239,7 +237,6 @@ sap.ui.define([
 		title : "Standard List Icon",
 		titleLevel: "H1",
 		showNavButton : true,
-		navButtonText : "Back",
 		navButtonPress : function() {
 			app.back();
 		},
@@ -289,7 +286,6 @@ sap.ui.define([
 		title : "Standard List Icon Active",
 		titleLevel: "H1",
 		showNavButton : true,
-		navButtonText : "Back",
 		navButtonPress : function() {
 			app.back();
 		},
@@ -339,7 +335,6 @@ sap.ui.define([
 		title : "Standard List Icon Detail and Active",
 		titleLevel: "H1",
 		showNavButton : true,
-		navButtonText : "Back",
 		navButtonPress : function() {
 			app.back();
 		},
@@ -389,7 +384,6 @@ sap.ui.define([
 		title : "Standard List Title",
 		titleLevel: "H1",
 		showNavButton : true,
-		navButtonText : "Back",
 		navButtonPress : function() {
 			app.back();
 		},
@@ -439,7 +433,6 @@ sap.ui.define([
 		title : "Standard List no Image",
 		titleLevel: "H1",
 		showNavButton : true,
-		navButtonText : "Back",
 		navButtonPress : function() {
 			app.back();
 		},
@@ -489,7 +482,6 @@ sap.ui.define([
 		title : "Standard List with Avatar",
 		titleLevel: "H1",
 		showNavButton : true,
-		navButtonText : "Back",
 		navButtonPress : function() {
 			app.back();
 		},
@@ -540,7 +532,6 @@ sap.ui.define([
 		title : "Display list",
 		titleLevel: "H1",
 		showNavButton : true,
-		navButtonText : "Back",
 		navButtonPress : function() {
 			app.back();
 		},
@@ -590,7 +581,6 @@ sap.ui.define([
 		title : "Input List",
 		titleLevel: "H1",
 		showNavButton : true,
-		navButtonText : "Back",
 		navButtonPress : function() {
 			app.back();
 		},
@@ -640,7 +630,6 @@ sap.ui.define([
 		title : "Custom List",
 		titleLevel: "H1",
 		showNavButton : true,
-		navButtonText : "Back",
 		navButtonPress : function() {
 			app.back();
 		},
@@ -690,7 +679,6 @@ sap.ui.define([
 		title : "Grouped List",
 		titleLevel: "H1",
 		showNavButton : true,
-		navButtonText : "Back",
 		navButtonPress : function() {
 			app.back();
 		},
@@ -712,7 +700,6 @@ sap.ui.define([
 		title : "Grouped List without Header/Footer",
 		titleLevel: "H1",
 		showNavButton : true,
-		navButtonText : "Back",
 		navButtonPress : function() {
 			app.back();
 		},
@@ -797,7 +784,6 @@ sap.ui.define([
 		title : "Html List",
 		titleLevel: "H1",
 		showNavButton : true,
-		navButtonText : "Back",
 		navButtonPress : function() {
 			app.back();
 		},
@@ -843,7 +829,6 @@ sap.ui.define([
 		title : "No Data List",
 		titleLevel: "H1",
 		showNavButton : true,
-		navButtonText : "Back",
 		navButtonPress : function() {
 			app.back();
 		},
@@ -894,7 +879,6 @@ sap.ui.define([
 		title : "List Swipe Action",
 		titleLevel: "H1",
 		showNavButton : true,
-		navButtonText : "Back",
 		navButtonPress : function() {
 			app.back();
 		},

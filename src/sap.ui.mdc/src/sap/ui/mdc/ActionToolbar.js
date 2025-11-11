@@ -51,17 +51,6 @@ sap.ui.define([
 					type: "boolean",
 					group: "Behavior",
 					defaultValue: true
-				},
-
-				/**
-				 * Defines the order of the end aggregation.
-				 * @private
-				 * @ui5-private sap.ui.mdc
-				 */
-				_endOrder: {
-					type: "string[]",
-					defaultValue: [],
-					visibility: "hidden"
 				}
 			},
 			aggregations: {
@@ -95,6 +84,15 @@ sap.ui.define([
 				end: {
 					type: "sap.ui.core.Control",
 					multiple: true
+				},
+
+				/**
+				 * Actions that are combined with the <code>end</code> aggregation according to the <code>position</code> information provided via the {@link sap.ui.mdc.IActionLayoutData IActionLayoutData} interface as <code>layoutData</code>.
+				 * @since 1.143
+				 */
+				controlActions: {
+					type: "sap.ui.core.Control",
+					multiple: true
 				}
 			}
 		},
@@ -105,7 +103,8 @@ sap.ui.define([
 		"begin",
 		"between",
 		"actions",
-		"end"
+		"end",
+		"controlActions"
 	];
 
 	const fnGetOverflowToolbarConfig = function() {
@@ -118,6 +117,40 @@ sap.ui.define([
 
 		return oConfig;
 	};
+
+	const fnGetGroupNameOfAction = (oAction) => {
+		const oLayoutData = oAction.getLayoutData();
+		if (oLayoutData?.isA("sap.ui.mdc.IActionLayoutData")) {
+			const sPosition = oLayoutData.getPosition();
+			return `${sPosition}`.split("Actions")[0];
+		}
+	};
+
+	const fnActionsSorter = (oAction1, oAction2) => {
+		const oLayoutData1 = oAction1.getLayoutData();
+		const oLayoutData2 = oAction2.getLayoutData();
+		const bAction1ImplementsIActionLayoutData = oLayoutData1?.isA("sap.ui.mdc.IActionLayoutData");
+		const bAction2ImplementsIActionLayoutData = oLayoutData2?.isA("sap.ui.mdc.IActionLayoutData");
+
+		if (!bAction1ImplementsIActionLayoutData && !bAction2ImplementsIActionLayoutData) {
+			return 0; // No layout data, so no sorting
+		}
+		if (bAction1ImplementsIActionLayoutData && !bAction2ImplementsIActionLayoutData) {
+			return -1; // Action 1 implements IActionLayoutData, so it should come first
+		}
+		if (!bAction1ImplementsIActionLayoutData && bAction2ImplementsIActionLayoutData) {
+			return 1; // Action 2 implements IActionLayoutData, so it should come first
+		}
+
+		const mPositionEnum1 = oLayoutData1.getMetadata().getProperty("position").getType().getEnumValues();
+		const mPositionEnum2 = oLayoutData2.getMetadata().getProperty("position").getType().getEnumValues();
+		const iPosition1 = Object.getOwnPropertyNames(mPositionEnum1).indexOf(oLayoutData1.getPosition());
+		const iPosition2 = Object.getOwnPropertyNames(mPositionEnum2).indexOf(oLayoutData2.getPosition());
+
+		return iPosition1 - iPosition2;
+	};
+
+	ActionToolbar.ShowGroupSeparators = window.location.search.includes("sap-ui-action-toolbar-separators");
 
 	ActionToolbar.prototype.init = function() {
 		OverflowToolbar.prototype.init.apply(this, arguments);
@@ -164,21 +197,9 @@ sap.ui.define([
 		}
 	};
 
-	ActionToolbar.prototype.setProperty = function(sProperty) {
-		if (sProperty === "_endOrder") {
-			this._bEnforceEndOrder = true;
-		}
-
-		return OverflowToolbar.prototype.setProperty.apply(this, arguments);
-	};
-
 	ActionToolbar.prototype.addAggregation = function(sAggregationName, oControl) {
 		if (sAggregationName === "content") {
 			throw new Error("Mutator functions of the content aggregation of the ActionToolbar '" + this.getId() + "' must not be used.");
-		}
-
-		if (sAggregationName === "end") {
-			this._bEnforceEndOrder = true;
 		}
 
 		const aArguments = arguments;
@@ -222,10 +243,6 @@ sap.ui.define([
 	ActionToolbar.prototype.insertAggregation = function(sAggregationName, oControl, iIndex) {
 		if (sAggregationName === "content") {
 			throw new Error("Mutator functions of the content aggregation of the ActionToolbar '" + this.getId() + "' must not be used.");
-		}
-
-		if (sAggregationName === "end") {
-			this._bEnforceEndOrder = true;
 		}
 
 		if (aAggregations.includes(sAggregationName)) {
@@ -304,29 +321,6 @@ sap.ui.define([
 		});
 	};
 
-	ActionToolbar.prototype.onBeforeRendering = function() {
-		OverflowToolbar.prototype.onBeforeRendering.apply(this, arguments);
-
-		if (this._bEnforceEndOrder) {
-
-			this.getProperty("_endOrder").reduce((iOrder, sElementId) => {
-				const oElement = Element.getElementById(sElementId);
-				if (!oElement) {
-					return iOrder;
-				}
-
-				const iIndex = this.indexOfEnd(oElement);
-				if (iIndex != iOrder) {
-					this.insertEnd(this.removeEnd(oElement), iOrder);
-				}
-
-				return iOrder + 1;
-			}, 0);
-
-			this._bEnforceEndOrder = false;
-		}
-	};
-
 	// According to visual designs currently no separator between actions and end content, only title separator is handled below
 	/* Begin Title Separator handling */
 	ActionToolbar.prototype.onAfterRendering = function() {
@@ -385,6 +379,34 @@ sap.ui.define([
 		}
 	};
 
+	ActionToolbar.prototype._getGroupSeparator = function(sGroupName) {
+		const sSeparatorId = `${this.getId()}-${sGroupName}-separator`;
+		let oSeparator = Element.getElementById(sSeparatorId);
+		if (!oSeparator) {
+			oSeparator = new ToolbarSeparator(sSeparatorId);
+			this.addDependent(oSeparator);
+		}
+		return oSeparator;
+	};
+
+	ActionToolbar.prototype._insertGroupSeparators = function(aActions) {
+		const aVisibleActions = aActions.filter((oAction) => oAction.getVisible());
+		aVisibleActions.forEach((oVisibleAction, iVisibleIndex) => {
+			const oNextVisibleAction = aVisibleActions[iVisibleIndex + 1];
+			if (!oNextVisibleAction) {
+				return;
+			}
+
+			const sGroupNameOfVisibleAction = fnGetGroupNameOfAction(oVisibleAction);
+			const sGroupNameOfNextVisibleAction = fnGetGroupNameOfAction(oNextVisibleAction);
+			if (sGroupNameOfVisibleAction !== sGroupNameOfNextVisibleAction) {
+				const oSeparator = this._getGroupSeparator(sGroupNameOfVisibleAction);
+				const iActualIndexOfVisibleAction = aActions.indexOf(oVisibleAction);
+				aActions.splice(iActualIndexOfVisibleAction + 1, 0, oSeparator);
+			}
+		});
+	};
+
 	/*
 	 * Overwrite generated functions to use internal array to look for aggregation
 	 */
@@ -394,17 +416,21 @@ sap.ui.define([
 
 	// Overwrite content aggregation functions
 	ActionToolbar.prototype.getContent = function() {
-		let aContent = this.getBegin();
-		aContent.push(this._oBeginSeparator);
-		aContent = aContent.concat(this.getBetween());
-		aContent.push(this._oSpacer);
-		aContent = aContent.concat(this.getEndActionsBegin());
-		aContent.push(this._oEndActionsBeginSeparator);
-		aContent = aContent.concat(this.getEnd());
-		aContent.push(this._oEndActionsEndSeparator);
-		aContent = aContent.concat(this.getEndActionsEnd());
+		const aEndAndControlActions = [...this.getEnd(), ...this.getControlActions()];
+		const aSortedEndAndControlActions = aEndAndControlActions.sort(fnActionsSorter);
+		ActionToolbar.ShowGroupSeparators && this._insertGroupSeparators(aSortedEndAndControlActions);
 
-		return aContent;
+		return [
+			...this.getBegin(),
+			this._oBeginSeparator,
+			...this.getBetween(),
+			this._oSpacer,
+			...this.getEndActionsBegin(),
+			this._oEndActionsBeginSeparator,
+			...aSortedEndAndControlActions,
+			this._oEndActionsEndSeparator,
+			...this.getEndActionsEnd()
+		];
 	};
 
 	ActionToolbar.prototype.getCurrentState = function() {

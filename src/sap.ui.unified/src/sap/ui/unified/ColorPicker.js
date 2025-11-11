@@ -1030,6 +1030,12 @@ sap.ui.define([
 		// Attaching events with parameter passed so the handler will know in which mode to execute
 		this.oAlphaSlider.attachEvent("liveChange", "liveChange", this._handleAlphaSliderChange.bind(this));
 		this.oAlphaSlider.attachEvent("change", "change", this._handleAlphaSliderChange.bind(this));
+		this.oAlphaSlider.addEventDelegate({
+			onAfterRendering: function() {
+				// restore the alpha background after the slider rerenders
+				this._updateAlphaBackground();
+			}.bind(this)
+		});
 	};
 
 	/**

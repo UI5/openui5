@@ -4,10 +4,12 @@
 
 sap.ui.define([
 	"./TableTypeBase",
+	"./ActionLayoutData",
 	"./utils/Personalization",
 	"sap/ui/mdc/enums/TableGrowingMode",
 	"sap/ui/mdc/enums/TableRowActionType",
 	"sap/ui/mdc/enums/TablePopinDisplay",
+	"sap/ui/mdc/enums/TableActionPosition",
 	"sap/m/plugins/ColumnResizer",
 	"sap/m/SegmentedButton",
 	"sap/m/SegmentedButtonItem",
@@ -16,10 +18,12 @@ sap.ui.define([
 	"sap/ui/core/Lib"
 ], (
 	TableTypeBase,
+	ActionLayoutData,
 	PersonalizationUtils,
 	GrowingMode,
 	RowActionType,
 	PopinDisplay,
+	TableActionPosition,
 	ColumnResizer,
 	SegmentedButton,
 	SegmentedButtonItem,
@@ -583,7 +587,10 @@ sap.ui.define([
 							}, this
 						]
 					})
-				]
+				],
+				layoutData: new ActionLayoutData({
+					position: TableActionPosition.PersonalizationActionsShowHideDetails
+				})
 			});
 		}
 		return this._oShowDetailsButton;

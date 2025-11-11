@@ -1,6 +1,5 @@
 /* global QUnit, sinon */
 // These are some globals generated due to fl (signals, hasher) and m (hyphenation) libs.
-
 sap.ui.define([
 	"./QUnitUtils",
 	"sap/ui/core/Element",
@@ -20,6 +19,7 @@ sap.ui.define([
 	"sap/ui/mdc/FilterBar",
 	"sap/m/Text",
 	"sap/m/Button",
+	"sap/m/Link",
 	"sap/m/MessageBox",
 	"sap/ui/model/odata/v4/ODataListBinding",
 	"sap/ui/model/json/JSONModel",
@@ -32,6 +32,7 @@ sap.ui.define([
 	"sap/m/library",
 	"sap/ui/mdc/ActionToolbar",
 	"sap/ui/mdc/actiontoolbar/ActionToolbarAction",
+	"sap/ui/mdc/table/ActionLayoutData",
 	"sap/m/plugins/CopyProvider",
 	"sap/m/plugins/CellSelector",
 	"../util/createAppEnvironment",
@@ -55,6 +56,7 @@ sap.ui.define([
 	"sap/ui/mdc/enums/TableType",
 	"sap/ui/mdc/enums/ConditionValidated",
 	"sap/ui/mdc/enums/OperatorName",
+	"sap/ui/mdc/enums/TableActionPosition",
 	"sap/m/Menu",
 	"sap/ui/fl/variants/VariantManagement",
 	"sap/ui/table/rowmodes/Fixed"
@@ -77,6 +79,7 @@ sap.ui.define([
 	FilterBar,
 	Text,
 	Button,
+	Link,
 	MessageBox,
 	ODataListBinding,
 	JSONModel,
@@ -89,6 +92,7 @@ sap.ui.define([
 	MLibrary,
 	ActionToolbar,
 	ActionToolbarAction,
+	ActionLayoutData,
 	CopyProvider,
 	CellSelector,
 	createAppEnvironment,
@@ -112,6 +116,7 @@ sap.ui.define([
 	TableType,
 	ConditionValidated,
 	OperatorName,
+	TableActionPosition,
 	Menu,
 	VariantManagement,
 	FixedRowMode
@@ -189,15 +194,48 @@ sap.ui.define([
 		}
 	}
 
-	const aToolbarEndOrderSuffix = ["copy", "paste", "showHideDetails", "collapseAll", "expandAll", "settings", "export"];
-	const fnActionToolbarValidateAggregation = ActionToolbar.prototype.validateAggregation;
+	const mActionIdAndPosition = {
+		"copy": TableActionPosition.ModificationActionsCopy,
+		"paste": TableActionPosition.ModificationActionsPaste,
+		"collapseAll": TableActionPosition.PersonalizationActionsCollapseAll,
+		"expandAll": TableActionPosition.PersonalizationActionsExpandAll,
+		"showHideDetails": TableActionPosition.PersonalizationActionsShowHideDetails,
+		"settings": TableActionPosition.PersonalizationActionsSettings,
+		"export": TableActionPosition.ExportActionsExport
+	};
 
+	const fnActionToolbarValidateAggregation = ActionToolbar.prototype.validateAggregation;
 	ActionToolbar.prototype.validateAggregation = function(sAggregationName, oAggregation) {
-		if (sAggregationName === "end" && !aToolbarEndOrderSuffix.some((sSuffix) => oAggregation.getId().endsWith("-" + sSuffix))) {
-			throw new Error("The order is not defined for the toolbar item " + oAggregation.getId());
+		if (sAggregationName === "end" || sAggregationName === "controlActions") {
+			const sAction = oAggregation.getId().split("-").pop();
+			const sPosition = oAggregation.getLayoutData().getPosition();
+			if (mActionIdAndPosition[sAction] && sPosition !== mActionIdAndPosition[sAction]) {
+				throw new Error(`The position is not defined for the toolbar action ${sAction}`);
+			}
 		}
+
 		return fnActionToolbarValidateAggregation.apply(this, arguments);
 	};
+
+	QUnit.test("The keys of TableActionPosition enum follow the expected sequence", function(assert) {
+		assert.deepEqual([
+			"ModificationActions",
+			"ModificationActionsCopy",
+			"ModificationActionsPaste",
+			"ModificationActionsEnd",
+			"PersonalizationActions",
+			"PersonalizationActionsCollapseAll",
+			"PersonalizationActionsExpandAll",
+			"PersonalizationActionsShowHideDetails",
+			"PersonalizationActionsMiddle",
+			"PersonalizationActionsSettings",
+			"ShareActions",
+			"ExportActions",
+			"ExportActionsExport",
+			"ViewActions",
+			"EndActions"
+		], Object.getOwnPropertyNames(TableActionPosition));
+	});
 
 	QUnit.module("Type initialization", {
 		beforeEach: function() {
@@ -548,13 +586,6 @@ sap.ui.define([
 		assert.ok(oDomRef.classList.contains("sapUiMdcTable"), "Table has class sapUiMdcTable if the type provides additional classes");
 		assert.ok(oDomRef.classList.contains("MyTestClassA"), "Table has class MyTestClassA provided by the type");
 		assert.ok(oDomRef.classList.contains("MyTestClassB"), "Table has class MyTestClassB provided by the type");
-	});
-
-	QUnit.test("The sort order defined for the end aggregation of the toolbar", function(assert) {
-		return this.oTable.initialized().then(() => {
-			const aEndOrder = aToolbarEndOrderSuffix.map((sSuffix) => this.oTable.getId() + "-" + sSuffix);
-			assert.deepEqual(this.oTable._oToolbar.getProperty("_endOrder"), aEndOrder);
-		});
 	});
 
 	QUnit.test("Columns added to inner table", function(assert) {
@@ -6150,4 +6181,165 @@ sap.ui.define([
 			assert.deepEqual(this.oTable.getVariant().getTitleStyle(), sExpectedTitleLevel, "variant titleStyle property");
 		});
 	}
+
+	QUnit.module("Toolbar actions", {
+		$: function(sSelector) {
+			return this.oTable.getDomRef("toolbar").querySelector(sSelector);
+		},
+		before: function() {
+			this.oModel = new JSONModel([{}]);
+			this.oClipboardStub = sinon.stub(window, "navigator").value({clipboard: {}});
+			this.oSecureContextStub = sinon.stub(window, "isSecureContext").value(true);
+		},
+		beforeEach: async function() {
+			this.oTable = new Table("table", {
+				p13nMode: ["Column"],
+				selectionMode: "Multi",
+				copyProvider: new CopyProvider(),
+				showPasteButton: true,
+				enablePaste: true,
+				enableExport: true,
+				models: this.oModel,
+				type: new ResponsiveTableType({
+					showDetailsButton: true
+				}),
+				columns: [
+					new Column({
+						width: "1000px",
+						template: new Text(),
+						extendedSettings: new ResponsiveColumnSettings({
+							importance: "High"
+						})
+					}),
+					new Column({
+						width: "1000px",
+						template: new Text(),
+						extendedSettings: new ResponsiveColumnSettings({
+							importance: "Low"
+						})
+					})
+				],
+				delegate: {
+					name: sDelegatePath,
+					payload: {
+						collectionPath: "/"
+					}
+				}
+			}).placeAt("qunit-fixture");
+			await this.oTable.initialized();
+			await nextUIUpdate();
+		},
+		afterEach: function() {
+			this.oTable.destroy();
+		},
+		after: function() {
+			this.oModel.destroy();
+			this.oClipboardStub.restore();
+			this.oSecureContextStub.restore();
+		}
+	});
+
+	QUnit.test("Table generated actions are positioned correctly", async function(assert) {
+		const mActionSettings = {
+			"copy": {
+				position: TableActionPosition.ModificationActionsCopy,
+				showAction: () => this.oTable.getCopyProvider().setVisible(true),
+				hideAction: () => this.oTable.getCopyProvider().setVisible(false)
+			},
+			"paste": {
+				position: TableActionPosition.ModificationActionsPaste,
+				showAction: () => this.oTable.setShowPasteButton(true),
+				hideAction: () => this.oTable.setShowPasteButton(false)
+			},
+			"showHideDetails": {
+				position: TableActionPosition.PersonalizationActionsShowHideDetails,
+				showAction: () => this.oTable.getType().setShowDetailsButton(true),
+				hideAction: () => this.oTable.getType().setShowDetailsButton(false)
+			},
+			"settings": {
+				position: TableActionPosition.PersonalizationActionsSettings,
+				showAction: () => this.oTable.setP13nMode(["Column"]),
+				hideAction: () => this.oTable.setP13nMode([])
+			},
+			"export": {
+				position: TableActionPosition.ExportActionsExport,
+				showAction: () => this.oTable.setEnableExport(true),
+				hideAction: () => this.oTable.setEnableExport(false)
+			}
+		};
+
+		for (const [sAction, {position: sPosition}] of Object.entries(mActionSettings)) {
+			const oAction = Element.getElementById(`table-${sAction}`);
+			assert.equal(oAction.getLayoutData().getPosition(), sPosition, `The ${sAction} action has the correct position: ${sPosition}`);
+		}
+
+		for (const [sAction, {showAction, hideAction}] of Object.entries(mActionSettings)) {
+			hideAction();
+			await nextUIUpdate();
+			const aActionsWithoutThisAction = Object.keys(mActionSettings).filter((sOtherAction) => sOtherAction !== sAction);
+			const sOrderOfOtherActionsSelector = aActionsWithoutThisAction.map((sOtherAction) => `#table-${sOtherAction}`).join(" ~ ");
+			assert.ok(this.$(sOrderOfOtherActionsSelector), `After hiding ${sAction} other actions are positioned correctly`);
+
+			showAction();
+			await nextUIUpdate();
+			const sOrderOfAllActionsSelector = Object.keys(mActionSettings).map((sAction) => `#table-${sAction}`).join(" ~ ");
+			assert.ok(this.$(sOrderOfAllActionsSelector), `After showing ${sAction} all actions are positioned correctly`);
+		}
+	});
+
+	QUnit.test("Provided tableActions are ordered together with table-generated actions based on their position", async function(assert) {
+		const aControlActions = [{
+				action: "cut",
+				position: TableActionPosition.ModificationActions,
+				selector: "#cut:first-of-type + #table-copy + #table-paste"
+			}, {
+				action: "reorder",
+				position: TableActionPosition.ModificationActionsEnd,
+				selector: "#table-paste + #reorder + #table-showHideDetails"
+			}, {
+				action: "filter",
+				position: TableActionPosition.PersonalizationActions,
+				selector: "#reorder + #filter + #table-showHideDetails"
+			}, {
+				action: "expand",
+				position: TableActionPosition.PersonalizationActionsMiddle,
+				selector: "#table-showHideDetails + #expand + #table-settings"
+			}, {
+				action: "collapse",
+				position: TableActionPosition.PersonalizationActionsMiddle,
+				selector: "#expand + #collapse + #table-settings"
+			}, {
+				action: "share",
+				position: TableActionPosition.ShareActions,
+				selector: "#table-settings + #share + #table-export"
+			}, {
+				action: "print",
+				position: TableActionPosition.ExportActions,
+				selector: "#share + #print + #table-export"
+			}, {
+				action: "fullscreen",
+				position: TableActionPosition.ViewActions,
+				selector: "#print + #table-export + #fullscreen:last-of-type"
+			}, {
+				action: "refresh",
+				position: TableActionPosition.EndActions,
+				selector: "#table-export + #fullscreen + #refresh:last-of-type"
+			}, {
+				action: "help",
+				selector: "#fullscreen + #refresh + #help:last-of-type"
+			}
+		];
+
+		for (const {action: sAction, position: sPosition, selector: sSelector} of aControlActions) {
+			const oAction = new Link(sAction, {
+				text: sAction.substring(0, 2),
+				layoutData: new ActionLayoutData({
+					position: sPosition
+				})
+			});
+			this.oTable.addTableAction(oAction);
+			await nextUIUpdate();
+			assert.ok(this.$(sSelector), `The ${sAction} action is positioned correctly at ${sPosition}`);
+		}
+	});
 });

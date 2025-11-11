@@ -11,6 +11,7 @@ sap.ui.define([
 	"./table/ResponsiveTableType",
 	"./table/PropertyHelper",
 	"./table/utils/Personalization",
+	"./table/ActionLayoutData",
 	"./mixin/FilterIntegrationMixin",
 	"sap/m/Text",
 	"sap/m/ToolbarSpacer",
@@ -63,6 +64,7 @@ sap.ui.define([
 	ResponsiveTableType,
 	PropertyHelper,
 	PersonalizationUtils,
+	ActionLayoutData,
 	FilterIntegrationMixin,
 	Text,
 	ToolbarSpacer,
@@ -670,6 +672,25 @@ sap.ui.define([
 					forwarding: {
 						getter: "_createToolbar",
 						aggregation: "actions"
+					}
+				},
+
+				/**
+				 * Additional table-related actions that are positioned together with other table-generated actions, based on the
+				 * {@link sap.ui.mdc.table.ActionLayoutData ActionLayoutData} provided.
+				 *
+				 * <b>Note:</b> All actions should use layout data of the {@link sap.ui.mdc.table.ActionLayoutData ActionLayoutData} type to ensure
+				 * correct ordering. Actions that do not use this layout data will be placed after the table-generated actions.<br>
+				 * <b>Note:</b> Like other table-generated actions, these actions are excluded from the UI adaptation.
+				 *
+				 * @since 1.143
+				 */
+				tableActions: {
+					type: "sap.ui.core.Control",
+					multiple: true,
+					forwarding: {
+						getter: "_createToolbar",
+						aggregation: "controlActions"
 					}
 				},
 
@@ -2037,16 +2058,6 @@ sap.ui.define([
 				],
 				visible: "{= !${$sap.ui.mdc.Table>/hideToolbar} }"
 			});
-			// Enfore the action order according to the UI Guideline
-			this._oToolbar.setProperty("_endOrder", [
-				"copy",
-				"paste",
-				"showHideDetails",
-				"collapseAll",
-				"expandAll",
-				"settings",
-				"export"
-			].map((sSuffix) => this.getId() + "-" + sSuffix));
 
 			this._updateInvisibleTitle();
 		}
@@ -2277,16 +2288,14 @@ sap.ui.define([
 	};
 
 	Table.prototype._getCopyButton = function() {
-		if (window.isSecureContext) {
-			return this.getCopyProvider()?.getCopyButton({id: this.getId() + "-copy"});
+		if (window.isSecureContext && this.getCopyProvider()) {
+			return TableSettings.createCopyButton(this.getId(), this.getCopyProvider());
 		}
 	};
 
 	Table.prototype._getPasteButton = function() {
 		if (this.getShowPasteButton()) {
-			if (!this._oPasteButton) {
-				this._oPasteButton = TableSettings.createPasteButton(this.getId());
-			}
+			this._oPasteButton ??= TableSettings.createPasteButton(this.getId());
 			return this._oPasteButton;
 		}
 	};

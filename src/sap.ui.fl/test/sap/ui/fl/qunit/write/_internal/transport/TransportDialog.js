@@ -20,12 +20,7 @@ sap.ui.define([
   var fPress = function() {
 	  var oDialog, fOnOkay, fOnCancel, sPackage, aPackages;
 
-	  fOnOkay = function(oEvent) {
-		  var sTransport, sPackage;
-
-		  sTransport = oEvent.mParameters.selectedTransport;
-		  sPackage = oEvent.mParameters.selectedPackage;
-	  };
+	  fOnOkay = function(oEvent) {};
 	  fOnCancel = function() {
 		  //debugger;
 	  };

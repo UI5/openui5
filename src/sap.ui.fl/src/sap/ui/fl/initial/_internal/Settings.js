@@ -46,29 +46,127 @@ sap.ui.define([
 		metadata: {
 			library: "sap.ui.fl",
 			properties: {
+
+				/**
+				 * Client number, only set by ABAP systems
+				 */
 				client: { type: "string" },
+
+				/**
+				 * Indicates whether the CF services are split into two (KeyUser and Personalization)
+				 * TODO remove this property and check the connector configuration directly where this property is used
+				 */
 				hasPersoConnector: { type: "boolean", defaultValue: false },
+
+				/**
+				 * Indicates whether the backend can handle annotation changes
+				 */
 				isAnnotationChangeEnabled: { type: "boolean", defaultValue: false },
+
+				/**
+				 * Indicates whether the app variant save as functionality is enabled
+				 */
 				isAppVariantSaveAsEnabled: { type: "boolean", defaultValue: false },
+
+				/**
+				 * Indicates whether the Adaptation Transport Organizer is enabled, only available in ABAP systems
+				 */
 				isAtoEnabled: { type: "boolean", defaultValue: false },
+
+				/**
+				 * Indicates whether the backend supports condensing
+				 */
 				isCondensingEnabled: { type: "boolean", defaultValue: false },
+
+				/**
+				 * Indicates whether the backend supports context-based adaptation
+				 */
 				isContextBasedAdaptationEnabled: { type: "boolean", defaultValue: false },
+
+				/**
+				 * Indicates whether the backend supports context sharing for views
+				 */
 				isContextSharingEnabled: { type: "boolean", defaultValue: true },
+
+				/**
+				 * Indicates whether the proper Authorization are set to be a Key User
+				 */
 				isKeyUser: { type: "boolean", defaultValue: false },
+
+				/**
+				 * Indicates whether the backend supports translation for key users. Only applicable for CF
+				 */
 				isKeyUserTranslationEnabled: { type: "boolean", defaultValue: false },
+
+				/**
+				 * Indicates whether the backend supports the local reset action
+				 */
 				isLocalResetEnabled: { type: "boolean", defaultValue: false },
+
+				/**
+				 * Indicates whether the backend is a productive system
+				 */
 				isProductiveSystem: { type: "boolean", defaultValue: true },
+
+				/**
+				 * Indicates whether public FlVariants are enabled. Customers can change this setting per system
+				 */
 				isPublicFlVariantEnabled: { type: "boolean", defaultValue: false },
+
+				/**
+				 * Indicates whether the backend supports the public layer
+				 */
 				isPublicLayerAvailable: { type: "boolean", defaultValue: false },
+
+				/**
+				 * Indicates whether the system has transports configured and is able to publish to another system
+				 */
 				isPublishAvailable: { type: "boolean", defaultValue: false },
+
+				/**
+				 * Indicates whether the backend can save already seen what's new features
+				 */
 				isSeenFeaturesAvailable: { type: "boolean", defaultValue: false },
+
+				/**
+				 * Indicates whether UI Adaptation at runtime or designtime are enabled for the SmartVariantManagement control
+				 */
 				isVariantAdaptationEnabled: { type: "boolean", defaultValue: false },
+
+				/**
+				 * Indicates whether there is a route to fetch variant author names
+				 */
 				isVariantAuthorNameAvailable: { type: "boolean", defaultValue: false },
+
+				/**
+				 * Indicates whether personalization of views is enabled.
+				 * In ABAP, there is settings that customer can say no personalized on views at all
+				 */
 				isVariantPersonalizationEnabled: { type: "boolean", defaultValue: true },
+
+				/**
+				 * Indicates whether sharing of views is enabled via the "Public" checkbox
+				 */
 				isVariantSharingEnabled: { type: "boolean", defaultValue: false },
+
+				/**
+				 * Indicates system Id of the ABAP backend system
+				 */
 				system: { type: "string" },
+
+				/**
+				 * Indicates system type of the ABAP backend system
+				 */
 				systemType: { type: "string" },
+
+				/**
+				 * User Id, only set by the CF service
+				 */
 				userId: { type: "string" },
+
+				/**
+				 * Indicates per layer if draft handling is enabled
+				 */
 				versioning: { type: "object", defaultValue: {} }
 			}
 		},

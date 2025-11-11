@@ -522,7 +522,6 @@ sap.ui.define([
 		var oFormContainer;
 		var oFormElement;
 		var oParent;
-		var oLayoutData;
 
 		if (oElement.isA(["sap.ui.core.Title", "sap.ui.core.Toolbar"])) {
 			//start a new container with a title
@@ -556,7 +555,7 @@ sap.ui.define([
 				if (oParent instanceof FormElement) {
 					oFormContainer = oParent.getParent();
 					oFormElement = oParent;
-					oLayoutData = _getFieldLayoutData.call(this, oElement);
+					_getFieldLayoutData.call(this, oElement);
 				} else if (oParent instanceof FormContainer) {
 					oFormContainer = oParent;
 					oFormElement = _addFormElement.call(this, oFormContainer);
@@ -627,7 +626,6 @@ sap.ui.define([
 		var aFormContainers;
 		var i = 0;
 		var oField;
-		var oLayoutData;
 
 		if (oElement.isA(["sap.ui.core.Title", "sap.ui.core.Toolbar"])) {
 			//start a new container with a title
@@ -723,7 +721,7 @@ sap.ui.define([
 			this._changedFormElements.push(oFormElement);
 		} else {
 			// new field
-			oLayoutData = _getFieldLayoutData.call(this, oElement);
+			_getFieldLayoutData.call(this, oElement);
 			if (oOldElement.isA(["sap.ui.core.Title", "sap.ui.core.Toolbar"])) {
 				// add new Field to last FormElement of previous FormContainer
 				oOldFormContainer = oOldElement.getParent();

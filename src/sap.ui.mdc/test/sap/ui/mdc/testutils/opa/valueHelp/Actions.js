@@ -79,7 +79,13 @@ sap.ui.define([
                     var oMatcher = new Matcher();
                     oMatcher.isMatching = function(oListItem) {
                         return !!oListItem.getCells().find(function (oCell) {
-                            return sText === oCell.mProperties["text"];
+                            const oMetadata = oCell.getMetadata();
+                            if (oMetadata.hasProperty("value")) {
+                                return sText === oCell.getProperty("value");
+                            } else if (oMetadata.hasProperty("text")) {
+                                return sText === oCell.getProperty("text");
+                            }
+                            return false;
                         });
                     };
 
@@ -316,6 +322,32 @@ sap.ui.define([
                 },
                 errorMessage: "Expand/Hide Filters Button not found."
             });
+        },
+        iSelectSearchTemplate: function (sTemplateName, sValueHelpId) {
+            return doWait(this).forValueHelpDialog({
+                success: function(oDialog) {
+                    return this.waitFor({
+                        controlType: "sap.ui.mdc.valuehelp.CollectiveSearchSelect",
+                        success: function (aSelects) {
+                            new Press().executeOn(aSelects[0]);
+                            return this.waitFor({
+                                controlType: "sap.ui.core.Item",
+                                matchers: [
+                                    new Ancestor(aSelects[0]),
+                                    new PropertyStrictEquals({
+                                        name: "text",
+                                        value: sTemplateName
+                                    })
+                                ],
+                                success: function (aItems) {
+                                    new Press().executeOn(aItems[0]);
+                                    Opa5.assert.ok(aItems[0], "Selected Search Template " + sTemplateName);
+                                }
+                            });
+                        }
+                    });
+                }
+            }, sValueHelpId);
         }
     };
 
