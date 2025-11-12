@@ -281,10 +281,10 @@ sap.ui.define([
 
 		QUnit.test("Root ARIA attributes", function (oAssert) {
 			var $colorPickerRef = this.oCP.$(),
-				sExpectedRoledescription = Library.getResourceBundleFor("sap.ui.unified").getText("COLOR_PICKER_TITLE");
+				sExpectedLabel = Library.getResourceBundleFor("sap.ui.unified").getText("COLOR_PICKER_TITLE");
 
 			oAssert.strictEqual($colorPickerRef.attr("role"), "group", "Color Picker has a 'group' role");
-			oAssert.strictEqual($colorPickerRef.attr("aria-roledescription"), sExpectedRoledescription, "roledescription contains control's name");
+			oAssert.strictEqual($colorPickerRef.attr("aria-label"), sExpectedLabel, "aria label contains control's name");
 		});
 
 		QUnit.test("Sliders invisible texts", function (oAssert) {

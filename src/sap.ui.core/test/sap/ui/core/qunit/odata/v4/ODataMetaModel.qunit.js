@@ -25,12 +25,11 @@ sap.ui.define([
 	"sap/ui/model/odata/v4/ValueListType",
 	"sap/ui/model/odata/v4/lib/_Helper",
 	"sap/ui/model/odata/v4/lib/_MetadataRequestor",
-	"sap/ui/test/TestUtils",
-	"sap/ui/thirdparty/URI"
+	"sap/ui/test/TestUtils"
 ], function (Log, Localization, JSTokenizer, SyncPromise, BindingMode, ChangeReason,
 		ClientListBinding, BaseContext, ContextBinding, Filter, FilterOperator, MetaModel, Model,
 		PropertyBinding, Sorter, OperationMode, AnnotationHelper, Context, ODataMetaModel,
-		ODataModel, ValueListType, _Helper, _MetadataRequestor, TestUtils, URI) {
+		ODataModel, ValueListType, _Helper, _MetadataRequestor, TestUtils) {
 	"use strict";
 
 	// Common := com.sap.vocabularies.Common.v1
@@ -5795,42 +5794,6 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test("getAbsoluteServiceUrl", function (assert) {
-		var oModel = new ODataModel({serviceUrl : "/Foo/DataService/"}),
-			oMetaModel = oModel.getMetaModel();
-
-		// code under test
-		assert.strictEqual(oMetaModel.getAbsoluteServiceUrl("../ValueListService/$metadata"),
-			"/Foo/ValueListService/");
-
-		// code under test
-		assert.strictEqual(oMetaModel.getAbsoluteServiceUrl("/Foo/ValueListService/$metadata"),
-			"/Foo/ValueListService/");
-
-		// code under test
-		assert.strictEqual(oMetaModel.getAbsoluteServiceUrl("$metadata"),
-			"/Foo/DataService/");
-
-		// code under test
-		assert.strictEqual(oMetaModel.getAbsoluteServiceUrl(
-				"$metadata?sap-context-token=XYZ&sap-client=123&sap-language=ABC"),
-			"/Foo/DataService/?sap-context-token=XYZ&sap-client=123&sap-language=ABC");
-	});
-
-	//*********************************************************************************************
-	QUnit.test("getAbsoluteServiceUrl: relative data service URL", function (assert) {
-		var sRelativePath = "../../../DataService/",
-			sAbsolutePath
-				= new URI(sRelativePath).absoluteTo(document.baseURI).pathname().toString(),
-			oModel = new ODataModel({serviceUrl : sRelativePath});
-
-		// code under test
-		assert.strictEqual(oModel.getMetaModel()
-				.getAbsoluteServiceUrl("../ValueListService/$metadata"),
-			new URI("../ValueListService/").absoluteTo(sAbsolutePath).toString());
-	});
-
-	//*********************************************************************************************
 	[true, false].forEach(function (bAutoExpandSelect) {
 		[false, true].forEach(function (bHasMetaModelForAnnotations) {
 			[false, true].forEach(function (bCopyAnnotations) {
@@ -5849,7 +5812,6 @@ sap.ui.define([
 			var mHeaders = {"Accept-Language" : "ab-CD", "X-CSRF-Token" : "xyz"},
 				oModel = new ODataModel({serviceUrl : "/Foo/DataService/"}),
 				oMetaModel = oModel.getMetaModel(),
-				oMetaModelMock = this.mock(oMetaModel),
 				oSharedModel;
 
 			if (bDestroyed) { // (meta) model might be destroyed while #requestCodeList in progress
@@ -5861,8 +5823,9 @@ sap.ui.define([
 				? "~oMetaModelForAnnotations~"
 				: null;
 			oMetaModel.sLanguage = "~sLanguage~";
-			oMetaModelMock.expects("getAbsoluteServiceUrl")
-				.withExactArgs("../ValueListService/$metadata")
+			const oHelperMock = this.mock(_Helper);
+			oHelperMock.expects("makeAbsolute")
+				.withExactArgs("../ValueListService/$metadata", "/Foo/DataService/$metadata", true)
 				.returns("/Foo/ValueListService/");
 			this.mock(oModel).expects("getHttpHeaders").withExactArgs().returns(mHeaders);
 			// observe metadataUrlParams being passed along
@@ -5906,8 +5869,9 @@ sap.ui.define([
 			});
 
 			if (!bDestroyed) {
-				oMetaModelMock.expects("getAbsoluteServiceUrl")
-					.withExactArgs("/Foo/ValueListService/$metadata")
+				oHelperMock.expects("makeAbsolute")
+					.withExactArgs("/Foo/ValueListService/$metadata", "/Foo/DataService/$metadata",
+						true)
 					.returns("/Foo/ValueListService/");
 
 				// code under test
@@ -5932,12 +5896,11 @@ sap.ui.define([
 	QUnit.test("getOrCreateSharedModel, bAutoExpandSelect defaults to false", function (assert) {
 		var oModel = new ODataModel({serviceUrl : "/Foo1/DataService/"}),
 			oMetaModel = oModel.getMetaModel(),
-			oMetaModelMock = this.mock(oMetaModel),
 			oSharedModel;
 
 		oModel.oRequestor.mHeaders["X-CSRF-Token"] = "xyz";
-		oMetaModelMock.expects("getAbsoluteServiceUrl").twice()
-			.withExactArgs("../ValueListService/$metadata")
+		this.mock(_Helper).expects("makeAbsolute").twice()
+			.withExactArgs("../ValueListService/$metadata", "/Foo1/DataService/$metadata", true)
 			.returns("/Foo1/ValueListService/");
 		// observe metadataUrlParams NOT being passed along
 		this.mock(_MetadataRequestor).expects("create")
@@ -5972,8 +5935,8 @@ sap.ui.define([
 		var oModel = new ODataModel({serviceUrl : "/Foo/DataService/"}),
 			oSharedModel;
 
-		this.mock(oModel.getMetaModel()).expects("getAbsoluteServiceUrl")
-			.withExactArgs("../ValueListService/$metadata")
+		this.mock(_Helper).expects("makeAbsolute")
+			.withExactArgs("../ValueListService/$metadata", "/Foo/DataService/$metadata", true)
 			.returns("/absolute/path/");
 		const oExpectation = this.mock(ODataModel.prototype).expects("setRetryAfterHandler")
 			.withExactArgs(sinon.match.func);
@@ -7321,8 +7284,9 @@ sap.ui.define([
 							});
 						this.mock(_Helper).expects("setLanguage").twice()
 							.withExactArgs(sUrl, "~sLanguage~").returns("~sUrl w/ sLanguage~");
-						this.oMetaModelMock.expects("getAbsoluteServiceUrl").twice()
-							.withExactArgs("~sUrl w/ sLanguage~").returns("/absolute/path/");
+						this.mock(_Helper).expects("makeAbsolute").twice()
+							.withExactArgs("~sUrl w/ sLanguage~", "/a/b/c/d/e/$metadata", true)
+							.returns("/absolute/path/");
 						this.oMetaModelMock.expects("getOrCreateSharedModel")
 							.withExactArgs("/absolute/path/")
 							.returns(oCodeListModel);
@@ -7485,8 +7449,9 @@ sap.ui.define([
 				});
 			this.mock(_Helper).expects("setLanguage").twice().withExactArgs(sUrl, undefined)
 				.returns(sUrl);
-			this.oMetaModelMock.expects("getAbsoluteServiceUrl").twice()
-				.withExactArgs(sUrl).returns("/absolute/path/");
+			this.mock(_Helper).expects("makeAbsolute").twice()
+				.withExactArgs(sUrl, "/a/b/c/d/e/$metadata", true)
+				.returns("/absolute/path/");
 			this.oMetaModelMock.expects("getOrCreateSharedModel").withExactArgs("/absolute/path/")
 				.returns(oCodeListModel);
 			this.mock(oCodeListModel).expects("getMetaModel").withExactArgs()
@@ -7544,8 +7509,9 @@ sap.ui.define([
 				});
 			this.mock(_Helper).expects("setLanguage").twice().withExactArgs(sUrl, undefined)
 				.returns(sUrl);
-			this.oMetaModelMock.expects("getAbsoluteServiceUrl").twice()
-				.withExactArgs(sUrl).returns("/absolute/path/");
+			this.mock(_Helper).expects("makeAbsolute").twice()
+				.withExactArgs(sUrl, "/a/b/c/d/e/$metadata", true)
+				.returns("/absolute/path/");
 			this.oMetaModelMock.expects("getOrCreateSharedModel").withExactArgs("/absolute/path/")
 				.returns(oCodeListModel);
 			this.mock(oCodeListModel).expects("getMetaModel").withExactArgs()
@@ -7658,8 +7624,8 @@ sap.ui.define([
 				Url : sUrl
 			});
 		this.mock(_Helper).expects("setLanguage").withExactArgs(sUrl, undefined).returns(sUrl);
-		this.oMetaModelMock.expects("getAbsoluteServiceUrl")
-			.withExactArgs(sUrl).returns("/absolute/path/");
+		this.mock(_Helper).expects("makeAbsolute").withExactArgs(sUrl, "/a/b/c/d/e/$metadata", true)
+			.returns("/absolute/path/");
 		this.oMetaModelMock.expects("getOrCreateSharedModel").withExactArgs("/absolute/path/")
 			.returns(oCodeListModel);
 		this.mock(oCodeListModel).expects("getMetaModel").withExactArgs()
@@ -7688,7 +7654,7 @@ sap.ui.define([
 				.withExactArgs("/@com.sap.vocabularies.CodeList.v1.A")
 				.resolves({
 					CollectionPath : "Units/Of/Measure",
-					Url : "/some/Url/" // no ".../$metadata" to simplify mock of #getAbsoluteServiceUrl
+					Url : "/some/Url/" // no ".../$metadata" to simplify mock of _Helper.makeAbsolute
 				});
 			this.oMetaModelMock.expects("requestObject")
 				.withExactArgs("/@com.sap.vocabularies.CodeList.v1.B")
@@ -7711,7 +7677,7 @@ sap.ui.define([
 					Url : sUrlD
 				});
 			this.mock(_Helper).expects("setLanguage").exactly(4).returnsArg(0); // keep Url unchanged
-			this.oMetaModelMock.expects("getAbsoluteServiceUrl").exactly(4).returnsArg(0); // dito
+			this.mock(_Helper).expects("makeAbsolute").exactly(4).returnsArg(0); // dito
 			const oCodeListMetaModelA = {
 				requestObject : function () {}
 			};
@@ -7807,8 +7773,8 @@ sap.ui.define([
 				Url : sUrl
 			});
 		this.mock(_Helper).expects("setLanguage").withExactArgs(sUrl, undefined).returns(sUrl);
-		this.oMetaModelMock.expects("getAbsoluteServiceUrl")
-			.withExactArgs(sUrl).returns("/absolute/path/");
+		this.mock(_Helper).expects("makeAbsolute").withExactArgs(sUrl, "/a/b/c/d/e/$metadata", true)
+			.returns("/absolute/path/");
 		this.oMetaModelMock.expects("getOrCreateSharedModel").withExactArgs("/absolute/path/")
 			.returns(oCodeListModel);
 		oCodeListMetaModelMock.expects("requestObject")
@@ -7876,8 +7842,8 @@ sap.ui.define([
 				Url : sUrl
 			});
 		this.mock(_Helper).expects("setLanguage").withExactArgs(sUrl, undefined).returns(sUrl);
-		this.oMetaModelMock.expects("getAbsoluteServiceUrl")
-			.withExactArgs(sUrl).returns("/absolute/path/");
+		this.mock(_Helper).expects("makeAbsolute").withExactArgs(sUrl, "/a/b/c/d/e/$metadata", true)
+			.returns("/absolute/path/");
 		this.oMetaModelMock.expects("getOrCreateSharedModel").withExactArgs("/absolute/path/")
 			.returns(oCodeListModel);
 		oCodeListMetaModelMock.expects("requestObject")

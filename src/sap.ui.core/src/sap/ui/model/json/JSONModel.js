@@ -289,7 +289,7 @@ sap.ui.define([
 
 			// attach exception/rejection handler, so the internal import promise always resolves
 			this.pSequentialImportCompleted = pReturn.catch(function(oError) {
-				Log.error("Loading of data failed: " + oError.stack);
+				Log.error("Loading of data failed: " + sURL);
 			});
 
 			// return chained loadData promise (sequential imports)

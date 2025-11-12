@@ -8,15 +8,16 @@
 
 	&:focus {
 		outline: none;
+
 		&::after {
-			content: "";
+			content: '';
 			position: absolute;
 			box-sizing: border-box;
 			left: 0.0625rem;
 			top: 0.0625rem;
 			right: 0.0625rem;
 			bottom: 0.0625rem;
-			border: @sapContent_FocusWidth @sapContent_FocusStyle @sapUiContentFocusColor;
+			border: var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);
 			pointer-events: none;
 		}
 	}
@@ -27,8 +28,11 @@
 }
 
 .sapUiSizeCompact {
+
 	.sapUiUnifiedLegendItem {
+
 		&:focus {
+
 			&::after {
 				left: 0;
 				top: 0;

@@ -47,7 +47,10 @@ sap.ui.define([
 						'"baz": [52, 97]' +
 					'}';
 					break;
-
+				case "/fake/nothingThere.json":
+					sAnswer = "~responseText";
+					iStatus = 404;
+					break;
 				default:
 					// No dummy request!
 

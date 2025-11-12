@@ -337,6 +337,9 @@ sap.ui.define([
 		if (oError["Dimension"] === 0) {
 			delete oError["Dimension"];
 		}
+		if (aMeasures?.length === 0) {
+			oError["Measure"] = 0;
+		}
 		return {
 			valid: bValid,
 			error: oError

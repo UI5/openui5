@@ -765,6 +765,15 @@ sap.ui.define([
 				oListItem = ListHelpers.getListItem(this.getSelectedItem());
 			}
 
+			const sSelectedItemText = this.getSelectedItem()?.getText();
+			const slastInputValue = this.getLastValue();
+
+			if (sValue.toLowerCase() === sSelectedItemText?.toLowerCase()) {
+				this.setValue(sSelectedItemText);
+				sValue = sSelectedItemText;
+				this.setLastValue(slastInputValue);
+			}
+
 			this._sInputValueBeforeOpen = sValue;
 
 			if (this.isOpen()) {

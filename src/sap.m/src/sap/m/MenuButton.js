@@ -15,6 +15,7 @@ sap.ui.define([
 	'sap/ui/core/Popup',
 	'sap/ui/core/LabelEnablement',
 	"./MenuButtonRenderer",
+	'sap/base/i18n/Localization',
 	"sap/ui/events/KeyCodes"
 ], function(
 	library,
@@ -28,6 +29,7 @@ sap.ui.define([
 	Popup,
 	LabelEnablement,
 	MenuButtonRenderer,
+	Localization,
 	KeyCodes
 ) {
 		"use strict";
@@ -366,6 +368,181 @@ sap.ui.define([
 		};
 
 		/**
+		 * Parses the dock string to extract horizontal and vertical alignment values
+		 * @param {string} sDock The dock string to parse
+		 * @returns {object} Object with sHorizontalAlign and sVerticalAlign properties
+		 * @private
+		 */
+		MenuButton.prototype._parseDockAlignment = function(sDock) {
+			let sHorizontalAlign = "Begin";
+			let sVerticalAlign = "Bottom";
+
+			// Determine horizontal alignment (test first part)
+			if (sDock.substring(0, 5) === "Begin") {
+				sHorizontalAlign = "Begin";
+			} else if (sDock.substring(0, 3) === "End") {
+				sHorizontalAlign = "End";
+			} else if (sDock.substring(0, 4) === "Left") {
+				sHorizontalAlign = "Left";
+			} else if (sDock.substring(0, 5) === "Right") {
+				sHorizontalAlign = "Right";
+			} else if (sDock.substring(0, 6) === "Center") {
+				sHorizontalAlign = "Center";
+			}
+
+			// Determine vertical alignment (test last part)
+			if (sDock.substring(sDock.length - 3) === "Top") {
+				sVerticalAlign = "Top";
+			} else if (sDock.substring(sDock.length - 6) === "Bottom") {
+				sVerticalAlign = "Bottom";
+			} else if (sDock.substring(sDock.length - 6) === "Center") {
+				sVerticalAlign = "Center";
+			}
+
+			return { sHorizontalAlign, sVerticalAlign };
+		};
+
+		/**
+		 * Adjusts the popover position after it opens according to the dock rules
+		 * @param {string} sDock The dock string to parse
+		 * @param {sap.m.ResponsivePopover} oPopover The popover instance
+		 * @param {object} oOpenerRect The opener rectangle
+		 * @private
+		 */
+		MenuButton.prototype._adjustPopoverPosition = function(sDock, oPopover, oOpenerRect) {
+			const { sHorizontalAlign, sVerticalAlign } = this._parseDockAlignment(sDock),
+				oPopoverDomRef = oPopover._oControl.getDomRef(),
+				oPopoverRect = oPopoverDomRef.getBoundingClientRect(),
+				iScrollX = window.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft || 0,
+				iScrollY = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0,
+				bLeftOrRight = (sHorizontalAlign === "Left" || sHorizontalAlign === "Right"),
+				bRTL = Localization.getRTL();
+			let iTargetLeft,
+				iTargetTop,
+				iOffsetLeft = 0,
+				iOffsetTop = 0;
+
+			// Calculate horizontal position based on sHorizontalAlign
+			switch (sHorizontalAlign) {
+				case "Begin":
+					iTargetLeft = (bRTL)
+									? (oOpenerRect.right + iScrollX) - oPopoverRect.width
+									: oOpenerRect.left + iScrollX;
+					iOffsetLeft = (bRTL) ? -1 : 1;
+					break;
+				case "End":
+					iTargetLeft = (bRTL)
+									? oOpenerRect.left + iScrollX
+									: (oOpenerRect.right + iScrollX) - oPopoverRect.width;
+					iOffsetLeft = (bRTL) ? 1 : -1;
+					break;
+				case "Left":
+					iTargetLeft = (oOpenerRect.left + iScrollX) - oPopoverRect.width;
+					iOffsetLeft = -2;
+					break;
+				case "Right":
+					iTargetLeft = oOpenerRect.right + iScrollX;
+					iOffsetLeft = 2;
+					break;
+				default: // Center
+					var iButtonCenterX = oOpenerRect.left + (oOpenerRect.width / 2) + iScrollX;
+					iTargetLeft = iButtonCenterX - (oPopoverRect.width / 2);
+			}
+
+			// Calculate vertical position based on sVerticalAlign
+			switch (sVerticalAlign) {
+				case "Top":
+					iTargetTop = bLeftOrRight
+									? (oOpenerRect.top + oOpenerRect.height + iScrollY) - oPopoverRect.height
+									: (oOpenerRect.top + iScrollY) - oPopoverRect.height;
+					iOffsetTop = bLeftOrRight ? -5 : 2;
+					break;
+				case "Bottom":
+					iTargetTop = bLeftOrRight
+									? oOpenerRect.top + iScrollY
+									: oOpenerRect.top + oOpenerRect.height + iScrollY;
+					iOffsetTop = bLeftOrRight ? 5 : -2;
+					break;
+				default: // Center
+					var iButtonCenterY = oOpenerRect.top + (oOpenerRect.height / 2) + iScrollY;
+					iTargetTop = iButtonCenterY - (oPopoverRect.height / 2);
+			}
+
+			// Apply the computed position
+			oPopoverDomRef.style.left = Math.round(iTargetLeft + iOffsetLeft) + "px";
+			oPopoverDomRef.style.top = Math.round(iTargetTop + iOffsetTop) + "px";
+			oPopoverDomRef.style.right = "";
+			oPopoverDomRef.style.bottom = "";
+
+			oPopover.detachEvent("afterOpen", this._adjustPopoverPosition);
+		};
+
+		/**
+		 * Destroys the menu button anchor element
+		 * @param {sap.m.ResponsivePopover | undefined} oPopover The popover instance (if provided)
+		 * @private
+		 */
+		MenuButton.prototype._destroyAnchorElement = function(oPopover) {
+			if (this._menuButtonAnchor && this._menuButtonAnchor.parentNode) {
+				this._menuButtonAnchor.parentNode.removeChild(this._menuButtonAnchor);
+			}
+			this._menuButtonAnchor = null;
+			oPopover && oPopover.detachEvent("afterClose", this._destroyAnchorElement);
+		};
+
+		/**
+		 * Creates and configures the DOM anchor element for menu positioning
+		 * @param {object} oOpenerRect The opener rectangle
+		 * @private
+		 */
+		MenuButton.prototype._createAnchorElement = function(oOpenerRect) {
+			// remove any previous anchor
+			this._destroyAnchorElement();
+
+			const iScrollX = window.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft || 0,
+				iScrollY = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0,
+				iAnchorX = oOpenerRect.left + (oOpenerRect.width / 2) + iScrollX,
+				iAnchorY = oOpenerRect.top + (oOpenerRect.height / 2) + iScrollY,
+				oAnchor = document.createElement("div");
+
+			oAnchor.style.position = "absolute";
+			oAnchor.style.width = "1px";
+			oAnchor.style.height = "1px";
+			oAnchor.style.left = Math.round(iAnchorX) + "px";
+			oAnchor.style.top = Math.round(iAnchorY) + "px";
+			oAnchor.style.zIndex = "2147483647";
+			oAnchor.style.pointerEvents = "none";
+			oAnchor.setAttribute("aria-hidden", "true");
+			oAnchor.className = "sapMMenuButtonAnchor";
+
+			document.body.appendChild(oAnchor);
+			this._menuButtonAnchor = oAnchor;
+		};
+
+		/**
+		 * Create a temporary DOM anchor at the coordinates computed from a Popup.Dock-like token (menuPosition).
+		 * The anchor is appended to document.body and will be removed after the popover closes.
+		 *
+		 * @param {string} sDock Popup.Dock-like token (e.g. "BeginTop", "EndCenter", "LeftBottom")
+		 * @param {sap.m.ResponsivePopover} oPopover the popover instance to attach cleanup to
+		 * @private
+		 */
+		MenuButton.prototype._createMenuPositionAnchor = function(sDock, oPopover) {
+			if (!sDock || !oPopover || !Dock[sDock]) {
+				return;
+			}
+
+			const oOpenerRect = this.getDomRef().getBoundingClientRect();
+
+			// create new anchor
+			this._createAnchorElement(oOpenerRect);
+
+			// Attach event handlers
+			oPopover.attachEvent("afterOpen", this._adjustPopoverPosition.bind(this, sDock, oPopover, oOpenerRect));
+			oPopover.attachEvent("afterClose", this._destroyAnchorElement.bind(this, oPopover));
+		};
+
+		/**
 		 * Handles the <code>buttonPress</code> event and opens the menu.
 		 * @param {boolean} oEvent event object
 		 * @private
@@ -394,7 +571,11 @@ sap.ui.define([
 			// adjust the positioning of the Menu Popover to align with MenuButton, because of padding around inner button
 			var oPopover = oMenu._getPopover();
 
-			oPopover && oPopover.setOffsetX(1).setOffsetY(-3);
+			// create anchor according to menuPosition
+			var sDock = this.getMenuPosition();
+			if (sDock && oPopover) {
+				this._createMenuPositionAnchor(sDock, oPopover);
+			}
 
 			oMenu.openBy.apply(oMenu, aParam);
 

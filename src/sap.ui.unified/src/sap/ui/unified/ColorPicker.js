@@ -929,14 +929,11 @@ sap.ui.define([
 			ariaLabelledBy: InvisibleText.getStaticId("sap.ui.unified", "COLORPICKER_RED")
 		}).addStyleClass(CONSTANTS.LeftColumnInputClass);
 
-
 		this.oGreenField = this.oColorPickerHelper.factory.createInput(sId + "-gF", {
 			value: this.Color.g,
 			change: this._handleGreenValueChange.bind(this),
 			ariaLabelledBy: InvisibleText.getStaticId("sap.ui.unified", "COLORPICKER_GREEN")
 		}).addStyleClass(CONSTANTS.LeftColumnInputClass);
-
-
 
 		this.oBlueField = this.oColorPickerHelper.factory.createInput(sId + "-bF", {
 			value: this.Color.b,
@@ -951,7 +948,6 @@ sap.ui.define([
 			ariaLabelledBy: InvisibleText.getStaticId("sap.ui.unified", "COLORPICKER_HUE")
 		}).addStyleClass(CONSTANTS.RightColumnInputClass);
 
-
 		this.oSatField = this.oColorPickerHelper.factory.createInput(sId + "-sF", {
 			value: this.Color.s,
 			change: this._handleSatValueChange.bind(this),
@@ -959,13 +955,13 @@ sap.ui.define([
 				" " + InvisibleText.getStaticId("sap.ui.unified", "COLORPICKER_PERCENTAGE")
 		}).addStyleClass(CONSTANTS.RightColumnInputClass);
 
-
 		this.oLitField = this.oColorPickerHelper.factory.createInput(sId + "-lF", {
 			value: this.Color.l,
 			change: this._handleLitValueChange.bind(this),
 			ariaLabelledBy: InvisibleText.getStaticId("sap.ui.unified", "COLORPICKER_LIGHTNESS") +
 				" " + InvisibleText.getStaticId("sap.ui.unified", "COLORPICKER_PERCENTAGE")
 		}).addStyleClass(CONSTANTS.RightColumnInputClass).addStyleClass(CONSTANTS.HideForHSVClass);
+
 
 		// this alpha field is rendered along with R, G, B fields
 		this.oAlphaField = this.oColorPickerHelper.factory.createInput(sId + "-aF", {
@@ -1000,7 +996,7 @@ sap.ui.define([
 			selectedIndex: (this.Color.formatHSL ? 1 : 0 )
 		}).addStyleClass(CONSTANTS.OutputSelectorClass);
 
-		// Slider
+		// Hue Slider
 		this.oHueInvisibleText = new InvisibleText({text: oRb.getText("COLORPICKER_HUE_SLIDER")}).toStatic();
 		this.addAggregation("_invisibleTexts", this.oHueInvisibleText, true);
 		this.oSlider = this.oColorPickerHelper.factory.createSlider(sId + "-hSLD", {
@@ -1010,7 +1006,6 @@ sap.ui.define([
 			value: parseInt(this.oHueField.getValue())
 		}).addStyleClass(CONSTANTS.SliderClass).addAriaLabelledBy(this.oHueInvisibleText);
 
-
 		// Attaching events with parameter passed so the handler will know in which mode to execute
 		this.oSlider.attachEvent("liveChange", "liveChange", this._handleSliderChange.bind(this));
 		this.oSlider.attachEvent("change", "change", this._handleSliderChange.bind(this));
@@ -1018,14 +1013,12 @@ sap.ui.define([
 		// Alpha Slider
 		this.oAlphaInvisibleText = new InvisibleText({text: oRb.getText("COLORPICKER_ALPHA_SLIDER")}).toStatic();
 		this.addAggregation("_invisibleTexts", this.oAlphaInvisibleText, true);
-
 		this.oAlphaSlider = this.oColorPickerHelper.factory.createSlider(sId + "-aSLD", {
 			max: 1,
 			value: 1,
 			step: 0.01,
 			tooltip: oRb.getText("COLORPICKER_ALPHA")
 		}).addStyleClass(CONSTANTS.AlphaSliderClass).addAriaLabelledBy(this.oAlphaInvisibleText);
-
 
 		// Attaching events with parameter passed so the handler will know in which mode to execute
 		this.oAlphaSlider.attachEvent("liveChange", "liveChange", this._handleAlphaSliderChange.bind(this));

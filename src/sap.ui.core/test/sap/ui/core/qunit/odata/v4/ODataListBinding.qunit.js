@@ -207,6 +207,7 @@ sap.ui.define([
 		assert.ok(oBinding.hasOwnProperty("sGroupId"));
 		assert.ok(oBinding.hasOwnProperty("bHasAnalyticalInfo"));
 		assert.ok(oBinding.hasOwnProperty("oHeaderContext"));
+		assert.strictEqual(oBinding.bInitial, true);
 		assert.ok(oBinding.hasOwnProperty("bLengthFinal"));
 		assert.ok(oBinding.hasOwnProperty("iMaxLength"));
 		assert.ok(oBinding.hasOwnProperty("sOperationMode"));
@@ -221,6 +222,10 @@ sap.ui.define([
 		assert.ok(oBinding.hasOwnProperty("sUpdateGroupId"));
 
 		assert.ok(fnParentBindingSpy.calledOnceWithExactly(sinon.match.same(oBinding)));
+
+		return Promise.resolve().then(() => {
+			assert.strictEqual(oBinding.bInitial, false, "reset bInitial asynchronously");
+		});
 	});
 
 	//*********************************************************************************************
@@ -230,6 +235,7 @@ sap.ui.define([
 	QUnit.test(sTitle, function (assert) {
 		var oBinding = this.bindList("n/a");
 
+		assert.strictEqual(oBinding.bInitial, true);
 		oBinding.sChangeReason = sChangeReason;
 		this.mock(oBinding).expects("isResolved").withExactArgs().returns(true);
 		this.mock(oBinding).expects("checkDataState").withExactArgs();
@@ -240,6 +246,7 @@ sap.ui.define([
 		// code under test
 		oBinding.initialize();
 
+		assert.strictEqual(oBinding.bInitial, false);
 		assert.strictEqual(oBinding.sChangeReason, sChangeReason);
 		assert.strictEqual(oBinding.sResumeChangeReason,
 			sChangeReason ? ChangeReason.Change : ChangeReason.Refresh);
@@ -291,6 +298,7 @@ sap.ui.define([
 		var oBinding = this.bindList("/n/a"),
 			sChangeReason = {};
 
+		assert.strictEqual(oBinding.bInitial, true);
 		oBinding.sChangeReason = sChangeReason;
 		this.mock(oBinding).expects("isResolved").withExactArgs().returns(false);
 		this.mock(oBinding).expects("checkDataState").never();
@@ -299,6 +307,7 @@ sap.ui.define([
 		// code under test
 		oBinding.initialize();
 
+		assert.strictEqual(oBinding.bInitial, false);
 		assert.strictEqual(oBinding.sChangeReason, sChangeReason);
 	});
 
@@ -9944,6 +9953,28 @@ sap.ui.define([
 		// code under test
 		assert.strictEqual(this.bindList("/EMPLOYEES").doSetProperty(), undefined);
 	});
+
+	//*********************************************************************************************
+[{
+	oBinding : {bInitial : false, oFetchCacheCallToken : undefined, oCache : "~oCache~"}
+}, {
+	oBinding : {bInitial : false, oFetchCacheCallToken : {}, oCache : "~oCache~"}
+}, {
+	oBinding : {bInitial : true, oFetchCacheCallToken : undefined, oCache : "~oCache~"}
+}, {
+	oBinding : {bInitial : true, oFetchCacheCallToken : {}, oCache : "~oCache~"},
+	oResult : {bInitial : true, oFetchCacheCallToken : {initiallySuspended : true}, oCache : null}
+}].forEach(function (oFixture, i) {
+	QUnit.test("doSuspend: #" + i, function (assert) {
+		const oBinding = oFixture.oBinding;
+		const oResult = oFixture.oResult ?? Object.assign({}, oBinding);
+
+		// code under test
+		ODataListBinding.prototype.doSuspend.call(oBinding);
+
+		assert.deepEqual(oBinding, oResult);
+	});
+});
 
 	//*********************************************************************************************
 	QUnit.test("fetchDownloadUrl", function (assert) {

@@ -1,6 +1,6 @@
 /* ============================================ */
 /* CSS for control sap.ui.unified/FileUploader  */
-/* Horizon theme                                */
+/* Morning Horizon theme                        */
 /* ============================================ */
 
 .sapUiFup,
@@ -8,7 +8,8 @@
 	height: 2.75rem;
 }
 
-.sapUiSizeCompact{
+.sapUiSizeCompact {
+
 	.sapUiFup,
 	.sapUiFup.sapMBarChild {
 		height: 2rem;
@@ -26,7 +27,7 @@
 
 html.sap-desktop .sapUiFup .sapMFocusable:focus,
 html.sap-desktop .sapUiFup .sapMFocusable:active {
-	outline: 1px dotted @sapUiContentFocusColor;
+	outline: 1px dotted var(--sapContent_FocusColor);
 	outline-offset: -1px;
 }
 
@@ -38,12 +39,10 @@ html.sap-desktop .sapUiFup .sapMBtnInner:active.sapMBtnAccept,
 html.sap-desktop .sapUiFup .sapMBtnInner:active.sapMBtnReject,
 .sapUiFup .sapMBtnInner:active.sapMBtnEmphasized,
 html.sap-desktop .sapUiFup .sapMBtnInner:active.sapMBtnEmphasized {
-	outline-color: @sapUiContentContrastFocusColor;
+	outline-color: var(--sapContent_ContrastFocusColor);
 	outline-offset: -.125rem;
 }
 
 .sapMFooter-CTX .sapUiFup .sapMBtnInner:active.sapMFocusable {
-	background-color: @sapUiButtonActiveBackground;
+	background-color: var(--sapButton_Active_Background);
 }
-
- 

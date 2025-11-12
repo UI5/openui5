@@ -729,11 +729,11 @@ sap.ui.define([
 	/**
 	 * Binding specific code for suspend.
 	 *
+	 * @abstract
+	 * @function
+	 * @name sap.ui.model.odata.v4.ODataParentBinding#doSuspend
 	 * @private
 	 */
-	ODataParentBinding.prototype.doSuspend = function () {
-		// nothing to do here
-	};
 
 	/**
 	 * Determines whether a child binding with the given context and path can use

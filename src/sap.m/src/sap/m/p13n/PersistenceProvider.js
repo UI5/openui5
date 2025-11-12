@@ -7,12 +7,16 @@ sap.ui.define([
 	"use strict";
 
 	/**
-	 * The <code>PersistenceProvider</code> control provides certain persistence capabilities, such as transient personalization and global persistence.
+	 * @class The <code>PersistenceProvider</code> control provides certain persistence capabilities, such as transient personalization and global persistence.
 	 * The <code>PersistenceProvider</code> control can be used in a similar way as <code>sap.ui.fl.variants.VariantManagement</code>,
 	 * since any control that is a direct or indirect descendant of the provided <code>for</code> association is affected by this configuration.
 	 * For example, this controller can be used for <code>sap.ui.mdc</code> controls.
 	 *
-	 * @class
+	 * @extends sap.ui.core.Control
+	 * @author SAP SE
+	 * @version ${version}
+	 * @alias sap.m.p13n.PersistenceProvider
+	 *
 	 * @private
 	 * @ui5-restricted sap.ui.mdc, sap.fe
 	 *

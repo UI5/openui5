@@ -1484,6 +1484,10 @@ function(
         const oChartImplementationContainer = new ChartImplementationContainer({
             noDataContent: oVBox
         });
+        const oInnerChart = ChartDelegate._getChart(this.oMDCChart);
+        const oMockTypes =  {available : [{chart: "bar"}, {chart: "column"}], unavailable: [{chart: "bar", error: {"Measure": 1}}]};
+        const oStub = sinon.stub(oInnerChart, "getAvailableChartTypes").returns(oMockTypes);
+        const oInnerChartStub = sinon.stub(oInnerChart, "_getVisibleMeasures").returns(["Measure1"]);
         ChartDelegate._setInnerStructure(this.oMDCChart, oChartImplementationContainer);
 
         // Act
@@ -1495,6 +1499,49 @@ function(
         assert.equal(ChartDelegate._sErrorMsg, MDCRb.getText("chart.MISSING_MEASURE_ERROR_MESSAGE", ["Bar Chart", 1]), "Error message is correct");
         assert.equal(ChartDelegate._oIllustratedMessage.getDescription(),  MDCRb.getText("chart.MISSING_MEASURE_ERROR_MESSAGE", ["Bar Chart", 1]), "Illustrated message description is correct");
         assert.equal(oChartImplementationContainer.getNoDataContent(), ChartDelegate._oIllustratedMessage, "No data content should be set to illustrated message");
+        const aAdditionalContent = ChartDelegate._oIllustratedMessage.getAdditionalContent();
+        assert.equal(aAdditionalContent.length, 2, "Illustrated message additional content length should be 2");
+        // Assert buttons visibility
+        assert.equal(aAdditionalContent[0].getVisible(), true, "First Additional Content button should be visible");
+        assert.equal(aAdditionalContent[1].getVisible(), true, "Second Additional Content button should be visible");
+
+        // Arrange
+        oStub.returns({unavailable: []});
+
+        // Act
+        ChartDelegate._toggleIllustratedMessage(this.oMDCChart);
+
+        // Assert
+        assert.equal(oChartImplementationContainer.getNoDataContent(), oVBox, "No data content should be restored to VBox");
+        assert.equal(oChartImplementationContainer.getShowNoDataStruct(), false, "No Data should not be visible");
+
+
+        // Cleanup
+        oStub.restore();
+        oInnerChartStub.restore();
+    });
+
+    QUnit.test("_toggleIllustratedMessage with ", function(assert) {
+        // Arrange
+        const oVBox = new VBox();
+        const oChartImplementationContainer = new ChartImplementationContainer({
+            noDataContent: oVBox
+        });
+        ChartDelegate._setInnerStructure(this.oMDCChart, oChartImplementationContainer);
+
+        // Act
+        ChartDelegate._toggleIllustratedMessage(this.oMDCChart);
+
+        //Assert
+        assert.equal(ChartDelegate._bInvalidChartType, true, "Invalid chart type flag is set");
+        assert.equal(oChartImplementationContainer.getShowNoDataStruct(), true, "No Data should be visible");
+        assert.equal(ChartDelegate._sErrorMsg, MDCRb.getText("chart.INVALID_CHART_TYPE_NO_MEASURE_ERROR_MESSAGE_DESCRIPTION"), "Error message is correct");
+        assert.equal(ChartDelegate._oIllustratedMessage.getDescription(),  MDCRb.getText("chart.INVALID_CHART_TYPE_NO_MEASURE_ERROR_MESSAGE_DESCRIPTION"), "Illustrated message description is correct");
+        assert.equal(oChartImplementationContainer.getNoDataContent(), ChartDelegate._oIllustratedMessage, "No data content should be set to illustrated message");
+        const aAdditionalContent = ChartDelegate._oIllustratedMessage.getAdditionalContent();
+        assert.equal(aAdditionalContent.length, 2, "Illustrated message additional content length should be 2");
+        assert.equal(aAdditionalContent[0].getVisible(), true, "First Additional Content button should be visible");
+        assert.equal(aAdditionalContent[1].getVisible(), false, "Second Additional Content button should not be visible");
 
         // Arrange
         const oStub = sinon.stub(ChartDelegate._getChart(this.oMDCChart), "getAvailableChartTypes").returns({unavailable: []});

@@ -2,41 +2,41 @@
 /* CSS for control sap.ui.unified/CalendarLegend  */
 /* Base theme                                     */
 /* ============================================== */
+
 @_sap_ui_unified_CalendarLegend_sapUiUnifiedLegendWorkingDay: lighten(@sapUiContentForegroundColor, 7);
 @_sap_ui_unified_CalendarLegend_sapUiUnifiedLegendNonWorkingDay: darken(@sapUiContentForegroundColor, 3);
-@_sap_ui_unified_CalendarLegend_sapUiCalLegDayType01: @sapLegendColor1;
-@_sap_ui_unified_CalendarLegend_sapUiCalLegDayType02: @sapLegendColor2;
-@_sap_ui_unified_CalendarLegend_sapUiCalLegDayType03: @sapLegendColor3;
-@_sap_ui_unified_CalendarLegend_sapUiCalLegDayType04: @sapLegendColor4;
-@_sap_ui_unified_CalendarLegend_sapUiCalLegDayType05: @sapLegendColor5;
-@_sap_ui_unified_CalendarLegend_sapUiCalLegDayType06: @sapLegendColor6;
-@_sap_ui_unified_CalendarLegend_sapUiCalLegDayType07: @sapLegendColor7;
-@_sap_ui_unified_CalendarLegend_sapUiCalLegDayType08: @sapLegendColor8;
-@_sap_ui_unified_CalendarLegend_sapUiCalLegDayType09: @sapLegendColor9;
-@_sap_ui_unified_CalendarLegend_sapUiCalLegDayType10: @sapLegendColor10;
-@_sap_ui_unified_CalendarLegend_sapUiCalLegDayType11: @sapLegendColor11;
-@_sap_ui_unified_CalendarLegend_sapUiCalLegDayType12: @sapLegendColor12;
-@_sap_ui_unified_CalendarLegend_sapUiCalLegDayType13: @sapLegendColor13;
-@_sap_ui_unified_CalendarLegend_sapUiCalLegDayType14: @sapLegendColor14;
-@_sap_ui_unified_CalendarLegend_sapUiCalLegDayType15: @sapLegendColor15;
-@_sap_ui_unified_CalendarLegend_sapUiCalLegDayType16: @sapLegendColor16;
-@_sap_ui_unified_CalendarLegend_sapUiCalLegDayType17: @sapLegendColor17;
-@_sap_ui_unified_CalendarLegend_sapUiCalLegDayType18: @sapLegendColor18;
-@_sap_ui_unified_CalendarLegend_sapUiCalLegDayType19: @sapLegendColor19;
-@_sap_ui_unified_CalendarLegend_sapUiCalLegDayType20: @sapLegendColor20;
+@_sap_ui_unified_CalendarLegend_sapUiCalLegDayType01: var(--sapLegendColor1);
+@_sap_ui_unified_CalendarLegend_sapUiCalLegDayType02: var(--sapLegendColor2);
+@_sap_ui_unified_CalendarLegend_sapUiCalLegDayType03: var(--sapLegendColor3);
+@_sap_ui_unified_CalendarLegend_sapUiCalLegDayType04: var(--sapLegendColor4);
+@_sap_ui_unified_CalendarLegend_sapUiCalLegDayType05: var(--sapLegendColor5);
+@_sap_ui_unified_CalendarLegend_sapUiCalLegDayType06: var(--sapLegendColor6);
+@_sap_ui_unified_CalendarLegend_sapUiCalLegDayType07: var(--sapLegendColor7);
+@_sap_ui_unified_CalendarLegend_sapUiCalLegDayType08: var(--sapLegendColor8);
+@_sap_ui_unified_CalendarLegend_sapUiCalLegDayType09: var(--sapLegendColor9);
+@_sap_ui_unified_CalendarLegend_sapUiCalLegDayType10: var(--sapLegendColor10);
+@_sap_ui_unified_CalendarLegend_sapUiCalLegDayType11: var(--sapLegendColor11);
+@_sap_ui_unified_CalendarLegend_sapUiCalLegDayType12: var(--sapLegendColor12);
+@_sap_ui_unified_CalendarLegend_sapUiCalLegDayType13: var(--sapLegendColor13);
+@_sap_ui_unified_CalendarLegend_sapUiCalLegDayType14: var(--sapLegendColor14);
+@_sap_ui_unified_CalendarLegend_sapUiCalLegDayType15: var(--sapLegendColor15);
+@_sap_ui_unified_CalendarLegend_sapUiCalLegDayType16: var(--sapLegendColor16);
+@_sap_ui_unified_CalendarLegend_sapUiCalLegDayType17: var(--sapLegendColor17);
+@_sap_ui_unified_CalendarLegend_sapUiCalLegDayType18: var(--sapLegendColor18);
+@_sap_ui_unified_CalendarLegend_sapUiCalLegDayType19: var(--sapLegendColor19);
+@_sap_ui_unified_CalendarLegend_sapUiCalLegDayType20: var(--sapLegendColor20);
 
 .sapUiUnifiedLegend {
-	color: @sapUiContentLabelColor;
-	font-family: @sapUiFontFamily;
-	font-size: @sapMFontSmallSize;
+	color: var(--sapContent_LabelColor);
+	font-family: var(--sapFontFamily);
+	font-size: var(--sapFontSmallSize);
 	font-weight: normal;
 	padding: 0.75rem;
-	background-color: @sapUiListBackground;
+	background-color: var(--sapList_Background);
 }
 
 .sapUiUnifiedLegendItems {
 	column-gap: 0.5rem;
-	-moz-column-gap: 0.5rem; /* Firefox */
 }
 
 .sapUiUnifiedLegendDescription {
@@ -50,12 +50,11 @@
 	cursor: default;
 }
 
-
 .sapUiUnifiedLegendSquare {
 	display: inline-block;
 	vertical-align: top;
 	margin: 4px 8px 4px 4px;
-	background: @sapUiListBackground;
+	background: var(--sapList_Background);
 }
 
 .sapUiUnifiedLegendSquareColor {
@@ -63,7 +62,7 @@
 	width: 0.875rem;
 	margin: 0.125rem;
 	background: lighten(@sapUiContentForegroundColor, 5);
-	border: 0.0625rem solid @sapUiContentForegroundBorderColor;
+	border: 0.0625rem solid var(--sapContent_ForegroundBorderColor);
 	box-sizing: content-box;
 	border-radius: 0.125rem;
 }
@@ -71,9 +70,8 @@
 .sapUiUnifiedLegendSquareSelected {
 	height: 1rem;
 	width: 1rem;
-	background: @sapUiListBackground;
+	background: var(--sapList_Background);
 	border: 0.125rem solid @sapUiCalendarColorToday;
-
 }
 
 .sapUiUnifiedLegendItem {
@@ -81,15 +79,16 @@
 
 	&:focus {
 		outline: none;
+
 		&::after {
-			content: "";
+			content: '';
 			position: absolute;
 			box-sizing: border-box;
 			left: 0;
 			top: 0;
 			right: 0;
 			bottom: 0;
-			border: 0.0625rem dotted @sapUiContentFocusColor;
+			border: 0.0625rem dotted var(--sapContent_FocusColor);
 			pointer-events: none;
 		}
 	}
@@ -105,7 +104,6 @@
 .sapUiSizeCompact .sapUiUnifiedLegendItems,
 .sapUiSizeCompact.sapUiUnifiedLegendItems {
 	column-gap: 0.5rem;
-	-moz-column-gap: 0.5rem; /* Firefox */
 }
 
 .sapUiSizeCompact .sapUiUnifiedLegendSquare {
@@ -121,13 +119,13 @@
 .sapUiUnifiedLegendToday > .sapUiUnifiedLegendSquare > .sapUiUnifiedLegendSquareColor {
 	height: 0.75rem;
 	width: 0.75rem;
-	background-color: @sapUiListBackground;
+	background-color: var(--sapList_Background);
 	border: 0.125rem solid @sapUiCalendarColorToday;
 	box-sizing: content-box;
 }
 
 .sapUiUnifiedLegendSelected > .sapUiUnifiedLegendSquare > .sapUiUnifiedLegendSquareColor {
-	background: @sapUiSelected;
+	background: var(--sapSelectedColor);
 }
 
 .sapUiUnifiedLegendWorkingDay > .sapUiUnifiedLegendSquare > .sapUiUnifiedLegendSquareColor {
@@ -144,17 +142,19 @@
 	border-width: 0 0 1px 0;
 }
 
-.sapMDialog-CTX, .sapMPopup-CTX {
+.sapMDialog-CTX,
+.sapMPopup-CTX {
+
 	.sapUiUnifiedLegend {
 		padding: 1rem;
 	}
 }
 
 .sapUiUnifiedLegendNonWorkingDay > .sapUiUnifiedLegendSquare > .sapUiUnifiedLegendSquareColor {
-	background: @sapUiLegendNonWorkingBackground;
+	background: var(--sapLegend_NonWorkingBackground);
 }
 
-.sapUiCalLegDayType01 > .sapUiUnifiedLegendSquare > .sapUiUnifiedLegendSquareColor{
+.sapUiCalLegDayType01 > .sapUiUnifiedLegendSquare > .sapUiUnifiedLegendSquareColor {
 	background: @_sap_ui_unified_CalendarLegend_sapUiCalLegDayType01;
 }
 

@@ -2868,13 +2868,9 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test("doSuspend", function () {
-		new ODataParentBinding().doSuspend(); // nothing more to test here :-)
-	});
-
-	//*********************************************************************************************
 	QUnit.test("suspend: root binding", function (assert) {
 		var oBinding = new ODataParentBinding({
+				doSuspend : mustBeMocked,
 				toString : function () { return "~"; }
 			}),
 			oBindingMock = this.mock(oBinding),

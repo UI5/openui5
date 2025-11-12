@@ -2280,13 +2280,19 @@ sap.ui.define([
 		 *   The URL
 		 * @param {string} sBase
 		 *   The absolute or root-relative base URL
+		 * @param {boolean} [bServiceUrl]
+		 *   Whether to turn a metadata URL ("/service/$metadata") into a service URL ("/service/")
+		 *   as needed by an ODataModel
 		 * @returns {string}
 		 *   The resolved absolute or root-relative URL
 		 *
 		 * @public
 		 */
-		makeAbsolute : function (sUrl, sBase) {
+		makeAbsolute : function (sUrl, sBase, bServiceUrl) {
 			const oUrl = new URL(sUrl, new URL(sBase, document.baseURI));
+			if (bServiceUrl) {
+				oUrl.pathname = oUrl.pathname.slice(0, oUrl.pathname.lastIndexOf("/") + 1);
+			}
 			return oUrl.origin === new URL(document.baseURI).origin
 				? oUrl.toString().slice(oUrl.origin.length)
 				: oUrl.toString();

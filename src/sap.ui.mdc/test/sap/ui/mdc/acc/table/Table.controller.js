@@ -25,8 +25,8 @@ sap.ui.define([
 	TableType,
 	coreLibrary,
 	Fragment,
-	JSONModel,
 	MessageType,
+	JSONModel,
 	Dialog,
 	Text,
 	Button
