@@ -1,5 +1,6 @@
 // Note: the HTML page 'TableODataV4.html' loads this module via data-sap-ui-on-init
 
+/*global TABLESETTINGS */
 sap.ui.define([
 	"sap/ui/table/Table",
 	"sap/ui/table/Column",

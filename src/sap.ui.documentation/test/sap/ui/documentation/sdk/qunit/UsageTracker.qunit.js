@@ -118,12 +118,13 @@ function (UsageTracker, Localization) {
 	QUnit.test("tracks localization info", function (assert) {
 		var oUserLanguageTag = Localization.getLanguageTag(),
 			sExpectedLanguage = oUserLanguageTag.language,
-			sExpectedRegion = oUserLanguageTag.region,
+			sExpectedLocale = oUserLanguageTag.toString(),
 			oRouteMatchEventParameters = oFactory.getRouteMatchEventParameters("apiId");
 
 		this.oTracker._getPageInfoFromRoute(oRouteMatchEventParameters, function (oPageInfo) {
 			assert.equal(oPageInfo.language, sExpectedLanguage, "language is correct");
-			assert.equal(oPageInfo.country, sExpectedRegion, "region is correct");
+			assert.equal(oPageInfo.locale, sExpectedLocale, "locale is correct");
+			assert.equal(oPageInfo.country, "glo", "country is always 'glo' for global site");
 		});
 	});
 

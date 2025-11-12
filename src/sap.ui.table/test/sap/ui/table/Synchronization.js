@@ -50,36 +50,39 @@ sap.ui.define([
 	oModel.setData(TABLESETTINGS.treeTestData.root);
 
 	const SyncedControl = Control.extend("sap.ui.table.test.SyncedControl", /** @lends sap.ui.table.test.SyncedControl.prototype */ {
-		renderer: function(oRm, oControl) {
-			oRm.openStart("div", oControl);
-			oRm.style("height", "0"); // height=0 allows shrinking in row mode Auto
-			oRm.openEnd();
-				oRm.openStart("div").style("display", "flex").openEnd();
-					oRm.openStart("div").style("display", "flex").style("flex-direction", "column").style("overflow", "hidden").openEnd();
-						oRm.openStart("div", "table").style("overflow", "hidden").openEnd()
-							oRm.openStart("div", "table-header")
-								.style("width", "1000px")
-								.style("height", (oControl.state.layout.top + oControl.state.layout.headerHeight) + "px")
-								.style("background-color", "#e8e8e8")
-								.style("border-bottom", "1px solid lightgray")
-								.openEnd()
-								.text("head")
-								.close("div");
-							oRm.openStart("div", "table-content")
-								.style("width", "1000px")
-								.style("height", oControl.state.layout.contentHeight + "px")
-								.style("overflow", "hidden")
-								.openEnd()
-								.close("div");
+		renderer: {
+			apiVersion: 2,
+			render: function(oRm, oControl) {
+				oRm.openStart("div", oControl);
+				oRm.style("height", "0"); // height=0 allows shrinking in row mode Auto
+				oRm.openEnd();
+					oRm.openStart("div").style("display", "flex").openEnd();
+						oRm.openStart("div").style("display", "flex").style("flex-direction", "column").style("overflow", "hidden").openEnd();
+							oRm.openStart("div", "table").style("overflow", "hidden").openEnd();
+								oRm.openStart("div", "table-header")
+									.style("width", "1000px")
+									.style("height", (oControl.state.layout.top + oControl.state.layout.headerHeight) + "px")
+									.style("background-color", "#e8e8e8")
+									.style("border-bottom", "1px solid lightgray")
+									.openEnd()
+									.text("head")
+									.close("div");
+								oRm.openStart("div", "table-content")
+									.style("width", "1000px")
+									.style("height", oControl.state.layout.contentHeight + "px")
+									.style("overflow", "hidden")
+									.openEnd()
+									.close("div");
+							oRm.close("div");
+							oRm.openStart("div", "table-hsb-container").openEnd().close("div");
 						oRm.close("div");
-						oRm.openStart("div", "table-hsb-container").openEnd().close("div");
+						oRm.openStart("div", "table-vsb-container")
+							.style("margin-top", (oControl.state.layout.top + oControl.state.layout.headerHeight) + "px")
+							.openEnd()
+							.close("div");
 					oRm.close("div");
-					oRm.openStart("div", "table-vsb-container")
-						.style("margin-top", (oControl.state.layout.top + oControl.state.layout.headerHeight) + "px")
-						.openEnd()
-						.close("div");
 				oRm.close("div");
-			oRm.close("div");
+			}
 		},
 		init: function() {
 			this.oSyncInterface = null;

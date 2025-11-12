@@ -3,11 +3,13 @@ sap.ui.define([
 	"sap/base/Log",
 	"sap/ui/fl/support/api/SupportAPI",
 	"sap/ui/fl/support/diagnostics/FlexibilityDataExtractor",
+	"sap/ui/VersionInfo",
 	"sap/ui/thirdparty/sinon-4"
 ], function(
 	Log,
 	SupportAPI,
 	FlexibilityDataExtractor,
+	VersionInfo,
 	sinon
 ) {
 	"use strict";
@@ -17,7 +19,7 @@ sap.ui.define([
 
 	QUnit.module("sap.ui.fl.support.diagnostics.FlexibilityDataExtractor", {
 		beforeEach() {
-			this.oVersionStub = oSandbox.stub(sap.ui, "version").value("1.120.0");
+			oSandbox.stub(VersionInfo, "load").resolves({ version: "1.120.0" });
 		},
 
 		afterEach() {
@@ -61,7 +63,7 @@ sap.ui.define([
 		const dEndTime = new Date();
 
 		assert.strictEqual(oResult.extractorVersion, "1.0", "Extractor version is set correctly");
-		assert.strictEqual(oResult.ui5Version, "1.120.0", "UI5 version is extracted correctly");
+		assert.strictEqual(oResult.ui5Version, "1.120.0", "UI5 version is extracted correctly from VersionInfo");
 		assert.strictEqual(oResult.appVersion, "1.2.3", "App version is extracted correctly");
 		assert.strictEqual(oResult.appACH, "FI-GL", "App ACH is extracted correctly");
 		assert.deepEqual(oResult.flexSettings, oMockFlexSettings, "Flex settings are extracted correctly");
@@ -116,7 +118,7 @@ sap.ui.define([
 		const oResult = await FlexibilityDataExtractor.extractFlexibilityData(true);
 
 		assert.strictEqual(oResult.extractorVersion, "1.0", "Extractor version is set correctly");
-		assert.strictEqual(oResult.ui5Version, "1.120.0", "UI5 version is extracted correctly");
+		assert.strictEqual(oResult.ui5Version, "1.120.0", "UI5 version is extracted correctly from VersionInfo");
 		assert.strictEqual(oResult.appVersion, "1.2.3", "App version is extracted correctly");
 		assert.strictEqual(oResult.appACH, "FI-GL", "App ACH is extracted correctly");
 

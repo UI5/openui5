@@ -1,4 +1,5 @@
 sap.ui.define([
+  "sap/m/MessageBox",
   "sap/ui/model/json/JSONModel",
   "sap/m/ObjectIdentifier",
   "sap/m/CheckBox",
@@ -14,6 +15,7 @@ sap.ui.define([
   "sap/m/App",
   "sap/m/Page"
 ], function(
+  MessageBox,
   JSONModel,
   ObjectIdentifier,
   CheckBox,
@@ -33,8 +35,6 @@ sap.ui.define([
 
   // shortcut for sap.ui.core.TextDirection
   const TextDirection = coreLibrary.TextDirection;
-
-  // Note: the HTML page 'ObjectIdentifier.html' loads this module via data-sap-ui-on-init
 
   var bCheckBoxSet = true;
 
@@ -158,7 +158,7 @@ sap.ui.define([
 	  title : "{/TextTrue}",
 	  text : "{/description1}",
 	  titlePress: function() {
-		  alert('ok');
+		  MessageBox.alert('ok');
 	  },
 	  titleActive : "{/true}"
   });
@@ -173,7 +173,7 @@ sap.ui.define([
 	  title: "{/TextTrue}",
 	  text: "{/description3}",
 	  titlePress: function() {
-		  alert('ok');
+		  MessageBox.alert('ok');
 	  },
 	  titleActive: {
 		  path: "/formatterTest",

@@ -17,18 +17,18 @@
 	position: absolute;
 	top: -10000px;
 	display: block;
-	background-color: @sapUiGroupContentBackground;
+	background-color: var(--sapGroup_ContentBackground);
 	cursor: default;
 	outline: none;
 	overflow: hidden;
 	padding: 1px;
-	font-family: @sapUiFontFamily;
+	font-family: var(--sapFontFamily);
 	font-size: @sapMFontMediumSize;
-	padding: 0px;
+	padding: 0;
 	min-width: 5rem;
-	color: @sapUiListTextColor;
-	box-shadow: @sapUiContentShadow1;
-	border-radius: @sapUiElementBorderCornerRadius;
+	color: var(--sapList_TextColor);
+	box-shadow: var(--sapContent_Shadow1);
+	border-radius: var(--sapElement_BorderCornerRadius);
 }
 
 .sapUiMnu:focus {
@@ -40,9 +40,9 @@
 	margin: 0;
 	display: block;
 	cursor: default;
-	color: @sapUiListTextColor;
+	color: var(--sapList_TextColor);
 	font-size: @sapMFontMediumSize;
-	font-family: @sapUiFontFamily;
+	font-family: var(--sapFontFamily);
 }
 
 .sapUiMnuItm {
@@ -60,23 +60,23 @@
 }
 
 .sapUiMnuItm:focus {
-	outline: @sapContent_FocusWidth @sapContent_FocusStyle @sapUiContentFocusColor;
+	outline: var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);
 	outline-offset: -3px;
 }
 
 .sapUiMnuItm.sapUiMnuItmDsbl,
 .sapUiMnuItm.sapUiMnuTfItm.sapUiMnuItmDsbl .sapUiMnuTfItemLbl,
 .sapUiMnuItm.sapUiMnuTfItm.sapUiMnuItmDsbl.sapUiMnuItmHov .sapUiMnuTfItemLbl {
-	color: @sapUiContentDisabledTextColor;
+	color: var(--sapContent_DisabledTextColor);
 }
 
 .sapUiMnuItm.sapUiMnuItmHov {
-	color: @sapUiListTextColor;
-	background-color: @sapUiListHoverBackground;
+	color: var(--sapList_TextColor);
+	background-color: var(--sapList_Hover_Background);
 }
 
 .sapUiMnuItm.sapUiMnuTfItm.sapUiMnuItmHov .sapUiMnuTfItemLbl {
-	color: @sapUiListTextColor;
+	color: var(--sapList_TextColor);
 }
 
 .sapUiMnuItmTxt {
@@ -91,7 +91,7 @@
 .sapUiMnuItmSCut {
 	padding-inline-start: 1rem;
 	padding-inline-end: 0.25rem;
-	color: @sapContent_LabelColor;
+	color: var(--sapContent_LabelColor);
 	font-weight: normal;
 	text-align: right;
 
@@ -106,10 +106,11 @@
 	padding-inline-end: 0;
 	font-weight: normal;
 	text-align: center;
+
 	&::after {
-		color: @sapSelectedColor;
-		content: "\e05b";
-		font-family: 'SAP-icons';
+		color: var(--sapSelectedColor);
+		content: '\e05b';
+		font-family: var(--sapContent_IconFontFamily);
 		outline: none;
 		line-height: inherit;
 		padding-inline-end: 0.125rem;
@@ -122,7 +123,7 @@
 	min-width: 1.125rem;
 	max-width: 1.125rem;
 	text-align: center;
-	color: @sapUiContentNonInteractiveIconColor;
+	color: var(--sapContent_NonInteractiveIconColor);
 	padding-inline-end: 0.625rem;
 }
 
@@ -148,12 +149,11 @@
 
 .sapUiMnuItmDsbl > .sapUiMnuItmIco > img {
 	opacity: 0.5;
-	filter: alpha(opacity=50);
 }
 
 .sapUiMnuNoIco > .sapUiMnuItm > .sapUiMnuItmIco,
 .sapUiMnuNoIco > div > .sapUiMnuItm > .sapUiMnuItmIco {
-	width: 0px;
+	width: 0;
 	display: none;
 }
 
@@ -186,43 +186,35 @@
 .sapUiMnuItm.sapUiMnuTfItm .sapUiMnuTfItemTf {
 	box-sizing: border-box;
 	vertical-align: top;
-	font-family: @sapUiFontFamily;
+	font-family: var(--sapFontFamily);
 	font-size: @sapUiFontSize;
-	-webkit-appearance: none; /*Needed for safari mobile*/
-	border: 1px solid @sapUiFieldBorderColor;
-	-webkit-border-radius: 0px; /*Needed for safari mobile*/
-	background-color: @sapUiFieldBackground;
-	color: @sapUiListTextColor;
+	-webkit-appearance: none; /* Needed for safari mobile */
+	border: 1px solid var(--sapField_BorderColor);
+	background-color: var(--sapField_Background);
+	color: var(--sapList_TextColor);
 	width: 100%;
 	outline: none; /* remove Webkit glow effect */
 }
 
 .sapUiMnuItm.sapUiMnuTfItm .sapUiMnuTfItemTf:focus {
-	background-color: @sapUiFieldBackground;
-	border-color: @sapUiFieldFocusBorderColor;
-}
-
-.sapUiMnuItm.sapUiMnuTfItm .sapUiMnuTfItemTf::-ms-clear {
-	width : 0;
-	height: 0;
-	display:none;
+	background-color: var(--sapField_Background);
+	border-color: var(--sapField_Focus_BorderColor);
 }
 
 .sapUiMnuItm.sapUiMnuTfItm .sapUiMnuTfItemTf.sapUiMnuTfItemTfDsbl {
 	/* Avoid text selection in disabled TextFields */
-	-moz-user-select: none;
 	-webkit-user-select: none;
 	user-select: none;
 }
 
 .sapUiMnuItm.sapUiMnuTfItm .sapUiMnuTfItemTf.sapUiMnuTfItemTfEnbl.sapUiMnuTfItemTfErr {
-	border-color: @sapUiFieldInvalidColor;
-	background-color: @sapUiFieldInvalidBackground;
+	border-color: var(--sapField_InvalidColor);
+	background-color: var(--sapField_InvalidBackground);
 }
 
 .sapUiMnuItm.sapUiMnuTfItm .sapUiMnuTfItemTf.sapUiMnuTfItemTfEnbl.sapUiMnuTfItemTfWarn {
-	border-color: @sapUiFieldWarningColor;
-	background-color: @sapUiFieldWarningBackground;
+	border-color: var(--sapField_WarningColor);
+	background-color: var(--sapField_WarningBackground);
 }
 
 .sapUiMnuTfItmStretch {
@@ -240,21 +232,21 @@
 	padding-inline-end: 0.25rem;
 }
 
-.sapUiMnuItmSbMnu > div:after {
-	content: "\e066";
-	color: @sapUiContentNonInteractiveIconColor;
-	font-family: 'SAP-icons';
+.sapUiMnuItmSbMnu > div::after {
+	content: '\e066';
+	color: var(--sapContent_NonInteractiveIconColor);
+	font-family: var(--sapContent_IconFontFamily);
 	outline: none;
 }
 
 .sapUiMnuNoSbMnu > .sapUiMnuItm > .sapUiMnuItmSbMnu {
-	width: 0px;
+	width: 0;
 	display: none;
 }
 
 .sapUiMnuItmR {
 	width: 2px;
-	right: 0px;
+	right: 0;
 }
 
 .sapUiMnuDiv {
@@ -271,24 +263,24 @@
 	margin-top: 1px;
 	margin-bottom: 1px;
 	border-width: 0;
-	border-top: 0.0625rem solid @sapUiGroupContentBorderColor;
+	border-top: 0.0625rem solid var(--sapGroup_ContentBorderColor);
 	height: 1px;
-	color: @sapUiToolbarSeparatorColor;
+	color: var(--sapToolbar_SeparatorColor);
 }
 
 .sapUiMnuDivL,
-.sapUiMnuDivR{
+.sapUiMnuDivR {
 	display: inline-block;
 	position: absolute;
 	width: 5px;
 	height: 100%;
 }
 
-.sapUiMnuDivR{
+.sapUiMnuDivR {
 	right: 0;
 }
 
-.sapUiMnuDivL{
+.sapUiMnuDivL {
 	left: 0;
 }
 
@@ -303,30 +295,30 @@
 
 .sapUiMnuItm.sapUiMnuItmSubMnuOpen,
 .sapUiMnuItm.sapUiMnuItmSubMnuOpen.sapUiMnuItmHov {
-	background-color: @sapUiListSelectionBackgroundColor;
+	background-color: var(--sapList_SelectionBackgroundColor);
 }
 
 .sapUiMnuItm.sapUiMnuItmHov:active {
-	color: @sapUiListActiveTextColor;
-	background-color: @sapUiListActiveBackground;
+	color: var(--sapList_Active_TextColor);
+	background-color: var(--sapList_Active_Background);
 }
 
 .sapUiMnuItm.sapUiMnuItmDsbl.sapUiMnuItmHov,
 .sapUiMnuItm.sapUiMnuItmDsbl.sapUiMnuItmHov:active {
-	color: @sapUiContentDisabledTextColor;
+	color: var(--sapContent_DisabledTextColor);
 	background-color: transparent;
 }
 
 .sapUiMnuItm.sapUiMnuItmDsbl .sapUiMnuItmIco {
-	color: @sapUiContentDisabledTextColor;
+	color: var(--sapContent_DisabledTextColor);
 }
 
 .sapUiMnuItm.sapUiMnuItmHov:active .sapUiMnuItmIco {
-	color: @sapUiListActiveTextColor;
+	color: var(--sapList_Active_TextColor);
 }
 
 .sapUiMnuItm.sapUiMnuItmDsbl.sapUiMnuItmHov:active .sapUiMnuItmIco {
-	color: @sapUiContentDisabledTextColor;
+	color: var(--sapContent_DisabledTextColor);
 }
 
 .sapUiMnu.sapUiMnuScroll .sapUiMnuItmTxt {
@@ -347,7 +339,7 @@
 }
 
 .sapUiMnuItm.sapUiMnuTfItm .sapUiMnuTfItemTf {
-	font-family: @sapUiFontFamily;
+	font-family: var(--sapFontFamily);
 	font-size: @sapMFontMediumSize;
 	padding: 0.125rem 0.3125rem 0.125rem 0.3125rem;
 	margin-top: 0.1875rem;
@@ -356,18 +348,18 @@
 
 .sapUiMnuItm.sapUiMnuTfItm .sapUiMnuTfItemLbl {
 	line-height: @_sap_ui_unified_Menu_ItmHeightCozy;
-	font-family: @sapUiFontFamily;
+	font-family: var(--sapFontFamily);
 	font-size: @sapMFontMediumSize;
-	color: @sapUiListTextColor;
+	color: var(--sapList_TextColor);
 	margin-inline-end: @_sap_ui_unified_Menu_ItmPaddingCozy;
 }
 
-.sapUiMnuItm.sapUiMnuItmHov .sapUiMnuItmSbMnu > div:after {
-	color: @sapUiContentNonInteractiveIconColor;
+.sapUiMnuItm.sapUiMnuItmHov .sapUiMnuItmSbMnu > div::after {
+	color: var(--sapContent_NonInteractiveIconColor);
 }
 
-.sapUiMnuItm.sapUiMnuItmHov:active .sapUiMnuItmSbMnu > div:after {
- 	color: @sapUiListActiveTextColor;
+.sapUiMnuItm.sapUiMnuItmHov:active .sapUiMnuItmSbMnu > div::after {
+ 	color: var(--sapList_Active_TextColor);
 }
 
 .sapUiMnu.sapUiMnuScroll .sapUiMnuItmSbMnu {
@@ -375,20 +367,25 @@
 }
 
 .sapUiMnuItm {
+
 	.sapUiMnuItmTxt {
 		padding-inline-start: 0.5rem;
 	}
+
 	.sapUiMnuItmIco + .sapUiMnuItmTxt {
 		padding-inline-start: 0;
 	}
 }
 
-html.sap-phone, html.sap-tablet {
+html.sap-phone,
+html.sap-tablet {
+
 	.sapMMenuLIImgThumbIcon {
-		color: @sapUiContentNonInteractiveIconColor;
+		color: var(--sapContent_NonInteractiveIconColor);
 	}
+
 	.sapMLIB.sapMLIBActive .sapMMenuLIImgThumbIcon::before {
-		color: @sapUiContentContrastIconColor;
+		color: var(--sapContent_ContrastIconColor);
 	}
 
 	.sapMRespMenuDialog .sapMList .sapMLIBContent .sapMSLITitleOnly {
@@ -396,17 +393,16 @@ html.sap-phone, html.sap-tablet {
 	}
 
 	.sapMRespMenuDialog .sapMPage .sapMHeader-CTX {
-		background-color: @sapUiGroupContentBackground;
+		background-color: var(--sapGroup_ContentBackground);
 		box-shadow: inset 0 -1px darken(@sapUiGroupContentBackground, 8);
 	}
 }
-
 
 html.sap-phone .sapMMenuLIImgThumbIcon {
 	height: 2.75rem;
 	width: 1rem;
 	font-size: 1rem;
-	line-height:  2.75rem;
+	line-height: 2.75rem;
 }
 
 /* Compact size */
@@ -419,27 +415,29 @@ html.sap-phone .sapMMenuLIImgThumbIcon {
 
 	.sapUiMnuNoIco.sapUiMnuNoSbMnu > .sapUiMnuItm > .sapUiMnuItmTxt {
 		padding-inline-end: 0.75rem;
-  	}
+	}
+
 	.sapUiMnuDiv {
 		height: 1px;
 	}
 
 	.sapUiMnuDiv > hr {
-		left: 0rem;
-		right: 0rem;
+		left: 0;
+		right: 0;
 		margin-top: 0;
 		margin-bottom: 0;
-  }
+	}
+
 	.sapUiMnuLst > .sapUiMnuItm > .sapUiMnuItmTxt {
 		padding-inline-start: 2rem;
 	}
 
 	.sapUiMnuLst > .sapUiMnuItm > .sapUiMnuItmIco + .sapUiMnuItmTxt {
-		padding-inline-start: 0rem;
+		padding-inline-start: 0;
 	}
 
 	.sapUiMnuLst.sapUiMnuNoIco > .sapUiMnuItm > .sapUiMnuItmTxt,
-	.sapUiMnuLst.sapUiMnuNoIco > .sapUiMnuItm > .sapUiMnuItmIco + .sapUiMnuItmTxt{
+	.sapUiMnuLst.sapUiMnuNoIco > .sapUiMnuItm > .sapUiMnuItmIco + .sapUiMnuItmTxt {
 		padding-inline-start: 0;
 	}
 
@@ -465,5 +463,4 @@ html.sap-phone .sapMMenuLIImgThumbIcon {
 	.sapUiMnuItmIco > .sapUiIcon {
 		line-height: @_sap_ui_unified_Menu_ItmHeightCompact;
 	}
-
 }

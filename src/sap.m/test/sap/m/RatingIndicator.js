@@ -221,7 +221,7 @@ sap.ui.define([
 			text : "Swipe Button",
 			type: "Reject",
 			press : function(e) {
-				oSwipeList3.swipeOut();
+				oRatingList.swipeOut();
 			}
 		}),
 		swipe: function(e) {

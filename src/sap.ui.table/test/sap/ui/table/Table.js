@@ -1,4 +1,5 @@
 sap.ui.define([
+  "sap/m/MessageBox",
   "sap/m/Title",
   "sap/ui/table/Table",
   "sap/m/IllustratedMessage",
@@ -33,6 +34,7 @@ sap.ui.define([
   "sap/m/FlexItemData",
   "sap/base/Log"
 ], function(
+  MessageBox,
   Title,
   Table,
   IllustratedMessage,
@@ -72,10 +74,6 @@ sap.ui.define([
   // shortcut for sap.ui.core.HorizontalAlign
   const HorizontalAlign = coreLibrary.HorizontalAlign;
 
-  // Note: the HTML page 'Table.html' loads this module via data-sap-ui-on-init
-
-  /*global TABLESETTINGS */
-
   function pressHandler(oEvent) {
 	  const bCellClick = oEvent.getId() === "cellClick";
 	  Log.warning((bCellClick ? "Cell" : oEvent.getSource().getMetadata().getName()) + " pressed");
@@ -96,7 +94,12 @@ sap.ui.define([
 		  title: "No Items found",
 		  description: "Adjust your filter settings.",
 		  additionalContent: [
-			  new Button({text: "Trigger Something", press: function() { alert("Something"); }})
+			  new Button({
+				  text: "Trigger Something",
+				  press: function() {
+					  MessageBox.alert("Something");
+				  }
+			  })
 		  ]
 	  })
   });
@@ -341,10 +344,10 @@ sap.ui.define([
 	  null.addContent(oButton);
   });
 
-  const oBindingInfo = oTable.getBindingInfo("rows");
+  oTable.getBindingInfo("rows");
 
   function rebind() {
-	  oTable.bindRows(oBindingInfo || {path: "/modelData"});
+	  // oTable.bindRows(oBindingInfo || {path: "/modelData"});
   }
 
   const bBindTable = (new URLSearchParams(window.location.search)).get("sap-ui-xx-table-bind") !== "false";

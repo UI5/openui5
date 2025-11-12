@@ -5,12 +5,10 @@
 // Provides the Design Time Metadata for the sap.ui.layout.form.FormContainer control
 sap.ui.define([
 	"sap/ui/thirdparty/jquery",
-	"sap/ui/core/Element",
-	"sap/ui/layout/form/Form"
-], function (
+	"sap/ui/core/Element"
+], function(
 	jQuery,
-	UI5Element,
-	Form
+	UI5Element
 ) {
 	"use strict";
 
@@ -18,23 +16,6 @@ sap.ui.define([
 		return oFormContainer.getFormElements().every(function (oFormElement) {
 			return oFormElement.getVisible() === false;
 		});
-	}
-
-	function fnFindForm(oElement) {
-		if (oElement && !(oElement instanceof Form)) {
-			return fnFindForm(oElement.getParent());
-		}
-		return oElement;
-	}
-
-	function fnIsLayoutSupported(oFormContainer) {
-		var oForm = fnFindForm(oFormContainer);
-		if (oForm &&
-			oForm.getLayout() &&
-			false) {
-			return false;
-		}
-		return true;
 	}
 
 	return {
@@ -49,32 +30,24 @@ sap.ui.define([
 		},
 		actions: {
 			remove: function (oFormContainer) {
-				if (fnIsLayoutSupported(oFormContainer)) {
-					return {
-						changeType: "hideControl"
-					};
-				} else {
-					return null;
-				}
+				return {
+					changeType: "hideControl"
+				};
 			},
 			rename: function (oFormContainer) {
-				if (fnIsLayoutSupported(oFormContainer)) {
-					return {
-						changeType: "renameGroup",
-						domRef: function (oFormContainer) {
-							if (!oFormContainer.getRenderedDomRef()) {
-								var oTitleOrToolbar = oFormContainer.getTitle() || oFormContainer.getToolbar();
-								return oTitleOrToolbar.getDomRef();
-							}
-							return jQuery(oFormContainer.getRenderedDomRef()).find(".sapUiFormTitle")[0];
-						},
-						isEnabled: function (oFormContainer) {
-							return !(oFormContainer.getToolbar() || !oFormContainer.getTitle());
+				return {
+					changeType: "renameGroup",
+					domRef: function (oFormContainer) {
+						if (!oFormContainer.getRenderedDomRef()) {
+							var oTitleOrToolbar = oFormContainer.getTitle() || oFormContainer.getToolbar();
+							return oTitleOrToolbar.getDomRef();
 						}
-					};
-				} else {
-					return null;
-				}
+						return jQuery(oFormContainer.getRenderedDomRef()).find(".sapUiFormTitle")[0];
+					},
+					isEnabled: function (oFormContainer) {
+						return !(oFormContainer.getToolbar() || !oFormContainer.getTitle());
+					}
+				};
 			}
 		},
 		aggregations: {
@@ -101,25 +74,19 @@ sap.ui.define([
 				},
 				actions: {
 					move: function (oFormContainer) {
-						if (fnIsLayoutSupported(oFormContainer)) {
-							return {
-								changeType: "moveControls"
-							};
-						} else {
-							return null;
-						}
+						return {
+							changeType: "moveControls"
+						};
 					},
 					remove : {
 						removeLastElement: true
 					},
 					add: {
 						delegate: function (oFormContainer) {
-							if (fnIsLayoutSupported(oFormContainer)) {
-								return {
-									changeType: "addFormField",
-									changeOnRelevantContainer: true
-								};
-							}
+							return {
+								changeType: "addFormField",
+								changeOnRelevantContainer: true
+							};
 						}
 					}
 				}
@@ -138,5 +105,4 @@ sap.ui.define([
 			plural: "GROUP_CONTROL_NAME_PLURAL"
 		}
 	};
-
 });

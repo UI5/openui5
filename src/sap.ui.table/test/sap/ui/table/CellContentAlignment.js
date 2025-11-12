@@ -8,6 +8,7 @@ sap.ui.define([
 	"sap/m/Text",
 	"sap/m/Label",
 	"sap/m/Select",
+	"sap/m/VBox",
 	"sap/ui/model/json/JSONModel",
 	"sap/ui/core/library"
 ], function (
@@ -18,9 +19,12 @@ sap.ui.define([
 	Text,
 	Label,
 	Select,
+	VBox,
 	JSONModel,
 	coreLibrary
 ) {
+	"use strict";
+
 	const sLongTextSuffix = "\nLorem ipsum dolor sit amet";
 	const sLongTextWithoutSpaces = "Loremipsumdolorsitamet";
 	const sColumnWidth = "150px";

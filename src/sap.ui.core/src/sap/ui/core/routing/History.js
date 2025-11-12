@@ -2,10 +2,11 @@
  * ${copyright}
  */
 sap.ui.define([
-	'sap/ui/core/library',
-	'./HashChanger',
+	"sap/ui/Device",
+	"sap/ui/core/library",
+	"./HashChanger",
 	"sap/base/Log"
-], function(library, HashChanger, Log) {
+], function(Device, library, HashChanger, Log) {
 	"use strict";
 
 	// shortcut for enum(s)
@@ -80,6 +81,9 @@ sap.ui.define([
 	/*
 	 * Whether the push state API should be used.
 	 *
+	 * In Safari, when the browser hash is changed, the browser doesn't clear the history state. Therefore we can't
+	 * use push state API in Safari.
+	 *
 	 * Within iframe, the usage of push state API has to be turned off because some browsers (Chrome, Firefox and Edge)
 	 * change the ownership of the last "hashchange" event to the outer frame as soon as the outer frame replaces the
 	 * current hash. This makes the state that is saved by using push state API incomplete in both outer and inner
@@ -87,7 +91,7 @@ sap.ui.define([
 	 *
 	 * @private
 	 */
-	History._bUsePushState = window.self === window.top;
+	History._bUsePushState = !Device.browser.safari && window.self === window.top;
 
 	/**
 	 * Returns the length difference between the history state stored in browser's

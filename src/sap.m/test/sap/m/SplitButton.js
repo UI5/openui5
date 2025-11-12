@@ -1,6 +1,11 @@
 // Note: the HTML page 'SplitButton.html' loads this module via data-sap-ui-on-init
 
-sap.ui.define(["sap/m/SplitButton", "sap/m/App", "sap/m/Page"], function(SplitButton, App, Page) {
+sap.ui.define([
+	"sap/m/MessageBox",
+	"sap/m/SplitButton",
+	"sap/m/App",
+	"sap/m/Page"
+], function(MessageBox, SplitButton, App, Page) {
 	"use strict";
 	new App().addPage(new Page({
 		title: "sap.m.SplitButton",
@@ -8,10 +13,10 @@ sap.ui.define(["sap/m/SplitButton", "sap/m/App", "sap/m/Page"], function(SplitBu
 			new SplitButton({
 				text: "abc",
 				arrowPress: function(oEvent) {
-					alert("arrow down: " + oEvent.getParameter('down'));
+					MessageBox.alert("arrow down: " + oEvent.getParameter('down'));
 				},
 				press: function() {
-					alert("press");
+					MessageBox.alert("press");
 				}
 			})
 		]

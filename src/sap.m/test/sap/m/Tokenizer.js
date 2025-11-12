@@ -216,7 +216,7 @@ sap.ui.define([
 		  new Token({text: "Token 2", key: "0002"}),
 		  new Token({text: "Token 3", key: "0003"}),
 		  new Token({text: "Token 4 - long text example", key: "0004"}),
-		  new Token({text: "Token 5", key: "0005"}),
+		  new Token({text: "Token 5", key: "0005"})
 	  ],
 	  tokenChange: fEventWriter
   });
@@ -237,7 +237,7 @@ sap.ui.define([
 			  type : "Reject"
 		  })
 	  ]
-  })
+  });
 
   const overflowToolbarContent = [
 	  new Label({
@@ -283,7 +283,7 @@ sap.ui.define([
 	  tokens: [
 		  new Token({text: "Disabled Token 1", key: "0001"}),
 		  new Token({text: "Disabled Token 2", key: "0002"})
-	  ],
+	  ]
   });
 
   var oDisabledNMoreTokenizer = new Tokenizer("disabled-tokenizer-nmore", {
@@ -315,13 +315,13 @@ sap.ui.define([
 	  ]
   });
 
-  fHandleTokenDelete = (oEvent) => {
+  var fnHandleTokenDelete = (oEvent) => {
 	  var aDeletedTokens = oEvent.getParameter("tokens");
 	  aDeletedTokens.forEach(function (oToken) {
 		  MessageToast.show("Token deleted: " + oToken.getText());
 		  oAddRemoveTokens.removeToken(oToken);
 	  });
-  }
+  };
 
   var oAddRemoveTokens = new Tokenizer("add-remove-tokens", {
 	  width: "100%",
@@ -330,7 +330,7 @@ sap.ui.define([
 		  new Token({text: "Two", key: "0002"}),
 		  new Token({text: "Three", key: "0003"})
 	  ],
-	  tokenDelete: fHandleTokenDelete
+	  tokenDelete: fnHandleTokenDelete
   });
 
   var oAddTokensButton = new Button({

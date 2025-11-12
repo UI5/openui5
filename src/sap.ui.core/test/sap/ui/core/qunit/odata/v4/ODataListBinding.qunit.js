@@ -145,9 +145,9 @@ sap.ui.define([
 	QUnit.test("mixin", function (assert) {
 		var oBinding = this.bindList("EMPLOYEES"),
 			oMixin = {},
-			aOverriddenFunctions = ["adjustPredicate", "destroy", "getDependentBindings",
-				"getGeneration", "hasPendingChangesForPath", "isUnchangedParameter",
-				"prepareDeepCreate", "updateAfterCreate"];
+			aOverriddenFunctions = ["adjustPredicate", "destroy", "getGeneration",
+				"hasPendingChangesForPath", "isUnchangedParameter", "prepareDeepCreate",
+				"updateAfterCreate"];
 
 		asODataParentBinding(oMixin);
 

@@ -1,4 +1,5 @@
 sap.ui.define([
+  "sap/m/MessageBox",
   "sap/ui/core/Element",
   "sap/ui/core/mvc/View",
   "sap/ui/rta/RuntimeAuthoring",
@@ -26,6 +27,7 @@ sap.ui.define([
   "sap/ui/core/mvc/JSView",
   "sap/ui/core/mvc/Controller"
 ], async function(
+  MessageBox,
   Element,
   View,
   RuntimeAuthoring,
@@ -73,7 +75,7 @@ sap.ui.define([
 		  this.getView().bindElement("/ProductSet('HT-1000')");
 	  },
 	  onPress: function(oEvent) {
-		  alert(oEvent.getSource());
+		  MessageBox.alert(oEvent.getSource());
 	  },
 	  onItemPress: function (oEvent) {
 		  oEvent.getParameter("item").firePress();

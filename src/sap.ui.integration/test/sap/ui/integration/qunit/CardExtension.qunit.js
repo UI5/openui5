@@ -753,4 +753,79 @@ sap.ui.define([
 		assert.strictEqual(oMessage.getTitle(), "No Data", "The no data message title set by expression binding is correct");
 		assert.strictEqual(oMessage.getIllustrationSize(), "Auto", "The no data message size set by expression binding is correct");
 	});
+
+	QUnit.test("Card facade methods are proxied to the card", async function (assert) {
+		this.oCard.setManifest({
+			"sap.app": {
+				"id": "sap.ui.integration.test"
+			},
+			"sap.card": {
+				"type": "List",
+				"extension": "./extensions/Extension1",
+				"data": {
+					"extension": {
+						"method": "getData"
+					}
+				},
+				"content": {
+					"item": {
+						"title": "{Name}"
+					}
+				}
+			}
+		});
+
+		this.oCard.placeAt(DOM_RENDER_LOCATION);
+		await nextCardReadyEvent(this.oCard);
+
+		const oExtension = this.oCard.getAggregation("_extension");
+		const oCardFacade = oExtension.getCard();
+
+		const aCardFacadeMethods = [
+			{ name: "getId", params: [] },
+			{ name: "getDomRef", params: [] },
+			{ name: "setVisible", params: ["bVisible"], testArgs: [false] },
+			{ name: "getParameters", params: [] },
+			{ name: "getCombinedParameters", params: [] },
+			{ name: "getManifestEntry", params: ["sPath"], testArgs: ["/sap.app/id"] },
+			{ name: "resolveDestination", params: ["sKey"], testArgs: ["testDestination"] },
+			{ name: "request", params: ["oSettings"], testArgs: [{ url: "sap.com"}] },
+			{ name: "refresh", params: [] },
+			{ name: "refreshData", params: [] },
+			{ name: "showMessage", params: ["sMessage", "sType", "bAutoClose"], testArgs: ["Test message", "Information", false] },
+			{ name: "getBaseUrl", params: [] },
+			{ name: "getRuntimeUrl", params: ["sUrl"], testArgs: ["test/url"] },
+			{ name: "getTranslatedText", params: ["sKey", "aArgs", "bIgnoreKeyFallback"], testArgs: ["TEST_KEY"] },
+			{ name: "getModel", params: ["sName"] },
+			{ name: "triggerAction", params: ["oAction"], testArgs: [{ type: "Navigation", parameters: { url: "test" } }] },
+			{ name: "addActionDefinition", params: [] },
+			{ name: "removeActionDefinition", params: [] },
+			{ name: "insertActionDefinition", params: [] },
+			{ name: "getActionDefinitions", params: [] },
+			{ name: "indexOfActionDefinition", params: [] },
+			{ name: "destroyActionDefinitions", params: [] },
+			{ name: "showLoadingPlaceholders", params: ["eCardArea"], testArgs: ["Content"] },
+			{ name: "hideLoadingPlaceholders", params: ["eCardArea"], testArgs: ["Content"] },
+			{ name: "showCard", params: ["oParameters"], testArgs: [{ childCardKey: "someKey"}] },
+			{ name: "hide", params: [] },
+			{ name: "getOpener", params: [] },
+			{ name: "validateControls", params: [] },
+			{ name: "showBlockingMessage", params: ["oSettings"], testArgs: [{ type: "Error", title: "Test" }] },
+			{ name: "hideBlockingMessage", params: [] },
+			{ name: "getBlockingMessage", params: [] }
+		];
+
+		aCardFacadeMethods.forEach((oMethodInfo) => {
+			const { name: sMethodName, params: aParams, testArgs: aTestArgs = [] } = oMethodInfo;
+
+			const oSpy = sinon.spy(this.oCard, sMethodName);
+
+			oCardFacade[sMethodName](...aTestArgs);
+
+			assert.ok(oSpy.calledOnce, `Card method '${sMethodName}' with params [${aParams.join(', ')}] was called when facade method was called`);
+			assert.ok(oSpy.calledWith(...aTestArgs), `Card method '${sMethodName}' was called with the expected arguments`);
+
+			oSpy.restore();
+		});
+	});
 });

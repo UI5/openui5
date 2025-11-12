@@ -1,10 +1,11 @@
 sap.ui.define([
+  "sap/m/MessageBox",
   "sap/ui/core/Element",
   "sap/ui/unified/calendar/Header",
   "sap/m/Label",
   "sap/m/Input",
   "sap/m/ToggleButton"
-], function(Element, Header, Label, Input, ToggleButton) {
+], function(MessageBox, Element, Header, Label, Input, ToggleButton) {
   "use strict";
 
   new Header("H1",{
@@ -12,19 +13,19 @@ sap.ui.define([
 	  textButton1: "Month",
 	  textButton2: "Year",
 	  pressPrevious: function(oEvent){
-			  alert("Previous");
-		  },
+		  MessageBox.alert("Previous");
+	  },
 	  pressNext: function(oEvent){
-		  alert("Previous");
+		  MessageBox.alert("Previous");
 	  },
 	  pressButton0: function(oEvent){
-		  alert("Button 0");
+		  MessageBox.alert("Button 0");
 	  },
 	  pressButton1: function(oEvent){
-		  alert("Button 1");
+		  MessageBox.alert("Button 1");
 	  },
 	  pressButton2: function(oEvent){
-		  alert("Button2");
+		  MessageBox.alert("Button2");
 	  }
   }).placeAt("sample1");
 

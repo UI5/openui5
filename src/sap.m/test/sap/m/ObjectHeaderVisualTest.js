@@ -30,12 +30,12 @@ sap.ui.define([
 	  intro: "Type XS",
 	  introActive: true,
 	  introPress: function() {
-		  this.setIntro("Type XS clicked")
+		  this.setIntro("Type XS clicked");
 	  },
 	  title: "Responsive Object Header fullScreenOptimized with two states",
 	  titleActive: true,
 	  titlePress: function() {
-		  this.setTitle("Responsive Object Header fullScreenOptimized with two states clicked")
+		  this.setTitle("Responsive Object Header fullScreenOptimized with two states clicked");
 	  },
 	  icon: "../../sap/m/images/Woman_04.png",
 	  imageShape: ObjectHeaderPictureShape.Square,

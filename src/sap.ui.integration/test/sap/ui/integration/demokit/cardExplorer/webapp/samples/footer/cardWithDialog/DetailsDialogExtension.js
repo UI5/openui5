@@ -3,14 +3,12 @@ sap.ui.define([
 	"sap/ui/core/syncStyleClass",
 	"sap/ui/integration/Extension",
 	"sap/ui/integration/widgets/Card",
-	"sap/ui/thirdparty/jquery",
 	"sap/m/Dialog"
-], function (
+], function(
 	Log,
 	syncStyleClass,
 	Extension,
 	Card,
-	jQuery,
 	Dialog
 ) {
 	"use strict";
@@ -70,7 +68,7 @@ sap.ui.define([
 			contentWidth: "40%"
 		});
 
-		syncStyleClass("sapUiSizeCompact", jQuery(oCard.getDomRef()), this._oDetailsDialog);
+		syncStyleClass("sapUiSizeCompact", oCard, this._oDetailsDialog);
 		this._oDetailsDialog.open();
 	};
 

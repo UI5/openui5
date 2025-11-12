@@ -4,10 +4,12 @@
 
 sap.ui.define([
 	"sap/base/Log",
-	"sap/ui/fl/support/api/SupportAPI"
+	"sap/ui/fl/support/api/SupportAPI",
+	"sap/ui/VersionInfo"
 ], function(
 	Log,
-	SupportAPI
+	SupportAPI,
+	VersionInfo
 ) {
 	"use strict";
 
@@ -70,7 +72,8 @@ sap.ui.define([
 
 			oFlexData.extractionTimeStamp = new Date().toISOString();
 
-			oFlexData.ui5Version = sap.ui.version;
+			const oVersionInfo = await VersionInfo.load();
+			oFlexData.ui5Version = oVersionInfo.version;
 			const oAppComponent = await SupportAPI.getApplicationComponent();
 			if (!oAppComponent) {
 				Log.error("No application component found");

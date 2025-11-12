@@ -1,4 +1,5 @@
 sap.ui.define([
+  "sap/m/MessageBox",
   "sap/m/MessageToast",
   "sap/ui/model/json/JSONModel",
   "sap/m/App",
@@ -14,8 +15,10 @@ sap.ui.define([
   "sap/m/Page",
   "sap/m/Bar",
   "sap/m/Label",
-  "sap/m/FlexBox"
+  "sap/m/FlexBox",
+  "sap/base/Log"
 ], function(
+  MessageBox,
   MessageToast,
   JSONModel,
   App,
@@ -31,7 +34,8 @@ sap.ui.define([
   Page,
   Bar,
   Label,
-  FlexBox
+  FlexBox,
+  Log
 ) {
   "use strict";
 
@@ -108,13 +112,13 @@ sap.ui.define([
 	  var sMessage = sEventType + " fired!";
 	  switch (sKey) {
 		  case "suppress":
-			  console.log(sMessage);
+			  Log.info(sMessage);
 			  break;
 		  case "alert":
-			  alert(sMessage);
+			  MessageBox.alert(sMessage);
 			  break;
 		  default:
-			  console.log("Unknown key: " + sKey);
+			  Log.info("Unknown key: " + sKey);
 	  }
   }
 

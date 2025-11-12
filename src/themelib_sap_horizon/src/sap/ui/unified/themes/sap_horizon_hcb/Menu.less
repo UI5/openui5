@@ -4,19 +4,19 @@
 /* ==================================== */
 
 .sapUiMnu {
-	border-radius: @sapUiPopoverBorderCornerRadius;
+	border-radius: var(--sapPopover_BorderCornerRadius);
 }
 
 .sapUiMnuItm:focus {
-	outline: 0.125rem dotted @sapUiContentFocusColor;
+	outline: 0.125rem dotted var(--sapContent_FocusColor);
 }
 
-.sapUiMnuItmSbMnu > div:after {
+.sapUiMnuItmSbMnu > div::after {
 	font-size: 1rem;
 }
 
 .sapUiMnuItm.sapUiMnuTfItm .sapUiMnuTfItemTf.sapUiMnuTfItemTfDsbl {
-	opacity: @sapUiContentDisabledOpacity;
+	opacity: var(--sapContent_DisabledOpacity);
 }
 
 /** Cozy Mode **/
@@ -24,14 +24,14 @@
 .sapUiMnu.sapUiMnuCozySupport.sapUiSizeCozy {
 
 	.sapUiMnuDiv > hr {
-		left: 0rem;
-		right: 0rem;
+		left: 0;
+		right: 0;
 		margin-top: 0;
 		margin-bottom: 0;
 	}
 
 	.sapUiMnuDiv {
-	  height: 1px;
+		height: 1px;
 	}
 
 	.sapUiMnuItm.sapUiMnuTfItm .sapUiMnuTfItemTf {
@@ -44,11 +44,11 @@
 	background-color: @sapUiListSelectionHoverBackground;
 }
 
-.sapUiMnu  .sapUiMnuDiv>hr,
-.sapMList .sapMListItems .sapUiMnuDiv>hr{
-	border-top: 0.0625rem solid @sapUiGroupContentBorderColor;
-	left: 0rem;
-	right: 0rem;
+.sapUiMnu .sapUiMnuDiv > hr,
+.sapMList .sapMListItems .sapUiMnuDiv > hr {
+	border-top: 0.0625rem solid var(--sapGroup_ContentBorderColor);
+	left: 0;
+	right: 0;
 }
 
 .sapUiMnu.sapUiMnuCozySupport.sapUiSizeCozy .sapUiMnuItm {
@@ -74,15 +74,18 @@
 	width: 2.25rem;
 	height: 2.75rem;
 	font-size: 0.75rem;
-	&.sapUiIconMirrorInRTL{
+
+	&.sapUiIconMirrorInRTL {
 		height: 2.75rem;
 	}
 }
 
 html.sap-phone .sapUiSizeCozy .sapUiMnuItm {
+
 	.sapUiMnuItmTxt {
 		padding-left: 1rem;
 	}
+
 	.sapUiMnuItmIco + .sapUiMnuItmTxt {
 		padding-left: 0;
 	}
@@ -101,30 +104,33 @@ html.sap-phone .sapUiSizeCozy .sapUiMnuItm {
 
 .sapUiMnu .sapUiMnuLst .sapUiMnuItm.sapUiMnuItmSubMnuOpen,
 .sapUiMnu .sapUiMnuLst .sapUiMnuItm.sapUiMnuItmSubMnuOpen.sapUiMnuItmHov {
-	border-bottom: 1px solid @sapUiListSelectionBorderColor;
+	border-bottom: 1px solid var(--sapList_SelectionBorderColor);
 }
 
 .sapUiMnu .sapUiMnuLst .sapUiMnuItm {
 	border-bottom: 1px solid transparent;
 }
 
-.sapUiMnu .sapUiMnuLst .sapUiMnuItm.sapUiMnuItmHov:active{
+.sapUiMnu .sapUiMnuLst .sapUiMnuItm.sapUiMnuItmHov:active {
 	border-bottom: 1px solid transparent;
 }
 
-.sapUiMnu .sapUiMnuLst .sapUiMnuItm.sapUiMnuItmSubMnuOpen.sapUiMnuItmHov:active{
+.sapUiMnu .sapUiMnuLst .sapUiMnuItm.sapUiMnuItmSubMnuOpen.sapUiMnuItmHov:active {
 	border-bottom: 1px solid transparent;
-	background-color: @sapUiListActiveBackground;
+	background-color: var(--sapList_Active_Background);
 }
 
 html.sap-desktop,
 html.sap-tablet {
+
 	.sapUiMnuLst > .sapUiMnuItm > .sapUiMnuItmTxt {
 		padding-left: 0.75rem;
 	}
+
 	.sapUiMnuLst > .sapUiMnuItm > .sapUiMnuItmIco + .sapUiMnuItmTxt {
 		padding-left: 0;
 	}
+
 	.sapUiMnuLst.sapUiMnuNoIco > .sapUiMnuItm > .sapUiMnuItmTxt,
 	.sapUiMnuLst.sapUiMnuNoIco > .sapUiMnuItm > .sapUiMnuItmIco + .sapUiMnuItmTxt {
 		padding-left: 0;
