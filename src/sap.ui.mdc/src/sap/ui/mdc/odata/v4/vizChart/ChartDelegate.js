@@ -1193,6 +1193,14 @@ sap.ui.define([
 				oChartImplementationContainer.setShowNoDataStruct(true);
 
 				const oError = aUnAvailableCharts[iUnavailableIndex].error;
+				const oTypeButton = oIllustratedMessage?.getAdditionalContent()[1];
+				const bIsTypeButton = oTypeButton?.isA("sap.m.Button") && oTypeButton?.getText() === this._oMDCRb.getText("chart.SELECT_ANOTHER_CHART_TYPE");
+				if (bIsTypeButton && oInnerChart._getVisibleMeasures()?.length === 0) {
+					oError["Measure"] = 0;
+					oTypeButton.setVisible(false);
+				} else {
+					oTypeButton.setVisible(true);
+				}
 				this._sErrorMsg = ChartUtil.getErrorMessageForMissingMeasuresAndDimensions(sChartType, oError);
 				oIllustratedMessage.setDescription(this._sErrorMsg);
 				this._bInvalidChartType = true;

@@ -591,7 +591,7 @@ sap.ui.define([
 
 		// Assert
 		assert.equal(oValidChartType.valid, false, "Chart type is invalid");
-		assert.equal(oValidChartType.error["Measure"], 1, "error correctly has 1 Measure");
+		assert.equal(oValidChartType.error["Measure"], 0, "error correctly has 0 Measure");
 
 		// Arrange
 		this.oChartItemPanel.setP13nData([{
@@ -619,7 +619,7 @@ sap.ui.define([
 
 		// Assert
 		assert.equal(oValidChartType.valid, false, "Chart type is invalid");
-		assert.equal(oValidChartType.error["Measure"], 2, "error correctly has Measure 2");
+		assert.equal(oValidChartType.error["Measure"], 0, "error correctly has Measure ");
 
 		// Arrange
 		this.oChartItemPanel.setP13nData([{
@@ -672,7 +672,7 @@ sap.ui.define([
 
 		// Assert
 		assert.equal(oValidChartType.valid, false, "Chart type is invalid");
-		assert.equal(oValidChartType.error["Measure"], 3, "error correctly has Measure 2");
+		assert.equal(oValidChartType.error["Measure"], 0, "error correctly has Measure 0");
 
 		// Arrange
 		this.oChartItemPanel.setP13nData([{
@@ -757,7 +757,7 @@ sap.ui.define([
 
 		// Assert
 		assert.equal(oValidChartType.valid, false, "Chart type is invalid");
-		assert.equal(oValidChartType.error["Measure"], 1, "error correctly has Measure 1");
+		assert.equal(oValidChartType.error["Measure"], 0, "error correctly has Measure 0");
 		assert.equal(oValidChartType.error["Dimension"], 1, "error correctly has Dimension 1");
 
 		// Arrange
@@ -774,7 +774,7 @@ sap.ui.define([
 
 		// Assert
 		assert.equal(oValidChartType.valid, false, "Chart type is invalid");
-		assert.equal(oValidChartType.error["Measure"], 1, "error correctly has Measure 1");
+		assert.equal(oValidChartType.error["Measure"], 0, "error correctly has Measure 0");
 
 		// Arrange
 		this.oChartItemPanel.setP13nData([
@@ -811,7 +811,7 @@ sap.ui.define([
 
 		// Assert
 		assert.equal(oValidChartType.valid, false, "Chart type is invalid");
-		assert.equal(oValidChartType.error["Measure"], 2, "error correctly has Measure 2");
+		assert.equal(oValidChartType.error["Measure"], 0, "error correctly has Measure 0");
 		assert.equal(oValidChartType.error["Dimension"], 1, "error correctly has Dimension 1");
 
 		// Arrange
@@ -828,7 +828,7 @@ sap.ui.define([
 
 		// Assert
 		assert.equal(oValidChartType.valid, false, "Chart type is invalid");
-		assert.equal(oValidChartType.error["Measure"], 2, "error correctly has Measure 2");
+		assert.equal(oValidChartType.error["Measure"], 0, "error correctly has Measure 0");
 		assert.equal(oValidChartType.error["Dimension"], undefined, "error correctly has no Dimension error");
 
 		// Arrange

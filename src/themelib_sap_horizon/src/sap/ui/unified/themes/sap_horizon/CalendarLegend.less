@@ -1,15 +1,15 @@
 /* ============================================== */
 /* CSS for control sap.ui.unified/CalendarLegend  */
-/* Horizon theme                                  */
+/* Morning Horizon theme                          */
 /* ============================================== */
 
-.sapUiUnifiedLegend  {
+.sapUiUnifiedLegend {
 	border-radius: 0.5rem;
 }
 
 .sapUiCalLegDayTypeNonWorking .sapUiUnifiedLegendSquare .sapUiUnifiedLegendSquareColor,
 .sapUiUnifiedLegendNonWorkingDay .sapUiUnifiedLegendSquare .sapUiUnifiedLegendSquareColor {
-	background: @sapUiLegendNonWorkingBackground;
+	background: var(--sapLegend_NonWorkingBackground);
 }
 
 .sapUiUnifiedLegendSelected .sapUiUnifiedLegendSquare .sapUiUnifiedLegendSquareColor {
@@ -17,7 +17,7 @@
 	border: 0.0625rem solid var(--sapList_SelectionBorderColor);
 
 	&::after {
-		content: "";
+		content: '';
 		display: block;
 		width: 0.25rem;
 		height: 0.25rem;
@@ -34,15 +34,16 @@
 
 	&:focus {
 		outline: none;
+
 		&::after {
-			content: "";
+			content: '';
 			position: absolute;
 			box-sizing: border-box;
 			left: 0.125rem;
 			top: 0.125rem;
 			right: 0.125rem;
 			bottom: 0.125rem;
-			border: @sapContent_FocusWidth @sapContent_FocusStyle @sapUiContentFocusColor;
+			border: var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);
 			border-radius: 0.25rem;
 			pointer-events: none;
 		}
@@ -55,11 +56,12 @@
 
 	&:focus {
 		outline: none;
+
 		&::after {
-			content: "";
+			content: '';
 			position: absolute;
 			box-sizing: border-box;
-			border: @sapContent_FocusWidth @sapContent_FocusStyle @sapUiContentFocusColor;
+			border: var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);
 			border-radius: 0.25rem;
 			pointer-events: none;
 			inset: 0;

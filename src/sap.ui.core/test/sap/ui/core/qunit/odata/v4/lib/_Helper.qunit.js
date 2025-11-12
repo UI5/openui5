@@ -2281,17 +2281,6 @@ sap.ui.define([
 	sUrl : "http://host-b:1234/alternative/bar",
 	sBase : "https://host-a:4321/service/",
 	sResult : "http://host-b:1234/alternative/bar"
-}, {
-	// absolute sUrl has pathname part of baseURI as prefix
-	sUrl : document.baseURI + "alternative/bar",
-	sBase : "/service/",
-	sResult : new URL(document.baseURI).pathname + "alternative/bar"
-}, {
-	// root relative but sBase has baseURI as origin, don't care about a baseURI-prefix because
-	// it is equivalent to a root relative URL (origin part can be removed)
-    sUrl : "/alternative/bar",
-    sBase : document.baseURI + "service/",
-    sResult : "/alternative/bar"
 }].forEach(function (oFixture, i) {
 	QUnit.test("makeAbsolute #" + i, function (assert) {
 		const sSuffix = "?custom=a%20b#hash/c";
@@ -2310,8 +2299,34 @@ sap.ui.define([
 			// code under test: query options and hash of sUrl and sBase are not mixed
 			_Helper.makeAbsolute(oFixture.sUrl + sSuffix, oFixture.sBase + "?d=e#f"),
 			oFixture.sResult + sSuffix);
+
+		assert.strictEqual(
+			// code under test: bServiceUrl removes filename, pathname ends with slash
+			_Helper.makeAbsolute(oFixture.sUrl + "/filename" + sSuffix, oFixture.sBase,
+				/*bServiceUrl*/true),
+			oFixture.sResult + "/" + sSuffix);
 	});
 });
+
+	//*********************************************************************************************
+	QUnit.test("makeAbsolute: document.baseURI", function (assert) {
+		// if the origins of the given URL and the document's base URI are equal, we don't care
+		// about it and remove the origin from the resulting URL, because it is equivalent to a root
+		// relative URL
+
+		// root of baseURI to make it independent of the test environment
+		const sBaseUri = new URL("/", document.baseURI).toString();
+
+		assert.strictEqual(
+			// code under test: absolute sUrl has baseURI as origin
+			_Helper.makeAbsolute(sBaseUri + "alternative/bar", "/service/"),
+			"/alternative/bar");
+
+		assert.strictEqual(
+			// code under test: root relative but sBase has baseURI as origin
+			_Helper.makeAbsolute("/alternative/bar", sBaseUri + "service/"),
+			"/alternative/bar");
+	});
 
 	//*********************************************************************************************
 	QUnit.test("makeRelativePath", function (assert) {

@@ -1714,6 +1714,53 @@ sap.ui.define([
 });
 
 	//*********************************************************************************************
+	QUnit.test("fetchCache: skip cache creation for initially suspended ODLB", function (assert) {
+		const oBinding = new ODataBinding({
+			oCache : null,
+			oModel : {
+				oRequestor : {
+					ready : mustBeMocked
+				},
+				getReporter : getForbiddenReporter,
+				waitForKeepAliveBinding : mustBeMocked
+			},
+			bRelative : true
+		});
+		const oBindingMock = this.mock(oBinding);
+		oBindingMock.expects("fetchOrGetQueryOptionsForOwnCache")
+			.withExactArgs("~oContext~", "~bIgnoreParentCache~")
+			.returns(SyncPromise.resolve(Promise.resolve({
+				mQueryOptions : "~mQueryOptions~",
+				sReducedPath : "/resolved/path"
+			})));
+		this.mock(oBinding.oModel.oRequestor).expects("ready").withExactArgs()
+			.returns(SyncPromise.resolve());
+		oBindingMock.expects("prepareDeepCreate").never();
+		oBindingMock.expects("fetchResourcePath").never();
+		this.mock(oBinding.oModel).expects("waitForKeepAliveBinding").never();
+		oBindingMock.expects("createAndSetCache").never();
+
+		// code under test
+		oBinding.fetchCache("~oContext~", "~bIgnoreParentCache~", /*bKeepQueryOptions*/false);
+
+		assert.strictEqual(oBinding.oCache, undefined);
+		assert.ok(oBinding.oCachePromise.isPending());
+
+		// simulate doSuspend of an initially suspended list binding
+		oBinding.oFetchCacheCallToken.initiallySuspended = true;
+		oBinding.oCache = null;
+
+		return oBinding.oCachePromise.then(function () {
+			assert.strictEqual(oBinding.oCachePromise.getResult(), null);
+			assert.strictEqual(oBinding.sReducedPath, undefined, "sReducedPath not yet set");
+			assert.deepEqual(oBinding.oFetchCacheCallToken, {
+					initiallySuspended : true,
+					oOldCache : null
+				}, "no cleanup needed");
+		});
+	});
+
+	//*********************************************************************************************
 [false, true].forEach(function (bHasLateQueryOptions) {
 	[false, true].forEach(function (bOldCacheIsReused) {
 	var sTitle = "createAndSetCache: absolute, bHasLateQueryOptions = " + bHasLateQueryOptions

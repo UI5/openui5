@@ -546,6 +546,9 @@ sap.ui.define([
 		this.oCachePromise = SyncPromise.all(aPromises).then(function (aResult) {
 			var mQueryOptions = aResult[0].mQueryOptions;
 
+			if (oCallToken.initiallySuspended) {
+				return null;
+			}
 			if (aResult[0].sReducedPath) {
 				that.sReducedPath = aResult[0].sReducedPath;
 			}

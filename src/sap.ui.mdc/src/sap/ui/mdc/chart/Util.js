@@ -99,8 +99,8 @@ sap.ui.define([
 		const sChartTypeText = oChartRB.getText("info/" + sChartType);
 
 		let sErrorMsg = "";
-		let iDimension = oError["Dimension"] ? oError["Dimension"] : "";
-		let iMeasure = oError["Measure"] ? oError["Measure"] : "";
+		let iDimension = oError["Dimension"] ? JSON.parse(JSON.stringify(oError["Dimension"])) : "";
+		let iMeasure = oError["Measure"] || oError["Measure"] === 0 ? JSON.parse(JSON.stringify(oError["Measure"])) : "";
 
 		if (iDimension < 0) {
 			iDimension = 0;
@@ -114,6 +114,9 @@ sap.ui.define([
 			sErrorMsg = MDCRb.getText("chart.MISSING_DIMENSION_ERROR_MESSAGE", [sChartTypeText, iDimension]);
 		} else if (iMeasure) {
 			sErrorMsg = MDCRb.getText("chart.MISSING_MEASURE_ERROR_MESSAGE", [sChartTypeText, iMeasure]);
+		}
+		if (oError["Measure"] === 0) {
+			sErrorMsg = MDCRb.getText("chart.INVALID_CHART_TYPE_NO_MEASURE_ERROR_MESSAGE_DESCRIPTION");
 		}
 		return sErrorMsg;
 	};

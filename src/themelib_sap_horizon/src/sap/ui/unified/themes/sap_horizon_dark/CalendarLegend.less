@@ -9,7 +9,7 @@
 
 .sapUiCalLegDayTypeNonWorking .sapUiUnifiedLegendSquare .sapUiUnifiedLegendSquareColor,
 .sapUiUnifiedLegendNonWorkingDay .sapUiUnifiedLegendSquare .sapUiUnifiedLegendSquareColor {
-	background: @sapUiLegendNonWorkingBackground;
+	background: var(--sapLegend_NonWorkingBackground);
 }
 
 .sapUiUnifiedLegendSelected .sapUiUnifiedLegendSquare .sapUiUnifiedLegendSquareColor {
@@ -17,7 +17,7 @@
 	border: 0.0625rem solid var(--sapList_SelectionBorderColor);
 
 	&::after {
-		content: "";
+		content: '';
 		display: block;
 		width: 0.25rem;
 		height: 0.25rem;
@@ -34,12 +34,13 @@
 
 	&:focus {
 		outline: none;
+
 		&::after {
-			content: "";
+			content: '';
 			position: absolute;
 			box-sizing: border-box;
 			inset: 0.125rem;
-			border: @sapContent_FocusWidth @sapContent_FocusStyle @sapUiContentFocusColor;
+			border: var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);
 			border-radius: 0.25rem;
 			pointer-events: none;
 		}
@@ -52,12 +53,13 @@
 
 	&:focus {
 		outline: none;
+
 		&::after {
-			content: "";
+			content: '';
 			position: absolute;
 			box-sizing: border-box;
 			inset: 0;
-			border: @sapContent_FocusWidth @sapContent_FocusStyle @sapUiContentFocusColor;
+			border: var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);
 			border-radius: 0.25rem;
 			pointer-events: none;
 		}

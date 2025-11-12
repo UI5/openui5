@@ -8166,6 +8166,40 @@ sap.ui.define([
 		oComboBox.destroy();
 	});
 
+	QUnit.test("Should correct typed value casing according to matched item text", async function (assert) {
+		this.clock = sinon.useFakeTimers();
+		const oComboBox = new ComboBox({
+			items: [
+				 new Item({
+					key: "0",
+					text: "Algeria"
+				}),
+
+				new Item({
+					key: "1",
+					text: "Argentina"
+				}),
+
+				new Item({
+					key: "2",
+					text: "Brazil"
+				})
+			]
+		});
+
+		oComboBox.placeAt("content");
+		await nextUIUpdate(this.clock);
+		oComboBox.focus();
+		const oFocusDomRef = oComboBox.getFocusDomRef();
+
+		oFocusDomRef.value = "ALGERIA";
+		qutils.triggerEvent("input", oFocusDomRef, {value: "ALGERIA"});
+		this.clock.tick(500);
+
+		assert.ok(oComboBox.getValue() === oComboBox.getSelectedItem().getText(), "The typed value is the same as the selected item text");
+		oComboBox.destroy();
+	});
+
 	QUnit.test("it should close the dropdown list when the text field is empty and it was opened by typing text", async function (assert) {
 		this.clock = sinon.useFakeTimers();
 		// system under test

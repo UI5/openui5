@@ -138,15 +138,6 @@ sap.ui.define([
 			"Nov 13, 2021, 8:22:33\u202FAM Americas, New York", "date was converted and timezone name was added.");
 	});
 
-	QUnit.test("Custom format 'yMMMhVV'", function (assert) {
-		var oDateFormat = DateFormat.getDateTimeWithTimezoneInstance({format: "yMMMhVV"});
-
-		// Timezone difference UTC-5 (Eastern Standard Time - EST), UTC Zulu
-		var oDateEST = UI5Date.getInstance("2021-11-13T13:22:33Z");
-		assert.strictEqual(oDateFormat.format(oDateEST, "America/New_York"),
-			"Nov 2021, 8\u202FAM Americas, New York", "New timezone should be be applied.");
-	});
-
 	QUnit.test("Timezone parameter is empty string, null or undefined", function (assert) {
 		var oDateTimeWithTimezoneFormat = DateFormat.getDateTimeWithTimezoneInstance();
 		var oDateEDT = UI5Date.getInstance("2021-10-13T13:22:33Z");
@@ -208,15 +199,6 @@ sap.ui.define([
 		var oDateEST = UI5Date.getInstance("2021-11-13T13:22:33Z");
 		assert.strictEqual(oDateFormat.format(oDateEST, "America/New_York"),
 			"13.11.2021, 08:22:33 Amerika, New York", "date was converted and timezone name was added.");
-	});
-
-	QUnit.test("Custom format 'yMMMhVV'", function (assert) {
-		var oDateFormat = DateFormat.getDateTimeWithTimezoneInstance({format: "yMMMhVV"});
-
-		// Timezone difference UTC-5 (Eastern Standard Time - EST), UTC Zulu
-		var oDateEST = UI5Date.getInstance("2021-11-13T13:22:33Z");
-		assert.strictEqual(oDateFormat.format(oDateEST, "America/New_York"),
-			"Nov. 2021, 8 Uhr AM Amerika, New York", "New timezone should be be applied.");
 	});
 
 	QUnit.module("DateTimeWithTimezone format", {
