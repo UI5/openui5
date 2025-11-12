@@ -1,12 +1,13 @@
 sap.ui.define([
   "sap/ui/core/IconPool",
+  "sap/m/MessageBox",
   "sap/m/Avatar",
   "sap/m/List",
   "sap/m/StandardListItem",
   "sap/ui/core/library",
   "sap/m/App",
   "sap/m/Page"
-], function(IconPool, Avatar, List, StandardListItem, coreLibrary, App, Page) {
+], function(IconPool, MessageBox, Avatar, List, StandardListItem, coreLibrary, App, Page) {
   "use strict";
 
   // shortcut for sap.ui.core.TextAlign
@@ -20,7 +21,7 @@ sap.ui.define([
 		  displayShape: "Square",
 		  badgeIcon: "sap-icon://camera",
 		  imageFitType: "Cover",
-		  press: function(){alert();}
+		  press: function(){MessageBox.alert("action press");}
 	  });
   av.setSrc("images/Lamp_avatar_01.jpg");
 
@@ -30,7 +31,7 @@ sap.ui.define([
 	  badgeIcon: "sap-icon://camera",
 	  imageFitType: "Contain",
 	  showBorder: true,
-	  press: function(){alert("action press");}
+	  press: function(){MessageBox.alert("action press");}
   });
   av1.setSrc("images/Lamp_avatar_01.jpg");
 

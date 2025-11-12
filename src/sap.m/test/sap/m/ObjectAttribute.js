@@ -168,7 +168,7 @@ sap.ui.define([
 	  attributes: oAttrs3,
 	  firstStatus: new ObjectStatus({text: "Positive Ñagçyfox", state: "Success", tooltip: "Status tip"}),
 	  markers: [
-		  new ObjectMarker({type: ObjectMarkerType.Favorite}),
+		  new ObjectMarker({type: ObjectMarkerType.Favorite})
 	  ]
   });
   oList.addItem(oOli);

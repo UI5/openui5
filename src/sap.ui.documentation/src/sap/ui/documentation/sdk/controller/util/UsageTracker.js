@@ -29,7 +29,8 @@ sap.ui.define(
             this.section = sSectionTitle || "/";
             this.title = undefined;
             this.language = oUserLanguageTag.language;
-            this.country = oUserLanguageTag.region;
+            this.locale = oUserLanguageTag.toString();
+            this.country = "glo";
             this.referrer = document.referrer;
         };
 

@@ -190,7 +190,7 @@ sap.ui.define([
 		  oInput2.clone().setPlaceholder("3"),
 		  oInput2.clone().setPlaceholder("4"),
 		  oInput2.clone().setPlaceholder("5"),
-		  oInput2.clone().setPlaceholder("6"),
+		  oInput2.clone().setPlaceholder("6")
 	  ]
   });
 

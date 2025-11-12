@@ -11,5 +11,5 @@ sap.ui.define(["sap/ui/core/Component", "sap/ui/core/ComponentContainer"], funct
 			component: oComponent
 		});
 		oCompCont.placeAt("target1");
-	})
-})
+	});
+});

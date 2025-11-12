@@ -7,15 +7,16 @@ sap.ui.define([
   "sap/m/ComboBox",
   "sap/ui/core/Item",
   "sap/m/MultiComboBox",
+  "sap/base/Log",
   "sap/ui/thirdparty/jquery"
-], function(App, Button, Page, VerticalLayout, Text, ComboBox, Item, MultiComboBox, jQuery) {
+], function(App, Button, Page, VerticalLayout, Text, ComboBox, Item, MultiComboBox, Log, jQuery) {
   "use strict";
   // Note: the HTML page 'ComboBoxClearIcon.html' loads this module via data-sap-ui-on-init
 
   var app = new App("myApp");
 
   var fnChange = function (event) {
-	  console.log("change: ", event.getParameter("value"));
+	  Log.info("change: ", event.getParameter("value"));
   };
 
   // Add a css class to the body HTML element, in order to be used for caret stylization in visual tests run.

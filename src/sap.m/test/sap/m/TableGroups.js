@@ -11,7 +11,8 @@ sap.ui.define([
   "sap/m/Toolbar",
   "sap/m/Button",
   "sap/m/ToolbarSpacer",
-  "sap/m/App"
+  "sap/m/App",
+  "sap/base/Log"
 ], function(
   JSONModel,
   Sorter,
@@ -25,7 +26,8 @@ sap.ui.define([
   Toolbar,
   Button,
   ToolbarSpacer,
-  App
+  App,
+  Log
 ) {
   "use strict";
 
@@ -176,10 +178,10 @@ sap.ui.define([
 		  })
 	  ],
 	  updateStarted : function(e) {
-		  console.log("updateStarted", e.getParameters(), Date.now());
+		  Log.info("updateStarted", e.getParameters(), Date.now());
 	  },
 	  updateFinished : function(e) {
-		  console.log("updateFinished", e.getParameters(), Date.now());
+		  Log.info("updateFinished", e.getParameters(), Date.now());
 	  }
   });
 

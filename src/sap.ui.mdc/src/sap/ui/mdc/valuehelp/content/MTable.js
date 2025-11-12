@@ -20,7 +20,8 @@ sap.ui.define([
 	'sap/ui/core/Element',
 	'sap/ui/Device',
 	'sap/ui/dom/containsOrEquals',
-	"sap/m/table/Util"
+	"sap/m/table/Util",
+	"sap/ui/events/KeyCodes"
 ], (
 	Library,
 	FilterableListContent,
@@ -39,7 +40,8 @@ sap.ui.define([
 	Element,
 	Device,
 	containsOrEquals,
-	MTableUtil
+	MTableUtil,
+	KeyCodes
 ) => {
 	"use strict";
 
@@ -1179,7 +1181,7 @@ sap.ui.define([
 
 		switch (oEvent.type) {
 			case "sapprevious":
-				if (oItem.isA("sap.m.ListItemBase")) {
+				if (oEvent.which !== KeyCodes.ARROW_LEFT && oItem.isA("sap.m.ListItemBase")) {
 					if (oTable.indexOfItem(oItem) === 0) {
 						this.fireNavigated({ condition: undefined, itemId: undefined, leaveFocus: true });
 						oEvent.preventDefault();
@@ -1189,7 +1191,7 @@ sap.ui.define([
 				}
 				break;
 			case "sapnext":
-				if (oItem.isA("sap.m.ListItemBase") && this._oShowAllItemsButton) {
+				if (oEvent.which !== KeyCodes.ARROW_RIGHT && oItem.isA("sap.m.ListItemBase") && this._oShowAllItemsButton) {
 					const aItems = oTable.getItems();
 					if (aItems.indexOf(oItem) === aItems.length - 1) { // end reached, focus show-all to behave similar to single-select
 						oEvent.preventDefault();

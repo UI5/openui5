@@ -1068,43 +1068,6 @@ sap.ui.define([
 			assert.strictEqual(this.oFlexStateSpy.callCount, 0, "FlexState was not initialized");
 			assert.strictEqual(this.oApplierSpy.callCount, 0, "the Applier was not called");
 		});
-
-		QUnit.test("when calling 'preprocessManifest' with a fl-asyncHint and a change", async function(assert) {
-			this.oConfig.asyncHints = {
-				requests: [
-					{
-						name: "sap.ui.fl.changes",
-						reference: "sap.app.descriptor.test",
-						url: "/sap/bc/lrep/flex/data/sap.app.descriptor.test"
-					}
-				]
-			};
-			const aChanges = [
-				{
-					fileName: "change1",
-					changeType: "appdescr_ui5_addLibraries",
-					content: {
-						libraries: {
-							"descriptor.mocha133": {
-								minVersion: "1.44"
-							}
-						}
-					},
-					appDescriptorChange: true
-				}
-			];
-
-			this.oStorageStub.resolves({
-				...StorageUtils.getEmptyFlexDataResponse(),
-				appDescriptorChanges: aChanges
-			});
-			const oManifest = await ComponentLifecycleHooks.preprocessManifest(this.oManifest, this.oConfig);
-			assert.deepEqual(oManifest, this.oManifest, "the manifest is returned");
-			assert.strictEqual(this.oLoaderSpy.callCount, 2, "Loader was initialized twice");
-			assert.strictEqual(this.oFlexStateSpy.callCount, 1, "FlexState was initialized once");
-			assert.ok(this.oFlexStateSpy.getCalls()[0].args[0].forceInvalidation, "FlexState was initialized with forceInvalidation=true");
-			assert.strictEqual(this.oApplierSpy.callCount, 0, "the Applier was not called");
-		});
 	});
 
 	QUnit.done(function() {

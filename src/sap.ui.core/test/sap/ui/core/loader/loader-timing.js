@@ -10,11 +10,16 @@ sap.ui.define([
 	  }
   });
 
-  async function sleep(ms) {
-	  return new Promise((resolve) => setTimeout(() => resolve(), ms));
+  function sleep(ms) {
+	  return new Promise((resolve) =>
+		  setTimeout(() => {
+			  resolve()
+		  }, ms)
+	  );
   }
 
-  async function testDeepDependencies() {
+  //eslint-disable no-console
+  function testDeepDependencies() {
 	  console.time("require");
 	  return new Promise((resolve) => {
 		  sap.ui.require(["fixture/deepDependencies/deep1"], function(deep1) {
@@ -24,7 +29,7 @@ sap.ui.define([
 	  });
   }
 
-  async function testBroadDependencies() {
+  function testBroadDependencies() {
 	  console.time("require");
 	  return new Promise((resolve) => {
 		  sap.ui.require(["fixture/broadDependencies/broad1"], function(broad1) {

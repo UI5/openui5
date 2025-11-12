@@ -610,16 +610,16 @@ sap.ui.define([
 
 		/**
 		 * Facade of the {@link sap.ui.integration.widgets.Card} control.
+		 *
+		 * This facade contains methods accessible within the card extension.
+		 * The available methods represent a limited subset of all card methods, since not all card methods function as expected when called from within the extension.
+		 *
 		 * @interface
 		 * @name sap.ui.integration.widgets.CardFacade
-		 * @experimental since 1.79
 		 * @public
 		 * @author SAP SE
 		 * @version ${version}
 		 * @borrows sap.ui.integration.widgets.Card#getId as getId
-		 * @borrows sap.ui.integration.widgets.Card#getDomRef as getDomRef
-		 * @borrows sap.ui.integration.widgets.Card#setVisible as setVisible
-		 * @borrows sap.ui.integration.widgets.Card#getParameters as getParameters
 		 * @borrows sap.ui.integration.widgets.Card#getCombinedParameters as getCombinedParameters
 		 * @borrows sap.ui.integration.widgets.Card#getManifestEntry as getManifestEntry
 		 * @borrows sap.ui.integration.widgets.Card#resolveDestination as resolveDestination
@@ -631,14 +631,13 @@ sap.ui.define([
 		 * @borrows sap.ui.integration.widgets.Card#getBaseUrl as getBaseUrl
 		 * @borrows sap.ui.integration.widgets.Card#getRuntimeUrl as getRuntimeUrl
 		 * @borrows sap.ui.integration.widgets.Card#getTranslatedText as getTranslatedText
-		 * @borrows sap.ui.integration.widgets.Card#getModel as getModel
 		 * @borrows sap.ui.integration.widgets.Card#triggerAction as triggerAction
 		 * @borrows sap.ui.integration.widgets.Card#addActionDefinition as addActionDefinition
 		 * @borrows sap.ui.integration.widgets.Card#removeActionDefinition as removeActionDefinition
 		 * @borrows sap.ui.integration.widgets.Card#insertActionDefinition as insertActionDefinition
-		 * @borrows sap.ui.integration.widgets.Card#getActionDefinition as getActionDefinition
+		 * @borrows sap.ui.integration.widgets.Card#getActionDefinitions as getActionDefinitions
 		 * @borrows sap.ui.integration.widgets.Card#indexOfActionDefinition as indexOfActionDefinition
-		 * @borrows sap.ui.integration.widgets.Card#destroyActionDefinition as destroyActionDefinition
+		 * @borrows sap.ui.integration.widgets.Card#destroyActionDefinitions as destroyActionDefinitions
 		 * @borrows sap.ui.integration.widgets.Card#showLoadingPlaceholders as showLoadingPlaceholders
 		 * @borrows sap.ui.integration.widgets.Card#hideLoadingPlaceholders as hideLoadingPlaceholders
 		 * @borrows sap.ui.integration.widgets.Card#showCard as showCard
@@ -669,9 +668,9 @@ sap.ui.define([
 			"addActionDefinition",
 			"removeActionDefinition",
 			"insertActionDefinition",
-			"getActionDefinition",
+			"getActionDefinitions",
 			"indexOfActionDefinition",
-			"destroyActionDefinition",
+			"destroyActionDefinitions",
 			"showLoadingPlaceholders",
 			"hideLoadingPlaceholders",
 			"showCard",
@@ -683,6 +682,41 @@ sap.ui.define([
 			"getBlockingMessage"
 		]);
 	};
+
+	/**
+	 * Gets current value of property {@link #getParameters parameters}.
+	 *
+	 * Overrides the default values of the parameters, which are defined in the manifest.
+	 * The returned value is an object containing parameters in format <code>{parameterKey: parameterValue}</code>.
+	 *
+	 * @public
+	 * @method
+	 * @name sap.ui.integration.widgets.CardFacade.getParameters
+	 * @deprecated Since 1.143. Use <code>getCombinedParameters()</code> instead.
+	 * @returns {object} Value of property <code>parameters<code>
+	 */
+
+	/**
+	 * @public
+	 * @method
+	 * @name sap.ui.integration.widgets.CardFacade.getDomRef
+	 * @deprecated Since 1.143. Do not access the card dom reference, as this is not supported in a mobile native environment.
+	 */
+
+	/**
+	 * @public
+	 * @method
+	 * @name sap.ui.integration.widgets.CardFacade.setVisible
+	 * @deprecated Since 1.143. Use <code>hide()</code> to hide a card opened by <code>showCard()</code>.
+	 * The card facade does not provide methods for showing or hiding the main card itself.
+	 */
+
+	/**
+	 * @public
+	 * @method
+	 * @name sap.ui.integration.widgets.CardFacade.getModel
+	 * @deprecated Since 1.143. Avoid accessing the models directly, use the binding syntax instead.
+	 */
 
 	/**
 	 * Initializes the internally used models.
@@ -2079,7 +2113,7 @@ sap.ui.define([
 
 	/**
 	 * @private
-     * @returns {sap.f.cards.IHeader} The header of the card.
+	 * @returns {sap.f.cards.IHeader} The header of the card.
 	 */
 	Card.prototype._getHeaderAggregation = function () {
 		return this.getAggregation("_header");

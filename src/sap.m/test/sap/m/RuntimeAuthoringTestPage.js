@@ -328,7 +328,7 @@ sap.ui.define([
 											});
 											oRta.attachStop(function() {
 												oRta.destroy();
-											})
+											});
 											oRta.start();
 										}
 									}),

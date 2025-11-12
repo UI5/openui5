@@ -385,7 +385,7 @@ sap.ui.define([
 	QUnit.test("mixin", function (assert) {
 		var oBinding = this.bindContext("/EMPLOYEES('42')"),
 			oMixin = {},
-			aOverriddenFunctions = ["adjustPredicate", "destroy", "doSetProperty", "doSuspend"];
+			aOverriddenFunctions = ["adjustPredicate", "destroy"];
 
 		asODataParentBinding(oMixin);
 

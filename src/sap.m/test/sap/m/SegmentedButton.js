@@ -1189,7 +1189,7 @@ sap.ui.define([
 				  ]
 		  });
 
-		  vBox.addItem(oSegBtnEqualSized)
+		  vBox.addItem(oSegBtnEqualSized);
 
 	  })();
   })();

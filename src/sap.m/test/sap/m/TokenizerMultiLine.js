@@ -36,13 +36,13 @@ sap.ui.define([
 		text: "Mexico Mexico Mexico Mexico Mexico Mexico Mexico Mexico Mexico Mexico",
 		key: "long-token",
 		editable: true
-	}
+	};
 
 	const nonEditablelongToken = {
 		text: "Mexico Mexico Mexico Mexico Mexico Mexico Mexico Mexico Mexico Mexico",
 		key: "long-token",
 		editable: false
-	}
+	};
 
 	// Helper function to create sample tokens
 	function createSampleTokens(editable = true) {
@@ -62,7 +62,7 @@ sap.ui.define([
 			"Norway",
 			"Japan",
 			"Korea",
-			"Latvia",
+			"Latvia"
 		];
 		const tokens = [];
 		for (var i = 1; i < countries.length; i++) {
@@ -212,7 +212,7 @@ sap.ui.define([
 						oExample3,
 						oExample4,
 						oExample5,
-						oExample6,
+						oExample6
 					]
 				}).addStyleClass("demoWrapper")
 			]

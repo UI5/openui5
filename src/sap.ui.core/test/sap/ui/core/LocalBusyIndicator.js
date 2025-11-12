@@ -10,11 +10,29 @@ sap.ui.define([
 	"sap/m/Text",
 	"sap/ui/core/Control",
 	"sap/ui/core/Icon",
+	"sap/ui/core/InvisibleText",
 	"sap/ui/core/ListItem",
 	"sap/ui/model/json/JSONModel",
 	"sap/ui/table/Column",
 	"sap/ui/table/Table"
-], function(Button, CheckBox, Input, Label, Link, Panel, RatingIndicator, SelectList, Text, Control, Icon, ListItem, JSONModel, Column, Table) {
+], function(
+	Button,
+	CheckBox,
+	Input,
+	Label,
+	Link,
+	Panel,
+	RatingIndicator,
+	SelectList,
+	Text,
+	Control,
+	Icon,
+	InvisibleText,
+	ListItem,
+	JSONModel,
+	Column,
+	Table
+) {
 	"use strict";
 
 	/**
@@ -186,7 +204,10 @@ sap.ui.define([
 	oMButton.placeAt("mButton");
 	oMButton.setBusyIndicatorDelay(0);
 
-	var oInput = new Input();
+	const oLabel = new InvisibleText({text: "Input used to test busy state"}).toStatic();
+	var oInput = new Input({
+		ariaLabelledBy: [oLabel]
+	});
 	oInput.placeAt("input");
 	oInput.setBusyIndicatorDelay(0);
 
@@ -234,10 +255,14 @@ sap.ui.define([
 	var oBusyModel = new JSONModel();
 	oBusyModel.setData({o:{isBusy: true}});
 
+
+	const oLabel2 = new InvisibleText({text: "Input in Panel to test busy state with data binding"}).toStatic();
 	var oPanel = new Panel({
 		headerText: "'busy' property is bound",
 		busy: "{/o/isBusy}",
-		content: new Input()
+		content: new Input({
+			ariaLabelledBy: [oLabel2]
+		})
 	});
 	oPanel.placeAt("mPanel");
 	oPanel.setModel(oBusyModel);
@@ -245,9 +270,12 @@ sap.ui.define([
 	/**
 	 * Partial Test
 	 */
+	const oLabel3 = new InvisibleText({text: "Input in Panel to test busy state on header only"}).toStatic();
 	var oPanel2 = new Panel({
 		headerText: "Only header is set busy",
-		content: new Input()
+		content: new Input({
+			ariaLabelledBy: [oLabel3]
+		})
 	});
 	oPanel2.placeAt("mPanel2");
 	oPanel2.setBusy(true, "header");

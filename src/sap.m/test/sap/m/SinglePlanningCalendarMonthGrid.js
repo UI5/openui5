@@ -1,6 +1,3 @@
-// Note: the HTML page 'SinglePlanningCalendarMonthGrid.html' loads this module via data-sap-ui-on-init
-
-var oSPCGrid;
 sap.ui.define([
 	'sap/ui/model/json/JSONModel',
 	'sap/m/SinglePlanningCalendarMonthGrid',
@@ -133,7 +130,7 @@ function (JSONModel, SinglePlanningCalendarMonthGrid, CalendarAppointment, App, 
 	var oModel = new JSONModel();
 	oModel.setData({modelData: aAppointments});
 
-	oSPCGrid = new SinglePlanningCalendarMonthGrid("SinglePlanningCalendarMonthGrid", {
+	var oSPCGrid = new SinglePlanningCalendarMonthGrid("SinglePlanningCalendarMonthGrid", {
 		startDate: UI5Date.getInstance(2018, 5, 18),
 		appointments : {
 			path : '/modelData',

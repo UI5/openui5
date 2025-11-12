@@ -44,7 +44,7 @@ sap.ui.define([
 	 * @private
 	 * @ui5-restricted sap.ui.fl
 	 */
-	var ComponentLifecycleHooks = {};
+	const ComponentLifecycleHooks = {};
 
 	// in this object a promise is stored for every application component instance
 	// if the same instance is initialized twice the promise is replaced
@@ -66,43 +66,32 @@ sap.ui.define([
 	 * @param {object} oComponent - Application component about to be started
 	 * @returns {Promise<undefined>} Resolves with undefined
 	 */
-	function checkForRtaStartOnDraftAndReturnResult(oComponent) {
+	async function checkForRtaStartOnDraftAndReturnResult(oComponent) {
 		// if the FLP is available the restart behavior is handled there
 		if (Utils.getUshellContainer()) {
-			return Promise.resolve();
+			return;
 		}
 
-		var sRestartingComponent = window.sessionStorage.getItem(`sap.ui.rta.restart.${Layer.CUSTOMER}`);
+		const sRestartingComponent = window.sessionStorage.getItem(`sap.ui.rta.restart.${Layer.CUSTOMER}`);
 		if (sRestartingComponent) {
-			var sComponentId = ManifestUtils.getFlexReferenceForControl(oComponent);
+			const sComponentId = ManifestUtils.getFlexReferenceForControl(oComponent);
 			if (sRestartingComponent !== sComponentId && sRestartingComponent !== "true") {
 				Log.error(`an application component was started which does not match the component for which the restart was triggered:
 					Triggering component: ${sRestartingComponent}
-					Started component: ${sComponentId}`);
+					Started component: ${sComponentId}`
+				);
 
-				return Promise.resolve();
+				return;
 			}
-
-			return new Promise(function(resolve, reject) {
-				Promise.all([
-					Lib.load({ name: "sap.ui.rta" }),
-					oComponent.rootControlLoaded()
-				])
-				.then(function() {
-					sap.ui.require(["sap/ui/rta/api/startKeyUserAdaptation"], function(startKeyUserAdaptation) {
-						startKeyUserAdaptation({
-							rootControl: oComponent
-						});
-						resolve();
-					});
-				})
-				.catch(function(oError) {
-					reject(oError);
-				});
+			await Promise.all([
+				Lib.load({ name: "sap.ui.rta" }),
+				oComponent.rootControlLoaded()
+			]);
+			const startKeyUserAdaptation = await requireAsync("sap/ui/rta/api/startKeyUserAdaptation");
+			startKeyUserAdaptation({
+				rootControl: oComponent
 			});
 		}
-
-		return Promise.resolve();
 	}
 
 	/**
@@ -169,7 +158,50 @@ sap.ui.define([
 		await checkForRtaStartOnDraftAndReturnResult(oComponent);
 	}
 
-	async function onLoadComponent(oConfig, oManifest) {
+	// the current sinon version used in UI5 does not support stubbing the constructor
+	ComponentLifecycleHooks._createVariantModel = function(oAppComponent) {
+		return new VariantModel({}, {
+			appComponent: oAppComponent
+		});
+	};
+
+	/**
+	 * Gets the changes and in case of existing changes, prepare the applyChanges function already with the changes.
+	 *
+	 * @param {object} oComponent - Component instance that is currently loading
+	 * @param {object} vConfig - Configuration of loaded component
+	 * @returns {Promise} Resolves when all relevant tasks for changes propagation have been processed
+	 */
+	ComponentLifecycleHooks.instanceCreatedHook = async function(oComponent, vConfig) {
+		if (Utils.isApplicationComponent(oComponent)) {
+			const oReturnPromise = await handleAppComponentInstanceCreated(oComponent, vConfig);
+			ComponentLifecycleHooks._componentInstantiationPromises.set(oComponent, oReturnPromise);
+			return oReturnPromise;
+		} else if (Utils.isEmbeddedComponent(oComponent)) {
+			const oAppComponent = Utils.getAppComponentForControl(oComponent);
+			// once the VModel is set to the outer component it also has to be set to any embedded component
+			if (ComponentLifecycleHooks._componentInstantiationPromises.has(oAppComponent)) {
+				await ComponentLifecycleHooks._componentInstantiationPromises.get(oAppComponent);
+				const oVariantModel = oAppComponent.getModel(ControlVariantApplyAPI.getVariantModelName());
+				oComponent.setModel(oVariantModel, ControlVariantApplyAPI.getVariantModelName());
+			}
+			ComponentLifecycleHooks._embeddedComponents[oAppComponent.getId()] ||= [];
+			ComponentLifecycleHooks._embeddedComponents[oAppComponent.getId()].push(oComponent);
+		}
+		return undefined;
+	};
+
+	/**
+	 * Callback which is called within the early state of Component processing.
+	 * Already triggers the loading of the flexibility changes if the loaded manifest is an application variant.
+	 * The processing is only done for components of the type "application"
+	 *
+	 * @param {object} oConfig - Copy of the configuration of loaded component
+	 * @param {object} oConfig.asyncHints - Async hints passed from the app index to the core Component processing
+	 * @param {object} oManifest - Copy of the manifest of loaded component
+	 * @returns {Promise} Resolves after all Manifest changes are applied
+	 */
+	ComponentLifecycleHooks.componentLoadedHook = async function(oConfig, oManifest) {
 		// stop processing if the component is not of the type application or component ID is missing
 		if (Utils.isApplication(oManifest) && oConfig.id) {
 			const mPropertyBag = {
@@ -200,56 +232,6 @@ sap.ui.define([
 				delete oManifestJSON[sChangesNamespace];
 			}
 		}
-	}
-
-	// the current sinon version used in UI5 does not support stubbing the constructor
-	ComponentLifecycleHooks._createVariantModel = function(oAppComponent) {
-		return new VariantModel({}, {
-			appComponent: oAppComponent
-		});
-	};
-
-	/**
-	 * Gets the changes and in case of existing changes, prepare the applyChanges function already with the changes.
-	 *
-	 * @param {object} oComponent - Component instance that is currently loading
-	 * @param {object} vConfig - Configuration of loaded component
-	 * @returns {Promise} Promise which resolves when all relevant tasks for changes propagation have been processed
-	 */
-	ComponentLifecycleHooks.instanceCreatedHook = async function(oComponent, vConfig) {
-		// if component's manifest is of type 'application' then only a flex controller and change persistence instances are created.
-		// if component's manifest is of type 'component' then no flex controller and change persistence instances are created.
-		// The variant model is fetched from the outer app component and applied on this component type.
-		if (Utils.isApplicationComponent(oComponent)) {
-			const oReturnPromise = await handleAppComponentInstanceCreated(oComponent, vConfig);
-			ComponentLifecycleHooks._componentInstantiationPromises.set(oComponent, oReturnPromise);
-			return oReturnPromise;
-		} else if (Utils.isEmbeddedComponent(oComponent)) {
-			const oAppComponent = Utils.getAppComponentForControl(oComponent);
-			// once the VModel is set to the outer component it also has to be set to any embedded component
-			if (ComponentLifecycleHooks._componentInstantiationPromises.has(oAppComponent)) {
-				await ComponentLifecycleHooks._componentInstantiationPromises.get(oAppComponent);
-				const oVariantModel = oAppComponent.getModel(ControlVariantApplyAPI.getVariantModelName());
-				oComponent.setModel(oVariantModel, ControlVariantApplyAPI.getVariantModelName());
-			}
-			ComponentLifecycleHooks._embeddedComponents[oAppComponent.getId()] ||= [];
-			ComponentLifecycleHooks._embeddedComponents[oAppComponent.getId()].push(oComponent);
-		}
-		return undefined;
-	};
-
-	/**
-	 * Callback which is called within the early state of Component processing.
-	 * Already triggers the loading of the flexibility changes if the loaded manifest is an application variant.
-	 * The processing is only done for components of the type "application"
-	 *
-	 * @param {object} oConfig - Copy of the configuration of loaded component
-	 * @param {object} oConfig.asyncHints - Async hints passed from the app index to the core Component processing
-	 * @param {object} oManifest - Copy of the manifest of loaded component
-	 * @returns {Promise} Resolves after all Manifest changes are applied
-	 */
-	ComponentLifecycleHooks.componentLoadedHook = function(...aArgs) {
-		return onLoadComponent(...aArgs);
 	};
 
 	async function fetchModelChanges(oPropertyBag) {
@@ -275,7 +257,6 @@ sap.ui.define([
 			componentData: oComponentData
 		});
 		try {
-			const aReturn = [];
 			// skipLoadBundle has to be true as there is no guarantee that the flex bundle is already available at this point
 			const mProperties = {
 				componentData: oComponentData,
@@ -286,31 +267,34 @@ sap.ui.define([
 				manifest: oManifest
 			};
 			const oFlexData = await Loader.getFlexData(mProperties);
-			if (StorageUtils.isStorageResponseFilled(oFlexData.data.changes)) {
-				const FlexState = await requireAsync("sap/ui/fl/apply/_internal/flexState/FlexState");
-				await FlexState.initialize({
-					...mProperties,
-					forceInvalidation: oFlexData.cacheInvalidated
-				});
-
-				const sServiceUrl = ODataUtils.removeOriginSegmentParameters(oPropertyBag.model.getServiceUrl());
-				const aRelevantAnnotationChanges = FlexState.getAnnotationChanges(sReference)
-				.filter((oAnnotationChange) => oAnnotationChange.getServiceUrl() === sServiceUrl);
-
-				for (const oAnnotationChange of aRelevantAnnotationChanges) {
-					try {
-						const oChangeHandler = await ChangeHandlerRegistration.getAnnotationChangeHandler({
-							changeType: oAnnotationChange.getChangeType()
-						});
-						aReturn.push(await oChangeHandler.applyChange(oAnnotationChange));
-						oAnnotationChange._appliedOnModel = true;
-					} catch (oError) {
-						// Continue with next change
-						Log.error(`Annotation change with id ${oAnnotationChange.getId()} could not be applied to the model`, oError);
-					}
-				}
+			if (!StorageUtils.isStorageResponseFilled(oFlexData.data.changes)) {
+				return [];
 			}
-			return aReturn;
+
+			const FlexState = await requireAsync("sap/ui/fl/apply/_internal/flexState/FlexState");
+			await FlexState.initialize({
+				...mProperties,
+				forceInvalidation: oFlexData.cacheInvalidated
+			});
+
+			const sServiceUrl = ODataUtils.removeOriginSegmentParameters(oPropertyBag.model.getServiceUrl());
+			const aRelevantAnnotationChanges = FlexState.getAnnotationChanges(sReference)
+			.filter((oAnnotationChange) => oAnnotationChange.getServiceUrl() === sServiceUrl);
+
+			return aRelevantAnnotationChanges.reduce(async (oPreviousPromise, oAnnotationChange) => {
+				const aReturn = await oPreviousPromise;
+				try {
+					const oChangeHandler = await ChangeHandlerRegistration.getAnnotationChangeHandler({
+						changeType: oAnnotationChange.getChangeType()
+					});
+					aReturn.push(await oChangeHandler.applyChange(oAnnotationChange));
+					oAnnotationChange._appliedOnModel = true;
+				} catch (oError) {
+					// Continue with next change
+					Log.error(`Annotation change with id ${oAnnotationChange.getId()} could not be applied to the model`, oError);
+				}
+				return aReturn;
+			}, Promise.resolve([]));
 		} catch (oError) {
 			Log.error("Annotation changes could not be applied.", oError);
 			return [];
@@ -343,12 +327,12 @@ sap.ui.define([
 	 * @param {object} oConfig.asyncHints - Async hints passed from the app index to the core Component processing
 	 * @param {object} [oConfig.componentData] - Component Data from the Component processing
 	 * @param {object} [oConfig.settings] - Object containing the componentData
-	 * @returns {Promise<object>} - Processed manifest
+	 * @returns {Promise<object>} - Resolves with the processed manifest
 	 */
 	ComponentLifecycleHooks.preprocessManifest = async function(oManifest, oConfig) {
 		// stop processing if the component is not of the type application or component ID is missing
 		if (!Utils.isApplication(oManifest, true) || !oConfig.id) {
-			return Promise.resolve(oManifest);
+			return oManifest;
 		}
 
 		const oComponentData = oConfig.componentData || {};
@@ -366,20 +350,6 @@ sap.ui.define([
 		});
 		const bFlexObjectAvailable = StorageUtils.isStorageResponseFilled(oFlexData.data.changes);
 
-		// in case the asyncHints already mention that there is no change for the manifest, just trigger the loading
-		if (!ManifestUtils.getChangeManifestFromAsyncHints(oConfig.asyncHints, sReference)) {
-			checkForChangesAndInitializeFlexState({
-				...oConfig,
-				rawManifest: oManifest,
-				componentId: oConfig.id,
-				reference: sReference,
-				skipLoadBundle: true,
-				forceInvalidation: oFlexData.cacheInvalidated
-			}, oFlexData);
-
-			return Promise.resolve(oManifest);
-		}
-
 		if (bFlexObjectAvailable) {
 			await checkForChangesAndInitializeFlexState({
 				...oConfig,
@@ -394,7 +364,7 @@ sap.ui.define([
 			return Applier.applyChanges(oManifestCopy);
 		}
 
-		return Promise.resolve(oManifest);
+		return oManifest;
 	};
 
 	return ComponentLifecycleHooks;

@@ -306,8 +306,6 @@ sap.ui.define([
 									var oItem = oEvent.getParameter("item");
 									var sBackground = oItem.getKey();
 									oLayout1.setBackgroundDesign(sBackground);
-									oLayout2.setBackgroundDesign(sBackground);
-									oLayout3.setBackgroundDesign(sBackground);
 									oLayout4.setBackgroundDesign(sBackground);
 									oLayout5.setBackgroundDesign(sBackground);
 								}
