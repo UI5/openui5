@@ -126,8 +126,7 @@
 					"sap.ui.mdc.demokit.sample.table.TableExport",
 					"sap.ui.mdc.demokit.sample.table.TableCopyPaste",
 					"sap.ui.mdc.demokit.sample.table.TreeTable",
-					"sap.ui.mdc.demokit.sample.table.UploadSetwithTablePlugin",
-					"sap.ui.mdc.demokit.sample.table.TableActions"
+					"sap.ui.mdc.demokit.sample.table.UploadSetwithTablePlugin"
 				]
 			},
 			{
@@ -313,10 +312,6 @@
 				"id": "sap.ui.mdc.demokit.sample.table.TreeTable",
 				"name": "Table - with hierarchy",
 				"description": "A table displaying a hierarchy."
-			},{
-				"id": "sap.ui.mdc.demokit.sample.table.TableActions",
-				"name": "Table - with toolbar actions",
-				"description": "A table with standard actions, application-specific table actions, and business actions defined by the tableActions and actions aggregations using the ActionLayoutData."
 			}
 		]
 	}
