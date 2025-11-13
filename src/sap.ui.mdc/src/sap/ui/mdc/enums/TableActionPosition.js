@@ -9,7 +9,6 @@ sap.ui.define(["sap/ui/base/DataType"], (DataType) => {
 	 * Defines the supported positions for table-relevant actions within the table toolbar, in accordance with the {@link https://www.sap.com/design-system/fiori-design-web/ui-elements/table-bar/ SAP Design System}.
 	 *
 	 * @enum {string}
-	 * @private
 	 * @alias sap.ui.mdc.enums.TableActionPosition
 	 * @since 1.143
 	 * @public
@@ -68,7 +67,7 @@ sap.ui.define(["sap/ui/base/DataType"], (DataType) => {
 
 		/**
 		 * Extension point for the personalization actions inserted after the first and before the second group of predefined actions.
-		 * These actions change the arrangement or personalization of the table on an item level, such as Expand/Collapse Node, Show/Hide Details, Table Settings.
+		 * These actions change the arrangement or personalization of the table at the item level, such as Expand/Collapse Node, Show/Hide Details, Table Settings.
 		 * @public
 		 */
 		PersonalizationActionsMiddle: "PersonalizationActionsMiddle",
@@ -88,7 +87,7 @@ sap.ui.define(["sap/ui/base/DataType"], (DataType) => {
 
 		/**
 		 * Extension point for the export actions at the start of the group.
-		 * These actions convert the content of the table into an external format, such as Excel, PDF, Print.
+		 * These actions convert the content of the table into an external format, such as Excel, PDF, a printed document.
 		 * @public
 		 */
 		ExportActions: "ExportActions",
@@ -108,7 +107,7 @@ sap.ui.define(["sap/ui/base/DataType"], (DataType) => {
 
 		/**
 		 * Extension point for actions displayed after all table-relevant actions.
-		 * These actions allow applications to add additional functionality, such as Pagination, Refresh.
+		 * These actions allow applications to add additional functionality, such as pagination, refresh.
 		 * @public
 		 */
 		EndActions: "EndActions"
