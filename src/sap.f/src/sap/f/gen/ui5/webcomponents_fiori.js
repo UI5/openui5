@@ -12,109 +12,100 @@ sap.ui.define(
     "use strict";
     const { registerEnum } = DataType;
 
-    const pkg = {
-      _ui5metadata: {
-        name: "sap/f/gen/ui5/webcomponents_fiori",
-        version: "2.15.0",
-        dependencies: ["sap.ui.core"],
-        types: [
-          "sap.f.gen.ui5.webcomponents_fiori.FCLLayout",
-          "sap.f.gen.ui5.webcomponents_fiori.IllustrationMessageDesign",
-          "sap.f.gen.ui5.webcomponents_fiori.IllustrationMessageType",
-          "sap.f.gen.ui5.webcomponents_fiori.MediaGalleryItemLayout",
-          "sap.f.gen.ui5.webcomponents_fiori.MediaGalleryLayout",
-          "sap.f.gen.ui5.webcomponents_fiori.MediaGalleryMenuHorizontalAlign",
-          "sap.f.gen.ui5.webcomponents_fiori.MediaGalleryMenuVerticalAlign",
-          "sap.f.gen.ui5.webcomponents_fiori.NavigationLayoutMode",
-          "sap.f.gen.ui5.webcomponents_fiori.NotificationListItemImportance",
-          "sap.f.gen.ui5.webcomponents_fiori.PageBackgroundDesign",
-          "sap.f.gen.ui5.webcomponents_fiori.SearchMode",
-          "sap.f.gen.ui5.webcomponents_fiori.SideContentFallDown",
-          "sap.f.gen.ui5.webcomponents_fiori.SideContentPosition",
-          "sap.f.gen.ui5.webcomponents_fiori.SideContentVisibility",
-          "sap.f.gen.ui5.webcomponents_fiori.SideNavigationItemDesign",
-          "sap.f.gen.ui5.webcomponents_fiori.TimelineGrowingMode",
-          "sap.f.gen.ui5.webcomponents_fiori.TimelineLayout",
-          "sap.f.gen.ui5.webcomponents_fiori.UploadCollectionSelectionMode",
-          "sap.f.gen.ui5.webcomponents_fiori.UploadState",
-          "sap.f.gen.ui5.webcomponents_fiori.ViewSettingsDialogMode",
-          "sap.f.gen.ui5.webcomponents_fiori.WizardContentLayout"
-        ],
-        interfaces: [
-          "sap.f.gen.ui5.webcomponents_fiori.IMediaGalleryItem",
-          "sap.f.gen.ui5.webcomponents_fiori.IProductSwitchItem",
-          "sap.f.gen.ui5.webcomponents_fiori.ISearchScope",
-          "sap.f.gen.ui5.webcomponents_fiori.ITimelineItem"
-        ],
-        controls: [
-          "sap.f.gen.ui5.webcomponents_fiori.dist.BarcodeScannerDialog",
-          "sap.f.gen.ui5.webcomponents_fiori.dist.DynamicPage",
-          "sap.f.gen.ui5.webcomponents_fiori.dist.DynamicPageHeader",
-          "sap.f.gen.ui5.webcomponents_fiori.dist.DynamicPageTitle",
-          "sap.f.gen.ui5.webcomponents_fiori.dist.DynamicSideContent",
-          "sap.f.gen.ui5.webcomponents_fiori.dist.FilterItem",
-          "sap.f.gen.ui5.webcomponents_fiori.dist.FilterItemOption",
-          "sap.f.gen.ui5.webcomponents_fiori.dist.FlexibleColumnLayout",
-          "sap.f.gen.ui5.webcomponents_fiori.dist.GroupItem",
-          "sap.f.gen.ui5.webcomponents_fiori.dist.IllustratedMessage",
-          "sap.f.gen.ui5.webcomponents_fiori.dist.MediaGallery",
-          "sap.f.gen.ui5.webcomponents_fiori.dist.MediaGalleryItem",
-          "sap.f.gen.ui5.webcomponents_fiori.dist.NavigationLayout",
-          "sap.f.gen.ui5.webcomponents_fiori.dist.NotificationList",
-          "sap.f.gen.ui5.webcomponents_fiori.dist.NotificationListGroupItem",
-          "sap.f.gen.ui5.webcomponents_fiori.dist.NotificationListItem",
-          "sap.f.gen.ui5.webcomponents_fiori.dist.Page",
-          "sap.f.gen.ui5.webcomponents_fiori.dist.ProductSwitch",
-          "sap.f.gen.ui5.webcomponents_fiori.dist.ProductSwitchItem",
-          "sap.f.gen.ui5.webcomponents_fiori.dist.Search",
-          "sap.f.gen.ui5.webcomponents_fiori.dist.SearchItem",
-          "sap.f.gen.ui5.webcomponents_fiori.dist.SearchItemGroup",
-          "sap.f.gen.ui5.webcomponents_fiori.dist.SearchItemShowMore",
-          "sap.f.gen.ui5.webcomponents_fiori.dist.SearchMessageArea",
-          "sap.f.gen.ui5.webcomponents_fiori.dist.SearchScope",
-          "sap.f.gen.ui5.webcomponents_fiori.dist.ShellBar",
-          "sap.f.gen.ui5.webcomponents_fiori.dist.ShellBarBranding",
-          "sap.f.gen.ui5.webcomponents_fiori.dist.ShellBarItem",
-          "sap.f.gen.ui5.webcomponents_fiori.dist.ShellBarSearch",
-          "sap.f.gen.ui5.webcomponents_fiori.dist.ShellBarSpacer",
-          "sap.f.gen.ui5.webcomponents_fiori.dist.SideNavigation",
-          "sap.f.gen.ui5.webcomponents_fiori.dist.SideNavigationGroup",
-          "sap.f.gen.ui5.webcomponents_fiori.dist.SideNavigationItem",
-          "sap.f.gen.ui5.webcomponents_fiori.dist.SideNavigationSubItem",
-          "sap.f.gen.ui5.webcomponents_fiori.dist.SortItem",
-          "sap.f.gen.ui5.webcomponents_fiori.dist.Timeline",
-          "sap.f.gen.ui5.webcomponents_fiori.dist.TimelineGroupItem",
-          "sap.f.gen.ui5.webcomponents_fiori.dist.TimelineItem",
-          "sap.f.gen.ui5.webcomponents_fiori.dist.UploadCollection",
-          "sap.f.gen.ui5.webcomponents_fiori.dist.UploadCollectionItem",
-          "sap.f.gen.ui5.webcomponents_fiori.dist.UserMenu",
-          "sap.f.gen.ui5.webcomponents_fiori.dist.UserMenuAccount",
-          "sap.f.gen.ui5.webcomponents_fiori.dist.UserMenuItem",
-          "sap.f.gen.ui5.webcomponents_fiori.dist.UserMenuItemGroup",
-          "sap.f.gen.ui5.webcomponents_fiori.dist.UserSettingsDialog",
-          "sap.f.gen.ui5.webcomponents_fiori.dist.UserSettingsItem",
-          "sap.f.gen.ui5.webcomponents_fiori.dist.UserSettingsView",
-          "sap.f.gen.ui5.webcomponents_fiori.dist.ViewSettingsDialog",
-          "sap.f.gen.ui5.webcomponents_fiori.dist.Wizard",
-          "sap.f.gen.ui5.webcomponents_fiori.dist.WizardStep"
-        ],
-        elements: [],
-        rootPath: "../"
-      }
+    // re-export package object
+    const pkg = Object.assign({}, WebCPackage);
+
+    // export the UI5 metadata along with the package
+    pkg["_ui5metadata"] = {
+      name: "sap/f/gen/ui5/webcomponents_fiori",
+      version: "2.15.0",
+      dependencies: ["sap.ui.core"],
+      types: [
+        "sap.f.gen.ui5.webcomponents_fiori.FCLLayout",
+        "sap.f.gen.ui5.webcomponents_fiori.IllustrationMessageDesign",
+        "sap.f.gen.ui5.webcomponents_fiori.IllustrationMessageType",
+        "sap.f.gen.ui5.webcomponents_fiori.MediaGalleryItemLayout",
+        "sap.f.gen.ui5.webcomponents_fiori.MediaGalleryLayout",
+        "sap.f.gen.ui5.webcomponents_fiori.MediaGalleryMenuHorizontalAlign",
+        "sap.f.gen.ui5.webcomponents_fiori.MediaGalleryMenuVerticalAlign",
+        "sap.f.gen.ui5.webcomponents_fiori.NavigationLayoutMode",
+        "sap.f.gen.ui5.webcomponents_fiori.NotificationListItemImportance",
+        "sap.f.gen.ui5.webcomponents_fiori.PageBackgroundDesign",
+        "sap.f.gen.ui5.webcomponents_fiori.SearchMode",
+        "sap.f.gen.ui5.webcomponents_fiori.SideContentFallDown",
+        "sap.f.gen.ui5.webcomponents_fiori.SideContentPosition",
+        "sap.f.gen.ui5.webcomponents_fiori.SideContentVisibility",
+        "sap.f.gen.ui5.webcomponents_fiori.SideNavigationItemDesign",
+        "sap.f.gen.ui5.webcomponents_fiori.TimelineGrowingMode",
+        "sap.f.gen.ui5.webcomponents_fiori.TimelineLayout",
+        "sap.f.gen.ui5.webcomponents_fiori.UploadCollectionSelectionMode",
+        "sap.f.gen.ui5.webcomponents_fiori.UploadState",
+        "sap.f.gen.ui5.webcomponents_fiori.ViewSettingsDialogMode",
+        "sap.f.gen.ui5.webcomponents_fiori.WizardContentLayout"
+      ],
+      interfaces: [
+        "sap.f.gen.ui5.webcomponents_fiori.IMediaGalleryItem",
+        "sap.f.gen.ui5.webcomponents_fiori.IProductSwitchItem",
+        "sap.f.gen.ui5.webcomponents_fiori.ISearchScope",
+        "sap.f.gen.ui5.webcomponents_fiori.ITimelineItem"
+      ],
+      controls: [
+        "sap.f.gen.ui5.webcomponents_fiori.dist.BarcodeScannerDialog",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.DynamicPage",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.DynamicPageHeader",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.DynamicPageTitle",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.DynamicSideContent",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.FilterItem",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.FilterItemOption",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.FlexibleColumnLayout",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.GroupItem",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.IllustratedMessage",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.MediaGallery",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.MediaGalleryItem",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.NavigationLayout",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.NotificationList",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.NotificationListGroupItem",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.NotificationListItem",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.Page",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.ProductSwitch",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.ProductSwitchItem",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.Search",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.SearchItem",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.SearchItemGroup",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.SearchItemShowMore",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.SearchMessageArea",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.SearchScope",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.ShellBar",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.ShellBarBranding",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.ShellBarItem",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.ShellBarSearch",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.ShellBarSpacer",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.SideNavigation",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.SideNavigationGroup",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.SideNavigationItem",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.SideNavigationSubItem",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.SortItem",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.Timeline",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.TimelineGroupItem",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.TimelineItem",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.UploadCollection",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.UploadCollectionItem",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.UserMenu",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.UserMenuAccount",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.UserMenuItem",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.UserMenuItemGroup",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.UserSettingsDialog",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.UserSettingsItem",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.UserSettingsView",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.ViewSettingsDialog",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.Wizard",
+        "sap.f.gen.ui5.webcomponents_fiori.dist.WizardStep"
+      ],
+      elements: [],
+      rootPath: "../"
     };
 
-    if (WebCPackage) {
-      Object.keys(WebCPackage).forEach((key) => {
-        if (key !== "default") {
-          pkg[key] = WebCPackage[key];
-        } else {
-          if (typeof WebCPackage[key] === "object") {
-            Object.assign(pkg, WebCPackage[key]);
-          }
-        }
-      });
-    }
-
+    // Enums
     /**
      * Different types of FCLLayout.
      *
@@ -1646,6 +1637,9 @@ sap.ui.define(
      * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori ITimelineItem
      * @private
      */
+
+    // marker to threat this as an ES module to support named exports
+    pkg.__esModule = true;
 
     return pkg;
   }

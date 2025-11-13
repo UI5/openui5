@@ -1,4 +1,4 @@
-sap.ui.define(['sap/f/thirdparty/webcomponents-base', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/Icons'], (function (webcomponentsBase, webcomponents, webcomponentsFiori, Icons) { 'use strict';
+sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Icons'], (function (webcomponentsBase, Icons) { 'use strict';
 
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -6,7 +6,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-base', 'sap/f/thirdparty/webcompo
         else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
         return c > 3 && r && Object.defineProperty(target, key, r), r;
     };
-    let UserMenuAccount = 
+    let UserMenuAccount =
     /**
      * @class
      * ### Overview

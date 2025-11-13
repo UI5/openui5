@@ -1,4 +1,4 @@
-sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-base', 'sap/f/thirdparty/parameters-bundle.css2', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/parameters-bundle.css'], (function (exports, webcomponentsBase, parametersBundle_css, eventStrict, Icons, parametersBundle_css$1) { 'use strict';
+sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/parameters-bundle.css2', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/parameters-bundle.css'], (function (exports, webcomponentsBase, parametersBundle_css, eventStrict, Icons, parametersBundle_css$1) { 'use strict';
 
     function IconTemplate() {
         return (parametersBundle_css.jsxs("svg", { class: "ui5-icon-root", part: "root", tabindex: this._tabIndex, dir: this._dir, viewBox: this.viewBox, role: this.effectiveAccessibleRole, focusable: "false", preserveAspectRatio: "xMidYMid meet", "aria-label": this.effectiveAccessibleName, "aria-hidden": this.effectiveAriaHidden, xmlns: "http://www.w3.org/2000/svg", onKeyDown: this._onkeydown, onKeyUp: this._onkeyup, children: [this.hasIconTooltip &&
@@ -44,7 +44,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-base', 'sap/f/thirdpar
     })(IconMode || (IconMode = {}));
     var IconMode$1 = IconMode;
 
-    Icons.p("@" + "ui5" + "/" + "sap/f/thirdparty/webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
+    Icons.p("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
     Icons.p("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme);
     var iconCss = `:host{-webkit-tap-highlight-color:rgba(0,0,0,0)}:host([hidden]){display:none}:host([invalid]){display:none}:host(:not([hidden]).ui5_hovered){opacity:.7}:host{display:inline-block;width:1rem;height:1rem;color:var(--sapContent_IconColor);fill:currentColor;outline:none}:host([design="Contrast"]){color:var(--sapContent_ContrastIconColor)}:host([design="Critical"]){color:var(--sapCriticalElementColor)}:host([design="Information"]){color:var(--sapInformativeElementColor)}:host([design="Negative"]){color:var(--sapNegativeElementColor)}:host([design="Neutral"]){color:var(--sapNeutralElementColor)}:host([design="NonInteractive"]){color:var(--sapContent_NonInteractiveIconColor)}:host([design="Positive"]){color:var(--sapPositiveElementColor)}:host([mode="Interactive"][desktop]) .ui5-icon-root:focus,:host([mode="Interactive"]) .ui5-icon-root:focus-visible{outline:var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);border-radius:var(--ui5-v2-15-0-icon-focus-border-radius)}.ui5-icon-root{display:flex;height:100%;width:100%;outline:none;vertical-align:top}:host([mode="Interactive"]){cursor:pointer}.ui5-icon-root:not([dir=ltr])>g{transform:var(--_ui5-v2-15-0_icon_transform_scale);transform-origin:center}
 `;
@@ -94,15 +94,15 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-base', 'sap/f/thirdpar
      *
      * For the standard "SAP-icons" icon collection, import an icon from the `@ui5/webcomponents-icons` package:
      *
-     * `import "sap/f/gen/ui5/webcomponents-icons/dist/employee.js";`
+     * `import "@ui5/webcomponents-icons/dist/employee.js";`
      *
      * For the "tnt" (SAP Fiori Tools) icon collection, import an icon from the `@ui5/webcomponents-icons-tnt` package:
      *
-     * `import "sap/f/gen/ui5/webcomponents-icons-tnt/dist/antenna.js";`
+     * `import "@ui5/webcomponents-icons-tnt/dist/antenna.js";`
      *
      * For the "business-suite" (SAP Business Suite) icon collection, import an icon from the `@ui5/webcomponents-icons-business-suite` package:
      *
-     * `import "sap/f/gen/ui5/webcomponents-icons-business-suite/dist/ab-testing.js";`
+     * `import "@ui5/webcomponents-icons-business-suite/dist/ab-testing.js";`
      *
      * 4. **Display the icon using the `ui5-icon` web component.**
      * Set the icon collection ("SAP-icons", "tnt" or "business-suite" - "SAP-icons" is the default icon collection and can be skipped)
@@ -119,7 +119,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-base', 'sap/f/thirdpar
      *
      * ### ES6 Module Import
      *
-     * `import "sap/f/gen/ui5/webcomponents/dist/Icon.js";`
+     * `import "@ui5/webcomponents/dist/Icon.js";`
      * @csspart root - Used to style the outermost wrapper of the `ui5-icon`.
      * @constructor
      * @extends UI5Element
@@ -220,7 +220,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-base', 'sap/f/thirdpar
             if (iconData === ICON_NOT_FOUND) {
                 this.invalid = true;
                 /* eslint-disable-next-line */
-                return console.warn(`Required icon is not registered. You can either import the icon as a module in order to use it e.g. "sap/f/gen/ui5/webcomponents-icons/dist/${name.replace("sap-icon://", "")}.js", or setup a JSON build step and import "sap/f/gen/ui5/webcomponents-icons/dist/AllIcons.js".`);
+                return console.warn(`Required icon is not registered. You can either import the icon as a module in order to use it e.g. "@ui5/webcomponents-icons/dist/${name.replace("sap-icon://", "")}.js", or setup a JSON build step and import "@ui5/webcomponents-icons/dist/AllIcons.js".`);
             }
             this.viewBox = iconData.viewBox || "0 0 512 512";
             if ("customTemplate" in iconData && iconData.customTemplate) {
