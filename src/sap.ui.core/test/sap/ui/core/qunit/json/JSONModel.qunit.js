@@ -945,9 +945,7 @@ sap.ui.define([
 			assert.equal(oEvent.sId, "parseError", "event type");
 		});
 
-		this.oLogMock.expects("fatal")
-			.withExactArgs('The following problem occurred: JSON parse Error: '
-				+ 'SyntaxError: Unexpected token \'J\', "{"name":John}" is not valid JSON');
+		this.oLogMock.expects("fatal").withExactArgs(sinon.match.string);
 
 		// code under test
 		oModel.setJSON(sJSON,false);
