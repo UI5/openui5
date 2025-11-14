@@ -24,11 +24,11 @@ sap.ui.define(
      *
      * **Note:** By default the “BeforeSearch” illustration is loaded. To use other illustrations, make sure you import them in addition, for example:
      *
-     * `import "sap/f/gen/ui5/webcomponents_fiori/dist/illustrations/NoData.js"`
+     * `import "@ui5/webcomponents-fiori/dist/illustrations/NoData.js"`
      *
      * **Note:** Illustrations starting with the “Tnt” prefix are part of another illustration set. For example to use the “TntSuccess” illustration, add the following import::
      *
-     * `import "sap/f/gen/ui5/webcomponents_fiori/dist/illustrations/tnt/Success.js"`
+     * `import "@ui5/webcomponents-fiori/dist/illustrations/tnt/Success.js"`
      *
      * ### Structure
      * The IllustratedMessage consists of the following elements, which are displayed below each other in the following order:
@@ -44,7 +44,7 @@ sap.ui.define(
      *
      * ### ES6 Module Import
      *
-     * `import "sap/f/gen/ui5/webcomponents_fiori/dist/IllustratedMessage.js";`
+     * `import "@ui5/webcomponents-fiori/dist/IllustratedMessage.js";`
      *
      * @extends sap.ui.core.webc.WebComponent
      * @constructor
@@ -56,7 +56,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents_fiori.dist.IllustratedMessage",
       {
         metadata: {
-          tag: "ui5-illustrated-message-87689b96",
+          tag: "ui5-illustrated-message-cc48984a",
 
           namespace: "sap.f.gen.ui5.webcomponents_fiori",
 

@@ -908,7 +908,11 @@ sap.ui.define([
 			afterClose: function () {
 				oDialog.destroy();
 			},
-			escapeHandler: (oPromise) => { oPromise?.reject();}
+			escapeHandler: (oPromise) => {
+				oDialog.close();
+				this.fireItemRenameCanceled({item: oItem});
+				oPromise?.reject();
+			}
 		});
 
 		return oDialog;

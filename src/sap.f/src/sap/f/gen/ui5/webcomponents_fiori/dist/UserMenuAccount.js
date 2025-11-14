@@ -17,7 +17,7 @@ sap.ui.define(
      * The `ui5-user-menu-account` represents an account in the `ui5-user-menu`.
      *
      * ### ES6 Module Import
-     * `import "sap/f/gen/ui5/webcomponents_fiori/dist/UserMenuAccount.js";`
+     * `import "@ui5/webcomponents-fiori/dist/UserMenuAccount.js";`
      *
      * @extends sap.ui.core.webc.WebComponent
      * @constructor
@@ -29,7 +29,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents_fiori.dist.UserMenuAccount",
       {
         metadata: {
-          tag: "ui5-user-menu-account-87689b96",
+          tag: "ui5-user-menu-account-cc48984a",
 
           namespace: "sap.f.gen.ui5.webcomponents_fiori",
 

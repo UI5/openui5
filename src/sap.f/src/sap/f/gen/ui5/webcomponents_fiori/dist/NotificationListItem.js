@@ -46,7 +46,7 @@ sap.ui.define(
      *
      * ### ES6 Module Import
      *
-     * `import "sap/f/gen/ui5/webcomponents_fiori/dist/NotificationListItem.js";`
+     * `import "@ui5/webcomponents-fiori/dist/NotificationListItem.js";`
      *
      * @extends module:sap/f/gen/ui5/webcomponents_fiori/dist/NotificationListItemBase
      * @constructor
@@ -58,7 +58,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents_fiori.dist.NotificationListItem",
       {
         metadata: {
-          tag: "ui5-li-notification-87689b96",
+          tag: "ui5-li-notification-cc48984a",
 
           namespace: "sap.f.gen.ui5.webcomponents_fiori",
 

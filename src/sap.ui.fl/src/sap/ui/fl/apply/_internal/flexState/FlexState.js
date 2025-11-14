@@ -341,12 +341,13 @@ sap.ui.define([
 		return mFilteredReturn;
 	}
 
-	function prepareNewInstance(mPropertyBag) {
+	function prepareNewInstance(mPropertyBag, sLoaderCacheKey) {
 		// The following line is used by the Flex Support Tool to set breakpoints - please adjust the tool if you change it!
 		_mInstances[mPropertyBag.reference] = merge({}, {
 			componentId: mPropertyBag.componentId,
 			componentData: mPropertyBag.componentData,
-			skipLoadBundle: mPropertyBag.skipLoadBundle
+			skipLoadBundle: mPropertyBag.skipLoadBundle,
+			loaderCacheKey: sLoaderCacheKey
 		});
 	}
 
@@ -402,7 +403,6 @@ sap.ui.define([
 	 * @param {string} [mPropertyBag.componentData] - Component data of the current component
 	 * @param {object} [mPropertyBag.asyncHints] - Async hints passed from the app index to the component processing
 	 * @param {boolean} [mPropertyBag.skipLoadBundle=false] - If true state is initialized partially and does not include flex bundles
-	 * @param {boolean} [mPropertyBag.forceInvalidation=false] - Make sure that the cache is invalidated during initialization
 	 * @returns {Promise<undefined>} Resolves a promise as soon as FlexState is initialized
 	 */
 	FlexState.initialize = async function(mPropertyBag) {
@@ -419,19 +419,18 @@ sap.ui.define([
 			await oOldInitPromise.promise;
 		}
 
-		const oFlexData = await Loader.getFlexData(mProperties);
+		const oLoaderData = await Loader.getFlexData(mProperties);
 		if (
 			!_mInstances[mProperties.reference]?.storageResponse
-			|| oFlexData.cacheInvalidated
-			|| mProperties.forceInvalidation
+			|| oLoaderData.parameters.loaderCacheKey !== _mInstances[mProperties.reference].loaderCacheKey
 			|| checkComponentIdChanged(mProperties)
 		) {
-			prepareNewInstance(mProperties);
+			prepareNewInstance(mProperties, oLoaderData.parameters.loaderCacheKey);
 		} else {
-			rebuildResponseIfMaxLayerChanged(mProperties.reference, oFlexData.data);
+			rebuildResponseIfMaxLayerChanged(mProperties.reference, oLoaderData.data);
 		}
 
-		initializeNewInstance(mProperties, oFlexData.data);
+		initializeNewInstance(mProperties, oLoaderData.data);
 		oNewInitPromise.resolve();
 	};
 
@@ -479,7 +478,8 @@ sap.ui.define([
 		}
 		const oResult = await Loader.loadFlVariant(mPropertyBag);
 		const oInstance = _mInstances[mPropertyBag.reference];
-		oInstance.storageResponse = filterByMaxLayer(mPropertyBag.reference, oResult.completeData);
+		oInstance.loaderCacheKey = oResult.completeLoaderData.parameters.loaderCacheKey;
+		oInstance.storageResponse = filterByMaxLayer(mPropertyBag.reference, oResult.completeLoaderData.data);
 		oInstance.runtimePersistence.flexObjects =
 		[
 			...oInstance.runtimePersistence.flexObjects,
@@ -509,7 +509,7 @@ sap.ui.define([
 		await oOldInitPromise;
 		mPropertyBag.reInitialize = true;
 		const oResponse = await Loader.getFlexData(mPropertyBag);
-		prepareNewInstance(mPropertyBag);
+		prepareNewInstance(mPropertyBag, oResponse.parameters.loaderCacheKey);
 		_mInstances[sReference].storageResponse = filterByMaxLayer(sReference, oResponse.data);
 		const bUpdated = updateRuntimePersistence(
 			sReference,
@@ -532,7 +532,8 @@ sap.ui.define([
 	FlexState.update = function(sReference, aUpdates) {
 		const aFlexObjectUpdates = [];
 		StorageUtils.updateStorageResponse(_mInstances[sReference].storageResponse, aUpdates);
-		Loader.updateCachedResponse(sReference, aUpdates);
+		const sNewLoaderCacheKey = Loader.updateCachedResponse(sReference, aUpdates);
+		_mInstances[sReference].loaderCacheKey = sNewLoaderCacheKey;
 		aUpdates.forEach((oUpdate) => {
 			if (oUpdate.type !== "ui2") {
 				// In some scenarios the runtime persistence is already updated

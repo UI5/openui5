@@ -5,7 +5,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/informatio
 	const ltr$1 = false;
 	const accData$1 = information.ICON_OVERFLOW;
 	const collection$1 = "SAP-icons-v4";
-	const packageName$1 = "sap/f/gen/ui5/webcomponents-icons";
+	const packageName$1 = "@ui5/webcomponents-icons";
 
 	Icons.y(name$1, { pathData: pathData$1, ltr: ltr$1, accData: accData$1, collection: collection$1, packageName: packageName$1 });
 
@@ -14,7 +14,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/informatio
 	const ltr = false;
 	const accData = information.ICON_OVERFLOW;
 	const collection = "SAP-icons-v5";
-	const packageName = "sap/f/gen/ui5/webcomponents-icons";
+	const packageName = "@ui5/webcomponents-icons";
 
 	Icons.y(name, { pathData, ltr, accData, collection, packageName });
 

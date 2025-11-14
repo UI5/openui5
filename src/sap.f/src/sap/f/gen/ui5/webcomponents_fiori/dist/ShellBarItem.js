@@ -16,7 +16,7 @@ sap.ui.define(
      * might be added to the `ui5-shellbar`.
      *
      * ### ES6 Module Import
-     * `import "sap/f/gen/ui5/webcomponents_fiori/dist/ShellBarItem.js";`
+     * `import "@ui5/webcomponents-fiori/dist/ShellBarItem.js";`
      *
      * @extends sap.ui.core.webc.WebComponent
      * @constructor
@@ -28,7 +28,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents_fiori.dist.ShellBarItem",
       {
         metadata: {
-          tag: "ui5-shellbar-item-87689b96",
+          tag: "ui5-shellbar-item-cc48984a",
 
           namespace: "sap.f.gen.ui5.webcomponents_fiori",
 

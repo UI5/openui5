@@ -1,4 +1,4 @@
-sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-base', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/FocusableElements', 'sap/f/thirdparty/i18n-defaults'], (function (exports, webcomponentsBase, parametersBundle_css, ListItemBase, FocusableElements, i18nDefaults) { 'use strict';
+sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/FocusableElements', 'sap/f/thirdparty/i18n-defaults'], (function (exports, webcomponentsBase, parametersBundle_css, ListItemBase, FocusableElements, i18nDefaults) { 'use strict';
 
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -90,7 +90,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-base', 'sap/f/thirdpar
         webcomponentsBase.s({ type: Number })
     ], NotificationListItemBase.prototype, "loadingDelay", void 0);
     __decorate([
-        parametersBundle_css.i("sap/f/gen/ui5/webcomponents_fiori")
+        parametersBundle_css.i("@ui5/webcomponents-fiori")
     ], NotificationListItemBase, "i18nFioriBundle", void 0);
 
     exports.NotificationListItemBase = NotificationListItemBase;

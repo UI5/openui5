@@ -31,11 +31,12 @@ sap.ui.define([
 	"sap/ui/codeeditor/CodeEditor",
 	"sap/m/Button",
 	"sap/ui/table/TreeTable",
-	"sap/m/MessageBox"
+	"sap/m/MessageBox",
+	"sap/ui/events/KeyCodes"
 ], function (Text, MTable, MColumn, ColumnListItem, UploadSetwithTable, MDCTable, MDCColumn, JSONModel,
 			qutils, nextUIUpdate, GridColumn, GridTable, TemplateHelper, ActionsPlaceholder, OverflowToolbar,
 			Uploader, Boolean, EventBase, UploadItem, mLibrary, Log, Event, UploadItemConfiguration, Dialog,
-			FilePreviewDialog, CodeEditor, Button, TreeTable, MessageBox) {
+			FilePreviewDialog, CodeEditor, Button, TreeTable, MessageBox, KeyCodes) {
 	"use strict";
 
 	const oJSONModel = new JSONModel();
@@ -1129,6 +1130,65 @@ sap.ui.define([
 			// Simulate user pressing discard
 			mOptions.onClose(mOptions.actions[1]); // assuming first action is discard
 		}
+	});
+	this.stub(oUploadSetwithTablePlugin, "_getFileRenameDialog").callsFake(function () {
+		oDialog.open();
+		return oDialog;
+	});
+
+	const oContext = oTable?._oTable?.getItems()[0]?.getBindingContext();
+	oUploadSetwithTablePlugin.renameItem(oContext);
+	oTable.destroy();
+
+	});
+
+	QUnit.test("File rename dialog should be closed on press of ESC and must trigger ItemRenameCanceled event and must not trigger model updates", async function (assert) {
+
+	const done = assert.async();
+
+	// arrange
+	const oTable = await createMDCTable();
+
+	const oRow = new UploadItemConfiguration({
+		fileNamePath: "fileName",
+		urlPath: "imageUrl",
+		mediaTypePath: "mediaType",
+		fileSizePath: "size"
+	});
+
+	const oUploadSetwithTablePlugin = new UploadSetwithTable({
+		rowConfiguration: oRow
+	});
+
+	oTable.addDependent(oUploadSetwithTablePlugin);
+	await oTable.initialized();
+	await nextUIUpdate();
+
+	// act
+	const oComputedItem = new UploadItem({
+		fileName: "Invoice summary.doc",
+		mediaType: "application/msword",
+		fileSize: 200
+	});
+	this.stub(oUploadSetwithTablePlugin, "getItemForContext").returns(oComputedItem);
+	const oDialog = oUploadSetwithTablePlugin._getFileRenameDialog(oComputedItem);
+
+	const oInvalidateSpy = this.spy(oComputedItem, "invalidate");
+	const oItemRenameCanceledEventSpy = this.spy(oUploadSetwithTablePlugin, "fireItemRenameCanceled");
+
+	function fnRenameCancelledHandler() {
+		assert.ok(oItemRenameCanceledEventSpy.called, "ItemRenameCancelled event is fired successfully");
+		assert.ok(oInvalidateSpy.notCalled, "Item model is not updated");
+	}
+
+	oDialog.attachAfterOpen(async () => {
+		oUploadSetwithTablePlugin.attachItemRenameCanceled(fnRenameCancelledHandler);
+		qutils.triggerKeydown(oDialog.getDomRef(), KeyCodes.ESCAPE);
+		await nextUIUpdate();
+	});
+	oDialog.attachAfterClose(() => {
+		assert.strictEqual(oDialog.isOpen(), false, 'Dialog should be closed.');
+		done();
 	});
 	this.stub(oUploadSetwithTablePlugin, "_getFileRenameDialog").callsFake(function () {
 		oDialog.open();

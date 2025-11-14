@@ -4,8 +4,8 @@
 
 sap.ui.define([
 	"sap/base/util/Deferred",
-	"sap/base/util/merge",
 	"sap/base/util/ObjectPath",
+	"sap/base/util/uid",
 	"sap/base/Log",
 	"sap/ui/base/ManagedObject",
 	"sap/ui/fl/initial/_internal/FlexInfoSession",
@@ -15,8 +15,8 @@ sap.ui.define([
 	"sap/ui/fl/initial/_internal/StorageUtils"
 ], function(
 	Deferred,
-	merge,
 	ObjectPath,
+	uid,
 	Log,
 	ManagedObject,
 	FlexInfoSession,
@@ -57,7 +57,10 @@ sap.ui.define([
 	 * 			version: <version>,
 	 * 			allContextsProvided: <boolean>,
 	 * 			adaptationId: <adaptationId>,
-	 * 			bundleNotLoaded: <boolean>
+	 * 			bundleNotLoaded: <boolean>,
+	 * 			// unique key per loader initialization. This is needed because the Loader has multiple consumers
+	 * 			// and each consumer needs to be able to identify changes in the loader data independently
+	 * 			loaderCacheKey: <uid()>
 	 * 		}
 	 * 	}
 	 * }
@@ -221,10 +224,7 @@ sap.ui.define([
 
 		if (!bRequiresNewLoadRequest && !bRequiresOnlyCompletion) {
 			oNewInitPromise.resolve();
-			return {
-				data: _mCachedFlexData[sReference].data,
-				cacheInvalidated: false
-			};
+			return _mCachedFlexData[sReference];
 		}
 
 		let oFlexData;
@@ -275,7 +275,8 @@ sap.ui.define([
 				bundleNotLoaded: !!mPropertyBag.skipLoadBundle,
 				version: sVersion,
 				allContextsProvided: bAllContextsProvided,
-				adaptationId: sAdaptationId
+				adaptationId: sAdaptationId,
+				loaderCacheKey: uid()
 			}
 		};
 
@@ -284,10 +285,7 @@ sap.ui.define([
 		}
 		FlexInfoSession.setByReference(oFlexInfoSession, sReference);
 		oNewInitPromise.resolve();
-		return {
-			data: oFormattedFlexData,
-			cacheInvalidated: true
-		};
+		return _mCachedFlexData[sReference];
 	};
 
 	/**
@@ -302,10 +300,11 @@ sap.ui.define([
 			data: oInitialFlexData,
 			parameters: {
 				bundleNotLoaded: true,
-				emptyState: true
+				emptyState: true,
+				loaderCacheKey: uid()
 			}
 		};
-		return oInitialFlexData;
+		return _mCachedFlexData[sReference];
 	};
 
 	/**
@@ -342,9 +341,10 @@ sap.ui.define([
 		Object.entries(oNewData).forEach(([sKey, vValue]) => {
 			_mCachedFlexData[mPropertyBag.reference].data.changes[sKey].push(...vValue);
 		});
+		_mCachedFlexData[mPropertyBag.reference].parameters.loaderCacheKey = uid();
 		return {
 			newData: oNewData,
-			completeData: _mCachedFlexData[mPropertyBag.reference].data
+			completeLoaderData: _mCachedFlexData[mPropertyBag.reference]
 		};
 	};
 
@@ -353,9 +353,12 @@ sap.ui.define([
 	 *
 	 * @param {string} sReference - The flex reference for which to update the storage response.
 	 * @param {object[]} aUpdates - The updates to apply to the storage response.
+	 * @returns {string} The new loader cache key after the update.
 	 */
 	Loader.updateCachedResponse = function(sReference, aUpdates) {
 		StorageUtils.updateStorageResponse(_mCachedFlexData[sReference].data, aUpdates);
+		_mCachedFlexData[sReference].parameters.loaderCacheKey = uid();
+		return _mCachedFlexData[sReference].parameters.loaderCacheKey;
 	};
 
 	/**
