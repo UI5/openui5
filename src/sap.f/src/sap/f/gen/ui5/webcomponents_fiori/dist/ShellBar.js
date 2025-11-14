@@ -32,10 +32,10 @@ sap.ui.define(
      * #### Fast Navigation
      * This component provides a build in fast navigation group which can be used via [F6] / [Shift] + [F6] / [Ctrl] + [Alt/Option] / [Down] or [Ctrl] + [Alt/Option] + [Up].
      * In order to use this functionality, you need to import the following module:
-     * `import "sap/f/gen/ui5/webcomponents_base/dist/features/F6Navigation.js"`
+     * `import "@ui5/webcomponents-base/dist/features/F6Navigation.js"`
      *
      * ### ES6 Module Import
-     * `import "sap/f/gen/ui5/webcomponents_fiori/dist/ShellBar.js";`
+     * `import "@ui5/webcomponents-fiori/dist/ShellBar.js";`
      *
      * @extends sap.ui.core.webc.WebComponent
      * @constructor
@@ -47,7 +47,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents_fiori.dist.ShellBar",
       {
         metadata: {
-          tag: "ui5-shellbar-87689b96",
+          tag: "ui5-shellbar-cc48984a",
 
           namespace: "sap.f.gen.ui5.webcomponents_fiori",
 

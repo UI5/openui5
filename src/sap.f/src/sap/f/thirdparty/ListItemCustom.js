@@ -1,10 +1,10 @@
-sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-base', 'sap/f/thirdparty/parameters-bundle.css2', 'sap/f/thirdparty/FocusableElements', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/information', 'sap/f/thirdparty/List', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/ListItemAdditionalText.css', 'sap/f/thirdparty/Button2', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/ValueState', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/Label'], (function (exports, webcomponentsBase, parametersBundle_css, FocusableElements, eventStrict, parametersBundle_css$1, Icons, information, List, ListItemBase, i18nDefaults, ListItemAdditionalText_css, Button, Icon, ValueState, AccessibilityTextsHelper, Label) { 'use strict';
+sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/parameters-bundle.css2', 'sap/f/thirdparty/FocusableElements', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/information', 'sap/f/thirdparty/List', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/ListItemAdditionalText.css', 'sap/f/thirdparty/Button2', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/ValueState', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/Label'], (function (exports, webcomponentsBase, parametersBundle_css, FocusableElements, eventStrict, parametersBundle_css$1, Icons, information, List, ListItemBase, i18nDefaults, ListItemAdditionalText_css, Button, Icon, ValueState, AccessibilityTextsHelper, Label) { 'use strict';
 
 	const name$b = "slim-arrow-right";
 	const pathData$b = "M357.5 233q10 10 10 23t-10 23l-165 165q-12 11-23 0t0-23l160-159q6-6 0-12l-159-159q-5-5-5-11t5-11 11-5 11 5z";
 	const ltr$b = false;
 	const collection$b = "SAP-icons-v4";
-	const packageName$b = "sap/f/gen/ui5/webcomponents-icons";
+	const packageName$b = "@ui5/webcomponents-icons";
 
 	Icons.y(name$b, { pathData: pathData$b, ltr: ltr$b, collection: collection$b, packageName: packageName$b });
 
@@ -12,7 +12,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-base', 'sap/f/thirdpar
 	const pathData$a = "M186 416q-11 0-18.5-7.5T160 390q0-10 8-18l121-116-121-116q-8-8-8-18 0-11 7.5-18.5T186 96q10 0 17 7l141 134q8 8 8 19 0 12-8 18L203 409q-7 7-17 7z";
 	const ltr$a = false;
 	const collection$a = "SAP-icons-v5";
-	const packageName$a = "sap/f/gen/ui5/webcomponents-icons";
+	const packageName$a = "@ui5/webcomponents-icons";
 
 	Icons.y(name$a, { pathData: pathData$a, ltr: ltr$a, collection: collection$a, packageName: packageName$a });
 
@@ -22,7 +22,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-base', 'sap/f/thirdpar
 	const pathData$9 = "M475 104q5 7 5 12 0 6-5 11L150 453q-4 4-8 4L32 480l22-110q0-5 4-9L384 36q4-4 11-4t11 4zm-121 99l-46-45L84 381l46 46zm87-88l-46-44-64 64 45 45z";
 	const ltr$9 = false;
 	const collection$9 = "SAP-icons-v4";
-	const packageName$9 = "sap/f/gen/ui5/webcomponents-icons";
+	const packageName$9 = "@ui5/webcomponents-icons";
 
 	Icons.y(name$9, { pathData: pathData$9, ltr: ltr$9, collection: collection$9, packageName: packageName$9 });
 
@@ -30,7 +30,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-base', 'sap/f/thirdpar
 	const pathData$8 = "M505 94q7 7 7 18t-6 17L130 505q-7 7-18 7H26q-11 0-18.5-7.5T0 486v-86q1-10 6-16L382 7q7-7 18-7t18 7zm-55 18l-50-50-50 50 50 50zm-86 86l-50-50L62 400l50 50z";
 	const ltr$8 = false;
 	const collection$8 = "SAP-icons-v5";
-	const packageName$8 = "sap/f/gen/ui5/webcomponents-icons";
+	const packageName$8 = "@ui5/webcomponents-icons";
 
 	Icons.y(name$8, { pathData: pathData$8, ltr: ltr$8, collection: collection$8, packageName: packageName$8 });
 
@@ -95,7 +95,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-base', 'sap/f/thirdpar
 	})(ListItemType || (ListItemType = {}));
 	var ListItemType$1 = ListItemType;
 
-	Icons.p("@" + "ui5" + "/" + "sap/f/thirdparty/webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
+	Icons.p("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
 	Icons.p("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme);
 	var styles = `.ui5-hidden-text{position:absolute;clip:rect(1px,1px,1px,1px);user-select:none;left:-1000px;top:-1000px;pointer-events:none;font-size:0}:host([navigated]) .ui5-li-root .ui5-li-navigated{width:.1875rem;position:absolute;right:0;top:0;bottom:0;background-color:var(--sapList_SelectionBorderColor)}:host([active][actionable]) .ui5-li-root .ui5-li-icon{color:var(--sapList_Active_TextColor)}:host([active][actionable]) .ui5-li-title,:host([active][actionable]) .ui5-li-desc,:host([active][actionable]) .ui5-li-additional-text{color:var(--sapList_Active_TextColor)}:host([active][actionable]) .ui5-li-additional-text{text-shadow:none}:host([additional-text-state="Critical"]) .ui5-li-additional-text{color:var(--sapCriticalTextColor)}:host([additional-text-state="Positive"]) .ui5-li-additional-text{color:var(--sapPositiveTextColor)}:host([additional-text-state="Negative"]) .ui5-li-additional-text{color:var(--sapNegativeTextColor)}:host([additional-text-state="Information"]) .ui5-li-additional-text{color:var(--sapInformativeTextColor)}:host([has-title][description]){height:5rem}:host([has-title][image]){height:5rem}:host([_has-image]){height:5rem}:host([image]) .ui5-li-content{height:3rem}::slotted(img[slot="image"]){width:var(--_ui5-v2-15-0_list_item_img_size);height:var(--_ui5-v2-15-0_list_item_img_size);border-radius:var(--ui5-v2-15-0-avatar-border-radius);object-fit:contain}::slotted([ui5-icon][slot="image"]){color:var(--sapContent_NonInteractiveIconColor);min-width:var(--_ui5-v2-15-0_list_item_icon_size);min-height:var(--_ui5-v2-15-0_list_item_icon_size);padding-inline-end:var(--_ui5-v2-15-0_list_item_icon_padding-inline-end)}::slotted([ui5-avatar][slot="image"]){min-width:var(--_ui5-v2-15-0_list_item_img_size);min-height:var(--_ui5-v2-15-0_list_item_img_size);margin-top:var(--_ui5-v2-15-0_list_item_img_top_margin);margin-bottom:var(--_ui5-v2-15-0_list_item_img_bottom_margin);margin-inline-end:var(--_ui5-v2-15-0_list_item_img_hn_margin)}:host([wrapping-type="None"][description]) .ui5-li-root{padding:1rem}:host([description]) .ui5-li-content{height:3rem}:host([has-title][description]) .ui5-li-title{padding-bottom:.5rem}.ui5-li-text-wrapper{flex-direction:column}:host([description]) .ui5-li-text-wrapper{justify-content:space-between;padding:.125rem 0}.ui5-li-description-info-wrapper{display:flex;justify-content:space-between}.ui5-li-additional-text,:host(:not([wrapping-type="Normal"])) .ui5-li-title,.ui5-li-desc{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}:host([wrapping-type="Normal"]){height:auto}:host([wrapping-type="Normal"]) .ui5-li-content{margin:var(--_ui5-v2-15-0_list_item_content_vertical_offset) 0}.ui5-li-desc{color:var(--sapContent_LabelColor);font-size:var(--sapFontSize)}:host([description]) .ui5-li-additional-text{align-self:flex-end}.ui5-li-icon{min-width:var(--_ui5-v2-15-0_list_item_icon_size);min-height:var(--_ui5-v2-15-0_list_item_icon_size);color:var(--sapContent_NonInteractiveIconColor);padding-inline-end:var(--_ui5-v2-15-0_list_item_icon_padding-inline-end)}:host([icon-end]) .ui5-li-icon{padding-inline-start:var(--_ui5-v2-15-0_list_item_icon_padding-inline-end)}.ui5-li-detailbtn,.ui5-li-deletebtn{display:flex;align-items:center;margin-left:var(--_ui5-v2-15-0_list_buttons_left_space)}.ui5-li-multisel-cb,.ui5-li-singlesel-radiobtn{flex-shrink:0}:host([description]) .ui5-li-singlesel-radiobtn{align-self:flex-start;margin-top:var(--_ui5-v2-15-0_list_item_selection_btn_margin_top)}:host([description]) .ui5-li-multisel-cb{align-self:flex-start;margin-top:var(--_ui5-v2-15-0_list_item_selection_btn_margin_top)}:host([_selection-mode="SingleStart"][wrapping-type]) .ui5-li-root{padding-inline:0 1rem}:host([_selection-mode="Multiple"][wrapping-type]) .ui5-li-root{padding-inline:0 1rem}:host([_selection-mode="SingleEnd"][wrapping-type]) .ui5-li-root{padding-inline:1rem 0}:host [ui5-checkbox].ui5-li-singlesel-radiobtn{margin-right:var(--_ui5-v2-15-0_list_item_cb_margin_right)}.ui5-li-highlight{position:absolute;width:.375rem;bottom:0;left:0;top:0;border-inline-end:.0625rem solid var(--ui5-v2-15-0-listitem-background-color);box-sizing:border-box}:host([highlight="Negative"]) .ui5-li-highlight{background:var(--sapNegativeTextColor)}:host([highlight="Critical"]) .ui5-li-highlight{background:var(--sapCriticalTextColor)}:host([highlight="Positive"]) .ui5-li-highlight{background:var(--sapPositiveTextColor)}:host([highlight="Information"]) .ui5-li-highlight{background:var(--sapInformativeTextColor)}:host([wrapping-type="Normal"][description]),:host([wrapping-type="Normal"][has-title][description]),:host([wrapping-type="Normal"][has-title][image]){height:auto;min-height:5rem}:host([wrapping-type="Normal"][description]) .ui5-li-content,:host([wrapping-type="Normal"][image]) .ui5-li-content{height:auto;min-height:3rem}:host([wrapping-type="Normal"][has-title][description]) .ui5-li-title{padding-bottom:.75rem}:host([wrapping-type="Normal"][additional-text]) .ui5-li-additional-text{padding-inline-start:.75rem}:host([wrapping-type="Normal"]) .ui5-li-description-info-wrapper{flex-direction:column}:host([wrapping-type="Normal"]) .ui5-li-description-info-wrapper .ui5-li-additional-text{white-space:normal}:host([wrapping-type="Normal"]) .ui5-li-multisel-cb,:host([wrapping-type="Normal"]) .ui5-li-singlesel-radiobtn{display:flex;align-self:flex-start}:host([wrapping-type="Normal"][description]) .ui5-li-multisel-cb,:host([wrapping-type="Normal"][description]) .ui5-li-singlesel-radiobtn{margin-top:0}:host([wrapping-type="Normal"]) .ui5-li-icon,:host([wrapping-type="Normal"]) .ui5-li-image{display:flex;align-self:flex-start}:host([wrapping-type="Normal"][icon-end]) .ui5-li-icon{margin-top:var(--_ui5-v2-15-0_list_item_content_vertical_offset)}:host([wrapping-type="Normal"]) ::slotted([ui5-avatar][slot="image"]){margin-top:0;margin-bottom:0}:host([wrapping-type="Normal"]) .ui5-li-detailbtn,:host([wrapping-type="Normal"]) .ui5-li-deletebtn{margin-inline-start:.875rem}
 `;
@@ -453,7 +453,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-base', 'sap/f/thirdpar
 	    webcomponentsBase.d()
 	], ListItem.prototype, "deleteButton", void 0);
 	__decorate$3([
-	    parametersBundle_css$1.i("sap/f/gen/ui5/webcomponents")
+	    parametersBundle_css$1.i("@ui5/webcomponents")
 	], ListItem, "i18nBundle", void 0);
 	ListItem = ListItem_1 = __decorate$3([
 	    webcomponentsBase.m({
@@ -713,7 +713,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-base', 'sap/f/thirdpar
 	                parametersBundle_css.jsx("span", { id: `${this._id}-descr`, class: "ui5-hidden-text", children: this.valueStateText })] }));
 	}
 
-	Icons.p("@" + "ui5" + "/" + "sap/f/thirdparty/webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
+	Icons.p("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
 	Icons.p("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme);
 	var radioButtonCss = `.ui5-hidden-text{position:absolute;clip:rect(1px,1px,1px,1px);user-select:none;left:-1000px;top:-1000px;pointer-events:none;font-size:0}:host(:not([hidden])){display:inline-block}:host{min-width:var(--_ui5-v2-15-0_radio_button_min_width);max-width:100%;text-overflow:ellipsis;overflow:hidden;color:var(--_ui5-v2-15-0_radio_button_color);border-radius:var(--_ui5-v2-15-0_radio_button_border_radius)}:host(:not([disabled])) .ui5-radio-root{cursor:pointer}:host([checked]){color:var(--_ui5-v2-15-0_radio_button_checked_fill)}:host([checked]) .ui5-radio-svg-inner{fill:var(--_ui5-v2-15-0_radio_button_inner_ring_color)}:host([checked]) .ui5-radio-svg-outer{stroke:var(--_ui5-v2-15-0_radio_button_outer_ring_color)}:host([disabled]) .ui5-radio-root{color:var(--_ui5-v2-15-0_radio_button_color);opacity:var(--sapContent_DisabledOpacity)}:host([disabled][checked]) .ui5-radio-svg-outer{stroke:var(--_ui5-v2-15-0_radio_button_color)}:host(:not([disabled])[desktop]) .ui5-radio-root:focus:before,:host(:not([disabled])) .ui5-radio-root:focus-visible:before{content:"";display:var(--_ui5-v2-15-0_radio_button_focus_outline);position:absolute;inset:var(--_ui5-v2-15-0_radio_button_focus_dist);pointer-events:none;border:var(--_ui5-v2-15-0_radio_button_border_width) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);border-radius:var(--_ui5-v2-15-0_radio_button_border_radius)}:host(:not([value-state="Negative"]):not([value-state="Critical"]):not([value-state="Positive"]):not([value-state="Information"])) .ui5-radio-root:hover .ui5-radio-inner--hoverable .ui5-radio-svg-outer{stroke:var(--_ui5-v2-15-0_radio_button_outer_ring_hover_color)}:host(:not([value-state="Negative"]):not([value-state="Critical"]):not([value-state="Positive"]):not([value-state="Information"])[checked]) .ui5-radio-root:hover .ui5-radio-inner--hoverable .ui5-radio-svg-outer{stroke:var(--_ui5-v2-15-0_radio_button_outer_ring_checked_hover_color)}.ui5-radio-root:hover .ui5-radio-inner--hoverable .ui5-radio-svg-outer,:host([checked]) .ui5-radio-root:hover .ui5-radio-inner--hoverable .ui5-radio-svg-outer{fill:var(--_ui5-v2-15-0_radio_button_hover_fill)}:host([active][checked]:not([value-state]):not([disabled]):not([readonly])) .ui5-radio-svg-outer{stroke:var(--_ui5-v2-15-0_radio_button_outer_ring_checked_hover_color)}:host([active]:not([checked]):not([value-state]):not([disabled]):not([readonly])) .ui5-radio-svg-outer{stroke:var(--_ui5-v2-15-0_radio_button_outer_ring_active_color)}:host([text]) .ui5-radio-root{padding-inline-end:var(--_ui5-v2-15-0_radio_button_border_width)}:host([text][desktop]) .ui5-radio-root:focus:before,:host([text]) .ui5-radio-root:focus-visible:before{inset-inline-end:0px}:host([text]) .ui5-radio-inner{padding:var(--_ui5-v2-15-0_radio_button_outer_ring_padding_with_label)}:host([checked][readonly]) .ui5-radio-svg-inner{fill:var(--_ui5-v2-15-0_radio_button_read_only_inner_ring_color)}:host([readonly]) .ui5-radio-root .ui5-radio-svg-outer{fill:var(--sapField_ReadOnly_Background);stroke:var(--sapField_ReadOnly_BorderColor);stroke-dasharray:var(--_ui5-v2-15-0_radio_button_read_only_border_type);stroke-width:var(--_ui5-v2-15-0_radio_button_read_only_border_width)}:host([value-state="Negative"]) .ui5-radio-svg-outer,:host([value-state="Critical"]) .ui5-radio-svg-outer{stroke-width:var(--sapField_InvalidBorderWidth)}:host([value-state="Information"]) .ui5-radio-svg-outer{stroke-width:var(--_ui5-v2-15-0_radio_button_information_border_width)}:host([value-state="Negative"][checked]) .ui5-radio-svg-inner{fill:var(--_ui5-v2-15-0_radio_button_checked_error_fill)}:host([value-state="Negative"]) .ui5-radio-svg-outer,:host([value-state="Negative"]) .ui5-radio-root:hover .ui5-radio-inner.ui5-radio-inner--hoverable:hover .ui5-radio-svg-outer{stroke:var(--sapField_InvalidColor);fill:var(--sapField_InvalidBackground)}:host([value-state="Negative"]) .ui5-radio-root:hover .ui5-radio-inner.ui5-radio-inner--hoverable .ui5-radio-svg-outer{fill:var(--_ui5-v2-15-0_radio_button_hover_fill_error)}:host([value-state="Critical"][checked]) .ui5-radio-svg-inner{fill:var(--_ui5-v2-15-0_radio_button_checked_warning_fill)}:host([value-state="Critical"]) .ui5-radio-svg-outer,:host([value-state="Critical"]) .ui5-radio-root:hover .ui5-radio-inner.ui5-radio-inner--hoverable:hover .ui5-radio-svg-outer{stroke:var(--sapField_WarningColor);fill:var(--sapField_WarningBackground)}:host([value-state="Critical"]) .ui5-radio-root:hover .ui5-radio-inner.ui5-radio-inner--hoverable .ui5-radio-svg-outer{fill:var(--_ui5-v2-15-0_radio_button_hover_fill_warning)}:host([value-state="Positive"][checked]) .ui5-radio-svg-inner{fill:var(--_ui5-v2-15-0_radio_button_checked_success_fill)}:host([value-state="Positive"]) .ui5-radio-svg-outer,:host([value-state="Positive"]) .ui5-radio-root:hover .ui5-radio-inner.ui5-radio-inner--hoverable:hover .ui5-radio-svg-outer{stroke:var(--sapField_SuccessColor);fill:var(--sapField_SuccessBackground)}:host([value-state="Positive"]) .ui5-radio-root:hover .ui5-radio-inner.ui5-radio-inner--hoverable .ui5-radio-svg-outer{fill:var(--_ui5-v2-15-0_radio_button_hover_fill_success)}:host([value-state="Information"][checked]) .ui5-radio-svg-inner{fill:var(--_ui5-v2-15-0_radio_button_checked_information_fill)}:host([value-state="Information"]) .ui5-radio-svg-outer,:host([value-state="Information"]) .ui5-radio-root:hover .ui5-radio-inner.ui5-radio-inner--hoverable:hover .ui5-radio-svg-outer{stroke:var(--sapField_InformationColor);fill:var(--sapField_InformationBackground)}:host([value-state="Information"]) .ui5-radio-root:hover .ui5-radio-inner.ui5-radio-inner--hoverable .ui5-radio-svg-outer{fill:var(--_ui5-v2-15-0_radio_button_hover_fill_information)}:host([value-state="Negative"]) .ui5-radio-root,:host([value-state="Critical"]) .ui5-radio-root,:host([value-state="Information"]) .ui5-radio-root{stroke-dasharray:var(--_ui5-v2-15-0_radio_button_warning_error_border_dash)}.ui5-radio-root{height:auto;position:relative;display:inline-flex;flex-wrap:nowrap;outline:none;max-width:100%;box-sizing:border-box;border:var(--_ui5-v2-15-0_radio_button_border);border-radius:var(--_ui5-v2-15-0_radio_button_border_radius)}.ui5-radio-inner{display:flex;align-items:center;padding:var(--_ui5-v2-15-0_radio_button_outer_ring_padding);flex-shrink:0;height:var(--_ui5-v2-15-0_radio_button_inner_size);font-size:1rem;pointer-events:none;vertical-align:top}.ui5-radio-inner{outline:none}.ui5-radio-inner input{-webkit-appearance:none;visibility:hidden;width:0;left:0;position:absolute;font-size:inherit;margin:0}[ui5-label].ui5-radio-label{display:flex;align-items:center;padding-inline-end:var(--_ui5-v2-15-0_radio_button_label_offset);padding-block:var(--_ui5-v2-15-0_radio_button_label_side_padding);vertical-align:top;max-width:100%;pointer-events:none;color:var(--_ui5-v2-15-0_radio_button_label_color);overflow-wrap:break-word}:host([wrapping-type="None"][text]) .ui5-radio-root{height:var(--_ui5-v2-15-0_radio_button_height)}:host([wrapping-type="None"][text]) [ui5-label].ui5-radio-label{text-overflow:ellipsis;overflow:hidden}.ui5-radio-svg{height:var(--_ui5-v2-15-0_radio_button_svg_size);width:var(--_ui5-v2-15-0_radio_button_svg_size);overflow:visible;pointer-events:none}.ui5-radio-svg-outer{fill:var(--_ui5-v2-15-0_radio_button_outer_ring_bg);stroke:currentColor;stroke-width:var(--_ui5-v2-15-0_radio_button_outer_ring_width)}.ui5-radio-svg-inner{fill:none;r:var(--_ui5-v2-15-0_radio_button_inner_ring_radius)}.ui5-radio-svg-outer,.ui5-radio-svg-inner{flex-shrink:0}:host(.ui5-li-singlesel-radiobtn) .ui5-radio-root .ui5-radio-inner .ui5-radio-svg-outer{fill:var(--sapList_Background)}
 `;
@@ -751,7 +751,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-base', 'sap/f/thirdpar
 	 *
 	 * ### ES6 Module Import
 	 *
-	 * `import "sap/f/gen/ui5/webcomponents/dist/RadioButton";`
+	 * `import "@ui5/webcomponents/dist/RadioButton";`
 	 * @constructor
 	 * @extends UI5Element
 	 * @public
@@ -1048,7 +1048,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-base', 'sap/f/thirdpar
 	    webcomponentsBase.s({ type: Boolean, noAttribute: true })
 	], RadioButton.prototype, "_groupRequired", void 0);
 	__decorate$2([
-	    parametersBundle_css$1.i("sap/f/gen/ui5/webcomponents")
+	    parametersBundle_css$1.i("@ui5/webcomponents")
 	], RadioButton, "i18nBundle", void 0);
 	RadioButton = RadioButton_1 = __decorate$2([
 	    webcomponentsBase.m({
@@ -1072,7 +1072,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-base', 'sap/f/thirdpar
 	RadioButton.define();
 	var RadioButton$1 = RadioButton;
 
-	Icons.p("@" + "ui5" + "/" + "sap/f/thirdparty/webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
+	Icons.p("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
 	Icons.p("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme);
 	var checkboxCss = `.ui5-hidden-text{position:absolute;clip:rect(1px,1px,1px,1px);user-select:none;left:-1000px;top:-1000px;pointer-events:none;font-size:0}:host{-webkit-tap-highlight-color:rgba(0,0,0,0)}:host(:not([hidden])){display:inline-block}:host([required]){vertical-align:middle}:host{overflow:hidden;max-width:100%;outline:none;border-radius:var(--_ui5-v2-15-0_checkbox_border_radius);transition:var(--_ui5-v2-15-0_checkbox_transition);cursor:pointer;user-select:none;-moz-user-select:none;-webkit-user-select:none;-ms-user-select:none}:host([disabled]){cursor:default}:host([disabled]) .ui5-checkbox-root{opacity:var(--_ui5-v2-15-0_checkbox_disabled_opacity)}:host([disabled]) .ui5-checkbox-inner{border-color:var(--_ui5-v2-15-0_checkbox_inner_disabled_border_color)}:host([disabled]) .ui5-checkbox-label{color:var(--_ui5-v2-15-0_checkbox_disabled_label_color)}:host([readonly]:not([value-state="Critical"]):not([value-state="Negative"])) .ui5-checkbox-inner{background:var(--sapField_ReadOnly_Background);border:var(--_ui5-v2-15-0_checkbox_inner_readonly_border);color:var(--sapField_TextColor)}:host(:not([wrapping-type="None"])[text]) .ui5-checkbox-root{min-height:auto;box-sizing:border-box;align-items:flex-start;padding-top:var(--_ui5-v2-15-0_checkbox_root_side_padding);padding-bottom:var(--_ui5-v2-15-0_checkbox_root_side_padding)}:host(:not([wrapping-type="None"])[text]) .ui5-checkbox-root .ui5-checkbox-label{overflow-wrap:break-word;align-self:center}:host([desktop][text]:not([wrapping-type="None"])) .ui5-checkbox-root:focus:before,.ui5-checkbox-root[text]:focus-visible:before{inset-block:var(--_ui5-v2-15-0_checkbox_wrapped_focus_inset_block)}:host([value-state="Negative"]) .ui5-checkbox-inner,:host([value-state="Negative"]) .ui5-checkbox--hoverable:hover .ui5-checkbox-inner{background:var(--sapField_InvalidBackground);border:var(--_ui5-v2-15-0_checkbox_inner_error_border);color:var(--sapField_InvalidColor)}:host([value-state="Negative"]) .ui5-checkbox--hoverable:hover .ui5-checkbox-inner{background:var(--_ui5-v2-15-0_checkbox_inner_error_background_hover)}:host([value-state="Critical"]) .ui5-checkbox-inner,:host([value-state="Critical"]) .ui5-checkbox--hoverable:hover .ui5-checkbox-inner{background:var(--sapField_WarningBackground);border:var(--_ui5-v2-15-0_checkbox_inner_warning_border);color:var(--_ui5-v2-15-0_checkbox_inner_warning_color)}:host([value-state="Critical"]) .ui5-checkbox--hoverable:hover .ui5-checkbox-inner{background:var(--_ui5-v2-15-0_checkbox_inner_warning_background_hover)}:host([value-state="Information"]) .ui5-checkbox-inner,:host([value-state="Information"]) .ui5-checkbox--hoverable:hover .ui5-checkbox-inner{background:var(--sapField_InformationBackground);border:var(--_ui5-v2-15-0_checkbox_inner_information_border);color:var(--_ui5-v2-15-0_checkbox_inner_information_color)}:host([value-state="Information"]) .ui5-checkbox--hoverable:hover .ui5-checkbox-inner{background:var(--_ui5-v2-15-0_checkbox_inner_information_background_hover)}:host([value-state="Positive"]) .ui5-checkbox-inner,:host([value-state="Positive"]) .ui5-checkbox--hoverable:hover .ui5-checkbox-inner{background:var(--sapField_SuccessBackground);border:var(--_ui5-v2-15-0_checkbox_inner_success_border);color:var(--sapField_SuccessColor)}:host([value-state="Positive"]) .ui5-checkbox--hoverable:hover .ui5-checkbox-inner{background:var(--_ui5-v2-15-0_checkbox_inner_success_background_hover)}:host([value-state="Critical"]) .ui5-checkbox-icon,:host([value-state="Critical"][indeterminate]) .ui5-checkbox-inner:after{color:var(--_ui5-v2-15-0_checkbox_checkmark_warning_color)}.ui5-checkbox-root{position:relative;display:inline-flex;align-items:center;max-width:100%;min-height:var(--_ui5-v2-15-0_checkbox_width_height);min-width:var(--_ui5-v2-15-0_checkbox_width_height);padding:0 var(--_ui5-v2-15-0_checkbox_wrapper_padding);outline:none;transition:var(--_ui5-v2-15-0_checkbox_transition);border:var(--_ui5-v2-15-0_checkbox_default_focus_border);border-radius:var(--_ui5-v2-15-0_checkbox_border_radius);box-sizing:border-box}:host([desktop]) .ui5-checkbox-root:focus:before,.ui5-checkbox-root:focus-visible:before{display:var(--_ui5-v2-15-0_checkbox_focus_outline_display);content:"";position:absolute;inset-inline:var(--_ui5-v2-15-0_checkbox_focus_position);inset-block:var(--_ui5-v2-15-0_checkbox_focus_position);border:var(--_ui5-v2-15-0_checkbox_focus_outline);border-radius:var(--_ui5-v2-15-0_checkbox_focus_border_radius)}:host([text]) .ui5-checkbox-root{padding-inline-end:var(--_ui5-v2-15-0_checkbox_right_focus_distance)}:host([text]) .ui5-checkbox-root:focus:before,:host([text]) .ui5-checkbox-root:focus-visible:before{inset-inline-end:0}:host(:hover:not([disabled])){background:var(--_ui5-v2-15-0_checkbox_outer_hover_background)}.ui5-checkbox--hoverable .ui5-checkbox-label:hover{color:var(--_ui5-v2-15-0_checkbox_label_color)}:host(:not([active]):not([checked]):not([value-state])) .ui5-checkbox--hoverable:hover .ui5-checkbox-inner,:host(:not([active]):not([checked])[value-state="None"]) .ui5-checkbox--hoverable:hover .ui5-checkbox-inner{background:var(--_ui5-v2-15-0_checkbox_hover_background);border-color:var(--_ui5-v2-15-0_checkbox_inner_hover_border_color)}:host(:not([active])[checked]:not([value-state])) .ui5-checkbox--hoverable:hover .ui5-checkbox-inner,:host(:not([active])[checked][value-state="None"]) .ui5-checkbox--hoverable:hover .ui5-checkbox-inner{background:var(--_ui5-v2-15-0_checkbox_hover_background);border-color:var(--_ui5-v2-15-0_checkbox_inner_hover_checked_border_color)}:host([checked]:not([value-state])) .ui5-checkbox-inner,:host([checked][value-state="None"]) .ui5-checkbox-inner{border-color:var(--_ui5-v2-15-0_checkbox_inner_selected_border_color)}:host([active]:not([checked]):not([value-state]):not([disabled])) .ui5-checkbox-inner,:host([active]:not([checked])[value-state="None"]:not([disabled])) .ui5-checkbox-inner{border-color:var(--_ui5-v2-15-0_checkbox_inner_active_border_color);background-color:var(--_ui5-v2-15-0_checkbox_active_background)}:host([active][checked]:not([value-state]):not([disabled])) .ui5-checkbox-inner,:host([active][checked][value-state="None"]:not([disabled])) .ui5-checkbox-inner{border-color:var(--_ui5-v2-15-0_checkbox_inner_selected_border_color);background-color:var(--_ui5-v2-15-0_checkbox_active_background)}.ui5-checkbox-inner{min-width:var(--_ui5-v2-15-0_checkbox_inner_width_height);max-width:var(--_ui5-v2-15-0_checkbox_inner_width_height);height:var(--_ui5-v2-15-0_checkbox_inner_width_height);max-height:var(--_ui5-v2-15-0_checkbox_inner_width_height);border:var(--_ui5-v2-15-0_checkbox_inner_border);border-radius:var(--_ui5-v2-15-0_checkbox_inner_border_radius);background:var(--_ui5-v2-15-0_checkbox_inner_background);color:var(--_ui5-v2-15-0_checkbox_checkmark_color);box-sizing:border-box;position:relative;cursor:inherit}:host([indeterminate][checked]) .ui5-checkbox-inner:after{content:"";background-color:currentColor;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:var(--_ui5-v2-15-0_checkbox_partially_icon_size);height:var(--_ui5-v2-15-0_checkbox_partially_icon_size)}:host input{-webkit-appearance:none;visibility:hidden;width:0;left:0;position:absolute;font-size:inherit}.ui5-checkbox-root .ui5-checkbox-label{margin-inline-start:var(--_ui5-v2-15-0_checkbox_label_offset);cursor:inherit;text-overflow:ellipsis;overflow:hidden;pointer-events:none;color:var(--_ui5-v2-15-0_checkbox_label_color)}.ui5-checkbox-icon{width:var(--_ui5-v2-15-0_checkbox_icon_size);height:var(--_ui5-v2-15-0_checkbox_icon_size);color:currentColor;cursor:inherit;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)}:host([display-only]){cursor:default}:host([display-only]) .ui5-checkbox-display-only-icon-inner [ui5-icon]{color:var(--sapTextColor)}:host([display-only]) .ui5-checkbox-display-only-icon-inner{min-width:var(--_ui5-v2-15-0_checkbox_inner_width_height);max-width:var(--_ui5-v2-15-0_checkbox_inner_width_height);height:var(--_ui5-v2-15-0_checkbox_inner_width_height);max-height:var(--_ui5-v2-15-0_checkbox_inner_width_height);display:flex;align-items:center;justify-content:center}
 `;
@@ -1081,7 +1081,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-base', 'sap/f/thirdpar
 	const pathData$7 = "M455.8 94q9 9 3 19l-222 326q-4 8-12 9t-14-5l-151-167q-5-5-4.5-11t5.5-11l25-25q12-12 23 0l96 96q5 5 13 4.5t12-8.5l175-249q4-7 11.5-8t13.5 4z";
 	const ltr$7 = true;
 	const collection$7 = "SAP-icons-v4";
-	const packageName$7 = "sap/f/gen/ui5/webcomponents-icons";
+	const packageName$7 = "@ui5/webcomponents-icons";
 
 	Icons.y(name$7, { pathData: pathData$7, ltr: ltr$7, collection: collection$7, packageName: packageName$7 });
 
@@ -1089,7 +1089,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-base', 'sap/f/thirdpar
 	const pathData$6 = "M187 416q-12 0-20-9L71 299q-7-7-7-17 0-11 7.5-18.5T90 256q12 0 19 9l77 87 217-247q8-9 19-9t18.5 7.5T448 122q0 10-6 16L206 407q-7 9-19 9z";
 	const ltr$6 = true;
 	const collection$6 = "SAP-icons-v5";
-	const packageName$6 = "sap/f/gen/ui5/webcomponents-icons";
+	const packageName$6 = "@ui5/webcomponents-icons";
 
 	Icons.y(name$6, { pathData: pathData$6, ltr: ltr$6, collection: collection$6, packageName: packageName$6 });
 
@@ -1099,7 +1099,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-base', 'sap/f/thirdpar
 	const pathData$5 = "M431.958 320h32v128q0 14-9.5 23t-22.5 9h-384q-14 0-23-9t-9-23V64q0-13 9-22.5t23-9.5h128v32h-128v384h384V320zm60-295q7 7 2 16l-185 272q-3 6-10 7t-12-4l-125-139q-9-9 0-18l21-21q10-10 19 0l80 80q5 5 11.5 4t9.5-8l146-207q3-6 9.5-7t11.5 4z";
 	const ltr$5 = true;
 	const collection$5 = "SAP-icons-v4";
-	const packageName$5 = "sap/f/gen/ui5/webcomponents-icons";
+	const packageName$5 = "@ui5/webcomponents-icons";
 
 	Icons.y(name$5, { pathData: pathData$5, ltr: ltr$5, collection: collection$5, packageName: packageName$5 });
 
@@ -1107,7 +1107,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-base', 'sap/f/thirdpar
 	const pathData$4 = "M438 224q11 0 18.5 7.5T464 250v140q0 38-26 64t-64 26H106q-38 0-64-26t-26-64V122q0-38 26-64t64-26h237q11 0 18 7.5t7 18.5-7 18-18 7H106q-16 0-27.5 11.5T67 122v268q0 16 11.5 27.5T106 429h268q16 0 27.5-11.5T413 390V250q0-11 7-18.5t18-7.5zm32-192q11 0 18.5 7.5T496 58q0 10-7 17L257 312q-6 8-18 8-10 0-18-8l-70-71q-7-7-7-18t7.5-18 18.5-7 18 7l51 53L452 40q8-8 18-8z";
 	const ltr$4 = true;
 	const collection$4 = "SAP-icons-v5";
-	const packageName$4 = "sap/f/gen/ui5/webcomponents-icons";
+	const packageName$4 = "@ui5/webcomponents-icons";
 
 	Icons.y(name$4, { pathData: pathData$4, ltr: ltr$4, collection: collection$4, packageName: packageName$4 });
 
@@ -1117,7 +1117,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-base', 'sap/f/thirdpar
 	const pathData$3 = "M448 32q13 0 22.5 9t9.5 23v384q0 14-9.5 23t-22.5 9H64q-14 0-23-9t-9-23V64q0-14 9-23t23-9h384zm0 32H64v384h384V64z";
 	const ltr$3 = false;
 	const collection$3 = "SAP-icons-v4";
-	const packageName$3 = "sap/f/gen/ui5/webcomponents-icons";
+	const packageName$3 = "@ui5/webcomponents-icons";
 
 	Icons.y(name$3, { pathData: pathData$3, ltr: ltr$3, collection: collection$3, packageName: packageName$3 });
 
@@ -1125,7 +1125,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-base', 'sap/f/thirdpar
 	const pathData$2 = "M390 480H122q-38 0-64-26t-26-64V122q0-38 26-64t64-26h268q38 0 64 26t26 64v268q0 38-26 64t-64 26zM122 83q-17 0-28 11t-11 28v268q0 17 11 28t28 11h268q17 0 28-11t11-28V122q0-17-11-28t-28-11H122z";
 	const ltr$2 = false;
 	const collection$2 = "SAP-icons-v5";
-	const packageName$2 = "sap/f/gen/ui5/webcomponents-icons";
+	const packageName$2 = "@ui5/webcomponents-icons";
 
 	Icons.y(name$2, { pathData: pathData$2, ltr: ltr$2, collection: collection$2, packageName: packageName$2 });
 
@@ -1135,7 +1135,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-base', 'sap/f/thirdpar
 	const pathData$1 = "M448 32q13 0 22.5 9.5T480 64v384q0 14-9.5 23t-22.5 9H64q-14 0-23-9t-9-23V64q0-13 9-22.5T64 32h384zm0 32H64v384h384V64zM160 345V169q0-8 8-8h176q8 0 8 8v176q0 8-8 8H168q-8 0-8-8z";
 	const ltr$1 = false;
 	const collection$1 = "SAP-icons-v4";
-	const packageName$1 = "sap/f/gen/ui5/webcomponents-icons";
+	const packageName$1 = "@ui5/webcomponents-icons";
 
 	Icons.y(name$1, { pathData: pathData$1, ltr: ltr$1, collection: collection$1, packageName: packageName$1 });
 
@@ -1143,7 +1143,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-base', 'sap/f/thirdpar
 	const pathData = "M390 32q38 0 64 26t26 64v268q0 38-26 64t-64 26H122q-38 0-64-26t-26-64V122q0-38 26-64t64-26h268zm39 90q0-17-11-28t-28-11H122q-17 0-28 11t-11 28v268q0 17 11 28t28 11h268q17 0 28-11t11-28V122zm-77 38v192H160V160h192z";
 	const ltr = false;
 	const collection = "SAP-icons-v5";
-	const packageName = "sap/f/gen/ui5/webcomponents-icons";
+	const packageName = "@ui5/webcomponents-icons";
 
 	Icons.y(name, { pathData, ltr, collection, packageName });
 
@@ -1215,7 +1215,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-base', 'sap/f/thirdpar
 	 *
 	 * ### ES6 Module Import
 	 *
-	 * `import "sap/f/gen/ui5/webcomponents/dist/CheckBox.js";`
+	 * `import "@ui5/webcomponents/dist/CheckBox.js";`
 	 * @constructor
 	 * @extends UI5Element
 	 * @public
@@ -1527,7 +1527,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-base', 'sap/f/thirdpar
 	    webcomponentsBase.s({ type: Object })
 	], CheckBox.prototype, "_accInfo", void 0);
 	__decorate$1([
-	    parametersBundle_css$1.i("sap/f/gen/ui5/webcomponents")
+	    parametersBundle_css$1.i("@ui5/webcomponents")
 	], CheckBox, "i18nBundle", void 0);
 	CheckBox = CheckBox_1 = __decorate$1([
 	    webcomponentsBase.m({
@@ -1600,7 +1600,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-base', 'sap/f/thirdpar
 	    return parametersBundle_css.jsx("slot", {});
 	}
 
-	Icons.p("@" + "ui5" + "/" + "sap/f/thirdparty/webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
+	Icons.p("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
 	Icons.p("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme);
 	var ListItemCustomCss = `:host(:not([hidden])){display:block}:host{min-height:var(--_ui5-v2-15-0_list_item_base_height);height:auto;box-sizing:border-box}.ui5-li-root.ui5-custom-li-root{pointer-events:inherit;min-height:inherit}.ui5-li-root.ui5-custom-li-root .ui5-li-content{pointer-events:inherit}[ui5-checkbox].ui5-li-singlesel-radiobtn,[ui5-radio-button].ui5-li-singlesel-radiobtn{display:flex;align-items:center}.ui5-li-root.ui5-custom-li-root,[ui5-checkbox].ui5-li-singlesel-radiobtn,[ui5-radio-button].ui5-li-singlesel-radiobtn{min-width:var(--_ui5-v2-15-0_custom_list_item_rb_min_width)}:host([_selection-mode="SingleStart"]) .ui5-li-root.ui5-custom-li-root{padding-inline:0 1rem}:host([_selection-mode="Multiple"]) .ui5-li-root.ui5-custom-li-root{padding-inline:0 1rem}:host([_selection-mode="SingleEnd"]) .ui5-li-root.ui5-custom-li-root{padding-inline:1rem 0}
 `;

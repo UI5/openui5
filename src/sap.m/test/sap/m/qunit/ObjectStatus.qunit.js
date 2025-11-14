@@ -720,7 +720,7 @@ sap.ui.define([
 
 		// Assert
 		assert.strictEqual(oObjectStatus.getDomRef().getAttribute("aria-labelledby"),
-			"info oslab-title oslab-text oslab-statusIcon",
+			"info oslab-title oslab-text oslab-statusIcon oslab-state",
 			"ObjecStatus's content information is added in aria-labelledby alongside the label");
 
 		// Cleanup

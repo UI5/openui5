@@ -493,6 +493,29 @@ sap.ui.define([
 	});
 
 	//*****************************************************************************************
+	// Scenario: A model w/ "earlyRequests" is still fetching its security token when a value list
+	// model is created and then sends a $batch of its own. The security token should be forwarded
+	// to the value list model and used for the $batch in order to avoid both a 403 and a 2nd HEAD
+	// request.
+	// SNOW: DINC0687843
+	QUnit.test("DINC0687843", async function () {
+		const oModel = new ODataModel({serviceUrl : sSampleServiceUrl});
+
+		await oModel.getMetaModel().requestObject("/ProductList/TypeCode");
+
+		oModel.oRequestor.refreshSecurityToken(); // simulate earlyRequests with special timing ;-)
+
+		// code under test
+		const mQualifier2ValueListType = await oModel.getMetaModel()
+			.requestValueListInfo("/ProductList/TypeCode");
+
+		const oValueListModel = mQualifier2ValueListType[""].$model;
+		const oValueListBinding = oValueListModel.bindList("/D_PR_TYPE_FV_Set");
+
+		await oValueListBinding.requestContexts(0, 10);
+	});
+
+	//*****************************************************************************************
 	QUnit.test("ODataModel#setContinueOnError", async function (assert) {
 		const oModel = new ODataModel({serviceUrl : sSampleServiceUrl});
 		const oBinding = oModel.bindContext("/SalesOrderList('0500000001')");

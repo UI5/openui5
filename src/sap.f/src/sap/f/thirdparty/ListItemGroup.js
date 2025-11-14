@@ -1,4 +1,4 @@
-sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-base', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/parameters-bundle.css2', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/toLowercaseEnumValue', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/WrappingType', 'sap/f/thirdparty/Icons'], (function (require, exports, webcomponentsBase, eventStrict, parametersBundle_css, parametersBundle_css$1, toLowercaseEnumValue, ListItemBase, i18nDefaults, WrappingType, Icons) { 'use strict';
+sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/parameters-bundle.css2', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/toLowercaseEnumValue', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/WrappingType', 'sap/f/thirdparty/Icons'], (function (require, exports, webcomponentsBase, eventStrict, parametersBundle_css, parametersBundle_css$1, toLowercaseEnumValue, ListItemBase, i18nDefaults, WrappingType, Icons) { 'use strict';
 
     function i(t,o,n,m,r={}){const a=webcomponentsBase.D$1.getDraggedElement(),e={targetReference:null,placement:null};if(!a&&!r?.crossDnD)return e;const s=n.placements;return e.targetReference=t.target,s.some(l=>{const c=r.originalEvent?{originalEvent:t}:{};return o.fireDecoratorEvent("move-over",{...c,source:{element:a},destination:{element:m,placement:l}})?false:(t.preventDefault(),e.targetReference=n.element,e.placement=l,true)})||(e.targetReference=null),e}
 
@@ -107,7 +107,7 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-base', 'sap
             } });
     }
 
-    Icons.p("@" + "ui5" + "/" + "sap/f/thirdparty/webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
+    Icons.p("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
     Icons.p("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme);
     var DropIndicatorCss = `:host{position:absolute;pointer-events:none;z-index:99}:host([orientation="Vertical"]) .ui5-di-needle{width:.125rem;height:100%;inset-block:0;background:var(--sapContent_DragAndDropActiveColor)}:host([orientation="Vertical"]){margin-left:-.0625rem}:host([orientation="Horizontal"]) .ui5-di-needle{height:.125rem;width:100%;inset-inline:0;background:var(--sapContent_DragAndDropActiveColor)}:host([orientation="Horizontal"]){margin-top:-.0625rem}:host([orientation="Horizontal"][placement="Before"][first]){margin-top:.3125rem}:host([orientation="Horizontal"][placement="After"][last]){margin-top:-.3125rem}:host([orientation="Vertical"]) .ui5-di-needle:before{left:-.1875rem;content:"";position:absolute;width:.25rem;height:.25rem;border-radius:.25rem;border:.125rem solid var(--sapContent_DragAndDropActiveColor);background-color:#fff;pointer-events:none}:host([orientation="Horizontal"]) .ui5-di-needle:before{top:-.1875rem;content:"";position:absolute;width:.25rem;height:.25rem;border-radius:.25rem;border:.125rem solid var(--sapContent_DragAndDropActiveColor);background-color:#fff;pointer-events:none}:host .ui5-di-rect{border:.125rem solid var(--sapContent_DragAndDropActiveColor);position:absolute;inset:0}:host .ui5-di-rect:before{content:" ";position:absolute;inset:0;background:var(--sapContent_DragAndDropActiveColor);opacity:.05}
 `;
@@ -127,7 +127,7 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-base', 'sap
      *
      * ### ES6 Module Import
      *
-     * `import "sap/f/gen/ui5/webcomponents/dist/DropIndicator.js";`
+     * `import "@ui5/webcomponents/dist/DropIndicator.js";`
      *
      * @constructor
      * @extends UI5Element
@@ -272,7 +272,7 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-base', 'sap
         return (parametersBundle_css.jsx("span", { part: "title", class: "ui5-ghli-title", children: parametersBundle_css.jsx("slot", {}) }));
     }
 
-    Icons.p("@" + "ui5" + "/" + "sap/f/thirdparty/webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
+    Icons.p("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
     Icons.p("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme);
     var ListItemGroupHeaderCss = `.ui5-hidden-text{position:absolute;clip:rect(1px,1px,1px,1px);user-select:none;left:-1000px;top:-1000px;pointer-events:none;font-size:0}:host{height:var(--_ui5-v2-15-0_group_header_list_item_height);background:var(--ui5-v2-15-0-group-header-listitem-background-color);color:var(--sapList_TableGroupHeaderTextColor)}:host([wrapping-type="Normal"]){height:auto}:host([has-border]){border-bottom:var(--sapList_BorderWidth) solid var(--sapList_GroupHeaderBorderColor)}:host([actionable]:not([disabled])){cursor:default}.ui5-li-root.ui5-ghli-root{padding-top:.5rem;color:currentColor;font-size:var(--sapFontHeader6Size);font-weight:400;line-height:2rem;margin:0}.ui5-ghli-title{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:700;font-family:var(--sapFontHeaderFamily)}.ui5-li-content{width:100%}
 `;
@@ -446,7 +446,7 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-base', 'sap
         webcomponentsBase.d()
     ], ListItemGroupHeader.prototype, "subItems", void 0);
     __decorate$1([
-        parametersBundle_css$1.i("sap/f/gen/ui5/webcomponents")
+        parametersBundle_css$1.i("@ui5/webcomponents")
     ], ListItemGroupHeader, "i18nBundle", void 0);
     ListItemGroupHeader = ListItemGroupHeader_1 = __decorate$1([
         webcomponentsBase.m({
@@ -464,7 +464,7 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-base', 'sap
                     parametersBundle_css.jsxs(ListItemGroupHeader$1, { wrappingType: this.wrappingType, focused: this.focused, part: "header", accessibleRole: ListItemAccessibleRole$1.ListItem, children: [this.hasFormattedHeader ? parametersBundle_css.jsx("slot", { name: "header" }) : this.headerText, parametersBundle_css.jsx("div", { role: "list", slot: "subItems", "aria-owns": `${this._id}-content`, "aria-label": this.headerText })] }), parametersBundle_css.jsxs("div", { class: "ui5-group-li-root", onDragEnter: this._ondragenter, onDragOver: this._ondragover, onDrop: this._ondrop, onDragLeave: this._ondragleave, id: `${this._id}-content`, children: [parametersBundle_css.jsx("slot", {}), parametersBundle_css.jsx(DropIndicator$1, { orientation: "Horizontal", ownerReference: this })] })] }));
     }
 
-    Icons.p("@" + "ui5" + "/" + "sap/f/thirdparty/webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
+    Icons.p("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
     Icons.p("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme);
     var ListItemGroupCss = `.ui5-hidden-text{position:absolute;clip:rect(1px,1px,1px,1px);user-select:none;left:-1000px;top:-1000px;pointer-events:none;font-size:0}:host{height:var(--_ui5-v2-15-0_group_header_list_item_height);background:var(--ui5-v2-15-0-group-header-listitem-background-color);color:var(--sapList_TableGroupHeaderTextColor)}.ui5-group-li-root{width:100%;height:100%;position:relative;box-sizing:border-box;padding:0;margin:0;list-style-type:none}
 `;
@@ -483,7 +483,7 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/webcomponents-base', 'sap
      * This is the item to use inside a `ui5-list`.
      *
      * ### ES6 Module Import
-     * `import "sap/f/gen/ui5/webcomponents/dist/ListItemGroup.js";`
+     * `import "@ui5/webcomponents/dist/ListItemGroup.js";`
      * @csspart header - Used to style the header item of the group
      * @constructor
      * @extends UI5Element

@@ -55,7 +55,7 @@ sap.ui.define([
 		sandbox.stub(Loader, "getCachedFlexData").returns(oResponse);
 		return sandbox.stub(Loader, "getFlexData").resolves({
 			data: oReturn,
-			cacheInvalidated: false
+			parameters: {}
 		});
 	}
 
@@ -490,25 +490,6 @@ sap.ui.define([
 			});
 		});
 
-		QUnit.test("when initialize is called with forceInvalidation = true", async function(assert) {
-			assert.notOk(FlexState.isInitialized({ reference: sReference }), "FlexState is not initialized at beginning");
-			assert.notOk(FlexState.isInitialized({ control: this.oAppComponent }), "FlexState is not initialized at beginning");
-
-			await FlexState.initialize({
-				reference: sReference,
-				componentId: sComponentId
-			});
-			assert.ok(FlexState.isInitialized({ reference: sReference }), "FlexState has been initialized");
-
-			const oDataSelectorCheckUpdateSpy = sandbox.spy(FlexState.getFlexObjectsDataSelector(), "checkUpdate");
-			await FlexState.initialize({
-				reference: sReference,
-				componentId: sComponentId,
-				forceInvalidation: true
-			});
-			assert.ok(oDataSelectorCheckUpdateSpy.calledOnce, "the DataSelector was updated during initialization with forceInvalidation");
-		});
-
 		QUnit.test("when initialize is called without a reference and with a componentID", function(assert) {
 			const oMockResponse = { changes: merge(StorageUtils.getEmptyFlexDataResponse(), { foo: "FlexResponse" }), authors: {} };
 			this.oLoadFlexDataStub = mockLoader(oMockResponse);
@@ -573,7 +554,10 @@ sap.ui.define([
 						mProperties.expectedOrder,
 						"then the initializations are executed in order and wait for each other"
 					);
-					return mEmptyResponse;
+					return {
+						data: mEmptyResponse,
+						parameters: {}
+					};
 				});
 			});
 			FlexState.initialize({
@@ -596,7 +580,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("when initialize is called multiple times with an async callback depending on the state", function(assert) {
-			// This test covers a previous bug where the FlexState was not initialized completly
+			// This test covers a previous bug where the FlexState was not initialized completely
 			// i.e. it was cleared during the second initialization but the storageResponse was not yet set
 			// because the process was async
 			// This resulted in a failing DataSelector, which is tested here
@@ -608,7 +592,10 @@ sap.ui.define([
 				if (this.oLoadFlexDataStub.callCount === 1) {
 					this.fnResolve();
 				}
-				return Promise.resolve(mEmptyResponse);
+				return Promise.resolve({
+					data: mEmptyResponse,
+					parameters: {}
+				});
 			});
 
 			const fnDone = assert.async();
@@ -836,6 +823,46 @@ sap.ui.define([
 			.then(function(oUnfilteredStorageResponse) {
 				assert.equal(oUnfilteredStorageResponse.changes.changes.length, 1, "there is one changes");
 			});
+		});
+
+		QUnit.test("when initialize is called multiple times and the loader response changing in between", async function(assert) {
+			const mResponse = merge(
+				{},
+				mEmptyResponse,
+				{
+					changes: {
+						changes: [{
+							fileType: "change",
+							changeType: "propertyChange",
+							layer: LayerUtils.getCurrentLayer()
+						}]
+					}
+				}
+			);
+			this.oApplyStorageLoadFlexDataStub.resolves(mResponse.changes);
+			const oCheckUpdateSpy = sandbox.spy(FlexState.getFlexObjectsDataSelector(), "checkUpdate");
+			await FlexState.initialize({
+				reference: sReference,
+				componentId: sComponentId
+			});
+			assert.strictEqual(this.oLoaderSpy.callCount, 1, "Loader is called once");
+			assert.strictEqual(this.oApplyStorageLoadFlexDataStub.callCount, 1, "storage loadFlexData is called once");
+			assert.strictEqual(oCheckUpdateSpy.callCount, 1, "the selector is updated once");
+
+			await FlexState.initialize({
+				reference: sReference,
+				componentId: sComponentId
+			});
+			assert.strictEqual(oCheckUpdateSpy.callCount, 1, "the selector is not updated");
+
+			// trigger update of the loader
+			Loader.updateCachedResponse(sReference, []);
+
+			await FlexState.initialize({
+				reference: sReference,
+				componentId: sComponentId
+			});
+			assert.strictEqual(oCheckUpdateSpy.callCount, 2, "the selector is updated");
 		});
 	});
 
@@ -1203,7 +1230,10 @@ sap.ui.define([
 			assert.expect(1);
 			this.oLoadFlexDataStub = mockLoader();
 			this.oLoadFlexDataStub
-			.resolves(mEmptyResponse);
+			.resolves({
+				data: mEmptyResponse,
+				parameters: {}
+			});
 
 			await FlexState.initialize({
 				reference: sReference,
@@ -1222,7 +1252,10 @@ sap.ui.define([
 					1,
 					"then the second update doesn't call loadFlexData before the first one finished"
 				);
-				return mEmptyResponse;
+				return {
+					data: mEmptyResponse,
+					parameters: {}
+				};
 			});
 
 			await Promise.all([
@@ -1362,16 +1395,21 @@ sap.ui.define([
 			this.oJson = await oResponse.json();
 			sandbox.stub(Loader, "loadFlVariant").resolves({
 				newData: this.oJson,
-				completeData: merge(
-					{},
-					this.oJson,
-					{
-						changes: [{
-							fileName: "uiChangeCustomer",
-							layer: Layer.CUSTOMER
-						}]
+				completeLoaderData: {
+					data: merge(
+						{},
+						this.oJson,
+						{
+							changes: [{
+								fileName: "uiChangeCustomer",
+								layer: Layer.CUSTOMER
+							}]
+						}
+					),
+					parameters: {
+						loaderCacheKey: "someCacheKey"
 					}
-				)
+				}
 			});
 			this.oCreateFlexObjectSpy = sandbox.spy(FlexObjectFactory, "createFromFileContent");
 		},

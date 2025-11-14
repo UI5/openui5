@@ -3,7 +3,7 @@
  */
 sap.ui.define(
   [
-    "sap/f/thirdparty/webcomponents-base2",
+    "sap/f/thirdparty/webcomponents-base",
     "sap/ui/core/webc/WebComponent",
     "sap/ui/base/DataType"
   ],
@@ -11,39 +11,30 @@ sap.ui.define(
     "use strict";
     const { registerEnum } = DataType;
 
-    const pkg = {
-      _ui5metadata: {
-        name: "sap/f/gen/ui5/webcomponents_base",
-        version: "2.15.0",
-        dependencies: ["sap.ui.core"],
-        types: [
-          "sap.f.gen.ui5.webcomponents_base.AnimationMode",
-          "sap.f.gen.ui5.webcomponents_base.CalendarType",
-          "sap.f.gen.ui5.webcomponents_base.ItemNavigationBehavior",
-          "sap.f.gen.ui5.webcomponents_base.MovePlacement",
-          "sap.f.gen.ui5.webcomponents_base.NavigationMode",
-          "sap.f.gen.ui5.webcomponents_base.SortOrder",
-          "sap.f.gen.ui5.webcomponents_base.ValueState"
-        ],
-        interfaces: [],
-        controls: [],
-        elements: [],
-        rootPath: "../"
-      }
+    // re-export package object
+    const pkg = Object.assign({}, WebCPackage);
+
+    // export the UI5 metadata along with the package
+    pkg["_ui5metadata"] = {
+      name: "sap/f/gen/ui5/webcomponents_base",
+      version: "2.15.0",
+      dependencies: ["sap.ui.core"],
+      types: [
+        "sap.f.gen.ui5.webcomponents_base.AnimationMode",
+        "sap.f.gen.ui5.webcomponents_base.CalendarType",
+        "sap.f.gen.ui5.webcomponents_base.ItemNavigationBehavior",
+        "sap.f.gen.ui5.webcomponents_base.MovePlacement",
+        "sap.f.gen.ui5.webcomponents_base.NavigationMode",
+        "sap.f.gen.ui5.webcomponents_base.SortOrder",
+        "sap.f.gen.ui5.webcomponents_base.ValueState"
+      ],
+      interfaces: [],
+      controls: [],
+      elements: [],
+      rootPath: "../"
     };
 
-    if (WebCPackage) {
-      Object.keys(WebCPackage).forEach((key) => {
-        if (key !== "default") {
-          pkg[key] = WebCPackage[key];
-        } else {
-          if (typeof WebCPackage[key] === "object") {
-            Object.assign(pkg, WebCPackage[key]);
-          }
-        }
-      });
-    }
-
+    // Enums
     /**
      * Different types of AnimationMode.
      *
@@ -570,6 +561,9 @@ sap.ui.define(
     // ====================
     // MONKEY PATCHES END
     // ====================
+
+    // marker to threat this as an ES module to support named exports
+    pkg.__esModule = true;
 
     return pkg;
   }

@@ -1,4 +1,4 @@
-sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-base', 'sap/f/thirdparty/parameters-bundle.css2', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/willShowContent', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/Icons'], (function (exports, webcomponentsBase, parametersBundle_css, parametersBundle_css$1, willShowContent, i18nDefaults, Icons) { 'use strict';
+sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/parameters-bundle.css2', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/willShowContent', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/Icons'], (function (exports, webcomponentsBase, parametersBundle_css, parametersBundle_css$1, willShowContent, i18nDefaults, Icons) { 'use strict';
 
     /**
      * Empty Indicator Mode.
@@ -26,7 +26,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-base', 'sap/f/thirdpar
                         parametersBundle_css.jsx("slot", {}) }) });
     }
 
-    Icons.p("@" + "ui5" + "/" + "sap/f/thirdparty/webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
+    Icons.p("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
     Icons.p("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme);
     var styles = `:host{max-width:100%;font-size:var(--sapFontSize);font-family:var(--sapFontFamily);color:var(--sapTextColor);line-height:normal;cursor:text;overflow:hidden}:host([max-lines="1"]){display:inline-block;text-overflow:ellipsis;white-space:nowrap}:host(:not([max-lines="1"])){display:-webkit-box;-webkit-line-clamp:var(--_ui5-v2-15-0_text_max_lines);line-clamp:var(--_ui5-v2-15-0_text_max_lines);-webkit-box-orient:vertical;white-space:normal;word-wrap:break-word}.empty-indicator-aria-label{position:absolute!important;clip:rect(1px,1px,1px,1px);user-select:none;left:0;top:0;font-size:0}
 `;
@@ -59,7 +59,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-base', 'sap/f/thirdpar
      *
      * <h3>ES6 Module Import</h3>
      *
-     * <code>import "sap/f/gen/ui5/webcomponents/dist/Text";</code>
+     * <code>import "@ui5/webcomponents/dist/Text";</code>
      *
      * @constructor
      * @extends UI5Element
@@ -109,7 +109,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-base', 'sap/f/thirdpar
         webcomponentsBase.d({ type: Node, "default": true })
     ], Text.prototype, "text", void 0);
     __decorate([
-        parametersBundle_css$1.i("sap/f/gen/ui5/webcomponents")
+        parametersBundle_css$1.i("@ui5/webcomponents")
     ], Text, "i18nBundle", void 0);
     Text = Text_1 = __decorate([
         webcomponentsBase.m({

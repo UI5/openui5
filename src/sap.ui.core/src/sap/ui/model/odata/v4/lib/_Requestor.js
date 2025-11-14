@@ -658,6 +658,25 @@ sap.ui.define([
 	};
 
 	/**
+	 * Copies the <code>oSecurityTokenPromise</code> from the given other requestor, if available,
+	 * and uses it to copy its "X-CSRF-Token" once the promise resolves.
+	 *
+	 * @param {sap.ui.model.odata.v4.lib._Requestor} oOtherRequestor - Some other requestor instance
+	 *
+	 * @public
+	 */
+	_Requestor.prototype.copySecurityTokenPromise = function (oOtherRequestor) {
+		this.oSecurityTokenPromise = oOtherRequestor.oSecurityTokenPromise?.then(() => {
+			const sCsrfToken = oOtherRequestor.mHeaders["X-CSRF-Token"];
+			if (sCsrfToken) {
+				this.mHeaders["X-CSRF-Token"] = sCsrfToken;
+			}
+		}).finally(() => {
+			this.oSecurityTokenPromise = null;
+		});
+	};
+
+	/**
 	 * Converts the value for a "$expand" in mQueryParams.
 	 *
 	 * @param {object} mExpandItems The expand items, a map from path to options

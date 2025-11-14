@@ -1,4 +1,4 @@
-sap.ui.define(['sap/f/thirdparty/webcomponents-base', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/Icons'], (function (webcomponentsBase, webcomponents, webcomponentsFiori, Icons) { 'use strict';
+sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Icons'], (function (webcomponentsBase, Icons) { 'use strict';
 
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;

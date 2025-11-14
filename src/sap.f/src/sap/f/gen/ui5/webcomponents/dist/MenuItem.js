@@ -26,7 +26,7 @@ sap.ui.define(
      *
      * ### ES6 Module Import
      *
-     * `import "sap/f/gen/ui5/webcomponents/dist/MenuItem.js";`
+     * `import "@ui5/webcomponents/dist/MenuItem.js";`
      *
      * @implements module:sap/f/gen/ui5/webcomponents.IMenuItem
      * @extends module:sap/f/gen/ui5/webcomponents/dist/ListItem
@@ -39,7 +39,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents.dist.MenuItem",
       {
         metadata: {
-          tag: "ui5-menu-item-87689b96",
+          tag: "ui5-menu-item-cc48984a",
 
           namespace: "sap.f.gen.ui5.webcomponents",
 

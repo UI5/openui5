@@ -1,4 +1,4 @@
-sap.ui.define(['exports', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/webcomponents-base', 'sap/f/thirdparty/Icons'], (function (exports, ListItemBase, webcomponentsBase, Icons) { 'use strict';
+sap.ui.define(['exports', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Icons'], (function (exports, ListItemBase, webcomponentsBase, Icons) { 'use strict';
 
 	const n=/^(?:a|area)$/i,a=/^(?:input|select|textarea|button)$/i,r=e=>{if(e.disabled)return  false;const t=e.getAttribute("tabindex");return t!=null?parseInt(t)>=0:a.test(e.nodeName)||n.test(e.nodeName)&&!!e.href};
 

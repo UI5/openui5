@@ -445,6 +445,10 @@ sap.ui.define([
 			sResult += sId + "-statusIcon ";
 		}
 
+		if (this.getState() !== ValueState.None) {
+			sResult += sId + "-state ";
+		}
+
 		return sResult.trim();
 	};
 

@@ -7,10 +7,12 @@
 <title>sap.ui.table - Scrolling with variable row heights</title>
 <link rel="shortcut icon" type="image/x-icon" href="images/controls/sap.ui.table.Table.gif">
 
+<link rel="stylesheet" href="./Scrolling.css">
+
 <script src="shared-config.js"></script>
 <script id="sap-ui-bootstrap"
         src="../../../../resources/sap-ui-core.js"
-        data-sap-ui-libs="sap.m, sap.ui.table, sap.ui.unified"
+        data-sap-ui-libs="sap.ui.table, sap.m"
         data-sap-ui-on-init="module:local/Scrolling"
         data-sap-ui-resource-roots='{
         	"local": "./"
@@ -23,8 +25,7 @@
 </head>
 
 <body class="sapUiBody sapUiSizeCozy">
-<h1 id="header">Test Page for <code>sap.ui.table.Table</code> with Variable Row Height (pixel based scrolling)</h1>
-<div id="table" style="min-height: 80vh"></div>
-<div id="content"></div>
+<h1 id="header">Test Page for <code>sap.ui.table.Table</code>: Scrolling with large data and different scroll granularities</h1>
+<div id="table"></div>
 </body>
 </html>

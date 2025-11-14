@@ -18,7 +18,7 @@ sap.ui.define(
      * This is the item to use inside a `ui5-list`.
      *
      * ### ES6 Module Import
-     * `import "sap/f/gen/ui5/webcomponents/dist/ListItemGroup.js";`
+     * `import "@ui5/webcomponents/dist/ListItemGroup.js";`
      *
      * @extends sap.ui.core.webc.WebComponent
      * @constructor
@@ -30,7 +30,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents.dist.ListItemGroup",
       {
         metadata: {
-          tag: "ui5-li-group-87689b96",
+          tag: "ui5-li-group-cc48984a",
 
           namespace: "sap.f.gen.ui5.webcomponents",
 

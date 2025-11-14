@@ -136,8 +136,7 @@ sap.ui.define([
 			const FlexState = await requireAsync("sap/ui/fl/apply/_internal/flexState/FlexState");
 			await FlexState.initialize({
 				componentId: sComponentId,
-				asyncHints: vConfig.asyncHints,
-				forceInvalidation: oFlexData.cacheInvalidated
+				asyncHints: vConfig.asyncHints
 			});
 			await propagateChangesForAppComponent(oComponent, sReference);
 			createVendorTranslationModelIfNecessary(oComponent, oFlexData.data.changes);
@@ -214,8 +213,7 @@ sap.ui.define([
 			await checkForChangesAndInitializeFlexState(
 				{
 					...mPropertyBag,
-					componentId: oConfig.id,
-					forceInvalidation: oFlexData.cacheInvalidated
+					componentId: oConfig.id
 				},
 				oFlexData
 			);
@@ -272,10 +270,7 @@ sap.ui.define([
 			}
 
 			const FlexState = await requireAsync("sap/ui/fl/apply/_internal/flexState/FlexState");
-			await FlexState.initialize({
-				...mProperties,
-				forceInvalidation: oFlexData.cacheInvalidated
-			});
+			await FlexState.initialize(mProperties);
 
 			const sServiceUrl = ODataUtils.removeOriginSegmentParameters(oPropertyBag.model.getServiceUrl());
 			const aRelevantAnnotationChanges = FlexState.getAnnotationChanges(sReference)
@@ -356,8 +351,7 @@ sap.ui.define([
 				rawManifest: oManifest,
 				componentId: oConfig.id,
 				reference: sReference,
-				skipLoadBundle: true,
-				forceInvalidation: oFlexData.cacheInvalidated
+				skipLoadBundle: true
 			}, oFlexData);
 			const oManifestCopy = { ...oManifest };
 			const Applier = await requireAsync("sap/ui/fl/apply/_internal/changes/descriptor/Applier");

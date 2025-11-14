@@ -173,6 +173,7 @@ sap.ui.define([
 				skipLoadBundle: true
 			});
 
+			assert.ok(oResult.parameters.loaderCacheKey, "a loader cache key is provided in the parameters");
 			assert.deepEqual(oResult.data.changes, this.oExpectedFlexDataResponse, "the Loader loads data");
 			assert.strictEqual(oResult.data.authors, "authors", "the authors are loaded");
 			assert.strictEqual(this.oLoadFlexDataStub.callCount, 1, "the Storage.loadFlexData was called");
@@ -209,6 +210,7 @@ sap.ui.define([
 				skipLoadBundle: true
 			});
 			assert.deepEqual(oFlexData2.data.changes, this.oExpectedFlexDataResponse, "the Loader loads data");
+			assert.deepEqual(oFlexData2, oFlexData, "both calls return the same data");
 			assert.strictEqual(this.oLoadFlexDataStub.callCount, 1, "the Storage.loadFlexData was not called again");
 		});
 
@@ -810,7 +812,8 @@ sap.ui.define([
 					return false;
 				}
 			});
-			await Loader.initializeEmptyCache(sReference);
+			const oInitialState = await Loader.initializeEmptyCache(sReference);
+			this.sInitialLoaderCacheKey = oInitialState.parameters.loaderCacheKey;
 		},
 		afterEach() {
 			sandbox.restore();
@@ -961,16 +964,47 @@ sap.ui.define([
 			});
 
 			const oFlexData = Loader.getCachedFlexData(sReference);
-			assert.deepEqual(oFlexData.changes, oLoadedVariantData.completeData.changes, "the cached data is correct");
-			assert.strictEqual(oLoadedVariantData.newData.variants.length, 2, "the cached data contains two FL variants");
-			assert.strictEqual(oLoadedVariantData.newData.variants[0].fileName, "flVariant2", "the first FL variant is the one requested");
-			assert.strictEqual(oLoadedVariantData.newData.variants[1].fileName, "flVariant3", "the second FL variant is the one loaded from the backend");
-			assert.strictEqual(oLoadedVariantData.newData.variantChanges.length, 1, "the cached data contains one variant change");
-			assert.strictEqual(oLoadedVariantData.newData.variantChanges[0].fileName, "uiChange3", "the variant change is the one loaded from the backend");
-			assert.strictEqual(oLoadedVariantData.newData.variantDependentControlChanges.length, 1, "the cached data contains one variant dependent control change");
-			assert.strictEqual(oLoadedVariantData.newData.variantDependentControlChanges[0].fileName, "uiChange2", "the variant dependent control change is the one loaded from the backend");
-			assert.strictEqual(oLoadedVariantData.newData.variantManagementChanges.length, 1, "the cached data contains one variant management change");
-			assert.strictEqual(oLoadedVariantData.newData.variantManagementChanges[0].fileName, "uiChange4", "the variant management change is the one loaded from the backend");
+			assert.deepEqual(oFlexData.changes, oLoadedVariantData.completeLoaderData.data.changes, "the cached data is correct");
+			assert.strictEqual(
+				oLoadedVariantData.newData.variants.length, 2,
+				"the cached data contains two FL variants"
+			);
+			assert.strictEqual(
+				oLoadedVariantData.newData.variants[0].fileName, "flVariant2",
+				"the first FL variant is the one requested"
+			);
+			assert.strictEqual(
+				oLoadedVariantData.newData.variants[1].fileName, "flVariant3",
+				"the second FL variant is the one loaded from the backend"
+			);
+			assert.strictEqual(
+				oLoadedVariantData.newData.variantChanges.length, 1,
+				"the cached data contains one variant change"
+			);
+			assert.strictEqual(
+				oLoadedVariantData.newData.variantChanges[0].fileName, "uiChange3",
+				"the variant change is the one loaded from the backend"
+			);
+			assert.strictEqual(
+				oLoadedVariantData.newData.variantDependentControlChanges.length, 1,
+				"the cached data contains one variant dependent control change"
+			);
+			assert.strictEqual(
+				oLoadedVariantData.newData.variantDependentControlChanges[0].fileName,
+				"uiChange2", "the variant dependent control change is the one loaded from the backend"
+			);
+			assert.strictEqual(
+				oLoadedVariantData.newData.variantManagementChanges.length, 1,
+				"the cached data contains one variant management change"
+			);
+			assert.strictEqual(
+				oLoadedVariantData.newData.variantManagementChanges[0].fileName, "uiChange4",
+				"the variant management change is the one loaded from the backend"
+			);
+			assert.notStrictEqual(
+				oLoadedVariantData.completeLoaderData.parameters.loaderCacheKey, this.sInitialLoaderCacheKey,
+				"the cache key was updated"
+			);
 		});
 	});
 

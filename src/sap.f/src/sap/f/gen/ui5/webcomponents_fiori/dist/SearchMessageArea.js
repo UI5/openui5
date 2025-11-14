@@ -12,7 +12,7 @@ sap.ui.define(
 
     /**
      * @class
-     * `import "sap/f/gen/ui5/webcomponents_fiori/dist/SearchMessageArea.js";`
+     * `import "@ui5/webcomponents-fiori/dist/SearchMessageArea.js";`
      *
      * @extends sap.ui.core.webc.WebComponent
      * @constructor
@@ -24,7 +24,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents_fiori.dist.SearchMessageArea",
       {
         metadata: {
-          tag: "ui5-search-message-area-87689b96",
+          tag: "ui5-search-message-area-cc48984a",
 
           namespace: "sap.f.gen.ui5.webcomponents_fiori",
 

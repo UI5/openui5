@@ -62,7 +62,7 @@ To prevent other runtimes from defining tags that you use, consider using scopin
 
 	let t$a;i$9(()=>{t$a=void 0;});const n$8=()=>(t$a===void 0&&(t$a=S$1()),t$a),u$5=e=>`${n$8()}Base/baseLib/${e}/css_variables.css`,i$5=async e=>{const o=document.querySelector(`[sap-ui-webcomponents-theme="${e}"]`);o&&document.head.removeChild(o),await d$3(u$5(e),{"sap-ui-webcomponents-theme":e});};
 
-	let _lib="ui5",_package="sap/f/thirdparty/webcomponents-theming";const s$7="@"+_lib+"/"+_package,S=()=>w$4().has(s$7),P$2=async e=>{if(!S())return;const t=await m$4(s$7,e);t&&R$1(t,"data-ui5-theme-properties",s$7,e);},E=()=>{f$7("data-ui5-theme-properties",s$7);},U=async(e,t)=>{const o=[...w$4()].map(async a=>{if(a===s$7)return;const i=await m$4(a,e,t);i&&R$1(i,`data-ui5-component-properties-${I$1()}`,a);});return Promise.all(o)},k=async e=>{const t=m$3();if(t)return t;const r=n$e("OpenUI5Support");if(r&&r.isOpenUI5Detected()){if(r.cssVariablesLoaded())return {themeName:r.getConfigurationSettingsObject()?.theme,baseThemeName:""}}else if(n$8())return await i$5(e),m$3()},w$3=async e=>{const t=await k(e);!t||e!==t.themeName?await P$2(e):E();const r=P$3(e)?e:t&&t.baseThemeName;await U(r||e$6,t&&t.themeName===e?e:void 0),r$9(e);};
+	let _lib="ui5",_package="webcomponents-theming";const s$7="@"+_lib+"/"+_package,S=()=>w$4().has(s$7),P$2=async e=>{if(!S())return;const t=await m$4(s$7,e);t&&R$1(t,"data-ui5-theme-properties",s$7,e);},E=()=>{f$7("data-ui5-theme-properties",s$7);},U=async(e,t)=>{const o=[...w$4()].map(async a=>{if(a===s$7)return;const i=await m$4(a,e,t);i&&R$1(i,`data-ui5-component-properties-${I$1()}`,a);});return Promise.all(o)},k=async e=>{const t=m$3();if(t)return t;const r=n$e("OpenUI5Support");if(r&&r.isOpenUI5Detected()){if(r.cssVariablesLoaded())return {themeName:r.getConfigurationSettingsObject()?.theme,baseThemeName:""}}else if(n$8())return await i$5(e),m$3()},w$3=async e=>{const t=await k(e);!t||e!==t.themeName?await P$2(e):E();const r=P$3(e)?e:t&&t.baseThemeName;await U(r||e$6,t&&t.themeName===e?e:void 0),r$9(e);};
 
 	const d$2=()=>new Promise(e=>{document.body?e():document.addEventListener("DOMContentLoaded",()=>{e();});});
 
@@ -123,38 +123,38 @@ To prevent other runtimes from defining tags that you use, consider using scopin
 
 	let t$6;i$9(()=>{t$6=void 0;});const r$6=()=>(t$6===void 0&&(t$6=T$1()),t$6),u$3=async e=>{t$6!==e&&(t$6=e,h$2()&&(await w$3(t$6),await C$1({themeAware:true})));},g$3=()=>e$6,n$6=()=>{const e=r$6();return l$3(e)?!e.startsWith("sap_horizon"):!m$3()?.baseThemeName?.startsWith("sap_horizon")},l$3=e=>s$d.includes(e);
 
-	const t$5=new Map,e$2=(n,o)=>{t$5.set(n,o);},c$5=n=>t$5.get(n);
+	const t$5=typeof document>"u",o$1=()=>{if(t$5)return a$a;const a=navigator.languages,n=()=>navigator.language;return a&&a[0]||n()||a$a};
 
-	var t$4=(o=>(o.SAPIconsV4="SAP-icons-v4",o.SAPIconsV5="SAP-icons-v5",o.SAPIconsTNTV2="tnt-v2",o.SAPIconsTNTV3="tnt-v3",o.SAPBSIconsV1="business-suite-v1",o.SAPBSIconsV2="business-suite-v2",o))(t$4||{});const s$4=new Map;s$4.set("SAP-icons",{legacy:"SAP-icons-v4",sap_horizon:"SAP-icons-v5"}),s$4.set("tnt",{legacy:"tnt-v2",sap_horizon:"tnt-v3"}),s$4.set("business-suite",{legacy:"business-suite-v1",sap_horizon:"business-suite-v2"});const c$4=(n,e)=>{if(s$4.has(n)){s$4.set(n,{...e,...s$4.get(n)});return}s$4.set(n,e);},r$5=n=>{const e=n$6()?"legacy":"sap_horizon";return s$4.has(n)?s$4.get(n)[e]:n};
+	const e$2=new i$a,n$5="languageChange",t$4=a=>{e$2.attachEvent(n$5,a);},r$5=a=>{e$2.detachEvent(n$5,a);},o=a=>e$2.fireEventAsync(n$5,a);
 
-	var t$3=(s=>(s["SAP-icons"]="SAP-icons-v4",s.horizon="SAP-icons-v5",s["SAP-icons-TNT"]="tnt",s.BusinessSuiteInAppSymbols="business-suite",s))(t$3||{});const n$5=e=>t$3[e]?t$3[e]:e;
+	let e$1,t$3;i$9(()=>{e$1=void 0,t$3=void 0;});let a$1=false;const s$4=()=>a$1,l$2=()=>(e$1===void 0&&(e$1=L$2()),e$1),L$1=async n=>{e$1!==n&&(a$1=true,e$1=n,await o(n),a$1=false,h$2()&&await C$1({languageAware:true}));},c$5=()=>a$a,m$1=n=>{t$3=n;},h$1=()=>(t$3===void 0&&(t$3=R()),t$3);
 
-	const i$2=o=>{const t=c$5(r$6());return !o&&t?n$5(t):o?r$5(o):r$5("SAP-icons")};
+	const n$4=/^((?:[A-Z]{2,3}(?:-[A-Z]{3}){0,3})|[A-Z]{4}|[A-Z]{5,8})(?:-([A-Z]{4}))?(?:-([A-Z]{2}|[0-9]{3}))?((?:-[0-9A-Z]{5,8}|-[0-9][0-9A-Z]{3})*)((?:-[0-9A-WYZ](?:-[0-9A-Z]{2,8})+)*)(?:-(X(?:-[0-9A-Z]{1,8})+))?$/i;let r$4 = class r{constructor(s){const t=n$4.exec(s.replace(/_/g,"-"));if(t===null)throw new Error(`The given language ${s} does not adhere to BCP-47.`);this.sLocaleId=s,this.sLanguage=t[1]||a$a,this.sScript=t[2]||"",this.sRegion=t[3]||"",this.sVariant=t[4]&&t[4].slice(1)||null,this.sExtension=t[5]&&t[5].slice(1)||null,this.sPrivateUse=t[6]||null,this.sLanguage&&(this.sLanguage=this.sLanguage.toLowerCase()),this.sScript&&(this.sScript=this.sScript.toLowerCase().replace(/^[a-z]/,i=>i.toUpperCase())),this.sRegion&&(this.sRegion=this.sRegion.toUpperCase());}getLanguage(){return this.sLanguage}getScript(){return this.sScript}getRegion(){return this.sRegion}getVariant(){return this.sVariant}getVariantSubtags(){return this.sVariant?this.sVariant.split("-"):[]}getExtension(){return this.sExtension}getExtensionSubtags(){return this.sExtension?this.sExtension.slice(2).split("-"):[]}getPrivateUse(){return this.sPrivateUse}getPrivateUseSubtags(){return this.sPrivateUse?this.sPrivateUse.slice(2).split("-"):[]}hasPrivateUseSubtag(s){return this.getPrivateUseSubtags().indexOf(s)>=0}toString(){const s=[this.sLanguage];return this.sScript&&s.push(this.sScript),this.sRegion&&s.push(this.sRegion),this.sVariant&&s.push(this.sVariant),this.sExtension&&s.push(this.sExtension),this.sPrivateUse&&s.push(this.sPrivateUse),s.join("-")}};
 
-	const t$2=typeof document>"u",o$1=()=>{if(t$2)return a$a;const a=navigator.languages,n=()=>navigator.language;return a&&a[0]||n()||a$a};
+	const r$3=new Map,n$3=t=>(r$3.has(t)||r$3.set(t,new r$4(t)),r$3.get(t)),c$4=t=>{try{if(t&&typeof t=="string")return n$3(t)}catch{}return new r$4(r$d)},s$3=t=>{const e=l$2();return e?n$3(e):c$4(o$1())};
 
-	const e$1=new i$a,n$4="languageChange",t$1=a=>{e$1.attachEvent(n$4,a);},r$4=a=>{e$1.detachEvent(n$4,a);},o=a=>e$1.fireEventAsync(n$4,a);
+	const _=/^((?:[A-Z]{2,3}(?:-[A-Z]{3}){0,3})|[A-Z]{4}|[A-Z]{5,8})(?:-([A-Z]{4}))?(?:-([A-Z]{2}|[0-9]{3}))?((?:-[0-9A-Z]{5,8}|-[0-9][0-9A-Z]{3})*)((?:-[0-9A-WYZ](?:-[0-9A-Z]{2,8})+)*)(?:-(X(?:-[0-9A-Z]{1,8})+))?$/i,c$3=/(?:^|-)(saptrc|sappsd)(?:-|$)/i,f$3={he:"iw",yi:"ji",nb:"no",sr:"sh"},p=i=>{let e;if(!i)return r$d;if(typeof i=="string"&&(e=_.exec(i.replace(/_/g,"-")))){let t=e[1].toLowerCase(),n=e[3]?e[3].toUpperCase():void 0;const s=e[2]?e[2].toLowerCase():void 0,r=e[4]?e[4].slice(1):void 0,o=e[6];return t=f$3[t]||t,o&&(e=c$3.exec(o))||r&&(e=c$3.exec(r))?`en_US_${e[1].toLowerCase()}`:(t==="zh"&&!n&&(s==="hans"?n="CN":s==="hant"&&(n="TW")),t+(n?"_"+n+(r?"_"+r.replace("-","_"):""):""))}return r$d};
 
-	let e,t;i$9(()=>{e=void 0,t=void 0;});let a$1=false;const s$3=()=>a$1,l$2=()=>(e===void 0&&(e=L$2()),e),L$1=async n=>{e!==n&&(a$1=true,e=n,await o(n),a$1=false,h$2()&&await C$1({languageAware:true}));},c$3=()=>a$a,m$1=n=>{t=n;},h$1=()=>(t===void 0&&(t=R()),t);
+	const r$2={zh_HK:"zh_TW",in:"id"},n$2=t=>{if(!t)return r$d;if(r$2[t])return r$2[t];const L=t.lastIndexOf("_");return L>=0?t.slice(0,L):t!==r$d?r$d:""};
 
-	const n$3=/^((?:[A-Z]{2,3}(?:-[A-Z]{3}){0,3})|[A-Z]{4}|[A-Z]{5,8})(?:-([A-Z]{4}))?(?:-([A-Z]{2}|[0-9]{3}))?((?:-[0-9A-Z]{5,8}|-[0-9][0-9A-Z]{3})*)((?:-[0-9A-WYZ](?:-[0-9A-Z]{2,8})+)*)(?:-(X(?:-[0-9A-Z]{1,8})+))?$/i;let r$3 = class r{constructor(s){const t=n$3.exec(s.replace(/_/g,"-"));if(t===null)throw new Error(`The given language ${s} does not adhere to BCP-47.`);this.sLocaleId=s,this.sLanguage=t[1]||a$a,this.sScript=t[2]||"",this.sRegion=t[3]||"",this.sVariant=t[4]&&t[4].slice(1)||null,this.sExtension=t[5]&&t[5].slice(1)||null,this.sPrivateUse=t[6]||null,this.sLanguage&&(this.sLanguage=this.sLanguage.toLowerCase()),this.sScript&&(this.sScript=this.sScript.toLowerCase().replace(/^[a-z]/,i=>i.toUpperCase())),this.sRegion&&(this.sRegion=this.sRegion.toUpperCase());}getLanguage(){return this.sLanguage}getScript(){return this.sScript}getRegion(){return this.sRegion}getVariant(){return this.sVariant}getVariantSubtags(){return this.sVariant?this.sVariant.split("-"):[]}getExtension(){return this.sExtension}getExtensionSubtags(){return this.sExtension?this.sExtension.slice(2).split("-"):[]}getPrivateUse(){return this.sPrivateUse}getPrivateUseSubtags(){return this.sPrivateUse?this.sPrivateUse.slice(2).split("-"):[]}hasPrivateUseSubtag(s){return this.getPrivateUseSubtags().indexOf(s)>=0}toString(){const s=[this.sLanguage];return this.sScript&&s.push(this.sScript),this.sRegion&&s.push(this.sRegion),this.sVariant&&s.push(this.sVariant),this.sExtension&&s.push(this.sExtension),this.sPrivateUse&&s.push(this.sPrivateUse),s.join("-")}};
+	const d=new Set,m=new Set,g$2=new Map,l$1=new Map,u$2=new Map,$=(n,t,e)=>{const r=`${n}/${t}`;u$2.set(r,e);},f$2=(n,t)=>{g$2.set(n,t);},A$1=n=>g$2.get(n),h=(n,t)=>{const e=`${n}/${t}`;return u$2.has(e)},B=(n,t)=>{const e=`${n}/${t}`,r=u$2.get(e);return r&&!l$1.get(e)&&l$1.set(e,r(t)),l$1.get(e)},M=n=>{d.has(n)||(console.warn(`[${n}]: Message bundle assets are not configured. Falling back to English texts.`,` Add \`import "${n}/dist/Assets.js"\` in your bundle and make sure your build tool supports dynamic imports and JSON imports. See section "Assets" in the documentation for more information.`),d.add(n));},L=(n,t)=>t!==a$a&&!h(n,t),w$1=async n=>{const t=s$3().getLanguage(),e=s$3().getRegion(),r=s$3().getVariant();let s=t+(e?`-${e}`:"")+(r?`-${r}`:"");if(L(n,s))for(s=p(s);L(n,s);)s=n$2(s);const I=h$1();if(s===a$a&&!I){f$2(n,null);return}if(!h(n,s)){M(n);return}try{const o=await B(n,s);f$2(n,o);}catch(o){const a=o;m.has(a.message)||(m.add(a.message),console.error(a.message));}};t$4(n=>{const t=[...g$2.keys()];return Promise.all(t.map(w$1))});
 
-	const r$2=new Map,n$2=t=>(r$2.has(t)||r$2.set(t,new r$3(t)),r$2.get(t)),c$2=t=>{try{if(t&&typeof t=="string")return n$2(t)}catch{}return new r$3(r$d)},s$2=t=>{const e=l$2();return e?n$2(e):c$2(o$1())};
+	const t$2=new Map,e=(n,o)=>{t$2.set(n,o);},c$2=n=>t$2.get(n);
 
-	const _=/^((?:[A-Z]{2,3}(?:-[A-Z]{3}){0,3})|[A-Z]{4}|[A-Z]{5,8})(?:-([A-Z]{4}))?(?:-([A-Z]{2}|[0-9]{3}))?((?:-[0-9A-Z]{5,8}|-[0-9][0-9A-Z]{3})*)((?:-[0-9A-WYZ](?:-[0-9A-Z]{2,8})+)*)(?:-(X(?:-[0-9A-Z]{1,8})+))?$/i,c$1=/(?:^|-)(saptrc|sappsd)(?:-|$)/i,f$3={he:"iw",yi:"ji",nb:"no",sr:"sh"},p=i=>{let e;if(!i)return r$d;if(typeof i=="string"&&(e=_.exec(i.replace(/_/g,"-")))){let t=e[1].toLowerCase(),n=e[3]?e[3].toUpperCase():void 0;const s=e[2]?e[2].toLowerCase():void 0,r=e[4]?e[4].slice(1):void 0,o=e[6];return t=f$3[t]||t,o&&(e=c$1.exec(o))||r&&(e=c$1.exec(r))?`en_US_${e[1].toLowerCase()}`:(t==="zh"&&!n&&(s==="hans"?n="CN":s==="hant"&&(n="TW")),t+(n?"_"+n+(r?"_"+r.replace("-","_"):""):""))}return r$d};
+	var t$1=(o=>(o.SAPIconsV4="SAP-icons-v4",o.SAPIconsV5="SAP-icons-v5",o.SAPIconsTNTV2="tnt-v2",o.SAPIconsTNTV3="tnt-v3",o.SAPBSIconsV1="business-suite-v1",o.SAPBSIconsV2="business-suite-v2",o))(t$1||{});const s$2=new Map;s$2.set("SAP-icons",{legacy:"SAP-icons-v4",sap_horizon:"SAP-icons-v5"}),s$2.set("tnt",{legacy:"tnt-v2",sap_horizon:"tnt-v3"}),s$2.set("business-suite",{legacy:"business-suite-v1",sap_horizon:"business-suite-v2"});const c$1=(n,e)=>{if(s$2.has(n)){s$2.set(n,{...e,...s$2.get(n)});return}s$2.set(n,e);},r$1=n=>{const e=n$6()?"legacy":"sap_horizon";return s$2.has(n)?s$2.get(n)[e]:n};
 
-	const r$1={zh_HK:"zh_TW",in:"id"},n$1=t=>{if(!t)return r$d;if(r$1[t])return r$1[t];const L=t.lastIndexOf("_");return L>=0?t.slice(0,L):t!==r$d?r$d:""};
+	var t=(s=>(s["SAP-icons"]="SAP-icons-v4",s.horizon="SAP-icons-v5",s["SAP-icons-TNT"]="tnt",s.BusinessSuiteInAppSymbols="business-suite",s))(t||{});const n$1=e=>t[e]?t[e]:e;
 
-	const d=new Set,m=new Set,g$2=new Map,l$1=new Map,u$2=new Map,$=(n,t,e)=>{const r=`${n}/${t}`;u$2.set(r,e);},f$2=(n,t)=>{g$2.set(n,t);},A$1=n=>g$2.get(n),h=(n,t)=>{const e=`${n}/${t}`;return u$2.has(e)},B=(n,t)=>{const e=`${n}/${t}`,r=u$2.get(e);return r&&!l$1.get(e)&&l$1.set(e,r(t)),l$1.get(e)},M=n=>{d.has(n)||(console.warn(`[${n}]: Message bundle assets are not configured. Falling back to English texts.`,` Add \`import "${n}/dist/Assets.js"\` in your bundle and make sure your build tool supports dynamic imports and JSON imports. See section "Assets" in the documentation for more information.`),d.add(n));},L=(n,t)=>t!==a$a&&!h(n,t),w$1=async n=>{const t=s$2().getLanguage(),e=s$2().getRegion(),r=s$2().getVariant();let s=t+(e?`-${e}`:"")+(r?`-${r}`:"");if(L(n,s))for(s=p(s);L(n,s);)s=n$1(s);const I=h$1();if(s===a$a&&!I){f$2(n,null);return}if(!h(n,s)){M(n);return}try{const o=await B(n,s);f$2(n,o);}catch(o){const a=o;m.has(a.message)||(m.add(a.message),console.error(a.message));}};t$1(n=>{const t=[...g$2.keys()];return Promise.all(t.map(w$1))});
+	const i$2=o=>{const t=c$2(r$6());return !o&&t?n$1(t):o?r$1(o):r$1("SAP-icons")};
 
 	const g$1=/('')|'([^']+(?:''[^']*)*)(?:'|$)|\{([0-9]+(?:\s*,[^{}]*)?)\}|[{}]/g,i$1=(n,t)=>(t=t||[],n.replace(g$1,(p,s,e,r,o)=>{if(s)return "'";if(e)return e.replace(/''/g,"'");if(r){const a=typeof r=="string"?parseInt(r):r;return String(t[a])}throw new Error(`[i18n]: pattern syntax error at pos ${o}`)}));
 
 	const r=new Map;let s$1;let u$1 = class u{constructor(e){this.packageName=e;}getText(e,...i){if(typeof e=="string"&&(e={key:e,defaultText:e}),!e||!e.key)return "";const t=A$1(this.packageName);t&&!t[e.key]&&console.warn(`Key ${e.key} not found in the i18n bundle, the default text will be used`);const l=t&&t[e.key]?t[e.key]:e.defaultText||e.key;return i$1(l,i)}};const a=n=>{if(r.has(n))return r.get(n);const e=new u$1(n);return r.set(n,e),e},f$1=async n=>s$1?s$1(n):(await w$1(n),a(n)),y$1=n=>{s$1=n;};
 
-	const w="legacy",s=new Map,c=m$9("SVGIcons.registry",new Map),i=m$9("SVGIcons.promises",new Map),l="ICON_NOT_FOUND",C=(e,t)=>{s.set(e,t);},N=async e=>{if(!i.has(e)){if(!s.has(e))throw new Error(`No loader registered for the ${e} icons collection. Probably you forgot to import the "AllIcons.js" module for the respective package.`);const t=s.get(e);i.set(e,t(e));}return i.get(e)},f=e=>{Object.keys(e.data).forEach(t=>{const a=e.data[t];y(t,{pathData:a.path||a.paths,ltr:a.ltr,accData:a.acc,collection:e.collection,packageName:e.packageName});});},y=(e,t)=>{const a=`${t.collection}/${e}`,o={collection:t.collection,packageName:t.packageName,pathData:t.pathData,viewBox:t.viewBox,ltr:t.ltr,accData:t.accData,customTemplate:t.customTemplate};c.set(a,o);},u=e=>{e.startsWith("sap-icon://")&&(e=e.replace("sap-icon://",""));let t;return [e,t]=e.split("/").reverse(),e=e.replace("icon-",""),t&&(t=n$5(t)),{name:e,collection:t}},D=e=>{const{name:t,collection:a}=u(e);return g(a,t)},n=async e=>{const{name:t,collection:a}=u(e);let o=l;try{o=await N(i$2(a));}catch(r){console.error(r.message);}if(o===l)return o;const p=g(a,t);return p||(Array.isArray(o)?o.forEach(r=>{f(r),c$4(a,{[r.themeFamily||w]:r.collection});}):f(o),g(a,t))},g=(e,t)=>{const a=`${i$2(e)}/${t}`;return c.get(a)},A=async e=>{if(!e)return;let t=D(e);if(t||(t=await n(e)),t&&t!==l&&t.accData)return t.packageName?(await f$1(t.packageName)).getText(t.accData):t.accData?.defaultText||""};
+	const w="legacy",s=new Map,c=m$9("SVGIcons.registry",new Map),i=m$9("SVGIcons.promises",new Map),l="ICON_NOT_FOUND",C=(e,t)=>{s.set(e,t);},N=async e=>{if(!i.has(e)){if(!s.has(e))throw new Error(`No loader registered for the ${e} icons collection. Probably you forgot to import the "AllIcons.js" module for the respective package.`);const t=s.get(e);i.set(e,t(e));}return i.get(e)},f=e=>{Object.keys(e.data).forEach(t=>{const a=e.data[t];y(t,{pathData:a.path||a.paths,ltr:a.ltr,accData:a.acc,collection:e.collection,packageName:e.packageName});});},y=(e,t)=>{const a=`${t.collection}/${e}`,o={collection:t.collection,packageName:t.packageName,pathData:t.pathData,viewBox:t.viewBox,ltr:t.ltr,accData:t.accData,customTemplate:t.customTemplate};c.set(a,o);},u=e=>{e.startsWith("sap-icon://")&&(e=e.replace("sap-icon://",""));let t;return [e,t]=e.split("/").reverse(),e=e.replace("icon-",""),t&&(t=n$1(t)),{name:e,collection:t}},D=e=>{const{name:t,collection:a}=u(e);return g(a,t)},n=async e=>{const{name:t,collection:a}=u(e);let o=l;try{o=await N(i$2(a));}catch(r){console.error(r.message);}if(o===l)return o;const p=g(a,t);return p||(Array.isArray(o)?o.forEach(r=>{f(r),c$1(a,{[r.themeFamily||w]:r.collection});}):f(o),g(a,t))},g=(e,t)=>{const a=`${i$2(e)}/${t}`;return c.get(a)},A=async e=>{if(!e)return;let t=D(e);if(t||(t=await n(e)),t&&t!==l&&t.accData)return t.packageName?(await f$1(t.packageName)).getText(t.accData):t.accData?.defaultText||""};
 
-	exports.$ = $$2;
-	exports.$$1 = $;
+	exports.$ = $;
+	exports.$$1 = $$2;
 	exports.A = A;
 	exports.A$1 = A$2;
 	exports.C = C;
@@ -177,12 +177,12 @@ To prevent other runtimes from defining tags that you use, consider using scopin
 	exports.c$1 = c$b;
 	exports.c$2 = c$7;
 	exports.c$3 = c$c;
-	exports.c$4 = c$5;
-	exports.c$5 = c$3;
+	exports.c$4 = c$2;
+	exports.c$5 = c$5;
 	exports.d = d$1;
 	exports.d$1 = d$7;
 	exports.e = e$7;
-	exports.e$1 = e$2;
+	exports.e$1 = e;
 	exports.f = f$4;
 	exports.f$1 = f$6;
 	exports.f$2 = f$1;
@@ -217,12 +217,12 @@ To prevent other runtimes from defining tags that you use, consider using scopin
 	exports.p$1 = p$4;
 	exports.r = r$6;
 	exports.r$1 = r$d;
-	exports.r$2 = r$4;
+	exports.r$2 = r$5;
 	exports.s = s$e;
-	exports.s$1 = s$2;
-	exports.s$2 = s$3;
-	exports.t = t$1;
-	exports.t$1 = t$4;
+	exports.s$1 = s$3;
+	exports.s$2 = s$4;
+	exports.t = t$4;
+	exports.t$1 = t$1;
 	exports.u = u$7;
 	exports.u$1 = u$3;
 	exports.u$2 = u$1;

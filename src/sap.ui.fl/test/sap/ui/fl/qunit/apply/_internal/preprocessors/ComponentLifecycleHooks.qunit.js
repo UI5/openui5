@@ -191,8 +191,7 @@ sap.ui.define([
 				componentData: this.oConfig.componentData,
 				asyncHints: this.oConfig.asyncHints,
 				manifest: this.oManifest,
-				componentId: this.oConfig.id,
-				forceInvalidation: true
+				componentId: this.oConfig.id
 			}, "the passed object is correct");
 			assert.strictEqual(this.oApplyManifestChangesStub.callCount, 0, "the AppDescriptorChanges were not applied");
 		});
@@ -403,7 +402,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("when getChangesAndPropagate() is called for two embedded components in parallel with no preexisting VariantModel on its application component", async function(assert) {
-			assert.expect(7);
+			assert.expect(6);
 			sandbox.spy(this.oAppComponent, "setModel");
 			this.oLoadFlexDataStub.reset();
 			this.oLoadFlexDataStub.resolves({
@@ -458,7 +457,6 @@ sap.ui.define([
 			]);
 			assert.strictEqual(this.oAppComponent.setModel.callCount, 1, "then the model is only set on the app component once");
 			assert.ok(oComponent2SetModelStub.called, "then the model is also set on the second embedded component");
-			assert.ok(this.oInitializeStub.getCalls()[0].args[0].forceInvalidation, "FlexState initialized with forceInvalidation=true");
 		});
 
 		QUnit.test("when getChangesAndPropagate() is called for an embedded component with a component not of type application", async function(assert) {
@@ -819,7 +817,6 @@ sap.ui.define([
 				componentId: this.oAppComponent.getId(),
 				reference: this.oAppComponent.getId(),
 				skipLoadBundle: true,
-				forceInvalidation: true,
 				manifest: this.oAppComponent.getManifest()
 			}, "FlexState was initialized with the correct parameters");
 			assert.deepEqual(this.oFlexStateInitStub.getCall(0).args[0], this.oFlexStateInitStub.getCall(1).args[0]);
@@ -879,8 +876,7 @@ sap.ui.define([
 				componentId: this.oAppComponent.getId(),
 				reference: this.oAppComponent.getId(),
 				skipLoadBundle: true,
-				manifest: this.oAppComponent.getManifest(),
-				forceInvalidation: true
+				manifest: this.oAppComponent.getManifest()
 			}, "FlexState was initialized with the correct parameters");
 
 			assert.ok(this.oSetAnnotationChangeStub1.calledOnce, "the promise was set on the first model");
@@ -1007,8 +1003,7 @@ sap.ui.define([
 				rawManifest: oManifest,
 				componentId: "componentId",
 				reference: "sap.app.descriptor.test",
-				skipLoadBundle: true,
-				forceInvalidation: true
+				skipLoadBundle: true
 			}, "FlexState was initialized with the correct parameters");
 			assert.strictEqual(this.oApplierSpy.callCount, 1, "Applier.applyChanges is called once");
 			assert.strictEqual(this.oApplyAddLibrarySpy.callCount, 3, "AddLibrary.applyChange is called three times");
