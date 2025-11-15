@@ -2157,15 +2157,16 @@ sap.ui.define([
 				}
 				jQuery.ajax(sRequestUrl, oAjaxSettings)
 				.then(function (/*{object|string}*/vResponse, _sTextStatus, jqXHR) {
-					var sETag = jqXHR.getResponseHeader("ETag"),
-						sCsrfToken = jqXHR.getResponseHeader("X-CSRF-Token");
+					var sCsrfToken = jqXHR.getResponseHeader("X-CSRF-Token"),
+						sETag = jqXHR.getResponseHeader("ETag"),
+						sODataVersion;
 
 					that.oModelInterface.onHttpResponse(
 						_Helper.parseRawHeaders(jqXHR.getAllResponseHeaders()));
 
 					try {
-						that.doCheckVersionHeader(jqXHR.getResponseHeader, sResourcePath,
-							!vResponse);
+						sODataVersion = that.doCheckVersionHeader(jqXHR.getResponseHeader,
+							sResourcePath, !vResponse);
 					} catch (oError) {
 						fnReject(oError);
 						return;
@@ -2181,8 +2182,13 @@ sap.ui.define([
 					// With GET it must be visible that there is no content, with the other
 					// methods it must be possible to insert the ETag from the header
 					vResponse ||= sMethod === "GET" ? null : {};
-					if (sETag && typeof vResponse === "object") {
-						vResponse["@odata.etag"] = sETag;
+					if (typeof vResponse === "object") {
+						if (sODataVersion === "4.01") {
+							vResponse = JSON.parse(JSON.stringify(vResponse), _Requestor.reviver);
+						}
+						if (sETag) {
+							vResponse["@odata.etag"] = sETag;
+						}
 					}
 
 					fnResolve({

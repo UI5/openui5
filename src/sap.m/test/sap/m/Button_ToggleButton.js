@@ -55,8 +55,6 @@ sap.ui.define([
   // shortcut for sap.m.ButtonType
   const ButtonType = mobileLibrary.ButtonType;
 
-  const encodeXML = sap.ui.require("sap/base/security/encodeXML");
-
   function toggleCompact() {
 	  jQuery("body").toggleClass("sapUiSizeCompact");
   }

@@ -19,6 +19,8 @@ sap.ui.define([
 	'sap/base/util/extend',
 	'sap/base/util/ObjectPath',
 	"sap/ui/core/ElementRegistry",
+	"sap/ui/core/Rendering",
+	"sap/ui/core/StaticArea",
 	'sap/ui/thirdparty/jquery',
 	'sap/ui/base/Object',
 	'sap/ui/core/Element',
@@ -27,8 +29,7 @@ sap.ui.define([
 	'sap/ui/test/matchers/MatcherFactory',
 	'sap/ui/test/pipelines/MatcherPipeline',
 	'sap/ui/test/_OpaLogger'
-], function (extend, ObjectPath, ElementRegistry, $, UI5Object, UI5Element, View, Ancestor, MatcherFactory,
-			MatcherPipeline, _OpaLogger) {
+], function(extend, ObjectPath, ElementRegistry, Rendering, StaticArea, $, UI5Object, UI5Element, View, Ancestor, MatcherFactory, MatcherPipeline, _OpaLogger) {
 	/**
 	 * @class A Plugin to search UI5 controls.
 	 *
@@ -694,9 +695,8 @@ sap.ui.define([
 	 * @protected
 	 */
 	OpaPlugin.isUIDirty = function() {
-		var oRendering = sap.ui.require("sap/ui/core/Rendering");
-		if (typeof oRendering?.isPending === "function") {
-			return oRendering.isPending();
+		if (typeof Rendering?.isPending === "function") {
+			return Rendering.isPending();
 		}
 		sap.ui.require("sap/ui/core/Core");
 	};
@@ -727,10 +727,8 @@ sap.ui.define([
 	 * @protected
 	 */
 	OpaPlugin.getElementById = function(sId) {
-		var oUI5Element = sap.ui.require("sap/ui/core/Element");
-
-		if (typeof oUI5Element.getElementById === "function") {
-			return oUI5Element.getElementById(sId);
+		if (typeof UI5Element.getElementById === "function") {
+			return UI5Element.getElementById(sId);
 		}
 		if (typeof ElementRegistry?.get === "function") {
 			return ElementRegistry.get(sId);
@@ -746,9 +744,8 @@ sap.ui.define([
 	 * @protected
 	 */
 	OpaPlugin.getStaticAreaDomRef = function() {
-		var oStaticArea = sap.ui.require("sap/ui/core/StaticArea");
-		if (typeof oStaticArea?.getDomRef === "function") {
-			return oStaticArea.getDomRef();
+		if (typeof StaticArea?.getDomRef === "function") {
+			return StaticArea.getDomRef();
 		}
 		sap.ui.require("sap/ui/core/Core");
 	};
@@ -762,10 +759,8 @@ sap.ui.define([
 	 * @returns {Object<sap.ui.core.ID,sap.ui.core.Element>}
 	 */
 	OpaPlugin.getElementRegistry = function() {
-		var oElementRegistry = sap.ui.require("sap/ui/core/ElementRegistry");
-
-		if (oElementRegistry) {
-			return oElementRegistry;
+		if (ElementRegistry) {
+			return ElementRegistry;
 		}
 		return ElementRegistry;
 	};

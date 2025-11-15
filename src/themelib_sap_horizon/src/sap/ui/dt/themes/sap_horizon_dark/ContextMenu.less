@@ -1,22 +1,27 @@
-/******************************************************************
-	Style of the DT Contextmenu - Horizon Dark Theme
-*******************************************************************/
-@_sap_ui_dt_ContextMenu_BorderRadius: @sapUiFieldBorderCornerRadius; // 0.25rem
+/* ====================================== */
+/* CSS for control sap.ui.dt/ContextMenu  */
+/* Evening Horizon theme                  */
+/* ====================================== */
+
+@_sap_ui_dt_ContextMenu_BorderRadius: var(--sapField_BorderCornerRadius); /* 0.25rem */
 
 .sapUiDtContextMenu.sapMMenu {
+
 	.sapMMenuList {
+
 		.sapMMenuItem {
 			margin: 0.0625rem;
 			border-radius: @_sap_ui_dt_ContextMenu_BorderRadius;
 
 			&:focus {
 				outline-offset: -0.125rem;
-				&.sapMMenuItemDisabled{
+				&.sapMMenuItemDisabled {
 					outline: none;
 				}
 			}
+
 			&.sapMMenuItemSubMenuOpen {
-				border-bottom: none !important; //1px
+				border-bottom: none !important; /* 1px */
 			}
 		}
 	}

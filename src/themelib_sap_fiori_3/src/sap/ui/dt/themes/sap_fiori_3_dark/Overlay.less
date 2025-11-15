@@ -1,19 +1,23 @@
-/******************************************************************
-	Style of the DT Overlays - sap_fiori_3_dark Theme
-*******************************************************************/
-@_sap_ui_dt_Overlay_CuttedBackgroundColor: fade(@sapUiContentImagePlaceholderBackground, 50%); //rgba(104, 125, 148, 0.5)
+/* ================================== */
+/* CSS for control sap.ui.dt/Overlay  */
+/* Quartz Dark theme                  */
+/* ================================== */
+
+@_sap_ui_dt_Overlay_CuttedBackgroundColor: fade(@sapUiContentImagePlaceholderBackground, 50%); /* rgba(104, 125, 148, 0.5) */
 
 .sapUiDtOverlayDropZone {
+
 	> .sapUiDtOverlayChildren {
+
 		> .sapUiDtOverlayMovable {
 			background: inherit;
 
-			&:before {
+			&::before {
 				content: none;
 			}
 
 			&.sapUiDtOverlayHover {
-				&:after {
+				&::after {
 					content: none;
 				}
 			}
@@ -26,7 +30,8 @@
 }
 
 .sapUiDtOverlayTargetZone {
-	&:after {
+
+	&::after {
 		transition: box-shadow .25s;
 		box-shadow: @_sap_ui_dt_Overlay_BoxShadow;
 	}

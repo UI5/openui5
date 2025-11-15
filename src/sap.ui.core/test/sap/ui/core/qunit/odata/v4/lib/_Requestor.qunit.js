@@ -626,6 +626,7 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
+["4.0", "4.01"].forEach((sODataVersion) => {
 	[{
 		iRequests : 1, sRequired : null, bRequestSucceeds : true, sTitle : "success"
 	}, {
@@ -650,16 +651,16 @@ sap.ui.define([
 		bDoNotDeliverToken : true,
 		sTitle : "no CSRF token can be fetched"
 	}].forEach(function (o) {
-		QUnit.test("sendRequest: " + o.sTitle, function (assert) {
+		QUnit.test("sendRequest: " + o.sTitle + "; " + sODataVersion, function (assert) {
 			var oError = {},
 				oExpectation,
 				mHeaders = {},
 				oHelperMock = this.mock(_Helper),
 				oReadFailure = {},
 				oRequestor = _Requestor.create("/Service/", oModelInterface,
-					{"X-CSRF-Token" : "Fetch"}),
+					{"X-CSRF-Token" : "Fetch"}, undefined, "4.01"),
 				mResolvedHeaders = {foo : "bar"},
-				oResponsePayload = {},
+				oResponsePayload = {value : "response payload"},
 				bSuccess = o.bRequestSucceeds !== false && !o.bReadFails && !o.bDoNotDeliverToken,
 				oTokenRequiredResponse = {
 					getResponseHeader : function (sName) {
@@ -689,6 +690,14 @@ sap.ui.define([
 				.withExactArgs("~getAllResponseHeaders~").returns("~mHeaders~");
 			this.mock(oModelInterface).expects("onHttpResponse").exactly(bSuccess ? 1 : 0)
 				.withExactArgs("~mHeaders~");
+			this.mock(oRequestor).expects("doCheckVersionHeader").exactly(bSuccess ? 1 : 0)
+				.withExactArgs(sinon.match.func, "foo", false).returns(sODataVersion);
+			// Note: cannot mock JSON.stringify, it collides with Sinon.JS framework :-(
+			this.mock(JSON).expects("parse")
+				.exactly(bSuccess && sODataVersion === "4.01" ? 1 : 0)
+				.withExactArgs(JSON.stringify(oResponsePayload),
+					sinon.match.same(_Requestor.reviver))
+				.returns({value : "revived response payload"});
 
 			// With <code>bRequestSucceeds === false</code>, "request" always fails,
 			// with <code>bRequestSucceeds === true</code>, "request" always succeeds,
@@ -748,8 +757,18 @@ sap.ui.define([
 				.then(function (oPayload) {
 					assert.ok(bSuccess, "success possible");
 					assert.strictEqual(oPayload.contentType, "application/json");
-					assert.strictEqual(oPayload.body, oResponsePayload);
-					assert.deepEqual(oPayload.body, {"@odata.etag" : "Bill"});
+					if (sODataVersion === "4.01") {
+						assert.deepEqual(oPayload.body, {
+							"@odata.etag" : "Bill",
+							value : "revived response payload"
+						});
+					} else {
+						assert.strictEqual(oPayload.body, oResponsePayload);
+						assert.deepEqual(oPayload.body, {
+							"@odata.etag" : "Bill",
+							value : "response payload"
+						});
+					}
 					assert.strictEqual(oPayload.messages, "[{code : 42}]");
 					assert.strictEqual(oPayload.resourcePath, "foo");
 				}, function (oError0) {
@@ -758,6 +777,7 @@ sap.ui.define([
 				});
 		});
 	});
+});
 
 	//*********************************************************************************************
 	["NOTGET", "GET"].forEach(function (sMethod, i) {

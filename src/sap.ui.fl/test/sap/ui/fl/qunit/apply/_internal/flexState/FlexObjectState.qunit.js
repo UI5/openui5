@@ -12,9 +12,10 @@ sap.ui.define([
 	"sap/ui/fl/apply/_internal/flexObjects/FlexObjectFactory",
 	"sap/ui/fl/apply/_internal/flexObjects/States",
 	"sap/ui/fl/apply/_internal/flexObjects/UIChange",
-	"sap/ui/fl/apply/_internal/flexState/FlexState",
 	"sap/ui/fl/apply/_internal/flexState/changes/DependencyHandler",
 	"sap/ui/fl/apply/_internal/flexState/FlexObjectState",
+	"sap/ui/fl/apply/_internal/flexState/FlexState",
+	"sap/ui/fl/Utils",
 	"sap/ui/thirdparty/sinon-4",
 	"test-resources/sap/ui/fl/qunit/FlQUnitUtils",
 	"test-resources/sap/ui/rta/qunit/RtaQunitUtils"
@@ -30,9 +31,10 @@ sap.ui.define([
 	FlexObjectFactory,
 	States,
 	UIChange,
-	FlexState,
 	DependencyHandler,
 	FlexObjectState,
+	FlexState,
+	Utils,
 	sinon,
 	FlQUnitUtils,
 	RtaQunitUtils
@@ -391,6 +393,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("with 3 queued changes dependent on each other and the first throwing an error", async function(assert) {
+			const oGetAppComponentForSelectorSpy = sandbox.spy(Utils, "getAppComponentForSelector");
 			const oChangeHandlerApplyChangeRejectStub = sandbox.stub().throws(new Error());
 			this.oGetChangeHandlerStub.restore();
 			this.oGetChangeHandlerStub = sandbox.stub(ChangeUtils, "getChangeHandler")
@@ -406,8 +409,9 @@ sap.ui.define([
 
 			Applier.applyAllChangesForControl(oAppComponent, sReference, this.oControl1);
 
-			await FlexObjectState.waitForFlexObjectsToBeApplied([{ selector: this.oControl1 }]);
+			await FlexObjectState.waitForFlexObjectsToBeApplied([{ selector: this.oControl1 }], oAppComponent);
 			assert.strictEqual(this.oAddAppliedCustomDataSpy.callCount, 2, "addCustomData was called 2 times");
+			assert.strictEqual(oGetAppComponentForSelectorSpy.callCount, 0, "the app component was not requested for the selector");
 		});
 
 		QUnit.test("twice with 3 queued changes", async function(assert) {

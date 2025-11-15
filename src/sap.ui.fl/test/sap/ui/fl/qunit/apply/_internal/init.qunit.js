@@ -1,14 +1,14 @@
 /* global QUnit */
 
 sap.ui.define([
+	"sap/ui/fl/apply/_internal/changeHandlers/ChangeHandlerRegistration",
 	"sap/ui/fl/apply/_internal/DelegateMediator",
 	"sap/ui/fl/changeHandler/ChangeAnnotation",
-	"sap/ui/fl/initial/_internal/changeHandlers/ChangeHandlerRegistration",
 	"sap/ui/thirdparty/sinon-4"
 ], function(
+	ChangeHandlerRegistration,
 	DelegateMediator,
 	ChangeAnnotation,
-	ChangeHandlerRegistration,
 	sinon
 ) {
 	"use strict";

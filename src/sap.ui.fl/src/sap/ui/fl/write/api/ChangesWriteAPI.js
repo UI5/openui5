@@ -10,6 +10,7 @@ sap.ui.define([
 	"sap/ui/core/Element",
 	"sap/ui/core/Lib",
 	"sap/ui/fl/apply/_internal/appVariant/DescriptorChangeTypes",
+	"sap/ui/fl/apply/_internal/changeHandlers/ChangeHandlerStorage",
 	"sap/ui/fl/apply/_internal/changes/Applier",
 	"sap/ui/fl/apply/_internal/changes/Reverter",
 	"sap/ui/fl/apply/_internal/changes/Utils",
@@ -19,14 +20,11 @@ sap.ui.define([
 	"sap/ui/fl/apply/_internal/flexState/FlexObjectState",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/descriptorRelated/api/DescriptorChangeFactory",
-	"sap/ui/fl/initial/_internal/changeHandlers/ChangeHandlerStorage",
 	"sap/ui/fl/write/_internal/appVariant/AppVariantInlineChangeFactory",
 	"sap/ui/fl/write/_internal/controlVariants/ControlVariantWriteUtils",
 	"sap/ui/fl/write/_internal/flexState/FlexObjectManager",
 	"sap/ui/fl/write/api/ContextBasedAdaptationsAPI",
-	"sap/ui/fl/write/api/FeaturesAPI",
 	"sap/ui/fl/write/api/VersionsAPI",
-	"sap/ui/fl/Layer",
 	"sap/ui/fl/Utils",
 	"sap/ui/fl/write/_internal/init"
 ], function(
@@ -37,6 +35,7 @@ sap.ui.define([
 	Element,
 	Lib,
 	DescriptorChangeTypes,
+	ChangeHandlerStorage,
 	Applier,
 	Reverter,
 	ChangesUtils,
@@ -46,14 +45,11 @@ sap.ui.define([
 	FlexObjectState,
 	ManifestUtils,
 	DescriptorChangeFactory,
-	ChangeHandlerStorage,
 	AppVariantInlineChangeFactory,
 	ControlVariantWriteUtils,
 	FlexObjectManager,
 	ContextBasedAdaptationsAPI,
-	FeaturesAPI,
 	VersionsAPI,
-	Layer,
 	Utils
 ) {
 	"use strict";

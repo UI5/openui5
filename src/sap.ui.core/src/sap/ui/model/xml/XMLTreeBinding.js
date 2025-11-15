@@ -32,6 +32,16 @@ sap.ui.define(['sap/ui/model/ClientTreeBinding', "sap/base/util/each"],
 	var XMLTreeBinding = ClientTreeBinding.extend("sap.ui.model.xml.XMLTreeBinding");
 
 	/**
+	 * Returns sap.ui.model.ClientTreeBinding.CannotCloneData.
+	 *
+	 * @returns {sap.ui.model.ClientTreeBinding.CannotCloneData} a symbol indicating that the tree data cannot be cloned
+	 * @override
+	 */
+	XMLTreeBinding.prototype.cloneData = function() {
+		return ClientTreeBinding.CannotCloneData;
+	};
+
+	/**
 	 * Return node contexts for the tree
 	 * @param {sap.ui.model.Context} oContext to use for retrieving the node contexts
 	 * @param {int} iStartIndex the startIndex where to start the retrieval of contexts

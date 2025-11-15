@@ -1,21 +1,25 @@
-/******************************************************************
-	Style of the DT Overlays - Horizon High Contrast Black theme
-*******************************************************************/
-@_sap_ui_dt_Overlay_TargetZoneOutlineColor: @sapUiSuccessBorder; //#9c9
-@_sap_ui_dt_Overlay_SelectionOutlineColor: darken(@sapUiSuccessBorder, 25%); //#4c994c
-@_sap_ui_dt_Overlay_CuttedBackgroundColor: @sapUiFieldPlaceholderTextColor; //#999
-@_sap_ui_dt_Overlay_CuttedBorderColor: darken(@sapUiSuccessBorder, 25%); //#4c994c
-@_sap_ui_dt_Overlay_HighlightOutlineColor: @sapUiWarningBorder; // #ffab1d
-@_sap_ui_dt_Overlay_BorderRadius: @sapUiButtonBorderCornerRadius; // 0.375rem
-@_sap_ui_dt_Overlay_DropZoneBackgroundColor: fade(@sapUiSuccessBorder, 30%); //rgba(153, 204, 153, 0.3)
+/* ================================== */
+/* CSS for control sap.ui.dt/Overlay  */
+/* Horizon High Contrast Black theme  */
+/* ================================== */
+
+@_sap_ui_dt_Overlay_TargetZoneOutlineColor: var(--sapSuccessBorderColor); /* #9c9 */
+@_sap_ui_dt_Overlay_SelectionOutlineColor: darken(@sapUiSuccessBorder, 25%); /* #4c994c */
+@_sap_ui_dt_Overlay_CuttedBackgroundColor: var(--sapField_PlaceholderTextColor); /* #999 */
+@_sap_ui_dt_Overlay_CuttedBorderColor: darken(@sapUiSuccessBorder, 25%); /* #4c994c */
+@_sap_ui_dt_Overlay_HighlightOutlineColor: var(--sapWarningBorderColor); /* #ffab1d */
+@_sap_ui_dt_Overlay_BorderRadius: var(--sapButton_BorderCornerRadius); /* 0.375rem */
+@_sap_ui_dt_Overlay_DropZoneBackgroundColor: fade(@sapUiSuccessBorder, 30%); /* rgba(153, 204, 153, 0.3) */
 
 .sapUiDtOverlayFocusable {
+
 	&:focus {
-		&:before {
+
+		&::before {
 			border-radius: @_sap_ui_dt_Overlay_BorderRadius;
 			outline: 0.125rem dotted @_sap_ui_dt_Overlay_FocusBorderColor;
 			border: none;
-			outline-offset: -0.25rem; //4px
+			outline-offset: -0.25rem; /* 4px */
 		}
 	}
 }
@@ -23,19 +27,22 @@
 .sapUiDtOverlaySelected {
 	box-shadow: none !important;
 
-	&:after {
+	&::after {
 		border-radius: @_sap_ui_dt_Overlay_BorderRadius;
 	}
+
 	&.sapUiDtOverlayHover {
-		&:after {
-			border: 0.125rem solid @_sap_ui_dt_Overlay_SelectionOutlineColor; //2px
-			outline-offset: -0.25rem; //4px
+
+		&::after {
+			border: 0.125rem solid @_sap_ui_dt_Overlay_SelectionOutlineColor; /* 2px */
+			outline-offset: -0.25rem; /* 4px */
 		}
 	}
 }
 
 .sapUiDtOverlayTargetZone {
-	&:after {
+
+	&::after {
 		border-radius: @_sap_ui_dt_Overlay_BorderRadius;
 	}
 }
@@ -43,22 +50,24 @@
 .sapUiDtOverlayCutted {
 	opacity: 0.7;
 
-	&:after {
+	&::after {
 		border-radius: @_sap_ui_dt_Overlay_BorderRadius;
 	}
 }
 
 .sapUiDtOverlayHighlighted:not(.sapUiDtOverlaySelected) {
-	&:after {
+
+	&::after {
 		box-shadow: none;
 	}
 }
 
 .sapUiDtOverlayHover {
-	&:after {
+
+	&::after {
 		box-shadow: none;
-		outline: 0.125rem dotted @_sap_ui_dt_Overlay_SelectionOutlineColor; //2px
-		outline-offset: -0.125rem; //2px
+		outline: 0.125rem dotted @_sap_ui_dt_Overlay_SelectionOutlineColor; /* 2px */
+		outline-offset: -0.125rem; /* 2px */
 		border-radius: @_sap_ui_dt_Overlay_BorderRadius;
 	}
 }

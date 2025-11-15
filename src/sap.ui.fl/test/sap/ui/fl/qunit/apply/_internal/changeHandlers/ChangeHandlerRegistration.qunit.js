@@ -2,8 +2,8 @@
 
 sap.ui.define([
 	"sap/ui/core/Lib",
-	"sap/ui/fl/initial/_internal/changeHandlers/ChangeHandlerRegistration",
-	"sap/ui/fl/initial/_internal/changeHandlers/ChangeHandlerStorage",
+	"sap/ui/fl/apply/_internal/changeHandlers/ChangeHandlerRegistration",
+	"sap/ui/fl/apply/_internal/changeHandlers/ChangeHandlerStorage",
 	"sap/ui/thirdparty/sinon-4"
 ], function(
 	Lib,

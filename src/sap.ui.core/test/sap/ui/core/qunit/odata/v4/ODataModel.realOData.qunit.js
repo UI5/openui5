@@ -376,7 +376,7 @@ sap.ui.define([
 	}
 
 	//*****************************************************************************************
-["$auto"/*TODO, "$direct"*/].forEach((sGroupId) => {
+["$auto", "$direct"].forEach((sGroupId) => {
 	QUnit.test("ODataModel: 4.01 w/ " + sGroupId, async function (assert) {
 		const oModel = new ODataModel({
 			earlyRequests : true,

@@ -1,11 +1,15 @@
-/******************************************************************
-	Style of the DT Contextmenu - sap_fiori_3_hcb Theme
-*******************************************************************/
-@_sap_ui_dt_ContextMenu_BorderRadius: @sapUiButtonBorderCornerRadius; // 0.375rem
-@_sap_ui_dt_ContextMenu_OpenSubMenuBackgroundColor: @sapUiSelected; //#0f5d94
+/* ====================================== */
+/* CSS for control sap.ui.dt/ContextMenu  */
+/* Quartz High Contrast Black theme       */
+/* ====================================== */
+
+@_sap_ui_dt_ContextMenu_BorderRadius: var(--sapButton_BorderCornerRadius); /* 0.375rem */
+@_sap_ui_dt_ContextMenu_OpenSubMenuBackgroundColor: var(--sapSelectedColor); /* #0f5d94 */
 
 .sapUiDtContextMenu.sapMMenu {
+
 	.sapMMenuList {
+
 		.sapMMenuItem {
 
 			&.sapMMenuItemDisabled {
@@ -17,7 +21,7 @@
 			}
 
 			&.sapMMenuItemSubMenuOpen {
-				border-bottom: 0.0625rem solid transparent !important; //remove border
+				border-bottom: 0.0625rem solid transparent !important; /* remove border */
 				border-radius: @_sap_ui_dt_ContextMenu_BorderRadius;
 
 				&:not(:hover) {

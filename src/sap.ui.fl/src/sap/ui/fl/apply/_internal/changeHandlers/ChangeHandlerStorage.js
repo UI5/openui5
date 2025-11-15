@@ -18,7 +18,7 @@ sap.ui.define([
 	/**
 	 * Storage of all registered change handlers.
 	 *
-	 * @alias sap.ui.fl.registry.ChangeHandlerStorage
+	 * @alias sap.ui.fl.apply._internal.changeHandlers.ChangeHandlerStorage
 	 *
 	 * @author SAP SE
 	 * @version ${version}

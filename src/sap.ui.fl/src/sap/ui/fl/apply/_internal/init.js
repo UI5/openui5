@@ -3,13 +3,13 @@
  */
 
 sap.ui.define([
+	"sap/ui/fl/apply/_internal/changeHandlers/ChangeHandlerRegistration",
 	"sap/ui/fl/apply/_internal/DelegateMediator",
-	"sap/ui/fl/changeHandler/ChangeAnnotation",
-	"sap/ui/fl/initial/_internal/changeHandlers/ChangeHandlerRegistration"
+	"sap/ui/fl/changeHandler/ChangeAnnotation"
 ], function(
+	ChangeHandlerRegistration,
 	DelegateMediator,
-	ChangeAnnotation,
-	ChangeHandlerRegistration
+	ChangeAnnotation
 ) {
 	"use strict";
 

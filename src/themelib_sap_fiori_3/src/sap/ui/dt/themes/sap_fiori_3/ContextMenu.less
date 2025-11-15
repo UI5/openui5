@@ -1,14 +1,18 @@
-/******************************************************************
-	Style of the DT Contextmenu - sap_fiori_3 Theme
-*******************************************************************/
-@_sap_ui_dt_ContextMenu_MnuItemTextColor: var(--sapList_SelectionBorderColor); // #0854a0
-@_sap_ui_dt_ContextMenu_MnuItemBackgroundColor: var(--sapList_Background); // #fff
-@_sap_ui_dt_ContextMenu_MnuItemHoverBackgroundColor: var( --sapList_SelectionBackgroundColor); // #e5f0fa
-@_sap_ui_dt_ContextMenu_BorderRadius: var(--sapButton_BorderCornerRadius); // 0.25rem
-@_sap_ui_dt_ContextMenu_MnuItemIconColor: var(--sapList_SelectionBorderColor); // #0854a0
+/* ====================================== */
+/* CSS for control sap.ui.dt/ContextMenu  */
+/* Quartz Light theme                     */
+/* ====================================== */
+
+@_sap_ui_dt_ContextMenu_MnuItemTextColor: var(--sapList_SelectionBorderColor); /* #0854a0 */
+@_sap_ui_dt_ContextMenu_MnuItemBackgroundColor: var(--sapList_Background); /* #fff */
+@_sap_ui_dt_ContextMenu_MnuItemHoverBackgroundColor: var( --sapList_SelectionBackgroundColor); /* #e5f0fa */
+@_sap_ui_dt_ContextMenu_BorderRadius: var(--sapButton_BorderCornerRadius); /* 0.25rem */
+@_sap_ui_dt_ContextMenu_MnuItemIconColor: var(--sapList_SelectionBorderColor); /* #0854a0 */
 
 .sapUiDtContextMenu.sapMMenu {
+
 	.sapMMenuList {
+
 		.sapMMenuItem {
 			color: @_sap_ui_dt_ContextMenu_MnuItemTextColor;
 			background-color: @_sap_ui_dt_ContextMenu_MnuItemBackgroundColor;
@@ -19,10 +23,11 @@
 				background-color: @_sap_ui_dt_ContextMenu_MnuItemBackgroundColor;
 			}
 
-			.sapMMenuItemSubMenu > div:after,
-			.sapMMenuItem:hover .sapMMenuItemSubMenu > div:after {
+			.sapMMenuItemSubMenu > div::after,
+			.sapMMenuItem:hover .sapMMenuItemSubMenu > div::after {
 				color: @_sap_ui_dt_ContextMenu_MnuItemTextColor;
 			}
+
 			&:hover {
 				color: @_sap_ui_dt_ContextMenu_MnuItemTextColor;
 				background-color: @_sap_ui_dt_ContextMenu_MnuItemHoverBackgroundColor;
@@ -31,8 +36,10 @@
 					color: @_sap_ui_dt_ContextMenu_MnuItemTextColor;
 					background-color: @_sap_ui_dt_ContextMenu_MnuItemHoverBackgroundColor;
 				}
+
 				&.sapMMenuItemDisabled {
 					background-color: @_sap_ui_dt_ContextMenu_MnuItemBackgroundColor;
+
 					.sapMMenuItemIcon {
 						background-color: @_sap_ui_dt_ContextMenu_MnuItemBackgroundColor;
 					}
@@ -42,34 +49,40 @@
 			&:focus {
 				border-radius: @_sap_ui_dt_ContextMenu_BorderRadius;
 				outline-offset: -0.125rem;
-				&.sapMMenuItemDisabled{
+
+				&.sapMMenuItemDisabled {
 					outline: none;
 				}
 			}
 
 			&.sapMMenuItemSubMenuOpen {
-				border-bottom: none !important; //1px
+				border-bottom: none !important; /* 1px */
 			}
 
 			&.sapUiDtContextMenuExtendedActionsTitle {
+
 				&:hover {
 					background-color: @_sap_ui_dt_ContextMenu_PrpgtedMnuItemBGColor;
 				}
 			}
 
 			&.sapUiDtContextMenuPropagatedControlTitle {
+
 				&:hover {
 					background-color: @_sap_ui_dt_ContextMenu_PrpgtedMnuItemBGColor;
 				}
 			}
 
 			&.sapUiDtContextMenuPropagatedItem {
+
 				.sapMMenuItemIcon {
 					background-color: @_sap_ui_dt_ContextMenu_PrpgtedMnuItemBGColor;
 				}
+
 				&:hover {
+
 					.sapMMenuItemIcon {
-						background-color: @_sap_ui_dt_ContextMenu_MnuItemHoverBackgroundColor!important;
+						background-color: @_sap_ui_dt_ContextMenu_MnuItemHoverBackgroundColor !important;
 					}
 				}
 			}

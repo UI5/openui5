@@ -462,7 +462,7 @@ function(
 			bIsUpOrDownArrowKey = [KeyCodes.ARROW_UP, KeyCodes.ARROW_DOWN].includes(oEvent.keyCode),
 			bIsBreadcrumbs = fnHasType("sap.m.Breadcrumbs"),
 			bIsSlider = fnHasType(["sap.m.Slider", "sap.m.RangeSlider"]),
-			bIsTokenizer = fnHasType("sap.m.OverflowToolbarTokenizer");
+			bIsTokenizer = fnHasType(["sap.m.OverflowToolbarTokenizer", "sap.m.Tokenizer"]);
 
 		if (bIsUpOrDownArrowKey && bIsSelectOrComboBox || bIsBreadcrumbs || bIsSlider || bIsTokenizer) {
 			return true;

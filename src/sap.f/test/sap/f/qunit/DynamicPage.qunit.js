@@ -558,6 +558,18 @@ function(
 		assert.ok(oNeedsVerticalScrollSpy.alwaysReturned(true), "scrollbar is needed");
 	});
 
+	QUnit.test("'isContentOverflowingIntoFooter' returns true when the fullscreen content overflaps the footer", function (assert) {
+		this.stub(this.oDynamicPage, "_isContentOverflowingFullscreenContainer").returns(true);
+		this.oDynamicPage.setShowFooter(true);
+		assert.strictEqual(this.oDynamicPage.isContentOverflowingIntoFooter(), true, "Content is overflowing when footer is shown");
+	});
+
+	QUnit.test("'isContentOverflowingIntoFooter' returns false when no footer is shown", function (assert) {
+		this.stub(this.oDynamicPage, "_isContentOverflowingFullscreenContainer").returns(true);
+		this.oDynamicPage.setShowFooter(false);
+		assert.strictEqual(this.oDynamicPage.isContentOverflowingIntoFooter(), false, "Content is not overflowing when footer is not shown");
+	});
+
 	QUnit.test("BCP: 1870261908 Header title cursor CSS reset is applied", function (assert) {
 		// Arrange
 		var $MainHeading = this.oDynamicPage.$().find(".sapFDynamicPageTitleMainHeading"),
@@ -1237,6 +1249,42 @@ function(
 
 		assert.strictEqual(oDynamicPage._headerBiggerThanAllowedHeight, false, "flag is updated");
 		assert.strictEqual(oDynamicPage._preserveHeaderStateOnScroll(), true, "preserveHeaderStateOnScroll should NOT be overridden with less than 60% height");
+	});
+
+	QUnit.test("DynamicPage Header is repositioned when 'preserveHeaderStateOnScroll' property is overridden", function (assert) {
+		var oDynamicPage = this.oDynamicPage;
+		// Setup
+		oDynamicPage.setPreserveHeaderStateOnScroll(true);
+
+		oUtil.renderObject(this.oDynamicPage);
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+		this.clock.tick();
+
+		var iHeaderHeight = oDynamicPage.getHeader().$().height(),
+			iTitleHeight = oDynamicPage.getTitle().$().height(),
+			iBigPageHeight = 1000,
+			iSmallPageHeight = iHeaderHeight + iTitleHeight + 1; // just enough to fit header and title
+		oDynamicPage._headerBiggerThanAllowedHeight = false;
+
+		// Act: resize page to make header bigger than 60% of DP height
+		oDynamicPage.$().height(iSmallPageHeight); // make page smaller
+		oDynamicPage._onResize({
+			size: {height: iSmallPageHeight},
+			oldSize: {height: iBigPageHeight}
+		});
+
+		assert.strictEqual(oDynamicPage._bHeaderInTitleArea, false, "header is moved to content");
+		assert.strictEqual(oDynamicPage._preserveHeaderStateOnScroll(), false, "preserveHeaderStateOnScroll should be overridden with 60% or bigger height");
+
+		// Act: resize page to make header less than 60% of DP height
+		oDynamicPage.$().height(iBigPageHeight); // make page bigger
+		oDynamicPage._onResize({
+			size: {height: iBigPageHeight},
+			oldSize: {height: iSmallPageHeight}
+		});
+
+		assert.strictEqual(oDynamicPage._bHeaderInTitleArea, true, "header is moved to title");
+		assert.strictEqual(oDynamicPage._preserveHeaderStateOnScroll(), true, "preserveHeaderStateOnScroll should be overridden with 60% or bigger height");
 	});
 
 	/* --------------------------- DynamicPage Tablet Rendering ---------------------------------- */

@@ -203,7 +203,7 @@ function(jQuery,
 		};
 		this.addWithParam = function(s, o) {
 			for (var n in o) {
-				var reg = new RegExp("\{" + n + "\}","g");
+				var reg = new RegExp("\\{" + n + "\\}","g");
 				s = s.replace(reg,o[n]);
 			}
 			that.add(s);

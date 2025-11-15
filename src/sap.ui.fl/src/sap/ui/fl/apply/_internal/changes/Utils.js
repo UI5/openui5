@@ -3,6 +3,8 @@
  */
 
 sap.ui.define([
+	"sap/ui/fl/apply/_internal/changeHandlers/ChangeHandlerRegistration",
+	"sap/ui/fl/apply/_internal/changeHandlers/ChangeHandlerStorage",
 	"sap/ui/fl/apply/_internal/changes/descriptor/ApplyStrategyFactory",
 	"sap/ui/fl/apply/_internal/changes/FlexCustomData",
 	"sap/ui/fl/apply/_internal/flexObjects/AnnotationChange",
@@ -10,10 +12,10 @@ sap.ui.define([
 	"sap/ui/fl/apply/_internal/flexObjects/VariantChange",
 	"sap/ui/fl/apply/_internal/flexObjects/VariantManagementChange",
 	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
-	"sap/ui/fl/initial/_internal/changeHandlers/ChangeHandlerRegistration",
-	"sap/ui/fl/initial/_internal/changeHandlers/ChangeHandlerStorage",
 	"sap/ui/fl/Utils"
 ], function(
+	ChangeHandlerRegistration,
+	ChangeHandlerStorage,
 	ApplyStrategyFactory,
 	FlexCustomData,
 	AnnotationChange,
@@ -21,8 +23,6 @@ sap.ui.define([
 	VariantChange,
 	VariantManagementChange,
 	VariantManagementState,
-	ChangeHandlerRegistration,
-	ChangeHandlerStorage,
 	FlUtils
 ) {
 	"use strict";

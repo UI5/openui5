@@ -439,8 +439,6 @@ sap.ui.define([
 	QUnit.module("Edge cases");
 
 	QUnit.test("RenderManager should not break for controls with invalid renderer", async function(assert) {
-
-		var Log = sap.ui.require("sap/base/Log");
 		assert.ok(Log, "Log module should be available");
 
 		// define a control without an invalid renderer

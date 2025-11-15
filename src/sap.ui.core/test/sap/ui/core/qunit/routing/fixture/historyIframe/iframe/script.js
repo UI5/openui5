@@ -35,7 +35,7 @@ sap.ui.define([
 
 	window.addEventListener("message", function(oEvent) {
 		var oData = oEvent.data;
-		if (oData.action && mActions[oData.action]) {
+		if (oData.action && Object.hasOwn(mActions, oData.action)) {
 			mActions[oData.action](oEvent);
 		}
 	});

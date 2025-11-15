@@ -1763,13 +1763,9 @@ sap.ui.define([
 	}
 
 	function _checkSpecialDate(oSpecialDate) {
-
-		var DateTypeRange = sap.ui.require("sap/ui/unified/DateTypeRange");
-
 		if (oSpecialDate && !(DateTypeRange && oSpecialDate instanceof DateTypeRange)) {
 			throw new Error(oSpecialDate + "is not valid for aggregation \"specialDates\" of " + this);
 		}
-
 	}
 
 	function _invalidateCalendar() {

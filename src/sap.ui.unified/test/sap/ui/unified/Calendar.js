@@ -71,7 +71,6 @@ sap.ui.define([
   const BackgroundDesign = layoutLibrary.BackgroundDesign;
 
   var UI5Date = sap.ui.require("sap/ui/core/date/UI5Date");
-  const CalendarType = sap.ui.require("sap/base/i18n/date/CalendarType");
 
   var oCalendars = new JSONModel(CalendarType);
 

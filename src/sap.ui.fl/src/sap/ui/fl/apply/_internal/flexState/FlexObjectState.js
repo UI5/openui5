@@ -213,10 +213,11 @@ sap.ui.define([
 	 * @param {object[]} aSelectorInformation - An array containing an object with {@link sap.ui.fl.Selector} and further configuration
 	 * @param {sap.ui.fl.Selector} aSelectorInformation.selector - A {@link sap.ui.fl.Selector}
 	 * @param {string[]} [aSelectorInformation.changeTypes] - An array containing the change types that will be considered. If empty no filtering will be done
+	 * @param {sap.ui.core.UIComponent} [oComponent] - Application component instance that is currently loading
 	 * @returns {Promise} Resolves when all changes on controls have been processed
 	 */
-	FlexObjectState.waitForFlexObjectsToBeApplied = async function(aSelectorInformation) {
-		const oAppComponent = Utils.getAppComponentForSelector(aSelectorInformation[0].selector);
+	FlexObjectState.waitForFlexObjectsToBeApplied = async function(aSelectorInformation, oComponent) {
+		const oAppComponent = oComponent || Utils.getAppComponentForSelector(aSelectorInformation[0].selector);
 		if (!oAppComponent) {
 			return;
 		}

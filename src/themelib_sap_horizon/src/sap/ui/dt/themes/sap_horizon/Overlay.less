@@ -1,15 +1,19 @@
-/******************************************************************
-	Style of the DT Overlays - Horizon Theme
-*******************************************************************/
-@_sap_ui_dt_Overlay_BorderRadius: @sapUiButtonBorderCornerRadius; //0.5rem
-@_sap_ui_dt_Overlay_BoxShadow: @sapUiUx3ToolPopupShadow; //0 6px 12px 0 rgba(34,53,72,0.3)
-@_sap_ui_dt_Overlay_DropZoneBackgroundColor: fade(@sapUiContentImagePlaceholderForegroundColor, 10%); //rgba(91, 115, 139, 0.1)
-@_sap_ui_dt_Overlay_CuttedBackgroundColor: @sapUiListSelectionBackgroundColor; // #ebf8ff
-@_sap_ui_dt_Overlay_HoverBackgroundColor: fade(@sapUiSelected, 5%); // rgba(0, 100, 217, 0.05)
+/* ================================== */
+/* CSS for control sap.ui.dt/Overlay  */
+/* Morning Horizon theme              */
+/* ================================== */
+
+@_sap_ui_dt_Overlay_BorderRadius: var(--sapButton_BorderCornerRadius); /* 0.5rem */
+@_sap_ui_dt_Overlay_BoxShadow: @sapUiUx3ToolPopupShadow; /* 0 6px 12px 0 rgba(34,53,72,0.3) */
+@_sap_ui_dt_Overlay_DropZoneBackgroundColor: fade(@sapUiContentImagePlaceholderForegroundColor, 10%); /* rgba(91, 115, 139, 0.1) */
+@_sap_ui_dt_Overlay_CuttedBackgroundColor: var(--sapList_SelectionBackgroundColor); /* #ebf8ff */
+@_sap_ui_dt_Overlay_HoverBackgroundColor: fade(@sapUiSelected, 5%); /* rgba(0, 100, 217, 0.05) */
 
 .sapUiDtOverlayFocusable {
+
 	&:focus {
-		&:before {
+
+		&::before {
 			border-radius: @_sap_ui_dt_Overlay_BorderRadius;
 			outline: 0.0625rem dotted @_sap_ui_dt_Overlay_FocusBorderColor;
 			border: none;
@@ -21,7 +25,7 @@
 .sapUiDtOverlaySelected {
 	box-shadow: none !important;
 
-	&:after {
+	&::after {
 		border-radius: @_sap_ui_dt_Overlay_BorderRadius;
 		transition: box-shadow 0.25s;
 		box-shadow: @_sap_ui_dt_Overlay_BoxShadow;
@@ -29,7 +33,8 @@
 }
 
 .sapUiDtOverlayTargetZone {
-	&:after {
+
+	&::after {
 		border-radius: @_sap_ui_dt_Overlay_BorderRadius;
 		transition: box-shadow .25s;
 		box-shadow: @_sap_ui_dt_Overlay_BoxShadow;
@@ -37,13 +42,15 @@
 }
 
 .sapUiDtOverlayCutted {
-	&:after {
+
+	&::after {
 		border-radius: @_sap_ui_dt_Overlay_BorderRadius;
 	}
 }
 
 .sapUiDtOverlayHover {
-	&:after {
+
+	&::after {
 		border-radius: @_sap_ui_dt_Overlay_BorderRadius;
 		border: none;
 	}

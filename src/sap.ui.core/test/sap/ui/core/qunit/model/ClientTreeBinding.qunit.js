@@ -309,7 +309,7 @@ sap.ui.define([
 		oBinding.checkUpdate(bForce);
 
 		assert.deepEqual(oBinding._mLengthsCache, {});
-		assert.strictEqual(oBinding.oTreeData, bUpdated ? oNew : oOldTreeData);
+		assert.deepEqual(oBinding.oTreeData, bUpdated ? oNew : oOldTreeData);
 	});
 });
 
@@ -337,7 +337,39 @@ sap.ui.define([
 		oBinding.setContext(oNewContext);
 
 		assert.strictEqual(oBinding.oContext, oNewContext);
-		assert.strictEqual(oBinding.oTreeData, bRelative ? oNewTreeData : oTreeData);
+		assert.deepEqual(oBinding.oTreeData, bRelative ? oNewTreeData : oTreeData);
 	});
 });
+
+	//*********************************************************************************************
+	QUnit.test("cloneData: simple types", function (assert) {
+		const oModel = {_getObject() {}};
+		const oBinding = new ClientTreeBinding(oModel, "~path");
+		const oOriginal = {
+			foo: "bar",
+			nested: {
+				value: 42
+			}
+		};
+
+		// code under test - object
+		const oCloned = oBinding.cloneData(oOriginal);
+
+		assert.deepEqual(oCloned, oOriginal);
+		assert.notStrictEqual(oCloned, oOriginal);
+		assert.notStrictEqual(oCloned.nested, oOriginal.nested);
+
+		const aOriginal = [
+			{name: "Item 1"},
+			{name: "Item 2", nested: {value: 123}}
+		];
+
+		// code under test - array
+		const aCloned = oBinding.cloneData(aOriginal);
+
+		assert.deepEqual(aCloned, aOriginal);
+		assert.notStrictEqual(aCloned, aOriginal);
+		assert.notStrictEqual(aCloned[0], aOriginal[0]);
+		assert.notStrictEqual(aCloned[1].nested, aOriginal[1].nested);
+	});
 });
