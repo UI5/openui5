@@ -4,9 +4,9 @@
 /* ================================== */
 
 
-// ==========================================================================
-// Variables and mixins
-// ==========================================================================
+/* ========================================================================== */
+/* Variables and mixins                                                       */
+/* ========================================================================== */
 
 @_sap_tnt_InfoLabel_ColorsArray:
 	@sapUiLegendBackgroundColor1 @sapUiAccent1,
@@ -22,11 +22,13 @@
 
 .create-classes-for-background-and-border-colors(backgroundColor, @_sap_tnt_InfoLabel_ColorsArray);
 
-// Iterate over the InfoLabel ColorsArray and create separate class for each
-// color named with the passed prefix and the number of the color
+/* Iterate over the InfoLabel ColorsArray and create separate class for each */
+/* color named with the passed prefix and the number of the color */
 .create-classes-for-background-and-border-colors(@prefix, @list) {
+
 	.iter(length(@list));
 	.iter(@i) when (@i > 0) {
+
 		.iter(@i - 1);
 
 		@pair: extract(@list, @i);
@@ -38,7 +40,7 @@
 			background-color: @backgroundColor;
 
 			.sapTntInfoLabelInner {
-				color: @sapUiBaseText;
+				color: var(--sapTextColor);
 			}
 		}
 	}

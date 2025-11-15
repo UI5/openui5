@@ -52,8 +52,6 @@ sap.ui.define([
   // shortcut for sap.ui.unified.CalendarDayType
   const CalendarDayType = unifiedLibrary.CalendarDayType;
 
-  const CalendarType = sap.ui.require("sap/base/i18n/date/CalendarType");
-
   var UI5Date = sap.ui.require("sap/ui/core/date/UI5Date");
   var oFormatYyyyMMddHHmm = DateFormat.getInstance({pattern: "yyyyMMddHHmm", calendarType: CalendarType.Gregorian});
 

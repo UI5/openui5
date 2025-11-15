@@ -1155,13 +1155,6 @@ sap.ui.define([
 
 		oChangeEventPromise = fnExpectChangeEvent(false);
 
-		// code under test - changing bound data: change event
-		oModel.setProperty("/children/0/name", "John Wallace Updated #2");
-
-		await oChangeEventPromise;
-
-		oChangeEventPromise = fnExpectChangeEvent(false);
-
 		// code under test - changing unrelated data: NO change event
 		oModel.setProperty("/otherBranch", "~foo");
 
@@ -1203,6 +1196,33 @@ sap.ui.define([
 
 		// code under test - bForceUpdate: change event
 		oTreeBinding.checkUpdate(true);
+
+		await oChangeEventPromise;
+
+		oChangeEventPromise = fnExpectChangeEvent(true);
+
+		// code under test - changing bound data: change event
+		oModel.setProperty("/contextB/children/0/name", "Gina Rush Changed #2");
+		oTreeBinding.checkUpdate();
+
+		await oChangeEventPromise;
+
+		oChangeEventPromise = fnExpectChangeEvent(true);
+
+		// code under test - setting new array for children: change event
+		oModel.setProperty("/contextB/children", [
+			{name: "New Child 1"},
+			{name: "New Child 2"}
+		]);
+		oTreeBinding.checkUpdate();
+
+		await oChangeEventPromise;
+
+		oChangeEventPromise = fnExpectChangeEvent(true);
+
+		// code under test - setting new object: change event
+		oModel.setProperty("/contextB/children/0", {name: "Completely New Object", id: 123});
+		oTreeBinding.checkUpdate();
 
 		await oChangeEventPromise;
 	});

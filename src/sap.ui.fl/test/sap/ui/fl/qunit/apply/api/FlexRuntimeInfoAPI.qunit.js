@@ -4,32 +4,32 @@ sap.ui.define([
 	"sap/ui/core/Control",
 	"sap/ui/core/UIComponent",
 	"sap/ui/fl/apply/_internal/controlVariants/Utils",
-	"sap/ui/fl/apply/_internal/flexState/FlexObjectState",
 	"sap/ui/fl/apply/_internal/flexState/FlexState",
-	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/apply/api/FlexRuntimeInfoAPI",
 	"sap/ui/fl/initial/_internal/FlexConfiguration",
 	"sap/ui/fl/initial/_internal/FlexInfoSession",
+	"sap/ui/fl/initial/_internal/ManifestUtils",
+	"sap/ui/fl/initial/api/InitialFlexAPI",
 	"sap/ui/fl/Layer",
 	"sap/ui/fl/Utils",
 	"sap/ui/thirdparty/sinon-4",
-	"test-resources/sap/ui/fl/qunit/FlQUnitUtils",
-	"sap/ui/VersionInfo"
+	"sap/ui/VersionInfo",
+	"test-resources/sap/ui/fl/qunit/FlQUnitUtils"
 ], function(
 	Control,
 	UIComponent,
 	VariantUtils,
-	FlexObjectState,
 	FlexState,
-	ManifestUtils,
 	FlexRuntimeInfoAPI,
 	FlexConfiguration,
 	FlexInfoSession,
+	ManifestUtils,
+	InitialFlexAPI,
 	Layer,
 	Utils,
 	sinon,
-	FlQUnitUtils,
-	VersionInfo
+	VersionInfo,
+	FlQUnitUtils
 ) {
 	"use strict";
 
@@ -211,75 +211,6 @@ sap.ui.define([
 		});
 	});
 
-	QUnit.module("waitForChanges", {
-		beforeEach() {
-			this.aObjectsToDestroy = [];
-			this.oWaitForChangesStub = sandbox.stub(FlexObjectState, "waitForFlexObjectsToBeApplied").resolves();
-		},
-		afterEach() {
-			sandbox.restore();
-			this.aObjectsToDestroy.forEach(function(oObject) {oObject.destroy();});
-		}
-	}, function() {
-		QUnit.test("FlexRuntimeInfoAPI.waitForChanges", async function(assert) {
-			var oControl = new Control();
-			this.aObjectsToDestroy.push(oControl);
-
-			await FlexRuntimeInfoAPI.waitForChanges({ element: oControl });
-			assert.equal(this.oWaitForChangesStub.callCount, 1, "the waitForChanges method was called");
-
-			var aPassedValue = [{
-				selector: oControl
-			}];
-			assert.ok(this.oWaitForChangesStub.alwaysCalledWithExactly(aPassedValue), "the controls are passed as parameter");
-		});
-
-		QUnit.test("FlexRuntimeInfoAPI.waitForChanges on multiple controls", async function(assert) {
-			var oControl = new Control();
-			var oControl1 = new Control();
-			this.aObjectsToDestroy.push(oControl, oControl1);
-			var aControls = [oControl, oControl1];
-
-			await FlexRuntimeInfoAPI.waitForChanges({ selectors: aControls });
-			assert.equal(this.oWaitForChangesStub.callCount, 1, "the waitForChanges method was called");
-
-			var aPassedValue = [{
-				selector: oControl
-			}, {
-				selector: oControl1
-			}];
-			assert.ok(this.oWaitForChangesStub.alwaysCalledWithExactly(aPassedValue), "the controls are passed as parameter");
-		});
-
-		QUnit.test("FlexRuntimeInfoAPI.waitForChanges with change types", async function(assert) {
-			var oControl = new Control();
-			var oControl1 = new Control();
-			this.aObjectsToDestroy.push(oControl, oControl1);
-			var aComplexSelectors = [
-				{
-					selector: oControl,
-					changeTypes: ["changeType1", "changeType2"]
-				},
-				{
-					selector: oControl1,
-					changeTypes: ["changeType3", "changeType4"]
-				}
-			];
-
-			await FlexRuntimeInfoAPI.waitForChanges({ complexSelectors: aComplexSelectors });
-			assert.equal(this.oWaitForChangesStub.callCount, 1, "the waitForChanges method was called");
-
-			var aPassedValue = [{
-				selector: oControl,
-				changeTypes: ["changeType1", "changeType2"]
-			}, {
-				selector: oControl1,
-				changeTypes: ["changeType3", "changeType4"]
-			}];
-			assert.ok(this.oWaitForChangesStub.alwaysCalledWithExactly(aPassedValue), "the controls are passed as parameter");
-		});
-	});
-
 	QUnit.module("isFlexSupported", {
 		afterEach() {
 			sandbox.restore();
@@ -363,6 +294,24 @@ sap.ui.define([
 			sandbox.stub(ManifestUtils, "getAppVersionFromManifest").returns("someAppVersion");
 			const oReturnedValue = await FlexRuntimeInfoAPI.getFeedbackInformation({ rootControl: "someRootControl" });
 			assert.deepEqual(oReturnedValue, oExpectedReturnValue, "the function returns the configured value");
+		});
+	});
+
+	QUnit.module("misc", {
+		afterEach() {
+			sandbox.restore();
+		}
+	}, function() {
+		QUnit.test("waitForChanges", async function(assert) {
+			const oWaitForChangesStub = sandbox.stub(InitialFlexAPI, "waitForChanges").resolves("someValue");
+			const oReturn = await FlexRuntimeInfoAPI.waitForChanges({ some: "propertyBag" });
+
+			assert.strictEqual(oWaitForChangesStub.callCount, 1, "InitialFlexAPI.waitForChanges was called once");
+			assert.deepEqual(
+				oWaitForChangesStub.firstCall.args[0], { some: "propertyBag" },
+				"InitialFlexAPI.waitForChanges was called with the correct property bag"
+			);
+			assert.strictEqual(oReturn, "someValue", "the return value is correct");
 		});
 	});
 

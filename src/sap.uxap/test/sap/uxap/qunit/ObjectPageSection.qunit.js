@@ -807,29 +807,27 @@ function(Element, nextUIUpdate, XMLView, library, ObjectPageLayout, ObjectPageSu
 			oLastSectionFirstSubsection.getTitle(), "aria-labelledby is updated properly"); //labelled by the subsection title
 	});
 
-	QUnit.test("Test aria-level attribute", async function(assert) {
+	QUnit.test("Test title heading element", async function(assert) {
 		assert.expect(3);
 		var oSectionWithOneSubsection = this.ObjectPageSectionView.byId("SectionWithSubSection"),
-			oSectionHeader = oSectionWithOneSubsection.$().find(".sapUxAPObjectPageSectionHeader"),
-			sDefaultAriaLevel = "3",
-			sNewAriaLevel = "5";
+			oSectionHeader = oSectionWithOneSubsection.$().find(".sapUxAPObjectPageSectionHeader");
 
 		// assert
-		assert.strictEqual(oSectionHeader.attr("aria-level"), sDefaultAriaLevel, "default aria-level is set");
+		assert.strictEqual(oSectionHeader.find("h3").length, 1, "default H3 heading element is rendered");
 
 		// act
 		oSectionWithOneSubsection.setTitleLevel("H5");
 		await nextUIUpdate();
 
 		// assert
-		assert.strictEqual(oSectionHeader.attr("aria-level"), sNewAriaLevel, "aria-level is correctly set");
+		assert.strictEqual(oSectionHeader.find("h5").length, 1, "H5 heading element is correctly rendered");
 
 		// act
 		oSectionWithOneSubsection.setTitleLevel("Auto");
 		await nextUIUpdate();
 
 		// assert
-		assert.strictEqual(oSectionHeader.attr("aria-level"), sDefaultAriaLevel, "default aria-level is set when titleLevel is set to Auto");
+		assert.strictEqual(oSectionHeader.find("h3").length, 1, "default H3 heading element is rendered when titleLevel is set to Auto");
 
 	});
 
@@ -1367,5 +1365,39 @@ function(Element, nextUIUpdate, XMLView, library, ObjectPageLayout, ObjectPageSu
 
 		assert.ok(oSection._getTitleControl().hasStyleClass("sapUxAPObjectPageSectionTitleUppercase"), "The section has the proper CSS class");
 		done();
+	});
+
+	QUnit.module("Single section with single subsection", {
+		beforeEach: function() {
+			return XMLView.create({
+				id: "UxAP-14_objectPageSection",
+				viewName: "view.UxAP-14_ObjectPageSection"
+			}).then(async function(oView) {
+				this.ObjectPageSectionView = oView;
+				this.ObjectPageSectionView.placeAt('qunit-fixture');
+				await nextUIUpdate();
+			}.bind(this));
+		},
+		afterEach: function() {
+			this.ObjectPageSectionView.destroy();
+		}
+	});
+
+	QUnit.test("Test role attribute of section with hidden title in different configurations", async function(assert) {
+		// Arrange
+		var oFirstSection = this.ObjectPageSectionView.byId("SectionHiddenTitle1"),
+		oSecondSection = this.ObjectPageSectionView.byId("SectionHiddenTitle2"),
+		oOPL = this.ObjectPageSectionView.byId("ObjectPageLayout");
+
+		assert.expect(2);
+
+		// Assert
+		assert.strictEqual(oFirstSection.$().attr("role"), "region", "When there are multiple sections with hidden titles, section get a role attribute from the AnchorBar title");
+
+		oOPL.removeAggregation("sections", oSecondSection);
+		oSecondSection.destroy();
+		await nextUIUpdate();
+		// Assert
+		assert.strictEqual(oFirstSection.$().attr("role"), undefined, "Single section with single subsection, section title is hidden, section does not get a role attribute");
 	});
 });

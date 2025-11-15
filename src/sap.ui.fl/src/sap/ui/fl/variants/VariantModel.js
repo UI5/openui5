@@ -135,7 +135,7 @@ sap.ui.define([
 			}
 			return aCurrentControls;
 		}, []);
-		return aSelectors.length ? FlexObjectState.waitForFlexObjectsToBeApplied(aSelectors) : Promise.resolve();
+		return aSelectors.length ? FlexObjectState.waitForFlexObjectsToBeApplied(aSelectors, mPropertyBag.appComponent) : Promise.resolve();
 	}
 
 	/**

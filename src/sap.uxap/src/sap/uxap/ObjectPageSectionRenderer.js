@@ -40,8 +40,9 @@ sap.ui.define(["sap/ui/core/ControlBehavior"], function (ControlBehavior) {
 		if (bWrapTitle) {
 			oRm.class("sapUxAPObjectPageSectionWrapTitle");
 		}
-
-		oRm.attr("role", "region");
+		if (bTitleVisible || oLabelledByTitleID) {
+			oRm.attr("role", "region");
+		}
 
 		if (bAccessibilityOn && oLabelledByTitleID) {
 			oRm.attr("aria-labelledby", oLabelledByTitleID);
@@ -60,8 +61,6 @@ sap.ui.define(["sap/ui/core/ControlBehavior"], function (ControlBehavior) {
 		}
 
 		oRm.openStart("div", oControl.getId() + "-header")
-			.attr("role", "heading")
-			.attr("aria-level", oControl._getARIALevel())
 			.class("sapUxAPObjectPageSectionHeader")
 			.class(bTitleAriaHidden ? "sapUxAPObjectPageSectionHeaderHidden" : "")
 			.class(bHasMoreThanOneVisibleSubSection && !bShouldDisplayButtonsInHeader ? "sapUxAPObjectPageSectionHeaderCompact" : "")

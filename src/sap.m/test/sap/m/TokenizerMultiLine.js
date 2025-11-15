@@ -1,5 +1,3 @@
-"use strict";
-
 sap.ui.define([
 	"sap/m/App",
 	"sap/m/Page",

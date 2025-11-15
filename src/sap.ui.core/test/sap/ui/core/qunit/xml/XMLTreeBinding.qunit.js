@@ -1,12 +1,13 @@
 /*global QUnit */
 sap.ui.define([
+	"sap/ui/model/ClientTreeBinding",
 	"sap/ui/model/Filter",
 	"sap/ui/model/FilterOperator",
 	"sap/ui/model/FilterType",
 	"sap/ui/model/Sorter",
 	"sap/ui/model/xml/XMLModel",
 	"sap/ui/model/xml/XMLTreeBinding"
-], function(Filter, FilterOperator, FilterType, Sorter, XMLModel, XMLTreeBinding) {
+], function(ClientTreeBinding, Filter, FilterOperator, FilterType, Sorter, XMLModel, XMLTreeBinding) {
 	"use strict";
 
 	var testData =
@@ -569,6 +570,40 @@ sap.ui.define([
 		assert.equal(aChildContexts[0].getProperty("@name"), "John Wallace", "Inga child node[0] after sorting is: John Wallace");
 		assert.equal(aChildContexts[1].getProperty("@name"), "Frank Wallace", "Inga child node[1] after sorting is: Frank Wallace");
 		assert.equal(aChildContexts[2].getProperty("@name"), "Gina Rush", "Inga child node[2] after sorting is: Gina Rush");
+	});
+
+	//*********************************************************************************************
+	QUnit.test("cloneData always returns false", function (assert) {
+		const treeBinding = this.createTreeBinding("/orgStructure");
+
+		// code under test
+		assert.strictEqual(treeBinding.cloneData(), ClientTreeBinding.CannotCloneData );
+	});
+
+	//*********************************************************************************************
+	QUnit.test("checkUpdate always fires change event", async function (assert) {
+		const oEventHandler = {
+			onChange() {}
+		};
+		const oEventHandlerMock = this.mock(oEventHandler);
+		const oXMLTreeBinding = this.createTreeBinding("/orgStructure");
+		const fnExpectChangeEvent = () => {
+			oEventHandlerMock.expects("onChange").exactly(1);
+			oXMLTreeBinding.attachChange(oEventHandler.onChange);
+
+			return new Promise((resolve) => {
+				setTimeout(() => {
+					oXMLTreeBinding.detachChange(oEventHandler.onChange);
+					resolve();
+				}, 0);
+			});
+		};
+		const oChangeEventPromise = fnExpectChangeEvent(true); // XMLTreeBinding#checkUpdate always fires a change event
+
+		// code under test
+		oXMLTreeBinding.checkUpdate();
+
+		await oChangeEventPromise;
 	});
 
 });

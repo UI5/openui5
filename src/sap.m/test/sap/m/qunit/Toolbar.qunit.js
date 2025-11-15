@@ -9,6 +9,8 @@ sap.ui.define([
 	"sap/m/Button",
 	"sap/m/SegmentedButton",
 	"sap/m/SegmentedButtonItem",
+	"sap/m/Tokenizer",
+	"sap/m/Token",
 	"sap/m/Select",
 	"sap/ui/core/Item",
 	"sap/m/Title",
@@ -36,6 +38,8 @@ sap.ui.define([
 	Button,
 	SegmentedButton,
 	SegmentedButtonItem,
+	Tokenizer,
+	Token,
 	Select,
 	Item,
 	Title,
@@ -929,6 +933,27 @@ sap.ui.define([
 		oLabel.destroy();
 		oButton.destroy();
 		oLink.destroy();
+		oTB.destroy();
+	});
+
+	QUnit.test("_shouldAllowDefaultBehavior on up/down arrow key navigation", function(assert) {
+		var oTokenizer = new Tokenizer({tokens : [new Token({text: "Token 1"}), new Token({text: "Token 2"})]}),
+			oTB = createToolbar({
+				Toolbar : {
+					content : [oTokenizer]
+				}
+			}),
+			oArrowUpEvent = new KeyboardEvent("keydown", { code: KeyCodes.ARROW_UP }),
+			oArrowDownEvent = new KeyboardEvent("keydown", { code: KeyCodes.ARROW_DOWN }),
+			oActiveDomElement = oTokenizer.getFocusDomRef();
+
+		var bShouldAllowOnArrowUp = oTB._shouldAllowDefaultBehavior(oActiveDomElement, oTokenizer, oArrowUpEvent);
+		assert.ok(bShouldAllowOnArrowUp, "The tokenizer should allow default behavior on arrow up");
+
+		var bShouldAllowOnArrowDown = oTB._shouldAllowDefaultBehavior(oActiveDomElement, oTokenizer, oArrowDownEvent);
+		assert.ok(bShouldAllowOnArrowDown, "The tokenizer should not allow default behavior on arrow down");
+
+		// Cleanup
 		oTB.destroy();
 	});
 

@@ -276,6 +276,28 @@ sap.ui.define([
 
 	// ---------------------------------------------------------------------
 
+	function fnGetInitialSortView() {
+		const sDelegate = '\\{"name": "sap/ui/mdc/qunit/table/CondenserDelegate"\\}';
+		const sView =
+		'<mvc:View xmlns:mvc="sap.ui.core.mvc" xmlns="sap.ui.mdc.table" xmlns:m="sap.m" xmlns:mdc="sap.ui.mdc">' +
+			'<mdc:Table id="myMDCTable" ' +
+				'selectionMode="Multi" ' +
+				'type="Table" ' +
+				"sortConditions=\"{sorters: [{key: 'modifiedBy', name: 'modifiedBy', descending: false}]}\" " +
+				'delegate=\'' + sDelegate + '\' ' +
+				'p13nMode="Column,Group,Sort">' +
+				'<mdc:columns>' +
+					'<Column id="IDTableName_01" header="Name" propertyKey="name"></Column>' +
+					'<Column id="IDTableYear" header="Founding Year" propertyKey="foundingYear"></Column>' +
+					'<Column id="IDTablemodified" header="Changed By" propertyKey="modifiedBy"></Column>' +
+					'<Column id="IDTableCreated" header="Created On" propertyKey="createdAt"></Column>' +
+				'</mdc:columns>' +
+			'</mdc:Table>' +
+		'</mvc:View>';
+
+		return sView;
+	}
+
 	function fnConfirmInitialSortingState(oUiComponent, oViewAfterAction, assert) {
 		const oTable = oViewAfterAction.byId("myMDCTable");
 		assert.ok(oTable, "then the mdc.Table exists");
@@ -364,6 +386,40 @@ sap.ui.define([
 			}
 		}],
 		changesAfterCondensing: 1,
+		afterAction: fnConfirmInitialSortingState,
+		afterUndo: fnConfirmSortingGotAdded(),
+		afterRedo: fnConfirmInitialSortingState
+	});
+
+	elementActionTest("initial: addSort(desc), changes: removeSort(desc) addSort(asc)", {
+		xmlView: fnGetInitialSortView(),
+		action: {
+			name: "settings",
+			controlId: "myMDCTable",
+			parameter: function() {
+				return {
+					changeType: "addSort",
+					content: {
+						name: "modifiedBy",
+						index: 0,
+						descending: true
+					}
+				};
+			}
+		},
+		previousActions: [{
+				name: "settings",
+				controlId: "myMDCTable",
+				parameter: function() {
+					return {
+						changeType: "removeSort",
+						content: {
+							name: "modifiedBy"
+						}
+					};
+				}
+			}],
+		changesAfterCondensing: 2,
 		afterAction: fnConfirmInitialSortingState,
 		afterUndo: fnConfirmSortingGotAdded(),
 		afterRedo: fnConfirmInitialSortingState

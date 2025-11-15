@@ -33,7 +33,6 @@ sap.ui.define([
   const ValueState = coreLibrary.ValueState;
 
   var UI5Date = sap.ui.require("sap/ui/core/date/UI5Date");
-  const CalendarType = sap.ui.require("sap/base/i18n/date/CalendarType");
 
   var oFormatYyyyMMddHHmmss = DateFormat.getInstance({pattern: "yyyyMMddHHmmss", calendarType: CalendarType.Gregorian});
 

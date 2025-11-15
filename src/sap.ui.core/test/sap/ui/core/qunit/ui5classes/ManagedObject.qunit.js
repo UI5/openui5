@@ -17,8 +17,9 @@ sap.ui.define([
 	"sap/ui/base/ManagedObjectMetadata",
 	"sap/base/util/isEmptyObject",
 	"sap/base/util/ObjectPath",
-	"sap/base/future"
-], function(BindingInfo, BindingParser, DataType, ManagedObject, OwnStatics, Element, JSONModel, Context, ManagedObjectModel, StringType, UnitType, Control, Component, Sorter, ManagedObjectMetadata, isEmptyObject, ObjectPath, future) {
+	"sap/base/future",
+	"sap/base/Log"
+], function(BindingInfo, BindingParser, DataType, ManagedObject, OwnStatics, Element, JSONModel, Context, ManagedObjectModel, StringType, UnitType, Control, Component, Sorter, ManagedObjectMetadata, isEmptyObject, ObjectPath, future, Log) {
 	"use strict";
 
 	const { runWithOwner } = OwnStatics.get(ManagedObject);
@@ -2104,8 +2105,6 @@ sap.ui.define([
 	});
 
 	QUnit.test("Accessor / Mutator functions public 0..n Associations", function(assert) {
-
-		var Log = sap.ui.require("sap/base/Log");
 		assert.ok(Log, "Log module should be available");
 		assert.equal(typeof this.obj.getAssociatedObjects, "function", "there should be a named get function for a public 0..n association");
 		assert.equal(typeof this.obj.addAssociatedObj, "function", "there should be a named add function for a public 0..n association");

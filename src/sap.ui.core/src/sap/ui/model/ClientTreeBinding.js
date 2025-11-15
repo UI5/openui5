@@ -64,7 +64,7 @@ sap.ui.define([
 			};
 			this.oCombinedFilter = null;
 			this.mNormalizeCache = {};
-			this.oTreeData = this.oModel._getObject(this.sPath, this.oContext);
+			this.oTreeData = this.cloneData(this.oModel._getObject(this.sPath, this.oContext));
 
 			if (aApplicationFilters) {
 				this.oModel.checkFilter(aApplicationFilters);
@@ -77,6 +77,21 @@ sap.ui.define([
 		}
 
 	});
+
+	ClientTreeBinding.CannotCloneData = Symbol("CannotCloneData");
+
+	/**
+	 * Returns a deep clone of the tree data or a symbol indicating that the given tree data cannot be cloned.
+	 *
+	 * @param {any} oTreeData
+	 *   The tree data to clone
+	 * @returns {any|sap.ui.model.ClientTreeBinding.CannotCloneData}
+	 *   A deep clone or the symbol ClientTreeBinding.CannotCloneData
+	 * @private
+	 */
+	ClientTreeBinding.prototype.cloneData = function(oTreeData) {
+		return structuredClone(oTreeData);
+	};
 
 	/**
 	 * Return root contexts for the tree.
@@ -454,7 +469,8 @@ sap.ui.define([
 		if (this.oContext != oContext) {
 			this.oContext = oContext;
 			if (this.isRelative()) {
-				this.oTreeData = this.oModel._getObject(this.sPath, this.oContext);
+				const oTreeData = this.oModel._getObject(this.sPath, this.oContext);
+				this.oTreeData = this.cloneData(oTreeData);
 				this._fireChange({reason: ChangeReason.Context});
 			}
 		}
@@ -476,7 +492,7 @@ sap.ui.define([
 		this._mLengthsCache = {};
 
 		if (bForceUpdate || !deepEqual(this.oTreeData, oCurrentTreeData)) {
-			this.oTreeData = oCurrentTreeData;
+			this.oTreeData = this.cloneData(oCurrentTreeData);
 			this._fireChange({reason: ChangeReason.Change});
 		}
 	};

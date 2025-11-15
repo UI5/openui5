@@ -11,7 +11,6 @@ sap.ui.define([
   "use strict";
   var app = new App("myApp");
   var UI5Date = sap.ui.require("sap/ui/core/date/UI5Date");
-  var Localization = sap.ui.require("sap/base/i18n/Localization");
 
   var page1 = new Page("page1", {
 	  title:"DateTimePicker with Timezone",

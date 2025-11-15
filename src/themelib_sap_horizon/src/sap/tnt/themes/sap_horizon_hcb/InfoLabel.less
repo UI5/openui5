@@ -3,9 +3,9 @@
 /* Horizon High Contrast Black theme  */
 /* ================================== */
 
-// ==========================================================================
-// Variables and mixins
-// ==========================================================================
+/* ========================================================================== */
+/* Variables and mixins                                                       */
+/* ========================================================================== */
 
 @_sap_tnt_InfoLabel_LineHeightDisplayOnly: 1rem;
 @_sap_tnt_InfoLabel_DisplayModeBorder: none;
@@ -21,9 +21,9 @@
 @_sap_tnt_InfoLabel_DisplayPadding: 0 0.25rem;
 @_sap_tnt_InfoLabel_IconMargin: 0.25rem;
 @_sap_tnt_InfoLabel_DisplayIconMargin: 0.125rem;
-@_sap_tnt_InfoLabel_FontFamily: @sapUiFontSemiboldDuplexFamily;
+@_sap_tnt_InfoLabel_FontFamily: var(--sapFontSemiboldDuplexFamily);
 @_sap_tnt_InfoLabel_FontSize: @sapMFontMediumSize;
-@_sap_tnt_InfoLabel_DisplayFontSize: @sapMFontSmallSize;
+@_sap_tnt_InfoLabel_DisplayFontSize: var(--sapFontSmallSize);
 @_sap_tnt_InfoLabel_DisplayFontSizeIcon: 0.625rem;
 @_sap_tnt_InfoLabel_NarrowPadding: @_sap_tnt_InfoLabel_Padding;
 @_sap_tnt_InfoLabel_LetterSpacing: normal;
@@ -42,11 +42,13 @@
 
 .create-classes-for-background-and-border-colors(backgroundColor, @_sap_tnt_InfoLabel_ColorsArray);
 
-// Iterate over the InfoLabel ColorsArray and create separate class for each
-// color named with the passed prefix and the number of the color
+/* Iterate over the InfoLabel ColorsArray and create separate class for each */
+/* color named with the passed prefix and the number of the color */
 .create-classes-for-background-and-border-colors(@prefix, @list) {
+
 	.iter(length(@list));
 	.iter(@i) when (@i > 0) {
+
 		.iter(@i - 1);
 
 		@pair: extract(@list, @i);

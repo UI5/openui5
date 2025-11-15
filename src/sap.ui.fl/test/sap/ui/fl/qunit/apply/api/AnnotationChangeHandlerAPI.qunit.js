@@ -1,12 +1,12 @@
 /* global QUnit */
 
 sap.ui.define([
+	"sap/ui/fl/apply/_internal/changeHandlers/ChangeHandlerRegistration",
 	"sap/ui/fl/apply/api/AnnotationChangeHandlerAPI",
-	"sap/ui/fl/initial/_internal/changeHandlers/ChangeHandlerRegistration",
 	"sap/ui/thirdparty/sinon-4"
 ], function(
-	AnnotationChangeHandlerAPI,
 	ChangeHandlerRegistration,
+	AnnotationChangeHandlerAPI,
 	sinon
 ) {
 	"use strict";

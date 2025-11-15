@@ -5,14 +5,13 @@ sap.ui.define([
 	"sap/ui/core/util/reflection/JsControlTreeModifier",
 	"sap/ui/core/Control",
 	"sap/ui/core/UIComponent",
+	"sap/ui/fl/apply/_internal/changeHandlers/ChangeHandlerRegistration",
+	"sap/ui/fl/apply/_internal/changeHandlers/ChangeHandlerStorage",
 	"sap/ui/fl/apply/_internal/changes/descriptor/ApplyStrategyFactory",
 	"sap/ui/fl/apply/_internal/changes/FlexCustomData",
 	"sap/ui/fl/apply/_internal/changes/Utils",
-	"sap/ui/fl/apply/_internal/flexObjects/AnnotationChange",
 	"sap/ui/fl/apply/_internal/flexObjects/FlexObjectFactory",
 	"sap/ui/fl/apply/_internal/flexObjects/UIChange",
-	"sap/ui/fl/initial/_internal/changeHandlers/ChangeHandlerRegistration",
-	"sap/ui/fl/initial/_internal/changeHandlers/ChangeHandlerStorage",
 	"sap/ui/fl/Utils",
 	"sap/ui/thirdparty/sinon-4"
 ], function(
@@ -20,14 +19,13 @@ sap.ui.define([
 	JsControlTreeModifier,
 	Control,
 	UIComponent,
+	ChangeHandlerRegistration,
+	ChangeHandlerStorage,
 	ApplyStrategyFactory,
 	FlexCustomData,
 	ChangeUtils,
-	AnnotationChange,
 	FlexObjectFactory,
 	UIChange,
-	ChangeHandlerRegistration,
-	ChangeHandlerStorage,
 	FlUtils,
 	sinon
 ) {

@@ -115,10 +115,10 @@ sap.ui.define([
 						var sDeclaredModule = aDeclaredModules[i];
 						if (sDeclaredModule.indexOf(sLibraryWithDot) === 0 &&
 							mLibraries[sLibrary].types.indexOf(sDeclaredModule) === -1 &&
-							sDeclaredModule.lastIndexOf(".library") !== sDeclaredModule.length - 8 &&
-							sDeclaredModule.lastIndexOf(".library-preload") !== sDeclaredModule.length - 16 &&
-							sDeclaredModule.lastIndexOf(".flexibility") !== sDeclaredModule.length - 12 &&
-							sDeclaredModule.lastIndexOf(".support") !== sDeclaredModule.length - 8) {
+							!sDeclaredModule.endsWith(".library") &&
+							!sDeclaredModule.endsWith(".library-preload") &&
+							!sDeclaredModule.endsWith(".flexibility") &&
+							!sDeclaredModule.endsWith(".support")) {
 							delete mLibraries[sLibrary];
 							break;
 						}

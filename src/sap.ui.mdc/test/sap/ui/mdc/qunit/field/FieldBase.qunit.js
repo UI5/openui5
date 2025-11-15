@@ -268,15 +268,12 @@ sap.ui.define([
 	});
 
 	QUnit.test("V4 delegate", (assert) => {
-
 		oField = new FieldBase("F1", {
 			delegate: {name: "delegates/odata/v4/FieldBaseDelegate", payload: {x: 1}}
 		});
 
-		const oDelegate = sap.ui.require("delegates/odata/v4/FieldBaseDelegate");
-		assert.equal(oField.getControlDelegate(), oDelegate, "Delegate used");
+		assert.equal(oField.getControlDelegate(), FieldBaseDelegate, "Delegate used");
 		assert.deepEqual(oField.getPayload(), {x: 1}, "Payload used");
-
 	});
 
 	QUnit.test("V4 delegate, async loading", (assert) => {
@@ -290,8 +287,7 @@ sap.ui.define([
 		});
 
 		const oPromise = oField.awaitControlDelegate().then(() => {
-			const oDelegate = sap.ui.require("delegates/odata/v4/FieldBaseDelegate");
-			assert.equal(oField.getControlDelegate(), oDelegate, "Delegate used");
+			assert.equal(oField.getControlDelegate(), FieldBaseDelegate, "Delegate used");
 			assert.deepEqual(oField.getPayload(), {x: 1}, "Payload used");
 		});
 

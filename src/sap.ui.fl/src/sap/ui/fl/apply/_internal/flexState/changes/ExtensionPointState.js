@@ -7,13 +7,13 @@ sap.ui.define([
 	"sap/base/util/merge",
 	"sap/base/Log",
 	"sap/ui/core/util/reflection/JsControlTreeModifier",
+	"sap/ui/fl/apply/_internal/changeHandlers/ChangeHandlerStorage",
 	"sap/ui/fl/apply/_internal/changes/Utils",
 	"sap/ui/fl/apply/_internal/flexObjects/FlexObjectFactory",
 	"sap/ui/fl/apply/_internal/flexObjects/States",
 	"sap/ui/fl/apply/_internal/flexState/changes/DependencyHandler",
 	"sap/ui/fl/apply/_internal/flexState/FlexObjectState",
 	"sap/ui/fl/apply/_internal/flexState/FlexState",
-	"sap/ui/fl/initial/_internal/changeHandlers/ChangeHandlerStorage",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/Utils"
 ], (
@@ -21,13 +21,13 @@ sap.ui.define([
 	merge,
 	Log,
 	JsControlTreeModifier,
+	ChangeHandlerStorage,
 	ChangesUtils,
 	FlexObjectFactory,
 	FlexObjectStates,
 	DependencyHandler,
 	FlexObjectState,
 	FlexState,
-	ChangeHandlerStorage,
 	ManifestUtils,
 	Utils
 ) => {

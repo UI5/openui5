@@ -7,7 +7,6 @@ sap.ui.define([
 	"sap/ui/core/Component",
 	"sap/ui/core/Lib",
 	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
-	"sap/ui/fl/initial/_internal/changeHandlers/ChangeHandlerRegistration",
 	"sap/ui/fl/initial/_internal/Loader",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/initial/_internal/StorageUtils",
@@ -22,7 +21,6 @@ sap.ui.define([
 	Component,
 	Lib,
 	ControlVariantApplyAPI,
-	ChangeHandlerRegistration,
 	Loader,
 	ManifestUtils,
 	StorageUtils,
@@ -279,6 +277,7 @@ sap.ui.define([
 			return aRelevantAnnotationChanges.reduce(async (oPreviousPromise, oAnnotationChange) => {
 				const aReturn = await oPreviousPromise;
 				try {
+					const ChangeHandlerRegistration = await requireAsync("sap/ui/fl/apply/_internal/changeHandlers/ChangeHandlerRegistration");
 					const oChangeHandler = await ChangeHandlerRegistration.getAnnotationChangeHandler({
 						changeType: oAnnotationChange.getChangeType()
 					});

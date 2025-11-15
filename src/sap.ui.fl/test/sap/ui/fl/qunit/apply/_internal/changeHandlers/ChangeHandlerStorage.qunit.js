@@ -4,8 +4,8 @@ sap.ui.define([
 	"sap/base/Log",
 	"sap/ui/core/util/reflection/JsControlTreeModifier",
 	"sap/ui/core/Control",
+	"sap/ui/fl/apply/_internal/changeHandlers/ChangeHandlerStorage",
 	"sap/ui/fl/changeHandler/MoveControls",
-	"sap/ui/fl/initial/_internal/changeHandlers/ChangeHandlerStorage",
 	"sap/ui/fl/Layer",
 	"sap/ui/thirdparty/sinon-4",
 	"test-resources/sap/ui/fl/qunit/FlQUnitUtils"
@@ -13,8 +13,8 @@ sap.ui.define([
 	Log,
 	JsControlTreeModifier,
 	Control,
-	MoveControls,
 	ChangeHandlerStorage,
+	MoveControls,
 	Layer,
 	sinon,
 	FlQUnitUtils

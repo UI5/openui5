@@ -32,8 +32,6 @@ sap.ui.define([
   // shortcut for sap.ui.core.ValueState
   const ValueState = coreLibrary.ValueState;
 
-  const CalendarType = sap.ui.require("sap/base/i18n/date/CalendarType");
-
   var oFormatYyyymmdd = DateFormat.getInstance({pattern: "yyyyMMdd", calendarType: CalendarType.Gregorian});
 
   var aSpecialDays = [["20150101",undefined,"Neujahr",1],

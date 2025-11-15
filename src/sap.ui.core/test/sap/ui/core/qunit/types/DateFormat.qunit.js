@@ -203,7 +203,6 @@ sap.ui.define([
 		QUnit.module("DateFormat format", {
 			beforeEach: function (assert) {
 				Localization.setTimezone("Europe/Berlin");
-				var Log = sap.ui.require("sap/base/Log");
 				assert.ok(Log, "Log module should be available");
 				this.oErrorSpy = sinon.spy(Log, "error");
 			},
@@ -3456,7 +3455,6 @@ sap.ui.define([
 				});
 
 				this.oFormat = DateFormat.getDateInstance();
-				var Log = sap.ui.require("sap/base/Log");
 				assert.ok(Log, "Log module should be available");
 				this.oErrorSpy = sinon.spy(Log, "error");
 			},

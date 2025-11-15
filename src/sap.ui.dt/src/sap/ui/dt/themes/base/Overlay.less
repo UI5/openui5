@@ -1,15 +1,17 @@
-/******************************************************************
-	Style of the DT Overlays - base Theme
-*******************************************************************/
-@_sap_ui_dt_Overlay_FocusBorderColor: @sapUiContentFocusColor; //#000
-@_sap_ui_dt_Overlay_TargetZoneOutlineColor: @sapUiSelected; //#8fb5ff
-@_sap_ui_dt_Overlay_SelectionOutlineColor: @sapUiSelected; //#8fb5ff
-@_sap_ui_dt_Overlay_CuttedBackgroundColor: @sapUiContentImagePlaceholderBackground; // #fff
-@_sap_ui_dt_Overlay_CuttedBorderColor: @sapUiSelected; //#8fb5ff
-@_sap_ui_dt_Overlay_HighlightOutlineColor: @sapUiWarningBorder; //ffff00
-@_sap_ui_dt_Overlay_HoverBackgroundColor: fade(@sapUiSelected, 5%); //rgba(143, 181, 255, 0.1);
-@_sap_ui_dt_Overlay_DropZoneBackgroundColor: fade(@sapUiSelected, 10%); //rgba(143, 181, 255, 0.1);
-@_sap_ui_dt_Overlay_BoxShadow: @sapUiUx3ToolPopupShadow; //0px 6px 12px 0px fade(black, 30);
+/* ================================== */
+/* CSS for control sap.ui.dt/Overlay  */
+/* Base theme                         */
+/* ================================== */
+
+@_sap_ui_dt_Overlay_FocusBorderColor: var(--sapContent_FocusColor); /* #000 */
+@_sap_ui_dt_Overlay_TargetZoneOutlineColor: var(--sapSelectedColor); /* #8fb5ff */
+@_sap_ui_dt_Overlay_SelectionOutlineColor: var(--sapSelectedColor); /* #8fb5ff */
+@_sap_ui_dt_Overlay_CuttedBackgroundColor: var(--sapContent_ImagePlaceholderBackground); /* #fff */
+@_sap_ui_dt_Overlay_CuttedBorderColor: var(--sapSelectedColor); /* #8fb5ff */
+@_sap_ui_dt_Overlay_HighlightOutlineColor: var(--sapWarningBorderColor); /* ffff00 */
+@_sap_ui_dt_Overlay_HoverBackgroundColor: fade(@sapUiSelected, 5%); /* rgba(143, 181, 255, 0.1); */
+@_sap_ui_dt_Overlay_DropZoneBackgroundColor: fade(@sapUiSelected, 10%); /* rgba(143, 181, 255, 0.1); */
+@_sap_ui_dt_Overlay_BoxShadow: @sapUiUx3ToolPopupShadow; /* 0px 6px 12px 0px fade(black, 30); */
 
 #overlay-container {
 	position: absolute;
@@ -21,13 +23,14 @@
 	position: absolute;
 	outline: none;
 
-	// please, don't use border property, it cause the size change of an overtla and box-sizing: border box doesn't work with position: absolute and absolute sizing
-	// please, don't use outline property, outline can be invisible due to overflow:hidden of parent
-	// instead you should use pseudo elements to special border-like styling:
-	// :before pseudoelement should be used for focus visualisation
-	// :after pseudoelement should be used for other border-like visualisations
+	/* please, don't use border property, it cause the size change of an overtla and box-sizing: border box doesn't work with position: absolute and absolute sizing */
+	/* please, don't use outline property, outline can be invisible due to overflow:hidden of parent */
+	/* instead you should use pseudo elements to special border-like styling: */
+	/* ::before pseudoelement should be used for focus visualisation */
+	/* ::after pseudoelement should be used for other border-like visualisations */
 
-	&:before, &:after {
+	&::before,
+	&::after {
 		position: absolute;
 		pointer-events: none;
 		top: 0;
@@ -41,10 +44,12 @@
 }
 
 .sapUiDtOverlayFocusable {
+
 	&:focus {
-		&:before {
-			content: " ";
-			border: 0.0625rem dotted @_sap_ui_dt_Overlay_FocusBorderColor; //1px
+
+		&::before {
+			content: '';
+			border: 0.0625rem dotted @_sap_ui_dt_Overlay_FocusBorderColor; /* 1px */
 		}
 	}
 }
@@ -60,10 +65,11 @@
 	z-index: 9999999 !important;
 
 	> .sapUiDtOverlayChildren {
+
 		> .sapUiDtOverlayMovable {
 			background: @_sap_ui_dt_Overlay_DropZoneBackgroundColor;
-			// no "border"
-			&:after {
+			/* no "border" */
+			&::after {
 				content: none;
 			}
 		}
@@ -71,22 +77,24 @@
 }
 
 .sapUiDtOverlayTargetZone {
-	&:after {
-		content: " ";
-		outline: 0.125rem dashed @_sap_ui_dt_Overlay_TargetZoneOutlineColor; //2px
-		outline-offset: -0.125rem; //2px
+
+	&::after {
+		content: '';
+		outline: 0.125rem dashed @_sap_ui_dt_Overlay_TargetZoneOutlineColor; /* 2px */
+		outline-offset: -0.125rem; /* 2px */
 	}
 }
 
 .sapUiDtOverlaySelected {
-	&:after {
-		content: " ";
-		outline: 0.125rem solid @_sap_ui_dt_Overlay_SelectionOutlineColor; //2px
-		outline-offset: -0.125rem; //2px
+
+	&::after {
+		content: '';
+		outline: 0.125rem solid @_sap_ui_dt_Overlay_SelectionOutlineColor; /* 2px */
+		outline-offset: -0.125rem; /* 2px */
 		border: none;
 	}
 
-	&.sapUiDtOverlayWithScrollBar:after {
+	&.sapUiDtOverlayWithScrollBar::after {
 		bottom: 0;
 		right: 0;
 		top: 0;
@@ -96,12 +104,14 @@
 	}
 
 	&.sapUiDtOverlayFocusable {
+
 		&:focus {
-			&:before {
-				top: 0.125rem; //2px
-				left: 0.125rem; //2px
-				bottom: 0.125rem; //2px
-				right: 0.125rem; //2px
+
+			&::before {
+				top: 0.125rem; /* 2px */
+				left: 0.125rem; /* 2px */
+				bottom: 0.125rem; /* 2px */
+				right: 0.125rem; /* 2px */
 				width: auto;
 				height: auto;
 			}
@@ -110,10 +120,11 @@
 }
 
 .sapUiDtOverlayHighlighted:not(.sapUiDtOverlaySelected) {
-	&:after {
-		content: " ";
-		outline: 0.0625rem solid @_sap_ui_dt_Overlay_HighlightOutlineColor; //1px
-		outline-offset: -0.0625rem; //1px
+
+	&::after {
+		content: '';
+		outline: 0.0625rem solid @_sap_ui_dt_Overlay_HighlightOutlineColor; /* 1px */
+		outline-offset: -0.0625rem; /* 1px */
 		box-shadow: @_sap_ui_dt_Overlay_BoxShadow;
 	}
 }
@@ -122,7 +133,7 @@
 	cursor: move;
 }
 
-// Used for non-movable children overlays of movable parents
+/* Used for non-movable children overlays of movable parents */
 .sapUiDtOverlaySelectable:not(.sapUiDtOverlayMovable) {
 	cursor: auto;
 }
@@ -131,10 +142,10 @@
 	background-color: @_sap_ui_dt_Overlay_CuttedBackgroundColor !important;
 	opacity: 0.5;
 
-	&:after {
-		content: " ";
-		outline: 0.063rem solid @_sap_ui_dt_Overlay_CuttedBorderColor; //1px
-		outline-offset: -0.125rem; //2px
+	&::after {
+		content: '';
+		outline: 0.063rem solid @_sap_ui_dt_Overlay_CuttedBorderColor; /* 1px */
+		outline-offset: -0.125rem; /* 2px */
 	}
 }
 
@@ -144,20 +155,20 @@
 }
 
 /* fix ghost blinking in FireFox */
-.sap-desktop[data-sap-ui-browser^="ff"] .sapUiDtDragGhostWrapper {
+.sap-desktop[data-sap-ui-browser^='ff'] .sapUiDtDragGhostWrapper {
 	top: -9999px;
 	left: -9999px;
 }
 
 /* fix for chrome */
-.sap-desktop[data-sap-ui-browser^="cr"] .sapUiDtDragGhostWrapper {
+.sap-desktop[data-sap-ui-browser^='cr'] .sapUiDtDragGhostWrapper {
 	padding-left: -500px;
 	padding-bottom: 500px;
 	bottom: -1000px;
 }
 
-// Fix for Safari, ghost must not be completly off screen
-.sap-desktop[data-sap-ui-browser^="sf"] .sapUiDtDragGhostWrapper {
+/* Fix for Safari, ghost must not be completly off screen */
+.sap-desktop[data-sap-ui-browser^='sf'] .sapUiDtDragGhostWrapper {
 	top: 100vh;
 }
 
@@ -180,11 +191,11 @@
 	transition: background 0.1s cubic-bezier(1, .01, 1, 0);
 	background: @_sap_ui_dt_Overlay_HoverBackgroundColor;
 
-	&:after {
-		content: " ";
+	&::after {
+		content: '';
 		transition: box-shadow .25s;
 		box-shadow: @_sap_ui_dt_Overlay_BoxShadow;
-		outline: 0.0625rem solid @_sap_ui_dt_Overlay_SelectionOutlineColor; //1px
-		outline-offset: -0.0625rem; //1px
+		outline: 0.0625rem solid @_sap_ui_dt_Overlay_SelectionOutlineColor; /* 1px */
+		outline-offset: -0.0625rem; /* 1px */
 	}
 }

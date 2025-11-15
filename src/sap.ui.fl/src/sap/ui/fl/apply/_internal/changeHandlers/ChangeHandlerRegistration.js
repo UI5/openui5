@@ -4,7 +4,7 @@
 
 sap.ui.define([
 	"sap/ui/core/Lib",
-	"sap/ui/fl/initial/_internal/changeHandlers/ChangeHandlerStorage",
+	"sap/ui/fl/apply/_internal/changeHandlers/ChangeHandlerStorage",
 	"sap/ui/fl/changeHandler/AddXML",
 	"sap/ui/fl/changeHandler/AddXMLAtExtensionPoint",
 	"sap/ui/fl/changeHandler/HideControl",
@@ -79,7 +79,7 @@ sap.ui.define([
 		 * Detects already loaded libraries and registers defined changeHandlers.
 		 *
 		 *
-		 * @alias sap.ui.fl.registry.ChangeHandlerRegistration
+		 * @alias sap.ui.fl.apply._internal.changeHandlers.ChangeHandlerRegistration
 		 *
 		 * @author SAP SE
 		 * @version ${version}

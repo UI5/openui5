@@ -6,7 +6,6 @@ sap.ui.define([
 	"sap/base/Log",
 	"sap/ui/core/util/reflection/JsControlTreeModifier",
 	"sap/ui/fl/apply/_internal/controlVariants/Utils",
-	"sap/ui/fl/apply/_internal/flexState/FlexObjectState",
 	"sap/ui/fl/apply/_internal/flexState/FlexState",
 	"sap/ui/fl/initial/_internal/FlexConfiguration",
 	"sap/ui/fl/initial/_internal/FlexInfoSession",
@@ -21,7 +20,6 @@ sap.ui.define([
 	Log,
 	JsControlTreeModifier,
 	VariantUtils,
-	FlexObjectState,
 	FlexState,
 	FlexConfiguration,
 	FlexInfoSession,
@@ -120,21 +118,7 @@ sap.ui.define([
 		 * @ui5-restricted
 		 */
 		waitForChanges(mPropertyBag) {
-			let aComplexSelectors;
-			if (mPropertyBag.element) {
-				aComplexSelectors = [{
-					selector: mPropertyBag.element
-				}];
-			} else if (mPropertyBag.selectors) {
-				aComplexSelectors = mPropertyBag.selectors.map(function(oSelector) {
-					return {
-						selector: oSelector
-					};
-				});
-			} else if (mPropertyBag.complexSelectors) {
-				aComplexSelectors = mPropertyBag.complexSelectors;
-			}
-			return FlexObjectState.waitForFlexObjectsToBeApplied(aComplexSelectors);
+			return InitialFlexAPI.waitForChanges(mPropertyBag);
 		},
 
 		/**

@@ -4,10 +4,20 @@
 
 sap.ui.define([
 	"sap/ui/fl/initial/_internal/FlexInfoSession",
-	"sap/ui/fl/initial/_internal/Settings"
+	"sap/ui/fl/initial/_internal/Loader",
+	"sap/ui/fl/initial/_internal/ManifestUtils",
+	"sap/ui/fl/initial/_internal/Settings",
+	"sap/ui/fl/initial/_internal/StorageUtils",
+	"sap/ui/fl/requireAsync",
+	"sap/ui/fl/Utils"
 ], function(
 	FlexInfoSession,
-	Settings
+	Loader,
+	ManifestUtils,
+	Settings,
+	StorageUtils,
+	requireAsync,
+	Utils
 ) {
 	"use strict";
 
@@ -49,6 +59,48 @@ sap.ui.define([
 	 */
 	InitialFlexAPI.getFlexVersion = function(mPropertyBag) {
 		return FlexInfoSession.getByReference(mPropertyBag.reference)?.version;
+	};
+
+	/**
+	 * Resolves with a promise after all the changes for all controls that are passed have been processed.
+	 * You can either pass a single control, multiple controls or an array with objects that may contain additional configuration.
+	 * If multiple selector parameters are passed, only one of them is used: first element, then selectors, then complexSelectors.
+	 *
+	 * @param {object} mPropertyBag - Object with parameters as properties
+	 * @param {sap.ui.fl.Selector} mPropertyBag.element - Control whose changes are being waited for, the control has to exist
+	 * @param {sap.ui.fl.Selector[]} mPropertyBag.selectors - An array of {@link sap.ui.fl.Selector}s, whose changes are being waited for, the controls have to exist
+	 * @param {object[]} mPropertyBag.complexSelectors - An array containing an object with {@link sap.ui.fl.Selector} and further configuration
+	 * @param {sap.ui.fl.Selector} mPropertyBag.complexSelectors.selector - A {@link sap.ui.fl.Selector}
+	 * @param {string[]} [mPropertyBag.complexSelectors.changeTypes] - An array containing the change types that will be considered. If empty no filtering will be done
+	 * @returns {Promise} Resolves when all changes on the control(s) are processed
+	 *
+	 * @private
+	 * @ui5-restricted
+	 */
+	InitialFlexAPI.waitForChanges = async function(mPropertyBag) {
+		let aComplexSelectors;
+		if (mPropertyBag.element) {
+			aComplexSelectors = [{
+				selector: mPropertyBag.element
+			}];
+		} else if (mPropertyBag.selectors) {
+			aComplexSelectors = mPropertyBag.selectors.map(function(oSelector) {
+				return {
+					selector: oSelector
+				};
+			});
+		} else if (mPropertyBag.complexSelectors) {
+			aComplexSelectors = mPropertyBag.complexSelectors;
+		}
+		const oAppComponent = Utils.getAppComponentForSelector(aComplexSelectors[0].selector);
+		const sFlexReference = ManifestUtils.getFlexReferenceForControl(oAppComponent);
+		const oFlexData = Loader.getCachedFlexData(sFlexReference);
+		// The FlexState is only available if there are changes. Without changes there is no need to check further
+		if (!StorageUtils.isStorageResponseFilled(oFlexData.changes)) {
+			return undefined;
+		}
+		const FlexObjectState = await requireAsync("sap/ui/fl/apply/_internal/flexState/FlexObjectState");
+		return FlexObjectState.waitForFlexObjectsToBeApplied(aComplexSelectors, oAppComponent);
 	};
 
 	return InitialFlexAPI;

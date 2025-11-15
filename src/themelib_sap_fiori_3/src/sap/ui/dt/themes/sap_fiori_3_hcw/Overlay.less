@@ -1,39 +1,46 @@
-/******************************************************************
-	Style of the DT Overlays - sap_fiori_3_hcw Theme
-*******************************************************************/
-@_sap_ui_dt_Overlay_CuttedBackgroundColor: @sapUiFieldPlaceholderTextColor; //#585858
-@_sap_ui_dt_Overlay_HighlightOutlineColor: @sapUiWarningBorder; // #5c5c00
-@_sap_ui_dt_Overlay_SelectionOutlineColor: darken(@sapUiSelected, 40%); //#0042c2
+/* ================================== */
+/* CSS for control sap.ui.dt/Overlay  */
+/* Quartz High Contrast White theme   */
+/* ================================== */
 
-.sapUiDtOverlayHighlighted:not(.sapUiDtOverlaySelected):after {
+@_sap_ui_dt_Overlay_CuttedBackgroundColor: var(--sapField_PlaceholderTextColor); /* #585858 */
+@_sap_ui_dt_Overlay_HighlightOutlineColor: var(--sapWarningBorderColor); /* #5c5c00 */
+@_sap_ui_dt_Overlay_SelectionOutlineColor: darken(@sapUiSelected, 40%); /* #0042c2 */
+
+.sapUiDtOverlayHighlighted:not(.sapUiDtOverlaySelected)::after {
     box-shadow: none;
 }
 
 .sapUiDtOverlayHover {
-    &:after {
-        box-shadow: none;
-        outline: 0.125rem dotted @_sap_ui_dt_Overlay_SelectionOutlineColor; //2px
-        outline-offset: -0.125rem; //2px
-    }
+
+	&::after {
+		box-shadow: none;
+		outline: 0.125rem dotted @_sap_ui_dt_Overlay_SelectionOutlineColor; /* 2px */
+		outline-offset: -0.125rem; /* 2px */
+	}
 }
 
 .sapUiDtOverlaySelected {
-    box-shadow: none!important;
-    &.sapUiDtOverlayHover {
-        &:after {
-            border: 0.125rem solid @_sap_ui_dt_Overlay_SelectionOutlineColor; //2px
-            outline-offset: -0.25rem; //4px
-            transition: none;
-        }
-    }
+	box-shadow: none !important;
+
+	&.sapUiDtOverlayHover {
+
+		&::after {
+			border: 0.125rem solid @_sap_ui_dt_Overlay_SelectionOutlineColor; /* 2px */
+			outline-offset: -0.25rem; /* 4px */
+			transition: none;
+		}
+	}
 }
 
 .sapUiDtOverlay {
-    &:focus {
-        &:before {
-            border: none;
-            outline: 0.125rem dotted @_sap_ui_dt_Overlay_FocusBorderColor; //2px
-            outline-offset: -0.25rem; //4px
-        }
-    }
+
+	&:focus {
+
+		&::before {
+			border: none;
+			outline: 0.125rem dotted @_sap_ui_dt_Overlay_FocusBorderColor; /* 2px */
+			outline-offset: -0.25rem; /* 4px */
+		}
+	}
 }
