@@ -338,62 +338,62 @@
 		 * @enum {string}
 		 * @alias module:sap/base/config.Type
 		 * @private
-		 * @ui5-restricted sap.ui.core, sap.fl, sap.ui.intergration, sap.ui.export
+		 * @ui5-restricted sap.ui.core, sap.ui.fl, sap.ui.integration, sap.ui.export
 		 */
 		var TypeEnum = {
 			/**
 			 * defaultValue: false
 			 * @private
-			 * @ui5-restricted sap.ui.core, sap.fl, sap.ui.intergration, sap.ui.export
+			 * @ui5-restricted sap.ui.core, sap.ui.fl, sap.ui.integration, sap.ui.export
 			 */
 			"Boolean": "boolean",
 
 			/**
 			 * defaultValue: 0
 			 * @private
-			 * @ui5-restricted sap.ui.core, sap.fl, sap.ui.intergration, sap.ui.export
+			 * @ui5-restricted sap.ui.core, sap.ui.fl, sap.ui.integration, sap.ui.export
 			 */
 			"Integer": "integer",
 
 			/**
 			 * defaultValue: ""
 			 * @private
-			 * @ui5-restricted sap.ui.core, sap.fl, sap.ui.intergration, sap.ui.export
+			 * @ui5-restricted sap.ui.core, sap.ui.fl, sap.ui.integration, sap.ui.export
 			 */
 			"String": "string",
 
 			/**
 			 * defaultValue: []
 			 * @private
-			 * @ui5-restricted sap.ui.core, sap.fl, sap.ui.intergration, sap.ui.export
+			 * @ui5-restricted sap.ui.core, sap.ui.fl, sap.ui.integration, sap.ui.export
 			 */
 			"StringArray": "string[]",
 
 			/**
 			 * defaultValue: []
 			 * @private
-			 * @ui5-restricted sap.ui.core, sap.fl, sap.ui.intergration, sap.ui.export
+			 * @ui5-restricted sap.ui.core, sap.ui.fl, sap.ui.integration, sap.ui.export
 			 */
 			"FunctionArray": "function[]",
 
 			/**
 			 * defaultValue: undefined
 			 * @private
-			 * @ui5-restricted sap.ui.core, sap.fl, sap.ui.intergration, sap.ui.export
+			 * @ui5-restricted sap.ui.core, sap.ui.fl, sap.ui.integration, sap.ui.export
 			 */
 			"Function": "function",
 
 			/**
 			 * defaultValue: {}
 			 * @private
-			 * @ui5-restricted sap.ui.core, sap.fl, sap.ui.intergration, sap.ui.export
+			 * @ui5-restricted sap.ui.core, sap.ui.fl, sap.ui.integration, sap.ui.export
 			 */
 			"Object":  "object",
 
 			/**
 			 * defaultValue: {}
 			 * @private
-			 * @ui5-restricted sap.ui.core, sap.fl, sap.ui.intergration, sap.ui.export
+			 * @ui5-restricted sap.ui.core, sap.ui.fl, sap.ui.integration, sap.ui.export
 			 */
 			"MergedObject":  "mergedObject"
 		};

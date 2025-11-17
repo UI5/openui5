@@ -1243,7 +1243,7 @@ sap.ui.define([
 	/**
 	 * Returns all items that have <code>selected</code> properties set to <code>true</code>.
 	 * <b>Note:</b> Only items with <code>selected</code> property set that are members of <code>MenuItemGroup</code> with <code>ItemSelectionMode</code> property
-	 * set to {@link sap.ui.core.ItemSelectionMode.SingleSelect} or {@link sap.ui.unified.ItemSelectionMode.MultiSelect}> are taken into account.
+	 * set to {@link sap.ui.core.ItemSelectionMode.SingleSelect} or {@link sap.ui.core.ItemSelectionMode.MultiSelect}> are taken into account.
 	 * @since 1.127.0
 	 * @public
 	 * @returns {Array} Array of all selected items

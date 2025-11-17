@@ -146,7 +146,7 @@ sap.ui.define([
 		 *             "controlId": "App",
 		 *             "controlAggregation": "pages",
 		 *             "viewNamespace": "myApplication.namespace",
-		 *             // If you are using the mobile library, you have to use an sap.m.Router, to get support for
+		 *             // If you are using the mobile library, you have to use an sap.m.routing.Router, to get support for
 		 *             // the controls sap.m.App, sap.m.SplitApp, sap.m.NavContainer and sap.m.SplitContainer.
 		 *             "routerClass": "sap.m.routing.Router",
 		 *             // What happens if no route matches the hash?

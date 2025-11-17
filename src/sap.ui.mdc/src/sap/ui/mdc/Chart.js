@@ -1366,7 +1366,7 @@ sap.ui.define([
 
 		/**
 		 * Returns the instance of the inner chart from the delegate
-		 * @returns {sap.core.Control} the instance of the inner chart
+		 * @returns {sap.ui.core.Control} the instance of the inner chart
 		 *
 		 * @private
 		 */

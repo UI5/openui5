@@ -6,7 +6,7 @@ sap.ui.define([
 ], function (AnnotationHelper) {
 	"use strict";
 
-	// @see sap.ui.core.ID.type: [A-Za-z_][-A-Za-z0-9_.:]*
+	// @see sap.ui.core.ID type: [A-Za-z_][-A-Za-z0-9_.:]*
 	// Note: "-" is somehow reserved for composition
 	var rBadIdChars = /[^A-Za-z0-9_.:]/g;
 

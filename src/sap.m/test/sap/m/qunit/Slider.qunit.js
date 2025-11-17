@@ -771,7 +771,7 @@ sap.ui.define([
 		oSlider.setValue(-Infinity);	// infinite negative number
 
 		// assert
-		assert.strictEqual(fnErrorSpy.callCount, 0, "sap.base.log.error method was not called");
+		assert.strictEqual(fnErrorSpy.callCount, 0, "sap/base/Log.error method was not called");
 		assert.strictEqual(oSlider.getValue(), 90);
 		assert.equal(oReturnedValue, oSlider);
 
@@ -1026,7 +1026,7 @@ sap.ui.define([
 		await nextUIUpdate();
 
 		// assert
-		assert.strictEqual(fnWarningSpy.callCount, 1, "sap.base.log.Warning method was called");
+		assert.strictEqual(fnWarningSpy.callCount, 1, "sap/base/Log.warning method was called");
 
 		// cleanup
 		oSlider.destroy();
@@ -2200,7 +2200,7 @@ sap.ui.define([
 
 		assert.strictEqual(this.oSlider.getCustomTooltips().length, 2, "Custom tooltips are set");
 		assert.strictEqual(this.oSlider.getAggregation("_tooltipContainer").getAssociatedTooltips().length, 1, "TooltipContainer should render 1 Tooltip");
-		assert.strictEqual(fnWarningSpy.callCount, 1, "sap.base.log.Warning is called");
+		assert.strictEqual(fnWarningSpy.callCount, 1, "sap/base/Log.warning is called");
 	});
 
 	QUnit.test("TooltipContainer: Should be initialized on demand", async function (assert) {

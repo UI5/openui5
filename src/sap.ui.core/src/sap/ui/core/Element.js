@@ -642,7 +642,7 @@ sap.ui.define([
 		 * the entire aggregation area needs to be skipped sinceh its DOM element will be removed
 		 * leaving no focusable element within the aggregation.
 		 *
-		 * @param {sap.ui.core.ManagedObject[]} aChildren The children that belong to the aggregation
+		 * @param {sap.ui.base.ManagedObject[]} aChildren The children that belong to the aggregation
 		 * @returns {HTMLElement|null} Returns the DOM which needs to be skipped, or 'null' if no relevant area is found.
 		 */
 		function searchAggregationAreaToSkip(aChildren) {

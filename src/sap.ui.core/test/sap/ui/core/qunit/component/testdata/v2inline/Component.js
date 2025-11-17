@@ -117,7 +117,7 @@ sap.ui.define(['sap/ui/core/UIComponent'],
 								"testdata.view.Main": {
 									"extension": {
 										"name": "sap.xx.new.Fragment",
-										"type": "sap.ui.core.XMLFragment"
+										"className": "sap.ui.core.Fragment"
 									}
 								}
 							},

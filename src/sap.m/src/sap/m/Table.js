@@ -34,7 +34,7 @@ sap.ui.define([
 	// shortcut for sap.m.PopinLayout
 	var PopinLayout = library.PopinLayout;
 
-	// shortcut for sap.m.Screensize
+	// shortcut for sap.m.ScreenSizes
 	var ScreenSizes = library.ScreenSizes;
 
 	/**

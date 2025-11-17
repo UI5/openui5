@@ -2491,6 +2491,364 @@ sap.ui.define([
         assert.ok(this.uploadSetInstance.handleDrop.calledOnce, "handleDrop was called once");
 	});
 
+	QUnit.test("_getFilesFromDataTransferItems should handle single file with getAsFile", function (assert) {
+		// arrange
+		const done = assert.async();
+		const mockFile = new File(["content"], "test.txt", { type: "text/plain" });
+		const mockDataTransferItem = {
+			webkitGetAsEntry: function() {
+				return {
+					isFile: true,
+					isDirectory: false
+				};
+			},
+			getAsFile: function() {
+				return mockFile;
+			}
+		};
+		const dataTransferItems = [mockDataTransferItem];
+
+		// act
+		this.uploadSetInstance._getFilesFromDataTransferItems(dataTransferItems).then(function(aFiles) {
+			// assert
+			assert.strictEqual(aFiles.length, 1, "One file was processed");
+			assert.strictEqual(aFiles[0], mockFile, "The correct file was returned");
+			assert.strictEqual(aFiles[0].name, "test.txt", "File name is correct");
+			done();
+		}).catch(function(error) {
+			assert.ok(false, "Promise should not reject: " + error);
+			done();
+		});
+	});
+
+	QUnit.test("_getFilesFromDataTransferItems should handle single file without getAsFile", function (assert) {
+		// arrange
+		const done = assert.async();
+		const mockFile = new File(["content"], "test.txt", { type: "text/plain" });
+		const mockDataTransferItem = {
+			webkitGetAsEntry: function() {
+				return {
+					isFile: true,
+					isDirectory: false,
+					file: function(successCallback, errorCallback) {
+						successCallback(mockFile);
+					}
+				};
+			}
+		};
+		const dataTransferItems = [mockDataTransferItem];
+
+		// act
+		this.uploadSetInstance._getFilesFromDataTransferItems(dataTransferItems).then(function(aFiles) {
+			// assert
+			assert.strictEqual(aFiles.length, 1, "One file was processed");
+			assert.strictEqual(aFiles[0], mockFile, "The correct file was returned");
+			assert.strictEqual(aFiles[0].name, "test.txt", "File name is correct");
+			done();
+		}).catch(function(error) {
+			assert.ok(false, "Promise should not reject: " + error);
+			done();
+		});
+	});
+
+	QUnit.test("_getFilesFromDataTransferItems should handle file read error", function (assert) {
+		// arrange
+		const done = assert.async();
+		const mockDataTransferItem = {
+			webkitGetAsEntry: function() {
+				return {
+					isFile: true,
+					isDirectory: false,
+					file: function(successCallback, errorCallback) {
+						errorCallback("File read error");
+					}
+				};
+			}
+		};
+		const dataTransferItems = [mockDataTransferItem];
+
+		// act
+		this.uploadSetInstance._getFilesFromDataTransferItems(dataTransferItems).then(function(aFiles) {
+			assert.ok(false, "Promise should reject on file read error");
+			done();
+		}).catch(function(error) {
+			// assert
+			assert.strictEqual(error, "File read error", "Correct error was propagated");
+			done();
+		});
+	});
+
+	QUnit.test("_getFilesFromDataTransferItems should handle directory with files", function (assert) {
+		// arrange
+		const done = assert.async();
+		const mockFile1 = new File(["content1"], "file1.txt", { type: "text/plain" });
+		const mockFile2 = new File(["content2"], "file2.txt", { type: "text/plain" });
+
+		const mockDataTransferItem = {
+			webkitGetAsEntry: function() {
+				return {
+					isFile: false,
+					isDirectory: true,
+					createReader: function() {
+						return {
+							readEntries: function(callback) {
+								callback([
+									{
+										isFile: true,
+										isDirectory: false,
+										file: function(successCallback) {
+											successCallback(mockFile1);
+										}
+									},
+									{
+										isFile: true,
+										isDirectory: false,
+										file: function(successCallback) {
+											successCallback(mockFile2);
+										}
+									}
+								]);
+							}
+						};
+					}
+				};
+			}
+		};
+		const dataTransferItems = [mockDataTransferItem];
+
+		// act
+		this.uploadSetInstance._getFilesFromDataTransferItems(dataTransferItems).then(function(aFiles) {
+			// assert
+			assert.strictEqual(aFiles.length, 2, "Two files were processed from directory");
+			assert.strictEqual(aFiles[0], mockFile1, "First file is correct");
+			assert.strictEqual(aFiles[1], mockFile2, "Second file is correct");
+			done();
+		}).catch(function(error) {
+			assert.ok(false, "Promise should not reject: " + error);
+			done();
+		});
+	});
+
+	QUnit.test("_getFilesFromDataTransferItems should handle multiple files with mixed getAsFile support", function (assert) {
+		// arrange
+		const done = assert.async();
+		const mockFile1 = new File(["content1"], "file1.txt", { type: "text/plain" });
+		const mockFile2 = new File(["content2"], "file2.txt", { type: "text/plain" });
+
+		const mockDataTransferItem1 = {
+			webkitGetAsEntry: function() {
+				return {
+					isFile: true,
+					isDirectory: false
+				};
+			},
+			getAsFile: function() {
+				return mockFile1;
+			}
+		};
+
+		const mockDataTransferItem2 = {
+			webkitGetAsEntry: function() {
+				return {
+					isFile: true,
+					isDirectory: false,
+					file: function(successCallback) {
+						successCallback(mockFile2);
+					}
+				};
+			}
+		};
+
+		const dataTransferItems = [mockDataTransferItem1, mockDataTransferItem2];
+
+		// act
+		this.uploadSetInstance._getFilesFromDataTransferItems(dataTransferItems).then(function(aFiles) {
+			// assert
+			assert.strictEqual(aFiles.length, 2, "Two files were processed");
+			assert.strictEqual(aFiles[0], mockFile1, "First file is correct (via getAsFile)");
+			assert.strictEqual(aFiles[1], mockFile2, "Second file is correct (via file method)");
+			done();
+		}).catch(function(error) {
+			assert.ok(false, "Promise should not reject: " + error);
+			done();
+		});
+	});
+
+	QUnit.test("_getFilesFromDataTransferItems should handle nested directory structure", function (assert) {
+		// arrange
+		const done = assert.async();
+		const mockFile1 = new File(["content1"], "file1.txt", { type: "text/plain" });
+		const mockFile2 = new File(["content2"], "file2.txt", { type: "text/plain" });
+
+		const mockDataTransferItem = {
+			webkitGetAsEntry: function() {
+				return {
+					isFile: false,
+					isDirectory: true,
+					createReader: function() {
+						return {
+							readEntries: function(callback) {
+								callback([
+									{
+										isFile: true,
+										isDirectory: false,
+										file: function(successCallback) {
+											successCallback(mockFile1);
+										}
+									},
+									{
+										isFile: false,
+										isDirectory: true,
+										createReader: function() {
+											return {
+												readEntries: function(nestedCallback) {
+													nestedCallback([
+														{
+															isFile: true,
+															isDirectory: false,
+															file: function(successCallback) {
+																successCallback(mockFile2);
+															}
+														}
+													]);
+												}
+											};
+										}
+									}
+								]);
+							}
+						};
+					}
+				};
+			}
+		};
+		const dataTransferItems = [mockDataTransferItem];
+
+		// act
+		this.uploadSetInstance._getFilesFromDataTransferItems(dataTransferItems).then(function(aFiles) {
+			// assert
+			assert.strictEqual(aFiles.length, 2, "Two files were processed from nested directory structure");
+			assert.strictEqual(aFiles[0], mockFile1, "First file is correct");
+			assert.strictEqual(aFiles[1], mockFile2, "Second file from nested directory is correct");
+			done();
+		}).catch(function(error) {
+			assert.ok(false, "Promise should not reject: " + error);
+			done();
+		});
+	});
+
+	QUnit.test("_getFilesFromDataTransferItems should handle empty data transfer items", function (assert) {
+		// arrange
+		const done = assert.async();
+		const dataTransferItems = [];
+
+		// act
+		this.uploadSetInstance._getFilesFromDataTransferItems(dataTransferItems).then(function(aFiles) {
+			// assert
+			assert.strictEqual(aFiles.length, 0, "No files were processed from empty array");
+			done();
+		}).catch(function(error) {
+			assert.ok(false, "Promise should not reject for empty array: " + error);
+			done();
+		});
+	});
+
+	QUnit.test("_getFilesFromDataTransferItems should prioritize getAsFile over file method", function (assert) {
+		// arrange
+		const done = assert.async();
+		const mockFileFromGetAsFile = new File(["getAsFile content"], "getAsFile.txt", { type: "text/plain" });
+		const mockFileFromFileMethod = new File(["file method content"], "fileMethod.txt", { type: "text/plain" });
+
+		const mockDataTransferItem = {
+			webkitGetAsEntry: function() {
+				return {
+					isFile: true,
+					isDirectory: false,
+					file: function(successCallback) {
+						successCallback(mockFileFromFileMethod);
+					}
+				};
+			},
+			getAsFile: function() {
+				return mockFileFromGetAsFile;
+			}
+		};
+		const dataTransferItems = [mockDataTransferItem];
+
+		// act
+		this.uploadSetInstance._getFilesFromDataTransferItems(dataTransferItems).then(function(aFiles) {
+			// assert
+			assert.strictEqual(aFiles.length, 1, "One file was processed");
+			assert.strictEqual(aFiles[0], mockFileFromGetAsFile, "getAsFile method was prioritized");
+			assert.strictEqual(aFiles[0].name, "getAsFile.txt", "File from getAsFile method was used");
+			done();
+		}).catch(function(error) {
+			assert.ok(false, "Promise should not reject: " + error);
+			done();
+		});
+	});
+
+	QUnit.test("_getFilesFromDataTransferItems should handle missing getAsFile method", function (assert) {
+		// arrange
+		const done = assert.async();
+		const mockFile = new File(["content"], "test.txt", { type: "text/plain" });
+		const mockDataTransferItem = {
+			webkitGetAsEntry: function() {
+				return {
+					isFile: true,
+					isDirectory: false,
+					file: function(successCallback) {
+						successCallback(mockFile);
+					}
+				};
+			}
+			// Note: no getAsFile method
+		};
+		const dataTransferItems = [mockDataTransferItem];
+
+		// act
+		this.uploadSetInstance._getFilesFromDataTransferItems(dataTransferItems).then(function(aFiles) {
+			// assert
+			assert.strictEqual(aFiles.length, 1, "One file was processed using file method");
+			assert.strictEqual(aFiles[0], mockFile, "The correct file was returned");
+			done();
+		}).catch(function(error) {
+			assert.ok(false, "Promise should not reject: " + error);
+			done();
+		});
+	});
+
+	QUnit.test("_getFilesFromDataTransferItems should handle empty directory", function (assert) {
+		// arrange
+		const done = assert.async();
+		const mockDataTransferItem = {
+			webkitGetAsEntry: function() {
+				return {
+					isFile: false,
+					isDirectory: true,
+					createReader: function() {
+						return {
+							readEntries: function(callback) {
+								callback([]); // Empty directory
+							}
+						};
+					}
+				};
+			}
+		};
+		const dataTransferItems = [mockDataTransferItem];
+
+		// act
+		this.uploadSetInstance._getFilesFromDataTransferItems(dataTransferItems).then(function(aFiles) {
+			// assert
+			assert.strictEqual(aFiles.length, 0, "No files were processed from empty directory");
+			done();
+		}).catch(function(error) {
+			assert.ok(false, "Promise should not reject for empty directory: " + error);
+			done();
+		});
+	});
+
     QUnit.module("Plugin Row Item Configuration", {
         beforeEach: function () {
             this.sandbox = sinon.createSandbox();

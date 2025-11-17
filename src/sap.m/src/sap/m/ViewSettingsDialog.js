@@ -954,7 +954,7 @@ function(
 	/**
 	 * Observes the items aggregation of the passed filterItem
 	 *
-	 * @param {sap.m.ViewSettingsDialogFilterItem} oFilterItem the filterItem, which aggregation will be observed
+	 * @param {sap.m.ViewSettingsFilterItem} oFilterItem the filterItem, which aggregation will be observed
 	 * @private
 	 */
 	ViewSettingsDialog.prototype._observeItem = function (oFilterItem) {
@@ -966,7 +966,7 @@ function(
 	/**
 	 * Unobserves the items aggregation of the passed filterItem
 	 *
-	 * @param {sap.m.ViewSettingsDialogFilterItem} oFilterItem the filterItem, which aggregation will be unobserved
+	 * @param {sap.m.ViewSettingsFilterItem} oFilterItem the filterItem, which aggregation will be unobserved
 	 * @private
 	 */
 	ViewSettingsDialog.prototype._unobserveItem = function (oFilterItem) {

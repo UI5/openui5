@@ -438,9 +438,9 @@ sap.ui.define([
 	// ----------------------- sap/ui/mdc/flp/FlpLinkDelegate relevant methods -------------------------------------
 
 	/**
-	 * Generates a new <code>sap.bas.log</code> if the payload contains semantic objects (this log is required for <code>sap.ui.mdc.flp.FlpLinkDelegate</code>).
+	 * Generates a new <code>sap/base/Log</code> if the payload contains semantic objects (this log is required for <code>sap.ui.mdc.flp.FlpLinkDelegate</code>).
 	 * @private
-	 * @returns {sap.base.Log | undefined} A generated <code>InfoLog</code> for the control | undefined
+	 * @returns {module:sap/base/Log | undefined} A generated <code>InfoLog</code> for the control | undefined
 	 */
 	Link.prototype._getInfoLog = function() {
 		if (this.getPayload() && this.getPayload().semanticObjects) {

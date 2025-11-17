@@ -2251,7 +2251,7 @@ sap.ui.define([
 		}.bind(this));
 	});
 
-	QUnit.module("sap.ui.model.v2.ODataModel", {
+	QUnit.module("sap.ui.model.odata.v2.ODataModel", {
 		beforeEach: function() {
 			bindHelper.apply(this);
 
@@ -2333,7 +2333,7 @@ sap.ui.define([
 		assert.equal(this.oComponent.getModel().bUseBatch, mExpected["useBatch"], "Correct 'useBatch' option is provided to the model configuration.");
 	});
 
-	QUnit.module("sap.ui.model.v2.ODataModel (with dataSource)", {
+	QUnit.module("sap.ui.model.odata.v2.ODataModel (with dataSource)", {
 		beforeEach: async function() {
 			bindHelper.apply(this);
 			await this.spyModels();
@@ -2827,7 +2827,7 @@ sap.ui.define([
 		assert.equal(oODataModelV2Spy.getCall(0).args[0].annotationURI[1], sap.ui.require.toUrl(`testdata/modelFromManifest/${mExpected["anno2Relative"]}`), "Correct relative annotation url is used in the request - 2.");
 	});
 
-	QUnit.module("sap.ui.model.v2.ODataModel (with cacheTokens)", {
+	QUnit.module("sap.ui.model.odata.v2.ODataModel (with cacheTokens)", {
 		beforeEach: async function() {
 			bindHelper.apply(this);
 			await this.spyModels();
@@ -2996,7 +2996,7 @@ sap.ui.define([
 
 	});
 
-	QUnit.module("sap.ui.model.v2.ODataModel (with cacheTokens / with sap-client/sap-server as URI Parameters)", {
+	QUnit.module("sap.ui.model.odata.v2.ODataModel (with cacheTokens / with sap-client/sap-server as URI Parameters)", {
 		beforeEach: async function() {
 			bindHelper.apply(this);
 			await this.spyModels();

@@ -369,7 +369,7 @@ sap.ui.define([
 					"sap.xx.new.Main": {
 						"extensionX": {
 							name: "sap.xx.new.Fragment1",
-							type: "sap.ui.core.XMLFragment"
+							className: "sap.ui.core.Fragment"
 						},
 						"extensionY": {
 							...

@@ -188,7 +188,7 @@ sap.ui.define([
 	 * Expects a warning with the given message for the given log mock.
 	 *
 	 * @param {object} oLogMock
-	 *   mock for <code>sap.base.log</code>
+	 *   mock for <code>sap/base/Log</code>
 	 * @param {string} sExpectedWarning
 	 *   expected warning message
 	 * @param {any} [vDetails]

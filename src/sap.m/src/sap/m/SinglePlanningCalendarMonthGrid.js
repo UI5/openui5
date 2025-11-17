@@ -949,7 +949,7 @@ sap.ui.define([
 		 * deselected and vice versa. If modifier keys are pressed - the previously selected appointments will be
 		 * preserved.
 		 *
-		 * @param {sap.m.CalendarAppointment} oAppointment The appointment to be selected/deselected.
+		 * @param {sap.ui.unified.CalendarAppointment} oAppointment The appointment to be selected/deselected.
 		 * @param {boolean} [bRemoveOldSelection=false] If true, previously selected appointments will be deselected.
 		 * @returns {array} Array of the appointments with changed selected state
 		 * @private

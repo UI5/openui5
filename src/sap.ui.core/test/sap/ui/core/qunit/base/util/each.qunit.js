@@ -15,7 +15,7 @@ sap.ui.define(['sap/base/util/each'], function(each) {
 		}
 	};
 
-	QUnit.module("sap.base.util.each");
+	QUnit.module("sap/base/util/each");
 
 	function testEach(assert, obj) {
 

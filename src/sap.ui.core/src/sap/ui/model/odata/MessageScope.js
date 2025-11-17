@@ -14,7 +14,7 @@ sap.ui.define(function() {
 	 * @enum {string}
 	 * @public
 	 * @alias sap.ui.model.odata.MessageScope
-	 * @see sap.ui.model.ODataModel#constructor
+	 * @see sap.ui.model.odata.v2.ODataModel#constructor
 	 */
 	var MessageScope = {
 		/**

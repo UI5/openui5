@@ -8629,7 +8629,7 @@ sap.ui.define([
 		oComboBox.destroy();
 	});
 
-	QUnit.test("onAfterOpen test case 3 - selected item position (sap.m.inputsUtils.scrollToItem)", async function (assert) {
+	QUnit.test("onAfterOpen test case 3 - selected item position (sap.m.inputUtils.scrollToItem)", async function (assert) {
 		this.clock = sinon.useFakeTimers();
 		var oComboBox = new ComboBox({
 			items: [

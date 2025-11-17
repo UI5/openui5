@@ -522,7 +522,7 @@ sap.ui.define([
 	};
 
 	/**
-	 * Takes care of async destruction of fragments created with {@link sap.ui.core.Controller.loadFragment loadFragment}
+	 * Takes care of async destruction of fragments created with {@link sap.ui.core.mvc.Controller#loadFragment loadFragment}
 	 *
 	 * @private
 	 */

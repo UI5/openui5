@@ -86,7 +86,7 @@ function(Press,
 ){
 	"use strict";
 
-	// shortcuts for types from sap.m.library
+	// shortcuts for types from sap/m/library
 	var ButtonType = mobileLibrary.ButtonType;
 	var ListMode = mobileLibrary.ListMode;
 	var OverflowToolbarPriority = mobileLibrary.OverflowToolbarPriority;

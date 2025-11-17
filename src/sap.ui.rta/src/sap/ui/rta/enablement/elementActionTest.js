@@ -72,7 +72,7 @@ sap.ui.define([
 	 * @param {string} sMsg - Name of QUnit test - e.g. Checking the move action for a VerticalLayout control
 	 * @param {object} mOptions - Configuration for this elementActionTest
 	 * @param {string} [mOptions.layer] - Flex layer used during testing, use it in case actions are enabled for other layers then CUSTOMER
-	 * @param {string|object} mOptions.xmlView - XML view content or all settings available to sap.ui.xmlView, to have a view to apply the action
+	 * @param {string|object} mOptions.xmlView - XML view content or all settings available to sap.ui.xmlview, to have a view to apply the action
 	 * @param {sap.ui.model.Model} [mOptions.model] - Any model to be assigned on the view
 	 * @param {string} [mOptions.placeAt="qunit-fixture"] - Id of tag to place view at runtime
 	 * @param {boolean} [mOptions.jsOnly] - Set to true, if change handler cannot work on xml view

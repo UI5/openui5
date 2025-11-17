@@ -66,7 +66,7 @@ sap.ui.define(["./isPlainObject"], function(isPlainObject) {
 		if (src == null) {
 			return src;
 		} else if (src instanceof Date) {
-			if (src.clone) { // sap.ui.core.date.UI5Date
+			if (src.clone) { // module:sap/ui/core/date/UI5Date
 				return src.clone();
 			}
 

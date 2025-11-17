@@ -32,7 +32,7 @@ sap.ui.define([
 	// shortcut for sap.ui.core.TextDirection
 	var TextDirection = coreLibrary.TextDirection;
 
-	// shortcut for sap.m.ExpandableOverflowTextMode
+	// shortcut for sap.m.ExpandableTextOverflowMode
 	var ExpandableTextOverflowMode = library.ExpandableTextOverflowMode;
 
 	// shortcut for sap.ui.core.TextDirection

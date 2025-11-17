@@ -287,7 +287,7 @@ sap.ui.define([
 							value : vRawValue,
 							// ensure that type information is available in sub paths of the
 							// expression even if for that sub path no complex binding is needed,
-							// e.g. see sap.ui.model.odata.v4_AnnotationHelperExpression.operator
+							// e.g. see sap.ui.model.odata.v4._AnnotationHelperExpression.operator
 							$$valueAsPromise : true
 						});
 				}

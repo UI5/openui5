@@ -2333,8 +2333,8 @@ sap.ui.define([
 	};
 
 	/**
-	 * Creates a lock for a group. {@link sap.ui.model.odata.v4._Requestor#submitBatch} has to wait
-	 * until all locks for <code>sGroupId</code> are unlocked. Delegates to
+	 * Creates a lock for a group. {@link sap.ui.model.odata.v4.lib._Requestor#submitBatch} has to
+	 * wait until all locks for <code>sGroupId</code> are unlocked. Delegates to
 	 * {@link sap.ui.model.odata.v4.lib._Requestor#lockGroup}.
 	 *
 	 * The goal of such a lock is to allow using an API that creates a request in a batch group and

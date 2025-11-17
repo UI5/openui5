@@ -17,7 +17,7 @@ sap.ui.define([
 	var sClassName = "sap.ui.model.odata.v4.lib._Cache",
 		// Matches if ending with a transient key predicate:
 		//   EMPLOYEE($uid=id-1550828854217-16) -> aMatches[0] === "($uid=id-1550828854217-16)"
-		//   @see sap.base.util.uid
+		//   @see sap/base/util/uid
 		rEndsWithTransientPredicate = /\(\$uid=[-\w]+\)$/,
 		rInactive = /^\$inactive\./,
 		sMessagesAnnotation = "@com.sap.vocabularies.Common.v1.Messages",
@@ -1547,7 +1547,7 @@ sap.ui.define([
 	 *
 	 * @abstract
 	 * @function
-	 * @name sap.ui.model.odata.lib._Cache#refreshSingleNoCollection
+	 * @name sap.ui.model.odata.v4.lib._Cache#refreshSingleNoCollection
 	 * @private
 	 */
 
@@ -3604,7 +3604,7 @@ sap.ui.define([
 
 	/**
 	 * @override
-	 * @see sap.ui.model.odata.lib._Cache#refreshSingleNoCollection
+	 * @see sap.ui.model.odata.v4.lib._Cache#refreshSingleNoCollection
 	 */
 	_CollectionCache.prototype.refreshSingleNoCollection = function (oGroupLock, sPath) {
 		return this.requestSideEffects(oGroupLock.getUnlockedCopy(), [_Helper.getMetaPath(sPath)],
@@ -4607,7 +4607,7 @@ sap.ui.define([
 
 	/**
 	 * @override
-	 * @see sap.ui.model.odata.lib._Cache#refreshSingleNoCollection
+	 * @see sap.ui.model.odata.v4.lib._Cache#refreshSingleNoCollection
 	 */
 	_SingleCache.prototype.refreshSingleNoCollection = function (oGroupLock, sPath) {
 		return this.requestSideEffects(oGroupLock.getUnlockedCopy(), [_Helper.getMetaPath(sPath)]);

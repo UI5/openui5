@@ -60,7 +60,7 @@ sap.ui.define([
 	 */
 
 	/**
-	 * Example Delegate for {@link sap.ui.mdc.Chart Chart}. This class extends the {@link sap.ui.mdc.ChartDelegate ChartDelegate} object und make use of the {@link sap.ui.chart.Chart Chart}.<br>
+	 * Example Delegate for {@link sap.ui.mdc.Chart Chart}. This class extends the {@link sap.ui.mdc.odata.v4.ChartDelegate ChartDelegate} object und make use of the {@link sap.chart.Chart Chart}.<br>
 	 *
 	 * @namespace
 	 * @author SAP SE

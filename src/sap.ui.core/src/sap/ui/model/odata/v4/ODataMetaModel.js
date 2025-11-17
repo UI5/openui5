@@ -1412,7 +1412,7 @@ sap.ui.define([
 			 * Outputs a log message for the given level. Leads to an <code>undefined</code> result
 			 * in case of a WARNING.
 			 *
-			 * @param {sap.base.Log.Level} iLevel
+			 * @param {module:sap/base/Log.Level} iLevel
 			 *   A log level, either DEBUG or WARNING
 			 * @param {...string} aTexts
 			 *   The main text of the message is constructed from the rest of the arguments by

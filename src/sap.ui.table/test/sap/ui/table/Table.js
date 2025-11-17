@@ -230,7 +230,7 @@ sap.ui.define([
   oColumn = new Column({label: new Label({text: "m.MultiComboBox"}), template: oControl, width: "250px"});
   oTable.addColumn(oColumn);
 
-  // sap.m.Checkbox
+  // sap.m.CheckBox
   oControl = new CheckBox({selected: "{checked}", text: "{lastName}"});
   oColumn = new Column({label: new Label({text: "m.Checkbox"}), template: oControl, width: "50px"}).data("clipboard", "checked");
   oColumn.setCreationTemplate(new HBox({items: [new CheckBox({selected: "{checked}"}), new Input({value: "{lastName}"})]}));

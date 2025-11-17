@@ -98,7 +98,7 @@ sap.ui.define([
 						"testdata.view.Main": {
 							"extension": {
 								"name": "sap.xx.new.Fragment",
-								"type": "sap.ui.core.XMLFragment"
+								"className": "sap.ui.core.Fragment"
 							}
 						}
 					},
@@ -217,7 +217,7 @@ sap.ui.define([
 								"testdata.view.Main": {
 									"extension": {
 										"name": "sap.xx.new.Fragment",
-										"type": "sap.ui.core.XMLFragment"
+										"className": "sap.ui.core.Fragment"
 									}
 								}
 							},

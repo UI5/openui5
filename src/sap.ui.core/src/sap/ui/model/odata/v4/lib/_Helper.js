@@ -854,7 +854,7 @@ sap.ui.define([
 		},
 
 		// Trampoline property to allow for mocking function module in unit tests.
-		// @see sap.base.util.deepEqual
+		// @see sap/base/util/deepEqual
 		deepEqual : deepEqual,
 
 		/**
@@ -2164,7 +2164,7 @@ sap.ui.define([
 		},
 
 		// Trampoline property to allow for mocking function module in unit tests.
-		// @see sap.base.util.isEmptyObject
+		// @see sap/base/util/isEmptyObject
 		isEmptyObject : isEmptyObject,
 
 		/**
@@ -2354,7 +2354,7 @@ sap.ui.define([
 		},
 
 		// Trampoline property to allow for mocking function module in unit tests.
-		// @see sap.base.util.merge
+		// @see sap/base'/util/merge
 		merge : merge,
 
 		/**
@@ -2820,7 +2820,7 @@ sap.ui.define([
 		},
 
 		// Trampoline property to allow for mocking function module in unit tests.
-		// @see sap.base.util.uid
+		// @see sap/base/util/uid
 		uid : uid,
 
 		/**

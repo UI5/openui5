@@ -50,7 +50,7 @@ sap.ui.define([
 		 * @param {string} [sQuery] URI query parameters starting with '?'
 		 * @param {object} [mParameters] additional model parameters
 		 * @param {boolean} [bAllowPrerenderingTasks] avoids that addPrerenderingTasks is blocked
-		 * @returns {sap.ui.model.odata.v4.oDataModel} the model
+		 * @returns {sap.ui.model.odata.v4.ODataModel} the model
 		 */
 		createModel : function (sQuery, mParameters, bAllowPrerenderingTasks) {
 			var oModel = new ODataModel(Object.assign({}, mParameters, {

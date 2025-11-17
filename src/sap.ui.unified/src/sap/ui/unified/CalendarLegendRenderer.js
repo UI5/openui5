@@ -88,7 +88,7 @@ CalendarLegendRenderer.render = function(oRm, oLeg) {
  *
  * @param {sap.ui.core.RenderManager} oRm the RenderManager that can be used for writing to the render output buffer
  * @param {string} sClass name of the CSS class used for this item
- * @param {sap.ui.unified.CalenderLegendItem} oItem item element
+ * @param {sap.ui.unified.CalendarLegendItem} oItem item element
  * @param {string[]} aColorClasses Css classes to be added to the color bullet item in front of the legend item
  */
 CalendarLegendRenderer.renderLegendItem = function(oRm, sClass, oItem, aColorClasses, iIndex, iCount) {

@@ -474,7 +474,7 @@ sap.ui.define([
 	 *
 	 * @returns {sap.ui.core.Control} Control to which the <code>ValueHelp</code> element is connected to
 	 * @private
-	 * @ui5-restricted sap.ui.mdc.field.FieldBase, sap.ui.mdc.valueHelp.base.Container
+	 * @ui5-restricted sap.ui.mdc.field.FieldBase, sap.ui.mdc.valuehelp.base.Container
 	 */
 	ValueHelp.prototype.getControl = function() {
 		return this._oControl;

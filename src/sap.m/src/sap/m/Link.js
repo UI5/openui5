@@ -51,7 +51,7 @@ function(
 	// shortcut for sap.m.LinkAccessibleRole
 	var LinkAccessibleRole = library.LinkAccessibleRole;
 
-	// shortcut for sap.m.EmptyIndicator
+	// shortcut for sap.m.EmptyIndicatorMode
 	var EmptyIndicatorMode = library.EmptyIndicatorMode;
 
 	// shortcut for sap.m.ReactiveAreaMode
@@ -632,7 +632,7 @@ function(
 	 * @returns {boolean} If it is an interactive Control
 	 *
 	 * @private
-	 * @ui5-restricted sap.m.OverflowToolBar, sap.m.Toolbar
+	 * @ui5-restricted sap.m.OverflowToolbar, sap.m.Toolbar
 	 */
 	Link.prototype._getToolbarInteractive = function () {
 		return true;

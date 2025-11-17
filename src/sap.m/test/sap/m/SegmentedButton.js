@@ -686,7 +686,7 @@ sap.ui.define([
 		   ****************************************/
 
 		  /****************************************
-		   * sap.m.ToolBar Start                  *
+		   * sap.m.Toolbar Start                  *
 		   ****************************************/
 
 		  var testPanel = new Panel({
@@ -783,11 +783,11 @@ sap.ui.define([
 		  vBox.addItem(testPanel);
 
 		  /****************************************
-		   * sap.m.ToolBar End                    *
+		   * sap.m.Toolbar End                    *
 		   ****************************************/
 
 		  /****************************************
-		   * sap.ui.SimpleForm                    *
+		   * sap.ui.layout.form.SimpleForm        *
 		   ****************************************/
 
 
@@ -796,11 +796,11 @@ sap.ui.define([
 			  type: ViewType.XML
 		  });
 
-		  vBox.addItem(createLabel("SegmentedButton in sap.ui.SimpleForm:"));
+		  vBox.addItem(createLabel("SegmentedButton in sap.ui.layout.form.SimpleForm:"));
 		  vBox.addItem(oSimpleFormView);
 
 		  /****************************************
-		   * sap.ui.SimpleForm                    *
+		   * sap.ui.layout.form.SimpleForm        *
 		   ****************************************/
 
 		  /****************************************
@@ -1101,7 +1101,7 @@ sap.ui.define([
 		   ****************************************/
 
 		  /****************************************
-		   * sap.m.InputLiistItem Start           *
+		   * sap.m.InputListItem Start            *
 		   ****************************************/
 
 		  vBox.addItem(createLabel("sap.m.InputListItem:"));
@@ -1136,7 +1136,7 @@ sap.ui.define([
 		  vBox.addItem(oList);
 
 		  /****************************************
-		   * sap.m.InputLiistItem End             *
+		   * sap.m.InputListItem End              *
 		   ****************************************/
 
 		  /****************************************

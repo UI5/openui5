@@ -36,7 +36,7 @@ sap.ui.define(function() {
 			},
 
 			"base/util/LoaderExtensions": {
-				title: "sap.base.util.LoaderExtensions"
+				title: "sap/base/util/LoaderExtensions"
 			},
 
 			"jqueryCompatibilityCheck": {

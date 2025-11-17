@@ -24,7 +24,7 @@ sap.ui.define([
 	// shortcut for sap.ui.core.TextDirection
 	var WrappingType = mobileLibrary.WrappingType;
 
-	// shortcut for sap.m.EmptyIndicator
+	// shortcut for sap.m.EmptyIndicatorMode
 	var EmptyIndicatorMode = mobileLibrary.EmptyIndicatorMode;
 
 	// shortcut for library resource bundle

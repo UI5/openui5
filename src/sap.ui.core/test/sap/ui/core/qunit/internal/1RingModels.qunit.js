@@ -30,7 +30,7 @@ sap.ui.require([
 		// "sap/ui/core/qunit/i18n/LocaleData.qunit",
 
 		// ***************************************************************************************
-		// sap.ui.core.date.* and sap.base.i18n.date.* - tests are contained in testsuite.i18.qunit.js
+		// sap.ui.core.date.* and sap/base/i18n/date/* - tests are contained in testsuite.i18n.qunit.js
 		// ***************************************************************************************
 		"sap/ui/core/qunit/date/_Calendars.qunit",
 		"sap/ui/core/qunit/i18n/Buddhist.qunit",

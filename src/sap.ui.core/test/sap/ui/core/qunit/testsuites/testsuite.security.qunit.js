@@ -19,31 +19,31 @@ sap.ui.define(function() {
 		},
 		tests: {
 			"base/security/encodeCSS": {
-				title: "sap.base.security.encodeCSS"
+				title: "sap/base/security/encodeCSS"
 			},
 
 			"base/security/encodeJS": {
-				title: "sap.base.security.encodeJS"
+				title: "sap/base/security/encodeJS"
 			},
 
 			"base/security/encodeURL": {
-				title: "sap.base.security.encodeURL"
+				title: "sap/base/security/encodeURL"
 			},
 
 			"base/security/encodeURLParameters": {
-				title: "sap.base.security.encodeURLParameters"
+				title: "sap/base/security/encodeURLParameters"
 			},
 
 			"base/security/encodeXML": {
-				title: "sap.base.security.encodeXML"
+				title: "sap/base/security/encodeXML"
 			},
 
 			"base/security/sanitizeHTML": {
-				title: "sap.base.security.sanitizeHTML"
+				title: "sap/base/security/sanitizeHTML"
 			},
 
 			"base/security/URLListValidator": {
-				title: "sap.base.security.URLListValidator"
+				title: "sap/base/security/URLListValidator"
 			},
 
 			"security/FrameOptions": {

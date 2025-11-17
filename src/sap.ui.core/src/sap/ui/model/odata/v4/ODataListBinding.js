@@ -1941,7 +1941,7 @@ sap.ui.define([
 	 * Returns a URL by which the complete content of the list can be downloaded in JSON format. The
 	 * request delivers all entities considering the binding's query options (such as filters or
 	 * sorters). Returns <code>null</code> if the binding's filter is
-	 * {@link sap.ui.filter.Filter.NONE}.
+	 * {@link sap.ui.model.Filter.NONE}.
 	 *
 	 * @returns {sap.ui.base.SyncPromise<string|null>}
 	 *   A promise that is resolved with the download URL or <code>null</code>
@@ -1981,7 +1981,7 @@ sap.ui.define([
 	/**
 	 * Requests a $filter query option value for this binding; the value is computed from the
 	 * given arrays of dynamic application and control filters and the given static filter. If
-	 * {@link sap.ui.filter.Filter.NONE} is set as any of the dynamic filters, it will override
+	 * {@link sap.ui.model.Filter.NONE} is set as any of the dynamic filters, it will override
 	 * all static filters.
 	 *
 	 * As a side effect, this method computes <code>$$aggregation.$leafLevelAggregated</code>.
@@ -2929,7 +2929,7 @@ sap.ui.define([
 	 * If known, the value represents the sum of the element count of the collection on the server
 	 * and the number of {@link sap.ui.model.odata.v4.Context#isInactive active}
 	 * {@link sap.ui.model.odata.v4.Context#isTransient transient} entities created on the client,
-	 * minus the {@link #sap.ui.model.data.v4.Context#delete deleted} entities. Otherwise, it is
+	 * minus the {@link #sap.ui.model.odata.v4.Context#delete deleted} entities. Otherwise, it is
 	 * <code>undefined</code>. The value is a number of type <code>Edm.Int64</code>. Since 1.91.0,
 	 * in case of data aggregation with group levels, the count is the leaf count on the server; it
 	 * is only determined if the <code>$count</code> system query option is given. Since 1.110.0,
@@ -3053,7 +3053,7 @@ sap.ui.define([
 	 * Returns a URL by which the complete content of the list can be downloaded in JSON format. The
 	 * request delivers all entities considering the binding's query options (such as filters or
 	 * sorters). Returns <code>null</code> if the binding's filter is
-	 * {@link sap.ui.filter.Filter.NONE}.
+	 * {@link sap.ui.model.Filter.NONE}.
 
 	 * The returned URL does not specify <code>$skip</code> and <code>$top</code> and leaves it up
 	 * to the server how many rows it delivers. Many servers tend to choose a small limit without
@@ -4380,7 +4380,7 @@ sap.ui.define([
 	 * Resolves with a URL by which the complete content of the list can be downloaded in JSON
 	 * format. The request delivers all entities considering the binding's query options (such as
 	 * filters or sorters). Resolves with <code>null</code> if the binding's filter is
-	 * {@link sap.ui.filter.Filter.NONE}.
+	 * {@link sap.ui.model.Filter.NONE}.
 	 *
 	 * The returned URL does not specify <code>$skip</code> and <code>$top</code> and leaves it up
 	 * to the server how many rows it delivers. Many servers tend to choose a small limit without

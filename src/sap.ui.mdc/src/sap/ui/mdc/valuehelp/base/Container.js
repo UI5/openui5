@@ -694,7 +694,7 @@ sap.ui.define([
 	 * @returns {boolean} True if used as typeahead
 	 *
 	 * @private
-	 * @ui5-restricted sap.ui.mdc.valueHelp.base.Content
+	 * @ui5-restricted sap.ui.mdc.valuehelp.base.Content
 	 */
 	Container.prototype.isTypeahead = function() {
 		const oValueHelp = this.getParent();
@@ -709,7 +709,7 @@ sap.ui.define([
 	 * @returns {boolean} Flag if searching is supported
 	 *
 	 * @private
-	 * @ui5-restricted sap.ui.mdc.ValueHelp, sap.ui.mdc.valueHelp.base.Content
+	 * @ui5-restricted sap.ui.mdc.ValueHelp, sap.ui.mdc.valuehelp.base.Content
  	 * @deprecated As of version 1.137 with no replacement.
 	 */
 	Container.prototype.isTypeaheadSupported = function() {
@@ -726,7 +726,7 @@ sap.ui.define([
 	 * @returns {boolean} True if used as dialog
 	 *
 	 * @private
-	 * @ui5-restricted sap.ui.mdc.valueHelp.base.Content
+	 * @ui5-restricted sap.ui.mdc.valuehelp.base.Content
 	 */
 	Container.prototype.isDialog = function() {
 		const oValueHelp = this.getParent();
@@ -741,7 +741,7 @@ sap.ui.define([
 	 * @returns {boolean} True if parent has a dialog
 	 *
 	 * @private
-	 * @ui5-restricted sap.ui.mdc.valueHelp.base.Content
+	 * @ui5-restricted sap.ui.mdc.valuehelp.base.Content
 	 */
 	Container.prototype.hasDialog = function() {
 		const oValueHelp = this.getParent();
@@ -757,7 +757,7 @@ sap.ui.define([
 	 * @returns {boolean} True if scrolling is provided
 	 *
 	 * @private
-	 * @ui5-restricted sap.ui.mdc.valueHelp.base.Content
+	 * @ui5-restricted sap.ui.mdc.valuehelp.base.Content
 	 */
 	Container.prototype.providesScrolling = function() {
 		return false;
@@ -771,7 +771,7 @@ sap.ui.define([
 	 * @returns {sap.ui.mdc.ValueHelp} <code>ValueHelp</code> instance
 	 *
 	 * @private
-	 * @ui5-restricted sap.ui.mdc.valueHelp.base.Content
+	 * @ui5-restricted sap.ui.mdc.valuehelp.base.Content
 	 */
 	Container.prototype.getValueHelp = function() {
 		const oValueHelp = this.getParent();
@@ -787,7 +787,7 @@ sap.ui.define([
 	 * @throws Throws an error if the delegate module is not available
 	 *
 	 * @private
-	 * @ui5-restricted sap.ui.mdc.valueHelp.base.Content
+	 * @ui5-restricted sap.ui.mdc.valuehelp.base.Content
 	 */
 	Container.prototype.getValueHelpDelegate = function() {
 		const oValueHelp = this.getParent();
@@ -802,7 +802,7 @@ sap.ui.define([
 	 * @returns {object} payload
 	 *
 	 * @private
-	 * @ui5-restricted sap.ui.mdc.valueHelp.base.Content
+	 * @ui5-restricted sap.ui.mdc.valuehelp.base.Content
 	 */
 	Container.prototype.getValueHelpDelegatePayload = function() {
 		const oValueHelp = this.getParent();
@@ -818,7 +818,7 @@ sap.ui.define([
 	 * @throws Throws an error if the delegate module is not available
 	 *
 	 * @private
-	 * @ui5-restricted sap.ui.mdc.valueHelp.base.Content
+	 * @ui5-restricted sap.ui.mdc.valuehelp.base.Content
 	 */
 	Container.prototype.awaitValueHelpDelegate = function() {
 		const oValueHelp = this.getParent();
@@ -833,7 +833,7 @@ sap.ui.define([
 	 * @returns {boolean} True if delegate is initialized
 	 *
 	 * @private
-	 * @ui5-restricted sap.ui.mdc.valueHelp.base.Content
+	 * @ui5-restricted sap.ui.mdc.valuehelp.base.Content
 	 */
 	Container.prototype.isValueHelpDelegateInitialized = function() {
 		const oValueHelp = this.getParent();
@@ -891,7 +891,7 @@ sap.ui.define([
 	 * @param {int} iMaxConditions maximal conditions allowed (as <code>ValueHelp</code> might not be connected to a field)
 	 * @returns {sap.ui.core.delegate.ScrollEnablement} The scroll enablement delegate
 	 * @private
-	 * @ui5-restricted sap.ui.mdc.valueHelp.base.Content
+	 * @ui5-restricted sap.ui.mdc.valuehelp.base.Content
 	 */
 	Container.prototype.getScrollDelegate = function(iMaxConditions) {
 		const oContainer = this.getAggregation("_container");

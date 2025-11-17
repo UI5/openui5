@@ -1008,7 +1008,7 @@ ObjectHeaderRenderer._renderResponsiveStatesColumn = function(oRM, oOH, iRenderC
  *
  * @param {sap.ui.core.RenderManager} oRM The RenderManager that can be used for writing to the render output buffer
  * @param {sap.m.ObjectHeader} oOH An object representation of the control that should be rendered
- * @param {sap.m.ObjectAttribute} oAttr An object representation of the sap.m.ObjectAtribute that should be rendered
+ * @param {sap.m.ObjectAttribute} oAttr An object representation of the sap.m.ObjectAttribute that should be rendered
  * @private
  */
 ObjectHeaderRenderer._renderResponsiveAttribute = function(oRM, oOH, oAttr) {

@@ -2,7 +2,7 @@
  * ${copyright}
  */
 
-// Provides default renderer for control sap.m.Togglebutton
+// Provides default renderer for control sap.m.ToggleButton
 sap.ui.define(['./ButtonRenderer', 'sap/ui/core/Renderer'], function(ButtonRenderer, Renderer) {
 "use strict";
 

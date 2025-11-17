@@ -27,7 +27,7 @@ sap.ui.define(
 		 * Renders the HTML for the given control, using the provided {@link sap.ui.core.RenderManager}.
 		 *
 		 * @param {sap.ui.core.RenderManager} oRm the RenderManager that can be used for writing to the render output buffer
-		 * @param {sap.n.RatingIndicator} oControl an object representation of the control that should be rendered
+		 * @param {sap.m.RatingIndicator} oControl an object representation of the control that should be rendered
 		 */
 		RatingIndicatorRenderer.render = function(oRm, oControl) {
 			var that = this;

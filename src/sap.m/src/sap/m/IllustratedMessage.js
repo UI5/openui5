@@ -40,7 +40,7 @@ sap.ui.define([
 ) {
 	"use strict";
 
-	// shortcut for sap.ui.core.IllustratedMessageType
+	// shortcut for sap.ui.core.TextAlign
 	var TextAlign = coreLibrary.TextAlign;
 
 	// shortcut for sap.ui.core.TitleLevel
