@@ -1853,9 +1853,14 @@ sap.ui.define([
 		for (var i = 0; i < aSections.length; i++) {
 			var oSection = aSections[i];
 			if (oSection._getInternalVisible()) {
-				oSection._setAriaLabelledByAnchorButton(aAnchorBarItems[i]);
+				if (aSections.length === 1) {
+					oSection._setAriaLabelledByAnchorButton(undefined);
+				} else {
+					oSection._setAriaLabelledByAnchorButton(aAnchorBarItems[i]);
+				}
 			}
 		}
+
 
 		this._setInternalAnchorBarVisible(bVisibleAnchorBar, bInvalidate);
 		this._oFirstVisibleSection = oFirstVisibleSection;
