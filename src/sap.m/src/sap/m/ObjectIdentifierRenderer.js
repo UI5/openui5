@@ -14,7 +14,7 @@ var ObjectIdentifierRenderer = {
 	apiVersion: 2
 };
 
-// shortcut for sap.m.EmptyIndicator
+// shortcut for sap.m.EmptyIndicatorMode
 var EmptyIndicatorMode = library.EmptyIndicatorMode;
 
 // shortcut for library resource bundle

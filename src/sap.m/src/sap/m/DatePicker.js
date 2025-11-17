@@ -113,8 +113,9 @@ sap.ui.define([
 	 * <code>DatePicker</code> to a model using the <code>sap.ui.model.type.Date</code></li>
 	 * <caption> binding the <code>value</code> property by using types </caption>
 	 * <pre>
+	 * // UI5Date imported from sap/ui/core/date/UI5Date
 	 * new sap.ui.model.json.JSONModel({
-	 *     date: sap.ui.core.date.UI5Date.getInstance(2022,10,10,10,10,10)
+	 *     date: UI5Date.getInstance(2022,10,10,10,10,10)
 	 * });
 	 *
 	 * new sap.m.DatePicker({

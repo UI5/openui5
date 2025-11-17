@@ -244,7 +244,7 @@ sap.ui.define([
 		assert.deepEqual(aReturnedFilters, ["~filter~"]);
 		assert.notStrictEqual(oBinding.aFilters, aReturnedFilters);
 
-		// all models in sap.ui.models have an empty array. but it is not a requirement for other
+		// all models in sap/ui/model have an empty array. but it is not a requirement for other
 		// models
 		oBinding.aFilters = undefined;
 		oBinding.aApplicationFilters = undefined;

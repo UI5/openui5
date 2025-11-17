@@ -6,9 +6,9 @@ sap.ui.define(["sap/ui/base/DataType"], (DataType) => {
 	"use strict";
 
 	/**
-	 * Defines the Icon and Text display behavior of a {@link sap.ui.mdc.chart.SelectionButtton SelectionButton} control.
+	 * Defines the Icon and Text display behavior of a {@link sap.ui.mdc.chart.SelectionButton SelectionButton} control.
 	 *
-	 * For the {@link sap.ui.mdc.chart.SelectionButtton SelectionButton} control, this enumeration defines how the <code>Icon</code> and <code>Text</code> on a button are displayed when the <code>SelectionButton</code> is not inside the overflow.
+	 * For the {@link sap.ui.mdc.chart.SelectionButton SelectionButton} control, this enumeration defines how the <code>Icon</code> and <code>Text</code> on a button are displayed when the <code>SelectionButton</code> is not inside the overflow.
 	 *
 	 * @enum {string}
 	 * @private

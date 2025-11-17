@@ -347,7 +347,7 @@ sap.ui.define([
 		 *
 		 *         // control type is often combined with viewName - only controls that are inside of the view
 		 *         // and have the correct type will be returned
-		 *         // here all sap.m.Inputs inside of a view called 'my.View' will be returned
+		 *         // here all sap.m.Input controls inside of a view called 'my.View' will be returned
 		 *         new OpaPlugin().getMatchingControls({
 		 *             viewName: "my.View"
 		 *             controlType: "sap.m.Input"

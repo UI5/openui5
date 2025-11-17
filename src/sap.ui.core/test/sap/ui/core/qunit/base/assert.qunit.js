@@ -6,7 +6,7 @@ sap.ui.define(["sap/base/assert"], function(assert) {
 	"use strict";
 
 	/*eslint-disable no-console*/
-	QUnit.module("sap.base.log.assert");
+	QUnit.module("sap/base/assert");
 
 	QUnit.test("assert", function(QUnitAssert) {
 		var assertSpy = this.spy(),

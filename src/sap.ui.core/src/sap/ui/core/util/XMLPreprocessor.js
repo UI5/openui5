@@ -353,7 +353,7 @@ sap.ui.define([
 	 *   the "with" control
 	 * @param {object} oBindingInfo
 	 *   the binding info which must be "ready" (because it refers only to models which are
-	 *   available) and normalized via {@link sap.ui.base.BindingIfo.createProperty}
+	 *   available) and normalized via {@link sap.ui.base.BindingInfo.createProperty}
 	 * @param {object} mSettings
 	 *   map/JSON-object with initial property values, etc.
 	 * @param {object} oScope

@@ -5,7 +5,7 @@
 sap.ui.define(['sap/base/util/resolveReference'], function(resolveReference) {
 	"use strict";
 
-	QUnit.module("sap.base.util.resolveReference");
+	QUnit.module("sap/base/util/resolveReference");
 
 	QUnit.test("resolve non-function from module", function(assert) {
 		var oModule = {

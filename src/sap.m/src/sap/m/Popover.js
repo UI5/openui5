@@ -1506,7 +1506,7 @@ sap.ui.define([
 		/*                      begin: internal methods                  */
 		/* =========================================================== */
 		/**
-		 * This method detects if there's an sap.m.NavContainer instance added as a single child into Popover's content aggregation or through one or more sap.ui.mvc.View controls.
+		 * This method detects if there's an sap.m.NavContainer instance added as a single child into Popover's content aggregation or through one or more sap.ui.core.mvc.View controls.
 		 * If there is, sapMPopoverNav style class will be added to the root node of the control in order to apply some special css styles to the inner dom nodes.
 		 * @returns {boolean} True is there is a single NavContainer within the Popover's content
 		 */
@@ -1543,7 +1543,7 @@ sap.ui.define([
 		};
 
 		/**
-		 * This method detects if there's an sap.m.Page instance added as a single child into popover's content aggregation or through one or more sap.ui.mvc.View controls.
+		 * This method detects if there's an sap.m.Page instance added as a single child into popover's content aggregation or through one or more sap.ui.core.mvc.View controls.
 		 * If there is, sapMPopoverPage style class will be added to the root node of the control in order to apply some special css styles to the inner dom nodes.
 		 *
 		 * @returns {boolean} True is there is a Page within the Popover's content
@@ -1563,7 +1563,7 @@ sap.ui.define([
 		};
 
 		/**
-		 * If a scrollable control (sap.m.NavContainer, sap.m.ScrollContainer, sap.m.Page) is added to popover's content aggregation as a single child or through one or more sap.ui.mvc.View instances,
+		 * If a scrollable control (sap.m.NavContainer, sap.m.ScrollContainer, sap.m.Page) is added to popover's content aggregation as a single child or through one or more sap.ui.core.mvc.View instances,
 		 * the scrolling inside popover will be disabled in order to avoid wrapped scrolling areas.
 		 *
 		 * If more than one scrollable control is added to popover, the scrolling needs to be disabled manually.

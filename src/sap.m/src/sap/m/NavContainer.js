@@ -1896,7 +1896,7 @@ sap.ui.define([
 	 * Otherwise, registers the 'onAfterRendering' delegate which shows the placeholder.
 	 *
 	 * @param {object} [mSettings] Object containing the placeholder instance.
-	 *                             Can be omitted if a placeholder instance is already created by <code>sap.ui.core.routing.async.Target</code>.
+	 *                             Can be omitted if a placeholder instance is already created by <code>sap.ui.core.routing.Target</code>.
 	 * @param {object} [mSettings.placeholder] The placeholder instance
 	 * @param {sap.ui.core.Placeholder} mSettings.placeholder The placeholder instance
 	 * @return {Promise} Promise that resolves with the placeholder

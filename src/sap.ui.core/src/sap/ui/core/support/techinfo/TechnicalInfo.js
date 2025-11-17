@@ -178,7 +178,7 @@ sap.ui.define([
 
 		/**
 		 * Enables/Disables debug mode globally with a confirmation dialog
-		 * @param {sap.ui.base.event} oEvent The checkbox select event
+		 * @param {sap.ui.base.Event} oEvent The checkbox select event
 		 */
 		onDebugSources: function (oEvent) {
 			var bSelected = oEvent.getParameter("selected");
@@ -417,7 +417,7 @@ sap.ui.define([
 
 		/**
 		 * Writes the option for opening in new window to local storage
-		 * @param {sap.ui.base.event} oEvent The checkbox select event
+		 * @param {sap.ui.base.Event} oEvent The checkbox select event
 		 */
 		onChangeOpenInNewWindow: function (oEvent) {
 			var bSelected = oEvent.getParameter("selected");

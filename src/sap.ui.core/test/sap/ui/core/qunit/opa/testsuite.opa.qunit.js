@@ -455,7 +455,7 @@ sap.ui.define([
 			},
 
 			"OpaBuilder": {
-				title: "QUnit Page for sap.ui.test.OpaBuilder"
+				title: "QUnit Page for sap/ui/test/OpaBuilder"
 			}
 		}
 	};

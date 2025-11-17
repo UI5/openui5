@@ -58,7 +58,7 @@ sap.ui.define(['sap/base/util/deepClone', 'sap/ui/core/Control'], function(deepC
 		return true;
 	}
 
-	QUnit.module("sap.base.util.deepClone");
+	QUnit.module("sap/base/util/deepClone");
 
 	QUnit.test("basic test", function(assert) {
 		assert.equal(deepClone(0), 0, "number");
@@ -74,7 +74,7 @@ sap.ui.define(['sap/base/util/deepClone', 'sap/ui/core/Control'], function(deepC
 	QUnit.test("UI5Date", function(assert) {
 		var oUI5Date = new Date();
 
-		oUI5Date.clone = function () {}; // sap.ui.core.date.UI5Date has specific clone method
+		oUI5Date.clone = function () {}; // sap/ui/core/date/UI5Date has specific clone method
 		this.mock(oUI5Date).expects("clone").withExactArgs().returns("~clonedDate");
 
 		assert.strictEqual(deepClone(oUI5Date), "~clonedDate");

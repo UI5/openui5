@@ -31,7 +31,7 @@ sap.ui.define([], function() {
 	 * The intervals are defined by the requiredParentWidth properties of the splitPanes
 	 * @param {int} iFrom Staring point for the interval
 	 * @param {int} iTo End point of the interval
-	 * @param {sap.ui.LayoutPaneContainer} oPaneContainer The content of the RSLayout
+	 * @param {sap.ui.layout.PaneContainer} oPaneContainer The content of the RSLayout
 	 */
 	RSUtil.splitterInterval = function (iFrom, iTo, oPaneContainer) {
 		this.iFrom = iFrom;

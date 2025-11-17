@@ -55,10 +55,10 @@ function(library,
 	// shortcut for sap.m.PlacementType
 	var PlacementType = library.PlacementType;
 
-	// shortcut for sap.m.ExpandableOverflowTextMode
+	// shortcut for sap.m.ExpandableTextOverflowMode
 	var ExpandableTextOverflowMode = library.ExpandableTextOverflowMode;
 
-	// shortcut for sap.m.EmptyIndicator
+	// shortcut for sap.m.EmptyIndicatorMode
 	var EmptyIndicatorMode = library.EmptyIndicatorMode;
 
 	// shortcut for sap.m.LinkAccessibleRole

@@ -13,10 +13,10 @@ sap.ui.define(function() {
 	 * @enum {string}
 	 * @public
 	 * @alias sap.ui.model.odata.CountMode
-	 * @see sap.ui.model.ODataModel#bindList
-	 * @see sap.ui.model.ODataModel#constructor
-	 * @see sap.ui.model.v2.ODataModel#bindList
-	 * @see sap.ui.model.v2.ODataModel#constructor
+	 * @see sap.ui.model.odata.ODataModel#bindList
+	 * @see sap.ui.model.odata.ODataModel#constructor
+	 * @see sap.ui.model.odata.v2.ODataModel#bindList
+	 * @see sap.ui.model.odata.v2.ODataModel#constructor
 	 */
 	var CountMode = {
 	 /**

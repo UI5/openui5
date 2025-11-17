@@ -622,7 +622,7 @@ sap.ui.define([
 		 *             viewName: "my.View"
 		 *             controlType: "sap.m.Input",
 		 *             success: function (aInputs) {
-		 *                 // aInputs are all sap.m.Inputs inside of a view called 'my.View'
+		 *                 // aInputs are all sap.m.Input controls inside of a view called 'my.View'
 		 *             }
 		 *         });
 		 *     </pre>

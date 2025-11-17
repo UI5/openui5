@@ -17,7 +17,7 @@ sap.ui.define([
 	 *
 	 * @static
 	 * @constant
-	 * @typedef {int} sap.ui.mdc.field.NavigationKeys Only the following keys of {@link sap.ui.events.KeyCodes} are allowed:
+	 * @typedef {int} sap.ui.mdc.field.NavigationKeys Only the following keys of {@link module:sap/ui/events/KeyCodes} are allowed:
 	 * <code>ARROW_DOWN</code>, <code>ARROW_UP</code>, <code>HOME</code>, <code>END</code>, <code>PAGE_DOWN</code> and <code>PAGE_UP</code>
 	 * @public
 	 * @since 1.138

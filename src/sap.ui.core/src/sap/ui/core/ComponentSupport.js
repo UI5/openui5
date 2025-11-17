@@ -2,7 +2,7 @@
  * ${copyright}
  */
 
-// Provides class sap.ui.core.ComponentSupport
+// Provides helper module:sap/ui/core/ComponentSupport
 sap.ui.define([
 	'sap/ui/base/DataType',
 	'sap/ui/core/ComponentContainer',

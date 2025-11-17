@@ -1677,7 +1677,7 @@ sap.ui.define([
 
 	/**
 	 * Gets the metadata context for the given function import and parameter name. The result can be
-	 * used with {@link sap.ui.model.ODataMetaModel#getODataValueLists} to request the metadata for
+	 * used with {@link sap.ui.model.odata.ODataMetaModel#getODataValueLists} to request the metadata for
 	 * the value lists for that function import parameter.
 	 *
 	 * @param {string} sFunctionName

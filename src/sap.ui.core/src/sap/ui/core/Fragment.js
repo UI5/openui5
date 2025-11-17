@@ -35,7 +35,7 @@ function(
 	 * This class acts as factory which returns the UI control tree defined inside the Fragments. When used within declarative Views,
 	 * the Fragment content is imported and seamlessly integrated into the View.
 	 *
-	 * Fragments are used similar as sap.ui.core.mvc.Views, but Fragments do not have a Controller on their own (they may know one, though),
+	 * Fragments are used similar as sap.ui.core.mvc.View, but Fragments do not have a Controller on their own (they may know one, though),
 	 * they are not a Control, they are not part of the UI tree and they have no representation in HTML.
 	 * By default, in contrast to declarative Views, they do not do anything to guarantee ID uniqueness.
 	 *

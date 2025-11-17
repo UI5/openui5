@@ -295,7 +295,7 @@ sap.ui.define([
 			return fnOrg.call(this, mSettings);
 		};
 
-		// Extension Provider module - used for sap.ui.mvc.Controller ExtensionProvider Tests
+		// Extension Provider module - used for sap.ui.core.mvc.Controller ExtensionProvider Tests
 		var that = this;
 		sap.ui.define("sap/my/async/ExtensionProvider", [], function() {
 			var ExtensionProvider = function() {};

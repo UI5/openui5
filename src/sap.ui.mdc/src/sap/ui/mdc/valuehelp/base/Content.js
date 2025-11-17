@@ -556,7 +556,7 @@ sap.ui.define([
 	 * @returns {boolean} Flag if searching is supported
 	 *
 	 * @private
-	 * @ui5-restricted sap.ui.mdc.valueHelp.base.Container
+	 * @ui5-restricted sap.ui.mdc.valuehelp.base.Container
 	 */
 	Content.prototype.isSearchSupported = function() {
 		return false;

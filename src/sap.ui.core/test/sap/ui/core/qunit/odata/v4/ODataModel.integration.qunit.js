@@ -564,7 +564,7 @@ sap.ui.define([
 	/**
 	 * Returns the binding context's path for a given managed object.
 	 *
-	 * @param {sap.ui.model.ManagedObject} oManagedObject - A managed object
+	 * @param {sap.ui.base.ManagedObject} oManagedObject - A managed object
 	 * @returns {string} The binding context's path
 	 */
 	function getBindingContextPath(oManagedObject) {

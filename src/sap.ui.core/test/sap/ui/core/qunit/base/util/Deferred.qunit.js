@@ -5,7 +5,7 @@
 sap.ui.define(["sap/base/util/Deferred"], function(Deferred) {
 	"use strict";
 
-	QUnit.module("sap.base.util.Deferred");
+	QUnit.module("sap/base/util/Deferred");
 
 	QUnit.test("resolve", function(assert) {
 		var done = assert.async();

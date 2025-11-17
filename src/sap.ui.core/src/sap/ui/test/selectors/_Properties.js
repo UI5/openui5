@@ -69,7 +69,7 @@ sap.ui.define([
         "type", // sap.m.Button
         "number",
         "icon",
-        "src", // sap.m.Icon
+        "src", // sap.ui.core.Icon
         "customIcon",
         "iconAlt",
         "iconTooltip",

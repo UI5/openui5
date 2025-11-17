@@ -1537,7 +1537,7 @@ sap.ui.define([
 	 * @param {boolean} bTypeahead Flag that determines whether value help is opened for type-ahead or for complex help
 	 * @returns {sap.ui.core.Control} Control for value help
 	 * @private
-	 * @ui5-restricted sap.ui.mdc.valueHelp.base.Container
+	 * @ui5-restricted sap.ui.mdc.valuehelp.base.Container
 	 */
 	FieldBase.prototype.getFocusElementForValueHelp = function(bTypeahead) {
 		const oSuggestControl = this.getControlForSuggestion();

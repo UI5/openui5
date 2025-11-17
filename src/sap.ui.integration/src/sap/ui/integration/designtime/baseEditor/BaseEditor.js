@@ -760,7 +760,7 @@ sap.ui.define([
 	 * i18n bundles in the merged configuration. To separate properties from different bundles,
 	 * namespacing should be used, e.g. <code>i18n>BASE_EDITOR.PROPERTY</code>
 	 *
-	 * @param {sap.base.i18n.ResourceBundle[]} aBundles - List of i18n resource bundles
+	 * @param {module:sap/base/i18n/ResourceBundle[]} aBundles - List of i18n resource bundles
 	 * @returns {sap.ui.model.resource.ResourceModel} I18n model of composed bundles
 	 * @private
 	 */

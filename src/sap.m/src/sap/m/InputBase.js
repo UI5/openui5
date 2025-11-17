@@ -552,7 +552,7 @@ function(
 	 */
 	InputBase.prototype.onfocusout = function(oEvent) {
 		this.removeStyleClass("sapMFocus");
-		// Don't close the ValueStateMessage on focusout if it contains sap.m.Formatted text, it can contain links
+		// Don't close the ValueStateMessage on focusout if it contains sap.m.FormattedText, it can contain links
 		if (!this._bClickOnValueStateLink(oEvent)) {
 			this.closeValueStateMessage();
 		}
@@ -1488,7 +1488,7 @@ function(
 	 * @returns {boolean} If it is an interactive Control
 	 *
 	 * @private
-	 * @ui5-restricted sap.m.OverflowToolBar, sap.m.Toolbar
+	 * @ui5-restricted sap.m.OverflowToolbar, sap.m.Toolbar
 	 */
 	InputBase.prototype._getToolbarInteractive = function () {
 		return true;

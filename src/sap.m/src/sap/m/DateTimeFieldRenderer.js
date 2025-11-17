@@ -8,6 +8,7 @@ sap.ui.define(['sap/ui/core/Renderer', './InputBaseRenderer'], function(Renderer
 	/**
 	 * DateTimeFieldRenderer renderer.
 	 * @namespace
+	 * @alias sap.m.DateTimeFieldRenderer
 	 */
 	var DateTimeFieldRenderer = Renderer.extend(InputBaseRenderer);
 	DateTimeFieldRenderer.apiVersion = 2;

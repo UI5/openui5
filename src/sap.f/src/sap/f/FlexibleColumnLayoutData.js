@@ -15,7 +15,7 @@ sap.ui.define(["sap/ui/core/LayoutData", "sap/ui/base/ManagedObjectObserver", "s
 		 *
 		 * @class
 		 * Holds layout data for <code>sap.f.FlexibleColumnLayout</code>.
-		 * Allows LayoutData of type <code>sap.f.FlexibleColumnLayoutDataForDesktop</code> or <code>sap.f.FlexibleColumnLayoutFlexibleColumnLayoutDataForTablet</code>
+		 * Allows LayoutData of type <code>sap.f.FlexibleColumnLayoutDataForDesktop</code> or <code>sap.f.FlexibleColumnLayoutDataForTablet</code>
 		 *
 		 *
 		 * @author SAP SE

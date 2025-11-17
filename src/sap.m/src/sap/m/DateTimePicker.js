@@ -110,7 +110,10 @@ sap.ui.define([
 	 * <code>sap.ui.model.type.DateTime</code></li>
      * <caption> binding the <code>value</code> property by using types </caption>
 	 * <pre>
-	 * new sap.ui.model.json.JSONModel({date: sap.ui.core.date.UI5Date.getInstance(2022,10,10,12,10,10)});
+	 * // UI5Date imported from sap/ui/core/date/UI5Date
+	 * new sap.ui.model.json.JSONModel({
+	 *     date: UI5Date.getInstance(2022,10,10,12,10,10)
+	 * });
 	 *
 	 * new sap.m.DateTimePicker({
 	 *     value: {

@@ -605,7 +605,7 @@ sap.ui.define([
 
 	 /**
 	  * @classdesc An <code>int</code> type that defines how many columns a {@link sap.ui.layout.form.Form Form} control using
-	  * the {@link sap.ui.layout.form.ColumnLayout ColumnLayout} as {@link sap.ui.layout.form.FormE#setLayout layout} can have if it has extra-large size
+	  * the {@link sap.ui.layout.form.ColumnLayout ColumnLayout} as {@link sap.ui.layout.form.Form#setLayout layout} can have if it has extra-large size
 	  *
 	  * Allowed values are numbers from 1 to 6.
 	  * <b>Note:</b> In versions lower than 1.89 only 4 columns are allowed.
@@ -630,7 +630,7 @@ sap.ui.define([
 
 	 /**
 	  * @classdesc An <code>int</code> type that defines how many columns a {@link sap.ui.layout.form.Form Form} control using
-	  * the {@link sap.ui.layout.form.ColumnLayout ColumnLayout} as {@link sap.ui.layout.form.FormE#setLayout layout} can have if it has large size
+	  * the {@link sap.ui.layout.form.ColumnLayout ColumnLayout} as {@link sap.ui.layout.form.Form#setLayout layout} can have if it has large size
 	  *
 	  * Allowed values are numbers from 1 to 4.
 	  * <b>Note:</b> In versions lower than 1.122 only 3 columns are allowed.
@@ -655,7 +655,7 @@ sap.ui.define([
 
 	 /**
 	  * @classdesc An <code>int</code> type that defines how many columns a {@link sap.ui.layout.form.Form Form} control using
-	  * the {@link sap.ui.layout.form.ColumnLayout ColumnLayout} as {@link sap.ui.layout.form.FormE#setLayout layout} can have if it has medium size
+	  * the {@link sap.ui.layout.form.ColumnLayout ColumnLayout} as {@link sap.ui.layout.form.Form#setLayout layout} can have if it has medium size
 	  *
 	  * Allowed values are numbers from 1 to 3.
 	  * <b>Note:</b> In versions lower than 1.122 only 2 columns are allowed.
@@ -680,7 +680,7 @@ sap.ui.define([
 
 	 /**
 	  * @classdesc An <code>int</code> type that defines how many cells a control inside of a column
-	  * of a {@link sap.ui.layout.form.Form Form} control using the {@link sap.ui.layout.form.ColumnLayout ColumnLayout} control as {@link sap.ui.layout.form.FormE#setLayout layout} can use.
+	  * of a {@link sap.ui.layout.form.Form Form} control using the {@link sap.ui.layout.form.ColumnLayout ColumnLayout} control as {@link sap.ui.layout.form.Form#setLayout layout} can use.
 	  *
 	  * Allowed values are numbers from 1 to 12 and -1. -1 means the value is calculated.
 	  *
@@ -706,7 +706,7 @@ sap.ui.define([
 
 	 /**
 	  * @classdesc An <code>int</code> type that defines how many cells beside the controls
-	  * inside of a column of a {@link sap.ui.layout.form.Form Form} control using the {@link sap.ui.layout.form.ColumnLayout ColumnLayout} control as {@link sap.ui.layout.form.FormE#setLayout layout}
+	  * inside of a column of a {@link sap.ui.layout.form.Form Form} control using the {@link sap.ui.layout.form.ColumnLayout ColumnLayout} control as {@link sap.ui.layout.form.Form#setLayout layout}
 	  * are empty.
 	  *
 	  * Allowed values are numbers from 0 to 11.

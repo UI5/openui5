@@ -1187,7 +1187,7 @@ sap.ui.define([
 
 	/**
 	 * Lazily retrieves the <code>snappedTitleOnMobileIcon</code> aggregation.
-	 * @returns {sap.m.Icon}
+	 * @returns {sap.ui.core.Icon}
 	 * @private
 	 */
 	DynamicPageTitle.prototype._getSnappedTitleOnMobileIcon = function () {

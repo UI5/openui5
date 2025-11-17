@@ -828,7 +828,7 @@ sap.ui.define([
 	 * @returns {boolean} Flag if searching is supported
 	 *
 	 * @private
-	 * @ui5-restricted sap.ui.mdc.ValueHelp, sap.ui.mdc.valueHelp.base.Content
+	 * @ui5-restricted sap.ui.mdc.ValueHelp, sap.ui.mdc.valuehelp.base.Content
  	 * @deprecated As of version 1.137 with no replacement.
 	 */
 	Popover.prototype.isTypeaheadSupported = function() {

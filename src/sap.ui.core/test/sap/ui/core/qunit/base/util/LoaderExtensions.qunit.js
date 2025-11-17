@@ -8,7 +8,7 @@ sap.ui.define(['sap/base/util/LoaderExtensions'], function(LoaderExtensions) {
 
 	var privateLoaderAPI = sap.ui.loader._;
 
-	QUnit.module("sap.base.util.LoaderExtensions");
+	QUnit.module("sap/base/util/LoaderExtensions");
 
 	QUnit.test("getAllRequiredModules", function(assert) {
 		assert.expect(6);

@@ -46,7 +46,7 @@
 			<Panel headerText="sap.m.Input">
 				<Input id="myInput" value="{viewModel>/value}" />
 			</Panel>
-			<Panel headerText="sap.m.Combobox">
+			<Panel headerText="sap.m.ComboBox">
 				<ComboBox
 					items="{ path: 'viewModel>/countries'}"
 					selectedKey="{viewModel>/selected}">

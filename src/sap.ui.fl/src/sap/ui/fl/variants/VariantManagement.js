@@ -1086,7 +1086,7 @@ sap.ui.define([
 	 * @returns {boolean} Indicates whether the control is interactive
 	 *
 	 * @private
-	 * @ui5-restricted sap.m.OverflowToolBar, sap.m.Toolbar
+	 * @ui5-restricted sap.m.OverflowToolbar, sap.m.Toolbar
 	 */
 	VariantManagement.prototype._getToolbarInteractive = function() {
 		return true;

@@ -5,7 +5,7 @@
 sap.ui.define(['sap/base/util/deepEqual'], function(deepEqual) {
 	"use strict";
 
-	QUnit.module("sap.base.util.deepEqual");
+	QUnit.module("sap/base/util/deepEqual");
 
 	QUnit.test("basic test", function(assert) {
 		assert.equal(deepEqual(0, 0), true, "number");

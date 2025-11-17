@@ -338,7 +338,7 @@ sap.ui.define([
 
 	/**
 	 * Gets the control that holds the initial focus.
-	 * @returns {sap.ui.core.control} control
+	 * @returns {sap.ui.core.Control} control
 	 */
 	FilterableListContent.prototype.getInitialFocusedControl = function() {
 		return this.getActiveFilterBar().getInitialFocusedControl();

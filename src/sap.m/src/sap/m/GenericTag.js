@@ -166,7 +166,7 @@ sap.ui.define([
 	/**
 	 * Gets the GenericTag's status icon.
 	 *
-	 * @returns {sap.m.Icon} Status icon
+	 * @returns {sap.ui.core.Icon} Status icon
 	 * @private
 	 */
 	GenericTag.prototype._getStatusIcon = function() {
@@ -183,7 +183,7 @@ sap.ui.define([
 	/**
 	 * Gets the GenericTag's error icon.
 	 *
-	 * @returns {sap.m.Icon} Error icon
+	 * @returns {sap.ui.core.Icon} Error icon
 	 * @private
 	 */
 	GenericTag.prototype._getErrorIcon = function() {
@@ -347,7 +347,7 @@ sap.ui.define([
 	 * @returns {boolean} If it is an interactive Control
 	 *
 	 * @private
-	 * @ui5-restricted sap.m.OverflowToolBar, sap.m.Toolbar
+	 * @ui5-restricted sap.m.OverflowToolbar, sap.m.Toolbar
 	 */
 	GenericTag.prototype._getToolbarInteractive = function () {
 		return true;

@@ -25,7 +25,7 @@ var ReactiveAreaMode = library.ReactiveAreaMode;
  */
 var _sCSSPrefixObjNumberStatus = 'sapMObjectNumberStatus';
 
-// shortcut for sap.m.EmptyIndicator
+// shortcut for sap.m.EmptyIndicatorMode
 var EmptyIndicatorMode = library.EmptyIndicatorMode;
 
 /**

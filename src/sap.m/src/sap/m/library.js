@@ -2228,7 +2228,7 @@ sap.ui.define([
 		 L : "L",
 
 		 /**
-		  * Small: Recommended for smaller controls, such as {@link sap.m.Switch} or {@link sap.m.Checkbox}. If there is limited space, only the label
+		  * Small: Recommended for smaller controls, such as {@link sap.m.Switch} or {@link sap.m.CheckBox}. If there is limited space, only the label
 		  * is wrapped. The input control is always right-aligned horizontally and middle-aligned vertically.
 		  * @public
 		  */
@@ -4748,7 +4748,7 @@ sap.ui.define([
 		 L : "L",
 
 		 /**
-		  * Small: Recommended for smaller controls, such as {@link sap.m.Switch} or {@link sap.m.Checkbox}. If there is limited space, only the label
+		  * Small: Recommended for smaller controls, such as {@link sap.m.Switch} or {@link sap.m.CheckBox}. If there is limited space, only the label
 		  * is wrapped. The input control is always right-aligned horizontally and middle-aligned vertically.
 		  * @public
 		  */

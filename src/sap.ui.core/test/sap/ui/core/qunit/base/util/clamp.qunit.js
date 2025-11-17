@@ -9,7 +9,7 @@ sap.ui.define([
 ) {
 	"use strict";
 
-	QUnit.module("sap.base.util.clamp");
+	QUnit.module("sap/base/util/clamp");
 
 	QUnit.test("basic functionality", function (assert) {
 		assert.strictEqual(clamp(2, 1, 4), 2);

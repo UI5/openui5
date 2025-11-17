@@ -956,7 +956,7 @@ sap.ui.define([
   */
  /**
   * The <code>State</code> object describes the interface to apply and retrieve the current adaptation state from mdc controls.
-  * The {@link sap.mdc.p13n.StateUtil StateUtil} class can be used to programatically apply changes considered for
+  * The {@link sap.ui.mdc.p13n.StateUtil StateUtil} class can be used to programatically apply changes considered for
   * the controls personalization to be part of its persistence.
   *
   * @typedef {object} sap.ui.mdc.State

@@ -285,7 +285,7 @@ sap.ui.define([
 				 * <li>Add a {@link sap.m.Label Label} control to start a new row (<code>{@link sap.ui.layout.form.FormElement FormElement}</code>).</li>
 				 * <li>Add controls as input fields, text fields or other as needed.</li>
 				 * <li>Use {@link sap.ui.core.Element#setLayoutData LayoutData} to influence the layout for special cases in the single controls.
-				 * For example, if a {@link sap.ui.layout.ColumnLayout ColumnLayout} is used as a layout,
+				 * For example, if a {@link sap.ui.layout.form.ColumnLayout ColumnLayout} is used as a layout,
 				 * the form content is weighted using 4 cells for the labels and 8 cells for the field part, for large size.
 				 * If there is only little space, the labels are above the fields and each field uses 12 cells.
 				 * If your input controls should influence their width, you can add {@link sap.ui.layout.form.ColumnElementData ColumnElementData}
@@ -300,7 +300,7 @@ sap.ui.define([
 				 * new sap.m.Input({value:"2 cells", layoutData: new sap.ui.layout.form.ColumnElementData({cellsLarge: 2, cellsSmall: 4})}),
 				 * </pre>
 				 *
-				 * For example, if a {@link sap.ui.layout.ResponsiveGridLayout ResponsiveGridLayout} is used as a layout, there are 12 cells in one row.
+				 * For example, if a {@link sap.ui.layout.form.ResponsiveGridLayout ResponsiveGridLayout} is used as a layout, there are 12 cells in one row.
 				 * Depending on the screen size the labels use the defined <code>labelSpan</code>.
 				 * The remaining cells are used for the fields (and <code>emptySpan</code> if defined).
 				 * The available cells are distributed to all fields in the row. If one field should use a fixed number of cells
@@ -308,7 +308,7 @@ sap.ui.define([
 				 * If there are additional fields in the row they will get the remaining cells.
 				 * </ul>
 				 * Example for a row with two {@link sap.m.Input Input} controls where one uses four cells on small screens,
-				 * one cell on medium screens and 2 cells on larger screens (using {@link sap.ui.layout.ResponsiveGridLayout ResponsiveGridLayout}):
+				 * one cell on medium screens and 2 cells on larger screens (using {@link sap.ui.layout.form.ResponsiveGridLayout ResponsiveGridLayout}):
 				 * <pre>
 				 * new sap.m.Label({text:"Label"});
 				 * new sap.m.Input({value:"auto size"}),

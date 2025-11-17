@@ -1967,7 +1967,7 @@ sap.ui.define([
 	 * you need to take care of identification yourself.
 	 *
 	 * @param {sap.ui.base.ManagedObject} [oManagedObject] instance that could have instance specific design time metadata
-	 * @param {string} [sScopeKey] scope name for which metadata will be resolved, see sap.ui.base.ManagedObjectMetadataScope
+	 * @param {string} [sScopeKey] scope name for which metadata will be resolved, see sap.ui.dt.DesignTime
 	 * @return {Promise} A promise which will return the loaded design time metadata
 	 * @private
 	 * @ui5-restricted sap.ui.dt, com.sap.webide

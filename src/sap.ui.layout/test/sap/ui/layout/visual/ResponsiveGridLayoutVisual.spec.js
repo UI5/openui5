@@ -1,6 +1,6 @@
 /*global describe,it,element,by,takeScreenshot,browser,expect*/
 
-describe("sap.ui.layout.ResponsiveGridLayoutVisual", function() {
+describe("sap.ui.layout.form.ResponsiveGridLayoutVisual", function() {
 	"use strict";
 
 	browser.testrunner.currentSuite.meta.controlName = 'sap.ui.layout.form.ResponsiveGridLayout';

@@ -559,7 +559,7 @@ sap.ui.define([
 				customShareActions: {type: "sap.m.Button", multiple: true},
 
 				/**
-				 * Accessible landmark settings to be applied to the containers of the <code>sap.f.SemanticPage</code> control.
+				 * Accessible landmark settings to be applied to the containers of the <code>sap.f.semantic.SemanticPage</code> control.
 				 *
 				 * If not set, no landmarks will be written.
 				 *

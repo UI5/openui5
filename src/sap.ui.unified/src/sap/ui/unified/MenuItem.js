@@ -66,7 +66,7 @@ sap.ui.define([
 			 * Determines whether the <code>MenuItem</code> is selected (default is set to <code>false</code>).
 			 * A selected <code>MenuItem</code> has a check mark rendered at its end.
 			 * <b>Note: </b> selection functionality works only if the menu item is a member of <code>MenuItemGroup</code> with
-			 * <code>itemSelectionMode</code> set to {@link sap.ui.core.ItemSelectionMode.SingleSelect} or {@link sap.ui.unified.ItemSelectionMode.MultiSelect}.
+			 * <code>itemSelectionMode</code> set to {@link sap.ui.core.ItemSelectionMode.SingleSelect} or {@link sap.ui.core.ItemSelectionMode.MultiSelect}.
 			 * @since 1.127.0
 			 */
 			selected : {type : "boolean", group : "Behavior", defaultValue : false},

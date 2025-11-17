@@ -1190,7 +1190,7 @@ sap.ui.define([
 		 * deselected and vice versa. If modifier keys are pressed - the previously selected appointments will be
 		 * preserved.
 		 *
-		 * @param {sap.m.CalendarAppointment} oAppointment The appointment to be selected/deselected.
+		 * @param {sap.ui.unified.CalendarAppointment} oAppointment The appointment to be selected/deselected.
 		 * @param {boolean} [bRemoveOldSelection=false] If true, previously selected appointments will be deselected.
 		 * @returns {array} Array of the appointments with changed selected state
 		 * @private
@@ -1825,7 +1825,7 @@ sap.ui.define([
 		/**
 		 * Selects the clusters of appointments which are in the visual port of the grid.
 		 *
-		 * @param {sap.m.CalendarAppointment[]} aAppointments the appointments in the corresponding aggregation
+		 * @param {sap.ui.unified.CalendarAppointment[]} aAppointments the appointments in the corresponding aggregation
 		 * @param {Date} oStartDate the start date of the grid
 		 * @param {int} iColumns the number of columns to be displayed in the grid
 		 * @returns {object} the clusters of appointments in the visual port of the grid

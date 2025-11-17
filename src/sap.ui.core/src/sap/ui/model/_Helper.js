@@ -17,7 +17,7 @@ sap.ui.define([
 	 */
 	var _Helper = {
 		// Trampoline properties to allow for mocking in unit tests.
-		// @see sap.base.(security|util).*
+		// @see sap/base/(security|util)/*
 		deepClone : deepClone,
 		deepEqual : deepEqual,
 		encodeURL : encodeURL,

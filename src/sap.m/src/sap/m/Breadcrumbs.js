@@ -870,7 +870,7 @@ sap.ui.define([
 	 * @returns {object} Configuration information for the <code>sap.m.IOverflowToolbarContent</code> interface.
 	 *
 	 * @private
-	 * @ui5-restricted sap.m.OverflowToolBar
+	 * @ui5-restricted sap.m.OverflowToolbar
 	 */
 	Breadcrumbs.prototype.getOverflowToolbarConfig = function() {
 		var oConfig = {
@@ -902,7 +902,7 @@ sap.ui.define([
 	 * @returns {boolean} If it is an interactive Control
 	 *
 	 * @private
-	 * @ui5-restricted sap.m.OverflowToolBar, sap.m.Toolbar
+	 * @ui5-restricted sap.m.OverflowToolbar, sap.m.Toolbar
 	 */
 	 Breadcrumbs.prototype._getToolbarInteractive = function () {
 		return true;

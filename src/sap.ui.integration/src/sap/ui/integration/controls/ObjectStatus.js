@@ -15,7 +15,7 @@ sap.ui.define([
 ) {
 	"use strict";
 
-	// shortcut for sap.m.EmptyIndicator
+	// shortcut for sap.m.EmptyIndicatorMode
 	var EmptyIndicatorMode = library.EmptyIndicatorMode;
 
 	// shortcuts for sap.ui.core.ValueState

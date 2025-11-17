@@ -2563,7 +2563,7 @@ function(
 	 *
 	 * @param {string} sText The value to be matched
 	 * @param {boolean} bInput Determines which items to search in (true - enabled items, false - selectable items)
-	 * @returns {sap.ui.core.item[]} They array of matching items
+	 * @returns {sap.ui.core.Item[]} They array of matching items
 	 * @private
 	 */
 	MultiComboBox.prototype._getItemsStartingWith = function(sText, bInput) {
@@ -3750,7 +3750,7 @@ function(
 	/**
 	 * Gets the select all checkbox.
 	 *
-	 * @returns {sap.m.Checkbox|undefined} The select all checkbox, if defined
+	 * @returns {sap.m.CheckBox|undefined} The select all checkbox, if defined
 	 * @private
 	 */
 	MultiComboBox.prototype.getSelectAllCheckbox = function () {

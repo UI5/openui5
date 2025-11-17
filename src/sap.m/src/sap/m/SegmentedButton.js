@@ -477,7 +477,7 @@ function(
 	 * @returns {object} Configuration information for the <code>sap.m.IOverflowToolbarContent</code> interface.
 	 *
 	 * @private
-	 * @ui5-restricted sap.m.OverflowToolBar
+	 * @ui5-restricted sap.m.OverflowToolbar
 	 */
 	SegmentedButton.prototype.getOverflowToolbarConfig = function() {
 		return {

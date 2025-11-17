@@ -2,7 +2,7 @@
  * ${copyright}
  */
 
-// Provides default renderer for control sap.f.cards.NumericSideIndicatorRenderer
+// Provides default renderer for control sap.f.cards.NumericSideIndicator
 sap.ui.define([], function () {
 	"use strict";
 

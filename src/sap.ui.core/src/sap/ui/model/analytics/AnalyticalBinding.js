@@ -432,8 +432,6 @@ sap.ui.define([
 	 * The ODataModel will call this on all bindings as soon as the metadata was loaded
 	 *
 	 * @public
-	 * @name sap.ui.model.analytics.v2.AnalyticalBinding#initialize
-	 * @function
 	 */
 	AnalyticalBinding.prototype.initialize = function() {
 		if (this.oModel.oMetadata && this.oModel.oMetadata.isLoaded() && this.isInitial()) {
@@ -451,8 +449,9 @@ sap.ui.define([
 
 	/**
 	 * Performs the actual initialization.
-	 * Called either by sap.ui.model.analytics.v2.AnalyticalBinding#initialize or
-	 * sap.ui.model.analytics.v2.AnalyticalBinding#setContext.
+	 *
+	 * Called either by sap.ui.model.analytics.AnalyticalBinding#initialize or
+	 * sap.ui.model.analytics.AnalyticalBinding#setContext.
 	 */
 	AnalyticalBinding.prototype._initialize = function() {
 		if (this.oModel.oMetadata && this.oModel.oMetadata.isLoaded()) {

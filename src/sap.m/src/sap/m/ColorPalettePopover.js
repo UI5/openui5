@@ -2,7 +2,7 @@
  * ${copyright}
  */
 
-// Provides control sap.ui.unified.ColorPalettePopover
+// Provides control sap.m.ColorPalettePopover
 sap.ui.define([
 	'sap/ui/core/Control',
 	'sap/ui/Device',

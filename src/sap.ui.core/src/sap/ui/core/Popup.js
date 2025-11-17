@@ -2765,7 +2765,7 @@ sap.ui.define([
 	//****************************************************
 
 	/**
-	 * Delegate function for handling of touchstart event on sap.ui.core.Elements as content
+	 * Delegate function for handling of touchstart event on sap.ui.core.Element as content
 	 *
 	 * This is a fix for preventing the Popup A from getting higher z-index than popup B when popup B is opened within popup A.
 	 *
@@ -2783,7 +2783,7 @@ sap.ui.define([
 	};
 
 	/**
-	 * Delegate function for handling of mousedown event on sap.ui.core.Elements as content
+	 * Delegate function for handling of mousedown event on sap.ui.core.Element as content
 	 *
 	 * @param {jQuery.Event} oEvent The event
 	 * @param {boolean} bSupressChecking Determines if the retrieved event was fired by another event with that no further checking is needed

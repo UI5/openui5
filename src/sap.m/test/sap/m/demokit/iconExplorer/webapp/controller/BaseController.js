@@ -26,7 +26,7 @@ sap.ui.define(["sap/ui/core/mvc/Controller", "sap/ui/core/UIComponent"], functio
 			 * @public
 			 * @param {sap.ui.model.Model} oModel the model instance
 			 * @param {string} sName the model name
-			 * @returns {sap.ui.mvc.View} the view instance
+			 * @returns {sap.ui.core.mvc.View} the view instance
 			 */
 			setModel : function (oModel, sName) {
 				return this.getView().setModel(oModel, sName);

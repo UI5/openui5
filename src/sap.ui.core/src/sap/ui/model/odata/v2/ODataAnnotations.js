@@ -285,7 +285,7 @@ sap.ui.define([
 	 * The <code>success</code> event is fired, whenever a source has been successfully (loaded,) parsed and merged into the
 	 * annotation data.
 	 *
-	 * @name sap.ui.model.v2.ODataAnnotations#success
+	 * @name sap.ui.model.odata.v2.ODataAnnotations#success
 	 * @event
 	 * @param {sap.ui.base.Event} oControlEvent
 	 * @param {sap.ui.base.EventProvider} oControlEvent.getSource
@@ -345,7 +345,7 @@ sap.ui.define([
 	/**
 	 * The <code>error</code> event is fired, whenever a source cannot be loaded, parsed or merged into the annotation data.
 	 *
-	 * @name sap.ui.model.v2.ODataAnnotations#error
+	 * @name sap.ui.model.odata.v2.ODataAnnotations#error
 	 * @event
 	 * @param {sap.ui.base.Event} oEvent
 	 * @param {sap.ui.base.EventProvider} oEvent.getSource
@@ -399,8 +399,8 @@ sap.ui.define([
 	 *
 	 * @typedef {object} sap.ui.model.odata.v2.ODataAnnotations.loadedParameters
 	 * @property {sap.ui.model.odata.v2.ODataAnnotations.Source[]|Error[]|any} result
-	 *         An array of results and Errors (see {@link sap.ui.model.v2.ODataAnnotations#success}
-	 *         and {@link sap.ui.model.v2.ODataAnnotations#error}) that occurred while loading
+	 *         An array of results and Errors (see {@link sap.ui.model.odata.v2.ODataAnnotations#success}
+	 *         and {@link sap.ui.model.odata.v2.ODataAnnotations#error}) that occurred while loading
 	 *         a group of annotations
 	 * @public
 	 */
@@ -409,7 +409,7 @@ sap.ui.define([
 	 * The <code>loaded</code> event is fired, when all annotations from a group of sources have been
 	 * (loaded,) parsed and merged successfully.
 	 *
-	 * @name sap.ui.model.v2.ODataAnnotations#loaded
+	 * @name sap.ui.model.odata.v2.ODataAnnotations#loaded
 	 * @event
 	 * @param {sap.ui.base.Event} oEvent
 	 * @param {sap.ui.base.EventProvider} oEvent.getSource
@@ -460,7 +460,7 @@ sap.ui.define([
 	 * Parameters of the <code>failed</code> event.
 	 *
 	 * @typedef {object} sap.ui.model.odata.v2.ODataAnnotations.failedParameters
-	 * @property {Error[]} result An array of Errors, see {@link sap.ui.model.v2.ODataAnnotations#error} that occurred while
+	 * @property {Error[]} result An array of Errors, see {@link sap.ui.model.odata.v2.ODataAnnotations#error} that occurred while
 	 *           loading a group of annotations
 	 * @public
 	 */
@@ -469,7 +469,7 @@ sap.ui.define([
 	 * The <code>failed</code> event is fired when at least one annotation from a group of sources was not
 	 * successfully (loaded,) parsed or merged.
 	 *
-	 * @name sap.ui.model.v2.ODataAnnotations#failed
+	 * @name sap.ui.model.odata.v2.ODataAnnotations#failed
 	 * @event
 	 * @param {sap.ui.base.Event} oEvent
 	 * @param {sap.ui.base.EventProvider} oEvent.getSource

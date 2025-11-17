@@ -2,7 +2,7 @@
 sap.ui.define(["sap/base/util/ObjectPath"], function(ObjectPath) {
 	"use strict";
 
-	QUnit.module("sap.base.util.ObjectPath");
+	QUnit.module("sap/base/util/ObjectPath");
 
 	QUnit.test("create object", function(assert) {
 		var oBase = {};

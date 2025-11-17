@@ -49,7 +49,7 @@ sap.ui.define([
 	// shortcut for sap.ui.integration.CardActionArea
 	var ActionArea = library.CardActionArea;
 
-	// shortcut for sap.m.EmptyIndicator
+	// shortcut for sap.m.EmptyIndicatorMode
 	var EmptyIndicatorMode = mLibrary.EmptyIndicatorMode;
 
 	var LEGEND_COLORS_LOAD = "_legendColorsLoad";

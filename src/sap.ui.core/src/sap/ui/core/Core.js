@@ -50,10 +50,9 @@ sap.ui.define([
 
 		/**
 		 * The Core version, e.g. '1.127.0'
-		 * @name sap.ui.core.Core.version
+		 * @name sap.ui.core.Core.prototype.version
 		 * @final
 		 * @type {string}
-		 * @static
 		 * @since 1.127
 		 * @private
 		 * @ui5-restricted sap.ui.core, sap.ui.test
@@ -71,10 +70,9 @@ sap.ui.define([
 
 		/**
 		 * The buildinfo, containing a build timestamp.
-		 * @name sap.ui.core.Core.buildinfo
+		 * @name sap.ui.core.Core.prototype.buildinfo
 		 * @final
 		 * @type {sap.ui.core.Core.BuildInfo}
-		 * @static
 		 * @since 1.127
 		 * @private
 		 * @ui5-restricted sap.ui.core, sap.ui.test

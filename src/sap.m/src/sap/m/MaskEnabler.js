@@ -393,7 +393,7 @@ sap.ui.define([
 		 * Overrides the method in order to validate the placeholder symbol.
 		 * @param {string} sSymbol The placeholder symbol
 		 * @override
-		 * @returns {sap.ui.base.MaskInput} <code>this</code> pointer for chaining
+		 * @returns {this} <code>this</code> pointer for chaining
 		 */
 		this.setPlaceholderSymbol = function(sSymbol) {
 			var bSymbolFound;
@@ -761,7 +761,7 @@ sap.ui.define([
 		/**
 		 * Places the cursor on a given position (zero based).
 		 * @param {int} iPos The position the cursor to be placed on. If negative value is given, 0 is considered.
-		 * @returns {sap.ui.MaskEnabler} <code>this</code> to allow method chaining
+		 * @returns {this} <code>this</code> to allow method chaining
 		 * @private
 		 */
 		this._setCursorPosition = function (iPos) {
