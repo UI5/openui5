@@ -1604,6 +1604,8 @@ sap.ui.define([
 
 		assert.strictEqual($Elem.attr("role"), "grid", "role");
 		assert.strictEqual($Elem.attr("aria-describedby"), oTable.getId() + "-ariaselection", "aria-describedby");
+		let sDescriptionText = document.getElementById(oTable.getId() + "-ariaselection").innerText;
+		assert.strictEqual(sDescriptionText, TableUtils.getResourceText("TBL_TABLE_SELECTION_MULTI"), "aria-describedby text");
 		assert.strictEqual($Elem.attr("aria-rowcount"), "9", "aria-rowcount");
 		assert.strictEqual($Elem.attr("aria-colcount"), "6", "aria-colcount");
 		assert.strictEqual($Elem.attr("aria-multiselectable"), "true", "aria-multiselectable");
@@ -1624,6 +1626,21 @@ sap.ui.define([
 		oTable.removeAllAriaLabelledBy();
 		await nextUIUpdate();
 		assert.notOk($Elem.attr("aria-labelledby"), "aria-labelledby when ariaLabelledBy association is empty array");
+
+		oTable.setSelectionMode(SelectionMode.Single);
+		await nextUIUpdate();
+		assert.notOk($Elem.attr("aria-multiselectable"), "aria-multiselectable, selectionMode = Single");
+		assert.strictEqual($Elem.attr("aria-describedby"), oTable.getId() + "-ariaselection", "aria-describedby, selectionMode = Single");
+		sDescriptionText = document.getElementById(oTable.getId() + "-ariaselection").innerText;
+		assert.strictEqual(sDescriptionText, TableUtils.getResourceText("TBL_TABLE_SELECTION_SINGLE"),
+			"aria-describedby text, selectionMode = Single");
+
+		oTable.setSelectionMode(SelectionMode.None);
+		await nextUIUpdate();
+		assert.notOk($Elem.attr("aria-multiselectable"), "aria-multiselectable, selectionMode = None");
+		assert.notOk($Elem.attr("aria-describedby"), "aria-describedby, selectionMode = None");
+		assert.notOk(document.getElementById(oTable.getId() + "-ariaselection"),
+			"aria-describedby text is removed from the DOM, selectionMode = None");
 	});
 
 	QUnit.test("ARIA attributes of content element (TreeTable)", async function(assert) {
