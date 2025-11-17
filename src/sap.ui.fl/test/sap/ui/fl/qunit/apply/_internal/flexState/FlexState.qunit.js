@@ -1837,6 +1837,34 @@ sap.ui.define([
 			);
 		});
 
+		QUnit.test("When deleting a flex object that is not available in FlexState", async function(assert) {
+			const aNewChanges = [
+				this.oUIChange,
+				this.oVariantChange1,
+				this.oFlVariant
+			];
+			aNewChanges.forEach(function(oFlexObject) {
+				FlexState.addDirtyFlexObjects(sReference, [oFlexObject]);
+			});
+			FlexState.updateStorageResponse(sReference, [
+				...aNewChanges.map((flexObject) => ({
+					type: "add",
+					flexObject: flexObject.convertToFileContent()
+				}))
+			]);
+			let oStorageResponse = await FlexState.getStorageResponse(sReference);
+			const iFlexObjectsAvailable = oStorageResponse.changes.changes.length;
+			FlexState.updateStorageResponse(sReference, [
+				{type: "delete", flexObject: {id: "unknownObject", fileType: "change"}}
+			]);
+			oStorageResponse = await FlexState.getStorageResponse(sReference);
+			assert.strictEqual(
+				oStorageResponse.changes.changes.length,
+				iFlexObjectsAvailable,
+				"then the count of flexObjects remains the same"
+			);
+		});
+
 		QUnit.test("when updating the storage response", function(assert) {
 			FlexState.addDirtyFlexObjects(sReference, [this.oUIChange]);
 			FlexState.updateStorageResponse(sReference, [

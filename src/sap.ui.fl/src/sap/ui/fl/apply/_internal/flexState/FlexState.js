@@ -668,6 +668,8 @@ sap.ui.define([
 				const iExistingFlexObjectIdx = _mInstances[sReference].runtimePersistence.flexObjects.findIndex(
 					(oFlexObject) => oFlexObject.getId() === sFileName
 				);
+				let iFilteredIdx;
+				let iUnfilteredIdx;
 				const oExistingFlexObject = _mInstances[sReference].runtimePersistence.flexObjects[iExistingFlexObjectIdx];
 				switch (oUpdate.type) {
 					case "add":
@@ -678,20 +680,28 @@ sap.ui.define([
 						}
 						break;
 					case "delete":
-						aFiltered.splice(aFiltered.findIndex((oFlexObject) => oFlexObject.fileName === sFileName), 1);
-						aUnfiltered.splice(aUnfiltered.findIndex((oFlexObject) => oFlexObject.fileName === sFileName), 1);
+						iFilteredIdx = aFiltered.findIndex((oFlexObject) => oFlexObject.fileName === sFileName);
+						if (iFilteredIdx > -1) {
+							aFiltered.splice(iFilteredIdx, 1);
+						}
+						iUnfilteredIdx = aUnfiltered.findIndex((oFlexObject) => oFlexObject.fileName === sFileName);
+						if (iUnfilteredIdx > -1) {
+							aUnfiltered.splice(iUnfilteredIdx, 1);
+						}
 						if (iExistingFlexObjectIdx >= 0) {
 							_mInstances[sReference].runtimePersistence.flexObjects.splice(iExistingFlexObjectIdx, 1);
 							aFlexObjectUpdates.push({ type: "removeFlexObject", updatedObject: oExistingFlexObject });
 						}
 						break;
 					case "update":
-						aFiltered.splice(aFiltered.findIndex((oFlexObject) => oFlexObject.fileName === sFileName), 1, oUpdate.flexObject);
-						aUnfiltered.splice(
-							aUnfiltered.findIndex((oFlexObject) => oFlexObject.fileName === sFileName),
-							1,
-							oUpdate.flexObject
-						);
+						iFilteredIdx = aFiltered.findIndex((oFlexObject) => oFlexObject.fileName === sFileName);
+						if (iFilteredIdx > -1) {
+							aFiltered.splice(iFilteredIdx, 1, oUpdate.flexObject);
+						}
+						iUnfilteredIdx = aUnfiltered.findIndex((oFlexObject) => oFlexObject.fileName === sFileName);
+						if (iUnfilteredIdx > -1) {
+							aUnfiltered.splice(iUnfilteredIdx, 1, oUpdate.flexObject);
+						}
 						if (oExistingFlexObject && oExistingFlexObject.getState() !== States.LifecycleState.PERSISTED) {
 							oExistingFlexObject.setResponse(oUpdate.flexObject);
 							aFlexObjectUpdates.push({ type: "updateFlexObject", updatedObject: oExistingFlexObject });
