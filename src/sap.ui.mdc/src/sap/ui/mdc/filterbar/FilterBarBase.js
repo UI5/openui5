@@ -26,7 +26,8 @@ sap.ui.define([
 		"sap/m/Button",
 		"./FilterBarBaseRenderer",
 		"sap/ui/mdc/FilterField",
-		"sap/ui/mdc/filterbar/PropertyInfoValidator"
+		"sap/ui/mdc/filterbar/PropertyInfoValidator",
+		"sap/ui/core/InvisibleText"
 	],
 	(
 		Element,
@@ -53,7 +54,8 @@ sap.ui.define([
 		Button,
 		FilterBarBaseRenderer,
 		FilterField,
-		PropertyInfoValidator
+		PropertyInfoValidator,
+		InvisibleText
 	) => {
 		"use strict";
 
@@ -398,6 +400,13 @@ sap.ui.define([
 					// vh/FilterBar is not in the root folder, so use the message property instead
 					message: this._oRb.getText("filterbar.GoBtnShortCutHint")
 				}, this);
+
+				const oInvisibleText = new InvisibleText({
+					id: this.getId() + "-btnSearch-description",
+					text: this._oRb.getText("filterbar.GO_DESCRIPTION")
+				});
+				this.addInvisibleText(oInvisibleText);
+				this._btnSearch.addAriaDescribedBy(oInvisibleText);
 			}
 
 			return this._btnSearch;

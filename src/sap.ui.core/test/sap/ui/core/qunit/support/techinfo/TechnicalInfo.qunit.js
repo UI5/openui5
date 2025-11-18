@@ -250,4 +250,30 @@ sap.ui.define([
 		});
 	});
 
+	QUnit.test("After dialog close event is triggered, all components should be destroyed", async function(assert) {
+		TechnicalInfo._storage.clear();
+		const oSpy = this.spy(TechnicalInfo, "close");
+
+		await TechnicalInfo._loadAndInitialize();
+		await TechnicalInfo._loadAssistantPopover();
+		await TechnicalInfo._loadDebugPopover();
+
+		assert.ok(TechnicalInfo._oDialog, "Dialog is initially created");
+		assert.ok(TechnicalInfo._oAssistantPopover, "Support Assistant popover is initially created");
+		assert.ok(TechnicalInfo._oDebugPopover, "Debug popover is initially created");
+
+		await new Promise(function(resolve) {
+			TechnicalInfo._oDialog.attachAfterClose(function() {
+				setTimeout(function() {
+					assert.ok(oSpy.calledOnce, "The close method is called once");
+					assert.ok(!TechnicalInfo._oDialog, "The dialog is destroyed");
+					assert.ok(!TechnicalInfo._oAssistantPopover, "The Support Assistant popover is destroyed");
+					assert.ok(!TechnicalInfo._oDebugPopover, "The debug popover is destroyed");
+					resolve();
+				}, 10);
+			});
+
+			TechnicalInfo._oDialog.close();
+		});
+	});
 });

@@ -189,9 +189,71 @@ sap.ui.define(["sap/base/security/URLListValidator"], function(URLListValidator)
 		URLListValidator.add("httpm");
 		sUrl = "httpg://www.example.com";
 		assert.notOk(URLListValidator.validate(sUrl), sUrl + " is not valid");
+		sUrl = "HTTPG://www.example.com";
+		assert.notOk(URLListValidator.validate(sUrl), sUrl + " is not valid");
 
 		var sUrl2 = "httpm://www.example.com";
 		assert.ok(URLListValidator.validate(sUrl2), sUrl2 + " valid");
+
+		var sUrl3 = "HTTPM://www.example.com";
+		assert.ok(URLListValidator.validate(sUrl3), sUrl3 + " valid");
+	});
+
+	QUnit.test("hostname match with allowlist", function(assert) {
+		//is ok with empty allowlist
+		var sUrl = "http://example.com";
+		assert.ok(URLListValidator.validate(sUrl), sUrl + " valid");
+
+		URLListValidator.add("http", "sap.com");
+		sUrl = "http://example.com";
+		assert.notOk(URLListValidator.validate(sUrl), sUrl + " is not valid");
+
+		sUrl = "http:/example.com";
+		assert.notOk(URLListValidator.validate(sUrl), sUrl + " is not valid");
+
+		var sUrl2 = "http://sap.com";
+		assert.ok(URLListValidator.validate(sUrl2), sUrl2 + " valid");
+
+		sUrl2 = "http:/sap.com";
+		assert.ok(URLListValidator.validate(sUrl2), sUrl2 + " valid");
+	});
+
+	QUnit.test("userinfo in URL with allowlist", function(assert) {
+		//is ok with empty allowlist
+		var sUrl = "http://user:password@example.com";
+		assert.ok(URLListValidator.validate(sUrl), sUrl + " valid");
+
+		URLListValidator.add("http", "sap.com");
+		sUrl = "http://user:password@example.com";
+		assert.notOk(URLListValidator.validate(sUrl), sUrl + " is not valid");
+
+		sUrl = "http://:password@example.com";
+		assert.notOk(URLListValidator.validate(sUrl), sUrl + " is not valid");
+
+		sUrl = "http:/:@example.com";
+		assert.notOk(URLListValidator.validate(sUrl), sUrl + " is not valid");
+
+		// Test that "@" in the path-component of the URL is not treated as userinfo
+		sUrl = "http://example.com/path@sap.com";
+		assert.notOk(URLListValidator.validate(sUrl), sUrl + " is not valid");
+
+		sUrl = "http://example.com?path@sap.com";
+		assert.notOk(URLListValidator.validate(sUrl), sUrl + " is not valid");
+
+		sUrl = "http://example.com#path@sap.com";
+		assert.notOk(URLListValidator.validate(sUrl), sUrl + " is not valid");
+	});
+
+	QUnit.test("relative path with allowlist", function(assert) {
+		// Note: It is strongly advised that consumers do not use relative URLs.
+		var sUrl = "/test";
+		assert.ok(URLListValidator.validate(sUrl), sUrl + " valid");
+
+		URLListValidator.add("http", "sap.com", undefined, "/test");
+		assert.ok(URLListValidator.validate(sUrl), sUrl + " valid");
+
+		var sUrl2 = "/test2";
+		assert.notOk(URLListValidator.validate(sUrl2), sUrl2 + " is not valid");
 	});
 
 	QUnit.test("check the allowlist", function(assert) {

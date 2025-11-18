@@ -286,6 +286,24 @@ sap.ui.define([
 		oLabeloRBGroupRBG1a, oRBGroupRBG1a
 	]});
 
+	const oRBGWrap = new RadioButtonGroup("RBGWrap", {
+		columns: 1,
+		buttons: [
+			new RadioButton({text: "Option 1", wrapping: true}),
+			new RadioButton({text: "Option 2", wrapping: false})
+		]
+	});
+
+	const oLabelRBGWrap = new Label({ text: "RadioButtonGroup with short texts and wrapping=true ", labelFor: oRBGWrap});
+
+	const flexBoxRBGWrap = new FlexBox("rbgWrap", {
+		items: [
+			oLabelRBGWrap,
+			oRBGWrap
+		],
+		direction: "Column"
+	});
+
 	var oRBGroupRBG2 = new RadioButtonGroup("RBG2");
 	oRBGroupRBG2.setColumns(2);
 	oRBGroupRBG2.setValueState(ValueState.Warning);
@@ -657,6 +675,7 @@ sap.ui.define([
 						content: [
 							flexBoxRBG1,
 							flexBoxRBG1a,
+							flexBoxRBGWrap,
 							flexBoxRBG2,
 							flexBoxRBG3,
 							flexBoxRBG31

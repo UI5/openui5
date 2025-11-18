@@ -1217,6 +1217,7 @@ sap.ui.define([
 			assert.ok(oInput);
 			assert.equal(oInput.getValue(), "Z1 One");
 			oInput.setValue("Z2 Two");
+			oInput.fireChange({ value: "Z2 Two" }); // setValue does not call fireChange event, which is required for binding updates
 
 			// setValue destroys the input while list binding is recreated....
 			[, oInput] = this._oVM.oManagementTable.getItems()[1].getCells();
@@ -1234,7 +1235,8 @@ sap.ui.define([
 			assert.ok(oInput);
 			assert.equal(oInput.getValue(), "Z2 Two");
 
-			oInput.setValue("TEN");
+			oInput.setValue("TEN"); // setValue does not call fireChange event, which is required for binding updates
+			oInput.fireChange({ value: "TEN" });
 			[, oInput] = this._oVM.oManagementTable.getItems()[1].getCells();
 
 			this._oVM._checkVariantNameConstraints(oInput, "2");

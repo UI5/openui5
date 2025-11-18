@@ -7,9 +7,11 @@ sap.ui.define([
 	"sap/ui/mdc/enums/ConditionValidated",
 	"sap/ui/mdc/enums/OperatorName",
 	"sap/ui/test/utils/nextUIUpdate",
-	'sap/base/Log'
+	"sap/base/Log",
+    "sap/ui/core/Lib",
+    "sap/ui/core/Core"
 ], function (
-	FilterBarBase, FilterField, DefaultTypeMap, ConditionValidated, OperatorName, nextUIUpdate, Log
+	FilterBarBase, FilterField, DefaultTypeMap, ConditionValidated, OperatorName, nextUIUpdate, Log, Library
 ) {
 	"use strict";
 
@@ -1005,45 +1007,76 @@ sap.ui.define([
 
     });
 
-		QUnit.module("_enhanceBasicSearchField");
+    QUnit.module("_enhanceBasicSearchField");
 
-		QUnit.test("should log a warning when the 'propertyKey' of the given SearchField is not '$search' and then default to it", function (assert) {
-				const oFilterBarBase = new FilterBarBase({
-						delegate: {
-								name: "test-resources/sap/ui/mdc/qunit/filterbar/UnitTestMetadataDelegate",
-								payload: {
-										modelName: undefined,
-										collectionName: "test"
-								}
-						}
-				});
+    QUnit.test("should log a warning when the 'propertyKey' of the given SearchField is not '$search' and then default to it", function (assert) {
+        const oFilterBarBase = new FilterBarBase({
+            delegate: {
+                name: "test-resources/sap/ui/mdc/qunit/filterbar/UnitTestMetadataDelegate",
+                payload: {
+                    modelName: undefined,
+                    collectionName: "test"
+                }
+            }
+        });
 
-				const fnLogWarningSpy = sinon.spy(Log, "warning");
-				const fnEnhanceFilterFieldStub = sinon.stub(oFilterBarBase, "_enhanceFilterField");
-				const oBasicSearchFieldMock = {};
-				oBasicSearchFieldMock.getPropertyKey = sinon.stub().returns("");
-				oBasicSearchFieldMock.setPropertyKey = sinon.stub();
+        const fnLogWarningSpy = sinon.spy(Log, "warning");
+        const fnEnhanceFilterFieldStub = sinon.stub(oFilterBarBase, "_enhanceFilterField");
+        const oBasicSearchFieldMock = {};
+        oBasicSearchFieldMock.getPropertyKey = sinon.stub().returns("");
+        oBasicSearchFieldMock.setPropertyKey = sinon.stub();
 
-				assert.ok(oBasicSearchFieldMock.getPropertyKey.notCalled, "should not call 'getPropertyKey' initially");
-				assert.ok(oBasicSearchFieldMock.setPropertyKey.notCalled, "should not call 'setPropertyKey' initially");
-				assert.ok(fnLogWarningSpy.notCalled, "should not call 'warning' initially");
-				assert.ok(fnEnhanceFilterFieldStub.notCalled, "should not call '_enhanceFilterField' initially");
+        assert.ok(oBasicSearchFieldMock.getPropertyKey.notCalled, "should not call 'getPropertyKey' initially");
+        assert.ok(oBasicSearchFieldMock.setPropertyKey.notCalled, "should not call 'setPropertyKey' initially");
+        assert.ok(fnLogWarningSpy.notCalled, "should not call 'warning' initially");
+        assert.ok(fnEnhanceFilterFieldStub.notCalled, "should not call '_enhanceFilterField' initially");
 
-				oFilterBarBase._enhanceBasicSearchField(oBasicSearchFieldMock);
+        oFilterBarBase._enhanceBasicSearchField(oBasicSearchFieldMock);
 
-				assert.ok(oBasicSearchFieldMock.getPropertyKey.calledOnce, "should call 'getPropertyKey'");
-				assert.ok(oBasicSearchFieldMock.setPropertyKey.calledOnce, "should call 'setPropertyKey'");
-				assert.ok(oBasicSearchFieldMock.setPropertyKey.calledWith("$search"), "should call 'setPropertyKey' with correct value");
+        assert.ok(oBasicSearchFieldMock.getPropertyKey.calledOnce, "should call 'getPropertyKey'");
+        assert.ok(oBasicSearchFieldMock.setPropertyKey.calledOnce, "should call 'setPropertyKey'");
+        assert.ok(oBasicSearchFieldMock.setPropertyKey.calledWith("$search"), "should call 'setPropertyKey' with correct value");
 
-				const sExpectedErrorText = `sap.ui.mdc.FilterBar: BasicSearchField has incorrect 'propertyKey' ''. Overriding to default '$search'`;
+        const sExpectedErrorText = `sap.ui.mdc.FilterBar: BasicSearchField has incorrect 'propertyKey' ''. Overriding to default '$search'`;
 
-				assert.ok(fnLogWarningSpy.calledOnce, "should call 'warning'");
-				assert.ok(fnLogWarningSpy.calledWith(sExpectedErrorText), "should call 'warning' with correct value");
+        assert.ok(fnLogWarningSpy.calledOnce, "should call 'warning'");
+        assert.ok(fnLogWarningSpy.calledWith(sExpectedErrorText), "should call 'warning' with correct value");
 
-				assert.ok(fnEnhanceFilterFieldStub.calledOnce, "should call '_enhanceFilterField'");
-				assert.ok(fnEnhanceFilterFieldStub.calledWith(oBasicSearchFieldMock), "should call '_enhanceFilterField' with correct value");
+        assert.ok(fnEnhanceFilterFieldStub.calledOnce, "should call '_enhanceFilterField'");
+        assert.ok(fnEnhanceFilterFieldStub.calledWith(oBasicSearchFieldMock), "should call '_enhanceFilterField' with correct value");
 
-				fnLogWarningSpy.restore();
-		});
+        fnLogWarningSpy.restore();
+    });
+
+    QUnit.module("Accessibility", {
+        beforeEach: async function () {
+			this.oFilterBarBase = new FilterBarBase({
+				delegate: { name: "test-resources/sap/ui/mdc/qunit/filterbar/UnitTestMetadataDelegate", payload: { modelName: undefined, collectionName: "test" } }
+            });
+            this.oRb = Library.getResourceBundleFor("sap.ui.mdc");
+
+            this.oFilterBarBase.placeAt("qunit-fixture");
+            await nextUIUpdate();
+		},
+		afterEach: function () {
+			this.oFilterBarBase.destroy();
+            this.oFilterBarBase = undefined;
+		}
+    });
+
+    QUnit.test("Check description for Go Button", function(assert) {
+        const oButton = this.oFilterBarBase._getSearchButton();
+        assert.ok(oButton, "Go Button available");
+
+        const sExpectedDescription = this.oRb.getText("filterbar.GO_DESCRIPTION");
+        const sInvisibleTextId = this.oFilterBarBase.getId() + "-btnSearch-description";
+
+        const aDescribedBy = oButton.getAriaDescribedBy();
+        assert.ok(aDescribedBy.length > 0, "Go Button has ariaDescribedBy references");
+
+        const oDescription = this.oFilterBarBase.getInvisibleText(sInvisibleTextId);
+        assert.ok(oDescription, "Description InvisibleText available");
+        assert.equal(oDescription.getText(), sExpectedDescription, "Description InvisibleText has correct text");
+    });
 
 });

@@ -2621,14 +2621,36 @@ sap.ui.define([
 		return oShortFormat;
 	};
 
+	/**
+	 * Returns an object with two properties. The first is the number substring of the given <code>sValue</code>.
+	 * The second property is the factor with which the determined number must be multiplied to resolve
+	 * the short format.
+	 * If the number of the given <code>sValue</code> is larger than 100 000 000 000 000 no short format will be found
+	 * and <code>undefined</code> is returned.
+	 *
+	 * @example
+	 * Formatted value to be parsed: "123K"
+	 * Chosen short format: "100000-other": "000K",
+	 * Number Substring: "123"
+	 * Factor: 1000
+	 * Parsed number: 123 * 1000 = 123000
+	 *
+	 * @param {string} sValue The value for which the short format shall be determined
+	 * @param {sap.ui.core.LocaleData} oLocaleData The locale data of this instance
+	 * @param {boolean} bIndianCurrency Whether the the value has to be treated as Indian currency
+	 *
+	 * @returns {{number: string, factor: number}|undefined}
+	 *   An object containing the number substring of the given <code>sValue</code>, e.g. <code>"123"</code> and
+	 *   the factor with which the determined number must be multiplied to resolve the short format;
+	 *   <code>undefined</code> if no short format is found for the given <code>sValue</code>
+	 */
 	function getNumberFromShortened(sValue, oLocaleData, bIndianCurrency) {
 		var sNumber,
 			iFactor = 1,
 			iKey = 10,
 			aPluralCategories = oLocaleData.getPluralCategories(),
 			sCldrFormat,
-			bestResult = {number: undefined,
-				factor: iFactor},
+			bestResult = {number: undefined, factor: iFactor},
 			fnGetFactor = function(sPlural, iKey, sStyle) {
 				sCldrFormat = oLocaleData.getCompactDecimalPattern(sStyle, iKey.toString(), sPlural);
 

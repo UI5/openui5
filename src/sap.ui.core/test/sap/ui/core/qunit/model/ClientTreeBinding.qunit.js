@@ -349,7 +349,8 @@ sap.ui.define([
 			foo: "bar",
 			nested: {
 				value: 42
-			}
+			},
+			baz() {}
 		};
 
 		// code under test - object
