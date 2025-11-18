@@ -5,6 +5,7 @@ define(function () {
 	QUnit.module("UI5 Loader tests for AMD compliant config paths", {
 		before: function () {
 			require.config({
+				waitSeconds: 20,
 				paths: {
 					"sub/foo": "app/foo-nodep",
 					"sub/sub/baz": "app/subdir/baz"

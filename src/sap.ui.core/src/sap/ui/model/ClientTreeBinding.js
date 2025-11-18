@@ -7,11 +7,12 @@ sap.ui.define([
 	"./ChangeReason",
 	"./TreeBinding",
 	"sap/base/util/deepEqual",
+	"sap/base/util/deepExtend",
 	"sap/base/util/each",
 	"sap/ui/model/FilterProcessor",
 	"sap/ui/model/FilterType",
 	"sap/ui/model/SorterProcessor"
-], function(ChangeReason, TreeBinding, deepEqual, each, FilterProcessor, FilterType, SorterProcessor) {
+], function(ChangeReason, TreeBinding, deepEqual, deepExtend, each, FilterProcessor, FilterType, SorterProcessor) {
 	"use strict";
 
 	/**
@@ -90,7 +91,7 @@ sap.ui.define([
 	 * @private
 	 */
 	ClientTreeBinding.prototype.cloneData = function(oTreeData) {
-		return structuredClone(oTreeData);
+		return deepExtend(Array.isArray(oTreeData) ? [] : {}, oTreeData);
 	};
 
 	/**

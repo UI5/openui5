@@ -21,7 +21,6 @@ sap.ui.define(function() {
 			bootstrap: {},
 			csp: {},
 			component: {},
-			composite: {},
 
 			"Messaging": {
 				page: "test-resources/sap/ui/core/qunit/messages/testsuite.messaging.base.qunit.html"
@@ -95,7 +94,6 @@ sap.ui.define(function() {
 			},
 
 			service: {},
-			tmpl: {},
 			designtime: {},
 			dnd: {},
 			fieldhelp: {},

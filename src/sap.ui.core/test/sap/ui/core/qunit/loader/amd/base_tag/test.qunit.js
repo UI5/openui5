@@ -5,6 +5,7 @@ define(function () {
 	QUnit.module("UI5 Loader tests for AMD compliant config paths", {
 		before: function () {
 			require.config({
+				waitSeconds: 20,
 				paths: {
 					"sub/sub/baz": "test-resources/sap/ui/core/qunit/loader/amd/config_paths/app/subdir/baz",
 					"app" : "test-resources/sap/ui/core/qunit/loader/amd/base_tag/app"

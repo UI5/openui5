@@ -635,8 +635,16 @@ sap.ui.define([
 			this._oDialog.setModel(oI18nModel, "i18n");
 			this._oDialog.setModel(this._createViewModel(), "view");
 
+			this._oDialog.attachAfterClose(this._onDialogAfterClose, this);
+
 			// set compact/cozy style class
 			this._oDialog.addStyleClass(this._getContentDensityClass());
+		},
+
+		_onDialogAfterClose: function () {
+			if (!this._bIsBeingClosed) {
+				this.close();
+			}
 		},
 
 		_loadVersionInfo: function() {

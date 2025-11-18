@@ -14,7 +14,7 @@
 	xmlns="sap.m"
 	xmlns:plugins="sap.m.plugins"
 	xmlns:types="sap.ui.v4demo.types"
-	
+
 	xmlns:mdcvh="sap.ui.mdc.valuehelp"
 	xmlns:mdcvc="sap.ui.mdc.valuehelp.content"
 	xmlns:demo="sap.ui.v4demo.controls" controllerName="sap.ui.v4demo.controller.Books">
@@ -929,8 +929,8 @@
 					</mdc:variant>
 
 					<mdc:items>
-						<mdcc:Item id="dim1" type="groupable" propertyKey="language_code"  />
-						<mdcc:Item id="meas1" type="aggregatable" propertyKey="averagemetricsWords"/>
+						<mdcc:Item id="dim1" type="groupable" propertyKey="language_code" label="Language" role="category"  />
+						<mdcc:Item id="meas1" type="aggregatable" propertyKey="averagemetricsWords" label="Words (average)" role="axis1"/>
 						<!-- <mdcc:Item id="meas2" type="aggregatable" propertyKey="averageprice"/> -->
 					</mdc:items>
 				</mdc:Chart>

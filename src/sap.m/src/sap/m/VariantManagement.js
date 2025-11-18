@@ -541,6 +541,7 @@ sap.ui.define([
 	VariantManagement.COLUMN_FAV_IDX = 0;
 	VariantManagement.COLUMN_NAME_IDX = 1;
 	VariantManagement.COLUMN_DEFAULT_IDX = 3;
+	VariantManagement.COLUMN_ROLES_IDX = 5;
 
 	/*
 	 * Constructs and initializes the <code>VariantManagement</code> control.
@@ -592,23 +593,31 @@ sap.ui.define([
 			}
 		} else if (oChanges.type === "property") {
 
-			if (oChanges.object.isA && oChanges.object.isA("sap.m.VariantItem")) {
+			if (oChanges.object?.isA?.("sap.m.VariantItem")) {
 				oVariantItem = oChanges.object;
-				if (oVariantItem) {
-					if (this.getSelectedKey() === oVariantItem.getKey()) {
-						this.refreshTitle();
-					}
 
-					if (!this.oManagementTable || (this.oManagementTable.getItems && this.oManagementTable.getItems().length === 0)) {
-						if (oChanges.name === "title") {
-							oVariantItem._setOriginalTitle(oChanges.current);
-						} else if (oChanges.name === "favorite") {
-							oVariantItem._setOriginalFavorite(oChanges.current);
-						} else if (oChanges.name === "executeOnSelect") {
-							oVariantItem._setOriginalExecuteOnSelect(oChanges.current);
-						} else if (oChanges.name === "contexts") {
-							oVariantItem._setOriginalContexts(oChanges.current);
-						}
+				if (this.getSelectedKey() === oVariantItem.getKey()) {
+					this.refreshTitle();
+				}
+
+				if (!this.oManagementTable || (this.oManagementTable.getItems && this.oManagementTable.getItems().length === 0)) {
+					if (oChanges.name === "title") {
+						oVariantItem._setOriginalTitle(oChanges.current);
+					} else if (oChanges.name === "favorite") {
+						oVariantItem._setOriginalFavorite(oChanges.current);
+					} else if (oChanges.name === "executeOnSelect") {
+						oVariantItem._setOriginalExecuteOnSelect(oChanges.current);
+					} else if (oChanges.name === "contexts") {
+						oVariantItem._setOriginalContexts(oChanges.current);
+					}
+				} else {
+					const oRow = this.oManagementTable.getItems().find((oListItem) => {
+						const oItem = this._findVariantItem(oListItem.getBindingContext(this._sModelName));
+						return oItem.getKey() === oVariantItem.getKey();
+					});
+
+					if (oChanges.name === "contexts") {
+						this._updateContextsDependencies(oRow);
 					}
 				}
 			}
@@ -2187,14 +2196,7 @@ sap.ui.define([
 			}
 			this.addDependent(this.oManagementDialog);
 
-			this.oManagementTable.bindAggregation("items", {
-				path: "/items",
-				model: "$mVariants",
-				factory: this._templateFactoryManagementDialog.bind(this),
-				filters: this._getVisibleFilter()
-			});
-
-			this._bRebindRequired = false;
+			this._rebindVMTable(true);
 		}
 	};
 
@@ -2222,12 +2224,10 @@ sap.ui.define([
 	};
 
 	VariantManagement.prototype._templateFactoryManagementDialog = function(sId, oContext) {
-		var sTooltip = null;
-		var oDeleteButton;
-		var oNameControl;
-		var oExecuteOnSelectCtrl;
-		var oRolesCell;
-		var oItem = oContext.getObject();
+		const sTooltip = null;
+		let oNameControl;
+		let oExecuteOnSelectCtrl;
+		const oItem = this._findVariantItem(oContext);
 		if (!oItem) {
 			Log.error("couldn't obtain the item for '" + oContext.getPath() + "'");
 			return undefined;
@@ -2239,37 +2239,45 @@ sap.ui.define([
 			return undefined;
 		}
 
-		var sIdPrefix = this.getId() + "-manage";
-
-		var sModelName = "$mVariants";
-
-		var fLiveChange = function(oEvent) {
-			var oItem = oEvent.oSource.getBindingContext(sModelName).getObject();
+		const sIdPrefix = this.getId() + "-manage";
+		const sModelName = this._sModelName;
+		const fLiveChange = function(oEvent) {
+			const oContext = oEvent.oSource.getBindingContext(sModelName);
+			const oItem = this._findVariantItem(oContext);
 			this._handleManageTitleChange(oEvent.oSource, oItem);
 		}.bind(this);
 
-		var fChange = function(oEvent) {
-			var oItem = oEvent.oSource.getBindingContext(sModelName).getObject();
+		const fChange = function(oEvent) {
+			const oContext = oEvent.oSource.getBindingContext(sModelName);
+			const oItem = this._findVariantItem(oContext);
+			oItem.setTitle(oEvent.oSource.getValue());
 			this._handleManageTitleChange(oEvent.oSource, oItem);
 		}.bind(this);
 
-		var fSelectRB = function(oEvent) {
-			this._handleManageDefaultVariantChange(oEvent.oSource, oEvent.oSource.getBindingContext(sModelName).getObject(), oEvent.getParameters().selected);
+		const fSelectRB = function(oEvent) {
+			const oContext = oEvent.oSource.getBindingContext(sModelName);
+			const oItem = this._findVariantItem(oContext);
+			this._handleManageDefaultVariantChange(oEvent.oSource, oItem, oEvent.getParameters().selected);
 		}.bind(this);
 
-		var fPress = function(oEvent) {
-			this._handleManageDeletePressed(oEvent.oSource.getBindingContext(sModelName).getObject());
+		const fPress = function(oEvent) {
+			const oContext = oEvent.oSource.getBindingContext(sModelName);
+			const oItem = this._findVariantItem(oContext);
+			this._handleManageDeletePressed(oItem);
 			this._reCheckVariantNameConstraints();
 		}.bind(this);
 
-		var fSelectFav = function(oEvent) {
-			this._handleManageFavoriteChanged(oEvent.oSource, oEvent.oSource.getBindingContext(sModelName).getObject());
+		const fSelectFav = function(oEvent) {
+			const oContext = oEvent.oSource.getBindingContext(sModelName);
+			const oItem = this._findVariantItem(oContext);
+			this._handleManageFavoriteChanged(oEvent.oSource, oItem);
 		}.bind(this);
 
-		var fRolesPressed = function(oEvent) {
-			var oItem = oEvent.oSource.getBindingContext(sModelName).getObject();
-			this._openRolesDialog(oItem, oEvent.oSource.getParent().getItems()[0]);
-		}.bind(this);
+		const fEnableApply = (oEvent) => {
+			const oContext = oEvent.oSource.getBindingContext(sModelName);
+			const oItem = this._findVariantItem(oContext);
+			oItem.setExecuteOnSelect(oEvent.getParameter("selected"));
+		};
 
 		if (oItem.getRename()) {
 			oNameControl = new Input(sIdPrefix + "-input-" + nPos, {
@@ -2292,7 +2300,7 @@ sap.ui.define([
 			}
 		}
 
-		oDeleteButton = new Button(sIdPrefix + "-del-" + nPos, {
+		const oDeleteButton = new Button(sIdPrefix + "-del-" + nPos, {
 			icon: "sap-icon://decline",
 			enabled: true,
 			type: ButtonType.Transparent,
@@ -2301,7 +2309,7 @@ sap.ui.define([
 			visible: oItem.getRemove()
 		});
 
-		var oFavoriteIcon = new Icon(sIdPrefix + "-fav-" + nPos, {
+		const oFavoriteIcon = new Icon(sIdPrefix + "-fav-" + nPos, {
 			src: {
 				path: "favorite",
 				model: sModelName,
@@ -2329,55 +2337,41 @@ sap.ui.define([
 		if (this.getDisplayTextForExecuteOnSelectionForStandardVariant() && (this.getStandardVariantKey() === oItem.getKey())) {
 			oExecuteOnSelectCtrl = new CheckBox(sIdPrefix + "-exe-" + nPos, {
 				wrapping: true,
-				text: '{' + sModelName + ">/_displayTextForExecuteOnSelectionForStandardVariant}",
-				selected: '{' + sModelName + ">executeOnSelect}"
+				text: "{$mVariants>/_displayTextForExecuteOnSelectionForStandardVariant}",
+				selected: '{' + sModelName + ">executeOnSelect}",
+				select: fEnableApply
 			});
 		} else {
 			oExecuteOnSelectCtrl = new CheckBox(sIdPrefix + "-exe-" + nPos, {
 				text: "",
-				selected: '{' + sModelName + ">executeOnSelect}"
+				selected: '{' + sModelName + ">executeOnSelect}",
+				select: fEnableApply
 			});
 		}
 
 		// roles
-		var oText;
-		if (this._sStyleClass && this.getSupportContexts() && (oItem.getKey() !== this.getStandardVariantKey())) {
-			oText = new Text({ wrapping: false });
-			this._determineRolesSpecificText(oItem, oText);
-			var oIcon = new Icon({
-				src: "sap-icon://edit",
-				press: fRolesPressed
-			});
-			oIcon.addStyleClass("sapMVarMngmtRolesEdit");
-			oIcon.setTooltip(this._oRb.getText("VARIANT_MANAGEMENT_VISIBILITY_ICON_TT"));
-			oRolesCell = new HBox(sIdPrefix + "-role-" + nPos, {
-				items: [oText, oIcon]
-			});
+		const oRolesCell = this._createRolesCell(oItem, oContext);
 
-		} else {
-			oRolesCell = new Text();
-		}
-
-		var oDefaultRadioButton = new RadioButton(sIdPrefix + "-def-" + nPos, {
+		const oDefaultRadioButton = new RadioButton(sIdPrefix + "-def-" + nPos, {
 			groupName: this.getId(),
 			select: fSelectRB,
 			selected: {
 				path: "/defaultKey",
-				model: sModelName,
+				model: "$mVariants",
 				formatter: function(sKey) {
 					return oItem.getKey() === sKey;
 				}
 			}
 		});
 
-		if (oText && this._isRestricted(oItem.getContexts())) {
+		if (oRolesCell.isA("sap.m.HBox") && this._isRestricted(oItem.getContexts())) {
 			oDefaultRadioButton.setEnabled(false);
 			if (this.getDefaultKey() === oItem.getKey())  {
 				this.setDefaultKey(this.getStandardVariantKey());
 			}
 		}
 
-		var oListItem = new ColumnListItem({
+		const oListItem = new ColumnListItem({
 			cells: [
 				oFavoriteIcon,
 				oNameControl,
@@ -2437,18 +2431,7 @@ sap.ui.define([
 		// not invalidated....
 		// WA: Always do the binding while opening the dialog.
 		if (this._bRebindRequired) {
-			this._bRebindRequired = false;
-
-			if (!this.oManagementTable.getBinding("items")) {
-				this.oManagementTable.bindAggregation("items", {
-					path: "/items",
-					model: "$mVariants",
-					factory: this._templateFactoryManagementDialog.bind(this),
-					filters: this._getVisibleFilter()
-				});
-			} else {
-				this.oManagementTable.getBinding("items").filter(this._getVisibleFilter());
-			}
+			this._rebindVMTable();
 		}
 
         if (this.oManagementTable.getItems().length < 1) {
@@ -2570,7 +2553,9 @@ sap.ui.define([
 		oItem.setFavorite(!oItem.getFavorite());
 		var oRow = this._getRowForKey(oItem.getKey());
 		if (oRow) {
-			oRow.getCells()[VariantManagement.COLUMN_FAV_IDX].focus();
+			const oIconCell = oRow.getCells()[VariantManagement.COLUMN_FAV_IDX];
+			this._setFavoriteIcon(oIconCell, oItem.getFavorite());
+			oIconCell.focus();
 		}
 	};
 
@@ -2873,11 +2858,13 @@ sap.ui.define([
 	// UTILS
 
 	VariantManagement.prototype._getRowForKey = function(sKey) {
-		var oRowForKey = null;
+		let oRowForKey = null;
 		if (this.oManagementTable) {
 			this.oManagementTable.getItems().some(function(oRow) {
-				var oColumnItem = oRow.getCells()[0].getParent();
-				var oItem = this.getModel("$mVariants").getObject(oColumnItem.getBindingContextPath());
+				const oColumnItem = oRow.getCells()[0].getParent();
+				const oBindingContext = oColumnItem.getBindingContext(this._sModelName);
+
+				const oItem = this._findVariantItem(oBindingContext);
 				if (sKey === oItem.getKey()) {
 					oRowForKey = oRow;
 				}
@@ -2891,7 +2878,7 @@ sap.ui.define([
 
 	VariantManagement.prototype._determineIndex = function(sPath) {
 		var nIdx = -1;
-		var nPos = sPath.indexOf('/', 1);
+		var nPos = sPath.lastIndexOf('/');
 		if (nPos > 0) {
 			nIdx = parseInt(sPath.substring(nPos + 1));
 		}
@@ -2979,13 +2966,13 @@ sap.ui.define([
 	};
 
 	VariantManagement.prototype._reCheckVariantNameConstraints = function() {
-		var aItems;
-		var bInError = false;
+		let aItems;
+		let bInError = false;
 
 		if (this.oManagementTable) {
 			aItems = this.oManagementTable.getItems();
 			aItems.some(function(oItem) {
-				var oObject = oItem.getBindingContext("$mVariants").getObject();
+				const oObject = this._findVariantItem(oItem.getBindingContext(this._sModelName));
 				if (oObject && oObject.getVisible()) {
 					var oInput = oItem.getCells()[VariantManagement.COLUMN_NAME_IDX];
 					if (oInput && oInput.getValueState && (oInput.getValueState() === ValueState.Error)) {
@@ -3033,19 +3020,19 @@ sap.ui.define([
 	};
 
 	VariantManagement.prototype._checkIsDuplicateInManageTable = function(sValue, sKey) {
-		var aItems;
-		var bInError = false;
-		var sLowerCaseValue = sValue.toLowerCase();
+		let aItems;
+		let bInError = false;
+		const sLowerCaseValue = sValue.toLowerCase();
 
 		if (this.oManagementTable) {
 			aItems = this.oManagementTable.getItems();
-			aItems.some(function(oItem) {
-				var sTitleLowerCase;
-				var oObject = oItem.getBindingContext("$mVariants").getObject();
-				if (oObject && oObject.getVisible()) {
+			aItems.some((oItem) => {
+				let sTitleLowerCase;
+				const oObject = oItem.getBindingContext(this._sModelName).getObject();
+				if (oObject?.visible) {
 					var oInput = oItem.getCells()[VariantManagement.COLUMN_NAME_IDX];
 
-					if (oInput && (oObject.getKey() !== sKey)) {
+					if (oInput && (oObject.key !== sKey)) {
 						if (oInput.isA("sap.m.Input")) {
 							sTitleLowerCase = oInput.getValue().toLowerCase();
 						} else {
@@ -3075,6 +3062,91 @@ sap.ui.define([
 	VariantManagement.prototype._getToolbarInteractive = function () {
 	   return true;
    };
+
+	VariantManagement.prototype._rebindVMTable = function(bForceRebind) {
+		const oItemsBindingInfos = this.getBindingInfo("items") ?? {
+			path: "/items",
+			model: "$mVariants",
+			factory: this._templateFactoryManagementDialog.bind(this),
+			filters: this._getVisibleFilter()
+		};
+
+		if (!this.oManagementTable.getBinding("items") || bForceRebind) {
+			const oBindingInfo = Object.assign({}, {
+				path: oItemsBindingInfos.path,
+				model: oItemsBindingInfos.model,
+				parameters: oItemsBindingInfos.parameters
+			}, {
+				factory: this._templateFactoryManagementDialog.bind(this),
+				filters: this._getVisibleFilter()
+			});
+
+			this._sModelName = oBindingInfo.model;
+			this.oManagementTable.bindAggregation("items", oBindingInfo);
+		} else {
+			this.oManagementTable.getBinding("items").filter(this._getVisibleFilter());
+		}
+
+		this._bRebindRequired = false;
+	};
+
+	VariantManagement.prototype._findVariantItem = function (oContext) {
+		const vObject = oContext.getObject();
+		if (vObject.isA?.("sap.m.VariantItem")) {
+			return vObject;
+		}
+		return this.getItems().find((oVariantItem) => oVariantItem.getKey() === vObject.key);
+	};
+
+	VariantManagement.prototype._createRolesCell = function (oItem, oContext, sIdPrefix = `${this.getId()}-manage`) {
+		const fRolesPressed = function(oEvent) {
+			const oContext = oEvent.oSource.getBindingContext(this._sModelName);
+			const oItem = this._findVariantItem(oContext);
+			this._openRolesDialog(oItem, oEvent.oSource.getParent().getItems()[0]);
+		}.bind(this);
+
+		if (this._sStyleClass && this.getSupportContexts() && (oItem.getKey() !== this.getStandardVariantKey())) {
+			const nPos = this._determineIndex(oContext.getPath());
+			const oText = new Text({ wrapping: false });
+			this._determineRolesSpecificText(oItem, oText);
+			var oIcon = new Icon({
+				src: "sap-icon://edit",
+				press: fRolesPressed
+			});
+			oIcon.addStyleClass("sapMVarMngmtRolesEdit");
+			oIcon.setTooltip(this._oRb.getText("VARIANT_MANAGEMENT_VISIBILITY_ICON_TT"));
+			return new HBox(sIdPrefix + "-role-" + nPos, {
+				items: [oText, oIcon]
+			});
+
+		} else {
+			return new Text();
+		}
+	};
+
+	VariantManagement.prototype._updateContextsDependencies = function (oRow) {
+		const oContext = oRow.getBindingContext(this._sModelName);
+		const oItem = this._findVariantItem(oContext);
+
+		// Update the roles
+		const oOldCell = oRow.removeCell(VariantManagement.COLUMN_ROLES_IDX);
+		const oRoleCell = this._createRolesCell(this._findVariantItem(oContext), oContext);
+
+		if (oOldCell) {
+			oOldCell.destroy();
+			oRow.insertCell(oRoleCell, VariantManagement.COLUMN_ROLES_IDX);
+		}
+
+		// Update the default state of the button and the default key
+		if (oRoleCell.isA("sap.m.HBox") && this._isRestricted(oItem.getContexts())) {
+			const oDefaultRadioButton = oRow.getCells()[VariantManagement.COLUMN_DEFAULT_IDX];
+			oDefaultRadioButton.setEnabled(false);
+
+			if (this.getDefaultKey() === oItem.getKey())  {
+				this.setDefaultKey(this.getStandardVariantKey());
+			}
+		}
+	};
 
 	// exit destroy all controls created in init
 	VariantManagement.prototype.exit = function() {
@@ -3127,6 +3199,11 @@ sap.ui.define([
 		this._oSearchFieldOnMgmtDialog = undefined;
 		this._sDefaultKey = undefined;
 		this._oCtrlRef = undefined;
+
+		if (this._oVMTableModel) {
+			this._oVMTableModel.destroy();
+			this._oVMTableModel = undefined;
+		}
 
 		if (this._oNoDataIllustratedMessage && !this._oNoDataIllustratedMessage.bIsDestroyed) {
 			this._oNoDataIllustratedMessage.destroy();

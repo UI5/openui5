@@ -2354,7 +2354,7 @@ sap.ui.define([
 		},
 
 		// Trampoline property to allow for mocking function module in unit tests.
-		// @see sap/base'/util/merge
+		// @see sap/base/util/merge
 		merge : merge,
 
 		/**

@@ -823,7 +823,9 @@ sap.ui.define([
 			const sTableId = oTable.getId();
 
 			mAttributes["role"] = TableUtils.Grouping.isInGroupMode(oTable) || TableUtils.Grouping.isInTreeMode(oTable) ? "treegrid" : "grid";
-			mAttributes["aria-describedby"] = [sTableId + "-ariaselection"];
+			if (oTable.getSelectionMode() !== SelectionMode.None) {
+				mAttributes["aria-describedby"] = [sTableId + "-ariaselection"];
+			}
 			mAttributes["aria-labelledby"] = [].concat(oTable.getAriaLabelledBy());
 
 			if (oTable.getSelectionMode() === SelectionMode.MultiToggle) {
