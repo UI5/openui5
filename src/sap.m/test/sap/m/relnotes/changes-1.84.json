@@ -2348,5 +2348,25 @@
         "text": " We've now fixed the SAP gateway issues for PDFViewer"
       }
     ]
+  },
+  "1.84.54": {
+    "date": "November 2025",
+    "notes": [
+      {
+        "id": "cfb3b2eb0d2e66f1d0624403b2c5a9f1d4bdbd5a",
+        "type": "FIX",
+        "text": " sap/ui/thirdparty: bump RequireJS to 2.3.7"
+      },
+      {
+        "id": "3e03b9a46b7235685eb28ab7db1e7a746688829e",
+        "type": "FIX",
+        "text": " We've now removed the iframe content check while loading a PDF to display it"
+      },
+      {
+        "id": "fbce6ef101bd3c75e7ddf2a136957cd3520c6686",
+        "type": "FIX",
+        "text": " We've now removed the iframe content check while loading a PDF to display it"
+      }
+    ]
   }
 }

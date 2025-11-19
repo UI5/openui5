@@ -298,5 +298,15 @@
         "text": " sap.f.SemanticPage: fix unstable QUnit test"
       }
     ]
+  },
+  "1.84.54": {
+    "date": "November 2025",
+    "notes": [
+      {
+        "id": "6e7b1fc4664ea5081b91d1777910ede64c0846d8",
+        "type": "FIX",
+        "text": " sap.f.DynamicPageTitle: Fix flaky focus test in Safari"
+      }
+    ]
   }
 }
