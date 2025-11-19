@@ -43,7 +43,7 @@ sap.ui.define([
 		var oPlanningCalendarHeader = new PlanningCalendarHeader(),
 			oFirstMockView = new SegmentedButtonItem({ text: "A view" }),
 			oSecondMockView = new SegmentedButtonItem({ text: "Another view" }),
-			$viewSwitch;
+			$viewSwitch, oViewSwitchLabel;
 
 		oPlanningCalendarHeader._oViewSwitch.addItem(oFirstMockView);
 		oPlanningCalendarHeader._oViewSwitch.addItem(oSecondMockView);
@@ -52,7 +52,8 @@ sap.ui.define([
 		await nextUIUpdate();
 
 		$viewSwitch = oPlanningCalendarHeader._oViewSwitch.$();
-		assert.strictEqual($viewSwitch.attr("aria-labelledby"), InvisibleText.getStaticId("sap.m", "PCH_VIEW_SWITCH"),
+		oViewSwitchLabel = oPlanningCalendarHeader._oViewSwitchLabel;
+		assert.strictEqual($viewSwitch.attr("aria-labelledby"), oViewSwitchLabel.getId(),
 			"View switch has an invisible label, which indicates its purpose ");
 
 		oPlanningCalendarHeader.destroy();

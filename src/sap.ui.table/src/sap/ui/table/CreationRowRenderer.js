@@ -217,7 +217,7 @@ sap.ui.define([
 					oRm.openStart("div");
 					oRm.class("sapUiTableCellInner");
 					oRm.openEnd();
-					TableRenderer.renderTableCellControl(oRm, oTable, oCell, bIsFirstColumn);
+					TableRenderer.renderDataCellControl(oRm, oTable, oCell, {isFirstColumn: bIsFirstColumn});
 					oRm.close("div");
 				}
 
