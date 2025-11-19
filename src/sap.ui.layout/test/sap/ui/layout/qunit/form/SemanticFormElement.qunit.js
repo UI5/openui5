@@ -830,4 +830,39 @@ sap.ui.define([
 		assert.equal(aFields[0].getText && aFields[0].getText(), "Text 1 / Text 2", "rendered text");
 	});
 
+
+	QUnit.test("_updateDisplayText doesn't fail without _displayField", async function(assert) {
+		var oLabel = new Label("L1", {text: "Test"});
+		oFormElement.setLabel(oLabel);
+
+		var oField1 = new Link("F1", {text: "Text 1"});
+		oField1.getFormRenderAsControl = function() {return false;};
+
+
+		oFormElement._setEditable(true);
+		oCore.applyChanges();
+		let bTextUpdated = false;
+
+		const {resolve, promise} = Promise.withResolvers();
+
+		oField1.getFormFormattedValue = function() {
+			const oDisplayField = oFormElement.getAggregation("_displayField");
+			oDisplayField.destroy();
+			setTimeout(() => {
+				bTextUpdated = true;
+				resolve("Text");
+			}, 50);
+			return promise;
+		};
+		oFormElement.addField(oField1);
+		oFormElement._setEditable(false);
+		oCore.applyChanges();
+		oFormElement.getFieldsForRendering();
+		sinon.spy(oFormElement, "_setEditable");
+		await new Promise((resolve) => {setTimeout(resolve, 100);});
+		assert.ok(bTextUpdated, "Text updated from promise");
+		delete oField1.getFormRenderAsControl;
+		delete oField1.getFormFormattedValue;
+	});
+
 });
