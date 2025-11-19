@@ -185,11 +185,10 @@ sap.ui.define([
 		 * @param {sap.ui.core.RenderManager} oRm The RenderManager that can be used for writing to the Render-Output-Buffer.
 		 * @param {sap.ui.table.Table} oTable Instance of the table.
 		 * @param {sap.ui.table.Row} oRow Instance of the row.
-		 * @param {int} iRowIndex The index of the row.
 		 * @see sap.ui.table.TableRenderer#writeRowHighlightContent
 		 * @public
 		 */
-		writeAccRowHighlightText: function(oRm, oTable, oRow, iRowIndex) {
+		writeAccRowHighlightText: function(oRm, oTable, oRow) {
 			if (!oTable._getAccExtension().getAccMode()) {
 				return;
 			}

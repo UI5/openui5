@@ -131,7 +131,10 @@ sap.ui.define([
 				throw new Error("The id must be specified.");
 			}
 
-			oTable.getRenderer().renderHSbExternal(oRM, oTable, sId, iScrollWidth);
+			oTable.getRenderer().renderHSbExternal(oRM, oTable, {
+				id: sId,
+				scrollWidth: iScrollWidth
+			});
 		}
 	};
 
