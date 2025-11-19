@@ -2,9 +2,10 @@ sap.ui.define([
 	'sap/base/future',
 	'sap/base/Log',
 	'sap/ui/core/library',
+	'sap/ui/core/Control',
 	'sap/ui/core/Component',
 	'sap/ui/core/ComponentContainer'
-], function(future, Log, sapUiCore, Component, ComponentContainer) {
+], function(future, Log, sapUiCore, Control, Component, ComponentContainer) {
 
 	"use strict";
 	/*global QUnit, sinon */
@@ -246,6 +247,36 @@ sap.ui.define([
 
 		// simulate rendering
 		oComponentContainer.onBeforeRendering();
+	});
+
+	QUnit.test("PropagationListener propagation (propagateModels:false)", function (assert) {
+		var oOwnerComponent = new Component("owner");
+		var oComponentContainer;
+
+		var done = assert.async();
+		function fnAsserts() {
+			assert.strictEqual(Component.getOwnerComponentFor(oComponentContainer).getId(), oOwnerComponent.getId(), "owner of ComponentContainer should be the expected component");
+			assert.strictEqual(Component.getOwnerComponentFor(oComponentContainer.getComponentInstance()).getId(), oOwnerComponent.getId(), "owner of created component should be the expected component");
+			done();
+			oComponentContainer.destroy();
+			oOwnerComponent.destroy();
+		}
+
+		oOwnerComponent.runAsOwner(function() {
+			oComponentContainer = new ComponentContainer({
+				name: "samples.components.button",
+				async: true,
+				componentCreated: fnAsserts
+			});
+		});
+
+		const oTestControl = new Control();
+		const fnListener = function() {};
+		oTestControl.addPropagationListener(fnListener);
+		oTestControl.addDependent(oComponentContainer, {propagateModels: false});
+		// simulate rendering
+		oComponentContainer.onBeforeRendering();
+		assert.strictEqual(oComponentContainer.getPropagationListeners().indexOf(fnListener), 0, "PropagationListener should be propagated even no models are propagated to ComponentContainer");
 	});
 
 	QUnit.test("Should prefix Component ID when an ID preprocessor is defined", function (assert) {
