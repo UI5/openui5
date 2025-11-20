@@ -388,6 +388,7 @@ sap.ui.define([
 	 *
 	 * @version 1.40
 	 * @protected
+	 * @alias sap.m.BarInAnyContentEnabler
 	 */
 	var BarInAnyContentEnabler = BarInPageEnabler.extend("sap.m.BarInAnyContentEnabler", /** @lends sap.m.BarInAnyContentEnabler.prototype */ {});
 

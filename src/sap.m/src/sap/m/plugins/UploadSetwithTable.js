@@ -203,7 +203,7 @@ sap.ui.define([
 				 */
 				fileNameValidationConfig: { type: 'object', defaultValue: null }
 			},
-				aggregations: {
+			aggregations: {
 				/**
 				 * Defines the uploader to be used. If not specified, the default implementation is used.
 				 */

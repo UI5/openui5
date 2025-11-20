@@ -915,7 +915,7 @@ sap.ui.define([
 	};
 
 	/**
-	 * Retrieves for the controls {@link sap.ui.comp.SmartVariantManagement} and {@link sap.ui.fl.variants.VariantManagement} the <i>Standard</i> variant.
+	 * Retrieves for the controls {@link sap.ui.comp.smartvariants.SmartVariantManagement} and {@link sap.ui.fl.variants.VariantManagement} the <i>Standard</i> variant.
 	 * For all other scenarios the first visible variant will be returned, or <code>null</code> if there are none.
 	 * @public
 	 * @returns {(string | null)} The key of either the standard variant or the first visible variant or <code>null</code>.

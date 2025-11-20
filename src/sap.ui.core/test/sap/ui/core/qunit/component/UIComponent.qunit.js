@@ -1119,7 +1119,7 @@ sap.ui.define([
 			"sap.ui5": {
 				"models": {
 					"odm1": {
-						"type": "sap.ui.model.odata.ODataModelNotExists",
+						"type": "someModelNotExists",
 						"uri": "./some/odata/service"
 					}
 				}
@@ -1142,7 +1142,7 @@ sap.ui.define([
 		}).catch((err) => {
 			assert.equal(
 				err.message,
-				"sap.ui.core.Component: Cannot load module 'sap/ui/model/odata/ODataModelNotExists' during creation of component: \"manifestModules.scenario4\".",
+				"sap.ui.core.Component: Cannot load module 'someModelNotExists' during creation of component: \"manifestModules.scenario4\".",
 				"Component creation rejects with correct error"
 			);
 			future.active = undefined;

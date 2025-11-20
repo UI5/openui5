@@ -4,8 +4,7 @@
 sap.ui.define([
 	'sap/ui/core/Icon',
 	'sap/ui/core/_IconRegistry',
-	"sap/base/Log",
-	'./Core' // provides sap.ui.getCore()
+	"sap/base/Log"
 ], function(Icon, _IconRegistry, Log) {
 		"use strict";
 

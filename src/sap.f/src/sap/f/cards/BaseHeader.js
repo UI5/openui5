@@ -185,13 +185,13 @@ sap.ui.define([
 	});
 
 	BaseHeader.prototype._setRootAccessibilityRole = function () {
-		// Do nothing. The sap.f.BaseHeader has the heading role already.
+		// Do nothing. The sap.f.cards.BaseHeader has the heading role already.
 	};
 	BaseHeader.prototype._setRootAriaLevel = function () {
-		// Do nothing. The sap.f.BaseHeader has aria-level set by headingLevel already.
+		// Do nothing. The sap.f.cards.BaseHeader has aria-level set by headingLevel already.
 	};
 	BaseHeader.prototype._applyContextClassFor = function () {
-		// Do nothing. The sap.f.BaseHeader does not differ based on context classes.
+		// Do nothing. The sap.f.cards.BaseHeader does not differ based on context classes.
 	};
 
 	BaseHeader.prototype.init = function () {

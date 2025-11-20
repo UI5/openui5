@@ -4084,7 +4084,7 @@ sap.ui.define([
 		assert.strictEqual(LoaderExtensions.resolveUI5Url.callCount, 8,
 			"Expected number of ui5:// URLs have been resolved");
 
-		// sap.ui.model.odata.ODataModel
+		// sap.ui.model.odata.v2.ODataModel
 		sinon.assert.callCount(this.modelSpy.odataV2, 2);
 
 		// model: "ODataModel"

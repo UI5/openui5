@@ -1189,7 +1189,7 @@ sap.ui.define([
 			return; // no pasted data
 		}
 
-		//var oRow = sap.ui.getCore().byId(jQuery(oEvent.target).closest(".sapMLIB").attr("id"));
+		// var oRow = Element.getElementById(jQuery(oEvent.target).closest(".sapMLIB").attr("id"));
 		this.firePaste({data: aData});
 	};
 

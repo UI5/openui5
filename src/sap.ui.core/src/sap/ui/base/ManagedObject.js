@@ -2320,7 +2320,7 @@ sap.ui.define([
 		}
 
 		if (typeof (vObject) == "string") { // ID of the object is given
-			// Note: old lookup via sap.ui.getCore().byId(vObject) only worked for Elements, not for managed objects in general!
+			// Note: lookup via ElementRegistry only works for Elements, not for managed objects in general!
 			for (i = 0; i < aChildren.length; i++) {
 				if (aChildren[i] && aChildren[i].getId() === vObject) {
 					vObject = i;

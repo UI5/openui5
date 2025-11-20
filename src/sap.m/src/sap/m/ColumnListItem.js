@@ -78,6 +78,9 @@ sap.ui.define([
 
 	/**
 	 * TablePopin element that handles own events.
+	 *
+	 * @class
+	 * @alias sap.m.TablePopin
 	 */
 	var TablePopin = Element.extend("sap.m.TablePopin", {
 		ontap: function(oEvent) {

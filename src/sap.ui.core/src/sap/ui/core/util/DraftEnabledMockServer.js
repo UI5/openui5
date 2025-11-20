@@ -24,7 +24,7 @@ sap.ui.define([
 
 		/**
 		 * Enriches MockServer with draft capabilities based on the given OData service annotations.
-		 * @param {object} oAnnotations annotation object of sap.ui.model.odata.ODataModel
+		 * @param {object} oAnnotations annotation object of ODataModel
 		 * @param {object} oMockServer
 		 */
 		handleDraft: function(oAnnotations, oMockServer) {

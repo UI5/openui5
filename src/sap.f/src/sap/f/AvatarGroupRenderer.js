@@ -2,7 +2,7 @@
  * ${copyright}
  */
 
-// Provides default renderer for control sap.f.AvatarGroupRenderer
+// Provides default renderer for control sap.f.AvatarGroup
 sap.ui.define([
 	"sap/m/AvatarSize",
 	"./library"], function (AvatarSize, library) {

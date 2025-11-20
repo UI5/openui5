@@ -1190,7 +1190,7 @@ sap.ui.define([
 	};
 
 	/**
-	* Opens the <code>sap.m.ActionSheet</code> container of <code>sap.m.SemanticShareMenu</code>.
+	* Opens the <code>sap.m.ActionSheet</code> container of <code>sap.f.semantic.SemanticShareMenu</code>.
 	*
 	* @private
 	*/

@@ -50,7 +50,7 @@ sap.ui.define([
 	 * <h3>Overview</h3>
 	 *
 	 * Dialog with a carousel to preview files uploaded using the UploadSetwithTable control.
-	 * This Element should only be used within the {@link sap.m.upload.UploadSetwithTable UploadSetwithTable} control or {@link sap.m.plugins.UploadSetwithTable UploadSetwithTable} Plugin as an association.
+	 * This Element should only be used within the {@link sap.m.plugins.UploadSetwithTable UploadSetwithTable} Plugin as an association.
 	 *
 	 * <h3>Supported File Types for Preview</h3>
 	 *
@@ -246,7 +246,7 @@ sap.ui.define([
 
 		/**
 		 * Creates a viewer for .vds files
-		 * @param {sap.m.upload.UploadSetwithTableItem | sap.m.upload.UploadItem} oItem The UploadSetwithTableItem or UploadItem to be previewed
+		 * @param {sap.m.upload.UploadItem} oItem The UploadSetwithTableItem or UploadItem to be previewed
 		 * @return {sap.ui.vk.Viewer} A vds viewer instance or undefined if dependency unavailable
 		 * @private
 		 */
@@ -276,7 +276,7 @@ sap.ui.define([
 
 		/**
 		 * Creates a rich text viewer
-		 * @param {sap.m.upload.UploadSetwithTableItem | sap.m.upload.UploadItem} oItem The UploadSetwithTableItem or UploadItem to be previewed
+		 * @param {sap.m.upload.UploadItem} oItem The UploadSetwithTableItem or UploadItem to be previewed
 		 * @return {sap.ui.richtexteditor.RichTextEditor} A rich text editor instance or undefined if dependency unavailable
 		 * @private
 		 */
@@ -525,7 +525,7 @@ sap.ui.define([
 
 		/**
 		 * Creates a {@link sap.m.Carousel} of uploaded files.
-		 * @return {sap.m.upload.UploadSetwithTableItem | sap.m.upload.UploadItem} The currently active UploadSetwithTableItem.
+		 * @return {sap.m.upload.UploadItem} The currently active UploadSetwithTableItem.
 		 * @private
 		 */
 		_getActiveUploadSetwithTableItem: function () {

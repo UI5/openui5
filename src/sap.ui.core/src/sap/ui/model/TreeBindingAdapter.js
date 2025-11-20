@@ -903,7 +903,7 @@ sap.ui.define([
 	 *
 	 * @private
 	 * @ui5-restricted unified.shell.override, sap.ca.scfld.md.controller.BaseMasterController,
-	 * sap.m.GrowingEnablement, sap.m.ListBase, sap.m.UploadCollection, sap.m.UploadSet
+	 * sap.m.GrowingEnablement, sap.m.ListBase, sap.m.UploadCollection, sap.m.upload.UploadSet
 	 */
 	TreeBindingAdapter.prototype.isGrouped = function () {
 		return true;

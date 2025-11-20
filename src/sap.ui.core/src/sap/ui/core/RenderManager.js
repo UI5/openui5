@@ -86,7 +86,9 @@ sap.ui.define([
 	 *
 	 * @class A class that handles the rendering of controls.
 	 *
-	 * For the default rendering task of UI5, a shared RenderManager is created and owned by <code>sap.ui.core.Core</code>.
+	 * For the default rendering task of UI5, a shared RenderManager is created and owned by
+	 * the framework.
+	 *
 	 * Controls or other code that want to render controls outside the default rendering task
 	 * can create a private instance of RenderManager by calling the
 	 * {@link sap.ui.core.Core#createRenderManager sap.ui.getCore().createRenderManager()} method.
@@ -227,7 +229,6 @@ sap.ui.define([
 	 * setting the <code>canSkipRendering</code> property to <code>true</code> lets the <code>RenderManager</code> know that the parent control's accessibility enhancement is static and does not interfere with the child control's rendering optimization.
 	 *
 	 * @see sap.ui.core.Core
-	 * @see sap.ui.getCore
 	 *
 	 * @extends Object
 	 * @author SAP SE

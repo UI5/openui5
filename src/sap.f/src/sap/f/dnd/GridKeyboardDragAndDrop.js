@@ -10,7 +10,7 @@ sap.ui.define([], function() {
 	 *
 	 * Note: This module is used only when doing keyboard drag and drop
 	 *
-	 * @name sap.f.dnd.GridDnD
+	 * @alias sap.f.dnd.GridKeyboardDragAndDrop
 	 * @namespace
 	 * @private
 	 * @since 1.81
