@@ -549,6 +549,7 @@ sap.ui.define([
 		this._listPage = null;
 		this._detailsPage = null;
 		this._sCurrentList = null;
+		this._oHeaderAriaLabelledByElement = null;
 	};
 
 	/**
@@ -654,19 +655,18 @@ sap.ui.define([
 			content: "<span id=\"" + sCloseBtnDescrId + "\" class=\"sapMMsgViewHiddenContainer\">" + sCloseBtnDescr + "</span>"
 		});
 
-		var sHeadingDescr = this._oResourceBundle.getText("MESSAGEPOPOVER_ARIA_HEADING"),
-		sHeadingDescrId = this.getId() + "-HeadingDescr",
-		sSegmentedBtnDescrId = InvisibleText.getStaticId("sap.m", "MESSAGEVIEW_SEGMENTED_BTN_DESCRIPTION"),
-		oHeadingARIAHiddenDescr = new HTML(sHeadingDescrId, {
-			content: "<span id=\"" + sHeadingDescrId + "\" class=\"sapMMsgViewHiddenContainer\" role=\"heading\">" + sHeadingDescr + "</span>"
-		});
+		var sSegmentedBtnDescrId = InvisibleText.getStaticId("sap.m", "MESSAGEVIEW_SEGMENTED_BTN_DESCRIPTION");
 
 		this._oSegmentedButton = new SegmentedButton(this.getId() + "-segmented", {
 			ariaLabelledBy: sSegmentedBtnDescrId
 		}).addStyleClass("sapMSegmentedButtonNoAutoWidth");
 
 		this._oListHeader = new Toolbar({
-			content: [this._oSegmentedButton, new ToolbarSpacer(), oCloseBtnARIAHiddenDescr, oHeadingARIAHiddenDescr]
+			content: [this._oSegmentedButton,
+			new ToolbarSpacer(),
+			oCloseBtnARIAHiddenDescr,
+			this._bShowCustomHeader ? this.getHeadingAriaLabelledByElement() : null
+			]
 		});
 
 		return this._oListHeader;
@@ -706,6 +706,19 @@ sap.ui.define([
 		return this._oDetailsHeader;
 	};
 
+	MessageView.prototype.getHeadingAriaLabelledByElement = function () {
+		if (!this._oHeaderAriaLabelledByElement) {
+			const sHeadingDescr = this._oResourceBundle.getText("MESSAGEPOPOVER_ARIA_HEADING"),
+				sHeadingDescrId = this.getHeadingAriaLabelledBy();
+
+			this._oHeaderAriaLabelledByElement = new HTML(sHeadingDescrId, {
+				content: "<span id=\"" + sHeadingDescrId + "\" class=\"sapMMsgViewHiddenContainer\" role=\"heading\">" + sHeadingDescr + "</span>"
+			});
+		}
+
+		return this._oHeaderAriaLabelledByElement;
+	};
+
 	/**
  	 * Inserts a title into the given title container of the MessageView's header.
 	 *
@@ -735,7 +748,8 @@ sap.ui.define([
 						text: sText
 					}),
 					new ToolbarSpacer(),
-					this.getCloseBtn()
+					this.getCloseBtn(),
+					this.getHeadingAriaLabelledByElement()
 				]
 			}).addStyleClass(CSS_CLASS + "CustomHeader");
 
@@ -750,13 +764,16 @@ sap.ui.define([
 	* @protected
 	*/
 	MessageView.prototype.setupCustomHeader = function () {
+		if (this._bShowCustomHeader) {
+			this._listPage.setCustomHeader(this._createCustomHeader());
+			this._listPage.setSubHeader(this._getListHeader());
+		} else {
+			this._listPage.setCustomHeader(this._getListHeader());
+		}
+	};
 
-			if (this._bShowCustomHeader) {
-				this._listPage.setCustomHeader(this._createCustomHeader());
-				this._listPage.setSubHeader(this._getListHeader());
-			} else {
-				this._listPage.setCustomHeader(this._getListHeader());
-			}
+	MessageView.prototype.getHeadingAriaLabelledBy = function () {
+		return `${this.getId()}-HeadingDescr`;
 	};
 
 	/**
@@ -1052,13 +1069,12 @@ sap.ui.define([
 		var bListPageHeaderVisible = bSegmentedButtonVisible || this._bHasHeaderButton;
 
 		if (this._bShowCustomHeader && !bListPageHeaderVisible) {
-			this._listPage.setShowHeader(this._bShowCustomHeader);
+			this._listPage.setShowHeader(true);
 			this._listPage.setShowSubHeader(false);
 		} else {
 			this._listPage.setShowHeader(bListPageHeaderVisible);
 			this._listPage?.setShowSubHeader(true);
 		}
-
 
 		return this;
 	};
