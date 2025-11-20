@@ -501,23 +501,33 @@ sap.ui.define([
 	FlexState.reinitialize = async function(mPropertyBag) {
 		enhancePropertyBag(mPropertyBag);
 		const sReference = mPropertyBag.reference;
-		const oCurrentRuntimePersistence = _mInstances[sReference].runtimePersistence;
 
-		const oOldInitPromise = _mInitPromises[sReference].promise;
+		const oOldInitPromise = _mInitPromises[sReference];
 		const oNewInitPromise = new Deferred();
 		_mInitPromises[sReference] = oNewInitPromise;
-		await oOldInitPromise;
+
+		if (oOldInitPromise) {
+			await oOldInitPromise.promise;
+		}
+
 		mPropertyBag.reInitialize = true;
 		const oResponse = await Loader.getFlexData(mPropertyBag);
-		prepareNewInstance(mPropertyBag, oResponse.parameters.loaderCacheKey);
-		_mInstances[sReference].storageResponse = filterByMaxLayer(sReference, oResponse.data);
-		const bUpdated = updateRuntimePersistence(
-			sReference,
-			_mInstances[sReference].storageResponse,
-			oCurrentRuntimePersistence
-		);
-		if (bUpdated) {
-			oFlexObjectsDataSelector.checkUpdate({ reference: sReference });
+
+		if (!_mInstances[sReference]) {
+			prepareNewInstance(mPropertyBag, oResponse.parameters.loaderCacheKey);
+			initializeNewInstance(mPropertyBag, oResponse.data);
+		} else {
+			const oCurrentRuntimePersistence = _mInstances[sReference].runtimePersistence;
+			prepareNewInstance(mPropertyBag, oResponse.parameters.loaderCacheKey);
+			_mInstances[sReference].storageResponse = filterByMaxLayer(sReference, oResponse.data);
+			const bUpdated = updateRuntimePersistence(
+				sReference,
+				_mInstances[sReference].storageResponse,
+				oCurrentRuntimePersistence
+			);
+			if (bUpdated) {
+				oFlexObjectsDataSelector.checkUpdate({ reference: sReference });
+			}
 		}
 		oNewInitPromise.resolve();
 	};

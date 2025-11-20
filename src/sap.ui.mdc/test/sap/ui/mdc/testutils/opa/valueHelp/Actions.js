@@ -22,12 +22,13 @@ sap.ui.define([
 ], function (Opa5, Ancestor, PropertyStrictEquals, Press, TriggerEvent, EnterText, KeyCodes, Util, doWait, waitForField, fnMatchProperties, Matcher, FieldActions, Lib) {
 	"use strict";
 
-    var oActions = {
+    const oRessourceBundle = Lib.getResourceBundleFor("sap.ui.mdc");
+    const oActions = {
         iCloseTheValueHelpDialog: function(bCancel, sValueHelpId) {
             return doWait(this).forValueHelp({
                 success: function(oValueHelp) {
                     Opa5.assert.ok(oValueHelp, "sap.ui.mdc.ValueHelp found.");
-                    var sContainerType = oValueHelp.getDialog().getMetadata().getName(); // may also be popover based
+                    const sContainerType = oValueHelp.getDialog().getMetadata().getName(); // may also be popover based
                     this.waitFor({
                         controlType: sContainerType,
                         matchers: new Ancestor(oValueHelp),
@@ -55,8 +56,8 @@ sap.ui.define([
                 success: function(oDialog) {
                     Opa5.assert.ok(oDialog, "ValueHelp dialog found.");
 
-                    var oValueHelpDialog = oDialog.getParent();
-                    var oNextContent = oValueHelpDialog.getContent().find(function (oControl) {
+                    const oValueHelpDialog = oDialog.getParent();
+                    const oNextContent = oValueHelpDialog.getContent().find(function (oControl) {
                         return fnMatchProperties(oProperties)(oControl);
                     });
                     Opa5.assert.ok(oNextContent, "Matching dialog content found.");
@@ -71,12 +72,12 @@ sap.ui.define([
         iToggleTheValueHelpListItem: function (sText, sValueHelpId, oOptions) {
             return doWait(this).forValueHelpList({
                 success: function(oTable) {
-                    var bMDCTable = oTable.isA("sap.ui.mdc.Table");
-                    var oRelevantTable = bMDCTable ? oTable._oTable : oTable;
-                    var oTableAncestor = new Ancestor(oRelevantTable);
+                    const bMDCTable = oTable.isA("sap.ui.mdc.Table");
+                    const oRelevantTable = bMDCTable ? oTable._oTable : oTable;
+                    const oTableAncestor = new Ancestor(oRelevantTable);
 
-                    var bIsGridTable = oRelevantTable && oRelevantTable.isA("sap.ui.table.Table");
-                    var oMatcher = new Matcher();
+                    const bIsGridTable = oRelevantTable && oRelevantTable.isA("sap.ui.table.Table");
+                    const oMatcher = new Matcher();
                     oMatcher.isMatching = function(oListItem) {
                         return !!oListItem.getCells().find(function (oCell) {
                             const oMetadata = oCell.getMetadata();
@@ -137,15 +138,16 @@ sap.ui.define([
         },
 
         iAddADefineConditionRow: function (sValue, sValueHelp) {
+            const sText = oRessourceBundle.getText("valuehelp.DEFINECONDITIONS_ADDCONDITION");
             return doWait(this).forValueHelpDefineConditionPanel({
                 success: function(aResults) {
-                    var oDefineConditionPanel = aResults[0];
+                    const oDefineConditionPanel = aResults[0];
                     return this.waitFor({
                         controlType: "sap.m.Button",
                         matchers: new Ancestor(oDefineConditionPanel),
                         searchOpenDialogs: true,
                         properties: {
-                            text: "Add"
+                            text: sText
                         },
                         success: function(aResults) {
                             Opa5.assert.ok(aResults[0], "DefineConditionPanel Row Add Button pressed.");
@@ -156,11 +158,11 @@ sap.ui.define([
             }, sValueHelp);
         },
         iEnterDefineConditionValuesInRow: function (iIndex, vValues, sValueHelp) {
-            var aValues = [].concat(vValues);
+            const aValues = [].concat(vValues);
             return doWait(this).forValueHelpDefineConditionPanel({
                 success: function(aResults) {
-                    var oDefineConditionPanel = aResults[0];
-                    var sPanelId = oDefineConditionPanel.getId();
+                    const oDefineConditionPanel = aResults[0];
+                    const sPanelId = oDefineConditionPanel.getId();
                     return this.waitFor({
                         searchOpenDialogs: true,
                         properties: {
@@ -188,10 +190,11 @@ sap.ui.define([
             }, sValueHelp);
         },
         iConfirmDefineConditionRowValues: function () {
+            const sText = oRessourceBundle.getText("valuehelp.OK");
             return this.waitFor({
                 controlType: "sap.m.Button",
                 properties: {
-                    text: "OK"
+                    text: sText
                 },
                 success: function (aResults) {
                     aResults[0].focus();
@@ -202,8 +205,8 @@ sap.ui.define([
         iChangeDefineConditionOperatorInRow: function (iIndex, sValue, sValueHelp) {
             return doWait(this).forValueHelpDefineConditionPanel({
                 success: function(aResults) {
-                    var oDefineConditionPanel = aResults[0];
-                    var sPanelId = oDefineConditionPanel.getId();
+                    const oDefineConditionPanel = aResults[0];
+                    const sPanelId = oDefineConditionPanel.getId();
                     return this.waitFor({
                         properties: {
                             id: {
@@ -215,7 +218,7 @@ sap.ui.define([
                         },
                         searchOpenDialogs: true,
                         success: function (aResults) {
-                           var oField = aResults[0];
+                           const oField = aResults[0];
                            oField.setValue(sValue);
                            Opa5.assert.ok(oField, "Set value " + sValue + " on " + oField.getId() + "");
                         }
@@ -226,8 +229,8 @@ sap.ui.define([
         iRemoveDefineConditionRow: function (iIndex, sValueHelp) {
             return doWait(this).forValueHelpDefineConditionPanel({
                 success: function(aResults) {
-                    var oDefineConditionPanel = aResults[0];
-                    var sPanelId = oDefineConditionPanel.getId();
+                    const oDefineConditionPanel = aResults[0];
+                    const sPanelId = oDefineConditionPanel.getId();
                     return this.waitFor({
 
                         properties: {
@@ -281,7 +284,7 @@ sap.ui.define([
         iRemoveAllValueHelpTokens: function (sValueHelp) {
             return doWait(this).forValueHelpDialog({
                 success: function(oDialog) {
-                    var oValueHelpDialog = oDialog.getParent();
+                    const oValueHelpDialog = oDialog.getParent();
                     return this.waitFor({
                         id: oValueHelpDialog.getId() + "-TokenRemoveAll",
                          searchOpenDialogs: true,
@@ -303,7 +306,6 @@ sap.ui.define([
             }, sValueHelp);
         },
         iPressShowOrHideFilters: function () {
-            const oRessourceBundle = Lib.getResourceBundleFor("sap.ui.mdc");
             const sShowText = oRessourceBundle.getText("valuehelp.SHOWADVSEARCH");
             const sHideText = oRessourceBundle.getText("valuehelp.HIDEADVSEARCH");
             return this.waitFor({

@@ -5,16 +5,14 @@ sap.ui.define([
 	"sap/ui/unified/Calendar",
 	"sap/ui/unified/calendar/CustomMonthPicker",
 	"sap/ui/unified/calendar/CustomYearPicker",
-	"sap/m/SegmentedButtonItem",
-	"sap/ui/core/InvisibleText"
+	"sap/m/SegmentedButtonItem"
 ], function(
 	PlanningCalendarHeader,
 	nextUIUpdate,
 	Calendar,
 	CustomMonthPicker,
 	CustomYearPicker,
-	SegmentedButtonItem,
-	InvisibleText
+	SegmentedButtonItem
 ) {
 	"use strict";
 
@@ -39,11 +37,11 @@ sap.ui.define([
 
 	QUnit.module("ARIA");
 
-	QUnit.test("View switch has an invisible label", async function (assert) {
+	QUnit.test("View switch label visibility and references", async function (assert) {
 		var oPlanningCalendarHeader = new PlanningCalendarHeader(),
 			oFirstMockView = new SegmentedButtonItem({ text: "A view" }),
 			oSecondMockView = new SegmentedButtonItem({ text: "Another view" }),
-			$viewSwitch, oViewSwitchLabel;
+			oViewSwitchLabel;
 
 		oPlanningCalendarHeader._oViewSwitch.addItem(oFirstMockView);
 		oPlanningCalendarHeader._oViewSwitch.addItem(oSecondMockView);
@@ -51,10 +49,26 @@ sap.ui.define([
 		oPlanningCalendarHeader.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
-		$viewSwitch = oPlanningCalendarHeader._oViewSwitch.$();
 		oViewSwitchLabel = oPlanningCalendarHeader._oViewSwitchLabel;
-		assert.strictEqual($viewSwitch.attr("aria-labelledby"), oViewSwitchLabel.getId(),
-			"View switch has an invisible label, which indicates its purpose ");
+
+		// Test initial state (SegmentedButton mode)
+		assert.notOk(oViewSwitchLabel.getVisible(), "Label is invisible when view switch is in normal SegmentedButton mode");
+		assert.strictEqual(oViewSwitchLabel.getLabelFor(), null, "Label has no labelFor reference in SegmentedButton mode");
+
+		// Force view switch to select mode to test label behavior
+		oPlanningCalendarHeader._convertViewSwitchToSelect();
+		await nextUIUpdate();
+
+		assert.ok(oViewSwitchLabel.getVisible(), "Label is visible when view switch is in select mode");
+		assert.strictEqual(oViewSwitchLabel.getLabelFor(), oPlanningCalendarHeader._oViewSwitch.getId() + "-select",
+			"Label references the select element when in select mode");
+
+		// Test conversion back to normal mode
+		oPlanningCalendarHeader._convertViewSwitchToSegmentedButton();
+		await nextUIUpdate();
+
+		assert.notOk(oViewSwitchLabel.getVisible(), "Label is invisible again when converted back to SegmentedButton mode");
+		assert.strictEqual(oViewSwitchLabel.getLabelFor(), null, "Label has no labelFor reference when back in SegmentedButton mode");
 
 		oPlanningCalendarHeader.destroy();
 	});

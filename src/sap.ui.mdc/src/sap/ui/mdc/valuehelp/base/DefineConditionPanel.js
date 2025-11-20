@@ -1303,7 +1303,7 @@ sap.ui.define([
 			press: _handleRemoveAll.bind(this)
 		});
 		const oButtonInsert = new Button(this.getId() + "--insert", {
-			icon: IconPool.getIconURI("add"),
+			text: "{$i18n>valuehelp.DEFINECONDITIONS_ADDCONDITION}",
 			visible: { path: "$this>/_pagination" },
 			enabled: { path: "$this>/inputOK" },
 			layoutData: new OverflowToolbarLayoutData({
@@ -1366,11 +1366,6 @@ sap.ui.define([
 		oPanel.addContent(oInvisibleOperatorText);
 		oPanel.addContent(oGrid);
 
-		this._oInvisibleAddOperatorButtonText = new InvisibleText({
-			text: oMessageBundle.getText("valuehelp.DEFINECONDITIONS_ADDCONDITION_DESCRIPTION")
-		});
-		oPanel.addContent(this._oInvisibleAddOperatorButtonText);
-
 		const oAddBtn = new Button(this.getId() + "--addBtn", {
 			press: this.addCondition.bind(this),
 			type: ButtonType.Default,
@@ -1383,8 +1378,7 @@ sap.ui.define([
 				visibleM: { parts: [{ path: "$this>/conditions" }, { path: "$this>/config" }], formatter: _getAddButtonVisible.bind(this) },
 				visibleL: { parts: [{ path: "$this>/conditions" }, { path: "$this>/config" }], formatter: _getAddButtonVisible.bind(this) },
 				visibleXL: { parts: [{ path: "$this>/conditions" }, { path: "$this>/config" }], formatter: _getAddButtonVisible.bind(this) }
-			}),
-			ariaDescribedBy: this._oInvisibleAddOperatorButtonText
+			})
 		});
 
 		oGrid.addContent(oAddBtn);

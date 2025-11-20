@@ -1274,6 +1274,102 @@ sap.ui.define([
 			]);
 		});
 
+		QUnit.test("when reinitialize is called with existing instance", async function(assert) {
+			mockLoader({
+				changes: {
+					changes: [{
+						fileName: "change1",
+						fileType: "change"
+					}]
+				}
+			});
+
+			await FlexState.initialize({
+				reference: sReference,
+				componentId: this.sComponentId
+			});
+
+			const oChange1 = FlexState.getFlexObjectsDataSelector().get({ reference: sReference })[0];
+			FlexState.removeDirtyFlexObjects(sReference, [oChange1]);
+			FlexState.addDirtyFlexObjects(sReference, [oChange1], this.sComponentId);
+
+			mockLoader({
+				changes: {
+					changes: [
+						{
+							fileName: "change1",
+							fileType: "change"
+						}
+					]
+				}
+			});
+
+			await FlexState.reinitialize({
+				reference: sReference,
+				componentId: this.sComponentId,
+				manifest: {},
+				componentData: {}
+			});
+
+			const aChanges = FlexState.getFlexObjectsDataSelector().get({ reference: sReference });
+			assert.strictEqual(
+				UIChangesState.getAllUIChanges(sReference).length,
+				1,
+				"then the change is not duplicated"
+			);
+			assert.strictEqual(aChanges.length, 1, "then the instance is updated with the change");
+		});
+
+		QUnit.test("when reinitialize is called multiple times sequentially", async function(assert) {
+			this.oLoadFlexDataStub = mockLoader();
+
+			await FlexState.reinitialize({
+				reference: sReference,
+				componentId: this.sComponentId,
+				manifest: {},
+				componentData: {}
+			});
+
+			await FlexState.reinitialize({
+				reference: sReference,
+				componentId: this.sComponentId,
+				manifest: {},
+				componentData: {}
+			});
+
+			await FlexState.reinitialize({
+				reference: sReference,
+				componentId: this.sComponentId,
+				manifest: {},
+				componentData: {}
+			});
+
+			assert.strictEqual(this.oLoadFlexDataStub.callCount, 3, "then loadFlexData is called for each reinitialize");
+			assert.ok(FlexState.isInitialized({ reference: sReference }), "then FlexState remains initialized");
+		});
+
+		QUnit.test("when reinitialize is called without existing instance", async function(assert) {
+			mockLoader({
+				changes: {
+					changes: [{
+						fileName: "change1",
+						fileType: "change"
+					}]
+				}
+			});
+
+			await FlexState.reinitialize({
+				reference: sReference,
+				componentId: this.sComponentId,
+				manifest: {},
+				componentData: {}
+			});
+
+			const aChanges = FlexState.getFlexObjectsDataSelector().get({ reference: sReference });
+			assert.strictEqual(aChanges.length, 1, "then the instance is initialized with the changes");
+			assert.ok(FlexState.isInitialized({ reference: sReference }), "then FlexState is initialized");
+		});
+
 		QUnit.test("An unknown object is returned from storage", function(assert) {
 			var fnDone = assert.async();
 			FlexState.initialize({

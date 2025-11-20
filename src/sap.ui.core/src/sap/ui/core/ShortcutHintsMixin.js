@@ -378,7 +378,9 @@ sap.ui.define([
 	ShortcutHintsMixin.prototype._updateShortcutHintAccLabel = function(oHintInfo) {
 		var oInvText,
 			sInvTextId,
-			oControl;
+			oControl,
+			oDOMElement,
+			bHasAriaKeyshortcuts;
 
 		if (!oHintInfo.addAccessibilityLabel) {
 			return;
@@ -390,6 +392,16 @@ sap.ui.define([
 			return;
 		}
 
+		// Check if the target DOM element already has aria-keyshortcuts
+		oDOMElement = document.getElementById(oHintInfo.id);
+		bHasAriaKeyshortcuts = oDOMElement && oDOMElement.hasAttribute("aria-keyshortcuts");
+
+		// If aria-keyshortcuts is present, don't add aria-describedby to avoid duplication
+		if (bHasAriaKeyshortcuts) {
+			return;
+		}
+
+		// Only add aria-describedby if aria-keyshortcuts is not available
 		oInvText = getInvisibleText(oControl);
 		sInvTextId = oInvText.getId();
 

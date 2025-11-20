@@ -112,6 +112,7 @@ sap.ui.define([
 			this.oAddElementsDialog.attachOpened(function() {
 				assert.ok(true, "then dialog pops up,");
 				assert.equal(this.getTitle(), "hugo", "then the title is set");
+				assert.strictEqual(this._oDialog.getTitle(), "hugo", "then the title is also set on the internal dialog");
 				assert.equal(this._oList.getItems().length, 5, "then 5 elements internally known");
 				assert.equal(this.getElements().length, 5, "then 5 elements externally known");
 				assert.equal(this.getSelectedElements().length, 2, "then 2 selected elements");
@@ -121,6 +122,10 @@ sap.ui.define([
 					"was original",
 					"then the originalLabel is set"
 				);
+
+				this.setTitle("new title");
+				assert.equal(this.getTitle(), "new title", "then the title is changed");
+				assert.strictEqual(this._oDialog.getTitle(), "new title", "then the title is also changed on the internal dialog");
 				done();
 			});
 			this.oAddElementsDialog.open();

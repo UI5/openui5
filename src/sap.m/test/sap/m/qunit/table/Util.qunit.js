@@ -27,8 +27,10 @@ sap.ui.define([
 	"sap/ui/model/odata/v2/ODataListBinding",
 	"sap/ui/core/InvisibleMessage",
 	"sap/m/Text",
-	"sap/m/HBox"
-], function(nextUIUpdate, Library, Theming, List, Util, Table, ThemeParameters, Filter, JSONListBinding, BooleanType, Byte, DateType, DateTime, DateTimeWithTimezone, Decimal, Double, Single, Guid, Int16, Int32, Int64, SByte, StringType, Time, TimeOfDay, ODataListBinding, InvisibleMessage, Text, HBox) {
+	"sap/m/HBox",
+	"sap/m/plugins/CellSelector",
+	"sap/m/plugins/DataStateIndicator"
+], function(nextUIUpdate, Library, Theming, List, Util, Table, ThemeParameters, Filter, JSONListBinding, BooleanType, Byte, DateType, DateTime, DateTimeWithTimezone, Decimal, Double, Single, Guid, Int16, Int32, Int64, SByte, StringType, Time, TimeOfDay, ODataListBinding, InvisibleMessage, Text, HBox, CellSelector, DataStateIndicator) {
 	"use strict";
 	/* global QUnit,sinon */
 
@@ -519,5 +521,19 @@ sap.ui.define([
 		mSettings.listItemContentTemplate = oTemplate;
 		await Util.createOrUpdateMultiUnitPopover(oPopover, mSettings);
 		assert.ok(oPopover.getContent()[0].getBindingInfo("items").template.getContent()[0].getId(), oTemplate.getId(), "Item template is reused");
+	});
+
+	QUnit.test("cleanupPluginsBeforeDestroy", function(assert) {
+		const oTable = new Table({
+			dependents: [
+				new CellSelector(),
+				new Text(),
+				new DataStateIndicator()
+			]
+		});
+
+		Util.cleanupPluginsBeforeDestroy(oTable);
+		assert.equal(oTable.getDependents().length, 1, "Only one dependent remains after cleanup");
+		assert.ok(oTable.getDependents()[0].isA("sap.m.Text"), "The remaining dependent is the Text instance");
 	});
 });
