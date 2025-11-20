@@ -44,33 +44,6 @@ sap.ui.define([
 	Localization.setLanguage("en");
 	document.body.className = document.body.className + " sapUiSizeCompact ";
 
-	function cleanUUIDAndPosition(oValue) {
-		var oClonedValue = deepClone(oValue, 500);
-		if (typeof oClonedValue === "string") {
-			oClonedValue = JSON.parse(oClonedValue);
-		}
-		if (Array.isArray(oClonedValue)) {
-			oClonedValue.forEach(function(oResult) {
-				if (oResult._dt) {
-					delete oResult._dt._uuid;
-					delete oResult._dt._position;
-				}
-				if (deepEqual(oResult._dt, {})) {
-					delete oResult._dt;
-				}
-			});
-		} else if (typeof oClonedValue === "object") {
-			if (oClonedValue._dt) {
-				delete oClonedValue._dt._uuid;
-				delete oClonedValue._dt._position;
-			}
-			if (deepEqual(oClonedValue._dt, {})) {
-				delete oClonedValue._dt;
-			}
-		}
-		return oClonedValue;
-	}
-
 	QUnit.module("basic", {
 		before: function () {
 			this.oMockServer = new MockServer();
@@ -157,35 +130,35 @@ sap.ui.define([
 							assert.ok(!oSelectOrUnSelectAllButton.getSelected(), "Table: Select or Unselect All button in Selection column not selected");
 
 							var oRow1 = oTable.getRows()[0];
-							assert.ok(deepEqual(cleanUUIDAndPosition(oRow1.getBindingContext().getObject()), Object.assign(deepClone(oValue1Ori), {"_dt": {"_editable": false}})), "Row 1: value");
+							assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oRow1.getBindingContext().getObject()), Object.assign(deepClone(oValue1Ori), {"_dt": {"_editable": false}})), "Row 1: value");
 							var oSelectionCell1 = oRow1.getCells()[0];
 							assert.ok(oSelectionCell1.getVisible(), "Row 1: cell1 selection checkbox Visible");
 							assert.ok(oSelectionCell1.getEnabled(), "Row 1: cell1 selection checkbox Enabled");
 							assert.ok(!oSelectionCell1.getSelected(), "Row 1: cell1 selection checkbox not selected");
 
 							var oRow2 = oTable.getRows()[1];
-							assert.ok(deepEqual(cleanUUIDAndPosition(oRow2.getBindingContext().getObject()), Object.assign(deepClone(oValue2Ori), {"_dt": {"_editable": false}})), "Row 2: value");
+							assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oRow2.getBindingContext().getObject()), Object.assign(deepClone(oValue2Ori), {"_dt": {"_editable": false}})), "Row 2: value");
 							var oSelectionCell2 = oRow2.getCells()[0];
 							assert.ok(oSelectionCell2.getVisible(), "Row 2: cell1 selection checkbox Visible");
 							assert.ok(oSelectionCell2.getEnabled(), "Row 2: cell1 selection checkbox Enabled");
 							assert.ok(!oSelectionCell2.getSelected(), "Row 2: cell1 selection checkbox not selected");
 
 							var oRow3 = oTable.getRows()[2];
-							assert.ok(deepEqual(cleanUUIDAndPosition(oRow3.getBindingContext().getObject()), Object.assign(deepClone(oValue3Ori), {"_dt": {"_editable": false}})), "Row 3: value");
+							assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oRow3.getBindingContext().getObject()), Object.assign(deepClone(oValue3Ori), {"_dt": {"_editable": false}})), "Row 3: value");
 							var oSelectionCell3 = oRow3.getCells()[0];
 							assert.ok(oSelectionCell3.getVisible(), "Row 3: cell1 selection checkbox Visible");
 							assert.ok(oSelectionCell3.getEnabled(), "Row 3: cell1 selection checkbox Enabled");
 							assert.ok(!oSelectionCell3.getSelected(), "Row 3: cell1 selection checkbox not selected");
 
 							var oRow4 = oTable.getRows()[3];
-							assert.ok(deepEqual(cleanUUIDAndPosition(oRow4.getBindingContext().getObject()), Object.assign(deepClone(oValue4Ori), {"_dt": {"_editable": false}})), "Row 4: value");
+							assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oRow4.getBindingContext().getObject()), Object.assign(deepClone(oValue4Ori), {"_dt": {"_editable": false}})), "Row 4: value");
 							var oSelectionCell4 = oRow4.getCells()[0];
 							assert.ok(oSelectionCell4.getVisible(), "Row 4: cell1 selection checkbox Visible");
 							assert.ok(oSelectionCell4.getEnabled(), "Row 4: cell1 selection checkbox Enabled");
 							assert.ok(!oSelectionCell4.getSelected(), "Row 4: cell1 selection checkbox not selected");
 
 							var oRow5 = oTable.getRows()[4];
-							assert.ok(deepEqual(cleanUUIDAndPosition(oRow5.getBindingContext().getObject()), Object.assign(deepClone(oValue5Ori), {"_dt": {"_editable": false}})), "Row 5: value");
+							assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oRow5.getBindingContext().getObject()), Object.assign(deepClone(oValue5Ori), {"_dt": {"_editable": false}})), "Row 5: value");
 							var oSelectionCell5 = oRow5.getCells()[0];
 							assert.ok(oSelectionCell5.getVisible(), "Row 5: cell1 selection checkbox Visible");
 							assert.ok(oSelectionCell5.getEnabled(), "Row 5: cell1 selection checkbox Enabled");
@@ -207,21 +180,21 @@ sap.ui.define([
 									oTable._getScrollExtension().getVerticalScrollbar().scrollTop = 400;
 									EditorQunitUtils.wait().then(function () {
 										var oRow6 = oTable.getRows()[2];
-										assert.ok(deepEqual(cleanUUIDAndPosition(oRow6.getBindingContext().getObject()), Object.assign(deepClone(oValue6Ori), {"_dt": {"_editable": false}})), "Row 6: value");
+										assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oRow6.getBindingContext().getObject()), Object.assign(deepClone(oValue6Ori), {"_dt": {"_editable": false}})), "Row 6: value");
 										var oSelectionCell6 = oRow6.getCells()[0];
 										assert.ok(oSelectionCell6.getVisible(), "Row 6: cell1 selection checkbox Visible");
 										assert.ok(oSelectionCell6.getEnabled(), "Row 6: cell1 selection checkbox Enabled");
 										assert.ok(!oSelectionCell6.getSelected(), "Row 6: cell1 selection checkbox not selected");
 
 										var oRow7 = oTable.getRows()[3];
-										assert.ok(deepEqual(cleanUUIDAndPosition(oRow7.getBindingContext().getObject()), Object.assign(deepClone(oValue7Ori), {"_dt": {"_editable": false}})), "Row 7: value");
+										assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oRow7.getBindingContext().getObject()), Object.assign(deepClone(oValue7Ori), {"_dt": {"_editable": false}})), "Row 7: value");
 										var oSelectionCell7 = oRow7.getCells()[0];
 										assert.ok(oSelectionCell7.getVisible(), "Row 7: cell1 selection checkbox Visible");
 										assert.ok(oSelectionCell7.getEnabled(), "Row 7: cell1 selection checkbox Enabled");
 										assert.ok(!oSelectionCell7.getSelected(), "Row 7: cell1 selection checkbox not selected");
 
 										var oRow8 = oTable.getRows()[4];
-										assert.ok(deepEqual(cleanUUIDAndPosition(oRow8.getBindingContext().getObject()), Object.assign(deepClone(oValue8Ori), {"_dt": {"_editable": false}})), "Row 8: value");
+										assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oRow8.getBindingContext().getObject()), Object.assign(deepClone(oValue8Ori), {"_dt": {"_editable": false}})), "Row 8: value");
 										var oSelectionCell8 = oRow8.getCells()[0];
 										assert.ok(oSelectionCell8.getVisible(), "Row 8: cell1 selection checkbox Visible");
 										assert.ok(oSelectionCell8.getEnabled(), "Row 8: cell1 selection checkbox Enabled");
@@ -285,7 +258,7 @@ sap.ui.define([
 					assert.ok(oLabel.isA("sap.m.Label"), "Label 1: Form content contains a Label");
 					assert.equal(oLabel.getText(), "Object properties defined: value from request", "Label 1: Has label text");
 					assert.ok(oField.isA("sap.ui.integration.editor.fields.ObjectListField"), "Field 1: Object List Field");
-					assert.ok(deepEqual(cleanUUIDAndPosition(oField._getCurrentProperty("value")), [
+					assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), [
 						Object.assign(deepClone(oValue1Ori), {"_dt": {"_editable": false}}),
 						Object.assign(deepClone(oValue2Ori), {"_dt": {"_editable": false}}),
 						Object.assign(deepClone(oValue3Ori), {"_dt": {"_editable": false}}),
@@ -319,35 +292,35 @@ sap.ui.define([
 							assert.ok(oSelectOrUnSelectAllButton.getSelected(), "Table: Select or Unselect All button in Selection column selected");
 
 							var oRow1 = oTable.getRows()[0];
-							assert.ok(deepEqual(cleanUUIDAndPosition(oRow1.getBindingContext().getObject()), Object.assign(deepClone(oValue1Ori), {"_dt": {"_editable": false, "_selected": true}})), "Row 1: value");
+							assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oRow1.getBindingContext().getObject()), Object.assign(deepClone(oValue1Ori), {"_dt": {"_editable": false, "_selected": true}})), "Row 1: value");
 							var oSelectionCell1 = oRow1.getCells()[0];
 							assert.ok(oSelectionCell1.getVisible(), "Row 1: cell1 selection checkbox Visible");
 							assert.ok(oSelectionCell1.getEnabled(), "Row 1: cell1 selection checkbox Enabled");
 							assert.ok(oSelectionCell1.getSelected(), "Row 1: cell1 selection checkbox selected");
 
 							var oRow2 = oTable.getRows()[1];
-							assert.ok(deepEqual(cleanUUIDAndPosition(oRow2.getBindingContext().getObject()), Object.assign(deepClone(oValue2Ori), {"_dt": {"_editable": false, "_selected": true}})), "Row 2: value");
+							assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oRow2.getBindingContext().getObject()), Object.assign(deepClone(oValue2Ori), {"_dt": {"_editable": false, "_selected": true}})), "Row 2: value");
 							var oSelectionCell2 = oRow2.getCells()[0];
 							assert.ok(oSelectionCell2.getVisible(), "Row 2: cell1 selection checkbox Visible");
 							assert.ok(oSelectionCell2.getEnabled(), "Row 2: cell1 selection checkbox Enabled");
 							assert.ok(oSelectionCell2.getSelected(), "Row 2: cell1 selection checkbox selected");
 
 							var oRow3 = oTable.getRows()[2];
-							assert.ok(deepEqual(cleanUUIDAndPosition(oRow3.getBindingContext().getObject()), Object.assign(deepClone(oValue3Ori), {"_dt": {"_editable": false, "_selected": true}})), "Row 3: value");
+							assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oRow3.getBindingContext().getObject()), Object.assign(deepClone(oValue3Ori), {"_dt": {"_editable": false, "_selected": true}})), "Row 3: value");
 							var oSelectionCell3 = oRow3.getCells()[0];
 							assert.ok(oSelectionCell3.getVisible(), "Row 3: cell1 selection checkbox Visible");
 							assert.ok(oSelectionCell3.getEnabled(), "Row 3: cell1 selection checkbox Enabled");
 							assert.ok(oSelectionCell3.getSelected(), "Row 3: cell1 selection checkbox selected");
 
 							var oRow4 = oTable.getRows()[3];
-							assert.ok(deepEqual(cleanUUIDAndPosition(oRow4.getBindingContext().getObject()), Object.assign(deepClone(oValue4Ori), {"_dt": {"_editable": false, "_selected": true}})), "Row 4: value");
+							assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oRow4.getBindingContext().getObject()), Object.assign(deepClone(oValue4Ori), {"_dt": {"_editable": false, "_selected": true}})), "Row 4: value");
 							var oSelectionCell4 = oRow4.getCells()[0];
 							assert.ok(oSelectionCell4.getVisible(), "Row 4: cell1 selection checkbox Visible");
 							assert.ok(oSelectionCell4.getEnabled(), "Row 4: cell1 selection checkbox Enabled");
 							assert.ok(oSelectionCell4.getSelected(), "Row 4: cell1 selection checkbox selected");
 
 							var oRow5 = oTable.getRows()[4];
-							assert.ok(deepEqual(cleanUUIDAndPosition(oRow5.getBindingContext().getObject()), Object.assign(deepClone(oValue5Ori), {"_dt": {"_editable": false, "_selected": true}})), "Row 5: value");
+							assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oRow5.getBindingContext().getObject()), Object.assign(deepClone(oValue5Ori), {"_dt": {"_editable": false, "_selected": true}})), "Row 5: value");
 							var oSelectionCell5 = oRow5.getCells()[0];
 							assert.ok(oSelectionCell5.getVisible(), "Row 5: cell1 selection checkbox Visible");
 							assert.ok(oSelectionCell5.getEnabled(), "Row 5: cell1 selection checkbox Enabled");
@@ -369,21 +342,21 @@ sap.ui.define([
 									oTable._getScrollExtension().getVerticalScrollbar().scrollTop = 400;
 									EditorQunitUtils.wait().then(function () {
 										var oRow6 = oTable.getRows()[2];
-										assert.ok(deepEqual(cleanUUIDAndPosition(oRow6.getBindingContext().getObject()), Object.assign(deepClone(oValue6Ori), {"_dt": {"_editable": false, "_selected": true}})), "Row 6: value");
+										assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oRow6.getBindingContext().getObject()), Object.assign(deepClone(oValue6Ori), {"_dt": {"_editable": false, "_selected": true}})), "Row 6: value");
 										var oSelectionCell6 = oRow6.getCells()[0];
 										assert.ok(oSelectionCell6.getVisible(), "Row 6: cell1 selection checkbox Visible");
 										assert.ok(oSelectionCell6.getEnabled(), "Row 6: cell1 selection checkbox Enabled");
 										assert.ok(oSelectionCell6.getSelected(), "Row 6: cell1 selection checkbox selected");
 
 										var oRow7 = oTable.getRows()[3];
-										assert.ok(deepEqual(cleanUUIDAndPosition(oRow7.getBindingContext().getObject()), Object.assign(deepClone(oValue7Ori), {"_dt": {"_editable": false, "_selected": true}})), "Row 7: value");
+										assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oRow7.getBindingContext().getObject()), Object.assign(deepClone(oValue7Ori), {"_dt": {"_editable": false, "_selected": true}})), "Row 7: value");
 										var oSelectionCell7 = oRow7.getCells()[0];
 										assert.ok(oSelectionCell7.getVisible(), "Row 7: cell1 selection checkbox Visible");
 										assert.ok(oSelectionCell7.getEnabled(), "Row 7: cell1 selection checkbox Enabled");
 										assert.ok(oSelectionCell7.getSelected(), "Row 7: cell1 selection checkbox selected");
 
 										var oRow8 = oTable.getRows()[4];
-										assert.ok(deepEqual(cleanUUIDAndPosition(oRow8.getBindingContext().getObject()), Object.assign(deepClone(oValue8Ori), {"_dt": {"_editable": false, "_selected": true}})), "Row 8: value");
+										assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oRow8.getBindingContext().getObject()), Object.assign(deepClone(oValue8Ori), {"_dt": {"_editable": false, "_selected": true}})), "Row 8: value");
 										var oSelectionCell8 = oRow8.getCells()[0];
 										assert.ok(oSelectionCell8.getVisible(), "Row 8: cell1 selection checkbox Visible");
 										assert.ok(oSelectionCell8.getEnabled(), "Row 8: cell1 selection checkbox Enabled");
@@ -463,14 +436,14 @@ sap.ui.define([
 							var oSelectionCell1 = oTable.getRows()[0].getCells()[0];
 							oSelectionCell1.setSelected(true);
 							oSelectionCell1.fireSelect({ selected: true });
-							assert.ok(deepEqual(cleanUUIDAndPosition(oField._getCurrentProperty("value")), [
+							assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), [
 								Object.assign(deepClone(oValue1Ori), {"_dt": {"_editable": false}})
 							]), "Field 1: Value after selecting row1");
 
 							var oSelectionCell2 = oTable.getRows()[1].getCells()[0];
 							oSelectionCell2.setSelected(true);
 							oSelectionCell2.fireSelect({ selected: true });
-							assert.ok(deepEqual(cleanUUIDAndPosition(oField._getCurrentProperty("value")), [
+							assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), [
 								Object.assign(deepClone(oValue1Ori), {"_dt": {"_editable": false}}),
 								Object.assign(deepClone(oValue2Ori), {"_dt": {"_editable": false}})
 							]), "Field 1: Value after selecting row2");
@@ -478,7 +451,7 @@ sap.ui.define([
 							var oSelectionCell3 = oTable.getRows()[2].getCells()[0];
 							oSelectionCell3.setSelected(true);
 							oSelectionCell3.fireSelect({ selected: true });
-							assert.ok(deepEqual(cleanUUIDAndPosition(oField._getCurrentProperty("value")), [
+							assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), [
 								Object.assign(deepClone(oValue1Ori), {"_dt": {"_editable": false}}),
 								Object.assign(deepClone(oValue2Ori), {"_dt": {"_editable": false}}),
 								Object.assign(deepClone(oValue3Ori), {"_dt": {"_editable": false}})
@@ -487,7 +460,7 @@ sap.ui.define([
 							var oSelectionCell4 = oTable.getRows()[3].getCells()[0];
 							oSelectionCell4.setSelected(true);
 							oSelectionCell4.fireSelect({ selected: true });
-							assert.ok(deepEqual(cleanUUIDAndPosition(oField._getCurrentProperty("value")), [
+							assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), [
 								Object.assign(deepClone(oValue1Ori), {"_dt": {"_editable": false}}),
 								Object.assign(deepClone(oValue2Ori), {"_dt": {"_editable": false}}),
 								Object.assign(deepClone(oValue3Ori), {"_dt": {"_editable": false}}),
@@ -497,7 +470,7 @@ sap.ui.define([
 							var oSelectionCell5 = oTable.getRows()[4].getCells()[0];
 							oSelectionCell5.setSelected(true);
 							oSelectionCell5.fireSelect({ selected: true });
-							assert.ok(deepEqual(cleanUUIDAndPosition(oField._getCurrentProperty("value")), [
+							assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), [
 								Object.assign(deepClone(oValue1Ori), {"_dt": {"_editable": false}}),
 								Object.assign(deepClone(oValue2Ori), {"_dt": {"_editable": false}}),
 								Object.assign(deepClone(oValue3Ori), {"_dt": {"_editable": false}}),
@@ -524,7 +497,7 @@ sap.ui.define([
 										var oSelectionCell6 = oTable.getRows()[2].getCells()[0];
 										oSelectionCell6.setSelected(true);
 										oSelectionCell6.fireSelect({ selected: true });
-										assert.ok(deepEqual(cleanUUIDAndPosition(oField._getCurrentProperty("value")), [
+										assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), [
 											Object.assign(deepClone(oValue1Ori), {"_dt": {"_editable": false}}),
 											Object.assign(deepClone(oValue2Ori), {"_dt": {"_editable": false}}),
 											Object.assign(deepClone(oValue3Ori), {"_dt": {"_editable": false}}),
@@ -536,7 +509,7 @@ sap.ui.define([
 										var oSelectionCell7 = oTable.getRows()[3].getCells()[0];
 										oSelectionCell7.setSelected(true);
 										oSelectionCell7.fireSelect({ selected: true });
-										assert.ok(deepEqual(cleanUUIDAndPosition(oField._getCurrentProperty("value")), [
+										assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), [
 											Object.assign(deepClone(oValue1Ori), {"_dt": {"_editable": false}}),
 											Object.assign(deepClone(oValue2Ori), {"_dt": {"_editable": false}}),
 											Object.assign(deepClone(oValue3Ori), {"_dt": {"_editable": false}}),
@@ -550,7 +523,7 @@ sap.ui.define([
 										var oSelectionCell8 = oTable.getRows()[4].getCells()[0];
 										oSelectionCell8.setSelected(true);
 										oSelectionCell8.fireSelect({ selected: true });
-										assert.ok(deepEqual(cleanUUIDAndPosition(oField._getCurrentProperty("value")), [
+										assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), [
 											Object.assign(deepClone(oValue1Ori), {"_dt": {"_editable": false}}),
 											Object.assign(deepClone(oValue2Ori), {"_dt": {"_editable": false}}),
 											Object.assign(deepClone(oValue3Ori), {"_dt": {"_editable": false}}),
@@ -623,7 +596,7 @@ sap.ui.define([
 					assert.ok(oLabel.isA("sap.m.Label"), "Label 1: Form content contains a Label");
 					assert.equal(oLabel.getText(), "Object properties defined: value from request", "Label 1: Has label text");
 					assert.ok(oField.isA("sap.ui.integration.editor.fields.ObjectListField"), "Field 1: Object List Field");
-					assert.ok(deepEqual(cleanUUIDAndPosition(oField._getCurrentProperty("value")), [
+					assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), [
 						Object.assign(deepClone(oValue1Ori), {"_dt": {"_editable": false}}),
 						Object.assign(deepClone(oValue2Ori), {"_dt": {"_editable": false}}),
 						Object.assign(deepClone(oValue3Ori), {"_dt": {"_editable": false}}),
@@ -659,7 +632,7 @@ sap.ui.define([
 							var oSelectionCell1 = oTable.getRows()[0].getCells()[0];
 							oSelectionCell1.setSelected(false);
 							oSelectionCell1.fireSelect({ selected: false });
-							assert.ok(deepEqual(cleanUUIDAndPosition(oField._getCurrentProperty("value")), [
+							assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), [
 								Object.assign(deepClone(oValue2Ori), {"_dt": {"_editable": false}}),
 								Object.assign(deepClone(oValue3Ori), {"_dt": {"_editable": false}}),
 								Object.assign(deepClone(oValue4Ori), {"_dt": {"_editable": false}}),
@@ -673,7 +646,7 @@ sap.ui.define([
 							var oSelectionCell2 = oTable.getRows()[1].getCells()[0];
 							oSelectionCell2.setSelected(false);
 							oSelectionCell2.fireSelect({ selected: false });
-							assert.ok(deepEqual(cleanUUIDAndPosition(oField._getCurrentProperty("value")), [
+							assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), [
 								Object.assign(deepClone(oValue3Ori), {"_dt": {"_editable": false}}),
 								Object.assign(deepClone(oValue4Ori), {"_dt": {"_editable": false}}),
 								Object.assign(deepClone(oValue5Ori), {"_dt": {"_editable": false}}),
@@ -686,7 +659,7 @@ sap.ui.define([
 							var oSelectionCell3 = oTable.getRows()[2].getCells()[0];
 							oSelectionCell3.setSelected(false);
 							oSelectionCell3.fireSelect({ selected: false });
-							assert.ok(deepEqual(cleanUUIDAndPosition(oField._getCurrentProperty("value")), [
+							assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), [
 								Object.assign(deepClone(oValue4Ori), {"_dt": {"_editable": false}}),
 								Object.assign(deepClone(oValue5Ori), {"_dt": {"_editable": false}}),
 								Object.assign(deepClone(oValue6Ori), {"_dt": {"_editable": false}}),
@@ -697,7 +670,7 @@ sap.ui.define([
 							var oSelectionCell4 = oTable.getRows()[3].getCells()[0];
 							oSelectionCell4.setSelected(false);
 							oSelectionCell4.fireSelect({ selected: false });
-							assert.ok(deepEqual(cleanUUIDAndPosition(oField._getCurrentProperty("value")), [
+							assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), [
 								Object.assign(deepClone(oValue5Ori), {"_dt": {"_editable": false}}),
 								Object.assign(deepClone(oValue6Ori), {"_dt": {"_editable": false}}),
 								Object.assign(deepClone(oValue7Ori), {"_dt": {"_editable": false}}),
@@ -707,7 +680,7 @@ sap.ui.define([
 							var oSelectionCell5 = oTable.getRows()[4].getCells()[0];
 							oSelectionCell5.setSelected(false);
 							oSelectionCell5.fireSelect({ selected: false });
-							assert.ok(deepEqual(cleanUUIDAndPosition(oField._getCurrentProperty("value")), [
+							assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), [
 								Object.assign(deepClone(oValue6Ori), {"_dt": {"_editable": false}}),
 								Object.assign(deepClone(oValue7Ori), {"_dt": {"_editable": false}}),
 								Object.assign(deepClone(oValue8Ori), {"_dt": {"_editable": false}})
@@ -731,7 +704,7 @@ sap.ui.define([
 										var oSelectionCell6 = oTable.getRows()[2].getCells()[0];
 										oSelectionCell6.setSelected(false);
 										oSelectionCell6.fireSelect({ selected: false });
-										assert.ok(deepEqual(cleanUUIDAndPosition(oField._getCurrentProperty("value")), [
+										assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), [
 											Object.assign(deepClone(oValue7Ori), {"_dt": {"_editable": false}}),
 											Object.assign(deepClone(oValue8Ori), {"_dt": {"_editable": false}})
 										]), "Field 1: Value after deselecting row6");
@@ -739,7 +712,7 @@ sap.ui.define([
 										var oSelectionCell7 = oTable.getRows()[3].getCells()[0];
 										oSelectionCell7.setSelected(false);
 										oSelectionCell7.fireSelect({ selected: false });
-										assert.ok(deepEqual(cleanUUIDAndPosition(oField._getCurrentProperty("value")), [
+										assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), [
 											Object.assign(deepClone(oValue8Ori), {"_dt": {"_editable": false}})
 										]), "Field 1: Value after deselecting row7");
 
@@ -751,7 +724,7 @@ sap.ui.define([
 
 										oSelectOrUnSelectAllButton.setSelected(true);
 										oSelectOrUnSelectAllButton.fireSelect({ selected: true });
-										assert.ok(deepEqual(cleanUUIDAndPosition(oField._getCurrentProperty("value")), [
+										assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), [
 											Object.assign(deepClone(oValue1Ori), {"_dt": {"_editable": false}}),
 											Object.assign(deepClone(oValue2Ori), {"_dt": {"_editable": false}}),
 											Object.assign(deepClone(oValue3Ori), {"_dt": {"_editable": false}}),

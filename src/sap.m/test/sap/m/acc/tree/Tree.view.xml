@@ -1,0 +1,32 @@
+<mvc:View
+	height="100%"
+	controllerName="sap.m.acc.tree.Tree"
+	xmlns:l="sap.ui.layout"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:core="sap.ui.core"
+	xmlns="sap.m"
+	displayBlock="true">
+	<App>
+		<Page
+			title="ACC Test Page for sap.m.Tree">
+			<content>
+				<core:Fragment fragmentName="sap.m.acc.tree.fragment.Config" type="XML"/>
+				<Tree
+					id="Tree"
+					headerText="Tree"
+					items="{path: '/'}"
+					mode="{treeConfig>/selectionMode}"
+					itemActionCount="{= ${treeConfig>/showRowActions} ? 2 : 0 }"
+					itemActionPress=".onItemActionPress">
+					<StandardTreeItem
+						title="{text}"
+						icon="{= ${treeConfig>/withIcon} ? ${ref} : '' }">
+						<actions>
+							<core:Fragment fragmentName="sap.m.acc.tree.fragment.Actions" type="XML"/>
+						</actions>
+					</StandardTreeItem>
+				</Tree>
+			</content>
+		</Page>
+	</App>
+</mvc:View>

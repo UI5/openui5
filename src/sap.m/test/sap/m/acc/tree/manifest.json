@@ -1,0 +1,39 @@
+{
+	"_version": "2.0.0",
+	"sap.app": {
+		"id": "sap.m.acc.tree",
+		"applicationVersion": {
+			"version": "1.0.0"
+		},
+		"type": "application",
+		"title": "Application 'sap.m.acc.tree'"
+	},
+	"sap.ui": {
+		"technology": "UI5",
+		"deviceTypes": {
+			"desktop": true,
+			"tablet": true,
+			"phone": true
+		}
+	},
+	"sap.ui5": {
+		"rootView": "sap.m.acc.tree.Tree",
+		"dependencies": {
+			"minUI5Version": "2.0.0",
+			"libs": {
+				"sap.m": {},
+				"sap.ui.core": {},
+				"sap.ui.layout": {}
+			}
+		},
+		"config": {
+			"sample": {
+				"files": [
+					"Tree.view.xml",
+					"Tree.controller.js",
+					"manifest.json"
+				]
+			}
+		}
+	}
+}

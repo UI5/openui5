@@ -278,13 +278,13 @@ sap.ui.define([
 	}
 
 	/**
-			 * Loads a controller class or a controller-extension
-			 *
-			 * @param {string} sName the controller name
-			 * @param {string} sViewId the ID of the View to which the loaded controller/extensions should be connected
-			 * @return {sap.ui.core.mvc.Controller | Promise} oController <code>Promise</code> in case of asynchronous loading
-			 *           or <code>undefined</code> in case of synchronous loading
-			 */
+	 * Loads a controller class or a controller-extension
+	 *
+	 * @param {string} sName the controller name
+	 * @param {string} sViewId the ID of the View to which the loaded controller/extensions should be connected
+	 * @return {sap.ui.core.mvc.Controller | Promise} oController <code>Promise</code> in case of asynchronous loading
+	 *           or <code>undefined</code> in case of synchronous loading
+	 */
 	function loadControllerClass(sName, sViewId) {
 		if (typeof sName !== "string") {
 			throw new Error("Controller name ('sName' parameter) is required and must be typeof 'string'");
@@ -358,18 +358,18 @@ sap.ui.define([
 	}
 
 	/**
-			 * This function can be used to extend a controller with controller
-			 * extensions returned by controller extension provider.
-			 *
-			 * @param {object|sap.ui.core.mvc.Controller} oController Controller to extend
-			 * @param {string} sName Name of the controller
-			 * @param {sap.ui.core.ID|undefined} sOwnerId the ID of the owner component to which this controller belongs,
-			 *                                            or undefined if the controller is not associated to a component
-			 * @param {sap.ui.core.ID|undefined} sViewId the ID of the corresponding View for <code>oController</code>, or undefined if the controller is created via the the factory
-			 * @return {sap.ui.core.mvc.Controller|Promise} A <code>Promise</code> in case of asynchronous extend
-			 *           or the <code>controller</code> in case of synchronous extend
-			 * @private
-			 */
+	 * This function can be used to extend a controller with controller
+	 * extensions returned by controller extension provider.
+	 *
+	 * @param {object|sap.ui.core.mvc.Controller} oController Controller to extend
+	 * @param {string} sName Name of the controller
+	 * @param {sap.ui.core.ID|undefined} sOwnerId the ID of the owner component to which this controller belongs,
+	 *                                            or undefined if the controller is not associated to a component
+	 * @param {sap.ui.core.ID|undefined} sViewId the ID of the corresponding View for <code>oController</code>, or undefined if the controller is created via the the factory
+	 * @return {sap.ui.core.mvc.Controller|Promise} A <code>Promise</code> in case of asynchronous extend
+	 *           or the <code>controller</code> in case of synchronous extend
+	 * @private
+	 */
 	Controller.applyExtensions = function(oController, sName, sOwnerId, sViewId) {
 		/**
 		 * Retrieves the controller-extension with the given name asynchronously.
@@ -435,11 +435,11 @@ sap.ui.define([
 	};
 
 	/**
-			 * Old controller factory implementation
-			 * @param {string} sName
-			 * @param {Object|undefined} oControllerImpl
-			 * @param {string|undefined} sViewId
-			 */
+	 * Old controller factory implementation
+	 * @param {string} sName
+	 * @param {Object|undefined} oControllerImpl
+	 * @param {string|undefined} sViewId
+	 */
 	function controllerFactory(sName, oControllerImpl, sViewId) {
 		var sOwnerId = getCurrentOwnerId();
 

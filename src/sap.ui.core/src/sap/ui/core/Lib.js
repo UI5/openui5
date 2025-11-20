@@ -355,17 +355,17 @@ sap.ui.define([
 		},
 
 		/**
-				 * Returns the file type (either js, json, none, or both) that should be used for preloading this library
-				 * instance.
-				 *
-				 * When <code>bJSON</code> is set to <code>true</code>, type "json" is returned directly. When
-				 * <code>bJSON</code> is set to <code>false</code>, type "js" is returned. Otherwise it takes the configured
-				 * file type into consideration. In case of conflict between the given <code>bJSON</code> and the configured
-				 * file type, type "none" is returned.
-				 *
-				 * @returns {string} The determined file type. It can be "js", "json", "none", or "both".
-				 * @private
-				 */
+		 * Returns the file type (either js, json, none, or both) that should be used for preloading this library
+		 * instance.
+		 *
+		 * When <code>bJSON</code> is set to <code>true</code>, type "json" is returned directly. When
+		 * <code>bJSON</code> is set to <code>false</code>, type "js" is returned. Otherwise it takes the configured
+		 * file type into consideration. In case of conflict between the given <code>bJSON</code> and the configured
+		 * file type, type "none" is returned.
+		 *
+		 * @returns {string} The determined file type. It can be "js", "json", "none", or "both".
+		 * @private
+		 */
 		_getFileType: function() {
 			var sFileType;
 			var sConfiguredFileType = mLibraryPreloadFileTypes[this.name] || mLibraryPreloadFileTypes[''] || 'both';
@@ -416,21 +416,21 @@ sap.ui.define([
 		},
 
 		/**
-				 * Internal function for preloading a library which still supports the legacy parameters:
-				 *
-				 * <ul>
-				 * <li><code>mOptions.sync</code>: load the preload file in sync mode</li>
-				 * <li><code>mOptions.json</code>: load the preload file in "json" format</li>
-				 * </ul>
-				 *
-				 * @param [mOptions] The options object that contains the following properties
-				 * @param [mOptions.url] URL to load the library from
-				 * @param [mOptions.lazy] Whether the library-preload-lazy bundle should be loaded instead of the
-				 *  library-preload bundle
-				 * @returns {Promise<Lib>|Lib} A promise that resolves with the library instance in async mode and the library
-				 *  instance itself in sync mode
-				 * @private
-				 */
+		 * Internal function for preloading a library which still supports the legacy parameters:
+		 *
+		 * <ul>
+		 * <li><code>mOptions.sync</code>: load the preload file in sync mode</li>
+		 * <li><code>mOptions.json</code>: load the preload file in "json" format</li>
+		 * </ul>
+		 *
+		 * @param [mOptions] The options object that contains the following properties
+		 * @param [mOptions.url] URL to load the library from
+		 * @param [mOptions.lazy] Whether the library-preload-lazy bundle should be loaded instead of the
+		 *  library-preload bundle
+		 * @returns {Promise<Lib>|Lib} A promise that resolves with the library instance in async mode and the library
+		 *  instance itself in sync mode
+		 * @private
+		 */
 		_preload: function(mOptions) {
 			mOptions = mOptions || {};
 
@@ -542,19 +542,19 @@ sap.ui.define([
 		},
 
 		/**
-				 * Loads the library's preload bundle in JS format. In case the resource "library-preload.js" doesn't exist and
-				 * <code>mOptions.fallbackToJSON</code> is set to <code>true</code>, the library's preload in JSON format will
-				 * be loaded.
-				 *
-				 * @param {object} [mOptions] The options object that contains the following properties
-				 * @param {boolean} [mOptions.fallbackToJSON] Whether to load the preload in JSON format when loading the JS
-				 *  format fails
-				 * @param {boolean} [mOptions.http2] Whether to load the "library-h2-preload" bundle instead of the
-				 * "library-preload" bundle
-				 * @returns {Promise|object} A promise that resolves with the dependency information of the library in async
-				 *  mode or the dependency information directly in sync mode
-				 * @private
-				 */
+		 * Loads the library's preload bundle in JS format. In case the resource "library-preload.js" doesn't exist and
+		 * <code>mOptions.fallbackToJSON</code> is set to <code>true</code>, the library's preload in JSON format will
+		 * be loaded.
+		 *
+		 * @param {object} [mOptions] The options object that contains the following properties
+		 * @param {boolean} [mOptions.fallbackToJSON] Whether to load the preload in JSON format when loading the JS
+		 *  format fails
+		 * @param {boolean} [mOptions.http2] Whether to load the "library-h2-preload" bundle instead of the
+		 * "library-preload" bundle
+		 * @returns {Promise|object} A promise that resolves with the dependency information of the library in async
+		 *  mode or the dependency information directly in sync mode
+		 * @private
+		 */
 		_preloadJSFormat: function(mOptions) {
 			mOptions = mOptions || {};
 

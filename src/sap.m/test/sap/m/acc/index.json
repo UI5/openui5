@@ -232,7 +232,7 @@
 		},
 		{
 			"control": "sap.m.List",
-			"url": "../List.html",
+			"url": "./list/List.html",
 			"desc": "Including StandardListItem, DisplayListItem, InputListItem, CustomListItem",
 			"appComponent": "CA-UI5-TBL",
 			"accTest": {
@@ -669,7 +669,7 @@
 		},
 		{
 			"control": "sap.m.Tree",
-			"url": "../Tree.html",
+			"url": "./tree/Tree.html",
 			"appComponent": "CA-UI5-TBL",
 			"accTest": {
 				"name": "sap.m.Tree",

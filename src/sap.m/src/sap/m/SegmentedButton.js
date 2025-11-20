@@ -112,8 +112,8 @@ function(
 			aggregations : {
 
 				/**
-								 * The buttons of the SegmentedButton control. The items set in this aggregation are used as an interface for the buttons displayed by the control. Only the properties ID, icon, text, enabled and textDirections of the Button control are evaluated. Setting other properties of the button will have no effect. Alternatively, you can use the createButton method to add buttons.
-								 */
+				 * The buttons of the SegmentedButton control. The items set in this aggregation are used as an interface for the buttons displayed by the control. Only the properties ID, icon, text, enabled and textDirections of the Button control are evaluated. Setting other properties of the button will have no effect. Alternatively, you can use the createButton method to add buttons.
+				 */
 				buttons : {type : "sap.m.Button", multiple : true, singularName : "button", visibility: "hidden"},
 
 				/**
@@ -134,9 +134,9 @@ function(
 			associations : {
 
 				/**
-								 * A reference to the currently selected button control. By default or if the association is set to false (null, undefined, "", false), the first button will be selected.
-								 * If the association is set to an invalid value (for example, an ID of a button that does not exist) the selection on the SegmentedButton will be removed.
-								 */
+				 * A reference to the currently selected button control. By default or if the association is set to false (null, undefined, "", false), the first button will be selected.
+				 * If the association is set to an invalid value (for example, an ID of a button that does not exist) the selection on the SegmentedButton will be removed.
+				 */
 				selectedButton : {type : "sap.m.Button", multiple : false, visibility: "hidden"},
 
 				/**

@@ -64,31 +64,6 @@ sap.ui.define([
 	Localization.setLanguage("en");
 	document.body.className = document.body.className + " sapUiSizeCompact ";
 
-	function cleanUUID(oValue) {
-		var oClonedValue = deepClone(oValue, 500);
-		if (typeof oClonedValue === "string") {
-			oClonedValue = JSON.parse(oClonedValue);
-		}
-		if (Array.isArray(oClonedValue)) {
-			oClonedValue.forEach(function(oResult) {
-				if (oResult._dt) {
-					delete oResult._dt._uuid;
-				}
-				if (deepEqual(oResult._dt, {})) {
-					delete oResult._dt;
-				}
-			});
-		} else if (typeof oClonedValue === "object") {
-			if (oClonedValue._dt) {
-				delete oClonedValue._dt._uuid;
-			}
-			if (deepEqual(oClonedValue._dt, {})) {
-				delete oClonedValue._dt;
-			}
-		}
-		return oClonedValue;
-	}
-
 	QUnit.module("object property translation", {
 		beforeEach: function () {
 			this.oHost = new Host("host");
@@ -115,7 +90,7 @@ sap.ui.define([
 					assert.ok(oLabel.isA("sap.m.Label"), "Label 1: Form content contains a Label");
 					assert.equal(oLabel.getText(), "Object properties defined: value from Json list", "Label 1: Has label text");
 					assert.ok(oField.isA("sap.ui.integration.editor.fields.ObjectField"), "Field 1: Object Field");
-					assert.ok(deepEqual(cleanUUID(oField._getCurrentProperty("value")), { "text": "text03", "key": "key03", "url": "https://sap.com/04", "icon": "sap-icon://zoom-in", "iconcolor": "#E69A17", "int": 3, "_dt": {"_editable": false }}), "Field 1: Value");
+					assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value")), { "text": "text03", "key": "key03", "url": "https://sap.com/04", "icon": "sap-icon://zoom-in", "iconcolor": "#E69A17", "int": 3, "_dt": {"_editable": false }}), "Field 1: Value");
 					EditorQunitUtils.isReady(that.oEditor).then(function () {
 						assert.ok(that.oEditor.isReady(), "Editor is ready");
 						var oTable = oField.getAggregation("_field");
@@ -170,14 +145,14 @@ sap.ui.define([
 							EditorQunitUtils.wait().then(function () {
 								var oNewObject = {"icon": "sap-icon://add","text": "{i18n>TRANSLATED_TEXT01}","url": "http://","number": 0.5, "_dt": {"_selected": true}};
 								assert.equal(oTable.getBinding().getCount(), 9, "Table: value length is 9");
-								assert.ok(deepEqual(cleanUUID(oTable.getBinding().getContexts()[8].getObject()), oNewObject), "Table: new row data");
+								assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oTable.getBinding().getContexts()[8].getObject()), oNewObject), "Table: new row data");
 								assert.ok(!oSelectionCell2.getSelected(), "Row 2: Cell 1 is not selected");
-								assert.ok(deepEqual(cleanUUID(oField._getCurrentProperty("value")), {"icon": "sap-icon://add","text": "{i18n>TRANSLATED_TEXT01}","url": "http://","number": 0.5}), "Field 1: Value changed");
+								assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value")), {"icon": "sap-icon://add","text": "{i18n>TRANSLATED_TEXT01}","url": "http://","number": 0.5}), "Field 1: Value changed");
 								// scroll to the bottom
 								oTable._getScrollExtension().getVerticalScrollbar().scrollTop = 200;
 								EditorQunitUtils.wait().then(function () {
 									var oNewRow = oTable.getRows()[4];
-									assert.ok(deepEqual(cleanUUID(oNewRow.getBindingContext().getObject()), oNewObject), "Table: new row in the bottom");
+									assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oNewRow.getBindingContext().getObject()), oNewObject), "Table: new row in the bottom");
 									var oTextCell = oNewRow.getCells()[3];
 									assert.equal(oTextCell.getText(), "translated text01 en", "Row: Text cell value");
 									var oSelectionCell10 = oNewRow.getCells()[0];
@@ -208,7 +183,7 @@ sap.ui.define([
 					assert.ok(oLabel.isA("sap.m.Label"), "Label 1: Form content contains a Label");
 					assert.equal(oLabel.getText(), "Object properties defined: value from Json list", "Label 1: Has label text");
 					assert.ok(oField.isA("sap.ui.integration.editor.fields.ObjectField"), "Field 1: Object Field");
-					assert.ok(deepEqual(cleanUUID(oField._getCurrentProperty("value")), { "text": "text03", "key": "key03", "url": "https://sap.com/04", "icon": "sap-icon://zoom-in", "iconcolor": "#E69A17", "int": 3, "_dt": {"_editable": false }}), "Field 1: Value");
+					assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value")), { "text": "text03", "key": "key03", "url": "https://sap.com/04", "icon": "sap-icon://zoom-in", "iconcolor": "#E69A17", "int": 3, "_dt": {"_editable": false }}), "Field 1: Value");
 					EditorQunitUtils.isReady(that.oEditor).then(function () {
 						assert.ok(that.oEditor.isReady(), "Editor is ready");
 						var oTable = oField.getAggregation("_field");
@@ -263,14 +238,14 @@ sap.ui.define([
 							EditorQunitUtils.wait().then(function () {
 								var oNewObject = {"icon": "sap-icon://add","text": "{i18n>TRANSLATED_TEXT01}","url": "http://","number": 0.5, "_dt": {"_selected": true}};
 								assert.equal(oTable.getBinding().getCount(), 9, "Table: value length is 9");
-								assert.ok(deepEqual(cleanUUID(oTable.getBinding().getContexts()[8].getObject()), oNewObject), "Table: new row data");
+								assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oTable.getBinding().getContexts()[8].getObject()), oNewObject), "Table: new row data");
 								assert.ok(!oSelectionCell2.getSelected(), "Row 2: Cell 1 is not selected");
-								assert.ok(deepEqual(cleanUUID(oField._getCurrentProperty("value")), {"icon": "sap-icon://add","text": "{i18n>TRANSLATED_TEXT01}","url": "http://","number": 0.5}), "Field 1: Value changed");
+								assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value")), {"icon": "sap-icon://add","text": "{i18n>TRANSLATED_TEXT01}","url": "http://","number": 0.5}), "Field 1: Value changed");
 								// scroll to the bottom
 								oTable._getScrollExtension().getVerticalScrollbar().scrollTop = 200;
 								EditorQunitUtils.wait().then(function () {
 									var oNewRow = oTable.getRows()[4];
-									assert.ok(deepEqual(cleanUUID(oNewRow.getBindingContext().getObject()), oNewObject), "Table: new row in the bottom");
+									assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oNewRow.getBindingContext().getObject()), oNewObject), "Table: new row in the bottom");
 									var oTextCell = oNewRow.getCells()[3];
 									assert.equal(oTextCell.getText(), "translated text01 France", "Row: Text cell value");
 									var oSelectionCell10 = oNewRow.getCells()[0];
@@ -301,7 +276,7 @@ sap.ui.define([
 					assert.ok(oLabel.isA("sap.m.Label"), "Label 1: Form content contains a Label");
 					assert.equal(oLabel.getText(), "Object properties defined: value from Json list", "Label 1: Has label text");
 					assert.ok(oField.isA("sap.ui.integration.editor.fields.ObjectField"), "Field 1: Object Field");
-					assert.ok(deepEqual(cleanUUID(oField._getCurrentProperty("value")), { "text": "text03", "key": "key03", "url": "https://sap.com/04", "icon": "sap-icon://zoom-in", "iconcolor": "#E69A17", "int": 3, "_dt": {"_editable": false }}), "Field 1: Value");
+					assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value")), { "text": "text03", "key": "key03", "url": "https://sap.com/04", "icon": "sap-icon://zoom-in", "iconcolor": "#E69A17", "int": 3, "_dt": {"_editable": false }}), "Field 1: Value");
 					EditorQunitUtils.isReady(that.oEditor).then(function () {
 						assert.ok(that.oEditor.isReady(), "Editor is ready");
 						var oTable = oField.getAggregation("_field");
@@ -357,14 +332,14 @@ sap.ui.define([
 							EditorQunitUtils.wait().then(function () {
 								var oNewObject = {"icon": "sap-icon://add","text": "{i18n>TRANSLATED_TEXT02}","url": "http://","number": 0.5, "_dt": {"_selected": true}};
 								assert.equal(oTable.getBinding().getCount(), 9, "Table: value length is 9");
-								assert.ok(deepEqual(cleanUUID(oTable.getBinding().getContexts()[8].getObject()), oNewObject), "Table: new row data");
+								assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oTable.getBinding().getContexts()[8].getObject()), oNewObject), "Table: new row data");
 								assert.ok(!oSelectionCell2.getSelected(), "Row 2: Cell 1 is not selected");
-								assert.ok(deepEqual(cleanUUID(oField._getCurrentProperty("value")), {"icon": "sap-icon://add","text": "{i18n>TRANSLATED_TEXT02}","url": "http://","number": 0.5}), "Field 1: Value changed");
+								assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value")), {"icon": "sap-icon://add","text": "{i18n>TRANSLATED_TEXT02}","url": "http://","number": 0.5}), "Field 1: Value changed");
 								// scroll to the bottom
 								oTable._getScrollExtension().getVerticalScrollbar().scrollTop = 200;
 								EditorQunitUtils.wait().then(function () {
 									var oNewRow = oTable.getRows()[4];
-									assert.ok(deepEqual(cleanUUID(oNewRow.getBindingContext().getObject()), oNewObject), "Table: new row in the bottom");
+									assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oNewRow.getBindingContext().getObject()), oNewObject), "Table: new row in the bottom");
 									var oTextCell = oNewRow.getCells()[3];
 									assert.equal(oTextCell.getText(), "translated text02 en", "Row: Text cell value");
 									var oSelectionCell10 = oNewRow.getCells()[0];
@@ -395,7 +370,7 @@ sap.ui.define([
 					assert.ok(oLabel.isA("sap.m.Label"), "Label 1: Form content contains a Label");
 					assert.equal(oLabel.getText(), "Object properties defined: value from Json list", "Label 1: Has label text");
 					assert.ok(oField.isA("sap.ui.integration.editor.fields.ObjectField"), "Field 1: Object Field");
-					assert.ok(deepEqual(cleanUUID(oField._getCurrentProperty("value")), { "text": "text03", "key": "key03", "url": "https://sap.com/04", "icon": "sap-icon://zoom-in", "iconcolor": "#E69A17", "int": 3, "_dt": {"_editable": false }}), "Field 1: Value");
+					assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value")), { "text": "text03", "key": "key03", "url": "https://sap.com/04", "icon": "sap-icon://zoom-in", "iconcolor": "#E69A17", "int": 3, "_dt": {"_editable": false }}), "Field 1: Value");
 					EditorQunitUtils.isReady(that.oEditor).then(function () {
 						assert.ok(that.oEditor.isReady(), "Editor is ready");
 						var oTable = oField.getAggregation("_field");
@@ -451,14 +426,14 @@ sap.ui.define([
 							EditorQunitUtils.wait().then(function () {
 								var oNewObject = {"icon": "sap-icon://add","text": "{i18n>TRANSLATED_TEXT02}","url": "http://","number": 0.5, "_dt": {"_selected": true}};
 								assert.equal(oTable.getBinding().getCount(), 9, "Table: value length is 9");
-								assert.ok(deepEqual(cleanUUID(oTable.getBinding().getContexts()[8].getObject()), oNewObject), "Table: new row data");
+								assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oTable.getBinding().getContexts()[8].getObject()), oNewObject), "Table: new row data");
 								assert.ok(!oSelectionCell2.getSelected(), "Row 2: Cell 1 is not selected");
-								assert.ok(deepEqual(cleanUUID(oField._getCurrentProperty("value")), {"icon": "sap-icon://add","text": "{i18n>TRANSLATED_TEXT02}","url": "http://","number": 0.5}), "Field 1: Value changed");
+								assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value")), {"icon": "sap-icon://add","text": "{i18n>TRANSLATED_TEXT02}","url": "http://","number": 0.5}), "Field 1: Value changed");
 								// scroll to the bottom
 								oTable._getScrollExtension().getVerticalScrollbar().scrollTop = 200;
 								EditorQunitUtils.wait().then(function () {
 									var oNewRow = oTable.getRows()[4];
-									assert.ok(deepEqual(cleanUUID(oNewRow.getBindingContext().getObject()), oNewObject), "Table: new row in the bottom");
+									assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oNewRow.getBindingContext().getObject()), oNewObject), "Table: new row in the bottom");
 									var oTextCell = oNewRow.getCells()[3];
 									assert.equal(oTextCell.getText(), "translated text02 France", "Row: Text cell value");
 									var oSelectionCell10 = oNewRow.getCells()[0];

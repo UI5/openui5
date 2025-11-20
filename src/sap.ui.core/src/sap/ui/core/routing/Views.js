@@ -8,19 +8,19 @@ sap.ui.define([
 		"use strict";
 
 		/**
-				 * Instantiates a view repository that creates and caches views. If it is destroyed, all the Views it created are destroyed.
-				 * Usually you do not have to create instances of this class, it is used by the {@link sap.ui.core.routing.Router}.
-				 * If you are using {@link sap.ui.core.routing.Targets} without using a {@link sap.ui.core.UIComponent} you have to create an instance of this class.
-				 * They will create an instance on their own, or if they are used with a {@link sap.ui.core.UIComponent} they will share the same instance of Views.
-				 *
-				 * @class
-				 * @extends sap.ui.base.EventProvider
-				 * @public
-				 * @since 1.28.1
-				 * @param {object} [oOptions]
-				 * @param {sap.ui.core.UIComponent} [oOptions.component] the owner of all the views that will be created by this Instance.
-				 * @alias sap.ui.core.routing.Views
-				 */
+		 * Instantiates a view repository that creates and caches views. If it is destroyed, all the Views it created are destroyed.
+		 * Usually you do not have to create instances of this class, it is used by the {@link sap.ui.core.routing.Router}.
+		 * If you are using {@link sap.ui.core.routing.Targets} without using a {@link sap.ui.core.UIComponent} you have to create an instance of this class.
+		 * They will create an instance on their own, or if they are used with a {@link sap.ui.core.UIComponent} they will share the same instance of Views.
+		 *
+		 * @class
+		 * @extends sap.ui.base.EventProvider
+		 * @public
+		 * @since 1.28.1
+		 * @param {object} [oOptions]
+		 * @param {sap.ui.core.UIComponent} [oOptions.component] the owner of all the views that will be created by this Instance.
+		 * @alias sap.ui.core.routing.Views
+		 */
 		var Views = TargetCache.extend("sap.ui.core.routing.Views", /** @lends sap.ui.core.routing.Views.prototype */ {
 			metadata: {},
 

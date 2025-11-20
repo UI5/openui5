@@ -3,15 +3,21 @@ sap.ui.define([
 	"sap/ui/qunit/QUnitUtils",
 	"sap/ui/events/KeyCodes",
 	"sap/ui/integration/editor/Editor",
+	"sap/ui/integration/designtime/editor/CardEditor",
 	"sap/ui/integration/Host",
-	"./../editor/ContextHost"
+	"./../editor/ContextHost",
+	"sap/base/util/deepEqual",
+	"sap/base/util/deepClone"
 ], function(
 	Localization,
 	QUnitUtils,
 	KeyCodes,
 	Editor,
+	CardEditor,
 	Host,
-	ContextHost
+	ContextHost,
+	deepEqual,
+	deepClone
 ) {
 	"use strict";
 
@@ -95,7 +101,7 @@ sap.ui.define([
 		});
 	};
 
-	EditorQunitUtils.beforeEachTest = function(oHostConfig, oContextHostConfig) {
+	EditorQunitUtils.beforeEachTest = function(oHostConfig, oContextHostConfig, sEditorType) {
 		oHostConfig = Object.assign({
 			"id": "host",
 			"getDestinations": function () {
@@ -126,7 +132,7 @@ sap.ui.define([
 		this.oHost.getDestinations = oHostConfig.getDestinations;
 		this.oContextHost = new ContextHost(oContextHostConfig.id);
 
-		return this.createEditor();
+		return this.createEditor(undefined, undefined, sEditorType);
 	};
 
 	EditorQunitUtils.afterEachTest = function(oEditor, sandbox, oMockServer) {
@@ -142,23 +148,30 @@ sap.ui.define([
 		}
 	};
 
-	EditorQunitUtils.createEditor = function(sLanguage, oDesigntime) {
+	EditorQunitUtils.createEditor = function(sLanguage, oDesigntime, sEditorType) {
 		sLanguage = sLanguage || "en";
 		Localization.setLanguage(sLanguage);
-		var oEditor = new Editor({
-			designtime: oDesigntime
-		});
+		var oEditor;
 		var oContent = document.getElementById("content");
 		if (!oContent) {
 			oContent = document.createElement("div");
 			oContent.style.position = "absolute";
 			oContent.style.top = "200px";
-			oContent.style.width = "800px";
+			oContent.style.width = sEditorType === "CardEditor" ? "calc(1000px + 5rem)" : "800px";
 			oContent.style.background = "white";
 
 			oContent.setAttribute("id", "content");
 			document.body.appendChild(oContent);
 			document.body.style.zIndex = 1000;
+		}
+		if (sEditorType === "CardEditor") {
+			oEditor = new CardEditor({
+				designtime: oDesigntime
+			});
+		} else {
+			oEditor = new Editor({
+				designtime: oDesigntime
+			});
 		}
 		oEditor.placeAt(oContent);
 		return oEditor;
@@ -191,7 +204,9 @@ sap.ui.define([
 	EditorQunitUtils.isReady = function(oEditor) {
 		return new Promise(function(resolve) {
 			oEditor.attachReady(function() {
-				resolve();
+				setTimeout(function () {
+					resolve();
+				}, 100);
 			});
 		});
 	};
@@ -238,6 +253,53 @@ sap.ui.define([
 		action: 150,
 		interaction: 1500,
 		complexInteraction: 3000
+	};
+
+	EditorQunitUtils.cleanUUID = function(oValue) {
+		return this.cleanDT(oValue, true);
+	};
+
+	EditorQunitUtils.cleanUUIDAndPosition = function(oValue) {
+		return this.cleanDT(oValue, true, true);
+	};
+
+	EditorQunitUtils.cleanDT = function(oValue, bDeleteUUID, bDeletePosition) {
+		var bDeleteAll = true;
+		if (typeof bDeleteUUID !== "undefined" || typeof bDeletePosition !== "undefined") {
+			bDeleteAll = false;
+		}
+		var oClonedValue = deepClone(oValue, 500);
+		if (typeof oClonedValue === "string") {
+			oClonedValue = JSON.parse(oClonedValue);
+		}
+		if (Array.isArray(oClonedValue)) {
+			oClonedValue.forEach(function(oResult) {
+				if (bDeleteAll) {
+					delete oResult._dt;
+				} else {
+					if (oResult._dt) {
+						bDeleteUUID && delete oResult._dt._uuid;
+						bDeletePosition && delete oResult._dt._position;
+					}
+					if (deepEqual(oResult._dt, {})) {
+						delete oResult._dt;
+					}
+				}
+			});
+		} else if (typeof oClonedValue === "object") {
+			if (bDeleteAll) {
+				delete oClonedValue._dt;
+			} else {
+				if (oClonedValue._dt) {
+					bDeleteUUID && delete oClonedValue._dt._uuid;
+					bDeletePosition && delete oClonedValue._dt._position;
+				}
+				if (deepEqual(oClonedValue._dt, {})) {
+					delete oClonedValue._dt;
+				}
+			}
+		}
+		return oClonedValue;
 	};
 
 	return EditorQunitUtils;

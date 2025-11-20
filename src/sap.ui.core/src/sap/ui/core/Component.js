@@ -1150,12 +1150,12 @@ sap.ui.define([
 	};
 
 	/**
-		 * Internal activation function for non lazy services which should be started immediately
-		 *
-		 * @param {sap.ui.core.Component} oComponent The Component instance
-		 * @returns {Promise[]|null} An array of promises from then loaded services
-		 * @private
-		 */
+	 * Internal activation function for non lazy services which should be started immediately
+	 *
+	 * @param {sap.ui.core.Component} oComponent The Component instance
+	 * @returns {Promise[]|null} An array of promises from then loaded services
+	 * @private
+	 */
 	function activateServices(oComponent) {
 		var oServices = oComponent._getManifestEntry("/sap.ui5/services", true);
 		var aOutPromises = [];
@@ -1924,8 +1924,8 @@ sap.ui.define([
 	}
 
 	/**
-		 * @private
-		 */
+	 * @private
+	 */
 	function _loadManifestModelClasses(mModelConfigurations, sLogComponentName) {
 		const aLoadPromises = [];
 
@@ -2588,22 +2588,22 @@ sap.ui.define([
 
 
 	/**
-		 * Internal loading method used by the factory methods.
-		 *
-		 * @param {object} oConfig
-		 *     Configuration options as provided to the calling factory, see e.g. {@link sap.ui.core.Component.create}
-		 * @param {object} mOptions Additional, internal loading configuration
-		 * @param {string[]} mOptions.activeTerminologies list of active terminologies.
-		 *                   See the public API documentation for more detail: {@link sap.ui.core.Component.create Component.create}
-		 * @param {boolean} mOptions.failOnError see <code>sap.ui.component.load</code>
-		 * @param {boolean} mOptions.createModels whether models from manifest should be created during
-		 *                                        component preload (should only be set via <code>sap.ui.component</code>)
-		 * @param {boolean} mOptions.preloadOnly see <code>sap.ui.component.load</code> (<code>vConfig.asyncHints.preloadOnly</code>)
-		 * @param {Promise|Promise[]} mOptions.waitFor see <code>sap.ui.component</code> (<code>vConfig.asyncHints.waitFor</code>)
-		 * @return {function|Promise<function>} the constructor of the Component class or a Promise that will be fulfilled with the same
-		 *
-		 * @private
-		 */
+	 * Internal loading method used by the factory methods.
+	 *
+	 * @param {object} oConfig
+	 *     Configuration options as provided to the calling factory, see e.g. {@link sap.ui.core.Component.create}
+	 * @param {object} mOptions Additional, internal loading configuration
+	 * @param {string[]} mOptions.activeTerminologies list of active terminologies.
+	 *                   See the public API documentation for more detail: {@link sap.ui.core.Component.create Component.create}
+	 * @param {boolean} mOptions.failOnError see <code>sap.ui.component.load</code>
+	 * @param {boolean} mOptions.createModels whether models from manifest should be created during
+	 *                                        component preload (should only be set via <code>sap.ui.component</code>)
+	 * @param {boolean} mOptions.preloadOnly see <code>sap.ui.component.load</code> (<code>vConfig.asyncHints.preloadOnly</code>)
+	 * @param {Promise|Promise[]} mOptions.waitFor see <code>sap.ui.component</code> (<code>vConfig.asyncHints.waitFor</code>)
+	 * @return {function|Promise<function>} the constructor of the Component class or a Promise that will be fulfilled with the same
+	 *
+	 * @private
+	 */
 	function loadComponent(oConfig, mOptions) {
 		var aActiveTerminologies = mOptions.activeTerminologies,
 			sName = oConfig.name,
@@ -2809,8 +2809,8 @@ sap.ui.define([
 		}
 
 		/**
-				 * @private
-				 */
+		 * @private
+		 */
 		function preload(sComponentName) {
 
 			var sController = sComponentName + '.Component',
@@ -2852,8 +2852,8 @@ sap.ui.define([
 		}
 
 		/**
-				 * @private
-				 */
+		 * @private
+		 */
 		function preloadDependencies(sComponentName, oManifest) {
 
 			var aPromises = [];

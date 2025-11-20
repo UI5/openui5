@@ -59,46 +59,6 @@ sap.ui.define([
 	Localization.setLanguage("en");
 	document.body.className = document.body.className + " sapUiSizeCompact ";
 
-	function cleanUUID(oValue) {
-		var oClonedValue = deepClone(oValue, 500);
-		if (typeof oClonedValue === "string") {
-			oClonedValue = JSON.parse(oClonedValue);
-		}
-		if (Array.isArray(oClonedValue)) {
-			oClonedValue.forEach(function(oResult) {
-				if (oResult._dt) {
-					delete oResult._dt._uuid;
-				}
-				if (deepEqual(oResult._dt, {})) {
-					delete oResult._dt;
-				}
-			});
-		} else if (typeof oClonedValue === "object") {
-			if (oClonedValue._dt) {
-				delete oClonedValue._dt._uuid;
-			}
-			if (deepEqual(oClonedValue._dt, {})) {
-				delete oClonedValue._dt;
-			}
-		}
-		return oClonedValue;
-	}
-
-	function cleanDT(oValue) {
-		var oClonedValue = deepClone(oValue, 500);
-		if (typeof oClonedValue === "string") {
-			oClonedValue = JSON.parse(oClonedValue);
-		}
-		if (Array.isArray(oClonedValue)) {
-			oClonedValue.forEach(function(oResult) {
-				delete oResult._dt;
-			});
-		} else if (typeof oClonedValue === "object") {
-			delete oClonedValue._dt;
-		}
-		return oClonedValue;
-	}
-
 	QUnit.module("Basic", {
 		beforeEach: function () {
 			this.oEditor = EditorQunitUtils.beforeEachTest();
@@ -153,13 +113,13 @@ sap.ui.define([
 						var sNewValue = '{\n\t"string": "string value",\n\t"boolean": true,\n\t"integer": 5,\n\t"number": 5.22\n}';
 						oTextArea.setValue(sNewValue);
 						oTextArea.fireChange({ value: sNewValue});
-						assert.ok(deepEqual(cleanUUID(oField._getCurrentProperty("value")), {"string":"string value", "boolean": true, "integer": 5, "number": 5.22}), "Field 1: DT Value");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value")), {"string":"string value", "boolean": true, "integer": 5, "number": 5.22}), "Field 1: DT Value");
 						var oSettings = this.oEditor.getCurrentSettings();
 						assert.deepEqual(oSettings["/sap.card/configuration/parameters/object/value"], oField._getCurrentProperty("value"), "Editor: field 1 setting value");
 						sNewValue = '{\n\t"string1": "string value 1",\n\t"boolean1": false,\n\t"integer1": 6,\n\t"number1": 8.22,\n\t"new": "new"\n}';
 						oTextArea.setValue(sNewValue);
 						oTextArea.fireChange({ value: sNewValue});
-						assert.ok(deepEqual(cleanUUID(oField._getCurrentProperty("value")), {"string1":"string value 1", "boolean1": false, "integer1": 6, "number1": 8.22, "new": "new"}), "Field 1: DT Value updated");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value")), {"string1":"string value 1", "boolean1": false, "integer1": 6, "number1": 8.22, "new": "new"}), "Field 1: DT Value updated");
 						oSettings = this.oEditor.getCurrentSettings();
 						assert.deepEqual(oSettings["/sap.card/configuration/parameters/object/value"], oField._getCurrentProperty("value"), "Editor: field 1 setting value updated");
 						sNewValue = '';
@@ -171,7 +131,7 @@ sap.ui.define([
 						sNewValue = '{}';
 						oTextArea.setValue(sNewValue);
 						oTextArea.fireChange({ value: sNewValue});
-						assert.ok(deepEqual(cleanUUID(oField._getCurrentProperty("value")), {}), "Field 1: DT Value {}");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value")), {}), "Field 1: DT Value {}");
 						oSettings = this.oEditor.getCurrentSettings();
 						assert.deepEqual(oSettings["/sap.card/configuration/parameters/object/value"], {}, "Editor: field 1 setting value {}");
 						resolve();
@@ -219,7 +179,7 @@ sap.ui.define([
 					assert.ok(oLabel.isA("sap.m.Label"), "Label 1: Form content contains a Label");
 					assert.equal(oLabel.getText(), "Object Field", "Label 1: Has label text");
 					assert.ok(oField.isA("sap.ui.integration.editor.fields.ObjectField"), "Field 1: Object Field");
-					assert.ok(deepEqual(cleanUUID(oField._getCurrentProperty("value")), {}), "Field 1: Value");
+					assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value")), {}), "Field 1: Value");
 					EditorQunitUtils.isReady(this.oEditor).then(function () {
 						assert.ok(this.oEditor.isReady(), "Editor is ready");
 						var oTextArea = oField.getAggregation("_field");
@@ -228,7 +188,7 @@ sap.ui.define([
 						var sNewValue = '{\n\t"string": "string value",\n\t"boolean": true,\n\t"integer": 5,\n\t"number": 5.22\n}';
 						oTextArea.setValue(sNewValue);
 						oTextArea.fireChange({ value: sNewValue});
-						assert.ok(deepEqual(cleanUUID(oField._getCurrentProperty("value")), {"string":"string value", "boolean": true, "integer": 5, "number": 5.22}), "Field 1: DT Value");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value")), {"string":"string value", "boolean": true, "integer": 5, "number": 5.22}), "Field 1: DT Value");
 						sNewValue = '';
 						oTextArea.setValue(sNewValue);
 						oTextArea.fireChange({ value: sNewValue});
@@ -255,7 +215,7 @@ sap.ui.define([
 					assert.ok(oLabel.isA("sap.m.Label"), "Label: Form content contains a Label");
 					assert.equal(oLabel.getText(), "Object Field", "Label: Has label text");
 					assert.ok(oField.isA("sap.ui.integration.editor.fields.ObjectField"), "Field: Object Field");
-					assert.ok(deepEqual(cleanUUID(oField._getCurrentProperty("value")), oUpdatedValue), "Field 1: Value");
+					assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value")), oUpdatedValue), "Field 1: Value");
 					EditorQunitUtils.isReady(this.oEditor).then(function () {
 						assert.ok(this.oEditor.isReady(), "Editor is ready");
 						var oSimpleForm = oField.getAggregation("_field");
@@ -326,7 +286,7 @@ sap.ui.define([
 						});
 						oFormField.setValue(sNewObjectPropertyValue);
 						oFormField.fireChange({ value: sNewObjectPropertyValue});
-						assert.ok(deepEqual(cleanUUID(oField._getCurrentProperty("value")), oUpdatedValue), "Field 1: DT Value updated");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value")), oUpdatedValue), "Field 1: DT Value updated");
 
 						oFormLabel = oContents[10];
 						oFormField = oContents[11];
@@ -335,7 +295,7 @@ sap.ui.define([
 						assert.ok(oFormField.isA("sap.m.TextArea"), "SimpleForm Field6: TextArea Field");
 						assert.ok(!oFormField.getVisible(), "SimpleForm Field6: Not Visible");
 						assert.ok(oFormField.getEditable(), "SimpleForm Field6: Editable");
-						assert.ok(deepEqual(cleanUUID(oFormField.getValue()), oUpdatedValue), "SimpleForm field textArea: value updated");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oFormField.getValue()), oUpdatedValue), "SimpleForm field textArea: value updated");
 						var oSwitchModeButton = oSimpleForm.getToolbar().getContent()[1];
 						oSwitchModeButton.firePress();
 						EditorQunitUtils.wait().then(function () {
@@ -364,8 +324,8 @@ sap.ui.define([
 							oFormField = oContents[11];
 							assert.ok(!oFormLabel.getVisible(), "SimpleForm label6: Not Visible");
 							assert.ok(oFormField.getVisible(), "SimpleForm Field6: Visible");
-							assert.ok(deepEqual(cleanDT(oFormField.getValue()), oUpdatedValue), "SimpleForm field5: value updated");
-							assert.ok(deepEqual(cleanUUID(oField._getCurrentProperty("value")), oUpdatedValue), "Field 1: Value");
+							assert.ok(deepEqual(EditorQunitUtils.cleanDT(oFormField.getValue()), oUpdatedValue), "SimpleForm field5: value updated");
+							assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value")), oUpdatedValue), "Field 1: Value");
 							//var sNewValue = '{\n\t"string2": "string value 2",\n\t"boolean2": false,\n\t"integer2": 5,\n\t"number2": 5.22\n}';
 							var sNewValue = '{\n\t"string2": "string value 2",\n\t"boolean2": false,\n\t"integer2": 5,\n\t"number2": 5.22,\n\t"object": {\n\t\t"key": "keynew",\n\t\t"text": "textnew"\n\t}\n}';
 							var oNewValue = JSON.parse(sNewValue);
@@ -409,7 +369,7 @@ sap.ui.define([
 								assert.ok(!oFormField.getVisible(), "SimpleForm Field6: Not Visible");
 								var oSettings = this.oEditor.getCurrentSettings();
 								assert.deepEqual(oSettings["/sap.card/configuration/parameters/object/value"], oNewValue, "Editor: field 1 setting value");
-								assert.ok(deepEqual(cleanUUID(oField._getCurrentProperty("value")), oNewValue), "Field 1: Value");
+								assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value")), oNewValue), "Field 1: Value");
 								resolve();
 							}.bind(this));
 						}.bind(this));

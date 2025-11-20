@@ -20,20 +20,20 @@ sap.ui.define([
 		"use strict";
 
 		/**
-				 * Instantiates a cache repository that creates and caches views and components which are loaded by {@link sap.ui.core.routing.Targets}.
-				 *
-				 * If it is destroyed, all the views and components which it created are destroyed. If the views or components are still being loaded,
-				 * they will be destroyed after they are loaded.
-				 *
-				 * This class is currently private and shouldn't be used out of the sap.ui.core.routing scope.
-				 *
-				 * @class
-				 * @extends sap.ui.base.EventProvider
-				 * @private
-				 * @param {object} [oOptions]
-				 * @param {sap.ui.core.UIComponent} [oOptions.component] the owner of all the views that will be created by this Instance.
-				 * @alias sap.ui.core.routing.TargetCache
-				 */
+		 * Instantiates a cache repository that creates and caches views and components which are loaded by {@link sap.ui.core.routing.Targets}.
+		 *
+		 * If it is destroyed, all the views and components which it created are destroyed. If the views or components are still being loaded,
+		 * they will be destroyed after they are loaded.
+		 *
+		 * This class is currently private and shouldn't be used out of the sap.ui.core.routing scope.
+		 *
+		 * @class
+		 * @extends sap.ui.base.EventProvider
+		 * @private
+		 * @param {object} [oOptions]
+		 * @param {sap.ui.core.UIComponent} [oOptions.component] the owner of all the views that will be created by this Instance.
+		 * @alias sap.ui.core.routing.TargetCache
+		 */
 		var TargetCache = EventProvider.extend("sap.ui.core.routing.TargetCache", /** @lends sap.ui.core.routing.TargetCache.prototype */ {
 
 			constructor : function (oOptions) {
@@ -306,16 +306,16 @@ sap.ui.define([
 			},
 
 			/**
-						 * Determines the object with the given <code>oOptions</code>, <code>sType</code> and <code>oTargetCreateInfo</code>
-						 *
-						 * @param {object} oOptions The options of the desired object
-						 * @param {string} sType The type of the desired object, e.g. 'View', 'Component', etc.
-						 * @param {object} oTargetCreateInfo The object which contains extra information for the creation of the target
-						 * @param {boolean} [bSynchronousCreate] When <code>true</code> the <code>_ViewFactory.create</code> is used for creating
-						 *  the view instance synchronously. In all other cases the asynchronous <code>View.create</code> factory is used.
-						 * @returns {Promise | object} The desired object, if the object already exists in the cache, if not the promise is returned
-						 * @private
-						 */
+			 * Determines the object with the given <code>oOptions</code>, <code>sType</code> and <code>oTargetCreateInfo</code>
+			 *
+			 * @param {object} oOptions The options of the desired object
+			 * @param {string} sType The type of the desired object, e.g. 'View', 'Component', etc.
+			 * @param {object} oTargetCreateInfo The object which contains extra information for the creation of the target
+			 * @param {boolean} [bSynchronousCreate] When <code>true</code> the <code>_ViewFactory.create</code> is used for creating
+			 *  the view instance synchronously. In all other cases the asynchronous <code>View.create</code> factory is used.
+			 * @returns {Promise | object} The desired object, if the object already exists in the cache, if not the promise is returned
+			 * @private
+			 */
 			_getObjectWithGlobalId : function (oOptions, sType, oTargetCreateInfo, _bSynchronousCreate, bNoCreate) {
 				var that = this,
 					vPromiseOrObject,
@@ -420,14 +420,14 @@ sap.ui.define([
 			},
 
 			/**
-						 * Determines the view with the given <code>oOptions</code>
-						 *
-						 * @param {object} oOptions The options of the desired object
-						 * @param {boolean} [bSynchronousCreate] When <code>true</code> the <code>_ViewFactory.create</code> is used for creating
-						 *  the view instance synchronously. In all other cases the asynchronous <code>View.create</code> factory is used.
-						 * @returns {Promise | object} The desired object, if the object already exists in the cache, if not the promise is returned
-						 * @private
-						 */
+			 * Determines the view with the given <code>oOptions</code>
+			 *
+			 * @param {object} oOptions The options of the desired object
+			 * @param {boolean} [bSynchronousCreate] When <code>true</code> the <code>_ViewFactory.create</code> is used for creating
+			 *  the view instance synchronously. In all other cases the asynchronous <code>View.create</code> factory is used.
+			 * @returns {Promise | object} The desired object, if the object already exists in the cache, if not the promise is returned
+			 * @private
+			 */
 			_getViewWithGlobalId : function (oOptions, _bSynchronousCreate, bNoCreate) {
 				if (oOptions && !oOptions.name) {
 					oOptions.name = oOptions.viewName;

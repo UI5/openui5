@@ -103,31 +103,6 @@ sap.ui.define([
 	Localization.setLanguage("en");
 	document.body.className = document.body.className + " sapUiSizeCompact ";
 
-	function cleanUUID(oValue) {
-		var oClonedValue = deepClone(oValue, 500);
-		if (typeof oClonedValue === "string") {
-			oClonedValue = JSON.parse(oClonedValue);
-		}
-		if (Array.isArray(oClonedValue)) {
-			oClonedValue.forEach(function(oResult) {
-				if (oResult._dt) {
-					delete oResult._dt._uuid;
-				}
-				if (deepEqual(oResult._dt, {})) {
-					delete oResult._dt;
-				}
-			});
-		} else if (typeof oClonedValue === "object") {
-			if (oClonedValue._dt) {
-				delete oClonedValue._dt._uuid;
-			}
-			if (deepEqual(oClonedValue._dt, {})) {
-				delete oClonedValue._dt;
-			}
-		}
-		return oClonedValue;
-	}
-
 	QUnit.module("normal string as value", {
 		beforeEach: function () {
 			this.oHost = new Host("host");
@@ -188,7 +163,7 @@ sap.ui.define([
 							var oContents = oSimpleForm.getContent();
 							assert.equal(oContents.length, 16, "SimpleForm: length");
 							var oTextArea = oContents[15];
-							assert.ok(deepEqual(cleanUUID(oTextArea.getValue()), oDefaultNewObject), "SimpleForm field textArea: Has Default value");
+							assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oTextArea.getValue()), oDefaultNewObject), "SimpleForm field textArea: Has Default value");
 							var oFormLabel3 = oContents[4];
 							var oFormField3 = oContents[5];
 							assert.equal(oFormLabel3.getText(), "Text", "SimpleForm label 3: Has label text");
@@ -254,7 +229,7 @@ sap.ui.define([
 											}
 										}
 										var oNewObject = JSON.parse(oTextArea.getValue());
-										assert.ok(deepEqual(cleanUUID(oNewObject), oDefaultNewObject), "SimpleForm: Value not updated");
+										assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oNewObject), oDefaultNewObject), "SimpleForm: Value not updated");
 										var sUUID = oNewObject._dt._uuid;
 										var sTranslationTextOfEN = oField.getTranslationValueInTexts("en", sUUID, "text");
 										assert.equal(sTranslationTextOfEN, "text en", "Texts: Translation text of EN correct");
@@ -360,7 +335,7 @@ sap.ui.define([
 							var oContents = oSimpleForm.getContent();
 							assert.equal(oContents.length, 16, "SimpleForm: length");
 							var oTextArea = oContents[15];
-							assert.ok(deepEqual(cleanUUID(oTextArea.getValue()), oDefaultNewObject), "SimpleForm field textArea: Has Default value");
+							assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oTextArea.getValue()), oDefaultNewObject), "SimpleForm field textArea: Has Default value");
 							var oFormLabel3 = oContents[4];
 							var oFormField3 = oContents[5];
 							assert.equal(oFormLabel3.getText(), "Text", "SimpleForm label 3: Has label text");
@@ -426,7 +401,7 @@ sap.ui.define([
 											}
 										}
 										var oNewObject = JSON.parse(oTextArea.getValue());
-										assert.ok(deepEqual(cleanUUID(oNewObject), oDefaultNewObject), "SimpleForm: Value not updated");
+										assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oNewObject), oDefaultNewObject), "SimpleForm: Value not updated");
 										var sUUID = oNewObject._dt._uuid;
 										var sTranslationTextOfEN = oField.getTranslationValueInTexts("en", sUUID, "text");
 										assert.equal(sTranslationTextOfEN, "text en", "Texts: Translation text of EN correct");
@@ -500,7 +475,7 @@ sap.ui.define([
 							var oContents = oSimpleForm.getContent();
 							assert.equal(oContents.length, 16, "SimpleForm: length");
 							var oTextArea = oContents[15];
-							assert.ok(deepEqual(cleanUUID(oTextArea.getValue()), oDefaultNewObject), "SimpleForm field textArea: Has Default value");
+							assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oTextArea.getValue()), oDefaultNewObject), "SimpleForm field textArea: Has Default value");
 							var oFormLabel3 = oContents[4];
 							var oFormField3 = oContents[5];
 							assert.equal(oFormLabel3.getText(), "Text", "SimpleForm label 3: Has label text");
@@ -565,7 +540,7 @@ sap.ui.define([
 											}
 										}
 										var oNewObject = JSON.parse(oTextArea.getValue());
-										assert.ok(deepEqual(cleanUUID(oNewObject), oDefaultNewObject), "SimpleForm: Value updated");
+										assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oNewObject), oDefaultNewObject), "SimpleForm: Value updated");
 										var sUUID = oNewObject._dt._uuid;
 										var sTranslationTextOfEN = oField.getTranslationValueInTexts("en", sUUID, "text");
 										assert.ok(!sTranslationTextOfEN, "Texts: no value");
@@ -630,7 +605,7 @@ sap.ui.define([
 							var oContents = oSimpleForm.getContent();
 							assert.equal(oContents.length, 16, "SimpleForm: length");
 							var oTextArea = oContents[15];
-							assert.ok(deepEqual(cleanUUID(oTextArea.getValue()), oDefaultNewObject), "SimpleForm field textArea: Has Default value");
+							assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oTextArea.getValue()), oDefaultNewObject), "SimpleForm field textArea: Has Default value");
 							var oFormLabel3 = oContents[4];
 							var oFormField3 = oContents[5];
 							assert.equal(oFormLabel3.getText(), "Text", "SimpleForm label 3: Has label text");
@@ -696,7 +671,7 @@ sap.ui.define([
 											}
 										}
 										var oNewObject = JSON.parse(oTextArea.getValue());
-										assert.ok(deepEqual(cleanUUID(oNewObject), oDefaultNewObject), "SimpleForm: Value not updated");
+										assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oNewObject), oDefaultNewObject), "SimpleForm: Value not updated");
 										var sUUID = oNewObject._dt._uuid;
 										var sTranslationTextOfEN = oField.getTranslationValueInTexts("en", sUUID, "text");
 										assert.equal(sTranslationTextOfEN, "text en", "Texts: Translation text of EN correct");
@@ -706,7 +681,7 @@ sap.ui.define([
 											oFormField3.fireChange({ value: "string value 2"});
 											EditorQunitUtils.wait().then(function () {
 												oNewObject = JSON.parse(oTextArea.getValue());
-												assert.ok(deepEqual(cleanUUID(oNewObject), Object.assign(deepClone(oDefaultNewObject, 500), {"text": "string value 2"})), "SimpleForm: Value updated");
+												assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oNewObject), Object.assign(deepClone(oDefaultNewObject, 500), {"text": "string value 2"})), "SimpleForm: Value updated");
 												assert.equal(oFormField3.getValue(), "string value 2", "SimpleForm field 3: Has new value");
 												assert.ok(oFormField3.getShowValueHelp(), "SimpleForm field 3: ShowValueHelp true");
 												oValueHelpIcon3 = oFormField3._oValueHelpIcon;
@@ -794,7 +769,7 @@ sap.ui.define([
 							var oContents = oSimpleForm.getContent();
 							assert.equal(oContents.length, 16, "SimpleForm: length");
 							var oTextArea = oContents[15];
-							assert.ok(deepEqual(cleanUUID(oTextArea.getValue()), oDefaultNewObject), "SimpleForm field textArea: Has Default value");
+							assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oTextArea.getValue()), oDefaultNewObject), "SimpleForm field textArea: Has Default value");
 							var oFormLabel3 = oContents[4];
 							var oFormField3 = oContents[5];
 							assert.equal(oFormLabel3.getText(), "Text", "SimpleForm label 3: Has label text");
@@ -860,7 +835,7 @@ sap.ui.define([
 											}
 										}
 										var oNewObject = JSON.parse(oTextArea.getValue());
-										assert.ok(deepEqual(cleanUUID(oNewObject), oDefaultNewObject), "SimpleForm: Value not updated");
+										assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oNewObject), oDefaultNewObject), "SimpleForm: Value not updated");
 										var sUUID = oNewObject._dt._uuid;
 										var sTranslationTextOfEN = oField.getTranslationValueInTexts("en", sUUID, "text");
 										assert.equal(sTranslationTextOfEN, "text en", "Texts: Translation text of EN correct");
@@ -870,7 +845,7 @@ sap.ui.define([
 											oFormField3.fireChange({ value: "{i18n>string1}"});
 											EditorQunitUtils.wait().then(function () {
 												oNewObject = JSON.parse(oTextArea.getValue());
-												assert.ok(deepEqual(cleanUUID(oNewObject), Object.assign(deepClone(oDefaultNewObject, 500), {"text": "{i18n>string1}"})), "SimpleForm: Value updated");
+												assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oNewObject), Object.assign(deepClone(oDefaultNewObject, 500), {"text": "{i18n>string1}"})), "SimpleForm: Value updated");
 												assert.equal(oFormField3.getValue(), "{i18n>string1}", "SimpleForm field 3: Has new value");
 												assert.ok(oFormField3.getShowValueHelp(), "SimpleForm field 3: ShowValueHelp true");
 												oValueHelpIcon3 = oFormField3._oValueHelpIcon;

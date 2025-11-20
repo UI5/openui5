@@ -92,31 +92,6 @@ sap.ui.define([
 	Localization.setLanguage("en");
 	document.body.className = document.body.className + " sapUiSizeCompact ";
 
-	function cleanUUID(oValue) {
-		var oClonedValue = deepClone(oValue, 500);
-		if (typeof oClonedValue === "string") {
-			oClonedValue = JSON.parse(oClonedValue);
-		}
-		if (Array.isArray(oClonedValue)) {
-			oClonedValue.forEach(function(oResult) {
-				if (oResult._dt) {
-					delete oResult._dt._uuid;
-				}
-				if (deepEqual(oResult._dt, {})) {
-					delete oResult._dt;
-				}
-			});
-		} else if (typeof oClonedValue === "object") {
-			if (oClonedValue._dt) {
-				delete oClonedValue._dt._uuid;
-			}
-			if (deepEqual(oClonedValue._dt, {})) {
-				delete oClonedValue._dt;
-			}
-		}
-		return oClonedValue;
-	}
-
 	QUnit.module("Basic", {
 		beforeEach: function () {
 			this.oEditor = EditorQunitUtils.beforeEachTest();
@@ -163,7 +138,7 @@ sap.ui.define([
 						assert.equal(oFormField3._oValueHelpIcon.getSrc(), "sap-icon://translate", "SimpleForm field 3: Input value help icon src");
 						oFormField3.setValue("text value 1");
 						oFormField3.fireChange({ value: "text value 1"});
-						assert.ok(deepEqual(cleanUUID(oField1._getCurrentProperty("value")), {"text": "text value 1"}), "Field 1: DT Value updated");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField1._getCurrentProperty("value")), {"text": "text value 1"}), "Field 1: DT Value updated");
 						assert.ok(oFormField3.getShowValueHelp(), "SimpleForm field 3: ShowValueHelp true");
 						assert.ok(oFormField3._oValueHelpIcon, "SimpleForm field 3: Value help icon exist");
 						assert.ok(oFormField3._oValueHelpIcon.getVisible(), "SimpleForm field 3: Value help icon visible");
@@ -171,7 +146,7 @@ sap.ui.define([
 						oFormField3.fireChange({ value: "{i18n>string1}"});
 						EditorQunitUtils.wait().then(function () {
 							assert.equal(oFormField3.getValue(), "{i18n>string1}", "SimpleForm field 3: Has new value");
-							assert.ok(deepEqual(cleanUUID(oField1._getCurrentProperty("value")), {"text": "{i18n>string1}"}), "Field 1: DT Value updated");
+							assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField1._getCurrentProperty("value")), {"text": "{i18n>string1}"}), "Field 1: DT Value updated");
 							assert.ok(oFormField3.getShowValueHelp(), "SimpleForm field 3: ShowValueHelp true");
 							assert.ok(oFormField3._oValueHelpIcon, "SimpleForm field 3: Value help icon exist");
 							assert.ok(oFormField3._oValueHelpIcon.getVisible(), "SimpleForm field 3: Value help icon visible");
@@ -179,7 +154,7 @@ sap.ui.define([
 							oFormField3.fireChange({ value: "string1"});
 							EditorQunitUtils.wait().then(function () {
 								assert.equal(oFormField3.getValue(), "string1", "SimpleForm field 3: Has new value");
-								assert.ok(deepEqual(cleanUUID(oField1._getCurrentProperty("value")), {"text": "string1"}), "Field 1: DT Value updated");
+								assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField1._getCurrentProperty("value")), {"text": "string1"}), "Field 1: DT Value updated");
 								assert.ok(oFormField3.getShowValueHelp(), "SimpleForm field 3: ShowValueHelp true");
 								assert.ok(oFormField3._oValueHelpIcon, "SimpleForm field 3: Value help icon exist");
 								assert.ok(oFormField3._oValueHelpIcon.getVisible(), "SimpleForm field 3: Value help icon visible");
@@ -256,7 +231,7 @@ sap.ui.define([
 							oCancelButton3.firePress();
 							oFormField3.setValue("text value 1");
 							oFormField3.fireChange({ value: "text value 1"});
-							assert.ok(deepEqual(cleanUUID(oField1._getCurrentProperty("value")), {"text": "text value 1"}), "Field 1: DT Value updated");
+							assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField1._getCurrentProperty("value")), {"text": "text value 1"}), "Field 1: DT Value updated");
 							oField1.attachEventOnce("translationPopoverOpened", function () {
 								oLanguageItems1 = oTranslationPopover3.getContent()[0].getItems();
 								assert.equal(oLanguageItems1.length, 49, "oTranslationPopover3 Content: length");
@@ -276,7 +251,7 @@ sap.ui.define([
 								oFormField3.fireChange({ value: "{i18n>string1}"});
 								EditorQunitUtils.wait().then(function () {
 									assert.equal(oFormField3.getValue(), "{i18n>string1}", "SimpleForm field 1: Has new value");
-									assert.ok(deepEqual(cleanUUID(oField1._getCurrentProperty("value")), {"text": "{i18n>string1}"}), "Field 1: DT Value updated");
+									assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField1._getCurrentProperty("value")), {"text": "{i18n>string1}"}), "Field 1: DT Value updated");
 									assert.ok(oFormField3.getShowValueHelp(), "SimpleForm field 1: ShowValueHelp true");
 									var oValueHelpIcon1 = oFormField3._oValueHelpIcon;
 									assert.ok(oValueHelpIcon1, "SimpleForm field 1: Value help icon exist");

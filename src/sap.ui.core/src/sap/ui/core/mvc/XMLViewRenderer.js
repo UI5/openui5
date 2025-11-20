@@ -65,9 +65,9 @@ sap.ui.define([
 	 */
 	XMLViewRenderer.render = function(rm, oControl) {
 		/**
-				 * Create the root open tag.
-				 *
-				 */
+		 * Create the root open tag.
+		 *
+		 */
 		function writeRootOpenTag() {
 			rm.openStart("div", oControl);
 			rm.class("sapUiView");

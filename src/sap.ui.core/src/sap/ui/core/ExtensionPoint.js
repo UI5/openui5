@@ -15,17 +15,17 @@ sap.ui.define(["sap/base/Log", "sap/ui/core/mvc/View", "sap/ui/core/Component"],
 		const ExtensionPoint = {};
 
 		/**
-			 * API documentation see ExtensionPoint.load() (v2 API) and sap.ui.extensionpoint() (v1 API).
-			 *
-			 * Used only internally by this module, as well as the XMLTemplateProcessor.
-			 *
-			 * @param {sap.ui.core.mvc.View|sap.ui.core.Fragment} oContainer the containing UI5 element, either a View or a Fragment instance
-			 * @param {string} sExtName the name of the extension-point
-			 * @param {function} fnCreateDefaultContent a function which creates the default content of an extension-point. Either given via public API or statically defined in {@link sap.ui.core.XMLTemplateProcessor}.
-			 * @param {sap.ui.core.Control} oTargetControl the target control into which the extension-point's content will be inserted
-			 * @param {string} sAggregationName the aggregation name inside the target control. The content controls of the extension-point will be inserted into this aggregation.
-			 * @private
-			 */
+		 * API documentation see ExtensionPoint.load() (v2 API) and sap.ui.extensionpoint() (v1 API).
+		 *
+		 * Used only internally by this module, as well as the XMLTemplateProcessor.
+		 *
+		 * @param {sap.ui.core.mvc.View|sap.ui.core.Fragment} oContainer the containing UI5 element, either a View or a Fragment instance
+		 * @param {string} sExtName the name of the extension-point
+		 * @param {function} fnCreateDefaultContent a function which creates the default content of an extension-point. Either given via public API or statically defined in {@link sap.ui.core.XMLTemplateProcessor}.
+		 * @param {sap.ui.core.Control} oTargetControl the target control into which the extension-point's content will be inserted
+		 * @param {string} sAggregationName the aggregation name inside the target control. The content controls of the extension-point will be inserted into this aggregation.
+		 * @private
+		 */
 		ExtensionPoint._factory = function(oContainer, sExtName, fnCreateDefaultContent, oTargetControl, sAggregationName) {
 			var oExtensionConfig, oView, vResult, sViewOrFragmentName;
 
@@ -247,24 +247,24 @@ sap.ui.define(["sap/base/Log", "sap/ui/core/mvc/View", "sap/ui/core/Component"],
 		};
 
 		/**
-			 * Creates 0..n UI5 controls from an <code>ExtensionPoint</code>.
-			 *
-			 * One control if the <code>ExtensionPoint</code> is e.g. filled with a <code>View</code>, zero for extension points without configured extension and
-			 * n controls for multi-root <code>Fragments</code> as extension.
-			 *
-			 * @param {object} mOptions an object map (see below)
-			 * @param {sap.ui.core.mvc.View|sap.ui.core.Fragment} mOptions.container The view or fragment containing the extension point
-			 * @param {string} mOptions.name The <code>mOptions.name</code> is used to identify the extension point in the customizing
-			 * @param {function} [mOptions.createDefaultContent] Optional callback function creating default content, returning an array of controls. It is executed
-			 *        when there's no customizing, if not provided, no default content will be rendered.
-			 *        <code>mOptions.createDefaultContent</code> might also return a Promise, which resolves with an array of controls.
-			 *
-			 * @returns {Promise<sap.ui.core.Control[]>} a Promise, which resolves with an array of 0..n controls created from an <code>ExtensionPoint</code>.
-			 *        If <code>mOptions.createDefaultContent</code> is called and returns a Promise, that Promise is returned by <code>ExtensionPoint.load</code>.
-			 * @since 1.56.0
-			 * @public
-			 * @static
-			 */
+		 * Creates 0..n UI5 controls from an <code>ExtensionPoint</code>.
+		 *
+		 * One control if the <code>ExtensionPoint</code> is e.g. filled with a <code>View</code>, zero for extension points without configured extension and
+		 * n controls for multi-root <code>Fragments</code> as extension.
+		 *
+		 * @param {object} mOptions an object map (see below)
+		 * @param {sap.ui.core.mvc.View|sap.ui.core.Fragment} mOptions.container The view or fragment containing the extension point
+		 * @param {string} mOptions.name The <code>mOptions.name</code> is used to identify the extension point in the customizing
+		 * @param {function} [mOptions.createDefaultContent] Optional callback function creating default content, returning an array of controls. It is executed
+		 *        when there's no customizing, if not provided, no default content will be rendered.
+		 *        <code>mOptions.createDefaultContent</code> might also return a Promise, which resolves with an array of controls.
+		 *
+		 * @returns {Promise<sap.ui.core.Control[]>} a Promise, which resolves with an array of 0..n controls created from an <code>ExtensionPoint</code>.
+		 *        If <code>mOptions.createDefaultContent</code> is called and returns a Promise, that Promise is returned by <code>ExtensionPoint.load</code>.
+		 * @since 1.56.0
+		 * @public
+		 * @static
+		 */
 		ExtensionPoint.load = function(mOptions) {
 			return Promise.resolve(
 				ExtensionPoint._factory(

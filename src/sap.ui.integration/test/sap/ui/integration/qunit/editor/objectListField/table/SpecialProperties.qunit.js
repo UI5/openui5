@@ -80,46 +80,6 @@ sap.ui.define([
 	Localization.setLanguage("en");
 	document.body.className = document.body.className + " sapUiSizeCompact ";
 
-	function cleanUUID(oValue) {
-		var oClonedValue = deepClone(oValue, 500);
-		if (typeof oClonedValue === "string") {
-			oClonedValue = JSON.parse(oClonedValue);
-		}
-		if (Array.isArray(oClonedValue)) {
-			oClonedValue.forEach(function(oResult) {
-				if (oResult._dt) {
-					delete oResult._dt._uuid;
-				}
-				if (deepEqual(oResult._dt, {})) {
-					delete oResult._dt;
-				}
-			});
-		} else if (typeof oClonedValue === "object") {
-			if (oClonedValue._dt) {
-				delete oClonedValue._dt._uuid;
-			}
-			if (deepEqual(oClonedValue._dt, {})) {
-				delete oClonedValue._dt;
-			}
-		}
-		return oClonedValue;
-	}
-
-	function cleanDT(oValue) {
-		var oClonedValue = deepClone(oValue, 500);
-		if (typeof oClonedValue === "string") {
-			oClonedValue = JSON.parse(oClonedValue);
-		}
-		if (Array.isArray(oClonedValue)) {
-			oClonedValue.forEach(function(oResult) {
-				delete oResult._dt;
-			});
-		} else if (typeof oClonedValue === "object") {
-			delete oClonedValue._dt;
-		}
-		return oClonedValue;
-	}
-
 	QUnit.module("StringPropertyWithValues", {
 		before: function () {
 			this.oHost = new Host("host");
@@ -175,7 +135,7 @@ sap.ui.define([
 						oTable = oField.getAggregation("_field");
 						assert.equal(oTable.getBinding().getCount(), 8, "Table: RowCount beforeFiltering ok");
 						var oRow1 = oTable.getRows()[0];
-						assert.ok(deepEqual(cleanDT(cleanUUID(oRow1.getBindingContext().getObject())), oValueOfRow1), "Table: row1 value");
+						assert.ok(deepEqual(EditorQunitUtils.cleanDT(EditorQunitUtils.cleanUUID(oRow1.getBindingContext().getObject())), oValueOfRow1), "Table: row1 value");
 						var oCells1 = oRow1.getCells();
 						assert.equal(oCells1.length, 5, "Row1: cells length ok");
 						var oSelectionCell1 = oCells1[0];
@@ -227,7 +187,7 @@ sap.ui.define([
 							assert.ok(oFormField.isA("sap.m.TextArea"), "SimpleForm field5: TextArea Field");
 							assert.ok(!oFormField.getVisible(), "SimpleForm field5: Not Visible");
 							assert.ok(!oFormField.getEditable(), "SimpleForm field5: Not Editable");
-							assert.ok(deepEqual(cleanDT(cleanUUID(oFormField.getValue())), oValueOfRow1), "SimpleForm field5 textArea: Has correct value");
+							assert.ok(deepEqual(EditorQunitUtils.cleanDT(EditorQunitUtils.cleanUUID(oFormField.getValue())), oValueOfRow1), "SimpleForm field5 textArea: Has correct value");
 							var oAddButtonInPopover = oField._oObjectDetailsPopover._oAddButton;
 							assert.ok(!oAddButtonInPopover.getVisible(), "Popover: add button not visible");
 							var oUpdateButtonInPopover = oField._oObjectDetailsPopover._oUpdateButton;
@@ -259,19 +219,19 @@ sap.ui.define([
 					assert.ok(oLabel.isA("sap.m.Label"), "Label 1: Form content contains a Label");
 					assert.equal(oLabel.getText(), "Object List with special properties defined", "Label 1: Has label text");
 					assert.ok(oField.isA("sap.ui.integration.editor.fields.ObjectListField"), "Field 1: Object List Field");
-					assert.ok(deepEqual(cleanDT(oField._getCurrentProperty("value")), [oValue]), "Field 1: Value");
+					assert.ok(deepEqual(EditorQunitUtils.cleanDT(oField._getCurrentProperty("value")), [oValue]), "Field 1: Value");
 					EditorQunitUtils.isReady(oEditor).then(function () {
 						assert.ok(oEditor.isReady(), "Editor is ready");
 						oTable = oField.getAggregation("_field");
 						assert.equal(oTable.getBinding().getCount(), 9, "Table: RowCount beforeFiltering ok");
 						oCell = oTable.getRows()[0].getCells()[0];
 						assert.ok(oCell.getSelected(), "Row 1: Cell 1 is selected");
-						assert.ok(deepEqual(cleanUUID(oTable.getBinding().getContexts()[0].getObject()), oValueInTable), "Table: new row");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oTable.getBinding().getContexts()[0].getObject()), oValueInTable), "Table: new row");
 						var oSelectionColumn = oTable.getColumns()[0];
 						oRemoveValueButton = oSelectionColumn.getAggregation("multiLabels")[0];
 						assert.ok(oRemoveValueButton.getEnabled(), "Table: Remove Value button in Selection column enabled");
 						var oRow1 = oTable.getRows()[0];
-						assert.ok(deepEqual(cleanUUID(oRow1.getBindingContext().getObject()), oValueInTable), "Table: value row is at top");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oRow1.getBindingContext().getObject()), oValueInTable), "Table: value row is at top");
 						var oCells1 = oRow1.getCells();
 						assert.equal(oCells1.length, 5, "Row1: cells length ok");
 						var oSelectionCell1 = oCells1[0];
@@ -323,7 +283,7 @@ sap.ui.define([
 							assert.ok(oFormField.isA("sap.m.TextArea"), "SimpleForm field5: TextArea Field");
 							assert.ok(!oFormField.getVisible(), "SimpleForm field5: Not Visible");
 							assert.ok(oFormField.getEditable(), "SimpleForm field5: Editable");
-							assert.ok(deepEqual(cleanDT(cleanUUID(oFormField.getValue())), oValue), "SimpleForm field5 textArea: Has correct value");
+							assert.ok(deepEqual(EditorQunitUtils.cleanDT(EditorQunitUtils.cleanUUID(oFormField.getValue())), oValue), "SimpleForm field5 textArea: Has correct value");
 							var oAddButtonInPopover = oField._oObjectDetailsPopover._oAddButton;
 							assert.ok(!oAddButtonInPopover.getVisible(), "Popover: add button not visible");
 							var oUpdateButtonInPopover = oField._oObjectDetailsPopover._oUpdateButton;
@@ -355,19 +315,19 @@ sap.ui.define([
 					assert.ok(oLabel.isA("sap.m.Label"), "Label 1: Form content contains a Label");
 					assert.equal(oLabel.getText(), "Object List with special properties defined", "Label 1: Has label text");
 					assert.ok(oField.isA("sap.ui.integration.editor.fields.ObjectListField"), "Field 1: Object List Field");
-					assert.ok(deepEqual(cleanDT(oField._getCurrentProperty("value")), [oValue]), "Field 1: Value");
+					assert.ok(deepEqual(EditorQunitUtils.cleanDT(oField._getCurrentProperty("value")), [oValue]), "Field 1: Value");
 					EditorQunitUtils.isReady(oEditor).then(function () {
 						assert.ok(oEditor.isReady(), "Editor is ready");
 						oTable = oField.getAggregation("_field");
 						assert.equal(oTable.getBinding().getCount(), 9, "Table: RowCount beforeFiltering ok");
 						oCell = oTable.getRows()[0].getCells()[0];
 						assert.ok(oCell.getSelected(), "Row 1: Cell 1 is selected");
-						assert.ok(deepEqual(cleanUUID(oTable.getBinding().getContexts()[0].getObject()), oValueInTable), "Table: new row");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oTable.getBinding().getContexts()[0].getObject()), oValueInTable), "Table: new row");
 						var oSelectionColumn = oTable.getColumns()[0];
 						oRemoveValueButton = oSelectionColumn.getAggregation("multiLabels")[0];
 						assert.ok(oRemoveValueButton.getEnabled(), "Table: Remove Value button in Selection column enabled");
 						var oRow1 = oTable.getRows()[0];
-						assert.ok(deepEqual(cleanUUID(oRow1.getBindingContext().getObject()), oValueInTable), "Table: value row is at top");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oRow1.getBindingContext().getObject()), oValueInTable), "Table: value row is at top");
 						var oCells1 = oRow1.getCells();
 						assert.equal(oCells1.length, 5, "Row1: cells length ok");
 						var oSelectionCell1 = oCells1[0];
@@ -418,7 +378,7 @@ sap.ui.define([
 								assert.ok(oFormField.getEditable(), "SimpleForm field5: Editable");
 								var oUpdatedObject = deepClone(oDefaultNewObject, 500);
 								oUpdatedObject.type = "type05";
-								assert.ok(deepEqual(cleanUUID(oFormField.getValue()), oUpdatedObject), "SimpleForm field5 textArea: Has updated value");
+								assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oFormField.getValue()), oUpdatedObject), "SimpleForm field5 textArea: Has updated value");
 								var oAddButtonInPopover = oField._oObjectDetailsPopover._oAddButton;
 								assert.ok(oAddButtonInPopover.getVisible(), "Popover: add button visible");
 								var oUpdateButtonInPopover = oField._oObjectDetailsPopover._oUpdateButton;
@@ -430,9 +390,9 @@ sap.ui.define([
 								oAddButtonInPopover.firePress();
 								EditorQunitUtils.wait().then(function () {
 									assert.equal(oTable.getBinding().getCount(), 10, "Table: value length is 10");
-									assert.ok(deepEqual(cleanUUID(oTable.getBinding().getContexts()[9].getObject()), {"text": "text", "type": "type05", "_dt": {"_selected": true, "_position": 10}}), "Table: new row data");
+									assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oTable.getBinding().getContexts()[9].getObject()), {"text": "text", "type": "type05", "_dt": {"_selected": true, "_position": 10}}), "Table: new row data");
 									assert.ok(oSelectionCell1.getSelected(), "Row 1: Cell 1 is still selected after new row added");
-									assert.ok(deepEqual(cleanDT(cleanUUID(oField._getCurrentProperty("value"))), [oValue, {"text": "text", "type": "type05"}]), "Field 1: Value added");
+									assert.ok(deepEqual(EditorQunitUtils.cleanDT(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value"))), [oValue, {"text": "text", "type": "type05"}]), "Field 1: Value added");
 									// scroll to the bottom
 									oTable._getScrollExtension().getVerticalScrollbar().scrollTop = 200;
 									EditorQunitUtils.wait().then(function () {
@@ -440,7 +400,7 @@ sap.ui.define([
 										var oSelectionCell5 = oRow5.getCells()[0];
 										assert.ok(oSelectionCell5.isA("sap.m.CheckBox"), "Row 9: Cell 1 is CheckBox");
 										assert.ok(oSelectionCell5.getSelected(), "Row 9: Cell 1 is selected");
-										assert.ok(deepEqual(cleanUUID(oRow5.getBindingContext().getObject()), {"text": "text", "type": "type05", "_dt": {"_selected": true, "_position": 10}}), "Table: new row in the bottom");
+										assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oRow5.getBindingContext().getObject()), {"text": "text", "type": "type05", "_dt": {"_selected": true, "_position": 10}}), "Table: new row in the bottom");
 										resolve();
 									});
 								});
@@ -467,19 +427,19 @@ sap.ui.define([
 					assert.ok(oLabel.isA("sap.m.Label"), "Label 1: Form content contains a Label");
 					assert.equal(oLabel.getText(), "Object List with special properties defined", "Label 1: Has label text");
 					assert.ok(oField.isA("sap.ui.integration.editor.fields.ObjectListField"), "Field 1: Object List Field");
-					assert.ok(deepEqual(cleanDT(oField._getCurrentProperty("value")), [oValue]), "Field 1: Value");
+					assert.ok(deepEqual(EditorQunitUtils.cleanDT(oField._getCurrentProperty("value")), [oValue]), "Field 1: Value");
 					EditorQunitUtils.isReady(oEditor).then(function () {
 						assert.ok(oEditor.isReady(), "Editor is ready");
 						oTable = oField.getAggregation("_field");
 						assert.equal(oTable.getBinding().getCount(), 9, "Table: RowCount beforeFiltering ok");
 						oCell = oTable.getRows()[0].getCells()[0];
 						assert.ok(oCell.getSelected(), "Row 1: Cell 1 is selected");
-						assert.ok(deepEqual(cleanUUID(oTable.getBinding().getContexts()[0].getObject()), oValueInTable), "Table: new row");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oTable.getBinding().getContexts()[0].getObject()), oValueInTable), "Table: new row");
 						var oSelectionColumn = oTable.getColumns()[0];
 						oRemoveValueButton = oSelectionColumn.getAggregation("multiLabels")[0];
 						assert.ok(oRemoveValueButton.getEnabled(), "Table: Remove Value button in Selection column enabled");
 						var oRow1 = oTable.getRows()[0];
-						assert.ok(deepEqual(cleanUUID(oRow1.getBindingContext().getObject()), oValueInTable), "Table: value row is at top");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oRow1.getBindingContext().getObject()), oValueInTable), "Table: value row is at top");
 						var oCells1 = oRow1.getCells();
 						assert.equal(oCells1.length, 5, "Row1: cells length ok");
 						var oSelectionCell1 = oCells1[0];
@@ -522,7 +482,7 @@ sap.ui.define([
 								assert.ok(oFormField.isA("sap.m.TextArea"), "SimpleForm field5: TextArea Field");
 								assert.ok(!oFormField.getVisible(), "SimpleForm field5: Not Visible");
 								assert.ok(oFormField.getEditable(), "SimpleForm field5: Editable");
-								assert.ok(deepEqual(cleanDT(cleanUUID(oFormField.getValue())), oUpdateValue), "SimpleForm field5 textArea: Has correct value");
+								assert.ok(deepEqual(EditorQunitUtils.cleanDT(EditorQunitUtils.cleanUUID(oFormField.getValue())), oUpdateValue), "SimpleForm field5 textArea: Has correct value");
 								var oAddButtonInPopover = oField._oObjectDetailsPopover._oAddButton;
 								assert.ok(!oAddButtonInPopover.getVisible(), "Popover: add button not visible");
 								var oUpdateButtonInPopover = oField._oObjectDetailsPopover._oUpdateButton;
@@ -535,10 +495,10 @@ sap.ui.define([
 								EditorQunitUtils.wait().then(function () {
 									assert.equal(oTable.getBinding().getCount(), 9, "Table: value length is 9");
 									oUpdateValue._dt = {"_selected": true, "_position": 1};
-									assert.ok(deepEqual(cleanUUID(oTable.getBinding().getContexts()[0].getObject()), oUpdateValue), "Table: row data updated");
+									assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oTable.getBinding().getContexts()[0].getObject()), oUpdateValue), "Table: row data updated");
 									assert.ok(oSelectionCell1.getSelected(), "Row 1: Cell 1 is still selected after updated");
 									delete oUpdateValue._dt;
-									assert.ok(deepEqual(cleanDT(cleanUUID(oField._getCurrentProperty("value"))), [oUpdateValue]), "Field 1: Value changed to added object");
+									assert.ok(deepEqual(EditorQunitUtils.cleanDT(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value"))), [oUpdateValue]), "Field 1: Value changed to added object");
 									resolve();
 								});
 							});
@@ -564,19 +524,19 @@ sap.ui.define([
 					assert.ok(oLabel.isA("sap.m.Label"), "Label 1: Form content contains a Label");
 					assert.equal(oLabel.getText(), "Object List with special properties defined", "Label 1: Has label text");
 					assert.ok(oField.isA("sap.ui.integration.editor.fields.ObjectListField"), "Field 1: Object List Field");
-					assert.ok(deepEqual(cleanDT(oField._getCurrentProperty("value")), [oValue]), "Field 1: Value");
+					assert.ok(deepEqual(EditorQunitUtils.cleanDT(oField._getCurrentProperty("value")), [oValue]), "Field 1: Value");
 					EditorQunitUtils.isReady(oEditor).then(function () {
 						assert.ok(oEditor.isReady(), "Editor is ready");
 						oTable = oField.getAggregation("_field");
 						assert.equal(oTable.getBinding().getCount(), 9, "Table: RowCount beforeFiltering ok");
 						oCell = oTable.getRows()[0].getCells()[0];
 						assert.ok(oCell.getSelected(), "Row 1: Cell 1 is selected");
-						assert.ok(deepEqual(cleanUUID(oTable.getBinding().getContexts()[0].getObject()), oValueInTable), "Table: new row");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oTable.getBinding().getContexts()[0].getObject()), oValueInTable), "Table: new row");
 						var oSelectionColumn = oTable.getColumns()[0];
 						oRemoveValueButton = oSelectionColumn.getAggregation("multiLabels")[0];
 						assert.ok(oRemoveValueButton.getEnabled(), "Table: Remove Value button in Selection column enabled");
 						var oRow1 = oTable.getRows()[0];
-						assert.ok(deepEqual(cleanUUID(oRow1.getBindingContext().getObject()), oValueInTable), "Table: value row is at top");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oRow1.getBindingContext().getObject()), oValueInTable), "Table: value row is at top");
 						var oCells1 = oRow1.getCells();
 						assert.equal(oCells1.length, 5, "Row1: cells length ok");
 						var oSelectionCell1 = oCells1[0];
@@ -614,7 +574,7 @@ sap.ui.define([
 							assert.ok(oTextAreaField.isA("sap.m.TextArea"), "SimpleForm field5: TextArea Field");
 							assert.ok(!oTextAreaField.getVisible(), "SimpleForm field5: Not Visible");
 							assert.ok(oTextAreaField.getEditable(), "SimpleForm field5: Editable");
-							assert.ok(deepEqual(cleanDT(cleanUUID(oTextAreaField.getValue())), oValue), "SimpleForm field5 textArea: Has correct value");
+							assert.ok(deepEqual(EditorQunitUtils.cleanDT(EditorQunitUtils.cleanUUID(oTextAreaField.getValue())), oValue), "SimpleForm field5 textArea: Has correct value");
 							var oSwitchModeButton = oField._oObjectDetailsPopover.getContent()[0].getPages()[0].getHeaderContent()[0];
 							oSwitchModeButton.firePress();
 							EditorQunitUtils.wait().then(function () {
@@ -623,7 +583,7 @@ sap.ui.define([
 								assert.ok(oTextAreaField.isA("sap.m.TextArea"), "SimpleForm field5: TextArea Field");
 								assert.ok(oTextAreaField.getVisible(), "SimpleForm field5: Visible");
 								assert.ok(oTextAreaField.getEditable(), "SimpleForm field5: Editable");
-								assert.ok(deepEqual(cleanDT(cleanUUID(oTextAreaField.getValue())), oValue), "SimpleForm field5 textArea: Has correct value");
+								assert.ok(deepEqual(EditorQunitUtils.cleanDT(EditorQunitUtils.cleanUUID(oTextAreaField.getValue())), oValue), "SimpleForm field5 textArea: Has correct value");
 								var oUpdateValue = JSON.parse(oTextAreaField.getValue());
 								oUpdateValue.type = "type05";
 								var sNewValue = JSON.stringify(oUpdateValue, null, "\t");
@@ -646,10 +606,10 @@ sap.ui.define([
 									EditorQunitUtils.wait().then(function () {
 										assert.equal(oTable.getBinding().getCount(), 9, "Table: value length is 9");
 										oUpdateValue._dt = {"_selected": true, "_position": 1};
-										assert.ok(deepEqual(cleanUUID(oTable.getBinding().getContexts()[0].getObject()), oUpdateValue), "Table: row data updated");
+										assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oTable.getBinding().getContexts()[0].getObject()), oUpdateValue), "Table: row data updated");
 										assert.ok(oSelectionCell1.getSelected(), "Row 1: Cell 1 is still selected after updated");
 										delete oUpdateValue._dt;
-										assert.ok(deepEqual(cleanDT(cleanUUID(oField._getCurrentProperty("value"))), [oUpdateValue]), "Field 1: Value changed to added object");
+										assert.ok(deepEqual(EditorQunitUtils.cleanDT(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value"))), [oUpdateValue]), "Field 1: Value changed to added object");
 										resolve();
 									});
 								});
@@ -716,7 +676,7 @@ sap.ui.define([
 						oTable = oField.getAggregation("_field");
 						assert.equal(oTable.getBinding().getCount(), 8, "Table: RowCount beforeFiltering ok");
 						var oRow1 = oTable.getRows()[0];
-						assert.ok(deepEqual(cleanDT(cleanUUID(oRow1.getBindingContext().getObject())), oValueOfRow1), "Table: row1 value");
+						assert.ok(deepEqual(EditorQunitUtils.cleanDT(EditorQunitUtils.cleanUUID(oRow1.getBindingContext().getObject())), oValueOfRow1), "Table: row1 value");
 						var oCells1 = oRow1.getCells();
 						assert.equal(oCells1.length, 5, "Row1: cells length ok");
 						var oSelectionCell1 = oCells1[0];
@@ -770,7 +730,7 @@ sap.ui.define([
 									assert.ok(oFormField.isA("sap.m.TextArea"), "SimpleForm Field8: TextArea Field");
 									assert.ok(!oFormField.getVisible(), "SimpleForm Field8: Not Visible");
 									assert.ok(!oFormField.getEditable(), "SimpleForm Field8: Not Editable");
-									assert.ok(deepEqual(cleanDT(cleanUUID(oFormField.getValue())), oValueOfRow1), "SimpleForm field textArea: Has correct value");
+									assert.ok(deepEqual(EditorQunitUtils.cleanDT(EditorQunitUtils.cleanUUID(oFormField.getValue())), oValueOfRow1), "SimpleForm field textArea: Has correct value");
 									var oAddButtonInPopover = oField._oObjectDetailsPopover._oAddButton;
 									assert.ok(!oAddButtonInPopover.getVisible(), "Popover: add button not visible");
 									var oUpdateButtonInPopover = oField._oObjectDetailsPopover._oUpdateButton;
@@ -804,19 +764,19 @@ sap.ui.define([
 					assert.ok(oLabel.isA("sap.m.Label"), "Label 1: Form content contains a Label");
 					assert.equal(oLabel.getText(), "Object List with special properties defined", "Label 1: Has label text");
 					assert.ok(oField.isA("sap.ui.integration.editor.fields.ObjectListField"), "Field 1: Object List Field");
-					assert.ok(deepEqual(cleanDT(oField._getCurrentProperty("value")), [oValue]), "Field 1: Value");
+					assert.ok(deepEqual(EditorQunitUtils.cleanDT(oField._getCurrentProperty("value")), [oValue]), "Field 1: Value");
 					EditorQunitUtils.isReady(oEditor).then(function () {
 						assert.ok(oEditor.isReady(), "Editor is ready");
 						oTable = oField.getAggregation("_field");
 						assert.equal(oTable.getBinding().getCount(), 9, "Table: RowCount beforeFiltering ok");
 						oCell = oTable.getRows()[0].getCells()[0];
 						assert.ok(oCell.getSelected(), "Row 1: Cell 1 is selected");
-						assert.ok(deepEqual(cleanUUID(oTable.getBinding().getContexts()[0].getObject()), oValueInTable), "Table: new row");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oTable.getBinding().getContexts()[0].getObject()), oValueInTable), "Table: new row");
 						var oSelectionColumn = oTable.getColumns()[0];
 						oRemoveValueButton = oSelectionColumn.getAggregation("multiLabels")[0];
 						assert.ok(oRemoveValueButton.getEnabled(), "Table: Remove Value button in Selection column enabled");
 						var oRow1 = oTable.getRows()[0];
-						assert.ok(deepEqual(cleanUUID(oRow1.getBindingContext().getObject()), oValueInTable), "Table: value row is at top");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oRow1.getBindingContext().getObject()), oValueInTable), "Table: value row is at top");
 						var oCells1 = oRow1.getCells();
 						assert.equal(oCells1.length, 5, "Row1: cells length ok");
 						var oSelectionCell1 = oCells1[0];
@@ -870,7 +830,7 @@ sap.ui.define([
 									assert.ok(oFormField.isA("sap.m.TextArea"), "SimpleForm field5: TextArea Field");
 									assert.ok(!oFormField.getVisible(), "SimpleForm field5: Not Visible");
 									assert.ok(oFormField.getEditable(), "SimpleForm field5: Editable");
-									assert.ok(deepEqual(cleanDT(cleanUUID(oFormField.getValue())), oValue), "SimpleForm field5 textArea: Has correct value");
+									assert.ok(deepEqual(EditorQunitUtils.cleanDT(EditorQunitUtils.cleanUUID(oFormField.getValue())), oValue), "SimpleForm field5 textArea: Has correct value");
 									var oAddButtonInPopover = oField._oObjectDetailsPopover._oAddButton;
 									assert.ok(!oAddButtonInPopover.getVisible(), "Popover: add button not visible");
 									var oUpdateButtonInPopover = oField._oObjectDetailsPopover._oUpdateButton;
@@ -904,19 +864,19 @@ sap.ui.define([
 					assert.ok(oLabel.isA("sap.m.Label"), "Label 1: Form content contains a Label");
 					assert.equal(oLabel.getText(), "Object List with special properties defined", "Label 1: Has label text");
 					assert.ok(oField.isA("sap.ui.integration.editor.fields.ObjectListField"), "Field 1: Object List Field");
-					assert.ok(deepEqual(cleanDT(oField._getCurrentProperty("value")), [oValue]), "Field 1: Value");
+					assert.ok(deepEqual(EditorQunitUtils.cleanDT(oField._getCurrentProperty("value")), [oValue]), "Field 1: Value");
 					EditorQunitUtils.isReady(oEditor).then(function () {
 						assert.ok(oEditor.isReady(), "Editor is ready");
 						oTable = oField.getAggregation("_field");
 						assert.equal(oTable.getBinding().getCount(), 9, "Table: RowCount beforeFiltering ok");
 						oCell = oTable.getRows()[0].getCells()[0];
 						assert.ok(oCell.getSelected(), "Row 1: Cell 1 is selected");
-						assert.ok(deepEqual(cleanUUID(oTable.getBinding().getContexts()[0].getObject()), oValueInTable), "Table: new row");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oTable.getBinding().getContexts()[0].getObject()), oValueInTable), "Table: new row");
 						var oSelectionColumn = oTable.getColumns()[0];
 						oRemoveValueButton = oSelectionColumn.getAggregation("multiLabels")[0];
 						assert.ok(oRemoveValueButton.getEnabled(), "Table: Remove Value button in Selection column enabled");
 						var oRow1 = oTable.getRows()[0];
-						assert.ok(deepEqual(cleanUUID(oRow1.getBindingContext().getObject()), oValueInTable), "Table: value row is at top");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oRow1.getBindingContext().getObject()), oValueInTable), "Table: value row is at top");
 						var oCells1 = oRow1.getCells();
 						assert.equal(oCells1.length, 5, "Row1: cells length ok");
 						var oSelectionCell1 = oCells1[0];
@@ -973,7 +933,7 @@ sap.ui.define([
 								assert.ok(oFormField.getEditable(), "SimpleForm field5: Editable");
 								var oUpdatedObject = deepClone(oDefaultNewObject, 500);
 								oUpdatedObject.object = oValue.object;
-								assert.ok(deepEqual(cleanUUID(oFormField.getValue()), oUpdatedObject), "SimpleForm field5 textArea: Has updated value");
+								assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oFormField.getValue()), oUpdatedObject), "SimpleForm field5 textArea: Has updated value");
 								var oAddButtonInPopover = oField._oObjectDetailsPopover._oAddButton;
 								assert.ok(oAddButtonInPopover.getVisible(), "Popover: add button visible");
 								var oUpdateButtonInPopover = oField._oObjectDetailsPopover._oUpdateButton;
@@ -985,9 +945,9 @@ sap.ui.define([
 								oAddButtonInPopover.firePress();
 								EditorQunitUtils.wait().then(function () {
 									assert.equal(oTable.getBinding().getCount(), 10, "Table: value length is 10");
-									assert.ok(deepEqual(cleanUUID(oTable.getBinding().getContexts()[9].getObject()), {"text": "text", "object": {"text": "textnew", "key": "keynew"}, "_dt": {"_selected": true, "_position": 10}}), "Table: new row data");
+									assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oTable.getBinding().getContexts()[9].getObject()), {"text": "text", "object": {"text": "textnew", "key": "keynew"}, "_dt": {"_selected": true, "_position": 10}}), "Table: new row data");
 									assert.ok(oSelectionCell1.getSelected(), "Row 1: Cell 1 is still selected after new row added");
-									assert.ok(deepEqual(cleanDT(cleanUUID(oField._getCurrentProperty("value"))), [oValue, {"text": "text", "object": {"text": "textnew", "key": "keynew"}}]), "Field 1: Value changed to added object");
+									assert.ok(deepEqual(EditorQunitUtils.cleanDT(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value"))), [oValue, {"text": "text", "object": {"text": "textnew", "key": "keynew"}}]), "Field 1: Value changed to added object");
 									// scroll to the bottom
 									oTable._getScrollExtension().getVerticalScrollbar().scrollTop = 200;
 									EditorQunitUtils.wait().then(function () {
@@ -995,7 +955,7 @@ sap.ui.define([
 										var oSelectionCell5 = oRow5.getCells()[0];
 										assert.ok(oSelectionCell5.isA("sap.m.CheckBox"), "Row 9: Cell 1 is CheckBox");
 										assert.ok(oSelectionCell5.getSelected(), "Row 9: Cell 1 is selected");
-										assert.ok(deepEqual(cleanUUID(oRow5.getBindingContext().getObject()), {"text": "text", "object": {"text": "textnew", "key": "keynew"}, "_dt": {"_selected": true, "_position": 10}}), "Table: new row in the bottom");
+										assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oRow5.getBindingContext().getObject()), {"text": "text", "object": {"text": "textnew", "key": "keynew"}, "_dt": {"_selected": true, "_position": 10}}), "Table: new row in the bottom");
 										var oCells5 = oRow5.getCells();
 										var oObjectCell5 = oCells5[4];
 										assert.ok(oObjectCell5.isA("sap.m.HBox"), "Row 9: Cell 4 is HBox");
@@ -1043,19 +1003,19 @@ sap.ui.define([
 					assert.ok(oLabel.isA("sap.m.Label"), "Label 1: Form content contains a Label");
 					assert.equal(oLabel.getText(), "Object List with special properties defined", "Label 1: Has label text");
 					assert.ok(oField.isA("sap.ui.integration.editor.fields.ObjectListField"), "Field 1: Object List Field");
-					assert.ok(deepEqual(cleanDT(oField._getCurrentProperty("value")), [oValue]), "Field 1: Value");
+					assert.ok(deepEqual(EditorQunitUtils.cleanDT(oField._getCurrentProperty("value")), [oValue]), "Field 1: Value");
 					EditorQunitUtils.isReady(oEditor).then(function () {
 						assert.ok(oEditor.isReady(), "Editor is ready");
 						oTable = oField.getAggregation("_field");
 						assert.equal(oTable.getBinding().getCount(), 9, "Table: RowCount beforeFiltering ok");
 						oCell = oTable.getRows()[0].getCells()[0];
 						assert.ok(oCell.getSelected(), "Row 1: Cell 1 is selected");
-						assert.ok(deepEqual(cleanUUID(oTable.getBinding().getContexts()[0].getObject()), oValueInTable), "Table: new row");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oTable.getBinding().getContexts()[0].getObject()), oValueInTable), "Table: new row");
 						var oSelectionColumn = oTable.getColumns()[0];
 						oRemoveValueButton = oSelectionColumn.getAggregation("multiLabels")[0];
 						assert.ok(oRemoveValueButton.getEnabled(), "Table: Remove Value button in Selection column enabled");
 						var oRow1 = oTable.getRows()[0];
-						assert.ok(deepEqual(cleanUUID(oRow1.getBindingContext().getObject()), oValueInTable), "Table: value row is at top");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oRow1.getBindingContext().getObject()), oValueInTable), "Table: value row is at top");
 						var oCells1 = oRow1.getCells();
 						assert.equal(oCells1.length, 5, "Row1: cells length ok");
 						var oSelectionCell1 = oCells1[0];
@@ -1109,7 +1069,7 @@ sap.ui.define([
 								assert.ok(oFormField.isA("sap.m.TextArea"), "SimpleForm field5: TextArea Field");
 								assert.ok(!oFormField.getVisible(), "SimpleForm field5: Not Visible");
 								assert.ok(oFormField.getEditable(), "SimpleForm field5: Editable");
-								assert.ok(deepEqual(cleanDT(cleanUUID(oFormField.getValue())), oUpdateValue), "SimpleForm field5 textArea: Has correct value");
+								assert.ok(deepEqual(EditorQunitUtils.cleanDT(EditorQunitUtils.cleanUUID(oFormField.getValue())), oUpdateValue), "SimpleForm field5 textArea: Has correct value");
 								var oAddButtonInPopover = oField._oObjectDetailsPopover._oAddButton;
 								assert.ok(!oAddButtonInPopover.getVisible(), "Popover: add button not visible");
 								var oUpdateButtonInPopover = oField._oObjectDetailsPopover._oUpdateButton;
@@ -1122,12 +1082,12 @@ sap.ui.define([
 								EditorQunitUtils.wait().then(function () {
 									assert.equal(oTable.getBinding().getCount(), 9, "Table: value length is 9");
 									oUpdateValue._dt = {"_selected": true, "_position": 1};
-									assert.ok(deepEqual(cleanUUID(oTable.getBinding().getContexts()[0].getObject()), oUpdateValue), "Table: row data updated");
-									assert.ok(deepEqual(cleanUUID(oRow1.getBindingContext().getObject()), oUpdateValue), "Table: row data updated");
+									assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oTable.getBinding().getContexts()[0].getObject()), oUpdateValue), "Table: row data updated");
+									assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oRow1.getBindingContext().getObject()), oUpdateValue), "Table: row data updated");
 
 									assert.ok(oSelectionCell1.getSelected(), "Row 1: Cell 1 is still selected after updated");
 									delete oUpdateValue._dt;
-									assert.ok(deepEqual(cleanDT(cleanUUID(oField._getCurrentProperty("value"))), [oUpdateValue]), "Field 1: Value changed to added object");
+									assert.ok(deepEqual(EditorQunitUtils.cleanDT(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value"))), [oUpdateValue]), "Field 1: Value changed to added object");
 
 									assert.ok(!oObjectCellInput.getEditable(), "Row 1: Cell 4 control 1 is not editable");
 									assert.ok(deepEqual(JSON.parse(oObjectCellInput.getValue()), oObjectPropertyUpdated), "Row 1: Cell 4 control 1 value updated");
@@ -1170,19 +1130,19 @@ sap.ui.define([
 					assert.ok(oLabel.isA("sap.m.Label"), "Label 1: Form content contains a Label");
 					assert.equal(oLabel.getText(), "Object List with special properties defined", "Label 1: Has label text");
 					assert.ok(oField.isA("sap.ui.integration.editor.fields.ObjectListField"), "Field 1: Object List Field");
-					assert.ok(deepEqual(cleanDT(oField._getCurrentProperty("value")), [oValue]), "Field 1: Value");
+					assert.ok(deepEqual(EditorQunitUtils.cleanDT(oField._getCurrentProperty("value")), [oValue]), "Field 1: Value");
 					EditorQunitUtils.isReady(oEditor).then(function () {
 						assert.ok(oEditor.isReady(), "Editor is ready");
 						oTable = oField.getAggregation("_field");
 						assert.equal(oTable.getBinding().getCount(), 9, "Table: RowCount beforeFiltering ok");
 						oCell = oTable.getRows()[0].getCells()[0];
 						assert.ok(oCell.getSelected(), "Row 1: Cell 1 is selected");
-						assert.ok(deepEqual(cleanUUID(oTable.getBinding().getContexts()[0].getObject()), oValueInTable), "Table: new row");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oTable.getBinding().getContexts()[0].getObject()), oValueInTable), "Table: new row");
 						var oSelectionColumn = oTable.getColumns()[0];
 						oRemoveValueButton = oSelectionColumn.getAggregation("multiLabels")[0];
 						assert.ok(oRemoveValueButton.getEnabled(), "Table: Remove Value button in Selection column enabled");
 						var oRow1 = oTable.getRows()[0];
-						assert.ok(deepEqual(cleanUUID(oRow1.getBindingContext().getObject()), oValueInTable), "Table: value row is at top");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oRow1.getBindingContext().getObject()), oValueInTable), "Table: value row is at top");
 						var oCells1 = oRow1.getCells();
 						assert.equal(oCells1.length, 5, "Row1: cells length ok");
 						var oSelectionCell1 = oCells1[0];
@@ -1227,7 +1187,7 @@ sap.ui.define([
 							assert.ok(oTextAreaField.isA("sap.m.TextArea"), "SimpleForm field5: TextArea Field");
 							assert.ok(!oTextAreaField.getVisible(), "SimpleForm field5: Not Visible");
 							assert.ok(oTextAreaField.getEditable(), "SimpleForm field5: Editable");
-							assert.ok(deepEqual(cleanDT(cleanUUID(oTextAreaField.getValue())), oValue), "SimpleForm field5 textArea: Has correct value");
+							assert.ok(deepEqual(EditorQunitUtils.cleanDT(EditorQunitUtils.cleanUUID(oTextAreaField.getValue())), oValue), "SimpleForm field5 textArea: Has correct value");
 							var oSwitchModeButton = oField._oObjectDetailsPopover.getContent()[0].getPages()[0].getHeaderContent()[0];
 							oSwitchModeButton.firePress();
 							EditorQunitUtils.wait().then(function () {
@@ -1236,7 +1196,7 @@ sap.ui.define([
 								assert.ok(oTextAreaField.isA("sap.m.TextArea"), "SimpleForm field5: TextArea Field");
 								assert.ok(oTextAreaField.getVisible(), "SimpleForm field5: Visible");
 								assert.ok(oTextAreaField.getEditable(), "SimpleForm field5: Editable");
-								assert.ok(deepEqual(cleanDT(cleanUUID(oTextAreaField.getValue())), oValue), "SimpleForm field5 textArea: Has correct value");
+								assert.ok(deepEqual(EditorQunitUtils.cleanDT(EditorQunitUtils.cleanUUID(oTextAreaField.getValue())), oValue), "SimpleForm field5 textArea: Has correct value");
 								var oUpdateValue = JSON.parse(oTextAreaField.getValue());
 								oUpdateValue.object = oObjectPropertyUpdated;
 								var sNewValue = JSON.stringify(oUpdateValue, null, "\t");
@@ -1266,12 +1226,12 @@ sap.ui.define([
 									EditorQunitUtils.wait().then(function () {
 										assert.equal(oTable.getBinding().getCount(), 9, "Table: value length is 9");
 										oUpdateValue._dt = {"_selected": true, "_position": 1};
-										assert.ok(deepEqual(cleanUUID(oTable.getBinding().getContexts()[0].getObject()), oUpdateValue), "Table: row data updated");
-										assert.ok(deepEqual(cleanUUID(oRow1.getBindingContext().getObject()), oUpdateValue), "Table: row data updated");
+										assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oTable.getBinding().getContexts()[0].getObject()), oUpdateValue), "Table: row data updated");
+										assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oRow1.getBindingContext().getObject()), oUpdateValue), "Table: row data updated");
 
 										assert.ok(oSelectionCell1.getSelected(), "Row 1: Cell 1 is still selected after updated");
 										delete oUpdateValue._dt;
-										assert.ok(deepEqual(cleanDT(cleanUUID(oField._getCurrentProperty("value"))), [oUpdateValue]), "Field 1: Value changed to added object");
+										assert.ok(deepEqual(EditorQunitUtils.cleanDT(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value"))), [oUpdateValue]), "Field 1: Value changed to added object");
 
 										assert.ok(!oObjectCellInput.getEditable(), "Row 1: Cell 4 control 1 is not editable");
 										assert.ok(deepEqual(JSON.parse(oObjectCellInput.getValue()), oObjectPropertyUpdated), "Row 1: Cell 4 control 1 value updated");

@@ -86,33 +86,6 @@ sap.ui.define([
 	Localization.setLanguage("en");
 	document.body.className = document.body.className + " sapUiSizeCompact ";
 
-	function cleanUUIDAndPosition(oValue) {
-		var oClonedValue = deepClone(oValue, 500);
-		if (typeof oClonedValue === "string") {
-			oClonedValue = JSON.parse(oClonedValue);
-		}
-		if (Array.isArray(oClonedValue)) {
-			oClonedValue.forEach(function(oResult) {
-				if (oResult._dt) {
-					delete oResult._dt._uuid;
-					delete oResult._dt._position;
-				}
-				if (deepEqual(oResult._dt, {})) {
-					delete oResult._dt;
-				}
-			});
-		} else if (typeof oClonedValue === "object") {
-			if (oClonedValue._dt) {
-				delete oClonedValue._dt._uuid;
-				delete oClonedValue._dt._position;
-			}
-			if (deepEqual(oClonedValue._dt, {})) {
-				delete oClonedValue._dt;
-			}
-		}
-		return oClonedValue;
-	}
-
 	QUnit.module("Basic", {
 		before: function () {
 			this.oMockServer = new MockServer();
@@ -174,7 +147,7 @@ sap.ui.define([
 			assert.ok(oLabel.isA("sap.m.Label"), "Label 1: Form content contains a Label");
 			assert.equal(oLabel.getText(), "Object properties defined: value from request", "Label 1: Has label text");
 			assert.ok(oField.isA("sap.ui.integration.editor.fields.ObjectListField"), "Field 1: Object List Field");
-			assert.ok(deepEqual(cleanUUIDAndPosition(oField._getCurrentProperty("value")), aObjectsParameterValue), "Field 1: DT Value");
+			assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), aObjectsParameterValue), "Field 1: DT Value");
 			oTable = oField.getAggregation("_field");
 			assert.ok(oTable.isA("sap.ui.table.Table"), "Field 1: Control is Table");
 			var oToolbar = oTable.getExtension()[0];
@@ -188,7 +161,7 @@ sap.ui.define([
 		}).then(function() {
 			assert.equal(oTable.getRows().length, 5, "Table: line number is 5");
 			assert.equal(oTable.getBinding().getCount(), (oResponseData.Objects.length + 1), "Table: value length is " + (oResponseData.Objects.length + 1));
-			assert.ok(deepEqual(cleanUUIDAndPosition(oField._getCurrentProperty("value")), aObjectsParameterValue), "Field 1: Value");
+			assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), aObjectsParameterValue), "Field 1: Value");
 			oURLColumn = oTable.getColumns()[4];
 			oIntColumn = oTable.getColumns()[6];
 			return EditorQunitUtils.openColumnMenu(oURLColumn, assert);
@@ -200,7 +173,7 @@ sap.ui.define([
 			return EditorQunitUtils.wait();
 		}).then(function () {
 			assert.equal(oTable.getBinding().getCount(), 6, "Table: RowCount after filtering column URL with 'https'");
-			assert.ok(deepEqual(cleanUUIDAndPosition(oField._getCurrentProperty("value")), aObjectsParameterValue), "Field 1: Value not changed after filtering");
+			assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), aObjectsParameterValue), "Field 1: Value not changed after filtering");
 			// open the column filter menu, input filter value, close the menu.
 			return EditorQunitUtils.openColumnMenu(oIntColumn, assert);
 		}).then(function() {
@@ -211,7 +184,7 @@ sap.ui.define([
 			return EditorQunitUtils.wait();
 		}).then(function () {
 			assert.equal(oTable.getBinding().getCount(), 1, "Table: RowCount after filtering column Integer with '4'");
-			assert.ok(deepEqual(cleanUUIDAndPosition(oField._getCurrentProperty("value")), aObjectsParameterValue), "Field 1: Value not changed after filtering");
+			assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), aObjectsParameterValue), "Field 1: Value not changed after filtering");
 			// open the column filter menu, input filter value, close the menu.
 			return EditorQunitUtils.openColumnMenu(oIntColumn, assert);
 		}).then(function() {
@@ -219,14 +192,14 @@ sap.ui.define([
 			return EditorQunitUtils.wait();
 		}).then(function () {
 			assert.equal(oTable.getBinding().getCount(), 2, "Table: RowCount after filtering column Integer with '>4'");
-			assert.ok(deepEqual(cleanUUIDAndPosition(oField._getCurrentProperty("value")), aObjectsParameterValue), "Field 1: Value not changed after filtering");
+			assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), aObjectsParameterValue), "Field 1: Value not changed after filtering");
 
 			// clear all the filters
 			oClearFilterButton.firePress();
 			return EditorQunitUtils.wait();
 		}).then(function () {
 			assert.equal(oTable.getBinding().getCount(), 9, "Table: RowCount after removing all the filters");
-			assert.ok(deepEqual(cleanUUIDAndPosition(oField._getCurrentProperty("value")), aObjectsParameterValue), "Field 1: Value not changed after filtering");
+			assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), aObjectsParameterValue), "Field 1: Value not changed after filtering");
 			return Promise.resolve();
 		});
 	});
@@ -245,7 +218,7 @@ sap.ui.define([
 			assert.ok(oLabel.isA("sap.m.Label"), "Label 1: Form content contains a Label");
 			assert.equal(oLabel.getText(), "Object properties defined: value from request", "Label 1: Has label text");
 			assert.ok(oField.isA("sap.ui.integration.editor.fields.ObjectListField"), "Field 1: Object List Field");
-			assert.ok(deepEqual(cleanUUIDAndPosition(oField._getCurrentProperty("value")), aObjectsParameterValue), "Field 1: DT Value");
+			assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), aObjectsParameterValue), "Field 1: DT Value");
 			oTable = oField.getAggregation("_field");
 			assert.ok(oTable.isA("sap.ui.table.Table"), "Field 1: Control is Table");
 			var oToolbar = oTable.getExtension()[0];
@@ -259,7 +232,7 @@ sap.ui.define([
 		}).then(function() {
 			assert.equal(oTable.getRows().length, 5, "Table: line number is 5");
 			assert.equal(oTable.getBinding().getCount(), (oResponseData.Objects.length + 1), "Table: value length is " + (oResponseData.Objects.length + 1));
-			assert.ok(deepEqual(cleanUUIDAndPosition(oField._getCurrentProperty("value")), aObjectsParameterValue), "Field 1: Value");
+			assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), aObjectsParameterValue), "Field 1: Value");
 			var oColumns = oTable.getColumns();
 			assert.equal(oColumns.length, 8, "Table: column number is 8");
 			var oSelectionColumn = oColumns[0];
@@ -277,7 +250,7 @@ sap.ui.define([
 			return EditorQunitUtils.wait();
 		}).then(function () {
 			assert.equal(oTable.getBinding().getCount(), 6, "Table: RowCount after filtering column URL with 'https'");
-			assert.ok(deepEqual(cleanUUIDAndPosition(oField._getCurrentProperty("value")), aObjectsParameterValue), "Field 1: Value not changed after filtering");
+			assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), aObjectsParameterValue), "Field 1: Value not changed after filtering");
 			assert.ok(!oSelectOrUnSelectAllButton.getSelected(), "Table: Select or Unselect All button in Selection column not selected");
 
 			// scroll to the bottom
@@ -285,21 +258,21 @@ sap.ui.define([
 			return EditorQunitUtils.wait();
 		}).then(function () {
 			oRow5 = oTable.getRows()[3];
-			assert.ok(deepEqual(cleanUUIDAndPosition(oRow5.getBindingContext().getObject()), Object.assign(deepClone(oValue4Ori), {"_dt": {"_editable": false}})), "Table: row 5 value");
+			assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oRow5.getBindingContext().getObject()), Object.assign(deepClone(oValue4Ori), {"_dt": {"_editable": false}})), "Table: row 5 value");
 			oSelectionCell5 = oRow5.getCells()[0];
 			assert.ok(!oSelectionCell5.getSelected(), "Row 5: not selected");
 			oSelectionCell5.setSelected(true);
 			oSelectionCell5.fireSelect({selected: true});
 			return EditorQunitUtils.wait();
 		}).then(function () {
-			assert.ok(deepEqual(cleanUUIDAndPosition(oRow5.getBindingContext().getObject()), Object.assign(deepClone(oValue4Ori), {
+			assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oRow5.getBindingContext().getObject()), Object.assign(deepClone(oValue4Ori), {
 				"_dt": {
 					"_editable": false,
 					"_selected": true
 				}
 			})), "Table: row 5 value");
 			assert.ok(oSelectionCell5.getSelected(), "Row 5: selected");
-			assert.ok(deepEqual(cleanUUIDAndPosition(oField._getCurrentProperty("value")), [
+			assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), [
 				Object.assign(deepClone(oValue1Ori), {"_dt": {"_editable": false}}),
 				Object.assign(deepClone(oValue3Ori), {"_dt": {"_editable": false}}),
 				Object.assign(deepClone(oValue5Ori), {"_dt": {"_editable": false}}),
@@ -311,21 +284,21 @@ sap.ui.define([
 			assert.ok(!oSelectOrUnSelectAllButton.getSelected(), "Table: Select or Unselect All button in Selection column not selected");
 
 			oRow6 = oTable.getRows()[4];
-			assert.ok(deepEqual(cleanUUIDAndPosition(oRow6.getBindingContext().getObject()), Object.assign(deepClone(oValue6Ori), {"_dt": {"_editable": false}})), "Table: row 6 value");
+			assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oRow6.getBindingContext().getObject()), Object.assign(deepClone(oValue6Ori), {"_dt": {"_editable": false}})), "Table: row 6 value");
 			oSelectionCell6 = oRow6.getCells()[0];
 			assert.ok(!oSelectionCell6.getSelected(), "Row 6: not selected");
 			oSelectionCell6.setSelected(true);
 			oSelectionCell6.fireSelect({selected: true});
 			return EditorQunitUtils.wait();
 		}).then(function () {
-			assert.ok(deepEqual(cleanUUIDAndPosition(oRow6.getBindingContext().getObject()), Object.assign(deepClone(oValue6Ori), {
+			assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oRow6.getBindingContext().getObject()), Object.assign(deepClone(oValue6Ori), {
 				"_dt": {
 					"_editable": false,
 					"_selected": true
 				}
 			})), "Table: row 6 value");
 			assert.ok(oSelectionCell6.getSelected(), "Row 6: selected");
-			assert.ok(deepEqual(cleanUUIDAndPosition(oField._getCurrentProperty("value")), [
+			assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), [
 				Object.assign(deepClone(oValue1Ori), {"_dt": {"_editable": false}}),
 				Object.assign(deepClone(oValue3Ori), {"_dt": {"_editable": false}}),
 				Object.assign(deepClone(oValue5Ori), {"_dt": {"_editable": false}}),
@@ -343,7 +316,7 @@ sap.ui.define([
 		}).then(function () {
 			assert.equal(oTable.getBinding().getCount(), 9, "Table: RowCount after removing all the filters");
 			assert.ok(!oSelectOrUnSelectAllButton.getSelected(), "Table: Select or Unselect All button in Selection column not selected");
-			assert.ok(deepEqual(cleanUUIDAndPosition(oField._getCurrentProperty("value")), aObjectsParameterValue.concat([
+			assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), aObjectsParameterValue.concat([
 				Object.assign(deepClone(oValue4Ori), {"_dt": {"_editable": false}}),
 				Object.assign(deepClone(oValue6Ori), {"_dt": {"_editable": false}})
 			])), "Field 1: Value after selecting row6");
@@ -365,7 +338,7 @@ sap.ui.define([
 			assert.ok(oLabel.isA("sap.m.Label"), "Label 1: Form content contains a Label");
 			assert.equal(oLabel.getText(), "Object properties defined: value from request", "Label 1: Has label text");
 			assert.ok(oField.isA("sap.ui.integration.editor.fields.ObjectListField"), "Field 1: Object List Field");
-			assert.ok(deepEqual(cleanUUIDAndPosition(oField._getCurrentProperty("value")), aObjectsParameterValue), "Field 1: DT Value");
+			assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), aObjectsParameterValue), "Field 1: DT Value");
 			oTable = oField.getAggregation("_field");
 			assert.ok(oTable.isA("sap.ui.table.Table"), "Field 1: Control is Table");
 			var oToolbar = oTable.getExtension()[0];
@@ -379,7 +352,7 @@ sap.ui.define([
 		}).then(function() {
 			assert.equal(oTable.getRows().length, 5, "Table: line number is 5");
 			assert.equal(oTable.getBinding().getCount(), (oResponseData.Objects.length + 1), "Table: value length is " + (oResponseData.Objects.length + 1));
-			assert.ok(deepEqual(cleanUUIDAndPosition(oField._getCurrentProperty("value")), aObjectsParameterValue), "Field 1: Value");
+			assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), aObjectsParameterValue), "Field 1: Value");
 			var oColumns = oTable.getColumns();
 			assert.equal(oColumns.length, 8, "Table: column number is 8");
 			var oSelectionColumn = oColumns[0];
@@ -397,7 +370,7 @@ sap.ui.define([
 			return EditorQunitUtils.wait();
 		}).then(function () {
 			assert.equal(oTable.getBinding().getCount(), 6, "Table: RowCount after filtering column URL with 'https'");
-			assert.ok(deepEqual(cleanUUIDAndPosition(oField._getCurrentProperty("value")), aObjectsParameterValue), "Field 1: Value not changed after filtering");
+			assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), aObjectsParameterValue), "Field 1: Value not changed after filtering");
 			assert.ok(!oSelectOrUnSelectAllButton.getSelected(), "Table: Select or Unselect All button in Selection column not selected");
 
 			// scroll to the bottom
@@ -405,11 +378,11 @@ sap.ui.define([
 			return EditorQunitUtils.wait();
 		}).then(function () {
 			oRow5 = oTable.getRows()[3];
-			assert.ok(deepEqual(cleanUUIDAndPosition(oRow5.getBindingContext().getObject()), Object.assign(deepClone(oValue4Ori), {"_dt": {"_editable": false}})), "Table: row 5 value");
+			assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oRow5.getBindingContext().getObject()), Object.assign(deepClone(oValue4Ori), {"_dt": {"_editable": false}})), "Table: row 5 value");
 			oSelectionCell5 = oRow5.getCells()[0];
 			assert.ok(!oSelectionCell5.getSelected(), "Row 5: not selected");
 			oRow6 = oTable.getRows()[4];
-			assert.ok(deepEqual(cleanUUIDAndPosition(oRow6.getBindingContext().getObject()), Object.assign(deepClone(oValue6Ori), {"_dt": {"_editable": false}})), "Table: row 6 value");
+			assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oRow6.getBindingContext().getObject()), Object.assign(deepClone(oValue6Ori), {"_dt": {"_editable": false}})), "Table: row 6 value");
 			oSelectionCell6 = oRow6.getCells()[0];
 			assert.ok(!oSelectionCell6.getSelected(), "Row 6: not selected");
 			// select all
@@ -418,21 +391,21 @@ sap.ui.define([
 			return EditorQunitUtils.wait();
 		}).then(function () {
 			assert.ok(oSelectOrUnSelectAllButton.getSelected(), "Table: Select or Unselect All button in Selection column selected");
-			assert.ok(deepEqual(cleanUUIDAndPosition(oRow5.getBindingContext().getObject()), Object.assign(deepClone(oValue4Ori), {
+			assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oRow5.getBindingContext().getObject()), Object.assign(deepClone(oValue4Ori), {
 				"_dt": {
 					"_editable": false,
 					"_selected": true
 				}
 			})), "Table: row 5 value");
 			assert.ok(oSelectionCell5.getSelected(), "Row 5: selected");
-			assert.ok(deepEqual(cleanUUIDAndPosition(oRow6.getBindingContext().getObject()), Object.assign(deepClone(oValue6Ori), {
+			assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oRow6.getBindingContext().getObject()), Object.assign(deepClone(oValue6Ori), {
 				"_dt": {
 					"_editable": false,
 					"_selected": true
 				}
 			})), "Table: row 6 value");
 			assert.ok(oSelectionCell6.getSelected(), "Row 6: selected");
-			assert.ok(deepEqual(cleanUUIDAndPosition(oField._getCurrentProperty("value")), [
+			assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), [
 				Object.assign(deepClone(oValue1Ori), {"_dt": {"_editable": false}}),
 				Object.assign(deepClone(oValue3Ori), {"_dt": {"_editable": false}}),
 				Object.assign(deepClone(oValue5Ori), {"_dt": {"_editable": false}}),
@@ -449,7 +422,7 @@ sap.ui.define([
 		}).then(function () {
 			assert.equal(oTable.getBinding().getCount(), 9, "Table: RowCount after removing all the filters");
 			assert.ok(!oSelectOrUnSelectAllButton.getSelected(), "Table: Select or Unselect All button in Selection column not selected");
-			assert.ok(deepEqual(cleanUUIDAndPosition(oField._getCurrentProperty("value")), aObjectsParameterValue.concat([
+			assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), aObjectsParameterValue.concat([
 				Object.assign(deepClone(oValue4Ori), {"_dt": {"_editable": false}}),
 				Object.assign(deepClone(oValue6Ori), {"_dt": {"_editable": false}})
 			])), "Field 1: Value after selecting row6");
@@ -471,7 +444,7 @@ sap.ui.define([
 			assert.ok(oLabel.isA("sap.m.Label"), "Label 1: Form content contains a Label");
 			assert.equal(oLabel.getText(), "Object properties defined: value from request", "Label 1: Has label text");
 			assert.ok(oField.isA("sap.ui.integration.editor.fields.ObjectListField"), "Field 1: Object List Field");
-			assert.ok(deepEqual(cleanUUIDAndPosition(oField._getCurrentProperty("value")), aObjectsParameterValue), "Field 1: DT Value");
+			assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), aObjectsParameterValue), "Field 1: DT Value");
 			oTable = oField.getAggregation("_field");
 			assert.ok(oTable.isA("sap.ui.table.Table"), "Field 1: Control is Table");
 			var oToolbar = oTable.getExtension()[0];
@@ -485,7 +458,7 @@ sap.ui.define([
 		}).then(function() {
 			assert.equal(oTable.getRows().length, 5, "Table: line number is 5");
 			assert.equal(oTable.getBinding().getCount(), (oResponseData.Objects.length + 1), "Table: value length is " + (oResponseData.Objects.length + 1));
-			assert.ok(deepEqual(cleanUUIDAndPosition(oField._getCurrentProperty("value")), aObjectsParameterValue), "Field 1: Value");
+			assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), aObjectsParameterValue), "Field 1: Value");
 			var oColumns = oTable.getColumns();
 			assert.equal(oColumns.length, 8, "Table: column number is 8");
 			var oSelectionColumn = oColumns[0];
@@ -503,11 +476,11 @@ sap.ui.define([
 			return EditorQunitUtils.wait();
 		}).then(function () {
 			assert.equal(oTable.getBinding().getCount(), 3, "Table: RowCount after filtering column URL with 'http://'");
-			assert.ok(deepEqual(cleanUUIDAndPosition(oField._getCurrentProperty("value")), aObjectsParameterValue), "Field 1: Value not changed after filtering");
+			assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), aObjectsParameterValue), "Field 1: Value not changed after filtering");
 			assert.ok(!oSelectOrUnSelectAllButton.getSelected(), "Table: Select or Unselect All button in Selection column not selected");
 
 			oRow1 = oTable.getRows()[0];
-			assert.ok(deepEqual(cleanUUIDAndPosition(oRow1.getBindingContext().getObject()), Object.assign(deepClone(oValue5Ori), {
+			assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oRow1.getBindingContext().getObject()), Object.assign(deepClone(oValue5Ori), {
 				"_dt": {
 					"_editable": false,
 					"_selected": true
@@ -516,7 +489,7 @@ sap.ui.define([
 			oSelectionCell1 = oRow1.getCells()[0];
 			assert.ok(oSelectionCell1.getSelected(), "Row1: selected");
 			oRow2 = oTable.getRows()[1];
-			assert.ok(deepEqual(cleanUUIDAndPosition(oRow2.getBindingContext().getObject()), Object.assign(deepClone(oValue7Ori), {
+			assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oRow2.getBindingContext().getObject()), Object.assign(deepClone(oValue7Ori), {
 				"_dt": {
 					"_editable": false,
 					"_selected": true
@@ -525,21 +498,21 @@ sap.ui.define([
 			oSelectionCell2 = oRow2.getCells()[0];
 			assert.ok(oSelectionCell2.getSelected(), "Row2: selected");
 			oRow3 = oTable.getRows()[2];
-			assert.ok(deepEqual(cleanUUIDAndPosition(oRow3.getBindingContext().getObject()), oValue2), "Table: row 2 value");
+			assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oRow3.getBindingContext().getObject()), oValue2), "Table: row 2 value");
 			oSelectionCell3 = oRow3.getCells()[0];
 			assert.ok(!oSelectionCell3.getSelected(), "Row3: not selected");
 			oSelectionCell1.setSelected(false);
 			oSelectionCell1.fireSelect({selected: false});
 			return EditorQunitUtils.wait();
 		}).then(function () {
-			assert.ok(deepEqual(cleanUUIDAndPosition(oRow1.getBindingContext().getObject()), Object.assign(deepClone(oValue5Ori), {
+			assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oRow1.getBindingContext().getObject()), Object.assign(deepClone(oValue5Ori), {
 				"_dt": {
 					"_editable": false,
 					"_selected": false
 				}
 			})), "Table: row 1 value after deselecting");
 			assert.ok(!oSelectionCell1.getSelected(), "Row1: not selected");
-			assert.ok(deepEqual(cleanUUIDAndPosition(oField._getCurrentProperty("value")), [
+			assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), [
 				Object.assign(deepClone(oValue1Ori), {"_dt": {"_editable": false}}),
 				Object.assign(deepClone(oValue3Ori), {"_dt": {"_editable": false}}),
 				Object.assign(deepClone(oValue7Ori), {"_dt": {"_editable": false}}),
@@ -552,14 +525,14 @@ sap.ui.define([
 			oSelectionCell2.fireSelect({selected: false});
 			return EditorQunitUtils.wait();
 		}).then(function () {
-			assert.ok(deepEqual(cleanUUIDAndPosition(oRow2.getBindingContext().getObject()), Object.assign(deepClone(oValue7Ori), {
+			assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oRow2.getBindingContext().getObject()), Object.assign(deepClone(oValue7Ori), {
 				"_dt": {
 					"_editable": false,
 					"_selected": false
 				}
 			})), "Table: row 2 value after deselecting");
 			assert.ok(!oSelectionCell2.getSelected(), "Row2: not selected");
-			assert.ok(deepEqual(cleanUUIDAndPosition(oField._getCurrentProperty("value")), [
+			assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), [
 				Object.assign(deepClone(oValue1Ori), {"_dt": {"_editable": false}}),
 				Object.assign(deepClone(oValue3Ori), {"_dt": {"_editable": false}}),
 				Object.assign(deepClone(oValue8Ori), {"_dt": {"_editable": false}}),
@@ -573,7 +546,7 @@ sap.ui.define([
 		}).then(function () {
 			assert.equal(oTable.getBinding().getCount(), 9, "Table: RowCount after removing all the filters");
 			assert.ok(!oSelectOrUnSelectAllButton.getSelected(), "Table: Select or Unselect All button in Selection column not selected");
-			assert.ok(deepEqual(cleanUUIDAndPosition(oField._getCurrentProperty("value")), [
+			assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), [
 				Object.assign(deepClone(oValue1Ori), {"_dt": {"_editable": false}}),
 				Object.assign(deepClone(oValue3Ori), {"_dt": {"_editable": false}}),
 				Object.assign(deepClone(oValue8Ori), {"_dt": {"_editable": false}}),
@@ -597,7 +570,7 @@ sap.ui.define([
 			assert.ok(oLabel.isA("sap.m.Label"), "Label 1: Form content contains a Label");
 			assert.equal(oLabel.getText(), "Object properties defined: value from request", "Label 1: Has label text");
 			assert.ok(oField.isA("sap.ui.integration.editor.fields.ObjectListField"), "Field 1: Object List Field");
-			assert.ok(deepEqual(cleanUUIDAndPosition(oField._getCurrentProperty("value")), aObjectsParameterValue), "Field 1: DT Value");
+			assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), aObjectsParameterValue), "Field 1: DT Value");
 			oTable = oField.getAggregation("_field");
 			assert.ok(oTable.isA("sap.ui.table.Table"), "Field 1: Control is Table");
 			var oToolbar = oTable.getExtension()[0];
@@ -611,7 +584,7 @@ sap.ui.define([
 		}).then(function() {
 			assert.equal(oTable.getRows().length, 5, "Table: line number is 5");
 			assert.equal(oTable.getBinding().getCount(), (oResponseData.Objects.length + 1), "Table: value length is " + (oResponseData.Objects.length + 1));
-			assert.ok(deepEqual(cleanUUIDAndPosition(oField._getCurrentProperty("value")), aObjectsParameterValue), "Field 1: Value");
+			assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), aObjectsParameterValue), "Field 1: Value");
 			var oColumns = oTable.getColumns();
 			assert.equal(oColumns.length, 8, "Table: column number is 8");
 			var oSelectionColumn = oColumns[0];
@@ -629,11 +602,11 @@ sap.ui.define([
 			return EditorQunitUtils.wait();
 		}).then(function () {
 			assert.equal(oTable.getBinding().getCount(), 3, "Table: RowCount after filtering column URL with 'http://'");
-			assert.ok(deepEqual(cleanUUIDAndPosition(oField._getCurrentProperty("value")), aObjectsParameterValue), "Field 1: Value not changed after filtering");
+			assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), aObjectsParameterValue), "Field 1: Value not changed after filtering");
 			assert.ok(!oSelectOrUnSelectAllButton.getSelected(), "Table: Select or Unselect All button in Selection column not selected");
 
 			oRow1 = oTable.getRows()[0];
-			assert.ok(deepEqual(cleanUUIDAndPosition(oRow1.getBindingContext().getObject()), Object.assign(deepClone(oValue5Ori), {
+			assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oRow1.getBindingContext().getObject()), Object.assign(deepClone(oValue5Ori), {
 				"_dt": {
 					"_editable": false,
 					"_selected": true
@@ -642,7 +615,7 @@ sap.ui.define([
 			oSelectionCell1 = oRow1.getCells()[0];
 			assert.ok(oSelectionCell1.getSelected(), "Row1: selected");
 			oRow2 = oTable.getRows()[1];
-			assert.ok(deepEqual(cleanUUIDAndPosition(oRow2.getBindingContext().getObject()), Object.assign(deepClone(oValue7Ori), {
+			assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oRow2.getBindingContext().getObject()), Object.assign(deepClone(oValue7Ori), {
 				"_dt": {
 					"_editable": false,
 					"_selected": true
@@ -651,14 +624,14 @@ sap.ui.define([
 			oSelectionCell2 = oRow2.getCells()[0];
 			assert.ok(oSelectionCell2.getSelected(), "Row2: selected");
 			oRow3 = oTable.getRows()[2];
-			assert.ok(deepEqual(cleanUUIDAndPosition(oRow3.getBindingContext().getObject()), oValue2), "Table: row 2 value");
+			assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oRow3.getBindingContext().getObject()), oValue2), "Table: row 2 value");
 			oSelectionCell3 = oRow3.getCells()[0];
 			assert.ok(!oSelectionCell3.getSelected(), "Row3: not selected");
 			oSelectionCell3.setSelected(true);
 			oSelectionCell3.fireSelect({selected: true});
 			return EditorQunitUtils.wait();
 		}).then(function () {
-			assert.ok(deepEqual(cleanUUIDAndPosition(oRow3.getBindingContext().getObject()), Object.assign(deepClone(oValue2Ori), {
+			assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oRow3.getBindingContext().getObject()), Object.assign(deepClone(oValue2Ori), {
 				"_dt": {
 					"_editable": false,
 					"_selected": true
@@ -666,7 +639,7 @@ sap.ui.define([
 			})), "Table: row 3 value after selecting");
 			assert.ok(oSelectionCell3.getSelected(), "Row1: not selected");
 			assert.ok(oSelectOrUnSelectAllButton.getSelected(), "Table: Select or Unselect All button in Selection column selected");
-			assert.ok(deepEqual(cleanUUIDAndPosition(oField._getCurrentProperty("value")), aObjectsParameterValue.concat([
+			assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), aObjectsParameterValue.concat([
 				oValue2
 			])), "Field 1: Value after selectingAll");
 			assert.ok(oSelectOrUnSelectAllButton.getSelected(), "Table: Select or Unselect All button in Selection column selected");
@@ -675,28 +648,28 @@ sap.ui.define([
 			oSelectOrUnSelectAllButton.fireSelect({selected: false});
 			return EditorQunitUtils.wait();
 		}).then(function () {
-			assert.ok(deepEqual(cleanUUIDAndPosition(oRow1.getBindingContext().getObject()), Object.assign(deepClone(oValue5Ori), {
+			assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oRow1.getBindingContext().getObject()), Object.assign(deepClone(oValue5Ori), {
 				"_dt": {
 					"_editable": false,
 					"_selected": false
 				}
 			})), "Table: row 1 value after deselectAll");
 			assert.ok(!oSelectionCell1.getSelected(), "Row1: not selected");
-			assert.ok(deepEqual(cleanUUIDAndPosition(oRow2.getBindingContext().getObject()), Object.assign(deepClone(oValue7Ori), {
+			assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oRow2.getBindingContext().getObject()), Object.assign(deepClone(oValue7Ori), {
 				"_dt": {
 					"_editable": false,
 					"_selected": false
 				}
 			})), "Table: row 2 value after deselectAll");
 			assert.ok(!oSelectionCell2.getSelected(), "Row2: not selected");
-			assert.ok(deepEqual(cleanUUIDAndPosition(oRow3.getBindingContext().getObject()), Object.assign(deepClone(oValue2Ori), {
+			assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oRow3.getBindingContext().getObject()), Object.assign(deepClone(oValue2Ori), {
 				"_dt": {
 					"_editable": false,
 					"_selected": false
 				}
 			})), "Table: row 3 value after deselectAll");
 			assert.ok(!oSelectionCell3.getSelected(), "Row3: not selected");
-			assert.ok(deepEqual(cleanUUIDAndPosition(oField._getCurrentProperty("value")), [
+			assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), [
 				Object.assign(deepClone(oValue1Ori), {"_dt": {"_editable": false}}),
 				Object.assign(deepClone(oValue3Ori), {"_dt": {"_editable": false}}),
 				Object.assign(deepClone(oValue8Ori), {"_dt": {"_editable": false}}),
@@ -710,7 +683,7 @@ sap.ui.define([
 		}).then(function () {
 			assert.equal(oTable.getBinding().getCount(), 9, "Table: RowCount after removing all the filters");
 			assert.ok(!oSelectOrUnSelectAllButton.getSelected(), "Table: Select or Unselect All button in Selection column not selected");
-			assert.ok(deepEqual(cleanUUIDAndPosition(oField._getCurrentProperty("value")), [
+			assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), [
 				Object.assign(deepClone(oValue1Ori), {"_dt": {"_editable": false}}),
 				Object.assign(deepClone(oValue3Ori), {"_dt": {"_editable": false}}),
 				Object.assign(deepClone(oValue8Ori), {"_dt": {"_editable": false}}),

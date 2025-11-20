@@ -64,46 +64,6 @@ sap.ui.define([
 	Localization.setLanguage("en");
 	document.body.className = document.body.className + " sapUiSizeCompact ";
 
-	function cleanUUID(oValue) {
-		var oClonedValue = deepClone(oValue, 500);
-		if (typeof oClonedValue === "string") {
-			oClonedValue = JSON.parse(oClonedValue);
-		}
-		if (Array.isArray(oClonedValue)) {
-			oClonedValue.forEach(function(oResult) {
-				if (oResult._dt) {
-					delete oResult._dt._uuid;
-				}
-				if (deepEqual(oResult._dt, {})) {
-					delete oResult._dt;
-				}
-			});
-		} else if (typeof oClonedValue === "object") {
-			if (oClonedValue._dt) {
-				delete oClonedValue._dt._uuid;
-			}
-			if (deepEqual(oClonedValue._dt, {})) {
-				delete oClonedValue._dt;
-			}
-		}
-		return oClonedValue;
-	}
-
-	function cleanDT(oValue) {
-		var oClonedValue = deepClone(oValue, 500);
-		if (typeof oClonedValue === "string") {
-			oClonedValue = JSON.parse(oClonedValue);
-		}
-		if (Array.isArray(oClonedValue)) {
-			oClonedValue.forEach(function(oResult) {
-				delete oResult._dt;
-			});
-		} else if (typeof oClonedValue === "object") {
-			delete oClonedValue._dt;
-		}
-		return oClonedValue;
-	}
-
 	QUnit.module("Basic", {
 		beforeEach: function () {
 			this.oEditor = EditorQunitUtils.beforeEachTest();
@@ -172,7 +132,7 @@ sap.ui.define([
 						oFormField.setValue("string value 1");
 						oFormField.fireChange({ value: "string value 1"});
 						assert.ok(oDeleteButton.getEnabled(), "SimpleForm: Delete button is enabled");
-						assert.ok(deepEqual(cleanUUID(oField._getCurrentProperty("value")), {"key": "string value 1"}), "Field 1: DT Value updated");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value")), {"key": "string value 1"}), "Field 1: DT Value updated");
 
 						oFormLabel = oContents[2];
 						oFormField = oContents[3];
@@ -184,7 +144,7 @@ sap.ui.define([
 						assert.equal(oFormField.getValue(), "", "SimpleForm field 2: Has No value");
 						oFormField.setValue("icon value 1");
 						oFormField.fireChange({ value: "icon value 1"});
-						assert.ok(deepEqual(cleanUUID(oField._getCurrentProperty("value")), {"key": "string value 1", "icon": "icon value 1"}), "Field 1: DT Value updated");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value")), {"key": "string value 1", "icon": "icon value 1"}), "Field 1: DT Value updated");
 
 						oFormLabel = oContents[4];
 						oFormField = oContents[5];
@@ -196,7 +156,7 @@ sap.ui.define([
 						assert.equal(oFormField.getValue(), "", "SimpleForm field 3: Has No value");
 						oFormField.setValue("text value 1");
 						oFormField.fireChange({ value: "text value 1"});
-						assert.ok(deepEqual(cleanUUID(oField._getCurrentProperty("value")), {"key": "string value 1", "icon": "icon value 1", "text": "text value 1"}), "Field 1: DT Value updated");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value")), {"key": "string value 1", "icon": "icon value 1", "text": "text value 1"}), "Field 1: DT Value updated");
 
 						oFormLabel = oContents[6];
 						oFormField = oContents[7];
@@ -208,7 +168,7 @@ sap.ui.define([
 						assert.equal(oFormField.getValue(), "", "SimpleForm field 4: Has No value");
 						oFormField.setValue("url value 1");
 						oFormField.fireChange({ value: "url value 1"});
-						assert.ok(deepEqual(cleanUUID(oField._getCurrentProperty("value")), {"key": "string value 1", "icon": "icon value 1", "text": "text value 1", "url": "url value 1"}), "Field 1: DT Value updated");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value")), {"key": "string value 1", "icon": "icon value 1", "text": "text value 1", "url": "url value 1"}), "Field 1: DT Value updated");
 
 						oFormLabel = oContents[8];
 						oFormField = oContents[9];
@@ -220,7 +180,7 @@ sap.ui.define([
 						assert.ok(!oFormField.getSelected(), "SimpleForm field 5: Has No value");
 						oFormField.setSelected(true);
 						oFormField.fireSelect({ selected: true});
-						assert.ok(deepEqual(cleanUUID(oField._getCurrentProperty("value")), {"key": "string value 1", "icon": "icon value 1", "text": "text value 1", "url": "url value 1", "editable": true}), "Field 1: DT Value updated");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value")), {"key": "string value 1", "icon": "icon value 1", "text": "text value 1", "url": "url value 1", "editable": true}), "Field 1: DT Value updated");
 
 						oFormLabel = oContents[10];
 						oFormField = oContents[11];
@@ -232,7 +192,7 @@ sap.ui.define([
 						assert.equal(oFormField.getValue(), "", "SimpleForm field 6: Has No value");
 						oFormField.setValue(3);
 						oFormField.fireChange({ value: 3});
-						assert.ok(deepEqual(cleanUUID(oField._getCurrentProperty("value")), {"key": "string value 1", "icon": "icon value 1", "text": "text value 1", "url": "url value 1", "editable": true, "int": 3}), "Field 1: DT Value updated");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value")), {"key": "string value 1", "icon": "icon value 1", "text": "text value 1", "url": "url value 1", "editable": true, "int": 3}), "Field 1: DT Value updated");
 
 						oFormLabel = oContents[12];
 						oFormField = oContents[13];
@@ -244,7 +204,7 @@ sap.ui.define([
 						assert.equal(oFormField.getValue(), "", "SimpleForm field 7: Has No value");
 						oFormField.setValue(3.11);
 						oFormField.fireChange({ value: 3.11});
-						assert.ok(deepEqual(cleanUUID(oField._getCurrentProperty("value")), {"key": "string value 1", "icon": "icon value 1", "text": "text value 1", "url": "url value 1", "editable": true, "int": 3, "number": 3.11}), "Field 1: DT Value updated");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value")), {"key": "string value 1", "icon": "icon value 1", "text": "text value 1", "url": "url value 1", "editable": true, "int": 3, "number": 3.11}), "Field 1: DT Value updated");
 
 						oFormLabel = oContents[14];
 						assert.equal(oFormLabel.getText(), "", "SimpleForm label 8: Has no label text");
@@ -252,7 +212,7 @@ sap.ui.define([
 						assert.ok(oTextArea.isA("sap.m.TextArea"), "SimpleForm Field 8: TextArea Field");
 						assert.ok(!oTextArea.getVisible(), "SimpleForm Field 8: Not Visible");
 						assert.ok(oTextArea.getEditable(), "SimpleForm Field 8: Editable");
-						assert.ok(deepEqual(cleanUUID(oTextArea.getValue()), {"key": "string value 1","icon": "icon value 1","text": "text value 1","url": "url value 1","editable": true,"int": 3,"number": 3.11}), "SimpleForm field 8: Has value");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oTextArea.getValue()), {"key": "string value 1","icon": "icon value 1","text": "text value 1","url": "url value 1","editable": true,"int": 3,"number": 3.11}), "SimpleForm field 8: Has value");
 						var oSettings = this.oEditor.getCurrentSettings();
 						assert.deepEqual(oSettings["/sap.card/configuration/parameters/objectWithPropertiesDefined/value"], oField._getCurrentProperty("value"), "Editor: field 1 setting value");
 						resolve();
@@ -300,7 +260,7 @@ sap.ui.define([
 					assert.ok(oLabel.isA("sap.m.Label"), "Label 2: Form content contains a Label");
 					assert.equal(oLabel.getText(), "Object properties defined", "Label 2: Has label text");
 					assert.ok(oField.isA("sap.ui.integration.editor.fields.ObjectField"), "Field 2: Object Field");
-					assert.ok(deepEqual(cleanUUID(oField._getCurrentProperty("value")), {}), "Field 2: Value");
+					assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value")), {}), "Field 2: Value");
 					EditorQunitUtils.isReady(this.oEditor).then(function () {
 						assert.ok(this.oEditor.isReady(), "Editor is ready");
 						var oSimpleForm = oField.getAggregation("_field");
@@ -322,7 +282,7 @@ sap.ui.define([
 						assert.equal(oFormField.getValue(), "", "SimpleForm field 1: Has No value");
 						oFormField.setValue("string value 1");
 						oFormField.fireChange({ value: "string value 1"});
-						assert.ok(deepEqual(cleanUUID(oField._getCurrentProperty("value")), {"key": "string value 1"}), "Field 1: DT Value updated");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value")), {"key": "string value 1"}), "Field 1: DT Value updated");
 
 						oFormLabel = oContents[2];
 						oFormField = oContents[3];
@@ -334,7 +294,7 @@ sap.ui.define([
 						assert.equal(oFormField.getValue(), "", "SimpleForm field 2: Has No value");
 						oFormField.setValue("icon value 1");
 						oFormField.fireChange({ value: "icon value 1"});
-						assert.ok(deepEqual(cleanUUID(oField._getCurrentProperty("value")), {"key": "string value 1", "icon": "icon value 1"}), "Field 1: DT Value updated");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value")), {"key": "string value 1", "icon": "icon value 1"}), "Field 1: DT Value updated");
 
 						oFormLabel = oContents[4];
 						oFormField = oContents[5];
@@ -346,7 +306,7 @@ sap.ui.define([
 						assert.equal(oFormField.getValue(), "", "SimpleForm field 3: Has No value");
 						oFormField.setValue("text value 1");
 						oFormField.fireChange({ value: "text value 1"});
-						assert.ok(deepEqual(cleanUUID(oField._getCurrentProperty("value")), {"key": "string value 1", "icon": "icon value 1", "text": "text value 1"}), "Field 1: DT Value updated");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value")), {"key": "string value 1", "icon": "icon value 1", "text": "text value 1"}), "Field 1: DT Value updated");
 
 						oFormLabel = oContents[6];
 						oFormField = oContents[7];
@@ -358,7 +318,7 @@ sap.ui.define([
 						assert.equal(oFormField.getValue(), "", "SimpleForm field 4: Has No value");
 						oFormField.setValue("url value 1");
 						oFormField.fireChange({ value: "url value 1"});
-						assert.ok(deepEqual(cleanUUID(oField._getCurrentProperty("value")), {"key": "string value 1", "icon": "icon value 1", "text": "text value 1", "url": "url value 1"}), "Field 1: DT Value updated");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value")), {"key": "string value 1", "icon": "icon value 1", "text": "text value 1", "url": "url value 1"}), "Field 1: DT Value updated");
 
 						oFormLabel = oContents[8];
 						oFormField = oContents[9];
@@ -370,7 +330,7 @@ sap.ui.define([
 						assert.ok(!oFormField.getSelected(), "SimpleForm field 5: Has No value");
 						oFormField.setSelected(true);
 						oFormField.fireSelect({ selected: true});
-						assert.ok(deepEqual(cleanUUID(oField._getCurrentProperty("value")), {"key": "string value 1", "icon": "icon value 1", "text": "text value 1", "url": "url value 1", "editable": true}), "Field 1: DT Value updated");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value")), {"key": "string value 1", "icon": "icon value 1", "text": "text value 1", "url": "url value 1", "editable": true}), "Field 1: DT Value updated");
 
 						oFormLabel = oContents[10];
 						oFormField = oContents[11];
@@ -382,7 +342,7 @@ sap.ui.define([
 						assert.equal(oFormField.getValue(), "", "SimpleForm field 6: Has No value");
 						oFormField.setValue(3);
 						oFormField.fireChange({ value: 3});
-						assert.ok(deepEqual(cleanUUID(oField._getCurrentProperty("value")), {"key": "string value 1", "icon": "icon value 1", "text": "text value 1", "url": "url value 1", "editable": true, "int": 3}), "Field 1: DT Value updated");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value")), {"key": "string value 1", "icon": "icon value 1", "text": "text value 1", "url": "url value 1", "editable": true, "int": 3}), "Field 1: DT Value updated");
 
 						oFormLabel = oContents[12];
 						oFormField = oContents[13];
@@ -394,7 +354,7 @@ sap.ui.define([
 						assert.equal(oFormField.getValue(), "", "SimpleForm field 7: Has No value");
 						oFormField.setValue(3.11);
 						oFormField.fireChange({ value: 3.11});
-						assert.ok(deepEqual(cleanUUID(oField._getCurrentProperty("value")), {"key": "string value 1", "icon": "icon value 1", "text": "text value 1", "url": "url value 1", "editable": true, "int": 3, "number": 3.11}), "Field 1: DT Value updated");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value")), {"key": "string value 1", "icon": "icon value 1", "text": "text value 1", "url": "url value 1", "editable": true, "int": 3, "number": 3.11}), "Field 1: DT Value updated");
 
 						oFormLabel = oContents[14];
 						assert.equal(oFormLabel.getText(), "", "SimpleForm label 8: Has no label text");
@@ -402,7 +362,7 @@ sap.ui.define([
 						assert.ok(oTextArea.isA("sap.m.TextArea"), "SimpleForm Field 8: TextArea Field");
 						assert.ok(!oTextArea.getVisible(), "SimpleForm Field 8: Not Visible");
 						assert.ok(oTextArea.getEditable(), "SimpleForm Field 8: Editable");
-						assert.ok(deepEqual(cleanUUID(oTextArea.getValue()), {"key": "string value 1","icon": "icon value 1","text": "text value 1","url": "url value 1","editable": true,"int": 3,"number": 3.11}), "SimpleForm field 8: Has value");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oTextArea.getValue()), {"key": "string value 1","icon": "icon value 1","text": "text value 1","url": "url value 1","editable": true,"int": 3,"number": 3.11}), "SimpleForm field 8: Has value");
 						var oSettings = this.oEditor.getCurrentSettings();
 						assert.deepEqual(oSettings["/sap.card/configuration/parameters/objectWithPropertiesDefined/value"], oField._getCurrentProperty("value"), "Editor: field 1 setting value");
 						resolve();
@@ -431,7 +391,7 @@ sap.ui.define([
 						assert.ok(oSimpleForm.isA("sap.ui.layout.form.SimpleForm"), "Field 2: Control is SimpleForm");
 						var oContents = oSimpleForm.getContent();
 						assert.equal(oContents.length, 16, "SimpleForm: length");
-						assert.ok(deepEqual(cleanDT(oContents[15].getValue()), {"text": "text01","key": "key01","url": "https://sap.com/06","icon": "sap-icon://accept","int": 1,"editable": true,"number": 3.55}), "SimpleForm field textArea: Has Origin value");
+						assert.ok(deepEqual(EditorQunitUtils.cleanDT(oContents[15].getValue()), {"text": "text01","key": "key01","url": "https://sap.com/06","icon": "sap-icon://accept","int": 1,"editable": true,"number": 3.55}), "SimpleForm field textArea: Has Origin value");
 						var oFormLabel = oContents[0];
 						var oFormField = oContents[1];
 						assert.equal(oFormLabel.getText(), "Key", "SimpleForm label1: Has label text");
@@ -671,7 +631,7 @@ sap.ui.define([
 						oFormField.setValue("string value 1");
 						oFormField.fireChange({ value: "string value 1"});
 						assert.ok(oDeleteButton.getEnabled(), "SimpleForm: Delete button is enabled");
-						assert.ok(deepEqual(cleanUUID(oField._getCurrentProperty("value")), {"key": "string value 1"}), "Field 1: DT Value updated");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value")), {"key": "string value 1"}), "Field 1: DT Value updated");
 
 						oFormLabel = oContents[2];
 						oFormField = oContents[3];
@@ -882,7 +842,7 @@ sap.ui.define([
 						assert.ok(oSimpleForm.isA("sap.ui.layout.form.SimpleForm"), "Field: Control is SimpleForm");
 						var oContents = oSimpleForm.getContent();
 						assert.equal(oContents.length, 16, "SimpleForm: length");
-						assert.ok(deepEqual(cleanDT(oContents[15].getValue()), {"text": "text01","key": "key01","url": "https://sap.com/06","icon": "sap-icon://accept","int": 1,"editable": true,"number": 3.55}), "SimpleForm field textArea: Has Origin value");
+						assert.ok(deepEqual(EditorQunitUtils.cleanDT(oContents[15].getValue()), {"text": "text01","key": "key01","url": "https://sap.com/06","icon": "sap-icon://accept","int": 1,"editable": true,"number": 3.55}), "SimpleForm field textArea: Has Origin value");
 						var oFormLabel = oContents[0];
 						var oFormField = oContents[1];
 						assert.equal(oFormLabel.getText(), "Key", "SimpleForm label1: Has label text");
@@ -996,7 +956,7 @@ sap.ui.define([
 							oFormField = oContents[15];
 							assert.ok(!oFormLabel.getVisible(), "SimpleForm label8: Not Visible");
 							assert.ok(oFormField.getVisible(), "SimpleForm Field8: Visible");
-							assert.ok(deepEqual(cleanDT(oFormField.getValue()), {"text": "text01 1","key": "key01 1","url": "https://sap.com/06 1","icon": "sap-icon://accept 1","int": 2,"editable": false,"number": 4.55}), "SimpleForm field8: Has value");
+							assert.ok(deepEqual(EditorQunitUtils.cleanDT(oFormField.getValue()), {"text": "text01 1","key": "key01 1","url": "https://sap.com/06 1","icon": "sap-icon://accept 1","int": 2,"editable": false,"number": 4.55}), "SimpleForm field8: Has value");
 							var sNewValue = '{\n\t"text new": "textnew",\n\t"text": "text01 2",\n\t"key": "key01 2",\n\t"url": "https://sap.com/06 2",\n\t"icon": "sap-icon://accept 2",\n\t"int": 3,\n\t"editable": true,\n\t"number": 5.55\n}';
 							oFormField.setValue(sNewValue);
 							oFormField.fireChange({ value: sNewValue});
@@ -1129,7 +1089,7 @@ sap.ui.define([
 						oFormField.setValue("string value 1");
 						oFormField.fireChange({ value: "string value 1"});
 						assert.ok(oDeleteButton.getEnabled(), "SimpleForm: Delete button is enabled");
-						assert.ok(deepEqual(cleanUUID(oField._getCurrentProperty("value")), {"key": "string value 1"}), "Field 1: DT Value updated");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value")), {"key": "string value 1"}), "Field 1: DT Value updated");
 
 						oFormLabel = oContents[2];
 						oFormField = oContents[3];
@@ -1141,7 +1101,7 @@ sap.ui.define([
 						assert.equal(oFormField.getValue(), "", "SimpleForm field 2: Has No value");
 						oFormField.setValue("text value 1");
 						oFormField.fireChange({ value: "text value 1"});
-						assert.ok(deepEqual(cleanUUID(oField._getCurrentProperty("value")), {"key": "string value 1", "text": "text value 1"}), "Field 1: DT Value updated");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value")), {"key": "string value 1", "text": "text value 1"}), "Field 1: DT Value updated");
 
 						oFormLabel = oContents[4];
 						oFormField = oContents[5];
@@ -1167,7 +1127,7 @@ sap.ui.define([
 						assert.equal(aComboBoxItems[5].getText(), "Type 06", "SimpleForm field3: ComboBox item6 text");
 						oFormField.setSelectedKey("type05");
 						oFormField.fireChange({ selectedItem: oFormField.getItems()[4] });
-						assert.ok(deepEqual(cleanUUID(oField._getCurrentProperty("value")), {"key": "string value 1", "text": "text value 1", "type": "type05"}), "Field 1: DT Value updated");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value")), {"key": "string value 1", "text": "text value 1", "type": "type05"}), "Field 1: DT Value updated");
 
 						oFormLabel = oContents[6];
 						oFormField = oContents[7];
@@ -1186,7 +1146,7 @@ sap.ui.define([
 						});
 						oFormField.setValue(sNewObjectPropertyValue);
 						oFormField.fireChange({ value: sNewObjectPropertyValue});
-						assert.ok(deepEqual(cleanUUID(oField._getCurrentProperty("value")), {"key": "string value 1", "text": "text value 1", "type": "type05", "object": {"text": "textupdated", "key": "keyupdated"}}), "Field 1: DT Value updated");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value")), {"key": "string value 1", "text": "text value 1", "type": "type05", "object": {"text": "textupdated", "key": "keyupdated"}}), "Field 1: DT Value updated");
 
 						oFormLabel = oContents[8];
 						oFormField = oContents[9];
@@ -1195,7 +1155,7 @@ sap.ui.define([
 						assert.ok(oFormField.isA("sap.m.TextArea"), "SimpleForm field5: TextArea Field");
 						assert.ok(!oFormField.getVisible(), "SimpleForm field5: Not Visible");
 						assert.ok(oFormField.getEditable(), "SimpleForm field5: Editable");
-						assert.ok(deepEqual(cleanDT(cleanUUID(oFormField.getValue())), {"key": "string value 1", "text": "text value 1", "type": "type05", "object": {"text": "textupdated", "key": "keyupdated"}}), "SimpleForm field5 textArea: Has correct value");
+						assert.ok(deepEqual(EditorQunitUtils.cleanDT(EditorQunitUtils.cleanUUID(oFormField.getValue())), {"key": "string value 1", "text": "text value 1", "type": "type05", "object": {"text": "textupdated", "key": "keyupdated"}}), "SimpleForm field5 textArea: Has correct value");
 
 						var oSettings = this.oEditor.getCurrentSettings();
 						assert.deepEqual(oSettings["/sap.card/configuration/parameters/objectWithSpecialPropertiesDefined/value"], oField._getCurrentProperty("value"), "Editor: field 1 setting value");
@@ -1268,7 +1228,7 @@ sap.ui.define([
 						assert.ok(oTextArea.isA("sap.m.TextArea"), "SimpleForm field5: TextArea Field");
 						assert.ok(!oTextArea.getVisible(), "SimpleForm field5: Not Visible");
 						assert.ok(oTextArea.getEditable(), "SimpleForm field5: Editable");
-						assert.ok(deepEqual(cleanUUID(oTextArea.getValue()), oValue), "SimpleForm field textArea: Has value");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oTextArea.getValue()), oValue), "SimpleForm field textArea: Has value");
 						var oFormLabel = oContents[0];
 						var oFormField = oContents[1];
 						assert.equal(oFormLabel.getText(), "Key", "SimpleForm label 1: Has label text");
@@ -1281,8 +1241,8 @@ sap.ui.define([
 						oFormField.setValue(oUpdatedValue.key);
 						oFormField.fireChange({ value: oUpdatedValue.key});
 						assert.ok(oDeleteButton.getEnabled(), "SimpleForm: Delete button is enabled");
-						assert.ok(deepEqual(cleanUUID(oField._getCurrentProperty("value")), oUpdatedValue), "Field 1: DT Value updated");
-						assert.ok(deepEqual(cleanUUID(oTextArea.getValue()), oUpdatedValue), "SimpleForm field textArea: value updated");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value")), oUpdatedValue), "Field 1: DT Value updated");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oTextArea.getValue()), oUpdatedValue), "SimpleForm field textArea: value updated");
 
 						oFormLabel = oContents[2];
 						oFormField = oContents[3];
@@ -1295,8 +1255,8 @@ sap.ui.define([
 						oUpdatedValue.text = "text value 1";
 						oFormField.setValue(oUpdatedValue.text);
 						oFormField.fireChange({ value: oUpdatedValue.text});
-						assert.ok(deepEqual(cleanUUID(oField._getCurrentProperty("value")), oUpdatedValue), "Field 1: DT Value updated");
-						assert.ok(deepEqual(cleanUUID(oTextArea.getValue()), oUpdatedValue), "SimpleForm field textArea: value updated");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value")), oUpdatedValue), "Field 1: DT Value updated");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oTextArea.getValue()), oUpdatedValue), "SimpleForm field textArea: value updated");
 
 						oFormLabel = oContents[4];
 						oFormField = oContents[5];
@@ -1323,8 +1283,8 @@ sap.ui.define([
 						oUpdatedValue.type = "type05";
 						oFormField.setSelectedKey(oUpdatedValue.type);
 						oFormField.fireChange({ selectedItem: oFormField.getItems()[4] });
-						assert.ok(deepEqual(cleanUUID(oField._getCurrentProperty("value")), oUpdatedValue), "Field 1: DT Value updated");
-						assert.ok(deepEqual(cleanUUID(oTextArea.getValue()), oUpdatedValue), "SimpleForm field textArea: value updated");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value")), oUpdatedValue), "Field 1: DT Value updated");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oTextArea.getValue()), oUpdatedValue), "SimpleForm field textArea: value updated");
 
 						oFormLabel = oContents[6];
 						oFormField = oContents[7];
@@ -1334,7 +1294,7 @@ sap.ui.define([
 						assert.ok(oFormField.getVisible(), "SimpleForm Field 4: Visible");
 						assert.ok(oFormField.getEditable(), "SimpleForm Field 4: Editable");
 						assert.ok(deepEqual(JSON.parse(oFormField.getValue()), oUpdatedValue.object), "SimpleForm field 4: Has value");
-						assert.ok(deepEqual(cleanUUID(oTextArea.getValue()), oUpdatedValue), "SimpleForm field textArea: value updated");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oTextArea.getValue()), oUpdatedValue), "SimpleForm field textArea: value updated");
 						oUpdatedValue.object = {
 							"text": "textupdated",
 							"key": "keyupdated"
@@ -1345,8 +1305,8 @@ sap.ui.define([
 						});
 						oFormField.setValue(sNewObjectPropertyValue);
 						oFormField.fireChange({ value: sNewObjectPropertyValue});
-						assert.ok(deepEqual(cleanUUID(oField._getCurrentProperty("value")), oUpdatedValue), "Field 1: DT Value updated");
-						assert.ok(deepEqual(cleanUUID(oTextArea.getValue()), oUpdatedValue), "SimpleForm field textArea: value updated");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value")), oUpdatedValue), "Field 1: DT Value updated");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oTextArea.getValue()), oUpdatedValue), "SimpleForm field textArea: value updated");
 
 						oFormLabel = oContents[8];
 						assert.equal(oFormLabel.getText(), "", "SimpleForm label5: Has no label text");
@@ -1363,8 +1323,8 @@ sap.ui.define([
 						});
 						oTextArea.setValue(sNewValue);
 						oTextArea.fireChange({ value: sNewValue});
-						assert.ok(deepEqual(cleanUUID(oField._getCurrentProperty("value")), oUpdatedValue), "Field 1: DT Value updated");
-						assert.ok(deepEqual(cleanUUID(oTextArea.getValue()), oUpdatedValue), "SimpleForm field textArea: value updated");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value")), oUpdatedValue), "Field 1: DT Value updated");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oTextArea.getValue()), oUpdatedValue), "SimpleForm field textArea: value updated");
 						oFormField = oContents[5];
 						assert.equal(oFormField.getSelectedKey(), "type06", "SimpleForm Field 3: value updated");
 						oFormField = oContents[7];
