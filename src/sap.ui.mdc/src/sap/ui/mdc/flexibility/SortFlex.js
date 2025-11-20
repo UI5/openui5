@@ -183,7 +183,7 @@ sap.ui.define([
 				affectedControlIdProperty: "name",
 				targetContainer: oChange.getSelector(),
 				targetAggregation: "sorters",
-				customAggregation: mPropertyBag.modifier.bySelector(oChange.getSelector(), mPropertyBag.appComponent).getSortConditions().sorters,
+				customAggregation: mPropertyBag.modifier.bySelector(oChange.getSelector(), mPropertyBag.appComponent).getSortConditions().sorters.map((oSorter) => ({ ...oSorter, name: getAffectedSorter(oSorter) })),
 				classification: CondenserClassification.Create,
 				setTargetIndex: function(oChange, iNewTargetIndex) {
 					oChange.getContent().index = iNewTargetIndex;
@@ -205,7 +205,7 @@ sap.ui.define([
 				affectedControlIdProperty: "name",
 				targetContainer: oChange.getSelector(),
 				targetAggregation: "sorters",
-				customAggregation: mPropertyBag.modifier.bySelector(oChange.getSelector(), mPropertyBag.appComponent).getSortConditions().sorters,
+				customAggregation: mPropertyBag.modifier.bySelector(oChange.getSelector(), mPropertyBag.appComponent).getSortConditions().sorters.map((oSorter) => ({ ...oSorter, name: getAffectedSorter(oSorter) })),
 				classification: CondenserClassification.Destroy,
 				sourceIndex: oChange.getRevertData().index,
 				setIndexInRevertData: function(oChange, iIndex) {
@@ -230,7 +230,7 @@ sap.ui.define([
 				classification: CondenserClassification.Move,
 				//sourceIndex: oChange.getContent().index,
 				sourceIndex: oChange.getRevertData().index,
-				customAggregation: mPropertyBag.modifier.bySelector(oChange.getSelector(), mPropertyBag.appComponent).getSortConditions().sorters,
+				customAggregation: mPropertyBag.modifier.bySelector(oChange.getSelector(), mPropertyBag.appComponent).getSortConditions().sorters.map((oSorter) => ({ ...oSorter, name: getAffectedSorter(oSorter) })),
 				sourceContainer: oChange.getSelector(),
 				sourceAggregation: "sorters",
 				setTargetIndex: function(oChange, iNewTargetIndex) {
