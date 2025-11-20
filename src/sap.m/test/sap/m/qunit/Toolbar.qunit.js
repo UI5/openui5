@@ -934,6 +934,44 @@ sap.ui.define([
 		oTB.destroy();
 	});
 
+	QUnit.test("disabled and invisible controls should be skipped during keyboard navigation", function(assert) {
+		var oButton1 = new Button({text: "Button 1"}),
+			oButton2 = new Button({text: "Button 2", enabled: false}),
+			oButton3 = new Button({text: "Button 3", visible: false}),
+			oButton4 = new Button({text: "Button 4"}),
+			oTB = createToolbar({
+				Toolbar: {
+					content: [oButton1, oButton2, oButton3, oButton4]
+				}
+			});
+
+		// Test that all interactive controls are counted for accessibility (including disabled ones)
+		var aInteractiveControls = oTB._getToolbarInteractiveControls();
+		assert.strictEqual(aInteractiveControls.length, 3, "All visible interactive controls are counted for accessibility");
+		assert.notStrictEqual(aInteractiveControls.indexOf(oButton2), -1, "Disabled button is included in interactive controls for accessibility");
+		assert.strictEqual(aInteractiveControls.indexOf(oButton3), -1, "Invisible button is not in the interactive controls list");
+
+		// Test that disabled and invisible controls are excluded from navigation
+		var aNavigatableControls = oTB._getToolbarNavigatableControls();
+		assert.strictEqual(aNavigatableControls.length, 2, "Only enabled and visible controls are navigatable");
+		assert.strictEqual(aNavigatableControls.indexOf(oButton2), -1, "Disabled button is not navigatable");
+		assert.strictEqual(aNavigatableControls.indexOf(oButton3), -1, "Invisible button is not navigatable");
+		assert.notStrictEqual(aNavigatableControls.indexOf(oButton1), -1, "Enabled and visible button is navigatable");
+
+		// Test navigation skips disabled and invisible controls
+		oButton1.focus();
+		var oArrowRightEvent = new KeyboardEvent("keydown", { keyCode: KeyCodes.ARROW_RIGHT });
+		oTB._moveFocus("forward", oArrowRightEvent);
+		assert.strictEqual(document.activeElement, oButton4.getDomRef(), "Arrow right skips disabled and invisible buttons and focuses next available button");
+
+		// Cleanup
+		oButton1.destroy();
+		oButton2.destroy();
+		oButton3.destroy();
+		oButton4.destroy();
+		oTB.destroy();
+	});
+
 	QUnit.test("inactive toolbar should not fire press on SPACE key", function(assert) {
 		var oLabel = new Label({text : "text"});
 		var fnPressSpy = this.spy();
