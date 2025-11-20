@@ -1007,7 +1007,7 @@ sap.ui.define([
 			default: break;
 		}
 
-		// sap.m.ScrollEnablement scrolls every time Ctrl + arrow are pressed, so stop propagation here.
+		// ScrollEnablement scrolls every time Ctrl + arrow are pressed, so stop propagation here.
 		oEvent.stopPropagation();
 
 		GridKeyboardDragAndDrop.fireDnD(oItem, aDropConfigs, oEvent);

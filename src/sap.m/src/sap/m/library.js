@@ -5207,7 +5207,7 @@ sap.ui.define([
 	 };
 
 	 /**
-	  * Type of the upload {@link sap.m.UploadSetItem}.
+	  * Type of the upload {@link sap.m.upload.UploadSetItem}.
 	  *
 	  * @enum {string}
 	  * @public

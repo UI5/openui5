@@ -12,11 +12,11 @@ sap.ui.define([
 	"use strict";
 
 	/*
-		* Change handler for adding a simple form group.
-		* @alias sap.ui.layout.changeHandler.AddSimpleFormGroup
-		* @author SAP SE
-		* @version ${version}
-		*/
+	 * Change handler for adding a simple form group.
+	 * @alias sap.ui.layout.changeHandler.AddSimpleFormGroup
+	 * @author SAP SE
+	 * @version ${version}
+	 */
 	var AddSimpleFormGroup = {};
 
 	AddSimpleFormGroup.CONTENT_AGGREGATION = "content";
@@ -75,7 +75,7 @@ sap.ui.define([
 	 * Adds a smart form group
 	 *
 	 * @param {sap.ui.fl.Change} oChangeWrapper Change wrapper object with instructions to be applied to the control map
-	 * @param {sap.ui.layout.SimpleForm} oForm Smart form control that matches the change selector for applying the change
+	 * @param {sap.ui.layout.form.SimpleForm} oForm Smart form control that matches the change selector for applying the change
 	 * @param {object} mPropertyBag Property bag containing the modifier, the appComponent and the view
 	 * @param {object} mPropertyBag.modifier Modifier for the controls
 	 * @param {object} mPropertyBag.appComponent Component in which the change should be applied
@@ -198,7 +198,7 @@ sap.ui.define([
 	 * Reverts the applied change
 	 *
 	 * @param {sap.ui.fl.Change} oChangeWrapper Change wrapper object with instructions to be applied to the control map
-	 * @param {sap.ui.layout.SimpleForm} oForm Smart form control that matches the change selector for applying the change
+	 * @param {sap.ui.layout.form.SimpleForm} oForm Smart form control that matches the change selector for applying the change
 	 * @param {object} mPropertyBag Property bag containing the modifier, the appComponent and the view
 	 * @param {object} mPropertyBag.modifier Modifier for the controls
 	 * @param {object} mPropertyBag.appComponent Component in which the change should be applied

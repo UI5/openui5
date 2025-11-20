@@ -136,7 +136,7 @@ sap.ui.define([
 	/**
 	 * Instances of the class per flexible column layout object.
 	 *
-	 * @type {Object<string,sap.m.FlexibleColumnLayoutSemanticHelper>}
+	 * @type {Object<string,sap.f.FlexibleColumnLayoutSemanticHelper>}
 	 * @private
 	 */
 	FlexibleColumnLayoutSemanticHelper._oInstances = {};

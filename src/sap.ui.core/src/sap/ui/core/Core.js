@@ -392,7 +392,7 @@ sap.ui.define([
 
 				Object.defineProperty(this, "mElements", {
 					get: function() {
-						Log.error("oCore.mElements was a private member and has been removed. Use one of the methods in sap.ui.core.ElementRegistry instead");
+						Log.error("oCore.mElements was a private member and has been removed. Use one of the methods in sap/ui/core/ElementRegistry instead");
 						return ElementRegistry.all(); // this is a very costly snapshot!
 					},
 					configurable: false

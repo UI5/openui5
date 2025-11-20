@@ -2684,7 +2684,7 @@ sap.ui.define([
 		 * Days are encoded as integer where Sunday=0, Monday=1 etc.
 		 *
 		 * @returns {int} The first day of week
-		 * @override sap.ui.core.LocalData#getFirstDayOfWeek
+		 * @override sap.ui.core.LocaleData#getFirstDayOfWeek
 		 * @since 1.113.0
 		 */
 		getFirstDayOfWeek: function() {
@@ -2706,7 +2706,7 @@ sap.ui.define([
 		 * see {@link sap.ui.core.LocaleData#getMinimalDaysInFirstWeek}.
 		 *
 		 * @returns {int} The required minimal number of days for the first week of a year
-		 * @override sap.ui.core.LocalData#getMinimalDaysInFirstWeek
+		 * @override sap.ui.core.LocaleData#getMinimalDaysInFirstWeek
 		 * @since 1.113.0
 		 */
 		getMinimalDaysInFirstWeek: function() {

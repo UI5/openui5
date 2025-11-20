@@ -261,6 +261,55 @@ sap.ui.define([
 		assert.equal(aVisibleTokens.length, 2, "no more than 2 tokens can be added");
 	});
 
+
+	QUnit.test("cloning should clear selected key property", async function(assert) {
+		this.clock = sinon.useFakeTimers();
+		const oData = {
+			"ProductSuppliers": [{
+				"key": "Titanium",
+				"name": "Titanium"
+			}]
+		};
+
+		const oModel = new JSONModel(oData);
+		const oMultiInput = new MultiInput({
+			showSuggestion: true,
+			suggestionItems: {
+				path: "/ProductSuppliers",
+				templateShareable: true,
+				template: new ListItem({
+					key: "{key}",
+					text: "{name}"
+				})
+			}
+		});
+		oMultiInput.setModel(oModel);
+		oMultiInput.placeAt("qunit-fixture");
+		await nextUIUpdate(this.clock);
+
+		// select first item
+		oMultiInput.onfocusin({
+			target: oMultiInput.getFocusDomRef()
+		}); // for some reason this is not triggered when calling focus via API
+		jQuery(oMultiInput.getFocusDomRef()).trigger("focus").val("t").trigger("input");
+		this.clock.tick(1000);
+
+		qutils.triggerKeydown(oMultiInput.getFocusDomRef(), KeyCodes.ARROW_DOWN);
+		this.clock.tick(300);
+		qutils.triggerKeydown(oMultiInput.getFocusDomRef(), KeyCodes.ENTER);
+		this.clock.tick(300);
+
+		const oClone = oMultiInput.clone();
+		oClone.placeAt("qunit-fixture");
+		await nextUIUpdate(this.clock);
+
+		assert.strictEqual(oClone.getValue(), "", "Selected key is cleared after cloning");
+
+		this.clock.restore();
+		oMultiInput.destroy();
+		oClone.destroy();
+	});
+
 	QUnit.test("_calculateSpaceForTokenizer", async function(assert) {
 		var multiInput = new MultiInput({
 			width: "500px"

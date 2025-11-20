@@ -82,7 +82,7 @@ CalendarRowRenderer.render = function(oRm, oRow){
 		oRm.style("height", sHeight);
 	}
 
-	//		var rb = sap.ui.getCore().getLibraryResourceBundle("sap.ui.unified");
+	//		var rb = Lib.getResourceBundleFor("sap.ui.unified");
 	oRm.openEnd(); // div element
 
 	this.renderAppointmentsRow(oRm, oRow, aTypes);

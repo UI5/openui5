@@ -371,7 +371,7 @@ sap.ui.define([
 			},
 
 			/**
-			* Retrieves the <code>sap.m.ListItem</code>, that should be selected within the List,
+			* Retrieves the <code>sap.m.ListItemBase</code>, that should be selected within the List,
 			* based on the loaded sample or null, if it does not exist.
 			* @returns {sap.m.ListItemBase | null}
 			*/
