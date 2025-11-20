@@ -5,6 +5,7 @@
 
 	<Dialog
 		class="sapUIRtaFieldRepositoryDialog sapUiNoContentPadding"
+		title="{/dialogTitle}"
 		horizontalScrolling="false">
 		<buttons>
 			<Button

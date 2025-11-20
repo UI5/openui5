@@ -2203,6 +2203,20 @@ sap.ui.define([
 		oRemoveSelectionStub.reset();
 	});
 
+	QUnit.test("cleanupPlginsOnDestroy", async function(assert) {
+		const oCellSelector = new CellSelector();
+		this.oTable.addDependent(oCellSelector);
+
+		await this.oTable._fullyInitialized();
+
+		const oCellSelectorDestroySpy = sinon.spy(oCellSelector, "destroy");
+		const oInnerTableDestroySpy = sinon.spy(this.oTable._oTable, "destroy");
+
+		this.oTable.destroy();
+
+		assert.ok(oCellSelectorDestroySpy.calledBefore(oInnerTableDestroySpy), "CellSelector is destroyed before the inner table is destroyed");
+	});
+
 	QUnit.test("showPasteButton", async function(assert) {
 		assert.notOk(this.oTable.getShowPasteButton(), "default value of showPasteButton=false");
 

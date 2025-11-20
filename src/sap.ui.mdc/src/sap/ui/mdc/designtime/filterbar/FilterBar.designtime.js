@@ -2,8 +2,9 @@
  * ${copyright}
  */
 sap.ui.define([
-	"sap/m/p13n/Engine"
-], (Engine) => {
+	"sap/m/p13n/Engine",
+	"sap/ui/core/Lib"
+], ( Engine, Library) => {
 	"use strict";
 
 	return {
@@ -11,7 +12,9 @@ sap.ui.define([
 			settings: {
 				"sap.ui.mdc": function(oControl) {
 					return Engine.getInstance()._runWithPersistence(oControl, (bIsGlobal) => ({
-						name: "filterbar.ADAPT_TITLE",
+						name: function() {
+							return Library.getResourceBundleFor("sap.ui.mdc").getText("filterbar.ADAPT_TITLE");
+						},
 						handler: function (oControl, mPropertyBag) {
 							//CHECK: move metadata finalizing to Engine?
 							return oControl.initializedWithMetadata().then(() => {

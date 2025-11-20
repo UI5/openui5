@@ -63,9 +63,6 @@ function(
 ) {
 	"use strict";
 
-	// shortcut for sap.m.ToolbarDesign
-	var ToolbarDesign = library.ToolbarDesign;
-
 	// shortcut for sap.ui.core.TitleLevel
 	var TitleLevel = coreLibrary.TitleLevel;
 
@@ -318,9 +315,7 @@ function(
 			oMonthPicker,
 			oYearPicker;
 
-		this.setAggregation("_actionsToolbar", new AssociativeOverflowToolbar(sOPHId + "-ActionsToolbar", {
-			design: ToolbarDesign.Transparent
-		})
+		this.setAggregation("_actionsToolbar", new AssociativeOverflowToolbar(sOPHId + "-ActionsToolbar", {})
 			.addStyleClass("sapMPCHeadActionsToolbar")
 			.addContent(this._getOrCreateTitleControl())
 			.addContent(this._getOrCreateToolbarSpacer())
@@ -416,7 +411,6 @@ function(
 		});
 
 		this.setAggregation("_navigationToolbar", new Toolbar(sNavToolbarId, {
-			design: ToolbarDesign.Transparent,
 			content: [
 				this._oPrevBtn,
 				this._oTodayBtn,
@@ -640,7 +634,7 @@ function(
 		if (!this._oViewSwitchLabel) {
 			this._oViewSwitchLabel = new Label(this.getId() + "-ViewSwitchLabel", {
 				text: Library.getResourceBundleFor("sap.m").getText("PCH_VIEW_SWITCH"),
-				labelFor: this._getOrCreateViewSwitch().getId(),
+				visible: false, // Start invisible, will be shown only in select mode
 				layoutData: new OverflowToolbarLayoutData({
 					group: 1,
 					priority: library.OverflowToolbarPriority.High
@@ -675,18 +669,23 @@ function(
 	/**
 	 * Updates the labelFor property of the view switch label to reference the correct element
 	 * depending on whether the view switch is in SegmentedButton or Select mode.
+	 * Also controls label visibility - only show when in select mode.
 	 * @private
 	 */
 	PlanningCalendarHeader.prototype._updateViewSwitchLabelFor = function () {
 		var oViewSwitch = this._getOrCreateViewSwitch();
 		var oViewSwitchLabel = this._getOrCreateViewSwitchLabel();
+		var bIsSelectMode = oViewSwitch.hasStyleClass("sapMSegBSelectWrapper");
 
-		// Set labelFor based on current mode: Select mode uses "-select" suffix, SegmentedButton uses base ID
-		var sLabelFor = oViewSwitch.hasStyleClass("sapMSegBSelectWrapper") ?
-			oViewSwitch.getId() + "-select" :
-			oViewSwitch.getId();
-
-		oViewSwitchLabel.setLabelFor(sLabelFor);
+		if (bIsSelectMode) {
+			// In select mode (overflow): show label and set labelFor to select element
+			oViewSwitchLabel.setVisible(true);
+			oViewSwitchLabel.setLabelFor(oViewSwitch.getId() + "-select");
+		} else {
+			// In normal SegmentedButton mode: hide label and clear labelFor
+			oViewSwitchLabel.setVisible(false);
+			oViewSwitchLabel.setLabelFor("");
+		}
 	};
 
 	/**

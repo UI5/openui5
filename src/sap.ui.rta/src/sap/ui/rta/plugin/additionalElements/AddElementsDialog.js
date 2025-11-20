@@ -236,10 +236,8 @@ sap.ui.define([
 	};
 
 	AddElementsDialog.prototype.setTitle = function(sTitle) {
-		ManagedObject.prototype.setProperty.call(this, "title", sTitle, true);
-		if (this._oDialog) {
-			this._oDialog.setTitle(sTitle);
-		}
+		this.setProperty("title", sTitle, true);
+		this._oDialogModel.setProperty("/dialogTitle", sTitle);
 	};
 
 	/**

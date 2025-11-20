@@ -15,11 +15,9 @@ sap.ui.define([
 	"sap/m/IllustratedMessage",
 	"sap/m/Button",
 	"sap/m/CustomListItem",
-	"sap/m/HBox",
 	"sap/m/ResponsivePopover",
-	"sap/m/Text",
 	"sap/ui/core/InvisibleMessage"
-], function(Localization, IllustratedMessageType, MLibrary, Library, Locale, LocaleData, syncStyleClass, Theming, ThemeParameters, IllustratedMessage, Button, CustomListItem, HBox, ResponsivePopover, Text, InvisibleMessage) {
+], function(Localization, IllustratedMessageType, MLibrary, Library, Locale, LocaleData, syncStyleClass, Theming, ThemeParameters, IllustratedMessage, Button, CustomListItem, ResponsivePopover, InvisibleMessage) {
 	"use strict";
 	/*global Intl*/
 
@@ -523,6 +521,22 @@ sap.ui.define([
 		Theming.attachApplied(fnOnThemeApplied); // Will be called immediately when theme is applied
 		Theming.detachApplied(fnOnThemeApplied);
 		return bIsApplied;
+	};
+
+	/**
+	 * Cleans up the plugins before the plugin owner is destroyed.
+	 *
+	 * @param {sap.ui.core.Control} oControl The control instance
+	 * @private
+	 * @ui5-restricted sap.ui.mdc, sap.ui.comp
+	 * @since 1.144
+	 */
+	Util.cleanupPluginsBeforeDestroy = function(oControl) {
+		oControl.findElements(false, (oElement) => {
+			return oElement.isA("sap.m.plugins.PluginBase");
+		}, false).forEach((oPlugin) => {
+			oPlugin.destroy();
+		});
 	};
 
 	/**
