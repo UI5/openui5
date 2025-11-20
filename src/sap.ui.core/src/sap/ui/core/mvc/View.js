@@ -315,13 +315,13 @@ sap.ui.define([
 	}
 
 	/**
-		 * resolves either the module dependency or the function which was passed to settings to the internal
-		 * preprocessor config object
-		 *
-		 * @param {object} oPreprocessor Preprocessor config object
-		 * @return {object} oPreprocessorImpl
-		 * @private
-		 */
+	 * resolves either the module dependency or the function which was passed to settings to the internal
+	 * preprocessor config object
+	 *
+	 * @param {object} oPreprocessor Preprocessor config object
+	 * @return {object} oPreprocessorImpl
+	 * @private
+	 */
 	function initPreprocessor(oPreprocessor) {
 		var oPreprocessorImpl;
 
@@ -419,15 +419,15 @@ sap.ui.define([
 	}
 
 	/**
-		 * Creates and connects the controller if the controller is not given in the
-		 * mSettings
-		 *
-		 * @param {sap.ui.core.mvc.XMLView} oThis the instance of the view that should be processed
-		 * @param {object} [mSettings] Settings
-		 * @returns {Promise|undefined} A promise for asynchronous or undefined for synchronous controllers
-		 * @throws {Error}
-		 * @private
-		 */
+	 * Creates and connects the controller if the controller is not given in the
+	 * mSettings
+	 *
+	 * @param {sap.ui.core.mvc.XMLView} oThis the instance of the view that should be processed
+	 * @param {object} [mSettings] Settings
+	 * @returns {Promise|undefined} A promise for asynchronous or undefined for synchronous controllers
+	 * @throws {Error}
+	 * @private
+	 */
 	var createAndConnectController = function(oThis, mSettings) {
 		var connectToView = function (oController) {
 			oThis.oController = oController;
@@ -556,8 +556,8 @@ sap.ui.define([
 		}
 
 		/**
-				 * @private
-				 */
+		 * @private
+		 */
 		var fnPropagateOwner = function(fnCallback) {
 			assert(typeof fnCallback === "function", "fn must be a function");
 			var oOwnerComponent = Component && Component.getOwnerComponentFor(that);
@@ -1195,8 +1195,8 @@ sap.ui.define([
 	};
 
 	/**
-		 * @private
-		 */
+	 * @private
+	 */
 	View.prototype.initViewSettings = function(mSettings) {
 		// check if renderer exists, otherwise default it
 		if (!this.getMetadata()._oRenderer) {

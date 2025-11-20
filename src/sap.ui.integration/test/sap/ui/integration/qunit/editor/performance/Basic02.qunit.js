@@ -58,73 +58,6 @@ sap.ui.define([
 		}
 	}
 
-	function cleanDT(oValue) {
-		var oClonedValue = deepClone(oValue, 500);
-		if (typeof oClonedValue === "string") {
-			oClonedValue = JSON.parse(oClonedValue);
-		}
-		if (Array.isArray(oClonedValue)) {
-			oClonedValue.forEach(function(oResult) {
-				delete oResult._dt;
-			});
-		} else if (typeof oClonedValue === "object") {
-			delete oClonedValue._dt;
-		}
-		return oClonedValue;
-	}
-
-	function cleanUUID(oValue) {
-		var oClonedValue = deepClone(oValue, 500);
-		if (typeof oClonedValue === "string") {
-			oClonedValue = JSON.parse(oClonedValue);
-		}
-		if (Array.isArray(oClonedValue)) {
-			oClonedValue.forEach(function(oResult) {
-				if (oResult._dt) {
-					delete oResult._dt._uuid;
-				}
-				if (deepEqual(oResult._dt, {})) {
-					delete oResult._dt;
-				}
-			});
-		} else if (typeof oClonedValue === "object") {
-			if (oClonedValue._dt) {
-				delete oClonedValue._dt._uuid;
-			}
-			if (deepEqual(oClonedValue._dt, {})) {
-				delete oClonedValue._dt;
-			}
-		}
-		return oClonedValue;
-	}
-
-	function cleanUUIDAndPosition(oValue) {
-		var oClonedValue = deepClone(oValue, 500);
-		if (typeof oClonedValue === "string") {
-			oClonedValue = JSON.parse(oClonedValue);
-		}
-		if (Array.isArray(oClonedValue)) {
-			oClonedValue.forEach(function(oResult) {
-				if (oResult._dt) {
-					delete oResult._dt._uuid;
-					delete oResult._dt._position;
-				}
-				if (deepEqual(oResult._dt, {})) {
-					delete oResult._dt;
-				}
-			});
-		} else if (typeof oClonedValue === "object") {
-			if (oClonedValue._dt) {
-				delete oClonedValue._dt._uuid;
-				delete oClonedValue._dt._position;
-			}
-			if (deepEqual(oClonedValue._dt, {})) {
-				delete oClonedValue._dt;
-			}
-		}
-		return oClonedValue;
-	}
-
 	QUnit.module("single parameter", {
 		beforeEach: function () {
 			//oEditor = EditorQunitUtils.beforeEachTest();
@@ -1094,7 +1027,7 @@ sap.ui.define([
 						assert.ok(oSimpleForm.isA("sap.ui.layout.form.SimpleForm"), "Field 2: Control is SimpleForm");
 						var oContents = oSimpleForm.getContent();
 						assert.equal(oContents.length, 16, "SimpleForm: length");
-						assert.ok(deepEqual(cleanDT(oContents[15].getValue()), {"text": "text01","key": "key01","url": "https://sap.com/06","icon": "sap-icon://accept","int": 1,"editable": true,"number": 3.55}), "SimpleForm field textArea: Has Origin value");
+						assert.ok(deepEqual(EditorQunitUtils.cleanDT(oContents[15].getValue()), {"text": "text01","key": "key01","url": "https://sap.com/06","icon": "sap-icon://accept","int": 1,"editable": true,"number": 3.55}), "SimpleForm field textArea: Has Origin value");
 						assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 						EditorQunitUtils.wait().then(function () {
 							destroyEditor(oEditor);
@@ -1125,7 +1058,7 @@ sap.ui.define([
 									assert.ok(oSimpleForm.isA("sap.ui.layout.form.SimpleForm"), "Field 2: Control is SimpleForm");
 									var oContents = oSimpleForm.getContent();
 									assert.equal(oContents.length, 16, "SimpleForm: length");
-									assert.ok(deepEqual(cleanDT(oContents[15].getValue()), {"text": "text01","key": "key01","url": "https://sap.com/06","icon": "sap-icon://accept","int": 1,"editable": true,"number": 3.55}), "SimpleForm field textArea: Has Origin value");
+									assert.ok(deepEqual(EditorQunitUtils.cleanDT(oContents[15].getValue()), {"text": "text01","key": "key01","url": "https://sap.com/06","icon": "sap-icon://accept","int": 1,"editable": true,"number": 3.55}), "SimpleForm field textArea: Has Origin value");
 									assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 									EditorQunitUtils.wait().then(function () {
 										destroyEditor(oEditor);
@@ -1156,7 +1089,7 @@ sap.ui.define([
 												assert.ok(oSimpleForm.isA("sap.ui.layout.form.SimpleForm"), "Field 2: Control is SimpleForm");
 												var oContents = oSimpleForm.getContent();
 												assert.equal(oContents.length, 16, "SimpleForm: length");
-												assert.ok(deepEqual(cleanDT(oContents[15].getValue()), {"text": "text01","key": "key01","url": "https://sap.com/06","icon": "sap-icon://accept","int": 1,"editable": true,"number": 3.55}), "SimpleForm field textArea: Has Origin value");
+												assert.ok(deepEqual(EditorQunitUtils.cleanDT(oContents[15].getValue()), {"text": "text01","key": "key01","url": "https://sap.com/06","icon": "sap-icon://accept","int": 1,"editable": true,"number": 3.55}), "SimpleForm field textArea: Has Origin value");
 												assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 												EditorQunitUtils.wait().then(function () {
 													destroyEditor(oEditor);
@@ -1187,7 +1120,7 @@ sap.ui.define([
 															assert.ok(oSimpleForm.isA("sap.ui.layout.form.SimpleForm"), "Field 2: Control is SimpleForm");
 															var oContents = oSimpleForm.getContent();
 															assert.equal(oContents.length, 16, "SimpleForm: length");
-															assert.ok(deepEqual(cleanDT(oContents[15].getValue()), {"text": "text01","key": "key01","url": "https://sap.com/06","icon": "sap-icon://accept","int": 1,"editable": true,"number": 3.55}), "SimpleForm field textArea: Has Origin value");
+															assert.ok(deepEqual(EditorQunitUtils.cleanDT(oContents[15].getValue()), {"text": "text01","key": "key01","url": "https://sap.com/06","icon": "sap-icon://accept","int": 1,"editable": true,"number": 3.55}), "SimpleForm field textArea: Has Origin value");
 															assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 															EditorQunitUtils.wait().then(function () {
 																destroyEditor(oEditor);
@@ -1218,7 +1151,7 @@ sap.ui.define([
 																		assert.ok(oSimpleForm.isA("sap.ui.layout.form.SimpleForm"), "Field 2: Control is SimpleForm");
 																		var oContents = oSimpleForm.getContent();
 																		assert.equal(oContents.length, 16, "SimpleForm: length");
-																		assert.ok(deepEqual(cleanDT(oContents[15].getValue()), {"text": "text01","key": "key01","url": "https://sap.com/06","icon": "sap-icon://accept","int": 1,"editable": true,"number": 3.55}), "SimpleForm field textArea: Has Origin value");
+																		assert.ok(deepEqual(EditorQunitUtils.cleanDT(oContents[15].getValue()), {"text": "text01","key": "key01","url": "https://sap.com/06","icon": "sap-icon://accept","int": 1,"editable": true,"number": 3.55}), "SimpleForm field textArea: Has Origin value");
 																		assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 																		EditorQunitUtils.wait().then(function () {
 																			destroyEditor(oEditor);
@@ -1494,7 +1427,7 @@ sap.ui.define([
 					assert.ok(oLabel.isA("sap.m.Label"), "Label 1: Form content contains a Label");
 					assert.equal(oLabel.getText(), "Object properties defined: value from Json list", "Label 1: Has label text");
 					assert.ok(oField.isA("sap.ui.integration.editor.fields.ObjectField"), "Field 1: Object Field");
-					assert.ok(deepEqual(cleanDT(oField._getCurrentProperty("value")), oValue), "Field 1: Value");
+					assert.ok(deepEqual(EditorQunitUtils.cleanDT(oField._getCurrentProperty("value")), oValue), "Field 1: Value");
 					assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Field Ready " + count + ": " + time + "ms OK");
 					EditorQunitUtils.isReady(oEditor).then(function () {
 						time = new Date().getTime() - start.getTime();
@@ -1502,9 +1435,9 @@ sap.ui.define([
 						var oTable = oField.getAggregation("_field");
 						assert.ok(oTable.isA("sap.ui.table.Table"), "Field 1: Control is Table");
 						assert.equal(oTable.getBinding().getCount(), 9, "Table: value length is 9");
-						assert.ok(deepEqual(cleanUUID(oTable.getBinding().getContexts()[0].getObject()), oValue1InTable), "Table: new row");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oTable.getBinding().getContexts()[0].getObject()), oValue1InTable), "Table: new row");
 						var oRow1 = oTable.getRows()[0];
-						assert.ok(deepEqual(cleanUUID(oRow1.getBindingContext().getObject()), oValue1InTable), "Table: value row is at top");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oRow1.getBindingContext().getObject()), oValue1InTable), "Table: value row is at top");
 						var oSelectionCell1 = oRow1.getCells()[0];
 						assert.ok(oSelectionCell1.isA("sap.m.CheckBox"), "Row 1: Cell 1 is CheckBox");
 						assert.ok(oSelectionCell1.getSelected(), "Row 1: Cell 1 is selected");
@@ -1530,7 +1463,7 @@ sap.ui.define([
 								assert.ok(oLabel.isA("sap.m.Label"), "Label 1: Form content contains a Label");
 								assert.equal(oLabel.getText(), "Object properties defined: value from Json list", "Label 1: Has label text");
 								assert.ok(oField.isA("sap.ui.integration.editor.fields.ObjectField"), "Field 1: Object Field");
-								assert.ok(deepEqual(cleanDT(oField._getCurrentProperty("value")), oValue), "Field 1: Value");
+								assert.ok(deepEqual(EditorQunitUtils.cleanDT(oField._getCurrentProperty("value")), oValue), "Field 1: Value");
 								assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Field Ready " + count + ": " + time + "ms OK");
 								EditorQunitUtils.isReady(oEditor).then(function () {
 									time = new Date().getTime() - start.getTime();
@@ -1538,9 +1471,9 @@ sap.ui.define([
 									var oTable = oField.getAggregation("_field");
 									assert.ok(oTable.isA("sap.ui.table.Table"), "Field 1: Control is Table");
 									assert.equal(oTable.getBinding().getCount(), 9, "Table: value length is 9");
-									assert.ok(deepEqual(cleanUUID(oTable.getBinding().getContexts()[0].getObject()), oValue1InTable), "Table: new row");
+									assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oTable.getBinding().getContexts()[0].getObject()), oValue1InTable), "Table: new row");
 									var oRow1 = oTable.getRows()[0];
-									assert.ok(deepEqual(cleanUUID(oRow1.getBindingContext().getObject()), oValue1InTable), "Table: value row is at top");
+									assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oRow1.getBindingContext().getObject()), oValue1InTable), "Table: value row is at top");
 									var oSelectionCell1 = oRow1.getCells()[0];
 									assert.ok(oSelectionCell1.isA("sap.m.CheckBox"), "Row 1: Cell 1 is CheckBox");
 									assert.ok(oSelectionCell1.getSelected(), "Row 1: Cell 1 is selected");
@@ -1566,7 +1499,7 @@ sap.ui.define([
 											assert.ok(oLabel.isA("sap.m.Label"), "Label 1: Form content contains a Label");
 											assert.equal(oLabel.getText(), "Object properties defined: value from Json list", "Label 1: Has label text");
 											assert.ok(oField.isA("sap.ui.integration.editor.fields.ObjectField"), "Field 1: Object Field");
-											assert.ok(deepEqual(cleanDT(oField._getCurrentProperty("value")), oValue), "Field 1: Value");
+											assert.ok(deepEqual(EditorQunitUtils.cleanDT(oField._getCurrentProperty("value")), oValue), "Field 1: Value");
 											assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Field Ready " + count + ": " + time + "ms OK");
 											EditorQunitUtils.isReady(oEditor).then(function () {
 												time = new Date().getTime() - start.getTime();
@@ -1574,9 +1507,9 @@ sap.ui.define([
 												var oTable = oField.getAggregation("_field");
 												assert.ok(oTable.isA("sap.ui.table.Table"), "Field 1: Control is Table");
 												assert.equal(oTable.getBinding().getCount(), 9, "Table: value length is 9");
-												assert.ok(deepEqual(cleanUUID(oTable.getBinding().getContexts()[0].getObject()), oValue1InTable), "Table: new row");
+												assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oTable.getBinding().getContexts()[0].getObject()), oValue1InTable), "Table: new row");
 												var oRow1 = oTable.getRows()[0];
-												assert.ok(deepEqual(cleanUUID(oRow1.getBindingContext().getObject()), oValue1InTable), "Table: value row is at top");
+												assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oRow1.getBindingContext().getObject()), oValue1InTable), "Table: value row is at top");
 												var oSelectionCell1 = oRow1.getCells()[0];
 												assert.ok(oSelectionCell1.isA("sap.m.CheckBox"), "Row 1: Cell 1 is CheckBox");
 												assert.ok(oSelectionCell1.getSelected(), "Row 1: Cell 1 is selected");
@@ -1602,7 +1535,7 @@ sap.ui.define([
 														assert.ok(oLabel.isA("sap.m.Label"), "Label 1: Form content contains a Label");
 														assert.equal(oLabel.getText(), "Object properties defined: value from Json list", "Label 1: Has label text");
 														assert.ok(oField.isA("sap.ui.integration.editor.fields.ObjectField"), "Field 1: Object Field");
-														assert.ok(deepEqual(cleanDT(oField._getCurrentProperty("value")), oValue), "Field 1: Value");
+														assert.ok(deepEqual(EditorQunitUtils.cleanDT(oField._getCurrentProperty("value")), oValue), "Field 1: Value");
 														assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Field Ready " + count + ": " + time + "ms OK");
 														EditorQunitUtils.isReady(oEditor).then(function () {
 															time = new Date().getTime() - start.getTime();
@@ -1610,9 +1543,9 @@ sap.ui.define([
 															var oTable = oField.getAggregation("_field");
 															assert.ok(oTable.isA("sap.ui.table.Table"), "Field 1: Control is Table");
 															assert.equal(oTable.getBinding().getCount(), 9, "Table: value length is 9");
-															assert.ok(deepEqual(cleanUUID(oTable.getBinding().getContexts()[0].getObject()), oValue1InTable), "Table: new row");
+															assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oTable.getBinding().getContexts()[0].getObject()), oValue1InTable), "Table: new row");
 															var oRow1 = oTable.getRows()[0];
-															assert.ok(deepEqual(cleanUUID(oRow1.getBindingContext().getObject()), oValue1InTable), "Table: value row is at top");
+															assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oRow1.getBindingContext().getObject()), oValue1InTable), "Table: value row is at top");
 															var oSelectionCell1 = oRow1.getCells()[0];
 															assert.ok(oSelectionCell1.isA("sap.m.CheckBox"), "Row 1: Cell 1 is CheckBox");
 															assert.ok(oSelectionCell1.getSelected(), "Row 1: Cell 1 is selected");
@@ -1638,7 +1571,7 @@ sap.ui.define([
 																	assert.ok(oLabel.isA("sap.m.Label"), "Label 1: Form content contains a Label");
 																	assert.equal(oLabel.getText(), "Object properties defined: value from Json list", "Label 1: Has label text");
 																	assert.ok(oField.isA("sap.ui.integration.editor.fields.ObjectField"), "Field 1: Object Field");
-																	assert.ok(deepEqual(cleanDT(oField._getCurrentProperty("value")), oValue), "Field 1: Value");
+																	assert.ok(deepEqual(EditorQunitUtils.cleanDT(oField._getCurrentProperty("value")), oValue), "Field 1: Value");
 																	assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Field Ready " + count + ": " + time + "ms OK");
 																	EditorQunitUtils.isReady(oEditor).then(function () {
 																		time = new Date().getTime() - start.getTime();
@@ -1646,9 +1579,9 @@ sap.ui.define([
 																		var oTable = oField.getAggregation("_field");
 																		assert.ok(oTable.isA("sap.ui.table.Table"), "Field 1: Control is Table");
 																		assert.equal(oTable.getBinding().getCount(), 9, "Table: value length is 9");
-																		assert.ok(deepEqual(cleanUUID(oTable.getBinding().getContexts()[0].getObject()), oValue1InTable), "Table: new row");
+																		assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oTable.getBinding().getContexts()[0].getObject()), oValue1InTable), "Table: new row");
 																		var oRow1 = oTable.getRows()[0];
-																		assert.ok(deepEqual(cleanUUID(oRow1.getBindingContext().getObject()), oValue1InTable), "Table: value row is at top");
+																		assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oRow1.getBindingContext().getObject()), oValue1InTable), "Table: value row is at top");
 																		var oSelectionCell1 = oRow1.getCells()[0];
 																		assert.ok(oSelectionCell1.isA("sap.m.CheckBox"), "Row 1: Cell 1 is CheckBox");
 																		assert.ok(oSelectionCell1.getSelected(), "Row 1: Cell 1 is selected");
@@ -1735,7 +1668,7 @@ sap.ui.define([
 						var oTextArea = oField.getAggregation("_field");
 						assert.ok(oTextArea.isA("sap.m.TextArea"), "Field 1: Control is TextArea");
 						assert.equal(oTextArea.getValue(), "[]", "Field 1: Object Value []");
-						assert.ok(deepEqual(cleanUUIDAndPosition(oField._getCurrentProperty("value")), []), "Field 1: DT Value []");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), []), "Field 1: DT Value []");
 						assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 						EditorQunitUtils.wait().then(function () {
 							destroyEditor(oEditor);
@@ -1765,7 +1698,7 @@ sap.ui.define([
 									var oTextArea = oField.getAggregation("_field");
 									assert.ok(oTextArea.isA("sap.m.TextArea"), "Field 1: Control is TextArea");
 									assert.equal(oTextArea.getValue(), "[]", "Field 1: Object Value []");
-									assert.ok(deepEqual(cleanUUIDAndPosition(oField._getCurrentProperty("value")), []), "Field 1: DT Value []");
+									assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), []), "Field 1: DT Value []");
 									assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 									EditorQunitUtils.wait().then(function () {
 										destroyEditor(oEditor);
@@ -1795,7 +1728,7 @@ sap.ui.define([
 												var oTextArea = oField.getAggregation("_field");
 												assert.ok(oTextArea.isA("sap.m.TextArea"), "Field 1: Control is TextArea");
 												assert.equal(oTextArea.getValue(), "[]", "Field 1: Object Value []");
-												assert.ok(deepEqual(cleanUUIDAndPosition(oField._getCurrentProperty("value")), []), "Field 1: DT Value []");
+												assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), []), "Field 1: DT Value []");
 												assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 												EditorQunitUtils.wait().then(function () {
 													destroyEditor(oEditor);
@@ -1825,7 +1758,7 @@ sap.ui.define([
 															var oTextArea = oField.getAggregation("_field");
 															assert.ok(oTextArea.isA("sap.m.TextArea"), "Field 1: Control is TextArea");
 															assert.equal(oTextArea.getValue(), "[]", "Field 1: Object Value []");
-															assert.ok(deepEqual(cleanUUIDAndPosition(oField._getCurrentProperty("value")), []), "Field 1: DT Value []");
+															assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), []), "Field 1: DT Value []");
 															assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 															EditorQunitUtils.wait().then(function () {
 																destroyEditor(oEditor);
@@ -1855,7 +1788,7 @@ sap.ui.define([
 																		var oTextArea = oField.getAggregation("_field");
 																		assert.ok(oTextArea.isA("sap.m.TextArea"), "Field 1: Control is TextArea");
 																		assert.equal(oTextArea.getValue(), "[]", "Field 1: Object Value []");
-																		assert.ok(deepEqual(cleanUUIDAndPosition(oField._getCurrentProperty("value")), []), "Field 1: DT Value []");
+																		assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), []), "Field 1: DT Value []");
 																		assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 																		EditorQunitUtils.wait().then(function () {
 																			destroyEditor(oEditor);
@@ -1938,7 +1871,7 @@ sap.ui.define([
 					assert.ok(oLabel.isA("sap.m.Label"), "Label 1: Form content contains a Label");
 					assert.equal(oLabel.getText(), "Object properties defined", "Label 1: Has label text");
 					assert.ok(oField.isA("sap.ui.integration.editor.fields.ObjectListField"), "Field 1: Object List Field");
-					assert.ok(deepEqual(cleanUUIDAndPosition(oField._getCurrentProperty("value")), aObjectsParameterValue1), "Field 1: DT Value");
+					assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), aObjectsParameterValue1), "Field 1: DT Value");
 					assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Field Ready " + count + ": " + time + "ms OK");
 					EditorQunitUtils.isReady(oEditor).then(function () {
 						time = new Date().getTime() - start.getTime();
@@ -1970,7 +1903,7 @@ sap.ui.define([
 								assert.ok(oLabel.isA("sap.m.Label"), "Label 1: Form content contains a Label");
 								assert.equal(oLabel.getText(), "Object properties defined", "Label 1: Has label text");
 								assert.ok(oField.isA("sap.ui.integration.editor.fields.ObjectListField"), "Field 1: Object List Field");
-								assert.ok(deepEqual(cleanUUIDAndPosition(oField._getCurrentProperty("value")), aObjectsParameterValue1), "Field 1: DT Value");
+								assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), aObjectsParameterValue1), "Field 1: DT Value");
 								assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Field Ready " + count + ": " + time + "ms OK");
 								EditorQunitUtils.isReady(oEditor).then(function () {
 									time = new Date().getTime() - start.getTime();
@@ -2002,7 +1935,7 @@ sap.ui.define([
 											assert.ok(oLabel.isA("sap.m.Label"), "Label 1: Form content contains a Label");
 											assert.equal(oLabel.getText(), "Object properties defined", "Label 1: Has label text");
 											assert.ok(oField.isA("sap.ui.integration.editor.fields.ObjectListField"), "Field 1: Object List Field");
-											assert.ok(deepEqual(cleanUUIDAndPosition(oField._getCurrentProperty("value")), aObjectsParameterValue1), "Field 1: DT Value");
+											assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), aObjectsParameterValue1), "Field 1: DT Value");
 											assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Field Ready " + count + ": " + time + "ms OK");
 											EditorQunitUtils.isReady(oEditor).then(function () {
 												time = new Date().getTime() - start.getTime();
@@ -2034,7 +1967,7 @@ sap.ui.define([
 														assert.ok(oLabel.isA("sap.m.Label"), "Label 1: Form content contains a Label");
 														assert.equal(oLabel.getText(), "Object properties defined", "Label 1: Has label text");
 														assert.ok(oField.isA("sap.ui.integration.editor.fields.ObjectListField"), "Field 1: Object List Field");
-														assert.ok(deepEqual(cleanUUIDAndPosition(oField._getCurrentProperty("value")), aObjectsParameterValue1), "Field 1: DT Value");
+														assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), aObjectsParameterValue1), "Field 1: DT Value");
 														assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Field Ready " + count + ": " + time + "ms OK");
 														EditorQunitUtils.isReady(oEditor).then(function () {
 															time = new Date().getTime() - start.getTime();
@@ -2066,7 +1999,7 @@ sap.ui.define([
 																	assert.ok(oLabel.isA("sap.m.Label"), "Label 1: Form content contains a Label");
 																	assert.equal(oLabel.getText(), "Object properties defined", "Label 1: Has label text");
 																	assert.ok(oField.isA("sap.ui.integration.editor.fields.ObjectListField"), "Field 1: Object List Field");
-																	assert.ok(deepEqual(cleanUUIDAndPosition(oField._getCurrentProperty("value")), aObjectsParameterValue1), "Field 1: DT Value");
+																	assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), aObjectsParameterValue1), "Field 1: DT Value");
 																	assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Field Ready " + count + ": " + time + "ms OK");
 																	EditorQunitUtils.isReady(oEditor).then(function () {
 																		time = new Date().getTime() - start.getTime();

@@ -1,0 +1,35 @@
+[
+	{
+		"title": "Title text",
+		"desc": "Description text",
+		"icon": "sap-icon://favorite",
+		"highlight": "Success",
+		"info": "Completed"
+	},
+	{
+		"title": "Title text",
+		"desc": "Description text",
+		"icon": "sap-icon://employee",
+		"highlight": "Error",
+		"info": "Incomplete"
+	},
+	{
+		"title": "Title text",
+		"icon": "sap-icon://accept",
+		"highlight": "Information",
+		"info": "Information"
+	},
+	{
+		"title": "Title text",
+		"icon": "sap-icon://activities",
+		"highlight": "None",
+		"info": "None"
+	},
+	{
+		"title": "Title text",
+		"desc": "Description text",
+		"icon": "sap-icon://badge",
+		"highlight": "Warning",
+		"info": "Warning"
+	}
+]

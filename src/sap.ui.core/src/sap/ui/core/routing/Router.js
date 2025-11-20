@@ -39,197 +39,197 @@ sap.ui.define([
 		var oRouters = {};
 
 		/**
-				 * A Router is responsible for managing navigation within an application by interpreting and responding to
-				 * changes in the URL hash. It enables applications to define routes, map them to Views/Components, and control
-				 * their placement and transitions — all in a structured and declarative way.
-				 *
-				 * A router:
-				 * <ul>
-				 *   <li>Listens to hash changes and matches them to configured route patterns</li>
-				 *   <li>Instantiates Views/Components dynamically when a route is matched and caches them for better
-				 *   performance</li>
-				 *   <li>Places Views/Components into UI containers based on the defined targets and aggregations</li>
-				 *   <li>Maintains the browser history and consistent back/forward navigation behavior</li>
-				 *   <li>Fires events such as <code>routeMatched</code> and <code>routePatternMatched</code>, allowing
-				 *   developers to run logic when routes change</li>
-				 *   <li>Handles unmatched routes through a special bypassed configuration for displaying "Not Found" View(s) or
-				 *   fallbacks</li>
-				 * </ul>
-				 *
-				 * It can be used directly or via a {@link sap.ui.core.UIComponent UIComponent}'s metadata (manifest.json) to
-				 * create scalable, maintainable, and testable navigation structures across complex applications.
-				 *
-				 * @class
-				 * @extends sap.ui.base.EventProvider
-				 *
-				 * @param {Object<string,sap.ui.core.routing.$RouteSettings>|Array<sap.ui.core.routing.$RouteSettings>} [oRoutes]
-				 *  may contain many Route configurations as {@link sap.ui.core.routing.Route#constructor}.<br/>
-				 *
-				 * Each of the routes contained in the array/object will be added to the router.<br/>
-				 *
-				 * One way of defining routes is an array:
-				 * <pre>
-				 * [
-				 *     //Will create a route called 'firstRouter' you can later use this name in navTo to navigate to this route
-				 *     {
-				 *         name: "firstRoute"
-				 *         pattern : "usefulPattern"
-				 *     },
-				 *     //Will create a route called 'anotherRoute' for displaying the target 'targetView' which is defined in 'oTargets'
-				 *     {
-				 *         name: "anotherRoute"
-				 *         pattern : "anotherPattern",
-				 *         target: "targetView"
-				 *     },
-				 *     //Will create a route for displaying a nested component which is defined in 'oTargets' with the prefix 'componentPrefix'
-				 *     {
-				 *         pattern: "componentPattern",
-				 *         name: "componentRoute",
-				 *         target: [
-				 *              {
-				 *                  name: "subComponent",
-				 *                  prefix: "componentPrefix"
-				 *              }
-				 *         ]
-				 *     }
-				 * ]
-				 * </pre>
-				 *
-				 * The alternative way of defining routes is an Object.<br/>
-				 * If you choose this way, the name attribute is the name of the property.
-				 * <pre>
-				 * {
-				 *     //Will create a route called 'firstRouter' you can later use this name in navTo to navigate to this route
-				 *     firstRoute : {
-				 *         pattern : "usefulPattern"
-				 *     },
-				 *     //Will create a route called 'anotherRoute' for displaying the target 'targetView' which is defined in 'oTargets'
-				 *     anotherRoute : {
-				 *         pattern : "anotherPattern",
-				 *         target: "targetView"
-				 *     },
-				 *     //Will create a route for displaying a nested component which is defined in 'oTargets' with the prefix 'componentPrefix'
-				 *     componentRoute{
-				 *         pattern: "componentPattern",
-				 *         target: [
-				 *              {
-				 *                  name: "subComponent",
-				 *                  prefix: "componentPrefix"
-				 *              }
-				 *         ]
-				 *     }
-				 * }
-				 * </pre>
-				 * The values that may be provided are the same as in {@link sap.ui.core.routing.Route#constructor}
-				 *
-				 * @param {object} [oConfig] Default values for route configuration - also takes the same parameters as {@link sap.ui.core.routing.Target#constructor}.<br/>
-				 * This config will be used for routes and for targets, used in the router<br/>
-				 * Eg: if the config object specifies:
-				 * <pre>
-				 * {
-				 *     viewType: "XML"
-				 * }
-				 * </pre>
-				 * The targets look like this:
-				 * <pre>
-				 * {
-				 *     xmlTarget : {
-				 *         ...
-				 *     },
-				 *     jsTarget : {
-				 *         viewType : "JS"
-				 *         ...
-				 *     }
-				 * }
-				 * </pre>
-				 * Then the effective config will look like this:
-				 * <pre>
-				 * {
-				 *     xmlTarget : {
-				 *         viewType : "XML"
-				 *         ...
-				 *     },
-				 *     jsTarget : {
-				 *         viewType : "JS"
-				 *         ...
-				 *     }
-				 * }
-				 * </pre>
-				 *
-				 * Since the xmlTarget does not specify its viewType, XML is taken from the config object. The jsTarget is specifying it, so the viewType will be JS.
-				 * @param {object} [oConfig.bypassed] Since 1.28. Settings which are used when no route of the router is matched after a hash change.
-				 * @param {string|string[]} [oConfig.bypassed.target] Since 1.28. One or multiple names of targets that will be displayed, if no route of the router is matched.<br/>
-				 * A typical use case is a not found page.<br/>
-				 * The current hash will be passed to the display event of the target.<br/>
-				 * <b>Example:</b>
-				 * <pre>
-				 *     new Router(
-				 *     // Routes
-				 *     [
-				 *         // Any route here
-				 *     ],
-				 *     {
-				 *         bypassed: {
-				 *             // you will find this name in the target config
-				 *             target: "notFound"
-				 *         }
-				 *     },
-				 *     // You should only use this constructor when you are not using a router with a component. Please use the metadata of a component to define your routes and targets. The documentation can be found here: {@link sap.ui.core.UIComponent.extend}.
-				 *     null,
-				 *     // Target config
-				 *     {
-				 *          //same name as in the config.bypassed.target
-				 *          notFound: {
-				 *              type: "View"
-				 *              name: "notFound",
-				 *              ...
-				 *              // more properties to place the view in the correct container
-				 *          }
-				 *     });
-				 * </pre>
-				 * @param {sap.ui.core.UIComponent} [oOwner] the Component of all the views that will be created by this Router,<br/>
-				 * will get forwarded to the {@link sap.ui.core.routing.Views#constructor}.<br/>
-				 * If you are using the componentMetadata to define your routes you should skip this parameter.
-				 * @param {Object<string,sap.ui.core.routing.$TargetSettings>} [oTargetsConfig] Since 1.28 the target configuration, see {@link sap.ui.core.routing.Targets#constructor} documentation (the options object).<br/>
-				 * You should use Targets to create and display views. Since 1.28 the route should only contain routing relevant properties.<br/>
-				 * <b>Example:</b>
-				 * <pre>
-				 *     new Router(
-				 *     // Routes
-				 *     [
-				 *         {
-				 *             // no view creation related properties are in the route
-				 *             name: "startRoute",
-				 *             //no hash
-				 *             pattern: "",
-				 *             // you can find this target in the targetConfig
-				 *             target: "welcome"
-				 *         }
-				 *     ],
-				 *     // Default values shared by routes and Targets
-				 *     {
-				 *         path: "my.application.namespace",
-				 *         viewType: "XML"
-				 *     },
-				 *     // You should only use this constructor when you are using a router without a component.
-				 *     // Please use the metadata of a component to define your routes and targets.
-				 *     // The documentation can be found here: {@link sap.ui.core.UIComponent.extend}.
-				 *     null,
-				 *     // Target config
-				 *     {
-				 *          //same name as in the route called 'startRoute'
-				 *          welcome: {
-				 *              // All properties for creating and placing a view go here or in the config
-				 *              type: "View",
-				 *              name: "Welcome",
-				 *              controlId: "app",
-				 *              controlAggregation: "pages"
-				 *          }
-				 *     })
-				 * </pre>
-				 * @public
-				 * @alias sap.ui.core.routing.Router
-				 */
+		 * A Router is responsible for managing navigation within an application by interpreting and responding to
+		 * changes in the URL hash. It enables applications to define routes, map them to Views/Components, and control
+		 * their placement and transitions — all in a structured and declarative way.
+		 *
+		 * A router:
+		 * <ul>
+		 *   <li>Listens to hash changes and matches them to configured route patterns</li>
+		 *   <li>Instantiates Views/Components dynamically when a route is matched and caches them for better
+		 *   performance</li>
+		 *   <li>Places Views/Components into UI containers based on the defined targets and aggregations</li>
+		 *   <li>Maintains the browser history and consistent back/forward navigation behavior</li>
+		 *   <li>Fires events such as <code>routeMatched</code> and <code>routePatternMatched</code>, allowing
+		 *   developers to run logic when routes change</li>
+		 *   <li>Handles unmatched routes through a special bypassed configuration for displaying "Not Found" View(s) or
+		 *   fallbacks</li>
+		 * </ul>
+		 *
+		 * It can be used directly or via a {@link sap.ui.core.UIComponent UIComponent}'s metadata (manifest.json) to
+		 * create scalable, maintainable, and testable navigation structures across complex applications.
+		 *
+		 * @class
+		 * @extends sap.ui.base.EventProvider
+		 *
+		 * @param {Object<string,sap.ui.core.routing.$RouteSettings>|Array<sap.ui.core.routing.$RouteSettings>} [oRoutes]
+		 *  may contain many Route configurations as {@link sap.ui.core.routing.Route#constructor}.<br/>
+		 *
+		 * Each of the routes contained in the array/object will be added to the router.<br/>
+		 *
+		 * One way of defining routes is an array:
+		 * <pre>
+		 * [
+		 *     //Will create a route called 'firstRouter' you can later use this name in navTo to navigate to this route
+		 *     {
+		 *         name: "firstRoute"
+		 *         pattern : "usefulPattern"
+		 *     },
+		 *     //Will create a route called 'anotherRoute' for displaying the target 'targetView' which is defined in 'oTargets'
+		 *     {
+		 *         name: "anotherRoute"
+		 *         pattern : "anotherPattern",
+		 *         target: "targetView"
+		 *     },
+		 *     //Will create a route for displaying a nested component which is defined in 'oTargets' with the prefix 'componentPrefix'
+		 *     {
+		 *         pattern: "componentPattern",
+		 *         name: "componentRoute",
+		 *         target: [
+		 *              {
+		 *                  name: "subComponent",
+		 *                  prefix: "componentPrefix"
+		 *              }
+		 *         ]
+		 *     }
+		 * ]
+		 * </pre>
+		 *
+		 * The alternative way of defining routes is an Object.<br/>
+		 * If you choose this way, the name attribute is the name of the property.
+		 * <pre>
+		 * {
+		 *     //Will create a route called 'firstRouter' you can later use this name in navTo to navigate to this route
+		 *     firstRoute : {
+		 *         pattern : "usefulPattern"
+		 *     },
+		 *     //Will create a route called 'anotherRoute' for displaying the target 'targetView' which is defined in 'oTargets'
+		 *     anotherRoute : {
+		 *         pattern : "anotherPattern",
+		 *         target: "targetView"
+		 *     },
+		 *     //Will create a route for displaying a nested component which is defined in 'oTargets' with the prefix 'componentPrefix'
+		 *     componentRoute{
+		 *         pattern: "componentPattern",
+		 *         target: [
+		 *              {
+		 *                  name: "subComponent",
+		 *                  prefix: "componentPrefix"
+		 *              }
+		 *         ]
+		 *     }
+		 * }
+		 * </pre>
+		 * The values that may be provided are the same as in {@link sap.ui.core.routing.Route#constructor}
+		 *
+		 * @param {object} [oConfig] Default values for route configuration - also takes the same parameters as {@link sap.ui.core.routing.Target#constructor}.<br/>
+		 * This config will be used for routes and for targets, used in the router<br/>
+		 * Eg: if the config object specifies:
+		 * <pre>
+		 * {
+		 *     viewType: "XML"
+		 * }
+		 * </pre>
+		 * The targets look like this:
+		 * <pre>
+		 * {
+		 *     xmlTarget : {
+		 *         ...
+		 *     },
+		 *     jsTarget : {
+		 *         viewType : "JS"
+		 *         ...
+		 *     }
+		 * }
+		 * </pre>
+		 * Then the effective config will look like this:
+		 * <pre>
+		 * {
+		 *     xmlTarget : {
+		 *         viewType : "XML"
+		 *         ...
+		 *     },
+		 *     jsTarget : {
+		 *         viewType : "JS"
+		 *         ...
+		 *     }
+		 * }
+		 * </pre>
+		 *
+		 * Since the xmlTarget does not specify its viewType, XML is taken from the config object. The jsTarget is specifying it, so the viewType will be JS.
+		 * @param {object} [oConfig.bypassed] Since 1.28. Settings which are used when no route of the router is matched after a hash change.
+		 * @param {string|string[]} [oConfig.bypassed.target] Since 1.28. One or multiple names of targets that will be displayed, if no route of the router is matched.<br/>
+		 * A typical use case is a not found page.<br/>
+		 * The current hash will be passed to the display event of the target.<br/>
+		 * <b>Example:</b>
+		 * <pre>
+		 *     new Router(
+		 *     // Routes
+		 *     [
+		 *         // Any route here
+		 *     ],
+		 *     {
+		 *         bypassed: {
+		 *             // you will find this name in the target config
+		 *             target: "notFound"
+		 *         }
+		 *     },
+		 *     // You should only use this constructor when you are not using a router with a component. Please use the metadata of a component to define your routes and targets. The documentation can be found here: {@link sap.ui.core.UIComponent.extend}.
+		 *     null,
+		 *     // Target config
+		 *     {
+		 *          //same name as in the config.bypassed.target
+		 *          notFound: {
+		 *              type: "View"
+		 *              name: "notFound",
+		 *              ...
+		 *              // more properties to place the view in the correct container
+		 *          }
+		 *     });
+		 * </pre>
+		 * @param {sap.ui.core.UIComponent} [oOwner] the Component of all the views that will be created by this Router,<br/>
+		 * will get forwarded to the {@link sap.ui.core.routing.Views#constructor}.<br/>
+		 * If you are using the componentMetadata to define your routes you should skip this parameter.
+		 * @param {Object<string,sap.ui.core.routing.$TargetSettings>} [oTargetsConfig] Since 1.28 the target configuration, see {@link sap.ui.core.routing.Targets#constructor} documentation (the options object).<br/>
+		 * You should use Targets to create and display views. Since 1.28 the route should only contain routing relevant properties.<br/>
+		 * <b>Example:</b>
+		 * <pre>
+		 *     new Router(
+		 *     // Routes
+		 *     [
+		 *         {
+		 *             // no view creation related properties are in the route
+		 *             name: "startRoute",
+		 *             //no hash
+		 *             pattern: "",
+		 *             // you can find this target in the targetConfig
+		 *             target: "welcome"
+		 *         }
+		 *     ],
+		 *     // Default values shared by routes and Targets
+		 *     {
+		 *         path: "my.application.namespace",
+		 *         viewType: "XML"
+		 *     },
+		 *     // You should only use this constructor when you are using a router without a component.
+		 *     // Please use the metadata of a component to define your routes and targets.
+		 *     // The documentation can be found here: {@link sap.ui.core.UIComponent.extend}.
+		 *     null,
+		 *     // Target config
+		 *     {
+		 *          //same name as in the route called 'startRoute'
+		 *          welcome: {
+		 *              // All properties for creating and placing a view go here or in the config
+		 *              type: "View",
+		 *              name: "Welcome",
+		 *              controlId: "app",
+		 *              controlAggregation: "pages"
+		 *          }
+		 *     })
+		 * </pre>
+		 * @public
+		 * @alias sap.ui.core.routing.Router
+		 */
 		var Router = EventProvider.extend("sap.ui.core.routing.Router", /** @lends sap.ui.core.routing.Router.prototype */ {
 			constructor : function(oRoutes, oConfig, oOwner, oTargetsConfig, oRouterHashChanger) {
 				EventProvider.apply(this);

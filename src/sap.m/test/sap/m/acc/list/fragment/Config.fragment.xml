@@ -1,0 +1,19 @@
+<core:FragmentDefinition 
+	xmlns="sap.m"
+	xmlns:core="sap.ui.core">
+	<OverflowToolbar>
+		<ToolbarSpacer />
+		<Label text="Selection Mode:" />
+		<Select
+			selectedKey="{listConfig>/selectionMode}">
+			<items>
+				<core:Item key="None" text="None" />
+				<core:Item key="SingleSelectLeft" text="SingleSelectLeft" />
+				<core:Item key="MultiSelect" text="MultiSelect" />
+			</items>
+		</Select>
+		<Label text="Show Row Actions:" />
+		<Switch
+			state="{listConfig>/showRowActions}" />
+	</OverflowToolbar>
+</core:FragmentDefinition>

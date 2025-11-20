@@ -197,11 +197,11 @@ sap.ui.define([
 	var VIEW_SPECIAL_ATTRIBUTES = ['controllerName', 'resourceBundleName', 'resourceBundleUrl', 'resourceBundleLocale', 'resourceBundleAlias'];
 
 	/**
-		 * Creates a function based on the passed mode and callback which applies a callback to each child of a node.
-		 * @param {function} fnCallback The callback to apply
-		 * @returns {function} The created function
-		 * @private
-		 */
+	 * Creates a function based on the passed mode and callback which applies a callback to each child of a node.
+	 * @param {function} fnCallback The callback to apply
+	 * @returns {function} The created function
+	 * @private
+	 */
 	function getHandleChildrenStrategy(fnCallback) {
 		// async strategy ensures processing order by chaining the callbacks
 		function asyncStrategy(node, mOptions) {
@@ -294,13 +294,13 @@ sap.ui.define([
 	};
 
 	/**
-		 * Parses a complete XML template definition (full node hierarchy) and resolves the ids to their full qualification
-		 *
-		 * @param {Element} xmlNode the XML element representing the View/Fragment
-		 * @param {sap.ui.core.mvc.XMLView|sap.ui.core.Fragment} oView the View/Fragment which corresponds to the parsed XML
-		 * @returns {Promise} which resolves with the xmlNode
-		 * @private
-		 */
+	 * Parses a complete XML template definition (full node hierarchy) and resolves the ids to their full qualification
+	 *
+	 * @param {Element} xmlNode the XML element representing the View/Fragment
+	 * @param {sap.ui.core.mvc.XMLView|sap.ui.core.Fragment} oView the View/Fragment which corresponds to the parsed XML
+	 * @returns {Promise} which resolves with the xmlNode
+	 * @private
+	 */
 	XMLTemplateProcessor.enrichTemplateIdsPromise = function(xmlNode, oView) {
 		return parseTemplate(xmlNode, oView, true, undefined, true).then(function() {
 			return xmlNode;
@@ -320,16 +320,16 @@ sap.ui.define([
 	};
 
 	/**
-		 * Parses a complete XML template definition (full node hierarchy)
-		 *
-		 * @param {Element} xmlNode the XML element representing the View/Fragment
-		 * @param {sap.ui.core.mvc.XMLView|sap.ui.core.Fragment} oView the View/Fragment which corresponds to the parsed XML
-		 * @param {boolean} bAsync Whether or not to perform the template processing asynchronously
-		 * @param {object} oParseConfig parse configuration options, e.g. settings pre-processor
-		 * @return {Promise} with an array containing Controls and/or plain HTML element strings
-		 * @private
-		 * @ui5-restricted sap.ui.core.Fragment, sap.ui.core.mvc.XMLView
-		 */
+	 * Parses a complete XML template definition (full node hierarchy)
+	 *
+	 * @param {Element} xmlNode the XML element representing the View/Fragment
+	 * @param {sap.ui.core.mvc.XMLView|sap.ui.core.Fragment} oView the View/Fragment which corresponds to the parsed XML
+	 * @param {boolean} bAsync Whether or not to perform the template processing asynchronously
+	 * @param {object} oParseConfig parse configuration options, e.g. settings pre-processor
+	 * @return {Promise} with an array containing Controls and/or plain HTML element strings
+	 * @private
+	 * @ui5-restricted sap.ui.core.Fragment, sap.ui.core.mvc.XMLView
+	 */
 	XMLTemplateProcessor.parseTemplatePromise = function(xmlNode, oView, _bAsync, oParseConfig) {
 		return parseTemplate(xmlNode, oView, false, oParseConfig, true).then(function(vResult) {
 			// vResult is the result array of the XMLTP's parsing.
@@ -420,13 +420,13 @@ sap.ui.define([
 	}
 
 	/**
-		 * Extract module information which is defined with the "require" attribute under "sap.ui.core" namespace
-		 * and load the modules when there are some defined
-		 *
-		 * @param {Element} xmlNode The current XMLNode which is being processed
-		 * @return {Promise|undefined} The promise resolves after all modules are loaded. If the given xml node
-		 *  doesn't have require context defined, undefined is returned.
-		 */
+	 * Extract module information which is defined with the "require" attribute under "sap.ui.core" namespace
+	 * and load the modules when there are some defined
+	 *
+	 * @param {Element} xmlNode The current XMLNode which is being processed
+	 * @return {Promise|undefined} The promise resolves after all modules are loaded. If the given xml node
+	 *  doesn't have require context defined, undefined is returned.
+	 */
 	function parseAndLoadRequireContext(xmlNode) {
 		var sCoreContext = xmlNode.getAttributeNS(CORE_NAMESPACE, "require"),
 			oRequireContext,
@@ -478,8 +478,8 @@ sap.ui.define([
 	}
 
 	/**
-		 * @private
-		 */
+	 * @private
+	 */
 	function fnTriggerExtensionPointProvider(oTargetControl, mAggregationsWithExtensionPoints) {
 		var pProvider = SyncPromise.resolve();
 
@@ -538,16 +538,16 @@ sap.ui.define([
 	}
 
 	/**
-		 * Parses a complete XML template definition (full node hierarchy)
-		 *
-		 * @param {Element} xmlNode the XML element representing the View/Fragment
-		 * @param {sap.ui.core.mvc.XMLView|sap.ui.core.Fragment} oView the View/Fragment which corresponds to the parsed XML
-		 * @param {boolean} bEnrichFullIds Flag for running in a mode which only resolves the ids and writes them back
-		 *     to the xml source.
-		 * @param {object} oParseConfig parse configuration options, e.g. settings pre-processor
-		 *
-		 * @return {Promise} with an array containing Controls and/or plain HTML element strings
-		 */
+	 * Parses a complete XML template definition (full node hierarchy)
+	 *
+	 * @param {Element} xmlNode the XML element representing the View/Fragment
+	 * @param {sap.ui.core.mvc.XMLView|sap.ui.core.Fragment} oView the View/Fragment which corresponds to the parsed XML
+	 * @param {boolean} bEnrichFullIds Flag for running in a mode which only resolves the ids and writes them back
+	 *     to the xml source.
+	 * @param {object} oParseConfig parse configuration options, e.g. settings pre-processor
+	 *
+	 * @return {Promise} with an array containing Controls and/or plain HTML element strings
+	 */
 	function parseTemplate(xmlNode, oView, bEnrichFullIds, oParseConfig) {
 		// the output of the template parsing, containing strings and promises which resolve to control or control arrays
 		// later this intermediate state with promises gets resolved to a flat array containing only strings and controls

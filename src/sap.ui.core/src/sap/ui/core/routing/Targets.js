@@ -16,72 +16,72 @@ sap.ui.define([
 		"use strict";
 
 		/**
-				 * Constructor for a new Targets class.
-				 *
-				 * @class
-				 * Provides a convenient way for placing views into the correct containers of your application.
-				 *
-				 * The main benefit of <code>Targets</code> is lazy loading: you do not have to create the views until you really need them.
-				 * If you are using the mobile library, please use {@link sap.m.routing.Targets} instead of this class.
-				 * @extends sap.ui.base.EventProvider
-				 * @param {object} oOptions
-				 * @param {sap.ui.core.routing.Views} oOptions.views the views instance will create the instances of all the targets defined, so if 2 targets have the same
-				 *  <code>type</code> and <code>name</code> set, the same instance of the target will be displayed.
-				 * @param {object} [oOptions.config] this config allows all the values oOptions.targets.anyName allows, these will be the default values for properties used in the target.<br/>
-				 * For example if you are only using xmlViews in your app you can specify viewType="XML" so you don't have to repeat this in every target.<br/>
-				 * If a target specifies viewType="JS", the JS will be stronger than the XML here is an example.
-				 *
-				 * <pre>
-				 * <code>
-				 * {
-				 *     config: {
-				 *         viewType : "XML"
-				 *     }
-				 *     targets : {
-				 *         xmlTarget : {
-				 *             ...
-				 *         },
-				 *         jsTarget : {
-				 *             viewType : "JS"
-				 *             ...
-				 *         }
-				 *     }
-				 * }
-				 * </code>
-				 * </pre>
-				 * Then the effective config that will be used looks like this:
-				 * <pre>
-				 * <code>
-				 * {
-				 *     xmlTarget : {
-				 *         // coming from the defaults
-				 *         viewType : "XML"
-				 *         ...
-				 *     },
-				 *     jsTarget : {
-				 *        // XML is overwritten by the "JS" of the targets property
-				 *        viewType : "JS"
-				 *       ...
-				 *     }
-				 * }
-				 * </code>
-				 * </pre>
-				 *
-				 * @param {string} [oOptions.config.rootView]
-				 * The id of the rootView - This should be the id of the view that contains the control with the controlId
-				 * since the control will be retrieved by calling the {@link sap.ui.core.mvc.View#byId} function of the rootView.
-				 * If you are using a component and add the routing.targets <b>do not set this parameter</b>,
-				 * since the component will set the rootView to the view created by the {@link sap.ui.core.UIComponent#createContent} function.
-				 * If you specify the "parent" property of a target, the control will not be searched in the root view but in the view Created by the parent (see parent documentation).
-				 * @param {boolean} [oOptions.config.async=false] @since 1.34 Whether the views which are created through this Targets are loaded asynchronously. This option can be set only when the Targets
-				 * is used standalone without the involvement of a Router. Otherwise the async option is inherited from the Router.
+		 * Constructor for a new Targets class.
+		 *
+		 * @class
+		 * Provides a convenient way for placing views into the correct containers of your application.
+		 *
+		 * The main benefit of <code>Targets</code> is lazy loading: you do not have to create the views until you really need them.
+		 * If you are using the mobile library, please use {@link sap.m.routing.Targets} instead of this class.
+		 * @extends sap.ui.base.EventProvider
+		 * @param {object} oOptions
+		 * @param {sap.ui.core.routing.Views} oOptions.views the views instance will create the instances of all the targets defined, so if 2 targets have the same
+		 *  <code>type</code> and <code>name</code> set, the same instance of the target will be displayed.
+		 * @param {object} [oOptions.config] this config allows all the values oOptions.targets.anyName allows, these will be the default values for properties used in the target.<br/>
+		 * For example if you are only using xmlViews in your app you can specify viewType="XML" so you don't have to repeat this in every target.<br/>
+		 * If a target specifies viewType="JS", the JS will be stronger than the XML here is an example.
+		 *
+		 * <pre>
+		 * <code>
+		 * {
+		 *     config: {
+		 *         viewType : "XML"
+		 *     }
+		 *     targets : {
+		 *         xmlTarget : {
+		 *             ...
+		 *         },
+		 *         jsTarget : {
+		 *             viewType : "JS"
+		 *             ...
+		 *         }
+		 *     }
+		 * }
+		 * </code>
+		 * </pre>
+		 * Then the effective config that will be used looks like this:
+		 * <pre>
+		 * <code>
+		 * {
+		 *     xmlTarget : {
+		 *         // coming from the defaults
+		 *         viewType : "XML"
+		 *         ...
+		 *     },
+		 *     jsTarget : {
+		 *        // XML is overwritten by the "JS" of the targets property
+		 *        viewType : "JS"
+		 *       ...
+		 *     }
+		 * }
+		 * </code>
+		 * </pre>
+		 *
+		 * @param {string} [oOptions.config.rootView]
+		 * The id of the rootView - This should be the id of the view that contains the control with the controlId
+		 * since the control will be retrieved by calling the {@link sap.ui.core.mvc.View#byId} function of the rootView.
+		 * If you are using a component and add the routing.targets <b>do not set this parameter</b>,
+		 * since the component will set the rootView to the view created by the {@link sap.ui.core.UIComponent#createContent} function.
+		 * If you specify the "parent" property of a target, the control will not be searched in the root view but in the view Created by the parent (see parent documentation).
+		 * @param {boolean} [oOptions.config.async=false] @since 1.34 Whether the views which are created through this Targets are loaded asynchronously. This option can be set only when the Targets
+		 * is used standalone without the involvement of a Router. Otherwise the async option is inherited from the Router.
 
-				 * @param {Object<string,sap.ui.core.routing.$TargetSettings>} oOptions.targets One or multiple targets in a map.
-				 *
-				 * @since 1.28.1
-				 * @public
-				 * @alias sap.ui.core.routing.Targets
-				 */
+		 * @param {Object<string,sap.ui.core.routing.$TargetSettings>} oOptions.targets One or multiple targets in a map.
+		 *
+		 * @since 1.28.1
+		 * @public
+		 * @alias sap.ui.core.routing.Targets
+		 */
 		var Targets = EventProvider.extend("sap.ui.core.routing.Targets", /** @lends sap.ui.core.routing.Targets.prototype */ {
 
 			constructor : function(oOptions) {

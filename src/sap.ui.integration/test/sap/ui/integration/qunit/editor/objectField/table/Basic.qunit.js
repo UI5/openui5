@@ -84,46 +84,6 @@ sap.ui.define([
 	Localization.setLanguage("en");
 	document.body.className = document.body.className + " sapUiSizeCompact ";
 
-	function cleanUUID(oValue) {
-		var oClonedValue = deepClone(oValue, 500);
-		if (typeof oClonedValue === "string") {
-			oClonedValue = JSON.parse(oClonedValue);
-		}
-		if (Array.isArray(oClonedValue)) {
-			oClonedValue.forEach(function(oResult) {
-				if (oResult._dt) {
-					delete oResult._dt._uuid;
-				}
-				if (deepEqual(oResult._dt, {})) {
-					delete oResult._dt;
-				}
-			});
-		} else if (typeof oClonedValue === "object") {
-			if (oClonedValue._dt) {
-				delete oClonedValue._dt._uuid;
-			}
-			if (deepEqual(oClonedValue._dt, {})) {
-				delete oClonedValue._dt;
-			}
-		}
-		return oClonedValue;
-	}
-
-	function cleanDT(oValue) {
-		var oClonedValue = deepClone(oValue, 500);
-		if (typeof oClonedValue === "string") {
-			oClonedValue = JSON.parse(oClonedValue);
-		}
-		if (Array.isArray(oClonedValue)) {
-			oClonedValue.forEach(function(oResult) {
-				delete oResult._dt;
-			});
-		} else if (typeof oClonedValue === "object") {
-			delete oClonedValue._dt;
-		}
-		return oClonedValue;
-	}
-
 	QUnit.module("basic", {
 		beforeEach: function () {
 			this.oMockServer = new MockServer();
@@ -281,7 +241,7 @@ sap.ui.define([
 						});
 						assert.ok(oSelectionCell1.getSelected(), "Row 1: Cell 1 is selected after selecting");
 						assert.equal(oTable.getSelectedIndices().length, 0, "Table: SelectedIndices Value not change after selecting");
-						assert.ok(deepEqual(cleanUUID(oField._getCurrentProperty("value")), { "text": "text01", "key": "key01", "url": "https://sap.com/06", "icon": "sap-icon://accept", "iconcolor": "#031E48", "int": 1, "_dt": { "_editable": false} }), "Field 1: DT Value changed after selecting");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value")), { "text": "text01", "key": "key01", "url": "https://sap.com/06", "icon": "sap-icon://accept", "iconcolor": "#031E48", "int": 1, "_dt": { "_editable": false} }), "Field 1: DT Value changed after selecting");
 						oSettings = this.oEditor.getCurrentSettings();
 						assert.deepEqual(oSettings["/sap.card/configuration/parameters/objectWithPropertiesDefinedAndValueFromJsonList/value"], oField._getCurrentProperty("value"), "Editor: Field 1 setting value changed after selecting");
 						assert.ok(oRemoveValueButton.getEnabled(), "Table: Remove Value button in Selection column enabled after selecting");
@@ -306,7 +266,7 @@ sap.ui.define([
 						});
 						assert.ok(oSelectionCell4.getSelected(), "Row 4: Cell 1 is selected after selecting");
 						assert.equal(oTable.getSelectedIndices().length, 0, "Table: SelectedIndices Value not change after selecting");
-						assert.ok(deepEqual(cleanUUID(oField._getCurrentProperty("value")), { "text": "text04", "key": "key04", "url": "https://sap.com/03", "icon": "sap-icon://accept", "iconcolor": "#1C4C98", "int": 4, "_dt": { "_editable": false} }), "Field 1: DT Value changed after selecting again");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value")), { "text": "text04", "key": "key04", "url": "https://sap.com/03", "icon": "sap-icon://accept", "iconcolor": "#1C4C98", "int": 4, "_dt": { "_editable": false} }), "Field 1: DT Value changed after selecting again");
 						oSettings = this.oEditor.getCurrentSettings();
 						assert.deepEqual(oSettings["/sap.card/configuration/parameters/objectWithPropertiesDefinedAndValueFromJsonList/value"], oField._getCurrentProperty("value"), "Editor: Field 1 setting value changed after selecting again");
 						assert.ok(oRemoveValueButton.getEnabled(), "Table: Remove Value button in Selection column enabled");
@@ -373,7 +333,7 @@ sap.ui.define([
 							});
 							assert.ok(oSelectionCell1.getSelected(), "Row 1: Cell 1 is selected after selecting");
 							assert.equal(oTable.getSelectedIndices().length, 0, "Table: SelectedIndices Value not change after selecting");
-							assert.ok(deepEqual(cleanUUID(oField2._getCurrentProperty("value")), {"text": "text1req", "key": "key1", "additionalText": "addtext1", "icon": "sap-icon://accept", "_dt": {"_editable": false} }), "Field 2: DT Value changed after selecting");
+							assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField2._getCurrentProperty("value")), {"text": "text1req", "key": "key1", "additionalText": "addtext1", "icon": "sap-icon://accept", "_dt": {"_editable": false} }), "Field 2: DT Value changed after selecting");
 							oSettings = this.oEditor.getCurrentSettings();
 							assert.deepEqual(oSettings["/sap.card/configuration/parameters/objectWithPropertiesDefinedAndValueFromRequestedFile/value"], oField2._getCurrentProperty("value"), "Editor: Field 2 setting value changed after selecting");
 							assert.ok(oRemoveValueButton.getEnabled(), "Table: Remove Value button in Selection column enabled after selecting");
@@ -398,7 +358,7 @@ sap.ui.define([
 							});
 							assert.ok(oSelectionCell4.getSelected(), "Row 4: Cell 1 is selected after selecting");
 							assert.equal(oTable.getSelectedIndices().length, 0, "Table: SelectedIndices Value not change after selecting");
-							assert.ok(deepEqual(cleanUUID(oField2._getCurrentProperty("value")), { "text": "text4req", "key": "key4", "additionalText": "addtext4", "icon": "sap-icon://zoom-out", "_dt": {"_editable": false} }), "Field 2: DT Value changed after selecting");
+							assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField2._getCurrentProperty("value")), { "text": "text4req", "key": "key4", "additionalText": "addtext4", "icon": "sap-icon://zoom-out", "_dt": {"_editable": false} }), "Field 2: DT Value changed after selecting");
 							oSettings = this.oEditor.getCurrentSettings();
 							assert.deepEqual(oSettings["/sap.card/configuration/parameters/objectWithPropertiesDefinedAndValueFromRequestedFile/value"], oField2._getCurrentProperty("value"), "Editor: Field 2 setting value changed after selecting");
 							assert.ok(oRemoveValueButton.getEnabled(), "Table: Remove Value button in Selection column enabled");
@@ -464,7 +424,7 @@ sap.ui.define([
 								});
 								assert.ok(oSelectionCell1.getSelected(), "Row 1: Cell 1 is selected after selecting");
 								assert.equal(oTable.getSelectedIndices().length, 0, "Table: SelectedIndices Value not change after selecting");
-								assert.ok(deepEqual(cleanUUID(oField3._getCurrentProperty("value")), {"CustomerID": "a", "CompanyName": "A Company", "Country": "Country 1", "City": "City 1", "Address": "Address 1", "_dt": {"_editable": false} }), "Field 3: DT Value not change after table selection change");
+								assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField3._getCurrentProperty("value")), {"CustomerID": "a", "CompanyName": "A Company", "Country": "Country 1", "City": "City 1", "Address": "Address 1", "_dt": {"_editable": false} }), "Field 3: DT Value not change after table selection change");
 								oSettings = this.oEditor.getCurrentSettings();
 								assert.deepEqual(oSettings["/sap.card/configuration/parameters/objectWithPropertiesDefinedAndValueFromODataRequest/value"], oField3._getCurrentProperty("value"), "Editor: Field 3 setting value not change after table selection change");
 								assert.ok(oRemoveValueButton.getEnabled(), "Table: Remove Value button in Selection column enabled after selecting");
@@ -489,7 +449,7 @@ sap.ui.define([
 								});
 								assert.ok(oSelectionCell4.getSelected(), "Row 4: Cell 1 is selected after selecting");
 								assert.equal(oTable.getSelectedIndices().length, 0, "Table: SelectedIndices Value not change after selecting");
-								assert.ok(deepEqual(cleanUUID(oField3._getCurrentProperty("value")), {"CustomerID": "d", "CompanyName": "C2 Company", "Country": "Country 4", "City": "City 4", "Address": "Address 4", "_dt": {"_editable": false} }), "Field 3: DT Value not change after table selection change again");
+								assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField3._getCurrentProperty("value")), {"CustomerID": "d", "CompanyName": "C2 Company", "Country": "Country 4", "City": "City 4", "Address": "Address 4", "_dt": {"_editable": false} }), "Field 3: DT Value not change after table selection change again");
 								oSettings = this.oEditor.getCurrentSettings();
 								assert.deepEqual(oSettings["/sap.card/configuration/parameters/objectWithPropertiesDefinedAndValueFromODataRequest/value"], oField3._getCurrentProperty("value"), "Editor: Field 3 setting value not change after table selection change again");
 								assert.ok(oRemoveValueButton.getEnabled(), "Table: Remove Value button in Selection column enabled");
@@ -556,7 +516,7 @@ sap.ui.define([
 					assert.ok(oLabel.isA("sap.m.Label"), "Label 1: Form content contains a Label");
 					assert.equal(oLabel.getText(), "Object properties defined: value from Json list", "Label 1: Has label text");
 					assert.ok(oField.isA("sap.ui.integration.editor.fields.ObjectField"), "Field 1: Object Field");
-					assert.ok(deepEqual(cleanUUID(oField._getCurrentProperty("value")), {}), "Field 1: Value");
+					assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value")), {}), "Field 1: Value");
 					EditorQunitUtils.isReady(this.oEditor).then(function () {
 						assert.ok(this.oEditor.isReady(), "Editor is ready");
 						var oTable = oField.getAggregation("_field");
@@ -597,7 +557,7 @@ sap.ui.define([
 							userInteraction: true
 						});
 						assert.equal(oTable.getSelectedIndices()[0], 0, "Table: SelectedIndices Value after table selection change");
-						assert.ok(deepEqual(cleanUUID(oField._getCurrentProperty("value")), {}), "Field 1: DT Value not change after table selection change");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value")), {}), "Field 1: DT Value not change after table selection change");
 						assert.ok(oSelectAllSelectionsButton.getEnabled(), "Table: SelectAllSelections button in toolbar enabled");
 						assert.ok(oClearAllSelectionsButton.getEnabled(), "Table: ClearAllSelections button in toolbar enabled");
 						assert.ok(!oRemoveValueButton.getEnabled(), "Table: Remove Value button in Selection column disabled");
@@ -607,7 +567,7 @@ sap.ui.define([
 							userInteraction: true
 						});
 						assert.equal(oTable.getSelectedIndices()[0], 3, "Table: SelectedIndices Value after table selection change again");
-						assert.ok(deepEqual(cleanUUID(oField._getCurrentProperty("value")), {}), "Field 1: DT Value not change after table selection change again");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value")), {}), "Field 1: DT Value not change after table selection change again");
 						assert.ok(oSelectAllSelectionsButton.getEnabled(), "Table: SelectAllSelections button in toolbar enabled");
 						assert.ok(oClearAllSelectionsButton.getEnabled(), "Table: ClearAllSelections button in toolbar enabled");
 						assert.ok(!oRemoveValueButton.getEnabled(), "Table: Remove Value button in Selection column disabled");
@@ -617,7 +577,7 @@ sap.ui.define([
 							userInteraction: true
 						});
 						assert.equal(oTable.getSelectedIndices().length, 0, "Table: SelectedIndices Value after remove table selection");
-						assert.ok(deepEqual(cleanUUID(oField._getCurrentProperty("value")), {}), "Field 1: Value not change after remove table selection");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value")), {}), "Field 1: Value not change after remove table selection");
 						assert.ok(oSelectAllSelectionsButton.getEnabled(), "Table: SelectAllSelections button in toolbar enabled");
 						assert.ok(!oClearAllSelectionsButton.getEnabled(), "Table: ClearAllSelections button in toolbar disabled");
 						assert.ok(!oRemoveValueButton.getEnabled(), "Table: Remove Value button in Selection column disabled");
@@ -642,7 +602,7 @@ sap.ui.define([
 						});
 						assert.ok(oSelectionCell1.getSelected(), "Row 1: Cell 1 is selected after selecting");
 						assert.equal(oTable.getSelectedIndices().length, 0, "Table: SelectedIndices Value not change after selecting");
-						assert.ok(deepEqual(cleanUUID(oField._getCurrentProperty("value")), { "text": "text01", "key": "key01", "url": "https://sap.com/06", "icon": "sap-icon://accept", "iconcolor": "#031E48", "int": 1, "_dt": { "_editable": false} }), "Field 1: DT Value changed after selecting");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value")), { "text": "text01", "key": "key01", "url": "https://sap.com/06", "icon": "sap-icon://accept", "iconcolor": "#031E48", "int": 1, "_dt": { "_editable": false} }), "Field 1: DT Value changed after selecting");
 						assert.ok(oRemoveValueButton.getEnabled(), "Table: Remove Value button in Selection column enabled after selecting");
 						oSelectionCell1.setSelected(false);
 						oSelectionCell1.fireSelect({
@@ -663,7 +623,7 @@ sap.ui.define([
 						});
 						assert.ok(oSelectionCell4.getSelected(), "Row 4: Cell 1 is selected after selecting");
 						assert.equal(oTable.getSelectedIndices().length, 0, "Table: SelectedIndices Value not change after selecting");
-						assert.ok(deepEqual(cleanUUID(oField._getCurrentProperty("value")), { "text": "text04", "key": "key04", "url": "https://sap.com/03", "icon": "sap-icon://accept", "iconcolor": "#1C4C98", "int": 4, "_dt": { "_editable": false} }), "Field 1: DT Value changed after selecting again");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value")), { "text": "text04", "key": "key04", "url": "https://sap.com/03", "icon": "sap-icon://accept", "iconcolor": "#1C4C98", "int": 4, "_dt": { "_editable": false} }), "Field 1: DT Value changed after selecting again");
 						assert.ok(oRemoveValueButton.getEnabled(), "Table: Remove Value button in Selection column enabled");
 
 						oRemoveValueButton.firePress();
@@ -718,7 +678,7 @@ sap.ui.define([
 							});
 							assert.ok(oSelectionCell1.getSelected(), "Row 1: Cell 1 is selected after selecting");
 							assert.equal(oTable.getSelectedIndices().length, 0, "Table: SelectedIndices Value not change after selecting");
-							assert.ok(deepEqual(cleanUUID(oField2._getCurrentProperty("value")), { "text": "text1req", "key": "key1", "additionalText": "addtext1", "icon": "sap-icon://accept", "_dt": {"_editable": false} }), "Field 2: DT Value changed after selecting");
+							assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField2._getCurrentProperty("value")), { "text": "text1req", "key": "key1", "additionalText": "addtext1", "icon": "sap-icon://accept", "_dt": {"_editable": false} }), "Field 2: DT Value changed after selecting");
 							assert.ok(oRemoveValueButton.getEnabled(), "Table: Remove Value button in Selection column enabled after selecting");
 							oSelectionCell1.setSelected(false);
 							oSelectionCell1.fireSelect({
@@ -739,7 +699,7 @@ sap.ui.define([
 							});
 							assert.ok(oSelectionCell4.getSelected(), "Row 4: Cell 1 is selected after selecting");
 							assert.equal(oTable.getSelectedIndices().length, 0, "Table: SelectedIndices Value not change after selecting");
-							assert.ok(deepEqual(cleanUUID(oField2._getCurrentProperty("value")), { "text": "text4req", "key": "key4", "additionalText": "addtext4", "icon": "sap-icon://zoom-out", "_dt": {"_editable": false} }), "Field 2: DT Value changed after selecting");
+							assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField2._getCurrentProperty("value")), { "text": "text4req", "key": "key4", "additionalText": "addtext4", "icon": "sap-icon://zoom-out", "_dt": {"_editable": false} }), "Field 2: DT Value changed after selecting");
 							assert.ok(oRemoveValueButton.getEnabled(), "Table: Remove Value button in Selection column enabled");
 							oRemoveValueButton.firePress();
 							assert.ok(!oRemoveValueButton.getEnabled(), "Table: Remove Value button in Selection column disabled after clicking it");
@@ -793,7 +753,7 @@ sap.ui.define([
 								});
 								assert.ok(oSelectionCell1.getSelected(), "Row 1: Cell 1 is selected after selecting");
 								assert.equal(oTable.getSelectedIndices().length, 0, "Table: SelectedIndices Value not change after selecting");
-								assert.ok(deepEqual(cleanUUID(oField3._getCurrentProperty("value")), {"CustomerID": "a", "CompanyName": "A Company", "Country": "Country 1", "City": "City 1", "Address": "Address 1", "_dt": {"_editable": false} }), "Field 3: DT Value not change after table selection change");
+								assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField3._getCurrentProperty("value")), {"CustomerID": "a", "CompanyName": "A Company", "Country": "Country 1", "City": "City 1", "Address": "Address 1", "_dt": {"_editable": false} }), "Field 3: DT Value not change after table selection change");
 								assert.ok(oRemoveValueButton.getEnabled(), "Table: Remove Value button in Selection column enabled after selecting");
 								oSelectionCell1.setSelected(false);
 								oSelectionCell1.fireSelect({
@@ -814,7 +774,7 @@ sap.ui.define([
 								});
 								assert.ok(oSelectionCell4.getSelected(), "Row 4: Cell 1 is selected after selecting");
 								assert.equal(oTable.getSelectedIndices().length, 0, "Table: SelectedIndices Value not change after selecting");
-								assert.ok(deepEqual(cleanUUID(oField3._getCurrentProperty("value")), {"CustomerID": "d", "CompanyName": "C2 Company", "Country": "Country 4", "City": "City 4", "Address": "Address 4", "_dt": {"_editable": false} }), "Field 3: DT Value not change after table selection change again");
+								assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField3._getCurrentProperty("value")), {"CustomerID": "d", "CompanyName": "C2 Company", "Country": "Country 4", "City": "City 4", "Address": "Address 4", "_dt": {"_editable": false} }), "Field 3: DT Value not change after table selection change again");
 								assert.ok(oRemoveValueButton.getEnabled(), "Table: Remove Value button in Selection column enabled");
 								oRemoveValueButton.firePress();
 								assert.ok(!oRemoveValueButton.getEnabled(), "Table: Remove Value button in Selection column disabled after clicking it");
@@ -864,7 +824,7 @@ sap.ui.define([
 					assert.ok(oLabel.isA("sap.m.Label"), "Label 1: Form content contains a Label");
 					assert.equal(oLabel.getText(), "Object properties defined: value from Json list", "Label 1: Has label text");
 					assert.ok(oField.isA("sap.ui.integration.editor.fields.ObjectField"), "Field 1: Object Field");
-					assert.ok(deepEqual(cleanUUID(oField._getCurrentProperty("value")), {}), "Field 1: Value");
+					assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value")), {}), "Field 1: Value");
 					EditorQunitUtils.isReady(this.oEditor).then(function () {
 						assert.ok(this.oEditor.isReady(), "Editor is ready");
 						var oTable = oField.getAggregation("_field");
@@ -904,7 +864,7 @@ sap.ui.define([
 					assert.ok(oLabel.isA("sap.m.Label"), "Label 1: Form content contains a Label");
 					assert.equal(oLabel.getText(), "Object properties defined: value from Json list", "Label 1: Has label text");
 					assert.ok(oField.isA("sap.ui.integration.editor.fields.ObjectField"), "Field 1: Object Field");
-					assert.ok(deepEqual(cleanUUID(oField._getCurrentProperty("value")), { "text": "text03", "key": "key03", "url": "https://sap.com/04", "icon": "sap-icon://zoom-in", "iconcolor": "#E69A17", "int": 3, "_dt": {"_editable": false }}), "Field 1: Value");
+					assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value")), { "text": "text03", "key": "key03", "url": "https://sap.com/04", "icon": "sap-icon://zoom-in", "iconcolor": "#E69A17", "int": 3, "_dt": {"_editable": false }}), "Field 1: Value");
 					EditorQunitUtils.isReady(this.oEditor).then(function () {
 						assert.ok(this.oEditor.isReady(), "Editor is ready");
 						var oTable = oField.getAggregation("_field");
@@ -945,7 +905,7 @@ sap.ui.define([
 							userInteraction: true
 						});
 						assert.equal(oTable.getSelectedIndices()[0], 0, "Table: SelectedIndices Value after table selection change");
-						assert.ok(deepEqual(cleanUUID(oField._getCurrentProperty("value")), { "text": "text03", "key": "key03", "url": "https://sap.com/04", "icon": "sap-icon://zoom-in", "iconcolor": "#E69A17", "int": 3, "_dt": {"_editable": false }}), "Field 1: DT Value not change after table selection change");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value")), { "text": "text03", "key": "key03", "url": "https://sap.com/04", "icon": "sap-icon://zoom-in", "iconcolor": "#E69A17", "int": 3, "_dt": {"_editable": false }}), "Field 1: DT Value not change after table selection change");
 						assert.ok(oSelectAllSelectionsButton.getEnabled(), "Table: SelectAllSelections button in toolbar enabled");
 						assert.ok(oClearAllSelectionsButton.getEnabled(), "Table: ClearAllSelections button in toolbar enabled");
 						assert.ok(oRemoveValueButton.getEnabled(), "Table: Remove Value button in Selection column enabled");
@@ -955,7 +915,7 @@ sap.ui.define([
 							userInteraction: true
 						});
 						assert.equal(oTable.getSelectedIndices()[0], 3, "Table: SelectedIndices Value after table selection change again");
-						assert.ok(deepEqual(cleanUUID(oField._getCurrentProperty("value")), { "text": "text03", "key": "key03", "url": "https://sap.com/04", "icon": "sap-icon://zoom-in", "iconcolor": "#E69A17", "int": 3, "_dt": {"_editable": false }}), "Field 1: DT Value not change after table selection change again");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value")), { "text": "text03", "key": "key03", "url": "https://sap.com/04", "icon": "sap-icon://zoom-in", "iconcolor": "#E69A17", "int": 3, "_dt": {"_editable": false }}), "Field 1: DT Value not change after table selection change again");
 						assert.ok(oSelectAllSelectionsButton.getEnabled(), "Table: SelectAllSelections button in toolbar enabled");
 						assert.ok(oClearAllSelectionsButton.getEnabled(), "Table: ClearAllSelections button in toolbar enabled");
 						assert.ok(oRemoveValueButton.getEnabled(), "Table: Remove Value button in Selection column enabled");
@@ -965,7 +925,7 @@ sap.ui.define([
 							userInteraction: true
 						});
 						assert.equal(oTable.getSelectedIndices().length, 0, "Table: SelectedIndices Value after remove table selection");
-						assert.ok(deepEqual(cleanUUID(oField._getCurrentProperty("value")), { "text": "text03", "key": "key03", "url": "https://sap.com/04", "icon": "sap-icon://zoom-in", "iconcolor": "#E69A17", "int": 3, "_dt": {"_editable": false }}), "Field 1: Value not change after remove table selection");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value")), { "text": "text03", "key": "key03", "url": "https://sap.com/04", "icon": "sap-icon://zoom-in", "iconcolor": "#E69A17", "int": 3, "_dt": {"_editable": false }}), "Field 1: Value not change after remove table selection");
 						assert.ok(oSelectAllSelectionsButton.getEnabled(), "Table: SelectAllSelections button in toolbar enabled");
 						assert.ok(!oClearAllSelectionsButton.getEnabled(), "Table: ClearAllSelections button in toolbar disabled");
 						assert.ok(oRemoveValueButton.getEnabled(), "Table: Remove Value button in Selection column enabled");
@@ -995,7 +955,7 @@ sap.ui.define([
 						});
 						assert.ok(oSelectionCell1.getSelected(), "Row 1: Cell 1 is selected after selecting");
 						assert.equal(oTable.getSelectedIndices().length, 0, "Table: SelectedIndices Value not change after selecting");
-						assert.ok(deepEqual(cleanUUID(oField._getCurrentProperty("value")), { "text": "text01", "key": "key01", "url": "https://sap.com/06", "icon": "sap-icon://accept", "iconcolor": "#031E48", "int": 1, "_dt": { "_editable": false} }), "Field 1: DT Value changed after selecting");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value")), { "text": "text01", "key": "key01", "url": "https://sap.com/06", "icon": "sap-icon://accept", "iconcolor": "#031E48", "int": 1, "_dt": { "_editable": false} }), "Field 1: DT Value changed after selecting");
 						assert.ok(oRemoveValueButton.getEnabled(), "Table: Remove Value button in Selection column enabled after selecting");
 						oSelectionCell1.setSelected(false);
 						oSelectionCell1.fireSelect({
@@ -1016,7 +976,7 @@ sap.ui.define([
 						});
 						assert.ok(oSelectionCell4.getSelected(), "Row 4: Cell 1 is selected after selecting");
 						assert.equal(oTable.getSelectedIndices().length, 0, "Table: SelectedIndices Value not change after selecting");
-						assert.ok(deepEqual(cleanUUID(oField._getCurrentProperty("value")), { "text": "text04", "key": "key04", "url": "https://sap.com/03", "icon": "sap-icon://accept", "iconcolor": "#1C4C98", "int": 4, "_dt": { "_editable": false} }), "Field 1: DT Value changed after selecting again");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField._getCurrentProperty("value")), { "text": "text04", "key": "key04", "url": "https://sap.com/03", "icon": "sap-icon://accept", "iconcolor": "#1C4C98", "int": 4, "_dt": { "_editable": false} }), "Field 1: DT Value changed after selecting again");
 						assert.ok(oRemoveValueButton.getEnabled(), "Table: Remove Value button in Selection column enabled");
 
 						oRemoveValueButton.firePress();
@@ -1069,7 +1029,7 @@ sap.ui.define([
 								assert.ok(oLabel3.isA("sap.m.Label"), "Label 3: Form content contains a Label");
 								assert.equal(oLabel3.getText(), "Object properties defined: value from OData Request", "Label 3: Has label text");
 								assert.ok(oField3.isA("sap.ui.integration.editor.fields.ObjectField"), "Field 3: Object Field");
-								assert.ok(deepEqual(cleanUUID(oField3._getCurrentProperty("value")), {"CustomerID": "b", "CompanyName": "B Company", "Country": "Country 2", "City": "City 2", "Address": "Address 2", "_dt": {"_editable": false}}), "Field 3: Value");
+								assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField3._getCurrentProperty("value")), {"CustomerID": "b", "CompanyName": "B Company", "Country": "Country 2", "City": "City 2", "Address": "Address 2", "_dt": {"_editable": false}}), "Field 3: Value");
 								oTable = oField3.getAggregation("_field");
 								assert.ok(oTable.isA("sap.ui.table.Table"), "Field 3: Control is Table");
 								assert.equal(oTable.getRows().length, 5, "Table: line number is 5");
@@ -1084,7 +1044,7 @@ sap.ui.define([
 									userInteraction: true
 								});
 								assert.ok(oTable.getSelectedIndices()[0] === 0, "Table: SelectedIndices Value after table selection change");
-								assert.ok(deepEqual(cleanUUID(oField3._getCurrentProperty("value")), {"CustomerID": "b", "CompanyName": "B Company", "Country": "Country 2", "City": "City 2", "Address": "Address 2", "_dt": {"_editable": false}}), "Field 3: DT Value not change after table selection change");
+								assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField3._getCurrentProperty("value")), {"CustomerID": "b", "CompanyName": "B Company", "Country": "Country 2", "City": "City 2", "Address": "Address 2", "_dt": {"_editable": false}}), "Field 3: DT Value not change after table selection change");
 								assert.ok(oRemoveValueButton.getEnabled(), "Table: Remove Value button in Selection column enabled");
 								oTable.setSelectedIndex(3);
 								oTable.fireRowSelectionChange({
@@ -1092,7 +1052,7 @@ sap.ui.define([
 									userInteraction: true
 								});
 								assert.ok(oTable.getSelectedIndices()[0] === 3, "Table: SelectedIndices Value after table selection change again");
-								assert.ok(deepEqual(cleanUUID(oField3._getCurrentProperty("value")), {"CustomerID": "b", "CompanyName": "B Company", "Country": "Country 2", "City": "City 2", "Address": "Address 2", "_dt": {"_editable": false}}), "Field 3: DT Value not change after table selection change again");
+								assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField3._getCurrentProperty("value")), {"CustomerID": "b", "CompanyName": "B Company", "Country": "Country 2", "City": "City 2", "Address": "Address 2", "_dt": {"_editable": false}}), "Field 3: DT Value not change after table selection change again");
 								assert.ok(oRemoveValueButton.getEnabled(), "Table: Remove Value button in Selection column enabled");
 								oTable.setSelectedIndex(-1);
 								oTable.fireRowSelectionChange({
@@ -1100,7 +1060,7 @@ sap.ui.define([
 									userInteraction: true
 								});
 								assert.ok(oTable.getSelectedIndices().length === 0, "Table: SetectedIndex and SelectedIndices Value after remove table selection");
-								assert.ok(deepEqual(cleanUUID(oField3._getCurrentProperty("value")), {"CustomerID": "b", "CompanyName": "B Company", "Country": "Country 2", "City": "City 2", "Address": "Address 2", "_dt": {"_editable": false}}), "Field 3: DT Value not change after remove table selections");
+								assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField3._getCurrentProperty("value")), {"CustomerID": "b", "CompanyName": "B Company", "Country": "Country 2", "City": "City 2", "Address": "Address 2", "_dt": {"_editable": false}}), "Field 3: DT Value not change after remove table selections");
 								assert.ok(oRemoveValueButton.getEnabled(), "Table: Remove Value button in Selection column enabled");
 
 								var oRow2 = oTable.getRows()[1];
@@ -1118,7 +1078,7 @@ sap.ui.define([
 								});
 								assert.ok(oSelectionCell1.getSelected(), "Row 1: Cell 1 is selected after selecting");
 								assert.equal(oTable.getSelectedIndices().length, 0, "Table: SelectedIndices Value not change after selecting");
-								assert.ok(deepEqual(cleanUUID(oField3._getCurrentProperty("value")), {"CustomerID": "a", "CompanyName": "A Company", "Country": "Country 1", "City": "City 1", "Address": "Address 1", "_dt": {"_editable": false} }), "Field 3: DT Value not change after table selection change");
+								assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField3._getCurrentProperty("value")), {"CustomerID": "a", "CompanyName": "A Company", "Country": "Country 1", "City": "City 1", "Address": "Address 1", "_dt": {"_editable": false} }), "Field 3: DT Value not change after table selection change");
 								assert.ok(oRemoveValueButton.getEnabled(), "Table: Remove Value button in Selection column enabled after selecting");
 								oSelectionCell1.setSelected(false);
 								oSelectionCell1.fireSelect({
@@ -1139,7 +1099,7 @@ sap.ui.define([
 								});
 								assert.ok(oSelectionCell4.getSelected(), "Row 4: Cell 1 is selected after selecting");
 								assert.equal(oTable.getSelectedIndices().length, 0, "Table: SelectedIndices Value not change after selecting");
-								assert.ok(deepEqual(cleanUUID(oField3._getCurrentProperty("value")), {"CustomerID": "d", "CompanyName": "C2 Company", "Country": "Country 4", "City": "City 4", "Address": "Address 4", "_dt": {"_editable": false} }), "Field 3: DT Value not change after table selection change again");
+								assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oField3._getCurrentProperty("value")), {"CustomerID": "d", "CompanyName": "C2 Company", "Country": "Country 4", "City": "City 4", "Address": "Address 4", "_dt": {"_editable": false} }), "Field 3: DT Value not change after table selection change again");
 								assert.ok(oRemoveValueButton.getEnabled(), "Table: Remove Value button in Selection column enabled");
 								oRemoveValueButton.firePress();
 								assert.ok(!oRemoveValueButton.getEnabled(), "Table: Remove Value button in Selection column disabled after clicking it");
@@ -1206,14 +1166,14 @@ sap.ui.define([
 					assert.ok(oLabel.isA("sap.m.Label"), "Label 1: Form content contains a Label");
 					assert.equal(oLabel.getText(), "Object properties defined: value from Json list", "Label 1: Has label text");
 					assert.ok(oField.isA("sap.ui.integration.editor.fields.ObjectField"), "Field 1: Object Field");
-					assert.ok(deepEqual(cleanDT(oField._getCurrentProperty("value")), oValue), "Field 1: Value");
+					assert.ok(deepEqual(EditorQunitUtils.cleanDT(oField._getCurrentProperty("value")), oValue), "Field 1: Value");
 					EditorQunitUtils.isReady(this.oEditor).then(function () {
 						assert.ok(this.oEditor.isReady(), "Editor is ready");
 						var oTable = oField.getAggregation("_field");
 						assert.equal(oTable.getBinding().getCount(), 9, "Table: value length is 9");
-						assert.ok(deepEqual(cleanUUID(oTable.getBinding().getContexts()[0].getObject()), oValueInTable), "Table: new row");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oTable.getBinding().getContexts()[0].getObject()), oValueInTable), "Table: new row");
 						var oNewRow = oTable.getRows()[0];
-						assert.ok(deepEqual(cleanUUID(oNewRow.getBindingContext().getObject()), oValueInTable), "Table: value row is at top");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oNewRow.getBindingContext().getObject()), oValueInTable), "Table: value row is at top");
 						var oSelectionCell1 = oNewRow.getCells()[0];
 						assert.ok(oSelectionCell1.isA("sap.m.CheckBox"), "Row 1: Cell 1 is CheckBox");
 						assert.ok(oSelectionCell1.getSelected(), "Row 1: Cell 1 is selected");
@@ -1249,7 +1209,7 @@ sap.ui.define([
 							assert.ok(oSimpleForm.isA("sap.ui.layout.form.SimpleForm"), "Popover: content is SimpleForm");
 							var oContents = oSimpleForm.getContent();
 							assert.equal(oContents.length, 16, "SimpleForm: length");
-							assert.ok(deepEqual(cleanUUID(oContents[15].getValue()), oEditObject), "SimpleForm field textArea: Has the value");
+							assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oContents[15].getValue()), oEditObject), "SimpleForm field textArea: Has the value");
 							var oFormLabel = oContents[0];
 							var oFormField = oContents[1];
 							assert.equal(oFormLabel.getText(), "Key", "SimpleForm label1: Has label text");
@@ -1363,7 +1323,7 @@ sap.ui.define([
 								oFormField = oContents[15];
 								assert.ok(!oFormLabel.getVisible(), "SimpleForm label8: Not Visible");
 								assert.ok(oFormField.getVisible(), "SimpleForm Field8: Visible");
-								assert.ok(deepEqual(cleanUUID(oFormField.getValue()), oChangedObject), "SimpleForm field textArea: Has changed value");
+								assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oFormField.getValue()), oChangedObject), "SimpleForm field textArea: Has changed value");
 								var sNewValue = '{\n\t"text new": "textnew",\n\t"text": "text01 2",\n\t"key": "key01 2",\n\t"url": "https://sap.com/06 2",\n\t"icon": "sap-icon://accept 2",\n\t"int": 3,\n\t"editable": false,\n\t"number": 5.55\n}';
 								oFormField.setValue(sNewValue);
 								oFormField.fireChange({ value: sNewValue});
@@ -1479,14 +1439,14 @@ sap.ui.define([
 					assert.ok(oLabel.isA("sap.m.Label"), "Label 1: Form content contains a Label");
 					assert.equal(oLabel.getText(), "Object properties defined: value from Json list", "Label 1: Has label text");
 					assert.ok(oField.isA("sap.ui.integration.editor.fields.ObjectField"), "Field 1: Object Field");
-					assert.ok(deepEqual(cleanDT(oField._getCurrentProperty("value")), oValue), "Field 1: Value");
+					assert.ok(deepEqual(EditorQunitUtils.cleanDT(oField._getCurrentProperty("value")), oValue), "Field 1: Value");
 					EditorQunitUtils.isReady(this.oEditor).then(function () {
 						assert.ok(this.oEditor.isReady(), "Editor is ready");
 						var oTable = oField.getAggregation("_field");
 						assert.equal(oTable.getBinding().getCount(), 9, "Table: value length is 9");
-						assert.ok(deepEqual(cleanUUID(oTable.getBinding().getContexts()[0].getObject()), oValueInTable), "Table: new row");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oTable.getBinding().getContexts()[0].getObject()), oValueInTable), "Table: new row");
 						var oNewRow = oTable.getRows()[0];
-						assert.ok(deepEqual(cleanUUID(oNewRow.getBindingContext().getObject()), oValueInTable), "Table: value row is at top");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oNewRow.getBindingContext().getObject()), oValueInTable), "Table: value row is at top");
 						var oSelectionCell1 = oNewRow.getCells()[0];
 						assert.ok(oSelectionCell1.isA("sap.m.CheckBox"), "Row 1: Cell 1 is CheckBox");
 						assert.ok(oSelectionCell1.getSelected(), "Row 1: Cell 1 is selected");
@@ -1494,7 +1454,7 @@ sap.ui.define([
 						var oEditButton = oTableToolbar.getContent()[2];
 						assert.ok(!oEditButton.getEnabled(), "Table: Edit button in toolbar disabled");
 						var oRow = oTable.getRows()[1];
-						assert.ok(deepEqual(cleanUUID(oRow.getBindingContext().getObject()), { "text": "text01", "key": "key01", "url": "https://sap.com/06", "icon": "sap-icon://accept", "iconcolor": "#031E48", "int": 1, "_dt": {"_editable": false}}), "Table: target row");
+						assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oRow.getBindingContext().getObject()), { "text": "text01", "key": "key01", "url": "https://sap.com/06", "icon": "sap-icon://accept", "iconcolor": "#031E48", "int": 1, "_dt": {"_editable": false}}), "Table: target row");
 						oTable.setSelectedIndex(1);
 						oTable.fireRowSelectionChange();
 						assert.ok(oEditButton.getEnabled(), "Table: Edit button in toolbar enabled");
@@ -1576,7 +1536,7 @@ sap.ui.define([
 							assert.ok(!oFormField.getVisible(), "SimpleForm Field8: Not Visible");
 							assert.ok(!oFormField.getEditable(), "SimpleForm Field8: Not Editable");
 							var oFormFieldObject = {"text": "text01","key": "key01","url": "https://sap.com/06","icon": "sap-icon://accept","iconcolor": "#031E48","int": 1,"_dt": {"_editable": false}};
-							assert.ok(deepEqual(cleanUUID(oFormField.getValue()), oFormFieldObject), "SimpleForm field textArea: Has the value");
+							assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oFormField.getValue()), oFormFieldObject), "SimpleForm field textArea: Has the value");
 							var oSwitchModeButton = oField._oObjectDetailsPopover.getContent()[0].getPages()[0].getHeaderContent()[0];
 							oSwitchModeButton.firePress();
 							EditorQunitUtils.wait().then(function () {
@@ -1635,7 +1595,7 @@ sap.ui.define([
 								assert.ok(!oFormLabel.getVisible(), "SimpleForm label8: Not Visible");
 								assert.ok(oFormField.getVisible(), "SimpleForm Field8: Visible");
 								assert.ok(!oFormField.getEditable(), "SimpleForm Field8: Not Editable");
-								assert.ok(deepEqual(cleanUUID(oFormField.getValue()), oFormFieldObject), "SimpleForm field textArea: Has the value");
+								assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oFormField.getValue()), oFormFieldObject), "SimpleForm field textArea: Has the value");
 								oSwitchModeButton.firePress();
 								EditorQunitUtils.wait().then(function () {
 									oContents = oSimpleForm.getContent();
@@ -1693,7 +1653,7 @@ sap.ui.define([
 									assert.ok(!oFormLabel.getVisible(), "SimpleForm label8: Not Visible");
 									assert.ok(!oFormField.getVisible(), "SimpleForm Field8: Not Visible");
 									assert.ok(!oFormField.getEditable(), "SimpleForm Field8: Not Editable");
-									assert.ok(deepEqual(cleanUUID(oFormField.getValue()), oFormFieldObject), "SimpleForm field textArea: Has the value");
+									assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oFormField.getValue()), oFormFieldObject), "SimpleForm field textArea: Has the value");
 									resolve();
 								});
 							});
@@ -1744,7 +1704,7 @@ sap.ui.define([
 					assert.ok(oLabel.isA("sap.m.Label"), "Label 1: Form content contains a Label");
 					assert.equal(oLabel.getText(), "Object properties defined: value from Json list", "Label 1: Has label text");
 					assert.ok(oField.isA("sap.ui.integration.editor.fields.ObjectField"), "Field 1: Object Field");
-					assert.ok(deepEqual(cleanDT(oField._getCurrentProperty("value")), oValue1), "Field 1: Value");
+					assert.ok(deepEqual(EditorQunitUtils.cleanDT(oField._getCurrentProperty("value")), oValue1), "Field 1: Value");
 					var oTable = oField.getAggregation("_field");
 					var oToolbar = oTable.getExtension()[0];
 					assert.equal(oToolbar.getContent().length, 7, "Table toolbar: content length");

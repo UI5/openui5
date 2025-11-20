@@ -1,0 +1,285 @@
+<mvc:View
+	height="100%"
+	controllerName="sap.m.acc.list.List"
+	xmlns:l="sap.ui.layout"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:core="sap.ui.core"
+	xmlns="sap.m"
+	displayBlock="true">
+	<App>
+		<NavContainer id="navCon">
+			<Page id="overviewPage" title="ACC Test Page for sap.m.List">
+				<content>
+					<List id="standardListItemList" headerText="List Overview">
+						<items>
+							<StandardListItem title="Standard List with Icon" type="Navigation" press="onOverviewListItemPress">
+								<customData>
+									<core:CustomData
+										key="target"
+										value="standardListPage" />
+								</customData>
+							</StandardListItem>
+							<StandardListItem title="Standard List with Avatar" type="Navigation" press="onOverviewListItemPress">
+								<customData>
+									<core:CustomData
+										key="target"
+										value="standardListAvatarPage" />
+								</customData>
+							</StandardListItem>
+							<StandardListItem title="Grouped List" type="Navigation" press="onOverviewListItemPress">
+								<customData>
+									<core:CustomData
+										key="target"
+										value="groupedListPage" />
+								</customData>
+							</StandardListItem>
+							<StandardListItem title="Display List" type="Navigation" press="onOverviewListItemPress">
+								<customData>
+									<core:CustomData
+										key="target"
+										value="displayListPage" />
+								</customData>
+							</StandardListItem>
+							<StandardListItem title="Input List" type="Navigation" press="onOverviewListItemPress">
+								<customData>
+									<core:CustomData
+										key="target"
+										value="inputListPage" />
+								</customData>
+							</StandardListItem>
+						</items>
+					</List>
+				</content>
+			</Page>
+			<Page
+				id="standardListPage"
+				title="Standard List with Icon"
+				showNavButton="true"
+				navButtonText="Back"
+				navButtonPress="onNavBackButtonPress">
+				<content>
+					<core:Fragment fragmentName="sap.m.acc.list.fragment.Config" type="XML"/>
+					<List
+						id="myList"
+						mode="{listConfig>/selectionMode}"
+						headerText="Title"
+						items="{
+							path: 'names>/'
+						}"
+						itemActionCount="{= ${listConfig>/showRowActions} ? 2 : 0 }"
+						itemActionPress=".onItemActionPress">
+						<items>
+							<StandardListItem
+								title="{names>title}"
+								description="{names>desc}"
+								icon="{names>icon}"
+								iconInset="false"
+								highlight="{names>highlight}"
+								info="{names>info}"
+								infoState="{names>highlight}"
+								infoStateInverted="true">
+								<actions>
+									<core:Fragment fragmentName="sap.m.acc.list.fragment.Actions" type="XML"/>
+								</actions>
+							</StandardListItem>
+						</items>
+					</List>
+				</content>
+			</Page>
+			<Page
+				id="standardListAvatarPage"
+				title="Standard List with Avatar"
+				showNavButton="true"
+				navButtonText="Back"
+				navButtonPress="onNavBackButtonPress">
+				<content>
+					<core:Fragment fragmentName="sap.m.acc.list.fragment.Config" type="XML"/>
+					<List
+						id="ShortProductList"
+						mode="{listConfig>/selectionMode}"
+						headerText="Products"
+						itemActionCount="{= ${listConfig>/showRowActions} ? 2 : 0 }"
+						itemActionPress=".onItemActionPress">
+						<items>
+							<StandardListItem
+								title="{products>/ProductCollection/0/Name}"
+								description="{products>/ProductCollection/0/ProductId}"
+								iconDensityAware="false"
+								iconInset="false"
+								adaptTitleSize="false" >
+								<avatar>
+									<Avatar
+										src="./images/HT-1000.jpg"
+										displayShape="Square"
+										imageFitType="Cover"
+										showBorder="true"/>
+									</avatar>
+								<actions>
+									<core:Fragment fragmentName="sap.m.acc.list.fragment.Actions" type="XML"/>
+								</actions>
+							</StandardListItem>
+							<!-- set this item's description be empty -->
+							<StandardListItem
+								title="{products>/ProductCollection/1/Name}"
+								description=""
+								iconInset="false"
+								adaptTitleSize="false" >
+								<avatar>
+									<Avatar
+										src="./images/HT-1000.jpg"
+										showBorder="true"/>
+								</avatar>
+								<actions>
+									<core:Fragment fragmentName="sap.m.acc.list.fragment.Actions" type="XML"/>
+								</actions>
+							</StandardListItem>
+							<StandardListItem
+								title="{products>/ProductCollection/2/Name}"
+								description="{products>/ProductCollection/2/ProductId}"
+								iconDensityAware="false"
+								iconInset="true"
+								adaptTitleSize="false" >
+								<avatar>
+									<Avatar
+										src="./images/HT-1000.jpg"
+										displayShape="Square"
+										showBorder="true"/>
+								</avatar>
+								<actions>
+									<core:Fragment fragmentName="sap.m.acc.list.fragment.Actions" type="XML"/>
+								</actions>
+							</StandardListItem>
+							<!-- don't specify a description for this item -->
+							<StandardListItem
+								title="{products>/ProductCollection/3/Name}"
+								icon="./images/HT-1000.jpg"
+								iconDensityAware="false"
+								iconInset="false"
+								adaptTitleSize="false">
+								<actions>
+									<core:Fragment fragmentName="sap.m.acc.list.fragment.Actions" type="XML"/>
+								</actions>
+							</StandardListItem>
+						</items>
+					</List>
+				</content>
+				
+			</Page>
+			<Page
+				id="groupedListPage"
+				title="Grouped List"
+				showNavButton="true"
+				navButtonText="Back"
+				navButtonPress="onNavBackButtonPress" >
+				<content>
+					<core:Fragment fragmentName="sap.m.acc.list.fragment.Config" type="XML"/>
+					<List
+						id="idList"
+						items="{
+							path: 'products>/ProductCollection',
+							sorter: {
+								path: 'products>SupplierName',
+								descending: false,
+								group: true
+							},
+							groupHeaderFactory: '.getGroupHeader'
+						}"
+						mode="{listConfig>/selectionMode}"
+						itemActionCount="{= ${listConfig>/showRowActions} ? 2 : 0 }"
+						itemActionPress=".onItemActionPress">
+						<StandardListItem
+							title="{products>Name}"
+							description="{products>ProductId}">
+							<actions>
+								<core:Fragment fragmentName="sap.m.acc.list.fragment.Actions" type="XML"/>
+							</actions>
+						</StandardListItem>
+					</List>
+				</content>
+			</Page>
+			<Page
+				id="displayListPage"
+				title="Display List"
+				showNavButton="true"
+				navButtonText="Back"
+				navButtonPress="onNavBackButtonPress" >
+				<content>
+					<List
+						binding="{supplier>/SupplierCollection/0}"
+						mode="None"
+						headerText="Address">
+						<DisplayListItem
+							label="Name"
+							value="{supplier>SupplierName}" />
+						<DisplayListItem
+							label="Street"
+							value="{supplier>Street} {supplier>HouseNumber}" />
+						<DisplayListItem
+							label="City"
+							value="{supplier>ZIPCode} {supplier>City}"
+							type="Navigation"/>
+						<DisplayListItem
+							label="Country"
+							value="{supplier>Country}"
+							type="Navigation" />
+					</List>
+				</content>
+			</Page>
+			<Page
+				id="inputListPage"
+				title="Input List"
+				showNavButton="true"
+				navButtonText="Back"
+				navButtonPress="onNavBackButtonPress" >
+				<content>
+					<List
+						headerText="Title"
+						mode="None">
+						<InputListItem label="WLAN">
+							<Switch state="true" />
+						</InputListItem>
+						<InputListItem label="Flight Mode">
+							<CheckBox selected="true" />
+						</InputListItem>
+						<InputListItem label="High Performance">
+							<RadioButton
+								groupName="GroupInputListItem"
+								selected="true" />
+						</InputListItem>
+						<InputListItem label="Battery Saving">
+							<RadioButton
+								groupName="GroupInputListItem" />
+						</InputListItem>
+						<InputListItem label="Price (EUR)">
+							<Input
+								placeholder="Price"
+								value="799"
+								type="Number" />
+						</InputListItem>
+						<InputListItem label="Address">
+							<Input
+								placeholder="Address"
+								value="Main Rd, Manchester" />
+						</InputListItem>
+						<InputListItem label="Country">
+							<Select>
+								<core:Item key="GR" text="Greece" />
+								<core:Item key="MX" text="Mexico" />
+								<core:Item key="NO" text="Norway" />
+								<core:Item key="NZ" text="New Zealand" />
+								<core:Item key="NL" text="Netherlands" />
+							</Select>
+						</InputListItem>
+						<InputListItem label="Volume">
+							<HBox justifyContent="End">
+								<Slider min="0" max="10" value="7" width="200px" />
+							</HBox>
+						</InputListItem>
+					</List>
+				</content>
+				
+			</Page>
+		</NavContainer>
+		
+	</App>
+</mvc:View>

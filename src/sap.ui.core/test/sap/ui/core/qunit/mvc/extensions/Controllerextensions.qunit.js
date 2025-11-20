@@ -400,9 +400,9 @@ sap.ui.define([
 		//ideally the code of the controller would be outsourced to
 		var ExtensionProvider = function() {};
 		/**
-				 * @param {string} sControllerName Name of the controller
-				 * @param {string} sComponentId Name of the compoonent
-				 */
+		 * @param {string} sControllerName Name of the controller
+		 * @param {string} sComponentId Name of the compoonent
+		 */
 		ExtensionProvider.prototype.getControllerExtensions = function(sControllerName, sComponentId) {
 			if (sControllerName == "example.BaseController") {
 				return new Promise(function(fnResolve, fnReject) {

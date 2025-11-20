@@ -373,8 +373,7 @@ sap.ui.define([
 		 * menu behind the getMenu function is lazy created when first accessed.
 		 */
 		if (oOrigin !== this.getTemplate()
-			&& oOrigin !== this.getCreationTemplate()
-			&& !TableUtils.isA(oOrigin, "sap.ui.table.ColumnMenu")) {
+			&& oOrigin !== this.getCreationTemplate()) {
 
 			// changes on the templates require to call invalidate on the column or table
 			Element.prototype.invalidate.apply(this, arguments);

@@ -1,0 +1,16 @@
+<core:FragmentDefinition 
+	xmlns="sap.m"
+	xmlns:core="sap.ui.core">
+	<ListItemAction
+		icon="sap-icon://navigation-right-arrow"
+		text="Details"
+		visible="{listConfig>/showRowActions}"/>
+	<ListItemAction
+		icon="sap-icon://edit"
+		text="Edit"
+		visible="{listConfig>/showRowActions}"/>
+	<ListItemAction
+		icon="sap-icon://line-chart"
+		text="Analyze"
+		visible="{listConfig>/showRowActions}"/>
+</core:FragmentDefinition>

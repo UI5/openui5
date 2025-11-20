@@ -120,19 +120,19 @@ sap.ui.define(["sap/ui/core/Component"], function(Component) {
 	};
 
 	/**
-		 * Retrieves the controller extensions.
-		 *
-		 * @param {string} sControllerName the name of the controller which should be extended
-		 * @param {string} sComponentId the ID of the controller's owner-component
-		 * @param {string} sViewId the view-id which is used to distinguish instance-specific controller extensions
-		 * @returns {object} an object containing all controller-extensions
-		 * split into two parts:
-		 * 1. extensions from the customizing configuration in the manifest (<return>.customizingControllerNames)
-		 * 2. extensions from the external provider (<return>.providerControllers)
-		 *
-		 * @private
-		 * @ui5-restricted sap.ui.core.mvc.Controller
-		 */
+	 * Retrieves the controller extensions.
+	 *
+	 * @param {string} sControllerName the name of the controller which should be extended
+	 * @param {string} sComponentId the ID of the controller's owner-component
+	 * @param {string} sViewId the view-id which is used to distinguish instance-specific controller extensions
+	 * @returns {object} an object containing all controller-extensions
+	 * split into two parts:
+	 * 1. extensions from the customizing configuration in the manifest (<return>.customizingControllerNames)
+	 * 2. extensions from the external provider (<return>.providerControllers)
+	 *
+	 * @private
+	 * @ui5-restricted sap.ui.core.mvc.Controller
+	 */
 	ControllerExtensionProvider.getControllerExtensions = function(sControllerName, sComponentId, sViewId) {
 		var mControllerExtensions = {
 			customizingControllerNames: [],   // extensions defined in the manifest via customizing config
@@ -210,11 +210,11 @@ sap.ui.define(["sap/ui/core/Component"], function(Component) {
 	}
 
 	/**
-		 * Load the registered ExtensionProvider.
-		 *
-		 * @return {ExtensionProvider|Promise|undefined} ExtensionProvider <code>Promise</code> in case of asynchronous loading
-		 *           or the <code>ExtensionProvider</code> in case of synchronous loading or undefined in case no provider exists
-		 */
+	 * Load the registered ExtensionProvider.
+	 *
+	 * @return {ExtensionProvider|Promise|undefined} ExtensionProvider <code>Promise</code> in case of asynchronous loading
+	 *           or the <code>ExtensionProvider</code> in case of synchronous loading or undefined in case no provider exists
+	 */
 	function loadExtensionProvider() {
 		var sProviderName = ControllerExtensionProvider._sExtensionProvider.replace(/\./g, "/"),
 			oProvider = mExtensionProvider[sProviderName];

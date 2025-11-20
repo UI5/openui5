@@ -450,13 +450,13 @@ sap.ui.define([
 		},
 
 		/**
-				 * Loads the included CSS and JavaScript resources. The resources will be
-				 * resolved relative to the component location.
-				 *
-				 * @return {Promise<void>|undefined} Promise for required *.js resources
-				 *
-				 * @private
-				 */
+		 * Loads the included CSS and JavaScript resources. The resources will be
+		 * resolved relative to the component location.
+		 *
+		 * @return {Promise<void>|undefined} Promise for required *.js resources
+		 *
+		 * @private
+		 */
 		_loadIncludes: function() {
 			var mResources = this.getEntry("/sap.ui5/resources"), oPromise;
 
@@ -516,12 +516,12 @@ sap.ui.define([
 		},
 
 		/**
-				 * Load external dependencies (like libraries and components)
-				 *
-				 * @return {Promise<void>} Promise containing further promises of dependent libs and components requests
-				 *
-				 * @private
-				 */
+		 * Load external dependencies (like libraries and components)
+		 *
+		 * @return {Promise<void>} Promise containing further promises of dependent libs and components requests
+		 *
+		 * @private
+		 */
 		_loadDependencies: function() {
 			var aPromises = [];
 			// afterwards we load our dependencies!

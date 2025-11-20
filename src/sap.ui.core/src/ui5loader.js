@@ -1468,23 +1468,23 @@
 	}
 
 	/**
-		 * Loads the given module if needed and returns the module export or a promise on it.
-		 *
-		 * If loading is still ongoing for the requested module and if there is a cycle detected between
-		 * the requesting module and the module to be loaded, then <code>undefined</code> (or a promise on
-		 * <code>undefined</code>) will be returned as intermediate module export to resolve the cycle.
-		 *
-		 * @param {Module} oRequestingModule The module in whose context the new module has to be loaded;
-		 *           this is needed to detect cycles
-		 * @param {string} sModuleName Name of the module to be loaded, in URN form and with '.js' extension
-		 * @param {boolean} bAsync Whether the operation can be executed asynchronously
-		 * @param {boolean} [bSkipShimDeps=false] Whether shim dependencies should be ignored (used by recursive calls)
-		 * @param {boolean} [bSkipBundle=false] Whether bundle information should be ignored (used by recursive calls)
-		 * @returns {any|Promise} Returns the module export in sync mode or a promise on it in async mode
-		 * @throws {Error} When loading failed in sync mode
-		 *
-		 * @private
-		 */
+	 * Loads the given module if needed and returns the module export or a promise on it.
+	 *
+	 * If loading is still ongoing for the requested module and if there is a cycle detected between
+	 * the requesting module and the module to be loaded, then <code>undefined</code> (or a promise on
+	 * <code>undefined</code>) will be returned as intermediate module export to resolve the cycle.
+	 *
+	 * @param {Module} oRequestingModule The module in whose context the new module has to be loaded;
+	 *           this is needed to detect cycles
+	 * @param {string} sModuleName Name of the module to be loaded, in URN form and with '.js' extension
+	 * @param {boolean} bAsync Whether the operation can be executed asynchronously
+	 * @param {boolean} [bSkipShimDeps=false] Whether shim dependencies should be ignored (used by recursive calls)
+	 * @param {boolean} [bSkipBundle=false] Whether bundle information should be ignored (used by recursive calls)
+	 * @returns {any|Promise} Returns the module export in sync mode or a promise on it in async mode
+	 * @throws {Error} When loading failed in sync mode
+	 *
+	 * @private
+	 */
 	function requireModule(oRequestingModule, sModuleName, _bAsync, bSkipShimDeps, bSkipBundle) {
 		// only for robustness, should not be possible by design (all callers append '.js')
 		const oSplitName = urnToBaseIDAndSubType(sModuleName);
@@ -1612,9 +1612,9 @@
 	}
 
 	/**
-		 * Note: `sModuleName` must be a normalized resource name of type .js
-		 * @private
-		 */
+	 * Note: `sModuleName` must be a normalized resource name of type .js
+	 * @private
+	 */
 	function execModule(sModuleName) {
 
 		const oModule = mModules[sModuleName];
@@ -1714,8 +1714,8 @@
 	}
 
 	/**
-		 * @private
-		 */
+	 * @private
+	 */
 	function requireAll(oRequestingModule, aDependencies, fnCallback, fnErrCallback) {
 		const aModules = [];
 		let sBaseName,
@@ -1777,8 +1777,8 @@
 	}
 
 	/**
-		 * @private
-		 */
+	 * @private
+	 */
 	function executeModuleDefinition(sResourceName, aDependencies, vFactory) {
 		const bLoggable = log.isLoggable();
 		sResourceName = normalize(sResourceName);
@@ -1868,8 +1868,8 @@
 	}
 
 	/**
-		 * @private
-		 */
+	 * @private
+	 */
 	function ui5Define(sModuleName, aDependencies, vFactory) {
 		let sResourceName;
 
@@ -2041,8 +2041,8 @@
 	const amdRequire = createContextualRequire(null, true);
 
 	/**
-		 * @private
-		 */
+	 * @private
+	 */
 	function predefine(sModuleName, aDependencies, vFactory) {
 		if ( typeof sModuleName !== 'string' ) {
 			throw new Error("predefine requires a module name");
