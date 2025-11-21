@@ -14,6 +14,8 @@ sap.ui.define([
 	"sap/m/InputBase",
 	"sap/m/Input",
 	"sap/m/Link",
+	"sap/ui/table/Table",
+	"sap/ui/table/Column",
 	"sap/ui/base/Event",
 	"sap/base/Log",
 	"sap/ui/events/KeyCodes",
@@ -46,6 +48,8 @@ sap.ui.define([
 	InputBase,
 	Input,
 	Link,
+	Table,
+	Column,
 	Event,
 	Log,
 	KeyCodes,
@@ -7159,8 +7163,60 @@ sap.ui.define([
 		oModel.destroy();
 	});
 
-	QUnit.module("highlighting");
+	QUnit.test("Binding: MultiComboBox closes when binding context changes", function (assert) {
+		// Prepare
+		var oModel = new JSONModel({
+			items: [
+				{ keys: [1], text: "One" },
+				{ keys: [2], text: "Two" },
+				{ keys: [3], text: "Three" }
+			]
+		});
 
+		var oTable = new Table({
+			visibleRowCount: 2,
+			rows: "{/items}",
+			columns: [
+				new Column({
+					template: new MultiComboBox({
+						selectedKey: "{keys}"
+					})
+				})
+			]
+		});
+
+		oTable.setModel(oModel);
+		oTable.placeAt("qunit-fixture");
+		oCore.applyChanges();
+		this.clock.tick(500);
+
+		var oMultiComboBox = oTable.getRows()[0].getCells()[0];
+
+		// Act - Open the MultiComboBox
+		oMultiComboBox.open();
+		oCore.applyChanges();
+		this.clock.tick(500);
+
+		var oPicker = oMultiComboBox.getPicker();
+
+		// Assert picker is open
+		assert.ok(oPicker.isOpen(), "MultiComboBox picker is initially open");
+
+		// Act - Change the binding context
+		var oNewContext = oModel.getContext("/items/2");
+		oMultiComboBox.setBindingContext(oNewContext);
+		oCore.applyChanges();
+		this.clock.tick(500);
+
+		// Assert - MultiComboBox picker should close
+		assert.notOk(oPicker.isOpen(), "MultiComboBox closes when binding context changes");
+
+		// Cleanup
+		oMultiComboBox.destroy();
+		oTable.destroy();
+	});
+
+	QUnit.module("highlighting");
 	QUnit.test("highlightList doesn't throw an error when showSecondaryValues=true and sap.ui.core.Item is set", function(assert) {
 
 		// system under test
@@ -8214,6 +8270,45 @@ sap.ui.define([
 		Core.applyChanges();
 
 		assert.strictEqual(this.oMultiComboBox.getValueState(), ValueState.Warning, "The value state is reset.");
+	});
+
+	QUnit.test("Value state popup should close on picker open", function (assert) {
+		// Arrange
+		const oMultiComboBoxWithLongValueStateText = new MultiComboBox({
+		valueState : "Warning",
+		valueStateText : "Warning message. Extra long text used as a warning message. Extra long text used as a warning message - 2. Extra long text used as a warning message - 3.",
+		items : [new Item({
+			key : "0",
+			text : "item 0"
+		}), new Item({
+			key : "1",
+			text : "item 1"
+		})]
+	});
+
+		oMultiComboBoxWithLongValueStateText.placeAt("MultiComboBoxContent");
+		Core.applyChanges();
+		oMultiComboBoxWithLongValueStateText.getFocusDomRef().focus();
+
+		oMultiComboBoxWithLongValueStateText.setValue("it");
+		Core.applyChanges();
+		this.clock.tick(500);
+
+		// Assert
+		assert.strictEqual(oMultiComboBoxWithLongValueStateText.getDomRef().classList.contains("sapMFocus"), true, "The visual focus is applied");
+		assert.ok(document.getElementById(oMultiComboBoxWithLongValueStateText.getValueStateMessageId()), "ValueState Message is shown on focus");
+
+
+		oMultiComboBoxWithLongValueStateText.open();
+		Core.applyChanges();
+		this.clock.tick(500);
+
+		// Assert
+		assert.notOk(document.getElementById(oMultiComboBoxWithLongValueStateText.getValueStateMessageId()), "ValueState Message is hidden on picker open");
+		assert.strictEqual(oMultiComboBoxWithLongValueStateText.getPicker().oPopup.getOpenState(), OpenState.OPEN, "The picker is open");
+
+		// Clean
+		oMultiComboBoxWithLongValueStateText.destroy();
 	});
 
 	QUnit.test("value state message should be opened if the input field is on focus", function(assert) {
