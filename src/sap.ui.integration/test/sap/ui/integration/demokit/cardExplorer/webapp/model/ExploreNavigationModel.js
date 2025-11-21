@@ -934,6 +934,22 @@ sap.ui.define([
 										key: 'data.json'
 									}
 								]
+							},
+							{
+								title: 'Tooltips',
+								key: 'tooltips',
+								settings: {
+									rows: 5,
+									columns: 4
+								},
+								files: [
+									{
+										url: '/samples/analytical/lineWithTooltips.json',
+										name: 'manifest.json',
+										key: 'manifest.json',
+										editable: true
+									}
+								]
 							}
 						]
 					},

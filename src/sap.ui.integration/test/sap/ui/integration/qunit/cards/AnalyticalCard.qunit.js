@@ -2,6 +2,7 @@
 
 sap.ui.define([
 	"sap/ui/core/Lib",
+	"sap/base/Log",
 	"sap/ui/integration/cards/AnalyticalContent",
 	"sap/ui/integration/cards/actions/NavigationAction",
 	"sap/ui/integration/widgets/Card",
@@ -12,6 +13,7 @@ sap.ui.define([
 	"../services/SampleServices"
 ], function (
 	Library,
+	Log,
 	AnalyticalContent,
 	NavigationAction,
 	Card,
@@ -557,6 +559,96 @@ sap.ui.define([
 		}
 	};
 
+	var oManifest_Analytical_PopoverTooltips = {
+		"sap.app": {
+			"id": "test.cards.analytical.card8"
+		},
+		"sap.card": {
+			"type": "Analytical",
+			"content": {
+				"chartType": "Donut",
+				"tooltips": true,
+				"measureAxis": "size",
+				"dimensionAxis": "color",
+				"dimensions": [
+					{
+						"label": "Store Name",
+						"value": "{Store Name}"
+					}
+				],
+				"measures": [
+					{
+						"label": "Revenue",
+						"value": "{Revenue}"
+					}
+				],
+				"popover": {
+					"active": true,
+					"actionsStrip": [{
+						"text": "Action for {Store Name}",
+						"actions": [{
+							"type": "Navigation",
+							"parameters": {
+								"url": "https://www.sap.com/{Store Name}"
+							}
+						}]
+					}]
+				},
+				"data": {
+					"json": [
+						{
+							"Store Name": "24-Seven",
+							"Revenue": 345292.06
+						},
+						{
+							"Store Name": "A&A",
+							"Revenue": 1564235.29
+						}
+					]
+				}
+			}
+		}
+	};
+
+	var oManifest_Analytical_Tooltips = {
+		"sap.app": {
+			"id": "test.cards.analytical.card8"
+		},
+		"sap.card": {
+			"type": "Analytical",
+			"tooltips": true,
+			"content": {
+				"chartType": "Donut",
+				"measureAxis": "size",
+				"dimensionAxis": "color",
+				"dimensions": [
+					{
+						"label": "Store Name",
+						"value": "{Store Name}"
+					}
+				],
+				"measures": [
+					{
+						"label": "Revenue",
+						"value": "{Revenue}"
+					}
+				],
+				"data": {
+					"json": [
+						{
+							"Store Name": "24-Seven",
+							"Revenue": 345292.06
+						},
+						{
+							"Store Name": "A&A",
+							"Revenue": 1564235.29
+						}
+					]
+				}
+			}
+		}
+	};
+
 	var oManifest_Analytical_ChartNavigation = {
 		"_version": "1.14.0",
 		"sap.app": {
@@ -1083,7 +1175,7 @@ sap.ui.define([
 			// Assert
 			assert.notOk(oCardContent.$().hasClass("sapFCardSectionClickable"), "Card Content is clickable");
 			assert.notOk(oCardHeader.$().hasClass("sapFCardSectionClickable"), "Card Content is clickable");
-			assert.ok(oCardContent._getVizProperties(oCardContent.getConfiguration()).interaction.noninteractiveMode, "Chart itself also shouldn't be interactive");
+			assert.ok(oCardContent._getVizProperties(oCardContent.getConfiguration()).interaction.noninteractiveMode, "The chart is not interactive by default.");
 
 			//Act
 			oCardContent.firePress();
@@ -1338,6 +1430,48 @@ sap.ui.define([
 			assert.ok(oStubOpenUrl.calledWith("https://www.sap.com/A&A"), "Url is resolved with correct path");
 
 			oStubOpenUrl.restore();
+		});
+
+
+		QUnit.module("Tooltips", {
+			beforeEach: function () {
+				this.oCard = new Card({
+					width: "400px",
+					height: "600px",
+					baseUrl: "test-resources/sap/ui/integration/qunit/testResources/"
+				});
+				this.oCard.placeAt(DOM_RENDER_LOCATION);
+			},
+			afterEach: function () {
+				this.oCard.destroy();
+				this.oCard = null;
+			}
+		});
+
+		QUnit.test("Chart parts are interactive when popover is attached", async function (assert) {
+			// Act
+			this.oCard.setManifest(oManifest_Analytical_Tooltips);
+
+			await nextCardReadyEvent(this.oCard);
+
+			var oCardContent = this.oCard.getCardContent();
+			// Assert
+			assert.ok(oCardContent._getVizProperties(oCardContent.getConfiguration()).interaction.noninteractiveMode, "Chart itself should not be interactive");
+		});
+
+		QUnit.test("When there is Popover and Tooltip set, the error is logged", async function (assert) {
+			var oLogSpy = this.spy(Log, "error");
+
+			// Act
+			this.oCard.setManifest(oManifest_Analytical_PopoverTooltips);
+
+			await nextCardReadyEvent(this.oCard);
+
+			// Assert
+			assert.ok(
+				oLogSpy.calledWith(sinon.match(/^"sap.card".content.popover property and "sap.card".content.tooltips property shouldn't be set at the same time. Only the popover will work.*/)),
+				"Error message should be logged"
+			);
 		});
 
 		QUnit.module("_onChartFullyLoaded Method", {

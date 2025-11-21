@@ -96,6 +96,7 @@
 					]
 				}
 			],
+			"tooltips": true,
 			"actionableArea": "Chart",
 			"actions": [
 				{
