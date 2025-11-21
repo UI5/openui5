@@ -1264,7 +1264,7 @@ sap.ui.define([
 	 */
 	DynamicPage.prototype._needsVerticalScrollBar = function () {
 		return this._isContentOverflowingScrollContainer()
-			|| this._isContentOverflowingFullscreenContainer(); // overlap between fullscreen-area and footer-area
+			|| this.isContentOverflowingIntoFooter();
 	};
 
 	DynamicPage.prototype._isContentOverflowingScrollContainer = function () {
@@ -1277,6 +1277,10 @@ sap.ui.define([
 	DynamicPage.prototype._isContentOverflowingFullscreenContainer = function () {
 		return exists(this.$contentFitContainer)
 			&& this.$contentFitContainer[0].scrollHeight > this.$contentFitContainer[0].clientHeight;
+	};
+
+	DynamicPage.prototype.isContentOverflowingIntoFooter = function () {
+		return this.getShowFooter() && this._isContentOverflowingFullscreenContainer();
 	};
 
 	/**

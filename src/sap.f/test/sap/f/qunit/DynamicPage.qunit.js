@@ -560,6 +560,18 @@ function(
 		assert.ok(oNeedsVerticalScrollSpy.alwaysReturned(true), "scrollbar is needed");
 	});
 
+	QUnit.test("'isContentOverflowingIntoFooter' returns true when the fullscreen content overflaps the footer", function (assert) {
+		this.stub(this.oDynamicPage, "_isContentOverflowingFullscreenContainer").returns(true);
+		this.oDynamicPage.setShowFooter(true);
+		assert.strictEqual(this.oDynamicPage.isContentOverflowingIntoFooter(), true, "Content is overflowing when footer is shown");
+	});
+
+	QUnit.test("'isContentOverflowingIntoFooter' returns false when no footer is shown", function (assert) {
+		this.stub(this.oDynamicPage, "_isContentOverflowingFullscreenContainer").returns(true);
+		this.oDynamicPage.setShowFooter(false);
+		assert.strictEqual(this.oDynamicPage.isContentOverflowingIntoFooter(), false, "Content is not overflowing when footer is not shown");
+	});
+
 	QUnit.test("BCP: 1870261908 Header title cursor CSS reset is applied", function (assert) {
 		// Arrange
 		var $MainHeading = this.oDynamicPage.$().find(".sapFDynamicPageTitleMainHeading"),
