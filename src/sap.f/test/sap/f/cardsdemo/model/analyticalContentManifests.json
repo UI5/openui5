@@ -76,7 +76,11 @@
 						"label": "Cost",
 						"value": "{Cost}"
 					}
-				]
+				],
+				"popover": {
+					"active": true
+				},
+				"tooltips": true
 			}
 		}
 	},
@@ -158,7 +162,8 @@
 						"label": "Cost",
 						"value": "{Cost}"
 					}
-				]
+				],
+				"tooltips": true
 			}
 		}
 	},

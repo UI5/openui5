@@ -27,7 +27,7 @@ sap.ui.define([
 	var ActionArea = library.CardActionArea;
 
 	// lazy dependencies, loaded on the first attempt to create AnalyticalContent
-	var VizFrame, FeedItem, FlattenedDataset, Popover, MeasureDefinition, DimensionDefinition;
+	var VizFrame, FeedItem, FlattenedDataset, Popover, MeasureDefinition, DimensionDefinition, VizTooltip;
 
 	/**
 	 * Enumeration with supported legend positions.
@@ -145,14 +145,16 @@ sap.ui.define([
 						"sap/viz/ui5/controls/Popover",
 						"sap/viz/ui5/data/FlattenedDataset",
 						"sap/viz/ui5/data/MeasureDefinition",
-						"sap/viz/ui5/data/DimensionDefinition"
-					], function (_VizFrame, _FeedItem, _Popover, _FlattenedDataset, _MeasureDefinition, _DimensionDefinition) {
+						"sap/viz/ui5/data/DimensionDefinition",
+						"sap/viz/ui5/controls/VizTooltip"
+					], function (_VizFrame, _FeedItem, _Popover, _FlattenedDataset, _MeasureDefinition, _DimensionDefinition, _VizTooltip) {
 						VizFrame = _VizFrame;
 						FeedItem = _FeedItem;
 						Popover = _Popover;
 						FlattenedDataset = _FlattenedDataset;
 						MeasureDefinition = _MeasureDefinition;
 						DimensionDefinition = _DimensionDefinition;
+						VizTooltip = _VizTooltip;
 						resolve();
 					}, function (sErr) {
 						reject(sErr);
@@ -214,6 +216,10 @@ sap.ui.define([
 			width: "100%",
 			vizType: ChartTypes[oResolvedConfiguration.chartType] || oResolvedConfiguration.chartType
 		});
+
+		if (oResolvedConfiguration.tooltips) {
+			new VizTooltip().connect(oChart.getVizUid());
+		}
 
 		this.setAggregation("_content", oChart);
 		this._attachActions(oConfiguration);
@@ -401,11 +407,18 @@ sap.ui.define([
 			}
 		};
 
-		if (oResolvedConfiguration.actions || oResolvedConfiguration.popover) {
+		if (oResolvedConfiguration.actions || oResolvedConfiguration.popover || oResolvedConfiguration.tooltips) {
 			this._bChartsInteractive = oResolvedConfiguration.actionableArea === ActionableArea.Chart
-									|| oResolvedConfiguration.popover && oResolvedConfiguration.popover.active;
+				|| oResolvedConfiguration.popover?.active
+				|| oResolvedConfiguration.tooltips;
 			this._bActions = oResolvedConfiguration.actions;
+
 			oVizProperties.interaction.noninteractiveMode = !this._bChartsInteractive;
+		}
+
+
+		if (oResolvedConfiguration.popover && oResolvedConfiguration.tooltips) {
+			Log.error("\"sap.card\".content.popover property and \"sap.card\".content.tooltips property shouldn't be set at the same time. Only the popover will work.", null, "sap.ui.integration.widgets.Card");
 		}
 
 		if (oTitle) {

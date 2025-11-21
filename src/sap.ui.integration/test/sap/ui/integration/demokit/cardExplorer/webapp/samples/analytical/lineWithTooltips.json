@@ -1,29 +1,32 @@
 {
 	"_version": "2.0.0",
 	"sap.app": {
-		"id": "list.card",
+		"id": "card.explorer.line.card",
 		"type": "card",
+		"title": "Sample of a Line Chart",
+		"subTitle": "Sample of a Line Chart",
 		"applicationVersion": {
 			"version": "1.0.0"
 		},
-		"title": "Card 'list.card'"
+		"shortTitle": "A short title for this Card",
+		"info": "Additional information about this Card",
+		"description": "A long description for this Card",
+		"tags": {
+			"keywords": [
+				"Analytical",
+				"Card",
+				"Line",
+				"Sample"
+			]
+		}
 	},
 	"sap.ui": {
 		"technology": "UI5",
 		"icons": {
-			"icon": "sap-icon://list"
+			"icon": "sap-icon://line-chart"
 		}
 	},
 	"sap.card": {
-		"actions": [
-			{
-				"type": "Navigation",
-				"parameters": {
-					"url": "https://sap.com",
-					"target": "_blank"
-				}
-			}
-		],
 		"type": "Analytical",
 		"header": {
 			"type": "Numeric",
@@ -44,7 +47,7 @@
 					"details": "Q1, 2018"
 				}
 			},
-			"title": "Card level Action",
+			"title": "Project Cloud Transformation",
 			"subtitle": "Revenue",
 			"unitOfMeasurement": "EUR",
 			"mainIndicator": {
@@ -221,38 +224,6 @@
 					"type": "Dimension",
 					"values": [
 						"{dimensions/weekLabel}"
-					]
-				}
-			]
-		},
-		"footer": {
-			"actionsStrip": [
-				{
-					"type": "ToolbarSpacer"
-				},
-				{
-					"type": "Link",
-					"text": "Agenda",
-					"icon": "sap-icon://action",
-					"actions": [
-						{
-							"type": "Navigation",
-							"parameters": {
-								"url": "{agendaUrl}"
-							}
-						}
-					]
-				},
-				{
-					"text": "Approve",
-					"overflowPriority": "High",
-					"actions": [
-						{
-							"type": "Custom",
-							"parameters": {
-								"method": "approve"
-							}
-						}
 					]
 				}
 			]
