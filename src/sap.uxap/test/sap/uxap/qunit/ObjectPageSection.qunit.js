@@ -983,6 +983,23 @@ function(Element, nextUIUpdate, jQuery, XMLView, library, ObjectPageLayout, Obje
 		assert.equal(oInvalidateSpy.callCount, 0, "section is not invalidated");
 	});
 
+	QUnit.test("_getWrapTitle returns correct value based on wrapTitle property", function (assert) {
+		// Arrange
+		var oSection = new ObjectPageSection();
+
+		// Act & Assert - default value is false
+		assert.strictEqual(oSection._getWrapTitle(), false, "Default value of wrapTitle is returned (false)");
+
+		// Act - change wrapTitle property to true
+		oSection.setWrapTitle(true);
+
+		// Assert - should return the new value
+		assert.strictEqual(oSection._getWrapTitle(), true, "Returns true when wrapTitle is set to true");
+
+		// Clean up
+		oSection.destroy();
+	});
+
 	QUnit.test("Async unstashing", function (assert) {
 
 		// Setup

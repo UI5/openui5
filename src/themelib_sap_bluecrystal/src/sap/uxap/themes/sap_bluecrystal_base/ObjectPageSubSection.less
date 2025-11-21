@@ -26,14 +26,6 @@
 	justify-content: space-between;
 }
 
-.sapUxAPObjectPageSubSectionHeaderTitle {
-	white-space: normal;
-	line-height: 3rem;
-	color: @sapUiGroupTitleTextColor;
-	font-size: @sapMFontHeader4Size;
-	font-weight: normal;
-}
-
 .sapUxAPSubSectionSeeMoreContainer {
 	text-align: right;
 	width: auto;
@@ -58,16 +50,6 @@
 .sapUxAPObjectPageLayout-Std-Phone .sapUxAPObjectPageSubSectionHeader,
 html .sapUiContainer-Narrow .sapUxAPObjectPageSubSectionHeader {
 	padding: 0 1rem;
-}
-
-.sapUxAPObjectPageLayout-Std-Phone .sapUxAPObjectPageSubSectionHeaderTitle,
-html .sapUiContainer-Narrow .sapUxAPObjectPageSubSectionHeaderTitle {
-	height: auto;
-	overflow: auto;
-	float: none;
-	white-space: normal;
-	word-wrap: break-word;
-	word-break: break-all;
 }
 
 /* tablet display */
@@ -101,13 +83,6 @@ Doing so will result in less generated CSS, as well as less future maintanance i
 		box-sizing: border-box;
 		display: inline-block;
 		margin-left: 0;
-	}
-
-	.sapUxAPObjectPageSubSectionHeader.titleOnLeftLayout .sapUxAPObjectPageSubSectionHeaderTitle {
-		height: auto;
-		white-space: normal;
-		word-wrap: break-word;
-		line-height: normal;
 	}
 
 	.sapUxAPObjectPageSubSectionHeader.titleOnLeftLayout .sapUxAPObjectPageSubSectionHeaderActions {
@@ -201,10 +176,6 @@ Doing so will result in less generated CSS, as well as less future maintanance i
 
 /* compact size */
 .sapUiSizeCompact {
-	.sapUxAPObjectPageSubSectionHeaderTitle {
-		height: 2rem;
-		line-height: 2rem;
-	}
 	.sapUxAPObjectPageLayout-Std-Phone .sapUxAPBlockContainer .sapUiFormResGrid > div,
 	.sapUxAPObjectPageLayout-Std-Phone .sapUxAPBlockContainer .sapUiFormCLContainer {
 		padding: 1rem 0;
@@ -237,3 +208,8 @@ html[data-sap-ui-browser^="ie"].sap-desktop {
 	}
 }
 
+// Styles needed for wrapTitle property
+.sapUxAPObjectPageSubSection .sapUxAPObjectPageSubSectionHeader .sapUxAPObjectPageSubSectionTitle  {
+	height: auto;
+	line-height: normal;
+}
