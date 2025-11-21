@@ -422,6 +422,27 @@ sap.ui.define([
 		this.oSearchField.$("F").trigger("click"); // click the form
 	});
 
+	QUnit.module("OverflowToolbar Integration");
+
+	QUnit.test("getOverflowToolbarConfig", function(assert) {
+		// Arrange
+		const oSearchField = new SearchField();
+
+		// Act
+		const oConfig = oSearchField.getOverflowToolbarConfig();
+
+		// Assert
+		assert.ok(oConfig, "Config object should be returned");
+		assert.strictEqual(oConfig.canOverflow, true, "SearchField should be able to overflow");
+		assert.ok(Array.isArray(oConfig.autoCloseEvents), "autoCloseEvents should be an array");
+		assert.deepEqual(oConfig.autoCloseEvents, ["search"], "autoCloseEvents should contain 'search' event");
+		assert.ok(Array.isArray(oConfig.propsUnrelatedToSize), "propsUnrelatedToSize should be an array");
+		assert.deepEqual(oConfig.propsUnrelatedToSize, ["enabled", "value", "selectOnFocus"], "propsUnrelatedToSize should contain correct properties");
+
+		// Cleanup
+		oSearchField.destroy();
+	});
+
 	QUnit.module("Events", {
 		beforeEach: function () {
 			this.oSearchField = new SearchField();
