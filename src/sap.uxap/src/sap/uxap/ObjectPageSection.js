@@ -373,6 +373,10 @@ sap.ui.define([
 		return (this.getShowTitle() && this._getInternalTitleVisible()) || this._shouldDisplayButtonsInHeader();
 	};
 
+	ObjectPageSection.prototype._getWrapTitle = function () {
+		return this.getWrapTitle();
+	};
+
 	/**
 	 * Determines if the <code>ObjectPageSection</code> title is forced to be visible.
 	 * This is the case when the <code>ObjectPageSection</code> displays the expand/collapse button or the show/hide all button.
