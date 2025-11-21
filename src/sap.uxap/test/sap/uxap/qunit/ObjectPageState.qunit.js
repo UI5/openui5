@@ -427,6 +427,37 @@ function(
 		await nextUIUpdate();
 	});
 
+	QUnit.test("_adjustTitlePositioning does not update padding-top when ResizeHandler is suspended", async function(assert) {
+		//setup
+		var oPage = this.oObjectPage,
+			oResizeHandlerStub,
+			oSpy,
+			done = assert.async();
+
+		oPage.attachEventOnce("onAfterRenderingDOMReady", function() {
+			oSpy = sinon.spy(oPage, "_adjustTitlePositioning");
+
+			// Create a stub for ResizeHandler.isSuspended to return true
+			oResizeHandlerStub = sinon.stub(sap.ui.core.ResizeHandler, "isSuspended").returns(true);
+
+			// Act: call _adjustTitlePositioning
+			oPage._adjustTitlePositioning();
+
+			// Assert: check that the function returned early and title positioning is not adjusted
+			assert.equal(oSpy.callCount, 1, "_adjustTitlePositioning was called");
+			assert.ok(oResizeHandlerStub.calledOnce, "ResizeHandler.isSuspended was called once");
+			assert.strictEqual(oSpy.returnValue, undefined, "Function returned early - padding-top of scroll container not adjusted");
+
+			// Cleanup
+			oSpy.restore();
+			oResizeHandlerStub.restore();
+			done();
+		});
+
+		oPage.placeAt("qunit-fixture");
+		await nextUIUpdate();
+	});
+
 	QUnit.test("updates the title positioning in first onAfterRendering", async function(assert) {
 		//setup
 		var oPage = this.oObjectPage,
