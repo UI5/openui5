@@ -6,7 +6,6 @@ sap.ui.define([
 	"sap/ui/core/mvc/XMLView",
 	"sap/ui/core/ComponentHooks",
 	"sap/ui/core/ExtensionPoint",
-	"sap/ui/fl/apply/_internal/flexState/communication/FLPAboutInfo",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/initial/_internal/preprocessors/RegistrationDelegator",
 	"sap/ui/thirdparty/sinon-4"
@@ -16,7 +15,6 @@ sap.ui.define([
 	XMLView,
 	ComponentHooks,
 	ExtensionPoint,
-	FLPAboutInfo,
 	ManifestUtils,
 	RegistrationDelegator,
 	sinon
@@ -43,7 +41,6 @@ sap.ui.define([
 			const oRegisterExtensionProviderStub = sandbox.stub(MvcControllerExtensionProvider, "registerExtensionProvider");
 			const oRegisterXMLPreprocessorStub = sandbox.stub(XMLView, "registerPreprocessor");
 			const oRegisterExtensionPointProviderStub = sandbox.stub(ExtensionPoint, "registerExtensionProvider");
-			const oRegisterFLPAboutInfoStub = sandbox.stub(FLPAboutInfo, "initialize");
 			const fnDone = assert.async();
 			sap.ui.require(["sap/ui/fl/library"], function() {
 				assert.equal(oRegisterAllSpy.callCount, 1, "register all was called once");
@@ -53,7 +50,6 @@ sap.ui.define([
 				assert.equal(oRegisterXMLPreprocessorStub.callCount, 1, "XML preprocessor called.");
 				assert.equal(oRegisterExtensionPointProviderStub.callCount, 1, "ExtensionPoint called.");
 				assert.ok(ComponentHooks.onPreprocessManifest.isRegistered());
-				assert.ok(oRegisterFLPAboutInfoStub.callCount, 1, "FLPAboutInfo registration is called.");
 				fnDone();
 			});
 		});

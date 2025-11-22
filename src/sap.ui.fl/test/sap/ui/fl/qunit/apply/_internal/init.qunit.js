@@ -2,11 +2,13 @@
 
 sap.ui.define([
 	"sap/ui/fl/apply/_internal/changeHandlers/ChangeHandlerRegistration",
+	"sap/ui/fl/apply/_internal/flexState/communication/FLPAboutInfo",
 	"sap/ui/fl/apply/_internal/DelegateMediator",
 	"sap/ui/fl/changeHandler/ChangeAnnotation",
 	"sap/ui/thirdparty/sinon-4"
 ], function(
 	ChangeHandlerRegistration,
+	FLPAboutInfo,
 	DelegateMediator,
 	ChangeAnnotation,
 	sinon
@@ -21,6 +23,7 @@ sap.ui.define([
 		}
 	}, function() {
 		QUnit.test("Check if the change handler registration functions were called", function(assert) {
+			const oRegisterFLPAboutInfoStub = sandbox.stub(FLPAboutInfo, "initialize");
 			const oRegisterChangeHandlersForLibraryStub = sandbox.stub(
 				ChangeHandlerRegistration,
 				"getChangeHandlersOfLoadedLibsAndRegisterOnNewLoadedLibs"
@@ -51,6 +54,7 @@ sap.ui.define([
 					oRegisterDelegateStub.getCall(2).args[0].modelType, "sap.ui.model.odata.ODataModel",
 					"then the model type is 'sap.ui.model.odata.ODataModel'"
 				);
+				assert.ok(oRegisterFLPAboutInfoStub.callCount, 1, "FLPAboutInfo registration is called.");
 				fnDone();
 			});
 		});

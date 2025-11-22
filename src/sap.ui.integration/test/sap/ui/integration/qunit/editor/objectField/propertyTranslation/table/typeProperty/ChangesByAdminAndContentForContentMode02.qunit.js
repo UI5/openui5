@@ -281,15 +281,6 @@ sap.ui.define([
 			"zh-TW": "String4 繁體 Content"
 		}
 	};
-	function destroyEditor(oEditor) {
-		oEditor.destroy();
-		var oContent = document.getElementById("content");
-		if (oContent) {
-			oContent.innerHTML = "";
-			document.body.style.zIndex = "unset";
-		}
-	}
-
 	Localization.setLanguage("en");
 	document.body.className = document.body.className + " sapUiSizeCompact ";
 
@@ -301,6 +292,7 @@ sap.ui.define([
 		afterEach: function () {
 			this.oHost.destroy();
 			this.oContextHost.destroy();
+			EditorQunitUtils.afterEachTest(this.oEditor);
 		}
 	}, function () {
 		_aCheckedLanguages.forEach(function(sLanguage) {
@@ -559,7 +551,6 @@ sap.ui.define([
 																		assert.equal(sCurrentValue, sExpectedValue, "oTranslationPopover 3 Content: item " + i + " " + sLanguage + ", current: " + sCurrentValue + ", expected: " + sExpectedValue);
 																	}
 																}
-																destroyEditor(that.oEditor);
 																resolve();
 															});
 														});

@@ -26,12 +26,9 @@ sap.ui.define([
 
 		if (bDesignTimeMode) {
 			await oVariantManagement.waitForInit();
-			oModel.setModelPropertiesForControl(sVariantManagementReference, bDesignTimeMode, oVariantManagement);
-			oModel.checkUpdate(true);
-		} else {
-			oModel.setModelPropertiesForControl(sVariantManagementReference, bDesignTimeMode, oVariantManagement);
-			oModel.checkUpdate(true);
 		}
+		oModel.setModelPropertiesForControl(sVariantManagementReference, bDesignTimeMode, oVariantManagement);
+		oModel.checkUpdate(true);
 	}
 
 	return {

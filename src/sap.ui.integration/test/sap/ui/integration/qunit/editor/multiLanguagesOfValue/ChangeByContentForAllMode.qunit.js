@@ -32,16 +32,6 @@ sap.ui.define([
 	Localization.setLanguage("en");
 	document.body.className = document.body.className + " sapUiSizeCompact ";
 
-	function destroyEditor(oEditor) {
-		oEditor.destroy();
-		var oContent = document.getElementById("content");
-		if (oContent) {
-			oContent.innerHTML = "";
-			document.body.style.zIndex = "unset";
-		}
-
-	}
-
 	var _oManifest = {
 		"sap.app": {
 			"id": "test.sample",
@@ -131,6 +121,7 @@ sap.ui.define([
 		afterEach: function () {
 			this.oHost.destroy();
 			this.oContextHost.destroy();
+			EditorQunitUtils.afterEachTest(this.oEditor);
 		}
 	}, function () {
 		QUnit.test("In en (English)", function (assert) {
@@ -237,7 +228,6 @@ sap.ui.define([
 									}
 									var oCancelButton4 = oTranslationPopover4.getFooter().getContent()[2];
 									oCancelButton4.firePress();
-									destroyEditor(that.oEditor);
 									resolve();
 								});
 								oValueHelpIcon4.firePress();
@@ -357,7 +347,6 @@ sap.ui.define([
 									}
 									var oCancelButton4 = oTranslationPopover4.getFooter().getContent()[2];
 									oCancelButton4.firePress();
-									destroyEditor(that.oEditor);
 									resolve();
 								});
 								oValueHelpIcon4.firePress();
@@ -477,7 +466,6 @@ sap.ui.define([
 									}
 									var oCancelButton4 = oTranslationPopover4.getFooter().getContent()[2];
 									oCancelButton4.firePress();
-									destroyEditor(that.oEditor);
 									resolve();
 								});
 								oValueHelpIcon4.firePress();
@@ -597,7 +585,6 @@ sap.ui.define([
 									}
 									var oCancelButton4 = oTranslationPopover4.getFooter().getContent()[2];
 									oCancelButton4.firePress();
-									destroyEditor(that.oEditor);
 									resolve();
 								});
 								oValueHelpIcon4.firePress();
@@ -717,7 +704,6 @@ sap.ui.define([
 									}
 									var oCancelButton4 = oTranslationPopover4.getFooter().getContent()[2];
 									oCancelButton4.firePress();
-									destroyEditor(that.oEditor);
 									resolve();
 								});
 								oValueHelpIcon4.firePress();
@@ -837,7 +823,6 @@ sap.ui.define([
 									}
 									var oCancelButton4 = oTranslationPopover4.getFooter().getContent()[2];
 									oCancelButton4.firePress();
-									destroyEditor(that.oEditor);
 									resolve();
 								});
 								oValueHelpIcon4.firePress();
@@ -957,7 +942,6 @@ sap.ui.define([
 									}
 									var oCancelButton4 = oTranslationPopover4.getFooter().getContent()[2];
 									oCancelButton4.firePress();
-									destroyEditor(that.oEditor);
 									resolve();
 								});
 								oValueHelpIcon4.firePress();

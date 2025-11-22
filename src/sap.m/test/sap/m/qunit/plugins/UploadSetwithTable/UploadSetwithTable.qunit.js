@@ -3286,4 +3286,111 @@ sap.ui.define([
 		});
 	});
 
+	QUnit.module("FilePreviewDialog VDS Viewer", {
+		beforeEach: function () {
+			this.oFilePreviewDialog = new FilePreviewDialog();
+
+			// Mock VDS item
+			this.oVdsItem = new UploadItem({
+				fileName: "test-model.vds",
+				mediaType: "model/vnd.sap.vds",
+				url: "test-resources/sap/m/qunit/upload/data/test-model.vds",
+				previewable: true
+			});
+
+			// Stub the VK dependency loading to avoid actual library loading in tests
+			this.oVkLoadStub = sinon.stub(this.oFilePreviewDialog, '_loadVkDependency');
+
+			// Create mock VK classes
+			this.MockViewer = function (mSettings) {
+				this.mSettings = mSettings;
+				this.getWidth = function () {
+					return this.mSettings.width;
+				};
+			};
+
+			this.MockContentResource = function (mSettings) {
+				this.mSettings = mSettings;
+			};
+
+			// Resolve the stub with mock classes
+			this.oVkLoadStub.resolves({
+				viewer: this.MockViewer,
+				contentResource: this.MockContentResource
+			});
+		},
+		afterEach: function () {
+			this.oFilePreviewDialog.destroy();
+			this.oVdsItem.destroy();
+			if (this.oVkLoadStub) {
+				this.oVkLoadStub.restore();
+			}
+		}
+	});
+
+	QUnit.test("VDS Viewer should have width set to 100% for proper content loading", async function (assert) {
+		// Arrange
+		const done = assert.async();
+
+		// Act - Create VDS viewer
+		const oVdsViewer = await this.oFilePreviewDialog._createVdsViewer(this.oVdsItem);
+
+		// Assert
+		assert.ok(oVdsViewer, "VDS viewer should be created successfully");
+		assert.equal(oVdsViewer.getWidth(), "100%", "VDS viewer width should be set to 100%");
+
+		// Verify that the viewer was created with correct settings
+		assert.ok(oVdsViewer.mSettings, "VDS viewer should have settings");
+		assert.equal(oVdsViewer.mSettings.width, "100%", "VDS viewer settings should include width: 100%");
+
+		// Verify content resources are set up correctly
+		assert.ok(oVdsViewer.mSettings.contentResources, "VDS viewer should have content resources");
+		assert.equal(oVdsViewer.mSettings.contentResources.length, 1, "VDS viewer should have one content resource");
+
+		const oContentResource = oVdsViewer.mSettings.contentResources[0];
+		assert.equal(oContentResource.mSettings.source, this.oVdsItem.getUrl(), "Content resource source should match item URL");
+		assert.equal(oContentResource.mSettings.sourceType, "vds", "Content resource sourceType should be 'vds'");
+
+		done();
+	});
+
+	QUnit.test("VDS Viewer creation should handle dependency loading failure gracefully", async function (assert) {
+		// Arrange
+		const done = assert.async();
+
+		// Override the stub to simulate loading failure
+		this.oVkLoadStub.restore();
+		this.oVkLoadStub = sinon.stub(this.oFilePreviewDialog, '_loadVkDependency');
+		this.oVkLoadStub.rejects(new Error("VK library not available"));
+
+		// Spy on Log.error to verify error handling
+		const oLogErrorSpy = sinon.spy(Log, "error");
+
+		// Act
+		const oVdsViewer = await this.oFilePreviewDialog._createVdsViewer(this.oVdsItem);
+
+		// Assert
+		assert.equal(oVdsViewer, null, "VDS viewer should be null when dependency loading fails");
+		assert.ok(oLogErrorSpy.called, "Error should be logged when dependency loading fails");
+
+		// Cleanup
+		oLogErrorSpy.restore();
+		done();
+	});
+
+	QUnit.test("VDS Viewer should be included in page content for VDS media type", async function (assert) {
+		// Arrange
+		const done = assert.async();
+
+		// Act - Get page content for VDS item
+		const oPageContent = await this.oFilePreviewDialog.getPageContent(this.oVdsItem);
+
+		// Assert
+		assert.ok(oPageContent, "Page content should be created for VDS item");
+		assert.ok(oPageContent instanceof this.MockViewer, "Page content should be a VDS viewer instance");
+		assert.equal(oPageContent.getWidth(), "100%", "VDS viewer in page content should have width 100%");
+
+		done();
+	});
+
 });

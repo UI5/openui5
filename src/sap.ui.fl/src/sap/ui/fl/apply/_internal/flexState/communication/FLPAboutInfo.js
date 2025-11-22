@@ -4,14 +4,14 @@
 
 sap.ui.define([
 	"sap/ui/core/Lib",
-	"sap/ui/fl/apply/_internal/flexState/FlexState",
-	"sap/ui/fl/apply/api/FlexRuntimeInfoAPI",
+	"sap/ui/fl/initial/_internal/FlexInfoSession",
+	"sap/ui/fl/initial/_internal/Loader",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/Utils"
 ], function(
 	Lib,
-	FlexState,
-	FlexRuntimeInfoAPI,
+	FlexInfoSession,
+	Loader,
 	ManifestUtils,
 	FlexUtils
 ) {
@@ -55,8 +55,9 @@ sap.ui.define([
 				componentData: oCurrentApplicationComponent.getComponentData(),
 				asyncHints: oCurrentApplicationComponent._componentConfig.asyncHints
 			};
-			await FlexState.initialize(mPropertyBag);
-			const sAdaptationId = FlexRuntimeInfoAPI.getContextBasedAdaptationId(mPropertyBag);
+			// this function ensures that the necessary information is loaded from the backend and stored in the FlexInfoSession
+			await Loader.getFlexData(mPropertyBag);
+			const sAdaptationId = FlexInfoSession.getByReference(sReference)?.adaptationId;
 			/**
 			 * In case the adaptationId is "DEFAULT" or undefined, which is the case, if
 			 * 	1. no context based adaptation has been created yet or
@@ -66,7 +67,7 @@ sap.ui.define([
 			if (sAdaptationId === "DEFAULT" || !sAdaptationId) {
 				return;
 			}
-			const sAdaptationTitle = FlexRuntimeInfoAPI.getContextBasedAdaptationTitle(mPropertyBag);
+			const sAdaptationTitle = FlexInfoSession.getByReference(sReference)?.adaptationTitle;
 			const sLabel = Lib.getResourceBundleFor("sap.ui.fl").getText("CBA_ABOUT_INFO_DIALOG_LABEL");
 			const sValue = `${sAdaptationTitle} (${sAdaptationId})`;
 			setAppInfoCustomProperties(oAppLifeCycleService, sLabel, sValue, "ui5.flex.adaptation");
@@ -85,7 +86,7 @@ sap.ui.define([
 	function waitForUshellLibraryIsReady() {
 		return new Promise((resolve) => {
 			/**
-			 * We need to dynamically require the BootstrapObserver, because we do not want to accidentially load the whole
+			 * We need to dynamically require the BootstrapObserver, because we do not want to accidentally load the whole
 			 * sap.ushell library. Further, we need hard require the module because we are the only once who are using
 			 * it and no one is loading it before.
 			 */

@@ -95,7 +95,6 @@ sap.ui.define([
 					delete oBindingInfo.parameters.$$clearSelectionOnFilter;
 					this.byId("table").bindRows(oBindingInfo);
 				}
-				oTreeTable._oProxy._bEnableV4 = true; // enable V4 tree table flag
 				const sVisibleRowCount = oUriParameters.get("visibleRowCount");
 				if (sVisibleRowCount) {
 					oTreeTable.getRowMode().setRowCount(parseInt(sVisibleRowCount));

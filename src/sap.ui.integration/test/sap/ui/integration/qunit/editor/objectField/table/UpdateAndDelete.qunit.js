@@ -109,23 +109,17 @@ sap.ui.define([
 	document.body.className = document.body.className + " sapUiSizeCompact ";
 
 	QUnit.module("add", {
+		before: function () {
+			EditorQunitUtils.createMockServer(oResponseData);
+		},
+		after: function () {
+			EditorQunitUtils.destroyMockServer();
+		},
 		beforeEach: function () {
-			this.oMockServer = new MockServer();
-			this.oMockServer.setRequests([
-				{
-					method: "GET",
-					path: RegExp("/mock_request/Customers.*"),
-					response: function (xhr) {
-						xhr.respondJSON(200, null, {"value": oResponseData["Customers"]});
-					}
-				}
-			]);
-			this.oMockServer.start();
-
 			this.oEditor = EditorQunitUtils.beforeEachTest();
 		},
 		afterEach: function () {
-			EditorQunitUtils.afterEachTest(this.oEditor, sandbox, this.oMockServer);
+			EditorQunitUtils.afterEachTest(this.oEditor, sandbox);
 		}
 	}, function () {
 		QUnit.test("add with default property values in popover", function (assert) {
@@ -1169,23 +1163,17 @@ sap.ui.define([
 	});
 
 	QUnit.module("update", {
+		before: function () {
+			EditorQunitUtils.createMockServer(oResponseData);
+		},
+		after: function () {
+			EditorQunitUtils.destroyMockServer();
+		},
 		beforeEach: function () {
-			this.oMockServer = new MockServer();
-			this.oMockServer.setRequests([
-				{
-					method: "GET",
-					path: RegExp("/mock_request/Customers.*"),
-					response: function (xhr) {
-						xhr.respondJSON(200, null, {"value": oResponseData["Customers"]});
-					}
-				}
-			]);
-			this.oMockServer.start();
-
 			this.oEditor = EditorQunitUtils.beforeEachTest();
 		},
 		afterEach: function () {
-			EditorQunitUtils.afterEachTest(this.oEditor, sandbox, this.oMockServer);
+			EditorQunitUtils.afterEachTest(this.oEditor, sandbox);
 		}
 	}, function () {
 		QUnit.test("update with property fields in popover", function (assert) {
@@ -1812,23 +1800,17 @@ sap.ui.define([
 	});
 
 	QUnit.module("delete", {
+		before: function () {
+			EditorQunitUtils.createMockServer(oResponseData);
+		},
+		after: function () {
+			EditorQunitUtils.destroyMockServer();
+		},
 		beforeEach: function () {
-			this.oMockServer = new MockServer();
-			this.oMockServer.setRequests([
-				{
-					method: "GET",
-					path: RegExp("/mock_request/Customers.*"),
-					response: function (xhr) {
-						xhr.respondJSON(200, null, {"value": oResponseData["Customers"]});
-					}
-				}
-			]);
-			this.oMockServer.start();
-
 			this.oEditor = EditorQunitUtils.beforeEachTest();
 		},
 		afterEach: function () {
-			EditorQunitUtils.afterEachTest(this.oEditor, sandbox, this.oMockServer);
+			EditorQunitUtils.afterEachTest(this.oEditor, sandbox);
 		}
 	}, function () {
 		QUnit.test("delete selected object", function (assert) {

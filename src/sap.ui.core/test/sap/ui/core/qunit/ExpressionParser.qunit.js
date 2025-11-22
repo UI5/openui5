@@ -11,14 +11,12 @@ sap.ui.define([
 	"sap/ui/core/InvisibleText",
 	"sap/ui/model/json/JSONModel",
 	"sap/ui/performance/Measurement",
-	"sap/ui/thirdparty/URI",
 	// following imports are only used while dynamically evaluating expressions
 	"sap/ui/model/odata/ODataUtils",
 	"sap/ui/model/odata/type/String",
-	"sap/ui/model/type/Integer",
-	"sap/ui/thirdparty/URITemplate"
+	"sap/ui/model/type/Integer"
 ], function (Log, JSTokenizer, BindingInfo, BindingParser, ExpressionParser, Icon, InvisibleText,
-		JSONModel, Measurement, URI) {
+		JSONModel, Measurement) {
 	/*global QUnit, sinon */
 	/*eslint no-warning-comments: 0 */
 	"use strict";

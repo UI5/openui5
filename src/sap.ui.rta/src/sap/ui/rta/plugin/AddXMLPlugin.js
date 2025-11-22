@@ -57,7 +57,8 @@ sap.ui.define([
 	const FLEX_CHANGE_TYPE = "addXML";
 
 	/**
-	 * Check if the given overlay is editable.
+	 * Check if the given overlay should be editable. This action is available by default,
+	 * disabling it requires explicitly setting it to null in the designtime metadata.
 	 *
 	 * @param {sap.ui.dt.ElementOverlay} oOverlay - Overlay to be checked for editable
 	 * @returns {Promise<boolean>} <code>true</code> when editable wrapped in a promise
@@ -66,9 +67,7 @@ sap.ui.define([
 	AddXML.prototype._isEditable = async function(oOverlay) {
 		// Action should be available by default
 		const oAddXMLAction = this.getAction(oOverlay);
-		if (
-			oAddXMLAction === null
-		) {
+		if (oAddXMLAction === null) {
 			return Promise.resolve(false);
 		}
 		const bHasChangeHandler = await this.hasChangeHandler(FLEX_CHANGE_TYPE, oOverlay.getElement());
@@ -182,6 +181,9 @@ sap.ui.define([
 	 */
 	AddXML.prototype.getAction = function(oOverlay) {
 		const oAction = Plugin.prototype.getAction.apply(this, [oOverlay]);
+		if (oAction === null) {
+			return null;
+		}
 		return oAction || { changeType: FLEX_CHANGE_TYPE };
 	};
 

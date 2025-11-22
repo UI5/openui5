@@ -52,7 +52,7 @@ sap.ui.define([
 	}
 
 	function getTableAsString(oTable, bCheckName, bCheckAge) {
-		const bTreeTable = oTable.expand; // duck-typed check
+		const bTreeTable = oTable.getId().includes("treeTable");
 		let sResult = "";
 
 		for (const oRow of oTable.getRows()) {
@@ -190,15 +190,15 @@ sap.ui.define([
 				toggleExpand : function (sId, sComment) {
 					this.waitFor({
 						actions : (oTable) => {
-							if (oTable.expand) { // TreeTable
-								const iRow = oTable.getRows().find(function (oControl) {
+							if (oTable.getId().includes("treeTable")) {
+								const oRow = oTable.getRows().find(function (oControl) {
 									return oControl.getBindingContext().getProperty("ID") === sId;
-								}).getBindingContext().getIndex();
+								}).getBindingContext();
 
-								if (oTable.isExpanded(iRow)) {
-									oTable.collapse(iRow);
+								if (oRow.isExpanded()) {
+									oRow.collapse();
 								} else {
-									oTable.expand(iRow);
+									oRow.expand();
 								}
 							} else { // Table
 								pressButtonInRow.call(this, sId, /expandToggle/, "Expand",

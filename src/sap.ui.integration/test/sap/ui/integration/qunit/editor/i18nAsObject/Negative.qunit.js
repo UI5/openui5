@@ -36,15 +36,6 @@ sap.ui.define([
 	Localization.setLanguage("en");
 	document.body.className = document.body.className + " sapUiSizeCompact ";
 
-	function destroyEditor(oEditor) {
-		oEditor.destroy();
-		var oContent = document.getElementById("content");
-		if (oContent) {
-			oContent.innerHTML = "";
-			document.body.style.zIndex = "unset";
-		}
-	}
-
 	QUnit.module("Basic", {
 		beforeEach: function () {
 			this.oHost = new Host("host");
@@ -53,6 +44,7 @@ sap.ui.define([
 		afterEach: function () {
 			this.oHost.destroy();
 			this.oContextHost.destroy();
+			EditorQunitUtils.afterEachTest(this.oEditor);
 		}
 	}, function () {
 		QUnit.test("Check translation for value, label, description in admin mode 1", function (assert) {
@@ -141,8 +133,7 @@ sap.ui.define([
 						oIcon3.onmouseover();
 						var oPopover3 = oIcon3.getDependents()[0];
 						assert.equal(oPopover3.getContent()[0].getText(), "Desc 3 English", "Label3: Desc 3 English");
-					}).then(function () {
-						destroyEditor(this.oEditor);
+						EditorQunitUtils.afterEachTest(this.oEditor);
 						resolve();
 					}.bind(this));
 				}.bind(this));
@@ -198,10 +189,8 @@ sap.ui.define([
 							oIcon3.onmouseover();
 							var oPopover3 = oIcon3.getDependents()[0];
 							assert.equal(oPopover3.getContent()[0].getText(), "Desc 3 English", "Label3: Desc 3 English");
-						}).then(function () {
-							destroyEditor(this.oEditor);
 							resolve();
-						}.bind(this));
+						});
 					}.bind(this));
 				}.bind(this));
 			}.bind(this));
@@ -292,8 +281,7 @@ sap.ui.define([
 						oIcon3.onmouseover();
 						var oPopover3 = oIcon3.getDependents()[0];
 						assert.equal(oPopover3.getContent()[0].getText(), "Desc 3 English", "Label3: Desc 3 English");
-					}).then(function () {
-						destroyEditor(this.oEditor);
+						EditorQunitUtils.afterEachTest(this.oEditor);
 						resolve();
 					}.bind(this));
 				}.bind(this));
@@ -349,10 +337,8 @@ sap.ui.define([
 							oIcon3.onmouseover();
 							var oPopover3 = oIcon3.getDependents()[0];
 							assert.equal(oPopover3.getContent()[0].getText(), "Desc 3 French", "Label3: Desc 3 French");
-						}).then(function () {
-							destroyEditor(this.oEditor);
 							resolve();
-						}.bind(this));
+						});
 					}.bind(this));
 				}.bind(this));
 			}.bind(this));
@@ -443,8 +429,7 @@ sap.ui.define([
 						oIcon3.onmouseover();
 						var oPopover3 = oIcon3.getDependents()[0];
 						assert.equal(oPopover3.getContent()[0].getText(), "Desc 3 English", "Label3: Desc 3 English");
-					}).then(function () {
-						destroyEditor(this.oEditor);
+						EditorQunitUtils.afterEachTest(this.oEditor);
 						resolve();
 					}.bind(this));
 				}.bind(this));
@@ -500,10 +485,8 @@ sap.ui.define([
 							oIcon3.onmouseover();
 							var oPopover3 = oIcon3.getDependents()[0];
 							assert.equal(oPopover3.getContent()[0].getText(), "Desc 3 English", "Label3: Desc 3 English");
-						}).then(function () {
-							destroyEditor(this.oEditor);
 							resolve();
-						}.bind(this));
+						});
 					}.bind(this));
 				}.bind(this));
 			}.bind(this));
@@ -593,8 +576,7 @@ sap.ui.define([
 						oIcon3.onmouseover();
 						var oPopover3 = oIcon3.getDependents()[0];
 						assert.equal(oPopover3.getContent()[0].getText(), "Desc 3 English", "Label3: Desc 3 English");
-					}).then(function () {
-						destroyEditor(this.oEditor);
+						EditorQunitUtils.afterEachTest(this.oEditor);
 						resolve();
 					}.bind(this));
 				}.bind(this));
@@ -650,10 +632,8 @@ sap.ui.define([
 							oIcon3.onmouseover();
 							var oPopover3 = oIcon3.getDependents()[0];
 							assert.equal(oPopover3.getContent()[0].getText(), "Desc 3 French", "Label3: Desc 3 French");
-						}).then(function () {
-							destroyEditor(this.oEditor);
 							resolve();
-						}.bind(this));
+						});
 					}.bind(this));
 				}.bind(this));
 			}.bind(this));
@@ -750,10 +730,8 @@ sap.ui.define([
 						assert.equal(oField4Ori.getAggregation("_field").getText(), "String 4 English", "Field4Ori: String 4 English");
 						assert.ok(oField4Trans.getAggregation("_field").getEditable() === true, "Field4Trans: Editable");
 						assert.equal(oField4Trans.getAggregation("_field").getValue(), "String 4 English", "Field4Trans: String 4 English");
-					}).then(function () {
-						destroyEditor(this.oEditor);
 						resolve();
-					}.bind(this));
+					});
 				}.bind(this));
 			}.bind(this));
 		});
@@ -849,10 +827,8 @@ sap.ui.define([
 						assert.equal(oField4Ori.getAggregation("_field").getText(), "String 4 English", "Field4Ori: String 4 English");
 						assert.ok(oField4Trans.getAggregation("_field").getEditable() === true, "Field4Trans: Editable");
 						assert.equal(oField4Trans.getAggregation("_field").getValue(), "String 4 French", "Field4Trans: String 4 French");
-					}).then(function () {
-						destroyEditor(this.oEditor);
 						resolve();
-					}.bind(this));
+					});
 				}.bind(this));
 			}.bind(this));
 		});
@@ -947,10 +923,8 @@ sap.ui.define([
 						assert.equal(oField4Ori.getAggregation("_field").getText(), "String 4 English", "Field4Ori: String 4 English");
 						assert.ok(oField4Trans.getAggregation("_field").getEditable() === true, "Field4Trans: Editable");
 						assert.equal(oField4Trans.getAggregation("_field").getValue(), "String 4 English", "Field4Trans: String 4 English");
-					}).then(function () {
-						destroyEditor(this.oEditor);
 						resolve();
-					}.bind(this));
+					});
 				}.bind(this));
 			}.bind(this));
 		});
@@ -1046,10 +1020,8 @@ sap.ui.define([
 						assert.equal(oField4Ori.getAggregation("_field").getText(), "String 4 English", "Field4Ori: String 4 English");
 						assert.ok(oField4Trans.getAggregation("_field").getEditable() === true, "Field4Trans: Editable");
 						assert.equal(oField4Trans.getAggregation("_field").getValue(), "String 4 English", "Field4Trans: String 4 English");
-					}).then(function () {
-						destroyEditor(this.oEditor);
 						resolve();
-					}.bind(this));
+					});
 				}.bind(this));
 			}.bind(this));
 		});
@@ -1145,10 +1117,8 @@ sap.ui.define([
 						assert.equal(oField4Ori.getAggregation("_field").getText(), "String 4 English", "Field4Ori: String 4 English");
 						assert.ok(oField4Trans.getAggregation("_field").getEditable() === true, "Field4Trans: Editable");
 						assert.equal(oField4Trans.getAggregation("_field").getValue(), "String 4 French", "Field4Trans: String 4 French");
-					}).then(function () {
-						destroyEditor(this.oEditor);
 						resolve();
-					}.bind(this));
+					});
 				}.bind(this));
 			}.bind(this));
 		});
@@ -1243,10 +1213,8 @@ sap.ui.define([
 						assert.equal(oField4Ori.getAggregation("_field").getText(), "String 4 English", "Field4Ori: String 4 English");
 						assert.ok(oField4Trans.getAggregation("_field").getEditable() === true, "Field4Trans: Editable");
 						assert.equal(oField4Trans.getAggregation("_field").getValue(), "String 4 English", "Field4Trans: String 4 English");
-					}).then(function () {
-						destroyEditor(this.oEditor);
 						resolve();
-					}.bind(this));
+					});
 				}.bind(this));
 			}.bind(this));
 		});

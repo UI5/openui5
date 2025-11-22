@@ -385,7 +385,7 @@ sap.ui.define([
 		this._aSelectEventHandlers = [];
 		this._oVariantAppliedListeners = {};
 
-		this._oVM.attachManage(this._fireManage, this);
+		this._oVM.attachManage(this._onManage, this);
 		this._oVM.attachCancel(this._fireCancel, this);
 		this._oVM.attachSave(this._fireSave, this);
 		this._oVM.attachSelect(this._fireSelect, this);
@@ -541,44 +541,48 @@ sap.ui.define([
 		}
 	};
 
-	VariantManagement.prototype.attachEventOnce = function(...aArgs) {
-		const [sEvent, mPros, fnCallback, oObj] = aArgs;
+	VariantManagement.prototype.attachEventOnce = function(sEvent, oData, fnFunction, oListener) {
+		if (typeof oData === "function") {
+			oListener = fnFunction;
+			fnFunction = oData;
+			oData = undefined;
+		}
 		var nIdx;
 		if (sEvent === "manage") {
-			nIdx = this._findCallback(this._aManageEventHandlers, fnCallback, oObj);
+			nIdx = this._findCallback(this._aManageEventHandlers, fnFunction, oListener);
 			if ((nIdx > -1) && this._aManageEventHandlers[nIdx].bOnce) {
 				this._aManageEventHandlers.splice(nIdx, 1);
 			}
 
-			this.attachManage(mPros, fnCallback, oObj);
-			nIdx = this._findCallback(this._aManageEventHandlers, fnCallback, oObj);
+			this.attachManage(oData, fnFunction, oListener);
+			nIdx = this._findCallback(this._aManageEventHandlers, fnFunction, oListener);
 			if (nIdx > -1) {
 				this._aManageEventHandlers[nIdx].bOnce = true;
 			}
 		} else if (sEvent === "save") {
-			nIdx = this._findCallback(this._aSaveEventHandlers, fnCallback, oObj);
+			nIdx = this._findCallback(this._aSaveEventHandlers, fnFunction, oListener);
 			if ((nIdx > -1) && this._aSaveEventHandlers[nIdx].bOnce) {
 				this._aSaveEventHandlers.splice(nIdx, 1);
 			}
 
-			this.attachSave(mPros, fnCallback, oObj);
-			nIdx = this._findCallback(this._aSaveEventHandlers, fnCallback, oObj);
+			this.attachSave(oData, fnFunction, oListener);
+			nIdx = this._findCallback(this._aSaveEventHandlers, fnFunction, oListener);
 			if (nIdx > -1) {
 				this._aSaveEventHandlers[nIdx].bOnce = true;
 			}
 		} else if (sEvent === "select") {
-			nIdx = this._findCallback(this._aSelectEventHandlers, fnCallback, oObj);
+			nIdx = this._findCallback(this._aSelectEventHandlers, fnFunction, oListener);
 			if ((nIdx > -1) && this._aSelectEventHandlers[nIdx].bOnce) {
 				this._aSelectEventHandlers.splice(nIdx, 1);
 			}
 
-			this.attachSelect(mPros, fnCallback, oObj);
-			nIdx = this._findCallback(this._aSelectEventHandlers, fnCallback, oObj);
+			this.attachSelect(oData, fnFunction, oListener);
+			nIdx = this._findCallback(this._aSelectEventHandlers, fnFunction, oListener);
 			if (nIdx > -1) {
 				this._aSelectEventHandlers[nIdx].bOnce = true;
 			}
 		} else {
-			Control.prototype.attachEventOnce.apply(this, aArgs);
+			Control.prototype.attachEventOnce.apply(this, [sEvent, oData, fnFunction, oListener]);
 		}
 	};
 
@@ -608,7 +612,14 @@ sap.ui.define([
 		}
 	};
 
-	VariantManagement.prototype._fireManage = function(oEvent) {
+	VariantManagement.prototype._onManage = function(oEvent) {
+		if (!this._oVM.getDesignMode()) {
+			sap.ui.require(["sap/ui/fl/variants/VariantManager"], (VariantManager) => {
+				VariantManager.handleManageEvent(oEvent, this);
+				this._handleAllListeners(oEvent, this._aManageEventHandlers);
+			});
+			return;
+		}
 		this._handleAllListeners(oEvent, this._aManageEventHandlers);
 	};
 
@@ -1040,7 +1051,7 @@ sap.ui.define([
 
 	// exit destroy all controls created in init
 	VariantManagement.prototype.exit = function(...aArgs) {
-		this._oVM.detachManage(this._fireManage, this);
+		this._oVM.detachManage(this._onManage, this);
 		this._oVM.detachCancel(this._fireCancel, this);
 		this._oVM.detachSelect(this._fireSelect, this);
 		this._oVM.detachSave(this._fireSave, this);

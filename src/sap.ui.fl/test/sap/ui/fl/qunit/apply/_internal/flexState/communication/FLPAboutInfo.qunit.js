@@ -2,18 +2,18 @@
 
 sap.ui.define([
 	"sap/ui/core/Lib",
-	"sap/ui/fl/apply/api/FlexRuntimeInfoAPI",
 	"sap/ui/fl/apply/_internal/flexState/communication/FLPAboutInfo",
 	"sap/ui/fl/apply/_internal/flexState/FlexState",
+	"sap/ui/fl/initial/_internal/FlexInfoSession",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/Utils",
 	"sap/ui/thirdparty/sinon-4",
 	"test-resources/sap/ui/fl/qunit/FlQUnitUtils"
 ], function(
 	Lib,
-	FlexRuntimeInfoAPI,
 	FLPAboutInfo,
 	FlexState,
+	FlexInfoSession,
 	ManifestUtils,
 	FlexUtils,
 	sinon,
@@ -22,6 +22,7 @@ sap.ui.define([
 	"use strict";
 
 	const sandbox = sinon.createSandbox();
+	const sReference = "sample.reference";
 	const sAdaptationId = "id_1231231_123";
 	const sDefaultAdaptationId = "DEFAULT";
 	const sAdaptationTitle = "Adaptation Title";
@@ -74,8 +75,13 @@ sap.ui.define([
 	 * @param {boolean} oTestSetup.isUI5Application - Indicates if it is a UI5 application.
 	 */
 	function setIsContextBasedAdaptationEnabledSettingsStub(oTestSetup) {
-		sandbox.stub(FlexRuntimeInfoAPI, "getContextBasedAdaptationId").returns(oTestSetup.adaptationId);
-		sandbox.stub(FlexRuntimeInfoAPI, "getContextBasedAdaptationTitle").returns(sAdaptationTitle);
+		FlexInfoSession.setByReference(
+			{
+				adaptationId: oTestSetup.adaptationId,
+				adaptationTitle: sAdaptationTitle
+			},
+			sReference
+		);
 	}
 
 	/**
@@ -173,9 +179,10 @@ sap.ui.define([
 			]);
 			sandbox.stub(Lib, "isLoaded").returns(true);
 			sandbox.stub(FlexState, "initialize").resolves();
-			sandbox.stub(ManifestUtils, "getFlexReference").returns("sample.reference");
+			sandbox.stub(ManifestUtils, "getFlexReference").returns(sReference);
 		},
 		afterEach() {
+			FlexInfoSession.removeByReference(sReference);
 			sandbox.restore();
 		}
 	}, function() {

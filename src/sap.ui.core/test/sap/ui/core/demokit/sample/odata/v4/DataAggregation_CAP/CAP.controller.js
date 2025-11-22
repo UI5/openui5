@@ -98,7 +98,6 @@ sap.ui.define([
 					this._oAggregation.group.BookingID = {additionally : ["ID"]};
 					this._oAggregation.groupLevels.push("BookingID");
 				}
-				oTable._oProxy._bEnableV4 = true; // enable V4 tree table flag
 				this.getView().setModel(oRowsBinding.getModel(), "header");
 				this.getView().setBindingContext(oRowsBinding.getHeaderContext(), "header");
 				if (sThreshold) {

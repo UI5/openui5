@@ -35,16 +35,6 @@ sap.ui.define([
 	Localization.setLanguage("en");
 	document.body.className = document.body.className + " sapUiSizeCompact ";
 
-	function destroyEditor(oEditor) {
-		oEditor.destroy();
-		var oContent = document.getElementById("content");
-		if (oContent) {
-			oContent.innerHTML = "";
-			document.body.style.zIndex = "unset";
-		}
-
-	}
-
 	var _oManifest = {
 		"sap.app": {
 			"id": "test.sample",
@@ -156,19 +146,16 @@ sap.ui.define([
 
 	QUnit.module("Check the admin/content/all mode", {
 		beforeEach: function () {
-			this.oHost = new Host("host");
-			this.oContextHost = new ContextHost("contexthost");
+			this.oEditor = EditorQunitUtils.beforeEachTest();
 		},
 		afterEach: function () {
-			this.oHost.destroy();
-			this.oContextHost.destroy();
+			EditorQunitUtils.afterEachTest(this.oEditor);
 		}
 	}, function () {
 		QUnit.test("Admin mode", function (assert) {
 			var that = this;
 			//Fallback language
 			return new Promise(function (resolve, reject) {
-				that.oEditor = EditorQunitUtils.createEditor("en");
 				that.oEditor.setMode("admin");
 				that.oEditor.setAllowSettings(true);
 				that.oEditor.setAllowDynamicValues(true);
@@ -288,9 +275,6 @@ sap.ui.define([
 									}
 									var oCancelButton4 = oTranslationPopover4.getFooter().getContent()[2];
 									oCancelButton4.firePress();
-
-								}).then(function () {
-									destroyEditor(that.oEditor);
 									resolve();
 								});
 							});
@@ -304,7 +288,6 @@ sap.ui.define([
 			var that = this;
 			//Fallback language
 			return new Promise(function (resolve, reject) {
-				that.oEditor = EditorQunitUtils.createEditor("en");
 				that.oEditor.setMode("content");
 				that.oEditor.setAllowSettings(true);
 				that.oEditor.setAllowDynamicValues(true);
@@ -424,9 +407,6 @@ sap.ui.define([
 									}
 									var oCancelButton4 = oTranslationPopover4.getFooter().getContent()[2];
 									oCancelButton4.firePress();
-
-								}).then(function () {
-									destroyEditor(that.oEditor);
 									resolve();
 								});
 							});
@@ -439,7 +419,6 @@ sap.ui.define([
 		QUnit.test("All mode", function (assert) {
 			var that = this;
 			return new Promise(function (resolve, reject) {
-				that.oEditor = EditorQunitUtils.createEditor("en");
 				that.oEditor.setMode("all");
 				that.oEditor.setAllowSettings(true);
 				that.oEditor.setAllowDynamicValues(true);
@@ -559,9 +538,6 @@ sap.ui.define([
 									}
 									var oCancelButton4 = oTranslationPopover4.getFooter().getContent()[2];
 									oCancelButton4.firePress();
-
-								}).then(function () {
-									destroyEditor(that.oEditor);
 									resolve();
 								});
 							});
@@ -580,6 +556,7 @@ sap.ui.define([
 		afterEach: function () {
 			this.oHost.destroy();
 			this.oContextHost.destroy();
+			EditorQunitUtils.afterEachTest(this.oEditor);
 		}
 	}, function () {
 		_aCoreLanguages.forEach(function(oCoreLanguage) {
@@ -632,8 +609,6 @@ sap.ui.define([
 								assert.equal(oField4Trans.getAggregation("_field").getValue(), sString4TransValue, "Field4Trans: " + sString4TransValue);
 								assert.ok(oField4Trans.getAggregation("_field").isA("sap.m.Input"), "Field4Trans: Input control");
 								assert.equal(oField4Trans.getAggregation("_field").getAggregation("_endIcon"), null, "Field4Trans: No Input value help icon");
-							}).then(function () {
-								destroyEditor(that.oEditor);
 								resolve();
 							});
 						});

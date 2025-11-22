@@ -91,15 +91,6 @@ sap.ui.define([
 		}
 	};
 
-	function destroyEditor(oEditor) {
-		oEditor.destroy();
-		var oContent = document.getElementById("content");
-		if (oContent) {
-			oContent.innerHTML = "";
-			document.body.style.zIndex = "unset";
-		}
-	}
-
 	Localization.setLanguage("en");
 	document.body.className = document.body.className + " sapUiSizeCompact ";
 
@@ -111,6 +102,7 @@ sap.ui.define([
 		afterEach: function () {
 			this.oHost.destroy();
 			this.oContextHost.destroy();
+			EditorQunitUtils.afterEachTest(this.oEditor);
 		}
 	}, function () {
 		QUnit.test("update translation values and delete", function (assert) {
@@ -272,7 +264,6 @@ sap.ui.define([
 															sTranslationTextOfEN = oField.getTranslationValueInTexts("en", sUUID, "text");
 															assert.ok(!sTranslationTextOfEN, "Texts: no value");
 															assert.ok(deepEqual(oField._getCurrentProperty("value"), [oSelectedValue3]), "Field 1: added object deleted");
-															destroyEditor(that.oEditor);
 															resolve();
 														});
 													});
@@ -415,7 +406,6 @@ sap.ui.define([
 												assert.ok(deepEqual(oField._getCurrentProperty("value"), [oValue03]), "Field 1: Value");
 												sTranslationTextOfEN = oField.getTranslationValueInTexts("en", sUUID, "text");
 												assert.ok(!sTranslationTextOfEN, "Texts: no value");
-												destroyEditor(that.oEditor);
 												resolve();
 											});
 										});
@@ -547,7 +537,6 @@ sap.ui.define([
 										var sUUID = oNewObject._dt._uuid;
 										var sTranslationTextOfEN = oField.getTranslationValueInTexts("en", sUUID, "text");
 										assert.ok(!sTranslationTextOfEN, "Texts: no value");
-										destroyEditor(that.oEditor);
 										resolve();
 									});
 								});
@@ -708,7 +697,6 @@ sap.ui.define([
 															assert.equal(sCurrentValue, sExpectedValue, "oTranslationPopover3 Content: item " + i + " " + sLanguage + ", current: " + sCurrentValue + ", expected: " + sExpectedValue);
 														}
 													}
-													destroyEditor(that.oEditor);
 													resolve();
 												});
 											});
@@ -872,7 +860,6 @@ sap.ui.define([
 															assert.equal(sCurrentValue, sExpectedValue, "oTranslationPopover3 Content: item " + i + " " + sLanguage + ", current: " + sCurrentValue + ", expected: " + sExpectedValue);
 														}
 													}
-													destroyEditor(that.oEditor);
 													resolve();
 												});
 											});

@@ -65,14 +65,7 @@ sap.ui.define([
 		oCardEditor.placeAt(oContent);
 		return oCardEditor;
 	}
-	function destroyEditor(oCardEditor) {
-		oCardEditor.destroy();
-		var oContent = document.getElementById("content");
-		if (oContent) {
-			oContent.innerHTML = "";
-			document.body.style.zIndex = "unset";
-		}
-	}
+
 	function getDefaultContextModel(oResourceBundle) {
 		return {
 			empty: {
@@ -322,29 +315,10 @@ sap.ui.define([
 
 	QUnit.module("Create an editor based on a card instance", {
 		beforeEach: function () {
-			this.oHost = new Host("host");
-			this.oContextHost = new ContextHost("contexthost");
-
-			this.oCardEditor = new CardEditor();
-			var oContent = document.getElementById("content");
-			if (!oContent) {
-				oContent = document.createElement("div");
-				oContent.setAttribute("id", "content");
-				document.body.appendChild(oContent);
-				document.body.style.zIndex = 1000;
-			}
-			this.oCardEditor.placeAt(oContent);
+			this.oCardEditor = EditorQunitUtils.beforeEachTest(undefined, undefined, "CardEditor");
 		},
 		afterEach: function () {
-			this.oCardEditor.destroy();
-			this.oHost.destroy();
-			this.oContextHost.destroy();
-			sandbox.restore();
-			var oContent = document.getElementById("content");
-			if (oContent) {
-				oContent.innerHTML = "";
-				document.body.style.zIndex = "unset";
-			}
+			EditorQunitUtils.afterEachTest(this.oCardEditor, sandbox, this.oMockServer);
 		}
 	}, function () {
 		QUnit.test("Create a CardEditor with an existing Card instance", function (assert) {
@@ -427,33 +401,10 @@ sap.ui.define([
 				}
 			]);
 			this.oMockServer.start();
-			this.oHost = new Host("host");
-			this.oContextHost = new ContextHost("contexthost");
-
-			this.oCardEditor = new CardEditor();
-			var oContent = document.getElementById("content");
-			if (!oContent) {
-				oContent = document.createElement("div");
-				oContent.style.position = "absolute";
-				oContent.style.top = "200px";
-
-				oContent.setAttribute("id", "content");
-				document.body.appendChild(oContent);
-				document.body.style.zIndex = 1000;
-			}
-			this.oCardEditor.placeAt(oContent);
+			this.oCardEditor = EditorQunitUtils.beforeEachTest(undefined, undefined, "CardEditor");
 		},
 		afterEach: function () {
-			this.oCardEditor.destroy();
-			this.oMockServer.destroy();
-			this.oHost.destroy();
-			this.oContextHost.destroy();
-			sandbox.restore();
-			var oContent = document.getElementById("content");
-			if (oContent) {
-				oContent.innerHTML = "";
-				document.body.style.zIndex = "unset";
-			}
+			EditorQunitUtils.afterEachTest(this.oCardEditor, sandbox, this.oMockServer);
 		}
 	}, function () {
 		QUnit.test("Check value items", function (assert) {
@@ -509,33 +460,10 @@ sap.ui.define([
 				}
 			]);
 			this.oMockServer.start();
-			this.oHost = new Host("host");
-			this.oContextHost = new ContextHost("contexthost");
-
-			this.oCardEditor = new CardEditor();
-			var oContent = document.getElementById("content");
-			if (!oContent) {
-				oContent = document.createElement("div");
-				oContent.style.position = "absolute";
-				oContent.style.top = "200px";
-
-				oContent.setAttribute("id", "content");
-				document.body.appendChild(oContent);
-				document.body.style.zIndex = 1000;
-			}
-			this.oCardEditor.placeAt(oContent);
+			this.oCardEditor = EditorQunitUtils.beforeEachTest(undefined, undefined, "CardEditor");
 		},
 		afterEach: function () {
-			this.oCardEditor.destroy();
-			this.oMockServer.destroy();
-			this.oHost.destroy();
-			this.oContextHost.destroy();
-			sandbox.restore();
-			var oContent = document.getElementById("content");
-			if (oContent) {
-				oContent.innerHTML = "";
-				document.body.style.zIndex = "unset";
-			}
+			EditorQunitUtils.afterEachTest(this.oCardEditor, sandbox, this.oMockServer);
 		}
 	}, function () {
 		QUnit.test("Check value items", function (assert) {
@@ -612,33 +540,10 @@ sap.ui.define([
 				}
 			]);
 			this.oMockServer.start();
-			this.oHost = new Host("host");
-			this.oContextHost = new ContextHost("contexthost");
-
-			this.oCardEditor = new CardEditor();
-			var oContent = document.getElementById("content");
-			if (!oContent) {
-				oContent = document.createElement("div");
-				oContent.style.position = "absolute";
-				oContent.style.top = "200px";
-
-				oContent.setAttribute("id", "content");
-				document.body.appendChild(oContent);
-				document.body.style.zIndex = 1000;
-			}
-			this.oCardEditor.placeAt(oContent);
+			this.oCardEditor = EditorQunitUtils.beforeEachTest(undefined, undefined, "CardEditor");
 		},
 		afterEach: function () {
-			this.oCardEditor.destroy();
-			this.oMockServer.destroy();
-			this.oHost.destroy();
-			this.oContextHost.destroy();
-			sandbox.restore();
-			var oContent = document.getElementById("content");
-			if (oContent) {
-				oContent.innerHTML = "";
-				document.body.style.zIndex = "unset";
-			}
+			EditorQunitUtils.afterEachTest(this.oCardEditor, sandbox, this.oMockServer);
 		}
 	}, function () {
 		QUnit.test("boolean check", function (assert) {
@@ -724,7 +629,7 @@ sap.ui.define([
 				});
 				this.oCardEditor.attachFieldReady(function () {
 					assert.ok(this.oCardEditor.isFieldReady(), "Card Editor fields are ready");
-					return new Promise(function (resolve) {
+					return new Promise(function () {
 						EditorQunitUtils.wait(100).then(function () {
 							var oField1 = this.oCardEditor.getAggregation("_formContent")[0].getAggregation("_field").getAggregation("content")[1];
 							oField1._settingsButton.focus();
@@ -743,9 +648,6 @@ sap.ui.define([
 								resolve();
 							});
 						}.bind(this));
-					}.bind(this)).then(function () {
-						destroyEditor(this.oCardEditor);
-						resolve();
 					}.bind(this));
 				}.bind(this));
 			}.bind(this));
@@ -790,33 +692,10 @@ sap.ui.define([
 				}
 			]);
 			this.oMockServer.start();
-			this.oHost = new Host("host");
-			this.oContextHost = new ContextHost("contexthost");
-
-			this.oCardEditor = new CardEditor();
-			var oContent = document.getElementById("content");
-			if (!oContent) {
-				oContent = document.createElement("div");
-				oContent.style.position = "absolute";
-				oContent.style.top = "200px";
-
-				oContent.setAttribute("id", "content");
-				document.body.appendChild(oContent);
-				document.body.style.zIndex = 1000;
-			}
-			this.oCardEditor.placeAt(oContent);
+			this.oCardEditor = EditorQunitUtils.beforeEachTest(undefined, undefined, "CardEditor");
 		},
 		afterEach: function () {
-			this.oCardEditor.destroy();
-			this.oMockServer.destroy();
-			this.oHost.destroy();
-			this.oContextHost.destroy();
-			sandbox.restore();
-			var oContent = document.getElementById("content");
-			if (oContent) {
-				oContent.innerHTML = "";
-				document.body.style.zIndex = "unset";
-			}
+			EditorQunitUtils.afterEachTest(this.oCardEditor, sandbox, this.oMockServer);
 		}
 	}, function () {
 		QUnit.test("checkbox", function (assert) {
@@ -883,7 +762,7 @@ sap.ui.define([
 				});
 				this.oCardEditor.attachFieldReady(function () {
 					assert.ok(this.oCardEditor.isFieldReady(), "Card Editor fields are ready");
-					return new Promise(function (resolve) {
+					return new Promise(function () {
 						EditorQunitUtils.wait().then(function () {
 							var oField1 = this.oCardEditor.getAggregation("_formContent")[0].getAggregation("_field").getAggregation("content")[1];
 							var oCheckBox = oField1.getAggregation("_field");
@@ -894,9 +773,6 @@ sap.ui.define([
 							});
 							oCheckBox.setSelected(true);
 						}.bind(this));
-					}.bind(this)).then(function () {
-						destroyEditor(this.oCardEditor);
-						resolve();
 					}.bind(this));
 				}.bind(this));
 			}.bind(this));
@@ -976,7 +852,7 @@ sap.ui.define([
 				});
 				this.oCardEditor.attachFieldReady(function () {
 					assert.ok(this.oCardEditor.isFieldReady(), "Card Editor fields are ready");
-					return new Promise(function (resolve) {
+					return new Promise(function () {
 						EditorQunitUtils.wait().then(function () {
 							var oField1 = this.oCardEditor.getAggregation("_formContent")[0].getAggregation("_field").getAggregation("content")[1];
 							var oSwitch = oField1.getAggregation("_field");
@@ -987,9 +863,6 @@ sap.ui.define([
 							});
 							oSwitch.setState(true);
 						}.bind(this));
-					}.bind(this)).then(function () {
-						destroyEditor(this.oCardEditor);
-						resolve();
 					}.bind(this));
 				}.bind(this));
 			}.bind(this));
@@ -998,29 +871,10 @@ sap.ui.define([
 
 	QUnit.module("Card Context", {
 		beforeEach: function () {
-			this.oHost = new Host("host");
-			this.oContextHost = new ContextHost("contexthost");
-
-			this.oCardEditor = new CardEditor();
-			var oContent = document.getElementById("content");
-			if (!oContent) {
-				oContent = document.createElement("div");
-				oContent.setAttribute("id", "content");
-				document.body.appendChild(oContent);
-				document.body.style.zIndex = 1000;
-			}
-			this.oCardEditor.placeAt(oContent);
+			this.oCardEditor = EditorQunitUtils.beforeEachTest(undefined, undefined, "CardEditor");
 		},
 		afterEach: function () {
-			this.oCardEditor.destroy();
-			this.oHost.destroy();
-			this.oContextHost.destroy();
-			sandbox.restore();
-			var oContent = document.getElementById("content");
-			if (oContent) {
-				oContent.innerHTML = "";
-				document.body.style.zIndex = "unset";
-			}
+			EditorQunitUtils.afterEachTest(this.oCardEditor, sandbox, this.oMockServer);
 		}
 	}, function () {
 		QUnit.test("Empty Host Context", function (assert) {
@@ -1058,29 +912,10 @@ sap.ui.define([
 
 	QUnit.module("Card Preview Mode", {
 		beforeEach: function () {
-			this.oHost = new Host("host");
-			this.oContextHost = new ContextHost("contexthost");
-
-			this.oCardEditor = new CardEditor();
-			var oContent = document.getElementById("content");
-			if (!oContent) {
-				oContent = document.createElement("div");
-				oContent.setAttribute("id", "content");
-				document.body.appendChild(oContent);
-				document.body.style.zIndex = 1000;
-			}
-			this.oCardEditor.placeAt(oContent);
+			this.oCardEditor = EditorQunitUtils.beforeEachTest(undefined, undefined, "CardEditor");
 		},
 		afterEach: function () {
-			this.oCardEditor.destroy();
-			this.oHost.destroy();
-			this.oContextHost.destroy();
-			sandbox.restore();
-			var oContent = document.getElementById("content");
-			if (oContent) {
-				oContent.innerHTML = "";
-				document.body.style.zIndex = "unset";
-			}
+			EditorQunitUtils.afterEachTest(this.oCardEditor, sandbox, this.oMockServer);
 		}
 	}, function () {
 		QUnit.test("Live and abstract (as json)", function (assert) {
@@ -1414,29 +1249,10 @@ sap.ui.define([
 
 	QUnit.module("Card Preview Position", {
 		beforeEach: function () {
-			this.oHost = new Host("host");
-			this.oContextHost = new ContextHost("contexthost");
-
-			this.oCardEditor = new CardEditor();
-			var oContent = document.getElementById("content");
-			if (!oContent) {
-				oContent = document.createElement("div");
-				oContent.setAttribute("id", "content");
-				document.body.appendChild(oContent);
-				document.body.style.zIndex = 1000;
-			}
-			this.oCardEditor.placeAt(oContent);
+			this.oCardEditor = EditorQunitUtils.beforeEachTest(undefined, undefined, "CardEditor");
 		},
 		afterEach: function () {
-			this.oCardEditor.destroy();
-			this.oHost.destroy();
-			this.oContextHost.destroy();
-			sandbox.restore();
-			var oContent = document.getElementById("content");
-			if (oContent) {
-				oContent.innerHTML = "";
-				document.body.style.zIndex = "unset";
-			}
+			EditorQunitUtils.afterEachTest(this.oCardEditor, sandbox, this.oMockServer);
 		}
 	}, function () {
 		QUnit.test("Default position", function (assert) {
@@ -1661,29 +1477,10 @@ sap.ui.define([
 	QUnit.module("Card Preview With changes", {
 		beforeEach: function () {
 			Localization.setLanguage("en");
-			this.oHost = new Host("host");
-			this.oContextHost = new ContextHost("contexthost");
-
-			this.oCardEditor = new CardEditor();
-			var oContent = document.getElementById("content");
-			if (!oContent) {
-				oContent = document.createElement("div");
-				oContent.setAttribute("id", "content");
-				document.body.appendChild(oContent);
-				document.body.style.zIndex = 1000;
-			}
-			this.oCardEditor.placeAt(oContent);
+			this.oCardEditor = EditorQunitUtils.beforeEachTest(undefined, undefined, "CardEditor");
 		},
 		afterEach: function () {
-			this.oCardEditor.destroy();
-			this.oHost.destroy();
-			this.oContextHost.destroy();
-			sandbox.restore();
-			var oContent = document.getElementById("content");
-			if (oContent) {
-				oContent.innerHTML = "";
-				document.body.style.zIndex = "unset";
-			}
+			EditorQunitUtils.afterEachTest(this.oCardEditor, sandbox, this.oMockServer);
 		}
 	}, function () {
 		QUnit.test("Check changes in Admin Mode: change from Admin", function (assert) {
@@ -2102,29 +1899,10 @@ sap.ui.define([
 
 	QUnit.module("Special cases", {
 		beforeEach: function () {
-			this.oHost = new Host("host");
-			this.oContextHost = new ContextHost("contexthost");
-
-			this.oCardEditor = new CardEditor();
-			var oContent = document.getElementById("content");
-			if (!oContent) {
-				oContent = document.createElement("div");
-				oContent.setAttribute("id", "content");
-				document.body.appendChild(oContent);
-				document.body.style.zIndex = 1000;
-			}
-			this.oCardEditor.placeAt(oContent);
+			this.oCardEditor = EditorQunitUtils.beforeEachTest(undefined, undefined, "CardEditor");
 		},
 		afterEach: function () {
-			this.oCardEditor.destroy();
-			this.oHost.destroy();
-			this.oContextHost.destroy();
-			sandbox.restore();
-			var oContent = document.getElementById("content");
-			if (oContent) {
-				oContent.innerHTML = "";
-				document.body.style.zIndex = "unset";
-			}
+			EditorQunitUtils.afterEachTest(this.oCardEditor, sandbox, this.oMockServer);
 		}
 	}, function () {
 		QUnit.test("1 icon parameter as value (as json)", function (assert) {

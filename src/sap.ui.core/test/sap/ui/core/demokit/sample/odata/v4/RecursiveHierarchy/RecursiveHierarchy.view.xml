@@ -4,6 +4,7 @@
 	xmlns="sap.ui.table"
 	xmlns:m="sap.m"
 	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:plugins="sap.ui.table.plugins"
 	xmlns:rm="sap.ui.table.rowmodes">
 
 	<Table ariaLabelledBy="title" id="table"
@@ -142,7 +143,7 @@
 		</Column>
 	</Table>
 
-	<TreeTable ariaLabelledBy="titleTreeTable" id="treeTable"
+	<Table ariaLabelledBy="titleTreeTable" id="treeTable"
 		rows="{
 				path : '/EMPLOYEES',
 				parameters : {
@@ -154,6 +155,9 @@
 				suspended : true
 			}"
 		selectionMode="None">
+		<dependents>
+			<plugins:ODataV4Hierarchy/>
+		</dependents>
 		<extension>
 			<m:Toolbar class="sapMTBHeader-CTX" design="Transparent">
 				<m:Title id="titleTreeTable" level="H1"
@@ -264,7 +268,7 @@
 				</m:FlexBox>
 			</template>
 		</Column>
-	</TreeTable>
+	</Table>
 
 	<mvc:dependents>
 		<m:SelectDialog confirm=".onMoveConfirm" draggable="true" id="moveDialog"

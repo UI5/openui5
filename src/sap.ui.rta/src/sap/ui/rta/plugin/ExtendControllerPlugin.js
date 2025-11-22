@@ -58,13 +58,19 @@ sap.ui.define([
 	}
 
 	/**
-	 * Check if the given overlay should be editable.
+	 * Check if the given overlay should be editable. This action is available by default,
+	 * disabling it requires explicitly setting it to null in the designtime metadata.
 	 *
 	 * @param {sap.ui.dt.ElementOverlay} oOverlay - Overlay to be checked for editable
 	 * @returns {Promise<boolean>} <code>true</code> when editable wrapped in a promise
 	 * @private
 	 */
-	ExtendControllerPlugin.prototype._isEditable = function() {
+	ExtendControllerPlugin.prototype._isEditable = function(oOverlay) {
+		// Action should be available by default
+		const oAction = this.getAction(oOverlay);
+		if (oAction === null) {
+			return Promise.resolve(false);
+		}
 		return Promise.resolve(true);
 	};
 
@@ -179,6 +185,9 @@ sap.ui.define([
 	 */
 	ExtendControllerPlugin.prototype.getAction = function(oOverlay) {
 		const oAction = Plugin.prototype.getAction.apply(this, [oOverlay]);
+		if (oAction === null) {
+			return null;
+		}
 		return oAction || { changeType: FLEX_CHANGE_TYPE };
 	};
 

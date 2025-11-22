@@ -11,7 +11,7 @@
 
 	<!-- Note: for $$aggregation, see controller's onInit! -->
 	<!-- Note: status is either 'B' or 'N', filter is just kiddin' ;-) -->
-	<TreeTable id="table" ariaLabelledBy="title" rowActionCount="{:= %{ui>/bBookingID} ? 1 : 0 }"
+	<Table id="table" ariaLabelledBy="title" rowActionCount="{:= %{ui>/bBookingID} ? 1 : 0 }"
 		rows="{path : '/Bookings',
 			filters : {path : 'status', operator : 'NE', value1 : ''},
 			parameters : {$count : true},
@@ -19,6 +19,7 @@
 			suspended : true}"
 		selectionMode="None" threshold="100">
 		<dependents>
+			<plugins:ODataV4Aggregation/>
 			<!-- plugins:ODataV4MultiSelection enableNotification="true"/ -->
 		</dependents>
 		<extension>
@@ -139,7 +140,7 @@
 				<m:CheckBox selected="{@$ui5.context.isSelected}"/>
 			</template>
 		</Column>
-	</TreeTable>
+	</Table>
 
 	<form:SimpleForm columnsL="3" id="details" layout="ColumnLayout" title="Booking Details"
 			visible="{ui>/bBookingID}">

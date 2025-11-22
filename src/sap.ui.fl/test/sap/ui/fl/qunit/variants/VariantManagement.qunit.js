@@ -9,7 +9,6 @@ sap.ui.define([
 	"sap/ui/core/Icon",
 	"sap/ui/core/Lib",
 	"sap/ui/fl/apply/_internal/flexObjects/FlexObjectFactory",
-	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
 	"sap/ui/fl/apply/_internal/flexState/FlexState",
 	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
 	"sap/ui/fl/apply/api/FlexRuntimeInfoAPI",
@@ -23,6 +22,7 @@ sap.ui.define([
 	"sap/ui/layout/Grid",
 	"sap/ui/test/utils/nextUIUpdate",
 	"sap/ui/thirdparty/sinon-4",
+	"test-resources/sap/ui/fl/qunit/FlQUnitUtils",
 	"test-resources/sap/ui/rta/qunit/RtaQunitUtils"
 ], function(
 	Localization,
@@ -33,7 +33,6 @@ sap.ui.define([
 	Icon,
 	Lib,
 	FlexObjectFactory,
-	VariantManagementState,
 	FlexState,
 	ControlVariantApplyAPI,
 	FlexRuntimeInfoAPI,
@@ -47,6 +46,7 @@ sap.ui.define([
 	Grid,
 	nextUIUpdate,
 	sinon,
+	FlQUnitUtils,
 	RtaQunitUtils
 ) {
 	"use strict";
@@ -146,10 +146,6 @@ sap.ui.define([
 				}
 			);
 
-			// to suppress "manage" event listener in VariantModel
-			sinon.stub(this.oModel, "_initializeManageVariantsEvents");
-			this.oModel.fnManageClick = function() {
-			};
 			return this.oModel.initialize();
 		},
 		afterEach() {
@@ -932,11 +928,18 @@ sap.ui.define([
 		});
 
 		QUnit.test("Checking _handleManageSavePressed; deleted item is selected", function(assert) {
+			const fnDone = assert.async();
 			this.oModel.fnManageClick = function() {
 				this.oVariantManagement.setCurrentVariantKey(this.oVariantManagement.getStandardVariantKey());
 			}.bind(this);
 
 			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
+
+			sandbox.stub(Utils, "getAppComponentForControl").returns({
+				getLocalId: (sControlId) => sControlId,
+				getModel: () => this.oModel,
+				getId: () => "componentId"
+			});
 
 			this.oVariantManagement.attachManage(function(oEvent) {
 				var oData = oEvent.getParameters();
@@ -957,7 +960,10 @@ sap.ui.define([
 				assert.equal(aFavItems.length, 1);
 				assert.equal(aFavItems[0].key, "v4");
 				assert.ok(!aFavItems[0].visible);
-			});
+
+				assert.strictEqual(this.oVariantManagement.getCurrentVariantKey(), this.oVariantManagement.getStandardVariantKey());
+				fnDone();
+			}.bind(this));
 
 			this._oVM._createManagementDialog();
 			assert.ok(this._oVM.oManagementDialog);
@@ -984,8 +990,6 @@ sap.ui.define([
 			this.oVariantManagement.setCurrentVariantKey("v1");
 
 			this._oVM._handleManageSavePressed();
-
-			assert.equal(this.oVariantManagement.getCurrentVariantKey(), this.oVariantManagement.getStandardVariantKey());
 		});
 
 		QUnit.test("Checking _triggerSearch", function(assert) {

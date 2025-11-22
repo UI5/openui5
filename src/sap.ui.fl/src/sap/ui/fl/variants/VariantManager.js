@@ -16,6 +16,7 @@ sap.ui.define([
 	"sap/ui/fl/apply/_internal/flexState/FlexObjectState",
 	"sap/ui/fl/apply/api/FlexRuntimeInfoAPI",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
+	"sap/ui/fl/initial/_internal/Settings",
 	"sap/ui/fl/write/_internal/controlVariants/ControlVariantWriteUtils",
 	"sap/ui/fl/write/_internal/flexState/changes/UIChangeManager",
 	"sap/ui/fl/write/_internal/flexState/FlexObjectManager",
@@ -36,6 +37,7 @@ sap.ui.define([
 	FlexObjectState,
 	FlexRuntimeInfoAPI,
 	ManifestUtils,
+	Settings,
 	ControlVariantWriteUtils,
 	UIChangeManager,
 	FlexObjectManager,
@@ -67,6 +69,114 @@ sap.ui.define([
 		return FlexObjectState.getDirtyFlexObjects(sFlexReference).filter(function(oChange) {
 			return aChangeFileNames.includes(oChange.getId()) && !oChange.getSavedToVariant();
 		});
+	}
+
+	function getChangesFromManageEvent(oVMControl, sLayer, oEvent) {
+		const sVariantManagementReference = oVMControl.getVariantManagementReference();
+		const sFlexReference = ManifestUtils.getFlexReferenceForControl(oVMControl);
+		const aVariants = VariantManagementState.getVariantsForVariantManagement({
+			reference: sFlexReference,
+			vmReference: sVariantManagementReference
+		});
+		const sDefaultVariant = VariantManagementState.getDefaultVariantReference({
+			reference: sFlexReference,
+			vmReference: sVariantManagementReference
+		});
+		const aChanges = [];
+		const oSettings = Settings.getInstanceOrUndef();
+		const aVariantsToBeDeleted = [];
+
+		const findVariant = (sVariantKey) => {
+			return aVariants.find((oVariant) => oVariant.key === sVariantKey);
+		};
+
+		const fnAddPreparedChange = (oVariant, sChangeType, mChangeData) => {
+			// layer can be PUBLIC for setTitle, setExecuteOnSelect or setVisible, but never for setFavorite, setDefault or setContexts
+			const bSupportsPublicChange = ["setTitle", "setExecuteOnSelect", "setVisible"].includes(sChangeType);
+			const sChangeLayer = (
+				bSupportsPublicChange
+				&& oSettings?.getIsPublicFlVariantEnabled()
+				&& oVariant.layer === Layer.PUBLIC
+			) ? Layer.PUBLIC : sLayer;
+
+			aChanges.push({
+				variantReference: oVariant.key,
+				changeType: sChangeType,
+				layer: sChangeLayer,
+				...mChangeData
+			});
+		};
+
+		oEvent.getParameter("renamed")?.forEach(({ key: sVariantKey, name: sNewTitle }) => {
+			const oVariant = findVariant(sVariantKey);
+			fnAddPreparedChange(
+				oVariant,
+				"setTitle",
+				{
+					title: sNewTitle,
+					originalTitle: oVariant.title
+				}
+			);
+		});
+		oEvent.getParameter("fav")?.forEach(({ key: sVariantKey, visible: bNewIsFavorite }) => {
+			const oVariant = findVariant(sVariantKey);
+			fnAddPreparedChange(
+				oVariant,
+				"setFavorite",
+				{
+					favorite: bNewIsFavorite,
+					originalFavorite: oVariant.favorite
+				}
+			);
+		});
+		oEvent.getParameter("exe")?.forEach(({ key: sVariantKey, exe: bNewExecuteOnSelect }) => {
+			const oVariant = findVariant(sVariantKey);
+			fnAddPreparedChange(
+				oVariant,
+				"setExecuteOnSelect",
+				{
+					executeOnSelect: bNewExecuteOnSelect,
+					originalExecuteOnSelect: oVariant.executeOnSelect
+				}
+			);
+		});
+		oEvent.getParameter("deleted")?.forEach((sVariantKey) => {
+			const oVariant = findVariant(sVariantKey);
+			fnAddPreparedChange(
+				oVariant,
+				"setVisible",
+				{
+					visible: false
+				}
+			);
+			aVariantsToBeDeleted.push(sVariantKey);
+		});
+		oEvent.getParameter("contexts")?.forEach(({ key: sVariantKey, contexts: aNewContexts }) => {
+			const oVariant = findVariant(sVariantKey);
+			fnAddPreparedChange(
+				oVariant,
+				"setContexts",
+				{
+					contexts: aNewContexts,
+					originalContexts: oVariant.contexts
+				}
+			);
+		});
+		const sNewDefault = oEvent.getParameter("def");
+		if (sNewDefault) {
+			aChanges.push({
+				variantManagementReference: sVariantManagementReference,
+				changeType: "setDefault",
+				defaultVariant: sNewDefault,
+				originalDefaultVariant: sDefaultVariant,
+				layer: sLayer
+			});
+		}
+
+		return {
+			changes: aChanges,
+			variantsToBeDeleted: aVariantsToBeDeleted
+		};
 	}
 
 	/**
@@ -257,16 +367,16 @@ sap.ui.define([
 		}, sFlexReference, mPropertyBag.vmReference);
 	};
 
-	VariantManager.handleManageEvent = async function(oEvent, oData, oVariantModel) {
-		const oVMControl = oEvent.getSource();
-		const sVMReference = oData.variantManagementReference;
-		if (!oVariantModel.getData()) {
-			return;
-		}
+	// Personalization scenario; for Adaptation, manageVariants is used
+	// The event source is the sap.m.VariantManagement control, so the fl VMControl needs to be passed separately
+	VariantManager.handleManageEvent = async function(oEvent, oVMControl) {
+		const sVMReference = oVMControl.getVariantManagementReference();
+		const oAppComponent = Utils.getAppComponentForControl(oVMControl);
+		const sFlexReference = ManifestUtils.getFlexReferenceForControl(oAppComponent);
 		const {
 			changes: aConfigurationChangesContent,
 			variantsToBeDeleted: aVariantsToBeDeleted
-		} = oVariantModel._collectModelChanges(sVMReference, Layer.USER, oEvent);
+		} = getChangesFromManageEvent(oVMControl, Layer.USER, oEvent);
 
 		if (!aConfigurationChangesContent.length && !aVariantsToBeDeleted.length) {
 			return;
@@ -282,7 +392,7 @@ sap.ui.define([
 			const sNewDefaultVariantReference = (
 				oEvent.getParameter("def")
 				|| VariantManagementState.getDefaultVariantReference({
-					reference: oVariantModel.sFlexReference,
+					reference: sFlexReference,
 					vmReference: sVMReference
 				})
 			);
@@ -295,19 +405,19 @@ sap.ui.define([
 		}
 
 		aConfigurationChangesContent.forEach(function(oChangeProperties) {
-			oChangeProperties.appComponent = oVariantModel.oAppComponent;
+			oChangeProperties.appComponent = oAppComponent;
 		});
 
 		const aNewVariantChanges = VariantManager.addVariantChanges(sVMReference, aConfigurationChangesContent);
 		const aVariantDeletionChanges = aVariantsToBeDeleted
 		.map((sVariantKey) => {
 			const oVariant = VariantManagementState.getVariant({
-				reference: oVariantModel.sFlexReference,
+				reference: sFlexReference,
 				vmReference: sVMReference,
 				vReference: sVariantKey
 			});
 			if (oVariant.layer === Layer.USER) {
-				return ControlVariantWriteUtils.deleteVariant(oVariantModel.sFlexReference, sVMReference, sVariantKey);
+				return ControlVariantWriteUtils.deleteVariant(sFlexReference, sVMReference, sVariantKey);
 			}
 			return [];
 		})
@@ -327,7 +437,7 @@ sap.ui.define([
 				// are also persisted during variant manage save
 				await FlexObjectManager.saveFlexObjects({
 					flexObjects: aChangesOnLayer,
-					selector: oVariantModel.oAppComponent
+					selector: oAppComponent
 				});
 			}
 		}
@@ -677,11 +787,11 @@ sap.ui.define([
 	};
 
 	/**
-	 * Opens the <i>Manage Views</i> dialog.
+	 * Opens the <i>Manage Views</i> dialog in Adaptation mode. Called from the ControlVariant plugin.
+	 * For Personalization, handleManageEvent is used.
 	 * Returns a promise which resolves to changes made from the manage dialog, based on the parameters passed.
 	 *
 	 * @param {sap.ui.fl.variants.VariantManagement} oVariantManagementControl - Variant management control
-	 * @param {string} sVMReference - Variant management reference
 	 * @param {string} sLayer - Current layer
 	 * @param {string} sClass - Style class assigned to the management dialog
 	 * @param {Promise<sap.ui.core.ComponentContainer>} oContextSharingComponentPromise - Promise resolving with the ComponentContainer
@@ -689,15 +799,14 @@ sap.ui.define([
 	 * @private
 	 * @ui5-restricted
 	 */
-	VariantManager.manageVariants = function(oVariantManagementControl, sVMReference, sLayer, sClass, oContextSharingComponentPromise) {
-		const oVariantModel = getVariantModel(oVariantManagementControl);
-		// called from the ControlVariant plugin in Adaptation mode
+	VariantManager.manageVariants = function(oVariantManagementControl, sLayer, sClass, oContextSharingComponentPromise) {
+		function onManageSaveRta(oEvent, mParams) {
+			const oModelChanges = getChangesFromManageEvent(oVariantManagementControl, sLayer, oEvent);
+			mParams.resolve(oModelChanges);
+		}
+
 		return new Promise(function(resolve) {
-			oVariantManagementControl.attachEventOnce("manage", {
-				resolve,
-				variantManagementReference: sVMReference,
-				layer: sLayer
-			}, oVariantModel.fnManageClickRta, oVariantModel);
+			oVariantManagementControl.attachEventOnce("manage", { resolve }, onManageSaveRta);
 			oVariantManagementControl.openManagementDialog(true, sClass, oContextSharingComponentPromise);
 		});
 	};

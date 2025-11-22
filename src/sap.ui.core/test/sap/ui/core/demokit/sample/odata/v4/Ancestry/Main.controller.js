@@ -101,7 +101,6 @@ sap.ui.define([
 				}), "ui");
 				this.bDescending = undefined;
 
-				oTreeTable._oProxy._bEnableV4 = true; // enable V4 tree table flag
 				const sVisibleRowCount = oUriParameters.get("visibleRowCount");
 				if (sVisibleRowCount) {
 					oTreeTable.getRowMode().setRowCount(parseInt(sVisibleRowCount));

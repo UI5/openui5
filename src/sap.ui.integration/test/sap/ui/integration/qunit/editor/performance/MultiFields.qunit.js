@@ -49,15 +49,6 @@ sap.ui.define([
 	Localization.setLanguage("en");
 	document.body.className = document.body.className + " sapUiSizeCompact ";
 
-	function destroyEditor(oEditor) {
-		oEditor.destroy();
-		var oContent = document.getElementById("content");
-		if (oContent) {
-			oContent.innerHTML = "";
-			document.body.style.zIndex = "unset";
-		}
-	}
-
 	QUnit.module("multi fields", {
 		beforeEach: function () {
 			//oEditor = EditorQunitUtils.beforeEachTest();
@@ -167,7 +158,7 @@ sap.ui.define([
 						assert.equal(aItems4[3].getKey(), "key4", "Field 4: Select item 3 Key is OK");
 						assert.equal(aItems4[3].getText(), "text4req", "Field 4: Select item 3 Text is OK");
 						EditorQunitUtils.wait().then(function () {
-							destroyEditor(oEditor);
+							EditorQunitUtils.destroyEditor(oEditor);
 							count++;
 							start = new Date();
 							oEditor = EditorQunitUtils.createEditor("en");
@@ -236,7 +227,7 @@ sap.ui.define([
 									assert.equal(aItems4[3].getKey(), "key4", "Field 4: Select item 3 Key is OK");
 									assert.equal(aItems4[3].getText(), "text4req", "Field 4: Select item 3 Text is OK");
 									EditorQunitUtils.wait().then(function () {
-										destroyEditor(oEditor);
+										EditorQunitUtils.destroyEditor(oEditor);
 										count++;
 										start = new Date();
 										oEditor = EditorQunitUtils.createEditor("en");
@@ -305,7 +296,7 @@ sap.ui.define([
 												assert.equal(aItems4[3].getKey(), "key4", "Field 4: Select item 3 Key is OK");
 												assert.equal(aItems4[3].getText(), "text4req", "Field 4: Select item 3 Text is OK");
 												EditorQunitUtils.wait().then(function () {
-													destroyEditor(oEditor);
+													EditorQunitUtils.destroyEditor(oEditor);
 													count++;
 													start = new Date();
 													oEditor = EditorQunitUtils.createEditor("en");
@@ -374,7 +365,7 @@ sap.ui.define([
 															assert.equal(aItems4[3].getKey(), "key4", "Field 4: Select item 3 Key is OK");
 															assert.equal(aItems4[3].getText(), "text4req", "Field 4: Select item 3 Text is OK");
 															EditorQunitUtils.wait().then(function () {
-																destroyEditor(oEditor);
+																EditorQunitUtils.destroyEditor(oEditor);
 																count++;
 																start = new Date();
 																oEditor = EditorQunitUtils.createEditor("en");
@@ -443,7 +434,7 @@ sap.ui.define([
 																		assert.equal(aItems4[3].getKey(), "key4", "Field 4: Select item 3 Key is OK");
 																		assert.equal(aItems4[3].getText(), "text4req", "Field 4: Select item 3 Text is OK");
 																		EditorQunitUtils.wait().then(function () {
-																			destroyEditor(oEditor);
+																			EditorQunitUtils.destroyEditor(oEditor);
 																			oHost.destroy();
 																			oContextHost.destroy();
 																			resolve();
@@ -528,7 +519,7 @@ sap.ui.define([
 						assert.equal(oControl1.getItems().length, 5, "Field 1: MultiComboBox items lenght is OK");
 						assert.equal(oControl2.getItems().length, 6, "Field 2: MultiComboBox items lenght is OK");
 						EditorQunitUtils.wait().then(function () {
-							destroyEditor(oEditor);
+							EditorQunitUtils.destroyEditor(oEditor);
 							count++;
 							start = new Date();
 							oEditor = EditorQunitUtils.createEditor("en");
@@ -565,7 +556,7 @@ sap.ui.define([
 									assert.equal(oControl1.getItems().length, 5, "Field 1: MultiComboBox items lenght is OK");
 									assert.equal(oControl2.getItems().length, 6, "Field 2: MultiComboBox items lenght is OK");
 									EditorQunitUtils.wait().then(function () {
-										destroyEditor(oEditor);
+										EditorQunitUtils.destroyEditor(oEditor);
 										count++;
 										start = new Date();
 										oEditor = EditorQunitUtils.createEditor("en");
@@ -602,7 +593,7 @@ sap.ui.define([
 												assert.equal(oControl1.getItems().length, 5, "Field 1: MultiComboBox items lenght is OK");
 												assert.equal(oControl2.getItems().length, 6, "Field 2: MultiComboBox items lenght is OK");
 												EditorQunitUtils.wait().then(function () {
-													destroyEditor(oEditor);
+													EditorQunitUtils.destroyEditor(oEditor);
 													count++;
 													start = new Date();
 													oEditor = EditorQunitUtils.createEditor("en");
@@ -639,7 +630,7 @@ sap.ui.define([
 															assert.equal(oControl1.getItems().length, 5, "Field 1: MultiComboBox items lenght is OK");
 															assert.equal(oControl2.getItems().length, 6, "Field 2: MultiComboBox items lenght is OK");
 															EditorQunitUtils.wait().then(function () {
-																destroyEditor(oEditor);
+																EditorQunitUtils.destroyEditor(oEditor);
 																count++;
 																start = new Date();
 																oEditor = EditorQunitUtils.createEditor("en");
@@ -676,7 +667,7 @@ sap.ui.define([
 																		assert.equal(oControl1.getItems().length, 5, "Field 1: MultiComboBox items lenght is OK");
 																		assert.equal(oControl2.getItems().length, 6, "Field 2: MultiComboBox items lenght is OK");
 																		EditorQunitUtils.wait().then(function () {
-																			destroyEditor(oEditor);
+																			EditorQunitUtils.destroyEditor(oEditor);
 																			oHost.destroy();
 																			oContextHost.destroy();
 																			resolve();
@@ -763,7 +754,7 @@ sap.ui.define([
 						oSelect2.setSelectedIndex(10);
 						oSelect2.open();
 						EditorQunitUtils.wait().then(function () {
-							destroyEditor(oEditor);
+							EditorQunitUtils.destroyEditor(oEditor);
 							count++;
 							start = new Date();
 							oEditor = EditorQunitUtils.createEditor("en");
@@ -802,7 +793,7 @@ sap.ui.define([
 									oSelect2.setSelectedIndex(10);
 									oSelect2.open();
 									EditorQunitUtils.wait().then(function () {
-										destroyEditor(oEditor);
+										EditorQunitUtils.destroyEditor(oEditor);
 										count++;
 										start = new Date();
 										oEditor = EditorQunitUtils.createEditor("en");
@@ -841,7 +832,7 @@ sap.ui.define([
 												oSelect2.setSelectedIndex(10);
 												oSelect2.open();
 												EditorQunitUtils.wait().then(function () {
-													destroyEditor(oEditor);
+													EditorQunitUtils.destroyEditor(oEditor);
 													count++;
 													start = new Date();
 													oEditor = EditorQunitUtils.createEditor("en");
@@ -880,7 +871,7 @@ sap.ui.define([
 															oSelect2.setSelectedIndex(10);
 															oSelect2.open();
 															EditorQunitUtils.wait().then(function () {
-																destroyEditor(oEditor);
+																EditorQunitUtils.destroyEditor(oEditor);
 																count++;
 																start = new Date();
 																oEditor = EditorQunitUtils.createEditor("en");
@@ -919,7 +910,7 @@ sap.ui.define([
 																		oSelect2.setSelectedIndex(10);
 																		oSelect2.open();
 																		EditorQunitUtils.wait().then(function () {
-																			destroyEditor(oEditor);
+																			EditorQunitUtils.destroyEditor(oEditor);
 																			oHost.destroy();
 																			oContextHost.destroy();
 																			resolve();
@@ -1033,7 +1024,7 @@ sap.ui.define([
 						assert.ok(oSelectionCell1.isA("sap.m.CheckBox"), "Table 3 Row 1: Cell 1 is CheckBox");
 						assert.ok(oSelectionCell1.getSelected(), "Table 3 Row 1: Cell 1 is selected");
 						EditorQunitUtils.wait().then(function () {
-							destroyEditor(oEditor);
+							EditorQunitUtils.destroyEditor(oEditor);
 							count++;
 							start = new Date();
 							oEditor = EditorQunitUtils.createEditor("en");
@@ -1087,7 +1078,7 @@ sap.ui.define([
 									assert.ok(oSelectionCell1.isA("sap.m.CheckBox"), "Table 3 Row 1: Cell 1 is CheckBox");
 									assert.ok(oSelectionCell1.getSelected(), "Table 3 Row 1: Cell 1 is selected");
 									EditorQunitUtils.wait().then(function () {
-										destroyEditor(oEditor);
+										EditorQunitUtils.destroyEditor(oEditor);
 										count++;
 										start = new Date();
 										oEditor = EditorQunitUtils.createEditor("en");
@@ -1141,7 +1132,7 @@ sap.ui.define([
 												assert.ok(oSelectionCell1.isA("sap.m.CheckBox"), "Table 3 Row 1: Cell 1 is CheckBox");
 												assert.ok(oSelectionCell1.getSelected(), "Table 3 Row 1: Cell 1 is selected");
 												EditorQunitUtils.wait().then(function () {
-													destroyEditor(oEditor);
+													EditorQunitUtils.destroyEditor(oEditor);
 													count++;
 													start = new Date();
 													oEditor = EditorQunitUtils.createEditor("en");
@@ -1195,7 +1186,7 @@ sap.ui.define([
 															assert.ok(oSelectionCell1.isA("sap.m.CheckBox"), "Table 3 Row 1: Cell 1 is CheckBox");
 															assert.ok(oSelectionCell1.getSelected(), "Table 3 Row 1: Cell 1 is selected");
 															EditorQunitUtils.wait().then(function () {
-																destroyEditor(oEditor);
+																EditorQunitUtils.destroyEditor(oEditor);
 																count++;
 																start = new Date();
 																oEditor = EditorQunitUtils.createEditor("en");
@@ -1249,7 +1240,7 @@ sap.ui.define([
 																		assert.ok(oSelectionCell1.isA("sap.m.CheckBox"), "Table 3 Row 1: Cell 1 is CheckBox");
 																		assert.ok(oSelectionCell1.getSelected(), "Table 3 Row 1: Cell 1 is selected");
 																		EditorQunitUtils.wait().then(function () {
-																			destroyEditor(oEditor);
+																			EditorQunitUtils.destroyEditor(oEditor);
 																			oHost.destroy();
 																			oContextHost.destroy();
 																			resolve();
@@ -1356,7 +1347,7 @@ sap.ui.define([
 						assert.equal(oTable2.getBinding().getCount(), aObjectsParameterValue1.length, "Table 2: value length is " + aObjectsParameterValue1.length);
 						assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField2._getCurrentProperty("value")), aObjectsParameterValue1), "Field 2: DT Value");
 						EditorQunitUtils.wait().then(function () {
-							destroyEditor(oEditor);
+							EditorQunitUtils.destroyEditor(oEditor);
 							count++;
 							start = new Date();
 							oEditor = EditorQunitUtils.createEditor("en");
@@ -1397,7 +1388,7 @@ sap.ui.define([
 									assert.equal(oTable2.getBinding().getCount(), aObjectsParameterValue1.length, "Table 2: value length is " + aObjectsParameterValue1.length);
 									assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField2._getCurrentProperty("value")), aObjectsParameterValue1), "Field 2: DT Value");
 									EditorQunitUtils.wait().then(function () {
-										destroyEditor(oEditor);
+										EditorQunitUtils.destroyEditor(oEditor);
 										count++;
 										start = new Date();
 										oEditor = EditorQunitUtils.createEditor("en");
@@ -1438,7 +1429,7 @@ sap.ui.define([
 												assert.equal(oTable2.getBinding().getCount(), aObjectsParameterValue1.length, "Table 2: value length is " + aObjectsParameterValue1.length);
 												assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField2._getCurrentProperty("value")), aObjectsParameterValue1), "Field 2: DT Value");
 												EditorQunitUtils.wait().then(function () {
-													destroyEditor(oEditor);
+													EditorQunitUtils.destroyEditor(oEditor);
 													count++;
 													start = new Date();
 													oEditor = EditorQunitUtils.createEditor("en");
@@ -1479,7 +1470,7 @@ sap.ui.define([
 															assert.equal(oTable2.getBinding().getCount(), aObjectsParameterValue1.length, "Table 2: value length is " + aObjectsParameterValue1.length);
 															assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField2._getCurrentProperty("value")), aObjectsParameterValue1), "Field 2: DT Value");
 															EditorQunitUtils.wait().then(function () {
-																destroyEditor(oEditor);
+																EditorQunitUtils.destroyEditor(oEditor);
 																count++;
 																start = new Date();
 																oEditor = EditorQunitUtils.createEditor("en");
@@ -1520,7 +1511,7 @@ sap.ui.define([
 																		assert.equal(oTable2.getBinding().getCount(), aObjectsParameterValue1.length, "Table 2: value length is " + aObjectsParameterValue1.length);
 																		assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField2._getCurrentProperty("value")), aObjectsParameterValue1), "Field 2: DT Value");
 																		EditorQunitUtils.wait().then(function () {
-																			destroyEditor(oEditor);
+																			EditorQunitUtils.destroyEditor(oEditor);
 																			oHost.destroy();
 																			oContextHost.destroy();
 																			resolve();
@@ -1833,7 +1824,7 @@ sap.ui.define([
 						assert.equal(oTable19.getBinding().getCount(), aObjectsParameterValue1.length, "Table 19: value length is " + aObjectsParameterValue1.length);
 						assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField19._getCurrentProperty("value")), aObjectsParameterValue1), "Field 19: DT Value");
 						EditorQunitUtils.wait().then(function () {
-							destroyEditor(oEditor);
+							EditorQunitUtils.destroyEditor(oEditor);
 							count++;
 							start = new Date();
 							oEditor = EditorQunitUtils.createEditor("en");
@@ -1902,7 +1893,7 @@ sap.ui.define([
 									assert.equal(aItems4[3].getKey(), "key4", "Field 4: Select item 3 Key is OK");
 									assert.equal(aItems4[3].getText(), "text4req", "Field 4: Select item 3 Text is OK");
 									EditorQunitUtils.wait().then(function () {
-										destroyEditor(oEditor);
+										EditorQunitUtils.destroyEditor(oEditor);
 										count++;
 										start = new Date();
 										oEditor = EditorQunitUtils.createEditor("en");
@@ -1971,7 +1962,7 @@ sap.ui.define([
 												assert.equal(aItems4[3].getKey(), "key4", "Field 4: Select item 3 Key is OK");
 												assert.equal(aItems4[3].getText(), "text4req", "Field 4: Select item 3 Text is OK");
 												EditorQunitUtils.wait().then(function () {
-													destroyEditor(oEditor);
+													EditorQunitUtils.destroyEditor(oEditor);
 													count++;
 													start = new Date();
 													oEditor = EditorQunitUtils.createEditor("en");
@@ -2040,7 +2031,7 @@ sap.ui.define([
 															assert.equal(aItems4[3].getKey(), "key4", "Field 4: Select item 3 Key is OK");
 															assert.equal(aItems4[3].getText(), "text4req", "Field 4: Select item 3 Text is OK");
 															EditorQunitUtils.wait().then(function () {
-																destroyEditor(oEditor);
+																EditorQunitUtils.destroyEditor(oEditor);
 																count++;
 																start = new Date();
 																oEditor = EditorQunitUtils.createEditor("en");
@@ -2109,7 +2100,7 @@ sap.ui.define([
 																		assert.equal(aItems4[3].getKey(), "key4", "Field 4: Select item 3 Key is OK");
 																		assert.equal(aItems4[3].getText(), "text4req", "Field 4: Select item 3 Text is OK");
 																		EditorQunitUtils.wait().then(function () {
-																			destroyEditor(oEditor);
+																			EditorQunitUtils.destroyEditor(oEditor);
 																			oHost.destroy();
 																			oContextHost.destroy();
 																			resolve();

@@ -9,7 +9,6 @@ sap.ui.define([
 	"sap/ui/thirdparty/sinon-4",
 	"./ContextHost",
 	"sap/ui/qunit/QUnitUtils",
-	"sap/ui/core/util/MockServer",
 	"./jsons/withDesigntime/sap.card/DataExtensionImpl",
 	"qunit/designtime/EditorQunitUtils"
 ], function(
@@ -22,7 +21,6 @@ sap.ui.define([
 	sinon,
 	ContextHost,
 	QUnitUtils,
-	MockServer,
 	DataExtensionImpl,
 	EditorQunitUtils
 ) {
@@ -35,16 +33,6 @@ sap.ui.define([
 	Localization.setLanguage("en");
 	document.body.className = document.body.className + " sapUiSizeCompact ";
 
-	function destroyEditor(oEditor) {
-		oEditor.destroy();
-		var oContent = document.getElementById("content");
-		if (oContent) {
-			oContent.innerHTML = "";
-			document.body.style.zIndex = "unset";
-		}
-
-	}
-
 	QUnit.module("Check Basic Validation - String, integer, number", {
 		beforeEach: function () {
 			this.oHost = new Host("host");
@@ -53,6 +41,7 @@ sap.ui.define([
 		afterEach: function () {
 			this.oHost.destroy();
 			this.oContextHost.destroy();
+			EditorQunitUtils.afterEachTest(this.oEditor);
 		}
 	}, function () {
 		QUnit.test("Check string validation", function (assert) {
@@ -196,10 +185,9 @@ sap.ui.define([
 					}.bind(this);
 					fTest1().then(function () {
 						fTest2().then(function () {
-							destroyEditor(this.oEditor);
 							resolve();
-						}.bind(this));
-					}.bind(this));
+						});
+					});
 				}.bind(this));
 			}.bind(this));
 		});
@@ -407,11 +395,10 @@ sap.ui.define([
 					fTest1().then(function () {
 						fTest2().then(function () {
 							fTest3().then(function () {
-								destroyEditor(this.oEditor);
 								resolve();
-							}.bind(this));
-						}.bind(this));
-					}.bind(this));
+							});
+						});
+					});
 				}.bind(this));
 			}.bind(this));
 		});
@@ -485,9 +472,8 @@ sap.ui.define([
 							});
 						}.bind(this));
 					}.bind(this)).then(function () {
-						destroyEditor(this.oEditor);
 						resolve();
-					}.bind(this));
+					});
 				}.bind(this));
 			}.bind(this));
 		});
@@ -577,9 +563,8 @@ sap.ui.define([
 							});
 						}.bind(this));
 					}.bind(this)).then(function () {
-						destroyEditor(this.oEditor);
 						resolve();
-					}.bind(this));
+					});
 				}.bind(this));
 			}.bind(this));
 		});
@@ -655,9 +640,8 @@ sap.ui.define([
 							});
 						}.bind(this));
 					}.bind(this)).then(function () {
-						destroyEditor(this.oEditor);
 						resolve();
-					}.bind(this));
+					});
 				}.bind(this));
 			}.bind(this));
 		});
@@ -733,9 +717,8 @@ sap.ui.define([
 							});
 						}.bind(this));
 					}.bind(this)).then(function () {
-						destroyEditor(this.oEditor);
 						resolve();
-					}.bind(this));
+					});
 				}.bind(this));
 			}.bind(this));
 		});
@@ -749,6 +732,7 @@ sap.ui.define([
 		afterEach: function () {
 			this.oHost.destroy();
 			this.oContextHost.destroy();
+			EditorQunitUtils.afterEachTest(this.oEditor);
 		}
 	}, function () {
 		QUnit.test("required", function (assert) {
@@ -831,9 +815,8 @@ sap.ui.define([
 							});
 						}.bind(this));
 					}.bind(this)).then(function () {
-						destroyEditor(this.oEditor);
 						resolve();
-					}.bind(this));
+					});
 				}.bind(this));
 			}.bind(this));
 		});
@@ -933,9 +916,8 @@ sap.ui.define([
 							});
 						}.bind(this));
 					}.bind(this)).then(function () {
-						destroyEditor(this.oEditor);
 						resolve();
-					}.bind(this));
+					});
 				}.bind(this));
 			}.bind(this));
 		});
@@ -1037,15 +1019,14 @@ sap.ui.define([
 							});
 						}.bind(this));
 					}.bind(this)).then(function () {
-						destroyEditor(this.oEditor);
 						resolve();
-					}.bind(this));
+					});
 				}.bind(this));
 			}.bind(this));
 		});
 	});
 	QUnit.module("Check Validation via request - List(string[])", {
-		beforeEach: function () {
+		before: function () {
 			this.oManifest = {
 				"sap.app": {
 					"id": "test.sample",
@@ -1067,28 +1048,16 @@ sap.ui.define([
 					}
 				}
 			};
-			this.oMockServer = new MockServer();
-			this.oMockServer.setRequests([
-				{
-					method: "GET",
-					path: "/mock_request/checkValidation",
-					response: function (xhr) {
-						xhr.respondJSON(200, null, {
-							"values": {
-								"checkEditable": false,
-								"minLength": 2,
-								"maxLength": 4,
-								"valueRange": ["key1", "key3", "key6"]
-							}
-						});
-					}
-				}
-			]);
-			this.oMockServer.start();
+			EditorQunitUtils.createMockServer();
+		},
+		after: function () {
+			EditorQunitUtils.destroyMockServer();
+		},
+		beforeEach: function () {
 			this.oEditor = EditorQunitUtils.beforeEachTest();
 		},
 		afterEach: function () {
-			EditorQunitUtils.afterEachTest(this.oEditor, sandbox, this.oMockServer);
+			EditorQunitUtils.afterEachTest(this.oEditor, sandbox);
 		}
 	}, function () {
 		QUnit.test("boolean check", function (assert) {
@@ -1169,9 +1138,8 @@ sap.ui.define([
 							});
 						}.bind(this));
 					}.bind(this)).then(function () {
-						destroyEditor(this.oEditor);
 						resolve();
-					}.bind(this));
+					});
 				}.bind(this));
 			}.bind(this));
 		});
@@ -1276,9 +1244,8 @@ sap.ui.define([
 							});
 						}.bind(this));
 					}.bind(this)).then(function () {
-						destroyEditor(this.oEditor);
 						resolve();
-					}.bind(this));
+					});
 				}.bind(this));
 			}.bind(this));
 		});
@@ -1381,9 +1348,8 @@ sap.ui.define([
 							});
 						}.bind(this));
 					}.bind(this)).then(function () {
-						destroyEditor(this.oEditor);
 						resolve();
-					}.bind(this));
+					});
 				}.bind(this));
 			}.bind(this));
 		});
@@ -1484,9 +1450,8 @@ sap.ui.define([
 							});
 						}.bind(this));
 					}.bind(this)).then(function () {
-						destroyEditor(this.oEditor);
 						resolve();
-					}.bind(this));
+					});
 				}.bind(this));
 			}.bind(this));
 		});
@@ -1597,9 +1562,8 @@ sap.ui.define([
 							});
 						}.bind(this));
 					}.bind(this)).then(function () {
-						destroyEditor(this.oEditor);
 						resolve();
-					}.bind(this));
+					});
 				}.bind(this));
 			}.bind(this));
 		});
@@ -1708,9 +1672,8 @@ sap.ui.define([
 							});
 						}.bind(this));
 					}.bind(this)).then(function () {
-						destroyEditor(this.oEditor);
 						resolve();
-					}.bind(this));
+					});
 				}.bind(this));
 			}.bind(this));
 		});
@@ -1821,16 +1784,15 @@ sap.ui.define([
 							});
 						}.bind(this));
 					}.bind(this)).then(function () {
-						destroyEditor(this.oEditor);
 						resolve();
-					}.bind(this));
+					});
 				}.bind(this));
 			}.bind(this));
 		});
 	});
 
 	QUnit.module("Check Validation via request - Boolean", {
-		beforeEach: function () {
+		before: function () {
 			this.oManifest = {
 				"sap.app": {
 					"id": "test.sample",
@@ -1852,25 +1814,16 @@ sap.ui.define([
 					}
 				}
 			};
-			this.oMockServer = new MockServer();
-			this.oMockServer.setRequests([
-				{
-					method: "GET",
-					path: "/mock_request/checkValidation",
-					response: function (xhr) {
-						xhr.respondJSON(200, null, {
-							"values": {
-								"checkEditable": false
-							}
-						});
-					}
-				}
-			]);
-			this.oMockServer.start();
+			EditorQunitUtils.createMockServer();
+		},
+		after: function () {
+			EditorQunitUtils.destroyMockServer();
+		},
+		beforeEach: function () {
 			this.oEditor = EditorQunitUtils.beforeEachTest();
 		},
 		afterEach: function () {
-			EditorQunitUtils.afterEachTest(this.oEditor, sandbox, this.oMockServer);
+			EditorQunitUtils.afterEachTest(this.oEditor, sandbox);
 		}
 	}, function () {
 		QUnit.test("checkbox", function (assert) {
@@ -1927,9 +1880,8 @@ sap.ui.define([
 							});
 						}.bind(this));
 					}.bind(this)).then(function () {
-						destroyEditor(this.oEditor);
 						resolve();
-					}.bind(this));
+					});
 				}.bind(this));
 			}.bind(this));
 		});
@@ -2010,9 +1962,8 @@ sap.ui.define([
 							});
 						}.bind(this));
 					}.bind(this)).then(function () {
-						destroyEditor(this.oEditor);
 						resolve();
-					}.bind(this));
+					});
 				}.bind(this));
 			}.bind(this));
 		});
@@ -2081,9 +2032,8 @@ sap.ui.define([
 							});
 						}.bind(this));
 					}.bind(this)).then(function () {
-						destroyEditor(this.oEditor);
 						resolve();
-					}.bind(this));
+					});
 				}.bind(this));
 			}.bind(this));
 		});
@@ -2174,9 +2124,8 @@ sap.ui.define([
 							});
 						}.bind(this));
 					}.bind(this)).then(function () {
-						destroyEditor(this.oEditor);
 						resolve();
-					}.bind(this));
+					});
 				}.bind(this));
 			}.bind(this));
 		});
