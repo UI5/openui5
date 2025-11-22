@@ -32,15 +32,6 @@ sap.ui.define([
 	Localization.setLanguage("en");
 	document.body.className = document.body.className + " sapUiSizeCompact ";
 
-	function destroyEditor(oEditor) {
-		oEditor.destroy();
-		var oContent = document.getElementById("content");
-		if (oContent) {
-			oContent.innerHTML = "";
-			document.body.style.zIndex = "unset";
-		}
-	}
-
 	var _oManifest = {
 		"sap.app": {
 			"id": "test.sample",
@@ -131,6 +122,7 @@ sap.ui.define([
 		afterEach: function () {
 			this.oHost.destroy();
 			this.oContextHost.destroy();
+			EditorQunitUtils.afterEachTest(this.oEditor);
 		}
 	}, function () {
 		_aCheckedLanguages.forEach(function(oCoreLanguage) {
@@ -193,8 +185,6 @@ sap.ui.define([
 								assert.equal(oField5Trans.getAggregation("_field").getValue(), sString5TransValue, "Field5Trans: " + sString5TransValue);
 								assert.ok(oField5Trans.getAggregation("_field").isA("sap.m.Input"), "Field5Trans: Input control");
 								assert.equal(oField5Trans.getAggregation("_field").getAggregation("_endIcon"), null, "Field5Trans: No Input value help icon");
-							}).then(function () {
-								destroyEditor(that.oEditor);
 								resolve();
 							});
 						});

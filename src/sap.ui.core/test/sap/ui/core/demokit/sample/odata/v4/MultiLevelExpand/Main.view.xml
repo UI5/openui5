@@ -10,7 +10,7 @@
 
 	<!-- Note: for $$aggregation, see controller's onInit! -->
 	<!-- Note: status must be either 'B' or 'N' (or maybe 'X') -->
-	<TreeTable id="table" ariaLabelledBy="title"
+	<Table id="table" ariaLabelledBy="title"
 		rows="{path : '/Bookings',
 			filters : {path : 'status', operator : 'NE', value1 : ''},
 			parameters : {$count : true},
@@ -18,6 +18,7 @@
 			suspended : true}"
 		selectionMode="None" threshold="100">
 		<dependents>
+			<plugins:ODataV4Aggregation/>
 			<!-- plugins:ODataV4MultiSelection enableNotification="true"/ -->
 		</dependents>
 		<extension>
@@ -118,7 +119,7 @@
 				</m:FlexBox>
 			</template>
 		</Column>
-	</TreeTable>
+	</Table>
 
 	<m:FormattedText htmlText="&lt;em>Available URL parameters:&lt;/em>
 		&lt;ul>

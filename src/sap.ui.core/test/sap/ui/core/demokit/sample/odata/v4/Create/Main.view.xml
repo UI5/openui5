@@ -9,7 +9,7 @@
 		<Table growing="true" growingThreshold="5" id="salesOrderList" items="{/SalesOrderList}">
 			<headerToolbar>
 				<Toolbar>
-					<Title text="Create Sales Order"/>
+					<Title text="Sales Orders"/>
 					<Button icon="sap-icon://add" press=".onCreateSalesOrder"
 						tooltip="Create Sales Order"/>
 					<dependents>

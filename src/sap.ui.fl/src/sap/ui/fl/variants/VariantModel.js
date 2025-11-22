@@ -368,106 +368,6 @@ sap.ui.define([
 		return oDuplicateVariant;
 	};
 
-	VariantModel.prototype._collectModelChanges = function(sVariantManagementReference, sLayer, oEvent) {
-		const oData = this.getData()[sVariantManagementReference];
-		const aModelVariants = oData.variants;
-		const aChanges = [];
-		const oSettings = Settings.getInstanceOrUndef();
-		const aVariantsToBeDeleted = [];
-
-		const findVariant = (sVariantKey) => {
-			return aModelVariants.find((oModelVariant) => oModelVariant.key === sVariantKey);
-		};
-
-		const fnAddPreparedChange = (oVariant, sChangeType, mChangeData) => {
-			// layer can be PUBLIC for setTitle, setExecuteOnSelect or setVisible, but never for setFavorite, setDefault or setContexts
-			const bSupportsPublicChange = ["setTitle", "setExecuteOnSelect", "setVisible"].includes(sChangeType);
-			const sChangeLayer = (
-				bSupportsPublicChange
-				&& oSettings?.getIsPublicFlVariantEnabled()
-				&& oVariant.layer === Layer.PUBLIC
-			) ? Layer.PUBLIC : sLayer;
-
-			aChanges.push({
-				variantReference: oVariant.key,
-				changeType: sChangeType,
-				layer: sChangeLayer,
-				...mChangeData
-			});
-		};
-
-		oEvent.getParameter("renamed")?.forEach(({ key: sVariantKey, name: sNewTitle }) => {
-			const oVariant = findVariant(sVariantKey);
-			fnAddPreparedChange(
-				oVariant,
-				"setTitle",
-				{
-					title: sNewTitle,
-					originalTitle: oVariant.title
-				}
-			);
-		});
-		oEvent.getParameter("fav")?.forEach(({ key: sVariantKey, visible: bNewIsFavorite }) => {
-			const oVariant = findVariant(sVariantKey);
-			fnAddPreparedChange(
-				oVariant,
-				"setFavorite",
-				{
-					favorite: bNewIsFavorite,
-					originalFavorite: oVariant.favorite
-				}
-			);
-		});
-		oEvent.getParameter("exe")?.forEach(({ key: sVariantKey, exe: bNewExecuteOnSelect }) => {
-			const oVariant = findVariant(sVariantKey);
-			fnAddPreparedChange(
-				oVariant,
-				"setExecuteOnSelect",
-				{
-					executeOnSelect: bNewExecuteOnSelect,
-					originalExecuteOnSelect: oVariant.executeOnSelect
-				}
-			);
-		});
-		oEvent.getParameter("deleted")?.forEach((sVariantKey) => {
-			const oVariant = findVariant(sVariantKey);
-			fnAddPreparedChange(
-				oVariant,
-				"setVisible",
-				{
-					visible: false
-				}
-			);
-			aVariantsToBeDeleted.push(sVariantKey);
-		});
-		oEvent.getParameter("contexts")?.forEach(({ key: sVariantKey, contexts: aNewContexts }) => {
-			const oVariant = findVariant(sVariantKey);
-			fnAddPreparedChange(
-				oVariant,
-				"setContexts",
-				{
-					contexts: aNewContexts,
-					originalContexts: oVariant.contexts
-				}
-			);
-		});
-		const sNewDefault = oEvent.getParameter("def");
-		if (sNewDefault) {
-			aChanges.push({
-				variantManagementReference: sVariantManagementReference,
-				changeType: "setDefault",
-				defaultVariant: sNewDefault,
-				originalDefaultVariant: oData.defaultVariant,
-				layer: sLayer
-			});
-		}
-
-		return {
-			changes: aChanges,
-			variantsToBeDeleted: aVariantsToBeDeleted
-		};
-	};
-
 	/**
 	 * Sets the passed properties on a variant for the passed variant management reference and
 	 * returns the content for change creation
@@ -598,11 +498,6 @@ sap.ui.define([
 			}
 		}
 
-		if (!(typeof this.fnManageClick === "function" && typeof this.fnManageClickRta === "function")) {
-			this._initializeManageVariantsEvents();
-		}
-		oVMControl.detachManage(this.fnManageClick, this); /* attach done below */
-
 		if (bDesignTimeModeToBeSet && oVMControl.getEditable()) {
 			// Key user adaptation settings
 			this.oData[sVariantManagementReference].variantsEditable = false;
@@ -615,10 +510,6 @@ sap.ui.define([
 				oVariant.remove = isVariantValidForRemove(oVariant, sVariantManagementReference, bDesignTimeModeToBeSet);
 			}.bind(this));
 		} else if (oVMControl.getEditable()) { // Personalization settings
-			oVMControl.attachManage({
-				variantManagementReference: sVariantManagementReference
-			}, this.fnManageClick, this);
-
 			this.oData[sVariantManagementReference].variantsEditable = true;
 
 			// Properties for variant management control's internal model
@@ -650,20 +541,6 @@ sap.ui.define([
 				oVariant.change = false;
 			});
 		}
-	};
-
-	// TODO refactor to use standard functions, not functions bound to the model instance that need to be initialized
-	VariantModel.prototype._initializeManageVariantsEvents = function() {
-		this.fnManageClickRta = function(oEvent, oData) {
-			const oModelChanges = this._collectModelChanges(oData.variantManagementReference, oData.layer, oEvent);
-			oData.resolve(oModelChanges);
-		};
-
-		this.fnManageClick = function(oEvent, oData) {
-			sap.ui.require(["sap/ui/fl/variants/VariantManager"], function(VariantManager) {
-				VariantManager.handleManageEvent(oEvent, oData, this);
-			}.bind(this));
-		};
 	};
 
 	VariantModel.prototype._handleSaveEvent = function(oEvent) {

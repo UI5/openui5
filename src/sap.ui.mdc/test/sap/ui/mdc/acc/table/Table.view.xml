@@ -8,15 +8,6 @@
 
 	<m:App id="MyApp" defaultTransitionName="show">
 		<m:Page id="MyPage" title="Table Sample" titleLevel="H1">
-			<m:landmarkInfo>
-				<m:PageAccessibleLandmarkInfo
-					contentRole="Main"
-					contentLabel="Page Content"
-					headerRole="Region"
-					headerLabel="Page Header"
-					footerRole="Region"
-					footerLabel="Page Footer" />
-			</m:landmarkInfo>
 			<m:headerContent>
 				<m:Label text="Table Type:" labelFor="selectType"/>
 				<m:Select id="selectType" change=".onTableTypeChange" selectedKey="GridTableType">

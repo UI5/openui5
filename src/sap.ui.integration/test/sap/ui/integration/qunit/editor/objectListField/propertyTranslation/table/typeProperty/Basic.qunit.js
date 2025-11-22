@@ -89,15 +89,6 @@ sap.ui.define([
 		}
 	};
 
-	function destroyEditor(oEditor) {
-		oEditor.destroy();
-		var oContent = document.getElementById("content");
-		if (oContent) {
-			oContent.innerHTML = "";
-			document.body.style.zIndex = "unset";
-		}
-	}
-
 	Localization.setLanguage("en");
 	document.body.className = document.body.className + " sapUiSizeCompact ";
 
@@ -109,6 +100,7 @@ sap.ui.define([
 		afterEach: function () {
 			this.oHost.destroy();
 			this.oContextHost.destroy();
+			EditorQunitUtils.afterEachTest(this.oEditor);
 		}
 	}, function () {
 		QUnit.test("check translation icon", function (assert) {
@@ -189,7 +181,6 @@ sap.ui.define([
 									assert.ok(oFormField3.getShowValueHelp(), "SimpleForm field 3: ShowValueHelp true");
 									assert.ok(oFormField3._oValueHelpIcon, "SimpleForm field 3: Value help icon exist");
 									assert.ok(oFormField3._oValueHelpIcon.getVisible(), "SimpleForm field 3: Value help icon visible");
-									destroyEditor(that.oEditor);
 									resolve();
 								});
 							});
@@ -318,7 +309,6 @@ sap.ui.define([
 																assert.equal(sValueState, "None", "oTranslationPopover3 Content: item " + i + " " + sLanguage + ", value state: " + sValueState + ", expected: None");
 															}
 														}
-														destroyEditor(that.oEditor);
 														resolve();
 													});
 												});

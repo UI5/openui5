@@ -32,16 +32,6 @@ sap.ui.define([
 	var sBaseUrl = "test-resources/sap/ui/integration/qunit/editor/jsons/withDesigntime/sap.card/";
 	Localization.setLanguage("en");
 	document.body.className = document.body.className + " sapUiSizeCompact ";
-
-	function destroyEditor(oEditor) {
-		oEditor.destroy();
-		var oContent = document.getElementById("content");
-		if (oContent) {
-			oContent.innerHTML = "";
-			document.body.style.zIndex = "unset";
-		}
-
-	}
 	var _oManifestWithouti18n = {
 		"sap.app": {
 			"id": "test.sample"
@@ -108,6 +98,7 @@ sap.ui.define([
 		afterEach: function () {
 			this.oHost.destroy();
 			this.oContextHost.destroy();
+			EditorQunitUtils.afterEachTest(this.oEditor);
 		}
 	}, function () {
 		QUnit.test("Admin mode", function (assert) {
@@ -225,7 +216,6 @@ sap.ui.define([
 									}
 									var oCancelButton4 = oTranslationPopover4.getFooter().getContent()[2];
 									oCancelButton4.firePress();
-									destroyEditor(that.oEditor);
 									resolve();
 								});
 								oValueHelpIcon4.firePress();
@@ -356,7 +346,6 @@ sap.ui.define([
 									}
 									var oCancelButton4 = oTranslationPopover4.getFooter().getContent()[2];
 									oCancelButton4.firePress();
-									destroyEditor(that.oEditor);
 									resolve();
 								});
 								oValueHelpIcon4.firePress();
@@ -487,7 +476,6 @@ sap.ui.define([
 									}
 									var oCancelButton4 = oTranslationPopover4.getFooter().getContent()[2];
 									oCancelButton4.firePress();
-									destroyEditor(that.oEditor);
 									resolve();
 								});
 								oValueHelpIcon4.firePress();
@@ -546,8 +534,6 @@ sap.ui.define([
 								assert.equal(oField4Trans.getAggregation("_field").getValue(), "string4", "Field4Trans: string4");
 								assert.ok(oField4Trans.getAggregation("_field").isA("sap.m.Input"), "Field4Trans: Input control");
 								assert.equal(oField4Trans.getAggregation("_field").getAggregation("_endIcon"), null, "Field4Trans: No Input value help icon");
-							}).then(function () {
-								destroyEditor(that.oEditor);
 								resolve();
 							});
 						});

@@ -49,15 +49,6 @@ sap.ui.define([
 	Localization.setLanguage("en");
 	document.body.className = document.body.className + " sapUiSizeCompact ";
 
-	function destroyEditor(oEditor) {
-		oEditor.destroy();
-		var oContent = document.getElementById("content");
-		if (oContent) {
-			oContent.innerHTML = "";
-			document.body.style.zIndex = "unset";
-		}
-	}
-
 	QUnit.module("single parameter", {
 		beforeEach: function () {
 			//oEditor = EditorQunitUtils.beforeEachTest();
@@ -116,7 +107,7 @@ sap.ui.define([
 						assert.ok(oEditor.isReady(), "Editor is ready");
 						assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 						EditorQunitUtils.wait().then(function () {
-							destroyEditor(oEditor);
+							EditorQunitUtils.destroyEditor(oEditor);
 							count++;
 							start = new Date();
 							oEditor = EditorQunitUtils.createEditor("en");
@@ -143,7 +134,7 @@ sap.ui.define([
 									assert.ok(oEditor.isReady(), "Editor is ready");
 									assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 									EditorQunitUtils.wait().then(function () {
-										destroyEditor(oEditor);
+										EditorQunitUtils.destroyEditor(oEditor);
 										count++;
 										start = new Date();
 										oEditor = EditorQunitUtils.createEditor("en");
@@ -170,7 +161,7 @@ sap.ui.define([
 												assert.ok(oEditor.isReady(), "Editor is ready");
 												assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 												EditorQunitUtils.wait().then(function () {
-													destroyEditor(oEditor);
+													EditorQunitUtils.destroyEditor(oEditor);
 													count++;
 													start = new Date();
 													oEditor = EditorQunitUtils.createEditor("en");
@@ -197,7 +188,7 @@ sap.ui.define([
 															assert.ok(oEditor.isReady(), "Editor is ready");
 															assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 															EditorQunitUtils.wait().then(function () {
-																destroyEditor(oEditor);
+																EditorQunitUtils.destroyEditor(oEditor);
 																count++;
 																start = new Date();
 																oEditor = EditorQunitUtils.createEditor("en");
@@ -224,7 +215,7 @@ sap.ui.define([
 																		assert.ok(oEditor.isReady(), "Editor is ready");
 																		assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 																		EditorQunitUtils.wait().then(function () {
-																			destroyEditor(oEditor);
+																			EditorQunitUtils.destroyEditor(oEditor);
 																			oHost.destroy();
 																			oContextHost.destroy();
 																			resolve();
@@ -294,7 +285,7 @@ sap.ui.define([
 						assert.ok(oEditor.isReady(), "Editor is ready");
 						assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 						EditorQunitUtils.wait().then(function () {
-							destroyEditor(oEditor);
+							EditorQunitUtils.destroyEditor(oEditor);
 							count++;
 							start = new Date();
 							oEditor = EditorQunitUtils.createEditor("en");
@@ -321,7 +312,7 @@ sap.ui.define([
 									assert.ok(oEditor.isReady(), "Editor is ready");
 									assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 									EditorQunitUtils.wait().then(function () {
-										destroyEditor(oEditor);
+										EditorQunitUtils.destroyEditor(oEditor);
 										count++;
 										start = new Date();
 										oEditor = EditorQunitUtils.createEditor("en");
@@ -348,7 +339,7 @@ sap.ui.define([
 												assert.ok(oEditor.isReady(), "Editor is ready");
 												assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 												EditorQunitUtils.wait().then(function () {
-													destroyEditor(oEditor);
+													EditorQunitUtils.destroyEditor(oEditor);
 													count++;
 													start = new Date();
 													oEditor = EditorQunitUtils.createEditor("en");
@@ -375,7 +366,7 @@ sap.ui.define([
 															assert.ok(oEditor.isReady(), "Editor is ready");
 															assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 															EditorQunitUtils.wait().then(function () {
-																destroyEditor(oEditor);
+																EditorQunitUtils.destroyEditor(oEditor);
 																count++;
 																start = new Date();
 																oEditor = EditorQunitUtils.createEditor("en");
@@ -402,7 +393,7 @@ sap.ui.define([
 																		assert.ok(oEditor.isReady(), "Editor is ready");
 																		assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 																		EditorQunitUtils.wait().then(function () {
-																			destroyEditor(oEditor);
+																			EditorQunitUtils.destroyEditor(oEditor);
 																			oHost.destroy();
 																			oContextHost.destroy();
 																			resolve();
@@ -472,7 +463,7 @@ sap.ui.define([
 						assert.ok(oEditor.isReady(), "Editor is ready");
 						assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 						EditorQunitUtils.wait().then(function () {
-							destroyEditor(oEditor);
+							EditorQunitUtils.destroyEditor(oEditor);
 							count++;
 							start = new Date();
 							oEditor = EditorQunitUtils.createEditor("en");
@@ -499,7 +490,7 @@ sap.ui.define([
 									assert.ok(oEditor.isReady(), "Editor is ready");
 									assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 									EditorQunitUtils.wait().then(function () {
-										destroyEditor(oEditor);
+										EditorQunitUtils.destroyEditor(oEditor);
 										count++;
 										start = new Date();
 										oEditor = EditorQunitUtils.createEditor("en");
@@ -526,7 +517,7 @@ sap.ui.define([
 												assert.ok(oEditor.isReady(), "Editor is ready");
 												assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 												EditorQunitUtils.wait().then(function () {
-													destroyEditor(oEditor);
+													EditorQunitUtils.destroyEditor(oEditor);
 													count++;
 													start = new Date();
 													oEditor = EditorQunitUtils.createEditor("en");
@@ -553,7 +544,7 @@ sap.ui.define([
 															assert.ok(oEditor.isReady(), "Editor is ready");
 															assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 															EditorQunitUtils.wait().then(function () {
-																destroyEditor(oEditor);
+																EditorQunitUtils.destroyEditor(oEditor);
 																count++;
 																start = new Date();
 																oEditor = EditorQunitUtils.createEditor("en");
@@ -580,7 +571,7 @@ sap.ui.define([
 																		assert.ok(oEditor.isReady(), "Editor is ready");
 																		assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 																		EditorQunitUtils.wait().then(function () {
-																			destroyEditor(oEditor);
+																			EditorQunitUtils.destroyEditor(oEditor);
 																			oHost.destroy();
 																			oContextHost.destroy();
 																			resolve();
@@ -652,7 +643,7 @@ sap.ui.define([
 						assert.ok(oEditor.isReady(), "Editor is ready");
 						assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 						EditorQunitUtils.wait().then(function () {
-							destroyEditor(oEditor);
+							EditorQunitUtils.destroyEditor(oEditor);
 							count++;
 							start = new Date();
 							oEditor = EditorQunitUtils.createEditor("en");
@@ -679,7 +670,7 @@ sap.ui.define([
 									assert.ok(oEditor.isReady(), "Editor is ready");
 									assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 									EditorQunitUtils.wait().then(function () {
-										destroyEditor(oEditor);
+										EditorQunitUtils.destroyEditor(oEditor);
 										count++;
 										start = new Date();
 										oEditor = EditorQunitUtils.createEditor("en");
@@ -706,7 +697,7 @@ sap.ui.define([
 												assert.ok(oEditor.isReady(), "Editor is ready");
 												assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 												EditorQunitUtils.wait().then(function () {
-													destroyEditor(oEditor);
+													EditorQunitUtils.destroyEditor(oEditor);
 													count++;
 													start = new Date();
 													oEditor = EditorQunitUtils.createEditor("en");
@@ -733,7 +724,7 @@ sap.ui.define([
 															assert.ok(oEditor.isReady(), "Editor is ready");
 															assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 															EditorQunitUtils.wait().then(function () {
-																destroyEditor(oEditor);
+																EditorQunitUtils.destroyEditor(oEditor);
 																count++;
 																start = new Date();
 																oEditor = EditorQunitUtils.createEditor("en");
@@ -760,7 +751,7 @@ sap.ui.define([
 																		assert.ok(oEditor.isReady(), "Editor is ready");
 																		assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 																		EditorQunitUtils.wait().then(function () {
-																			destroyEditor(oEditor);
+																			EditorQunitUtils.destroyEditor(oEditor);
 																			oHost.destroy();
 																			oContextHost.destroy();
 																			resolve();
@@ -833,7 +824,7 @@ sap.ui.define([
 						assert.ok(oEditor.isReady(), "Editor is ready");
 						assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 						EditorQunitUtils.wait().then(function () {
-							destroyEditor(oEditor);
+							EditorQunitUtils.destroyEditor(oEditor);
 							count++;
 							start = new Date();
 							oEditor = EditorQunitUtils.createEditor("en");
@@ -861,7 +852,7 @@ sap.ui.define([
 									assert.ok(oEditor.isReady(), "Editor is ready");
 									assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 									EditorQunitUtils.wait().then(function () {
-										destroyEditor(oEditor);
+										EditorQunitUtils.destroyEditor(oEditor);
 										count++;
 										start = new Date();
 										oEditor = EditorQunitUtils.createEditor("en");
@@ -889,7 +880,7 @@ sap.ui.define([
 												assert.ok(oEditor.isReady(), "Editor is ready");
 												assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 												EditorQunitUtils.wait().then(function () {
-													destroyEditor(oEditor);
+													EditorQunitUtils.destroyEditor(oEditor);
 													count++;
 													start = new Date();
 													oEditor = EditorQunitUtils.createEditor("en");
@@ -917,7 +908,7 @@ sap.ui.define([
 															assert.ok(oEditor.isReady(), "Editor is ready");
 															assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 															EditorQunitUtils.wait().then(function () {
-																destroyEditor(oEditor);
+																EditorQunitUtils.destroyEditor(oEditor);
 																count++;
 																start = new Date();
 																oEditor = EditorQunitUtils.createEditor("en");
@@ -945,7 +936,7 @@ sap.ui.define([
 																		assert.ok(oEditor.isReady(), "Editor is ready");
 																		assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 																		EditorQunitUtils.wait().then(function () {
-																			destroyEditor(oEditor);
+																			EditorQunitUtils.destroyEditor(oEditor);
 																			oHost.destroy();
 																			oContextHost.destroy();
 																			resolve();
@@ -1030,7 +1021,7 @@ sap.ui.define([
 						assert.ok(deepEqual(EditorQunitUtils.cleanDT(oContents[15].getValue()), {"text": "text01","key": "key01","url": "https://sap.com/06","icon": "sap-icon://accept","int": 1,"editable": true,"number": 3.55}), "SimpleForm field textArea: Has Origin value");
 						assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 						EditorQunitUtils.wait().then(function () {
-							destroyEditor(oEditor);
+							EditorQunitUtils.destroyEditor(oEditor);
 							count++;
 							start = new Date();
 							oEditor = EditorQunitUtils.createEditor("en");
@@ -1061,7 +1052,7 @@ sap.ui.define([
 									assert.ok(deepEqual(EditorQunitUtils.cleanDT(oContents[15].getValue()), {"text": "text01","key": "key01","url": "https://sap.com/06","icon": "sap-icon://accept","int": 1,"editable": true,"number": 3.55}), "SimpleForm field textArea: Has Origin value");
 									assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 									EditorQunitUtils.wait().then(function () {
-										destroyEditor(oEditor);
+										EditorQunitUtils.destroyEditor(oEditor);
 										count++;
 										start = new Date();
 										oEditor = EditorQunitUtils.createEditor("en");
@@ -1092,7 +1083,7 @@ sap.ui.define([
 												assert.ok(deepEqual(EditorQunitUtils.cleanDT(oContents[15].getValue()), {"text": "text01","key": "key01","url": "https://sap.com/06","icon": "sap-icon://accept","int": 1,"editable": true,"number": 3.55}), "SimpleForm field textArea: Has Origin value");
 												assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 												EditorQunitUtils.wait().then(function () {
-													destroyEditor(oEditor);
+													EditorQunitUtils.destroyEditor(oEditor);
 													count++;
 													start = new Date();
 													oEditor = EditorQunitUtils.createEditor("en");
@@ -1123,7 +1114,7 @@ sap.ui.define([
 															assert.ok(deepEqual(EditorQunitUtils.cleanDT(oContents[15].getValue()), {"text": "text01","key": "key01","url": "https://sap.com/06","icon": "sap-icon://accept","int": 1,"editable": true,"number": 3.55}), "SimpleForm field textArea: Has Origin value");
 															assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 															EditorQunitUtils.wait().then(function () {
-																destroyEditor(oEditor);
+																EditorQunitUtils.destroyEditor(oEditor);
 																count++;
 																start = new Date();
 																oEditor = EditorQunitUtils.createEditor("en");
@@ -1154,7 +1145,7 @@ sap.ui.define([
 																		assert.ok(deepEqual(EditorQunitUtils.cleanDT(oContents[15].getValue()), {"text": "text01","key": "key01","url": "https://sap.com/06","icon": "sap-icon://accept","int": 1,"editable": true,"number": 3.55}), "SimpleForm field textArea: Has Origin value");
 																		assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 																		EditorQunitUtils.wait().then(function () {
-																			destroyEditor(oEditor);
+																			EditorQunitUtils.destroyEditor(oEditor);
 																			oHost.destroy();
 																			oContextHost.destroy();
 																			resolve();
@@ -1235,7 +1226,7 @@ sap.ui.define([
 						assert.equal(oTextArea.getValue(), "", "Field 1: Object Value null");
 						assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 						EditorQunitUtils.wait().then(function () {
-							destroyEditor(oEditor);
+							EditorQunitUtils.destroyEditor(oEditor);
 							count++;
 							start = new Date();
 							oEditor = EditorQunitUtils.createEditor("en");
@@ -1264,7 +1255,7 @@ sap.ui.define([
 									assert.equal(oTextArea.getValue(), "", "Field 1: Object Value null");
 									assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 									EditorQunitUtils.wait().then(function () {
-										destroyEditor(oEditor);
+										EditorQunitUtils.destroyEditor(oEditor);
 										count++;
 										start = new Date();
 										oEditor = EditorQunitUtils.createEditor("en");
@@ -1293,7 +1284,7 @@ sap.ui.define([
 												assert.equal(oTextArea.getValue(), "", "Field 1: Object Value null");
 												assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 												EditorQunitUtils.wait().then(function () {
-													destroyEditor(oEditor);
+													EditorQunitUtils.destroyEditor(oEditor);
 													count++;
 													start = new Date();
 													oEditor = EditorQunitUtils.createEditor("en");
@@ -1322,7 +1313,7 @@ sap.ui.define([
 															assert.equal(oTextArea.getValue(), "", "Field 1: Object Value null");
 															assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 															EditorQunitUtils.wait().then(function () {
-																destroyEditor(oEditor);
+																EditorQunitUtils.destroyEditor(oEditor);
 																count++;
 																start = new Date();
 																oEditor = EditorQunitUtils.createEditor("en");
@@ -1351,7 +1342,7 @@ sap.ui.define([
 																		assert.equal(oTextArea.getValue(), "", "Field 1: Object Value null");
 																		assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 																		EditorQunitUtils.wait().then(function () {
-																			destroyEditor(oEditor);
+																			EditorQunitUtils.destroyEditor(oEditor);
 																			oHost.destroy();
 																			oContextHost.destroy();
 																			resolve();
@@ -1443,7 +1434,7 @@ sap.ui.define([
 						assert.ok(oSelectionCell1.getSelected(), "Row 1: Cell 1 is selected");
 						assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 						EditorQunitUtils.wait().then(function () {
-							destroyEditor(oEditor);
+							EditorQunitUtils.destroyEditor(oEditor);
 							count++;
 							start = new Date();
 							oEditor = EditorQunitUtils.createEditor("en");
@@ -1479,7 +1470,7 @@ sap.ui.define([
 									assert.ok(oSelectionCell1.getSelected(), "Row 1: Cell 1 is selected");
 									assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 									EditorQunitUtils.wait().then(function () {
-										destroyEditor(oEditor);
+										EditorQunitUtils.destroyEditor(oEditor);
 										count++;
 										start = new Date();
 										oEditor = EditorQunitUtils.createEditor("en");
@@ -1515,7 +1506,7 @@ sap.ui.define([
 												assert.ok(oSelectionCell1.getSelected(), "Row 1: Cell 1 is selected");
 												assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 												EditorQunitUtils.wait().then(function () {
-													destroyEditor(oEditor);
+													EditorQunitUtils.destroyEditor(oEditor);
 													count++;
 													start = new Date();
 													oEditor = EditorQunitUtils.createEditor("en");
@@ -1551,7 +1542,7 @@ sap.ui.define([
 															assert.ok(oSelectionCell1.getSelected(), "Row 1: Cell 1 is selected");
 															assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 															EditorQunitUtils.wait().then(function () {
-																destroyEditor(oEditor);
+																EditorQunitUtils.destroyEditor(oEditor);
 																count++;
 																start = new Date();
 																oEditor = EditorQunitUtils.createEditor("en");
@@ -1587,7 +1578,7 @@ sap.ui.define([
 																		assert.ok(oSelectionCell1.getSelected(), "Row 1: Cell 1 is selected");
 																		assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 																		EditorQunitUtils.wait().then(function () {
-																			destroyEditor(oEditor);
+																			EditorQunitUtils.destroyEditor(oEditor);
 																			oHost.destroy();
 																			oContextHost.destroy();
 																			resolve();
@@ -1671,7 +1662,7 @@ sap.ui.define([
 						assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), []), "Field 1: DT Value []");
 						assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 						EditorQunitUtils.wait().then(function () {
-							destroyEditor(oEditor);
+							EditorQunitUtils.destroyEditor(oEditor);
 							count++;
 							start = new Date();
 							oEditor = EditorQunitUtils.createEditor("en");
@@ -1701,7 +1692,7 @@ sap.ui.define([
 									assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), []), "Field 1: DT Value []");
 									assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 									EditorQunitUtils.wait().then(function () {
-										destroyEditor(oEditor);
+										EditorQunitUtils.destroyEditor(oEditor);
 										count++;
 										start = new Date();
 										oEditor = EditorQunitUtils.createEditor("en");
@@ -1731,7 +1722,7 @@ sap.ui.define([
 												assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), []), "Field 1: DT Value []");
 												assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 												EditorQunitUtils.wait().then(function () {
-													destroyEditor(oEditor);
+													EditorQunitUtils.destroyEditor(oEditor);
 													count++;
 													start = new Date();
 													oEditor = EditorQunitUtils.createEditor("en");
@@ -1761,7 +1752,7 @@ sap.ui.define([
 															assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), []), "Field 1: DT Value []");
 															assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 															EditorQunitUtils.wait().then(function () {
-																destroyEditor(oEditor);
+																EditorQunitUtils.destroyEditor(oEditor);
 																count++;
 																start = new Date();
 																oEditor = EditorQunitUtils.createEditor("en");
@@ -1791,7 +1782,7 @@ sap.ui.define([
 																		assert.ok(deepEqual(EditorQunitUtils.cleanUUIDAndPosition(oField._getCurrentProperty("value")), []), "Field 1: DT Value []");
 																		assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 																		EditorQunitUtils.wait().then(function () {
-																			destroyEditor(oEditor);
+																			EditorQunitUtils.destroyEditor(oEditor);
 																			oHost.destroy();
 																			oContextHost.destroy();
 																			resolve();
@@ -1883,7 +1874,7 @@ sap.ui.define([
 						assert.equal(oTable.getBinding().getCount(), aObjectsParameterValue1.length, "Table: value length is " + aObjectsParameterValue1.length);
 						assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 						EditorQunitUtils.wait().then(function () {
-							destroyEditor(oEditor);
+							EditorQunitUtils.destroyEditor(oEditor);
 							count++;
 							start = new Date();
 							oEditor = EditorQunitUtils.createEditor("en");
@@ -1915,7 +1906,7 @@ sap.ui.define([
 									assert.equal(oTable.getBinding().getCount(), aObjectsParameterValue1.length, "Table: value length is " + aObjectsParameterValue1.length);
 									assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 									EditorQunitUtils.wait().then(function () {
-										destroyEditor(oEditor);
+										EditorQunitUtils.destroyEditor(oEditor);
 										count++;
 										start = new Date();
 										oEditor = EditorQunitUtils.createEditor("en");
@@ -1947,7 +1938,7 @@ sap.ui.define([
 												assert.equal(oTable.getBinding().getCount(), aObjectsParameterValue1.length, "Table: value length is " + aObjectsParameterValue1.length);
 												assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 												EditorQunitUtils.wait().then(function () {
-													destroyEditor(oEditor);
+													EditorQunitUtils.destroyEditor(oEditor);
 													count++;
 													start = new Date();
 													oEditor = EditorQunitUtils.createEditor("en");
@@ -1979,7 +1970,7 @@ sap.ui.define([
 															assert.equal(oTable.getBinding().getCount(), aObjectsParameterValue1.length, "Table: value length is " + aObjectsParameterValue1.length);
 															assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 															EditorQunitUtils.wait().then(function () {
-																destroyEditor(oEditor);
+																EditorQunitUtils.destroyEditor(oEditor);
 																count++;
 																start = new Date();
 																oEditor = EditorQunitUtils.createEditor("en");
@@ -2011,7 +2002,7 @@ sap.ui.define([
 																		assert.equal(oTable.getBinding().getCount(), aObjectsParameterValue1.length, "Table: value length is " + aObjectsParameterValue1.length);
 																		assert.ok(time < EditorQunitUtils.performance.interaction, "Performance - Ready " + count + ": " + time + "ms OK");
 																		EditorQunitUtils.wait().then(function () {
-																			destroyEditor(oEditor);
+																			EditorQunitUtils.destroyEditor(oEditor);
 																			oHost.destroy();
 																			oContextHost.destroy();
 																			resolve();

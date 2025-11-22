@@ -7,7 +7,6 @@ sap.ui.define([
 	"sap/ui/thirdparty/sinon-4",
 	"./../../ContextHost",
 	"sap/base/util/deepEqual",
-	"sap/ui/core/util/MockServer",
 	"sap/base/util/deepClone",
 	"qunit/designtime/EditorQunitUtils",
 	"sap/ui/integration/formatters/IconFormatter",
@@ -21,7 +20,6 @@ sap.ui.define([
 	sinon,
 	ContextHost,
 	deepEqual,
-	MockServer,
 	deepClone,
 	EditorQunitUtils,
 	IconFormatter,
@@ -85,23 +83,17 @@ sap.ui.define([
 	document.body.className = document.body.className + " sapUiSizeCompact ";
 
 	QUnit.module("basic", {
+		before: function () {
+			EditorQunitUtils.createMockServer(oResponseData);
+		},
+		after: function () {
+			EditorQunitUtils.destroyMockServer();
+		},
 		beforeEach: function () {
-			this.oMockServer = new MockServer();
-			this.oMockServer.setRequests([
-				{
-					method: "GET",
-					path: RegExp("/mock_request/Customers.*"),
-					response: function (xhr) {
-						xhr.respondJSON(200, null, {"value": oResponseData["Customers"]});
-					}
-				}
-			]);
-			this.oMockServer.start();
-
 			this.oEditor = EditorQunitUtils.beforeEachTest();
 		},
 		afterEach: function () {
-			EditorQunitUtils.afterEachTest(this.oEditor, sandbox, this.oMockServer);
+			EditorQunitUtils.afterEachTest(this.oEditor, sandbox);
 		}
 	}, function () {
 		QUnit.test("no value", function (assert) {

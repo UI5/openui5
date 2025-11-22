@@ -34,15 +34,6 @@ sap.ui.define([
 	Localization.setLanguage("en");
 	document.body.className = document.body.className + " sapUiSizeCompact ";
 
-	function destroyEditor(oEditor) {
-		oEditor.destroy();
-		var oContent = document.getElementById("content");
-		if (oContent) {
-			oContent.innerHTML = "";
-			document.body.style.zIndex = "unset";
-		}
-	}
-
 	QUnit.module("Basic", {
 		beforeEach: function () {
 			this.oHost = new Host("host");
@@ -51,6 +42,7 @@ sap.ui.define([
 		afterEach: function () {
 			this.oHost.destroy();
 			this.oContextHost.destroy();
+			EditorQunitUtils.afterEachTest(this.oEditor);
 		}
 	}, function () {
 		QUnit.test("Check translation for value, label, description in admin mode", function (assert) {
@@ -129,7 +121,7 @@ sap.ui.define([
 						var oPopover3 = oIcon3.getDependents()[0];
 						assert.equal(oPopover3.getContent()[0].getText(), "Desc 3 English", "Label3: Desc 3 English");
 					}).then(function () {
-						destroyEditor(this.oEditor);
+						EditorQunitUtils.afterEachTest(this.oEditor);
 						resolve();
 					}.bind(this));
 				}.bind(this));
@@ -185,10 +177,8 @@ sap.ui.define([
 							oIcon3.onmouseover();
 							var oPopover3 = oIcon3.getDependents()[0];
 							assert.equal(oPopover3.getContent()[0].getText(), "Desc 3 US English", "Label3: Desc 3 US English");
-						}).then(function () {
-							destroyEditor(this.oEditor);
 							resolve();
-						}.bind(this));
+						});
 					}.bind(this));
 				}.bind(this));
 			}.bind(this));
@@ -269,7 +259,7 @@ sap.ui.define([
 						var oPopover3 = oIcon3.getDependents()[0];
 						assert.equal(oPopover3.getContent()[0].getText(), "Desc 3 English", "Label3: Desc 3 English");
 					}).then(function () {
-						destroyEditor(this.oEditor);
+						EditorQunitUtils.afterEachTest(this.oEditor);
 						resolve();
 					}.bind(this));
 				}.bind(this));
@@ -325,10 +315,8 @@ sap.ui.define([
 							oIcon3.onmouseover();
 							var oPopover3 = oIcon3.getDependents()[0];
 							assert.equal(oPopover3.getContent()[0].getText(), "Desc 3 US English", "Label3: Desc 3 US English");
-						}).then(function () {
-							destroyEditor(this.oEditor);
 							resolve();
-						}.bind(this));
+						});
 					}.bind(this));
 				}.bind(this));
 			}.bind(this));
@@ -436,10 +424,8 @@ sap.ui.define([
 						assert.equal(oField3Ori.getAggregation("_field").getText(), "string3", "Field3Ori: string3");
 						assert.ok(oField3Trans.getAggregation("_field").getEditable() === true, "Field3Trans: Editable");
 						assert.equal(oField3Trans.getAggregation("_field").getValue(), "string3", "Field3Trans: value string3");
-					}).then(function () {
-						destroyEditor(this.oEditor);
 						resolve();
-					}.bind(this));
+					});
 				}.bind(this));
 			}.bind(this));
 		});
@@ -453,6 +439,7 @@ sap.ui.define([
 		afterEach: function () {
 			this.oHost.destroy();
 			this.oContextHost.destroy();
+			EditorQunitUtils.afterEachTest(this.oEditor);
 		}
 	}, function () {
 		QUnit.test("language from en (as original) to fr(existing)", function (assert) {
@@ -535,10 +522,8 @@ sap.ui.define([
 						assert.equal(oField4Ori.getAggregation("_field").getText(), "String 4 English", "Field4Ori: String 4 English");
 						assert.ok(oField4Trans.getAggregation("_field").getEditable() === true, "Field4Trans: Editable");
 						assert.equal(oField4Trans.getAggregation("_field").getValue(), "String 4 French", "Field4Trans: String 4 French");
-					}).then(function () {
-						destroyEditor(this.oEditor);
 						resolve();
-					}.bind(this));
+					});
 				}.bind(this));
 			}.bind(this));
 		});
@@ -612,10 +597,8 @@ sap.ui.define([
 						assert.equal(oField3Ori.getAggregation("_field").getText(), "String 3 English", "Field3Ori: String 3 English");
 						assert.ok(oField3Trans.getAggregation("_field").getEditable() === true, "Field3Trans: Editable");
 						assert.equal(oField3Trans.getAggregation("_field").getValue(), "String 3 French", "Field3Trans: String 3 French");
-					}).then(function () {
-						destroyEditor(this.oEditor);
 						resolve();
-					}.bind(this));
+					});
 				}.bind(this));
 			}.bind(this));
 		});
@@ -623,12 +606,10 @@ sap.ui.define([
 
 	QUnit.module("Check translation value in translation mode", {
 		beforeEach: function () {
-			this.oHost = new Host("host");
-			this.oContextHost = new ContextHost("contexthost");
+			this.oEditor = EditorQunitUtils.beforeEachTest("de-DE");
 		},
 		afterEach: function () {
-			this.oHost.destroy();
-			this.oContextHost.destroy();
+			EditorQunitUtils.afterEachTest(this.oEditor);
 		}
 	}, function () {
 		QUnit.test("with 2 changes by admin, language from de-DE (not existing) to fr(existing)", function (assert) {
@@ -663,7 +644,6 @@ sap.ui.define([
 			};
 			//Fallback language
 			return new Promise(function (resolve, reject) {
-				this.oEditor = EditorQunitUtils.createEditor("de-DE");
 				this.oEditor.setMode("translation");
 				this.oEditor.setLanguage("fr");
 				this.oEditor.setAllowSettings(true);
@@ -710,7 +690,6 @@ sap.ui.define([
 					}).then(function () {
 						var oCurrentSettings = this.oEditor.getCurrentSettings();
 						assert.ok(deepEqual(oCurrentSettings, { ":layer": 10, ":errors": false }), "Editor: currentSettings correct");
-						destroyEditor(this.oEditor);
 						resolve();
 					}.bind(this));
 				}.bind(this));
@@ -749,7 +728,6 @@ sap.ui.define([
 			};
 			//Fallback language
 			return new Promise(function (resolve, reject) {
-				this.oEditor = EditorQunitUtils.createEditor("de-DE");
 				this.oEditor.setMode("translation");
 				this.oEditor.setLanguage("fr");
 				this.oEditor.setAllowSettings(true);
@@ -796,7 +774,6 @@ sap.ui.define([
 					}).then(function () {
 						var oCurrentSettings = this.oEditor.getCurrentSettings();
 						assert.ok(deepEqual(oCurrentSettings, { ":layer": 10, ":errors": false }), "Editor: currentSettings correct");
-						destroyEditor(this.oEditor);
 						resolve();
 					}.bind(this));
 				}.bind(this));
@@ -840,7 +817,6 @@ sap.ui.define([
 			};
 			//Fallback language
 			return new Promise(function (resolve, reject) {
-				this.oEditor = EditorQunitUtils.createEditor("de-DE");
 				this.oEditor.setMode("translation");
 				this.oEditor.setLanguage("fr");
 				this.oEditor.setAllowSettings(true);
@@ -887,7 +863,6 @@ sap.ui.define([
 					}).then(function () {
 						var oCurrentSettings = this.oEditor.getCurrentSettings();
 						assert.ok(deepEqual(oCurrentSettings, { ":layer": 10, ":errors": false }), "Editor: currentSettings correct");
-						destroyEditor(this.oEditor);
 						resolve();
 					}.bind(this));
 				}.bind(this));
@@ -937,7 +912,6 @@ sap.ui.define([
 			};
 			//Fallback language
 			return new Promise(function (resolve, reject) {
-				this.oEditor = EditorQunitUtils.createEditor("de-DE");
 				this.oEditor.setMode("translation");
 				this.oEditor.setLanguage("fr");
 				this.oEditor.setAllowSettings(true);
@@ -984,7 +958,6 @@ sap.ui.define([
 					}).then(function () {
 						var oCurrentSettings = this.oEditor.getCurrentSettings();
 						assert.ok(deepEqual(oCurrentSettings, translationchanges), "Editor: currentSettings correct");
-						destroyEditor(this.oEditor);
 						resolve();
 					}.bind(this));
 				}.bind(this));
@@ -1024,7 +997,6 @@ sap.ui.define([
 			};
 			//Fallback language
 			return new Promise(function (resolve, reject) {
-				this.oEditor = EditorQunitUtils.createEditor("de-DE");
 				this.oEditor.setMode("translation");
 				this.oEditor.setLanguage("fr");
 				this.oEditor.setAllowSettings(true);
@@ -1071,7 +1043,6 @@ sap.ui.define([
 					}).then(function () {
 						var oCurrentSettings = this.oEditor.getCurrentSettings();
 						assert.ok(deepEqual(oCurrentSettings, translationchanges), "Editor: currentSettings correct");
-						destroyEditor(this.oEditor);
 						resolve();
 					}.bind(this));
 				}.bind(this));
@@ -1111,7 +1082,6 @@ sap.ui.define([
 			};
 			//Fallback language
 			return new Promise(function (resolve, reject) {
-				this.oEditor = EditorQunitUtils.createEditor("de-DE");
 				this.oEditor.setMode("translation");
 				this.oEditor.setLanguage("fr-CA");
 				this.oEditor.setAllowSettings(true);
@@ -1158,7 +1128,6 @@ sap.ui.define([
 					}).then(function () {
 						var oCurrentSettings = this.oEditor.getCurrentSettings();
 						assert.ok(deepEqual(oCurrentSettings, translationchanges), "Editor: currentSettings correct");
-						destroyEditor(this.oEditor);
 						resolve();
 					}.bind(this));
 				}.bind(this));
@@ -1200,7 +1169,6 @@ sap.ui.define([
 			};
 			//Fallback language
 			return new Promise(function (resolve, reject) {
-				this.oEditor = EditorQunitUtils.createEditor("de-DE");
 				this.oEditor.setMode("translation");
 				this.oEditor.setLanguage("es-MX");
 				this.oEditor.setAllowSettings(true);
@@ -1255,7 +1223,6 @@ sap.ui.define([
 					}).then(function () {
 						var oCurrentSettings = this.oEditor.getCurrentSettings();
 						assert.ok(deepEqual(oCurrentSettings, translationchanges), "Editor: currentSettings correct");
-						destroyEditor(this.oEditor);
 						resolve();
 					}.bind(this));
 				}.bind(this));
@@ -1265,12 +1232,10 @@ sap.ui.define([
 
 	QUnit.module("Update translation value in translation mode", {
 		beforeEach: function () {
-			this.oHost = new Host("host");
-			this.oContextHost = new ContextHost("contexthost");
+			this.oEditor = EditorQunitUtils.beforeEachTest("de-DE");
 		},
 		afterEach: function () {
-			this.oHost.destroy();
-			this.oContextHost.destroy();
+			EditorQunitUtils.afterEachTest(this.oEditor);
 		}
 	}, function () {
 		QUnit.test("no translation changes before", function (assert) {
@@ -1305,7 +1270,6 @@ sap.ui.define([
 			};
 			//Fallback language
 			return new Promise(function (resolve, reject) {
-				this.oEditor = EditorQunitUtils.createEditor("de-DE");
 				this.oEditor.setMode("translation");
 				this.oEditor.setLanguage("fr");
 				this.oEditor.setAllowSettings(true);
@@ -1367,7 +1331,6 @@ sap.ui.define([
 								":layer": 10,
 								":errors": false
 							}), "Editor: currentSettings correct");
-							destroyEditor(this.oEditor);
 							resolve();
 						}.bind(this));
 					}.bind(this));
@@ -1418,7 +1381,6 @@ sap.ui.define([
 			};
 			//Fallback language
 			return new Promise(function (resolve, reject) {
-				this.oEditor = EditorQunitUtils.createEditor("de-DE");
 				this.oEditor.setMode("translation");
 				this.oEditor.setLanguage("fr");
 				this.oEditor.setAllowSettings(true);
@@ -1480,7 +1442,6 @@ sap.ui.define([
 								":layer": 10,
 								":errors": false
 							}), "Editor: currentSettings correct");
-							destroyEditor(this.oEditor);
 							resolve();
 						}.bind(this));
 					}.bind(this));

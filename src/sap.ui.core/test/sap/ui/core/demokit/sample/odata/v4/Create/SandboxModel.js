@@ -10,11 +10,100 @@ sap.ui.define([
 ], function (SandboxModelHelper, ODataModel) {
 	"use strict";
 
-	function SandboxModel(mParameters) {
-		const mModelParameters = SandboxModelHelper.adaptModelParameters(mParameters);
+	let oCurrentSalesOrder;
+	const aData = [{
+		BuyerID : "0100000000",
+		CreatedAt : "2025-10-28T12:00:00Z",
+		CurrencyCode : "EUR",
+		GrossAmount : "25867.03",
+		LifecycleStatusDesc : "New",
+		Note : "EPM DG: SO ID 0500000000 Deliver as fast as possible",
+		SalesOrderID : "0500000000",
+		SO_2_BP : {
+			BusinessPartnerID : "0100000000",
+			CompanyName : "SAP"
+		}
+	}, {
+		BuyerID : "0100000004",
+		CreatedAt : "2025-10-28T12:00:00Z",
+		CurrencyCode : "USD",
+		GrossAmount : "250.73",
+		LifecycleStatusDesc : "New",
+		Note : "EPM DG: SO ID 0500000001 Deliver as fast as possible",
+		SalesOrderID : "0500000001",
+		SO_2_BP : {
+			BusinessPartnerID : "0100000004",
+			CompanyName : "Panorama Studios"
+		}
+	}];
+	const mIdToCompanyName = {
+		"0100000000" : "SAP",
+		"0100000001" : "Becker Berlin",
+		"0100000002" : "DelBont Industries",
+		"0100000003" : "Talpa",
+		"0100000004" : "Panorama Studios"
+	};
+	let iInitialId = 500000001;
 
-		return SandboxModelHelper.createModel(mModelParameters);
+	function SandboxModel(mParameters) {
+		return SandboxModelHelper.adaptModelParametersAndCreateModel(mParameters, {
+			sFilterBase : "/sap/opu/odata4/sap/zui5_testv4/default/sap/zui5_epm_sample/0002/",
+			mFixture : {},
+			aRegExps : [{
+				regExp : /^GET [\w\/.]+\$metadata(?:[\w?&\-=]+sap-language=..|)$/,
+				response : {source : "metadata.xml"}
+			}, {
+				regExp : /^GET \/sap\/opu\/odata4\/sap\/zui5_testv4\/default\/sap\/zui5_epm_sample\/0002\/SalesOrderList\?/,
+				response : {message : {value : aData}}
+			}, {
+				regExp : /^POST \/sap\/opu\/odata4\/sap\/zui5_testv4\/default\/sap\/zui5_epm_sample\/0002\/SalesOrderList/,
+				response : {buildResponse : buildPostResponse}
+			}, {
+				regExp : /^GET \/sap\/opu\/odata4\/sap\/zui5_testv4\/default\/sap\/zui5_epm_sample\/0002\/SalesOrderList\(/,
+				response : {buildResponse : buildGetSingleResponse}
+			}],
+			sSourceBase : "sap/ui/core/sample/odata/v4/Create/data"
+		});
 	}
+
+	/**
+	 * Builds a response for any POST request on the "SalesOrderList" collection.
+	 *
+	 * @param {string[]} _aMatches - The matches against the RegExp
+	 * @param {object} oResponse - Response object to fill
+	 * @param {object} oRequest - Request object to get POST body from
+	 */
+	function buildPostResponse(_aMatches, oResponse, oRequest) {
+		const oRequestBody = JSON.parse(oRequest.requestBody);
+		iInitialId += 1;
+		oCurrentSalesOrder = {
+			BuyerID : oRequestBody.BuyerID,
+			CreatedAt : new Date().toISOString(),
+			CurrencyCode : oRequestBody.CurrencyCode ?? "EUR",
+			GrossAmount : "0.00",
+			LifecycleStatusDesc : "New",
+			Note : oRequestBody.Note ?? "",
+			SalesOrderID : "0" + iInitialId
+		};
+		oResponse.message = JSON.stringify(oCurrentSalesOrder);
+
+		oCurrentSalesOrder.SO_2_BP = {
+			BusinessPartnerID : oCurrentSalesOrder.BuyerID,
+			CompanyName : mIdToCompanyName[oCurrentSalesOrder.BuyerID] ?? "n/a"
+		};
+	}
+
+	/**
+	 * Builds a response for a GET request on a specific "SalesOrder" instance which was created by
+	 * the previous POST.
+	 *
+	 * @param {string[]} _aMatches - The matches against the RegExp
+	 * @param {object} oResponse - Response object to fill
+	 */
+	function buildGetSingleResponse(_aMatches, oResponse) {
+		oResponse.message = JSON.stringify(oCurrentSalesOrder);
+	}
+
 	SandboxModel.getMetadata = ODataModel.getMetadata;
 
 	return SandboxModel;

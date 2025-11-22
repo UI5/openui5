@@ -52,15 +52,6 @@ sap.ui.define([
 		}
 	};
 
-	function destroyEditor(oEditor) {
-		oEditor.destroy();
-		var oContent = document.getElementById("content");
-		if (oContent) {
-			oContent.innerHTML = "";
-			document.body.style.zIndex = "unset";
-		}
-	}
-
 	Localization.setLanguage("en");
 	document.body.className = document.body.className + " sapUiSizeCompact ";
 
@@ -72,6 +63,7 @@ sap.ui.define([
 		afterEach: function () {
 			this.oHost.destroy();
 			this.oContextHost.destroy();
+			EditorQunitUtils.afterEachTest(this.oEditor);
 		}
 	}, function () {
 		QUnit.test("syntax {{KEY}}: en", function (assert) {
@@ -157,7 +149,6 @@ sap.ui.define([
 									assert.equal(oTextCell.getText(), "translated text01 en", "Row: Text cell value");
 									var oSelectionCell10 = oNewRow.getCells()[0];
 									assert.ok(oSelectionCell10.getSelected(), "Row 10: Cell 1 is not selected");
-									destroyEditor(that.oEditor);
 									resolve();
 								});
 							});
@@ -250,7 +241,6 @@ sap.ui.define([
 									assert.equal(oTextCell.getText(), "translated text01 France", "Row: Text cell value");
 									var oSelectionCell10 = oNewRow.getCells()[0];
 									assert.ok(oSelectionCell10.getSelected(), "Row 10: Cell 1 is not selected");
-									destroyEditor(that.oEditor);
 									resolve();
 								});
 							});
@@ -344,7 +334,6 @@ sap.ui.define([
 									assert.equal(oTextCell.getText(), "translated text02 en", "Row: Text cell value");
 									var oSelectionCell10 = oNewRow.getCells()[0];
 									assert.ok(oSelectionCell10.getSelected(), "Row 10: Cell 1 is not selected");
-									destroyEditor(that.oEditor);
 									resolve();
 								});
 							});
@@ -438,7 +427,6 @@ sap.ui.define([
 									assert.equal(oTextCell.getText(), "translated text02 France", "Row: Text cell value");
 									var oSelectionCell10 = oNewRow.getCells()[0];
 									assert.ok(oSelectionCell10.getSelected(), "Row 10: Cell 1 is not selected");
-									destroyEditor(that.oEditor);
 									resolve();
 								});
 							});

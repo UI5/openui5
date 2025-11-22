@@ -526,7 +526,6 @@ sap.ui.define([
 
 		return VariantManager.manageVariants(
 			oVariantManagementControl,
-			sVariantManagementReference,
 			mFlexSettings.layer,
 			Utils.getRtaStyleClassName(),
 			ContextSharingAPI.createComponent(mComponentPropertyBag)

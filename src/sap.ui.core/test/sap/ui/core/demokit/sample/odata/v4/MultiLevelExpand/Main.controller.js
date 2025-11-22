@@ -139,7 +139,6 @@ sap.ui.define([
 						: parseFloat(sExpandTo); // Note: parseInt("1E16") === 1
 				}
 				oRowsBinding.setAggregation(this._oAggregation);
-				oTable._oProxy._bEnableV4 = true; // enable V4 tree table flag
 				this.getView().setModel(oRowsBinding.getModel(), "header");
 				this.getView().setBindingContext(oRowsBinding.getHeaderContext(), "header");
 				if (sLeafCount === "false" || sLeafCount === "off") {

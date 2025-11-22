@@ -7,6 +7,7 @@ sap.ui.define([
 	return Controller.extend("sap.ui.core.sample.odata.v4.Create.Main", {
 		onCreateSalesOrder : function () {
 			const oContext = this.byId("salesOrderList").getBinding("items")
+				// Since a default for CurrencyCode is defined in metadata, no need to set this here
 				.create({BuyerID : "0100000000", LifecycleStatus : "N"});
 
 			oContext.created().then(function () {

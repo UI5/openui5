@@ -12,14 +12,18 @@ sap.ui.define([
 	"sap/m/IconTabFilter",
 	"sap/m/IconTabHeader",
 	"sap/m/library",
+	"./library",
 	"sap/uxap/ObjectPageSection"
-], function(Element, coreLib, coreLibrary, BaseObject, ManagedObject, ManagedObjectObserver, IconTabFilter, IconTabHeader, mobileLibrary, ObjectPageSection) {
+], function(Element, coreLib, coreLibrary, BaseObject, ManagedObject, ManagedObjectObserver, IconTabFilter, IconTabHeader, mobileLibrary, library, ObjectPageSection) {
 	"use strict";
 
 	// shortcut for sap.m.TabsOverflowMode
 	var TabsOverflowMode = mobileLibrary.TabsOverflowMode;
 	// shortcut for sap.m.IconTabHeaderMode
 	var IconTabHeaderMode = mobileLibrary.IconTabHeaderMode;
+
+	// shortcut for sap.uxap.ObjectPageSubSectionLayout
+	var ObjectPageSubSectionLayout = library.ObjectPageSubSectionLayout;
 
 	var ABHelper = BaseObject.extend("sap.uxap._helpers.AB", {
 		/**
@@ -172,6 +176,10 @@ sap.ui.define([
 						this._setupCustomButtonForwarding(oSubSection, oSubSectionFilter);
 					}, this);
 				} else if (aSubSections.length === 1 && !oSection.getCustomAnchorBarButton() && aSubSections[0].getTitle()?.trim()) { // promoted section
+					// When SubSectionLayout is TitleOnLeft, the SubSection title is shown in the AnchorBar, when there is only one SubSection and it has title
+					oObjectPage.getSubSectionLayout() === ObjectPageSubSectionLayout.TitleOnLeft
+						&& oSectionFilter.setText(ManagedObject.escapeSettingsValue(aSubSections[0].getTitle()));
+
 					this._setupCustomButtonForwarding(aSubSections[0], oSectionFilter, bUpperCase);
 				}
 			}

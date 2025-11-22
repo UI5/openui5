@@ -136,15 +136,6 @@ sap.ui.define([
 			"zh-CN": "String1 简体 Admin"
 		}
 	};
-	function destroyEditor(oEditor) {
-		oEditor.destroy();
-		var oContent = document.getElementById("content");
-		if (oContent) {
-			oContent.innerHTML = "";
-			document.body.style.zIndex = "unset";
-		}
-	}
-
 	Localization.setLanguage("en");
 	document.body.className = document.body.className + " sapUiSizeCompact ";
 
@@ -156,6 +147,7 @@ sap.ui.define([
 		afterEach: function () {
 			this.oHost.destroy();
 			this.oContextHost.destroy();
+			EditorQunitUtils.afterEachTest(this.oEditor);
 		}
 	}, function () {
 		_aCheckedLanguages.forEach(function(sLanguage) {
@@ -292,7 +284,6 @@ sap.ui.define([
 														var oValueHelpIcon3 = oFormField3._oValueHelpIcon;
 														assert.ok(oValueHelpIcon3, "SimpleForm 3 field 1: Value help icon exist");
 														assert.ok(!oValueHelpIcon3.getVisible(), "SimpleForm 3 field 1: Value help icon not visible");
-														destroyEditor(that.oEditor);
 														resolve();
 													});
 													oTable1.setSelectedIndex(2);

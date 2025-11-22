@@ -37,16 +37,6 @@ sap.ui.define([
 	Localization.setLanguage("en");
 	document.body.className = document.body.className + " sapUiSizeCompact ";
 
-	function destroyEditor(oEditor) {
-		oEditor.destroy();
-		var oContent = document.getElementById("content");
-		if (oContent) {
-			oContent.innerHTML = "";
-			document.body.style.zIndex = "unset";
-		}
-
-	}
-
 	var _oManifest = {
 		"sap.app": {
 			"id": "test.sample",
@@ -126,6 +116,7 @@ sap.ui.define([
 		afterEach: function () {
 			this.oHost.destroy();
 			this.oContextHost.destroy();
+			EditorQunitUtils.afterEachTest(this.oEditor);
 		}
 	}, function () {
 		QUnit.test("Cancel translation", function (assert) {
@@ -237,8 +228,6 @@ sap.ui.define([
 											var oCancelButton1 = oTranslationPopover1.getFooter().getContent()[2];
 											assert.ok(oCancelButton1.getEnabled(), "oTranslationPopover1 Content: cancel button enabled");
 											oCancelButton1.firePress();
-
-											destroyEditor(that.oEditor);
 											resolve();
 										});
 										oValueHelpIcon1.firePress();
@@ -378,8 +367,6 @@ sap.ui.define([
 											var oCancelButton1 = oTranslationPopover1.getFooter().getContent()[2];
 											assert.ok(oCancelButton1.getEnabled(), "oTranslationPopover1 Content: cancel button enabled");
 											oCancelButton1.firePress();
-
-											destroyEditor(that.oEditor);
 											resolve();
 										});
 										oValueHelpIcon1.firePress();
@@ -550,7 +537,6 @@ sap.ui.define([
 																assert.equal(sCurrentValue, sExpectedValue, "oTranslationPopover1 Content: item " + i + " " + sLanguage + ", current: " + sCurrentValue + ", expected: " + sExpectedValue);
 																assert.equal(sValueState, "None", "oTranslationPopover1 Content: item " + i + " " + sLanguage + ", value state: " + sValueState + ", expected: None");
 															}
-															destroyEditor(that.oEditor);
 															resolve();
 														});
 														oValueHelpIcon1.firePress();
@@ -581,6 +567,7 @@ sap.ui.define([
 		afterEach: function () {
 			this.oHost.destroy();
 			this.oContextHost.destroy();
+			EditorQunitUtils.afterEachTest(this.oEditor);
 		}
 	}, function () {
 		QUnit.test("Cancel translation", function (assert) {
@@ -686,8 +673,6 @@ sap.ui.define([
 											var oCancelButton1 = oTranslationPopover1.getFooter().getContent()[2];
 											assert.ok(oCancelButton1.getEnabled(), "oTranslationPopover1 Content: cancel button enabled");
 											oCancelButton1.firePress();
-
-											destroyEditor(that.oEditor);
 											resolve();
 										});
 										oValueHelpIcon1.firePress();
@@ -821,8 +806,6 @@ sap.ui.define([
 											var oCancelButton1 = oTranslationPopover1.getFooter().getContent()[2];
 											assert.ok(oCancelButton1.getEnabled(), "oTranslationPopover1 Content: cancel button enabled");
 											oCancelButton1.firePress();
-
-											destroyEditor(that.oEditor);
 											resolve();
 										});
 										oValueHelpIcon1.firePress();
@@ -984,7 +967,6 @@ sap.ui.define([
 																assert.equal(sCurrentValue, sExpectedValue, "oTranslationPopover1 Content: item " + i + " " + sLanguage + ", current: " + sCurrentValue + ", expected: " + sExpectedValue);
 																assert.equal(sValueState, "None", "oTranslationPopover1 Content: item " + i + " " + sLanguage + ", value state: " + sValueState + ", expected: None");
 															}
-															destroyEditor(that.oEditor);
 															resolve();
 														});
 														oValueHelpIcon1.firePress();

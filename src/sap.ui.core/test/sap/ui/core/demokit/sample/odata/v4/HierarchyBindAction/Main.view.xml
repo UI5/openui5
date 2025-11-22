@@ -8,7 +8,7 @@
 	xmlns:plugins="sap.ui.table.plugins"
 	xmlns:rm="sap.ui.table.rowmodes">
 
-	<TreeTable ariaLabelledBy="title" id="table"
+	<Table ariaLabelledBy="title" id="table"
 		rows="{
 				path : '_Hierarchy',
 				parameters : {
@@ -20,6 +20,7 @@
 			}"
 		selectionMode="None" threshold="0">
 		<dependents>
+			<plugins:ODataV4Hierarchy/>
 			<plugins:ODataV4MultiSelection enableNotification="true"/>
 		</dependents>
 		<extension>
@@ -113,7 +114,7 @@
 				</m:FlexBox>
 			</template>
 		</Column>
-	</TreeTable>
+	</Table>
 
 	<mvc:dependents>
 		<m:SelectDialog confirm=".onMoveConfirm" draggable="true" id="moveDialog"

@@ -398,7 +398,8 @@ sap.ui.define([
 				config : "any"
 			},
 			*/
-			library: "sap.ui.core"
+			library: "sap.ui.core",
+			designtime: "sap/ui/core/designtime/Component.designtime"
 		}
 
 	}, /* Metadata constructor */ ComponentMetadata);

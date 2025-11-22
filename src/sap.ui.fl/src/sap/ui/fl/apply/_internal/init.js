@@ -4,10 +4,12 @@
 
 sap.ui.define([
 	"sap/ui/fl/apply/_internal/changeHandlers/ChangeHandlerRegistration",
+	"sap/ui/fl/apply/_internal/flexState/communication/FLPAboutInfo",
 	"sap/ui/fl/apply/_internal/DelegateMediator",
 	"sap/ui/fl/changeHandler/ChangeAnnotation"
 ], function(
 	ChangeHandlerRegistration,
+	FLPAboutInfo,
 	DelegateMediator,
 	ChangeAnnotation
 ) {
@@ -42,4 +44,6 @@ sap.ui.define([
 		modelType: "sap.ui.model.odata.ODataModel",
 		delegate: "sap/ui/fl/write/_internal/delegates/ODataV2ReadDelegate"
 	});
+
+	FLPAboutInfo.initialize();
 });

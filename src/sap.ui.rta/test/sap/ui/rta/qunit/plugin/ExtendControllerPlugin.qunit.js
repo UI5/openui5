@@ -12,6 +12,7 @@ sap.ui.define([
 	"sap/ui/rta/command/CommandFactory",
 	"sap/ui/rta/command/ExtendControllerCommand",
 	"sap/ui/rta/plugin/ExtendControllerPlugin",
+	"sap/ui/rta/plugin/Plugin",
 	"sap/ui/thirdparty/sinon-4"
 ], function(
 	XMLView,
@@ -26,6 +27,7 @@ sap.ui.define([
 	CommandFactory,
 	ExtendControllerCommand,
 	ExtendControllerPlugin,
+	Plugin,
 	sinon
 ) {
 	"use strict";
@@ -129,8 +131,15 @@ sap.ui.define([
 			);
 		});
 
+		QUnit.test("When the Action is set to null", function(assert) {
+			sandbox.stub(Plugin.prototype, "getAction").returns(null);
+			return this.oExtendControllerPlugin._isEditable(this.oPanelOverlay).then(function(bEditable) {
+				assert.notOk(bEditable, "then the Overlay is not editable");
+			});
+		});
+
 		QUnit.test("When the Action is not defined in the designtimeMetadata", function(assert) {
-			sandbox.stub(this.oExtendControllerPlugin, "getAction").returns(undefined);
+			sandbox.stub(Plugin.prototype, "getAction").returns(undefined);
 			return this.oExtendControllerPlugin._isEditable(this.oPanelOverlay).then(function(bEditable) {
 				assert.ok(bEditable, "then the Overlay is editable");
 			});

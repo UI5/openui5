@@ -3,13 +3,14 @@
 
 sap.ui.define([
 	"sap/base/util/Deferred",
+	"sap/ui/base/Event",
 	"sap/ui/core/util/reflection/JsControlTreeModifier",
 	"sap/ui/core/Control",
 	"sap/ui/fl/apply/_internal/changes/Applier",
 	"sap/ui/fl/apply/_internal/changes/Reverter",
 	"sap/ui/fl/apply/_internal/flexObjects/FlexObjectFactory",
-	"sap/ui/fl/apply/_internal/flexState/controlVariants/Switcher",
 	"sap/ui/fl/apply/_internal/flexState/changes/DependencyHandler",
+	"sap/ui/fl/apply/_internal/flexState/controlVariants/Switcher",
 	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
 	"sap/ui/fl/apply/_internal/flexState/FlexObjectState",
 	"sap/ui/fl/apply/_internal/flexState/FlexState",
@@ -27,13 +28,14 @@ sap.ui.define([
 	"test-resources/sap/ui/rta/qunit/RtaQunitUtils"
 ], function(
 	Deferred,
+	BaseEvent,
 	JsControlTreeModifier,
 	Control,
 	Applier,
 	Reverter,
 	FlexObjectFactory,
-	Switcher,
 	DependencyHandler,
+	Switcher,
 	VariantManagementState,
 	FlexObjectState,
 	FlexState,
@@ -108,6 +110,10 @@ sap.ui.define([
 
 	QUnit.module("VariantManager", {
 		async beforeEach() {
+			this.oSettingsStub = sandbox.stub(Settings, "getInstanceOrUndef").callsFake(() => {
+				const oSettings = this.oSettingsStub.wrappedMethod();
+				return oSettings || { getUserId: () => "test user" };
+			});
 			stubFlexObjectsSelector([
 				createVariant({
 					author: ControlVariantWriteUtils.DEFAULT_AUTHOR,
@@ -254,9 +260,6 @@ sap.ui.define([
 
 		[true, false].forEach(function(bVendorLayer) {
 			QUnit.test(bVendorLayer ? "when calling 'copyVariant' in VENDOR layer" : "when calling 'copyVariant'", async function(assert) {
-				sandbox.stub(Settings, "getInstanceOrUndef").returns({
-					getUserId: () => "test user"
-				});
 				sandbox.stub(JsControlTreeModifier, "getSelector").returns({ id: sVMReference });
 				var oAddDirtyChangesSpy = sandbox.spy(FlexObjectManager, "addDirtyFlexObjects");
 
@@ -399,68 +402,213 @@ sap.ui.define([
 		});
 
 		QUnit.test("when calling 'handleManageEvent' without parameters", async function(assert) {
-			sandbox.stub(this.oModel, "_collectModelChanges").returns({
-				changes: [],
-				variantsToBeDeleted: []
-			});
 			const oSaveStub = sandbox.stub(FlexObjectManager, "saveFlexObjects");
-			await VariantManager.handleManageEvent({ getSource: () => this.oVMControl }, {}, this.oModel);
+			const oManageEvent = new BaseEvent("manage", this.oVMControl, { });
+			await VariantManager.handleManageEvent(oManageEvent, this.oVMControl);
 			assert.strictEqual(oSaveStub.callCount, 0, "then no changes were saved");
 		});
 
 		QUnit.test("when calling 'handleManageEvent' deleting a USER and a PUBLIC variants", async function(assert) {
-			sandbox.stub(this.oModel, "_collectModelChanges").returns({
-				changes: [{
-					changeType: "setVisible",
-					layer: "PUBLIC",
-					variantReference: sVMReference,
+			const sPublicVariantKey = this.oModel.getData()[sVMReference].variants[2].key;
+			const sUserVariantKey = this.oModel.getData()[sVMReference].variants[4].key;
+			const oManageEvent = new BaseEvent("manage", this.oVMControl, {
+				fav: [{
+					key: sPublicVariantKey,
 					visible: false
 				}, {
-					changeType: "setVisible",
-					layer: "USER",
-					variantReference: "variant1",
+					key: sUserVariantKey,
 					visible: false
 				}],
-				variantsToBeDeleted: ["variant1", "variant3"]
+				deleted: [sPublicVariantKey, sUserVariantKey]
 			});
+
 			const oSaveStub = sandbox.stub(FlexObjectManager, "saveFlexObjects");
-			await VariantManager.handleManageEvent(
-				{
-					getSource: () => this.oVMControl,
-					getParameter: () => undefined
-				},
-				{ variantManagementReference: sVMReference },
-				this.oModel
-			);
+			await VariantManager.handleManageEvent(oManageEvent, this.oVMControl);
 			assert.strictEqual(oSaveStub.callCount, 2, "then saveDirtyChanges is called twice, once for each layer");
 		});
 
 		QUnit.test("when calling 'handleManageEvent' deleting the current USER variant", async function(assert) {
-			sandbox.stub(this.oModel, "_collectModelChanges").returns({
-				changes: [{
-					changeType: "setVisible",
-					layer: "USER",
-					variantReference: "variant2",
-					visible: false
-				}],
-				variantsToBeDeleted: ["variant2"]
+			const sCurrentUserVariantKey = this.oModel.getData()[sVMReference].variants[3].key;
+			const oManageEvent = new BaseEvent("manage", this.oVMControl, {
+				deleted: [sCurrentUserVariantKey]
 			});
 			sandbox.stub(VariantManagementState, "getCurrentVariantReference").returns("variant2");
 			const oSaveStub = sandbox.stub(FlexObjectManager, "saveFlexObjects");
 			const oGetDefaultVariantReferenceSpy = sandbox.spy(VariantManagementState, "getDefaultVariantReference");
 			const oUpdateCurrentVariantSpy = sandbox.spy(VariantManager, "updateCurrentVariant");
-			await VariantManager.handleManageEvent(
-				{
-					getSource: () => this.oVMControl,
-					getParameter: () => undefined
-				},
-				{ variantManagementReference: sVMReference },
-				this.oModel
-			);
+			await VariantManager.handleManageEvent(oManageEvent, this.oVMControl);
 			assert.strictEqual(oSaveStub.callCount, 1, "then saveDirtyChanges is called once");
-			assert.strictEqual(oGetDefaultVariantReferenceSpy.callCount, 1, "then default variant is requested");
+			assert.ok(oGetDefaultVariantReferenceSpy.called, "then default variant is requested");
 			assert.strictEqual(oUpdateCurrentVariantSpy.callCount, 1, "then current variant is updated");
 			assert.strictEqual(oUpdateCurrentVariantSpy.lastCall.args[0].newVariantReference, "variant1", "to the default variant");
+		});
+
+		QUnit.test("when calling 'handleManageEvent' and public variant is enabled", async function(assert) {
+			this.oSettingsStub.callsFake(() => {
+				const oSettings = this.oSettingsStub.wrappedMethod();
+				oSettings.getIsPublicFlVariantEnabled = () => true;
+				return oSettings;
+			});
+
+			// variant0 CUSTOMER -> set as default => USER change
+			// variant1 PUBLIC -> renamed to "test" (PUBLIC change), favorite set to true (USER change)
+			// variant2 PUBLIC -> deleted => "setVisible = false" PUBLIC change
+			// variant3 USER -> previously invisible, now deleted => USER deletion
+			const sNewDefaultVariantKey = this.oModel.getData()[sVMReference].variants[1].key; // variant0
+			const sPublicVariantKey = this.oModel.getData()[sVMReference].variants[2].key; // variant1
+			const sPublicVariantKey2 = this.oModel.getData()[sVMReference].variants[3].key; // variant2
+			const sUserVariantKey = this.oModel.getData()[sVMReference].variants[4].key; // variant3
+			const oManageEvent = new BaseEvent("manage", this.oVMControl, {
+				renamed: [{
+					key: sPublicVariantKey,
+					name: "test"
+				}],
+				fav: [{
+					key: sPublicVariantKey,
+					visible: true
+				}],
+				deleted: [sPublicVariantKey2, sUserVariantKey],
+				def: sNewDefaultVariantKey
+			});
+
+			const oSaveStub = sandbox.stub(FlexObjectManager, "saveFlexObjects");
+			const oDeleteStub = sandbox.stub(FlexObjectManager, "deleteFlexObjects");
+
+			await VariantManager.handleManageEvent(oManageEvent, this.oVMControl);
+			const aPublicChanges = oSaveStub.firstCall.args[0].flexObjects;
+			const aUserChanges = oSaveStub.lastCall.args[0].flexObjects;
+			const aDeletedFlexObjects = oDeleteStub.firstCall.args[0].flexObjects;
+
+			assert.strictEqual(aUserChanges.length, 2, "then 2 changes are saved for USER layer");
+			assert.strictEqual(aPublicChanges.length, 2, "then 2 changes are saved for PUBLIC layer");
+			assert.strictEqual(
+				aDeletedFlexObjects.length,
+				2,
+				"then the USER layer variant (variant3) and the 'setVisible' change for the variant are deleted"
+			);
+
+			assert.strictEqual(aPublicChanges[0].getChangeType(), "setTitle", "then the first PUBLIC change is of type 'setTitle'");
+			assert.strictEqual(aPublicChanges[0].getTexts().title.value, "test", "then the variant is renamed correctly");
+			assert.strictEqual(aPublicChanges[1].getChangeType(), "setVisible", "then the second PUBLIC change is of type 'setVisible'");
+			assert.strictEqual(aPublicChanges[1].getContent().visible, false, "then the visible property is set to false correctly");
+
+			assert.strictEqual(aUserChanges[0].getChangeType(), "setFavorite", "then the first USER change is of type 'setFavorite'");
+			assert.strictEqual(aUserChanges[0].getContent().favorite, true, "then the favorite property is set to true correctly");
+			assert.strictEqual(aUserChanges[1].getChangeType(), "setDefault", "then the second USER change is of type 'setDefault'");
+			assert.strictEqual(
+				aUserChanges[1].getContent().defaultVariant, sNewDefaultVariantKey, "then the default variant is set correctly"
+			);
+
+			assert.strictEqual(aDeletedFlexObjects[0].getId(), sUserVariantKey, "then the correct USER variant is deleted");
+			assert.strictEqual(aDeletedFlexObjects[1].getChangeType(), "setVisible", "then the 'setVisible' change is deleted");
+		});
+
+		QUnit.test("when the VM Control fires the manage event in Personalization mode with dirty VM changes and UI Changes", function(assert) {
+			const fnDone = assert.async();
+			const oDeleteVariantSpy = sandbox.stub(ControlVariantWriteUtils, "deleteVariant");
+
+			const sVariantKey = VariantManagementState.getAllVariants(sVMReference)[1].key;
+			const oManageParameters = {
+				renamed: [{
+					key: sVariantKey,
+					name: "test"
+				}],
+				fav: [{
+					key: sVariantKey,
+					visible: false
+				}],
+				deleted: [sVariantKey],
+				def: sVariantKey
+			};
+
+			const oUpdateVariantSpy = sandbox.spy(VariantManager, "updateCurrentVariant");
+			const oSaveStub = sandbox.stub(FlexObjectManager, "saveFlexObjects");
+			const oAddVariantChangesSpy = sandbox.stub(VariantManager, "handleManageEvent").callsFake(async (...aArgs) => {
+				await oAddVariantChangesSpy.wrappedMethod.apply(this, aArgs);
+
+				assert.strictEqual(oUpdateVariantSpy.callCount, 0, "the variant was not switched");
+				const oPassedPropertyBag = oSaveStub.lastCall.args[0];
+				assert.strictEqual(oPassedPropertyBag.selector, oComponent, "the app component was passed");
+				// Changes must be passed in this case to avoid that UI changes are read from the FlexState and persisted as well
+				assert.deepEqual(
+					oPassedPropertyBag.flexObjects.length,
+					4,
+					"an array with 4 changes was passed instead of taking the changes directly from the FlexState"
+				);
+				assert.ok(oDeleteVariantSpy.notCalled, "for the CUSTOMER layer variant, deleteVariant is not called");
+				fnDone();
+			});
+
+			this.oVMControl.fireManage(oManageParameters, { variantManagementReference: sVMReference });
+		});
+
+		QUnit.test("when the VM Control fires the manage event in Personalization mode with deleting the current variant", function(assert) {
+			const fnDone = assert.async();
+
+			const oManageParameters = {
+				deleted: [VariantManagementState.getCurrentVariantReference({
+					vmReference: sVMReference,
+					reference: sReference
+				})]
+			};
+
+			const oUpdateVariantStub = sandbox.stub(VariantManager, "updateCurrentVariant");
+			const oAddVariantChangesSpy = sandbox.spy(VariantManager, "addVariantChanges");
+			sandbox.stub(FlexObjectManager, "saveFlexObjects").callsFake((oPropertyBag) => {
+				assert.strictEqual(oUpdateVariantStub.callCount, 1, "the variant was switched");
+				assert.deepEqual(oUpdateVariantStub.lastCall.args[0], {
+					variantManagementReference: sVMReference,
+					newVariantReference: "variant1",
+					appComponent: oComponent,
+					vmControl: this.oVMControl
+				}, "the correct variant was switched to");
+				assert.strictEqual(oPropertyBag.selector, oComponent, "the app component was passed");
+				assert.strictEqual(oAddVariantChangesSpy.lastCall.args[1].length, 1, "1 change was added");
+				assert.strictEqual(oPropertyBag.flexObjects.length, 1, "an array with 1 change was passed");
+				fnDone();
+			});
+
+			this.oVMControl.fireManage(oManageParameters, { variantManagementReference: sVMReference });
+		});
+
+		QUnit.test("when the VM Control fires the manage event in Personalization mode deleting a USER and a PUBLIC layer variant", function(assert) {
+			const fnDone = assert.async();
+			const oDeleteVariantSpy = sandbox.spy(ControlVariantWriteUtils, "deleteVariant");
+
+			const oManageParameters = {
+				deleted: ["variant2", "variant3"]
+			};
+
+			sandbox.stub(FlexObjectManager, "saveFlexObjects").callsFake((oPropertyBag) => {
+				assert.ok(
+					oDeleteVariantSpy.calledWith(sReference, sVMReference, "variant3"),
+					"then the variant and related objects were deleted"
+				);
+				assert.notOk(
+					oDeleteVariantSpy.calledWith(sReference, sVMReference, "variant2"),
+					"then the PUBLIC variant is only hidden and not deleted"
+				);
+
+				assert.strictEqual(
+					oPropertyBag.flexObjects.length,
+					1,
+					"then only one change is saved since the rest is dirty and directly removed from FlexState"
+				);
+				assert.strictEqual(
+					oPropertyBag.flexObjects[0].getChangeType(),
+					"setVisible",
+					"then the change is of the correct type (setVisible)"
+				);
+				assert.strictEqual(
+					oPropertyBag.flexObjects[0].getVariantId(),
+					"variant2",
+					"then only the PUBLIC variant is hidden via setVisible"
+				);
+
+				fnDone();
+			});
+
+			this.oVMControl.fireManage(oManageParameters, { variantManagementReference: sVMReference });
 		});
 
 		QUnit.test("when calling 'handleSaveEvent' with parameter from SaveAs button and default/execute box checked", async function(assert) {
@@ -863,7 +1011,10 @@ sap.ui.define([
 				checkUpdate: oCheckUpdateStub
 			});
 			VariantManager.updateVariantManagementMap(sFlexReference);
-			assert.ok(oCheckUpdateStub.calledWith({ reference: sFlexReference }), "then the invalidate method was called for the reference");
+			assert.ok(
+				oCheckUpdateStub.calledWith({ reference: sFlexReference }),
+				"then the invalidate method was called for the reference"
+			);
 		});
 
 		QUnit.test("getControlChangesForVariant", function(assert) {
@@ -1023,6 +1174,96 @@ sap.ui.define([
 				"then the variant switch promise was set twice"
 			);
 			assert.strictEqual(oCallVariantSwitchListenersSpy.callCount, 1, "then the listeners were called");
+		});
+
+		QUnit.test("when calling 'manageVariants' in Adaptation mode with changes", function(assert) {
+			const sLayer = Layer.CUSTOMER;
+			const sDummyClass = "DummyClass";
+			const oFakeComponentContainerPromise = { property: "fake" };
+
+			const sVariant1Key = this.oModel.oData[sVMReference].variants[1].key;
+			const oManageParameters = {
+				renamed: [{
+					key: sVariant1Key,
+					name: "test"
+				}],
+				fav: [{
+					key: sVariant1Key,
+					visible: false
+				}],
+				exe: [{
+					key: this.oModel.oData[sVMReference].variants[2].key,
+					exe: false
+				}],
+				deleted: [sVariant1Key],
+				contexts: [{
+					key: this.oModel.oData[sVMReference].variants[3].key,
+					contexts: { foo: "bar" }
+				}],
+				def: "variant0"
+			};
+
+			this.oVMControl._oVM.setDesignMode(true);
+
+			const oOpenManagementDialogStub = sandbox.stub(this.oVMControl, "openManagementDialog")
+			.callsFake(() => this.oVMControl.fireManage(oManageParameters));
+
+			this.oModel.setModelPropertiesForControl(sVMReference, true, this.oVMControl);
+
+			return VariantManager.manageVariants(this.oVMControl, sLayer, sDummyClass, oFakeComponentContainerPromise)
+			.then(function({ changes: aChanges, variantsToBeDeleted: aVariantsToBeDeleted }) {
+				assert.strictEqual(aChanges.length, 6, "then 6 changes were returned since changes were made in the manage dialog");
+				assert.deepEqual(aChanges[0], {
+					variantReference: "variant0",
+					changeType: "setTitle",
+					title: "test",
+					originalTitle: "variant A",
+					layer: Layer.CUSTOMER
+				}, "the setTitle change is correct");
+				assert.deepEqual(aChanges[1], {
+					variantReference: "variant0",
+					changeType: "setFavorite",
+					favorite: false,
+					originalFavorite: true,
+					layer: Layer.CUSTOMER
+				}, "the setFavorite change is correct");
+				assert.deepEqual(aChanges[2], {
+					variantReference: "variant1",
+					changeType: "setExecuteOnSelect",
+					executeOnSelect: false,
+					originalExecuteOnSelect: true,
+					layer: Layer.PUBLIC
+				}, "the setExecuteOnSelect change is correct");
+				assert.deepEqual(aChanges[3], {
+					variantReference: "variant0",
+					changeType: "setVisible",
+					visible: false,
+					layer: Layer.CUSTOMER
+				}, "the setVisible change is correct");
+				assert.deepEqual(aChanges[4], {
+					variantReference: "variant2",
+					changeType: "setContexts",
+					contexts: { foo: "bar" },
+					originalContexts: {},
+					layer: Layer.CUSTOMER
+				}, "the setContexts change is correct");
+				assert.deepEqual(aChanges[5], {
+					variantManagementReference: sVMReference,
+					changeType: "setDefault",
+					defaultVariant: "variant0",
+					originalDefaultVariant: "variant1",
+					layer: Layer.CUSTOMER
+				}, "the setDefault change is correct");
+				assert.ok(
+					oOpenManagementDialogStub.calledWith(true, sDummyClass, oFakeComponentContainerPromise),
+					"then openManagementControl is called with the right parameters"
+				);
+				assert.deepEqual(
+					aVariantsToBeDeleted,
+					["variant0"],
+					"then the removed variant is returned as variant to be deleted"
+				);
+			});
 		});
 	});
 

@@ -46,20 +46,10 @@ sap.ui.define([
 
 	QUnit.module("basic", {
 		before: function () {
-			this.oMockServer = new MockServer();
-			this.oMockServer.setRequests([
-				{
-					method: "GET",
-					path: RegExp("/mock_request/Objects.*"),
-					response: function (xhr) {
-						xhr.respondJSON(200, null, {"value": oResponseData["Objects"]});
-					}
-				}
-			]);
-			this.oMockServer.start();
+			EditorQunitUtils.createMockServer(oResponseData);
 		},
 		after: function () {
-			this.oMockServer.destroy();
+			EditorQunitUtils.destroyMockServer();
 		},
 		beforeEach: function () {
 			this.oEditor = EditorQunitUtils.beforeEachTest();

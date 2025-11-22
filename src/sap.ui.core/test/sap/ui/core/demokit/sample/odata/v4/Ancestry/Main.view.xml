@@ -4,11 +4,15 @@
 	xmlns="sap.ui.table"
 	xmlns:m="sap.m"
 	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:plugins="sap.ui.table.plugins"
 	xmlns:rm="sap.ui.table.rowmodes">
 
-	<TreeTable id="table" ariaLabelledBy="title"
+	<Table id="table" ariaLabelledBy="title"
 		rows="{path : '/SADL_V_RS_Ancestry_4_Hier', parameters : {$count : true}, suspended : true}"
 		selectionMode="None" threshold="0">
+		<dependents>
+			<plugins:ODataV4Hierarchy/>
+		</dependents>
 		<extension>
 			<m:Toolbar design="Transparent" class="sapMTBHeader-CTX">
 				<m:Title id="title" level="H1" text="{header>$count} Ancestors"/>
@@ -61,6 +65,6 @@
 				<m:Text text="{hobby}" wrapping="false"/>
 			</template>
 		</Column>
-	</TreeTable>
+	</Table>
 
 </mvc:View>

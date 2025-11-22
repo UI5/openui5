@@ -136,8 +136,6 @@ sap.ui.define([
 					oTreeTable.unbindRows();
 					oTreeTable.setVisible(false);
 				} else {
-					// enable V4 tree table flag
-					oTreeTable._oProxy._bEnableV4 = true;
 					if (sVisibleRowCount) {
 						oTreeTable.getRowMode().setRowCount(parseInt(sVisibleRowCount));
 					}

@@ -11,6 +11,7 @@ sap.ui.define([
 	"sap/ui/rta/command/AddXML",
 	"sap/ui/rta/command/CommandFactory",
 	"sap/ui/rta/plugin/AddXMLPlugin",
+	"sap/ui/rta/plugin/Plugin",
 	"sap/ui/rta/Utils",
 	"sap/ui/thirdparty/sinon-4"
 ], function(
@@ -25,6 +26,7 @@ sap.ui.define([
 	AddXMLCommand,
 	CommandFactory,
 	AddXMLPlugin,
+	Plugin,
 	RtaUtils,
 	sinon
 ) {
@@ -124,14 +126,14 @@ sap.ui.define([
 		});
 
 		QUnit.test("When the Action is set to null", function(assert) {
-			sandbox.stub(this.oAddXmlPlugin, "getAction").returns(null);
+			sandbox.stub(Plugin.prototype, "getAction").returns(null);
 			return this.oAddXmlPlugin._isEditable(this.oPanelOverlay).then(function(bEditable) {
 				assert.notOk(bEditable, "then the Overlay is not editable");
 			});
 		});
 
 		QUnit.test("When the Action is not defined in the designtimeMetadata", function(assert) {
-			sandbox.stub(this.oAddXmlPlugin, "getAction").returns(undefined);
+			sandbox.stub(Plugin.prototype, "getAction").returns(undefined);
 			return this.oAddXmlPlugin._isEditable(this.oPanelOverlay).then(function(bEditable) {
 				assert.ok(bEditable, "then the Overlay is editable");
 			});

@@ -7,7 +7,6 @@ sap.ui.define([
 	"sap/ui/thirdparty/sinon-4",
 	"./../../ContextHost",
 	"sap/base/util/deepEqual",
-	"sap/ui/core/util/MockServer",
 	"sap/base/util/deepClone",
 	"qunit/designtime/EditorQunitUtils"
 ], function (
@@ -18,7 +17,6 @@ sap.ui.define([
 	sinon,
 	ContextHost,
 	deepEqual,
-	MockServer,
 	deepClone,
 	EditorQunitUtils
 ) {
@@ -72,48 +70,16 @@ sap.ui.define([
 
 	QUnit.module("filter", {
 		before: function() {
-			this.oMockServer = new MockServer();
-			this.oMockServer.setRequests([
-				{
-					method: "GET",
-					path: RegExp("/mock_request/Customers.*"),
-					response: function (xhr) {
-						xhr.respondJSON(200, null, {"value": oResponseData["Customers"]});
-					}
-				}
-			]);
-			this.oMockServer.start();
-
-			this.oHost = new Host("host");
-			this.oContextHost = new ContextHost("contexthost");
+			EditorQunitUtils.createMockServer(oResponseData);
 		},
 		beforeEach: function () {
-			this.oEditor = new Editor();
-			var oContent = document.getElementById("content");
-			if (!oContent) {
-				oContent = document.createElement("div");
-				oContent.style.position = "absolute";
-				oContent.style.top = "200px";
-
-				oContent.setAttribute("id", "content");
-				document.body.appendChild(oContent);
-				document.body.style.zIndex = 1000;
-			}
-			this.oEditor.placeAt(oContent);
+			this.oEditor = EditorQunitUtils.beforeEachTest();
 		},
 		afterEach: function () {
-			this.oEditor.destroy();
+			EditorQunitUtils.afterEachTest(this.oEditor, sandbox);
 		},
 		after: function() {
-			this.oMockServer.destroy();
-			this.oHost.destroy();
-			this.oContextHost.destroy();
-			sandbox.restore();
-			var oContent = document.getElementById("content");
-			if (oContent) {
-				oContent.innerHTML = "";
-				document.body.style.zIndex = "unset";
-			}
+			EditorQunitUtils.destroyMockServer();
 		}
 	});
 

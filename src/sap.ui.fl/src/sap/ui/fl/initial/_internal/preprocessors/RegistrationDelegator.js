@@ -8,7 +8,6 @@ sap.ui.define([
 	"sap/ui/core/mvc/XMLView",
 	"sap/ui/core/ComponentHooks",
 	"sap/ui/core/ExtensionPoint",
-	"sap/ui/fl/apply/_internal/flexState/communication/FLPAboutInfo",
 	"sap/ui/fl/apply/_internal/preprocessors/ComponentLifecycleHooks",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/base/DesignTime",
@@ -20,7 +19,6 @@ sap.ui.define([
 	XMLView,
 	ComponentHooks,
 	ExtensionPoint,
-	FLPAboutInfo,
 	ComponentLifecycleHooks,
 	ManifestUtils,
 	DesignTime
@@ -80,10 +78,6 @@ sap.ui.define([
 		ExtensionPoint.registerExtensionProvider(getExtensionPointProvider);
 	}
 
-	function registerFLPAboutInfo() {
-		FLPAboutInfo.initialize();
-	}
-
 	/**
 	 * Registers everything in one call
 	 *
@@ -97,7 +91,6 @@ sap.ui.define([
 		registerDescriptorChangeHandler();
 		registerExtensionPointProvider();
 		registerOnModelCreated();
-		registerFLPAboutInfo();
 	};
 
 	return RegistrationDelegator;

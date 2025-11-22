@@ -6,7 +6,6 @@ sap.ui.define([
 	"sap/ui/integration/Host",
 	"sap/ui/thirdparty/sinon-4",
 	"./ContextHost",
-	"sap/ui/core/util/MockServer",
 	"./jsons/withDesigntime/sap.card/DataExtensionImpl",
 	"qunit/designtime/EditorQunitUtils"
 ], function (
@@ -16,7 +15,6 @@ sap.ui.define([
 	Host,
 	sinon,
 	ContextHost,
-	MockServer,
 	DataExtensionImpl,
 	EditorQunitUtils
 ) {
@@ -27,64 +25,7 @@ sap.ui.define([
 
 	var sBaseUrl = "test-resources/sap/ui/integration/qunit/editor/jsons/withDesigntime/sap.card/";
 	var iWaitTimeout = 3000;
-	var oResponseData = {
-		"Customers": [
-			{"CustomerID": "a", "CompanyName": "A Company", "Country": "Country 1", "City": "City 1", "Address": "Address 1"},
-			{"CustomerID": "b", "CompanyName": "B Company", "Country": "Country 2", "City": "City 2", "Address": "Address 2"},
-			{"CustomerID": "c", "CompanyName": "C1 Company", "Country": "Country 3", "City": "City 3", "Address": "Address 3"},
-			{"CustomerID": "d", "CompanyName": "C2 Company", "Country": "Country 4", "City": "City 4", "Address": "Address 4"}
-		],
-		"Customers_1_2": [
-			{"CustomerID": "b", "CompanyName": "B Company", "Country": "Country 2", "City": "City 2", "Address": "Address 2"},
-			{"CustomerID": "c", "CompanyName": "C Company", "Country": "Country 3", "City": "City 3", "Address": "Address 3"}
-		],
-		"Customers_CustomerID_b_startswith_": [
-			{"CustomerID": "b", "CompanyName": "B Company", "Country": "Country 2", "City": "City 2", "Address": "Address 2"}
-		],
-		"Customers_startswith_": [
-			{"CustomerID": "a", "CompanyName": "A Company", "Country": "Country 1", "City": "City 1", "Address": "Address 1"},
-			{"CustomerID": "b", "CompanyName": "B Company", "Country": "Country 2", "City": "City 2", "Address": "Address 2"},
-			{"CustomerID": "c", "CompanyName": "C1 Company", "Country": "Country 3", "City": "City 3", "Address": "Address 3"},
-			{"CustomerID": "d", "CompanyName": "C2 Company", "Country": "Country 4", "City": "City 4", "Address": "Address 4"}
-		],
-		"Customers_startswith_c": [
-			{"CustomerID": "c", "CompanyName": "C1 Company", "Country": "Country 3", "City": "City 3", "Address": "Address 3"},
-			{"CustomerID": "d", "CompanyName": "C2 Company", "Country": "Country 4", "City": "City 4", "Address": "Address 4"}
-		],
-		"Employees": [
-			{"EmployeeID": 1, "FirstName": "FirstName1", "LastName": "LastName1", "Country": "Country 1", "Title": "City 1", "HomePhone": "111111"},
-			{"EmployeeID": 2, "FirstName": "FirstName2", "LastName": "LastName2", "Country": "Country 2", "Title": "City 2", "HomePhone": "222222"},
-			{"EmployeeID": 3, "FirstName": "FirstName3", "LastName": "LastName3", "Country": "Country 3", "Title": "City 3", "HomePhone": "333333"},
-			{"EmployeeID": 4, "FirstName": "FirstName4", "LastName": "LastName4", "Country": "Country 4", "Title": "City 4", "HomePhone": "444444"},
-			{"EmployeeID": 5, "FirstName": "FirstName5", "LastName": "LastName5", "Country": "Country 5", "Title": "City 5", "HomePhone": "555555"},
-			{"EmployeeID": 6, "FirstName": "FirstName6", "LastName": "LastName6", "Country": "Country 6", "Title": "City 6", "HomePhone": "666666"}
-		],
-		"Employees_endswith__endswith_": [
-			{"EmployeeID": 1, "FirstName": "FirstName1", "LastName": "LastName1", "Country": "Country 1", "Title": "City 1", "HomePhone": "111111"},
-			{"EmployeeID": 2, "FirstName": "FirstName2", "LastName": "LastName2", "Country": "Country 2", "Title": "City 2", "HomePhone": "222222"},
-			{"EmployeeID": 3, "FirstName": "FirstName3", "LastName": "LastName3", "Country": "Country 3", "Title": "City 3", "HomePhone": "333333"},
-			{"EmployeeID": 4, "FirstName": "FirstNamen", "LastName": "LastNamen", "Country": "Country 4", "Title": "City 4", "HomePhone": "444444"},
-			{"EmployeeID": 5, "FirstName": "FirstName5", "LastName": "LastName5", "Country": "Country 5", "Title": "City 5", "HomePhone": "555555"},
-			{"EmployeeID": 6, "FirstName": "FirstName6", "LastName": "LastName6", "Country": "Country 6", "Title": "City 6", "HomePhone": "666666"}
-		],
-		"Employees_endswith_n_endswith_n": [
-			{"EmployeeID": 4, "FirstName": "FirstNamen", "LastName": "LastNamen", "Country": "Country 4", "Title": "City 4", "HomePhone": "444444"}
-		],
-		"Orders_a_1": [
-			{"OrderID": 1, "OrderDate": "2021-02-11", "CustomerID": "a", "EmployeeID": 1}
-		],
-		"Orders_b_2": [
-			{"OrderID": 2, "OrderDate": "2021-02-12", "CustomerID": "b", "EmployeeID": 2},
-			{"OrderID": 3, "OrderDate": "2021-02-13", "CustomerID": "b", "EmployeeID": 2}
-		],
-		"Products_1": [
-			{"ProductID": 1, "OrderID": 1, "UnitPrice": 32.4, "Quantity": 2, "Product": {"ProductID": 1, "ProductName": "Product A"}},
-			{"ProductID": 2, "OrderID": 1, "UnitPrice": 11.5, "Quantity": 4, "Product": {"ProductID": 2, "ProductName": "Product B"}}
-		],
-		"Products_2": [
-			{"ProductID": 3, "OrderID": 2, "UnitPrice": 12.3, "Quantity": 6, "Product": {"ProductID": 3, "ProductName": "Product C"}}
-		]
-	};
+
 	var oManifestForFilterBackendInComboBox = {
 		"sap.app": {
 			"id": "test.sample",
@@ -195,101 +136,17 @@ sap.ui.define([
 	document.body.className = document.body.className + " sapUiSizeCompact ";
 
 	QUnit.module("Filter in Backend by input for string (ComboBox)", {
+		before: function () {
+			EditorQunitUtils.createMockServer();
+		},
+		after: function () {
+			EditorQunitUtils.destroyMockServer();
+		},
 		beforeEach: function () {
-			this.oMockServer = new MockServer();
-			this.oMockServer.setRequests([
-				{
-					method: "GET",
-					path: RegExp("/mock_request/Customers.*"),
-					response: function (xhr) {
-						var oValue = {};
-						var sKey = "Customers";
-						var aSplits = xhr.url.split("?");
-						if (aSplits.length > 1) {
-							var aParameters = aSplits[1].split("&");
-							var sConditionOperation = "_";
-							var sConditionValue = "_";
-							aParameters.forEach(function (parameter) {
-								if (parameter.startsWith("%24filter=")) {
-									parameter = parameter.substr(10);
-									var aConditions = parameter.split(")%20and%20(");
-									aConditions.forEach(function (condition) {
-										if (condition.startsWith("startswith(CompanyName%2C'")) {
-											sConditionOperation += "startswith";
-											sConditionValue += condition.substring(26, condition.lastIndexOf("')"));
-											sKey = sKey + sConditionOperation + sConditionValue;
-										} else if (condition.startsWith("(CustomerID%20eq%20'")) {
-											sConditionOperation += "CustomerID";
-											sConditionValue += condition.slice(20, -1);
-											sKey = sKey + sConditionOperation + sConditionValue;
-										}
-										sConditionOperation = "_";
-										sConditionValue = "_";
-									});
-								} else if (parameter.startsWith("$filter=")) {
-									parameter = parameter.substr(8);
-									var aConditions = parameter.split(") and (");
-									aConditions.forEach(function (condition) {
-										if (condition.startsWith("startswith(CompanyName,'")) {
-											sConditionOperation += "startswith";
-											sConditionValue += condition.substring(24, condition.lastIndexOf("')"));
-											sKey = sKey + sConditionOperation + sConditionValue;
-										}
-										sConditionOperation = "_";
-										sConditionValue = "_";
-									});
-								}
-							});
-							oValue = {"value": oResponseData[sKey]};
-						} else {
-							oValue = {"value": []};
-						}
-						xhr.respondJSON(200, null, oValue);
-					}
-				},
-				{
-					method: "GET",
-					path: RegExp("/mock_request/Employees.*"),
-					response: function (xhr) {
-						var oValue = {};
-						var sKey = "Employees";
-						var aSplits = xhr.url.split("?");
-						if (aSplits.length > 1) {
-							var aParameters = aSplits[1].split("&");
-							var sConditionOperation = "_";
-							var sConditionValue = "_";
-							aParameters.forEach(function (parameter) {
-								if (parameter.startsWith("%24filter=")) {
-									parameter = parameter.substr(10);
-									var aConditions = parameter.split(")%20or%20");
-									aConditions.forEach(function (condition) {
-										if (condition.startsWith("endswith(FirstName%2C'")) {
-											sConditionOperation += "endswith";
-											sConditionValue += condition.slice(22, -1);
-											sKey = sKey + sConditionOperation + sConditionValue;
-										} else if (condition.startsWith("endswith(LastName%2C'")) {
-											sConditionOperation += "endswith";
-											sConditionValue += condition.substring(21, condition.lastIndexOf("')"));
-											sKey = sKey + sConditionOperation + sConditionValue;
-										}
-										sConditionOperation = "_";
-										sConditionValue = "_";
-									});
-								}
-							});
-							oValue = {"value": oResponseData[sKey]};
-						} else {
-							oValue = {"value": []};
-						}
-						xhr.respondJSON(200, null, oValue);
-					}
-				}
-			]);
-			this.oMockServer.start();
 			this.oEditor = EditorQunitUtils.beforeEachTest();
 		},
 		afterEach: function () {
-			EditorQunitUtils.afterEachTest(this.oEditor, sandbox, this.oMockServer);
+			EditorQunitUtils.afterEachTest(this.oEditor, sandbox);
 		}
 	}, function () {
 		QUnit.test("Check the setting button", function (assert) {
@@ -450,101 +307,17 @@ sap.ui.define([
 	});
 
 	QUnit.module("Filter in Backend by input for string[] (MultiComboBox)", {
+		before: function () {
+			EditorQunitUtils.createMockServer();
+		},
+		after: function () {
+			EditorQunitUtils.destroyMockServer();
+		},
 		beforeEach: function () {
-			this.oMockServer = new MockServer();
-			this.oMockServer.setRequests([
-				{
-					method: "GET",
-					path: RegExp("/mock_request/Customers.*"),
-					response: function (xhr) {
-						var oValue = {};
-						var sKey = "Customers";
-						var aSplits = xhr.url.split("?");
-						if (aSplits.length > 1) {
-							var aParameters = aSplits[1].split("&");
-							var sConditionOperation = "_";
-							var sConditionValue = "_";
-							aParameters.forEach(function (parameter) {
-								if (parameter.startsWith("%24filter=")) {
-									parameter = parameter.substr(10);
-									var aConditions = parameter.split(")%20and%20(");
-									aConditions.forEach(function (condition) {
-										if (condition.startsWith("startswith(CompanyName%2C'")) {
-											sConditionOperation += "startswith";
-											sConditionValue += condition.substring(26, condition.lastIndexOf("')"));
-											sKey = sKey + sConditionOperation + sConditionValue;
-										} else if (condition.startsWith("(CustomerID%20eq%20'")) {
-											sConditionOperation += "CustomerID";
-											sConditionValue += condition.slice(20, -1);
-											sKey = sKey + sConditionOperation + sConditionValue;
-										}
-										sConditionOperation = "_";
-										sConditionValue = "_";
-									});
-								} else if (parameter.startsWith("$filter=")) {
-									parameter = parameter.substr(8);
-									var aConditions = parameter.split(") and (");
-									aConditions.forEach(function (condition) {
-										if (condition.startsWith("startswith(CompanyName,'")) {
-											sConditionOperation += "startswith";
-											sConditionValue += condition.substring(24, condition.lastIndexOf("')"));
-											sKey = sKey + sConditionOperation + sConditionValue;
-										}
-										sConditionOperation = "_";
-										sConditionValue = "_";
-									});
-								}
-							});
-							oValue = {"value": oResponseData[sKey]};
-						} else {
-							oValue = {"value": []};
-						}
-						xhr.respondJSON(200, null, oValue);
-					}
-				},
-				{
-					method: "GET",
-					path: RegExp("/mock_request/Employees.*"),
-					response: function (xhr) {
-						var oValue = {};
-						var sKey = "Employees";
-						var aSplits = xhr.url.split("?");
-						if (aSplits.length > 1) {
-							var aParameters = aSplits[1].split("&");
-							var sConditionOperation = "_";
-							var sConditionValue = "_";
-							aParameters.forEach(function (parameter) {
-								if (parameter.startsWith("%24filter=")) {
-									parameter = parameter.substr(10);
-									var aConditions = parameter.split(")%20or%20");
-									aConditions.forEach(function (condition) {
-										if (condition.startsWith("endswith(FirstName%2C'")) {
-											sConditionOperation += "endswith";
-											sConditionValue += condition.slice(22, -1);
-											sKey = sKey + sConditionOperation + sConditionValue;
-										} else if (condition.startsWith("endswith(LastName%2C'")) {
-											sConditionOperation += "endswith";
-											sConditionValue += condition.substring(21, condition.lastIndexOf("')"));
-											sKey = sKey + sConditionOperation + sConditionValue;
-										}
-										sConditionOperation = "_";
-										sConditionValue = "_";
-									});
-								}
-							});
-							oValue = {"value": oResponseData[sKey]};
-						} else {
-							oValue = {"value": []};
-						}
-						xhr.respondJSON(200, null, oValue);
-					}
-				}
-			]);
-			this.oMockServer.start();
 			this.oEditor = EditorQunitUtils.beforeEachTest();
 		},
 		afterEach: function () {
-			EditorQunitUtils.afterEachTest(this.oEditor, sandbox, this.oMockServer);
+			EditorQunitUtils.afterEachTest(this.oEditor, sandbox);
 		}
 	}, function () {
 		QUnit.test("Check the setting button", function (assert) {
@@ -706,101 +479,17 @@ sap.ui.define([
 	});
 
 	QUnit.module("Filter in Backend by input for string[] (MultiInput)", {
+		before: function () {
+			EditorQunitUtils.createMockServer();
+		},
+		after: function () {
+			EditorQunitUtils.destroyMockServer();
+		},
 		beforeEach: function () {
-			this.oMockServer = new MockServer();
-			this.oMockServer.setRequests([
-				{
-					method: "GET",
-					path: RegExp("/mock_request/Customers.*"),
-					response: function (xhr) {
-						var oValue = {};
-						var sKey = "Customers";
-						var aSplits = xhr.url.split("?");
-						if (aSplits.length > 1) {
-							var aParameters = aSplits[1].split("&");
-							var sConditionOperation = "_";
-							var sConditionValue = "_";
-							aParameters.forEach(function (parameter) {
-								if (parameter.startsWith("%24filter=")) {
-									parameter = parameter.substr(10);
-									var aConditions = parameter.split(")%20and%20(");
-									aConditions.forEach(function (condition) {
-										if (condition.startsWith("startswith(CompanyName%2C'")) {
-											sConditionOperation += "startswith";
-											sConditionValue += condition.substring(26, condition.lastIndexOf("')"));
-											sKey = sKey + sConditionOperation + sConditionValue;
-										} else if (condition.startsWith("(CustomerID%20eq%20'")) {
-											sConditionOperation += "CustomerID";
-											sConditionValue += condition.slice(20, -1);
-											sKey = sKey + sConditionOperation + sConditionValue;
-										}
-										sConditionOperation = "_";
-										sConditionValue = "_";
-									});
-								} else if (parameter.startsWith("$filter=")) {
-									parameter = parameter.substr(8);
-									var aConditions = parameter.split(") and (");
-									aConditions.forEach(function (condition) {
-										if (condition.startsWith("startswith(CompanyName,'")) {
-											sConditionOperation += "startswith";
-											sConditionValue += condition.substring(24, condition.lastIndexOf("')"));
-											sKey = sKey + sConditionOperation + sConditionValue;
-										}
-										sConditionOperation = "_";
-										sConditionValue = "_";
-									});
-								}
-							});
-							oValue = {"value": oResponseData[sKey]};
-						} else {
-							oValue = {"value": []};
-						}
-						xhr.respondJSON(200, null, oValue);
-					}
-				},
-				{
-					method: "GET",
-					path: RegExp("/mock_request/Employees.*"),
-					response: function (xhr) {
-						var oValue = {};
-						var sKey = "Employees";
-						var aSplits = xhr.url.split("?");
-						if (aSplits.length > 1) {
-							var aParameters = aSplits[1].split("&");
-							var sConditionOperation = "_";
-							var sConditionValue = "_";
-							aParameters.forEach(function (parameter) {
-								if (parameter.startsWith("%24filter=")) {
-									parameter = parameter.substr(10);
-									var aConditions = parameter.split(")%20or%20");
-									aConditions.forEach(function (condition) {
-										if (condition.startsWith("endswith(FirstName%2C'")) {
-											sConditionOperation += "endswith";
-											sConditionValue += condition.slice(22, -1);
-											sKey = sKey + sConditionOperation + sConditionValue;
-										} else if (condition.startsWith("endswith(LastName%2C'")) {
-											sConditionOperation += "endswith";
-											sConditionValue += condition.substring(21, condition.lastIndexOf("')"));
-											sKey = sKey + sConditionOperation + sConditionValue;
-										}
-										sConditionOperation = "_";
-										sConditionValue = "_";
-									});
-								}
-							});
-							oValue = {"value": oResponseData[sKey]};
-						} else {
-							oValue = {"value": []};
-						}
-						xhr.respondJSON(200, null, oValue);
-					}
-				}
-			]);
-			this.oMockServer.start();
 			this.oEditor = EditorQunitUtils.beforeEachTest();
 		},
 		afterEach: function () {
-			EditorQunitUtils.afterEachTest(this.oEditor, sandbox, this.oMockServer);
+			EditorQunitUtils.afterEachTest(this.oEditor, sandbox);
 		}
 	}, function () {
 		QUnit.test("Check the setting button", function (assert) {
