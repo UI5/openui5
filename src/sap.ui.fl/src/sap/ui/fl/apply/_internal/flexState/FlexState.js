@@ -400,11 +400,15 @@ sap.ui.define([
 	async function loadFlexData(mPropertyBag) {
 		const mResponse = await Loader.loadFlexData(mPropertyBag);
 		if (!mPropertyBag.partialFlexState) {
-			mResponse.authors = await Loader.loadVariantsAuthors(mPropertyBag.reference);
+			mResponse.authors = isVariantsAuthorsDataRequired(mResponse?.changes) ? await Loader.loadVariantsAuthors(mPropertyBag.reference) : {};
 		}
 		storeInfoInSession(mPropertyBag.reference, mResponse);
 
 		return mResponse;
+	}
+
+	function isVariantsAuthorsDataRequired(mChanges = {}) {
+		return mChanges.variants?.length > 0 || mChanges.comp?.variants?.length > 0;
 	}
 
 	function prepareNewInstance(mResponse, mPropertyBag) {
