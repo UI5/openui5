@@ -338,4 +338,34 @@ sap.ui.define([
 			assert.ok(!oButton3.getDomRef().getAttribute('title'), "title attribute was removed onmouseout");
 		});
 	});
+
+	QUnit.test("aria-describedby duplication prevention with addAccessibilityLabel", function(assert) {
+		var done = assert.async();
+
+		sap.ui.require([
+			"sap/m/Button",
+			"sap/ui/core/ShortcutHintsMixin"
+		], async function(Button, ShortcutHintsMixin) {
+			var oButton = new Button({
+				text: 'Go'
+			});
+
+			ShortcutHintsMixin.addConfig(oButton, {
+				message: "Enter",
+				addAccessibilityLabel: true
+			});
+
+			oButton.placeAt('qunit-fixture');
+			await nextUIUpdate();
+
+			assert.equal(oButton.getDomRef().getAttribute('aria-keyshortcuts'),
+				"Enter", "aria-keyshortcuts has the correct value");
+
+			assert.notOk(oButton.getDomRef().getAttribute('aria-describedby'),
+				"aria-describedby is not set when aria-keyshortcuts is present to prevent duplication");
+
+			oButton.destroy();
+			done();
+		});
+	});
 });
