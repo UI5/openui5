@@ -51,7 +51,7 @@ sap.ui.define([
 			const sUrl = "/btp/flex/all/v3/seenFeatures";
 			assert.ok(oStubSendRequest.calledWith(sUrl, "PUT", {
 				initialConnector: InitialConnector,
-				tokenUrl: BtpServiceConnector.ROUTES.TOKEN,
+				tokenUrl: `/btp${BtpServiceConnector.ROUTES.TOKEN}`,
 				payload: JSON.stringify({ seenFeatureIds: ["feature1", "feature2", "feature3"] }),
 				dataType: "json",
 				contentType: "application/json; charset=utf-8"
@@ -91,7 +91,7 @@ sap.ui.define([
 				contentType: "application/json; charset=utf-8",
 				dataType: "json",
 				payload: JSON.stringify(oPayload),
-				tokenUrl: BtpServiceConnector.ROUTES.TOKEN
+				tokenUrl: `my/url${BtpServiceConnector.ROUTES.TOKEN}`
 			});
 			assert.strictEqual(oResult, "response", "the function returns the response of the request");
 		});
@@ -118,7 +118,7 @@ sap.ui.define([
 				contentType: "application/json; charset=utf-8",
 				dataType: "json",
 				payload: JSON.stringify(oPayload),
-				tokenUrl: BtpServiceConnector.ROUTES.TOKEN
+				tokenUrl: `my/url${BtpServiceConnector.ROUTES.TOKEN}`
 			});
 			assert.strictEqual(oResult, "response", "the function returns the response of the request");
 		});
@@ -154,7 +154,7 @@ sap.ui.define([
 			assert.deepEqual(
 				oSendRequestStub.lastCall.args[2],
 				{
-					tokenUrl: BtpServiceConnector.ROUTES.TOKEN,
+					tokenUrl: `/btp${BtpServiceConnector.ROUTES.TOKEN}`,
 					initialConnector: InitialConnector,
 					payload: JSON.stringify(testPayload),
 					dataType: "json",
