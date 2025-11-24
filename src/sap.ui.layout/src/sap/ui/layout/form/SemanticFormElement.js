@@ -487,9 +487,11 @@ sap.ui.define([
 			if (bAsync) {
 				Promise.all(aTexts).then(function(aTexts) {
 					var oDisplay = this.getAggregation("_displayField");
-					var sText = _concatenateTexts.call(this, aTexts);
-					oDisplay._bNoForceUpdate = true; // prevent double update, as setText might trigger re-rendering (again as a re-rendeing could happen until promise resolved)
-					FormHelper.updateSemanticDisplayControl(oDisplay, sText);
+					if (oDisplay) {
+						var sText = _concatenateTexts.call(this, aTexts);
+						oDisplay._bNoForceUpdate = true; // prevent double update, as setText might trigger re-rendering (again as a re-rendeing could happen until promise resolved)
+						FormHelper.updateSemanticDisplayControl(oDisplay, sText);
+					}
 				}.bind(this));
 			} else {
 				var sText = _concatenateTexts.call(this, aTexts);
