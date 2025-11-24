@@ -13,6 +13,7 @@
  * @namespace
  * @name sap.ui.Device
  * @public
+ * @ui5-module-override sap/ui/Device
  */
 
 // Introduce namespace if it does not yet exist
