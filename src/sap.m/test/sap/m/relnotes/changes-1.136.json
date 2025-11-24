@@ -448,5 +448,50 @@
         "text": " m.VariantManagement: add aria-expanded & aria-haspopup"
       }
     ]
+  },
+  "1.136.9": {
+    "date": "November 2025",
+    "notes": [
+      {
+        "id": "7a984fbb87a2059213743ab9285513ddfe7d0d10",
+        "type": "FIX",
+        "text": " sap.m.SearchField: Fix Korean text display within OverflowToolbar"
+      },
+      {
+        "id": "0fc1e941d6a900c93372bc4c9a05fd0dcdf4145b",
+        "type": "FIX",
+        "text": " sap.m.Toolbar: Focus issue prevented"
+      },
+      {
+        "id": "326576955afd885a355d66fdaf228d1f838b9bab",
+        "type": "FIX",
+        "text": " sap.m.SinglePlanningCalendar: Add the browser event information to the UI5 event"
+      },
+      {
+        "id": "86ddfabadb24c1c9d06f2fa28e969b96d80ae7e4",
+        "type": "FIX",
+        "text": " sap.m.TimePicker: Remove custom shadow overwriting"
+      },
+      {
+        "id": "b02340d622f1daba9da285c1ccde17775b4e3b57",
+        "type": "FIX",
+        "text": " sap.m.Popover: Set shadow style according to the \"showArrow\" property"
+      },
+      {
+        "id": "6310b78382b73fddecd040840422ddefb0fcd174",
+        "type": "FIX",
+        "text": " sap.m.DateTimePicker: fix test about timezone failing in safari"
+      },
+      {
+        "id": "2c913b7590709025ad5dfbd60e195a4a24b7b6a8",
+        "type": "FIX",
+        "text": " sap.m.Select: Correct dropdown width when wrapItemsText enabled"
+      },
+      {
+        "id": "ac820462ba2917808fc57db1ca1333798092e5ae",
+        "type": "FIX",
+        "text": " sap.m.DatePicker: close picker on context change"
+      }
+    ]
   }
 }

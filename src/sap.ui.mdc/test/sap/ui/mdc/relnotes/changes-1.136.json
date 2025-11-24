@@ -93,5 +93,15 @@
         "text": " SortFlex: Take sortOrder into account for affectedControl during condensing"
       }
     ]
+  },
+  "1.136.9": {
+    "date": "November 2025",
+    "notes": [
+      {
+        "id": "75153ed15f1104ad16c133bc27f2a30fc28a50b3",
+        "type": "FIX",
+        "text": " Table: Remove renderWhitespace restriction"
+      }
+    ]
   }
 }

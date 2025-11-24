@@ -13,5 +13,20 @@
         "text": " sap.uxap.ObjectPageLayout: Action buttons in OverflowToolbar"
       }
     ]
+  },
+  "1.136.9": {
+    "date": "November 2025",
+    "notes": [
+      {
+        "id": "0451ac28c1c37f278620e4c1f5cd39eb89d019e4",
+        "type": "FIX",
+        "text": " sap.uxap.ObjectPageSubSection: fix wrapping titles"
+      },
+      {
+        "id": "86ddfabadb24c1c9d06f2fa28e969b96d80ae7e4",
+        "type": "FIX",
+        "text": " sap.m.TimePicker: Remove custom shadow overwriting"
+      }
+    ]
   }
 }

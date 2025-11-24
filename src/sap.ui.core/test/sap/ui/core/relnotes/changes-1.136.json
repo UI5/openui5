@@ -343,5 +343,25 @@
         "text": " sap/ui/model/odata/v2/ODataTreeBinding: $count requests must not contain $expand or $select"
       }
     ]
+  },
+  "1.136.9": {
+    "date": "November 2025",
+    "notes": [
+      {
+        "id": "cdc707a02a6ce74173323c138e2f19bd02ba178d",
+        "type": "FIX",
+        "text": " sap.m.Button: Prevent duplicate shortcut announcements in screen readers"
+      },
+      {
+        "id": "d2058285c720ce7606dc669e655acd07795897d9",
+        "type": "FIX",
+        "text": " ComponentContainer: always propagate propagation listeners"
+      },
+      {
+        "id": "da19d9509608ad83692c9b8da90a6c9c76671b02",
+        "type": "FIX",
+        "text": " sap/ui/thirdparty: bump RequireJS to 2.3.7"
+      }
+    ]
   }
 }

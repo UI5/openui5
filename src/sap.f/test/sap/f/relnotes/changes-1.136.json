@@ -18,5 +18,20 @@
         "text": " sap.f.FlexibleColumnLayout: prevent animation when initially shown"
       }
     ]
+  },
+  "1.136.9": {
+    "date": "November 2025",
+    "notes": [
+      {
+        "id": "c213387e86825089a1695b4b339871f955d72738",
+        "type": "FIX",
+        "text": " sap.f.DynamicPageTitle: Fix flaky focus test in Safari"
+      },
+      {
+        "id": "51315d0c6ffe7adbdaa0546b9d3d27c3cba76263",
+        "type": "FIX",
+        "text": " sap.f.DynamicPage: Header visibility issue fixed"
+      }
+    ]
   }
 }

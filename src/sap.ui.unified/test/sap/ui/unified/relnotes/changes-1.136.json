@@ -18,5 +18,15 @@
         "text": " sap.ui.unified.FileUploader: Selected file stays selected"
       }
     ]
+  },
+  "1.136.9": {
+    "date": "November 2025",
+    "notes": [
+      {
+        "id": "e68a5d6b77995def0285468783bbd045ce407a7b",
+        "type": "FIX",
+        "text": " sap.ui.unified.Month: removed redundant \"selected\" announce"
+      }
+    ]
   }
 }

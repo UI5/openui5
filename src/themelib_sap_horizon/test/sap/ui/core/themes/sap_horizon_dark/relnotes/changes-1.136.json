@@ -113,5 +113,15 @@
         "text": " sap.m.Button: has correct css parameters for active Emphasized"
       }
     ]
+  },
+  "1.136.9": {
+    "date": "November 2025",
+    "notes": [
+      {
+        "id": "0451ac28c1c37f278620e4c1f5cd39eb89d019e4",
+        "type": "FIX",
+        "text": " sap.uxap.ObjectPageSubSection: fix wrapping titles"
+      }
+    ]
   }
 }

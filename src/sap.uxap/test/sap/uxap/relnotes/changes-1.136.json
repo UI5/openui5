@@ -103,5 +103,25 @@
         "text": " sap.uxap.ObjectPageSection: Invalid aria-labelledBy fixed"
       }
     ]
+  },
+  "1.136.9": {
+    "date": "November 2025",
+    "notes": [
+      {
+        "id": "0451ac28c1c37f278620e4c1f5cd39eb89d019e4",
+        "type": "FIX",
+        "text": " sap.uxap.ObjectPageSubSection: fix wrapping titles"
+      },
+      {
+        "id": "8e092a5902861f3a25c677a73940960293946ba3",
+        "type": "FIX",
+        "text": " sap.uxap.ObjectPageLayout: Fix wrong positioning"
+      },
+      {
+        "id": "6c1c803551c2a39267368ab7deb85d72fd3947a4",
+        "type": "FIX",
+        "text": " sap.uxap.ObjectPageSubSection: prevent infinite rerendering loop"
+      }
+    ]
   }
 }
