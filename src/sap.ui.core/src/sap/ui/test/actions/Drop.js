@@ -85,7 +85,8 @@ sap.ui.define([
 					return aAggregations[mAggregation].dnd.droppable;
 				})[0];
 				if (sDropAggregation) {
-					oActionDomRef = oControl.getDomRefForSetting(sDropAggregation) || oControl["get" + sDropAggregation]()[0];
+					const oAggregation = oControl["get" + capitalize(sDropAggregation)]()[0]
+					oActionDomRef = oControl.getDomRefForSetting(sDropAggregation) || this.$(oAggregation)[0];
 				}
 			}
 
