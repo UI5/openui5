@@ -830,4 +830,36 @@ sap.ui.define([
 		assert.equal(aFields[0].getText && aFields[0].getText(), "Text 1 / Text 2", "rendered text");
 	});
 
+	QUnit.test("_updateDisplayText doesn't fail without _displayField", async function(assert) {
+		var oLabel = new Label("L1", {text: "Test"});
+		oFormElement.setLabel(oLabel);
+
+		var oField1 = new Text("F1", {text: "Text 1"});
+		sinon.stub(oField1, "getFormRenderAsControl").returns(false);
+
+
+		oFormElement._setEditable(true);
+		await nextUIUpdate(); // to test change of rendering mode
+		let bTextUpdated = false;
+		const {resolve, promise} = Promise.withResolvers();
+		sinon.stub(oField1, "getFormFormattedValue").callsFake(() => {
+			const oDisplayField = oFormElement.getAggregation("_displayField");
+			oDisplayField.destroy();
+			setTimeout(() => {
+				bTextUpdated = true;
+				resolve("Text");
+			}, 50);
+			return promise;
+		});
+		oFormElement.addField(oField1);
+		oFormElement._setEditable(false);
+		await nextUIUpdate(); // to test change of rendering mode
+		await nextUIUpdate(); // to test change of rendering mode
+		oFormElement.getFieldsForRendering();
+		sinon.spy(oFormElement, "_setEditable");
+		await new Promise((resolve) => {setTimeout(resolve, 100);});
+		oField1.getFormFormattedValue.restore();
+		assert.ok(bTextUpdated, "Text updated from promise");
+	});
+
 });
