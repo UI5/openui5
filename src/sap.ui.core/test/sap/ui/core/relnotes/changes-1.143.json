@@ -3,6 +3,11 @@
     "date": "November 2025",
     "notes": [
       {
+        "id": "c9768c9f1a02f669d5c129f6fd3af5a2badae377",
+        "type": "FIX",
+        "text": " sap/ui/model/ClientTreeBinding#cloneData: use a clone for this.oTreeData"
+      },
+      {
         "id": "05315efa2c7ac18cde5bc321b133955986a6855a",
         "type": "FIX",
         "text": " core/routing: no usage of history state API in Safari"
