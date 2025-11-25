@@ -31461,6 +31461,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// @see QUnit.skip("ODLB: resume/refresh/filter w/ submitBatch on a t:Table"
 	//
 	// #setAggregation before resolving the ODLB (JIRA: CPOUI5ODATAV4-2408)
+	// Collapse root and then PATCH the kept-alive child (SNOW: DINC0702621)
 [false, true].forEach(function (bSuspended) {
 	var sTitle = "Recursive Hierarchy: getKeepAliveContext, suspended = " + bSuspended;
 
@@ -31471,7 +31472,11 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			oTable,
 			sView = '\
 <Table id="list" growing="true" growingThreshold="3" items="{\
-		parameters : {$$getKeepAliveContext : true, $$ownRequest : true},\
+		parameters : {\
+			$$getKeepAliveContext : true,\
+			$$ownRequest : true,\
+			$$patchWithoutSideEffects : true\
+		},\
 		path : \'' + (bSuspended ? "/" : "") + "EMPLOYEES',\
 		suspended : " + bSuspended + '}">\
 	<Text text="{= %{@$ui5.node.isExpanded} }"/>\
@@ -31485,6 +31490,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	<Text id="name" text="{Name}"/>\
 </FlexBox>',
 			that = this;
+
+		// 1 Beta
+		//   2 Kappa
+		//   3 Lambda (getKeepAliveContext)
 
 		this.expectChange("age")
 			.expectChange("name");
@@ -31523,7 +31532,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 			// code under test
 			oContext = oModel.getKeepAliveContext("/EMPLOYEES('3')", /*bRequestMessages*/true,
-				{$$groupId : "$auto.heroes"});
+				{$$groupId : "$auto.heroes", $$patchWithoutSideEffects : true});
 
 			that.oView.byId("form").setBindingContext(oContext);
 
@@ -31542,11 +31551,11 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					"@odata.count" : "3",
 					value : [{
 						"@odata.etag" : "etag1",
-						DescendantCount : "0",
-						DistanceFromRoot : "1",
-						DrillState : "collapsed",
+						DescendantCount : "2",
+						DistanceFromRoot : "0",
+						DrillState : "expanded",
 						ID : "1",
-						MANAGER_ID : "0",
+						MANAGER_ID : null,
 						Name : "Beta"
 					}, {
 						"@odata.etag" : "etag2",
@@ -31554,7 +31563,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						DistanceFromRoot : "1",
 						DrillState : "leaf",
 						ID : "2",
-						MANAGER_ID : "0",
+						MANAGER_ID : "1",
 						Name : "Kappa"
 					}, {
 						"@odata.etag" : "etag3",
@@ -31562,7 +31571,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						DistanceFromRoot : "1",
 						DrillState : "leaf",
 						ID : "3",
-						MANAGER_ID : "0",
+						MANAGER_ID : "1",
 						Name : "Lambda"
 					}]
 				});
@@ -31585,9 +31594,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				"/EMPLOYEES('2')",
 				"/EMPLOYEES('3')"
 			], [
-				[false, 2, "1", "0", "Beta"],
-				[undefined, 2, "2", "0", "Kappa"],
-				[undefined, 2, "3", "0", "Lambda"]
+				[true, 1, "1", "", "Beta"],
+				[undefined, 2, "2", "1", "Kappa"],
+				[undefined, 2, "3", "1", "Lambda"]
 			]);
 			assert.strictEqual(oListBinding.getAllCurrentContexts()[2], oContext, "reused");
 			assert.strictEqual(oContext.isKeepAlive(), true, "still kept alive");
@@ -31597,7 +31606,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					"@$ui5.node.level" : 2,
 					AGE : 57,
 					ID : "3",
-					MANAGER_ID : "0",
+					MANAGER_ID : "1",
 					Name : "Lambda",
 					ROOM_ID : "3.0",
 					__CT__FAKE__Message : {
@@ -31619,6 +31628,36 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			oModel.getKeepAliveContext("/EMPLOYEES('5')");
 
 			return that.waitForChanges(assert, "ODLB#getKeepAliveContext");
+		}).then(function () {
+			oListBinding.getCurrentContexts()[0].collapse();
+
+			return that.waitForChanges(assert, "collapse");
+		}).then(function () {
+			checkTable("after collapse", assert, oTable, [
+				"/EMPLOYEES('1')",
+				"/EMPLOYEES('5')",
+				"/EMPLOYEES('3')"
+			], [
+				[false, 1, "1", "", "Beta"]
+			], 1);
+
+			that.expectChange("name", "Lambda (Λλ)")
+				.expectRequest({
+					headers : {
+						"If-Match" : "etag3",
+						Prefer : "return=minimal"
+					},
+					method : "PATCH",
+					payload : {
+						Name : "Lambda (Λλ)"
+					},
+					url : "EMPLOYEES('3')"
+				});
+
+			// code under test
+			oContext.setProperty("Name", "Lambda (Λλ)");
+
+			return that.waitForChanges(assert, "PATCH");
 		});
 	});
 });
