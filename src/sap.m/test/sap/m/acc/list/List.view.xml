@@ -58,9 +58,9 @@
 				navButtonText="Back"
 				navButtonPress="onNavBackButtonPress">
 				<content>
-					<core:Fragment fragmentName="sap.m.acc.list.fragment.Config" type="XML"/>
+					<core:Fragment id="sliConfigurationDialog" fragmentName="sap.m.acc.list.fragment.Config" type="XML"/>
 					<List
-						id="myList"
+						id="standardListIcon"
 						mode="{listConfig>/selectionMode}"
 						headerText="Title"
 						items="{
@@ -93,9 +93,9 @@
 				navButtonText="Back"
 				navButtonPress="onNavBackButtonPress">
 				<content>
-					<core:Fragment fragmentName="sap.m.acc.list.fragment.Config" type="XML"/>
+					<core:Fragment id="slaConfigurationDialog" fragmentName="sap.m.acc.list.fragment.Config" type="XML"/>
 					<List
-						id="ShortProductList"
+						id="standardListAvatar"
 						mode="{listConfig>/selectionMode}"
 						headerText="Products"
 						itemActionCount="{= ${listConfig>/showRowActions} ? 2 : 0 }"
@@ -172,9 +172,9 @@
 				navButtonText="Back"
 				navButtonPress="onNavBackButtonPress" >
 				<content>
-					<core:Fragment fragmentName="sap.m.acc.list.fragment.Config" type="XML"/>
+					<core:Fragment id="glConfigurationDialog" fragmentName="sap.m.acc.list.fragment.Config" type="XML"/>
 					<List
-						id="idList"
+						id="groupedList"
 						items="{
 							path: 'products>/ProductCollection',
 							sorter: {
@@ -205,6 +205,7 @@
 				navButtonPress="onNavBackButtonPress" >
 				<content>
 					<List
+						id="displayList"
 						binding="{supplier>/SupplierCollection/0}"
 						mode="None"
 						headerText="Address">
@@ -233,6 +234,7 @@
 				navButtonPress="onNavBackButtonPress" >
 				<content>
 					<List
+						id="inputList"
 						headerText="Title"
 						mode="None">
 						<InputListItem label="WLAN">

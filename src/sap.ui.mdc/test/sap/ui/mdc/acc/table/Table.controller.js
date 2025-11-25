@@ -156,6 +156,9 @@ sap.ui.define([
 			this.getView().addDependent(this.oDialog);
 			this.oDialog.open();
 		},
+		openTableSettings: function() {
+			this.byId("mdcTable-settings").firePress();
+		},
 		closeDialog: function() {
 			this.oDialog.close();
 			this.oDialog.destroy();

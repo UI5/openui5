@@ -1,16 +1,20 @@
-/******************************************************************
-	Style of the RTA Change Visualization - Quartz hcw theme
-*******************************************************************/
-@_sap_ui_rta_ChangeVisualization_ChangeIndicatorColorMedium: @sapUiShellActiveBackground; //#ec8b46
-@_sap_ui_rta_ChangeVisualization_ChangeIndicatorColorDark: lighten(@sapUiChart8, 20%); //#e52faa
-@_sap_ui_rta_ChangeVisualization_OverlayOutlineColor: darken(@sapUiSelected, 40%); //#0042c2
+/* =============================================== */
+/* CSS for control sap.ui.rta/ChangeVisualization  */
+/* Quartz High Contrast White theme                */
+/* =============================================== */
+
+@_sap_ui_rta_ChangeVisualization_ChangeIndicatorColorMedium: var(--sapShell_Active_Background); /* #ec8b46 */
+@_sap_ui_rta_ChangeVisualization_ChangeIndicatorColorDark: lighten(@sapUiChart8, 20%); /* #e52faa */
+@_sap_ui_rta_ChangeVisualization_OverlayOutlineColor: darken(@sapUiSelected, 40%); /* #0042c2 */
 
 .sapUiDtOverlay {
+
 	.sapUiRtaChangeIndicatorHovered {
-		&:after {
+
+		&::after {
 			box-shadow: none;
-			outline-width: 0.125rem; //2px
-			outline-offset: -0.125rem; //2px
+			outline-width: 0.125rem; /* 2px */
+			outline-offset: -0.125rem; /* 2px */
 		}
 	}
 }

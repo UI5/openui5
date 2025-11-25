@@ -2,7 +2,8 @@
 	"employees": [
 		{
 			"id": "1",
-			"name": "John Doe",
+			"firstName": "John",
+			"lastName": "Doe",
 			"position": "CEO",
 			"department": "Management",
 			"email": "john.doe@company.com",
@@ -12,7 +13,8 @@
 			"children": [
 				{
 					"id": "2",
-					"name": "Jane Smith",
+					"firstName": "Jane",
+					"lastName": "Smith",
 					"position": "CTO",
 					"department": "Technology",
 					"email": "jane.smith@company.com",
@@ -22,7 +24,8 @@
 					"children": [
 						{
 							"id": "3",
-							"name": "Alice Johnson",
+							"firstName": "Alice",
+							"lastName": "Johnson",
 							"position": "Senior Developer",
 							"department": "Technology",
 							"email": "alice.johnson@company.com",
@@ -32,7 +35,8 @@
 						},
 						{
 							"id": "4",
-							"name": "Bob Brown",
+							"firstName": "Bob",
+							"lastName": "Brown",
 							"position": "Junior Developer",
 							"department": "Technology",
 							"email": "bob.brown@company.com",
@@ -44,7 +48,8 @@
 				},
 				{
 					"id": "5",
-					"name": "Michael Green",
+					"firstName": "Michael",
+					"lastName": "Green",
 					"position": "CFO",
 					"department": "Finance",
 					"email": "michael.green@company.com",
@@ -56,7 +61,8 @@
 		},
 		{
 			"id": "6",
-			"name": "Emily White",
+			"firstName": "Emily",
+			"lastName": "White",
 			"position": "COO",
 			"department": "Operations",
 			"email": "emily.white@company.com",
@@ -66,7 +72,8 @@
 			"children": [
 				{
 					"id": "7",
-					"name": "Chris Black",
+					"firstName": "Chris",
+					"lastName": "Black",
 					"position": "Operations Manager",
 					"department": "Operations",
 					"email": "chris.black@company.com",
@@ -78,7 +85,8 @@
 		},
 		{
 			"id": "8",
-			"name": "Sophia Blue",
+			"firstName": "Sophia",
+			"lastName": "Blue",
 			"position": "Marketing Manager",
 			"department": "Marketing",
 			"email": "sophia.blue@company.com",
@@ -88,7 +96,8 @@
 			"children": [
 				{
 					"id": "9",
-					"name": "Liam Gray",
+					"firstName": "Liam",
+					"lastName": "Gray",
 					"position": "Marketing Specialist",
 					"department": "Marketing",
 					"email": "liam.gray@company.com",
@@ -100,7 +109,8 @@
 		},
 		{
 			"id": "10",
-			"name": "Olivia Brown",
+			"firstName": "Olivia",
+			"lastName": "Brown",
 			"position": "Product Manager",
 			"department": "Product",
 			"email": "olivia.brown@company.com",
@@ -110,7 +120,8 @@
 		},
 		{
 			"id": "11",
-			"name": "Ethan Green",
+			"firstName": "Ethan",
+			"lastName": "Green",
 			"position": "Sales Manager",
 			"department": "Sales",
 			"email": "ethan.green@company.com",
@@ -120,7 +131,8 @@
 			"children": [
 				{
 					"id": "12",
-					"name": "Mia White",
+					"firstName": "Mia",
+					"lastName": "White",
 					"position": "Sales Representative",
 					"department": "Sales",
 					"email": "mia.white@company.com",
@@ -130,7 +142,8 @@
 				},
 				{
 					"id": "13",
-					"name": "Noah Black",
+					"firstName": "Noah",
+					"lastName": "Black",
 					"position": "Sales Representative",
 					"department": "Sales",
 					"email": "noah.black@company.com",
@@ -142,7 +155,8 @@
 		},
 		{
 			"id": "14",
-			"name": "Ava Gray",
+			"firstName": "Ava",
+			"lastName": "Gray",
 			"position": "HR Manager",
 			"department": "Human Resources",
 			"email": "ava.gray@company.com",
@@ -152,7 +166,8 @@
 			"children": [
 				{
 					"id": "15",
-					"name": "Isabella Blue",
+					"firstName": "Isabella",
+					"lastName": "Blue",
 					"position": "HR Specialist",
 					"department": "Human Resources",
 					"email": "isabella.blue@company.com",
@@ -164,7 +179,8 @@
 		},
 		{
 			"id": "16",
-			"name": "William Brown",
+			"firstName": "William",
+			"lastName": "Brown",
 			"position": "Finance Manager",
 			"department": "Finance",
 			"email": "william.brown@company.com",
@@ -174,7 +190,8 @@
 		},
 		{
 			"id": "17",
-			"name": "James Green",
+			"firstName": "James",
+			"lastName": "Green",
 			"position": "Accountant",
 			"department": "Finance",
 			"email": "james.green@company.com",
@@ -184,7 +201,8 @@
 		},
 		{
 			"id": "18",
-			"name": "Lucas White",
+			"firstName": "Lucas",
+			"lastName": "White",
 			"position": "Accountant",
 			"department": "Finance",
 			"email": "lucas.white@company.com",
@@ -194,7 +212,8 @@
 		},
 		{
 			"id": "19",
-			"name": "Charlotte Black",
+			"firstName": "Charlotte",
+			"lastName": "Black",
 			"position": "IT Manager",
 			"department": "Technology",
 			"email": "charlotte.black@company.com",
@@ -204,7 +223,8 @@
 			"children": [
 				{
 					"id": "20",
-					"name": "Amelia Gray",
+					"firstName": "Amelia",
+					"lastName": "Gray",
 					"position": "System Administrator",
 					"department": "Technology",
 					"email": "amelia.gray@company.com",
@@ -214,7 +234,8 @@
 				},
 				{
 					"id": "21",
-					"name": "Harper Blue",
+					"firstName": "Harper",
+					"lastName": "Blue",
 					"position": "Network Engineer",
 					"department": "Technology",
 					"email": "harper.blue@company.com",
@@ -226,7 +247,8 @@
 		},
 		{
 			"id": "22",
-			"name": "Elijah Brown",
+			"firstName": "Elijah",
+			"lastName": "Brown",
 			"position": "Legal Advisor",
 			"department": "Legal",
 			"email": "elijah.brown@company.com",
@@ -236,7 +258,8 @@
 		},
 		{
 			"id": "23",
-			"name": "Abigail Green",
+			"firstName": "Abigail",
+			"lastName": "Green",
 			"position": "Compliance Officer",
 			"department": "Legal",
 			"email": "abigail.green@company.com",
@@ -246,7 +269,8 @@
 		},
 		{
 			"id": "24",
-			"name": "Benjamin White",
+			"firstName": "Benjamin",
+			"lastName": "White",
 			"position": "Data Scientist",
 			"department": "Analytics",
 			"email": "benjamin.white@company.com",
@@ -256,7 +280,8 @@
 			"children": [
 				{
 					"id": "25",
-					"name": "Emma Black",
+					"firstName": "Emma",
+					"lastName": "Black",
 					"position": "Data Analyst",
 					"department": "Analytics",
 					"email": "emma.black@company.com",
@@ -266,7 +291,8 @@
 				},
 				{
 					"id": "26",
-					"name": "Sophia Gray",
+					"firstName": "Sophia",
+					"lastName": "Gray",
 					"position": "Data Engineer",
 					"department": "Analytics",
 					"email": "sophia.gray@company.com",
@@ -278,7 +304,8 @@
 		},
 		{
 			"id": "27",
-			"name": "Henry Blue",
+			"firstName": "Henry",
+			"lastName": "Blue",
 			"position": "Research Scientist",
 			"department": "R&D",
 			"email": "henry.blue@company.com",
@@ -288,7 +315,8 @@
 			"children": [
 				{
 					"id": "28",
-					"name": "Mason Brown",
+					"firstName": "Mason",
+					"lastName": "Brown",
 					"position": "Research Assistant",
 					"department": "R&D",
 					"email": "mason.brown@company.com",
@@ -300,7 +328,8 @@
 		},
 		{
 			"id": "29",
-			"name": "Ella Green",
+			"firstName": "Ella",
+			"lastName": "Green",
 			"position": "Customer Support Manager",
 			"department": "Support",
 			"email": "ella.green@company.com",
@@ -310,7 +339,8 @@
 			"children": [
 				{
 					"id": "30",
-					"name": "Aiden White",
+					"firstName": "Aiden",
+					"lastName": "White",
 					"position": "Support Specialist",
 					"department": "Support",
 					"email": "aiden.white@company.com",
@@ -320,7 +350,8 @@
 				},
 				{
 					"id": "31",
-					"name": "Logan Black",
+					"firstName": "Logan",
+					"lastName": "Black",
 					"position": "Support Specialist",
 					"department": "Support",
 					"email": "logan.black@company.com",
@@ -332,7 +363,8 @@
 		},
 		{
 			"id": "32",
-			"name": "Grace Gray",
+			"firstName": "Grace",
+			"lastName": "Gray",
 			"position": "UX Designer",
 			"department": "Design",
 			"email": "grace.gray@company.com",
@@ -342,7 +374,8 @@
 			"children": [
 				{
 					"id": "33",
-					"name": "Zoe Blue",
+					"firstName": "Zoe",
+					"lastName": "Blue",
 					"position": "UI Designer",
 					"department": "Design",
 					"email": "zoe.blue@company.com",
@@ -354,7 +387,8 @@
 		},
 		{
 			"id": "34",
-			"name": "Daniel Brown",
+			"firstName": "Daniel",
+			"lastName": "Brown",
 			"position": "DevOps Engineer",
 			"department": "Technology",
 			"email": "daniel.brown@company.com",
@@ -364,7 +398,8 @@
 			"children": [
 				{
 					"id": "35",
-					"name": "Matthew Green",
+					"firstName": "Matthew",
+					"lastName": "Green",
 					"position": "Cloud Engineer",
 					"department": "Technology",
 					"email": "matthew.green@company.com",
@@ -376,7 +411,8 @@
 		},
 		{
 			"id": "36",
-			"name": "Victoria White",
+			"firstName": "Victoria",
+			"lastName": "White",
 			"position": "Content Manager",
 			"department": "Marketing",
 			"email": "victoria.white@company.com",
@@ -386,7 +422,8 @@
 			"children": [
 				{
 					"id": "37",
-					"name": "Hannah Black",
+					"firstName": "Hannah",
+					"lastName": "Black",
 					"position": "Content Writer",
 					"department": "Marketing",
 					"email": "hannah.black@company.com",
@@ -398,7 +435,8 @@
 		},
 		{
 			"id": "38",
-			"name": "Andrew Gray",
+			"firstName": "Andrew",
+			"lastName": "Gray",
 			"position": "Procurement Manager",
 			"department": "Procurement",
 			"email": "andrew.gray@company.com",
@@ -408,7 +446,8 @@
 			"children": [
 				{
 					"id": "39",
-					"name": "Evelyn Blue",
+					"firstName": "Evelyn",
+					"lastName": "Blue",
 					"position": "Procurement Specialist",
 					"department": "Procurement",
 					"email": "evelyn.blue@company.com",
@@ -420,7 +459,8 @@
 		},
 		{
 			"id": "40",
-			"name": "Jack Brown",
+			"firstName": "Jack",
+			"lastName": "Brown",
 			"position": "Logistics Manager",
 			"department": "Logistics",
 			"email": "jack.brown@company.com",
@@ -430,7 +470,8 @@
 			"children": [
 				{
 					"id": "41",
-					"name": "Scarlett Green",
+					"firstName": "Scarlett",
+					"lastName": "Green",
 					"position": "Logistics Coordinator",
 					"department": "Logistics",
 					"email": "scarlett.green@company.com",
@@ -442,7 +483,8 @@
 		},
 		{
 			"id": "42",
-			"name": "Lily Gray",
+			"firstName": "Lily",
+			"lastName": "Gray",
 			"position": "Quality Assurance Manager",
 			"department": "Quality Assurance",
 			"email": "lily.gray@company.com",
@@ -452,7 +494,8 @@
 			"children": [
 				{
 					"id": "43",
-					"name": "Evan Blue",
+					"firstName": "Evan",
+					"lastName": "Blue",
 					"position": "QA Specialist",
 					"department": "Quality Assurance",
 					"email": "evan.blue@company.com",
@@ -464,7 +507,8 @@
 		},
 		{
 			"id": "44",
-			"name": "Mason White",
+			"firstName": "Mason",
+			"lastName": "White",
 			"position": "Business Analyst",
 			"department": "Business Analysis",
 			"email": "mason.white@company.com",
@@ -474,7 +518,8 @@
 		},
 		{
 			"id": "45",
-			"name": "Ella Black",
+			"firstName": "Ella",
+			"lastName": "Black",
 			"position": "Project Manager",
 			"department": "Project Management",
 			"email": "ella.black@company.com",
@@ -484,7 +529,8 @@
 			"children": [
 				{
 					"id": "46",
-					"name": "Liam Green",
+					"firstName": "Liam",
+					"lastName": "Green",
 					"position": "Project Coordinator",
 					"department": "Project Management",
 					"email": "liam.green@company.com",
@@ -496,7 +542,8 @@
 		},
 		{
 			"id": "47",
-			"name": "Sophia Brown",
+			"firstName": "Sophia",
+			"lastName": "Brown",
 			"position": "Training Manager",
 			"department": "Training",
 			"email": "sophia.brown@company.com",
@@ -506,7 +553,8 @@
 		},
 		{
 			"id": "48",
-			"name": "James White",
+			"firstName": "James",
+			"lastName": "White",
 			"position": "Technical Writer",
 			"department": "Documentation",
 			"email": "james.white@company.com",
@@ -516,7 +564,8 @@
 		},
 		{
 			"id": "49",
-			"name": "Amelia Green",
+			"firstName": "Amelia",
+			"lastName": "Green",
 			"position": "Customer Success Manager",
 			"department": "Customer Success",
 			"email": "amelia.green@company.com",
@@ -526,7 +575,8 @@
 			"children": [
 				{
 					"id": "50",
-					"name": "Oliver Blue",
+					"firstName": "Oliver",
+					"lastName": "Blue",
 					"position": "Customer Success Specialist",
 					"department": "Customer Success",
 					"email": "oliver.blue@company.com",
@@ -538,7 +588,8 @@
 		},
 		{
 			"id": "51",
-			"name": "Lucas Brown",
+			"firstName": "Lucas",
+			"lastName": "Brown",
 			"position": "Procurement Officer",
 			"department": "Procurement",
 			"email": "lucas.brown@company.com",
@@ -548,7 +599,8 @@
 		},
 		{
 			"id": "52",
-			"name": "Isabella White",
+			"firstName": "Isabella",
+			"lastName": "White",
 			"position": "Legal Counsel",
 			"department": "Legal",
 			"email": "isabella.white@company.com",
@@ -558,7 +610,8 @@
 		},
 		{
 			"id": "53",
-			"name": "Ethan Black",
+			"firstName": "Ethan",
+			"lastName": "Black",
 			"position": "Operations Specialist",
 			"department": "Operations",
 			"email": "ethan.black@company.com",
@@ -568,7 +621,8 @@
 		},
 		{
 			"id": "54",
-			"name": "Mia Gray",
+			"firstName": "Mia",
+			"lastName": "Gray",
 			"position": "Marketing Coordinator",
 			"department": "Marketing",
 			"email": "mia.gray@company.com",
@@ -578,7 +632,8 @@
 		},
 		{
 			"id": "55",
-			"name": "Noah Blue",
+			"firstName": "Noah",
+			"lastName": "Blue",
 			"position": "Sales Executive",
 			"department": "Sales",
 			"email": "noah.blue@company.com",
@@ -588,7 +643,8 @@
 		},
 		{
 			"id": "56",
-			"name": "Ava Brown",
+			"firstName": "Ava",
+			"lastName": "Brown",
 			"position": "HR Specialist",
 			"department": "Human Resources",
 			"email": "ava.brown@company.com",
@@ -598,7 +654,8 @@
 		},
 		{
 			"id": "57",
-			"name": "William Green",
+			"firstName": "William",
+			"lastName": "Green",
 			"position": "Finance Analyst",
 			"department": "Finance",
 			"email": "william.green@company.com",
@@ -608,7 +665,8 @@
 		},
 		{
 			"id": "58",
-			"name": "Charlotte White",
+			"firstName": "Charlotte",
+			"lastName": "White",
 			"position": "IT Support Specialist",
 			"department": "Technology",
 			"email": "charlotte.white@company.com",
@@ -618,7 +676,8 @@
 		},
 		{
 			"id": "59",
-			"name": "Elijah Black",
+			"firstName": "Elijah",
+			"lastName": "Black",
 			"position": "Data Engineer",
 			"department": "Analytics",
 			"email": "elijah.black@company.com",
@@ -628,7 +687,8 @@
 		},
 		{
 			"id": "60",
-			"name": "Abigail Gray",
+			"firstName": "Abigail",
+			"lastName": "Gray",
 			"position": "Research Assistant",
 			"department": "R&D",
 			"email": "abigail.gray@company.com",
@@ -638,7 +698,8 @@
 		},
 		{
 			"id": "61",
-			"name": "Benjamin Blue",
+			"firstName": "Benjamin",
+			"lastName": "Blue",
 			"position": "Customer Support Specialist",
 			"department": "Support",
 			"email": "benjamin.blue@company.com",
@@ -648,7 +709,8 @@
 		},
 		{
 			"id": "62",
-			"name": "Henry Brown",
+			"firstName": "Henry",
+			"lastName": "Brown",
 			"position": "UX Researcher",
 			"department": "Design",
 			"email": "henry.brown@company.com",
@@ -658,7 +720,8 @@
 		},
 		{
 			"id": "63",
-			"name": "Ella Green",
+			"firstName": "Ella",
+			"lastName": "Green",
 			"position": "DevOps Specialist",
 			"department": "Technology",
 			"email": "ella.green@company.com",
@@ -668,7 +731,8 @@
 		},
 		{
 			"id": "64",
-			"name": "Grace White",
+			"firstName": "Grace",
+			"lastName": "White",
 			"position": "Content Strategist",
 			"department": "Marketing",
 			"email": "grace.white@company.com",
@@ -678,7 +742,8 @@
 		},
 		{
 			"id": "65",
-			"name": "Daniel Black",
+			"firstName": "Daniel",
+			"lastName": "Black",
 			"position": "Procurement Specialist",
 			"department": "Procurement",
 			"email": "daniel.black@company.com",
@@ -688,7 +753,8 @@
 		},
 		{
 			"id": "66",
-			"name": "Victoria Gray",
+			"firstName": "Victoria",
+			"lastName": "Gray",
 			"position": "Logistics Coordinator",
 			"department": "Logistics",
 			"email": "victoria.gray@company.com",
@@ -698,7 +764,8 @@
 		},
 		{
 			"id": "67",
-			"name": "Andrew Blue",
+			"firstName": "Andrew",
+			"lastName": "Blue",
 			"position": "Quality Assurance Specialist",
 			"department": "Quality Assurance",
 			"email": "andrew.blue@company.com",
@@ -708,7 +775,8 @@
 		},
 		{
 			"id": "68",
-			"name": "Jack Brown",
+			"firstName": "Jack",
+			"lastName": "Brown",
 			"position": "Business Development Manager",
 			"department": "Business Development",
 			"email": "jack.brown@company.com",
@@ -718,7 +786,8 @@
 		},
 		{
 			"id": "69",
-			"name": "Lily Green",
+			"firstName": "Lily",
+			"lastName": "Green",
 			"position": "Training Specialist",
 			"department": "Training",
 			"email": "lily.green@company.com",
@@ -728,7 +797,8 @@
 		},
 		{
 			"id": "70",
-			"name": "Mason White",
+			"firstName": "Mason",
+			"lastName": "White",
 			"position": "Technical Support Engineer",
 			"department": "Support",
 			"email": "mason.white@company.com",
@@ -738,7 +808,8 @@
 		},
 		{
 			"id": "71",
-			"name": "Sophia Black",
+			"firstName": "Sophia",
+			"lastName": "Black",
 			"position": "Operations Analyst",
 			"department": "Operations",
 			"email": "sophia.black@company.com",
@@ -748,7 +819,8 @@
 		},
 		{
 			"id": "72",
-			"name": "James Gray",
+			"firstName": "James",
+			"lastName": "Gray",
 			"position": "Marketing Analyst",
 			"department": "Marketing",
 			"email": "james.gray@company.com",
@@ -758,7 +830,8 @@
 		},
 		{
 			"id": "73",
-			"name": "Amelia Blue",
+			"firstName": "Amelia",
+			"lastName": "Blue",
 			"position": "Sales Coordinator",
 			"department": "Sales",
 			"email": "amelia.blue@company.com",
@@ -768,7 +841,8 @@
 		},
 		{
 			"id": "74",
-			"name": "Lucas Brown",
+			"firstName": "Lucas",
+			"lastName": "Brown",
 			"position": "HR Coordinator",
 			"department": "Human Resources",
 			"email": "lucas.brown@company.com",
@@ -778,7 +852,8 @@
 		},
 		{
 			"id": "75",
-			"name": "Isabella White",
+			"firstName": "Isabella",
+			"lastName": "White",
 			"position": "Finance Coordinator",
 			"department": "Finance",
 			"email": "isabella.white@company.com",
@@ -788,7 +863,8 @@
 		},
 		{
 			"id": "76",
-			"name": "Ethan Black",
+			"firstName": "Ethan",
+			"lastName": "Black",
 			"position": "IT Coordinator",
 			"department": "Technology",
 			"email": "ethan.black@company.com",
@@ -798,7 +874,8 @@
 		},
 		{
 			"id": "77",
-			"name": "Mia Gray",
+			"firstName": "Mia",
+			"lastName": "Gray",
 			"position": "Data Coordinator",
 			"department": "Analytics",
 			"email": "mia.gray@company.com",

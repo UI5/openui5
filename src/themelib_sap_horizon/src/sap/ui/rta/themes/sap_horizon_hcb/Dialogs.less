@@ -1,10 +1,12 @@
-/**********************************************************************
-	Style of Dialogs shown in RTA - Horizon High Contrast Black theme
-***********************************************************************/
-@_sap_ui_rta_Dialogs_BorderLightColor: @sapUiShellBorderColor; //#fff
-@_sap_ui_rta_Dialogs_BorderDarkColor: @sapUiShellBackground; //#000000
-@_sap_ui_rta_Dialogs_BorderRadius: @sapUiButtonBorderCornerRadius; //0.375rem
-@_sap_ui_rta_Dialogs_BoxShadowLightColor: fade(@sapUiContentShadowColor, 60%); //rgba(255, 255, 255, 0.6)
+/* =================================== */
+/* CSS for control sap.ui.rta/Dialogs  */
+/* Horizon High Contrast Black theme   */
+/* =================================== */
+
+@_sap_ui_rta_Dialogs_BorderLightColor: var(--sapShell_BorderColor); /* #fff */
+@_sap_ui_rta_Dialogs_BorderDarkColor: var(--sapShell_Background); /* #000000 */
+@_sap_ui_rta_Dialogs_BorderRadius: var(--sapButton_BorderCornerRadius); /* 0.375rem */
+@_sap_ui_rta_Dialogs_BoxShadowLightColor: fade(@sapUiContentShadowColor, 60%); /* rgba(255, 255, 255, 0.6) */
 
 @_sap_ui_rta_Dialogs_BorderBoxShadow:
 		0 0.25rem 2rem 0 fade(@_sap_ui_rta_Dialogs_BoxShadowLightColor, 60%),
@@ -14,24 +16,27 @@
 	border: 0.188rem solid @_sap_ui_rta_Dialogs_BorderLightColor;
 	border-image: none;
 	border-radius: @_sap_ui_rta_Dialogs_BorderRadius;
-	outline: 0.188rem dashed @_sap_ui_rta_Dialogs_BorderDarkColor; //4px
+	outline: 0.188rem dashed @_sap_ui_rta_Dialogs_BorderDarkColor; /* 4px */
 	outline-offset: -0.125rem;
 }
 
 .sapUiRtaPopover {
 
-	&.sapMPopover, .sapMPopover {
-		border: 0.188rem solid @_sap_ui_rta_Dialogs_BorderLightColor; //3px
+	&.sapMPopover,
+	.sapMPopover {
+		border: 0.188rem solid @_sap_ui_rta_Dialogs_BorderLightColor; /* 3px */
 		border-image: none;
 		border-radius: @_sap_ui_rta_Dialogs_BorderRadius;
-		outline: 0.188rem dashed @_sap_ui_rta_Dialogs_BorderDarkColor; //4px
-		outline-offset: -0.125rem; //4px
+		outline: 0.188rem dashed @_sap_ui_rta_Dialogs_BorderDarkColor; /* 4px */
+		outline-offset: -0.125rem; /* 4px */
 		box-shadow: @_sap_ui_rta_Dialogs_BorderBoxShadow;
 	}
 
-	&.sapMPopoverArr, .sapMPopoverArr {
-		&:after {
-			border: 0.188rem dashed @_sap_ui_rta_Dialogs_BorderLightColor; //3px
+	&.sapMPopoverArr,
+	.sapMPopoverArr {
+
+		&::after {
+			border: 0.188rem dashed @_sap_ui_rta_Dialogs_BorderLightColor; /* 3px */
 			border-image: none;
 		}
 	}

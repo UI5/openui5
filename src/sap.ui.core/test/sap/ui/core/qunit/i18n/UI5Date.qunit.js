@@ -26,7 +26,9 @@ sap.ui.define([
 		var aDateFunctions = Object.getOwnPropertyNames(Date.prototype),
 			aUI5DateFunctions = Object.getOwnPropertyNames(UI5Date.prototype),
 			aMissingDateFunctions = aDateFunctions.filter(function (sMethod) {
-				return !aUI5DateFunctions.includes(sMethod);
+				// Not all browsers support the "toTemporalInstant" JSDate API yet.
+				// The tests are run in the latest browser versions though, thus we exclude this JSDate API.
+				return !aUI5DateFunctions.includes(sMethod) && sMethod !== "toTemporalInstant";
 			});
 
 		// code under test

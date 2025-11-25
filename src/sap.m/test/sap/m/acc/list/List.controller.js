@@ -1,10 +1,12 @@
 sap.ui.define([
 		'sap/ui/core/mvc/Controller',
 		'sap/ui/model/json/JSONModel',
+		'sap/ui/model/Filter',
 		'sap/m/MessageToast'
-	], function(Controller, JSONModel, MessageToast) {
+	], function(Controller, JSONModel, Filter, MessageToast) {
 	"use strict";
 
+	let aStandardListAvatarItems = [];
 	var ListController = Controller.extend("sap.m.acc.list.List", {
 
 		onInit: function () {
@@ -20,6 +22,7 @@ sap.ui.define([
 
 			const oConfigModel = new JSONModel({
 				selectionMode: "None",
+				content: "Show Data",
 				showRowActions: false
 			});
 			this.getView().setModel(oConfigModel, "listConfig");
@@ -38,6 +41,26 @@ sap.ui.define([
 		onNavBackButtonPress: function () {
 			var navCon = this.byId("navCon");
 			navCon.back();
+		},
+
+		onContentChange: function (oEvent) {
+			const sKey = oEvent.getParameter("selectedItem").getKey();
+			const oStandardListIcon = this.byId("standardListIcon");
+			const oStandardListAvatar =	this.byId("standardListAvatar");
+			const oGroupedList = this.byId("groupedList");
+
+			if (sKey === "No Data") {
+				oStandardListIcon.getBinding("items").filter([new Filter("title", "Contains", "123456789")]);
+				aStandardListAvatarItems = oStandardListAvatar.getItems();
+				oStandardListAvatar.removeAllItems();
+				oGroupedList.getBinding("items").filter([new Filter("title", "Contains", "123456789")]);
+			} else if (sKey === "Show Data") {
+				oStandardListIcon.getBinding("items").filter([]);
+				aStandardListAvatarItems.forEach(function (oItem) {
+					oStandardListAvatar.addItem(oItem);
+				});
+				oGroupedList.getBinding("items").filter([]);
+			}
 		},
 
 		onItemActionPress: function (oEvent) {

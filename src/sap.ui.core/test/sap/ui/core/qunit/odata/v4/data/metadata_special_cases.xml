@@ -189,6 +189,10 @@
 				<Parameter Name="_it" Type="special.cases.ArtistsType" Nullable="false"/>
 				<Parameter Name="NextSibling" Type="special.cases.NextSiblingType" Nullable="true"/>
 			</Action>
+			<Action Name="CopyAction" IsBound="true">
+				<Parameter Name="_it" Type="special.cases.ArtistsType" Nullable="false"/>
+				<ReturnType Type="special.cases.ArtistsType" Nullable="false"/>
+			</Action>
 			<Function Name="GetDefaults" EntitySetPath="_it" IsBound="true">
 				<Parameter Name="_it" Type="Collection(special.cases.ArtistsType)" Nullable="false"/>
 				<ReturnType Type="special.cases.ArtistsType" Nullable="false"/>
@@ -415,6 +419,8 @@
 				<Annotation Qualifier="OrgChart" Term="com.sap.vocabularies.Hierarchy.v1.RecursiveHierarchyActions">
 					<Record>
 						<PropertyValue Property="ChangeNextSiblingAction" String="special.cases.ChangeNextSibling"/>
+						<!-- PropertyValue Property="ChangeSiblingForRootsSupported" Bool="true"/ -->
+						<PropertyValue Property="CopyAction" String="special.cases.CopyAction"/>
 					</Record>
 				</Annotation>
 			</Annotations>

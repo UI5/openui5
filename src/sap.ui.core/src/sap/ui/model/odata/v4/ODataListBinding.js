@@ -3789,21 +3789,19 @@ sap.ui.define([
 		}
 		this.checkSuspended();
 
-		const sUpdateGroupId = this.getUpdateGroupId();
-		const oGroupLock = this.lockGroup(sUpdateGroupId, true, true);
-		const sChildPath = oChildContext.getCanonicalPath().slice(1);
+		const sChildPath = oChildContext.getCanonicalPath().slice(1); // before #lockGroup!
 		const sParentPath = oParentContext === null
 			? null
 			: oParentContext.getCanonicalPath().slice(1); // before #lockGroup!
 		const sSiblingPath = oSiblingContext === null
 			? null
 			: oSiblingContext?.getCanonicalPath().slice(1); // before #lockGroup!
-		const sNonCanonicalChildPath = oSiblingContext === undefined
-			? undefined
-			: oChildContext.getPath().slice(1);
+		const sUpdateGroupId = this.getUpdateGroupId();
+		const oGroupLock = this.lockGroup(sUpdateGroupId, true, true); // after #getCanonicalPath!
 		const bUpdateSiblingIndex = oSiblingContext?.isEffectivelyKeptAlive();
 		const {promise : oPromise, refresh : bRefresh} = this.oCache.move(oGroupLock, sChildPath,
-			sParentPath, sSiblingPath, sNonCanonicalChildPath, bUpdateSiblingIndex, bCopy);
+			oChildContext.getPath().slice(1), sParentPath, sSiblingPath, bUpdateSiblingIndex,
+			bCopy);
 
 		if (bRefresh) {
 			return SyncPromise.all([
