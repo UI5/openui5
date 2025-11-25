@@ -3,12 +3,13 @@
 	controllerName="sap.ui.core.sample.odata.v4.HierarchyBindAction.Main"
 	xmlns="sap.ui.table"
 	xmlns:core="sap.ui.core"
+	xmlns:form="sap.ui.layout.form"
 	xmlns:m="sap.m"
 	xmlns:mvc="sap.ui.core.mvc"
 	xmlns:plugins="sap.ui.table.plugins"
 	xmlns:rm="sap.ui.table.rowmodes">
 
-	<TreeTable id="table" ariaLabelledBy="title"
+	<TreeTable id="table" ariaLabelledBy="title" rowActionCount="1"
 		rows="{
 				path : '_Hierarchy',
 				parameters : {
@@ -42,6 +43,11 @@
 					tooltip="Show Selection"/>
 			</m:Toolbar>
 		</extension>
+		<rowActionTemplate>
+			<RowAction>
+				<RowActionItem press=".onShowDetails" type="Navigation"/>
+			</RowAction>
+		</rowActionTemplate>
 		<rowMode>
 			<rm:Interactive rowCount="10" minRowCount="2"/>
 		</rowMode>
@@ -70,12 +76,6 @@
 			<m:Label text="Description"/>
 			<template>
 				<m:Input change=".onDescriptionChanged" value="{Description}"/>
-			</template>
-		</Column>
-		<Column>
-			<m:Label text="Hierarchy"/>
-			<template>
-				<m:Text text="{Hierarchy}" wrapping="false"/>
 			</template>
 		</Column>
 		<Column width="33em">
@@ -124,6 +124,16 @@
 			<m:StandardListItem title="{Id}" type="Active" />
 		</m:SelectDialog>
 	</mvc:dependents>
+
+	<form:SimpleForm columnsL="3" editable="true" id="details" layout="ColumnLayout"
+		title="Details Of Node {Id}">
+		<m:Label text="Directory"/>
+		<m:Text text="{Hierarchy} ({_HierarchyDirectory/Description})"/>
+		<m:Label text="Parent"/>
+		<m:Text text="{_HierarchyParent/Id} ({_HierarchyParent/Description})"/>
+		<m:Label text="Description"/>
+		<m:Input value="{Description}"/>
+	</form:SimpleForm>
 
 	<m:FormattedText htmlText="&lt;em>Available URL parameters:&lt;/em>
 		&lt;ul>
