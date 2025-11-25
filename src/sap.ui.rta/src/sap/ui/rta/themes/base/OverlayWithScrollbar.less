@@ -1,30 +1,38 @@
-/******************************************************************
-	Style of the RTA OverlayWithScrollBar - base Theme
-*******************************************************************/
+/* ================================================ */
+/* CSS for control sap.ui.rta/OverlayWithScrollbar  */
+/* Base theme                                       */
+/* ================================================ */
 
 .sapUiRta .sapUiDtOverlayWithScrollBar {
+
 	&.sapUiDtOverlaySelected {
+
 		&.sapUiDtOverlayWithScrollBarVertical {
-			&:after {
+
+			&::after {
 				inset-inline-end: var(--sap-ui-rta-scrollbar-scrollWidth) !important;
 			}
 		}
 
 		&.sapUiDtOverlayWithScrollBarHorizontal {
-			&:after {
+
+			&::after {
 				inset-block-end: var(--sap-ui-rta-scrollbar-scrollWidth) !important;
 			}
 		}
 
 		&.sapUiDtOverlayFocusable {
+
 			&.sapUiDtOverlayWithScrollBarVertical {
-				&:focus:before {
+
+				&:focus::before {
 					inset-inline-end: var(--sap-ui-rta-scrollbar-scrollWidthPlusTwo) !important;
 				}
 			}
 
 			&.sapUiDtOverlayWithScrollBarHorizontal {
-				&:focus:before {
+
+				&:focus::before {
 					inset-block-end: var(--sap-ui-rta-scrollbar-scrollWidthPlusTwo) !important;
 				}
 			}
@@ -32,28 +40,34 @@
 	}
 
 	&.sapUiDtOverlayFocusable {
+
 		&.sapUiDtOverlayWithScrollBarHorizontal {
-			&:focus:before {
+
+			&:focus::before {
 				inset-block-end: var(--sap-ui-rta-scrollbar-scrollWidth) !important;
 			}
 		}
 
 		&.sapUiDtOverlayWithScrollBarVertical {
-			&:focus:before {
+
+			&:focus::before {
 				inset-inline-end: var(--sap-ui-rta-scrollbar-scrollWidth) !important;
 			}
 		}
 	}
 
 	&.sapUiDtOverlayHover {
+
 		&.sapUiDtOverlayWithScrollBarHorizontal {
-			&:after {
+
+			&::after {
 				inset-block-end: var(--sap-ui-rta-scrollbar-scrollWidth) !important;
 			}
 		}
 
 		&.sapUiDtOverlayWithScrollBarVertical {
-			&:after {
+
+			&::after {
 				inset-inline-end: var(--sap-ui-rta-scrollbar-scrollWidth) !important;
 			}
 		}

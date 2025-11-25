@@ -12,7 +12,7 @@
 			<content>
 				<core:Fragment fragmentName="sap.m.acc.tree.fragment.Config" type="XML"/>
 				<Tree
-					id="Tree"
+					id="testTree"
 					headerText="Tree"
 					items="{path: '/'}"
 					mode="{treeConfig>/selectionMode}"

@@ -1,22 +1,30 @@
-/******************************************************************
-	Style of the RTA Add IFrame Dialog  - Horizon Theme
-*******************************************************************/
-@_sap_ui_rta_AddIFrame_BorderRadius: @sapUiFieldBorderCornerRadius; //0.25rem
-@_sap_ui_rta_AddIFrame_ButtonHoverBackgroundColor: @sapUiButtonHoverBackground; //#eaecee
+/* ===================================== */
+/* CSS for control sap.ui.rta/AddIFrame  */
+/* Morning Horizon theme                 */
+/* ===================================== */
+
+@_sap_ui_rta_AddIFrame_BorderRadius: var(--sapField_BorderCornerRadius); /* 0.25rem */
+@_sap_ui_rta_AddIFrame_ButtonHoverBackgroundColor: var(--sapButton_Hover_Background); /* #eaecee */
 
 .sapUiRtaMode {
+
 	.sapUiRtaAddIFrameDialog {
+
 		.sapUiRtaAddIFrameDialogVlWrapper {
+
 			.sapUiRtaAddIFrameDialogEditGrid {
 
 				.sapUiRtaAddIFrameDialogParameters {
+
 					.sapMScrollCont {
 						border-radius: @_sap_ui_rta_AddIFrame_BorderRadius;
 					}
 				}
 
 				.sapUiRtaAddIFrameDialogEditUrl {
+
 					.sapMTextArea {
+
 						.sapMInputBaseContentWrapper {
 							background-image: none;
 						}
@@ -29,6 +37,7 @@
 			}
 
 			.sapUiRtaAddIFrameDialogPreviewLinkGrid {
+
 				.sapUiRtaAddIFrameDialogPreviewLinkPanel {
 
 					&.sapMPanel .sapMPanelWrappingDiv:not(.sapMPanelWrappingDivExpanded),
@@ -41,7 +50,9 @@
 						padding-right: 0.125rem;
 
 						.sapUiRtaAddIFrameDialogPreviewButton {
+
 							&:not(.sapMBtnDisabled):hover {
+
 								.sapMBtnInner {
 									background-color: @_sap_ui_rta_AddIFrame_ButtonHoverBackgroundColor;
 								}
@@ -58,7 +69,7 @@
 	}
 }
 
-// adapt scrollbars to rounded corners
+/* adapt scrollbars to rounded corners */
 html.sap-desktop:not(.sapUiNativeScrollbars) ::-webkit-scrollbar {
 	background-color: inherit !important;
 }

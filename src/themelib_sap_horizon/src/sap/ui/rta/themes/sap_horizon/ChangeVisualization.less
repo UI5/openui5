@@ -1,11 +1,15 @@
-/******************************************************************
-	Style of the RTA Change Visualization - Horizon theme
-*******************************************************************/
-@_sap_ui_rta_ChangeVisualization_BorderRadius: @sapUiButtonBorderCornerRadius; // 0.5rem
+/* =============================================== */
+/* CSS for control sap.ui.rta/ChangeVisualization  */
+/* Morning Horizon theme                           */
+/* =============================================== */
+
+@_sap_ui_rta_ChangeVisualization_BorderRadius: var(--sapButton_BorderCornerRadius); /* 0.5rem */
 
 .sapUiDtOverlay {
+
 	.sapUiRtaChangeIndicatorHovered {
-		&:after {
+
+		&::after {
 			border-radius: @_sap_ui_rta_ChangeVisualization_BorderRadius;
 		}
 	}

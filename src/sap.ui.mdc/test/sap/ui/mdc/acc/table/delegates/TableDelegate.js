@@ -91,6 +91,12 @@ sap.ui.define([
 			});
 		}
 
+		if (oProperty.key === "name") {
+			return new Text({
+				text: "{firstName} {lastName}"
+			});
+		}
+
 		return new Text({
 			text: {
 				path: oProperty.path

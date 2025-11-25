@@ -1600,14 +1600,13 @@ sap.ui.define([
 	 * @param {sap.ui.model.odata.v4.lib._GroupLock} oGroupLock
 	 *   A lock for the group to associate the requests with
 	 * @param {string} sChildPath
-	 *   The (child) node's path relative to the cache
+	 *   The (child) node's canonical resource path (relative to the service)
+	 * @param {string} sNonCanonicalChildPath
+	 *   The (child) node's non-canonical resource path (relative to the service)
 	 * @param {string|null} sParentPath
-	 *   The parent node's path relative to the cache
+	 *   The parent node's canonical resource path (relative to the service)
 	 * @param {string|null} [sSiblingPath]
-	 *   The next sibling's path relative to the cache
-	 * @param {string} [sNonCanonicalChildPath]
-	 *   The (child) node's non-canonical path (relative to the service); only used when
-	 *   <code>sSiblingPath</code> is given
+	 *   The next sibling's canonical resource path (relative to the service)
 	 * @param {boolean} [bRequestSiblingRank]
 	 *   Whether to request the next sibling's rank and return its new index
 	 * @param {boolean} [bCopy]
@@ -1630,8 +1629,8 @@ sap.ui.define([
 	 *
 	 * @public
 	 */
-	_AggregationCache.prototype.move = function (oGroupLock, sChildPath, sParentPath, sSiblingPath,
-			sNonCanonicalChildPath, bRequestSiblingRank, bCopy) {
+	_AggregationCache.prototype.move = function (oGroupLock, sChildPath, sNonCanonicalChildPath,
+			sParentPath, sSiblingPath, bRequestSiblingRank, bCopy) {
 		let bRefreshNeeded = !this.bUnifiedCache;
 
 		const sChildPredicate = sChildPath.slice(sChildPath.indexOf("("));
@@ -1697,7 +1696,8 @@ sap.ui.define([
 			bRefreshNeeded = true;
 			const mQueryOptions = {$select : []};
 			_Helper.selectKeyProperties(mQueryOptions, this.getTypes()[this.sMetaPath]);
-			const sResourcePath = sChildPath + "/" + this.oAggregation.$Actions.CopyAction
+			const sResourcePath = sNonCanonicalChildPath
+				+ "/" + this.oAggregation.$Actions.CopyAction
 				+ this.oRequestor.buildQueryString(this.sMetaPath, mQueryOptions, false, true);
 			oCopyActionPromise = this.oRequestor.request("POST", sResourcePath,
 				oGroupLock.getUnlockedCopy(), {

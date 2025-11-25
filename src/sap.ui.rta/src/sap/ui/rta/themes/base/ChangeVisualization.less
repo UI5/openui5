@@ -1,10 +1,12 @@
-/******************************************************************
-	Style of the RTA Change Visualization - base theme
-*******************************************************************/
-@_sap_ui_rta_ChangeVisualization_ChangeIndicatorColorMedium: @sapUiChartPaletteSequentialHue1Dark1; //#1b57a7
-@_sap_ui_rta_ChangeVisualization_ChangeIndicatorColorDark: @sapUiChartPaletteSequentialHue11Dark2; //#0e4186
-@_sap_ui_rta_ChangeVisualization_OverlayBoxShadow: @sapUiUx3ToolPopupShadow; //0px 6px 12px 0px fade(black, 30);
-@_sap_ui_rta_ChangeVisualization_OverlayOutlineColor: @sapUiSelected; //#8fb5ff
+/* =============================================== */
+/* CSS for control sap.ui.rta/ChangeVisualization  */
+/* Base theme                                      */
+/* =============================================== */
+
+@_sap_ui_rta_ChangeVisualization_ChangeIndicatorColorMedium: @sapUiChartPaletteSequentialHue1Dark1; /* #1b57a7 */
+@_sap_ui_rta_ChangeVisualization_ChangeIndicatorColorDark: @sapUiChartPaletteSequentialHue11Dark2; /* #0e4186 */
+@_sap_ui_rta_ChangeVisualization_OverlayBoxShadow: @sapUiUx3ToolPopupShadow; /* 0px 6px 12px 0px fade(black, 30) */
+@_sap_ui_rta_ChangeVisualization_OverlayOutlineColor: var(--sapSelectedColor); /* #8fb5ff */
 
 .sapUiRtaChangeIndicator {
 	height: 0.8rem;
@@ -36,12 +38,12 @@
 	&.sapUiRtaChangeIndicatorHovered {
 		cursor: pointer !important;
 
-		&:after {
-			content: " ";
+		&::after {
+			content: '';
 			transition: box-shadow .25s;
 			box-shadow: @_sap_ui_rta_ChangeVisualization_OverlayBoxShadow;
-			outline: 0.0625rem solid @_sap_ui_rta_ChangeVisualization_OverlayOutlineColor; //1px
-			outline-offset: -0.0625rem; //1px
+			outline: 0.0625rem solid @_sap_ui_rta_ChangeVisualization_OverlayOutlineColor; /* 1px */
+			outline-offset: -0.0625rem; /* 1px */
 		}
 	}
 
@@ -65,9 +67,12 @@
 }
 
 .sapUiRtaMode {
+
 	.sapMPopover {
+
 		.sapUiRtaChangesList {
-			// Visualize Changes: gray out items with no changes
+
+			/* Visualize Changes: gray out items with no changes */
 			li.sapMLIBTypeInactive {
 				opacity: 0.5;
 			}
@@ -75,8 +80,9 @@
 	}
 }
 
-//do not show focus border in the popover
+/* do not show focus border in the popover */
 .sapUiRtaChangeVisualizationPopover {
+
 	.sapMLIBFocusable:focus {
 		outline: none;
 	}

@@ -10,8 +10,19 @@ sap.ui.define([
 	}, {
 		key: "name",
 		label: "Name",
-		path: "name",
-		dataType: "sap.ui.model.type.String"
+		propertyInfos: ["firstName", "lastName"]
+	}, {
+		key: "firstName",
+		label: "First Name",
+		path: "firstName",
+		dataType: "sap.ui.model.type.String",
+		visible: false
+	}, {
+		key: "lastName",
+		label: "Last Name",
+		path: "lastName",
+		dataType: "sap.ui.model.type.String",
+		visible: false
 	}, {
 		key: "position",
 		label: "Position",

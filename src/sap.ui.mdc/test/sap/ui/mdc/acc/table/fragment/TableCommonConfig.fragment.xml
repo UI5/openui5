@@ -1,10 +1,10 @@
 <core:FragmentDefinition 
 	xmlns="sap.m"
 	xmlns:core="sap.ui.core">
-	<Label text="Selection Mode"/>
+	<Label text="Selection Mode" labelFor="selectSelectionMode"/>
 	<Select id="selectSelectionMode" items="{tableConfig>/enums/selectionModes}" selectedKey="{tableConfig>/selectionMode}">
 		<core:Item key="{tableConfig>value}" text="{tableConfig>value}"></core:Item>
 	</Select>
-	<Label text="Row Actions"/>
-	<Switch id="showRowActions" state="{tableConfig>/showRowActions}" customTextOn=" " customTextOff=" " change=".onShowRowActionsChange"/>
+	<Label text="Row Actions" labelFor="switchShowRowActions"/>
+	<Switch id="switchShowRowActions" state="{tableConfig>/showRowActions}" customTextOn=" " customTextOff=" " change=".onShowRowActionsChange"/>
 </core:FragmentDefinition>

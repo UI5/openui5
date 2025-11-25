@@ -14,7 +14,8 @@ sap.ui.define([
 	// following imports are only used while dynamically evaluating expressions
 	"sap/ui/model/odata/ODataUtils",
 	"sap/ui/model/odata/type/String",
-	"sap/ui/model/type/Integer"
+	"sap/ui/model/type/Integer",
+	"sap/ui/thirdparty/URITemplate"
 ], function (Log, JSTokenizer, BindingInfo, BindingParser, ExpressionParser, Icon, InvisibleText,
 		JSONModel, Measurement) {
 	/*global QUnit, sinon */

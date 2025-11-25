@@ -5191,7 +5191,7 @@ sap.ui.define([
 
 		const {promise : oSyncPromise, refresh : bRefresh}
 			// code under test
-			= oCache.move("~oGroupLock~", "Foo('23')", "Foo('42')");
+			= oCache.move("~oGroupLock~", "Foo('23')", "n/a", "Foo('42')");
 
 		assert.strictEqual(oSyncPromise.isPending(), true);
 		assert.strictEqual(bRefresh, false);
@@ -5230,7 +5230,7 @@ sap.ui.define([
 			self.mock(oGroupLock).expects("getUnlockedCopy").exactly(bCopy ? 1 : 0)
 				.withExactArgs().returns("~oGroupLockCopy~");
 			oRequestorMock.expects("request").exactly(bCopy ? 1 : 0)
-				.withExactArgs("POST", "Foo('23')/copy.Action?~sSelect~", "~oGroupLockCopy~", {
+				.withExactArgs("POST", "non/canonical/copy.Action?~sSelect~", "~oGroupLockCopy~", {
 						"If-Match" : sinon.match.same(oChildNode)
 					}, {})
 				.returns("E");
@@ -5251,7 +5251,8 @@ sap.ui.define([
 
 			const {promise : oSyncPromise, refresh : bRefresh}
 				// code under test
-				= oCache.move(oGroupLock, "Foo('23')", sParent, undefined, "n/a", undefined, bCopy);
+				= oCache.move(oGroupLock, "Foo('23')", "non/canonical", sParent, undefined, undefined,
+					bCopy);
 
 			const fnGetRank = oSyncPromise.getResult();
 			assert.strictEqual(typeof fnGetRank, "function");
@@ -5455,9 +5456,8 @@ sap.ui.define([
 				oGroupLockMock.expects("getUnlockedCopy").withExactArgs()
 					.returns("~groupLockCopyAction~");
 				oRequestorMock.expects("request")
-					.withExactArgs("POST", "Foo('23')/copy.Action?~query~", "~groupLockCopyAction~", {
-						"If-Match" : "~oChildNode~"
-					}, {})
+					.withExactArgs("POST", "non/canonical/copy.Action?~query~", "~groupLockCopyAction~",
+						{"If-Match" : "~oChildNode~"}, {})
 					.returns("E");
 			}
 			oRequestorMock.expects("request")
@@ -5495,7 +5495,7 @@ sap.ui.define([
 
 			const {promise : oSyncPromise, refresh : bRefresh}
 				// code under test
-				= oCache.move(oGroupLock, "Foo('23')", "Foo('42')", sSiblingPath, "non/canonical",
+				= oCache.move(oGroupLock, "Foo('23')", "non/canonical", "Foo('42')", sSiblingPath,
 					bRequestSiblingRank, bCopy);
 
 			const fnGetRank = oSyncPromise.getResult();
@@ -5632,7 +5632,7 @@ sap.ui.define([
 
 			// code under test
 			const {promise : oSyncPromise, refresh : bRefresh}
-				= oCache.move("~oGroupLock~", "Foo('23')", bMakeRoot ? null : "Foo('42')");
+				= oCache.move("~oGroupLock~", "Foo('23')", "n/a", bMakeRoot ? null : "Foo('42')");
 
 			assert.strictEqual(oSyncPromise.isPending(), true);
 			assert.strictEqual(bRefresh, false);

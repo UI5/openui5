@@ -1622,7 +1622,37 @@ sap.ui.define([
 		// prepare
 		var oTimePicker = new TimePicker(),
 			oSandbox = sinon.createSandbox({}),
-			oLabel = new Label({text: "TimePicker Label", labelFor: oTimePicker.getId()}),
+			oDialog;
+
+		oSandbox.stub(Device.system, "phone").value(true);
+		oSandbox.stub(Device.system, "desktop").value(false);
+		oTimePicker.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		// act
+		oTimePicker._createPicker("medium");
+		oDialog = oTimePicker.getAggregation("_picker");
+
+		// assert
+		assert.ok(oDialog.getShowHeader(), "Header is shown");
+		assert.notOk(oDialog.getShowCloseButton(), "Close button in the header is set");
+		assert.strictEqual(oDialog.getBeginButton().getType(), "Emphasized", "OK button type is set");
+		assert.ok(oDialog.getEndButton(), "Close button in the footer is set");
+
+		// clean
+		oSandbox.restore();
+		oTimePicker.destroy();
+	});
+
+	QUnit.test("Dialog title on mobile device", async function(assert) {
+		// prepare
+		var oTimePicker = new TimePicker(),
+			oSandbox = sinon.createSandbox({}),
+			sDefaultTitle = oTimePicker._oResourceBundle.getText("TIMEPICKER_DEFAULT_TITLE"),
+			sLabelText = "Custom Label Text",
+			sLabelTitle = oTimePicker._oResourceBundle.getText("TIMEPICKER_SET_TIME", [sLabelText]),
+			sTitleText = "Custom TimePicker Title",
+			oLabel = new Label({text: sLabelText}),
 			oDialog;
 
 		oSandbox.stub(Device.system, "phone").value(true);
@@ -1636,11 +1666,35 @@ sap.ui.define([
 		oDialog = oTimePicker.getAggregation("_picker");
 
 		// assert
-		assert.ok(oDialog.getShowHeader(), "Header is shown");
-		assert.notOk(oDialog.getShowCloseButton(), "Close button in the header is set");
-		assert.strictEqual(oDialog.getTitle(), "TimePicker Label", "Title is set");
-		assert.strictEqual(oDialog.getBeginButton().getType(), "Emphasized", "OK button type is set");
-		assert.ok(oDialog.getEndButton(), "Close button in the footer is set");
+		assert.strictEqual(oDialog.getTitle(), sDefaultTitle, "Default Title is set");
+
+		// act - associate Label with TimePicker
+		oLabel.setLabelFor(oTimePicker.getId());
+		await nextUIUpdate();
+
+		// assert
+		assert.strictEqual(oDialog.getTitle(), sLabelTitle, "Title is set as per the associated Label");
+
+		// act - set title of the TimePicker
+		oTimePicker.setTitle(sTitleText);
+		await nextUIUpdate();
+
+		// assert
+		assert.strictEqual(oDialog.getTitle(), sTitleText, "Title is set explicitly on the TimePicker");
+
+		// act - clear title of the TimePicker
+		oTimePicker.setTitle("");
+		await nextUIUpdate();
+
+		// assert
+		assert.strictEqual(oDialog.getTitle(), sLabelTitle, "Title is set as per the associated Label");
+
+		// act - clear associated Label with TimePicker
+		oLabel.setLabelFor("");
+		await nextUIUpdate();
+
+		// assert
+		assert.strictEqual(oDialog.getTitle(), sDefaultTitle, "Default Title is set");
 
 		// clean
 		oSandbox.restore();

@@ -11920,9 +11920,11 @@ sap.ui.define([
 	QUnit.test(sTitle, function (assert) {
 		const oChildContext = {
 			getCanonicalPath : mustBeMocked,
-			getModelIndex : mustBeMocked
+			getModelIndex : mustBeMocked,
+			getPath : mustBeMocked
 		};
 		this.mock(oChildContext).expects("getCanonicalPath").withExactArgs().returns("/~child~");
+		this.mock(oChildContext).expects("getPath").withExactArgs().returns("/~childNonCanonical~");
 		const oParentContext = bMakeRoot ? null : {
 			getCanonicalPath : mustBeMocked,
 			getModelIndex : mustBeMocked
@@ -11944,7 +11946,8 @@ sap.ui.define([
 		};
 		oBinding.oCache = oCache;
 		this.mock(oCache).expects("move").withExactArgs("~oGroupLock~", "~child~",
-				bMakeRoot ? null : "~parent~", undefined, undefined, undefined, "~copy~")
+				"~childNonCanonical~", bMakeRoot ? null : "~parent~", undefined, undefined,
+				"~copy~")
 			.returns({promise : new SyncPromise((resolve) => {
 				setTimeout(() => {
 					if (oParentContext) {
@@ -12016,20 +12019,20 @@ sap.ui.define([
 			}
 
 	QUnit.test(sTitle, async function (assert) {
+		const aGetCanonicalPathExpectations = [];
 		const oChildContext = {
 			getCanonicalPath : mustBeMocked,
 			getPath : mustBeMocked
 		};
-		this.mock(oChildContext).expects("getCanonicalPath").withExactArgs().returns("/~child~");
-		const bHasSibling = oSiblingContext !== undefined;
-		this.mock(oChildContext).expects("getPath").exactly(bHasSibling ? 1 : 0)
-			.withExactArgs().returns("/~childNonCanonical~");
+		aGetCanonicalPathExpectations.push(this.mock(oChildContext).expects("getCanonicalPath")
+			.withExactArgs().returns("/~child~"));
+		this.mock(oChildContext).expects("getPath").withExactArgs().returns("/~childNonCanonical~");
 		const oParentContext = bMakeRoot ? null : {
 			getCanonicalPath : mustBeMocked
 		};
 		if (oParentContext) {
-			this.mock(oParentContext).expects("getCanonicalPath").withExactArgs()
-				.returns("/~parent~");
+			aGetCanonicalPathExpectations.push(this.mock(oParentContext).expects("getCanonicalPath")
+				.withExactArgs().returns("/~parent~"));
 		}
 		let sSiblingPath = oSiblingContext;
 		if (oSiblingContext) {
@@ -12037,8 +12040,8 @@ sap.ui.define([
 			oSiblingContext.iIndex = "~old~";
 			oSiblingContext.getCanonicalPath = mustBeMocked;
 			oSiblingContext.isEffectivelyKeptAlive = mustBeMocked;
-			this.mock(oSiblingContext).expects("getCanonicalPath").withExactArgs()
-				.returns("/~sibling~");
+			aGetCanonicalPathExpectations.push(this.mock(oSiblingContext)
+				.expects("getCanonicalPath").withExactArgs().returns("/~sibling~"));
 			this.mock(oSiblingContext).expects("isEffectivelyKeptAlive").withExactArgs()
 				.returns(bUpdateSiblingIndex);
 		}
@@ -12050,8 +12053,8 @@ sap.ui.define([
 		this.mock(oBinding).expects("expand").never();
 		this.mock(oBinding).expects("checkSuspended").withExactArgs();
 		this.mock(oBinding).expects("getUpdateGroupId").withExactArgs().returns("~group~");
-		this.mock(oBinding).expects("lockGroup").withExactArgs("~group~", true, true)
-			.returns("~oGroupLock~");
+		const oLockGroupExpectation = this.mock(oBinding).expects("lockGroup")
+			.withExactArgs("~group~", true, true).returns("~oGroupLock~");
 		const oCache = {
 			move : mustBeMocked
 		};
@@ -12062,8 +12065,8 @@ sap.ui.define([
 			bCopy ? Promise.resolve("~copyIndex~") : undefined
 		]);
 		this.mock(oCache).expects("move")
-			.withExactArgs("~oGroupLock~", "~child~", bMakeRoot ? null : "~parent~", sSiblingPath,
-				bHasSibling ? "~childNonCanonical~" : undefined,
+			.withExactArgs("~oGroupLock~", "~child~", "~childNonCanonical~",
+				bMakeRoot ? null : "~parent~", sSiblingPath,
 				oSiblingContext ? bUpdateSiblingIndex : undefined, bCopy)
 			.returns({promise : "A", refresh : true});
 		this.mock(oBinding).expects("requestSideEffects").withExactArgs("~group~", [""])
@@ -12088,6 +12091,8 @@ sap.ui.define([
 			assert.strictEqual(oSiblingContext.iIndex,
 				bUpdateSiblingIndex ? "~siblingIndex~" : "~old~");
 		}
+		// Note: avoid lock in case canonical path fails
+		sinon.assert.callOrder(...aGetCanonicalPathExpectations, oLockGroupExpectation);
 	});
 			});
 		});
@@ -12097,9 +12102,11 @@ sap.ui.define([
 	//*********************************************************************************************
 	QUnit.test("move: fails", function (assert) {
 		const oChildContext = {
-			getCanonicalPath : mustBeMocked
+			getCanonicalPath : mustBeMocked,
+			getPath : mustBeMocked
 		};
 		this.mock(oChildContext).expects("getCanonicalPath").withExactArgs().returns("/~child~");
+		this.mock(oChildContext).expects("getPath").withExactArgs().returns("/~childNonCanonical~");
 		const oParentContext = {
 			getCanonicalPath : mustBeMocked
 		};
@@ -12118,8 +12125,8 @@ sap.ui.define([
 		};
 		oBinding.oCache = oCache;
 		this.mock(oCache).expects("move")
-			.withExactArgs("~oGroupLock~", "~child~", "~parent~", undefined, undefined, undefined,
-				"~copy~")
+			.withExactArgs("~oGroupLock~", "~child~", "~childNonCanonical~", "~parent~", undefined,
+				undefined, "~copy~")
 			.returns({promise : SyncPromise.reject("~error~"), refresh : false});
 		this.mock(oBinding).expects("expand").never();
 
@@ -12138,8 +12145,11 @@ sap.ui.define([
 		const oChildContext = {
 			created : mustBeMocked,
 			getCanonicalPath : mustBeMocked,
-			getModelIndex : mustBeMocked
+			getModelIndex : mustBeMocked,
+			getPath : mustBeMocked
 		};
+		this.mock(oChildContext).expects("getCanonicalPath").withExactArgs().returns("/~child~");
+		this.mock(oChildContext).expects("getPath").withExactArgs().returns("/~childNonCanonical~");
 		const oBinding = this.bindList("/EMPLOYEES");
 		// Note: autoExpandSelect at model would be required for hierarchyQualifier, but that leads
 		// too far :-(
@@ -12148,14 +12158,13 @@ sap.ui.define([
 		this.mock(oBinding).expects("getUpdateGroupId").withExactArgs().returns("~group~");
 		this.mock(oBinding).expects("lockGroup").withExactArgs("~group~", true, true)
 			.returns("~oGroupLock~");
-		this.mock(oChildContext).expects("getCanonicalPath").withExactArgs().returns("/~child~");
 		const oCache = {
 			move : mustBeMocked
 		};
 		oBinding.oCache = oCache;
 		this.mock(oCache).expects("move")
-			.withExactArgs("~oGroupLock~", "~child~", null, undefined, undefined, undefined,
-				"~copy~")
+			.withExactArgs("~oGroupLock~", "~child~", "~childNonCanonical~", null, undefined,
+				undefined, "~copy~")
 			.returns({promise : SyncPromise.resolve([1, 43, "~iCollapseCount~"]), refresh : false});
 		this.mock(oBinding).expects("requestSideEffects").never();
 		this.mock(oBinding).expects("insertGap").never();

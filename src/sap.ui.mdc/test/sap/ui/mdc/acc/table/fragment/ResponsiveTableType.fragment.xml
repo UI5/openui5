@@ -6,7 +6,7 @@
 		<content>
 		  <form:SimpleForm editable="true" id="configForm">
 				<core:Fragment fragmentName="sap.ui.mdc.acc.table.fragment.TableCommonConfig"/>
-				<Label text="Popin Display"/>
+				<Label text="Popin Display" labelFor="selectPopinDisplay"/>
 				<Select id="selectPopinDisplay" items="{tableConfig>/enums/popinDisplay}" selectedKey="{tableConfig>/respType/popinDisplay}">
 					<core:Item key="{tableConfig>value}" text="{tableConfig>value}"></core:Item>
 				</Select>

@@ -1,8 +1,9 @@
 sap.ui.define([
 		'sap/ui/core/mvc/Controller',
 		'sap/ui/model/json/JSONModel',
+		'sap/ui/model/Filter',
 		'sap/m/MessageToast'
-	], function(Controller, JSONModel, MessageToast) {
+	], function(Controller, JSONModel, Filter, MessageToast) {
 	"use strict";
 
 	var TreeController = Controller.extend("sap.m.acc.tree.Tree", {
@@ -18,6 +19,17 @@ sap.ui.define([
 				withIcon: false
 			});
 			this.getView().setModel(oConfigModel, "treeConfig");
+		},
+
+		onContentChange: function (oEvent) {
+			const sKey = oEvent.getParameter("selectedItem").getKey();
+			const oTree = this.byId("testTree");
+
+			if (sKey === "No Data") {
+				oTree.getBinding("items").filter([new Filter("text", "Contains", "123456789")]);
+			} else if (sKey === "Show Data") {
+				oTree.getBinding("items").filter([]);
+			}
 		},
 
 		onItemActionPress: function (oEvent) {

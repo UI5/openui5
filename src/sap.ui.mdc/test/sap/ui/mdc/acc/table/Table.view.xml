@@ -9,7 +9,7 @@
 	<m:App id="MyApp" defaultTransitionName="show">
 		<m:Page id="MyPage" title="Table Sample" titleLevel="H1">
 			<m:headerContent>
-				<m:Label text="Table Type:" labelFor="selectType"/>
+				<m:Label text="Table Type" labelFor="selectType" showColon="true"/>
 				<m:Select id="selectType" change=".onTableTypeChange" selectedKey="GridTableType">
 					<core:Item key="GridTableType" text="GridTable"></core:Item>
 					<core:Item key="ResponsiveTableType" text="ResponsiveTable"></core:Item>
@@ -39,7 +39,11 @@
 					</mdct:RowSettings>
 				</mdc:rowSettings>
 				<mdc:noData>
-					<m:IllustratedMessage/>
+					<m:IllustratedMessage>
+						<m:additionalContent>
+							<m:Button text="Open Table Settings" press=".openTableSettings"/>
+						</m:additionalContent>
+					</m:IllustratedMessage>
 				</mdc:noData>
 				<mdct:Column
 					propertyKey="id"
@@ -52,7 +56,7 @@
 				<mdct:Column
 					propertyKey="name"
 					header="Name">
-					<m:Text text="{name}"/>
+					<m:Text text="{firstName} {lastName}"/>
 					<mdct:extendedSettings>
 						<mdct:ResponsiveColumnSettings importance="High" />
 					</mdct:extendedSettings>

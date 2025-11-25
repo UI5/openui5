@@ -1,18 +1,22 @@
-/******************************************************************
-	Style of the RTA Change Visualization - Horizon hcb theme
-*******************************************************************/
-@_sap_ui_rta_ChangeVisualization_ChangeIndicatorColorMedium: @sapUiCriticalText; //#ffab1d
-@_sap_ui_rta_ChangeVisualization_ChangeIndicatorColorDark: lighten(@sapUiChart8, 20%); //#dd8ec9
-@_sap_ui_rta_ChangeVisualization_OverlayOutlineColor: darken(@sapUiSuccessBorder, 25%); //#4c994c
-@_sap_ui_rta_ChangeVisualization_BorderRadius: @sapUiButtonBorderCornerRadius; // 0.375rem
+/* =============================================== */
+/* CSS for control sap.ui.rta/ChangeVisualization  */
+/* Horizon High Contrast Black theme               */
+/* =============================================== */
+
+@_sap_ui_rta_ChangeVisualization_ChangeIndicatorColorMedium: var(--sapCriticalTextColor); /* #ffab1d */
+@_sap_ui_rta_ChangeVisualization_ChangeIndicatorColorDark: lighten(@sapUiChart8, 20%); /* #dd8ec9 */
+@_sap_ui_rta_ChangeVisualization_OverlayOutlineColor: darken(@sapUiSuccessBorder, 25%); /* #4c994c */
+@_sap_ui_rta_ChangeVisualization_BorderRadius: var(--sapButton_BorderCornerRadius); /* 0.375rem */
 
 .sapUiDtOverlay {
+
 	.sapUiRtaChangeIndicatorHovered {
-		&:after {
+
+		&::after {
 			box-shadow: none;
 			border-radius: @_sap_ui_rta_ChangeVisualization_BorderRadius;
-			outline-width: 0.125rem; //2px
-			outline-offset: -0.125rem; //2px
+			outline-width: 0.125rem; /* 2px */
+			outline-offset: -0.125rem; /* 2px */
 		}
 	}
 
