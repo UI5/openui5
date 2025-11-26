@@ -40,6 +40,7 @@ sap.ui.define(
      * @extends sap.ui.core.webc.WebComponent
      * @constructor
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      * @alias module:sap/f/gen/ui5/webcomponents/dist/Button
      */
 
@@ -47,7 +48,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents.dist.Button",
       {
         metadata: {
-          tag: "ui5-button-cc48984a",
+          tag: "ui5-button-68f7652d",
 
           namespace: "sap.f.gen.ui5.webcomponents",
 
@@ -69,6 +70,7 @@ sap.ui.define(
               mapping: "property",
               defaultValue: "Default"
             },
+
             /**
              * Defines whether the component is disabled.
              * A disabled component can't be pressed or
@@ -83,6 +85,7 @@ sap.ui.define(
                 formatter: "_mapEnabled"
               }
             },
+
             /**
              * Defines the icon, displayed as graphical element within the component.
              * The SAP-icons font provides numerous options.
@@ -91,6 +94,7 @@ sap.ui.define(
              * See all the available icons within the [Icon Explorer](https://sdk.openui5.org/test-resources/sap/m/demokit/iconExplorer/webapp/index.html).
              */
             icon: { type: "string", mapping: "property" },
+
             /**
              * Defines the icon, displayed as graphical element within the component after the button text.
              *
@@ -103,6 +107,7 @@ sap.ui.define(
              * See all the available icons within the [Icon Explorer](https://sdk.openui5.org/test-resources/sap/m/demokit/iconExplorer/webapp/index.html).
              */
             endIcon: { type: "string", mapping: "property" },
+
             /**
              * When set to `true`, the component will
              * automatically submit the nearest HTML form element on `press`.
@@ -114,10 +119,12 @@ sap.ui.define(
               mapping: "property",
               defaultValue: false
             },
+
             /**
              * Defines the accessible ARIA name of the component.
              */
             accessibleName: { type: "string", mapping: "property" },
+
             /**
              * Defines the additional accessibility attributes that will be applied to the component.
              * The following fields are supported:
@@ -141,10 +148,12 @@ sap.ui.define(
               mapping: "property",
               defaultValue: "{}"
             },
+
             /**
              * Defines the accessible description of the component.
              */
             accessibleDescription: { type: "string", mapping: "property" },
+
             /**
              * Defines whether the button has special form-related functionality.
              *
@@ -156,6 +165,7 @@ sap.ui.define(
               mapping: "property",
               defaultValue: "Button"
             },
+
             /**
              * Describes the accessibility role of the button.
              *
@@ -167,6 +177,7 @@ sap.ui.define(
               mapping: "property",
               defaultValue: "Button"
             },
+
             /**
              * Defines whether the button shows a loading indicator.
              *
@@ -177,6 +188,7 @@ sap.ui.define(
               mapping: "property",
               defaultValue: false
             },
+
             /**
              * Specifies the delay in milliseconds before the loading indicator appears within the associated button.
              */
@@ -185,14 +197,17 @@ sap.ui.define(
               mapping: "property",
               defaultValue: 1000
             },
+
             /**
              * The text-content of the Web Component.
              */
             text: { type: "string", mapping: "textContent" },
+
             /**
              * The 'width' of the Web Component in <code>sap.ui.core.CSSSize</code>.
              */
             width: { type: "sap.ui.core.CSSSize", mapping: "style" },
+
             /**
              * The 'height' of the Web Component in <code>sap.ui.core.CSSSize</code>.
              */

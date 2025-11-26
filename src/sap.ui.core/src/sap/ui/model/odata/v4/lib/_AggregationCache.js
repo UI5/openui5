@@ -1725,8 +1725,15 @@ sap.ui.define([
 				return () => { // Note: caller MUST wait for side-effects refresh first
 					let oCopyIndexPromise;
 					if (bCopy) {
-						oCopyIndexPromise = this.requestRank(oCopy, oGroupLock, true)
-							.then((iCopyIndex) => this.findIndex(iCopyIndex));
+						const oCandidate = this.aElements.$byPredicate[
+							_Helper.getKeyPredicate(oCopy, this.sMetaPath, this.getTypes())];
+						if (oCandidate) { // copy already inside collection
+							oCopyIndexPromise = SyncPromise.resolve(
+								this.aElements.indexOf(oCandidate));
+						} else {
+							oCopyIndexPromise = this.requestRank(oCopy, oGroupLock, true)
+								.then((iCopyRank) => this.findIndex(iCopyRank));
+						}
 					}
 					return [
 						iRank === undefined ? undefined : this.findIndex(iRank),

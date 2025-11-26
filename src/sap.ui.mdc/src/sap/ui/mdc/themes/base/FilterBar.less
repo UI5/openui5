@@ -25,7 +25,7 @@
 	margin-top: 0.5rem;
 }
 
-.sapUiMdcFilterBarBase .sapUiMdcFilterBarBaseButtonPaddingRight {
+.sapUiMdcFilterBarBase .sapUiMdcFilterBarBaseButtonPaddingRight, .sapUiMdcFilterBarLayoutButtons .sapUiMdcFilterBarBaseButtonPaddingRight {
 	padding-right: 0.5rem;
 }
 
@@ -33,7 +33,8 @@
 	padding-left: 0.5rem;
 }
 
-.sapUiMdcFilterBarBase .sapUiMdcFilterBarBaseLabel .sapMLabelColonAndRequired::before {
+.sapUiMdcFilterBarBase .sapUiMdcFilterBarBaseLabel .sapMLabelColonAndRequired,
+.sapUiMdcFilterBarLayoutItems .sapUiMdcFilterBarBaseLabel .sapMLabelColonAndRequired::before {
 	content: attr(data-colon);
 	white-space-collapse: preserve;
 }
@@ -47,6 +48,7 @@ html[dir='rtl'] .sapUiMdcFilterBarBaseFloatLeft {
 }
 
 .sapUiMdcFilterBarBaseAFLayout > .sapUiAFLayoutItem > div,
-.sapUiMdcFilterBarBaseAFLayout > .sapUiAFLayoutItem .sapUiMdcFieldBase {
+.sapUiMdcFilterBarBaseAFLayout > .sapUiAFLayoutItem .sapUiMdcFieldBase,
+.sapUiMdcFilterBarLayoutItem .sapUiMdcFieldBase {
 	width: 100%;
 }

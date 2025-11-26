@@ -1,6 +1,7 @@
 {
 	"tableContent": {
 		"employees": {
+			"_version": "1.81.0",
 			"sap.app": {
 				"id": "employeesCard",
 				"type": "card"
@@ -58,6 +59,7 @@
 	},
 	"adaptiveContent": {
 		"summary": {
+			"_version": "1.81.0",
 			"sap.app": {
 				"id": "adaptivecard.embedded",
 				"type": "card"
@@ -96,6 +98,7 @@
 	},
 	"objectContent": {
 		"contact": {
+			"_version": "1.81.0",
 			"sap.app": {
 				"id": "contact",
 				"type": "card"
@@ -169,6 +172,7 @@
 	},
 	"listContent": {
 		"orders": {
+			"_version": "1.81.0",
 			"sap.app": {
 				"id": "ordersCard",
 				"type": "card"
@@ -220,6 +224,7 @@
 			}
 		},
 		"withAction": {
+			"_version": "1.81.0",
 			"sap.card": {
 				"type": "List",
 				"header": {
@@ -285,8 +290,10 @@
 			}
 		},
 		"tasks": {
+			"_version": "1.81.0",
 			"sap.app": {
-				"id": "tasksCard"
+				"id": "tasksCard",
+				"type": "card"
 			},
 			"sap.card": {
 				"type": "List",
@@ -314,8 +321,10 @@
 			}
 		},
 		"contacts": {
+			"_version": "1.81.0",
 			"sap.app": {
-				"id": "contactsCard"
+				"id": "contactsCard",
+				"type": "card"
 			},
 			"sap.card": {
 				"type": "List",
@@ -357,8 +366,10 @@
 			}
 		},
 		"products": {
+			"_version": "1.81.0",
 			"sap.app": {
-				"id": "products"
+				"id": "products",
+				"type": "card"
 			},
 			"sap.card": {
 				"type": "List",

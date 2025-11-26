@@ -52,6 +52,7 @@ sap.ui.define(
      * @extends sap.ui.core.webc.WebComponent
      * @constructor
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      * @alias module:sap/f/gen/ui5/webcomponents/dist/Menu
      */
 
@@ -59,7 +60,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents.dist.Menu",
       {
         metadata: {
-          tag: "ui5-menu-cc48984a",
+          tag: "ui5-menu-68f7652d",
 
           namespace: "sap.f.gen.ui5.webcomponents",
 
@@ -76,10 +77,12 @@ sap.ui.define(
              * Defines the header text of the menu (displayed on mobile).
              */
             headerText: { type: "string", mapping: "property" },
+
             /**
              * Indicates if the menu is open.
              */
             open: { type: "boolean", mapping: "property", defaultValue: false },
+
             /**
              * Determines the horizontal alignment of the menu relative to its opener control.
              * @type module:sap/f/gen/ui5/webcomponents.PopoverHorizontalAlign
@@ -89,6 +92,7 @@ sap.ui.define(
               mapping: "property",
               defaultValue: "Start"
             },
+
             /**
              * Defines if a loading indicator would be displayed inside the corresponding ui5-menu popover.
              */
@@ -97,6 +101,7 @@ sap.ui.define(
               mapping: "property",
               defaultValue: false
             },
+
             /**
              * Defines the delay in milliseconds, after which the loading indicator will be displayed inside the corresponding ui5-menu popover.
              */
@@ -105,14 +110,17 @@ sap.ui.define(
               mapping: "property",
               defaultValue: 1000
             },
+
             /**
              * The text-content of the Web Component.
              */
             text: { type: "string", mapping: "textContent" },
+
             /**
              * The 'width' of the Web Component in <code>sap.ui.core.CSSSize</code>.
              */
             width: { type: "sap.ui.core.CSSSize", mapping: "style" },
+
             /**
              * The 'height' of the Web Component in <code>sap.ui.core.CSSSize</code>.
              */

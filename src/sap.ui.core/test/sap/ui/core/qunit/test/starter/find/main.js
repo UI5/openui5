@@ -278,7 +278,7 @@ sap.ui.define([
 								new Column("qunitVersion",{
 									//width: "85px",
 									label: new Label({text: "Q"}),
-									width: "4ex",
+									width: "6ex",
 									template: new Text({
 										text: { path: "qunit/version" }
 									}),
@@ -287,7 +287,7 @@ sap.ui.define([
 								new Column("sinonVersion",{
 									//width: "85px",
 									label: new Label({text: "S"}),
-									width: "4ex",
+									width: "6ex",
 									template: new Text({
 										text: { path: "sinon/version" }
 									}),
@@ -435,7 +435,7 @@ sap.ui.define([
 
 	const uiCreated = new Promise( (resolve, reject) => {
 		Core.ready().then(() => {
-			const showSuite = url.searchParams.has('showSuite');
+			const showSuite = url.searchParams.get('showSuite') !== 'false';
 			createUI(showSuite).then( resolve, reject );
 		});
 	});

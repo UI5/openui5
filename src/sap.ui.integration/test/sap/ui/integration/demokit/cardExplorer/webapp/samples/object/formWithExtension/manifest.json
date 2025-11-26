@@ -1,5 +1,5 @@
 {
-	"_version": "2.0.0",
+	"_version": "%LATEST_SCHEMA_VERSION%",
 	"sap.app": {
 		"id": "card.explorer.object.formWithExtension",
 		"i18n": "i18n/i18n.properties",

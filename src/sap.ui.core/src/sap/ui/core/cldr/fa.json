@@ -1,7 +1,7 @@
 {
 	"__license": "This file has been derived from Unicode Common Locale Data Repository (CLDR) files (http://cldr.unicode.org). See the copyright and permission notice in the Unicode-Data-Files-LICENSE.txt available at the same location as this file or visit http://www.unicode.org/copyright.html",
-	"__version": "46.1.0",
-	"__buildtime": "2025-01-28T09:40:27.437Z",
+	"__version": "48.0.0",
+	"__buildtime": "2025-11-18T12:31:55.685Z",
 	"languages": {
 		"aa": "آفاری",
 		"ab": "آبخازی",
@@ -147,9 +147,7 @@
 		"en_AU": "انگلیسی استرالیا",
 		"en_CA": "انگلیسی کانادا",
 		"en_GB": "انگلیسی بریتانیا",
-		"en_GB-alt-short": "انگلیسی بریتانیا",
 		"en_US": "انگلیسی آمریکا",
-		"en_US-alt-short": "انگلیسی آمریکا",
 		"enm": "انگلیسی میانه",
 		"eo": "اسپرانتو",
 		"es": "اسپانیایی",
@@ -286,6 +284,8 @@
 		"ksf": "بافیایی",
 		"ksh": "کولش",
 		"ku": "کردی",
+		"ku_menu-core": "کردی",
+		"ku_menu-extension": "کرمانجی",
 		"kum": "کومیکی",
 		"kut": "کوتنی",
 		"kv": "کومیایی",
@@ -811,6 +811,7 @@
 		"CN": "چین",
 		"CO": "کلمبیا",
 		"CP": "جزایر کلیپرتون",
+		"CQ": "سارک",
 		"CR": "کاستاریکا",
 		"CU": "کوبا",
 		"CV": "کیپ‌ورد",
@@ -845,7 +846,6 @@
 		"FR": "فرانسه",
 		"GA": "گابن",
 		"GB": "بریتانیا",
-		"GB-alt-short": "بریتانیا",
 		"GD": "گرنادا",
 		"GE": "گرجستان",
 		"GF": "گویان فرانسه",
@@ -877,7 +877,6 @@
 		"IM": "جزیرهٔ من",
 		"IN": "هند",
 		"IO": "قلمرو بریتانیا در اقیانوس هند",
-		"IO-alt-biot": "قلمرو بریتانیا در اقیانوس هند",
 		"IO-alt-chagos": "مجمع‌الجزایر چاگوس",
 		"IQ": "عراق",
 		"IR": "ایران",
@@ -1006,7 +1005,6 @@
 		"TN": "تونس",
 		"TO": "تونگا",
 		"TR": "ترکیه",
-		"TR-alt-variant": "ترکیه",
 		"TT": "ترینیداد و توباگو",
 		"TV": "تووالو",
 		"TW": "تایوان",
@@ -1017,7 +1015,6 @@
 		"UN": "سازمان ملل متحد",
 		"UN-alt-short": "سازمان ملل",
 		"US": "ایالات متحده",
-		"US-alt-short": "ایالات متحده",
 		"UY": "اروگوئه",
 		"UZ": "ازبکستان",
 		"VA": "واتیکان",
@@ -1064,15 +1061,19 @@
 				"Bhms": "h:mm:ss B",
 				"d": "d",
 				"E": "ccc",
+				"EBh": "E h B",
 				"EBhm": "E h:mm B",
 				"EBhms": "E h:mm:ss B",
 				"Ed": "E d",
+				"Eh": "E h a",
 				"Ehm": "E h:mm a",
 				"EHm": "E H:mm",
 				"Ehms": "E h:mm:ss a",
 				"EHms": "E H:mm:ss",
 				"Gy": "y G",
+				"GyM": "y/M G",
 				"GyMd": "y/M/d GGGGG",
+				"GyMEd": "E، y/M/d G",
 				"GyMMM": "MMM y G",
 				"GyMMMd": "d MMM y G",
 				"GyMMMEd": "E d MMM y G",
@@ -1087,6 +1088,8 @@
 				"Hmsv": "H:mm:ss v",
 				"hmv": "h:mm a v",
 				"Hmv": "H:mm v",
+				"hv": "h a v",
+				"Hv": "سHH v",
 				"M": "L",
 				"Md": "M/d",
 				"MEd": "E M/d",
@@ -1248,7 +1251,7 @@
 					"y": "E y/M/d تا E y/M/d"
 				},
 				"yMMM": {
-					"M": "LLL تا MMM y",
+					"M": "MMM تا MMM y",
 					"y": "MMM y تا MMM y"
 				},
 				"yMMMd": {
@@ -1262,7 +1265,7 @@
 					"y": "E d MMM y تا E d MMM y"
 				},
 				"yMMMM": {
-					"M": "LLLL تا MMMM y",
+					"M": "MMMM تا MMMM y",
 					"y": "MMMM y تا MMMM y"
 				}
 			}
@@ -1610,15 +1613,19 @@
 				"Bhms": "h:mm:ss B",
 				"d": "d",
 				"E": "ccc",
+				"EBh": "E h B",
 				"EBhm": "E h:mm B",
 				"EBhms": "E h:mm:ss B",
 				"Ed": "E dم",
+				"Eh": "E h a",
 				"Ehm": "E h:mm a",
 				"EHm": "E H:mm",
 				"Ehms": "E h:mm:ss a",
 				"EHms": "E H:mm:ss",
 				"Gy": "y G",
+				"GyM": "y/M G",
 				"GyMd": "M/d/y GGGGG",
+				"GyMEd": "E، y/M/d G",
 				"GyMMM": "MMM y G",
 				"GyMMMd": "d MMM y G",
 				"GyMMMEd": "E d MMM y G",
@@ -1630,6 +1637,8 @@
 				"hms": "h:mm:ss a",
 				"Hms": "H:mm:ss",
 				"HmZ": "HH:mm (Z)",
+				"hv": "h a v",
+				"Hv": "سHH v",
 				"M": "L",
 				"Md": "M/d",
 				"MEd": "E M/d",
@@ -2115,13 +2124,16 @@
 			}
 		},
 		"era-wide": {
-			"0": "هجری قمری"
+			"0": "هجری قمری",
+			"1": "BH"
 		},
 		"era-abbreviated": {
-			"0": "ه‍.ق."
+			"0": "ه‍.ق.",
+			"1": "BH"
 		},
 		"era-narrow": {
-			"0": "ه‍.ق."
+			"0": "ه‍.ق.",
+			"1": "BH"
 		}
 	},
 	"ca-japanese": {
@@ -2148,15 +2160,19 @@
 				"Bhms": "h:mm:ss B",
 				"d": "d",
 				"E": "ccc",
+				"EBh": "E h B",
 				"EBhm": "E h:mm B",
 				"EBhms": "E h:mm:ss B",
 				"Ed": "E dم",
+				"Eh": "E h a",
 				"Ehm": "E h:mm a",
 				"EHm": "E H:mm",
 				"Ehms": "E h:mm:ss a",
 				"EHms": "E H:mm:ss",
 				"Gy": "y G",
+				"GyM": "y/M G",
 				"GyMd": "M/d/y GGGGG",
+				"GyMEd": "E، y/M/d G",
 				"GyMMM": "MMM y G",
 				"GyMMMd": "d MMM y G",
 				"GyMMMEd": "E d MMM y G",
@@ -2167,6 +2183,8 @@
 				"Hm": "H:mm",
 				"hms": "h:mm:ss a",
 				"Hms": "H:mm:ss",
+				"hv": "h a v",
+				"Hv": "سHH v",
 				"M": "L",
 				"Md": "M/d",
 				"MEd": "E M/d",
@@ -2704,15 +2722,19 @@
 				"Bhms": "h:mm:ss B",
 				"d": "d",
 				"E": "ccc",
+				"EBh": "E h B",
 				"EBhm": "E h:mm B",
 				"EBhms": "E h:mm:ss B",
 				"Ed": "E dم",
+				"Eh": "E h a",
 				"Ehm": "E h:mm a",
 				"EHm": "E H:mm",
 				"Ehms": "E h:mm:ss a",
 				"EHms": "E H:mm:ss",
 				"Gy": "y G",
+				"GyM": "y/M G",
 				"GyMd": "M/d/y GGGGG",
+				"GyMEd": "E، y/M/d G",
 				"GyMMM": "MMM y G",
 				"GyMMMd": "d MMM y G",
 				"GyMMMEd": "E d MMM y G",
@@ -2723,6 +2745,8 @@
 				"Hm": "H:mm",
 				"hms": "h:mm:ss a",
 				"Hms": "H:mm:ss",
+				"hv": "h a v",
+				"Hv": "سHH v",
 				"M": "L",
 				"Md": "M/d",
 				"MEd": "E M/d",
@@ -3228,15 +3252,19 @@
 				"Bhms": "h:mm:ss B",
 				"d": "d",
 				"E": "ccc",
+				"EBh": "E h B",
 				"EBhm": "E h:mm B",
 				"EBhms": "E h:mm:ss B",
 				"Ed": "E dم",
+				"Eh": "E h a",
 				"Ehm": "E h:mm a",
 				"EHm": "E H:mm",
 				"Ehms": "E h:mm:ss a",
 				"EHms": "E H:mm:ss",
 				"Gy": "y G",
+				"GyM": "y/M G",
 				"GyMd": "M/d/y GGGGG",
+				"GyMEd": "E، y/M/d G",
 				"GyMMM": "MMM y G",
 				"GyMMMd": "d MMM y G",
 				"GyMMMEd": "E d MMM y G",
@@ -3247,6 +3275,8 @@
 				"Hm": "H:mm",
 				"hms": "h:mm:ss a",
 				"Hms": "H:mm:ss",
+				"hv": "h a v",
+				"Hv": "سHH v",
 				"M": "L",
 				"Md": "M/d",
 				"MEd": "E M/d",
@@ -4177,6 +4207,7 @@
 			"Chihuahua": "چیواوا",
 			"Ciudad_Juarez": "سیوداد خوارز",
 			"Costa_Rica": "کاستاریکا",
+			"Coyhaique": "کویهایکیو",
 			"Creston": "کرستون",
 			"Cuiaba": "کویاوا",
 			"Curacao": "کوراسائو",
@@ -4602,13 +4633,17 @@
 	},
 	"currencyFormat": {
 		"standard": "‎‪¤‬ #,##0.00",
-		"standard-noCurrency": "#,##0.00",
+		"standard-alphaNextToNumber": "‎‪¤‬ #,##0.00",
+		"standard-noCurrency": "‎#,##0.00",
 		"accounting": "‎‪¤‬ #,##0.00;‎(‪¤‬ #,##0.00)",
-		"accounting-noCurrency": "#,##0.00;(#,##0.00)",
+		"accounting-alphaNextToNumber": "‎‪¤‬ #,##0.00;‎(‪¤‬ #,##0.00)",
+		"accounting-noCurrency": "‎#,##0.00;‎(#,##0.00)",
 		"sap-standard": "‎‪¤‬ #,##0.00",
+		"sap-standard-alphaNextToNumber": "‎‪¤‬ #,##0.00",
 		"sap-accounting": "‎‪¤‬ #,##0.00;‎(‪¤‬ #,##0.00)",
-		"sap-standard-noCurrency": "#,##0.00",
-		"sap-accounting-noCurrency": "#,##0.00;(#,##0.00)"
+		"sap-accounting-alphaNextToNumber": "‎‪¤‬ #,##0.00;‎(‪¤‬ #,##0.00)",
+		"sap-standard-noCurrency": "‎#,##0.00",
+		"sap-accounting-noCurrency": "‎#,##0.00;‎(#,##0.00)"
 	},
 	"miscPattern": {
 		"approximately": "~{0}",
@@ -4617,30 +4652,30 @@
 		"range": "{0}–{1}"
 	},
 	"currencyFormat-short": {
-		"1000-one": "0 هزار ‪¤‬",
-		"1000-other": "0 هزار ‪¤‬",
-		"10000-one": "00 هزار ‪¤‬",
-		"10000-other": "00 هزار ‪¤‬",
-		"100000-one": "000 هزار ‪¤‬",
-		"100000-other": "000 هزار ‪¤‬",
-		"1000000-one": "0 میلیون ‪¤‬",
-		"1000000-other": "0 میلیون ‪¤‬",
-		"10000000-one": "00 میلیون ‪¤‬",
-		"10000000-other": "00 میلیون ‪¤‬",
-		"100000000-one": "000 میلیون ‪¤‬",
-		"100000000-other": "000 میلیون ‪¤‬",
-		"1000000000-one": "0 میلیارد ‪¤‬",
-		"1000000000-other": "0 میلیارد ‪¤‬",
-		"10000000000-one": "00 میلیارد ‪¤‬",
-		"10000000000-other": "00 میلیارد ‪¤‬",
-		"100000000000-one": "000 میلیارد ‪¤‬",
-		"100000000000-other": "000 میلیارد ‪¤‬",
-		"1000000000000-one": "0 هزارمیلیارد ‪¤‬",
-		"1000000000000-other": "0 هزارمیلیارد ‪¤‬",
-		"10000000000000-one": "00 هزارمیلیارد ‪¤‬",
-		"10000000000000-other": "00 هزارمیلیارد ‪¤‬",
-		"100000000000000-one": "000 هزارمیلیارد ‪¤‬",
-		"100000000000000-other": "000 هزارمیلیارد ‪¤‬"
+		"1000-one": "‎‪¤‬ 0 هزار",
+		"1000-other": "‎‪¤‬ 0 هزار",
+		"10000-one": "‎‪¤‬ 00 هزار",
+		"10000-other": "‎‪¤‬ 00 هزار",
+		"100000-one": "‎‪¤‬ 000 هزار",
+		"100000-other": "‎‪¤‬ 000 هزار",
+		"1000000-one": "‎‪¤‬ 0 میلیون",
+		"1000000-other": "‎‪¤‬ 0 میلیون",
+		"10000000-one": "‎‪¤‬ 00 میلیون",
+		"10000000-other": "‎‪¤‬ 00 میلیون",
+		"100000000-one": "‎‪¤‬ 000 میلیون",
+		"100000000-other": "‎‪¤‬ 000 میلیون",
+		"1000000000-one": "‎‪¤‬ 0 میلیارد",
+		"1000000000-other": "‎‪¤‬ 0 میلیارد",
+		"10000000000-one": "‎‪¤‬ 00 میلیارد",
+		"10000000000-other": "‎‪¤‬ 00 میلیارد",
+		"100000000000-one": "‎‪¤‬ 000 میلیارد",
+		"100000000000-other": "‎‪¤‬ 000 میلیارد",
+		"1000000000000-one": "‎‪¤‬ 0 تریلیون",
+		"1000000000000-other": "‎‪¤‬ 0 تریلیون",
+		"10000000000000-one": "‎‪¤‬ 00 تریلیون",
+		"10000000000000-other": "‎‪¤‬ 00 تریلیون",
+		"100000000000000-one": "‎‪¤‬ 000 تریلیون",
+		"100000000000000-other": "‎‪¤‬ 000 تریلیون"
 	},
 	"symbols-latn-decimal": ".",
 	"symbols-latn-group": ",",
@@ -4927,7 +4962,12 @@
 				"unitPattern-count-one": "{0} مورد",
 				"unitPattern-count-other": "{0} مورد"
 			},
-			"concentr-permillion": {
+			"concentr-part": {
+				"displayName": "پارت",
+				"unitPattern-count-one": "{0} پارت",
+				"unitPattern-count-other": "{0} پارت"
+			},
+			"concentr-part-per-1e6": {
 				"displayName": "بخش/میلیون",
 				"unitPattern-count-other": "{0} ppm"
 			},
@@ -4948,6 +4988,11 @@
 				"displayName": "مول",
 				"unitPattern-count-one": "{0} مول",
 				"unitPattern-count-other": "{0} مول"
+			},
+			"concentr-ofglucose": {
+				"displayName": "گلوکز",
+				"unitPattern-count-one": "{0} گلوکز",
+				"unitPattern-count-other": "{0} گلوکز"
 			},
 			"consumption-liter-per-kilometer": {
 				"displayName": "لیتر/کیلومتر",
@@ -5341,12 +5386,14 @@
 				"unitPattern-count-other": "{0} لوکس"
 			},
 			"light-candela": {
-				"displayName": "cd",
-				"unitPattern-count-other": "{0} cd"
+				"displayName": "شمع",
+				"unitPattern-count-one": "{0} شمع",
+				"unitPattern-count-other": "{0} شمع"
 			},
 			"light-lumen": {
-				"displayName": "lm",
-				"unitPattern-count-other": "{0} lm"
+				"displayName": "لومن",
+				"unitPattern-count-one": "{0} لومن",
+				"unitPattern-count-other": "{0} لومن"
 			},
 			"light-solar-luminosity": {
 				"displayName": "تابندگی خورشید",
@@ -5466,6 +5513,11 @@
 				"displayName": "میلی‌متر جیوه",
 				"unitPattern-count-one": "{0} م‌م جیوه",
 				"unitPattern-count-other": "{0} م‌م جیوه"
+			},
+			"pressure-ofhg": {
+				"displayName": "جیوه",
+				"unitPattern-count-one": "{0} جیوه",
+				"unitPattern-count-other": "{0} جیوه"
 			},
 			"pressure-pound-force-per-square-inch": {
 				"displayName": "پوند در اینچ مربع",
@@ -5641,6 +5693,11 @@
 				"unitPattern-count-one": "{0} پیمانهٔ متریک",
 				"unitPattern-count-other": "{0} پیمانهٔ متریک"
 			},
+			"volume-fluid-ounce-metric": {
+				"displayName": "fl oz m.",
+				"unitPattern-count-one": "{0} fl oz m.",
+				"unitPattern-count-other": "{0} fl oz m."
+			},
 			"volume-acre-foot": {
 				"displayName": "جریب فوت",
 				"unitPattern-count-one": "{0} جریب فوت",
@@ -5673,10 +5730,18 @@
 				"unitPattern-count-one": "{0} پاینت",
 				"unitPattern-count-other": "{0} پاینت"
 			},
+			"volume-pint-imperial": {
+				"displayName": "pint Imp.",
+				"unitPattern-count-other": "{0} pt Imp."
+			},
 			"volume-cup": {
 				"displayName": "پیمانه",
 				"unitPattern-count-one": "{0} پیمانه",
 				"unitPattern-count-other": "{0} پیمانه"
+			},
+			"volume-cup-imperial": {
+				"displayName": "cup Imp.",
+				"unitPattern-count-other": "{0} cup Imp."
 			},
 			"volume-fluid-ounce": {
 				"displayName": "اونس سیال",
@@ -5738,11 +5803,177 @@
 				"unitPattern-count-one": "{0} کوارت انگلیسی",
 				"unitPattern-count-other": "{0} کوارت انگلیسی"
 			},
-			"speed-light-speed": {
-				"displayName": "light",
-				"unitPattern-count-other": "{0} light"
+			"angle-steradian": {
+				"displayName": "استرادیان",
+				"unitPattern-count-one": "{0} استرادیان",
+				"unitPattern-count-other": "{0} استرادیان"
 			},
-			"concentr-portion-per-1e9": {
+			"concentr-katal": {
+				"displayName": "کاتال",
+				"unitPattern-count-one": "{0} کاتال",
+				"unitPattern-count-other": "{0} کاتال"
+			},
+			"electric-coulomb": {
+				"displayName": "کولن",
+				"unitPattern-count-one": "{0} کولن",
+				"unitPattern-count-other": "{0} کولن"
+			},
+			"electric-farad": {
+				"displayName": "فاراد",
+				"unitPattern-count-one": "{0} فاراد",
+				"unitPattern-count-other": "{0} فاراد"
+			},
+			"electric-henry": {
+				"displayName": "هنری",
+				"unitPattern-count-one": "{0} هنری",
+				"unitPattern-count-other": "{0} هنری"
+			},
+			"electric-siemens": {
+				"displayName": "زیمنس",
+				"unitPattern-count-one": "{0} زیمنس",
+				"unitPattern-count-other": "{0} زیمنس"
+			},
+			"energy-calorie-it": {
+				"displayName": "کالری-IT",
+				"unitPattern-count-one": "{0} کالری-IT",
+				"unitPattern-count-other": "{0} کالری-IT"
+			},
+			"energy-british-thermal-unit-it": {
+				"displayName": "BTU-IT",
+				"unitPattern-count-other": "{0} BTU-IT"
+			},
+			"energy-becquerel": {
+				"displayName": "بکرل",
+				"unitPattern-count-one": "{0} بکرل",
+				"unitPattern-count-other": "{0} بکرل"
+			},
+			"energy-sievert": {
+				"displayName": "سیورت",
+				"unitPattern-count-one": "{0} سیورت",
+				"unitPattern-count-other": "{0} سیورت"
+			},
+			"energy-gray": {
+				"displayName": "گری",
+				"unitPattern-count-one": "{0} گری",
+				"unitPattern-count-other": "{0} گری"
+			},
+			"force-kilogram-force": {
+				"displayName": "کیلوگرم-نیرو",
+				"unitPattern-count-one": "{0} کیلوگرم-نیرو",
+				"unitPattern-count-other": "{0} کیلوگرم-نیرو"
+			},
+			"length-rod": {
+				"displayName": "rod",
+				"unitPattern-count-other": "{0} rod"
+			},
+			"length-chain": {
+				"displayName": "chain",
+				"unitPattern-count-other": "{0} chain"
+			},
+			"magnetic-tesla": {
+				"displayName": "تسلا",
+				"unitPattern-count-one": "{0} تسلا",
+				"unitPattern-count-other": "{0} تسلا"
+			},
+			"magnetic-weber": {
+				"displayName": "وبر",
+				"unitPattern-count-one": "{0} وبر",
+				"unitPattern-count-other": "{0} وبر"
+			},
+			"temperature-rankine": {
+				"displayName": "°R",
+				"unitPattern-count-other": "{0} °R"
+			},
+			"duration-fortnight": {
+				"displayName": "fortnight",
+				"unitPattern-count-other": "{0} fw"
+			},
+			"mass-slug": {
+				"displayName": "slug",
+				"unitPattern-count-other": "{0} slug"
+			},
+			"pressure-gasoline-energy-density": {
+				"displayName": "gas E",
+				"unitPattern-count-other": "{0} gas E"
+			},
+			"length-rin": {
+				"displayName": "rin [JP]",
+				"unitPattern-count-other": "{0} rin [JP]"
+			},
+			"length-sun": {
+				"displayName": "sun [JP]",
+				"unitPattern-count-other": "{0} sun [JP]"
+			},
+			"length-shaku-length": {
+				"displayName": "shaku [JP]",
+				"unitPattern-count-other": "{0} shaku [JP]"
+			},
+			"length-shaku-cloth": {
+				"displayName": "shaku [cloth, JP]",
+				"unitPattern-count-other": "{0} shaku [cloth, JP]"
+			},
+			"length-ken": {
+				"displayName": "ken [JP]",
+				"unitPattern-count-other": "{0} ken [JP]"
+			},
+			"length-jo-jp": {
+				"displayName": "jo [JP]",
+				"unitPattern-count-other": "{0} jo [JP]"
+			},
+			"length-ri-jp": {
+				"displayName": "ri [JP]",
+				"unitPattern-count-other": "{0} ri [JP]"
+			},
+			"area-bu-jp": {
+				"displayName": "bu [JP]",
+				"unitPattern-count-other": "{0} bu [JP]"
+			},
+			"area-se-jp": {
+				"displayName": "se [JP]",
+				"unitPattern-count-other": "{0} se [JP]"
+			},
+			"area-cho": {
+				"displayName": "cho [JP]",
+				"unitPattern-count-other": "{0} cho [JP]"
+			},
+			"volume-kosaji": {
+				"displayName": "kosaji [JP]",
+				"unitPattern-count-other": "{0} kosaji [JP]"
+			},
+			"volume-osaji": {
+				"displayName": "osaji [JP]",
+				"unitPattern-count-other": "{0} osaji [JP]"
+			},
+			"volume-cup-jp": {
+				"displayName": "cup [JP]",
+				"unitPattern-count-other": "{0} cup [JP]"
+			},
+			"volume-shaku": {
+				"displayName": "shaku [vol, JP]",
+				"unitPattern-count-other": "{0} shaku [vol, JP]"
+			},
+			"volume-sai": {
+				"displayName": "sai [JP]",
+				"unitPattern-count-other": "{0} sai [JP]"
+			},
+			"volume-to-jp": {
+				"displayName": "to [JP]",
+				"unitPattern-count-other": "{0} to [JP]"
+			},
+			"volume-koku": {
+				"displayName": "koku [JP]",
+				"unitPattern-count-other": "{0} koku [JP]"
+			},
+			"speed-light-speed": {
+				"displayName": "نور",
+				"unitPattern-count-one": "{0} نوری",
+				"unitPattern-count-other": "{0} نوری"
+			},
+			"mass-fun": {
+				"displayName": "fun [JP]",
+				"unitPattern-count-other": "{0} fun [JP]"
+			},
+			"concentr-part-per-1e9": {
 				"displayName": "بخش در بیلیون",
 				"unitPattern-count-other": "{0} ppb"
 			},
@@ -5767,30 +5998,30 @@
 		"plusSign": "+＋﬩﹢⁺₊➕"
 	},
 	"currencyFormat-sap-short": {
-		"1000-one": "0 هزار ‪¤‬",
-		"1000-other": "0 هزار ‪¤‬",
-		"10000-one": "00 هزار ‪¤‬",
-		"10000-other": "00 هزار ‪¤‬",
-		"100000-one": "000 هزار ‪¤‬",
-		"100000-other": "000 هزار ‪¤‬",
-		"1000000-one": "0 میلیون ‪¤‬",
-		"1000000-other": "0 میلیون ‪¤‬",
-		"10000000-one": "00 میلیون ‪¤‬",
-		"10000000-other": "00 میلیون ‪¤‬",
-		"100000000-one": "000 میلیون ‪¤‬",
-		"100000000-other": "000 میلیون ‪¤‬",
-		"1000000000-one": "0 میلیارد ‪¤‬",
-		"1000000000-other": "0 میلیارد ‪¤‬",
-		"10000000000-one": "00 میلیارد ‪¤‬",
-		"10000000000-other": "00 میلیارد ‪¤‬",
-		"100000000000-one": "000 میلیارد ‪¤‬",
-		"100000000000-other": "000 میلیارد ‪¤‬",
-		"1000000000000-one": "0 هزارمیلیارد ‪¤‬",
-		"1000000000000-other": "0 هزارمیلیارد ‪¤‬",
-		"10000000000000-one": "00 هزارمیلیارد ‪¤‬",
-		"10000000000000-other": "00 هزارمیلیارد ‪¤‬",
-		"100000000000000-one": "000 هزارمیلیارد ‪¤‬",
-		"100000000000000-other": "000 هزارمیلیارد ‪¤‬"
+		"1000-one": "‎0 هزار ‪¤‬",
+		"1000-other": "‎0 هزار ‪¤‬",
+		"10000-one": "‎00 هزار ‪¤‬",
+		"10000-other": "‎00 هزار ‪¤‬",
+		"100000-one": "‎000 هزار ‪¤‬",
+		"100000-other": "‎000 هزار ‪¤‬",
+		"1000000-one": "‎0 میلیون ‪¤‬",
+		"1000000-other": "‎0 میلیون ‪¤‬",
+		"10000000-one": "‎00 میلیون ‪¤‬",
+		"10000000-other": "‎00 میلیون ‪¤‬",
+		"100000000-one": "‎000 میلیون ‪¤‬",
+		"100000000-other": "‎000 میلیون ‪¤‬",
+		"1000000000-one": "‎0 میلیارد ‪¤‬",
+		"1000000000-other": "‎0 میلیارد ‪¤‬",
+		"10000000000-one": "‎00 میلیارد ‪¤‬",
+		"10000000000-other": "‎00 میلیارد ‪¤‬",
+		"100000000000-one": "‎000 میلیارد ‪¤‬",
+		"100000000000-other": "‎000 میلیارد ‪¤‬",
+		"1000000000000-one": "‎0 تریلیون ‪¤‬",
+		"1000000000000-other": "‎0 تریلیون ‪¤‬",
+		"10000000000000-one": "‎00 تریلیون ‪¤‬",
+		"10000000000000-other": "‎00 تریلیون ‪¤‬",
+		"100000000000000-one": "‎000 تریلیون ‪¤‬",
+		"100000000000000-other": "‎000 تریلیون ‪¤‬"
 	},
 	"currencyDigits": {
 		"ADP": 0,
@@ -5801,11 +6032,13 @@
 		"BYR": 0,
 		"CLF": 4,
 		"CLP": 0,
+		"COP": 0,
 		"DEFAULT": 2,
 		"DJF": 0,
 		"ESP": 0,
 		"GNF": 0,
 		"HUF": 0,
+		"IDR": 0,
 		"IQD": 0,
 		"IRR": 0,
 		"ISK": 0,
@@ -5825,6 +6058,7 @@
 		"MMK": 0,
 		"MRO": 0,
 		"OMR": 3,
+		"PKR": 0,
 		"PYG": 0,
 		"RSD": 0,
 		"RWF": 0,
@@ -5861,45 +6095,46 @@
 	},
 	"eras-gregorian": {
 		"0": {
-			"_code": "gregory-inverse",
-			"_aliases": "bc bce",
+			"_code": "bce",
+			"_aliases": "bc",
 			"_end": "0-12-31"
 		},
 		"1": {
-			"_code": "gregory",
-			"_aliases": "ad ce",
+			"_code": "ce",
+			"_aliases": "ad",
 			"_start": "1-01-01"
 		}
 	},
 	"eras-islamic": {
 		"0": {
-			"_code": "islamic",
-			"_aliases": "ah",
-			"_start": "622-7-15"
+			"_code": "ah",
+			"_start": "622-07-19"
+		},
+		"1": {
+			"_code": "bh",
+			"_end": "622-07-18"
 		}
 	},
 	"eras-persian": {
 		"0": {
-			"_code": "persian",
-			"_aliases": "ap",
-			"_start": "622-01-01"
+			"_code": "ap",
+			"_start": "622-03-21"
 		}
 	},
 	"eras-buddhist": {
 		"0": {
-			"_code": "buddhist",
-			"_aliases": "be",
+			"_code": "be",
 			"_start": "-542-01-01"
 		}
 	},
 	"eras-japanese": {
 		"232": {
 			"_code": "meiji",
-			"_start": "1868-9-8"
+			"_start": "1868-10-23"
 		},
 		"233": {
 			"_code": "taisho",
-			"_start": "1912-7-30"
+			"_start": "1912-07-30"
 		},
 		"234": {
 			"_code": "showa",
@@ -5907,11 +6142,11 @@
 		},
 		"235": {
 			"_code": "heisei",
-			"_start": "1989-1-8"
+			"_start": "1989-01-08"
 		},
 		"236": {
 			"_code": "reiwa",
-			"_start": "2019-5-1"
+			"_start": "2019-05-01"
 		}
 	},
 	"dayPeriodRules": {

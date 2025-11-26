@@ -106,8 +106,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("filterFieldThreshold / showAllFilters button", (assert) => {
-		const oLayout = oFilterBar._oFilterBarLayout.oAlgnLayout;
-		sinon.spy(oLayout, "removeAllContent");
+		const oFilterContainer = oFilterBar._oFilterBarLayout;
 
 		oFilterBar.setFilterFieldThreshold(2);
 		assert.notOk(oFilterBar._oShowAllFiltersBtn.getVisible(), "showAllFilters button is not visible");
@@ -119,12 +118,11 @@ sap.ui.define([
 			delegate: '{name: "delegates/odata/v4/FieldBaseDelegate", payload: {}}'
 		});
 		oFilterBar.addFilterItem(oFilterField);
-		let aContent = oLayout.getContent();
+		let aContent = oFilterContainer.getFilterFields();
 		assert.notOk(oFilterBar._oShowAllFiltersBtn.getVisible(), "showAllFilters button is not visible");
 		assert.equal(aContent.length, 1, "One FilterField shown");
 		assert.equal(aContent[0]._getFilterField(), oFilterField, "New FilterField is first item");
 
-		oLayout.removeAllContent.reset();
 		oFilterField = new FilterField("FF2", {
 			conditions: "{$filters>/conditions/ff2}",
 			propertyKey: "ff2",
@@ -132,13 +130,11 @@ sap.ui.define([
 			delegate: '{name: "delegates/odata/v4/FieldBaseDelegate", payload: {}}'
 		});
 		oFilterBar.insertFilterItem(oFilterField, 0);
-		aContent = oLayout.getContent();
+		aContent = oFilterContainer.getFilterFields();
 		assert.notOk(oFilterBar._oShowAllFiltersBtn.getVisible(), "showAllFilters button is not visible");
 		assert.equal(aContent.length, 2, "Two FilterFields shown");
 		assert.equal(aContent[0]._getFilterField(), oFilterField, "New FilterField is first item");
-		assert.ok(oLayout.removeAllContent.calledOnce, "Layout content new assigned");
 
-		oLayout.removeAllContent.reset();
 		oFilterField = new FilterField("FF3", {
 			conditions: "{$filters>/conditions/ff3}",
 			propertyKey: "ff3",
@@ -146,13 +142,11 @@ sap.ui.define([
 			delegate: '{name: "delegates/odata/v4/FieldBaseDelegate", payload: {}}'
 		});
 		oFilterBar.insertFilterItem(oFilterField, 0);
-		aContent = oLayout.getContent();
+		aContent = oFilterContainer.getFilterFields();
 		assert.ok(oFilterBar._oShowAllFiltersBtn.getVisible(), "showAllFilters button is visible");
 		assert.equal(aContent.length, 2, "Two FilterFields shown");
 		assert.equal(aContent[0]._getFilterField(), oFilterField, "New FilterField is first item");
-		assert.ok(oLayout.removeAllContent.calledOnce, "Layout content new assigned");
 
-		oLayout.removeAllContent.reset();
 		oFilterField = new FilterField("FF4", {
 			conditions: "{$filters>/conditions/ff4}",
 			propertyKey: "ff3",
@@ -160,18 +154,15 @@ sap.ui.define([
 			delegate: '{name: "delegates/odata/v4/FieldBaseDelegate", payload: {}}'
 		});
 		oFilterBar.addFilterItem(oFilterField);
-		aContent = oLayout.getContent();
+		aContent = oFilterContainer.getFilterFields();
 		assert.ok(oFilterBar._oShowAllFiltersBtn.getVisible(), "showAllFilters button is visible");
 		assert.equal(aContent.length, 2, "Two FilterFields shown");
 		assert.equal(aContent[0]._getFilterField().getId(), "FF3", "Old FilterField is first item");
-		assert.ok(oLayout.removeAllContent.notCalled, "Layout content not changed");
 
-		oLayout.removeAllContent.reset();
 		oFilterBar._oShowAllFiltersBtn.firePress();
-		aContent = oLayout.getContent();
+		aContent = oFilterContainer.getFilterFields();
 		assert.notOk(oFilterBar._oShowAllFiltersBtn.getVisible(), "showAllFilters button is not visible");
 		assert.equal(aContent.length, 4, "Four FilterFields shown");
-		assert.ok(oLayout.removeAllContent.calledOnce, "Layout content new assigned");
 	});
 
 	QUnit.test("check liveMode property", (assert) => {
@@ -191,26 +182,28 @@ sap.ui.define([
 	});
 
 	QUnit.test("check ExpandFilterFields", (assert) => {
-		const oLayout = oFilterBar._oFilterBarLayout.oAlgnLayout;
+		const oFilterContainer = oFilterBar._oFilterBarLayout;
 		const oButton = oFilterBar._oBtnFilters;
+		sinon.stub(oFilterContainer.oLayout, "getContent").returns([1,2,3]); // fake 3 FilterFields
 		const bExpanded = oFilterBar.getExpandFilterFields();
 		assert.ok(bExpanded);
 
 		assert.equal(oButton.getText(), "Hide Filters");
-		assert.ok(oLayout.getVisible(), "FilterFields layout should be visible");
+		assert.ok(oFilterContainer.getFilterFields().length, "FilterFields layout should be visible");
 
 		oFilterBar.setExpandFilterFields(false);
 		assert.ok(!oFilterBar.getExpandFilterFields());
 
 		assert.ok(oButton.getText() === "Show Filters");
-		assert.ok(!oLayout.getVisible(), "FilterFields layout should be invisible");
+		assert.ok(!oFilterContainer.getFilterFields().length, "FilterFields layout should be invisible");
 
 		oFilterBar._onToggleFilters();
 		assert.equal(oButton.getText(), "Hide Filters");
-		assert.ok(oLayout.getVisible(), "FilterFields layout should be visible");
+		assert.ok(oFilterContainer.getFilterFields().length, "FilterFields layout should be visible");
 
 		oFilterBar._onShowAllFilters();
 		assert.notOk(oFilterBar._oShowAllFiltersBtn.getVisible(), "Show All button should be invisible");
+		oFilterContainer.oLayout.getContent.restore();
 	});
 
 	QUnit.test("check BasicSearch", (assert) => {

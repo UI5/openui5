@@ -1,8 +1,10 @@
 {
 	"listContent": {
 		"smallList": {
+			"_version": "1.81.0",
 			"sap.app": {
-				"id": "smallListCard"
+				"id": "smallListCard",
+				"type": "card"
 			},
 			"sap.card": {
 				"type": "List",
@@ -30,8 +32,10 @@
 			}
 		},
 		"mediumList": {
+			"_version": "1.81.0",
 			"sap.app": {
-				"id": "mediumListCard"
+				"id": "mediumListCard",
+				"type": "card"
 			},
 			"sap.card": {
 				"type": "List",
@@ -73,8 +77,10 @@
 			}
 		},
 		"largeList": {
+			"_version": "1.81.0",
 			"sap.app": {
-				"id": "largeListCard"
+				"id": "largeListCard",
+				"type": "card"
 			},
 			"sap.card": {
 				"type": "List",

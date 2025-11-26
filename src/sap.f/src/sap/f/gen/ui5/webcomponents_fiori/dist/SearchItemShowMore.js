@@ -23,6 +23,7 @@ sap.ui.define(
      * @extends module:sap/f/gen/ui5/webcomponents/dist/ListItemBase
      * @constructor
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/SearchItemShowMore
      */
 
@@ -30,7 +31,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents_fiori.dist.SearchItemShowMore",
       {
         metadata: {
-          tag: "ui5-search-item-show-more-cc48984a",
+          tag: "ui5-search-item-show-more-68f7652d",
 
           namespace: "sap.f.gen.ui5.webcomponents_fiori",
 
@@ -50,6 +51,7 @@ sap.ui.define(
              * If not set, the placeholder will remain as (N).
              */
             itemsToShowCount: { type: "float", mapping: "property" },
+
             /**
              * Defines whether the show more item is selected.
              */
@@ -58,10 +60,12 @@ sap.ui.define(
               mapping: "property",
               defaultValue: false
             },
+
             /**
              * The 'width' of the Web Component in <code>sap.ui.core.CSSSize</code>.
              */
             width: { type: "sap.ui.core.CSSSize", mapping: "style" },
+
             /**
              * The 'height' of the Web Component in <code>sap.ui.core.CSSSize</code>.
              */

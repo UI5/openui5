@@ -1,5 +1,5 @@
 {
-	"_version": "2.0.0",
+	"_version": "%LATEST_SCHEMA_VERSION%",
 	"sap.app": {
 		"id": "card.explorer.preview.missingMockConfiguration.tablecard",
 		"type": "card",
@@ -74,8 +74,7 @@
 			},
 			"maxItems": "{parameters>/maxItems/value}",
 			"row": {
-				"columns": [
-					{
+				"columns": [{
 						"title": "Customer",
 						"value": "{ShipName}"
 					},

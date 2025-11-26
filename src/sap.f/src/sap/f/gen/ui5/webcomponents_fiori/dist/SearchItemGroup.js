@@ -18,6 +18,7 @@ sap.ui.define(
      * @extends module:sap/f/gen/ui5/webcomponents/dist/ListItemGroup
      * @constructor
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/SearchItemGroup
      */
 
@@ -25,7 +26,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents_fiori.dist.SearchItemGroup",
       {
         metadata: {
-          tag: "ui5-search-item-group-cc48984a",
+          tag: "ui5-search-item-group-68f7652d",
 
           namespace: "sap.f.gen.ui5.webcomponents_fiori",
 

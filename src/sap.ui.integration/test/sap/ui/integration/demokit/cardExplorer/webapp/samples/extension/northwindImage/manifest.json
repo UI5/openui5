@@ -1,9 +1,9 @@
 {
-	"_version": "2.0.0",
+	"_version": "%LATEST_SCHEMA_VERSION%",
 	"sap.app": {
 		"type": "card",
 		"id": "card.explorer.extension.northwindImage",
-		"title": "Employee From Norhtwind DB",
+		"title":"Employee From Norhtwind DB",
 		"subTitle": "Demonstrates conversion for Northwind images",
 		"applicationVersion": {
 			"version": "1.0.0"

@@ -1,5 +1,5 @@
 {
-	"_version": "2.0.0",
+	"_version": "%LATEST_SCHEMA_VERSION%",
 	"sap.app": {
 		"id": "card.explorer.table.card",
 		"type": "card",
@@ -28,8 +28,7 @@
 	"sap.card": {
 		"type": "Table",
 		"data": {
-			"json": [
-				{
+			"json": [{
 					"product": "DVD player",
 					"salesOrder": "5000010050",
 					"netAmount": "2K USD",
@@ -110,8 +109,7 @@
 		"content": {
 			"maxItems": 9,
 			"row": {
-				"columns": [
-					{
+				"columns": [{
 						"title": "Product",
 						"value": "{product}",
 						"additionalText": "{salesOrder}",

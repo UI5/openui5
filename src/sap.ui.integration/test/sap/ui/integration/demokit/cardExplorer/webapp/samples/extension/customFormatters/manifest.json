@@ -1,12 +1,8 @@
 {
-	"_version": "2.0.0",
+	"_version": "%LATEST_SCHEMA_VERSION%",
 	"sap.app": {
 		"type": "card",
-		"id": "card.explorer.extension.customFormatters",
-		"title": "Card 'customFormatters'",
-		"applicationVersion": {
-			"version": "1.0.0"
-		}
+		"id": "card.explorer.extension.customFormatters"
 	},
 	"sap.card": {
 		"extension": "./CustomFormattersExtension",
@@ -19,22 +15,10 @@
 		},
 		"data": {
 			"json": [
-				{
-					"training": "Scrum",
-					"location": "Online"
-				},
-				{
-					"training": "Quality Management",
-					"location": "Classroom Attendance"
-				},
-				{
-					"training": "Test Driven Development",
-					"location": "Classroom Attendance"
-				},
-				{
-					"training": "Integration Cards Training",
-					"location": "Online"
-				}
+				{ "training": "Scrum", "location": "Online" },
+				{ "training": "Quality Management", "location": "Classroom Attendance" },
+				{ "training": "Test Driven Development", "location": "Classroom Attendance" },
+				{ "training": "Integration Cards Training", "location": "Online" }
 			]
 		},
 		"type": "List",
@@ -47,7 +31,7 @@
 		"content": {
 			"item": {
 				"title": "{= extension.formatters.toUpperCase(${training}) }",
-				"description": "{= extension.formatters.appendSuffix(${location}) }"
+				"description":  "{= extension.formatters.appendSuffix(${location}) }"
 			}
 		}
 	}

@@ -2690,23 +2690,8 @@ sap.ui.define([
 					}
 				}
 			};
-		// iterate over all formats. Max:  100 000 000 000 000
-		// find best result as format can have multiple matches:
-		// * value can be contained one in another (de-DE): "Million" and "Millionen"
-		// * end with each other (es-ES): "mil millones" and "millones"
-		["long", "short"].forEach(function(sStyle) {
-			iKey = 10;
-			while (iKey < 1e15) {
-				for (var i = 0; i < aPluralCategories.length; i++) {
-					var sPluralCategory = aPluralCategories[i];
-					fnGetFactor(sPluralCategory, iKey, sStyle);
-				}
-				iKey = iKey * 10;
-			}
-		});
-
 		// For india currencies try lakhs/crores
-		if (bIndianCurrency && !sNumber) {
+		if (bIndianCurrency) {
 			iKey = 10;
 			while (iKey < 1e15) {
 				for (var i = 0; i < aPluralCategories.length; i++) {
@@ -2715,6 +2700,22 @@ sap.ui.define([
 				}
 				iKey = iKey * 10;
 			}
+		}
+		// iterate over all formats. Max:  100 000 000 000 000
+		// find best result as format can have multiple matches:
+		// * value can be contained one in another (de-DE): "Million" and "Millionen"
+		// * end with each other (es-ES): "mil millones" and "millones"
+		if (!sNumber) {
+			["long", "short"].forEach(function(sStyle) {
+				iKey = 10;
+				while (iKey < 1e15) {
+					for (var i = 0; i < aPluralCategories.length; i++) {
+						var sPluralCategory = aPluralCategories[i];
+						fnGetFactor(sPluralCategory, iKey, sStyle);
+					}
+					iKey = iKey * 10;
+				}
+			});
 		}
 
 		if (!sNumber) {

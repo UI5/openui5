@@ -1489,7 +1489,7 @@ sap.ui.define([
 
 		// execution
 		var sFormatted = oFormat.format(iExpectedNumber);
-		assert.strictEqual(sFormatted, "50,000.00", "can be formatted '" + sFormatted + "' (no RTL character)");
+		assert.strictEqual(sFormatted, "\u200F50,000.00\u00A0\u200F", "can be formatted '" + sFormatted + "' (RTL character)");
 
 		var aParsed = oFormat.parse(sFormatted);
 		assert.deepEqual(aParsed, [50000, undefined], "should match input number " + iExpectedNumber);
@@ -1536,9 +1536,9 @@ sap.ui.define([
 		assert.strictEqual(oFormat.format(1000000000000, "INR"), "1 Lk Cr" + "\xa0" + "INR", "INR is formatted as Lk/Cr");
 		assert.strictEqual(oFormat.format(100000000000000, "INR"), "100 Lk Cr" + "\xa0" + "INR");
 
-		assert.strictEqual(oFormat.format(100000, "USD"), "100K" + "\xa0" + "USD", "USD is formatted as M/B/T");
-		assert.strictEqual(oFormat.format(1000000, "USD"), "1M" + "\xa0" + "USD", "USD is formatted as M/B/T");
-		assert.strictEqual(oFormat.format(1000000000, "USD"), "1B" + "\xa0" + "USD", "USD is formatted as M/B/T");
+		assert.strictEqual(oFormat.format(100000, "USD"), "100k" + "\xa0" + "USD", "USD is formatted as M/B/T");
+		assert.strictEqual(oFormat.format(1000000, "USD"), "1m" + "\xa0" + "USD", "USD is formatted as M/B/T");
+		assert.strictEqual(oFormat.format(1000000000, "USD"), "1bn" + "\xa0" + "USD", "USD is formatted as M/B/T");
 
 		var aResult = oFormat.parse("INR 12 Lk");
 		assert.ok(Array.isArray(aResult), "Currency parser should return an array");
@@ -1555,7 +1555,7 @@ sap.ui.define([
 		assert.strictEqual(aResult[0], 120000000, "Number is parsed correctly");
 		assert.strictEqual(aResult[1], "INR", "Currency Code is parsed correctly: expected INR, parsed " + aResult[1]);
 
-		aResult = oFormat.parse("EUR 12M");
+		aResult = oFormat.parse("EUR 12m");
 		assert.ok(Array.isArray(aResult), "Currency parser should return an array");
 		assert.strictEqual(aResult[0], 12000000, "Number is parsed correctly");
 		assert.strictEqual(aResult[1], "EUR", "Currency Code is parsed correctly: expected EUR, parsed " + aResult[1]);
@@ -1599,9 +1599,6 @@ sap.ui.define([
 		"zh_TW",
 		"zh_CN"
 	];
-	function isLeading(sFormatted) {
-		return sFormatted.search(/\d+/) > sFormatted.search(/EUR/);
-	}
 
 	function isTrailing(sFormatted) {
 		return sFormatted.search(/\d+/) < sFormatted.search(/EUR/);
@@ -1644,7 +1641,7 @@ sap.ui.define([
 		var oLocale = new Locale("fa_IR");
 		var oFormat = getCurrencyInstance({}, oLocale);
 		var sFormatted = oFormat.format(100000, "EUR");
-		assert.ok(isLeading(sFormatted), "Locale " + "fa_IR" +  " '" + sFormatted + "'");
+		assert.strictEqual(sFormatted, "\u200e\u202aEUR\u202c\u00a0100,000.00");
 	});
 
 	QUnit.test("accounting " + "fa_IR", function (assert) {
@@ -1654,20 +1651,20 @@ sap.ui.define([
 			currencyContext: "accounting"
 		}, oLocale);
 		var sFormatted = oFormat.format(100000, "EUR");
-		assert.ok(isLeading(sFormatted), "Locale " + "fa_IR" +  " '" + sFormatted + "'");
+		assert.strictEqual(sFormatted, "\u200e\u202aEUR\u202c\u00a0100,000.00");
 		// negative
 		var sFormattedNegative = oFormat.format(-100000, "EUR");
-		assert.ok(isLeading(sFormattedNegative), "Locale " + "fa_IR" +  " '" + sFormattedNegative + "'");
+		assert.strictEqual(sFormattedNegative, "\u200e(\u202aEUR\u202c\u00a0100,000.00)");
 	});
 
 	QUnit.test("style " + "fa_IR", function (assert) {
 		var oLocale = new Locale("fa_IR");
 		var oFormat = getCurrencyInstance({style: "short"}, oLocale);
 		var sFormatted = oFormat.format(10, "EUR");
-		assert.ok(isLeading(sFormatted), "Locale " + "fa_IR" +  " '" + sFormatted + "'");
+		assert.strictEqual(sFormatted, "\u200e\u202aEUR\u202c\u00a010");
 
 		var sFormattedBig = oFormat.format(100000000, "EUR");
-		assert.ok(isTrailing(sFormattedBig), "Locale " + "fa_IR" +  " '" + sFormattedBig + "'");
+		assert.strictEqual(sFormattedBig, "\u200e100\u00a0میلیون\u00a0\u202aEUR\u202c");
 	});
 
 
@@ -1675,7 +1672,7 @@ sap.ui.define([
 		var oLocale = new Locale("he_IL");
 		var oFormat = getCurrencyInstance({}, oLocale);
 		var sFormatted = oFormat.format(100000, "EUR");
-		assert.ok(isTrailing(sFormatted), "Locale " + "he_IL" +  " '" + sFormatted + "'");
+		assert.strictEqual(sFormatted, "\u200f100,000.00\u00a0\u200fEUR\u200e");
 	});
 
 	QUnit.test("accounting " + "he_IL", function (assert) {
@@ -1685,20 +1682,20 @@ sap.ui.define([
 			currencyContext: "accounting"
 		}, oLocale);
 		var sFormatted = oFormat.format(100000, "EUR");
-		assert.ok(isTrailing(sFormatted), "Locale " + "he_IL" +  " '" + sFormatted + "'");
+		assert.strictEqual(sFormatted, "\u200f100,000.00\u00a0\u200fEUR\u200e");
 		// negative
 		var sFormattedNegative = oFormat.format(-100000, "EUR");
-		assert.ok(isTrailing(sFormattedNegative), "Locale " + "he_IL" +  " '" + sFormattedNegative + "'");
+		assert.strictEqual(sFormattedNegative, "\u200f\u200e-100,000.00\u00a0\u200fEUR\u200e");
 	});
 
 	QUnit.test("style " + "he_IL", function (assert) {
 		var oLocale = new Locale("he_IL");
 		var oFormat = getCurrencyInstance({style: "short"}, oLocale);
 		var sFormatted = oFormat.format(10, "EUR");
-		assert.ok(isTrailing(sFormatted), "Locale " + "he_IL" +  " '" + sFormatted + "'");
+		assert.strictEqual(sFormatted, "\u200f10\u00a0\u200fEUR\u200e");
 
 		var sFormattedBig = oFormat.format(100000000, "EUR");
-		assert.ok(isLeading(sFormattedBig), "Locale " + "he_IL" +  " '" + sFormattedBig + "'");
+		assert.strictEqual(sFormattedBig, "\u200f100M\u200f\u00a0\u200f\u200eEUR");
 	});
 
 	QUnit.test("overwrite configuration config", function (assert) {

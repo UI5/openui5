@@ -43294,6 +43294,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// JIRA: CPOUI5ODATAV4-2228
 	//
 	// Copy a node via non-canonical URL (JIRA: CPOUI5ODATAV4-2933)
+	// Observe that the indices for the copies are provided. (JIRA: CPOUI5ODATAV4-2919)
 	QUnit.test("Recursive Hierarchy: nextSibling (non-canonical path)", async function (assert) {
 		const oModel = this.createSpecialCasesModel({autoExpandSelect : true});
 		const sFriend = "/Artists(ArtistID='99',IsActiveEntity=false)/_Friend";
@@ -43461,19 +43462,25 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						NodeID : "1,false"
 					}
 				}]
-			})
-			//TODO is this still needed, now that '_1' was contained above?
-			.expectRequest("#4 " + sUrl
-				+ "&$filter=ArtistID eq '_1' and IsActiveEntity eq false&$select=_/Limited_Rank", {
-				value : [{
-					_ : {Limited_Rank : "1"}
-				}]
 			});
 
-		await Promise.all([
+		const [iIndexOfCopy] = await Promise.all([
 			// code under test
 			oAlpha.move({copy : true, nextSibling : oAlpha, parent : null}),
 			this.waitForChanges(assert, "copy Alpha into the middle")
+		]);
+
+		// code under test (JIRA: CPOUI5ODATAV4-2919)
+		assert.strictEqual(iIndexOfCopy, 1);
+		assert.strictEqual(oAlpha.getIndex(), 2);
+		checkTable("after copy Alpha into the middle", assert, oTable, [
+			sFriend + "(ArtistID='2',IsActiveEntity=false)",
+			sFriend + "(ArtistID='_1',IsActiveEntity=false)",
+			sFriend + "(ArtistID='1',IsActiveEntity=false)"
+		], [
+			[undefined, 1, "Beta"],
+			[undefined, 1, "Copy of Alpha"],
+			[undefined, 1, "Alpha"]
 		]);
 	});
 
@@ -50141,12 +50148,6 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					DrillState : "leaf",
 					ID : "2",
 					Name : "Epsilon"
-				}]
-			})
-			//TODO is this still needed, now that '_1' was contained above?
-			.expectRequest("#3 " + sBaseUrl + "&$filter=ID eq '_1'&$select=LimitedRank", {
-				value : [{
-					LimitedRank : "1" // Edm.Int64
 				}]
 			})
 			.expectChange("id", [, "_1", "0", "1", "2"]);

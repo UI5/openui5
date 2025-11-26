@@ -69,7 +69,7 @@ sap.ui.define([
 	 * </ul>
 	 *
 	 * @extends sap.ui.core.Control
-	 * @implements sap.ui.core.IShrinkable
+	 * @implements sap.ui.core.ITitle, sap.ui.core.IShrinkable
 	 *
 	 * @author SAP SE
 	 * @version ${version}
@@ -85,9 +85,10 @@ sap.ui.define([
 
 			library : "sap.m",
 			interfaces : [
-				 "sap.ui.core.IShrinkable",
-				 "sap.m.IHyphenation",
-				 "sap.m.IToolbarInteractiveControl"
+				"sap.ui.core.ITitle",
+				"sap.ui.core.IShrinkable",
+				"sap.m.IHyphenation",
+				"sap.m.IToolbarInteractiveControl"
 			],
 			properties : {
 

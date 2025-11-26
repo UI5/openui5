@@ -1,7 +1,7 @@
 {
 	"__license": "This file has been derived from Unicode Common Locale Data Repository (CLDR) files (http://cldr.unicode.org). See the copyright and permission notice in the Unicode-Data-Files-LICENSE.txt available at the same location as this file or visit http://www.unicode.org/copyright.html",
-	"__version": "46.1.0",
-	"__buildtime": "2025-01-28T09:40:27.437Z",
+	"__version": "48.0.0",
+	"__buildtime": "2025-11-18T12:31:55.685Z",
 	"languages": {
 		"aa": "афарски",
 		"ab": "апхаски",
@@ -322,6 +322,8 @@
 		"ksf": "бафија",
 		"ksh": "колоњски",
 		"ku": "курдски",
+		"ku_menu-core": "курдски",
+		"ku_menu-extension": "курманџи",
 		"kum": "кумички",
 		"kut": "кутенајски",
 		"kv": "коми",
@@ -927,6 +929,7 @@
 		"CN": "Кина",
 		"CO": "Колумбија",
 		"CP": "Остров Клипертон",
+		"CQ": "Сарк",
 		"CR": "Костарика",
 		"CU": "Куба",
 		"CV": "Кабо Верде",
@@ -993,7 +996,6 @@
 		"IM": "Остров Ман",
 		"IN": "Индија",
 		"IO": "Британска Индоокеанска Територија",
-		"IO-alt-biot": "Британска Индоокеанска Територија",
 		"IO-alt-chagos": "Архипелаг Чагос",
 		"IQ": "Ирак",
 		"IR": "Иран",
@@ -1105,8 +1107,7 @@
 		"SV": "Ел Салвадор",
 		"SX": "Свети Мартин",
 		"SY": "Сирија",
-		"SZ": "Свазиленд",
-		"SZ-alt-variant": "Свазиленд",
+		"SZ": "Есватини",
 		"TA": "Тристан да Куња",
 		"TC": "Острови Туркс и Каикос",
 		"TD": "Чад",
@@ -1121,7 +1122,6 @@
 		"TN": "Тунис",
 		"TO": "Тонга",
 		"TR": "Турција",
-		"TR-alt-variant": "Турција",
 		"TT": "Тринидад и Тобаго",
 		"TV": "Тувалу",
 		"TW": "Тајван",
@@ -1159,8 +1159,8 @@
 		"dateFormats": {
 			"full": "EEEE, d MMMM y 'г'.",
 			"long": "d MMMM y 'г'.",
-			"medium": "d.M.y 'г'.",
-			"short": "d.M.yy"
+			"medium": "d MMM y 'г'.",
+			"short": "d.M.y 'г'."
 		},
 		"timeFormats": {
 			"full": "HH:mm:ss zzzz",
@@ -1179,20 +1179,24 @@
 				"Bhms": "h:mm:ss B",
 				"d": "d",
 				"E": "ccc",
+				"EBh": "E h B",
 				"EBhm": "E h:mm B",
 				"EBhms": "E h:mm:ss B",
 				"Ed": "E, d",
+				"Eh": "E h a",
 				"Ehm": "E h:mm a",
 				"EHm": "E HH:mm",
 				"Ehms": "E h:mm:ss a",
 				"EHms": "E HH:mm:ss",
 				"Gy": "y 'г'. G",
+				"GyM": "M.y 'г'. G",
 				"GyMd": "d.M.y 'г'. G",
+				"GyMEd": "E, d.M.y 'г'. G",
 				"GyMMM": "MMM y 'г'. G",
 				"GyMMMd": "d MMM y 'г'. G",
 				"GyMMMEd": "E, d MMM y 'г'. G",
 				"h": "h a",
-				"H": "HH",
+				"H": "H",
 				"hm": "h:mm a",
 				"Hm": "HH:mm",
 				"hms": "h:mm:ss a",
@@ -1201,6 +1205,8 @@
 				"Hmsv": "HH:mm:ss v",
 				"hmv": "h:mm a v",
 				"Hmv": "HH:mm v",
+				"hv": "h a v",
+				"Hv": "HH 'ч'. v",
 				"M": "L",
 				"Md": "d.M",
 				"Mdd": "d.M",
@@ -1732,15 +1738,19 @@
 				"Bhms": "h:mm:ss B",
 				"d": "d",
 				"E": "E",
+				"EBh": "E h B",
 				"EBhm": "E h:mm B",
 				"EBhms": "E h:mm:ss B",
 				"Ed": "d E",
+				"Eh": "E h a",
 				"Ehm": "E h:mm a",
 				"EHm": "E H:mm",
 				"Ehms": "E h:mm:ss a",
 				"EHms": "E H:mm:ss",
 				"Gy": "y 'г'. G",
+				"GyM": "M. y 'г'. G",
 				"GyMd": "d.M.y 'г'. GGGGG",
+				"GyMEd": "E d.M.y 'г'. G",
 				"GyMMM": "MMM y 'г'. G",
 				"GyMMMd": "dd MMM y 'г'. G",
 				"GyMMMEd": "E, dd MMM y 'г'. G",
@@ -1750,6 +1760,8 @@
 				"Hm": "H:mm",
 				"hms": "h:mm:ss a",
 				"Hms": "H:mm:ss",
+				"hv": "h a v",
+				"Hv": "HH 'ч'. v",
 				"M": "L",
 				"Md": "dd.M",
 				"MEd": "E, dd.M",
@@ -2231,13 +2243,16 @@
 			}
 		},
 		"era-wide": {
-			"0": "AH"
+			"0": "AH",
+			"1": "BH"
 		},
 		"era-abbreviated": {
-			"0": "AH"
+			"0": "AH",
+			"1": "BH"
 		},
 		"era-narrow": {
-			"0": "AH"
+			"0": "AH",
+			"1": "BH"
 		}
 	},
 	"ca-japanese": {
@@ -2264,15 +2279,19 @@
 				"Bhms": "h:mm:ss B",
 				"d": "d",
 				"E": "E",
+				"EBh": "E h B",
 				"EBhm": "E h:mm B",
 				"EBhms": "E h:mm:ss B",
 				"Ed": "E, d",
+				"Eh": "E h a",
 				"Ehm": "E h:mm a",
 				"EHm": "E H:mm",
 				"Ehms": "E h:mm:ss a",
 				"EHms": "E H:mm:ss",
 				"Gy": "y 'г'. G",
+				"GyM": "M. y 'г'. G",
 				"GyMd": "d.M.y 'г'. GGGGG",
+				"GyMEd": "E d.M.y 'г'. G",
 				"GyMMM": "MMM y 'г'. G",
 				"GyMMMd": "d MMM y 'г'. G",
 				"GyMMMEd": "E, d MMM y 'г'. G",
@@ -2282,6 +2301,8 @@
 				"Hm": "H:mm",
 				"hms": "h:mm:ss a",
 				"Hms": "H:mm:ss",
+				"hv": "h a v",
+				"Hv": "HH 'ч'. v",
 				"M": "L",
 				"Md": "d.M",
 				"MEd": "E, d.M",
@@ -2828,15 +2849,19 @@
 				"Bhms": "h:mm:ss B",
 				"d": "d",
 				"E": "E",
+				"EBh": "E h B",
 				"EBhm": "E h:mm B",
 				"EBhms": "E h:mm:ss B",
 				"Ed": "E, d",
+				"Eh": "E h a",
 				"Ehm": "E h:mm a",
 				"EHm": "E H:mm",
 				"Ehms": "E h:mm:ss a",
 				"EHms": "E H:mm:ss",
 				"Gy": "y 'г'. G",
+				"GyM": "M. y 'г'. G",
 				"GyMd": "d.M.y 'г'. GGGGG",
+				"GyMEd": "E d.M.y 'г'. G",
 				"GyMMM": "MMM y 'г'. G",
 				"GyMMMd": "d MMM y 'г'. G",
 				"GyMMMEd": "E, d MMM y 'г'. G",
@@ -2846,6 +2871,8 @@
 				"Hm": "H:mm",
 				"hms": "h:mm:ss a",
 				"Hms": "H:mm:ss",
+				"hv": "h a v",
+				"Hv": "HH 'ч'. v",
 				"M": "L",
 				"Md": "d.M",
 				"MEd": "E, d.M",
@@ -3360,15 +3387,19 @@
 				"Bhms": "h:mm:ss B",
 				"d": "d",
 				"E": "E",
+				"EBh": "E h B",
 				"EBhm": "E h:mm B",
 				"EBhms": "E h:mm:ss B",
 				"Ed": "d E",
+				"Eh": "E h a",
 				"Ehm": "E h:mm a",
 				"EHm": "E H:mm",
 				"Ehms": "E h:mm:ss a",
 				"EHms": "E H:mm:ss",
 				"Gy": "y 'г'. G",
+				"GyM": "M. y 'г'. G",
 				"GyMd": "d.M.y 'г'. GGGGG",
+				"GyMEd": "E d.M.y 'г'. G",
 				"GyMMM": "MMM y 'г'. G",
 				"GyMMMd": "dd MMM y 'г'. G",
 				"GyMMMEd": "E, dd MMM y 'г'. G",
@@ -3378,6 +3409,8 @@
 				"Hm": "H:mm",
 				"hms": "h:mm:ss a",
 				"Hms": "H:mm:ss",
+				"hv": "h a v",
+				"Hv": "HH 'ч'. v",
 				"M": "L",
 				"Md": "dd.M",
 				"MEd": "E, dd.M",
@@ -3927,45 +3960,45 @@
 			}
 		},
 		"quarter-wide": {
-			"displayName": "тромесечје",
-			"relative-type--1": "последното тромесечје",
-			"relative-type-0": "ова тромесечје",
-			"relative-type-1": "следното тромесечје",
+			"displayName": "тримесечје",
+			"relative-type--1": "последното тримесечје",
+			"relative-type-0": "ова тримесечје",
+			"relative-type-1": "следното тримесечје",
 			"relativeTime-type-future": {
-				"relativeTimePattern-count-one": "за {0} тромесечје",
-				"relativeTimePattern-count-other": "за {0} тромесечја"
+				"relativeTimePattern-count-one": "за {0} тримесечје",
+				"relativeTimePattern-count-other": "за {0} тримесечја"
 			},
 			"relativeTime-type-past": {
-				"relativeTimePattern-count-one": "пред {0} тромесечје",
-				"relativeTimePattern-count-other": "пред {0} тромесечја"
+				"relativeTimePattern-count-one": "пред {0} тримесечје",
+				"relativeTimePattern-count-other": "пред {0} тримесечја"
 			}
 		},
 		"quarter-short": {
-			"displayName": "тромес.",
-			"relative-type--1": "последното тромесечје",
-			"relative-type-0": "ова тромесечје",
-			"relative-type-1": "следното тромесечје",
+			"displayName": "тримес.",
+			"relative-type--1": "последното тримесечје",
+			"relative-type-0": "ова тримесечје",
+			"relative-type-1": "следното тримесечје",
 			"relativeTime-type-future": {
-				"relativeTimePattern-count-one": "за {0} тромес.",
-				"relativeTimePattern-count-other": "за {0} тромес."
+				"relativeTimePattern-count-one": "за {0} тримес.",
+				"relativeTimePattern-count-other": "за {0} тримес."
 			},
 			"relativeTime-type-past": {
-				"relativeTimePattern-count-one": "пред {0} тромес.",
-				"relativeTimePattern-count-other": "пред {0} тромес."
+				"relativeTimePattern-count-one": "пред {0} тримес.",
+				"relativeTimePattern-count-other": "пред {0} тримес."
 			}
 		},
 		"quarter-narrow": {
-			"displayName": "тромес.",
-			"relative-type--1": "последното тромесечје",
-			"relative-type-0": "ова тромесечје",
-			"relative-type-1": "следното тромесечје",
+			"displayName": "тримес.",
+			"relative-type--1": "последното тримесечје",
+			"relative-type-0": "ова тримесечје",
+			"relative-type-1": "следното тримесечје",
 			"relativeTime-type-future": {
-				"relativeTimePattern-count-one": "за {0} тромес.",
-				"relativeTimePattern-count-other": "за {0} тромес."
+				"relativeTimePattern-count-one": "за {0} тримес.",
+				"relativeTimePattern-count-other": "за {0} тримес."
 			},
 			"relativeTime-type-past": {
-				"relativeTimePattern-count-one": "пред {0} тромес.",
-				"relativeTimePattern-count-other": "пред {0} тромес."
+				"relativeTimePattern-count-one": "пред {0} тримес.",
+				"relativeTimePattern-count-other": "пред {0} тримес."
 			}
 		},
 		"month-wide": {
@@ -4108,7 +4141,7 @@
 		},
 		"hour-wide": {
 			"displayName": "час",
-			"relative-type-0": "часов",
+			"relative-type-0": "овој час",
 			"relativeTime-type-future": {
 				"relativeTimePattern-count-one": "за {0} час",
 				"relativeTimePattern-count-other": "за {0} часа"
@@ -4120,7 +4153,7 @@
 		},
 		"hour-short": {
 			"displayName": "ч.",
-			"relative-type-0": "часов",
+			"relative-type-0": "овој час",
 			"relativeTime-type-future": {
 				"relativeTimePattern-count-one": "за {0} час",
 				"relativeTimePattern-count-other": "за {0} часа"
@@ -4132,7 +4165,7 @@
 		},
 		"hour-narrow": {
 			"displayName": "ч.",
-			"relative-type-0": "часов",
+			"relative-type-0": "овој час",
 			"relativeTime-type-future": {
 				"relativeTimePattern-count-one": "за {0} час",
 				"relativeTimePattern-count-other": "за {0} часа"
@@ -4297,7 +4330,7 @@
 			},
 			"Aruba": "Аруба",
 			"Asuncion": "Асунсион",
-			"Atikokan": "Корал Харбор",
+			"Atikokan": "Атикокан",
 			"Bahia": "Бахиа",
 			"Bahia_Banderas": "Бахија де Бандерас",
 			"Barbados": "Барбадос",
@@ -4317,6 +4350,7 @@
 			"Chihuahua": "Чивава",
 			"Ciudad_Juarez": "Сиудад Хуарез",
 			"Costa_Rica": "Костарика",
+			"Coyhaique": "Којајке",
 			"Creston": "Крестон",
 			"Cuiaba": "Кујаба",
 			"Curacao": "Курасао",
@@ -4742,11 +4776,15 @@
 	},
 	"currencyFormat": {
 		"standard": "#,##0.00 ¤",
+		"standard-alphaNextToNumber": "#,##0.00 ¤",
 		"standard-noCurrency": "#,##0.00",
 		"accounting": "#,##0.00 ¤",
+		"accounting-alphaNextToNumber": "#,##0.00 ¤",
 		"accounting-noCurrency": "#,##0.00",
 		"sap-standard": "#,##0.00 ¤",
+		"sap-standard-alphaNextToNumber": "#,##0.00 ¤",
 		"sap-accounting": "#,##0.00 ¤",
+		"sap-accounting-alphaNextToNumber": "#,##0.00 ¤",
 		"sap-standard-noCurrency": "#,##0.00",
 		"sap-accounting-noCurrency": "#,##0.00"
 	},
@@ -4767,14 +4805,14 @@
 		"1000000-other": "0 мил'.' ¤",
 		"10000000-one": "00 мил'.' ¤",
 		"10000000-other": "00 мил'.' ¤",
-		"100000000-one": "000 мил'.' ¤",
-		"100000000-other": "000 мил'.' ¤",
+		"100000000-one": "000 М ¤",
+		"100000000-other": "000 М ¤",
 		"1000000000-one": "0 милј'.' ¤",
 		"1000000000-other": "0 милј'.' ¤",
 		"10000000000-one": "00 милј'.' ¤",
 		"10000000000-other": "00 милј'.' ¤",
-		"100000000000-one": "000 милј'.' ¤",
-		"100000000000-other": "000 милј'.' ¤",
+		"100000000000-one": "000 мј'.' ¤",
+		"100000000000-other": "000 ми'.' ¤",
 		"1000000000000-one": "0 бил'.' ¤",
 		"1000000000000-other": "0 бил'.' ¤",
 		"10000000000000-one": "00 бил'.' ¤",
@@ -5041,7 +5079,12 @@
 				"unitPattern-count-one": "{0} ставка",
 				"unitPattern-count-other": "{0} ставки"
 			},
-			"concentr-permillion": {
+			"concentr-part": {
+				"displayName": "дел",
+				"unitPattern-count-one": "{0} дел",
+				"unitPattern-count-other": "{0} делови"
+			},
+			"concentr-part-per-1e6": {
 				"displayName": "ppm",
 				"unitPattern-count-other": "{0} ppm"
 			},
@@ -5062,6 +5105,10 @@
 			"concentr-mole": {
 				"displayName": "mol",
 				"unitPattern-count-other": "{0} mol"
+			},
+			"concentr-ofglucose": {
+				"displayName": "Glc",
+				"unitPattern-count-other": "{0} Glc"
 			},
 			"consumption-liter-per-kilometer": {
 				"displayName": "L/km",
@@ -5516,6 +5563,10 @@
 				"unitPattern-count-one": "{0} mmHg",
 				"unitPattern-count-other": "{0} mmHg"
 			},
+			"pressure-ofhg": {
+				"displayName": "Hg",
+				"unitPattern-count-other": "{0} Hg"
+			},
 			"pressure-pound-force-per-square-inch": {
 				"displayName": "psi",
 				"unitPattern-count-other": "{0} psi"
@@ -5664,6 +5715,10 @@
 				"displayName": "mcup",
 				"unitPattern-count-other": "{0} mc"
 			},
+			"volume-fluid-ounce-metric": {
+				"displayName": "fl oz m.",
+				"unitPattern-count-other": "{0} fl oz m."
+			},
 			"volume-acre-foot": {
 				"displayName": "acre ft",
 				"unitPattern-count-other": "{0} ac ft"
@@ -5691,9 +5746,17 @@
 				"displayName": "пинти",
 				"unitPattern-count-other": "{0} pt"
 			},
+			"volume-pint-imperial": {
+				"displayName": "pint Imp.",
+				"unitPattern-count-other": "{0} pt Imp."
+			},
 			"volume-cup": {
 				"displayName": "чаши",
 				"unitPattern-count-other": "{0} c"
+			},
+			"volume-cup-imperial": {
+				"displayName": "cup Imp.",
+				"unitPattern-count-other": "{0} cup Imp."
 			},
 			"volume-fluid-ounce": {
 				"displayName": "fl oz",
@@ -5734,7 +5797,8 @@
 			},
 			"volume-jigger": {
 				"displayName": "џигер",
-				"unitPattern-count-other": "{0} jigger"
+				"unitPattern-count-one": "{0} џигер",
+				"unitPattern-count-other": "{0} џигери"
 			},
 			"volume-pinch": {
 				"displayName": "pinch",
@@ -5744,12 +5808,165 @@
 				"displayName": "qt Imp",
 				"unitPattern-count-other": "{0} qt Imp."
 			},
-			"speed-light-speed": {
-				"displayName": "светлина",
-				"unitPattern-count-one": "{0} светлина",
-				"unitPattern-count-other": "{0} светлини"
+			"angle-steradian": {
+				"displayName": "sr",
+				"unitPattern-count-other": "{0} sr"
 			},
-			"concentr-portion-per-1e9": {
+			"concentr-katal": {
+				"displayName": "kat",
+				"unitPattern-count-other": "{0} kat"
+			},
+			"electric-coulomb": {
+				"displayName": "C",
+				"unitPattern-count-other": "{0} C"
+			},
+			"electric-farad": {
+				"displayName": "F",
+				"unitPattern-count-other": "{0} F"
+			},
+			"electric-henry": {
+				"displayName": "H",
+				"unitPattern-count-other": "{0} H"
+			},
+			"electric-siemens": {
+				"displayName": "S",
+				"unitPattern-count-other": "{0} S"
+			},
+			"energy-calorie-it": {
+				"displayName": "cal [IT]",
+				"unitPattern-count-one": "{0} cal [IT]",
+				"unitPattern-count-other": "{0} cal [IT]"
+			},
+			"energy-british-thermal-unit-it": {
+				"displayName": "BTU-IT",
+				"unitPattern-count-other": "{0} BTU-IT"
+			},
+			"energy-becquerel": {
+				"displayName": "Bq",
+				"unitPattern-count-other": "{0} Bq"
+			},
+			"energy-sievert": {
+				"displayName": "Sv",
+				"unitPattern-count-other": "{0} Sv"
+			},
+			"energy-gray": {
+				"displayName": "Gy",
+				"unitPattern-count-other": "{0} Gy"
+			},
+			"force-kilogram-force": {
+				"displayName": "kgf",
+				"unitPattern-count-other": "{0} kgf"
+			},
+			"length-rod": {
+				"displayName": "rod",
+				"unitPattern-count-other": "{0} rod"
+			},
+			"length-chain": {
+				"displayName": "chain",
+				"unitPattern-count-other": "{0} chain"
+			},
+			"magnetic-tesla": {
+				"displayName": "T",
+				"unitPattern-count-other": "{0} T"
+			},
+			"magnetic-weber": {
+				"displayName": "Wb",
+				"unitPattern-count-other": "{0} Wb"
+			},
+			"temperature-rankine": {
+				"displayName": "°R",
+				"unitPattern-count-other": "{0} °R"
+			},
+			"duration-fortnight": {
+				"displayName": "fortnight",
+				"unitPattern-count-other": "{0} fw"
+			},
+			"mass-slug": {
+				"displayName": "slug",
+				"unitPattern-count-other": "{0} slug"
+			},
+			"pressure-gasoline-energy-density": {
+				"displayName": "gas E",
+				"unitPattern-count-other": "{0} gas E"
+			},
+			"length-rin": {
+				"displayName": "rin [JP]",
+				"unitPattern-count-other": "{0} rin [JP]"
+			},
+			"length-sun": {
+				"displayName": "sun [JP]",
+				"unitPattern-count-other": "{0} sun [JP]"
+			},
+			"length-shaku-length": {
+				"displayName": "shaku [JP]",
+				"unitPattern-count-other": "{0} shaku [JP]"
+			},
+			"length-shaku-cloth": {
+				"displayName": "shaku [cloth, JP]",
+				"unitPattern-count-other": "{0} shaku [cloth, JP]"
+			},
+			"length-ken": {
+				"displayName": "ken [JP]",
+				"unitPattern-count-other": "{0} ken [JP]"
+			},
+			"length-jo-jp": {
+				"displayName": "jo [JP]",
+				"unitPattern-count-other": "{0} jo [JP]"
+			},
+			"length-ri-jp": {
+				"displayName": "ri [JP]",
+				"unitPattern-count-other": "{0} ri [JP]"
+			},
+			"area-bu-jp": {
+				"displayName": "bu [JP]",
+				"unitPattern-count-other": "{0} bu [JP]"
+			},
+			"area-se-jp": {
+				"displayName": "se [JP]",
+				"unitPattern-count-other": "{0} se [JP]"
+			},
+			"area-cho": {
+				"displayName": "cho [JP]",
+				"unitPattern-count-other": "{0} cho [JP]"
+			},
+			"volume-kosaji": {
+				"displayName": "kosaji [JP]",
+				"unitPattern-count-other": "{0} kosaji [JP]"
+			},
+			"volume-osaji": {
+				"displayName": "osaji [JP]",
+				"unitPattern-count-other": "{0} osaji [JP]"
+			},
+			"volume-cup-jp": {
+				"displayName": "cup [JP]",
+				"unitPattern-count-other": "{0} cup [JP]"
+			},
+			"volume-shaku": {
+				"displayName": "shaku [vol, JP]",
+				"unitPattern-count-other": "{0} shaku [vol, JP]"
+			},
+			"volume-sai": {
+				"displayName": "sai [JP]",
+				"unitPattern-count-other": "{0} sai [JP]"
+			},
+			"volume-to-jp": {
+				"displayName": "to [JP]",
+				"unitPattern-count-other": "{0} to [JP]"
+			},
+			"volume-koku": {
+				"displayName": "koku [JP]",
+				"unitPattern-count-other": "{0} koku [JP]"
+			},
+			"speed-light-speed": {
+				"displayName": "светлосна",
+				"unitPattern-count-one": "{0} светлосна",
+				"unitPattern-count-other": "{0} светлосни"
+			},
+			"mass-fun": {
+				"displayName": "fun [JP]",
+				"unitPattern-count-other": "{0} fun [JP]"
+			},
+			"concentr-part-per-1e9": {
 				"displayName": "ppb",
 				"unitPattern-count-other": "{0} ppb"
 			},
@@ -5784,14 +6001,14 @@
 		"1000000-other": "0 мил'.' ¤",
 		"10000000-one": "00 мил'.' ¤",
 		"10000000-other": "00 мил'.' ¤",
-		"100000000-one": "000 мил'.' ¤",
-		"100000000-other": "000 мил'.' ¤",
+		"100000000-one": "000 М ¤",
+		"100000000-other": "000 М ¤",
 		"1000000000-one": "0 милј'.' ¤",
 		"1000000000-other": "0 милј'.' ¤",
 		"10000000000-one": "00 милј'.' ¤",
 		"10000000000-other": "00 милј'.' ¤",
-		"100000000000-one": "000 милј'.' ¤",
-		"100000000000-other": "000 милј'.' ¤",
+		"100000000000-one": "000 мј'.' ¤",
+		"100000000000-other": "000 ми'.' ¤",
 		"1000000000000-one": "0 бил'.' ¤",
 		"1000000000000-other": "0 бил'.' ¤",
 		"10000000000000-one": "00 бил'.' ¤",
@@ -5808,11 +6025,13 @@
 		"BYR": 0,
 		"CLF": 4,
 		"CLP": 0,
+		"COP": 0,
 		"DEFAULT": 2,
 		"DJF": 0,
 		"ESP": 0,
 		"GNF": 0,
 		"HUF": 0,
+		"IDR": 0,
 		"IQD": 0,
 		"IRR": 0,
 		"ISK": 0,
@@ -5832,6 +6051,7 @@
 		"MMK": 0,
 		"MRO": 0,
 		"OMR": 3,
+		"PKR": 0,
 		"PYG": 0,
 		"RSD": 0,
 		"RWF": 0,
@@ -5868,45 +6088,46 @@
 	},
 	"eras-gregorian": {
 		"0": {
-			"_code": "gregory-inverse",
-			"_aliases": "bc bce",
+			"_code": "bce",
+			"_aliases": "bc",
 			"_end": "0-12-31"
 		},
 		"1": {
-			"_code": "gregory",
-			"_aliases": "ad ce",
+			"_code": "ce",
+			"_aliases": "ad",
 			"_start": "1-01-01"
 		}
 	},
 	"eras-islamic": {
 		"0": {
-			"_code": "islamic",
-			"_aliases": "ah",
-			"_start": "622-7-15"
+			"_code": "ah",
+			"_start": "622-07-19"
+		},
+		"1": {
+			"_code": "bh",
+			"_end": "622-07-18"
 		}
 	},
 	"eras-persian": {
 		"0": {
-			"_code": "persian",
-			"_aliases": "ap",
-			"_start": "622-01-01"
+			"_code": "ap",
+			"_start": "622-03-21"
 		}
 	},
 	"eras-buddhist": {
 		"0": {
-			"_code": "buddhist",
-			"_aliases": "be",
+			"_code": "be",
 			"_start": "-542-01-01"
 		}
 	},
 	"eras-japanese": {
 		"232": {
 			"_code": "meiji",
-			"_start": "1868-9-8"
+			"_start": "1868-10-23"
 		},
 		"233": {
 			"_code": "taisho",
-			"_start": "1912-7-30"
+			"_start": "1912-07-30"
 		},
 		"234": {
 			"_code": "showa",
@@ -5914,11 +6135,11 @@
 		},
 		"235": {
 			"_code": "heisei",
-			"_start": "1989-1-8"
+			"_start": "1989-01-08"
 		},
 		"236": {
 			"_code": "reiwa",
-			"_start": "2019-5-1"
+			"_start": "2019-05-01"
 		}
 	},
 	"dayPeriodRules": {

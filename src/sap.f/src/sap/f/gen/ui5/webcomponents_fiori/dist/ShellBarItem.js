@@ -21,6 +21,7 @@ sap.ui.define(
      * @extends sap.ui.core.webc.WebComponent
      * @constructor
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/ShellBarItem
      */
 
@@ -28,7 +29,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents_fiori.dist.ShellBarItem",
       {
         metadata: {
-          tag: "ui5-shellbar-item-cc48984a",
+          tag: "ui5-shellbar-item-68f7652d",
 
           namespace: "sap.f.gen.ui5.webcomponents_fiori",
 
@@ -46,16 +47,19 @@ sap.ui.define(
              * Defines the name of the item's icon.
              */
             icon: { type: "string", mapping: "property" },
+
             /**
              * Defines the item text.
              *
              * **Note:** The text is only displayed inside the overflow popover list view.
              */
             text: { type: "string", mapping: "property" },
+
             /**
              * Defines the count displayed in the top-right corner.
              */
             count: { type: "string", mapping: "property" },
+
             /**
              * Defines additional accessibility attributes on Shellbar Items.
              *
@@ -77,10 +81,12 @@ sap.ui.define(
               mapping: "property",
               defaultValue: "{}"
             },
+
             /**
              * The 'width' of the Web Component in <code>sap.ui.core.CSSSize</code>.
              */
             width: { type: "sap.ui.core.CSSSize", mapping: "style" },
+
             /**
              * The 'height' of the Web Component in <code>sap.ui.core.CSSSize</code>.
              */

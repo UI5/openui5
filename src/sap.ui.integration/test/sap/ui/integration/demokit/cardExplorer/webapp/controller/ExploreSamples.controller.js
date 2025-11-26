@@ -5,6 +5,7 @@ sap.ui.define([
 	"../model/ExploreSettingsModel",
 	"../model/formatter",
 	"../util/FileUtils",
+	"../util/fetchLatestSchemaVersion",
 	"../localService/MockServerManager",
 	"sap/m/MessageToast",
 	"sap/f/GridContainerItemLayoutData",
@@ -38,6 +39,7 @@ sap.ui.define([
 	exploreSettingsModel,
 	formatter,
 	FileUtils,
+	fetchLatestSchemaVersion,
 	MockServerManager,
 	MessageToast,
 	GridContainerItemLayoutData,
@@ -118,6 +120,16 @@ sap.ui.define([
 					"shared/lib": sap.ui.require.toUrl("sap/ui/demo/cardExplorer/samples/extension/shared/lib")
 				}
 			});
+		},
+
+		modifyFile: async function (oFile) {
+			const vContent = oFile.content;
+			if (!vContent || typeof vContent !== "string") {
+				return;
+			}
+
+			const sLatestSchemaVersion = await fetchLatestSchemaVersion();
+			oFile.content = vContent.replaceAll("%LATEST_SCHEMA_VERSION%", sLatestSchemaVersion);
 		},
 
 		onExit: function () {

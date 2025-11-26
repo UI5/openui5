@@ -1,7 +1,7 @@
 {
 	"__license": "This file has been derived from Unicode Common Locale Data Repository (CLDR) files (http://cldr.unicode.org). See the copyright and permission notice in the Unicode-Data-Files-LICENSE.txt available at the same location as this file or visit http://www.unicode.org/copyright.html",
-	"__version": "46.1.0",
-	"__buildtime": "2025-01-28T09:40:27.437Z",
+	"__version": "48.0.0",
+	"__buildtime": "2025-11-18T12:31:55.685Z",
 	"languages": {
 		"aa": "阿法尔语",
 		"ab": "阿布哈西亚语",
@@ -95,7 +95,6 @@
 		"chr": "切罗基语",
 		"chy": "夏延语",
 		"ckb": "中库尔德语",
-		"ckb_alt-menu": "中库尔德语",
 		"ckb_alt-variant": "索拉尼库尔德语",
 		"clc": "奇尔科廷语",
 		"cnr": "黑山语",
@@ -288,13 +287,15 @@
 		"ksf": "巴菲亚语",
 		"ksh": "科隆语",
 		"ku": "库尔德语",
+		"ku_menu-core": "库尔德语",
+		"ku_menu-extension": "北库尔德语",
 		"kum": "库梅克语",
 		"kut": "库特奈语",
 		"kv": "科米语",
 		"kw": "康沃尔语",
 		"kwk": "夸夸瓦拉语",
 		"kxv": "库维语",
-		"ky": "柯尔克孜语",
+		"ky": "吉尔吉斯语",
 		"la": "拉丁语",
 		"lad": "拉迪诺语",
 		"lag": "朗吉语",
@@ -889,6 +890,7 @@
 		"CN": "中国",
 		"CO": "哥伦比亚",
 		"CP": "克利珀顿岛",
+		"CQ": "萨克岛",
 		"CR": "哥斯达黎加",
 		"CU": "古巴",
 		"CV": "佛得角",
@@ -923,7 +925,6 @@
 		"FR": "法国",
 		"GA": "加蓬",
 		"GB": "英国",
-		"GB-alt-short": "英国",
 		"GD": "格林纳达",
 		"GE": "格鲁吉亚",
 		"GF": "法属圭亚那",
@@ -955,7 +956,6 @@
 		"IM": "马恩岛",
 		"IN": "印度",
 		"IO": "英属印度洋领地",
-		"IO-alt-biot": "英属印度洋领地",
 		"IO-alt-chagos": "查戈斯群岛",
 		"IQ": "伊拉克",
 		"IR": "伊朗",
@@ -1023,7 +1023,6 @@
 		"NR": "瑙鲁",
 		"NU": "纽埃",
 		"NZ": "新西兰",
-		"NZ-alt-variant": "新西兰",
 		"OM": "阿曼",
 		"PA": "巴拿马",
 		"PE": "秘鲁",
@@ -1068,7 +1067,6 @@
 		"SX": "荷属圣马丁",
 		"SY": "叙利亚",
 		"SZ": "斯威士兰",
-		"SZ-alt-variant": "斯威士兰",
 		"TA": "特里斯坦-达库尼亚群岛",
 		"TC": "特克斯和凯科斯群岛",
 		"TD": "乍得",
@@ -1078,12 +1076,10 @@
 		"TJ": "塔吉克斯坦",
 		"TK": "托克劳",
 		"TL": "东帝汶",
-		"TL-alt-variant": "东帝汶",
 		"TM": "土库曼斯坦",
 		"TN": "突尼斯",
 		"TO": "汤加",
 		"TR": "土耳其",
-		"TR-alt-variant": "土耳其",
 		"TT": "特立尼达和多巴哥",
 		"TV": "图瓦卢",
 		"TW": "台湾",
@@ -1093,7 +1089,6 @@
 		"UM": "美国本土外小岛屿",
 		"UN": "联合国",
 		"US": "美国",
-		"US-alt-short": "美国",
 		"UY": "乌拉圭",
 		"UZ": "乌兹别克斯坦",
 		"VA": "梵蒂冈",
@@ -1140,15 +1135,19 @@
 				"Bhms": "Bh:mm:ss",
 				"d": "d日",
 				"E": "ccc",
+				"EBh": "EBh时",
 				"EBhm": "EBh:mm",
 				"EBhms": "EBh:mm:ss",
 				"Ed": "d日E",
+				"Eh": "Eah时",
 				"Ehm": "Eah:mm",
 				"EHm": "EHH:mm",
 				"Ehms": "Eah:mm:ss",
 				"EHms": "EHH:mm:ss",
 				"Gy": "Gy年",
-				"GyMd": "GGGGG y-MM-dd",
+				"GyM": "Gy年M月",
+				"GyMd": "Gy-MM-dd",
+				"GyMEd": "Gy-MM-ddE",
 				"GyMMM": "Gy年M月",
 				"GyMMMd": "Gy年M月d日",
 				"GyMMMEd": "Gy年M月d日E",
@@ -1158,10 +1157,12 @@
 				"Hm": "HH:mm",
 				"hms": "ah:mm:ss",
 				"Hms": "HH:mm:ss",
-				"hmsv": "v ah:mm:ss",
-				"Hmsv": "v HH:mm:ss",
-				"hmv": "v ah:mm",
+				"hmsv": "vah:mm:ss",
+				"Hmsv": "vHH:mm:ss",
+				"hmv": "vah:mm",
 				"Hmv": "v HH:mm",
+				"hv": "vah时",
+				"Hv": "vH时",
 				"M": "M月",
 				"Md": "M/d",
 				"MEd": "M/dE",
@@ -1309,8 +1310,8 @@
 					"y": "y–y年"
 				},
 				"yM": {
-					"M": "y年M月至M月",
-					"y": "y年M月至y年M月"
+					"M": "y/M – y/M",
+					"y": "y/M – y/M"
 				},
 				"yMd": {
 					"d": "y/M/d – y/M/d",
@@ -1320,25 +1321,25 @@
 				"yMEd": {
 					"d": "y/M/dE至y/M/dE",
 					"M": "y/M/dE至y/M/dE",
-					"y": "y/M/dE至y/M/dE"
+					"y": "y/M/dE – y/M/dE"
 				},
 				"yMMM": {
-					"M": "y年M月至M月",
-					"y": "y年M月至y年M月"
+					"M": "y年MMM – MMM",
+					"y": "y年MMM – y年MMM"
 				},
 				"yMMMd": {
-					"d": "y年M月d日至d日",
-					"M": "y年M月d日至M月d日",
-					"y": "y年M月d日至y年M月d日"
+					"d": "y年MMMd日 – d日",
+					"M": "y年MMMd日 – MMMd日",
+					"y": "y年MMMd日 – y年MMMd日"
 				},
 				"yMMMEd": {
-					"d": "y年M月d日E至d日E",
+					"d": "y年MMMd日E – MMMd日E",
 					"M": "y年M月d日E至M月d日E",
 					"y": "y年M月d日E至y年M月d日E"
 				},
 				"yMMMM": {
-					"M": "y年M月至M月",
-					"y": "y年M月至y年M月"
+					"M": "y年M月 – M月",
+					"y": "y年M月 – y年M月"
 				}
 			}
 		},
@@ -1679,15 +1680,19 @@
 				"Bhms": "Bh:mm:ss",
 				"d": "d日",
 				"E": "ccc",
-				"EBhm": "EB h:mm",
+				"EBh": "EBh时",
+				"EBhm": "EBh:mm",
 				"EBhms": "EB h:mm:ss",
 				"Ed": "d日E",
+				"Eh": "Eah时",
 				"Ehm": "Ea h:mm",
 				"EHm": "E HH:mm",
 				"Ehms": "Ea h:mm:ss",
 				"EHms": "E HH:mm:ss",
 				"Gy": "Gy年",
+				"GyM": "Gy/M",
 				"GyMd": "Gy/M/d",
+				"GyMEd": "Gy-MM-dd E",
 				"GyMEEEEd": "Gy年M月d日EEEE",
 				"GyMMM": "Gy年M月",
 				"GyMMMd": "Gy年M月d日",
@@ -1698,6 +1703,8 @@
 				"Hm": "HH:mm",
 				"hms": "ah:mm:ss",
 				"Hms": "HH:mm:ss",
+				"hv": "vah时",
+				"Hv": "vH时",
 				"M": "M月",
 				"Md": "M-d",
 				"MEd": "M-dE",
@@ -2175,13 +2182,16 @@
 			}
 		},
 		"era-wide": {
-			"0": "伊斯兰历"
+			"0": "伊斯兰历",
+			"1": "BH"
 		},
 		"era-abbreviated": {
-			"0": "伊斯兰历"
+			"0": "伊斯兰历",
+			"1": "BH"
 		},
 		"era-narrow": {
-			"0": "伊斯兰历"
+			"0": "伊斯兰历",
+			"1": "BH"
 		}
 	},
 	"ca-japanese": {
@@ -2208,15 +2218,19 @@
 				"Bhms": "Bh:mm:ss",
 				"d": "d日",
 				"E": "ccc",
-				"EBhm": "EB h:mm",
+				"EBh": "EBh时",
+				"EBhm": "EBh:mm",
 				"EBhms": "EB h:mm:ss",
 				"Ed": "d日E",
+				"Eh": "Eah时",
 				"Ehm": "Ea h:mm",
 				"EHm": "E HH:mm",
 				"Ehms": "Ea h:mm:ss",
 				"EHms": "E HH:mm:ss",
 				"Gy": "Gy年",
+				"GyM": "Gy/M",
 				"GyMd": "Gy-MM-dd",
+				"GyMEd": "Gy/M/d E",
 				"GyMEEEEd": "Gy年M月d日EEEE",
 				"GyMMM": "Gy年M月",
 				"GyMMMd": "Gy年M月d日",
@@ -2227,6 +2241,8 @@
 				"Hm": "HH:mm",
 				"hms": "ah:mm:ss",
 				"Hms": "HH:mm:ss",
+				"hv": "vah时",
+				"Hv": "vH时",
 				"M": "M月",
 				"Md": "M-d",
 				"MEd": "M-dE",
@@ -2757,15 +2773,19 @@
 				"Bhms": "Bh:mm:ss",
 				"d": "d日",
 				"E": "ccc",
-				"EBhm": "EB h:mm",
+				"EBh": "EBh时",
+				"EBhm": "EBh:mm",
 				"EBhms": "EB h:mm:ss",
 				"Ed": "d日E",
+				"Eh": "Eah时",
 				"Ehm": "Ea h:mm",
 				"EHm": "E HH:mm",
 				"Ehms": "Ea h:mm:ss",
 				"EHms": "E HH:mm:ss",
 				"Gy": "Gy年",
+				"GyM": "Gy/M",
 				"GyMd": "Gy/M/d",
+				"GyMEd": "Gy/M/d E",
 				"GyMEEEEd": "Gy年M月d日EEEE",
 				"GyMMM": "Gy年M月",
 				"GyMMMd": "Gy年M月d日",
@@ -2776,6 +2796,8 @@
 				"Hm": "HH:mm",
 				"hms": "ah:mm:ss",
 				"Hms": "HH:mm:ss",
+				"hv": "vah时",
+				"Hv": "vH时",
 				"M": "L",
 				"Md": "M/d",
 				"MEd": "M/dE",
@@ -3286,15 +3308,19 @@
 				"Bhms": "Bh:mm:ss",
 				"d": "d日",
 				"E": "ccc",
-				"EBhm": "EB h:mm",
+				"EBh": "EBh时",
+				"EBhm": "EBh:mm",
 				"EBhms": "EB h:mm:ss",
 				"Ed": "d日E",
+				"Eh": "Eah时",
 				"Ehm": "Ea h:mm",
 				"EHm": "E HH:mm",
 				"Ehms": "Ea h:mm:ss",
 				"EHms": "E HH:mm:ss",
 				"Gy": "Gy年",
+				"GyM": "Gy/M",
 				"GyMd": "Gy-M-d",
+				"GyMEd": "Gy/M/d E",
 				"GyMEEEEd": "Gy年M月d日EEEE",
 				"GyMMM": "Gy年MM月",
 				"GyMMMd": "Gy年MM月d日",
@@ -3305,6 +3331,8 @@
 				"Hm": "HH:mm",
 				"hms": "ah:mm:ss",
 				"Hms": "HH:mm:ss",
+				"hv": "vah时",
+				"Hv": "vH时",
 				"M": "M月",
 				"Md": "M-d",
 				"MEd": "M-dE",
@@ -4180,6 +4208,7 @@
 			"Chihuahua": "奇瓦瓦",
 			"Ciudad_Juarez": "华雷斯城",
 			"Costa_Rica": "哥斯达黎加",
+			"Coyhaique": "科伊艾克",
 			"Creston": "克雷斯顿",
 			"Cuiaba": "库亚巴",
 			"Curacao": "库拉索",
@@ -4296,7 +4325,7 @@
 			"Casey": "卡塞",
 			"Davis": "戴维斯",
 			"DumontDUrville": "迪蒙·迪维尔",
-			"Macquarie": "麦格理",
+			"Macquarie": "麦夸里岛",
 			"Mawson": "莫森",
 			"McMurdo": "麦克默多",
 			"Palmer": "帕尔默",
@@ -4387,7 +4416,7 @@
 			"Urumqi": "乌鲁木齐",
 			"Ust-Nera": "乌斯内拉",
 			"Vientiane": "万象",
-			"Vladivostok": "符拉迪沃斯托克",
+			"Vladivostok": "海参崴",
 			"Yakutsk": "雅库茨克",
 			"Yangon": "仰光",
 			"Yekaterinburg": "叶卡捷琳堡",
@@ -4581,11 +4610,13 @@
 	},
 	"currencyFormat": {
 		"standard": "¤#,##0.00",
+		"standard-alphaNextToNumber": "¤ #,##0.00",
 		"standard-noCurrency": "#,##0.00",
 		"accounting": "¤#,##0.00;(¤#,##0.00)",
 		"accounting-alphaNextToNumber": "¤ #,##0.00;(¤ #,##0.00)",
 		"accounting-noCurrency": "#,##0.00;(#,##0.00)",
 		"sap-standard": "#,##0.00¤",
+		"sap-standard-alphaNextToNumber": "#,##0.00 ¤",
 		"sap-accounting": "#,##0.00¤;(#,##0.00¤)",
 		"sap-accounting-alphaNextToNumber": "#,##0.00 ¤;(#,##0.00 ¤)",
 		"sap-standard-noCurrency": "#,##0.00",
@@ -4600,16 +4631,27 @@
 	"currencyFormat-short": {
 		"1000-other": "0",
 		"10000-other": "¤0万",
+		"10000-other-alphaNextToNumber": "¤ 0万",
 		"100000-other": "¤00万",
+		"100000-other-alphaNextToNumber": "¤ 00万",
 		"1000000-other": "¤000万",
+		"1000000-other-alphaNextToNumber": "¤ 000万",
 		"10000000-other": "¤0000万",
+		"10000000-other-alphaNextToNumber": "¤ 0000万",
 		"100000000-other": "¤0亿",
+		"100000000-other-alphaNextToNumber": "¤ 0亿",
 		"1000000000-other": "¤00亿",
+		"1000000000-other-alphaNextToNumber": "¤ 00亿",
 		"10000000000-other": "¤000亿",
+		"10000000000-other-alphaNextToNumber": "¤ 000亿",
 		"100000000000-other": "¤0000亿",
+		"100000000000-other-alphaNextToNumber": "¤ 0000亿",
 		"1000000000000-other": "¤0万亿",
+		"1000000000000-other-alphaNextToNumber": "¤ 0万亿",
 		"10000000000000-other": "¤00万亿",
-		"100000000000000-other": "¤000万亿"
+		"10000000000000-other-alphaNextToNumber": "¤ 00万亿",
+		"100000000000000-other": "¤000万亿",
+		"100000000000000-other-alphaNextToNumber": "¤ 000万亿"
 	},
 	"symbols-latn-decimal": ".",
 	"symbols-latn-group": ",",
@@ -4874,7 +4916,11 @@
 				"displayName": "项",
 				"unitPattern-count-other": "{0}项"
 			},
-			"concentr-permillion": {
+			"concentr-part": {
+				"displayName": "份",
+				"unitPattern-count-other": "{0}份"
+			},
+			"concentr-part-per-1e6": {
 				"displayName": "ppm",
 				"unitPattern-count-other": "{0}ppm"
 			},
@@ -4893,6 +4939,10 @@
 			"concentr-mole": {
 				"displayName": "mol",
 				"unitPattern-count-other": "{0} mol"
+			},
+			"concentr-ofglucose": {
+				"displayName": "Glc",
+				"unitPattern-count-other": "{0}Glc"
 			},
 			"consumption-liter-per-kilometer": {
 				"displayName": "L/km",
@@ -5327,6 +5377,10 @@
 				"displayName": "mmHg",
 				"unitPattern-count-other": "{0} mmHg"
 			},
+			"pressure-ofhg": {
+				"displayName": "Hg",
+				"unitPattern-count-other": "{0}Hg"
+			},
 			"pressure-pound-force-per-square-inch": {
 				"displayName": "psi",
 				"unitPattern-count-other": "{0} psi"
@@ -5470,6 +5524,10 @@
 				"displayName": "公制杯",
 				"unitPattern-count-other": "{0}公制杯"
 			},
+			"volume-fluid-ounce-metric": {
+				"displayName": "公制液量盎司",
+				"unitPattern-count-other": "{0}公制液量盎司"
+			},
 			"volume-acre-foot": {
 				"displayName": "英亩英尺",
 				"unitPattern-count-other": "{0}英亩英尺"
@@ -5496,9 +5554,17 @@
 				"displayName": "品脱",
 				"unitPattern-count-other": "{0}品脱"
 			},
+			"volume-pint-imperial": {
+				"displayName": "pint Imp.",
+				"unitPattern-count-other": "{0} pt Imp."
+			},
 			"volume-cup": {
 				"displayName": "杯",
 				"unitPattern-count-other": "{0}杯"
+			},
+			"volume-cup-imperial": {
+				"displayName": "cup Imp.",
+				"unitPattern-count-other": "{0} cup Imp."
 			},
 			"volume-fluid-ounce": {
 				"displayName": "液盎司",
@@ -5548,13 +5614,165 @@
 				"displayName": "qt Imp",
 				"unitPattern-count-other": "{0} qt Imp."
 			},
+			"angle-steradian": {
+				"displayName": "sr",
+				"unitPattern-count-other": "{0}sr"
+			},
+			"concentr-katal": {
+				"displayName": "kat",
+				"unitPattern-count-other": "{0}kat"
+			},
+			"electric-coulomb": {
+				"displayName": "C",
+				"unitPattern-count-other": "{0} C"
+			},
+			"electric-farad": {
+				"displayName": "F",
+				"unitPattern-count-other": "{0} F"
+			},
+			"electric-henry": {
+				"displayName": "H",
+				"unitPattern-count-other": "{0} H"
+			},
+			"electric-siemens": {
+				"displayName": "S",
+				"unitPattern-count-other": "{0} S"
+			},
+			"energy-calorie-it": {
+				"displayName": "国际蒸汽表卡",
+				"unitPattern-count-other": "{0}国际蒸汽表卡"
+			},
+			"energy-british-thermal-unit-it": {
+				"displayName": "BTU-IT",
+				"unitPattern-count-other": "{0} BTU-IT"
+			},
+			"energy-becquerel": {
+				"displayName": "贝克",
+				"unitPattern-count-other": "{0}贝克"
+			},
+			"energy-sievert": {
+				"displayName": "西弗",
+				"unitPattern-count-other": "{0}西弗"
+			},
+			"energy-gray": {
+				"displayName": "戈瑞",
+				"unitPattern-count-other": "{0}戈瑞"
+			},
+			"force-kilogram-force": {
+				"displayName": "kgf",
+				"unitPattern-count-other": "{0}kgf"
+			},
+			"length-rod": {
+				"displayName": "rod",
+				"unitPattern-count-other": "{0} rod"
+			},
+			"length-chain": {
+				"displayName": "chain",
+				"unitPattern-count-other": "{0} chain"
+			},
+			"magnetic-tesla": {
+				"displayName": "T",
+				"unitPattern-count-other": "{0}T"
+			},
+			"magnetic-weber": {
+				"displayName": "Wb",
+				"unitPattern-count-other": "{0}Wb"
+			},
+			"temperature-rankine": {
+				"displayName": "°R",
+				"unitPattern-count-other": "{0} °R"
+			},
+			"duration-fortnight": {
+				"displayName": "fortnight",
+				"unitPattern-count-other": "{0} fw"
+			},
+			"mass-slug": {
+				"displayName": "slug",
+				"unitPattern-count-other": "{0} slug"
+			},
+			"pressure-gasoline-energy-density": {
+				"displayName": "gas E",
+				"unitPattern-count-other": "{0} gas E"
+			},
+			"length-rin": {
+				"displayName": "rin [JP]",
+				"unitPattern-count-other": "{0} rin [JP]"
+			},
+			"length-sun": {
+				"displayName": "sun [JP]",
+				"unitPattern-count-other": "{0} sun [JP]"
+			},
+			"length-shaku-length": {
+				"displayName": "shaku [JP]",
+				"unitPattern-count-other": "{0} shaku [JP]"
+			},
+			"length-shaku-cloth": {
+				"displayName": "shaku [cloth, JP]",
+				"unitPattern-count-other": "{0} shaku [cloth, JP]"
+			},
+			"length-ken": {
+				"displayName": "ken [JP]",
+				"unitPattern-count-other": "{0} ken [JP]"
+			},
+			"length-jo-jp": {
+				"displayName": "jo [JP]",
+				"unitPattern-count-other": "{0} jo [JP]"
+			},
+			"length-ri-jp": {
+				"displayName": "ri [JP]",
+				"unitPattern-count-other": "{0} ri [JP]"
+			},
+			"area-bu-jp": {
+				"displayName": "bu [JP]",
+				"unitPattern-count-other": "{0} bu [JP]"
+			},
+			"area-se-jp": {
+				"displayName": "se [JP]",
+				"unitPattern-count-other": "{0} se [JP]"
+			},
+			"area-cho": {
+				"displayName": "cho [JP]",
+				"unitPattern-count-other": "{0} cho [JP]"
+			},
+			"volume-kosaji": {
+				"displayName": "kosaji [JP]",
+				"unitPattern-count-other": "{0} kosaji [JP]"
+			},
+			"volume-osaji": {
+				"displayName": "osaji [JP]",
+				"unitPattern-count-other": "{0} osaji [JP]"
+			},
+			"volume-cup-jp": {
+				"displayName": "cup [JP]",
+				"unitPattern-count-other": "{0} cup [JP]"
+			},
+			"volume-shaku": {
+				"displayName": "shaku [vol, JP]",
+				"unitPattern-count-other": "{0} shaku [vol, JP]"
+			},
+			"volume-sai": {
+				"displayName": "sai [JP]",
+				"unitPattern-count-other": "{0} sai [JP]"
+			},
+			"volume-to-jp": {
+				"displayName": "to [JP]",
+				"unitPattern-count-other": "{0} to [JP]"
+			},
+			"volume-koku": {
+				"displayName": "koku [JP]",
+				"unitPattern-count-other": "{0} koku [JP]"
+			},
 			"speed-light-speed": {
 				"displayName": "光",
 				"unitPattern-count-other": "{0}光"
 			},
-			"concentr-portion-per-1e9": {
+			"mass-fun": {
+				"displayName": "fun [JP]",
+				"unitPattern-count-other": "{0} fun [JP]"
+			},
+			"concentr-part-per-1e9": {
 				"displayName": "ppb",
-				"unitPattern-count-other": "{0} ppb"
+				"unitPattern-count-other": "{0}ppb"
 			},
 			"duration-night": {
 				"displayName": "晚",
@@ -5598,11 +5816,13 @@
 		"BYR": 0,
 		"CLF": 4,
 		"CLP": 0,
+		"COP": 0,
 		"DEFAULT": 2,
 		"DJF": 0,
 		"ESP": 0,
 		"GNF": 0,
 		"HUF": 0,
+		"IDR": 0,
 		"IQD": 0,
 		"IRR": 0,
 		"ISK": 0,
@@ -5622,6 +5842,7 @@
 		"MMK": 0,
 		"MRO": 0,
 		"OMR": 3,
+		"PKR": 0,
 		"PYG": 0,
 		"RSD": 0,
 		"RWF": 0,
@@ -5656,45 +5877,46 @@
 	},
 	"eras-gregorian": {
 		"0": {
-			"_code": "gregory-inverse",
-			"_aliases": "bc bce",
+			"_code": "bce",
+			"_aliases": "bc",
 			"_end": "0-12-31"
 		},
 		"1": {
-			"_code": "gregory",
-			"_aliases": "ad ce",
+			"_code": "ce",
+			"_aliases": "ad",
 			"_start": "1-01-01"
 		}
 	},
 	"eras-islamic": {
 		"0": {
-			"_code": "islamic",
-			"_aliases": "ah",
-			"_start": "622-7-15"
+			"_code": "ah",
+			"_start": "622-07-19"
+		},
+		"1": {
+			"_code": "bh",
+			"_end": "622-07-18"
 		}
 	},
 	"eras-persian": {
 		"0": {
-			"_code": "persian",
-			"_aliases": "ap",
-			"_start": "622-01-01"
+			"_code": "ap",
+			"_start": "622-03-21"
 		}
 	},
 	"eras-buddhist": {
 		"0": {
-			"_code": "buddhist",
-			"_aliases": "be",
+			"_code": "be",
 			"_start": "-542-01-01"
 		}
 	},
 	"eras-japanese": {
 		"232": {
 			"_code": "meiji",
-			"_start": "1868-9-8"
+			"_start": "1868-10-23"
 		},
 		"233": {
 			"_code": "taisho",
-			"_start": "1912-7-30"
+			"_start": "1912-07-30"
 		},
 		"234": {
 			"_code": "showa",
@@ -5702,11 +5924,11 @@
 		},
 		"235": {
 			"_code": "heisei",
-			"_start": "1989-1-8"
+			"_start": "1989-01-08"
 		},
 		"236": {
 			"_code": "reiwa",
-			"_start": "2019-5-1"
+			"_start": "2019-05-01"
 		}
 	},
 	"dayPeriodRules": {

@@ -1,5 +1,5 @@
 {
-	"_version": "2.0.0",
+	"_version": "%LATEST_SCHEMA_VERSION%",
 	"sap.app": {
 		"id": "card.explorer.format.unit",
 		"type": "card",
@@ -81,8 +81,7 @@
 					"src": "{image}"
 				},
 				"info": {
-					"value": "{= format.unit(${Distance}, ${parameters>/cardUnitType/value})}"
-				}
+					"value": "{= format.unit(${Distance}, ${parameters>/cardUnitType/value})}"}
 			}
 		}
 	}

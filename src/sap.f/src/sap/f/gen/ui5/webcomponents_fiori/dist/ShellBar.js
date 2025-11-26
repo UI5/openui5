@@ -40,6 +40,7 @@ sap.ui.define(
      * @extends sap.ui.core.webc.WebComponent
      * @constructor
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/ShellBar
      */
 
@@ -47,7 +48,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents_fiori.dist.ShellBar",
       {
         metadata: {
-          tag: "ui5-shellbar-cc48984a",
+          tag: "ui5-shellbar-68f7652d",
 
           namespace: "sap.f.gen.ui5.webcomponents_fiori",
 
@@ -70,6 +71,7 @@ sap.ui.define(
               mapping: "property",
               defaultValue: false
             },
+
             /**
              * Disables the automatic search field expansion/collapse when the available space is not enough.
              *
@@ -80,23 +82,27 @@ sap.ui.define(
               mapping: "property",
               defaultValue: false
             },
+
             /**
              * Defines the `primaryTitle`.
              *
              * **Note:** The `primaryTitle` would be hidden on S screen size (less than approx. 700px).
              */
             primaryTitle: { type: "string", mapping: "property" },
+
             /**
              * Defines the `secondaryTitle`.
              *
              * **Note:** The `secondaryTitle` would be hidden on S and M screen sizes (less than approx. 1300px).
              */
             secondaryTitle: { type: "string", mapping: "property" },
+
             /**
              * Defines the `notificationsCount`,
              * displayed in the notification icon top-right corner.
              */
             notificationsCount: { type: "string", mapping: "property" },
+
             /**
              * Defines, if the notification icon would be displayed.
              */
@@ -105,6 +111,7 @@ sap.ui.define(
               mapping: "property",
               defaultValue: false
             },
+
             /**
              * Defines, if the product switch icon would be displayed.
              */
@@ -113,6 +120,7 @@ sap.ui.define(
               mapping: "property",
               defaultValue: false
             },
+
             /**
              * Defines, if the Search Field would be displayed when there is a valid `searchField` slot.
              *
@@ -123,6 +131,7 @@ sap.ui.define(
               mapping: "property",
               defaultValue: false
             },
+
             /**
              * Defines additional accessibility attributes on different areas of the component.
              *
@@ -158,14 +167,17 @@ sap.ui.define(
               mapping: "property",
               defaultValue: "{}"
             },
+
             /**
              * The text-content of the Web Component.
              */
             text: { type: "string", mapping: "textContent" },
+
             /**
              * The 'width' of the Web Component in <code>sap.ui.core.CSSSize</code>.
              */
             width: { type: "sap.ui.core.CSSSize", mapping: "style" },
+
             /**
              * The 'height' of the Web Component in <code>sap.ui.core.CSSSize</code>.
              */
@@ -580,6 +592,7 @@ sap.ui.define(
              * Returns the `logo` DOM ref.
              *
              * @private
+             * @ui5-restricted sap.ushell,sap.esh.search.ui
              * @name module:sap/f/gen/ui5/webcomponents_fiori/dist/ShellBar#getLogoDomRef
              * @function
              */
@@ -589,6 +602,7 @@ sap.ui.define(
              * Returns the `notifications` icon DOM ref.
              *
              * @private
+             * @ui5-restricted sap.ushell,sap.esh.search.ui
              * @name module:sap/f/gen/ui5/webcomponents_fiori/dist/ShellBar#getNotificationsDomRef
              * @function
              */
@@ -598,6 +612,7 @@ sap.ui.define(
              * Returns the `overflow` icon DOM ref.
              *
              * @private
+             * @ui5-restricted sap.ushell,sap.esh.search.ui
              * @name module:sap/f/gen/ui5/webcomponents_fiori/dist/ShellBar#getOverflowDomRef
              * @function
              */
@@ -607,6 +622,7 @@ sap.ui.define(
              * Returns the `profile` icon DOM ref.
              *
              * @private
+             * @ui5-restricted sap.ushell,sap.esh.search.ui
              * @name module:sap/f/gen/ui5/webcomponents_fiori/dist/ShellBar#getProfileDomRef
              * @function
              */
@@ -616,6 +632,7 @@ sap.ui.define(
              * Returns the `product-switch` icon DOM ref.
              *
              * @private
+             * @ui5-restricted sap.ushell,sap.esh.search.ui
              * @name module:sap/f/gen/ui5/webcomponents_fiori/dist/ShellBar#getProductSwitchDomRef
              * @function
              */
@@ -629,6 +646,7 @@ sap.ui.define(
              * Useful to manually close the overflow after having suppressed automatic closing with preventDefault() of ShellbarItem's press event
              *
              * @private
+             * @ui5-restricted sap.ushell,sap.esh.search.ui
              * @name module:sap/f/gen/ui5/webcomponents_fiori/dist/ShellBar#closeOverflow
              * @function
              */
@@ -638,6 +656,7 @@ sap.ui.define(
              * Returns the `search` icon DOM ref.
              *
              * @private
+             * @ui5-restricted sap.ushell,sap.esh.search.ui
              * @name module:sap/f/gen/ui5/webcomponents_fiori/dist/ShellBar#getSearchButtonDomRef
              * @function
              */

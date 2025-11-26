@@ -23,6 +23,7 @@ sap.ui.define(
      * @extends sap.ui.core.webc.WebComponent
      * @constructor
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      * @alias module:sap/f/gen/ui5/webcomponents/dist/ListItemGroup
      */
 
@@ -30,7 +31,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents.dist.ListItemGroup",
       {
         metadata: {
-          tag: "ui5-li-group-cc48984a",
+          tag: "ui5-li-group-68f7652d",
 
           namespace: "sap.f.gen.ui5.webcomponents",
 
@@ -47,10 +48,12 @@ sap.ui.define(
              * Defines the header text of the <code>ui5-li-group</code>.
              */
             headerText: { type: "string", mapping: "property" },
+
             /**
              * Defines the accessible name of the header.
              */
             headerAccessibleName: { type: "string", mapping: "property" },
+
             /**
              * Defines if the text of the component should wrap when it's too long.
              * When set to "Normal", the content (title, description) will be wrapped
@@ -70,14 +73,17 @@ sap.ui.define(
               mapping: "property",
               defaultValue: "None"
             },
+
             /**
              * The text-content of the Web Component.
              */
             text: { type: "string", mapping: "textContent" },
+
             /**
              * The 'width' of the Web Component in <code>sap.ui.core.CSSSize</code>.
              */
             width: { type: "sap.ui.core.CSSSize", mapping: "style" },
+
             /**
              * The 'height' of the Web Component in <code>sap.ui.core.CSSSize</code>.
              */

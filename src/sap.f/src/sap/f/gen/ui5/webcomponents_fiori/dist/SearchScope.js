@@ -18,6 +18,7 @@ sap.ui.define(
      * @extends sap.ui.core.webc.WebComponent
      * @constructor
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/SearchScope
      */
 
@@ -25,7 +26,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents_fiori.dist.SearchScope",
       {
         metadata: {
-          tag: "ui5-search-scope-cc48984a",
+          tag: "ui5-search-scope-68f7652d",
 
           namespace: "sap.f.gen.ui5.webcomponents_fiori",
 
@@ -43,6 +44,7 @@ sap.ui.define(
              * Defines the text of the component.
              */
             text: { type: "string", mapping: "property", defaultValue: "" },
+
             /**
              * Indicates whether the item is selected
              */
@@ -51,10 +53,12 @@ sap.ui.define(
               mapping: "property",
               defaultValue: false
             },
+
             /**
              * The 'width' of the Web Component in <code>sap.ui.core.CSSSize</code>.
              */
             width: { type: "sap.ui.core.CSSSize", mapping: "style" },
+
             /**
              * The 'height' of the Web Component in <code>sap.ui.core.CSSSize</code>.
              */

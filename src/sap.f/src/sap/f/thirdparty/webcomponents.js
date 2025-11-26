@@ -4555,7 +4555,7 @@ sap.ui.define(['require', 'exports', 'sap/f/thirdparty/Icons'], (function (requi
         supportsTouch: Icons.l$2
     });
 
-    Icons.l$4("cc48984a");
+    Icons.l$4("68f7652d");
 
     exports.A = A;
     exports.C = C$2;

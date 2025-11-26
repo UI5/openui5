@@ -1,5 +1,5 @@
 {
-	"_version": "2.0.0",
+	"_version": "%LATEST_SCHEMA_VERSION%",
 	"sap.app": {
 		"id": "card.explorer.parameters.arrayParameters",
 		"type": "card",
@@ -31,16 +31,10 @@
 			"editor": "dt/Configuration",
 			"parameters": {
 				"visibleCompanyFields": {
-					"value": [
-						"companyDetails",
-						"companyName"
-					]
+					"value": ["companyDetails", "companyName"]
 				},
 				"teamMembers": {
-					"value": [
-						"Alain Chevalier",
-						"Donna Moore"
-					]
+					"value": ["Alain Chevalier", "Donna Moore"]
 				}
 			}
 		},

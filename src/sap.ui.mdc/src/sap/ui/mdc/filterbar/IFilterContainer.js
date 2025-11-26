@@ -29,6 +29,16 @@ sap.ui.define([
 	};
 
 	/**
+	 * Adds a button control to the inner layout of the <code>IFilterContainer</code>.
+	 * @public
+	 * @param {sap.ui.core.Control} oControl Control that is added
+	 * @since 1.144
+	 */
+	IFilterContainer.prototype.addButton = function(oControl) {
+		//add the button to the inner layout this.oLayout
+	};
+
+	/**
 	 * Gets the inner layout item.
 	 * @returns {sap.ui.core.Control} Control instance of the inner layout item
 	 * @public

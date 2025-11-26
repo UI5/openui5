@@ -5215,7 +5215,7 @@ sap.ui.define([
 			oCache.aElements.$byPredicate["('23')"] = oChildNode;
 			const oGroupLock = {getUnlockedCopy : mustBeMocked};
 			const oRequestorMock = self.mock(self.oRequestor);
-			self.mock(oCache).expects("getTypes").exactly(bCopy ? 1 : 0).withExactArgs()
+			self.mock(oCache).expects("getTypes").exactly(bCopy ? 2 : 0).withExactArgs()
 				.returns({"/~sMetaPath~" : "~oType~"});
 			let mQueryOptions;
 			self.mock(_Helper).expects("selectKeyProperties").exactly(bCopy ? 1 : 0)
@@ -5258,6 +5258,7 @@ sap.ui.define([
 			assert.strictEqual(typeof fnGetRank, "function");
 			assert.strictEqual(bRefresh, true, "refresh needed");
 
+			self.mock(_Helper).expects("getKeyPredicate").exactly(bCopy ? 1 : 0).returns("n/a");
 			oCacheMock.expects("requestRank").exactly(bCopy ? 1 : 0)
 				.withExactArgs("~oCopy~", sinon.match.same(oGroupLock), true)
 				.resolves("~limitedRank~");
@@ -5416,12 +5417,14 @@ sap.ui.define([
 		[null, "Foo('43')"].forEach((sSiblingPath) => {
 			[false, true].forEach((bRequestSiblingRank) => {
 				[false, true].forEach((bCopy) => {
-					const sTitle = `move: refresh needed (rank=${vRank}, sibling=${sSiblingPath}`
-						+ `, request sibling rank=${bRequestSiblingRank}, bCopy=${bCopy})`;
+					[undefined, 17].forEach((iCopyIndex) => {
+						const sTitle = `move: refresh needed (rank=${vRank}, sibling=${sSiblingPath}`
+							+ `, request sibling rank=${bRequestSiblingRank}, bCopy=${bCopy})`
+							+ `, iCopyIndex=${iCopyIndex}`;
 
-					if (bRequestSiblingRank && !sSiblingPath) {
-						return;
-					}
+						if (bRequestSiblingRank && !sSiblingPath || iCopyIndex && !bCopy) {
+							return;
+						}
 
 		QUnit.test(sTitle, async function (assert) {
 			const oCache = _AggregationCache.create(this.oRequestor, "~sMetaPath~", "", {}, {
@@ -5502,7 +5505,14 @@ sap.ui.define([
 			assert.strictEqual(typeof fnGetRank, "function");
 			assert.strictEqual(bRefresh, true, "refresh needed");
 
-			oCacheMock.expects("requestRank").exactly(bCopy ? 1 : 0)
+			oCacheMock.expects("getTypes").exactly(bCopy ? 1 : 0).withExactArgs().returns("~getTypes~");
+			this.mock(_Helper).expects("getKeyPredicate").exactly(bCopy ? 1 : 0)
+				.withExactArgs("~oCopy~", "/~sMetaPath~", "~getTypes~").returns("~sPredicate~");
+			if (iCopyIndex) {
+				oCache.aElements.$byPredicate["~sPredicate~"]
+					= oCache.aElements[iCopyIndex] = "~oCopiedNode~";
+			}
+			oCacheMock.expects("requestRank").exactly(bCopy && !iCopyIndex ? 1 : 0)
 				.withExactArgs("~oCopy~", sinon.match.same(oGroupLock), true)
 				.resolves("~limitedRank~");
 			oCacheMock.expects("findIndex").exactly(vRank ? 1 : 0)
@@ -5515,13 +5525,16 @@ sap.ui.define([
 
 			assert.strictEqual(aResult[0], vRank ? "~findIndex~child~" : undefined);
 			assert.strictEqual(aResult[1], bRequestSiblingRank && "~findIndex~sibling~");
-			if (bCopy) {
+			if (iCopyIndex) {
+				assert.strictEqual(aResult[2].getResult(), iCopyIndex);
+			} else if (bCopy) {
 				oCacheMock.expects("findIndex").withExactArgs("~limitedRank~")
 					.returns("~findIndex~copy~");
 				assert.ok(aResult[2] instanceof Promise);
 				assert.strictEqual(await aResult[2], "~findIndex~copy~");
 			}
 		});
+					});
 				});
 			});
 		});

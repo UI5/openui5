@@ -315,7 +315,7 @@ sap.ui.define([], function() {
 		"America/Thunder_Bay": "America/Toronto",
 		"America/Virgin": "America/St_Thomas",
 		"America/Yellowknife": "America/Edmonton",
-		"Antarctica/South_Pole": "Pacific/Auckland",
+		"Antarctica/South_Pole": "Antarctica/McMurdo",
 		"Asia/Ashkhabad": "Asia/Ashgabat",
 		"Asia/Calcutta": "Asia/Kolkata",
 		"Asia/Choibalsan": "Asia/Ulaanbaatar",

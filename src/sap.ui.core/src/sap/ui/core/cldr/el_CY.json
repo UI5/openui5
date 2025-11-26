@@ -1,7 +1,7 @@
 {
 	"__license": "This file has been derived from Unicode Common Locale Data Repository (CLDR) files (http://cldr.unicode.org). See the copyright and permission notice in the Unicode-Data-Files-LICENSE.txt available at the same location as this file or visit http://www.unicode.org/copyright.html",
-	"__version": "46.1.0",
-	"__buildtime": "2025-01-28T09:40:27.437Z",
+	"__version": "48.0.0",
+	"__buildtime": "2025-11-18T12:31:55.685Z",
 	"languages": {
 		"aa": "Αφάρ",
 		"ab": "Αμπχαζικά",
@@ -282,6 +282,8 @@
 		"ksf": "Μπάφια",
 		"ksh": "Κολωνικά",
 		"ku": "Κουρδικά",
+		"ku_menu-core": "Κουρδικά",
+		"ku_menu-extension": "Κουρμάντζι",
 		"kum": "Κουμγιούκ",
 		"kut": "Κουτενάι",
 		"kv": "Κόμι",
@@ -360,6 +362,7 @@
 		"myv": "Έρζια",
 		"mzn": "Μαζαντεράνι",
 		"na": "Ναούρου",
+		"nan": "Μιν Ναν",
 		"nap": "Ναπολιτανικά",
 		"naq": "Νάμα",
 		"nb": "Νορβηγικά Μποκμάλ",
@@ -808,13 +811,13 @@
 		"CG-alt-variant": "Κονγκό (Δημοκρατία)",
 		"CH": "Ελβετία",
 		"CI": "Ακτή Ελεφαντοστού",
-		"CI-alt-variant": "Ακτή Ελεφαντοστού",
 		"CK": "Νήσοι Κουκ",
 		"CL": "Χιλή",
 		"CM": "Καμερούν",
 		"CN": "Κίνα",
 		"CO": "Κολομβία",
 		"CP": "Νήσος Κλίπερτον",
+		"CQ": "Σαρκ",
 		"CR": "Κόστα Ρίκα",
 		"CU": "Κούβα",
 		"CV": "Πράσινο Ακρωτήριο",
@@ -881,7 +884,6 @@
 		"IM": "Νήσος του Μαν",
 		"IN": "Ινδία",
 		"IO": "Βρετανικά Εδάφη Ινδικού Ωκεανού",
-		"IO-alt-biot": "Βρετανικά Εδάφη Ινδικού Ωκεανού",
 		"IO-alt-chagos": "Αρχιπέλαγος Τσάγκος",
 		"IQ": "Ιράκ",
 		"IR": "Ιράν",
@@ -1009,7 +1011,6 @@
 		"TN": "Τυνησία",
 		"TO": "Τόνγκα",
 		"TR": "Τουρκία",
-		"TR-alt-variant": "Τουρκία",
 		"TT": "Τρινιντάντ και Τομπάγκο",
 		"TV": "Τουβαλού",
 		"TW": "Ταϊβάν",
@@ -1067,15 +1068,19 @@
 				"Bhms": "h:mm:ss B",
 				"d": "d",
 				"E": "ccc",
+				"EBh": "E h B",
 				"EBhm": "E h:mm B",
 				"EBhms": "E h:mm:ss B",
 				"Ed": "E d",
+				"Eh": "E h a",
 				"Ehm": "E h:mm a",
 				"EHm": "E HH:mm",
 				"Ehms": "E h:mm:ss a",
 				"EHms": "E HH:mm:ss",
 				"Gy": "y G",
+				"GyM": "G y-MM",
 				"GyMd": "d/M/y GGGGG",
+				"GyMEd": "E, dd-MM-y G",
 				"GyMMM": "LLL y G",
 				"GyMMMd": "d MMM y G",
 				"GyMMMEd": "E d MMM y G",
@@ -1086,9 +1091,11 @@
 				"hms": "h:mm:ss a",
 				"Hms": "HH:mm:ss",
 				"hmsv": "h:mm:ss a v",
-				"Hmsv": "HH:mm:ss v",
+				"Hmsv": "HH:mm:ss (vvvv)",
 				"hmv": "h:mm a v",
-				"Hmv": "HH:mm v",
+				"Hmv": "HH:mm (vvvv)",
+				"hv": "h a v",
+				"Hv": "HH'h' (vvvv)",
 				"M": "L",
 				"Md": "d/M",
 				"MEd": "E d/M",
@@ -1586,15 +1593,19 @@
 				"Bhms": "h:mm:ss B",
 				"d": "d",
 				"E": "ccc",
+				"EBh": "E h B",
 				"EBhm": "E h:mm B",
 				"EBhms": "E h:mm:ss B",
 				"Ed": "E d",
+				"Eh": "E h a",
 				"Ehm": "E h:mm a",
 				"EHm": "E HH:mm",
 				"Ehms": "E h:mm:ss a",
 				"EHms": "E HH:mm:ss",
 				"Gy": "y G",
+				"GyM": "MM-y G",
 				"GyMd": "d/M/y GGGGG",
+				"GyMEd": "E, dd-MM-y G",
 				"GyMMM": "MMM y G",
 				"GyMMMd": "d MMM y G",
 				"GyMMMEd": "E, d MMM y G",
@@ -1604,6 +1615,8 @@
 				"Hm": "HH:mm",
 				"hms": "h:mm:ss a",
 				"Hms": "HH:mm:ss",
+				"hv": "h a (vvvv)",
+				"Hv": "HH'h' (vvvv)",
 				"M": "L",
 				"Md": "d/M",
 				"MEd": "E, d/M",
@@ -2064,13 +2077,16 @@
 			}
 		},
 		"era-wide": {
-			"0": "Ε.Ε."
+			"0": "Ε.Ε.",
+			"1": "BH"
 		},
 		"era-abbreviated": {
-			"0": "Ε.Ε."
+			"0": "Ε.Ε.",
+			"1": "BH"
 		},
 		"era-narrow": {
-			"0": "Ε.Ε."
+			"0": "Ε.Ε.",
+			"1": "BH"
 		}
 	},
 	"ca-japanese": {
@@ -2097,15 +2113,19 @@
 				"Bhms": "h:mm:ss B",
 				"d": "d",
 				"E": "ccc",
+				"EBh": "E h B",
 				"EBhm": "E h:mm B",
 				"EBhms": "E h:mm:ss B",
 				"Ed": "E d",
+				"Eh": "E h a",
 				"Ehm": "E h:mm a",
 				"EHm": "E HH:mm",
 				"Ehms": "E h:mm:ss a",
 				"EHms": "E HH:mm:ss",
 				"Gy": "y G",
+				"GyM": "MM-y G",
 				"GyMd": "d/M/y GGGGG",
+				"GyMEd": "E, dd-MM-y G",
 				"GyMMM": "MMM y G",
 				"GyMMMd": "d MMM y G",
 				"GyMMMEd": "E, d MMM y G",
@@ -2115,6 +2135,8 @@
 				"Hm": "HH:mm",
 				"hms": "h:mm:ss a",
 				"Hms": "HH:mm:ss",
+				"hv": "h a (vvvv)",
+				"Hv": "HH'h' (vvvv)",
 				"M": "L",
 				"Md": "d/M",
 				"MEd": "E, d/M",
@@ -2635,15 +2657,19 @@
 				"Bhms": "h:mm:ss B",
 				"d": "d",
 				"E": "ccc",
+				"EBh": "E h B",
 				"EBhm": "E h:mm B",
 				"EBhms": "E h:mm:ss B",
 				"Ed": "E d",
+				"Eh": "E h a",
 				"Ehm": "E h:mm a",
 				"EHm": "E HH:mm",
 				"Ehms": "E h:mm:ss a",
 				"EHms": "E HH:mm:ss",
 				"Gy": "y G",
+				"GyM": "MM-y G",
 				"GyMd": "d/M/y GGGGG",
+				"GyMEd": "E, dd-MM-y G",
 				"GyMMM": "MMM y G",
 				"GyMMMd": "d MMM y G",
 				"GyMMMEd": "E, d MMM y G",
@@ -2653,6 +2679,8 @@
 				"Hm": "HH:mm",
 				"hms": "h:mm:ss a",
 				"Hms": "HH:mm:ss",
+				"hv": "h a (vvvv)",
+				"Hv": "HH'h' (vvvv)",
 				"M": "L",
 				"Md": "d/M",
 				"MEd": "E, d/M",
@@ -3146,15 +3174,19 @@
 				"Bhms": "h:mm:ss B",
 				"d": "d",
 				"E": "ccc",
+				"EBh": "E h B",
 				"EBhm": "E h:mm B",
 				"EBhms": "E h:mm:ss B",
 				"Ed": "E d",
+				"Eh": "E h a",
 				"Ehm": "E h:mm a",
 				"EHm": "E HH:mm",
 				"Ehms": "E h:mm:ss a",
 				"EHms": "E HH:mm:ss",
 				"Gy": "y G",
+				"GyM": "MM-y G",
 				"GyMd": "d/M/y GGGGG",
+				"GyMEd": "E, dd-MM-y G",
 				"GyMMM": "MMM y G",
 				"GyMMMd": "d MMM y G",
 				"GyMMMEd": "E, d MMM y G",
@@ -3164,6 +3196,8 @@
 				"Hm": "HH:mm",
 				"hms": "h:mm:ss a",
 				"Hms": "HH:mm:ss",
+				"hv": "h a (vvvv)",
+				"Hv": "HH'h' (vvvv)",
 				"M": "L",
 				"Md": "d/M",
 				"MEd": "E, d/M",
@@ -4070,6 +4104,7 @@
 			"Chihuahua": "Τσιουάουα",
 			"Ciudad_Juarez": "Σιουδάδ Χουάρες",
 			"Costa_Rica": "Κόστα Ρίκα",
+			"Coyhaique": "Κοϊάικε",
 			"Creston": "Κρέστον",
 			"Cuiaba": "Κουιαμπά",
 			"Curacao": "Κουρασάο",
@@ -4495,11 +4530,15 @@
 	},
 	"currencyFormat": {
 		"standard": "#,##0.00 ¤",
+		"standard-alphaNextToNumber": "#,##0.00 ¤",
 		"standard-noCurrency": "#,##0.00",
 		"accounting": "#,##0.00 ¤",
+		"accounting-alphaNextToNumber": "#,##0.00 ¤",
 		"accounting-noCurrency": "#,##0.00",
 		"sap-standard": "#,##0.00 ¤",
+		"sap-standard-alphaNextToNumber": "#,##0.00 ¤",
 		"sap-accounting": "#,##0.00 ¤",
+		"sap-accounting-alphaNextToNumber": "#,##0.00 ¤",
 		"sap-standard-noCurrency": "#,##0.00",
 		"sap-accounting-noCurrency": "#,##0.00"
 	},
@@ -4817,7 +4856,12 @@
 				"unitPattern-count-one": "{0} στοιχείο",
 				"unitPattern-count-other": "{0} στοιχεία"
 			},
-			"concentr-permillion": {
+			"concentr-part": {
+				"displayName": "μέρος",
+				"unitPattern-count-one": "{0} μέρος",
+				"unitPattern-count-other": "{0} μέρη"
+			},
+			"concentr-part-per-1e6": {
 				"displayName": "μέρη/εκατ.",
 				"unitPattern-count-other": "{0} ppm"
 			},
@@ -4837,6 +4881,10 @@
 				"displayName": "μολ",
 				"unitPattern-count-one": "{0} μολ",
 				"unitPattern-count-other": "{0} μολ"
+			},
+			"concentr-ofglucose": {
+				"displayName": "Glc",
+				"unitPattern-count-other": "{0} Glc"
 			},
 			"consumption-liter-per-kilometer": {
 				"displayName": "λίτρα/χλμ.",
@@ -5322,6 +5370,10 @@
 				"unitPattern-count-one": "{0} mmHg",
 				"unitPattern-count-other": "{0} mmHg"
 			},
+			"pressure-ofhg": {
+				"displayName": "Hg",
+				"unitPattern-count-other": "{0} Hg"
+			},
 			"pressure-pound-force-per-square-inch": {
 				"displayName": "psi",
 				"unitPattern-count-other": "{0} psi"
@@ -5476,6 +5528,11 @@
 				"unitPattern-count-one": "{0} μετρ. κύπελλο",
 				"unitPattern-count-other": "{0} μετρ. κύπελλα"
 			},
+			"volume-fluid-ounce-metric": {
+				"displayName": "μ. ουγγιά υγρ.",
+				"unitPattern-count-one": "μ. ουγγιά υγρ.",
+				"unitPattern-count-other": "{0} μ. ουγγιές υγρ."
+			},
 			"volume-acre-foot": {
 				"displayName": "ακρ πόδια",
 				"unitPattern-count-one": "{0} ακρ πδ",
@@ -5508,10 +5565,18 @@
 				"unitPattern-count-one": "{0} πντ",
 				"unitPattern-count-other": "{0} πντ"
 			},
+			"volume-pint-imperial": {
+				"displayName": "pint Imp.",
+				"unitPattern-count-other": "{0} pt Imp."
+			},
 			"volume-cup": {
 				"displayName": "κύπ.",
 				"unitPattern-count-one": "{0} κύπ.",
 				"unitPattern-count-other": "{0} κύπ."
+			},
+			"volume-cup-imperial": {
+				"displayName": "cup Imp.",
+				"unitPattern-count-other": "{0} cup Imp."
 			},
 			"volume-fluid-ounce": {
 				"displayName": "fl oz",
@@ -5573,12 +5638,165 @@
 				"unitPattern-count-one": "{0} αγγλ. τέτ. γαλ.",
 				"unitPattern-count-other": "{0} αγγλ. τέτ. γαλ."
 			},
+			"angle-steradian": {
+				"displayName": "sr",
+				"unitPattern-count-other": "{0} sr"
+			},
+			"concentr-katal": {
+				"displayName": "kat",
+				"unitPattern-count-one": "{0} kat",
+				"unitPattern-count-other": "{0} kat"
+			},
+			"electric-coulomb": {
+				"displayName": "C",
+				"unitPattern-count-other": "{0} C"
+			},
+			"electric-farad": {
+				"displayName": "F",
+				"unitPattern-count-other": "{0} F"
+			},
+			"electric-henry": {
+				"displayName": "H",
+				"unitPattern-count-other": "{0} H"
+			},
+			"electric-siemens": {
+				"displayName": "S",
+				"unitPattern-count-other": "{0} S"
+			},
+			"energy-calorie-it": {
+				"displayName": "cal-IT",
+				"unitPattern-count-other": "{0} cal-IT"
+			},
+			"energy-british-thermal-unit-it": {
+				"displayName": "BTU-IT",
+				"unitPattern-count-other": "{0} BTU-IT"
+			},
+			"energy-becquerel": {
+				"displayName": "Bq",
+				"unitPattern-count-other": "{0} Bq"
+			},
+			"energy-sievert": {
+				"displayName": "Sv",
+				"unitPattern-count-other": "{0} Sv"
+			},
+			"energy-gray": {
+				"displayName": "Gy",
+				"unitPattern-count-other": "{0} Gy"
+			},
+			"force-kilogram-force": {
+				"displayName": "kgf",
+				"unitPattern-count-other": "{0} kgf"
+			},
+			"length-rod": {
+				"displayName": "rod",
+				"unitPattern-count-other": "{0} rod"
+			},
+			"length-chain": {
+				"displayName": "chain",
+				"unitPattern-count-other": "{0} chain"
+			},
+			"magnetic-tesla": {
+				"displayName": "T",
+				"unitPattern-count-other": "{0} T"
+			},
+			"magnetic-weber": {
+				"displayName": "Wb",
+				"unitPattern-count-other": "{0} Wb"
+			},
+			"temperature-rankine": {
+				"displayName": "°R",
+				"unitPattern-count-other": "{0} °R"
+			},
+			"duration-fortnight": {
+				"displayName": "fortnight",
+				"unitPattern-count-other": "{0} fw"
+			},
+			"mass-slug": {
+				"displayName": "slug",
+				"unitPattern-count-other": "{0} slug"
+			},
+			"pressure-gasoline-energy-density": {
+				"displayName": "gas E",
+				"unitPattern-count-other": "{0} gas E"
+			},
+			"length-rin": {
+				"displayName": "rin [JP]",
+				"unitPattern-count-other": "{0} rin [JP]"
+			},
+			"length-sun": {
+				"displayName": "sun [JP]",
+				"unitPattern-count-other": "{0} sun [JP]"
+			},
+			"length-shaku-length": {
+				"displayName": "shaku [JP]",
+				"unitPattern-count-other": "{0} shaku [JP]"
+			},
+			"length-shaku-cloth": {
+				"displayName": "shaku [cloth, JP]",
+				"unitPattern-count-other": "{0} shaku [cloth, JP]"
+			},
+			"length-ken": {
+				"displayName": "ken [JP]",
+				"unitPattern-count-other": "{0} ken [JP]"
+			},
+			"length-jo-jp": {
+				"displayName": "jo [JP]",
+				"unitPattern-count-other": "{0} jo [JP]"
+			},
+			"length-ri-jp": {
+				"displayName": "ri [JP]",
+				"unitPattern-count-other": "{0} ri [JP]"
+			},
+			"area-bu-jp": {
+				"displayName": "bu [JP]",
+				"unitPattern-count-other": "{0} bu [JP]"
+			},
+			"area-se-jp": {
+				"displayName": "se [JP]",
+				"unitPattern-count-other": "{0} se [JP]"
+			},
+			"area-cho": {
+				"displayName": "cho [JP]",
+				"unitPattern-count-other": "{0} cho [JP]"
+			},
+			"volume-kosaji": {
+				"displayName": "kosaji [JP]",
+				"unitPattern-count-other": "{0} kosaji [JP]"
+			},
+			"volume-osaji": {
+				"displayName": "osaji [JP]",
+				"unitPattern-count-other": "{0} osaji [JP]"
+			},
+			"volume-cup-jp": {
+				"displayName": "cup [JP]",
+				"unitPattern-count-other": "{0} cup [JP]"
+			},
+			"volume-shaku": {
+				"displayName": "shaku [vol, JP]",
+				"unitPattern-count-other": "{0} shaku [vol, JP]"
+			},
+			"volume-sai": {
+				"displayName": "sai [JP]",
+				"unitPattern-count-other": "{0} sai [JP]"
+			},
+			"volume-to-jp": {
+				"displayName": "to [JP]",
+				"unitPattern-count-other": "{0} to [JP]"
+			},
+			"volume-koku": {
+				"displayName": "koku [JP]",
+				"unitPattern-count-other": "{0} koku [JP]"
+			},
 			"speed-light-speed": {
 				"displayName": "φως",
 				"unitPattern-count-one": "{0} φως",
 				"unitPattern-count-other": "{0} φως"
 			},
-			"concentr-portion-per-1e9": {
+			"mass-fun": {
+				"displayName": "fun [JP]",
+				"unitPattern-count-other": "{0} fun [JP]"
+			},
+			"concentr-part-per-1e9": {
 				"displayName": "μέρη/δισεκατομμύριο",
 				"unitPattern-count-other": "{0} ppb"
 			},
@@ -5637,11 +5855,13 @@
 		"BYR": 0,
 		"CLF": 4,
 		"CLP": 0,
+		"COP": 0,
 		"DEFAULT": 2,
 		"DJF": 0,
 		"ESP": 0,
 		"GNF": 0,
 		"HUF": 0,
+		"IDR": 0,
 		"IQD": 0,
 		"IRR": 0,
 		"ISK": 0,
@@ -5661,6 +5881,7 @@
 		"MMK": 0,
 		"MRO": 0,
 		"OMR": 3,
+		"PKR": 0,
 		"PYG": 0,
 		"RSD": 0,
 		"RWF": 0,
@@ -5697,45 +5918,46 @@
 	},
 	"eras-gregorian": {
 		"0": {
-			"_code": "gregory-inverse",
-			"_aliases": "bc bce",
+			"_code": "bce",
+			"_aliases": "bc",
 			"_end": "0-12-31"
 		},
 		"1": {
-			"_code": "gregory",
-			"_aliases": "ad ce",
+			"_code": "ce",
+			"_aliases": "ad",
 			"_start": "1-01-01"
 		}
 	},
 	"eras-islamic": {
 		"0": {
-			"_code": "islamic",
-			"_aliases": "ah",
-			"_start": "622-7-15"
+			"_code": "ah",
+			"_start": "622-07-19"
+		},
+		"1": {
+			"_code": "bh",
+			"_end": "622-07-18"
 		}
 	},
 	"eras-persian": {
 		"0": {
-			"_code": "persian",
-			"_aliases": "ap",
-			"_start": "622-01-01"
+			"_code": "ap",
+			"_start": "622-03-21"
 		}
 	},
 	"eras-buddhist": {
 		"0": {
-			"_code": "buddhist",
-			"_aliases": "be",
+			"_code": "be",
 			"_start": "-542-01-01"
 		}
 	},
 	"eras-japanese": {
 		"232": {
 			"_code": "meiji",
-			"_start": "1868-9-8"
+			"_start": "1868-10-23"
 		},
 		"233": {
 			"_code": "taisho",
-			"_start": "1912-7-30"
+			"_start": "1912-07-30"
 		},
 		"234": {
 			"_code": "showa",
@@ -5743,11 +5965,11 @@
 		},
 		"235": {
 			"_code": "heisei",
-			"_start": "1989-1-8"
+			"_start": "1989-01-08"
 		},
 		"236": {
 			"_code": "reiwa",
-			"_start": "2019-5-1"
+			"_start": "2019-05-01"
 		}
 	},
 	"dayPeriodRules": {

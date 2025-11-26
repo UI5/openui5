@@ -99,6 +99,7 @@ sap.ui.define(["sap/ui/Device"], function(Device) {
 		"America/Chihuahua",
 		"America/Ciudad_Juarez",
 		"America/Costa_Rica",
+		"America/Coyhaique",
 		"America/Creston",
 		"America/Cuiaba",
 		"America/Curacao",
@@ -500,7 +501,7 @@ sap.ui.define(["sap/ui/Device"], function(Device) {
 
 
 	/**
-	 * CLDR 46.1.0 time zone IDs which are extracted from the first entries of the <code>_alias</code> properties of the
+	 * CLDR 48.0.0 time zone IDs which are extracted from the first entries of the <code>_alias</code> properties of the
 	 * <code>timezone.json</code> file in the BCP47 CLDR package, see
 	 * https://github.com/unicode-org/cldr-json/blob/main/cldr-json/cldr-bcp47/bcp47/timezone.json.
 	 *
@@ -600,6 +601,7 @@ sap.ui.define(["sap/ui/Device"], function(Device) {
 		"America/Coral_Harbour",
 		"America/Cordoba",
 		"America/Costa_Rica",
+		"America/Coyhaique",
 		"America/Creston",
 		"America/Cuiaba",
 		"America/Curacao",

@@ -72,6 +72,8 @@ sap.ui.define([
 
 		assert.ok(!this.title1.getWrapping(), "Default property 'wrapping'");
 		assert.ok(this.title2.getWrapping(), "Custom property 'wrapping'");
+
+		assert.ok(this.title1.isA("sap.ui.core.ITitle"), "Title control implements the ITitle interface");
 	});
 
 	QUnit.test("Title should be shrinkable", function(assert){
