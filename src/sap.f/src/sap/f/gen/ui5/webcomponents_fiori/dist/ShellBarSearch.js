@@ -17,6 +17,7 @@ sap.ui.define(
      * @extends module:sap/f/gen/ui5/webcomponents_fiori/dist/Search
      * @constructor
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/ShellBarSearch
      */
 
@@ -24,7 +25,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents_fiori.dist.ShellBarSearch",
       {
         metadata: {
-          tag: "ui5-shellbar-search-cc48984a",
+          tag: "ui5-shellbar-search-68f7652d",
 
           namespace: "sap.f.gen.ui5.webcomponents_fiori",
 
@@ -46,6 +47,7 @@ sap.ui.define(
               mapping: "property",
               defaultValue: false
             },
+
             /**
              * Indicates whether a loading indicator should be shown in the popup.
              */
@@ -54,6 +56,7 @@ sap.ui.define(
               mapping: "property",
               defaultValue: false
             },
+
             /**
              * Defines whether the value will be autcompleted to match an item.
              */
@@ -62,10 +65,12 @@ sap.ui.define(
               mapping: "property",
               defaultValue: false
             },
+
             /**
              * Indicates whether the items picker is open.
              */
             open: { type: "boolean", mapping: "property", defaultValue: false },
+
             /**
              * Defines whether the clear icon of the search will be shown.
              */
@@ -74,21 +79,25 @@ sap.ui.define(
               mapping: "property",
               defaultValue: false
             },
+
             /**
              * Defines the value of the component.
              *
              * **Note:** The property is updated upon typing.
              */
             value: { type: "string", mapping: "property", defaultValue: "" },
+
             /**
              * Defines a short hint intended to aid the user with data entry when the
              * component has no value.
              */
             placeholder: { type: "string", mapping: "property" },
+
             /**
              * Defines the accessible ARIA name of the component.
              */
             accessibleName: { type: "string", mapping: "property" },
+
             /**
              * Defines the accessible ARIA description of the field.
              */

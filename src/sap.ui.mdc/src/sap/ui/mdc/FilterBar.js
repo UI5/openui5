@@ -4,7 +4,7 @@
 sap.ui.define([
 	"sap/ui/mdc/p13n/subcontroller/FilterController",
 	"sap/ui/mdc/p13n/subcontroller/AdaptFiltersController",
-	"sap/ui/mdc/filterbar/aligned/FilterContainer",
+	"sap/ui/mdc/filterbar/FilterContainer",
 	"sap/ui/mdc/filterbar/aligned/FilterItemLayout",
 	"sap/ui/mdc/filterbar/FilterBarBase",
 	"sap/ui/mdc/filterbar/FilterBarBaseRenderer",
@@ -97,8 +97,6 @@ sap.ui.define([
 	FilterBar.prototype._createInnerLayout = function() {
 		this._cLayoutItem = FilterItemLayout;
 		this._oFilterBarLayout = new FilterContainer();
-		this._oFilterBarLayout.getInner().setParent(this);
-		this._oFilterBarLayout.getInner().addStyleClass("sapUiMdcFilterBarBaseAFLayout");
 		this.setAggregation("layout", this._oFilterBarLayout, true);
 		this._addButtons();
 	};
@@ -146,8 +144,6 @@ sap.ui.define([
 
 	FilterBar.prototype._addButtons = function() {
 
-		if (this._oFilterBarLayout) {
-
 			this.setProperty("_filterCount", this._oRb.getText("filterbar.ADAPT"), false);
 
 			this._btnAdapt = new Button(this.getId() + "-btnAdapt", {
@@ -155,7 +151,6 @@ sap.ui.define([
 				text: "{" + FilterBarBase.INNER_MODEL_NAME + ">/_filterCount}",
 				press: this.onAdaptFilters.bind(this)
 			});
-			this._btnAdapt.setModel(this._oModel, FilterBarBase.INNER_MODEL_NAME);
 
 			this._btnAdapt.bindProperty("visible", {
 				parts: [{
@@ -171,7 +166,6 @@ sap.ui.define([
 			});
 
 			this._btnSearch = this._getSearchButton();
-			this._btnSearch.setModel(this._oModel, FilterBarBase.INNER_MODEL_NAME);
 			this._btnSearch.bindProperty("visible", {
 				parts: [{
 					path: "/showGoButton",
@@ -194,13 +188,14 @@ sap.ui.define([
 					this.onClear();
 				}.bind(this)
 			});
-			this._btnClear.setModel(this._oModel, FilterBarBase.INNER_MODEL_NAME);
-			//this._btnClear.addStyleClass("sapUiMdcFilterBarBaseButtonPaddingRight");
 
 			this._oFilterBarLayout.addButton(this._btnSearch);
 			this._oFilterBarLayout.addButton(this._btnClear);
 			this._oFilterBarLayout.addButton(this._btnAdapt);
-		}
+	};
+
+	FilterBar.prototype._getButtons = function () {
+		return this._oFilterBarLayout.getButtons();
 	};
 
 	FilterBar.prototype.onClear = function() {

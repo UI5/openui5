@@ -88,6 +88,16 @@ sap.ui.define(
 						filterFieldThreshold: {
 							type: "int",
 							defaultValue: 8
+						},
+
+						/**
+						 * Internal property to bind the <code>visible</code> property of the ShowAllFilters button.<br>
+						 */
+						_showAllFiltersEnabled: {
+							type: "boolean",
+							group: "Appearance",
+							defaultValue: false,
+							visibility: "hidden"
 						}
 					},
 					aggregations: {}
@@ -146,10 +156,18 @@ sap.ui.define(
 				type: ButtonType.Transparent,
 				press: this._onShowAllFilters.bind(this),
 				text: this._oRb.getText("valuehelp.SHOWALLFILTERS"),
-				visible: false
+				visible: {
+					parts: [
+						{ path: "/_showAllFiltersEnabled", model: FilterBarBase.INNER_MODEL_NAME },
+						{ path: "/expandFilterFields", model: FilterBarBase.INNER_MODEL_NAME }
+					],
+					formatter: function(bShowAllFiltersEnabled, bExpandFilterFields) {
+						return bShowAllFiltersEnabled && bExpandFilterFields;
+					}
+				}
 			});
 
-			this._oFilterBarLayout.addEndContent(this._oShowAllFiltersBtn);
+			this._oFilterBarLayout.addControl(this._oShowAllFiltersBtn);
 		};
 
 
@@ -270,6 +288,7 @@ sap.ui.define(
 			}
 			this._oBasicSearchField = oBasicSearchField;
 
+
 			if (oBasicSearchField) {
 				if (!this._oBasicSearchField.getLayoutData()) {
 					// set LayouData to have better overflow behaviour in toolbar; TODO: If collectiveSearch is active min-with of 8rem would be better, but this might not known here
@@ -296,7 +315,6 @@ sap.ui.define(
 				if (this._oFilterBarLayout) {
 					this._oFilterBarLayout.insertControl(oBasicSearchField, this._oCollectiveSearch ? 1 : 0);
 				}
-
 				oBasicSearchField.attachSubmit(this._handleFilterItemSubmit, this);
 				this._enhanceBasicSearchField(oBasicSearchField);
 				if (!this._oObserver.isObserved(oBasicSearchField, { properties: ["visible"] })) {

@@ -1,5 +1,6 @@
 {
   "listTest": {
+	"_version": "1.81.0",
 	"sap.app": {
 	  "type": "card"
 	},
@@ -44,6 +45,7 @@
 	}
   },
   "list": {
+	"_version": "1.81.0",
 	"sap.app": {
 	  "type": "card"
 	},
@@ -88,6 +90,7 @@
 	}
   },
   "error": {
+	"_version": "1.81.0",
 	"sap.app": {
 	  "type": "card"
 	},
@@ -130,6 +133,7 @@
 	}
   },
   "all": {
+	"_version": "1.81.0",
 	"sap.app": {
 	  "type": "card"
 	},
@@ -175,6 +179,7 @@
 	}
   },
   "descriptionTitle": {
+	"_version": "1.81.0",
 	"sap.app": {
 	  "type": "card"
 	},
@@ -217,6 +222,7 @@
 	}
   },
   "iconTitle": {
+	"_version": "1.81.0",
 	"sap.app": {
 	  "type": "card"
 	},
@@ -259,6 +265,7 @@
 	}
   },
   "table": {
+	"_version": "1.81.0",
 	"sap.app": {
 	  "type": "card"
 	},
@@ -332,6 +339,7 @@
 	}
   },
   "analytical": {
+	"_version": "1.81.0",
 	"sap.app": {
 	  "type": "card"
 	},
@@ -419,6 +427,7 @@
 	}
   },
   "calendar": {
+	"_version": "1.81.0",
 	"sap.app": {
 	  "type": "card"
 	},
@@ -492,6 +501,7 @@
 	}
   },
   "object": {
+	"_version": "1.81.0",
 	"sap.app": {
 	  "type": "card"
 	},
@@ -605,6 +615,7 @@
 	  }
 	},
 	"sap.card": {
+	  "_version": "1.81.0",
 	  "type": "Timeline",
 	  "header": {
 		"title": "New Team Members",

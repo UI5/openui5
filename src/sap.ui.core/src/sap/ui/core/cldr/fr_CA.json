@@ -1,7 +1,7 @@
 {
 	"__license": "This file has been derived from Unicode Common Locale Data Repository (CLDR) files (http://cldr.unicode.org). See the copyright and permission notice in the Unicode-Data-Files-LICENSE.txt available at the same location as this file or visit http://www.unicode.org/copyright.html",
-	"__version": "46.1.0",
-	"__buildtime": "2025-01-28T09:40:27.437Z",
+	"__version": "48.0.0",
+	"__buildtime": "2025-11-18T12:31:55.685Z",
 	"languages": {
 		"aa": "afar",
 		"ab": "abkhaze",
@@ -322,6 +322,8 @@
 		"ksf": "bafia",
 		"ksh": "kölsch",
 		"ku": "kurde",
+		"ku_menu-core": "kurde",
+		"ku_menu-extension": "kurmanji",
 		"kum": "koumyk",
 		"kut": "kutenai",
 		"kv": "komi",
@@ -901,6 +903,7 @@
 		"CN": "Chine",
 		"CO": "Colombie",
 		"CP": "île Clipperton",
+		"CQ": "Sercq",
 		"CR": "Costa Rica",
 		"CU": "Cuba",
 		"CV": "Cap-Vert",
@@ -1126,7 +1129,7 @@
 		"ZA": "Afrique du Sud",
 		"ZM": "Zambie",
 		"ZW": "Zimbabwe",
-		"ZZ": "région indéterminée"
+		"ZZ": "région inconnue"
 	},
 	"orientation": "left-to-right",
 	"ca-gregorian": {
@@ -1153,15 +1156,19 @@
 				"Bhms": "h 'h' mm 'min' ss 's' B",
 				"d": "d",
 				"E": "E",
+				"EBh": "E h 'h' B",
 				"EBhm": "E h 'h' mm B",
 				"EBhms": "E h 'h' mm 'min' ss 's' B",
 				"Ed": "E d",
+				"Eh": "E h 'h' a",
 				"Ehm": "E h 'h' mm a",
 				"EHm": "E HH 'h' mm",
 				"Ehms": "E h 'h' mm 'min' ss 's' a",
 				"EHms": "E HH 'h' mm 'min' ss 's'",
 				"Gy": "y G",
+				"GyM": "y-MM G",
 				"GyMd": "y-MM-dd GGGGG",
+				"GyMEd": "E y-MM-dd G",
 				"GyMMM": "MMM y G",
 				"GyMMMd": "d MMM y G",
 				"GyMMMEd": "E d MMM y G",
@@ -1175,6 +1182,8 @@
 				"Hmsv": "HH 'h' mm 'min' ss 's' v",
 				"hmv": "h 'h' mm a v",
 				"Hmv": "HH 'h' mm v",
+				"hv": "h 'h' a v",
+				"Hv": "H 'h' v",
 				"M": "L",
 				"Md": "MM-dd",
 				"MEd": "E MM-dd",
@@ -1686,15 +1695,19 @@
 				"Bhms": "h 'h' mm 'min' ss 's' B",
 				"d": "d",
 				"E": "ccc",
+				"EBh": "E h 'h' B",
 				"EBhm": "E h 'h' mm B",
 				"EBhms": "E h 'h' mm 'min' ss 's' B",
 				"Ed": "E d",
+				"Eh": "E h 'h' a",
 				"Ehm": "E h 'h' mm a",
 				"EHm": "E HH 'h' mm",
 				"Ehms": "E h 'h' mm 'min' ss 's' a",
 				"EHms": "E HH 'h' mm 'min' ss 's'",
 				"Gy": "y G",
+				"GyM": "y-MM G",
 				"GyMd": "y-MM-dd GGGGG",
+				"GyMEd": "E y-MM-dd G",
 				"GyMMM": "MMM y G",
 				"GyMMMd": "d MMM y G",
 				"GyMMMEd": "E d MMM y G",
@@ -1704,6 +1717,8 @@
 				"Hm": "HH 'h' mm",
 				"hms": "h 'h' mm 'min' ss 's' a",
 				"Hms": "HH 'h' mm 'min' ss 's'",
+				"hv": "h 'h' a v",
+				"Hv": "HH 'h' v",
 				"M": "L",
 				"Md": "MM-dd",
 				"MEd": "E d MMM",
@@ -2178,13 +2193,16 @@
 			}
 		},
 		"era-wide": {
-			"0": "Anno Hegirae"
+			"0": "Anno Hegirae",
+			"1": "BH"
 		},
 		"era-abbreviated": {
-			"0": "AH"
+			"0": "AH",
+			"1": "BH"
 		},
 		"era-narrow": {
-			"0": "AH"
+			"0": "AH",
+			"1": "BH"
 		}
 	},
 	"ca-japanese": {
@@ -2211,15 +2229,19 @@
 				"Bhms": "h 'h' mm 'min' ss 's' B",
 				"d": "d",
 				"E": "ccc",
+				"EBh": "E h 'h' B",
 				"EBhm": "E h 'h' mm B",
 				"EBhms": "E h 'h' mm 'min' ss 's' B",
 				"Ed": "E d",
+				"Eh": "E h 'h' a",
 				"Ehm": "E h 'h' mm a",
 				"EHm": "E HH 'h' mm",
 				"Ehms": "E h 'h' mm 'min' ss 's' a",
 				"EHms": "E HH 'h' mm 'min' ss 's'",
 				"Gy": "y G",
+				"GyM": "y-M G",
 				"GyMd": "y-MM-dd GGGGG",
+				"GyMEd": "E y-MM-dd G",
 				"GyMMM": "MMM y G",
 				"GyMMMd": "d MMM y G",
 				"GyMMMEd": "E d MMM y G",
@@ -2229,6 +2251,8 @@
 				"Hm": "HH 'h' mm",
 				"hms": "h 'h' mm 'min' ss 's' a",
 				"Hms": "HH 'h' mm 'min' ss 's'",
+				"hv": "h 'h' a v",
+				"Hv": "HH 'h' v",
 				"M": "L",
 				"Md": "d/M",
 				"MEd": "E d/M",
@@ -2756,15 +2780,19 @@
 				"Bhms": "h 'h' mm 'min' ss 's' B",
 				"d": "d",
 				"E": "ccc",
+				"EBh": "E h 'h' B",
 				"EBhm": "E h 'h' mm B",
 				"EBhms": "E h 'h' mm 'min' ss 's' B",
 				"Ed": "E d",
+				"Eh": "E h 'h' a",
 				"Ehm": "E h 'h' mm a",
 				"EHm": "E HH 'h' mm",
 				"Ehms": "E h 'h' mm 'min' ss 's' a",
 				"EHms": "E HH 'h' mm 'min' ss 's'",
 				"Gy": "y G",
+				"GyM": "y-M G",
 				"GyMd": "y-MM-dd GGGGG",
+				"GyMEd": "E y-MM-dd G",
 				"GyMMM": "MMM y G",
 				"GyMMMd": "d MMM y G",
 				"GyMMMEd": "E d MMM y G",
@@ -2774,6 +2802,8 @@
 				"Hm": "HH 'h' mm",
 				"hms": "h 'h' mm 'min' ss 's' a",
 				"Hms": "HH 'h' mm 'min' ss 's'",
+				"hv": "h 'h' a v",
+				"Hv": "HH 'h' v",
 				"M": "L",
 				"Md": "M-d",
 				"MEd": "E M-d",
@@ -3281,15 +3311,19 @@
 				"Bhms": "h 'h' mm 'min' ss 's' B",
 				"d": "d",
 				"E": "ccc",
+				"EBh": "E h 'h' B",
 				"EBhm": "E h 'h' mm B",
 				"EBhms": "E h 'h' mm 'min' ss 's' B",
 				"Ed": "E d",
+				"Eh": "E h 'h' a",
 				"Ehm": "E h 'h' mm a",
 				"EHm": "E HH 'h' mm",
 				"Ehms": "E h 'h' mm 'min' ss 's' a",
 				"EHms": "E HH 'h' mm 'min' ss 's'",
 				"Gy": "y G",
+				"GyM": "y-M G",
 				"GyMd": "y-MM-dd GGGGG",
+				"GyMEd": "E y-MM-dd G",
 				"GyMMM": "MMM y G",
 				"GyMMMd": "d MMM y G",
 				"GyMMMEd": "E d MMM y G",
@@ -3299,6 +3333,8 @@
 				"Hm": "HH 'h' mm",
 				"hms": "h 'h' mm 'min' ss 's' a",
 				"Hms": "HH 'h' mm 'min' ss 's'",
+				"hv": "h 'h' a v",
+				"Hv": "HH 'h' v",
 				"M": "L",
 				"Md": "d/M",
 				"MEd": "E d/M",
@@ -3802,9 +3838,9 @@
 		},
 		"year-short": {
 			"displayName": "a",
-			"relative-type--1": "l’année dernière",
+			"relative-type--1": "l’an dernier",
 			"relative-type-0": "cette année",
-			"relative-type-1": "l’année prochaine",
+			"relative-type-1": "l’an prochain",
 			"relativeTime-type-future": {
 				"relativeTimePattern-count-one": "dans {0} a",
 				"relativeTimePattern-count-other": "dans {0} a"
@@ -3816,9 +3852,9 @@
 		},
 		"year-narrow": {
 			"displayName": "a",
-			"relative-type--1": "l’année dernière",
+			"relative-type--1": "l’an dernier",
 			"relative-type-0": "cette année",
-			"relative-type-1": "l’année prochaine",
+			"relative-type-1": "l’an prochain",
 			"relativeTime-type-future": {
 				"relativeTimePattern-count-one": "+{0} a",
 				"relativeTimePattern-count-other": "+{0} a"
@@ -4207,7 +4243,7 @@
 			"Belize": "Belize",
 			"Blanc-Sablon": "Blanc-Sablon",
 			"Boa_Vista": "Boa Vista",
-			"Bogota": "Bogota",
+			"Bogota": "Bogotá",
 			"Boise": "Boise",
 			"Cambridge_Bay": "Cambridge Bay",
 			"Campo_Grande": "Campo Grande",
@@ -4219,6 +4255,7 @@
 			"Chihuahua": "Chihuahua",
 			"Ciudad_Juarez": "Ciudad Juárez",
 			"Costa_Rica": "Costa Rica",
+			"Coyhaique": "Coyhaique",
 			"Creston": "Creston",
 			"Cuiaba": "Cuiabá",
 			"Curacao": "Curaçao",
@@ -4278,7 +4315,7 @@
 			"Merida": "Mérida",
 			"Metlakatla": "Metlakatla",
 			"Mexico_City": "Mexico",
-			"Miquelon": "Miquelon",
+			"Miquelon": "Saint-Pierre",
 			"Moncton": "Moncton",
 			"Monterrey": "Monterrey",
 			"Montevideo": "Montevideo",
@@ -4286,7 +4323,7 @@
 			"Nassau": "Nassau",
 			"New_York": "New York",
 			"Nome": "Nome",
-			"Noronha": "Noronha",
+			"Noronha": "Fernando de Noronha",
 			"North_Dakota": {
 				"Beulah": "Beulah [Dakota du Nord]",
 				"Center": "Center [Dakota du Nord]",
@@ -4377,7 +4414,7 @@
 			"Hebron": "Hébron",
 			"Ho_Chi_Minh": "Hô-Chi-Minh-Ville",
 			"Hong_Kong": "Hong Kong",
-			"Hovd": "Hovd",
+			"Hovd": "Khovd",
 			"Irkutsk": "Irkoutsk",
 			"Jakarta": "Jakarta",
 			"Jayapura": "Jayapura",
@@ -4475,7 +4512,7 @@
 			"Bucharest": "Bucarest",
 			"Budapest": "Budapest",
 			"Busingen": "Büsingen",
-			"Chisinau": "Chisinau",
+			"Chisinau": "Chișinău",
 			"Copenhagen": "Copenhague",
 			"Dublin": "Dublin",
 			"Gibraltar": "Gibraltar",
@@ -4575,7 +4612,7 @@
 			"Tarawa": "Tarawa",
 			"Tongatapu": "Tongatapu",
 			"Wake": "Wake",
-			"Wallis": "Wallis"
+			"Wallis": "Wallis & Futuna"
 		}
 	},
 	"timezoneNamesFormats": {
@@ -4645,11 +4682,15 @@
 	},
 	"currencyFormat": {
 		"standard": "#,##0.00 ¤",
+		"standard-alphaNextToNumber": "#,##0.00 ¤",
 		"standard-noCurrency": "#,##0.00",
 		"accounting": "#,##0.00 ¤;(#,##0.00 ¤)",
+		"accounting-alphaNextToNumber": "#,##0.00 ¤;(#,##0.00 ¤)",
 		"accounting-noCurrency": "#,##0.00;(#,##0.00)",
 		"sap-standard": "#,##0.00 ¤",
+		"sap-standard-alphaNextToNumber": "#,##0.00 ¤",
 		"sap-accounting": "#,##0.00 ¤;(#,##0.00 ¤)",
+		"sap-accounting-alphaNextToNumber": "#,##0.00 ¤;(#,##0.00 ¤)",
 		"sap-standard-noCurrency": "#,##0.00",
 		"sap-accounting-noCurrency": "#,##0.00;(#,##0.00)"
 	},
@@ -4660,54 +4701,30 @@
 		"range": "{0}–{1}"
 	},
 	"currencyFormat-short": {
-		"1000-one": "0 k¤",
-		"1000-one-alphaNextToNumber": "0 k ¤",
-		"1000-other": "0 k¤",
-		"1000-other-alphaNextToNumber": "0 k ¤",
-		"10000-one": "00 k¤",
-		"10000-one-alphaNextToNumber": "00 k ¤",
-		"10000-other": "00 k¤",
-		"10000-other-alphaNextToNumber": "00 k ¤",
-		"100000-one": "000 k¤",
-		"100000-one-alphaNextToNumber": "000 k ¤",
-		"100000-other": "000 k¤",
-		"100000-other-alphaNextToNumber": "000 k ¤",
-		"1000000-one": "0 M¤",
-		"1000000-one-alphaNextToNumber": "0 M ¤",
-		"1000000-other": "0 M¤",
-		"1000000-other-alphaNextToNumber": "0 M ¤",
-		"10000000-one": "00 M¤",
-		"10000000-one-alphaNextToNumber": "00 M ¤",
-		"10000000-other": "00 M¤",
-		"10000000-other-alphaNextToNumber": "00 M ¤",
-		"100000000-one": "000 M¤",
-		"100000000-one-alphaNextToNumber": "000 M ¤",
-		"100000000-other": "000 M¤",
-		"100000000-other-alphaNextToNumber": "000 M ¤",
-		"1000000000-one": "0 G¤",
-		"1000000000-one-alphaNextToNumber": "0 G ¤",
-		"1000000000-other": "0 G¤",
-		"1000000000-other-alphaNextToNumber": "0 G ¤",
-		"10000000000-one": "00 G¤",
-		"10000000000-one-alphaNextToNumber": "00 G ¤",
-		"10000000000-other": "00 G¤",
-		"10000000000-other-alphaNextToNumber": "00 G ¤",
-		"100000000000-one": "000 G¤",
-		"100000000000-one-alphaNextToNumber": "000 G ¤",
-		"100000000000-other": "000 G¤",
-		"100000000000-other-alphaNextToNumber": "000 G ¤",
-		"1000000000000-one": "0 T¤",
-		"1000000000000-one-alphaNextToNumber": "0 T ¤",
-		"1000000000000-other": "0 T¤",
-		"1000000000000-other-alphaNextToNumber": "0 T ¤",
-		"10000000000000-one": "00 T¤",
-		"10000000000000-one-alphaNextToNumber": "00 T ¤",
-		"10000000000000-other": "00 T¤",
-		"10000000000000-other-alphaNextToNumber": "00 T ¤",
-		"100000000000000-one": "000 T¤",
-		"100000000000000-one-alphaNextToNumber": "000 T ¤",
-		"100000000000000-other": "000 T¤",
-		"100000000000000-other-alphaNextToNumber": "000 T ¤"
+		"1000-one": "0 k ¤",
+		"1000-other": "0 k ¤",
+		"10000-one": "00 k ¤",
+		"10000-other": "00 k ¤",
+		"100000-one": "000 k ¤",
+		"100000-other": "000 k ¤",
+		"1000000-one": "0 M ¤",
+		"1000000-other": "0 M ¤",
+		"10000000-one": "00 M ¤",
+		"10000000-other": "00 M ¤",
+		"100000000-one": "000 M ¤",
+		"100000000-other": "000 M ¤",
+		"1000000000-one": "0 G ¤",
+		"1000000000-other": "0 G ¤",
+		"10000000000-one": "00 G ¤",
+		"10000000000-other": "00 G ¤",
+		"100000000000-one": "000 G ¤",
+		"100000000000-other": "000 G ¤",
+		"1000000000000-one": "0 T ¤",
+		"1000000000000-other": "0 T ¤",
+		"10000000000000-one": "00 T ¤",
+		"10000000000000-other": "00 T ¤",
+		"100000000000000-one": "000 T ¤",
+		"100000000000000-other": "000 T ¤"
 	},
 	"symbols-latn-decimal": ",",
 	"symbols-latn-group": " ",
@@ -4894,13 +4911,13 @@
 			},
 			"angle-revolution": {
 				"displayName": "tr",
-				"unitPattern-count-one": "{0} tr",
-				"unitPattern-count-other": "{0} tr"
+				"unitPattern-count-one": "{0} tr",
+				"unitPattern-count-other": "{0} tr"
 			},
 			"angle-radian": {
 				"displayName": "rad",
-				"unitPattern-count-one": "{0} rad",
-				"unitPattern-count-other": "{0} rad"
+				"unitPattern-count-one": "{0} rad",
+				"unitPattern-count-other": "{0} rad"
 			},
 			"angle-degree": {
 				"displayName": "°",
@@ -4916,83 +4933,88 @@
 			},
 			"area-square-kilometer": {
 				"displayName": "km²",
-				"unitPattern-count-one": "{0} km²",
-				"unitPattern-count-other": "{0} km²",
+				"unitPattern-count-one": "{0} km²",
+				"unitPattern-count-other": "{0} km²",
 				"perUnitPattern": "{0}/km²"
 			},
 			"area-hectare": {
 				"displayName": "ha",
-				"unitPattern-count-one": "{0} ha",
-				"unitPattern-count-other": "{0} ha"
+				"unitPattern-count-one": "{0} ha",
+				"unitPattern-count-other": "{0} ha"
 			},
 			"area-square-meter": {
 				"displayName": "m²",
-				"unitPattern-count-one": "{0} m²",
-				"unitPattern-count-other": "{0} m²",
+				"unitPattern-count-one": "{0} m²",
+				"unitPattern-count-other": "{0} m²",
 				"perUnitPattern": "{0}/m²"
 			},
 			"area-square-centimeter": {
 				"displayName": "cm²",
-				"unitPattern-count-one": "{0} cm²",
-				"unitPattern-count-other": "{0} cm²",
+				"unitPattern-count-one": "{0} cm²",
+				"unitPattern-count-other": "{0} cm²",
 				"perUnitPattern": "{0}/cm²"
 			},
 			"area-square-mile": {
 				"displayName": "mi²",
-				"unitPattern-count-one": "{0} mi²",
-				"unitPattern-count-other": "{0} mi²",
+				"unitPattern-count-one": "{0} mi²",
+				"unitPattern-count-other": "{0} mi²",
 				"perUnitPattern": "{0}/mi²"
 			},
 			"area-acre": {
 				"displayName": "ac",
-				"unitPattern-count-one": "{0} ac",
-				"unitPattern-count-other": "{0} ac"
+				"unitPattern-count-one": "{0} ac",
+				"unitPattern-count-other": "{0} ac"
 			},
 			"area-square-yard": {
 				"displayName": "vg²",
-				"unitPattern-count-one": "{0} vg²",
-				"unitPattern-count-other": "{0} vg²"
+				"unitPattern-count-one": "{0} vg²",
+				"unitPattern-count-other": "{0} vg²"
 			},
 			"area-square-foot": {
 				"displayName": "pi²",
 				"unitPattern-count-one": "{0} pi²",
-				"unitPattern-count-other": "{0} pi²"
+				"unitPattern-count-other": "{0} pi²"
 			},
 			"area-square-inch": {
 				"displayName": "po²",
-				"unitPattern-count-one": "{0} po²",
-				"unitPattern-count-other": "{0} po²",
+				"unitPattern-count-one": "{0} po²",
+				"unitPattern-count-other": "{0} po²",
 				"perUnitPattern": "{0}/po²"
 			},
 			"area-dunam": {
 				"displayName": "dounam",
-				"unitPattern-count-one": "{0} dounam",
-				"unitPattern-count-other": "{0} dounam"
+				"unitPattern-count-one": "{0} dounam",
+				"unitPattern-count-other": "{0} dounams"
 			},
 			"concentr-karat": {
 				"displayName": "carats",
-				"unitPattern-count-one": "{0} ct",
-				"unitPattern-count-other": "{0} ct"
+				"unitPattern-count-one": "{0} ct",
+				"unitPattern-count-other": "{0} ct"
 			},
 			"concentr-milligram-ofglucose-per-deciliter": {
 				"displayName": "mg/dl",
-				"unitPattern-count-one": "{0} mg/dl",
-				"unitPattern-count-other": "{0} mg/dl"
+				"unitPattern-count-one": "{0} mg/dl",
+				"unitPattern-count-other": "{0} mg/dl"
 			},
 			"concentr-millimole-per-liter": {
 				"displayName": "mmol/l",
-				"unitPattern-count-one": "{0} mmol/l",
-				"unitPattern-count-other": "{0} mmol/l"
+				"unitPattern-count-one": "{0} mmol/l",
+				"unitPattern-count-other": "{0} mmol/l"
 			},
 			"concentr-item": {
 				"displayName": "item",
-				"unitPattern-count-one": "{0} item",
-				"unitPattern-count-other": "{0} items"
+				"unitPattern-count-one": "{0} item",
+				"unitPattern-count-other": "{0} items"
 			},
-			"concentr-permillion": {
+			"concentr-part": {
+				"displayName": "part",
+				"unitPattern-count-one": "{0} part",
+				"unitPattern-count-other": "{0} parts"
+			},
+			"concentr-part-per-1e6": {
 				"displayName": "ppm",
-				"unitPattern-count-one": "{0} ppm",
-				"unitPattern-count-other": "{0} ppm"
+				"unitPattern-count-one": "{0} ppm",
+				"unitPattern-count-other": "{0} ppm"
 			},
 			"concentr-percent": {
 				"displayName": "%",
@@ -5001,186 +5023,191 @@
 			},
 			"concentr-permille": {
 				"displayName": "‰",
-				"unitPattern-count-one": "{0} ‰",
-				"unitPattern-count-other": "{0} ‰"
+				"unitPattern-count-one": "{0} ‰",
+				"unitPattern-count-other": "{0} ‰"
 			},
 			"concentr-permyriad": {
 				"displayName": "‱",
-				"unitPattern-count-one": "{0} ‱",
-				"unitPattern-count-other": "{0} ‱"
+				"unitPattern-count-one": "{0} ‱",
+				"unitPattern-count-other": "{0} ‱"
 			},
 			"concentr-mole": {
 				"displayName": "mol",
-				"unitPattern-count-one": "{0} mol",
-				"unitPattern-count-other": "{0} mol"
+				"unitPattern-count-one": "{0} mol",
+				"unitPattern-count-other": "{0} mol"
+			},
+			"concentr-ofglucose": {
+				"displayName": "Glc",
+				"unitPattern-count-one": "{0} Glc",
+				"unitPattern-count-other": "{0} Glc"
 			},
 			"consumption-liter-per-kilometer": {
 				"displayName": "l/km",
-				"unitPattern-count-one": "{0} l/km",
-				"unitPattern-count-other": "{0} l/km"
+				"unitPattern-count-one": "{0} l/km",
+				"unitPattern-count-other": "{0} l/km"
 			},
 			"consumption-liter-per-100-kilometer": {
 				"displayName": "l/100 km",
-				"unitPattern-count-one": "{0} l/100 km",
-				"unitPattern-count-other": "{0} l/100 km"
+				"unitPattern-count-one": "{0} l/100 km",
+				"unitPattern-count-other": "{0} l/100 km"
 			},
 			"consumption-mile-per-gallon": {
 				"displayName": "mi/gal",
-				"unitPattern-count-one": "{0} mi/gal",
-				"unitPattern-count-other": "{0} mi/gal"
+				"unitPattern-count-one": "{0} mi/gal",
+				"unitPattern-count-other": "{0} mi/gal"
 			},
 			"consumption-mile-per-gallon-imperial": {
 				"displayName": "mi/gal imp.",
-				"unitPattern-count-one": "{0} mi/gal imp.",
-				"unitPattern-count-other": "{0} mi/gal imp."
+				"unitPattern-count-one": "{0} mi/gal imp.",
+				"unitPattern-count-other": "{0} mi/gal imp."
 			},
 			"digital-petabyte": {
 				"displayName": "Po",
-				"unitPattern-count-one": "{0} Po",
-				"unitPattern-count-other": "{0} Po"
+				"unitPattern-count-one": "{0} Po",
+				"unitPattern-count-other": "{0} Po"
 			},
 			"digital-terabyte": {
 				"displayName": "To",
-				"unitPattern-count-one": "{0} To",
-				"unitPattern-count-other": "{0} To"
+				"unitPattern-count-one": "{0} To",
+				"unitPattern-count-other": "{0} To"
 			},
 			"digital-terabit": {
 				"displayName": "Tb",
-				"unitPattern-count-one": "{0} Tb",
-				"unitPattern-count-other": "{0} Tb"
+				"unitPattern-count-one": "{0} Tb",
+				"unitPattern-count-other": "{0} Tb"
 			},
 			"digital-gigabyte": {
 				"displayName": "Go",
-				"unitPattern-count-one": "{0} Go",
-				"unitPattern-count-other": "{0} Go"
+				"unitPattern-count-one": "{0} Go",
+				"unitPattern-count-other": "{0} Go"
 			},
 			"digital-gigabit": {
 				"displayName": "Gb",
-				"unitPattern-count-one": "{0} Gb",
-				"unitPattern-count-other": "{0} Gb"
+				"unitPattern-count-one": "{0} Gb",
+				"unitPattern-count-other": "{0} Gb"
 			},
 			"digital-megabyte": {
 				"displayName": "Mo",
-				"unitPattern-count-one": "{0} Mo",
-				"unitPattern-count-other": "{0} Mo"
+				"unitPattern-count-one": "{0} Mo",
+				"unitPattern-count-other": "{0} Mo"
 			},
 			"digital-megabit": {
 				"displayName": "Mb",
-				"unitPattern-count-one": "{0} Mb",
-				"unitPattern-count-other": "{0} Mb"
+				"unitPattern-count-one": "{0} Mb",
+				"unitPattern-count-other": "{0} Mb"
 			},
 			"digital-kilobyte": {
 				"displayName": "ko",
-				"unitPattern-count-one": "{0} ko",
-				"unitPattern-count-other": "{0} ko"
+				"unitPattern-count-one": "{0} ko",
+				"unitPattern-count-other": "{0} ko"
 			},
 			"digital-kilobit": {
 				"displayName": "kb",
-				"unitPattern-count-one": "{0} kb",
-				"unitPattern-count-other": "{0} kb"
+				"unitPattern-count-one": "{0} kb",
+				"unitPattern-count-other": "{0} kb"
 			},
 			"digital-byte": {
 				"displayName": "octet",
-				"unitPattern-count-one": "{0} octet",
-				"unitPattern-count-other": "{0} octet"
+				"unitPattern-count-one": "{0} o",
+				"unitPattern-count-other": "{0} o"
 			},
 			"digital-bit": {
 				"displayName": "bit",
-				"unitPattern-count-one": "{0} bit",
-				"unitPattern-count-other": "{0} bit"
+				"unitPattern-count-one": "{0} bit",
+				"unitPattern-count-other": "{0} bit"
 			},
 			"duration-century": {
 				"displayName": "s.",
-				"unitPattern-count-one": "{0} s.",
-				"unitPattern-count-other": "{0} s."
+				"unitPattern-count-one": "{0} s.",
+				"unitPattern-count-other": "{0} s."
 			},
 			"duration-decade": {
 				"displayName": "décennies",
-				"unitPattern-count-one": "{0} déc.",
-				"unitPattern-count-other": "{0} déc."
+				"unitPattern-count-one": "{0} déc.",
+				"unitPattern-count-other": "{0} déc."
 			},
 			"duration-year": {
 				"displayName": "ans",
-				"unitPattern-count-one": "{0} an",
-				"unitPattern-count-other": "{0} ans",
+				"unitPattern-count-one": "{0} an",
+				"unitPattern-count-other": "{0} ans",
 				"perUnitPattern": "{0}/an"
 			},
 			"duration-quarter": {
 				"displayName": "trim.",
-				"unitPattern-count-one": "{0} trim.",
-				"unitPattern-count-other": "{0} trim.",
+				"unitPattern-count-one": "{0} trim.",
+				"unitPattern-count-other": "{0} trim.",
 				"perUnitPattern": "{0}/trim."
 			},
 			"duration-month": {
 				"displayName": "m.",
-				"unitPattern-count-one": "{0} m.",
-				"unitPattern-count-other": "{0} m.",
+				"unitPattern-count-one": "{0} m.",
+				"unitPattern-count-other": "{0} m.",
 				"perUnitPattern": "{0}/m."
 			},
 			"duration-week": {
 				"displayName": "sem.",
-				"unitPattern-count-one": "{0} sem.",
-				"unitPattern-count-other": "{0} sem.",
+				"unitPattern-count-one": "{0} sem.",
+				"unitPattern-count-other": "{0} sem.",
 				"perUnitPattern": "{0}/sem."
 			},
 			"duration-day": {
 				"displayName": "j",
-				"unitPattern-count-one": "{0} j",
-				"unitPattern-count-other": "{0} j",
+				"unitPattern-count-one": "{0} j",
+				"unitPattern-count-other": "{0} j",
 				"perUnitPattern": "{0}/j"
 			},
 			"duration-hour": {
 				"displayName": "h",
-				"unitPattern-count-one": "{0} h",
-				"unitPattern-count-other": "{0} h",
+				"unitPattern-count-one": "{0} h",
+				"unitPattern-count-other": "{0} h",
 				"perUnitPattern": "{0}/h"
 			},
 			"duration-minute": {
 				"displayName": "min",
-				"unitPattern-count-one": "{0} min",
-				"unitPattern-count-other": "{0} min",
+				"unitPattern-count-one": "{0} min",
+				"unitPattern-count-other": "{0} min",
 				"perUnitPattern": "{0}/min"
 			},
 			"duration-second": {
 				"displayName": "s",
-				"unitPattern-count-one": "{0} s",
-				"unitPattern-count-other": "{0} s",
+				"unitPattern-count-one": "{0} s",
+				"unitPattern-count-other": "{0} s",
 				"perUnitPattern": "{0}/s"
 			},
 			"duration-millisecond": {
 				"displayName": "ms",
-				"unitPattern-count-one": "{0} ms",
-				"unitPattern-count-other": "{0} ms"
+				"unitPattern-count-one": "{0} ms",
+				"unitPattern-count-other": "{0} ms"
 			},
 			"duration-microsecond": {
 				"displayName": "μs",
-				"unitPattern-count-one": "{0} μs",
-				"unitPattern-count-other": "{0} μs"
+				"unitPattern-count-one": "{0} μs",
+				"unitPattern-count-other": "{0} μs"
 			},
 			"duration-nanosecond": {
 				"displayName": "ns",
-				"unitPattern-count-one": "{0} ns",
-				"unitPattern-count-other": "{0} ns"
+				"unitPattern-count-one": "{0} ns",
+				"unitPattern-count-other": "{0} ns"
 			},
 			"electric-ampere": {
 				"displayName": "A",
-				"unitPattern-count-one": "{0} A",
-				"unitPattern-count-other": "{0} A"
+				"unitPattern-count-one": "{0} A",
+				"unitPattern-count-other": "{0} A"
 			},
 			"electric-milliampere": {
 				"displayName": "mA",
-				"unitPattern-count-one": "{0} mA",
-				"unitPattern-count-other": "{0} mA"
+				"unitPattern-count-one": "{0} mA",
+				"unitPattern-count-other": "{0} mA"
 			},
 			"electric-ohm": {
 				"displayName": "Ω",
-				"unitPattern-count-one": "{0} Ω",
-				"unitPattern-count-other": "{0} Ω"
+				"unitPattern-count-one": "{0} Ω",
+				"unitPattern-count-other": "{0} Ω"
 			},
 			"electric-volt": {
 				"displayName": "V",
-				"unitPattern-count-one": "{0} V",
-				"unitPattern-count-other": "{0} V"
+				"unitPattern-count-one": "{0} V",
+				"unitPattern-count-other": "{0} V"
 			},
 			"energy-kilocalorie": {
 				"displayName": "kcal",
@@ -5223,43 +5250,43 @@
 			},
 			"energy-therm-us": {
 				"displayName": "therm US",
-				"unitPattern-count-one": "{0} therm US",
-				"unitPattern-count-other": "{0} therms US"
+				"unitPattern-count-one": "{0} therm US",
+				"unitPattern-count-other": "{0} therms US"
 			},
 			"force-pound-force": {
 				"displayName": "lbf",
-				"unitPattern-count-one": "{0} lbf",
-				"unitPattern-count-other": "{0} lbf"
+				"unitPattern-count-one": "{0} lbf",
+				"unitPattern-count-other": "{0} lbf"
 			},
 			"force-newton": {
 				"displayName": "N",
-				"unitPattern-count-one": "{0} N",
-				"unitPattern-count-other": "{0} N"
+				"unitPattern-count-one": "{0} N",
+				"unitPattern-count-other": "{0} N"
 			},
 			"force-kilowatt-hour-per-100-kilometer": {
 				"displayName": "kWh/100 km",
-				"unitPattern-count-one": "{0} kWh/100 km",
-				"unitPattern-count-other": "{0} kWh/100 km"
+				"unitPattern-count-one": "{0} kWh/100 km",
+				"unitPattern-count-other": "{0} kWh/100 km"
 			},
 			"frequency-gigahertz": {
 				"displayName": "GHz",
-				"unitPattern-count-one": "{0} GHz",
-				"unitPattern-count-other": "{0} GHz"
+				"unitPattern-count-one": "{0} GHz",
+				"unitPattern-count-other": "{0} GHz"
 			},
 			"frequency-megahertz": {
 				"displayName": "MHz",
-				"unitPattern-count-one": "{0} MHz",
-				"unitPattern-count-other": "{0} MHz"
+				"unitPattern-count-one": "{0} MHz",
+				"unitPattern-count-other": "{0} MHz"
 			},
 			"frequency-kilohertz": {
 				"displayName": "kHz",
-				"unitPattern-count-one": "{0} kHz",
-				"unitPattern-count-other": "{0} kHz"
+				"unitPattern-count-one": "{0} kHz",
+				"unitPattern-count-other": "{0} kHz"
 			},
 			"frequency-hertz": {
 				"displayName": "Hz",
-				"unitPattern-count-one": "{0} Hz",
-				"unitPattern-count-other": "{0} Hz"
+				"unitPattern-count-one": "{0} Hz",
+				"unitPattern-count-other": "{0} Hz"
 			},
 			"graphics-em": {
 				"displayName": "em",
@@ -5269,7 +5296,7 @@
 			"graphics-pixel": {
 				"displayName": "px",
 				"unitPattern-count-one": "{0} px",
-				"unitPattern-count-other": "{0} px"
+				"unitPattern-count-other": "{0} px"
 			},
 			"graphics-megapixel": {
 				"displayName": "Mpx",
@@ -5278,13 +5305,13 @@
 			},
 			"graphics-pixel-per-centimeter": {
 				"displayName": "px/cm",
-				"unitPattern-count-one": "{0} px/cm",
-				"unitPattern-count-other": "{0} px/cm"
+				"unitPattern-count-one": "{0} px/cm",
+				"unitPattern-count-other": "{0} px/cm"
 			},
 			"graphics-pixel-per-inch": {
 				"displayName": "px/po",
-				"unitPattern-count-one": "{0} px/po",
-				"unitPattern-count-other": "{0} px/po"
+				"unitPattern-count-one": "{0} px/po",
+				"unitPattern-count-other": "{0} px/po"
 			},
 			"graphics-dot-per-centimeter": {
 				"displayName": "pt/cm",
@@ -5293,97 +5320,98 @@
 			},
 			"graphics-dot-per-inch": {
 				"displayName": "pt/po",
-				"unitPattern-count-one": "{0} pt/po",
-				"unitPattern-count-other": "{0} pt/po"
+				"unitPattern-count-one": "{0} pt/po",
+				"unitPattern-count-other": "{0} pt/po"
 			},
 			"graphics-dot": {
 				"displayName": "pt",
 				"unitPattern-count-one": "{0} pt",
-				"unitPattern-count-other": "{0} pt"
+				"unitPattern-count-other": "{0} pt"
 			},
 			"length-earth-radius": {
 				"displayName": "R⊕",
-				"unitPattern-count-other": "{0} R⊕"
+				"unitPattern-count-one": "{0} R⊕",
+				"unitPattern-count-other": "{0} R⊕"
 			},
 			"length-kilometer": {
 				"displayName": "km",
-				"unitPattern-count-one": "{0} km",
-				"unitPattern-count-other": "{0} km",
+				"unitPattern-count-one": "{0} km",
+				"unitPattern-count-other": "{0} km",
 				"perUnitPattern": "{0}/km"
 			},
 			"length-meter": {
 				"displayName": "m",
-				"unitPattern-count-one": "{0} m",
-				"unitPattern-count-other": "{0} m",
+				"unitPattern-count-one": "{0} m",
+				"unitPattern-count-other": "{0} m",
 				"perUnitPattern": "{0}/m"
 			},
 			"length-decimeter": {
 				"displayName": "dm",
-				"unitPattern-count-one": "{0} dm",
-				"unitPattern-count-other": "{0} dm"
+				"unitPattern-count-one": "{0} dm",
+				"unitPattern-count-other": "{0} dm"
 			},
 			"length-centimeter": {
 				"displayName": "cm",
-				"unitPattern-count-one": "{0} cm",
-				"unitPattern-count-other": "{0} cm",
+				"unitPattern-count-one": "{0} cm",
+				"unitPattern-count-other": "{0} cm",
 				"perUnitPattern": "{0}/cm"
 			},
 			"length-millimeter": {
 				"displayName": "mm",
-				"unitPattern-count-one": "{0} mm",
-				"unitPattern-count-other": "{0} mm"
+				"unitPattern-count-one": "{0} mm",
+				"unitPattern-count-other": "{0} mm"
 			},
 			"length-micrometer": {
 				"displayName": "μm",
-				"unitPattern-count-one": "{0} μm",
-				"unitPattern-count-other": "{0} μm"
+				"unitPattern-count-one": "{0} μm",
+				"unitPattern-count-other": "{0} μm"
 			},
 			"length-nanometer": {
 				"displayName": "nm",
-				"unitPattern-count-one": "{0} nm",
-				"unitPattern-count-other": "{0} nm"
+				"unitPattern-count-one": "{0} nm",
+				"unitPattern-count-other": "{0} nm"
 			},
 			"length-picometer": {
 				"displayName": "pm",
-				"unitPattern-count-one": "{0} pm",
-				"unitPattern-count-other": "{0} pm"
+				"unitPattern-count-one": "{0} pm",
+				"unitPattern-count-other": "{0} pm"
 			},
 			"length-mile": {
 				"displayName": "mi",
-				"unitPattern-count-one": "{0} mi",
-				"unitPattern-count-other": "{0} mi"
+				"unitPattern-count-one": "{0} mi",
+				"unitPattern-count-other": "{0} mi"
 			},
 			"length-yard": {
 				"displayName": "vg",
 				"unitPattern-count-one": "{0} vg",
-				"unitPattern-count-other": "{0} vg"
+				"unitPattern-count-other": "{0} vg"
 			},
 			"length-foot": {
 				"displayName": "pi",
 				"unitPattern-count-one": "{0} pi",
-				"unitPattern-count-other": "{0} pi",
+				"unitPattern-count-other": "{0} pi",
 				"perUnitPattern": "{0}/pi"
 			},
 			"length-inch": {
 				"displayName": "po",
-				"unitPattern-count-one": "{0} po",
-				"unitPattern-count-other": "{0} po",
+				"unitPattern-count-one": "{0} po",
+				"unitPattern-count-other": "{0} po",
 				"perUnitPattern": "{0}/po"
 			},
 			"length-parsec": {
 				"displayName": "pc",
-				"unitPattern-count-one": "{0} pc",
-				"unitPattern-count-other": "{0} pc"
+				"unitPattern-count-one": "{0} pc",
+				"unitPattern-count-other": "{0} pc"
 			},
 			"length-light-year": {
 				"displayName": "al",
-				"unitPattern-count-one": "{0} al",
-				"unitPattern-count-other": "{0} al"
+				"unitPattern-count-one": "{0} al",
+				"unitPattern-count-other": "{0} al"
 			},
 			"length-astronomical-unit": {
 				"displayName": "ua",
 				"unitPattern-count-one": "{0} ua",
-				"unitPattern-count-other": "{0} ua"
+				"unitPattern-count-other": "{0} ua"
 			},
 			"length-furlong": {
 				"displayName": "fur",
@@ -5397,40 +5425,42 @@
 			"length-nautical-mile": {
 				"displayName": "NM",
 				"unitPattern-count-one": "{0} NM",
-				"unitPattern-count-other": "{0} NM"
+				"unitPattern-count-other": "{0} NM"
 			},
 			"length-mile-scandinavian": {
 				"displayName": "smi",
-				"unitPattern-count-one": "{0} smi",
-				"unitPattern-count-other": "{0} smi"
+				"unitPattern-count-one": "{0} smi",
+				"unitPattern-count-other": "{0} smi"
 			},
 			"length-point": {
 				"displayName": "pt typog.",
-				"unitPattern-count-one": "{0} pt typog.",
-				"unitPattern-count-other": "{0} pts typog."
+				"unitPattern-count-one": "{0} pt typog.",
+				"unitPattern-count-other": "{0} pts typog."
 			},
 			"length-solar-radius": {
 				"displayName": "R☉",
-				"unitPattern-count-one": "{0} R☉",
-				"unitPattern-count-other": "{0} R☉"
+				"unitPattern-count-one": "{0} R☉",
+				"unitPattern-count-other": "{0} R☉"
 			},
 			"light-lux": {
 				"displayName": "lx",
-				"unitPattern-count-one": "{0} lx",
-				"unitPattern-count-other": "{0} lx"
+				"unitPattern-count-one": "{0} lx",
+				"unitPattern-count-other": "{0} lx"
 			},
 			"light-candela": {
 				"displayName": "cd",
-				"unitPattern-count-other": "{0} cd"
+				"unitPattern-count-one": "{0} cd",
+				"unitPattern-count-other": "{0} cd"
 			},
 			"light-lumen": {
 				"displayName": "lm",
-				"unitPattern-count-other": "{0} lm"
+				"unitPattern-count-one": "{0} lm",
+				"unitPattern-count-other": "{0} lm"
 			},
 			"light-solar-luminosity": {
 				"displayName": "L☉",
-				"unitPattern-count-one": "{0} L☉",
-				"unitPattern-count-other": "{0} L☉"
+				"unitPattern-count-one": "{0} L☉",
+				"unitPattern-count-other": "{0} L☉"
 			},
 			"mass-tonne": {
 				"displayName": "t",
@@ -5439,8 +5469,8 @@
 			},
 			"mass-kilogram": {
 				"displayName": "kg",
-				"unitPattern-count-one": "{0} kg",
-				"unitPattern-count-other": "{0} kg",
+				"unitPattern-count-one": "{0} kg",
+				"unitPattern-count-other": "{0} kg",
 				"perUnitPattern": "{0}/kg"
 			},
 			"mass-gram": {
@@ -5470,8 +5500,8 @@
 			},
 			"mass-pound": {
 				"displayName": "lb",
-				"unitPattern-count-one": "{0} lb",
-				"unitPattern-count-other": "{0} lb",
+				"unitPattern-count-one": "{0} lb",
+				"unitPattern-count-other": "{0} lb",
 				"perUnitPattern": "{0}/lb"
 			},
 			"mass-ounce": {
@@ -5492,8 +5522,8 @@
 			},
 			"mass-dalton": {
 				"displayName": "Da",
-				"unitPattern-count-one": "{0} Da",
-				"unitPattern-count-other": "{0} Da"
+				"unitPattern-count-one": "{0} Da",
+				"unitPattern-count-other": "{0} Da"
 			},
 			"mass-earth-mass": {
 				"displayName": "M⊕",
@@ -5517,23 +5547,23 @@
 			},
 			"power-megawatt": {
 				"displayName": "MW",
-				"unitPattern-count-one": "{0} MW",
-				"unitPattern-count-other": "{0} MW"
+				"unitPattern-count-one": "{0} MW",
+				"unitPattern-count-other": "{0} MW"
 			},
 			"power-kilowatt": {
 				"displayName": "kW",
-				"unitPattern-count-one": "{0} kW",
-				"unitPattern-count-other": "{0} kW"
+				"unitPattern-count-one": "{0} kW",
+				"unitPattern-count-other": "{0} kW"
 			},
 			"power-watt": {
 				"displayName": "W",
-				"unitPattern-count-one": "{0} W",
-				"unitPattern-count-other": "{0} W"
+				"unitPattern-count-one": "{0} W",
+				"unitPattern-count-other": "{0} W"
 			},
 			"power-milliwatt": {
 				"displayName": "mW",
-				"unitPattern-count-one": "{0} mW",
-				"unitPattern-count-other": "{0} mW"
+				"unitPattern-count-one": "{0} mW",
+				"unitPattern-count-other": "{0} mW"
 			},
 			"power-horsepower": {
 				"displayName": "ch",
@@ -5542,13 +5572,18 @@
 			},
 			"pressure-millimeter-ofhg": {
 				"displayName": "mm Hg",
-				"unitPattern-count-one": "{0} mm Hg",
-				"unitPattern-count-other": "{0} mm Hg"
+				"unitPattern-count-one": "{0} mm Hg",
+				"unitPattern-count-other": "{0} mm Hg"
+			},
+			"pressure-ofhg": {
+				"displayName": "de Hg",
+				"unitPattern-count-one": "{0} de Hg",
+				"unitPattern-count-other": "{0} de Hg"
 			},
 			"pressure-pound-force-per-square-inch": {
 				"displayName": "psi",
 				"unitPattern-count-one": "{0} psi",
-				"unitPattern-count-other": "{0} psi"
+				"unitPattern-count-other": "{0} psi"
 			},
 			"pressure-inch-ofhg": {
 				"displayName": "po Hg",
@@ -5557,18 +5592,18 @@
 			},
 			"pressure-bar": {
 				"displayName": "bar",
-				"unitPattern-count-one": "{0} bar",
-				"unitPattern-count-other": "{0} bars"
+				"unitPattern-count-one": "{0} bar",
+				"unitPattern-count-other": "{0} bars"
 			},
 			"pressure-millibar": {
 				"displayName": "mbar",
-				"unitPattern-count-one": "{0} mbar",
-				"unitPattern-count-other": "{0} mbar"
+				"unitPattern-count-one": "{0} mbar",
+				"unitPattern-count-other": "{0} mbar"
 			},
 			"pressure-atmosphere": {
 				"displayName": "atm",
-				"unitPattern-count-one": "{0} atm",
-				"unitPattern-count-other": "{0} atm"
+				"unitPattern-count-one": "{0} atm",
+				"unitPattern-count-other": "{0} atm"
 			},
 			"pressure-pascal": {
 				"displayName": "Pa",
@@ -5577,23 +5612,23 @@
 			},
 			"pressure-hectopascal": {
 				"displayName": "hPa",
-				"unitPattern-count-one": "{0} hPa",
-				"unitPattern-count-other": "{0} hPa"
+				"unitPattern-count-one": "{0} hPa",
+				"unitPattern-count-other": "{0} hPa"
 			},
 			"pressure-kilopascal": {
 				"displayName": "kPa",
-				"unitPattern-count-one": "{0} kPa",
-				"unitPattern-count-other": "{0} kPa"
+				"unitPattern-count-one": "{0} kPa",
+				"unitPattern-count-other": "{0} kPa"
 			},
 			"pressure-megapascal": {
 				"displayName": "MPa",
-				"unitPattern-count-one": "{0} MPa",
-				"unitPattern-count-other": "{0} MPa"
+				"unitPattern-count-one": "{0} MPa",
+				"unitPattern-count-other": "{0} MPa"
 			},
 			"speed-kilometer-per-hour": {
 				"displayName": "km/h",
-				"unitPattern-count-one": "{0} km/h",
-				"unitPattern-count-other": "{0} km/h"
+				"unitPattern-count-one": "{0} km/h",
+				"unitPattern-count-other": "{0} km/h"
 			},
 			"speed-meter-per-second": {
 				"displayName": "m/s",
@@ -5607,11 +5642,11 @@
 			},
 			"speed-knot": {
 				"displayName": "nd",
-				"unitPattern-count-one": "{0} nd",
-				"unitPattern-count-other": "{0} nd"
+				"unitPattern-count-one": "{0} nd",
+				"unitPattern-count-other": "{0} nd"
 			},
 			"speed-beaufort": {
-				"displayName": "Bft",
+				"displayName": "Bf",
 				"unitPattern-count-one": "{0} Bf",
 				"unitPattern-count-other": "{0} Bf"
 			},
@@ -5621,55 +5656,55 @@
 			},
 			"temperature-celsius": {
 				"displayName": "°C",
-				"unitPattern-count-one": "{0} °C",
-				"unitPattern-count-other": "{0} °C"
+				"unitPattern-count-one": "{0} °C",
+				"unitPattern-count-other": "{0} °C"
 			},
 			"temperature-fahrenheit": {
 				"displayName": "°F",
-				"unitPattern-count-one": "{0} °F",
-				"unitPattern-count-other": "{0} °F"
+				"unitPattern-count-one": "{0} °F",
+				"unitPattern-count-other": "{0} °F"
 			},
 			"temperature-kelvin": {
 				"displayName": "K",
-				"unitPattern-count-one": "{0} K",
-				"unitPattern-count-other": "{0} K"
+				"unitPattern-count-one": "{0} K",
+				"unitPattern-count-other": "{0} K"
 			},
 			"torque-pound-force-foot": {
 				"displayName": "lb-pi",
-				"unitPattern-count-one": "{0} lb-pi",
-				"unitPattern-count-other": "{0} lb-pi"
+				"unitPattern-count-one": "{0} lb-pi",
+				"unitPattern-count-other": "{0} lb-pi"
 			},
 			"torque-newton-meter": {
 				"displayName": "N⋅m",
-				"unitPattern-count-one": "{0} N⋅m",
-				"unitPattern-count-other": "{0} N⋅m"
+				"unitPattern-count-one": "{0} N⋅m",
+				"unitPattern-count-other": "{0} N⋅m"
 			},
 			"volume-cubic-kilometer": {
 				"displayName": "km³",
-				"unitPattern-count-one": "{0} km³",
-				"unitPattern-count-other": "{0} km³"
+				"unitPattern-count-one": "{0} km³",
+				"unitPattern-count-other": "{0} km³"
 			},
 			"volume-cubic-meter": {
 				"displayName": "m³",
-				"unitPattern-count-one": "{0} m³",
-				"unitPattern-count-other": "{0} m³",
+				"unitPattern-count-one": "{0} m³",
+				"unitPattern-count-other": "{0} m³",
 				"perUnitPattern": "{0}/m³"
 			},
 			"volume-cubic-centimeter": {
 				"displayName": "cm³",
-				"unitPattern-count-one": "{0} cm³",
-				"unitPattern-count-other": "{0} cm³",
+				"unitPattern-count-one": "{0} cm³",
+				"unitPattern-count-other": "{0} cm³",
 				"perUnitPattern": "{0}/cm³"
 			},
 			"volume-cubic-mile": {
 				"displayName": "mi³",
-				"unitPattern-count-one": "{0} mi³",
-				"unitPattern-count-other": "{0} mi³"
+				"unitPattern-count-one": "{0} mi³",
+				"unitPattern-count-other": "{0} mi³"
 			},
 			"volume-cubic-yard": {
 				"displayName": "vg³",
 				"unitPattern-count-one": "{0} vg³",
-				"unitPattern-count-other": "{0} vg³"
+				"unitPattern-count-other": "{0} vg³"
 			},
 			"volume-cubic-foot": {
 				"displayName": "pi³",
@@ -5678,53 +5713,59 @@
 			},
 			"volume-cubic-inch": {
 				"displayName": "po³",
-				"unitPattern-count-one": "{0} po³",
-				"unitPattern-count-other": "{0} po³"
+				"unitPattern-count-one": "{0} po³",
+				"unitPattern-count-other": "{0} po³"
 			},
 			"volume-megaliter": {
 				"displayName": "Ml",
-				"unitPattern-count-one": "{0} Ml",
-				"unitPattern-count-other": "{0} Ml"
+				"unitPattern-count-one": "{0} Ml",
+				"unitPattern-count-other": "{0} Ml"
 			},
 			"volume-hectoliter": {
 				"displayName": "hl",
-				"unitPattern-count-one": "{0} hl",
-				"unitPattern-count-other": "{0} hl"
+				"unitPattern-count-one": "{0} hl",
+				"unitPattern-count-other": "{0} hl"
 			},
 			"volume-liter": {
 				"displayName": "l",
-				"unitPattern-count-one": "{0} l",
-				"unitPattern-count-other": "{0} l",
+				"unitPattern-count-one": "{0} l",
+				"unitPattern-count-other": "{0} l",
 				"perUnitPattern": "{0}/l"
 			},
 			"volume-deciliter": {
 				"displayName": "dl",
-				"unitPattern-count-one": "{0} dl",
-				"unitPattern-count-other": "{0} dl"
+				"unitPattern-count-one": "{0} dl",
+				"unitPattern-count-other": "{0} dl"
 			},
 			"volume-centiliter": {
 				"displayName": "cl",
-				"unitPattern-count-one": "{0} cl",
-				"unitPattern-count-other": "{0} cl"
+				"unitPattern-count-one": "{0} cl",
+				"unitPattern-count-other": "{0} cl"
 			},
 			"volume-milliliter": {
 				"displayName": "ml",
-				"unitPattern-count-one": "{0} ml",
-				"unitPattern-count-other": "{0} ml"
+				"unitPattern-count-one": "{0} ml",
+				"unitPattern-count-other": "{0} ml"
 			},
 			"volume-pint-metric": {
 				"displayName": "mpt",
-				"unitPattern-count-other": "{0} mpt"
+				"unitPattern-count-one": "{0} mpt",
+				"unitPattern-count-other": "{0} mpt"
 			},
 			"volume-cup-metric": {
 				"displayName": "tm",
-				"unitPattern-count-one": "{0} tm",
-				"unitPattern-count-other": "{0} tm"
+				"unitPattern-count-one": "{0} tm",
+				"unitPattern-count-other": "{0} tm"
+			},
+			"volume-fluid-ounce-metric": {
+				"displayName": "fl oz m.",
+				"unitPattern-count-one": "{0} fl oz m.",
+				"unitPattern-count-other": "{0} fl oz m."
 			},
 			"volume-acre-foot": {
 				"displayName": "ac pi",
-				"unitPattern-count-one": "{0} ac pi",
-				"unitPattern-count-other": "{0} ac pi"
+				"unitPattern-count-one": "{0} ac pi",
+				"unitPattern-count-other": "{0} ac pi"
 			},
 			"volume-bushel": {
 				"displayName": "bu",
@@ -5733,8 +5774,8 @@
 			},
 			"volume-gallon": {
 				"displayName": "gal",
-				"unitPattern-count-one": "{0} gal",
-				"unitPattern-count-other": "{0} gal",
+				"unitPattern-count-one": "{0} gal",
+				"unitPattern-count-other": "{0} gal",
 				"perUnitPattern": "{0}/gal"
 			},
 			"volume-gallon-imperial": {
@@ -5746,157 +5787,306 @@
 			"volume-quart": {
 				"displayName": "pte",
 				"unitPattern-count-one": "{0} pte",
-				"unitPattern-count-other": "{0} pte"
+				"unitPattern-count-other": "{0} pte"
 			},
 			"volume-pint": {
 				"displayName": "chop",
-				"unitPattern-count-one": "{0} chop",
-				"unitPattern-count-other": "{0} chop"
+				"unitPattern-count-one": "{0} chop",
+				"unitPattern-count-other": "{0} chop"
+			},
+			"volume-pint-imperial": {
+				"displayName": "pint Imp.",
+				"unitPattern-count-other": "{0} pt Imp."
 			},
 			"volume-cup": {
 				"displayName": "tasses",
-				"unitPattern-count-one": "{0} tasse",
-				"unitPattern-count-other": "{0} tasses"
+				"unitPattern-count-one": "{0} tasse",
+				"unitPattern-count-other": "{0} tasses"
+			},
+			"volume-cup-imperial": {
+				"displayName": "cup Imp.",
+				"unitPattern-count-other": "{0} cup Imp."
 			},
 			"volume-fluid-ounce": {
 				"displayName": "oz liq.",
 				"unitPattern-count-one": "{0} oz liq.",
-				"unitPattern-count-other": "{0} oz liq."
+				"unitPattern-count-other": "{0} oz liq."
 			},
 			"volume-fluid-ounce-imperial": {
 				"displayName": "oz liq imp.",
-				"unitPattern-count-one": "{0} oz liq imp.",
-				"unitPattern-count-other": "{0} oz liq imp."
+				"unitPattern-count-one": "{0} oz liq imp.",
+				"unitPattern-count-other": "{0} oz liq imp."
 			},
 			"volume-tablespoon": {
 				"displayName": "c. à s.",
-				"unitPattern-count-one": "{0} c. à s.",
-				"unitPattern-count-other": "{0} c. à s."
+				"unitPattern-count-one": "{0} c. à s.",
+				"unitPattern-count-other": "{0} c. à s."
 			},
 			"volume-teaspoon": {
 				"displayName": "c. à t.",
 				"unitPattern-count-one": "{0} c. à t.",
-				"unitPattern-count-other": "{0} c. à t."
+				"unitPattern-count-other": "{0} c. à t."
 			},
 			"volume-barrel": {
 				"displayName": "bbl",
-				"unitPattern-count-one": "{0} bbl",
-				"unitPattern-count-other": "{0} bbl"
+				"unitPattern-count-one": "{0} bbl",
+				"unitPattern-count-other": "{0} bbl"
 			},
 			"volume-dessert-spoon": {
 				"displayName": "cuill. à d.",
-				"unitPattern-count-one": "{0} cuill. à d.",
-				"unitPattern-count-other": "{0} cuill. à d."
+				"unitPattern-count-one": "{0} cuill. à d.",
+				"unitPattern-count-other": "{0} cuill. à d."
 			},
 			"volume-dessert-spoon-imperial": {
 				"displayName": "cuill. à d. imp.",
-				"unitPattern-count-one": "{0} cuill. à d. imp.",
-				"unitPattern-count-other": "{0} cuill. à d. imp."
+				"unitPattern-count-one": "{0} cuill. à d. imp.",
+				"unitPattern-count-other": "{0} cuill. à d. imp."
 			},
 			"volume-drop": {
 				"displayName": "goutte",
-				"unitPattern-count-one": "{0} goutte",
-				"unitPattern-count-other": "{0} gouttes"
+				"unitPattern-count-one": "{0} goutte",
+				"unitPattern-count-other": "{0} gouttes"
 			},
 			"volume-dram": {
 				"displayName": "dram liquide",
-				"unitPattern-count-one": "{0} dram liq",
-				"unitPattern-count-other": "{0} dram liq"
+				"unitPattern-count-one": "{0} dram liq",
+				"unitPattern-count-other": "{0} dram liq"
 			},
 			"volume-jigger": {
 				"displayName": "gobelet doseur",
-				"unitPattern-count-one": "{0} gobelet doseur",
-				"unitPattern-count-other": "{0} gobelets doseurs"
+				"unitPattern-count-one": "{0} gobelet doseur",
+				"unitPattern-count-other": "{0} gobelets doseurs"
 			},
 			"volume-pinch": {
 				"displayName": "pincée",
-				"unitPattern-count-one": "{0} pincée",
-				"unitPattern-count-other": "{0} pincées"
+				"unitPattern-count-one": "{0} pincée",
+				"unitPattern-count-other": "{0} pincées"
 			},
 			"volume-quart-imperial": {
 				"displayName": "pte imp",
 				"unitPattern-count-one": "{0} pte imp",
 				"unitPattern-count-other": "{0} pte imp"
 			},
+			"angle-steradian": {
+				"displayName": "sr",
+				"unitPattern-count-one": "{0} sr",
+				"unitPattern-count-other": "{0} sr"
+			},
+			"concentr-katal": {
+				"displayName": "kat",
+				"unitPattern-count-one": "{0} kat",
+				"unitPattern-count-other": "{0} kat"
+			},
+			"electric-coulomb": {
+				"displayName": "C",
+				"unitPattern-count-one": "{0} C",
+				"unitPattern-count-other": "{0} C"
+			},
+			"electric-farad": {
+				"displayName": "F",
+				"unitPattern-count-one": "{0} F",
+				"unitPattern-count-other": "{0} F"
+			},
+			"electric-henry": {
+				"displayName": "H",
+				"unitPattern-count-one": "{0} H",
+				"unitPattern-count-other": "{0} H"
+			},
+			"electric-siemens": {
+				"displayName": "S",
+				"unitPattern-count-one": "{0} S",
+				"unitPattern-count-other": "{0} S"
+			},
+			"energy-calorie-it": {
+				"displayName": "cal-IT",
+				"unitPattern-count-one": "{0} cal-IT",
+				"unitPattern-count-other": "{0} cal-IT"
+			},
+			"energy-british-thermal-unit-it": {
+				"displayName": "BTU-IT",
+				"unitPattern-count-other": "{0} BTU-IT"
+			},
+			"energy-becquerel": {
+				"displayName": "Bq",
+				"unitPattern-count-one": "{0} Bq",
+				"unitPattern-count-other": "{0} Bq"
+			},
+			"energy-sievert": {
+				"displayName": "Sv",
+				"unitPattern-count-one": "{0} Sv",
+				"unitPattern-count-other": "{0} Sv"
+			},
+			"energy-gray": {
+				"displayName": "Gy",
+				"unitPattern-count-one": "{0} Gy",
+				"unitPattern-count-other": "{0} Gy"
+			},
+			"force-kilogram-force": {
+				"displayName": "kgf",
+				"unitPattern-count-one": "{0} kgf",
+				"unitPattern-count-other": "{0} kgf"
+			},
+			"length-rod": {
+				"displayName": "rod",
+				"unitPattern-count-other": "{0} rod"
+			},
+			"length-chain": {
+				"displayName": "chain",
+				"unitPattern-count-other": "{0} chain"
+			},
+			"magnetic-tesla": {
+				"displayName": "T",
+				"unitPattern-count-one": "{0} T",
+				"unitPattern-count-other": "{0} T"
+			},
+			"magnetic-weber": {
+				"displayName": "Wb",
+				"unitPattern-count-one": "{0} Wb",
+				"unitPattern-count-other": "{0} Wb"
+			},
+			"temperature-rankine": {
+				"displayName": "°R",
+				"unitPattern-count-other": "{0} °R"
+			},
+			"duration-fortnight": {
+				"displayName": "fortnight",
+				"unitPattern-count-other": "{0} fw"
+			},
+			"mass-slug": {
+				"displayName": "slug",
+				"unitPattern-count-other": "{0} slug"
+			},
+			"pressure-gasoline-energy-density": {
+				"displayName": "gas E",
+				"unitPattern-count-other": "{0} gas E"
+			},
+			"length-rin": {
+				"displayName": "rin [JP]",
+				"unitPattern-count-other": "{0} rin [JP]"
+			},
+			"length-sun": {
+				"displayName": "sun [JP]",
+				"unitPattern-count-other": "{0} sun [JP]"
+			},
+			"length-shaku-length": {
+				"displayName": "shaku [JP]",
+				"unitPattern-count-other": "{0} shaku [JP]"
+			},
+			"length-shaku-cloth": {
+				"displayName": "shaku [cloth, JP]",
+				"unitPattern-count-other": "{0} shaku [cloth, JP]"
+			},
+			"length-ken": {
+				"displayName": "ken [JP]",
+				"unitPattern-count-other": "{0} ken [JP]"
+			},
+			"length-jo-jp": {
+				"displayName": "jo [JP]",
+				"unitPattern-count-other": "{0} jo [JP]"
+			},
+			"length-ri-jp": {
+				"displayName": "ri [JP]",
+				"unitPattern-count-other": "{0} ri [JP]"
+			},
+			"area-bu-jp": {
+				"displayName": "bu [JP]",
+				"unitPattern-count-other": "{0} bu [JP]"
+			},
+			"area-se-jp": {
+				"displayName": "se [JP]",
+				"unitPattern-count-other": "{0} se [JP]"
+			},
+			"area-cho": {
+				"displayName": "cho [JP]",
+				"unitPattern-count-other": "{0} cho [JP]"
+			},
+			"volume-kosaji": {
+				"displayName": "kosaji [JP]",
+				"unitPattern-count-other": "{0} kosaji [JP]"
+			},
+			"volume-osaji": {
+				"displayName": "osaji [JP]",
+				"unitPattern-count-other": "{0} osaji [JP]"
+			},
+			"volume-cup-jp": {
+				"displayName": "cup [JP]",
+				"unitPattern-count-other": "{0} cup [JP]"
+			},
+			"volume-shaku": {
+				"displayName": "shaku [vol, JP]",
+				"unitPattern-count-other": "{0} shaku [vol, JP]"
+			},
+			"volume-sai": {
+				"displayName": "sai [JP]",
+				"unitPattern-count-other": "{0} sai [JP]"
+			},
+			"volume-to-jp": {
+				"displayName": "to [JP]",
+				"unitPattern-count-other": "{0} to [JP]"
+			},
+			"volume-koku": {
+				"displayName": "koku [JP]",
+				"unitPattern-count-other": "{0} koku [JP]"
+			},
 			"speed-light-speed": {
 				"displayName": "lumière",
 				"unitPattern-count-one": "{0} lumière",
 				"unitPattern-count-other": "{0} lumière"
 			},
-			"concentr-portion-per-1e9": {
+			"mass-fun": {
+				"displayName": "fun [JP]",
+				"unitPattern-count-other": "{0} fun [JP]"
+			},
+			"concentr-part-per-1e9": {
 				"displayName": "p.p. 10⁹",
 				"unitPattern-count-one": "{0} p.p. 10⁹",
-				"unitPattern-count-other": "{0} p.p. 10⁹"
+				"unitPattern-count-other": "{0} p.p. 10⁹"
 			},
 			"duration-night": {
 				"displayName": "nuits",
-				"unitPattern-count-one": "{0} nuit",
-				"unitPattern-count-other": "{0} nuits",
+				"unitPattern-count-one": "{0} nuit",
+				"unitPattern-count-other": "{0} nuits",
 				"perUnitPattern": "{0}/nuit"
 			},
 			"coordinateUnit": {
 				"displayName": "direction",
-				"east": "{0} E.",
-				"north": "{0} N.",
-				"south": "{0} S.",
-				"west": "{0} O."
+				"east": "{0} E.",
+				"north": "{0} N.",
+				"south": "{0} S.",
+				"west": "{0} O."
 			}
 		}
 	},
 	"lenient-scope-number": {
-		"minusSign": "-－﹣‑‒−⁻₋➖",
+		"minusSign": "-－﹣‐‑‒–−⁻₋➖",
 		"commaSign": ",，﹐︐،٫、﹑､︑",
 		"plusSign": "+＋﬩﹢⁺₊➕"
 	},
 	"currencyFormat-sap-short": {
-		"1000-one": "0 k¤",
-		"1000-one-alphaNextToNumber": "0 k ¤",
-		"1000-other": "0 k¤",
-		"1000-other-alphaNextToNumber": "0 k ¤",
-		"10000-one": "00 k¤",
-		"10000-one-alphaNextToNumber": "00 k ¤",
-		"10000-other": "00 k¤",
-		"10000-other-alphaNextToNumber": "00 k ¤",
-		"100000-one": "000 k¤",
-		"100000-one-alphaNextToNumber": "000 k ¤",
-		"100000-other": "000 k¤",
-		"100000-other-alphaNextToNumber": "000 k ¤",
-		"1000000-one": "0 M¤",
-		"1000000-one-alphaNextToNumber": "0 M ¤",
-		"1000000-other": "0 M¤",
-		"1000000-other-alphaNextToNumber": "0 M ¤",
-		"10000000-one": "00 M¤",
-		"10000000-one-alphaNextToNumber": "00 M ¤",
-		"10000000-other": "00 M¤",
-		"10000000-other-alphaNextToNumber": "00 M ¤",
-		"100000000-one": "000 M¤",
-		"100000000-one-alphaNextToNumber": "000 M ¤",
-		"100000000-other": "000 M¤",
-		"100000000-other-alphaNextToNumber": "000 M ¤",
-		"1000000000-one": "0 G¤",
-		"1000000000-one-alphaNextToNumber": "0 G ¤",
-		"1000000000-other": "0 G¤",
-		"1000000000-other-alphaNextToNumber": "0 G ¤",
-		"10000000000-one": "00 G¤",
-		"10000000000-one-alphaNextToNumber": "00 G ¤",
-		"10000000000-other": "00 G¤",
-		"10000000000-other-alphaNextToNumber": "00 G ¤",
-		"100000000000-one": "000 G¤",
-		"100000000000-one-alphaNextToNumber": "000 G ¤",
-		"100000000000-other": "000 G¤",
-		"100000000000-other-alphaNextToNumber": "000 G ¤",
-		"1000000000000-one": "0 T¤",
-		"1000000000000-one-alphaNextToNumber": "0 T ¤",
-		"1000000000000-other": "0 T¤",
-		"1000000000000-other-alphaNextToNumber": "0 T ¤",
-		"10000000000000-one": "00 T¤",
-		"10000000000000-one-alphaNextToNumber": "00 T ¤",
-		"10000000000000-other": "00 T¤",
-		"10000000000000-other-alphaNextToNumber": "00 T ¤",
-		"100000000000000-one": "000 T¤",
-		"100000000000000-one-alphaNextToNumber": "000 T ¤",
-		"100000000000000-other": "000 T¤",
-		"100000000000000-other-alphaNextToNumber": "000 T ¤"
+		"1000-one": "0 k ¤",
+		"1000-other": "0 k ¤",
+		"10000-one": "00 k ¤",
+		"10000-other": "00 k ¤",
+		"100000-one": "000 k ¤",
+		"100000-other": "000 k ¤",
+		"1000000-one": "0 M ¤",
+		"1000000-other": "0 M ¤",
+		"10000000-one": "00 M ¤",
+		"10000000-other": "00 M ¤",
+		"100000000-one": "000 M ¤",
+		"100000000-other": "000 M ¤",
+		"1000000000-one": "0 G ¤",
+		"1000000000-other": "0 G ¤",
+		"10000000000-one": "00 G ¤",
+		"10000000000-other": "00 G ¤",
+		"100000000000-one": "000 G ¤",
+		"100000000000-other": "000 G ¤",
+		"1000000000000-one": "0 T ¤",
+		"1000000000000-other": "0 T ¤",
+		"10000000000000-one": "00 T ¤",
+		"10000000000000-other": "00 T ¤",
+		"100000000000000-one": "000 T ¤",
+		"100000000000000-other": "000 T ¤"
 	},
 	"currencyDigits": {
 		"ADP": 0,
@@ -5907,11 +6097,13 @@
 		"BYR": 0,
 		"CLF": 4,
 		"CLP": 0,
+		"COP": 0,
 		"DEFAULT": 2,
 		"DJF": 0,
 		"ESP": 0,
 		"GNF": 0,
 		"HUF": 0,
+		"IDR": 0,
 		"IQD": 0,
 		"IRR": 0,
 		"ISK": 0,
@@ -5931,6 +6123,7 @@
 		"MMK": 0,
 		"MRO": 0,
 		"OMR": 3,
+		"PKR": 0,
 		"PYG": 0,
 		"RSD": 0,
 		"RWF": 0,
@@ -5968,45 +6161,46 @@
 	},
 	"eras-gregorian": {
 		"0": {
-			"_code": "gregory-inverse",
-			"_aliases": "bc bce",
+			"_code": "bce",
+			"_aliases": "bc",
 			"_end": "0-12-31"
 		},
 		"1": {
-			"_code": "gregory",
-			"_aliases": "ad ce",
+			"_code": "ce",
+			"_aliases": "ad",
 			"_start": "1-01-01"
 		}
 	},
 	"eras-islamic": {
 		"0": {
-			"_code": "islamic",
-			"_aliases": "ah",
-			"_start": "622-7-15"
+			"_code": "ah",
+			"_start": "622-07-19"
+		},
+		"1": {
+			"_code": "bh",
+			"_end": "622-07-18"
 		}
 	},
 	"eras-persian": {
 		"0": {
-			"_code": "persian",
-			"_aliases": "ap",
-			"_start": "622-01-01"
+			"_code": "ap",
+			"_start": "622-03-21"
 		}
 	},
 	"eras-buddhist": {
 		"0": {
-			"_code": "buddhist",
-			"_aliases": "be",
+			"_code": "be",
 			"_start": "-542-01-01"
 		}
 	},
 	"eras-japanese": {
 		"232": {
 			"_code": "meiji",
-			"_start": "1868-9-8"
+			"_start": "1868-10-23"
 		},
 		"233": {
 			"_code": "taisho",
-			"_start": "1912-7-30"
+			"_start": "1912-07-30"
 		},
 		"234": {
 			"_code": "showa",
@@ -6014,11 +6208,11 @@
 		},
 		"235": {
 			"_code": "heisei",
-			"_start": "1989-1-8"
+			"_start": "1989-01-08"
 		},
 		"236": {
 			"_code": "reiwa",
-			"_start": "2019-5-1"
+			"_start": "2019-05-01"
 		}
 	},
 	"dayPeriodRules": {

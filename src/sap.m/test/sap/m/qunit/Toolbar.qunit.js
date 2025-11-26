@@ -334,6 +334,58 @@ sap.ui.define([
 		oTB.destroy();
 	});
 
+	QUnit.test("Default ARIA attributes", async function(assert) {
+		const MyTitle = Control.extend("my.Title", {
+			metadata : {
+				library : "my",
+				interfaces : [
+					"sap.ui.core.ITitle"
+				],
+				properties : {
+					"text" : "string"
+				}
+			},
+			renderer : {
+				apiVersion: 2,
+				render: (oRm, oControl) => {
+					oRm.openStart("div", oControl).openEnd().text(oControl.getText()).close("div");
+				}
+			}
+		});
+
+		const oMyTitle = new MyTitle({
+			text : "Title"
+		});
+		const oToolbar = new Toolbar({
+			content : [
+				oMyTitle,
+				new Button({
+					text: "Btn1"
+				}),
+				new Button({
+					text: "Btn2"
+				})
+			]
+		});
+
+		oToolbar.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		assert.equal(oToolbar.getTitleControl(), oMyTitle, "getTitleControl returns the custom title control");
+		assert.equal(oToolbar.getTitleId(), oMyTitle.getId(), "getTitleId returns the custom title control ID");
+		assert.equal(oToolbar.$().attr("aria-labelledby"), oMyTitle.getId(), "Toolbar is labelled by the custom title control");
+
+		oMyTitle.setVisible(false);
+		oToolbar.invalidate();
+		await nextUIUpdate();
+
+		assert.notOk(oToolbar.getTitleControl(), undefined, "getTitleControl does not return the custom title control since it is invisible");
+		assert.notOk(oToolbar.getTitleId(), "getTitleId returns empty since the custom title control is invisible");
+		assert.notOk(oToolbar.$().attr("aria-labelledby"), "Toolbar is not labelled by the custom invisible title control");
+
+		oToolbar.destroy();
+	});
+
 	QUnit.test("Role attribute and aria-labelledby with interactive Controls", async function(assert) {
 		// Arrange + System under Test
 		var oBtn1 = new Button({

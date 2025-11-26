@@ -20,6 +20,7 @@ sap.ui.define([
 	 * @constructor
 	 * @since 1.80.0
 	 * @alias sap.ui.mdc.filterbar.aligned.FilterContainer
+	 * @deprecated As of version 1.144, replaced by {@link sap.ui.mdc.filterbar.FilterContainer}.
 	 */
 	const FilterContainer = IFilterContainer.extend("sap.ui.mdc.filterbar.aligned.FilterContainer", {
 		metadata: {

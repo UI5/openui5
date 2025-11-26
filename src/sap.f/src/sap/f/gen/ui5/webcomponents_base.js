@@ -42,30 +42,35 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents_base.AnimationMode
      * @ui5-module-override sap/f/gen/ui5/webcomponents_base AnimationMode
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["AnimationMode"] = {
       /**
        * Full
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Full: "Full",
       /**
        * Basic
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Basic: "Basic",
       /**
        * Minimal
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Minimal: "Minimal",
       /**
        * None
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       None: "None"
     };
@@ -77,36 +82,42 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents_base.CalendarType
      * @ui5-module-override sap/f/gen/ui5/webcomponents_base CalendarType
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["CalendarType"] = {
       /**
        * Gregorian
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Gregorian: "Gregorian",
       /**
        * Islamic
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Islamic: "Islamic",
       /**
        * Japanese
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Japanese: "Japanese",
       /**
        * Buddhist
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Buddhist: "Buddhist",
       /**
        * Persian
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Persian: "Persian"
     };
@@ -118,18 +129,21 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents_base.ItemNavigationBehavior
      * @ui5-module-override sap/f/gen/ui5/webcomponents_base ItemNavigationBehavior
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["ItemNavigationBehavior"] = {
       /**
        * Static behavior: navigations stops at the first or last item.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Static: "Static",
       /**
        * Cycling behavior: navigating past the last item continues with the first and vice versa.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Cyclic: "Cyclic"
     };
@@ -144,24 +158,28 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents_base.MovePlacement
      * @ui5-module-override sap/f/gen/ui5/webcomponents_base MovePlacement
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["MovePlacement"] = {
       /**
        * On
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       On: "On",
       /**
        * Before
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Before: "Before",
       /**
        * After
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       After: "After"
     };
@@ -173,30 +191,35 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents_base.NavigationMode
      * @ui5-module-override sap/f/gen/ui5/webcomponents_base NavigationMode
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["NavigationMode"] = {
       /**
        * Auto
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Auto: "Auto",
       /**
        * Vertical
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Vertical: "Vertical",
       /**
        * Horizontal
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Horizontal: "Horizontal",
       /**
        * Paging
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Paging: "Paging"
     };
@@ -211,24 +234,28 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents_base.SortOrder
      * @ui5-module-override sap/f/gen/ui5/webcomponents_base SortOrder
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["SortOrder"] = {
       /**
        * Sorting is not applied.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       None: "None",
       /**
        * Sorting is applied in ascending order.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Ascending: "Ascending",
       /**
        * Sorting is applied in descending order.
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Descending: "Descending"
     };
@@ -240,36 +267,42 @@ sap.ui.define(
      * @alias module:sap/f/gen/ui5/webcomponents_base.ValueState
      * @ui5-module-override sap/f/gen/ui5/webcomponents_base ValueState
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     pkg["ValueState"] = {
       /**
        * None
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       None: "None",
       /**
        * Positive
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Positive: "Positive",
       /**
        * Critical
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Critical: "Critical",
       /**
        * Negative
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Negative: "Negative",
       /**
        * Information
        *
        * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
        */
       Information: "Information"
     };

@@ -1886,11 +1886,26 @@ sap.ui.define([
 		assert.deepEqual(oFormat.parse("42 M km"), [42000000, "length-kilometer"]);
 		assert.deepEqual(oFormat.parse("42 M KM"), [42000000, "length-kilometer"]);
 
-		oFormat = NumberFormat.getUnitInstance({}, new Locale("en"));
+		// As of CLDR version 48 this case is not present anymore as there are no ambiguous units present in the data.
+		// Therefore, we constructed this case with custom units to cover the corresponding productive code lines.
+		oFormat = NumberFormat.getUnitInstance({
+			customUnits : {
+				"duration-century" : {
+					"displayName" : "c",
+					"unitPattern-count-other" : "{0} c"
+				},
+				"volume-cup" : {
+					"displayName" : "C",
+					"unitPattern-count-other" : "{0} c"
+				}
+			}
+		}, new Locale("en"));
 
 		// ambiguous unit (duration-century, volume-cup) cannot be parsed case insensitive
 		assert.deepEqual(oFormat.parse("1 c"), [1, undefined]);
 		assert.deepEqual(oFormat.parse("1 C"), null);
+
+		oFormat = NumberFormat.getUnitInstance({}, new Locale("en"));
 
 		// only exact matches should be found for units only differing by case
 		assert.deepEqual(oFormat.parse("42 g"), [42, "mass-gram"]);
@@ -1964,6 +1979,22 @@ sap.ui.define([
 
 		assert.deepEqual(oFormat.parse("g"), [undefined, "mass-gram"]);
 		assert.deepEqual(oFormat.parse("G"), [undefined, "acceleration-g-force"]);
+
+		// As of CLDR version 48 this case is not present anymore as there are no ambiguous units present in the data.
+		// Therefore, we constructed this case with custom units to cover the corresponding productive code lines.
+		oFormat = NumberFormat.getUnitInstance({
+			customUnits : {
+				"duration-century" : {
+					"displayName" : "c",
+					"unitPattern-count-other" : "{0} c"
+				},
+				"volume-cup" : {
+					"displayName" : "C",
+					"unitPattern-count-other" : "{0} c"
+				}
+			},
+			showNumber: false
+		}, new Locale("en"));
 
 		// ambiguous matches resulting of case-insensitivity are not parseable
 		assert.deepEqual(oFormat.parse("c"), null);
@@ -2161,18 +2192,18 @@ sap.ui.define([
 	//*********************************************************************************************
 	QUnit.test("Unit parse custom pattern in config", function (assert) {
 		var oConfigObject = {
-			"electric-inductance": {
-				"displayName": "H",
-				"unitPattern-count-one": "{0} H",
-				"unitPattern-count-other": "{0} H"
+			"my-custom-unit": {
+				"displayName": "Z",
+				"unitPattern-count-one": "{0} Z",
+				"unitPattern-count-other": "{0} Z"
 			}
 		};
 		Formatting.setCustomUnits(oConfigObject);
 		var oFormat = NumberFormat.getUnitInstance({});
 
 		assert.deepEqual(oFormat.parse("20 ha"), [20, "area-hectare"], "20 ha");
-		assert.deepEqual(oFormat.parse("20 H"), [20, "electric-inductance"], "20 H");
-		assert.deepEqual(oFormat.parse("1 H"), [1, "electric-inductance"], "1 H");
+		assert.deepEqual(oFormat.parse("20 Z"), [20, "my-custom-unit"], "20 Z");
+		assert.deepEqual(oFormat.parse("1 Z"), [1, "my-custom-unit"], "1 Z");
 
 		Formatting.setCustomUnits(undefined);
 	});
@@ -4682,17 +4713,17 @@ sap.ui.define([
 
 			// ’ (apostrophe) is default e.g. for Italian Switzerland (it_CH.json)
 			oFloatFormat = NumberFormat.getFloatInstance(oOptions, new Locale("it_CH"));
-			assert.deepEqual(oFloatFormat.parse("1’234’567"), 1234567, "Parse '1’234’567'");
-			assert.deepEqual(oFloatFormat.parse("1234’567.89"), 1234567.89, "Parse '1234’567.89'");
+			assert.deepEqual(oFloatFormat.parse("1'234'567"), 1234567, "Parse '1’234’567'");
+			assert.deepEqual(oFloatFormat.parse("1234'567.89"), 1234567.89, "Parse '1234’567.89'");
 			// tolerated, as single separator with grouping base size (assumingly a grouping separator)
-			assert.deepEqual(oFloatFormat.parse("1234’567"), 1234567, "Parse '1234’567'");
+			assert.deepEqual(oFloatFormat.parse("1234'567"), 1234567, "Parse '1234’567'");
 
 			// wrong grouping
 			if (oOptions.strictGroupingValidation) {
-				assert.deepEqual(oFloatFormat.parse("1’23’45’67"), NaN, "Parse '1’23’45’67'");
+				assert.deepEqual(oFloatFormat.parse("1'23'45'67"), NaN, "Parse '1’23’45’67'");
 			} else {
 				// tolerated, because of multiple grouping separators
-				assert.deepEqual(oFloatFormat.parse("1’23’45’67"), 1234567, "Parse '1’23’45’67'");
+				assert.deepEqual(oFloatFormat.parse("1'23'45'67"), 1234567, "Parse '1’23’45’67'");
 			}
 
 			// custom groupingSize
@@ -5673,21 +5704,21 @@ sap.ui.define([
 		sExpectedResult: "(1,234,567.89\u00a0USD)"
 	}, {
 		oFormatOptions: {currencyCode: false, style: "short"},
-		sExpectedResult: "$\ufeff-1.2M"
+		sExpectedResult: "$\ufeff-1.2m"
 	}, {
 		oFormatOptions: {currencyCode: false, style: "short"},
 		sCurrency: "INR",
 		sExpectedResult: "\u20b9\ufeff-12 Lk"
 	}, {
 		oFormatOptions: {style: "short", trailingCurrencyCode: false},
-		sExpectedResult: "USD\ufeff-1.2M"
+		sExpectedResult: "USD\ufeff-1.2m"
 	}, {
 		oFormatOptions: {style: "short", trailingCurrencyCode: false},
 		sCurrency: "INR",
 		sExpectedResult: "INR\ufeff-12 Lk"
 	}, {
 		oFormatOptions: {style: "short", trailingCurrencyCode: true},
-		sExpectedResult: "-1.2M\u00a0USD"
+		sExpectedResult: "-1.2m\u00a0USD"
 	}, {
 		oFormatOptions: {style: "short", trailingCurrencyCode: true},
 		sCurrency: "INR",

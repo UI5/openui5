@@ -1,12 +1,9 @@
 {
-	"_version": "2.0.0",
+	"_version": "%LATEST_SCHEMA_VERSION%",
 	"sap.app": {
 		"id": "card.explorer.filters.combobox.dynamic",
 		"type": "card",
-		"title": "Sample of a Card with filters",
-		"applicationVersion": {
-			"version": "1.0.0"
-		}
+		"title": "Sample of a Card with filters"
 	},
 	"sap.card": {
 		"configuration": {
@@ -60,7 +57,7 @@
 		"type": "List",
 		"header": {
 			"title": "Orders from {filters>/country/value}",
-			"subtitle": "{filters>/country/selectedItem/title}, key: {filters>/country/selectedItem/key}, additional text: {filters>/country/selectedItem/additionalText}",
+			"subtitle" : "{filters>/country/selectedItem/title}, key: {filters>/country/selectedItem/key}, additional text: {filters>/country/selectedItem/additionalText}",
 			"icon": {
 				"src": "sap-icon://product"
 			}

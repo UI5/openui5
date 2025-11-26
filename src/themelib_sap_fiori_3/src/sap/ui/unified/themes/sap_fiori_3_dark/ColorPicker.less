@@ -16,10 +16,12 @@
 }
 
 .sapUnifiedColorPicker {
+
 	.sapUiColorPicker-ColorPickerAlphaSlider,
 	.sapUiColorPicker-ColorPickerSlider {
+
 		.sapMSliderHandle {
-			border: 0.125rem solid @sapUiFieldBorderColor;
+			border: 0.125rem solid var(--sapField_BorderColor);
 			background-color: transparent;
 			height: 1.625rem;
 		}
@@ -27,15 +29,17 @@
 }
 
 .sapUiColorPicker-ColorPickerMatrix.sapUnifiedColorPicker {
+
 	.sapUiColorPicker-ColorPickerHexField,
 	.sapUiCPHexWrapper,
 	.sapUiCPComparisonWrapper {
+		margin-top: 0.5rem;
+		vertical-align: top;
+
 		.sapUiColorPicker-ColorPickerOldColor,
 		.sapUiColorPicker-ColorPickerNewColor {
 			height: 2.25rem;
 		}
-		margin-top: 0.5rem;
-		vertical-align: top;
 	}
 }
 
@@ -46,6 +50,7 @@
 }
 
 .sapUiColorPicker-Large {
+
 	.sapUiCPHSLVText {
 		padding-left: 2.125rem;
 	}
@@ -62,6 +67,7 @@
 }
 
 .sapUiSizeCompact {
+
 	.sapUnifiedColorPicker:not(.sapUiCPPhone) .sapUiCPComparisonWrapper {
 		height: 1.5rem;
 		vertical-align: top;
@@ -75,26 +81,33 @@
 	.sapUiColorPicker-Simplified.sapUnifiedColorPicker.sapUiCPPhone .sapUiColorPicker-ColorPickerOldColor {
 		height: 2.065rem;
 	}
+
 	.sapUiColorPicker-Default.sapUnifiedColorPicker.sapUiCPPhone {
+
 		.sapUiColorPicker-ColorPickerNewColor,
 		.sapUiColorPicker-ColorPickerOldColor {
 			width: 2.5rem;
 			height: 1.5rem;
 		}
+
 		.sapMBtn {
 			width: 2.5rem;
 			margin-left: 1.1rem;
 		}
+
 		.sapUiColorPicker-ColorPickerSlider {
 			margin-bottom: 0.0625rem;
 		}
 	}
+
 	.sapUnifiedColorPicker {
+
 		.sapUiColorPicker-ColorPickerAlphaSlider,
 		.sapUiColorPicker-ColorPickerSlider {
+
 			.sapMSliderHandle {
 				height: 1.25rem;
-			 }
+			}
 		}
 	}
 }
@@ -108,8 +121,9 @@
 }
 
 .sapUnifiedColorPicker .sapMSliderProgress {
-	background: @sapUiSliderSelectedBackground;
-	&:before {
+	background: var(--sapSlider_Selected_Background);
+
+	&::before {
 		content: none;
 		transform: none;
 	}

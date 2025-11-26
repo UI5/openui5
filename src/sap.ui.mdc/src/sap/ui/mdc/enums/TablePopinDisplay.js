@@ -15,13 +15,13 @@ sap.ui.define(["sap/ui/base/DataType"], (DataType) => {
 	 */
 	const TablePopinDisplay = {
 		/**
-		 * The header is displayed in the first line, and the cell content is displayed in the next line.
+		 * The header is displayed on the first line, and the cell content is displayed on the next line.
 		 * @public
 		 */
 		Block: "Block",
 		/**
-		 * The cell content is displayed next to the header in the same line.
-		 * <b>Note:</b> If there is not enough space for the cell content, then it is displayed in the next line.
+		 * The cell content is displayed next to the header on the same line.
+		 * <b>Note:</b> If there is not enough space for the cell content, then it is displayed on the next line.
 		 * @public
 		 */
 		Inline: "Inline"

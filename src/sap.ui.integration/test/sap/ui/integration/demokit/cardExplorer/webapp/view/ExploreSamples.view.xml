@@ -123,7 +123,13 @@
 							</OverflowToolbarButton>
 						</OverflowToolbar>
 					</customHeader>
-					<cardExplorer:FileEditor id="fileEditor" manifestChange="onFileEditorManifestChange" designtimeChange="onFileEditorDesigntimeChange" fileSwitch="onFileSwitch" visible="{= ${settings>/editorType} === 'TEXT' }" />
+					<cardExplorer:FileEditor
+						id="fileEditor"
+						manifestChange="onFileEditorManifestChange"
+						designtimeChange="onFileEditorDesigntimeChange"
+						fileSwitch="onFileSwitch"
+						visible="{= ${settings>/editorType} === 'TEXT' }"
+						fileModifier=".modifyFile" />
 					<footer>
 						<OverflowToolbar>
 							<ToolbarSpacer/>

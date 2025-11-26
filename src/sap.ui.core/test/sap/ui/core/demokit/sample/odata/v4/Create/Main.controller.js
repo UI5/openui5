@@ -1,7 +1,8 @@
 sap.ui.define([
 	"sap/m/MessageBox",
+	"sap/ui/core/Messaging",
 	"sap/ui/core/mvc/Controller"
-], function (MessageBox, Controller) {
+], function (MessageBox, Messaging, Controller) {
 	"use strict";
 
 	return Controller.extend("sap.ui.core.sample.odata.v4.Create.Main", {
@@ -24,8 +25,16 @@ sap.ui.define([
 			oDialog.open();
 		},
 		onSaveSalesOrder : function () {
-			this.getView().getModel().submitBatch("update");
-			this.byId("createDialog").close();
+			const aMessages = Messaging.getMessageModel().getObject("/").filter((oMessage) => {
+				return oMessage.type === "Error" && oMessage.getControlId();
+			});
+
+			if (aMessages.length) {
+				this.byId(aMessages[0].getControlId()).focus();
+			} else {
+				this.getView().getModel().submitBatch("update");
+				this.byId("createDialog").close();
+			}
 		},
 		onCancelSalesOrder : function (oEvent) {
 			const oContext = oEvent.getSource().getBindingContext();

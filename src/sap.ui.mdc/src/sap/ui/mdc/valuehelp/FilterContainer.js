@@ -6,23 +6,21 @@
 sap.ui.define(
 	[
 		"sap/ui/mdc/filterbar/IFilterContainer",
-		"sap/ui/layout/AlignedFlowLayout",
+		"sap/ui/mdc/filterbar/FilterBarBaseLayout",
 		"sap/m/OverflowToolbar",
-		"sap/m/ToolbarSpacer",
-		"sap/m/VBox"
+		"sap/m/ToolbarSpacer"
 	],
 	(
 		IFilterContainer,
-		AlignedFlowLayout,
+		FilterBarBaseLayout,
 		Toolbar,
-		ToolbarSpacer,
-		VBox
+		ToolbarSpacer
 	) => {
 		"use strict";
 		/**
 		 * Constructor for a new valuehelp/FilterContainer.
 		 * @param {string} [sId] ID for the new control, generated automatically if no ID is given
-		 * @class The FilterContainer is a IFilterContainer implementation for <code>AlignedFlowLayout</code>
+		 * @class The FilterContainer is a IFilterContainer implementation for {@link sap.ui.mdc.filterbar.FilterBarBaseLayout FilterBarBaseLayout}.
 		 * @extends sap.ui.mdc.filterbar.IFilterContainer
 		 * @constructor
 		 * @private
@@ -40,7 +38,7 @@ sap.ui.define(
 						 */
 						_layout: {
 							type: "sap.ui.core.Control",
-							multiple: false,
+							multiple: true,
 							visibility: "hidden"
 						}
 					}
@@ -49,19 +47,12 @@ sap.ui.define(
 		);
 
 		FilterContainer.prototype.init = function() {
+			this.oLayout = new FilterBarBaseLayout();
+			this.oLayout._oToolbar = new Toolbar(this.getId() + "-tbr", { content: [new ToolbarSpacer()] });
+
 			this.aLayoutItems = [];
-
-			this.oToolbar = new Toolbar(this.getId() + "-tbr", { content: [new ToolbarSpacer()] });
-
-			this.oAlgnLayout = new AlignedFlowLayout(this.getId() + "-aflayout", {
-				visible: "{$sap.ui.filterbar.mdc.FilterBarBase>/expandFilterFields}"
-			}).addStyleClass("sapUiMdcFilterBarBaseAFLayout");
-
-			this.oLayout = new VBox(this.getId() + "-vbox", {
-				items: [this.oToolbar, this.oAlgnLayout]
-			});
-
-			this.setAggregation("_layout", this.oLayout, true);
+			this.addAggregation("_layout", this.oLayout._oToolbar, true);
+			this.addAggregation("_layout", this.oLayout, true);
 		};
 
 		FilterContainer.prototype.exit = function() {
@@ -72,19 +63,15 @@ sap.ui.define(
 		};
 
 		FilterContainer.prototype.addControl = function(oControl) {
-			this.oToolbar.addContent(oControl);
+			this.oLayout._oToolbar.addContent(oControl);
 		};
 
 		FilterContainer.prototype.insertControl = function(oControl, iIndex) {
-			this.oToolbar.insertContent(oControl, iIndex);
+			this.oLayout._oToolbar.insertContent(oControl, iIndex);
 		};
 
 		FilterContainer.prototype.removeControl = function(oControl) {
-			this.oToolbar.removeContent(oControl);
-		};
-
-		FilterContainer.prototype.addEndContent = function(oControl) {
-			this.oAlgnLayout.addEndContent(oControl);
+			this.oLayout._oToolbar.removeContent(oControl);
 		};
 
 		FilterContainer.prototype.insertFilterField = function(oControl, iIndex) {
@@ -110,7 +97,7 @@ sap.ui.define(
 		};
 
 		FilterContainer.prototype.getFilterFields = function() {
-			return this.oAlgnLayout.getContent();
+			return this.getParent().getProperty("expandFilterFields") ? this.oLayout.getContent() : [];
 		};
 
 		FilterContainer.prototype._updateFilterBarLayout = function(bShowAll) {
@@ -120,7 +107,7 @@ sap.ui.define(
 			let bUpdate = bShowAll || n <= iThreshold;
 
 			if (!bUpdate) {
-				const aItems = this.oAlgnLayout.getContent();
+				const aItems = this.oLayout._getFilterItems();
 				aItems.some((oItem, i) => {
 					if (oItem != this.aLayoutItems[i]) {
 						bUpdate = true;
@@ -131,19 +118,24 @@ sap.ui.define(
 			}
 
 			if (bUpdate) {
-				this.oAlgnLayout.removeAllContent();
+				this.oLayout.removeAllContent();
 
 				this.aLayoutItems.some((oLayoutItem, nIdx) => {
 					if (bShowAll || n <= iThreshold || nIdx < iThreshold) {
-						this.oAlgnLayout.insertContent(oLayoutItem, nIdx);
+						this.oLayout.insertContent(oLayoutItem, nIdx);
 						return false;
 					}
 					return true;
 				});
 			}
 
-			const oShowAllFiltersBtn = this.oAlgnLayout.getEndContent()[0];
-			oShowAllFiltersBtn.setVisible(!bShowAll && n > iThreshold);
+			this.getParent().setProperty("_showAllFiltersEnabled", !bShowAll && n > iThreshold);
+		};
+
+		FilterContainer.prototype.exit = function () {
+			this.oLayout._oToolbar = null;
+			this.oLayout = null;
+			this.aLayoutItems = null;
 		};
 
 		return FilterContainer;

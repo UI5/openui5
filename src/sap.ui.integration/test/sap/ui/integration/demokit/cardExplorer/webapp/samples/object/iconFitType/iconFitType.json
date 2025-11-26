@@ -1,5 +1,5 @@
 {
-	"_version": "2.0.0",
+	"_version": "%LATEST_SCHEMA_VERSION%",
 	"sap.app": {
 		"id": "card.explorer.object.imageFitType",
 		"type": "card",
@@ -31,10 +31,7 @@
 		"configuration": {
 			"parameters": {
 				"visibleCompanyFields": {
-					"value": [
-						"companyDetails",
-						"companyName"
-					]
+					"value": ["companyDetails", "companyName"]
 				}
 			}
 		},
@@ -47,18 +44,18 @@
 				"photo": "./images/team.jpg",
 				"fit": "Cover",
 				"team": {
-					"manager": {
-						"firstName": "Donna",
-						"lastName": "Moore",
-						"photo": "./images/leader.jpg",
-						"fit": "Contain"
-					},
-					"supervisor": {
-						"firstName": "Alain",
-						"lastName": "Chevalier",
-						"photo": "./images/supervisor.png",
-						"fit": "Cover"
-					}
+				    "manager": {
+					    "firstName": "Donna",
+					    "lastName": "Moore",
+					    "photo": "./images/leader.jpg",
+					    "fit": "Contain"
+				    },
+				    "supervisor": {
+				    	"firstName": "Alain",
+				    	"lastName": "Chevalier",
+				    	"photo": "./images/supervisor.png",
+				    	"fit": "Cover"
+				    }
 				}
 			}
 		},
@@ -75,7 +72,7 @@
 				{
 					"title": "Status Metrics",
 					"items": [
-						{
+					    {
 							"value": "Project is on track",
 							"type": "Status",
 							"state": "Success",

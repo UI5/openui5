@@ -188,7 +188,7 @@ sap.ui.define([
 		var oLocaleData = LocaleData.getInstance(new Locale(Formatting.getLanguageTag()));
 		assert.equal(oLocaleData.getDatePattern("short"), "MM-dd-yyyy", "short pattern should be the one defined in format settings");
 		assert.equal(oLocaleData.getDatePattern("medium"), "MM-dd-yyyy", "medium pattern should be the one defined in format settings");
-		assert.equal(oLocaleData.getDatePattern("short", CalendarType.Islamic), "M/d/y GGGGG", "short pattern for Islamic calendar type should be fetched from locale data");
+		assert.equal(oLocaleData.getDatePattern("short", CalendarType.Islamic), "M/d/y G", "short pattern for Islamic calendar type should be fetched from locale data");
 
 		Formatting.setABAPTimeFormat("0");
 		assert.equal(oLocaleData.getTimePattern("short"), "HH:mm", "short pattern should be the one defined in format settings");

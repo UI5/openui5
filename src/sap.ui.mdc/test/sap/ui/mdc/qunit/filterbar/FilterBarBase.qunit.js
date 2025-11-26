@@ -1025,6 +1025,7 @@ sap.ui.define([
         const oBasicSearchFieldMock = {};
         oBasicSearchFieldMock.getPropertyKey = sinon.stub().returns("");
         oBasicSearchFieldMock.setPropertyKey = sinon.stub();
+        oBasicSearchFieldMock.setModel = sinon.stub();
 
         assert.ok(oBasicSearchFieldMock.getPropertyKey.notCalled, "should not call 'getPropertyKey' initially");
         assert.ok(oBasicSearchFieldMock.setPropertyKey.notCalled, "should not call 'setPropertyKey' initially");

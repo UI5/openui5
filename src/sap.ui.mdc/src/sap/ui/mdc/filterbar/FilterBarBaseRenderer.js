@@ -21,23 +21,17 @@ sap.ui.define([], () => {
 	 */
 	FilterBarBaseRenderer.CSS_CLASS = "sapUiMdcFilterBarBase";
 
-	/**
-	 * Renders the HTML for the given control, using the provided {@link sap.ui.core.RenderManager}.
-	 *
-	 * @param {sap.ui.core.RenderManager} oRm The RenderManager that can be used for writing to the render output buffer
-	 * @param {sap.ui.mdc.filterbar.FilterBarBase} oControl An object representation of the control that should be rendered
-	 */
-	FilterBarBaseRenderer.render = function(oRm, oControl) {
-		oRm.openStart("div", oControl);
+	FilterBarBaseRenderer.render = function(oRm, oFilterBar) {
+		oRm.openStart("div", oFilterBar);
 		oRm.class(FilterBarBaseRenderer.CSS_CLASS);
-		if (oControl.isA("sap.ui.mdc.filterbar.p13n.AdaptationFilterBar") && oControl.getProperty("_useFixedWidth")) {
-			oRm.style("width", oControl.getWidth());
+		if (oFilterBar.isA("sap.ui.mdc.filterbar.p13n.AdaptationFilterBar") && oFilterBar.getProperty("_useFixedWidth")) {
+			oRm.style("width", oFilterBar.getWidth());
 		}
 		oRm.openEnd();
 
-		oControl.getAggregation("invisibleTexts")?.forEach((oInvisibleText) => oRm.renderControl(oInvisibleText));
+		oFilterBar.getAggregation("invisibleTexts")?.forEach((oInvisibleText) => oRm.renderControl(oInvisibleText));
 
-		const oInnerLayout = oControl.getAggregation("layout") ? oControl.getAggregation("layout").getInner() : null;
+		const oInnerLayout = oFilterBar.getAggregation("layout") ? oFilterBar.getAggregation("layout").getInner() : null;
 		oRm.renderControl(oInnerLayout);
 		oRm.close("div");
 	};

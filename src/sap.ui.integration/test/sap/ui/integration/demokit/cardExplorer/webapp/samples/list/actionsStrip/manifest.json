@@ -1,12 +1,8 @@
 {
-	"_version": "2.0.0",
+	"_version": "%LATEST_SCHEMA_VERSION%",
 	"sap.app": {
 		"type": "card",
-		"id": "card.explorer.actionsStrip",
-		"title": "Card 'actionsStrip'",
-		"applicationVersion": {
-			"version": "1.0.0"
-		}
+		"id": "card.explorer.actionsStrip"
 	},
 	"sap.card": {
 		"extension": "./Extension",
@@ -42,7 +38,7 @@
 				"title": "{Name}",
 				"description": "{Description}",
 				"info": {
-					"value": "{= format.currency(${Price}, ${CurrencyCode})}"
+					"value":  "{= format.currency(${Price}, ${CurrencyCode})}"
 				},
 				"actionsStrip": [
 					{

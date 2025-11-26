@@ -32,6 +32,7 @@ sap.ui.define(
      * @extends module:sap/f/gen/ui5/webcomponents/dist/ListItem
      * @constructor
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      * @alias module:sap/f/gen/ui5/webcomponents/dist/MenuItem
      */
 
@@ -39,7 +40,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents.dist.MenuItem",
       {
         metadata: {
-          tag: "ui5-menu-item-cc48984a",
+          tag: "ui5-menu-item-68f7652d",
 
           namespace: "sap.f.gen.ui5.webcomponents",
 
@@ -56,6 +57,7 @@ sap.ui.define(
              * Defines the text of the tree item.
              */
             text: { type: "string", mapping: "property" },
+
             /**
              * Defines the `additionalText`, displayed in the end of the menu item.
              *
@@ -66,6 +68,7 @@ sap.ui.define(
              * sub-menu arrow (if there are items added in `items` slot) -> components added in `endContent` -> text set to `additionalText`.
              */
             additionalText: { type: "string", mapping: "property" },
+
             /**
              * Defines the icon to be displayed as graphical element within the component.
              * The SAP-icons font provides numerous options.
@@ -75,6 +78,7 @@ sap.ui.define(
              * See all the available icons in the [Icon Explorer](https://sdk.openui5.org/test-resources/sap/m/demokit/iconExplorer/webapp/index.html).
              */
             icon: { type: "string", mapping: "property" },
+
             /**
              * Defines whether menu item is in disabled state.
              *
@@ -89,6 +93,7 @@ sap.ui.define(
                 formatter: "_mapEnabled"
               }
             },
+
             /**
              * Defines the delay in milliseconds, after which the loading indicator will be displayed inside the corresponding menu popover.
              *
@@ -99,6 +104,7 @@ sap.ui.define(
               mapping: "property",
               defaultValue: false
             },
+
             /**
              * Defines the delay in milliseconds, after which the loading indicator will be displayed inside the corresponding menu popover.
              */
@@ -107,10 +113,12 @@ sap.ui.define(
               mapping: "property",
               defaultValue: 1000
             },
+
             /**
              * Defines the accessible ARIA name of the component.
              */
             accessibleName: { type: "string", mapping: "property" },
+
             /**
              * Defines whether menu item is in checked state.
              *
@@ -124,6 +132,7 @@ sap.ui.define(
               mapping: "property",
               defaultValue: false
             },
+
             /**
              * Defines the additional accessibility attributes that will be applied to the component.
              * The following fields are supported:
@@ -137,6 +146,7 @@ sap.ui.define(
               mapping: "property",
               defaultValue: "{}"
             },
+
             /**
              * Defines the visual indication and behavior of the list items.
              * Available options are `Active` (by default), `Inactive`, `Detail` and `Navigation`.
@@ -150,6 +160,7 @@ sap.ui.define(
               mapping: "property",
               defaultValue: "Active"
             },
+
             /**
              * The navigated state of the list item.
              * If set to `true`, a navigation indicator is displayed at the end of the list item.
@@ -159,6 +170,7 @@ sap.ui.define(
               mapping: "property",
               defaultValue: false
             },
+
             /**
              * Defines the highlight state of the list items.
              * Available options are: `"None"` (by default), `"Positive"`, `"Critical"`, `"Information"` and `"Negative"`.
@@ -169,6 +181,7 @@ sap.ui.define(
               mapping: "property",
               defaultValue: "None"
             },
+
             /**
              * Defines the selected state of the component.
              */
@@ -177,10 +190,12 @@ sap.ui.define(
               mapping: "property",
               defaultValue: false
             },
+
             /**
              * The 'width' of the Web Component in <code>sap.ui.core.CSSSize</code>.
              */
             width: { type: "sap.ui.core.CSSSize", mapping: "style" },
+
             /**
              * The 'height' of the Web Component in <code>sap.ui.core.CSSSize</code>.
              */

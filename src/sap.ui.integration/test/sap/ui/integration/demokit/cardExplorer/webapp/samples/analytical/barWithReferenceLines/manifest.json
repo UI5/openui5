@@ -1,5 +1,5 @@
 {
-	"_version": "2.0.0",
+	"_version": "%LATEST_SCHEMA_VERSION%",
 	"sap.app": {
 		"id": "card.explorer.analytical.barWithReferenceLines.card",
 		"type": "card",
@@ -46,38 +46,34 @@
 				"plotArea": {
 					"referenceLine": {
 						"line": {
-							"valueAxis": [
-								{
-									"value": 40000,
+							"valueAxis": [{
+								"value": 40000,
+								"visible": true,
+								"label": {
+									"text": "Low Performance",
 									"visible": true,
-									"label": {
-										"text": "Low Performance",
-										"visible": true,
-										"background": "sapUiNegativeElement"
-									},
-									"color": "sapUiNegativeElement"
+									"background": "sapUiNegativeElement"
 								},
-								{
-									"value": 120000,
+								"color": "sapUiNegativeElement"
+							},{
+								"value": 120000,
+								"visible": true,
+								"label": {
+									"text": "Medium Performance",
 									"visible": true,
-									"label": {
-										"text": "Medium Performance",
-										"visible": true,
-										"background": "sapUiCriticalElement"
-									},
-									"color": "sapUiCriticalElement"
+									"background": "sapUiCriticalElement"
 								},
-								{
-									"value": 230000,
+								"color": "sapUiCriticalElement"
+							},{
+								"value": 230000,
+								"visible": true,
+								"label": {
+									"text": "High Performance",
 									"visible": true,
-									"label": {
-										"text": "High Performance",
-										"visible": true,
-										"background": "sapUiPositiveElement"
-									},
-									"color": "sapUiPositiveElement"
-								}
-							]
+									"background": "sapUiPositiveElement"
+								},
+								"color": "sapUiPositiveElement"
+							}]
 						}
 					}
 				}

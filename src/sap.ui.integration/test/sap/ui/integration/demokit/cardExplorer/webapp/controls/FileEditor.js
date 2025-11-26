@@ -39,6 +39,9 @@ sap.ui.define([
 				editable: {
 					type: "boolean",
 					defaultValue: true
+				},
+				fileModifier: {
+					type: "function"
 				}
 			},
 			aggregations: {
@@ -361,42 +364,49 @@ sap.ui.define([
 		"properties": "text/plain"
 	};
 
-	FileEditor.prototype._fetchContents = function () {
-		var aFetchPromises = this._aFiles.map(function (oFile) {
-			var sType = oFile.url.substring(oFile.url.lastIndexOf(".") + 1);
+	FileEditor.prototype._fetchContents = async function () {
+		const aFetchPromises = this._aFiles.map(function (oFile) {
+			const sType = oFile.url.substring(oFile.url.lastIndexOf(".") + 1);
 			oFile._type = FileEditor.mimetypes[sType] || "text/plain";
 			oFile.promise = FileUtils.fetch(sap.ui.require.toUrl("sap/ui/demo/cardExplorer" + oFile.url));
 			return oFile.promise;
 		});
 
-		Promise.all(aFetchPromises)
-			.then(function (aData) {
-				aData.map(function (sData, i) {
-					this._aFiles[i]._url = URL.createObjectURL(new Blob([sData], { type: this._aFiles[i]._type }));
-					this._aFiles[i].content = sData;
-				}.bind(this));
+		try {
+			const aData = await Promise.all(aFetchPromises);
 
-				if (this.getDesigntimeFile()) {
-					this.fireDesigntimeChange({
-						value: this.getDesigntimeFile().content,
-						reRender: true
-					});
+			const aMapPromises = aData.map(async (sData, i) => {
+				this._aFiles[i]._url = URL.createObjectURL(new Blob([sData], { type: this._aFiles[i]._type }));
+
+				this._aFiles[i].content = sData;
+
+				if (this.getFileModifier()) {
+					await this.getFileModifier()(this._aFiles[i]);
 				}
+			});
 
-				this.fireManifestChange({
-					value: this.getCardManifestFile().content,
+			await Promise.all(aMapPromises);
+
+			if (this.getDesigntimeFile()) {
+				this.fireDesigntimeChange({
+					value: this.getDesigntimeFile().content,
 					reRender: true
 				});
+			}
 
-				this._getHeader().setSelectedKey(this._aFiles[0].key);
-				this._createIconTabFilters();
-				this._update();
-			}.bind(this))
-			.catch(function (sErr) {
-				this._getErrorsStrip()
-					.setVisible(true)
-					.setText(sErr);
-			}.bind(this));
+			this.fireManifestChange({
+				value: this.getCardManifestFile().content,
+				reRender: true
+			});
+
+			this._getHeader().setSelectedKey(this._aFiles[0].key);
+			this._createIconTabFilters();
+			this._update();
+		} catch (sErr) {
+			this._getErrorsStrip()
+				.setVisible(true)
+				.setText(sErr);
+		}
 	};
 
 	FileEditor.prototype._onFileSwitch = function (oEvent) {

@@ -267,7 +267,13 @@ sap.ui.define([
 	};
 
 	DesignTimeMetadata.prototype._getTextFromLibrary = function(sLibraryName, sKey, aArgs) {
-		const oLibResourceBundle = ResourceBundle.create({ bundleName: `${sLibraryName}/designtime/messagebundle` });
+		let oLibResourceBundle = ResourceBundle.create({ bundleName: `${sLibraryName}/designtime/messagebundle` });
+		if (oLibResourceBundle && oLibResourceBundle.hasText(sKey)) {
+			return oLibResourceBundle.getText(sKey, aArgs);
+		}
+		// Fallback to old logic that tries to get the text from the libraries resource bundle
+		// TODO#12
+		oLibResourceBundle = Lib.getResourceBundleFor(sLibraryName);
 		if (oLibResourceBundle && oLibResourceBundle.hasText(sKey)) {
 			return oLibResourceBundle.getText(sKey, aArgs);
 		}

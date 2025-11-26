@@ -49,6 +49,7 @@ sap.ui.define(
      * @extends sap.ui.core.webc.WebComponent
      * @constructor
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/IllustratedMessage
      */
 
@@ -56,7 +57,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents_fiori.dist.IllustratedMessage",
       {
         metadata: {
-          tag: "ui5-illustrated-message-cc48984a",
+          tag: "ui5-illustrated-message-68f7652d",
 
           namespace: "sap.f.gen.ui5.webcomponents_fiori",
 
@@ -98,6 +99,7 @@ sap.ui.define(
               mapping: "property",
               defaultValue: "BeforeSearch"
             },
+
             /**
              * Determines which illustration breakpoint variant is used.
              *
@@ -110,6 +112,7 @@ sap.ui.define(
               mapping: "property",
               defaultValue: "Auto"
             },
+
             /**
              * Defines the subtitle of the component.
              *
@@ -118,12 +121,14 @@ sap.ui.define(
              * **Note:** Using `subtitle` slot, the default of this property will be overwritten.
              */
             subtitleText: { type: "string", mapping: "property" },
+
             /**
              * Defines the title of the component.
              *
              * **Note:** Using this property, the default title text of illustration will be overwritten.
              */
             titleText: { type: "string", mapping: "property" },
+
             /**
              * Defines whether the illustration is decorative.
              *
@@ -134,14 +139,17 @@ sap.ui.define(
               mapping: "property",
               defaultValue: false
             },
+
             /**
              * The text-content of the Web Component.
              */
             text: { type: "string", mapping: "textContent" },
+
             /**
              * The 'width' of the Web Component in <code>sap.ui.core.CSSSize</code>.
              */
             width: { type: "sap.ui.core.CSSSize", mapping: "style" },
+
             /**
              * The 'height' of the Web Component in <code>sap.ui.core.CSSSize</code>.
              */

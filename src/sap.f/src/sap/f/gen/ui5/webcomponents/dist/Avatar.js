@@ -33,6 +33,7 @@ sap.ui.define(
      * @extends sap.ui.core.webc.WebComponent
      * @constructor
      * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
      * @alias module:sap/f/gen/ui5/webcomponents/dist/Avatar
      */
 
@@ -40,7 +41,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents.dist.Avatar",
       {
         metadata: {
-          tag: "ui5-avatar-cc48984a",
+          tag: "ui5-avatar-68f7652d",
 
           namespace: "sap.f.gen.ui5.webcomponents",
 
@@ -67,6 +68,7 @@ sap.ui.define(
                 formatter: "_mapEnabled"
               }
             },
+
             /**
              * Defines if the avatar is interactive (focusable and pressable).
              *
@@ -78,6 +80,7 @@ sap.ui.define(
               mapping: "property",
               defaultValue: false
             },
+
             /**
              * Defines the name of the UI5 Icon, that will be displayed.
              *
@@ -94,6 +97,7 @@ sap.ui.define(
              * See all the available icons in the [Icon Explorer](https://sdk.openui5.org/test-resources/sap/m/demokit/iconExplorer/webapp/index.html).
              */
             icon: { type: "string", mapping: "property" },
+
             /**
              * Defines the name of the fallback icon, which should be displayed in the following cases:
              *
@@ -116,12 +120,14 @@ sap.ui.define(
               mapping: "property",
               defaultValue: "employee"
             },
+
             /**
              * Defines the displayed initials.
              *
              * Up to three Latin letters can be displayed as initials.
              */
             initials: { type: "string", mapping: "property" },
+
             /**
              * Defines the shape of the component.
              * @type module:sap/f/gen/ui5/webcomponents.AvatarShape
@@ -131,6 +137,7 @@ sap.ui.define(
               mapping: "property",
               defaultValue: "Circle"
             },
+
             /**
              * Defines predefined size of the component.
              * @type module:sap/f/gen/ui5/webcomponents.AvatarSize
@@ -140,6 +147,7 @@ sap.ui.define(
               mapping: "property",
               defaultValue: "S"
             },
+
             /**
              * Defines the background color of the desired image.
              * If `colorScheme` is set to `Auto`, the avatar will be displayed with the `Accent6` color.
@@ -150,11 +158,13 @@ sap.ui.define(
               mapping: "property",
               defaultValue: "Auto"
             },
+
             /**
              * Defines the text alternative of the component.
              * If not provided a default text alternative will be set, if present.
              */
             accessibleName: { type: "string", mapping: "property" },
+
             /**
              * Defines the additional accessibility attributes that will be applied to the component.
              * The following field is supported:
@@ -167,14 +177,17 @@ sap.ui.define(
               mapping: "property",
               defaultValue: "{}"
             },
+
             /**
              * The text-content of the Web Component.
              */
             text: { type: "string", mapping: "textContent" },
+
             /**
              * The 'width' of the Web Component in <code>sap.ui.core.CSSSize</code>.
              */
             width: { type: "sap.ui.core.CSSSize", mapping: "style" },
+
             /**
              * The 'height' of the Web Component in <code>sap.ui.core.CSSSize</code>.
              */

@@ -1,12 +1,8 @@
 {
-	"_version": "2.0.0",
+	"_version": "%LATEST_SCHEMA_VERSION%",
 	"sap.app": {
 		"id": "sap.ui.integration.sample.Progressive.DefaultCard",
-		"type": "card",
-		"title": "Card 'DefaultCard'",
-		"applicationVersion": {
-			"version": "1.0.0"
-		}
+		"type": "card"
 	},
 	"sap.card": {
 		"type": "List",
@@ -57,53 +53,54 @@
 					"customStateIcon": "{CustomStateIcon}"
 				}
 			},
+
+
 			"data": {
-				"json": [
-					{
-						"Name": "Comfort Easy",
-						"Description": "32 GB Digital Assistant with high-resolution color screen",
-						"Sales": "150",
-						"State": "Warning",
-						"ShowStateIcon": true
-					},
-					{
-						"Name": "ITelO Vault",
-						"Description": "Digital Organizer with State-of-the-Art Storage Encryption",
-						"Sales": "540",
-						"State": "Success",
-						"ShowStateIcon": true
-					},
-					{
-						"Name": "Notebook Professional 15",
-						"Description": "Notebook Professional 15 with 2,80 GHz quad core, 15\" Multitouch LCD, 8 GB DDR3 RAM, 500 GB SSD - DVD-Writer (DVD-R/+R/-RW/-RAM),Windows 8 Pro",
-						"Sales": "350",
-						"State": "Success",
-						"ShowStateIcon": true
-					},
-					{
-						"Name": "Ergo Screen E-I",
-						"Description": "Optimum Hi-Resolution max. 1920 x 1080 @ 85Hz, Dot Pitch: 0.27mm",
-						"Sales": "100",
-						"State": "Error",
-						"ShowStateIcon": true,
-						"CustomStateIcon": "sap-icon://warning2"
-					},
-					{
-						"Name": "Ergo Screen E-I",
-						"Description": "Optimum Hi-Resolution max. 1920 x 1080 @ 85Hz, Dot Pitch: 0.27mm",
-						"Sales": "100",
-						"State": "Error",
-						"ShowStateIcon": true,
-						"CustomStateIcon": "sap-icon://warning2"
-					},
-					{
-						"Name": "Ergo Screen E-I",
-						"Description": "Optimum Hi-Resolution max. 1920 x 1080 @ 85Hz, Dot Pitch: 0.27mm",
-						"Sales": "100",
-						"State": "Error",
-						"ShowStateIcon": true,
-						"CustomStateIcon": "sap-icon://warning2"
-					}
+				"json": [{
+					"Name": "Comfort Easy",
+					"Description": "32 GB Digital Assistant with high-resolution color screen",
+					"Sales": "150",
+					"State": "Warning",
+					"ShowStateIcon": true
+				},
+				{
+					"Name": "ITelO Vault",
+					"Description": "Digital Organizer with State-of-the-Art Storage Encryption",
+					"Sales": "540",
+					"State": "Success",
+					"ShowStateIcon": true
+				},
+				{
+					"Name": "Notebook Professional 15",
+					"Description": "Notebook Professional 15 with 2,80 GHz quad core, 15\" Multitouch LCD, 8 GB DDR3 RAM, 500 GB SSD - DVD-Writer (DVD-R/+R/-RW/-RAM),Windows 8 Pro",
+					"Sales": "350",
+					"State": "Success",
+					"ShowStateIcon": true
+				},
+				{
+					"Name": "Ergo Screen E-I",
+					"Description": "Optimum Hi-Resolution max. 1920 x 1080 @ 85Hz, Dot Pitch: 0.27mm",
+					"Sales": "100",
+					"State": "Error",
+					"ShowStateIcon": true,
+					"CustomStateIcon": "sap-icon://warning2"
+				},
+				{
+					"Name": "Ergo Screen E-I",
+					"Description": "Optimum Hi-Resolution max. 1920 x 1080 @ 85Hz, Dot Pitch: 0.27mm",
+					"Sales": "100",
+					"State": "Error",
+					"ShowStateIcon": true,
+					"CustomStateIcon": "sap-icon://warning2"
+				},
+				{
+					"Name": "Ergo Screen E-I",
+					"Description": "Optimum Hi-Resolution max. 1920 x 1080 @ 85Hz, Dot Pitch: 0.27mm",
+					"Sales": "100",
+					"State": "Error",
+					"ShowStateIcon": true,
+					"CustomStateIcon": "sap-icon://warning2"
+				}
 				]
 			}
 		},

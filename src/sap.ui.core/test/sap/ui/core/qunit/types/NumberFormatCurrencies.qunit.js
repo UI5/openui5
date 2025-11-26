@@ -1783,7 +1783,7 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test("currency for 'he' locale with big number. Contains no RTL characters", function (assert) {
+	QUnit.test("currency for 'he' locale with big number. Contains RTL characters", function (assert) {
 		//setup
 		var oLocale = new Locale("he");
 		var oFormat = getCurrencyInstance({
@@ -1795,7 +1795,7 @@ sap.ui.define([
 
 		// execution
 		var sFormatted = oFormat.format(iExpectedNumber);
-		assert.strictEqual(sFormatted, "50,000.00", "can be formatted '" + sFormatted + "' (no RTL character)");
+		assert.strictEqual(sFormatted, 	"\u200F50,000.00\u00A0\u200F", "can be formatted '" + sFormatted + "' (RTL character)");
 
 		var aParsed = oFormat.parse(sFormatted);
 		assert.deepEqual(aParsed, [50000, undefined], "should match input number " + iExpectedNumber);
@@ -1874,9 +1874,9 @@ sap.ui.define([
 		assert.deepEqual(oFormat.parse("INR 1 00 00 00 00 000 Lk Cr"), [100000000000000000000000, "INR"]);
 		assert.deepEqual(oFormat.parse("INR 100000000000 Lk Cr"), [100000000000000000000000, "INR"]);
 
-		assert.strictEqual(oFormat.format(100000, "USD"), "USD\xa0100K", "USD is formatted as M/B/T");
-		assert.strictEqual(oFormat.format(1000000, "USD"), "USD\xa01M", "USD is formatted as M/B/T");
-		assert.strictEqual(oFormat.format(1000000000, "USD"), "USD\xa01B", "USD is formatted as M/B/T");
+		assert.strictEqual(oFormat.format(100000, "USD"), "USD\xa0100k", "USD is formatted as M/B/T");
+		assert.strictEqual(oFormat.format(1000000, "USD"), "USD\xa01m", "USD is formatted as M/B/T");
+		assert.strictEqual(oFormat.format(1000000000, "USD"), "USD\xa01bn", "USD is formatted as M/B/T");
 
 		var aResult = oFormat.parse("INR 12 Lk");
 		assert.ok(Array.isArray(aResult), "Currency parser should return an array");
@@ -1893,7 +1893,7 @@ sap.ui.define([
 		assert.strictEqual(aResult[0], 120000000, "Number is parsed correctly");
 		assert.strictEqual(aResult[1], "INR", "Currency Code is parsed correctly: expected INR, parsed " + aResult[1]);
 
-		aResult = oFormat.parse("EUR 12M");
+		aResult = oFormat.parse("EUR 12m");
 		assert.ok(Array.isArray(aResult), "Currency parser should return an array");
 		assert.strictEqual(aResult[0], 12000000, "Number is parsed correctly");
 		assert.strictEqual(aResult[1], "EUR", "Currency Code is parsed correctly: expected EUR, parsed " + aResult[1]);
@@ -2357,12 +2357,13 @@ sap.ui.define([
 		const oFormat = NumberFormat.getCurrencyInstance({decimalPadding: 4, showMeasure: false}, new Locale(sLocale));
 		const sSeparator = oFormat.oLocaleData.getNumberSymbol("decimal");
 		let sMinusSign = oFormat.oLocaleData.getNumberSymbol("minusSign");
+		const sRTLChar = sMinusSign[1] ? "\u200F" : "";
 		// if the sMinusSign contains an u200e character, only use the minus sign
 		sMinusSign = sMinusSign[1] || sMinusSign;
 
 		// code under test
-		assert.strictEqual(oFormat.format(42.12, "EUR"), "42" + sSeparator + "12\u2007\u2007");
-		assert.strictEqual(oFormat.format(-42.12, "EUR"), sMinusSign + "42" + sSeparator + "12\u2007\u2007");
+		assert.strictEqual(oFormat.format(42.12, "EUR"), sRTLChar + "42" + sSeparator + "12\u2007\u2007");
+		assert.strictEqual(oFormat.format(-42.12, "EUR"), sRTLChar + sMinusSign + "42" + sSeparator + "12\u2007\u2007");
 	});
 });
 
@@ -2394,6 +2395,6 @@ sap.ui.define([
 		const oFormat = NumberFormat.getCurrencyInstance({showMeasure: false}, new Locale("ar"));
 
 		// code under test
-		assert.strictEqual(oFormat.format(42.12, "EUR"), "42.12");
+		assert.strictEqual(oFormat.format(42.12, "EUR"), "\u200F42.12");
 	});
 });

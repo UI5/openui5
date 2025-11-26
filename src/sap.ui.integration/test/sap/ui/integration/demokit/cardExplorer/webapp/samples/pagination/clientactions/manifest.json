@@ -1,5 +1,6 @@
+
 {
-	"_version": "2.0.0",
+	"_version": "%LATEST_SCHEMA_VERSION%",
 	"sap.app": {
 		"id": "card.explorer.data.list.card",
 		"type": "card",

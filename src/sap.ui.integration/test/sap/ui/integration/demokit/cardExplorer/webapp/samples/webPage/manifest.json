@@ -1,10 +1,10 @@
 {
-	"_version": "2.0.0",
+	"_version": "%LATEST_SCHEMA_VERSION%",
 	"sap.app": {
 		"id": "card.explorer.webpage.card",
 		"type": "card",
 		"title": "Sample of a WebPage Card",
-		"subTitle": "Sample of a WebPage Card",
+		"subTitle" :"Sample of a WebPage Card",
 		"applicationVersion": {
 			"version": "1.0.0"
 		},

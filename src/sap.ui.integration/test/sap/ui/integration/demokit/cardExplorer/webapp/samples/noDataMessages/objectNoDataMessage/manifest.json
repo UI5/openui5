@@ -1,13 +1,9 @@
 {
-	"_version": "2.0.0",
+	"_version": "%LATEST_SCHEMA_VERSION%",
 	"sap.app": {
 		"id": "card.explorer.data.object.card",
 		"type": "card",
-		"i18n": "i18n/i18n.properties",
-		"title": "Card 'card.explorer.data.object.card'",
-		"applicationVersion": {
-			"version": "1.0.0"
-		}
+		"i18n": "i18n/i18n.properties"
 	},
 	"sap.card": {
 		"type": "Object",

@@ -1,5 +1,5 @@
 {
-	"_version": "2.0.0",
+	"_version": "%LATEST_SCHEMA_VERSION%",
 	"sap.app": {
 		"id": "card.explorer.actionslabels.list.card",
 		"type": "card",
@@ -54,8 +54,7 @@
 		},
 		"content": {
 			"data": {
-				"json": [
-					{
+				"json": [{
 						"Name": "Comfort Easy",
 						"Description": "32 GB Digital Assistant with high-resolution color screen",
 						"Highlight": "Error"
@@ -87,7 +86,7 @@
 				"title": "{Name}",
 				"description": "{Description}",
 				"highlight": "{Highlight}",
-				"actionsStrip": [
+					"actionsStrip": [
 					{
 						"buttonType": "Transparent",
 						"text": "Add to Favorites",
