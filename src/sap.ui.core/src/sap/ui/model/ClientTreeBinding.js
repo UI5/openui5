@@ -7,12 +7,11 @@ sap.ui.define([
 	"./ChangeReason",
 	"./TreeBinding",
 	"sap/base/util/deepEqual",
-	"sap/base/util/deepExtend",
 	"sap/base/util/each",
 	"sap/ui/model/FilterProcessor",
 	"sap/ui/model/FilterType",
 	"sap/ui/model/SorterProcessor"
-], function(ChangeReason, TreeBinding, deepEqual, deepExtend, each, FilterProcessor, FilterType, SorterProcessor) {
+], function(ChangeReason, TreeBinding, deepEqual, each, FilterProcessor, FilterType, SorterProcessor) {
 	"use strict";
 
 	/**
@@ -84,14 +83,21 @@ sap.ui.define([
 	/**
 	 * Returns a deep clone of the tree data or a symbol indicating that the given tree data cannot be cloned.
 	 *
+	 * Uses <code>structuredClone</code> to create a deep copy. If cloning fails (e.g., due to functions, DOM nodes,
+	 * or other uncloneable values), the symbol <code>ClientTreeBinding.CannotCloneData</code> is returned.
+	 *
 	 * @param {any} oTreeData
 	 *   The tree data to clone
 	 * @returns {any|sap.ui.model.ClientTreeBinding.CannotCloneData}
-	 *   A deep clone or the symbol ClientTreeBinding.CannotCloneData
+	 *   A deep clone or the symbol <code>ClientTreeBinding.CannotCloneData</code> if cloning fails
 	 * @private
 	 */
 	ClientTreeBinding.prototype.cloneData = function(oTreeData) {
-		return deepExtend(Array.isArray(oTreeData) ? [] : {}, oTreeData);
+		try {
+			return structuredClone(oTreeData);
+		} catch {
+			return ClientTreeBinding.CannotCloneData;
+		}
 	};
 
 	/**
