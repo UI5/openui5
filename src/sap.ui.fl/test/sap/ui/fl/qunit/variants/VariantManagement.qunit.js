@@ -22,7 +22,6 @@ sap.ui.define([
 	"sap/ui/layout/Grid",
 	"sap/ui/test/utils/nextUIUpdate",
 	"sap/ui/thirdparty/sinon-4",
-	"test-resources/sap/ui/fl/qunit/FlQUnitUtils",
 	"test-resources/sap/ui/rta/qunit/RtaQunitUtils"
 ], function(
 	Localization,
@@ -46,7 +45,6 @@ sap.ui.define([
 	Grid,
 	nextUIUpdate,
 	sinon,
-	FlQUnitUtils,
 	RtaQunitUtils
 ) {
 	"use strict";
@@ -140,7 +138,7 @@ sap.ui.define([
 				{},
 				{
 					appComponent: {
-						getId: () => "foo",
+						getId: () => "componentId",
 						byId: () => null
 					}
 				}

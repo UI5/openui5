@@ -363,10 +363,16 @@ sap.ui.define([
 		}
 	}
 
-	function initializeEmptyState(sReference, sComponentId) {
+	function initializeEmptyStateIfNeeded(sReference, sComponentId) {
 		if (!sComponentId) {
 			throw new Error(`No FlexState instance created for reference ${sReference} - missing component ID`);
 		}
+
+		// State already initialized for the component ID
+		if (_mInstances[sReference]?.componentId === sComponentId) {
+			return;
+		}
+
 		_mInstances[sReference] = {
 			emptyState: true,
 			// this makes sure that a proper initialize will still work as expected
@@ -385,9 +391,7 @@ sap.ui.define([
 	};
 
 	FlexState.addFlexObjectsToRuntimeOnlyData = function(sReference, sComponentId, aFlexObjects) {
-		if (!_mInstances[sReference]) {
-			initializeEmptyState(sReference, sComponentId);
-		}
+		initializeEmptyStateIfNeeded(sReference, sComponentId);
 		_mInstances[sReference].runtimePersistence.runtimeOnlyData.flexObjects.push(...aFlexObjects);
 	};
 
@@ -473,9 +477,7 @@ sap.ui.define([
 	 * @param {string} mPropertyBag.variantReference - The reference of the variant to load.
 	 */
 	FlexState.lazyLoadFlVariant = async function(mPropertyBag) {
-		if (!_mInstances[mPropertyBag.reference]) {
-			initializeEmptyState(mPropertyBag.reference, mPropertyBag.componentId);
-		}
+		initializeEmptyStateIfNeeded(mPropertyBag.reference, mPropertyBag.componentId);
 		const oResult = await Loader.loadFlVariant(mPropertyBag);
 		const oInstance = _mInstances[mPropertyBag.reference];
 		oInstance.loaderCacheKey = oResult.completeLoaderData.parameters.loaderCacheKey;
@@ -603,9 +605,7 @@ sap.ui.define([
 	 * @param {object} oFlexObject - Flex object to be added as runtime-steady
 	 */
 	FlexState.addRuntimeSteadyObject = function(sReference, sComponentId, oFlexObject) {
-		if (!_mInstances[sReference]) {
-			initializeEmptyState(sReference, sComponentId);
-		}
+		initializeEmptyStateIfNeeded(sReference, sComponentId);
 		// with setting the state to persisted it is made sure that they not show up as a dirty flex object
 		oFlexObject.setState(States.LifecycleState.PERSISTED);
 		_mExternalData.flexObjects[sReference] ||= {};
@@ -660,8 +660,9 @@ sap.ui.define([
 	 * @returns {sap.ui.fl.apply._internal.flexObjects.FlexObject[]} The flex objects that were added
 	 */
 	FlexState.addDirtyFlexObjects = function(sReference, aFlexObjects, sComponentId) {
-		if (!_mInstances[sReference]) {
-			initializeEmptyState(sReference, sComponentId);
+		// TODO: Check why sComponentId is optional here todos#13
+		if (sComponentId) {
+			initializeEmptyStateIfNeeded(sReference, sComponentId);
 		}
 		const sAdaptationLayer = FlexInfoSession.getByReference(sReference).adaptationLayer;
 		const aFilteredFlexObjects = aFlexObjects

@@ -12,7 +12,8 @@ sap.ui.define([
 	"./BindingResolver",
 	"./DateRangeHelper",
 	"./Duration",
-	"./ComboBoxHelper"
+	"./ComboBoxHelper",
+	"./RadioButtonHelper"
 ], function (
 	ManagedObject,
 	Library,
@@ -24,7 +25,8 @@ sap.ui.define([
 	BindingResolver,
 	DateRangeHelper,
 	Duration,
-	ComboBoxHelper
+	ComboBoxHelper,
+	RadioButtonHelper
 ) {
 	"use strict";
 
@@ -120,17 +122,19 @@ sap.ui.define([
 		switch (oItem.type) {
 			case "ComboBox":
 				oResolved.selectedKey = vValue.key;
-				vValue = vValue.value;
+				oResolved.value = vValue.value;
 				break;
 			case "DateRange":
-				vValue = vValue.value;
+				oResolved.value = vValue.value;
+				break;
+			case "RadioButtonGroup":
+				oResolved.selectedIndex = vValue.selectedIndex;
+				oResolved.selectedKey = vValue.selectedKey;
 				break;
 			default:
-				// do nothing
+				oResolved.value = vValue;
 				break;
-		}
-
-		oResolved.value = vValue;
+			}
 
 		return oResolved;
 	};
@@ -152,6 +156,8 @@ sap.ui.define([
 
 		if (oControl.isA("sap.m.ComboBox")) {
 			ComboBoxHelper.setValueAndKey(oControl, oFormControlData.key, oFormControlData.value);
+		} else if (oControl.isA("sap.m.RadioButtonGroup")) {
+			RadioButtonHelper.setSelectedIndexAndKey(oControl, oFormControlData.selectedIndex, oFormControlData.key);
 		} else if (vValue) {
 			if (oControl.isA("sap.m.DatePicker") || oControl.isA("sap.m.DynamicDateRange")) {
 				DateRangeHelper.setValue(oControl, vValue, this._oCard);
@@ -235,6 +241,15 @@ sap.ui.define([
 			}
 
 			Log.error("Form data for control ID - '" + sId + "' requires properties 'key' or 'value'." , "sap.ui.integration.widgets.Card");
+			return false;
+		}
+
+		if (oControl.isA("sap.m.RadioButtonGroup")) {
+			if ("selectedIndex" in oData || "key" in oData) {
+				return true;
+			}
+
+			Log.error("Form data for control ID - '" + sId + "' requires property 'selectedIndex' or 'selectedKey'." , "sap.ui.integration.widgets.Card");
 			return false;
 		}
 
@@ -360,7 +375,9 @@ sap.ui.define([
 		if (bShowValueState || oControl._bShowValueState) {
 			oControl._bShowValueState = true; // control has been touched once. mark it "dirty"
 			oControl.setValueState(oMessage.type);
-			oControl.setValueStateText(oMessage.message);
+			if (oControl.setValueStateText) {
+				oControl.setValueStateText(oMessage.message);
+			}
 		}
 
 		this._updateMessageModel();
@@ -448,6 +465,8 @@ sap.ui.define([
 				return "keyValuePair";
 			case "DateRange":
 				return "dateRange";
+			case "RadioButtonGroup":
+				return "radioButtonGroup";
 			default:
 				return "string";
 		}
@@ -460,6 +479,8 @@ sap.ui.define([
 				key: oControl.getSelectedKey(),
 				value: oControl.getValue()
 			};
+		} else if (oControl.isA("sap.m.RadioButtonGroup")) {
+			return RadioButtonHelper.getValueForModel(oControl);
 		} else if (oControl.isA("sap.m.DynamicDateRange") || oControl.isA("sap.m.DatePicker")) {
 			return DateRangeHelper.getValueForModel(oControl);
 		} else if (oControl.isA("sap.m.TimePicker")) {

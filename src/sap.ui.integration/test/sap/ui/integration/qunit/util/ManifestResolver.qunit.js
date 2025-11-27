@@ -35,6 +35,11 @@ sap.ui.define([
 								"title": "Monitoring"
 							}
 						],
+						"priorityLevels": [
+							{ "key": "low", "text": "Low Priority" },
+							{ "key": "medium", "text": "Medium Priority" },
+							{ "key": "high", "text": "High Priority" }
+						],
 						"activityTypeSelectedKey": "activity1"
 					}
 				},
@@ -3499,6 +3504,160 @@ sap.ui.define([
 				}
 			]);
 		});
+	});
+
+	QUnit.test("RadioButtonGroup: 'selectedIndex' and 'value' are resolved", function (assert) {
+		var oManifest = createManifestWithFormElement({
+			"id": "priority",
+			"label": "Priority Level",
+			"type": "RadioButtonGroup",
+			"selectedIndex": 1,
+			"required": true,
+			"item": {
+				"path": "/priorityLevels",
+				"template": {
+					"key": "{key}",
+					"title": "{text}"
+				}
+			},
+			"validations": [
+				{
+					"required": true,
+					"message": "Priority selection is required"
+				}
+			]
+		});
+
+		var oCard = new SkeletonCard({
+			manifest: oManifest,
+			baseUrl: "test-resources/sap/ui/integration/qunit/testResources/manifestResolver/"
+		});
+
+		return ManifestResolver.resolveCard(oCard)
+			.then(function (oRes) {
+				assert.deepEqual(oRes["sap.card"].content.groups[0].items[0].selectedIndex, 1, "RadioButtonGroup should have the correct selectedIndex.");
+				assert.deepEqual(oRes["sap.card"].content.groups[0].items[0].selectedKey, "medium", "RadioButtonGroup should have the correct selectedKey.");
+				assert.deepEqual(oRes["sap.card"].content.groups[0].items[0].type, "RadioButtonGroup", "RadioButtonGroup form element type should be resolved correctly.");
+
+				oCard.destroy();
+			});
+	});
+
+	QUnit.test("RadioButtonGroup: Dynamic items from data binding", function (assert) {
+		var oManifest = {
+			"sap.app": {
+				"id": "test.radioButtonGroup.dynamic",
+				"type": "card"
+			},
+			"sap.card": {
+				"type": "Object",
+				"data": {
+					"json": {
+						"priorities": [
+							{
+								"key": "active",
+								"text": "Active"
+							},
+							{
+								"key": "inactive",
+								"text": "Inactive"
+							},
+							{
+								"key": "vacation",
+								"text": "On Vacation"
+							},
+							{
+								"key": "sick",
+								"text": "Sick Leave",
+								"enabled": false
+							}
+						]
+					}
+				},
+				"content": {
+					"groups": [
+						{
+							"items": [
+								{
+									"id": "dynamicPriority",
+									"label": "Select Priority",
+									"type": "RadioButtonGroup",
+									"item": {
+										"path": "/priorities",
+										"template": {
+											"key": "{id}",
+											"title": "{title}",
+											"selected": "{selected}"
+										}
+									},
+									"validations": [
+										{
+											"required": true,
+											"message": "Priority must be selected"
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
+		};
+
+		var oCard = new SkeletonCard({
+			manifest: oManifest,
+			baseUrl: "test-resources/sap/ui/integration/qunit/testResources/manifestResolver/"
+		});
+
+		return ManifestResolver.resolveCard(oCard)
+			.then(function (oRes) {
+				var oExpectedResult = {
+					"groups": [
+						{
+							"items": [
+								{
+									"id": "dynamicPriority",
+									"label": "Select Priority",
+									"type": "RadioButtonGroup",
+									"selectedIndex": -1,
+									"selectedKey": null,
+									"item": [
+										{
+											"key": "active",
+											"text": "Active"
+										},
+										{
+											"key": "inactive",
+											"text": "Inactive"
+										},
+										{
+											"key": "vacation",
+											"text": "On Vacation"
+										},
+										{
+											"key": "sick",
+											"text": "Sick Leave",
+											"enabled": false
+										}
+									],
+									"validations": [
+										{
+											"required": true,
+											"message": "Priority must be selected"
+										}
+									]
+								}
+							]
+						}
+					]
+				};
+
+				assert.deepEqual(oRes["sap.card"].content, oExpectedResult, "RadioButtonGroup with dynamic items should be resolved correctly.");
+				assert.deepEqual(oRes["sap.card"].content.groups[0].items[0].selectedKey, null, oExpectedResult, "RadioButtonGroup with dynamic items should be resolved correctly with proper selectedKey based on value.");
+				assert.deepEqual(oRes["sap.card"].content.groups[0].items[0].selectedIndex, -1, oExpectedResult, "RadioButtonGroup with dynamic items should be resolved correctly with proper selectedIndex based on value.");
+
+				oCard.destroy();
+			});
 	});
 
 	QUnit.module("Resolve show/hide message");

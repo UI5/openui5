@@ -412,7 +412,7 @@ sap.ui.define([
 		QUnit.test("Get - Given flex objects and dirty changes are present ", async function(assert) {
 			await FlQUnitUtils.initializeFlexStateWithData(sandbox, sReference, {
 				changes: createTwoChangeDefs()
-			});
+			}, sComponentId);
 			addDirtyChanges();
 			const aFlexObjects = await FlexObjectManager.getFlexObjects({
 				selector: this.oAppComponent
@@ -1221,7 +1221,7 @@ sap.ui.define([
 					changeType: "renameField",
 					layer: Layer.USER
 				}]
-			});
+			}, sComponentId);
 			FlexObjectManager.addDirtyFlexObjects(sReference, sComponentId, [this.oFlexObject1, this.oFlexObject2]);
 		},
 		afterEach() {
@@ -1271,7 +1271,7 @@ sap.ui.define([
 					changeType: "renameField",
 					layer: Layer.USER
 				}]
-			});
+			}, sComponentId);
 			FlexObjectManager.addDirtyFlexObjects(sReference, sComponentId, [this.oFlexObject1, this.oFlexObject2]);
 		},
 		afterEach() {

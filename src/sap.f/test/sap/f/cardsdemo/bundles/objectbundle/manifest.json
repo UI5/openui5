@@ -14,6 +14,27 @@
 		"data": {
 			"request": {
 				"url": "./mockdata/employee.json"
+			},
+			"json": {
+				"activityStatus": [
+					{
+						"key": "active",
+						"text": "Active"
+					},
+					{
+						"key": "inactive",
+						"text": "Inactive"
+					},
+					{
+						"key": "vacation",
+						"text": "On Vacation"
+					},
+					{
+						"key": "sick",
+						"text": "Sick Leave",
+						"enabled": false
+					}
+				]
 			}
 		},
 		"header": {
@@ -120,6 +141,28 @@
 									}
 								}
 							]
+						}
+					]
+				},
+				{
+					"items": [
+						{
+							"id": "status",
+							"label": "Employee Status",
+							"type": "RadioButtonGroup",
+							"validations": [
+								{
+									"required": true
+								}
+							],
+							"item": {
+								"path": "/activityStatus",
+								"template": {
+									"key": "{key}",
+									"title": "{text}",
+									"enabled": "{enabled}"
+								}
+							}
 						}
 					]
 				}

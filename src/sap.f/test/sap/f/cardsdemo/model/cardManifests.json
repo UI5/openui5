@@ -4480,6 +4480,268 @@
 			}
 		}
 	},
+	"objectContent": {
+		"radioButtonGroupCard": {
+			"_version": "1.14.0",
+			"sap.app": {
+				"id": "cardsdemo.objectContent.radioButtonGroupCard",
+				"type": "card",
+				"applicationVersion": {
+					"version": "1.0.0"
+				}
+			},
+			"sap.ui": {
+				"technology": "UI5",
+				"icons": {
+					"icon": "sap-icon://form"
+				}
+			},
+			"sap.card": {
+				"type": "Object",
+				"data": {
+					"json": {
+						"employee": {
+							"name": "John Doe",
+							"position": "Senior Developer",
+							"department": "IT Development",
+							"email": "john.doe@company.com",
+							"phone": "+1 234 567 8900"
+						},
+						"settings": {
+							"priority": "medium",
+							"status": "active",
+							"experience": "senior",
+							"workMode": "hybrid"
+						}, 
+						"statusOptions": [
+							{ "key": "active", "text": "Active" },
+							{ "key": "inactive", "text": "Inactive" },
+							{ "key": "vacation", "text": "On Vacation" },
+							{ "key": "sick", "text": "Sick Leave", "enabled": false }
+						],
+						"workModeOptions": [
+							{ "key": "remote", "text": "Full Remote" },
+							{ "key": "hybrid", "text": "Hybrid" },
+							{ "key": "office", "text": "Full Office" }
+						],
+						"notificationOptions": [
+							{ "key": "all", "text": "All notifications with extensive text that should wrap correctly in three different lines in the UI." },
+							{ "key": "important", "text": "Important Only with very long text to test that should wrap correctly in the UI" },
+							{ "key": "none", "text": "No Notifications with very long text to test that should wrap correctly in the UI" }
+						]
+					}
+				},
+				"header": {
+					"title": "RadioButtonGroup Test Card",
+					"subtitle": "Testing RadioButtonGroup functionality in Object Cards",
+					"icon": {
+						"src": "sap-icon://form"
+					}
+				},
+				"content": {
+					"groups": [
+						{
+							"title": "Employee Information",
+							"items": [
+								{
+									"label": "Name",
+									"value": "{employee/name}"
+								},
+								{
+									"label": "Position",
+									"value": "{employee/position}"
+								},
+								{
+									"label": "Department",
+									"value": "{employee/department}"
+								},
+								{
+									"label": "Email",
+									"value": "{employee/email}"
+								},
+								{
+									"label": "Phone",
+									"value": "{employee/phone}"
+								}
+							]
+						},
+						{
+							"title": "RadioButtonGroup Examples",
+							"items": [
+								{
+									"id": "status",
+									"label": "Employee Status",
+									"type": "RadioButtonGroup",
+									"selectedKey": "vacation",
+									"item": {
+										"path": "/statusOptions",
+										"template": {
+											"key": "{key}",
+											"title": "{text}",
+											"enabled": "{enabled}"
+										}
+									}
+								},
+								{
+									"id": "workMode",
+									"label": "Work Mode",
+									"type": "RadioButtonGroup",
+									"selectedIndex": 1,
+									"item": {
+										"path": "/workModeOptions",
+										"template": {
+											"key": "{key}",
+											"title": "{text}",
+											"enabled": "{enabled}"
+										}
+									}
+								}
+							]
+						},
+						{
+							"title": "Additional Settings",
+							"items": [
+								{
+									"id": "notifications",
+									"label": "Notification Preference",
+									"type": "RadioButtonGroup",
+									"selectedIndex": 0,
+									"selectedKey": "important",
+									"item": {
+										"path": "/notificationOptions",
+										"template": {
+											"key": "{key}",
+											"title": "{text}",
+											"enabled": "{enabled}"
+										}
+									}
+								}
+							]
+						}
+					]
+				}
+			}
+		}, 
+		"radioButtonSubmitCard": {
+			"sap.app": {
+				"id": "test.radio.submit",
+				"type": "card"
+			},
+			"sap.card": {
+				"type": "Object",
+				"data": {
+					"json": {
+						"options": [
+							{ "key": "active", "text": "Active" },
+							{ "key": "inactive", "text": "Inactive" },
+							{ "key": "vacation", "text": "On Vacation" },
+							{ "key": "sick", "text": "Sick Leave", "enabled": false }
+						]
+					}
+				},
+				"header": {
+					"title": "Radio Button Submit Test"
+				},
+				"content": {
+					"groups": [
+						{
+							"title": "Employee Status",
+							"items": [
+								{
+									"id": "status",
+									"label": "Employee Status",
+									"type": "RadioButtonGroup",
+									"item": {
+										"path": "/options",
+										"template": {
+											"key": "{key}",
+											"title": "{text}",
+											"enabled": "{enabled}"
+										}
+									}
+								}
+							]
+						}
+					]
+				},
+				"footer": {
+					"actionsStrip": [
+						{
+							"text": "Submit",
+							"buttonType": "Accept",
+							"actions": [
+								{
+									"type": "Submit"
+								}
+							]
+						}
+					]
+				}
+			}
+		},
+		"radioButtonSubmitCardWithValidation": {
+			"sap.app": {
+				"id": "test.radio.submit",
+				"type": "card"
+			},
+			"sap.card": {
+				"type": "Object",
+				"data": {
+					"json": {
+						"options": [
+							{ "key": "active", "text": "Active" },
+							{ "key": "inactive", "text": "Inactive" },
+							{ "key": "vacation", "text": "On Vacation" },
+							{ "key": "sick", "text": "Sick Leave", "enabled": false }
+						]
+					}
+				},
+				"header": {
+					"title": "Radio Button Submit Test with required selection"
+				},
+				"content": {
+					"groups": [
+						{
+							"title": "Employee Status",
+							"items": [
+								{
+									"id": "status",
+									"label": "Employee Status",
+									"type": "RadioButtonGroup",
+									"validations": [
+										{
+											"required": true
+										}
+									],
+									"item": {
+										"path": "/options",
+										"template": {
+											"key": "{key}",
+											"title": "{text}",
+											"enabled": "{enabled}"
+										}
+									}
+								}
+							]
+						}
+					]
+				},
+				"footer": {
+					"actionsStrip": [
+						{
+							"text": "Submit",
+							"buttonType": "Accept",
+							"actions": [
+								{
+									"type": "Submit"
+								}
+							]
+						}
+					]
+				}
+			}
+		}
+	},
 	"transparent": {
 		"list1": {
 			"sap.app": {

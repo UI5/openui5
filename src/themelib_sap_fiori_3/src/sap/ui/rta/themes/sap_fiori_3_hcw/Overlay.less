@@ -1,27 +1,36 @@
-/******************************************************************
-	Style of the RTA Overlays - sap_fiori_3_hcw Theme
-*******************************************************************/
-@_sap_ui_rta_Overlay_ResizeHandleColor: darken(@sapUiSelected, 40%); //#0042c2
-@_sap_ui_rta_Overlay_PlaceholderBackgroundColor: @sapUiContentSelectedBackground; //#8fb5ff
+/* =================================== */
+/* CSS for control sap.ui.rta/Overlay  */
+/* Quartz High Contrast White theme    */
+/* =================================== */
+
+@_sap_ui_rta_Overlay_ResizeHandleColor: darken(@sapUiSelected, 40%); /* #0042c2 */
+@_sap_ui_rta_Overlay_PlaceholderBackgroundColor: var(--sapContent_Selected_Background); /* #8fb5ff */
 
 .sapUiRta {
+
 	.sapUiDtOverlayDropZone {
+
 		> .sapUiDtOverlayChildren {
+
 			> .sapUiRtaOverlayPlaceholder {
 				background: @_sap_ui_rta_Overlay_PlaceholderBackgroundColor !important;
-				// no "focus" border
+
+				/* no "focus" border */
 				&:focus {
-					&:before {
+
+					&::before {
 						content: none;
 					}
 				}
 
-				// all descendants
+				/* all descendants */
 				* {
 					background: @_sap_ui_rta_Overlay_PlaceholderBackgroundColor;
-					// no "focus" border
+
+					/* no "focus" border */
 					&:focus {
-						&:before {
+
+						&::before {
 							content: none;
 						}
 					}

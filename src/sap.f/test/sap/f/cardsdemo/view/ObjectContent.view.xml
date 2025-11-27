@@ -16,6 +16,36 @@
 		<mvc:View viewName="sap.f.cardsdemo.view.common.CommonCardSettings" type="XML" async="true"></mvc:View>
 		<f:GridContainer>
 			<w:Card
+				id="radioButtonGroupCard1"
+				manifest="{manifests>/objectContent/radioButtonGroupCard}"
+				baseUrl="{cardsPlayground>/playgroundBaseUrl}"
+				width="auto"
+				class="sapUiTinyMargin">
+				<w:layoutData>
+					<f:GridContainerItemLayoutData minRows="3" columns="4" />
+				</w:layoutData>
+			</w:Card>
+			<w:Card
+				id="radioButtonSubmitCard"
+				manifest="{manifests>/objectContent/radioButtonSubmitCard}"
+				baseUrl="{cardsPlayground>/playgroundBaseUrl}"
+				width="auto"
+				class="sapUiTinyMargin">
+				<w:layoutData>
+					<f:GridContainerItemLayoutData minRows="3" columns="4" />
+				</w:layoutData>
+			</w:Card>
+			<w:Card
+				id="radioButtonSubmitCardWithValidation"
+				manifest="{manifests>/objectContent/radioButtonSubmitCardWithValidation}"
+				baseUrl="{cardsPlayground>/playgroundBaseUrl}"
+				width="auto"
+				class="sapUiTinyMargin">
+				<w:layoutData>
+					<f:GridContainerItemLayoutData minRows="3" columns="4" />
+				</w:layoutData>
+			</w:Card>
+			<w:Card
 				id="cardDataHandling"
 				manifest="{cardsPlayground>/playgroundBaseUrl}/cardcontent/objectcontent/datahandling_manifest.json"
 				width="auto"

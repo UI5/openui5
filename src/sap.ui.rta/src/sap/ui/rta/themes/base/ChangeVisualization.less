@@ -5,7 +5,6 @@
 
 @_sap_ui_rta_ChangeVisualization_ChangeIndicatorColorMedium: @sapUiChartPaletteSequentialHue1Dark1; /* #1b57a7 */
 @_sap_ui_rta_ChangeVisualization_ChangeIndicatorColorDark: @sapUiChartPaletteSequentialHue11Dark2; /* #0e4186 */
-@_sap_ui_rta_ChangeVisualization_OverlayBoxShadow: @sapUiUx3ToolPopupShadow; /* 0px 6px 12px 0px fade(black, 30) */
 @_sap_ui_rta_ChangeVisualization_OverlayOutlineColor: var(--sapSelectedColor); /* #8fb5ff */
 
 .sapUiRtaChangeIndicator {
@@ -29,7 +28,7 @@
 	&.sapUiRtaHover {
 		height: 0.9rem;
 		width: 0.9rem;
-		box-shadow: 0 0 0.25rem @_sap_ui_rta_ChangeVisualization_ChangeIndicatorColorDark;
+		box-shadow: var(--sapContent_Shadow2);
 	}
 }
 
@@ -41,21 +40,21 @@
 		&::after {
 			content: '';
 			transition: box-shadow .25s;
-			box-shadow: @_sap_ui_rta_ChangeVisualization_OverlayBoxShadow;
-			outline: 0.0625rem solid @_sap_ui_rta_ChangeVisualization_OverlayOutlineColor; /* 1px */
+			box-shadow: var(--sapContent_Shadow2);
+			outline: 0.0625rem solid @_sap_ui_rta_ChangeVisualization_OverlayOutlineColor !important; /* 1px */
 			outline-offset: -0.0625rem; /* 1px */
 		}
 	}
 
 	&.sapUiRtaChangeIndicatorDependent {
 		position: absolute;
-		box-shadow: inset 0 0 0 0.1875rem @_sap_ui_rta_ChangeVisualization_ChangeIndicatorColorDark, @_sap_ui_rta_ChangeVisualization_OverlayBoxShadow;
+		box-shadow: inset 0 0 0 0.1875rem @_sap_ui_rta_ChangeVisualization_ChangeIndicatorColorDark, var(--sapContent_Shadow2);
 		background-color: fade(@_sap_ui_rta_ChangeVisualization_ChangeIndicatorColorDark, 25%);
 		animation: fadeOut linear 1.5s;
 		animation-fill-mode: forwards;
 		@keyframes fadeOut {
 			66% {
-				box-shadow: inset 0 0 0 0.1875rem @_sap_ui_rta_ChangeVisualization_ChangeIndicatorColorDark, @_sap_ui_rta_ChangeVisualization_OverlayBoxShadow;
+				box-shadow: inset 0 0 0 0.1875rem @_sap_ui_rta_ChangeVisualization_ChangeIndicatorColorDark, var(--sapContent_Shadow2);
 				background-color: fade(@_sap_ui_rta_ChangeVisualization_ChangeIndicatorColorDark, 25%);
 			}
 			100% {
@@ -71,7 +70,6 @@
 	.sapMPopover {
 
 		.sapUiRtaChangesList {
-
 			/* Visualize Changes: gray out items with no changes */
 			li.sapMLIBTypeInactive {
 				opacity: 0.5;

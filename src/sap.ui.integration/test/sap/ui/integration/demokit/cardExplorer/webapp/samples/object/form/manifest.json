@@ -39,7 +39,8 @@
 						"comment": "{form>/comment}",
 						"name": "{form>/name}",
 						"duration": "{form>/duration}",
-						"date": "{form>/date/range/startLocalDate}"
+						"date": "{form>/date/range/startLocalDate}",
+						"employeeStatusSelection": "{form>/activityStatus/selectedKey}"
 					}
 				}
 			}
@@ -55,6 +56,12 @@
 						"id": "reason2",
 						"title": "Reason 2"
 					}
+				],
+				"statusOptions": [
+					{ "key": "active", "text": "Active" },
+					{ "key": "inactive", "text": "Inactive" },
+					{ "key": "vacation", "text": "On Vacation" },
+					{ "key": "sick", "text": "Sick Leave", "enabled": false }
 				]
 			}
 		},
@@ -131,6 +138,20 @@
 							"label": "Date",
 							"type": "DateRange",
 							"placeholder": "Select date"
+						},
+						{
+							"id": "activityStatus",
+							"label": "Employee Status",
+							"type": "RadioButtonGroup",
+							"selectedIndex": 1,
+							"item": {
+								"path": "/statusOptions",
+								"template": {
+									"key": "{key}",
+									"title": "{text}",
+									"enabled": "{enabled}"
+								}
+							}
 						}
 					]
 				}

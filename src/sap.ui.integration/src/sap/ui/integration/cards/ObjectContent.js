@@ -24,6 +24,8 @@ sap.ui.define([
 	"sap/m/TextArea",
 	"sap/m/Input",
 	"sap/m/TimePicker",
+	"sap/m/RadioButton",
+	"sap/m/RadioButtonGroup",
 	"sap/base/Log",
 	"sap/base/util/isEmptyObject",
 	"sap/base/util/isPlainObject",
@@ -72,6 +74,8 @@ sap.ui.define([
 	TextArea,
 	Input,
 	TimePicker,
+	RadioButton,
+	RadioButtonGroup,
 	Log,
 	isEmptyObject,
 	isPlainObject,
@@ -274,7 +278,7 @@ sap.ui.define([
 		var oResolvedGroupItem = merge({}, oItem),
 			sItemPath = oItem.path || "/",
 			oTemplate = oItem.template,
-			bIsFormInput = ["TextArea", "Input", "ComboBox", "Duration", "DateRange"].includes(oItem.type),
+			bIsFormInput = ["TextArea", "Input", "ComboBox", "Duration", "DateRange", "RadioButtonGroup"].includes(oItem.type),
 			bHasItemsToResolve = ["ButtonGroup", "IconGroup"].includes(oItem.type);
 
 		if (bIsFormInput) {
@@ -527,6 +531,9 @@ sap.ui.define([
 				break;
 			case "DateRange":
 				oControl = this._createDateRangeItem(oItem, vVisible, oLabel, sPath);
+				break;
+			case "RadioButtonGroup":
+				oControl = this._createRadioButtonGroupItem(oItem, vVisible, oLabel, sPath);
 				break;
 
 			// deprecated types
@@ -987,6 +994,58 @@ sap.ui.define([
 		}
 
 		oForm.addControl("change", oControl, oItem, sPath);
+
+		return oControl;
+	};
+
+	ObjectContent.prototype._createRadioButtonGroupItem = function (oItem, vVisible, oLabel, sPath) {
+		const oForm = this._getForm(),
+			oSettings = {
+				visible: BindingHelper.reuse(vVisible),
+				selectedIndex: oItem.selectedIndex ?? -1,
+				columns: 1
+			};
+
+		const oControl = new RadioButtonGroup(oSettings);
+
+		if (oLabel) {
+			oLabel.setLabelFor(oControl);
+			oLabel.setRequired(oForm.getRequiredValidationValue(oItem));
+		}
+
+		if (oItem.item) {
+			const oItemTemplate = new RadioButton({
+				text: oItem.item.template.title,
+				enabled: oItem.item.template.enabled,
+				wrapping: true
+			});
+
+			oItemTemplate.data("key", oItem.item.template.key);
+
+			oControl.bindAggregation("buttons", {
+				path: oItem.item.path || "/",
+				template: oItemTemplate,
+				templateShareable: false
+			});
+
+			if (oItem.selectedIndex === undefined || oItem.selectedIndex === -1) {
+				oControl.attachModelContextChange(function() {
+					const aButtons = this.getButtons();
+					const sTargetKey = BindingResolver.resolveValue(oItem.selectedKey, oControl, oControl.getBindingContext()?.getPath() || "");
+
+					const iSelectedIndex = aButtons.findIndex(function(oButton) {
+						const sKey = oButton.data("key");
+						return sKey && sKey.toString() === sTargetKey;
+					});
+
+					if (iSelectedIndex !== -1) {
+						this.setSelectedIndex(iSelectedIndex);
+					}
+				});
+			}
+		}
+
+		oForm.addControl("select", oControl, oItem, sPath);
 
 		return oControl;
 	};

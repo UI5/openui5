@@ -1279,18 +1279,16 @@ sap.ui.define([
 	};
 
 	/**
-	 * Executes a given callback only if the control's configuration allows for change persistence
+	 * Checks if the control's configuration allows for change persistence
 	 *
 	 * @private
 	 * @param {string|sap.ui.core.Control} vControl The control id or instance
-	 * @param {function(bGlobalPersistenceEnabled:boolean)} fCallback The callback to be executed, if change persistence is available
-	 * @returns {any} The return value of the callback
+	 * @returns {boolean} Returns whether global persistence is enabled
 	 */
-	Engine.prototype._runWithPersistence = function(vControl, fCallback) {
+	Engine.prototype._getKeyUserPersistence = function(vControl) {
 		const {payload} = oEngine._determineModification(vControl);
 		const vGlobalPersistence = oEngine._determineGlobalPersistence(payload);
-		const bPersistenceEnabled = typeof vGlobalPersistence === "boolean";
-		return bPersistenceEnabled && fCallback(vGlobalPersistence);
+		return !!vGlobalPersistence;
 	};
 
 	Engine.prototype.hasForReference = (vControl, sControlType) => {
