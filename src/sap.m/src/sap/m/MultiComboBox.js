@@ -607,8 +607,6 @@ function(
 				listItemUpdated: false
 			};
 
-			this._bPreventValueRemove = false;
-
 			if (this.getValue() === "" || (typeof this.getValue() === "string" && oItem.getText().toLowerCase().startsWith(this.getValue().toLowerCase()))) {
 				if (ListHelpers.getListItem(oItem).getSelected()) {
 					this.setValue('');
@@ -616,8 +614,6 @@ function(
 					this.setSelection(oParam);
 				}
 			}
-		} else {
-			this._bPreventValueRemove = true;
 		}
 
 		if (oEvent) {
@@ -934,13 +930,21 @@ function(
 		var oInput = oEvent.srcControl,
 			bIsPickerDialog = this.isPickerDialog(),
 			oInputField = bIsPickerDialog ? this.getPickerTextField() : this,
-			sValueState = oInputField.getValueState();
+			sValueState = oInputField.getValueState(),
+			sValue = oEvent.target.value;
 
 		// reset the value state
 		if (sValueState === ValueState.Error && this._bAlreadySelected) {
 				oInputField.setValueState(this._sInitialValueState);
 				oInputField.setValueStateText(this._sInitialValueStateText);
 				this._bAlreadySelected = false;
+		}
+
+		// Clear error state when user types valid input
+		if (sValueState === ValueState.Error && this._sPreviousValueState && this.isValueValid(sValue)) {
+			oInputField.setValueState(this._sPreviousValueState);
+			oInputField.setValueStateText(this._sInitialValueStateText || "");
+			this._sPreviousValueState = null;
 		}
 
 		if (!this.getEnabled() || !this.getEditable()) {
@@ -1002,7 +1006,7 @@ function(
 	/* ----------------------------------------------------------- */
 
 	/**
-	 * Triggers the value state "Error" for 1s, and resets the state to the previous one.
+	 * Triggers the value state "Error" and keeps it persistent until user corrects the input.
 	 *
 	 * @private
 	 */
@@ -1011,7 +1015,6 @@ function(
 		var sInitialValueStateText = this._sInitialValueStateText;
 		var sInitialValueState = this._sInitialValueState;
 		var sInvalidEntry = sInitialValueStateText || this._oRbC.getText("VALUE_STATE_ERROR");
-		var that = this;
 
 		if (sInitialValueState === ValueState.Error) {
 			return;
@@ -1019,14 +1022,11 @@ function(
 
 		if (oSuggestionsPopover) {
 			oSuggestionsPopover.updateValueState(ValueState.Error, sInvalidEntry, true);
-			setTimeout(oSuggestionsPopover.updateValueState.bind(oSuggestionsPopover, that.getValueState(), sInvalidEntry, true), 1000);
 		}
 
 		if (!this.isPickerDialog()) {
 			this.setValueState(ValueState.Error);
 			this.setValueStateText(this.getValueStateText() || sInvalidEntry);
-
-			setTimeout(this["setValueState"].bind(this, sInitialValueState || ValueState.Error), 1000);
 		}
 
 		this._syncInputWidth(this.getAggregation("tokenizer"));
@@ -1428,9 +1428,6 @@ function(
 
 		// Show all items when the list will be opened next time
 		this.clearFilter();
-
-		// resets or not the value of the input depending on the event (enter does not clear the value)
-		!this.isComposingCharacter() && !this._bPreventValueRemove && this.setValue("");
 
 		// clear old values
 		this._sOldValue = "";
@@ -2037,12 +2034,12 @@ function(
 	 * @private
 	 */
 	MultiComboBox.prototype._handleInputFocusOut = function (oEvent) {
-		var bIsPickerDialog = this.isPickerDialog(),
-		oInput = bIsPickerDialog ? this.getPickerTextField() : this,
-		sUpdateValue = this._sOldInput || this._sOldValue || "",
-		bOkButtonPressed = bIsPickerDialog && oEvent && oEvent.relatedTarget &&
-			oEvent.relatedTarget.id.includes("-popup-closeButton");
-		if (!bOkButtonPressed) {
+		var oPicker = this.getPicker();
+		var bIsPickerDialog = this.isPickerDialog();
+		var oInput = bIsPickerDialog ? this.getPickerTextField() : this;
+		var sUpdateValue = this._sOldInput || this._sOldValue || "";
+
+		if (oPicker && oEvent && oEvent.relatedTarget && containsOrEquals(oPicker.getDomRef(), oEvent.relatedTarget)) {
 			oInput.updateDomValue(sUpdateValue);
 		}
 
@@ -2288,7 +2285,7 @@ function(
 	MultiComboBox.prototype.onfocusout = function(oEvent) {
 		// if the focus switches from the picker to the dropdown
 		// update the input value with the last typed in input from the user
-		this.isOpen() && this._handleInputFocusOut();
+		this.isOpen() && this._handleInputFocusOut(oEvent);
 		this.removeStyleClass("sapMFocus");
 
 		// reset the value state
@@ -2299,18 +2296,12 @@ function(
 
 		ComboBoxBase.prototype.onfocusout.apply(this, arguments);
 
-		var sOldValue = this.getValue(),
-			oPicker = this.getPicker(),
+		var oPicker = this.getPicker(),
 			oFocusTarget = oEvent.relatedTarget;
 
 		// If focus target is outside of picker and the picker is fully opened
 		if (!containsOrEquals(oPicker?.getDomRef(), oFocusTarget) && !containsOrEquals(this.getDomRef(), oFocusTarget)) {
-			this.setValue(null);
-
-			// fire change event only if the value of the MCB is not empty
-			if (sOldValue) {
-				this.fireChangeEvent("", { value: sOldValue });
-			}
+				this.fireChangeEvent("", { value: this.getValue() });
 		}
 	};
 
@@ -2579,7 +2570,6 @@ function(
 		}, this);
 		return aItems;
 	};
-
 
 	/**
 	 * Get unselected items which match value of input field.
@@ -3263,30 +3253,6 @@ function(
 		typeAhead(sValue, oInput, aFilteredItems);
 	};
 
-	/**
-	 * Shows invalid state to an input control
-	 *
-	 * @param {sap.m.InputBase} oInput Input to be validated
-	 * @private
-	 */
-	MultiComboBox.prototype._handleFieldValidationState = function (oInput) {
-		// ensure that the value, which will be updated is valid
-		// needed for the composition characters
-		if (this._sOldInput && this.isValueValid(this._sOldInput)) {
-			oInput.updateDomValue(this._sOldInput);
-		} else if (this._sOldValue && this.isValueValid(this._sOldValue)) {
-			oInput.updateDomValue(this._sOldValue);
-		} else {
-			oInput.updateDomValue("");
-			oInput.setProperty("effectiveShowClearIcon", false);
-		}
-
-		if (this._iOldCursorPos) {
-			jQuery(oInput.getFocusDomRef()).cursorPos(this._iOldCursorPos);
-		}
-
-		this._showWrongValueVisualEffect();
-	};
 
 	MultiComboBox.prototype.init = function() {
 		ComboBoxBase.prototype.init.apply(this, arguments);
@@ -3307,8 +3273,8 @@ function(
 		 */
 		this._bCheckBoxClicked = true;
 
-		// determines if value of the combobox should be empty string after popup's close
-		this._bPreventValueRemove = false;
+		this._sPreviousValueState = null;
+
 		// ToDo: Remove. Just for backwards compatibility with the runtime layer. When this change merges, we'd need to adjust the code in the runtime
 		this._oTokenizer = this._createTokenizer();
 
@@ -3835,9 +3801,29 @@ function(
 			this.setValue("");
 			this._sOldInput = "";
 
+			if (this._sPreviousValueState) {
+				this.setValueState(this._sPreviousValueState);
+				this.setValueStateText(this._sInitialValueStateText || "");
+				this._sPreviousValueState = null;
+			}
+
 			this.bOpenedByKeyboardOrButton ? this.clearFilter() : this.close();
 			this.setProperty("effectiveShowClearIcon", false);
 		}
+	};
+
+	/**
+	 * Handles validation on invalid user input.
+	 *
+	 * @param {sap.m.Input} oInput The input field of the MultiComboBox control.
+	 * @private
+	 */
+	MultiComboBox.prototype._handleFieldValidationState = function (oInput) {
+		if (!this._sPreviousValueState) {
+			this._sPreviousValueState = this.getValueState();
+		}
+
+		this._showWrongValueVisualEffect();
 	};
 
 	// support for SemanticFormElement

@@ -151,7 +151,6 @@ sap.ui.define([
 				text: "{" + FilterBarBase.INNER_MODEL_NAME + ">/_filterCount}",
 				press: this.onAdaptFilters.bind(this)
 			});
-
 			this._btnAdapt.bindProperty("visible", {
 				parts: [{
 					path: "/showAdaptFiltersButton",
@@ -188,6 +187,15 @@ sap.ui.define([
 					this.onClear();
 				}.bind(this)
 			});
+
+			/**
+			 * @deprecated since 1.144
+			 */
+			if (this._oModel) {
+				this._btnSearch.setModel(this._oModel, FilterBarBase.INNER_MODEL_NAME);
+				this._btnClear.setModel(this._oModel, FilterBarBase.INNER_MODEL_NAME);
+				this._btnAdapt.setModel(this._oModel, FilterBarBase.INNER_MODEL_NAME);
+			}
 
 			this._oFilterBarLayout.addButton(this._btnSearch);
 			this._oFilterBarLayout.addButton(this._btnClear);

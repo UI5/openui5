@@ -489,6 +489,7 @@ sap.ui.define([
 	 * @param {object} mPropertyBag - Object with the necessary properties
 	 * @param {string} mPropertyBag.reference - Flexibility reference
 	 * @param {string} mPropertyBag.variantReference - Variant reference to be loaded
+	 * @param {string} mPropertyBag.componentId - Component ID
 	 */
 	VariantManagementState.loadVariant = async function(mPropertyBag) {
 		await FlexState.lazyLoadFlVariant({

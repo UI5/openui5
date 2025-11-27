@@ -193,6 +193,7 @@
 								<li>"RatingIndicator" (experimental since 1.111) - see <a href="#ratingIndicatorProperties">Additional Properties for ObjectGroupItem of type RatingIndicator</a></li>
 								<li>"Image" (experimental since 1.112) - see <a href="#imageProperties">Additional Properties for ObjectGroupItem of type Image</a></li>
 								<li>"DateRange" (experimental since 1.115) - see <a href="#dateRangeProperties">Additional Properties for ObjectGroupItem of type DateRange</a></li>
+								<li>"RadioButtonGroup" (experimental since 1.144) - see <a href="#radioButtonGroupProperties">Additional Properties for ObjectGroupItem of type RadioButtonGroup</a></li>
 							</ul>
 						</td>
 						<td>1.15.0</td>
@@ -1389,6 +1390,149 @@
 				<tr>
 					<td>{form>/idOfTheItem/range/endLocalDate}</td>
 					<td>The end date of the range in short ISO 8601 date format in the local time zone. It is in the boundaries of Edm.DateTime type of the OData protocol.</td>
+				</tr>
+			</table>
+
+			<div id="radioButtonGroupProperties" class="boldBlock">Additional Properties for ObjectGroupItem of type RadioButtonGroup</div>
+			<span class="mobileNoteIcon"></span>
+			<b>Note:</b> Not yet implemented for <a href="../../../index.html#/overview/supportedPlatforms/native" target="_parent">mobile native cards</a>.
+			<div class="tableWrapper">
+				<table>
+					<tr>
+						<th>Property</th>
+						<th>Type</th>
+						<th>Default Value</th>
+						<th>Required</th>
+						<th>Description</th>
+						<th>Schema Version</th>
+						<th>Since</th>
+					</tr>
+					<tr>
+						<td>id</td>
+						<td>string</td>
+						<td></td>
+						<td>Yes</td>
+						<td>
+							Defines the ID of the form input. This ID is used in the submitted payload.
+						</td>
+						<td>1.81</td>
+						<td>1.144</td>
+					</tr>
+					<tr>
+						<td>selectedIndex</td>
+						<td>number</td>
+						<td></td>
+						<td>No</td>
+						<td>
+							Defines the initially selected radio button by its index in the items array.
+						</td>
+						<td>1.81</td>
+						<td>1.144</td>
+					</tr>
+					<tr>
+						<td>selectedKey</td>
+						<td>string</td>
+						<td></td>
+						<td>No</td>
+						<td>
+							Defines the initially selected radio button by its key in the items array. In case both selectedKey and selectedIndex are set, the latter takes priority.
+						</td>
+						<td>1.81</td>
+						<td>1.144</td>
+					</tr>
+					<tr>
+						<td>item</td>
+						<td><a href="#radioButtonGroupOptionsProperties">RadioButtonGroupItemBindingInfo</a></td>
+						<td></td>
+						<td>Yes</td>
+						<td>
+							Binding info object used to bind data to the options of the RadioButtonGroup.
+						</td>
+						<td>1.81</td>
+						<td>1.144</td>
+					</tr>
+					<tr>
+						<td>validations</td>
+						<td><a href="#validationsProperties">ObjectGroupItemValidation[]</a></td>
+						<td></td>
+						<td>No</td>
+						<td>Defines the user input validations.</td>
+						<td>1.81</td>
+						<td>1.144</td>
+					</tr>
+				</table>
+			</div>
+
+			<div id="radioButtonGroupOptionsProperties" class="boldBlock">RadioButtonGroupOption Properties</div>
+			<div class="tableWrapper">
+				<table>
+					<tr>
+						<th colspan="2">Property</th>
+						<th>Type</th>
+						<th>Default Value</th>
+						<th>Required</th>
+						<th>Description</th>
+						<th>Schema Version</th>
+						<th>Since</th>
+					</tr>
+					<tr>
+						<td colspan="2">path</td>
+						<td>string</td>
+						<td>/</td>
+						<td>No</td>
+						<td>The context path.</td>
+						<td>1.81</td>
+						<td>1.144</td>
+					</tr>
+					<tr>
+						<td colspan="2">template</td>
+						<td></td>
+						<td></td>
+						<td>Yes</td>
+						<td>Binding template for items.</td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td></td>
+						<td>title</td>
+						<td>string</td>
+						<td></td>
+						<td>Yes</td>
+						<td>The title of the radio button.</td>
+						<td>1.81</td>
+						<td>1.144</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td>key</td>
+						<td>string</td>
+						<td></td>
+						<td>Yes</td>
+						<td>The key of the item. This key corresponds to the value of the RadioButton.</td>
+						<td>1.81</td>
+						<td>1.144</td>
+					</tr>
+				</table>
+			</div>
+
+			<p>The following values are available in the "form" model for item of type "RadioButtonGroup":</p>
+			<table>
+				<tr>
+					<th>Path</th>
+					<th>Description</th>
+				</tr>
+				<tr>
+					<td>{form>/idOfTheItem/selectedIndex}</td>
+					<td>The index of the currently selected radio button option.</td>
+				</tr>
+				<tr>
+					<td>{form>/idOfTheItem/selectedText}</td>
+					<td>The text of the currently selected radio button option.</td>
+				</tr>
+				<tr>
+					<td>{form>/idOfTheItem/selectedKey}</td>
+					<td>The key of the currently selected radio button option.</td>
 				</tr>
 			</table>
 

@@ -110,13 +110,14 @@ sap.ui.define([
 	 * @param {object} sandbox - Sinon or sandbox instance
 	 * @param {string} sReference - Flex Reference
 	 * @param {object} oData - Data that should be loaded
+	 * @param {string} [sComponentId] - Component ID
 	 */
-	FlQUnitUtils.initializeFlexStateWithData = async function(sandbox, sReference, oData) {
+	FlQUnitUtils.initializeFlexStateWithData = async function(sandbox, sReference, oData, sComponentId) {
 		sandbox.stub(Storage, "loadFlexData").resolves(merge(StorageUtils.getEmptyFlexDataResponse(), oData || {}));
 		sandbox.stub(Storage, "loadVariantsAuthors").resolves({});
 		await FlexState.initialize({
 			reference: sReference,
-			componentId: sReference
+			componentId: sComponentId || sReference
 		});
 	};
 

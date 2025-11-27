@@ -1,43 +1,50 @@
-/******************************************************************
-	Style of the RTA Toolbar (type: adaptation) - Horizon Theme
-*******************************************************************/
-@_sap_ui_rta_Toolbar_Adaptation_TextColor: var(--sapShell_TextColor); //#131e29
+/* ============================================== */
+/* CSS for control sap.ui.rta/Toolbar.adaptation  */
+/* Morning Horizon theme                          */
+/* ============================================== */
+
+@_sap_ui_rta_Toolbar_Adaptation_TextColor: var(--sapShell_TextColor); /* #131e29 */
 @_sap_ui_rta_Toolbar_Adaptation_BtnFocusBorderColor: transparent;
-@_sap_ui_rta_Toolbar_Adaptation_SegBBtnTextColor: var(--sapButton_Emphasized_TextColor); //#fff
-@_sap_ui_rta_Toolbar_Adaptation_SegBBtnBackgroundColor: var(--sapToolbar_Background); //#fff
-@_sap_ui_rta_Toolbar_Adaptation_SegBBtnFocusColor: var(--sapToolbar_Background); //#fff
-@_sap_ui_rta_Toolbar_Adaptation_SegBBtnSelectedBackgroundColor: ~"hsl(from var(--sapButton_Emphasized_Background) h s calc(l - 5) / alpha)"; // #0064d9, darken the emphasized button background by 5%
-@_sap_ui_rta_Toolbar_Adaptation_BorderRadius: var(--sapButton_BorderCornerRadius); //0.5rem
-@_sap_ui_rta_Toolbar_Adaptation_DraftVersionColor: ~"hsl(from var(--sapContent_RatedColor) h s calc(l - 10) / alpha)"; // #9f5a00, darken the rated color by 10%
-@_sap_ui_rta_Toolbar_Adaptation_ActiveVersionColor: var(--sapShell_PositiveColor); //#256f3a
-@_sap_ui_rta_Toolbar_Adaptation_FocusOutlineColor: var(--sapContent_FocusColor); //#0032a5
-@_sap_ui_rta_Toolbar_Adaptation_VersionListBackgroundColor: var(--sapToolbar_Background); //#fff
+@_sap_ui_rta_Toolbar_Adaptation_SegBBtnTextColor: var(--sapButton_Emphasized_TextColor); /* #fff */
+@_sap_ui_rta_Toolbar_Adaptation_SegBBtnBackgroundColor: var(--sapToolbar_Background); /* #fff */
+@_sap_ui_rta_Toolbar_Adaptation_SegBBtnFocusColor: var(--sapToolbar_Background); /* #fff */
+@_sap_ui_rta_Toolbar_Adaptation_SegBBtnSelectedBackgroundColor: ~"hsl(from var(--sapButton_Emphasized_Background) h s calc(l - 5) / alpha)"; /* #0064d9, darken the emphasized button background by 5% */
+@_sap_ui_rta_Toolbar_Adaptation_BorderRadius: var(--sapButton_BorderCornerRadius); /* 0.5rem */
+@_sap_ui_rta_Toolbar_Adaptation_DraftVersionColor: ~"hsl(from var(--sapContent_RatedColor) h s calc(l - 10) / alpha)"; /* #9f5a00, darken the rated color by 10% */
+@_sap_ui_rta_Toolbar_Adaptation_ActiveVersionColor: var(--sapShell_PositiveColor); /* #256f3a */
+@_sap_ui_rta_Toolbar_Adaptation_FocusOutlineColor: var(--sapContent_FocusColor); /* #0032a5 */
+@_sap_ui_rta_Toolbar_Adaptation_VersionListBackgroundColor: var(--sapToolbar_Background); /* #fff */
 
 .sapUiRtaMode {
+
 	.sapUiRtaToolbar.sapUiRtaToolbarAdaptation {
 
-		//Segmented Buttons
+		/* Segmented Buttons */
 		.sapMSegB {
 			background: @_sap_ui_rta_Toolbar_Adaptation_SegBBtnBackgroundColor;
+
 			.sapMSegBBtn {
+
 				.sapMSegBBtnInnerWrapper {
 					background: @_sap_ui_rta_Toolbar_Adaptation_SegBBtnBackgroundColor;
 					border: none;
 				}
 
 				&.sapMSegBBtnFocusable {
+
 					.sapMSegBBtnInner {
 						color: @_sap_ui_rta_Toolbar_Adaptation_TextColor;
 					}
+
 					&.sapMSegBBtnSel:focus .sapMSegBBtnInner {
 						outline: 0.0625rem solid @_sap_ui_rta_Toolbar_Adaptation_SegBBtnFocusColor; //1px
-						outline-offset: -0.125rem; //2px
+						outline-offset: -0.125rem; /* 2px */
 					}
 
 					&:focus .sapMSegBBtnInner {
 						outline: none;
 
-						&:after {
+						&::after {
 							left: 0.0625rem;
 							top: 0.0625rem;
 							right: 0.0625rem;
@@ -46,8 +53,10 @@
 					}
 
 					&.sapMSegBBtnSel {
+
 						&:hover .sapMSegBBtnInner {
-							&:after {
+
+							&::after {
 								content: none;
 							}
 						}
@@ -56,7 +65,7 @@
 							background: @_sap_ui_rta_Toolbar_Adaptation_SegBBtnSelectedBackgroundColor;
 							color: @_sap_ui_rta_Toolbar_Adaptation_SegBBtnTextColor;
 
-							&:after {
+							&::after {
 								content: none;
 							}
 
@@ -67,23 +76,31 @@
 					}
 				}
 			}
+
 			&.sapMSegBIcons {
+
 				.sapMSegBBtn {
+
 					&.sapMSegBBtnFocusable {
+
 						&:not(.sapMSegBBtnSel):focus {
+
 							.sapMSegBBtnInner {
-								outline: 0.125rem solid @_sap_ui_rta_Toolbar_Adaptation_FocusOutlineColor; //1px
+								outline: 0.125rem solid @_sap_ui_rta_Toolbar_Adaptation_FocusOutlineColor; /* 1px */
 								border-radius: @_sap_ui_rta_Toolbar_Adaptation_BorderRadius;
 								outline-offset: -0.125rem;
 
-								&:after {
+								&::after {
 									content: none;
 								}
 							}
 						}
+
 						&.sapMSegBBtnSel:focus {
+
 							.sapMSegBBtnInner {
-								&:after {
+
+								&::after {
 									content: none;
 								}
 							}
@@ -93,15 +110,17 @@
 			}
 		}
 
-		//Buttons
+		/* Buttons */
 		.sapMBtn:not(.sapUiRtaVersionButton) {
+
 			&.sapMBtnDisabled .sapMBtnInner {
 				opacity: 1.0;
 			}
+
 			.sapMBtnTransparent,
 			.sapMBtnTransparent bdi,
-			.sapMBtnTransparent>.sapMBtnIcon {
-				color: @_sap_ui_rta_Toolbar_Adaptation_TextColor!important;
+			.sapMBtnTransparent > .sapMBtnIcon {
+				color: @_sap_ui_rta_Toolbar_Adaptation_TextColor !important;
 			}
 		}
 
@@ -111,7 +130,9 @@
 		}
 
 		.sapUiRtaVersionButton.sapUiRtaDraftVersionAccent {
+
 			&:hover {
+
 				> span > span > bdi,
 				> span > span.sapMBtnIcon {
 					color: @_sap_ui_rta_Toolbar_Adaptation_DraftVersionColor !important;
@@ -120,19 +141,23 @@
 		}
 
 		.sapUiRtaVersionButton.sapUiRtaActiveVersionAccent {
+
 			&:hover {
+
 				> span > span > bdi,
 				> span > span.sapMBtnIcon{
 					color: @_sap_ui_rta_Toolbar_Adaptation_ActiveVersionColor !important;
 				}
 			}
 		}
-
 	}
+
 	.sapUiRtaVersionHistory {
+
 		.sapMLIB:not(:hover) {
 			background: @_sap_ui_rta_Toolbar_Adaptation_VersionListBackgroundColor;
 		}
+
 		.sapMLIBHoverable:hover {
 			outline: 0.125rem solid @_sap_ui_rta_Toolbar_Adaptation_FocusOutlineColor;
 			border-radius: @_sap_ui_rta_Toolbar_Adaptation_BorderRadius;

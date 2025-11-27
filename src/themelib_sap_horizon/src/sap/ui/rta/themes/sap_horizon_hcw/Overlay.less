@@ -1,27 +1,36 @@
-/******************************************************************
-	Style of the RTA Overlays - Horizon High Contrast White theme
-*******************************************************************/
-@_sap_ui_rta_Overlay_ResizeHandleColor: darken(@sapUiSelected, 25%); //#004adc
-@_sap_ui_rta_Overlay_PlaceholderBackgroundColor: @sapUiContentImagePlaceholderBackground; //#fff
+/* =================================== */
+/* CSS for control sap.ui.rta/Overlay  */
+/* Horizon High Contrast White theme   */
+/* =================================== */
+
+@_sap_ui_rta_Overlay_ResizeHandleColor: darken(@sapUiSelected, 25%); /* #004adc */
+@_sap_ui_rta_Overlay_PlaceholderBackgroundColor: @sapUiContentImagePlaceholderBackground; /* #fff */
 
 .sapUiRta {
+
 	.sapUiDtOverlayDropZone {
+
 		> .sapUiDtOverlayChildren {
+
 			> .sapUiRtaOverlayPlaceholder {
 				background: @_sap_ui_rta_Overlay_PlaceholderBackgroundColor !important;
-				// no "focus" border
+
+				/* no "focus" border */
 				&:focus {
-					&:before {
+
+					&::before {
 						content: none;
 					}
 				}
 
-				// all descendants
+				/* all descendants */
 				* {
 					background: @_sap_ui_rta_Overlay_PlaceholderBackgroundColor;
-					// no "focus" border
+
+					/* no "focus" border */
 					&:focus {
-						&:before {
+
+						&::before {
 							content: none;
 						}
 					}

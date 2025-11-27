@@ -1063,6 +1063,149 @@ sap.ui.define([
 		}
 	};
 
+	var oManifest_ObjectCard_With_Radio_Buttons = {
+		"sap.card": {
+			"type": "Object",
+			"header": {
+				"title": "RadioButtonGroup Test Card"
+			},
+			"data": {
+				"json": {
+					"employeeStatus": [
+						{ "key": "active", "text": "Active" },
+						{ "key": "inactive", "text": "Inactive" },
+						{ "key": "vacation", "text": "On Vacation" },
+						{ "key": "sick", "text": "Sick Leave", "enabled": false }
+					]
+				}
+			},
+			"content": {
+				"groups": [
+					{
+						"title": "RadioButtonGroup Examples",
+						"items": [
+							{
+								"id": "status",
+								"label": "Employee Status",
+								"type": "RadioButtonGroup",
+								"selectedIndex": 1,
+								"item": {
+									"path": "/employeeStatus",
+									"template": {
+										"key": "{key}",
+										"title": "{text}",
+										"enabled": "{enabled}"
+									}
+								}
+							}
+						]
+					}
+				]
+			}
+		}
+	};
+
+	var oManifest_RadioButtonGroupWithValidation = {
+		"sap.app": {
+			"id": "test.cards.object.radioValidation",
+			"type": "card"
+		},
+		"sap.card": {
+			"type": "Object",
+			"header": {
+				"title": "RadioButtonGroup Validation Test"
+			},
+			"data": {
+				"json": {
+					"priorityLevels": [
+						{ "key": "low", "text": "Low Priority" },
+						{ "key": "medium", "text": "Medium Priority" },
+						{ "key": "high", "text": "High Priority" },
+						{ "key": "critical", "text": "Critical Priority" }
+					]
+				}
+			},
+			"content": {
+				"groups": [
+					{
+						"title": "Required Selection",
+						"items": [
+							{
+								"id": "priority",
+								"label": "Priority Level",
+								"type": "RadioButtonGroup",
+								"required": true,
+								"item": {
+									"path": "/priorityLevels",
+									"template": {
+										"key": "{key}",
+										"title": "{text}"
+									}
+								},
+								"validations": [
+									{
+										"required": true
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		}
+	};
+
+	var oManifest_RadioButtonGroupWithValidationWithSelection = {
+		"sap.app": {
+			"id": "test.cards.object.radioValidation",
+			"type": "card"
+		},
+		"sap.card": {
+			"type": "Object",
+			"header": {
+				"title": "RadioButtonGroup Validation Test"
+			},
+			"data": {
+				"json": {
+					"priorityLevels": [
+						{ "key": "low", "text": "Low Priority" },
+						{ "key": "medium", "text": "Medium Priority" },
+						{ "key": "high", "text": "High Priority" },
+						{ "key": "critical", "text": "Critical Priority" }
+					]
+				}
+			},
+			"content": {
+				"groups": [
+					{
+						"title": "Required Selection",
+						"items": [
+							{
+								"id": "priority",
+								"label": "Priority Level",
+								"type": "RadioButtonGroup",
+								"selectedIndex": 1,
+								"required": true,
+								"item": {
+									"path": "/priorityLevels",
+									"template": {
+										"key": "{key}",
+										"title": "{text}"
+									}
+								},
+								"validations": [
+									{
+										"required": true
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		}
+	};
+
 	actionEnablementTests("Status in NumericHeader", {
 		manifest: {
 			"sap.app": {
@@ -2815,6 +2958,115 @@ sap.ui.define([
 		assert.strictEqual(this.oCard.getModel("form").getProperty("/i2"), "some long text", "Form model has correct value for TextArea");
 		assert.deepEqual(this.oCard.getModel("form").getProperty("/i3"), DateRangeHelper.getValueForModel(oDateRange), "Form model has correct value for DateRange");
 		assert.strictEqual(this.oCard.getModel("form").getProperty("/i4"), "PT12H30M", "Form model has correct value for Duration");
+	});
+
+	QUnit.test("Verifying RadioButtonGroup properties and bindings", async function (assert) {
+		this.oCard.setManifest(oManifest_ObjectCard_With_Radio_Buttons);
+
+		await nextCardReadyEvent(this.oCard);
+		await nextUIUpdate();
+
+		const oLayout = this.oCard.getCardContent().getAggregation("_content").getItems()[0];
+		const oGroup = oLayout.getContent()[0];
+		const oRadioButtonGroup = oGroup.getItems()[2];
+
+		assert.ok(oRadioButtonGroup.isA("sap.m.RadioButtonGroup"), "RadioButtonGroup control is instantiated");
+		assert.strictEqual(oRadioButtonGroup.getButtons().length, 4, "RadioButtonGroup contains four radio buttons");
+
+		const aButtons = oRadioButtonGroup.getButtons();
+
+		assert.strictEqual(aButtons[0].getText(), "Active", "Button[0] text is 'Active'");
+		assert.strictEqual(aButtons[0].getSelected(), false, "Button[0] is not selected");
+		assert.strictEqual(aButtons[0].getEnabled(), true, "Button[0] is enabled");
+
+		assert.strictEqual(aButtons[1].getText(), "Inactive", "Button[1] text is 'Inactive'");
+		assert.strictEqual(aButtons[1].getSelected(), true, "Button[1] is selected by default (selectedIndex = 0)");
+		assert.strictEqual(aButtons[1].getEnabled(), true, "Button[1] is enabled");
+
+		assert.strictEqual(aButtons[2].getText(), "On Vacation", "Button[2] text is 'On Vacation'");
+		assert.strictEqual(aButtons[2].getSelected(), false, "Button[2] is not selected");
+		assert.strictEqual(aButtons[2].getEnabled(), true, "Button[2] is enabled");
+
+		assert.strictEqual(aButtons[3].getText(), "Sick Leave", "Button[3] text is 'Sick Leave'");
+		assert.strictEqual(aButtons[3].getSelected(), false, "Button[3] is not selected");
+		assert.strictEqual(aButtons[3].getEnabled(), false, "Button[3] is disabled as configured");
+	});
+
+	QUnit.test("Setting form data via public card API - valid RadioButtonGroup input", async function (assert) {
+		this.oCard.setManifest(oManifest_ObjectCard_With_Radio_Buttons);
+
+		await nextCardReadyEvent(this.oCard);
+		await nextUIUpdate();
+
+		const oLayout = this.oCard.getCardContent().getAggregation("_content").getItems()[0];
+		const oGroup = oLayout.getContent()[0];
+		const oRadioButtonGroup = oGroup.getItems()[2];
+		const aButtons = oRadioButtonGroup.getButtons();
+
+		assert.strictEqual(aButtons[1].getSelected(), true, "Button[1] is selected by default (selectedIndex = 0)");
+
+		this.oCard.setFormValues([{ "id": "status", "selectedIndex": 2 }]);
+
+		assert.strictEqual(this.oCard.getModel("messages").getProperty("/hasErrors"), false, "Form has no validation errors after setting valid RadioButtonGroup value");
+
+		assert.strictEqual(this.oCard.getModel("form").getProperty("/status/selectedIndex"), 2, "Form model correctly reflects the selected radio button (index 2)");
+		assert.strictEqual(this.oCard.getModel("form").getProperty("/status/selectedKey"), "vacation", "Form model correctly reflects the selected radio button (key vacation)");
+		assert.strictEqual(this.oCard.getModel("form").getProperty("/status/selectedText"), "On Vacation", "Form model correctly reflects the selected radio button (text On Vacation)");
+		assert.strictEqual(aButtons[2].getSelected(), true, "Button[2] is selected");
+	});
+
+	QUnit.test("RadioButtonGroup with validation required, selected index and validateControls invocation", async function (assert) {
+		this.oCard.setManifest(oManifest_RadioButtonGroupWithValidation);
+
+		await nextCardReadyEvent(this.oCard);
+		await nextUIUpdate();
+
+		const oLayout = this.oCard.getCardContent().getAggregation("_content").getItems()[0];
+		const oGroup = oLayout.getContent()[0];
+		const oRadioButtonGroup = oGroup.getItems()[2];
+
+		assert.ok(oRadioButtonGroup.isA("sap.m.RadioButtonGroup"), "RadioButtonGroup control is created");
+		assert.strictEqual(oRadioButtonGroup.getButtons().length, 4, "RadioButtonGroup contains four radio buttons");
+		assert.strictEqual(oRadioButtonGroup.getSelectedIndex(), -1, "No radio button is selected initially");
+
+		assert.strictEqual(this.oCard.getModel("messages").getProperty("/hasErrors"), true, "Form has validation errors initially");
+
+		var aValidationRecords = this.oCard.getModel("messages").getProperty("/records");
+		assert.strictEqual(aValidationRecords.length, 1, "There is one validation error");
+		assert.strictEqual(aValidationRecords[0].bindingPath, "/priority", "Validation error is for the priority field");
+		assert.strictEqual(aValidationRecords[0].message, "Field is required.", "Validation error message is correct");
+		assert.strictEqual(aValidationRecords[0].type, "Error", "Validation error type is correct");
+
+		this.oCard.validateControls();
+
+		await nextUIUpdate();
+
+		assert.strictEqual(oRadioButtonGroup.getValueState(), ValueState.Error, "RadioButtonGroup shows error state after validation");
+	});
+
+	QUnit.test("RadioButtonGroup with validation required true and validateControls invocation", async function (assert) {
+		this.oCard.setManifest(oManifest_RadioButtonGroupWithValidationWithSelection);
+
+		await nextCardReadyEvent(this.oCard);
+		await nextUIUpdate();
+
+		const oLayout = this.oCard.getCardContent().getAggregation("_content").getItems()[0];
+		const oGroup = oLayout.getContent()[0];
+		const oRadioButtonGroup = oGroup.getItems()[2];
+
+		await nextUIUpdate();
+
+		this.oCard.validateControls();
+
+		await nextUIUpdate();
+
+		assert.strictEqual(this.oCard.getModel("messages").getProperty("/hasErrors"), false, "Form has no validation errors after selection");
+		assert.strictEqual(this.oCard.getModel("messages").getProperty("/records").length, 0, "No validation error records remain");
+		assert.strictEqual(oRadioButtonGroup.getValueState(), ValueState.None, "RadioButtonGroup shows no error state after valid selection");
+		assert.strictEqual(oRadioButtonGroup.getSelectedIndex(), 1, "Correct radio button is selected");
+
+		var oFormData = this.oCard.getModel("form").getProperty("/priority");
+		assert.strictEqual(oFormData.selectedIndex, 1, "Form model reflects correct selected index");
 	});
 
 	QUnit.module("Form controls with Validation", {

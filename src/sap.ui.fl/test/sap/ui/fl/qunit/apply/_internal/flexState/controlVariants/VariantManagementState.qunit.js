@@ -1693,7 +1693,7 @@ sap.ui.define([
 				changes: [{ fileName: "change1" }],
 				variantDependentControlChanges: [{ fileName: "change2" }],
 				variants: [{ fileName: "variant1" }]
-			});
+			}, sComponentId);
 		},
 		afterEach() {
 			FlexState.clearState();
@@ -1708,7 +1708,7 @@ sap.ui.define([
 			await VariantManagementState.loadVariant({
 				reference: sReference,
 				variantReference: sVariantManagementReference,
-				sReference
+				componentId: sComponentId
 			});
 			assert.ok(oUpdateSpy.calledOnce, "then the storage response is updated");
 			assert.strictEqual(oUpdateSpy.lastCall.args[0].reference, sReference, "with the correct reference");

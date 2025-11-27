@@ -11,7 +11,8 @@ sap.ui.define([
 		actions: {
 			settings: {
 				"sap.ui.mdc": function(oControl) {
-					return Engine.getInstance()._runWithPersistence(oControl, (bIsGlobal) => ({
+					const bIsGlobal = Engine.getInstance()._getKeyUserPersistence(oControl);
+					return {
 						name: function() {
 							return Library.getResourceBundleFor("sap.ui.mdc").getText("filterbar.ADAPT_TITLE");
 						},
@@ -22,7 +23,7 @@ sap.ui.define([
 							});
 						},
 						CAUTION_variantIndependent: bIsGlobal
-					}));
+					};
 				}
 			}
 		},

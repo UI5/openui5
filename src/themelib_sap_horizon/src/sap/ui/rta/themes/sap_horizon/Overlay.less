@@ -1,26 +1,35 @@
-/******************************************************************
-	Style of the RTA Overlays - Horizon Theme
-*******************************************************************/
-@_sap_ui_rta_Overlay_PlaceholderBackgroundColor: @sapUiListSelectionBackgroundColor; //	#ebf8ff
+/* =================================== */
+/* CSS for control sap.ui.rta/Overlay  */
+/* Morning Horizon theme               */
+/* =================================== */
+
+@_sap_ui_rta_Overlay_PlaceholderBackgroundColor: var(--sapList_SelectionBackgroundColor); /* #ebf8ff */
 
 .sapUiRta {
+
 	.sapUiDtOverlayDropZone {
+
 		> .sapUiDtOverlayChildren {
+
 			> .sapUiRtaOverlayPlaceholder {
 				background: @_sap_ui_rta_Overlay_PlaceholderBackgroundColor;
-				// no "focus" border
+
+				/* no "focus" border */
 				&:focus {
-					&:before {
+
+					&::before {
 						content: none;
 					}
 				}
 
-				// all descendants
+				/* all descendants */
 				* {
 					background: @_sap_ui_rta_Overlay_PlaceholderBackgroundColor;
-					// no "focus" border
+
+					/* no "focus" border */
 					&:focus {
-						&:before {
+
+						&::before {
 							content: none;
 						}
 					}

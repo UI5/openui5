@@ -1,56 +1,60 @@
-/******************************************************************
-	Style of the RTA Overlays - base Theme
-*******************************************************************/
-@_sap_ui_rta_Overlay_ResizeHandleColor: @sapUiSelected; //#8fb5ff
-@_sap_ui_rta_Overlay_ErrorBorderColor: @sapUiErrorBorder; //#ff0000
-@_sap_ui_rta_Overlay_BoxShadow: @sapUiUx3ToolPopupShadow; //0px 6px 12px 0px fade(black, 30);
+/* =================================== */
+/* CSS for control sap.ui.rta/Overlay  */
+/* Base theme                          */
+/* =================================== */
+
+@_sap_ui_rta_Overlay_ResizeHandleColor: var(--sapSelectedColor); /* #8fb5ff */
+@_sap_ui_rta_Overlay_ErrorBorderColor: var(--sapErrorBorderColor); /* #ff0000 */
 
 .sapUiRtaRoot {
+
 	.sapUiRtaMarginBottom {
-		margin-bottom: 2.5rem; //40px
+		margin-bottom: 2.5rem; /* 40px */
 	}
 
 	.sapUiRtaPaddingTop {
-		padding-top: 2.5rem; //40px
+		padding-top: 2.5rem; /* 40px */
 	}
 
 	&.sapUiRtaStretchPaddingTop, .sapUiRtaStretchPaddingTop {
-		padding-top: 1.5rem; //24px
+		padding-top: 1.5rem; /* 24px */
 	}
 }
 
-.sapUiSizeCozy .sapUiRtaRoot .sapUiRtaStretchPaddingTop, .sapUiSizeCozy .sapUiRtaRoot.sapUiRtaStretchPaddingTop {
-	padding-top: 2rem; //32px
+.sapUiSizeCozy .sapUiRtaRoot .sapUiRtaStretchPaddingTop,
+.sapUiSizeCozy .sapUiRtaRoot.sapUiRtaStretchPaddingTop {
+	padding-top: 2rem; /* 32px */
 }
 
 .sapUiRta:not(.sapUiRtaVisualizationMode) {
+
 	.sapUiRtaResizeHandle {
 		cursor: col-resize;
 		position: absolute;
 		top: 0;
 		bottom: 0;
-		width: 0.625rem; // 10px
+		width: 0.625rem; /* 10px */
 		background-clip: content-box;
 		background-color: @_sap_ui_rta_Overlay_ResizeHandleColor;
 		-webkit-user-select: none;
 		user-select: none;
 
-		&:before {
-			content: "";
+		&::before {
+			content: '';
 			position: absolute;
 			top: 10%;
 			bottom: 10%;
 			left: 37.5%;
-			border-left: 0.0625rem solid @sapUiHighlightTextColor; //1px
+			border-left: 0.0625rem solid var(--sapHighlightTextColor); /* 1px */
 		}
 
-		&:after {
-			content: "";
+		&::after {
+			content: '';
 			position: absolute;
 			top: 25%;
 			bottom: 25%;
 			left: 62.5%;
-			border-left: 0.0625rem solid @sapUiHighlightTextColor; //1px
+			border-left: 0.0625rem solid var(--sapHighlightTextColor); /* 1px */
 		}
 	}
 
@@ -58,8 +62,8 @@
 		position: relative;
 		top: 0;
 		bottom: 0;
-		width: 0.5rem; // 8px
-		border-right: 0.125rem dotted @_sap_ui_rta_Overlay_ResizeHandleColor; // 2px
+		width: 0.5rem; /* 8px */
+		border-right: 0.125rem dotted @_sap_ui_rta_Overlay_ResizeHandleColor; /* 2px */
 		background-clip: content-box;
 		-webkit-user-select: none;
 		user-select: none;
@@ -76,14 +80,15 @@
 
 	.sapUiDtOverlaySelected {
 		transition: box-shadow .25s;
-		box-shadow: @_sap_ui_rta_Overlay_BoxShadow;
+		box-shadow: var(--sapContent_Shadow2);
 
-		&.sapUiRtaErrorBg:after {
-			outline: 0.125rem solid @_sap_ui_rta_Overlay_ErrorBorderColor; //2px
-			outline-offset: -0.125rem; //2px
+		&.sapUiRtaErrorBg::after {
+			outline: 0.125rem solid @_sap_ui_rta_Overlay_ErrorBorderColor; /* 2px */
+			outline-offset: -0.125rem; /* 2px */
 			border: none
 		}
 	}
+
 	.sapUiRtaEditableField {
 		position: absolute;
 		top: 0;
@@ -98,11 +103,13 @@
 }
 
 .sapUiRta {
+
 	&.sapUiRtaVisualizationMode {
+
 		.sapUiDtOverlayHover {
 			background: inherit;
 
-			&:after {
+			&::after {
 				content: none;
 			}
 		}

@@ -1,11 +1,11 @@
-/******************************************************************************
-	Style of the RTA Toolbar (all types) - Horizon High Contrast White theme
-*******************************************************************************/
-@_sap_ui_rta_Toolbar_Base_OutlineColor: @sapUiShellBorderColor; //#000
-@_sap_ui_rta_Toolbar_Base_BoxShadowDarkColor: fade(@sapUiContentShadowColor, 80%); //rgba(0, 0, 0, 0.8)
-@_sap_ui_rta_Toolbar_Base_BoxShadowLightColor: @sapUiShellBackground; //#fff
+/* ======================================== */
+/* CSS for control sap.ui.rta/Toolbar.base  */
+/* Horizon High Contrast White theme        */
+/* ======================================== */
 
+@_sap_ui_rta_Toolbar_Base_OutlineColor: var(--sapShell_BorderColor); /* #000 */
 .sapUiRtaMode {
+
 	.sapUiRtaToolbar {
 		outline: 0.125rem dashed @_sap_ui_rta_Toolbar_Base_OutlineColor;
 		outline-offset: -0.125rem;

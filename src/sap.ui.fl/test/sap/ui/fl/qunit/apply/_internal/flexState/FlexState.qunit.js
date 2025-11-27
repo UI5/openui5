@@ -941,6 +941,12 @@ sap.ui.define([
 				States.LifecycleState.PERSISTED,
 				"the standard variant state is set to persisted"
 			);
+			const oInitializeEmptyCacheSpy = sandbox.spy(Loader, "initializeEmptyCache");
+			FlexState.addRuntimeSteadyObject(this.sSecondReference, sComponentId, this.oVariant);
+			assert.ok(
+				oInitializeEmptyCacheSpy.notCalled,
+				"then the empty state is not initialized twice for the same component ID"
+			);
 		});
 
 		QUnit.test("when the fake standard variants are reset", function(assert) {
@@ -965,6 +971,7 @@ sap.ui.define([
 					reference: this.sReference
 				});
 				FlexState.addRuntimeSteadyObject(this.sReference, sComponentId, this.oVariant);
+				const oInitializeEmptyCacheSpy = sandbox.spy(Loader, "initializeEmptyCache");
 				FlexState.addRuntimeSteadyObject(this.sReference, sComponentId2, oVariant2);
 
 				FlexState.rebuildFilteredResponse(this.sReference);
@@ -972,6 +979,10 @@ sap.ui.define([
 					FlexState.getFlexObjectsDataSelector().get({ reference: this.sReference }).length,
 					1,
 					"then only one fake variant is available"
+				);
+				assert.ok(
+					oInitializeEmptyCacheSpy.calledOnce,
+					"then the empty state is initialized again for the new component ID"
 				);
 
 				FlexState.clearRuntimeSteadyObjects(this.sReference, sComponentId2);
@@ -1010,7 +1021,16 @@ sap.ui.define([
 					layer: LayerUtils.getCurrentLayer()
 				});
 				oNewChange.setRevertData("revertData");
+				const oLoaderInitializeEmptyCacheSpy = sandbox.spy(Loader, "initializeEmptyCache");
+				// When initialize already happened, the component ID is not required
+				this.sComponentId = bInitFlexState ? undefined : this.sComponentId;
 				FlexState.addDirtyFlexObjects(sReference, [oNewChange], this.sComponentId);
+
+				assert.strictEqual(
+					oLoaderInitializeEmptyCacheSpy.notCalled,
+					bInitFlexState,
+					"then initializeEmptyCache is called only if FlexState was not initialized before"
+				);
 
 				// Change gets additional information from storage response (user)
 				mockLoader({
@@ -1519,12 +1539,12 @@ sap.ui.define([
 			sandbox.stub(FlexInfoSession, "getByReference").returns({ maxLayer: Layer.CUSTOMER });
 			await FlexState.initialize({
 				reference: sReference,
-				componentId: this.sComponentId
+				componentId: sComponentId
 			});
 			assert.strictEqual(this.oCreateFlexObjectSpy.callCount, 1, "one flexObject is created");
 			await FlexState.lazyLoadFlVariant({
 				reference: sReference,
-				componentId: this.sComponentId
+				componentId: sComponentId
 			});
 			const aAllFlexObjects = FlexState.getFlexObjectsDataSelector().get({ reference: sReference });
 			assert.strictEqual(aAllFlexObjects.length, 35, "all flex objects are loaded");
@@ -1536,12 +1556,12 @@ sap.ui.define([
 			sandbox.stub(FlexInfoSession, "getByReference").returns({ maxLayer: Layer.CUSTOMER });
 			await FlexState.initialize({
 				reference: sReference,
-				componentId: this.sComponentId
+				componentId: sComponentId
 			});
 			assert.strictEqual(this.oCreateFlexObjectSpy.callCount, 1, "one flexObject is created");
 			await FlexState.lazyLoadFlVariant({
 				reference: sReference,
-				componentId: this.sComponentId
+				componentId: sComponentId
 			});
 			const aAllFlexObjects = FlexState.getFlexObjectsDataSelector().get({ reference: sReference });
 			assert.strictEqual(aAllFlexObjects.length, 31, "all flex objects are loaded");
@@ -1551,7 +1571,7 @@ sap.ui.define([
 		QUnit.test("without an initialized state", async function(assert) {
 			await FlexState.lazyLoadFlVariant({
 				reference: sReference,
-				componentId: "componentId"
+				componentId: sComponentId
 			});
 			const aAllFlexObjects = FlexState.getFlexObjectsDataSelector().get({ reference: sReference });
 			assert.strictEqual(aAllFlexObjects.length, 34, "all flex objects are loaded");

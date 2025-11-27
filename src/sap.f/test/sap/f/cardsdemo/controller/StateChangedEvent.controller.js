@@ -305,6 +305,9 @@ sap.ui.define([
 						"2023-05-20"
 					]
 				}
+			}, {
+				"id": "priority",
+				"selectedIndex": 2
 			}];
 
 			this._oSkeletonCard.setFormValues(aFormValues);
@@ -321,6 +324,9 @@ sap.ui.define([
 			}, {
 				"id": "email",
 				"value": "no"
+			}, {
+				"id": "priority",
+				"key": null
 			}];
 
 			this._oSkeletonCard.setFormValues(aFormValues);

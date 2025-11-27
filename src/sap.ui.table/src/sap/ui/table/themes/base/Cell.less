@@ -32,29 +32,6 @@
 			outline-offset: @_sap_ui_table_Cell_FocusOutlineOffsetInZoomedChrome;
 		}
 	}
-
-	.sapUiTableRowNavIndicator & {
-
-		&.sapUiTableRowActionCell::before,
-		&.sapUiTableRowActionHeaderCell::before {
-			right: @_sap_ui_table_NavIndicatorWidth;
-		}
-	}
-
-	.sapUiTableRowNavIndicator:not(.sapUiTableRAct) & {
-
-		&.sapUiTableCellLast::before {
-			right: @_sap_ui_table_NavIndicatorWidth;
-		}
-	}
-
-	.sapUiTableRowHighlights & {
-
-		&.sapUiTableRowSelectionCell::before,
-		&.sapUiTableRowSelectionHeaderCell::before {
-			left: @_sap_ui_table_RowHighlightWidth;
-		}
-	}
 }
 
 /*
@@ -105,7 +82,7 @@
 
 	&.sapUiTableRowActionCell {
 
-		.sapUiTableRowNavIndicator:not(.sapUiTableRAct) & {
+		.sapUiTableRowNavIndicator & {
 			border-right: none;
 			border-left: none;
 		}

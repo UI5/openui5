@@ -42,7 +42,26 @@
 					}
 				],
 				"activityTypeSelectedKey": "activity1",
-				"notes": "Summary:\n1.\n2."
+				"notes": "Summary:\n1.\n2.",
+				"activity": [
+					{
+						"key": "low",
+						"text": "Low Priority"
+					},
+					{
+						"key": "medium",
+						"text": "Medium Priority"
+					},
+					{
+						"key": "high",
+						"text": "High Priority"
+					},
+					{
+						"key": "urgent",
+						"text": "Urgent",
+						"enabled": false
+					}
+				]
 			}
 		},
 		"content": {
@@ -134,6 +153,25 @@
 									"required": true
 								}
 							]
+						},
+						{
+							"id": "priority",
+							"label": "Priority Level",
+							"type": "RadioButtonGroup",
+							"selectedIndex": 1,
+							"validations": [
+								{
+									"required": true
+								}
+							],
+							"item": {
+								"path": "/activity",
+								"template": {
+									"key": "{key}",
+									"title": "{text}",
+									"enabled": "{enabled}"
+								}
+							}
 						}
 					]
 				}

@@ -2715,15 +2715,17 @@ sap.ui.define([
 		// assertions
 		assert.strictEqual(fnOninputSpy.callCount, 1, "The oninput was called");
 		assert.strictEqual(fnOnkeyupSpy.callCount, 1, "The onkeyup was called");
-		assert.strictEqual(oMultiComboBox.getValue(), sInitValue,
-				"Input value is returned to the inital value after wrong character was typed");
+		assert.strictEqual(oMultiComboBox.getValue(), "Algeriz",
+				"Input value is kept as-is (not reverted) after invalid character was typed");
 		assert.strictEqual(oMultiComboBox.getFocusDomRef().value, oMultiComboBox.getValue(),
-				"Dom value and value property are same after wrong character was typed");
+				"Dom value and value property are same after invalid character was typed");
 		assert.ok(oMultiComboBox.$("content").hasClass("sapMInputBaseContentWrapperError"),
 				'The MultiComboBox must have the css class sapMInputBaseContentWrapperError');
 		this.clock.tick(1100);
-		assert.ok(!oMultiComboBox.$("content").hasClass("sapMInputBaseContentWrapperError"),
-				'The MultiComboBox must not have the css class sapMComboBoxTextFieldError after 1000 msec');
+		assert.ok(oMultiComboBox.$("content").hasClass("sapMInputBaseContentWrapperError"),
+				'The MultiComboBox must still have the css class sapMInputBaseContentWrapperError after 1000 msec (persistent error state)');
+		assert.strictEqual(oMultiComboBox.getValueState(), ValueState.Error,
+				'The MultiComboBox must remain in Error state (persistent error state)');
 
 		// cleanup
 		oMultiComboBox.destroy();
@@ -2758,17 +2760,14 @@ sap.ui.define([
 		// assertions
 		assert.strictEqual(fnOninputSpy.callCount, 1, "The oninput was called");
 		assert.strictEqual(fnOnkeyupSpy.callCount, 1, "The onkeyup was called");
-		assert.strictEqual(oMultiComboBox.getValue(), sInitValue,
-				"Input value is returned to the inital value after wrong character was typed");
+		assert.strictEqual(oMultiComboBox.getValue(), "Azgeri",
+				"Input value is updated value after wrong character was typed");
 		assert.strictEqual(oMultiComboBox.getFocusDomRef().value, oMultiComboBox.getValue(),
 				"Dom value and value property are same after wrong character was typed");
 		assert.ok(oMultiComboBox.$("content").hasClass("sapMInputBaseContentWrapperError"),
 				'The MultiComboBox must have the css class sapMInputBaseContentWrapperError');
-		this.clock.tick(1100);
-		assert.ok(!oMultiComboBox.$("content").hasClass("sapMInputBaseContentWrapperError"),
-				'The MultiComboBox must not have the css class sapMInputBaseContentWrapperError after 1000 msec');
 
-		// cleanup
+				// cleanup
 		oMultiComboBox.destroy();
 	});
 
@@ -3109,7 +3108,6 @@ sap.ui.define([
 		var oMultiComboBox = new MultiComboBox();
 		oMultiComboBox._bIsPasteEvent = true;
 		oMultiComboBox.sUpdateValue = "Test";
-		var oUpdateDomValueSpy = this.spy(oMultiComboBox, "updateDomValue");
 
 		// Act
 		oMultiComboBox._handleInputFocusOut();
@@ -3117,8 +3115,6 @@ sap.ui.define([
 
 		// Assert
 		assert.notOk(oMultiComboBox._bIsPasteEvent, "Should reset _bIsPasteEvent variable");
-		assert.ok(oUpdateDomValueSpy.called, "DOM value should be called");
-		assert.ok(oUpdateDomValueSpy.calledWith(""), "DOM value should be updated");
 		oMultiComboBox.destroy();
 	});
 
@@ -3186,7 +3182,6 @@ sap.ui.define([
 		oMultiComboBox.placeAt("MultiComboBoxContent");
 		await nextUIUpdate(this.clock);
 
-		var fnFireChangeSpy = this.spy(oMultiComboBox, "fireChange");
 		var fnFireSelectionChangeSpy = this.spy(oMultiComboBox, "fireSelectionChange");
 		var fnFireSelectionFinishSpy = this.spy(oMultiComboBox, "fireSelectionFinish");
 
@@ -3201,7 +3196,6 @@ sap.ui.define([
 		// assertions
 		var aSelectedItems = oMultiComboBox.getSelectedItems();
 		assert.strictEqual(aSelectedItems.length, 0, "No token was selected on Focus Out");
-		assert.strictEqual(fnFireChangeSpy.callCount, 1, "The change event was not fired");
 		assert.strictEqual(fnFireSelectionChangeSpy.callCount, 0, "The selection change event was not fired");
 		assert.strictEqual(fnFireSelectionFinishSpy.callCount, 0, "The selection finish event was not fired");
 
@@ -4571,45 +4565,6 @@ sap.ui.define([
 		oMultiComboBox.destroy();
 	});
 
-	QUnit.test("Input Value - reset on focus out", async function(assert) {
-		this.clock = sinon.useFakeTimers();
-		// system under test
-		var oMultiComboBox = new MultiComboBox({
-			items : [new Item({
-				key : "DZ",
-				text : "Algeria"
-			})]
-		});
-
-		var oMultiComboBoxNext = new MultiComboBox({
-			items : [new Item({
-				key : "DZ",
-				text : "Algeria"
-			})]
-		});
-
-		// arrange
-		oMultiComboBox.placeAt("MultiComboBoxContent");
-		oMultiComboBoxNext.placeAt("MultiComboBoxContent");
-
-		await nextUIUpdate(this.clock);
-		oMultiComboBox.setValue("Foo");
-
-		// act
-		oMultiComboBox.getFocusDomRef().focus();
-		this.clock.tick(500);
-		oMultiComboBox.getFocusDomRef().blur();
-		this.clock.tick(500);
-
-		// assertions
-		assert.strictEqual(oMultiComboBox.getValue(), "",
-				'The InputValue of the MultiComboBox must be resetted (empty) when it loses the focus.');
-
-		// cleanup
-		oMultiComboBox.destroy();
-		oMultiComboBoxNext.destroy();
-	});
-
 	QUnit.test("Input Value - select Item on Tab out", async function(assert) {
 
 		// system under test
@@ -4958,7 +4913,7 @@ sap.ui.define([
 		await nextUIUpdate(this.clock);
 
 		// assert
-		assert.strictEqual(oMultiComboBox.getValue(), "", "Value should be cleared");
+		assert.strictEqual(oMultiComboBox.getValue(), "test1", "Value should persist");
 
 		// clean up
 		oFakeInput = null;
@@ -5482,7 +5437,7 @@ sap.ui.define([
 		oMultiComboBox._handlePopupOpenAndItemsLoad(true); // Icon press
 		this.clock.tick(300);
 
-		assert.strictEqual(oMultiComboBox.getValue(), "", "The value should be cleared when closing the picker with icon press");
+		assert.strictEqual(oMultiComboBox.getValue(), "Item2", "The value should not be cleared when closing the picker with icon press");
 
 		// clean
 		oMultiComboBox.destroy();
@@ -8524,7 +8479,7 @@ sap.ui.define([
 		// assert
 		assert.notEqual(document.activeElement, this.oMultiComboBox.getFocusDomRef(), "Focus is not in the input field");
 		assert.strictEqual(this.oMultiComboBox.getValueState(), ValueState.Success, "The value state is reset");
-		assert.strictEqual(this.oMultiComboBox.getValue(), "", "The input value is deleted");
+		assert.strictEqual(this.oMultiComboBox.getValue(), "Brussel", "The input value is not deleted");
 	});
 
 	QUnit.test("onfocusout value should be cleared", async function(assert) {
@@ -8546,7 +8501,7 @@ sap.ui.define([
 
 		// assert
 		assert.notEqual(document.activeElement, this.oMultiComboBox.getFocusDomRef(), "Focus is not in the input field");
-		assert.strictEqual(this.oMultiComboBox.getValue(), "", "The input value is deleted");
+		assert.strictEqual(this.oMultiComboBox.getValue(), "Brussel", "The input value is not deleted");
 	});
 
 	QUnit.module("Value State Containing links", {

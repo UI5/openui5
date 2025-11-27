@@ -122,6 +122,12 @@ sap.ui.define([], function () {
 				return !b || !!v.value;
 			},
 			requiredTxt: "EDITOR_VAL_FIELDREQ"
+		},
+		radioButtonGroup: {
+			required: function (v, b) {
+				return !b || v.selectedIndex !== -1 || !!v.selectedKey;
+			},
+			requiredTxt: "EDITOR_VAL_FIELDREQ"
 		}
 	};
 

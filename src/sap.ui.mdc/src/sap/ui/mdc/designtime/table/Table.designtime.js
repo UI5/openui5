@@ -13,7 +13,8 @@ sap.ui.define([
 		actions: {
 			settings: {
 				"sap.ui.mdc": function(oControl) {
-					return Engine.getInstance()._runWithPersistence(oControl, (bIsGlobal) => ( {
+					const bIsGlobal = Engine.getInstance()._getKeyUserPersistence(oControl);
+					return {
 						name: "p13nDialog.VIEW_SETTINGS",
 						handler: function (oControl, mPropertyBag) {
 							return oControl.finalizePropertyHelper().then(() => {
@@ -21,7 +22,7 @@ sap.ui.define([
 							});
 						},
 						CAUTION_variantIndependent: bIsGlobal
-					}));
+					};
 				}
 			}
 		},
