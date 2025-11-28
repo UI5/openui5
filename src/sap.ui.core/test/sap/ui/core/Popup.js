@@ -34,7 +34,7 @@ sap.ui.define([
 			return;
 		}
 
-		var element = window.document.getElementById("popup");
+		var element = jQuery.sap.domById("popup");
 
 		popup = new Popup(element, bModal, true, bAutoClose);
 		popup.attachClosed(popupClosed);

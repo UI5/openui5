@@ -6,13 +6,13 @@ sap.ui.define([
   "sap/m/Label",
   "sap/m/Table",
   "sap/m/Column",
+  "jquery.sap.global",
   "sap/m/GroupHeaderListItem",
   "sap/m/Page",
   "sap/m/Toolbar",
   "sap/m/Button",
   "sap/m/ToolbarSpacer",
-  "sap/m/App",
-  "sap/base/Log"
+  "sap/m/App"
 ], function(
   JSONModel,
   Sorter,
@@ -21,13 +21,13 @@ sap.ui.define([
   Label,
   Table,
   Column,
+  jQuery,
   GroupHeaderListItem,
   Page,
   Toolbar,
   Button,
   ToolbarSpacer,
-  App,
-  Log
+  App
 ) {
   "use strict";
 
@@ -178,10 +178,10 @@ sap.ui.define([
 		  })
 	  ],
 	  updateStarted : function(e) {
-		  Log.info("updateStarted", e.getParameters(), Date.now());
+		  jQuery.sap.log.info("updateStarted", e.getParameters(), Date.now());
 	  },
 	  updateFinished : function(e) {
-		  Log.info("updateFinished", e.getParameters(), Date.now());
+		  jQuery.sap.log.info("updateFinished", e.getParameters(), Date.now());
 	  }
   });
 

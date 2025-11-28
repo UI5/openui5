@@ -1,9 +1,9 @@
 sap.ui.define([
   "sap/m/MessageBox",
+  "jquery.sap.global",
   "sap/m/Title",
   "sap/ui/table/Table",
   "sap/m/IllustratedMessage",
-  "sap/m/IllustratedMessageType",
   "sap/m/Button",
   "sap/m/Toolbar",
   "sap/m/MessageToast",
@@ -31,14 +31,13 @@ sap.ui.define([
   "sap/m/RatingIndicator",
   "sap/ui/model/json/JSONModel",
   "sap/m/VBox",
-  "sap/m/FlexItemData",
-  "sap/base/Log"
+  "sap/m/FlexItemData"
 ], function(
   MessageBox,
+  jQuery,
   Title,
   Table,
   IllustratedMessage,
-  IllustratedMessageType,
   Button,
   Toolbar,
   MessageToast,
@@ -66,8 +65,7 @@ sap.ui.define([
   RatingIndicator,
   JSONModel,
   VBox,
-  FlexItemData,
-  Log
+  FlexItemData
 ) {
   "use strict";
 
@@ -76,7 +74,7 @@ sap.ui.define([
 
   function pressHandler(oEvent) {
 	  const bCellClick = oEvent.getId() === "cellClick";
-	  Log.warning((bCellClick ? "Cell" : oEvent.getSource().getMetadata().getName()) + " pressed");
+	  jQuery.sap.log.warning((bCellClick ? "Cell" : oEvent.getSource().getMetadata().getName()) + " pressed");
 	  if (!bCellClick) {
 		  oEvent.preventDefault();
 	  }
@@ -90,7 +88,7 @@ sap.ui.define([
 	  firstVisibleRow: 1,
 	  ariaLabelledBy: oTitle,
 	  noData: new IllustratedMessage({
-		  illustrationType: IllustratedMessageType.NoSearchResults,
+		  illustrationType: sap.m.IllustratedMessageType.NoSearchResults,
 		  title: "No Items found",
 		  description: "Adjust your filter settings.",
 		  additionalContent: [

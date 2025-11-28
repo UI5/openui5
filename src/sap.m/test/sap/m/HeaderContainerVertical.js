@@ -1,6 +1,7 @@
 sap.ui.define([
   "sap/ui/model/json/JSONModel",
   "sap/ui/model/type/Integer",
+  "jquery.sap.mobile",
   "sap/m/library",
   "sap/ui/core/library",
   "sap/m/VBox",
@@ -19,11 +20,11 @@ sap.ui.define([
   "sap/ui/model/type/String",
   "sap/ui/layout/form/SimpleForm",
   "sap/m/Page",
-  "sap/m/App",
-  "sap/ui/util/Mobile"
+  "sap/m/App"
 ], function(
   JSONModel,
   Integer,
+  jQuery,
   mobileLibrary,
   coreLibrary,
   VBox,
@@ -42,8 +43,7 @@ sap.ui.define([
   TypeString,
   SimpleForm,
   Page,
-  App,
-  Mobile
+  App
 ) {
   "use strict";
 
@@ -58,7 +58,7 @@ sap.ui.define([
 
   // Note: the HTML page 'HeaderContainerVertical.html' loads this module via data-sap-ui-on-init
 
-  Mobile.init();
+  jQuery.sap.initMobile();
 
   var oData = {
 	  "scrollStep": 200,

@@ -11,6 +11,7 @@ sap.ui.define([
   "sap/m/Label",
   "sap/m/Switch",
   "sap/m/ObjectMarker",
+  "jquery.sap.global",
   "sap/m/ProgressIndicator",
   "sap/m/Popover",
   "sap/m/List",
@@ -19,9 +20,7 @@ sap.ui.define([
   "sap/m/ObjectNumber",
   "sap/m/SplitApp",
   "sap/m/Button",
-  "sap/m/Page",
-  "sap/base/Log",
-  "sap/ui/Device"
+  "sap/m/Page"
 ], function(
   IconPool,
   HTML,
@@ -35,6 +34,7 @@ sap.ui.define([
   Label,
   Switch,
   ObjectMarker,
+  jQuery,
   ProgressIndicator,
   Popover,
   List,
@@ -43,11 +43,12 @@ sap.ui.define([
   ObjectNumber,
   SplitApp,
   Button,
-  Page,
-  Log,
-  Device
+  Page
 ) {
   "use strict";
+
+  // shortcut for jQuery.device.is
+  const is = jQuery.device.is;
 
   // shortcut for sap.m.BackgroundDesign
   const BackgroundDesign = mobileLibrary.BackgroundDesign;
@@ -283,7 +284,7 @@ sap.ui.define([
 
   var oh7PressHandler = function(oEvent) {
 
-	  Log.debug(oEvent.getParameter("domRef") && oEvent.getParameter("domRef").id);
+	  jQuery.sap.log.debug(oEvent.getParameter("domRef") && oEvent.getParameter("domRef").id);
 	  if (oh7.getIcon() === IconPool.getIconURI("attachment")) {
 		  oh7.setIcon("images/SAPUI5Icon.png");
 	  } else {
@@ -774,7 +775,7 @@ sap.ui.define([
 
   // put all the testing object header objects on the testing page
   var detail = new Page("detail", {
-	  showNavButton: Device.system.phone,
+	  showNavButton: is.phone,
 	  navButtonPress: function() {
 		  app.backMaster();
 	  },

@@ -7,6 +7,7 @@ sap.ui.define([
   "sap/m/Text",
   "sap/m/Table",
   "sap/m/Column",
+  "jquery.sap.global",
   "sap/ui/layout/ResponsiveSplitter",
   "sap/ui/layout/PaneContainer",
   "sap/ui/layout/SplitPane",
@@ -15,8 +16,7 @@ sap.ui.define([
   "sap/m/Button",
   "sap/m/OverflowToolbar",
   "sap/ui/layout/Splitter",
-  "sap/m/App",
-  "sap/base/Log"
+  "sap/m/App"
 ], function(
   JSONModel,
   ColumnListItem,
@@ -26,6 +26,7 @@ sap.ui.define([
   Text,
   Table,
   Column,
+  jQuery,
   ResponsiveSplitter,
   PaneContainer,
   SplitPane,
@@ -34,8 +35,7 @@ sap.ui.define([
   Button,
   OverflowToolbar,
   Splitter,
-  App,
-  Log
+  App
 ) {
   "use strict";
 
@@ -147,10 +147,10 @@ sap.ui.define([
 		  })
 	  ],
 	  updateStarted : function(e) {
-		  Log.info("updateStarted", e.getParameters(), Date.now());
+		  jQuery.sap.log.info("updateStarted", e.getParameters(), Date.now());
 	  },
 	  updateFinished : function(e) {
-		  Log.info("updateFinished", e.getParameters(), Date.now());
+		  jQuery.sap.log.info("updateFinished", e.getParameters(), Date.now());
 	  }
   });
 
@@ -202,10 +202,10 @@ sap.ui.define([
 		  })
 	  ],
 	  updateStarted : function(e) {
-		  Log.info("updateStarted", e.getParameters(), Date.now());
+		  jQuery.sap.log.info("updateStarted", e.getParameters(), Date.now());
 	  },
 	  updateFinished : function(e) {
-		  Log.info("updateFinished", e.getParameters(), Date.now());
+		  jQuery.sap.log.info("updateFinished", e.getParameters(), Date.now());
 	  }
   });
 
@@ -291,10 +291,10 @@ sap.ui.define([
 		  })
 	  ],
 	  updateStarted : function(e) {
-		  Log.info("updateStarted", e.getParameters(), Date.now());
+		  jQuery.sap.log.info("updateStarted", e.getParameters(), Date.now());
 	  },
 	  updateFinished : function(e) {
-		  Log.info("updateFinished", e.getParameters(), Date.now());
+		  jQuery.sap.log.info("updateFinished", e.getParameters(), Date.now());
 	  }
   });
 
@@ -348,10 +348,10 @@ sap.ui.define([
 		  })
 	  ],
 	  updateStarted : function(e) {
-		  Log.info("updateStarted", e.getParameters(), Date.now());
+		  jQuery.sap.log.info("updateStarted", e.getParameters(), Date.now());
 	  },
 	  updateFinished : function(e) {
-		  Log.info("updateFinished", e.getParameters(), Date.now());
+		  jQuery.sap.log.info("updateFinished", e.getParameters(), Date.now());
 	  }
   });
 
@@ -438,10 +438,10 @@ sap.ui.define([
 		  })
 	  ],
 	  updateStarted : function(e) {
-		  Log.info("updateStarted", e.getParameters(), Date.now());
+		  jQuery.sap.log.info("updateStarted", e.getParameters(), Date.now());
 	  },
 	  updateFinished : function(e) {
-		  Log.info("updateFinished", e.getParameters(), Date.now());
+		  jQuery.sap.log.info("updateFinished", e.getParameters(), Date.now());
 	  }
 
   });

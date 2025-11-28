@@ -663,6 +663,10 @@ sap.ui.define([
 		}).length > 0;
 	};
 
+	ObjectPageSubSection.prototype._shouldHaveVisibleTitleLine = function () {
+		return this.getTitleVisible() || this._hasVisibleActions();
+	};
+
 	/**
 	 * Called whenever the actions aggregation is mutated.
 	 * @param oChanges

@@ -935,6 +935,41 @@ sap.ui.define([
 		assert.ok(oContent1 instanceof MultiInput, "MultiInput rendered");
 		assert.equal(oContent1.getBindingPath("description"), "/conditions", "MultiInput description bound to Field conditions");
 
+		// read-only:  both number and currency
+		oContent1 = undefined; oContent2 = undefined;
+		oField.setEditMode(FieldEditMode.ReadOnly);
+		await nextUIUpdate();
+		aContent = oField.getAggregation("_content", []);
+		assert.equal(aContent.length, 2, "2 content controls");
+		oContent1 = aContent?.length > 0 && aContent[0];
+		oContent2 = aContent?.length > 1 && aContent[1];
+		assert.ok(oContent1 instanceof MultiInput, "MultiInput rendered");
+		assert.ok(oContent2 instanceof Input, "Input rendered");
+		assert.notOk(oContent1?.getEditable?.(), "MultiInput not editable");
+		assert.notOk(oContent2?.getEditable?.(), "Input not editable");
+
+		// read-only:  but currency in display mode
+		oContent1 = undefined; oContent2 = undefined;
+		oField.setEditMode(FieldEditMode.ReadOnlyDisplay);
+		await nextUIUpdate();
+		aContent = oField.getAggregation("_content", []);
+		assert.equal(aContent.length, 1, "1 content control");
+		oContent1 = aContent?.length > 0 && aContent[0];
+		assert.ok(oContent1 instanceof MultiInput, "MultiInput rendered");
+		assert.equal(oContent1.getBindingPath("description"), "/conditions", "MultiInput description bound to Field conditions");
+		assert.notOk(oContent1.getEditable(), "MultiInput not editable");
+
+		// disabled:  but currency in display mode
+		oContent1 = undefined; oContent2 = undefined;
+		oField.setEditMode(FieldEditMode.DisabledDisplay);
+		await nextUIUpdate();
+		aContent = oField.getAggregation("_content", []);
+		assert.equal(aContent.length, 1, "1 content control");
+		oContent1 = aContent?.length > 0 && aContent[0];
+		assert.ok(oContent1 instanceof MultiInput, "MultiInput rendered");
+		assert.equal(oContent1.getBindingPath("description"), "/conditions", "MultiInput description bound to Field conditions");
+		assert.notOk(oContent1.getEnabled(), "MultiInput disabled");
+
 	});
 
 	QUnit.test("Empty Indicator", async (assert) => {

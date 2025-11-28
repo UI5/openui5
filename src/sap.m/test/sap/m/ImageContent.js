@@ -1,4 +1,5 @@
 sap.ui.define([
+  "jquery.sap.mobile",
   "sap/m/MessageToast",
   "sap/m/ImageContent",
   "sap/m/FlexBox",
@@ -9,13 +10,12 @@ sap.ui.define([
   "sap/ui/layout/form/SimpleForm",
   "sap/ui/core/Title",
   "sap/m/Page",
-  "sap/m/App",
-  "sap/ui/util/Mobile"
-], function(MessageToast, ImageContent, FlexBox, Label, Select, Item, Switch, SimpleForm, Title, Page, App, Mobile) {
+  "sap/m/App"
+], function(jQuery, MessageToast, ImageContent, FlexBox, Label, Select, Item, Switch, SimpleForm, Title, Page, App) {
   "use strict";
   // Note: the HTML page 'ImageContent.html' loads this module via data-sap-ui-on-init
 
-  Mobile.init();
+  jQuery.sap.initMobile();
 
   var fnPress = function(oEvent) {
 	  MessageToast.show("The image content is pressed.");

@@ -1,4 +1,5 @@
 sap.ui.define([
+  "jquery.sap.mobile",
   "sap/m/library",
   "sap/m/ActionSheet",
   "sap/m/Button",
@@ -24,9 +25,9 @@ sap.ui.define([
   "sap/m/VBox",
   "sap/m/Toolbar",
   "sap/m/App",
-  "sap/ui/util/Mobile",
   "sap/ui/core/Core"
 ], function(
+  jQuery,
   mobileLibrary,
   ActionSheet,
   Button,
@@ -52,7 +53,6 @@ sap.ui.define([
   VBox,
   Toolbar,
   App,
-  Mobile,
   Core
 ) {
   "use strict";
@@ -71,7 +71,7 @@ sap.ui.define([
 
   // Note: the HTML page 'GenericTileLineMode.html' loads this module via data-sap-ui-on-init
 
-  Mobile.init();
+  jQuery.sap.initMobile();
 
   function makeTileData() {
 	  return {

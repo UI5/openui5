@@ -1,5 +1,6 @@
 sap.ui.define([
   "sap/ui/core/IconPool",
+  "jquery.sap.mobile",
   "sap/m/ObjectAttribute",
   "sap/m/ObjectHeader",
   "sap/ui/core/library",
@@ -7,9 +8,8 @@ sap.ui.define([
   "sap/m/ObjectMarker",
   "sap/m/library",
   "sap/m/App",
-  "sap/m/Page",
-  "sap/ui/Device"
-], function(IconPool, ObjectAttribute, ObjectHeader, coreLibrary, ObjectStatus, ObjectMarker, mobileLibrary, App, Page, Device) {
+  "sap/m/Page"
+], function(IconPool, jQuery, ObjectAttribute, ObjectHeader, coreLibrary, ObjectStatus, ObjectMarker, mobileLibrary, App, Page) {
   "use strict";
 
   // shortcut for sap.m.ObjectMarkerType
@@ -18,7 +18,10 @@ sap.ui.define([
   // shortcut for sap.ui.core.ValueState
   const ValueState = coreLibrary.ValueState;
 
-  Device.system.phone ? "sapUiSmallMargin" : "sapUiMediumMargin";
+  // shortcut for jQuery.device.is
+  const is = jQuery.device.is;
+
+  is.phone ? "sapUiSmallMargin" : "sapUiMediumMargin";
 
   var attrs = [ new ObjectAttribute({
 	  text : "Object AttributeA"

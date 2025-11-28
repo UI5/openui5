@@ -14,16 +14,15 @@ sap.ui.define([
 	"sap/m/Link",
 	"sap/m/Text",
 	"sap/ui/core/library",
+	"sap/ui/thirdparty/jquery",
 	"sap/m/MessageToast",
 	"sap/ui/core/Popup",
 	"sap/m/Button",
 	"sap/m/Page",
 	"sap/m/Title",
 	"sap/m/ToolbarSpacer",
-	"sap/m/App",
-	"sap/base/Log",
-	"sap/ui/thirdparty/jquery"
-], async function(Core, JSONModel, Item, SeparatorItem, ListItem, HTML, HorizontalLayout, ComboBox, Label, FormattedText, Link, Text, coreLibrary, MessageToast, Popup, Button, Page, Title, ToolbarSpacer, App, Log, jQuery) {
+	"sap/m/App"
+], async function(Core, JSONModel, Item, SeparatorItem, ListItem, HTML, HorizontalLayout, ComboBox, Label, FormattedText, Link, Text, coreLibrary, jQuery, MessageToast, Popup, Button, Page, Title, ToolbarSpacer, App) {
 	"use strict";
 
 	// shortcut for sap.ui.core.ValueState
@@ -515,14 +514,14 @@ sap.ui.define([
 		},
 
 		change: function(oControlEvent) {
-			Log.info('Event fired: "change" the value of the input change to ' + oControlEvent.getParameter("value") + " on", this);
+			jQuery.sap.log.info('Event fired: "change" the value of the input change to ' + oControlEvent.getParameter("value") + " on", this);
 			MessageToast.show("change " + oControlEvent.getParameter("value"));
 		},
 
 		selectionChange: function(oControlEvent) {
 			var oSelectedItem = oControlEvent.getParameter("selectedItem");
 			oSelectedItem = oSelectedItem ? oSelectedItem.getText() : oSelectedItem;
-			Log.info('Event fired: "selectionChange" selected item change to ' + oSelectedItem + " on", this);
+			jQuery.sap.log.info('Event fired: "selectionChange" selected item change to ' + oSelectedItem + " on", this);
 		}
 	});
 
@@ -556,14 +555,14 @@ sap.ui.define([
 		},
 
 		change: function(oControlEvent) {
-			Log.info('Event fired: "change" the value of the input change to ' + oControlEvent.getParameter("value") + " on", this);
+			jQuery.sap.log.info('Event fired: "change" the value of the input change to ' + oControlEvent.getParameter("value") + " on", this);
 			MessageToast.show("change " + oControlEvent.getParameter("value"));
 		},
 
 		selectionChange: function(oControlEvent) {
 			var oSelectedItem = oControlEvent.getParameter("selectedItem");
 			oSelectedItem = oSelectedItem ? oSelectedItem.getText() : oSelectedItem;
-			Log.info('Event fired: "selectionChange" selected item change to ' + oSelectedItem + " on", this);
+			jQuery.sap.log.info('Event fired: "selectionChange" selected item change to ' + oSelectedItem + " on", this);
 		}
 	});
 
@@ -577,14 +576,14 @@ sap.ui.define([
 		},
 
 		change: function(oControlEvent) {
-			Log.info('Event fired: "change" the value of the input change to ' + oControlEvent.getParameter("value") + " on", this);
+			jQuery.sap.log.info('Event fired: "change" the value of the input change to ' + oControlEvent.getParameter("value") + " on", this);
 			MessageToast.show("change " + oControlEvent.getParameter("value"));
 		},
 
 		selectionChange: function(oControlEvent) {
 			var oSelectedItem = oControlEvent.getParameter("selectedItem");
 			oSelectedItem = oSelectedItem ? oSelectedItem.getText() : oSelectedItem;
-			Log.info('Event fired: "selectionChange" selected item change to ' + oSelectedItem + " on", this);
+			jQuery.sap.log.info('Event fired: "selectionChange" selected item change to ' + oSelectedItem + " on", this);
 		}
 	});
 
@@ -597,14 +596,14 @@ sap.ui.define([
 		},
 
 		change: function(oControlEvent) {
-			Log.info('Event fired: "change" the value of the input change to ' + oControlEvent.getParameter("value") + " on", this);
+			jQuery.sap.log.info('Event fired: "change" the value of the input change to ' + oControlEvent.getParameter("value") + " on", this);
 			MessageToast.show("change " + oControlEvent.getParameter("value"));
 		},
 
 		selectionChange: function(oControlEvent) {
 			var oSelectedItem = oControlEvent.getParameter("selectedItem");
 			oSelectedItem = oSelectedItem ? oSelectedItem.getText() : oSelectedItem;
-			Log.info('Event fired: "selectionChange" selected item change to ' + oSelectedItem + " on", this);
+			jQuery.sap.log.info('Event fired: "selectionChange" selected item change to ' + oSelectedItem + " on", this);
 		}
 	});
 
@@ -617,14 +616,14 @@ sap.ui.define([
 		},
 
 		change: function(oControlEvent) {
-			Log.info('Event fired: "change" the value of the input change to ' + oControlEvent.getParameter("value") + " on", this);
+			jQuery.sap.log.info('Event fired: "change" the value of the input change to ' + oControlEvent.getParameter("value") + " on", this);
 			MessageToast.show("change " + oControlEvent.getParameter("value"));
 		},
 
 		selectionChange: function(oControlEvent) {
 			var oSelectedItem = oControlEvent.getParameter("selectedItem");
 			oSelectedItem = oSelectedItem ? oSelectedItem.getText() : oSelectedItem;
-			Log.info('Event fired: "selectionChange" selected item change to ' + oSelectedItem + " on", this);
+			jQuery.sap.log.info('Event fired: "selectionChange" selected item change to ' + oSelectedItem + " on", this);
 		}
 	});
 
@@ -637,14 +636,14 @@ sap.ui.define([
 		},
 
 		change: function(oControlEvent) {
-			Log.info('Event fired: "change" the value of the input change to ' + oControlEvent.getParameter("value") + " on", this);
+			jQuery.sap.log.info('Event fired: "change" the value of the input change to ' + oControlEvent.getParameter("value") + " on", this);
 			MessageToast.show("change " + oControlEvent.getParameter("value"));
 		},
 
 		selectionChange: function(oControlEvent) {
 			var oSelectedItem = oControlEvent.getParameter("selectedItem");
 			oSelectedItem = oSelectedItem ? oSelectedItem.getText() : oSelectedItem;
-			Log.info('Event fired: "selectionChange" selected item change to ' + oSelectedItem + " on", this);
+			jQuery.sap.log.info('Event fired: "selectionChange" selected item change to ' + oSelectedItem + " on", this);
 		}
 	});
 
@@ -809,14 +808,14 @@ sap.ui.define([
 		},
 
 		change: function(oControlEvent) {
-			Log.info('Event fired: "change" the value of the input change to ' + oControlEvent.getParameter("value") + " on", this);
+			jQuery.sap.log.info('Event fired: "change" the value of the input change to ' + oControlEvent.getParameter("value") + " on", this);
 			MessageToast.show("change " + oControlEvent.getParameter("value"));
 		},
 
 		selectionChange: function(oControlEvent) {
 			var oSelectedItem = oControlEvent.getParameter("selectedItem");
 			oSelectedItem = oSelectedItem ? oSelectedItem.getText() : oSelectedItem;
-			Log.info('Event fired: "selectionChange" selected item change to ' + oSelectedItem + " on", this);
+			jQuery.sap.log.info('Event fired: "selectionChange" selected item change to ' + oSelectedItem + " on", this);
 			oSpecialCharsComboBox.invalidate();
 		}
 

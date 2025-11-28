@@ -84,9 +84,10 @@ sap.ui.define([
 	QUnit.test("_getEnabled", function(assert) {
 		assert.notOk(ContentFactory._getEnabled(null), "Return FALSE if sEditMode = null");
 		assert.notOk(ContentFactory._getEnabled(undefined), "Return FALSE if sEditMode = undefined");
-		assert.notOk(ContentFactory._getEnabled("Disabled"), "Return FALSE if sEditMode = 'Disabled'");
+		assert.notOk(ContentFactory._getEnabled(FieldEditMode.Disabled), "Return FALSE if sEditMode = 'Disabled'");
+		assert.notOk(ContentFactory._getEnabled(FieldEditMode.DisabledDisplay), "Return FALSE if sEditMode = 'DisabledDisplay'");
 
-		assert.ok(ContentFactory._getEnabled("Enabled"), "Return TRUE if sEditMode = 'Enabled'");
+		assert.ok(ContentFactory._getEnabled(FieldEditMode.Editable), "Return TRUE if sEditMode = 'Editable'");
 		assert.ok(ContentFactory._getEnabled("undefinedEditMode"), "Return TRUE if sEditMode !== 'Disabled'");
 	});
 
@@ -94,10 +95,15 @@ sap.ui.define([
 		assert.notOk(ContentFactory._getEditable(null), "Return FALSE if sEditMode = null");
 		assert.notOk(ContentFactory._getEditable(undefined), "Return FALSE if sEditMode = undefined");
 		assert.notOk(ContentFactory._getEditable("undefinedEditMode"), "Return FALSE if sEditMode is a random string");
+		assert.notOk(ContentFactory._getEditable(FieldEditMode.ReadOnly), "Return FALSE if sEditMode = ReadOnly");
+		assert.notOk(ContentFactory._getEditable(FieldEditMode.Disabled), "Return FALSE if sEditMode = Disabled");
+		assert.notOk(ContentFactory._getEditable(FieldEditMode.Display), "Return FALSE if sEditMode = Display");
+		assert.notOk(ContentFactory._getEditable(FieldEditMode.ReadOnlyDisplay), "Return FALSE if sEditMode = ReadOnlyDisplay");
+		assert.notOk(ContentFactory._getEditable(FieldEditMode.DisabledDisplay), "Return FALSE if sEditMode = DisabledDisplay");
 
-		assert.ok(ContentFactory._getEditable("Editable"), "Return TRUE if sEditMode = 'Editable'");
-		assert.ok(ContentFactory._getEditable("EditableReadOnly"), "Return TRUE if sEditMode = 'EditableReadOnly'");
-		assert.ok(ContentFactory._getEditable("EditableDisplay"), "Return TRUE if sEditMode = 'EditableDisplay'");
+		assert.ok(ContentFactory._getEditable(FieldEditMode.Editable), "Return TRUE if sEditMode = 'Editable'");
+		assert.ok(ContentFactory._getEditable(FieldEditMode.EditableReadOnly), "Return TRUE if sEditMode = 'EditableReadOnly'");
+		assert.ok(ContentFactory._getEditable(FieldEditMode.EditableDisplay), "Return TRUE if sEditMode = 'EditableDisplay'");
 	});
 
 	QUnit.test("_getDisplayOnly", function(assert) {

@@ -2,17 +2,17 @@ sap.ui.define([
   "sap/ui/core/mvc/XMLView",
   "sap/ui/table/TreeTable",
   "sap/ui/table/Table",
-  "sap/ui/performance/Measurement"
-], async function(XMLView, TreeTable, Table, Measurement) {
+  "jquery.sap.global"
+], async function(XMLView, TreeTable, Table, jQuery) {
   "use strict";
   // Note: the HTML page 'TreeTableODataV2.html' loads this module via data-sap-ui-on-init
 
-  Measurement.setActive(true);
+  jQuery.sap.measure.setActive(true);
 
-  Measurement.registerMethod("Table._createRows", Table.prototype, "_createRows", ["JS"]);
-  Measurement.registerMethod("TreeTable._updateTableContent", TreeTable.prototype, "_updateTableContent", ["JS"]);
-  Measurement.registerMethod("Table._syncColumnHeaders", Table.prototype, "_syncColumnHeaders", ["JS"]);
-  Measurement.registerMethod("Table._updateRowHeader", Table.prototype, "_updateRowHeader", ["JS"]);
+  jQuery.sap.measure.registerMethod("Table._createRows", Table.prototype, "_createRows", ["JS"]);
+  jQuery.sap.measure.registerMethod("TreeTable._updateTableContent", TreeTable.prototype, "_updateTableContent", ["JS"]);
+  jQuery.sap.measure.registerMethod("Table._syncColumnHeaders", Table.prototype, "_syncColumnHeaders", ["JS"]);
+  jQuery.sap.measure.registerMethod("Table._updateRowHeader", Table.prototype, "_updateRowHeader", ["JS"]);
 
   (await XMLView.create({
 	  viewName: "sap.ui.table.mvc.TreeTableODataV2"

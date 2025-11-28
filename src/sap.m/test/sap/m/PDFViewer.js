@@ -2,6 +2,7 @@ sap.ui.define([
   "sap/m/MessageBox",
   "sap/m/MessageToast",
   "sap/ui/model/json/JSONModel",
+  "jquery.sap.global",
   "sap/m/App",
   "sap/m/PDFViewer",
   "sap/m/Button",
@@ -15,12 +16,12 @@ sap.ui.define([
   "sap/m/Page",
   "sap/m/Bar",
   "sap/m/Label",
-  "sap/m/FlexBox",
-  "sap/base/Log"
+  "sap/m/FlexBox"
 ], function(
   MessageBox,
   MessageToast,
   JSONModel,
+  jQuery,
   App,
   PDFViewer,
   Button,
@@ -34,8 +35,7 @@ sap.ui.define([
   Page,
   Bar,
   Label,
-  FlexBox,
-  Log
+  FlexBox
 ) {
   "use strict";
 
@@ -112,13 +112,13 @@ sap.ui.define([
 	  var sMessage = sEventType + " fired!";
 	  switch (sKey) {
 		  case "suppress":
-			  Log.info(sMessage);
+			  jQuery.sap.log.info(sMessage);
 			  break;
 		  case "alert":
 			  MessageBox.alert(sMessage);
 			  break;
 		  default:
-			  Log.info("Unknown key: " + sKey);
+			  jQuery.sap.log.info("Unknown key: " + sKey);
 	  }
   }
 

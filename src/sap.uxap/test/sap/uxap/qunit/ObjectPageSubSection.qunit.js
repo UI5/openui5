@@ -982,17 +982,21 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 			oObjectPageLayout = new ObjectPageLayout({
 				sections: [ oSection ]
 			}),
-			fnIsSubSectionHeaderHidden = function() {
-				return oSubSection.$().find(".sapUxAPObjectPageSubSectionHeader").hasClass("sapUiHidden");
+			fnIsSubSectionHeaderVisible = function() {
+				return !!oSubSection.$().find(".sapUxAPObjectPageSubSectionHeader").length;
 			},
 			fnDone = assert.async();
 
 		oObjectPageLayout.placeAt('qunit-fixture');
 		await nextUIUpdate();
 
-		assert.ok(fnIsSubSectionHeaderHidden(), "SubSection header is hidden");
+		assert.notOk(fnIsSubSectionHeaderVisible(), "SubSection header is hidden");
+
+		// Act
 		oActionButton.setVisible(true);
-		assert.ok(!fnIsSubSectionHeaderHidden(), "SubSection header is visible");
+		await nextUIUpdate();
+
+		assert.ok(fnIsSubSectionHeaderVisible(), "SubSection header is visible");
 		fnDone();
 
 		oObjectPageLayout.destroy();
@@ -1428,8 +1432,8 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 
 		//assert
 		oObjectPageLayout.attachEventOnce("onAfterRenderingDOMReady", async function() {
-			assert.ok(oSubSection1.$("header").hasClass("sapUiHidden"), "SubSection header with no visisble title and actions should be invisible");
-			assert.notOk(oSubSection2.$("header").hasClass("sapUiHidden"), "SubSection header with title and no visible actions should be visible");
+			assert.notOk(oSubSection1.$("header").length, "SubSection header with no visisble title and actions should be invisible");
+			assert.ok(oSubSection2.$("header").length, "SubSection header with title and no visible actions should be visible");
 
 			//act
 			oActionButton1.setVisible(true);
@@ -1437,8 +1441,8 @@ function(Element, nextUIUpdate, $, Control, coreLibrary, XMLView, ResizeHandler,
 			await nextUIUpdate();
 
 			//assert
-			assert.notOk(oSubSection1.$("header").hasClass("sapUiHidden"), "SubSection header with visible actions should become visible");
-			assert.ok(oSubSection2.$("header").hasClass("sapUiHidden"), "SubSection header with no visisble title and actions should become invisible");
+			assert.ok(oSubSection1.$("header").length, "SubSection header with visible actions should become visible");
+			assert.notOk(oSubSection2.$("header").length, "SubSection header with no visisble title and actions should become invisible");
 
 			oObjectPageLayout.destroy();
 			fnDone();

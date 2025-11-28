@@ -281,6 +281,17 @@ sap.ui.define([
 			oEvent.getSource().getBinding("items").filter(aFilters);
 		},
 
+		onShowDetails : function (oEvent) {
+			const oDetails = this.byId("details");
+			oDetails.getBindingContext()?.setKeepAlive(false);
+
+			const oContext = oEvent.getSource().getBindingContext();
+			oContext.setKeepAlive(true, (oVictim = oContext) => {
+				MessageBox.alert("Unexpected #destroy of " + oVictim);
+			}, /*bRequestMessages*/true);
+			oDetails.setBindingContext(oContext);
+		},
+
 		/**
 		 * Shows a message box with the selected items.
 		 */

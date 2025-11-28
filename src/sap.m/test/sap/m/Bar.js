@@ -1,4 +1,5 @@
 sap.ui.define([
+  "jquery.sap.mobile",
   "sap/m/Page",
   "sap/ui/Device",
   "sap/m/Bar",
@@ -11,9 +12,9 @@ sap.ui.define([
   "sap/m/SegmentedButton",
   "sap/m/Select",
   "sap/ui/core/Item",
-  "sap/ui/core/IconPool",
-  "sap/ui/util/Mobile"
+  "sap/ui/core/IconPool"
 ], function(
+  jQuery,
   Page,
   Device,
   Bar,
@@ -26,8 +27,7 @@ sap.ui.define([
   SegmentedButton,
   Select,
   Item,
-  IconPool,
-  Mobile
+  IconPool
 ) {
   "use strict";
 
@@ -42,7 +42,7 @@ sap.ui.define([
 
   // Note: the HTML page 'Bar.html' loads this module via data-sap-ui-on-init
 
-  Mobile.init();
+  jQuery.sap.initMobile();
 
   var page = new Page("page");
 

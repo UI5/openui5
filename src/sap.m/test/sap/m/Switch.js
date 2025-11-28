@@ -1,14 +1,14 @@
 sap.ui.define([
   "sap/m/Switch",
+  "jquery.sap.global",
   "sap/m/Label",
   "sap/m/library",
   "sap/ui/layout/VerticalLayout",
   "sap/ui/core/HTML",
   "sap/m/VBox",
   "sap/m/App",
-  "sap/m/Page",
-  "sap/base/Log"
-], function(Switch, Label, mobileLibrary, VerticalLayout, HTML, VBox, App, Page, Log) {
+  "sap/m/Page"
+], function(Switch, jQuery, Label, mobileLibrary, VerticalLayout, HTML, VBox, App, Page) {
   "use strict";
 
   // shortcut for sap.m.SwitchType
@@ -19,7 +19,7 @@ sap.ui.define([
   var oSwitch = new Switch({
 	  id: "switch_regular",
 	  change: function(oControlEvent) {
-		  Log.info("Event fired: 'change' state property " + this.getState() + " on", this);
+		  jQuery.sap.log.info("Event fired: 'change' state property " + this.getState() + " on", this);
 	  }
   });
 
@@ -88,7 +88,7 @@ sap.ui.define([
 		  new Switch({
 			  id: "switch_vbox",
 			  change: function(oControlEvent) {
-				  Log.info("Event fired: 'change' state property " + this.getState() + " on", this);
+				  jQuery.sap.log.info("Event fired: 'change' state property " + this.getState() + " on", this);
 			  }
 		  }),
 		  new HTML({ content: "<hr>" })

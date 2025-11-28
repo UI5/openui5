@@ -349,13 +349,16 @@ sap.ui.define([
 	 *   Whether no ("change") events should be fired
 	 * @param {boolean} [bNested]
 	 *   Whether the "collapse all" was performed at an ancestor
+	 * @param {string[]} [aKeptElementPredicates]
+	 *   The key predicates for all (effectively) kept-alive elements incl. exceptions of selection
 	 * @returns {number}
 	 *   The number of descendant nodes that were affected
 	 *
 	 * @public
 	 * @see #expand
 	 */
-	_AggregationCache.prototype.collapse = function (sGroupNodePath, oGroupLock, bSilent, bNested) {
+	_AggregationCache.prototype.collapse = function (sGroupNodePath, oGroupLock, bSilent, bNested,
+			aKeptElementPredicates) {
 		const oGroupNode = this.getValue(sGroupNodePath);
 		const oCollapsed = _AggregationHelper.getCollapsedObject(oGroupNode);
 		_Helper.updateAll(bSilent ? {} : this.mChangeListeners, sGroupNodePath, oGroupNode,
@@ -380,13 +383,15 @@ sap.ui.define([
 			if (_Helper.hasPrivateAnnotation(oElement, "placeholder")) {
 				continue;
 			}
+			const sPredicate = _Helper.getPrivateAnnotation(oElement, "predicate");
 			if (bAll && oElement["@$ui5.node.isExpanded"]) {
-				iRemaining -= this.collapse(
-					_Helper.getPrivateAnnotation(oElement, "predicate"), oGroupLock, bSilent, true);
+				iRemaining
+					-= this.collapse(sPredicate, oGroupLock, bSilent, true, aKeptElementPredicates);
 			}
 			// exceptions of selection are effectively kept alive
-			if (!this.isSelectionDifferent(oElement)) {
-				delete aElements.$byPredicate[_Helper.getPrivateAnnotation(oElement, "predicate")];
+			if (!this.isSelectionDifferent(oElement)
+					&& !aKeptElementPredicates?.includes(sPredicate)) {
+				delete aElements.$byPredicate[sPredicate];
 				delete aElements.$byPredicate[
 					_Helper.getPrivateAnnotation(oElement, "transientPredicate")];
 			}

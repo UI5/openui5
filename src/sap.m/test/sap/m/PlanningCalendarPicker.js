@@ -18,6 +18,7 @@ sap.ui.define([
   "sap/m/library",
   "sap/m/PlanningCalendarRow",
   "sap/ui/unified/CalendarAppointment",
+  "jquery.sap.global",
   "sap/ui/core/format/DateFormat",
   "sap/m/SearchField",
   "sap/m/ToggleButton",
@@ -39,8 +40,7 @@ sap.ui.define([
   "sap/m/Text",
   "sap/ui/core/Icon",
   "sap/m/ToolbarSeparator",
-  "sap/m/Page",
-  "sap/base/Log"
+  "sap/m/Page"
 ], function(
   Popover,
   Element,
@@ -61,6 +61,7 @@ sap.ui.define([
   mobileLibrary,
   PlanningCalendarRow,
   CalendarAppointment,
+  jQuery,
   DateFormat,
   SearchField,
   ToggleButton,
@@ -82,8 +83,7 @@ sap.ui.define([
   Text,
   Icon,
   ToolbarSeparator,
-  Page,
-  Log
+  Page
 ) {
   "use strict";
 
@@ -411,7 +411,7 @@ sap.ui.define([
 		  });
 		  oRow.addAppointment(oAppointment);
 	  } else {
-		  Log.warning("No row selected");
+		  jQuery.sap.log.warning("No row selected");
 	  }
 
   };

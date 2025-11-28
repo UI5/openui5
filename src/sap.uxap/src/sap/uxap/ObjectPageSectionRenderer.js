@@ -27,8 +27,8 @@ sap.ui.define(["sap/ui/core/ControlBehavior"], function (ControlBehavior) {
 		bTitleVisible = oControl.getTitleVisible();
 		bTitleAriaHidden = !oControl._isTitleAriaVisible();
 		bShouldDisplayButtonsInHeader = oControl._shouldDisplayButtonsInHeader();
-		bHasMoreThanOneVisibleSubSection = oControl._getVisibleSubSections().length > 1;
-		bShouldStick = !bHasMoreThanOneVisibleSubSection;
+		bHasMoreThanOneVisibleSubSection = oControl._hasMoreThanOneVisibleSubSection();
+		bShouldStick = oControl._shouldHaveStickyHeader();
 
 		oRm.openStart("section", oControl)
 			.class("sapUxAPObjectPageSection");
