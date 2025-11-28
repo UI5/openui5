@@ -349,9 +349,13 @@ sap.ui.define([
 			foo: "bar",
 			nested: {
 				value: 42
-			},
-			baz() {}
+			}
 		};
+		const oNestedObject = {
+			circularRef: oOriginal
+		};
+
+		oOriginal.circularRef2 = oNestedObject;
 
 		// code under test - object
 		const oCloned = oBinding.cloneData(oOriginal);
@@ -359,6 +363,13 @@ sap.ui.define([
 		assert.deepEqual(oCloned, oOriginal);
 		assert.notStrictEqual(oCloned, oOriginal);
 		assert.notStrictEqual(oCloned.nested, oOriginal.nested);
+
+		oOriginal.baz = () => {};
+
+		// code under test - functions cannot be cloned
+		const oCannotCloneData = oBinding.cloneData(oOriginal);
+
+		assert.deepEqual(oCannotCloneData, ClientTreeBinding.CannotCloneData);
 
 		const aOriginal = [
 			{name: "Item 1"},
@@ -372,5 +383,10 @@ sap.ui.define([
 		assert.notStrictEqual(aCloned, aOriginal);
 		assert.notStrictEqual(aCloned[0], aOriginal[0]);
 		assert.notStrictEqual(aCloned[1].nested, aOriginal[1].nested);
+
+		// code under test - falsy values
+		assert.deepEqual(oBinding.cloneData(undefined), undefined);
+		assert.deepEqual(oBinding.cloneData(false), false);
+		assert.deepEqual(oBinding.cloneData(null), null);
 	});
 });

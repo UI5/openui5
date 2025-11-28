@@ -1258,27 +1258,6 @@ sap.ui.define([
 	};
 
 	/**
-	 * Determines global persistence mode enablement based on the given modification payload
-	 *
-	 * @private
-	 * @param {object} oModificationPayload The modification registry entry payload
-	 * @returns {boolean|undefined} <code>undefined</code> if the given payload does not allow for persistence, or a boolean indicating enablement of global persistence
-	 */
-	Engine.prototype._determineGlobalPersistence = function(oModificationPayload) {
-		const {mode, hasVM} = oModificationPayload;
-
-		if (mode === PersistenceMode.Transient) {
-			return undefined;
-		}
-
-		if (mode === PersistenceMode.Auto) {
-			return hasVM ? false : true;
-		}
-
-		return mode === PersistenceMode.Global;
-	};
-
-	/**
 	 * Checks if the control's configuration allows for change persistence
 	 *
 	 * @private
@@ -1286,9 +1265,14 @@ sap.ui.define([
 	 * @returns {boolean} Returns whether global persistence is enabled
 	 */
 	Engine.prototype._getKeyUserPersistence = function(vControl) {
-		const {payload} = oEngine._determineModification(vControl);
-		const vGlobalPersistence = oEngine._determineGlobalPersistence(payload);
-		return !!vGlobalPersistence;
+		const {mode, hasVM} = oEngine._determineModification(vControl);
+
+		let bGlobalPersistence = mode === PersistenceMode.Global;
+		if (mode === PersistenceMode.Auto || mode === PersistenceMode.Transient) {
+			bGlobalPersistence = hasVM ? false : true;
+		}
+
+		return bGlobalPersistence;
 	};
 
 	Engine.prototype.hasForReference = (vControl, sControlType) => {

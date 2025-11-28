@@ -344,10 +344,10 @@ sap.ui.define([
 	  null.addContent(oButton);
   });
 
-  oTable.getBindingInfo("rows");
+  const oBindingInfo = oTable.getBindingInfo("rows");
 
   function rebind() {
-	  // oTable.bindRows(oBindingInfo || {path: "/modelData"});
+	  oTable.bindRows(oBindingInfo || {path: "/modelData"});
   }
 
   const bBindTable = (new URLSearchParams(window.location.search)).get("sap-ui-xx-table-bind") !== "false";

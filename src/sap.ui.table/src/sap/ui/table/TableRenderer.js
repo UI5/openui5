@@ -162,7 +162,9 @@ sap.ui.define([
 				default:
 					rm.class("sapUiTableRActL");
 			}
-		} else if (TableUtils.hasRowNavigationIndicators(oTable)) {
+		}
+
+		if (TableUtils.hasRowNavigationIndicators(oTable)) {
 			rm.class("sapUiTableRowNavIndicator");
 		}
 	};

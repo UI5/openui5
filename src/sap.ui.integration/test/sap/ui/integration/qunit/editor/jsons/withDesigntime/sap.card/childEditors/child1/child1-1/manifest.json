@@ -1,0 +1,74 @@
+{
+	"_version": "2.0.0",
+	"sap.app": {
+		"id": "sap.ui5.test.editor.listcard.child1.child1-1",
+		"type": "card",
+		"i18n": "../../../../../i18n/i18n.properties",
+		"title": "Test Card(in sap.app)",
+		"subTitle": "Test Card for Parameters",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
+	},
+	"sap.ui": {
+		"technology": "UI5",
+		"icons": {
+			"icon": "sap-icon://accept"
+		}
+	},
+	"sap.card": {
+		"type": "List",
+		"configuration": {
+			"editor": "dt",
+			"parameters": {
+				"cardTitle": {
+					"value": "{{TRANSLATED_CARD_TITLE}}"
+				},
+				"maxItems": {
+					"value": 6
+				},
+				"Customer": {
+					"value": "b"
+				},
+				"Employee": {
+					"value": "2"
+				}
+			},
+			"destinations": {
+				"northwind": {
+					"name": "Northwind"
+				},
+				"mock_request": {
+					"name": "mock_request"
+				}
+			}
+		},
+		"header": {
+			"title": "{parameters>/cardTitle/value}",
+			"icon": {
+				"src": "sap-icon://add-document",
+				"shape": "Circle",
+				"backgroundColor": ""
+			}
+		},
+		"data": {
+			"request": {
+				"url": "{{destinations.mock_request}}/Orders",
+				"parameters": {
+					"$filter": "(CustomerID eq '{parameters>Customer/value}') and (EmployeeID eq {parameters>Employee/value})"
+				}
+			},
+			"path": "/value/"
+		},
+		"content": {
+			"item": {
+				"title": "{OrderID}",
+				"description": "{= ${OrderID} !== undefined ? ${OrderID} + '-' +  ${CustomerID} + '-' + ${EmployeeID} : ''}",
+				"info": {
+					"value": "{OrderDate}"
+				}
+			},
+			"maxItems": "{parameters>/maxItems/value}"
+		}
+	}
+}

@@ -4136,6 +4136,86 @@ sap.ui.define([
 						]
 					},
 					{
+						key: 'designtimeChildCards',
+						target: 'exploreSamples',
+						title: 'Child Cards',
+						editorMode: 'admin',
+						hidden: !isDevelopmentBuild(),
+						files: [
+							{
+								url: '/samples/designtimeChildCards/dt.js',
+								name: 'dt.js',
+								key: 'designtime.js'
+							},
+							{
+								url: '/samples/designtimeChildCards/manifest.json',
+								name: 'manifest.json',
+								key: 'cardManifest.json',
+								editable: true
+							},
+							{
+								url: '/samples/designtimeChildCards/i18n/i18n.properties',
+								name: 'i18n/i18n.properties',
+								key: 'i18n.properties'
+							},
+							{
+								url: '/samples/designtimeChildCards/child1/dt.js',
+								name: 'child1/dt.js',
+								key: 'child1/designtime.js'
+							},
+							{
+								url: '/samples/designtimeChildCards/child1/manifest.json',
+								name: 'child1/manifest.json',
+								key: 'child1/cardManifest.json',
+								editable: true
+							},
+							{
+								url: '/samples/designtimeChildCards/child1/child1-1/dt.js',
+								name: 'child1/child1-1/dt.js',
+								key: 'child1/child1-1/designtime.js'
+							},
+							{
+								url: '/samples/designtimeChildCards/child1/child1-1/manifest.json',
+								name: 'child1/child1-1/manifest.json',
+								key: 'child1/child1-1/cardManifest.json',
+								editable: true
+							},
+							{
+								url: '/samples/designtimeChildCards/child2/dt.js',
+								name: 'child2/dt.js',
+								key: 'child2/designtime.js'
+							},
+							{
+								url: '/samples/designtimeChildCards/child2/manifest.json',
+								name: 'child2/manifest.json',
+								key: 'child2/cardManifest.json',
+								editable: true
+							},
+							{
+								url: '/samples/designtimeChildCards/child2/child2-1/dt.js',
+								name: 'child2/child2-1/dt.js',
+								key: 'child2/child2-1/designtime.js'
+							},
+							{
+								url: '/samples/designtimeChildCards/child2/child2-1/manifest.json',
+								name: 'child2/child2-1/manifest.json',
+								key: 'child2/child2-1/cardManifest.json',
+								editable: true
+							},
+							{
+								url: '/samples/designtimeChildCards/child2/child2-2/dt.js',
+								name: 'child2/child2-2/dt.js',
+								key: 'child2/child2-2/designtime.js'
+							},
+							{
+								url: '/samples/designtimeChildCards/child2/child2-2/manifest.json',
+								name: 'child2/child2-2/manifest.json',
+								key: 'child2/child2-2/cardManifest.json',
+								editable: true
+							}
+						]
+					},
+					{
 						title: 'Playground',
 						target: 'exploreSamples',
 						key: 'playground',

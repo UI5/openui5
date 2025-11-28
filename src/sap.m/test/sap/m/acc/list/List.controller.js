@@ -69,6 +69,17 @@ sap.ui.define([
 			const iItemIndex = oItem.getParent().indexOfItem(oItem) + 1;
 			const sAction = oAction.getText() || oAction.getType();
 			MessageToast.show(`${sAction} action of row ${iItemIndex} is pressed`);
+		},
+
+		onStandardListIconItemPress: function (oEvent) {
+			const oItem = oEvent.getSource();
+			const iItemIndex = oItem.getParent().indexOfItem(oItem) + 1;
+			MessageToast.show(`Item ${iItemIndex} is pressed`);
+		},
+
+		onAvatarPress: function (oEvent) {
+			const oAvatar = oEvent.getSource();
+			MessageToast.show(`Avatar of ${oAvatar.getParent().getTitle()} is pressed`);
 		}
 	});
 

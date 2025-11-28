@@ -3,6 +3,7 @@
 sap.ui.define([
 	"rta/qunit/RtaQunitUtils",
 	"sap/base/Log",
+	"sap/ui/core/Component",
 	"sap/ui/core/Lib",
 	"sap/ui/core/Manifest",
 	"sap/ui/fl/apply/_internal/changeHandlers/ChangeHandlerRegistration",
@@ -24,6 +25,7 @@ sap.ui.define([
 ], function(
 	RtaQunitUtils,
 	Log,
+	Component,
 	Lib,
 	Manifest,
 	ChangeHandlerRegistration,
@@ -918,6 +920,52 @@ sap.ui.define([
 			const aAnnoChangesModel = await this.oSetAnnotationChangeStub1.getCall(0).args[0];
 			assert.strictEqual(aAnnoChangesModel.length, 0, "the model was set with no annotation change");
 			assert.strictEqual(Log.error.callCount, 1, "an error was logged");
+		});
+
+		QUnit.test("hook gets called for a component which is not an application", async function(assert) {
+			const oAsyncHints = { foobar: "baz" };
+			ComponentLifecycleHooks.modelCreatedHook({
+				model: this.oFakeModel1,
+				modelId: "someModelId",
+				factoryConfig: { id: "reuse-component", asyncHints: oAsyncHints, componentData: { foo: "bar" } },
+				ownerId: undefined,
+				manifest: new Manifest({
+					"_version": "2.0.0",
+					"sap.app": { type: "component" }
+				})
+			});
+
+			const aAnnoChangesModel = await this.oSetAnnotationChangeStub1.getCall(0).args[0];
+			assert.strictEqual(aAnnoChangesModel.length, 0, "the model was set with no annotation change");
+			assert.strictEqual(this.oLoaderInitStub.callCount, 0, "Loader was not initialized");
+			assert.strictEqual(this.oFlexStateInitStub.callCount, 0, "FlexState was not initialized");
+		});
+
+		QUnit.test("hook gets called for an embedded component which is not an application", async function(assert) {
+			const oAsyncHints = { foobar: "baz" };
+			sandbox.stub(Component, "getComponentById").returns({
+				getManifest: () => new Manifest({
+					"_version": "2.0.0",
+					"sap.app": { type: "component" }
+				}),
+				getComponentData: () => ({ foo: "bar" })
+			});
+			ComponentLifecycleHooks.modelCreatedHook({
+				model: this.oFakeModel1,
+				modelId: "someModelId",
+				factoryConfig: { id: "reuse-component" },
+				owner: {
+					id: "ownerId",
+					config: {
+						asyncHints: oAsyncHints
+					}
+				}
+			});
+
+			const aAnnoChangesModel = await this.oSetAnnotationChangeStub1.getCall(0).args[0];
+			assert.strictEqual(aAnnoChangesModel.length, 0, "the model was set with no annotation change");
+			assert.strictEqual(this.oLoaderInitStub.callCount, 0, "Loader was not initialized");
+			assert.strictEqual(this.oFlexStateInitStub.callCount, 0, "FlexState was not initialized");
 		});
 	});
 

@@ -543,6 +543,13 @@ sap.ui.define([
 		that._oTranslationPopover.openBy(oControl._oValueHelpIcon);
 	};
 
+	StringField.prototype.exit = function () {
+		if (this._oTranslationPopover) {
+			this._oTranslationPopover.destroy();
+			this._oTranslationPopover = null;
+		}
+	};
+
 	StringField.prototype.buildTranslationsData = function(oControl) {
 		var that = this;
 		var oConfig = that.getConfiguration();

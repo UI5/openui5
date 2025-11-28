@@ -2527,11 +2527,11 @@ sap.ui.define([
 			function missingResponse() {
 				throw new Error(`Missing response for ${vRequest.method} ${vRequest.url}`);
 			}
-
 			function unexpectedResponse() {
 				throw new Error(
 					`Unexpected response for ${vRequest.method} ${vRequest.url}: ${vResponse}`);
 			}
+
 			if (typeof vRequest === "object"
 				&& mRequestPropertyNames.some((sProperty) => sProperty in vRequest)) {
 				for (const sProperty in vRequest) {
@@ -2577,6 +2577,12 @@ sap.ui.define([
 			vRequest.url = TestUtils.encodeReadableUrl(vRequest.url);
 			this.aRequests.push(vRequest);
 
+			if (vResponse && typeof vResponse === "object" && _Helper.isEmptyObject(vResponse)
+				&& !(vResponse instanceof Error || vResponse instanceof Promise
+					|| vResponse === oDONT_CARE || vResponse === oNO_RESPONSE)) {
+				// Note: use {"@This.page" : "intentionally left blank"} to avoid this issue
+				unexpectedResponse();
+			}
 			if (vResponse === oNO_CONTENT) { // early conversion for $direct
 				vResponse = vRequest.response = undefined; // 204 No Content
 			} else if (vRequest.method === "DELETE") {
@@ -63615,7 +63621,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			that.expectRequest("Artists(ArtistID='42',IsActiveEntity=true)?$select=BestFriend"
 					+ "&$expand=BestFriend($select=ArtistID,IsActiveEntity"
 						+ ";$expand=BestFriend($select=ArtistID,IsActiveEntity"
-							+ ";$expand=BestPublication($select=Price,PublicationID)))", {});
+							+ ";$expand=BestPublication($select=Price,PublicationID)))",
+					{"@This.page" : "intentionally left blank"});
 
 			return Promise.all([
 				// code under test
@@ -64174,8 +64181,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					headers : {
 						Prefer : "handling=strict"
 					}
-				}, {})
-				.expectRequest("GetProductStock()", {})
+				}, {"@This.page" : "intentionally left blank"})
+				.expectRequest("GetProductStock()", {"@This.page" : "intentionally left blank"})
 				.expectChange("status", "C")
 				.expectMessages([{
 					message : "All requests with strict handling must belong to the same change"
@@ -75893,7 +75900,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		}).then(function (aResults) {
 			assert.strictEqual(aResults[0], "smtp");
 
-			that.expectRequest("BusinessPartnerList('1')?$select=FaxNumber", {});
+			that.expectRequest("BusinessPartnerList('1')?$select=FaxNumber",
+					{"@This.page" : "intentionally left blank"});
 
 			return Promise.all([
 				oContext.requestProperty("FaxNumber@some.missing.Annotation"),
@@ -75909,7 +75917,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		}).then(function (aResults) {
 			assert.strictEqual(aResults[0], undefined);
 
-			that.expectRequest("BusinessPartnerList('1')?$select=FaxNumber", {});
+			that.expectRequest("BusinessPartnerList('1')?$select=FaxNumber",
+					{"@This.page" : "intentionally left blank"});
 
 			return Promise.all([
 				oContext.requestSideEffects(["FaxNumber"]),
@@ -76876,7 +76885,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			assert.notOk(fnOnBeforeDestroy.called, "still alive");
 
 			that.expectRequest("POST Artists(ArtistID='23',IsActiveEntity=true)"
-					+ "/special.cases.EditAction", {/* This page intentionally left blank. */})
+					+ "/special.cases.EditAction", {"@This.page" : "intentionally left blank"})
 				.expectMessages([{
 					message : "Cannot replace w/o return value context",
 					persistent : true,

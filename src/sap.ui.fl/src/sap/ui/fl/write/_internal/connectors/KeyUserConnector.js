@@ -96,7 +96,7 @@ sap.ui.define([
 
 	function _enhancePropertyBagWithTokenInfo(mPropertyBag) {
 		mPropertyBag.initialConnector = InitialConnector;
-		mPropertyBag.tokenUrl = this.ROUTES.TOKEN;
+		mPropertyBag.tokenUrl = InitialUtils.getUrl(this.ROUTES.TOKEN, { url: mPropertyBag.url });
 	}
 
 	function _enhancePropertyBagForDraftActivation(mPropertyBag) {

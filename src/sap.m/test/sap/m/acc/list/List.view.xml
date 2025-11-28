@@ -71,13 +71,15 @@
 						<items>
 							<StandardListItem
 								title="{names>title}"
+								type="Active"
 								description="{names>desc}"
 								icon="{names>icon}"
 								iconInset="false"
 								highlight="{names>highlight}"
 								info="{names>info}"
 								infoState="{names>highlight}"
-								infoStateInverted="true">
+								infoStateInverted="true"
+								press="onStandardListIconItemPress">
 								<actions>
 									<core:Fragment fragmentName="sap.m.acc.list.fragment.Actions" type="XML"/>
 								</actions>
@@ -103,7 +105,7 @@
 						<items>
 							<StandardListItem
 								title="{products>/ProductCollection/0/Name}"
-								description="{products>/ProductCollection/0/ProductId}"
+								description="Active avatar with press event handler and square shape"
 								iconDensityAware="false"
 								iconInset="false"
 								adaptTitleSize="false" >
@@ -112,7 +114,8 @@
 										src="./images/HT-1000.jpg"
 										displayShape="Square"
 										imageFitType="Cover"
-										showBorder="true"/>
+										showBorder="true"
+										press="onAvatarPress"/>
 									</avatar>
 								<actions>
 									<core:Fragment fragmentName="sap.m.acc.list.fragment.Actions" type="XML"/>
@@ -121,13 +124,14 @@
 							<!-- set this item's description be empty -->
 							<StandardListItem
 								title="{products>/ProductCollection/1/Name}"
-								description=""
+								description="Active Avatar with press event handler and round shape"
 								iconInset="false"
 								adaptTitleSize="false" >
 								<avatar>
 									<Avatar
 										src="./images/HT-1000.jpg"
-										showBorder="true"/>
+										showBorder="true"
+										press="onAvatarPress"/>
 								</avatar>
 								<actions>
 									<core:Fragment fragmentName="sap.m.acc.list.fragment.Actions" type="XML"/>
@@ -135,7 +139,7 @@
 							</StandardListItem>
 							<StandardListItem
 								title="{products>/ProductCollection/2/Name}"
-								description="{products>/ProductCollection/2/ProductId}"
+								description="Non active Avatar"
 								iconDensityAware="false"
 								iconInset="true"
 								adaptTitleSize="false" >
@@ -152,6 +156,7 @@
 							<!-- don't specify a description for this item -->
 							<StandardListItem
 								title="{products>/ProductCollection/3/Name}"
+								description="Icon"
 								icon="./images/HT-1000.jpg"
 								iconDensityAware="false"
 								iconInset="false"

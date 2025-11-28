@@ -37,6 +37,7 @@ sap.ui.define([
 			sandbox.spy(this.oVariantManagement, "detachCancel");
 			sandbox.spy(this.oVariantManagement, "detachSave");
 			sandbox.stub(Utils, "getRtaStyleClassName").returns("myRtaStyleClass");
+			sandbox.stub(this.oVariantManagement, "getDesignMode").returns(true);
 			this.oOpenDialogStub = sandbox.stub(this.oVariantManagement, "openSaveAsDialogForKeyUser");
 		},
 		afterEach() {
@@ -123,7 +124,7 @@ sap.ui.define([
 				generator: rtaLibrary.GENERATOR_NAME,
 				newVariantReference: undefined
 			};
-			assert.strictEqual(this.oHandleSaveStub.callCount, 1, "the model was called");
+			assert.strictEqual(this.oHandleSaveStub.callCount, 1, "handle save on VariantManager was called");
 			assert.strictEqual(
 				this.oHandleSaveStub.firstCall.args[0].getId(),
 				"variantMgmtId1",

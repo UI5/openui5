@@ -3695,6 +3695,55 @@ function(
 	});
 
 
+	/* --------------------------- Sticky Content -------------------------------------- */
+	QUnit.module("DynamicPage - Sticky Content", {
+		beforeEach: function () {
+			this.oDynamicPage = oFactory.getDynamicPageWithStickySubheader(false, false, false, true);
+			oUtil.renderObject(this.oDynamicPage);
+		},
+		afterEach: function () {
+			this.oDynamicPage.destroy();
+			this.oDynamicPage = null;
+		}
+	});
+
+	QUnit.test("_adjustStickyContent updates title positioning when sticky content sticks on scroll", function(assert) {
+		// Arrange
+		var oUpdateTitlePositioningSpy = this.spy(this.oDynamicPage, "_updateTitlePositioning"),
+			oScrollContainer = this.oDynamicPage.$("contentWrapper").get(0),
+			iInitialPaddingTop,
+			iPaddingTopAfterStick;
+
+		// Ensure the page is scrollable and sticky content can stick
+		this.oDynamicPage.getDomRef().style.height = "500px";
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		iInitialPaddingTop = parseInt(oScrollContainer.style.paddingTop);
+		oUpdateTitlePositioningSpy.resetHistory();
+
+		// Act: Scroll down to trigger sticky content to stick
+		this.oDynamicPage._setScrollPosition(100);
+		this.oDynamicPage._toggleHeaderOnScroll();
+
+		// Assert: _updateTitlePositioning should be called when sticky content sticks
+		assert.ok(oUpdateTitlePositioningSpy.called, "_updateTitlePositioning was called when sticky content sticks");
+
+		// Check that padding-top includes the title and sticky area height
+		iPaddingTopAfterStick = parseInt(oScrollContainer.style.paddingTop);
+
+		assert.ok(iPaddingTopAfterStick > iInitialPaddingTop,
+			"Padding-top includes both title height and sticky area height");
+
+		oUpdateTitlePositioningSpy.resetHistory();
+
+		// Act: Scroll back up to unstick the sticky content
+		this.oDynamicPage._setScrollPosition(0);
+		this.oDynamicPage._toggleHeaderOnScroll();
+
+		// Assert: _updateTitlePositioning should be called when sticky content unsticks
+		assert.ok(oUpdateTitlePositioningSpy.called, "_updateTitlePositioning was called when sticky content unsticks");
+	});
+
 	/* --------------------------- Accessibility -------------------------------------- */
 	QUnit.module("Accessibility", {
 		beforeEach: function () {

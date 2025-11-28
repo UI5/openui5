@@ -43,7 +43,10 @@ sap.ui.define([
 	"./Constants",
 	"sap/m/FlexItemData",
 	"sap/m/FlexBox",
-	"sap/m/Button"
+	"sap/m/Button",
+	"sap/ui/core/UIArea",
+	"sap/m/Tree",
+	"sap/m/StandardTreeItem"
 ], function(
 	Localization,
 	Control,
@@ -85,7 +88,10 @@ sap.ui.define([
 	Constants,
 	FlexItemData,
 	FlexBox,
-	Button
+	Button,
+	UIArea,
+	Tree,
+	StandardTreeItem
 ) {
 	"use strict";
 
@@ -257,6 +263,64 @@ sap.ui.define([
 					oRm.openStart("div", oControl);
 					oRm.class("sapUiIntegrationEditor");
 					oRm.openEnd();
+				}
+				// render the Child editors tree
+				var oRef = oControl.getId() + "_childsTreeContainer";
+				var bChildTreeRendered;
+				var renderChildsTreePromise;
+				if (oControl.isFieldReady() && oControl._oChildTree) {
+					bChildTreeRendered = false;
+					// render the container for Child editors tree
+					oRm.openStart("div", oRef);
+					oRm.class("childsTreeContainer");
+					oRm.openEnd();
+					oRm.close("div");
+
+					// if the container is not rendered in body immediately by above codes, wait for it to be created
+					var waitForContainer = new Promise((resolve) => {
+						const observer = new MutationObserver((mutations, obs) => {
+							const container = document.getElementById(oRef);
+							if (container) {
+								obs.disconnect();
+								resolve(container);
+							}
+						});
+						observer.observe(document.body, {
+							childList: true,
+							subtree: true
+						});
+					});
+
+					// wait for the container to be created and then render the nodes tree
+					renderChildsTreePromise = waitForContainer.then((container) => {
+						// create a UIArea for the container and render the tree into it
+						var oUIArea = UIArea.create(oRef);
+						oUIArea.addContent(oControl._oChildTree);
+						oRm.renderControl(oControl._oChildTree);
+						// focus the selected item in the nodes tree
+						var expandTreeItemPromise = new Promise(function (resolve, reject) {
+							setTimeout(function () {
+								if (oControl._oChildTree._itemIndex) {
+									var oItem = oControl._oChildTree.getItems().find(function(item) {
+										return item.getBindingContext().getPath() === oControl._oChildTree._itemIndex;
+									});
+									if (oItem) {
+										oItem.focus();
+										if (!oItem.isLeaf() && !oItem.getExpanded()) {
+											oControl._oChildTree.expand(oControl._oChildTree.indexOfItem(oItem));
+										}
+									}
+								} else {
+									oControl._oChildTree.expand(0);
+								}
+								bChildTreeRendered = true;
+								setTimeout(function () {
+									resolve({});
+								}, 100);
+							}, 100);
+						});
+						return expandTreeItemPromise;
+					});
 				}
 				if (oControl.isFieldReady()) {
 					//surrounding div tag for form <div class="sapUiIntegrationEditorForm"
@@ -868,9 +932,27 @@ sap.ui.define([
 							oControl._aFieldDataReadyPromise = [];
 							// check ready status again since this is in async promise
 							if (!oControl.isReady()) {
+								if (bChildTreeRendered === false && renderChildsTreePromise) {
+									renderChildsTreePromise.then(function() {
+										// add a timeout to make sure all UI updates are done before firing ready
+										setTimeout(function () {
+											oControl._ready = true;
+											oControl.fireReady();
+										}, 200);
+									});
+								} else {
+									oControl._ready = true;
+									oControl.fireReady();
+								}
+							}
+						});
+					} else if (bChildTreeRendered === false && renderChildsTreePromise) {
+						renderChildsTreePromise.then(function() {
+							// add a timeout to make sure all UI updates are done before firing ready
+							setTimeout(function () {
 								oControl._ready = true;
 								oControl.fireReady();
-							}
+							}, 200);
 						});
 					} else {
 						oControl._ready = true;
@@ -1010,6 +1092,7 @@ sap.ui.define([
 	};
 
 	Editor.prototype.setJson = function (vIdOrSettings, bSuppress) {
+		this._vIdOrSettings = deepClone(vIdOrSettings, 500);
 		this._fieldReady = false;
 		this._ready = false;
 		if (deepEqual(vIdOrSettings, this._preIdOrSettings)) {
@@ -1027,7 +1110,9 @@ sap.ui.define([
 			if (vIdOrSettings.manifestChanges) {
 				//map translations of unmatch languages
 				Utils.mapLanguagesInManifestChanges(vIdOrSettings.manifestChanges);
-				//remove the changes from the current layer
+				//filter the child changes from the current layer
+				this._filterChildManifestChanges(vIdOrSettings);
+				//filter the changes from the current layer
 				this._filterManifestChangesByLayer(vIdOrSettings);
 			}
 			if (this._manifestModel) {
@@ -1353,6 +1438,7 @@ sap.ui.define([
 		}
 		return this;
 	};
+
 	/**
 	 * Increases the zIndex to a higher value for all popups
 	 */
@@ -1362,15 +1448,77 @@ sap.ui.define([
 			Popup.setInitialZIndex(this._iZIndex);
 		}
 	};
+
 	/**
-		 * Filters the manifestChanges array in the oManifestSettings
-		 * All changes that are done for layers > than current layer are removed (see also layers)
-		 * The current layers changes are stored in this._currentLayerManifestChanges to be applied later in the editor code.
-		 * All changes that are done for layers < that the current layer are kept in oManifestSettings.manifestChanges
-		 *
-		 * @param {*} oManifestSettings
-		 */
-	 Editor.prototype._filterManifestChangesByLayer = function (oManifestSettings) {
+	 * Filter out the manifestChanges of Child editors in the oManifestSettings
+	 *
+	 * @param {*} oManifestSettings
+	 */
+	Editor.prototype._filterChildManifestChanges = function (oManifestSettings) {
+		var that = this;
+		if (that._bChildManifestChangesFiltered) {
+			return;
+		}
+		that._aMainManifestChanges = deepClone(oManifestSettings.manifestChanges, 500);
+		that._oChildManifestChanges = {};
+		var processObject = function(obj, parentKey) {
+			parentKey = parentKey ? (parentKey + "/") : "";
+			Object.keys(obj).forEach(function(sKey) {
+				if (sKey.startsWith(that.getConfigurationPath() + "/childCards/") && sKey.endsWith("_manifestChanges")) {
+					var sRest = sKey.substring(35);
+					var sChildEditorName = sRest.split("/")[0];
+					if (sChildEditorName) {
+						var sChildEditorPath = parentKey + sChildEditorName;
+						that._oChildManifestChanges[sChildEditorPath] = that._oChildManifestChanges[sChildEditorPath] || [];
+						that._oChildManifestChanges[sChildEditorPath].push(obj[sKey]);
+						if (obj[sKey] !== null) {
+							processObject(obj[sKey], sChildEditorPath);
+						}
+					}
+				}
+			});
+		};
+
+		// first process child changes
+		//   - move all the /sap.card/configuration/childCards/.../_manifestChanges to oChildChanges
+		that._aMainManifestChanges.forEach(function(oChange) {
+			processObject(oChange);
+		});
+
+		// clean up child changes
+		//  - remove all /sap.card/configuration/childCards/.../_manifestChanges
+		Object.keys(that._oChildManifestChanges).forEach(function(sKey) {
+			that._oChildManifestChanges[sKey].forEach(function(oChange) {
+				Object.keys(oChange).forEach(function(sKey1) {
+					if (sKey1.startsWith(that.getConfigurationPath() + "/childCards/") && sKey1.endsWith("_manifestChanges")) {
+						delete oChange[sKey1];
+					}
+				});
+			});
+		});
+
+		// clean up main changes
+		//  - remove all /sap.card/configuration/childCards/.../_manifestChanges
+		that._aMainManifestChanges.forEach(function(oChange) {
+			Object.keys(oChange).forEach(function(sKey1) {
+				if (sKey1.startsWith(that.getConfigurationPath() + "/childCards/") && sKey1.endsWith("_manifestChanges")) {
+					delete oChange[sKey1];
+				}
+			});
+		});
+
+		that._bChildManifestChangesFiltered = true;
+	};
+
+	/**
+	 * Filters the manifestChanges array in the oManifestSettings
+	 * All changes that are done for layers > than current layer are removed (see also layers)
+	 * The current layers changes are stored in this._currentLayerManifestChanges to be applied later in the editor code.
+	 * All changes that are done for layers < that the current layer are kept in oManifestSettings.manifestChanges
+	 *
+	 * @param {*} oManifestSettings
+	 */
+	Editor.prototype._filterManifestChangesByLayer = function (oManifestSettings) {
 		var aChanges = [],
 			that = this,
 			oBeforeLayerChanges = {},
@@ -1413,6 +1561,257 @@ sap.ui.define([
 		this._currentLayerManifestChanges = oCurrentLayerChanges;
 		this._beforeLayerManifestChanges = oBeforeLayerChanges;
 	};
+
+	/**
+	 * Create the tree of Child editors
+	 *
+	 * @param {*} oChildNodes
+	 */
+	Editor.prototype.createChildTree = function (oChildNodes) {
+		var that = this;
+		var sBaseUrl = this.getBaseUrl();
+		if (sBaseUrl.endsWith("/")) {
+			sBaseUrl = sBaseUrl.slice(0, -1);
+		}
+
+		var sMainManifest = that._vIdOrSettings.manifest;
+		if (typeof that._vIdOrSettings.manifest === "object") {
+			sMainManifest = JSON.stringify(that._vIdOrSettings.manifest);
+		}
+		var mainTitle = this._oEditorManifest.get("/sap.app/title") || this._oResourceBundle.getText("EDITOR_CHILD_TREE_MAIN_NODE_TEXT");
+		// Create data model with main node
+		var oData = [{
+			text: mainTitle,
+			baseUrl: sBaseUrl,
+			manifest: sMainManifest,
+			path: "",
+			selected: true,
+			nodes: []
+		}];
+		var oModel = new JSONModel(oData);
+
+		var loadChildNode = function (sName, oChildConfig, sPath, sBaseUrl, sParentName) {
+			// calculate base url and manifest path for childs
+			var sManifestPath = sBaseUrl + "/" + oChildConfig.manifest;
+			sBaseUrl = sManifestPath.substring(0, sManifestPath.lastIndexOf("/") + 1);
+			var oNode = {
+				text: sName,
+				baseUrl: sBaseUrl,
+				manifest: sManifestPath,
+				isChild: true,
+				path: sPath,
+				selected: false,
+				nodes: []
+			};
+			if (oChildConfig.manifest) {
+				try {
+					var sManifestUrl = that._sAppId.replace(/\./g, "/");
+					if (sParentName) {
+						sManifestUrl += "/" + sParentName;
+					}
+					sManifestUrl += "/" + oChildConfig.manifest;
+					// load child manifest to get title and sub child nodes
+					LoaderExtensions.loadResource(sManifestUrl, {
+						dataType: "json",
+						async: true,
+						failOnError: false
+					}).then(function (oManifest) {
+						if (oManifest && oManifest["sap.card"]?.configuration?.childCards) {
+							var oSubChildNodes = oManifest["sap.card"].configuration.childCards;
+							for (var sSubName in oSubChildNodes) {
+								var oSubNode = loadChildNode(sSubName, oSubChildNodes[sSubName], sPath ? (sPath + "/" + sSubName) : sSubName, sBaseUrl, sName);
+								oNode.nodes.push(oSubNode);
+							}
+						}
+						if (oManifest) {
+							oNode.text = oChildConfig.title || oManifest["sap.app"].title || oNode.text;
+						} else if (oChildConfig.title) {
+							oNode.text = oChildConfig.title;
+						}
+						oModel.checkUpdate(true);
+					});
+				} catch (e) {
+					if (oChildConfig.title) {
+						oNode.text = oChildConfig.title;
+					}
+					oModel.checkUpdate(true);
+					Log.error("sap.ui.integration.editor.Editor: child edtior tree manifest load error: " + e);
+				}
+			} else if (oChildConfig.title) {
+				oNode.text = oChildConfig.title;
+			}
+			return oNode;
+		};
+
+		for (var sChildNodeName in oChildNodes) {
+			var oNode = loadChildNode(sChildNodeName, oChildNodes[sChildNodeName], sChildNodeName, sBaseUrl);
+			oData[0].nodes.push(oNode);
+		}
+		that._oChildTree = new Tree({
+			items: {
+				path: "/",
+				template: new StandardTreeItem({
+					title: "{text}",
+					tooltip: "{text}",
+					type: "Active",
+					highlight: "{= ${selected} ? 'Information' : 'None'}"
+				})
+			},
+			toggleOpenState: that.onToggleOpenState,
+			itemPress: that.onTreeItemPress.bind(that)
+		}).addStyleClass("sapUiIntegrationEditorChildTreeItem");
+		that._oChildTree.setModel(oModel);
+	};
+
+	Editor.prototype.onToggleOpenState = function(oEvent) {
+		var oControl = oEvent.getSource();
+		var bExpanded = oEvent.getParameter("expanded");
+		if (bExpanded) {
+			Log.info("sap.ui.integration.editor.Editor: child edtior tree item expanded: " + oEvent.getParameter("itemIndex"));
+			oControl.expand([oEvent.getParameter("itemIndex")]);
+		} else {
+			Log.info("sap.ui.integration.editor.Editor: child edtior tree item collapsed: " + oEvent.getParameter("itemIndex"));
+			oControl.collapse([oEvent.getParameter("itemIndex")]);
+		}
+	};
+
+	/**
+	 * process the pressed tree item event
+	 * @param {sap.ui.base.Event} oEvent the event object
+	 */
+	Editor.prototype.onTreeItemPress = function(oEvent) {
+		// get the pressed item
+		var oItem = oEvent.getParameter("srcControl");
+		if (!oItem || !oItem.getBindingContext() || !oItem.getBindingContext().getObject()) {
+			Log.error("sap.ui.integration.editor.Editor: child editor tree item pressed without binding context or binding object");
+			return;
+		}
+
+		// get the binding object and the manifest
+		var oItemObject = oItem.getBindingContext().getObject();
+		var oManifest = oItemObject.manifest;
+		if (!oManifest) {
+			Log.error("sap.ui.integration.editor.Editor: child editor tree item pressed without manifest");
+			return;
+		}
+		// check if manifest is json
+		try {
+			oManifest = JSON.parse(oManifest);
+		} catch (e) {
+			//manifest is not json
+			Log.info("sap.ui.integration.editor.Editor: child editor tree item pressed with manifest not json");
+		}
+		// check if same item pressed, if yes do nothing
+		var path = oItemObject.path || "/";
+		this._oChildTree._path = this._oChildTree._path || "/";
+		if (this._oChildTree._path === path) {
+			Log.info("sap.ui.integration.editor.Editor: same item pressed, do nothing");
+			return;
+		}
+
+		// update current settings to manifest changes (main editor or Child editor)
+		var oCurrentSettings = this.getCurrentSettings(true);
+		this._oChildManifestChanges = this._oChildManifestChanges || {};
+		this._aMainManifestChanges = this._aMainManifestChanges || [];
+		var sLayer = oCurrentSettings[":layer"];
+		var oMatchedChange, oMatchedChangeCloned;
+		if (!this.isChild) {
+			// find current layer change in main editor changes
+			oMatchedChange = this._aMainManifestChanges.find(function(oChange) {
+				return oChange[":layer"] === sLayer;
+			});
+			if (oMatchedChange) {
+				oMatchedChangeCloned = merge({}, oMatchedChange, oCurrentSettings);
+				var iIndex = this._aMainManifestChanges.indexOf(oMatchedChange);
+				if (iIndex > -1) {
+					this._aMainManifestChanges.splice(iIndex, 1);
+				}
+				oMatchedChange = oMatchedChangeCloned;
+			} else {
+				oMatchedChange = oCurrentSettings;
+			}
+			this._aMainManifestChanges.push(oMatchedChange);
+		} else {
+			this._oChildManifestChanges[this._oChildTree._path] = this._oChildManifestChanges[this._oChildTree._path] || [];
+			var aChildChanges = this._oChildManifestChanges[this._oChildTree._path];
+			// find current layer change in Child editor changes
+			oMatchedChange = aChildChanges.find(function(oChange) {
+				return oChange[":layer"] === sLayer;
+			});
+			if (oMatchedChange) {
+				oMatchedChangeCloned = merge({}, oMatchedChange, oCurrentSettings);
+				var iIndex = aChildChanges.indexOf(oMatchedChange);
+				if (iIndex > -1) {
+					aChildChanges.splice(iIndex, 1);
+				}
+				oMatchedChange = oMatchedChangeCloned;
+			} else {
+				oMatchedChange = oCurrentSettings;
+			}
+			aChildChanges.push(oMatchedChange);
+		}
+
+		// clean editor
+		this._manifestModel = null;
+		this._oDesigntime = null;
+		this.resetProperty("designtime");
+		this.destroyAggregation("_formContent");
+		this._ready = false;
+		this._fieldReady = false;
+
+		// destory preview
+		this._destoryPreview();
+
+		// switch to the pressed editor
+		this.switchToEditor(oManifest, oItemObject, path);
+
+		// unHighlignt the previous selected item and highlight the current selected item
+		var oTreeModel = this._oChildTree.getModel();
+		var sCurrentItemIndex = this._oChildTree._itemIndex || "/0";
+		oTreeModel.setProperty(sCurrentItemIndex + "/selected", false);
+		oItemObject.selected = true;
+		oTreeModel.checkUpdate(true);
+
+		// update the item index and path
+		this._oChildTree._itemIndex = oItem.getBindingContext().getPath();
+		this._oChildTree._path = path;
+		Log.info("sap.ui.integration.editor.Editor: child editor tree item pressed");
+	};
+
+	/**
+	 * Switch to another editor based on the manifest and item object
+	 *
+	 * @param {*} oManifest the manifest of the editor to switch to
+	 * @param {*} oItemObject the binding object of the pressed tree item
+	 * @param {string} sPath the path of the pressed tree item
+	 */
+	Editor.prototype.switchToEditor = function(oManifest, oItemObject, sPath) {
+		// save the current settings, to avoid creating new instance when switching between child editors
+		this._oChildTreeSettings = this._oChildTreeSettings || {};
+		if (!this._oChildTreeSettings[this._oChildTree._path]) {
+			this._oChildTreeSettings[this._oChildTree._path] = deepClone(this._vIdOrSettings, 500);
+		}
+
+		// get settings for the pressed item
+		this.isChild = oItemObject.isChild;
+		var oManifestChanges;
+		if (!this.isChild) {
+			oManifestChanges = this._aMainManifestChanges;
+		} else {
+			oManifestChanges = this._oChildManifestChanges[sPath] || [];
+		}
+		if (this._oChildTreeSettings[sPath]) {
+			this._vIdOrSettings = this._oChildTreeSettings[sPath];
+		} else {
+			this._vIdOrSettings.baseUrl = oItemObject.baseUrl;
+			this._vIdOrSettings.manifest = oManifest;
+		}
+		this._vIdOrSettings.manifestChanges = oManifestChanges;
+
+		// switch to the pressed editor
+		this.setJson(this._vIdOrSettings, true); //suppress rerendering as the editor will be rerendered anyway
+	};
+
 	/**
 	 * Initializes the editor after the json is set
 	 */
@@ -1423,6 +1822,13 @@ sap.ui.define([
 		var sDesigntime = that._oEditorManifest.get(sConfigurationPath + "/editor");
 		if (!sDesigntime) {
 			sDesigntime = that._oEditorManifest.get("/" + that.getSection() + "/designtime");
+		}
+		if (!that._oChildTree) {
+			// create Child editors tree if Child editors are defined and tree not created yet
+			var oChildEditors = that._oEditorManifest.get(sConfigurationPath + "/childCards");
+			if (oChildEditors && typeof oChildEditors === "object") {
+				that.createChildTree(oChildEditors);
+			}
 		}
 		//load the designtime control and bundles lazy
 		var	oConfiguration = that._manifestModel.getProperty(sConfigurationPath),
@@ -1462,8 +1868,8 @@ sap.ui.define([
 			that._oDesigntimeInstance = oDesigntime;
 			that.initDestinations();
 			that.initDataProviderFactory();
-			if (that.getMode() === Constants.EDITOR_MODE.ADMIN || that.getMode() === Constants.EDITOR_MODE.ALL) {
-				//always add destination settings for admin and all modes
+			if (!that.isChild && (that.getMode() === Constants.EDITOR_MODE.ADMIN || that.getMode() === Constants.EDITOR_MODE.ALL)) {
+				//always add destination settings for admin and all modes if not child editor
 				that._addDestinationSettings(oConfiguration);
 			} else {
 				//delete destination settings in dt for other modes
@@ -1536,8 +1942,12 @@ sap.ui.define([
 	/**
 	 * Returns the current settings as a json with a manifest path and the current value
 	 * additionally there is a layer number added as ":layer"
+	 *
+	 * @param {boolean} bOnlyCurrentEditor If true, only the settings of the current editor are returned (without child editors)
+	 * @returns {object} The current settings in manifest format
 	 */
-	Editor.prototype.getCurrentSettings = function () {
+	Editor.prototype.getCurrentSettings = function (bOnlyCurrentEditor) {
+		bOnlyCurrentEditor = bOnlyCurrentEditor || false;
 		var oSettings = this._settingsModel.getProperty("/"),
 			mResult = {},
 			mNext;
@@ -1615,7 +2025,9 @@ sap.ui.define([
 										}
 										break;
 									default:
-										mResult[oItem.manifestpath] = oItem.value;
+										if (oItem.manifestpath) {
+											mResult[oItem.manifestpath] = oItem.value;
+										}
 								}
 							}
 						}
@@ -1724,13 +2136,50 @@ sap.ui.define([
 				}
 			}
 		}
-		mResult[":layer"] = Merger.layers[this.getMode()];
+		var iLayer = Merger.layers[this.getMode()];
+		mResult[":layer"] = iLayer;
 		mResult[":errors"] = this.checkCurrentSettings()[":errors"];
 		if (mNext) {
 			mResult[":designtime"] = mNext;
 		}
 		if (oSettings[":designtime"]) {
 			mResult[":designtime"] = merge(mResult[":designtime"], oSettings[":designtime"]);
+		}
+
+		// handle child editor settings
+		if (this._oChildTree) {
+			this._childSettings = this._childSettings || [];
+			this._mainSettings = this._mainSettings || {};
+			if (this.isChild) {
+				this._childSettings[this._oChildTree._path] = mResult;
+			} else {
+				this._mainSettings = mResult;
+			}
+			// return whole settings including child editors
+			if (!bOnlyCurrentEditor){
+				// merge main settings and child settings into one object
+				var mAllSettings = deepClone(this._mainSettings, 500);
+				Object.keys(this._childSettings).forEach(function (childKey) {
+					var oChildSetting = this._childSettings[childKey];
+					var paths = childKey.split("/");
+					var oParent = mAllSettings;
+					paths.forEach(function (sPath, iIndex) {
+						if (sPath && oChildSetting) {
+							var fullPath = this.getConfigurationPath() + "/childCards/" + sPath + "/_manifestChanges";
+							if (iIndex === paths.length - 1) {
+								oParent[fullPath] = oChildSetting;
+							} else {
+								oParent[fullPath] = oParent[fullPath] || {
+									":layer": iLayer,
+									":errors": false
+								};
+								oParent = oParent[fullPath];
+							}
+						}
+					}.bind(this));
+				}.bind(this));
+				return mAllSettings;
+			}
 		}
 		return mResult;
 	};
@@ -3188,7 +3637,7 @@ sap.ui.define([
 			var oItem = oItems[n];
 			this._addItem(oItem, n);
 		}
-		// customize the size of card editor, define the size in dt.js
+		// customize the size of editor, define the size in dt.js
 		var editorHeight = this._settingsModel.getProperty("/form/height") !== undefined ? this._settingsModel.getProperty("/form/height") : "350px",
 		editorWidth = this._settingsModel.getProperty("/form/width") !== undefined ? this._settingsModel.getProperty("/form/width") : "100%";
 		if (this.getProperty("height") === "") {
@@ -3240,10 +3689,7 @@ sap.ui.define([
 		if (this._oDesigntimeInstance) {
 			this._oDesigntimeInstance.destroy();
 		}
-		var oPreview = this.getAggregation("_preview");
-		if (oPreview && oPreview.destroy) {
-			oPreview.destroy();
-		}
+		this._destoryPreview();
 		var oMessageStrip = Element.getElementById(MessageStripId);
 		if (oMessageStrip) {
 			oMessageStrip.destroy();
@@ -3260,9 +3706,20 @@ sap.ui.define([
 	};
 
 	/**
-	 * Initializes the additional content
+	 * Initializes the preview content
 	 */
 	Editor.prototype._initPreview = function () {
+	};
+
+	/**
+	 * Destory the preview content
+	 */
+	Editor.prototype._destoryPreview = function () {
+		var oPreview = this.getAggregation("_preview");
+		if (oPreview) {
+			oPreview.destroy();
+			this.setAggregation("_preview", null);
+		}
 	};
 
 	/**

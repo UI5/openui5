@@ -186,11 +186,10 @@ sap.ui.define([
 		})
 		.then(function() {
 			FlexPerformanceTestUtil.startMeasurement(sMassiveLabel);
-			const oVariantModel = oVMControl.getModel(ControlVariantApplyAPI.getVariantModelName());
 			return VariantManager.handleSaveEvent(oVMControl, {
 				name: "newVariant",
 				layer: Layer.CUSTOMER
-			}, oVariantModel);
+			});
 		})
 		.then(function() {
 			FlexPerformanceTestUtil.stopMeasurement(sMassiveLabel);

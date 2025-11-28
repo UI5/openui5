@@ -563,6 +563,10 @@ sap.ui.define([
 			sMode = exploreSettingsModel.getProperty("/editorMode"),
 			sPreviewPosition = exploreSettingsModel.getProperty("/previewPosition"),
 			cardTitle = "Card Editor with Company Administration Mode";
+			if (!baseUrl) {
+				var sManifestFileName = that._sSampleManifestUrl.split("/").pop(),
+				baseUrl = that._sSampleManifestUrl.substring(0, this._sSampleManifestUrl.length - sManifestFileName.length);
+			}
 			if (sMode === EditorConstants.EDITOR_MODE.TRANSLATION) {
 				cardTitle = "Card Editor with Translation Mode";
 			} else if (sMode === EditorConstants.EDITOR_MODE.ADMIN || sMode === EditorConstants.EDITOR_MODE.CONTENT) {
@@ -685,6 +689,7 @@ sap.ui.define([
 
 				var oCard = new Card({baseUrl: baseUrl, manifest: sJson, manifestChanges: oManifestSettings});
 				oCardEditor.setCard(oCard);
+				oCardEditor.setBaseUrl(baseUrl);
 				oCardEditor.setMode(sMode);
 				oCardEditor.setPreviewPosition(sPreviewPosition);
 				oCardEditor.setHeight("100%");

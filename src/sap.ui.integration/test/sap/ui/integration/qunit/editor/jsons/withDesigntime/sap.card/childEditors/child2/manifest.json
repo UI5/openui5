@@ -1,0 +1,71 @@
+{
+	"_version": "2.0.0",
+	"sap.app": {
+		"id": "sap.ui5.test.editor.listcard.child2",
+		"type": "card",
+		"i18n": "../../../i18n/i18n.properties",
+		"title": "Child2 (in sap.app)",
+		"subTitle": "Test Card for Parameters",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
+	},
+	"sap.ui": {
+		"technology": "UI5",
+		"icons": {
+			"icon": "sap-icon://accept"
+		}
+	},
+	"sap.card": {
+		"type": "List",
+		"configuration": {
+			"editor": "dt",
+			"childCards": {
+				"child2-1": {
+					"title": "Child2-1 (in config)",
+					"manifest": "./child2-1/manifest.json"
+				}
+			},
+			"parameters": {
+				"cardTitle": {
+					"value": "{{TRANSLATED_CARD_TITLE}}"
+				},
+				"maxItems": {
+					"value": 5
+				}
+			},
+			"destinations": {
+				"northwind": {
+					"name": "Northwind"
+				},
+				"mock_request": {
+					"name": "mock_request"
+				}
+			}
+		},
+		"header": {
+			"title": "{parameters>/cardTitle/value}",
+			"icon": {
+				"src": "sap-icon://add-document",
+				"shape": "Circle",
+				"backgroundColor": ""
+			}
+		},
+		"data": {
+			"request": {
+				"url": "{{destinations.mock_request}}/Customers"
+			},
+			"path": "/value"
+		},
+		"content": {
+			"item": {
+				"title": "{CustomerID}",
+				"description": "Trainer: {CompanyName}",
+				"info": {
+					"value": "Location: {Country} - {City} - {Address}"
+				}
+			},
+			"maxItems": "{parameters>/maxItems/value}"
+		}
+	}
+}

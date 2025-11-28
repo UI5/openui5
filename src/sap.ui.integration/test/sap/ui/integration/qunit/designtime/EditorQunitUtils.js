@@ -194,7 +194,7 @@ sap.ui.define([
 		],
 		"Customers_1_2": [
 			{"CustomerID": "b", "CompanyName": "B Company", "Country": "Country 2", "City": "City 2", "Address": "Address 2"},
-			{"CustomerID": "c", "CompanyName": "C Company", "Country": "Country 3", "City": "City 3", "Address": "Address 3"}
+			{"CustomerID": "c", "CompanyName": "C1 Company", "Country": "Country 3", "City": "City 3", "Address": "Address 3"}
 		],
 		"Customers_CustomerID_b_startswith_": [
 			{"CustomerID": "b", "CompanyName": "B Company", "Country": "Country 2", "City": "City 2", "Address": "Address 2"}
@@ -227,6 +227,11 @@ sap.ui.define([
 		],
 		"Employees_endswith_n_endswith_n": [
 			{"EmployeeID": 4, "FirstName": "FirstNamen", "LastName": "LastNamen", "Country": "Country 4", "Title": "City 4", "HomePhone": "444444"}
+		],
+		"Orders": [
+			{"OrderID": 1, "OrderDate": "2021-02-11", "CustomerID": "a", "EmployeeID": 1},
+			{"OrderID": 2, "OrderDate": "2021-02-12", "CustomerID": "b	", "EmployeeID": 2},
+			{"OrderID": 3, "OrderDate": "2021-02-13", "CustomerID": "b	", "EmployeeID": 2}
 		],
 		"Orders_a_1": [
 			{"OrderID": 1, "OrderDate": "2021-02-11", "CustomerID": "a", "EmployeeID": 1}

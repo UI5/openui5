@@ -65,13 +65,7 @@ sap.ui.define([
 				seenFeatureIds: mPropertyBag.seenFeatureIds
 			};
 			const sUrl = InitialUtils.getUrl(this.ROUTES.SEEN_FEATURES, mPropertyBag);
-			const oResult = await WriteUtils.sendRequest(sUrl, "PUT", {
-				tokenUrl: this.ROUTES.TOKEN,
-				initialConnector: InitialConnector,
-				payload: JSON.stringify(mParameters),
-				dataType: "json",
-				contentType: "application/json; charset=utf-8"
-			});
+			const oResult = await WriteUtils.sendRequest(sUrl, "PUT", _getRequestOptions.call(this, mPropertyBag.url, mParameters));
 			return oResult.response?.seenFeatureIds;
 		},
 
@@ -93,15 +87,8 @@ sap.ui.define([
 				InitialUtils.addLanguageInfo(mParameters);
 			}
 			const sUrl = InitialUtils.getUrl(this.ROUTES.CONDENSE, mPropertyBag, mParameters);
-			const oRequestOption = WriteUtils.getRequestOptions(
-				InitialConnector,
-				this.ROUTES.TOKEN,
-				mPropertyBag.flexObjects,
-				"application/json; charset=utf-8",
-				"json"
-			);
 
-			return WriteUtils.sendRequest(sUrl, "POST", oRequestOption);
+			return WriteUtils.sendRequest(sUrl, "POST", _getRequestOptions.call(this, mPropertyBag.url, mPropertyBag.flexObjects));
 		},
 
 		/**
@@ -119,15 +106,19 @@ sap.ui.define([
 				variantManagementReferences: mPropertyBag.variantManagementReferences
 			};
 			const sUrl = InitialUtils.getUrl(this.ROUTES.DELETE_USER_VARIANTS, mPropertyBag);
-			return WriteUtils.sendRequest(sUrl, "POST", {
-				tokenUrl: this.ROUTES.TOKEN,
-				initialConnector: InitialConnector,
-				payload: JSON.stringify(mPayload),
-				dataType: "json",
-				contentType: "application/json; charset=utf-8"
-			});
+			return WriteUtils.sendRequest(sUrl, "POST", _getRequestOptions.call(this, mPropertyBag.url, mPayload));
 		}
 	});
+
+	function _getRequestOptions(sUrl, vPayload) {
+		return WriteUtils.getRequestOptions(
+			InitialConnector,
+			InitialUtils.getUrl(this.ROUTES.TOKEN, { url: sUrl }),
+			vPayload,
+			"application/json; charset=utf-8",
+			"json"
+		);
+	}
 
 	BtpServiceConnector.initialConnector = InitialConnector;
 	return BtpServiceConnector;
