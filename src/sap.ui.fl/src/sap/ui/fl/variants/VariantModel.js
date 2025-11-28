@@ -543,16 +543,6 @@ sap.ui.define([
 		}
 	};
 
-	VariantModel.prototype._handleSaveEvent = function(oEvent) {
-		if (!this._bDesignTimeMode) {
-			var oVariantManagementControl = oEvent.getSource();
-			var mParameters = oEvent.getParameters();
-			sap.ui.require(["sap/ui/fl/variants/VariantManager"], function(VariantManager) {
-				VariantManager.handleSaveEvent(oVariantManagementControl, mParameters, this);
-			}.bind(this));
-		}
-	};
-
 	function variantSelectHandler(oEvent, mPropertyBag) {
 		sap.ui.require(["sap/ui/fl/variants/VariantManager"], function(VariantManager) {
 			VariantManager.handleSelectVariant(oEvent, mPropertyBag);
@@ -613,9 +603,6 @@ sap.ui.define([
 			vmReference: sVariantManagementReference,
 			model: this
 		}, variantSelectHandler);
-
-		// save / saveAs
-		oVariantManagementControl.attachSave(this._handleSaveEvent, this);
 
 		// set model's properties specific to control's appearance
 		this.setModelPropertiesForControl(sVariantManagementReference, false, oVariantManagementControl);

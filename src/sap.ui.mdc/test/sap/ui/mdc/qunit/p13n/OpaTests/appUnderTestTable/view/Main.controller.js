@@ -19,6 +19,7 @@ sap.ui.define([
 				Explicit: "AppUnderTestTable.view.Explicit",
 				Implicit: "AppUnderTestTable.view.Implicit",
 				Transient: "AppUnderTestTable.view.Transient",
+				TransientGlobal: "AppUnderTestTable.view.TransientGlobal",
 				AutoImplicit: "AppUnderTestTable.view.AutoImplicit",
 				State: "AppUnderTestTable.view.State"
 			};

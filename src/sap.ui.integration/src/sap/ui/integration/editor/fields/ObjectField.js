@@ -2002,6 +2002,21 @@ sap.ui.define([
 		that._oTranslationPopover.openBy(oControl._oValueHelpIcon);
 	};
 
+	ObjectField.prototype.exit = function () {
+		if (this._oTranslationPopover) {
+			this._oTranslationPopover.destroy();
+			this._oTranslationPopover = null;
+		}
+		if (this._oObjectDetailsPopover) {
+			this._oObjectDetailsPopover.destroy();
+			this._oObjectDetailsPopover = null;
+		}
+		if (this._oObjectPropertyDetailsPopover) {
+			this._oObjectPropertyDetailsPopover.destroy();
+			this._oObjectPropertyDetailsPopover = null;
+		}
+	};
+
 	ObjectField.prototype.navToTranslationListPage = function (sProperty, oEvent) {
 		var that = this;
 		if (!that._oEditorResourceBundles.isReady()) {

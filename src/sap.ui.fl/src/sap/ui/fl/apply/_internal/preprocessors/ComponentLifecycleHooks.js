@@ -242,16 +242,22 @@ sap.ui.define([
 			Log.error("Could not fetch Annotation changes. This can be caused by creating a component in an unsupported way");
 			return [];
 		}
+
+		const oManifest = oOwnerComponent?.getManifest() || oPropertyBag.manifest;
+		if (!Utils.isApplication(oManifest)) {
+			return [];
+		}
+
 		const sAppComponentId = oPropertyBag.owner?.id || oPropertyBag.factoryConfig.id || oPropertyBag.factoryConfig.settings?.id;
 
 		const oComponentData = oOwnerComponent?.getComponentData()
 			|| oPropertyBag.factoryConfig.componentData
 			|| oPropertyBag.factoryConfig.settings?.componentData;
-		const oManifest = oOwnerComponent?.getManifest() || oPropertyBag.manifest;
 		const sReference = ManifestUtils.getFlexReference({
 			manifest: oManifest,
 			componentData: oComponentData
 		});
+
 		try {
 			// skipLoadBundle has to be true as there is no guarantee that the flex bundle is already available at this point
 			const mProperties = {

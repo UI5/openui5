@@ -14,6 +14,7 @@ sap.ui.define([
 	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/initial/_internal/Settings",
+	"sap/ui/fl/requireAsync",
 	"sap/ui/fl/Utils",
 	"sap/ui/model/Context",
 	"sap/ui/model/Filter",
@@ -29,6 +30,7 @@ sap.ui.define([
 	ControlVariantApplyAPI,
 	ManifestUtils,
 	flSettings,
+	requireAsync,
 	Utils,
 	Context,
 	Filter,
@@ -38,6 +40,25 @@ sap.ui.define([
 
 	// shortcut for sap.ui.core.TitleLevel
 	var { TitleLevel } = coreLibrary;
+
+	async function onSave(oEvent) {
+		if (!this.getDesignMode()) {
+			const mParameters = oEvent.getParameters();
+			await requireAsync("sap/ui/fl/variants/VariantManager").then(async (VariantManager) => {
+				await VariantManager.handleSaveEvent(this, mParameters);
+			});
+		}
+		this._handleAllListeners(oEvent, this._aSaveEventHandlers);
+	}
+
+	async function onManage(oEvent) {
+		if (!this.getDesignMode()) {
+			await requireAsync("sap/ui/fl/variants/VariantManager").then(async (VariantManager) => {
+				await VariantManager.handleManageEvent(oEvent, this);
+			});
+		}
+		this._handleAllListeners(oEvent, this._aManageEventHandlers);
+	}
 
 	/**
 	 * Constructor for a new <code>VariantManagement</code>.
@@ -385,9 +406,9 @@ sap.ui.define([
 		this._aSelectEventHandlers = [];
 		this._oVariantAppliedListeners = {};
 
-		this._oVM.attachManage(this._onManage, this);
+		this._oVM.attachManage(onManage, this);
 		this._oVM.attachCancel(this._fireCancel, this);
-		this._oVM.attachSave(this._fireSave, this);
+		this._oVM.attachSave(onSave, this);
 		this._oVM.attachSelect(this._fireSelect, this);
 
 		this._updateWithSettingsInfo();
@@ -477,10 +498,6 @@ sap.ui.define([
 		}
 
 		return this;
-	};
-
-	VariantManagement.prototype._fireSave = function(oEvent) {
-		this._handleAllListeners(oEvent, this._aSaveEventHandlers);
 	};
 
 	VariantManagement.prototype.hasListeners = function(...aArgs) {
@@ -610,17 +627,6 @@ sap.ui.define([
 		for (i = aOnlyOnce.length - 1; i > -1; i--) {
 			aEventHandler.splice(aOnlyOnce[i], 1);
 		}
-	};
-
-	VariantManagement.prototype._onManage = function(oEvent) {
-		if (!this._oVM.getDesignMode()) {
-			sap.ui.require(["sap/ui/fl/variants/VariantManager"], (VariantManager) => {
-				VariantManager.handleManageEvent(oEvent, this);
-				this._handleAllListeners(oEvent, this._aManageEventHandlers);
-			});
-			return;
-		}
-		this._handleAllListeners(oEvent, this._aManageEventHandlers);
 	};
 
 	VariantManagement.prototype.detachManage = function(fnCallback, oObj) {
@@ -1051,10 +1057,10 @@ sap.ui.define([
 
 	// exit destroy all controls created in init
 	VariantManagement.prototype.exit = function(...aArgs) {
-		this._oVM.detachManage(this._onManage, this);
+		this._oVM.detachManage(onManage, this);
 		this._oVM.detachCancel(this._fireCancel, this);
 		this._oVM.detachSelect(this._fireSelect, this);
-		this._oVM.detachSave(this._fireSave, this);
+		this._oVM.detachSave(onSave, this);
 
 		if (this._oVM) {
 			this._oVM.destroy();
@@ -1150,6 +1156,14 @@ sap.ui.define([
 		const sControlId = this.getId();
 		const oAppComponent = Utils.getAppComponentForControl(this);
 		return (oAppComponent && oAppComponent.getLocalId(sControlId)) || sControlId;
+	};
+
+	/**
+	 * Checks whether the variant management is in design mode (e.g. RTA).
+	 * @returns {boolean} True if in design mode (e.g. RTA)
+	 */
+	VariantManagement.prototype.getDesignMode = function() {
+		return this._oVM.getDesignMode();
 	};
 
 	return VariantManagement;

@@ -227,20 +227,27 @@ sap.ui.define([
 		return oNewPromise;
 	}
 
-	async function handleDirtyChanges(aDirtyChanges, sVariantManagementReference, oAppComponent, oVariantModel) {
-		if (!oVariantModel._bDesignTimeMode) {
+	async function handleDirtyChanges(mProperties) {
+		const {
+			dirtyChanges: aDirtyChanges,
+			variantManagementReference: sVariantManagementReference,
+			appComponent: oAppComponent,
+			variantManagementControl: oVariantManagementControl,
+			flexReference: sFlexReference
+		} = mProperties;
+		if (!oVariantManagementControl.getDesignMode()) {
 			const oResponse = await FlexObjectManager.saveFlexObjects({ flexObjects: aDirtyChanges, selector: oAppComponent });
 			if (oResponse) {
 				const oVariantFlexObject = oResponse.response.find((oFlexObject) => oFlexObject.fileType === "ctrl_variant");
-				const oAffectedVariant = oVariantModel.oData[sVariantManagementReference].variants
-				.find((oVariant) => oVariant.key === oVariantFlexObject.fileName);
+				const aVariants = VariantManagementState.getVariantsForVariantManagement({
+					reference: sFlexReference,
+					vmReference: sVariantManagementReference
+				});
+				const oAffectedVariant = aVariants.find((oVariant) => oVariant.key === oVariantFlexObject.fileName);
 				const oSupportInformation = oAffectedVariant.instance.getSupportInformation();
 				oSupportInformation.user = oVariantFlexObject.support.user;
 				oAffectedVariant.instance.setSupportInformation(oSupportInformation);
 			}
-
-			// TODO: as soon as the invalidation is done automatically this can be removed
-			oVariantModel.invalidateMap();
 		}
 	}
 
@@ -443,10 +450,9 @@ sap.ui.define([
 		}
 	};
 
-	VariantManager.handleSaveEvent = async function(oVariantManagementControl, mParameters, oVariantModel) {
+	VariantManager.handleSaveEvent = async function(oVariantManagementControl, mParameters) {
 		const sFlexReference = ManifestUtils.getFlexReferenceForControl(oVariantManagementControl);
 		const oAppComponent = Utils.getAppComponentForControl(oVariantManagementControl);
-		oVariantModel ||= getVariantModel(oVariantManagementControl);
 		const sVMReference = oVariantManagementControl.getVariantManagementReference();
 		let aNewVariantDirtyChanges;
 
@@ -461,16 +467,20 @@ sap.ui.define([
 			if (mParameters.overwrite) {
 				// handle triggered "Save" button
 				// Includes special handling for PUBLIC variant which requires changing all the dirty changes to PUBLIC layer before saving
-				aNewVariantDirtyChanges = getDirtyChangesFromVariantChanges(aSourceVariantChanges, oVariantModel.sFlexReference);
-				if (oVariantModel.getVariant(sSourceVariantReference, sVMReference).layer === Layer.PUBLIC) {
+				aNewVariantDirtyChanges = getDirtyChangesFromVariantChanges(aSourceVariantChanges, sFlexReference);
+				const oSourceVariant = VariantManagementState.getVariant({
+					reference: sFlexReference,
+					vmReference: sVMReference,
+					vReference: sSourceVariantReference
+				});
+				if (oSourceVariant.layer === Layer.PUBLIC) {
 					aNewVariantDirtyChanges.forEach((oChange) => oChange.setLayer(Layer.PUBLIC));
 				}
 				const oResponse = await FlexObjectManager.saveFlexObjects({
 					flexObjects: aNewVariantDirtyChanges,
 					selector: oAppComponent
 				});
-				// TODO: as soon as the invalidation is done automatically this can be removed
-				oVariantModel.invalidateMap();
+
 				return oResponse;
 			}
 
@@ -519,17 +529,18 @@ sap.ui.define([
 			// unsaved changes on the source variant are removed before copied variant changes are saved
 			await eraseDirtyChanges({
 				changes: aSourceVariantChanges,
-				reference: oVariantModel.sFlexReference,
+				reference: sFlexReference,
 				vmReference: sVMReference,
 				vReference: sSourceVariantReference,
 				appComponent: oAppComponent
 			});
-			return handleDirtyChanges(
-				aNewVariantDirtyChanges,
-				sVMReference,
-				oAppComponent,
-				oVariantModel
-			);
+			return handleDirtyChanges({
+				dirtyChanges: aNewVariantDirtyChanges,
+				variantManagementReference: sVMReference,
+				appComponent: oAppComponent,
+				variantManagementControl: oVariantManagementControl,
+				flexReference: sFlexReference
+			});
 		}, sFlexReference, sVMReference);
 		return aNewVariantDirtyChanges;
 	};

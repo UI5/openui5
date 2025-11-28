@@ -33,8 +33,8 @@
 				selectionMode="{tableConfig>/selectionMode}">
 				<mdc:rowSettings>
 					<mdct:RowSettings
-						highlight="{path: 'hireDate', formatter: '.formatHighlight'}"
-						highlightText="{path: 'hireDate', formatter: '.formatHighlightText'}"
+						highlight="{path: 'location', formatter: '.formatHighlight'}"
+						highlightText="{path: 'location', formatter: '.formatHighlightText'}"
 						navigated="{= ${tableConfig>/navigatedRowId} === ${id} }">
 					</mdct:RowSettings>
 				</mdc:rowSettings>
@@ -70,7 +70,7 @@
 				<mdct:Column
 					propertyKey="location"
 					header="Location">
-					<m:ObjectStatus text="{location}" state="{= ${location} === 'Headquarters' ? 'Success' : 'Warning' }"/>
+					<m:ObjectStatus text="{location}" state="{= ${location} === 'Headquarters' ? 'None' : 'Information' }"/>
 				</mdct:Column>
 				<mdct:Column
 					propertyKey="hireDate"

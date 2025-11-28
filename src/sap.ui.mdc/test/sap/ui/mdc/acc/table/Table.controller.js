@@ -60,11 +60,11 @@ sap.ui.define([
 			this.getView().byId("mdcTable").setType(this.getGridTableType());
 			this.getView().setModel(oTableConfigModel, "tableConfig");
 		},
-		formatHighlight: function(dHireDate) {
-			return new Date(dHireDate).getFullYear() === new Date().getFullYear() - 10 ? MessageType.Information : MessageType.None;
+		formatHighlight: function(location) {
+			return location !== "Headquarters" ? MessageType.Information : MessageType.None;
 		},
-		formatHighlightText: function(dHireDate) {
-			return new Date(dHireDate).getFullYear() === new Date().getFullYear() - 10 ? "10 years job anniversary" : null;
+		formatHighlightText: function(location) {
+			return location !== "Headquarters" ? "Employee works at a remote location" : null;
 		},
 		onTableTypeChange: function(oEvent) {
 			const oSelectedType = oEvent.getParameter("selectedItem");

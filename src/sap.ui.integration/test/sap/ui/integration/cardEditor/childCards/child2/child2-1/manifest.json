@@ -1,0 +1,218 @@
+{
+	"_version": "2.0.0",
+	"sap.app": {
+		"id": "sap.ui5.test.cardeditor.listcard.child2.child2-1",
+		"type": "card",
+		"i18n": "../../../../i18n/i18n.properties",
+		"title": "Test Card for Parameters",
+		"subTitle": "Test Card for Parameters",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
+	},
+	"sap.ui": {
+		"technology": "UI5",
+		"icons": {
+			"icon": "sap-icon://accept"
+		}
+	},
+	"sap.card": {
+		"extension1": "DataExtensionImpl",
+		"extension": "module:sap/ui/integration/cardEditor/test/testLib/SharedExtension",
+		"type": "List",
+		"configuration": {
+			"editor": "dt",
+			"parameters": {
+				"checkItemWithTabNotEditable": {
+					"value": {
+						"text": "text01",
+						"key": "key01",
+						"url": "https://sap.com/06",
+						"icon": "sap-icon://accept",
+						"editable": true
+					}
+				},
+				"contextModelSyntax": {
+					"value": []
+				},
+				"enableLearningCourses": {
+					"value": false
+				},
+				"cardTitle": {
+					"value": "Child Card Title Child2-1"
+				},
+				"stringWithVisualizationFragment": {
+					"value": "StringValue in visualization"
+				},
+				"string": {
+					"value": "StringValue Child2-1"
+				},
+				"stringLabel": {
+					"value": "StringValue"
+				},
+				"stringLabelTrans": {
+					"value": "StringValue"
+				},
+				"stringLabelTrans2": {
+					"value": "StringValue"
+				},
+				"stringWithDescription": {
+					"value": "StringValue"
+				},
+				"stringWithLongDescription": {
+					"value": "StringValue"
+				},
+				"stringWithTranslatedValue": {
+					"value": "{{TRANSLATED_STRING_VALUE}}"
+				},
+				"stringWithTranslatedValueIni18nFormat": {
+					"value": "{i18n>TRANSLATED_STRING_VALUE}"
+				},
+				"stringInCols1": {
+					"value": "stringInCols1 long long long long long long long long long long long long value"
+				},
+				"stringInCols2": {
+					"value": ""
+				},
+				"maxItems": {
+					"value": 4
+				},
+				"integer": {
+					"value": 1
+				},
+				"integerLabel": {
+					"value": 1
+				},
+				"integerLabelTrans": {
+					"value": 1
+				},
+				"stringphone": {
+					"value": "StringValue"
+				},
+				"stringphonenomessage": {
+					"value": "StringValue"
+				},
+				"stringmaxmin": {
+					"value": ""
+				},
+				"integervalidation": {
+					"value": 1
+				},
+				"integerrequired": {
+					"value": ""
+				},
+				"number": {
+					"value": 1.5
+				},
+				"numberLabel": {
+					"value": 1.5
+				},
+				"numberLabelTrans": {
+					"value": 1.5
+				},
+				"numberrequired": {
+					"value": 2.5
+				},
+				"boolean": {
+					"value": false
+				},
+				"booleanLabel": {
+					"value": true
+				},
+				"booleanLabelTrans": {
+					"value": false
+				},
+				"date": {
+					"value": "2020-09-02"
+				},
+				"dateLabel": {
+					"value": "2020-09-02"
+				}
+			},
+			"destinations": {
+				"string": {
+					"name": "Simple"
+				},
+				"local": {
+					"name": "local",
+					"label": "local destination label defined in manifest"
+				},
+				"dest": {
+					"name": "JAM"
+				},
+				"destLabel": {
+					"name": "products",
+					"label": "Direct Destination Label defined in manifest"
+				},
+				"destLabelTrans": {
+					"name": "SF",
+					"label": "{i18n>TRANSLATED_DESTINATION_LABEL} defined in manifest"
+				},
+				"northwind": {
+					"name": "Northwind"
+				}
+			}
+		},
+		"header": {
+			"title": "{parameters>/string/value}",
+			"subtitle": "{parameters>/objectsWithPropertiesDefinedAndValueFromJsonList/value/0/text}",
+			"icon": {
+				"src": "sap-icon://add-document",
+				"shape": "Circle",
+				"backgroundColor": ""
+			},
+			"status": {
+				"text": {
+					"format": {
+						"translationKey": "i18n>CARD.COUNT_X_OF_Y",
+						"parts": [
+							"activities",
+							"count"
+						]
+					}
+				}
+			}
+		},
+		"data1": {
+			"extension": {
+				"method": "getData",
+				"args": [
+					"{filters>/country/value}"
+				]
+			},
+			"path": "/values"
+		},
+		"data": {
+			"request": {
+				"url": "{{destinations.northwind}}/Customers",
+				"parameters": {
+					"$select": "CustomerID, CompanyName, Country, City, Address"
+				}
+			},
+			"path": "/value"
+		},
+		"content": {
+			"item": {
+				"title": "{CustomerID}",
+				"description": "Trainer: {CompanyName}",
+				"info": {
+					"value": "Location: {Country} - {City} - {Address}"
+				}
+			},
+			"item1": {
+				"title": "{title}",
+				"description": "Trainer: {trainer}",
+				"info": {
+					"value": "Location: {location}"
+				}
+			},
+			"maxItems": "{parameters>/maxItems/value}"
+		},
+		"footer": {
+			"paginator": {
+				"totalCount": 80,
+				"pageSize": "{parameters>/maxItems/value}"
+			}
+		}
+	}
+}

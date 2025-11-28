@@ -906,7 +906,7 @@ sap.ui.define([
 			});
 		});
 
-		QUnit.test("when calling 'handleSaveEvent' with bDesignTimeMode set to true and parameters from SaveAs button and default/execute box checked", async function(assert) {
+		QUnit.test("when calling 'handleSaveEvent' in Design Mode and parameters from SaveAs button and default/execute box checked", async function(assert) {
 			const sNewVariantReference = "variant2";
 			const aChanges = createChanges(sReference, Layer.CUSTOMER, "variant0");
 			const sCopyVariantName = "variant0";
@@ -928,7 +928,6 @@ sap.ui.define([
 				{ fileName: sCopyVariantName, fileType: "ctrl_variant", support: { user: sUserName } }
 			] };
 
-			sandbox.stub(this.oModel, "getLocalId").returns(sVMReference);
 			sandbox.stub(DependencyHandler, "addChangeAndUpdateDependencies");
 			const oSaveStub = sandbox.stub(FlexObjectManager, "saveFlexObjects").resolves(oResponse);
 			const oDeleteFlexObjectsSpy = sandbox.spy(FlexObjectManager, "deleteFlexObjects");
@@ -941,7 +940,7 @@ sap.ui.define([
 				vmReference: sVMReference,
 				newVReference: "variant0"
 			});
-			this.oModel._bDesignTimeMode = true;
+			sandbox.stub(this.oVMControl, "getDesignMode").returns(true);
 			const aDirtyChanges = await VariantManager.handleSaveEvent(this.oVMControl, mParameters, this.oModel);
 			assert.ok(oCopyVariantSpy.calledOnce, "then copyVariant() was called once");
 			assert.strictEqual(oCreateVManagementChangeSpy.callCount, 1, "one variant management change was created");

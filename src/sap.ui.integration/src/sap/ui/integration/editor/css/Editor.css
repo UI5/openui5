@@ -3,6 +3,34 @@
 	padding: 1rem 1rem 1rem 0.5rem;
 	display: flex;
 	box-sizing: border-box;
+	background-color: var(--sapShellColor);
+}
+
+.sapUiIntegrationEditor .sapMTreeItemBaseChildren {
+	background-color: var(--sapShellColor);
+}
+
+.sapUiIntegrationEditor .childsTreeContainer {
+	width: 20rem;
+    box-sizing: border-box;
+    margin: 0 0 0 10px;
+    padding: 6px;
+	background-color: rgba(222, 222, 222, 0.3) !important;
+}
+
+.childsTreeContainer .sapMList {
+    margin: -0.3rem 0 0 0
+}
+.childsTreeContainer .sapMListUl {
+	border-right: 1px solid var(--sapList_BorderColor);
+}
+
+.sapUiIntegrationEditorChildTreeItem .sapMLIBContent {
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+    white-space: nowrap;
 }
 
 .sapUiIntegrationEditor .sapUiIntegrationEditorForm {

@@ -377,7 +377,7 @@ sap.ui.define([
 		await nextUIUpdate(this.clock);
 
 		// Act
-		oGrid.onmouseup({
+		oGrid.ontap({
 			target: {
 				parentElement: oAppointment.getDomRef(),
 				classList: {
@@ -683,7 +683,7 @@ sap.ui.define([
 			fnFireAppointmentSelectSpy = this.spy(oGrid, "fireAppointmentSelect");
 
 		//act
-		oGrid.onmouseup(oFakeEvent);
+		oGrid.ontap(oFakeEvent);
 
 		//assert
 		assert.ok(fnFireAppointmentSelectSpy.calledOnce, "Event was fired");
@@ -722,7 +722,7 @@ sap.ui.define([
 			fnFireAppointmentSelectSpy = this.spy(oGrid, "fireAppointmentSelect");
 
 		//act
-		oGrid.onmouseup(oFakeEvent);
+		oGrid.ontap(oFakeEvent);
 
 		//assert
 		assert.ok(fnFireAppointmentSelectSpy.calledOnce, "Event was fired");

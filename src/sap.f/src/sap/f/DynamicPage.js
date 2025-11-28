@@ -833,9 +833,8 @@ sap.ui.define([
 					"sapFDynamicPageTitleSnappedTitleOnMobile" : "sapFDynamicPageTitleSnapped");
 			this._updateToggleHeaderVisualIndicators();
 			this._togglePinButtonVisibility(false);
-			this._updateTitlePositioning();
 		}
-
+		this._updateTitlePositioning();
 		this._toggleHeaderInTabChain(false);
 		this._updateARIAStates(false);
 		this._toggleHeaderBackground(true);
@@ -876,9 +875,8 @@ sap.ui.define([
 			if (!this.getPreserveHeaderStateOnScroll() && !this._headerBiggerThanAllowedToPin()) {
 				this._togglePinButtonVisibility(true);
 			}
-			this._updateTitlePositioning();
 		}
-
+		this._updateTitlePositioning();
 		this._toggleHeaderInTabChain(true);
 		this._updateARIAStates(true);
 		this._toggleHeaderBackground(false);

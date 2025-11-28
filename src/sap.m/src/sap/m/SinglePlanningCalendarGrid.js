@@ -1311,7 +1311,7 @@ sap.ui.define([
 			return oColumnGridHeaderCell;
 		};
 
-		SinglePlanningCalendarGrid.prototype.onmouseup = function (oEvent) {
+		SinglePlanningCalendarGrid.prototype.ontap = function (oEvent) {
 			var bMultiDateSelection = SinglePlanningCalendarSelectionMode.MultiSelect === this.getDateSelectionMode();
 
 			if (!bMultiDateSelection && !(oEvent.metaKey || oEvent.ctrlKey)) {

@@ -22,14 +22,17 @@ sap.ui.define(
 				});
 			});
 
-			QUnit.test("onfocusin", function (assert) {
+			QUnit.test("onfocusin", async function (assert) {
 				// Arrange
 				var oDTF = new DateTimeField({valueState: "Error"}),
 					oSpy = this.spy(oDTF, "openValueStateMessage");
 
+				oDTF.placeAt("qunit-fixture");
+				await nextUIUpdate();
+
 				// Act
 				oDTF.onfocusin({
-					target: oDTF.$("sapMInputBaseInner").get(0)
+					target: oDTF.getFocusDomRef()
 				});
 
 				// Assert
@@ -105,6 +108,35 @@ sap.ui.define(
 
 				// Assert
 				assert.strictEqual(oDTF.getRenderer().getAriaRole() , "", "The role attribute is empty");
+			});
+
+			QUnit.test("_getValueStateHeader returns header with updated Value State", async function(assert) {
+				// Prepare
+				const oDTF = new DateTimeField();
+				oDTF.placeAt("qunit-fixture");
+				await nextUIUpdate();
+
+				const oHeader = oDTF._getValueStateHeader();
+
+				// Assert - Initial state
+				assert.ok(oHeader, "Value state header exists");
+				assert.equal(oHeader.getValueState(), "None", "Header is initialized with ValueState = None");
+				assert.equal(oHeader, oDTF._oValueStateHeader, "Private variable _oValueStateHeader is assigned");
+
+				// Act
+				oDTF.setValueState("Error");
+				oDTF.setValueStateText("Invalid date");
+
+				await nextUIUpdate();
+
+				// Assert - Value state header should be properly after value state has been changed
+				assert.ok(oHeader, "Value state header exists");
+				assert.equal(oHeader.getValueState(), "Error", "Header's ValueState is updated to Error");
+				assert.equal(oHeader.getText(), "Invalid date", "Header has correct text");
+				assert.equal(oHeader, oDTF._oValueStateHeader, "Private variable _oValueStateHeader is updated");
+
+				// Cleanup
+				oDTF.destroy();
 			});
 		});
 	}

@@ -1,0 +1,83 @@
+{
+	"_version": "2.0.0",
+	"sap.app": {
+		"id": "sap.ui5.test.cardeditor.listcard.child1",
+		"type": "card",
+		"i18n": "../i18n/i18n.properties",
+		"title": "Employees",
+		"subTitle": "Test Card for Parameters",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
+	},
+	"sap.ui": {
+		"technology": "UI5",
+		"icons": {
+			"icon": "sap-icon://accept"
+		}
+	},
+	"sap.card": {
+		"type": "List",
+		"configuration": {
+			"editor": "dt",
+			"childCards": {
+				"Orders": {
+					"manifest": "./child1-1/manifest.json"
+				}
+			},
+			"parameters": {
+				"cardTitle": {
+					"value": "{{TRANSLATED_CARD_TITLE_EMPLOYEES}}"
+				}
+			},
+			"destinations": {
+				"string": {
+					"name": "Simple"
+				},
+				"local": {
+					"name": "local",
+					"label": "local destination label defined in manifest"
+				},
+				"dest": {
+					"name": "Northwind",
+					"defaultUrl": "https://services.odata.org/V4/Northwind/Northwind.svc"
+				},
+				"destLabel": {
+					"name": "products",
+					"label": "Direct Destination Label defined in manifest"
+				},
+				"destLabelTrans": {
+					"name": "SF",
+					"label": "{i18n>TRANSLATED_DESTINATION_LABEL} defined in manifest"
+				}
+			}
+		},
+		"header": {
+			"title": "{parameters>/cardTitle/value}",
+			"icon": {
+				"src": "sap-icon://add-document",
+				"shape": "Circle",
+				"backgroundColor": ""
+			}
+		},
+		"data": {
+			"request": {
+				"url": "{{destinations.dest}}/Employees",
+				"parameters": {
+					"$select": "EmployeeID, FirstName, LastName, Country, Title, HomePhone"
+				}
+			},
+			"path": "/value"
+		},
+		"content": {
+			"item": {
+				"title": "{EmployeeID}",
+				"description": "{FirstName} {LastName}",
+				"info": {
+					"value": "Info: {Country} - {Title} - {HomePhone}"
+				}
+			},
+			"maxItems": 4
+		}
+	}
+}

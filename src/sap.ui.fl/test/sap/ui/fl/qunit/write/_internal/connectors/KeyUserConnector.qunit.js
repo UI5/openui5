@@ -333,7 +333,7 @@ sap.ui.define([
 				assert.equal(call.args[0], sUrl, "the request has the correct url");
 				assert.equal(call.args[1], "POST", "the request has the correct method");
 				assert.deepEqual(call.args[2].payload, JSON.stringify(mPropertyBag.flexObjects), "the request has the correct payload");
-				assert.equal(call.args[2].tokenUrl, "/flex/keyuser/v2/settings", "the request has the correct token url");
+				assert.equal(call.args[2].tokenUrl, "/flexKeyuser/flex/keyuser/v2/settings", "the request has the correct token url");
 				assert.equal(call.args[2].xsrfToken, InitialConnector.xsrfToken, "the request has the correct xsrfToken");
 			});
 		});
@@ -402,7 +402,7 @@ sap.ui.define([
 			};
 			const mExpectedPropertyBag = {
 				initialConnector: InitialConnector,
-				tokenUrl: KeyUserConnector.ROUTES.TOKEN,
+				tokenUrl: mPropertyBag.url + KeyUserConnector.ROUTES.TOKEN,
 				...mPropertyBag
 			};
 			const aReturnedVersions = [{
@@ -448,7 +448,7 @@ sap.ui.define([
 			const sExpectedUrl = `/flexKeyuser/flex/keyuser/v2/versions/activate/com.sap.test.app?version=${sActivateVersion}&sap-language=en`;
 			const mExpectedPropertyBag = {
 				initialConnector: InitialConnector,
-				tokenUrl: KeyUserConnector.ROUTES.TOKEN,
+				tokenUrl: mPropertyBag.url + KeyUserConnector.ROUTES.TOKEN,
 				contentType: "application/json; charset=utf-8",
 				dataType: "json",
 				payload: "{\"title\":\"new Title\"}",
@@ -482,7 +482,7 @@ sap.ui.define([
 			const sExpectedUrl = `/flexKeyuser/flex/keyuser/v2/versions/activate/com.sap.test.app?version=${sActivateVersion}&sap-language=en`;
 			const mExpectedPropertyBag = {
 				initialConnector: InitialConnector,
-				tokenUrl: KeyUserConnector.ROUTES.TOKEN,
+				tokenUrl: mPropertyBag.url + KeyUserConnector.ROUTES.TOKEN,
 				contentType: "application/json; charset=utf-8",
 				dataType: "json",
 				payload: "{\"title\":\"new reactivate Title\"}",
@@ -516,7 +516,7 @@ sap.ui.define([
 			const sExpectedUrl = `/flexKeyuser/flex/keyuser/v2/versions/activate/com.sap.test.app?version=${sActivateVersion}&sap-language=en`;
 			const mExpectedPropertyBag = {
 				initialConnector: InitialConnector,
-				tokenUrl: KeyUserConnector.ROUTES.TOKEN,
+				tokenUrl: mPropertyBag.url + KeyUserConnector.ROUTES.TOKEN,
 				contentType: "application/json; charset=utf-8",
 				dataType: "json",
 				payload: "{\"title\":\"new Title\"}",
@@ -556,7 +556,7 @@ sap.ui.define([
 			};
 			const mExpectedPropertyBag = {
 				initialConnector: InitialConnector,
-				tokenUrl: KeyUserConnector.ROUTES.TOKEN,
+				tokenUrl: mPropertyBag.url + KeyUserConnector.ROUTES.TOKEN,
 				...mPropertyBag
 			};
 			const oStubSendRequest = sandbox.stub(WriteUtils, "sendRequest").resolves();
@@ -590,7 +590,7 @@ sap.ui.define([
 			const sExpectedUrl = "/flexKeyuser/flex/keyuser/v2/versions/publish/com.sap.test.app?version=3";
 			const mExpectedPropertyBag = {
 				initialConnector: InitialConnector,
-				tokenUrl: KeyUserConnector.ROUTES.TOKEN,
+				tokenUrl: mPropertyBag.url + KeyUserConnector.ROUTES.TOKEN,
 				...mPropertyBag
 			};
 

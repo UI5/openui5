@@ -346,5 +346,19 @@ sap.ui.define([
 		}, 50);
 	};
 
+	GroupField.prototype.exit = function () {
+		if (BaseField.prototype.exit) {
+			BaseField.prototype.exit.call(this);
+		}
+
+		// destroy MessageStrip
+		var oControl = this.getAggregation("_field");
+		if ((oControl instanceof Panel || oControl instanceof IconTabBar) && oControl._messageStrip) {
+			oControl._messageStrip.destroy();
+			delete oControl._messageStrip;
+		}
+	};
+
+
 	return GroupField;
 });

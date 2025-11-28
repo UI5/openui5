@@ -19,9 +19,9 @@
 								<Button press=".onCancelSalesOrder" text="Cancel"/>
 							</buttons>
 							<form:SimpleForm backgroundDesign="Transparent" editable="true" >
-								<Label labelFor="inputBuyerID" text="Buyer ID"/>
+								<Label labelFor="inputBuyerID" required="true" text="Buyer ID"/>
 								<Input id="inputBuyerID" value="{BuyerID}"/>
-								<Label labelFor="inputCurrency" text="Currency" />
+								<Label labelFor="inputCurrency" required="true" text="Currency" />
 								<Input id="inputCurrency" value="{CurrencyCode}"/>
 								<Label labelFor="inputNote" text="Note"/>
 								<Input id="inputNote" value="{Note}"/>

@@ -3518,11 +3518,913 @@ sap.ui.define([
 				sinon: false
 			},
 
+			"editor/childEditors/Basic": {
+				group: "Runtime Editor",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"editor/childEditors/Navigation01": {
+				group: "Runtime Editor",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"editor/childEditors/Navigation02": {
+				group: "Runtime Editor",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"editor/childEditors/SaveChanges01": {
+				group: "Runtime Editor",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"editor/childEditors/SaveChanges02": {
+				group: "Runtime Editor",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"editor/childEditors/manifestChanges/ChangesByAdminForAdminMode": {
+				group: "Runtime Editor",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"editor/childEditors/manifestChanges/ChangesByAdminForContentMode": {
+				group: "Runtime Editor",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"editor/childEditors/manifestChanges/ChangesByAdminForTranslationMode01": {
+				group: "Runtime Editor",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"editor/childEditors/manifestChanges/ChangesByAdminForTranslationMode02": {
+				group: "Runtime Editor",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"editor/childEditors/manifestChanges/ChangesByAdminForTranslationMode03": {
+				group: "Runtime Editor",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"editor/childEditors/manifestChanges/ChangesByAdminForTranslationMode04": {
+				group: "Runtime Editor",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"editor/childEditors/manifestChanges/ChangesByAdminForAllMode": {
+				group: "Runtime Editor",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"editor/childEditors/manifestChanges/ChangesByContentForContentMode": {
+				group: "Runtime Editor",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"editor/childEditors/manifestChanges/ChangesByContentForTranslationMode01": {
+				group: "Runtime Editor",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"editor/childEditors/manifestChanges/ChangesByContentForTranslationMode02": {
+				group: "Runtime Editor",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"editor/childEditors/manifestChanges/ChangesByContentForTranslationMode03": {
+				group: "Runtime Editor",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"editor/childEditors/manifestChanges/ChangesByContentForTranslationMode04": {
+				group: "Runtime Editor",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"editor/childEditors/manifestChanges/ChangesByContentForAllMode": {
+				group: "Runtime Editor",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"editor/childEditors/manifestChanges/ChangesByTranslationForTranslationMode01": {
+				group: "Runtime Editor",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"editor/childEditors/manifestChanges/ChangesByTranslationForTranslationMode02": {
+				group: "Runtime Editor",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"editor/childEditors/manifestChanges/ChangesByTranslationForTranslationMode03": {
+				group: "Runtime Editor",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"editor/childEditors/manifestChanges/ChangesByTranslationForTranslationMode04": {
+				group: "Runtime Editor",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"editor/childEditors/manifestChanges/ChangesByTranslationForAllMode": {
+				group: "Runtime Editor",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"editor/childEditors/manifestChanges/ChangesByAdminAndContentForContentMode": {
+				group: "Runtime Editor",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"editor/childEditors/manifestChanges/ChangesByAdminAndContentForTranslationMode01": {
+				group: "Runtime Editor",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"editor/childEditors/manifestChanges/ChangesByAdminAndContentForTranslationMode02": {
+				group: "Runtime Editor",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"editor/childEditors/manifestChanges/ChangesByAdminAndContentForTranslationMode03": {
+				group: "Runtime Editor",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"editor/childEditors/manifestChanges/ChangesByAdminAndContentForTranslationMode04": {
+				group: "Runtime Editor",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"editor/childEditors/manifestChanges/ChangesByAdminAndContentForAllMode": {
+				group: "Runtime Editor",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"editor/childEditors/manifestChanges/ChangesByAdminAndTranslationForTranslationMode01": {
+				group: "Runtime Editor",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"editor/childEditors/manifestChanges/ChangesByAdminAndTranslationForTranslationMode02": {
+				group: "Runtime Editor",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"editor/childEditors/manifestChanges/ChangesByAdminAndTranslationForTranslationMode03": {
+				group: "Runtime Editor",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"editor/childEditors/manifestChanges/ChangesByAdminAndTranslationForTranslationMode04": {
+				group: "Runtime Editor",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"editor/childEditors/manifestChanges/ChangesByAdminAndTranslationForAllMode": {
+				group: "Runtime Editor",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"editor/childEditors/manifestChanges/ChangesByContentAndTranslationForTranslationMode01": {
+				group: "Runtime Editor",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"editor/childEditors/manifestChanges/ChangesByContentAndTranslationForTranslationMode02": {
+				group: "Runtime Editor",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"editor/childEditors/manifestChanges/ChangesByContentAndTranslationForTranslationMode03": {
+				group: "Runtime Editor",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"editor/childEditors/manifestChanges/ChangesByContentAndTranslationForTranslationMode04": {
+				group: "Runtime Editor",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"editor/childEditors/manifestChanges/ChangesByContentAndTranslationForAllMode": {
+				group: "Runtime Editor",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"editor/childEditors/manifestChanges/ChangesByAdminAndContentAndTranslationForTranslationMode01": {
+				group: "Runtime Editor",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"editor/childEditors/manifestChanges/ChangesByAdminAndContentAndTranslationForTranslationMode02": {
+				group: "Runtime Editor",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"editor/childEditors/manifestChanges/ChangesByAdminAndContentAndTranslationForTranslationMode03": {
+				group: "Runtime Editor",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"editor/childEditors/manifestChanges/ChangesByAdminAndContentAndTranslationForTranslationMode04": {
+				group: "Runtime Editor",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"editor/childEditors/manifestChanges/ChangesByAdminAndContentAndTranslationForAllMode": {
+				group: "Runtime Editor",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
 			"designtime/editor/CardEditor": {
 				group: "Runtime Editor for Card",
 				coverage: {
 					only: [
 						"sap/ui/integration/designtime/editor",
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"designtime/editor/childCards/Basic": {
+				group: "Runtime Editor for Card",
+				coverage: {
+					only: [
+						"sap/ui/integration/designtime/editor",
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"designtime/editor/childCards/Navigation01": {
+				group: "Runtime Editor for Card",
+				coverage: {
+					only: [
+						"sap/ui/integration/designtime/editor",
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"designtime/editor/childCards/Navigation02": {
+				group: "Runtime Editor for Card",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"designtime/editor/childCards/SaveChanges01": {
+				group: "Runtime Editor for Card",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"designtime/editor/childCards/SaveChanges02": {
+				group: "Runtime Editor for Card",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"designtime/editor/childCards/manifestChanges/ChangesByAdminForAdminMode": {
+				group: "Runtime Editor for Card",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"designtime/editor/childCards/manifestChanges/ChangesByAdminForContentMode": {
+				group: "Runtime Editor for Card",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"designtime/editor/childCards/manifestChanges/ChangesByAdminForTranslationMode01": {
+				group: "Runtime Editor for Card",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"designtime/editor/childCards/manifestChanges/ChangesByAdminForTranslationMode02": {
+				group: "Runtime Editor for Card",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"designtime/editor/childCards/manifestChanges/ChangesByAdminForTranslationMode03": {
+				group: "Runtime Editor for Card",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"designtime/editor/childCards/manifestChanges/ChangesByAdminForTranslationMode04": {
+				group: "Runtime Editor for Card",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"designtime/editor/childCards/manifestChanges/ChangesByAdminForAllMode": {
+				group: "Runtime Editor for Card",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"designtime/editor/childCards/manifestChanges/ChangesByContentForContentMode": {
+				group: "Runtime Editor for Card",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"designtime/editor/childCards/manifestChanges/ChangesByContentForTranslationMode01": {
+				group: "Runtime Editor for Card",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"designtime/editor/childCards/manifestChanges/ChangesByContentForTranslationMode02": {
+				group: "Runtime Editor for Card",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"designtime/editor/childCards/manifestChanges/ChangesByContentForTranslationMode03": {
+				group: "Runtime Editor for Card",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"designtime/editor/childCards/manifestChanges/ChangesByContentForTranslationMode04": {
+				group: "Runtime Editor for Card",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"designtime/editor/childCards/manifestChanges/ChangesByContentForAllMode": {
+				group: "Runtime Editor for Card",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"designtime/editor/childCards/manifestChanges/ChangesByTranslationForTranslationMode01": {
+				group: "Runtime Editor for Card",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"designtime/editor/childCards/manifestChanges/ChangesByTranslationForTranslationMode02": {
+				group: "Runtime Editor for Card",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"designtime/editor/childCards/manifestChanges/ChangesByTranslationForTranslationMode03": {
+				group: "Runtime Editor for Card",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"designtime/editor/childCards/manifestChanges/ChangesByTranslationForTranslationMode04": {
+				group: "Runtime Editor for Card",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"designtime/editor/childCards/manifestChanges/ChangesByTranslationForAllMode": {
+				group: "Runtime Editor for Card",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"designtime/editor/childCards/manifestChanges/ChangesByAdminAndContentForContentMode": {
+				group: "Runtime Editor for Card",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"designtime/editor/childCards/manifestChanges/ChangesByAdminAndContentForTranslationMode01": {
+				group: "Runtime Editor for Card",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"designtime/editor/childCards/manifestChanges/ChangesByAdminAndContentForTranslationMode02": {
+				group: "Runtime Editor for Card",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"designtime/editor/childCards/manifestChanges/ChangesByAdminAndContentForTranslationMode03": {
+				group: "Runtime Editor for Card",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"designtime/editor/childCards/manifestChanges/ChangesByAdminAndContentForTranslationMode04": {
+				group: "Runtime Editor for Card",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"designtime/editor/childCards/manifestChanges/ChangesByAdminAndContentForAllMode": {
+				group: "Runtime Editor for Card",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"designtime/editor/childCards/manifestChanges/ChangesByAdminAndTranslationForTranslationMode01": {
+				group: "Runtime Editor for Card",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"designtime/editor/childCards/manifestChanges/ChangesByAdminAndTranslationForTranslationMode02": {
+				group: "Runtime Editor for Card",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"designtime/editor/childCards/manifestChanges/ChangesByAdminAndTranslationForTranslationMode03": {
+				group: "Runtime Editor for Card",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"designtime/editor/childCards/manifestChanges/ChangesByAdminAndTranslationForTranslationMode04": {
+				group: "Runtime Editor for Card",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"designtime/editor/childCards/manifestChanges/ChangesByAdminAndTranslationForAllMode": {
+				group: "Runtime Editor for Card",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"designtime/editor/childCards/manifestChanges/ChangesByContentAndTranslationForTranslationMode01": {
+				group: "Runtime Editor for Card",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"designtime/editor/childCards/manifestChanges/ChangesByContentAndTranslationForTranslationMode02": {
+				group: "Runtime Editor for Card",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"designtime/editor/childCards/manifestChanges/ChangesByContentAndTranslationForTranslationMode03": {
+				group: "Runtime Editor for Card",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"designtime/editor/childCards/manifestChanges/ChangesByContentAndTranslationForTranslationMode04": {
+				group: "Runtime Editor for Card",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"designtime/editor/childCards/manifestChanges/ChangesByContentAndTranslationForAllMode": {
+				group: "Runtime Editor for Card",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"designtime/editor/childCards/manifestChanges/ChangesByAdminAndContentAndTranslationForAdminMode": {
+				group: "Runtime Editor for Card",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"designtime/editor/childCards/manifestChanges/ChangesByAdminAndContentAndTranslationForContentMode": {
+				group: "Runtime Editor for Card",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"designtime/editor/childCards/manifestChanges/ChangesByAdminAndContentAndTranslationForTranslationMode01": {
+				group: "Runtime Editor for Card",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"designtime/editor/childCards/manifestChanges/ChangesByAdminAndContentAndTranslationForTranslationMode02": {
+				group: "Runtime Editor for Card",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"designtime/editor/childCards/manifestChanges/ChangesByAdminAndContentAndTranslationForTranslationMode03": {
+				group: "Runtime Editor for Card",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"designtime/editor/childCards/manifestChanges/ChangesByAdminAndContentAndTranslationForTranslationMode04": {
+				group: "Runtime Editor for Card",
+				coverage: {
+					only: [
+						"sap/ui/integration/editor"
+					]
+				},
+				sinon: false
+			},
+
+			"designtime/editor/childCards/manifestChanges/ChangesByAdminAndContentAndTranslationForAllMode": {
+				group: "Runtime Editor for Card",
+				coverage: {
+					only: [
 						"sap/ui/integration/editor"
 					]
 				},
