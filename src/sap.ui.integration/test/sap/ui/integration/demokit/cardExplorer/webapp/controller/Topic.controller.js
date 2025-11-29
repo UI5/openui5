@@ -12,27 +12,29 @@ sap.ui.define([
 	 */
 	var TopicFrameMessageManager = {
 		_fnCurrentCb: null,
-		_iCurrentCbCallCount: 0,
+		_iBootFinishedCallCount: 0,
 		_registered: false,
-		_onTopicBootFinished: function () {
-			if (this._fnCurrentCb && this._iCurrentCbCallCount === 0) {
-				this._iCurrentCbCallCount = 1;
+		_onMessage: function (oEvent) {
+			if (this._fnCurrentCb) {
+				if (oEvent.data === "bootFinished" && this._iBootFinishedCallCount === 0) {
+					this._iBootFinishedCallCount = 1;
+				}
 				this._fnCurrentCb.apply(this, arguments);
 			}
 		},
 		startListening: function (fnCb) {
 			this._fnCurrentCb = fnCb;
-			this._iCurrentCbCallCount = 0;
+			this._iBootFinishedCallCount = 0;
 
 			if (this._registered) {
 				return;
 			}
 
-			window.addEventListener("message", this._onTopicBootFinished.bind(this));
+			window.addEventListener("message", this._onMessage.bind(this));
 			this._registered = true;
 		},
 		stopListening: function () {
-			window.removeEventListener("message", this._onTopicBootFinished.bind(this));
+			window.removeEventListener("message", this._onMessage.bind(this));
 		}
 	};
 
@@ -61,6 +63,35 @@ sap.ui.define([
 		_onFrameMessage: function (oEvent) {
 			if (oEvent.data === "bootFinished") {
 				this._onFrameLoaded();
+			} else if (oEvent.data.channel === "updateURL") {
+				this._updateURLHash(oEvent.data.targetId);
+			}
+		},
+
+		_updateURLHash: function (sTargetId) {
+			const sCurrentHash = this.getRouter().getHashChanger().getHash(),
+				oRouteInfo = this.getRouter().getRouteInfoByHash(sCurrentHash);
+
+			if (oRouteInfo && oRouteInfo.name) {
+				const oArgs = oRouteInfo.arguments;
+
+				const mNewArgs = {
+					topic: oArgs.topic
+				};
+
+				if (oArgs.subTopic && this.isSubTopic(oArgs.subTopic)) {
+					mNewArgs.subTopic = oArgs.subTopic;
+					mNewArgs.id = sTargetId;
+				} else {
+					mNewArgs.subTopic = sTargetId;
+				}
+
+				if (oRouteInfo.name === "default") {
+					oRouteInfo.name = "overview";
+					mNewArgs.topic = "introduction";
+				}
+
+				this.getRouter().navTo(oRouteInfo.name, mNewArgs, true);
 			}
 		},
 

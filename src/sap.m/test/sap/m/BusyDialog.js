@@ -5,9 +5,8 @@ sap.ui.define([
   "sap/ui/model/json/JSONModel",
   "sap/m/Page",
   "sap/m/Button",
-  "jquery.sap.script",
   "sap/ui/core/HTML"
-], function(nextUIUpdate, App, BusyDialog, JSONModel, Page, Button, jQuery, HTML) {
+], function(nextUIUpdate, App, BusyDialog, JSONModel, Page, Button, HTML) {
   "use strict";
   // Note: the HTML page 'BusyDialog.html' loads this module via data-sap-ui-on-init
 
@@ -69,9 +68,9 @@ sap.ui.define([
 			  width: _buttonWidth,
 			  press: function () {
 				  defaultLightBusyDialog.open();
-				  jQuery.sap.delayedCall(2000, this, function () {
+				  setTimeout(function () {
 					  defaultLightBusyDialog.close();
-				  });
+				  }, 2000);
 			  }
 		  }),
 		  new Button({
@@ -101,47 +100,47 @@ sap.ui.define([
 				  // =========================================================================================
 				  // test the title
 				  // =========================================================================================
-				  jQuery.sap.delayedCall(delay += step, this, function () {
+				  setTimeout(function () {
 					  standartBusyDialog.setTitle('');
-				  });
+				  }, delay += step);
 
-				  jQuery.sap.delayedCall(delay += step, this, function () {
+				  setTimeout(function () {
 					  standartBusyDialog.setTitle('Set Title');
-				  });
+				  }, delay += step);
 
 				  // =========================================================================================
 				  // test the toolbar
 				  // =========================================================================================
-				  jQuery.sap.delayedCall(delay += step, this, function () {
+				  setTimeout(function () {
 					  standartBusyDialog.setCancelButtonText('');
-				  });
+				  }, delay += step);
 
-				  jQuery.sap.delayedCall(delay += step, this, function () {
+				  setTimeout(function () {
 					  standartBusyDialog.setCancelButtonText('SetCancelButtonText');
-				  });
+				  }, delay += step);
 
 				  // =========================================================================================
 				  // test the toolbar visibility
 				  // =========================================================================================
-				  jQuery.sap.delayedCall(delay += step, this, function () {
+				  setTimeout(function () {
 					  standartBusyDialog.setShowCancelButton(false);
-				  });
+				  }, delay += step);
 
-				  jQuery.sap.delayedCall(delay += step, this, function () {
+				  setTimeout(function () {
 					  standartBusyDialog.setShowCancelButton(true);
-				  });
+				  }, delay += step);
 
 				  // =========================================================================================
 				  // test the text
 				  // =========================================================================================
 
-				  jQuery.sap.delayedCall(delay += step, this, function () {
+				  setTimeout(function () {
 					  standartBusyDialog.setText('');
-				  });
+				  }, delay += step);
 
-				  jQuery.sap.delayedCall(delay += step, this, function () {
+				  setTimeout(function () {
 					  standartBusyDialog.setText('Set text');
-				  });
+				  }, delay += step);
 			  }
 		  }),
 		  new Button({
@@ -157,9 +156,9 @@ sap.ui.define([
 			  press: function () {
 				  standartNoHeaderAndFooterBusyDialog.open();
 
-				  jQuery.sap.delayedCall(2000, this, function () {
+				  setTimeout(function () {
 					  standartNoHeaderAndFooterBusyDialog.close();
-				  });
+				  }, 2000);
 			  }
 		  }),
 		  new HTML({content: "<br>"}),
@@ -202,9 +201,9 @@ sap.ui.define([
 	  title: 'busyDialogInstantOpen'
   }).open();
 
-  jQuery.sap.delayedCall(3500, this, function () {
+  setTimeout(function () {
 	  busyDialogInstantOpen.close();
-  });
+  }, 3500);
 
   app.addPage(initialPage).placeAt('content');
 });

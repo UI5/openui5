@@ -16,7 +16,6 @@ sap.ui.define([
 	"sap/m/Input",
 	"sap/m/TextArea",
 	"sap/m/Select",
-	"sap/ui/thirdparty/jquery",
 	"sap/ui/core/LayoutData",
 	"sap/ui/core/Element",
 	"sap/m/Page",
@@ -24,8 +23,9 @@ sap.ui.define([
 	"sap/m/ToolbarSpacer",
 	"sap/m/Toolbar",
 	"sap/m/CheckBox",
-	"sap/m/App"
-], function(Log, MessagePopover, JSONModel, MessageItem, Button, IconPool, mobileLibrary, Item, SimpleForm, layoutLibrary, Title, Label, Input, TextArea, Select, jQuery, LayoutData, Element, Page, MTitle, ToolbarSpacer, Toolbar, CheckBox, App) {
+	"sap/m/App",
+	"sap/ui/thirdparty/jquery"
+], function(Log, MessagePopover, JSONModel, MessageItem, Button, IconPool, mobileLibrary, Item, SimpleForm, layoutLibrary, Title, Label, Input, TextArea, Select, LayoutData, Element, Page, MTitle, ToolbarSpacer, Toolbar, CheckBox, App, jQuery) {
 	"use strict";
 
 	// shortcut for sap.m.InputType
@@ -303,7 +303,7 @@ sap.ui.define([
 					return new Item({key: item, text: item});
 				}),
 				change: function () {
-					jQuery.sap.log.info("Event fired: \"change\" value property to " +
+					Log.info("Event fired: \"change\" value property to " +
 					this.getSelectedKey() + " on " + this);
 				}
 			}),

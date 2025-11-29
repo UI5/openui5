@@ -6,10 +6,10 @@ sap.ui.define([
   "sap/m/ActionSheet",
   "sap/m/Button",
   "sap/m/library",
-  "jquery.sap.global",
   "sap/m/Page",
-  "sap/m/Bar"
-], function(App, List, StandardListItem, JSONModel, ActionSheet, Button, mobileLibrary, jQuery, Page, Bar) {
+  "sap/m/Bar",
+  "sap/base/Log"
+], function(App, List, StandardListItem, JSONModel, ActionSheet, Button, mobileLibrary, Page, Bar, Log) {
   "use strict";
 
   // shortcut for sap.m.PlacementType
@@ -100,7 +100,7 @@ sap.ui.define([
 	  ],
 	  placement: PlacementType.Bottom,
 	  cancelButtonPress: function () {
-		  jQuery.sap.log.info("sap.m.ActionSheet: cancelButton is pressed");
+		  Log.info("sap.m.ActionSheet: cancelButton is pressed");
 	  }
   });
 
@@ -377,7 +377,7 @@ sap.ui.define([
 	  ],
 	  placement: PlacementType.Bottom,
 	  cancelButtonPress: function () {
-		  jQuery.sap.log.info("sap.m.ActionSheet: cancelButton is pressed");
+		  Log.info("sap.m.ActionSheet: cancelButton is pressed");
 	  }
   });
 

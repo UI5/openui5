@@ -234,12 +234,18 @@ sap.ui.define([
 	 * @private
 	 */
 	ObjectStatus.prototype._getImageControl = function() {
-		if (!this._oImageControl || this.getTooltip()) {
+		var sIcon = this.getIcon() ?? "";
+		var bTooltipPresent = !!this.getTooltip();
+		// Recreate or update the image control when:
+		// - there's no existing image control
+		// - the bound icon changed (src differs)
+		// - a tooltip is present
+		if (!this._oImageControl || (this._oImageControl.getSrc && this._oImageControl.getSrc() !== sIcon) || bTooltipPresent) {
 			var sImgId = this.getId() + '-icon',
 				bIsIconOnly = !this.getText() && !this.getTitle(),
 				bUseIconTooltip = !this.getText() && !this.getTitle() && !this.getTooltip(),
 				mProperties = {
-					src : this.getIcon(),
+					src : sIcon,
 					densityAware : this.getIconDensityAware(),
 					useIconTooltip : bUseIconTooltip,
 					decorative: !this.getActive() && !bIsIconOnly

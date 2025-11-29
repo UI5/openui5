@@ -1,6 +1,5 @@
 sap.ui.define([
   "sap/ui/core/IconPool",
-  "jquery.sap.mobile",
   "sap/m/ObjectAttribute",
   "sap/m/ObjectHeader",
   "sap/ui/core/library",
@@ -15,7 +14,6 @@ sap.ui.define([
   "sap/m/App"
 ], function(
   IconPool,
-  jQuery,
   ObjectAttribute,
   ObjectHeader,
   coreLibrary,
@@ -37,10 +35,7 @@ sap.ui.define([
   // shortcut for sap.ui.core.ValueState
   const ValueState = coreLibrary.ValueState;
 
-  // shortcut for jQuery.device.is
-  const is = jQuery.device.is;
-
-  is.phone ? "sapUiSmallMargin" : "sapUiMediumMargin";
+  Device.system.phone ? "sapUiSmallMargin" : "sapUiMediumMargin";
 
   var attrs = [ new ObjectAttribute({
 	  text : "Ñagçyfox Contract #D1234567890"

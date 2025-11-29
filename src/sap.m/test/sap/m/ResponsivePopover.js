@@ -9,11 +9,11 @@ sap.ui.define([
   "sap/m/ToolbarSpacer",
   "sap/m/OverflowToolbar",
   "sap/m/ResponsivePopover",
-  "jquery.sap.global",
   "sap/m/Bar",
   "sap/m/NavContainer",
   "sap/m/Page",
-  "sap/m/Label"
+  "sap/m/Label",
+  "sap/base/Log"
 ], function(
   App,
   List,
@@ -25,11 +25,11 @@ sap.ui.define([
   ToolbarSpacer,
   OverflowToolbar,
   ResponsivePopover,
-  jQuery,
   Bar,
   NavContainer,
   Page,
-  Label
+  Label,
+  Log
 ) {
   "use strict";
 
@@ -192,16 +192,16 @@ sap.ui.define([
 	  endButton: oEndButton,
 	  horizontalScrolling: false,
 	  beforeOpen: function(oEvent){
-		  jQuery.sap.log.info("before popover opens!!!");
+		  Log.info("before popover opens!!!");
 	  },
 	  afterOpen: function(oEvent){
-		  jQuery.sap.log.info("popover is opened finally!!!");
+		  Log.info("popover is opened finally!!!");
 	  },
 	  beforeClose: function(oEvent){
-		  jQuery.sap.log.info("before popover closes!!!");
+		  Log.info("before popover closes!!!");
 	  },
 	  afterClose: function(oEvent){
-		  jQuery.sap.log.info("popover is closed properly!!!");
+		  Log.info("popover is closed properly!!!");
 	  },
 	  content: [
 		  oList
@@ -215,16 +215,16 @@ sap.ui.define([
 	  showHeader: true,
 	  horizontalScrolling: false,
 	  beforeOpen: function (oEvent) {
-		  jQuery.sap.log.info("before popover opens!!!");
+		  Log.info("before popover opens!!!");
 	  },
 	  afterOpen: function (oEvent) {
-		  jQuery.sap.log.info("popover is opened finally!!!");
+		  Log.info("popover is opened finally!!!");
 	  },
 	  beforeClose: function (oEvent) {
-		  jQuery.sap.log.info("before popover closes!!!");
+		  Log.info("before popover closes!!!");
 	  },
 	  afterClose: function (oEvent) {
-		  jQuery.sap.log.info("popover is closed properly!!!");
+		  Log.info("popover is closed properly!!!");
 	  },
 	  content: [
 		  oList2
@@ -331,16 +331,16 @@ sap.ui.define([
 	  contentWidth: "320px",
 	  contentHeight: "400px",
 	  beforeOpen: function(oEvent){
-		  jQuery.sap.log.info("before popover opens!!!");
+		  Log.info("before popover opens!!!");
 	  },
 	  afterOpen: function(oEvent){
-		  jQuery.sap.log.info("popover is opened finally!!!");
+		  Log.info("popover is opened finally!!!");
 	  },
 	  beforeClose: function(oEvent){
-		  jQuery.sap.log.info("before popover closes!!!");
+		  Log.info("before popover closes!!!");
 	  },
 	  afterClose: function(oEvent){
-		  jQuery.sap.log.info("popover is closed properly!!!");
+		  Log.info("popover is closed properly!!!");
 	  },
 	  content: [
 		  oNavContainer

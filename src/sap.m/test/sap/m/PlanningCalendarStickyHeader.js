@@ -12,12 +12,12 @@ sap.ui.define([
   "sap/m/PlanningCalendarRow",
   "sap/ui/unified/library",
   "sap/ui/unified/CalendarAppointment",
-  "jquery.sap.global",
   "sap/ui/core/format/DateFormat",
   "sap/m/Title",
   "sap/m/PlanningCalendar",
   "sap/ui/unified/DateTypeRange",
-  "sap/m/Page"
+  "sap/m/Page",
+  "sap/base/Log"
 ], function(
   Popover,
   Element,
@@ -32,12 +32,12 @@ sap.ui.define([
   PlanningCalendarRow,
   unifiedLibrary,
   CalendarAppointment,
-  jQuery,
   DateFormat,
   Title,
   PlanningCalendar,
   DateTypeRange,
-  Page
+  Page,
+  Log
 ) {
   "use strict";
 

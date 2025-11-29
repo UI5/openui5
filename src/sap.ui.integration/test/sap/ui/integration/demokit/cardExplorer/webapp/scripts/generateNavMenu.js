@@ -50,6 +50,20 @@
 		var link = document.createElement("a");
 		link.innerText = heading.innerText;
 		link.href = "#" + heading.id;
+
+		link.addEventListener("click", function(event) {
+			const targetId = heading.id;
+
+			// Check if we're in an iframe
+			if (window.parent && window.parent !== window) {
+				window.parent.postMessage({
+					channel: "updateURL",
+					targetId: targetId
+				}, window.location.origin);
+
+			}
+		});
+
 		wrapper.appendChild(link);
 		navMenu.appendChild(wrapper);
 	});

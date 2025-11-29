@@ -3,9 +3,10 @@ sap.ui.define([
   "sap/ui/core/IconPool",
   "sap/ui/core/Element",
   "sap/m/RangeSlider",
-  "sap/ui/thirdparty/jquery",
-  "sap/m/SliderTooltipBaseRenderer"
-], function(SliderTooltipBase, IconPool, Element, RangeSlider, jQuery, SliderTooltipBaseRenderer) {
+  "sap/m/SliderTooltipBaseRenderer",
+  "sap/base/Log",
+  "sap/ui/thirdparty/jquery"
+], function(SliderTooltipBase, IconPool, Element, RangeSlider, SliderTooltipBaseRenderer, Log, jQuery) {
   "use strict";
   // Note: the HTML page 'RangeSliderWithCustomElements.html' loads this module via data-sap-ui-on-init
 
@@ -38,10 +39,10 @@ sap.ui.define([
 	  visible: true,
 	  enabled: true,
 	  liveChange: function (oControlEvent) {
-		  jQuery.sap.log.info("Event fired: 'liveChange' range property to " + oControlEvent.getParameter("range") + " on " + this);
+		  Log.info("Event fired: 'liveChange' range property to " + oControlEvent.getParameter("range") + " on " + this);
 	  },
 	  change: function (oControlEvent) {
-		  jQuery.sap.log.info("Event fired: 'change' range property to " + oControlEvent.getParameter("range") + " on " + this);
+		  Log.info("Event fired: 'change' range property to " + oControlEvent.getParameter("range") + " on " + this);
 	  }
   }).placeAt("content7");
 
@@ -141,10 +142,10 @@ sap.ui.define([
 	  visible: true,
 	  enabled: true,
 	  liveChange: function (oControlEvent) {
-		  jQuery.sap.log.info("Event fired: 'liveChange' range property to " + oControlEvent.getParameter("range") + " on " + this);
+		  Log.info("Event fired: 'liveChange' range property to " + oControlEvent.getParameter("range") + " on " + this);
 	  },
 	  change: function (oControlEvent) {
-		  jQuery.sap.log.info("Event fired: 'change' range property to " + oControlEvent.getParameter("range") + " on " + this);
+		  Log.info("Event fired: 'change' range property to " + oControlEvent.getParameter("range") + " on " + this);
 	  }
   }).placeAt("content8").addStyleClass("rangeSlider-margin");
 
@@ -161,10 +162,10 @@ sap.ui.define([
 	  visible: true,
 	  enabled: true,
 	  liveChange: function (oControlEvent) {
-		  jQuery.sap.log.info("Event fired: 'liveChange' range property to " + oControlEvent.getParameter("range") + " on " + this);
+		  Log.info("Event fired: 'liveChange' range property to " + oControlEvent.getParameter("range") + " on " + this);
 	  },
 	  change: function (oControlEvent) {
-		  jQuery.sap.log.info("Event fired: 'change' range property to " + oControlEvent.getParameter("range") + " on " + this);
+		  Log.info("Event fired: 'change' range property to " + oControlEvent.getParameter("range") + " on " + this);
 	  }
   }).placeAt("content9").addStyleClass("rangeSlider-margin");
 });

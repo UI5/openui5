@@ -7,10 +7,10 @@ sap.ui.define([
   "sap/m/CheckBox",
   "sap/m/ProgressIndicator",
   "sap/m/Toolbar",
-  "jquery.sap.global",
   "sap/ui/model/json/JSONModel",
-  "sap/ui/table/utils/TableUtils"
-], function(Button, TreeTable, tableLibrary, Column, Text, CheckBox, ProgressIndicator, Toolbar, jQuery, JSONModel, TableUtils) {
+  "sap/ui/table/utils/TableUtils",
+  "sap/base/Log"
+], function(Button, TreeTable, tableLibrary, Column, Text, CheckBox, ProgressIndicator, Toolbar, JSONModel, TableUtils, Log) {
   "use strict";
 
   // shortcut for sap.ui.table.SelectionMode
@@ -45,13 +45,13 @@ sap.ui.define([
   });
 
   oTable.attachToggleOpenState(function(oEvent) {
-	  jQuery.sap.log.info("ToggleOpenState: rowIndex: " + oEvent.getParameter("rowIndex") +
+	  Log.info("ToggleOpenState: rowIndex: " + oEvent.getParameter("rowIndex") +
 						  " - rowContext: " + oEvent.getParameter("rowContext") +
 						  " - expanded? " + oEvent.getParameter("expanded"));
   });
 
   oTable.attachRowSelectionChange(function(oEvent) {
-	  jQuery.sap.log.info("RowSelectionChange: rowIndex: " + oEvent.getParameter("rowIndex") +
+	  Log.info("RowSelectionChange: rowIndex: " + oEvent.getParameter("rowIndex") +
 						  " - rowContext: " + oEvent.getParameter("rowContext"));
   });
 

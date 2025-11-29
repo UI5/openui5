@@ -5,8 +5,8 @@ sap.ui.define([
 	"sap/ui/core/Item",
 	"sap/m/Select",
 	"sap/m/VBox",
-	"jquery.sap.global"
-], function(Page, App, JSONModel, Item, Select, VBox, jQuery) {
+	"sap/base/Log"
+], function(Page, App, JSONModel, Item, Select, VBox, Log) {
 	"use strict";
 	var mData = {
 		"items": [
@@ -384,7 +384,7 @@ sap.ui.define([
 		},
 
 		change: function (oControlEvent) {
-			jQuery.sap.log.info("Event fired: 'change' value property to " + oControlEvent.getParameter("selectedItem") + " on " + this);
+			Log.info("Event fired: 'change' value property to " + oControlEvent.getParameter("selectedItem") + " on " + this);
 		}
 	});
 

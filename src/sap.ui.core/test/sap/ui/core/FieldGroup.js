@@ -1,18 +1,18 @@
 sap.ui.define([
   "sap/ui/layout/VerticalLayout",
-  "jquery.sap.global",
   "sap/ui/layout/form/SimpleForm",
   "sap/m/Label",
   "sap/m/Input",
   "sap/m/CheckBox",
-  "sap/m/DatePicker"
-], function(VerticalLayout, jQuery, SimpleForm, Label, Input, CheckBox, DatePicker) {
+  "sap/m/DatePicker",
+  "sap/base/Log"
+], function(VerticalLayout, SimpleForm, Label, Input, CheckBox, DatePicker, Log) {
   "use strict";
   // Note: the HTML page 'FieldGroup.html' loads this module via data-sap-ui-on-init
 
   var oVerticalLayout = new VerticalLayout({width:"100%"});
   oVerticalLayout.attachValidateFieldGroup(function(oEvent) {
-	  jQuery.sap.log.info("Validate " + oEvent.mParameters.fieldGroupIds[0]);
+	  Log.info("Validate " + oEvent.mParameters.fieldGroupIds[0]);
   });
   var oSimpleForm = new SimpleForm({
 	  width: "100%",

@@ -8,8 +8,8 @@ sap.ui.define([
 	"sap/m/RangeSlider",
 	"sap/m/ResponsiveScale",
 	"sap/m/Title",
-	"jquery.sap.global"
-], async function(Core, HTML, App, Page, RangeSlider, ResponsiveScale, Title, jQuery) {
+	"sap/base/Log"
+], async function(Core, HTML, App, Page, RangeSlider, ResponsiveScale, Title, Log) {
 	"use strict";
 
 	await Core.ready();
@@ -18,10 +18,10 @@ sap.ui.define([
 		oRangeSlider1 = new RangeSlider("rangeSlider1", {
 			range: [0, 100],
 			liveChange: function (oControlEvent) {
-				jQuery.sap.log.info("Event fired: 'liveChange' range property to " + oControlEvent.getParameter("range") + " on " + this);
+				Log.info("Event fired: 'liveChange' range property to " + oControlEvent.getParameter("range") + " on " + this);
 			},
 			change: function (oControlEvent) {
-				jQuery.sap.log.info("Event fired: 'change' range property to " + oControlEvent.getParameter("range") + " on " + this);
+				Log.info("Event fired: 'change' range property to " + oControlEvent.getParameter("range") + " on " + this);
 			}
 		}),
 
@@ -31,10 +31,10 @@ sap.ui.define([
 			min: 50,
 			max: 150,
 			liveChange: function(oControlEvent) {
-				jQuery.sap.log.info("Event fired: 'liveChange' range property to " + oControlEvent.getParameter("range") + " on " + this);
+				Log.info("Event fired: 'liveChange' range property to " + oControlEvent.getParameter("range") + " on " + this);
 			},
 			change : function(oControlEvent) {
-				jQuery.sap.log.info("Event fired: 'change' range property to " + oControlEvent.getParameter("range") + " on " + this);
+				Log.info("Event fired: 'change' range property to " + oControlEvent.getParameter("range") + " on " + this);
 			}
 		}),
 
@@ -43,10 +43,10 @@ sap.ui.define([
 			showAdvancedTooltip: true,
 			enabled: false,
 			liveChange: function(oControlEvent) {
-				jQuery.sap.log.info("Event fired: 'liveChange' range property to " + oControlEvent.getParameter("range") + " on " + this);
+				Log.info("Event fired: 'liveChange' range property to " + oControlEvent.getParameter("range") + " on " + this);
 			},
 			change : function(oControlEvent) {
-				jQuery.sap.log.info("Event fired: 'change' range property to " + oControlEvent.getParameter("range") + " on " + this);
+				Log.info("Event fired: 'change' range property to " + oControlEvent.getParameter("range") + " on " + this);
 			},
 			showHandleTooltip: false
 		});
@@ -63,10 +63,10 @@ sap.ui.define([
 			max: 50,
 			range: [-45, 45],
 			liveChange: function(oControlEvent) {
-				jQuery.sap.log.info("Event fired: 'liveChange' range property to " + oControlEvent.getParameter("range") + " on " + this);
+				Log.info("Event fired: 'liveChange' range property to " + oControlEvent.getParameter("range") + " on " + this);
 			},
 			change : function(oControlEvent) {
-				jQuery.sap.log.info("Event fired: 'change' range property to " + oControlEvent.getParameter("range") + " on " + this);
+				Log.info("Event fired: 'change' range property to " + oControlEvent.getParameter("range") + " on " + this);
 			},
 			showHandleTooltip: false
 		});
@@ -79,10 +79,10 @@ sap.ui.define([
 			max: 100,
 			range: [-35, 40],
 			liveChange: function(oControlEvent) {
-				jQuery.sap.log.info("Event fired: 'liveChange' range property to " + oControlEvent.getParameter("range") + " on " + this);
+				Log.info("Event fired: 'liveChange' range property to " + oControlEvent.getParameter("range") + " on " + this);
 			},
 			change : function(oControlEvent) {
-				jQuery.sap.log.info("Event fired: 'change' range property to " + oControlEvent.getParameter("range") + " on " + this);
+				Log.info("Event fired: 'change' range property to " + oControlEvent.getParameter("range") + " on " + this);
 			},
 			showHandleTooltip: false,
 			inputsAsTooltips: true,
@@ -97,10 +97,10 @@ sap.ui.define([
 			max: 100,
 			range: [-35.5, 40],
 			liveChange: function(oControlEvent) {
-				jQuery.sap.log.info("Event fired: 'liveChange' range property to " + oControlEvent.getParameter("range") + " on " + this);
+				Log.info("Event fired: 'liveChange' range property to " + oControlEvent.getParameter("range") + " on " + this);
 			},
 			change : function(oControlEvent) {
-				jQuery.sap.log.info("Event fired: 'change' range property to " + oControlEvent.getParameter("range") + " on " + this);
+				Log.info("Event fired: 'change' range property to " + oControlEvent.getParameter("range") + " on " + this);
 			},
 			showHandleTooltip: false,
 			name: "RangeSlider11",

@@ -7,8 +7,8 @@ sap.ui.define([
 	"sap/m/Page",
 	"sap/m/ResponsiveScale",
 	"sap/m/Slider",
-	"jquery.sap.global"
-], async function(Core, HTML, App, Page, ResponsiveScale, Slider, jQuery) {
+	"sap/base/Log"
+], async function(Core, HTML, App, Page, ResponsiveScale, Slider, Log) {
 	"use strict";
 	await Core.ready();
 
@@ -16,10 +16,10 @@ sap.ui.define([
 		oSlider0 = new Slider("__slider0", {
 			value: 30,
 			liveChange: function(oControlEvent) {
-				jQuery.sap.log.info("Event fired: 'liveChange' value property to " + oControlEvent.getParameter("value") + " on " + this);
+				Log.info("Event fired: 'liveChange' value property to " + oControlEvent.getParameter("value") + " on " + this);
 			},
 			change : function(oControlEvent) {
-				jQuery.sap.log.info("Event fired: 'change' value property to " + oControlEvent.getParameter("value") + " on " + this);
+				Log.info("Event fired: 'change' value property to " + oControlEvent.getParameter("value") + " on " + this);
 			}
 		}),
 
@@ -32,10 +32,10 @@ sap.ui.define([
 			visible: true,
 			enabled: true,
 			liveChange: function(oControlEvent) {
-				jQuery.sap.log.info("Event fired: 'liveChange' value property to " + oControlEvent.getParameter("value") + " on " + this);
+				Log.info("Event fired: 'liveChange' value property to " + oControlEvent.getParameter("value") + " on " + this);
 			},
 			change : function(oControlEvent) {
-				jQuery.sap.log.info("Event fired: 'change' value property to " + oControlEvent.getParameter("value") + " on " + this);
+				Log.info("Event fired: 'change' value property to " + oControlEvent.getParameter("value") + " on " + this);
 			}
 		}),
 
@@ -49,10 +49,10 @@ sap.ui.define([
 			visible: true,
 			enabled: true,
 			liveChange: function(oControlEvent) {
-				jQuery.sap.log.info("Event fired: 'liveChange' value property to " + oControlEvent.getParameter("value") + " on " + this);
+				Log.info("Event fired: 'liveChange' value property to " + oControlEvent.getParameter("value") + " on " + this);
 			},
 			change : function(oControlEvent) {
-				jQuery.sap.log.info("Event fired: 'change' value property to " + oControlEvent.getParameter("value") + " on " + this);
+				Log.info("Event fired: 'change' value property to " + oControlEvent.getParameter("value") + " on " + this);
 			}
 		}),
 
@@ -66,10 +66,10 @@ sap.ui.define([
 			visible: true,
 			enabled: true,
 			liveChange: function(oControlEvent) {
-				jQuery.sap.log.info("Event fired: 'liveChange' value property to " + oControlEvent.getParameter("value") + " on " + this);
+				Log.info("Event fired: 'liveChange' value property to " + oControlEvent.getParameter("value") + " on " + this);
 			},
 			change : function(oControlEvent) {
-				jQuery.sap.log.info("Event fired: 'change' value property to " + oControlEvent.getParameter("value") + " on " + this);
+				Log.info("Event fired: 'change' value property to " + oControlEvent.getParameter("value") + " on " + this);
 			}
 		}),
 
@@ -77,10 +77,10 @@ sap.ui.define([
 			value: 27,
 			width: "10em",
 			liveChange: function(oControlEvent) {
-				jQuery.sap.log.info("Event fired: 'liveChange' value property to " + oControlEvent.getParameter("value") + " on " + this);
+				Log.info("Event fired: 'liveChange' value property to " + oControlEvent.getParameter("value") + " on " + this);
 			},
 			change : function(oControlEvent) {
-				jQuery.sap.log.info("Event fired: 'change' value property to " + oControlEvent.getParameter("value") + " on " + this);
+				Log.info("Event fired: 'change' value property to " + oControlEvent.getParameter("value") + " on " + this);
 			}
 		}),
 
@@ -89,10 +89,10 @@ sap.ui.define([
 			width: "15em",
 			enabled: false,
 			liveChange: function(oControlEvent) {
-				jQuery.sap.log.info("Event fired: 'liveChange' value property to " + oControlEvent.getParameter("value") + " on " + this);
+				Log.info("Event fired: 'liveChange' value property to " + oControlEvent.getParameter("value") + " on " + this);
 			},
 			change : function(oControlEvent) {
-				jQuery.sap.log.info("Event fired: 'change' value property to " + oControlEvent.getParameter("value") + " on " + this);
+				Log.info("Event fired: 'change' value property to " + oControlEvent.getParameter("value") + " on " + this);
 			}
 		}),
 
@@ -100,10 +100,10 @@ sap.ui.define([
 			value: 10.34,
 			step: 0.1,
 			liveChange: function(oControlEvent) {
-				jQuery.sap.log.info("Event fired: 'liveChange' value property to " + oControlEvent.getParameter("value") + " on " + this);
+				Log.info("Event fired: 'liveChange' value property to " + oControlEvent.getParameter("value") + " on " + this);
 			},
 			change : function(oControlEvent) {
-				jQuery.sap.log.info("Event fired: 'change' value property to " + oControlEvent.getParameter("value") + " on " + this);
+				Log.info("Event fired: 'change' value property to " + oControlEvent.getParameter("value") + " on " + this);
 			}
 		}),
 
@@ -113,10 +113,10 @@ sap.ui.define([
 			min: 0,
 			max: 500,
 			liveChange: function(oControlEvent) {
-				jQuery.sap.log.info("Event fired: 'liveChange' value property to " + oControlEvent.getParameter("value") + " on " + this);
+				Log.info("Event fired: 'liveChange' value property to " + oControlEvent.getParameter("value") + " on " + this);
 			},
 			change : function(oControlEvent) {
-				jQuery.sap.log.info("Event fired: 'change' value property to " + oControlEvent.getParameter("value") + " on " + this);
+				Log.info("Event fired: 'change' value property to " + oControlEvent.getParameter("value") + " on " + this);
 			}
 		}),
 
@@ -126,10 +126,10 @@ sap.ui.define([
 			step: 0.1,
 			min: 50,
 			liveChange: function(oControlEvent) {
-				jQuery.sap.log.info("Event fired: 'liveChange' value property to " + oControlEvent.getParameter("value") + " on " + this);
+				Log.info("Event fired: 'liveChange' value property to " + oControlEvent.getParameter("value") + " on " + this);
 			},
 			change : function(oControlEvent) {
-				jQuery.sap.log.info("Event fired: 'change' value property to " + oControlEvent.getParameter("value") + " on " + this);
+				Log.info("Event fired: 'change' value property to " + oControlEvent.getParameter("value") + " on " + this);
 			},
 			showAdvancedTooltip: true
 		}),
@@ -141,10 +141,10 @@ sap.ui.define([
 			min: 0,
 			max: 500,
 			liveChange: function(oControlEvent) {
-				jQuery.sap.log.info("Event fired: 'liveChange' value property to " + oControlEvent.getParameter("value") + " on " + this);
+				Log.info("Event fired: 'liveChange' value property to " + oControlEvent.getParameter("value") + " on " + this);
 			},
 			change : function(oControlEvent) {
-				jQuery.sap.log.info("Event fired: 'change' value property to " + oControlEvent.getParameter("value") + " on " + this);
+				Log.info("Event fired: 'change' value property to " + oControlEvent.getParameter("value") + " on " + this);
 			},
 			showAdvancedTooltip: true,
 			inputsAsTooltips: true
@@ -166,10 +166,10 @@ sap.ui.define([
 			width: "70%",
 			enableTickmarks: true,
 			liveChange: function(oControlEvent) {
-				jQuery.sap.log.info("Event fired: 'liveChange' value property to " + oControlEvent.getParameter("value") + " on " + this);
+				Log.info("Event fired: 'liveChange' value property to " + oControlEvent.getParameter("value") + " on " + this);
 			},
 			change : function(oControlEvent) {
-				jQuery.sap.log.info("Event fired: 'change' value property to " + oControlEvent.getParameter("value") + " on " + this);
+				Log.info("Event fired: 'change' value property to " + oControlEvent.getParameter("value") + " on " + this);
 			},
 			scale: new ResponsiveScale({
 				tickmarksBetweenLabels: 2
@@ -183,10 +183,10 @@ sap.ui.define([
 			width: "300px",
 			enableTickmarks: true,
 			liveChange: function(oControlEvent) {
-				jQuery.sap.log.info("Event fired: 'liveChange' value property to " + oControlEvent.getParameter("value") + " on " + this);
+				Log.info("Event fired: 'liveChange' value property to " + oControlEvent.getParameter("value") + " on " + this);
 			},
 			change : function(oControlEvent) {
-				jQuery.sap.log.info("Event fired: 'change' value property to " + oControlEvent.getParameter("value") + " on " + this);
+				Log.info("Event fired: 'change' value property to " + oControlEvent.getParameter("value") + " on " + this);
 			},
 			scale: new ResponsiveScale({
 				tickmarksBetweenLabels: 2

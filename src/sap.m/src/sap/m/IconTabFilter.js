@@ -1222,6 +1222,16 @@ sap.ui.define([
 				oListItem.addCustomData(aCustomData[iCustomDataItemIndex].clone());
 			}
 
+			// clone tooltip aggregation
+			var oTooltip = oItem.getTooltip();
+			if (oTooltip) {
+				if (typeof oTooltip === "string") {
+					oListItem.setTooltip(oTooltip);
+				} else if (oTooltip.clone) {
+					oListItem.setTooltip(oTooltip.clone());
+				}
+			}
+
 			oListItem._oRealItem = oItem; // link list item to its underlying item from the items aggregation
 			oSelectList.addItem(oListItem);
 

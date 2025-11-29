@@ -23,11 +23,12 @@ sap.ui.define([
   "sap/m/VBox",
   "sap/m/SegmentedButton",
   "sap/m/SegmentedButtonItem",
-  "sap/ui/thirdparty/jquery",
   "sap/m/Image",
   "sap/ui/Device",
   "sap/m/Carousel",
-  "sap/m/App"
+  "sap/m/App",
+  "sap/base/Log",
+  "sap/ui/thirdparty/jquery"
 ], async function(
   ImageRenderer,
   XMLView,
@@ -53,11 +54,12 @@ sap.ui.define([
   VBox,
   SegmentedButton,
   SegmentedButtonItem,
-  jQuery,
   Image,
   Device,
   Carousel,
-  App
+  App,
+  Log,
+  jQuery
 ) {
   "use strict";
 
@@ -279,13 +281,13 @@ sap.ui.define([
   //Example of usage for 'BeforeShow' and 'AfterHide' events
   demoPage.addEventDelegate({
 	  onBeforeShow: function(evt) {
-		  jQuery.sap.log.info("sap.m.Page: demo page is going to be shown");
+		  Log.info("sap.m.Page: demo page is going to be shown");
 	  },
 	  onBeforeFirstShow: function(evt) {
-		  jQuery.sap.log.info("sap.m.Page: first time, demo page is going to be shown");
+		  Log.info("sap.m.Page: first time, demo page is going to be shown");
 	  },
 	  onAfterHide: function(evt) {
-		  jQuery.sap.log.info("sap.m.Page: demo page has been hidden");
+		  Log.info("sap.m.Page: demo page has been hidden");
 		  //Remove content of 'demoPage' when it is discarded from the carousel
 		  /* if(demoPage.getContent().length > 0) {
 			  //Make sure you do not trigger re-rendering!
@@ -470,8 +472,8 @@ sap.ui.define([
 
   //Listen to 'pageChanged' events
   carousel.attachPageChanged(function(oControlEvent) {
-	  jQuery.sap.log.info("sap.m.Carousel: page changed: old: " + oControlEvent.getParameters().oldActivePageId );
-	  jQuery.sap.log.info("                              new: " + oControlEvent.getParameters().newActivePageId );
+	  Log.info("sap.m.Carousel: page changed: old: " + oControlEvent.getParameters().oldActivePageId );
+	  Log.info("                              new: " + oControlEvent.getParameters().newActivePageId );
   });
 
 
