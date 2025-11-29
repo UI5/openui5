@@ -830,6 +830,12 @@
 				<m:Label text="odata-currency field, unit display"/>
 				<mdc:Field id="F6-9_3" value="{parts: [{path: 'Price', type: 'sap.ui.model.odata.type.Decimal', formatOptions: {parseEmptyValueToZero: true}, constraints: {nullable: false, precision: 23, scale: 4}}, {path: 'CurrencyCode', type: 'sap.ui.model.odata.type.String', constraints: {nullable: false, maxLength: 5}}, {path: 'view>/ODataCurrencyCodeList'}], type: 'sap.ui.model.odata.type.Currency'}" delegate='\{"name": "delegates/odata/v4/FieldBaseDelegate"\}' display="Value" editMode="EditableDisplay" change="handleChange" liveChange="handleLiveChange" submit="handleSubmit"/>
 
+				<m:Label text="odata-currency field, number readonly, unit display"/>
+				<mdc:Field id="F6-9_3a" value="{parts: [{path: 'Price', type: 'sap.ui.model.odata.type.Decimal', formatOptions: {parseEmptyValueToZero: true}, constraints: {nullable: false, precision: 23, scale: 4}}, {path: 'CurrencyCode', type: 'sap.ui.model.odata.type.String', constraints: {nullable: false, maxLength: 5}}, {path: 'view>/ODataCurrencyCodeList'}], type: 'sap.ui.model.odata.type.Currency'}" delegate='\{"name": "delegates/odata/v4/FieldBaseDelegate"\}' display="Value" editMode="ReadOnlyDisplay" change="handleChange" liveChange="handleLiveChange" submit="handleSubmit"/>
+
+				<m:Label text="odata-currency field, number disabled, unit display"/>
+				<mdc:Field id="F6-9_3b" value="{parts: [{path: 'Price', type: 'sap.ui.model.odata.type.Decimal', formatOptions: {parseEmptyValueToZero: true}, constraints: {nullable: false, precision: 23, scale: 4}}, {path: 'CurrencyCode', type: 'sap.ui.model.odata.type.String', constraints: {nullable: false, maxLength: 5}}, {path: 'view>/ODataCurrencyCodeList'}], type: 'sap.ui.model.odata.type.Currency'}" delegate='\{"name": "delegates/odata/v4/FieldBaseDelegate"\}' display="Value" editMode="DisabledDisplay" change="handleChange" liveChange="handleLiveChange" submit="handleSubmit"/>
+
 				<m:Label text="odata-currency field in display mode"/>
 				<mdc:Field id="F6-9_4" value="{parts: [{path: 'Price', type: 'sap.ui.model.odata.type.Decimal', formatOptions: {parseEmptyValueToZero: true}, constraints: {nullable: false, precision: 23, scale: 4}}, {path: 'CurrencyCode', type: 'sap.ui.model.odata.type.String', constraints: {nullable: false, maxLength: 5}}, {path: 'view>/ODataCurrencyCodeList'}], type: 'sap.ui.model.odata.type.Currency'}" delegate='\{"name": "delegates/odata/v4/FieldBaseDelegate"\}' display="Value" editMode="Display" change="handleChange" submit="handleSubmit"/>
 

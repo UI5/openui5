@@ -288,4 +288,25 @@ sap.ui.define([
 		assert.ok(!_promiseWaiter.hasPending(), "Has no pending promises");
 		return oPromise;
 	});
+
+	QUnit.test("Should handle null executor function gracefully", function (assert) {
+		var fnDone = assert.async();
+
+		try {
+			// Create a Promise with a null executor (similar to Angular polyfill)
+			var oPromise = new Promise(null);
+
+			// Add a short timeout to let any potential async operations complete
+			setTimeout(function () {
+				assert.ok(true, "Promise with null executor did not cause an error");
+				assert.ok(!_promiseWaiter.hasPending(), "Has no pending promises");
+				fnDone();
+			}, 50);
+
+			return oPromise;
+		} catch (e) {
+			assert.ok(false, "Promise with null executor should not throw: " + e.message);
+			fnDone();
+		}
+	});
 });

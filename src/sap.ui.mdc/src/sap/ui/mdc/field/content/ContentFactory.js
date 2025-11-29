@@ -307,7 +307,7 @@ sap.ui.define([
 	};
 
 	ContentFactory._getEnabled = function(sEditMode) {
-		return (sEditMode && sEditMode !== FieldEditMode.Disabled);
+		return (sEditMode && sEditMode !== FieldEditMode.Disabled && sEditMode !== FieldEditMode.DisabledDisplay);
 	};
 
 	ContentFactory._getEditable = function(sEditMode) {

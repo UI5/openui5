@@ -16,6 +16,7 @@ sap.ui.define([
 function(Element, nextUIUpdate, XMLView, library, ObjectPageLayout, ObjectPageSubSection, ObjectPageSection, ObjectPageSectionBase, Text, MessageStrip, Button, Panel) {
 	"use strict";
 	var Importance = library.Importance;
+	var ObjectPageSubSectionLayout = library.ObjectPageSubSectionLayout;
 
 	QUnit.module("aatTest");
 
@@ -1399,5 +1400,175 @@ function(Element, nextUIUpdate, XMLView, library, ObjectPageLayout, ObjectPageSu
 		await nextUIUpdate();
 		// Assert
 		assert.strictEqual(oFirstSection.$().attr("role"), undefined, "Single section with single subsection, section title is hidden, section does not get a role attribute");
+	});
+
+	QUnit.module("Sticky Header");
+
+	QUnit.test("ObjectPageSection with multiple SubSections should not have sticky header", function(assert) {
+		// Arrange
+		var oObjectPageLayout = new ObjectPageLayout({
+			sections: [
+				new ObjectPageSection({
+					title: "Section with multiple subsections",
+					subSections: [
+						new ObjectPageSubSection({
+							title: "Subsection 1",
+							blocks: [new Text({text: "Content 1"})]
+						}),
+						new ObjectPageSubSection({
+							title: "Subsection 2",
+							blocks: [new Text({text: "Content 2"})]
+						})
+					]
+				})
+			]
+		});
+
+		// Act
+		oObjectPageLayout.placeAt('qunit-fixture');
+
+		// Assert
+		var oSection = oObjectPageLayout.getSections()[0];
+		var $sectionHeader = oSection.$().find(".sapUxAPObjectPageSectionHeader");
+		assert.strictEqual(oSection._shouldHaveStickyHeader(), false,
+			"Section with multiple SubSections does not have sticky header");
+		assert.strictEqual($sectionHeader.hasClass("sapUxAPObjectPageSectionHeaderSticky"), false,
+			"Section does not have sticky header CSS class");
+
+		// Clean up
+		oObjectPageLayout.destroy();
+	});
+
+	QUnit.test("ObjectPageSection with one SubSection and titleOnTop should not have sticky header", async function(assert) {
+		// Arrange
+		var oObjectPageLayout = new ObjectPageLayout({
+			sections: [
+				new ObjectPageSection({
+					title: "Section Title",
+					subSections: [
+						new ObjectPageSubSection({
+							title: "Subsection Title",
+							blocks: [new Text({text: "Content"})]
+						})
+					]
+				})
+			]
+		});
+
+		oObjectPageLayout.placeAt('qunit-fixture');
+		await nextUIUpdate();
+
+		// Assert
+		var oSection = oObjectPageLayout.getSections()[0];
+		var $sectionHeader = oSection.$().find(".sapUxAPObjectPageSectionHeader");
+
+		assert.strictEqual($sectionHeader.hasClass("sapUxAPObjectPageSectionHeaderHidden"), true,
+			"Section header is hidden when there's only one subsection (promoted)");
+		assert.strictEqual(oSection._shouldHaveStickyHeader(), false,
+			"Section with one SubSection and titleOnTop does not have sticky header");
+		assert.strictEqual($sectionHeader.hasClass("sapUxAPObjectPageSectionHeaderSticky"), false,
+			"Section does not have sticky header CSS class when header is hidden");
+
+		// Clean up
+		oObjectPageLayout.destroy();
+	});
+
+	QUnit.test("ObjectPageSection with one SubSection and titleOnLeft should not have sticky header", async function(assert) {
+		// Arrange
+		var oObjectPageLayout = new ObjectPageLayout({
+			subSectionLayout: ObjectPageSubSectionLayout.TitleOnLeft,
+			sections: [
+				new ObjectPageSection({
+					title: "Section Title",
+					subSections: [
+						new ObjectPageSubSection({
+							title: "Subsection Title",
+							blocks: [new Text({text: "Content"})]
+						})
+					]
+				})
+			]
+		});
+
+		oObjectPageLayout.placeAt('qunit-fixture');
+		await nextUIUpdate();
+
+		// Assert
+		var oSection = oObjectPageLayout.getSections()[0];
+		var $sectionHeader = oSection.$().find(".sapUxAPObjectPageSectionHeader");
+
+		assert.strictEqual(oSection._shouldHaveStickyHeader(), false,
+			"Section with titleOnLeft should not have sticky header");
+		assert.strictEqual($sectionHeader.hasClass("sapUxAPObjectPageSectionHeaderSticky"), false,
+			"Section does not have sticky header CSS class when title is on left");
+
+		// Clean up
+		oObjectPageLayout.destroy();
+	});
+
+	QUnit.test("ObjectPageSection with one SubSection (with NO title) should have sticky header", async function(assert) {
+		// Arrange
+		var oObjectPageLayout = new ObjectPageLayout({
+			sections: [
+				new ObjectPageSection({
+					title: "Section Title",
+					subSections: [
+						new ObjectPageSubSection({
+							// No title for the subsection
+							blocks: [new Text({text: "Content without subsection title"})]
+						})
+					]
+				})
+			]
+		});
+
+		oObjectPageLayout.placeAt('qunit-fixture');
+		await nextUIUpdate();
+
+		// Assert
+		var oSection = oObjectPageLayout.getSections()[0];
+		var $sectionHeader = oSection.$().find(".sapUxAPObjectPageSectionHeader");
+
+		assert.strictEqual(oSection._shouldHaveStickyHeader(), true,
+			"Section with one SubSection without title should have sticky header");
+		assert.strictEqual($sectionHeader.hasClass("sapUxAPObjectPageSectionHeaderSticky"), true,
+			"Section has sticky header CSS class when it has one subsection without title");
+
+		// Clean up
+		oObjectPageLayout.destroy();
+	});
+
+	QUnit.test("ObjectPageSection with one SubSection with titleOnLeft and NO subsection title visible should have sticky header", async function(assert) {
+		// Arrange
+		var oObjectPageLayout = new ObjectPageLayout({
+			subSectionLayout: ObjectPageSubSectionLayout.TitleOnLeft,
+			sections: [
+				new ObjectPageSection({
+					title: "Section Title",
+					subSections: [
+						new ObjectPageSubSection({
+							title: "Subsection Title",
+							showTitle: false, // Title is NOT visible
+							blocks: [new Text({text: "Content with titleOnLeft but no visible subsection title"})]
+						})
+					]
+				})
+			]
+		});
+
+		oObjectPageLayout.placeAt('qunit-fixture');
+		await nextUIUpdate();
+
+		// Assert
+		var oSection = oObjectPageLayout.getSections()[0];
+		var $sectionHeader = oSection.$().find(".sapUxAPObjectPageSectionHeader");
+
+		assert.strictEqual(oSection._shouldHaveStickyHeader(), true,
+			"Section with one SubSection with titleOnLeft and NO subsection title visible should have sticky header");
+		assert.strictEqual($sectionHeader.hasClass("sapUxAPObjectPageSectionHeaderSticky"), true,
+			"Section has sticky header CSS class when it has one subsection with titleOnLeft and no visible subsection title");
+
+		// Clean up
+		oObjectPageLayout.destroy();
 	});
 });

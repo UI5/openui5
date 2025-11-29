@@ -151,7 +151,7 @@ sap.ui.define([
 		_addUnitControl: function(oContentFactory, aControls, sId, Input, InvisibleText) {
 			const oUnitConditionsType = oContentFactory.getUnitConditionsType();
 
-			if (oContentFactory.getField().getEditMode() === FieldEditMode.EditableDisplay) {
+			if ([FieldEditMode.EditableDisplay, FieldEditMode.ReadOnlyDisplay, FieldEditMode.DisabledDisplay].includes(oContentFactory.getField().getEditMode())) {
 				aControls[0].bindProperty("description", { path: "$field>/conditions", type: oUnitConditionsType });
 				aControls[0].setWidth("100%");
 				aControls[0].setFieldWidth("70%");

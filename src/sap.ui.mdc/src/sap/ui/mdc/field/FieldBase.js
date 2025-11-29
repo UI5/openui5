@@ -1414,12 +1414,20 @@ sap.ui.define([
 
 		if (oChanges.name === "editMode") {
 			_refreshLabel.call(this); // as required-idicator might set or removed on Label
-			if (this._bSettingsApplied && (oChanges.old === FieldEditMode.Display || oChanges.old === FieldEditMode.EditableDisplay || oChanges.current === FieldEditMode.Display || oChanges.current === FieldEditMode.EditableDisplay)) {
-				// edit mode changed after settings applied (happens if edit mode is bound and binding updates after control initialization)
-				if (this._aCustomControlNames) {
-					this.destroyInternalContent(); // as control might change in Delegate
+			if (this._bSettingsApplied) {
+				const aDisplayModes = [FieldEditMode.Display, FieldEditMode.EditableDisplay];
+				const aUnitDisplayModes = [FieldEditMode.EditableDisplay, FieldEditMode.ReadOnlyDisplay, FieldEditMode.DisabledDisplay];
+				if ((aUnitDisplayModes.includes(oChanges.old) && !aUnitDisplayModes.includes(oChanges.current)) || (!aUnitDisplayModes.includes(oChanges.old) && aUnitDisplayModes.includes(oChanges.current))) {
+					// switch between one control mode and 2 control mode (normally no usual use-case)
+					this.destroyInternalContent(); // to be sure that controls are recreated
+					this.triggerCheckCreateInternalContent();
+				} else if (aDisplayModes.includes(oChanges.old) || aDisplayModes.includes(oChanges.current)) {
+					// edit mode changed after settings applied (happens if edit mode is bound and binding updates after control initialization)
+					if (this._aCustomControlNames) {
+						this.destroyInternalContent(); // as control might change in Delegate
+					}
+					this.triggerCheckCreateInternalContent();
 				}
-				this.triggerCheckCreateInternalContent();
 			}
 		}
 
@@ -3781,7 +3789,7 @@ sap.ui.define([
 			delegateName: this.getDelegate() && this.getDelegate().name,
 			payload: this.getPayload(),
 			preventGetDescription: this._bPreventGetDescription,
-			convertWhitespaces: this.getEditMode() === FieldEditMode.Display || this.getEditMode() === FieldEditMode.EditableDisplay,
+			convertWhitespaces: [FieldEditMode.Display, FieldEditMode.EditableDisplay, FieldEditMode.ReadOnlyDisplay, FieldEditMode.DisabledDisplay].includes(this.getEditMode()),
 			control: this,
 			getConditions: this.getConditions.bind(this), // TODO: better solution to update unit in all conditions
 			noFormatting: false,

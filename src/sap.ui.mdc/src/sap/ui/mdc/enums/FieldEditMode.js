@@ -15,37 +15,51 @@ sap.ui.define(["sap/ui/base/DataType"], (DataType) => {
 	 */
 	const FieldEditMode = {
 		/**
-		 * {@link sap.ui.mdc.Field Field}, {@link sap.ui.mdc.FilterField FilterField} or {@link sap.ui.mdc.MultiValueField MultiValueField} is rendered in display mode
+		 * {@link sap.ui.mdc.Field Field}, {@link sap.ui.mdc.FilterField FilterField}, or {@link sap.ui.mdc.MultiValueField MultiValueField} is rendered in display mode.
 		 * @public
 		 */
 		Display: "Display",
 		/**
-		 * {@link sap.ui.mdc.Field Field}, {@link sap.ui.mdc.FilterField FilterField} or {@link sap.ui.mdc.MultiValueField MultiValueField} is rendered in editable mode
+		 * {@link sap.ui.mdc.Field Field}, {@link sap.ui.mdc.FilterField FilterField}, or {@link sap.ui.mdc.MultiValueField MultiValueField} is rendered in editable mode.
 		 * @public
 		 */
 		Editable: "Editable",
 		/**
-		 * {@link sap.ui.mdc.Field Field}, {@link sap.ui.mdc.FilterField FilterField} or {@link sap.ui.mdc.MultiValueField MultiValueField} is rendered in read-only mode
+		 * {@link sap.ui.mdc.Field Field}, {@link sap.ui.mdc.FilterField FilterField}, or {@link sap.ui.mdc.MultiValueField MultiValueField} is rendered in read-only mode.
 		 * @public
 		 */
 		ReadOnly: "ReadOnly",
 		/**
-		 * {@link sap.ui.mdc.Field Field}, {@link sap.ui.mdc.FilterField FilterField} or {@link sap.ui.mdc.MultiValueField MultiValueField} is rendered in disabled mode
+		 * {@link sap.ui.mdc.Field Field}, {@link sap.ui.mdc.FilterField FilterField}, or {@link sap.ui.mdc.MultiValueField MultiValueField} is rendered in disabled mode.
 		 * @public
 		 */
 		Disabled: "Disabled",
 		/**
-		 * If more than one control is rendered by the {@link sap.ui.mdc.Field Field}, {@link sap.ui.mdc.FilterField FilterField} or {@link sap.ui.mdc.MultiValueField MultiValueField} control,
+		 * If more than one control is rendered by the {@link sap.ui.mdc.Field Field}, {@link sap.ui.mdc.FilterField FilterField}, or {@link sap.ui.mdc.MultiValueField MultiValueField} control,
 		 * the first part is editable, and the other parts are read-only.
 		 * @public
 		 */
 		EditableReadOnly: "EditableReadOnly",
 		/**
-		 * If more than one control is rendered by the {@link sap.ui.mdc.Field Field}, {@link sap.ui.mdc.FilterField FilterField} or {@link sap.ui.mdc.MultiValueField MultiValueField} control,
+		 * If more than one control is rendered by the {@link sap.ui.mdc.Field Field}, {@link sap.ui.mdc.FilterField FilterField}, or {@link sap.ui.mdc.MultiValueField MultiValueField} control,
 		 * the first part is editable, and the other parts are in display mode.
 		 * @public
 		 */
-		EditableDisplay: "EditableDisplay"
+		EditableDisplay: "EditableDisplay",
+		/**
+		 * If more than one control is rendered by the {@link sap.ui.mdc.Field Field}, {@link sap.ui.mdc.FilterField FilterField}, or {@link sap.ui.mdc.MultiValueField MultiValueField} control,
+		 * the first part is read-only, and the other parts are in display mode.
+		 * @public
+		 * @since 1.144
+		 */
+		ReadOnlyDisplay: "ReadOnlyDisplay",
+		/**
+		 * If more than one control is rendered by the {@link sap.ui.mdc.Field Field}, {@link sap.ui.mdc.FilterField FilterField}, or {@link sap.ui.mdc.MultiValueField MultiValueField} control,
+		 * the first part is disabled, and the other parts are in display mode.
+		 * @public
+		 * @since 1.144
+		 */
+		DisabledDisplay: "DisabledDisplay"
 	};
 
 	DataType.registerEnum("sap.ui.mdc.enums.FieldEditMode", FieldEditMode);

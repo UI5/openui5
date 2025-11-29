@@ -42,8 +42,8 @@ sap.ui.define([
 	// load Table resources upfront to avoid loading times > 1 second for the first test using Table
 	"sap/ui/table/Table"
 ], function(Log, Localization, uid, ColumnListItem, CustomListItem, FlexBox, _MessageStrip, Text, Device, EventProvider, SyncPromise, Messaging, Rendering, Supportability, FieldHelp, Message, Controller, View, ChangeReason, Filter, FilterOperator, FilterType, Sorter, OperationMode, Decimal, AnnotationHelper, ODataListBinding, ODataMetaModel, ODataModel, ODataPropertyBinding, ValueListType, _Helper, Security, TestUtils, XMLHelper, jQuery) {
-	/*eslint no-sparse-arrays: 0, "max-len": ["error", {"code": 100,
-		"ignorePattern": "/sap/opu/odata4/|\" :$|\" : \\{$|\\{meta>"}], */
+	/*eslint no-sparse-arrays: 0,
+		"max-len": ["error", {"code": 100, "ignorePattern": "\\{meta>"}] */
 	"use strict";
 
 	// system query options for collection responses, but not inside $expand
@@ -3223,7 +3223,8 @@ sap.ui.define([
 	}">\
 	<Text id="text" text="{Name}"/>\
 </Table>',
-		{"EMPLOYEES?$select=Name&$filter=AGE gt 21 and (TEAM_ID eq 42)&$orderby=AGE,Name desc&$skip=0&$top=100" :
+		{["EMPLOYEES?$select=Name&$filter=AGE gt 21 and (TEAM_ID eq 42)&$orderby=AGE,Name desc"
+			+ "&$skip=0&$top=100"] :
 			{value : [{Name : "Frederic Fall"}, {Name : "Jonathan Smith"}]}},
 		{text : ["Frederic Fall", "Jonathan Smith"]}
 	);
@@ -18873,7 +18874,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		text="{= %{#com.sap.gateway.default.iwbep.tea_busi.v0001.AcSetIsAvailable}\
 			? \'set to available\' : \'\'}"/>\
 </FlexBox>', {
-			"EMPLOYEES('2')?$select=AGE,ID,Name,com.sap.gateway.default.iwbep.tea_busi.v0001.AcSetIsAvailable,com.sap.gateway.default.iwbep.tea_busi.v0001.AcSetIsOccupied" : {
+			["EMPLOYEES('2')?$select=AGE,ID,Name"
+					+ ",com.sap.gateway.default.iwbep.tea_busi.v0001.AcSetIsAvailable"
+					+ ",com.sap.gateway.default.iwbep.tea_busi.v0001.AcSetIsOccupied"] : {
 				"#com.sap.gateway.default.iwbep.tea_busi.v0001.AcSetIsAvailable" : {},
 				AGE : 32,
 				Name : "Frederic Fall"
@@ -31448,6 +31451,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// @see QUnit.skip("ODLB: resume/refresh/filter w/ submitBatch on a t:Table"
 	//
 	// #setAggregation before resolving the ODLB (JIRA: CPOUI5ODATAV4-2408)
+	// Collapse root and then PATCH the kept-alive child (SNOW: DINC0702621)
 	[false, true].forEach(function (bSuspended) {
 		var sTitle = "Recursive Hierarchy: getKeepAliveContext, suspended = " + bSuspended;
 
@@ -31458,7 +31462,11 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				oTable,
 				sView = '\
 <Table id="list" growing="true" growingThreshold="3" items="{\
-		parameters : {$$getKeepAliveContext : true, $$ownRequest : true},\
+		parameters : {\
+			$$getKeepAliveContext : true,\
+			$$ownRequest : true,\
+			$$patchWithoutSideEffects : true\
+		},\
 		path : \'' + (bSuspended ? "/" : "") + "EMPLOYEES',\
 		suspended : " + bSuspended + '}">\
 	<Text text="{= %{@$ui5.node.isExpanded} }"/>\
@@ -31472,6 +31480,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	<Text id="name" text="{Name}"/>\
 </FlexBox>',
 				that = this;
+
+			// 1 Beta
+			//   2 Kappa
+			//   3 Lambda (getKeepAliveContext)
 
 			this.expectChange("age")
 				.expectChange("name");
@@ -31509,7 +31521,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 				// code under test
 				oContext = oModel.getKeepAliveContext("/EMPLOYEES('3')", /*bRequestMessages*/true,
-					{$$groupId : "$auto.heroes"});
+					{$$groupId : "$auto.heroes", $$patchWithoutSideEffects : true});
 
 				that.oView.byId("form").setBindingContext(oContext);
 
@@ -31528,11 +31540,11 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						"@odata.count" : "3",
 						value : [{
 							"@odata.etag" : "etag1",
-							DescendantCount : "0",
-							DistanceFromRoot : "1",
-							DrillState : "collapsed",
+							DescendantCount : "2",
+							DistanceFromRoot : "0",
+							DrillState : "expanded",
 							ID : "1",
-							MANAGER_ID : "0",
+							MANAGER_ID : null,
 							Name : "Beta"
 						}, {
 							"@odata.etag" : "etag2",
@@ -31540,7 +31552,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 							DistanceFromRoot : "1",
 							DrillState : "leaf",
 							ID : "2",
-							MANAGER_ID : "0",
+							MANAGER_ID : "1",
 							Name : "Kappa"
 						}, {
 							"@odata.etag" : "etag3",
@@ -31548,7 +31560,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 							DistanceFromRoot : "1",
 							DrillState : "leaf",
 							ID : "3",
-							MANAGER_ID : "0",
+							MANAGER_ID : "1",
 							Name : "Lambda"
 						}]
 					});
@@ -31571,9 +31583,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					"/EMPLOYEES('2')",
 					"/EMPLOYEES('3')"
 				], [
-					[false, 2, "1", "0", "Beta"],
-					[undefined, 2, "2", "0", "Kappa"],
-					[undefined, 2, "3", "0", "Lambda"]
+					[true, 1, "1", "", "Beta"],
+					[undefined, 2, "2", "1", "Kappa"],
+					[undefined, 2, "3", "1", "Lambda"]
 				]);
 				assert.strictEqual(oListBinding.getAllCurrentContexts()[2], oContext, "reused");
 				assert.strictEqual(oContext.isKeepAlive(), true, "still kept alive");
@@ -31583,7 +31595,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						"@$ui5.node.level" : 2,
 						AGE : 57,
 						ID : "3",
-						MANAGER_ID : "0",
+						MANAGER_ID : "1",
 						Name : "Lambda",
 						ROOM_ID : "3.0",
 						__CT__FAKE__Message : {
@@ -31605,6 +31617,34 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				oModel.getKeepAliveContext("/EMPLOYEES('5')");
 
 				return that.waitForChanges(assert, "ODLB#getKeepAliveContext");
+			}).then(function () {
+				oListBinding.getCurrentContexts()[0].collapse();
+
+				return that.waitForChanges(assert, "collapse");
+			}).then(function () {
+				checkTable("after collapse", assert, oTable, [
+					"/EMPLOYEES('1')",
+					"/EMPLOYEES('5')",
+					"/EMPLOYEES('3')"
+				], [
+					[false, 1, "1", "", "Beta"]
+				], 1);
+
+				that.expectChange("name", "Lambda (Λλ)")
+					.expectRequest("PATCH EMPLOYEES('3')", {
+						headers : {
+							"If-Match" : "etag3",
+							Prefer : "return=minimal"
+						},
+						payload : {
+							Name : "Lambda (Λλ)"
+						}
+					}, oNO_CONTENT);
+
+				// code under test
+				oContext.setProperty("Name", "Lambda (Λλ)");
+
+				return that.waitForChanges(assert, "PATCH");
 			});
 		});
 	});
@@ -57603,7 +57643,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						details : [{
 							code : "bound_delete",
 							message : "Must not delete mock data",
-							"@Common.longtextUrl" : "./Messages(1)/LongText",
+							"@Common.longtextUrl" : "Messages(1)/LongText",
 							"@Common.numericSeverity" : 4,
 							target : ""
 						}]
@@ -57993,7 +58033,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 <FlexBox binding="{/Artists(ArtistID=\'42\',IsActiveEntity=true)}">\
 	<Text id="publicationCount" text="{:= %{_Publication}.length }"/>\
 </FlexBox>',
-		{"Artists(ArtistID='42',IsActiveEntity=true)?$select=ArtistID,IsActiveEntity&$expand=_Publication($select=PublicationID)" : {
+		{["Artists(ArtistID='42',IsActiveEntity=true)?$select=ArtistID,IsActiveEntity"
+				+ "&$expand=_Publication($select=PublicationID)"] : {
 			ArtistID : "42",
 			IsActiveEntity : true,
 			_Publication : [{PublicationID : "n/a"}, {}, {}]
@@ -65101,7 +65142,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					"/sap/opu/odata4/sap/zui5_testv4/f4/sap/d_pr_type-fv-ext/0001/$metadata"
 						: {source : "odata/v4/data/VH_ProductTypeCode_ext.xml"},
 					// fake "nested" value help
-					"/sap/opu/odata4/sap/zui5_testv4/f4/sap/d_pr_type-fv/0001;ps='N_A';va='com.sap.gateway.f4.d_pr_type-fv.v0001.D_PR_TYPE_FV.FIELD_VALUE'/$metadata"
+					["/sap/opu/odata4/sap/zui5_testv4/f4/sap/d_pr_type-fv/0001;ps='N_A'"
+							+ ";va='com.sap.gateway.f4.d_pr_type-fv.v0001.D_PR_TYPE_FV.FIELD_VALUE'"
+							+ "/$metadata"]
 						: {source : "odata/v4/data/VH_FIELD_VALUE.xml"}
 				}),
 				oValueListModel,
