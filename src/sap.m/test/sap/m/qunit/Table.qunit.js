@@ -3617,12 +3617,14 @@ sap.ui.define([
 
 	QUnit.test("No Data String", async function(assert) {
 		const sNoData = "Example No Data Text";
-		const sut = createSUT(true, false, "None", false);
+		const sut = createSUT(true, false, "MultiSelect", false);
 		const oData = {
 			items: [],
 			cols: ["Name", "Color", "Number"]
 		};
 		sut.setModel(new JSONModel(oData));
+		sut.setFixedLayout("Strict");
+		sut.getColumns().forEach((oColummn) => oColummn.setWidth("100px"));
 		sut.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
@@ -3632,8 +3634,18 @@ sap.ui.define([
 		assert.strictEqual($noDataText.text(), "No data", "Table's standard nodata-text contains correct string");
 		assert.ok($noDataCell.hasClass("sapMListTblCellNoIllustratedMessage"), "sapMListTblCellNoData contains sapMListTblCellNoIllustratedMessage");
 
-		assert.ok($noData.find(".sapMListTblHighlightCell")[0], "Highlight cell is rendered for no-data row");
-		assert.ok($noData.find(".sapMListTblNavigatedCell")[0], "Navigated cell is rendered for no-data row");
+		assert.notOk($noData.find(".sapMListTblHighlightCell")[0], "Highlight cell is NOT rendered for no-data row");
+		assert.notOk($noData.find(".sapMListTblNavigatedCell")[0], "Navigated cell is NOT rendered for no-data row");
+		assert.notOk($noData.find(".sapMListTblDummyCell")[0], "Dummy cell is NOT rendered for no-data row");
+		assert.notOk($noData.hasClass("sapMTableRowCustomFocus"), "No-data row does NOT have custom focus handling");
+
+		assert.equal($noDataText.attr("colspan"), 7, "| Hightlight | Selection | Name | Color | Number | Navigated | Spacer |");
+		sut.setMode("SingleSelectMaster");
+		await nextUIUpdate();
+		assert.equal($noDataText.attr("colspan"), 6, "| Hightlight | Name | Color | Number | Navigated | Spacer |");
+		sut.getColumns().forEach((oColummn) => oColummn.setWidth(""));
+		await nextUIUpdate();
+		assert.equal($noDataText.attr("colspan"), 5, "| Hightlight | Name | Color | Number | Navigated |");
 
 		$noData.trigger("focus");
 		let sLabelledBy = $noData.attr("aria-labelledby");

@@ -72,6 +72,38 @@ sap.ui.define([
 		await testCase("_inactiveHandlingInheritor",false);
 	});
 
+	QUnit.test("Should toggle sapMPopinHovered class", async function(assert) {
+		const className = "sapMPopinHovered",
+			oListItem = new ColumnListItem({
+				cells: new Text(),
+				type: "Navigation"
+			}),
+			column = [new Column({
+				demandPopin : true,
+				// make the column bigger than the screen
+				minScreenWidth : "48000px"
+			}), new Column()],
+			table = new Table({
+				columns : column,
+				items : oListItem
+			});
+
+		table.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		oListItem.$Popin().trigger("mouseenter");
+		assert.ok(oListItem.$().hasClass(className), "sapMPopinHovered class added on mouseenter");
+
+		oListItem.invalidate();
+		await nextUIUpdate();
+		assert.ok(oListItem.$().hasClass(className), "after rerendering the sapMPopinHovered class still on the item");
+
+		oListItem.$Popin().trigger("mouseleave");
+		assert.notOk(oListItem.$().hasClass(className), "sapMPopinHovered class is removed after mouseleave");
+
+		table.destroy();
+	});
+
 	QUnit.test("Should calculate drop area rectangle", async function(assert) {
 		const oListItem = new ColumnListItem({
 				cells: new Text()

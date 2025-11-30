@@ -5,7 +5,7 @@
 
 @_sap_tnt_ToolHeader_Height: 3rem;
 @_sap_tnt_ToolHeader_AvatarBackground: lighten(saturate(spin(@sapUiAccent6, 348), 36), 28);
-@_sap_tnt_ToolHeader_AvatarColor: @sapUiBaseText;
+@_sap_tnt_ToolHeader_AvatarColor: var(--sapTextColor);
 @_sap_tnt_ToolHeader_BorderColor: contrast(@sapUiShellColor, @sapUiContentFocusColor, @sapUiContentContrastFocusColor, @sapUiContentContrastTextThreshold);
 @_sap_tnt_ToolHeader_ArrowHeight: 0.1875rem;
 @_sap_tnt_ToolHeader_ArrowMargin: 0;
@@ -17,13 +17,13 @@
 	height: @_sap_tnt_ToolHeader_Height;
 }
 
-// ==========================================================================
-// sap.m.IconTabHeader overriding
-// ==========================================================================
+/* ========================================================================== */
+/* sap.m.IconTabHeader overriding                                             */
+/* ========================================================================== */
 
 .sapMIBar.sapTntToolHeader .sapMBarChild.sapMITH {
 	flex: 1;
-	min-width: 0; // fixes Chrome flex issue
+	min-width: 0; /* fixes Chrome flex issue */
 }
 
 .sapMIBar.sapTntToolHeader:not(.sapUshellShellToolHeader) .sapMBarChild.sapMITH {
@@ -37,7 +37,8 @@
 		padding-bottom: 0;
 
 		.sapMITBFilter .sapMITBText + .sapMITBContentArrow  {
-			&:after {
+
+			&::after {
 				border-radius: 0.125rem;
 				box-shadow: none;
 				margin-bottom: @_sap_tnt_ToolHeader_ArrowMarginBottom;
@@ -48,8 +49,9 @@
 }
 
 .sapMITBFilterPopover.sapMITBFilterPopoverInToolHeader {
+
 	.sapUiIcon {
-		color: @sapUiContentNonInteractiveIconColor;
+		color: var(--sapContent_NonInteractiveIconColor);
 	}
 }
 
@@ -57,24 +59,25 @@
 	margin: @_sap_tnt_ToolHeader_ArrowMargin;
 }
 
-// ==========================================================================
-// sap.m.MenuButton overriding
-// ==========================================================================
+/* ========================================================================== */
+/* sap.m.MenuButton overriding                                                */
+/* ========================================================================== */
 
 .sapTntToolHeader {
+
 	.sapMMenuBtn.sapMMenuBtnRegular .sapMBtnEmphasized.sapMBtnInner::after {
 		content: '\e287';
 	}
 }
 
-/* ------------------------------------------------ */
-/* Shell overrides                        */
-/* ------------------------------------------------ */
+/* ================================================ */
+/* Shell overrides                                  */
+/* ================================================ */
 
 .sapTntToolHeader.sapMTB.sapUshellShellToolHeader {
-	background-color: @sapUiShellNavigationBackground;
+	background-color: var(--sapShell_Navigation_Background);
 	height: 2.75rem;
-	box-shadow: @sapUiShellShadow;
+	box-shadow: var(--sapShell_Shadow);
 	border: none;
 	z-index: 1;
 	position: relative;
