@@ -119,8 +119,8 @@ sap.ui.define([
 	ColumnListItem.prototype.onAfterRendering = function() {
 		if (this._oPopin) {
 			this.$().attr("aria-owns", this.aAriaOwns.join(" "));
-			this.isActionable(true) && this.$Popin().on("mouseenter mouseleave", function(oEvent) {
-				this.previousSibling.classList.toggle("sapMPopinHovered", oEvent.type == "mouseenter");
+			this.isActionable(true) && this.$Popin().on("mouseenter mouseleave", (oEvent) => {
+				this.toggleStyleClass("sapMPopinHovered", oEvent.type == "mouseenter");
 			});
 		}
 

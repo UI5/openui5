@@ -1152,8 +1152,6 @@ sap.ui.define([
 		} else if (oTarget.id == this.getId("tblFooter")) {
 			this._setFooterAnnouncement();
 			this._setFirstLastVisibleCells(oTarget);
-		} else if (oTarget.id == this.getId("nodata")) {
-			this._setFirstLastVisibleCells(oTarget);
 		} else if (!this._bIgnoreFocusIn && this.getShowOverlay()) {
 			this._bIgnoreFocusIn = true;
 			this.$("overlay").trigger("focus");

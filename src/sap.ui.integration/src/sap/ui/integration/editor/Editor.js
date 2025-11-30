@@ -296,7 +296,6 @@ sap.ui.define([
 						// create a UIArea for the container and render the tree into it
 						var oUIArea = UIArea.create(oRef);
 						oUIArea.addContent(oControl._oChildTree);
-						oRm.renderControl(oControl._oChildTree);
 						// focus the selected item in the nodes tree
 						var expandTreeItemPromise = new Promise(function (resolve, reject) {
 							setTimeout(function () {

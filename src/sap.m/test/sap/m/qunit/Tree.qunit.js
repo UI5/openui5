@@ -370,6 +370,10 @@ sap.ui.define([
 
 		//initial state
 		assert.strictEqual(oTree.getItems().length, 2, "two nodes displayed before tree expanding");
+		assert.equal(oTree.getItems()[0].getDomRef().getAttribute("aria-posinset"), 1, "aria-posinset is set for the item 1");
+		assert.equal(oTree.getItems()[0].getDomRef().getAttribute("aria-setsize"), 2, "aria-setsize is set for the item 1");
+		assert.equal(oTree.getItems()[1].getDomRef().getAttribute("aria-posinset"), 2, "aria-posinset is set for the item 2");
+		assert.equal(oTree.getItems()[1].getDomRef().getAttribute("aria-setsize"), 2, "aria-setsize is set for the item 2");
 
 		oTree.focus();
 		assert.strictEqual(oTree.getItems()[0].$().attr("aria-expanded"), "false", "aria-expanded is false");
@@ -379,10 +383,17 @@ sap.ui.define([
 		await nextUIUpdate();
 
 		assert.strictEqual(oTree.getItems().length, 4, "four nodes displayed after tree expanding");
-
 		assert.equal(oTree.getItems()[0].getLevel(), 0, "first level node is in level 0");
 		assert.equal(oTree.getItems()[1].getLevel(), 1, "second node is in level 1");
 		assert.strictEqual(oTree.getItems()[0].$().attr("aria-expanded"), "true", "aria-expanded is true");
+		assert.equal(oTree.getItems()[0].getDomRef().getAttribute("aria-posinset"), 1, "aria-posinset is set for the item 1");
+		assert.equal(oTree.getItems()[0].getDomRef().getAttribute("aria-setsize"), 2, "aria-setsize is set for the item 1");
+		assert.equal(oTree.getItems()[1].getDomRef().getAttribute("aria-posinset"), 1, "aria-posinset is set for the item 2");
+		assert.equal(oTree.getItems()[1].getDomRef().getAttribute("aria-setsize"), 2, "aria-setsize is set for the item 2");
+		assert.equal(oTree.getItems()[2].getDomRef().getAttribute("aria-posinset"), 2, "aria-posinset is set for the item 3");
+		assert.equal(oTree.getItems()[2].getDomRef().getAttribute("aria-setsize"), 2, "aria-setsize is set for the item 3");
+		assert.equal(oTree.getItems()[3].getDomRef().getAttribute("aria-posinset"), 2, "aria-posinset is set for the item 4");
+		assert.equal(oTree.getItems()[3].getDomRef().getAttribute("aria-setsize"), 2, "aria-setsize is set for the item 4");
 
 		assert.ok(oToggleOpenStateEventSpy.calledOnce, "The toggleOpenState event was called once");
 		assertToggleOpenStateParameters(assert, oTree, 0, true, oToggleOpenStateEventSpy._mEventParameters);
