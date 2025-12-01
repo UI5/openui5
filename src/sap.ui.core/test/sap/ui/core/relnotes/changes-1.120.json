@@ -1063,5 +1063,20 @@
         "text": " sap/ui/model/odata/v2/ODataTreeBinding: $count requests must not contain $expand or $select"
       }
     ]
+  },
+  "1.120.39": {
+    "date": "December 2025",
+    "notes": [
+      {
+        "id": "6f47ded8074a7339ecd08e8ca2bd2a82e893b485",
+        "type": "FIX",
+        "text": " sap.m.Button: Prevent duplicate shortcut announcements in screen readers"
+      },
+      {
+        "id": "6a89c58bfdb92e5422cea57c2a8b7e88f4c810d6",
+        "type": "FIX",
+        "text": " sap/ui/thirdparty: bump RequireJS to 2.3.7"
+      }
+    ]
   }
 }

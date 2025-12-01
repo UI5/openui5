@@ -85,5 +85,15 @@
         "text": " Tables: Announce required state of columns with 'custom' label controls"
       }
     ]
+  },
+  "1.120.39": {
+    "date": "December 2025",
+    "notes": [
+      {
+        "id": "9a2b64417edc31ee3e058a0343ff9b462bb0c4ad",
+        "type": "FIX",
+        "text": " Table: Remove renderWhitespace restriction"
+      }
+    ]
   }
 }

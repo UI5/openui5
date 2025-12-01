@@ -1341,5 +1341,50 @@
         "text": " sap.m.ViewSettingsDialog: add a view settings dialog items active announcement"
       }
     ]
+  },
+  "1.120.39": {
+    "date": "December 2025",
+    "notes": [
+      {
+        "id": "fd800a6028174ee08371ddf51d0c9d31c8e3e89d",
+        "type": "FIX",
+        "text": " sap.m.Page: Show footer after calling setShowFooter twice"
+      },
+      {
+        "id": "19c57be77fcad378ccbc8f300e9283cda61b161b",
+        "type": "FIX",
+        "text": " sap.m.SinglePlanningCalendar: Add the browser event information to the UI5 event"
+      },
+      {
+        "id": "26c7b74c574267eff314439af4fe0eec6154479a",
+        "type": "FIX",
+        "text": " m.p13n: integrate missing screen reader announcement for table filtering in SAP UI5 1.120"
+      },
+      {
+        "id": "0443ea5f010f3cf8ac909b37ed11450b8a6fde12",
+        "type": "FIX",
+        "text": " We've now removed the iframe content check while loading a PDF to display it"
+      },
+      {
+        "id": "210dd5cd361d1a877c46f4f3087d9bc18d5757b6",
+        "type": "FIX",
+        "text": " We've now removed the iframe content check while loading a PDF to display it"
+      },
+      {
+        "id": "a568e5fb7939636d34fd47227e0e9de3c3111e84",
+        "type": "FIX",
+        "text": " sap.m.DateTimePicker: fix test about timezone failing in safari"
+      },
+      {
+        "id": "8d684c298ebfb89c9fb7861bf59f93470826afd2",
+        "type": "FIX",
+        "text": " sap.m.DatePicker: has correct placeholder"
+      },
+      {
+        "id": "886dc249f95dd752f8940ea6e1a0e30aeb3a28a4",
+        "type": "FIX",
+        "text": " sap.m.DatePicker: close picker on context change"
+      }
+    ]
   }
 }

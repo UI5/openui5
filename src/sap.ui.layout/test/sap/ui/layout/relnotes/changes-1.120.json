@@ -38,5 +38,15 @@
         "text": " sap.ui.layout.PaneContainer: fix invalidation of nested panes"
       }
     ]
+  },
+  "1.120.39": {
+    "date": "December 2025",
+    "notes": [
+      {
+        "id": "14414cac89e3d32b5ed836b48518d38718db572c",
+        "type": "FIX",
+        "text": " SemanticFormElement: _updateDisplayText does no longer fail without available _displayField"
+      }
+    ]
   }
 }
