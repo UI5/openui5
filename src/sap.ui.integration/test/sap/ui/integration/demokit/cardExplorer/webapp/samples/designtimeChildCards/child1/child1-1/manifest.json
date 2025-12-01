@@ -3,7 +3,7 @@
 	"sap.app": {
 		"id": "sap.ui5.test.cardeditor.listcard.child1.child1-1",
 		"type": "card",
-		"i18n": "../../../i18n/i18n.properties",
+		"i18n": "../../i18n/i18n.properties",
 		"title": "Orders",
 		"subTitle": "Test Card for Parameters",
 		"applicationVersion": {

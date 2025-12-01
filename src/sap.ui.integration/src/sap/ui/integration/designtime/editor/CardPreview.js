@@ -366,7 +366,7 @@ sap.ui.define([
 					baseUrl = this.getCard().getManifest();
 					baseUrl = baseUrl.substring(0, baseUrl.lastIndexOf("/") + 1);
 				}
-				var src = baseUrl + "/" + mSettings.preview.src;
+				var src = baseUrl + mSettings.preview.src;
 				var oImg = new Image({ src: src });
 				oImg.addStyleClass("sapUiIntegrationDTPreviewImg");
 				oHBox.addItem(oImg);
