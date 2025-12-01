@@ -2,9 +2,11 @@
 /* ui5lint-disable prefer-test-starter -- test scenario needs to control the bootstrap */
 sap.ui.require([
 	"sap/ui/core/Theming",
+	"sap/ui/core/theming/ThemeHelper",
 	"sap/ui/core/theming/ThemeManager"
 ], (
-	Theming
+	Theming,
+	ThemeHelper
 	/** ThemeManager is needed to activate theming*/
 ) => {
 	"use strict";
@@ -22,7 +24,7 @@ sap.ui.require([
 		const done = assert.async();
 
 		var mExpectedLinkURIs = {
-			"sap-ui-theme-sap.ui.core": `/sap/ui/core/themes/sap_hcb/library.css?sap-ui-dist-version=0.0.0`, // Fallback to sap_hcb for core lib because of theme metadata
+			"sap-ui-theme-sap.ui.core": `/sap/ui/core/themes/${ThemeHelper.getDefaultThemeInfo().DEFAULT_THEME}_hcb/library.css?sap-ui-dist-version=0.0.0`, // Fallback to sap_hcb for core lib because of theme metadata
 			"sap-ui-theme-testlibs.customCss.lib1": "/libraries/customCss/lib1/themes/customTheme/library.css?sap-ui-dist-version=1.2.3"
 		};
 		var checkLoadedCss = function () {
