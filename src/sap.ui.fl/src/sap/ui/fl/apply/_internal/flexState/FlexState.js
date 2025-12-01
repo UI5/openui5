@@ -560,12 +560,13 @@ sap.ui.define([
 
 	/**
 	 * Some save operations don't require a complete new data request, so the storage response gets a live update.
-	 * This will not invalidate the DataSelectors
+	 * This will also update the runtime persistence.
 	 *
 	 * @param {string} sReference - Flex reference of the app
 	 * @param {object[]} aUpdates - All new FlexObjects in JSON format
 	 */
 	FlexState.updateStorageResponse = function(sReference, aUpdates) {
+		const aFlexObjectUpdates = [];
 		aUpdates.forEach((oUpdate) => {
 			if (oUpdate.type === "ui2") {
 				_mInstances[sReference].unfilteredStorageResponse.changes.ui2personalization = oUpdate.newData;
@@ -574,23 +575,55 @@ sap.ui.define([
 				const sFileName = oUpdate.flexObject.fileName;
 				const aUnfiltered = ObjectPath.get(vPath, _mInstances[sReference].unfilteredStorageResponse.changes);
 				const aFiltered = ObjectPath.get(vPath, _mInstances[sReference].storageResponse.changes);
+				const iExistingFlexObjectIdx = _mInstances[sReference].runtimePersistence.flexObjects.findIndex(
+					(oFlexObject) => oFlexObject.getId() === sFileName
+				);
+				let iFilteredIdx;
+				let iUnfilteredIdx;
+				const oExistingFlexObject = _mInstances[sReference].runtimePersistence.flexObjects[iExistingFlexObjectIdx];
 				switch (oUpdate.type) {
 					case "add":
 						aUnfiltered.push(oUpdate.flexObject);
 						aFiltered.push(oUpdate.flexObject);
+						if (iExistingFlexObjectIdx < 0) {
+							throw new Error("Flex response includes unknown flex object");
+						}
 						break;
 					case "delete":
-						aFiltered.splice(aFiltered.findIndex((oFlexObject) => oFlexObject.fileName === sFileName), 1);
-						aUnfiltered.splice(aUnfiltered.findIndex((oFlexObject) => oFlexObject.fileName === sFileName), 1);
+						iFilteredIdx = aFiltered.findIndex((oFlexObject) => oFlexObject.fileName === sFileName);
+						if (iFilteredIdx > -1) {
+							aFiltered.splice(iFilteredIdx, 1);
+						}
+						iUnfilteredIdx = aUnfiltered.findIndex((oFlexObject) => oFlexObject.fileName === sFileName);
+						if (iUnfilteredIdx > -1) {
+							aUnfiltered.splice(iUnfilteredIdx, 1);
+						}
+						if (iExistingFlexObjectIdx >= 0) {
+							_mInstances[sReference].runtimePersistence.flexObjects.splice(iExistingFlexObjectIdx, 1);
+							aFlexObjectUpdates.push({ type: "removeFlexObject", updatedObject: oExistingFlexObject });
+						}
 						break;
 					case "update":
-						aFiltered.splice(aFiltered.findIndex((oFlexObject) => oFlexObject.fileName === sFileName), 1, oUpdate.flexObject);
-						aUnfiltered.splice(aUnfiltered.findIndex((oFlexObject) => oFlexObject.fileName === sFileName), 1, oUpdate.flexObject);
+						iFilteredIdx = aFiltered.findIndex((oFlexObject) => oFlexObject.fileName === sFileName);
+						if (iFilteredIdx > -1) {
+							aFiltered.splice(iFilteredIdx, 1, oUpdate.flexObject);
+						}
+						iUnfilteredIdx = aUnfiltered.findIndex((oFlexObject) => oFlexObject.fileName === sFileName);
+						if (iUnfilteredIdx > -1) {
+							aUnfiltered.splice(iUnfilteredIdx, 1, oUpdate.flexObject);
+						}
+						if (oExistingFlexObject && oExistingFlexObject.getState() !== States.LifecycleState.PERSISTED) {
+							oExistingFlexObject.setResponse(oUpdate.flexObject);
+							aFlexObjectUpdates.push({ type: "updateFlexObject", updatedObject: oExistingFlexObject });
+						}
 						break;
 					default:
 				}
 			}
 		});
+		if (aFlexObjectUpdates.length > 0) {
+			oFlexObjectsDataSelector.checkUpdate({ reference: sReference }, aFlexObjectUpdates);
+		}
 	};
 
 	FlexState.clearState = function(sReference) {
