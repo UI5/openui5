@@ -81,10 +81,10 @@ sap.ui.define([
 					}
 				},
 				":errors": false,
-				":layer": 20
+				":layer": 5
 			},
 			":errors": false,
-			":layer": 20
+			":layer": 5
 		},
 		"/sap.card/configuration/childCards/child2/_manifestChanges": {
 			"/sap.card/configuration/childCards/child2-1/_manifestChanges": {
@@ -98,7 +98,7 @@ sap.ui.define([
 					}
 				},
 				":errors": false,
-				":layer": 20
+				":layer": 5
 			},
 			"texts": {
 				"en": {
@@ -109,9 +109,9 @@ sap.ui.define([
 				}
 			},
 			":errors": false,
-			":layer": 20
+			":layer": 5
 		},
-		":layer": 20,
+		":layer": 5,
 		":errors": false,
 		"texts": {
 			"en": {
@@ -266,21 +266,8 @@ sap.ui.define([
 
 							var oSettings = that.oEditor.getCurrentSettings();
 							assert.deepEqual(oSettings, {
-								"/sap.card/configuration/parameters/maxItems/value": 1,
-								"/sap.card/configuration/parameters/Customer/value": "b",
 								"/sap.card/configuration/destinations/mock_request/name": "mock_request",
 								"/sap.card/configuration/destinations/northwind/name": "Northwind",
-								"texts": {
-									"en": {
-										"/sap.card/configuration/parameters/cardTitle/value": "cardTitle EN Content - main"
-									},
-									"ru": {
-										"/sap.card/configuration/parameters/cardTitle/value": "cardTitle RU Content - main"
-									},
-									"zh-TW": {
-										"/sap.card/configuration/parameters/cardTitle/value": "cardTitle 繁體 Content - main"
-									}
-								},
 								":errors": false,
 								":layer": 20
 							}, "Editor settings are OK");
@@ -401,25 +388,11 @@ sap.ui.define([
 										assert.deepEqual(oSettings, {
 											"/sap.card/configuration/childCards/child1/_manifestChanges": {
 												"/sap.card/configuration/parameters/Employee/value": "1",
-												"/sap.card/configuration/parameters/maxItems/value": 3,
 												":errors": false,
 												":layer": 20
 											},
-											"/sap.card/configuration/parameters/maxItems/value": 1,
-											"/sap.card/configuration/parameters/Customer/value": "b",
 											"/sap.card/configuration/destinations/mock_request/name": "mock_request",
 											"/sap.card/configuration/destinations/northwind/name": "Northwind",
-											"texts": {
-												"en": {
-													"/sap.card/configuration/parameters/cardTitle/value": "cardTitle EN Content - main"
-												},
-												"ru": {
-													"/sap.card/configuration/parameters/cardTitle/value": "cardTitle RU Content - main"
-												},
-												"zh-TW": {
-													"/sap.card/configuration/parameters/cardTitle/value": "cardTitle 繁體 Content - main"
-												}
-											},
 											":errors": false,
 											":layer": 20
 										}, "Editor settings are OK");
@@ -527,40 +500,16 @@ sap.ui.define([
 													assert.deepEqual(oSettings, {
 														"/sap.card/configuration/childCards/child1/_manifestChanges": {
 															"/sap.card/configuration/parameters/Employee/value": "1",
-															"/sap.card/configuration/parameters/maxItems/value": 3,
 															"/sap.card/configuration/childCards/child1-1/_manifestChanges": {
 																"/sap.card/configuration/parameters/maxItems/value": 6,
-																"/sap.card/configuration/parameters/Customer/value": "a",
-																"/sap.card/configuration/parameters/Employee/value": "3",
-																"texts": {
-																	"fr": {
-																		"/sap.card/configuration/parameters/cardTitle/value": "cardTitle FR Content - child1-1"
-																	},
-																	"ru": {
-																		"/sap.card/configuration/parameters/cardTitle/value": "cardTitle RU Content - child1-1"
-																	}
-																},
 																":errors": false,
 																":layer": 20
 															},
 															":errors": false,
 															":layer": 20
 														},
-														"/sap.card/configuration/parameters/maxItems/value": 1,
-														"/sap.card/configuration/parameters/Customer/value": "b",
 														"/sap.card/configuration/destinations/mock_request/name": "mock_request",
 														"/sap.card/configuration/destinations/northwind/name": "Northwind",
-														"texts": {
-															"en": {
-																"/sap.card/configuration/parameters/cardTitle/value": "cardTitle EN Content - main"
-															},
-															"ru": {
-																"/sap.card/configuration/parameters/cardTitle/value": "cardTitle RU Content - main"
-															},
-															"zh-TW": {
-																"/sap.card/configuration/parameters/cardTitle/value": "cardTitle 繁體 Content - main"
-															}
-														},
 														":errors": false,
 														":layer": 20
 													}, "Editor settings are OK");
@@ -657,19 +606,8 @@ sap.ui.define([
 																assert.deepEqual(oSettings, {
 																	"/sap.card/configuration/childCards/child1/_manifestChanges": {
 																		"/sap.card/configuration/parameters/Employee/value": "1",
-																		"/sap.card/configuration/parameters/maxItems/value": 3,
 																		"/sap.card/configuration/childCards/child1-1/_manifestChanges": {
 																			"/sap.card/configuration/parameters/maxItems/value": 6,
-																			"/sap.card/configuration/parameters/Customer/value": "a",
-																			"/sap.card/configuration/parameters/Employee/value": "3",
-																			"texts": {
-																				"fr": {
-																					"/sap.card/configuration/parameters/cardTitle/value": "cardTitle FR Content - child1-1"
-																				},
-																				"ru": {
-																					"/sap.card/configuration/parameters/cardTitle/value": "cardTitle RU Content - child1-1"
-																				}
-																			},
 																			":errors": false,
 																			":layer": 20
 																		},
@@ -682,21 +620,8 @@ sap.ui.define([
 																		":errors": false,
 																		":layer": 20
 																	},
-																	"/sap.card/configuration/parameters/maxItems/value": 1,
-																	"/sap.card/configuration/parameters/Customer/value": "b",
 																	"/sap.card/configuration/destinations/mock_request/name": "mock_request",
 																	"/sap.card/configuration/destinations/northwind/name": "Northwind",
-																	"texts": {
-																		"en": {
-																			"/sap.card/configuration/parameters/cardTitle/value": "cardTitle EN Content - main"
-																		},
-																		"ru": {
-																			"/sap.card/configuration/parameters/cardTitle/value": "cardTitle RU Content - main"
-																		},
-																		"zh-TW": {
-																			"/sap.card/configuration/parameters/cardTitle/value": "cardTitle 繁體 Content - main"
-																		}
-																	},
 																	":errors": false,
 																	":layer": 20
 																}, "Editor settings are OK");
@@ -861,21 +786,8 @@ sap.ui.define([
 
 							var oSettings = that.oEditor.getCurrentSettings();
 							assert.deepEqual(oSettings, {
-								"/sap.card/configuration/parameters/maxItems/value": 1,
-								"/sap.card/configuration/parameters/Customer/value": "b",
 								"/sap.card/configuration/destinations/mock_request/name": "mock_request",
 								"/sap.card/configuration/destinations/northwind/name": "Northwind",
-								"texts": {
-									"en": {
-										"/sap.card/configuration/parameters/cardTitle/value": "cardTitle EN Content - main"
-									},
-									"ru": {
-										"/sap.card/configuration/parameters/cardTitle/value": "cardTitle RU Content - main"
-									},
-									"zh-TW": {
-										"/sap.card/configuration/parameters/cardTitle/value": "cardTitle 繁體 Content - main"
-									}
-								},
 								":errors": false,
 								":layer": 20
 							}, "Editor settings are OK");
@@ -957,32 +869,11 @@ sap.ui.define([
 										assert.deepEqual(oSettings, {
 											"/sap.card/configuration/childCards/child2/_manifestChanges": {
 												"/sap.card/configuration/parameters/maxItems/value": 5,
-												"texts": {
-													"en": {
-														"/sap.card/configuration/parameters/cardTitle/value": "cardTitle EN Content - child2"
-													},
-													"zh-CN": {
-														"/sap.card/configuration/parameters/cardTitle/value": "cardTitle 简体 Content - child2"
-													}
-												},
 												":errors": false,
 												":layer": 20
 											},
-											"/sap.card/configuration/parameters/maxItems/value": 1,
-											"/sap.card/configuration/parameters/Customer/value": "b",
 											"/sap.card/configuration/destinations/mock_request/name": "mock_request",
 											"/sap.card/configuration/destinations/northwind/name": "Northwind",
-											"texts": {
-												"en": {
-													"/sap.card/configuration/parameters/cardTitle/value": "cardTitle EN Content - main"
-												},
-												"ru": {
-													"/sap.card/configuration/parameters/cardTitle/value": "cardTitle RU Content - main"
-												},
-												"zh-TW": {
-													"/sap.card/configuration/parameters/cardTitle/value": "cardTitle 繁體 Content - main"
-												}
-											},
 											":errors": false,
 											":layer": 20
 										}, "Editor settings are OK");
@@ -1064,45 +955,15 @@ sap.ui.define([
 													assert.deepEqual(oSettings, {
 														"/sap.card/configuration/childCards/child2/_manifestChanges": {
 															"/sap.card/configuration/parameters/maxItems/value": 5,
-															"texts": {
-																"en": {
-																	"/sap.card/configuration/parameters/cardTitle/value": "cardTitle EN Content - child2"
-																},
-																"zh-CN": {
-																	"/sap.card/configuration/parameters/cardTitle/value": "cardTitle 简体 Content - child2"
-																}
-															},
 															"/sap.card/configuration/childCards/child2-1/_manifestChanges": {
-																"/sap.card/configuration/parameters/string/value": "StringValue Content Child2-1",
-																"texts": {
-																	"fr": {
-																		"/sap.card/configuration/parameters/cardTitle/value": "cardTitle FR Content - child2-1"
-																	},
-																	"zh-TW": {
-																		"/sap.card/configuration/parameters/cardTitle/value": "cardTitle 繁體 Content - child2-1"
-																	}
-																},
 																":errors": false,
 																":layer": 20
 															},
 															":errors": false,
 															":layer": 20
 														},
-														"/sap.card/configuration/parameters/maxItems/value": 1,
-														"/sap.card/configuration/parameters/Customer/value": "b",
 														"/sap.card/configuration/destinations/mock_request/name": "mock_request",
 														"/sap.card/configuration/destinations/northwind/name": "Northwind",
-														"texts": {
-															"en": {
-																"/sap.card/configuration/parameters/cardTitle/value": "cardTitle EN Content - main"
-															},
-															"ru": {
-																"/sap.card/configuration/parameters/cardTitle/value": "cardTitle RU Content - main"
-															},
-															"zh-TW": {
-																"/sap.card/configuration/parameters/cardTitle/value": "cardTitle 繁體 Content - main"
-															}
-														},
 														":errors": false,
 														":layer": 20
 													}, "Editor settings are OK");

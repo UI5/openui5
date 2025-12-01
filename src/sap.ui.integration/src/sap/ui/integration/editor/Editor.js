@@ -1569,9 +1569,6 @@ sap.ui.define([
 	Editor.prototype.createChildTree = function (oChildNodes) {
 		var that = this;
 		var sBaseUrl = this.getBaseUrl();
-		if (sBaseUrl.endsWith("/")) {
-			sBaseUrl = sBaseUrl.slice(0, -1);
-		}
 
 		var sMainManifest = that._vIdOrSettings.manifest;
 		if (typeof that._vIdOrSettings.manifest === "object") {
@@ -1591,7 +1588,7 @@ sap.ui.define([
 
 		var loadChildNode = function (sName, oChildConfig, sPath, sBaseUrl, sParentName) {
 			// calculate base url and manifest path for childs
-			var sManifestPath = sBaseUrl + "/" + oChildConfig.manifest;
+			var sManifestPath = sBaseUrl + oChildConfig.manifest;
 			sBaseUrl = sManifestPath.substring(0, sManifestPath.lastIndexOf("/") + 1);
 			var oNode = {
 				text: sName,
