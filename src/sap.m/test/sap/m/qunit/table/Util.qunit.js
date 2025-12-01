@@ -1,5 +1,6 @@
 sap.ui.define([
 	"sap/ui/qunit/utils/nextUIUpdate",
+	"sap/ui/qunit/utils/waitForThemeApplied",
 	"sap/ui/core/Lib",
 	"sap/ui/core/Theming",
 	"sap/m/List",
@@ -28,7 +29,7 @@ sap.ui.define([
 	"sap/ui/core/InvisibleMessage",
 	"sap/m/Text",
 	"sap/m/HBox"
-], function(nextUIUpdate, Library, Theming, List, Util, Table, ThemeParameters, Filter, JSONListBinding, BooleanType, Byte, DateType, DateTime, DateTimeWithTimezone, Decimal, Double, Single, Guid, Int16, Int32, Int64, SByte, StringType, Time, TimeOfDay, ODataListBinding, InvisibleMessage, Text, HBox) {
+], function(nextUIUpdate, waitForThemeApplied, Library, Theming, List, Util, Table, ThemeParameters, Filter, JSONListBinding, BooleanType, Byte, DateType, DateTime, DateTimeWithTimezone, Decimal, Double, Single, Guid, Int16, Int32, Int64, SByte, StringType, Time, TimeOfDay, ODataListBinding, InvisibleMessage, Text, HBox) {
 	"use strict";
 	/* global QUnit,sinon */
 
@@ -402,7 +403,7 @@ sap.ui.define([
 		const done = assert.async();
 		let sCurrentTheme, iPass = 0;
 
-		const fnThemeChanged = (oEvent) => {
+		const fnThemeChanged = async (oEvent) => {
 			const sTheme = oEvent.theme;
 
 			if (iPass == 0) {
@@ -418,10 +419,10 @@ sap.ui.define([
 				iPass++;
 				assert.strictEqual(sTheme, "my_dummy_theme", "After Change: Correct current Theme: " + sTheme);
 				assert.ok(Util.isThemeApplied(), sTheme + " is applied");
-				Theming.setTheme(sCurrentTheme); // Just reset theme back to the standard one to cleanup for later tests
-			} else {
-				assert.strictEqual(sTheme, sCurrentTheme, "Final: Correct current Theme: " + sTheme);
+
 				Theming.detachApplied(fnThemeChanged);
+				Theming.setTheme();
+				await waitForThemeApplied();
 				done();
 			}
 		};

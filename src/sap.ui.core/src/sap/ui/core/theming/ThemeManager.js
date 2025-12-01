@@ -406,23 +406,24 @@ sap.ui.define([
 					var oThemeMetaData = ThemeHelper.getMetadata(sLib);
 					if (oThemeMetaData && oThemeMetaData.Extends && oThemeMetaData.Extends[0]) {
 						_sFallbackTheme = oThemeMetaData.Extends[0];
-					} else {
+					}
+					if (!_sFallbackTheme) {
 						const sThemeRoot = Theming.getThemeRoot(sThemeName, sLib);
 						if (sThemeRoot) {
 							const rBaseTheme = /~v=[^\/]+\(([a-zA-Z0-9_]+)\)/;
 							// base theme should be matched in the first capturing group
 							_sFallbackTheme = rBaseTheme.exec(sThemeRoot)?.[1];
-							// pass derived fallback theme through our default theme handling
-							// in case the fallback theme is not supported anymore, we fall up to the latest default theme
-							if (_sFallbackTheme) {
-								_sFallbackTheme = ThemeHelper.validateAndFallbackTheme(_sFallbackTheme);
-							}
 						}
 					}
 
 					if (_sFallbackTheme) {
 						break;
 					}
+				}
+				// pass derived fallback theme through our default theme handling
+				// in case the fallback theme is not supported anymore, we fall up to the latest default theme
+				if (_sFallbackTheme) {
+					_sFallbackTheme = ThemeHelper.validateAndFallbackTheme(_sFallbackTheme);
 				}
 			}
 

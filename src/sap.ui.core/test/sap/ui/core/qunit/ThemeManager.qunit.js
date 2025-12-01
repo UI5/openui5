@@ -3,9 +3,17 @@ sap.ui.define([
 	"sap/base/i18n/Localization",
 	"sap/ui/core/Lib",
 	"sap/ui/core/Theming",
+	"sap/ui/core/theming/ThemeHelper",
 	"sap/ui/core/theming/ThemeManager",
 	"sap/ui/test/utils/waitForThemeApplied"
-], function(Localization, Library, Theming, ThemeManager, themeApplied) {
+], function(
+	Localization,
+	Library,
+	Theming,
+	ThemeHelper,
+	ThemeManager,
+	themeApplied
+) {
 	"use strict";
 
 
@@ -120,7 +128,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("After theme change without custom.css", function(assert) {
-		testApplyTheme(assert, "sap_hcb");
+		testApplyTheme(assert, `${ThemeHelper.getDefaultThemeInfo().DEFAULT_THEME}_hcb`);
 
 		return themeApplied().then(function() {
 
@@ -137,10 +145,9 @@ sap.ui.define([
 	});
 
 	QUnit.test("Provide custom css using metadata of custom lib after core was booted and theme fully applied", function(assert) {
-		assert.expect(3);
-		var mExpectedLinkURIs = {
-			"sap-ui-theme-sap.ui.core": `/sap/ui/core/themes/sap_hcb/library.css?version=${sCoreVersion}`, // Fallback to sap_hcb for core lib because of theme metadata
-			"sap-ui-theme-testlibs.customCss.lib1": "/libraries/customCss/lib1/themes/customTheme/library.css?version=1.2.3"
+		const mExpectedLinkURIs = {
+			"sap-ui-theme-sap.ui.core": `/sap/ui/core/themes/${ThemeHelper.getDefaultThemeInfo().DEFAULT_THEME}_hcb/library.css?version=${sCoreVersion}`, // Fallback to sap_horizon for core lib because of theme metadata
+			"sap-ui-theme-testlibs.customCss.lib1": `/libraries/customCss/lib1/themes/customTheme/library.css?version=1.2.3`
 		};
 		var checkLoadedCss = function () {
 			var aAllThemeLinksForLibs = document.querySelectorAll("link[id^=sap-ui-theme]");
