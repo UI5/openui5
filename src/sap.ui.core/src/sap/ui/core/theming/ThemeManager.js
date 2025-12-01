@@ -45,10 +45,10 @@ sap.ui.define([
 	let pAllCssRequests = Promise.resolve();
 	let _customCSSAdded = false;
 	let _themeCheckedForCustom = null;
-	let _sFallbackThemeFromMetadata = null;
-	let _sFallbackThemeFromThemeRoot = null;
+	let sFallbackTheme = null;
 	let sUi5Version;
 	let mAllDistLibraries;
+	const aFailedLibs = [];
 
 	function isVersionInfoNeeded() {
 		const theme = Theming.getTheme();
@@ -143,7 +143,8 @@ sap.ui.define([
 						 */
 						if (mAllDistLibraries && !mAllDistLibraries.has(this.libName) &&
 							!ThemeHelper.isStandardTheme(sTheme) && Theming.getThemeRoot(sTheme, this.libName)) {
-							sTheme = _sFallbackThemeFromMetadata || _sFallbackThemeFromThemeRoot;
+							sTheme = sFallbackTheme;	// We don't want to use the UI5 default theme yet,
+														// since there could be a better option after from the metadata of the first request
 							if (!sTheme) {
 								return undefined;
 							}
@@ -267,11 +268,6 @@ sap.ui.define([
 	 *                                 Use the old URL to prevent unnecessary requests.
 	 */
 	function updateThemeUrl({libInfo, theme, suppressFOUC, force}) {
-		if (suppressFOUC) {
-			pAllCssRequests = Promise.resolve();
-			ThemeManager.themeLoaded = false;
-			Log.debug(`Register theme change for library ${libInfo.id}`, undefined, MODULE_NAME);
-		}
 		if (!sUi5Version && isVersionInfoNeeded()) {
 			Log.error("UI5 theming lifecycle requires valid version information when a theming service is active. Please check why the version info could not be loaded in this system.", undefined, MODULE_NAME);
 		}
@@ -280,8 +276,12 @@ sap.ui.define([
 		const sOldUrlWoVersion = sOldUrl?.replace(/\?.*/, "");
 		const sUrl = libInfo.getUrl(theme).baseUrl;
 		if (!sUrl || sOldUrlWoVersion !== sUrl || force) {
+			if (suppressFOUC) {
+				pAllCssRequests = Promise.resolve();
+				ThemeManager.themeLoaded = false;
+				Log.debug(`Register theme change for library ${libInfo.id}`, undefined, MODULE_NAME);
+			}
 			libInfo.finishedLoading = false;
-			libInfo.failed = false;
 			if (suppressFOUC) {
 				// Only add stylesheet in case there is no existing stylesheet or the href is different
 				// use the special FOUC handling for initially existing stylesheets
@@ -366,7 +366,7 @@ sap.ui.define([
 				handleThemeFinished(libInfo.id);
 				pAllCssRequests = Promise.allSettled([...mAllLoadedLibraries.values()].map((libInfo) => libInfo.cssLoaded));
 				pAllCssRequests.finally(function() {
-					if (this === pAllCssRequests) {
+					if (this === pAllCssRequests && !applyFallbackTheme()) {
 						Log.debug("Theme change finished", undefined, MODULE_NAME);
 						// Even if suppressFOUC is not set, we must fire the event if themeLoaded was previously set to false,
 						// because this indicates that at least one theme change was caused by a theming-relevant trigger.
@@ -409,7 +409,6 @@ sap.ui.define([
 	 */
 	function handleThemeFinished(libId) {
 		const sThemeName = Theming.getTheme();
-		const oLibThemingInfo = mAllLoadedLibraries.get(libId);
 		ThemeHelper.reset();
 
 		if (!_customCSSAdded || _themeCheckedForCustom != sThemeName) {
@@ -435,38 +434,12 @@ sap.ui.define([
 		}
 
 		// Only retrieve the fallback theme once per ThemeManager cycle
-		if (!_sFallbackThemeFromThemeRoot) {
+		if (!sFallbackTheme) {
 			const sThemeRoot = Theming.getThemeRoot(sThemeName, libId);
 			if (sThemeRoot) {
 				const rBaseTheme = /~v=[^\/]+\(([a-zA-Z0-9_]+)\)/;
 				// base theme should be matched in the first capturing group
-				_sFallbackThemeFromThemeRoot = rBaseTheme.exec(sThemeRoot)?.[1];
-
-				// pass derived fallback theme through our default theme handling
-				// in case the fallback theme is not supported anymore, we fall up to the latest default theme
-				if (_sFallbackThemeFromThemeRoot) {
-					_sFallbackThemeFromThemeRoot = ThemeHelper.validateAndFallbackTheme(_sFallbackThemeFromThemeRoot);
-				}
-			}
-		}
-
-		const sFallbackTheme = _sFallbackThemeFromMetadata || _sFallbackThemeFromThemeRoot;
-		if (sFallbackTheme) {
-			for (const [sLibId, oLib] of mAllLoadedLibraries) {
-				if (oLib.failed) {
-					Log.warning(`Custom theme '${sThemeName}' could not be loaded for library '${sLibId}'. Falling back to its base theme '${sFallbackTheme}'.`, undefined, MODULE_NAME);
-
-					// Change the URL to load the fallback theme
-					updateThemeUrl({
-						libInfo: oLib,
-						theme: sFallbackTheme,
-						suppressFOUC: true
-					});
-
-					// remember the lib to prevent doing the fallback multiple times
-					// (if the fallback also can't be loaded)
-					oLibThemingInfo.themeFallback = true;
-				}
+				sFallbackTheme = rBaseTheme.exec(sThemeRoot)?.[1];
 			}
 		}
 	}
@@ -480,10 +453,10 @@ sap.ui.define([
 	 * @param {string} libId - The ID of the library whose CSS request has successfully finished.
 	 */
 	function handleThemeSucceeded(libId) {
-		if (!_sFallbackThemeFromMetadata) {
+		if (!sFallbackTheme) {
 			const oThemeMetaData = ThemeHelper.getMetadata(libId);
 			if (oThemeMetaData && oThemeMetaData.Extends && oThemeMetaData.Extends[0]) {
-				_sFallbackThemeFromMetadata = oThemeMetaData.Extends[0];
+				sFallbackTheme = oThemeMetaData.Extends[0];
 			}
 		}
 	}
@@ -506,9 +479,50 @@ sap.ui.define([
 			// E.g. in case an @import within the stylesheet fails, the error marker will
 			// also be set, but in this case no fallback should be done as there is a (broken) theme
 			if (oLibThemingInfo.cssLinkElement && !(oLibThemingInfo.cssLinkElement.sheet && hasSheetCssRules(oLibThemingInfo.cssLinkElement.sheet))) {
-				oLibThemingInfo.failed = true;
+				aFailedLibs.push(oLibThemingInfo);
 			}
 		}
+	}
+
+	/**
+	 * Applies the fallback theme for libraries whose CSS failed to load.
+	 *
+	 * This function processes all libraries in the failed library queue and attempts to load
+	 * their CSS resources using a fallback theme. The fallback theme is validated and may be
+	 * adjusted to the latest default theme if it is no longer supported.
+	 *
+	 * For each failed library, the function:
+	 * - Logs a warning about the failed custom theme
+	 * - Updates the theme URL to point to the fallback theme resources
+	 * - Marks the library with a fallback flag to prevent repeated fallback attempts
+	 *
+	 * @returns {boolean} Returns true if new CSS requests were triggered for one or more libraries,
+	 *                    false if no new CSS was requested (i.e., no libraries required fallback).
+	 */
+	function applyFallbackTheme() {
+		const pOldAllCssRequests = pAllCssRequests;
+		// pass derived fallback theme through our default theme handling
+		// in case the fallback theme is not supported anymore, we fall up to the latest default theme
+		sFallbackTheme = ThemeHelper.validateAndFallbackTheme(sFallbackTheme);
+
+		while (aFailedLibs.length) {
+			const oLib = aFailedLibs.shift();
+
+			Log.warning(`Custom theme '${Theming.getTheme()}' could not be loaded for library '${oLib.id}'. Falling back to its base theme '${sFallbackTheme}'.`, undefined, MODULE_NAME);
+
+			// Change the URL to load the fallback theme
+			updateThemeUrl({
+				libInfo: oLib,
+				theme: sFallbackTheme,
+				suppressFOUC: true
+			});
+
+			// remember the lib to prevent doing the fallback multiple times
+			// (if the fallback also can't be loaded)
+			oLib.themeFallback = true;
+		}
+		// Check whether fallback CSS requests have been triggered or not
+		return pOldAllCssRequests !== pAllCssRequests;
 	}
 
 	/**
@@ -612,7 +626,7 @@ sap.ui.define([
 		for (const [, oLibInfo] of mAllLoadedLibraries) {
 			delete oLibInfo.themeFallback;
 		}
-		_sFallbackThemeFromMetadata = _sFallbackThemeFromThemeRoot = null;
+		sFallbackTheme = null;
 
 		Log.debug(`ThemeManager: Theme changed from ${oTheme.old} to ${sTheme}`, undefined, MODULE_NAME);
 		updateThemeUrls(sTheme, /* bSuppressFOUC */ true);

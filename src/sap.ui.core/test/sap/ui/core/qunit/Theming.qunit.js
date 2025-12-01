@@ -345,9 +345,16 @@ sap.ui.define([
 			assert.throws(function() {
 				Theming.setTheme("sap_fiori_3@sap/custom/themeroot");
 			}, new TypeError("Providing a theme root as part of the theme parameter is not allowed."), "Providing a theme root using setTheme should throw an error.");
-			// Setting theme to undefined, should not change anything
+			// Setting theme to undefined, should set the theme to the default theme
 			Theming.setTheme();
-			return fnAssert("sap_horizon_hcb");
+			return fnAssert("sap_horizon", [{
+				theme: {
+					"old": "sap_horizon_hcb",
+					"new": ThemeHelper.getDefaultThemeInfo().DEFAULT_THEME
+				}
+			}], [{
+				theme: ThemeHelper.getDefaultThemeInfo().DEFAULT_THEME
+			}]);
 		});
 	});
 

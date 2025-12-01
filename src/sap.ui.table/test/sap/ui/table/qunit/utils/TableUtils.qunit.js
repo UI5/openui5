@@ -3,6 +3,7 @@
 sap.ui.define([
 	"sap/ui/table/qunit/TableQUnitUtils",
 	"sap/ui/qunit/utils/nextUIUpdate",
+	"sap/ui/qunit/utils/waitForThemeApplied",
 	"sap/ui/table/utils/TableUtils",
 	"sap/ui/table/Table",
 	"sap/ui/table/Column",
@@ -21,6 +22,7 @@ sap.ui.define([
 ], function(
 	TableQUnitUtils,
 	nextUIUpdate,
+	waitForThemeApplied,
 	TableUtils,
 	Table,
 	Column,
@@ -52,6 +54,8 @@ sap.ui.define([
 	QUnit.module("TableUtils", {
 		beforeEach: async function() {
 			await createTables();
+			Theming.setTheme();
+			await waitForThemeApplied();
 		},
 		afterEach: function() {
 			destroyTables();
@@ -1345,9 +1349,6 @@ sap.ui.define([
 				iPass++;
 				assert.strictEqual(sTheme, "my_dummy_theme", "After Change: Correct current Theme: " + sTheme);
 				assert.ok(TableUtils.isThemeApplied(), sTheme + " is applied");
-				Theming.setTheme(sCurrentTheme); // Just reset theme back to the standard one to cleanup for later tests
-			} else {
-				assert.strictEqual(sTheme, sCurrentTheme, "Final: Correct current Theme: " + sTheme);
 				Theming.detachApplied(fnThemeChanged);
 				done();
 			}
