@@ -899,5 +899,15 @@
         "text": " sap.ui.core.format.NumberFormat: Invalid groupingSize configuration disables grouping"
       }
     ]
+  },
+  "1.96.43": {
+    "date": "December 2025",
+    "notes": [
+      {
+        "id": "12ab1d5fc3ce03f6f177f3af069e9ae105da7e5f",
+        "type": "FIX",
+        "text": " sap/ui/thirdparty: bump RequireJS to 2.3.7"
+      }
+    ]
   }
 }

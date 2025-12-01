@@ -261,5 +261,15 @@
         "text": " sap.f.DynamicPage: Syncronization issue corrected"
       }
     ]
+  },
+  "1.96.43": {
+    "date": "December 2025",
+    "notes": [
+      {
+        "id": "e591af82731e5df3a42d9ebcaac34879672d976f",
+        "type": "FIX",
+        "text": " sap.f.DynamicPageTitle: Fix flaky focus test in Safari"
+      }
+    ]
   }
 }

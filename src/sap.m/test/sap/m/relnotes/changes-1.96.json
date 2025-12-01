@@ -2126,5 +2126,20 @@
         "text": " We've now fixed the SAP gateway issues for PDFViewer"
       }
     ]
+  },
+  "1.96.43": {
+    "date": "December 2025",
+    "notes": [
+      {
+        "id": "0590bd61d7db3114efb703fcb0c2461ede689d01",
+        "type": "FIX",
+        "text": " We've now removed the iframe content check while loading a PDF to display it"
+      },
+      {
+        "id": "a9b521d18ecac2fa0aa821ef5b2489bb364cb483",
+        "type": "FIX",
+        "text": " We've now removed the iframe content check while loading a PDF to display it"
+      }
+    ]
   }
 }
