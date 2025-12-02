@@ -397,7 +397,6 @@ sap.ui.define([
 		this._attachResizeHandlers();
 		this._preventWidowWords(this._getTitle().getDomRef());
 		this._preventWidowWords(this._getDescription().getDomRef());
-		this._setDefaultIllustrationLabel();
 	};
 
 	IllustratedMessage.prototype.exit = function () {
@@ -428,24 +427,6 @@ sap.ui.define([
 		}
 		return this;
 	};
-
-	/**
-	 * Sets the title of the IllustratedMessage as default aria-labelledby to the Illustration.
-	 * @private
-	 */
-	IllustratedMessage.prototype._setDefaultIllustrationLabel = function (sValue) {
-		var aAriaLabelledBy = this.getAssociation("ariaLabelledBy"),
-			sTitleId = this._getTitle().sId;
-
-		// Set default aria-labelledby only if the Illustration is not decorative
-		if (!this.getDecorative()) {
-			// check if falsy or empty array
-			if (!aAriaLabelledBy || !aAriaLabelledBy.length) {
-				this.addIllustrationAriaLabelledBy(sTitleId);
-			}
-		}
-	};
-
 
 	/**
 	 * Gets the default text for the description aggregation.
@@ -944,8 +925,6 @@ sap.ui.define([
 		var oIllustratedMessageIllustration = this._getIllustration();
 		oIllustratedMessageIllustration.removeAriaLabelledBy(sID);
 
-		this._setDefaultIllustrationLabel();
-
 		return this;
 	};
 
@@ -954,8 +933,6 @@ sap.ui.define([
 
 		var oIllustratedMessageIllustration = this._getIllustration();
 		oIllustratedMessageIllustration.removeAllAriaLabelledBy(sID);
-
-		this._setDefaultIllustrationLabel();
 
 		return this;
 	};

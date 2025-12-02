@@ -10,8 +10,9 @@ sap.ui.define([
 	"sap/ui/model/odata/type/Date",
 	"sap/ui/model/odata/type/Boolean",
 	"sap/ui/model/type/Boolean",
-	"sap/ui/model/type/Currency"
-], function(Localization, PasteHelper, ODataStringType, StringType, ODataByteType, ODataInt32Type, ODataDateType, ODataBooleanType, BooleanType, CurrencyType) {
+	"sap/ui/model/type/Currency",
+    "sap/ui/model/ValidateException"
+], function(Localization, PasteHelper, ODataStringType, StringType, ODataByteType, ODataInt32Type, ODataDateType, ODataBooleanType, BooleanType, CurrencyType, ValidateException) {
 	"use strict";
 
 	var sDefaultLanguage = Localization.getLanguage();
@@ -212,6 +213,55 @@ sap.ui.define([
 		]
 	};
 
+    var aColumnsInfo4 = [
+        {
+            property: "Firstname",
+            type: new ODataStringType()
+        },
+        {
+            property: "Lastname",
+            type: new ODataStringType()
+        },
+        {
+            property: "Member",
+            customParseFunction: function(oData) {
+                if (oData !== "yes" && oData !== "no") {
+                    throw new ValidateException("Invalid Boolean value");
+                }
+                return oData === "yes";
+            }
+        },
+        {
+            property: "LastLogin",
+            type: new ODataDateType()
+        },
+        {
+            property: "AboPrice",
+            type: new CurrencyType()
+        }
+    ];
+
+    var aData4_OK = [["Luis", "Bond", "yes", "2018-12-03", "5 USD"],["Leo", "Prince", "no","2018-12-18", "1553 EUR"]];
+    var oResult4_OK = {
+        parsedData: [
+            {Firstname: "Luis", Lastname: "Bond", Member: true, LastLogin: "2018-12-03", AboPrice: [ 5, "USD"]},
+            {Firstname: "Leo", Lastname: "Prince", Member: false, LastLogin: "2018-12-18", AboPrice: [ 1553, "EUR"]}],
+        errors: null
+    };
+
+    var aData4_ERR = [["Luis", "Bond", "true", "r05.122018 07:67:00", "a5 EUR"],["Leo", "Prince", "vino","18.12.2018 88:20:00", "-l1550EUR"]];
+    var oResult4_ERR = {
+        parsedData: null,
+        errors: [
+            {row: 1 , column: 3, property: "Member", value: "true", type: undefined, message: ""}, // "Value 'true' in row 1 and column 3 could not be parsed as sap.ui.model.odata.type.Boolean"},
+            {row: 1 , column: 4, property: "LastLogin", value: "r05.122018 07:67:00", type: "sap.ui.model.odata.type.Date", message: ""}, //"Value 'r05.122018 07:67:00' in row 1 and column 4 could not be parsed as sap.ui.model.odata.type.Date"},
+            {row: 1 , column: 5, property: "AboPrice", value: "a5 EUR", type: "sap.ui.model.type.Currency", message: ""}, //"Value 'a5 EUR' in row 1 and column 5 could not be parsed as sap.ui.model.type.Currency"},
+            {row: 2 , column: 3, property: "Member", value: "vino", type: undefined, message: ""}, //"Value 'vino' in row 2 and column 3 could not be parsed as sap.ui.model.odata.type.Boolean"},
+            {row: 2 , column: 4, property: "LastLogin", value: "18.12.2018 88:20:00", type: "sap.ui.model.odata.type.Date", message: ""}, //"Value '18.12.2018 88:20:00' in row 2 and column 4 could not be parsed as sap.ui.model.odata.type.Date"},
+            {row: 2 , column: 5, property: "AboPrice", value: "-l1550EUR", type: "sap.ui.model.type.Currency", message: ""} //"Value '-l1550EUR' in row 2 and column 5 could not be parsed as sap.ui.model.type.Currency"}
+        ]
+    };
+
 	function validate(assert, pastedData, columnsInfo, expectedResult, sMsg) {
 
 		var done = assert.async();
@@ -223,7 +273,7 @@ sap.ui.define([
 			if (aResult.errors) {
 				for (var i = 0; i < aResult.errors.length; i++) {
 					aResult.errors[i].message = "";
-					aResult.errors[i].type = aResult.errors[i].type.getMetadata().getName();
+					aResult.errors[i].type = aResult.errors[i].type?.getMetadata().getName();
 				}
 			}
 			assert.deepEqual(aResult, expectedResult, "The result has to contain array of parsed data or errors. In this test the validation has to be " + sMsg + ".");
@@ -251,6 +301,13 @@ sap.ui.define([
 	QUnit.test("EDM Boolean and Currency types Validation. Failing", function(assert) {
 		validate(assert, aData3_ERR, aColumnsInfo3, oResult3_ERR, " fail");
 	});
+
+    QUnit.test("Custom parse function. Passing", function(assert) {
+        validate(assert, aData4_OK, aColumnsInfo4, oResult4_OK, " pass");
+    });
+    QUnit.test("Custom parse function. Failing", function(assert) {
+        validate(assert, aData4_ERR, aColumnsInfo4, oResult4_ERR, " fail");
+    });
 
 	// To check - number of columns is mismatching -  data for the last column are missing
 	//var oResult4 = {

@@ -81,7 +81,8 @@ sap.ui.define([
 			assert.deepEqual(_Parser.parseSystemQueryOption("$expand=" + oFixture.string),
 				{$expand : oFixture.parsed});
 			// verify that the parsed result is consumable
-			assert.deepEqual(_Requestor.create("/~/")
+			assert.deepEqual(_Requestor.create("/~/", /*oModelInterface*/null, {/*mHeaders*/},
+						{/*mQueryParams*/}, "4.0")
 					.convertQueryOptions("Foo", {$expand : oFixture.parsed}),
 				{$expand : oFixture.string});
 		});
@@ -120,7 +121,8 @@ sap.ui.define([
 			assert.deepEqual(_Parser.parseSystemQueryOption("$select=" + oFixture.string),
 					{$select : oFixture.parsed});
 			// verify that the parsed result is consumable
-			assert.deepEqual(_Requestor.create("/~/")
+			assert.deepEqual(_Requestor.create("/~/", /*oModelInterface*/null, {/*mHeaders*/},
+						{/*mQueryParams*/}, "4.0")
 					.convertQueryOptions("Foo", {$select : oFixture.parsed}),
 				{$select : oFixture.string});
 		});
@@ -197,7 +199,8 @@ sap.ui.define([
 					oExpand = {
 						$select : ["*"]
 					},
-					oRequestor = _Requestor.create("/~/"),
+					oRequestor = _Requestor.create("/~/", /*oModelInterface*/null, {/*mHeaders*/},
+						{/*mQueryParams*/}, "4.0"),
 					oResult = {};
 
 				oResult[sOption] = sValue;
@@ -424,7 +427,9 @@ sap.ui.define([
 			assert.deepEqual(_Parser.parseSystemQueryOption(oFixture.string), oFixture.parsed,
 				oFixture.string);
 			// verify that the parsed result is consumable
-			assert.deepEqual(_Requestor.create("/~/").convertQueryOptions("Foo", oFixture.parsed),
+			assert.deepEqual(_Requestor.create("/~/", /*oModelInterface*/null, {/*mHeaders*/},
+						{/*mQueryParams*/}, "4.0")
+					.convertQueryOptions("Foo", oFixture.parsed),
 				oFixture.converted, JSON.stringify(oFixture.converted));
 		});
 	});

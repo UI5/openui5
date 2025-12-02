@@ -1317,7 +1317,7 @@ sap.ui.define([
 
 	//*****************************************************************************************
 	QUnit.test("_Requestor: request(...)/processBatch success", function (assert) {
-		var oRequestor = _Requestor.create(sServiceUrl, oModelInterface),
+		var oRequestor = _Requestor.create(sServiceUrl, oModelInterface, {}, {}, "4.0"),
 			sResourcePath = "TEAMS('TEAM_01')",
 			that = this;
 
@@ -1345,7 +1345,7 @@ sap.ui.define([
 
 	//*****************************************************************************************
 	QUnit.test("_Requestor: request(...)/processBatch fail", function (assert) {
-		var oRequestor = _Requestor.create(sServiceUrl, oModelInterface);
+		var oRequestor = _Requestor.create(sServiceUrl, oModelInterface, {}, {}, "4.0");
 
 		oRequestor.request(
 			"GET", "TEAMS('TEAM_01')", this.createGroupLock()
@@ -1382,7 +1382,7 @@ sap.ui.define([
 	//*****************************************************************************************
 	QUnit.test("_Requestor: request(ProductList)/processBatch patch", function () {
 		var oBody = {Name : "modified by QUnit test"},
-			oRequestor = _Requestor.create(sSampleServiceUrl, oModelInterface),
+			oRequestor = _Requestor.create(sSampleServiceUrl, oModelInterface, {}, {}, "4.0"),
 			sResourcePath = "ProductList('HT-1001')";
 
 		// code under test
@@ -1404,7 +1404,7 @@ sap.ui.define([
 				"@odata.etag" : "*"
 			},
 			fnMergeRequests = function () {},
-			oRequestor = _Requestor.create(sSampleServiceUrl, oModelInterface);
+			oRequestor = _Requestor.create(sSampleServiceUrl, oModelInterface, {}, {}, "4.0");
 
 		function onError(sRequestUrl, oError) {
 			if (sCommonMessage) {

@@ -694,14 +694,19 @@ sap.ui.define([
 
 	ChartItemPanel.prototype._handleActivated = function(oHoveredItem) {
 		const oItem = this._getModelItemByTableItem(oHoveredItem);
-		if (oItem && oItem.template) {
+		if (this._oHoveredItem !== oHoveredItem || (oItem && oItem.template)) {
 			this.removeMoveButtons();
+		}
+		if (this._oHoveredItem === oHoveredItem) {
+			return;
 		}
 
 		this._oHoveredItem = oHoveredItem;
-		this._updateEnableOfMoveButtons(oHoveredItem, false);
-		this._addMoveButtons(oHoveredItem);
-		this._setMoveButtonVisibility(true);
+		if (!oItem || !oItem.template) {
+			this._updateEnableOfMoveButtons(oHoveredItem, false);
+			this._addMoveButtons(oHoveredItem);
+			this._setMoveButtonVisibility(true);
+		}
 
 	};
 
@@ -803,13 +808,13 @@ sap.ui.define([
 
 		if (oTableItem.getCells && oTableItem.getCells() && (oTableItem.getCells().length === 2 || oTableItem.getCells().length === 3) && !bIgnore) {
 			if (this._bMobileMode) {
-				oTableItem.getCells()[1].insertItem(this._getMoveDownButton(), 0);
 				oTableItem.getCells()[1].insertItem(this._getMoveUpButton(), 0);
+				oTableItem.getCells()[1].insertItem(this._getMoveDownButton(), 1);
 			} else {
-				oTableItem.getCells()[2].insertItem(this._getMoveBottomButton(), 0);
-				oTableItem.getCells()[2].insertItem(this._getMoveDownButton(), 0);
-				oTableItem.getCells()[2].insertItem(this._getMoveUpButton(), 0);
 				oTableItem.getCells()[2].insertItem(this._getMoveTopButton(), 0);
+				oTableItem.getCells()[2].insertItem(this._getMoveUpButton(), 1);
+				oTableItem.getCells()[2].insertItem(this._getMoveDownButton(), 2);
+				oTableItem.getCells()[2].insertItem(this._getMoveBottomButton(), 3);
 			}
 
 		}

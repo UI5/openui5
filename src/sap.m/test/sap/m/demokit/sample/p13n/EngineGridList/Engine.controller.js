@@ -97,6 +97,10 @@ sap.ui.define([
 			Engine.getInstance().attachStateChange(this.handleStateChange, this);
 		},
 
+		onExit: function() {
+			Engine.getInstance().detachStateChange(this.handleStateChange, this);
+		},
+
 		openPersoDialog: function(oEvt) {
 			const oGridList = this.byId("persoList");
 

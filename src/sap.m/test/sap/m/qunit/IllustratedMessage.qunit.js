@@ -819,7 +819,7 @@ function(
 	QUnit.test("Tests the accessibility attributes with decorative property", async function (assert) {
 		var $illustration = this.oIllustratedMessage._getIllustration().$();
 
-		assert.notOk($illustration.attr("role"), "The SVG element does not have role=presentation when it is with decorative default value false");
+		assert.strictEqual($illustration.attr("role"), "img", "The SVG element has role=img when it is with decorative default value false");
 		assert.notOk($illustration.attr("aria-hidden"), "The SVG element does not have aria-hidden=true when it is with decorative default value false");
 
 		this.oIllustratedMessage.setDecorative(true);
@@ -898,47 +898,6 @@ function(
 			this.oIllustration.destroy();
 			this.oIllustration = null;
 		}
-	});
-
-	QUnit.test("Testing the default ariaLabelledBy association in combination with calls of the other ariaLabelledBy related methods ", async function(assert) {
-
-		// Arrange
-		var $illustration = this.oIllustration.$(),
-			sTitleId = this.oIllustratedMessage._getTitle().getId();
-
-		// Assert
-		assert.equal($illustration.attr("aria-labelledby"), sTitleId);
-
-		// Arrange
-		new InvisibleText("illustration_label", {text: "My label"}).toStatic();
-
-		// Act
-		this.oIllustratedMessage.addIllustrationAriaLabelledBy('illustration_label');
-		await nextUIUpdate();
-
-		// Assert
-		assert.equal($illustration.attr("aria-labelledby"), 'illustration_label');
-
-		// Act
-		this.oIllustratedMessage.removeIllustrationAriaLabelledBy('illustration_label');
-		await nextUIUpdate();
-
-		// Assert
-		assert.equal($illustration.attr("aria-labelledby"), sTitleId);
-
-		// Act
-		this.oIllustratedMessage.addIllustrationAriaLabelledBy('illustration_label');
-		await nextUIUpdate();
-
-		// Assert
-		assert.equal($illustration.attr("aria-labelledby"), 'illustration_label');
-
-		// Act
-		this.oIllustratedMessage.removeAllAriaLabelledBy('illustration_label');
-		await nextUIUpdate();
-
-		// Assert
-		assert.equal($illustration.attr("aria-labelledby"), sTitleId);
 	});
 
 	QUnit.test("Testing illustrationAriaLabelledBy association", async function(assert) {

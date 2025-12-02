@@ -1,0 +1,76 @@
+<!DOCTYPE HTML>
+<html>
+	<head><meta charset="utf-8">
+		<link rel="stylesheet" href="./MIT.Create.css">
+		<title>Manual Integration Test</title>
+	</head>
+	<body>
+		<h1>Manual Integration Test</h1>
+		<h2>DESCRIPTION</h2>
+		Test the creation of new entities and verify whether the cancel and save functionalities
+		work correctly.
+		<h2>PREPARATION</h2>
+		To check console errors open the developer tools before starting the application and
+		check with each step, that there are no errors and warnings.
+		<h3>Testing with mock data</h3>
+		Start the application URL (adjust host and port if necessary):
+		<ul>
+			<li> local: <a href="http://localhost:8080/test-resources/sap/ui/core/demokit/sample/common/index.html?component=odata.v4.Create">http://&lt;host>:&lt;port>/test-resources/sap/ui/core/demokit/sample/common/index.html?component=odata.v4.Create</a></li>
+		</ul>
+		<h3>Testing with back end</h3>
+		Configure your IDE to be able to run the application against an ABAP back end system. Start
+		the application URL (adjust host and port if necessary):
+		<ul>
+			<li>local: <a href="http://localhost:8080/test-resources/sap/ui/core/demokit/sample/common/index.html?component=odata.v4.Create&amp;realOData=true">http://&lt;host>:&lt;port>/test-resources/sap/ui/core/demokit/sample/common/index.html?component=odata.v4.Create&amp;realOData=true</a></li>
+		</ul>
+		<h2>REALIZE and CHECK</h2>
+		<h3>Start the application</h3>
+		<ol>
+			<li><b>Check:</b> The table is visible and contains several entries.</li>
+			<li>Press the <code>Create Sales Order</code> button.</li>
+			<li><b>Check:</b> The table contains a new entry.</li>
+			<li><b>Check:</b> The dialog for creating a new entry opens.</li>
+			<li>Set the <code>Note</code> by entering <code>New note</code>.</li>
+			<li>Remove the focus from <code>Note</code>.</li>
+			<li><b>Check:</b> The field <code>Note</code> in the first entry of the table contains
+				<code>New note</code>.</li>
+			<li>Press the <code>Cancel</code> button.</li>
+			<li><b>Check:</b> The dialog for creating a new entry closes.</li>
+			<li><b>Check:</b> The new entry in the table disappears.</li>
+			<li>Press the <code>Create Sales Order</code> button.</li>
+			<li><b>Check:</b> The table contains a new entry.</li>
+			<li><b>Check:</b> The dialog for creating a new entry opens.</li>
+			<li>Remove the default value of <code>0100000000</code> for the
+				<code>Buyer ID</code>.</li>
+			<li>Press the <code>Save</code> button.</li>
+			<li><b>Check:</b> The dialog for creating a new entry is still open.</li>
+			<li><b>Check:</b> The <code>Buyer ID</code> field has the focus and the border is red,
+				indicating an error.</li>
+			<li>Set the <code>Buyer ID</code> by entering <code>0100000004</code>.</li>
+			<li>Remove the focus from <code>Buyer ID</code>.</li>
+			<li><b>Check:</b> The <code>Buyer ID</code> has the value state <code>None</code>.</li>
+			<li>Remove the default value of <code>EUR</code> for the <code>Currency</code>.</li>
+			<li>Press the <code>Save</code> button.</li>
+			<li><b>Check:</b> The dialog for creating a new entry is still open.</li>
+			<li><b>Check:</b> The <code>Currency</code> field has the focus and the border is red,
+				indicating an error.</li>
+			<li>Set the <code>Currency</code> by entering <code>USD</code>.</li>
+			<li>Remove the focus from <code>Currency</code>.</li>
+			<li><b>Check:</b> The <code>Currency</code> has the value state <code>None</code>.</li>
+			<li>Set the <code>Note</code> by entering <code>New note</code>.</li>
+			<li>Press the <code>Save</code> button.</li>
+			<li><b>Check:</b> The dialog for creating a new entry closes.</li>
+			<li><b>Check:</b> The dialog with the success message opens.</li>
+			<li>Press the <code>OK</code> button.</li>
+			<li><b>Check:</b> The dialog with the success message closes.</li>
+			<li><b>Check:</b> The first entry of the table contains</li>
+			<ul>
+				<li>the entered data for the <code>Buyer ID</code> of the <code>Buyer</code>,
+					<code>Currency</code> and <code>Note</code>.</li>
+				<li>the automatically provided data for the <code>Company Name</code> of the
+					<code>Buyer</code>, <code>Sales Order ID</code>, <code>Gross Amount</code>,
+					<code>Lifecycle Status</code> and <code>Created At</code></li>
+			</ul>
+		</ol>
+	</body>
+</html>

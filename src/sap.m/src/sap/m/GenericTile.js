@@ -1822,14 +1822,13 @@ sap.ui.define([
 		});
 
 		//The below piece of code is written for the scenario if the link inside the TileAttribute has been clicked
-		var bIsLinkClicked = false;
-		this.getTileContent().forEach(function(oActionTileContent){
-			if (oActionTileContent._isLinkPressed) {
-				bIsLinkClicked = true;
-				oActionTileContent._isLinkPressed = false;
+		var oSrcControl = oEvent.srcControl;
+		var oActionTileContent = this.getTileContent().find(function(oActionTileContent){
+			if (oActionTileContent.isA("sap.m.ActionTileContent")){
+				return oActionTileContent._isLinkClicked(oSrcControl);
 			}
 		});
-		return !!oLinkTileContent || bIsLinkClicked;
+		return !!oLinkTileContent || !!oActionTileContent;
 	};
 
 	/**

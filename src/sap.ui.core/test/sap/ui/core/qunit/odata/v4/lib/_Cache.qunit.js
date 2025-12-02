@@ -9649,7 +9649,7 @@ sap.ui.define([
 			oRequestor = _Requestor.create("/~/", {
 				getGroupProperty : defaultGetGroupProperty,
 				onCreateGroup : function () {}
-			}),
+			}, {/*mHeaders*/}, {/*mQueryParams*/}, "4.0"),
 			oCache = new _Cache(oRequestor, "TEAMS"),
 			oCacheMock = this.mock(oCache),
 			aCollection = [],
@@ -10752,7 +10752,7 @@ sap.ui.define([
 		var oRequestor = _Requestor.create("/~/", {
 				getGroupProperty : defaultGetGroupProperty,
 				onCreateGroup : function () {}
-			}),
+			}, {/*mHeaders*/}, {/*mQueryParams*/}, "4.0"),
 			oCache = _Cache.create(oRequestor, "Employees"),
 			oCreatePromise,
 			oDeletePromise,
@@ -10815,7 +10815,7 @@ sap.ui.define([
 				getMessagesByPath : function () { return []; },
 				onCreateGroup : function () {},
 				updateMessages : function () {}
-			}),
+			}, {/*mHeaders*/}, {/*mQueryParams*/}, "4.0"),
 			oCache = _Cache.create(oRequestor, "Employees"),
 			fnCallback = this.spy(),
 			oCreatedPromise,
