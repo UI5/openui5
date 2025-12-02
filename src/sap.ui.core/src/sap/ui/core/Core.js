@@ -108,7 +108,7 @@ sap.ui.define([
 
 	function loadCoreLibrary() {
 		// load library & content - Lib relies on the config
-		pContentLoaded = sap.ui.loader._.loadJSResourceAsync("sap/ui/core/library-content.js", true);
+		pContentLoaded = sap.ui.loader._.loadJSResourceAsync("sap/ui/core/_library-content.js", true);
 
 		aBeforeReady.push(() => {
 			return Lib.load({
