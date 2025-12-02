@@ -4,27 +4,29 @@
 sap.ui.define([
 	"sap/base/Log",
 	"sap/m/Token",
+	"sap/ui/base/BindingParser",
 	"sap/ui/core/mvc/Controller",
 	"sap/ui/core/Element",
 	"sap/ui/core/Lib",
 	"sap/ui/core/library",
-	"sap/ui/rta/util/validateText",
 	"sap/ui/fl/util/IFrame",
 	"sap/ui/model/Filter",
 	"sap/ui/model/FilterOperator",
-	"sap/ui/rta/plugin/iframe/urlCleaner"
+	"sap/ui/rta/plugin/iframe/urlCleaner",
+	"sap/ui/rta/util/validateText"
 ], function(
 	Log,
 	Token,
+	BindingParser,
 	Controller,
 	Element,
 	Lib,
 	coreLibrary,
-	validateText,
 	IFrame,
 	Filter,
 	FilterOperator,
-	urlCleaner
+	urlCleaner,
+	validateText
 ) {
 	"use strict";
 
@@ -233,6 +235,16 @@ sap.ui.define([
 			const sUrl = this._buildReturnedURL();
 			const oResolver = Element.getElementById("sapUiRtaAddIFrameDialog_PreviewLinkResolver");
 			try {
+				// Whenever a URL contains a binding string, all old bindings are cleaned up
+				// and a new binding is created for the text property
+				// However this doesn't happen if there was a binding previously and the new url
+				// value is a plain string, which can then lead to problems with two-way bindings
+				// where the new plain value would leak back into the model
+				// In this case the old binding has to be cleaned up explicitly
+				if (!BindingParser.complexParser(sUrl)) {
+					oResolver.unbindProperty("text");
+				}
+
 				oResolver.applySettings({
 					text: sUrl
 				});

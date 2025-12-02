@@ -14,6 +14,10 @@ sap.ui.define([
 			this._registerForP13n();
 		},
 
+		onExit: function() {
+			Engine.getInstance().detachStateChange(this.handleStateChange, this);
+		},
+
 		_registerForP13n: function () {
 			const oTable = this.byId("persoTable");
 

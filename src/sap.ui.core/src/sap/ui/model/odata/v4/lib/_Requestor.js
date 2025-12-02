@@ -66,10 +66,10 @@ sap.ui.define([
 	 * @param {string} sServiceUrl
 	 *   URL of the service document to request the CSRF token from; also used to resolve
 	 *   relative resource paths (see {@link #request})
-	 * @param {object} [mHeaders={}]
+	 * @param {object} mHeaders
 	 *   Map of default headers; may be overridden with request-specific headers; certain
 	 *   predefined OData V4 headers are added by default, but may be overridden
-	 * @param {object} [mQueryParams={}]
+	 * @param {object} mQueryParams
 	 *   A map of query parameters as described in
 	 *   {@link sap.ui.model.odata.v4.lib._Helper.buildQuery}; used only to request the CSRF token
 	 * @param {object} oModelInterface
@@ -87,7 +87,7 @@ sap.ui.define([
 			bWithCredentials) {
 		this.mBatchQueue = {};
 		this.bBatchSent = false;
-		this.mHeaders = mHeaders || {};
+		this.mHeaders = mHeaders;
 		this.aLockedGroupLocks = [];
 		this.oModelInterface = oModelInterface;
 		this.sODataVersion = sODataVersion;
@@ -97,7 +97,7 @@ sap.ui.define([
 		this.iSessionTimer = 0;
 		this.iSerialNumber = 0;
 		this.sServiceUrl = sServiceUrl;
-		this.vStatistics = mQueryParams && mQueryParams["sap-statistics"];
+		this.vStatistics = mQueryParams["sap-statistics"];
 		this.bWithCredentials = bWithCredentials;
 		this.processSecurityTokenHandlers(); // sets this.oSecurityTokenPromise
 
@@ -2488,7 +2488,7 @@ sap.ui.define([
 	 *   A function to report messages to {@link module:sap/ui/core/Messaging}, expecting two arrays
 	 *   of {@link sap.ui.core.message.Message} as parameters. The first array should be the old
 	 *   messages and the second array the new messages.
-	 * @param {object} [mHeaders={}]
+	 * @param {object} mHeaders
 	 *   Map of default headers; may be overridden with request-specific headers; certain
 	 *   OData V4 headers are predefined, but may be overridden by the default or
 	 *   request-specific headers:
@@ -2501,7 +2501,7 @@ sap.ui.define([
 	 *   <code>_Requestor</code> always sets the "Content-Type" header value to
 	 *   "application/json;charset=UTF-8;IEEE754Compatible=true" for OData V4 or
 	 *   "application/json;charset=UTF-8" for OData V2.
-	 * @param {object} [mQueryParams={}]
+	 * @param {object} mQueryParams
 	 *   A map of query parameters as described in
 	 *   {@link sap.ui.model.odata.v4.lib._Helper.buildQuery}; used only to request the CSRF
 	 *   token

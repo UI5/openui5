@@ -2245,7 +2245,7 @@ sap.ui.define([
 	 * next one (via offset +1) or the previous one (via offset -1).
 	 *
 	 * @param {sap.ui.model.odata.v4.Context} oNode - A node
-	 * @param {number} iOffset - An offset, either -1 or +1
+	 * @param {number} [iOffset=+1] - An offset, either -1 or +1
 	 * @param {boolean} [bAllowRequest]
 	 *   Whether it is allowed to send a GET request to fetch the sibling
 	 * @returns {sap.ui.model.odata.v4.Context|null|undefined

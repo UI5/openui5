@@ -588,6 +588,35 @@ sap.ui.define([
 			return this.oAddIFrameDialog.open(mTestURLBuilderData, oReferenceControl);
 		});
 
+		QUnit.test("when a url containing a binding is updated", function(assert) {
+			this.oAddIFrameDialog.attachOpened(async () => {
+				const oUrlTextArea = Element.getElementById("sapUiRtaAddIFrameDialog_EditUrlTA");
+
+				// Updating from binding to binding should automatically remove the old binding so no data
+				// leaks from the new binding into the old property
+				await setTextAreaValue(this.oAddIFrameDialog._oDialog, "{ProductCategory}");
+				await setTextAreaValue(this.oAddIFrameDialog._oDialog, "{BrandName}");
+				assert.strictEqual(
+					oUrlTextArea.getModel().getData().ProductCategory,
+					"Ice Cream",
+					"then no incorrect data leaks into the model"
+				);
+
+				// Updating from binding to plain text should lead to manual removal of the old binding
+				// in the controller, so the new plain text doesn't leak into the old binding property
+				await setTextAreaValue(this.oAddIFrameDialog._oDialog, "{ProductCategory}");
+				await setTextAreaValue(this.oAddIFrameDialog._oDialog, "Plain text now");
+				assert.strictEqual(
+					oUrlTextArea.getModel().getData().ProductCategory,
+					"Ice Cream",
+					"then no incorrect data leaks into the model"
+				);
+
+				clickOnCancel();
+			});
+			return this.oAddIFrameDialog.open(mTestURLBuilderData, oReferenceControl);
+		});
+
 		QUnit.test("when a url with a user model binding is entered", function(assert) {
 			sandbox.stub(FlUtils, "getUshellContainer").returns({});
 			sandbox.stub(FlUtils, "getUShellService").resolves({

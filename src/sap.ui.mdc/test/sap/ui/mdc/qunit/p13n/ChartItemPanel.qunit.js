@@ -1055,4 +1055,151 @@ sap.ui.define([
 
 	}.bind(this));
 
+	QUnit.module("Keyboard Navigation and Move Button Tests", {
+		beforeEach: async function(){
+			await nextUIUpdate();
+
+			const aItems = [
+				{
+					label: "Test",
+					name: "test",
+					visible: true,
+					kind: "Dimension",
+					role: "category"
+				},
+				{
+					label: "Test2",
+					name: "test2",
+					visible: true,
+					kind: "Measure",
+					role: "axis1"
+				},
+				{
+					label: "Test3",
+					name: "test3",
+					visible: true,
+					kind: "Measure",
+					role: "axis1"
+				}
+			];
+
+			this.oChartItemPanel = new ChartItemPanel({panelConfig: oChartConfig, errorConfig: oErrorConfig});
+			this.oChartItemPanel.setP13nData(aItems);
+			this.oChartItemPanel.placeAt("qunit-fixture");
+		}.bind(this),
+		afterEach: function(){
+			this.oChartItemPanel.destroy();
+		}.bind(this)
+	});
+
+	QUnit.test("Check '_addMoveButtons' inserts buttons in correct order (Desktop)", function(assert){
+		// Arrange
+		const oTableItem = this.oChartItemPanel._oListControl.getItems()[4];
+		const oHBox = oTableItem.getCells()[2];
+
+		// Act
+		this.oChartItemPanel._addMoveButtons(oTableItem);
+
+		// Assert
+		assert.equal(oHBox.getItems().length, 5, "HBox contains 5 buttons (4 move + 1 remove)");
+		assert.ok(oHBox.getItems()[0].getId().includes("moveTopBtn"), "Button at position 0 is MoveTop");
+		assert.ok(oHBox.getItems()[1].getId().includes("moveUpBtn"), "Button at position 1 is MoveUp");
+		assert.ok(oHBox.getItems()[2].getId().includes("moveDownpBtn"), "Button at position 2 is MoveDown");
+		assert.ok(oHBox.getItems()[3].getId().includes("moveBottomBtn"), "Button at position 3 is MoveBottom");
+		assert.ok(oHBox.getItems()[4].getIcon() === "sap-icon://decline", "Button at position 4 is Remove button");
+	}.bind(this));
+
+	QUnit.test("Check '_addMoveButtons' inserts buttons in correct order (Mobile)", function(assert){
+		// Arrange
+		this.oChartItemPanel._switchMobileMode(true);
+		const oTableItem = this.oChartItemPanel._oListControl.getItems()[4];
+		const oHBox = oTableItem.getCells()[1];
+
+		// Act
+		this.oChartItemPanel._addMoveButtons(oTableItem);
+
+		// Assert
+		assert.equal(oHBox.getItems().length, 3, "HBox contains 3 buttons (2 move + 1 remove)");
+		assert.ok(oHBox.getItems()[0].getId().includes("moveUpBtn"), "Button at position 0 is MoveUp");
+		assert.ok(oHBox.getItems()[1].getId().includes("moveDownpBtn"), "Button at position 1 is MoveDown");
+		assert.ok(oHBox.getItems()[2].getIcon() === "sap-icon://decline", "Button at position 2 is Remove button");
+	}.bind(this));
+
+	QUnit.test("Check '_handleActivated' (remove buttons) works for new hovered item", function(assert){
+		// Arrange
+		const oHoveredItem = this.oChartItemPanel._oListControl.getItems()[4];
+		const oSpyRemoveButtons = sinon.spy(this.oChartItemPanel, "removeMoveButtons");
+
+		// Act
+		this.oChartItemPanel._oHoveredItem = this.oChartItemPanel._oListControl.getItems()[5];
+		this.oChartItemPanel._handleActivated(oHoveredItem);
+
+		// Assert
+		assert.ok(oSpyRemoveButtons.called, "Buttons were removed when hovering different item");
+
+		// Cleanup
+		oSpyRemoveButtons.restore();
+	}.bind(this));
+
+	QUnit.test("Check '_handleActivated' (early return) does not add buttons for same item", function(assert){
+		// Arrange
+		const oHoveredItem = this.oChartItemPanel._oListControl.getItems()[4];
+		const oSpyRemoveButtons = sinon.spy(this.oChartItemPanel, "removeMoveButtons");
+		const oSpyAddButtons = sinon.spy(this.oChartItemPanel, "_addMoveButtons");
+
+		// Act - Set the item as already hovered
+		this.oChartItemPanel._oHoveredItem = oHoveredItem;
+		this.oChartItemPanel._handleActivated(oHoveredItem);
+
+		// Assert
+		assert.ok(oSpyRemoveButtons.notCalled, "Buttons were not removed for same item");
+		assert.ok(oSpyAddButtons.notCalled, "Buttons were not added again for same item");
+
+		// Cleanup
+		oSpyRemoveButtons.restore();
+		oSpyAddButtons.restore();
+	}.bind(this));
+
+	QUnit.test("Check '_handleActivated' removes buttons for template item", function(assert){
+		// Arrange
+		const oTableItem = this.oChartItemPanel._oListControl.getItems()[4];
+		const oTemplateItem = this.oChartItemPanel._oListControl.getItems()[6];
+
+		// Act - First hover regular item
+		this.oChartItemPanel._handleActivated(oTableItem);
+
+		// Create spies after first hover to track only the template item interaction
+		const oSpyRemoveButtons = sinon.spy(this.oChartItemPanel, "removeMoveButtons");
+		const oSpyAddButtons = sinon.spy(this.oChartItemPanel, "_addMoveButtons");
+
+		// Act - Then hover template item
+		this.oChartItemPanel._handleActivated(oTemplateItem);
+
+		// Assert
+		assert.ok(oSpyRemoveButtons.calledOnce, "Buttons were removed when hovering template item");
+		assert.ok(oSpyAddButtons.notCalled, "Buttons were not added for template item");
+
+		// Cleanup
+		oSpyRemoveButtons.restore();
+		oSpyAddButtons.restore();
+	}.bind(this));
+
+	QUnit.test("Check '_handleActivated' adds buttons only for non-template items", function(assert){
+		// Arrange
+		const oHoveredItem = this.oChartItemPanel._oListControl.getItems()[4];
+		const oSpyAddButtons = sinon.spy(this.oChartItemPanel, "_addMoveButtons");
+		const oSpyUpdateButtons = sinon.spy(this.oChartItemPanel, "_updateEnableOfMoveButtons");
+
+		// Act
+		this.oChartItemPanel._handleActivated(oHoveredItem);
+
+		// Assert
+		assert.ok(oSpyAddButtons.calledOnce, "Buttons were added for non-template item");
+		assert.ok(oSpyUpdateButtons.calledOnce, "Button states were updated for non-template item");
+
+		// Cleanup
+		oSpyAddButtons.restore();
+		oSpyUpdateButtons.restore();
+	}.bind(this));
+
 });

@@ -30,6 +30,9 @@ sap.ui.define([], function () {
 		if (bDecorative) {
 			oRm.attr("role", "presentation");
 			oRm.attr("aria-hidden", "true");
+		} else {
+			oRm.attr("role", "img");
+			oRm.attr("aria-label", oIllustration.getType());
 		}
 
 		oRm.openEnd();

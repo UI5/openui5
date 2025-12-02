@@ -1420,7 +1420,7 @@ sap.ui.define([
 		bVersionOptional : true
 	}].forEach(function (oFixture, i) {
 		QUnit.test("doCheckVersionHeader, success cases - " + i, function (assert) {
-			var oRequestor = _Requestor.create("/", {}, undefined, undefined, "2.0"),
+			var oRequestor = _Requestor.create("/", {}, {}, {}, "2.0"),
 				fnGetHeader = this.spy(function (sHeaderKey) {
 					return oFixture.mHeaders[sHeaderKey];
 				});
@@ -1452,7 +1452,7 @@ sap.ui.define([
 		mHeaders : {"OData-Version" : "baz"}
 	}].forEach(function (oFixture, i) {
 		QUnit.test("doCheckVersionHeader, error cases - " + i, function (assert) {
-			var oRequestor = _Requestor.create("/", {}, undefined, undefined, "2.0"),
+			var oRequestor = _Requestor.create("/", {}, {}, {}, "2.0"),
 				fnGetHeader = this.spy(function (sHeaderKey) {
 					return oFixture.mHeaders[sHeaderKey];
 				});
@@ -1487,7 +1487,7 @@ sap.ui.define([
 			},
 			mParameters = {ID : "1", Foo : 42, "n/a" : NaN},
 			mQueryOptions = {},
-			oRequestor = _Requestor.create("/", oModelInterface, undefined, undefined, "2.0"),
+			oRequestor = _Requestor.create("/", oModelInterface, {}, {}, "2.0"),
 			oRequestorMock = this.mock(oRequestor);
 
 		oRequestorMock.expects("formatPropertyAsLiteral")
@@ -1521,7 +1521,7 @@ sap.ui.define([
 				},
 				mParameters = {Bar : true},
 				mQueryOptions = {},
-				oRequestor = _Requestor.create("/", oModelInterface, undefined, undefined, "2.0"),
+				oRequestor = _Requestor.create("/", oModelInterface, {}, {}, "2.0"),
 				oRequestorMock = this.mock(oRequestor),
 				oTypeMetadata = { // "$kind" : "EntityType",
 					$Key : ["ID", "Foo"],
@@ -1561,7 +1561,7 @@ sap.ui.define([
 	QUnit.test("getPathAndAddQueryOptions: Operation w/o parameters", function (assert) {
 		var oOperationMetadata = {},
 			mParameters = {foo : "bar"},
-			oRequestor = _Requestor.create("/", {}, undefined, undefined, "2.0");
+			oRequestor = _Requestor.create("/", {}, {}, {}, "2.0");
 
 		this.mock(oRequestor).expects("formatPropertyAsLiteral").never();
 
@@ -1577,7 +1577,7 @@ sap.ui.define([
 	QUnit.test("getPathAndAddQueryOptions: $v2HttpMethod", function (assert) {
 		var oOperationMetadata = {$v2HttpMethod : "PUT"},
 			mParameters = {foo : "bar"},
-			oRequestor = _Requestor.create("/", {}, undefined, undefined, "2.0");
+			oRequestor = _Requestor.create("/", {}, {}, {}, "2.0");
 
 		assert.strictEqual(
 			// code under test
@@ -1590,7 +1590,7 @@ sap.ui.define([
 	//*********************************************************************************************
 	QUnit.test("getPathAndAddQueryOptions: collection parameter", function (assert) {
 		var oOperationMetadata = {$Parameter : [{$Name : "foo", $isCollection : true}]},
-			oRequestor = _Requestor.create("/", {}, undefined, undefined, "2.0");
+			oRequestor = _Requestor.create("/", {}, {}, {}, "2.0");
 
 		assert.throws(function () {
 			// code under test
@@ -1601,14 +1601,14 @@ sap.ui.define([
 
 	//*****************************************************************************************
 	QUnit.test("isChangeSetOptional", function (assert) {
-		var oRequestor = _Requestor.create("/", {}, undefined, undefined, "2.0");
+		var oRequestor = _Requestor.create("/", {}, {}, {}, "2.0");
 
 		assert.strictEqual(oRequestor.isChangeSetOptional(), false);
 	});
 
 	//*****************************************************************************************
 	QUnit.test("isActionBodyOptional", function (assert) {
-		var oRequestor = _Requestor.create("/", {}, undefined, undefined, "2.0");
+		var oRequestor = _Requestor.create("/", {}, {}, {}, "2.0");
 
 		assert.strictEqual(oRequestor.isActionBodyOptional(), true);
 	});
@@ -1619,7 +1619,7 @@ sap.ui.define([
 				$Key : ["KeyProperty"],
 				KeyProperty : {$Type : "Edm.String"}
 			},
-			oRequestor = _Requestor.create("/", {}, undefined, undefined, "2.0");
+			oRequestor = _Requestor.create("/", {}, {}, {}, "2.0");
 
 		this.mock(_Helper).expects("getMetaPath")
 			.withExactArgs("/my/path('foo')").returns("/my/path");
@@ -1637,7 +1637,7 @@ sap.ui.define([
 				$Key : ["KeyProperty"],
 				KeyProperty : {$Type : "Edm.Foo"}
 			},
-			oRequestor = _Requestor.create("/", {}, undefined, undefined, "2.0");
+			oRequestor = _Requestor.create("/", {}, {}, {}, "2.0");
 
 		this.mock(_Helper).expects("getMetaPath")
 			.withExactArgs("/my/path(42)").returns("/my/path");
@@ -1658,7 +1658,7 @@ sap.ui.define([
 				$Key : ["føø"],
 				føø : {$Type : "Edm.Foo"}
 			},
-			oRequestor = _Requestor.create("/", {}, undefined, undefined, "2.0");
+			oRequestor = _Requestor.create("/", {}, {}, {}, "2.0");
 
 		this.mock(_Helper).expects("getMetaPath")
 			.withExactArgs("/my/path(f%C3%B8%C3%B8=42)").returns("/my/path");
@@ -1687,7 +1687,7 @@ sap.ui.define([
 			},
 			oHelperMock = this.mock(_Helper),
 			oParserMock = this.mock(_Parser),
-			oRequestor = _Requestor.create("/", {}, undefined, undefined, "2.0"),
+			oRequestor = _Requestor.create("/", {}, {}, {}, "2.0"),
 			oRequestorMock = this.mock(oRequestor);
 
 		this.mock(_Helper).expects("getMetaPath")
@@ -1713,7 +1713,7 @@ sap.ui.define([
 	//*****************************************************************************************
 	["", "?$select=*"].forEach(function (sQuery) {
 		QUnit.test("convertResourcePath: query=" + sQuery, function (assert) {
-			var oRequestor = _Requestor.create("/", {}, undefined, undefined, "2.0"),
+			var oRequestor = _Requestor.create("/", {}, {}, {}, "2.0"),
 				oRequestorMock = this.mock(oRequestor);
 
 			oRequestorMock.expects("convertKeyPredicate")
@@ -1732,7 +1732,7 @@ sap.ui.define([
 	QUnit.test("reportTransitionMessages does not call model", function (assert) {
 		var fnreportTransitionMessages = this.spy(),
 			oModelInterface = {reportTransitionMessages : fnreportTransitionMessages},
-			oRequestor = _Requestor.create("/", oModelInterface, undefined, undefined, "2.0");
+			oRequestor = _Requestor.create("/", oModelInterface, {}, {}, "2.0");
 
 		// code under test
 		oRequestor.reportHeaderMessages("resource/path", "[]");
@@ -1744,7 +1744,7 @@ sap.ui.define([
 	QUnit.test("reportStateMessages does not call model", function (assert) {
 		var fnreportStateMessages = this.spy(),
 			oModelInterface = {reportStateMessages : fnreportStateMessages},
-			oRequestor = _Requestor.create("/", oModelInterface, undefined, undefined, "2.0");
+			oRequestor = _Requestor.create("/", oModelInterface, {}, {}, "2.0");
 
 		// code under test
 		oRequestor.getModelInterface().reportStateMessages("Teams('42')", {/*mPathToMessages*/});
@@ -1783,7 +1783,7 @@ sap.ui.define([
 
 	//*****************************************************************************************
 	QUnit.test("checkHeaderNames", function (assert) {
-		var oRequestor = _Requestor.create("/", {}, undefined, undefined, "2.0");
+		var oRequestor = _Requestor.create("/", {}, {}, {}, "2.0");
 
 		// code under test
 		oRequestor.checkHeaderNames({allowed : "123"});

@@ -287,13 +287,15 @@ sap.ui.define([ "sap/ui/core/Lib", "sap/ui/model/ParseException", "sap/ui/model/
 
 			var sCellData = aRowData[i];
 
+			let fnCellParse = fnParse;
+			let fnCellValidate = fnValidate;
 			if (!oColumnInfo.typeInstance) {
-				fnParse = oColumnInfo.customParseFunction;
-				fnValidate = function() {
+				fnCellParse = oColumnInfo.customParseFunction;
+                fnCellValidate = function() {
 				};
 			}
 
-			var oSingleCellPromise = PasteHelper._parseCell(i, sCellData, oColumnInfo, iRowIndex, fnParse, fnValidate, oBundle, oObject, aErrors);
+			var oSingleCellPromise = PasteHelper._parseCell(i, sCellData, oColumnInfo, iRowIndex, fnCellParse, fnCellValidate, oBundle, oObject, aErrors);
 			aCellPromises.push(oSingleCellPromise);
 		}
 

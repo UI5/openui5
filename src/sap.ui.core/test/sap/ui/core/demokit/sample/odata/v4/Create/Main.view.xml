@@ -13,7 +13,7 @@
 					<Button icon="sap-icon://add" press=".onCreateSalesOrder"
 						tooltip="Create Sales Order"/>
 					<dependents>
-						<Dialog id="createDialog" title="Create New Sales Order">
+						<Dialog draggable="true" id="createDialog" title="Create New Sales Order">
 							<buttons>
 								<Button press=".onSaveSalesOrder" text="Save" type="Emphasized"/>
 								<Button press=".onCancelSalesOrder" text="Cancel"/>

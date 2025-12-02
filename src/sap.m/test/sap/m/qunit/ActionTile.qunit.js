@@ -16,7 +16,8 @@ sap.ui.define([
 	"sap/ui/core/theming/Parameters",
 	"sap/m/Link",
 	"sap/ui/test/utils/nextUIUpdate",
-	"sap/ui/core/Element"
+	"sap/ui/core/Element",
+	"sap/ui/qunit/QUnitUtils"
 ], function(
 	ActionTile,
 	ActionTileContent,
@@ -34,7 +35,8 @@ sap.ui.define([
 	Parameters,
 	Link,
 	nextUIUpdate,
-	Element
+	Element,
+	qutils
 ) {
 	"use strict";
 
@@ -488,4 +490,61 @@ sap.ui.define([
 		var oTileContent = this.oToDo.getTileContent()[0];
 		assert.ok(getComputedStyle(oTileContent.getDomRef()).marginBottom.slice(0,-2) !== '0',"Margin Bottom has been added to create space between the button and the tile");
 	});
+
+	 QUnit.module("Press Event Tests for ActionTileContent", {
+				beforeEach: async function() {
+					var oActionTileContent = new ActionTileContent("action-tile-content", {
+						headerLink: new Link(),
+						attributes: [
+							new TileAttribute({
+								label: "Test Attribute",
+								contentConfig: new ContentConfig({
+									type:"Link",
+									text:"Test Value"
+								})
+							})
+						]
+					});
+				//render action tile
+				this.oActionTile = new ActionTile("action-tile", {
+				header: "My Action Tile",
+				tileContent: oActionTileContent
+				}).placeAt("qunit-fixture");
+				await nextUIUpdate();
+				},
+				afterEach: function() {
+					this.oActionTile.destroy();
+					this.oActionTile = null;
+				}
+		});
+
+    QUnit.test("ENTER key event on link", function (assert) {
+        var oActionTileContent = this.oActionTile.getTileContent()[0];
+        var bEventNotTriggered = true;
+		oActionTileContent.getHeaderLink().attachEvent("press", function() {
+			bEventNotTriggered = false;
+		});
+		qutils.triggerKeyup(oActionTileContent.getHeaderLink().getDomRef(),KeyCodes.ENTER);
+        assert.ok(bEventNotTriggered, "ENTER press is not fired on headerlink");
+
+		bEventNotTriggered = true;
+		oActionTileContent.getAttributes()[0].attachEvent("press", function() {
+			bEventNotTriggered = false;
+		});
+		qutils.triggerKeyup(oActionTileContent.getAttributes()[0].getDomRef(),KeyCodes.ENTER);
+        assert.ok(bEventNotTriggered, "ENTER press is not fired on attributes link");
+    });
+    QUnit.test("TAB key event after after link is activated", async function (assert) {
+        var oActionTileContent = this.oActionTile.getTileContent()[0];
+		qutils.triggerKeyup(oActionTileContent.getHeaderLink().getDomRef(),KeyCodes.SPACE);
+        await nextUIUpdate();
+
+		var bEventNotTriggered = true;
+		oActionTileContent.getHeaderLink().attachEvent("press", function() {
+			bEventNotTriggered = false;
+		});
+		qutils.triggerKeydown(oActionTileContent.getHeaderLink().getDomRef(),KeyCodes.SPACE);
+        assert.ok(bEventNotTriggered, "TAB navigation is not disabled just after link is activated");
+    });
+
 });
