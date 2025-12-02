@@ -858,6 +858,27 @@ sap.ui.define([
 		const oContent = aContent?.length > 0 && aContent[0];
 		assert.deepEqual(oField.getAccessibilityInfo(), oContent.getAccessibilityInfo(), "accessibility info of content returned");
 
+		const oResourceBundle = Library.getResourceBundleFor("sap.m");
+		const oMIStub = sinon.stub(MultiInput.prototype, "getAccessibilityInfo").callsFake(function() {
+			const oInfo = oMIStub.wrappedMethod.apply(this, arguments);
+			oInfo.role = "combobox";
+			return oInfo;
+		});
+		let oInfo = oField.getAccessibilityInfo();
+		assert.equal(oInfo.type, oResourceBundle.getText("ACC_CTR_TYPE_MULTICOMBO"), "type changed to MultiComboBox");
+		oMIStub.restore();
+
+		oField.setMaxConditions(1);
+		await nextUIUpdate();
+		const oIStub = sinon.stub(Input.prototype, "getAccessibilityInfo").callsFake(function() {
+			const oInfo = oIStub.wrappedMethod.apply(this, arguments);
+			oInfo.role = "combobox";
+			return oInfo;
+		});
+		oInfo = oField.getAccessibilityInfo();
+		assert.equal(oInfo.type, oResourceBundle.getText("ACC_CTR_TYPE_COMBO"), "type changed to ComboBox");
+		oIStub.restore();
+
 	});
 
 	QUnit.test("Currency rendering", async (assert) => {

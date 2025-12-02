@@ -8,17 +8,20 @@ sap.ui.define([
 	'sap/m/Tokenizer',
 	'sap/ui/mdc/field/FieldMultiInputRenderer',
 	'sap/ui/Device',
-	'sap/ui/base/ManagedObjectObserver'
+	'sap/ui/base/ManagedObjectObserver',
+	'sap/ui/core/Lib'
 ], (
 	Element,
 	MultiInput,
 	Tokenizer,
 	FieldMultiInputRenderer,
 	Device,
-	ManagedObjectObserver
-
+	ManagedObjectObserver,
+	Library
 ) => {
 	"use strict";
+
+	const oRbM = Library.getResourceBundleFor("sap.m");
 
 	/**
 	 * Constructor for a new <code>FieldMultiInput</code>.
@@ -291,6 +294,19 @@ sap.ui.define([
 	FieldMultiInput.prototype._onValueHelpRequested = function () {
 		this._bValueHelpOpen = false; // otherwise in non-modal Valuehelp focusout will not show the more-indicator. In Field case, onSapFocusLeave is prevented on opening ValueHelp-Dialog, so the original use-case will not occur
 	};
+
+	FieldMultiInput.prototype.getAccessibilityInfo = function() {
+
+		const oInfo = MultiInput.prototype.getAccessibilityInfo.apply(this, arguments);
+
+		if (oInfo.role === "combobox") { // use text like in ComboBox
+			oInfo.type = oRbM.getText("ACC_CTR_TYPE_MULTICOMBO");
+		}
+
+		return oInfo;
+
+	};
+
 
 	return FieldMultiInput;
 
