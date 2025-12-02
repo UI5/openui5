@@ -3,9 +3,8 @@
  */
 sap.ui.define([
 	"sap/base/util/merge",
-	"sap/base/util/deepEqual",
 	"sap/ui/core/util/reflection/JsControlTreeModifier"
-], (merge, deepEqual, JsControlTreeModifier) => {
+], (merge, JsControlTreeModifier) => {
 	"use strict";
 
 	/**
@@ -450,9 +449,7 @@ sap.ui.define([
 		const sOperation = oModificationPayload.operation;
 
 		const oItem = oConfig.properties[sAffectedProperty].find((oEntry) => {
-			// DINC0490163: If two filters are applied on the same filter field, the incorrect one can be taken as the values are
-			// not taken into account. Therefore, we need to ensure, that the "correct" filter is being taken into consideration by doing a value comparison.
-			return oEntry.key === oModificationPayload.key && deepEqual(oEntry, oModificationPayload.value);
+			return oEntry.key === oModificationPayload.key;
 		});
 
 		if (oItem && sOperation !== "add") {
