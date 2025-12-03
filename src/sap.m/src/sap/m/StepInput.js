@@ -606,6 +606,7 @@ function(
 			} else {
 				// just update the visual value and buttons
 				this._applyValue(this._fTempValue);
+				this._bValueStatePreset = false;
 				this._disableButtons(this._parseNumber(this._getInput().getValue()), this._getMax(), this._getMin());
 			}
 			return this;
@@ -740,7 +741,7 @@ function(
 				bHasValidationErrorListeners = false,
 				oEventProvider;
 
-			if (oBindingValueState && oBindingValueState.oValue) {
+			if (oBindingValueState && oBindingValueState.oValue && this._bValueStatePreset) {
 				return;
 			}
 
@@ -1145,6 +1146,7 @@ function(
 		StepInput.prototype._liveChange = function () {
 			this._disableButtons(this._parseNumber(this._getInput().getValue()), this._getMax(), this._getMin());
 			this._verifyValue();
+			this._bValueStatePreset = false;
 		};
 
 		/**
