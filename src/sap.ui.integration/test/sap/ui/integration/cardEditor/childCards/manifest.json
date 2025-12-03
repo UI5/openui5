@@ -4,11 +4,11 @@
 		"id": "sap.ui5.test.cardeditor.listcard",
 		"type": "card",
 		"i18n": "../i18n/i18n.properties",
+		"title": "Main Card",
 		"subTitle": "Test Card for Parameters",
 		"applicationVersion": {
 			"version": "1.0.0"
-		},
-		"title": "Card 'listcard'"
+		}
 	},
 	"sap.ui": {
 		"technology": "UI5",

@@ -1357,5 +1357,38 @@ sap.ui.define([
 		}
 		assert.ok(iFeedListItemWidth >= iTotalChildrenWidth,`FeedListItem children don't overflow`);
 	});
+	QUnit.module("FeedListItem size and count",{
+		beforeEach: async function () {
+			this.oList = new List({
+				items: [
+					new FeedListItem({
+						sender: "George Washington",
+						info: "Reply",
+						icon: "sap-icon://edit",
+						timestamp: "March 04 2013",
+						text: "This is a text"
+					}),
+					new FeedListItem({
+						sender: "Mrs Smith",
+						info: "Reply",
+						icon: "sap-icon://edit",
+						timestamp: "March 07 2015",
+						text: "This is a text"
+					})
+				]
+			}).placeAt("qunit-fixture");
+			await nextUIUpdate();
+		},
+		afterEach: function () {
+			this.oList.destroy();
+			this.oList = null;
+		}
+	});
+	QUnit.test("FeedListItem should announce the total item size and current item number", function (assert) {
+		var oItem = this.oList.getItems()[0];
+		oItem.focus();
+		assert.equal(oItem.getDomRef().ariaSetSize,'2','Total List size is available to be announced');
+		assert.equal(oItem.getDomRef().ariaPosInSet,'1','Current List Item count is available to be announced');
+	});
 
 });

@@ -28,36 +28,6 @@
 						.sapMInputBaseContentWrapper {
 							background-image: none;
 						}
-
-						.sapMTextAreaInner {
-							border: none;
-						}
-					}
-				}
-			}
-
-			.sapUiRtaAddIFrameDialogPreviewLinkGrid {
-
-				.sapUiRtaAddIFrameDialogPreviewLinkPanel {
-
-					&.sapMPanel .sapMPanelWrappingDiv:not(.sapMPanelWrappingDivExpanded),
-					&.sapMPanel .sapMPanelWrappingDivTb:not(.sapMPanelWrappingDivTbExpanded) {
-						border-radius: 0;
-					}
-
-					.sapUiRtaAddIFrameDialogPreviewLinkToolbar {
-						padding-left: 0;
-						padding-right: 0.125rem;
-
-						.sapUiRtaAddIFrameDialogPreviewButton {
-
-							&:not(.sapMBtnDisabled):hover {
-
-								.sapMBtnInner {
-									background-color: @_sap_ui_rta_AddIFrame_ButtonHoverBackgroundColor;
-								}
-							}
-						}
 					}
 				}
 			}
@@ -67,9 +37,4 @@
 			}
 		}
 	}
-}
-
-/* adapt scrollbars to rounded corners */
-html.sap-desktop:not(.sapUiNativeScrollbars) ::-webkit-scrollbar {
-	background-color: inherit !important;
 }

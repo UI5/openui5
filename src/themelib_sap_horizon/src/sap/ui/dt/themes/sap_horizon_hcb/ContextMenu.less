@@ -24,7 +24,7 @@
 			}
 
 			&.sapMMenuItemDisabled {
-				opacity: 1;
+				opacity: @_sap_ui_dt_ContextMenu_EnabledOpacity;
 			}
 
 			&:focus {
@@ -32,7 +32,6 @@
 			}
 
 			&.sapMMenuItemSubMenuOpen {
-				border-bottom: 0.0625rem solid transparent !important; /* remove border */
 				border-radius: @_sap_ui_dt_ContextMenu_BorderRadius;
 
 				&:not(:hover) {

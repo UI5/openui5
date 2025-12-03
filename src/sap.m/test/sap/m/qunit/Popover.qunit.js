@@ -740,6 +740,7 @@ sap.ui.define([
 		const oOpener = new Button({ text: "Open Popover" });
 		oOpener.placeAt(DOM_RENDER_LOCATION);
 		await nextUIUpdate();
+		// Ensure there is no vertical scrollbar
 		oDomRenderLocation.style.height = "";
 
 		// Assert
@@ -754,7 +755,8 @@ sap.ui.define([
 
 		oPopover.attachAfterOpen(() => {
 			// Assert
-			assert.strictEqual(document.documentElement.style.overflow, sCurrentOverflow, "The documentElement should NOT have an overflow style");
+			assert.strictEqual(document.documentElement.style.overflow, sCurrentOverflow, "The documentElement overflow style should be restored");
+			assert.ok(document.documentElement.scrollHeight <= document.documentElement.clientHeight, "The documentElement should NOT have a scrollbar");
 
 			// Clean up
 			oPopover.destroy();
@@ -767,7 +769,7 @@ sap.ui.define([
 		oPopover.openBy(oOpener);
 	});
 
-	QUnit.test("If there is already a scrollbar on the documentElement, it is preserved during position calculation", async function (assert) {
+	QUnit.test("If there is already a vertical scrollbar on the documentElement, it is preserved during position calculation", async function (assert) {
 		// Arrange
 		this.clock.restore();
 		const done = assert.async();
@@ -781,7 +783,7 @@ sap.ui.define([
 		await nextUIUpdate();
 
 		// Assert
-		assert.ok(document.documentElement.scrollHeight > document.documentElement.clientHeight, "The documentElement should have a scrollbar");
+		assert.ok(document.documentElement.scrollHeight > document.documentElement.clientHeight, "The documentElement should have a vertical scrollbar");
 
 		oPopover._beforeAdjustPositionAndArrowHook = function () {
 			// Assert
@@ -790,11 +792,60 @@ sap.ui.define([
 
 		oPopover.attachAfterOpen(() => {
 			// Assert
-			assert.strictEqual(document.documentElement.style.overflow, "", "The documentElement should NOT have an overflow style");
+			assert.strictEqual(document.documentElement.style.overflow, "", "The documentElement overflow style should be restored");
+			assert.ok(document.documentElement.scrollHeight > document.documentElement.clientHeight, "The documentElement should have a vertical scrollbar");
 
 			// Clean up
 			oPopover.destroy();
 			oOpener.destroy();
+			done();
+		});
+
+		// Act
+		oPopover.openBy(oOpener);
+	});
+
+	QUnit.test("If there is no vertical, but there is horizontal scrollbar, overflow styles are correctly restores during position calculation", async function (assert) {
+		// Arrange
+		this.clock.restore();
+		const done = assert.async();
+		const oDomRenderLocation = document.getElementById(DOM_RENDER_LOCATION);
+		const oPopover = new Popover({
+			content: [
+				new HTML({ content: "<div style='height: 1000px;'></div>" })
+			]
+		});
+		const oOpener = new Button({ text: "Open Popover" });
+		oOpener.placeAt(DOM_RENDER_LOCATION);
+		await nextUIUpdate();
+
+		const sCurrentRenderLocationHeight = oDomRenderLocation.style.height;
+		const sCurrentRenderLocationWidth = oDomRenderLocation.style.width;
+
+		// Ensure there is no vertical scrollbar
+		oDomRenderLocation.style.height = "100px";
+		// Ensure there is horizontal scrollbar
+		oDomRenderLocation.style.width = "10000px";
+
+		// Assert
+		assert.ok(document.documentElement.scrollHeight <= document.documentElement.clientHeight, "The documentElement should NOT have a vertical scrollbar");
+		assert.ok(document.documentElement.scrollWidth > document.documentElement.clientWidth, "The documentElement should have a horizontal scrollbar");
+
+		oPopover._beforeAdjustPositionAndArrowHook = function () {
+			// Assert
+			assert.strictEqual(document.documentElement.style.overflow, "hidden", "The documentElement should have 'hidden' overflow style");
+		};
+
+		oPopover.attachAfterOpen(() => {
+			// Assert
+			assert.strictEqual(document.documentElement.style.overflow, "", "The documentElement overflow style should be restored");
+			assert.ok(document.documentElement.scrollWidth > document.documentElement.clientWidth, "The documentElement should have a horizontal scrollbar");
+
+			// Clean up
+			oPopover.destroy();
+			oOpener.destroy();
+			oDomRenderLocation.style.height = sCurrentRenderLocationHeight;
+			oDomRenderLocation.style.width = sCurrentRenderLocationWidth;
 			done();
 		});
 

@@ -41,18 +41,15 @@
 	}
 
 	&.sapMPopoverArr,
-	.sapMPopoverArr {
+	 .sapMPopoverArr {
 		width: 2rem; /* 32px */
 		height: 2rem; /* 32px */
-		bottom: -2rem; /* 32px */
 
 		&::after {
 			box-shadow: var(--sapContent_Shadow2);
 			border: 0.125rem solid @_sap_ui_rta_Dialogs_BorderLightColor; /* 2px */
 			border-image: @_sap_ui_rta_Dialogs_ArrowBorderImage;
-			width: 1rem; /* 16px */
-			height: 0.8125rem; /* 13px */
-			margin: -0.65rem 0 0 0.35rem; /* 10px 6px */
+			margin-top: ~"calc(-1 * var(--sapContent_Space_Tiny))"; /* -8px */
 		}
 
 		&.sapMPopoverArrUp {
@@ -61,7 +58,7 @@
 
 			&::after {
 				box-shadow: var(--sapContent_Shadow2);
-				margin: 0.35rem 0 0 0.35rem; /* 6px 6px */
+				margin-top: 0.35rem !important; /* 6px 6px */
 			}
 		}
 	}

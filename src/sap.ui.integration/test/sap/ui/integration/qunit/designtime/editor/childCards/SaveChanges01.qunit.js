@@ -136,7 +136,7 @@ sap.ui.define([
 						var oItem0 = that.oEditor._oChildTree.getItems()[0];
 						var oItem1 = that.oEditor._oChildTree.getItems()[1];
 						var oItem2 = that.oEditor._oChildTree.getItems()[2];
-						assert.equal(oItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+						assert.equal(oItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.ok(oItem0.isTopLevel(), "Child tree item 1 is top level: true");
 						assert.equal(oItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -148,7 +148,7 @@ sap.ui.define([
 
 						var oTreeModel = that.oEditor._oChildTree.getModel();
 						var oMainNode = oTreeModel.getData()[0];
-						assert.equal(oMainNode.text, "Main", "Child tree main node text is OK");
+						assert.equal(oMainNode.text, "Main Card", "Child tree main node text is OK");
 						assert.equal(oMainNode.path, "", "Child tree main node path is OK");
 						assert.ok(oMainNode.selected, "Child tree main node selected: true");
 
@@ -196,7 +196,7 @@ sap.ui.define([
 						var oItem0 = that.oEditor._oChildTree.getItems()[0];
 						var oItem1 = that.oEditor._oChildTree.getItems()[1];
 						var oItem2 = that.oEditor._oChildTree.getItems()[2];
-						assert.equal(oItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+						assert.equal(oItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.ok(oItem0.isTopLevel(), "Child tree item 1 is top level: true");
 						assert.equal(oItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -208,7 +208,7 @@ sap.ui.define([
 
 						var oTreeModel = that.oEditor._oChildTree.getModel();
 						var oMainNode = oTreeModel.getData()[0];
-						assert.equal(oMainNode.text, "Main", "Child tree main node text is OK");
+						assert.equal(oMainNode.text, "Main Card", "Child tree main node text is OK");
 						assert.equal(oMainNode.path, "", "Child tree main node path is OK");
 						assert.ok(oMainNode.selected, "Child tree main node selected: true");
 
@@ -516,7 +516,7 @@ sap.ui.define([
 						var oItem0 = that.oEditor._oChildTree.getItems()[0];
 						var oItem1 = that.oEditor._oChildTree.getItems()[1];
 						var oItem2 = that.oEditor._oChildTree.getItems()[2];
-						assert.equal(oItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+						assert.equal(oItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.ok(oItem0.isTopLevel(), "Child tree item 1 is top level: true");
 						assert.equal(oItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -528,7 +528,7 @@ sap.ui.define([
 
 						var oTreeModel = that.oEditor._oChildTree.getModel();
 						var oMainNode = oTreeModel.getData()[0];
-						assert.equal(oMainNode.text, "Main", "Child tree main node text is OK");
+						assert.equal(oMainNode.text, "Main Card", "Child tree main node text is OK");
 						assert.equal(oMainNode.path, "", "Child tree main node path is OK");
 						assert.ok(oMainNode.selected, "Child tree main node selected: true");
 
@@ -863,7 +863,7 @@ sap.ui.define([
 						var oItem0 = that.oEditor._oChildTree.getItems()[0];
 						var oItem1 = that.oEditor._oChildTree.getItems()[1];
 						var oItem2 = that.oEditor._oChildTree.getItems()[2];
-						assert.equal(oItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+						assert.equal(oItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.ok(oItem0.isTopLevel(), "Child tree item 1 is top level: true");
 						assert.equal(oItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -875,7 +875,7 @@ sap.ui.define([
 
 						var oTreeModel = that.oEditor._oChildTree.getModel();
 						var oMainNode = oTreeModel.getData()[0];
-						assert.equal(oMainNode.text, "Main", "Child tree main node text is OK");
+						assert.equal(oMainNode.text, "Main Card", "Child tree main node text is OK");
 						assert.equal(oMainNode.path, "", "Child tree main node path is OK");
 						assert.ok(oMainNode.selected, "Child tree main node selected: true");
 
@@ -914,7 +914,7 @@ sap.ui.define([
 								var oNewItem2 = that.oEditor._oChildTree.getItems()[2];
 								var oNewItem3 = that.oEditor._oChildTree.getItems()[3];
 								var oNewItem4 = that.oEditor._oChildTree.getItems()[4];
-								assert.equal(oNewItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+								assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 								assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 								assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
 								assert.equal(oNewItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -973,7 +973,7 @@ sap.ui.define([
 						var oItem0 = that.oEditor._oChildTree.getItems()[0];
 						var oItem1 = that.oEditor._oChildTree.getItems()[1];
 						var oItem2 = that.oEditor._oChildTree.getItems()[2];
-						assert.equal(oItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+						assert.equal(oItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.ok(oItem0.isTopLevel(), "Child tree item 1 is top level: true");
 						assert.equal(oItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -985,7 +985,7 @@ sap.ui.define([
 
 						var oTreeModel = that.oEditor._oChildTree.getModel();
 						var oMainNode = oTreeModel.getData()[0];
-						assert.equal(oMainNode.text, "Main", "Child tree main node text is OK");
+						assert.equal(oMainNode.text, "Main Card", "Child tree main node text is OK");
 						assert.equal(oMainNode.path, "", "Child tree main node path is OK");
 						assert.ok(oMainNode.selected, "Child tree main node selected: true");
 
@@ -1024,7 +1024,7 @@ sap.ui.define([
 								var oNewItem2 = that.oEditor._oChildTree.getItems()[2];
 								var oNewItem3 = that.oEditor._oChildTree.getItems()[3];
 								var oNewItem4 = that.oEditor._oChildTree.getItems()[4];
-								assert.equal(oNewItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+								assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 								assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 								assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
 								assert.equal(oNewItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -1226,7 +1226,7 @@ sap.ui.define([
 						var oItem0 = that.oEditor._oChildTree.getItems()[0];
 						var oItem1 = that.oEditor._oChildTree.getItems()[1];
 						var oItem2 = that.oEditor._oChildTree.getItems()[2];
-						assert.equal(oItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+						assert.equal(oItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.ok(oItem0.isTopLevel(), "Child tree item 1 is top level: true");
 						assert.equal(oItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -1238,7 +1238,7 @@ sap.ui.define([
 
 						var oTreeModel = that.oEditor._oChildTree.getModel();
 						var oMainNode = oTreeModel.getData()[0];
-						assert.equal(oMainNode.text, "Main", "Child tree main node text is OK");
+						assert.equal(oMainNode.text, "Main Card", "Child tree main node text is OK");
 						assert.equal(oMainNode.path, "", "Child tree main node path is OK");
 						assert.ok(oMainNode.selected, "Child tree main node selected: true");
 
@@ -1277,7 +1277,7 @@ sap.ui.define([
 								var oNewItem2 = that.oEditor._oChildTree.getItems()[2];
 								var oNewItem3 = that.oEditor._oChildTree.getItems()[3];
 								var oNewItem4 = that.oEditor._oChildTree.getItems()[4];
-								assert.equal(oNewItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+								assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 								assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 								assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
 								assert.equal(oNewItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -1325,7 +1325,7 @@ sap.ui.define([
 										oNewItem2 = that.oEditor._oChildTree.getItems()[2];
 										oNewItem3 = that.oEditor._oChildTree.getItems()[3];
 										oNewItem4 = that.oEditor._oChildTree.getItems()[4];
-										assert.equal(oNewItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+										assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 										assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 										assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
 										assert.equal(oNewItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -1394,7 +1394,7 @@ sap.ui.define([
 						var oItem0 = that.oEditor._oChildTree.getItems()[0];
 						var oItem1 = that.oEditor._oChildTree.getItems()[1];
 						var oItem2 = that.oEditor._oChildTree.getItems()[2];
-						assert.equal(oItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+						assert.equal(oItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.ok(oItem0.isTopLevel(), "Child tree item 1 is top level: true");
 						assert.equal(oItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -1406,7 +1406,7 @@ sap.ui.define([
 
 						var oTreeModel = that.oEditor._oChildTree.getModel();
 						var oMainNode = oTreeModel.getData()[0];
-						assert.equal(oMainNode.text, "Main", "Child tree main node text is OK");
+						assert.equal(oMainNode.text, "Main Card", "Child tree main node text is OK");
 						assert.equal(oMainNode.path, "", "Child tree main node path is OK");
 						assert.ok(oMainNode.selected, "Child tree main node selected: true");
 
@@ -1445,7 +1445,7 @@ sap.ui.define([
 								var oNewItem2 = that.oEditor._oChildTree.getItems()[2];
 								var oNewItem3 = that.oEditor._oChildTree.getItems()[3];
 								var oNewItem4 = that.oEditor._oChildTree.getItems()[4];
-								assert.equal(oNewItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+								assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 								assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 								assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
 								assert.equal(oNewItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -1493,7 +1493,7 @@ sap.ui.define([
 										oNewItem2 = that.oEditor._oChildTree.getItems()[2];
 										oNewItem3 = that.oEditor._oChildTree.getItems()[3];
 										oNewItem4 = that.oEditor._oChildTree.getItems()[4];
-										assert.equal(oNewItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+										assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 										assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 										assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
 										assert.equal(oNewItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -1641,7 +1641,7 @@ sap.ui.define([
 						var oItem0 = that.oEditor._oChildTree.getItems()[0];
 						var oItem1 = that.oEditor._oChildTree.getItems()[1];
 						var oItem2 = that.oEditor._oChildTree.getItems()[2];
-						assert.equal(oItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+						assert.equal(oItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.ok(oItem0.isTopLevel(), "Child tree item 1 is top level: true");
 						assert.equal(oItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -1653,7 +1653,7 @@ sap.ui.define([
 
 						var oTreeModel = that.oEditor._oChildTree.getModel();
 						var oMainNode = oTreeModel.getData()[0];
-						assert.equal(oMainNode.text, "Main", "Child tree main node text is OK");
+						assert.equal(oMainNode.text, "Main Card", "Child tree main node text is OK");
 						assert.equal(oMainNode.path, "", "Child tree main node path is OK");
 						assert.ok(oMainNode.selected, "Child tree main node selected: true");
 
@@ -1686,7 +1686,7 @@ sap.ui.define([
 						var oNewItem2 = that.oEditor._oChildTree.getItems()[2];
 						var oNewItem3 = that.oEditor._oChildTree.getItems()[3];
 						var oNewItem4 = that.oEditor._oChildTree.getItems()[4];
-						assert.equal(oNewItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+						assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.equal(oNewItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
 						assert.ok(oNewItem1.getExpanded(), "Child tree item 1 expanded: true");
@@ -1713,7 +1713,7 @@ sap.ui.define([
 								oNewItem2 = that.oEditor._oChildTree.getItems()[2];
 								oNewItem3 = that.oEditor._oChildTree.getItems()[3];
 								oNewItem4 = that.oEditor._oChildTree.getItems()[4];
-								assert.equal(oNewItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+								assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 								assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 								assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
 								assert.equal(oNewItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -1778,7 +1778,7 @@ sap.ui.define([
 						var oItem0 = that.oEditor._oChildTree.getItems()[0];
 						var oItem1 = that.oEditor._oChildTree.getItems()[1];
 						var oItem2 = that.oEditor._oChildTree.getItems()[2];
-						assert.equal(oItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+						assert.equal(oItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.ok(oItem0.isTopLevel(), "Child tree item 1 is top level: true");
 						assert.equal(oItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -1790,7 +1790,7 @@ sap.ui.define([
 
 						var oTreeModel = that.oEditor._oChildTree.getModel();
 						var oMainNode = oTreeModel.getData()[0];
-						assert.equal(oMainNode.text, "Main", "Child tree main node text is OK");
+						assert.equal(oMainNode.text, "Main Card", "Child tree main node text is OK");
 						assert.equal(oMainNode.path, "", "Child tree main node path is OK");
 						assert.ok(oMainNode.selected, "Child tree main node selected: true");
 
@@ -1823,7 +1823,7 @@ sap.ui.define([
 						var oNewItem2 = that.oEditor._oChildTree.getItems()[2];
 						var oNewItem3 = that.oEditor._oChildTree.getItems()[3];
 						var oNewItem4 = that.oEditor._oChildTree.getItems()[4];
-						assert.equal(oNewItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+						assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.equal(oNewItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
 						assert.ok(oNewItem1.getExpanded(), "Child tree item 1 expanded: true");
@@ -1850,7 +1850,7 @@ sap.ui.define([
 								oNewItem2 = that.oEditor._oChildTree.getItems()[2];
 								oNewItem3 = that.oEditor._oChildTree.getItems()[3];
 								oNewItem4 = that.oEditor._oChildTree.getItems()[4];
-								assert.equal(oNewItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+								assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 								assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 								assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
 								assert.equal(oNewItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -1992,7 +1992,7 @@ sap.ui.define([
 						var oItem0 = that.oEditor._oChildTree.getItems()[0];
 						var oItem1 = that.oEditor._oChildTree.getItems()[1];
 						var oItem2 = that.oEditor._oChildTree.getItems()[2];
-						assert.equal(oItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+						assert.equal(oItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.ok(oItem0.isTopLevel(), "Child tree item 1 is top level: true");
 						assert.equal(oItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -2004,7 +2004,7 @@ sap.ui.define([
 
 						var oTreeModel = that.oEditor._oChildTree.getModel();
 						var oMainNode = oTreeModel.getData()[0];
-						assert.equal(oMainNode.text, "Main", "Child tree main node text is OK");
+						assert.equal(oMainNode.text, "Main Card", "Child tree main node text is OK");
 						assert.equal(oMainNode.path, "", "Child tree main node path is OK");
 						assert.ok(oMainNode.selected, "Child tree main node selected: true");
 
@@ -2043,7 +2043,7 @@ sap.ui.define([
 								var oNewItem2 = that.oEditor._oChildTree.getItems()[2];
 								var oNewItem3 = that.oEditor._oChildTree.getItems()[3];
 								var oNewItem4 = that.oEditor._oChildTree.getItems()[4];
-								assert.equal(oNewItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+								assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 								assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 								assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
 								assert.equal(oNewItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -2091,7 +2091,7 @@ sap.ui.define([
 										oNewItem2 = that.oEditor._oChildTree.getItems()[2];
 										oNewItem3 = that.oEditor._oChildTree.getItems()[3];
 										oNewItem4 = that.oEditor._oChildTree.getItems()[4];
-										assert.equal(oNewItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+										assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 										assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 										assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
 										assert.equal(oNewItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -2159,7 +2159,7 @@ sap.ui.define([
 						var oItem0 = that.oEditor._oChildTree.getItems()[0];
 						var oItem1 = that.oEditor._oChildTree.getItems()[1];
 						var oItem2 = that.oEditor._oChildTree.getItems()[2];
-						assert.equal(oItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+						assert.equal(oItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.ok(oItem0.isTopLevel(), "Child tree item 1 is top level: true");
 						assert.equal(oItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -2171,7 +2171,7 @@ sap.ui.define([
 
 						var oTreeModel = that.oEditor._oChildTree.getModel();
 						var oMainNode = oTreeModel.getData()[0];
-						assert.equal(oMainNode.text, "Main", "Child tree main node text is OK");
+						assert.equal(oMainNode.text, "Main Card", "Child tree main node text is OK");
 						assert.equal(oMainNode.path, "", "Child tree main node path is OK");
 						assert.ok(oMainNode.selected, "Child tree main node selected: true");
 
@@ -2204,7 +2204,7 @@ sap.ui.define([
 						var oNewItem2 = that.oEditor._oChildTree.getItems()[2];
 						var oNewItem3 = that.oEditor._oChildTree.getItems()[3];
 						var oNewItem4 = that.oEditor._oChildTree.getItems()[4];
-						assert.equal(oNewItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+						assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.equal(oNewItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
 						assert.ok(oNewItem1.getExpanded(), "Child tree item 1 expanded: true");
@@ -2231,7 +2231,7 @@ sap.ui.define([
 								oNewItem2 = that.oEditor._oChildTree.getItems()[2];
 								oNewItem3 = that.oEditor._oChildTree.getItems()[3];
 								oNewItem4 = that.oEditor._oChildTree.getItems()[4];
-								assert.equal(oNewItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+								assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 								assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 								assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
 								assert.equal(oNewItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -2295,7 +2295,7 @@ sap.ui.define([
 						var oItem0 = that.oEditor._oChildTree.getItems()[0];
 						var oItem1 = that.oEditor._oChildTree.getItems()[1];
 						var oItem2 = that.oEditor._oChildTree.getItems()[2];
-						assert.equal(oItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+						assert.equal(oItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.ok(oItem0.isTopLevel(), "Child tree item 1 is top level: true");
 						assert.equal(oItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -2307,7 +2307,7 @@ sap.ui.define([
 
 						var oTreeModel = that.oEditor._oChildTree.getModel();
 						var oMainNode = oTreeModel.getData()[0];
-						assert.equal(oMainNode.text, "Main", "Child tree main node text is OK");
+						assert.equal(oMainNode.text, "Main Card", "Child tree main node text is OK");
 						assert.equal(oMainNode.path, "", "Child tree main node path is OK");
 						assert.ok(oMainNode.selected, "Child tree main node selected: true");
 
@@ -2345,7 +2345,7 @@ sap.ui.define([
 								var oNewItem1 = that.oEditor._oChildTree.getItems()[1];
 								var oNewItem2 = that.oEditor._oChildTree.getItems()[2];
 								var oNewItem3 = that.oEditor._oChildTree.getItems()[3];
-								assert.equal(oNewItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+								assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 								assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 								assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
 								assert.equal(oNewItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -2401,7 +2401,7 @@ sap.ui.define([
 						var oItem0 = that.oEditor._oChildTree.getItems()[0];
 						var oItem1 = that.oEditor._oChildTree.getItems()[1];
 						var oItem2 = that.oEditor._oChildTree.getItems()[2];
-						assert.equal(oItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+						assert.equal(oItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.ok(oItem0.isTopLevel(), "Child tree item 1 is top level: true");
 						assert.equal(oItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -2413,7 +2413,7 @@ sap.ui.define([
 
 						var oTreeModel = that.oEditor._oChildTree.getModel();
 						var oMainNode = oTreeModel.getData()[0];
-						assert.equal(oMainNode.text, "Main", "Child tree main node text is OK");
+						assert.equal(oMainNode.text, "Main Card", "Child tree main node text is OK");
 						assert.equal(oMainNode.path, "", "Child tree main node path is OK");
 						assert.ok(oMainNode.selected, "Child tree main node selected: true");
 
@@ -2451,7 +2451,7 @@ sap.ui.define([
 								var oNewItem1 = that.oEditor._oChildTree.getItems()[1];
 								var oNewItem2 = that.oEditor._oChildTree.getItems()[2];
 								var oNewItem3 = that.oEditor._oChildTree.getItems()[3];
-								assert.equal(oNewItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+								assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 								assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 								assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
 								assert.equal(oNewItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -2551,7 +2551,7 @@ sap.ui.define([
 						var oItem0 = that.oEditor._oChildTree.getItems()[0];
 						var oItem1 = that.oEditor._oChildTree.getItems()[1];
 						var oItem2 = that.oEditor._oChildTree.getItems()[2];
-						assert.equal(oItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+						assert.equal(oItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.ok(oItem0.isTopLevel(), "Child tree item 1 is top level: true");
 						assert.equal(oItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -2563,7 +2563,7 @@ sap.ui.define([
 
 						var oTreeModel = that.oEditor._oChildTree.getModel();
 						var oMainNode = oTreeModel.getData()[0];
-						assert.equal(oMainNode.text, "Main", "Child tree main node text is OK");
+						assert.equal(oMainNode.text, "Main Card", "Child tree main node text is OK");
 						assert.equal(oMainNode.path, "", "Child tree main node path is OK");
 						assert.ok(oMainNode.selected, "Child tree main node selected: true");
 
@@ -2601,7 +2601,7 @@ sap.ui.define([
 								var oNewItem1 = that.oEditor._oChildTree.getItems()[1];
 								var oNewItem2 = that.oEditor._oChildTree.getItems()[2];
 								var oNewItem3 = that.oEditor._oChildTree.getItems()[3];
-								assert.equal(oNewItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+								assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 								assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 								assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
 								assert.equal(oNewItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -2662,7 +2662,7 @@ sap.ui.define([
 										var oNewItem1 = that.oEditor._oChildTree.getItems()[1];
 										var oNewItem2 = that.oEditor._oChildTree.getItems()[2];
 										var oNewItem3 = that.oEditor._oChildTree.getItems()[3];
-										assert.equal(oNewItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+										assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 										assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 										assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
 										assert.equal(oNewItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -2725,7 +2725,7 @@ sap.ui.define([
 						var oItem0 = that.oEditor._oChildTree.getItems()[0];
 						var oItem1 = that.oEditor._oChildTree.getItems()[1];
 						var oItem2 = that.oEditor._oChildTree.getItems()[2];
-						assert.equal(oItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+						assert.equal(oItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.ok(oItem0.isTopLevel(), "Child tree item 1 is top level: true");
 						assert.equal(oItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -2737,7 +2737,7 @@ sap.ui.define([
 
 						var oTreeModel = that.oEditor._oChildTree.getModel();
 						var oMainNode = oTreeModel.getData()[0];
-						assert.equal(oMainNode.text, "Main", "Child tree main node text is OK");
+						assert.equal(oMainNode.text, "Main Card", "Child tree main node text is OK");
 						assert.equal(oMainNode.path, "", "Child tree main node path is OK");
 						assert.ok(oMainNode.selected, "Child tree main node selected: true");
 
@@ -2775,7 +2775,7 @@ sap.ui.define([
 								var oNewItem1 = that.oEditor._oChildTree.getItems()[1];
 								var oNewItem2 = that.oEditor._oChildTree.getItems()[2];
 								var oNewItem3 = that.oEditor._oChildTree.getItems()[3];
-								assert.equal(oNewItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+								assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 								assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 								assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
 								assert.equal(oNewItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -2838,7 +2838,7 @@ sap.ui.define([
 										var oNewItem1 = that.oEditor._oChildTree.getItems()[1];
 										var oNewItem2 = that.oEditor._oChildTree.getItems()[2];
 										var oNewItem3 = that.oEditor._oChildTree.getItems()[3];
-										assert.equal(oNewItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+										assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 										assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 										assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
 										assert.equal(oNewItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -2933,7 +2933,7 @@ sap.ui.define([
 						var oItem0 = that.oEditor._oChildTree.getItems()[0];
 						var oItem1 = that.oEditor._oChildTree.getItems()[1];
 						var oItem2 = that.oEditor._oChildTree.getItems()[2];
-						assert.equal(oItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+						assert.equal(oItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.ok(oItem0.isTopLevel(), "Child tree item 1 is top level: true");
 						assert.equal(oItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -2945,7 +2945,7 @@ sap.ui.define([
 
 						var oTreeModel = that.oEditor._oChildTree.getModel();
 						var oMainNode = oTreeModel.getData()[0];
-						assert.equal(oMainNode.text, "Main", "Child tree main node text is OK");
+						assert.equal(oMainNode.text, "Main Card", "Child tree main node text is OK");
 						assert.equal(oMainNode.path, "", "Child tree main node path is OK");
 						assert.ok(oMainNode.selected, "Child tree main node selected: true");
 
@@ -2977,7 +2977,7 @@ sap.ui.define([
 						var oNewItem1 = that.oEditor._oChildTree.getItems()[1];
 						var oNewItem2 = that.oEditor._oChildTree.getItems()[2];
 						var oNewItem3 = that.oEditor._oChildTree.getItems()[3];
-						assert.equal(oNewItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+						assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
 						assert.equal(oNewItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -3022,7 +3022,7 @@ sap.ui.define([
 								var oNewItem1 = that.oEditor._oChildTree.getItems()[1];
 								var oNewItem2 = that.oEditor._oChildTree.getItems()[2];
 								var oNewItem3 = that.oEditor._oChildTree.getItems()[3];
-								assert.equal(oNewItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+								assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 								assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 								assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
 								assert.equal(oNewItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -3082,7 +3082,7 @@ sap.ui.define([
 						var oItem0 = that.oEditor._oChildTree.getItems()[0];
 						var oItem1 = that.oEditor._oChildTree.getItems()[1];
 						var oItem2 = that.oEditor._oChildTree.getItems()[2];
-						assert.equal(oItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+						assert.equal(oItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.ok(oItem0.isTopLevel(), "Child tree item 1 is top level: true");
 						assert.equal(oItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -3094,7 +3094,7 @@ sap.ui.define([
 
 						var oTreeModel = that.oEditor._oChildTree.getModel();
 						var oMainNode = oTreeModel.getData()[0];
-						assert.equal(oMainNode.text, "Main", "Child tree main node text is OK");
+						assert.equal(oMainNode.text, "Main Card", "Child tree main node text is OK");
 						assert.equal(oMainNode.path, "", "Child tree main node path is OK");
 						assert.ok(oMainNode.selected, "Child tree main node selected: true");
 
@@ -3126,7 +3126,7 @@ sap.ui.define([
 						var oNewItem1 = that.oEditor._oChildTree.getItems()[1];
 						var oNewItem2 = that.oEditor._oChildTree.getItems()[2];
 						var oNewItem3 = that.oEditor._oChildTree.getItems()[3];
-						assert.equal(oNewItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+						assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
 						assert.equal(oNewItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -3173,7 +3173,7 @@ sap.ui.define([
 								var oNewItem1 = that.oEditor._oChildTree.getItems()[1];
 								var oNewItem2 = that.oEditor._oChildTree.getItems()[2];
 								var oNewItem3 = that.oEditor._oChildTree.getItems()[3];
-								assert.equal(oNewItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+								assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 								assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 								assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
 								assert.equal(oNewItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -3331,7 +3331,7 @@ sap.ui.define([
 						var oItem0 = that.oEditor._oChildTree.getItems()[0];
 						var oItem1 = that.oEditor._oChildTree.getItems()[1];
 						var oItem2 = that.oEditor._oChildTree.getItems()[2];
-						assert.equal(oItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+						assert.equal(oItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.ok(oItem0.isTopLevel(), "Child tree item 1 is top level: true");
 						assert.equal(oItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -3343,7 +3343,7 @@ sap.ui.define([
 
 						var oTreeModel = that.oEditor._oChildTree.getModel();
 						var oMainNode = oTreeModel.getData()[0];
-						assert.equal(oMainNode.text, "Main", "Child tree main node text is OK");
+						assert.equal(oMainNode.text, "Main Card", "Child tree main node text is OK");
 						assert.equal(oMainNode.path, "", "Child tree main node path is OK");
 						assert.ok(oMainNode.selected, "Child tree main node selected: true");
 
@@ -3389,7 +3389,7 @@ sap.ui.define([
 						var oItem0 = that.oEditor._oChildTree.getItems()[0];
 						var oItem1 = that.oEditor._oChildTree.getItems()[1];
 						var oItem2 = that.oEditor._oChildTree.getItems()[2];
-						assert.equal(oItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+						assert.equal(oItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.ok(oItem0.isTopLevel(), "Child tree item 1 is top level: true");
 						assert.equal(oItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -3401,7 +3401,7 @@ sap.ui.define([
 
 						var oTreeModel = that.oEditor._oChildTree.getModel();
 						var oMainNode = oTreeModel.getData()[0];
-						assert.equal(oMainNode.text, "Main", "Child tree main node text is OK");
+						assert.equal(oMainNode.text, "Main Card", "Child tree main node text is OK");
 						assert.equal(oMainNode.path, "", "Child tree main node path is OK");
 						assert.ok(oMainNode.selected, "Child tree main node selected: true");
 
@@ -3691,7 +3691,7 @@ sap.ui.define([
 						var oItem0 = that.oEditor._oChildTree.getItems()[0];
 						var oItem1 = that.oEditor._oChildTree.getItems()[1];
 						var oItem2 = that.oEditor._oChildTree.getItems()[2];
-						assert.equal(oItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+						assert.equal(oItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.ok(oItem0.isTopLevel(), "Child tree item 1 is top level: true");
 						assert.equal(oItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -3703,7 +3703,7 @@ sap.ui.define([
 
 						var oTreeModel = that.oEditor._oChildTree.getModel();
 						var oMainNode = oTreeModel.getData()[0];
-						assert.equal(oMainNode.text, "Main", "Child tree main node text is OK");
+						assert.equal(oMainNode.text, "Main Card", "Child tree main node text is OK");
 						assert.equal(oMainNode.path, "", "Child tree main node path is OK");
 						assert.ok(oMainNode.selected, "Child tree main node selected: true");
 
@@ -4020,7 +4020,7 @@ sap.ui.define([
 						var oItem0 = that.oEditor._oChildTree.getItems()[0];
 						var oItem1 = that.oEditor._oChildTree.getItems()[1];
 						var oItem2 = that.oEditor._oChildTree.getItems()[2];
-						assert.equal(oItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+						assert.equal(oItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.ok(oItem0.isTopLevel(), "Child tree item 1 is top level: true");
 						assert.equal(oItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -4032,7 +4032,7 @@ sap.ui.define([
 
 						var oTreeModel = that.oEditor._oChildTree.getModel();
 						var oMainNode = oTreeModel.getData()[0];
-						assert.equal(oMainNode.text, "Main", "Child tree main node text is OK");
+						assert.equal(oMainNode.text, "Main Card", "Child tree main node text is OK");
 						assert.equal(oMainNode.path, "", "Child tree main node path is OK");
 						assert.ok(oMainNode.selected, "Child tree main node selected: true");
 
@@ -4069,7 +4069,7 @@ sap.ui.define([
 								var oNewItem2 = that.oEditor._oChildTree.getItems()[2];
 								var oNewItem3 = that.oEditor._oChildTree.getItems()[3];
 								var oNewItem4 = that.oEditor._oChildTree.getItems()[4];
-								assert.equal(oNewItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+								assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 								assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 								assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
 								assert.equal(oNewItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -4126,7 +4126,7 @@ sap.ui.define([
 						var oItem0 = that.oEditor._oChildTree.getItems()[0];
 						var oItem1 = that.oEditor._oChildTree.getItems()[1];
 						var oItem2 = that.oEditor._oChildTree.getItems()[2];
-						assert.equal(oItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+						assert.equal(oItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.ok(oItem0.isTopLevel(), "Child tree item 1 is top level: true");
 						assert.equal(oItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -4138,7 +4138,7 @@ sap.ui.define([
 
 						var oTreeModel = that.oEditor._oChildTree.getModel();
 						var oMainNode = oTreeModel.getData()[0];
-						assert.equal(oMainNode.text, "Main", "Child tree main node text is OK");
+						assert.equal(oMainNode.text, "Main Card", "Child tree main node text is OK");
 						assert.equal(oMainNode.path, "", "Child tree main node path is OK");
 						assert.ok(oMainNode.selected, "Child tree main node selected: true");
 
@@ -4175,7 +4175,7 @@ sap.ui.define([
 								var oNewItem2 = that.oEditor._oChildTree.getItems()[2];
 								var oNewItem3 = that.oEditor._oChildTree.getItems()[3];
 								var oNewItem4 = that.oEditor._oChildTree.getItems()[4];
-								assert.equal(oNewItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+								assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 								assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 								assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
 								assert.equal(oNewItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -4373,7 +4373,7 @@ sap.ui.define([
 						var oItem0 = that.oEditor._oChildTree.getItems()[0];
 						var oItem1 = that.oEditor._oChildTree.getItems()[1];
 						var oItem2 = that.oEditor._oChildTree.getItems()[2];
-						assert.equal(oItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+						assert.equal(oItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.ok(oItem0.isTopLevel(), "Child tree item 1 is top level: true");
 						assert.equal(oItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -4385,7 +4385,7 @@ sap.ui.define([
 
 						var oTreeModel = that.oEditor._oChildTree.getModel();
 						var oMainNode = oTreeModel.getData()[0];
-						assert.equal(oMainNode.text, "Main", "Child tree main node text is OK");
+						assert.equal(oMainNode.text, "Main Card", "Child tree main node text is OK");
 						assert.equal(oMainNode.path, "", "Child tree main node path is OK");
 						assert.ok(oMainNode.selected, "Child tree main node selected: true");
 
@@ -4422,7 +4422,7 @@ sap.ui.define([
 								var oNewItem2 = that.oEditor._oChildTree.getItems()[2];
 								var oNewItem3 = that.oEditor._oChildTree.getItems()[3];
 								var oNewItem4 = that.oEditor._oChildTree.getItems()[4];
-								assert.equal(oNewItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+								assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 								assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 								assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
 								assert.equal(oNewItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -4468,7 +4468,7 @@ sap.ui.define([
 										oNewItem2 = that.oEditor._oChildTree.getItems()[2];
 										oNewItem3 = that.oEditor._oChildTree.getItems()[3];
 										oNewItem4 = that.oEditor._oChildTree.getItems()[4];
-										assert.equal(oNewItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+										assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 										assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 										assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
 										assert.equal(oNewItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -4535,7 +4535,7 @@ sap.ui.define([
 						var oItem0 = that.oEditor._oChildTree.getItems()[0];
 						var oItem1 = that.oEditor._oChildTree.getItems()[1];
 						var oItem2 = that.oEditor._oChildTree.getItems()[2];
-						assert.equal(oItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+						assert.equal(oItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.ok(oItem0.isTopLevel(), "Child tree item 1 is top level: true");
 						assert.equal(oItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -4547,7 +4547,7 @@ sap.ui.define([
 
 						var oTreeModel = that.oEditor._oChildTree.getModel();
 						var oMainNode = oTreeModel.getData()[0];
-						assert.equal(oMainNode.text, "Main", "Child tree main node text is OK");
+						assert.equal(oMainNode.text, "Main Card", "Child tree main node text is OK");
 						assert.equal(oMainNode.path, "", "Child tree main node path is OK");
 						assert.ok(oMainNode.selected, "Child tree main node selected: true");
 
@@ -4584,7 +4584,7 @@ sap.ui.define([
 								var oNewItem2 = that.oEditor._oChildTree.getItems()[2];
 								var oNewItem3 = that.oEditor._oChildTree.getItems()[3];
 								var oNewItem4 = that.oEditor._oChildTree.getItems()[4];
-								assert.equal(oNewItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+								assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 								assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 								assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
 								assert.equal(oNewItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -4630,7 +4630,7 @@ sap.ui.define([
 										oNewItem2 = that.oEditor._oChildTree.getItems()[2];
 										oNewItem3 = that.oEditor._oChildTree.getItems()[3];
 										oNewItem4 = that.oEditor._oChildTree.getItems()[4];
-										assert.equal(oNewItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+										assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 										assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 										assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
 										assert.equal(oNewItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -4774,7 +4774,7 @@ sap.ui.define([
 						var oItem0 = that.oEditor._oChildTree.getItems()[0];
 						var oItem1 = that.oEditor._oChildTree.getItems()[1];
 						var oItem2 = that.oEditor._oChildTree.getItems()[2];
-						assert.equal(oItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+						assert.equal(oItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.ok(oItem0.isTopLevel(), "Child tree item 1 is top level: true");
 						assert.equal(oItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -4786,7 +4786,7 @@ sap.ui.define([
 
 						var oTreeModel = that.oEditor._oChildTree.getModel();
 						var oMainNode = oTreeModel.getData()[0];
-						assert.equal(oMainNode.text, "Main", "Child tree main node text is OK");
+						assert.equal(oMainNode.text, "Main Card", "Child tree main node text is OK");
 						assert.equal(oMainNode.path, "", "Child tree main node path is OK");
 						assert.ok(oMainNode.selected, "Child tree main node selected: true");
 
@@ -4817,7 +4817,7 @@ sap.ui.define([
 						var oNewItem2 = that.oEditor._oChildTree.getItems()[2];
 						var oNewItem3 = that.oEditor._oChildTree.getItems()[3];
 						var oNewItem4 = that.oEditor._oChildTree.getItems()[4];
-						assert.equal(oNewItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+						assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.equal(oNewItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
 						assert.ok(oNewItem1.getExpanded(), "Child tree item 1 expanded: true");
@@ -4844,7 +4844,7 @@ sap.ui.define([
 								oNewItem2 = that.oEditor._oChildTree.getItems()[2];
 								oNewItem3 = that.oEditor._oChildTree.getItems()[3];
 								oNewItem4 = that.oEditor._oChildTree.getItems()[4];
-								assert.equal(oNewItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+								assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 								assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 								assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
 								assert.equal(oNewItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -4907,7 +4907,7 @@ sap.ui.define([
 						var oItem0 = that.oEditor._oChildTree.getItems()[0];
 						var oItem1 = that.oEditor._oChildTree.getItems()[1];
 						var oItem2 = that.oEditor._oChildTree.getItems()[2];
-						assert.equal(oItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+						assert.equal(oItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.ok(oItem0.isTopLevel(), "Child tree item 1 is top level: true");
 						assert.equal(oItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -4919,7 +4919,7 @@ sap.ui.define([
 
 						var oTreeModel = that.oEditor._oChildTree.getModel();
 						var oMainNode = oTreeModel.getData()[0];
-						assert.equal(oMainNode.text, "Main", "Child tree main node text is OK");
+						assert.equal(oMainNode.text, "Main Card", "Child tree main node text is OK");
 						assert.equal(oMainNode.path, "", "Child tree main node path is OK");
 						assert.ok(oMainNode.selected, "Child tree main node selected: true");
 
@@ -4950,7 +4950,7 @@ sap.ui.define([
 						var oNewItem2 = that.oEditor._oChildTree.getItems()[2];
 						var oNewItem3 = that.oEditor._oChildTree.getItems()[3];
 						var oNewItem4 = that.oEditor._oChildTree.getItems()[4];
-						assert.equal(oNewItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+						assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.equal(oNewItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
 						assert.ok(oNewItem1.getExpanded(), "Child tree item 1 expanded: true");
@@ -4977,7 +4977,7 @@ sap.ui.define([
 								oNewItem2 = that.oEditor._oChildTree.getItems()[2];
 								oNewItem3 = that.oEditor._oChildTree.getItems()[3];
 								oNewItem4 = that.oEditor._oChildTree.getItems()[4];
-								assert.equal(oNewItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+								assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 								assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 								assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
 								assert.equal(oNewItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -5115,7 +5115,7 @@ sap.ui.define([
 						var oItem0 = that.oEditor._oChildTree.getItems()[0];
 						var oItem1 = that.oEditor._oChildTree.getItems()[1];
 						var oItem2 = that.oEditor._oChildTree.getItems()[2];
-						assert.equal(oItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+						assert.equal(oItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.ok(oItem0.isTopLevel(), "Child tree item 1 is top level: true");
 						assert.equal(oItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -5127,7 +5127,7 @@ sap.ui.define([
 
 						var oTreeModel = that.oEditor._oChildTree.getModel();
 						var oMainNode = oTreeModel.getData()[0];
-						assert.equal(oMainNode.text, "Main", "Child tree main node text is OK");
+						assert.equal(oMainNode.text, "Main Card", "Child tree main node text is OK");
 						assert.equal(oMainNode.path, "", "Child tree main node path is OK");
 						assert.ok(oMainNode.selected, "Child tree main node selected: true");
 
@@ -5164,7 +5164,7 @@ sap.ui.define([
 								var oNewItem2 = that.oEditor._oChildTree.getItems()[2];
 								var oNewItem3 = that.oEditor._oChildTree.getItems()[3];
 								var oNewItem4 = that.oEditor._oChildTree.getItems()[4];
-								assert.equal(oNewItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+								assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 								assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 								assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
 								assert.equal(oNewItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -5210,7 +5210,7 @@ sap.ui.define([
 										oNewItem2 = that.oEditor._oChildTree.getItems()[2];
 										oNewItem3 = that.oEditor._oChildTree.getItems()[3];
 										oNewItem4 = that.oEditor._oChildTree.getItems()[4];
-										assert.equal(oNewItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+										assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 										assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 										assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
 										assert.equal(oNewItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -5276,7 +5276,7 @@ sap.ui.define([
 						var oItem0 = that.oEditor._oChildTree.getItems()[0];
 						var oItem1 = that.oEditor._oChildTree.getItems()[1];
 						var oItem2 = that.oEditor._oChildTree.getItems()[2];
-						assert.equal(oItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+						assert.equal(oItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.ok(oItem0.isTopLevel(), "Child tree item 1 is top level: true");
 						assert.equal(oItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -5288,7 +5288,7 @@ sap.ui.define([
 
 						var oTreeModel = that.oEditor._oChildTree.getModel();
 						var oMainNode = oTreeModel.getData()[0];
-						assert.equal(oMainNode.text, "Main", "Child tree main node text is OK");
+						assert.equal(oMainNode.text, "Main Card", "Child tree main node text is OK");
 						assert.equal(oMainNode.path, "", "Child tree main node path is OK");
 						assert.ok(oMainNode.selected, "Child tree main node selected: true");
 
@@ -5319,7 +5319,7 @@ sap.ui.define([
 						var oNewItem2 = that.oEditor._oChildTree.getItems()[2];
 						var oNewItem3 = that.oEditor._oChildTree.getItems()[3];
 						var oNewItem4 = that.oEditor._oChildTree.getItems()[4];
-						assert.equal(oNewItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+						assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.equal(oNewItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
 						assert.ok(oNewItem1.getExpanded(), "Child tree item 1 expanded: true");
@@ -5346,7 +5346,7 @@ sap.ui.define([
 								oNewItem2 = that.oEditor._oChildTree.getItems()[2];
 								oNewItem3 = that.oEditor._oChildTree.getItems()[3];
 								oNewItem4 = that.oEditor._oChildTree.getItems()[4];
-								assert.equal(oNewItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+								assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 								assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 								assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
 								assert.equal(oNewItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -5408,7 +5408,7 @@ sap.ui.define([
 						var oItem0 = that.oEditor._oChildTree.getItems()[0];
 						var oItem1 = that.oEditor._oChildTree.getItems()[1];
 						var oItem2 = that.oEditor._oChildTree.getItems()[2];
-						assert.equal(oItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+						assert.equal(oItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.ok(oItem0.isTopLevel(), "Child tree item 1 is top level: true");
 						assert.equal(oItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -5420,7 +5420,7 @@ sap.ui.define([
 
 						var oTreeModel = that.oEditor._oChildTree.getModel();
 						var oMainNode = oTreeModel.getData()[0];
-						assert.equal(oMainNode.text, "Main", "Child tree main node text is OK");
+						assert.equal(oMainNode.text, "Main Card", "Child tree main node text is OK");
 						assert.equal(oMainNode.path, "", "Child tree main node path is OK");
 						assert.ok(oMainNode.selected, "Child tree main node selected: true");
 
@@ -5456,7 +5456,7 @@ sap.ui.define([
 								var oNewItem1 = that.oEditor._oChildTree.getItems()[1];
 								var oNewItem2 = that.oEditor._oChildTree.getItems()[2];
 								var oNewItem3 = that.oEditor._oChildTree.getItems()[3];
-								assert.equal(oNewItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+								assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 								assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 								assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
 								assert.equal(oNewItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -5510,7 +5510,7 @@ sap.ui.define([
 						var oItem0 = that.oEditor._oChildTree.getItems()[0];
 						var oItem1 = that.oEditor._oChildTree.getItems()[1];
 						var oItem2 = that.oEditor._oChildTree.getItems()[2];
-						assert.equal(oItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+						assert.equal(oItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.ok(oItem0.isTopLevel(), "Child tree item 1 is top level: true");
 						assert.equal(oItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -5522,7 +5522,7 @@ sap.ui.define([
 
 						var oTreeModel = that.oEditor._oChildTree.getModel();
 						var oMainNode = oTreeModel.getData()[0];
-						assert.equal(oMainNode.text, "Main", "Child tree main node text is OK");
+						assert.equal(oMainNode.text, "Main Card", "Child tree main node text is OK");
 						assert.equal(oMainNode.path, "", "Child tree main node path is OK");
 						assert.ok(oMainNode.selected, "Child tree main node selected: true");
 
@@ -5558,7 +5558,7 @@ sap.ui.define([
 								var oNewItem1 = that.oEditor._oChildTree.getItems()[1];
 								var oNewItem2 = that.oEditor._oChildTree.getItems()[2];
 								var oNewItem3 = that.oEditor._oChildTree.getItems()[3];
-								assert.equal(oNewItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+								assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 								assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 								assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
 								assert.equal(oNewItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -5654,7 +5654,7 @@ sap.ui.define([
 						var oItem0 = that.oEditor._oChildTree.getItems()[0];
 						var oItem1 = that.oEditor._oChildTree.getItems()[1];
 						var oItem2 = that.oEditor._oChildTree.getItems()[2];
-						assert.equal(oItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+						assert.equal(oItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.ok(oItem0.isTopLevel(), "Child tree item 1 is top level: true");
 						assert.equal(oItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -5666,7 +5666,7 @@ sap.ui.define([
 
 						var oTreeModel = that.oEditor._oChildTree.getModel();
 						var oMainNode = oTreeModel.getData()[0];
-						assert.equal(oMainNode.text, "Main", "Child tree main node text is OK");
+						assert.equal(oMainNode.text, "Main Card", "Child tree main node text is OK");
 						assert.equal(oMainNode.path, "", "Child tree main node path is OK");
 						assert.ok(oMainNode.selected, "Child tree main node selected: true");
 
@@ -5702,7 +5702,7 @@ sap.ui.define([
 								var oNewItem1 = that.oEditor._oChildTree.getItems()[1];
 								var oNewItem2 = that.oEditor._oChildTree.getItems()[2];
 								var oNewItem3 = that.oEditor._oChildTree.getItems()[3];
-								assert.equal(oNewItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+								assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 								assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 								assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
 								assert.equal(oNewItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -5761,7 +5761,7 @@ sap.ui.define([
 										var oNewItem1 = that.oEditor._oChildTree.getItems()[1];
 										var oNewItem2 = that.oEditor._oChildTree.getItems()[2];
 										var oNewItem3 = that.oEditor._oChildTree.getItems()[3];
-										assert.equal(oNewItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+										assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 										assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 										assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
 										assert.equal(oNewItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -5822,7 +5822,7 @@ sap.ui.define([
 						var oItem0 = that.oEditor._oChildTree.getItems()[0];
 						var oItem1 = that.oEditor._oChildTree.getItems()[1];
 						var oItem2 = that.oEditor._oChildTree.getItems()[2];
-						assert.equal(oItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+						assert.equal(oItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.ok(oItem0.isTopLevel(), "Child tree item 1 is top level: true");
 						assert.equal(oItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -5834,7 +5834,7 @@ sap.ui.define([
 
 						var oTreeModel = that.oEditor._oChildTree.getModel();
 						var oMainNode = oTreeModel.getData()[0];
-						assert.equal(oMainNode.text, "Main", "Child tree main node text is OK");
+						assert.equal(oMainNode.text, "Main Card", "Child tree main node text is OK");
 						assert.equal(oMainNode.path, "", "Child tree main node path is OK");
 						assert.ok(oMainNode.selected, "Child tree main node selected: true");
 
@@ -5870,7 +5870,7 @@ sap.ui.define([
 								var oNewItem1 = that.oEditor._oChildTree.getItems()[1];
 								var oNewItem2 = that.oEditor._oChildTree.getItems()[2];
 								var oNewItem3 = that.oEditor._oChildTree.getItems()[3];
-								assert.equal(oNewItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+								assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 								assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 								assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
 								assert.equal(oNewItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -5931,7 +5931,7 @@ sap.ui.define([
 										var oNewItem1 = that.oEditor._oChildTree.getItems()[1];
 										var oNewItem2 = that.oEditor._oChildTree.getItems()[2];
 										var oNewItem3 = that.oEditor._oChildTree.getItems()[3];
-										assert.equal(oNewItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+										assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 										assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 										assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
 										assert.equal(oNewItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -6022,7 +6022,7 @@ sap.ui.define([
 						var oItem0 = that.oEditor._oChildTree.getItems()[0];
 						var oItem1 = that.oEditor._oChildTree.getItems()[1];
 						var oItem2 = that.oEditor._oChildTree.getItems()[2];
-						assert.equal(oItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+						assert.equal(oItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.ok(oItem0.isTopLevel(), "Child tree item 1 is top level: true");
 						assert.equal(oItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -6034,7 +6034,7 @@ sap.ui.define([
 
 						var oTreeModel = that.oEditor._oChildTree.getModel();
 						var oMainNode = oTreeModel.getData()[0];
-						assert.equal(oMainNode.text, "Main", "Child tree main node text is OK");
+						assert.equal(oMainNode.text, "Main Card", "Child tree main node text is OK");
 						assert.equal(oMainNode.path, "", "Child tree main node path is OK");
 						assert.ok(oMainNode.selected, "Child tree main node selected: true");
 
@@ -6064,7 +6064,7 @@ sap.ui.define([
 						var oNewItem1 = that.oEditor._oChildTree.getItems()[1];
 						var oNewItem2 = that.oEditor._oChildTree.getItems()[2];
 						var oNewItem3 = that.oEditor._oChildTree.getItems()[3];
-						assert.equal(oNewItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+						assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
 						assert.equal(oNewItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -6109,7 +6109,7 @@ sap.ui.define([
 								var oNewItem1 = that.oEditor._oChildTree.getItems()[1];
 								var oNewItem2 = that.oEditor._oChildTree.getItems()[2];
 								var oNewItem3 = that.oEditor._oChildTree.getItems()[3];
-								assert.equal(oNewItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+								assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 								assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 								assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
 								assert.equal(oNewItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -6167,7 +6167,7 @@ sap.ui.define([
 						var oItem0 = that.oEditor._oChildTree.getItems()[0];
 						var oItem1 = that.oEditor._oChildTree.getItems()[1];
 						var oItem2 = that.oEditor._oChildTree.getItems()[2];
-						assert.equal(oItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+						assert.equal(oItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.ok(oItem0.isTopLevel(), "Child tree item 1 is top level: true");
 						assert.equal(oItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -6179,7 +6179,7 @@ sap.ui.define([
 
 						var oTreeModel = that.oEditor._oChildTree.getModel();
 						var oMainNode = oTreeModel.getData()[0];
-						assert.equal(oMainNode.text, "Main", "Child tree main node text is OK");
+						assert.equal(oMainNode.text, "Main Card", "Child tree main node text is OK");
 						assert.equal(oMainNode.path, "", "Child tree main node path is OK");
 						assert.ok(oMainNode.selected, "Child tree main node selected: true");
 
@@ -6209,7 +6209,7 @@ sap.ui.define([
 						var oNewItem1 = that.oEditor._oChildTree.getItems()[1];
 						var oNewItem2 = that.oEditor._oChildTree.getItems()[2];
 						var oNewItem3 = that.oEditor._oChildTree.getItems()[3];
-						assert.equal(oNewItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+						assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
 						assert.equal(oNewItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -6256,7 +6256,7 @@ sap.ui.define([
 								var oNewItem1 = that.oEditor._oChildTree.getItems()[1];
 								var oNewItem2 = that.oEditor._oChildTree.getItems()[2];
 								var oNewItem3 = that.oEditor._oChildTree.getItems()[3];
-								assert.equal(oNewItem0.getTitle(), "Main", "Child tree item 0 title is OK");
+								assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 								assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 								assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
 								assert.equal(oNewItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");

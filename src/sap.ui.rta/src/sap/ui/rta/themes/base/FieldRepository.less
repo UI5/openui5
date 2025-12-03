@@ -1,23 +1,9 @@
-/* =========================================== */
-/* CSS for control sap.ui.rta/FieldRepository  */
-/* Base theme                                  */
-/* =========================================== */
-
-@_sap_ui_rta_FieldRepository_BtnFocusOutlineColor: var(--sapContent_FocusColor); /* #000 */
-@_sap_ui_rta_FieldRepository_BC_Container_BorderColor: var(--sapGroup_ContentBorderColor); /* #000 */
+/******************************************************************
+	Style of the RTA Add Fields Dialog  - base Theme
+*******************************************************************/
+@_sap_ui_rta_FieldRepository_BC_Container_BorderColor: @sapUiGroupContentBorderColor; //#000
 
 .sapUIRtaFieldRepositoryDialog {
-
-	.sapMBtn {
-
-		&:focus {
-
-			> .sapMBtnInner {
-				outline: 0.0625rem dotted @_sap_ui_rta_FieldRepository_BtnFocusOutlineColor; /* 1px */
-				border: 0.0625rem solid transparent;
-			}
-		}
-	}
 
 	.sapUIRtaListItem {
 		line-height: 1rem;
@@ -25,23 +11,26 @@
 
 	.sapUIRtaBusinessContextContainer {
 		width: 100%;
-		margin-top: 0.25rem; /* 4px */
-		padding-bottom: 0.5rem; /* 8px */
+		padding: var(--sapContent_Space_Tiny) 0; /* 8px */
 		border-bottom: 0.0625rem solid @_sap_ui_rta_FieldRepository_BC_Container_BorderColor; /* 1px */
 
 		> div:not(:first-child) {
-			padding-left: 2.125rem; /* 34px */
-			padding-right: 0.625rem; /* 10px */
+			padding-left: var(--sapContent_Space_Medium); /* 32px */
+			padding-right: var(--sapContent_Space_Tiny); /* 8px */
 		}
 
 		> div:first-child {
 			font-weight: bold;
-			padding: 0.25rem 0 0.25rem 0.625rem;
+			padding: var(--sapContent_Space_Tiny); /* 8px */
+		}
+
+		.sapMText {
+			max-width: 37.5rem; /* 600px */
 		}
 
 	}
 
 	.sapUIRtaCCDialogScrollContainer {
-		height: 25rem !important;
+		max-height: 25rem; /* 400px */
 	}
 }

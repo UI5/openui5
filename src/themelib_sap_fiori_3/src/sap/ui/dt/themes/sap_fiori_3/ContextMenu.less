@@ -15,12 +15,9 @@
 
 		.sapMMenuItem {
 			color: @_sap_ui_dt_ContextMenu_MnuItemTextColor;
-			background-color: @_sap_ui_dt_ContextMenu_MnuItemBackgroundColor;
-			margin: 0.0625rem;
 
 			.sapMMenuItemIcon {
 				color: @_sap_ui_dt_ContextMenu_MnuItemTextColor;
-				background-color: @_sap_ui_dt_ContextMenu_MnuItemBackgroundColor;
 			}
 
 			.sapMMenuItemSubMenu > div::after,
@@ -48,15 +45,10 @@
 
 			&:focus {
 				border-radius: @_sap_ui_dt_ContextMenu_BorderRadius;
-				outline-offset: -0.125rem;
 
 				&.sapMMenuItemDisabled {
 					outline: none;
 				}
-			}
-
-			&.sapMMenuItemSubMenuOpen {
-				border-bottom: none !important; /* 1px */
 			}
 
 			&.sapUiDtContextMenuExtendedActionsTitle {

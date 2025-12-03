@@ -2040,34 +2040,26 @@ sap.ui.define([
 	 * @param {sap.ui.table.Table} oTable Table instance
 	 * @param {object} [mConfig] Optional configuration object
 	 * @param {string} [mConfig.cssClass] Additional CSS class to apply
-	 * @param {boolean} [mConfig.tabIndex=true] True if tabindex="-1" should be set for accessibility
 	 * @private
 	 */
 	TableRenderer.renderVSb = function(rm, oTable, mConfig) {
 		const oScrollExtension = oTable._getScrollExtension();
-
-		mConfig = {
-			tabIndex: true,
-			...mConfig
-		};
 
 		rm.openStart("div");
 		rm.class("sapUiTableVSbContainer");
 		if (!oScrollExtension.isVerticalScrollbarRequired()) {
 			rm.class("sapUiTableHidden");
 		}
-		rm.class(mConfig.cssClass);
+		rm.class(mConfig?.cssClass);
 		rm.openEnd();
 
 		rm.openStart("div", oTable.getId() + "-vsb");
 		rm.class("sapUiTableVSb");
 		rm.style("max-height", oScrollExtension.getVerticalScrollbarHeight() + "px");
 
-		if (mConfig.tabIndex) {
-			// https://bugzilla.mozilla.org/show_bug.cgi?id=1069739
-			// Avoid focusing of the scrollbar in Firefox with tab.
-			rm.attr("tabindex", "-1");
-		}
+		// https://bugzilla.mozilla.org/show_bug.cgi?id=1069739
+		// Avoid focusing of the scrollbar with tab.
+		rm.attr("tabindex", "-1");
 		rm.openEnd();
 		rm.openStart("div");
 		rm.class("sapUiTableVSbContent");
@@ -2089,8 +2081,7 @@ sap.ui.define([
 	TableRenderer.renderVSbExternal = function(rm, oTable) {
 		if (ExtensionBase.isEnrichedWith(oTable, "sap.ui.table.extensions.Synchronization")) {
 			this.renderVSb(rm, oTable, {
-				cssClass: "sapUiTableVSbExternal",
-				tabIndex: false
+				cssClass: "sapUiTableVSbExternal"
 			});
 		} else {
 			Log.error("This method can only be used with synchronization enabled.", oTable, "TableRenderer.renderVSbExternal");
@@ -2105,7 +2096,6 @@ sap.ui.define([
 	 * @param {object} [mConfig] Optional configuration object
 	 * @param {string} [mConfig.id] Scrollbar ID
 	 * @param {string} [mConfig.cssClass] Additional CSS class
-	 * @param {boolean} [mConfig.tabIndex=true] True if tabindex should be set for accessibility
 	 * @param {boolean} [mConfig.hidden=true] True if scrollbar initially hidden
 	 * @param {int} [mConfig.scrollWidth=0] Scroll content width
 	 * @private
@@ -2114,7 +2104,6 @@ sap.ui.define([
 		mConfig = Object.assign({
 			id: oTable.getId() + "-hsb",
 			cssClass: "sapUiTableHSb",
-			tabIndex: true,
 			hidden: true,
 			scrollWidth: 0
 		}, mConfig);
@@ -2124,9 +2113,7 @@ sap.ui.define([
 		if (mConfig.hidden) {
 			rm.class("sapUiTableHidden");
 		}
-		if (mConfig.tabIndex) {
-			rm.attr("tabindex", "-1"); // Avoid focusing of the scrollbar in Firefox with tab.
-		}
+		rm.attr("tabindex", "-1"); // Avoid focusing of the scrollbar with tab.
 		rm.openEnd();
 
 		rm.openStart("div", mConfig.id + "-content");
@@ -2154,7 +2141,6 @@ sap.ui.define([
 			this.renderHSb(rm, oTable, {
 				id: mConfig.id,
 				cssClass: "sapUiTableHSbExternal",
-				tabIndex: false,
 				hidden: false,
 				scrollWidth: mConfig.scrollWidth
 			});

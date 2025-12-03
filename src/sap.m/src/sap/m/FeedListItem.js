@@ -435,13 +435,13 @@ function(
 	 */
 	FeedListItem.prototype.onfocusin = function(oEvent) {
 		//Added for calculating List Count.
-        var oItem = oEvent.srcControl ,
-            oItemDomRef = oItem.getDomRef(),
-            mPosition = this.getParent().getAccessbilityPosition(oItem);
+		var oItem = oEvent.srcControl ,
+			oItemDomRef = oItem.getDomRef(),
+			mPosition = this.getParent().getAccessbilityPosition(oItem);
 
-        if ( oItem instanceof FeedListItem ) {
-            oItemDomRef.setAttribute("aria-posinset", mPosition.posInset);
-            oItemDomRef.setAttribute("aria-setsize", mPosition.setSize);
+		if ( oItem instanceof FeedListItem ) {
+			oItemDomRef.setAttribute("aria-posinset", mPosition.posinset);
+			oItemDomRef.setAttribute("aria-setsize", mPosition.setsize);
 		}
 	};
 

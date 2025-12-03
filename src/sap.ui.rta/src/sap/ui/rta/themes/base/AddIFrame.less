@@ -15,62 +15,35 @@
 			justify-content: center
 		}
 
-		&.sapMDialog > header .sapMDialogTitleGroup {
-
-			&:focus::after {
-				content: none;
-			}
-		}
-
 		.sapUiRtaAddIFrameDialogVlWrapper {
 
 			.sapUiRtaAddIFrameDialogContainer {
-				padding: 0 1rem 0 1rem;
+				padding: 0 var(--sapContent_Space_Small);
 			}
 
 			.sapUiRtaAddIFrameDialogShowParametersButton {
-				margin-top: 1.3rem;
+				position: relative;
+				top: 1.375rem;
 			}
 
 			.sapUiRtaAddIFrameDialogHideParametersButton {
-				margin-top: -@sapUiMarginTiny;
+				margin-top: ~"calc(-1 * var(--sapContent_Space_Small))";
 			}
 
 			.sapUiRtaAddIFrameParametersHeader {
-				margin-bottom: -@sapUiMarginTiny;
+				margin-bottom: ~"calc(-1 * var(--sapContent_Space_Tiny))";
+				.sapUiRtaAddIFrameDialogParametersLabel {
+					// avoid label beeing too long
+					max-width: 20.5rem;
+				}
 			}
 
 			.sapUiRtaAddIFrameDialogSizeVBox {
-				margin-top: -@sapUiMarginSmall;
-			}
-
-			.sapUiRtaAddIFrameDialogSizeGrid {
-
-				.sapUiFormResGridMain {
-					padding: 0;
-				}
-			}
-
-			.sapUiRtaAddIFrameDialogPercentGrid {
-				padding: 0.25rem 0 0 0;
-				margin: 0 1rem;
-				border-bottom: 0.0625rem solid @_sap_ui_rta_AddIFrame_BorderColor; /* 1px */
-
-				> div {
-					margin-bottom: 0.25rem;
-				}
-
-				.sapUiRtaAddIFrameDialogPercentText {
-					float: right;
-
-					&.sapUiRtaAddIFrameDialogPercentText-invisible {
-						visibility: hidden;
-					}
-				}
+				margin-top: ~"calc(-1 * var(--sapContent_Space_Small))";
 			}
 
 			.sapUiRtaAddIFrameDialogEditGrid {
-				margin-top: 1rem;
+				margin-top: var(--sapContent_Space_Small);
 
 				.sapUiRtaAddIFrameDialogParameters {
 
@@ -83,16 +56,12 @@
 
 					.sapMTextArea {
 						margin-bottom: 0;
-
-						.sapMTextAreaInner {
-							border: 0.0625rem solid @_sap_ui_rta_AddIFrame_BorderColor; /* 1px */
-						}
 					}
 				}
 			}
 
-			.sapUiRtaAddIFrameDialogUrlWarningGrid {
-				padding-left: 1.625rem;
+			.sapUiRtaAddIFrameDialogUrlWarningVBox {
+				width: 96%;
 			}
 
 			.sapUiRtaAddIFrameDialogAdvancedSettingsGrid {
@@ -100,14 +69,12 @@
 				.sapUiRtaAddIFrameDialogAdvancedSettingsPanel {
 					margin: 0 !important;
 
-					.sapMPanelContent {
-						padding: 0.5rem 1rem 0.5rem 1rem;
+					.sapMPanelWrappingDivTb {
+						border-radius: 0;
 					}
-
 					.sapUiRtaAddIFrameDialogAdvancedSettingsToolbar {
 						height: 2rem !important;
 						padding-right: 0;
-						margin-left: 2.75rem;
 
 						.sapUiRtaAddIFrameDialogAdvancedSettingsTitle {
 							font-size: 0.875rem;
@@ -118,16 +85,11 @@
 
 			.sapUiRtaAddIFrameDialogPreviewGrid {
 				padding: 0;
-				margin: 0 1rem 1rem;
+				margin: 0 var(--sapContent_Space_Small) var(--sapContent_Space_Small);
 				background: @_sap_ui_rta_AddIFrame_PreviewBackgroundColor;
 				border: 0.0625rem solid @_sap_ui_rta_AddIFrame_BorderColor; /* 1px */
 				overflow: auto;
 				height: 230px;
-
-				> div {
-					margin-bottom: 0;
-					height: 9.75rem;
-				}
 			}
 		}
 	}
@@ -138,19 +100,12 @@
 	.sapUiRtaAddIFrameDialog {
 
 		.sapUiRtaAddIFrameDialogVlWrapper {
-
-			.sapUiRtaAddIFrameDialogAdvancedSettingsGrid {
-
-				.sapUiRtaAddIFrameDialogAdvancedSettingsPanel {
-
-					.sapUiRtaAddIFrameDialogAdvancedSettingsToolbar {
-						height: 2.625rem !important;
-
-						.sapUiRtaAddIFrameDialogAdvancedSettingsTitle {
-							margin-left: 0.25rem;
-						}
-					}
-				}
+			.sapUiRtaAddIFrameDialogHideParametersButton {
+				position: relative;
+				top: -0.3125rem;
+			}
+			.sapUiRtaAddIFrameParametersHeader {
+				margin-bottom: var(--sapContent_Space_Small);
 			}
 		}
 	}

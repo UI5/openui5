@@ -20,11 +20,10 @@
 		border-image: none;
 	}
 
-	&.sapMPopoverArr,
-	.sapMPopoverArr {
-
-		&::after {
-			border: 0.188rem dashed @_sap_ui_rta_Dialogs_BorderDarkColor; /* 3px */
+	&.sapMPopoverArr, .sapMPopoverArr {
+		&:after {
+			/* Arrow border needs to be solid and smaller than the popover border to avoid visual glitches */
+			border: 0.125rem solid @_sap_ui_rta_Dialogs_BorderDarkColor; /* 2px */
 			border-image: none;
 		}
 	}
