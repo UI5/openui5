@@ -30,7 +30,8 @@ sap.ui.require([
 		}
 	});
 
-	QUnit.on("suiteStart", function() {
+	QUnit.moduleStart(function() {
+		// Async hooks are not supported in the used QUnit version (2.3.2). As soon as it is available, ExportJourney can be adjusted.
 		return new Opa5().iStartMyAppInAFrame({
 			source: `test-resources/sap/ui/mdc/qunit/table/OpaTests/${sApp}/index.html`,
 			autoWait: true,
@@ -39,12 +40,12 @@ sap.ui.require([
 		});
 	});
 
-	QUnit.on("suiteEnd", function() {
+	QUnit.moduleDone(function() {
 		return new Opa5().iTeardownMyApp();
 	});
 
-	QUnit.on("runEnd", function() {
-		// After the final module, Opa's queue is empty and automatic execution is stopped. "suiteEnd" is called afterwards, so the teardown is added
+	QUnit.done(function() {
+		// After the final module, Opa's queue is empty and automatic execution is stopped. This hook is called afterwards, so the teardown is added
 		// to the empty queue. Execution of this queue needs to be started manually.
 		return Opa5.emptyQueue();
 	});

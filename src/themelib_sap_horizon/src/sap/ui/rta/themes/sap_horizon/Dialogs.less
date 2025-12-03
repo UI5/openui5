@@ -3,8 +3,8 @@
 /* Morning Horizon theme               */
 /* =================================== */
 
-@_sap_ui_rta_Dialogs_BorderLightColor: var(--sapToolbar_Background); //#fff
-@_sap_ui_rta_Dialogs_BorderDarkColor: var(--sapInformationBorderColor); //#0070f2
+@_sap_ui_rta_Dialogs_BorderLightColor: var(--sapToolbar_Background); /* #fff */
+@_sap_ui_rta_Dialogs_BorderDarkColor: var(--sapInformationBorderColor); /* #0070f2 */
 
 .sapMDialog.sapUiRTABorder {
 	border-image: none;
@@ -14,17 +14,15 @@
 
 .sapUiRtaPopover {
 
-	&.sapMPopover,
-	.sapMPopover {
+	&.sapMPopover, .sapMPopover {
 		border: 0.188rem dashed @_sap_ui_rta_Dialogs_BorderDarkColor; /* 3px */
 		border-image: none;
 	}
 
-	&.sapMPopoverArr,
-	.sapMPopoverArr {
-
-		&::after {
-			border: 0.188rem dashed @_sap_ui_rta_Dialogs_BorderDarkColor; /* 3px */
+	&.sapMPopoverArr, .sapMPopoverArr {
+		&:after {
+			/* Arrow border needs to be solid and smaller than the popover border to avoid visual glitches */
+			border: 0.125rem solid @_sap_ui_rta_Dialogs_BorderDarkColor; /* 2px */
 			border-image: none;
 		}
 	}

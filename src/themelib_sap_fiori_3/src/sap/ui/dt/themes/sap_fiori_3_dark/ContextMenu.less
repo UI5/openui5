@@ -16,8 +16,6 @@
 
 		.sapMMenuItem {
 			color: @_sap_ui_dt_ContextMenu_MnuItemTextColor;
-			background-color: @_sap_ui_dt_ContextMenu_MnuItemBackgroundColor;
-			border: 0.0625rem dotted transparent;
 
 			.sapMMenuItemIcon {
 				color: @_sap_ui_dt_ContextMenu_MnuItemTextColor;
@@ -26,7 +24,6 @@
 			.sapMMenuItemSubMenu > div::after,
 			.sapMMenuItem:hover .sapMMenuItemSubMenu > div::after {
 				color: @_sap_ui_dt_ContextMenu_MnuItemTextColor;
-				background-color: @_sap_ui_dt_ContextMenu_MnuItemBackgroundColor;
 			}
 
 			&:hover {
@@ -49,12 +46,7 @@
 
 			&:focus:not(.sapMMenuItemDisabled) {
 				outline: 0.0625rem dotted @_sap_ui_dt_ContextMenu_FocusColor;
-				outline-offset: -0.125rem;
 				border-radius: @_sap_ui_dt_ContextMenu_BorderRadius;
-			}
-
-			&.sapMMenuItemSubMenuOpen {
-				border-bottom: none !important;
 			}
 
 			&.sapMMenuItemDisabled {
