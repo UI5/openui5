@@ -34,7 +34,8 @@ sap.ui.define([
 	"sap/ui/model/json/JSONModel",
 	"sap/ui/events/KeyCodes",
 	"sap/m/Title",
-	"sap/ui/dom/units/Rem"
+	"sap/ui/dom/units/Rem",
+	"sap/m/dialogUtils/PreventKeyboardEvents"
 ], function(
 	Library,
 	qutils,
@@ -69,7 +70,8 @@ sap.ui.define([
 	JSONModel,
 	KeyCodes,
 	Title,
-	Rem
+	Rem,
+	PreventKeyboardEvents
 ) {
 	"use strict";
 
@@ -1592,6 +1594,69 @@ sap.ui.define([
 		assert.ok(oFocusedControl.isA("sap.m.Input"), "After Shift+F6, focus should return to the Input field");
 
 		oDialog.destroy();
+	});
+
+	QUnit.test("Focus moves directly on the correct target", function (assert) {
+		this.clock.restore();
+		const done = assert.async();
+		const oDialog = new Dialog({
+			title: "Test Dialog",
+			content: [
+				new Button("btn1", {
+					text: "Button 1"
+				})
+			]
+		});
+
+		const fnFocusInSpy = this.spy();
+		const fnFocusInHandler = (e) => {
+			fnFocusInSpy(e.target);
+		};
+		document.addEventListener("focusin", fnFocusInHandler);
+
+		oDialog.open();
+		oDialog.attachAfterOpen(() => {
+			assert.strictEqual(document.activeElement?.id, "btn1", "Focus is on the correct button.");
+			assert.ok(fnFocusInSpy.calledOnce, "Focus has been moved only once. This is required to not confuse the screen reader.");
+			assert.ok(fnFocusInSpy.calledWith(document.activeElement), "Focus has been moved to the correct button.");
+
+			oDialog.destroy();
+			document.removeEventListener("focusin", fnFocusInHandler);
+			done();
+		});
+	});
+
+	QUnit.test("Keyup and keypress are prevented during opening", function (assert) {
+		const oDialog = new Dialog({
+			title: "Test Dialog",
+			content: [
+				new Button("btn1", {
+					text: "Button 1"
+				})
+			]
+		});
+
+		const fnKeyboardPreventSpy = this.spy(PreventKeyboardEvents, "preventOnce");
+		const fnKeyboardRestoreSpy = this.spy(PreventKeyboardEvents, "restore");
+
+		oDialog.addEventDelegate({
+			onAfterRendering: () => {
+				assert.ok(fnKeyboardPreventSpy.calledOnce, "Keyboard events are prevented during opening.");
+				assert.ok(fnKeyboardPreventSpy.calledWith(oDialog.getDomRef()), "preventOnce was called with correct parameter.");
+				assert.ok(fnKeyboardRestoreSpy.notCalled, "Keyboard events are not restored during open.");
+			}
+		});
+
+		oDialog.open();
+		this.clock.tick(500);
+
+		assert.ok(fnKeyboardPreventSpy.calledOnce, "Keyboard events are not prevented further.");
+		assert.ok(fnKeyboardRestoreSpy.called, "Keyboard events are restored after open.");
+		assert.ok(fnKeyboardRestoreSpy.calledWith(oDialog.getDomRef()), "Keyboard events are restored after open.");
+
+		oDialog.destroy();
+		fnKeyboardPreventSpy.restore();
+		fnKeyboardRestoreSpy.restore();
 	});
 
 	QUnit.test("Container Padding Classes", function (assert) {

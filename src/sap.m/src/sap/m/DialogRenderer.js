@@ -180,7 +180,7 @@ sap.ui.define([
 				if (oHeader._applyContextClassFor) {
 					oHeader._applyContextClassFor("header");
 				}
-				oRM.openStart("div")
+				oRM.openStart("div", sId + "-titleGroup")
 					.class("sapMDialogTitleGroup");
 
 				if (oDialog._isDraggableOrResizable()) {
