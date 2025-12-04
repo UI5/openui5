@@ -1529,15 +1529,22 @@ sap.ui.define([
 			const sFallBackReference = oVariantManagement.getVariantManagementReference();
 			assert.equal(sFallBackReference, oVariantManagement.getId(), "Reference ID matches VM ID when no app component is found");
 
+			const oAnotherVariantManagement = new VariantManagement("AnotherTestVM");
 			this.oGetAppComponentForControlStub.returns({
 				getLocalId(sControlId) {
 					return `appComponentId-${sControlId}`;
 				}
 			});
-			const sReference = oVariantManagement.getVariantManagementReference();
-			assert.equal(sReference, "appComponentId-TestVM", "Local ID is returned when app component is found");
+			const sVMReference = oAnotherVariantManagement.getVariantManagementReference();
+			assert.equal(sVMReference, "appComponentId-AnotherTestVM", "Local ID is returned when app component is found");
+
+			this.oGetAppComponentForControlStub.resetHistory();
+			const sVMReferenceAgain = oAnotherVariantManagement.getVariantManagementReference();
+			assert.equal(sVMReferenceAgain, "appComponentId-AnotherTestVM", "Local ID is returned from cache on subsequent calls");
+			assert.ok(this.oGetAppComponentForControlStub.notCalled, "App component lookup not called again due to caching");
 
 			oVariantManagement.destroy();
+			oAnotherVariantManagement.destroy();
 		});
 	});
 

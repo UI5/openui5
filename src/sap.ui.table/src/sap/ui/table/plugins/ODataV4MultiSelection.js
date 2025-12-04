@@ -6,14 +6,12 @@ sap.ui.define([
 	"./PluginBase",
 	"../utils/TableUtils",
 	"../library",
-	"sap/ui/core/Icon",
 	"sap/ui/core/IconPool"
 ], function(
 	ODataV4Selection,
 	PluginBase,
 	TableUtils,
 	library,
-	Icon,
 	IconPool
 ) {
 	"use strict";
@@ -86,9 +84,6 @@ sap.ui.define([
 				 * Hide the header selector.
 				 */
 				hideHeaderSelector: {type: "boolean", group: "Appearance", defaultValue: false}
-			},
-			aggregations: {
-				icon: {type: "sap.ui.core.Icon", multiple: false, visibility: "hidden"}
 			}
 		}
 	});
@@ -101,10 +96,6 @@ sap.ui.define([
 	ODataV4MultiSelection.prototype.init = function() {
 		ODataV4Selection.prototype.init.apply(this, arguments);
 
-		const oIcon = new Icon({src: IconPool.getIconURI(TableUtils.ThemeParameters.checkboxIcon), useIconTooltip: false});
-		oIcon.addStyleClass("sapUiTableSelectClear");
-		this.setAggregation("icon", oIcon, true);
-
 		_private(this).bLimitReached = false;
 		_private(this).oRangeSelectionStartContext = null;
 	};
@@ -113,10 +104,19 @@ sap.ui.define([
 	 * @inheritDoc
 	 */
 	ODataV4MultiSelection.prototype.onActivate = function(oTable) {
+		const oBinding = oTable.getBinding();
+
 		ODataV4Selection.prototype.onActivate.apply(this, arguments);
 		oTable.setProperty("selectionMode", library.SelectionMode.MultiToggle);
-		attachToBinding(this, oTable.getBinding());
+
+		if (oBinding) {
+			attachToBinding(this, oBinding);
+		} else {
+			updateHeaderSelector(this);
+		}
+
 		TableUtils.Hook.register(oTable, TableUtils.Hook.Keys.Table.RowsBound, onTableRowsBound, this);
+		TableUtils.Hook.register(oTable, TableUtils.Hook.Keys.Table.TotalRowCountChanged, onTotalRowCountChanged, this);
 		TableUtils.Hook.register(oTable, TableUtils.Hook.Keys.Table.UpdateRows, clearSelectionCache, this);
 		TableUtils.Hook.register(oTable, TableUtils.Hook.Keys.Table.UnbindRows, clearSelectionCache, this);
 	};
@@ -131,6 +131,7 @@ sap.ui.define([
 		_private(this).oRangeSelectionStartContext = null;
 		detachFromBinding(this, oTable.getBinding());
 		TableUtils.Hook.deregister(oTable, TableUtils.Hook.Keys.Table.RowsBound, onTableRowsBound, this);
+		TableUtils.Hook.deregister(oTable, TableUtils.Hook.Keys.Table.TotalRowCountChanged, onTotalRowCountChanged, this);
 		TableUtils.Hook.deregister(oTable, TableUtils.Hook.Keys.Table.UpdateRows, clearSelectionCache, this);
 		TableUtils.Hook.register(oTable, TableUtils.Hook.Keys.Table.UnbindRows, clearSelectionCache, this);
 		clearSelectionCache.call(this);
@@ -190,10 +191,6 @@ sap.ui.define([
 			return 0;
 		}
 
-		if (_private(oPlugin).iSelectableCount != null) {
-			return _private(oPlugin).iSelectableCount;
-		}
-
 		if (oBinding.getAggregation()) {
 			/* In case of data aggregation with visual grouping and sum rows, we cannot determine the number of selectable contexts.
 			 * The expected behavior is that if all visible selectable rows are selected, the state changes to "everything is selected". For example,
@@ -225,58 +222,47 @@ sap.ui.define([
 			iSelectableCount = oBinding.getLength();
 		} // The count is not requested and not all data is loaded.
 
-		_private(oPlugin).iSelectableCount = iSelectableCount;
 		return iSelectableCount;
 	}
 
 	/**
-	 * Changes the current icon and tooltip text of the header selection icon in the given plugin object based on the selection.
+	 * Updates the HeaderSelector control based on the current selection state.
 	 *
-	 * @param {sap.ui.table.plugins.ODataV4MultiSelection} oPlugin The plugin to change the header selection icon on.
+	 * @param {sap.ui.table.plugins.ODataV4MultiSelection} oPlugin The plugin to update the header selector for.
 	 */
-	function updateHeaderSelectorIcon(oPlugin) {
-		if (oPlugin._isLimitDisabled()) {
+	function updateHeaderSelector(oPlugin) {
+		const oHeaderSelector = oPlugin._getHeaderSelector();
+
+		if (!oPlugin.isActive() || !oHeaderSelector) {
 			return;
 		}
 
-		let sIconURI = IconPool.getIconURI(TableUtils.ThemeParameters.checkboxIcon);
+		const sType = oPlugin._isLimitDisabled() ? "checkbox" : "custom";
+		const iSelectableCount = getSelectableCount(oPlugin);
+		const iSelectedCount = oPlugin.getSelectedCount();
+		const bAllRowsSelected = areAllRowsSelected(iSelectableCount, iSelectedCount);
+		let sTooltip = null;
+		let sIcon = "";
 
-		if (oPlugin.getSelectedCount() > 0) {
-			if (areAllRowsSelected(oPlugin)) {
-				sIconURI = IconPool.getIconURI(TableUtils.ThemeParameters.allSelectedIcon);
-			} else {
-				sIconURI = IconPool.getIconURI(TableUtils.ThemeParameters.clearSelectionIcon);
-			}
+		if (sType === "custom") { // Default tooltip is used for type checkbox.
+			sTooltip = iSelectedCount === 0 ? TableUtils.getResourceText("TBL_SELECT_ALL") : TableUtils.getResourceText("TBL_DESELECT_ALL");
 		}
 
-		oPlugin.getAggregation("icon").setSrc(sIconURI);
+		if (bAllRowsSelected) {
+			sIcon = IconPool.getIconURI(TableUtils.ThemeParameters.allSelectedIcon);
+		} else if (iSelectedCount > 0) {
+			sIcon = IconPool.getIconURI(TableUtils.ThemeParameters.clearSelectionIcon);
+		} else {
+			sIcon = IconPool.getIconURI(TableUtils.ThemeParameters.checkboxIcon);
+		}
+
+		oHeaderSelector.setVisible(!oPlugin.getHideHeaderSelector());
+		oHeaderSelector.setEnabled(iSelectableCount !== 0);
+		oHeaderSelector.setType(sType);
+		oHeaderSelector.setSelected(bAllRowsSelected);
+		oHeaderSelector.setTooltip(sTooltip);
+		oHeaderSelector.setIcon(sIcon);
 	}
-
-	/**
-	 * @inheritDoc
-	 */
-	ODataV4MultiSelection.prototype.getRenderConfig = function() {
-		if (!this.isActive()) {
-			return ODataV4Selection.prototype.getRenderConfig.apply(this, arguments);
-		}
-
-		updateHeaderSelectorIcon(this);
-
-		const mRenderConfig = {
-			headerSelector: {
-				type: this._isLimitDisabled() ? "toggle" : "custom",
-				icon: this.getAggregation("icon"),
-				visible: !this.getHideHeaderSelector(),
-				enabled: getSelectableCount(this) !== 0,
-				selected: areAllRowsSelected(this),
-				tooltip: this.getSelectedCount() === 0
-					? TableUtils.getResourceText("TBL_SELECT_ALL")
-					: TableUtils.getResourceText("TBL_DESELECT_ALL")
-			}
-		};
-
-		return mRenderConfig;
-	};
 
 	/**
 	 * Selects all rows if not all are already selected, otherwise the selection is cleared.
@@ -285,7 +271,7 @@ sap.ui.define([
 	 * @returns {boolean} The state of selection. true - all selected, false - all cleared, undefined - no action
 	 */
 	function toggleSelectAll(oPlugin) {
-		if (areAllRowsSelected(oPlugin)) {
+		if (areAllRowsSelected(getSelectableCount(oPlugin), oPlugin.getSelectedCount())) {
 			oPlugin.clearSelection();
 			return false;
 		} else if (oPlugin._isLimitDisabled()) {
@@ -301,16 +287,16 @@ sap.ui.define([
 	/**
 	 * Checks if all rows are selected.
 	 *
-	 * @param {sap.ui.table.plugins.ODataV4MultiSelection} oPlugin The selection plugin.
+	 * @param {int} iSelectableCount The number of selectable rows.
+	 * @param {int} iSelectedCount The number of selected rows.
 	 * @returns {boolean} Whether all rows are selected.
 	 */
-	function areAllRowsSelected(oPlugin) {
-		const iSelectableCount = getSelectableCount(oPlugin);
+	function areAllRowsSelected(iSelectableCount, iSelectedCount) {
 		/* Fails to return the correct information if there are selected invisible contexts. For example, if a context is selected and after
 		 * filtering the table contains 1 row with a different, unselected context -> 1 === 1.
 		 * We would have to load all contexts and check if all selectable contexts are selected. This would significantly impact performance.
 		 */
-		return iSelectableCount > 0 && iSelectableCount === oPlugin.getSelectedCount();
+		return iSelectableCount > 0 && iSelectableCount === iSelectedCount;
 	}
 
 	/**
@@ -319,19 +305,15 @@ sap.ui.define([
 	ODataV4MultiSelection.prototype.onHeaderSelectorPress = function() {
 		ODataV4Selection.prototype.onHeaderSelectorPress.apply(this, arguments);
 
-		if (!this.isActive()) {
+		const oHeaderSelector = this._getHeaderSelector();
+
+		if (!oHeaderSelector.getVisible() || !oHeaderSelector.getEnabled()) {
 			return;
 		}
 
-		const mRenderConfig = this.getRenderConfig();
-
-		if (!mRenderConfig.headerSelector.visible || !mRenderConfig.headerSelector.enabled) {
-			return;
-		}
-
-		if (mRenderConfig.headerSelector.type === "toggle") {
+		if (oHeaderSelector.getType() === "checkbox") {
 			toggleSelectAll(this);
-		} else if (mRenderConfig.headerSelector.type === "custom") {
+		} else if (oHeaderSelector.getType() === "custom") {
 			if (this.getSelectedCount() > 0) {
 				this.clearSelection();
 			} else {
@@ -368,8 +350,10 @@ sap.ui.define([
 	};
 
 	ODataV4MultiSelection.prototype.setLimit = function(iLimit) {
-		this.setProperty("limit", iLimit);
+		this.setProperty("limit", iLimit, true);
 		_private(this).bLimitReached = false;
+		// Full update of the header selector is needed when switching the type. Type checkbox and custom have a different selectable count.
+		updateHeaderSelector(this);
 		return this;
 	};
 
@@ -377,17 +361,32 @@ sap.ui.define([
 		attachToBinding(this, oBinding);
 	}
 
+	function onTotalRowCountChanged() {
+		updateHeaderSelector(this);
+	}
+
 	function attachToBinding(oPlugin, oBinding) {
+		const oSelectionCountBinding = oBinding.getModel().bindProperty("$selectionCount", oBinding.getHeaderContext());
+
+		oSelectionCountBinding.attachChange(() => {
+			updateHeaderSelector(oPlugin);
+		});
+		oSelectionCountBinding.initialize();
+
+		_private(oPlugin).oSelectionCountBinding = oSelectionCountBinding;
+
 		oBinding?.attachEvent("selectionChanged", clearSelectionCache, oPlugin);
 	}
 
 	function detachFromBinding(oPlugin, oBinding) {
+		_private(oPlugin).oSelectionCountBinding?.destroy();
+		delete _private(oPlugin).oSelectionCountBinding;
+
 		oBinding?.detachEvent("selectionChanged", clearSelectionCache, oPlugin);
 	}
 
 	function clearSelectionCache() {
 		delete _private(this).aSelectedContexts; // Delete the cached selected contexts to force a recalculation.
-		delete _private(this).iSelectableCount; // Delete the cached selectable count to force a recalculation.
 	}
 
 	/**
@@ -398,6 +397,12 @@ sap.ui.define([
 	 */
 	ODataV4MultiSelection.prototype._isLimitDisabled = function() {
 		return this.getLimit() === 0;
+	};
+
+	ODataV4MultiSelection.prototype.setHideHeaderSelector = function(bHide) {
+		this.setProperty("hideHeaderSelector", bHide, true);
+		this._getHeaderSelector()?.setVisible(!bHide);
+		return this;
 	};
 
 	/**
@@ -471,7 +476,9 @@ sap.ui.define([
 	};
 
 	ODataV4MultiSelection.prototype.onThemeChanged = function() {
-		updateHeaderSelectorIcon(this);
+		// Full update of the header selector is needed, because the required icon name needs to be calculated and cannot be determined from the
+		// current state of the header selector.
+		updateHeaderSelector(this);
 	};
 
 	/**

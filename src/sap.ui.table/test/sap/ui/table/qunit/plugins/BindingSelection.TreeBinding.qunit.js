@@ -125,4 +125,33 @@ sap.ui.define([
 		oClearSelectionSpy.reset();
 		oSelectAllSpy.reset();
 	});
+
+	QUnit.module("HeaderSelector", {
+		beforeEach: async function() {
+			this.oTable = TableQUnitUtils.createTable(TreeTable, {
+				rows: {
+					path: "/GLAccountHierarchyInChartOfAccountsSet(P_MANDT='902',P_VERSN='INT',P_KTOPL='INT')/Result",
+					parameters: {
+						rootLevel: 1,
+						numberOfExpandedLevels: 4
+					}
+				},
+				columns: TableQUnitUtils.createTextColumn({text: "HierarchyNode", bind: true}),
+				models: TableQUnitUtils.createODataModel("/metadata")
+			});
+
+			await this.oTable.qunit.whenRenderingFinished();
+		},
+		afterEach: function() {
+			this.oTable.destroy();
+		}
+	});
+
+	QUnit.test("Rebind when everything is selected", function(assert) {
+		this.oTable.selectAll();
+		assert.ok(this.oTable._getHeaderSelector().getSelected(), "HeaderSelector is selected before rebind");
+
+		this.oTable.bindRows(this.oTable.getBindingInfo("rows"));
+		assert.notOk(this.oTable._getHeaderSelector().getSelected(), "HeaderSelector is not selected after rebind");
+	});
 });

@@ -5,13 +5,17 @@
 sap.ui.define([
 	'sap/m/Input',
 	'sap/ui/mdc/field/FieldInputRenderer',
-	'sap/ui/base/ManagedObjectObserver'
+	'sap/ui/base/ManagedObjectObserver',
+	'sap/ui/core/Lib'
 ], (
 	Input,
 	FieldInputRenderer,
-	ManagedObjectObserver
+	ManagedObjectObserver,
+	Library
 ) => {
 	"use strict";
+
+	const oRbM = Library.getResourceBundleFor("sap.m");
 
 	/**
 	 * Constructor for a new <code>FieldInput</code>.
@@ -68,6 +72,18 @@ sap.ui.define([
 
 		this._oObserver.disconnect();
 		this._oObserver = undefined;
+
+	};
+
+	FieldInput.prototype.getAccessibilityInfo = function() {
+
+		const oInfo = Input.prototype.getAccessibilityInfo.apply(this, arguments);
+
+		if (oInfo.role === "combobox") { // use text like in ComboBox
+			oInfo.type = oRbM.getText("ACC_CTR_TYPE_COMBO");
+		}
+
+		return oInfo;
 
 	};
 

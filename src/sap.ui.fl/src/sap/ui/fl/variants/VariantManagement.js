@@ -1153,9 +1153,12 @@ sap.ui.define([
 	 * @returns {string} The reference of the variant management control
 	 */
 	VariantManagement.prototype.getVariantManagementReference = function() {
-		const sControlId = this.getId();
-		const oAppComponent = Utils.getAppComponentForControl(this);
-		return (oAppComponent && oAppComponent.getLocalId(sControlId)) || sControlId;
+		if (!this._sVMReference) {
+			const sControlId = this.getId();
+			const oAppComponent = Utils.getAppComponentForControl(this);
+			this._sVMReference = (oAppComponent && oAppComponent.getLocalId(sControlId)) || sControlId;
+		}
+		return this._sVMReference;
 	};
 
 	/**

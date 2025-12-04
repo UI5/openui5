@@ -14,6 +14,7 @@ sap.ui.define([
 	"sap/ui/model/BindingMode",
 	"./Column",
 	"./Row",
+	"./HeaderSelector",
 	"./library",
 	"./utils/TableUtils",
 	"./extensions/ExtensionBase",
@@ -46,6 +47,7 @@ sap.ui.define([
 	BindingMode,
 	Column,
 	Row,
+	HeaderSelector,
 	library,
 	TableUtils,
 	ExtensionBase,
@@ -835,6 +837,8 @@ sap.ui.define([
 		}
 
 		this._bInvalid = true;
+
+		this.addAggregation("_hiddenDependents", new HeaderSelector(this.getId() + "-selall"));
 	};
 
 	/**
@@ -2837,38 +2841,12 @@ sap.ui.define([
 			return;
 		}
 
-		const mRenderConfig = this._getSelectionPlugin().getRenderConfig();
-
-		const $SelectAll = this.$("selall");
-
 		// trigger the rows to update their selection
 		const aRows = this.getRows();
 
 		for (let i = 0; i < aRows.length; i++) {
 			const oRow = aRows[i];
 			oRow._updateSelection();
-		}
-
-		if (!mRenderConfig.headerSelector.visible) {
-			return;
-		}
-
-		// update the DOM without going through the whole table rendering
-		if (mRenderConfig.headerSelector.type === "toggle") {
-			const bAllRowsSelected = mRenderConfig.headerSelector.selected;
-
-			$SelectAll.toggleClass("sapUiTableSelAll", !bAllRowsSelected);
-			this._getAccExtension().setSelectAllState(bAllRowsSelected);
-		} else if (mRenderConfig.headerSelector.type === "custom") {
-			$SelectAll.toggleClass("sapUiTableSelAllDisabled", !mRenderConfig.headerSelector.enabled);
-
-			if (mRenderConfig.headerSelector.enabled) {
-				$SelectAll.removeAttr("aria-disabled");
-			} else {
-				$SelectAll.attr("aria-disabled", "true");
-			}
-			const sTitle = mRenderConfig.headerSelector.tooltip;
-			$SelectAll.attr('title', sTitle);
 		}
 	};
 
@@ -3446,6 +3424,17 @@ sap.ui.define([
 	};
 
 	/**
+	 * Gets the header selector control.
+	 *
+	 * @return {sap.ui.table.HeaderSelector} The header selector control.
+	 * @private
+	 */
+	Table.prototype._getHeaderSelector = function() {
+		const aHiddenDependents = this.getAggregation("_hiddenDependents") || [];
+		return aHiddenDependents.find((oDependent) => oDependent.isA("sap.ui.table.HeaderSelector"));
+	};
+
+	/**
 	 * Gets the selection plugin. If no selection plugin is applied to the table, a legacy selection plugin is returned.
 	 *
 	 * @return {sap.ui.table.plugins.SelectionPlugin} The selection plugin.
@@ -3457,12 +3446,14 @@ sap.ui.define([
 
 		if (oSelectionPlugin && oLegacySelectionPlugin) {
 			delete _private(this).oLegacySelectionPlugin;
+			delete oLegacySelectionPlugin.isMainSelectionPlugin;
 			oLegacySelectionPlugin.destroy();
 		} else if (!oSelectionPlugin && !oLegacySelectionPlugin && !this.isDestroyed()) {
 			oLegacySelectionPlugin = this._createLegacySelectionPlugin();
 			_private(this).oLegacySelectionPlugin = oLegacySelectionPlugin;
 			oLegacySelectionPlugin.setSelectionMode(this.getSelectionMode());
 			oLegacySelectionPlugin.attachSelectionChange(onLegacySelectionChanged, this);
+			oLegacySelectionPlugin.isMainSelectionPlugin = true;
 			this.addAggregation("_hiddenDependents", oLegacySelectionPlugin);
 
 			// Temporary fix for the Support Assistant hacks. Support Assistant should implement a selection plugin.
@@ -3487,12 +3478,20 @@ sap.ui.define([
 	};
 
 	Table.prototype._onSelectionPluginChange = function() {
-		const oSelectionPlugin = SelectionPlugin.findOn(this);
+		const oCurrentSelectionPlugin = _private(this).oSelectionPlugin;
+		const oNewSelectionPlugin = SelectionPlugin.findOn(this);
 
-		if (_private(this).oSelectionPlugin !== oSelectionPlugin) {
-			_private(this).oSelectionPlugin?.detachSelectionChange(this._updateSelection, this);
-			oSelectionPlugin?.attachSelectionChange(this._updateSelection, this);
-			_private(this).oSelectionPlugin = oSelectionPlugin;
+		if (oCurrentSelectionPlugin !== oNewSelectionPlugin) {
+			if (oCurrentSelectionPlugin) {
+				oCurrentSelectionPlugin.detachSelectionChange(this._updateSelection, this);
+				delete oCurrentSelectionPlugin.isMainSelectionPlugin;
+			}
+			if (oNewSelectionPlugin) {
+				oNewSelectionPlugin.attachSelectionChange(this._updateSelection, this);
+				oNewSelectionPlugin.isMainSelectionPlugin = true;
+			}
+			this._getHeaderSelector()?.resetSettings();
+			_private(this).oSelectionPlugin = oNewSelectionPlugin;
 		}
 	};
 

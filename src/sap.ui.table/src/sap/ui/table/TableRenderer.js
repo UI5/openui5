@@ -536,9 +536,6 @@ sap.ui.define([
 	 * @private
 	 */
 	TableRenderer._renderSelectionHeader = function(rm, oTable) {
-		let bEnabled = false;
-		let bSelAll = false;
-		const mRenderConfig = oTable._getSelectionPlugin().getRenderConfig();
 		const oAccRenderExtension = oTable._getAccRenderExtension();
 
 		rm.openStart("div");
@@ -562,56 +559,7 @@ sap.ui.define([
 
 		oAccRenderExtension.writeAriaAttributesFor(rm, oTable, "ColumnRowHeaderCell", {bLabel: true});
 		rm.openEnd();
-		rm.openStart("div", oTable.getId() + "-selall");
-
-		rm.class("sapUiTableCell");
-		rm.class("sapUiTableHeaderCell");
-		rm.class("sapUiTableRowSelectionHeaderCell");
-		rm.attr("tabindex", "-1");
-
-		if (mRenderConfig.headerSelector.visible) {
-			const bAllRowsSelected = mRenderConfig.headerSelector.selected;
-
-			if (mRenderConfig.headerSelector.type === "toggle") {
-				rm.attr("title", TableUtils.getResourceText("TBL_SELECT_ALL"));
-			} else if (mRenderConfig.headerSelector.type === "custom") {
-				const sTitle = mRenderConfig.headerSelector.tooltip;
-				rm.attr("title", sTitle);
-
-				if (!mRenderConfig.headerSelector.enabled) {
-					rm.class("sapUiTableSelAllDisabled");
-					rm.attr("aria-disabled", "true");
-				}
-			}
-
-			if (!bAllRowsSelected) {
-				rm.class("sapUiTableSelAll");
-			} else {
-				bSelAll = true;
-			}
-			rm.class("sapUiTableSelAllVisible");
-			bEnabled = true;
-		}
-
-		oAccRenderExtension.writeAriaAttributesFor(rm, oTable, "ColumnRowHeader", {
-			enabled: bEnabled,
-			checked: bSelAll
-		});
-
-		rm.openEnd();
-
-		if (mRenderConfig.headerSelector.visible) {
-			if (mRenderConfig.headerSelector.type === "custom" && mRenderConfig.headerSelector.icon) {
-				rm.renderControl(mRenderConfig.headerSelector.icon);
-			} else {
-				rm.openStart("div");
-				rm.class("sapUiTableSelectAllCheckBox");
-				rm.openEnd();
-				rm.close("div");
-			}
-		}
-
-		rm.close("div");
+		rm.renderControl(oTable._getHeaderSelector());
 		rm.close("div");
 		rm.close("div");
 	};

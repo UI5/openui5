@@ -1,0 +1,417 @@
+/*global QUnit */
+
+sap.ui.define([
+	"sap/ui/table/HeaderSelector",
+	"sap/ui/table/Table",
+	"sap/ui/table/utils/TableUtils",
+	"sap/ui/test/utils/nextUIUpdate"
+], function(
+	HeaderSelector,
+	Table,
+	TableUtils,
+	nextUIUpdate
+) {
+	"use strict";
+
+	QUnit.module("API", {
+		beforeEach: function() {
+			this.oHeaderSelector = new HeaderSelector();
+		},
+		afterEach: function() {
+			this.oHeaderSelector.destroy();
+		}
+	});
+
+	QUnit.test("Defaults", function(assert) {
+		assert.strictEqual(this.oHeaderSelector.getType(), "checkbox", "Default type is 'checkbox'");
+		assert.strictEqual(this.oHeaderSelector.getVisible(), false, "Default visible is false");
+		assert.strictEqual(this.oHeaderSelector.getEnabled(), true, "Default enabled is true");
+		assert.strictEqual(this.oHeaderSelector.getSelected(), false, "Default selected is false");
+		assert.strictEqual(this.oHeaderSelector.getIcon(), "", "Default icon is empty string");
+		assert.strictEqual(this.oHeaderSelector.getTooltip(), null, "Default tooltip is null");
+	});
+
+	QUnit.test("#resetSettings", function(assert) {
+		this.oHeaderSelector.setType("custom");
+		this.oHeaderSelector.setVisible(true);
+		this.oHeaderSelector.setEnabled(false);
+		this.oHeaderSelector.setSelected(true);
+		this.oHeaderSelector.setIcon("sap-icon://accept");
+		this.oHeaderSelector.setTooltip("Test Tooltip");
+
+		this.oHeaderSelector.resetSettings();
+
+		assert.strictEqual(this.oHeaderSelector.getType(), "checkbox", "Type reset to default");
+		assert.strictEqual(this.oHeaderSelector.getVisible(), false, "Visible reset to default");
+		assert.strictEqual(this.oHeaderSelector.getEnabled(), true, "Enabled reset to default");
+		assert.strictEqual(this.oHeaderSelector.getSelected(), false, "Selected reset to default");
+		assert.strictEqual(this.oHeaderSelector.getIcon(), "", "Icon reset to default");
+		assert.strictEqual(this.oHeaderSelector.getTooltip(), null, "Tooltip reset to default");
+	});
+
+	QUnit.module("Rendering", {
+		beforeEach: async function() {
+			this.oHeaderSelector = new HeaderSelector();
+			this.oHeaderSelector.placeAt("qunit-fixture");
+
+			// Stub the parent to avoid errors during rendering when the renderer tries to access the table's accessibility extension
+			this.oHeaderSelector.getParent()._getAccRenderExtension = () => {
+				return {
+					writeAriaAttributesFor: () => { }
+				};
+			};
+
+			await nextUIUpdate();
+		},
+		afterEach: function() {
+			this.oHeaderSelector.destroy();
+		}
+	});
+
+	QUnit.test("Base structure when not visible", function(assert) {
+		const oDomRef = this.oHeaderSelector.getDomRef();
+		const assertDOM = () => {
+			assert.ok(oDomRef, "Root element is rendered");
+			assert.strictEqual(oDomRef.tagName, "DIV", "Root element is a div");
+			assert.strictEqual(oDomRef.getAttribute("id"), this.oHeaderSelector.getId(), "Root element has correct ID");
+			assert.strictEqual(oDomRef.children.length, 0, "No child elements when visible=false");
+			assert.notOk(oDomRef.classList.contains("sapUiTableSelAllVisible"), "No sapUiTableSelAllVisible class");
+			assert.notOk(oDomRef.classList.contains("sapUiTableSelAll"), "No sapUiTableSelAll class");
+			assert.notOk(oDomRef.classList.contains("sapUiTableSelAllDisabled"), "No sapUiTableSelAllDisabled class");
+			assert.notOk(oDomRef.hasAttribute("title"), "No title attribute");
+		};
+
+		assertDOM();
+
+		this.oHeaderSelector.setType("custom");
+		this.oHeaderSelector.setIcon("sap-icon://decline");
+		this.oHeaderSelector.setTooltip("Test Tooltip");
+		assertDOM();
+	});
+
+	QUnit.test("Base classes", async function(assert) {
+		let oDomRef = this.oHeaderSelector.getDomRef();
+		assert.ok(oDomRef.classList.contains("sapUiTableCell"), "sapUiTableCell present when not visible");
+		assert.ok(oDomRef.classList.contains("sapUiTableHeaderCell"), "sapUiTableHeaderCell present when not visible");
+		assert.ok(oDomRef.classList.contains("sapUiTableRowSelectionHeaderCell"), "sapUiTableRowSelectionHeaderCell present when not visible");
+
+		this.oHeaderSelector.setVisible(true);
+		await nextUIUpdate();
+		oDomRef = this.oHeaderSelector.getDomRef();
+		assert.ok(oDomRef.classList.contains("sapUiTableCell"), "sapUiTableCell present when visible");
+		assert.ok(oDomRef.classList.contains("sapUiTableHeaderCell"), "sapUiTableHeaderCell present when visible");
+		assert.ok(oDomRef.classList.contains("sapUiTableRowSelectionHeaderCell"), "sapUiTableRowSelectionHeaderCell present when visible");
+
+		this.oHeaderSelector.setEnabled(false);
+		await nextUIUpdate();
+		oDomRef = this.oHeaderSelector.getDomRef();
+		assert.ok(oDomRef.classList.contains("sapUiTableCell"), "sapUiTableCell present when disabled");
+		assert.ok(oDomRef.classList.contains("sapUiTableHeaderCell"), "sapUiTableHeaderCell present when disabled");
+		assert.ok(oDomRef.classList.contains("sapUiTableRowSelectionHeaderCell"), "sapUiTableRowSelectionHeaderCell present when disabled");
+	});
+
+	QUnit.test("tabindex", async function(assert) {
+		let oDomRef = this.oHeaderSelector.getDomRef();
+		assert.strictEqual(oDomRef.getAttribute("tabindex"), "-1", "tabindex when not visible");
+
+		this.oHeaderSelector.setVisible(true);
+		await nextUIUpdate();
+		oDomRef = this.oHeaderSelector.getDomRef();
+		assert.strictEqual(oDomRef.getAttribute("tabindex"), "-1", "tabindex for checkbox");
+
+		this.oHeaderSelector.setType("custom");
+		await nextUIUpdate();
+		oDomRef = this.oHeaderSelector.getDomRef();
+		assert.strictEqual(oDomRef.getAttribute("tabindex"), "-1", "tabindex for custom");
+
+		this.oHeaderSelector.setEnabled(false);
+		await nextUIUpdate();
+		oDomRef = this.oHeaderSelector.getDomRef();
+		assert.strictEqual(oDomRef.getAttribute("tabindex"), "-1", "tabindex when disabled");
+	});
+
+	QUnit.test("type=checkbox, selected=false, enabled=true", async function(assert) {
+		this.oHeaderSelector.setVisible(true);
+		await nextUIUpdate();
+
+		const oDomRef = this.oHeaderSelector.getDomRef();
+
+		// Base classes
+		assert.ok(oDomRef.classList.contains("sapUiTableCell"), "Has sapUiTableCell class");
+		assert.ok(oDomRef.classList.contains("sapUiTableHeaderCell"), "Has sapUiTableHeaderCell class");
+		assert.ok(oDomRef.classList.contains("sapUiTableRowSelectionHeaderCell"), "Has sapUiTableRowSelectionHeaderCell class");
+
+		// Checkbox-specific classes
+		assert.ok(oDomRef.classList.contains("sapUiTableSelAllVisible"), "Has sapUiTableSelAllVisible class");
+		assert.ok(oDomRef.classList.contains("sapUiTableSelAll"), "Has sapUiTableSelAll class (not selected)");
+
+		assert.notOk(oDomRef.classList.contains("sapUiTableSelAllDisabled"), "No sapUiTableSelAllDisabled class");
+
+		// Default tooltip for checkbox
+		assert.ok(oDomRef.getAttribute("title"), TableUtils.getResourceText("TBL_SELECT_ALL"), "Default tooltip");
+
+		// Checkbox child element
+		const oCheckbox = oDomRef.querySelector(".sapUiTableSelectAllCheckBox");
+		assert.ok(oCheckbox, "Checkbox div is rendered");
+		assert.strictEqual(oCheckbox.tagName, "DIV", "Checkbox is a div element");
+		assert.ok(oCheckbox.classList.contains("sapUiTableSelectAllCheckBox"), "Checkbox has correct CSS class");
+
+		assert.notOk(oDomRef.querySelector(".sapUiIcon"), "No icon element");
+	});
+
+	QUnit.test("type=checkbox, selected=true, enabled=true", async function(assert) {
+		this.oHeaderSelector.setVisible(true);
+		this.oHeaderSelector.setSelected(true);
+		await nextUIUpdate();
+
+		const oDomRef = this.oHeaderSelector.getDomRef();
+
+		// Selected state: no sapUiTableSelAll class
+		assert.ok(oDomRef.classList.contains("sapUiTableSelAllVisible"), "Has sapUiTableSelAllVisible class");
+		assert.notOk(oDomRef.classList.contains("sapUiTableSelAll"), "No sapUiTableSelAll class when selected");
+
+		// Default tooltip for checkbox
+		assert.ok(oDomRef.getAttribute("title"), TableUtils.getResourceText("TBL_DESELECT_ALL"), "Default tooltip");
+
+		// Checkbox still rendered
+		assert.ok(oDomRef.querySelector(".sapUiTableSelectAllCheckBox"), "Checkbox div is rendered");
+	});
+
+	QUnit.test("type=checkbox, selected=false, enabled=false", async function(assert) {
+		this.oHeaderSelector.setVisible(true);
+		this.oHeaderSelector.setEnabled(false);
+		await nextUIUpdate();
+
+		const oDomRef = this.oHeaderSelector.getDomRef();
+
+		// Disabled class
+		assert.ok(oDomRef.classList.contains("sapUiTableSelAllDisabled"), "Has sapUiTableSelAllDisabled class");
+
+		// Other classes remain
+		assert.ok(oDomRef.classList.contains("sapUiTableSelAllVisible"), "Has sapUiTableSelAllVisible class");
+		assert.ok(oDomRef.classList.contains("sapUiTableSelAll"), "Has sapUiTableSelAll class (not selected)");
+
+		// Checkbox still rendered
+		assert.ok(oDomRef.querySelector(".sapUiTableSelectAllCheckBox"), "Checkbox div is rendered");
+	});
+
+	QUnit.test("type=checkbox, selected=true, enabled=false", async function(assert) {
+		this.oHeaderSelector.setVisible(true);
+		this.oHeaderSelector.setSelected(true);
+		this.oHeaderSelector.setEnabled(false);
+		await nextUIUpdate();
+
+		const oDomRef = this.oHeaderSelector.getDomRef();
+
+		// Disabled and selected classes
+		assert.ok(oDomRef.classList.contains("sapUiTableSelAllDisabled"), "Has sapUiTableSelAllDisabled class");
+		assert.ok(oDomRef.classList.contains("sapUiTableSelAllVisible"), "Has sapUiTableSelAllVisible class");
+		assert.notOk(oDomRef.classList.contains("sapUiTableSelAll"), "No sapUiTableSelAll class when selected");
+
+		// Checkbox still rendered
+		assert.ok(oDomRef.querySelector(".sapUiTableSelectAllCheckBox"), "Checkbox div is rendered");
+	});
+
+	QUnit.test("type=checkbox with custom tooltip", async function(assert) {
+		this.oHeaderSelector.setVisible(true);
+		this.oHeaderSelector.setTooltip("My Custom Tooltip");
+		await nextUIUpdate();
+
+		const oDomRef = this.oHeaderSelector.getDomRef();
+		assert.strictEqual(oDomRef.getAttribute("title"), "My Custom Tooltip", "Custom tooltip is used");
+	});
+
+	QUnit.test("type=custom, enabled=true, visible=true with icon", async function(assert) {
+		this.oHeaderSelector.setVisible(true);
+		this.oHeaderSelector.setType("custom");
+		this.oHeaderSelector.setIcon("sap-icon://decline");
+		await nextUIUpdate();
+
+		const oDomRef = this.oHeaderSelector.getDomRef();
+
+		// Base classes only, no checkbox-specific classes
+		assert.ok(oDomRef.classList.contains("sapUiTableCell"), "Has sapUiTableCell class");
+		assert.ok(oDomRef.classList.contains("sapUiTableHeaderCell"), "Has sapUiTableHeaderCell class");
+		assert.ok(oDomRef.classList.contains("sapUiTableRowSelectionHeaderCell"), "Has sapUiTableRowSelectionHeaderCell class");
+
+		// No checkbox classes
+		assert.notOk(oDomRef.classList.contains("sapUiTableSelAllVisible"), "No sapUiTableSelAllVisible class");
+		assert.notOk(oDomRef.classList.contains("sapUiTableSelAll"), "No sapUiTableSelAll class");
+
+		assert.notOk(oDomRef.classList.contains("sapUiTableSelAllDisabled"), "No sapUiTableSelAllDisabled class");
+
+		// Icon is rendered
+		const oIcon = oDomRef.querySelector(".sapUiIcon");
+		assert.ok(oIcon, "Icon element is rendered");
+		assert.ok(oIcon.classList.contains("sapUiTableHeaderSelectorIcon"), "Icon has sapUiTableHeaderSelectorIcon class");
+		assert.ok(!oIcon.hasAttribute("title"), "Icon has no title attribute");
+
+		assert.notOk(oDomRef.querySelector(".sapUiTableSelectAllCheckBox"), "No checkbox element");
+		assert.notOk(oDomRef.hasAttribute("title"), "No title on container");
+	});
+
+	QUnit.test("type=custom with icon and tooltip", async function(assert) {
+		this.oHeaderSelector.setVisible(true);
+		this.oHeaderSelector.setType("custom");
+		this.oHeaderSelector.setIcon("sap-icon://accept");
+		this.oHeaderSelector.setTooltip("Clear Selection");
+		await nextUIUpdate();
+
+		const oDomRef = this.oHeaderSelector.getDomRef();
+		const oIcon = oDomRef.querySelector(".sapUiIcon");
+
+		assert.strictEqual(oDomRef.getAttribute("title"), "Clear Selection", "Container has tooltip");
+		assert.ok(!oIcon.hasAttribute("title"), "Icon has no title attribute");
+	});
+
+	QUnit.test("type=custom, enabled=false with icon", async function(assert) {
+		this.oHeaderSelector.setVisible(true);
+		this.oHeaderSelector.setType("custom");
+		this.oHeaderSelector.setIcon("sap-icon://decline");
+		this.oHeaderSelector.setEnabled(false);
+		await nextUIUpdate();
+
+		const oDomRef = this.oHeaderSelector.getDomRef();
+
+		assert.ok(oDomRef.classList.contains("sapUiTableSelAllDisabled"), "Has sapUiTableSelAllDisabled class");
+
+		// Icon still rendered
+		const oIcon = oDomRef.querySelector(".sapUiIcon");
+		assert.ok(oIcon, "Icon element is rendered");
+		assert.ok(oIcon.classList.contains("sapUiTableHeaderSelectorIcon"), "Icon has sapUiTableHeaderSelectorIcon class");
+	});
+
+	QUnit.test("type=custom, selected property is ignored", async function(assert) {
+		this.oHeaderSelector.setVisible(true);
+		this.oHeaderSelector.setType("custom");
+		this.oHeaderSelector.setIcon("sap-icon://decline");
+		this.oHeaderSelector.setSelected(true);
+		await nextUIUpdate();
+
+		const oDomRef = this.oHeaderSelector.getDomRef();
+
+		// Selected state doesn't affect custom type
+		assert.notOk(oDomRef.classList.contains("sapUiTableSelAll"), "No sapUiTableSelAll class");
+		assert.notOk(oDomRef.classList.contains("sapUiTableSelAllVisible"), "No sapUiTableSelAllVisible class");
+	});
+
+	QUnit.test("Switching from visible=false to visible=true", async function(assert) {
+		// Start with visible=false (already in beforeEach)
+		let oDomRef = this.oHeaderSelector.getDomRef();
+		assert.strictEqual(oDomRef.children.length, 0, "No children when not visible");
+
+		// Switch to visible
+		this.oHeaderSelector.setVisible(true);
+		await nextUIUpdate();
+
+		oDomRef = this.oHeaderSelector.getDomRef();
+		assert.ok(oDomRef.querySelector(".sapUiTableSelectAllCheckBox"), "Checkbox rendered after becoming visible");
+		assert.ok(oDomRef.classList.contains("sapUiTableSelAllVisible"), "Has visibility class");
+	});
+
+	QUnit.test("Switching from type=checkbox to type=custom", async function(assert) {
+		this.oHeaderSelector.setVisible(true);
+		await nextUIUpdate();
+
+		let oDomRef = this.oHeaderSelector.getDomRef();
+		assert.ok(oDomRef.querySelector(".sapUiTableSelectAllCheckBox"), "Initially has checkbox");
+		assert.ok(oDomRef.classList.contains("sapUiTableSelAllVisible"), "Has checkbox classes");
+
+		this.oHeaderSelector.setType("custom");
+		this.oHeaderSelector.setIcon("sap-icon://decline");
+		await nextUIUpdate();
+
+		oDomRef = this.oHeaderSelector.getDomRef();
+		assert.notOk(oDomRef.querySelector(".sapUiTableSelectAllCheckBox"), "No checkbox after switch");
+		assert.ok(oDomRef.querySelector(".sapUiIcon"), "Has icon after switch");
+		assert.notOk(oDomRef.classList.contains("sapUiTableSelAllVisible"), "No checkbox classes");
+	});
+
+	QUnit.test("Switching from type=custom to type=checkbox", async function(assert) {
+		this.oHeaderSelector.setVisible(true);
+		this.oHeaderSelector.setType("custom");
+		this.oHeaderSelector.setIcon("sap-icon://accept");
+		await nextUIUpdate();
+
+		let oDomRef = this.oHeaderSelector.getDomRef();
+		assert.ok(oDomRef.querySelector(".sapUiIcon"), "Initially has icon");
+
+		this.oHeaderSelector.setType("checkbox");
+		await nextUIUpdate();
+
+		oDomRef = this.oHeaderSelector.getDomRef();
+		assert.ok(oDomRef.querySelector(".sapUiTableSelectAllCheckBox"), "Has checkbox after switch");
+		assert.notOk(oDomRef.querySelector(".sapUiIcon"), "No icon after switch");
+		assert.ok(oDomRef.classList.contains("sapUiTableSelAllVisible"), "Has checkbox classes");
+	});
+
+	QUnit.module("Accessibility", {
+		beforeEach: async function() {
+			// ARIA attributes are rendered by the Table's accessibility extension, so we need a Table parent
+			this.oTable = new Table();
+			this.oHeaderSelector = this.oTable._getHeaderSelector();
+			this.oHeaderSelector.setVisible(true);
+			this.oTable.placeAt("qunit-fixture");
+			await nextUIUpdate();
+		},
+		afterEach: function() {
+			this.oTable.destroy();
+		}
+	});
+
+	QUnit.test("ARIA role; type=checkbox", async function(assert) {
+		await nextUIUpdate();
+		assert.strictEqual(this.oHeaderSelector.getDomRef().getAttribute("role"), "checkbox");
+	});
+
+	QUnit.test("ARIA role; type=custom", async function(assert) {
+		this.oHeaderSelector.setType("custom");
+		await nextUIUpdate();
+		assert.strictEqual(this.oHeaderSelector.getDomRef().getAttribute("role"), "button");
+	});
+
+	QUnit.test("ARIA checked; type=checkbox", async function(assert) {
+		const oDomRef = this.oHeaderSelector.getDomRef();
+
+		await nextUIUpdate();
+		assert.strictEqual(oDomRef.getAttribute("aria-checked"), "false", "aria-checked when not selected");
+
+		this.oHeaderSelector.setSelected(true);
+		await nextUIUpdate();
+		assert.strictEqual(oDomRef.getAttribute("aria-checked"), "true", "aria-checked when selected");
+	});
+
+	QUnit.test("ARIA checked; type=custom", async function(assert) {
+		const oDomRef = this.oHeaderSelector.getDomRef();
+
+		this.oHeaderSelector.setType("custom");
+		await nextUIUpdate();
+		assert.ok(!oDomRef.hasAttribute("aria-checked"), "No aria-checked attribute when not selected");
+
+		this.oHeaderSelector.setSelected(true);
+		await nextUIUpdate();
+		assert.ok(!oDomRef.hasAttribute("aria-checked"), "No aria-checked attribute when selected");
+	});
+
+	QUnit.test("ARIA disabled; type=checkbox", async function(assert) {
+		const oDomRef = this.oHeaderSelector.getDomRef();
+
+		assert.strictEqual(oDomRef.getAttribute("aria-disabled"), "false", "aria-disabled when enabled");
+
+		this.oHeaderSelector.setEnabled(false);
+		await nextUIUpdate();
+		assert.strictEqual(oDomRef.getAttribute("aria-disabled"), "true", "aria-disabled when disabled");
+	});
+
+	QUnit.test("ARIA disabled; type=custom", async function(assert) {
+		const oDomRef = this.oHeaderSelector.getDomRef();
+
+		this.oHeaderSelector.setType("custom");
+		await nextUIUpdate();
+		assert.strictEqual(oDomRef.getAttribute("aria-disabled"), "false", "aria-disabled when enabled");
+
+		this.oHeaderSelector.setEnabled(false);
+		await nextUIUpdate();
+		assert.strictEqual(oDomRef.getAttribute("aria-disabled"), "true", "aria-disabled when disabled");
+	});
+});
