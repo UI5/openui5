@@ -2957,6 +2957,60 @@ sap.ui.define([
             "valueStateText was set by _verifyValue");
     });
 
+	QUnit.test("_verifyValue setting correct value state", function(assert) {
+		// arrange
+		this.stepInput.setModel(new JSONModel({ value: 100 }));
+        this.stepInput.bindProperty("value", "/value");
+        // Note: valueState is NOT bound here
+        this.stepInput.setMax(50);
+        this.stepInput._getInput().setValue("100");
+
+        // act
+        this.stepInput._verifyValue();
+
+        // assert
+        assert.strictEqual(this.stepInput.getValueState(), ValueState.Error,
+            "valueState is set to Error by validation");
+        assert.strictEqual(this.stepInput._getInput().getValueState(), ValueState.Error,
+            "inner input valueState is also Error");
+
+		// act
+		this.stepInput.setValue(30);
+		this.stepInput._verifyValue();
+
+		assert.strictEqual(this.stepInput.getValueState(), ValueState.None,
+            "valueState is set to None by validation");
+        assert.strictEqual(this.stepInput._getInput().getValueState(), ValueState.None,
+            "inner input valueState is also None");
+	});
+
+	QUnit.test("_verifyValue works correctly when valueState bound", function(assert) {
+		// arrange
+		this.stepInput.setModel(new JSONModel({ value: 100, state: ValueState.Error }));
+        this.stepInput.bindProperty("value", "/value");
+		this.stepInput.bindProperty("valueState", "/state");
+        this.stepInput.setMax(50);
+        this.stepInput._getInput().setValue("20");
+
+        // act
+        this.stepInput._verifyValue();
+
+        // assert
+        assert.strictEqual(this.stepInput.getValueState(), ValueState.Error,
+            "valueState is set to Error by validation");
+        assert.strictEqual(this.stepInput._getInput().getValueState(), ValueState.Error,
+            "inner input valueState is also Error");
+
+		// act
+		this.stepInput.setValue(30);
+		this.stepInput._verifyValue();
+
+		assert.strictEqual(this.stepInput.getValueState(), ValueState.None,
+            "valueState is set to None by validation");
+        assert.strictEqual(this.stepInput._getInput().getValueState(), ValueState.None,
+            "inner input valueState is also None");
+	});
+
 	QUnit.test("_disableButtons is called with respect of min/max binding constraints", function(assert) {
 		// arrange
 		var oSpyDisableButtons;
@@ -3144,5 +3198,4 @@ sap.ui.define([
 		// cleanup
 		oStepInput.destroy();
 	});
-
 });
