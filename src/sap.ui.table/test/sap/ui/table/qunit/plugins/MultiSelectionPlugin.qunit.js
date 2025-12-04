@@ -37,30 +37,21 @@ sap.ui.define([
 		afterEach: function() {
 			this.oTable.destroy();
 		},
-		assertRenderConfig: function(assert, mActualConfig, mExpectedConfig, sTitle) {
-			let oActualIcon;
-			let sExpectedIconUri;
-
-			if (mActualConfig.headerSelector) {
-				oActualIcon = mActualConfig.headerSelector.icon ? mActualConfig.headerSelector.icon : undefined;
-				delete mActualConfig.headerSelector.icon;
-			}
-
-			if (mExpectedConfig.headerSelector) {
-				sExpectedIconUri = mExpectedConfig.headerSelector.icon != null ? "sap-icon://" + mExpectedConfig.headerSelector.icon : undefined;
-				delete mExpectedConfig.headerSelector.icon;
-			}
-
-			assert.deepEqual(mActualConfig, mExpectedConfig, sTitle);
-
-			if (sExpectedIconUri == null && oActualIcon) {
-				assert.ok(false, sTitle + "; Should not contain an icon");
-			} else if (sExpectedIconUri != null && !oActualIcon) {
-				assert.ok(false, sTitle + "; Should contain an icon");
-			} else if (sExpectedIconUri == null && !oActualIcon) {
-				assert.ok(true, sTitle + "; Does not contain an icon");
+		assertHeaderSelector: function(assert, oHeaderSelector, mExpectedConfig, sTitle) {
+			if (mExpectedConfig.visible === false) {
+				assert.strictEqual(oHeaderSelector.getVisible(), false, sTitle + "; HeaderSelector is not visible");
 			} else {
-				assert.equal(oActualIcon.getSrc(), sExpectedIconUri, sTitle + "; Contains the correct icon");
+				assert.strictEqual(oHeaderSelector.getVisible(), mExpectedConfig.visible, sTitle + "; Visible: " + mExpectedConfig.visible);
+				assert.strictEqual(oHeaderSelector.getType(), mExpectedConfig.type, sTitle + "; Type: " + mExpectedConfig.type);
+				assert.strictEqual(oHeaderSelector.getEnabled(), mExpectedConfig.enabled, sTitle + "; Enabled: " + mExpectedConfig.enabled);
+				assert.strictEqual(oHeaderSelector.getSelected(), mExpectedConfig.selected, sTitle + "; Selected: " + mExpectedConfig.selected);
+
+				if (mExpectedConfig.icon) {
+					assert.strictEqual(oHeaderSelector.getIcon(), IconPool.getIconURI(mExpectedConfig.icon),
+						sTitle + "; Icon: " + mExpectedConfig.icon);
+				} if (mExpectedConfig.tooltip) {
+					assert.strictEqual(oHeaderSelector.getTooltip(), mExpectedConfig.tooltip, sTitle + "; Tooltip: " + mExpectedConfig.tooltip);
+				}
 			}
 		}
 	});
@@ -68,7 +59,6 @@ sap.ui.define([
 	QUnit.test("Initialization", function(assert) {
 		const oMultiSelectionPlugin = new MultiSelectionPlugin();
 		assert.equal(oMultiSelectionPlugin.oInnerSelectionPlugin, null, "The MultiSelectionPlugin has no internal default selection plugin");
-		assert.equal(oMultiSelectionPlugin.getAggregation("icon"), null, "The MultiSelectionPlugin has no icon");
 	});
 
 	QUnit.test("Add to and remove from table", function(assert) {
@@ -76,11 +66,9 @@ sap.ui.define([
 
 		this.oTable.addDependent(oMultiSelectionPlugin);
 		assert.notEqual(oMultiSelectionPlugin.oInnerSelectionPlugin, null, "The MultiSelectionPlugin has an internal default selection plugin");
-		assert.notEqual(oMultiSelectionPlugin.getAggregation("icon"), null, "The MultiSelectionPlugin has an icon");
 
 		this.oTable.removeDependent(oMultiSelectionPlugin);
 		assert.equal(oMultiSelectionPlugin.oInnerSelectionPlugin, null, "The MultiSelectionPlugin has no internal default selection plugin");
-		assert.notEqual(oMultiSelectionPlugin.getAggregation("icon"), null, "The MultiSelectionPlugin has an icon");
 	});
 
 	QUnit.test("Destruction", function(assert) {
@@ -94,130 +82,81 @@ sap.ui.define([
 		assert.equal(oMultiSelectionPlugin.oInnerSelectionPlugin, null, "The reference to the internal default selection plugin is cleared");
 	});
 
-	QUnit.test("#getRenderConfig", function(assert) {
+	QUnit.test("HeaderSelector", async function(assert) {
 		const oMultiSelectionPlugin = new MultiSelectionPlugin();
 		const sDeselectAll = TableUtils.getResourceText("TBL_DESELECT_ALL");
 		const sSelectAll = TableUtils.getResourceText("TBL_SELECT_ALL");
-		const that = this;
-
-		this.assertRenderConfig(assert, oMultiSelectionPlugin.getRenderConfig(), {
-			headerSelector: {
-				type: "none"
-			}
-		}, "Not assigned to a table");
 
 		this.oTable.addDependent(oMultiSelectionPlugin);
+		const oHeaderSelector = this.oTable._getHeaderSelector();
 
-		this.assertRenderConfig(assert, oMultiSelectionPlugin.getRenderConfig(), {
-			headerSelector: {
-				type: "custom",
-				icon: TableUtils.ThemeParameters.checkboxIcon,
-				visible: true,
-				enabled: true,
-				selected: false,
-				tooltip: sSelectAll
-			}
+		this.assertHeaderSelector(assert, oHeaderSelector, {
+			type: "custom",
+			icon: TableUtils.ThemeParameters.checkboxIcon,
+			visible: true,
+			enabled: true,
+			selected: false,
+			tooltip: sSelectAll
 		}, "MultiToggle");
 
 		oMultiSelectionPlugin.setSelectionMode(SelectionMode.Single);
-		this.assertRenderConfig(assert, oMultiSelectionPlugin.getRenderConfig(), {
-			headerSelector: {
-				type: "custom",
-				icon: null,
-				visible: false,
-				enabled: true,
-				selected: false,
-				tooltip: sSelectAll
-			}
+		this.assertHeaderSelector(assert, oHeaderSelector, {
+			visible: false
 		}, "Single");
 
 		oMultiSelectionPlugin.setSelectionMode(SelectionMode.MultiToggle);
 		oMultiSelectionPlugin.setShowHeaderSelector(false);
-		this.assertRenderConfig(assert, oMultiSelectionPlugin.getRenderConfig(), {
-			headerSelector: {
-				type: "custom",
-				icon: TableUtils.ThemeParameters.checkboxIcon,
-				visible: false,
-				enabled: true,
-				selected: false,
-				tooltip: sSelectAll
-			}
-		}, "MultiToggle; Header selector hidden");
+		this.assertHeaderSelector(assert, oHeaderSelector, {
+			visible: false
+		}, "MultiToggle; HeaderSelector hidden");
 
 		oMultiSelectionPlugin.setShowHeaderSelector(true);
 		oMultiSelectionPlugin.setLimit(0);
-		this.assertRenderConfig(assert, oMultiSelectionPlugin.getRenderConfig(), {
-			headerSelector: {
-				type: "toggle",
-				icon: null,
-				visible: true,
-				enabled: true,
-				selected: false,
-				tooltip: sSelectAll
-			}
+		this.assertHeaderSelector(assert, oHeaderSelector, {
+			type: "checkbox",
+			visible: true,
+			enabled: true,
+			selected: false,
+			tooltip: null
 		}, "MultiToggle; Limit disabled");
 
-		return oMultiSelectionPlugin.selectAll().then(function() {
-			that.assertRenderConfig(assert, oMultiSelectionPlugin.getRenderConfig(), {
-				headerSelector: {
-					type: "toggle",
-					icon: null,
-					visible: true,
-					enabled: true,
-					selected: true,
-					tooltip: sDeselectAll
-				}
-			}, "MultiToggle; Limit disabled; All rows selected");
+		await oMultiSelectionPlugin.selectAll();
+		this.assertHeaderSelector(assert, oHeaderSelector, {
+			type: "checkbox",
+			visible: true,
+			enabled: true,
+			selected: true,
+			tooltip: null
+		}, "MultiToggle; Limit disabled; All rows selected");
 
-			oMultiSelectionPlugin.setLimit(1);
-			return oMultiSelectionPlugin.setSelectionInterval(1, 1);
-		}).then(function() {
-			that.assertRenderConfig(assert, oMultiSelectionPlugin.getRenderConfig(), {
-				headerSelector: {
-					type: "custom",
-					icon: TableUtils.ThemeParameters.clearSelectionIcon,
-					visible: true,
-					enabled: true,
-					selected: false,
-					tooltip: sDeselectAll
-				}
-			}, "MultiToggle; One row selected");
+		oMultiSelectionPlugin.setLimit(1);
+		await oMultiSelectionPlugin.setSelectionInterval(1, 1);
+		this.assertHeaderSelector(assert, oHeaderSelector, {
+			type: "custom",
+			icon: TableUtils.ThemeParameters.clearSelectionIcon,
+			visible: true,
+			enabled: true,
+			selected: false,
+			tooltip: sDeselectAll
+		}, "MultiToggle; One row selected");
 
-			oMultiSelectionPlugin.setSelectionMode(SelectionMode.Single);
-			return oMultiSelectionPlugin.setSelectionInterval(1, 1);
-		}).then(function() {
-			that.assertRenderConfig(assert, oMultiSelectionPlugin.getRenderConfig(), {
-				headerSelector: {
-					type: "custom",
-					icon: null,
-					visible: false,
-					enabled: true,
-					selected: false,
-					tooltip: sDeselectAll
-				}
-			}, "Single; One row selected");
+		oMultiSelectionPlugin.setSelectionMode(SelectionMode.Single);
+		await oMultiSelectionPlugin.setSelectionInterval(1, 1);
+		this.assertHeaderSelector(assert, oHeaderSelector, {
+			visible: false
+		}, "Single; One row selected");
 
-			oMultiSelectionPlugin.setSelectionMode(SelectionMode.MultiToggle);
-			oMultiSelectionPlugin.setEnabled(false);
-			that.assertRenderConfig(assert, oMultiSelectionPlugin.getRenderConfig(), {
-				headerSelector: {
-					type: "none"
-				}
-			}, "MultiToggle; Plugin disabled");
+		oMultiSelectionPlugin.setSelectionMode(SelectionMode.MultiToggle);
+		oMultiSelectionPlugin.setEnabled(false);
+		this.assertHeaderSelector(assert, oHeaderSelector, {
+			visible: false
+		}, "MultiToggle; Plugin disabled");
 
-			oMultiSelectionPlugin.setEnabled(true);
-			oMultiSelectionPlugin.setSelectionMode(SelectionMode.None);
-			that.assertRenderConfig(assert, oMultiSelectionPlugin.getRenderConfig(), {
-				headerSelector: {
-					type: "custom",
-					icon: null,
-					visible: false,
-					enabled: true,
-					selected: false,
-					tooltip: sSelectAll
-				}
-			}, "None");
-		});
+		oMultiSelectionPlugin.setEnabled(true);
+		oMultiSelectionPlugin.setSelectionMode(SelectionMode.None);
+		this.assertHeaderSelector(assert, oHeaderSelector, {
+			visible: false
+		}, "None");
 	});
 
 	QUnit.test("#setSelected", async function(assert) {
@@ -307,7 +246,7 @@ sap.ui.define([
 		this.oTable.getBinding().filter(new Filter({path: "something", operator: "EQ", value1: "something"}));
 	});
 
-	QUnit.module("Header selector", {
+	QUnit.module("HeaderSelector", {
 		beforeEach: function() {
 			this.oTable = TableQUnitUtils.createTable({
 				dependents: [
@@ -323,47 +262,32 @@ sap.ui.define([
 
 	QUnit.test("Enable/Disable", function(assert) {
 		const oTable = this.oTable;
-		let $SelectAll;
 		const oSelectionPlugin = oTable._getSelectionPlugin();
-		const oIcon = oSelectionPlugin.getAggregation("icon");
+		const oHeaderSelector = oTable._getHeaderSelector();
 
 		return oTable.qunit.whenRenderingFinished().then(function() {
-			$SelectAll = oTable.$("selall");
-			assert.ok($SelectAll.attr("aria-disabled"), "Before bindRows: aria-disabled is set to true");
-			assert.ok($SelectAll.hasClass("sapUiTableSelAllDisabled"), "Before bindRows: Deselect All is disabled");
-
-			assert.ok(!oIcon.getUseIconTooltip(), "DeselectAll icon has no tooltip");
-			assert.strictEqual(oIcon.getSrc(), IconPool.getIconURI(TableUtils.ThemeParameters.checkboxIcon), "checkboxIcon is correct");
-			assert.strictEqual($SelectAll.attr("title"), TableUtils.getResourceText("TBL_SELECT_ALL"), "AllSelected tooltip is correct");
-			assert.strictEqual($SelectAll.attr("aria-disabled"), "true", "Aria-Disabled set to true");
-			assert.ok(oIcon.hasStyleClass("sapUiTableSelectClear"), "DeselectAll icon has the correct css class applied");
+			assert.strictEqual(oHeaderSelector.getEnabled(), false, "Before bindRows: HeaderSelector is disabled");
+			assert.strictEqual(oHeaderSelector.getIcon(), IconPool.getIconURI(TableUtils.ThemeParameters.checkboxIcon), "checkboxIcon is correct");
+			assert.strictEqual(oHeaderSelector.getTooltip(), TableUtils.getResourceText("TBL_SELECT_ALL"), "Tooltip is correct");
 
 			oTable.bindRows({path: "/"});
 		}).then(oTable.qunit.whenRenderingFinished).then(function() {
 			assert.ok(oTable.getBinding().getLength() > 0, "After bindRows: Table has data");
-			assert.strictEqual($SelectAll.attr("role"), "button", "role attribute is set to button");
-			assert.notOk($SelectAll.attr("aria-disabled"), "After bindRows: aria-disabled is undefined");
-			assert.notOk($SelectAll.hasClass("sapUiTableSelAllDisabled"), "After bindRows: Select All is enabled");
-			assert.ok($SelectAll.hasClass("sapUiTableSelAllVisible"), "After bindRows: Select All is visible");
-
-			assert.ok(!oIcon.getUseIconTooltip(), "SelectAll icon has no tooltip");
-			assert.strictEqual(oIcon.getSrc(), IconPool.getIconURI(TableUtils.ThemeParameters.checkboxIcon), "checkboxIcon icon is correct");
-			assert.strictEqual($SelectAll.attr("title"), TableUtils.getResourceText("TBL_SELECT_ALL"), "AllSelected tooltip is correct");
-			assert.strictEqual($SelectAll.attr("aria-disabled"), undefined, "Aria-Disabled is undefined");
-			assert.ok(oIcon.hasStyleClass("sapUiTableSelectClear"), "AllSelected icon has the correct css class applied");
+			assert.strictEqual(oHeaderSelector.getEnabled(), true, "After bindRows: HeaderSelector is enabled");
+			assert.strictEqual(oHeaderSelector.getVisible(), true, "After bindRows: HeaderSelector is visible");
+			assert.strictEqual(oHeaderSelector.getIcon(), IconPool.getIconURI(TableUtils.ThemeParameters.checkboxIcon), "checkboxIcon is correct");
+			assert.strictEqual(oHeaderSelector.getTooltip(), TableUtils.getResourceText("TBL_SELECT_ALL"), "Tooltip is correct");
 		}).then(function() {
 			return new Promise(function(resolve) {
 				oSelectionPlugin.attachEventOnce("selectionChange", function(oEvent) {
-					assert.notOk($SelectAll.attr("aria-disabled"), "After rows are selected: aria-disabled is undefined");
-					assert.notOk($SelectAll.hasClass("sapUiTableSelAllDisabled"), "After rows are selected: Deselect All is enabled");
+					assert.strictEqual(oHeaderSelector.getEnabled(), true, "After rows are selected: HeaderSelector is enabled");
 					oTable.unbindRows();
 					resolve();
 				});
 				oSelectionPlugin.setSelectedIndex(0);
 			});
 		}).then(oTable.qunit.whenRenderingFinished).then(function() {
-			assert.ok($SelectAll.attr("aria-disabled"), "After unbindRows: aria-disabled is set to true");
-			assert.ok($SelectAll.hasClass("sapUiTableSelAllDisabled"), "After unbindRows: Deselect All is disabled");
+			assert.strictEqual(oHeaderSelector.getEnabled(), false, "After unbindRows: HeaderSelector is disabled");
 		});
 	});
 
@@ -385,30 +309,29 @@ sap.ui.define([
 		}
 	});
 
-	QUnit.test("Display and accessibility", async function(assert) {
+	QUnit.test("HeaderSelector", async function(assert) {
 		const oTable = this.oTable;
-		const $SelectAll = oTable.$("selall");
+		const oHeaderSelector = oTable._getHeaderSelector();
 		const oSelectionPlugin = oTable._getSelectionPlugin();
 
 		assert.ok(oSelectionPlugin.isA("sap.ui.table.plugins.MultiSelectionPlugin"), "MultiSelectionPlugin is initialised");
-		assert.strictEqual($SelectAll.find(".sapUiTableSelectAllCheckBox").length, 0, "no Select All checkbox");
-		assert.strictEqual($SelectAll.find(".sapUiTableSelectClear").length, 1, "Deselect All button exists");
-		assert.strictEqual($SelectAll.attr("title"), "Select All", "Tooltip exists");
-		assert.strictEqual($SelectAll.attr("role"), "button", "role attribute is set to button");
-		assert.notOk($SelectAll.attr("aria-disabled"), "aria-disabled is undefined");
+		assert.strictEqual(oHeaderSelector.getType(), "custom", "HeaderSelector type is custom");
+		assert.strictEqual(oHeaderSelector.getTooltip(), "Select All", "Tooltip is correct");
+		assert.strictEqual(oHeaderSelector.getEnabled(), true, "HeaderSelector is enabled");
+		assert.strictEqual(oHeaderSelector.getVisible(), true, "HeaderSelector is visible");
+
 		oTable.setEnableSelectAll(false);
-		assert.strictEqual($SelectAll.attr("title"), "Select All", "Tooltip exists");
-		assert.notOk($SelectAll.attr("aria-disabled"), "aria-disabled is undefined");
-		assert.notOk($SelectAll.hasClass("sapUiTableSelAllDisabled"), "Deselect All is enabled");
+		assert.strictEqual(oHeaderSelector.getTooltip(), "Select All", "Tooltip is correct");
+		assert.strictEqual(oHeaderSelector.getEnabled(), true, "HeaderSelector is enabled");
+		assert.strictEqual(oHeaderSelector.getVisible(), true, "HeaderSelector is visible");
 
 		const nextSelectionChange = TableQUnitUtils.nextEvent("selectionChange", oSelectionPlugin);
 
 		oSelectionPlugin.setSelectedIndex(0);
 		await nextSelectionChange;
 
-		assert.strictEqual($SelectAll.attr("title"), "Deselect All", "Tooltip exists");
-		assert.notOk($SelectAll.attr("aria-disabled"), "aria-disabled is removed");
-		assert.notOk($SelectAll.hasClass("sapUiTableSelAllDisabled"), "Deselect All is enabled");
+		assert.strictEqual(oHeaderSelector.getTooltip(), "Deselect All", "Tooltip is correct");
+		assert.strictEqual(oHeaderSelector.getEnabled(), true, "HeaderSelector is enabled");
 		oTable.setEnableSelectAll(true);
 
 		const oSetPropertySpy = sinon.spy(oSelectionPlugin, "setProperty");
@@ -422,12 +345,8 @@ sap.ui.define([
 		await oTable.qunit.whenRenderingFinished();
 
 		assert.ok(oSetPropertySpy.calledOnceWithExactly("limit", 0, false), "setProperty called once with the correct parameters");
-
-		assert.strictEqual($SelectAll.find(".sapUiTableSelectAllCheckBox").length, 1,
-			"When the limit is set to -1 the Select All checkbox is rendered");
-		assert.strictEqual($SelectAll.find(".sapUiTableSelectClear").length, 0,
-			"When the limit is set to -1 the Deselect All button is not rendered");
-		assert.strictEqual($SelectAll.attr("title"), "Select All", "Tooltip exists");
+		assert.strictEqual(oHeaderSelector.getType(), "checkbox", "HeaderSelector type is checkbox when limit is disabled");
+		assert.strictEqual(oHeaderSelector.getTooltip(), null, "Tooltip is correct");
 	});
 
 	QUnit.test("Change SelectionMode", function(assert) {
@@ -1046,23 +965,23 @@ sap.ui.define([
 
 		return pressHeaderSelector().then(function() {
 			assert.equal(oSelectionPlugin.getSelectedIndices().length, 16,
-				"Limit enabled: Pressing the header selector triggers select all and selects until its limit is reached");
+				"Limit enabled: Pressing the HeaderSelector triggers select all and selects until its limit is reached");
 		}).then(function() {
 			return doSelection(function() {
 				oSelectionPlugin.addSelectionInterval(0, 5);
 			}).then(pressHeaderSelector).then(function() {
 				assert.equal(oSelectionPlugin.getSelectedIndices().length, 0,
-					"Limit enabled: Pressing the header selector deselects everything if something is selected");
+					"Limit enabled: Pressing the HeaderSelector deselects everything if something is selected");
 			});
 		}).then(function() {
 			oSelectionPlugin.setLimit(0);
 
 			return pressHeaderSelector().then(function() {
 				assert.equal(oSelectionPlugin.getSelectedIndices().length, oTable.getBinding().getLength(),
-					"Limit disabled: Pressing the header selector selects everything if not everything is selected");
+					"Limit disabled: Pressing the HeaderSelector selects everything if not everything is selected");
 			}).then(pressHeaderSelector).then(function() {
 				assert.equal(oSelectionPlugin.getSelectedIndices().length, 0,
-					"Limit disabled: Pressing the header selector deselects everything if everything is selected");
+					"Limit disabled: Pressing the HeaderSelector deselects everything if everything is selected");
 			});
 		}).then(function() {
 			oSelectionPlugin.setShowHeaderSelector(false);
@@ -1071,14 +990,14 @@ sap.ui.define([
 				oSelectionPlugin.addSelectionInterval(0, 5);
 			}).then(pressHeaderSelector).then(function() {
 				assert.deepEqual(oSelectionPlugin.getSelectedIndices(), [0, 1, 2, 3, 4, 5],
-					"Limit disabled, header selector hidden: Pressing the header selector does not change the selection");
+					"Limit disabled, HeaderSelector hidden: Pressing the HeaderSelector does not change the selection");
 			});
 		}).then(function() {
 			oSelectionPlugin.setLimit(200);
 
 			return pressHeaderSelector().then(function() {
 				assert.deepEqual(oSelectionPlugin.getSelectedIndices(), [0, 1, 2, 3, 4, 5],
-					"Limit enabled, header selector hidden: Pressing the header selector does not change the selection");
+					"Limit enabled, HeaderSelector hidden: Pressing the HeaderSelector does not change the selection");
 			});
 		});
 	});
@@ -1216,14 +1135,15 @@ sap.ui.define([
 		const fnGetContexts = sinon.spy(oTable.getBinding(), "getContexts");
 		const oSelectionChangeSpy = sinon.spy();
 		const iHighestSelectableIndex = oSelectionPlugin._getHighestSelectableIndex();
+		const oHeaderSelector = oTable._getHeaderSelector();
 
-		assert.equal(oSelectionPlugin.getRenderConfig().headerSelector.type, "custom", "The headerSelector type is clear");
+		assert.equal(oHeaderSelector.getType(), "custom", "The headerSelector type is custom");
 
 		oSelectionPlugin.setLimit(0);
 		oSelectionPlugin.attachSelectionChange(oSelectionChangeSpy);
 		await oTable.qunit.whenRenderingFinished();
 
-		assert.equal(oSelectionPlugin.getRenderConfig().headerSelector.type, "toggle", "The headerSelector type is toggle");
+		assert.equal(oHeaderSelector.getType(), "checkbox", "The headerSelector type is checkbox");
 
 		fnGetContexts.resetHistory();
 		oSelectionPlugin.attachEventOnce("selectionChange", function(oEvent) {
@@ -1259,12 +1179,13 @@ sap.ui.define([
 	QUnit.test("Select All when count is not available and context length is lower than the limit", async function(assert) {
 		const oTable = this.oTable;
 		const oSelectionPlugin = oTable._getSelectionPlugin();
+		const oHeaderSelector = oTable._getHeaderSelector();
 
 		const oSelectionChangeSpy = sinon.spy();
 		oSelectionPlugin.attachSelectionChange(oSelectionChangeSpy);
 
 		await oTable.qunit.whenRenderingFinished();
-		assert.equal(oSelectionPlugin.getRenderConfig().headerSelector.type, "custom", "The headerSelector type is correct");
+		assert.equal(oHeaderSelector.getType(), "custom", "The headerSelector type is correct");
 
 		sinon.stub(oSelectionPlugin, "_getHighestSelectableIndex").returns(250); // simulate count is not available
 
@@ -1476,20 +1397,20 @@ sap.ui.define([
 
 	QUnit.test("Header selection icon - limit 5", async function(assert) {
 		const oSelectionPlugin = this.oTable._getSelectionPlugin();
-		const oIcon = oSelectionPlugin.getAggregation("icon");
+		const oHeaderSelector = this.oTable._getHeaderSelector();
 
 		oSelectionPlugin.setLimit(5);
 
-		assert.strictEqual(oIcon.getSrc(), IconPool.getIconURI(TableUtils.ThemeParameters.checkboxIcon),
-			"DeselectAll icon is correct - checkboxIcon");
+		assert.strictEqual(oHeaderSelector.getIcon(), IconPool.getIconURI(TableUtils.ThemeParameters.checkboxIcon),
+			"HeaderSelector icon is correct - checkboxIcon");
 
 		let nextSelectionChange = TableQUnitUtils.nextEvent("selectionChange", oSelectionPlugin);
 		oSelectionPlugin.addSelectionInterval(0, 4);
 		await nextSelectionChange;
 
 		assert.deepEqual(oSelectionPlugin.getSelectedIndices(), [0, 1, 2, 3, 4], "Row index [0, 1, 2, 3, 4] selected");
-		assert.strictEqual(oIcon.getSrc(), IconPool.getIconURI(TableUtils.ThemeParameters.clearSelectionIcon),
-			"DeselectAll icon is correct - clearSelectionIcon");
+		assert.strictEqual(oHeaderSelector.getIcon(), IconPool.getIconURI(TableUtils.ThemeParameters.clearSelectionIcon),
+			"HeaderSelector icon is correct - clearSelectionIcon");
 
 		nextSelectionChange = TableQUnitUtils.nextEvent("selectionChange", oSelectionPlugin);
 		oSelectionPlugin.addSelectionInterval(5, 9);
@@ -1497,8 +1418,8 @@ sap.ui.define([
 
 		assert.deepEqual(oSelectionPlugin.getSelectedIndices(), [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
 			"Row index [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] selected");
-		assert.strictEqual(oIcon.getSrc(), IconPool.getIconURI(TableUtils.ThemeParameters.clearSelectionIcon),
-			"DeselectAll icon is correct - allSelectedIcon");
+		assert.strictEqual(oHeaderSelector.getIcon(), IconPool.getIconURI(TableUtils.ThemeParameters.clearSelectionIcon),
+			"HeaderSelector icon is correct - clearSelectionIcon");
 
 		nextSelectionChange = TableQUnitUtils.nextEvent("selectionChange", oSelectionPlugin);
 		oSelectionPlugin.addSelectionInterval(10, 12);
@@ -1506,8 +1427,8 @@ sap.ui.define([
 
 		assert.deepEqual(oSelectionPlugin.getSelectedIndices(), [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
 			"Row index [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] selected");
-		assert.strictEqual(oIcon.getSrc(), IconPool.getIconURI(TableUtils.ThemeParameters.clearSelectionIcon),
-			"DeselectAll icon is correct - allSelectedIcon");
+		assert.strictEqual(oHeaderSelector.getIcon(), IconPool.getIconURI(TableUtils.ThemeParameters.clearSelectionIcon),
+			"HeaderSelector icon is correct - clearSelectionIcon");
 
 		nextSelectionChange = TableQUnitUtils.nextEvent("selectionChange", oSelectionPlugin);
 		oSelectionPlugin.addSelectionInterval(13, 15);
@@ -1515,24 +1436,24 @@ sap.ui.define([
 
 		assert.deepEqual(oSelectionPlugin.getSelectedIndices(), [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
 			"Row index [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15] - all indexes selected");
-		assert.strictEqual(oIcon.getSrc(), IconPool.getIconURI(TableUtils.ThemeParameters.allSelectedIcon),
-			"DeselectAll icon is correct - allSelectedIcon");
+		assert.strictEqual(oHeaderSelector.getIcon(), IconPool.getIconURI(TableUtils.ThemeParameters.allSelectedIcon),
+			"HeaderSelector icon is correct - allSelectedIcon");
 
 		nextSelectionChange = TableQUnitUtils.nextEvent("selectionChange", oSelectionPlugin);
 		oSelectionPlugin.removeSelectionInterval(1, 15);
 		await nextSelectionChange;
 
 		assert.deepEqual(oSelectionPlugin.getSelectedIndices(), [0], "Row index 0 selected");
-		assert.strictEqual(oIcon.getSrc(), IconPool.getIconURI(TableUtils.ThemeParameters.clearSelectionIcon),
-			"DeselectAll icon is correct - clearSelectionIcon");
+		assert.strictEqual(oHeaderSelector.getIcon(), IconPool.getIconURI(TableUtils.ThemeParameters.clearSelectionIcon),
+			"HeaderSelector icon is correct - clearSelectionIcon");
 
 		nextSelectionChange = TableQUnitUtils.nextEvent("selectionChange", oSelectionPlugin);
 		oSelectionPlugin.removeSelectionInterval(0, 15);
 		await nextSelectionChange;
 
 		assert.deepEqual(oSelectionPlugin.getSelectedIndices(), [], "Nothing selected");
-		assert.strictEqual(oIcon.getSrc(), IconPool.getIconURI(TableUtils.ThemeParameters.checkboxIcon),
-			"DeselectAll icon is correct - checkboxIcon");
+		assert.strictEqual(oHeaderSelector.getIcon(), IconPool.getIconURI(TableUtils.ThemeParameters.checkboxIcon),
+			"HeaderSelector icon is correct - checkboxIcon");
 	});
 
 	QUnit.test("Header selection icon - limit deactivated", async function(assert) {
@@ -1570,7 +1491,7 @@ sap.ui.define([
 	QUnit.test("#onKeyboardShortcut - Event Marking", async function(assert) {
 		const sEventMarker = "sapUiTableClearAll";
 		const oEvent = {
-			setMarked: function() {}
+			setMarked: function() { }
 		};
 		const oSelectionPlugin = this.oTable._getSelectionPlugin();
 		const oClearSelectionSpy = sinon.spy(oSelectionPlugin, "clearSelection");

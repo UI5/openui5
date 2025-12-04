@@ -381,26 +381,27 @@ sap.ui.define([
 		oTable.setSelectionMode(SelectionMode.MultiToggle);
 		await nextUIUpdate();
 
+		const oHeaderSelector = oTable._getHeaderSelector();
 		const $SelectAll = oTable.$("selall");
 		const sSelectAllTitleText = TableUtils.getResourceText("TBL_SELECT_ALL");
 
 		// Initially no rows are selected.
-		assert.ok($SelectAll.hasClass("sapUiTableSelAll"), "Initial: The SelectAll checkbox is not checked");
+		assert.ok(!oHeaderSelector.getSelected(), "Initial: The SelectAll checkbox is not checked");
 		assert.strictEqual($SelectAll.attr("title"), sSelectAllTitleText, "Initial: The SelectAll title text is correct");
 
 		// Select all rows. The SelectAll checkbox should be checked.
 		oTable.selectAll();
-		assert.ok(!$SelectAll.hasClass("sapUiTableSelAll"), "Called selectAll: The SelectAll checkbox is checked");
+		assert.ok(oHeaderSelector.getSelected(), "Called selectAll: The SelectAll checkbox is checked");
 		assert.strictEqual($SelectAll.attr("title"), sSelectAllTitleText, "Called selectAll: The SelectAll title text is correct");
 
 		// Deselect the first row. The SelectAll checkbox should not be checked.
 		oTable.removeSelectionInterval(0, 0);
-		assert.ok($SelectAll.hasClass("sapUiTableSelAll"), "Deselected the first row: The SelectAll checkbox is not checked");
+		assert.ok(!oHeaderSelector.getSelected(), "Deselected the first row: The SelectAll checkbox is not checked");
 		assert.strictEqual($SelectAll.attr("title"), sSelectAllTitleText, "Deselected the first row: The SelectAll title text is correct");
 
 		// Select the first row again. The SelectAll checkbox should be checked.
 		oTable.addSelectionInterval(0, 0);
-		assert.ok(!$SelectAll.hasClass("sapUiTableSelAll"), "Selected the first row again: The SelectAll checkbox is checked");
+		assert.ok(oHeaderSelector.getSelected(), "Selected the first row again: The SelectAll checkbox is checked");
 		assert.strictEqual($SelectAll.attr("title"), sSelectAllTitleText, "Selected the first row again: The SelectAll title text is correct");
 	});
 
@@ -2679,6 +2680,7 @@ sap.ui.define([
 	QUnit.test("RowSelectionChange", function(assert) {
 		assert.expect(42);
 		let sTestCase = "";
+		const oHeaderSelector = oTable._getHeaderSelector();
 		const fnHandler = function(oEvent) {
 			// eslint-disable-next-line default-case
 			switch (sTestCase) {
@@ -2689,7 +2691,7 @@ sap.ui.define([
 					assert.equal(oEvent.getParameter("rowContext"), oTable.getContextByIndex(0), sTestCase + ": Parameter rowContext correct");
 					assert.deepEqual(oEvent.getParameter("rowIndices"), Array.apply(0, Array(200)).map(function(c, i) { return i; }),
 						sTestCase + ": Parameter rowIndices correct");
-					assert.ok(!oTable.$("selall").hasClass("sapUiTableSelAll"), "Select all icon is checked.");
+					assert.ok(oHeaderSelector.getSelected(), "Select all icon is checked.");
 					break;
 				case "userClearSelectAll":
 					assert.equal(oEvent.getParameter("selectAll"), undefined, sTestCase + ": Parameter selectAll correct");
@@ -2698,7 +2700,7 @@ sap.ui.define([
 					assert.equal(oEvent.getParameter("rowContext"), undefined, sTestCase + ": Parameter rowContext correct");
 					assert.deepEqual(oEvent.getParameter("rowIndices"), Array.apply(0, Array(200)).map(function(c, i) { return i; }),
 						sTestCase + ": Parameter rowIndices correct");
-					assert.ok(oTable.$("selall").hasClass("sapUiTableSelAll"), "Select all icon is not checked.");
+					assert.ok(!oHeaderSelector.getSelected(), "Select all icon is not checked.");
 					break;
 				case "APISelectAll":
 					assert.equal(oEvent.getParameter("selectAll"), true, sTestCase + ": Parameter selectAll correct");
@@ -2707,7 +2709,7 @@ sap.ui.define([
 					assert.equal(oEvent.getParameter("rowContext"), oTable.getContextByIndex(0), sTestCase + ": Parameter rowContext correct");
 					assert.deepEqual(oEvent.getParameter("rowIndices"), Array.apply(0, Array(200)).map(function(c, i) { return i; }),
 						sTestCase + ": Parameter rowIndices correct");
-					assert.ok(!oTable.$("selall").hasClass("sapUiTableSelAll"), "Select all icon is checked.");
+					assert.ok(oHeaderSelector.getSelected(), "Select all icon is checked.");
 					break;
 				case "APIClearSelectAll":
 					assert.equal(oEvent.getParameter("selectAll"), undefined, sTestCase + ": Parameter selectAll correct");
@@ -2716,7 +2718,7 @@ sap.ui.define([
 					assert.equal(oEvent.getParameter("rowContext"), undefined, sTestCase + ": Parameter rowContext correct");
 					assert.deepEqual(oEvent.getParameter("rowIndices"), Array.apply(0, Array(200)).map(function(c, i) { return i; }),
 						sTestCase + ": Parameter rowIndices correct");
-					assert.ok(oTable.$("selall").hasClass("sapUiTableSelAll"), "Select all icon is not checked.");
+					assert.ok(!oHeaderSelector.getSelected(), "Select all icon is not checked.");
 					break;
 				case "userSetSelectedIndex":
 					assert.equal(oEvent.getParameter("selectAll"), undefined, sTestCase + ": Parameter selectAll correct");
@@ -2724,7 +2726,7 @@ sap.ui.define([
 					assert.equal(oEvent.getParameter("rowIndex"), 0, sTestCase + ": Parameter rowIndex correct");
 					assert.equal(oEvent.getParameter("rowContext"), oTable.getContextByIndex(0), sTestCase + ": Parameter rowContext correct");
 					assert.deepEqual(oEvent.getParameter("rowIndices"), [0], sTestCase + ": Parameter rowIndices correct");
-					assert.ok(oTable.$("selall").hasClass("sapUiTableSelAll"), "Select all icon is not checked.");
+					assert.ok(!oHeaderSelector.getSelected(), "Select all icon is not checked.");
 					break;
 				case "userUnsetSelectedIndex":
 					assert.equal(oEvent.getParameter("selectAll"), undefined, sTestCase + ": Parameter selectAll correct");
@@ -2732,7 +2734,7 @@ sap.ui.define([
 					assert.equal(oEvent.getParameter("rowIndex"), 0, sTestCase + ": Parameter rowIndex correct");
 					assert.equal(oEvent.getParameter("rowContext"), oTable.getContextByIndex(0), sTestCase + ": Parameter rowContext correct");
 					assert.deepEqual(oEvent.getParameter("rowIndices"), [0], sTestCase + ": Parameter rowIndices correct");
-					assert.ok(oTable.$("selall").hasClass("sapUiTableSelAll"), "Select all icon is not checked.");
+					assert.ok(!oHeaderSelector.getSelected(), "Select all icon is not checked.");
 					break;
 				case "APISetSelectedIndex":
 					assert.equal(oEvent.getParameter("selectAll"), undefined, sTestCase + ": Parameter selectAll correct");
@@ -2740,7 +2742,7 @@ sap.ui.define([
 					assert.equal(oEvent.getParameter("rowIndex"), 0, sTestCase + ": Parameter rowIndex correct");
 					assert.equal(oEvent.getParameter("rowContext"), oTable.getContextByIndex(0), sTestCase + ": Parameter rowContext correct");
 					assert.deepEqual(oEvent.getParameter("rowIndices"), [0], sTestCase + ": Parameter rowIndices correct");
-					assert.ok(oTable.$("selall").hasClass("sapUiTableSelAll"), "Select all icon is not checked.");
+					assert.ok(!oHeaderSelector.getSelected(), "Select all icon is not checked.");
 					break;
 			}
 
@@ -2769,11 +2771,12 @@ sap.ui.define([
 
 	QUnit.test("Select All on Binding Change", async function(assert) {
 		const nextRowSelectionChange = TableQUnitUtils.nextEvent("rowSelectionChange", oTable);
-		assert.ok(oTable.$("selall").hasClass("sapUiTableSelAll"), "Select all icon is not checked.");
+		const oHeaderSelector = oTable._getHeaderSelector();
+		assert.ok(!oHeaderSelector.getSelected(), "Select all icon is not checked.");
 		oTable.$("selall").trigger("tap");
 		await nextRowSelectionChange;
 
-		assert.ok(!oTable.$("selall").hasClass("sapUiTableSelAll"), "Select all icon is checked.");
+		assert.ok(oHeaderSelector.getSelected(), "Select all icon is checked.");
 
 		let nextRowsUpdated = TableQUnitUtils.nextEvent("rowsUpdated", oTable);
 		const oModel = new JSONModel();
@@ -2782,13 +2785,13 @@ sap.ui.define([
 		oTable.bindRows("/modelData");
 		await nextRowsUpdated;
 
-		assert.ok(oTable.$("selall").hasClass("sapUiTableSelAll"), "Select all icon is not checked.");
+		assert.ok(!oHeaderSelector.getSelected(), "Select all icon is not checked.");
 
 		nextRowsUpdated = TableQUnitUtils.nextEvent("rowsUpdated", oTable);
 		oModel.setData({modelData: aData});
 		await nextRowsUpdated;
 
-		assert.ok(oTable.$("selall").hasClass("sapUiTableSelAll"), "Select all icon is not checked.");
+		assert.ok(!oHeaderSelector.getSelected(), "Select all icon is not checked.");
 	});
 
 	QUnit.module("Event: _rowsUpdated", {
@@ -3775,99 +3778,21 @@ sap.ui.define([
 			"The selection mode cannot be changed here, it is controlled by the plugin");
 	});
 
-	QUnit.test("#getRenderConfig", async function(assert) {
-		const sSelectAllTitleText = TableUtils.getResourceText("TBL_SELECT_ALL");
-		const sDeselectAllTitleText = TableUtils.getResourceText("TBL_DESELECT_ALL");
-		let Elem;
+	QUnit.test("Table creates HeaderSelector", function(assert) {
+		const oHeaderSelector = this.oTable._getHeaderSelector();
 
-		this.oTable.addDependent(this.oTestPlugin);
+		assert.ok(TableUtils.isA(oHeaderSelector, "sap.ui.table.HeaderSelector"), "Table has a HeaderSelector");
+		assert.strictEqual(oHeaderSelector.getId(), this.oTable.getId() + "-selall", "HeaderSelector has correct ID");
+	});
+
+	QUnit.test("HeaderSelector rendered in table header", async function(assert) {
 		this.oTable.placeAt("qunit-fixture");
-
-		this.oTestPlugin.getRenderConfig = function() {
-			return {
-				headerSelector: {type: "none"}
-			};
-		};
-		this.oTable.invalidate();
 		await nextUIUpdate();
-		Elem = this.oTable.getDomRef("selall");
-		assert.ok(Elem.innerHTML.length === 0, "header selector is not rendered");
 
-		this.oTestPlugin.getRenderConfig = function() {
-			return {
-				headerSelector: {type: "custom", visible: true, enabled: false, selected: false, tooltip: sDeselectAllTitleText}
-			};
-		};
-		this.oTable.invalidate();
-		await nextUIUpdate();
-		Elem = this.oTable.getDomRef("selall");
-		assert.ok(Elem.firstChild.classList.contains("sapUiTableSelectAllCheckBox"), "header selector is rendered");
-		assert.equal(Elem.getAttribute("title"), sDeselectAllTitleText, "Tooltip is correct");
+		const oDomRef = document.getElementById(this.oTable.getId() + "-selall");
 
-		this.oTestPlugin.getRenderConfig = function() {
-			return {
-				headerSelector: {type: "custom", visible: false, enabled: false, selected: false, tooltip: sDeselectAllTitleText}
-			};
-		};
-		this.oTable.invalidate();
-		await nextUIUpdate();
-		Elem = this.oTable.getDomRef("selall");
-		assert.ok(Elem.innerHTML.length === 0, "header selector is not rendered");
-
-		this.oTestPlugin.getRenderConfig = function() {
-			return {
-				headerSelector: {type: "toggle", visible: true, enabled: true, selected: false}
-			};
-		};
-		this.oTable.invalidate();
-		await nextUIUpdate();
-		Elem = this.oTable.getDomRef("selall");
-		assert.ok(Elem.firstChild.classList.contains("sapUiTableSelectAllCheckBox"), "header selector is rendered");
-		assert.equal(Elem.getAttribute("title"), sSelectAllTitleText, "Tooltip is correct");
-
-		this.oTestPlugin.getRenderConfig = function() {
-			return {
-				headerSelector: {type: "toggle", visible: true, enabled: true, selected: true}
-			};
-		};
-		this.oTable.invalidate();
-		await nextUIUpdate();
-		Elem = this.oTable.getDomRef("selall");
-		assert.ok(Elem.firstChild.classList.contains("sapUiTableSelectAllCheckBox"), "header selector is rendered");
-		assert.equal(Elem.getAttribute("title"), sSelectAllTitleText, "Tooltip is correct");
-
-		this.oTestPlugin.getRenderConfig = function() {
-			return {
-				headerSelector: {type: "custom", visible: true,	enabled: true, selected: false, tooltip: sDeselectAllTitleText}
-			};
-		};
-		this.oTable.invalidate();
-		await nextUIUpdate();
-		Elem = this.oTable.getDomRef("selall");
-		assert.ok(Elem.firstChild.classList.contains("sapUiTableSelectAllCheckBox"), "header selector is rendered");
-		assert.equal(Elem.getAttribute("title"), sDeselectAllTitleText, "Tooltip is correct");
-
-		this.oTestPlugin.getRenderConfig = function() {
-			return {
-				headerSelector: {type: "custom", visible: false, enabled: true,	selected: false, tooltip: sDeselectAllTitleText}
-			};
-		};
-		this.oTable.invalidate();
-		await nextUIUpdate();
-		Elem = this.oTable.getDomRef("selall");
-		assert.ok(Elem.innerHTML.length === 0, "header selector is not rendered");
-
-		this.oTestPlugin.getRenderConfig = function() {
-			return {
-				headerSelector: {type: "custom", icon: new Icon({src: "sap-icon://clear-all"}), visible: true, enabled: true, selected: false}
-			};
-		};
-		this.oTable.invalidate();
-		await nextUIUpdate();
-		Elem = this.oTable.getDomRef("selall");
-		assert.ok(Elem.firstChild.classList.contains("sapUiIcon"), "header selector icon is rendered");
-		assert.equal(Element.closestTo(this.oTable.getDomRef("selall").firstChild).getSrc(), "sap-icon://clear-all", "The icon source is correct");
-		assert.notEqual(Elem.getAttribute("title"), sDeselectAllTitleText, "Tooltip is not set through missing tooltip in render config");
+		assert.ok(oDomRef, "HeaderSelector is rendered");
+		assert.ok(oDomRef.parentElement === this.oTable.getDomRef("rowcolhdr"), "HeaderSelector is in column header container");
 	});
 
 	QUnit.test("Selection API", function(assert) {

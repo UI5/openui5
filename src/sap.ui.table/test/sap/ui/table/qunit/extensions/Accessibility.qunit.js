@@ -1486,12 +1486,12 @@ sap.ui.define([
 		}
 	});
 
-	QUnit.test("Cell: role", function(assert) {
+	QUnit.test("role", function(assert) {
 		const oCell = getSelectAll().parent()[0];
 		assert.strictEqual(oCell.getAttribute("role"), "columnheader");
 	});
 
-	QUnit.test("Cell: aria-label", async function(assert) {
+	QUnit.test("aria-label", async function(assert) {
 		const oCell = getSelectAll().parent()[0];
 
 		assert.strictEqual(oCell.getAttribute("aria-label"), TableUtils.getResourceText("TBL_TABLE_SELECTION_COLUMNHEADER"), "Selection enabled");
@@ -1504,44 +1504,6 @@ sap.ui.define([
 		await nextUIUpdate();
 		assert.strictEqual(oCell.getAttribute("aria-label"), TableUtils.getResourceText("TBL_ROW_SELECTION_COLUMN_LABEL"),
 			"Selection disabled. Hierarchy mode set to 'Group'");
-	});
-
-	QUnit.test("Cell content: aria-labelledby without Focus", function(assert) {
-		TableQUnitUtils.setFocusOutsideOfTable(assert);
-		const $Cell = getSelectAll(false, assert);
-		assert.strictEqual(($Cell.attr("aria-labelledby") || "").trim(),
-			"", "aria-labelledby of select all");
-		TableQUnitUtils.setFocusOutsideOfTable(assert);
-	});
-
-	QUnit.test("Cell content: aria-describedby with Focus", function(assert) {
-		const done = assert.async();
-		const $Cell = getSelectAll(true, assert);
-		assert.strictEqual(($Cell.attr("aria-describedby") || "").trim(), "", "aria-describedby of select all");
-		TableQUnitUtils.setFocusOutsideOfTable(assert);
-		setTimeout(function() {
-			done();
-		}, 100);
-	});
-
-	QUnit.test("Cell content: aria-describedby without Focus", function(assert) {
-		TableQUnitUtils.setFocusOutsideOfTable(assert);
-		const $Cell = getSelectAll(false, assert);
-		assert.strictEqual(($Cell.attr("aria-describedby") || "").trim(), "", "aria-describedby of select all");
-		TableQUnitUtils.setFocusOutsideOfTable(assert);
-	});
-
-	QUnit.test("Cell content: Other ARIA attributes", async function(assert) {
-		let $Elem = getSelectAll(false);
-		assert.strictEqual($Elem.attr("role"), "checkbox", "role");
-		assert.strictEqual($Elem.attr("aria-checked"), "false", "aria-checked");
-		oTable.selectAll();
-		$Elem = getSelectAll(false);
-		assert.strictEqual($Elem.attr("aria-checked"), "true", "aria-checked");
-		oTable.setSelectionMode(SelectionMode.Single);
-		await nextUIUpdate();
-		assert.strictEqual($Elem.attr("role"), undefined, "role");
-		assert.strictEqual($Elem.attr("aria-checked"), undefined, "aria-checked");
 	});
 
 	QUnit.module("Misc", {

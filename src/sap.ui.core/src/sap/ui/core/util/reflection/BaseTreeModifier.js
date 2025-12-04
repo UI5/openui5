@@ -398,8 +398,8 @@ sap.ui.define([
 			return isPlainObject(vPropertyValue) || Array.isArray(vPropertyValue) || Object(vPropertyValue) !== vPropertyValue;
 		},
 
-		_escapeCurlyBracketsInString: function(vPropertyValue) {
-			return typeof vPropertyValue === "string" ? vPropertyValue.replace(/({|})/g, "\\$&") : vPropertyValue;
+		_escapeSpecialCharactersInString: function(vPropertyValue) {
+			return typeof vPropertyValue === "string" ? vPropertyValue.replace(/([\\\{\}])/g, "\\$1") : vPropertyValue;
 		},
 
 		_templateFragment: function(sFragmentName, mPreprocessorSettings) {

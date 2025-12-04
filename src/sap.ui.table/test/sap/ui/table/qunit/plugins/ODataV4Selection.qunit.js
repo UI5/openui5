@@ -52,12 +52,9 @@ sap.ui.define([
 		assert.equal(oFireSelectionChange.callCount, 1, "#fireSelectionChange call");
 	});
 
-	QUnit.test("Render config", function(assert) {
-		assert.deepEqual(this.oSelectionPlugin.getRenderConfig(), {
-			headerSelector: {
-				type: "none"
-			}
-		});
+	QUnit.test("HeaderSelector not visible for base selection plugin", function(assert) {
+		const oHeaderSelector = this.oTable._getHeaderSelector();
+		assert.strictEqual(oHeaderSelector.getVisible(), false, "HeaderSelector is not visible for ODataV4Selection base class");
 	});
 
 	QUnit.module("Validation during activation", {

@@ -80,6 +80,7 @@ sap.ui.define([
 		SelectionPlugin.prototype.onActivate.apply(this, arguments);
 		this.oSelectionModel.attachSelectionChanged(onSelectionChange, this);
 		attachToBinding(this, oTable.getBinding());
+		updateHeaderSelector(this);
 		TableUtils.Hook.register(oTable, TableUtils.Hook.Keys.Table.TotalRowCountChanged, onTotalRowCountChanged, this);
 		TableUtils.Hook.register(oTable, TableUtils.Hook.Keys.Table.UnbindRows, onTableUnbindRows, this);
 		TableUtils.Hook.register(oTable, TableUtils.Hook.Keys.Table.RowsBound, onTableRowsBound, this);
@@ -122,17 +123,25 @@ sap.ui.define([
 	};
 
 	/**
-	 * @inheritDoc
+	 * Updates the header selector based on the current selection state.
+	 *
+	 * @param {sap.ui.table.plugins.SelectionModelSelection} oPlugin The plugin instance
+	 * @private
 	 */
-	SelectionModelSelection.prototype.getRenderConfig = function() {
-		return {
-			headerSelector: {
-				type: "toggle",
-				visible: TableUtils.hasSelectAll(this.getControl()),
-				selected: this.getSelectableCount() > 0 && this.getSelectableCount() === this.getSelectedCount()
-			}
-		};
-	};
+	function updateHeaderSelector(oPlugin) {
+		const oHeaderSelector = oPlugin._getHeaderSelector();
+
+		if (!oPlugin.isActive() || !oHeaderSelector) {
+			return;
+		}
+
+		const iSelectableCount = oPlugin.getSelectableCount();
+
+		oHeaderSelector.setVisible(TableUtils.hasSelectAll(oPlugin.getControl()));
+		oHeaderSelector.setEnabled(true);
+		oHeaderSelector.setType("checkbox");
+		oHeaderSelector.setSelected(iSelectableCount > 0 && iSelectableCount === oPlugin.getSelectedCount());
+	}
 
 	function toggleSelectAll(oPlugin) {
 		const oTable = oPlugin.getControl();
@@ -164,7 +173,7 @@ sap.ui.define([
 	 * @private
 	 */
 	SelectionModelSelection.prototype.onHeaderSelectorPress = function() {
-		if (this.getRenderConfig().headerSelector.visible) {
+		if (this._getHeaderSelector().getVisible()) {
 			toggleSelectAll(this);
 		}
 	};
@@ -329,6 +338,8 @@ sap.ui.define([
 			this.oSelectionModel.setSelectionMode(getSelectionModelSelectionMode(this.getSelectionMode()));
 		}
 
+		updateHeaderSelector(this);
+
 		return this;
 	};
 
@@ -360,6 +371,8 @@ sap.ui.define([
 	function onSelectionChange(oEvent) {
 		const aRowIndices = oEvent.getParameter("rowIndices");
 		const bSelectAll = oEvent.getParameter("selectAll");
+
+		updateHeaderSelector(this);
 
 		if (!this._bSuppressSelectionChangeEvent) {
 			this.fireSelectionChange({

@@ -51,28 +51,30 @@ sap.ui.define([
 	SelectionPlugin.prototype.setParent = function(oParent) {
 		const oOldParent = this.getParent();
 
-		PluginBase.prototype.setParent.apply(this, arguments);
-
 		oOldParent?._onSelectionPluginChange();
 		if (oOldParent !== oParent) {
 			oParent?._onSelectionPluginChange();
 		}
 
+		PluginBase.prototype.setParent.apply(this, arguments);
+
 		return this;
 	};
 
+	SelectionPlugin.prototype.onDeactivate = function() {
+		PluginBase.prototype.onDeactivate.apply(this, arguments);
+		this._getHeaderSelector()?.setVisible(false);
+	};
+
 	/**
-	 * TODO: Historically grown and hard to understand possible combinations of settings. Refactor!
+	 * Returns the table's header selector control if available.
+	 * Only the table's main selection plugin can access the table's header selector.
 	 *
-	 * @returns {{headerSelector: {type: string, bla: blub}}}
+	 * @returns {sap.ui.table.HeaderSelector|undefined}
 	 * @private
 	 */
-	SelectionPlugin.prototype.getRenderConfig = function() {
-		return {
-			headerSelector: {
-				type: "none"
-			}
-		};
+	SelectionPlugin.prototype._getHeaderSelector = function() {
+		return this.isMainSelectionPlugin ? this.getControl()?._getHeaderSelector() : undefined;
 	};
 
 	/**
@@ -81,7 +83,7 @@ sap.ui.define([
 	 *
 	 * @private
 	 */
-	SelectionPlugin.prototype.onHeaderSelectorPress = function() {};
+	SelectionPlugin.prototype.onHeaderSelectorPress = function() { };
 
 	/**
 	 * This hook is called when a keyboard shortcut relevant for selection is pressed.
@@ -92,7 +94,7 @@ sap.ui.define([
 	 * @param {sap.ui.base.Event} oEvent The emitted event.
 	 * @private
 	 */
-	SelectionPlugin.prototype.onKeyboardShortcut = function(sType, oEvent) {};
+	SelectionPlugin.prototype.onKeyboardShortcut = function(sType, oEvent) { };
 
 	/**
 	 * Changes the selection state of a row.

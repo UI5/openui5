@@ -8,7 +8,6 @@ sap.ui.define([
 	"./BindingSelection",
 	"../library",
 	"../utils/TableUtils",
-	"sap/ui/core/Icon",
 	"sap/ui/core/IconPool",
 	"sap/base/Log"
 ], function(
@@ -18,7 +17,6 @@ sap.ui.define([
 	BindingSelectionPlugin,
 	library,
 	TableUtils,
-	Icon,
 	IconPool,
 	Log
 ) {
@@ -97,9 +95,6 @@ sap.ui.define([
 			 */
 			selectionMode: {type: "sap.ui.table.SelectionMode", group: "Behavior", defaultValue: SelectionMode.MultiToggle}
 		},
-		aggregations: {
-			icon: {type: "sap.ui.core.Icon", multiple: false, visibility: "hidden"}
-		},
 		events: {
 			/**
 			 * This event is fired when the selection is changed.
@@ -147,8 +142,9 @@ sap.ui.define([
 		attachToBinding(this, oTable.getBinding());
 		oTable.addAggregation("_hiddenDependents", this.oInnerSelectionPlugin);
 		oTable.setProperty("selectionMode", this.getSelectionMode());
-		updateHeaderSelectorIcon(this);
+		updateHeaderSelector(this);
 		TableUtils.Hook.register(oTable, TableUtils.Hook.Keys.Table.RowsBound, onTableRowsBound, this);
+		TableUtils.Hook.register(oTable, TableUtils.Hook.Keys.Table.RowsUnbound, onTableRowsUnbound, this);
 	};
 
 	function createInnerSelectionPlugin(oTable) {
@@ -169,6 +165,7 @@ sap.ui.define([
 		this.oInnerSelectionPlugin?.destroy();
 		delete this.oInnerSelectionPlugin;
 		TableUtils.Hook.deregister(oTable, TableUtils.Hook.Keys.Table.RowsBound, onTableRowsBound, this);
+		TableUtils.Hook.deregister(oTable, TableUtils.Hook.Keys.Table.RowsUnbound, onTableRowsUnbound, this);
 	};
 
 	MultiSelectionPlugin.prototype.setSelected = function(oRow, bSelected, mConfig) {
@@ -193,38 +190,21 @@ sap.ui.define([
 		return this.isIndexSelected(oRow.getIndex());
 	};
 
-	MultiSelectionPlugin.prototype.getRenderConfig = function() {
-		if (!this.isActive()) {
-			return SelectionPlugin.prototype.getRenderConfig.apply(this, arguments);
-		}
-
-		return {
-			headerSelector: {
-				type: this._bLimitDisabled ? "toggle" : "custom",
-				icon: this.getAggregation("icon"),
-				visible: this.getSelectionMode() === SelectionMode.MultiToggle && this.getShowHeaderSelector(),
-				enabled: this.getSelectableCount() > 0,
-				selected: this.getSelectableCount() > 0 && this.getSelectableCount() === this.getSelectedCount(),
-				tooltip: this.getSelectedCount() === 0 ? TableUtils.getResourceText("TBL_SELECT_ALL") : TableUtils.getResourceText("TBL_DESELECT_ALL")
-			}
-		};
-	};
-
 	MultiSelectionPlugin.prototype.onHeaderSelectorPress = function() {
-		const mRenderConfig = this.getRenderConfig();
+		const oHeaderSelector = this._getHeaderSelector();
 
-		if (!mRenderConfig.headerSelector.visible || !mRenderConfig.headerSelector.enabled) {
+		if (!oHeaderSelector.getVisible() || !oHeaderSelector.getEnabled()) {
 			return;
 		}
 
-		if (mRenderConfig.headerSelector.type === "toggle") {
+		if (oHeaderSelector.getType() === "checkbox") {
 			toggleSelection(this);
-		} else if (mRenderConfig.headerSelector.type === "custom") {
-			 if (this.getSelectedCount() > 0) {
-				 this.clearSelection();
-			 } else {
+		} else if (oHeaderSelector.getType() === "custom") {
+			if (this.getSelectedCount() > 0) {
+				this.clearSelection();
+			} else {
 				this.addSelectionInterval(0, this._getHighestSelectableIndex());
-			 }
+			}
 		}
 	};
 
@@ -272,7 +252,7 @@ sap.ui.define([
 
 		this.getControl().setProperty("selectionMode", sSelectionMode);
 		this.oInnerSelectionPlugin.setSelectionMode(sSelectionMode);
-		updateHeaderSelectorIcon(this);
+		updateHeaderSelector(this);
 
 		return this;
 	};
@@ -287,13 +267,19 @@ sap.ui.define([
 		this.setProperty("limit", iLimit, !!this.getLimit() === !!iLimit);
 		this._bLimitDisabled = iLimit === 0;
 
-		updateHeaderSelectorIcon(this);
+		updateHeaderSelector(this);
 
 		return this;
 	};
 
 	MultiSelectionPlugin.prototype.setEnableNotification = function(bNotify) {
 		this.setProperty("enableNotification", bNotify, true);
+		return this;
+	};
+
+	MultiSelectionPlugin.prototype.setShowHeaderSelector = function(bShow) {
+		this.setProperty("showHeaderSelector", bShow, true);
+		updateHeaderSelector(this);
 		return this;
 	};
 
@@ -632,31 +618,51 @@ sap.ui.define([
 	};
 
 	/**
-	 * Changes the current icon and tooltip text of the header selection icon in the given plugin object based on the selection.
+	 * Updates the HeaderSelector control based on the current selection state.
 	 *
-	 * @param {sap.ui.table.plugins.MultiSelectionPlugin} oPlugin The plugin to toggle the selection on.
+	 * @param {sap.ui.table.plugins.MultiSelectionPlugin} oPlugin The plugin to update the header selector for.
 	 */
-	function updateHeaderSelectorIcon(oPlugin) {
-		if (oPlugin.getSelectionMode() === SelectionMode.MultiToggle && !oPlugin._bLimitDisabled) {
-			if (!oPlugin.getAggregation("icon")) {
-				const oIcon = new Icon({useIconTooltip: false});
-				oIcon.addStyleClass("sapUiTableSelectClear");
-				oPlugin.setAggregation("icon", oIcon, true);
-			}
+	function updateHeaderSelector(oPlugin) {
+		const oHeaderSelector = oPlugin._getHeaderSelector();
 
-			const oIcon = oPlugin.getAggregation("icon");
+		if (!oPlugin.isActive() || !oHeaderSelector) {
+			return;
+		}
+
+		const bVisible = oPlugin.getSelectionMode() === SelectionMode.MultiToggle && oPlugin.getShowHeaderSelector();
+		const sType = oPlugin._bLimitDisabled ? "checkbox" : "custom";
+		const bEnabled = oPlugin.getSelectableCount() > 0;
+		const bSelected = oPlugin.getSelectableCount() > 0 && oPlugin.getSelectableCount() === oPlugin.getSelectedCount();
+		let sTooltip = null;
+
+		if (sType === "custom") { // Default tooltip is used for type checkbox.
+			if (oPlugin.getSelectedCount() === 0) {
+				sTooltip = TableUtils.getResourceText("TBL_SELECT_ALL");
+			} else {
+				sTooltip = TableUtils.getResourceText("TBL_DESELECT_ALL");
+			}
+		}
+
+		// Determine icon for custom type
+		let sIcon = "";
+		if (oPlugin.getSelectionMode() === SelectionMode.MultiToggle && !oPlugin._bLimitDisabled) {
 			const iSelectedCount = oPlugin.getSelectedCount();
 
 			if (oPlugin.getSelectableCount() === iSelectedCount && iSelectedCount !== 0) {
-				oIcon.setSrc(IconPool.getIconURI(TableUtils.ThemeParameters.allSelectedIcon));
+				sIcon = IconPool.getIconURI(TableUtils.ThemeParameters.allSelectedIcon);
 			} else if (iSelectedCount !== 0) {
-				oIcon.setSrc(IconPool.getIconURI(TableUtils.ThemeParameters.clearSelectionIcon));
+				sIcon = IconPool.getIconURI(TableUtils.ThemeParameters.clearSelectionIcon);
 			} else {
-				oIcon.setSrc(IconPool.getIconURI(TableUtils.ThemeParameters.checkboxIcon));
+				sIcon = IconPool.getIconURI(TableUtils.ThemeParameters.checkboxIcon);
 			}
-		} else {
-			oPlugin.destroyAggregation("icon");
 		}
+
+		oHeaderSelector.setVisible(bVisible);
+		oHeaderSelector.setType(sType);
+		oHeaderSelector.setEnabled(bEnabled);
+		oHeaderSelector.setSelected(bSelected);
+		oHeaderSelector.setIcon(sIcon);
+		oHeaderSelector.setTooltip(sTooltip);
 	}
 
 	/**
@@ -668,7 +674,7 @@ sap.ui.define([
 	MultiSelectionPlugin.prototype._onSelectionChange = function(oEvent) {
 		const aRowIndices = oEvent.getParameter("rowIndices");
 
-		updateHeaderSelectorIcon(this);
+		updateHeaderSelector(this);
 
 		this.fireSelectionChange({
 			rowIndices: aRowIndices,
@@ -694,6 +700,11 @@ sap.ui.define([
 
 	function onTableRowsBound(oBinding) {
 		attachToBinding(this, oBinding);
+		updateHeaderSelector(this);
+	}
+
+	function onTableRowsUnbound() {
+		updateHeaderSelector(this);
 	}
 
 	function attachToBinding(oPlugin, oBinding) {
@@ -705,11 +716,11 @@ sap.ui.define([
 	}
 
 	function onBindingChange(oEvent) {
-		updateHeaderSelectorIcon(this);
+		updateHeaderSelector(this);
 	}
 
 	MultiSelectionPlugin.prototype.onThemeChanged = function() {
-		updateHeaderSelectorIcon(this);
+		updateHeaderSelector(this);
 	};
 
 	return MultiSelectionPlugin;

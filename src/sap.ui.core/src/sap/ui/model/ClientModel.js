@@ -167,7 +167,7 @@ sap.ui.define([
 	 * @param {string} sPath
 	 *   The path pointing to the property that should be bound; either an absolute path or a path
 	 *   relative to a given <code>oContext</code>
-	 * @param {object} [oContext]
+	 * @param {sap.ui.model.Context} [oContext]
 	 *   A context object for the new binding
 	 * @param {Object<string,any>} [mParameters]
 	 *   Map of optional parameters for the binding

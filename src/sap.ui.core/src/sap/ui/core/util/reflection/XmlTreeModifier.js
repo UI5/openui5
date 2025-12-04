@@ -104,7 +104,7 @@ sap.ui.define([
 		_setProperty: function(oControl, sPropertyName, vPropertyValue, bEscapeBindingStrings) {
 			let sValue = XmlTreeModifier._getSerializedValue(vPropertyValue);
 			if (bEscapeBindingStrings) {
-				sValue = XmlTreeModifier._escapeCurlyBracketsInString(sValue);
+				sValue = XmlTreeModifier._escapeSpecialCharactersInString(sValue);
 			}
 			oControl.setAttribute(sPropertyName, sValue);
 		},
@@ -195,7 +195,7 @@ sap.ui.define([
 		 * @inheritDoc
 		 */
 		createAndAddCustomData: function(oControl, sCustomDataKey, sValue) {
-			oControl.setAttributeNS(CUSTOM_DATA_NS, "custom.data.via.modifier:" + sCustomDataKey, XmlTreeModifier._escapeCurlyBracketsInString(sValue));
+			oControl.setAttributeNS(CUSTOM_DATA_NS, "custom.data.via.modifier:" + sCustomDataKey, XmlTreeModifier._escapeSpecialCharactersInString(sValue));
 			return Promise.resolve();
 		},
 

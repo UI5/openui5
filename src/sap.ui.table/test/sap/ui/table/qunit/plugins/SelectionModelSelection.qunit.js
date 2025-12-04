@@ -226,4 +226,24 @@ sap.ui.define([
 			assert.deepEqual(this.oTable.getSelectedIndices(), [2, 3, 4, 5, 6], "Selection");
 		}.bind(this));
 	});
+
+	QUnit.module("HeaderSelector", {
+		beforeEach: function() {
+			this.oTable = TableQUnitUtils.createTable({
+				rows: {path: "/"},
+				models: TableQUnitUtils.createJSONModelWithEmptyRows(10)
+			});
+		},
+		afterEach: function() {
+			this.oTable.destroy();
+		}
+	});
+
+	QUnit.test("Rebind when everything is selected", function(assert) {
+		this.oTable.selectAll();
+		assert.ok(this.oTable._getHeaderSelector().getSelected(), "HeaderSelector is selected before rebind");
+
+		this.oTable.bindRows(this.oTable.getBindingInfo("rows"));
+		assert.notOk(this.oTable._getHeaderSelector().getSelected(), "HeaderSelector is not selected after rebind");
+	});
 });

@@ -383,7 +383,7 @@ sap.ui.define([
 			if (oChangeInfo.initial || oChangeInfo.rowChange) {
 				if (TableUtils.hasRowNavigationIndicators(oTable)) {
 					const oCellInfo = TableUtils.getCellInfo($Cell);
-					if (oCellInfo.type !== TableUtils.CELLTYPE.COLUMNHEADER && oCellInfo.type !== TableUtils.CELLTYPE.COLUMNROWHEADER) {
+					if (oCellInfo.isOfType(CellType.ANYCONTENTCELL)) {
 						const oRowSettings = oTable.getRows()[oCellInfo.rowIndex].getAggregation("_settings");
 						if (oRowSettings.getNavigated()) {
 							aLabels.push(sTableId + "-rownavigatedtext");
@@ -554,25 +554,6 @@ sap.ui.define([
 		},
 
 		/*
-		 * Modifies the labels and descriptions of the column row header.
-		 * @see ExtensionHelper.performCellModifications
-		 */
-		modifyAccOfColumnRowHeader: function(oCellInfo, oChangeInfo) {
-			const oTable = this.getTable();
-			const $Cell = jQuery(oCellInfo.cell);
-			const bEnabled = $Cell.hasClass("sapUiTableSelAllVisible");
-
-			const mAttributes = ExtensionHelper.getAriaAttributesForColumnRowHeader(
-				this,
-				{enabled: bEnabled, checked: bEnabled && !oTable.$().hasClass("sapUiTableSelAll")}
-			);
-			const aLabels = mAttributes["aria-labelledby"] || [];
-			ExtensionHelper.performCellModifications(this, $Cell, [], mAttributes["aria-describedby"],
-				aLabels, mAttributes["aria-describedby"], null, oChangeInfo
-			);
-		},
-
-		/*
 		 * Modifies the labels and descriptions of a row action cell.
 		 * @see ExtensionHelper.performCellModifications
 		 */
@@ -664,27 +645,27 @@ sap.ui.define([
 		 * Returns the aria attributes for the column row header content (select all checkbox/deselect all icon).
 		 *
 		 * @param {sap.ui.table.extensions.Accessibility} oExtension The accessibility extension
-		 * @param {{enabled: boolean, checked: boolean}} mParams Whether the select all checkbox is enabled and checked
+		 * @param {sap.ui.table.HeaderSelector} oHeaderSelector The header selector control
 		 * @returns {object} An object containing the aria attributes
 		 */
-		getAriaAttributesForColumnRowHeader: function(oExtension, mParams) {
+		getAriaAttributesForColumnRowHeader: function(oExtension, oHeaderSelector) {
 			const mAttributes = {};
-			const oTable = oExtension.getTable();
-			const mRenderConfig = oTable._getSelectionPlugin().getRenderConfig();
 
-			if (mRenderConfig.headerSelector.visible) {
-				if (mRenderConfig.headerSelector.type === "toggle") {
-					mAttributes["role"] = ["checkbox"];
-					if (mParams.enabled) {
-						mAttributes["aria-checked"] = mParams.checked ? "true" : "false";
-					}
-				} else if (mRenderConfig.headerSelector.type === "custom") {
-					mAttributes["role"] = ["button"];
-					if (!mParams.enabled) {
-						mAttributes["aria-disabled"] = "true";
-					}
-				}
+			if (!oHeaderSelector.getVisible()) {
+				return mAttributes;
 			}
+
+			const sHeaderSelectorType = oHeaderSelector.getType();
+
+			if (sHeaderSelectorType === "checkbox") {
+				mAttributes["role"] = ["checkbox"];
+				mAttributes["aria-checked"] = oHeaderSelector.getSelected().toString();
+			} else if (sHeaderSelectorType === "custom") {
+				mAttributes["role"] = ["button"];
+			}
+
+			mAttributes["aria-disabled"] = !oHeaderSelector.getEnabled() ? "true" : "false";
+
 			return mAttributes;
 		},
 
@@ -1535,20 +1516,6 @@ sap.ui.define([
 			rowSelect: TableUtils.getResourceText("TBL_ROW_SELECT_KEY"),
 			rowDeselect: TableUtils.getResourceText("TBL_ROW_DESELECT_KEY")
 		};
-	};
-
-	/**
-	 * Applies corresponding ARIA properties of the given state to the select all button.
-	 *
-	 * @param {boolean} bSelectAll The select all state to be applied to the select all button.
-	 * @public
-	 */
-	AccExtension.prototype.setSelectAllState = function(bSelectAll) {
-		const oTable = this.getTable();
-
-		if (this._accMode && oTable) {
-			oTable.$("selall").attr("aria-checked", bSelectAll ? "true" : "false");
-		}
 	};
 
 	/**
