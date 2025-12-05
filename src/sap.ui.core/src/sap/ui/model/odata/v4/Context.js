@@ -1251,19 +1251,18 @@ sap.ui.define([
 	/**
 	 * Tells whether this context represents aggregated data, as opposed to a single entity
 	 * instance. This method returns <code>true</code> only in case of data aggregation (but not for
-	 * a recursive hierarchy)
-	 * and not for non-expandable nodes (so-called leaves; see {@link #isExpanded}) if all of the
-	 * entity type's key properties are available as groups. For a list binding's
+	 * a recursive hierarchy) and not for non-expandable nodes (so-called leaves; see
+	 * {@link #isExpanded}) if all of the entity type's key properties are available as groups. For
+	 * a list binding's
 	 * {@link sap.ui.model.odata.v4.ODataListBinding#getHeaderContext header context}, the returned
 	 * value is the same as for every leaf.
 	 *
 	 * @returns {boolean} Whether this context represents aggregated data
 	 * @throws {Error} If this context's root binding is suspended
 	 *
-	 * @private
+	 * @public
 	 * @see sap.ui.model.odata.v4.ODataListBinding#setAggregation
-	 * @since 1.132.0
-	 * @ui5-restricted sap.fe
+	 * @since 1.144.0
 	 */
 	Context.prototype.isAggregated = function () {
 		this.oBinding.checkSuspended();
@@ -2307,6 +2306,10 @@ sap.ui.define([
 	 *
 	 * Note: This is only supported if the model uses the <code>autoExpandSelect</code> parameter.
 	 *
+	 * Note: This can be used for single entities in a data aggregation scenario (@experimental as
+	 * of version 1.144.0), see {@link #isAggregated}. Such a context can be used as a binding
+	 * context and for updating (see {@link #setProperty}). Other APIs are not supported.
+	 *
 	 * @param {boolean} bKeepAlive
 	 *   Whether to keep the context alive
 	 * @param {function((sap.ui.model.odata.v4.Context|undefined))} [fnOnBeforeDestroy]
@@ -2336,8 +2339,10 @@ sap.ui.define([
 	 *       parameter (see {@link sap.ui.model.odata.v4.ODataModel#bindList}),
 	 *     <li> the list binding uses or inherits the <code>$$sharedRequest</code> parameter
 	 *       (see {@link sap.ui.model.odata.v4.ODataModel#bindList}),
-	 *     <li> the list binding uses data aggregation, but no recursive hierarchy
-	 *       (see {@link sap.ui.model.odata.v4.ODataListBinding#setAggregation}),
+	 *     <li> the list binding uses data aggregation, but no recursive hierarchy (see
+	 *       {@link sap.ui.model.odata.v4.ODataListBinding#setAggregation}), and either the
+	 *       context's root binding is suspended or this context does not represent a single entity
+	 *       (see {@link #isAggregated}),
 	 *     <li> messages are requested, but the model does not use the <code>autoExpandSelect</code>
 	 *       parameter.
 	 *   </ul>

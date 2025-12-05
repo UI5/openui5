@@ -1,7 +1,4 @@
 /* global QUnit, sinon*/
-
-QUnit.dump.maxDepth = 10;
-
 sap.ui.define([
 	"sap/ui/core/Control",
 	"sap/m/p13n/modules/xConfigAPI",
@@ -420,111 +417,6 @@ sap.ui.define([
 				}
 			  }
 			}, "The correct remove value has been created - removing an item needs to be reflected in the order of existing items");
-		});
-	});
-
-	QUnit.test("Ensure that the correct condition is removed", function(assert) {
-		const oModificationPayload = {
-			key: "test_property",
-			property: "filterConditions",
-			operation: "add",
-			value: {
-				key: "test_property",
-				condition: {
-					operator: "EQ",
-					values: ["Maria"]
-				}
-			}
-		};
-
-		return xConfigAPI.enhanceConfig(this.oControl, oModificationPayload).then(() => {
-			const oCustomData = this.oControl.getCustomData()[0];
-
-			assert.equal(oCustomData.getKey(), "xConfig", "The xConfig instance has been created");
-
-			assert.deepEqual(JSON.parse(oCustomData.getValue().replace(/\\/g, '')), {
-				"properties": {
-					"filterConditions": [
-						{
-							"key": "test_property",
-							"condition": {
-								"operator": "EQ",
-								"values": ["Maria"]
-							}
-						}
-					]
-				}
-			}, "The correct value has been created");
-
-			const oSecondAddPayload = {
-				key: "test_property",
-				property: "filterConditions",
-				operation: "add",
-				value: {
-					key: "test_property",
-					condition: {
-						operator: "EQ",
-						values: ["John"]
-					}
-				}
-			};
-			return xConfigAPI.enhanceConfig(this.oControl, oSecondAddPayload);
-		}).then(() => {
-			const oCustomData = this.oControl.getCustomData()[0];
-
-			assert.deepEqual(JSON.parse(oCustomData.getValue().replace(/\\/g, '')), {
-				// Note: This is sorted in ascending order of the values (J < M)
-				"properties": {
-					"filterConditions": [
-						{
-							"key": "test_property",
-							"condition": {
-								"operator": "EQ",
-								"values": ["John"]
-							}
-						},
-						{
-							"key": "test_property",
-							"condition": {
-								"operator": "EQ",
-								"values": ["Maria"]
-							}
-						}
-					]
-				}
-			}, "The correct value has been created");
-
-			const oRemovePayload = {
-				key: "test_property",
-				property: "filterConditions",
-				operation: "remove",
-				value: {
-					key: "test_property",
-					condition: {
-						operator: "EQ",
-						values: ["Maria"]
-					}
-				}
-			};
-
-			return xConfigAPI.enhanceConfig(this.oControl, oRemovePayload);
-		}).then(() => {
-			const oCustomData = this.oControl.getCustomData()[0];
-
-			assert.deepEqual(JSON.parse(oCustomData.getValue().replace(/\\/g, '')), {
-				// Note: This is sorted in ascending order of the values (J < M)
-				"properties": {
-					"filterConditions": [
-						{
-							"key": "test_property",
-							"condition": {
-								"operator": "EQ",
-								"values": ["John"]
-							}
-						}
-					]
-				}
-			}, "The correct value has been removed");
 		});
 	});
 

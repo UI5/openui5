@@ -732,8 +732,10 @@ sap.ui.define([
 		if (oContext === this.oHeaderContext) {
 			throw new Error("Unsupported header context " + oContext);
 		}
-		if (_Helper.isDataAggregation(this.mParameters)) {
-			throw new Error("Unsupported $$aggregation at " + this);
+		// Context#isAggregated() throws an error if its root binding is suspended; avoid that error
+		// in non data aggregation cases
+		if (_Helper.isDataAggregation(this.mParameters) && oContext?.isAggregated()) {
+			throw new Error("Unsupported on aggregated data: " + oContext);
 		}
 		if (this.bSharedRequest) {
 			throw new Error("Unsupported $$sharedRequest at " + this);
@@ -3206,7 +3208,8 @@ sap.ui.define([
 	 *     <li> the binding's root binding is suspended,
 	 *     <li> the binding is part of a {@link #create deep create} because it is relative to a
 	 *       {@link sap.ui.model.odata.v4.Context#isTransient transient} context,
-	 *     <li> {@link sap.ui.model.odata.v4.Context#setKeepAlive} fails
+	 *     <li> {@link sap.ui.model.odata.v4.Context#setKeepAlive} fails, or
+	 *     <li> data aggregation, but no recursive hierarchy (see {@link #setAggregation}) is used.
 	 *   </ul>
 	 *
 	 * @public
@@ -3221,6 +3224,9 @@ sap.ui.define([
 			iPredicateIndex = _Helper.getPredicateIndex(sPath),
 			sResolvedPath = this.getResolvedPath();
 
+		if (_Helper.isDataAggregation(this.mParameters)) {
+			throw new Error("Unsupported $$aggregation at " + this);
+		}
 		this.checkKeepAlive();
 		this.checkSuspended();
 		this.checkTransient();

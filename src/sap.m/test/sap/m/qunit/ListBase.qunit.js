@@ -4415,5 +4415,57 @@ sap.ui.define([
 		await nextUIUpdate();
 		assert.notOk(this.oItem1.getDomRef("imgDet"), "Details action is not rendered, since custom actions are enabled");
 	});
+
+	QUnit.test("Action type=Navigation", async function(assert) {
+		const oNavigationAction = new ListItemAction({
+			type: "Navigation"
+		});
+
+		this.oItem1.setType("Active");
+		assert.equal(this.oItem1.getType(), "Active", "Item type is Active");
+		assert.equal(this.oItem1.getEffectiveType(), "Active", "Item effective type is also Active");
+
+		this.oItem1.addAction(oNavigationAction);
+		assert.equal(this.oItem1.getType(), "Active", "Item type is Active public API is not changed");
+		assert.equal(this.oItem1.getEffectiveType(), "Navigation", "Item effective type is Navigation since action of type Navigation is added");
+
+		oNavigationAction.setType("Edit");
+		assert.equal(this.oItem1.getType(), "Active", "Item type is still Active public API is not changed");
+		assert.equal(this.oItem1.getEffectiveType(), "Active", "Item effective type is Active since action of type Edit has no effect on item type");
+
+		oNavigationAction.setType("Navigation");
+		assert.equal(this.oItem1.getType(), "Active", "Item type is Active public API is not changed");
+		assert.equal(this.oItem1.getEffectiveType(), "Navigation", "Item effective type is Navigation since action of type set back to Navigation");
+
+		oNavigationAction.setVisible(false);
+		assert.equal(this.oItem1.getType(), "Active", "Item type is Active public API is not changed");
+		assert.equal(this.oItem1.getEffectiveType(), "Active", "Item effective type is Active since action of type Navigation is not visible");
+
+		oNavigationAction.setVisible(true);
+		this.oList.setItemActionCount(2);
+		await nextUIUpdate();
+
+		assert.equal(this.oItem1.getType(), "Active", "Item type is Active public API is not changed");
+		assert.equal(this.oItem1.getEffectiveType(), "Navigation", "Item effective type is Navigation since action of type Navigation is visible again");
+		assert.notOk(oNavigationAction.isEffective(), "Navigation action is not effective");
+		assert.equal(this.oItem1._getEffectiveActions().length, 2, "There are 2 effective actions since type Navigation is not effective");
+		assert.notOk(this.oItem1.getDomRef("overflow"), "Although there are 3 actions there is no overflow since Navigation action is not effective");
+
+		const fnItemPressSpy = this.spy();
+		const fnItemActionPressSpy = this.spy();
+		this.oList.attachItemPress(fnItemPressSpy);
+		this.oList.attachItemActionPress(fnItemActionPressSpy);
+
+		const clock = sinon.useFakeTimers();
+		this.oItem1.$().trigger("tap");
+		clock.tick(1);
+		assert.equal(fnItemPressSpy.callCount, 1, "The itemPress event fired once since type of the ListItem is Navigation ");
+		assert.equal(fnItemActionPressSpy.callCount, 0, "The itemActionPress event is not fired since Navigation action is not effective");
+		clock.restore();
+
+		this.oItem1.removeAction(oNavigationAction);
+		assert.equal(this.oItem1.getType(), "Active", "Item type is Active public API is not changed");
+		assert.equal(this.oItem1.getEffectiveType(), "Active", "Item effective type is Active again since action of type Navigation is removed");
+	});
 }
 );

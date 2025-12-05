@@ -527,7 +527,8 @@ sap.ui.define([
 	};
 
 	Overlay.prototype.focus = function() {
-		this.getDomRef()?.focus();
+		// Automatic scrolling can cause issues with the toolbar positioning in scenarios like cFLP
+		this.getDomRef()?.focus({ preventScroll: true });
 	};
 
 	/**

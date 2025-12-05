@@ -3582,7 +3582,7 @@ sap.ui.define([
 				var oBinding,
 					oHelperMock = this.mock(_Helper),
 					oModel = oFixture.oModel || this.oModel,
-					oContext = Context.createNewContext(oModel, oParentBinding, "/TEAMS", 1),
+					oContext = Context.createNewContext(oModel, oParentBinding, "/TEAMS"),
 					aSorters = [];
 
 				oBinding = oModel.bindList("TEAM_2_EMPLOYEES", undefined, undefined, undefined,
@@ -10123,14 +10123,45 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test("checkKeepAlive: $$aggregation", function (assert) {
-		var oBinding = this.bindList("/EMPLOYEES", undefined, undefined, undefined,
-				{$$aggregation : {}}); // Note: no hierarchyQualifier!
+	QUnit.test("checkKeepAlive: data aggregation - aggregated data", function (assert) {
+		const oBinding = this.bindList("/EMPLOYEES");
+		this.mock(_Helper).expects("isDataAggregation")
+			.withExactArgs(sinon.match.same(oBinding.mParameters))
+			.returns(true);
+		const oContext = Context.create({/*oModel*/}, oParentBinding, "/EMPLOYEES('42')", 13);
+		this.mock(oContext).expects("isAggregated").withExactArgs().returns(true);
 
-		assert.throws(function () {
+		assert.throws(() => {
 			// code under test
-			oBinding.checkKeepAlive();
-		}, new Error("Unsupported $$aggregation at " + oBinding));
+			oBinding.checkKeepAlive(oContext);
+		}, new Error("Unsupported on aggregated data: /EMPLOYEES('42')[13]"));
+	});
+
+	//*********************************************************************************************
+	QUnit.test("checkKeepAlive: data aggregation - root binding suspended", function (assert) {
+		const oBinding = this.bindList("/EMPLOYEES");
+		this.mock(_Helper).expects("isDataAggregation")
+			.withExactArgs(sinon.match.same(oBinding.mParameters))
+			.returns(true);
+		const oContext = Context.create({/*oModel*/}, oParentBinding, "/EMPLOYEES('42')", 13);
+		const oError = new Error("Root binding is suspended");
+		this.mock(oContext).expects("isAggregated").withExactArgs().throws(oError);
+
+		assert.throws(() => {
+			// code under test
+			oBinding.checkKeepAlive(oContext);
+		}, oError);
+	});
+
+	//*********************************************************************************************
+	QUnit.test("checkKeepAlive: data aggregation - no context", function () {
+		const oBinding = this.bindList("/EMPLOYEES");
+		this.mock(_Helper).expects("isDataAggregation")
+			.withExactArgs(sinon.match.same(oBinding.mParameters))
+			.returns(true);
+
+		// code under test
+		oBinding.checkKeepAlive();
 	});
 
 	//*********************************************************************************************
@@ -10190,17 +10221,26 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test("checkKeepAlive: pending changes", function (assert) {
+[false, true].forEach((bAggregation) => {
+	QUnit.test("checkKeepAlive: pending changes, data aggregation:" + bAggregation,
+			function (assert) {
 		var oBinding = this.bindList("/EMPLOYEES"),
 			oContext = {
 				hasPendingChanges : function () {},
 				getIndex : function () {},
+				isAggregated : function () {},
 				isDeleted : function () {},
 				isKeepAlive : function () {},
 				toString : function () { return "foo"; }
 			},
-			oContextMock = this.mock(oContext);
+			oContextMock = this.mock(oContext),
+			oHelperMock = this.mock(_Helper);
 
+		oHelperMock.expects("isDataAggregation")
+			.withExactArgs(sinon.match.same(oBinding.mParameters))
+			.returns(bAggregation);
+		oContextMock.expects("isAggregated").withExactArgs().exactly(bAggregation ? 1 : 0)
+			.returns(false);
 		oContextMock.expects("getIndex").withExactArgs().returns(undefined);
 		oContextMock.expects("isKeepAlive").withExactArgs().returns(true);
 		oContextMock.expects("isDeleted").withExactArgs().returns(false);
@@ -10211,6 +10251,11 @@ sap.ui.define([
 			oBinding.checkKeepAlive(oContext, false);
 		}, new Error("Not allowed due to pending changes: foo"));
 
+		oHelperMock.expects("isDataAggregation")
+			.withExactArgs(sinon.match.same(oBinding.mParameters))
+			.returns(bAggregation);
+		oContextMock.expects("isAggregated").withExactArgs().exactly(bAggregation ? 1 : 0)
+			.returns(false);
 		oContextMock.expects("getIndex").withExactArgs().returns(undefined);
 		oContextMock.expects("isKeepAlive").withExactArgs().returns(true);
 		oContextMock.expects("isDeleted").withExactArgs().returns(true);
@@ -10218,20 +10263,37 @@ sap.ui.define([
 		// code under test
 		oBinding.checkKeepAlive(oContext, false);
 
+		oHelperMock.expects("isDataAggregation")
+			.withExactArgs(sinon.match.same(oBinding.mParameters))
+			.returns(bAggregation);
+		oContextMock.expects("isAggregated").withExactArgs().exactly(bAggregation ? 1 : 0)
+			.returns(false);
 		oContextMock.expects("getIndex").withExactArgs().returns(undefined);
 		oContextMock.expects("isKeepAlive").withExactArgs().returns(false);
 
 		// code under test
 		oBinding.checkKeepAlive(oContext, false);
 
+		oHelperMock.expects("isDataAggregation")
+			.withExactArgs(sinon.match.same(oBinding.mParameters))
+			.returns(bAggregation);
+		oContextMock.expects("isAggregated").withExactArgs().exactly(bAggregation ? 1 : 0)
+			.returns(false);
 		oContextMock.expects("getIndex").withExactArgs().returns(42);
 
 		// code under test
 		oBinding.checkKeepAlive(oContext, false);
 
+		oHelperMock.expects("isDataAggregation")
+			.withExactArgs(sinon.match.same(oBinding.mParameters))
+			.returns(bAggregation);
+		oContextMock.expects("isAggregated").withExactArgs().exactly(bAggregation ? 1 : 0)
+			.returns(false);
+
 		// code under test
 		oBinding.checkKeepAlive(oContext, true);
 	});
+});
 
 	//*********************************************************************************************
 [false, true].forEach(function (bSuccess) {
@@ -11502,6 +11564,21 @@ sap.ui.define([
 			// code under test
 			oBinding.getKeepAliveContext(sPath);
 		}, new Error(oBinding + ": Not a valid context path: " + sPath));
+	});
+
+	//*********************************************************************************************
+	QUnit.test("getKeepAliveContext: data aggregation", function (assert) {
+		const oBinding = this.bindList("/EMPLOYEES");
+		this.mock(_Helper).expects("isDataAggregation")
+			.withExactArgs(sinon.match.same(oBinding.mParameters))
+			.returns(true);
+		this.mock(Context).expects("create").never();
+		this.mock(oContextPrototype).expects("setKeepAlive").never();
+
+		assert.throws(() => {
+			// code under test
+			oBinding.getKeepAliveContext("/EMPLOYEES('1')");
+		}, new Error("Unsupported $$aggregation at " + oBinding));
 	});
 
 	//*********************************************************************************************

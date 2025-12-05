@@ -1,5 +1,5 @@
 {
-	"_version": "2.0.0",
+	"_version": "2.1.0",
 	"sap.app": {
 		"applicationVersion": {
 			"version": "${version}"
@@ -11,16 +11,7 @@
 			}
 		},
 		"id": "sap.ui.core.sample.odata.types.v4.DateTimeOffset",
-		"type": "application",
-		"title": "Application 'DateTimeOffset'"
-	},
-	"sap.ui": {
-		"technology": "UI5",
-		"deviceTypes": {
-			"desktop": true,
-			"tablet": true,
-			"phone": true
-		}
+		"type": "application"
 	},
 	"sap.ui5": {
 		"config": {
@@ -34,7 +25,7 @@
 			}
 		},
 		"dependencies": {
-			"minUI5Version": "2.0.0",
+			"minUI5Version": "1.136.0",
 			"libs": {
 				"sap.m": {},
 				"sap.ui.core": {},
@@ -48,6 +39,9 @@
 				"type": "sap.ui.model.json.JSONModel"
 			}
 		},
-		"rootView": "sap.ui.core.sample.odata.types.v4.DateTimeOffset.DateTimeOffset"
+		"rootView": {
+			"viewName": "sap.ui.core.sample.odata.types.v4.DateTimeOffset.DateTimeOffset",
+			"type": "XML"
+		}
 	}
 }

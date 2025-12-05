@@ -57,30 +57,15 @@ function(
 ) {
 	"use strict";
 
-
-	// shortcut for sap.m.ListType
-	var ListItemType = library.ListType;
-
-	// shortcut for sap.m.ListGrowingDirection
-	var ListGrowingDirection = library.ListGrowingDirection;
-
-	// shortcut for sap.m.SwipeDirection
-	var SwipeDirection = library.SwipeDirection;
-
-	// shortcut for sap.m.ListSeparators
-	var ListSeparators = library.ListSeparators;
-
-	// shortcut for sap.m.ListMode
-	var ListMode = library.ListMode;
-
-	// shortcut for sap.m.Sticky
-	var Sticky = library.Sticky;
-
-	// shortcut for sap.m.MultiSelectMode
-	var MultiSelectMode = library.MultiSelectMode;
-
-	// shortcut for sap.ui.core.TitleLevel
-	var TitleLevel = coreLibrary.TitleLevel;
+	// shortcut for enums
+	const {
+		ListGrowingDirection,
+		SwipeDirection,
+		ListSeparators,
+		ListMode,
+		Sticky,
+		MultiSelectMode
+	} = library;
 
 	/**
 	 * Constructor for a new ListBase.
@@ -139,7 +124,7 @@ function(
 				 *
 				 * @since 1.117.0
 				 */
-				headerLevel : {type : "sap.ui.core.TitleLevel", group : "Misc", defaultValue : TitleLevel.Auto},
+				headerLevel : {type : "sap.ui.core.TitleLevel", group : "Misc", defaultValue : coreLibrary.TitleLevel.Auto},
 
 				/**
 				 * Defines the footer text that appears in the control.
@@ -263,7 +248,8 @@ function(
 				 * prevent the sticky elements of the control from becoming fixed at the top of the viewport.</li>
 				 * <li>If sticky column headers are enabled in the <code>sap.m.Table</code> control, setting focus on the column headers will let the table scroll to the top.</li>
 				 * <li>A transparent toolbar design is not supported for sticky bars. The toolbar will automatically get an intransparent background color.</li>
-				 * <li>This feature supports only the default height of the toolbar control.</li>
+				 * <li>This feature supports only the default height of the toolbar control and the column headers.</li>
+				 * <li>When sticky group headers are enabled, wrapping in the column headers is not supported.</li>
 				 * </ul>
 				 *
 				 * @since 1.58
@@ -1652,19 +1638,13 @@ function(
 
 	// this gets called from item when item is pressed(enter/tap/click)
 	ListBase.prototype.onItemPress = function(oListItem, oSrcControl) {
-
-		// do not fire press event for inactive type
-		if (oListItem.getType() == ListItemType.Inactive) {
-			return;
-		}
-
 		// fire event async
-		setTimeout(function() {
+		setTimeout(() => {
 			this.fireItemPress({
 				listItem : oListItem,
 				srcControl : oSrcControl
 			});
-		}.bind(this), 0);
+		}, 0);
 	};
 
 	ListBase.prototype.onItemKeyDown = function (oItem, oEvent) {
@@ -3119,4 +3099,5 @@ function(
 	};
 
 	return ListBase;
+
 });

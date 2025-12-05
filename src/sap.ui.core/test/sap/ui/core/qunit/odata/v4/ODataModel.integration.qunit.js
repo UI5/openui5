@@ -22628,6 +22628,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// Selection is hidden, but kept while deleted (JIRA: CPOUI5ODATAV4-2053).
 	// Data binding for selection (JIRA: CPOUI5ODATAV4-1944).
 	// ODLB#getSelectionCount (JIRA: CPOUI5ODATAV4-1945)
+	// Context#setKeepAlive can be called on a suspended binding (JIRA: CPOUI5ODATAV4-2757)
 	QUnit.test("CPOUI5ODATAV4-1638: ODLB: deferred delete w/ isKeepAlive fails", function (assert) {
 		var oBinding,
 			oKeptContext1,
@@ -22675,8 +22676,11 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				});
 
 			oKeptContext1 = oBinding.getCurrentContexts()[0];
+			oBinding.suspend();
+			// code under test (JIRA: CPOUI5ODATAV4-2757)
 			oKeptContext1.setKeepAlive(true);
 			oBinding.sort(new Sorter("GrossAmount"));
+			oBinding.resume();
 
 			return that.waitForChanges(assert, "setKeepAlive and sort");
 		}).then(function () {
@@ -27106,11 +27110,11 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 	//*********************************************************************************************
 	// Scenario: Binding-specific parameter $$aggregation is used; no visual grouping, but single
-	// records where properties are "renamed" using with/as.
+	// entities where properties are "renamed" using with/as.
 	// SNOW: DINC0687517
 	//
 	// If key properties are known, late properties are requested (JIRA: CPOUI5ODATAV4-2756)
-	QUnit.test("Data Aggregation: single records using with/as", async function (assert) {
+	QUnit.test("Data Aggregation: single entity using with/as", async function (assert) {
 		const oModel = this.createAggregationModel({autoExpandSelect : true});
 		const sView = `
 <t:Table id="table" rows="{
@@ -27182,8 +27186,138 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	});
 
 	//*********************************************************************************************
+	// Scenario: Binding-specific parameter $$aggregation is used and single entities are shown on
+	// leaf level. Allow Context#setKeepAlive only on single entity and ensure that properties of a
+	// single entity can be modified independent whether the single entity is currently visible in
+	// the list.
+	// JIRA: CPOUI5ODATAV4-2757
+	[false, true].forEach((bCollapse) => {
+		QUnit.test("Data Aggregation: keep alive single entity, modify Region (node "
+				+ (bCollapse ? "NOT " : "") + "visible in the list)", async function (assert) {
+			const oModel = this.createAggregationModel({autoExpandSelect : true});
+			const sView = `
+	<t:Table id="table" rows="{path : '/BusinessPartners',
+				parameters : {
+					$$aggregation : {
+						aggregate : {
+							SalesAmount : {unit : 'Currency'}
+						},
+						group : {
+							Id : {
+								additionally : ['Name']
+							}
+						},
+						groupLevels : ['Country', 'Id']
+					}
+				}
+			}" threshold="0" visibleRowCount="3">
+		<Text id="country" text="{Country}"/>
+		<Text id="id" text="{Id}"/>
+		<Text id="name" text="{Name}"/>
+		<Text id="salesAmount" text="{SalesAmount}"/>
+		<Text id="currency" text="{Currency}"/>
+	</t:Table>
+	<FlexBox id="details">
+		<Text id="detailId" text="{Id}"/>
+		<Text id="region" text="{Region}"/>
+	</FlexBox>`;
+
+			this.expectRequest("BusinessPartners?$apply=groupby((Country))&$count=true"
+					+ "&$skip=0&$top=3", {
+					"@odata.count" : "26",
+					value : [
+							{Country : "A"},
+							{Country : "B"},
+							{Country : "C"}
+						]
+				})
+				.expectChange("country", ["A", "B", "C"])
+				.expectChange("id", [null, null, null])
+				.expectChange("name", [null, null, null])
+				.expectChange("salesAmount", [null, null, null])
+				.expectChange("currency", [null, null, null])
+				.expectChange("detailId")
+				.expectChange("region");
+
+			await this.createView(assert, sView, oModel);
+
+			const oListBinding = this.oView.byId("table").getBinding("rows");
+			const oContextA = oListBinding.getCurrentContexts()[0];
+			assert.throws(() => {
+				// code under test
+				oContextA.setKeepAlive(true);
+			}, new Error("Unsupported on aggregated data: /BusinessPartners(Country='A')[0]"));
+
+			this.expectRequest("BusinessPartners?"
+					+ "$apply=filter(Country eq 'A')/groupby((Id,Name),aggregate(SalesAmount,Currency))"
+					+ "&$count=true&$skip=0&$top=3", {
+					"@odata.count" : "2",
+					value : [
+							{Id : 26, Name : "Foo", Currency : "EUR", SalesAmount : "60"},
+							{Id : 25, Name : "Bar", Currency : "EUR", SalesAmount : "40"}
+						]
+				})
+				.expectChange("country", [, "A", "A"])
+				.expectChange("id", [, "26", "25"])
+				.expectChange("name", [, "Foo", "Bar"])
+				.expectChange("salesAmount", [, "60", "40"])
+				.expectChange("currency", [, "EUR", "EUR"]);
+
+			await Promise.all([
+				oContextA.expand(),
+				this.waitForChanges(assert, "expand Country 'A'")
+			]);
+
+			this.expectChange("detailId", "26")
+				.expectRequest("BusinessPartners(26)?$select=Region", {Region : "Late"})
+				.expectChange("region", "Late");
+
+			const oContext26 = oListBinding.getCurrentContexts()[1];
+			this.oView.byId("details").setBindingContext(oContext26);
+
+			await this.waitForChanges(assert, "show details for Id 26");
+
+			// code under test
+			oContext26.setKeepAlive(true);
+
+			assert.strictEqual(oContext26.isKeepAlive(), true);
+
+			assert.throws(() => {
+				// code under test
+				oListBinding.getKeepAliveContext("/BusinessPartners(24)");
+			}, new Error("Unsupported $$aggregation at " + oListBinding));
+
+			if (bCollapse) {
+				this.expectChange("country", [, "B", "C"])
+					.expectChange("id", [, null, null])
+					.expectChange("name", [, null, null])
+					.expectChange("salesAmount", [, null, null])
+					.expectChange("currency", [, null, null]);
+					// detailId and region remain unchanged
+
+				await Promise.all([
+					oContextA.collapse(),
+					this.waitForChanges(assert, "collapse Country 'A'")
+				]);
+
+				assert.strictEqual(oContext26.oBinding, oListBinding, "context not destroyed");
+				assert.strictEqual(oContext26.getProperty("Name"), "Foo", "data still available");
+			}
+
+			this.expectChange("region", "Modified")
+				.expectRequest("PATCH BusinessPartners(26)", {
+					payload : {Region : "Modified"}
+				}, oNO_CONTENT);
+
+			oContext26.setProperty("Region", "Modified");
+
+			await this.waitForChanges(assert, "modify Region of Id 26");
+		});
+	});
+
+	//*********************************************************************************************
 	// Scenario: Binding-specific parameter $$aggregation is used; no visual grouping, but single
-	// records with additional min/max: late properties are requested.
+	// entities with additional min/max: late properties are requested.
 	// JIRA: CPOUI5ODATAV4-3209
 	QUnit.test("Data Aggregation: late properties with min/max", async function (assert) {
 		const oModel = this.createAggregationModel({autoExpandSelect : true});
@@ -52114,6 +52248,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				.expectChange("price", []);
 
 			return this.createView(assert, sView, oModel).then(function () {
+				that.bIgnoreOrder4GET = true; // avoid flaky test (JIRA: CPOUI5ODATAV4-3251)
 				that.expectRequest("Artists(ArtistID='42',IsActiveEntity=true)/_Publication"
 						+ "?$select=Price,PublicationID&$skip=0&$top=100", {
 						value : [{
@@ -58145,6 +58280,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 </FlexBox>',
 			that = this;
 
+		this.bIgnoreOrder4GET = true; // avoid flaky test (JIRA: CPOUI5ODATAV4-3251)
 		this.expectRequest("ProductList(\'HT-1000\')?sap-client=123"
 			+ "&$select=ProductID,WeightMeasure,WeightUnit", {
 				"@odata.etag" : "ETag",
@@ -58330,6 +58466,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 </FlexBox>',
 			that = this;
 
+		this.bIgnoreOrder4GET = true; // avoid flaky test (JIRA: CPOUI5ODATAV4-3251)
 		this.expectRequest("ProductList(\'HT-1000\')?sap-client=123"
 			+ "&$select=CurrencyCode,Price,ProductID", {
 				"@odata.etag" : "ETag",
@@ -68291,6 +68428,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				oObjectPage = that.oView.byId("objectPage");
 				oOldRoot = fnCreateContext(oModel);
 
+				that.bIgnoreOrder4GET = true; // avoid flaky test (JIRA: CPOUI5ODATAV4-3251)
 				that.expectRequest("TEAMS('42')/TEAM_2_EMPLOYEES?$select=AGE,ID&$skip=0&$top=100", {
 						value : [{
 							AGE : 31,
@@ -69108,6 +69246,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			.expectChange("lastUsedChannel");
 
 		return this.createView(assert, sView, oModel).then(function () {
+			that.bIgnoreOrder4GET = true; // avoid flaky test (JIRA: CPOUI5ODATAV4-3251)
 			that.expectRequest("Artists?$select=ArtistID,IsActiveEntity,Name,defaultChannel"
 					+ "&$skip=0&$top=2", {
 					value : [{
@@ -69456,6 +69595,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			.expectChange("friend");
 
 		return this.createView(assert, sView, oModel).then(function () {
+			that.bIgnoreOrder4GET = true; // avoid flaky test (JIRA: CPOUI5ODATAV4-3251)
 			that.expectRequest("#1 Artists?$select=ArtistID,IsActiveEntity,Name"
 					+ "&$expand=BestFriend($select=ArtistID,IsActiveEntity,Name)&$skip=0&$top=1", {
 					value : [{
