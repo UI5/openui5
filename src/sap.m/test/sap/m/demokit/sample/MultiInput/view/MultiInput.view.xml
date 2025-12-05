@@ -16,12 +16,13 @@
 				path: '/ProductCollection',
 				sorter: { path: 'Name' }
 			}"
+			placeholder="Products..."
 			showValueHelp="false">
 			<core:Item key="{ProductId}" text="{Name}" />
 		</MultiInput>
-		<Label text="MultiInput with pre-selected tokens" labelFor="multiInput1"/>
+		<Label text="MultiInput with pre-selected tokens" labelFor="multiInput1" placeholder="Type something and press enter to create token..."/>
 		<MultiInput id="multiInput1" showSuggestion="false" width="70%" showValueHelp="false"/>
-		<Label text="MultiInput with single long token" labelFor="multiInput2"/>
+		<Label text="MultiInput with single long token" labelFor="multiInput2" placeholder="Single long token.."/>
 		<MultiInput id="multiInput2" showSuggestion="false" width="300px" showValueHelp="false" />
 	</l:VerticalLayout>
 </mvc:View>

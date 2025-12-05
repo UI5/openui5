@@ -290,9 +290,17 @@ tr.sapMListTblHeaderNone > .sapMTableTH {
 	top: ~"calc(var(--sapElement_LineHeight) + 2rem)";
 }
 
+.sapMSticky12 .sapMGHLI {
+	top: ~"calc(var(--sapElement_LineHeight) + 2px)";
+}
+
 .sapMSticky13 .sapMGHLI {
 	z-index: 3;
-	top: ~"calc(var(--sapElement_LineHeight) * 2)";
+	top: ~"calc(var(--sapElement_LineHeight) * 2 + 2px)";
+}
+
+.sapMSticky14 .sapMGHLI {
+	top: ~"calc(var(--sapElement_LineHeight) + 2rem + 2px)";
 }
 
 /* busyIndicator should not block the toolbars if <table> is set busy */
@@ -302,7 +310,12 @@ tr.sapMListTblHeaderNone > .sapMTableTH {
 
 .sapMSticky15 .sapMGHLI {
 	z-index: 3;
-	top:  ~"calc(var(--sapElement_LineHeight) * 2 + 2rem)";
+	/* sapMListHdrTBar + sapMTB + sapMListTblRow + 2px */
+	top:  ~"calc(var(--sapElement_LineHeight) + 2rem + var(--sapElement_LineHeight) + 2px)";
+}
+
+.sapMSticky15:has(.sapMPluginsColumnAIAction) .sapMGHLI {
+	top: ~"calc(var(--sapElement_LineHeight) + 2rem + ( 0.875rem + 1rem + 1.625rem))";
 }
 
 .sapUiSizeCompact {
@@ -326,31 +339,21 @@ tr.sapMListTblHeaderNone > .sapMTableTH {
 
 	& .sapMSticky13 .sapMGHLI {
 		top:  ~"calc(var(--sapElement_LineHeight) + 1.95rem)";
-
-		/* only first child needs 2px more which prevents (tiny) double borders through stacking the following groupHeaders */
-		&:first-child {
-			top: ~"calc(var(--sapElement_LineHeight) + 1.95rem + 0.125rem )";
-		}
 	}
 
 	& .sapMSticky14 .sapMGHLI {
 		top:  ~"calc(var(--sapElement_LineHeight) + 1.25rem)";
-
-		/* only first child needs 1px more which prevents (tiny) double borders through stacking the following groupHeaders */
-		&:first-child {
-			top: ~"calc(var(--sapElement_LineHeight) + 1.25rem + 0.0625rem)" ;
-		}
 	}
 
 	& .sapMSticky15 .sapMGHLI {
-		top: ~"calc(var(--sapElement_LineHeight) * 2 + 1.2rem)";
+		top: ~"calc(var(--sapElement_LineHeight) * 2 + 1.2rem + 1px)";
+	}
 
-		/* only first child needs 2px more which prevents (tiny) double borders through stacking the following groupHeaders */
-		&:first-child {
-			top:  ~"calc(var(--sapElement_LineHeight) * 2 + 1.2rem + 0.125rem)";
-		}
+	& .sapMSticky15:has(.sapMPluginsColumnAIAction) .sapMGHLI {
+		top: ~"calc(var(--sapElement_LineHeight) + 2rem + ( 0.5rem + 0.5rem + 1.625rem))";
 	}
 }
+
 
 /* define outline for the block layer */
 .sapMListTblCnt > .sapMTableOverlay:focus {

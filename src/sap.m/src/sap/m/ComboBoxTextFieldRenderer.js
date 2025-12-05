@@ -66,6 +66,7 @@ sap.ui.define([
 	ComboBoxTextFieldRenderer.writeIcons = function (oRm, aIcons) {
 		oRm.openStart("div")
 			.attr("aria-hidden", "true")
+			.attr("tabindex", "-1")
 			.class("sapMInputBaseIconContainer")
 			.openEnd();
 		aIcons.forEach(oRm.renderControl, oRm);

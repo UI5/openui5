@@ -785,7 +785,6 @@ sap.ui.require(["sap/m/Wizard", "sap/m/WizardStep", "sap/m/MessageToast",
 			var oDialog = new Dialog({
 				id: "wiz-page-dialog",
 				contentHeight: "50%",
-				contentWidth: "100%",
 				verticalScrolling: false,
 				beginButton: new Button({
 					id: "dialog-next-step-button",

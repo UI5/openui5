@@ -152,7 +152,14 @@ sap.ui.define([
 		},
 
 		onShowDetails : function (oEvent) {
-			this.byId("details").setBindingContext(oEvent.getSource().getBindingContext());
+			const oDetails = this.byId("details");
+			oDetails.getBindingContext()?.setKeepAlive(false);
+
+			const oContext = oEvent.getSource().getBindingContext();
+			oContext.setKeepAlive(true, (oVictim = oContext) => {
+				MessageBox.alert("Unexpected #destroy of " + oVictim);
+			});
+			oDetails.setBindingContext(oContext);
 		},
 
 		onShowSelection : function () {

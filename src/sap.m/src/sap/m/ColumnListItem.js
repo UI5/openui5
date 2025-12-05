@@ -280,7 +280,7 @@ sap.ui.define([
 
 	ColumnListItem.prototype.getContentAnnouncementOfRowAction = function() {
 		// Only if the item is inactive, to announce empty row action cell
-		if (this.getType() === ListItemType.Inactive) {
+		if (this.getEffectiveType() === ListItemType.Inactive) {
 			return ListItemBase.getAccessibilityText(null, true);
 		}
 	};
@@ -370,7 +370,7 @@ sap.ui.define([
 			sEventHandler = this.getMode() == "Delete" ? "onsapdelete" : "onsapspace";
 		} else if (sTargetId == this.getId() + "-TypeCell") {
 			oEvent.target = this.getDomRef();
-			if (this.getType() == "Navigation") {
+			if (this.getEffectiveType() == "Navigation") {
 				sEventHandler = "onsapenter";
 			} else {
 				oEvent.code = "KeyE";
@@ -414,7 +414,7 @@ sap.ui.define([
 			return false;
 		}
 
-		var sType = this.getType();
+		const sType = this.getEffectiveType();
 		return sType === ListItemType.Navigation ? true : sType.startsWith(ListItemType.Detail) && this._getMaxActionsCount() === -1;
 	};
 

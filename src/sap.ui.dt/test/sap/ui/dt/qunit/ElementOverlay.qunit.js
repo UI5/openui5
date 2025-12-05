@@ -404,10 +404,12 @@ sap.ui.define([
 		});
 
 		QUnit.test("when the overlay is focusable and is focused", function(assert) {
+			const oOverlayFocusSpy = sandbox.spy(this.oElementOverlay.getDomRef(), "focus");
 			this.oElementOverlay.setFocusable(true);
 			assert.ok(this.oElementOverlay.isFocusable(), "then the control knows it is focusable");
 			this.oElementOverlay.focus();
 			assert.ok(this.oElementOverlay.hasFocus(), "then the state of the overlay is 'focused'");
+			assert.ok(oOverlayFocusSpy.calledWith({ preventScroll: true }), "then the focus method is called with 'preventScroll: true'");
 		});
 
 		QUnit.test("when ignore for the aggregation is not defined, then...", function(assert) {

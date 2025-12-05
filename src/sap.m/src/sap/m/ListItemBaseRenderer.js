@@ -255,8 +255,8 @@ ListItemBaseRenderer.getAriaDescribedBy = function(oLI) {
 		return "";
 	}
 
-	var aDescribedBy = [],
-		sType = oLI.getType();
+	const aDescribedBy = [];
+	const sType = oLI.getEffectiveType();
 
 	if (oLI.getListProperty("showUnread") && oLI.getUnread()) {
 		aDescribedBy.push(this.getAriaAnnouncement("unread"));
@@ -426,7 +426,7 @@ ListItemBaseRenderer.renderContentLatter = function(rm, oLI) {
 		if (iMaxActionsCount > 0) {
 			this.renderActions(rm, oLI);
 		}
-		if (oLI.getType() === ListItemType.Navigation) {
+		if (oLI.getEffectiveType() === ListItemType.Navigation) {
 			this.renderType(rm, oLI);
 		}
 	}
@@ -497,8 +497,9 @@ ListItemBaseRenderer.render = function(rm, oLI) {
 	rm.class("sapMLIB");
 	rm.class("sapMLIB-CTX");
 	rm.class("sapMLIBShowSeparator");
-	if (oLI._getMaxActionsCount() === -1 || !oLI.getType().startsWith("Detail")) {
-		rm.class("sapMLIBType" + oLI.getType());
+	const sType = oLI.getEffectiveType();
+	if (oLI._getMaxActionsCount() === -1 || !sType.startsWith("Detail")) {
+		rm.class("sapMLIBType" + sType);
 	}
 
 	if (oLI.isActionable(true)) {

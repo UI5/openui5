@@ -93,6 +93,12 @@ sap.ui.define([
 		}
 	};
 
+	ListItemAction.prototype.isEffective = function() {
+		// Navigation actions do not have any visual representation in the item actions area
+		// They are used to make the list item behave as if its type property were set to Navigation
+		return this.getType() !== ListItemActionType.Navigation;
+	};
+
 	ListItemAction.prototype.setType = function(sType) {
 		this.setProperty("type", sType);
 		if (this._oAction) {
