@@ -367,4 +367,9 @@ sap.ui.define([
 
 		Measurement.setActive(true); // Delete existing categories by activating measurements without specifing category
 	});
+
+	QUnit.test("setActive(false) - must not fail if not yet activecorrect function context", function(assert) {
+		Measurement.setActive(false);
+		assert.ok(Measurement.getActive() === false, "Measurement is inactive");
+	});
 });

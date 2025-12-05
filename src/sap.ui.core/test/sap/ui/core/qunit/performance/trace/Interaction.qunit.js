@@ -9,6 +9,8 @@ sap.ui.define([
 ], function(Interaction, XMLView, FESRHelper, Press, Button, nextUIUpdate) {
 	"use strict";
 
+	QUnit.config.reorder = false;
+
 	// performance is hijacked by sinon's fakeTimers (https://github.com/sinonjs/fake-timers/issues/374)
 	// and might be out of sync with the latest specs and APIs. Therefore, mock them further,
 	// so they won't affect tests.
@@ -16,12 +18,9 @@ sap.ui.define([
 	// *Note:* Call this method after sinon.useFakeTimers(); as for example performance.timeOrigin is read only
 	// in its nature and cannot be modified otherwise.
 	function mockPerformanceObject () {
-		const timeOrigin = performance.timeOrigin;
+		const oPerformance = globalThis.performance;
 		const clock = sinon.useFakeTimers();
-		performance.getEntriesByType = function() {
-			return [];
-		};
-		performance.timeOrigin = timeOrigin;
+		globalThis.performance = oPerformance;
 		return clock;
 	}
 
