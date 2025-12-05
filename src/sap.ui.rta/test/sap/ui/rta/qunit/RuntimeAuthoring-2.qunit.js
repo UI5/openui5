@@ -866,7 +866,11 @@ sap.ui.define([
 				assert.strictEqual(this.oRta._oToolbarControlsModel.getProperty("/changesNeedHardReload"), true, "then the flag is set");
 
 				this.oRta.attachEventOnce("undoRedoStackModified", () => {
-					assert.strictEqual(this.oRta._oToolbarControlsModel.getProperty("/changesNeedHardReload"), true, "then the flag is set");
+					assert.strictEqual(
+						this.oRta._oToolbarControlsModel.getProperty("/changesNeedHardReload"),
+						true,
+						"then the flag is set"
+					);
 					done();
 				});
 				await this.oRta.stop(false, true, true);
@@ -888,6 +892,7 @@ sap.ui.define([
 			await this.oRta.start();
 
 			sandbox.stub(this.oRta, "canSave").returns(true);
+			sandbox.stub(VersionsAPI, "isDraftAvailable").returns(true);
 			const oEnableRestartStub = sandbox.stub(RuntimeAuthoring, "enableRestart");
 			const oReloadStub = sandbox.stub(ReloadManager, "reloadPage");
 			const oSaveStub = sandbox.stub(this.oRta, "save").resolves();
@@ -923,6 +928,35 @@ sap.ui.define([
 			assert.strictEqual(oReloadStub.callCount, 1, "the reloadPage function was called again");
 			assert.strictEqual(oStopStub.callCount, 2, "the stop function was called again");
 			assert.strictEqual(oLoadDraftStub.callCount, 1, "the loadDraftForApplication function was not called again");
+		});
+
+		QUnit.test("when saveAndReload is triggered via the toolbar after a version was activated (= no draft available)", async function(assert) {
+			await this.oRta.start();
+
+			sandbox.stub(this.oRta, "canSave").returns(false);
+			sandbox.stub(VersionsAPI, "isDraftAvailable").returns(false);
+			const oEnableRestartStub = sandbox.stub(RuntimeAuthoring, "enableRestart");
+			const oReloadStub = sandbox.stub(ReloadManager, "reloadPage");
+			const oSaveStub = sandbox.stub(this.oRta, "save").resolves();
+			const oStopStub = sandbox.stub(this.oRta, "stop").resolves();
+			const oLoadVersionForApplicationStub = sandbox.stub(VersionsAPI, "loadVersionForApplication").resolves();
+
+			this.oRta._oVersionsModel.setProperty("/versioningEnabled", true);
+			this.oRta._oVersionsModel.setProperty("/displayedVersion", "myVersion");
+			this.oRta.getToolbar().fireSaveAndReload();
+			await waitForSaveAndReloadEventHandler(oReloadStub);
+			assert.strictEqual(oSaveStub.callCount, 1, "the save function was called once");
+			assert.strictEqual(oEnableRestartStub.callCount, 1, "the enableRestart function was called once");
+			assert.strictEqual(oReloadStub.callCount, 1, "the reloadPage function was called once");
+			assert.strictEqual(oStopStub.callCount, 1, "the stop function was called once");
+			assert.ok(
+				oLoadVersionForApplicationStub.calledOnceWith({
+					control: oComp,
+					layer: Layer.CUSTOMER,
+					version: "myVersion"
+				}),
+				"the loadVersionForApplication function was called with the displayed version"
+			);
 		});
 	});
 
