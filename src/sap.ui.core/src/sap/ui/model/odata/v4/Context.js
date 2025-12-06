@@ -1249,13 +1249,13 @@ sap.ui.define([
 	};
 
 	/**
-	 * Tells whether this context represents aggregated data, as opposed to a single entity
+	 * Indicates whether this context represents aggregated data rather than a single entity
 	 * instance. This method returns <code>true</code> only in case of data aggregation (but not for
 	 * a recursive hierarchy) and not for non-expandable nodes (so-called leaves; see
 	 * {@link #isExpanded}) if all of the entity type's key properties are available as groups. For
 	 * a list binding's
 	 * {@link sap.ui.model.odata.v4.ODataListBinding#getHeaderContext header context}, the returned
-	 * value is the same as for every leaf.
+	 * value matches that of every leaf.
 	 *
 	 * @returns {boolean} Whether this context represents aggregated data
 	 * @throws {Error} If this context's root binding is suspended
@@ -2339,7 +2339,7 @@ sap.ui.define([
 	 *       parameter (see {@link sap.ui.model.odata.v4.ODataModel#bindList}),
 	 *     <li> the list binding uses or inherits the <code>$$sharedRequest</code> parameter
 	 *       (see {@link sap.ui.model.odata.v4.ODataModel#bindList}),
-	 *     <li> the list binding uses data aggregation, but no recursive hierarchy (see
+	 *     <li> the list binding uses data aggregation but no recursive hierarchy (see
 	 *       {@link sap.ui.model.odata.v4.ODataListBinding#setAggregation}), and either the
 	 *       context's root binding is suspended or this context does not represent a single entity
 	 *       (see {@link #isAggregated}),

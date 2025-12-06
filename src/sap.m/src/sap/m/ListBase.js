@@ -59,6 +59,7 @@ function(
 
 	// shortcut for enums
 	const {
+		ListType: ListItemType,
 		ListGrowingDirection,
 		SwipeDirection,
 		ListSeparators,
@@ -1638,6 +1639,11 @@ function(
 
 	// this gets called from item when item is pressed(enter/tap/click)
 	ListBase.prototype.onItemPress = function(oListItem, oSrcControl) {
+		// do not fire press event for inactive type
+		if (oListItem.getEffectiveType() === ListItemType.Inactive) {
+			return;
+		}
+
 		// fire event async
 		setTimeout(() => {
 			this.fireItemPress({

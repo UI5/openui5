@@ -8,7 +8,10 @@ sap.ui.define([
 
 	// initial structure of designTime object
 	const oDesignTime = {
-		name: "{name}",
+		name: {
+			singular: "TABLE_NAME",
+			plural: "TABLE_NAME_PLURAL"
+		},
 		description: "{description}",
 		actions: {
 			settings: {

@@ -8,6 +8,10 @@ sap.ui.define([],
 	"use strict";
 
 	return {
+		name: {
+			singular: "TABLE_NAME",
+			plural: "TABLE_NAME_PLURAL"
+		},
 		aggregations: {
 			columns: {
 				domRef: ".sapUiTableCHA"

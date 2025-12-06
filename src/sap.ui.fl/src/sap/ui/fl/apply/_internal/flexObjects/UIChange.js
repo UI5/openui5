@@ -323,6 +323,8 @@ sap.ui.define([
 	 * @param {object} [mAdditionalSelectorInformation] - Additional mapped data which is added to the selector
 	 *
 	 * @throws {Exception} oException If <code>sAlias</code> already exists
+	 * @private
+	 * @ui5-restricted sap.ui.fl, Change handlers
 	 */
 	UIChange.prototype.addDependentControl = function(vControl, sAlias, mPropertyBag, mAdditionalSelectorInformation) {
 		if (!vControl) {
@@ -369,6 +371,8 @@ sap.ui.define([
 	 * @param {Node} mPropertyBag.view - For XML processing: XML node of the view
 	 *
 	 * @returns {array|object} Dependent selector list in <code>selectorPropertyName:selectorPropertyValue</code> format, or the selector saved under the alias
+	 * @private
+	 * @ui5-restricted sap.ui.fl, Change handlers
 	 */
 	UIChange.prototype.getDependentControl = function(sAlias, mPropertyBag) {
 		var aDependentControls = [];

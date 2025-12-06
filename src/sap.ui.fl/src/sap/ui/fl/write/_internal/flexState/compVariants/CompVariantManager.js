@@ -198,13 +198,12 @@ sap.ui.define([
 		}
 	}
 
-	function revertVariantUpdate(oVariant, mPropertyBag) {
-		oVariant.storeExecuteOnSelection(mPropertyBag.executeOnSelection);
-		oVariant.storeFavorite(mPropertyBag.favorite);
-		oVariant.storeContexts(mPropertyBag.contexts);
-		oVariant.storeName(mPropertyBag.name);
-		oVariant.storeContent(mPropertyBag.content || oVariant.getContent());
-		return oVariant;
+	function revertVariantUpdate(oVariant, oRevertDataContent) {
+		oVariant.storeExecuteOnSelection(oRevertDataContent.previousExecuteOnSelection);
+		oVariant.storeFavorite(oRevertDataContent.previousFavorite);
+		oVariant.storeContexts(oRevertDataContent.previousContexts);
+		oVariant.storeName(oRevertDataContent.previousName);
+		oVariant.storeContent(oRevertDataContent.previousContent || oVariant.getContent());
 	}
 
 	function revertVariantChange(oVariant, mPropertyBag) {
@@ -217,23 +216,15 @@ sap.ui.define([
 	}
 
 	function revertAllVariantUpdate(oVariant) {
-		if (oVariant && oVariant.getRevertData().length) {
-			let oRevertDataContent;
-			oVariant.getRevertData().reverse().some((oRevertData) => {
-				oRevertDataContent = oRevertData.getContent();
-				return oRevertDataContent.previousAction === CompVariantManager.updateActionType.SAVE;
+		if (oVariant?.getRevertData().length) {
+			let oRevertData;
+			oVariant.getRevertData().reverse().some((oCurrentRevertData) => {
+				oRevertData = oCurrentRevertData;
+				return oCurrentRevertData.getContent().previousAction === CompVariantManager.updateActionType.SAVE;
 			});
-			revertVariantUpdate(
-				oVariant,
-				{
-					name: oRevertDataContent.previousName,
-					content: oRevertDataContent.previousContent,
-					favorite: oRevertDataContent.previousFavorite,
-					executeOnSelection: oRevertDataContent.previousExecuteOnSelection,
-					contexts: oRevertDataContent.previousContexts
-				}
-			);
-			oVariant.setState(oRevertDataContent.previousState);
+			revertVariantUpdate(oVariant, oRevertData.getContent());
+			FlexState.removeDirtyFlexObjects(oVariant.getFlexObjectMetadata().reference, [oRevertData.getChange()]);
+			oVariant.setState(oRevertData.getContent().previousState);
 		}
 	}
 
@@ -350,7 +341,7 @@ sap.ui.define([
 	};
 
 	/**
-	 * Adds a new variant for a smart variant management, such as filter bar or table, and returns the ID of the new variant.
+	 * Adds a new variant for a smart variant management, such as filter bar or table, and returns it.
 	 *
 	 * @param {object} mPropertyBag - Object with parameters as properties
 	 * @param {string} mPropertyBag.reference - Flex reference of the application
@@ -389,13 +380,13 @@ sap.ui.define([
 		oChangeSpecificData.texts = getTexts(oChangeSpecificData);
 		setAuthor(oChangeSpecificData);
 		const oFileContent = { ...oChangeSpecificData, ...(_omit(mPropertyBag, "changeSpecificData")) };
-		const oFlexObject = FlexObjectFactory.createCompVariant(oFileContent);
-		FlexState.addDirtyFlexObjects(mPropertyBag.reference, [oFlexObject]);
+		const oCompVariantInstance = FlexObjectFactory.createCompVariant(oFileContent);
+		FlexState.addDirtyFlexObjects(mPropertyBag.reference, [oCompVariantInstance]);
 		if (oChangeSpecificData.layer !== Layer.USER && oChangeSpecificData.layer !== Layer.PUBLIC) {
 			mPropertyBag.id = mPropertyBag.control.getCurrentVariantId();
 			revertAllVariantUpdate(CompVariantManagementState.getVariant(mPropertyBag));
 		}
-		return oFlexObject;
+		return oCompVariantInstance;
 	};
 
 	/**
@@ -702,17 +693,7 @@ sap.ui.define([
 
 		switch (oVariantRevertData.getType()) {
 			case CompVariantManager.operationType.ContentUpdate:
-				revertVariantUpdate(
-					oVariant,
-					{
-						name: oRevertDataContent.previousName,
-						content: oRevertDataContent.previousContent,
-						favorite: oRevertDataContent.previousFavorite,
-						executeOnSelection: oRevertDataContent.previousExecuteOnSelection,
-						contexts: oRevertDataContent.previousContexts,
-						..._pick(mPropertyBag, ["reference", "persistencyKey", "id"])
-					}
-				);
+				revertVariantUpdate(oVariant, oRevertDataContent);
 				break;
 			case CompVariantManager.operationType.NewChange:
 				oChange = oVariantRevertData.getChange();

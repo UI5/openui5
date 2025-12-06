@@ -11,6 +11,10 @@ sap.ui.define([
 	"use strict";
 
 	return {
+		name: {
+			singular: "TABLE_NAME",
+			plural: "TABLE_NAME_PLURAL"
+		},
 		domRef: function(oTable) {
 			const vRowMode = oTable.getRowMode();
 			let bIsTableInAutoMode = false;

@@ -2574,8 +2574,14 @@ sap.ui.define([
 
 		oMenuButton.attachBeforeMenuOpen(() => {
 			const aContexts = this.getSelectedContexts();
-			// Node needs to be expanded to collapse it and vice versa
-			const bShowNodeOption = aContexts.length === 1 && fnIsExpanded(this, aContexts[0]) === !bIsExpand;
+			let bShowNodeOption;
+			if (bIsExpand) {
+				bShowNodeOption = aContexts.length === 1 && fnIsExpanded(this, aContexts[0]) !== undefined;
+				// Expand node is enabled unless it is a leaf node
+			} else {
+				bShowNodeOption = aContexts.length === 1 && fnIsExpanded(this, aContexts[0]) === true;
+				// Collapse node is enabled if the node is expanded
+			}
 
 			oMenuButton.getMenu().getItems()[0].setEnabled(fnTree !== undefined);
 			oMenuButton.getMenu().getItems()[1].setEnabled(bShowNodeOption);

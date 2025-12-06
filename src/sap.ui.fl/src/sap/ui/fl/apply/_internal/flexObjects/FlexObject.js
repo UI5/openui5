@@ -39,6 +39,7 @@ sap.ui.define([
 	 * @property {string} packageName - ABAP package name
 	 * @property {string} moduleName - Name of the module which this flex object refers to (XML or JS)
 	 * @private
+	 * @ui5-restricted sap.ui.fl, Change handlers
 	 */
 
 	/**
@@ -58,6 +59,7 @@ sap.ui.define([
 	 * @property {string} oDataInformation - Object with information about the OData service
 	 * @property {string} originalLanguage - Language in which the flex object was created
 	 * @private
+	 * @ui5-restricted sap.ui.fl, Change handlers
 	 */
 
 	/**
@@ -69,7 +71,7 @@ sap.ui.define([
 	 * @since 1.100
 	 * @version ${version}
 	 * @private
-	 * @ui5-restricted sap.ui.fl
+	 * @ui5-restricted sap.ui.fl, Change handlers
 	 */
 	var FlexObject = ManagedObject.extend("sap.ui.fl.apply._internal.flexObjects.FlexObject", /* @lends sap.ui.fl.apply._internal.flexObjects.FlexObject.prototype */ {
 		metadata: {
@@ -310,6 +312,8 @@ sap.ui.define([
 	/**
 	 * Getter for the namespace from the FlexObjectMetadata.
 	 * @returns {string} Namespace
+	 * @private
+	 * @ui5-restricted sap.ui.fl, Change handlers
 	 */
 	FlexObject.prototype.getNamespace = function() {
 		return this.getFlexObjectMetadata().namespace;
@@ -318,6 +322,8 @@ sap.ui.define([
 	/**
 	 * Getter for the change type from the FlexObjectMetadata.
 	 * @returns {string} Change type
+	 * @private
+	 * @ui5-restricted sap.ui.fl, Change handlers
 	 */
 	FlexObject.prototype.getChangeType = function() {
 		return this.getFlexObjectMetadata().changeType;
@@ -326,6 +332,8 @@ sap.ui.define([
 	/**
 	 * Returns <code>true</code> if the flex object is user dependent.
 	 * @returns {boolean} <code>true</code> if the flex object is only relevant for the current user
+	 * @private
+	 * @ui5-restricted sap.ui.fl, Change handlers
 	 */
 	FlexObject.prototype.isUserDependent = function() {
 		return this.getLayer() === Layer.USER;
@@ -335,6 +343,8 @@ sap.ui.define([
 	 * Returns the text in the current language for a given ID.
 	 * @param {string} sTextId - Text ID which was used as part of the <code>texts</code> property
 	 * @returns {string} The text for the given text ID
+	 * @private
+	 * @ui5-restricted sap.ui.fl, Change handlers
 	 */
 	FlexObject.prototype.getText = function(sTextId) {
 		var oText = this.getTexts()[sTextId] || {};

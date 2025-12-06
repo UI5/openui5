@@ -33,9 +33,8 @@ sap.ui.define([
 ) {
 	"use strict";
 
-	// TODO: Move to initial and make dependencies to apply lazy
 	/**
-	 * @namespace sap.ui.fl.apply._internal.preprocessors.ComponentLifecycleHooks
+	 * @namespace sap.ui.fl.initial._internal.preprocessors.ComponentLifecycleHooks
 	 * @since 1.114
 	 * @author SAP SE
 	 *

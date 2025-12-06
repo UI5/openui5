@@ -525,9 +525,13 @@ sap.ui.define([
 	/**
 	 * Called when the <code>Avatar</code> is selected.
 	 *
+	 * @param {jQuery.Event} oEvent The tap/click event object
 	 * @private
 	 */
-	Avatar.prototype.ontap = function () {
+	Avatar.prototype.ontap = function (oEvent) {
+		if (oEvent && this.getDetailBox()) {
+			oEvent.stopPropagation();
+		}
 		this._handlePress();
 	};
 

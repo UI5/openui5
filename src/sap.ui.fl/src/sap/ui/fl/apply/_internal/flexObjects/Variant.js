@@ -111,6 +111,8 @@ sap.ui.define([
 	/**
 	 * Retrieves the variant name from the <code>texts</code> FlexObject property
 	 * @returns {string} Variant name
+	 * @private
+	 * @ui5-restricted sap.ui.fl
 	 */
 	Variant.prototype.getName = function() {
 		return this.getText("variantName");
