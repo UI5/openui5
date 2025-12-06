@@ -779,7 +779,7 @@ sap.ui.define([
 	 	 * @private
 	 	 */
 		ComboBoxBase.prototype._closePicker = function () {
-			if (this.isOpen()) {
+			if (this.isOpen() && !this.hasLoadItemsEventListeners()) {
 				this.close();
 			}
 		};

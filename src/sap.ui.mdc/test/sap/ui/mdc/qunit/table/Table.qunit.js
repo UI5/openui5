@@ -4739,10 +4739,10 @@ sap.ui.define([
 		this.oTable._oCollapseAllButton.fireBeforeMenuOpen(); // simulate beforeMenuOpen event
 		assert.ok(this.oTable._oCollapseAllButton.getMenu().getItems()[1].getEnabled(), "Collapse Node option is enabled");
 
-		// One Row Selected, but node is not correct expansion state => Node option should be disabled
+		// One Row Selected and the node is expanded => Node option should be enabled (we don't check whether the whole subtree is expanded)
 		this.bIsNodeExpanded = true;
 		this.oTable._oExpandAllButton.fireBeforeMenuOpen(); // simulate beforeMenuOpen event
-		assert.notOk(this.oTable._oExpandAllButton.getMenu().getItems()[1].getEnabled(), "Expand Node option is not enabled");
+		assert.ok(this.oTable._oExpandAllButton.getMenu().getItems()[1].getEnabled(), "Expand Node option is enabled");
 
 		this.bIsNodeExpanded = false;
 		this.oTable._oCollapseAllButton.fireBeforeMenuOpen(); // simulate beforeMenuOpen event

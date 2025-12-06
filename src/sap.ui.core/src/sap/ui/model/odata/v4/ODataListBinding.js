@@ -3209,7 +3209,7 @@ sap.ui.define([
 	 *     <li> the binding is part of a {@link #create deep create} because it is relative to a
 	 *       {@link sap.ui.model.odata.v4.Context#isTransient transient} context,
 	 *     <li> {@link sap.ui.model.odata.v4.Context#setKeepAlive} fails, or
-	 *     <li> data aggregation, but no recursive hierarchy (see {@link #setAggregation}) is used.
+	 *     <li> data aggregation but no recursive hierarchy (see {@link #setAggregation}) is used.
 	 *   </ul>
 	 *
 	 * @public

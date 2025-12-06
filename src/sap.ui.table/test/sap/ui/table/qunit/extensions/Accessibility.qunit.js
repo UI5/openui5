@@ -1653,6 +1653,35 @@ sap.ui.define([
 		assert.strictEqual(oDomRef.querySelector("th:not([id])").getAttribute("role"), "presentation", "role");
 	});
 
+	QUnit.test("ARIA attributes of Column header row", async function(assert) {
+		oTable.setRowActionTemplate(TableQUnitUtils.createRowAction(null));
+		oTable.setRowActionCount(1);
+		await nextUIUpdate();
+
+		const sTableId = oTable.getId();
+
+		function getExpectedAriaOwnsForColumnHeaderRow() {
+			const aAriaOwns = [sTableId + "-rowcolhdr"];
+			for (let i = 0; i < 5; i++) {
+				aAriaOwns.push(oTable.getColumns()[i].getId());
+			}
+			aAriaOwns.push(sTableId + "-rowacthdr");
+			return aAriaOwns.join(" ");
+		}
+
+		// fixed part
+		let $Elem = document.getElementsByClassName("sapUiTableHeaderRow")[0];
+		assert.strictEqual($Elem.getAttribute("role"), "row", "fixed part role");
+		assert.strictEqual($Elem.getAttribute("aria-hidden"), "true", "fixed part aria-hidden");
+		assert.notOk($Elem.getAttribute("aria-owns"), "aria-owns is not set for the fixed part of the column header row");
+
+		// scrollable part
+		$Elem = document.getElementsByClassName("sapUiTableHeaderRow")[1];
+		assert.strictEqual($Elem.getAttribute("role"), "row", "scrollable part role");
+		assert.notOk($Elem.getAttribute("aria-hidden"), "aria-hidden is not set for the scrollable part of the column header row");
+		assert.strictEqual($Elem.getAttribute("aria-owns"), getExpectedAriaOwnsForColumnHeaderRow(), "scrollable part aria-owns");
+	});
+
 	QUnit.test("ARIA attributes of TR elements", async function(assert) {
 		oTable.setRowActionTemplate(TableQUnitUtils.createRowAction(null));
 		oTable.setRowActionCount(1);
@@ -1672,6 +1701,7 @@ sap.ui.define([
 		}
 
 		assert.strictEqual($Elem.attr("aria-owns"), undefined, "aria-owns is not set for the fixed part of the row");
+		assert.strictEqual($Elem.attr("aria-hidden"), "true", "fixed part aria-hidden");
 		checkAriaSelected($Elem.attr("aria-selected"), true, assert);
 		$Elem = getCell(0, 1, false, assert).parent();
 		assert.strictEqual($Elem.attr("role"), "row", "role");

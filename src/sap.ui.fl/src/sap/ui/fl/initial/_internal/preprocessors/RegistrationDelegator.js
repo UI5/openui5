@@ -8,7 +8,7 @@ sap.ui.define([
 	"sap/ui/core/mvc/XMLView",
 	"sap/ui/core/ComponentHooks",
 	"sap/ui/core/ExtensionPoint",
-	"sap/ui/fl/apply/_internal/preprocessors/ComponentLifecycleHooks",
+	"sap/ui/fl/initial/_internal/preprocessors/ComponentLifecycleHooks",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/base/DesignTime",
 	// the lower 2 are set as a callback in the "register...Processors" which are not detected as dependencies from the preload-building
@@ -29,7 +29,7 @@ sap.ui.define([
 	 * This module registers everything needed for the app to start,
 	 * without flex changes being involved yet.
 	 *
-	 * @name sap.ui.fl.apply._internal.preprocessors.RegistrationDelegator
+	 * @name sap.ui.fl.initial._internal.preprocessors.RegistrationDelegator
 	 * @class
 	 * @constructor
 	 * @author SAP SE

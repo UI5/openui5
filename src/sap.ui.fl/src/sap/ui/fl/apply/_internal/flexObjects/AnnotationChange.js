@@ -61,6 +61,8 @@ sap.ui.define([
 	/**
 	 * Returns either the 'annotationText' text or the value in the content
 	 * @returns {string} The value of the annotation
+	 * @private
+	 * @ui5-restricted sap.ui.fl, Change handlers
 	 */
 	AnnotationChange.prototype.getValue = function() {
 		return this.getText("annotationText") ? this.getText("annotationText") : this.getContent().value;

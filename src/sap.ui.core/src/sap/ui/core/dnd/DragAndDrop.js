@@ -8,8 +8,9 @@ sap.ui.define([
 	"sap/ui/core/Element",
 	"sap/ui/core/StaticArea",
 	"../UIArea",
+	"sap/ui/core/Popup",
 	"sap/ui/thirdparty/jquery"
-], function(lib, Localization, Device, Element, StaticArea, UIArea, jQuery) {
+], function(lib, Localization, Device, Element, StaticArea, UIArea, Popup, jQuery) {
 	"use strict";
 
 	var RelativeDropPosition = lib.dnd.RelativeDropPosition;
@@ -499,6 +500,7 @@ sap.ui.define([
 			$Indicator.attr("data-drop-layout", sDropLayout);
 			$Indicator.attr("data-drop-position", sDropPosition);
 			$Indicator.css(Object.assign(mStyle, mIndicatorConfig));
+			$Indicator.css("z-index", Math.max(Popup.getNextZIndex() + 1, 99)); // ensure indicator is always on top
 			$Indicator.show();
 			mLastIndicatorStyle = mStyle;
 		}

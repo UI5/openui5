@@ -10,8 +10,9 @@ sap.ui.define([
 	"sap/ui/core/UIArea",
 	"sap/ui/Device",
 	"sap/ui/test/utils/nextUIUpdate",
-	"sap/ui/qunit/QUnitUtils"
-], function(Localization, DragAndDrop, DragInfo, DropInfo, DragDropInfo, jQuery, Control, UIArea, Device, nextUIUpdate, qutils) {
+	"sap/ui/qunit/QUnitUtils",
+	"sap/ui/core/Popup"
+], function(Localization, DragAndDrop, DragInfo, DropInfo, DragDropInfo, jQuery, Control, UIArea, Device, nextUIUpdate, qutils, Popup) {
 	"use strict";
 
 	var DivControl = Control.extend("sap.ui.core.dnd.test.DivControl", {
@@ -472,6 +473,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Indicator position with dropLayout property", function(assert) {
+		const popupStub = sinon.stub(Popup, "getNextZIndex").returns(1234);
 		var oEvent, $Indicator, mIndicatorOffset, mTargetOffset;
 		var oDiv1 = this.oControl.getTopItems()[0];
 		var oDiv2 = this.oControl.getTopItems()[1];
@@ -506,6 +508,7 @@ sap.ui.define([
 		assert.strictEqual($Indicator.width(), oDiv2.$().width() , "Indicator's width is equal to dropped item's width.");
 		assert.strictEqual(mIndicatorOffset.top, mTargetOffset.top , "Indicator's top position is equal to dropped item's top position.");
 		assert.strictEqual(mIndicatorOffset.left, mTargetOffset.left , "Indicator's left position is equal to dropped item's left position.");
+		assert.strictEqual($Indicator.css("z-index"), "1235", "Indicator's z-index is one more than the current highest z-index.");
 
 		// act for bottom indicator
 		oEvent = createjQueryDragEventDummy("dragover", oDiv2);
@@ -569,6 +572,7 @@ sap.ui.define([
 		oDiv2.$().trigger("dragend");
 		assert.ok($Indicator.is(":hidden"), "Indicator is hidden after dragend");
 		oLocalizationStub.restore();
+		popupStub.restore();
 	});
 
 	QUnit.test("preventDefault on dragover event", function(assert) {

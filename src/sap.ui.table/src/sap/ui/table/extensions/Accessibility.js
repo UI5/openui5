@@ -880,6 +880,7 @@ sap.ui.define([
 		getAriaAttributesForColumnHeaderRow: function(oExtension, mParams) {
 			const mAttributes = {"role": "row"};
 			if (mParams.fixedCol) {
+				mAttributes["aria-hidden"] = "true";
 				return mAttributes;
 			}
 			const oTable = oExtension.getTable();
@@ -976,6 +977,7 @@ sap.ui.define([
 			}
 
 			if (mParams.fixedCol) {
+				mAttributes["aria-hidden"] = "true";
 				return mAttributes;
 			}
 

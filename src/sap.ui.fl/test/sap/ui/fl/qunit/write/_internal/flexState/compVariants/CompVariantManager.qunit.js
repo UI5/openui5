@@ -55,6 +55,7 @@ sap.ui.define([
 		},
 		afterEach() {
 			FlexState.clearState(sComponentId);
+			FlexState.clearRuntimeSteadyObjects(sComponentId, sComponentId);
 			sandbox.restore();
 		}
 	}, function() {
@@ -250,6 +251,7 @@ sap.ui.define([
 			sandbox.stub(Utils, "createDefaultFileName").returns("someFileName");
 			var mPropertyBag = {
 				reference: sComponentId,
+				componentId: sComponentId,
 				persistencyKey: sPersistencyKey,
 				changeSpecificData: {
 					content: {},
@@ -286,10 +288,11 @@ sap.ui.define([
 		});
 
 		QUnit.test("two variants as CUSTOMER and first variant don't save content of second but keep his own", function(assert) {
-			var sPersistencyKey = "persistency.key";
+			const sPersistencyKey = "persistency.key";
 			sandbox.stub(Settings.getInstanceOrUndef(), "getUserId").returns("currentUser");
-			var mPropertyBag = {
+			const mPropertyBag = {
 				reference: sComponentId,
+				componentId: sComponentId,
 				persistencyKey: sPersistencyKey,
 				changeSpecificData: {
 					content: {},
@@ -304,7 +307,7 @@ sap.ui.define([
 				}
 			};
 
-			var oAddedObject = CompVariantManager.addVariant(mPropertyBag);
+			const oAddedObject = CompVariantManager.addVariant(mPropertyBag);
 			let aCompVariants = CompVariantManagementState.assembleVariantList(mPropertyBag);
 			assert.strictEqual(aCompVariants.length, 2, "then one entity was stored including the standard variant");
 			assert.strictEqual(aCompVariants[0], oAddedObject, "which is the returned entity");
@@ -339,7 +342,7 @@ sap.ui.define([
 				reference: sComponentId,
 				persistencyKey: sPersistencyKey
 			});
-			var mPropertyBagSecond = {
+			const mPropertyBagSecond = {
 				reference: sComponentId,
 				persistencyKey: sPersistencyKey,
 				changeSpecificData: {
@@ -354,14 +357,81 @@ sap.ui.define([
 					}
 				}
 			};
-			var oAddedObjectSecond = CompVariantManager.addVariant(mPropertyBagSecond);
+			const oFlexObjectDataSelector = FlexState.getFlexObjectsDataSelector();
+			assert.strictEqual(oFlexObjectDataSelector.get({ reference: sComponentId }).length, 2, "initially there are 2 flex objects");
 
+			const oAddedObjectSecond = CompVariantManager.addVariant(mPropertyBagSecond);
+
+			assert.strictEqual(oFlexObjectDataSelector.get({ reference: sComponentId }).length, 3, "afterwards there are 3 flex objects");
 			aCompVariants = CompVariantManagementState.assembleVariantList(mPropertyBag);
 			assert.strictEqual(aCompVariants.length, 3, "then another entity was stored");
 			assert.strictEqual(aCompVariants[1], oAddedObjectSecond, "which is the returned entity");
 			assert.deepEqual(aCompVariants[1].getContent(), { filter: "second update" }, "content of second variant is correct");
 			assert.strictEqual(aCompVariants[0].getRevertData().length, 3, "first variant contain correct number of revert data");
 			assert.deepEqual(aCompVariants[0].getContent(), { filter: "first update" }, "content of first variant is correct");
+		});
+
+		QUnit.test("one VENDOR variant and an update in the CUSTOMER layer", function(assert) {
+			const sPersistencyKey = "persistency.key";
+			sandbox.stub(Settings.getInstanceOrUndef(), "getUserId").returns("currentUser");
+			const oVendorView = CompVariantManager.addVariant({
+				reference: sComponentId,
+				componentId: sComponentId,
+				content: { filter: "initial content" },
+				persistencyKey: sPersistencyKey,
+				changeSpecificData: {
+					content: {},
+					isVariant: true,
+					type: "filterVariant"
+				},
+				layer: Layer.VENDOR,
+				control: {
+					getCurrentVariantId() {
+						return "";
+					}
+				}
+			});
+			CompVariantManager.updateVariant({
+				action: CompVariantManager.updateActionType.UPDATE,
+				id: oVendorView.getVariantId(),
+				layer: Layer.CUSTOMER,
+				content: {
+					filter: "first update"
+				},
+				reference: sComponentId,
+				persistencyKey: sPersistencyKey
+			});
+			const oFlexObjectDataSelector = FlexState.getFlexObjectsDataSelector();
+			// one view and one update change
+			assert.strictEqual(oFlexObjectDataSelector.get({ reference: sComponentId }).length, 2, "initially there are 2 flex objects");
+
+			const oCustomerView = CompVariantManager.addVariant({
+				reference: sComponentId,
+				persistencyKey: sPersistencyKey,
+				changeSpecificData: {
+					content: { filter: "second update" },
+					isVariant: true,
+					type: "filterVariant"
+				},
+				layer: Layer.CUSTOMER,
+				control: {
+					getCurrentVariantId() {
+						return oVendorView.getVariantId();
+					}
+				}
+			});
+			// only two views left, the update change was deleted
+			assert.strictEqual(oFlexObjectDataSelector.get({ reference: sComponentId }).length, 2, "there are still 2 flex objects");
+			const aCompVariants = CompVariantManagementState.assembleVariantList({
+				reference: sComponentId,
+				persistencyKey: sPersistencyKey,
+				componentId: sComponentId
+			});
+			assert.strictEqual(aCompVariants.length, 3, "then another entity was stored");
+			assert.strictEqual(aCompVariants[1], oCustomerView, "which is the returned entity");
+			assert.deepEqual(aCompVariants[1].getContent(), { filter: "second update" }, "content of second variant is correct");
+			assert.strictEqual(aCompVariants[0].getRevertData().length, 1, "first variant contain correct number of revert data");
+			assert.deepEqual(aCompVariants[0].getContent(), { filter: "initial content" }, "content of first variant is correct");
 		});
 	});
 
@@ -497,6 +567,7 @@ sap.ui.define([
 
 			await CompVariantManagementState.assembleVariantList({
 				reference: sComponentId,
+				componentId: sComponentId,
 				persistencyKey: sPersistencyKey
 			});
 

@@ -1137,10 +1137,8 @@ function(
 			}, 0);
 		}
 
-		// let the parent know that an active item is pressed
-		if (this.getEffectiveType() !== ListItemType.Inactive) {
-			oList.onItemPress(this, oEvent.srcControl);
-		}
+		// let the parent know item is pressed
+		oList.onItemPress(this, oEvent.srcControl);
 	};
 
 	ListItemBase.prototype.onsapdelete = function(oEvent) {
