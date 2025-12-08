@@ -375,6 +375,30 @@ sap.ui.define([
 		});
 	});
 
+	// SNOW: CS20250011089825
+	// In OData V4 scenarios the Contexts own getIndex function is preferred to determine the index of the context in the binding
+	QUnit.test("modifySelection - prefer Context.getIndex() if available", function(assert) {
+		_init(false, "Table", "Multi");
+		var oContentPromise = oMdcTableWrapper.getContent();
+
+		sinon.spy(oMdcTableWrapper, "_handleSelectionChange");
+		sinon.spy(oMdcTableWrapper, "_fireSelect");
+
+		return oContentPromise.then(function (oContent) {
+			return oMdcTableWrapper._retrievePromise("listBinding").then(function () {
+				var oTableHelper = oMdcTableWrapper._oTableHelper;
+				var oFirstItem = oTableHelper.getItems.apply(oMdcTableWrapper)[0];
+				var oFirstItemContext = oFirstItem.getBindingContext();
+				oFirstItemContext.getIndex = function () { return 0; };
+				sinon.spy(oFirstItemContext, "getIndex");
+				oMdcTableWrapper._oTableHelper.modifySelection.call(oMdcTableWrapper, oFirstItem, true);
+				assert.ok(oFirstItemContext.getIndex.calledOnce, "getIndex called on context");
+				oFirstItemContext.getIndex.restore();
+				delete oFirstItemContext.getIndex;
+			});
+		});
+	});
+
 	QUnit.test("handleSelectionChange - noop", function(assert) {
 		_init(false, "Table", "Single");
 		var oContentPromise = oMdcTableWrapper.getContent();
