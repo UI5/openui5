@@ -1937,5 +1937,40 @@
         "text": " sap.m.DatePicker: close picker on context change"
       }
     ]
+  },
+  "1.108.47": {
+    "date": "December 2025",
+    "notes": [
+      {
+        "id": "55faf7ade1eac7c8aae5dbc38be4476537cd2ce0",
+        "type": "FIX",
+        "text": " We now trigger a fetch call to load PDF content and determine PDF availability in the PDFViewer"
+      },
+      {
+        "id": "e9867eb15b7890c5f50d9cb26239f6a18c42763d",
+        "type": "FIX",
+        "text": " sap.m.DateTimePicker: fix test about timezone failing in safari"
+      },
+      {
+        "id": "18fcca252a785d5ba3e969f0ffee6f83d1bb7b21",
+        "type": "FIX",
+        "text": " We've now removed the iframe content check while loading a PDF to display it"
+      },
+      {
+        "id": "6334a6ed5e4372777fb3c872ced7e25a1d345e1f",
+        "type": "FIX",
+        "text": " We've now removed the iframe content check while loading a PDF to display it"
+      },
+      {
+        "id": "5f0690e2bfa87e928e01a9b9b7179abab2599bbc",
+        "type": "FIX",
+        "text": " sap.m.DatePicker: has correct placeholder"
+      },
+      {
+        "id": "c6856f2fb6ac625b9aa034cbaee1548e8515ddeb",
+        "type": "FIX",
+        "text": " sap.m.ComboBox: Picker now closes on table scroll"
+      }
+    ]
   }
 }

@@ -305,5 +305,15 @@
         "text": " sap.f.DynamicPage: Header visibility issue fixed"
       }
     ]
+  },
+  "1.108.47": {
+    "date": "December 2025",
+    "notes": [
+      {
+        "id": "12b909b77eece136a3e5cd0e784dbd23d68aca7d",
+        "type": "FIX",
+        "text": " sap.f.DynamicPageTitle: Fix flaky focus test in Safari"
+      }
+    ]
   }
 }

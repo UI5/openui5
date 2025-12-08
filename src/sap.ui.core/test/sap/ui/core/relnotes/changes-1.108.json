@@ -767,5 +767,15 @@
         "text": " sap.ui.model.json.JSONPropertyBinding.js#checkUpdate: Fix logic to determine whether an update of the DataState has to be done"
       }
     ]
+  },
+  "1.108.47": {
+    "date": "December 2025",
+    "notes": [
+      {
+        "id": "9cb679b5497268009517a7b33d7a62f893d7873d",
+        "type": "FIX",
+        "text": " sap/ui/thirdparty: bump RequireJS to 2.3.7"
+      }
+    ]
   }
 }

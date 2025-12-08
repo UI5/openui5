@@ -344,5 +344,15 @@
         "text": " sap.ui.unified.calendar.Month: Improve day re-rendering peformance"
       }
     ]
+  },
+  "1.108.47": {
+    "date": "December 2025",
+    "notes": [
+      {
+        "id": "a80b1e901dc0b13e99db4b46faa34867201e6603",
+        "type": "FIX",
+        "text": " sap.ui.unified.Calendar: fixed weekday announcement in multi-month setup"
+      }
+    ]
   }
 }
