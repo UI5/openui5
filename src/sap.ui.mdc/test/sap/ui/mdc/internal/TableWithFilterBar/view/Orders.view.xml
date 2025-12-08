@@ -47,7 +47,9 @@
 				delegate='\{"name": "sap/ui/v4demo/delegate/Orders.FB.delegate", "payload": \{"collectionName": "Orders"\} \}'
 				search="onSearch"
 				p13nMode="Item,Value"
-				filtersChanged="onFiltersChanged">
+				filtersChanged="onFiltersChanged"
+				adaptFiltersText="All Filters"
+				adaptFiltersTextNonZero="All Filters (\{0\})">
 				<mdc:dependents>
 
 					<mdc:ValueHelp id="FH1"

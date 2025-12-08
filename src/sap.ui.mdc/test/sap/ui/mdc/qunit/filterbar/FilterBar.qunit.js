@@ -1,5 +1,4 @@
 /* global QUnit, sinon*/
-
 /*eslint max-nested-callbacks: [2, 5]*/
 
 sap.ui.define([
@@ -20,7 +19,8 @@ sap.ui.define([
 	"sap/ui/qunit/utils/nextUIUpdate",
 	"test-resources/sap/m/qunit/p13n/TestModificationHandler",
 	"sap/ui/mdc/enums/ConditionValidated",
-	"sap/ui/mdc/enums/OperatorName"
+	"sap/ui/mdc/enums/OperatorName",
+	"sap/ui/core/Lib"
 ], function(
 	FBTestDelegate,
 	Localization,
@@ -39,7 +39,8 @@ sap.ui.define([
 	nextUIUpdate,
 	TestModificationHandler,
 	ConditionValidated,
-	OperatorName
+	OperatorName,
+	Library
 ) {
 	"use strict";
 
@@ -49,6 +50,8 @@ sap.ui.define([
 	let oFilterBar;
 	const HasPopup = CoreLibrary.aria.HasPopup;
 	const ValueState = CoreLibrary.ValueState;
+
+	const oRB = Library.getResourceBundleFor("sap.ui.mdc");
 
 	QUnit.module("FilterBar", {
 		beforeEach: function() {
@@ -123,6 +126,124 @@ sap.ui.define([
 		assert.ok(!oButton.getVisible());
 	});
 
+	QUnit.test("modifiable Adapt Filters button", function(assert) {
+		const sText = "All Filters";
+
+		const oCustomFilterBar = new FilterBar({
+			delegate: { name: "test-resources/sap/ui/mdc/qunit/filterbar/UnitTestMetadataDelegate", payload: { modelName: undefined, collectionName: "test" } },
+			adaptFiltersText: sText,
+			adaptFiltersTextNonZero: `${sText} (\\{0\\})`,
+			p13nMode: ["Item", "Value"]
+		});
+
+		return oCustomFilterBar.initializedWithMetadata().then(function() {
+			sinon.stub(oCustomFilterBar, "_stringifyConditions").returns([Condition.createCondition(OperatorName.EQ, ["foo"])]);
+
+			const oButton = oCustomFilterBar._btnAdapt;
+			assert.ok(oButton, "Adapt Filters Button exists");
+			assert.ok(oButton.getVisible(), "Button is visible");
+			assert.equal(oButton.getText(), sText, "Text is correct");
+
+			// Simulate "filter" event by stubbing handleAssignedFilterNames call
+			const fnStub = sinon.stub(oCustomFilterBar, "getAssignedFilterNames");
+			fnStub.returns(["Test1"]);
+			oCustomFilterBar._handleAssignedFilterNames(false);
+
+			assert.equal(oButton.getText(), `${sText} (1)`, "Text is correct");
+
+			oCustomFilterBar.destroy();
+			fnStub.restore();
+		});
+	});
+
+	QUnit.test("Adapt Filters button text is set to default when neither adaptFiltersText or adaptFiltersTextNonZero are set", function(assert) {
+		const sText = oRB.getText("filterbar.ADAPT");
+		const sTextNonZero = oRB.getText("filterbar.ADAPT_NONZERO", [1]);
+
+		const oCustomFilterBar = new FilterBar({
+			delegate: { name: "test-resources/sap/ui/mdc/qunit/filterbar/UnitTestMetadataDelegate", payload: { modelName: undefined, collectionName: "test" } },
+			p13nMode: ["Item", "Value"]
+		});
+
+		return oCustomFilterBar.initializedWithMetadata().then(function() {
+			sinon.stub(oCustomFilterBar, "_stringifyConditions").returns([Condition.createCondition(OperatorName.EQ, ["foo"])]);
+
+			const oButton = oCustomFilterBar._btnAdapt;
+			assert.ok(oButton, "Adapt Filters Button exists");
+			assert.ok(oButton.getVisible(), "Button is visible");
+			assert.equal(oButton.getText(), sText, "Text is correct");
+
+			// Simulate "filter" event by stubbing handleAssignedFilterNames call
+			const fnStub = sinon.stub(oCustomFilterBar, "getAssignedFilterNames");
+			fnStub.returns(["Test1"]);
+			oCustomFilterBar._handleAssignedFilterNames(false);
+
+			assert.equal(oButton.getText(), sTextNonZero, "Text is correct");
+
+			oCustomFilterBar.destroy();
+			fnStub.restore();
+		});
+	});
+
+	QUnit.test("Adapt Filters button text is set to default when only adaptFiltersText property is set", function(assert) {
+		const sText = oRB.getText("filterbar.ADAPT");
+		const sTextNonZero = oRB.getText("filterbar.ADAPT_NONZERO", [1]);
+
+		const oCustomFilterBar = new FilterBar({
+			delegate: { name: "test-resources/sap/ui/mdc/qunit/filterbar/UnitTestMetadataDelegate", payload: { modelName: undefined, collectionName: "test" } },
+			adaptFiltersText: "All Filters",
+			p13nMode: ["Item", "Value"]
+		});
+
+		return oCustomFilterBar.initializedWithMetadata().then(function() {
+			sinon.stub(oCustomFilterBar, "_stringifyConditions").returns([Condition.createCondition(OperatorName.EQ, ["foo"])]);
+
+			const oButton = oCustomFilterBar._btnAdapt;
+			assert.ok(oButton, "Adapt Filters Button exists");
+			assert.ok(oButton.getVisible(), "Button is visible");
+			assert.equal(oButton.getText(), sText, "Text is correct");
+
+			// Simulate "filter" event by stubbing handleAssignedFilterNames call
+			const fnStub = sinon.stub(oCustomFilterBar, "getAssignedFilterNames");
+			fnStub.returns(["Test1"]);
+			oCustomFilterBar._handleAssignedFilterNames(false);
+
+			assert.equal(oButton.getText(), sTextNonZero, "Text is correct");
+
+			oCustomFilterBar.destroy();
+			fnStub.restore();
+		});
+	});
+
+	QUnit.test("Adapt Filters button text is set to default when only adaptFiltersTextNonZero property is set", function(assert) {
+		const sText = oRB.getText("filterbar.ADAPT");
+		const sTextNonZero = oRB.getText("filterbar.ADAPT_NONZERO", [1]);
+
+		const oCustomFilterBar = new FilterBar({
+			delegate: { name: "test-resources/sap/ui/mdc/qunit/filterbar/UnitTestMetadataDelegate", payload: { modelName: undefined, collectionName: "test" } },
+			adaptFiltersTextNonZero: "All Filters",
+			p13nMode: ["Item", "Value"]
+		});
+
+		return oCustomFilterBar.initializedWithMetadata().then(function() {
+			sinon.stub(oCustomFilterBar, "_stringifyConditions").returns([Condition.createCondition(OperatorName.EQ, ["foo"])]);
+
+			const oButton = oCustomFilterBar._btnAdapt;
+			assert.ok(oButton, "Adapt Filters Button exists");
+			assert.ok(oButton.getVisible(), "Button is visible");
+			assert.equal(oButton.getText(), sText, "Text is correct");
+
+			// Simulate "filter" event by stubbing handleAssignedFilterNames call
+			const fnStub = sinon.stub(oCustomFilterBar, "getAssignedFilterNames");
+			fnStub.returns(["Test1"]);
+			oCustomFilterBar._handleAssignedFilterNames(false);
+
+			assert.equal(oButton.getText(), sTextNonZero, "Text is correct");
+
+			oCustomFilterBar.destroy();
+			fnStub.restore();
+		});
+	});
 
 	QUnit.test("check liveMode property", function(assert) {
 		const oButton = oFilterBar._btnSearch;

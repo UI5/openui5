@@ -43,6 +43,12 @@ sap.ui.define([
 			},
 			p13nMode: {
 				ignore: false
+			},
+			adaptFiltersText: {
+				ignore: true
+			},
+			adaptFiltersTextNonZero: {
+				ignore: true
 			}
 		}
 	};
