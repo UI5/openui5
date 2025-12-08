@@ -617,6 +617,14 @@ sap.ui.define([
 			assert.strictEqual(sStringifiedData, '\\{"key2":2\\}', "returns json value stringified and escaped");
 		});
 
+		QUnit.test("setProperty for properties of type object with values containing backslashes", function (assert) {
+			const oControl = XmlTreeModifier._byId(ID_OF_CONTROL_WITH_PROP_TYPE_OBJECT, this.oXmlView);
+			XmlTreeModifier.setProperty(oControl, "value", { key2 : "foo\\bar" });
+
+			const sStringifiedData = oControl.getAttribute("value");
+			assert.strictEqual(sStringifiedData, '\\{"key2":"foo\\\\\\\\bar"\\}', "returns json value stringified and escaped");
+		});
+
 		QUnit.test("setProperty for properties of type array", function (assert) {
 			var oControl = XmlTreeModifier._byId(ID_OF_CONTROL_WITH_PROP_TYPE_OBJECT, this.oXmlView);
 			XmlTreeModifier.setProperty(oControl, "value", [{ key2 : 2}]);

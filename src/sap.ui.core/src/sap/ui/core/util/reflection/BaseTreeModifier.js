@@ -408,7 +408,7 @@ sap.ui.define([
 		},
 
 		_escapeCurlyBracketsInString: function (vPropertyValue) {
-			return typeof vPropertyValue === "string" ? vPropertyValue.replace(/({|})/g, "\\$&") : vPropertyValue;
+			return typeof vPropertyValue === "string" ? vPropertyValue.replace(/([\\\{\}])/g, "\\$1") : vPropertyValue;
 		},
 
 		_templateFragment: function(sFragmentName, mPreprocessorSettings) {
