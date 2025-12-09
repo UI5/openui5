@@ -98,10 +98,7 @@ sap.ui.define(function() {
 			},
 
 			ODataV2ListBinding: {
-				title: "sap.ui.model.odata.v2.ODataListBinding - QUnit tests",
-				qunit : {
-					version : 2
-				}
+				title: "sap.ui.model.odata.v2.ODataListBinding - QUnit tests"
 			},
 
 			ODataV2ListBinding_Paging: {
@@ -118,10 +115,7 @@ sap.ui.define(function() {
 			},
 
 			ODataV2Model: {
-				title: "sap.ui.model.odata.v2.ODataModel - Sinon QUnit tests",
-				qunit : {
-					version : 2
-				}
+				title: "sap.ui.model.odata.v2.ODataModel - Sinon QUnit tests"
 			},
 
 			ODataV2TreeBinding: {
@@ -134,17 +128,11 @@ sap.ui.define(function() {
 
 			ODataV2TreeBindingFlat_MockSrv: {
 				title: "sap.ui.model.odata.ODataTreeBindingFlat - MockServer based QUnit tests",
-				qunit : {
-					version : 2
-				},
 				sinon: 1 // because MockServer is used which has a hard dependency to sinon V1
 			},
 
 			ODataV2TreeBindingFlat_FakeSrv: {
-				title: "sap.ui.model.odata.ODataTreeBindingFlat - Fake service QUnit tests",
-				qunit : {
-					version : 2
-				}
+				title: "sap.ui.model.odata.ODataTreeBindingFlat - Fake service QUnit tests"
 			},
 
 			V2ODataModel: {

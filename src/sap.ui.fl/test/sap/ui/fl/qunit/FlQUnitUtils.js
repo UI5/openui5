@@ -121,5 +121,22 @@ sap.ui.define([
 		});
 	};
 
+	/**
+	 * Stubs the FlexObjectsSelector to return the given flex objects in addition to the ones already present.
+	 *
+	 * @param {object} sandbox - Sinon or sandbox instance
+	 * @param {sap.ui.fl.apply._internal.flexObjects.FlexObject[]} aFlexObjects - Flex objects that should be returned by the FlexObjectSelector
+	 * @returns {object} The created stub
+	 */
+	FlQUnitUtils.stubFlexObjectsSelector = function(sandbox, aFlexObjects) {
+		const oFlexObjectsSelector = FlexState.getFlexObjectsDataSelector();
+		const oGetFlexObjectsStub = sandbox.stub(oFlexObjectsSelector, "get");
+		oGetFlexObjectsStub.callsFake(function(...aArgs) {
+			return aFlexObjects.concat(oGetFlexObjectsStub.wrappedMethod.apply(this, aArgs));
+		});
+		oFlexObjectsSelector.checkUpdate();
+		return oGetFlexObjectsStub;
+	};
+
 	return FlQUnitUtils;
 });

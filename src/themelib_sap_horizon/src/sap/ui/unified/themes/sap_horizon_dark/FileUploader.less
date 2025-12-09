@@ -5,7 +5,7 @@
 
 .sapUiFup,
 .sapUiFup.sapMBarChild {
-	height: 2.75rem;
+	height: var(--sapElement_Height);
 }
 
 .sapUiSizeCompact {
@@ -13,6 +13,14 @@
 	.sapUiFup,
 	.sapUiFup.sapMBarChild {
 		height: 2rem;
+	}
+
+	.sapUiFup .sapMInputBaseContentWrapper {
+		height: var(--sapElement_Compact_Height);
+
+		.sapMBtn {
+			height: var(--sapElement_Compact_Height);
+		}
 	}
 }
 

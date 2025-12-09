@@ -3,7 +3,6 @@
 sap.ui.define([
 	"sap/ui/core/Control",
 	"sap/ui/fl/apply/_internal/flexState/FlexObjectState",
-	"sap/ui/fl/apply/_internal/flexState/FlexState",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/initial/_internal/FlexInfoSession",
 	"sap/ui/fl/initial/api/Version",
@@ -19,7 +18,6 @@ sap.ui.define([
 ], function(
 	Control,
 	FlexObjectState,
-	FlexState,
 	ManifestUtils,
 	FlexInfoSession,
 	Version,
@@ -400,7 +398,6 @@ sap.ui.define([
 				}
 			];
 			sandbox.stub(Storage.versions, "load").resolves(aReturnedBackendVersions);
-			const oClearStub = sandbox.stub(FlexState, "clearState");
 
 			return Versions.initialize(mPropertyBag)
 			.then(function(oVersionsModel) {
@@ -410,7 +407,6 @@ sap.ui.define([
 			}.bind(this))
 			.then(VersionsAPI.loadVersionForApplication.bind(undefined, mPropertyBag))
 			.then(function() {
-				assert.strictEqual(oClearStub.callCount, 1, "and cleared");
 				const oInfoSession = FlexInfoSession.getByReference(sReference);
 				assert.strictEqual(
 					oInfoSession.displayedAdaptationId, "id_5678",
@@ -451,7 +447,6 @@ sap.ui.define([
 				}
 			];
 			sandbox.stub(Storage.versions, "load").resolves(aReturnedBackendVersions);
-			const oClearStub = sandbox.stub(FlexState, "clearState").resolves([]);
 
 			return Versions.initialize(mPropertyBag)
 			.then(function(oVersionsModel) {
@@ -461,7 +456,6 @@ sap.ui.define([
 			}.bind(this))
 			.then(VersionsAPI.loadVersionForApplication.bind(undefined, mPropertyBag))
 			.then(function() {
-				assert.strictEqual(oClearStub.callCount, 1, "and cleared");
 				const oInfoSession = FlexInfoSession.getByReference(sReference);
 				assert.strictEqual(oInfoSession.displayedAdaptationId, "id_5678", "and set displayedAdaptationId");
 				assert.strictEqual(oInfoSession.version, sActiveVersion, "and active version is set by version model");
@@ -498,7 +492,6 @@ sap.ui.define([
 			];
 
 			sandbox.stub(Storage.versions, "load").resolves(aReturnedBackendVersions);
-			const oClearStub = sandbox.stub(FlexState, "clearState");
 
 			return Versions.initialize(mPropertyBag)
 			.then(function(oVersionsModel) {
@@ -515,7 +508,6 @@ sap.ui.define([
 			}.bind(this))
 			.then(VersionsAPI.loadVersionForApplication.bind(undefined, mPropertyBag))
 			.then(function() {
-				assert.strictEqual(oClearStub.callCount, 1, "and cleared");
 				const oInfoSession = FlexInfoSession.getByReference(sReference);
 				assert.strictEqual(oInfoSession.version, Version.Number.Draft, "and passing the version number accordingly");
 				assert.strictEqual(this.oVersionsModel.getProperty("/displayedVersion"), Version.Number.Draft, "and displayed version is draft");
@@ -540,12 +532,8 @@ sap.ui.define([
 				setProperty() {}
 			});
 
-			const aReturnedVersions = [];
-			const oClearStub = sandbox.stub(FlexState, "clearState").resolves(aReturnedVersions);
-
 			return VersionsAPI.loadVersionForApplication(mPropertyBag)
 			.then(function() {
-				assert.strictEqual(oClearStub.callCount, 1, "and cleared");
 				const oInfoSession = FlexInfoSession.getByReference(sReference);
 				assert.strictEqual(oInfoSession.version, sActiveVersion, "and passing the version number accordingly");
 			});
@@ -670,7 +658,6 @@ sap.ui.define([
 				control: new Control()
 			};
 
-			const oClearStub = sandbox.stub(FlexState, "clearState");
 			const oDeleteStub = sandbox.stub(FlexObjectManager, "deleteFlexObjects");
 			const oGetDirtyFlexObjectsStub = sandbox.stub(FlexObjectState, "getDirtyFlexObjects").returns(["foo"]);
 			const oDiscardStub = sandbox.stub(Versions, "discardDraft").resolves({
@@ -682,7 +669,6 @@ sap.ui.define([
 			return VersionsAPI.discardDraft(mPropertyBag)
 			.then(function(oDiscardInfo) {
 				assert.strictEqual(oDeleteStub.callCount, 1, "then the dirty changes were deleted");
-				assert.strictEqual(oClearStub.callCount, 1, "then the FlexState was cleared");
 				assert.strictEqual(oAdaptationsRefreshStub.callCount, 1, "then the Adaptation Model was refreshed");
 				assert.strictEqual(oGetDirtyFlexObjectsStub.callCount, 1, "then getDirtyFlexObjects was called");
 				assert.ok(oGetDirtyFlexObjectsStub.calledWith("com.sap.test"), "and has been called with the correct reference");
@@ -705,7 +691,6 @@ sap.ui.define([
 				control: new Control()
 			};
 
-			const oClearStub = sandbox.stub(FlexState, "clearState");
 			const oDeleteStub = sandbox.stub(FlexObjectManager, "deleteFlexObjects");
 			sandbox.stub(FlexObjectState, "getDirtyFlexObjects").returns(["foo"]);
 			const oDiscardStub = sandbox.stub(Versions, "discardDraft").resolves({
@@ -718,7 +703,6 @@ sap.ui.define([
 			.then(function(oDiscardInfo) {
 				assert.strictEqual(oDeleteStub.callCount, 1, "then the dirty changes were deleted");
 				assert.strictEqual(oAdaptationsDiscardStub.callCount, 1, "then the Adaptation Model was refreshed");
-				assert.strictEqual(oClearStub.callCount, 1, "then the FlexState was cleared");
 				const oInfoSession = FlexInfoSession.getByReference(sReference);
 				assert.strictEqual(
 					oInfoSession.displayedAdaptationId, sDisplayedAdaptationId,
@@ -737,7 +721,6 @@ sap.ui.define([
 				control: new Control()
 			};
 
-			const oClearStub = sandbox.stub(FlexState, "clearState");
 			const oDeleteStub = sandbox.stub(FlexObjectManager, "deleteFlexObjects");
 			sandbox.stub(FlexObjectState, "getDirtyFlexObjects").returns(["foo"]);
 			const oDiscardStub = sandbox.stub(Versions, "discardDraft").resolves({
@@ -748,7 +731,6 @@ sap.ui.define([
 			.then(function(oDiscardInfo) {
 				assert.strictEqual(oDeleteStub.callCount, 1, "then the dirty changes were deleted");
 				assert.strictEqual(oAdaptationsDiscardStub.calledOnce, false, "then the Adaptation Model was not called");
-				assert.strictEqual(oClearStub.callCount, 1, "then the FlexState was cleared");
 				assert.strictEqual(oDiscardInfo.backendChangesDiscarded, false, "then the discard outcome was returned");
 				assert.strictEqual(oDiscardInfo.dirtyChangesDiscarded, true, "then the discard outcome was returned");
 				assert.strictEqual(oDiscardStub.callCount, 1, "then the discard was called");
@@ -764,7 +746,6 @@ sap.ui.define([
 				discardDraftAndKeepActiveVersion: true
 			};
 
-			const oClearStub = sandbox.stub(FlexState, "clearState");
 			sandbox.stub(FlexObjectState, "getDirtyFlexObjects").returns(["foo"]);
 			const oDiscardStub = sandbox.stub(Versions, "discardDraft").resolves({
 				backendChangesDiscarded: false
@@ -773,7 +754,6 @@ sap.ui.define([
 			return VersionsAPI.discardDraft(mPropertyBag)
 			.then(function(oDiscardInfo) {
 				assert.strictEqual(oAdaptationsDiscardStub.calledOnce, false, "then the Adaptation Model was not called");
-				assert.strictEqual(oClearStub.callCount, 0, "then the FlexState was not cleared");
 				assert.strictEqual(oDiscardInfo.backendChangesDiscarded, false, "then the discard outcome was returned");
 				assert.strictEqual(oDiscardInfo.dirtyChangesDiscarded, false, "then the discard outcome was returned");
 				assert.strictEqual(oDiscardStub.callCount, 1, "then the discard was called");

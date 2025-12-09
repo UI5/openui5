@@ -4,7 +4,6 @@
 
 sap.ui.define([
 	"sap/ui/fl/apply/_internal/flexState/FlexObjectState",
-	"sap/ui/fl/apply/_internal/flexState/FlexState",
 	"sap/ui/fl/initial/_internal/FlexInfoSession",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/initial/api/Version",
@@ -16,7 +15,6 @@ sap.ui.define([
 	"sap/ui/fl/write/_internal/init"
 ], function(
 	FlexObjectState,
-	FlexState,
 	FlexInfoSession,
 	ManifestUtils,
 	Version,
@@ -195,8 +193,8 @@ sap.ui.define([
 	};
 
 	/**
-	 * Removes the internal stored state of a given application and refreshes the state including a draft for the given layer;
-	 * an actual reload of the application has to be triggered by the caller.
+	 * Prepares the State for loading a specific version after a reload;
+	 * the actual reload of the application has to be triggered by the caller.
 	 *
 	 * @param {object} mPropertyBag - Property bag
 	 * @param {sap.ui.core.Control} mPropertyBag.control - Control for which the request is done
@@ -242,7 +240,6 @@ sap.ui.define([
 			oFlexInfo.version = mPropertyBag.version;
 			oFlexInfo.displayedAdaptationId = sDisplayedAdaptationId;
 			FlexInfoSession.setByReference(oFlexInfo, sReference);
-			FlexState.clearState(sReference);
 		});
 	};
 
@@ -347,15 +344,9 @@ sap.ui.define([
 						const oFlexInfo = FlexInfoSession.getByReference(sReference);
 						oFlexInfo.displayedAdaptationId = sDisplayedAdaptationId;
 						FlexInfoSession.setByReference(oFlexInfo, sReference);
-						if (!mPropertyBag.discardDraftAndKeepActiveVersion) {
-							FlexState.clearState(sReference);
-						}
 						return oDiscardInfo;
 					});
 				}
-			}
-			if (!mPropertyBag.discardDraftAndKeepActiveVersion) {
-				FlexState.clearState(sReference);
 			}
 			return oDiscardInfo;
 		});

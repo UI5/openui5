@@ -314,6 +314,7 @@
 						label="Height (Integer)"
 						propertyKey="height"
 						dataType="sap.ui.model.type.Integer"
+						dataTypeFormatOptions='\{"emptyString": null\}'
 						conditions="{$filters>/conditions/height}"
 						delegate='\{"name": "sap/ui/mdc/field/FieldBaseDelegate"\}' >
 					</mdc:FilterField>
@@ -323,6 +324,7 @@
 						label="Prominence (Float)"
 						propertyKey="prominence"
 						dataType="sap.ui.model.type.Float"
+						dataTypeFormatOptions='\{"emptyString": null\}'
 						conditions="{$filters>/conditions/prominence}"
 						maxConditions="-1"
 						delegate='\{"name": "sap/ui/mdc/field/FieldBaseDelegate"\}'>

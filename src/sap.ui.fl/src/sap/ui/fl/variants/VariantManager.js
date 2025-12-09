@@ -11,8 +11,8 @@ sap.ui.define([
 	"sap/ui/fl/apply/_internal/changes/Reverter",
 	"sap/ui/fl/apply/_internal/flexObjects/FlexObjectFactory",
 	"sap/ui/fl/apply/_internal/flexObjects/States",
-	"sap/ui/fl/apply/_internal/flexState/controlVariants/Switcher",
 	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
+	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagerApply",
 	"sap/ui/fl/apply/_internal/flexState/FlexObjectState",
 	"sap/ui/fl/apply/api/FlexRuntimeInfoAPI",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
@@ -32,8 +32,8 @@ sap.ui.define([
 	Reverter,
 	FlexObjectFactory,
 	States,
-	Switcher,
 	VariantManagementState,
+	VariantManagerApply,
 	FlexObjectState,
 	FlexRuntimeInfoAPI,
 	ManifestUtils,
@@ -209,24 +209,6 @@ sap.ui.define([
 		});
 	}
 
-	/**
-	 * Adds the passed function to the variant switch promise and returns the whole promise chain.
-	 *
-	 * @param {function():Promise} fnCallback - Callback function returning a promise
-	 * @param {string} sFlexReference - Flex reference of the app
-	 * @param {string} sVMReference - Variant Management reference
-	 * @returns {Promise} Resolves when the variant model is not busy anymore
-	 * @private
-	 */
-	function executeAfterSwitch(fnCallback, sFlexReference, sVMReference) {
-		// if there are multiple switches triggered very quickly this makes sure that they are being executed one after another
-		const oNewPromise = VariantManagementState.waitForVariantSwitch(sFlexReference, sVMReference)
-		.catch(function() {})
-		.then(fnCallback);
-		VariantManagementState.setVariantSwitchPromise(sFlexReference, sVMReference, oNewPromise);
-		return oNewPromise;
-	}
-
 	async function handleDirtyChanges(mProperties) {
 		const {
 			dirtyChanges: aDirtyChanges,
@@ -264,116 +246,6 @@ sap.ui.define([
 		return bHasAdaptationsModel && ContextBasedAdaptationsAPI.getDisplayedAdaptationId(mContextBasedAdaptationBag);
 	}
 
-	/**
-	 * Switches the current variant and triggers all switch listener.
-	 *
-	 * @param {object} mPropertyBag - Object with properties
-	 * @param {string} mPropertyBag.variantManagementReference - Variant management reference
-	 * @param {string} mPropertyBag.newVariantReference - Variant reference to be set as current
-	 * @param {sap.ui.fl.variants.VariantManagement} mPropertyBag.vmControl - Variant management control
-	 * @param {sap.ui.core.Component} [mPropertyBag.appComponent] - App component
-	 * @param {boolean} [mPropertyBag.internallyCalled] - Whether the function is called from within the VariantManager
-	 * @param {string} [mPropertyBag.scenario] - Scenario why the variant is switched
-	 * @returns {Promise} Resolves when the variant has been switched
-	 */
-	VariantManager.updateCurrentVariant = function(mPropertyBag) {
-		const oAppComponent = mPropertyBag.appComponent || Utils.getAppComponentForControl(mPropertyBag.vmControl);
-		const sFlexReference = ManifestUtils.getFlexReferenceForControl(oAppComponent);
-		const mProperties = {
-			vmReference: mPropertyBag.variantManagementReference,
-			currentVReference: mPropertyBag.vmControl.getCurrentVariantReference(),
-			newVReference: mPropertyBag.newVariantReference,
-			appComponent: oAppComponent,
-			modifier: JsControlTreeModifier,
-			reference: sFlexReference
-		};
-
-		const fnSwitchVariant = async () => {
-			const oNewVariant = VariantManagementState.getVariant({
-				reference: sFlexReference,
-				vmReference: mProperties.vmReference,
-				vReference: mProperties.newVReference
-			});
-			if (mPropertyBag.scenario) {
-				// Only relevant for the callback - no need to persist this information
-				oNewVariant.createScenario = mPropertyBag.scenario;
-			}
-			await Switcher.switchVariant(mProperties);
-			mPropertyBag.vmControl._executeAllVariantAppliedListeners(oNewVariant);
-		};
-
-		if (mPropertyBag.internallyCalled) {
-			return fnSwitchVariant();
-		}
-		return executeAfterSwitch(
-			fnSwitchVariant,
-			sFlexReference,
-			mPropertyBag.variantManagementReference
-		);
-	};
-
-	/**
-	 * Handler for "select" event fired from a variant management control. Adds to the variant switch promise chain,
-	 * resolving when new variant (if applicable) has been switched and all source variant dirty changes have been removed.
-	 *
-	 * @param {sap.ui.base.Event} oEvent - Event object
-	 * @param {object} mPropertyBag - Object with properties
-	 * @param {string} mPropertyBag.vmReference - Variant management reference
-	 * @param {sap.ui.fl.variants.VariantModel} mPropertyBag.model - Variant model instance
-	 * @returns {Promise<undefined>} Resolves with undefined
-	 */
-	VariantManager.handleSelectVariant = function(oEvent, mPropertyBag) {
-		const sFlexReference = ManifestUtils.getFlexReferenceForControl(oEvent.getSource());
-		return executeAfterSwitch(async () => {
-			const oVMControl = oEvent.getSource();
-			const oAppComponent = Utils.getAppComponentForControl(oVMControl);
-			const sVMReference = mPropertyBag.vmReference;
-			const bOldVariantWasModified = oVMControl.getModified();
-			const sTargetVReference = oEvent.getParameter("key");
-			let sSourceVReference = oEvent.getParameter("key");
-			let bVariantSwitch = false;
-			// for standard variants 'currentVariant' property is not set
-			// e.g. variants generated through _ensureStandardVariantExists()
-			const sCurrentVariantKey = oVMControl.getCurrentVariantReference();
-			if (sCurrentVariantKey && sCurrentVariantKey !== sTargetVReference) {
-				sSourceVReference = sCurrentVariantKey;
-				bVariantSwitch = true;
-				await VariantManager.updateCurrentVariant({
-					variantManagementReference: sVMReference,
-					newVariantReference: sTargetVReference,
-					appComponent: oAppComponent,
-					vmControl: oVMControl,
-					internallyCalled: true
-				});
-			}
-			if (bOldVariantWasModified) {
-				const aControlChanges = VariantManagementState.getControlChangesForVariant({
-					reference: sFlexReference,
-					vmReference: sVMReference,
-					vReference: sSourceVReference
-				});
-				await eraseDirtyChanges({
-					changes: aControlChanges,
-					reference: sFlexReference,
-					vmReference: sVMReference,
-					vReference: sSourceVReference,
-					appComponent: oAppComponent,
-					revert: !bVariantSwitch
-				});
-			}
-
-			// updateCurrentVariant already calls the listeners
-			if (!bVariantSwitch) {
-				const oVariant = VariantManagementState.getVariant({
-					reference: sFlexReference,
-					vmReference: sVMReference,
-					vReference: oVMControl.getCurrentVariantReference()
-				});
-				oVMControl._executeAllVariantAppliedListeners(oVariant);
-			}
-		}, sFlexReference, mPropertyBag.vmReference);
-	};
-
 	// Personalization scenario; for Adaptation, manageVariants is used
 	// The event source is the sap.m.VariantManagement control, so the fl VMControl needs to be passed separately
 	VariantManager.handleManageEvent = async function(oEvent, oVMControl) {
@@ -403,7 +275,7 @@ sap.ui.define([
 					vmReference: sVMReference
 				})
 			);
-			await VariantManager.updateCurrentVariant({
+			await VariantManagerApply.updateCurrentVariant({
 				variantManagementReference: sVMReference,
 				newVariantReference: sNewDefaultVariantReference,
 				vmControl: oVMControl,
@@ -456,7 +328,7 @@ sap.ui.define([
 		const sVMReference = oVariantManagementControl.getVariantManagementReference();
 		let aNewVariantDirtyChanges;
 
-		await executeAfterSwitch(async () => {
+		await VariantManagerApply.executeAfterSwitch(async () => {
 			const sSourceVariantReference = oVariantManagementControl.getCurrentVariantReference();
 			const aSourceVariantChanges = VariantManagementState.getControlChangesForVariant({
 				reference: sFlexReference,
@@ -582,9 +454,10 @@ sap.ui.define([
 	 * @param {string} sVariantManagementReference - Variant management reference
 	 * @param {string} sVariantReference - Variant reference to remove dirty changes from
 	 * @param {sap.ui.core.Control} oControl - Control instance to fetch the variant model
+	 * @param {boolean} [bRevert] - Whether the changes should be reverted
 	 * @returns {Promise<sap.ui.fl.apply._internal.flexObjects.FlexObject[]>} Resolves with the removed dirty changes
 	 */
-	VariantManager.eraseDirtyChangesOnVariant = async function(sVariantManagementReference, sVariantReference, oControl) {
+	VariantManager.eraseDirtyChangesOnVariant = async function(sVariantManagementReference, sVariantReference, oControl, bRevert) {
 		const sFlexReference = FlexRuntimeInfoAPI.getFlexReference({ element: oControl });
 		var aSourceVariantChanges = VariantManagementState.getControlChangesForVariant({
 			reference: sFlexReference,
@@ -600,7 +473,7 @@ sap.ui.define([
 			vmReference: sVariantManagementReference,
 			vReference: sVariantReference,
 			appComponent: Utils.getAppComponentForControl(oControl),
-			revert: true
+			revert: bRevert === undefined ? true : bRevert
 		});
 		return aSourceVariantDirtyChanges;
 	};
@@ -664,12 +537,12 @@ sap.ui.define([
 			.concat(mPropertyBag.additionalVariantChanges))
 		);
 
-		await VariantManager.updateCurrentVariant({
+		await VariantManagerApply.updateCurrentVariant({
 			variantManagementReference: mPropertyBag.variantManagementReference,
 			newVariantReference: oDuplicateVariantData.instance.getId(),
 			appComponent: mPropertyBag.appComponent,
 			vmControl: mPropertyBag.vmControl,
-			internallyCalled: true,
+			skipExecuteAfterSwitch: true,
 			scenario: "saveAs"
 		});
 		return aChanges;
@@ -693,7 +566,7 @@ sap.ui.define([
 				oChange.getId() === mPropertyBag.variant.getId();
 		});
 
-		await VariantManager.updateCurrentVariant({
+		await VariantManagerApply.updateCurrentVariant({
 			variantManagementReference: mPropertyBag.variantManagementReference,
 			newVariantReference: mPropertyBag.sourceVariantReference,
 			appComponent: mPropertyBag.appComponent,

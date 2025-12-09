@@ -429,17 +429,13 @@ sap.ui.define([
 		initiallyExpanded: false,
 		items: [new MessageItem({
 			type: "Error",
-			title: "Error Message 1",
+			title: "Error Message",
 			description: "First Error message description"
 
 		}), new MessageItem({
-			type: "Error",
-			title: "Error Message 2",
+			type: "Warning",
+			title: "Warning message",
 			description: "Second Error message description"
-		}), new MessageItem({
-			type: "Error",
-			title: "Error Message 3",
-			description: "Third Error message description"
 		})]
 	});
 

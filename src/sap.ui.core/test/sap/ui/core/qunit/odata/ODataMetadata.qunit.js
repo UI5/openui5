@@ -252,13 +252,11 @@ sap.ui.define([
 	var oModelV2 = initModelV2(sServiceUri);
 
 
-	var fnWrapMetadataReady = function(fnRealTest, assert) {
+	var fnWrapMetadataReadyV2 = function(fnRealTest, assert) {
 		var done = assert.async();
-		if (oModel instanceof V2ODataModel) {
-			oModel.metadataLoaded().then(function () {
-				fnRealTest.apply(this, [assert, done].concat([].slice.call(arguments)));
-			});
-		}
+		oModelV2.metadataLoaded().then(function () {
+			fnRealTest.apply(this, [assert, done].concat([].slice.call(arguments)));
+		});
 	};
 
 	for (var sTest in mInternalTests) {
@@ -267,7 +265,7 @@ sap.ui.define([
 			continue;
 		}
 
-		QUnit.test("V2: " + sTest, fnWrapMetadataReady.bind(this, mInternalTests[sTest].bind(mInternalTests, oModelV2)));
+		QUnit.test("V2: " + sTest, fnWrapMetadataReadyV2.bind(this, mInternalTests[sTest].bind(mInternalTests, oModelV2)));
 	}
 
 
@@ -347,7 +345,7 @@ sap.ui.define([
 		done();
 	};
 
-	QUnit.test("V2: _getAnnotation method", fnWrapMetadataReady.bind(this, fnTestAnnotations.bind(this, oModelV2)));
+	QUnit.test("V2: _getAnnotation method", fnWrapMetadataReadyV2.bind(this, fnTestAnnotations.bind(this, oModelV2)));
 
 
 	QUnit.module("ODataMetadata: sap-cancel-on-close header handling");

@@ -35,11 +35,11 @@
 			<Button id="saveButton" text="Save" press=".onSave" visible="{ui>/realOData}"/>
 			<Button id="resetButton" binding="{v4>/ResetEdmTypes(...)}" text="Reset" press=".onReset" visible="{ui>/realOData}"/>
 			<Button id="messagesButton" icon="sap-icon://message-popup" tooltip="Show messages"
-				press="onToggleMessagePopover" text="{ui>/iMessages}"
+				press=".onToggleMessagePopover" text="{ui>/iMessages}"
 				type="{= ${ui>/iMessages} ? 'Emphasized' : 'Default' }"/>
 			<Button id="resetModelButton" icon="sap-icon://sys-cancel" text="Reset Model" tooltip="Reset Model" press=".onResetModel"/>
 			<ToggleButton id="toggleV4Button" icon="sap-icon://switch-views" press=".onV4" pressed="{ui>/v4}" text="V4"/>
-			<ToggleButton id="toggleSourceCodeButton" icon="sap-icon://syntax" press="onSourceCode" text="Source Code after Templating"/>
+			<ToggleButton id="toggleSourceCodeButton" icon="sap-icon://syntax" press=".onSourceCode" text="Source Code after Templating"/>
 			<Button id="resetContextBindingButton" icon="sap-icon://sys-cancel" text="Reset ContextBinding" tooltip="Reset ContextBinding" press=".onResetContextBinding" visible="{ui>/v4}"/>
 		</HBox>
 		<Panel expandable="false" visible="{ui>/bCodeVisible}" headerText="Source Code after Templating" width="auto" class="sapUiResponsiveMargin">

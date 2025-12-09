@@ -11,14 +11,13 @@ sap.ui.define([
 	"sap/ui/fl/apply/_internal/changes/Reverter",
 	"sap/ui/fl/apply/_internal/controlVariants/URLHandler",
 	"sap/ui/fl/apply/_internal/flexObjects/FlexObjectFactory",
-	"sap/ui/fl/apply/_internal/flexState/controlVariants/Switcher",
 	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
+	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagerApply",
 	"sap/ui/fl/apply/_internal/flexState/FlexObjectState",
 	"sap/ui/fl/apply/_internal/flexState/FlexState",
 	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/variants/VariantManagement",
-	"sap/ui/fl/variants/VariantManager",
 	"sap/ui/fl/variants/VariantModel",
 	"sap/ui/fl/write/_internal/flexState/FlexObjectManager",
 	"sap/ui/fl/Layer",
@@ -37,14 +36,13 @@ sap.ui.define([
 	Reverter,
 	URLHandler,
 	FlexObjectFactory,
-	Switcher,
 	VariantManagementState,
+	VariantManagerApply,
 	FlexObjectState,
 	FlexState,
 	ControlVariantApplyAPI,
 	ManifestUtils,
 	VariantManagement,
-	VariantManager,
 	VariantModel,
 	FlexObjectManager,
 	Layer,
@@ -143,7 +141,7 @@ sap.ui.define([
 			this.getVMRefForVariantStub = sandbox.stub(VariantManagementState, "getVariantManagementReferenceForVariant")
 			.withArgs("myReference", "variant1").returns("variantMgmtId1");
 			sandbox.stub(this.oDummyControl, "waitForInit").resolves();
-			this.oUpdateCurrentVariantStub = sandbox.stub(VariantManager, "updateCurrentVariant").resolves();
+			this.oUpdateCurrentVariantStub = sandbox.stub(VariantManagerApply, "updateCurrentVariant").resolves();
 
 			this.oModel = new VariantModel(this.oData, {
 				appComponent: this.oAppComponent
@@ -441,7 +439,6 @@ sap.ui.define([
 				.withArgs("MockController", "variant1").returns(this.sVMReference)
 				.withArgs("MockController", "variant2").returns(this.sVMReference);
 				this.oGetDirtyFlexObjectsStub = sandbox.stub(FlexObjectState, "getDirtyFlexObjects");
-				sandbox.stub(Switcher, "switchVariant").resolves();
 				sandbox.stub(Reverter, "revertMultipleChanges").resolves();
 
 				this.oVariantModel.setData(oData);

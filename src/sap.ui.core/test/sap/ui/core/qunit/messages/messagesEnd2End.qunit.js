@@ -197,9 +197,9 @@ sap.ui.define([
 								var aMessages = Messaging.getMessageModel().getData();
 								assert.equal(aMessages.length, 4, "Correct message count.");
 								checkMessages(aMessages, assert);
+								done();
 							}
 						});
-						done();
 					}
 				});
 				that.oModelCanonical.detachBatchRequestCompleted(fnRequestCompleted);

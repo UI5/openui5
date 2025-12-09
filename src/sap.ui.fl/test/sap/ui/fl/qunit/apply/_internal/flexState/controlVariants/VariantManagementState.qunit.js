@@ -88,15 +88,6 @@ sap.ui.define([
 		});
 	}
 
-	function stubFlexObjectsSelector(aFlexObjects) {
-		const oFlexObjectsSelector = FlexState.getFlexObjectsDataSelector();
-		const oGetFlexObjectsStub = sandbox.stub(oFlexObjectsSelector, "get");
-		oGetFlexObjectsStub.callsFake(function(...aArgs) {
-			return aFlexObjects.concat(oGetFlexObjectsStub.wrappedMethod.apply(this, aArgs));
-		});
-		oFlexObjectsSelector.checkUpdate();
-	}
-
 	function cleanup() {
 		FlexState.clearState();
 		FlexState.clearRuntimeSteadyObjects(sReference, sComponentId);
@@ -125,7 +116,7 @@ sap.ui.define([
 				id: "someCompVariant",
 				layer: Layer.CUSTOMER
 			});
-			stubFlexObjectsSelector([oUIChange, oCompVariant]);
+			FlQUnitUtils.stubFlexObjectsSelector(sandbox, [oUIChange, oCompVariant]);
 
 			assert.deepEqual(
 				VariantManagementState.getVariantManagementMap().get({ reference: sReference }),
@@ -190,7 +181,7 @@ sap.ui.define([
 					}
 				})
 			];
-			stubFlexObjectsSelector(aVariantChanges);
+			FlQUnitUtils.stubFlexObjectsSelector(sandbox, aVariantChanges);
 
 			assert.deepEqual(
 				VariantManagementState.getVariantManagementMap().get({ reference: sReference }),
@@ -227,7 +218,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("when there are variant management changes", function(assert) {
-			stubFlexObjectsSelector([
+			FlQUnitUtils.stubFlexObjectsSelector(sandbox, [
 				createVariant({
 					variantReference: sVariantManagementReference,
 					fileName: "customVariant"
@@ -330,7 +321,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("when there is an invalid variant change", function(assert) {
-			stubFlexObjectsSelector([
+			FlQUnitUtils.stubFlexObjectsSelector(sandbox, [
 				FlexObjectFactory.createVariantChange({
 					id: "changeWithSomeInvalidChangeType",
 					layer: Layer.CUSTOMER,
@@ -358,7 +349,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("when multiple variants are returned", function(assert) {
-			stubFlexObjectsSelector([
+			FlQUnitUtils.stubFlexObjectsSelector(sandbox, [
 				createVariant({
 					variantReference: sVariantManagementReference,
 					fileName: "XYZ"
@@ -434,7 +425,7 @@ sap.ui.define([
 			});
 			oChangeSavedToVariant.setSavedToVariant(true);
 
-			stubFlexObjectsSelector([oPersistedUIChange, oChangeSavedToVariant]);
+			FlQUnitUtils.stubFlexObjectsSelector(sandbox, [oPersistedUIChange, oChangeSavedToVariant]);
 			const oVariantsMap = VariantManagementState.getVariantManagementMap().get({ reference: sReference });
 			assert.notOk(
 				oVariantsMap[sVariantManagementReference].modified,
@@ -479,7 +470,7 @@ sap.ui.define([
 				fileName: "userVariant",
 				layer: Layer.USER
 			});
-			stubFlexObjectsSelector([
+			FlQUnitUtils.stubFlexObjectsSelector(sandbox, [
 				oUIChangeBasedOnStandard,
 				oIndependentUIChange,
 				oUIChange,
@@ -533,7 +524,7 @@ sap.ui.define([
 					favorite: false
 				}
 			});
-			stubFlexObjectsSelector([
+			FlQUnitUtils.stubFlexObjectsSelector(sandbox, [
 				oVariantManagementChange,
 				createVariant({
 					title: "variant1",
@@ -581,7 +572,7 @@ sap.ui.define([
 				reference: sCorrectReference
 			});
 
-			stubFlexObjectsSelector([oFirstFlexObjectWithWrongRef, oPreviouslySelectedVariant]);
+			FlQUnitUtils.stubFlexObjectsSelector(sandbox, [oFirstFlexObjectWithWrongRef, oPreviouslySelectedVariant]);
 
 			const oVariantsMap = VariantManagementState.getVariantManagementMap().get({
 				reference: sCorrectReference
@@ -979,7 +970,7 @@ sap.ui.define([
 					defaultVariant: "anotherCustomVariant"
 				}
 			});
-			stubFlexObjectsSelector([oUIChange, oSetTitleChange, oSetDefaultChange]);
+			FlQUnitUtils.stubFlexObjectsSelector(sandbox, [oUIChange, oSetTitleChange, oSetDefaultChange]);
 			return FlexState.initialize({
 				componentId: sComponentId,
 				reference: sReference
@@ -1014,7 +1005,7 @@ sap.ui.define([
 			const oComponentData = { technicalParameters: {} };
 			oComponentData.technicalParameters[VariantUtil.VARIANT_TECHNICAL_PARAMETER] = ["customVariant"];
 			sandbox.stub(FlexState, "getComponentData").returns(oComponentData);
-			stubFlexObjectsSelector([
+			FlQUnitUtils.stubFlexObjectsSelector(sandbox, [
 				createVariant({
 					variantReference: sVariantManagementReference,
 					fileName: "customVariant"
@@ -1032,7 +1023,7 @@ sap.ui.define([
 			const oComponentData = { technicalParameters: {} };
 			oComponentData.technicalParameters[VariantUtil.VARIANT_TECHNICAL_PARAMETER] = ["customVariant,customVariantForSecondVM"];
 			sandbox.stub(FlexState, "getComponentData").returns(oComponentData);
-			stubFlexObjectsSelector([
+			FlQUnitUtils.stubFlexObjectsSelector(sandbox, [
 				createVariant({
 					variantReference: sVariantManagementReference,
 					fileName: "customVariant"
@@ -1069,7 +1060,7 @@ sap.ui.define([
 			const oComponentData = { technicalParameters: {} };
 			oComponentData.technicalParameters[VariantUtil.VARIANT_TECHNICAL_PARAMETER] = ["customVariant", "customVariantForSecondVM"];
 			sandbox.stub(FlexState, "getComponentData").returns(oComponentData);
-			stubFlexObjectsSelector([
+			FlQUnitUtils.stubFlexObjectsSelector(sandbox, [
 				createVariant({
 					variantReference: sVariantManagementReference,
 					fileName: "customVariant"
@@ -1119,7 +1110,7 @@ sap.ui.define([
 			oComponentData.technicalParameters[VariantUtil.VARIANT_TECHNICAL_PARAMETER] = ["customVariant"];
 			sandbox.stub(FlexState, "getComponentData").returns(oComponentData);
 
-			stubFlexObjectsSelector([
+			FlQUnitUtils.stubFlexObjectsSelector(sandbox, [
 				createVariant({
 					variantReference: sVariantManagementReference,
 					fileName: "customVariant"
@@ -1139,7 +1130,7 @@ sap.ui.define([
 			oComponentData.technicalParameters[VariantUtil.VARIANT_TECHNICAL_PARAMETER] = ["customVariant"];
 			sandbox.stub(FlexState, "getComponentData").returns(oComponentData);
 
-			stubFlexObjectsSelector([
+			FlQUnitUtils.stubFlexObjectsSelector(sandbox, [
 				createVariant({
 					variantReference: sVariantManagementReference,
 					fileName: "customVariant"
@@ -1170,7 +1161,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("when the variant that was set as default was removed and there is no key user default variant", function(assert) {
-			stubFlexObjectsSelector([
+			FlQUnitUtils.stubFlexObjectsSelector(sandbox, [
 				// Default variant was set via perso change but is no longer available, e.g. because of version switch
 				FlexObjectFactory.createVariantManagementChange({
 					id: "setDefaultVariantChange",
@@ -1200,7 +1191,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("when the variant that was set as default is set to hidden (removed by Key User) but there is a key user default variant", function(assert) {
-			stubFlexObjectsSelector([
+			FlQUnitUtils.stubFlexObjectsSelector(sandbox, [
 				// Key user creates two new variants and sets one to default
 				createVariant({
 					variantReference: sVariantManagementReference,
@@ -1267,7 +1258,7 @@ sap.ui.define([
 				variantReference: sVariantManagementReference,
 				fileName: sCustomVariantKey
 			});
-			stubFlexObjectsSelector([
+			FlQUnitUtils.stubFlexObjectsSelector(sandbox, [
 				oVariant
 			]);
 			const oVariantData = VariantManagementState.getVariant({
@@ -1288,7 +1279,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("when accessing a variant without providing a variant key", function(assert) {
-			stubFlexObjectsSelector([
+			FlQUnitUtils.stubFlexObjectsSelector(sandbox, [
 				createVariant({
 					variantReference: sVariantManagementReference,
 					fileName: "customVariant"
@@ -1322,7 +1313,7 @@ sap.ui.define([
 				variantReference: sVariantManagementReference,
 				layer: Layer.CUSTOMER
 			});
-			stubFlexObjectsSelector([
+			FlQUnitUtils.stubFlexObjectsSelector(sandbox, [
 				createVariant({
 					variantReference: sVariantManagementReference,
 					fileName: "customVariant",
@@ -1392,7 +1383,7 @@ sap.ui.define([
 				fileType: "ctrl_variant_change",
 				variantId: "customVariant"
 			});
-			stubFlexObjectsSelector([
+			FlQUnitUtils.stubFlexObjectsSelector(sandbox, [
 				createVariant({
 					variantReference: sVariantManagementReference,
 					fileName: "customVariant"
@@ -1421,7 +1412,7 @@ sap.ui.define([
 				"then the standard variant is returned by default"
 			);
 
-			stubFlexObjectsSelector([
+			FlQUnitUtils.stubFlexObjectsSelector(sandbox, [
 				createVariant({
 					variantReference: sVariantManagementReference,
 					fileName: "customVariant"
@@ -1519,7 +1510,7 @@ sap.ui.define([
 					defaultVariant: "someOtherVM"
 				}
 			});
-			stubFlexObjectsSelector([
+			FlQUnitUtils.stubFlexObjectsSelector(sandbox, [
 				oSetDefaultVariantChange,
 				oSetDefaultVariantChange2
 			]);
@@ -1585,7 +1576,7 @@ sap.ui.define([
 				aUIChanges.forEach(function(oUIChange) {
 					oUIChange.setState(States.LifecycleState.PERSISTED);
 				});
-				stubFlexObjectsSelector(aUIChanges);
+				FlQUnitUtils.stubFlexObjectsSelector(sandbox, aUIChanges);
 			});
 		},
 		afterEach() {
@@ -1654,7 +1645,7 @@ sap.ui.define([
 					}
 				})
 			];
-			stubFlexObjectsSelector(aFlexObjects);
+			FlQUnitUtils.stubFlexObjectsSelector(sandbox, aFlexObjects);
 			const aFilteredFlexObjects = VariantManagementState.filterHiddenFlexObjects(aFlexObjects, sReference);
 			assert.strictEqual(aFilteredFlexObjects.length, 4, "all variants are returned");
 		});
@@ -1681,7 +1672,7 @@ sap.ui.define([
 					}
 				})
 			];
-			stubFlexObjectsSelector(aFlexObjects);
+			FlQUnitUtils.stubFlexObjectsSelector(sandbox, aFlexObjects);
 			const aFilteredFlexObjects = VariantManagementState.filterHiddenFlexObjects(aFlexObjects, sReference);
 			assert.strictEqual(aFilteredFlexObjects.length, 1, "only the visible variant is left");
 		});
@@ -1823,7 +1814,7 @@ sap.ui.define([
 				}
 			});
 
-			stubFlexObjectsSelector([oCustomVariant, oSetDefaultChange]);
+			FlQUnitUtils.stubFlexObjectsSelector(sandbox, [oCustomVariant, oSetDefaultChange]);
 
 			const sDefaultVariantReference = VariantManagementState.getDefaultVariantReference({
 				reference: sReference,
@@ -1849,7 +1840,7 @@ sap.ui.define([
 				title: "Custom Variant"
 			});
 
-			stubFlexObjectsSelector([oCustomVariant]);
+			FlQUnitUtils.stubFlexObjectsSelector(sandbox, [oCustomVariant]);
 
 			const sVMReference = VariantManagementState.getVariantManagementReferenceForVariant(
 				sReference,
@@ -1902,7 +1893,7 @@ sap.ui.define([
 				title: "Custom Variant in Second VM"
 			});
 
-			stubFlexObjectsSelector([oSecondStandardVariant, oCustomVariantInSecondVM]);
+			FlQUnitUtils.stubFlexObjectsSelector(sandbox, [oSecondStandardVariant, oCustomVariantInSecondVM]);
 
 			const sVMReferenceForFirstVariant = VariantManagementState.getVariantManagementReferenceForVariant(
 				sReference,

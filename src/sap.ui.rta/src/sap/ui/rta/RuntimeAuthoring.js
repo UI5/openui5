@@ -1249,10 +1249,18 @@ sap.ui.define([
 		}
 		await this.save();
 		if (this._oVersionsModel.getProperty("/versioningEnabled")) {
-			await VersionsAPI.loadDraftForApplication({
-				control: this.getRootControlInstance(),
-				layer: this.getLayer()
-			});
+			if (isDraftAvailable.call(this)) {
+				await VersionsAPI.loadDraftForApplication({
+					control: this.getRootControlInstance(),
+					layer: this.getLayer()
+				});
+			} else {
+				await VersionsAPI.loadVersionForApplication({
+					control: this.getRootControlInstance(),
+					layer: this.getLayer(),
+					version: this._oVersionsModel.getProperty("/displayedVersion")
+				});
+			}
 		}
 		RuntimeAuthoring.enableRestart(this.getLayer(), this.getRootControlInstance());
 		await this.stop(true, true, true);

@@ -11,6 +11,7 @@ sap.ui.define([
 	"sap/ui/core/Lib",
 	"sap/ui/core/library",
 	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
+	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagerApply",
 	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/initial/_internal/Settings",
@@ -27,6 +28,7 @@ sap.ui.define([
 	Lib,
 	coreLibrary,
 	VariantManagementState,
+	VariantManagerApply,
 	ControlVariantApplyAPI,
 	ManifestUtils,
 	flSettings,
@@ -58,6 +60,11 @@ sap.ui.define([
 			});
 		}
 		this._handleAllListeners(oEvent, this._aManageEventHandlers);
+	}
+
+	async function onSelect(oEvent) {
+		await VariantManagerApply.handleSelectVariant(oEvent, this);
+		this._handleAllListeners(oEvent, this._aSelectEventHandlers);
 	}
 
 	/**
@@ -409,7 +416,7 @@ sap.ui.define([
 		this._oVM.attachManage(onManage, this);
 		this._oVM.attachCancel(this._fireCancel, this);
 		this._oVM.attachSave(onSave, this);
-		this._oVM.attachSelect(this._fireSelect, this);
+		this._oVM.attachSelect(onSelect, this);
 
 		this._updateWithSettingsInfo();
 	};
@@ -644,10 +651,6 @@ sap.ui.define([
 	VariantManagement.prototype.attachSelect = function(mProps, fnCallback, oObj) {
 		this.attachEvent("select", mProps, fnCallback, oObj);
 		return this;
-	};
-
-	VariantManagement.prototype._fireSelect = function(oEvent) {
-		this._handleAllListeners(oEvent, this._aSelectEventHandlers);
 	};
 
 	VariantManagement.prototype.detachSelect = function(fnCallback, oObj) {
@@ -1059,7 +1062,7 @@ sap.ui.define([
 	VariantManagement.prototype.exit = function(...aArgs) {
 		this._oVM.detachManage(onManage, this);
 		this._oVM.detachCancel(this._fireCancel, this);
-		this._oVM.detachSelect(this._fireSelect, this);
+		this._oVM.detachSelect(onSelect, this);
 		this._oVM.detachSave(onSave, this);
 
 		if (this._oVM) {

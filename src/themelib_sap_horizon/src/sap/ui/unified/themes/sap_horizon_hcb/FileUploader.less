@@ -8,11 +8,56 @@
 	height: 2.75rem;
 }
 
-.sapUiSizeCompact {
+.sapUiFup {
+	.sapMInputBaseContentWrapper {
+		.sapUiFupBrowseIcon,
+		.sapUiFupClearIcon {
+			line-height: 1.25rem;
+			width: 2rem;
+		}
 
+		.sapMBtnInner {
+			border: none;
+			border-radius: 0;
+		}
+
+		.sapUiFupVisual .sapUiFupPlaceholder > div {
+			font-style: normal;
+		}
+	}
+
+	&.sapUiFupButtonOnly {
+		&.sapMInputBase:not(.sapMFocus) .sapMInputBaseContentWrapper:not(.sapMInputBaseReadonlyWrapper):not(.sapMInputBaseContentWrapperState):not(.sapMInputBaseDisabledWrapper):hover {
+			border-color: initial;
+		}
+	}
+}
+
+.sapUiSizeCompact {
 	.sapUiFup,
 	.sapUiFup.sapMBarChild {
 		height: 2rem;
+	}
+
+	.sapUiFup {
+		.sapMInputBaseContentWrapper {
+			height: var(--sapElement_Compact_Height);
+
+			.sapUiFupBrowseIcon,
+			.sapUiFupClearIcon {
+				height: 1.375rem;
+				line-height: 1.25rem;
+				width: 2rem;
+			}
+
+			.sapMBtn {
+				height: var(--sapElement_Compact_Height);
+
+				.sapMBtnContent {
+					line-height: 1.375rem;
+				}
+			}
+		}
 	}
 }
 

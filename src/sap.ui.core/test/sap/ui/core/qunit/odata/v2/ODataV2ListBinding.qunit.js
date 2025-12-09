@@ -388,6 +388,7 @@ sap.ui.define([
 		};
 		oBinding.attachRefresh(function() {oBinding.getContexts();});
 		oBinding.attachChange(handler);
+		oBinding.initialize();
 		// fire first loading...getContexts might be empty the first time...then when data is loaded the handler will be called
 	});
 
@@ -628,6 +629,7 @@ sap.ui.define([
 			oBinding.getContexts();
 		});
 		oBinding.attachChange(handler0);
+		oBinding.initialize();
 	});
 
 	QUnit.test("ListBinding clientside sort", function(assert){
@@ -699,6 +701,7 @@ sap.ui.define([
 			oBinding.getContexts();
 		});
 		oBinding.attachChange(handler);
+		oBinding.initialize();
 	});
 
 	QUnit.test("ListBinding clientside sort on Edm.Decimal", function(assert){
@@ -758,6 +761,7 @@ sap.ui.define([
 			oBinding.getContexts();
 		});
 		oBinding.attachChange(handler);
+		oBinding.initialize();
 	});
 
 	QUnit.test("ListBinding clientside sort with null values", function(assert){
@@ -817,6 +821,7 @@ sap.ui.define([
 			oBinding.getContexts();
 		});
 		oBinding.attachChange(handler);
+		oBinding.initialize();
 	});
 
 	QUnit.test("ListBinding clientside sort before data is available", function(assert){
@@ -927,6 +932,7 @@ sap.ui.define([
 			}
 		};
 		oBinding.attachChange(handler);
+		oBinding.initialize();
 	});
 
 	QUnit.test("ListBinding Client Mode - value list", function(assert){
@@ -971,6 +977,7 @@ sap.ui.define([
 				done();
 			};
 			oBinding.attachChange(handler);
+			oBinding.initialize();
 
 	});
 
@@ -986,6 +993,7 @@ sap.ui.define([
 		};
 		oBinding.attachRefresh(function() {oBinding.getContexts();});
 		oBinding.attachChange(handler);
+		oBinding.initialize();
 	});
 
 	QUnit.test("ListBinding filter", function(assert){
@@ -1070,6 +1078,7 @@ sap.ui.define([
 		};
 		oBinding.attachChange(handler);
 		oBinding.attachRefresh(fnFilter);
+		oBinding.initialize();
 	});
 
 	QUnit.test("ListBinding filter aborted", function(assert){
@@ -1335,6 +1344,7 @@ sap.ui.define([
 		oBinding.attachRefresh(function() {
 			oBinding.getContexts();
 		});
+		oBinding.initialize();
 	});
 
 	QUnit.test("ListBinding clientside filter on Edm.Decimal", function(assert){
@@ -1409,6 +1419,7 @@ sap.ui.define([
 			oBinding.getContexts();
 		});
 		oBinding.attachChange(handler);
+		oBinding.initialize();
 	});
 
 	QUnit.test("ListBinding clientside filter on Edm.Decimal with number value", function(assert){
@@ -1492,6 +1503,7 @@ sap.ui.define([
 			oBinding.getContexts();
 		});
 		oBinding.attachChange(handler);
+		oBinding.initialize();
 	});
 
 	QUnit.test("ListBinding clientside filter on Edm.Int32", function(assert){
@@ -1543,6 +1555,7 @@ sap.ui.define([
 			oBinding.getContexts();
 		});
 		oBinding.attachChange(handler);
+		oBinding.initialize();
 	});
 
 	QUnit.test("ListBinding clientside filter on Edm.Int32 with string value", function(assert){
@@ -1594,6 +1607,7 @@ sap.ui.define([
 			oBinding.getContexts();
 		});
 		oBinding.attachChange(handler);
+		oBinding.initialize();
 	});
 
 	QUnit.test("ListBinding clientside filter on Edm.Single", function(assert){
@@ -1649,6 +1663,7 @@ sap.ui.define([
 			oBinding.getContexts();
 		});
 		oBinding.attachChange(handler);
+		oBinding.initialize();
 	});
 
 	QUnit.test("ListBinding clientside filter on Edm.Single with string value", function(assert){
@@ -1704,6 +1719,7 @@ sap.ui.define([
 			oBinding.getContexts();
 		});
 		oBinding.attachChange(handler);
+		oBinding.initialize();
 	});
 
 	QUnit.test("ListBinding clientside filter before data is available", function(assert){
@@ -1926,6 +1942,7 @@ sap.ui.define([
 			done();
 		};
 		oBinding.attachChange(handler);
+		oBinding.initialize();
 	});
 
 	QUnit.test("ListBinding on expanded data, operationmode Default, late filter", function(assert){
@@ -1961,6 +1978,7 @@ sap.ui.define([
 			done();
 		};
 		oBinding.attachChange(handler);
+		oBinding.initialize();
 	});
 
 	QUnit.test("ListBinding on expanded data, operationmode Server, initial filter", function(assert){
@@ -1988,6 +2006,7 @@ sap.ui.define([
 			done();
 		};
 		oBinding.attachChange(handler);
+		oBinding.initialize();
 	});
 
 	QUnit.test("ListBinding on expanded data, operationmode Server, late filter", function(assert){
@@ -2023,6 +2042,7 @@ sap.ui.define([
 			done();
 		};
 		oBinding.attachChange(handler);
+		oBinding.initialize();
 	});
 
 	QUnit.test("ListBinding on expanded data, operationmode Default, custom parameter", function(assert){
@@ -2051,6 +2071,7 @@ sap.ui.define([
 			done();
 		};
 		oBinding.attachChange(handler);
+		oBinding.initialize();
 	});
 
 
@@ -2095,6 +2116,7 @@ sap.ui.define([
 		oBinding.attachRefresh(function() {
 			oBinding.getContexts(0, 8);
 		});
+		oBinding.initialize();
 	});
 
 	QUnit.test("ListBinding Diff with key", function(assert){
@@ -2134,6 +2156,7 @@ sap.ui.define([
 		oBinding.attachRefresh(function() {
 			oBinding.getContexts(0, 8);
 		});
+		oBinding.initialize();
 	});
 
 	QUnit.test("Event order", function(assert){
@@ -2215,6 +2238,7 @@ sap.ui.define([
 		oBinding.attachRefresh(function() {
 			oBinding.getContexts(0, 2, 0);
 		});
+		oBinding.initialize();
 	});
 
 	QUnit.test("Inline Count mode - service returns no data & 0 count: Count should be updated irrespective of startIndex", function(assert) {

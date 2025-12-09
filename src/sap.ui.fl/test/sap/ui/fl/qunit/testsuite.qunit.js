@@ -672,10 +672,10 @@ sap.ui.define([
 				}
 			},
 
-			"apply/_internal/flexState/controlVariants/Switcher": {
+			"apply/_internal/flexState/controlVariants/VariantManagerApply": {
 				group: "Apply Internal",
 				coverage: {
-					only: ["sap/ui/fl/apply/_internal/flexState/controlVariants/Switcher"]
+					only: ["sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagerApply"]
 				}
 			},
 
@@ -1310,6 +1310,12 @@ sap.ui.define([
 			// Variant tests:
 			"variants/VariantManagement": {
 				group: "Variants",
+				ui5: {
+					resourceroots: {
+						"fl.test": "test-resources/sap/ui/fl/qunit/testResources/"
+					},
+					flexibilityServices: '[{"connector": "SessionStorageConnector"}]'
+				},
 				coverage: {
 					only: ["sap/ui/fl/variants/VariantManagement"]
 				}

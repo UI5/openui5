@@ -10,7 +10,7 @@ describe("sap.ui.integration.HeaderInfoSectionVisualTests", function () {
 	var aCardIds = ["card1", "card2"];
 
 	it("Header Info Section", function () {
-		utils.navigateTo("Header Info Section");
+		utils.navigateTo("Extended Header with Info Section");
 
 		aCardIds.forEach(function (sId) {
 			utils.takePictureOfElement({

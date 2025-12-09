@@ -10,12 +10,6 @@ describe("sap.m.MessagePopover", function () {
 		_resolvePopoverWithGrouping = function () {
 			return bPhone ? "mPopoverWithGrouping-messagePopover-dialog" : "mPopoverWithGrouping-messagePopover-popover";
 		};
-	var _resolveCloseButton = function () {
-			return bPhone ? "__button4" : "__button2";
-		},
-		_resolveCloseButtonWithGrouping = function () {
-			return bPhone ? "__button4" : "__button5";
-		};
 
 	it("should load test page", function () {
 		browser.executeScript(function () {
@@ -59,7 +53,7 @@ describe("sap.m.MessagePopover", function () {
 	});
 
 	it("should open MessagePopover with groupItems set to true", function () {
-		element(by.id(_resolveCloseButton())).click(); //Close the Popover/Dialog
+		element(by.css(".sapMMsgPopoverCloseBtn")).click(); //Close the Popover/Dialog
 		element(by.id("mPopoverWithGroupingButton")).click();
 		expect(takeScreenshot(element(by.id(_resolvePopoverWithGrouping())))).toLookAs("mpopover-grouping");
 	});
@@ -70,7 +64,7 @@ describe("sap.m.MessagePopover", function () {
 	});
 
 	it("should open MessagePopover in compact mode", function () {
-		element(by.id(_resolveCloseButtonWithGrouping())).click(); //Close the Popover/Dialog
+		element(by.css('#' + _resolvePopoverWithGrouping() + ' .sapMMsgPopoverCloseBtn')).click(); //Close the Popover/Dialog
 		element(by.id("compactMode")).click();
 		element(by.id("mPopoverButton")).click();
 		expect(takeScreenshot(element(by.id(_resolvePopover())))).toLookAs("mpopover-compact");
@@ -84,10 +78,10 @@ describe("sap.m.MessagePopover", function () {
 	});
 
 	it("should open MessagePopover with grouping in compact mode", function () {
-		element(by.id(_resolveCloseButton())).click(); //Close the Popover/Dialog
+		element(by.css(".sapMMsgPopoverCloseBtn")).click(); //Close the Popover/Dialog
 		element(by.id("mPopoverWithGroupingButton")).click();
 		element(by.id("mPopoverWithGrouping-messageView-all")).click();
 		expect(takeScreenshot(element(by.id(_resolvePopoverWithGrouping())))).toLookAs("mpopover-grouping-compact");
-		element(by.id(_resolveCloseButtonWithGrouping())).click(); //Close the Popover/Dialog
+		element(by.css('#' + _resolvePopoverWithGrouping() + ' .sapMMsgPopoverCloseBtn')).click(); //Close the Popover/Dialog
 	});
 });

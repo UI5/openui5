@@ -144,7 +144,6 @@ sap.ui.define(function() {
 					"test-resources/sap/ui/core/qunit/odata/ODataMetadata.qunit"
 				],
 				qunit: {
-					version: 2,
 					reorder: false
 				},
 				sinon: 1 // because MockServer is used which has a hard dependency to sinon V1

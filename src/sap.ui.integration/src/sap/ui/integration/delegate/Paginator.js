@@ -66,6 +66,7 @@ sap.ui.define([
 	Paginator.prototype.init = function() {
 		this._iPageNumber = 0;
 		this._iPageCount = 0;
+		this._onScrollBound = this._onScroll.bind(this);
 	};
 
 	Paginator.prototype._applySettings = function() {
@@ -203,26 +204,14 @@ sap.ui.define([
 			this._bInitialLoadComplete = true;
 		}
 
-		const onScroll = (e) => {
-			if (this.isLoadingMore()) {
-				return;
-			}
-
-			const LOAD_MORE_THRESHOLD = 300;
-			// approaching the end of the list
-			if (e.target.scrollHeight - e.target.scrollTop - e.target.clientHeight < LOAD_MORE_THRESHOLD && this.getCard().getCardContent().getDataLength() < iTotalCount) {
-				this._loadMore();
-			}
-		};
-
 		const oDelegate = {
 			onAfterRendering: () => {
 				oList.removeEventDelegate(oDelegate);
 
 				const oScrollContainer = oList.getDomRef().closest(".sapFCardContent");
 
-				oScrollContainer.removeEventListener("scroll", onScroll);
-				oScrollContainer.addEventListener("scroll", onScroll);
+				oScrollContainer.removeEventListener("scroll", this._onScrollBound);
+				oScrollContainer.addEventListener("scroll", this._onScrollBound);
 
 				// load more items until scrollbar appears
 				if (!this.isLoadingMore() && oContent.hasData() && oScrollContainer.clientHeight >= oScrollContainer.scrollHeight && oContent.getDataLength() < iTotalCount) {
@@ -255,6 +244,19 @@ sap.ui.define([
 
 	Paginator.prototype._getLastPageNumber = function () {
 		return Math.max(0, this._iPageCount - 1);
+	};
+
+	Paginator.prototype._onScroll = function(e) {
+		if (this.isLoadingMore()) {
+			return;
+		}
+
+		const LOAD_MORE_THRESHOLD = 300;
+
+		// approaching the end of the list
+		if (e.target.scrollHeight - e.target.scrollTop - e.target.clientHeight < LOAD_MORE_THRESHOLD && this.getCard().getCardContent().getDataLength() < this._iTotalCount) {
+			this._loadMore();
+		}
 	};
 
 	return Paginator;
