@@ -48,5 +48,15 @@
         "text": " sap/base/security/sanitizeHTML: Add support for `text-decoration-line` CSS property"
       }
     ]
+  },
+  "1.143.1": {
+    "date": "December 2025",
+    "notes": [
+      {
+        "id": "71d6f0a1a01e850fd4587d41af5931eb2c5f86e2",
+        "type": "FIX",
+        "text": " sap/ui/model/ClientTreeBinding#cloneData: Use wrapped structuredClone"
+      }
+    ]
   }
 }
