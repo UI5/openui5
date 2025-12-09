@@ -8,5 +8,15 @@
         "text": " sap.m.Tokenizer: allow tokenizer in forms"
       }
     ]
+  },
+  "1.142.1": {
+    "date": "December 2025",
+    "notes": [
+      {
+        "id": "f5597fa4f3487172edde715a08471ad46fc41c6b",
+        "type": "FIX",
+        "text": " SemanticFormElement: _updateDisplayText does no longer fail without available _displayField"
+      }
+    ]
   }
 }

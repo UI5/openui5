@@ -53,5 +53,30 @@
         "text": " ManagedObjectModel: Use original binding's length if no filters are applied"
       }
     ]
+  },
+  "1.142.1": {
+    "date": "December 2025",
+    "notes": [
+      {
+        "id": "751f309775c37e670b03bdee728c9b78b6078529",
+        "type": "FIX",
+        "text": " sap.m.Button: Prevent duplicate shortcut announcements in screen readers"
+      },
+      {
+        "id": "acfc35c7b3735072fb87e4cf9b6c97003f66e086",
+        "type": "FIX",
+        "text": " sap.ui.test.Opa: Fix Safari polling interval test failure"
+      },
+      {
+        "id": "ec782d67b9e763e401767804e32989952f1d7746",
+        "type": "FIX",
+        "text": " sap/ui/thirdparty: bump RequireJS to 2.3.7"
+      },
+      {
+        "id": "191a3f82921537e208748d8b2d2c1d5d7fa1479a",
+        "type": "FIX",
+        "text": " sap/ui/test/: manually fire focus events when browser inactive"
+      }
+    ]
   }
 }

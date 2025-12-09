@@ -18,5 +18,20 @@
         "text": " sap.f.DynamicPage: Layout issue prevented"
       }
     ]
+  },
+  "1.142.1": {
+    "date": "December 2025",
+    "notes": [
+      {
+        "id": "9efa64f5648fc57d0d5e80c536fca34f411871a6",
+        "type": "FIX",
+        "text": " sap.f.DynamicPage: Correct header repositioning in both directions"
+      },
+      {
+        "id": "d295c47164dad1e4378629f23ec49fd6fbcad341",
+        "type": "FIX",
+        "text": " sap.f.DynamicPage: Issue with table sizing fixed"
+      }
+    ]
   }
 }

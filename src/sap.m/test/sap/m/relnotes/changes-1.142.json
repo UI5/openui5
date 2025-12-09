@@ -123,5 +123,90 @@
         "text": " sap.m.Popover: Removed invalidate on resize"
       }
     ]
+  },
+  "1.142.1": {
+    "date": "December 2025",
+    "notes": [
+      {
+        "id": "5c4b59519655ccbdfdb33ed73880a57309738fc7",
+        "type": "FIX",
+        "text": " sap.m.StepInput: change validation behaviour of the StepInput when it has a binding model with Value State:"
+      },
+      {
+        "id": "52aa27b0b7485117e8923b9967596f486d19d261",
+        "type": "FIX",
+        "text": " We now trigger a fetch call to load PDF content and determine PDF availability in the PDFViewer"
+      },
+      {
+        "id": "095810785b80b11bc4a43d35ce8b406ccd4e6178",
+        "type": "FIX",
+        "text": " xConfig: Reverts \"Remove correct value\""
+      },
+      {
+        "id": "78989c7da5f35e00b1ba574dc58d4ed425e77f25",
+        "type": "FIX",
+        "text": " sap.m.SplitContainer: Fixed box-shadow parameter"
+      },
+      {
+        "id": "f67319b94462f72215b1a987b9f910cc83a13afa",
+        "type": "FIX",
+        "text": " sap.m.SearchField: Fix Korean text display within OverflowToolbar"
+      },
+      {
+        "id": "46fbe3f25ef8b68184adf5c068e34199c5a93e79",
+        "type": "FIX",
+        "text": " sap.m.StepInput: range validation is working properly now when there is binding for valueState but no value is provided"
+      },
+      {
+        "id": "226ab7c4414c8f5f6a0dfd2eb5db2231f538c01d",
+        "type": "FIX",
+        "text": " sap.m.MessagePopover: AriaLabelledBy element is now created"
+      },
+      {
+        "id": "216148ab57a1601a04d3d105ae5f67c26b260f1b",
+        "type": "FIX",
+        "text": " sap.m.SinglePlanningCalendar: Add the browser event information to the UI5 event"
+      },
+      {
+        "id": "c8d09b7eac58c53cadeb77196bdddcfca51b8f84",
+        "type": "FIX",
+        "text": " sap.m.TimePicker: Remove custom shadow overwriting"
+      },
+      {
+        "id": "6ab9a0df5d1a1d18da05fa17244a325ad294aa94",
+        "type": "FIX",
+        "text": " We've now removed the iframe content check while loading a PDF to display it"
+      },
+      {
+        "id": "236edd57a70d888190ce43c134fd97ae8c00899c",
+        "type": "FIX",
+        "text": " We've now removed the iframe content check while loading a PDF to display it"
+      },
+      {
+        "id": "add48d9e0f13d1ddea9979db4710c9b7b50fa23a",
+        "type": "FIX",
+        "text": " sap.m.DateTimePicker: fix test about timezone failing in safari"
+      },
+      {
+        "id": "ac17f7b70264d4e45eb34d68a02b502d8c7ca556",
+        "type": "FIX",
+        "text": " SelectionPanel: Update count correctly when no filter is applied"
+      },
+      {
+        "id": "edc6ee79e4057dec942b73002975ac47c784f941",
+        "type": "FIX",
+        "text": " sap.m.DatePicker: has correct placeholder"
+      },
+      {
+        "id": "5ed5e603367b8447d976ac73388ecb1279ae70b5",
+        "type": "FIX",
+        "text": " sap.m.Select: Correct dropdown width when wrapItemsText enabled"
+      },
+      {
+        "id": "24ff945f0159b2e2f00e9851a7cbd0f9db4ee202",
+        "type": "FIX",
+        "text": " sap.m.DatePicker: close picker on context change"
+      }
+    ]
   }
 }

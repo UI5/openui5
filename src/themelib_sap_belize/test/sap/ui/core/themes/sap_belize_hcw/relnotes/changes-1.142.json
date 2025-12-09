@@ -8,5 +8,20 @@
         "text": " sap.uxap.ObjectPageHeader: Improve responsive paddings"
       }
     ]
+  },
+  "1.142.1": {
+    "date": "December 2025",
+    "notes": [
+      {
+        "id": "7fa27e814f617ed25ab54ab646fa58790bcea8c8",
+        "type": "FIX",
+        "text": " sap.uxap.ObjectPageSubSection: fix wrapping titles"
+      },
+      {
+        "id": "c8d09b7eac58c53cadeb77196bdddcfca51b8f84",
+        "type": "FIX",
+        "text": " sap.m.TimePicker: Remove custom shadow overwriting"
+      }
+    ]
   }
 }

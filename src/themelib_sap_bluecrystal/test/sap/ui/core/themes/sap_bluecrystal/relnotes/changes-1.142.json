@@ -1,14 +1,4 @@
 {
-  "1.142.0": {
-    "date": "October 2025",
-    "notes": [
-      {
-        "id": "cbdff77b67907f359924ab0e034b2a88b39de282",
-        "type": "FIX",
-        "text": " sap.uxap.ObjectPageHeader: Improve responsive paddings"
-      }
-    ]
-  },
   "1.142.1": {
     "date": "December 2025",
     "notes": [

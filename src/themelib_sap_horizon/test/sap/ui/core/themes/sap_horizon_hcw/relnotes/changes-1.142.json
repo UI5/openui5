@@ -13,5 +13,15 @@
         "text": " sap.m.SegmentedButton: Correct active color on regular state"
       }
     ]
+  },
+  "1.142.1": {
+    "date": "December 2025",
+    "notes": [
+      {
+        "id": "7fa27e814f617ed25ab54ab646fa58790bcea8c8",
+        "type": "FIX",
+        "text": " sap.uxap.ObjectPageSubSection: fix wrapping titles"
+      }
+    ]
   }
 }

@@ -13,5 +13,35 @@
         "text": " sap.uxap.ObjectPageLayout: Prevent duplicate roles on AnchorBar"
       }
     ]
+  },
+  "1.142.1": {
+    "date": "December 2025",
+    "notes": [
+      {
+        "id": "a122a565d23652faca7bf0bf0ada298b01af845c",
+        "type": "FIX",
+        "text": " sap.uxap.ObjectPageLayout: Fix wrong title in AnchorBar"
+      },
+      {
+        "id": "7fa27e814f617ed25ab54ab646fa58790bcea8c8",
+        "type": "FIX",
+        "text": " sap.uxap.ObjectPageSubSection: fix wrapping titles"
+      },
+      {
+        "id": "f1953675ffce716b14e5db420f4f0fbe5ee47d93",
+        "type": "FIX",
+        "text": " sap.uxap.ObjectPageSubSection: role region"
+      },
+      {
+        "id": "ea75b653d429131c55d3b38e8267c6c5ff01e230",
+        "type": "FIX",
+        "text": " sap.uxap.ObjectPageLayout: Fix wrong positioning"
+      },
+      {
+        "id": "1c9462e3c75f87aaccd638f1a6a455ae69444bc0",
+        "type": "FIX",
+        "text": " sap.uxap.ObjectPageSubSection: prevent infinite rerendering loop"
+      }
+    ]
   }
 }
