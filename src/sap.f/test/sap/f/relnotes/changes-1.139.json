@@ -23,5 +23,25 @@
         "text": " Integration Cards: Child cards now reuse destinations from main card"
       }
     ]
+  },
+  "1.139.3": {
+    "date": "December 2025",
+    "notes": [
+      {
+        "id": "a6da4fc442457bdd307f994cb5d166cfab641e2b",
+        "type": "FIX",
+        "text": " sap.f.DynamicPage: Correct header repositioning in both directions"
+      },
+      {
+        "id": "5094e8919c05a25270315e642296b5eb209d64d1",
+        "type": "FIX",
+        "text": " sap.f.DynamicPageTitle: Fix flaky focus test in Safari"
+      },
+      {
+        "id": "121deb1d84ec21b3aeb3b91966e103db13c93755",
+        "type": "FIX",
+        "text": " sap.f.DynamicPage: Header visibility issue fixed"
+      }
+    ]
   }
 }

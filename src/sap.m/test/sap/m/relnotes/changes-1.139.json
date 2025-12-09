@@ -288,5 +288,50 @@
         "text": " sap.m.ComboBox: Picker now closes on table scroll"
       }
     ]
+  },
+  "1.139.3": {
+    "date": "December 2025",
+    "notes": [
+      {
+        "id": "a6bfe6f0bb3f8004f1f7b40428ea2c5ebf882f78",
+        "type": "FIX",
+        "text": " sap.m.SearchField: Fix Korean text display within OverflowToolbar"
+      },
+      {
+        "id": "08003753e6a3806bf847fbf4a608d90e86d3dccb",
+        "type": "FIX",
+        "text": " sap.m.SinglePlanningCalendar: Add the browser event information to the UI5 event"
+      },
+      {
+        "id": "8e8144dbe6105abe65833e9b90bfe424148e061f",
+        "type": "FIX",
+        "text": " sap.m.TimePicker: Remove custom shadow overwriting"
+      },
+      {
+        "id": "8125eae71d51d58cf94e9cd18a855fbdef5cb15e",
+        "type": "FIX",
+        "text": " sap.m.Popover: Set shadow style according to the \"showArrow\" property"
+      },
+      {
+        "id": "d0a603802f39889febeed480f87678e39859422d",
+        "type": "FIX",
+        "text": " sap.m.DatePicker: close picker on context change"
+      },
+      {
+        "id": "803b3eaf80ca125b4a860d21021659dfda3591f3",
+        "type": "FIX",
+        "text": " sap.m.DateTimePicker: fix test about timezone failing in safari"
+      },
+      {
+        "id": "29f5a2bdd11ce4d9362694f87913bb631d26e9f6",
+        "type": "FIX",
+        "text": " sap.m.DatePicker: has correct placeholder"
+      },
+      {
+        "id": "7c301b5f075e4f79f50f7370a3d1d95a10ab47f7",
+        "type": "FIX",
+        "text": " sap.m.Select: Correct dropdown width when wrapItemsText enabled"
+      }
+    ]
   }
 }

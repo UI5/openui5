@@ -8,5 +8,15 @@
         "text": " SimpleForm: use ColumnLayout as default"
       }
     ]
+  },
+  "1.139.3": {
+    "date": "December 2025",
+    "notes": [
+      {
+        "id": "4d1b38688899f7bc5dc5413e7e29313d55601e5e",
+        "type": "FIX",
+        "text": " SemanticFormElement: _updateDisplayText does no longer fail without available _displayField"
+      }
+    ]
   }
 }

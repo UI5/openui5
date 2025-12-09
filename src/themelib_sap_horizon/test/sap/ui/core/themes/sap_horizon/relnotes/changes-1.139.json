@@ -43,5 +43,15 @@
         "text": " sap.m.ObjectNumber: doesn't have glow effect in horizon and fiori_3 HCB and HCW themes"
       }
     ]
+  },
+  "1.139.3": {
+    "date": "December 2025",
+    "notes": [
+      {
+        "id": "22b3da1b253a76ba2da4e6e6822d2371eaee482a",
+        "type": "FIX",
+        "text": " sap.uxap.ObjectPageSubSection: fix wrapping titles"
+      }
+    ]
   }
 }

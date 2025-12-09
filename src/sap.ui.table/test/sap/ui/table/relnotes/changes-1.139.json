@@ -1,0 +1,12 @@
+{
+  "1.139.3": {
+    "date": "December 2025",
+    "notes": [
+      {
+        "id": "e1723be21b3070daa52add36f18231249a079d24",
+        "type": "FIX",
+        "text": " Table: Remove renderWhitespace restriction"
+      }
+    ]
+  }
+}

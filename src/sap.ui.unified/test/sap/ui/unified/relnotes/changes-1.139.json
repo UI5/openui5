@@ -13,5 +13,15 @@
         "text": " sap.ui.unified.Calendar: specialDates customData aggregation is written in DOM"
       }
     ]
+  },
+  "1.139.3": {
+    "date": "December 2025",
+    "notes": [
+      {
+        "id": "5efde525239979db6f6ec912cc81674081916c92",
+        "type": "FIX",
+        "text": " sap.ui.unified.Month: removed redundant \"selected\" announce"
+      }
+    ]
   }
 }

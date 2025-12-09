@@ -103,5 +103,35 @@
         "text": " sap/ui/model/odata/v2/ODataTreeBinding: $count requests must not contain $expand or $select"
       }
     ]
+  },
+  "1.139.3": {
+    "date": "December 2025",
+    "notes": [
+      {
+        "id": "b67de5cce2592829dfc9c1246cb95c2e256d21f7",
+        "type": "FIX",
+        "text": " sap/ui/model/type/Unit.js: if quantity part is integer, decimals defaults to '0', may be overwritten"
+      },
+      {
+        "id": "06f6baf72a36d0e069f3eadaab653286cd2d948e",
+        "type": "FIX",
+        "text": " sap/base/security/sanitizeHTML: Add support for modern CSS display values"
+      },
+      {
+        "id": "de8209f29c1333a7a33377f3ed0418cd4e2ac691",
+        "type": "FIX",
+        "text": " sap.m.Button: Prevent duplicate shortcut announcements in screen readers"
+      },
+      {
+        "id": "c22bdfcc9312ff59b214285c9c8167d060318bb4",
+        "type": "FIX",
+        "text": " sap.ui.test.Opa: Fix Safari polling interval test failure"
+      },
+      {
+        "id": "a41981bdcbd560111d13bfba4ff3ecb7ce6e52c2",
+        "type": "FIX",
+        "text": " sap/ui/thirdparty: bump RequireJS to 2.3.7"
+      }
+    ]
   }
 }

@@ -28,5 +28,30 @@
         "text": " sap.uxap.ObjectPageSection - hidden title aria-labelledby"
       }
     ]
+  },
+  "1.139.3": {
+    "date": "December 2025",
+    "notes": [
+      {
+        "id": "09d66b641bfedb00e4face8bb9a51d0b74d2bbfb",
+        "type": "FIX",
+        "text": " sap.uxap.ObjectPageLayout: Fix wrong title in AnchorBar"
+      },
+      {
+        "id": "22b3da1b253a76ba2da4e6e6822d2371eaee482a",
+        "type": "FIX",
+        "text": " sap.uxap.ObjectPageSubSection: fix wrapping titles"
+      },
+      {
+        "id": "9e1f04505a7dfb1ecbf1a6bddd8858545e1c232b",
+        "type": "FIX",
+        "text": " sap.uxap.ObjectPageLayout: Fix wrong positioning"
+      },
+      {
+        "id": "3e5e25d73a11125adbc1b371291d8389fd58e866",
+        "type": "FIX",
+        "text": " sap.uxap.ObjectPageSubSection: prevent infinite rerendering loop"
+      }
+    ]
   }
 }
