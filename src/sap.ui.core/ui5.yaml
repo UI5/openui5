@@ -64,7 +64,7 @@ builder:
         decorateBootstrapModule: true
         addTryCatchRestartWrapper: true
     - bundleDefinition:
-        name: sap/ui/core/library-content.js
+        name: sap/ui/core/_library-content.js
         sections:
           - mode: provided
             filters:
@@ -107,7 +107,7 @@ builder:
             resolve: true
             resolveConditional: false
           - mode: preload
-            name: sap/ui/core/library-content
+            name: sap/ui/core/_library-content
             filters: &filters-library-content
               # NOTE: In some scenarios, more files are available during bundling, so only specific includes must be used
               - sap/ui/core/
@@ -181,7 +181,7 @@ builder:
             resolve: true
             resolveConditional: false
           - mode: bundleInfo
-            name: sap/ui/core/library-content.js
+            name: sap/ui/core/_library-content.js
             filters: *filters-library-content
             resolve: false
             resolveConditional: false
