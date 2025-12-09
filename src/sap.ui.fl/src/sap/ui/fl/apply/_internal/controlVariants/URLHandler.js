@@ -12,7 +12,7 @@ sap.ui.define([
 	"sap/ui/core/Component",
 	"sap/ui/fl/apply/_internal/controlVariants/Utils",
 	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
-	"sap/ui/fl/variants/VariantManager",
+	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagerApply",
 	"sap/ui/thirdparty/hasher"
 ], function(
 	deepEqual,
@@ -24,7 +24,7 @@ sap.ui.define([
 	Component,
 	VariantUtil,
 	VariantManagementState,
-	VariantManager,
+	VariantManagerApply,
 	hasher
 ) {
 	"use strict";
@@ -505,7 +505,7 @@ sap.ui.define([
 								sVariantManagementToBeReset,
 								mPropertyBag.appComponent
 							);
-							VariantManager.updateCurrentVariant({
+							VariantManagerApply.updateCurrentVariant({
 								variantManagementReference: sVariantManagementToBeReset,
 								newVariantReference: oAffectedVMControl.getDefaultVariantKey(),
 								vmControl: oAffectedVMControl,

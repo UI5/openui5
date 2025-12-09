@@ -4,77 +4,61 @@ sap.ui.define([
 	"sap/base/util/restricted/_omit",
 	"sap/base/util/Deferred",
 	"sap/m/App",
-	"sap/ui/base/Event",
 	"sap/ui/core/mvc/XMLView",
-	"sap/ui/core/util/reflection/JsControlTreeModifier",
 	"sap/ui/core/BusyIndicator",
 	"sap/ui/core/ComponentContainer",
-	"sap/ui/core/Control",
-	"sap/ui/core/Element",
 	"sap/ui/core/Lib",
-	"sap/ui/core/UIComponent",
-	"sap/ui/fl/apply/_internal/changes/Reverter",
 	"sap/ui/fl/apply/_internal/controlVariants/URLHandler",
 	"sap/ui/fl/apply/_internal/controlVariants/Utils",
 	"sap/ui/fl/apply/_internal/flexObjects/FlexObjectFactory",
 	"sap/ui/fl/apply/_internal/flexObjects/States",
-	"sap/ui/fl/apply/_internal/flexState/controlVariants/Switcher",
 	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
 	"sap/ui/fl/apply/_internal/flexState/FlexObjectState",
 	"sap/ui/fl/apply/_internal/flexState/FlexState",
-	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
+	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/initial/_internal/Settings",
 	"sap/ui/fl/variants/VariantManagement",
 	"sap/ui/fl/variants/VariantManager",
 	"sap/ui/fl/variants/VariantModel",
-	"sap/ui/fl/write/_internal/controlVariants/ControlVariantWriteUtils",
 	"sap/ui/fl/write/_internal/flexState/FlexObjectManager",
 	"sap/ui/fl/write/api/ContextBasedAdaptationsAPI",
 	"sap/ui/fl/Layer",
 	"sap/ui/fl/LayerUtils",
 	"sap/ui/fl/Utils",
 	"sap/ui/model/resource/ResourceModel",
-	"sap/ui/test/utils/nextUIUpdate",
 	"sap/ui/thirdparty/sinon-4",
+	"test-resources/sap/ui/fl/qunit/FlQUnitUtils",
 	"test-resources/sap/ui/rta/qunit/RtaQunitUtils"
 ], function(
 	_omit,
 	Deferred,
 	App,
-	Event,
 	XMLView,
-	JsControlTreeModifier,
 	BusyIndicator,
 	ComponentContainer,
-	Control,
-	Element,
 	Lib,
-	UIComponent,
-	Reverter,
 	URLHandler,
 	VariantUtil,
 	FlexObjectFactory,
 	States,
-	Switcher,
 	VariantManagementState,
 	FlexObjectState,
 	FlexState,
-	ManifestUtils,
 	ControlVariantApplyAPI,
+	ManifestUtils,
 	Settings,
 	VariantManagement,
 	VariantManager,
 	VariantModel,
-	ControlVariantWriteUtils,
 	FlexObjectManager,
 	ContextBasedAdaptationsAPI,
 	Layer,
 	LayerUtils,
 	Utils,
 	ResourceModel,
-	nextUIUpdate,
 	sinon,
+	FlQUnitUtils,
 	RtaQunitUtils
 ) {
 	"use strict";
@@ -98,15 +82,6 @@ sap.ui.define([
 			variantName: mVariantProperties.title,
 			contexts: mVariantProperties.contexts
 		});
-	}
-
-	function stubFlexObjectsSelector(aFlexObjects) {
-		var oFlexObjectsSelector = FlexState.getFlexObjectsDataSelector();
-		var oGetFlexObjectsStub = sandbox.stub(oFlexObjectsSelector, "get");
-		oGetFlexObjectsStub.callsFake(function(...aArgs) {
-			return aFlexObjects.concat(oGetFlexObjectsStub.wrappedMethod.apply(this, aArgs));
-		});
-		oFlexObjectsSelector.checkUpdate();
 	}
 
 	QUnit.module("Given an instance of VariantModel", {
@@ -133,7 +108,7 @@ sap.ui.define([
 					variantReference: "variant1"
 				});
 				oPersistedUIChange.setProperty("state", States.LifecycleState.PERSISTED);
-				stubFlexObjectsSelector([
+				FlQUnitUtils.stubFlexObjectsSelector(sandbox, [
 					createVariant({
 						author: VariantUtil.DEFAULT_AUTHOR,
 						key: sVMReference,
@@ -1362,7 +1337,7 @@ sap.ui.define([
 			var oResourceModel = new ResourceModel({ bundleUrl: oResourceBundle.oUrlInfo.url });
 			this.oVariantManagement.setModel(oResourceModel, "i18n");
 			var sTitleBinding = "{i18n>VARIANT_MANAGEMENT_AUTHOR}";
-			stubFlexObjectsSelector(createTranslationVariants.call(this, sTitleBinding));
+			FlQUnitUtils.stubFlexObjectsSelector(sandbox, createTranslationVariants.call(this, sTitleBinding));
 			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
 			return this.oVariantManagement.waitForInit().then(function() {
 				assert.strictEqual(
@@ -1383,7 +1358,7 @@ sap.ui.define([
 			oResourceModel._oResourceBundle.aPropertyFiles[0].mProperties["test.with.dots"] = "Text From Key With Dots";
 			this.oVariantManagement.setModel(oResourceModel, "i18n");
 			var sTitleBinding = "{i18n>test.with.dots}";
-			stubFlexObjectsSelector(createTranslationVariants.call(this, sTitleBinding));
+			FlQUnitUtils.stubFlexObjectsSelector(sandbox, createTranslationVariants.call(this, sTitleBinding));
 			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
 			return this.oVariantManagement.waitForInit().then(function() {
 				assert.strictEqual(
@@ -1399,7 +1374,7 @@ sap.ui.define([
 			var oResourceModel = new ResourceModel({ bundleUrl: oResourceBundle.oUrlInfo.url });
 			this.oVariantManagement.setModel(oResourceModel, "i18n");
 			var sTitleBinding = "{anotherResourceModel>VARIANT_MANAGEMENT_AUTHOR}";
-			stubFlexObjectsSelector(createTranslationVariants.call(this, sTitleBinding));
+			FlQUnitUtils.stubFlexObjectsSelector(sandbox, createTranslationVariants.call(this, sTitleBinding));
 			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
 			this.oVariantManagement.attachModelContextChange(function() {
 				assert.strictEqual(
@@ -1417,235 +1392,6 @@ sap.ui.define([
 				);
 				this.oVariantManagement.setModel(oResourceModel, "anotherResourceModel");
 			}.bind(this));
-		});
-
-		QUnit.test("calling updateCurrentVariant in between registerToModel calls", async function(assert) {
-			const oControl = new Control("someControlId");
-			VariantManagementState.getInitialUIChanges.restore();
-			const sVMReference2 = "varMgmtRef2";
-			const sVMReference3 = "varMgmtRef3";
-			FlexObjectState.waitForFlexObjectsToBeApplied.restore();
-			const oUIChange1 = FlexObjectFactory.createUIChange({
-				id: "someUIChange",
-				selector: {
-					id: "someControlId"
-				},
-				layer: Layer.CUSTOMER,
-				variantReference: this.sVMReference
-			});
-			oUIChange1.setState(States.LifecycleState.PERSISTED);
-			oUIChange1.markSuccessful("result");
-			const oUIChange2 = FlexObjectFactory.createUIChange({
-				id: "someUIChange2",
-				selector: {
-					id: "someControlId"
-				},
-				layer: Layer.CUSTOMER,
-				variantReference: sVMReference2
-			});
-			oUIChange2.setState(States.LifecycleState.PERSISTED);
-			oUIChange2.markSuccessful("result");
-			const oUIChange3 = FlexObjectFactory.createUIChange({
-				id: "someUIChange3",
-				selector: {
-					id: "someControlId"
-				},
-				layer: Layer.CUSTOMER,
-				variantReference: "variant0"
-			});
-			oUIChange3.setState(States.LifecycleState.PERSISTED);
-			oUIChange3.markSuccessful("result");
-			stubFlexObjectsSelector([
-				createVariant({
-					author: VariantUtil.DEFAULT_AUTHOR,
-					key: this.sVMReference,
-					layer: Layer.VENDOR,
-					title: "Standard",
-					contexts: {},
-					variantManagementReference: this.sVMReference
-				}),
-				createVariant({
-					author: "Me",
-					key: sVMReference2,
-					layer: Layer.CUSTOMER,
-					title: "Standard",
-					variantManagementReference: sVMReference2
-				}),
-				createVariant({
-					author: "Me",
-					key: "variant0",
-					layer: Layer.CUSTOMER,
-					title: "variant A",
-					variantManagementReference: sVMReference2
-				}),
-				oUIChange1, oUIChange2, oUIChange3
-			]);
-
-			this.oVariantManagement.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
-
-			const oVariantManagement2 = new VariantManagement(sVMReference2);
-			oVariantManagement2.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
-
-			await oVariantManagement2.waitForInit();
-			await VariantManager.updateCurrentVariant({
-				variantManagementReference: sVMReference2,
-				newVariantReference: "variant0",
-				appComponent: this.oModel.oAppComponent,
-				vmControl: oVariantManagement2
-			});
-
-			const oVariantManagement3 = new VariantManagement(sVMReference3);
-			oVariantManagement3.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
-
-			await VariantManagementState.waitForAllVariantSwitches(sReference);
-			assert.ok(true, "the variant switch promise was resolved");
-			oControl.destroy();
-			oVariantManagement2.destroy();
-			oVariantManagement3.destroy();
-		});
-	});
-
-	QUnit.module("Given a variant management control in personalization mode", {
-		beforeEach() {
-			return FlexState.initialize({
-				reference: "MockController",
-				componentId: "testComponent",
-				componentData: {},
-				manifest: {}
-			}).then(async function() {
-				const oView = await XMLView.create({
-					id: "testComponent---mockview",
-					viewName: "fl.test.VariantManagementTestApp"
-				});
-				var MockComponent = UIComponent.extend("MockController", {
-					metadata: {
-						manifest: {
-							"_version": "2.0.0",
-
-							"sap.app": {
-								applicationVersion: {
-									version: "1.2.3"
-								},
-								id: "MockController"
-							}
-						}
-					},
-					createContent() {
-						var oApp = new App(oView.createId("mockapp"));
-						oApp.addPage(oView);
-						return oApp;
-					}
-				});
-
-				this.oComp = new MockComponent({ id: "testComponent" });
-				this.oView = oView;
-				this.oVariantModel = new VariantModel({}, {
-					appComponent: this.oComp
-				});
-				return this.oVariantModel.initialize();
-			}.bind(this)).then(async function() {
-				this.oComp.setModel(this.oVariantModel, ControlVariantApplyAPI.getVariantModelName());
-				this.sVMReference = "mockview--VariantManagement1";
-
-				var oData = this.oVariantModel.getData();
-				oData[this.sVMReference].defaultVariant = "variant1";
-				oData[this.sVMReference].currentVariant = "variant1";
-				this.oVariant1 = {
-					author: "Me",
-					key: "variant1",
-					layer: Layer.CUSTOMER,
-					title: "variant A",
-					favorite: true,
-					visible: true,
-					executeOnSelect: false
-				};
-				this.oVariant2 = {
-					author: "Me",
-					key: "variant2",
-					layer: Layer.CUSTOMER,
-					title: "variant B",
-					favorite: true,
-					visible: true,
-					executeOnSelect: false
-				};
-				oData[this.sVMReference].variants.push(this.oVariant1);
-				oData[this.sVMReference].variants.push(this.oVariant2);
-				this.oUpdateCurrentVariantStub = sandbox.stub(VariantManager, "updateCurrentVariant").resolves();
-				sandbox.stub(VariantManagementState, "getCurrentVariantReference").returns("variant1");
-				sandbox.stub(VariantManagementState, "getControlChangesForVariant").returns([]);
-				sandbox.stub(FlexObjectManager, "deleteFlexObjects");
-				this.oGetDirtyFlexObjectsStub = sandbox.stub(FlexObjectState, "getDirtyFlexObjects");
-				sandbox.stub(Switcher, "switchVariant").resolves();
-				sandbox.stub(Reverter, "revertMultipleChanges").resolves();
-
-				this.oVariantModel.setData(oData);
-				this.oVariantModel.checkUpdate(true);
-
-				this.oCompContainer = new ComponentContainer("ComponentContainer", {
-					component: this.oComp
-				}).placeAt("qunit-fixture");
-				await nextUIUpdate();
-			}.bind(this));
-		},
-		afterEach() {
-			this.oCompContainer.destroy();
-			FlexState.clearState();
-			sandbox.restore();
-		}
-	}, function() {
-		function clickOnVMControl(oVMControl) {
-			// to create variant list control - inside variant management control's popover
-			oVMControl._getEmbeddedVM().getDomRef().click();
-		}
-
-		function makeSelection(oVMControl, iIndex) {
-			var oVariantListControl = oVMControl._getEmbeddedVM().oVariantPopOver.getContent()[0].getContent()[0];
-			var oSelectedItem = oVariantListControl.getItems()[iIndex];
-			oVariantListControl.fireItemPress({
-				item: oSelectedItem
-			});
-		}
-
-		function selectTargetVariant(oVMControl, iIndex) {
-			// variant management control popover
-			if (oVMControl._getEmbeddedVM().oVariantPopOver && oVMControl._getEmbeddedVM().oVariantPopOver.isOpen()) {
-				makeSelection(oVMControl, iIndex);
-			} else {
-				oVMControl._getEmbeddedVM().oVariantPopOver.attachEventOnce("afterOpen", makeSelection.bind(null, oVMControl, iIndex));
-			}
-		}
-
-		QUnit.test("when the control is switched to a new variant with no unsaved personalization changes", function(assert) {
-			var fnDone = assert.async();
-			var sVMControlId = this.oComp.createId(this.sVMReference);
-			var oVMControl = Element.getElementById(sVMControlId);
-			var oCallListenerStub = sandbox.stub(oVMControl, "_executeAllVariantAppliedListeners");
-
-			oVMControl.attachEventOnce("select", function(oEvent) {
-				var sSelectedVariantReference = oEvent.getParameters().key;
-				this.oUpdateCurrentVariantStub.onFirstCall().callsFake(function(mPropertyBag) {
-					// update call will make variant model busy, which will be resolved after the whole update process has taken place
-					VariantManagementState.waitForVariantSwitch(sReference, this.sVMReference)
-					.then(function() {
-						assert.strictEqual(oCallListenerStub.callCount, 0, "the listeners are not notified again");
-						assert.deepEqual(mPropertyBag, {
-							variantManagementReference: sSelectedVariantReference,
-							newVariantReference: this.sVMReference,
-							appComponent: this.oComp,
-							vmControl: oVMControl,
-							internallyCalled: true
-						}, "then variant switch was performed");
-						assert.ok(Reverter.revertMultipleChanges.notCalled, "then variant was not reverted explicitly");
-						assert.ok(FlexObjectManager.deleteFlexObjects.notCalled, "then no dirty changes were deleted");
-						fnDone();
-					}.bind(this));
-					return Promise.resolve();
-				}.bind(this));
-			}.bind(this));
-
-			clickOnVMControl(oVMControl);
-
-			selectTargetVariant(oVMControl, 0);
 		});
 	});
 

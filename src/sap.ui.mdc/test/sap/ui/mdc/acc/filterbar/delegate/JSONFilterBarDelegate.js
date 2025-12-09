@@ -16,6 +16,8 @@ sap.ui.define([
 		const sPropertyName = oProperty.key;
 		const oFilterField = new FilterField(sId, {
 			dataType: oProperty.dataType,
+			dataTypeFormatOptions: oProperty.formatOptions,
+			dataTypeConstraints: oProperty.constraints,
 			conditions: "{$filters>/conditions/" + sPropertyName + '}',
 			propertyKey: sPropertyName,
 			required: oProperty.required,

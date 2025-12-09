@@ -7,7 +7,8 @@ sap.ui.define([
 	"sap/ui/fl/write/_internal/controlVariants/ControlVariantWriteUtils",
 	"sap/ui/fl/write/_internal/flexState/FlexObjectManager",
 	"sap/ui/fl/Layer",
-	"sap/ui/thirdparty/sinon-4"
+	"sap/ui/thirdparty/sinon-4",
+	"test-resources/sap/ui/fl/qunit/FlQUnitUtils"
 ], function(
 	FlexObjectFactory,
 	FlexState,
@@ -15,20 +16,12 @@ sap.ui.define([
 	ControlVariantWriteUtils,
 	FlexObjectManager,
 	Layer,
-	sinon
+	sinon,
+	FlQUnitUtils
 ) {
 	"use strict";
 
 	const sandbox = sinon.createSandbox();
-
-	function stubFlexObjectsSelector(aFlexObjects) {
-		const oFlexObjectsSelector = FlexState.getFlexObjectsDataSelector();
-		const oGetFlexObjectsStub = sandbox.stub(oFlexObjectsSelector, "get");
-		oGetFlexObjectsStub.callsFake(function(...aArgs) {
-			return aFlexObjects.concat(oGetFlexObjectsStub.wrappedMethod.apply(this, aArgs));
-		});
-		oFlexObjectsSelector.checkUpdate();
-	}
 
 	function createFlexObjects(sReference, sVMReference) {
 		return [
@@ -121,7 +114,7 @@ sap.ui.define([
 				oSetTitleVariantChange,
 				oVMDependentChange
 			] = aAllChanges;
-			stubFlexObjectsSelector(aAllChanges);
+			FlQUnitUtils.stubFlexObjectsSelector(sandbox, aAllChanges);
 			const aExpectedChanges = [oVariant, oVMChange, oSetVisibleVariantChange, oSetTitleVariantChange, oVMDependentChange];
 
 			sandbox.stub(FlexObjectManager, "deleteFlexObjects");
@@ -152,7 +145,7 @@ sap.ui.define([
 			const sVariantReference = "variant1";
 
 			const aAllChanges = createFlexObjects(sReference, sVMReference);
-			stubFlexObjectsSelector(aAllChanges);
+			FlQUnitUtils.stubFlexObjectsSelector(sandbox, aAllChanges);
 			sandbox.stub(FlexObjectManager, "deleteFlexObjects");
 			const aDeletedChanges = ControlVariantWriteUtils.deleteVariant(sReference, sVMReference, sVariantReference);
 			assert.strictEqual(aDeletedChanges.length, 0, "then no changes are returned");

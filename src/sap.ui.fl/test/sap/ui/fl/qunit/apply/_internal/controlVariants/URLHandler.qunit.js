@@ -6,10 +6,10 @@ sap.ui.define([
 	"sap/ui/core/UIComponent",
 	"sap/ui/fl/apply/_internal/controlVariants/URLHandler",
 	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
+	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagerApply",
 	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/variants/VariantManagement",
-	"sap/ui/fl/variants/VariantManager",
 	"sap/ui/fl/variants/VariantModel",
 	"sap/ui/fl/Layer",
 	"sap/ui/thirdparty/hasher",
@@ -20,10 +20,10 @@ sap.ui.define([
 	UIComponent,
 	URLHandler,
 	VariantManagementState,
+	VariantManagerApply,
 	ControlVariantApplyAPI,
 	ManifestUtils,
 	VariantManagement,
-	VariantManager,
 	VariantModel,
 	Layer,
 	hasher,
@@ -382,7 +382,7 @@ sap.ui.define([
 
 			return this.oModel.initialize()
 			.then(function() {
-				this.oSwitchToDefaultVariantStub = sandbox.stub(VariantManager, "updateCurrentVariant");
+				this.oSwitchToDefaultVariantStub = sandbox.stub(VariantManagerApply, "updateCurrentVariant");
 
 				// variant management controls
 				this.oVariantManagement1 = new VariantManagement("variantMgmtId1", { updateVariantInURL: true });

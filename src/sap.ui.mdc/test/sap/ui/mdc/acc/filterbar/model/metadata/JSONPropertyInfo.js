@@ -34,13 +34,15 @@ sap.ui.define([
 		label: "Height",
 		visible: true,
 		path: "height",
-		dataType: "sap.ui.model.type.Integer"
+		dataType: "sap.ui.model.type.Integer",
+		formatOptions:{emptyString: null}
 	},{
 		key: "prominence",
 		label: "Prominence",
 		visible: true,
 		path: "prominence",
-		dataType: "sap.ui.model.type.Float"
+		dataType: "sap.ui.model.type.Float",
+		formatOptions:{emptyString: null}
 	},{
 		key: "range",
 		label: "Range",

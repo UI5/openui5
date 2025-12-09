@@ -9,11 +9,12 @@ sap.ui.define([
 	"sap/ui/core/StaticArea",
 	"sap/ui/core/TooltipBase",
 	"sap/ui/core/InvisibleText",
+	"sap/m/Button",
 	"sap/m/Label",
 	"sap/m/Text",
 	"sap/ui/Device",
 	"sap/ui/thirdparty/jquery"
-], function(Library, qutils, nextUIUpdate, FileUploader, FileUploaderHttpRequestMethod, StaticArea, TooltipBase, InvisibleText, Label, Text, Device, jQuery) {
+], function(Library, qutils, nextUIUpdate, FileUploader, FileUploaderHttpRequestMethod, StaticArea, TooltipBase, InvisibleText, Button, Label, Text, Device, jQuery) {
 	"use strict";
 
 	/**
@@ -65,6 +66,59 @@ sap.ui.define([
 
 		return bIsFirefox ? new Blob([oFileObject]) : oFileObject;
 	};
+
+	/**
+	 * Waits until a predicate on the file input becomes true or timeouts.
+	 * Observes DOM mutations in the document (includes StaticArea). Resolves when the predicate is true.
+	 * Rejects after the timeout to avoid infinite waiting.
+	 * @param {function} fnPredicate - () => boolean
+	 * @param {number} [iTimeout=2000] - ms
+	 * @returns {Promise<void>}
+	 */
+	function waitForFileInputCondition(fnPredicate, iTimeout) {
+		return new Promise(function(resolve, reject) {
+			// Immediate check
+			try {
+				if (fnPredicate()) {
+					resolve();
+					return;
+				}
+			} catch (e) {
+				// fall through to observer
+			}
+
+			var timer = setTimeout(function() {
+				observer.disconnect();
+				reject(new Error("waitForFileInputCondition: timeout"));
+			}, iTimeout || 2000);
+
+			var observer = new MutationObserver(function() {
+				try {
+					if (fnPredicate()) {
+						clearTimeout(timer);
+						observer.disconnect();
+						resolve();
+					}
+				} catch (e) {
+					// ignore and wait
+				}
+			});
+
+			// observe whole document (covers static area). attribute changes + subtree childList
+			observer.observe(document, { childList: true, subtree: true, attributes: true, attributeFilter: ["name", "multiple", "webkitdirectory", "required"] });
+		});
+	}
+
+	/**
+	 * Helper: Add files to a FileUploader by invoking its change handler.
+	 * @param {sap.ui.unified.FileUploader} oFileUploader
+	 * @param {Array} aFilesToAdd
+	 */
+	function addFilesToFileUploaderTokenizer(oFileUploader, aFilesToAdd) {
+		aFilesToAdd = aFilesToAdd || [];
+		oFileUploader._selectedFileNames = aFilesToAdd;
+		oFileUploader._updateTokenizer();
+	}
 
 	/**
 	 * Test Public Interface
@@ -170,6 +224,7 @@ sap.ui.define([
 
 		//cleanup
 		oFileUploader.destroy();
+		await nextUIUpdate();
 	});
 
 	QUnit.test("Test fileType property - setter/getter - compatibility cases", function (assert) {
@@ -307,62 +362,51 @@ sap.ui.define([
 	});
 
 	QUnit.test("Test multiple property - setter", async function (assert) {
-		//prepare
-		var done = assert.async(),
-			oFileUploader = new FileUploader(),
-			oInput;
-
+		var oFileUploader = new FileUploader();
 		oFileUploader.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
-		var oAfterRenderingDelegate = {
-			onAfterRendering: function() {
-				oInput = document.querySelector("[type='file']");
-
-				//assert
-				assert.strictEqual(oInput.getAttribute("name"), oFileUploader.getId() + "[]", "multiple files expected");
-
-				//clean
-				oFileUploader.removeDelegate(oAfterRenderingDelegate);
-				oFileUploader.destroy();
-				done();
-			}
-		};
-
-		oFileUploader.addDelegate(oAfterRenderingDelegate);
-
-		//act
+		// act
 		oFileUploader.setMultiple(true);
+
+		// wait for the control's own native input to reflect the change
+		await waitForFileInputCondition(function() {
+			var oInput = oFileUploader.getInputReference(); // use control-specific getter
+			return oInput && oInput.getAttribute("name") === oFileUploader.getId() + "[]";
+		}, 2000);
+
+		// assert using the control-specific input
+		var oInput = oFileUploader.getInputReference();
+		assert.strictEqual(oInput.getAttribute("name"), oFileUploader.getId() + "[]", "multiple files expected");
+
+		// cleanup
+		oFileUploader.destroy();
+		await nextUIUpdate();
 	});
 
 	QUnit.test("Test directory property - setter", async function (assert) {
-		//prepare
-		var done = assert.async(),
-			oFileUploader = new FileUploader(),
-			oInput;
 
+		var oFileUploader = new FileUploader();
 		oFileUploader.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
-		var oAfterRenderingDelegate = {
-			onAfterRendering: function() {
-				oInput = document.querySelector("[type='file']");
-
-				//assert
-				assert.strictEqual(oInput.getAttribute("name"), oFileUploader.getId() + "[]", "multiple files expected");
-				assert.ok(oInput.hasAttribute("webkitdirectory"), "attribute properly set");
-
-				//clean
-				oFileUploader.removeDelegate(oAfterRenderingDelegate);
-				oFileUploader.destroy();
-				done();
-			}
-		};
-
-		oFileUploader.addDelegate(oAfterRenderingDelegate);
-
-		//act
+		// act
 		oFileUploader.setDirectory(true);
+
+		// wait for the control's own native input to reflect the change
+		await waitForFileInputCondition(function() {
+			var oInput = oFileUploader.getInputReference();
+			return oInput && oInput.getAttribute("name") === oFileUploader.getId() + "[]" && oInput.hasAttribute("webkitdirectory");
+		}, 2000);
+
+		// assert using the control-specific input
+		var oInput = oFileUploader.getInputReference();
+		assert.strictEqual(oInput.getAttribute("name"), oFileUploader.getId() + "[]", "multiple files expected");
+		assert.ok(oInput.hasAttribute("webkitdirectory"), "attribute properly set");
+
+		// cleanup
+		oFileUploader.destroy();
+		await nextUIUpdate();
 	});
 
 	QUnit.test("Setters used on after rendering, don't create additional input field type file", async function (assert) {
@@ -508,29 +552,6 @@ sap.ui.define([
 		oFileUploader.destroy();
 	});
 
-	QUnit.test("Test valueStateText property - setter/getter", async function (assert) {
-		var oFileUploader = createFileUploader(),
-			VALUE_STATE_TEXT = "Test";
-
-		//Set up
-		oFileUploader.placeAt("qunit-fixture");
-		await nextUIUpdate();
-
-		// assert default
-		assert.equal(oFileUploader.getValueStateText(), "", "setValueStateText() --> getValueStateText() should return an empty string by default");
-
-		// act
-		oFileUploader.setValueStateText(VALUE_STATE_TEXT);
-		await nextUIUpdate();
-
-		// assert
-		assert.equal(oFileUploader.getValueStateText(), VALUE_STATE_TEXT, "setValueStateText() --> getValueStateText() should return '" + VALUE_STATE_TEXT + "'");
-		assert.equal(oFileUploader.oFilePath.getValueStateText(), VALUE_STATE_TEXT, "Child input setValueStateText() --> getValueStateText() should return '" + VALUE_STATE_TEXT + "'");
-
-		//cleanup
-		oFileUploader.destroy();
-	});
-
 	QUnit.test("Test setTooltip", async function (assert) {
 		//Set up
 		var sTooltip = "this is \"the\" file uploader";
@@ -572,11 +593,12 @@ sap.ui.define([
 		oFileUploader.destroy();
 	});
 
-	QUnit.test("Test associated label interaction", async function (assert) {
+	QUnit.test("Test browse icon/button interaction", async function (assert) {
 		//Set up
-		var oFileUploader = createFileUploader({}),
+		var oFileUploader = createFileUploader({ buttonOnly: true }),
 			oSpy,
-			FUEl;
+			FUEl,
+			oBrowseIcon;
 
 		// override onclick handler to prevent file dialog opening, causing the test execution to stop
 		oFileUploader.onclick = function (oEvent) {
@@ -586,7 +608,7 @@ sap.ui.define([
 		oFileUploader.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
-		//act
+		//act (in buttonOnly mode)
 		FUEl = oFileUploader.getDomRef("fu");
 		oSpy = this.spy(FUEl, "click");
 		qutils.triggerEvent("click", oFileUploader.oBrowse.getId());
@@ -594,7 +616,18 @@ sap.ui.define([
 		// assert
 		assert.strictEqual(oSpy.callCount, 1, "Clicking on browse button should trigger click on the input");
 
+		oFileUploader.setButtonOnly(false);
+		await nextUIUpdate();
+
+		// act (in standard mode)
+		oBrowseIcon = oFileUploader.getDomRef("fu_browse_icon");
+		qutils.triggerEvent("click", oBrowseIcon);
+
+		// assert
+		assert.strictEqual(oSpy.callCount, 2, "Clicking on browse icon should trigger click on the input");
+
 		// cleanup
+		oSpy.restore();
 		oFileUploader.destroy();
 	});
 
@@ -603,21 +636,26 @@ sap.ui.define([
 		var oFileUploader = new FileUploader("uploader"),
 			oLabel = new Label({labelFor: "uploader", text: "label"}),
 			oClickEvent = new MouseEvent("click", {bubbles: true, cancelable: true}),
-			oBrowseClickSpy;
+			oOpenDialogSpy;
 
 		oLabel.placeAt("qunit-fixture");
 		oFileUploader.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
-		oBrowseClickSpy = this.spy(oFileUploader.getDomRef("fu"), "click");
+		oOpenDialogSpy = this.spy(oFileUploader, "fireBeforeDialogOpen");
+
+		// assert
+		assert.notOk(oFileUploader.getDomRef().classList.contains("sapMFocus"),  "The File Uploader is not focused");
 
 		// act
 		oLabel.getDomRef().dispatchEvent(oClickEvent);
 
 		// assert
-		assert.ok(oBrowseClickSpy.calledOnce, "The browse button gets activated");
+		assert.ok(oFileUploader.getDomRef().classList.contains("sapMFocus"),  "The File Uploader gets focused");
+		assert.equal(oOpenDialogSpy.callCount, 0,  "The browse button does not get activated");
 
 		// clean
+		oOpenDialogSpy.restore();
 		oLabel.destroy();
 		oFileUploader.destroy();
 	});
@@ -759,7 +797,194 @@ sap.ui.define([
 		oFileUploader.destroy();
 	});
 
+	// test various File Uploader interactions
+	QUnit.module("FileUploader Interactions");
+
+	QUnit.test("Check which DOM element is focused when file uploader is focused (buttonOnly: false)", async function (assert) {
+		var oButton = new Button({ text: "Before" });
+		var oFileUploader = new FileUploader({ buttonOnly: false });
+
+		oButton.placeAt("qunit-fixture");
+		oFileUploader.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		// focus button first
+		oButton.focus();
+		await nextUIUpdate();
+		assert.strictEqual(document.activeElement, oButton.getDomRef(), "Button is focused initially");
+
+		// focus file uploader and verify internal input is active
+		oFileUploader.focus();
+		await nextUIUpdate();
+
+		assert.strictEqual(document.activeElement, oFileUploader.oFileUpload, "After focusing FileUploader (buttonOnly:false) the internal input is the active element");
+		assert.strictEqual(document.activeElement.id, oFileUploader.getId() + "-fu", "Active element id matches internal input id");
+
+		// cleanup
+		oButton.destroy();
+		oFileUploader.destroy();
+		await nextUIUpdate();
+	});
+
+	QUnit.test("Check which DOM element is focused when file uploader is focused (buttonOnly: true)", async function (assert) {
+		var oButton = new Button({ text: "Before" });
+		var oFileUploader = new FileUploader({ buttonOnly: true });
+
+		oButton.placeAt("qunit-fixture");
+		oFileUploader.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		// focus button first
+		oButton.focus();
+		await nextUIUpdate();
+		assert.strictEqual(document.activeElement, oButton.getDomRef(), "Button is focused initially");
+
+		// focus file uploader and verify internal input is active
+		oFileUploader.focus();
+		await nextUIUpdate();
+
+		assert.strictEqual(document.activeElement, oFileUploader.oFileUpload, "After focusing FileUploader (buttonOnly:true) the internal input is the active element");
+		assert.strictEqual(document.activeElement.id, oFileUploader.getId() + "-fu", "Active element id matches internal input id");
+
+		// cleanup
+		oButton.destroy();
+		oFileUploader.destroy();
+		await nextUIUpdate();
+	});
+
+	QUnit.test("Browse icon opens file picker dialog", async function (assert) {
+		// arrange
+		var oFileUploader = new FileUploader();
+		oFileUploader.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		var oSpy = this.spy(oFileUploader, "openFilePicker");
+
+		// act - click the browse icon (non-buttonOnly mode)
+		qutils.triggerEvent("click", oFileUploader._getBrowseIcon().getId());
+		await nextUIUpdate();
+
+		// assert
+		assert.ok(oSpy.calledOnce, "Clicking the browse icon fires openFilePicker");
+
+		// cleanup
+		oSpy.restore();
+		oFileUploader.destroy();
+		await nextUIUpdate();
+	});
+
+	QUnit.test("DEL removes selected tokens when FileUploader is focused", async function (assert) {
+		// arrange
+		var oFileUploader = new FileUploader({ multiple: true });
+		oFileUploader.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		// populate tokens (helper updates tokenizer from selectedFileNames)
+		addFilesToFileUploaderTokenizer(oFileUploader, ["a.txt", "b.txt"]);
+		await nextUIUpdate();
+
+		var oTokenizer = oFileUploader._getTokenizer();
+		var aTokens = oTokenizer.getTokens();
+		assert.strictEqual(aTokens.length, 2, "Tokenizer initially has two tokens");
+
+		// ensure uploader is focused (as requested)
+		oFileUploader.focus();
+		await nextUIUpdate();
+
+		// act: simulate DEL key press
+		var oDelEvent = {
+			keyCode: 46
+		};
+		oFileUploader.onkeydown(oDelEvent);
+		oFileUploader.onkeyup(oDelEvent);
+		await nextUIUpdate();
+
+		// assert: tokens removed and internal state cleared
+		assert.strictEqual(oTokenizer.getTokens().length, 0, "All tokens removed after DEL");
+		assert.strictEqual(oFileUploader._selectedFileNames.length, 0, "_selectedFileNames cleared after DEL");
+
+		// cleanup
+		oFileUploader.destroy();
+		await nextUIUpdate();
+	});
+
+	QUnit.test("ValueState popup opens on focus when valueState is set", async function (assert) {
+		var oFileUploader = new FileUploader({
+				valueState: "Error",
+				valueStateText: "There is an error"
+			}),
+			oOpenSpy = this.spy(oFileUploader, "openValueStateMessage"),
+			oButton = new Button({ text: "Before" }),
+			oValueStateMessage;
+
+		// place a button before the uploader to be able to shift focus away
+		oButton.placeAt("qunit-fixture");
+		await nextUIUpdate();
+		oButton.focus();
+		await nextUIUpdate();
+
+		// oFileUploader.placeAt("qunit-fixture");
+		oFileUploader.placeAt("qunit-fixture");
+		await nextUIUpdate();
+		oValueStateMessage = oFileUploader._oValueStateMessage;
+
+		// assert initial state
+		assert.notOk(oOpenSpy.called, "openValueStateMessage not called before focus");
+		assert.notOk(oValueStateMessage.getPopup().isOpen(), "Value state message popup is not open before focus");
+
+		// focus the control -> should open value state message
+		oFileUploader.focus();
+		await nextUIUpdate();
+
+		// assert
+		assert.ok(oOpenSpy.calledOnce, "openValueStateMessage was called once on focus when valueState is Error");
+		assert.ok(oValueStateMessage.getPopup().isOpen(), "Value state message popup is open after focus");
+
+		oButton.focus();
+		await nextUIUpdate();
+
+		// assert state on focus out
+		assert.notOk(oValueStateMessage.getPopup().isOpen(), "Value state message popup is not open after focus out");
+
+		// cleanup
+		oOpenSpy.restore && oOpenSpy.restore();
+		oButton.destroy();
+		oFileUploader.destroy();
+		await nextUIUpdate();
+	});
+
+	QUnit.test("Label click focuses FileUploader (external label via labelFor)", async function (assert) {
+		var oFileUploader = new FileUploader("fuLabelTest"),
+			oLabel = new Label({ text: "Click me", labelFor: oFileUploader.getId() }),
+			oBeforeDialogOpenSpy;
+
+		// render
+		oLabel.placeAt("qunit-fixture");
+		oFileUploader.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		// spy to ensure clicking the label does not open the native dialog
+		oBeforeDialogOpenSpy = this.spy(oFileUploader, "fireBeforeDialogOpen");
+
+		// simulate user click on the label
+		var oClickEvent = new MouseEvent("click", { bubbles: true, cancelable: true });
+		oLabel.getDomRef().dispatchEvent(oClickEvent);
+		await nextUIUpdate();
+
+		// assert: file uploader receives focus (focus class present) and dialog not opened
+		assert.ok(oFileUploader.getDomRef().classList.contains("sapMFocus"), "FileUploader is focused after clicking external label");
+		assert.ok(document.activeElement === oFileUploader.oFileUpload, "Internal file input is the active element after clicking external label");
+		assert.strictEqual(oBeforeDialogOpenSpy.callCount, 0, "Clicking external label does not fire beforeDialogOpen");
+
+		// cleanup
+		oBeforeDialogOpenSpy.restore();
+		oLabel.destroy();
+		oFileUploader.destroy();
+		await nextUIUpdate();
+	});
+
 	QUnit.module("'title' attribute of the internal <input type='file'>");
+
 	QUnit.test("Test 'title' attribute in different scenarios", async function (assert){
 		var oFileUploader = new FileUploader(),
 			sDefaultTitle = oFileUploader._getNoFileChosenText(),
@@ -979,31 +1204,47 @@ sap.ui.define([
 		oFileUploader.destroy();
 	});
 
-
-	QUnit.test("Testing the clearing of the input fields - clear()", async function (assert) {
-		//setup
+	QUnit.test("Testing the clearing of the files - clear()", async function (assert) {
+		// setup
 		var oFileUploader = createFileUploader(),
 			oSpy = this.spy(oFileUploader, "setValue"),
-			domFileInputField;
+			oTokenizer,
+			iTry = 0,
+			oDelegate = {
+				onAfterRendering: function() {
+					// to avoid side effects in further tests
+					if (iTry === 0) {
+						assert.equal(oTokenizer.getTokens().length, 1, "Tokenizer should have 1 token");
+					} else {
+						assert.equal(oTokenizer.getTokens().length, 0, "Tokenizer should be empty after clearing the FileUploader");
+						oTokenizer.removeDelegate(oDelegate);
+					}
+					iTry++;
+				}
+			};
 
-		//explicit place the FileUploader somewhere, otherwise there are some internal objects missing!
+		// explicit place the FileUploader somewhere, otherwise there are some internal objects missing!
 		oFileUploader.placeAt("qunit-fixture");
 		await nextUIUpdate();
+		oTokenizer = oFileUploader._getTokenizer();
+		oTokenizer.addDelegate(oDelegate);
 
+		// act - simulate adding a file
 		oFileUploader.setValue("Testfilename.txt");
+		await nextUIUpdate();
+
+		// assert - check if the file is set correctly
 		assert.equal(oFileUploader.getValue(), "Testfilename.txt", "Check if filename is set correctly");
 		assert.equal(oSpy.callCount, 1, "setValue was called ONCE");
 
-		//clearing the FUP
+		// clearing the FUP
 		oFileUploader.clear();
 		assert.equal(oFileUploader.getValue(), "", "Value should be empty string: ''");
 
-		//check if the text fields are empty as expected
-		domFileInputField = oFileUploader.getDomRef("fu");
-		assert.equal(domFileInputField.value, "", "File-Input TextField should be empty now");
+		// check if the text fields are empty as expected
 		assert.equal(oSpy.callCount, 2, "setValue should now be called TWICE");
 
-		//cleanup
+		// cleanup
 		oFileUploader.destroy();
 	});
 
@@ -1234,50 +1475,9 @@ sap.ui.define([
 		oFileUploader.destroy();
 	});
 
-	QUnit.test("setEnabled will call _resizeDomElements after input is re-rendered", async function (assert) {
-		// setup
-		var oFileUploader = createFileUploader();
-		oFileUploader.placeAt("qunit-fixture");
-		await nextUIUpdate(this.clock);
-
-		// act
-		var oResizeDomElementsSpy = this.spy(oFileUploader, "_resizeDomElements");
-		oFileUploader["setEnabled"](false);
-		await nextUIUpdate(this.clock);
-
-		// assert
-		assert.equal(oResizeDomElementsSpy.callCount, 2, "_resizeDomElements should be called once when input is re-rendered");
-
-		// cleanup
-		oResizeDomElementsSpy.restore();
-		oFileUploader.destroy();
-		await nextUIUpdate(this.clock);
-	});
-
-	QUnit.test("setPlaceholder will call _resizeDomElements after input is re-rendered", async function (assert) {
-		// setup
-		var oFileUploader = createFileUploader();
-		oFileUploader.placeAt("qunit-fixture");
-		await nextUIUpdate();
-
-		// act
-		var oResizeDomElementsSpy = this.spy(oFileUploader, "_resizeDomElements");
-		oFileUploader["setPlaceholder"]("placeholder");
-		await nextUIUpdate();
-
-		// assert
-		assert.equal(oResizeDomElementsSpy.callCount, 2, "_resizeDomElements should be called once when input is re-rendered");
-
-		// cleanup
-		oResizeDomElementsSpy.restore();
-		oFileUploader.destroy();
-		await nextUIUpdate();
-	});
-
-
 	QUnit.test("Drop file over the browse button", async function(assert) {
 		// prepare
-		var oFileUploader = new FileUploader();
+		var oFileUploader = new FileUploader({ buttonOnly: true });
 		oFileUploader.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
@@ -1310,7 +1510,7 @@ sap.ui.define([
 
 	QUnit.test("Input type file element has the proper events registered", async function(assert) {
 		// prepare
-		var oFileUploader = new FileUploader();
+		var oFileUploader = new FileUploader({ buttonOnly: true });
 		oFileUploader.placeAt("qunit-fixture");
 		await nextUIUpdate();
 		var oEvents = jQuery._data(oFileUploader.oBrowse.getDomRef(), "events");
@@ -1356,9 +1556,8 @@ sap.ui.define([
 		assert.equal($Frame.css("display"), "none", "Blindlayer is 'display:none'");
 	});
 
-	QUnit.test("File uploader input field and browse button have stable IDs", function (assert) {
-		var sBrowseButtonSuffix = "-fu_button",
-			sTextFueldSuffix = "-fu_input";
+	QUnit.test("File uploader browse button has stable ID", function (assert) {
+		var sBrowseButtonSuffix = "-fu_button";
 
 		// assert
 		assert.strictEqual(
@@ -1366,20 +1565,14 @@ sap.ui.define([
 			this.oFileUploader.getId()  + sBrowseButtonSuffix,
 			"Browse button ID is stable"
 		);
-		assert.strictEqual(
-			this.oFileUploader.oFilePath.getId(),
-			this.oFileUploader.getId()  + sTextFueldSuffix,
-			"Input field ID is stable"
-		);
 	});
 
 	QUnit.test("getFocusDomRef returns the proper element", function(assert) {
-
 		// assert
 		assert.strictEqual(
 			this.oFileUploader.getFocusDomRef().id,
-			this.oFileUploader.oBrowse.getId(),
-			"Browse button returned"
+			this.oFileUploader.getId() + "-fu",
+			"Hidden input type='file' returned"
 		);
 	});
 
@@ -1473,195 +1666,125 @@ sap.ui.define([
 
 	QUnit.test("AriaLabelledBy", async function(assert) {
 		// setup
-		var oFileUploader = new FileUploader("fu"),
-			oLabel = new Label({
-				text: "label for",
-				labelFor: "fu"
-			}),
-			oBrowse = oFileUploader.oBrowse,
+		var sPrefix = "lbl-" + Date.now() + "-" + Math.floor(Math.random() * 1000);
+		var oFileUploader = new FileUploader(sPrefix + "-fu"),
+			oLabel = new Label({ text: "label for", labelFor: oFileUploader.getId() }),
 			aLabelledBy = [
-				new Text({text: "Labelled by 1"}),
-				new Text("labelledby2", {text: "Labelled by 2"}),
-				new Text({text: "Labelled by 3"})
+				new Text(sPrefix + "-l1", { text: "Labelled by 1" }),
+				new Text(sPrefix + "-l2", { text: "Labelled by 2" }),
+				new Text(sPrefix + "-l3", { text: "Labelled by 3" })
 			];
 
+		// render helpers and control
+		oLabel.placeAt("qunit-fixture");
+		aLabelledBy.forEach(function(oControl){ oControl.placeAt("qunit-fixture"); });
 		oFileUploader.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
 		// act
-		aLabelledBy.forEach(function(oLabel) {
-			oFileUploader.addAriaLabelledBy(oLabel.getId());
-		});
+		aLabelledBy.forEach(function(oControl){ oFileUploader.addAriaLabelledBy(oControl.getId()); });
+		await nextUIUpdate();
 
 		// assert
-		assert.strictEqual(oFileUploader.getAriaLabelledBy().length, 3, "All three aria label IDs are added to the FileUploader 'ariaLabelledBy' association");
-		assert.ok(oBrowse.getAriaLabelledBy().indexOf("labelledby2") >= 0, "ID 'labelledby2' is added to the browse button 'ariaLabelledBy' association");
+		assert.strictEqual(oFileUploader.getAriaLabelledBy().length, 3, "All three aria label IDs are added");
 
-		// act
-		oFileUploader.removeAriaLabelledBy("labelledby2");
+		// act/remove
+		oFileUploader.removeAriaLabelledBy(aLabelledBy[1].getId());
+		await nextUIUpdate();
+		assert.strictEqual(oFileUploader.getAriaLabelledBy().length, 2, "One ID removed");
+		assert.ok(oFileUploader.getAriaLabelledBy().indexOf(aLabelledBy[1].getId()) === -1, "Removed ID not present");
 
-		// assert
-		assert.strictEqual(oFileUploader.getAriaLabelledBy().length, 2, "Aria label ID is removed from FileUploader 'ariaLabelledBy' association");
-		assert.ok(oFileUploader.getAriaLabelledBy().indexOf("labelledby2") === -1, "ID 'labelledby2' is removed from FileUploader 'ariaLabelledBy' association");
-		assert.ok(oBrowse.getAriaLabelledBy().indexOf("labelledby2") === -1, "ID 'labelledby2' is removed from browse button 'ariaLabelledBy' association");
-
-		// act
+		// act/remove all
 		oFileUploader.removeAllAriaLabelledBy();
-
-		// assert
-		assert.ok(oFileUploader.getAriaLabelledBy().length === 0, "All label IDs are removed from FileUploader 'ariaLabelledBy' association");
-		assert.ok(oBrowse.getAriaLabelledBy().length === 1, "Initial label ID remains in the 'Browse' button 'ariaLabelledBy' association");
+		await nextUIUpdate();
+		assert.strictEqual(oFileUploader.getAriaLabelledBy().length, 0, "All label IDs removed");
 
 		// cleanup
 		oLabel.destroy();
-		aLabelledBy.forEach(function(oLabel) {
-			oLabel.destroy();
-		});
+		aLabelledBy.forEach(function(oControl){ oControl.destroy(); });
 		oFileUploader.destroy();
-
+		await nextUIUpdate();
 	});
 
-	QUnit.test("AriaDescribedBy", function(assert) {
+	QUnit.test("AriaDescribedBy", async function(assert) {
 		// setup
-		var oFileUploader = new FileUploader("fu"),
-			oLabel = new Label({
-				text: "label for",
-				labelFor: "fu"
-			}),
-			oBrowse = oFileUploader.oBrowse,
+		var sPrefix = "desc-" + Date.now() + "-" + Math.floor(Math.random() * 1000);
+		var oFileUploader = new FileUploader(sPrefix + "-fu"),
+			oLabel = new Label({ text: "label for", labelFor: oFileUploader.getId() }),
 			aDescribedBy = [
-				new Text({text: "Described by 1"}),
-				new Text("describedby2", {text: "Described by 2"}),
-				new Text({text: "Described by 3"})
+				new Text(sPrefix + "-d1", { text: "Described by 1" }),
+				new Text(sPrefix + "-d2", { text: "Described by 2" }),
+				new Text(sPrefix + "-d3", { text: "Described by 3" })
 			];
 
+		// render helpers and control
+		oLabel.placeAt("qunit-fixture");
+		aDescribedBy.forEach(function(oControl){ oControl.placeAt("qunit-fixture"); });
+		oFileUploader.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
 		// act
-		aDescribedBy.forEach(function(oDesc) {
-			oFileUploader.addAriaDescribedBy(oDesc.getId());
-		});
+		aDescribedBy.forEach(function(oControl){ oFileUploader.addAriaDescribedBy(oControl.getId()); });
+		await nextUIUpdate();
 
 		// assert
-		assert.strictEqual(oFileUploader.getAriaDescribedBy().length, 3, "All three description IDs are added to the FileUploader 'ariaDescribedBy' association");
-		assert.ok(oBrowse.getAriaDescribedBy().indexOf("describedby2") >= 0, "ID 'describedby2' is added to the browse button 'ariaDescribedBy' association");
+		assert.strictEqual(oFileUploader.getAriaDescribedBy().length, 3, "All three description IDs are added");
 
-		// act
-		oFileUploader.removeAriaDescribedBy("describedby2");
+		// act/remove
+		oFileUploader.removeAriaDescribedBy(aDescribedBy[1].getId());
+		await nextUIUpdate();
+		assert.strictEqual(oFileUploader.getAriaDescribedBy().length, 2, "One ID removed");
+		assert.ok(oFileUploader.getAriaDescribedBy().indexOf(aDescribedBy[1].getId()) === -1, "Removed ID not present");
 
-		// assert
-		assert.strictEqual(oFileUploader.getAriaDescribedBy().length, 2, "Aria description ID is removed from FileUploader 'ariaDescribedBy' association");
-		assert.ok(oFileUploader.getAriaDescribedBy().indexOf("describedby2") === -1, "ID 'describedby2' is removed from FileUploader 'ariaDescribedBy' association");
-		assert.ok(oBrowse.getAriaDescribedBy().indexOf("describedby2") === -1, "ID 'describedby2' is removed from browse button 'ariaDescribedBy' association");
-
-		// act
+		// act/remove all
 		oFileUploader.removeAllAriaDescribedBy();
-
-		// assert
-		assert.ok(oFileUploader.getAriaDescribedBy().length === 0, "All IDs are removed from FileUploader 'ariaDescribedBy' association");
-		assert.ok(oBrowse.getAriaDescribedBy().length === 1, "Initial description ID remains in the 'Browse' sap.m.Button 'ariaDescribedBy' association");
+		await nextUIUpdate();
+		assert.strictEqual(oFileUploader.getAriaDescribedBy().length, 0, "All IDs removed");
 
 		// cleanup
 		oLabel.destroy();
-		aDescribedBy.forEach(function(oDesc) {
-			oDesc.destroy();
-		});
+		aDescribedBy.forEach(function(oControl){ oControl.destroy(); });
 		oFileUploader.destroy();
-	});
-
-	QUnit.test("Label is redirected to internal button", async function (assert) {
-		// setup
-		var sInternalButtonAriaLabelledby,
-			oLabel = new Label("newLabel", {
-				text: "Select Document",
-				labelFor: "fu"
-			}),
-			oFileUploader = new FileUploader("fu");
-
-		// act
-		oLabel.placeAt("qunit-fixture");
-		oFileUploader.placeAt("qunit-fixture");
 		await nextUIUpdate();
-
-		sInternalButtonAriaLabelledby = oFileUploader.oBrowse.$().attr("aria-labelledby");
-
-		// assert
-		assert.ok(sInternalButtonAriaLabelledby.indexOf("newLabel") !== -1, "Internal button has reference to the newly created label");
-
-		// cleanup
-		oLabel.destroy();
-		oFileUploader.destroy();
-	});
-
-	QUnit.test("Label added dynamicaly", async function (assert) {
-		// setup
-		var oNewLabel,
-			sInternalButtonAriaLabelledby,
-			oLabel = new Label("initialLabel", {
-				text: "Select Document",
-				labelFor: "fu"
-			}),
-			oFileUploader = new FileUploader("fu");
-
-		// act
-		oLabel.placeAt("qunit-fixture");
-		oFileUploader.placeAt("qunit-fixture");
-		await nextUIUpdate();
-
-		oNewLabel = new Label("newLabel", { labelFor: "fu" });
-
-		oNewLabel.placeAt("content");
-		await nextUIUpdate();
-
-		sInternalButtonAriaLabelledby = oFileUploader.oBrowse.$().attr("aria-labelledby");
-
-		// assert
-		assert.ok(sInternalButtonAriaLabelledby.indexOf("initialLabel") !== -1, "Internal button has reference to the initialy created label");
-		assert.ok(sInternalButtonAriaLabelledby.indexOf("newLabel") !== -1, "Internal button has reference to the newly created label");
-
-		// cleanup
-		oLabel.destroy();
-		oNewLabel.destroy();
-		oFileUploader.destroy();
 	});
 
 	QUnit.test("Browse button tooltip", async function(assert) {
 		var oFileUploader = new FileUploader({
-			buttonText: "Something"
-		});
+				buttonOnly: true,
+				buttonText: "Something"
+			}),
+			sTooltip = oFileUploader.getTooltip_AsString() || oFileUploader._getBrowseIconTooltip();
 
 		oFileUploader.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
-		assert.notOk(oFileUploader.oBrowse.getTooltip(), "It shouldn't have one while FileUploader has text");
-
-		oFileUploader.setIconOnly(true);
-		oFileUploader.setIcon("sap-icon://add");
-		await nextUIUpdate();
-
-		assert.strictEqual(oFileUploader.oBrowse.getTooltip(), oFileUploader.getBrowseText(),
+		assert.strictEqual(oFileUploader.oBrowse.getTooltip(), sTooltip,
 				"Once FileUploader becomes icon-only, then it should contain just the 'Browse...' text");
 
 		oFileUploader.destroy();
 	});
 
 	QUnit.test("Description for default FileUploader", async function (assert) {
-		// Setup
-		var oFileUploader = new FileUploader("fu"),
+		// use a unique control id to avoid collisions between runs
+		var sId = "fu-" + Date.now() + "-" + Math.floor(Math.random() * 1000);
+		var oFileUploader = new FileUploader(sId),
 			oRB = Library.getResourceBundleFor("sap.ui.unified");
 
 		oFileUploader.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
-		// Assert
-		var $description = oFileUploader.$().find("#fu-AccDescr");
-		assert.strictEqual($description.text(), oRB.getText("FILEUPLOAD_ACC"), "Description contains information just for activating.");
+		// find the description inside the control DOM only
+		var $description = oFileUploader.$().find("#" + oFileUploader.getId() + "-AccDescr");
+		assert.strictEqual($description.text(), oRB.getText("FILEUPLOADER_ACC_TEXT"), "Description contains information just for activating.");
 
-		// Cleanup
+		// cleanup
 		oFileUploader.destroy();
+		await nextUIUpdate();
 	});
 
 	QUnit.test("Description for FileUploader with tooltip and placeholder", async function (assert) {
-		// Setup
-		var oFileUploader = new FileUploader("fu", {
+		var sId = "fu-" + Date.now() + "-" + Math.floor(Math.random() * 1000);
+		var oFileUploader = new FileUploader(sId, {
 				tooltip: "the-tooltip",
 				placeholder: "the-placeholder"
 			}),
@@ -1670,49 +1793,49 @@ sap.ui.define([
 		oFileUploader.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
-		// Assert
-		var sDescriptionText = oFileUploader.$().find("#fu-AccDescr").text();
-		assert.ok(sDescriptionText.indexOf(oRB.getText("FILEUPLOAD_ACC")) !== -1, "Activation information is placed in the description");
+		// read the description only from this control's DOM
+		var sDescriptionText = oFileUploader.$().find("#" + oFileUploader.getId() + "-AccDescr").text();
+		assert.ok(sDescriptionText.indexOf(oRB.getText("FILEUPLOADER_ACC_TEXT")) !== -1, "Activation information is placed in the description");
 		assert.ok(sDescriptionText.indexOf("the-tooltip") !== -1, "FileUploader's tooltip is in the description");
 		assert.ok(sDescriptionText.indexOf("the-placeholder") !== -1, "FileUploader's placeholder is in the description");
 
-		// Cleanup
+		// cleanup
 		oFileUploader.destroy();
+		await nextUIUpdate();
 	});
 
 	QUnit.test("Description for FileUploader after tooltip update", async function (assert) {
-		// Setup
 		var sInitialTooltip = "initial-tooltip",
 			sUpdatedTooltip = "updated-tooltip",
-			oFileUploader = new FileUploader("fu", {
+			sId = "fu-" + Date.now() + "-" + Math.floor(Math.random() * 1000),
+			oFileUploader = new FileUploader(sId, {
 				tooltip: sInitialTooltip
-			}),
-			sAccDescription;
+			});
 
 		oFileUploader.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
-		// Act
+		// Act - update tooltip and wait for rendering
 		oFileUploader.setTooltip(sUpdatedTooltip);
 		await nextUIUpdate();
 
-		// Assert
-		sAccDescription = document.getElementById("fu-AccDescr").innerHTML;
+		// Assert - query the description only inside this control DOM
+		var sAccDescription = oFileUploader.$().find("#" + oFileUploader.getId() + "-AccDescr").html();
 		assert.ok(sAccDescription.indexOf(sInitialTooltip) === -1, "FileUploader's initial tooltip isn't in the description");
 		assert.ok(sAccDescription.indexOf(sUpdatedTooltip) !== -1, "FileUploader's updated tooltip is in the description");
 
 		// Cleanup
 		oFileUploader.destroy();
+		await nextUIUpdate();
 	});
 
 	QUnit.test("Description for FileUploader after placeholder update", async function (assert) {
-		// Setup
 		var sInitialPlaceholder = "initial-placeholder",
 			sUpdatedPlaceholder = "updated-placeholder",
-			oFileUploader = new FileUploader("fu", {
+			sId = "fu-" + Date.now() + "-" + Math.floor(Math.random() * 1000),
+			oFileUploader = new FileUploader(sId, {
 				placeholder: sInitialPlaceholder
-			}),
-			sAccDescription;
+			});
 
 		oFileUploader.placeAt("qunit-fixture");
 		await nextUIUpdate();
@@ -1721,67 +1844,34 @@ sap.ui.define([
 		oFileUploader.setPlaceholder(sUpdatedPlaceholder);
 		await nextUIUpdate();
 
-		// Assert
-		sAccDescription = document.getElementById("fu-AccDescr").innerHTML;
+		// Assert - query description only inside this control's DOM
+		var sAccDescription = oFileUploader.$().find("#" + oFileUploader.getId() + "-AccDescr").html();
 		assert.ok(sAccDescription.indexOf(sInitialPlaceholder) === -1, "FileUploader's initial placeholder isn't in the description");
 		assert.ok(sAccDescription.indexOf(sUpdatedPlaceholder) !== -1, "FileUploader's updated placeholder is in the description");
 
 		// Cleanup
 		oFileUploader.destroy();
+		await nextUIUpdate();
 	});
 
 	QUnit.test("Description for required FileUploader", async function (assert) {
-		// Setup
-		var oLabel = new Label({ text: "Label", labelFor: "fu", required: true }),
-			oFileUploader = new FileUploader("fu"),
-			sRequiredText = Library.getResourceBundleFor("sap.ui.unified").getText("FILEUPLOAD_REQUIRED");
+		// use unique id to avoid collisions across test runs
+		var sId = "fu-" + Date.now() + "-" + Math.floor(Math.random() * 1000);
+		var oLabel = new Label({ text: "Label", labelFor: sId, required: true });
+		var oFileUploader = new FileUploader(sId);
 
 		oLabel.placeAt("qunit-fixture");
 		oFileUploader.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
-		// Assert
-		var $description = oFileUploader.$().find("#fu-AccDescr");
-		assert.ok($description.text().indexOf(sRequiredText) !== -1, "Word Required is added in the description");
+		// get the native input element belonging to this control
+		var oInput = oFileUploader.getInputReference();
+		assert.ok(oInput && oInput.hasAttribute("required"), "'required' attribute is added in the hidden input type='file' element");
 
-		// Cleanup
+		// cleanup
 		oLabel.destroy();
 		oFileUploader.destroy();
-	});
-
-	QUnit.test("Internal hidden label for the Input", async function (assert) {
-		var oFileUploader = new FileUploader(),
-			sExpectedLabelId = InvisibleText.getStaticId("sap.ui.unified", "FILEUPLOAD_FILENAME"),
-			aInputLabels;
-
-		oFileUploader.placeAt("qunit-fixture");
 		await nextUIUpdate();
-
-		aInputLabels = oFileUploader.oFilePath.getAriaLabelledBy();
-		assert.strictEqual(aInputLabels[0], sExpectedLabelId, "A hidden label is added to FileUploader's input");
-
-		oFileUploader.destroy();
-	});
-
-	QUnit.test("Click focuses the fileuploader button", async function (assert) {
-		//Arrange
-		this.stub(Device, "browser").value({"safari": true});
-		var oFileUploader = new FileUploader("fu"),
-			oSpy = this.spy(oFileUploader.oBrowse, "focus"),
-			oFakeEvent = {};
-
-		oFileUploader.placeAt("qunit-fixture");
-		await nextUIUpdate();
-		oFakeEvent.target = oFileUploader.getDomRef();
-
-		//Act
-		oFileUploader.onclick(oFakeEvent);
-
-		//Assert
-		assert.strictEqual(oSpy.callCount, 1, "Clicking on browse button should focus the button in safari");
-
-		//Clean
-		oFileUploader.destroy();
 	});
 
 	QUnit.test("External label reference", function(assert) {
@@ -1789,7 +1879,7 @@ sap.ui.define([
 		var oFileUploader = new FileUploader("fu");
 
 		// assert
-		assert.strictEqual(oFileUploader.getIdForLabel(), "fu", "The file uploader id is used for external label references");
+		assert.strictEqual(oFileUploader.getIdForLabel(), "fu-fu", "The file uploader id is used for external label references");
 	});
 
 	QUnit.test("Change event firing", async function (assert){
@@ -1817,13 +1907,15 @@ sap.ui.define([
 		};
 
 		// act
-		qutils.triggerEvent("drop", oFileUploader.oBrowse.getId(), oEventParams);
+		qutils.triggerEvent("drop", oFileUploader.getId(), oEventParams);
 
 		assert.ok(oFireChangeSpy.calledOnce, "Change event is fired once.");
 
 		//Clean up
 		oFileUploader.destroy();
 	});
+
+
 
 	//IE has no Event constructor
 	function createNewEvent(eventName) {
@@ -1836,4 +1928,156 @@ sap.ui.define([
 		}
 		return oEvent;
 	}
+
+	QUnit.module("Tokenizer", {
+		beforeEach: async function() {
+		},
+		afterEach: async function() {
+			await nextUIUpdate();
+		}
+	});
+
+	QUnit.test("tokens created from selected files", async function (assert) {
+		// arrange
+		var oFileUploader = new FileUploader({ multiple: true });
+		oFileUploader.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		// populate tokens
+		addFilesToFileUploaderTokenizer(oFileUploader, ["a.txt", "b.txt"]);
+		await nextUIUpdate();
+
+		// assert
+		var oTokenizer = oFileUploader._getTokenizer();
+		var aTokens = oTokenizer.getTokens();
+		assert.strictEqual(aTokens.length, 2, "Tokenizer contains two tokens");
+		assert.strictEqual(aTokens[0].getText(), "a.txt", "First token text is the first filename");
+		assert.strictEqual(aTokens[1].getText(), "b.txt", "Second token text is the second filename");
+
+		// cleanup
+		oFileUploader.destroy();
+		await nextUIUpdate();
+	});
+
+	QUnit.test("tokens cleared when clear() is called", async function (assert) {
+		// arrange
+		var oFileUploader = new FileUploader({ multiple: true });
+		oFileUploader.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		// populate tokens
+		addFilesToFileUploaderTokenizer(oFileUploader, ["a.txt", "b.txt"]);
+		await nextUIUpdate();
+
+		var oTokenizer = oFileUploader._getTokenizer();
+		assert.ok(oTokenizer.getTokens().length >= 2, "Tokenizer populated before clear");
+
+		// act
+		oFileUploader.clear();
+		await nextUIUpdate();
+
+		// assert
+		assert.strictEqual(oTokenizer.getTokens().length, 0, "Tokenizer is empty after clear()");
+
+		// cleanup
+		oFileUploader.destroy();
+		await nextUIUpdate();
+	});
+
+	QUnit.test("Focus in/out of Tokenizer on Arrow Right/Left", async function (assert) {
+		// arrange
+		var oFileUploader = new FileUploader({ multiple: true }),
+			oMockArrowRightPress = {
+				keyCode: 39,
+				preventDefault: function() {}
+			},
+			oMockArrowLeftPress = {
+				keyCode: 37,
+				preventDefault: function() {},
+				isMarked: function() { return true; }
+			},
+			oDelegate = {
+				onfocusin: function () {
+					// assert - first token should have tabindex 0 and control state updated
+					var oFirstToken = oTokenizer.getTokens()[0].getDomRef();
+					assert.ok(oFileUploader._bTokenizerFocus, "_bTokenizerFocus is true after pressing of Arrow Right");
+					assert.strictEqual(document.activeElement, oFirstToken, "First token is focused after pressing of Arrow Right");
+				},
+				onsapfocusleave: function () {
+					assert.notOk(oFileUploader._bTokenizerFocus, "_bTokenizerFocus is false after pressing of Arrow Left");
+					assert.strictEqual(document.activeElement, oFileUploader.oFileUpload, "Internal hidden input type='file' is focused after pressing of Arrow Left");
+				}
+			};
+
+		oFileUploader.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		// populate tokens
+		addFilesToFileUploaderTokenizer(oFileUploader, ["a.txt", "b.txt"]);
+		await nextUIUpdate();
+
+		var oTokenizer = oFileUploader._getTokenizer();
+		oTokenizer.addDelegate(oDelegate);
+		oFileUploader.focus();
+		await nextUIUpdate();
+
+		// assert initial state
+		assert.notOk(oFileUploader._bTokenizerFocus, "_bTokenizerFocus is initially false");
+		assert.strictEqual(document.activeElement, oFileUploader.oFileUpload, "Internal hidden input type='file' is initially focused");
+
+		// act - simulate Arrow Right press to focus first token
+		oFileUploader.onsapnext(oMockArrowRightPress);
+		await nextUIUpdate();
+
+		// act - simulate Arrow Left press to focus back the FileUploader
+		oFileUploader.onsapprevious(oMockArrowLeftPress);
+		await nextUIUpdate();
+
+		// cleanup
+		oFileUploader.destroy();
+		await nextUIUpdate();
+	});
+
+	QUnit.test("expands on FileUploader focus and collapses on focus out (asserts in tokenizer onAfterRendering)", async function (assert) {
+
+		var oButton = new Button({
+			text: "Button Before File Uploader"
+		});
+		oButton.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		var oFileUploader = new FileUploader({ multiple: true });
+		// oFileUploader.placeAt("qunit-fixture");
+		oFileUploader.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		// populate tokens
+		addFilesToFileUploaderTokenizer(oFileUploader, ["a.txt", "b.txt", "c.txt", "d.txt"]);
+		await nextUIUpdate();
+		var oTokenizer = oFileUploader._getTokenizer();
+
+		// act - ensure focus is outside FileUploader
+		oButton.focus();
+
+		// assert initial state
+		assert.strictEqual(oTokenizer.getRenderMode(), "Narrow", "Tokenizer is initially in Narrow mode when not focused");
+
+		// act - focus FileUploader
+		oFileUploader.focus();
+		await nextUIUpdate();
+
+		// assert expanded state
+		assert.strictEqual(oTokenizer.getRenderMode(), "Loose", "Tokenizer is in Loose mode when focused");
+
+		// act - ensure focus is outside FileUploader
+		oButton.focus();
+
+		// assert collapsed state
+		assert.strictEqual(oTokenizer.getRenderMode(), "Narrow", "Tokenizer is in Narrow mode when not focused");
+
+		// cleanup
+		oFileUploader.destroy();
+		oButton.destroy();
+		await nextUIUpdate();
+	});
 });

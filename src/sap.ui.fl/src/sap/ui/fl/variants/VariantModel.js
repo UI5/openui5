@@ -543,12 +543,6 @@ sap.ui.define([
 		}
 	};
 
-	function variantSelectHandler(oEvent, mPropertyBag) {
-		sap.ui.require(["sap/ui/fl/variants/VariantManager"], function(VariantManager) {
-			VariantManager.handleSelectVariant(oEvent, mPropertyBag);
-		});
-	}
-
 	VariantModel.prototype.getLocalId = function(sId, oAppComponent) {
 		return JsControlTreeModifier.getSelector(sId, oAppComponent).id;
 	};
@@ -596,13 +590,6 @@ sap.ui.define([
 
 		// replace bindings in titles with the resolved texts
 		resolveTitleBindingsAndCreateVariantChanges.call(this, oVariantManagementControl, sVariantManagementReference);
-
-		// attach/detach events on control
-		// select event
-		oVariantManagementControl.attachEvent("select", {
-			vmReference: sVariantManagementReference,
-			model: this
-		}, variantSelectHandler);
 
 		// set model's properties specific to control's appearance
 		this.setModelPropertiesForControl(sVariantManagementReference, false, oVariantManagementControl);
@@ -694,17 +681,6 @@ sap.ui.define([
 				DependencyHandler.removeChangeFromDependencies(oLiveDependencyMap, oChange.getId());
 			}
 		});
-		// this promise can be used in tests to properly wait for the asynchronous logic of the destroy function
-		this.oDestroyPromise = new Deferred();
-		sap.ui.require(["sap/ui/fl/write/_internal/flexState/FlexObjectManager"], (FlexObjectManager) => {
-			FlexObjectManager.deleteFlexObjects({
-				reference: this.sFlexReference,
-				flexObjects: aDirtyChanges,
-				componentId: this.oAppComponent.getId()
-			});
-			this.oDestroyPromise.resolve();
-		});
-
 		this.oDataSelector.removeUpdateListener(this.fnUpdateListener);
 
 		// as soon as there is a change / variant referencing a standard variant, the model is not in charge of creating the standard
@@ -726,6 +702,21 @@ sap.ui.define([
 		VariantManagementState.clearRuntimeSteadyObjects(this.sFlexReference, this.oAppComponent.getId());
 		VariantManagementState.resetCurrentVariantReference(this.sFlexReference);
 		JSONModel.prototype.destroy.apply(this);
+
+		// this promise can be used in tests to properly wait for the asynchronous logic of the destroy function
+		this.oDestroyPromise = new Deferred();
+		if (aDirtyChanges.length) {
+			sap.ui.require(["sap/ui/fl/write/_internal/flexState/FlexObjectManager"], (FlexObjectManager) => {
+				FlexObjectManager.deleteFlexObjects({
+					reference: this.sFlexReference,
+					flexObjects: aDirtyChanges,
+					componentId: this.oAppComponent.getId()
+				});
+				this.oDestroyPromise.resolve();
+			});
+		} else {
+			this.oDestroyPromise.resolve();
+		}
 	};
 
 	/**

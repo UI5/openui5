@@ -8,11 +8,68 @@
 	height: 2.75rem;
 }
 
-.sapUiSizeCompact {
+.sapUiFup {
+	&.sapUiFupButtonOnly.sapMInputBase:not(.sapMFocus) .sapMInputBaseContentWrapper:not(.sapMInputBaseReadonlyWrapper):not(.sapMInputBaseContentWrapperState) {
+		&:not(.sapMInputBaseDisabledWrapper):hover {
+			border-color: var(--sapButton_BorderColor);
+		}
+	}
 
+	.sapMInputBaseContentWrapper {
+		.sapUiFupBrowseIcon,
+		.sapUiFupClearIcon {
+			line-height: 1.25rem;
+			width: 2rem;
+		}
+
+		.sapMBtnInner {
+			border-width: 0;
+		}
+	}
+
+	&.sapMFocus.sapMInputBase.sapUiFupButtonOnly .sapMInputBaseContentWrapper:not(.sapMInputBaseDisabledWrapper)::before {
+		top: 2px;
+		left: 2px;
+		right: 2px;
+		bottom: 2px;
+	}
+}
+
+.sapUiSizeCompact{
 	.sapUiFup,
 	.sapUiFup.sapMBarChild {
 		height: 2rem;
+	}
+
+	.sapUiFup {
+		.sapMInputBaseContentWrapper {
+			height: var(--sapElement_Compact_Height);
+
+			.sapUiFupBrowseIcon,
+			.sapUiFupClearIcon {
+				height: 1.5rem;
+				line-height: 1.25rem;
+				width: 2rem;
+			}
+
+			.sapMBtn {
+				height: var(--sapElement_Compact_Height);
+				margin: 0;
+
+				.sapMBtnContent {
+					line-height: 1.375rem;
+				}
+			}
+
+			.sapMTokenizer {
+				height: var(--sapElement_Compact_Height);
+
+				.sapMToken {
+					margin-top: 0.1875rem;
+					margin-bottom: 0.1875rem;
+				}
+			}
+		}
 	}
 }
 
@@ -21,7 +78,7 @@
 	outline-offset: -.125rem;
 }
 
-.sapUiFup:focus .sapMBtn {
+.sapUiFup .sapMBtn:focus {
 	outline: none;
 }
 

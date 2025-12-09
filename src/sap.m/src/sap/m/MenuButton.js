@@ -403,6 +403,112 @@ sap.ui.define([
 		};
 
 		/**
+		 * Checks if the popover would overflow the viewport and determines if flipping is needed
+		 * @param {number} iLeft The calculated left position
+		 * @param {number} iTop The calculated top position
+		 * @param {number} iWidth The popover width
+		 * @param {number} iHeight The popover height
+		 * @returns {object} Object with bFlipHorizontal and bFlipVertical flags properties
+		 * @private
+		 */
+		MenuButton.prototype._checkViewportCollision = function(iLeft, iTop, iWidth, iHeight) {
+			const iScrollX = window.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft || 0,
+				iScrollY = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0,
+				iViewportWidth = window.innerWidth || document.documentElement.clientWidth,
+				iViewportHeight = window.innerHeight || document.documentElement.clientHeight,
+				iAbsoluteLeft = iLeft - iScrollX,
+				iAbsoluteTop = iTop - iScrollY;
+
+			return {
+				bFlipHorizontal: (iAbsoluteLeft < 0) || (iAbsoluteLeft + iWidth > iViewportWidth),
+				bFlipVertical: (iAbsoluteTop < 0) || (iAbsoluteTop + iHeight > iViewportHeight)
+			};
+		};
+
+		/**
+		 * Flips the dock alignment to the opposite side or adjusts Center positions
+		 * @param {string} sHorizontalAlign The horizontal alignment
+		 * @param {string} sVerticalAlign The vertical alignment
+		 * @param {boolean} bFlipHorizontal Whether to flip horizontally
+		 * @param {boolean} bFlipVertical Whether to flip vertically
+		 * @param {object} oOpenerRect The opener rectangle
+		 * @param {object} oPopoverRect The popover rectangle
+		 * @returns {object} Object with flipped sHorizontalAlign and sVerticalAlign, adjustment offsets iCenterOffsetX and iCenterOffsetY properties
+		 * @private
+		 */
+		MenuButton.prototype._flipDockAlignment = function(sHorizontalAlign, sVerticalAlign, bFlipHorizontal, bFlipVertical, oOpenerRect, oPopoverRect) {
+			let sNewHorizontal = sHorizontalAlign,
+				sNewVertical = sVerticalAlign,
+				iCenterOffsetX = 0,
+				iCenterOffsetY = 0;
+
+			if (bFlipHorizontal) {
+				switch (sHorizontalAlign) {
+					case "Begin":
+						sNewHorizontal = "End";
+						break;
+					case "End":
+						sNewHorizontal = "Begin";
+						break;
+					case "Left":
+						sNewHorizontal = "Right";
+						break;
+					case "Right":
+						sNewHorizontal = "Left";
+						break;
+					case "Center": {
+						// For Center, calculate offset to keep within viewport
+						const iViewportWidth = window.innerWidth || document.documentElement.clientWidth;
+						const iButtonCenterX = oOpenerRect.left + (oOpenerRect.width / 2);
+						const iPopoverLeft = iButtonCenterX - (oPopoverRect.width / 2);
+
+						if (iPopoverLeft < 0) {
+							// Shift right to fit
+							iCenterOffsetX = -iPopoverLeft;
+						} else if (iPopoverLeft + oPopoverRect.width > iViewportWidth) {
+							// Shift left to fit
+							iCenterOffsetX = iViewportWidth - (iPopoverLeft + oPopoverRect.width);
+						}
+						break;
+					}
+				}
+			}
+
+			if (bFlipVertical) {
+				switch (sVerticalAlign) {
+					case "Top":
+						sNewVertical = "Bottom";
+						break;
+					case "Bottom":
+						sNewVertical = "Top";
+						break;
+					case "Center": {
+						// For Center, calculate offset to keep within viewport
+						const iViewportHeight = window.innerHeight || document.documentElement.clientHeight;
+						const iButtonCenterY = oOpenerRect.top + (oOpenerRect.height / 2);
+						const iPopoverTop = iButtonCenterY - (oPopoverRect.height / 2);
+
+						if (iPopoverTop < 0) {
+							// Shift down to fit
+							iCenterOffsetY = -iPopoverTop;
+						} else if (iPopoverTop + oPopoverRect.height > iViewportHeight) {
+							// Shift up to fit
+							iCenterOffsetY = iViewportHeight - (iPopoverTop + oPopoverRect.height);
+						}
+						break;
+					}
+				}
+			}
+
+			return {
+				sHorizontalAlign: sNewHorizontal,
+				sVerticalAlign: sNewVertical,
+				iCenterOffsetX: iCenterOffsetX,
+				iCenterOffsetY: iCenterOffsetY
+			};
+		};
+
+		/**
 		 * Adjusts the popover position after it opens according to the dock rules
 		 * @param {string} sDock The dock string to parse
 		 * @param {sap.m.ResponsivePopover} oPopover The popover instance
@@ -410,19 +516,82 @@ sap.ui.define([
 		 * @private
 		 */
 		MenuButton.prototype._adjustPopoverPosition = function(sDock, oPopover, oOpenerRect) {
-			const { sHorizontalAlign, sVerticalAlign } = this._parseDockAlignment(sDock),
+			let iTargetLeft,
+				iTargetTop,
+				iOffsetLeft = 0,
+				iOffsetTop = 0,
+				{ sHorizontalAlign, sVerticalAlign } = this._parseDockAlignment(sDock);
+			const iScrollX = window.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft || 0,
+				iScrollY = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0,
 				oPopoverDomRef = oPopover._oControl.getDomRef(),
 				oPopoverRect = oPopoverDomRef.getBoundingClientRect(),
-				iScrollX = window.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft || 0,
-				iScrollY = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0,
-				bLeftOrRight = (sHorizontalAlign === "Left" || sHorizontalAlign === "Right"),
 				bRTL = Localization.getRTL();
+
+
+			// Calculate initial position
+			const oPosition = this._calculatePopoverPosition(sHorizontalAlign, sVerticalAlign, oOpenerRect, oPopoverRect, iScrollX, iScrollY, bRTL);
+
+			iTargetLeft = oPosition.iLeft;
+			iTargetTop = oPosition.iTop;
+			iOffsetLeft = oPosition.iOffsetLeft;
+			iOffsetTop = oPosition.iOffsetTop;
+
+			// Check for viewport collision
+			const oCollision = this._checkViewportCollision(iTargetLeft + iOffsetLeft, iTargetTop + iOffsetTop, oPopoverRect.width, oPopoverRect.height);
+
+			// Flip if needed
+			if (oCollision.bFlipHorizontal || oCollision.bFlipVertical) {
+				const oFlipped = this._flipDockAlignment(sHorizontalAlign, sVerticalAlign, oCollision.bFlipHorizontal, oCollision.bFlipVertical, oOpenerRect, oPopoverRect);
+
+				sHorizontalAlign = oFlipped.sHorizontalAlign;
+				sVerticalAlign = oFlipped.sVerticalAlign;
+
+				// Recalculate position with flipped alignment
+				const oNewPosition = this._calculatePopoverPosition(sHorizontalAlign, sVerticalAlign, oOpenerRect, oPopoverRect, iScrollX, iScrollY, bRTL);
+
+				iTargetLeft = oNewPosition.iLeft;
+				iTargetTop = oNewPosition.iTop;
+				iOffsetLeft = oNewPosition.iOffsetLeft;
+				iOffsetTop = oNewPosition.iOffsetTop;
+
+				// Apply center adjustments if any
+				if (oFlipped.iCenterOffsetX !== 0) {
+					iOffsetLeft += oFlipped.iCenterOffsetX;
+				}
+				if (oFlipped.iCenterOffsetY !== 0) {
+					iOffsetTop += oFlipped.iCenterOffsetY;
+				}
+			}
+
+			// Apply the computed position
+			oPopoverDomRef.style.left = Math.round(iTargetLeft + iOffsetLeft) + "px";
+			oPopoverDomRef.style.top = Math.round(iTargetTop + iOffsetTop) + "px";
+			oPopoverDomRef.style.right = "";
+			oPopoverDomRef.style.bottom = "";
+
+			oPopover.detachEvent("afterOpen", this._adjustPopoverPosition);
+		};
+
+		/**
+		 * Calculates the popover position based on alignment
+		 * @param {string} sHorizontalAlign Horizontal alignment
+		 * @param {string} sVerticalAlign Vertical alignment
+		 * @param {object} oOpenerRect Opener rectangle
+		 * @param {object} oPopoverRect Popover rectangle
+		 * @param {number} iScrollX Horizontal scroll offset
+		 * @param {number} iScrollY Vertical scroll offset
+		 * @param {boolean} bRTL RTL mode flag
+		 * @returns {object} Object with iLeft, iTop, iOffsetLeft, iOffsetTop properties
+		 * @private
+		 */
+		MenuButton.prototype._calculatePopoverPosition = function(sHorizontalAlign, sVerticalAlign, oOpenerRect, oPopoverRect, iScrollX, iScrollY, bRTL) {
 			let iTargetLeft,
 				iTargetTop,
 				iOffsetLeft = 0,
 				iOffsetTop = 0;
+			const bLeftOrRight = (sHorizontalAlign === "Left" || sHorizontalAlign === "Right");
 
-			// Calculate horizontal position based on sHorizontalAlign
+			// Calculate horizontal position
 			switch (sHorizontalAlign) {
 				case "Begin":
 					iTargetLeft = (bRTL)
@@ -444,12 +613,14 @@ sap.ui.define([
 					iTargetLeft = oOpenerRect.right + iScrollX;
 					iOffsetLeft = 2;
 					break;
-				default: // Center
-					var iButtonCenterX = oOpenerRect.left + (oOpenerRect.width / 2) + iScrollX;
+				default: { // Center
+					const iButtonCenterX = oOpenerRect.left + (oOpenerRect.width / 2) + iScrollX;
+
 					iTargetLeft = iButtonCenterX - (oPopoverRect.width / 2);
+				}
 			}
 
-			// Calculate vertical position based on sVerticalAlign
+			// Calculate vertical position
 			switch (sVerticalAlign) {
 				case "Top":
 					iTargetTop = bLeftOrRight
@@ -463,18 +634,19 @@ sap.ui.define([
 									: oOpenerRect.top + oOpenerRect.height + iScrollY;
 					iOffsetTop = bLeftOrRight ? 5 : -2;
 					break;
-				default: // Center
-					var iButtonCenterY = oOpenerRect.top + (oOpenerRect.height / 2) + iScrollY;
+				default: { // Center
+					const iButtonCenterY = oOpenerRect.top + (oOpenerRect.height / 2) + iScrollY;
+
 					iTargetTop = iButtonCenterY - (oPopoverRect.height / 2);
+				}
 			}
 
-			// Apply the computed position
-			oPopoverDomRef.style.left = Math.round(iTargetLeft + iOffsetLeft) + "px";
-			oPopoverDomRef.style.top = Math.round(iTargetTop + iOffsetTop) + "px";
-			oPopoverDomRef.style.right = "";
-			oPopoverDomRef.style.bottom = "";
-
-			oPopover.detachEvent("afterOpen", this._adjustPopoverPosition);
+			return {
+				iLeft: iTargetLeft,
+				iTop: iTargetTop,
+				iOffsetLeft: iOffsetLeft,
+				iOffsetTop: iOffsetTop
+			};
 		};
 
 		/**

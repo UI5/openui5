@@ -68,13 +68,6 @@ ColorPickerRenderer.render = function(oRm, oControl){
 	oRm.close("div");
 };
 
-ColorPickerRenderer.renderColorSelectionBox = function(oRm, oControl) {
-	oRm.renderControl(oControl.getAggregation("_oCPBox"));
-	oRm.accessibilityState({
-		role: "presentation"
-	});
-};
-
 ColorPickerRenderer.renderSliders = function(oRm, oControl) {
 	oRm.openStart("div");
 	oRm.class("sapUiCPSlidersWrapper");
@@ -89,7 +82,7 @@ ColorPickerRenderer.renderSliders = function(oRm, oControl) {
 };
 
 ColorPickerRenderer.renderDefaultColorPicker = function(oRm, oControl) {
-	this.renderColorSelectionBox(oRm, oControl);
+	oRm.renderControl(oControl.getAggregation("_oCPBox"));
 	if (Device.system.phone) { //mobile
 		oRm.openStart("div");
 		oRm.class("sapUiCPPhoneContent");
@@ -165,7 +158,7 @@ ColorPickerRenderer.renderDefaultColorPicker = function(oRm, oControl) {
 };
 
 ColorPickerRenderer.renderLargeColorPicker = function(oRm, oControl) {
-	this.renderColorSelectionBox(oRm, oControl);
+	oRm.renderControl(oControl.getAggregation("_oCPBox"));
 	this.renderSliders(oRm, oControl);
 	this.renderDesktopSwatchesAndHexFields(oRm, oControl);
 	oRm.renderControl(oControl.oRGBorHSLRBUnifiedGroup);
@@ -214,7 +207,7 @@ ColorPickerRenderer.renderLargeColorPicker = function(oRm, oControl) {
 };
 
 ColorPickerRenderer.renderSimplifiedColorPicker = function(oRm, oControl) {
-	this.renderColorSelectionBox(oRm, oControl);
+	oRm.renderControl(oControl.getAggregation("_oCPBox"));
 	if (Device.system.phone) {
 		oRm.openStart("div");
 		oRm.class("sapUiCPPhoneContent");

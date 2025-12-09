@@ -11,7 +11,7 @@
 				<headerToolbar>
 					<Toolbar design="Transparent">
 						<Title level="H2" text="Initial data"/>
-						<Button id="rebind" text="Initialize" press="onRebind"/>
+						<Button id="rebind" text="Initialize" press=".onRebind"/>
 					</Toolbar>
 				</headerToolbar>
 				<form:SimpleForm editable="true" layout="ResponsiveGridLayout">

@@ -163,9 +163,6 @@ sap.ui.define(function() {
 					}
 				},
 				module : ["test-resources/sap/ui/table/qunit/AnalyticalTable.qunit"],
-				qunit : {
-					version : 2
-				},
 				ui5 : {
 					libs : ["sap.ui.table", "sap.m"]
 				}
@@ -196,10 +193,7 @@ sap.ui.define(function() {
 			messagesEnd2End : {
 				// not in 1RingModels.qunit because of MockServer usage
 				title : "Messaging (messagesEnd2End.qunit)",
-				module : ["test-resources/sap/ui/core/qunit/messages/messagesEnd2End.qunit"],
-				qunit : {
-					version : 2
-				}
+				module : ["test-resources/sap/ui/core/qunit/messages/messagesEnd2End.qunit"]
 			},
 
 			messagesGeneral : {
@@ -240,8 +234,7 @@ sap.ui.define(function() {
 				title : "sap.ui.model.odata.ODataMetadata",
 				module : ["test-resources/sap/ui/core/qunit/odata/ODataMetadata.qunit"],
 				qunit : {
-					reorder : false,
-					version : 2
+					reorder : false
 				},
 				sinon : 1
 			},
@@ -282,10 +275,7 @@ sap.ui.define(function() {
 			ODataV2ListBinding : {
 				// not in 1RingModels.qunit because of ODataModelFakeService usage
 				title : "sap.ui.model.odata.v2.ODataListBinding",
-				module : ["test-resources/sap/ui/core/qunit/odata/v2/ODataV2ListBinding.qunit"],
-				qunit : {
-					version : 2
-				}
+				module : ["test-resources/sap/ui/core/qunit/odata/v2/ODataV2ListBinding.qunit"]
 			},
 
 			ODataV2ListBinding_Paging : {
@@ -299,10 +289,7 @@ sap.ui.define(function() {
 			ODataV2Model : {
 				// not in 1RingModels.qunit because of ODataModelFakeService usage
 				title : "sap.ui.model.odata.v2.ODataModel (ODataV2Model)",
-				module : ["test-resources/sap/ui/core/qunit/odata/v2/ODataV2Model.qunit"],
-				qunit : {
-					version : 2
-				}
+				module : ["test-resources/sap/ui/core/qunit/odata/v2/ODataV2Model.qunit"]
 			},
 
 			ODataV2TreeBinding : {
@@ -321,9 +308,6 @@ sap.ui.define(function() {
 				module : [
 					"test-resources/sap/ui/core/qunit/odata/v2/ODataV2TreeBindingFlat_MockSrv.qunit"
 				],
-				qunit : {
-					version : 2
-				},
 				sinon : 1
 			},
 
@@ -332,10 +316,7 @@ sap.ui.define(function() {
 				title : "sap.ui.model.odata.ODataTreeBindingFlat (FakeSrv)",
 				module : [
 					"test-resources/sap/ui/core/qunit/odata/v2/ODataV2TreeBindingFlat_FakeSrv.qunit"
-				],
-				qunit : {
-					version : 2
-				}
+				]
 			},
 
 			PendingChanges : {

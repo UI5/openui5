@@ -7,6 +7,35 @@
 	position: relative;
 	display: inherit;
 	z-index: 0;
+	height: var(--sapElement_Height);
+	width: auto;
+	min-width: 12rem;
+
+	&.sapUiFupButtonOnly {
+		width: fit-content;
+		min-width: 0;
+		margin: 0.25rem 0;
+
+		.sapMInputBaseContentWrapper {
+			box-shadow: none !important; /* cannot remove !important because of different DOM structure and impossibility to override the selector that originally introduces border-shadow */
+ 			border: var(--sapField_BorderWidth) var(--sapField_BorderStyle) var(--sapField_BorderColor);
+ 			background: transparent;
+			padding: 0;
+			height: 100%;
+
+			.sapMBtn {
+				height: var(--sapElement_Height);
+				padding: 0;
+			}
+		}
+
+		&.sapMInputBase:not(.sapMFocus) .sapMInputBaseContentWrapper:not(.sapMInputBaseReadonlyWrapper):not(.sapMInputBaseContentWrapperState):not(.sapMInputBaseDisabledWrapper):hover {
+			background: none;
+			background-color: none;
+			border-color: transparent;
+			box-shadow: none;
+		}
+	}
 
 	&.sapUiFupDisabled {
 		pointer-events: none;
@@ -19,41 +48,127 @@
 	.sapUiLocalBusyIndicator {
 		z-index: 2;
 	}
+
+	.sapMInputBaseContentWrapper {
+		position: relative;
+		box-sizing: border-box;
+		width: 100%;
+
+		.sapUiFupVisual {
+			width: 100%;
+			height: 100%;
+			top: 0;
+			left: 0;
+			position: relative;
+			display: block;
+			align-items: center;
+			justify-content: stretch;
+			cursor: pointer;
+
+			.sapUiFupBrowseIcon,
+			.sapUiFupClearIcon {
+				height: 100%;
+				width: 2.25rem;
+				outline: none;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				position: absolute;
+				top: 0;
+				border-radius: var(--sapField_BorderCornerRadius);
+			}
+
+			.sapUiFupBrowseIcon {
+				inset-inline-end: 0;
+			}
+
+			.sapUiFupClearIcon {
+				inset-inline-end: 2.25rem;
+			}
+
+			.sapUiFupPlaceholder {
+				user-select: none;
+				-webkit-user-select: none;
+				-moz-user-select: none;
+				pointer-events: none;
+				display: flex;
+				align-items: center;
+				justify-content: start;
+				position: absolute;
+				inset-inline-start: 0;
+				inset-inline-end: 2.25rem;
+				width: 100%;
+				max-width: 100%;
+				height: 100%;
+				box-sizing: border-box;
+				background: transparent;
+				border: none;
+
+				& > div {
+					padding: 0 0.625rem;
+					max-width: 100%;
+					min-width: 0;
+					white-space: nowrap;
+					overflow: hidden;
+					text-overflow: ellipsis;
+					font-style: italic;
+					-webkit-appearance: none;
+					-moz-appearance: textfield;
+					font-size: var(--sapFontSize);
+					font-family: var(--sapFontFamily);
+					color: var(--sapField_PlaceholderTextColor);
+					line-height: normal;
+				}
+			}
+
+			.sapUiFupTokenizer {
+				display: flex;
+				align-items: center;
+				justify-content: start;
+				position: absolute;
+				top: 0;
+				inset-inline-start: 0;
+				min-width: 100%;
+				max-width: 100%;
+				padding-block: 0;
+				padding-inline: 0.125rem 4.75rem;
+				height: 100%;
+				box-sizing: border-box;
+				pointer-events: none;
+
+				.sapMToken,
+				.sapMTokenizerIndicator {
+					pointer-events: auto;
+				}
+
+			}
+		}
+	}
+
+	&.sapUiFupButtonOnly .sapMBtn {
+		width: 100%;
+	}
+
+	&:not(.sapMInputBaseDisabled) .sapUiFupPlaceholder {
+		padding-inline-end: 2.375rem;
+	}
+
 }
 
-.sapUiFupInp .sapUiFUM {
-	top: 2px;
-}
-
-.sapUiFupGroup {
-	display: table;
-}
-
-.sapUiFupGroup > div {
-	display: table-row;
-}
-
-.sapUiFupGroup > div > div {
-	display: table-cell;
-	vertical-align: top;
-}
-
-.sapUiFup > form {
-	display: inline-block;
-}
-
-.sapUiFup > form > div {
-	position: relative;
-	display: inline-block;
+.sapUiFup form {
+	display: block;
+	position: absolute;
+	width: 100%;
+	height: 100%;
 }
 
 .sapUiFupInputMask { /* the element masking the real (but hidden) file input, so the clickable area has exactly the same size as the visible control */
 	display: inline-block;
 	position: absolute;
+	width: 100%;
+	height: 100%;
 	top: 0;
 	left: 0;
-	bottom: 0;
-	right: 0;
 	overflow: hidden;
 }
 
@@ -65,8 +180,37 @@
 	height: 3rem;
 }
 
-.sapUiSizeCompact .sapUiFup.sapMBarChild {
-	height: 2rem;
+.sapUiSizeCompact {
+
+	.sapUiFup.sapMBarChild {
+		height: 2rem;
+	}
+
+	&:not(.sapMInputBaseDisabled) .sapUiFupPlaceholder {
+		padding-inline-end: 2rem;
+	}
+
+	.sapUiFup .sapMInputBaseContentWrapper {
+
+		.sapUiFupBrowseIcon,
+		.sapUiFupClearIcon {
+			width: 2rem;
+		}
+
+		.sapUiFupClearIcon {
+			inset-inline-end: 2rem;
+		}
+
+		.sapUiFupTokenizer {
+			padding-inline: 0.125rem 4.25rem;
+
+		}
+
+		.sapMTokenizer .sapMTokenizerScrollContainer {
+			vertical-align: middle;
+		}
+	}
+
 }
 
 .sapUiCFUM .sapUiFupInputMask,
@@ -83,7 +227,8 @@
 	cursor: pointer;
 	left: -4em; /* avoid the input field behind the file chooser */
 	font-size: 500px; /* to make the field high enough for most themes; for themes with very large fonts this needs to be increased further */
-	width: 5000px;
+	width: 100%;
+	height: 100%;
 }
 
 .sapUiFupInputMask > input[disabled],
@@ -96,14 +241,6 @@ html[data-sap-ui-browser^='cr'] .sapUiFupInputMask > input {
 	position: relative;
 	left: auto;
 	opacity: 0.01;
-}
-
-html[data-sap-ui-browser^='cr'] .sapUiFupInputMask > input {
-	float: right;
-}
-
-.sapUiFup:not(.sapUiFupButtonOnly) .sapUiFupGroup > div > div:last-child {
-	padding-left: 4px;
 }
 
 .sapUiFup .sapUiBtnS.sapUiBtnStdFocus:hover {
@@ -199,8 +336,51 @@ html[data-sap-ui-browser^='cr'] .sapUiFupInputMask > input {
 
 .sapUiFup {
 	.sapMBtnInner:active .sapMBtnIcon,
-	.sapUiFupGroup:active .sapMBtn > span.sapMBtnInner.sapMBtnAccept > .sapMBtnIcon,
-	.sapUiFupGroup:active .sapMBtn > span.sapMBtnInner.sapMBtnReject > .sapMBtnIcon {
+	.sapMBtn > span.sapMBtnInner.sapMBtnAccept > .sapMBtnIcon,
+	.sapMBtn > span.sapMBtnInner.sapMBtnReject > .sapMBtnIcon {
 		color: var(--sapButton_Active_TextColor);
+	}
+}
+
+/* Icon colors, borders, and backgrounds for different Value States */
+.sapUiFup:not(.sapUiFupDisabled) {
+	.sapMInputBaseContentWrapper.sapMInputBaseContentWrapperState {
+
+		/* Define a reusable mixin for the icon styles */
+		.icon-state-styles(@shadow, @activeColor, @borderColor) {
+			border-color: @borderColor;
+
+			.sapUiFupBrowseIcon,
+			.sapUiFupClearIcon {
+				&:hover {
+					box-shadow: @shadow;
+				}
+				&:active {
+					box-shadow: @shadow;
+					background-color: var(--sapField_Focus_Background);
+					color: @activeColor;
+				}
+			}
+		}
+
+		/* Success State */
+		&.sapMInputBaseContentWrapperSuccess {
+			.icon-state-styles(var(--sapField_Hover_SuccessShadow), var(--sapButton_Accept_Selected_TextColor), var(--sapField_SuccessColor));
+		}
+
+		/* Error State */
+		&.sapMInputBaseContentWrapperError {
+			.icon-state-styles(var(--sapField_Hover_InvalidShadow), var(--sapButton_Reject_Selected_TextColor), var(--sapField_InvalidColor));
+		}
+
+		/* Warning State */
+		&.sapMInputBaseContentWrapperWarning {
+			.icon-state-styles(var(--sapField_Hover_WarningShadow), var(--sapButton_Attention_Selected_TextColor), var(--sapField_WarningColor));
+		}
+
+		/* Information State */
+		&.sapMInputBaseContentWrapperInformation {
+			.icon-state-styles(var(--sapField_Hover_InformationShadow), var(--sapButton_Selected_TextColor), var(--sapField_InformationColor));
+		}
 	}
 }

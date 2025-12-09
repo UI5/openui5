@@ -63,10 +63,10 @@ sap.ui.define([
 	 * Creates a simple spy for the OData.request function of the datajs library.
 	 * Used to check the internals of an OData.request.
 	 */
-	var fnSpyRequestsInDatajs = function (fnCallback) {
+	var fnSpyRequestsInDatajs = function (fnCallback, mParameters) {
 		// spy original function
 		var fnDatajsRequest = OData.request;
-		OData.request = function (oRequest, mParameters) {
+		OData.request = function (oRequest) {
 			// restore the original function
 			OData.request = fnDatajsRequest;
 

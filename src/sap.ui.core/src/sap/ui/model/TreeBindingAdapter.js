@@ -1996,7 +1996,7 @@ sap.ui.define([
 	 * @param {function}
 	 *            fnFunction The function to be called, when the event occurs
 	 * @param {object}
-	 *            [oListener] Context object to call the event handler with. Defaults to this
+	 *            [oListener=this] Context object to call the event handler with. Defaults to this
 	 *            <code>TreeBindingAdapter</code> itself
 	 *
 	 * @returns {this} Reference to <code>this</code> in order to allow method chaining

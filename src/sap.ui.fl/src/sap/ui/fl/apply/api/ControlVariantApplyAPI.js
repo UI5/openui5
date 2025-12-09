@@ -10,9 +10,9 @@ sap.ui.define([
 	"sap/ui/fl/apply/_internal/controlVariants/URLHandler",
 	"sap/ui/fl/apply/_internal/controlVariants/Utils",
 	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
+	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagerApply",
 	"sap/ui/fl/apply/_internal/flexState/FlexObjectState",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
-	"sap/ui/fl/variants/VariantManager",
 	"sap/ui/fl/Utils",
 	"sap/ui/fl/apply/_internal/init"
 ], function(
@@ -23,9 +23,9 @@ sap.ui.define([
 	URLHandler,
 	VariantUtil,
 	VariantManagementState,
+	VariantManagerApply,
 	FlexObjectState,
 	ManifestUtils,
-	VariantManager,
 	Utils
 ) {
 	"use strict";
@@ -290,7 +290,7 @@ sap.ui.define([
 			await oVMControl.waitForInit();
 
 			try {
-				await VariantManager.updateCurrentVariant({
+				await VariantManagerApply.updateCurrentVariant({
 					variantManagementReference: sVariantManagementReference,
 					newVariantReference: sVariantReference,
 					appComponent: oAppComponent,

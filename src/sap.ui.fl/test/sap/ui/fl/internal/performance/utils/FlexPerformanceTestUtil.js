@@ -7,10 +7,11 @@ sap.ui.define([
 	"sap/m/Slider",
 	"sap/m/VBox",
 	"sap/ui/core/Element",
+	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagerApply",
 	"sap/ui/fl/apply/_internal/flexState/FlexObjectState",
-	"sap/ui/fl/initial/_internal/preprocessors/XmlPreprocessor",
 	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
 	"sap/ui/fl/apply/api/FlexRuntimeInfoAPI",
+	"sap/ui/fl/initial/_internal/preprocessors/XmlPreprocessor",
 	"sap/ui/fl/variants/VariantManager",
 	"sap/ui/fl/write/api/PersistenceWriteAPI",
 	"sap/ui/fl/Layer",
@@ -26,10 +27,11 @@ sap.ui.define([
 	Slider,
 	VBox,
 	Element,
+	VariantManagerApply,
 	FlexObjectState,
-	XmlPreprocessor,
 	ControlVariantApplyAPI,
 	FlexRuntimeInfoAPI,
+	XmlPreprocessor,
 	VariantManager,
 	PersistenceWriteAPI,
 	Layer,
@@ -277,7 +279,7 @@ sap.ui.define([
 	};
 
 	FlexPerformanceTestUtil.updateVariant = function(oComponent) {
-		return VariantManager.updateCurrentVariant({
+		return VariantManagerApply.updateCurrentVariant({
 			variantManagementReference: "idMain1--variantManagementOrdersTable",
 			newVariantReference: "id_1570801327284_11",
 			appComponent: oComponent,

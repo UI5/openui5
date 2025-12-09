@@ -29,6 +29,12 @@ sap.ui.define([
 		});
 	}
 
+	function _nextPaginatorReadyEvent(oPaginator) {
+		return new Promise((resolve) => {
+			oPaginator.attachEventOnce("_ready", resolve);
+		});
+	}
+
 	async function openPaginationCard(oCard) {
 		oCard.getCardFooter().getAggregation("_showMore").$().trigger("tap");
 		const oDialog = oCard.getDependents()[0];
@@ -872,14 +878,23 @@ sap.ui.define([
 
 		const oFilterBar = oPaginatedCard.getAggregation("_filterBar");
 		const oFilter = oFilterBar._getFilters()[0];
+		const oScrollContainer = oPaginatedCard.getDomRef("contentSection");
+		const oRemoveScrollListenerSpy = this.spy(oScrollContainer, "removeEventListener");
 
 		// Act
 		oFilter.getField().open();
 		oFilter.getField().getItems()[1].$().trigger("tap");
 		await nextCardDataReadyEvent(oPaginatedCard);
 
+		const oPaginator = oPaginatedCard._oPaginator;
+
+		await _nextPaginatorReadyEvent(oPaginator);
+		await nextUIUpdate();
+
 		// Assert
 		assert.ok(secondFilterFirstPageRequested, "First page should be requested for the second filter");
+		assert.ok(oRemoveScrollListenerSpy.called, "Scroll event listener should be removed to prevent multiple bindings");
+		assert.ok(oRemoveScrollListenerSpy.calledWith("scroll", oPaginator._onScrollBound), "Correct scroll listener callback should be removed");
 	});
 
 	QUnit.test("Initial load of data", async function (assert) {

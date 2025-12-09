@@ -16,10 +16,11 @@
 				headerLabel="{i18n>NotFound_headerLabel}"/>
 		</landmarkInfo>
 		<content>
-			<MessagePage
-				showHeader="false"
-				text="{i18n>categoryNoData}"
-				description=""/>
+			<IllustratedMessage
+				title="{i18n>categoryNoData}"
+				description="{i18n>notFoundDescription}"
+				illustrationType="NoSearchResults"
+			/>
 		</content>
 	</Page>
 </mvc:View>

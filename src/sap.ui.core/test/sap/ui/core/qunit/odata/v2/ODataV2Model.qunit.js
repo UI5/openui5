@@ -1703,7 +1703,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("test bindElement", function(assert) {
-		assert.expect(2);
+		assert.expect(3);
 		var done = assert.async();
 		var oModel = initModel(sURI, {json:false});
 		oLabel.setModel(oModel);
@@ -1711,18 +1711,25 @@ sap.ui.define([
 		oLabel.setBindingContext(oTestContext);
 		oLabel.bindElement("/Categories(2)");
 		assert.ok(oLabel.getBindingContext() == oTestContext, "bindElement must not reset context");
+		var oHandlerSpy;
 		var fnHandler = function() {
-			assert.equal(oLabel.getBindingContext().getPath(), "/Categories(2)", "context must be set in change handler");
-			oLabel.getElementBinding().detachChange(fnHandler);
+			const oBoundContext = oLabel.getElementBinding().getBoundContext();
+			if (!oBoundContext) {
+				return; // Bound context not set yet
+			}
+			assert.strictEqual(oHandlerSpy.callCount, 2);
+			assert.strictEqual(oBoundContext.getPath(), "/Categories(2)", "context must be set in change handler");
+			oLabel.getElementBinding().detachChange(oHandlerSpy);
 			oLabel.unbindElement();
 			oLabel.setBindingContext();
 			done();
 		};
-		oLabel.getElementBinding().attachChange(fnHandler);
+		oHandlerSpy = sinon.spy(fnHandler);
+		oLabel.getElementBinding().attachChange(oHandlerSpy);
 	});
 
 	QUnit.test("test bindElement 2", function(assert) {
-		assert.expect(2);
+		assert.expect(3);
 		var done = assert.async();
 		var oModel = initModel(sURI, {json:false});
 		oLabel.setModel(oModel);
@@ -1730,18 +1737,25 @@ sap.ui.define([
 		oLabel.setBindingContext(oTestContext);
 		oLabel.bindElement("Category");
 		assert.ok(oLabel.getBindingContext() == oTestContext, "bindElement must not reset context");
+		var oHandlerSpy;
 		var fnHandler = function() {
-			assert.equal(oLabel.getBindingContext().getPath(), "/Categories(2)", "context must be set in change handler");
-			oLabel.getElementBinding().detachChange(fnHandler);
+			const oBoundContext = oLabel.getElementBinding().getBoundContext();
+			if (!oBoundContext) {
+				return; // Bound context not set yet
+			}
+			assert.strictEqual(oHandlerSpy.callCount, 2);
+			assert.strictEqual(oBoundContext.getPath(), "/Categories(2)", "context must be set in change handler");
+			oLabel.getElementBinding().detachChange(oHandlerSpy);
 			oLabel.unbindElement();
 			oLabel.setBindingContext();
 			done();
 		};
-		oLabel.getElementBinding().attachChange(fnHandler);
+		oHandlerSpy = sinon.spy(fnHandler);
+		oLabel.getElementBinding().attachChange(oHandlerSpy);
 	});
 
 	QUnit.test("test bindElement - set ParentContext null", function(assert) {
-		assert.expect(5);
+		assert.expect(6);
 		var done = assert.async();
 		var oModel = initModel(sURI, {json:false});
 		oLabel.setModel(oModel);
@@ -1749,9 +1763,15 @@ sap.ui.define([
 		oLabel.setBindingContext(oTestContext);
 		oLabel.bindElement("Category");
 		assert.ok(oLabel.getBindingContext() == oTestContext, "bindElement must not reset context");
+		var oHandlerSpy;
 		var fnHandler = function() {
-			assert.equal(oLabel.getBindingContext().getPath(), "/Categories(2)", "context must be set in change handler");
-			oLabel.getElementBinding().detachChange(fnHandler);
+			const oBoundContext = oLabel.getElementBinding().getBoundContext();
+			if (!oBoundContext) {
+				return;
+			}
+			assert.strictEqual(oHandlerSpy.callCount, 2);
+			assert.strictEqual(oBoundContext.getPath(), "/Categories(2)", "context must be set in change handler");
+			oLabel.getElementBinding().detachChange(oHandlerSpy);
 			oLabel.getElementBinding().attachChange(fnHandler2);
 			oLabel.setBindingContext();
 		};
@@ -1764,7 +1784,9 @@ sap.ui.define([
 			oLabel.unbindElement();
 			done();
 		};
-		oLabel.getElementBinding().attachChange(fnHandler);
+
+		oHandlerSpy = sinon.spy(fnHandler);
+		oLabel.getElementBinding().attachChange(oHandlerSpy);
 	});
 
 	QUnit.test("test bindElement 3", function(assert) {
@@ -1806,8 +1828,9 @@ sap.ui.define([
 		};
 		oLabel.getElementBinding().attachChange(fnHandler);
 	});
+
 	QUnit.test("test bindElement 5 - change parentContext", function(assert) {
-		assert.expect(3);
+		assert.expect(4);
 		var done = assert.async();
 		cleanSharedData();
 		var oModel = initModel(sURI, {json:false});
@@ -1816,9 +1839,15 @@ sap.ui.define([
 		oLabel.setBindingContext(oTestContext);
 		oLabel.bindElement("Category");
 		assert.ok(oLabel.getBindingContext() == oTestContext, "bindElement must not reset context");
+		var oHandlerSpy;
 		var fnHandler = function() {
-			assert.equal(oLabel.getBindingContext().getPath(), "/Categories(2)", "context must be set in change handler");
-			oLabel.getElementBinding().detachChange(fnHandler);
+			const oBoundContext = oLabel.getElementBinding().getBoundContext();
+			if (!oBoundContext) {
+				return;
+			}
+			assert.strictEqual(oHandlerSpy.callCount, 2);
+			assert.strictEqual(oBoundContext.getPath(), "/Categories(2)", "context must be set in change handler");
+			oLabel.getElementBinding().detachChange(oHandlerSpy);
 			oModel.attachRequestSent(fnHandler2);
 			oTestContext = oModel.getContext("/Products(1)");
 			oLabel.setBindingContext(oTestContext);
@@ -1831,11 +1860,13 @@ sap.ui.define([
 			oLabel.setBindingContext();
 			done();
 		};
-		oLabel.getElementBinding().attachChange(fnHandler);
+
+		oHandlerSpy = sinon.spy(fnHandler);
+		oLabel.getElementBinding().attachChange(oHandlerSpy);
 	});
 
 	QUnit.test("test bindElement 6 - change parentContext with propagation", function(assert) {
-		assert.expect(3);
+		assert.expect(4);
 		var done = assert.async();
 		cleanSharedData();
 		var oModel = initModel(sURI, {json:false});
@@ -1844,9 +1875,15 @@ sap.ui.define([
 		oPanel.setBindingContext(oTestContext);
 		oLabel.bindElement("Category");
 		assert.ok(oLabel.getBindingContext() == oTestContext, "bindElement must not reset context");
+		var oHandlerSpy;
 		var fnHandler = function() {
-			assert.equal(oLabel.getBindingContext().getPath(), "/Categories(2)", "context must be set in change handler");
-			oLabel.getElementBinding().detachChange(fnHandler);
+			const oBoundContext = oLabel.getElementBinding().getBoundContext();
+			if (!oBoundContext) {
+				return;
+			}
+			assert.equal(oHandlerSpy.callCount, 2);
+			assert.equal(oBoundContext.getPath(), "/Categories(2)", "context must be set in change handler");
+			oLabel.getElementBinding().detachChange(oHandlerSpy);
 			oModel.attachRequestSent(fnHandler2);
 			oTestContext = oModel.getContext("/Products(1)");
 			oPanel.setBindingContext(oTestContext);
@@ -1859,7 +1896,9 @@ sap.ui.define([
 			oLabel.setBindingContext();
 			done();
 		};
-		oLabel.getElementBinding().attachChange(fnHandler);
+
+		oHandlerSpy = sinon.spy(fnHandler);
+		oLabel.getElementBinding().attachChange(oHandlerSpy);
 	});
 
 	QUnit.test("test bindElement 7 - checkUpdate", function(assert) {
@@ -1897,28 +1936,40 @@ sap.ui.define([
 	});
 
 	QUnit.test("test bindElement 8 - parent context and model exist initially", function(assert) {
+		assert.expect(4);
 		var done = assert.async();
 		cleanSharedData();
 		var oModel = initModel(sURI, {json:false});
 		var oPanel, oBox, oText;
 		var fnHandler = function() {
-			assert.equal(oText.getBindingContext().getPath(), "/Categories(2)", "Context is set after change");
-			oBox.getObjectBinding().detachChange(fnHandler);
+			const oBindingContext = oText.getBindingContext();
+			if (!oBindingContext) {
+				return;
+			}
+			assert.equal(oBindingContext.getPath(), "/Categories(2)", "Context is set after change");
+			oBox.getObjectBinding().detachChange(oHandlerSpy);
 			oBox.getObjectBinding().attachChange(fnHandler2);
 			oModel.createBindingContext("/Products(3)", function(oContext) {
 				oPanel.setBindingContext(oContext);
 			});
 		};
+		var oHandlerSpy = sinon.spy(fnHandler);
+		var oHandlerSpy3;
 		var fnHandler2 = function() {
 			assert.ok(oText.getBindingContext() === null, "Binding context on text must be null after parent context change");
 			oBox.getObjectBinding().detachChange(fnHandler2);
-			oBox.getObjectBinding().attachChange(fnHandler3);
+			oBox.getObjectBinding().attachChange(oHandlerSpy3);
 		};
 		var fnHandler3 = function() {
-			assert.equal(oText.getBindingContext().getPath(), "/Categories(7)", "Context is set after change");
-			oBox.getObjectBinding().detachChange(fnHandler3);
+			const oBindingContext = oText.getBindingContext();
+			if (!oBindingContext) {
+				return;
+			}
+			assert.equal(oBindingContext.getPath(), "/Categories(7)", "Context is set after change");
+			oBox.getObjectBinding().detachChange(oHandlerSpy3);
 			done();
 		};
+		oHandlerSpy3 = sinon.spy(fnHandler3);
 		oModel.createBindingContext("/Products(2)", function(oContext) {
 			oPanel = new Panel({
 				models: oModel,
@@ -1937,12 +1988,12 @@ sap.ui.define([
 			oBox = oPanel.getContent()[0];
 			oText = oBox.getItems()[0];
 			assert.ok(oText.getBindingContext() === null, "Binding context on text must be null");
-			oBox.getObjectBinding().attachChange(fnHandler);
+			oBox.getObjectBinding().attachChange(oHandlerSpy);
 		});
 	});
 
 	QUnit.test("test getBindingContext", function(assert) {
-		assert.expect(4);
+		assert.expect(5);
 		var done = assert.async();
 		cleanSharedData();
 		var oODataModel = initModel(sURI, {json:false});
@@ -1956,14 +2007,21 @@ sap.ui.define([
 		assert.ok(oPanel.getBindingContext(), "Context and model are the same type. Context returned");
 		oLabel.setModel(oODataModel);
 		oLabel.bindElement("Category");
+		var oHandlerSpy;
 		var fnHandler = function() {
-			assert.equal(oLabel.getBindingContext().getPath(), "/Categories(2)", "context must be set in change handler");
+			const oBoundContext = oLabel.getElementBinding().getBoundContext();
+			if (!oBoundContext) {
+				return;
+			}
+			assert.strictEqual(oHandlerSpy.callCount, 2);
+			assert.strictEqual(oBoundContext.getPath(), "/Categories(2)", "context must be set in change handler");
 			oLabel.getElementBinding().detachChange(fnHandler);
 			oPanel.setBindingContext(oTestContextJSON);
 			assert.ok(!oPanel.getBindingContext(), "Model is type OData, Context is type JSON so no context should be returned");
 			done();
 		};
-		oLabel.getElementBinding().attachChange(fnHandler);
+		oHandlerSpy = sinon.spy(fnHandler);
+		oLabel.getElementBinding().attachChange(oHandlerSpy);
 	});
 
 	QUnit.test("test data events for bindElement", function(assert) {
@@ -3019,7 +3077,6 @@ sap.ui.define([
 			assert.strictEqual(oContext.getObject("Address/City"), undefined);
 			oModel.setProperty("Address/City", "Walldorf", oContext);
 			assert.strictEqual(oContext.getObject("Address/City"), "Walldorf");
-			oModel.destroy();
 		});
 	});
 

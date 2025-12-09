@@ -2,7 +2,6 @@
 /* global QUnit */
 
 sap.ui.define([
-	"sap/base/util/Deferred",
 	"sap/ui/base/Event",
 	"sap/ui/core/util/reflection/JsControlTreeModifier",
 	"sap/ui/core/Control",
@@ -10,8 +9,8 @@ sap.ui.define([
 	"sap/ui/fl/apply/_internal/changes/Reverter",
 	"sap/ui/fl/apply/_internal/flexObjects/FlexObjectFactory",
 	"sap/ui/fl/apply/_internal/flexState/changes/DependencyHandler",
-	"sap/ui/fl/apply/_internal/flexState/controlVariants/Switcher",
 	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
+	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagerApply",
 	"sap/ui/fl/apply/_internal/flexState/FlexObjectState",
 	"sap/ui/fl/apply/_internal/flexState/FlexState",
 	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
@@ -25,9 +24,9 @@ sap.ui.define([
 	"sap/ui/fl/Layer",
 	"sap/ui/fl/Utils",
 	"sap/ui/thirdparty/sinon-4",
+	"test-resources/sap/ui/fl/qunit/FlQUnitUtils",
 	"test-resources/sap/ui/rta/qunit/RtaQunitUtils"
 ], function(
-	Deferred,
 	BaseEvent,
 	JsControlTreeModifier,
 	Control,
@@ -35,8 +34,8 @@ sap.ui.define([
 	Reverter,
 	FlexObjectFactory,
 	DependencyHandler,
-	Switcher,
 	VariantManagementState,
+	VariantManagerApply,
 	FlexObjectState,
 	FlexState,
 	ControlVariantApplyAPI,
@@ -50,6 +49,7 @@ sap.ui.define([
 	Layer,
 	Utils,
 	sinon,
+	FlQUnitUtils,
 	RtaQunitUtils
 ) {
 	"use strict";
@@ -99,22 +99,13 @@ sap.ui.define([
 		});
 	}
 
-	function stubFlexObjectsSelector(aFlexObjects) {
-		var oFlexObjectsSelector = FlexState.getFlexObjectsDataSelector();
-		var oGetFlexObjectsStub = sandbox.stub(oFlexObjectsSelector, "get");
-		oGetFlexObjectsStub.callsFake(function(...aArgs) {
-			return aFlexObjects.concat(oGetFlexObjectsStub.wrappedMethod.apply(this, aArgs));
-		});
-		oFlexObjectsSelector.checkUpdate();
-	}
-
 	QUnit.module("VariantManager", {
 		async beforeEach() {
 			this.oSettingsStub = sandbox.stub(Settings, "getInstanceOrUndef").callsFake(() => {
 				const oSettings = this.oSettingsStub.wrappedMethod();
 				return oSettings || { getUserId: () => "test user" };
 			});
-			stubFlexObjectsSelector([
+			FlQUnitUtils.stubFlexObjectsSelector(sandbox, [
 				createVariant({
 					author: ControlVariantWriteUtils.DEFAULT_AUTHOR,
 					key: sVMReference,
@@ -273,7 +264,7 @@ sap.ui.define([
 					layer: bVendorLayer ? Layer.VENDOR : Layer.CUSTOMER,
 					additionalVariantChanges: []
 				};
-				const oUpdateCurrentVariantStub = sandbox.stub(VariantManager, "updateCurrentVariant").resolves();
+				const oUpdateCurrentVariantStub = sandbox.stub(VariantManagerApply, "updateCurrentVariant").resolves();
 
 				const aChanges = await VariantManager.copyVariant(mPropertyBag);
 				var oNewVariant = this.oModel.oData[sVMReference].variants.find(function(oVariant) {
@@ -295,7 +286,7 @@ sap.ui.define([
 						newVariantReference: mPropertyBag.newVariantReference,
 						appComponent: mPropertyBag.appComponent,
 						vmControl: mPropertyBag.vmControl,
-						internallyCalled: true,
+						skipExecuteAfterSwitch: true,
 						scenario: "saveAs"
 					}
 				);
@@ -319,7 +310,7 @@ sap.ui.define([
 
 			sandbox.stub(this.oModel, "_duplicateVariant").returns(oVariantData);
 			sandbox.stub(JsControlTreeModifier, "getSelector").returns({ id: sVMReference });
-			sandbox.stub(VariantManager, "updateCurrentVariant").resolves();
+			sandbox.stub(VariantManagerApply, "updateCurrentVariant").resolves();
 
 			var mPropertyBag = {
 				variantManagementReference: sVMReference,
@@ -369,7 +360,7 @@ sap.ui.define([
 			};
 			const aDummyDirtyChanges = [oVariant].concat(oChangeInVariant);
 
-			const fnUpdateCurrentVariantStub = sandbox.stub(VariantManager, "updateCurrentVariant").resolves();
+			const fnUpdateCurrentVariantStub = sandbox.stub(VariantManagerApply, "updateCurrentVariant").resolves();
 			sandbox.stub(FlexObjectState, "getDirtyFlexObjects").returns(aDummyDirtyChanges);
 
 			assert.strictEqual(this.oModel.oData[sVMReference].variants.length, 5, "then initial length is 5");
@@ -435,7 +426,7 @@ sap.ui.define([
 			sandbox.stub(VariantManagementState, "getCurrentVariantReference").returns("variant2");
 			const oSaveStub = sandbox.stub(FlexObjectManager, "saveFlexObjects");
 			const oGetDefaultVariantReferenceSpy = sandbox.spy(VariantManagementState, "getDefaultVariantReference");
-			const oUpdateCurrentVariantSpy = sandbox.spy(VariantManager, "updateCurrentVariant");
+			const oUpdateCurrentVariantSpy = sandbox.spy(VariantManagerApply, "updateCurrentVariant");
 			await VariantManager.handleManageEvent(oManageEvent, this.oVMControl);
 			assert.strictEqual(oSaveStub.callCount, 1, "then saveDirtyChanges is called once");
 			assert.ok(oGetDefaultVariantReferenceSpy.called, "then default variant is requested");
@@ -521,7 +512,7 @@ sap.ui.define([
 				def: sVariantKey
 			};
 
-			const oUpdateVariantSpy = sandbox.spy(VariantManager, "updateCurrentVariant");
+			const oUpdateVariantSpy = sandbox.spy(VariantManagerApply, "updateCurrentVariant");
 			const oSaveStub = sandbox.stub(FlexObjectManager, "saveFlexObjects");
 			const oAddVariantChangesSpy = sandbox.stub(VariantManager, "handleManageEvent").callsFake(async (...aArgs) => {
 				await oAddVariantChangesSpy.wrappedMethod.apply(this, aArgs);
@@ -552,7 +543,7 @@ sap.ui.define([
 				})]
 			};
 
-			const oUpdateVariantStub = sandbox.stub(VariantManager, "updateCurrentVariant");
+			const oUpdateVariantStub = sandbox.stub(VariantManagerApply, "updateCurrentVariant");
 			const oAddVariantChangesSpy = sandbox.spy(VariantManager, "addVariantChanges");
 			sandbox.stub(FlexObjectManager, "saveFlexObjects").callsFake((oPropertyBag) => {
 				assert.strictEqual(oUpdateVariantStub.callCount, 1, "the variant was switched");
@@ -1026,153 +1017,6 @@ sap.ui.define([
 			}).returns({ controlChanges: aControlChanges });
 			const aChanges = VariantManager.getControlChangesForVariant("fakeVMReference", "variantMgmt1", "variant1");
 			assert.strictEqual(aChanges, aControlChanges, "then the changes are returned");
-		});
-
-		QUnit.test("when calling 'updateCurrentVariant' with root app component", async function(assert) {
-			sandbox.stub(Switcher, "switchVariant").resolves();
-			const oSetVariantSwitchPromiseSpy = sandbox.spy(VariantManagementState, "setVariantSwitchPromise");
-			const oCallVariantSwitchListenersSpy = sandbox.spy(this.oVMControl, "_executeAllVariantAppliedListeners");
-
-			assert.strictEqual(
-				this.oVMControl.getCurrentVariantReference(),
-				"variant1",
-				"then initially the current variant was correct before updating"
-			);
-
-			await VariantManager.updateCurrentVariant({
-				variantManagementReference: sVMReference,
-				newVariantReference: "variant0",
-				appComponent: oComponent,
-				vmControl: this.oVMControl
-			});
-
-			assert.ok(
-				Switcher.switchVariant.calledWith({
-					vmReference: sVMReference,
-					currentVReference: "variant1",
-					newVReference: "variant0",
-					appComponent: oComponent,
-					modifier: JsControlTreeModifier,
-					reference: this.oModel.sFlexReference
-				}),
-				"then Switcher.switchVariant is called with correct parameters"
-			);
-			assert.ok(
-				oSetVariantSwitchPromiseSpy.calledBefore(Switcher.switchVariant),
-				"then the switch variant promise was set before switching"
-			);
-			assert.strictEqual(oCallVariantSwitchListenersSpy.callCount, 1, "then the listeners were called");
-		});
-
-		QUnit.test("when calling 'updateCurrentVariant' without a root app component", async function(assert) {
-			sandbox.stub(Switcher, "switchVariant").resolves();
-			const oSetVariantSwitchPromiseSpy = sandbox.spy(VariantManagementState, "setVariantSwitchPromise");
-			const oCallVariantSwitchListenersSpy = sandbox.spy(this.oVMControl, "_executeAllVariantAppliedListeners");
-
-			await VariantManager.updateCurrentVariant({
-				variantManagementReference: sVMReference,
-				newVariantReference: "variant0",
-				vmControl: this.oVMControl
-			});
-
-			assert.ok(
-				Switcher.switchVariant.calledWith({
-					vmReference: sVMReference,
-					currentVReference: "variant1",
-					newVReference: "variant0",
-					appComponent: oComponent,
-					modifier: JsControlTreeModifier,
-					reference: this.oModel.sFlexReference
-				}),
-				"then Switcher.switchVariant is called with correct parameters"
-			);
-			assert.ok(
-				oSetVariantSwitchPromiseSpy.calledBefore(Switcher.switchVariant),
-				"then the switch variant promise was set before switching"
-			);
-			assert.strictEqual(oCallVariantSwitchListenersSpy.callCount, 1, "then the listeners were called");
-		});
-
-		QUnit.test("when calling 'updateCurrentVariant' twice without waiting for the first one to be finished", async function(assert) {
-			const oSetVariantSwitchPromiseSpy = sandbox.spy(VariantManagementState, "setVariantSwitchPromise");
-			const oCallVariantSwitchListenersSpy = sandbox.spy(this.oVMControl, "_executeAllVariantAppliedListeners");
-
-			const oSwitch1Deferred = new Deferred();
-			const oSwitchVariantStub = sandbox.stub(Switcher, "switchVariant")
-			.onCall(0)
-			.returns(oSwitch1Deferred.promise)
-			.onCall(1)
-			.resolves();
-
-			// first call
-			VariantManager.updateCurrentVariant({
-				variantManagementReference: sVMReference,
-				newVariantReference: "variant2",
-				appComponent: oComponent,
-				vmControl: this.oVMControl
-			});
-
-			// second call
-			VariantManager.updateCurrentVariant({
-				variantManagementReference: sVMReference,
-				newVariantReference: "variant0",
-				appComponent: oComponent,
-				vmControl: this.oVMControl
-			});
-
-			oSwitch1Deferred.resolve();
-			await VariantManagementState.waitForVariantSwitch(sReference, sVMReference);
-
-			assert.strictEqual(oSwitchVariantStub.callCount, 2, "then Switcher.switchVariant() was called twice");
-			assert.strictEqual(
-				oSetVariantSwitchPromiseSpy.callCount,
-				2,
-				"then the variant switch promise was set twice"
-			);
-			assert.strictEqual(oCallVariantSwitchListenersSpy.callCount, 2, "then the listeners were called twice");
-		});
-
-		QUnit.test("when calling 'updateCurrentVariant' twice without waiting for the first one to be failed and finished", async function(assert) {
-			assert.expect(4);
-			const oSetVariantSwitchPromiseSpy = sandbox.spy(VariantManagementState, "setVariantSwitchPromise");
-			const oCallVariantSwitchListenersSpy = sandbox.spy(this.oVMControl, "_executeAllVariantAppliedListeners");
-
-			const oSwitch1Deferred = new Deferred();
-			const oSwitchVariantStub = sandbox.stub(Switcher, "switchVariant")
-			.onCall(0)
-			.returns(oSwitch1Deferred.promise)
-			.onCall(1)
-			.resolves();
-
-			// first call
-			VariantManager.updateCurrentVariant({
-				variantManagementReference: sVMReference,
-				newVariantReference: "variant2",
-				appComponent: oComponent,
-				vmControl: this.oVMControl
-			})
-			.catch(function() {
-				assert.ok(true, "then the first promise was rejected");
-			});
-
-			// second call
-			VariantManager.updateCurrentVariant({
-				variantManagementReference: sVMReference,
-				newVariantReference: "variant0",
-				appComponent: oComponent,
-				vmControl: this.oVMControl
-			});
-
-			oSwitch1Deferred.reject();
-			await VariantManagementState.waitForVariantSwitch(sReference, sVMReference);
-
-			assert.strictEqual(oSwitchVariantStub.callCount, 2, "then Switcher.switchVariant() was called twice");
-			assert.strictEqual(
-				oSetVariantSwitchPromiseSpy.callCount,
-				2,
-				"then the variant switch promise was set twice"
-			);
-			assert.strictEqual(oCallVariantSwitchListenersSpy.callCount, 1, "then the listeners were called");
 		});
 
 		QUnit.test("when calling 'manageVariants' in Adaptation mode with changes", function(assert) {

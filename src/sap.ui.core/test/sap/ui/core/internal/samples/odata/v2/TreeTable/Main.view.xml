@@ -1,6 +1,10 @@
 <mvc:View
 	class="sapUiSizeCompact"
 	controllerName="sap.ui.core.internal.samples.odata.v2.TreeTable.Main"
+	core:require="{
+		Integer: 'sap/ui/model/type/Integer',
+		DateTimeOffset: 'sap/ui/model/odata/type/DateTimeOffset'
+	}"
 	height="100%"
 	xmlns="sap.m"
 	xmlns:core="sap.ui.core"
@@ -25,7 +29,7 @@
 						<Input value="{
 							constraints : {minimum : 0},
 							path : 'ui>/expandedLevels',
-							type : 'sap.ui.model.type.Integer'
+							type : 'Integer'
 						}" width="5em" />
 						<Label text="Restore Tree State" />
 						<CheckBox selected="{ui>/restoreState}" />
@@ -36,7 +40,7 @@
 				</content>
 			</Panel>
 			<t:TreeTable ariaLabelledBy="treeTableTitle" id="treetable" rowMode="Auto" selectionBehavior="Row"
-				selectionMode="Single" rowSelectionChange="onRowSelection" threshold="10">
+				selectionMode="Single" rowSelectionChange=".onRowSelection" threshold="10">
 				<t:extension>
 					<Toolbar>
 						<Title id="treeTableTitle" level="H1" text="Items"/>
@@ -50,9 +54,9 @@
 						<Button enabled="{ui>/rowSelected}" icon="sap-icon://paste"
 							press=".onPaste" tooltip="Paste" />
 						<Button enabled="{ui>/tableBound}" icon="sap-icon://expand"
-							press="onExpandAll" tooltip="Expand All" />
+							press=".onExpandAll" tooltip="Expand All" />
 						<Button enabled="{ui>/tableBound}" icon="sap-icon://collapse"
-							press="onCollapseAll" tooltip="Collapse All" />
+							press=".onCollapseAll" tooltip="Collapse All" />
 						<ToolbarSpacer width="3em" />
 						<Label labelFor="filterCreator" text="Filter by Creator (AppFilter)" />
 						<SearchField id="filterCreator" search=".onFilterByCreator"
@@ -72,7 +76,7 @@
 					</Toolbar>
 				</t:extension>
 				<t:dragDropConfig>
-					<dnd:DragDropInfo dragStart="onDragStart" drop="onDrop" sourceAggregation="rows"
+					<dnd:DragDropInfo dragStart=".onDragStart" drop=".onDrop" sourceAggregation="rows"
 						targetAggregation="rows" />
 				</t:dragDropConfig>
 				<t:columns>
@@ -106,7 +110,7 @@
 							<Input editable="false" value="{
 								formatOptions : {style : 'short'},
 								path : 'CreationDateTime',
-								type : 'sap.ui.model.odata.type.DateTimeOffset'
+								type : 'DateTimeOffset'
 							}" />
 						</t:template>
 					</t:Column>
@@ -153,7 +157,7 @@
 				<dependents>
 					<Dialog contentWidth="50%" id="messageDetails" title="Message Details">
 						<buttons>
-							<Button press="onCloseMessageDetails" text="Close"
+							<Button press=".onCloseMessageDetails" text="Close"
 								tooltip="Close the message details dialog" type="Emphasized" />
 						</buttons>
 						<form:SimpleForm ariaLabelledBy="messageDetails" editable="false"
@@ -188,10 +192,10 @@
 					</Dialog>
 					<Dialog contentWidth="50%" id="createItem" title="Create Item" type="Message">
 						<beginButton>
-							<Button press="onCreateItem" text="OK" />
+							<Button press=".onCreateItem" text="OK" />
 						</beginButton>
 						<endButton>
-							<Button press="onCancelCreateItem" text="Cancel" />
+							<Button press=".onCancelCreateItem" text="Cancel" />
 						</endButton>
 						<content>
 							<Label text="Item Name" />
@@ -210,10 +214,10 @@
 		<footer>
 			<OverflowToolbar>
 				<Button icon="sap-icon://message-popup" id="messagePopoverButton"
-					press="onMessagePopoverPress" text="{ui>/messageCount}" tooltip="Show Messages"
+					press=".onMessagePopoverPress" text="{ui>/messageCount}" tooltip="Show Messages"
 					type="Emphasized">
 					<dependents>
-						<MessagePopover afterClose="onMessagePopoverClosed" id="messagePopover"
+						<MessagePopover afterClose=".onMessagePopoverClosed" id="messagePopover"
 							items="{
 								events : {
 									change : '.updateMessageCount'
@@ -227,7 +231,7 @@
 								}"
 								title="{messages>message}"
 								type="{messages>type}">
-								<Link binding="{messages>}" press="onShowMessageDetails"
+								<Link binding="{messages>}" press=".onShowMessageDetails"
 									text="Technical Details" />
 							</MessageItem>
 						</MessagePopover>

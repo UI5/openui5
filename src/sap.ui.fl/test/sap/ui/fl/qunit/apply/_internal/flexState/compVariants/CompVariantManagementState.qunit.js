@@ -6,14 +6,16 @@ sap.ui.define([
 	"sap/ui/fl/apply/_internal/flexObjects/FlexObjectFactory",
 	"sap/ui/fl/apply/_internal/flexState/FlexState",
 	"sap/ui/fl/Layer",
-	"sap/ui/thirdparty/sinon-4"
+	"sap/ui/thirdparty/sinon-4",
+	"test-resources/sap/ui/fl/qunit/FlQUnitUtils"
 ], function(
 	Log,
 	CompVariantManagementState,
 	FlexObjectFactory,
 	FlexState,
 	Layer,
-	sinon
+	sinon,
+	FlQUnitUtils
 ) {
 	"use strict";
 	const sandbox = sinon.createSandbox();
@@ -34,15 +36,6 @@ sap.ui.define([
 		CompVariantManagementState.getCompEntitiesDataSelector().clearCachedResult({ reference: sReference });
 		CompVariantManagementState.getSetDefaultDataSelector().clearCachedResult({ reference: sReference });
 		sandbox.restore();
-	}
-
-	function stubFlexObjectsSelector(aFlexObjects) {
-		const oFlexObjectsSelector = FlexState.getFlexObjectsDataSelector();
-		const oGetFlexObjectsStub = sandbox.stub(oFlexObjectsSelector, "get");
-		oGetFlexObjectsStub.callsFake(function(...aArgs) {
-			return aFlexObjects.concat(oGetFlexObjectsStub.wrappedMethod.apply(this, aArgs));
-		});
-		oFlexObjectsSelector.checkUpdate();
 	}
 
 	QUnit.module("getVariant", {
@@ -73,7 +66,7 @@ sap.ui.define([
 				layer: Layer.USER
 			});
 
-			stubFlexObjectsSelector([oSetDefaultChange1, oSetDefaultChange2]);
+			FlQUnitUtils.stubFlexObjectsSelector(sandbox, [oSetDefaultChange1, oSetDefaultChange2]);
 			const aDefaultChanges = CompVariantManagementState.getDefaultChanges({
 				reference: "myApp",
 				persistencyKey: sPersistencyKey
@@ -102,7 +95,7 @@ sap.ui.define([
 				},
 				layer: Layer.USER
 			});
-			stubFlexObjectsSelector([oSetDefaultChange1, oSetDefaultChange2]);
+			FlQUnitUtils.stubFlexObjectsSelector(sandbox, [oSetDefaultChange1, oSetDefaultChange2]);
 			assert.deepEqual(CompVariantManagementState.getDefaultChanges(
 				{ reference: "myApp", persistencyKey: sPersistencyKey }), [oSetDefaultChange1], "the first set default change gets returned");
 		});
@@ -129,7 +122,7 @@ sap.ui.define([
 				},
 				layer: Layer.USER
 			});
-			stubFlexObjectsSelector([oSetDefaultChange1, oSetDefaultChange2]);
+			FlQUnitUtils.stubFlexObjectsSelector(sandbox, [oSetDefaultChange1, oSetDefaultChange2]);
 			assert.deepEqual(CompVariantManagementState.getDefaultChanges(
 				{ reference: "myApp", persistencyKey: sPersistencyKey }), [oSetDefaultChange1], "the first set default change gets returned");
 		});
@@ -145,7 +138,7 @@ sap.ui.define([
 				},
 				layer: Layer.CUSTOMER
 			});
-			stubFlexObjectsSelector([oSetDefaultChange1]);
+			FlQUnitUtils.stubFlexObjectsSelector(sandbox, [oSetDefaultChange1]);
 			assert.deepEqual(CompVariantManagementState.getDefaultChanges(
 				{ reference: "myApp", persistencyKey: sPersistencyKey }), [oSetDefaultChange1], "the set default change gets returned");
 		});
@@ -210,7 +203,7 @@ sap.ui.define([
 				},
 				layer: Layer.CUSTOMER
 			});
-			stubFlexObjectsSelector([oUIChange]);
+			FlQUnitUtils.stubFlexObjectsSelector(sandbox, [oUIChange]);
 			const oDataSelector = CompVariantManagementState.getSetDefaultDataSelector();
 			const oClearCacheSpy = sandbox.spy(oDataSelector, "_clearCache");
 			oDataSelector.checkUpdate({ reference: sReference, persistencyKey: sPersistencyKey });
@@ -319,7 +312,7 @@ sap.ui.define([
 					defaultVariantName: sDefaultVariantName
 				}
 			});
-			stubFlexObjectsSelector([oSetDefaultChange]);
+			FlQUnitUtils.stubFlexObjectsSelector(sandbox, [oSetDefaultChange]);
 
 			const sDefaultVariantId = CompVariantManagementState.getDefaultVariantId({
 				persistencyKey: sPersistencyKey,
@@ -376,7 +369,7 @@ sap.ui.define([
 				}
 			});
 
-			stubFlexObjectsSelector([oUpdateVariantChange0, oUpdateVariantChange1]);
+			FlQUnitUtils.stubFlexObjectsSelector(sandbox, [oUpdateVariantChange0, oUpdateVariantChange1]);
 
 			const aVariants = await CompVariantManagementState.assembleVariantList({
 				reference: sReference,
