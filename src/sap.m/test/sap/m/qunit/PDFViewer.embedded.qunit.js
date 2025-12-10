@@ -1,4 +1,4 @@
-/*global QUnit sinon*/
+/*global QUnit, sinon*/
 
 sap.ui.define([
 	"sap/ui/thirdparty/jquery",
@@ -18,7 +18,7 @@ sap.ui.define([
 
 	QUnit.module('Embedded mode', {
 		afterEach: function (assert) {
-			if ( oPdfViewer ) {
+			if (oPdfViewer) {
 				oPdfViewer.destroy();
 			}
 		}
@@ -184,7 +184,7 @@ sap.ui.define([
 
 		TestUtils.wait(2000)()
 			.then(async function () {
-				oModel.setData({showDownloadButton: true}, true);
+				oModel.setData({ showDownloadButton: true }, true);
 				await TestUtils.triggerRerender();
 			})
 			.then(TestUtils.wait(2000))
@@ -199,7 +199,7 @@ sap.ui.define([
 				assert.ok(oDownloadButton.length === 1, 'Download button should be visible');
 			})
 			.then(async function () {
-				oModel.setData({showDownloadButton: false}, true);
+				oModel.setData({ showDownloadButton: false }, true);
 				await TestUtils.triggerRerender();
 			})
 			.then(TestUtils.wait(2000))
@@ -284,153 +284,279 @@ sap.ui.define([
 			.then(fnCheckControlStructure);
 	});
 
-	QUnit.test("getting header info", function (assert) {
+	QUnit.module('Source Validation Tests', {
+		beforeEach: function () {
+			// Stub window.fetch before each test
+			this.oFetchStub = sinon.stub(window, 'fetch');
+		},
+		afterEach: function () {
+			if (oPdfViewer) {
+				oPdfViewer.destroy();
+				oPdfViewer = null;
+			}
+			// Restore the original fetch function
+			if (this.oFetchStub) {
+				this.oFetchStub.restore();
+			}
+		}
+	});
+
+	QUnit.test("_onLoadListener validates PDF source with GET request (successful)", function (assert) {
 		var fnDone = assert.async();
-		var sTitle = "My Title";
-		var oOptions = {
-			source: "{/source}",
-			isTrustedSource: true,
-			title: sTitle
+
+		// Mock 200 OK response (successful validation)
+		var oMockResponse = {
+			ok: true,
+			status: 200
 		};
+		this.oFetchStub.resolves(oMockResponse);
 
-		oPdfViewer = TestUtils.createPdfViewer(oOptions);
-		var getHeaderInfoStub = sinon.spy(oPdfViewer, "_getHeaderInfo");
-		oPdfViewer._onLoadListener({});
+		var originalPdfPluginEnabled = PDFViewerRenderer._isPdfPluginEnabled;
+		PDFViewerRenderer._isPdfPluginEnabled = function () { return true; };
 
-		TestUtils.wait(1000)()
-			.then(function()  {
-				assert.ok(getHeaderInfoStub.calledOnce, "getHeaderInfo should be invoked");
-				getHeaderInfoStub.restore();
+		oPdfViewer = TestUtils.createPdfViewer({
+			source: "test-resources/sap/m/qunit/pdfviewer/sample-file.pdf"
+		});
+
+		var bLoadedCalled = false;
+		var bErrorCalled = false;
+		oPdfViewer._fireLoadedEvent = function () {
+			bLoadedCalled = true;
+			// Verify fetch was called with correct parameters
+			assert.ok(this.oFetchStub.calledOnce, "Fetch was called once");
+			var oFetchOptions = this.oFetchStub.firstCall.args[1];
+			assert.deepEqual(oFetchOptions, {
+				method: "GET"
+			}, "Fetch called with GET method");
+			assert.ok(bLoadedCalled, "Loaded event fired for successful response");
+			assert.notOk(bErrorCalled, "Error event not fired for successful response");
+
+			// Restore original function
+			PDFViewerRenderer._isPdfPluginEnabled = originalPdfPluginEnabled;
+			fnDone();
+		}.bind(this);
+		oPdfViewer._fireErrorEvent = function () { bErrorCalled = true; };
+
+		var oEvent = { target: {} };
+		oPdfViewer._onLoadListener(oEvent);
+	});
+
+	QUnit.test("_onLoadListener handles network errors during validation", function (assert) {
+		var fnDone = assert.async();
+
+		// Mock network error
+		this.oFetchStub.rejects(new Error("Network error"));
+
+		var originalPdfPluginEnabled = PDFViewerRenderer._isPdfPluginEnabled;
+		PDFViewerRenderer._isPdfPluginEnabled = function () { return true; };
+
+		oPdfViewer = TestUtils.createPdfViewer({
+			source: "test-resources/sap/m/qunit/pdfviewer/sample-file.pdf"
+		});
+
+		var bLoadedCalled = false;
+		var bErrorCalled = false;
+		oPdfViewer._fireLoadedEvent = function () { bLoadedCalled = true; };
+		oPdfViewer._fireErrorEvent = function () {
+			bErrorCalled = true;
+			// Give time for async fetch to complete
+			setTimeout(function () {
+				assert.ok(this.oFetchStub.calledOnce, "Fetch was called");
+				var oFetchOptions = this.oFetchStub.firstCall.args[1];
+				assert.deepEqual(oFetchOptions, {
+					method: "GET"
+				}, "Fetch called with GET method");
+				assert.notOk(bLoadedCalled, "Loaded event not fired for network error");
+				assert.ok(bErrorCalled, "Error event fired for network error");
+
+				// Restore original function
+				PDFViewerRenderer._isPdfPluginEnabled = originalPdfPluginEnabled;
 				fnDone();
-			});
+			}.bind(this), 100);
+		}.bind(this);
+
+		var oEvent = { target: {} };
+		oPdfViewer._onLoadListener(oEvent);
 	});
 
-	QUnit.test("_getHeaderInfo: fetch success (status 200)", function(assert) {
+	QUnit.test("_onLoadListener handles file not found (404 response)", function (assert) {
 		var fnDone = assert.async();
-		var sTitle = "My Title";
-		var oOptions = {
-			source: "{/source}",
-			isTrustedSource: true,
-			title: sTitle
+
+		// Mock 404 Not Found response
+		var oMockResponse = {
+			ok: false,
+			status: 404
 		};
-		var oPdfViewer = TestUtils.createPdfViewer(oOptions);
-		var oFetchStub = sinon.stub(window, "fetch").callsFake(function() {
-			return Promise.resolve({
-				status: 200,
-				headers: { get: function(key) { return key === "content-type" ? "application/pdf" : null; } }
-			});
+		this.oFetchStub.resolves(oMockResponse);
+
+		var originalPdfPluginEnabled = PDFViewerRenderer._isPdfPluginEnabled;
+		PDFViewerRenderer._isPdfPluginEnabled = function () { return true; };
+
+		oPdfViewer = TestUtils.createPdfViewer({
+			source: "test-resources/sap/m/qunit/pdfviewer/non-existent.pdf"
 		});
-		oPdfViewer._getHeaderInfo("dummy.pdf", "HEAD").then(function(contentType) {
-			assert.equal(contentType, "application/pdf", "fetch branch: returns content-type on 200");
-			oFetchStub.restore();
-			fnDone();
-		});
+
+		var bLoadedCalled = false;
+		var bErrorCalled = false;
+		oPdfViewer._fireLoadedEvent = function () { bLoadedCalled = true; };
+		oPdfViewer._fireErrorEvent = function () {
+			bErrorCalled = true;
+			// Give time for async fetch to complete
+			setTimeout(function () {
+				assert.ok(this.oFetchStub.calledOnce, "Fetch was called");
+				var oFetchOptions = this.oFetchStub.firstCall.args[1];
+				assert.deepEqual(oFetchOptions, {
+					method: "GET"
+				}, "Fetch called with GET method");
+				assert.notOk(bLoadedCalled, "Loaded event not fired for 404 response");
+				assert.ok(bErrorCalled, "Error event fired for 404 response");
+
+				// Restore original function
+				PDFViewerRenderer._isPdfPluginEnabled = originalPdfPluginEnabled;
+				fnDone();
+			}.bind(this), 100);
+		}.bind(this);
+
+		var oEvent = { target: {} };
+		oPdfViewer._onLoadListener(oEvent);
 	});
 
-	QUnit.test("_getHeaderInfo: fetch error (status 404)", function(assert) {
-		var fnDone = assert.async();
-		var oPdfViewer = TestUtils.createPdfViewer({});
-		var oFetchStub = sinon.stub(window, "fetch").callsFake(function() {
-			return Promise.resolve({
-				status: 404,
-				statusText: "Not Found",
-				headers: { get: function() { return null; } }
-			});
+	QUnit.test("_onLoadListener handles synchronous errors in try-catch", function (assert) {
+		// Make fetch throw a synchronous error
+		this.oFetchStub.throws(new Error("Synchronous Error"));
+
+		var originalPdfPluginEnabled = PDFViewerRenderer._isPdfPluginEnabled;
+		PDFViewerRenderer._isPdfPluginEnabled = function () { return true; };
+
+		oPdfViewer = TestUtils.createPdfViewer({
+			source: "test-resources/sap/m/qunit/pdfviewer/sample-file.pdf"
 		});
-		oPdfViewer._getHeaderInfo("dummy.pdf", "HEAD").catch(function(error) {
-			assert.ok(error, "fetch branch: rejects on 404");
-			oFetchStub.restore();
-			fnDone();
-		});
+
+		var bLoadedCalled = false;
+		var bErrorCalled = false;
+		oPdfViewer._fireLoadedEvent = function () { bLoadedCalled = true; };
+		oPdfViewer._fireErrorEvent = function () { bErrorCalled = true; };
+
+		var oEvent = { target: {} };
+		oPdfViewer._onLoadListener(oEvent);
+
+		assert.ok(this.oFetchStub.calledOnce, "Fetch was called");
+		assert.notOk(bLoadedCalled, "Loaded event not fired for synchronous error");
+		assert.ok(bErrorCalled, "Error event fired for synchronous error");
+
+		// Restore original function
+		PDFViewerRenderer._isPdfPluginEnabled = originalPdfPluginEnabled;
 	});
 
-	QUnit.test("_getHeaderInfo: fetch network error", function(assert) {
-		var fnDone = assert.async();
-		var oPdfViewer = TestUtils.createPdfViewer({});
-		var oFetchStub = sinon.stub(window, "fetch").rejects(new Error("Network error"));
-		oPdfViewer._getHeaderInfo("dummy.pdf", "HEAD").catch(function(error) {
-			assert.ok(error, "fetch branch: rejects on network error");
-			oFetchStub.restore();
-			fnDone();
-		});
+	QUnit.test("_onLoadListener doesn't call fetch for data URIs and blob URLs", function (assert) {
+		var originalPdfPluginEnabled = PDFViewerRenderer._isPdfPluginEnabled;
+		PDFViewerRenderer._isPdfPluginEnabled = function () { return true; };
+
+		oPdfViewer = TestUtils.createPdfViewer({});
+
+		var bLoadedCalled = false;
+		oPdfViewer._fireLoadedEvent = function () { bLoadedCalled = true; };
+		oPdfViewer._fireErrorEvent = function () { };
+
+		// Test with data URI - should not call fetch
+		oPdfViewer.setSource("data:application/pdf;base64,JVBERi0xLjQ=");
+		var oEvent = { target: {} };
+		oPdfViewer._onLoadListener(oEvent);
+		assert.notOk(this.oFetchStub.called, "Fetch not called for data URI");
+		assert.ok(bLoadedCalled, "Loaded event fired for data URI");
+
+		// Reset
+		bLoadedCalled = false;
+		this.oFetchStub.resetHistory();
+
+		// Test with blob URL - should not call fetch
+		oPdfViewer.setSource("blob:https://example.com/550e8400-e29b-41d4-a716-446655440000");
+		oPdfViewer._onLoadListener(oEvent);
+		assert.notOk(this.oFetchStub.called, "Fetch not called for blob URL");
+		assert.ok(bLoadedCalled, "Loaded event fired for blob URL");
+
+		// Reset
+		bLoadedCalled = false;
+		this.oFetchStub.resetHistory();
+
+		// Verify with regular URL that fetch would be called
+		this.oFetchStub.resolves({ ok: true, status: 200 });
+		oPdfViewer.setSource("test.pdf");
+		oPdfViewer._onLoadListener(oEvent);
+		assert.ok(this.oFetchStub.calledOnce, "Fetch called for regular URL");
+
+		// Restore original function
+		PDFViewerRenderer._isPdfPluginEnabled = originalPdfPluginEnabled;
 	});
 
-	QUnit.test("_getHeaderInfo: XHR success (status 200)", function(assert) {
-		var fnDone = assert.async();
-		var oPdfViewer = TestUtils.createPdfViewer({});
-		var origFetch = window.fetch;
-		window.fetch = undefined; // force XHR branch
-		var xhr = {
-			open: sinon.spy(),
-			send: sinon.spy(),
-			status: 200,
-			getAllResponseHeaders: function() { return "content-type: application/pdf\n"; },
-			onload: null,
-			onerror: null
-		};
-		var xhrStub = sinon.stub(window, "XMLHttpRequest").callsFake(function() { return xhr; });
-		setTimeout(function() {
-			xhr.onload();
-		}, 0);
-		oPdfViewer._getHeaderInfo("dummy.pdf", "HEAD").then(function(contentType) {
-			assert.equal(contentType, "application/pdf", "XHR branch: returns content-type on 200");
-			xhrStub.restore();
-			window.fetch = origFetch;
-			fnDone();
-		});
+	QUnit.test("_isDataUriOrBlob method validation", function (assert) {
+		oPdfViewer = TestUtils.createPdfViewer({});
+
+		// Test data URIs
+		assert.ok(oPdfViewer._isDataUriOrBlob("data:application/pdf;base64,JVBERi0xLjQ="), "Returns true for data URI");
+		assert.ok(oPdfViewer._isDataUriOrBlob("DATA:application/pdf;base64,JVBERi0xLjQ="), "Returns true for uppercase DATA URI");
+		assert.ok(oPdfViewer._isDataUriOrBlob("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg=="), "Returns true for data URI with different content type");
+
+		// Test blob URLs
+		assert.ok(oPdfViewer._isDataUriOrBlob("blob:https://example.com/550e8400-e29b-41d4-a716-446655440000"), "Returns true for blob URL");
+		assert.ok(oPdfViewer._isDataUriOrBlob("BLOB:https://example.com/550e8400-e29b-41d4-a716-446655440000"), "Returns true for uppercase BLOB URL");
+		assert.ok(oPdfViewer._isDataUriOrBlob("blob:http://localhost:8080/123e4567-e89b-12d3-a456-426614174000"), "Returns true for local blob URL");
+
+		// Test regular URLs (should return false)
+		assert.notOk(oPdfViewer._isDataUriOrBlob("https://example.com/document.pdf"), "Returns false for HTTPS URL");
+		assert.notOk(oPdfViewer._isDataUriOrBlob("http://example.com/file.pdf"), "Returns false for HTTP URL");
+		assert.notOk(oPdfViewer._isDataUriOrBlob("/relative/path/to/document.pdf"), "Returns false for relative path");
+		assert.notOk(oPdfViewer._isDataUriOrBlob("file:///absolute/path/to/document.pdf"), "Returns false for file URL");
+
+		// Test edge cases
+		assert.notOk(oPdfViewer._isDataUriOrBlob(""), "Returns false for empty string");
+		assert.notOk(oPdfViewer._isDataUriOrBlob(null), "Returns false for null");
+		assert.notOk(oPdfViewer._isDataUriOrBlob(undefined), "Returns false for undefined");
 	});
 
-	QUnit.test("_getHeaderInfo: XHR error (status 404)", function(assert) {
-		var fnDone = assert.async();
-		var oPdfViewer = TestUtils.createPdfViewer({});
-		var origFetch = window.fetch;
-		window.fetch = undefined;
-		var xhr = {
-			open: sinon.spy(),
-			send: sinon.spy(),
-			status: 404,
-			statusText: "Not Found",
-			getAllResponseHeaders: function() { return ""; },
-			onload: null,
-			onerror: null
-		};
-		var xhrStub = sinon.stub(window, "XMLHttpRequest").callsFake(function() { return xhr; });
-		setTimeout(function() {
-			xhr.onload();
-		}, 0);
-		oPdfViewer._getHeaderInfo("dummy.pdf", "HEAD").catch(function(error) {
-			assert.ok(error, "XHR branch: rejects on 404");
-			assert.equal(error.status, 404, "Error status is 404");
-			assert.ok(error.message.indexOf("Error fetching header") !== -1, "Error message contains 'Error fetching header'");
-			xhrStub.restore();
-			window.fetch = origFetch;
-			fnDone();
-		});
-	});
+	QUnit.test("_onLoadListener with empty source fires error event", function (assert) {
+		// Mock PDFViewerRenderer._isPdfPluginEnabled
+		var originalPdfPluginEnabled = PDFViewerRenderer._isPdfPluginEnabled;
+		PDFViewerRenderer._isPdfPluginEnabled = function () { return true; };
 
-	QUnit.test("_getHeaderInfo: XHR network error", function(assert) {
-		var fnDone = assert.async();
-		var oPdfViewer = TestUtils.createPdfViewer({});
-		var origFetch = window.fetch;
-		window.fetch = undefined;
-		var xhr = {
-			open: sinon.spy(),
-			send: sinon.spy(),
-			status: 0,
-			statusText: "",
-			getAllResponseHeaders: function() { return ""; },
-			onload: null,
-			onerror: null
-		};
-		var xhrStub = sinon.stub(window, "XMLHttpRequest").callsFake(function() { return xhr; });
-		setTimeout(function() {
-			xhr.onerror(new Error("Network error"));
-		}, 0);
-		oPdfViewer._getHeaderInfo("dummy.pdf", "HEAD").catch(function(error) {
-			assert.ok(error, "XHR branch: rejects on network error");
-			xhrStub.restore();
-			window.fetch = origFetch;
-			fnDone();
-		});
+		oPdfViewer = TestUtils.createPdfViewer({});
+
+		var bLoadedCalled = false;
+		var bErrorCalled = false;
+		oPdfViewer._fireLoadedEvent = function () { bLoadedCalled = true; };
+		oPdfViewer._fireErrorEvent = function () { bErrorCalled = true; };
+
+		// Test with empty source
+		oPdfViewer.setSource("");
+		var oEvent = { target: {} };
+		oPdfViewer._onLoadListener(oEvent);
+
+		assert.notOk(bLoadedCalled, "Loaded event should not be fired for empty source");
+		assert.ok(bErrorCalled, "Error event should be fired for empty source");
+
+		// Reset for null source test
+		bLoadedCalled = false;
+		bErrorCalled = false;
+
+		// Test with null source
+		oPdfViewer.setSource(null);
+		oPdfViewer._onLoadListener(oEvent);
+
+		assert.notOk(bLoadedCalled, "Loaded event should not be fired for null source");
+		assert.ok(bErrorCalled, "Error event should be fired for null source");
+
+		// Reset for undefined source test
+		bLoadedCalled = false;
+		bErrorCalled = false;
+
+		// Test with undefined source
+		oPdfViewer.setSource(undefined);
+		oPdfViewer._onLoadListener(oEvent);
+
+		assert.notOk(bLoadedCalled, "Loaded event should not be fired for undefined source");
+		assert.ok(bErrorCalled, "Error event should be fired for undefined source");
+
+		// Restore original function
+		PDFViewerRenderer._isPdfPluginEnabled = originalPdfPluginEnabled;
 	});
 });
