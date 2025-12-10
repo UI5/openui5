@@ -1251,6 +1251,248 @@ sap.ui.define([
 			oStubOpenUrl.restore();
 		});
 
+		QUnit.test("chartEventData model provides measure-specific data for navigation", async function (assert) {
+			// Arrange
+			const oManifest = {
+				"sap.app": {
+					"id": "test.cards.analytical.chartEventData"
+				},
+				"sap.card": {
+					"type": "Analytical",
+					"header": {
+						"title": "Measure-Specific Navigation Test"
+					},
+					"content": {
+						"chartType": "stacked_column",
+						"data": {
+							"json": [
+								{
+									"Week": "CW14",
+									"Revenue": 431000.22,
+									"Cost": 230000.00
+								},
+								{
+									"Week": "CW15",
+									"Revenue": 494000.30,
+									"Cost": 238000.00
+								}
+							]
+						},
+						"dimensions": [
+							{
+								"name": "Weeks",
+								"value": "{Week}"
+							}
+						],
+						"measures": [
+							{
+								"name": "Revenue",
+								"value": "{Revenue}"
+							},
+							{
+								"name": "Cost",
+								"value": "{Cost}"
+							}
+						],
+						"feeds": [
+							{
+								"uid": "categoryAxis",
+								"type": "Dimension",
+								"values": ["Weeks"]
+							},
+							{
+								"uid": "valueAxis",
+								"type": "Measure",
+								"values": ["Revenue", "Cost"]
+							}
+						],
+						"actionableArea": "Chart",
+						"actions": [
+							{
+								"type": "Navigation",
+								"parameters": {
+									"url": "https://example.com?week={Week}&measure={chartEventData>/0/measureNames}&revenue={chartEventData>/0/Revenue}&cost={chartEventData>/0/Cost}"
+								}
+							}
+						]
+					}
+				}
+			};
+
+			this.oCard.setManifest(oManifest);
+			await nextCardReadyEvent(this.oCard);
+			await nextUIUpdate();
+
+			const oContent = this.oCard.getCardContent(),
+				oChart = oContent.getAggregation("_content");
+			const oStubOpenUrl = sinon.stub(window, "open").callsFake(function () {});
+
+			// Act - Simulate clicking on Revenue measure
+			oChart.fireSelectData({
+				data: [
+					{
+						target: {
+							__data__: {
+								"measureNames": "Revenue",
+								"_context_row_number": 1,
+								"Week": "CW15",
+								"Revenue": 494000.30,
+								"Cost": 238000.00
+							}
+						},
+						data: {
+							"measureNames": "Revenue",
+							"_context_row_number": 1,
+							"Week": "CW15",
+							"Revenue": 494000.30,
+							"Cost": 238000.00
+						}
+					}
+				]
+			});
+			await nextUIUpdate();
+
+			// Assert - Revenue click
+			assert.ok(oStubOpenUrl.calledOnce, "Window.open is called once for Revenue click");
+			const sRevenueUrl = oStubOpenUrl.getCall(0).args[0];
+			assert.ok(sRevenueUrl.includes("week=CW15"), "URL contains the week parameter");
+			assert.ok(sRevenueUrl.includes("measure=Revenue"), "URL contains measureNames=Revenue from chartEventData");
+			assert.ok(sRevenueUrl.includes("revenue=494000"), "URL contains Revenue value from chartEventData");
+			assert.ok(sRevenueUrl.includes("cost=238000"), "URL contains Cost value from chartEventData");
+
+			oStubOpenUrl.resetHistory();
+
+			// Act - Simulate clicking on Cost measure
+			oChart.fireSelectData({
+				data: [
+					{
+						target: {
+							__data__: {
+								"measureNames": "Cost",
+								"_context_row_number": 0,
+								"Week": "CW14",
+								"Revenue": 431000.22,
+								"Cost": 230000.00
+							}
+						},
+						data: {
+							"measureNames": "Cost",
+							"_context_row_number": 0,
+							"Week": "CW14",
+							"Revenue": 431000.22,
+							"Cost": 230000.00
+						}
+					}
+				]
+			});
+			await nextUIUpdate();
+
+			// Assert - Cost click
+			assert.ok(oStubOpenUrl.calledOnce, "Window.open is called once for Cost click");
+			const sCostUrl = oStubOpenUrl.getCall(0).args[0];
+			assert.ok(sCostUrl.includes("week=CW14"), "URL contains the week parameter for Cost");
+			assert.ok(sCostUrl.includes("measure=Cost"), "URL contains measureNames=Cost from chartEventData");
+			assert.ok(sCostUrl.includes("revenue=431000"), "URL contains Revenue value from chartEventData for Cost row");
+			assert.ok(sCostUrl.includes("cost=230000"), "URL contains Cost value from chartEventData");
+
+			// Cleanup
+			oStubOpenUrl.restore();
+		});
+
+		QUnit.test("chartEventData model is properly cleaned up after parameter resolution", async function (assert) {
+			// Arrange
+			const oManifest = {
+				"sap.app": {
+					"id": "test.cards.analytical.chartEventData.cleanup"
+				},
+				"sap.card": {
+					"type": "Analytical",
+					"content": {
+						"chartType": "Donut",
+						"data": {
+							"json": [
+								{
+									"Store": "Store A",
+									"Revenue": 345292.06
+								}
+							]
+						},
+						"dimensions": [
+							{
+								"name": "Store Name",
+								"value": "{Store}"
+							}
+						],
+						"measures": [
+							{
+								"name": "Revenue",
+								"value": "{Revenue}"
+							}
+						],
+						"feeds": [
+							{
+								"uid": "color",
+								"type": "Dimension",
+								"values": ["Store Name"]
+							},
+							{
+								"uid": "size",
+								"type": "Measure",
+								"values": ["Revenue"]
+							}
+						],
+						"actionableArea": "Chart",
+						"actions": [
+							{
+								"type": "Navigation",
+								"parameters": {
+									"url": "https://example.com?store={Store}&revenue={chartEventData>/0/Revenue}"
+								}
+							}
+						]
+					}
+				}
+			};
+
+			this.oCard.setManifest(oManifest);
+			await nextCardReadyEvent(this.oCard);
+			await nextUIUpdate();
+
+			const oContent = this.oCard.getCardContent(),
+				oChart = oContent.getAggregation("_content");
+			const oStubOpenUrl = sinon.stub(window, "open").callsFake(function () {});
+
+			// Act
+			oChart.fireSelectData({
+				data: [
+					{
+						target: {
+							__data__: {
+								"measureNames": "Revenue",
+								"_context_row_number": 0,
+								"Store": "Store A",
+								"Revenue": 345292.06
+							}
+						},
+						data: {
+							"measureNames": "Revenue",
+							"_context_row_number": 0,
+							"Store": "Store A",
+							"Revenue": 345292.06
+						}
+					}
+				]
+			});
+			await nextUIUpdate();
+
+			// Assert
+			assert.ok(oStubOpenUrl.calledOnce, "Navigation was triggered");
+			assert.notOk(oChart.getModel("chartEventData"), "chartEventData model should be cleaned up after use");
+
+			// Cleanup
+			oStubOpenUrl.restore();
+		});
+
 		QUnit.module("Whole Card Interactive - Analytical Content", {
 			beforeEach: function () {
 				this.oCard = new Card({

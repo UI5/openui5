@@ -70,8 +70,10 @@ sap.ui.define([
 		this.setProperty("value", oValue);
 		if (oValue) {
 			var aNextValues = oValue.indexOf("...") != -1 ? oValue.split("...") : [this.getMin() || 0, this.getMax() || 100];
-			var iValue1 = parseInt(aNextValues[0]);
-			var iValue2 = parseInt(aNextValues[1]);
+			const oBinding = this.getBinding("value");
+			const oType = oBinding?.getType().getFormatOptions().valueType;
+			var iValue1 = oType ? oType.parseValue(aNextValues[0], "string") : parseInt(aNextValues[0]);
+			var iValue2 = oType ? oType.parseValue(aNextValues[1], "string") : parseInt(aNextValues[1]);
 			if (iValue1 !== this.getContent().getValue()) {
 				this.getContent().setValue(iValue1);
 			}

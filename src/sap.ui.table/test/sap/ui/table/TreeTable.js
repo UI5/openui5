@@ -6,11 +6,10 @@ sap.ui.define([
   "sap/m/Text",
   "sap/m/CheckBox",
   "sap/m/ProgressIndicator",
-  "sap/m/Toolbar",
   "sap/ui/model/json/JSONModel",
   "sap/ui/table/utils/TableUtils",
   "sap/base/Log"
-], function(Button, TreeTable, tableLibrary, Column, Text, CheckBox, ProgressIndicator, Toolbar, JSONModel, TableUtils, Log) {
+], function(Button, TreeTable, tableLibrary, Column, Text, CheckBox, ProgressIndicator, JSONModel, TableUtils, Log) {
   "use strict";
 
   // shortcut for sap.ui.table.SelectionMode

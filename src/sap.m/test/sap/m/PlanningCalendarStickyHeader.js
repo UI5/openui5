@@ -16,8 +16,7 @@ sap.ui.define([
   "sap/m/Title",
   "sap/m/PlanningCalendar",
   "sap/ui/unified/DateTypeRange",
-  "sap/m/Page",
-  "sap/base/Log"
+  "sap/m/Page"
 ], function(
   Popover,
   Element,
@@ -36,8 +35,7 @@ sap.ui.define([
   Title,
   PlanningCalendar,
   DateTypeRange,
-  Page,
-  Log
+  Page
 ) {
   "use strict";
 

@@ -19,8 +19,7 @@ sap.ui.define([
   "sap/m/Page",
   "sap/m/Toolbar",
   "sap/m/Bar",
-  "sap/m/App",
-  "sap/ui/core/Core"
+  "sap/m/App"
 ], function(
   Menu,
   MessageToast,
@@ -42,8 +41,7 @@ sap.ui.define([
   Page,
   Toolbar,
   Bar,
-  App,
-  Core
+  App
 ) {
   "use strict";
 

@@ -77,6 +77,16 @@
 						manifest="{cardsPlayground>/playgroundBaseUrl}/cardcontent/navigationService/manifest_navigationAction_service_analyticalContent.json"
 						height="500px"
 						width="500px" />
+					<w:Card
+						class="sapUiSmallMargin"
+						manifest="{cardsPlayground>/playgroundBaseUrl}/cardcontent/navigationService/manifest_navigationAction_measure_binding_analyticalContent.json"
+						height="500px"
+						width="500px" />
+					<w:Card
+						class="sapUiSmallMargin"
+						manifest="{cardsPlayground>/playgroundBaseUrl}/cardcontent/navigationService/manifest_navigationAction_measure_extension_analyticalContent.json"
+						height="500px"
+						width="500px" />
 				</HBox>
 				<VBox class="sapUiMediumMarginLeft">
 					<Text text="Cards using navigation service. - Object Content" />

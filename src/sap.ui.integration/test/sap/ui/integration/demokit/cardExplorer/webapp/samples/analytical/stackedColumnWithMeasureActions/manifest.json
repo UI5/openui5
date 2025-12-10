@@ -1,0 +1,193 @@
+{
+	"_version": "2.0.0",
+	"sap.app": {
+		"id": "card.explorer.stacked.column.measureActions",
+		"type": "card",
+		"title": "Stacked Column Chart with Measure-Specific Actions",
+		"subTitle": "Click on different measures to navigate with measure context",
+		"applicationVersion": {
+			"version": "1.0.0"
+		},
+		"shortTitle": "Measure Actions",
+		"info": "Demonstrates measure-specific navigation in stacked column charts",
+		"description": "This sample shows how to use measure-specific data in chart actions. Click on the blue (Revenue) or orange (Cost) parts of the columns to see different navigation parameters.",
+		"tags": {
+			"keywords": [
+				"Analytical",
+				"Card",
+				"Stacked Column",
+				"Actions",
+				"Measure-Specific"
+			]
+		}
+	},
+	"sap.ui": {
+		"technology": "UI5",
+		"icons": {
+			"icon": "sap-icon://full-stacked-column-chart"
+		}
+	},
+	"sap.card": {
+		"type": "Analytical",
+		"header": {
+			"type": "Numeric",
+			"data": {
+				"json": {
+					"n": "56",
+					"u": "%",
+					"trend": "Up",
+					"valueColor": "Good"
+				}
+			},
+			"title": "Project Cloud Transformation",
+			"subtitle": "Click on Revenue (blue) or Cost (orange) sections to navigate with measure context",
+			"unitOfMeasurement": "EUR",
+			"mainIndicator": {
+				"number": "{n}",
+				"unit": "{u}",
+				"trend": "{trend}",
+				"state": "{valueColor}"
+			},
+			"details": "Measure-specific navigation enabled",
+			"sideIndicators": [
+				{
+					"title": "Target",
+					"number": "3252.234",
+					"unit": "K"
+				},
+				{
+					"title": "Deviation",
+					"number": "22.43",
+					"unit": "%"
+				}
+			]
+		},
+		"content": {
+			"chartType": "stacked_column",
+			"chartProperties": {
+				"legendGroup": {
+					"position": "bottom",
+					"alignment": "topLeft"
+				},
+				"plotArea": {
+					"dataLabel": {
+						"visible": false,
+						"showTotal": true
+					}
+				},
+				"categoryAxis": {
+					"title": {
+						"visible": false
+					}
+				},
+				"valueAxis": {
+					"title": {
+						"visible": false
+					}
+				},
+				"title": {
+					"text": "Stacked column chart with measure-specific actions",
+					"alignment": "left"
+				}
+			},
+			"data": {
+				"json": {
+					"list": [
+						{
+							"Week": "CW14",
+							"Revenue": 431000.22,
+							"Cost": 230000,
+							"Target": 500000,
+							"Budget": 210000
+						},
+						{
+							"Week": "CW15",
+							"Revenue": 494000.3,
+							"Cost": 238000,
+							"Target": 500000,
+							"Budget": 224000
+						},
+						{
+							"Week": "CW16",
+							"Revenue": 491000.17,
+							"Cost": 221000,
+							"Target": 500000,
+							"Budget": 238000
+						},
+						{
+							"Week": "CW17",
+							"Revenue": 536000.34,
+							"Cost": 280000,
+							"Target": 500000,
+							"Budget": 252000
+						},
+						{
+							"Week": "CW18",
+							"Revenue": 675000,
+							"Cost": 230000,
+							"Target": 600000,
+							"Budget": 266000
+						},
+						{
+							"Week": "CW19",
+							"Revenue": 680000,
+							"Cost": 250000,
+							"Target": 600000,
+							"Budget": 280000
+						},
+						{
+							"Week": "CW20",
+							"Revenue": 659000.14,
+							"Cost": 325000,
+							"Target": 600000,
+							"Budget": 294000
+						}
+					]
+				},
+				"path": "/list"
+			},
+			"dimensions": [
+				{
+					"name": "Weeks",
+					"value": "{Week}"
+				}
+			],
+			"measures": [
+				{
+					"name": "Revenue",
+					"value": "{Revenue}"
+				},
+				{
+					"name": "Cost",
+					"value": "{Cost}"
+				}
+			],
+			"feeds": [
+				{
+					"type": "Dimension",
+					"uid": "categoryAxis",
+					"values": [
+						"Weeks"
+					]
+				},
+				{
+					"type": "Measure",
+					"uid": "valueAxis",
+					"values": [
+						"Revenue",
+						"Cost"
+					]
+				}
+			],
+			"actionableArea": "Chart",
+			"actions": [
+				{
+					"type": "Navigation",
+					"parameters": {
+						"url": "https://example.com?week={Week}&measure={chartEventData>/0/measureNames}&value={Revenue}"
+					}
+				}
+			]
+		}
+	}
+}

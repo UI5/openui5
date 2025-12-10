@@ -17,9 +17,9 @@ sap.ui.define(function() {
 	/**
 	 * Merges together oNewSection into a set of other sections (aSections)
 	 * The array/objects are not modified, the function returns a new section array.
-	 * @param {object[]} aSections the sections into which oNewSection will be merged
-	 * @param {object} oNewSection the section which should be merged into aNewSections
-	 * @return {object[]} a new array containing all sections from aSections merged with oNewSection
+	 * @param {Array<{startIndex: number, length: number}>} aSections the sections into which oNewSection will be merged
+	 * @param {{startIndex: number, length: number}} oNewSection the section which should be merged into aNewSections
+	 * @return {Array<{startIndex: number, length: number}>} a new array containing all sections from aSections merged with oNewSection
 	 * @public
 	 */
 	TreeBindingUtils.mergeSections = function (aSections, oNewSection) {

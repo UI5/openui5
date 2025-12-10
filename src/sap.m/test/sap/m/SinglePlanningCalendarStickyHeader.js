@@ -16,8 +16,7 @@ sap.ui.define([
 	'sap/m/Select',
 	'sap/m/OverflowToolbarLayoutData',
 	'sap/ui/unified/CalendarAppointment',
-	'sap/ui/core/date/UI5Date',
-	"sap/ui/core/Core"
+	'sap/ui/core/date/UI5Date'
 ], function(
 	Element,
 	JSONModel,
@@ -36,8 +35,7 @@ sap.ui.define([
 	Select,
 	OverflowToolbarLayoutData,
 	CalendarAppointment,
-	UI5Date,
-	Core
+	UI5Date
 ) {
 	"use strict";
 	var aAppointments = [

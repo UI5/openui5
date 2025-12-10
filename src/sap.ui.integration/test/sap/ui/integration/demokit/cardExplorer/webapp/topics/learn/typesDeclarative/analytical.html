@@ -146,6 +146,8 @@
 							<br>
 							<b>Note:</b> When <code>actionableArea</code> has value <code>Full</code>, and the property <code>actions</code> is used to make the full content interactive, the content itself must not contain interactive elements. It is not recommended to nest interactive elements in this scenario.
 							<br>
+							<b>Note:</b> When <code>actionableArea</code> is set to <code>"Chart"</code>, a model named <code>chartEventData</code> will be available to access the event data, such as "measureName". See the <a href="#chartEventDataModel">Chart Event Data Model</a> section for details.
+							<br>
 							<span class="mobileNoteIcon"></span>
 							<b>Note:</b> Not yet implemented for <a href="../../../index.html#/overview/supportedPlatforms/native" target="_parent">mobile native cards</a>.
 						</td>
@@ -704,6 +706,31 @@
 					</tr>
 				</table>
 			</div>
+
+			<h2 id="chartEventDataModel">Chart Event Data Model</h2>
+			<p>
+				When the <code>actionableArea</code> is set to <code>"Chart"</code>, you can use a model, named <code>chartEventData</code>, to refer to the specific event data inside your action parameters binding.
+				This event data contains information about what specific sector of the chart is clicked, for example - the measurementNames. See the <a href="../../../index.html#/explore/analytical/stackedColumnWithMeasureActions" target="_parent">related sample in the explore section</a>. You can view all the available event data for each chart type in the <a data-demokit-href="/docs/vizdocs/index.html" target="_blank">VizDocs</a>.
+			</p>
+
+			<h3>Important Notes</h3>
+			<div class="messageStripWarning">
+				<b>Reserved Model Name:</b> The model name <code>chartEventData</code> is reserved by the framework. 
+				Card developers must not use this name for their own models, as it will cause conflicts and prevent proper 
+				chart event data binding. If a model with this name already exists, an error will be logged to the console.
+			</div>
+
+			<h3>Data Structure</h3>
+			<p>The <code>chartEventData</code> model contains an array of data points that were selected. When clicking on a single chart element, the array will contain one item. When clicking on a legend item or selecting multiple elements, the array may contain multiple items.</p>
+
+			<h3>Usage in Action Parameters</h3>
+			<p>Access chart event data using the binding syntax with array index <code>{chartEventData>/0/property}</code>:</p>
+			<pre class="lang-json">"actions": [{
+	"type": "Navigation",
+	"parameters": {
+		"url": "https://example.com?measure={chartEventData>/0/measureNames}"
+	}
+}]</pre>
 
 			<h2 id="example">Example</h2>
 			<p>Define the type and data for the card:
