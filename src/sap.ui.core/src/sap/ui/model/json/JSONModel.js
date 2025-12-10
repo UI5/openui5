@@ -307,10 +307,10 @@ sap.ui.define([
 	 * Every currently running {@link sap.ui.model.json.JSONModel#loadData} call is respected by the returned Promise.
 	 * This also includes a potential loadData call from the JSONModel's constructor in case a URL was given.
 	 * The data-loaded Promise will resolve once all running requests have finished.
-	 * Only request, which have been queued up to the point of calling
+	 * Only requests, which have been queued up to the point of calling
 	 * this function will be respected by the returned Promise.
 	 *
-	 * @return {Promise} a Promise, which resolves if all pending data-loading requests have finished
+	 * @return {Promise<undefined>} a Promise, which resolves if all pending data-loading requests have finished
 	 * @public
 	 */
 	JSONModel.prototype.dataLoaded = function() {

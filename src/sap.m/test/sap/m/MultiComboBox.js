@@ -17,8 +17,7 @@ sap.ui.define([
 	"sap/ui/model/json/JSONModel",
 	"sap/m/library",
 	"sap/m/ToggleButton",
-	"sap/ui/model/Sorter",
-	"sap/ui/core/Core"
+	"sap/ui/model/Sorter"
 ],
 function(
 	Log,
@@ -39,8 +38,7 @@ function(
 	JSONModel,
 	mobileLibrary,
 	ToggleButton,
-	Sorter,
-	Core
+	Sorter
 ) {
 	"use strict";
 

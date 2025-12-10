@@ -718,6 +718,27 @@ sap.ui.define([
 		},
 
 		/**
+		 * @typedef {object} sap.ui.core.LocaleData.DateFieldGroupsDifference
+		 *
+		 * Type which describes the difference in the date field groups of the two dates of an date time interval.
+		 * The keys are the names of the date field symbol groups. If one of them is set, the value should be set to
+		 * <code>true</code>.
+		 *
+		 * @property {boolean} [Era] The era date field symbol group
+		 * @property {boolean} [Year] The year date field symbol group
+		 * @property {boolean} [Quarter] The quarter date field symbol group
+		 * @property {boolean} [Month] The month date field symbol group
+		 * @property {boolean} [Week] The week date field symbol group
+		 * @property {boolean} [Day] The day date field symbol group
+		 * @property {boolean} [DayPeriod] The day period date field symbol group
+		 * @property {boolean} [Hour] The hour date field symbol group
+		 * @property {boolean} [Minute] The minute date field symbol group
+		 * @property {boolean} [Second] The second date field symbol group
+		 *
+		 * @public
+		 */
+
+		/**
 		 * Get interval pattern for a given skeleton format.
 		 *
 		 * The format string does contain pattern symbols (e.g. "yMMMd" or "Hms") and will be converted into the pattern in the used
@@ -725,12 +746,18 @@ sap.ui.define([
 		 * Era (G), Year (y/Y), Quarter (q/Q), Month (M/L), Week (w/W), Day-Of-Week (E/e/c), Day (d/D),
 		 * Hour (h/H/k/K/), Minute (m), Second (s), Timezone (z/Z/v/V/O/X/x)
 		 *
-		 * See https://unicode.org/reports/tr35/tr35-dates.html#availableFormats_appendItems
+		 * See {@link https://unicode.org/reports/tr35/tr35-dates.html#availableFormats_appendItems
+		 *   Unicode - Available Formats}
 		 *
 		 * @param {string} sSkeleton the wanted skeleton format for the datetime pattern
-		 * @param {object|string} vGreatestDiff is either a string which represents the symbol matching the greatest difference in the two dates to format or an object which contains key-value pairs.
-		 *  The value is always true. The key is one of the date field symbol groups whose value are different between the two dates. The key can only be set with 'Year', 'Quarter', 'Month', 'Week',
-		 *  'Day', 'DayPeriod', 'Hour', 'Minute', or 'Second'.
+		 * @param {sap.ui.core.LocaleData.DateFieldGroupsDifference|string} vGreatestDiff
+		 *   is either a string which represents the symbol matching the greatest difference in the two dates to
+		 *   format or an object which contains key-value pairs. The value is always <code>true</code>. The key is one
+		 *   of the date field symbol groups whose value are different between the two dates. The key can only be set
+		 *   with:
+		 *   <code>'Era', 'Year', 'Quarter', 'Month', 'Week', 'Day', 'DayPeriod', 'Hour','Minute', 'Second'</code>.
+		 *   For more information, see {@link https://unicode.org/reports/tr35/tr35-dates.html#element-intervalformats
+		 *   Unicode - Element intervalFormats}.
 		 * @param {module:sap/base/i18n/date/CalendarType} [sCalendarType] the type of calendar. If it's not set, it falls back to the calendar type either set in configuration or calculated from locale.
 		 * @returns {string|string[]} the best matching interval pattern if interval difference is given otherwise an array with all possible interval patterns which match the given skeleton format
 		 * @since 1.46

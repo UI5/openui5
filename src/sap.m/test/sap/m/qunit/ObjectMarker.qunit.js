@@ -947,7 +947,7 @@ sap.ui.define([
 
 		// Assert
 		assert.ok(oIcon.getDecorative(), "Icon is decorative when the ObjectMarker is not visible");
-		assert.equal(oIcon.getAccessibilityInfo(), null, "getAccessibilityInfo of the Icon is null");
+		assert.equal(Object.keys(oIcon.getAccessibilityInfo()).length, 0, "getAccessibilityInfo of the Icon is an empty object");
 
 		// Cleanup
 		oMarker.destroy();

@@ -117,20 +117,37 @@ ODataMessageParser.prototype.setHeaderField = function(sFieldName) {
 	return this;
 };
 
+/**
+ * @typedef sap.ui.model.odata.ODataMessageParser.Request
+ *
+ * Object describing an OData request.
+ *
+ * @property {string} method The HTTP method used for this request
+ * @property {string} requestUri The request URI of this request
+ * @property {Object<string, string>} headers The headers of this request
+ * @property {string} [key] Entity key for created entities
+ * @property {boolean} [created] Flag indicating if an entity was created
+ * @property {string} [deepPath] Deep path for nested entities
+ * @property {object} [functionMetadata] Metadata for function imports
+ * @property {string} [functionTarget] Target for function imports
+ * @property {boolean} [updateAggregatedMessages] Flag for updating aggregated messages
+ *
+ * @public
+ */
 
 /**
  * Parses the given response for messages, calculates the delta and fires the messageChange-event
  * on the MessageProcessor if messages are found. Messages of responses to GET requests with status
  * codes 204 or 424 are ignored.
  *
- * @param {object} oResponse
+ * @param {{statusCode: number, headers: Object<string, string>, body: string}} oResponse
  *   The response from the server containing body and headers
- * @param {object} oRequest
+ * @param {sap.ui.model.odata.ODataMessageParser.Request} oRequest
  *   The original request that lead to this response
- * @param {object} [mGetEntities]
- *   A map with the keys of the entities requested from the back-end mapped to true
- * @param {object} [mChangeEntities]
- *   A map with the keys of the entities changed in the back-end mapped to true
+ * @param {Object<string, true>} [mGetEntities]
+ *   A map with the keys of the entities requested from the back end mapped to true
+ * @param {Object<string, true>} [mChangeEntities]
+ *   A map with the keys of the entities changed in the back end mapped to true
  * @param {boolean} [bMessageScopeSupported]
  *   Whether the used OData service supports the message scope
  *   {@link sap.ui.model.odata.MessageScope.BusinessObject}

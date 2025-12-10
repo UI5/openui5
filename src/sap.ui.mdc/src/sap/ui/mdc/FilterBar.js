@@ -85,6 +85,17 @@ sap.ui.define([
 					type: "boolean",
 					visibility: "hidden",
 					defaultValue: false
+				},
+				/**
+				 * Determines whether the old or the new Adapt Filters UI is enabled.
+				 * Do nothing at the moment, property is reserved for further use.
+				 * @experimental
+				 * @private
+				 * @ui5-restricted sap.ui.comp, sap.fe
+				 */
+				enableLegacyUI: {
+					type: "boolean",
+					defaultValue: false
 				}
 			}
 		},

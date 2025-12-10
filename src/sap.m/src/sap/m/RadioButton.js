@@ -8,6 +8,7 @@ sap.ui.define([
 	'sap/ui/core/Control',
 	'sap/ui/core/EnabledPropagator',
 	"sap/ui/core/Lib",
+	"sap/ui/core/Element",
 	'sap/ui/core/message/MessageMixin',
 	'sap/m/Label',
 	'sap/ui/core/library',
@@ -19,6 +20,7 @@ function(
 	Control,
 	EnabledPropagator,
 	Library,
+	Element,
 	MessageMixin,
 	Label,
 	coreLibrary,
@@ -81,12 +83,10 @@ function(
 	 * <li>Avoid using horizontally aligned radio buttons as they will be cut off on phones.</li>
 	 * </ul>
 	 *
-	 * <b>Note:</b> The order in which the RadioButtons will be selected one after another is determined upon instantiation of the control.
-	 * This order is consistent with the ARIA attributes for position, which the same button will receive when added to specific group.
+	 * <b>Note:</b> The order in which the RadioButtons will be traversed with keyboard arrow keys is determined based on their order in the document.
 	 *
-	 * <b>Example:</b> If three buttons are created (<code>button1, button2, button3</code>) in consecutive order, initially they will have the same positions
-	 * and TAB order. However if after that <code>button1</code> and <code>button3</code> are moved to a new group and then <code>button2</code> is added to the
-	 * same group, their TAB order and position in this group will be <code>button1, button3, button2</code>.
+	 * <b>Example:</b> If there are three buttons of the same group (<code>button1, button2, button3</code>) initially and then a new button <code>button4</code> is added on the second position,
+	 * the order will be <code>button1, button4, button2, button3</code>.
 	 *
 	 * @extends sap.ui.core.Control
 	 * @implements sap.ui.core.IFormContent
@@ -491,13 +491,21 @@ function(
 	 * @private
 	 */
 	RadioButton.prototype._getNextFocusItem = function(sNavigation) {
-		var aVisibleBtnsGroup = this._groupNames[this.getGroupName()].filter(function (oRB) {
+		const aVisibleBtnsGroup = this._groupNames[this.getGroupName()].filter(function (oRB) {
 			return (oRB.getDomRef() && oRB.getEnabled());
 		});
 
-		var iButtonIndex = aVisibleBtnsGroup.indexOf(this),
-			iIndex = iButtonIndex,
-			iVisibleBtnsLength = aVisibleBtnsGroup.length;
+		const sBtnsDomSelector = aVisibleBtnsGroup.map((oRB) => {
+			return `#${oRB.getDomRef().getAttribute("id")}`;
+		}).join(", ");
+
+		const aBtnsInDomOrder = Array.from(document.querySelectorAll(sBtnsDomSelector)).map((oBtnDom) => {
+			return Element.getElementById(oBtnDom.id);
+		});
+
+		const iButtonIndex = aBtnsInDomOrder.indexOf(this);
+		const iVisibleBtnsLength = aBtnsInDomOrder.length;
+		let iIndex = iButtonIndex;
 
 		switch (sNavigation) {
 			case KH_NAVIGATION.NEXT:
@@ -514,7 +522,7 @@ function(
 				break;
 		}
 
-		return aVisibleBtnsGroup[iIndex] || this;
+		return aBtnsInDomOrder[iIndex] || this;
 	};
 
 	// #############################################################################

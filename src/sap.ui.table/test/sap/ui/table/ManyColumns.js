@@ -3,14 +3,13 @@ sap.ui.define([
   "sap/ui/table/Table",
   "sap/m/Label",
   "sap/ui/table/Column",
-  "sap/m/Input",
   "sap/ui/table/rowmodes/Fixed",
   "sap/m/Text",
   "sap/m/Button",
   "sap/m/VBox",
   "sap/m/App",
   "sap/m/Page"
-], function(JSONModel, Table, Label, Column, Input, Fixed, Text, Button, VBox, App, Page) {
+], function(JSONModel, Table, Label, Column, Fixed, Text, Button, VBox, App, Page) {
   "use strict";
 
   const nCols = 300;

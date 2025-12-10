@@ -9,6 +9,7 @@ sap.ui.define([
 	"sap/ui/core/Lib",
 	"sap/ui/integration/library",
 	"sap/ui/integration/util/BindingResolver",
+	"sap/ui/model/json/JSONModel",
 	"sap/base/Log",
 	"sap/base/util/merge"
 ], function (
@@ -19,6 +20,7 @@ sap.ui.define([
 	Library,
 	library,
 	BindingResolver,
+	JSONModel,
 	Log,
 	merge
 ) {
@@ -325,6 +327,28 @@ sap.ui.define([
 				return sResolvedPath;
 			});
 
+			this._oActions.setParametersResolver((oAction, oSource, sPath, oEvent) => {
+				if (oSource.getModel("chartEventData")) {
+					Log.error("Model 'chartEventData' is already in use. Chart event data binding will not work correctly.");
+
+					return BindingResolver.resolveValue(oAction.parameters, oSource, sPath);
+				}
+
+				const aChartEventData = this._prepareChartEventData(oEvent);
+
+				if (!aChartEventData) {
+					return BindingResolver.resolveValue(oAction.parameters, oSource, sPath);
+				}
+
+				const oChartEventModel = new JSONModel(aChartEventData);
+				oSource.setModel(oChartEventModel, "chartEventData");
+
+				const oResolved = BindingResolver.resolveValue(oAction.parameters, oSource, sPath);
+				oSource.setModel(null, "chartEventData");
+
+				return oResolved;
+			});
+
 		} else {
 			oActionConfig.eventName = "press";
 		}
@@ -527,13 +551,48 @@ sap.ui.define([
 	/**
 	 * Get the resolved chart item path.
 	 * @private
-	 * @param {jQuery.Event} oEvent
+	 * @param {jQuery.Event} oEvent The chart selection event
+	 * @returns {string} The resolved context path for the selected chart item
 	 */
-
 	AnalyticalContent.prototype._getContextPath = function (oEvent) {
-		const iIndex = oEvent.getParameter("data")[0].data._context_row_number;
+		const oEventData = oEvent.getParameter("data")[0].data;
+		const iIndex = oEventData._context_row_number;
 		const sPath = this.getBindingContext().getPath();
-		return sPath !== "/" ? sPath + "/" + iIndex : sPath + iIndex;
+		const sContextPath = sPath !== "/" ? sPath + "/" + iIndex : sPath + iIndex;
+
+		return sContextPath;
+	};
+
+	/**
+	 * Prepares chart event data by extracting relevant properties from the event.
+	 * Filters out internal properties that start with underscore.
+	 * Returns an array of all selected data points.
+	 * @private
+	 * @param {jQuery.Event} oEvent The chart selection event
+	 * @returns {Array<object>} Array containing chart event data properties for all selected data points
+	 */
+	AnalyticalContent.prototype._prepareChartEventData = function (oEvent) {
+		if (!oEvent) {
+			return null;
+		}
+
+		const aEventData = oEvent.getParameter("data");
+		const aChartEventData = [];
+
+		aEventData.forEach(function(oDataPoint) {
+			const oEventData = oDataPoint.data;
+			const oFilteredData = {};
+
+			for (const sKey in oEventData) {
+				if (oEventData.hasOwnProperty(sKey) && !sKey.startsWith("_")) {
+					oFilteredData[sKey] = oEventData[sKey];
+				}
+			}
+
+			aChartEventData.push(oFilteredData);
+		});
+
+		return aChartEventData;
 	};
 
 	AnalyticalContent.prototype.getFocusDomRef = function () {

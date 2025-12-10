@@ -1,0 +1,184 @@
+{
+	"_version": "2.0.0",
+	"sap.app": {
+		"id": "cardsdemo.navigationService.analytical.measureExtension",
+		"type": "card",
+		"title": "Measure-Specific Actions with Extension",
+		"subTitle": "Click on different measures to trigger extension actions",
+		"applicationVersion": {
+			"version": "1.0.0"
+		},
+		"shortTitle": "Measure Actions Extension",
+		"info": "Testing measure-specific parameters in extensions",
+		"description": "This sample demonstrates how to access measure-specific data (measureNames) in card extensions by clicking on various sections of stacked columns.",
+		"tags": {
+			"keywords": [
+				"Analytical",
+				"Card",
+				"Stacked Column",
+				"Extension",
+				"Measure-Specific"
+			]
+		}
+	},
+	"sap.ui": {
+		"technology": "UI5",
+		"icons": {
+			"icon": "sap-icon://full-stacked-column-chart"
+		}
+	},
+	"sap.card": {
+		"type": "Analytical",
+		"extension": "./MeasureActionsExtension",
+		"header": {
+			"type": "Numeric",
+			"data": {
+				"json": {
+					"n": "56",
+					"u": "%",
+					"trend": "Up",
+					"valueColor": "Good"
+				}
+			},
+			"title": "Weekly Revenue vs Cost",
+			"subtitle": "Click on Revenue (blue) or Cost (orange) to see measure-specific extension action",
+			"unitOfMeasurement": "EUR",
+			"mainIndicator": {
+				"number": "{n}",
+				"unit": "{u}",
+				"trend": "{trend}",
+				"state": "{valueColor}"
+			},
+			"details": "Extension will log which measure was clicked",
+			"sideIndicators": [
+				{
+					"title": "Total Revenue",
+					"number": "4366",
+					"unit": "K"
+				},
+				{
+					"title": "Total Cost",
+					"number": "1874",
+					"unit": "K"
+				}
+			]
+		},
+		"content": {
+			"chartType": "stacked_column",
+			"chartProperties": {
+				"legendGroup": {
+					"position": "bottom",
+					"alignment": "topLeft"
+				},
+				"plotArea": {
+					"dataLabel": {
+						"visible": false,
+						"showTotal": true
+					}
+				},
+				"categoryAxis": {
+					"title": {
+						"visible": false
+					}
+				},
+				"valueAxis": {
+					"title": {
+						"visible": false
+					}
+				},
+				"title": {
+					"text": "Click on different measures to trigger extension",
+					"alignment": "left"
+				}
+			},
+			"data": {
+				"json": {
+					"list": [
+						{
+							"Week": "CW14",
+							"Revenue": 431000.22,
+							"Cost": 230000
+						},
+						{
+							"Week": "CW15",
+							"Revenue": 494000.3,
+							"Cost": 238000
+						},
+						{
+							"Week": "CW16",
+							"Revenue": 491000.17,
+							"Cost": 221000
+						},
+						{
+							"Week": "CW17",
+							"Revenue": 536000.34,
+							"Cost": 280000
+						},
+						{
+							"Week": "CW18",
+							"Revenue": 675000,
+							"Cost": 230000
+						},
+						{
+							"Week": "CW19",
+							"Revenue": 680000,
+							"Cost": 250000
+						},
+						{
+							"Week": "CW20",
+							"Revenue": 659000.14,
+							"Cost": 325000
+						}
+					]
+				},
+				"path": "/list"
+			},
+			"dimensions": [
+				{
+					"name": "Weeks",
+					"value": "{Week}"
+				}
+			],
+			"measures": [
+				{
+					"name": "Revenue",
+					"value": "{Revenue}"
+				},
+				{
+					"name": "Cost",
+					"value": "{Cost}"
+				}
+			],
+			"feeds": [
+				{
+					"type": "Dimension",
+					"uid": "categoryAxis",
+					"values": [
+						"Weeks"
+					]
+				},
+				{
+					"type": "Measure",
+					"uid": "valueAxis",
+					"values": [
+						"Revenue",
+						"Cost"
+					]
+				}
+			],
+			"actionableArea": "Chart",
+			"actions": [
+				{
+					"type": "Custom",
+					"parameters": {
+						"method": "processMeasureClick",
+						"week": "{Week}",
+						"measure": "{chartEventData>/0/measureNames}",
+						"revenueValue": "{chartEventData>/0/Revenue}",
+						"costValue": "{chartEventData>/0/Cost}"
+					}
+				}
+			]
+		}
+	}
+}

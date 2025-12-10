@@ -4,10 +4,11 @@ sap.ui.define([
 	"sap/ui/core/Lib",
 	"sap/ui/core/Messaging",
 	"sap/ui/qunit/QUnitUtils",
+	"sap/ui/qunit/utils/createAndAppendDiv",
+	"sap/ui/test/utils/nextUIUpdate",
 	"sap/m/RadioButton",
 	"sap/ui/core/library",
 	"sap/ui/events/KeyCodes",
-	"sap/ui/test/utils/nextUIUpdate",
 	"sap/ui/util/Mobile",
 	"sap/m/Label",
 	"sap/ui/model/json/JSONModel",
@@ -18,10 +19,11 @@ sap.ui.define([
 	Library,
 	Messaging,
 	qutils,
+	createAndAppendDiv,
+	nextUIUpdate,
 	RadioButton,
 	coreLibrary,
 	KeyCodes,
-	nextUIUpdate,
 	Mobile,
 	Label,
 	JSONModel,
@@ -858,6 +860,9 @@ sap.ui.define([
 
 			oRadioButton1.destroy();
 			oRadioButton2.destroy();
+		},
+		afterEach: async function () {
+			await nextUIUpdate(this.clock);
 		}
 	});
 
@@ -939,6 +944,44 @@ sap.ui.define([
 
 		assert.strictEqual(oRadioButton1.$().is(":focus"), true, "3rd RadioButton should be focussed");
 
+		oRadioButton1.destroy();
+		oRadioButton2.destroy();
+		oRadioButton3.destroy();
+	});
+
+	QUnit.test("Keyboard navigation with 'arrow down' when button is added to the group later", async function(assert) {
+		// Arrange
+		const oRadioButton1 = new RadioButton({ selected: true, groupName: "g" });
+		const oRadioButton2 = new RadioButton({ groupName: "g" });
+		const oRadioButton3 = new RadioButton();
+		const oContainer = createAndAppendDiv("container");
+
+		oRadioButton1.placeAt(oContainer);
+		oRadioButton2.placeAt(oContainer);
+		await nextUIUpdate(this.clock);
+
+		// Act
+		oRadioButton3.setGroupName("g");
+		oRadioButton3.placeAt(oContainer, 1);
+		await nextUIUpdate(this.clock);
+		oRadioButton1.focus();
+
+		// Assert
+		assert.strictEqual(document.activeElement, oRadioButton1.getDomRef(), "Keyboard focus is on 1st RadioButton");
+
+		// Act
+		qutils.triggerKeydown(oRadioButton1.getDomRef(), KeyCodes.ARROW_DOWN);
+
+		// Assert
+		assert.strictEqual(document.activeElement, oRadioButton3.getDomRef(), "Keyboard focus is on 3rd RadioButton");
+		// Act
+		qutils.triggerKeydown(oRadioButton3.getDomRef(), KeyCodes.ARROW_DOWN);
+
+		// Assert
+		assert.strictEqual(document.activeElement, oRadioButton2.getDomRef(), "Keyboard focus is on 2nd RadioButton");
+
+		// Clean up
+		oContainer.remove();
 		oRadioButton1.destroy();
 		oRadioButton2.destroy();
 		oRadioButton3.destroy();

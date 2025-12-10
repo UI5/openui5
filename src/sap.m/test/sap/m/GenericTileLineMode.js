@@ -24,8 +24,7 @@ sap.ui.define([
   "sap/m/VBox",
   "sap/m/Toolbar",
   "sap/m/App",
-  "sap/ui/util/Mobile",
-  "sap/ui/core/Core"
+  "sap/ui/util/Mobile"
 ], function(
   mobileLibrary,
   ActionSheet,
@@ -52,8 +51,7 @@ sap.ui.define([
   VBox,
   Toolbar,
   App,
-  Mobile,
-  Core
+  Mobile
 ) {
   "use strict";
 

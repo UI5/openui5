@@ -699,6 +699,9 @@ sap.ui.define([
 			return Rendering.isPending();
 		}
 		sap.ui.require("sap/ui/core/Core");
+		if (typeof Rendering.isPending === "function") {
+			return Rendering.isPending();
+		}
 	};
 
 	/**
@@ -748,6 +751,9 @@ sap.ui.define([
 			return StaticArea.getDomRef();
 		}
 		sap.ui.require("sap/ui/core/Core");
+		if (typeof StaticArea.getDomRef === "function") {
+			return StaticArea.getDomRef();
+		}
 	};
 
 	/**

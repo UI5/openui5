@@ -615,7 +615,7 @@ sap.ui.define([
 	 */
 	Icon.prototype.getAccessibilityInfo = function() {
 		if (this.getDecorative()) {
-			return null;
+			return {};
 		}
 
 		var bHasPressListeners = this.hasListeners("press");

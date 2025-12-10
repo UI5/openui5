@@ -385,7 +385,11 @@ sap.ui.define([
 	 * with the properties <code>oldValue</code> with the old property value and <code>value</code>
 	 * with the new value of the property. The map only contains the changed properties.
 	 *
-	 * @returns {object} The changed properties of the data state
+	 * @returns {Object<string,{oldValue:any,value:any}>}
+	 *   The changed properties and messages of the data state.
+	 *   Changed messages are located in the <code>messages</code> property. They share the same object structure as
+	 *   the changed properties, but the values in this structure are of type {@link sap.ui.core.message.Message}.
+	 *
 	 * @public
 	 */
 	DataState.prototype.getChanges = function() {

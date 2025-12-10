@@ -91,6 +91,14 @@ sap.ui.define([
 				 */
 				bindingPathResolver: {
 					type: "function"
+				},
+
+				/**
+				 * Set this function if specific parameter resolution is needed.
+				 * By default BindingResolver.resolveValue is used.
+				 */
+				parametersResolver: {
+					type: "function"
 				}
 			}
 		}
@@ -351,7 +359,7 @@ sap.ui.define([
 			.catch(function (e) {
 				Log.error("Navigation service unavailable", e);
 			}).finally(function () {
-				this._processAction(oSource, oAction, sPath);
+				this._processAction(oSource, oAction, sPath, oEvent);
 			}.bind(this));
 	};
 
@@ -379,20 +387,27 @@ sap.ui.define([
 			if (oAction.service) {
 				this._handleServiceAction(oEvent, oAction, oConfig.control);
 			} else {
-				this._processAction(oSource, oAction, this._resolveBindingPath(oEvent));
+				this._processAction(oSource, oAction, this._resolveBindingPath(oEvent), oEvent);
 			}
 		}.bind(this));
 	};
 
-	CardActions.prototype._processAction = function (oSource, oAction, sPath) {
+	CardActions.prototype._processAction = function (oSource, oAction, sPath, oEvent) {
 		var oHost = this._getHostInstance(),
-			oCard = this.getCard();
+			oCard = this.getCard(),
+			mParameters;
+
+		if (this.getParametersResolver()) {
+			mParameters = this.getParametersResolver()(oAction, oSource, sPath, oEvent);
+		} else {
+			mParameters = BindingResolver.resolveValue(oAction.parameters, oSource, sPath);
+		}
 
 		CardActions.fireAction({
 			card: oCard,
 			host: oHost,
 			action: oAction,
-			parameters: BindingResolver.resolveValue(oAction.parameters, oSource, sPath),
+			parameters: mParameters,
 			source: oSource
 		});
 	};

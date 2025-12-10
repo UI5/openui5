@@ -915,6 +915,22 @@ sap.ui.define([
 								]
 							},
 							{
+								title: 'Measure-specific Actions',
+								key: 'stackedColumnWithMeasureActions',
+								settings: {
+									rows: 5,
+									columns: 4
+								},
+								files: [
+									{
+										url: '/samples/analytical/stackedColumnWithMeasureActions/manifest.json',
+										name: 'manifest.json',
+										key: 'manifest.json',
+										editable: true
+									}
+								]
+							},
+							{
 								title: 'Column with Time Axis',
 								key: 'timeAxis',
 								settings: {

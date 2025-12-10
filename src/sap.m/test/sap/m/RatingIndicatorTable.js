@@ -23,8 +23,7 @@ sap.ui.define([
   "sap/m/RatingIndicator",
   "sap/m/DatePicker",
   "sap/m/Table",
-  "sap/m/Page",
-  "sap/ui/core/Core"
+  "sap/m/Page"
 ], function(
   MessageBox,
   MessageToast,
@@ -50,8 +49,7 @@ sap.ui.define([
   RatingIndicator,
   DatePicker,
   Table,
-  Page,
-  Core
+  Page
 ) {
   "use strict";
 

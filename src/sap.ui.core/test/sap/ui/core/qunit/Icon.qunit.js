@@ -515,7 +515,7 @@ sap.ui.define([
 		var oIcon = new Icon({alt: "Alt", tooltip: "Tooltip", src: "sap-icon://search"});
 		assert.ok(!!oIcon.getAccessibilityInfo, "Icon has a getAccessibilityInfo function");
 		var oInfo = oIcon.getAccessibilityInfo();
-		assert.ok(!oInfo, "getAccessibilityInfo returns no info object in case of decorative icons");
+		assert.equal(Object.keys(oInfo).length, 0, "getAccessibilityInfo returns an empty object in case of decorative icons");
 		oIcon.setDecorative(false);
 		oInfo = oIcon.getAccessibilityInfo();
 		assert.strictEqual(oInfo.role, "img", "AriaRole");

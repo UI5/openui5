@@ -139,6 +139,13 @@ sap.ui.define([
 				oModel.setData(oData);
 			});
 
+			// Called when the user chooses a new theme in the ComboBox
+			// Creates a new Data Structure for the table including the updated theme data
+			Theming.attachApplied(async (oEvent) => {
+				var oData = await this.createDataStructure(aParameterMetadata);
+				oModel.setData(oData);
+			});
+
 			this.byId("colTP").setVisible(false);
 			this._oTableFilterState.aCPFilter = [
 				new Filter("cp", FilterOperator.EQ, true)

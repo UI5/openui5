@@ -47,6 +47,9 @@ sap.ui.define([
 			},
 			p13nMode: {
 				ignore: false
+			},
+			enableLegacyUI: {
+				ignore: true
 			}
 		}
 	};
