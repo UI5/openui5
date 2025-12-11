@@ -10,21 +10,23 @@
 			<headerToolbar>
 				<Toolbar>
 					<Title text="Sales Orders"/>
-					<Button icon="sap-icon://add" press=".onCreateSalesOrder"
-						tooltip="Create Sales Order"/>
+					<Button icon="sap-icon://add" id="createSalesOrderButton"
+						press=".onCreateSalesOrder" tooltip="Create Sales Order"/>
 					<dependents>
 						<Dialog draggable="true" id="createDialog" title="Create New Sales Order">
 							<buttons>
-								<Button press=".onSaveSalesOrder" text="Save" type="Emphasized"/>
-								<Button press=".onCancelSalesOrder" text="Cancel"/>
+								<Button id="saveButton" press=".onSaveSalesOrder" text="Save"
+									type="Emphasized"/>
+								<Button id="cancelButton" press=".onCancelSalesOrder"
+									text="Cancel"/>
 							</buttons>
 							<form:SimpleForm backgroundDesign="Transparent" editable="true" >
-								<Label labelFor="inputBuyerID" required="true" text="Buyer ID"/>
-								<Input id="inputBuyerID" value="{BuyerID}"/>
-								<Label labelFor="inputCurrency" required="true" text="Currency" />
-								<Input id="inputCurrency" value="{CurrencyCode}"/>
-								<Label labelFor="inputNote" text="Note"/>
-								<Input id="inputNote" value="{Note}"/>
+								<Label labelFor="buyerIdInput" required="true" text="Buyer ID"/>
+								<Input id="buyerIdInput" value="{BuyerID}"/>
+								<Label labelFor="currencyInput" required="true" text="Currency" />
+								<Input id="currencyInput" value="{CurrencyCode}"/>
+								<Label labelFor="noteInput" text="Note"/>
+								<Input id="noteInput" value="{Note}"/>
 							</form:SimpleForm>
 						</Dialog>
 					</dependents>

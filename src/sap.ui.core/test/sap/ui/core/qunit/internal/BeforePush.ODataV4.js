@@ -89,7 +89,6 @@ sap.ui.define([
 	addAppsAndTests(oFeatureSuite, "internal/testsuite.feature-odata-v4.qunit");
 	const mName2Sandbox = {
 		"Ancestry" : false,
-		"Create": true,
 		"DataAggregation_CAP" : false,
 		"DataAggregation_RAP" : false,
 		"FlatDataAggregation" : false,

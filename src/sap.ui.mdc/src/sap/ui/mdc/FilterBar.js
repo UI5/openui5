@@ -91,7 +91,7 @@ sap.ui.define([
 				 * Do nothing at the moment, property is reserved for further use.
 				 * @experimental
 				 * @private
-				 * @ui5-restricted sap.ui.comp, sap.fe
+				 * @ui5-restricted sap.fe
 				 */
 				enableLegacyUI: {
 					type: "boolean",

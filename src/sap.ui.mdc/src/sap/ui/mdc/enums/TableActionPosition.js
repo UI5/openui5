@@ -6,7 +6,7 @@ sap.ui.define(["sap/ui/base/DataType"], (DataType) => {
 	"use strict";
 
 	/**
-	 * Defines the supported positions for table-relevant actions within the table toolbar, in accordance with the {@link https://www.sap.com/design-system/fiori-design-web/ui-elements/table-bar/ SAP Design System}.
+	 * Defines the supported positions for table-relevant actions within the table toolbar, in accordance with the {@link https://www.sap.com/design-system/fiori-design-web/ui-elements/table-bar/ SAP Design System guidelines}.
 	 *
 	 * @enum {string}
 	 * @alias sap.ui.mdc.enums.TableActionPosition

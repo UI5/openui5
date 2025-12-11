@@ -44,26 +44,26 @@
 						</Button>
 					</mdc:actions>
 					<mdc:tableActions>
-						<Button icon="sap-icon://scissors">
+						<OverflowToolbarButton icon="sap-icon://scissors" text="Cut">
 							<layoutData>
 								<mdct:ActionLayoutData position="ModificationActions"/>
 							</layoutData>
-						</Button>
-						<Button icon="sap-icon://sort">
+						</OverflowToolbarButton>
+						<OverflowToolbarButton icon="sap-icon://sort" text="Reorder">
 							<layoutData>
 								<mdct:ActionLayoutData position="ModificationActionsEnd"/>
 							</layoutData>
-						</Button>
-						<Button icon="sap-icon://print">
+						</OverflowToolbarButton>
+						<OverflowToolbarButton icon="sap-icon://print" text="Print">
 							<layoutData>
 								<mdct:ActionLayoutData position="ExportActions"/>
 							</layoutData>
-						</Button>
-						<Button icon="sap-icon://share-2">
+						</OverflowToolbarButton>
+						<OverflowToolbarButton icon="sap-icon://share-2" text="Share">
 							<layoutData>
 								<mdct:ActionLayoutData position="ShareActions"/>
 							</layoutData>
-						</Button>
+						</OverflowToolbarButton>
 						<SegmentedButton selectedKey="table">
 							<items>
 								<SegmentedButtonItem icon="sap-icon://table-view" key="table"/>
@@ -73,16 +73,16 @@
 								<mdct:ActionLayoutData position="ViewActions"/>
 							</layoutData>
 						</SegmentedButton>
-						<Button icon="sap-icon://full-screen">
+						<OverflowToolbarButton icon="sap-icon://full-screen" text="Fullscreen">
 							<layoutData>
 								<mdct:ActionLayoutData position="ViewActions"/>
 							</layoutData>
-						</Button>
-						<Button icon="sap-icon://sys-help">
+						</OverflowToolbarButton>
+						<OverflowToolbarButton icon="sap-icon://sys-help" text="Help">
 							<layoutData>
 								<mdct:ActionLayoutData position="EndActions"/>
 							</layoutData>
-						</Button>
+						</OverflowToolbarButton>
 					</mdc:tableActions>
 					<mdc:copyProvider>
 						<plugins:CopyProvider></plugins:CopyProvider>
