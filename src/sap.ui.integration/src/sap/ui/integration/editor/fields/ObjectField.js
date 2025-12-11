@@ -2258,7 +2258,7 @@ sap.ui.define([
 		var that = this;
 		var oConfig = that.getConfiguration();
 		var sTranslationPath = "/texts/" + sLanguage;
-		var oProperty = this._settingsModel.getProperty(sTranslationPath) || {};
+		var oProperty = this._oSettingsModel.getProperty(sTranslationPath) || {};
 		var oValue = oProperty[oConfig.manifestpath];
 		var sValue;
 		if (oValue && oValue[sUUID]) {
@@ -2272,7 +2272,7 @@ sap.ui.define([
 		var that = this;
 		var oConfig = that.getConfiguration();
 		var sDesigntimePath = "/:designtime";
-		var oData = this._settingsModel.getData();
+		var oData = this._oSettingsModel.getData();
 		if (!oData) {
 			return;
 		}
@@ -2292,7 +2292,7 @@ sap.ui.define([
 			oDesigntime[oConfig.manifestpath][sUUID][sProperty] = {};
 		}
 		oDesigntime[oConfig.manifestpath][sUUID][sProperty][sConfigName] = vConfigValue;
-		this._settingsModel.setProperty(sDesigntimePath, oDesigntime);
+		this._oSettingsModel.setProperty(sDesigntimePath, oDesigntime);
 	};
 
 	// get the config value of the property in designtime
@@ -2300,7 +2300,7 @@ sap.ui.define([
 		var that = this;
 		var vConfigValue;
 		var oConfig = that.getConfiguration();
-		var oData = this._settingsModel.getData();
+		var oData = this._oSettingsModel.getData();
 		if (oData && oData[":designtime"]
 			&& oData[":designtime"][oConfig.manifestpath]
 			&& oData[":designtime"][oConfig.manifestpath][sUUID]
@@ -2316,7 +2316,7 @@ sap.ui.define([
 		var that = this;
 		var oConfig = that.getConfiguration();
 		var sTranslationPath = "/texts";
-		var oData = this._settingsModel.getData();
+		var oData = this._oSettingsModel.getData();
 		if (!oData) {
 			return;
 		}
@@ -2336,13 +2336,13 @@ sap.ui.define([
 			oTexts[sLanguage][oConfig.manifestpath][sUUID] = {};
 		}
 		oTexts[sLanguage][oConfig.manifestpath][sUUID][sProperty] = sValue;
-		this._settingsModel.setProperty(sTranslationPath, oTexts);
+		this._oSettingsModel.setProperty(sTranslationPath, oTexts);
 	};
 
 	// delete the translation text
 	ObjectField.prototype.deleteTranslationValueInTexts = function (sLanguage, sUUID, sProperty) {
 		var that = this;
-		var oData = that._settingsModel.getData();
+		var oData = that._oSettingsModel.getData();
 		if (!oData || !oData.texts || !sUUID) {
 			return;
 		}
@@ -2359,7 +2359,7 @@ sap.ui.define([
 						if (deepEqual(oTexts[sLanguage][oConfig.manifestpath][sUUID], {})) {
 							delete oTexts[sLanguage][oConfig.manifestpath][sUUID];
 						}
-						this._settingsModel.setProperty(sTranslationPath, oTexts);
+						this._oSettingsModel.setProperty(sTranslationPath, oTexts);
 					}
 				} else {
 					delete oTexts[sLanguage][oConfig.manifestpath][sUUID];
@@ -2369,7 +2369,7 @@ sap.ui.define([
 							delete oTexts[sLanguage];
 						}
 					}
-					this._settingsModel.setProperty(sTranslationPath, oTexts);
+					this._oSettingsModel.setProperty(sTranslationPath, oTexts);
 				}
 			}
 		} else {

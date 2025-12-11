@@ -452,7 +452,7 @@ sap.ui.define([
 		}
 
 		if (this.getState() !== ValueState.None) {
-			sResult += sId + "-state ";
+			sResult += sId + "-state-text ";
 		}
 
 		return sResult.trim();

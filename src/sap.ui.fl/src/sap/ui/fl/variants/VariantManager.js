@@ -58,8 +58,7 @@ sap.ui.define([
 	 */
 	var VariantManager = {};
 
-	function getVariantModel(oControl) {
-		const oAppComponent = Utils.getAppComponentForControl(oControl);
+	function getVariantModel(oAppComponent) {
 		return oAppComponent.getModel("$FlexVariants");
 	}
 
@@ -425,22 +424,23 @@ sap.ui.define([
 	 * @returns {Promise<undefined>} Promise resolving when all changes are applied
 	 */
 	VariantManager.addAndApplyChangesOnVariant = function(aChanges, oControl) {
-		const oVariantModel = getVariantModel(oControl);
-		const aAddedChanges = UIChangeManager.addDirtyChanges(oVariantModel.sFlexReference, aChanges, oVariantModel.oAppComponent);
+		const oAppComponent = Utils.getAppComponentForControl(oControl);
+		const sFlexReference = FlexRuntimeInfoAPI.getFlexReference({ element: oAppComponent });
+		const aAddedChanges = UIChangeManager.addDirtyChanges(sFlexReference, aChanges, oAppComponent);
 		return aAddedChanges.reduce(async function(oPreviousPromise, oChange) {
 			await oPreviousPromise;
 			const oControl = Element.getElementById(
-				JsControlTreeModifier.getControlIdBySelector(oChange.getSelector(), oVariantModel.oAppComponent)
+				JsControlTreeModifier.getControlIdBySelector(oChange.getSelector(), oAppComponent)
 			);
 			const oReturn = await Applier.applyChangeOnControl(oChange, oControl, {
 				modifier: JsControlTreeModifier,
-				appComponent: oVariantModel.oAppComponent,
+				appComponent: oAppComponent,
 				view: Utils.getViewForControl(oControl)
 			});
 			if (!oReturn.success) {
 				var oException = oReturn.error || new Error("The change could not be applied.");
 				FlexObjectManager.deleteFlexObjects({
-					reference: oVariantModel.sFlexReference,
+					reference: sFlexReference,
 					flexObjects: [oChange]
 				});
 				throw oException;
@@ -559,8 +559,8 @@ sap.ui.define([
 	 * @param {sap.ui.fl.variants.VariantManagement} mPropertyBag.vmControl - Variant management control
 	 */
 	VariantManager.removeVariant = async function(mPropertyBag) {
-		const oVariantModel = getVariantModel(mPropertyBag.appComponent);
-		var aChangesToBeDeleted = FlexObjectState.getDirtyFlexObjects(oVariantModel.sFlexReference)
+		const sFlexReference = FlexRuntimeInfoAPI.getFlexReference({ element: mPropertyBag.appComponent });
+		var aChangesToBeDeleted = FlexObjectState.getDirtyFlexObjects(sFlexReference)
 		.filter(function(oChange) {
 			return (oChange.getVariantReference && oChange.getVariantReference() === mPropertyBag.variant.getId()) ||
 				oChange.getId() === mPropertyBag.variant.getId();
@@ -573,7 +573,7 @@ sap.ui.define([
 			vmControl: mPropertyBag.vmControl
 		});
 		FlexObjectManager.deleteFlexObjects({
-			reference: oVariantModel.sFlexReference,
+			reference: sFlexReference,
 			flexObjects: aChangesToBeDeleted
 		});
 	};
@@ -583,12 +583,13 @@ sap.ui.define([
 	 *
 	 * @param {string} sVariantManagementReference - Variant management reference
 	 * @param {object} mPropertyBag - Map of properties
+	 * @param {sap.ui.core.Component} mPropertyBag.appComponent - App component
 	 * @returns {sap.ui.fl.apply._internal.flexObjects.FlexObject} Created Change object
 	 */
 	VariantManager.addVariantChange = function(sVariantManagementReference, mPropertyBag) {
-		const oVariantModel = getVariantModel(mPropertyBag.appComponent);
-		var oChange = VariantManager.createVariantChange(sVariantManagementReference, mPropertyBag);
-		FlexObjectManager.addDirtyFlexObjects(oVariantModel.sFlexReference, mPropertyBag.appComponent.getId(), [oChange]);
+		const oChange = VariantManager.createVariantChange(sVariantManagementReference, mPropertyBag);
+		const sFlexReference = FlexRuntimeInfoAPI.getFlexReference({ element: mPropertyBag.appComponent });
+		FlexObjectManager.addDirtyFlexObjects(sFlexReference, mPropertyBag.appComponent.getId(), [oChange]);
 
 		return oChange;
 	};
@@ -600,11 +601,12 @@ sap.ui.define([
 	 * @returns {sap.ui.fl.apply._internal.flexObjects.FlexObject[]} Created Change objects
 	 */
 	VariantManager.addVariantChanges = function(sVariantManagementReference, aChangePropertyMaps) {
-		const oVariantModel = getVariantModel(aChangePropertyMaps[0].appComponent);
+		const oAppComponent = aChangePropertyMaps[0].appComponent;
+		const sFlexReference = FlexRuntimeInfoAPI.getFlexReference({ element: oAppComponent });
 		var aChanges = aChangePropertyMaps.map(function(mProperties) {
 			return VariantManager.createVariantChange(sVariantManagementReference, mProperties);
 		});
-		FlexObjectManager.addDirtyFlexObjects(oVariantModel.sFlexReference, aChangePropertyMaps[0].appComponent.getId(), aChanges);
+		FlexObjectManager.addDirtyFlexObjects(sFlexReference, oAppComponent.getId(), aChanges);
 
 		return aChanges;
 	};
@@ -614,6 +616,7 @@ sap.ui.define([
 	 *
 	 * @param {string} sVariantManagementReference - Variant management reference
 	 * @param {object} mPropertyBag - Property bag
+	 * @param {sap.ui.core.Component} mPropertyBag.appComponent - App component
 	 * @param {sap.ui.fl.apply._internal.flexObjects.FlexObject} oChange - Variant change to be deleted
 	 */
 	VariantManager.deleteVariantChange = function(sVariantManagementReference, mPropertyBag, oChange) {

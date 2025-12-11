@@ -138,9 +138,9 @@ sap.ui.define([
 		this.isChild = oItemObject.isChild;
 		var oManifestChanges;
 		if (!this.isChild) {
-			oManifestChanges = this._aMainManifestChanges;
+			oManifestChanges = this._aMainEditorChanges;
 		} else {
-			oManifestChanges = this._oChildManifestChanges[sPath] || [];
+			oManifestChanges = this._oChildEditorChanges[sPath] || [];
 		}
 		if (this._oChildTreeSettings[sPath]) {
 			this._vIdOrSettings = this._oChildTreeSettings[sPath];
@@ -216,8 +216,8 @@ sap.ui.define([
 	};
 
 	CardEditor.prototype.initDestinations = function (vHost) {
-		this._destinationsModel = new JSONModel({});
-		this.setModel(this._destinationsModel, "destinations");
+		this._oDestinationsModel = new JSONModel({});
+		this.setModel(this._oDestinationsModel, "destinations");
 		var oHostInstance = this.getHostInstance();
 
 		if (vHost && !oHostInstance) {
@@ -270,33 +270,33 @@ sap.ui.define([
 
 	CardEditor.prototype.createManifest = async function (vIdOrSettings, bSuppress) {
 		this._isManifestReady = false;
-		if (this._oEditorManifest) {
-			this._oEditorManifest.destroy();
+		if (this._oManifest) {
+			this._oManifest.destroy();
 		}
 		this.destroyAggregation("_extension");
 		var iCurrentModeIndex = Merger.layers[this.getMode()];
 
-		this._oEditorManifest = this._oEditorCard._oCardManifest;
+		this._oManifest = this._oEditorCard._oCardManifest;
 		this._registerManifestModulePath();
 		// since Manifest.js will translate i18n values in the manifest.json which we don't want to,
 		// so we need to get inital manifest json, merge it with before layer changes by ourself to keep the i18n key
-		var oInitialJson = this._oEditorManifest._oInitialJson;
+		var oInitialJson = this._oManifest._oInitialJson;
 		this._oInitialManifestModel = new JSONModel(oInitialJson);
 		this.setProperty("json", oInitialJson, bSuppress);
 		var oManifestJson;
-		if (this._beforeLayerManifestChanges) {
-			oManifestJson = Merger.mergeDelta(oInitialJson, [this._beforeLayerManifestChanges]);
+		if (this._oBeforeLayerChange) {
+			oManifestJson = Merger.mergeDelta(oInitialJson, [this._oBeforeLayerChange]);
 		} else {
 			oManifestJson = oInitialJson;
 		}
-		var _beforeCurrentLayer = merge({}, oManifestJson);
-		this._beforeManifestModel = new JSONModel(_beforeCurrentLayer);
-		if (iCurrentModeIndex < Merger.layers["translation"] && this._currentLayerManifestChanges) {
+		var oBeforeLayerManifestJson = merge({}, oManifestJson);
+		this._oBeforeLayerManifestModel = new JSONModel(oBeforeLayerManifestJson);
+		if (iCurrentModeIndex < Merger.layers["translation"] && this._oCurrentLayerChange) {
 			//merge if not translation
-			oManifestJson = Merger.mergeDelta(oManifestJson, [this._currentLayerManifestChanges]);
+			oManifestJson = Merger.mergeDelta(oManifestJson, [this._oCurrentLayerChange]);
 		}
 		//create a manifest model after the changes are merged
-		this._manifestModel = new JSONModel(oManifestJson);
+		this._oManifestModel = new JSONModel(oManifestJson);
 		this._isManifestReady = true;
 		this.fireManifestReady();
 		this._initResourceBundlesForMultiTranslation();
@@ -305,8 +305,8 @@ sap.ui.define([
 		}
 		//add a context model
 		this._createContextModel();
-		if (this._oEditorManifest && this._oEditorManifest.getResourceBundle()) {
-			var oResourceBundle = this._oEditorManifest.getResourceBundle();
+		if (this._oManifest && this._oManifest.getResourceBundle()) {
+			var oResourceBundle = this._oManifest.getResourceBundle();
 			var oResourceModel = new ResourceModel({
 				bundle: oResourceBundle
 			});

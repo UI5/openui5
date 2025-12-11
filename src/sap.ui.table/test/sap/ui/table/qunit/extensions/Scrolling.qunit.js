@@ -5558,9 +5558,38 @@ sap.ui.define([
 		return pTestSequence;
 	});
 
-	QUnit.test("The table's DOM is removed without notifying the table", function(assert) {
+	QUnit.test("Scroll with scrollbar; The table's DOM is removed without notifying the table", function(assert) {
 		const oTable = this.createTable();
 		const oScrollExtension = oTable._getScrollExtension();
+		let oTableElement;
+		let oTableParentElement;
+
+		return oTable.qunit.whenRenderingFinished().then(function() {
+			oTableElement = oTable.getDomRef();
+			oTableParentElement = oTableElement.parentNode;
+			oScrollExtension.getVerticalScrollbar().scrollTop = 100;
+			return oTable.qunit.whenVSbScrolled();
+		}).then(function() {
+			oTableParentElement.removeChild(oTableElement);
+		}).then(TableQUnitUtils.$wait()).then(function() {
+			assert.strictEqual(oTable.getFirstVisibleRow(), 2,
+				"Remove DOM after scrolling with scrollbar: The firstVisibleRow is correct");
+
+		}).then(function() {
+			oTableParentElement.appendChild(oTableElement);
+			oTable._setLargeDataScrolling(true);
+			oScrollExtension.getVerticalScrollbar().scrollTop = 200;
+			return oTable.qunit.whenVSbScrolled();
+		}).then(function() {
+			oTableParentElement.removeChild(oTableElement);
+		}).then(TableQUnitUtils.$wait(300)).then(function() {
+			assert.strictEqual(oTable.getFirstVisibleRow(), 2,
+				"Remove DOM after scrolling with scrollbar and large data scrolling enabled: The firstVisibleRow is correct");
+		});
+	});
+
+	QUnit.test("Scroll by setting FirstVisibleRow; The table's DOM is removed without notifying the table", function(assert) {
+		const oTable = this.createTable();
 		let oTableElement;
 		let oTableParentElement;
 
@@ -5586,35 +5615,6 @@ sap.ui.define([
 		}).then(TableQUnitUtils.$wait()).then(function() {
 			assert.strictEqual(oTable.getFirstVisibleRow(), 5,
 				"Remove DOM asynchronously after setting firstVisibleRow: The firstVisibleRow is correct");
-
-		}).then(function() {
-			oTableParentElement.appendChild(oTableElement);
-			oScrollExtension.getVerticalScrollbar().scrollTop = 150;
-			oTableParentElement.removeChild(oTableElement);
-		}).then(TableQUnitUtils.$wait()).then(function() {
-			assert.strictEqual(oTable.getFirstVisibleRow(), 5,
-				"Remove DOM synchronously after scrolling with scrollbar: The firstVisibleRow is correct");
-
-		}).then(function() {
-			oTableParentElement.appendChild(oTableElement);
-			oScrollExtension.getVerticalScrollbar().scrollTop = 100;
-			return oTable.qunit.whenVSbScrolled();
-		}).then(function() {
-			oTableParentElement.removeChild(oTableElement);
-		}).then(TableQUnitUtils.$wait()).then(function() {
-			assert.strictEqual(oTable.getFirstVisibleRow(), 2,
-				"Remove DOM asynchronously after scrolling with scrollbar: The firstVisibleRow is correct");
-
-		}).then(function() {
-			oTableParentElement.appendChild(oTableElement);
-			oTable._setLargeDataScrolling(true);
-			oScrollExtension.getVerticalScrollbar().scrollTop = 200;
-			return oTable.qunit.whenVSbScrolled();
-		}).then(function() {
-			oTableParentElement.removeChild(oTableElement);
-		}).then(TableQUnitUtils.$wait(300)).then(function() {
-			assert.strictEqual(oTable.getFirstVisibleRow(), 2,
-				"Remove DOM asynchronously after scrolling with scrollbar and large data scrolling enabled: The firstVisibleRow is correct");
 		});
 	});
 

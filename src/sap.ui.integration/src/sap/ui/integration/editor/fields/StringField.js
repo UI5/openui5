@@ -117,9 +117,9 @@ sap.ui.define([
 					var sValue = oEvent.getSource().getValue();
 					var sSettingspath = this.getBindingContext("currentSettings").sPath;
 					//clean the value in data model
-					this._settingsModel.setProperty(sSettingspath + "/value", sValue);
+					this._oSettingsModel.setProperty(sSettingspath + "/value", sValue);
 					//update the dependent fields via bindings
-					var aBindings = this._settingsModel.getBindings();
+					var aBindings = this._oSettingsModel.getBindings();
 					var sParameter = sSettingspath.substring(sSettingspath.lastIndexOf("/") + 1);
 					each(aBindings, function(iIndex, oBinding) {
 						if (oBinding.sPath === "/form/items/" + sParameter + "/value") {
@@ -325,7 +325,7 @@ sap.ui.define([
 		var oSelectedItem = oEvent.getParameter("selectedItem") || {};
 		var sKey = oSelectedItem.getKey();
 		var sSettingspath = this.getBindingContext("currentSettings").sPath;
-		this._settingsModel.setProperty(sSettingspath + "/value", sKey);
+		this._oSettingsModel.setProperty(sSettingspath + "/value", sKey);
 		//oSettingsModel.setProperty(sSettingspath + "/suggestValue", "");
 	};
 
@@ -334,12 +334,12 @@ sap.ui.define([
 		var sTerm = oEvent.target.value;
 		var sSettingspath = this.getBindingContext("currentSettings").sPath;
 		//set the suggestion value into data model property "suggestValue" for filter backend
-		this._settingsModel.setProperty(sSettingspath + "/suggestValue", sTerm.replaceAll("'", "\'\'"));
-		this._settingsModel.setProperty(sSettingspath + "/_loading", true);
+		this._oSettingsModel.setProperty(sSettingspath + "/suggestValue", sTerm.replaceAll("'", "\'\'"));
+		this._oSettingsModel.setProperty(sSettingspath + "/_loading", true);
 		//clean the value in data model
-		this._settingsModel.setProperty(sSettingspath + "/value", "");
+		this._oSettingsModel.setProperty(sSettingspath + "/value", "");
 		//update the dependent fields via bindings
-		var aBindings = this._settingsModel.getBindings();
+		var aBindings = this._oSettingsModel.getBindings();
 		var sParameter = sSettingspath.substring(sSettingspath.lastIndexOf("/") + 1);
 		each(aBindings, function(iIndex, oBinding) {
 			if (oBinding.sPath === "/form/items/" + sParameter + "/value") {
@@ -400,14 +400,14 @@ sap.ui.define([
 
 	StringField.prototype.getTranslationValueInTexts = function (sLanguage, sManifestPath) {
 		var sTranslationPath = "/texts/" + sLanguage;
-		var oProperty = this._settingsModel.getProperty(sTranslationPath) || {};
+		var oProperty = this._oSettingsModel.getProperty(sTranslationPath) || {};
 		return oProperty[sManifestPath];
 	};
 
 	StringField.prototype.setTranslationValueInTexts = function (sLanguage, sValue) {
 		var sManifestPath = this.getConfiguration().manifestpath;
 		var sTranslationPath = "/texts";
-		var oData = this._settingsModel.getData();
+		var oData = this._oSettingsModel.getData();
 		if (!oData) {
 			return;
 		}
@@ -415,7 +415,7 @@ sap.ui.define([
 			var oTexts = {};
 			oTexts[sLanguage] = {};
 			oTexts[sLanguage][sManifestPath] = sValue;
-			this._settingsModel.setProperty(sTranslationPath, oTexts);
+			this._oSettingsModel.setProperty(sTranslationPath, oTexts);
 		} else {
 			sTranslationPath = "/texts/" + sLanguage;
 			var oLanguage;
@@ -425,13 +425,13 @@ sap.ui.define([
 				oLanguage = oData.texts[sLanguage];
 			}
 			oLanguage[sManifestPath] = sValue;
-			this._settingsModel.setProperty(sTranslationPath, oLanguage);
+			this._oSettingsModel.setProperty(sTranslationPath, oLanguage);
 		}
 	};
 
 	StringField.prototype.deleteTranslationValueInTexts = function (sLanguage) {
 		var sManifestPath = this.getConfiguration().manifestpath;
-		var oData = this._settingsModel.getData();
+		var oData = this._oSettingsModel.getData();
 		if (oData && oData.texts && oData.texts[sLanguage]) {
 			delete oData.texts[sLanguage][sManifestPath];
 		}
@@ -441,7 +441,7 @@ sap.ui.define([
 		if (deepEqual(oData.texts, {})) {
 			delete oData.texts;
 		}
-		this._settingsModel.setData(oData);
+		this._oSettingsModel.setData(oData);
 	};
 
 	//open the translation popup

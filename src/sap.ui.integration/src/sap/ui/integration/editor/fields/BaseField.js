@@ -182,7 +182,7 @@ sap.ui.define([
 
 	BaseField.prototype.init = function () {
 		this._readyPromise = new Promise(function (resolve) {
-			this._fieldResolver = resolve;
+			this._fnFieldResolver = resolve;
 		}.bind(this));
 	};
 
@@ -250,7 +250,7 @@ sap.ui.define([
 		var that = this;
 		var oConfig = that.getConfiguration();
 		var sTranslationPath = "/texts";
-		var oData = this._settingsModel.getData();
+		var oData = this._oSettingsModel.getData();
 		if (!oData || !oData.texts) {
 			return;
 		}
@@ -263,9 +263,9 @@ sap.ui.define([
 				}
 				if (deepEqual(oTexts, {})) {
 					delete oData.texts;
-					this._settingsModel.setData(oData);
+					this._oSettingsModel.setData(oData);
 				} else {
-					this._settingsModel.setProperty(sTranslationPath, oTexts);
+					this._oSettingsModel.setProperty(sTranslationPath, oTexts);
 				}
 			}
 		} else {
@@ -565,7 +565,7 @@ sap.ui.define([
 
 	BaseField.prototype.initEditor = function (oConfig) {
 		var oControl;
-		this._settingsModel = this.getModel("currentSettings");
+		this._oSettingsModel = this.getModel("currentSettings");
 		this.initVisualization && this.initVisualization(oConfig);
 		if (this._visualization.editor) {
 			oControl = this._visualization.editor;
@@ -652,7 +652,7 @@ sap.ui.define([
 					this._triggerValidation(value);
 				}.bind(this));
 			}*/
-			var oBinding = this._settingsModel.bindProperty("value", this.getBindingContext("currentSettings"));
+			var oBinding = this._oSettingsModel.bindProperty("value", this.getBindingContext("currentSettings"));
 			oBinding.attachChange(function () {
 				this._triggerValidation(oConfig.value);
 			}.bind(this));
@@ -759,12 +759,12 @@ sap.ui.define([
 	BaseField.prototype._setCurrentProperty = function (sProperty, vValue) {
 		//avoid fire binding changes in the model
 		if (this._getCurrentProperty(sProperty) !== vValue) {
-			this._settingsModel.setProperty(sProperty, vValue, this.getBindingContext("currentSettings"));
+			this._oSettingsModel.setProperty(sProperty, vValue, this.getBindingContext("currentSettings"));
 		}
 	};
 
 	BaseField.prototype._getCurrentProperty = function (sProperty) {
-		return this._settingsModel.getProperty(sProperty, this.getBindingContext("currentSettings"));
+		return this._oSettingsModel.getProperty(sProperty, this.getBindingContext("currentSettings"));
 	};
 
 	BaseField.prototype._applySettings = function (oData) {
@@ -817,8 +817,8 @@ sap.ui.define([
 		} else {
 			this._showDynamicField();
 		}
-		this._fieldResolver && this._fieldResolver();
-		this._fieldResolver = null;
+		this._fnFieldResolver && this._fnFieldResolver();
+		this._fnFieldResolver = null;
 	};
 
 	BaseField.prototype._cancelSettings = function () {

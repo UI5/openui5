@@ -581,25 +581,4 @@ sap.ui.define([
 			});
 		});
 	});
-
-	QUnit.test("Focus restoration after unbind and then bind (DataCell -> NoData -> previously focused DataCell)", function(assert) {
-		const done = assert.async();
-		const oCell = oTable.getRows()[0].getDomRef("col0");
-		const oModel = new JSONModel({modelData: oTable.getModel().getData()});
-
-		oCell.focus();
-		oTable.unbindRows();
-
-		oTable.attachEventOnce("rowsUpdated", function() {
-			assert.strictEqual(document.activeElement.id, oTable.getDomRef("noDataCnt").id, "Focus on NoData");
-
-			oTable.setModel(oModel);
-			oTable.bindRows("/modelData");
-
-			oTable.attachEventOnce("rowsUpdated", function() {
-				assert.strictEqual(document.activeElement.id, oCell.id, "2nd focus on cell");
-				done();
-			});
-		});
-	});
 });

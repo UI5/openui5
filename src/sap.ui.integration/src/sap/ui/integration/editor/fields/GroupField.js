@@ -140,7 +140,7 @@ sap.ui.define([
 					}
 				});
 				if (oConfig.level !== "1") {
-					oMessageStripOfPanel.setModel(this._settingsModel, "currentSettings");
+					oMessageStripOfPanel.setModel(this._oSettingsModel, "currentSettings");
 				}
 				oMessageStripOfPanel.addStyleClass("sapUiIntegrationEditorPanelMessageStrip");
 				oControl._messageStrip = oMessageStripOfPanel;
@@ -157,7 +157,7 @@ sap.ui.define([
 					ePanel.setAttribute("aria-label", oConfig.label);
 					// handle error message for panel
 					if (oControl._subItems && oControl._subItems.length > 0) {
-						this.checkErrorsInSubItems(this._settingsModel, oControl);
+						this.checkErrorsInSubItems(this._oSettingsModel, oControl);
 					}
 					var oMessageStrip = oControl._messageStrip;
 					if (oControl._level !== "1" && oMessageStrip) {
@@ -170,7 +170,7 @@ sap.ui.define([
 							if (oItem.isA("sap.ui.integration.editor.fields.GroupField")) {
 								var oItemControl = oItem.getAggregation("_field");
 								if (oItemControl instanceof Panel && oItemControl._subItems && oItemControl._subItems.length > 0) {
-									oItem.checkErrorsInSubItems(oItem._settingsModel, oItemControl);
+									oItem.checkErrorsInSubItems(oItem._oSettingsModel, oItemControl);
 								} else if (oItemControl instanceof IconTabBar && oItemControl.getItems().length > 0) {
 									oItem.checkErrorsInIconTabBar();
 								}

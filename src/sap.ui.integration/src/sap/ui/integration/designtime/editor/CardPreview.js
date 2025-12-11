@@ -292,11 +292,11 @@ sap.ui.define([
 		} else if (this._currentMode === "Live") {
 			this._oCardPreview.setPreviewMode(CardPreviewMode.Off);
 		}
-		if (!this._initalChanges) {
-			var beforeLayerChanges = deepClone(this.getEditor()._beforeLayerManifestChanges || {}, 500);
-			this._initalChanges = [beforeLayerChanges];
+		if (!this._aInitalChanges) {
+			var oBeforeLayerChange = deepClone(this.getEditor()._oBeforeLayerChange || {}, 500);
+			this._aInitalChanges = [oBeforeLayerChange];
 		}
-		var aChanges = this._initalChanges.concat([this.getEditor().getCurrentSettings(this.getEditor().isChild)]);
+		var aChanges = this._aInitalChanges.concat([this.getEditor().getCurrentSettings(this.getEditor().isChild)]);
 		this._oCardPreview.setManifestChanges(aChanges);
 		this._oCardPreview.setManifest(this.getCard()._oCardManifest._oManifest.getRawJson());
 		this._oCardPreview.setHost(this.getCard().getHost());
