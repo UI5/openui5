@@ -24,7 +24,7 @@ sap.ui.define([
 
 	QUnit.test("Implicit loading of the VersionInfo", function(assert) {
 		assert.ok(sap.ui.require("sap/ui/VersionInfo")._content, "VersionInfo should have been loaded.");
-});
+	});
 
 	QUnit.test("library.css", function(assert) {
 		const oLink = document.getElementById("sap-ui-theme-sap.ui.core");

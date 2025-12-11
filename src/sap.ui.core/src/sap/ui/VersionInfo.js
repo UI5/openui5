@@ -2,7 +2,7 @@
  * ${copyright}
  */
 
-sap.ui.define(['sap/base/util/LoaderExtensions'], function (LoaderExtensions) {
+sap.ui.define([], function () {
 	"use strict";
 
 	let oVersionInfo;
@@ -48,7 +48,6 @@ sap.ui.define(['sap/base/util/LoaderExtensions'], function (LoaderExtensions) {
 	 */
 	VersionInfo.load = function (mOptions) {
 		mOptions = mOptions || {};
-		mOptions.async = true;
 		return VersionInfo._load(mOptions);
 	};
 
@@ -84,11 +83,8 @@ sap.ui.define(['sap/base/util/LoaderExtensions'], function (LoaderExtensions) {
 	 *
 	 * @param {string|object} [mOptions] name of the library (e.g. "sap.ui.core") or an object map (see below)
 	 * @param {boolean} [mOptions.library] name of the library (e.g. "sap.ui.core")
-	 * @param {boolean} [mOptions.async=false] whether "sap-ui-version.json" should be loaded asynchronously
-	 * @param {boolean} [mOptions.failOnError=true] whether to propagate load errors or not (not relevant for async loading)
-	 * @return {object|undefined|Promise} the full version info, the library specific one,
-	 *                                    undefined (if library is not listed or there was an error and "failOnError" is set to "false")
-	 *                                    or a Promise which resolves with one of them
+	 * @return {object|undefined|Promise} A Promise which resolves with the full version info,
+	 *                                    the library specific one or undefined (if library is not listed)
 	 * @private
 	 * @static
 	 */
@@ -101,39 +97,21 @@ sap.ui.define(['sap/base/util/LoaderExtensions'], function (LoaderExtensions) {
 			};
 		}
 
-		// Cast "async" to boolean (defaults to false)
-		mOptions.async = mOptions.async === true;
-
-		// Cast "failOnError" to boolean (defaults to true)
-		mOptions.failOnError = mOptions.failOnError !== false;
-
 		if (!oVersionInfo) {
 			// Load and cache the versioninfo
 
-			// When async is enabled and the file is currently being loaded
-			// return the promise and make sure the requested options are passed.
+			// When the file is currently being loaded return the promise and make sure
+			// the requested options are passed.
 			// This is to prevent returning the full object as requested in a
 			// first call (which created this promise) to the one requested just a
 			// single lib in a second call (which re-uses this same promise) or vice versa.
-			if (mOptions.async && oVersionInfoPromise instanceof Promise) {
+			if (oVersionInfoPromise instanceof Promise) {
 				return oVersionInfoPromise.then(function() {
 					return VersionInfo._load(mOptions);
 				});
 			}
 
 			var fnHandleSuccess = function(oNewVersionInfo) {
-				// Remove the stored Promise as the version info is now cached.
-				// This allows reloading the file by clearing "sap.ui.versioninfo"
-				// (however this is not documented and therefore not supported).
-				oVersionInfoPromise = null;
-
-				// "LoaderExtensions.loadResource" returns "null" in case of an error when
-				// "failOnError" is set to "false". In this case the won't be persisted
-				// and undefined will be returned.
-				if (oNewVersionInfo === null) {
-					return undefined;
-				}
-
 				updateVersionInfo(oNewVersionInfo);
 
 				// Calling the function again with the same arguments will return the
@@ -149,16 +127,19 @@ sap.ui.define(['sap/base/util/LoaderExtensions'], function (LoaderExtensions) {
 				throw oError;
 			};
 
-			var vReturn = LoaderExtensions.loadResource("sap-ui-version.json", {
-				async: mOptions.async,
-
-				// "failOnError" only applies for sync mode, async should always fail (reject)
-				failOnError: mOptions.async || mOptions.failOnError
-			});
+			const vReturn = fetch(sap.ui.require.toUrl("sap-ui-version.json"))
+				.then((oResponse) => {
+					if (!oResponse.ok) {
+						throw new Error(`loading of VersionInfo failed with status code ${oResponse.status}`);
+					}
+					return oResponse.json();
+				})
+				.then(fnHandleSuccess)
+				.catch(fnHandleError);
 
 			if (vReturn instanceof Promise) {
 				oVersionInfoPromise = vReturn;
-				return vReturn.then(fnHandleSuccess, fnHandleError);
+				return vReturn;
 			} else {
 				return fnHandleSuccess(vReturn);
 			}
@@ -183,7 +164,7 @@ sap.ui.define(['sap/base/util/LoaderExtensions'], function (LoaderExtensions) {
 				oResult = oVersionInfo;
 			}
 
-			return mOptions.async ? Promise.resolve(oResult) : oResult;
+			return Promise.resolve(oResult);
 		}
 	};
 
@@ -310,6 +291,7 @@ sap.ui.define(['sap/base/util/LoaderExtensions'], function (LoaderExtensions) {
 	 * @ui5-restricted sap.ui.core
 	 */
 	VersionInfo._reset = function() {
+		oVersionInfoPromise = undefined;
 		updateVersionInfo();
 	};
 

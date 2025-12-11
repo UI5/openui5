@@ -830,29 +830,33 @@ sap.ui.define([
 			// Clear cached version info data before each test starts
 			VersionInfo._reset();
 
-			return LoaderExtensions.loadResource({
-				dataType: "json",
-				url: sap.ui.require.toUrl("testlibs/scenario15/sap-ui-version.json"),
-				async: true
-			}).then(function(oVersionInfo) {
-				this.oServer = this._oSandbox.useFakeServer();
-				this.oServer.autoRespond = true;
-				this.oServer.respondWith("GET", sap.ui.require.toUrl("sap-ui-version.json"), [
-					200,
-					{
-						"Content-Type": "application/json"
-					},
-					JSON.stringify(oVersionInfo)
-				]);
-				sinon.FakeXMLHttpRequest.useFilters = true;
-                sinon.FakeXMLHttpRequest.addFilter(function (_sMethod, sUrl) {
-                    // If the filter returns true, the request will NOT be faked.
-                    // We only want to fake requests that go to the intended service.
-                    return !sUrl.includes("sap-ui-version.json");
-                });
-			}.bind(this));
+			return fetch(sap.ui.require.toUrl("testlibs/scenario15/sap-ui-version.json"))
+				.then((oResponse) => {
+					if (!oResponse.ok) {
+						throw new Error(`loading of VersionInfo failed with status code ${oResponse.status}`);
+					}
+					return oResponse.json();
+				})
+				.then((oVersionInfo) => {
+					this.fetchStub = sinon.stub(globalThis, "fetch");
+					this.fetchStub.callsFake(function(sUrl) {
+						if (sUrl.endsWith("sap-ui-version.json")) {
+							return Promise.resolve({
+								ok: true,
+								status: 200,
+								json: () => {
+									return Promise.resolve(oVersionInfo);
+								}
+							});
+						}
+						// Pass all irrelevant requests to the original function
+						return this.fetchStub.wrappedMethod.apply(this, arguments);
+					}.bind(this));
+				});
+
 		},
 		afterEach: function() {
+			this.fetchStub.restore();
 			sap.ui.loader.config({
 				paths:{
 					"testlibs": null

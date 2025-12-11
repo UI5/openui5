@@ -5,6 +5,7 @@ sap.ui.define([
 	"sap/base/config",
 	"sap/base/util/Deferred",
 	"sap/ui/Global",
+	"sap/ui/VersionInfo",
 	"sap/ui/core/Lib",
 	"sap/ui/core/boot/loadBootManifest",
 	"sap/ui/core/boot/Splash"
@@ -12,6 +13,7 @@ sap.ui.define([
 	config,
 	Deferred,
 	Global,
+	VersionInfo,
 	Lib,
 	loadBootManifest,
 	Splash
@@ -115,11 +117,12 @@ sap.ui.define([
 				name: "sap.ui.core"
 			});
 		});
-		return Lib._load({ name: "sap.ui.core" }, { preloadOnly: true });
+		// Skip preloading the CSS for the core library, since the configuration may not be complete yet
+		return Lib._load({ name: "sap.ui.core" }, { preloadOnly: true, skipCss: true });
 	}
 
-	function loadBundles(oManifest) {
-		return Promise.all(oManifest.bundles.map((sBundle) => {
+	function loadBundles(aBundles) {
+		return Promise.all(aBundles?.map((sBundle) => {
 			return sap.ui.loader._.loadJSResourceAsync(`${sBundle}.js`, true);
 		}));
 	}
@@ -127,8 +130,18 @@ sap.ui.define([
 	// load manifest & bootstrap sequence
 	loadBootManifest().then((oManifest) => {
 		oBootManifest = oManifest;
+		// trigger VersionInfo load for ThemeManager
+		VersionInfo.load();
+		// execute Splash and loade core library in parallel
+		const aTasks = [
+			executeTasks([Splash]),
+			loadCoreLibrary()
+		];
 		// load configured bundles containing the boot tasks
-		return oBootManifest.bundles ? loadBundles(oBootManifest) : Promise.resolve();
+		if (oBootManifest.bundles) {
+			aTasks.push(loadBundles(oBootManifest.bundles));
+		}
+		return Promise.all(aTasks);
 	}).then(() => {
 		// load config providers
 		return loadTasks(oBootManifest.config);
@@ -148,12 +161,6 @@ sap.ui.define([
 			config._.freeze();
 			return loadTasks(["sap/ui/core/boot/config"]);
 		});
-	}).then(() => {
-		//executeSplash and pass libLoaded promise to register prerendering task
-		return Promise.all([
-			executeTasks([Splash]),
-			loadCoreLibrary()
-		]);
 	}).then(() => {
 		return loadTasks(oBootManifest.preBoot);
 	}).then((aTasks) => {

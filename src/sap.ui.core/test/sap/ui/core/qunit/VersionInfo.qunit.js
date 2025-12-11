@@ -34,6 +34,7 @@ sap.ui.define([
 			};
 		},
 		beforeEach: function() {
+			this.iVersionInfoRequests = 0;
 			// Define mocked version info
 			this.oVersionInfo = {
 				"name": "qunit",
@@ -148,25 +149,34 @@ sap.ui.define([
 
 			// Clear cached version info data before each test starts
 			VersionInfo._reset();
+			this.fetchStub = sinon.stub(globalThis, "fetch");
+			this.fetchStub.callsFake(function(sUrl) {
+				if (sUrl.endsWith("sap-ui-version.json")) {
+					this.iVersionInfoRequests++;
+					return this.oVersionInfoRequestPromise;
+				}
+				// Pass all irrelevant requests to the original function
+				return this.fetchStub.wrappedMethod.apply(this, arguments);
+			}.bind(this));
+		},
+		afterEach: function() {
+			this.fetchStub.restore();
 		},
 		// Keep fn initFakeServer and call it at the begining of each test
 		// in order to enable single test execution
 		initFakeServer: function(sResponseCode, oResponse) {
-			this.oServer = this._oSandbox.useFakeServer();
-			this.oServer.autoRespond = true;
-			this.oServer.respondWith("GET", sap.ui.require.toUrl("sap-ui-version.json"), [
-				sResponseCode || 200,
-				{
-					"Content-Type": "application/json"
-				},
-				JSON.stringify(oResponse || this.oVersionInfo)
-			]);
+			const status = sResponseCode || 200;
+			this.oVersionInfoRequestPromise = Promise.resolve({
+				ok: status < 400,
+				status,
+				json: () => {
+					return Promise.resolve(oResponse || this.oVersionInfo);
+				}
+			});
 		},
 		checkVersionInfoRequest: function (assert) {
-			assert.strictEqual(this.oServer.requests.length, 1,
+			assert.strictEqual(this.iVersionInfoRequests, 1,
 				"Server should have received one request (async).");
-
-			assert.ok(this.oServer.requests[0].async, "First request should be async.");
 		}
 	});
 
@@ -177,7 +187,7 @@ sap.ui.define([
 			assert.ok(false, "Promise should not get resolved.");
 		}, function(err) {
 			// Check if exception is correct
-			sinon.assert.match(err.message, sinon.match("resource sap-ui-version.json could not be loaded"),
+			sinon.assert.match(err.message, sinon.match("loading of VersionInfo failed with status code 404"),
 				"Should give an error saying the file can not be found.");
 
 			this.checkVersionInfoRequest(assert);
