@@ -4304,12 +4304,13 @@ sap.ui.define([
 		oVSD.destroy();
 	});
 
-	QUnit.test("Sort list items have ListType.Active type", function (assert) {
+	QUnit.test("Sort and Group list items have ListType.Inactive type", function (assert) {
 		var done = assert.async();
 		var ListType = mobileLibrary.ListType;
 		var oVSD = new ViewSettingsDialog();
 
 		oVsdConfig.addSortItems(oVSD);
+		oVsdConfig.addGroupItems(oVSD);
 		oVSD.placeAt("qunit-fixture");
 		oCore.applyChanges();
 
@@ -4327,19 +4328,44 @@ sap.ui.define([
 			// Check each sort item (excluding group header)
 			aSortItems.forEach(function(oItem) {
 				if (!oItem.isA("sap.m.GroupHeaderListItem")) {
-					assert.strictEqual(oItem.getType(), ListType.Active,
-						"Sort list item '" + oItem.getTitle() + "' should have ListType.Active");
+					assert.strictEqual(oItem.getType(), ListType.Inactive,
+						"Sort list item '" + oItem.getTitle() + "' should have ListType.Inactive");
 				}
 			});
 
-			// Also check sort order items
+			// Check sort order items
 			var oSortOrderList = oVSD._sortOrderList;
 			if (oSortOrderList) {
 				var aSortOrderItems = oSortOrderList.getItems();
 				aSortOrderItems.forEach(function(oItem) {
 					if (!oItem.isA("sap.m.GroupHeaderListItem")) {
-						assert.strictEqual(oItem.getType(), ListType.Active,
-							"Sort order item '" + oItem.getTitle() + "' should have ListType.Active");
+						assert.strictEqual(oItem.getType(), ListType.Inactive,
+							"Sort order item '" + oItem.getTitle() + "' should have ListType.Inactive");
+					}
+				});
+			}
+
+			// Check group list items
+			var oGroupList = oVSD._groupList;
+			if (oGroupList) {
+				assert.ok(oGroupList, "Group list should exist");
+				var aGroupItems = oGroupList.getItems();
+				aGroupItems.forEach(function(oItem) {
+					if (!oItem.isA("sap.m.GroupHeaderListItem")) {
+						assert.strictEqual(oItem.getType(), ListType.Inactive,
+							"Group list item '" + oItem.getTitle() + "' should have ListType.Inactive");
+					}
+				});
+			}
+
+			// Check group order items
+			var oGroupOrderList = oVSD._groupOrderList;
+			if (oGroupOrderList) {
+				var aGroupOrderItems = oGroupOrderList.getItems();
+				aGroupOrderItems.forEach(function(oItem) {
+					if (!oItem.isA("sap.m.GroupHeaderListItem")) {
+						assert.strictEqual(oItem.getType(), ListType.Inactive,
+							"Group order item '" + oItem.getTitle() + "' should have ListType.Inactive");
 					}
 				});
 			}
