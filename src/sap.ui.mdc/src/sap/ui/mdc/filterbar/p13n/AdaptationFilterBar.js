@@ -527,6 +527,8 @@ sap.ui.define([
 						applyAbsolute: true,
 						key: "Filter",
 						state: mConditions
+					}).then(() => {
+						this.fireChange();
 					});
 				}
 				this.fireChange();

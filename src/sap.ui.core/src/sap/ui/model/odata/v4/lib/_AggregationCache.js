@@ -2230,10 +2230,6 @@ sap.ui.define([
 	 */
 	_AggregationCache.prototype.refreshKeptElements = function (oGroupLock, fnOnRemove,
 			bIgnorePendingChanges, _bDropApply) {
-		if (!this.oAggregation.hierarchyQualifier) {
-			return; // no own request for data aggregation
-		}
-
 		// "super" call (like @borrows ...)
 		const fnSuper = this.oFirstLevel.refreshKeptElements;
 		return fnSuper.call(this, oGroupLock, fnOnRemove, bIgnorePendingChanges,

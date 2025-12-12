@@ -132,11 +132,11 @@ sap.ui.define([
 			collapseAll: function(oTable) {
 				oTable.getRowBinding()?.collapseToLevel(0);
 			},
-			/*expandAllFromNode: function(oTable, oContext) { // Can only expand one level
+			/*expandEntireNode: function(oTable, oContext) { // Can only expand one level
 				const oBinding = oTable.getRowBinding();
 				return oBinding?.expand(oBinding.getContexts().indexOf(oContext));
 			},*/
-			collapseAllFromNode: function(oTable, oContext) {
+			collapseEntireNode: function(oTable, oContext) {
 				const oBinding = oTable.getRowBinding();
 				return oBinding?.collapse(oBinding.getContexts().indexOf(oContext));
 			},

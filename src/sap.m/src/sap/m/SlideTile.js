@@ -215,6 +215,7 @@ sap.ui.define([
 	 * Handler for afterrendering
 	 */
 	SlideTile.prototype.onAfterRendering = function () {
+		this.getDomRef()?.getElementsByClassName("sapMSTIconClickTapArea")[0]?.setAttribute("title", this._oRb.getText("SLIDETILEPAUSE"));
 		this._setupResizeClassHandler();
 
 		var cTiles = this.getTiles().length,
@@ -1064,9 +1065,11 @@ sap.ui.define([
 			if (this._bAnimationPause) {
 				this.getAggregation("_pausePlayIcon").setSrc("sap-icon://media-play");
 				this.$().removeClass("sapMSTPauseIcon");
+				this.getDomRef().getElementsByClassName('sapMSTIconClickTapArea')[0].setAttribute("title", this._oRb.getText("SLIDETILEPLAY"));
 			} else {
 				this.getAggregation("_pausePlayIcon").setSrc("sap-icon://media-pause");
 				this.$().addClass("sapMSTPauseIcon");
+				this.getDomRef().getElementsByClassName('sapMSTIconClickTapArea')[0].setAttribute("title", this._oRb.getText("SLIDETILEPAUSE"));
 			}
 		}
 	};

@@ -43,7 +43,12 @@ sap.ui.define([
 				children : {type : "sap.ui.core.TestControl" }
 			}
 		},
-		renderer : function() {}
+		renderer : {
+			apiVersion: 4,
+			render: () => {
+				// test control, no rendering needed
+			}
+		}
 	});
 
 	var oModel1 = new JSONModel({

@@ -619,6 +619,10 @@ sap.ui.define([
 		assert.ok($indicator.length === 0, "Multiple tiles indicator not displayed when there is only one tile");
 	});
 
+	QUnit.test("Test for dot accessibility", function(assert) {
+		assert.equal(document.getElementsByClassName('sapMSTIndicator')[0].getAttribute('title'), oResBundle.getText("SLIDETILERADIOBUTTON"), "The tootltip for the slide radio button is present");
+	});
+
 	QUnit.test("Tests if the number of dots is correct", function(assert) {
 		//Act
 		var $indicator = this.oSlideTile.$("tilesIndicator");
@@ -786,6 +790,8 @@ sap.ui.define([
 		// Act
 		// Assert
 		assert.ok(this.oSlideTile.$().hasClass("sapMSTPauseIcon"), "The pause icon is set");
+		assert.equal(document.getElementsByClassName('sapMSTIconClickTapArea')[0].getAttribute('title'), oResBundle.getText("SLIDETILEPAUSE"), "Pause tooltip coming when slide mode is active");
+
 	});
 
 	QUnit.test("The pause/play icons are switched after a click on the icon", function(assert) {
@@ -796,6 +802,8 @@ sap.ui.define([
 		// Assert
 		assert.ok(this.oSlideTile._bAnimationPause === true, "The animation is stopped");
 		assert.ok(!this.oSlideTile.$().hasClass("sapMSTPauseIcon"), "The play icon is set");
+		assert.equal(document.getElementsByClassName('sapMSTIconClickTapArea')[0].getAttribute('title'), oResBundle.getText("SLIDETILEPLAY"), "Pause tooltip coming when slide mode is active");
+
 	});
 
 	QUnit.module("Event Tests", {

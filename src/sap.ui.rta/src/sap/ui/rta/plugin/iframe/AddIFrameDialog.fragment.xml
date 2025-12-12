@@ -15,7 +15,6 @@
 		validationError="onValidationError"
 		parseError="onValidationError"
 		contentWidth="50rem"
-		contentHeight="44rem"
 		core:require="{ FloatType: 'sap/ui/model/type/Float' }"
 		beforeOpen="onBeforeOpen"
 	>

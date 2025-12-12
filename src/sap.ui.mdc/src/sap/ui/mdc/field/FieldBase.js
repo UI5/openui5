@@ -759,7 +759,7 @@ sap.ui.define([
 	};
 
 	FieldBase.prototype.setProperty = function(sPropertyName, vValue, bSuppressInvalidate) {
-
+		const aExcemptionProperties = ["width", "multipleLines", "showEmptyIndicator", "visible"];
 		// most properties are rendered from content controls. Only invalidate whole Field if needed
 		// (multipleLines mostly changed together with editMode -> update once on rendering)
 		if (sPropertyName === "editMode") {
@@ -768,7 +768,7 @@ sap.ui.define([
 			if (sOld !== FieldEditMode.Display && sOld !== FieldEditMode.EditableDisplay && vValue !== FieldEditMode.Display && vValue !== FieldEditMode.EditableDisplay) {
 				bSuppressInvalidate = true;
 			}
-		} else if (sPropertyName !== "width" && sPropertyName !== "multipleLines" && sPropertyName !== "showEmptyIndicator") {
+		} else if (!aExcemptionProperties.includes(sPropertyName)) {
 			bSuppressInvalidate = true;
 		}
 

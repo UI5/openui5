@@ -650,8 +650,66 @@ sap.ui.define([
 				});
 
 				assert.ok(oConditionChangeSpy.calledOnce, "Conditions are removed once");
+				oConditionChangeSpy.restore();
 
 				done();
+			});
+		});
+	});
+
+	QUnit.test("Check that change event is fired when item is removed", function(assert){
+		const done = assert.async();
+		this.prepareTestSetup(false);
+
+		const oFilterPanel = oAdaptationFilterBar._oFilterBarLayout.getInner();
+
+		oAdaptationFilterBar.setP13nData({
+			items: [
+				{
+					name: "key1"
+				},
+				{
+					name: "key2"
+				},
+				{
+					name: "key3"
+				}
+			]
+		});
+
+		Promise.all([
+			//1) Init Parent (Delegate + PropertyHelper)
+			this.oParent.initPropertyHelper(this.createPropertyHelper()),
+			this.oParent.initControlDelegate()
+		])
+		.then(function(){
+			oAdaptationFilterBar.createFilterFields().then(function(){
+
+				// Spy on the fireChange method to verify it's called
+				const oFireChangeSpy = sinon.spy(oAdaptationFilterBar, "fireChange");
+
+				// Mock the engine.createChanges to return a resolved promise
+				const oSpyCreateChanges = sinon.stub(oAdaptationFilterBar.getEngine(), "createChanges");
+				oSpyCreateChanges.returns(Promise.resolve([]));
+
+				// Fire the change event with reason "Remove"
+				oFilterPanel.fireChange({
+					item: {
+						name: "key1"
+					},
+					reason: "Remove"
+				});
+
+				// Wait for the promise chain to complete, then verify fireChange was called
+				setTimeout(function() {
+					assert.ok(oFireChangeSpy.calledOnce, "Change event is fired when item is removed");
+					assert.ok(oSpyCreateChanges.called, "createChanges is called");
+
+					// Clean up
+					oFireChangeSpy.restore();
+					oSpyCreateChanges.restore();
+					done();
+				}, 10);
 			});
 		});
 	});

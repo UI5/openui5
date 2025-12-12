@@ -1,9 +1,12 @@
 /*!
  * ${copyright}
  */
-sap.ui.define([
+QUnit.config.autostart = false;
+
+sap.ui.require([
 	"sap/base/Log",
 	"sap/base/i18n/Localization",
+	"sap/ui/core/Core",
 	"sap/ui/core/Lib",
 	"sap/ui/core/library",
 	"sap/ui/core/date/UI5Date",
@@ -13,8 +16,8 @@ sap.ui.define([
 	"sap/ui/core/sample/ViewTemplate/types/pages/Main",
 	"sap/ui/test/opaQunit",
 	"sap/ui/test/TestUtils"
-], function (Log, Localization, Lib, library, UI5Date, DateFormat, MessageType, Any, Main, opaTest,
-		TestUtils) {
+], function (Log, Localization, Core, Lib, library, UI5Date, DateFormat, MessageType, Any, Main,
+		opaTest, TestUtils) {
 	"use strict";
 	var sDefaultLanguage = Localization.getLanguage(),
 		ValueState = library.ValueState; // shortcut for sap.ui.core.ValueState
@@ -139,5 +142,9 @@ sap.ui.define([
 			message : "'Edm.Duration', using sap.ui.model.odata.type.Raw"}]);
 		Then.onAnyPage.analyzeSupportAssistant();
 		Then.iTeardownMyUIComponent();
+	});
+
+	Core.ready().then(function () {
+		QUnit.start();
 	});
 });

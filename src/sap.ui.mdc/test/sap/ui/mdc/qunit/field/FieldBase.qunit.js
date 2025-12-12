@@ -83,7 +83,8 @@ sap.ui.define([
 	"sap/ui/core/date/Japanese",
 	"./FieldBaseDelegateODataDefaultTypes",
 	"test-resources/sap/m/qunit/plugins/ClipboardUtils",
-	"sap/ui/mdc/enums/RequestShowContainerReason"
+	"sap/ui/mdc/enums/RequestShowContainerReason",
+	"sap/ui/mdc/Control"
 ], (
 	Element,
 	FocusHandler,
@@ -164,7 +165,8 @@ sap.ui.define([
 	Japanese,
 	FieldBaseDelegateODataDefaultTypes,
 	ClipboardUtils,
-	RequestShowContainerReason
+	RequestShowContainerReason,
+	MDCControl
 ) => {
 	"use strict";
 
@@ -1066,6 +1068,33 @@ sap.ui.define([
 		assert.ok(_createContentStub.called, "FieldBaseDelegate.createContent called during internal content creation");
 		assert.ok(oField.getAggregation("_content")[0] === aTestContent[0], "Content created");
 		_createContentStub.restore();
+	});
+
+	const aExcemptionProperties = [
+		{ property: "width", value: "100%" },
+		{ property: "multipleLines", value: true },
+		{ property: "showEmptyIndicator", value: true },
+		{ property: "visible", value: true }
+	];
+	aExcemptionProperties.forEach((sEntry) => {
+		QUnit.test(`#setProperty doesn't supress invalidation for '${sEntry.property}'`, (assert) => {
+			// SNOW: DINC0735786
+			// arrange
+			const oField = new FieldBase("F2", {
+				conditions: "{cm>/conditions/Name}",
+				models: {cm: oCM}
+			});
+			const oSpySetProperty = sinon.spy(MDCControl.prototype, "setProperty");
+			// act
+			oField.setProperty(sEntry.property, sEntry.value, false);
+
+			// assert
+			assert.ok(oSpySetProperty.calledWith(sEntry.property, sEntry.value, false), "called with the correct bSuppressInvalidate parameter");
+
+			// cleanup
+			oSpySetProperty.restore();
+			oField.destroy();
+		});
 	});
 
 	QUnit.module("Field APIs", {
@@ -7166,4 +7195,5 @@ sap.ui.define([
 		assert.equal(oField.getAggregation("_content").length, 2, "Field has three controls");
 		assert.ok(oField._getToolbarInteractive(), "Field with interactive content is interactive");
 	});
+
 });

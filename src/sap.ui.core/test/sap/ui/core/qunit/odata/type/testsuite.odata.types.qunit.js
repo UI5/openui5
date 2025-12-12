@@ -75,6 +75,7 @@ sap.ui.define(function () {
 			// OPA Test for OData Types
 			// *************************************************************************
 			"OPA.ViewTemplate.Types" : {
+				autostart : false,
 				loader : {
 					paths : {
 						"sap/ui/core/sample" : "test-resources/sap/ui/core/demokit/sample"

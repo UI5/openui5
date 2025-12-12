@@ -2402,9 +2402,9 @@ sap.ui.define([
 			bAvailable = true;
 		}
 
-		if ("collapseAllFromNode" in oConfig && "isNodeExpanded" in oConfig) {
-			if (typeof oConfig.collapseAllFromNode !== "function") {
-				throw new Error("TableDelegate#fetchExpandAndCollapseConfiguration: collapseAllFromNode needs to be a function");
+		if ("collapseEntireNode" in oConfig && "isNodeExpanded" in oConfig) {
+			if (typeof oConfig.collapseEntireNode !== "function") {
+				throw new Error("TableDelegate#fetchExpandAndCollapseConfiguration: collapseEntireNode needs to be a function");
 			}
 
 			if (typeof oConfig.isNodeExpanded !== "function") {
@@ -2469,9 +2469,9 @@ sap.ui.define([
 			bAvailable = true;
 		}
 
-		if ("expandAllFromNode" in oConfig && "isNodeExpanded" in oConfig) {
-			if (typeof oConfig.expandAllFromNode !== "function") {
-				throw new Error("TableDelegate#fetchExpandAndCollapseConfiguration: expandAllFromNode needs to be a function");
+		if ("expandEntireNode" in oConfig && "isNodeExpanded" in oConfig) {
+			if (typeof oConfig.expandEntireNode !== "function") {
+				throw new Error("TableDelegate#fetchExpandAndCollapseConfiguration: expandEntireNode needs to be a function");
 			}
 
 			if (typeof oConfig.isNodeExpanded !== "function") {
@@ -2526,7 +2526,7 @@ sap.ui.define([
 		const oConfiguration = await this.getControlDelegate().fetchExpandAndCollapseConfiguration(this);
 		return this._createExpandCollapseButton(true, {
 			tree: oConfiguration.expandAll,
-			node: oConfiguration.expandAllFromNode,
+			node: oConfiguration.expandEntireNode,
 			isExpanded: oConfiguration.isNodeExpanded
 		});
 	};
@@ -2540,7 +2540,7 @@ sap.ui.define([
 		const oConfiguration = await this.getControlDelegate().fetchExpandAndCollapseConfiguration(this);
 		return this._createExpandCollapseButton(false, {
 			tree: oConfiguration.collapseAll,
-			node: oConfiguration.collapseAllFromNode,
+			node: oConfiguration.collapseEntireNode,
 			isExpanded: oConfiguration.isNodeExpanded
 		});
 	};
