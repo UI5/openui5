@@ -2642,7 +2642,7 @@ sap.ui.define([
 		});
 	});
 
-	QUnit.test("ExpandAndCollapseConfiguration#expandAllFromNode", function(assert) {
+	QUnit.test("ExpandAndCollapseConfiguration#expandEntireNode", function(assert) {
 		const fnTest = async (sTableType, bSupportsExpandAll) => {
 			const pInit = this.oTable ? this.oTable.setType(sTableType).initialized() : this.initTable({type: sTableType});
 			const oTable = await pInit;
@@ -2656,7 +2656,7 @@ sap.ui.define([
 			};
 
 			if (bSupportsExpandAll) {
-				oConfig.expandAllFromNode(oTable, oMockBindingContext);
+				oConfig.expandEntireNode(oTable, oMockBindingContext);
 			} else {
 				assert.deepEqual(oConfig, {}, "Config object is empty");
 			}
@@ -2714,7 +2714,7 @@ sap.ui.define([
 		});
 	});
 
-	QUnit.test("ExpandAndCollapseConfiguration#collapseAllFromNode", function(assert) {
+	QUnit.test("ExpandAndCollapseConfiguration#collapseEntireNode", function(assert) {
 		const fnTest = async (sTableType, bSupportsExpandAll) => {
 			const pInit = this.oTable ? this.oTable.setType(sTableType).initialized() : this.initTable({type: sTableType});
 			const oTable = await pInit;
@@ -2728,7 +2728,7 @@ sap.ui.define([
 			};
 
 			if (bSupportsExpandAll) {
-				oConfig.collapseAllFromNode(oTable, oMockBindingContext);
+				oConfig.collapseEntireNode(oTable, oMockBindingContext);
 			} else {
 				assert.deepEqual(oConfig, {}, "Config object is empty");
 			}

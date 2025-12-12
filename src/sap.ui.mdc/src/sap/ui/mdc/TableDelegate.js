@@ -119,11 +119,14 @@ sap.ui.define([
 	 *
 	 * @typedef {object} sap.ui.mdc.TableDelegate.ExpandAndCollapseConfiguration
 	 *
-	 * @property {function(sap.ui.mdc.Table): void} [expandAll] Function to expand all rows
-	 * @property {function(sap.ui.mdc.Table): void} [collapseAll] Function to collapse all rows
-	 * @property {function(sap.ui.mdc.Table, sap.ui.model.Context): void} [expandAllFromNode] Function to expand all rows from a specific node
-	 * @property {function(sap.ui.mdc.Table, sap.ui.model.Context): void} [collapseAllFromNode] Function to collapse all rows from a specific node
-	 * @property {function(sap.ui.mdc.Table, sap.ui.model.Context): void} [isNodeExpanded] Function to check if a specific node is expanded
+	 * @property {function(sap.ui.mdc.Table): void} [expandAll] Function to expand the entire tree
+	 * @property {function(sap.ui.mdc.Table): void} [collapseAll] Function to collapse the entire tree
+	 * @property {function(sap.ui.mdc.Table, sap.ui.model.Context): void} [expandEntireNode]
+	 *     Function to expand a node and all the nodes in its entire subtree.
+	 * @property {function(sap.ui.mdc.Table, sap.ui.model.Context): void} [collapseEntireNode]
+	 *     Function to collapse a node and all the nodes in its entire subtree.
+	 * @property {function(sap.ui.mdc.Table, sap.ui.model.Context): boolean|undefined} [isNodeExpanded]
+	 *     Function to check if a specific node is expanded. Returns <code>undefined</code> if the node is a leaf.
 	 *
 	 * @protected
 	 */
@@ -377,13 +380,13 @@ sap.ui.define([
 	 * <ul>
 	 *   <li>To enable <b>Expand Entire Tree</b>, the <code>expandAll</code> function needs to be implemented.</li>
 	 *   <li>To enable <b>Collapse Entire Tree</b>, the <code>collapseAll</code> function needs to be implemented.</li>
-	 *   <li>To enable <b>Expand Entire Node</b>, the <code>expandAllFromNode</code> and <code>isNodeExpanded</code> functions need to be
+	 *   <li>To enable <b>Expand Entire Node</b>, the <code>expandEntireNode</code> and <code>isNodeExpanded</code> functions need to be
 	 *       implemented.</li>
-	 *   <li>To enable <b>Collapse Entire Node</b>, the <code>collapseAllFromNode</code> and <code>isNodeExpanded</code> functions need to be
+	 *   <li>To enable <b>Collapse Entire Node</b>, the <code>collapseEntireNode</code> and <code>isNodeExpanded</code> functions need to be
 	 *       implemented.</li>
 	 * </ul>
 	 *
-	 * <b>Note:</b> Expand and collapse all from a specific node is only supported if the table rows are selectable.
+	 * <b>Note:</b> Expanding and collapsing an entire node is only supported if the table rows are selectable.
 	 *
 	 * @example
 	 * TableDelegate.fetchExpandAndCollapseConfiguration = function(oTable) {

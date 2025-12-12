@@ -4512,7 +4512,7 @@ sap.ui.define([
 				this.oFetchExpandAndCollapseConfiguration.restore();
 			}
 		},
-		createTable: async function(mSettings, bExpandCollapseSupported, bExpandFromNodeSupported, bCollapseFromNodeSupported,
+		createTable: async function(mSettings, bExpandCollapseSupported, bExpandEntireNodeSupported, bCollapseEntireNodeSupported,
 									bIsNodeExpandedSupported) {
 			this.oTable = new Table(Object.assign({
 				type: "TreeTable",
@@ -4606,12 +4606,12 @@ sap.ui.define([
 				oSupport.collapseAll = function() {};
 			}
 
-			if (bExpandFromNodeSupported) {
-				oSupport.expandAllFromNode = function() {};
+			if (bExpandEntireNodeSupported) {
+				oSupport.expandEntireNode = function() {};
 			}
 
-			if (bCollapseFromNodeSupported) {
-				oSupport.collapseAllFromNode = function() {};
+			if (bCollapseEntireNodeSupported) {
+				oSupport.collapseEntireNode = function() {};
 			}
 
 			if (bIsNodeExpandedSupported) {

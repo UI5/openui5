@@ -4427,40 +4427,28 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test("refreshKeptElements", function (assert) {
-		var oAggregation = {
-				hierarchyQualifier : "X"
-			},
-			oCache = _AggregationCache.create(this.oRequestor, "~", "", {}, oAggregation);
+	[false, true].forEach((bDataAggregation) => {
+		QUnit.test("refreshKeptElements: data aggregation = " + bDataAggregation, function (assert) {
+			var oAggregation = bDataAggregation
+					? { // filled before by buildApply
+						aggregate : {},
+						group : {},
+						groupLevels : ["foo"]
+					}
+					: {hierarchyQualifier : "X"},
+				oCache = _AggregationCache.create(this.oRequestor, "~", "", {}, oAggregation);
 
-		this.mock(oCache.oFirstLevel).expects("refreshKeptElements").on(oCache)
-			.withExactArgs("~oGroupLock~", "~fnOnRemove~", "~bIgnorePendingChanges~",
-				/*bDropApply*/true)
-			.returns("~result~");
+			this.mock(oCache.oFirstLevel).expects("refreshKeptElements").on(oCache)
+				.withExactArgs("~oGroupLock~", "~fnOnRemove~", "~bIgnorePendingChanges~",
+					/*bDropApply*/true)
+				.returns("~result~");
 
-		assert.strictEqual(
-			// code under test
-			oCache.refreshKeptElements("~oGroupLock~", "~fnOnRemove~", "~bIgnorePendingChanges~",
-				"~bDropApply~"),
-			"~result~");
-	});
-
-	//*********************************************************************************************
-	QUnit.test("refreshKeptElements: data aggregation", function (assert) {
-		var oAggregation = { // filled before by buildApply
-				aggregate : {},
-				group : {},
-				groupLevels : ["foo"]
-			},
-			oCache = _AggregationCache.create(this.oRequestor, "~", "", {}, oAggregation);
-
-		this.mock(oCache.oFirstLevel).expects("refreshKeptElements").never();
-
-		assert.strictEqual(
-			// code under test
-			oCache.refreshKeptElements("~oGroupLock~", "~fnOnRemove~"),
-			undefined,
-			"nothing happens");
+			assert.strictEqual(
+				// code under test
+				oCache.refreshKeptElements("~oGroupLock~", "~fnOnRemove~", "~bIgnorePendingChanges~",
+					"~bDropApply~"),
+				"~result~");
+		});
 	});
 
 	//*********************************************************************************************

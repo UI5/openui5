@@ -16,13 +16,13 @@ sap.ui.define([
 			+ "?testsuite=test-resources/sap/ui/core/qunit/internal/testsuite.models.qunit&test=",
 
 		mTests = {
-			'internal/samples/odata/twoFields/Opa.qunit.html' : 'both',
-			'internal/samples/odata/v2/SalesOrders/Opa.qunit.html' : 'both',
-			'internal/samples/odata/v2/Products/Opa.qunit.html' : 'both',
-			'../../../sap/m/demokit/cart/webapp/test/Test.qunit.html?testsuite=test-resources/sap/ui/demo/cart/testsuite.qunit&test=integration/opaTestsComponent': 'both',
-			'../../../sap/m/demokit/cart/webapp/test/Test.qunit.html?testsuite=test-resources/sap/ui/demo/cart/testsuite.qunit&test=integration/opaTestsGherkinComponent': 'both',
+			'Test.qunit.html?testsuite=test-resources/sap/ui/core/internal/samples/odata/twoFields/testsuite.qunit&test=OPA.TwoFields' : 'both',
+			'Test.qunit.html?testsuite=test-resources/sap/ui/core/internal/samples/odata/v2/SalesOrders/testsuite.qunit&test=OPA.SalesOrders' : 'both',
+			'Test.qunit.html?testsuite=test-resources/sap/ui/core/internal/samples/odata/v2/Products/testsuite.qunit&test=OPA.Products' : 'both',
 			'Test.qunit.html?testsuite=test-resources/sap/ui/core/qunit/odata/type/testsuite.odata.types.qunit&test=OPA.ViewTemplate.Types&supportAssistant=true' : 'both',
 			'Test.qunit.html?testsuite=test-resources/sap/ui/core/qunit/odata/type/testsuite.odata.types.qunit&test=OPA.ViewTemplate.Types&realOData=true' : 'both',
+			'../../../sap/m/demokit/cart/webapp/test/Test.qunit.html?testsuite=test-resources/sap/ui/demo/cart/testsuite.qunit&test=integration/opaTestsComponent': 'both',
+			'../../../sap/m/demokit/cart/webapp/test/Test.qunit.html?testsuite=test-resources/sap/ui/demo/cart/testsuite.qunit&test=integration/opaTestsGherkinComponent': 'both',
 			'qunit/internal/AnnotationParser.qunit.html?hidepassed&coverage' : 'both'
 		};
 

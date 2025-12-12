@@ -359,10 +359,10 @@ sap.ui.define([
 			collapseAll: function(oTable) {
 				expandRowsToLevel(oTable, 1);
 			},
-			expandAllFromNode: function(oTable, oContext) {
+			expandEntireNode: function(oTable, oContext) {
 				oContext.expand(Number.MAX_SAFE_INTEGER);
 			},
-			collapseAllFromNode: function(oTable, oContext) {
+			collapseEntireNode: function(oTable, oContext) {
 				oContext.collapse(true);
 			},
 			isNodeExpanded: function(oTable, oContext) {

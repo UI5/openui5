@@ -2619,7 +2619,7 @@ sap.ui.define([
 					}
 					return; // ignore other annotations
 				}
-				if (Array.isArray(vPropertyValue) && sProperty !== sMessageProperty) {
+				if (Array.isArray(vPropertyValue)) {
 					vPropertyValue.$created = 0; // number of (client-side) created elements
 					// compute count
 					const sCount = oInstance[sProperty + "@odata.count"];
@@ -3564,7 +3564,8 @@ sap.ui.define([
 			return _Helper.getPrivateAnnotation(oElement, "predicate") === sPredicate
 				&& Object.keys(oElement).length > 1 // entity has key properties
 				&& !oElement["@$ui5.context.isDeleted"]
-				&& !that.hasPendingChangesForPath(sPredicate, bIgnorePendingChanges);
+				&& !that.hasPendingChangesForPath(sPredicate, bIgnorePendingChanges)
+				&& !that.isAggregated?.(oElement); // no refresh needed for aggregated elements
 		}
 
 		this.checkSharedRequest();
