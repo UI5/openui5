@@ -879,7 +879,10 @@ sap.ui.define([
 			if (!bFiltersAggregationChanged) {
 				if (this._btnAdapt) {
 					const aFilterNames = this.getAssignedFilterNames();
-					this.setProperty("_filterCount", this._oRb.getText(aFilterNames.length ? "filterbar.ADAPT_NONZERO" : "filterbar.ADAPT", [aFilterNames.length]), false);
+
+					const sText = this.getAdaptFiltersButtonText(aFilterNames.length);
+
+					this.setProperty("_filterCount", sText, false);
 				}
 			}
 
@@ -893,6 +896,16 @@ sap.ui.define([
 			this._bDoNotTriggerFiltersChangeEventBasedOnVariantSwitch = false;
 			this.fireFiltersChanged(oObj);
 
+		};
+
+		/**
+		 * Updates the Adapt Filters button text based on the number of assigned filters.
+		 * @param {int} iFilterCount number of assigned filters
+		 * @returns {string} text for the Adapt Filters button
+		 * @protected
+		 */
+		FilterBarBase.prototype.getAdaptFiltersButtonText = function(iFilterCount) {
+			return this._oRb.getText(iFilterCount ? "filterbar.ADAPT_NONZERO" : "filterbar.ADAPT", [iFilterCount]);
 		};
 
 		FilterBarBase.prototype.onSearch = function(oEvent) {

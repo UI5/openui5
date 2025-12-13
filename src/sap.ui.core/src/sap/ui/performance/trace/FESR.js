@@ -318,8 +318,10 @@ sap.ui.define([
 			// passport stays active so far
 			if (XHRInterceptor.isRegistered("PASSPORT_HEADER", "open")) {
 				XHRInterceptor.register("PASSPORT_HEADER", "open", function() {
-					// set passport with Root Context ID, Transaction ID for Trace
-					this.setRequestHeader("SAP-PASSPORT", Passport.header(Passport.traceFlags(), ROOT_ID, Passport.getTransactionId()));
+					if (!isCrossOriginURL(arguments[1])) {
+						// set passport with Root Context ID, Transaction ID for Trace
+						this.setRequestHeader("SAP-PASSPORT", Passport.header(Passport.traceFlags(), ROOT_ID, Passport.getTransactionId()));
+					}
 				});
 			}
 			if (oBeaconRequest) {

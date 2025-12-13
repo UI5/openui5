@@ -51,6 +51,8 @@ sap.ui.define([
 				delete oFeatures.isCondensingEnabledOnBtp;
 				oFeatures.isLocalResetEnabled = oFeatures.isLocalResetEnabledOnBtp;
 				delete oFeatures.isLocalResetEnabledOnBtp;
+				oFeatures.isContextBasedAdaptationEnabled = oFeatures.isContextBasedAdaptationEnabledOnBtp;
+				delete oFeatures.isContextBasedAdaptationEnabledOnBtp;
 				return oFeatures;
 			});
 		},

@@ -1946,6 +1946,48 @@ sap.ui.define([
 			assert.strictEqual(oMockCardDomRef.getAttribute("aria-describedby"), null, "Card should not have aria-describedby");
 		});
 
+		QUnit.test("Non-interactive chart with popover - interaction", async function (assert) {
+			// Arrange
+			this.oCard.setManifest(oManifest_Analytical_Popover);
+			this.oCard.setSemanticRole("ListItem");
+			await nextCardReadyEvent(this.oCard);
+
+			const oCardContent = this.oCard.getCardContent();
+			const oChart = oCardContent.getAggregation("_content");
+
+			// Mock DOM structure
+			const oMockSvg = document.createElement("svg");
+			oMockSvg.setAttribute("tabindex", "0");
+			oMockSvg.setAttribute("focusable", "true");
+
+			const oMockChartDomRef = document.createElement("div");
+			oMockChartDomRef.appendChild(oMockSvg);
+
+			const oMockCardDomRef = document.createElement("div");
+
+			sinon.stub(oChart, "getDomRef").returns(oMockChartDomRef);
+			sinon.stub(this.oCard, "getDomRef").returns(oMockCardDomRef);
+			sinon.stub(this.oCard, "isInteractive").returns(false);
+
+			// Set up the content to be non-interactive
+			oCardContent._bFullInteractive = false;
+			oCardContent._bChartsInteractive = false;
+
+			// Act
+			oCardContent._onChartFullyLoaded(oChart);
+
+			// Trigger the render complete handler
+			await new Promise((resolve) => {
+				oChart.attachRenderComplete(resolve);
+				oChart.fireRenderComplete();
+			});
+
+			// Assert
+			assert.strictEqual(oMockSvg.getAttribute("tabindex"), "0", "SVG tabindex should be set to 0");
+			assert.strictEqual(oMockSvg.getAttribute("focusable"), "true", "SVG focusable should be set to true");
+			assert.notOk(oMockSvg.classList.contains("sapUiIntegrationAnalyticalForcePointer"), "SVG should not have the clickable class when card is not interactive");
+		});
+
 	}).catch(function () {
 		QUnit.test("Analytical not supported", function (assert) {
 			assert.ok(true, "Analytical content type is not available with this distribution.");

@@ -15911,8 +15911,15 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// with bAllowRemoval=true for the context the entity is pointing to. If the entity is gone from
 	// the list binding no error should happen because of the just deleted context.
 	// TODO Test with a created binding parameter, too. This failed in an OPA test previously.
+	//
+	// A context binding is created with an absolute path to an entity. Create an operation binding
+	// and bind its context to a form. Ensure that at least one parameter is bound to a property of
+	// the entity. Initiate a side-effects refresh and ensure that the requestSideEffects promise
+	// resolves.
+	// SNOW: CS20250011047587
 	QUnit.test("Bound action with context refresh which removes the context", function (assert) {
 		var oAction,
+			oBoundContext,
 			oContext,
 			oInvocationPromise,
 			oModel = this.createTeaBusiModel({autoExpandSelect : true}),
@@ -15925,7 +15932,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		}">\
 	<Text id="text" text="{Name}"/>\
 	<Text id="teamId" text="{TEAM_ID}"/>\
-</Table>',
+</Table>\
+<Text id="employeeID" text="{$Parameter/EMPLOYEE/ID}"/>',
 			that = this;
 
 		this.expectRequest("EMPLOYEES?$count=true&$filter=TEAM_ID eq '77'&$select=ID,Name,TEAM_ID"
@@ -15963,6 +15971,24 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						"no R.V.C. w/o key predicate");
 				}),
 				that.waitForChanges(assert)
+			]);
+		}).then(function () { // SNOW: CS20250011047587
+			oBoundContext = oModel.bindContext(oContext.getPath()).getBoundContext();
+			oAction = oModel.bindContext("com.sap.gateway.default.iwbep.tea_busi.v0001"
+				+ ".AcChangeTeamOfEmployee(...)", oBoundContext);
+
+			that.expectRequest("EMPLOYEES('0')?$select=ID", {ID : "0"});
+
+			that.oView.byId("employeeID").setBindingContext(oAction.getBoundContext());
+
+			return that.waitForChanges(assert, "set binding context for action");
+		}).then(function () {
+			that.expectRequest("EMPLOYEES('0')?$select=ID", {ID : "0"});
+
+			return Promise.all([
+				// code under test (SNOW: CS20250011047587)
+				oBoundContext.requestSideEffects([""]),
+				that.waitForChanges(assert, "requestSideEffects - refresh Promise resolves")
 			]);
 		});
 	});

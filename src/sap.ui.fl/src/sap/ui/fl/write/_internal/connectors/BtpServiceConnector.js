@@ -51,7 +51,8 @@ sap.ui.define([
 			},
 			CONTEXTS: `${InitialConnector.ROOT}/contexts`,
 			SEEN_FEATURES: `${InitialConnector.ROOT}/seenFeatures`,
-			DELETE_USER_VARIANTS: `${InitialConnector.ROOT}/variantdata/delete`
+			DELETE_USER_VARIANTS: `${InitialConnector.ROOT}/variantdata/delete`,
+			CONTEXT_BASED_ADAPTATION: (appId) => `${InitialConnector.ROOT}/apps/${appId}/adaptations/`
 		},
 
 		async getSeenFeatureIds(mPropertyBag) {
@@ -107,6 +108,85 @@ sap.ui.define([
 			};
 			const sUrl = InitialUtils.getUrl(this.ROUTES.DELETE_USER_VARIANTS, mPropertyBag);
 			return WriteUtils.sendRequest(sUrl, "POST", _getRequestOptions.call(this, mPropertyBag.url, mPayload));
+		},
+
+		/**
+		 * Routes for the context based adaptation.
+		 *
+		 * @param {object} mPropertyBag - Property bag
+		 * @param {string} mPropertyBag.appId - Id of the underlying app
+		 * @param {string} mPropertyBag.adaptationId - Id of the adaptation to be updated or removed
+		 * @param {object} mPropertyBag.payload - Payload object for the body of the request
+		 * @param {string} mPropertyBag.version - Version number to be used for loading the information about adaptations
+		 * @param {string} [mPropertyBag.parentVersion] - Indicates if changes should be based on a version
+		 */
+		contextBasedAdaptation: {
+			create(mPropertyBag) {
+				const mParameters = {};
+				if (mPropertyBag.parentVersion !== undefined) {
+					mParameters.parentVersion = mPropertyBag.parentVersion;
+				}
+				const sUrl = InitialUtils.getUrl(BtpServiceConnector.ROUTES.CONTEXT_BASED_ADAPTATION(mPropertyBag.appId), mPropertyBag, mParameters);
+				return WriteUtils.sendRequest(sUrl, "POST", {
+					tokenUrl: BtpServiceConnector.ROUTES.TOKEN,
+					initialConnector: InitialConnector,
+					payload: JSON.stringify(mPropertyBag.payload),
+					dataType: "json",
+					contentType: "application/json; charset=utf-8"
+				});
+			},
+			reorder(mPropertyBag) {
+				const mParameters = {};
+				if (mPropertyBag.parentVersion !== undefined) {
+					mParameters.parentVersion = mPropertyBag.parentVersion;
+				}
+				const sUrl = InitialUtils.getUrl(BtpServiceConnector.ROUTES.CONTEXT_BASED_ADAPTATION(mPropertyBag.appId), mPropertyBag, mParameters);
+				return WriteUtils.sendRequest(sUrl, "PUT", {
+					tokenUrl: BtpServiceConnector.ROUTES.TOKEN,
+					initialConnector: InitialConnector,
+					payload: JSON.stringify(mPropertyBag.payload),
+					dataType: "json",
+					contentType: "application/json; charset=utf-8"
+				});
+			},
+			update(mPropertyBag) {
+				const mParameters = {};
+				if (mPropertyBag.parentVersion !== undefined) {
+					mParameters.parentVersion = mPropertyBag.parentVersion;
+				}
+				mPropertyBag.reference = mPropertyBag.adaptationId;
+				const sUrl = InitialUtils.getUrl(BtpServiceConnector.ROUTES.CONTEXT_BASED_ADAPTATION(mPropertyBag.appId), mPropertyBag, mParameters);
+				return WriteUtils.sendRequest(sUrl, "PUT", {
+					tokenUrl: BtpServiceConnector.ROUTES.TOKEN,
+					initialConnector: InitialConnector,
+					payload: JSON.stringify(mPropertyBag.payload),
+					dataType: "json",
+					contentType: "application/json; charset=utf-8"
+				});
+			},
+			load(mPropertyBag) {
+				const mParameters = {};
+				mParameters.version = mPropertyBag.version;
+				var sDataUrl = InitialUtils.getUrl(BtpServiceConnector.ROUTES.CONTEXT_BASED_ADAPTATION(mPropertyBag.appId), mPropertyBag, mParameters);
+				return InitialUtils.sendRequest(sDataUrl, "GET", {
+					initialConnector: InitialConnector,
+					tokenUrl: BtpServiceConnector.ROUTES.TOKEN
+				}).then(function(oResult) {
+					return oResult.response;
+				});
+			},
+			remove(mPropertyBag) {
+				const mParameters = {};
+				if (mPropertyBag.parentVersion !== undefined) {
+					mParameters.parentVersion = mPropertyBag.parentVersion;
+				}
+				mPropertyBag.reference = mPropertyBag.adaptationId;
+				const sUrl = InitialUtils.getUrl(BtpServiceConnector.ROUTES.CONTEXT_BASED_ADAPTATION(mPropertyBag.appId), mPropertyBag, mParameters);
+				return WriteUtils.sendRequest(sUrl, "DELETE", {
+					tokenUrl: BtpServiceConnector.ROUTES.TOKEN,
+					initialConnector: InitialConnector
+				});
+			}
 		}
 	});
 

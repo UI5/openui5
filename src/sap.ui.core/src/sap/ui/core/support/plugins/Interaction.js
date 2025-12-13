@@ -191,17 +191,18 @@ sap.ui.define([
 		}
 
 		function initInApps(oSupportStub) {
-			var _bFesrActive = BaseConfig.get({
+			const bFESRActive = BaseConfig.get({
 				name: "sapUiFesr",
-				type: BaseConfig.Type.Boolean,
+				type: BaseConfig.Type.String,
 				external: true,
 				freeze: true
-			});
+			}) != "false";
+
 			var _bODATA_Stats_On = Supportability.isStatisticsEnabled();
 
 			this._oStub.sendEvent(this.getId() + "SetQueryString", {
 				"queryString": {
-					bFesrActive: _bFesrActive,
+					bFesrActive: bFESRActive,
 					bODATA_Stats_On: _bODATA_Stats_On
 				}
 			});
