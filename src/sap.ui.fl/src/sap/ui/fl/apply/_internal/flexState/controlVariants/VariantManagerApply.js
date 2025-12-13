@@ -134,14 +134,17 @@ sap.ui.define([
 				// Only relevant for the callback - no need to persist this information
 				oNewVariant.createScenario = mPropertyBag.scenario;
 			}
-			await switchVariant({
-				vmReference: sVMReference,
-				currentVReference: mPropertyBag.vmControl.getCurrentVariantReference(),
-				newVReference: mPropertyBag.newVariantReference,
-				appComponent: oAppComponent,
-				modifier: JsControlTreeModifier,
-				reference: sFlexReference
-			});
+			const sCurrentVariantReference = mPropertyBag.vmControl.getCurrentVariantReference();
+			if (sCurrentVariantReference !== mPropertyBag.newVariantReference) {
+				await switchVariant({
+					vmReference: sVMReference,
+					currentVReference: sCurrentVariantReference,
+					newVReference: mPropertyBag.newVariantReference,
+					appComponent: oAppComponent,
+					modifier: JsControlTreeModifier,
+					reference: sFlexReference
+				});
+			}
 			mPropertyBag.vmControl._executeAllVariantAppliedListeners(oNewVariant);
 		};
 
@@ -167,37 +170,24 @@ sap.ui.define([
 	 */
 	VariantManagerApply.handleSelectVariant = async function(oEvent, oVMControl) {
 		const oAppComponent = Utils.getAppComponentForControl(oVMControl);
-		const sFlexReference = ManifestUtils.getFlexReferenceForControl(oAppComponent);
 		const sVMReference = oVMControl.getVariantManagementReference();
 		const bOldVariantWasModified = oVMControl.getModified();
 		const sTargetVReference = oEvent.getParameter("key");
 		const sSourceVReference = oVMControl.getCurrentVariantReference();
 		const bVariantSwitch = sSourceVReference !== sTargetVReference;
-		// Source and target variants are different -> real variant switch
-		if (bVariantSwitch) {
-			await VariantManagerApply.updateCurrentVariant({
-				variantManagementReference: sVMReference,
-				newVariantReference: sTargetVReference,
-				appComponent: oAppComponent,
-				vmControl: oVMControl,
-				skipExecuteAfterSwitch: true
-			});
-		}
+
+		await VariantManagerApply.updateCurrentVariant({
+			variantManagementReference: sVMReference,
+			newVariantReference: sTargetVReference,
+			appComponent: oAppComponent,
+			vmControl: oVMControl,
+			skipExecuteAfterSwitch: true
+		});
 
 		if (bOldVariantWasModified) {
 			const VariantManager = await requireAsync("sap/ui/fl/variants/VariantManager");
 			// Only revert if the variant is not switched, otherwise the revert will happen on switch
 			await VariantManager.eraseDirtyChangesOnVariant(sVMReference, sSourceVReference, oVMControl, /* bRevert = */!bVariantSwitch);
-		}
-
-		// updateCurrentVariant already calls the listeners, so this is only needed if no real switch happened
-		if (!bVariantSwitch) {
-			const oVariant = VariantManagementState.getVariant({
-				reference: sFlexReference,
-				vmReference: sVMReference,
-				vReference: oVMControl.getCurrentVariantReference()
-			});
-			oVMControl._executeAllVariantAppliedListeners(oVariant);
 		}
 	};
 

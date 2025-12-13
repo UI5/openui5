@@ -661,23 +661,94 @@ sap.ui.define([
 		//act
 		oIncrementButton.firePress();
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
-		assert.strictEqual(this.stepInput.getValue(), -4, "The value is successfuly incremented");
+		assert.strictEqual(this.stepInput.getValue(), -4, "The value is successfully incremented");
 
 		//act
 		oDecrementButton.firePress();
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
-		assert.strictEqual(this.stepInput.getValue(), -5, "The value is successfuly decremented");
+		assert.strictEqual(this.stepInput.getValue(), -5, "The value is successfully decremented");
 
 		//act
 		this.stepInput.setValue(-1);
 		oIncrementButton.firePress();
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
-		assert.strictEqual(this.stepInput.getValue(), 0, "The value is successfuly incremented");
+		assert.strictEqual(this.stepInput.getValue(), 0, "The value is successfully incremented");
 
 		//act
 		oDecrementButton.firePress();
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
-		assert.strictEqual(this.stepInput.getValue(), -1, "The value is successfuly decremented");
+		assert.strictEqual(this.stepInput.getValue(), -1, "The value is successfully decremented");
+	});
+
+	QUnit.module("Value Formatting and Precision", {
+		beforeEach: function () {
+			this.stepInput = new StepInput({
+				displayValuePrecision: 2
+			});
+			this.stepInput.placeAt('qunit-fixture');
+			nextUIUpdate.runSync()/*fake timer is used in module*/;
+		},
+		afterEach: function () {
+			this.stepInput.destroy();
+		}
+	});
+
+	QUnit.test("Value is not formatted on focus out", function (assert) {
+		//arrange
+		var oInput = this.stepInput._getInput();
+		this.stepInput.setValue(1.2345);
+
+		//act
+		oInput.onfocusin();
+		oInput._$input.trigger("focus").val("1.2345").trigger("input");
+		oInput.fireChange({ value: "1.2345" });
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		//assert
+		assert.strictEqual(oInput.getValue(), "1.2345", "Value remains unformatted on focus out");
+	});
+
+	QUnit.test("ValueState Error when value does not meet displayValuePrecision", function (assert) {
+		//arrange
+		var oInput = this.stepInput._getInput();
+		this.stepInput.setValue(1.2);
+
+		//act
+		oInput.onfocusin();
+		oInput._$input.trigger("focus").val("1.2").trigger("input");
+		oInput.fireChange({ value: "1.2" });
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		//assert
+		assert.notEqual(this.stepInput.getValueState(), ValueState.Error, "ValueState is not Error when precision matches");
+
+		//arrange
+		this.stepInput.setValue(1.2345);
+
+		//act
+		oInput.onfocusin();
+		oInput._$input.trigger("focus").val("1.2345").trigger("input");
+		oInput.fireChange({ value: "1.2345" });
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		//assert
+		assert.equal(this.stepInput.getValueState(), ValueState.Error, "ValueState is Error when precision does not match");
+	});
+
+	QUnit.test("LiveChange validation: value not formatted and ValueState Error on incorrect precision", function (assert) {
+		//arrange
+		this.stepInput.setValidationMode(StepInputValidationMode.LiveChange);
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+		var oInput = this.stepInput._getInput();
+
+		//act
+		oInput.onfocusin();
+		oInput._$input.trigger("focus").val("1.234").trigger("input");
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		//assert
+		assert.strictEqual(oInput.getValue(), "1.234", "Value remains unformatted on live change");
+		assert.equal(this.stepInput.getValueState(), ValueState.Error, "ValueState is Error when precision does not match on live change");
 	});
 
 
@@ -819,79 +890,74 @@ sap.ui.define([
 
 		// act
 		this.stepInput.setMax(20);
-		this.stepInput.setDisplayValuePrecision(0);
 		this.stepInput.placeAt('content');
+
+		this.stepInput.setValue("3.12");
+		this.stepInput.setDisplayValuePrecision(0);
+
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
 
 		// assert
 		assert.strictEqual(this.stepInput.getDisplayValuePrecision(), 0, "The displayValuePrecision is set to 0");
 
 		// act
-		oInput.onfocusin();
-		oInput._$input.trigger("focus").val("3.12").trigger("input");
 		this.clock.tick(300);
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
 
 		// assert
-		assert.strictEqual(oInput.getValue(), "3", "The value is proper (3)");
+		assert.strictEqual(oInput.getValue(), "3", "The value is properly formatted (3)");
 
-		// act
+		//act
+		this.stepInput.setValue("6.1267");
 		this.stepInput.setDisplayValuePrecision(2);
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
-		oInput.onfocusin();
-		oInput._$input.trigger("focus").val("6.1267").trigger("input");
-		this.clock.tick(300);
-		nextUIUpdate.runSync()/*fake timer is used in module*/;
 
 		// assert
-		assert.strictEqual(oInput.getValue(), "6.12", "The value is proper (6.12)");
+		assert.strictEqual(oInput.getValue(), "6.13", "The value is properly formatted (6.13)");
 
 		// act
+		this.stepInput.setValue("9.12588");
 		this.stepInput.setDisplayValuePrecision(3);
-		nextUIUpdate.runSync()/*fake timer is used in module*/;
-		oInput.onfocusin();
-		oInput._$input.trigger("focus").val("9.12588").trigger("input");
-		this.clock.tick(300);
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
 
 		// assert
-		assert.strictEqual(oInput.getValue(), "9.125", "The value is proper (9.125)");
+		assert.strictEqual(oInput.getValue(), "9.126", "The value is properly formatted (9.126)");
 
 	});
 
-	QUnit.test("displayValuePrecision formating when digits after the dot are more than the value precision", function (assert) {
+	QUnit.test("displayValuePrecision formatting when digits after the dot are more than the value precision", function (assert) {
 		this.stepInput.setDisplayValuePrecision(2);
 		this.stepInput.setValue(1.104);
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
 
-		assert.strictEqual(this.stepInput.getValue(), 1.104, "The value is formated correctly");
+		assert.strictEqual(this.stepInput.getValue(), 1.104, "The value is formatted correctly");
 		assert.strictEqual(this.stepInput.getAggregation("_input")._getInputValue(), "1.10", "The input value is correctly formatted");
 	});
 
-	QUnit.test("displayValuePrecision formating when digits after the dot are less than the value precision", function (assert) {
+	QUnit.test("displayValuePrecision formatting when digits after the dot are less than the value precision", function (assert) {
 		this.stepInput.setDisplayValuePrecision(5);
 		this.stepInput.setValue(1.104);
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
 
-		assert.strictEqual(this.stepInput.getValue(), 1.104, "The value is formated correctly");
+		assert.strictEqual(this.stepInput.getValue(), 1.104, "The value is formatted correctly");
 		assert.strictEqual(this.stepInput.getAggregation("_input")._getInputValue(), "1.10400", "The input value is correctly formatted");
 	});
 
-	QUnit.test("displayValuePrecision formating when there are no digits after the dot and the value precision is bigger than 0", function (assert) {
+	QUnit.test("displayValuePrecision formatting when there are no digits after the dot and the value precision is bigger than 0", function (assert) {
 		this.stepInput.setDisplayValuePrecision(5);
 		this.stepInput.setValue(0);
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
 
-		assert.strictEqual(this.stepInput.getValue(), 0, "The value is formated correctly");
+		assert.strictEqual(this.stepInput.getValue(), 0, "The value is formatted correctly");
 		assert.strictEqual(this.stepInput.getAggregation("_input")._getInputValue(), "0.00000", "The input value is correctly formatted");
 	});
 
-	QUnit.test("displayValuePrecision formating when there are digits after the dot and the value precision is 0", function (assert) {
+	QUnit.test("displayValuePrecision formatting when there are digits after the dot and the value precision is 0", function (assert) {
 		this.stepInput.setDisplayValuePrecision(0);
 		this.stepInput.setValue(1.325);
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
 
-		assert.strictEqual(this.stepInput.getValue(), 1.325, "The value is formated correctly");
+		assert.strictEqual(this.stepInput.getValue(), 1.325, "The value is formatted correctly");
 		assert.strictEqual(this.stepInput.getAggregation("_input")._getInputValue(), "1", "The input value is correctly formatted");
 	});
 
@@ -905,7 +971,7 @@ sap.ui.define([
 
 		oIncrementButton.firePress();
 
-		assert.strictEqual(this.stepInput.getValue(), 1.3285, "The value is formated correctly");
+		assert.strictEqual(this.stepInput.getValue(), 1.3285, "The value is formatted correctly");
 		assert.strictEqual(this.stepInput.getAggregation("_input")._getInputValue(), "1.3285", "The input value is correctly formatted");
 	});
 
@@ -919,7 +985,7 @@ sap.ui.define([
 
 		oIncrementButton.firePress();
 
-		assert.strictEqual(this.stepInput.getValue(), 1.3285, "The value is formated correctly");
+		assert.strictEqual(this.stepInput.getValue(), 1.3285, "The value is formatted correctly");
 		assert.strictEqual(this.stepInput.getAggregation("_input")._getInputValue(), "1.33", "The input value is correctly formatted");
 	});
 
@@ -933,7 +999,7 @@ sap.ui.define([
 
 		oIncrementButton.firePress();
 
-		assert.strictEqual(this.stepInput.getValue(), 1.3285, "The value is formated correctly");
+		assert.strictEqual(this.stepInput.getValue(), 1.3285, "The value is formatted correctly");
 		assert.strictEqual(this.stepInput.getAggregation("_input")._getInputValue(), "1.328500", "The input value is correctly formatted");
 	});
 
@@ -949,7 +1015,7 @@ sap.ui.define([
 		oSI.placeAt('qunit-fixture');
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
 
-		assert.strictEqual(oSI.getValue(), 431.5, "The value is formated correctly");
+		assert.strictEqual(oSI.getValue(), 431.5, "The value is formatted correctly");
 		assert.strictEqual(oSI.getAggregation("_input")._getInputValue(), "431.50", "The input value is correctly formatted");
 
 		oSI.destroy();
@@ -982,12 +1048,12 @@ sap.ui.define([
 		assert.strictEqual(oSI.getAggregation("_input")._getInputValue(), "1.332", "The input value is correctly formatted");
 
 		//second test
-		assert.strictEqual(oSI2.getValue(), 1.326699999999999, "The value is formated correctly");
+		assert.strictEqual(oSI2.getValue(), 1.326699999999999, "The value is formatted correctly");
 		assert.strictEqual(oSI2.getAggregation("_input")._getInputValue(), "1.327", "The input value is rounded to the given displayValuePrecision");
 
 		oIncBtn2.firePress();
 
-		assert.strictEqual(oSI2.getValue(), 1.331699999999989, "The value is formated correctly");
+		assert.strictEqual(oSI2.getValue(), 1.331699999999989, "The value is formatted correctly");
 		assert.strictEqual(oSI2.getAggregation("_input")._getInputValue(), "1.332", "The input value is correctly formatted");
 
 		oSI.destroy();
@@ -2185,7 +2251,7 @@ sap.ui.define([
 
 		assert.strictEqual(this.stepInput.getValue(), 6, "Value is set correctly");
 		assert.strictEqual(this.stepInput.getDisplayValuePrecision(), 3, "Value precision is set correctly");
-		assert.strictEqual(this.stepInput.getAggregation("_input")._getInputValue(), "6.000", "The input is set and formated correctly");
+		assert.strictEqual(this.stepInput.getAggregation("_input")._getInputValue(), "6.000", "The input is set and formatted correctly");
 	});
 
 	QUnit.test("less than Min value set via binding", function (assert) {
@@ -2700,66 +2766,6 @@ sap.ui.define([
 		// Assert
 		assert.equal(oSpy.callCount, 0, "setValue() is not called after setEditable(false)");
 		assert.strictEqual(this.stepInput.getValue(), 0, "'value' still holds the old value");
-	});
-
-	QUnit.test("_inputLiveChangeHandler() & _restrictCharsWhenDecimal()", function (assert) {
-		//prepare
-		var oSpy = sinon.spy(this.stepInput._getInput(), "setProperty"),
-			oRestrictSpy = sinon.spy(this.stepInput, "_restrictCharsWhenDecimal"),
-			oEvent = {
-				getParameter : function () {
-					return "1.2345";
-				},
-				getSource : function () {
-					return {
-						getProperty : function (){
-							return "1.234";
-						}
-					};
-				}
-			};
-
-		//act
-		this.stepInput.setDisplayValuePrecision(3);
-		this.stepInput._inputLiveChangeHandler(oEvent);
-
-		//assert
-		assert.equal(oSpy.callCount, 2,
-				"_inputLiveChangeHandler always calls setProperty(). If the displayValuePrecision is bigger than the characters after the decimal mark - setProperty is called two times");
-		assert.equal(oRestrictSpy.callCount, 1,
-				"_inputLiveChangeHandler always calls _restrictCharsWhenDecimal");
-		assert.strictEqual(oSpy.getCall(0).args[0], "valueState",
-				"setProperty is called and it's first parameter is 'valueState'");
-		assert.strictEqual(oSpy.getCall(0).args[1], "Error",
-				"setProperty is called and it's second parameter is Error");
-		assert.strictEqual(oSpy.getCall(1).args[0], "value",
-				"setProperty is called and it's first parameter is 'value'");
-		assert.strictEqual(oSpy.getCall(1).args[1], "1.234",
-				"setProperty is called and it's second parameter is 1.234");
-		assert.strictEqual(oSpy.getCall(1).args[2], true,
-				"setProperty is called and it's third parameter is 'true'");
-
-		//act
-		this.stepInput._restrictCharsWhenDecimal(oEvent);
-
-		//assert
-		assert.strictEqual(this.stepInput._getInput().$("inner").val(), "1.234",
-				"the digits's length is correct - equal to the displayValuePrecision");
-	});
-
-	QUnit.test("_showWrongValueVisualEffect() triggers an error state for 1s and set it back to the previous state", function (assert) {
-		//act
-		this.stepInput._showWrongValueVisualEffect();
-
-		//assert
-		assert.strictEqual(this.stepInput._getInput().getValueState(), "Error", "input's valueState is set to Error");
-		assert.strictEqual(this.stepInput.getValueState(), "None", "it's only a visual effect");
-
-		//act
-		this.clock.tick(1000);
-
-		//assert
-		assert.strictEqual(this.stepInput._getInput().getValueState(), "None", "input's valueState is back to None");
 	});
 
 	QUnit.test("_iRealPrecision is updated on each value change", function (assert) {

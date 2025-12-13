@@ -12,8 +12,9 @@ sap.ui.define([
 	"sap/m/Button",
 	"sap/base/util/merge",
 	"sap/base/Log",
-	"sap/ui/mdc/enums/FilterBarP13nMode"
-], (FilterController, AdaptFiltersController, FilterContainer, FilterItemLayout, FilterBarBase, FilterBarBaseRenderer, mLibrary, Button, merge, Log, FilterBarP13nMode) => {
+	"sap/ui/mdc/enums/FilterBarP13nMode",
+	"sap/base/strings/formatMessage"
+], (FilterController, AdaptFiltersController, FilterContainer, FilterItemLayout, FilterBarBase, FilterBarBaseRenderer, mLibrary, Button, merge, Log, FilterBarP13nMode, formatMessage) => {
 	"use strict";
 
 	/**
@@ -96,6 +97,28 @@ sap.ui.define([
 				enableLegacyUI: {
 					type: "boolean",
 					defaultValue: false
+				},
+				/**
+				 * Defines a text for the "Adapt Filters" button.
+				 *
+				 * <b>Note:</b> Both <code>adaptFiltersText</code> and <code>adaptFiltersTextNonZero</code> need to be set for them to take effect.
+				 *
+				 * @private
+				 * @ui5-restricted sap.fe
+				 */
+				adaptFiltersText: {
+					type: "string"
+				},
+				/**
+				 * Defines a text for the "Adapt Filters" button in case of multiple filters being applied.
+				 *
+				 * <b>Note:</b> Both <code>adaptFiltersText</code> and <code>adaptFiltersTextNonZero</code> need to be set for them to take effect.
+				 * <b>Note:</b> If the count should be shown use <code>{0}</code> as a placeholder within the string.
+				 * @private
+				 * @ui5-restricted sap.fe
+				 */
+				adaptFiltersTextNonZero: {
+					type: "string"
 				}
 			}
 		},
@@ -278,6 +301,18 @@ sap.ui.define([
 
 		this._aAddedFilterFields = undefined;
 		this._aRemovedFilterFields = undefined;
+	};
+
+	FilterBar.prototype.getAdaptFiltersButtonText = function(iFilterCount) {
+		let sText = FilterBarBase.prototype.getAdaptFiltersButtonText.call(this, iFilterCount);
+
+		const sAdaptFiltersText = this.getAdaptFiltersText(),
+			sAdaptFiltersTextNonZero = this.getAdaptFiltersTextNonZero();
+		if (sAdaptFiltersText && sAdaptFiltersTextNonZero) {
+			sText = iFilterCount ? formatMessage(sAdaptFiltersTextNonZero, [iFilterCount]) : sAdaptFiltersText;
+		}
+
+		return sText;
 	};
 
 	FilterBar.prototype._handleAddedFilterField = function(oFilterField) {

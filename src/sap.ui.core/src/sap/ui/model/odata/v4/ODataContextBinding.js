@@ -1524,7 +1524,9 @@ sap.ui.define([
 		var that = this;
 
 		if (this.oOperation && this.oOperation.bAction !== false) {
-			return SyncPromise.resolve();
+			// there may be dependent bindings that refer the parent entity
+			return this.refreshDependentBindings(sResourcePathPrefix, sGroupId, bCheckUpdate,
+				bKeepCacheOnError);
 		}
 
 		this.bHasFetchedExpandSelectProperties = false;

@@ -281,9 +281,9 @@ sap.ui.define([
 					return;
 				}
 
-				// The chart shouldn't be focused when it has no action.
+				// The chart shouldn't be focused when it has no action or popover.
 				// In all other cases (actionableArea is "Full" or "Content") the chart should be focusable
-				if (!this._bActions && this.getCardInstance().isRoleListItem()) {
+				if (!this._bActions && !this._bPopover  && this.getCardInstance().isRoleListItem()) {
 					const sCardDescriptionId = oCard.getDomRef().getAttribute("aria-describedby");
 					const sChartLabelId = oSvgElement.getAttribute("aria-labelledby");
 
@@ -436,6 +436,7 @@ sap.ui.define([
 				|| oResolvedConfiguration.popover?.active
 				|| oResolvedConfiguration.tooltips;
 			this._bActions = oResolvedConfiguration.actions;
+			this._bPopover = oResolvedConfiguration.popover && oResolvedConfiguration.popover.active;
 
 			oVizProperties.interaction.noninteractiveMode = !this._bChartsInteractive;
 		}

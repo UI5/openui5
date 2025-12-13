@@ -50,6 +50,12 @@ sap.ui.define([
 			},
 			enableLegacyUI: {
 				ignore: true
+			},
+			adaptFiltersText: {
+				ignore: true
+			},
+			adaptFiltersTextNonZero: {
+				ignore: true
 			}
 		}
 	};

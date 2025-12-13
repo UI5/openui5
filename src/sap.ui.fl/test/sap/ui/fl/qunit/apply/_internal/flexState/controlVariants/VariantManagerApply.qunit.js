@@ -414,6 +414,19 @@ sap.ui.define([
 			oVariantManagement3.destroy();
 		});
 
+		QUnit.test("when calling 'updateCurrentVariant' with a currently selected variant", async function(assert) {
+			await VariantManagerApply.updateCurrentVariant({
+				variantManagementReference: sVMReference,
+				newVariantReference: sVMReference,
+				appComponent: oComponent,
+				vmControl: this.oVMControl
+			});
+			assert.strictEqual(this.oCallVariantSwitchListenersSpy.callCount, 1, "then the listeners were called");
+			assert.strictEqual(this.oSetCurrentVariantSpy.callCount, 0, "then setting current variant was not triggered");
+			assert.strictEqual(this.oRevertStub.callCount, 0, "then no revert of changes was triggered");
+			assert.strictEqual(this.oApplyStub.callCount, 0, "then no apply of changes was triggered");
+		});
+
 		QUnit.test("when 'handleSelectVariant' is called", async function(assert) {
 			const oExecuteAfterSwitchSpy = sandbox.spy(VariantManagerApply, "executeAfterSwitch");
 			const oEvent = {
@@ -462,10 +475,8 @@ sap.ui.define([
 
 			await VariantManagerApply.handleSelectVariant(oEvent, this.oVMControl);
 
-			assert.ok(
-				oUpdateCurrentVariantSpy.notCalled,
-				"then 'updateCurrentVariant' was not called"
-			);
+			assert.strictEqual(oUpdateCurrentVariantSpy.callCount, 1, "then 'updateCurrentVariant' was called");
+			assert.strictEqual(this.oSetCurrentVariantSpy.callCount, 0, "then setting current variant was not triggered");
 
 			assert.strictEqual(
 				this.oCallVariantSwitchListenersSpy.firstCall.args[0].key,

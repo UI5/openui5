@@ -165,6 +165,128 @@ sap.ui.define([
 		});
 	});
 
+	QUnit.module("Context based adaptation", {
+		afterEach() {
+			sandbox.restore();
+		}
+	}, function() {
+		QUnit.test("create route", async function(assert) {
+			const oPayload = {
+				id: "adpId123",
+				title: "My adapatation",
+				contexts: {
+					role: ["Keyuser", "Sales"]
+				},
+				priority: 2
+			};
+			const oSendRequestStub = sandbox.stub(WriteUtils, "sendRequest").resolves("response");
+			const oResult = await BtpServiceConnector.contextBasedAdaptation.create({
+				url: "my/url",
+				payload: oPayload,
+				appId: "my/fancy/app",
+				parentVersion: "0"
+			});
+			const aArgs = oSendRequestStub.lastCall.args;
+			assert.strictEqual(aArgs[0], "my/url/flex/all/v3/apps/my/fancy/app/adaptations/?parentVersion=0");
+			assert.strictEqual(aArgs[1], "POST");
+			assert.deepEqual(_omit(aArgs[2], "initialConnector"), {
+				contentType: "application/json; charset=utf-8",
+				dataType: "json",
+				payload: JSON.stringify(oPayload),
+				tokenUrl: BtpServiceConnector.ROUTES.TOKEN
+			});
+			assert.strictEqual(oResult, "response", "the function returns the response of the request");
+		});
+
+		QUnit.test("reorder route", async function(assert) {
+			const oPayload = {
+				priorities: [
+					"id 1",
+					"id 2",
+					"id 3"
+				]
+			};
+			const oSendRequestStub = sandbox.stub(WriteUtils, "sendRequest").resolves("response");
+			const oResult = await BtpServiceConnector.contextBasedAdaptation.reorder({
+				url: "my/url",
+				payload: oPayload,
+				appId: "my/fancy/app",
+				parentVersion: "0"
+			});
+			const aArgs = oSendRequestStub.lastCall.args;
+			assert.strictEqual(aArgs[0], "my/url/flex/all/v3/apps/my/fancy/app/adaptations/?parentVersion=0");
+			assert.strictEqual(aArgs[1], "PUT");
+			assert.deepEqual(_omit(aArgs[2], "initialConnector"), {
+				contentType: "application/json; charset=utf-8",
+				dataType: "json",
+				payload: JSON.stringify(oPayload),
+				tokenUrl: BtpServiceConnector.ROUTES.TOKEN
+			});
+			assert.strictEqual(oResult, "response", "the function returns the response of the request");
+		});
+
+		QUnit.test("update route", async function(assert) {
+			const oPayload = {
+				title: "My adapatation",
+				contexts: {
+					role: ["Keyuser", "Sales"]
+				},
+				priority: 2
+			};
+			const oSendRequestStub = sandbox.stub(WriteUtils, "sendRequest").resolves("response");
+			const oResult = await BtpServiceConnector.contextBasedAdaptation.update({
+				url: "my/url",
+				payload: oPayload,
+				appId: "my/fancy/app",
+				adaptationId: "adpId123",
+				parentVersion: "0"
+			});
+			const aArgs = oSendRequestStub.lastCall.args;
+			assert.strictEqual(aArgs[0], "my/url/flex/all/v3/apps/my/fancy/app/adaptations/adpId123?parentVersion=0");
+			assert.strictEqual(aArgs[1], "PUT");
+			assert.deepEqual(_omit(aArgs[2], "initialConnector"), {
+				contentType: "application/json; charset=utf-8",
+				dataType: "json",
+				payload: JSON.stringify(oPayload),
+				tokenUrl: BtpServiceConnector.ROUTES.TOKEN
+			});
+			assert.strictEqual(oResult, "response", "the function returns the response of the request");
+		});
+
+		QUnit.test("load route", async function(assert) {
+			const oSendRequestStub = sandbox.stub(InitialUtils, "sendRequest").resolves({ response: "response" });
+			const oResult = await BtpServiceConnector.contextBasedAdaptation.load({
+				url: "my/url",
+				appId: "my/fancy/app",
+				version: "2"
+			});
+			const aArgs = oSendRequestStub.lastCall.args;
+			assert.strictEqual(aArgs[0], "my/url/flex/all/v3/apps/my/fancy/app/adaptations/?version=2");
+			assert.strictEqual(aArgs[1], "GET");
+			assert.deepEqual(_omit(aArgs[2], "initialConnector"), {
+				tokenUrl: BtpServiceConnector.ROUTES.TOKEN
+			});
+			assert.strictEqual(oResult, "response", "the function returns the response of the request");
+		});
+
+		QUnit.test("delete route", async function(assert) {
+			const oSendRequestStub = sandbox.stub(WriteUtils, "sendRequest").resolves("response");
+			const oResult = await BtpServiceConnector.contextBasedAdaptation.remove({
+				url: "my/url",
+				appId: "my/fancy/app",
+				adaptationId: "adpId123",
+				parentVersion: "0"
+			});
+			const aArgs = oSendRequestStub.lastCall.args;
+			assert.strictEqual(aArgs[0], "my/url/flex/all/v3/apps/my/fancy/app/adaptations/adpId123?parentVersion=0");
+			assert.strictEqual(aArgs[1], "DELETE");
+			assert.deepEqual(_omit(aArgs[2], "initialConnector"), {
+				tokenUrl: BtpServiceConnector.ROUTES.TOKEN
+			});
+			assert.strictEqual(oResult, "response", "the function returns the response of the request");
+		});
+	});
+
 	QUnit.done(function() {
 		document.getElementById("qunit-fixture").style.display = "none";
 	});

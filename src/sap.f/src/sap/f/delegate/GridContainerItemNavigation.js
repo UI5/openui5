@@ -66,7 +66,7 @@ sap.ui.define([
 
 		// leave only real tabbable elements in the tab chain, GridContainer and List types have dummy areas
 		$AllTabbables.map(function(index, element) {
-			if (element.className.indexOf("DummyArea") === -1) {
+			if (!element.classList.contains("DummyArea")) {
 				aTabbables.push(element);
 			}
 		});
