@@ -3,8 +3,8 @@
 /* Quartz Dark theme                                 */
 /* ================================================= */
 
-@sapUiFiori3AnchorBarBottomShadow: inset 0 -0.0625rem @sapUiObjectHeaderBorderColor;
-@sapUiFiori3AnchorBarTopShadow: inset 0 0.0625rem @sapUiObjectHeaderBorderColor;
+@_sap_uxap_ObjectPageHeaderContent_AnchorBarBottomShadow: inset 0 -0.0625rem var(--sapObjectHeader_BorderColor);
+@_sap_uxap_ObjectPageHeaderContent_AnchorBarTopShadow: inset 0 0.0625rem var(--sapObjectHeader_BorderColor);
 
 .sapUxAPObjectPageHeaderContent .sapMObjStatus, .sapUxAPObjectPageContainer .sapMObjStatus {
 	font-size: @sapMFontMediumSize;
@@ -12,7 +12,7 @@
 
 .sapUxAPObjectPageHeaderIdentifierTitleInContent,
 .sapUxAPObjectPageHeaderIdentifierSubTitleInContent {
-	color: @sapUiGroupTitleTextColor;
+	color: var(--sapGroup_TitleTextColor);
 }
 
 .sapUxAPObjectPageHeaderIdentifier .sapUxAPObjectPageHeaderObjectImageForce .sapUxAPObjectPageHeaderObjectImage,
@@ -21,12 +21,14 @@
 }
 
 html .sapUxAPObjectPageLayout-Std-Desktop, html .sapUxAPObjectPageLayout-Std-Tablet {
+
 	.sapUxAPObjectPageHeaderContent .sapUxAPObjectPageHeaderObjectImage-Circle .sapUxAPObjectPageHeaderObjectImage {
 		margin-right: 2rem;
 		margin-bottom: 1rem;
 		width: 5rem;
 		height: 5rem;
 	}
+
 	.sapUxAPObjectPageHeaderIdentifier .sapUxAPObjectPageHeaderObjectImageForce .sapUxAPObjectPageHeaderObjectImage,
 	.sapUxAPObjectPageHeaderStickied .sapUxAPObjectPageHeaderIdentifier .sapUxAPObjectPageHeaderObjectImage {
 		margin: 0.25rem 1rem 0.25rem 0;
@@ -40,15 +42,18 @@ html .sapUxAPObjectPageLayout-Std-Desktop, html .sapUxAPObjectPageLayout-Std-Tab
 
 .sapUxAPObjectPageLayout-Std-Tablet,
 .sapUxAPObjectPageLayout-Std-Desktop {
+
 	.sapUxAPObjectPageHeaderContentCellRight {
 		padding-right: 2rem;
 	}
+
 	.sapUxAPObjectPageHeaderContent:only-child {
 		padding: 1rem 2rem;
 	}
 }
 
 .sapUxAPObjectPageLayout-Std-Phone  {
+
 	.sapUxAPObjectPageHeaderContent:only-child {
 		padding: 1rem;
 	}
