@@ -3,9 +3,9 @@
 /* Horizon High Contrast White theme                 */
 /* ================================================= */
 
-@sapUiFiori3AnchorBarBottomShadow: inset 0 -0.0625rem @sapUiObjectHeaderBorderColor;
-@sapUiFiori3AnchorBarTopShadow: inset 0 0.0625rem @sapUiObjectHeaderBorderColor;
-@sapUiFiori3AnchorBarShadow: @sapUiFiori3AnchorBarBottomShadow, 0 0.125rem 0.25rem 0 fade(@sapUiContentShadowColor, 7.5);
+@_sap_uxap_ObjectPageHeaderContent_AnchorBarBottomShadow: inset 0 -0.0625rem var(--sapObjectHeader_BorderColor);
+@_sap_uxap_ObjectPageHeaderContent_AnchorBarTopShadow: inset 0 0.0625rem var(--sapObjectHeader_BorderColor);
+@_sap_uxap_ObjectPageHeaderContent_AnchorBarShadow: @_sap_uxap_ObjectPageHeaderContent_AnchorBarBottomShadow, 0 0.125rem 0.25rem 0 fade(@sapUiContentShadowColor, 7.5);
 
 .sapUxAPObjectPageHeaderContent .sapMObjStatus, .sapUxAPObjectPageContainer .sapMObjStatus {
 	font-size: @sapMFontMediumSize;
@@ -13,7 +13,7 @@
 
 .sapUxAPObjectPageHeaderIdentifierTitleInContent,
 .sapUxAPObjectPageHeaderIdentifierSubTitleInContent {
-	color: @sapUiGroupTitleTextColor;
+	color: var(--sapGroup_TitleTextColor);
 }
 
 .sapUxAPObjectPageHeaderIdentifier .sapUxAPObjectPageHeaderObjectImageForce .sapUxAPObjectPageHeaderObjectImage,
@@ -22,12 +22,14 @@
 }
 
 html .sapUxAPObjectPageLayout-Std-Desktop, html .sapUxAPObjectPageLayout-Std-Tablet {
+
 	.sapUxAPObjectPageHeaderContent .sapUxAPObjectPageHeaderObjectImage-Circle .sapUxAPObjectPageHeaderObjectImage {
 		margin-right: 2rem;
 		margin-bottom: 1rem;
 		width: 5rem;
 		height: 5rem;
 	}
+
 	.sapUxAPObjectPageHeaderIdentifier .sapUxAPObjectPageHeaderObjectImageForce .sapUxAPObjectPageHeaderObjectImage,
 	.sapUxAPObjectPageHeaderStickied .sapUxAPObjectPageHeaderIdentifier .sapUxAPObjectPageHeaderObjectImage {
 		margin: 0.25rem 1rem 0.25rem 0;
@@ -41,15 +43,18 @@ html .sapUxAPObjectPageLayout-Std-Desktop, html .sapUxAPObjectPageLayout-Std-Tab
 
 .sapUxAPObjectPageLayout-Std-Tablet,
 .sapUxAPObjectPageLayout-Std-Desktop {
+
 	.sapUxAPObjectPageHeaderContentCellRight {
 		padding-right: 2rem;
 	}
+
 	.sapUxAPObjectPageHeaderContent:only-child {
 		padding: 1rem 2rem;
 	}
 }
 
 .sapUxAPObjectPageLayout-Std-Phone  {
+
 	.sapUxAPObjectPageHeaderContent:only-child {
 		padding: 1rem;
 	}
@@ -68,6 +73,7 @@ html .sapUxAPObjectPageLayout-Std-Desktop, html .sapUxAPObjectPageLayout-Std-Tab
 	}
 
 	> .sapUiSimpleForm {
+
 		.sapMText, .sapMLabel, .sapMLnk {
 			font-size: @sapMFontMediumSize;
 		}
@@ -75,12 +81,14 @@ html .sapUxAPObjectPageLayout-Std-Desktop, html .sapUxAPObjectPageLayout-Std-Tab
 }
 
 .sapUxAPObjectPageLayout:not(.sapUxAPObjectPageLayoutNoAnchorBar) {
+
 	.sapFDynamicPageHeader.sapFDynamicPageHeaderWithContent {
 		box-shadow: none;
 	}
-	.sapUxAPObjectPageNavigation:not(:empty):after {
-		content: "";
-		box-shadow: @sapUiFiori3AnchorBarShadow;
+
+	.sapUxAPObjectPageNavigation:not(:empty)::after {
+		content: '';
+		box-shadow: @_sap_uxap_ObjectPageHeaderContent_AnchorBarShadow;
 		pointer-events: none;
 		position: absolute;
 		height: 0.25rem;
@@ -88,6 +96,7 @@ html .sapUxAPObjectPageLayout-Std-Desktop, html .sapUxAPObjectPageLayout-Std-Tab
 		left: 0;
 		width: 100%;
 		z-index: 10;
+
 		&.sapUxAPObjectPageHeaderStickied {
 			box-shadow: none;
 		}

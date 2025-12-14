@@ -14,7 +14,6 @@
 		line-height: 1.5rem;
 	}
 
-
 	.sapUxAPObjectPageHeaderContentItem.sapFAvatar .sapFAvatarMagnifyingGlass,
 	.sapUxAPObjectPageHeaderContentItem .sapFAvatar .sapFAvatarMagnifyingGlass {
 		line-height: 0.8125rem;
@@ -32,9 +31,10 @@
 	.sapUxAPObjectPageHeaderSeparatorContainer {
 		position: relative;
 		margin-right: 4rem;
+
 		.sapUxAPObjectPageHeaderSeparatorBefore {
 			width: 1px;
-			background-color: @sapUiToolbarSeparatorColor;
+			background-color: var(--sapToolbar_SeparatorColor);
 			display: inline-block;
 			position: absolute;
 			top: 0;
@@ -42,9 +42,10 @@
 			margin-right: 1rem;
 			left: -2rem;
 		}
+
 		.sapUxAPObjectPageHeaderSeparatorAfter {
 			width: 1px;
-			background-color: @sapUiToolbarSeparatorColor;
+			background-color: var(--sapToolbar_SeparatorColor);
 			display: inline-block;
 			position: absolute;
 			top: 0;
@@ -54,20 +55,26 @@
 		}
 	}
 
-	&, > .sapUxAPObjectPageHeaderSeparatorContainer, > .sapUxAPObjectPageHeaderWidthContainer {
+	&,
+	> .sapUxAPObjectPageHeaderSeparatorContainer,
+	> .sapUxAPObjectPageHeaderWidthContainer {
+
 		.sapUiVlt .sapUiVltCell {
 			> * {
 				line-height: normal;
 			}
 		}
+
 		.sapUiHLayoutChildWrapper {
 			min-height: 2rem;
 			min-width: 2rem;
+
 			& > .sapMImg {
 				vertical-align: middle;
 
 			}
 		}
+
 		> .sapUiSimpleForm {
 
 			.sapUiFormResLayout > div {
@@ -80,16 +87,18 @@
 			}
 
 			.sapMText, .sapMLabel, .sapMLnk {
-				font-family: @sapUiFontFamily;
+				font-family: var(--sapFontFamily);
 				font-weight: normal;
 				height: 1.5rem;
 				line-height: 1.5rem;
 			}
 		}
+
 		.sapMOH {
 			margin: 0;
 			padding: 0;
 			line-height: inherit;
+
 			.sapMOHTitleArrow {
 				right: 0.5rem;
 				margin-left: 0;
@@ -111,13 +120,11 @@
 		}
 
 		/* ProgressIndicator has display flex, but OPHeaderContent override it by setting display inline-block
-		* for each content entry to order the entries horizontally.
-		* In order to keep the display flex behaviour of the PI and the inline-block behaviour inside OPHeaderContent,
-		* we use inline-flex.
-		* NOTE: It`s needed in case PI is direct child of OPHeaderContent only.
-		*/
+		for each content entry to order the entries horizontally.
+		In order to keep the display flex behaviour of the PI and the inline-block behaviour inside OPHeaderContent,
+		we use inline-flex.
+		NOTE: It`s needed in case PI is direct child of OPHeaderContent only. */
 		> .sapMPI {
-			display: -webkit-inline-flex;
 			display: inline-flex;
 			margin-top: 0.25rem;
 		}
@@ -127,6 +134,7 @@
 			height: 1rem;
 			position: relative;
 			margin-bottom: 1rem;
+
 			.sap-phone & {
 				width: 100% !important;
 			}
@@ -172,6 +180,7 @@ html .sapUiContainer-Narrow .sapUxAPObjectPageHeaderContent {
 
 /* content separators */
 .sapUxAPObjectPageHeaderDetailsDesign-Dark .sapUxAPObjectPageHeaderSeparatorContainer {
+
 	.sapUxAPObjectPageHeaderSeparatorBefore,
 	.sapUxAPObjectPageHeaderSeparatorAfter {
 		background-color: transparent;
@@ -201,14 +210,6 @@ html .sapUiContainer-Narrow .sapUxAPObjectPageHeaderContentImageContainer .sapMI
 .sapUxAPObjectPageHeaderContentImageContainer > .sapMImg.sapUxAPObjectPageHeaderObjectImage.sapMNoImg {
 	display: none;
 	margin: 0;
-}
-
-/* In this particular case disply none doesn't work corectly in the current version of chrome (43.0.2357.132) */
-html[data-sap-ui-browser^="cr4"] .sapUxAPObjectPageHeaderContentImageContainer > .sapMImg.sapUxAPObjectPageHeaderObjectImage.sapMNoImg {
-	width: 0;
-	height: 0;
-	border: none;
-	display: inline-block;
 }
 
 .sapUxAPObjectPageHeaderLayoutTitleContainer {
@@ -271,7 +272,6 @@ html .sapUiContainer-Narrow .sapUxAPObjectPageHeaderContent .sapUxAPObjectPageHe
 }
 
 .sapUxAPObjectPageHeaderContentFlexBox {
-	display: -webkit-box; /* OLD - iOS 6-, Safari 3.1-6 */
 	display: flex;
 }
 
@@ -297,5 +297,5 @@ html .sapUiContainer-Narrow .sapUxAPObjectPageHeaderContent .sapUxAPObjectPageHe
 
 .sapUxAPObjectPageHeaderContentDesign-Light,
 .sapUxAPObjectPageHeaderContentDesign-Dark {
-	background-color: @sapUiObjectHeaderBackground;
+	background-color: var(--sapObjectHeader_Background);
 }
