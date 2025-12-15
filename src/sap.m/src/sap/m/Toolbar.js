@@ -352,6 +352,20 @@ function(
 		}
 	};
 
+	/**
+	 * @returns {Array} Toolbar interactive, visible and enabled Controls that should be included in the arrow navigation
+	 * @private
+	 */
+	Toolbar.prototype._getToolbarNavigatableControls = function () {
+		return this._getToolbarInteractiveControls().filter(function (oControl) {
+			var oDomRef = oControl.getDomRef(),
+				bDomVisible = oDomRef && oDomRef.offsetParent !== null,
+				bEnabled = (typeof oControl.getEnabled !== "function" || oControl.getEnabled() !== false);
+
+			return bDomVisible && bEnabled;
+		});
+	};
+
 	Toolbar.prototype._handleKeyNavigation = function(oEvent) {
 		const focusedElement = document.activeElement;
 		const toolbarDom = this.getDomRef();
@@ -398,7 +412,7 @@ function(
 	};
 
 	Toolbar.prototype._moveFocus = function(sDirection, oEvent) {
-		var aFocusableElements = this._getToolbarInteractiveControls(),
+		var aFocusableElements = this._getToolbarNavigatableControls(),
 			oActiveElement = Toolbar._getActiveElement(),
 			oActiveDomElement = document.activeElement;
 
@@ -409,9 +423,9 @@ function(
 			bIsFirst = this._isFirst(sDirection, iCurrentIndex),
 			bIsLast = this._isLast(sDirection, iCurrentIndex, aFocusableElements);
 
-			if (this._shouldAllowDefaultBehavior(oActiveDomElement, oActiveElement, oEvent)) {
-				return;
-			}
+		if (this._shouldAllowDefaultBehavior(oActiveDomElement, oActiveElement, oEvent)) {
+			return;
+		}
 
 		// Handle specific behaviour for the input based controls
 		if (this._isInputBasedControl(oActiveDomElement, oActiveElement, oEvent)) {
@@ -662,7 +676,7 @@ function(
 			return oControl.getVisible()
 				&& oControl.isA("sap.m.IToolbarInteractiveControl")
 				&& typeof (oControl._getToolbarInteractive) === "function" && oControl._getToolbarInteractive();
-		});
+		}, this);
 	};
 
 	Toolbar.prototype._getActiveButton = function() {
