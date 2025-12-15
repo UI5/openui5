@@ -5944,6 +5944,100 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
+	// Scenario: A late property is requested for an equipment item from a table, then the context
+	// is changed to a different employee. The equipment context from the table is a keep alive
+	// context and is refreshed. The late property is edited afterwards. Check that the correct
+	// PATCH request is sent.
+	// SNOW: DINC0649002
+	QUnit.test("SNOW: DINC0649002", async function (assert) {
+		const oModel = this.createTeaBusiModel({autoExpandSelect : true});
+		const sView = `
+<FlexBox id="form" binding="{}">
+	<Text id="name" text="{Name}"/>
+	<Table id="equipments" items="{path : 'EMPLOYEE_2_EQUIPMENTS',
+			parameters : {$$ownRequest : true}}">
+		<Text id="category" text="{Category}"/>
+	</Table>
+</FlexBox>`;
+
+		this.expectChange("name")
+			.expectChange("category", []);
+
+		await this.createView(assert, sView, oModel);
+
+		this.expectRequest("EMPLOYEES('0')?$select=ID,Name", {ID : "0", Name : "Frederic Fall"})
+			.expectRequest("EMPLOYEES('0')/EMPLOYEE_2_EQUIPMENTS?$select=Category,ID"
+				+ "&$skip=0&$top=100", {value : [{Category : "Electronics", ID : 99}]})
+			.expectChange("name", "Frederic Fall")
+			.expectChange("category", ["Electronics"]);
+
+		const oForm = this.oView.byId("form");
+		oForm.setBindingContext(oModel.createBindingContext("/EMPLOYEES('0')"));
+
+		await this.waitForChanges(assert, "resolve binding");
+
+		this.expectRequest("EMPLOYEES('0')/EMPLOYEE_2_EQUIPMENTS(Category='Electronics',ID=99)"
+				+ "?$select=EQUIPMENT_2_PRODUCT&$expand=EQUIPMENT_2_PRODUCT($select=ID,Name)", {
+				EQUIPMENT_2_PRODUCT : {
+					ID : 1,
+					Name : "Notebook Basic 15"
+				}
+			});
+
+		const [sName] = await Promise.all([
+			this.oView.byId("equipments").getItems()[0].getBindingContext()
+				.requestProperty("EQUIPMENT_2_PRODUCT/Name"),
+			this.waitForChanges(assert, "request late property")
+		]);
+
+		assert.strictEqual(sName, "Notebook Basic 15");
+
+		this.expectRequest("EMPLOYEES('1')?$select=ID,Name", {ID : "1", Name : "Jonathan Smith"})
+			.expectRequest("EMPLOYEES('1')/EMPLOYEE_2_EQUIPMENTS?$select=Category,ID"
+				+ "&$skip=0&$top=100", {
+				value : [
+					{Category : "Vehicle", ID : 59}
+				]
+			})
+			.expectChange("name", "Jonathan Smith")
+			.expectChange("category", ["Vehicle"]);
+
+		oForm.setBindingContext(oModel.createBindingContext("/EMPLOYEES('1')"));
+
+		await this.waitForChanges(assert, "change context");
+
+		this.expectRequest("EMPLOYEES('1')/EMPLOYEE_2_EQUIPMENTS(Category='Vehicle',ID=59)"
+				+ "?$select=Category,ID&$expand=EQUIPMENT_2_PRODUCT($select=ID,Name)", {
+				Category : "Vehicle",
+				ID : 59,
+				EQUIPMENT_2_PRODUCT : {
+					ID : 2,
+					Name : "VW Golf 2.0"
+				}
+			});
+
+		const oContext = this.oView.byId("equipments").getItems()[0].getBindingContext();
+		oContext.setKeepAlive(true);
+
+		await Promise.all([
+			// code under test
+			oContext.requestRefresh(),
+			this.waitForChanges(assert, "refresh")
+		]);
+
+		this.expectRequest({
+				method : "PATCH",
+				payload : {Name : "VW ID.Golf"},
+				url : "com.sap.gateway.default.iwbep.tea_busi_product.v0001.Container%2FProducts(2)"
+			}, {});
+
+		await Promise.all([
+			oContext.setProperty("EQUIPMENT_2_PRODUCT/Name", "VW ID.Golf"),
+			this.waitForChanges(assert, "patch")
+		]);
+	});
+
+	//*********************************************************************************************
 	// Refresh a single row that has been removed in between. Check the bound message of the error
 	// response.
 	QUnit.test("Context#refresh() error messages", function (assert) {
