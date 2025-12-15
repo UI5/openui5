@@ -87,7 +87,7 @@ sap.ui.define([
 				return oEvent.stopImmediatePropagation(true);
 			}
 			if (oEvent.srcControl === this || !jQuery(oEvent.target).is(":sapFocusable")) {
-				this.getParent().focus();
+				this.getParent().focus({ preventScroll: true });
 			}
 		}
 	});
