@@ -4018,5 +4018,15 @@
         "text": " We've now fixed the SAP gateway issues for PDFViewer"
       }
     ]
+  },
+  "1.71.75": {
+    "date": "December 2025",
+    "notes": [
+      {
+        "id": "38d765b3c99bf933d147cf628e017286cf304aaa",
+        "type": "FIX",
+        "text": " We now trigger a fetch call to load PDF content and determine PDF availability in the PDFViewer"
+      }
+    ]
   }
 }
