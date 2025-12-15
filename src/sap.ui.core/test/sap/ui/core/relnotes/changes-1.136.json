@@ -363,5 +363,15 @@
         "text": " sap/ui/thirdparty: bump RequireJS to 2.3.7"
       }
     ]
+  },
+  "1.136.10": {
+    "date": "December 2025",
+    "notes": [
+      {
+        "id": "ce9b2513885438cb38372108252ae970ff24a578",
+        "type": "FIX",
+        "text": " sap/base/security/sanitizeHTML: Add support for modern CSS display values"
+      }
+    ]
   }
 }

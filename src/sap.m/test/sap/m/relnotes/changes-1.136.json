@@ -493,5 +493,20 @@
         "text": " sap.m.DatePicker: close picker on context change"
       }
     ]
+  },
+  "1.136.10": {
+    "date": "December 2025",
+    "notes": [
+      {
+        "id": "c7bdac5ff6a823e268ab6290c634a69bbaf0ac5b",
+        "type": "FIX",
+        "text": " We now trigger a fetch call to load PDF content and determine PDF availability in the PDFViewer"
+      },
+      {
+        "id": "fba83dfa3ea9054192f130ff431636924fbe9620",
+        "type": "FIX",
+        "text": " sap.m.SplitContainer: Fixed box-shadow parameter"
+      }
+    ]
   }
 }

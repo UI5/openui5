@@ -103,5 +103,15 @@
         "text": " Table: Remove renderWhitespace restriction"
       }
     ]
+  },
+  "1.136.10": {
+    "date": "December 2025",
+    "notes": [
+      {
+        "id": "180b3341f7152db33a68bf346a8eeeb973d2d3b6",
+        "type": "FIX",
+        "text": " Field: if ComboBox-Like wrong accessibility info"
+      }
+    ]
   }
 }

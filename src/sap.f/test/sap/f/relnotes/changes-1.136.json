@@ -33,5 +33,15 @@
         "text": " sap.f.DynamicPage: Header visibility issue fixed"
       }
     ]
+  },
+  "1.136.10": {
+    "date": "December 2025",
+    "notes": [
+      {
+        "id": "501f15c790cb6834d7a426d47452679d1e73f393",
+        "type": "FIX",
+        "text": " sap.f.DynamicPage: Correct header repositioning in both directions"
+      }
+    ]
   }
 }

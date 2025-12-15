@@ -123,5 +123,15 @@
         "text": " sap.uxap.ObjectPageSubSection: prevent infinite rerendering loop"
       }
     ]
+  },
+  "1.136.10": {
+    "date": "December 2025",
+    "notes": [
+      {
+        "id": "34f3fa5da73d2e7a442d9f7318e82bc320babf52",
+        "type": "FIX",
+        "text": " sap.uxap.ObjectPageLayout: Fix wrong title in AnchorBar"
+      }
+    ]
   }
 }
