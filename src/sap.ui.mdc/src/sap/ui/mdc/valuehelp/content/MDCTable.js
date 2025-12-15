@@ -162,7 +162,8 @@ sap.ui.define([
 				}.bind(this),
 				modifySelection: function (oItem, bSelected) {
 					var oContext = this._getListItemBindingContext(oItem);
-					var iContextIndex = MDCTableHelperConfig["Table"].getContexts().indexOf(oContext);
+                                        //SNOW: CS20250011089825 - odata/v4/Context/getIndex provides the necessary model index in large dataset scenarios
+					var iContextIndex = oContext.getIndex ? oContext.getIndex() : MDCTableHelperConfig["Table"].getContexts().indexOf(oContext);
 					var bInSelectedIndices = _getUITableSelectionHandler().getSelectedIndices().indexOf(iContextIndex) >= 0;
 					if (bSelected && !bInSelectedIndices) {
 						return this._isSingleSelect() ? _getUITableSelectionHandler().setSelectedIndex(iContextIndex) : _getUITableSelectionHandler().addSelectionInterval(iContextIndex,iContextIndex);
