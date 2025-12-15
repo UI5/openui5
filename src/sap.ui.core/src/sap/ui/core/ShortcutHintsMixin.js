@@ -492,11 +492,6 @@ sap.ui.define([
 			}
 
 			if (checkMouseEnterOrLeave(oEvent, oShortcutHintRefs[0].ref)) {
-				// do not hide if the element is focused
-				if (oShortcutHintRefs[0].ref.contains(document.activeElement)) {
-					return;
-				}
-
 				// remove the native tooltip that was set onmouseover
 				if (oShortcutHintRefs[0].ref.getAttribute('title') === '') {
 					oShortcutHintRefs[0].ref.removeAttribute('title');
