@@ -508,5 +508,20 @@
         "text": " sap.m.SplitContainer: Fixed box-shadow parameter"
       }
     ]
+  },
+  "1.136.11": {
+    "date": "December 2025",
+    "notes": [
+      {
+        "id": "d81a8fa55de42e4a0cd41d9fab7d56becfba6483",
+        "type": "FIX",
+        "text": " sap.m.ViewSettingsDialog: Remove redundant announcements from sort and group list items"
+      },
+      {
+        "id": "75d3a164570e80c45bab9c05d4113b4f65572c5a",
+        "type": "FIX",
+        "text": " sap.m.Toolbar: exclude disabled controls from Toolbar navigation"
+      }
+    ]
   }
 }
