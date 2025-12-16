@@ -109,6 +109,7 @@ sap.ui.define([
 	 * @private
 	 * @ui5-restricted
 	 * @interface
+	 * @name sap.ui.fl.interfaces.Delegate
 	 */
 	return /** @lends sap.ui.fl.interfaces.Delegate */ {
 		/**

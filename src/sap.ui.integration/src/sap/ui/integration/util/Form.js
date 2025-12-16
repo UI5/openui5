@@ -158,14 +158,12 @@ sap.ui.define([
 			ComboBoxHelper.setValueAndKey(oControl, oFormControlData.key, oFormControlData.value);
 		} else if (oControl.isA("sap.m.RadioButtonGroup")) {
 			RadioButtonHelper.setSelectedIndexAndKey(oControl, oFormControlData.selectedIndex, oFormControlData.key);
-		} else if (vValue) {
-			if (oControl.isA("sap.m.DatePicker") || oControl.isA("sap.m.DynamicDateRange")) {
-				DateRangeHelper.setValue(oControl, vValue, this._oCard);
-			} else if (oControl.isA("sap.m.TimePicker")) {
-				oControl.setValue(Duration.fromISO(vValue));
-			} else {
-				oControl.setValue(vValue);
-			}
+		} else if (oControl.isA("sap.m.DatePicker") || oControl.isA("sap.m.DynamicDateRange")) {
+			DateRangeHelper.setValue(oControl, vValue, this._oCard);
+		} else if (oControl.isA("sap.m.TimePicker")) {
+			oControl.setValue(Duration.fromISO(vValue));
+		} else {
+			oControl.setValue(vValue);
 		}
 
 		this._validateAndUpdate(oControl);
@@ -236,12 +234,22 @@ sap.ui.define([
 		}
 
 		if (oControl.isA("sap.m.ComboBox")) {
-			if ("value" in oData || "key" in oData) {
-				return true;
+			if (!("value" in oData) && !("key" in oData)) {
+				Log.error("Form data for control ID - '" + sId + "' requires properties 'key' or 'value'." , "sap.ui.integration.widgets.Card");
+				return false;
+			}
+		}
+
+		if (oControl.isA("sap.m.DatePicker") || oControl.isA("sap.m.DynamicDateRange")) {
+			if (!("value" in oData)) {
+				Log.error("Form data for control ID - '" + sId + "' is missing property 'value'." , "sap.ui.integration.widgets.Card");
+				return false;
 			}
 
-			Log.error("Form data for control ID - '" + sId + "' requires properties 'key' or 'value'." , "sap.ui.integration.widgets.Card");
-			return false;
+			if (oData.value !== null && (!("option" in oData.value) || !("values" in oData.value))) {
+				Log.error("Form data for control ID - '" + sId + "' requires property 'value' to contain 'option' and 'values'." , "sap.ui.integration.widgets.Card");
+				return false;
+			}
 		}
 
 		if (oControl.isA("sap.m.RadioButtonGroup")) {

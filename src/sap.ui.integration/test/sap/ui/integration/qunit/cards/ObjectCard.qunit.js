@@ -936,62 +936,6 @@ sap.ui.define([
 		}
 	};
 
-	var oManifest_ObjectCardFormControlsPublicAPI = {
-		"sap.app": {
-			"id": "test.cards.object.card5change"
-		},
-		"sap.card": {
-			"type": "Object",
-			"content": {
-				"groups": [
-					{
-						"items": [
-							{
-								"id": "i1",
-								"type": "TextArea",
-								"validations": [
-									{
-										"required": true
-									}
-								]
-							},
-							{
-								"id": "i2",
-								"type": "Input",
-								"validations": [
-									{
-										"required": true
-									},
-									{
-										"minLength": 10
-									}
-								]
-							},
-							{
-								"id": "i3",
-								"type": "DateRange",
-								"validations": [
-									{
-										"required": true
-									}
-								]
-							},
-							{
-								"id": "i4",
-								"type": "Duration",
-								"validations": [
-									{
-										"required": true
-									}
-								]
-							}
-						]
-					}
-				]
-			}
-		}
-	};
-
 	var oManifest_ObjectCard_showColon = {
 		"sap.app": {
 			"id": "test.cards.object.card6",
@@ -2918,27 +2862,155 @@ sap.ui.define([
 		assert.strictEqual(this.oCard.getModel("form").getProperty("/i3").value, "a", "Value in model is updated");
 		assert.deepEqual(this.oCard.getModel("form").getProperty("/i4"), DateRangeHelper.getValueForModel(oDateRange), "Value in model is updated");
 		assert.strictEqual(this.oCard.getModel("form").getProperty("/i5"), "PT12H30M", "Value in model is updated");
+
+		// Act - set empty values
+		oInput.$("inner").val("").trigger("input");
+		oTextArea.$("inner").val("").trigger("input");
+		oComboBox.$("inner").val("");
+		oComboBox.fireEvent("change");
+		oDateRange.$().find("input").val("");
+		oDateRange.onChange();
+		oDuration.$().find("input").val("");
+		oDuration.onChange();
+
+		assert.strictEqual(this.oCard.getModel("form").getProperty("/i1"), "", "Value in model is updated");
+		assert.strictEqual(this.oCard.getModel("form").getProperty("/i2"), "", "Value in model is updated");
+		assert.strictEqual(this.oCard.getModel("form").getProperty("/i3").value, "", "Value in model is updated");
+		assert.deepEqual(this.oCard.getModel("form").getProperty("/i4"), DateRangeHelper.getValueForModel(oDateRange), "Value in model is updated");
+		assert.strictEqual(this.oCard.getModel("form").getProperty("/i5"), "PT0S", "Value in model is updated");
 	});
 
 	QUnit.test("Setting form data using public card API - invalid input", async function (assert) {
-		this.oCard.setManifest(oManifest_ObjectCardFormControlsPublicAPI);
+		this.oCard.setManifest({
+			"sap.app": {
+				"id": "test.cards.object.card5change"
+			},
+			"sap.card": {
+				"type": "Object",
+				"content": {
+					"groups": [
+						{
+							"items": [
+								{
+									"id": "textArea",
+									"type": "TextArea",
+									"validations": [
+										{
+											"required": true
+										}
+									]
+								},
+								{
+									"id": "input",
+									"type": "Input",
+									"validations": [
+										{
+											"required": true
+										},
+										{
+											"minLength": 10
+										}
+									]
+								},
+								{
+									"id": "dateRange",
+									"type": "DateRange",
+									"validations": [
+										{
+											"required": true
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
+		});
 
 		await nextCardReadyEvent(this.oCard);
 
 		// Act
 		this.oCard.setFormValues([
-			{ "id": "i1", "value": "some text" },
-			{ "id": "i2", "value": "too short" }
+			{ "id": "textArea", "value": "some text" },
+			{ "id": "input", "value": "too short" }
 		]);
 
 		// Assert
 		assert.strictEqual(this.oCard.getModel("messages").getProperty("/hasErrors"), true, "Form has errors");
-		assert.strictEqual(this.oCard.getModel("form").getProperty("/i1"), "some text", "Form model has value");
-		assert.strictEqual(this.oCard.getModel("form").getProperty("/i2"), "too short", "Form model has value");
+		assert.strictEqual(this.oCard.getModel("form").getProperty("/textArea"), "some text", "Form model has value");
+		assert.strictEqual(this.oCard.getModel("form").getProperty("/input"), "too short", "Form model has value");
 	});
 
 	QUnit.test("Setting form data using public card API - valid input", async function (assert) {
-		this.oCard.setManifest(oManifest_ObjectCardFormControlsPublicAPI);
+		this.oCard.setManifest({
+			"sap.app": {
+				"id": "test.cards.object.card5change"
+			},
+			"sap.card": {
+				"type": "Object",
+				"data": {
+					"json": {
+						"options": [
+							{
+								"id": "option1",
+								"title": "Option 1"
+							},
+							{
+								"id": "option2",
+								"title": "Option 2"
+							}
+						]
+					}
+				},
+				"content": {
+					"groups": [
+						{
+							"items": [
+								{
+									"id": "textArea",
+									"type": "TextArea"
+								},
+								{
+									"id": "input",
+									"type": "Input"
+								},
+								{
+									"id": "dateRange",
+									"type": "DateRange"
+								},
+								{
+									"id": "duration",
+									"type": "Duration"
+								},
+								{
+									"id": "comboBox",
+									"type": "ComboBox",
+									"item": {
+										"path": "/options",
+										"template": {
+											"key": "{id}",
+											"title": "{title}"
+										}
+									}
+								},
+								{
+									"id": "radioButtonGroup",
+									"type": "RadioButtonGroup",
+									"item": {
+										"path": "/options",
+										"template": {
+											"text": "{title}",
+											"key": "{id}"
+										}
+									}
+								}
+							]
+						}
+					]
+				}
+			}
+		});
 
 		await nextCardReadyEvent(this.oCard);
 
@@ -2946,18 +3018,88 @@ sap.ui.define([
 
 		// Act
 		this.oCard.setFormValues([
-			{ "id": "i1", "value": "some text" },
-			{ "id": "i2", "value": "some long text" },
-			{ "id": "i3", "value": { "option": "date", "values": ["2020-05-20"]} },
-			{ "id": "i4", "value": "PT12H30M" }
+			{ "id": "textArea", "value": "some text" },
+			{ "id": "input", "value": "some long text" },
+			{ "id": "dateRange", "value": { "option": "date", "values": ["2020-05-20"]} },
+			{ "id": "duration", "value": "PT12H30M" },
+			{ "id": "comboBox", "value": "some value" },
+			{ "id": "radioButtonGroup", "key": "option2" }
 		]);
 
 		// Assert
 		assert.strictEqual(this.oCard.getModel("messages").getProperty("/hasErrors"), false, "Form has no errors");
-		assert.strictEqual(this.oCard.getModel("form").getProperty("/i1"), "some text", "Form model has correct value for Input");
-		assert.strictEqual(this.oCard.getModel("form").getProperty("/i2"), "some long text", "Form model has correct value for TextArea");
-		assert.deepEqual(this.oCard.getModel("form").getProperty("/i3"), DateRangeHelper.getValueForModel(oDateRange), "Form model has correct value for DateRange");
-		assert.strictEqual(this.oCard.getModel("form").getProperty("/i4"), "PT12H30M", "Form model has correct value for Duration");
+		assert.strictEqual(this.oCard.getModel("form").getProperty("/textArea"), "some text", "Form model has correct value for Input");
+		assert.strictEqual(this.oCard.getModel("form").getProperty("/input"), "some long text", "Form model has correct value for TextArea");
+		assert.deepEqual(this.oCard.getModel("form").getProperty("/dateRange"), DateRangeHelper.getValueForModel(oDateRange), "Form model has correct value for DateRange");
+		assert.strictEqual(this.oCard.getModel("form").getProperty("/duration"), "PT12H30M", "Form model has correct value for Duration");
+		assert.deepEqual(
+			this.oCard.getModel("form").getProperty("/comboBox"),
+			{
+				key: "",
+				value: "some value"
+			},
+			"Form model has correct value for ComboBox"
+		);
+		assert.deepEqual(
+			this.oCard.getModel("form").getProperty("/radioButtonGroup"),
+			{
+				"selectedIndex": 1,
+				"selectedKey": "option2",
+				"selectedText": null
+			},
+			"Form model has correct value for RadioButtonGroup"
+		);
+
+		// Act
+		this.oCard.setFormValues([
+			{ "id": "textArea", "value": "" },
+			{ "id": "input", "value": "" },
+			{ "id": "dateRange", "value": { "option": null, "values": null} },
+			{ "id": "duration", "value": "" },
+			{ "id": "comboBox", "value": "" }
+		]);
+
+		// Assert
+		assert.strictEqual(this.oCard.getModel("messages").getProperty("/hasErrors"), false, "Form has no errors");
+		assert.strictEqual(this.oCard.getModel("form").getProperty("/textArea"), "", "Form model has correct value for Input");
+		assert.strictEqual(this.oCard.getModel("form").getProperty("/input"), "", "Form model has correct value for TextArea");
+		assert.deepEqual(
+			this.oCard.getModel("form").getProperty("/dateRange"),
+			{
+				range: undefined,
+				rangeOData: undefined,
+				value: undefined
+			},
+			"Form model has correct value for DateRange"
+		);
+		assert.strictEqual(this.oCard.getModel("form").getProperty("/duration"), "PT0S", "Form model has correct value for Duration");
+		assert.deepEqual(
+			this.oCard.getModel("form").getProperty("/comboBox"),
+			{
+				key: "",
+				value: ""
+			},
+			"Form model has correct value for ComboBox"
+		);
+
+		// Act - set DateRange to null value
+		this.oCard.setFormValues([
+			{ "id": "dateRange", "value": { "option": "date", "values": ["2020-05-20"]} }
+		]);
+		this.oCard.setFormValues([
+			{ "id": "dateRange", "value": null }
+		]);
+
+		// Assert
+		assert.deepEqual(
+			this.oCard.getModel("form").getProperty("/dateRange"),
+			{
+				range: undefined,
+				rangeOData: undefined,
+				value: undefined
+			},
+			"Form model has correct value for DateRange after setting null value"
+		);
 	});
 
 	QUnit.test("Verifying RadioButtonGroup properties and bindings", async function (assert) {
@@ -3746,6 +3888,62 @@ sap.ui.define([
 
 			done();
 		});
+	});
+
+	QUnit.test("Image properties (imageFit, imagePosition, height) work correctly when bound to data", async function (assert) {
+		// Arrange
+		this.oCard.setManifest({
+			"sap.app": {
+				"id": "test.cards.object.imagePropertiesBound",
+				"type": "card"
+			},
+			"sap.card": {
+				"type": "Object",
+				"data": {
+					"json": {
+						"fit": "contain",
+						"position": "center",
+						"height": "200px",
+						"src": "images/grass.jpg"
+					}
+				},
+				"header": {
+					"title": "Test Image Properties with Data Binding"
+				},
+				"content": {
+					"groups": [
+						{
+							"alignment": "Stretch",
+							"items": [
+								{
+									"type": "Image",
+									"src": "{/src}",
+									"fullWidth": true,
+									"height": "{/height}",
+									"imageFit": "{/fit}",
+									"imagePosition": "{/position}"
+								}
+							]
+						}
+					]
+				}
+			}
+		});
+
+		// Act
+		await nextCardReadyEvent(this.oCard);
+		await nextUIUpdate();
+
+		const oObjectContent = this.oCard.getAggregation("_content");
+		const oContent = oObjectContent.getAggregation("_content");
+		const oImage = oContent.getItems()[0].getItems()[0];
+
+		// Assert
+		assert.ok(oImage.isA("sap.m.Image"), "Image control is created");
+		assert.strictEqual(oImage.getHeight(), "200px", "height property is correctly bound and resolved");
+		assert.strictEqual(oImage.getBackgroundSize(), "contain", "imageFit property is correctly bound and resolved");
+		assert.strictEqual(oImage.getBackgroundPosition(), "center", "imagePosition property is correctly bound and resolved");
+		assert.strictEqual(oImage.getMode(), "Background", "Image mode is set to 'Background' when imageFit or imagePosition is used");
 	});
 
 	QUnit.module("Test deprecated image overlay subTitle", {

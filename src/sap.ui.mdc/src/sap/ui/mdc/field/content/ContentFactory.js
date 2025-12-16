@@ -30,7 +30,7 @@ sap.ui.define([
 
 	/**
 	 * Object-based factory that handles the content creation process of the {@link sap.ui.mdc.field.FieldBase}.
-	 * @namespace
+	 * @class
 	 * @author SAP SE
 	 * @private
 	 * @ui5-restricted sap.ui.mdc.field.FieldBase

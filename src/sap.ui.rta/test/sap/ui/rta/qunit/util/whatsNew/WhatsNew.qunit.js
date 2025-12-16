@@ -287,6 +287,127 @@ sap.ui.define([
 				"then the setSeenFeatureIds function is called with the correct parameters"
 			);
 		});
+
+		QUnit.test("When the dialog is closed and the don't show again checkbox is not checked but with excluded features", async function(assert) {
+			const sLayer = "CUSTOMER";
+			const oSetSeenFeatureIdsSpy = sandbox.spy(FeaturesAPI, "setSeenFeatureIds");
+			const aExcludedFeatures = ["excludedFeature1"];
+
+			this.oWhatsNew = new WhatsNew({ layer: sLayer });
+			sandbox.stub(WhatsNewUtils, "getFilteredFeatures").returns(aFeatureCollection);
+			await this.oWhatsNew.initializeWhatsNewDialog([], aExcludedFeatures);
+
+			this.oWhatsNewDialog = Element.getElementById("sapUiRtaWhatsNewDialog");
+			await nextUIUpdate();
+
+			const oDontShowAgainCheckbox = Element.getElementById("whatsNewDialog_DontShowAgain");
+			assert.notOk(oDontShowAgainCheckbox.getSelected(), "checkbox is not selected");
+
+			this.oWhatsNew.closeWhatsNewDialog();
+			await nextUIUpdate();
+
+			assert.ok(oSetSeenFeatureIdsSpy.calledOnce, "then setSeenFeatureIds is called once");
+			assert.deepEqual(
+				oSetSeenFeatureIdsSpy.lastCall.args[0],
+				{ layer: sLayer, seenFeatureIds: aExcludedFeatures },
+				"then setSeenFeatureIds is called with excluded feature IDs only"
+			);
+		});
+
+		QUnit.test("When the dialog is closed with duplicate feature IDs in dontShowAgain and excluded features", async function(assert) {
+			const sLayer = "CUSTOMER";
+			const oSetSeenFeatureIdsSpy = sandbox.spy(FeaturesAPI, "setSeenFeatureIds");
+			const aDontShowAgainIds = ["feature1", "feature2"];
+			const aExcludedFeatures = ["feature2", "feature3"]; // feature2 is duplicate
+
+			this.oWhatsNew = new WhatsNew({ layer: sLayer });
+			sandbox.stub(WhatsNewUtils, "getFilteredFeatures").returns(aFeatureCollection);
+			await this.oWhatsNew.initializeWhatsNewDialog(aDontShowAgainIds, aExcludedFeatures);
+
+			this.oWhatsNewDialog = Element.getElementById("sapUiRtaWhatsNewDialog");
+			await nextUIUpdate();
+
+			const oDontShowAgainCheckbox = Element.getElementById("whatsNewDialog_DontShowAgain");
+			assert.notOk(oDontShowAgainCheckbox.getSelected(), "checkbox is not selected");
+
+			this.oWhatsNew.closeWhatsNewDialog();
+			await nextUIUpdate();
+
+			assert.ok(oSetSeenFeatureIdsSpy.calledOnce, "then setSeenFeatureIds is called once");
+			const aActualSeenIds = oSetSeenFeatureIdsSpy.lastCall.args[0].seenFeatureIds;
+
+			// Check that duplicates are removed
+			const aExpectedUniqueIds = ["feature1", "feature2", "feature3"];
+			assert.deepEqual(
+				aActualSeenIds,
+				aExpectedUniqueIds,
+				"then setSeenFeatureIds is called with deduplicated feature IDs"
+			);
+			assert.strictEqual(
+				aActualSeenIds.length,
+				3,
+				"then only 3 unique feature IDs are present (not 4 with duplicate)"
+			);
+		});
+
+		QUnit.test("When the dialog is closed with 'don't show again' checked and excluded features", async function(assert) {
+			const sLayer = "CUSTOMER";
+			const oSetSeenFeatureIdsSpy = sandbox.spy(FeaturesAPI, "setSeenFeatureIds");
+			const aDontShowAgainIds = ["alreadySeen1"];
+			const aExcludedFeatures = ["excludedFeature1"];
+
+			this.oWhatsNew = new WhatsNew({ layer: sLayer });
+			sandbox.stub(WhatsNewUtils, "getFilteredFeatures").returns(aFeatureCollection);
+			await this.oWhatsNew.initializeWhatsNewDialog(aDontShowAgainIds, aExcludedFeatures);
+
+			// Get the unseen features after exclusion
+			const aUnseenFeatureIds = this.oWhatsNew.aUnseenFeatures.map((oFeature) => oFeature.featureId);
+			const aExpectedSeenFeatureIds = [...aDontShowAgainIds, ...aExcludedFeatures, ...aUnseenFeatureIds];
+
+			this.oWhatsNewDialog = Element.getElementById("sapUiRtaWhatsNewDialog");
+			await nextUIUpdate();
+
+			const oDontShowAgainCheckbox = Element.getElementById("whatsNewDialog_DontShowAgain");
+			oDontShowAgainCheckbox.setSelected(true);
+
+			this.oWhatsNew.closeWhatsNewDialog();
+			await nextUIUpdate();
+
+			assert.ok(oSetSeenFeatureIdsSpy.calledOnce, "then setSeenFeatureIds is called once");
+			assert.deepEqual(
+				oSetSeenFeatureIdsSpy.lastCall.args[0],
+				{ layer: sLayer, seenFeatureIds: aExpectedSeenFeatureIds },
+				"then setSeenFeatureIds is called with all feature IDs (don't show again + excluded + unseen)"
+			);
+		});
+
+		QUnit.test("When the only unseen features are excluded and dialog should not open but excluded features should be saved", async function(assert) {
+			const sLayer = "CUSTOMER";
+			const oSetSeenFeatureIdsSpy = sandbox.spy(FeaturesAPI, "setSeenFeatureIds");
+			const aDontShowAgainIds = ["onlyText", "onlyImage", "text&Image"];
+			const aExcludedFeatures = ["text&Image", "twoText1Img"];
+
+			this.oWhatsNew = new WhatsNew({ layer: sLayer });
+			const aFilteredFeatures = aFeatureCollection.slice(2, 4);
+			sandbox.stub(WhatsNewUtils, "getFilteredFeatures").returns(aFilteredFeatures);
+
+			await this.oWhatsNew.initializeWhatsNewDialog(aDontShowAgainIds, aExcludedFeatures);
+
+			this.oWhatsNewDialog = Element.getElementById("sapUiRtaWhatsNewDialog");
+			await nextUIUpdate();
+
+			assert.notOk(this.oWhatsNewDialog, "then the dialog is not opened");
+			assert.ok(oSetSeenFeatureIdsSpy.calledOnce, "then setSeenFeatureIds is called once");
+
+			const aActualSeenIds = oSetSeenFeatureIdsSpy.lastCall.args[0].seenFeatureIds;
+			const aExpectedSeenIds = ["onlyText", "onlyImage", "text&Image", "twoText1Img"];
+
+			assert.deepEqual(
+				aActualSeenIds,
+				aExpectedSeenIds,
+				"then setSeenFeatureIds is called with only the excluded features that were actually in the unseen list"
+			);
+		});
 	});
 
 	QUnit.done(function() {

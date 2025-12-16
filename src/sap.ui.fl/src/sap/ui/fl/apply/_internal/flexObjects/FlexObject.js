@@ -27,9 +27,6 @@ sap.ui.define([
 	"use strict";
 
 	/**
-	 * @type {sap.ui.fl.apply._internal.flexObjects.FlexObject.FlexObjectMetadata}
-	 * @static
-	 * @constant
 	 * @typedef {object} sap.ui.fl.apply._internal.flexObjects.FlexObject.FlexObjectMetadata
 	 * @property {string} changeType - Type of the flexObject
 	 * @property {string} reference - Flexibility reference of the app
@@ -43,9 +40,6 @@ sap.ui.define([
 	 */
 
 	/**
-	 * @type {sap.ui.fl.apply._internal.flexObjects.FlexObject.SupportInformation}
-	 * @static
-	 * @constant
 	 * @typedef {object} sap.ui.fl.apply._internal.flexObjects.FlexObject.SupportInformation
 	 * @property {string} generator - Tool that is used to generate the flex object file
 	 * @property {string} service - Name of the OData service

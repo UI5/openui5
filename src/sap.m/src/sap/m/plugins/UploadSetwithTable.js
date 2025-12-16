@@ -187,7 +187,7 @@ sap.ui.define([
 				 * @property {string} characters The file name validation configuration characters.
 				 * <br> <br> The default restricted filename character set is: \:/*?"<>|[]{}@#$
 				 * @public
-				 * @since since 1.136
+				 * @since 1.136
 				**/
 
 				/**

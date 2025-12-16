@@ -77,8 +77,20 @@ sap.ui.define([
 			return;
 		}
 		const oWhatsNewDialogModel = new JSONModel();
+		this.aExcludeFeatureIds = aExcludeFeatureIds;
+
+		const aUnfilteredUnseenFeatureIds = this.aUnseenFeatures.map((oFeature) => oFeature.featureId);
+
 		this.aUnseenFeatures = this.aUnseenFeatures.filter((oFeature) => !aExcludeFeatureIds.includes(oFeature.featureId));
+
 		if (this.aUnseenFeatures.length === 0) {
+			// check if there are excluded features that were not seen before, if yes save them as seen features
+			const aFilteredOutFeatureIds = aUnfilteredUnseenFeatureIds.filter((sId) => aExcludeFeatureIds.includes(sId));
+			if (aFilteredOutFeatureIds.length > 0) {
+				const aNewSeenFeatureIds = [...new Set([...this.getDontShowAgainFeatureIds(), ...aFilteredOutFeatureIds])];
+				FeaturesAPI.setSeenFeatureIds({ layer: this.getLayer(), seenFeatureIds: aNewSeenFeatureIds });
+			}
+
 			return;
 		}
 		oWhatsNewDialogModel.setData({ featureCollection: this.aUnseenFeatures });
@@ -111,12 +123,25 @@ sap.ui.define([
 	WhatsNew.prototype.closeWhatsNewDialog = function() {
 		if (this.oWhatsNewDialog) {
 			const oDontShowAgainCheckbox = Element.getElementById("whatsNewDialog_DontShowAgain");
+
+			const oNewDontShowAgainSet = new Set([
+				...this.getDontShowAgainFeatureIds(),
+				...this.aExcludeFeatureIds
+			]);
+
 			if (oDontShowAgainCheckbox.getSelected()) {
-				const aUnseenFeatureIds = this.aUnseenFeatures.map((oUnseenFeature) => oUnseenFeature.featureId);
-				const aSeenFeatureIds = [...this.getDontShowAgainFeatureIds(), ...aUnseenFeatureIds];
-				const mPropertyBag = { layer: this.getLayer(), seenFeatureIds: aSeenFeatureIds };
-				FeaturesAPI.setSeenFeatureIds(mPropertyBag);
+				this.aUnseenFeatures.forEach((oUnseenFeature) => oNewDontShowAgainSet.add(oUnseenFeature.featureId));
 			}
+
+			const aNewDontShowAgainFeatureIds = [...oNewDontShowAgainSet];
+
+			if (aNewDontShowAgainFeatureIds.length > this.getDontShowAgainFeatureIds().length) {
+				FeaturesAPI.setSeenFeatureIds({
+					layer: this.getLayer(),
+					seenFeatureIds: aNewDontShowAgainFeatureIds
+				});
+			}
+
 			this.oWhatsNewDialog.close();
 		}
 	};

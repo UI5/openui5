@@ -2329,9 +2329,6 @@ sap.ui.define([
 			aAttributes.push(`aria-roledescription="${encodeXML(sAriaRoleDescription)}" `);
 		}
 
-		// Expanded state (always false for file input)
-		aAttributes.push('aria-expanded="false" ');
-
 		// Has popup (indicates file dialog will open)
 		aAttributes.push('aria-haspopup="dialog" ');
 

@@ -799,7 +799,7 @@ sap.ui.define([
 	 *
 	 * @param {string} sEdmType
 	 *   the EDM type
-	 * @returns {function}
+	 * @returns {function(any, any): int}
 	 *   the comparator function taking two values of the given type and returning <code>0</code>
 	 *   if the values are equal, <code>-1</code> if the first value is smaller, <code>1</code> if
 	 *   the first value is larger and <code>NaN</code> if they cannot be compared (e.g. one value
