@@ -466,9 +466,6 @@ function(
 		if (sSecondaryCalendarType){
 			this.setSecondaryCalendarTypeToPickers(sSecondaryCalendarType);
 		}
-
-		// Update label reference to ensure proper accessibility
-		this._updateViewSwitchLabelFor();
 	};
 
 	PlanningCalendarHeader.prototype.setTitle = function (sTitle) {
@@ -675,7 +672,10 @@ function(
 	PlanningCalendarHeader.prototype._updateViewSwitchLabelFor = function () {
 		var oViewSwitch = this._getOrCreateViewSwitch();
 		var oViewSwitchLabel = this._getOrCreateViewSwitchLabel();
-		var bIsSelectMode = oViewSwitch.hasStyleClass("sapMSegBSelectWrapper");
+
+		// Check if the SegmentedButton is in overflow mode (select mode)
+		// Use _bInOverflow property first, fallback to CSS class check for robustness
+		var bIsSelectMode = oViewSwitch._bInOverflow || oViewSwitch.hasStyleClass("sapMSegBSelectWrapper");
 
 		if (bIsSelectMode) {
 			// In select mode (overflow): show label and set labelFor to select element

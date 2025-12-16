@@ -54,7 +54,7 @@ sap.ui.define([
 	/**
 	 * Returns the type's name.
 	 *
-	 * @returns {string}
+	 * @returns {"sap.ui.model.odata.type.Int32"}
 	 *   the type's name
 	 * @public
 	 */
@@ -66,7 +66,7 @@ sap.ui.define([
 	 * Returns the type's supported range as object with properties <code>minimum</code> and
 	 * <code>maximum</code>.
 	 *
-	 * @returns {object} the range
+	 * @returns {{minimum: number, maximum: number}} the range
 	 * @protected
 	 */
 	Int32.prototype.getRange = function () {

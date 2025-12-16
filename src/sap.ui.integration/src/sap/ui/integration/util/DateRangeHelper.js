@@ -133,20 +133,29 @@ sap.ui.define([
 	};
 
 	DateRangeHelper.setValue = function (oControl, oValue, oCard) {
-		if (!oValue) {
+		let _oValue = oValue;
+
+		if (_oValue === null) {
+			_oValue = {
+				option: null,
+				values: null
+			};
+		}
+
+		if (!_oValue) {
 			return;
 		}
 
 		if (oControl.isA("sap.m.DatePicker")) {
-			if (oValue.values) {
-				oValue = oValue.values;
+			if ("values" in _oValue) {
+				_oValue = _oValue.values;
 			}
 
 			oControl.applySettings({
-				value: oValue
+				value: _oValue
 			});
 		} else {
-			var oResolvedValue = BindingResolver.resolveValue(oValue, oCard);
+			var oResolvedValue = BindingResolver.resolveValue(_oValue, oCard);
 			var sOption = oResolvedValue.option.toUpperCase();
 			var aTypes = oControl.getOption(sOption).getValueTypes();
 			oControl.setValue({

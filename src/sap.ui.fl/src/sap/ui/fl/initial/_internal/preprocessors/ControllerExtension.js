@@ -24,7 +24,7 @@ sap.ui.define([
 	/**
 	 * Provides the Controller Extensions to the ControllerExtensionProvider from the core
 	 *
-	 * @name sap.ui.fl.apply._internal.preprocessors.ControllerExtension
+	 * @name sap.ui.fl.initial._internal.preprocessors.ControllerExtension
 	 * @class
 	 * @constructor
 	 * @author SAP SE

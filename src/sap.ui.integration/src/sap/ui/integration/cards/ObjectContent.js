@@ -920,10 +920,12 @@ sap.ui.define([
 			height: oItem.height
 		});
 
-		if (oItem.imageFit || oItem.imagePosition) {
-			oImage.setMode(ImageMode.Background);
-			oImage.setBackgroundSize(oItem.imageFit);
-			oImage.setBackgroundPosition(oItem.imagePosition);
+		if (oItem.hasOwnProperty("imageFit") || oItem.hasOwnProperty("imagePosition")) {
+			oImage.applySettings({
+				mode: ImageMode.Background,
+				backgroundSize: oItem.imageFit,
+				backgroundPosition: oItem.imagePosition
+			});
 		}
 
 		if (oItem.overlay) {

@@ -392,7 +392,7 @@ function(
 		}, {
 			tooltip: {}
 		},{
-			type : ListType.Active
+			type : ListType.Inactive
 		}, {
 			mode : ListMode.SingleSelectLeft,
 			includeItemInSelection : true,
@@ -2140,7 +2140,6 @@ function(
 			// use name if there is no key defined
 			oListItem = new StandardListItem({
 				title : ManagedObject.escapeSettingsValue(aSubFilters[i].getText()),
-				type : ListType.Active,
 				selected : aSubFilters[i].getSelected(),
 				tooltip : aSubFilters[i].getTooltip(),
 				wrapping: aSubFilters[i].getWrapping()
@@ -2197,12 +2196,10 @@ function(
 		this._sortOrderList.addItemGroup(undefined, new GroupHeaderListItem({title: this._rb.getText("VIEWSETTINGS_SORT_BY")}));
 
 		this._sortOrderList.addItem(new StandardListItem({
-			title : this._rb.getText("VIEWSETTINGS_ASCENDING_ITEM"),
-			type : ListType.Active
+			title : this._rb.getText("VIEWSETTINGS_ASCENDING_ITEM")
 		}).data("item", false).setSelected(true));
 		this._sortOrderList.addItem(new StandardListItem({
-			title : this._rb.getText("VIEWSETTINGS_DESCENDING_ITEM"),
-			type : ListType.Active
+			title : this._rb.getText("VIEWSETTINGS_DESCENDING_ITEM")
 		}).data("item", true));
 
 		this._sortList.addAriaLabelledBy(this._sTitleLabelId);
@@ -2227,7 +2224,6 @@ function(
 				oListItem = new StandardListItem({
 					id: oItem.getId() + LIST_ITEM_SUFFIX,
 					title: ManagedObject.escapeSettingsValue(oItem.getText()),
-					type: ListType.Active,
 					selected: oItem.getSelected(),
 					tooltip : oItem.getTooltip(),
 					wrapping: oItem.getWrapping()
@@ -2257,7 +2253,6 @@ function(
 			oListItem = new StandardListItem({
 				id: this._oGroupingNoneItem.getId() + LIST_ITEM_SUFFIX,
 				title: this._oGroupingNoneItem.getText(),
-				type: ListType.Active,
 				selected: this._oGroupingNoneItem.getSelected(),
 				wrapping: this._oGroupingNoneItem.getWrapping()
 			}).data("item", this._oGroupingNoneItem);
@@ -2289,12 +2284,10 @@ function(
 
 		this._groupOrderList.addItemGroup(undefined, new GroupHeaderListItem({title: this._rb.getText("VIEWSETTINGS_GROUP_BY")}));
 		this._groupOrderList.addItem(new StandardListItem({
-			title : this._rb.getText("VIEWSETTINGS_ASCENDING_ITEM"),
-			type : ListType.Active
+			title : this._rb.getText("VIEWSETTINGS_ASCENDING_ITEM")
 		}).data("item", false).setSelected(true));
 		this._groupOrderList.addItem(new StandardListItem({
-			title : this._rb.getText("VIEWSETTINGS_DESCENDING_ITEM"),
-			type : ListType.Active
+			title : this._rb.getText("VIEWSETTINGS_DESCENDING_ITEM")
 		}).data("item", true));
 
 		this._groupList = new List(this.getId() + "-grouplist",
@@ -2345,7 +2338,6 @@ function(
 			oListItem = new StandardListItem({
 				id: this._presetFilterList.getId() + "-none" + LIST_ITEM_SUFFIX,
 				title : this._rb.getText("VIEWSETTINGS_NONE_ITEM_FILTER"),
-				type : ListType.Active,
 				selected : !!this.getSelectedPresetFilterItem()
 			});
 			this._presetFilterList.addItem(oListItem);

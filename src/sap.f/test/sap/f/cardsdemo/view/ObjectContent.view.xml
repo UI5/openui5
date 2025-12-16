@@ -322,6 +322,15 @@
 					<f:GridContainerItemLayoutData minRows="3" columns="7" />
 				</w:layoutData>
 			</w:Card>
+			<w:Card
+				id="cardImageFitPositionBound"
+				manifest="{cardsPlayground>/playgroundBaseUrl}/cardcontent/objectcontent/imageFitPositionBound.json"
+				width="400px"
+				class="sapUiTinyMargin"  >
+				<w:layoutData>
+					<f:GridContainerItemLayoutData minRows="6" columns="5" />
+				</w:layoutData>
+			</w:Card>
 		</f:GridContainer>
 	</Page>
 </mvc:View>

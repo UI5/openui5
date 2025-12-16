@@ -142,7 +142,7 @@ sap.ui.define([
 	/**
 	 * Returns the type's name.
 	 *
-	 * @returns {string}
+	 * @returns {"sap.ui.model.odata.type.Currency"}
 	 *   The type's name
 	 *
 	 * @public

@@ -647,6 +647,16 @@ function(
 	 */
 	SinglePlanningCalendar.prototype.onAfterRendering = function () {
 		var oHeader = this._getHeader();
+		var oEvent = {
+			size: {
+				height: this.getDomRef().offsetHeight
+			},
+			oldSize: {
+				height: 0
+			}
+		};
+
+		this._onHeaderResize(oEvent);
 
 		// Adjusting is done after rendering, because otherwise we won't have
 		// info about how much offset is actually needed.
@@ -680,6 +690,9 @@ function(
 	 * @private
 	 */
 	SinglePlanningCalendar.prototype._onHeaderResize = function (oEvent) {
+		// Update view switch label visibility in case overflow state changed
+		this._getHeader()._updateViewSwitchLabelFor();
+
 		if (oEvent.oldSize.height === oEvent.size.height) {
 			// We need only height changes
 			return this;

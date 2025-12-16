@@ -1297,20 +1297,35 @@ sap.ui.define([
 
 	/**
 	 * Sets the values of form fields in the Object card.
-	 * Each value in the aFormValues array must have a
-	 * key and the respective value for ObjectGroupItems as defined in the card's manifest:
+	 * Each value in the aFormValues array must have an
+	 * id and the respective value for ObjectGroupItems as defined in the card's manifest:
 	 * <code>[
 	 *     {
 	 *         "id": "textAreaItemId",
 	 *         "value": "New value"
 	 *     },
 	 *     {
-	 *         "id": "textAreaItemId",
-	 *         "value": "New value"
+	 *         "id": "inputItemId",
+	 *         "value": "New input value"
 	 *     },
 	 *     {
 	 *         "id": "comboBoxItemId",
-	 *         "selectedKey": "key"
+	 *         "key": "key"
+	 *     },
+	 *     {
+	 *         "id": "radioButtonGroupId",
+	 *         "key": "radioButtonKey"
+	 *     },
+	 *     {
+	 *         "id": "dateRangeItemId",
+	 *         "value": {
+	 *              "option": "date",
+	 *              "values": ["2024-01-01"]
+	 *          }
+	 *     },
+	 *     {
+	 *         "id": "durationItemId",
+	 *         "value": "PT11H12M"
 	 *     }
 	 * ]</code>
 	 *

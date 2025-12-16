@@ -322,7 +322,7 @@ sap.ui.define([
 	 * @param {sap.ui.core.Component} [mPropertyBag.appComponent] - Application component; only needed if <code>vControl</code> is a string or an XML node
 	 * @param {object} [mAdditionalSelectorInformation] - Additional mapped data which is added to the selector
 	 *
-	 * @throws {Exception} oException If <code>sAlias</code> already exists
+	 * @throws {Error} If <code>sAlias</code> already exists
 	 * @private
 	 * @ui5-restricted sap.ui.fl, Change handlers
 	 */

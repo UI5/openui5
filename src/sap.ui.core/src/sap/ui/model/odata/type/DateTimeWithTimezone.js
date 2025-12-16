@@ -181,7 +181,7 @@ sap.ui.define([
 	/**
 	 * Returns the type's name.
 	 *
-	 * @returns {string}
+	 * @returns {"sap.ui.model.odata.type.DateTimeWithTimezone"}
 	 *   The type's name
 	 *
 	 * @public
