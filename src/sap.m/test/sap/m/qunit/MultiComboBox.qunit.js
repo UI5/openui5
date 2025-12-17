@@ -83,6 +83,12 @@ sap.ui.define([
 		return Date.now();
 	};
 
+	// Function to filter visible items
+	var fnGetVisisbleItems = function (aItems) {
+		return aItems.filter(function (oItem) {
+			return oItem.getVisible();
+		});
+	};
 
 	var oResourceBundle = sap.ui.getCore().getLibraryResourceBundle("sap.m");
 
@@ -7466,8 +7472,8 @@ sap.ui.define([
 				key : "AR",
 				text : "Argentina"
 			}), new Item({
-				key : "AU",
-				text : "Australia"
+				key : "BG",
+				text : "Bulgaria"
 			})]
 		}), oInputEvent = {
 				target: {
@@ -7489,15 +7495,15 @@ sap.ui.define([
 		oMultiComboBox.oninput(oInputEvent);
 		this.clock.tick(500);
 
-		// arrange
-		var oSyncPickerContentSpy = this.spy(oMultiComboBox, "syncPickerContent");
+		// assert
+		assert.strictEqual(fnGetVisisbleItems(oMultiComboBox._getList().getItems()).length, 2, "List is filtered correctly");
 
 		// act - select item from list
 		oMultiComboBox._getList().setSelectedItem(oMultiComboBox._getList().getItems()[0], true, true);
 		this.clock.tick(500);
 
 		// assert
-		assert.notOk(oSyncPickerContentSpy.called, "syncPickerContent() should not be called when picker is opened.");
+		assert.strictEqual(fnGetVisisbleItems(oMultiComboBox._getList().getItems()).length, 2, "List is still filtered correctly after selection");
 
 		// cleanup
 		oMultiComboBox.destroy();
@@ -8239,13 +8245,6 @@ sap.ui.define([
 	});
 
 	QUnit.test("Should show all the items", function (assert) {
-		// Setup
-		var fnGetVisisbleItems = function (aItems) {
-			return aItems.filter(function (oItem) {
-				return oItem.getVisible();
-			});
-		};
-
 		// Act
 		this.oMultiComboBox.showItems();
 		sap.ui.getCore().applyChanges();

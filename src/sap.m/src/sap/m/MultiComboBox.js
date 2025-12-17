@@ -1234,6 +1234,7 @@ function(
 	MultiComboBox.prototype.onBeforeRendering = function() {
 		var bEditable = this.getEditable();
 		var oTokenizer = this.getAggregation("tokenizer");
+		var aItems = this.getItems();
 
 		ComboBoxBase.prototype.onBeforeRendering.apply(this, arguments);
 
@@ -1243,15 +1244,24 @@ function(
 		oTokenizer.setEditable(bEditable);
 		this._updatePopoverBasedOnEditMode(bEditable);
 
-		if (!this.getItems().length) {
+		if (!aItems.length) {
 			this._clearTokenizer();
 		}
 
-		if (this._getList() && !this.getPicker().isOpen()) {
+		if (this._getList()) {
 			this.syncPickerContent(true);
 		}
 
 		this.toggleSelectAllVisibility(this.getShowSelectAll());
+
+		// In case there is an old input, the picker is opened and there are items
+		// we need to return the previous state of the filtering as syncPickerContent
+		// will have removed it.
+		if (this._sOldInput && aItems.length && this.isOpen()) {
+			itemsVisibilityHandler(this.getItems(), this.filterItems({ value: this._sOldInput, items: aItems }));
+			// wait a tick so the setVisible call has replaced the DOM
+			setTimeout(this.highlightList.bind(this, this._sOldInput));
+		}
 
 		this._deregisterResizeHandler();
 		this._synchronizeSelectedItemAndKey();
