@@ -671,6 +671,7 @@ sap.ui.define([
 					oHeaderLayoutUtil = this._getHeaderLayoutUtil(),
 					aSubClasses = oEntityData.extendedBy || oEntityData.implementedBy || [],
 					bIsOpenUI5 = this.getModel("versionData").getProperty("/isOpenUI5"),
+					bIsPureNamespace = oControlData.kind === "namespace" && oControlData.module === this.NOT_AVAILABLE,
 					aHeaderBlocksInfo = [
 						{creator: "_getControlSampleBlock", exists: oControlData.isClass || oControlData.isNamespace},
 						{creator: "_getDocumentationBlock", exists: oControlData.docuLink !== undefined},
@@ -679,10 +680,10 @@ sap.ui.define([
 						{creator: "_getExtendsBlock", exists: oControlData.isClass || oControlData.isTypedef && oControlData.isDerived},
 						{creator: "_getSubclassesBlock", exists: aSubClasses.length > 0},
 						{creator: "_getImplementsBlock", exists: oControlData.hasImplementsData},
-						{creator: "_getModuleBlock", exists: true},
+						{creator: "_getModuleBlock", exists: !bIsPureNamespace},
 						{creator: "_getLibraryBlock", exists: oControlData.kind === "namespace" && oEntityData.lib},
 						{creator: "_getVisibilityBlock", exists: oControlData.visibility},
-						{creator: "_getAvailableSinceBlock", exists: true},
+						{creator: "_getAvailableSinceBlock", exists: !bIsPureNamespace},
 						{creator: "_getApplicationComponentBlock", exists: true}
 					],
 					fnFillHeaderControlsStructure = function () {

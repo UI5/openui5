@@ -1,43 +1,120 @@
+ /** Base Typography - inspired by QUnit */
+body, h1, h3, li, p, div, label, input, button, select {
+	font-family: "Helvetica Neue Light", "HelveticaNeue-Light", "Helvetica Neue", Calibri, Helvetica, Arial, sans-serif;
+}
 
+body {
+	margin: 0;
+	padding: 8px;
+	background-color: #F5F5F5;
+}
+
+h1 {
+	padding: 0.5em 0 0.5em 1em;
+	color: #C2CCD1;
+	background-color: #0D3349;
+	font-size: 1.5em;
+	line-height: 1em;
+	font-weight: 400;
+	border-radius: 5px 5px 0 0;
+	margin: 0;
+}
+
+#qunit-banner {
+	height: 5px;
+	background-color: #4646E7;
+	margin-bottom: 0.5rem;
+}
+
+#qunit-banner.qunit-pass {
+	background-color: #C6E746;
+}
+
+#qunit-banner.qunit-fail {
+	background-color: #EE5757;
+}
+
+#qunit-banner.qunit-running {
+	background-color: #FFF;
+}
+
+/** Button Styling - inspired by QUnit */
+button, input[type="button"] {
+	font-size: small;
+	border: 1px solid #AAA;
+	background-color: #EEE;
+	padding: 0.4em 0.8em;
+	cursor: pointer;
+	border-radius: 3px;
+}
+
+button:hover, input[type="button"]:hover {
+	background-color: #DDD;
+}
+
+input[type="text"] {
+	box-sizing: border-box;
+	height: 1.6em;
+	padding: 0.3em;
+	border: 1px solid #CCC;
+	border-radius: 3px;
+}
+
+input[type="checkbox"] {
+	margin: 3px;
+	vertical-align: -2px;
+}
+
+label {
+	display: inline-block;
+	margin-right: 0.5em;
+}
+
+/** Test Results - inspired by QUnit */
 .testResult.pass > p{
 	padding: 0.5em 0 0.5em 1em;
-	color: #000000;
-	background-color: #a4ec81;
+	color: #366097;
+	background-color: #E2F0F7;
 	line-height: 1em;
 	font-weight: bold;
 	cursor: pointer;
-	font-family: "Arial";
 	margin: 0rem;
+	border-bottom: 1px solid #FFF;
 }
 
 .testResult.fail > p{
-	background-color: #ed866f;
+	background-color: #EE5757;
 	color: #000000;
 	padding: 0.5em 0 0.5em 1em;
 	line-height: 1em;
 	font-weight: bold;
 	cursor: pointer;
-	font-family: "Arial";
 	margin: 0rem;
-}
-
-h3, li, p, h1, div {
-	font-family: "Arial";
-}
-
-.testResult .fail{
-	background-color: #ed866f;
-}
-
-.testResult .pass{
-	background-color: #a4ec81;
+	border-bottom: 1px solid #FFF;
 }
 
 .testResult li{
-	border-bottom: 1px solid #fff;
-	padding: 0.4em 0.5em 0.4em 1.5em;
+	border-bottom: 1px solid #FFF;
+	padding: 0.4em 0.5em 0.4em 1em;
 	color: #000000;
 	font-size: small;
+	background-color: #FFF;
+}
+
+.testResult li.fail {
+	border-left: 10px solid #EE5757;
+	color: #710909;
+	background-color: #FFF5F5;
+}
+
+.testResult li.pass {
+	border-left: 10px solid #C6E746;
+	color: #3C510C;
+	background-color: #F4FFF0;
+}
+
+.testResult li:hover {
+	background-color: #F9F9F9;
 }
 
 .testResult ol{
@@ -83,8 +160,10 @@ li.check {
 
 .uiArea > .uiAreaContent {
 	display: flex;
-	padding: 1rem;
+	padding: 1em;
 	flex-direction: column;
+	background-color: #FFF;
+	border-radius: 0 0 5px 5px;
 }
 
 .uiArea > .uiAreaContent > div {
@@ -118,14 +197,50 @@ li.check {
 }
 
 .uiArea > div {
-	border: 1px solid;
-	border-color: #aaa;
+	border: 1px solid #D3D3D3;
+	background-color: #FFF;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 .uiAreaHeader {
-	background-color: #ccc;
+	background-color: #EEE;
 	justify-content: space-between;
-	padding: 0.5rem;
+	padding: 0.5em 1em 0.5em 1em;
+	color: #333;
+	font-size: small;
+	border-bottom: 1px solid #CCC;
+	border-radius: 5px 5px 0 0;
+}
+
+.uiAreaHeader > div:nth-child(2) {
+	flex: 1;
+	text-align: center;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.uiAreaHeader > div:nth-child(1) {
+	flex: 0 0 auto;
+}
+
+.uiAreaHeader > div:nth-child(3) {
+	flex: 0 0 auto;
+}
+
+.uiAreaHeader > input {
+	flex: 0 0 auto;
+	margin-left: auto;
+}
+
+.uiAreaHeader > div:last-child {
+	flex: 0 0 auto;
+	margin-left: 1em;
+}
+
+.uiArea.collapsed .uiAreaHeader {
+	border-radius: 5px;
+	border-bottom: none;
 }
 
 .uiAreaHeader > div > * {
@@ -161,17 +276,36 @@ li.check {
 	margin-inline: 0.25rem;
 }
 
+#progressSection {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	flex: 1;
+}
+
+#progress {
+	flex-shrink: 0;
+}
+
 .progressBar {
-	border: 1px solid;
-	width: 12rem;
+	border: 1px solid #CCC;
+	flex: 1;
 	height: 1.25rem;
+	border-radius: 3px;
+	background-color: #F5F5F5;
+	overflow: hidden;
 }
 
 .progressBar > div {
-	background-color: #a4ec81;
+	background-color: #C6E746;
 	width: 0%;
-	height: 1.25rem;
+	height: 100%;
 	text-align: right;
+	padding-right: 0.25rem;
+	color: #000;
+	font-size: 0.75rem;
+	line-height: 1.25rem;
+	transition: width 0.2s ease-out, background-color 0.2s ease;
 }
 
 .testSelection :has(> select) {
@@ -181,4 +315,31 @@ li.check {
 
 .testSelection select {
 	width: 100%;
+	padding: 0.4em;
+	border: 1px solid #D3D3D3;
+	border-radius: 3px;
+	background-color: #FFF;
+	font-size: small;
+}
+
+.testSelection select:focus {
+	outline: 2px solid #0D3349;
+	outline-offset: 1px;
+}
+
+.test-execution {
+	display: none;
+}
+
+.test-execution:has(> *) {
+	display: block;
+	overflow: auto;
+	overflow-x: hidden;
+}
+
+#test-iframe {
+	width: 100%;
+	min-width: 1280px;
+	height: calc(100vh - 150px);
+	min-height: 600px;
 }

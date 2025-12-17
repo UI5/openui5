@@ -1891,7 +1891,7 @@ sap.ui.define([
 	 * Returns a promise which is fulfilled once the meta model data is loaded and can be used.
 	 *
 	 * @public
-	 * @returns {Promise} a Promise
+	 * @returns {Promise<void>} a Promise
 	 */
 	ODataMetaModel.prototype.loaded = function () {
 		return this.oLoadedPromise;

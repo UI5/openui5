@@ -1025,6 +1025,52 @@ sap.ui.define([
 		assert.ok(aValueHelpUITypes1[0].isDestroyed(), "the UI types are destroyed with the option");
 	});
 
+	QUnit.test("Popover accessible name", async function(assert) {
+		// arrange
+		var fnDone = assert.async();
+		var oFakeOptionPressEvent = {
+			getSource: () => {
+				return { getOptionKey: () => "LASTDAYS" };
+			}
+		};
+
+		this.ddr.open();
+		await nextUIUpdate();
+
+		var oNavContainer = this.ddr._oNavContainer;
+		var oPage = oNavContainer.getPages()[1];
+		var fnAssertCallback = function() {
+			// arrange
+			var oPopup = this.ddr._oPopup;
+			var oInvisibleText = this.ddr._oInvisibleLabelText;
+			var oStepInput = this.ddr.aInputControls[1];
+			var oSelect = this.ddr.aInputControls[3];
+
+			// assert
+			assert.notOk(oStepInput.getAriaLabelledBy().length, "StepInput has no aria-labelledby association set");
+			assert.notOk(oSelect.getAriaLabelledBy().length, "Select has no aria-labelledby association set");
+			assert.strictEqual(oInvisibleText.getText(), oPage.getTitle(), "Invisible aria label text is correct");
+			assert.ok(oPopup.getAriaLabelledBy().length === 2, "Popover has aria-labelledby association set");
+			assert.ok(oPopup.getAriaLabelledBy().includes(oInvisibleText.getId()), "Popover has aria-labelledby reference to the tile of the page");
+
+			// arrange
+			oNavContainer.detachEvent("afterNavigate", fnAssertCallback, this);
+			oNavContainer.attachEventOnce("afterNavigate", function() {
+				// assert
+				assert.ok(oPopup.getAriaLabelledBy().length === 1, "Popover exatly one aria-labelledby reference set after closing");
+				fnDone();
+			}, this);
+
+			// act
+			oNavContainer.back();
+		};
+
+		oNavContainer.attachEvent("afterNavigate", fnAssertCallback, this);
+
+		// act
+		this.ddr._handleOptionPress(oFakeOptionPressEvent);
+	});
+
 	QUnit.module("StandardDynamicDateOption DateTime (single)", {
 		beforeEach: async function() {
 			this.ddr = new DynamicDateRange();
