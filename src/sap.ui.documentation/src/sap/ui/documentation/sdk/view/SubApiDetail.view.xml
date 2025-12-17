@@ -60,7 +60,7 @@
 				</headerContent>
 
 				<sections>
-					<ObjectPageSection id="overview" title="Overview" titleUppercase="false">
+					<ObjectPageSection id="overview" title="Overview" titleUppercase="false" visible="{= !!${/description} }">
 						<subSections>
 							<custom:ObjectPageSubSection>
 								<custom:blocks>

@@ -608,6 +608,11 @@ sap.ui.define([
 			this._onBeforeInputRenderingDelegate = undefined;
 			this.oValueObserver.destroy();
 
+			if (this._oInvisibleLabelText) {
+				this._oInvisibleLabelText.destroy();
+				this._oInvisibleLabelText = undefined;
+			}
+
 			this._infoDatesFooter = undefined;
 			this.aInputControls = undefined;
 
@@ -1705,6 +1710,59 @@ sap.ui.define([
 		DynamicDateRange.prototype._reApplyFocusToElement = function (oToPage, oValue) {};
 
 		/**
+		 * Returns the invisible label text for the DynamicDateRange options page.
+		 * @private
+		 * @returns {sap.ui.core.InvisibleText} The invisible label text
+		 */
+		DynamicDateRange.prototype._getInvisibleLabelText = function() {
+			if (!this._oInvisibleLabelText) {
+				this._oInvisibleLabelText = new InvisibleText({
+					text: ""
+				}).toStatic();
+			}
+
+			return this._oInvisibleLabelText;
+		};
+
+		/**
+		 * Updates the invisible label text with the options page title.
+		 * @param {sap.m.Page} oToPage The options page
+		 * @private
+		 */
+		DynamicDateRange.prototype._updateInvisibleLabelText = function(oToPage) {
+			// Ensure the invisible label is created first
+			this._getInvisibleLabelText();
+
+			if (this._oInvisibleLabelText && oToPage && oToPage.getTitle) {
+				this._oInvisibleLabelText.setText(oToPage.getTitle());
+			}
+		};
+
+		/**
+		 * Adds the invisible label to the popover's ariaLabelledBy association.
+		 * @private
+		 */
+		DynamicDateRange.prototype._addInvisibleLabelToPopover = function() {
+			if (this._oPopup && this._oInvisibleLabelText) {
+				var aCurrentLabels = this._oPopup.getAriaLabelledBy();
+				var sInvisibleLabelId = this._oInvisibleLabelText.getId();
+				if (aCurrentLabels.indexOf(sInvisibleLabelId) === -1) {
+					this._oPopup.addAriaLabelledBy(sInvisibleLabelId);
+				}
+			}
+		};
+
+		/**
+		 * Removes the invisible label from the popover's ariaLabelledBy association.
+		 * @private
+		 */
+		DynamicDateRange.prototype._removeInvisibleLabelFromPopover = function() {
+			if (this._oPopup && this._oInvisibleLabelText) {
+				this._oPopup.removeAriaLabelledBy(this._oInvisibleLabelText.getId());
+			}
+		};
+
+		/**
 		 * Creates the title text for the options page.
 		 *
 		 * @returns {string} title text
@@ -1727,19 +1785,23 @@ sap.ui.define([
 		 */
 		DynamicDateRange.prototype._navContainerAfterNavigate = function(oEvent) {
 			var oOptionDetailsPage = this._oNavContainer.getPages()[1],
-				oToPage = oEvent.getParameters()["to"];
+				oToPage = oEvent.getParameters()["to"],
+				oOptionsListPage = this._oNavContainer.getPages()[0];
 
 			if (oToPage === oOptionDetailsPage) {
+				// Update the invisible label text with the page title and add it to popover
+				this._updateInvisibleLabelText(oToPage);
+				this._addInvisibleLabelToPopover();
+
 				this.aInputControls.forEach(function(oControl) {
 					// jQuery Plugin "firstFocusableDomRef"
-					if (oControl.$().firstFocusableDomRef()) {
-						oControl.addAriaLabelledBy && oControl.addAriaLabelledBy(oToPage.getId() + "-title");
-
-						if (!this._isCalendarBasedControl(oControl) && oControl.addAriaDescribedBy) {
-							oControl.addAriaDescribedBy(oToPage.getFooter().getContent()[0]);
-						}
+					if (oControl.$().firstFocusableDomRef() && !this._isCalendarBasedControl(oControl) && oControl.addAriaDescribedBy) {
+						oControl.addAriaDescribedBy(oToPage.getFooter().getContent()[0]);
 					}
 				}, this);
+			} else if (oToPage === oOptionsListPage) {
+				// Remove the invisible label from popover when navigating back to options list
+				this._removeInvisibleLabelFromPopover();
 			}
 
 			if (this._oPopup && this._oPopup.isOpen()) {

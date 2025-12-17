@@ -273,14 +273,14 @@
 				return this.runTests(aTestPages, nBarStep);
 			}
 		}
-		printTestResultAndRemoveFrame(frame, framediv, oContext) {
+		printTestResultAndRemoveFrame(frame, oContext) {
 			frame.src = "about:blank";
 			frame.contentWindow.document.write('');
 			frame.contentWindow.close();
 			if ( typeof CollectGarbage == "function") {
 				CollectGarbage(); // eslint-disable-line
 			}
-			framediv.remove();
+			frame.remove();
 			this.printTestResult(oContext);
 		}
 		printTestResult(oContext) {
@@ -315,13 +315,8 @@
 				sTestPage += (sTestPage.includes("?") ? "&" : "?") + "hidepassed";
 			}
 			// we could make this configurable
-			const frame = h("iframe", {style: {height: "1024px", width: "1280px"}, src: sTestPage});
-			const framediv = h("div", {style: {
-				height: "400px",
-				width: "100%",
-				overflow: "scroll"
-			}}, [frame]);
-			querySelector("div.test-execution").appendChild(framediv);
+			const frame = h("iframe", {id: "test-iframe", src: sTestPage});
+			querySelector("div.test-execution").appendChild(frame);
 			const iTestTimeout = parseInt(this.getUrlParameter("test-timeout")) || 300000;
 			const tBegin = Date.now();
 			const fnCheckSuccess = () => {
@@ -334,7 +329,7 @@
 						sTestName = "QUnit page for " + doc.baseURI.substring(doc.baseURI.indexOf("test-resources") + 15, doc.baseURI.length);
 					}
 					const oContext = this.#extractTestResults(sTestName, results);
-					this.printTestResultAndRemoveFrame(frame, framediv, oContext);
+					this.printTestResultAndRemoveFrame(frame, oContext);
 					oDeferred.resolve();
 					return;
 				}
@@ -366,7 +361,7 @@
 						// No qunit print error message
 						oContext = this.#createFailContext(frame.contentWindow.location.href, "Testsite did not load QUnit after 5 minutes");
 					}
-					this.printTestResultAndRemoveFrame(frame, framediv, oContext);
+					this.printTestResultAndRemoveFrame(frame, oContext);
 					oDeferred.resolve();
 				}
 			};
@@ -582,6 +577,7 @@
 			querySelector("span.total").textContent =
 			querySelector("span.passed").textContent =
 			querySelector("span.failed").textContent = "0";
+			querySelector("#qunit-banner").className = "qunit-running";
 		}
 
 		function createTestPageSelectionOptions(sFilter) {
@@ -673,6 +669,9 @@
 			setVisibile(["progressSection", "stop"], false);
 			toggleDisplay(aAreas, true);
 			toggleArea("test-reporting", true);
+			const banner = querySelector("#qunit-banner");
+			const failed = parseInt(querySelector("span.failed").textContent) || 0;
+			banner.className = failed > 0 ? "qunit-fail" : "qunit-pass";
 		}
 
 		/**
