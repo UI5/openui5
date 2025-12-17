@@ -237,13 +237,29 @@ sap.ui.define([
 			// Only retrieve the fallback theme once per ThemeCheck cycle
 			if (!oThemeCheck._sFallbackTheme) {
 				for (var sLib in mLibs) {
+					// Only retrieve the fallback theme once per ThemeCheck cycle
+					var sThemePath = oThemeCheck._oCore._getThemePath(sLib, sThemeName);
+					if (sThemePath) {
+						var rBaseTheme = /~v=[^\/]+\(([a-zA-Z0-9_]+)\)/;
+						// base theme should be matched in the first capturing group
+						oThemeCheck._sFallbackTheme = rBaseTheme.exec(sThemePath) && rBaseTheme.exec(sThemePath)[1];
+					}
+
 					var oThemeMetaData = ThemeHelper.getMetadata(sLib);
 					if (oThemeMetaData && oThemeMetaData.Extends && oThemeMetaData.Extends[0]) {
 						oThemeCheck._sFallbackTheme = oThemeMetaData.Extends[0];
+					}
+
+					if (oThemeCheck._sFallbackTheme) {
 						break;
 					}
 				}
 			}
+
+			// pass derived fallback theme through our default theme handling
+			// in case the fallback theme is not supported anymore, we fall up to the latest default theme
+			oThemeCheck._sFallbackTheme = ThemeHelper.validateAndFallbackTheme(oThemeCheck._sFallbackTheme);
+
 
 			if (oThemeCheck._sFallbackTheme) {
 				aFailedLibs.forEach(function(lib) {

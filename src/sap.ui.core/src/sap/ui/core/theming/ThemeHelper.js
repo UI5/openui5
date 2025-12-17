@@ -15,8 +15,8 @@ sap.ui.define([
 	// dark mode detection
 	var bDarkMode = window.matchMedia("(prefers-color-scheme: dark)").matches;
 
-	// Theme Fallback
-	var rThemePattern = /^([a-zA-Z0-9_]*)(_(hcb|hcw|dark))$/g;
+	// Theme Fallback for variants
+	var rThemeVariantPattern = /(_hcb|_hcw|_dark)$/g;
 
 	/**
 	 * The list of all known themes incl. their variants.
@@ -138,37 +138,34 @@ sap.ui.define([
 	 * @returns {string} the validated and transformed theme name
 	 */
 	ThemeHelper.validateAndFallbackTheme = function(sTheme, sThemeRoot) {
-		var sNewTheme;
-		if (sTheme) {
-			// check cache for already determined fallback
-			// only do this for themes from the default location (potential SAP standard themes)
-			if (sThemeRoot == null && mThemeFallbacks[sTheme]) {
-				return mThemeFallbacks[sTheme];
-			}
+		// check cache for already determined fallback
+		// only do this for themes from the default location (potential SAP standard themes)
+		if (sThemeRoot == null && mThemeFallbacks[sTheme]) {
+			return mThemeFallbacks[sTheme];
+		}
 
-			sNewTheme = sTheme;
+		var sNewTheme = sTheme;
 
-			// We only fallback for a very specific set of themes:
-			//  * no theme-root is given (themes from a different endpoint (i.e. theming-service) are excluded) and
-			//  * the given theme is a standard SAP theme ('sap_' prefix)
-			//  * not supported in this version
-			if (sThemeRoot == null && sTheme.startsWith("sap_") && aKnownThemes.indexOf(sTheme) == -1) {
+		// We only fallback for a very specific set of themes:
+		//  * no theme-root is given (themes from a different endpoint (i.e. theming-service) are excluded) and
+		//  * the given theme is a standard SAP theme ('sap_' prefix)
+		//  * not supported in this version
+		if (sThemeRoot == null && (!sTheme || (sTheme.startsWith("sap_") && aKnownThemes.indexOf(sTheme) == -1))) {
+			var sVariant;
+			if (sTheme) {
 				// extract the theme variant if given: "_hcb", "_hcw", "_dark"
-				var aThemeMatch = rThemePattern.exec(sTheme) || [];
-				var sVariant = aThemeMatch[2]; //match includes an underscore
-
-				if (sVariant) {
-					sNewTheme = DEFAULT_THEME + sVariant;
-				} else {
-					sNewTheme = DEFAULT_THEME;
-				}
-
-				mThemeFallbacks[sTheme] = sNewTheme;
-
-				Log.warning("The configured theme '" + sTheme + "' is not yet or no longer supported in this version. " +
-							"The valid fallback theme is '" + sNewTheme + "'.",
-							"Theming");
+				sVariant = sTheme.match(rThemeVariantPattern) && sTheme.match(rThemeVariantPattern)[0] || "";
+			} else {
+				sVariant = bDarkMode ? "_dark" : "";
 			}
+
+			sNewTheme = DEFAULT_THEME + sVariant;
+
+			mThemeFallbacks[sTheme] = sNewTheme;
+
+			Log.warning("The configured theme '" + sTheme + "' is not yet or no longer supported in this version. " +
+						"The valid fallback theme is '" + sNewTheme + "'.",
+						"Theming");
 		}
 		return sNewTheme;
 	};
