@@ -303,6 +303,10 @@ sap.ui.define([
 					compatVersion: "1.16"
 				}
 			},
+			"dialogUtils/PreventKeyboardEvents": {
+				title: "QUnit Page for dialogUtils/PreventKeyboardEvents",
+				module: "test-resources/sap/m/qunit/dialogUtils/PreventKeyboardEvents.qunit"
+			},
 			DialogRTL: {
 				title: "QUnit Page for sap.m.Dialog in RTL",
 				sinon: {
