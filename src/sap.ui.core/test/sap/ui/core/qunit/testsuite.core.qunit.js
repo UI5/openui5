@@ -421,6 +421,10 @@ sap.ui.define(function() {
 						},
 						"customcss": {
 							"sap.ui.core": "test-resources/sap/ui/core/qunit/testdata/customcss/"
+						},
+						"customTheme": {
+							"sap.ui.core": "test-resources/sap/ui/core/qunit/testdata/libraries/customCss/",
+							"testlibs.customCss.lib2": "test-resources/sap/ui/core/qunit/testdata/customcss/"
 						}
 					}
 				},
@@ -428,7 +432,9 @@ sap.ui.define(function() {
 					paths: {
 							"sap/ui/testlib" : "test-resources/sap/ui/core/qunit/testdata/uilib/",
 							"sap/ui/customthemefallback/testlib" : "test-resources/sap/ui/core/qunit/testdata/uilib-custom-theme-fallback/",
-							"sap/ui/failingcssimport/testlib" : "test-resources/sap/ui/core/qunit/testdata/uilib-failing-css-import/"
+							"sap/ui/failingcssimport/testlib" : "test-resources/sap/ui/core/qunit/testdata/uilib-failing-css-import/",
+							"testlibs/customCss/lib1" : "test-resources/sap/ui/core/qunit/testdata/libraries/customCss/lib1/",
+							"testlibs/customCss/lib2" : "test-resources/sap/ui/core/qunit/testdata/libraries/customCss/lib2/"
 					}
 				},
 				qunit: {

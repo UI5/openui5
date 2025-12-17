@@ -7,10 +7,11 @@ sap.ui.define([
 	'sap/ui/Device',
 	'sap/ui/base/Object',
 	"sap/base/Log",
+	"sap/ui/core/theming/ThemeHelper",
 	"sap/ui/dom/includeStylesheet",
 	"sap/ui/thirdparty/jquery"
 ],
-	function(Device, BaseObject, Log, includeStylesheet, jQuery) {
+	function(Device, BaseObject, Log, ThemeHelper, includeStylesheet, jQuery) {
 	"use strict";
 
 
@@ -227,18 +228,36 @@ sap.ui.define([
 
 			// Only retrieve the fallback theme once per ThemeCheck cycle
 			if (!oThemeCheck._sFallbackTheme) {
-				if (!oThemeCheck._oThemeMetaDataCheckElement) {
-					// Create dummy element to retrieve custom theme metadata which is applied
-					// via background-image data-uri
-					oThemeCheck._oThemeMetaDataCheckElement = document.createElement("style");
-					jQuery.each(mLibs, function(sLib) {
+				for (var sLib in mLibs) {
+					// Only retrieve the fallback theme once per ThemeCheck cycle
+					var sThemePath = oThemeCheck._oCore._getThemePath(sLib, sThemeName);
+					if (sThemePath) {
+						var rBaseTheme = /~v=[^\/]+\(([a-zA-Z0-9_]+)\)/;
+						// base theme should be matched in the first capturing group
+						oThemeCheck._sFallbackTheme = rBaseTheme.exec(sThemePath) && rBaseTheme.exec(sThemePath)[1];
+					}
+
+					if (!oThemeCheck._sFallbackTheme) {
+						if (!oThemeCheck._oThemeMetaDataCheckElement) {
+							// Create dummy element to retrieve custom theme metadata which is applied
+							// via background-image data-uri
+							oThemeCheck._oThemeMetaDataCheckElement = document.createElement("style");
+							document.head.appendChild(oThemeCheck._oThemeMetaDataCheckElement);
+						}
 						var sClassName = "sapThemeMetaData-UI5-" + sLib.replace(/\./g, "-");
 						oThemeCheck._oThemeMetaDataCheckElement.classList.add(sClassName);
-					});
-					document.head.appendChild(oThemeCheck._oThemeMetaDataCheckElement);
+						oThemeCheck._sFallbackTheme = getFallbackTheme(oThemeCheck._oThemeMetaDataCheckElement);
+					}
+
+					if (oThemeCheck._sFallbackTheme) {
+						break;
+					}
 				}
-				oThemeCheck._sFallbackTheme = getFallbackTheme(oThemeCheck._oThemeMetaDataCheckElement);
 			}
+
+			// pass derived fallback theme through our default theme handling
+			// in case the fallback theme is not supported anymore, we fall up to the latest default theme
+			oThemeCheck._sFallbackTheme = ThemeHelper.validateAndFallbackTheme(oThemeCheck._sFallbackTheme);
 
 			if (oThemeCheck._sFallbackTheme) {
 				aFailedLibs.forEach(function(lib) {
