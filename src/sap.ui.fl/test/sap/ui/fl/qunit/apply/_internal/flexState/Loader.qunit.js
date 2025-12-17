@@ -415,24 +415,14 @@ sap.ui.define([
 					id1: "name1"
 				}
 			};
-			sandbox.stub(Settings, "getInstanceOrUndef").returns({
-				isVariantAuthorNameAvailable() {
-					return false;
-				}
+			const oSettingStub = sandbox.stub(Settings, "getInstance").resolves({
+				isVariantAuthorNameAvailable() {return false;}
 			});
 			const oStubLoadVariantsAuthors = sandbox.stub(ApplyStorage, "loadVariantsAuthors").resolves(oBackEndResult);
 
 			const oResult = await Loader.loadVariantsAuthors("test.app");
 			assert.deepEqual(oResult, {}, "then empty result is returned");
-			assert.equal(oStubLoadVariantsAuthors.callCount, 0, "then correct function of storage is not called");
-		});
-
-		QUnit.test("When load variant author name is triggered and the settings are not loaded (i.e. '<NO CACHE>' mentioned in the asyncHints)", async function(assert) {
-			sandbox.stub(Settings, "getInstanceOrUndef");
-			const oStubLoadVariantsAuthors = sandbox.stub(ApplyStorage, "loadVariantsAuthors");
-
-			const oResult = await Loader.loadVariantsAuthors("test.app");
-			assert.deepEqual(oResult, {}, "then empty result is returned");
+			assert.equal(oSettingStub.callCount, 1, "then settings are requested");
 			assert.equal(oStubLoadVariantsAuthors.callCount, 0, "then correct function of storage is not called");
 		});
 
@@ -445,15 +435,14 @@ sap.ui.define([
 					id1: "name1"
 				}
 			};
-			sandbox.stub(Settings, "getInstanceOrUndef").returns({
-				isVariantAuthorNameAvailable() {
-					return true;
-				}
+			const oSettingStub = sandbox.stub(Settings, "getInstance").resolves({
+				isVariantAuthorNameAvailable() {return true;}
 			});
 			const oStubLoadVariantsAuthors = sandbox.stub(ApplyStorage, "loadVariantsAuthors").resolves(oBackEndResult);
 
 			const oResult = await Loader.loadVariantsAuthors("test.app");
 			assert.deepEqual(oResult, oBackEndResult, "then result is get from LRep back end");
+			assert.equal(oSettingStub.callCount, 1, "then settings are requested");
 			assert.equal(oStubLoadVariantsAuthors.callCount, 1, "then correct function of storage is called");
 			assert.equal(oStubLoadVariantsAuthors.getCall(0).args[0], "test.app", "with correct reference");
 		});

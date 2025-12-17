@@ -194,11 +194,10 @@ sap.ui.define([
 		 * @param {string} sReference - Flex reference of application
 		 * @returns {Promise<object>} Resolving with a list of maps between user's ID and name
 		 */
-		loadVariantsAuthors(sReference) {
-			// the settings are available due to previous loadFlexData calls or
-			// not available due to an async hint stating that no changes are available, thus also no author mapping needed
-			const oSettings = Settings.getInstanceOrUndef();
-			return oSettings?.isVariantAuthorNameAvailable() ? ApplyStorage.loadVariantsAuthors(sReference) : Promise.resolve({});
+		async loadVariantsAuthors(sReference) {
+			// Loading settings to check the naming feature availability
+			const oSettings = await Settings.getInstance();
+			return oSettings?.isVariantAuthorNameAvailable() ? ApplyStorage.loadVariantsAuthors(sReference) : {};
 		}
 	};
 });
