@@ -1,20 +1,7 @@
 {
 	"_version": "2.0.0",
 	"sap.app": {
-		"id": "sap.ui.core.tutorial.odatav4.05",
-		"type": "application",
-		"title": "Application 'sap.ui.core.tutorial.odatav4.05'",
-		"applicationVersion": {
-			"version": "1.0.0"
-		}
-	},
-	"sap.ui": {
-		"technology": "UI5",
-		"deviceTypes": {
-			"desktop": true,
-			"tablet": true,
-			"phone": true
-		}
+		"id": "sap.ui.core.tutorial.odatav4.05"
 	},
 	"sap.ui5": {
 		"config": {

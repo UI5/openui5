@@ -65,7 +65,7 @@ sap.ui.define([
 				/**
 				 * Defines whether the illustration is decorative.
 				 *
-				 * @experimental since 1.138
+				 * @since 1.138
 				 */
 				decorative: {type: "boolean", group: "Appearance", defaultValue: false}
 			},

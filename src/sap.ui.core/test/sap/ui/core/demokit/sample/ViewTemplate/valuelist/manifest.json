@@ -1,24 +1,19 @@
 {
-	"_version": "2.0.0",
-	"sap.app": {
-		"ach": "CA-UI5-COR",
-		"applicationVersion": {
-			"version": "${version}"
+	"_version" : "2.0.0",
+	"sap.app" : {
+		"ach" : "CA-UI5-COR",
+		"applicationVersion" : {
+			"version" : "${version}"
 		},
-		"description": "Separate loading of value lists to reduce size of OData service metadata to be loaded",
-		"id": "sap.ui.core.demokit.sample.ViewTemplate.valuelist",
-		"title": "Separate Value List Loading",
-		"type": "application"
+		"description" : "Separate loading of value lists to reduce size of OData service metadata to be loaded",
+		"id" : "sap.ui.core.demokit.sample.ViewTemplate.valuelist",
+		"title" : "Separate Value List Loading",
+		"type" : "application"
 	},
-	"sap.ui": {
-		"technology": "UI5",
-		"deviceTypes": {
-			"desktop": true,
-			"tablet": true,
-			"phone": true
-		}
+	"sap.ui" : {
+		"technology" : "UI5"
 	},
-	"sap.ui5": {
+	"sap.ui5" : {
 		"config": {
 			"sample": {
 				"files": [
@@ -42,13 +37,13 @@
 				]
 			}
 		},
-		"dependencies": {
-			"minUI5Version": "2.0.0",
-			"libs": {
-				"sap.m": {},
-				"sap.ui.core": {}
+		"dependencies" : {
+			"minUI5Version": "1.136.0",
+			"libs" : {
+				"sap.m" : {},
+				"sap.ui.core" : {}
 			}
 		},
-		"handleValidation": true
+		"handleValidation" : true
 	}
 }

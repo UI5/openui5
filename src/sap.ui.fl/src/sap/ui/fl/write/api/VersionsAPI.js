@@ -205,12 +205,12 @@ sap.ui.define([
 	 *
 	 * @returns {Promise} Resolves as soon as the clearance and the requesting is triggered.
 	 */
-	VersionsAPI.loadVersionForApplication = function(mPropertyBag) {
+	VersionsAPI.loadVersionForApplication = async function(mPropertyBag) {
 		if (!mPropertyBag.control) {
-			return Promise.reject("No control was provided");
+			throw Error("No control was provided");
 		}
 		if (!mPropertyBag.layer) {
-			return Promise.reject("No layer was provided");
+			throw Error("No layer was provided");
 		}
 		const oModel = getVersionsModel(mPropertyBag);
 		if (oModel) {
@@ -219,7 +219,8 @@ sap.ui.define([
 			}
 			oModel.setProperty("/displayedVersion", mPropertyBag.version);
 			oModel.setProperty("/persistedVersion", mPropertyBag.version);
-			if (mPropertyBag.version !== Version.Number.Draft && FeaturesAPI.isPublishAvailable()) {
+			const bIsPublishAvailable = await FeaturesAPI.isPublishAvailable();
+			if (mPropertyBag.version !== Version.Number.Draft && bIsPublishAvailable) {
 				const aVersions = oModel.getProperty("/versions");
 				if (aVersions.length) {
 					const oVersion = aVersions.find(function(oVersion) {
@@ -232,15 +233,13 @@ sap.ui.define([
 			}
 		}
 
-		return incorporateAdaptationIdInSwitch(mPropertyBag)
-		.then(function(sDisplayedAdaptationId) {
-			const oAppComponent = Utils.getAppComponentForControl(mPropertyBag.control);
-			const sReference = getFlexReferenceForControl(oAppComponent);
-			const oFlexInfo = FlexInfoSession.getByReference(sReference);
-			oFlexInfo.version = mPropertyBag.version;
-			oFlexInfo.displayedAdaptationId = sDisplayedAdaptationId;
-			FlexInfoSession.setByReference(oFlexInfo, sReference);
-		});
+		const sDisplayedAdaptationId = await incorporateAdaptationIdInSwitch(mPropertyBag);
+		const oAppComponent = Utils.getAppComponentForControl(mPropertyBag.control);
+		const sReference = getFlexReferenceForControl(oAppComponent);
+		const oFlexInfo = FlexInfoSession.getByReference(sReference);
+		oFlexInfo.version = mPropertyBag.version;
+		oFlexInfo.displayedAdaptationId = sDisplayedAdaptationId;
+		FlexInfoSession.setByReference(oFlexInfo, sReference);
 	};
 
 	/**

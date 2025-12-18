@@ -25,7 +25,6 @@ sap.ui.define([
 	 * @author SAP SE
 	 * @version ${version}
 	 * @since 1.75
-	 * @experimental Since 1.75
 	 */
 	 var AddIFrameObjectPageLayout = Object.assign({}, BaseAddIFrame);
 

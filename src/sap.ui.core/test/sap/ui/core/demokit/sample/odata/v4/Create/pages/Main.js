@@ -21,20 +21,6 @@ sap.ui.define([
 				}
 			},
 			assertions : {
-				checkHasFocus : function (sControlId) {
-					// checks if the test runs in an iFrame, because the check is not possible there
-					if (window.parent !== window) {
-						return;
-					}
-					this.waitFor({
-						id : sControlId,
-						success : function (oControl) {
-							Opa5.assert.strictEqual(oControl.getFocusDomRef(),
-								document.activeElement, sControlId + " has focus");
-						},
-						viewName : sViewName
-					});
-				},
 				checkInputValueState : function (sInputId, sValueState) {
 					Helper.checkValueState(this, sViewName, sInputId, sValueState);
 				}

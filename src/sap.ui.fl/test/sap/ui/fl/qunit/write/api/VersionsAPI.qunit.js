@@ -67,9 +67,8 @@ sap.ui.define([
 
 	function stubSettings(sandbox) {
 		sandbox.stub(Settings, "getInstance").resolves({
-			getVersioning() {
-				return { ALL: true };
-			}
+			getVersioning: () => ({ ALL: true }),
+			getIsPublishAvailable: () => true
 		});
 	}
 
@@ -263,25 +262,23 @@ sap.ui.define([
 			});
 		});
 
-		QUnit.test("when a control and a layer were provided and display version is not equal to active version", function(assert) {
+		QUnit.test("when a control and a layer were provided and display version is not equal to active version", async function(assert) {
 			sandbox.stub(URLSearchParams.prototype, "get").returns("1");
-			var mPropertyBag = {
+			const mPropertyBag = {
 				layer: Layer.CUSTOMER,
 				control: new Control(),
 				version: "1"
 			};
 
-			var aReturnedVersions = [
+			const aReturnedVersions = [
 				{ version: "2" },
 				{ version: "1" }
 			];
 			sandbox.stub(Storage.versions, "load").resolves(aReturnedVersions);
-			return VersionsAPI.initialize(mPropertyBag)
+			await VersionsAPI.initialize(mPropertyBag);
 			// switch to another version
-			.then(VersionsAPI.loadVersionForApplication.bind(this, mPropertyBag))
-			.then(function() {
-				assert.equal(VersionsAPI.isOldVersionDisplayed(mPropertyBag), true, "then a 'true' is returned");
-			});
+			await VersionsAPI.loadVersionForApplication(mPropertyBag);
+			assert.equal(VersionsAPI.isOldVersionDisplayed(mPropertyBag), true, "then true is returned");
 		});
 	});
 
@@ -346,38 +343,36 @@ sap.ui.define([
 		}
 	}, function() {
 		QUnit.test("when no control is provided", function(assert) {
-			var mPropertyBag = {
+			const mPropertyBag = {
 				layer: Layer.CUSTOMER
 			};
 
-			return VersionsAPI.loadVersionForApplication(mPropertyBag).catch(function(sErrorMessage) {
-				assert.equal(sErrorMessage, "No control was provided", "then an Error is thrown");
+			return VersionsAPI.loadVersionForApplication(mPropertyBag).catch((oError) => {
+				assert.equal(oError.message, "No control was provided", "then an Error is thrown");
 			});
 		});
 
 		QUnit.test("when no layer is provided", function(assert) {
-			var mPropertyBag = {
+			const mPropertyBag = {
 				control: new Control()
 			};
 
-			return VersionsAPI.loadVersionForApplication(mPropertyBag).catch(function(sErrorMessage) {
-				assert.equal(sErrorMessage, "No layer was provided", "then an Error is thrown");
+			return VersionsAPI.loadVersionForApplication(mPropertyBag).catch((oError) => {
+				assert.equal(oError.message, "No layer was provided", "then an Error is thrown");
 			});
 		});
 
 		QUnit.test("when a control, a layer and a version were provided, but no app ID could be determined", function(assert) {
-			var mPropertyBag = {
+			const mPropertyBag = {
 				layer: Layer.CUSTOMER,
 				control: new Control(),
 				version: Version.Number.Original
 			};
 			Utils.getAppComponentForControl.restore();
 
-			assert.throws(
-				VersionsAPI.loadVersionForApplication.bind(undefined, mPropertyBag),
-				new Error("The application ID could not be determined"),
-				"then an Error is thrown"
-			);
+			return VersionsAPI.loadVersionForApplication(mPropertyBag).catch((oError) => {
+				assert.equal(oError.message, "The application ID could not be determined", "then an Error is thrown");
+			});
 		});
 
 		QUnit.test("when a control, a layer, a context but no adaptationId parameter were provided and the request returns a list (version is switched)", function(assert) {

@@ -12,6 +12,69 @@ sap.ui.define([
 ], (oTestSuite) => {
 	"use strict";
 
+	const sCSS = `
+		/* simple css inspired by ui5 theme */
+		body {
+			font-family: "72", "72full", Arial, Helvetica, sans-serif;
+			font-size: 0.875rem;
+			line-height: 1.4;
+			color: #32363a;
+			margin: 0.5rem 1rem;
+		}
+		h1 {
+			font-size: 1.75rem;
+			font-weight: 400;
+			margin: 0;
+		}
+		h2 {
+			font-size: 1.25rem;
+			font-weight: 400;
+			margin: 1rem 0 0.5rem 0;
+		}
+		a {
+			color: #0070f2;
+			text-decoration: none;
+		}
+		a:hover {
+			text-decoration: underline;
+		}
+		#actions {
+			margin-bottom: 0.5rem;
+		}
+		ul {
+			list-style: none;
+			padding: 0;
+			margin: 0.5rem 0;
+		}
+		ol {
+			margin-top: 0;
+		}
+		li > div {
+			cursor: pointer;
+		}
+		#apps {
+			border-collapse: collapse;
+			width: 100%;
+			margin-top: 0.5rem;
+		}
+		#apps td {
+			padding: 0.15rem 1rem;
+			border-bottom: 1px solid #e5e5e5;
+		}
+		#apps td:first-child {
+			padding-left: 0;
+		}
+		#apps tr:hover {
+			background-color: #ebf8ff;
+		}
+		#status:empty {
+			display: none;
+		}
+	`;
+
+	const oStyle = document.createElement('style');
+	oStyle.textContent = sCSS;
+	document.head.appendChild(oStyle);
 	const sSuite = "Test.qunit.html?testsuite=test-resources/sap/ui/core/qunit/internal/testsuite.models.qunit&test=";
 
 	const mTests = {
