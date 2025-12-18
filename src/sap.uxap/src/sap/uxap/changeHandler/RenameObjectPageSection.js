@@ -20,7 +20,7 @@ sap.ui.define([
 	 * @alias sap.uxap.changeHandler.RenameObjectPageSection
 	 * @author SAP SE
 	 * @version ${version}
-	 * @experimental Since 1.50
+	 * @since 1.50
 	 */
 
 	var mRenameSettings = {

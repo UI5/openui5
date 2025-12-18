@@ -1,27 +1,22 @@
 {
-	"_version": "2.0.0",
-	"sap.app": {
-		"ach": "CA-UI5-COR",
-		"applicationVersion": {
-			"version": "${version}"
+	"_version" : "2.0.0",
+	"sap.app" : {
+		"ach" : "CA-UI5-COR",
+		"applicationVersion" : {
+			"version" : "${version}"
 		},
 		"description": "Complete demo scenario for XML Templating based on OData V4 annotations",
-		"id": "sap.ui.core.sample.ViewTemplate.scenario",
-		"title": "XML Templating: demo scenario",
-		"type": "application"
+		"id" : "sap.ui.core.sample.ViewTemplate.scenario",
+		"title" : "XML Templating: demo scenario",
+		"type" : "application"
 	},
-	"sap.ui": {
-		"technology": "UI5",
-		"deviceTypes": {
-			"desktop": true,
-			"tablet": true,
-			"phone": true
-		}
+	"sap.ui" : {
+		"technology" : "UI5"
 	},
 	"sap.ui5": {
-		"config": {
-			"sample": {
-				"files": [
+		"config" : {
+			"sample" : {
+				"files" : [
 					"ChartAnnotation.fragment.xml",
 					"Component.js",
 					"Detail.controller.js",
@@ -47,17 +42,14 @@
 				"sap.ui.core": {},
 				"sap.ui.layout": {}
 			},
-			"minUI5Version": "2.0.0"
+			"minUI5Version": "1.136.0"
 		},
 		"models": {
 			"@i18n": {
 				"settings": {
 					"bundleName": "sap.ui.core.sample.ViewTemplate.scenario.i18n.i18n",
-					"fallbackLocale": "",
-					"supportedLocales": [
-						"de",
-						""
-					]
+					"fallbackLocale" : "",
+					"supportedLocales" : ["de", ""]
 				},
 				"type": "sap.ui.model.resource.ResourceModel"
 			}

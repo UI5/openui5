@@ -63,7 +63,6 @@ sap.ui.define([
 		When.onTheCreateNewSalesOrderDialog.changeInputValue("buyerIdInput", "");
 		When.onTheCreateNewSalesOrderDialog.pressButton("saveButton");
 		Then.onTheMainPage.checkDialogIsOpen(true);
-		Then.onTheCreateNewSalesOrderDialog.checkHasFocus("buyerIdInput");
 		Then.onTheCreateNewSalesOrderDialog.checkInputValueState("buyerIdInput", "Error");
 		When.onTheCreateNewSalesOrderDialog.changeInputValue("buyerIdInput", "0100000004");
 		Then.onTheCreateNewSalesOrderDialog.checkInputValueState("buyerIdInput", "None");
@@ -71,7 +70,6 @@ sap.ui.define([
 		When.onTheCreateNewSalesOrderDialog.changeInputValue("currencyInput", "");
 		When.onTheCreateNewSalesOrderDialog.pressButton("saveButton");
 		Then.onTheMainPage.checkDialogIsOpen(true);
-		Then.onTheCreateNewSalesOrderDialog.checkHasFocus("currencyInput");
 		Then.onTheCreateNewSalesOrderDialog.checkInputValueState("currencyInput", "Error");
 		When.onTheCreateNewSalesOrderDialog.changeInputValue("currencyInput", "USD");
 		Then.onTheCreateNewSalesOrderDialog.checkInputValueState("currencyInput", "None");

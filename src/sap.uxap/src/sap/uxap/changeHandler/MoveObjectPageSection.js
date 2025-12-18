@@ -22,7 +22,7 @@ sap.ui.define([
 	 * @alias sap.uxap.changeHandler.MoveObjectPageSection
 	 * @author SAP SE
 	 * @version ${version}
-	 * @experimental Since 1.54
+	 * @since 1.54
 	 */
 
 	var MoveObjectPageSection = Object.assign({}, MoveControls);
