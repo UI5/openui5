@@ -4,11 +4,13 @@ sap.ui.define([
 	"sap/ui/fl/apply/_internal/controlVariants/Utils",
 	"sap/ui/fl/apply/_internal/flexObjects/FlexObjectFactory",
 	"sap/ui/fl/apply/_internal/flexObjects/FlVariant",
+	"sap/ui/fl/Layer",
 	"sap/ui/thirdparty/sinon-4"
 ], function(
 	ControlVariantUtils,
 	FlexObjectFactory,
 	FlVariant,
+	Layer,
 	sinon
 ) {
 	"use strict";
@@ -166,6 +168,22 @@ sap.ui.define([
 			assert.strictEqual(oVariant.getVariantReference(), "myVariantReference", "the VariantReference is properly set");
 			assert.strictEqual(oVariant.getVariantManagementReference(), "myVariantManagementReference", "the VariantManagementReference is properly set");
 			assert.notOk(oVariant.hasContexts(), "then the variant has no contexts");
+		});
+
+		QUnit.test("in the VENDOR layer", function(assert) {
+			const oVariant = FlexObjectFactory.createFlVariant({
+				id: "myId",
+				variantName: "myVariantName",
+				variantManagementReference: "myVariantManagementReference",
+				variantReference: "myVariantReference",
+				contexts: {
+					foo: "bar"
+				},
+				layer: Layer.VENDOR,
+				reference: "myReference",
+				generator: "myGenerator"
+			});
+			assert.strictEqual(oVariant.getSupportInformation().user, ControlVariantUtils.DEFAULT_AUTHOR, "the default user is set");
 		});
 	});
 

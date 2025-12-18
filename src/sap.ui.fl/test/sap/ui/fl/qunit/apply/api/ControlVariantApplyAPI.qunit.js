@@ -91,7 +91,6 @@ sap.ui.define([
 	function checkUpdateCurrentVariantCalled(assert, sVariantManagement, sVariant) {
 		assert.ok(this.oUpdateCurrentVariantStub.calledOnce, "then updateCurrentVariant called once");
 		assert.ok(this.oUpdateCurrentVariantStub.calledWithExactly({
-			variantManagementReference: sVariantManagement,
 			newVariantReference: sVariant,
 			appComponent: this.oAppComponent,
 			vmControl: this.oDummyControl

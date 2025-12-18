@@ -204,10 +204,15 @@ sap.ui.define([
 		QUnit.test("when changes should not be saved", function(assert) {
 			const fnDone = assert.async();
 			sandbox.stub(Utils, "showMessageBox").resolves(MessageBox.Action.NO);
+			const oRemoveAllCommandsSpy = sandbox.spy(this.oRta.getCommandStack(), "removeAllCommands");
 
 			this.oLoadVersionStub.callsFake(function(mPropertyBag) {
 				assert.strictEqual(mPropertyBag.version, this.nVersionParameter, "the version parameter was passed correct");
 				assert.strictEqual(this.oSerializeStub.callCount, 0, "the changes were not saved");
+				assert.ok(
+					oRemoveAllCommandsSpy.calledWith(true, true),
+					"commands were removed from stack with suppressInvalidate = true and dirty changes were removed from persistence"
+				);
 				fnDone();
 			}.bind(this));
 

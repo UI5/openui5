@@ -15,7 +15,9 @@
 	height: 2.875rem;
 }
 
-html.sap-desktop .sapUiCalHead > .sapUiCalHeadB:focus {
+html.sap-desktop .sapUiCalHead > .sapUiCalHeadB:focus,
+html.sap-desktop .sapUiCalHead > .sapUiCalHeadNext:focus,
+html.sap-desktop .sapUiCalHead > .sapUiCalHeadPrev:focus {
 	outline: 0.125rem dotted var(--sapContent_FocusColor);
 	outline-offset: -0.1875rem;
 }
@@ -33,7 +35,9 @@ html[data-sap-ui-browser^='ff'].sap-desktop .sapUiCalHead > .sapUiCalHeadB:focus
 	outline-offset: 0; /* to hide firefox bug with native outline always displayed */
 }
 
-html.sap-desktop .sapUiCalHead > .sapUiCalHeadB:focus:not(:hover):not(:active) {
+html.sap-desktop .sapUiCalHead > .sapUiCalHeadB:focus:not(:hover):not(:active),
+html.sap-desktop .sapUiCalHead > .sapUiCalHeadNext:focus:not(:hover):not(:active),
+html.sap-desktop .sapUiCalHead > .sapUiCalHeadPrev:focus:not(:hover):not(:active) {
 	background-color: transparent;
 }
 

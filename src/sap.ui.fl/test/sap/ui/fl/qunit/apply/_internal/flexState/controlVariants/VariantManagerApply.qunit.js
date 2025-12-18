@@ -251,7 +251,6 @@ sap.ui.define([
 
 			// first call - standard -> variant2
 			VariantManagerApply.updateCurrentVariant({
-				variantManagementReference: sVMReference,
 				newVariantReference: "variant2",
 				appComponent: oComponent,
 				vmControl: this.oVMControl
@@ -259,7 +258,6 @@ sap.ui.define([
 
 			// second call - variant2 -> standard
 			VariantManagerApply.updateCurrentVariant({
-				variantManagementReference: sVMReference,
 				newVariantReference: sVMReference,
 				appComponent: oComponent,
 				vmControl: this.oVMControl
@@ -286,7 +284,6 @@ sap.ui.define([
 
 			// first call - standard -> variant2
 			VariantManagerApply.updateCurrentVariant({
-				variantManagementReference: sVMReference,
 				newVariantReference: "variant2",
 				appComponent: oComponent,
 				vmControl: this.oVMControl
@@ -297,7 +294,6 @@ sap.ui.define([
 
 			// second call - standard -> variant3
 			VariantManagerApply.updateCurrentVariant({
-				variantManagementReference: sVMReference,
 				newVariantReference: "variant3",
 				appComponent: oComponent,
 				vmControl: this.oVMControl
@@ -399,7 +395,6 @@ sap.ui.define([
 
 			await oVariantManagement2.waitForInit();
 			await VariantManagerApply.updateCurrentVariant({
-				variantManagementReference: sVMReference2,
 				newVariantReference: "variant0",
 				appComponent: this.oModel.oAppComponent,
 				vmControl: oVariantManagement2

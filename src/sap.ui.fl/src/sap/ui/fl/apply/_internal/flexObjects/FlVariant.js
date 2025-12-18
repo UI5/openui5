@@ -28,7 +28,7 @@ sap.ui.define([
 		metadata: {
 			properties: {
 				/**
-				 * ID of the base variant this variant was created from.
+				 * ID of the base variant this variant was created from. The referenced variant must always be in a lower layer
 				 */
 				variantReference: {
 					type: "string"

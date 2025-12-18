@@ -11,9 +11,10 @@ sap.ui.define([
 	'sap/ui/Device',
 	'./PanelRenderer',
 	"sap/ui/core/Lib",
-	'sap/m/Button'
+	'sap/m/Button',
+	"sap/ui/events/KeyCodes"
 ],
-	function(library, Control, ControlBehavior, IconPool, Device, PanelRenderer, Library, Button) {
+	function(library, Control, ControlBehavior, IconPool, Device, PanelRenderer, Library, Button, KeyCodes) {
 	"use strict";
 
 	// shortcut for sap.m.PanelAccessibleRole
@@ -203,6 +204,8 @@ sap.ui.define([
 
 		// identifies whether the last expand action is triggered by a user interaction or by calling setExpanded setter
 		this._bInteractiveExpand = false;
+		// tracks if there's a pending toggle action waiting for space key release
+		this._bPendingToggle = false;
 		this.data("sap-ui-fastnavgroup", "true", true); // Define group for F6 handling
 	};
 
@@ -307,7 +310,7 @@ sap.ui.define([
 	};
 
 	/**
-	 * Event handler called when the SPACE key is pressed.
+	 * Event handler called when the SPACE key is pressed (keydown).
 	 *
 	 * @param {jQuery.Event} oEvent The event object.
 	 * @private
@@ -323,11 +326,45 @@ sap.ui.define([
 			oEvent.preventDefault();
 		}
 
+		// Ignore repeated keydown events when key is held
 		if (oEvent.originalEvent.repeat) {
 			return;
 		}
 
-		this.ontap(oEvent);
+		// Mark that we have a pending toggle action (will execute on keyup)
+		this._bPendingToggle = true;
+	};
+
+	/**
+	 * Event handler called when the ESCAPE key is pressed.
+	 * Cancels the pending toggle action if space is currently held down.
+	 *
+	 * @param {jQuery.Event} oEvent The event object.
+	 * @private
+	 */
+	Panel.prototype.onsapescape = function(oEvent) {
+		if (this._bPendingToggle) {
+			// Cancel the pending toggle
+			this._bPendingToggle = false;
+			oEvent.preventDefault();
+		}
+	};
+
+	/**
+	 * Event handler called when the SPACE key is released (keyup).
+	 *
+	 * @param {jQuery.Event} oEvent The event object.
+	 * @private
+	 */
+	Panel.prototype.onkeyup = function(oEvent) {
+		if (oEvent.which === KeyCodes.SPACE) {
+			// Only trigger action if there's a pending toggle
+			if (this._bPendingToggle) {
+				this.ontap(oEvent);
+			}
+			// Reset pending toggle state
+			this._bPendingToggle = false;
+		}
 	};
 
 	/**

@@ -1,39 +1,41 @@
 /* global QUnit */
 
 sap.ui.define([
+	"sap/m/Input",
+	"sap/m/MessageBox",
+	"sap/m/Panel",
+	"sap/ui/core/Lib",
 	"sap/ui/dt/DesignTimeMetadata",
 	"sap/ui/fl/write/api/ChangesWriteAPI",
 	"sap/ui/fl/write/api/PersistenceWriteAPI",
 	"sap/ui/rta/command/AddXMLAtExtensionPoint",
 	"sap/ui/rta/command/BaseCommand",
-	"sap/ui/rta/command/CompositeCommand",
 	"sap/ui/rta/command/CommandFactory",
+	"sap/ui/rta/command/CompositeCommand",
 	"sap/ui/rta/command/ControlVariantSwitch",
+	"sap/ui/rta/command/FlexCommand",
 	"sap/ui/rta/command/LREPSerializer",
 	"sap/ui/rta/command/Stack",
 	"sap/ui/thirdparty/sinon-4",
-	"sap/m/Input",
-	"sap/m/Panel",
-	"test-resources/sap/ui/rta/qunit/RtaQunitUtils",
-	"sap/m/MessageBox",
-	"sap/ui/core/Lib"
+	"test-resources/sap/ui/rta/qunit/RtaQunitUtils"
 ], function(
+	Input,
+	MessageBox,
+	Panel,
+	Lib,
 	DesignTimeMetadata,
 	ChangesWriteAPI,
 	PersistenceWriteAPI,
 	AddXMLAtExtensionPointCommand,
 	BaseCommand,
-	CompositeCommand,
 	CommandFactory,
+	CompositeCommand,
 	ControlVariantSwitchCommand,
+	FlexCommand,
 	CommandSerializer,
 	CommandStack,
 	sinon,
-	Input,
-	Panel,
-	RtaQunitUtils,
-	MessageBox,
-	Lib
+	RtaQunitUtils
 ) {
 	"use strict";
 
@@ -531,6 +533,161 @@ sap.ui.define([
 				"then the composite command was created correctly"
 			);
 			assert.deepEqual(this.oCommandStack.getCommands().length, 1, "then the stack has only one command");
+		});
+
+		QUnit.test("removeAllCommands with empty stack", function(assert) {
+			const oModifiedSpy = sandbox.spy(this.oCommandStack, "fireModified");
+
+			const aRemovedCommands = this.oCommandStack.removeAllCommands();
+
+			assert.deepEqual(aRemovedCommands, [], "then an empty array is returned");
+			assert.strictEqual(this.oCommandStack.getCommands().length, 0, "then the stack remains empty");
+			assert.strictEqual(this.oCommandStack._toBeExecuted, -1, "then _toBeExecuted is set to -1");
+			assert.ok(oModifiedSpy.calledOnce, "then the modified event is fired");
+		});
+
+		QUnit.test("removeAllCommands with commands in stack", function(assert) {
+			const oModifiedSpy = sandbox.spy(this.oCommandStack, "fireModified");
+			const oBaseCommand1 = new BaseCommand();
+			const oBaseCommand2 = new BaseCommand();
+			this.oCommandStack.push(oBaseCommand1);
+			this.oCommandStack.push(oBaseCommand2);
+
+			const aRemovedCommands = this.oCommandStack.removeAllCommands();
+
+			assert.strictEqual(aRemovedCommands.length, 2, "then all commands are returned");
+			assert.deepEqual(aRemovedCommands, [oBaseCommand2, oBaseCommand1], "then commands are returned in correct order");
+			assert.strictEqual(this.oCommandStack.getCommands().length, 0, "then the stack is empty");
+			assert.strictEqual(this.oCommandStack._toBeExecuted, -1, "then _toBeExecuted is reset to -1");
+			assert.ok(oModifiedSpy.calledOnce, "then the modified event is fired");
+		});
+
+		QUnit.test("removeAllCommands with executed commands", async function(assert) {
+			const oBaseCommand1 = new BaseCommand();
+			const oBaseCommand2 = new BaseCommand();
+
+			await this.oCommandStack.pushAndExecute(oBaseCommand1);
+			await this.oCommandStack.pushAndExecute(oBaseCommand2);
+
+			assert.strictEqual(this.oCommandStack._toBeExecuted, -1, "then both commands are executed");
+
+			const oModifiedSpy = sandbox.spy(this.oCommandStack, "fireModified");
+			const aRemovedCommands = this.oCommandStack.removeAllCommands();
+
+			assert.strictEqual(aRemovedCommands.length, 2, "then all commands are returned");
+			assert.strictEqual(this.oCommandStack.getCommands().length, 0, "then the stack is empty");
+			assert.strictEqual(this.oCommandStack._toBeExecuted, -1, "then _toBeExecuted remains -1");
+			assert.ok(oModifiedSpy.calledOnce, "then the modified event is fired");
+		});
+
+		QUnit.test("removeAllCommands with bSuppressInvalidate parameter", function(assert) {
+			const oBaseCommand = new BaseCommand();
+			this.oCommandStack.push(oBaseCommand);
+
+			const oRemoveAllAggregationSpy = sandbox.spy(this.oCommandStack, "removeAllAggregation");
+
+			const aRemovedCommands = this.oCommandStack.removeAllCommands(true);
+
+			assert.strictEqual(aRemovedCommands.length, 1, "then the command is returned");
+			assert.strictEqual(this.oCommandStack.getCommands().length, 0, "then the stack is empty");
+			assert.ok(
+				oRemoveAllAggregationSpy.calledOnceWithExactly("commands", true),
+				"then removeAllAggregation is called with bSuppressInvalidate = true"
+			);
+		});
+
+		QUnit.test("removeAllCommands with bRemoveChangesFromPersistence parameter", function(assert) {
+			const sDummyComponent = "dummyComponent";
+			const oRemoveStub = sandbox.stub(PersistenceWriteAPI, "remove");
+
+			const oFlexCommand1 = new FlexCommand();
+			const oFlexCommand2 = new FlexCommand();
+
+			this.oCommandStack.push(oFlexCommand1);
+			this.oCommandStack.push(oFlexCommand2);
+
+			sandbox.stub(oFlexCommand1, "getPreparedChange").returns({ getId: () => "testChangeId1" });
+			sandbox.stub(oFlexCommand1, "getAppComponent").returns(sDummyComponent);
+			sandbox.stub(oFlexCommand2, "getPreparedChange").returns({ getId: () => "testChangeId2" });
+			sandbox.stub(oFlexCommand2, "getAppComponent").returns(sDummyComponent);
+
+			this.oCommandStack.removeAllCommands(false, true);
+
+			assert.ok(oRemoveStub.calledOnce, "then PersistenceWriteAPI.remove is called once");
+			const aFlexObjects = oRemoveStub.getCalls()[0].args[0].flexObjects;
+			assert.strictEqual(aFlexObjects.length, 2, "then remove is called with two flex objects");
+			assert.strictEqual(aFlexObjects[0].getId(), "testChangeId2", "then the first change is from the second command");
+			assert.strictEqual(aFlexObjects[1].getId(), "testChangeId1", "then the second change is from the first command");
+			assert.strictEqual(
+				oRemoveStub.getCalls()[0].args[0].selector,
+				sDummyComponent,
+				"then remove is called with the correct app component"
+			);
+		});
+
+		QUnit.test("removeAllCommands with composite commands", function(assert) {
+			const sDummyComponent = "dummyComponent";
+			const oRemoveStub = sandbox.stub(PersistenceWriteAPI, "remove");
+			const oModifiedSpy = sandbox.spy(this.oCommandStack, "fireModified");
+
+			const oFlexCommand1 = new FlexCommand();
+			const oFlexCommand2 = new FlexCommand();
+			const oCompositeCommand = new CompositeCommand();
+			oCompositeCommand.addCommand(oFlexCommand1);
+			oCompositeCommand.addCommand(oFlexCommand2);
+
+			const oStandaloneFlexCommand = new FlexCommand();
+
+			sandbox.stub(oFlexCommand1, "getPreparedChange").returns({ getId: () => "compositeChangeId1" });
+			sandbox.stub(oFlexCommand1, "getAppComponent").returns(sDummyComponent);
+			sandbox.stub(oFlexCommand2, "getPreparedChange").returns({ getId: () => "compositeChangeId2" });
+			sandbox.stub(oFlexCommand2, "getAppComponent").returns(sDummyComponent);
+			sandbox.stub(oStandaloneFlexCommand, "getPreparedChange").returns({ getId: () => "standaloneChangeId" });
+			sandbox.stub(oStandaloneFlexCommand, "getAppComponent").returns(sDummyComponent);
+
+			this.oCommandStack.push(oCompositeCommand);
+			this.oCommandStack.push(oStandaloneFlexCommand);
+
+			const aRemovedCommands = this.oCommandStack.removeAllCommands(false, true);
+
+			assert.strictEqual(aRemovedCommands.length, 2, "then both commands are returned");
+			assert.strictEqual(aRemovedCommands[0], oStandaloneFlexCommand, "then the standalone command is returned first");
+			assert.strictEqual(aRemovedCommands[1], oCompositeCommand, "then the composite command is returned second");
+			assert.strictEqual(this.oCommandStack.getCommands().length, 0, "then the stack is empty");
+			assert.strictEqual(this.oCommandStack._toBeExecuted, -1, "then _toBeExecuted is reset to -1");
+			assert.ok(oModifiedSpy.calledOnce, "then the modified event is fired");
+
+			assert.ok(oRemoveStub.calledOnce, "then PersistenceWriteAPI.remove is called once");
+			const aFlexObjects = oRemoveStub.getCalls()[0].args[0].flexObjects;
+			assert.strictEqual(aFlexObjects.length, 3, "then remove is called with three flex objects");
+			assert.strictEqual(aFlexObjects[0].getId(), "standaloneChangeId", "then the first change is from the standalone command");
+			assert.strictEqual(aFlexObjects[1].getId(), "compositeChangeId1", "then the second change is from the first sub-command");
+			assert.strictEqual(aFlexObjects[2].getId(), "compositeChangeId2", "then the third change is from the second sub-command");
+			assert.strictEqual(
+				oRemoveStub.getCalls()[0].args[0].selector,
+				sDummyComponent,
+				"then remove is called with the correct app component"
+			);
+		});
+
+		QUnit.test("removeAllCommands resets stack state correctly", async function(assert) {
+			const oBaseCommand1 = new BaseCommand();
+			const oBaseCommand2 = new BaseCommand();
+
+			// Add and execute one command
+			await this.oCommandStack.pushAndExecute(oBaseCommand1);
+			// Add another command but don't execute it
+			this.oCommandStack.push(oBaseCommand2);
+
+			assert.ok(this.oCommandStack.canRedo(), "then canRedo returns true before removeAll");
+			assert.ok(this.oCommandStack.canUndo(), "then canUndo returns true before removeAll");
+
+			this.oCommandStack.removeAllCommands();
+
+			assert.notOk(this.oCommandStack.canRedo(), "then canRedo returns false after removeAll");
+			assert.notOk(this.oCommandStack.canUndo(), "then canUndo returns false after removeAll");
+			assert.notOk(this.oCommandStack.canSave(), "then canSave returns false after removeAll");
+			assert.ok(this.oCommandStack.isEmpty(), "then isEmpty returns true after removeAll");
 		});
 	});
 

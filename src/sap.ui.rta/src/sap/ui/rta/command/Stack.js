@@ -217,8 +217,11 @@ sap.ui.define([
 		return oRemovedCommand;
 	};
 
-	Stack.prototype.removeAllCommands = function(bSuppressInvalidate) {
+	Stack.prototype.removeAllCommands = function(bSuppressInvalidate, bRemoveChangesFromPersistence) {
 		const aCommands = this.removeAllAggregation("commands", bSuppressInvalidate);
+		if (bRemoveChangesFromPersistence) {
+			removeCommandChangesFromPersistence.call(this, aCommands);
+		}
 		this._toBeExecuted = -1;
 		this.fireModified();
 		return aCommands;
@@ -263,21 +266,23 @@ sap.ui.define([
 		}
 	}
 
-	function removeCommandChangesFromPersistence(oCommand) {
+	function removeCommandChangesFromPersistence(aCommands) {
 		let oAppComponent;
 		const aFlexObjects = [];
-		const aSubCommands = this.getSubCommands(oCommand);
-		aSubCommands.forEach((oSubCommand) => {
-			// for revertable changes which don't belong to LREP (variantSwitch) or runtime only changes
-			if (!(oSubCommand instanceof FlexCommand || oSubCommand instanceof ManifestCommand)
-				|| oSubCommand.getRuntimeOnly()) {
-				return;
-			}
-			const oChange = oSubCommand.getPreparedChange();
-			oAppComponent = oSubCommand.getAppComponent();
-			if (oAppComponent) {
-				aFlexObjects.push(oChange);
-			}
+		aCommands.forEach((oCommand) => {
+			const aSubCommands = this.getSubCommands(oCommand);
+			aSubCommands.forEach((oSubCommand) => {
+				// for revertable changes which don't belong to LREP (variantSwitch) or runtime only changes
+				if (!(oSubCommand instanceof FlexCommand || oSubCommand instanceof ManifestCommand)
+					|| oSubCommand.getRuntimeOnly()) {
+					return;
+				}
+				const oChange = oSubCommand.getPreparedChange();
+				oAppComponent = oSubCommand.getAppComponent();
+				if (oAppComponent) {
+					aFlexObjects.push(oChange);
+				}
+			});
 		});
 		if (oAppComponent) {
 			PersistenceWriteAPI.remove({
@@ -311,7 +316,7 @@ sap.ui.define([
 						oError.command = this.removeCommand(this._toBeExecuted); // remove failing command
 						this._toBeExecuted--;
 						// Remove Flex Changes for failed command from persistence
-						removeCommandChangesFromPersistence.call(this, oError.command);
+						removeCommandChangesFromPersistence.call(this, [oError.command]);
 						const oRtaResourceBundle = Lib.getResourceBundleFor("sap.ui.rta");
 						// AddXMLAtExtensionPoint errors explain to the user what they did wrong, so they shouldn't open an incident
 						const sErrorMessage = oCommand.isA("sap.ui.rta.command.AddXMLAtExtensionPoint") ?
@@ -344,7 +349,7 @@ sap.ui.define([
 					const aDiscardedChanges = oCommand.getDiscardedChanges?.();
 					if (oCommand) {
 						await oCommand.undo();
-						removeCommandChangesFromPersistence.call(this, oCommand);
+						removeCommandChangesFromPersistence.call(this, [oCommand]);
 						if (aDiscardedChanges) {
 							handleDiscardedChanges.call(this, aDiscardedChanges, true);
 						}

@@ -228,6 +228,13 @@
 				<ReturnType Type="Collection(com.sap.gateway.default.iwbep.tea_busi.v0001.Worker)"
 					Nullable="false"/>
 			</Function>
+			<Function Name="__FAKE__FuGetEmployees">
+				<ReturnType Type="Collection(com.sap.gateway.default.iwbep.tea_busi.v0001.Worker)"/>
+			</Function>
+			<Function Name="__FAKE__FuGetEmployees">
+				<Parameter Name="ManagerID" Type="Edm.String" Nullable="false" MaxLength="4"/>
+				<ReturnType Type="Collection(com.sap.gateway.default.iwbep.tea_busi.v0001.Worker)"/>
+			</Function>
 			<Function Name="__FAKE__FuGetEmployeesByManager" IsBound="true">
 				<Parameter Name="_it" Type="com.sap.gateway.default.iwbep.tea_busi.v0001.MANAGER" Nullable="false"/>
 				<ReturnType Type="Collection(com.sap.gateway.default.iwbep.tea_busi.v0001.Worker)" Nullable="false"/>
@@ -292,6 +299,8 @@
 				<FunctionImport Name="GetEmployeeMaxAge"
 					Function="com.sap.gateway.default.iwbep.tea_busi.v0001.FuGetEmployeeMaxAge"
 					IncludeInServiceDocument="true"/>
+				<FunctionImport Name="__FAKE__FuGetEmployees" EntitySet="EMPLOYEES"
+					Function="com.sap.gateway.default.iwbep.tea_busi.v0001.__FAKE__FuGetEmployees"/>
 			</EntityContainer>
 			<Annotations Target="SAP__self.Worker/LOCATION/COUNTRY">
 				<Annotation Term="SAP__common.Label" String="char 255"/>
