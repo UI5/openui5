@@ -251,7 +251,7 @@ sap.ui.define([
 		assert.ok(bExpand, "The expand parameter should be true");
 	});
 
-	QUnit.test("onsapspace()", async function(assert) {
+	QUnit.test("onsapspace() - panel expands on keyup", async function(assert) {
 		var bPassedArg, bExpand,
 			fnEventSpy = sinon.spy(function (oEvent) {
 				bPassedArg = oEvent.getParameter('triggeredByInteraction');
@@ -260,6 +260,8 @@ sap.ui.define([
 
 		await this.createPanel({ expanded: false });
 		this.oPanel.attachExpand(fnEventSpy);
+
+		// Simulate space keydown
 		this.oPanel.onsapspace({
 			target: this.oPanel.getDomRef().querySelector(".sapMPanelWrappingDiv"),
 			preventDefault: function () {},
@@ -268,8 +270,28 @@ sap.ui.define([
 			}
 		});
 
+		// Panel should not expand yet on keydown
+		assert.notOk(fnEventSpy.called, "Event should not be fired on keydown");
+		assert.notOk(this.oPanel.getExpanded(), "Panel should not be expanded yet");
+
+		// Simulate space keyup
+		this.oPanel.onkeyup({
+			which: KeyCodes.SPACE,
+			target: this.oPanel.getDomRef().querySelector(".sapMPanelWrappingDiv")
+		});
+
+		// Now the panel should expand
+		assert.ok(fnEventSpy.calledOnce, "Event should be fired once on keyup");
+		assert.ok(bPassedArg, "Event should be triggered by an user interaction");
+		assert.ok(bExpand, "The expand parameter should be true");
+	});
+
+	QUnit.test("onsapspace() - repeated keydown is ignored", async function(assert) {
+		await this.createPanel({ expanded: false });
+
 		var fnTapSpy = this.spy(this.oPanel, "ontap");
 
+		// Simulate space keydown with repeat=true
 		this.oPanel.onsapspace({
 			target: this.oPanel.getDomRef().querySelector(".sapMPanelWrappingDiv"),
 			preventDefault: function () {},
@@ -278,9 +300,45 @@ sap.ui.define([
 			}
 		});
 
-		assert.ok(bPassedArg, "Event should be triggered by an user interaction");
-		assert.ok(bExpand, "Event should be triggered by an user interaction");
-		assert.notOk(fnTapSpy.called, "The event action is not repeated");
+		// Simulate space keyup
+		this.oPanel.onkeyup({
+			which: KeyCodes.SPACE,
+			target: this.oPanel.getDomRef().querySelector(".sapMPanelWrappingDiv")
+		});
+
+		assert.notOk(fnTapSpy.called, "The event action should not be triggered for repeated keydown");
+		assert.notOk(this.oPanel.getExpanded(), "Panel should not be expanded");
+	});
+
+	QUnit.test("onsapspace() - escape cancels expansion", async function(assert) {
+		var fnEventSpy = sinon.spy();
+
+		await this.createPanel({ expanded: false });
+		this.oPanel.attachExpand(fnEventSpy);
+
+		// Simulate space keydown
+		this.oPanel.onsapspace({
+			target: this.oPanel.getDomRef().querySelector(".sapMPanelWrappingDiv"),
+			preventDefault: function () {},
+			originalEvent: {
+				repeat: false
+			}
+		});
+
+		// Simulate escape key while space is held down
+		this.oPanel.onsapescape({
+			preventDefault: function () {}
+		});
+
+		// Simulate space keyup
+		this.oPanel.onkeyup({
+			which: KeyCodes.SPACE,
+			target: this.oPanel.getDomRef().querySelector(".sapMPanelWrappingDiv")
+		});
+
+		// Panel should not expand because escape was pressed
+		assert.notOk(fnEventSpy.called, "Event should not be fired when escape cancels the action");
+		assert.notOk(this.oPanel.getExpanded(), "Panel should not be expanded");
 	});
 
 	QUnit.test("onsapenter()", async function(assert) {

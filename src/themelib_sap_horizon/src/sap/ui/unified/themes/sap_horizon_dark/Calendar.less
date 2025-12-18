@@ -65,8 +65,10 @@ html[data-sap-ui-browser^='ff'].sap-desktop .sapUiCalHead > .sapUiCalHeadB:focus
 	}
 }
 
-html.sap-desktop .sapUiCalHead > .sapUiCalHeadB:focus::before {
-	content: '';
+html.sap-desktop .sapUiCalHead > .sapUiCalHeadB:focus::before,
+html.sap-desktop .sapUiCalHead > .sapUiCalHeadNext:focus::before,
+html.sap-desktop .sapUiCalHead > .sapUiCalHeadPrev:focus::before {
+	content: "";
 	position: absolute;
 	box-sizing: border-box;
 	left: 0.125rem;
@@ -113,7 +115,16 @@ html.sap-desktop .sapUiCalCancel:focus {
 	font-size: var(--sapFontSmallSize);
 }
 
-html.sap-desktop .sapUiCalHead > .sapUiCalHeadB:focus:not(:hover):not(:active) {
+.sapUiCalHead.sapUiCalHeaderWithTodayButton .sapUiCalHeadNext,
+.sapUiCalHead.sapUiCalHeaderWithTodayButton .sapUiCalHeadPrev {
+	position: relative;
+	left:0;
+	right: 0;
+}
+
+html.sap-desktop .sapUiCalHead > .sapUiCalHeadB:focus:not(:hover):not(:active),
+html.sap-desktop .sapUiCalHead > .sapUiCalHeadNext:focus:not(:hover):not(:active),
+html.sap-desktop .sapUiCalHead > .sapUiCalHeadPrev:focus:not(:hover):not(:active) {
 	background-color: transparent;
 }
 
@@ -135,6 +146,19 @@ html.sap-desktop .sapUiCalHead > .sapUiCalHeadB:hover {
 }
 
 html.sap-desktop .sapUiCalHead > .sapUiCalHeadB:active {
+html.sap-desktop .sapUiCalHead > .sapUiCalHeadNext:focus::before,
+html.sap-desktop .sapUiCalHead > .sapUiCalHeadPrev:focus::before {
+  content: "";
+  position: absolute;
+  box-sizing: border-box;
+  left: 0.125rem;
+  top: 0.125rem;
+  right: 0.125rem;
+  bottom: 0.125rem;
+  border: 0.125rem dotted @sapUiContentFocusColor;
+  pointer-events: none;
+  border-radius: 0.375rem;
+}
 	color: var(--sapButton_Active_TextColor);
 	border-color: var(--sapButton_Lite_Active_BorderColor);
 }

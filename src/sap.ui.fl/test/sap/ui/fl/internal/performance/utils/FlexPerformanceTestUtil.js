@@ -280,7 +280,6 @@ sap.ui.define([
 
 	FlexPerformanceTestUtil.updateVariant = function(oComponent) {
 		return VariantManagerApply.updateCurrentVariant({
-			variantManagementReference: "idMain1--variantManagementOrdersTable",
 			newVariantReference: "id_1570801327284_11",
 			appComponent: oComponent,
 			vmControl: Element.getElementById("idMain1--variantManagementOrdersTable")

@@ -191,6 +191,9 @@ sap.ui.define([
 				"tea_busi.DefaultContainer" : {
 					"@DefaultContainer" : {}
 				},
+				"tea_busi.DefaultContainer/GetEmployees/$ReturnType" : {
+					"@Common.Label" : "Return type's label across all overloads of function import"
+				},
 				"tea_busi.DefaultContainer/Me" : {
 					"@Singleton" : {
 						AbsolutePath2Age : {
@@ -655,6 +658,11 @@ sap.ui.define([
 					$kind : "FunctionImport",
 					$Function : "tea_busi.FuGetEmployeeMaxAge"
 				},
+				GetEmployees : {
+					$kind : "FunctionImport",
+					// $EntitySet : "EMPLOYEES",
+					$Function : "tea_busi.FuGetEmployees"
+				},
 				MANAGERS : {
 					$kind : "EntitySet",
 					$Type : "tea_busi.MANAGER"
@@ -714,6 +722,23 @@ sap.ui.define([
 				$kind : "Function",
 				$ReturnType : {
 					$Type : "Edm.Int16"
+				}
+			}],
+			"tea_busi.FuGetEmployees" : [{
+				$kind : "Function",
+				$ReturnType : {
+					$isCollection : true,
+					$Type : "tea_busi.Worker"
+				}
+			}, {
+				$kind : "Function",
+				$Parameter : [{
+					$Name : "LOCATION",
+					$Type : "tea_busi.ComplexType_Location"
+				}],
+				$ReturnType : {
+					$isCollection : true,
+					$Type : "tea_busi.Worker"
 				}
 			}],
 			"tea_busi.MANAGER" : {
@@ -1802,6 +1827,7 @@ sap.ui.define([
 		"/OverloadedFunctionImport/@$ui5.overload/AMOUNT"
 			: mScope["tea_busi.ComplexType_Salary"].AMOUNT,
 		"/OverloadedFunctionImport/AMOUNT" : mScope["tea_busi.ComplexType_Salary"].AMOUNT,
+		"/GetEmployees/AGE" : oWorkerData.AGE, // two unbound overloads => same return type
 		"/T€AMS/name.space.OverloadedBoundFunction/Team_Id" : oTeamData.Team_Id,
 		"/EMPLOYEES/EMPLOYEE_2_TEAM/name.space.OverloadedBoundFunction/Team_Id" : oTeamData.Team_Id,
 		"/EMPLOYEES/name.space.OverloadedBoundFunction/_it"
@@ -1939,6 +1965,8 @@ sap.ui.define([
 			: mScope.$Annotations["tea_busi.NewAction/$ReturnType"]["@Common.Label"],
 		"/T€AMS/tea_busi.NewAction/$ReturnType@Common.Label" : mScope.$Annotations
 			["tea_busi.NewAction(Collection(tea_busi.TEAM))/$ReturnType"]["@Common.Label"],
+		//TODO "/GetEmployees/$ReturnType@Common.Label"
+		// : "Return type's label across all overloads of function import",
 		// annotations at properties of return type - - - - - - - - - - - - - - - - - - - - - - - -
 		"/T€AMS/tea_busi.NewAction/Name@" : mScope.$Annotations["tea_busi.TEAM/Name"],
 		"/T€AMS/tea_busi.NewAction//Team_Id@" : mScope.$Annotations["tea_busi.TEAM/Team_Id"],
@@ -2345,6 +2373,9 @@ sap.ui.define([
 			"/name.space.OverloadedAction/" : "Expected a single overload, but found 4",
 			"/name.space.OverloadedAction/_it" : "Expected a single overload, but found 4",
 			"/name.space.OverloadedFunction/" : "Expected a single overload, but found 2",
+
+			// Parameter
+			"/GetEmployees/LOCATION" : "Expected a single overload, but found 2",
 
 			// wrong binding parameter
 			"/ServiceGroups/name.space.OverloadedAction/parameter1@Common.Label"
@@ -4800,6 +4831,7 @@ sap.ui.define([
 			"/EMPLOYEES",
 			"/EQUIPM€NTS",
 			"/GetEmployeeMaxAge",
+			"/GetEmployees",
 			"/MANAGERS",
 			"/Me",
 			"/OverloadedAction",

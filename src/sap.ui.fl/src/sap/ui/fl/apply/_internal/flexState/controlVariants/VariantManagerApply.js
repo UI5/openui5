@@ -175,9 +175,7 @@ sap.ui.define([
 		const sTargetVReference = oEvent.getParameter("key");
 		const sSourceVReference = oVMControl.getCurrentVariantReference();
 		const bVariantSwitch = sSourceVReference !== sTargetVReference;
-
 		await VariantManagerApply.updateCurrentVariant({
-			variantManagementReference: sVMReference,
 			newVariantReference: sTargetVReference,
 			appComponent: oAppComponent,
 			vmControl: oVMControl,

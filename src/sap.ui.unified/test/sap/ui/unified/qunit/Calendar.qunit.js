@@ -154,6 +154,36 @@ sap.ui.define([
 		}
 	});
 
+	QUnit.test("Next/Previous month buttons are focusable and have correct acc attributes", function(assert) {
+	  var $PrevBtn = jQuery("#Cal1--Head-prev");
+	  var $NextBtn = jQuery("#Cal1--Head-next");
+	  var prevTabindex = $PrevBtn.attr("tabindex");
+	  var nextTabindex = $NextBtn.attr("tabindex");
+	  var prevTitle = $PrevBtn.attr("title");
+	  var nextTitle = $NextBtn.attr("title");
+	  var nextAriaLabel = $NextBtn.attr("aria-label");
+	  var prevAriaLabel = $PrevBtn.attr("aria-label");
+	  var nextAriaDescription = $NextBtn.attr("aria-description");
+	  var prevAriaDescription = $PrevBtn.attr("aria-description");
+	  var nextAriaShortCuts = $NextBtn.attr("aria-keyshortcuts");
+	  var prevAriaShortCuts = $PrevBtn.attr("aria-keyshortcuts");
+
+	  assert.ok($PrevBtn.length, "Previous month button exists");
+	  assert.ok($NextBtn.length, "Next month button exists");
+	  assert.equal(prevTabindex, "0", "Previous month button is focusable (tabindex=0)");
+	  assert.equal(nextTabindex, "0", "Next month button is focusable (tabindex=0)");
+	  assert.ok(prevTitle && prevTitle.length > 0, "Previous month button has a tooltip");
+	  assert.ok(nextTitle && nextTitle.length > 0, "Next month button has a tooltip");
+	  assert.equal(prevTitle, "Previous Month (Pageup)", "Previous month button has correct tooltip");
+	  assert.equal(nextTitle, "Next Month (Pagedown)", "Next month button has correct tooltip");
+	  assert.equal(prevAriaLabel, "Previous Month", "Previous month button has correct aria-label");
+	  assert.equal(nextAriaLabel, "Next Month", "Next month button has correct aria-label");
+	  assert.equal(prevAriaDescription, "Previous Month", "Previous month button has correct aria-description");
+	  assert.equal(nextAriaDescription, "Next Month", "Next month button has correct aria-description");
+	  assert.equal(prevAriaShortCuts, "Pageup", "Previous month button has correct aria-keyshortcuts");
+	  assert.equal(nextAriaShortCuts, "Pagedown", "Next month button has correct aria-keyshortcuts");
+	});
+
 	QUnit.test("width", function(assert) {
 		var sStyle = jQuery("#Cal1").attr("style");
 		assert.ok((!sStyle || sStyle.search("width") < 0), "Calendar1: no width set");
@@ -563,7 +593,14 @@ sap.ui.define([
 
 		//assert
 		assert.ok(jQuery("#Cal2--Month0-20110122").hasClass("sapUiCalItemWeekEnd"), "20110122 is a date of type 'NonWorking'");
+	});
 
+	QUnit.test("interval selection", function(assert) {
+		assert.equal(jQuery("#Cal2--Month0-20110110").attr("aria-label"), "10. Januar 2011, First Date of Range", "20110010 aria label");
+		assert.equal(jQuery("#Cal2--Month0-20110111").attr("aria-label"), "11. Januar 2011, Part of Range", "20110011 aria label");
+		assert.equal(jQuery("#Cal2--Month0-20110112").attr("aria-label"), "12. Januar 2011, Part of Range", "20110012 aria label");
+		assert.equal(jQuery("#Cal2--Month0-20110113").attr("aria-label"), "13. Januar 2011, Last Date of Range", "20110013 aria label");
+		assert.equal(jQuery("#Cal2--Month0-20110114").attr("aria-label"), "14. Januar 2011", "20110014 aria label");
 	});
 
 	QUnit.test("YearPicker primaryCalendarType", function(assert) {

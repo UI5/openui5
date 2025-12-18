@@ -14,6 +14,7 @@ sap.ui.define([
 	"sap/ui/fl/apply/_internal/flexState/FlexObjectState",
 	"sap/ui/fl/apply/_internal/flexState/FlexState",
 	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
+	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/initial/_internal/Settings",
 	"sap/ui/fl/variants/VariantManagement",
 	"sap/ui/fl/variants/VariantManager",
@@ -39,6 +40,7 @@ sap.ui.define([
 	FlexObjectState,
 	FlexState,
 	ControlVariantApplyAPI,
+	ManifestUtils,
 	Settings,
 	VariantManagement,
 	VariantManager,
@@ -249,96 +251,6 @@ sap.ui.define([
 			oControl.destroy();
 		});
 
-		[true, false].forEach(function(bVendorLayer) {
-			QUnit.test(bVendorLayer ? "when calling 'copyVariant' in VENDOR layer" : "when calling 'copyVariant'", async function(assert) {
-				sandbox.stub(JsControlTreeModifier, "getSelector").returns({ id: sVMReference });
-				var oAddDirtyChangesSpy = sandbox.spy(FlexObjectManager, "addDirtyFlexObjects");
-
-				var mPropertyBag = {
-					sourceVariantReference: sVMReference,
-					variantManagementReference: sVMReference,
-					vmControl: this.oVMControl,
-					appComponent: oComponent,
-					generator: "myFancyGenerator",
-					newVariantReference: "potato",
-					layer: bVendorLayer ? Layer.VENDOR : Layer.CUSTOMER,
-					additionalVariantChanges: []
-				};
-				const oUpdateCurrentVariantStub = sandbox.stub(VariantManagerApply, "updateCurrentVariant").resolves();
-
-				const aChanges = await VariantManager.copyVariant(mPropertyBag);
-				var oNewVariant = this.oModel.oData[sVMReference].variants.find(function(oVariant) {
-					return oVariant.key === "potato";
-				});
-				assert.ok(oAddDirtyChangesSpy.calledOnce, "then the changes were added");
-				assert.ok(oNewVariant.rename, "then the property was added correctly");
-				assert.ok(oNewVariant.change, "then the property was added correctly");
-				assert.ok(oNewVariant.remove, "then the property was added correctly");
-				assert.strictEqual(oNewVariant.sharing, this.oModel.sharing.PUBLIC, "then the property was added correctly");
-				assert.strictEqual(
-					aChanges[0].getId(), "potato",
-					"then the returned variant is the duplicate variant"
-				);
-				assert.deepEqual(
-					oUpdateCurrentVariantStub.firstCall.args[0],
-					{
-						variantManagementReference: mPropertyBag.variantManagementReference,
-						newVariantReference: mPropertyBag.newVariantReference,
-						appComponent: mPropertyBag.appComponent,
-						vmControl: mPropertyBag.vmControl,
-						skipExecuteAfterSwitch: true,
-						scenario: "saveAs"
-					}
-				);
-			});
-		});
-
-		QUnit.test("when calling 'copyVariant' with public layer", async function(assert) {
-			var oVariantData = {
-				instance: createVariant({
-					fileName: "variant0",
-					variantManagementReference: sVMReference,
-					variantReference: "",
-					layer: Layer.PUBLIC,
-					title: "Text for TextDemo",
-					author: ""
-				}),
-				controlChanges: [],
-				variantChanges: {}
-			};
-			const oAddDirtyFlexObjectsStub = sandbox.stub(FlexObjectManager, "addDirtyFlexObjects").returnsArg(2);
-
-			sandbox.stub(this.oModel, "_duplicateVariant").returns(oVariantData);
-			sandbox.stub(JsControlTreeModifier, "getSelector").returns({ id: sVMReference });
-			sandbox.stub(VariantManagerApply, "updateCurrentVariant").resolves();
-
-			var mPropertyBag = {
-				variantManagementReference: sVMReference,
-				appComponent: oComponent,
-				generator: "myFancyGenerator",
-				layer: Layer.PUBLIC,
-				additionalVariantChanges: []
-			};
-			const aChanges = await VariantManager.copyVariant(mPropertyBag);
-			assert.ok(this.oModel.getVariant("variant0", sVMReference), "then variant added to VariantModel");
-			assert.strictEqual(oVariantData.instance.getFavorite(), false, "then variant has favorite set to false");
-			assert.strictEqual(aChanges.length, 2, "then there are 2 changes");
-			assert.strictEqual(aChanges[0].getLayer(), Layer.USER, "the first change is a user layer change");
-			assert.strictEqual(aChanges[0].getChangeType(), "setFavorite", "with changeType 'setFavorite'");
-			assert.deepEqual(aChanges[0].getContent(), { favorite: true }, "and favorite set to true");
-			assert.strictEqual(aChanges[1].getLayer(), Layer.PUBLIC, "then the second change is a public layer change");
-			assert.strictEqual(
-				aChanges[1].getId(),
-				oVariantData.instance.getId(),
-				"then the returned variant is the duplicate variant"
-			);
-			assert.equal(
-				oAddDirtyFlexObjectsStub.firstCall.args[2].length,
-				2,
-				"then both changes are added as dirty changes"
-			);
-		});
-
 		QUnit.test("when calling 'removeVariant' with a component", async function(assert) {
 			const fnDeleteFlexObjectsStub = sandbox.stub(FlexObjectManager, "deleteFlexObjects");
 			const oChangeInVariant = {
@@ -367,13 +279,11 @@ sap.ui.define([
 			const mPropertyBag = {
 				variant: oVariant,
 				sourceVariantReference: "sourceVariant",
-				variantManagementReference: sVMReference,
 				appComponent: oComponent,
 				vmControl: this.oVMControl
 			};
 			await VariantManager.removeVariant(mPropertyBag);
 			assert.deepEqual(fnUpdateCurrentVariantStub.getCall(0).args[0], {
-				variantManagementReference: mPropertyBag.variantManagementReference,
 				newVariantReference: mPropertyBag.sourceVariantReference,
 				appComponent: mPropertyBag.appComponent,
 				vmControl: this.oVMControl
@@ -548,7 +458,6 @@ sap.ui.define([
 			sandbox.stub(FlexObjectManager, "saveFlexObjects").callsFake((oPropertyBag) => {
 				assert.strictEqual(oUpdateVariantStub.callCount, 1, "the variant was switched");
 				assert.deepEqual(oUpdateVariantStub.lastCall.args[0], {
-					variantManagementReference: sVMReference,
 					newVariantReference: "variant1",
 					appComponent: oComponent,
 					vmControl: this.oVMControl
@@ -621,36 +530,16 @@ sap.ui.define([
 			sandbox.stub(DependencyHandler, "addChangeAndUpdateDependencies");
 			const oSaveStub = sandbox.stub(FlexObjectManager, "saveFlexObjects").resolves(oResponse);
 			const oDeleteFlexObjectsSpy = sandbox.spy(FlexObjectManager, "deleteFlexObjects");
-			const oCopyVariantSpy = sandbox.spy(VariantManager, "copyVariant");
 			const oCreateVManagementChangeSpy = sandbox.spy(FlexObjectFactory, "createVariantManagementChange");
 			const oCreateDefaultFileNameSpy = sandbox.spy(Utils, "createDefaultFileName");
 
 			await VariantManager.handleSaveEvent(this.oVMControl, oParameters, this.oModel);
-			const sNewVariantReference = oCreateDefaultFileNameSpy.getCall(0).returnValue;
 			assert.strictEqual(
 				oCreateDefaultFileNameSpy.getCall(0).args[0],
 				"flVariant",
 				"then the file type was passed to sap.ui.fl.Utils.createDefaultFileName"
 			);
 			assert.strictEqual(oCreateVManagementChangeSpy.callCount, 1, "one variant management change was created");
-			assert.ok(oCopyVariantSpy.calledOnce, "then copyVariant() was called once");
-			assert.deepEqual(oCopyVariantSpy.lastCall.args[0], {
-				appComponent: oComponent,
-				vmControl: this.oVMControl,
-				layer: Layer.USER,
-				currentVariantComparison: -1,
-				generator: undefined,
-				contexts: {
-					role: ["testRole"]
-				},
-				executeOnSelection: true,
-				newVariantReference: sNewVariantReference,
-				sourceVariantReference: sCopyVariantName,
-				title: "Test",
-				variantManagementReference: sVMReference,
-				adaptationId: undefined,
-				additionalVariantChanges: [oCreateVManagementChangeSpy.getCall(0).returnValue]
-			}, "then copyVariant() was called with the right parameters");
 
 			assert.strictEqual(oSaveStub.callCount, 1, "then dirty changes were saved");
 			assert.strictEqual(
@@ -699,38 +588,18 @@ sap.ui.define([
 			sandbox.stub(DependencyHandler, "addChangeAndUpdateDependencies");
 			const oSaveStub = sandbox.stub(FlexObjectManager, "saveFlexObjects").resolves(oResponse);
 			const oDeleteFlexObjectsSpy = sandbox.spy(FlexObjectManager, "deleteFlexObjects");
-			const oCopyVariantSpy = sandbox.spy(VariantManager, "copyVariant");
 			const oCreateDefaultFileNameSpy = sandbox.spy(Utils, "createDefaultFileName");
 			const oCreateVManagementChangeSpy = sandbox.spy(FlexObjectFactory, "createVariantManagementChange");
 			const oCreateVChangeSpy = sandbox.spy(FlexObjectFactory, "createVariantChange");
 
 			await VariantManager.handleSaveEvent(this.oVMControl, oParameters, this.oModel);
-			const sNewVariantReference = oCreateDefaultFileNameSpy.getCall(0).returnValue;
 			assert.strictEqual(
 				oCreateDefaultFileNameSpy.getCall(0).args[0],
 				"flVariant",
 				"then the file type was passed to sap.ui.fl.Utils.createDefaultFileName"
 			);
-			assert.ok(oCopyVariantSpy.calledOnce, "then copyVariant() was called once");
 			assert.strictEqual(oCreateVManagementChangeSpy.callCount, 1, "one variant management change was created");
 			assert.strictEqual(oCreateVChangeSpy.callCount, 1, "two variant changes were created");
-			assert.deepEqual(oCopyVariantSpy.lastCall.args[0], {
-				appComponent: oComponent,
-				vmControl: this.oVMControl,
-				layer: Layer.PUBLIC,
-				currentVariantComparison: 0,
-				generator: undefined,
-				contexts: {
-					role: ["testRole"]
-				},
-				executeOnSelection: true,
-				newVariantReference: sNewVariantReference,
-				sourceVariantReference: sCopyVariantName,
-				title: "Test",
-				variantManagementReference: sVMReference,
-				adaptationId: undefined,
-				additionalVariantChanges: [oCreateVManagementChangeSpy.getCall(0).returnValue]
-			}, "then copyVariant() was called with the right parameters");
 
 			assert.strictEqual(
 				oSaveStub.callCount, 1,
@@ -779,11 +648,9 @@ sap.ui.define([
 			var oSaveStub = sandbox.stub(FlexObjectManager, "saveFlexObjects").resolves({
 				response: [{ fileName: "change1" }, { fileName: "change2" }, { fileName: "change3" }]
 			});
-			var oCopyVariantSpy = sandbox.spy(VariantManager, "copyVariant");
 			var oSetVariantPropertiesSpy = sandbox.spy(this.oModel, "setVariantProperties");
 
 			await VariantManager.handleSaveEvent(this.oVMControl, oParameters, this.oModel);
-			assert.ok(oCopyVariantSpy.notCalled, "copyVariant is not called");
 			assert.ok(oSetVariantPropertiesSpy.notCalled, "SetVariantProperties is not called");
 			assert.ok(oSaveStub.calledOnce, "SaveAll is called");
 			oSaveStub.getCall(0).args[0].flexObjects.forEach((oChange) => {
@@ -808,14 +675,27 @@ sap.ui.define([
 
 			sandbox.stub(this.oModel, "getLocalId").returns(sVMReference);
 			sandbox.stub(DependencyHandler, "addChangeAndUpdateDependencies");
-			var oCopyVariantSpy = sandbox.spy(VariantManager, "copyVariant");
 			sandbox.stub(FlexObjectManager, "saveFlexObjects").resolves(oResponse);
 
-			await VariantManager.handleSaveEvent(this.oVMControl, oParameters, this.oModel);
-			assert.ok(
-				oCopyVariantSpy.calledOnceWith(sinon.match({
-					layer: Layer.PUBLIC
-				})),
+			const aChanges = await VariantManager.handleSaveEvent(this.oVMControl, oParameters, this.oModel);
+			assert.strictEqual(
+				aChanges[0].getChangeType(),
+				"setFavorite",
+				"then a 'setFavorite' change is created"
+			);
+			assert.strictEqual(
+				aChanges[0].getLayer(),
+				Layer.USER,
+				"then the 'setFavorite' change is created on the USER layer"
+			);
+			assert.strictEqual(
+				aChanges[1].getFileType(),
+				"ctrl_variant",
+				"then the variant is created correctly"
+			);
+			assert.strictEqual(
+				aChanges[1].getLayer(),
+				Layer.PUBLIC,
 				"then the variant is created on the PUBLIC layer"
 			);
 		});
@@ -839,35 +719,15 @@ sap.ui.define([
 			sandbox.stub(DependencyHandler, "addChangeAndUpdateDependencies");
 			const oSaveStub = sandbox.stub(FlexObjectManager, "saveFlexObjects").resolves(oResponse);
 			const oDeleteFlexObjectsSpy = sandbox.spy(FlexObjectManager, "deleteFlexObjects");
-			const oCopyVariantSpy = sandbox.spy(VariantManager, "copyVariant");
 			const oAddVariantChangeSpy = sandbox.spy(VariantManager, "addVariantChange");
 			const oCreateDefaultFileNameSpy = sandbox.spy(Utils, "createDefaultFileName");
 
 			await VariantManager.handleSaveEvent(this.oVMControl, oParameters, this.oModel);
-			const sNewVariantReference = oCreateDefaultFileNameSpy.getCall(0).returnValue;
 			assert.strictEqual(
 				oCreateDefaultFileNameSpy.getCall(0).args[0],
 				"flVariant",
 				"then the file type was passed to sap.ui.fl.Utils.createDefaultFileName"
 			);
-			assert.ok(oCopyVariantSpy.calledOnce, "then copyVariant() was called once");
-			assert.deepEqual(oCopyVariantSpy.lastCall.args[0], {
-				appComponent: oComponent,
-				vmControl: this.oVMControl,
-				layer: Layer.USER,
-				currentVariantComparison: -1,
-				generator: undefined,
-				contexts: {
-					role: ["testRole"]
-				},
-				executeOnSelection: false,
-				newVariantReference: sNewVariantReference,
-				sourceVariantReference: sCopyVariantName,
-				title: "Test",
-				variantManagementReference: sVMReference,
-				adaptationId: undefined,
-				additionalVariantChanges: []
-			}, "then copyVariant() was called with the right parameters");
 
 			assert.ok(oAddVariantChangeSpy.notCalled, "then no new changes were created");
 			assert.strictEqual(oSaveStub.callCount, 1, "then dirty changes were saved");
@@ -922,7 +782,6 @@ sap.ui.define([
 			sandbox.stub(DependencyHandler, "addChangeAndUpdateDependencies");
 			const oSaveStub = sandbox.stub(FlexObjectManager, "saveFlexObjects").resolves(oResponse);
 			const oDeleteFlexObjectsSpy = sandbox.spy(FlexObjectManager, "deleteFlexObjects");
-			const oCopyVariantSpy = sandbox.spy(VariantManager, "copyVariant");
 			const oCreateVManagementChangeSpy = sandbox.spy(FlexObjectFactory, "createVariantManagementChange");
 
 			// Copy a variant from the CUSTOMER layer
@@ -933,25 +792,7 @@ sap.ui.define([
 			});
 			sandbox.stub(this.oVMControl, "getDesignMode").returns(true);
 			const aDirtyChanges = await VariantManager.handleSaveEvent(this.oVMControl, mParameters, this.oModel);
-			assert.ok(oCopyVariantSpy.calledOnce, "then copyVariant() was called once");
 			assert.strictEqual(oCreateVManagementChangeSpy.callCount, 1, "one variant management change was created");
-			assert.deepEqual(oCopyVariantSpy.lastCall.args[0], {
-				appComponent: oComponent,
-				vmControl: this.oVMControl,
-				layer: Layer.CUSTOMER,
-				currentVariantComparison: 0,
-				generator: "myFancyGenerator",
-				newVariantReference: sNewVariantReference,
-				sourceVariantReference: sCopyVariantName,
-				title: "Key User Test Variant",
-				variantManagementReference: sVMReference,
-				contexts: {
-					role: ["testRole"]
-				},
-				executeOnSelection: true,
-				adaptationId: undefined,
-				additionalVariantChanges: [oCreateVManagementChangeSpy.getCall(0).returnValue]
-			}, "then copyVariant() was called with the right parameters");
 			assert.strictEqual(oSaveStub.callCount, 0, "then dirty changes were not saved");
 			assert.strictEqual(
 				aDirtyChanges.length,
@@ -1107,6 +948,275 @@ sap.ui.define([
 					"then the removed variant is returned as variant to be deleted"
 				);
 			});
+		});
+	});
+
+	QUnit.module("handleSaveEvent - check variant references", {
+		beforeEach() {
+			sandbox.stub(Settings, "getInstance").resolves({});
+			sandbox.stub(FlexObjectManager, "saveFlexObjects").resolves();
+			sandbox.stub(VariantManagerApply, "updateCurrentVariant").resolves();
+			this.oVMControl = new VariantManagement(sVMReference);
+			this.oModel = new VariantModel({}, {
+				appComponent: oComponent
+			});
+			oComponent.setModel(this.oModel, ControlVariantApplyAPI.getVariantModelName());
+
+			this.oOriginalVariant = createVariant({
+				fileName: "variant0",
+				title: "foo",
+				adaptationId: "id_12345",
+				variantManagementReference: sVMReference,
+				variantReference: sVMReference,
+				contexts: {
+					role: ["testRole"]
+				},
+				layer: Layer.CUSTOMER
+			});
+			FlQUnitUtils.stubFlexObjectsSelector(sandbox, [
+				createVariant({
+					author: ControlVariantWriteUtils.DEFAULT_AUTHOR,
+					key: sVMReference,
+					layer: Layer.VENDOR,
+					title: "Standard",
+					contexts: {}
+				}),
+				createVariant({
+					author: "Me",
+					key: "publicVariant",
+					layer: Layer.PUBLIC,
+					variantReference: sVMReference,
+					title: "variant B"
+				}),
+				FlexObjectFactory.createFromFileContent({
+					fileName: "change0",
+					adaptationId: "id_12345",
+					selector: { id: "abc123" },
+					variantReference: "variant0",
+					layer: Layer.CUSTOMER,
+					support: {},
+					reference: "test",
+					packageName: "MockPackageName"
+				}),
+				FlexObjectFactory.createFromFileContent({
+					fileName: "change1",
+					selector: { id: "abc123" },
+					variantReference: "variant0",
+					layer: Layer.USER,
+					reference: "test"
+				}),
+				this.oOriginalVariant
+			]);
+
+			return this.oModel.initialize();
+		},
+		async afterEach() {
+			sandbox.restore();
+			this.oVMControl.destroy();
+			this.oModel.destroy();
+			await this.oModel.oDestroyPromise.promise;
+			FlexState.clearState();
+			FlexState.clearRuntimeSteadyObjects(sReference, sReference);
+		}
+	}, function() {
+		QUnit.test("on the same layer - CUSTOMER", async function(assert) {
+			const mParameters = {
+				overwrite: false,
+				def: false,
+				execute: true,
+				name: "variant A Copy",
+				layer: Layer.CUSTOMER,
+				newVariantReference: "newVariant",
+				generator: "myFancyGenerator",
+				contexts: {
+					role: ["testRole2"]
+				}
+			};
+
+			VariantManagementState.setCurrentVariant({
+				reference: sReference,
+				vmReference: sVMReference,
+				newVReference: "variant0"
+			});
+
+			const aChanges = await VariantManager.handleSaveEvent(this.oVMControl, mParameters, this.oModel);
+			const oNewVariant = aChanges[0];
+			assert.strictEqual(oNewVariant.getName(), "variant A Copy", "the name is correct");
+			assert.strictEqual(oNewVariant.getId(), "newVariant", "the id is correct");
+			assert.strictEqual(oNewVariant.getLayer(), Layer.CUSTOMER, "the layer is correct");
+			assert.deepEqual(oNewVariant.getContexts(), { role: ["testRole2"] }, "the contexts object is correct");
+			assert.strictEqual(oNewVariant.getVariantReference(), sVMReference, "the variantReference is correct");
+			assert.strictEqual(oNewVariant.getExecuteOnSelection(), true, "apply automatically is true");
+			assert.strictEqual(
+				aChanges[1].getSupportInformation().sourceChangeFileName,
+				"change0",
+				"the sourceChangeFileName is correct"
+			);
+			assert.strictEqual(
+				aChanges[2].getSupportInformation().sourceChangeFileName,
+				"change1",
+				"the sourceChangeFileName is correct"
+			);
+			assert.notEqual(aChanges[1].getId(), "change0", "the fileName is different from the source");
+			assert.notEqual(aChanges[2].getId(), "change1", "the fileName is different from the source");
+		});
+
+		QUnit.test("from USER layer referencing a CUSTOMER layer variant", async function(assert) {
+			const mParameters = {
+				overwrite: false,
+				def: false,
+				execute: false,
+				name: "variant A Copy",
+				layer: Layer.USER,
+				newVariantReference: "newVariant",
+				generator: "myFancyGenerator",
+				contexts: {
+					role: ["testRole2"]
+				}
+			};
+
+			VariantManagementState.setCurrentVariant({
+				reference: sReference,
+				vmReference: sVMReference,
+				newVReference: "variant0"
+			});
+
+			const oFlexObjectFactorySpy = sandbox.spy(FlexObjectFactory, "createFromFileContent");
+
+			const aChanges = await VariantManager.handleSaveEvent(this.oVMControl, mParameters, this.oModel);
+			const oNewVariant = aChanges[0];
+			assert.notOk(oFlexObjectFactorySpy.getCall(0).args[0].adaptationId, "the properties for the change don't contain adaptationId");
+			assert.strictEqual(oNewVariant.getName(), "variant A Copy", "the name is correct");
+			assert.strictEqual(oNewVariant.getId(), "newVariant", "the id is correct");
+			assert.strictEqual(oNewVariant.getLayer(), Layer.USER, "the layer is correct");
+			assert.deepEqual(oNewVariant.getContexts(), { role: ["testRole2"] }, "the contexts object is correct");
+			assert.strictEqual(oNewVariant.getVariantReference(), "variant0", "the variantReference is correct");
+			assert.strictEqual(oNewVariant.getExecuteOnSelection(), false, "apply automatically is false");
+			assert.strictEqual(aChanges[1].getVariantReference(), "newVariant", "the control change variantReference is correct");
+			assert.strictEqual(
+				aChanges[1].getSupportInformation().sourceChangeFileName,
+				"change1",
+				"the sourceChangeFileName is correct"
+			);
+		});
+
+		QUnit.test("from PUBLIC layer referencing a USER layer variant", async function(assert) {
+			const mParameters = {
+				overwrite: false,
+				def: false,
+				execute: false,
+				name: "variant A Copy",
+				layer: Layer.PUBLIC,
+				newVariantReference: "newVariant",
+				generator: "myFancyGenerator",
+				contexts: {
+					role: ["testRole2"]
+				}
+			};
+
+			this.oOriginalVariant.setLayer(Layer.USER);
+			VariantManagementState.setCurrentVariant({
+				reference: sReference,
+				vmReference: sVMReference,
+				newVReference: "variant0"
+			});
+
+			const aChanges = await VariantManager.handleSaveEvent(this.oVMControl, mParameters, this.oModel);
+			assert.strictEqual(aChanges[0].getChangeType(), "setFavorite", "the first change is setFavorite");
+			assert.strictEqual(aChanges[0].getLayer(), Layer.USER, "the layer of the setFavorite change is USER");
+			const oNewVariant = aChanges[1];
+			assert.strictEqual(oNewVariant.getName(), "variant A Copy", "the name is correct");
+			assert.strictEqual(oNewVariant.getId(), "newVariant", "the id is correct");
+			assert.strictEqual(oNewVariant.getLayer(), Layer.PUBLIC, "the layer is correct");
+			assert.deepEqual(oNewVariant.getContexts(), { role: ["testRole2"] }, "the contexts object is correct");
+			assert.strictEqual(oNewVariant.getVariantReference(), sVMReference, "the variantReference is correct");
+			assert.strictEqual(aChanges[2].getVariantReference(), "newVariant", "the control change variantReference is correct");
+			assert.strictEqual(
+				aChanges[2].getSupportInformation().sourceChangeFileName,
+				"change1",
+				"the sourceChangeFileName is correct"
+			);
+			assert.strictEqual(aChanges[2].getLayer(), Layer.PUBLIC, "the layer of the control change is correct");
+		});
+
+		QUnit.test("from USER layer referencing a PUBLIC layer variant", async function(assert) {
+			const mParameters = {
+				overwrite: false,
+				def: false,
+				execute: false,
+				name: "variant A Copy",
+				layer: Layer.USER,
+				newVariantReference: "newVariant",
+				generator: "myFancyGenerator",
+				contexts: {
+					role: ["testRole2"]
+				}
+			};
+
+			this.oOriginalVariant.setLayer(Layer.PUBLIC);
+			VariantManagementState.setCurrentVariant({
+				reference: sReference,
+				vmReference: sVMReference,
+				newVReference: "variant0"
+			});
+
+			const aChanges = await VariantManager.handleSaveEvent(this.oVMControl, mParameters, this.oModel);
+			const oNewVariant = aChanges[0];
+			assert.strictEqual(oNewVariant.getName(), "variant A Copy", "the name is correct");
+			assert.strictEqual(oNewVariant.getId(), "newVariant", "the id is correct");
+			assert.strictEqual(oNewVariant.getLayer(), Layer.USER, "the layer is correct");
+			assert.deepEqual(oNewVariant.getContexts(), { role: ["testRole2"] }, "the contexts object is correct");
+			assert.strictEqual(oNewVariant.getVariantReference(), "variant0", "the variantReference is correct");
+			assert.strictEqual(
+				aChanges[1].getSupportInformation().sourceChangeFileName,
+				"change1",
+				"the control change is correct"
+			);
+			assert.strictEqual(aChanges[1].getVariantReference(), "newVariant", "the variantReference of the control change is correct");
+		});
+
+		QUnit.test("from PUBLIC layer referencing a USER layer variant, that in turn references a PUBLIC layer variant", async function(assert) {
+			const mParameters = {
+				overwrite: false,
+				def: false,
+				execute: false,
+				name: "variant A Copy",
+				layer: Layer.PUBLIC,
+				newVariantReference: "newVariant",
+				generator: "myFancyGenerator",
+				contexts: {
+					role: ["testRole2"]
+				}
+			};
+
+			this.oOriginalVariant.setLayer(Layer.USER);
+			this.oOriginalVariant.setVariantReference("publicVariant");
+			VariantManagementState.setCurrentVariant({
+				reference: sReference,
+				vmReference: sVMReference,
+				newVReference: "variant0"
+			});
+
+			const aChanges = await VariantManager.handleSaveEvent(this.oVMControl, mParameters, this.oModel);
+			assert.strictEqual(aChanges[0].getChangeType(), "setFavorite", "the first change is setFavorite");
+			assert.strictEqual(aChanges[0].getLayer(), Layer.USER, "the layer of the setFavorite change is USER");
+			const oNewVariant = aChanges[1];
+			assert.strictEqual(oNewVariant.getName(), "variant A Copy", "the name is correct");
+			assert.strictEqual(oNewVariant.getId(), "newVariant", "the id is correct");
+			assert.strictEqual(oNewVariant.getLayer(), Layer.PUBLIC, "the layer is correct");
+			assert.deepEqual(oNewVariant.getContexts(), { role: ["testRole2"] }, "the contexts object is correct");
+			assert.strictEqual(
+				oNewVariant.getVariantReference(),
+				sVMReference,
+				"the variantReference is correct"
+			);
+			assert.strictEqual(
+				aChanges[2].getSupportInformation().sourceChangeFileName,
+				"change1",
+				"the control change is correct"
+			);
+			assert.strictEqual(aChanges[2].getVariantReference(), "newVariant", "the variantReference of the control change is correct");
+			assert.strictEqual(aChanges[2].getLayer(), Layer.PUBLIC, "the layer of the control change is correct");
 		});
 	});
 

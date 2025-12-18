@@ -1449,7 +1449,8 @@ sap.ui.define([
 				await fnCallback();
 			} else if (sAction === MessageBox.Action.NO) {
 				// avoids the data loss popup; a reload is triggered later and will destroy RTA & the command stack
-				this.getCommandStack().removeAllCommands(true);
+				// the dirty changes also need to be removed here since user decided to not save them
+				this.getCommandStack().removeAllCommands(true, /* bRemoveChangesFromPersistence = */ true);
 				await fnCallback();
 			}
 		} else {

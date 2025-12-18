@@ -193,7 +193,13 @@ sap.ui.define([
 			 * Description of the fourth button (normally second year) - private property used for aria-description
 			 * @private
 			 */
-			_descriptionButton4 : {type : "string", group : "Misc", visibility: "hidden"}
+			_descriptionButton4 : {type : "string", group : "Misc", visibility: "hidden"},
+
+			/**
+			 * Holds a reference to the currently shown picker. Possible values: month, monthPicker, yearPicker and yearRangePicker.
+			 * @private
+			 */
+			_currentPicker : {type : "string", group : "Appearance", visibility: "hidden"}
 
 		},
 		events : {

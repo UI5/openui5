@@ -506,7 +506,6 @@ sap.ui.define([
 								mPropertyBag.appComponent
 							);
 							VariantManagerApply.updateCurrentVariant({
-								variantManagementReference: sVariantManagementToBeReset,
 								newVariantReference: oAffectedVMControl.getDefaultVariantKey(),
 								vmControl: oAffectedVMControl,
 								appComponent: mPropertyBag.appComponent

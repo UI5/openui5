@@ -602,7 +602,6 @@ sap.ui.define([
 		}
 
 		return this._sLocale;
-
 	};
 
 	/*
@@ -623,7 +622,6 @@ sap.ui.define([
 		}
 
 		return this._oLocaleData;
-
 	};
 
 	/*
@@ -706,7 +704,6 @@ sap.ui.define([
 		} else {
 			return this.getAggregation("specialDates", []);
 		}
-
 	};
 
 	/*
@@ -1918,7 +1915,6 @@ sap.ui.define([
 	 * @private
 	 */
 	Month.prototype._selectDay = function(oDate, bMove) {
-
 		if (!this._checkDateEnabled(oDate)) {
 			// date is disabled -> do not select it
 			return false;
@@ -1961,12 +1957,10 @@ sap.ui.define([
 					oEndDate = oStartDate;
 					oStartDate = oDate;
 					if (!bMove) {
-						// in move mode do not set date. this bring problems if on backward move the start date would be cahnged
 						oDateRange.setProperty("startDate", oStartDate.toLocalJSDate()); // no-rerendering
 						oDateRange.setProperty("endDate", oEndDate.toLocalJSDate()); // no-rerendering
 					}
 				} else if (oDate.isSameOrAfter(oStartDate)) {
-					// single day ranges are allowed
 					oEndDate = oDate;
 					if (!bMove) {
 						oDateRange.setProperty("endDate", oEndDate.toLocalJSDate()); // no-rerendering
@@ -1976,7 +1970,7 @@ sap.ui.define([
 				oDateRange.setProperty("startDate", oDate.toLocalJSDate()); // no-rerendering
 				oDateRange.setProperty("endDate", undefined); // no-rerendering
 			}
-	} else {
+		} else {
 			// multiple selection
 			if (this.getIntervalSelection()) {
 				throw new Error("Calender don't support multiple interval selection");
@@ -2018,7 +2012,6 @@ sap.ui.define([
 		}
 
 		return true;
-
 	};
 
 	/**
@@ -2090,7 +2083,6 @@ sap.ui.define([
 	}
 
 	function _handleAfterFocus(oControlEvent){
-
 		var iIndex = oControlEvent.getParameter("index"),
 			oEvent = oControlEvent.getParameter("event"),
 			oOldDate = this._getDate(),
@@ -2250,6 +2242,7 @@ sap.ui.define([
 						this._oItemNavigation.focusItem(i);
 					}
 				}
+
 				break;
 			}
 		}

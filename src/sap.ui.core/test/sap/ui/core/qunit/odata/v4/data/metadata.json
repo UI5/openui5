@@ -592,6 +592,25 @@
 			"$Nullable" : false
 		}
 	}],
+	"com.sap.gateway.default.iwbep.tea_busi.v0001.__FAKE__FuGetEmployees": [{
+		"$kind": "Function",
+		"$ReturnType": {
+			"$isCollection": true,
+			"$Type": "com.sap.gateway.default.iwbep.tea_busi.v0001.Worker"
+		}
+	}, {
+		"$kind": "Function",
+		"$Parameter": [{
+			"$MaxLength": 4,
+			"$Name": "ManagerID",
+			"$Nullable": false,
+			"$Type": "Edm.String"
+		}],
+		"$ReturnType": {
+			"$isCollection": true,
+			"$Type": "com.sap.gateway.default.iwbep.tea_busi.v0001.Worker"
+		}
+	}],
 	"com.sap.gateway.default.iwbep.tea_busi.v0001.__FAKE__FuGetEmployeesByManager" : [{
 		"$kind" : "Function",
 		"$IsBound" : true,
@@ -722,6 +741,11 @@
 			"$kind" : "FunctionImport",
 			"$Function" : "com.sap.gateway.default.iwbep.tea_busi.v0001.FuGetEmployeeMaxAge",
 			"$IncludeInServiceDocument" : true
+		},
+		"__FAKE__FuGetEmployees": {
+			"$kind": "FunctionImport",
+			"$EntitySet": "EMPLOYEES",
+			"$Function": "com.sap.gateway.default.iwbep.tea_busi.v0001.__FAKE__FuGetEmployees"
 		}
 	},
 	"com.sap.gateway.default.iwbep.tea_busi.v0001.__FAKE__Message" : {

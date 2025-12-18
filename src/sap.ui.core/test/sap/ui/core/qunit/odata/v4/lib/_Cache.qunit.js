@@ -3436,6 +3436,7 @@ sap.ui.define([
 		options : {$select : ["foo"]},
 		types : ["/TEAMS"]
 	}, {
+		lateExpandSelect : null,
 		options : {
 			$expand : {
 				MANAGER : null,
@@ -3456,6 +3457,10 @@ sap.ui.define([
 			"/TEAMS/TEAM_2_EMPLOYEES/Address",
 			"/TEAMS/TEAM_2_EMPLOYEES/Address/Country"
 		]
+	}, {
+		lateExpandSelect : {$expand : {TEAM_2_EMPLOYEES : null}},
+		options : "n/a",
+		types : ["/TEAMS", "/TEAMS/TEAM_2_EMPLOYEES"]
 	}].forEach(function (oFixture, i) {
 		QUnit.test("Cache#fetchTypes #" + i, function (assert) {
 			var oCache = new _Cache(this.oRequestor, "TEAMS('42')", oFixture.options),
@@ -3472,6 +3477,10 @@ sap.ui.define([
 						}));
 				}),
 				oPromise;
+
+			if ("lateExpandSelect" in oFixture) {
+				oCache.mLateExpandSelect = oFixture.lateExpandSelect;
+			}
 
 			// code under test
 			oPromise = oCache.fetchTypes();

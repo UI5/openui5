@@ -291,7 +291,6 @@ sap.ui.define([
 
 			try {
 				await VariantManagerApply.updateCurrentVariant({
-					variantManagementReference: sVariantManagementReference,
 					newVariantReference: sVariantReference,
 					appComponent: oAppComponent,
 					vmControl: oVMControl

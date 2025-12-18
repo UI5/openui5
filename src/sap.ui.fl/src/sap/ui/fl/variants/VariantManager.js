@@ -22,6 +22,7 @@ sap.ui.define([
 	"sap/ui/fl/write/_internal/flexState/FlexObjectManager",
 	"sap/ui/fl/write/api/ContextBasedAdaptationsAPI",
 	"sap/ui/fl/Layer",
+	"sap/ui/fl/LayerUtils",
 	"sap/ui/fl/Utils"
 ], function(
 	_difference,
@@ -43,6 +44,7 @@ sap.ui.define([
 	FlexObjectManager,
 	ContextBasedAdaptationsAPI,
 	Layer,
+	LayerUtils,
 	Utils
 ) {
 	"use strict";
@@ -192,20 +194,21 @@ sap.ui.define([
 	 * @returns {Promise<undefined>} Resolves when changes have been erased
 	 */
 	async function eraseDirtyChanges(mPropertyBag) {
-		var aVariantDirtyChanges = getDirtyChangesFromVariantChanges(mPropertyBag.changes, mPropertyBag.reference);
-		aVariantDirtyChanges = aVariantDirtyChanges.reverse();
+		const aVariantDirtyChanges = getDirtyChangesFromVariantChanges(mPropertyBag.changes, mPropertyBag.reference).slice().reverse();
+		if (aVariantDirtyChanges.length > 0) {
+			if (mPropertyBag.revert) {
+				await Reverter.revertMultipleChanges(aVariantDirtyChanges, {
+					appComponent: mPropertyBag.appComponent,
+					modifier: JsControlTreeModifier,
+					reference: mPropertyBag.reference
+				});
+			}
 
-		if (mPropertyBag.revert) {
-			await Reverter.revertMultipleChanges(aVariantDirtyChanges, {
-				appComponent: mPropertyBag.appComponent,
-				modifier: JsControlTreeModifier,
-				reference: mPropertyBag.reference
+			FlexObjectManager.deleteFlexObjects({
+				reference: mPropertyBag.reference,
+				flexObjects: aVariantDirtyChanges
 			});
 		}
-		FlexObjectManager.deleteFlexObjects({
-			reference: mPropertyBag.reference,
-			flexObjects: aVariantDirtyChanges
-		});
 	}
 
 	async function handleDirtyChanges(mProperties) {
@@ -245,6 +248,157 @@ sap.ui.define([
 		return bHasAdaptationsModel && ContextBasedAdaptationsAPI.getDisplayedAdaptationId(mContextBasedAdaptationBag);
 	}
 
+	function createNewVariant(oSourceVariant, mPropertyBag) {
+		const sReference = oSourceVariant.getFlexObjectMetadata().reference;
+		const mProperties = {
+			id: mPropertyBag.newVariantReference,
+			variantName: mPropertyBag.title,
+			contexts: mPropertyBag.contexts,
+			layer: mPropertyBag.layer,
+			adaptationId: mPropertyBag.adaptationId,
+			reference: sReference,
+			generator: mPropertyBag.generator,
+			variantManagementReference: mPropertyBag.variantManagementReference,
+			executeOnSelection: mPropertyBag.executeOnSelection
+		};
+
+		const iLayerComparison = LayerUtils.compareAgainstCurrentLayer(oSourceVariant.getLayer(), mPropertyBag.layer);
+
+		if (iLayerComparison === 1) {
+			// current layer is lower than source variant layer, e.g. (PUBLIC) -> [USER]
+			const oSourceVariantReferencedVariant = VariantManagementState.getVariant({
+				reference: sReference,
+				vmReference: mPropertyBag.variantManagementReference,
+				vReference: oSourceVariant.getVariantReference()
+			});
+			if (oSourceVariantReferencedVariant.instance.getLayer() === mPropertyBag.layer) {
+				// in case the new variant is in the PUBLIC layer, and the source variant references a PUBLIC variant,
+				// the new variant must also reference the same variant as the PUBLIC variant
+				// (PUBLIC) -> [USER] -> [PUBLIC] -> [CUSTOMER]
+				mProperties.variantReference = oSourceVariantReferencedVariant.instance.getVariantReference();
+			} else {
+				// (PUBLIC) -> [USER] -> [CUSTOMER]
+				mProperties.variantReference = oSourceVariant.getVariantReference();
+			}
+		} else if (iLayerComparison === 0) {
+			// current layer is the same as source variant layer, so the new variant should refer to the same as the source
+			mProperties.variantReference = oSourceVariant.getVariantReference();
+		} else if (iLayerComparison === -1) {
+			// current layer is higher than source variant layer, e.g. (USER) -> [PUBLIC]
+			mProperties.variantReference = mPropertyBag.sourceVariantId;
+		}
+
+		return FlexObjectFactory.createFlVariant(mProperties);
+	}
+
+	function duplicateVariant(mPropertyBag) {
+		const oSourceVariant = VariantManagementState.getVariant({
+			reference: mPropertyBag.reference,
+			vmReference: mPropertyBag.variantManagementReference,
+			vReference: mPropertyBag.sourceVariantId
+		});
+
+		const aVariantChanges = VariantManagementState.getControlChangesForVariant({
+			vmReference: mPropertyBag.variantManagementReference,
+			vReference: mPropertyBag.sourceVariantId,
+			reference: mPropertyBag.reference
+		})
+		.map((oVariantChange) => {
+			return oVariantChange.convertToFileContent();
+		});
+
+		const oNewVariant = createNewVariant(oSourceVariant.instance, { ...mPropertyBag });
+		return {
+			instance: oNewVariant,
+			variantChanges: {},
+			controlChanges: aVariantChanges.reduce((aSameLayerChanges, oChange) => {
+				// copy all changes in the same layer and higher layers (PUBLIC variant can copy USER layer changes)
+				if (LayerUtils.compareAgainstCurrentLayer(oChange.layer, mPropertyBag.layer) >= 0) {
+					const oDuplicateChangeData = merge({}, oChange);
+					// ensure that the layer is set to the current variants (USER may become PUBLIC)
+					oDuplicateChangeData.layer = mPropertyBag.layer;
+					oDuplicateChangeData.variantReference = oNewVariant.getId();
+					oDuplicateChangeData.support ||= {};
+					oDuplicateChangeData.support.sourceChangeFileName = oChange.fileName;
+					// For new change instances the package name needs to be reset to $TMP, BCP: 1870561348
+					oDuplicateChangeData.packageName = "$TMP";
+					oDuplicateChangeData.fileName = Utils.createDefaultFileName(oDuplicateChangeData.changeType);
+					aSameLayerChanges.push(FlexObjectFactory.createFromFileContent(oDuplicateChangeData));
+				}
+				return aSameLayerChanges;
+			}, [])
+		};
+	}
+
+	/**
+	 * Copies a variant.
+	 *
+	 * @param {object} mPropertyBag - Map of properties
+	 * @param {string} mPropertyBag.variantManagementReference - Variant management reference
+	 * @param {string} mPropertyBag.title - Title for the variant
+	 * @param {sap.ui.core.Component} mPropertyBag.appComponent - Model's app component
+	 * @param {string} mPropertyBag.layer - Layer on which the new variant should be created
+	 * @param {string} mPropertyBag.newVariantId - Variant Id for the new variant
+	 * @param {string} mPropertyBag.sourceVariantId - Variant Id of the source variant
+	 * @param {string} mPropertyBag.generator - Information about who created the change
+	 * @param {object} mPropertyBag.contexts - Context structure containing roles and countries
+	 * @param {boolean} mPropertyBag.executeOnSelection - Apply automatically the content of the variant
+	 * @param {string} mPropertyBag.reference - Flex reference of the app
+	 * @param {sap.ui.fl.variants.VariantManagement} mPropertyBag.vmControl - Variant management control
+	 * @returns {Promise<sap.ui.fl.apply._internal.flexObjects.FlexObject[]>} Resolves with dirty changes created during variant copy
+	 */
+	async function copyVariant(mPropertyBag) {
+		const oVariantModel = getVariantModel(mPropertyBag.appComponent);
+		const oDuplicateVariantData = duplicateVariant({ ...mPropertyBag });
+		oDuplicateVariantData.generator = mPropertyBag.generator;
+
+		// VMTODO: check if this can also be done in the updateData function of the variant model
+		// this information is not derived from the data selector, so it needs to be set manually
+		oVariantModel.oData[mPropertyBag.variantManagementReference].variants.push({
+			key: oDuplicateVariantData.instance.getId(),
+			rename: true,
+			change: true,
+			remove: true,
+			sharing: mPropertyBag.layer === Layer.USER ? oVariantModel.sharing.PRIVATE : oVariantModel.sharing.PUBLIC
+		});
+
+		const aChanges = [];
+
+		// other users should not see a new PUBLIC variant as favorite by default to not pollute their favorite list
+		if (mPropertyBag.layer === Layer.PUBLIC) {
+			oDuplicateVariantData.instance.setFavorite(false);
+			const oChangeProperties = {
+				variantId: mPropertyBag.newVariantReference,
+				changeType: "setFavorite",
+				fileType: "ctrl_variant_change",
+				generator: mPropertyBag.generator,
+				layer: Layer.USER,
+				reference: mPropertyBag.reference,
+				content: { favorite: true }
+			};
+			aChanges.push(FlexObjectFactory.createVariantChange(oChangeProperties));
+		}
+
+		const aAllFlexObjects = FlexObjectManager.addDirtyFlexObjects(
+			mPropertyBag.reference,
+			mPropertyBag.appComponent.getId(),
+			aChanges
+			.concat([oDuplicateVariantData.instance]
+			.concat(oDuplicateVariantData.controlChanges)
+			.concat(mPropertyBag.additionalVariantChanges))
+		);
+
+		await VariantManagerApply.updateCurrentVariant({
+			variantManagementReference: mPropertyBag.variantManagementReference,
+			newVariantReference: oDuplicateVariantData.instance.getId(),
+			appComponent: mPropertyBag.appComponent,
+			vmControl: mPropertyBag.vmControl,
+			skipExecuteAfterSwitch: true,
+			scenario: "saveAs"
+		});
+		return aAllFlexObjects;
+	}
+
 	// Personalization scenario; for Adaptation, manageVariants is used
 	// The event source is the sap.m.VariantManagement control, so the fl VMControl needs to be passed separately
 	VariantManager.handleManageEvent = async function(oEvent, oVMControl) {
@@ -275,7 +429,6 @@ sap.ui.define([
 				})
 			);
 			await VariantManagerApply.updateCurrentVariant({
-				variantManagementReference: sVMReference,
 				newVariantReference: sNewDefaultVariantReference,
 				vmControl: oVMControl,
 				appComponent: Utils.getAppComponentForControl(oVMControl)
@@ -328,11 +481,11 @@ sap.ui.define([
 		let aNewVariantDirtyChanges;
 
 		await VariantManagerApply.executeAfterSwitch(async () => {
-			const sSourceVariantReference = oVariantManagementControl.getCurrentVariantReference();
+			const sSourceVariantId = oVariantManagementControl.getCurrentVariantReference();
 			const aSourceVariantChanges = VariantManagementState.getControlChangesForVariant({
 				reference: sFlexReference,
 				vmReference: sVMReference,
-				vReference: sSourceVariantReference
+				vReference: sSourceVariantId
 			});
 
 			if (mParameters.overwrite) {
@@ -342,7 +495,7 @@ sap.ui.define([
 				const oSourceVariant = VariantManagementState.getVariant({
 					reference: sFlexReference,
 					vmReference: sVMReference,
-					vReference: sSourceVariantReference
+					vReference: sSourceVariantId
 				});
 				if (oSourceVariant.layer === Layer.PUBLIC) {
 					aNewVariantDirtyChanges.forEach((oChange) => oChange.setLayer(Layer.PUBLIC));
@@ -367,12 +520,13 @@ sap.ui.define([
 				layer: sVariantLayer,
 				title: mParameters.name,
 				contexts: mParameters.contexts,
-				sourceVariantReference: sSourceVariantReference,
+				sourceVariantId: sSourceVariantId,
 				newVariantReference: sNewVariantReference,
 				generator: mParameters.generator,
 				additionalVariantChanges: [],
 				adaptationId: getAdaptationId(sVariantChangeLayer, oAppComponent, sFlexReference),
-				executeOnSelection: mParameters.execute
+				executeOnSelection: mParameters.execute,
+				reference: sFlexReference
 			};
 
 			const oBaseChangeProperties = {
@@ -395,14 +549,14 @@ sap.ui.define([
 				mPropertyBag.additionalVariantChanges.push(FlexObjectFactory.createVariantManagementChange(mPropertyBagSetDefault));
 			}
 
-			const aCopiedVariantDirtyChanges = await VariantManager.copyVariant(mPropertyBag);
+			const aCopiedVariantDirtyChanges = await copyVariant(mPropertyBag);
 			aNewVariantDirtyChanges = aCopiedVariantDirtyChanges;
 			// unsaved changes on the source variant are removed before copied variant changes are saved
 			await eraseDirtyChanges({
 				changes: aSourceVariantChanges,
 				reference: sFlexReference,
 				vmReference: sVMReference,
-				vReference: sSourceVariantReference,
+				vReference: sSourceVariantId,
 				appComponent: oAppComponent
 			});
 			return handleDirtyChanges({
@@ -438,7 +592,7 @@ sap.ui.define([
 				view: Utils.getViewForControl(oControl)
 			});
 			if (!oReturn.success) {
-				var oException = oReturn.error || new Error("The change could not be applied.");
+				const oException = oReturn.error || new Error("The change could not be applied.");
 				FlexObjectManager.deleteFlexObjects({
 					reference: sFlexReference,
 					flexObjects: [oChange]
@@ -479,76 +633,6 @@ sap.ui.define([
 	};
 
 	/**
-	 * Copies a variant.
-	 *
-	 * @param {object} mPropertyBag - Map of properties
-	 * @param {string} mPropertyBag.variantManagementReference - Variant management reference
-	 * @param {string} mPropertyBag.title - Title for the variant
-	 * @param {sap.ui.core.Component} mPropertyBag.appComponent - Model's app component
-	 * @param {string} mPropertyBag.layer - Layer on which the new variant should be created
-	 * @param {string} mPropertyBag.newVariantReference - <code>variantReference</code> for the new variant
-	 * @param {string} mPropertyBag.sourceVariantReference - <code>variantReference</code> of the source variant
-	 * @param {string} mPropertyBag.generator - Information about who created the change
-	 * @param {object} mPropertyBag.contexts - Context structure containing roles and countries
-	 * @param {boolean} mPropertyBag.executeOnSelection - Apply automatically the content of the variant
-	 * @param {sap.ui.fl.variants.VariantManagement} mPropertyBag.vmControl - Variant management control
-	 * @returns {Promise<sap.ui.fl.apply._internal.flexObjects.FlexObject[]>} Resolves with dirty changes created during variant copy
-	 * @private
-	 */
-	VariantManager.copyVariant = async function(mPropertyBag) {
-		const oVariantModel = getVariantModel(mPropertyBag.appComponent);
-		var oDuplicateVariantData = oVariantModel._duplicateVariant(mPropertyBag);
-		oDuplicateVariantData.generator = mPropertyBag.generator;
-
-		oVariantModel.oData[mPropertyBag.variantManagementReference].variants.push({
-			key: oDuplicateVariantData.instance.getId(),
-			rename: true,
-			change: true,
-			remove: true,
-			sharing: mPropertyBag.layer === Layer.USER
-				? oVariantModel.sharing.PRIVATE
-				: oVariantModel.sharing.PUBLIC
-		});
-
-		var aChanges = [];
-
-		// when created a new public variant other users do not see the new public variant
-		if (mPropertyBag.layer === Layer.PUBLIC) {
-			oDuplicateVariantData.instance.setFavorite(false);
-			var oChangeProperties = {
-				variantId: mPropertyBag.newVariantReference,
-				changeType: "setFavorite",
-				fileType: "ctrl_variant_change",
-				generator: mPropertyBag.generator,
-				layer: Layer.USER,
-				reference: oVariantModel.sFlexReference,
-				content: { favorite: true }
-			};
-			aChanges.push(FlexObjectFactory.createVariantChange(oChangeProperties));
-		}
-
-		// sets copied variant and associated changes as dirty
-		aChanges = FlexObjectManager.addDirtyFlexObjects(
-			oVariantModel.sFlexReference,
-			mPropertyBag.appComponent.getId(),
-			aChanges
-			.concat([oDuplicateVariantData.instance]
-			.concat(oDuplicateVariantData.controlChanges)
-			.concat(mPropertyBag.additionalVariantChanges))
-		);
-
-		await VariantManagerApply.updateCurrentVariant({
-			variantManagementReference: mPropertyBag.variantManagementReference,
-			newVariantReference: oDuplicateVariantData.instance.getId(),
-			appComponent: mPropertyBag.appComponent,
-			vmControl: mPropertyBag.vmControl,
-			skipExecuteAfterSwitch: true,
-			scenario: "saveAs"
-		});
-		return aChanges;
-	};
-
-	/**
 	 * Removes a variant and switches to the provided sourceVariantReference.
 	 *
 	 * @param {object} mPropertyBag - Map of properties
@@ -567,7 +651,6 @@ sap.ui.define([
 		});
 
 		await VariantManagerApply.updateCurrentVariant({
-			variantManagementReference: mPropertyBag.variantManagementReference,
 			newVariantReference: mPropertyBag.sourceVariantReference,
 			appComponent: mPropertyBag.appComponent,
 			vmControl: mPropertyBag.vmControl

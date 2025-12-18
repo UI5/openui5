@@ -5,6 +5,7 @@ sap.ui.define([
 	"sap/base/util/restricted/_pick",
 	"sap/base/util/isPlainObject",
 	"sap/base/util/ObjectPath",
+	"sap/ui/fl/apply/_internal/controlVariants/Utils",
 	"sap/ui/fl/apply/_internal/flexObjects/AnnotationChange",
 	"sap/ui/fl/apply/_internal/flexObjects/AppDescriptorChange",
 	"sap/ui/fl/apply/_internal/flexObjects/CompVariant",
@@ -24,6 +25,7 @@ sap.ui.define([
 	_pick,
 	isPlainObject,
 	ObjectPath,
+	ControlVariantsUtils,
 	AnnotationChange,
 	AppDescriptorChange,
 	CompVariant,
@@ -269,6 +271,9 @@ sap.ui.define([
 	FlexObjectFactory.createFlVariant = function(mPropertyBag) {
 		const mPropertyBagClone = cloneIfObject(mPropertyBag);
 		mPropertyBagClone.generator ||= "FlexObjectFactory.createFlVariant";
+		if (mPropertyBagClone.layer === Layer.VENDOR) {
+			mPropertyBagClone.user = ControlVariantsUtils.DEFAULT_AUTHOR;
+		}
 		const mProperties = createBasePropertyBag(mPropertyBagClone);
 		mProperties.variantManagementReference = mPropertyBagClone.variantManagementReference;
 		mProperties.variantReference = mPropertyBagClone.variantReference;

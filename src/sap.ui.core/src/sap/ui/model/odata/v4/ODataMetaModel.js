@@ -1403,9 +1403,8 @@ sap.ui.define([
 			 *   binding parameter (bound and unbound cases).
 			 */
 			function isRightOverload(oOverload) {
-				return !oOverload.$IsBound && vBindingParameterType === UNBOUND
-					|| oOverload.$IsBound
-					&& vBindingParameterType === oOverload.$Parameter[0].$Type;
+				return vBindingParameterType
+					=== (oOverload.$IsBound ? oOverload.$Parameter[0].$Type : UNBOUND);
 			}
 
 			/*
@@ -1662,7 +1661,9 @@ sap.ui.define([
 									if (sSegment === "@$ui5.overload") {
 										return true;
 									}
-									if (vResult.length !== 1) {
+									if (vResult.length !== 1
+										&& (vBindingParameterType !== UNBOUND
+											|| maybeParameter(sSegment, vResult))) {
 										return log(WARNING, "Expected a single overload, but found "
 											+ vResult.length);
 									}
@@ -3173,7 +3174,7 @@ sap.ui.define([
 	 *
 	 * A segment which represents an OData simple identifier (or the special names "$ReturnType",
 	 * since 1.71.0, or "$Parameter", since 1.73.0) needs special preparations. The same applies to
-	 * the empty segment after a trailing slash.
+	 * the empty segment (typically after a trailing slash).
 	 * <ol>
 	 *   <li> If the current object has a "$Action", "$Function" or "$Type" property, it is used for
 	 *     scope lookup first. This way, "/EMPLOYEES/ENTRYDATE" addresses the same object as
@@ -3202,7 +3203,9 @@ sap.ui.define([
 	 *
 	 *     Operation overloads are then filtered by binding parameter; multiple overloads after
 	 *     filtering are invalid except if addressing all overloads via the segment
-	 *     "@$ui5.overload", for example "/acme.NewAction/@$ui5.overload".
+	 *     "@$ui5.overload", for example "/acme.NewAction/@$ui5.overload". Since 1.144.0, multiple
+	 *     overloads for an unbound function are tolerated when addressing the return type (which is
+	 *     the same for all of them).
 	 *
 	 *     Once a single overload has been determined, its parameters can be immediately addressed,
 	 *     for example "/TEAMS/acme.NewAction/Team_ID", or the special name "$Parameter" can be used
