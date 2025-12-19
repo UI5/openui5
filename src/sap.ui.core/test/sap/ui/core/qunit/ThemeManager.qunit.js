@@ -4,6 +4,7 @@ sap.ui.define([
 	"sap/ui/base/OwnStatics",
 	"sap/ui/core/Lib",
 	"sap/ui/core/Theming",
+	"sap/ui/core/theming/ThemeHelper",
 	"sap/ui/core/theming/ThemeManager",
 	"sap/ui/test/utils/waitForThemeApplied"
 ], function(
@@ -11,6 +12,7 @@ sap.ui.define([
 	OwnStatics,
 	Library,
 	Theming,
+	ThemeHelper,
 	ThemeManager,
 	themeApplied
 ) {
@@ -162,7 +164,7 @@ sap.ui.define([
 		// Expect 1 assert from the test
 		// Expect 1 assert from checkCssAddedInCorrectOrder
 		assert.expect((getAllLibraryInfoObjects().size * 5) + 2);
-		testApplyTheme(assert, "sap_hcb");
+		testApplyTheme(assert, `${ThemeHelper.getDefaultThemeInfo().DEFAULT_THEME}_hcb`);
 
 		return themeApplied().then(function() {
 
@@ -183,9 +185,9 @@ sap.ui.define([
 		// Expect 1 assert from checkCssAddedInCorrectOrder
 		assert.expect(7);
 		const mExpectedLinkURIs = {
-			"sap-ui-theme-sap.ui.core": `/sap/ui/core/themes/sap_hcb/library.css?sap-ui-dist-version=${sCoreVersion}`, // Fallback to sap_hcb for core lib because of theme metadata
+			"sap-ui-theme-sap.ui.core": `/sap/ui/core/themes/customTheme/library.css?sap-ui-dist-version=${sCoreVersion}`, // Fallback to sap_horizon for core lib because of theme metadata
 			"sap-ui-theme-testlibs.customCss.lib1": `/libraries/customCss/lib1/themes/customTheme/library.css?sap-ui-dist-version=${sCoreVersion}`,
-			"sap-ui-theme-testlibs.customCss.lib2": `/libraries/customCss/lib2/themes/sap_hcb/library.css?sap-ui-dist-version=${sCoreVersion}`
+			"sap-ui-theme-testlibs.customCss.lib2": `/libraries/customCss/lib2/themes/${ThemeHelper.getDefaultThemeInfo().DEFAULT_THEME}_hcb/library.css?sap-ui-dist-version=${sCoreVersion}`
 		};
 		const checkLoadedCss = function () {
 			const aAllThemeLinksForLibs = document.querySelectorAll("link[id^=sap-ui-theme]");
@@ -206,7 +208,7 @@ sap.ui.define([
 				return oResource.name === oLib2CssLink.getAttribute("href") && oResource.initiatorType === "link";
 			}).length <= 1, "No CSS request for custom theme and custom library which is not part of DIST layer");
 
-			assert.ok(oLib2CssLink.sheet.href === oLib2CssLink.href && oLib2CssLink.href.includes("sap_hcb"));
+			assert.ok(oLib2CssLink.sheet.href === oLib2CssLink.href && oLib2CssLink.href.includes(ThemeHelper.getDefaultThemeInfo().DEFAULT_THEME));
 			assert.ok(aCustomCssLink[0].getAttribute("href")
 				.endsWith(`/libraries/customCss/sap/ui/core/themes/customTheme/custom.css?sap-ui-dist-version=${sCoreVersion}`), "URI of custom.css link tag is correct");
 		};

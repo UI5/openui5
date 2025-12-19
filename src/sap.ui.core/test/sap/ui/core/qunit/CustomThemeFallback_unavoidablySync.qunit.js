@@ -2,8 +2,9 @@ sap.ui.define([
 	"sap/ui/core/Lib",
 	"sap/ui/core/Theming",
 	"sap/ui/core/theming/Parameters",
+	"sap/ui/core/theming/ThemeHelper",
 	"sap/ui/test/utils/waitForThemeApplied"
-], function(Lib, Theming, Parameters, themeApplied) {
+], function(Lib, Theming, Parameters, ThemeHelper, themeApplied) {
 	"use strict";
 	/* global QUnit */
 
@@ -59,7 +60,7 @@ sap.ui.define([
 
 		assert.equal(aLinks[1].id, "sap-ui-theme-sap.ui.customthemefallback.testlib",
 			"sap.ui.customthemefallback.testlib stylesheet should be second");
-		assert.equal(aLinks[1].href, `${sPath}/testdata/uilib-custom-theme-fallback/themes/sap_hcb/library.css?sap-ui-dist-version=${sCoreVersion}`,
+		assert.equal(aLinks[1].href, `${sPath}/testdata/uilib-custom-theme-fallback/themes/${ThemeHelper.getDefaultThemeInfo().DEFAULT_THEME}_hcb/library.css?sap-ui-dist-version=${sCoreVersion}`,
 			"sap.ui.customthemefallback.testlib stylesheet href should be correct");
 
 		assert.equal(aLinks[2].id, "sap-ui-theme-sap.ui.failingcssimport.testlib",
@@ -97,12 +98,12 @@ sap.ui.define([
 
 			assert.equal(aLinks[1].id, "sap-ui-theme-sap.ui.customthemefallback.testlib",
 				"sap.ui.customthemefallback.testlib stylesheet should be second");
-			assert.equal(aLinks[1].href, `${sPath}/testdata/uilib-custom-theme-fallback/themes/sap_hcb/library.css?sap-ui-dist-version=${sCoreVersion}`,
+			assert.equal(aLinks[1].href, `${sPath}/testdata/uilib-custom-theme-fallback/themes/${ThemeHelper.getDefaultThemeInfo().DEFAULT_THEME}_hcb/library.css?sap-ui-dist-version=${sCoreVersion}`,
 				"sap.ui.customthemefallback.testlib stylesheet href should be correct");
 
 			assert.equal(aLinks[2].id, "sap-ui-theme-sap.ui.failingcssimport.testlib",
 				"sap.ui.failingcssimport.testlib stylesheet should be second");
-			assert.equal(aLinks[2].href, `${sPath}/testdata/uilib-failing-css-import/themes/sap_hcb/library.css?sap-ui-dist-version=${sCoreVersion}`,
+			assert.equal(aLinks[2].href, `${sPath}/testdata/uilib-failing-css-import/themes/${ThemeHelper.getDefaultThemeInfo().DEFAULT_THEME}_hcb/library.css?sap-ui-dist-version=${sCoreVersion}`,
 				"sap.ui.failingcssimport.testlib stylesheet href should be correct");
 
 			// Check for custom.css order (should be after last library theme)

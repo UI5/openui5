@@ -139,9 +139,14 @@ sap.ui.define([
 		//  * no theme-root is given (themes from a different endpoint (i.e. theming-service) are excluded) and
 		//  * the given theme is a standard SAP theme ('sap_' prefix)
 		//  * not supported in this version
-		if (sThemeRoot == null && sTheme.startsWith("sap_") && aKnownThemes.indexOf(sTheme) == -1) {
-			// extract the theme variant if given: "_hcb", "_hcw", "_dark"
-			const sVariant = sTheme.match(rThemeVariantPattern)?.[0] || "";
+		if (sThemeRoot == null && (!sTheme || (sTheme.startsWith("sap_") && aKnownThemes.indexOf(sTheme) == -1))) {
+			let sVariant;
+			if (sTheme) {
+				// extract the theme variant if given: "_hcb", "_hcw", "_dark"
+				sVariant = sTheme.match(rThemeVariantPattern)?.[0] || "";
+			} else {
+				sVariant = bDarkMode ? "_dark" : "";
+			}
 
 			sNewTheme = `${DEFAULT_THEME}${sVariant}`;
 
