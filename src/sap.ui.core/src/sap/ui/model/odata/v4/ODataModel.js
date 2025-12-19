@@ -3053,6 +3053,7 @@ sap.ui.define([
 	 * @private
 	 */
 	ODataModel.prototype.waitForKeepAliveBinding = function (oBinding) {
+		// Note: ODPrB does not have mParameters
 		if (oBinding.mParameters?.$$getKeepAliveContext) {
 			// $$canonicalPath is not allowed, binding path and resource path are (almost) identical
 			const oTemporaryBinding = this.mKeepAliveBindingsByPath[oBinding.getResolvedPath()];

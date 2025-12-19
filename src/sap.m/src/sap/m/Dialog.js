@@ -899,14 +899,30 @@ function(
 		//Check if the invisible FIRST focusable element (suffix '-firstfe') has gained focus
 		if (oSourceDomRef.id === this.getId() + "-firstfe") {
 			//Check if buttons are available
-			var oLastFocusableDomRef = this._getAnyFooter()?.$().lastFocusableDomRef() || this.$("cont").lastFocusableDomRef() || (this.getSubHeader() && this.getSubHeader().$().firstFocusableDomRef()) || (this._getAnyHeader() && this._getAnyHeader().$().lastFocusableDomRef());
+			var oLastFocusableDomRef =
+				this._getAnyFooter()?.$().lastFocusableDomRef() ||
+				this.$("cont").lastFocusableDomRef({
+					includeSelf: true,
+					includeScroller: true
+				}) ||
+				(this.getSubHeader() && this.getSubHeader().$().firstFocusableDomRef()) ||
+				(this._getAnyHeader() && this._getAnyHeader().$().lastFocusableDomRef());
+
 			if (oLastFocusableDomRef) {
 				oLastFocusableDomRef.focus();
 			}
 		} else if (oSourceDomRef.id === this.getId() + "-lastfe") {
 			//Check if the invisible LAST focusable element (suffix '-lastfe') has gained focus
 			//First check if header content is available
-			var oFirstFocusableDomRef = this._getFocusableHeader() || (this._getAnyHeader() && this._getAnyHeader().$().firstFocusableDomRef()) || (this.getSubHeader() && this.getSubHeader().$().firstFocusableDomRef()) || this.$("cont").firstFocusableDomRef() || this.$("footer").firstFocusableDomRef();
+			var oFirstFocusableDomRef =
+				this._getFocusableHeader() ||
+				(this._getAnyHeader() && this._getAnyHeader().$().firstFocusableDomRef()) ||
+				(this.getSubHeader() && this.getSubHeader().$().firstFocusableDomRef()) ||
+				this.$("cont").firstFocusableDomRef({
+					includeSelf: true,
+					includeScroller: true
+				}) ||
+				this.$("footer").firstFocusableDomRef();
 			if (oFirstFocusableDomRef) {
 				oFirstFocusableDomRef.focus();
 			}
@@ -1592,7 +1608,10 @@ function(
 	Dialog.prototype._getFirstFocusableContentElement = function () {
 		var $dialogContent = this.$("cont");
 
-		return $dialogContent.firstFocusableDomRef();
+		return $dialogContent.firstFocusableDomRef({
+			includeSelf: true,
+			includeScroller: true
+		});
 	};
 
 	/**

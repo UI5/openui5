@@ -27,6 +27,7 @@ sap.ui.define([
 	"sap/ui/core/theming/Parameters",
 	"sap/ui/core/InvisibleText",
 	"sap/m/Title",
+	"sap/m/Text",
 	"sap/m/Input",
 	"sap/ui/events/KeyCodes",
 	"sap/ui/dom/containsOrEquals",
@@ -59,6 +60,7 @@ sap.ui.define([
 	Parameters,
 	InvisibleText,
 	Title,
+	Text,
 	Input,
 	KeyCodes,
 	containsOrEquals,
@@ -3069,6 +3071,88 @@ sap.ui.define([
 
 		oPopover.openBy(oButton);
 	});
+
+	QUnit.module("Initial Focus");
+
+	QUnit.test("Keyboard Focusable Scroll Container", async function (assert) {
+		if (Device.browser.safari) {
+			assert.ok(true, "Skipping test on Safari as focus is not set to the Keyboard Focusable Scroll Container.");
+			return;
+		}
+
+		var oClock = sinon.useFakeTimers();
+
+		var oButton = new Button({text: "Open"});
+		var oPopover = new Popover("popover", {
+			title: "Popover Title",
+			contentWidth: "200px",
+			contentHeight: "200px",
+			content: [
+				new Text({
+					text: "This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text."
+				}),
+				new Text({
+					text: "This is the second line of text. This is the second line of text. This is the second line of text. This is the second line of text.This is the second line of text. This is the second line of text. This is the second line of text. This is the second line of text."
+				})
+			]
+		});
+
+		page.addContent(oButton);
+
+		await nextUIUpdate(oClock);
+
+		oPopover.openBy(oButton);
+		oClock.tick(300);
+		await nextUIUpdate(oClock);
+
+		assert.strictEqual(document.activeElement, oPopover.getDomRef("cont"), "Initial focus is set to the first keyboard scrollable container.");
+
+		//cleanup
+		runAllFakeTimersAndRestore(oClock);
+		oPopover.destroy();
+		oButton.destroy();
+	});
+
+	QUnit.test("Scroll Container with a button inside", async function (assert) {
+		var oClock = sinon.useFakeTimers();
+
+		var oPopoverButton = new Button({
+			text: "Popover Button"
+		});
+
+		var oButton = new Button({text: "Open"});
+		var oPopover = new Popover("popover", {
+			title: "Popover Title",
+			contentWidth: "200px",
+			contentHeight: "200px",
+			content: [
+				new Text({
+					text: "This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text."
+				}),
+				oPopoverButton,
+				new Text({
+					text: "This is the second line of text. This is the second line of text. This is the second line of text. This is the second line of text.This is the second line of text. This is the second line of text. This is the second line of text. This is the second line of text."
+				})
+			]
+		});
+
+		page.addContent(oButton);
+
+		await nextUIUpdate(oClock);
+
+		oPopover.openBy(oButton);
+		oClock.tick(300);
+		await nextUIUpdate(oClock);
+
+		assert.strictEqual(document.activeElement, oPopoverButton.getFocusDomRef(), "Initial focus is set to the button.");
+
+		//cleanup
+		runAllFakeTimersAndRestore(oClock);
+		oPopover.destroy();
+		oButton.destroy();
+		oPopoverButton.destroy();
+	});
+
 
 	// include stylesheet and let test starter wait for it
 	return includeStylesheet({

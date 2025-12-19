@@ -303,6 +303,7 @@ sap.ui.define([
 			sApply = _AggregationHelper.buildApply(mParameters.$$aggregation).$apply;
 		}
 
+		// Note: called from c'tor before mParameters are stored for the 1st time
 		const bResetSelection = this.mParameters?.$$clearSelectionOnFilter
 			&& (aChangedParameters?.includes("$filter") || aChangedParameters?.includes("$search")
 				|| mParameters.$$aggregation?.search !== this.mParameters.$$aggregation?.search);

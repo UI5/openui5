@@ -274,7 +274,7 @@ sap.ui.define(['sap/ui/Device', "sap/ui/core/Element", 'sap/ui/core/ElementMetad
 			function findDeclaredClasses() {
 
 				var aClasses = [];
-				var aModules = LoaderExtensions.getAllRequiredModules();
+				var aModules = LoaderExtensions.getAllRequiredModules(/* omitDeprecated */ true);
 
 				for (var i = 0; i < aModules.length; i++) {
 					if (aClasses.indexOf(aModules[i]) > -1) {

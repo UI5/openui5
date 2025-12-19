@@ -22,6 +22,21 @@ body {
 	top: 450px;
 }
 
+.positioned17 {
+	position: absolute !important;
+	top: 500px;
+}
+
+.positioned18 {
+	position: absolute !important;
+	top: 550px;
+}
+
+.positioned19 {
+	position: absolute !important;
+	top: 600px;
+}
+
 .customClassForVisualTests {
 	caret-color: transparent;
 }

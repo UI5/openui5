@@ -1425,6 +1425,7 @@ sap.ui.define([
 	 * @since 1.87.0
 	 */
 	ODataBinding.prototype.requestRefresh = function (sGroupId) {
+		// Note: ODPrB does not have mParameters
 		if (!this.mParameters?.$$ownRequest && !this.isRoot()) {
 			throw new Error("Refresh on this binding is not supported");
 		}
