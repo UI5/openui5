@@ -1163,7 +1163,8 @@ sap.ui.define([
 	 */
 	FlexibleColumnLayout.prototype._getVisibleColumnsForLayout = function (sLayout) {
 		return FlexibleColumnLayout.COLUMN_ORDER.filter(function (sColumn) {
-			return this._getColumnSizeForLayout(sColumn, sLayout) > 0;
+			// Different than 0, as when we are storing the begin column size, it may happen that it's too big, leading to a negative size of the mid column
+			return this._getColumnSizeForLayout(sColumn, sLayout) !== 0;
 		}, this);
 	};
 
@@ -2007,6 +2008,7 @@ sap.ui.define([
 
 		if (this._isValidWidthDistributionForLayout(sNewWidthsDistribution, sNewLayout)) {
 			this._getLocalStorage().put(sNewLayout, sNewWidthsDistribution);
+			this._getLocalStorage().put("begin", oColumnPercentWidths.begin);
 		}
 	};
 
@@ -2244,6 +2246,10 @@ sap.ui.define([
 		return (iVisibleColumnsCount > iPreviousVisibleColumnsCount) &&
 			!bWasFullScreen &&
 			bIsLastColumn;
+	};
+
+	FlexibleColumnLayout.prototype._isFullScreenLayout = function (sLayout) {
+		return sLayout === LT.OneColumn || sLayout === LT.MidColumnFullScreen || sLayout === LT.EndColumnFullScreen;
 	};
 
 	FlexibleColumnLayout.prototype._isInteractivelyResizedColumn = function (sColumn) {
@@ -2966,16 +2972,18 @@ sap.ui.define([
 	/**
 	 * Returns a string, representing the relative percentage sizes of the columns for the given layout in the format "begin/mid/end" (f.e. "33/67/0")
 	 * @param {string} sLayout - the layout
-	 * @param {boolean} bAsArray - return an array in the format [33, 67, 0] instead of a string "33/67/0"
+	 * @param {boolean} bAsIntArray - return an array in the format [33, 67, 0] instead of a string "33/67/0"
 	 * @param {number} [iMaxColumnsCount] the maximun number of columns. If not provided, the result of
 	 * <code>getMaxColumnsCount</code> will be taken
 	 * @returns {string|array}
 	 * @private
 	 * @ui5-restricted sap.f.FlexibleColumnLayoutSemanticHelper
 	 */
-	FlexibleColumnLayout.prototype._getColumnWidthDistributionForLayout = function (sLayout, bAsArray, iMaxColumnsCount) {
+	FlexibleColumnLayout.prototype._getColumnWidthDistributionForLayout = function (sLayout, bAsIntArray, iMaxColumnsCount) {
 		var sColumnWidthDistribution = this._getLocalStorage(iMaxColumnsCount).get(sLayout),
-			vResult;
+			iBeginWidth = this._getLocalStorage(iMaxColumnsCount).get("begin"),
+			vResult,
+			vResultAsArray;
 
 		iMaxColumnsCount || (iMaxColumnsCount = this.getMaxColumnsCount());
 
@@ -2990,13 +2998,31 @@ sap.ui.define([
 			vResult = this._getDefaultColumnWidthDistributionForLayout(sLayout, iMaxColumnsCount);
 		}
 
-		if (bAsArray) {
-			vResult = vResult.split("/").map(function (sColumnWidth) {
-				return parseInt(sColumnWidth);
+		vResultAsArray = vResult.split("/");
+
+		iBeginWidth = normalizeBeginColumnWidth(iBeginWidth, sLayout);
+
+		// Used stored begin column width, if not fullscreen layout and the begin column should be shown
+		if (iBeginWidth && !this._isFullScreenLayout(sLayout) && parseInt(vResultAsArray[0]) !== 0) {
+			vResultAsArray[0] = iBeginWidth;
+			vResultAsArray = vResultAsArray.map(function (sColumnWidth) {
+				return parseFloat(sColumnWidth);
 			});
+			normalizeColumnPercentWidths(vResultAsArray);
 		}
 
-		return vResult;
+		if (bAsIntArray) {
+			vResult = vResultAsArray.map(function (sColumnWidth) {
+				return Math.round(parseFloat(sColumnWidth));
+			});
+			normalizeColumnPercentWidths(vResult);
+		}
+
+		if (bAsIntArray) {
+			return vResult;
+		} else {
+			return vResultAsArray.join("/");
+		}
 	};
 
 	/**
@@ -3379,6 +3405,42 @@ sap.ui.define([
 			oConfig = oConfig.changedTouches[0];
 		}
 		return oConfig.pageX;
+	}
+
+	/**
+	 * Ensures the sum of all column percent widths is 100.
+	 * (Used after converting all the column widths from floats to integers,
+	 * to avoid inconsistency of the final sum due to rounding.)
+	 *
+	 * @param {object} aColumnPercentWidths the percent widths of all three columns
+	 */
+	function normalizeColumnPercentWidths(aColumnPercentWidths) {
+		var oColumnIndex = {
+			begin: 0,
+			mid: 1,
+			end: 2
+		},
+		iSum = aColumnPercentWidths.reduce((a, b) => a + b, 0);
+		if (iSum !== 100) {
+			// the CSS of the mid column always causes it take the space that remained
+			// after sizing the begin and end columns
+			aColumnPercentWidths[oColumnIndex.mid] = 100 -
+			(aColumnPercentWidths[oColumnIndex.begin] + aColumnPercentWidths[oColumnIndex.end]);
+		}
+	}
+
+	/**
+	 * Ensures width of begin column is correct for specific layouts
+	 *
+	 * @param {number} iBeginWidth
+	 * @param {string} sLayout
+	 */
+	function normalizeBeginColumnWidth(iBeginWidth, sLayout) {
+		if ((sLayout === LT.ThreeColumnsMidExpanded ||  sLayout == LT.ThreeColumnsEndExpanded) && Math.floor(iBeginWidth) >= 33) {
+			return 32;
+		}
+
+		return iBeginWidth;
 	}
 
 	return FlexibleColumnLayout;
