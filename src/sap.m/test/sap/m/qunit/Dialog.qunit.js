@@ -1657,6 +1657,78 @@ sap.ui.define([
 		oDialog.destroy();
 	});
 
+	QUnit.test("Keyboard Focusable Scroll Container", async function (assert) {
+		if (Device.browser.safari) {
+			assert.ok(true, "Skipping test on Safari as focus is not set to the Keyboard Focusable Scroll Container.");
+			return;
+		}
+
+		var oClock = sinon.useFakeTimers();
+
+		var oDialog = new Dialog("dialog", {
+			title: "Dialog Title",
+			contentWidth: "320px",
+			contentHeight: "100px",
+			content: [
+				new Text({
+					text: "This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text."
+				}),
+				new Text({
+					text: "This is the second line of text. This is the second line of text. This is the second line of text. This is the second line of text.This is the second line of text. This is the second line of text. This is the second line of text. This is the second line of text."
+				})
+			]
+		});
+
+		await nextUIUpdate(oClock);
+
+		oDialog.open();
+		oClock.tick(300);
+		await nextUIUpdate(oClock);
+
+		assert.strictEqual(document.activeElement, oDialog.getDomRef("cont"), "Initial focus is set to the first keyboard scrollable container.");
+
+		oClock.restore();
+		oDialog.destroy();
+	});
+
+	QUnit.test("Scroll Container with a button inside", async function (assert) {
+		var oClock = sinon.useFakeTimers();
+
+		var oDialogButton = new Button({
+			text: "Dialog Button"
+		});
+
+		var oDialog = new Dialog("dialog", {
+			title: "Dialog Title",
+			contentWidth: "320px",
+			contentHeight: "100px",
+			content: [
+				new Text({
+					text: "This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text."
+				}),
+				oDialogButton,
+				new Text({
+					text: "This is the second line of text. This is the second line of text. This is the second line of text. This is the second line of text.This is the second line of text. This is the second line of text. This is the second line of text. This is the second line of text."
+				})
+			]
+		});
+
+		await nextUIUpdate(oClock);
+
+		oDialog.open();
+
+		oClock.tick(300);
+		await nextUIUpdate(oClock);
+
+		assert.strictEqual(document.activeElement, oDialogButton.getFocusDomRef(), "Initial focus is set to the button.");
+
+		//cleanup
+		oClock.restore();
+		oDialog.destroy();
+		oDialogButton.destroy();
+	});
+
+
 	QUnit.module("Accessibility");
 
 	QUnit.test("Check if ValueState is present", function (assert) {

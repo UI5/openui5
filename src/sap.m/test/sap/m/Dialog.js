@@ -42,8 +42,9 @@ sap.ui.define([
 	"sap/ui/layout/form/SimpleForm",
 	"sap/ui/layout/Splitter",
 	"sap/m/FlexBox",
-	"sap/ui/thirdparty/jquery"
-], function (
+	"sap/ui/thirdparty/jquery",
+	"sap/base/Log"
+], function(
 	JSONModel,
 	HTML,
 	App,
@@ -87,7 +88,8 @@ sap.ui.define([
 	SimpleForm,
 	Splitter,
 	FlexBox,
-	jQuery
+	jQuery,
+	Log
 ) {
 	"use strict";
 	var app = new App("myApp", {initialPage: "page1"});
@@ -1631,6 +1633,8 @@ sap.ui.define([
 			]
 		})
 	});
+
+
 	var oMessage = new MessageItem({
 		type: 'Error',
 		title: 'Error message',
@@ -1655,6 +1659,68 @@ sap.ui.define([
 		}
 	});
 
+	//=================================================================
+	// Real use cases
+	//=================================================================
+
+	var oDialogWithKFS = new Dialog("popWithKFS", {
+		title: "Dialog Title",
+		contentWidth: "320px",
+		contentHeight: "100px",
+		content: [
+			new Text({
+				text: "This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text."
+			}),
+			new Text({
+				text: "This is the second line of text. This is the second line of text. This is the second line of text. This is the second line of text.This is the second line of text. This is the second line of text. This is the second line of text. This is the second line of text."
+			})
+		]
+	});
+
+	var oDialogWithSAndButton = new Dialog("popWithSAndButton", {
+		title: "Dialog Title",
+		contentWidth: "320px",
+		contentHeight: "100px",
+		content: [
+			new Text({
+				text: "This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text."
+			}),
+			new Button({
+				text: "A Button inside Scroller",
+				press: function () {
+					Log.info("Button inside Scroller pressed!");
+				}
+			}),
+			new Text({
+				text: "This is the second line of text. This is the second line of text. This is the second line of text. This is the second line of text.This is the second line of text."
+			})
+		]
+	});
+
+	var oDialogWithKFSAndFooter = new Dialog({
+		title: "Dialog Title",
+		contentWidth: "320px",
+		contentHeight: "100px",
+		initialFocus: "btnClose",
+		footer: new Toolbar({
+			content: [
+				new Button("btnClose",{
+					text: "Close",
+					press: function () {
+						oDialogWithKFSAndFooter.close();
+					}
+				})
+			]
+		}),
+		content: [
+			new Text({
+				text: "This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text."
+			}),
+			new Text({
+				text: "This is the second line of text. This is the second line of text. This is the second line of text. This is the second line of text.This is the second line of text. This is the second line of text. This is the second line of text. This is the second line of text."
+			})
+		]
+	});
 
 	//=================================================================
 
@@ -2161,6 +2227,28 @@ sap.ui.define([
 				width: _buttonWidth,
 				press: function () {
 					oPopoverDialog.open();
+				}
+			}),
+
+			new HTML({content: "<h1>Inital Focus</h1>"}),
+
+			new Button({
+				text: "Dialog with Keyboard Focusable Scroller",
+				press: function () {
+					oDialogWithKFS.open();
+				}
+			}),
+
+			new Button({
+				text: "Dialog with Scroller with Button inside",
+				press: function () {
+					oDialogWithSAndButton.open();
+				}
+			}),
+			new Button({
+				text: "Dialog with Keyboard Focusable Scroller and Footer",
+				press: function () {
+					oDialogWithKFSAndFooter.open();
 				}
 			})
 		]

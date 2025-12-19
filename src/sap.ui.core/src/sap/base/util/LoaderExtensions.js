@@ -61,20 +61,25 @@ sap.ui.define([
 	/**
 	 * Returns the names of all required modules in the legacy syntax for module names (dot-separated).
 	 *
-	 * @return {string[]} The names of all required modules
+	 * @param {boolean} [omitDeprecated=false]
+	 *     Whether to omit deprecated modules from the result (e.g. pseudo modules for data types)
+	 * @returns {string[]} The names of all required modules
 	 * @static
 	 * @private
 	 * @ui5-restricted sap.ui.core
 	 */
-	LoaderExtensions.getAllRequiredModules = function() {
+	LoaderExtensions.getAllRequiredModules = function(omitDeprecated) {
 		var aModuleNames = [],
-			mModules = sap.ui.loader._.getAllModules(true),
+			mModules = sap.ui.loader._.getAllModules(),
 			oModule;
 
 		for (var sModuleName in mModules) {
 			oModule = mModules[sModuleName];
 			// filter out preloaded modules
-			if (oModule.ui5 && oModule.state !== -1 /* PRELOADED */) {
+			if (oModule.ui5
+				&& oModule.state !== -1 /* PRELOADED */
+				&& (!oModule.deprecated || !omitDeprecated)
+			) {
 				aModuleNames.push(oModule.ui5);
 			}
 		}

@@ -325,6 +325,65 @@ sap.ui.define([
 		contentHeight: "50%"
 	});
 
+	var oPopoverWithKFS = new Popover("popWithKFS", {
+		title: "Popover Title",
+		contentWidth: "200px",
+		contentHeight: "200px",
+		content: [
+			new Text({
+				text: "This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text."
+			}),
+			new Text({
+				text: "This is the second line of text. This is the second line of text. This is the second line of text. This is the second line of text.This is the second line of text. This is the second line of text. This is the second line of text. This is the second line of text."
+			})
+		]
+	});
+
+	var oPopoverWithSAndButton = new Popover("popWithSAndButton", {
+		title: "Popover Title",
+		contentWidth: "200px",
+		contentHeight: "200px",
+		content: [
+			new Text({
+				text: "This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text."
+			}),
+			new Button({
+				text: "A Button inside Scroller",
+				press: function () {
+					Log.info("Button inside Scroller pressed!");
+				}
+			}),
+			new Text({
+				text: "This is the second line of text. This is the second line of text. This is the second line of text. This is the second line of text.This is the second line of text."
+			})
+		]
+	});
+
+	var oPopoverWithKFSAndFooter = new Popover({
+		title: "Popover Title",
+		contentWidth: "200px",
+		contentHeight: "200px",
+		initialFocus: "btnClose",
+		footer: new Bar({
+			contentRight: [
+				new Button("btnClose",{
+					text: "Close",
+					press: function () {
+						oPopoverWithKFSAndFooter.close();
+					}
+				})
+			]
+		}),
+		content: [
+			new Text({
+				text: "This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text.This is the first line of text."
+			}),
+			new Text({
+				text: "This is the second line of text. This is the second line of text. This is the second line of text. This is the second line of text.This is the second line of text. This is the second line of text. This is the second line of text. This is the second line of text."
+			})
+		]
+	});
+
 	var oButton16 = new Button("btn16", {
 		text: "Nested Popovers",
 		press: function () {
@@ -332,6 +391,30 @@ sap.ui.define([
 		}
 	});
 	oButton16.addStyleClass("positioned16");
+
+	var oButton17 = new Button("btn17", {
+		text: "Popover with Keyboard Focusable Scroller",
+		press: function () {
+			oPopoverWithKFS.openBy(this);
+		}
+	});
+	oButton17.addStyleClass("positioned17");
+
+	var oButton18 = new Button("btn18", {
+		text: "Popover with Scroller with Button inside",
+		press: function () {
+			oPopoverWithSAndButton.openBy(this);
+		}
+	});
+	oButton18.addStyleClass("positioned18");
+
+	var oButton19 = new Button("btn19", {
+		text: "Popover with Keyboard Focusable Scroller and Footer",
+		press: function () {
+			oPopoverWithKFSAndFooter.openBy(this);
+		}
+	});
+	oButton19.addStyleClass("positioned19");
 
 	var oPopoverNested = new Popover("popNested", {
 		title: "Nested Popovers",
@@ -448,7 +531,7 @@ sap.ui.define([
 	oOverflowingPopover.addStyleClass("positioned11");
 
 	// Add a css class to the body HTML element, in order to be used for caret stylization in visual tests run.
-	var oCustomCssButton = new Button("customCssButton",{
+	var oCustomCssButton = new Button("customCssButton", {
 		text: "Toggle custom CSS for visual test",
 		press: function() {
 			var $body = jQuery("body");
@@ -497,7 +580,10 @@ sap.ui.define([
 			oVBox,
 			oButton14,
 			oButton15,
-			oButton16
+			oButton16,
+			oButton17,
+			oButton18,
+			oButton19
 		]
 	}).addStyleClass("sapUiContentPadding");
 

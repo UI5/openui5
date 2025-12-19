@@ -32,6 +32,17 @@ sap.ui.define(['sap/base/util/LoaderExtensions'], function(LoaderExtensions) {
 		});
 	});
 
+	QUnit.test("getAllRequiredModules (filtered)", function(assert) {
+		const aUnfilteredModules = LoaderExtensions.getAllRequiredModules();
+		assert.ok(Array.isArray(aUnfilteredModules), "should return an array");
+		/* @deprecated */
+		assert.ok(aUnfilteredModules.includes("sap.ui.core.CSSSize"), "unfiltered result contains deprecated module");
+
+		const aFilteredModules = LoaderExtensions.getAllRequiredModules(/* omitDeprecated */ true);
+		assert.ok(Array.isArray(aFilteredModules), "should return an array");
+		assert.notOk(aFilteredModules.includes("sap.ui.core.CSSSize"), "filtered result does not contain deprecated module");
+	});
+
 	QUnit.test("toURL - resolve ui5:// pseudo protocol", function(assert) {
 		// define paths
 		sap.ui.loader.config({

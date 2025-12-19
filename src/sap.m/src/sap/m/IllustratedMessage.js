@@ -83,6 +83,10 @@ sap.ui.define([
 	 * and the available space of its parent container. Some of the structural elements are displayed differently or
 	 * are omitted in the different breakpoint sizes (XS, S, M, L).
 	 *
+	 * <b>Note:</b> When using automatic sizing (see {@link #getIllustrationSize illustrationSize} property), ensure the parent container has a constrained width
+	 * (for example, an explicit <code>width</code>, a <code>max-width</code>, or a width inherited from its parent).
+	 * Containers without width constraints can cause flickering during resize operations.
+	 *
 	 * @extends sap.ui.core.Control
 	 *
 	 * @author SAP SE
@@ -139,6 +143,11 @@ sap.ui.define([
 				 *
 				 * As <code>IllustratedMessage</code> adapts itself around the <code>Illustration</code>, the other
 				 * elements of the control are displayed differently on the different breakpoints/illustration sizes.
+				 *
+				 * When set to <code>Auto</code> (default), the illustration size is determined by the available space in the parent container.
+				 *
+				 * <b>Note:</b> Auto sizing requires the parent container to have a width constraint — for example, an explicit <code>width</code>, a <code>max-width</code>, or a width inherited from its parent.
+				 * Containers without width constraints may cause flickering during resize operations.
 				 *
 				 * @since 1.98
 				 */
