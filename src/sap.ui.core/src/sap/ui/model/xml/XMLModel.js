@@ -117,14 +117,15 @@ sap.ui.define([
 	 * @param {string} sURL A string containing the URL to which the request is sent
 	 * @param {object | string} [oParameters] A map of parameters or a single parameter string that is sent to the server with the request
 	 * @param {boolean} [bAsync=true] <b>Deprecated as of Version 1.107</b>; always use asynchronous
-	 * loading for performance reasons. By default, all requests are sent asynchronously.
-	 * Synchronous requests may temporarily lock the browser, disabling any actions while
-	 * the request is active. Cross-domain requests do not support synchronous operations.
+	 *   loading for performance reasons. By default, all requests are sent asynchronously.
+	 *   Synchronous requests may temporarily lock the browser, disabling any actions while
+	 *   the request is active. Cross-domain requests do not support synchronous operations.
 	 * @param {string} [sType=GET] HTTP method of request
 	 * @param {string} [bCache=true] <b>Deprecated as of Version 1.107</b>; always use the cache
-	 * headers from the back-end system for performance reasons. Disables caching if set to
-	 * <code>false</code>.
-	 * @param {object} [mHeaders] An object of additional header key/value pairs to send along with the request
+	 *   headers from the back-end system for performance reasons. Disables caching if set to
+	 *   <code>false</code>.
+	 * @param {Object<string, string>} [mHeaders]
+	 *   An object of additional header key/value pairs to send along with the request
 	 *
 	 * @public
 	 */
@@ -213,7 +214,7 @@ sap.ui.define([
 	 *   Path of the property to set
 	 * @param {any} oValue
 	 *   Value to set the property to
-	 * @param {object} [oContext]
+	 * @param {sap.ui.model.Context} [oContext]
 	 *   The context which will be used to set the property
 	 * @param {boolean} [bAsyncUpdate]
 	 *   Whether to update other bindings dependent on this property asynchronously
@@ -259,7 +260,7 @@ sap.ui.define([
 	 * Returns the value for the property with the given <code>sPropertyName</code>.
 	 *
 	 * @param {string} sPath The path to the property
-	 * @param {object} [oContext] The context which will be used to retrieve the property
+	 * @param {sap.ui.model.Context} [oContext] The context which will be used to retrieve the property
 	 *
 	 * @return {string} The value of the property
 	 * @public
@@ -276,9 +277,15 @@ sap.ui.define([
 	 * Returns the object for the given path and context.
 	 *
 	 * @param {string} sPath The path to the object
-	 * @param {object} [oContext] The context which will be used to retrieve the object
+	 * @param {sap.ui.model.Context} [oContext] The context which will be used to retrieve the object
 	 *
-	 * @return {object} The object
+	 * @return {Element|string|null|undefined} The object at the specified path:
+	 *   <ul>
+	 *     <li>An XML DOM Element node object when the path resolves to an element.</li>
+	 *     <li>A string value when the path points to an attribute (using the @attribute syntax) or text content.</li>
+	 *     <li><code>null</code> when the document has no root element or the path cannot be resolved.</li>
+	 *     <li><code>undefined</code> when the path resolution returns an empty result.</li>
+	 *   </ul>
 	 * @public
 	 */
 	XMLModel.prototype.getObject = function(sPath, oContext) {

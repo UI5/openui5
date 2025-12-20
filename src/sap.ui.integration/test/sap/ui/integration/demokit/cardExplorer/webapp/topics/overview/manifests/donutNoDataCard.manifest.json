@@ -1,0 +1,117 @@
+{
+	"_version": "2.0.0",
+	"sap.app": {
+		"id": "card.explorer.analytical.bubble.card",
+		"type": "card",
+		"title": "Sample of a Bubble Chart",
+		"subTitle": "Sample of a Bubble Chart",
+		"applicationVersion": {
+			"version": "1.0.0"
+		},
+		"shortTitle": "A short title for this Card",
+		"info": "Additional information about this Card",
+		"description": "A long description for this Card",
+		"tags": {
+			"keywords": [
+				"Analytical",
+				"Card",
+				"Bubble",
+				"Sample"
+			]
+		}
+	},
+	"sap.card": {
+		"configuration": {
+			"messages": {
+				"noData": {
+					"type": "NoSearchResults",
+					"title": "Analytical Card Type is not available in OpenUI5",
+					"description": "This feature requires the sap.viz library, which is part of SAPUI5.",
+					"size": "Auto"
+				}
+			}
+		},
+		"type": "List",
+		"header": {
+			"title": "Sales by Stores",
+			"type": "Numeric",
+			"data": {
+				"json": {
+					"number": "65.34",
+					"unit": "M",
+					"trend": "Down",
+					"state": "Critical",
+					"target": {
+						"number": 100,
+						"unit": "M"
+					},
+					"deviation": {
+						"number": 34.7,
+						"state": "Critical"
+					},
+					"details": "Current Quarter"
+				}
+			},
+			"subtitle": "Revenue Distribution by Store",
+			"unitOfMeasurement": "EUR",
+			"infoSection": {
+				"rows": [
+					{
+						"items": [
+							{
+								"type": "Status",
+								"value": "Below Target",
+								"state": "Warning",
+								"inverted": true,
+								"showStateIcon": true
+							},
+							{
+								"type": "Status",
+								"value": "Quarterly KPI",
+								"state": "None",
+								"inverted": true,
+								"showStateIcon": true
+							}
+						]
+					}
+				]
+			},
+			"mainIndicator": {
+				"number": "{number}",
+				"unit": "{unit}",
+				"trend": "{trend}",
+				"state": "{state}"
+			},
+			"sideIndicators": [
+				{
+					"title": "Target",
+					"number": "{target/number}",
+					"unit": "{target/unit}"
+				},
+				{
+					"title": "Deviation",
+					"number": "{deviation/number}",
+					"unit": "%"
+				}
+			],
+			"details": "{details}"
+		},
+		"content": {
+			"data": {
+				"request": {
+					"url": "https://services.odata.org/V4/Northwind/Northwind.svc/Products",
+					"parameters": {
+						"$format": "json",
+						"$filter": "UnitPrice eq 0"
+					}
+				},
+				"path": "/value"
+			},
+			"item": {
+				"title": "{ProductName}",
+				"description": "{UnitsInStock} units in stock",
+				"highlight": "{= ${Discontinued} ? 'Error' : 'Success'}"
+			}
+		}
+	}
+}

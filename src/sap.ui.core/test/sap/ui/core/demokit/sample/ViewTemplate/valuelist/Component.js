@@ -9,14 +9,13 @@
  */
 sap.ui.define([
 	"sap/base/Log",
-	"sap/ui/core/mvc/View", // sap.ui.view()
-	"sap/ui/core/mvc/XMLView", // type : ViewType.XML
+	"sap/ui/core/mvc/XMLView",
 	"sap/ui/core/sample/common/Component",
 	"sap/ui/core/util/MockServer",
 	"sap/ui/model/json/JSONModel",
 	"sap/ui/model/odata/v2/ODataModel",
 	"sap/ui/test/TestUtils"
-], function (Log, _View, _XMLView, BaseComponent, MockServer, JSONModel,
+], function (Log, XMLView, BaseComponent, MockServer, JSONModel,
 		ODataModel, TestUtils) {
 	"use strict";
 
@@ -141,7 +140,7 @@ sap.ui.define([
 				metadataUrlParams : sValueList ? {"sap-value-list" : sValueList} : undefined,
 				useBatch : false // make network trace easier to read
 			});
-			return _XMLView.create({
+			return XMLView.create({
 				models : {
 					undefined : oModel,
 					ui : new JSONModel({valueHelpDetails : false})

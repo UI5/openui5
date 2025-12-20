@@ -36,8 +36,9 @@ sap.ui.define([
 		 * @param {object} mSettings.target Target for which the TitleProvider is created
 		 * @private
 		 * @extends sap.ui.core.Element
+		 * @alias sap.ui.core.routing.Target.TitleProvider
 		 */
-		var TitleProvider = Element.extend("sap.ui.core.routing.Target.TitleProvider", /** @lends sap.ui.core.routing.TitleProvider.prototype */ {
+		var TitleProvider = Element.extend("sap.ui.core.routing.Target.TitleProvider", /** @lends sap.ui.core.routing.Target.TitleProvider.prototype */ {
 			metadata: {
 				library: "sap.ui.core",
 				properties: {

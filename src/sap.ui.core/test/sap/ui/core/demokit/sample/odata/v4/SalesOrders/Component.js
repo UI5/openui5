@@ -7,11 +7,10 @@ sap.ui.define([
 	"sap/ui/core/Messaging",
 	"sap/ui/core/UIComponent",
 	"sap/ui/core/message/MessageType",
-	"sap/ui/core/mvc/View",
-	"sap/ui/core/mvc/ViewType",
+	"sap/ui/core/mvc/XMLView",
 	"sap/ui/model/json/JSONModel",
 	"sap/ui/test/TestUtils"
-], function (Log, HBox, Messaging, UIComponent, MessageType, View, ViewType, JSONModel, TestUtils) {
+], function (Log, HBox, Messaging, UIComponent, MessageType, XMLView, JSONModel, TestUtils) {
 	"use strict";
 
 	return UIComponent.extend("sap.ui.core.sample.odata.v4.SalesOrders.Component", {
@@ -112,13 +111,12 @@ sap.ui.define([
 				});
 
 				this.runAsOwner(() => {
-					View.create({
+					XMLView.create({
 						id : "sap.ui.core.sample.odata.v4.SalesOrders.Main",
 						models : {
 							undefined : oModel,
 							ui : this.oUiModel
 						},
-						type : ViewType.XML,
 						viewName : "sap.ui.core.sample.odata.v4.SalesOrders.Main"
 					}).then(function (oView) {
 						oLayout.addItem(oView);

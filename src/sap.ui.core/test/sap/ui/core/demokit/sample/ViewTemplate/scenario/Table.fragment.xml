@@ -25,7 +25,7 @@
 				<template:if test="{field>Target}"><!-- duck typing for com.sap.vocabularies.UI.v1.DataFieldWithNavigationPath -->
 					<template:then>
 						<template:with path="field>Target" helper="AH.resolvePath" var="entityType">
-							<Link text="{path: 'field>Value', formatter: 'AH.format'}" press="onDetailsPressed">
+							<Link text="{path: 'field>Value', formatter: 'AH.format'}" press=".onDetailsPressed">
 								<dependents>
 									<template:with path="entityType>com.sap.vocabularies.UI.v1.HeaderInfo" var="headerInfo">
 										<Popover binding="{path: 'field>Target', formatter: 'AH.getNavigationPath'}"

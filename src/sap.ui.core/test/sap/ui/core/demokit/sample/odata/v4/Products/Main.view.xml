@@ -126,7 +126,7 @@
 				<template:repeat list="{lineItem>}" var="field">
 					<Label text="{field>@@label}"/>
 					<Input id="{field>Value/$Path}::newEntry" value="{field>Value/@@format}"
-						change="enableAddButton"/>
+						change=".enableAddButton"/>
 				</template:repeat>
 			</form:SimpleForm>
 		</template:with>

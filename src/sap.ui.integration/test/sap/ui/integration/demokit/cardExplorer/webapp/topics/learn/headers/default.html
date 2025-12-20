@@ -5,7 +5,7 @@
 	<title>Default Header</title>
 	
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<script src="../../../scripts/boot.js"></script>
+	<script data-require-ui5-noinit src="../../../scripts/boot.js"></script>
 </head>
 
 <body class="sapUiBody topicBody">
@@ -16,7 +16,10 @@
 			</h1>
 			<p>The header displays general information about the card. Using properties you can configure the title,
 				subtitle, status text, and icon.</p>
-			<img class="cardHeadersImg" src="../../images/DefaultHeaderExample.png" alt="Example of default header">
+			<div class="cardsContainer">
+				<ui-integration-card id="defaultHeaderExample" class="card-width-small" manifest="../manifests/defaultHeader.manifest.json">
+				</ui-integration-card>
+			</div>
 
 			<h2 id="usage">Usage</h2>
 			<p>

@@ -12,10 +12,8 @@
 @_sap_tnt_SideNavigation_NavigationSeparatorHeight: 1px;
 @_sap_tnt_SideNavigation_TriangleColor: var(--sapContent_IconColor);
 @_sap_tnt_SideNavigation_BorderRight: 1px solid var(--sapGroup_ContentBorderColor);
-@_sap_tnt_SideNavigation_PhoneBorderRadius: 0;
 @_sap_tnt_SideNavigation_BoxShadow: none;
 @_sap_tnt_SideNavigation_TriangleDisplay: block;
-@_sap_tnt_SideNavigation_PhoneWidth: @_sap_tnt_SideNavigation_Width;
 
 .sapTntSideNavigation {
 	display: flex;
@@ -41,20 +39,10 @@ html[data-sap-ui-animation='off'] .sapTntSideNavigation {
 	transition: none;
 }
 
-html.sap-phone,
-html.sap-tablet:not(html.sap-combi) {
-
-	.sapTntSideNavigation {
-		border-radius: @_sap_tnt_SideNavigation_PhoneBorderRadius;
-	}
+.sapTntToolPage-LayoutS .sapTntSideNavigation {
+	width: ~"100% !important";
 }
 
-html.sap-phone {
-
-	.sapTntSideNavigation {
-		width: @_sap_tnt_SideNavigation_PhoneWidth;
-	}
-}
 
 .sapTntSideNavigation.sapTntSideNavigationNotExpandedWidth {
 	min-width: @_sap_tnt_SideNavigation_CollapsedWidth;

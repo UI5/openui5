@@ -1,6 +1,7 @@
 <mvc:View
 	class="sapUiSizeCompact"
 	controllerName="sap.ui.core.sample.odata.v4.MultiLevelExpand.Main"
+	core:require="{Currency : 'sap/ui/model/odata/type/Currency'}"
 	xmlns="sap.ui.table"
 	xmlns:core="sap.ui.core"
 	xmlns:m="sap.m"
@@ -94,7 +95,7 @@
 						path : '/##@@requestCurrencyCodes',
 						targetType : 'any'
 					}],
-					type : 'sap.ui.model.odata.type.Currency',
+					type : 'Currency',
 					formatOptions : { showMeasure : false }
 				}" wrapping="false"/>
 			</template>

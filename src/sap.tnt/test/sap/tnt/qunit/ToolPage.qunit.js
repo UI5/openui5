@@ -629,24 +629,6 @@ sap.ui.define([
 		assert.strictEqual(this.toolPage.getSideExpanded(), false, "ToolPage should be collapsed");
 	});
 
-	QUnit.test("Media Query Handler", function (assert) {
-		// Arrange
-		var oSideExpandedSpy = this.spy(this.toolPage, "setSideExpanded");
-		var oUpdateLastQuerySpy = this.spy(this.toolPage, "_updateLastMediaQuery");
-		this.toolPage._lastMediaQuery = "test";
-
-		// Act
-		this.toolPage._mediaQueryHandler();
-
-		// Assert
-		assert.strictEqual(oSideExpandedSpy.callCount, 1, "setSideExpanded called once");
-		assert.strictEqual(oUpdateLastQuerySpy.callCount, 1, "setSideExpanded called once");
-
-		// Reset sinon spy
-		this.toolPage.setSideExpanded.restore();
-		this.toolPage._updateLastMediaQuery.restore();
-	});
-
 	QUnit.test("#setContentBackgroundDesign() to 'Solid'", async function (assert) {
 		// Act
 		this.toolPage.setContentBackgroundDesign(PageBackgroundDesign.Solid);
@@ -674,48 +656,225 @@ sap.ui.define([
 		assert.ok(this.toolPage.$("main").hasClass("sapTntToolPageMainBackground-List"), "Correct class for List Background should be set");
 	});
 
-	QUnit.module("Media handling", {
+	QUnit.module("Screen size", {
 		beforeEach: async function () {
 			this.toolPage = getToolPage();
 			oPage.addContent(this.toolPage);
+			this._originalInnerWidth = window.innerWidth;
 
 			await nextUIUpdate(); // no fake timer active in beforeEach
 		},
 		afterEach: function () {
 			this.toolPage.destroy();
 			this.toolPage = null;
+			// Restore original innerWidth
+			Object.defineProperty(window, 'innerWidth', {
+				writable: true,
+				configurable: true,
+				value: this._originalInnerWidth
+			});
 		}
 	});
 
-	QUnit.test("Media Query Handler - Tablet", async function (assert) {
-		// Arrange
-		var oDeviceStub = this.stub(Device, "system",  {
-			tablet: true
+	QUnit.test("Layout S - default sideExpanded property", async function (assert) {
+		// Arrange - Override window.innerWidth for Layout S (up to 599px)
+		Object.defineProperty(window, 'innerWidth', {
+			writable: true,
+			configurable: true,
+			value: 400
 		});
-		// Act
-		this.toolPage._mediaQueryHandler();
+
+		// Recreate ToolPage to trigger the layout update on init
+		this.toolPage.destroy();
+		this.toolPage = null;
+		this.toolPage = getToolPage();
+		oPage.addContent(this.toolPage);
+		await nextUIUpdate(this.clock);
 
 		// Assert
-		assert.strictEqual(this.toolPage.getSideExpanded(), false, "ToolPage should be collapsed in Tablet mode");
-
-		oDeviceStub.restore();
-		await clearPendingUIUpdates(this.clock);
+		assert.strictEqual(this.toolPage.getSideExpanded(), false, "ToolPage should be collapsed in layout S");
 	});
 
-	QUnit.test("Media Query Handler - Phone", function (assert) {
-		// Arrange
-		var oDeviceStub = this.stub(Device, "system",  {
-			phone: true
+	QUnit.test("Layout M - default sideExpanded property", async function (assert) {
+		// Arrange - Override window.innerWidth for Layout M (600px - 1023px)
+		Object.defineProperty(window, 'innerWidth', {
+			writable: true,
+			configurable: true,
+			value: 800
 		});
 
-		// Act
-		this.toolPage._mediaQueryHandler();
+		// Recreate ToolPage to trigger the layout update on init
+		this.toolPage.destroy();
+		this.toolPage = null;
+		this.toolPage = getToolPage();
+		oPage.addContent(this.toolPage);
+		await nextUIUpdate(this.clock);
 
 		// Assert
-		assert.strictEqual(this.toolPage.getSideExpanded(), false, "ToolPage should be collapsed in Phone mode");
-		assert.strictEqual(this.toolPage.getSideContent().getExpanded(), true, "SideContent should be expanded in Phone mode");
+		assert.strictEqual(this.toolPage.getSideExpanded(), true, "ToolPage should be expanded in Layout M");
+	});
 
-		oDeviceStub.restore();
+	QUnit.test("Layout S - changed sideExpanded property + resize", async function (assert) {
+		// Arrange - Override window.innerWidth for Layout S (up to 599px)
+		Object.defineProperty(window, 'innerWidth', {
+			writable: true,
+			configurable: true,
+			value: 400
+		});
+
+		// Recreate ToolPage to trigger the layout update on init
+		this.toolPage.destroy();
+		this.toolPage = null;
+		this.toolPage = getToolPage();
+		this.toolPage.setSideExpanded(true);
+		oPage.addContent(this.toolPage);
+		await nextUIUpdate(this.clock);
+
+		// Assert
+		assert.strictEqual(this.toolPage.getSideExpanded(), true, "ToolPage should be expanded in Layout M");
+
+		// Arrange - Override window.innerWidth for Layout M (600px - 1023px)
+		Object.defineProperty(window, 'innerWidth', {
+			writable: true,
+			configurable: true,
+			value: 400
+		});
+
+		// Trigger the update layout settings
+		this.toolPage._updateLayoutSettings();
+		await nextUIUpdate(this.clock);
+
+		// Assert
+		assert.strictEqual(this.toolPage.getSideExpanded(), true, "ToolPage should be expanded if layout is changed to S");
+
+
+		// Arrange - Override window.innerWidth for Layout M (600px - 1023px)
+		Object.defineProperty(window, 'innerWidth', {
+			writable: true,
+			configurable: true,
+			value: 800
+		});
+
+		// Trigger the update layout settings
+		this.toolPage._updateLayoutSettings();
+		await nextUIUpdate(this.clock);
+
+		// Assert
+		assert.strictEqual(this.toolPage.getSideExpanded(), true, "ToolPage should be expanded in Layout M, when coming back from Layout S");
+	});
+
+	QUnit.test("Layout M - changed sideExpanded property + resize", async function (assert) {
+		// Arrange - Override window.innerWidth for Layout M (600px - 1023px)
+		Object.defineProperty(window, 'innerWidth', {
+			writable: true,
+			configurable: true,
+			value: 800
+		});
+
+		// Recreate ToolPage to trigger the layout update on init
+		this.toolPage.destroy();
+		this.toolPage = null;
+		this.toolPage = getToolPage();
+		this.toolPage.setSideExpanded(false);
+		oPage.addContent(this.toolPage);
+		await nextUIUpdate(this.clock);
+
+		// Assert
+		assert.strictEqual(this.toolPage.getSideExpanded(), false, "ToolPage should be collapsed in Layout M");
+
+		// Arrange - Override window.innerWidth for Layout M (600px - 1023px)
+		Object.defineProperty(window, 'innerWidth', {
+			writable: true,
+			configurable: true,
+			value: 400
+		});
+
+		// Trigger the update layout settings
+		this.toolPage._updateLayoutSettings();
+		await nextUIUpdate(this.clock);
+
+		// Assert
+		assert.strictEqual(this.toolPage.getSideExpanded(), false, "ToolPage should be collapsed if layout is changed to S");
+
+
+		// Arrange - Override window.innerWidth for Layout M (600px - 1023px)
+		Object.defineProperty(window, 'innerWidth', {
+			writable: true,
+			configurable: true,
+			value: 800
+		});
+
+		// Trigger the update layout settings
+		this.toolPage._updateLayoutSettings();
+		await nextUIUpdate(this.clock);
+
+		// Assert
+		assert.strictEqual(this.toolPage.getSideExpanded(), false, "ToolPage should be collapsed in Layout M, when coming back from Layout S");
+	});
+
+		QUnit.test("Layout S to M and back to S - remember expanded state", async function (assert) {
+		// Arrange - Override window.innerWidth for Layout M (600px - 1023px)
+		Object.defineProperty(window, 'innerWidth', {
+			writable: true,
+			configurable: true,
+			value: 800
+		});
+
+		// Trigger the update layout settings
+		this.toolPage._updateLayoutSettings();
+		await nextUIUpdate(this.clock);
+
+		// Assert
+		assert.strictEqual(this.toolPage.getSideExpanded(), true, "ToolPage should be expanded in Layout M");
+
+		// Collapse side content
+		this.toolPage.setSideExpanded(false);
+		// Expand side content
+		this.toolPage.setSideExpanded(true);
+
+		// Arrange - Override window.innerWidth for Layout M (600px - 1023px)
+		Object.defineProperty(window, 'innerWidth', {
+			writable: true,
+			configurable: true,
+			value: 400
+		});
+
+		// Trigger the update layout settings
+		this.toolPage._updateLayoutSettings();
+		await nextUIUpdate(this.clock);
+
+		// Assert
+		assert.strictEqual(this.toolPage.getSideExpanded(), true, "ToolPage should be expanded as it was before resizing to Layout S");
+
+		// Collapse side content
+		this.toolPage.setSideExpanded(false);
+
+		// Arrange - Override window.innerWidth for Layout M (600px - 1023px)
+		Object.defineProperty(window, 'innerWidth', {
+			writable: true,
+			configurable: true,
+			value: 800
+		});
+
+		// Trigger the update layout settings
+		this.toolPage._updateLayoutSettings();
+		await nextUIUpdate(this.clock);
+
+		// Assert
+		assert.strictEqual(this.toolPage.getSideExpanded(), false, "ToolPage should be collapsed as it was before resizing to Layout  M");
+	});
+
+	QUnit.test("_resize function calls _updateLayoutSettings", function (assert) {
+		// Arrange
+		const oSpy = this.spy(this.toolPage, "_updateLayoutSettings");
+
+		// Act - Call _resize method directly to test line 187
+		this.toolPage._resize();
+
+		// Assert
+		assert.ok(oSpy.calledOnce, "_updateLayoutSettings should be called when _resize is triggered");
+
+		oSpy.restore();
 	});
 
 	QUnit.module("Header and subheader restrictions");

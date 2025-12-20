@@ -5,7 +5,7 @@
 	<title>Preview</title>
 	
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<script src="../../scripts/boot.js"></script>
+	<script data-require-ui5-noinit src="../../scripts/boot.js"></script>
 </head>
 
 <body class="sapUiBody topicBody">
@@ -30,13 +30,22 @@
 				<li>"Off" - Preview is turned off, real data is displayed.</li>
 				<li>
 					<p>"MockData" - In this mode if the card is configured with mock data, it is displayed instead of the real data.</p>
-					<img src="../images/previewMockData.png" alt="Caching Diagram" style="max-width: 100%;">
+					<div class="cardsContainer">
+						<ui-integration-card id="mockDataCardExample" manifest="./manifests/mockDataCard.manifest.json" class="card-width-small" preview-mode="MockData">
+						</ui-integration-card>
+					</div>
 					<p>If the card is missing mock data configuration (the <code>mockData</code> sub-section in the manifests' data section), it will fall back to display an Abstract preview with a message notification like:</p>
-					<img src="../images/previewMockDataMissingConfiguration.png" alt="Caching Diagram" style="max-width: 100%;">
+					<div class="cardsContainer">
+						<ui-integration-card id="missingMockDataCardExample" manifest="./manifests/missingMockDataCard.manifest.json" class="card-width-small" preview-mode="MockData">
+						</ui-integration-card>
+					</div>
 				</li>
 				<li>
 					<p>"Abstract" - In this mode cards display abstract placeholders.</p>
-					<img src="../images/previewAbstract.png" alt="Caching Diagram" style="max-width: 100%;">
+					<div class="cardsContainer">
+						<ui-integration-card id="abstractCardExample" manifest="./manifests/mockDataCard.manifest.json" class="card-width-small" preview-mode="Abstract">
+						</ui-integration-card>
+					</div>
 				</li>
 			</ul>
 

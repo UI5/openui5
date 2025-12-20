@@ -8,7 +8,7 @@ sap.ui.define([
 	"sap/ui/model/FilterOperator",
 	"sap/ui/model/Sorter",
 	"sap/ui/model/json/JSONModel"
-], function (Library, Controller, Filter, FilterOperator, Sorter, JSONModel) {
+], function (Lib, Controller, Filter, FilterOperator, Sorter, JSONModel) {
 	"use strict";
 
 	return Controller.extend("sap.ui.core.sample.odata.v4.Ancestry.Main", {
@@ -61,7 +61,7 @@ sap.ui.define([
 					}
 				};
 
-			Library.load("sap.ui.export").then(function () {
+			Lib.load({name : "sap.ui.export"}).then(function () {
 				sap.ui.require(["sap/ui/export/Spreadsheet"], function (Spreadsheet) {
 					var oSheet = new Spreadsheet(oSettings);
 

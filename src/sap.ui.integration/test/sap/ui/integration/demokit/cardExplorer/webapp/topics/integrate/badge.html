@@ -5,7 +5,7 @@
 	<title>Text Badge</title>
 	
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<script src="../../scripts/boot.js"></script>
+	<script data-require-ui5-noinit src="../../scripts/boot.js"></script>
 </head>
 
 <body class="sapUiBody topicBody">
@@ -25,7 +25,10 @@
 				<li>The card is added to the home page by the user.</li>
 				<li>The card is added to the user's home page by an admin or key user.</li>
 			</ul>
-			<img src="../images/Badge.PNG" height="329" width="380" alt="Badge">
+			<div class="cardsContainer">
+				<ui-integration-card id="quickLinksCardExample" manifest="./manifests/quickLinksCard.manifest.json" class="card-width-small" badge="New Card">
+				</ui-integration-card>
+			</div>
 			<h2 id="usage">When to Use</h2>
 			<p>Use the badge when:</p>
 			<ul>

@@ -66,8 +66,7 @@ sap.ui.define([
 						},
 						success : function () {
 							if (bSkipTest) {
-								Opa5.assert.ok(true, "Document lost focus or test runs in Firefox,"
-									+ " check skipped");
+								Opa5.assert.ok(true, "Document lost focus, check skipped");
 							} else {
 								aExpectedMessages.forEach(function (sExpectedMessage) {
 									Opa5.assert.ok(sCurrentRequestBody.includes(sExpectedMessage),

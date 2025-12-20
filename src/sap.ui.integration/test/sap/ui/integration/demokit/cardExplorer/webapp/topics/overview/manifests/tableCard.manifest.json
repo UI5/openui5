@@ -1,0 +1,131 @@
+{
+	"_version": "2.0.0",
+	"sap.app": {
+		"id": "card.explorer.table.card",
+		"type": "card",
+		"title": "Sample of a Table Card",
+		"subTitle": "Sample of a Table Card",
+		"applicationVersion": {
+			"version": "1.0.0"
+		},
+		"shortTitle": "A short title for this Card",
+		"info": "Additional information about this Card",
+		"description": "A long description for this Card",
+		"tags": {
+			"keywords": [
+				"Table",
+				"Card",
+				"Sample"
+			]
+		}
+	},
+	"sap.ui": {
+		"technology": "UI5",
+		"icons": {
+			"icon": "sap-icon://table-view"
+		}
+	},
+	"sap.card": {
+		"type": "Table",
+		"data": {
+			"json": [
+				{
+					"product": "DVD player",
+					"salesOrder": "5000010050",
+					"netAmount": "2K USD",
+					"status": "Delivered",
+					"statusState": "Success",
+					"deliveryProgress": 100,
+					"url": "https://www.sap.com"
+				},
+				{
+					"product": "Astro Laptop 1516",
+					"salesOrder": "5000010051",
+					"netAmount": "127k USD",
+					"status": "Canceled",
+					"statusState": "Error",
+					"deliveryProgress": 0,
+					"url": "https://www.sap.com"
+				},
+				{
+					"product": "Astro Phone 6",
+					"salesOrder": "5000010052",
+					"netAmount": "8K USD",
+					"status": "In Progress",
+					"statusState": "Warning",
+					"deliveryProgress": 33,
+					"url": "https://www.sap.com"
+				},
+				{
+					"product": "Beam Breaker B-1",
+					"salesOrder": "5000010053",
+					"netAmount": "25K USD",
+					"status": "Delivered",
+					"statusState": "Success",
+					"deliveryProgress": 100,
+					"url": "https://www.sap.com"
+				},
+				{
+					"product": "Benda Laptop 1408",
+					"salesOrder": "5000010051",
+					"netAmount": "127k USD",
+					"status": "Canceled",
+					"statusState": "Error",
+					"deliveryProgress": 0,
+					"url": "https://www.sap.com"
+				}
+			]
+		},
+		"header": {
+			"title": "Sales Orders for Key Accounts",
+			"subtitle": "Today"
+		},
+		"content": {
+			"maxItems": 9,
+			"row": {
+				"columns": [
+					{
+						"title": "Product",
+						"value": "{product}",
+						"additionalText": "{salesOrder}",
+						"actions": [
+							{
+								"type": "Navigation",
+								"parameters": {
+									"url": "{url}",
+									"target": "_blank"
+								}
+							}
+						],
+						"identifier": true
+					},
+					{
+						"title": "Net Amount",
+						"value": "{netAmount}",
+						"hAlign": "End"
+					},
+					{
+						"title": "Status",
+						"value": "{status}",
+						"state": "{statusState}"
+					},
+					{
+						"title": "Delivery Progress",
+						"progressIndicator": {
+							"percent": "{deliveryProgress}",
+							"text": "{= format.percent(${deliveryProgress} / 100)}",
+							"state": "{statusState}"
+						}
+					}
+				]
+			},
+			"group": {
+				"title": "{= ${deliveryProgress} > 10 ? 'In Delivery' : 'Not in Delivery'}",
+				"order": {
+					"path": "statusState",
+					"dir": "ASC"
+				}
+			}
+		}
+	}
+}

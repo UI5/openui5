@@ -350,7 +350,7 @@ sap.ui.define([
 	 *   the source type (the expected type of <code>sValue</code>); must be "string", or a type
 	 *   with "string" as its {@link sap.ui.base.DataType#getPrimitiveType primitive type}.
 	 *   See {@link sap.ui.model.odata.type} for more information.
-	 * @returns {{__edmType: "Edm.Time", ms: int}}}
+	 * @returns {{__edmType: "Edm.Time", ms: int}}
 	 *   the parsed value as described in {@link #formatValue formatValue}
 	 * @throws {sap.ui.model.ParseException}
 	 *   if <code>sSourceType</code> is unsupported

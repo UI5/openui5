@@ -1,0 +1,88 @@
+{
+	"_version": "2.0.0",
+	"sap.app": {
+		"id": "card.explorer.adaptive.markdown",
+		"type": "card",
+		"title": "Sample of an Adaptive Card With Markdown Support",
+		"subTitle": "Sample of an Adaptive Card With Formatted Text using Markdown",
+		"applicationVersion": {
+			"version": "1.0.0"
+		},
+		"shortTitle": "Markdown Card Sample",
+		"info": "Demonstrates markdown formatting capabilities in Adaptive Cards",
+		"description": "A compact example showcasing key markdown formatting features including bold, italic, lists, links, and code blocks.",
+		"tags": {
+			"keywords": [
+				"Adaptive",
+				"Card",
+				"Markdown",
+				"Formatting",
+				"Text",
+				"Sample"
+			]
+		}
+	},
+	"sap.ui": {
+		"technology": "UI5",
+		"icons": {
+			"icon": "sap-icon://text-formatting"
+		}
+	},
+	"sap.card": {
+		"configuration": {
+			"enableMarkdown": true
+		},
+		"header": {
+			"title": "Markdown Formatting Features",
+			"subtitle": "Key Examples of Markdown Support in MS Adaptive Cards",
+			"icon": {
+				"src": "sap-icon://text-formatting"
+			}
+		},
+		"type": "AdaptiveCard",
+		"content": {
+			"$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+			"type": "AdaptiveCard",
+			"version": "1.5",
+			"height": "500px",
+			"body": [
+				{
+					"type": "TextBlock",
+					"text": "## Text Formatting",
+					"size": "Medium",
+					"weight": "Bolder"
+				},
+				{
+					"type": "TextBlock",
+					"text": "**Bold text**, *italic text*, ~~strikethrough~~, and `inline code`",
+					"wrap": true
+				},
+				{
+					"type": "TextBlock",
+					"text": "## Lists",
+					"size": "Medium",
+					"weight": "Bolder",
+					"spacing": "Medium"
+				},
+				{
+					"type": "TextBlock",
+					"text": "• **Bullet list** item\n• *Formatted* bullet item\n• Item with `code`",
+					"wrap": true
+				},
+				{
+					"type": "TextBlock",
+					"text": "1. **Numbered** list item\n2. Item with [link](https://adaptivecards.io)\n3. Final numbered item",
+					"wrap": true
+				},
+				{
+					"type": "TextBlock",
+					"text": "> **Quote:** This demonstrates markdown capabilities in a compact card format.",
+					"wrap": true,
+					"size": "Small",
+					"color": "Accent",
+					"spacing": "Medium"
+				}
+			]
+		}
+	}
+}

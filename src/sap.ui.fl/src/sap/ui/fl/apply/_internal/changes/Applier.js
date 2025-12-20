@@ -34,8 +34,8 @@ sap.ui.define([
 	 * Formats the log message by replacing placeholders with values and logging the message.
 	 *
 	 * @param {string} sLogType - Logging type to be used. Possible values: info | warning | debug | error
-	 * @param {array.<string>} aMessageComponents - Individual parts of the message text
-	 * @param {array.<any>} aValuesToInsert - The values to be used instead of the placeholders in the message
+	 * @param {Array<string>} aMessageComponents - Individual parts of the message text
+	 * @param {Array<any>} aValuesToInsert - The values to be used instead of the placeholders in the message
 	 * @param {string} [sCallStack] - Passes the call stack to the logging function
 	 */
 	function formatAndLogMessage(sLogType, aMessageComponents, aValuesToInsert, sCallStack) {

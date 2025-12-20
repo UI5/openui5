@@ -2614,11 +2614,11 @@ sap.ui.define([
 	 *   <li>Resolves even if <code>preventDefault()</code> is called in the <code>beforeExport</code> event if no error is thrown.</li>
 	 * </ul>
 	 *
+	 * @private
 	 * @ui5-restricted sap.ux.eng.fioriai.reuse
 	 * @returns {Promise}
 	 * <code>Promise</code> that resolves if the export is finished, rejects if the table does not have columns, the export is disabled,
 	 * or the <code>sap.ui.export</code> library is unavailable.
-	 * @private
 	 */
 	Table.prototype.triggerExport = function() {
 		if (!this._isExportEnabled()) {
@@ -3287,9 +3287,9 @@ sap.ui.define([
 
 	/**
 	 * Allows programmatic configuration of the table's selection state
-	 * @param {array<sap.ui.model.Context>} aContexts Contexts which should be selected
-	 * @ui5-restricted sap.ui.mdc
+	 * @param {Array<sap.ui.model.Context>} aContexts Contexts which should be selected
 	 * @private
+	 * @ui5-restricted sap.ui.mdc
 	 */
 	Table.prototype._setSelectedContexts = function(aContexts) {
 		this.getControlDelegate().setSelectedContexts(this, aContexts);

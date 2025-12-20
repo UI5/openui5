@@ -43,7 +43,7 @@ sap.ui.define([
 	 * @private
 	 * @alias sap.tnt.NavigationListMenuItem
 	 */
-	var NavigationListMenuItem = MenuItem.extend("sap.tnt.NavigationListMenuItem", /** @lends sap.ui.unified.MenuItem.prototype */ {
+	var NavigationListMenuItem = MenuItem.extend("sap.tnt.NavigationListMenuItem", /** @lends sap.tnt.NavigationListMenuItem.prototype */ {
 		metadata : {
 
 			library : "sap.tnt",

@@ -32,7 +32,7 @@ sap.ui.define(['./DateInterval', 'sap/ui/core/format/DateFormat'],
 	 * @param {Date|string} [oConstraints.maximum] Largest value allowed for this type. Values for constraints must use the same type as configured via <code>oFormatOptions.source</code>.
 	 * @alias sap.ui.model.type.TimeInterval
 	 */
-	var TimeInterval = DateInterval.extend("sap.ui.model.type.TimeInterval", /** @lends sap.ui.model.type.DateTimeInterval.prototype */ {
+	var TimeInterval = DateInterval.extend("sap.ui.model.type.TimeInterval", /** @lends sap.ui.model.type.TimeInterval.prototype */ {
 
 		constructor : function () {
 			DateInterval.apply(this, arguments);

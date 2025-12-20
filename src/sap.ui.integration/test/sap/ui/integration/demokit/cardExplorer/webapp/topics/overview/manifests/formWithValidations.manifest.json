@@ -1,0 +1,205 @@
+{
+	"_version": "2.0.0",
+	"sap.app": {
+		"id": "card.explorer.object.form",
+		"i18n": "i18n/i18n.properties",
+		"type": "card",
+		"title": "Employee Onboarding Form Card",
+		"subTitle": "Interactive Form With Comprehensive Validations",
+		"applicationVersion": {
+			"version": "1.0.0"
+		},
+		"shortTitle": "Onboarding Form",
+		"info": "New employee registration and setup",
+		"description": "A comprehensive form card designed to collect employee information during the onboarding process, featuring built-in validations.",
+		"tags": {
+			"keywords": [
+				"Onboarding",
+				"Employee",
+				"Form",
+				"HR",
+				"Validation"
+			]
+		}
+	},
+	"sap.ui": {
+		"technology": "UI5",
+		"icons": {
+			"icon": "sap-icon://switch-classes"
+		}
+	},
+	"sap.card": {
+		"type": "Object",
+		"configuration": {
+			"actionHandlers": {
+				"submit": {
+					"url": "./MOCK.json",
+					"method": "GET",
+					"parameters": {
+						"status": "approved",
+						"reason": "{form>/reason/key}",
+						"reasonText": "{form>/reason/value}",
+						"comment": "{form>/comment}",
+						"e-mail": "{form>/e-mail}",
+						"duration": "{form>/duration}",
+						"date": "{form>/date/range/startLocalDate}",
+						"employeeStatusSelection": "{form>/activityStatus/selectedKey}"
+					}
+				}
+			}
+		},
+		"data": {
+			"json": {
+				"departments": [
+					{
+						"id": "engineering",
+						"title": "Engineering & Development"
+					},
+					{
+						"id": "marketing",
+						"title": "Marketing & Communications"
+					},
+					{
+						"id": "sales",
+						"title": "Sales & Business Development"
+					},
+					{
+						"id": "hr",
+						"title": "Human Resources"
+					},
+					{
+						"id": "finance",
+						"title": "Finance & Accounting"
+					}
+				],
+				"workLocationOptions": [
+					{
+						"key": "office",
+						"text": "Office (Full-time)"
+					},
+					{
+						"key": "remote",
+						"text": "Remote (Full-time)"
+					},
+					{
+						"key": "hybrid",
+						"text": "Hybrid (3 days office)"
+					},
+					{
+						"key": "flexible",
+						"text": "Flexible arrangement",
+						"enabled": false
+					}
+				]
+			}
+		},
+		"header": {
+			"icon": {
+				"initials": "AM"
+			},
+			"title": "Alex Martinez",
+			"subtitle": "New Employee Onboarding",
+			"infoSection": {
+				"rows": [
+					{
+						"items": [
+							{
+								"type": "Status",
+								"value": "Starting: January 15, 2024",
+								"state": "Success",
+								"inverted": true,
+								"showStateIcon": true
+							}
+						]
+					}
+				]
+			}
+		},
+		"content": {
+			"groups": [
+				{
+					"alignment": "Stretch",
+					"items": [
+						{
+							"value": "Software Engineer - Frontend Development Team"
+						}
+					]
+				},
+				{
+					"alignment": "Stretch",
+					"items": [
+						{
+							"id": "department",
+							"label": "Department",
+							"type": "ComboBox",
+							"placeholder": "Select your department",
+							"item": {
+								"path": "/departments",
+								"template": {
+									"key": "{id}",
+									"title": "{title}"
+								}
+							},
+							"validations": [
+								{
+									"required": true
+								},
+								{
+									"restrictToPredefinedOptions": true,
+									"message": "Please select a valid department from the list."
+								}
+							]
+						},
+						{
+							"id": "personalNote",
+							"label": "Tell us about yourself",
+							"type": "TextArea",
+							"rows": 2,
+							"placeholder": "Share your background, interests, or anything that would help the team get to know you",
+							"showColon": false,
+							"validations": [
+								{
+									"required": true
+								},
+								{
+									"minLength": 20,
+									"maxLength": 300,
+									"message": "Please provide a brief introduction between 20 and 300 characters.",
+									"type": "Warning"
+								}
+							]
+						},
+						{
+							"id": "personalEmail",
+							"label": "Personal Email",
+							"type": "Input",
+							"placeholder": "your.personal@email.com",
+							"validations": [
+								{
+									"required": true
+								},
+								{
+									"pattern": "^\\w+[\\w-+\\.]*\\@\\w+([-\\.]\\w+)*\\.[a-zA-Z]{2,}+$",
+									"message": "Please enter a valid personal email address."
+								}
+							]
+						}
+					]
+				}
+			]
+		},
+		"footer": {
+			"actionsStrip": [
+				{
+					"text": "Complete Onboarding",
+					"actions": [
+						{
+							"enabled": "{= !${messages>/hasErrors}}",
+							"type": "Submit"
+						}
+					]
+				}
+			]
+		}
+	}
+}

@@ -920,11 +920,6 @@ function (
 		]
 	});
 
-	if (Device.media.getCurrentRange('StdExt').name === 'Phone' ||
-		Device.media.getCurrentRange('StdExt').name === 'Tablet') {
-		toolHeader.getAggregation('content')[0].setTooltip('Large Size Navigation');
-	}
-
 	const toolPage = new ToolPage({
 		header: toolHeader,
 		sideContent: sideNavigation,

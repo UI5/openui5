@@ -8,15 +8,14 @@
 sap.ui.define([
 	"sap/m/FlexItemData",
 	"sap/m/MessageBox",
-	"sap/ui/core/mvc/View",
-	"sap/ui/core/mvc/ViewType",
+	"sap/ui/core/mvc/XMLView",
 	"sap/ui/core/sample/common/Component",
 	"sap/ui/model/BindingMode",
 	"sap/ui/model/json/JSONModel",
 	"sap/ui/model/odata/v2/ODataModel",
 	"sap/ui/model/odata/v4/ODataModel",
 	"sap/ui/test/TestUtils"
-], function (FlexItemData, MessageBox, View, ViewType, BaseComponent, BindingMode, JSONModel,
+], function (FlexItemData, MessageBox, XMLView, BaseComponent, BindingMode, JSONModel,
 		ODataModelV2, ODataModelV4, TestUtils) {
 	"use strict";
 
@@ -76,7 +75,7 @@ sap.ui.define([
 			pIdentificationViewV2 = oModelV2.getMetaModel().loaded().then(function () {
 				var oMetaModel = oModelV2.getMetaModel();
 
-				return View.create({
+				return XMLView.create({
 					preprocessors : {
 						xml : {
 							bindingContexts : {meta : oMetaModel.createBindingContext(
@@ -84,7 +83,6 @@ sap.ui.define([
 							models : {meta : oMetaModel}
 						}
 					},
-					type : ViewType.XML,
 					viewName : "sap.ui.core.sample.ViewTemplate.types.TemplateV2"
 				}).then(function (oView) {
 					oView.setLayoutData(new FlexItemData({growFactor : 1.0, baseSize : "0%"}));
@@ -97,7 +95,7 @@ sap.ui.define([
 				.then(function () {
 					var oMetaModel = oModelV4.getMetaModel();
 
-					return View.create({
+					return XMLView.create({
 						preprocessors : {
 							xml : {
 								bindingContexts : {meta : oMetaModel.createBindingContext(
@@ -105,7 +103,6 @@ sap.ui.define([
 								models : {meta : oMetaModel}
 							}
 						},
-						type : ViewType.XML,
 						viewName : "sap.ui.core.sample.ViewTemplate.types.TemplateV4"
 					}).then(function (oView) {
 						oView.setLayoutData(new FlexItemData({growFactor : 1.0, baseSize : "0%"}));
@@ -114,7 +111,7 @@ sap.ui.define([
 				}, onError);
 
 			return Promise.all([pIdentificationViewV2, pIdentificationViewV4]).then(function () {
-				return View.create({
+				return XMLView.create({
 					models : {
 						undefined : oModelV2,
 						ui : new JSONModel({
@@ -128,7 +125,6 @@ sap.ui.define([
 						v2 : oModelV2,
 						v4 : oModelV4
 					},
-					type : ViewType.XML,
 					viewData : mViews,
 					viewName : "sap.ui.core.sample.ViewTemplate.types.Types"
 				}).then(function (oRootView) {

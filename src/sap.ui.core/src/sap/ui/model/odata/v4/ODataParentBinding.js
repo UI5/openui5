@@ -36,6 +36,8 @@ sap.ui.define([
 		// the child paths that are handled by the parent binding due to path reduction, see
 		// #fetchIfChildCanUseCache and ODLB#fetchDownloadUrl
 		this.mChildPathsReducedToParent = {};
+		// query options resulting from child bindings added when this binding already has data
+		this.mLateQueryOptions = undefined;
 		// counts the sent but not yet completed PATCHes
 		this.iPatchCounter = 0;
 		// whether all sent PATCHes have been successfully processed
@@ -670,6 +672,7 @@ sap.ui.define([
 		this.aChildCanUseCachePromises = [];
 		// cannot be set to undefined, it might be modified after destruction
 		this.mChildPathsReducedToParent = {};
+		this.mLateQueryOptions = undefined;
 		this.removeReadGroupLock();
 		this.oRefreshPromise = undefined;
 		this.oResumePromise = undefined;

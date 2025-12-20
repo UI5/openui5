@@ -60,12 +60,20 @@ sap.ui.define([
 		Then.onTheMainPage.checkNumberOfEntries(3);
 		Then.onTheMainPage.checkDialogIsOpen(true);
 
+		When.onTheCreateNewSalesOrderDialog.changeInputValue("buyerIdInput", "FOO");
+		When.onTheCreateNewSalesOrderDialog.pressButton("saveButton");
+		Then.onTheMainPage.checkDialogIsOpen(true);
+		Then.onTheCreateNewSalesOrderDialog.checkInputValueState("buyerIdInput", "Error");
+		//TODO check error message?
+		//TODO find a better place? value state should change, if possible
+
 		When.onTheCreateNewSalesOrderDialog.changeInputValue("buyerIdInput", "");
 		When.onTheCreateNewSalesOrderDialog.pressButton("saveButton");
 		Then.onTheMainPage.checkDialogIsOpen(true);
 		Then.onTheCreateNewSalesOrderDialog.checkInputValueState("buyerIdInput", "Error");
 		When.onTheCreateNewSalesOrderDialog.changeInputValue("buyerIdInput", "0100000004");
-		Then.onTheCreateNewSalesOrderDialog.checkInputValueState("buyerIdInput", "None");
+		// Note: the backend error has not yet been removed
+		Then.onTheCreateNewSalesOrderDialog.checkInputValueState("buyerIdInput", "Error");
 
 		When.onTheCreateNewSalesOrderDialog.changeInputValue("currencyInput", "");
 		When.onTheCreateNewSalesOrderDialog.pressButton("saveButton");
@@ -76,6 +84,8 @@ sap.ui.define([
 
 		When.onTheCreateNewSalesOrderDialog.changeInputValue("noteInput", "New note");
 		When.onTheCreateNewSalesOrderDialog.pressButton("saveButton");
+		// Note: "Save" removes the backend error, but the dialog closes too fast
+		// Then.onTheCreateNewSalesOrderDialog.checkInputValueState("buyerIdInput", "None");
 		Then.onTheMainPage.checkDialogIsOpen(false);
 		Then.onTheMainPage.checkSuccessMessageIsVisible(true);
 		When.onTheSuccessMessageBox.pressOkButton();

@@ -1,0 +1,95 @@
+{
+	"_version": "2.0.0",
+	"sap.app": {
+		"id": "card.explorer.object.imageWithOverlay",
+		"type": "card",
+		"title": "Sample of an Object Card With Image With Overlay",
+		"applicationVersion": {
+			"version": "1.0.0"
+		},
+		"tags": {
+			"keywords": [
+				"Object",
+				"Card",
+				"Sample"
+			]
+		}
+	},
+	"sap.ui": {
+		"technology": "UI5",
+		"icons": {
+			"icon": "sap-icon://switch-classes"
+		}
+	},
+	"sap.card": {
+		"type": "Object",
+		"header": {
+			"title": "Object Card with Image with Overlay",
+			"visible": false
+		},
+		"content": {
+			"groups": [
+				{
+					"alignment": "Stretch",
+					"items": [
+						{
+							"type": "Image",
+							"src": "./images/natureAndChildren.jpg",
+							"fullWidth": true,
+							"height": "200px",
+							"imageFit": "cover",
+							"imagePosition": "center",
+							"overlay": {
+								"supertitle": "Sun, May 28",
+								"title": "Marketing Campaign",
+								"subtitle": "Starting from next week",
+								"textColor": "#fff",
+								"verticalPosition": "Center",
+								"background": "linear-gradient(90deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0))",
+								"textFilter": "drop-shadow(0px 0px 1px #000)",
+								"animation": "FadeIn"
+							}
+						}
+					]
+				},
+				{
+					"alignment": "Stretch",
+					"items": [
+						{
+							"value": "7 days till launch",
+							"type": "Status",
+							"state": "Information",
+							"showStateIcon": true
+						},
+						{
+							"value": "Project budget is secured: USD 10,000.00"
+						}
+					]
+				},
+				{
+					"items": [
+						{
+							"label": "Billing Element",
+							"value": "RN47565.0.1"
+						},
+						{
+							"label": "Customer",
+							"value": "Domestic US Customer 1"
+						},
+						{
+							"label": "Project Manager",
+							"value": "Donna Moore"
+						}
+					]
+				}
+			]
+		},
+		"footer": {
+			"actionsStrip": [
+				{
+					"text": "Start Campaign"
+				}
+			]
+		}
+	}
+}

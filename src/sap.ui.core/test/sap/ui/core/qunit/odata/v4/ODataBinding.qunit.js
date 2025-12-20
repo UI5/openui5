@@ -86,8 +86,6 @@ sap.ui.define([
 		assert.strictEqual(oBinding.fnDeregisterChangeListener, undefined);
 		assert.ok(oBinding.hasOwnProperty("oFetchCacheCallToken"));
 		assert.strictEqual(oBinding.oFetchCacheCallToken, undefined);
-		assert.ok(oBinding.hasOwnProperty("mLateQueryOptions"));
-		assert.strictEqual(oBinding.mLateQueryOptions, undefined);
 		assert.ok(oBinding.hasOwnProperty("sReducedPath"));
 		assert.strictEqual(oBinding.sReducedPath, undefined);
 		assert.ok(oBinding.hasOwnProperty("sResumeChangeReason"));
@@ -109,7 +107,6 @@ sap.ui.define([
 		oBinding.mCacheQueryOptions = {};
 		oBinding.oContext = {}; // @see sap.ui.model.Binding's c'tor
 		oBinding.oFetchCacheCallToken = {};
-		oBinding.mLateQueryOptions = {};
 		this.mock(oBinding).expects("deregisterChangeListener").withExactArgs();
 		this.mock(oCache).expects("setActive").withExactArgs(false);
 
@@ -123,7 +120,6 @@ sap.ui.define([
 		assert.strictEqual(oBinding.mCacheQueryOptions, undefined);
 		assert.strictEqual(oBinding.oContext, undefined);
 		assert.strictEqual(oBinding.oFetchCacheCallToken, undefined);
-		assert.strictEqual(oBinding.mLateQueryOptions, undefined);
 
 		return oPromise;
 	});

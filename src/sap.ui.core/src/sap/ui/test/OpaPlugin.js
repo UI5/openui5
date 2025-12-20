@@ -678,7 +678,7 @@ sap.ui.define([
 	/**
 	 * marker for a return type
 	 * @private
-	 * @type {{}}
+	 * @type {string}
 	 */
 	OpaPlugin.FILTER_FOUND_NO_CONTROLS = "FILTER_FOUND_NO_CONTROL";
 

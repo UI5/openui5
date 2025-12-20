@@ -74,7 +74,7 @@ sap.ui.define(['sap/ui/base/Object', "sap/base/assert", "sap/base/Log"],
 	 * @ui5-restricted sap.ushell
 	 * @since 1.37.0
 	 */
-	var Service = BaseObject.extend("sap.ui.core.service.Service", /** @lends sap.ui.service.Service.prototype */ {
+	var Service = BaseObject.extend("sap.ui.core.service.Service", /** @lends sap.ui.core.service.Service.prototype */ {
 
 		metadata: {
 			"abstract" : true,

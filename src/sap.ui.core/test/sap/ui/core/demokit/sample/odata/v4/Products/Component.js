@@ -4,11 +4,10 @@
 sap.ui.define([
 	"sap/m/HBox",
 	"sap/ui/core/UIComponent",
-	"sap/ui/core/mvc/View",
-	"sap/ui/core/mvc/ViewType",
+	"sap/ui/core/mvc/XMLView",
 	"sap/ui/model/json/JSONModel",
 	"sap/ui/test/TestUtils"
-], function (HBox, UIComponent, View, ViewType, JSONModel, TestUtils) {
+], function (HBox, UIComponent, XMLView, JSONModel, TestUtils) {
 	"use strict";
 
 	return UIComponent.extend("sap.ui.core.sample.odata.v4.Products.Component", {
@@ -27,8 +26,7 @@ sap.ui.define([
 				}),
 				oModel = this.getModel();
 
-			View.create({
-				async : true,
+			XMLView.create({
 				models : {
 					undefined : oModel,
 					ui : new JSONModel({
@@ -53,7 +51,6 @@ sap.ui.define([
 						}
 					}
 				},
-				type : ViewType.XML,
 				viewName : "sap.ui.core.sample.odata.v4.Products.Main"
 			}).then(function (oView) {
 				oLayout.addItem(oView);

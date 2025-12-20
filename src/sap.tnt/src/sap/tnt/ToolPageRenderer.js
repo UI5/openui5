@@ -29,6 +29,10 @@ sap.ui.define([
 			oRM.class("sapTntToolPageWithSideContent");
 		}
 
+		if (window.innerWidth < 600) {
+			oRM.class("sapTntToolPage-LayoutS");
+		}
+
 		oRM.openEnd();
 
 		this.renderHeader(oRM, oControl);
@@ -84,7 +88,7 @@ sap.ui.define([
 	ToolPageRenderer.renderContent = function (oRM, oControl) {
 		oRM.openStart("div").class("sapTntToolPageContentWrapper");
 
-		if (!Device.system.desktop || !oControl.getSideExpanded()) {
+		if (window.innerWidth < 600 || !oControl.getSideExpanded()) {
 			oRM.class("sapTntToolPageAsideCollapsed");
 		}
 
@@ -109,10 +113,6 @@ sap.ui.define([
 			var bSideExpanded = oControl.getSideExpanded();
 			if (oSideContent && oSideContent.getExpanded() !== bSideExpanded) {
 				oSideContent.setExpanded(bSideExpanded);
-			}
-
-			if (!Device.system.desktop) {
-				oControl.setSideExpanded(false);
 			}
 
 			// The render of the aggregation should be after the above statement,

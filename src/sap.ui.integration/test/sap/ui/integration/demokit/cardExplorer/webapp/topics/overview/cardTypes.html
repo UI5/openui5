@@ -5,7 +5,7 @@
 	<title>Integration Card Types</title>
 	
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<script src="../../scripts/boot.js"></script>
+	<script data-require-ui5-noinit src="../../scripts/boot.js"></script>
 </head>
 
 <body class="sapUiBody topicBody">
@@ -16,38 +16,79 @@
 
 			<h2 id="declarative">Declarative Types</h2>
 			<h3 id="list">List Card</h3>
-			<div class="imageContainer">
-				<img style="width: 300px" src="../images/overview_list1.png" alt="List card">
-				<img style="width: 300px" src="../images/overview_list2.png" alt="List card">
-				<img style="width: 300px" src="../images/overview_list3.png" alt="List card">
+			<div class="cardsContainer">
+				<ui-integration-card id="actionsLabelsCardExample" manifest="./manifests/actionsLabels.manifest.json" class="card-width-small">
+				</ui-integration-card>
+				<ui-integration-card id="listCardWithGroupingExample" manifest="./manifests/listCardWithGrouping.manifest.json" class="card-width-small">
+				</ui-integration-card>
+				<ui-integration-card id="bulletChartCardNoDataExample" class="hiddenNotice card-width-small noDataCardExample" data-card-sapui5-required-notice manifest="./manifests/bulletChartNoData.manifest.json">
+				</ui-integration-card>
+				<ui-integration-card id="bulletChartCardExample" data-card-sapui5-required manifest="./manifests/bulletChart.manifest.json" class="card-width-small">
+				</ui-integration-card>
 			</div>
 
 			<h3 id="analytical">Analytical Card</h3>
-			<div class="imageContainer">
-				<img style="width: 300px" src="../images/barchart1.png" alt="Analytical card with bar chart">
-				<img style="width: 300px" src="../images/barchart2.png" alt="Analytical card with bar chart">
-				<img style="width: 300px" src="../images/donutchart.png" alt="Analytical card with donut chart">
-				<img style="width: 300px" src="../images/linechart.png" alt="Analytical cars with line chart">
+			<div class="cardsContainer">
+				<ui-integration-card id="analyticalBarNoDataCard" class="hiddenNotice card-width-medium noDataCardExample" data-card-sapui5-required-notice manifest="./manifests/analyticalBarNoDataCard.manifest.json">
+				</ui-integration-card>
+				<ui-integration-card id="analyticalBarCardExample" class="card-width-medium" data-card-sapui5-required manifest="./manifests/analyticalBarCard.manifest.json">
+				</ui-integration-card>
+				<ui-integration-card id="donutNoDataCardExample" class="hiddenNotice card-width-small noDataCardExample" data-card-sapui5-required-notice manifest="./manifests/donutNoDataCard.manifest.json">
+				</ui-integration-card>
+				<ui-integration-card id="donutCardExample" class="card-width-small" data-card-sapui5-required manifest="./manifests/donutCard.manifest.json">
+				</ui-integration-card>
+			</div>
+			<div class="cardsContainer">
+				<ui-integration-card id="analyticalNoDataCardWithTooltips" class="hiddenNotice card-width-medium noDataCardExample" data-card-sapui5-required-notice manifest="./manifests/analyticalNoDataCardWithTooltips.manifest.json">
+				</ui-integration-card>
+				<ui-integration-card id="analyticalCardWithTooltips" class="card-width-medium" data-card-sapui5-required manifest="./manifests/analyticalCardWithTooltips.manifest.json">
+				</ui-integration-card>
+				<ui-integration-card id="columnAnalyticalNoDataCardExample" class="hiddenNotice card-width-small noDataCardExample" data-card-sapui5-required-notice manifest="./manifests/columnAnalyticalNoDataCard.manifest.json">
+				</ui-integration-card>
+				<ui-integration-card id="columnAnalyticalCardExample" class="card-width-small" data-card-sapui5-required manifest="./manifests/columnAnalyticalCard.manifest.json">
+				</ui-integration-card>
 			</div>
 
 			<h3 id="table">Table Card</h3>
-			<img style="width: 300px" src="../images/table.png" alt="Table card">
+			<div class="cardsContainer">
+				<ui-integration-card id="tableCardExample" class="card-width-large" manifest="./manifests/tableCard.manifest.json">
+				</ui-integration-card>
+			</div>
 
 			<h3 id="object">Object Card</h3>
-			<img style="width: 300px" src="../images/object.png" alt="Object card">
-			<h3 id="timeline">Timeline Card</h3>
+			<div class="cardsContainer">
+				<ui-integration-card id="formWithValidationExample" manifest="./manifests/formWithValidations.manifest.json" class="card-width-small">
+				</ui-integration-card>
+				<ui-integration-card id="iconFitTypeExample" manifest="./manifests/iconFitTypeCard.manifest.json" class="card-width-small">
+				</ui-integration-card>
+				<ui-integration-card id="imageCardExample" manifest="./manifests/imageCard.manifest.json" class="card-width-small">
+				</ui-integration-card>
+			</div>
 
-			<img style="width: 300px" src="../images/timeline.png" alt="Timeline card">
+			<h3 id="timeline">Timeline Card</h3>
+			<div class="cardsContainer">
+				<ui-integration-card id="timelineCardNoDataExample" class="hiddenNotice card-width-small noDataCardExample" data-card-sapui5-required-notice manifest="./manifests/pastTimelineNoDataCard.manifest.json">
+				</ui-integration-card>
+				<ui-integration-card id="timelineCardExample" data-card-sapui5-required manifest="./manifests/pastTimelineCard.manifest.json" class="card-width-small">
+				</ui-integration-card>
+			</div>
 
 			<h3 id="calendar">Calendar Card</h3>
-
-			<img style="width:300px" src="../images/calendar.png" alt="Calendar card">
+			<div class="cardsContainer">
+				<ui-integration-card id="calendarCardExample" class="card-width-large" manifest="./manifests/calendarCard.manifest.json">
+				</ui-integration-card>
+			</div>
 
 			<h2 id="other">Other Types</h2>
 			<h3 id="adaptive">Adaptive Card</h3>
 			<p>This is a special type of card, which application developers can use to visualize and reuse cards that
 				are created using the Microsoft Adaptive Cards specification and manifest.</p>
-			<img style="width: 300px" src="../images/adaptive.png" alt="Adaptive card">
+			<div class="cardsContainer">
+				<ui-integration-card id="adaptiveCardExample" manifest="./manifests/adaptiveCard.manifest.json" class="card-width-small">
+				</ui-integration-card>
+				<ui-integration-card id="markdownCardExample" manifest="./manifests/markdownCard.manifest.json" class="card-width-small">
+				</ui-integration-card>
+			</div>
 
 			<h3 id="component">Component Card</h3>
 			<p>

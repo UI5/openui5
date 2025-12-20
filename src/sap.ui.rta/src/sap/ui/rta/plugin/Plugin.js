@@ -120,7 +120,7 @@ sap.ui.define([
 	 * @alias sap.ui.rta.plugin.Plugin
 	 */
 
-	var BasePlugin = Plugin.extend("sap.ui.rta.plugin.Plugin", /** @lends sap.ui.dt.Plugin.prototype */ {
+	var BasePlugin = Plugin.extend("sap.ui.rta.plugin.Plugin", /** @lends sap.ui.rta.plugin.Plugin.prototype */ {
 		metadata: {
 			"abstract": true,
 			library: "sap.ui.rta",

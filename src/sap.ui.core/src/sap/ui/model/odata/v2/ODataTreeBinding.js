@@ -500,7 +500,7 @@ sap.ui.define([
 	 * Returns the number of child nodes. This function is not available when the annotation "hierarchy-node-descendant-count-for"
 	 * is exposed on the service.
 	 *
-	 * @param {Object} oContext the context element of the node
+	 * @param {sap.ui.model.Context} oContext the context element of the node
 	 * @return {int} the number of children
 	 *
 	 * @public
@@ -2544,7 +2544,7 @@ sap.ui.define([
 	 * @param {int} iIndex Absolute row index
 	 * @param {int} iLevel Level to which the data should be expanded
 	 * @param {boolean} bSuppressChange If set to true, no change event will be fired
-	 * @return {Promise} A promise resolving once the expansion process has been completed
+	 * @return {Promise<void>} A promise resolving once the expansion process has been completed
 	 *
 	 * @function
 	 * @name sap.ui.model.odata.v2.ODataTreeBinding.prototype.expandNodeToLevel

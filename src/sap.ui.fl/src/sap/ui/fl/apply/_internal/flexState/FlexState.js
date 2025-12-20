@@ -655,7 +655,7 @@ sap.ui.define([
 	 * Adds a list of dirty flex objects to the flex state.
 	 *
 	 * @param {string} sReference - Flexibility reference of the app
-	 * @param {array.<sap.ui.fl.apply._internal.flexObjects.FlexObject>} aFlexObjects - Flex objects
+	 * @param {Array<sap.ui.fl.apply._internal.flexObjects.FlexObject>} aFlexObjects - Flex objects
 	 * @param {string} [sComponentId] - ID of the component, required if an empty state needs to be initialized
 	 * @returns {sap.ui.fl.apply._internal.flexObjects.FlexObject[]} The flex objects that were added
 	 */

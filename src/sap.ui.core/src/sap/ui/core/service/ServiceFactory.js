@@ -127,7 +127,7 @@ sap.ui.define(['sap/ui/base/Object', 'sap/ui/core/service/Service', "sap/base/as
 	 * @ui5-restricted sap.ushell
 	 * @since 1.37.0
 	 */
-	var ServiceFactory = BaseObject.extend("sap.ui.core.service.ServiceFactory", /** @lends sap.ui.service.ServiceFactory.prototype */ {
+	var ServiceFactory = BaseObject.extend("sap.ui.core.service.ServiceFactory", /** @lends sap.ui.core.service.ServiceFactory.prototype */ {
 
 		metadata: {
 			"library" : "sap.ui.core" // UI Library that contains this class

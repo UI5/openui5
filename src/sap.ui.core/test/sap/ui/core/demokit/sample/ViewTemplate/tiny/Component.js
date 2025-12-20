@@ -13,14 +13,12 @@ sap.ui.define([
 	"sap/m/VBox",
 	"sap/ui/core/library",
 	"sap/ui/core/UIComponent",
-	"sap/ui/core/mvc/View",
-	"sap/ui/core/mvc/ViewType",
+	"sap/ui/core/mvc/XMLView",
 	"sap/ui/model/odata/v2/ODataModel"
-], function(MessageBox, Title, VBox, library, UIComponent, View, ViewType, ODataModel) {
+], function (MessageBox, Title, VBox, library, UIComponent, XMLView, ODataModel) {
 	"use strict";
 
-	var // shortcut for sap.ui.core.TitleLevel
-	TitleLevel = library.TitleLevel; // shortcut for sap.ui.core.mvc.ViewType
+	var TitleLevel = library.TitleLevel; // shortcut for sap.ui.core.TitleLevel
 
 	return UIComponent.extend("sap.ui.core.sample.ViewTemplate.tiny.Component", {
 		metadata : {
@@ -46,8 +44,7 @@ sap.ui.define([
 				});
 
 			oMetaModel.loaded().then(function () {
-				View.create({
-					async : true,
+				XMLView.create({
 					models : oModel,
 					preprocessors : {
 						xml : {
@@ -59,7 +56,6 @@ sap.ui.define([
 							}
 						}
 					},
-					type : ViewType.XML,
 					viewName : "sap.ui.core.sample.ViewTemplate.tiny.Template"
 				}).then(function (oTemplateView) {
 					oTemplateView.bindElement(sPath);

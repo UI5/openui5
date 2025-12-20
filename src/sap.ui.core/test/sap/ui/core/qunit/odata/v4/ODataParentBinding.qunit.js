@@ -67,6 +67,8 @@ sap.ui.define([
 		assert.deepEqual(oBinding.mCanUseCachePromiseByChildPath, {});
 		assert.deepEqual(oBinding.aChildCanUseCachePromises, []);
 		assert.deepEqual(oBinding.mChildPathsReducedToParent, {});
+		assert.ok(oBinding.hasOwnProperty("mLateQueryOptions"));
+		assert.strictEqual(oBinding.mLateQueryOptions, undefined);
 		assert.strictEqual(oBinding.iPatchCounter, 0);
 		assert.strictEqual(oBinding.bPatchSuccess, true);
 		assert.ok("oReadGroupLock" in oBinding);
@@ -3493,6 +3495,7 @@ sap.ui.define([
 
 		oBinding.aChildCanUseCachePromises = [{}, {}];
 		oBinding.mChildPathsReducedToParent = "~mChildPathsReducedToParent~";
+		oBinding.mLateQueryOptions = {};
 		oBinding.oResumePromise = {};
 		this.mock(oBinding).expects("removeReadGroupLock").withExactArgs();
 		this.mock(asODataBinding.prototype).expects("destroy").on(oBinding).withExactArgs();
@@ -3503,6 +3506,7 @@ sap.ui.define([
 		assert.strictEqual(oBinding.mAggregatedQueryOptions, undefined);
 		assert.deepEqual(oBinding.aChildCanUseCachePromises, []);
 		assert.deepEqual(oBinding.mChildPathsReducedToParent, {});
+		assert.strictEqual(oBinding.mLateQueryOptions, undefined);
 		assert.strictEqual(oBinding.oRefreshPromise, undefined);
 		assert.strictEqual(oBinding.oResumePromise, undefined);
 		assert.strictEqual(oBinding.mCanUseCachePromiseByChildPath, undefined);

@@ -1,0 +1,144 @@
+{
+	"_version": "2.0.0",
+	"sap.app": {
+		"id": "card.explorer.team.members.snack.card",
+		"type": "card",
+		"title": "Team Members Details",
+		"subTitle": "Complete Team Members List",
+		"applicationVersion": {
+			"version": "1.0.0"
+		},
+		"shortTitle": "Team Members",
+		"info": "Full list of team members",
+		"description": "Detailed view of all team members",
+		"tags": {
+			"keywords": [
+				"Team",
+				"Members",
+				"List",
+				"Snack"
+			]
+		}
+	},
+	"sap.ui": {
+		"technology": "UI5",
+		"icons": {
+			"icon": "sap-icon://group"
+		}
+	},
+	"sap.card": {
+		"type": "Timeline",
+		"header": {
+			"title": "All Team Members",
+			"icon": {
+				"src": "sap-icon://group"
+			},
+			"subtitle": "Complete Team Timeline"
+		},
+		"content": {
+			"data": {
+				"json": [
+					{
+						"Name": "Laurent Dubois",
+						"JobTitle": "Accounts Payable Manager",
+						"Photo": "./images/Laurent_Dubois.png",
+						"Icon": "sap-icon://activity-individual",
+						"JobResponsibilities": "I'm Laurent, and I pay great attention to detail.",
+						"HireDate": "Date(1371020400000)"
+					},
+					{
+						"Name": "Sabine Mayer",
+						"JobTitle": "Configuration Expert",
+						"Photo": "./images/Sabine_Mayer.png",
+						"Icon": "sap-icon://collaborate",
+						"JobResponsibilities": "I'm Sabine, and I'm excited to get to know the team.",
+						"HireDate": "Date(1376290800000)"
+					},
+					{
+						"Name": "Alain Chevalier",
+						"JobTitle": "Credit Analyst",
+						"Photo": "./images/Alain_Chevalier.png",
+						"Icon": "sap-icon://manager-insight",
+						"JobResponsibilities": "I'm Alain, and I pay great attention to detail.",
+						"HireDate": "Date(1332403200000)"
+					},
+					{
+						"Name": "Monique Legrand",
+						"JobTitle": "Accountant Manager",
+						"Photo": "./images/Monique_Legrand.png",
+						"Icon": "sap-icon://account",
+						"JobResponsibilities": "I'm Monique, and I'm the new head of Accounting.",
+						"HireDate": "Date(1422777600000)"
+					},
+					{
+						"Name": "Maria Rodriguez",
+						"JobTitle": "HR Manager",
+						"Photo": "./images/default_user.png",
+						"Icon": "sap-icon://employee",
+						"JobResponsibilities": "I'm Maria, and I manage human resources and employee relations.",
+						"HireDate": "Date(1420156800000)"
+					},
+					{
+						"Name": "John Anderson",
+						"JobTitle": "Software Developer",
+						"Photo": "./images/default_user.png",
+						"Icon": "sap-icon://people-connected",
+						"JobResponsibilities": "I'm John, and I develop and maintain software solutions.",
+						"HireDate": "Date(1430438400000)"
+					},
+					{
+						"Name": "Anna Schmidt",
+						"JobTitle": "UX Designer",
+						"Photo": "./images/default_user.png",
+						"Icon": "sap-icon://employee",
+						"JobResponsibilities": "I'm Anna, and I create user-friendly interfaces and design experiences.",
+						"HireDate": "Date(1435708800000)"
+					},
+					{
+						"Name": "Carlos Martinez",
+						"JobTitle": "Project Manager",
+						"Photo": "./images/default_user.png",
+						"Icon": "sap-icon://manager-insight",
+						"JobResponsibilities": "I'm Carlos, and I coordinate projects and ensure timely delivery.",
+						"HireDate": "Date(1440979200000)"
+					},
+					{
+						"Name": "Sarah Johnson",
+						"JobTitle": "Marketing Specialist",
+						"Photo": "./images/default_user.png",
+						"Icon": "sap-icon://marketing-campaign",
+						"JobResponsibilities": "I'm Sarah, and I develop marketing strategies and campaigns.",
+						"HireDate": "Date(1446249600000)"
+					},
+					{
+						"Name": "David Wilson",
+						"JobTitle": "Operations Manager",
+						"Photo": "./images/default_user.png",
+						"Icon": "sap-icon://account",
+						"HireDate": "Date(1451520000000)"
+					}
+				]
+			},
+			"item": {
+				"dateTime": {
+					"value": "{HireDate}"
+				},
+				"description": {
+					"value": "{JobResponsibilities}"
+				},
+				"title": {
+					"value": "{JobTitle}"
+				},
+				"owner": {
+					"value": "{Name}"
+				},
+				"ownerImage": {
+					"value": "{Photo}"
+				},
+				"icon": {
+					"src": "{Icon}"
+				}
+			}
+		}
+	}
+}

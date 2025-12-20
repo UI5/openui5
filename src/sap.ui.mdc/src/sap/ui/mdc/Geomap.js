@@ -29,7 +29,7 @@ sap.ui.define([
         "use strict";
 
         /**
-         * Constructor for a new GeoMap.
+         * Constructor for a new Geomap.
          *
          * @param {string} [sId] ID for the new control, generated automatically if no id is given
          * @param {object} [mSettings] Initial settings for the new control
@@ -48,7 +48,7 @@ sap.ui.define([
          * @see {@link topic:1dd2aa91115d43409452a271d11be95b sap.ui.mdc}
          * @ui5-experimental-since 1.142
          */
-        const Geomap = Control.extend("sap.ui.mdc.Geomap", /** @lends sap.ui.mdc.Geomp.prototype */ {
+        const Geomap = Control.extend("sap.ui.mdc.Geomap", /** @lends sap.ui.mdc.Geomap.prototype */ {
             metadata: {
                 library: "sap.ui.mdc",
                 designtime: "sap/ui/mdc/designtime/geomap/Geomap.designtime",
@@ -181,7 +181,7 @@ sap.ui.define([
                      * Specifies the geomap metadata.<br>
                      * <b>Note:</b> This property must not be bound.<br>
                      * <b>Note:</b> This property is exclusively used for handling SAPUI5 flexibility changes. Do not use it otherwise.<br>
-                     * <b>Note</b>: Existing properties (set via <code>sap.ui.mdc.Geomap#setPropertyInfo</code>) must not be removed and their attributes must not be changed during the {@link module:sap/ui/mdc/GeoMapDelegate.fetchProperties fetchProperties} callback. Otherwise validation errors might occur whenever personalization-related control features (such as the opening of any personalization dialog) are activated.
+                     * <b>Note</b>: Existing properties (set via <code>sap.ui.mdc.Geomap#setPropertyInfo</code>) must not be removed and their attributes must not be changed during the {@link module:sap/ui/mdc/GeomapDelegate.fetchProperties fetchProperties} callback. Otherwise validation errors might occur whenever personalization-related control features (such as the opening of any personalization dialog) are activated.
                      *
                      * <b>Note</b>: For more information about the supported inner elements, see {@link sap.ui.mdc.geomap.PropertyInfo PropertyInfo}.
                      */
@@ -220,9 +220,9 @@ sap.ui.define([
 
 
         /**
-         * An object literal describing a data property in the context of a {@link sap.ui.mdc.GeoMap}.
+         * An object literal describing a data property in the context of a {@link sap.ui.mdc.Geomap}.
          *
-         * When specifying the <code>PropertyInfo</code> objects in the {@link sap.ui.mdc.GeoMap#getPropertyInfo propertyInfo} property, the following
+         * When specifying the <code>PropertyInfo</code> objects in the {@link sap.ui.mdc.Geomap#getPropertyInfo propertyInfo} property, the following
          * attributes need to be specified:
          * <ul>
          *   <li><code>key</code></li>

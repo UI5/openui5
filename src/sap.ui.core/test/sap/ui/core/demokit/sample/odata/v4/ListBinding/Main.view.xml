@@ -1,11 +1,12 @@
 <mvc:View
 	class="sapUiSizeCompact"
 	controllerName="sap.ui.core.sample.odata.v4.ListBinding.Main"
+	core:require="{StringType : 'sap/ui/model/odata/type/String'}"
 	xmlns="sap.m"
+	xmlns:app="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1"
 	xmlns:core="sap.ui.core"
 	xmlns:form="sap.ui.layout.form"
-	xmlns:mvc="sap.ui.core.mvc"
-	xmlns:app="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1">
+	xmlns:mvc="sap.ui.core.mvc">
 	<form:SimpleForm ariaLabelledBy="teamTitle" id="TeamDetails"
 			layout="ResponsiveGridLayout">
 		<form:toolbar>
@@ -43,15 +44,15 @@
 					<core:Item key="{Team_Id}" text="{Name}"/>
 				</Select>
 				<Button id="openChangeTeamBudgetDialog" enabled="{ui>/bRealOData}" text="Budget"
-						icon="sap-icon://edit" press="openChangeTeamBudgetDialog">
+						icon="sap-icon://edit" press=".openChangeTeamBudgetDialog">
 					<dependents>
 						<Dialog id="ChangeTeamBudgetDialog" title="Change Team Budget"
 							binding="{/ChangeTeamBudgetByID(...)}">
 							<buttons>
 								<Button icon="sap-icon://sys-cancel-2"
-									press="cancelChangeTeamBudget" text="Cancel" type="Reject"/>
+									press=".cancelChangeTeamBudget" text="Cancel" type="Reject"/>
 								<Button id="changeTeamBudget" icon="sap-icon://save"
-									press="changeTeamBudget" text="Change" type="Accept"/>
+									press=".changeTeamBudget" text="Change" type="Accept"/>
 							</buttons>
 							<form:SimpleForm ariaLabelledBy="ChangeTeamBudgetDialog"
 								binding="{$Parameter}" editable="true"
@@ -66,7 +67,7 @@
 					</dependents>
 				</Button>
 				<Button id="openChangeManagerOfTeamDialog" enabled="{ui>/bRealOData}" text="Manager"
-						icon="sap-icon://edit" press="openChangeManagerOfTeamDialog"/>
+						icon="sap-icon://edit" press=".openChangeManagerOfTeamDialog"/>
 			</Toolbar>
 		</form:toolbar>
 		<Label text="Team ID"/>
@@ -84,10 +85,10 @@
 		<form:dependents>
 			<Dialog id="ChangeManagerOfTeamDialog" title="Change Team Manager">
 				<buttons>
-					<Button icon="sap-icon://sys-cancel-2" press="cancelChangeManagerOfTeam"
+					<Button icon="sap-icon://sys-cancel-2" press=".cancelChangeManagerOfTeam"
 						text="Cancel" type="Reject"/>
 					<Button icon="sap-icon://save" id="changeManagerOfTeam"
-						press="changeManagerOfTeam" text="Change" type="Accept"/>
+						press=".changeManagerOfTeam" text="Change" type="Accept"/>
 				</buttons>
 				<form:SimpleForm ariaLabelledBy="ChangeManagerOfTeamDialog"
 						editable="true" id="ChangeTeamManagerByID"
@@ -152,7 +153,7 @@
 			<Text text="{LOCATION/City/CITYNAME}"/>
 			<Input value="{ENTRYDATE}"/>
 			<!-- Note: automatic type determination cannot work here and invokes a warning -->
-			<Text text="{path : '@odata.etag', type : 'sap.ui.model.odata.type.String'}"/>
+			<Text text="{path : '@odata.etag', type : 'StringType'}"/>
 			<Button icon="sap-icon://delete" text="Delete" press=".onDeleteEmployee"/>
 		</ColumnListItem>
 	</Table>
@@ -197,7 +198,7 @@
 				<Title id="maxEmployeeAge" text="Max. Employee Age" level="H4"/>
 				<ToolbarSpacer width="1em"/>
 				<Text text="{value}"/>
-				<Button press="getEmployeeMaxAge" text="Invoke"/>
+				<Button press=".getEmployeeMaxAge" text="Invoke"/>
 			</Toolbar>
 		</form:toolbar>
 	</form:SimpleForm>
@@ -219,7 +220,7 @@
 					</Label>
 					<Input enabled="{ui>/bRealOData}" id="EmployeeId" value="{ui>/EmployeeID}"
 						width="4em"/>
-					<Button text="Search" enabled="{ui>/bRealOData}" press="getEmployeeByID"/>
+					<Button text="Search" enabled="{ui>/bRealOData}" press=".getEmployeeByID"/>
 				</Toolbar>
 			</form:toolbar>
 			<Label text="Name"/>

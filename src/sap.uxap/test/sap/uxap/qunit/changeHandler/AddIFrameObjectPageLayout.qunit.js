@@ -10,7 +10,11 @@ sap.ui.define([
 	"sap/ui/util/XMLHelper",
 	"sap/ui/core/Component",
 	"sap/ui/test/utils/nextUIUpdate",
-	"test-resources/sap/ui/fl/api/FlexTestAPI"
+	"test-resources/sap/ui/fl/api/FlexTestAPI",
+	// Pre-load to ensure change handlers are registered before tests run.
+	// Otherwise, library loading triggers async registration via setTimeout(0),
+	// causing intermittent "No Change handler registered" errors.
+	"sap/uxap/flexibility/ObjectPageLayout.flexibility"
 ], function(
 	jQuery,
 	AddIFrameObjectPageLayout,

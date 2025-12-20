@@ -1,0 +1,186 @@
+{
+	"_version": "%LATEST_SCHEMA_VERSION%",
+	"sap.app": {
+		"id": "card.explorer.actions.popoverExtensionActions",
+		"type": "card",
+		"title": "Sample of Chart Actions",
+		"subTitle": "Sample of Chart Actions",
+		"applicationVersion": {
+			"version": "1.0.0"
+		},
+		"shortTitle": "A short title for this Card",
+		"info": "Additional information about this Card",
+		"description": "A long description for this Card",
+		"tags": {
+			"keywords": [
+				"Analytical",
+				"Card",
+				"Line",
+				"Sample"
+			]
+		}
+	},
+	"sap.ui": {
+		"technology": "UI5",
+		"icons": {
+			"icon": "sap-icon://line-chart"
+		}
+	},
+	"sap.card": {
+		"type": "Analytical",
+		"extension": "./ChartExtension",
+		"header": {
+			"title": "Sales by Stores",
+			"type": "Numeric",
+			"data": {
+				"json": {
+					"number": "65.34",
+					"unit": "M",
+					"trend": "Down",
+					"state": "Critical",
+					"target": {
+						"number": 100,
+						"unit": "M"
+					},
+					"deviation": {
+						"number": 34.7,
+						"state": "Critical"
+					},
+					"details": "Current Quarter"
+				}
+			},
+			"subtitle": "Revenue Distribution by Store",
+			"unitOfMeasurement": "EUR",
+			"infoSection": {
+				"rows": [
+					{
+						"items": [
+							{
+								"type": "Status",
+								"value": "Below Target",
+								"state": "Warning",
+								"inverted": true,
+								"showStateIcon": true
+							},
+							{
+								"type": "Status",
+								"value": "Quarterly KPI",
+								"state": "None",
+								"inverted": true,
+								"showStateIcon": true
+							}
+						]
+					}
+				]
+			},
+			"mainIndicator": {
+				"number": "{number}",
+				"unit": "{unit}",
+				"trend": "{trend}",
+				"state": "{state}"
+			},
+			"sideIndicators": [
+				{
+					"title": "Target",
+					"number": "{target/number}",
+					"unit": "{target/unit}"
+				},
+				{
+					"title": "Deviation",
+					"number": "{deviation/number}",
+					"unit": "%"
+				}
+			],
+			"details": "{details}"
+		},
+		"content": {
+			"chartType": "Donut",
+			"chartProperties": {
+				"legendGroup": {
+					"layout": {
+						"position": "top",
+						"alignment": "center"
+					}
+				},
+				"plotArea": {
+					"dataLabel": {
+						"visible": true
+					}
+				},
+				"title": {
+					"visible": false
+				}
+			},
+			"data": {
+				"json": {
+					"milk": [
+						{
+							"id": "1",
+							"storeName": "24-Seven",
+							"revenue": 345292.06
+						},
+						{
+							"id": "2",
+							"storeName": "A&A",
+							"revenue": 1564235.29
+						},
+						{
+							"id": "3",
+							"storeName": "Alexei's Specialities",
+							"revenue": 1085567.22
+						}
+					]
+				},
+				"path": "/milk"
+			},
+			"dimensions": [
+				{
+					"name": "Store Name",
+					"value": "{storeName}"
+				}
+			],
+			"measures": [
+				{
+					"name": "Revenue",
+					"value": "{revenue}"
+				}
+			],
+			"feeds": [
+				{
+					"type": "Dimension",
+					"uid": "color",
+					"values": [
+						"Store Name"
+					]
+				},
+				{
+					"type": "Measure",
+					"uid": "size",
+					"values": [
+						"Revenue"
+					]
+				}
+			],
+			"popover": {
+				"active": true,
+				"actionsStrip": [
+					{
+						"text": "Action for {storeName}",
+						"actions": [
+							{
+								"type": "Custom",
+								"parameters": {
+									"method": "approve",
+									"id": "{id}",
+									"storeName": "{storeName}",
+									"revenue": "{revenue}"
+								}
+							}
+						]
+					}
+				]
+			},
+			"actionableArea": "Chart"
+		}
+	}
+}

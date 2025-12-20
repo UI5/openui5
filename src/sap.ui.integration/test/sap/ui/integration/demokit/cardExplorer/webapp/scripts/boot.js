@@ -6,6 +6,10 @@
 
 window.addEventListener("load", function () {
 	"use strict";
+	function restoreOpacity() {
+		document.documentElement.style.opacity = "1";
+	}
+
 	var sTargetRoot = document.location.href.substring(0, document.location.href.indexOf("/test-resources")),
 		sWebApp = sTargetRoot + "/test-resources/sap/ui/integration/demokit/cardExplorer/webapp/",
 		sRes = sTargetRoot + "/resources/",
@@ -19,6 +23,7 @@ window.addEventListener("load", function () {
 	aNodes.push('<link rel="stylesheet" href="' + sWebApp + 'css/codesample.css">');
 	aNodes.push('<link rel="stylesheet" href="' + sRes + 'sap/ui/documentation/sdk/thirdparty/highlight.js/styles.css">');
 	aNodes.push('<script src="' + sRes + 'sap/ui/documentation/sdk/thirdparty/highlight.js/highlight.js"></script>');
+	aNodes.push('<script src="' + sWebApp + 'scripts/distributionCheck.js"></script>');
 
 	if (!isLandingPage) {
 		aNodes.push('<link rel="stylesheet" href="' + sRes + 'sap/ui/core/themes/sap_horizon/library.css">');
@@ -45,7 +50,7 @@ window.addEventListener("load", function () {
 			sc.addEventListener("load", function () {
 				if (window.hljs && window.codesample) {
 					window.codesample();
-					document.documentElement.style.opacity = "1";
+
 					if (document.querySelector("script[data-require-ui5-init]") || document.querySelector("script[data-require-ui5-noinit]")) {
 						var oScript = document.createElement("script");
 						oScript.setAttribute("id", "sap-ui-bootstrap");
@@ -53,11 +58,22 @@ window.addEventListener("load", function () {
 						oScript.setAttribute("data-sap-ui-theme", "sap_horizon");
 						oScript.setAttribute("data-sap-ui-compatVersion", "edge");
 						oScript.setAttribute("data-sap-ui-async", "true");
-						if (document.querySelector("script[data-require-ui5-init]")) {
-							oScript.setAttribute("data-sap-ui-oninit", "init");
-						}
+						window.initWithDistributionCheck = function () {
+							window.distributionCheck();
+
+							if (document.querySelector("script[data-require-ui5-init]")) {
+								window.init();
+							}
+
+							sap.ui.require(["sap/ui/core/Theming"], (Theming) => {
+								Theming.attachApplied(restoreOpacity);
+							});
+						};
+						oScript.setAttribute("data-sap-ui-on-init", "initWithDistributionCheck");
 						oScript.setAttribute("data-sap-ui-resourceroots", '{"custom": "./"}');
 						document.head.appendChild(oScript);
+					} else {
+						restoreOpacity();
 					}
 				}
 				afterLoad();

@@ -5,7 +5,8 @@
 	<title>Card Headers</title>
 	
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<script src="../../scripts/boot.js"></script>
+	<script data-require-ui5-noinit src="../../scripts/boot.js">
+	</script>
 </head>
 
 <body class="sapUiBody topicBody">
@@ -25,19 +26,28 @@
 				<li>
 					<a href="../../index.html#/learn/headers/default" target="_parent">Default</a>
 					<br>
-					<img class="cardHeadersImg" src="../images/DefaultHeaderExample.png" alt="Example of a default header">
+					<div class="cardsContainer">
+						<ui-integration-card id="defaultHeaderExample" class="card-width-small" manifest="./manifests/defaultHeader.manifest.json">
+						</ui-integration-card>
+					</div>
 				</li>
 				<li>
 					<a href="../../index.html#/learn/headers/numeric" target="_parent">Numeric</a>
 					<br>
-					<img class="cardHeadersImg" src="../images/NumericHeaderExample.png" alt="Example of a numeric header">
+					<div class="cardsContainer">
+						<ui-integration-card id="numericHeaderExample" class="card-width-small" manifest="./manifests/numericHeader.manifest.json">
+						</ui-integration-card>
+					</div>
 				</li>
 			</ul>
 			<p>Additionally, both header types can be extended with the Info Section feature:
 				<a href="../../index.html#/learn/headers/infoSection" target="_parent">Extended header with info section</a>
 				<br>
-				<img class="cardHeadersImg" src="../images/ExtendedHeaderInfoSection.png" alt="Example of a extended header info section">
-			</p>	
+				</p><div>
+					<ui-integration-card id="infoSectionHeaderExample" class="card-width-small" manifest="./manifests/infoSectionHeader.manifest.json">
+					</ui-integration-card>
+				</div>
+			<p></p>	
 		</div>
 	</div>
 </body>
