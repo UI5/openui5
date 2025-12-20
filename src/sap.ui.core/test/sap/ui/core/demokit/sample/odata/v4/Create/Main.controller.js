@@ -8,40 +8,43 @@ sap.ui.define([
 
 	return Controller.extend("sap.ui.core.sample.odata.v4.Create.Main", {
 		onCancelSalesOrder : function (oEvent) {
-			const oContext = oEvent.getSource().getBindingContext();
-			oContext.delete();
-			this.byId("createDialog").close();
+			oEvent.getSource().getBindingContext().delete();
 		},
 
 		onCreateSalesOrder : function () {
-			const oContext = this.byId("salesOrderList").getBinding("items")
+			const oListBinding = this.byId("salesOrderList").getBinding("items");
+			const oContext = oListBinding.create(
 				// Since a default for CurrencyCode is defined in metadata, no need to set this here
-				.create({BuyerID : "0100000000", LifecycleStatus : "N"});
+				{BuyerID : "0100000000", LifecycleStatus : "N"}, /*bSkipRefresh*/true);
 
-			oContext.created().then(function () {
-				MessageBox.success("Sales Order Created");
-			}).catch(function (oError) {
-				if (!oError.canceled) {
-					throw oError; // unexpected error
-				}
-				// Message handling is used to treat failed request. Since this is part of another
-				// sample, this is deliberately omitted here.
-			});
 			const oDialog = this.byId("createDialog");
 			oDialog.setBindingContext(oContext);
 			oDialog.open();
+			oListBinding.attachEventOnce("createSent", () => oDialog.setBusy(true));
+			oListBinding.attachEventOnce("createCompleted", () => oDialog.setBusy(false));
+
+			oContext.created().then(function () {
+				oDialog.close();
+				MessageBox.success("Sales Order Created");
+			}, function (oError) {
+				if (!oError.canceled) {
+					throw oError; // unexpected error
+				}
+				oDialog.close();
+			});
 		},
 
 		onSaveSalesOrder : function () {
-			const aErrors = Messaging.getMessageModel().getObject("/").filter((oMessage) => {
-				return oMessage.getType() === MessageType.Error;
+			const aAllMessages = Messaging.getMessageModel().getObject("/");
+			const aValidationErrors = aAllMessages.filter((oMessage) => {
+				return oMessage.getType() === MessageType.Error && !oMessage.getPersistent();
 			});
-			if (aErrors.length) {
-				return;
-			}
+			if (!aValidationErrors.length) {
+				Messaging.removeMessages( // drop old backend messages to try again
+					aAllMessages.filter((oMessage) => oMessage.getPersistent()));
 
-			this.getView().getModel().submitBatch("update");
-			this.byId("createDialog").close();
+				this.getView().getModel().submitBatch("update");
+			}
 		}
 	});
 });

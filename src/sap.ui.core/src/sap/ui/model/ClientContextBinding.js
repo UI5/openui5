@@ -29,8 +29,8 @@ sap.ui.define(['./ContextBinding'],
 	 */
 	var ClientContextBinding = ContextBinding.extend("sap.ui.model.ClientContextBinding", /** @lends sap.ui.model.ClientContextBinding.prototype */ {
 
-		constructor : function(oModel, sPath, oContext, mParameters, oEvents){
-			ContextBinding.call(this, oModel, sPath, oContext, mParameters, oEvents);
+		constructor : function(oModel, sPath, oContext, mParameters){
+			ContextBinding.call(this, oModel, sPath, oContext, mParameters);
 			var that = this;
 			oModel.createBindingContext(sPath, oContext, mParameters, function(oContext) {
 				that.bInitial = false;

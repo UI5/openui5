@@ -467,7 +467,7 @@ sap.ui.define([
 		 * By default errors do not break the sequential execution of the queue, but this can be changed with the parameter bThrowError.
 		 * Error message will be written in any case.
 		 *
-		 * @param {array.<function>} aPromiseQueue - List of asynchronous functions that returns promises
+		 * @param {Array<function>} aPromiseQueue - List of asynchronous functions that returns promises
 		 * @param {boolean} bThrowError - true: errors will be re-thrown and therefore break the execution
 		 * @param {boolean} bAsync - true: asynchronous processing with Promise, false: synchronous processing with FakePromise
 		 * @param {boolean} bSuppressAdditionalErrorMessage - true: additional error message will be suppressed

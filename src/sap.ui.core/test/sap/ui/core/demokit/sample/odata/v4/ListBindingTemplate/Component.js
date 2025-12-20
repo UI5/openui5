@@ -4,11 +4,10 @@
 sap.ui.define([
 	"sap/m/HBox",
 	"sap/ui/core/UIComponent",
-	"sap/ui/core/mvc/View",
-	"sap/ui/core/mvc/ViewType",
+	"sap/ui/core/mvc/XMLView",
 	"sap/ui/model/json/JSONModel",
 	"sap/ui/test/TestUtils"
-], function (HBox, UIComponent, View, ViewType, JSONModel, TestUtils) {
+], function (HBox, UIComponent, XMLView, JSONModel, TestUtils) {
 	"use strict";
 
 	return UIComponent.extend("sap.ui.core.sample.odata.v4.ListBindingTemplate.Component", {
@@ -104,8 +103,7 @@ sap.ui.define([
 				iconTooltip : bRealOData ? "real OData service" : "mock OData service"
 			});
 
-			View.create({
-				async : true,
+			XMLView.create({
 				bindingContexts : {
 					undefined : oModel.createBindingContext("/Equipments")
 				},
@@ -126,7 +124,6 @@ sap.ui.define([
 						}
 					}
 				},
-				type : ViewType.XML,
 				viewName : "sap.ui.core.sample.odata.v4.ListBindingTemplate.Main"
 			}).then(function (oView) {
 				oLayout.addItem(oView);

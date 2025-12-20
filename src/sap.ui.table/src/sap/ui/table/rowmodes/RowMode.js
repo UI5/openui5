@@ -191,7 +191,7 @@ sap.ui.define([
 	/**
 	 * Gets the CSS styles that are applied to the table's DOM root element.
 	 *
-	 * @returns {{height: sap.ui.core.CSSSize?, minHeight: sap.ui.core.CSSSize?, maxHeight: sap.ui.core.CSSSize?}}
+	 * @returns {{height=: sap.ui.core.CSSSize, minHeight=: sap.ui.core.CSSSize, maxHeight=: sap.ui.core.CSSSize}}
 	 * The styles the table should have
 	 * @private
 	 * @abstract
@@ -204,7 +204,7 @@ sap.ui.define([
 	 * Gets the CSS styles that are applied to the table's bottom placeholder DOM element. This element can be used to visually reserve space for
 	 * rows. If <code>undefined</code> is returned during rendering, this element will not be rendered.
 	 *
-	 * @returns {{height: sap.ui.core.CSSSize?}|undefined}
+	 * @returns {{height=: sap.ui.core.CSSSize}|undefined}
 	 * The styles the table's bottom placeholder should have
 	 * @private
 	 * @abstract
@@ -216,7 +216,7 @@ sap.ui.define([
 	/**
 	 * Gets the CSS styles that are applied to the DOM container of the rows.
 	 *
-	 * @returns {{height: sap.ui.core.CSSSize?, minHeight: sap.ui.core.CSSSize?, maxHeight: sap.ui.core.CSSSize?}}
+	 * @returns {{height=: sap.ui.core.CSSSize, minHeight=: sap.ui.core.CSSSize, maxHeight=: sap.ui.core.CSSSize}}
 	 * The styles the row container should have
 	 * @private
 	 * @abstract

@@ -533,7 +533,7 @@ sap.ui.define([
 	 * All non-variant changes are taken over. Variant dependent changes are filtered depending on the variant
 	 * Changes for variants that will not be taken over into this adaptation will be removed
 	 * Also removes setContext changes for FLVariants
-	 * @param {array<string>} aIgnoredVariantIds - IDs of variants that are out of scope
+	 * @param {Array<string>} aIgnoredVariantIds - IDs of variants that are out of scope
 	 * @param {sap.ui.fl.apply._internal.flexObjects.FlexObject[]} aChanges - Array of flex objects
 	 * @returns {sap.ui.fl.apply._internal.flexObjects.FlexObject[]} A list of changes that are relevant
 	 */

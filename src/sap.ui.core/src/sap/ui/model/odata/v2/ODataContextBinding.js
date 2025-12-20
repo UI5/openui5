@@ -48,8 +48,8 @@ sap.ui.define([
 	 */
 	var ODataContextBinding = ContextBinding.extend("sap.ui.model.odata.v2.ODataContextBinding", /** @lends sap.ui.model.odata.v2.ODataContextBinding.prototype */ {
 
-		constructor : function(oModel, sPath, oContext, mParameters, oEvents){
-			ContextBinding.call(this, oModel, sPath, oContext, mParameters, oEvents);
+		constructor : function(oModel, sPath, oContext, mParameters){
+			ContextBinding.call(this, oModel, sPath, oContext, mParameters);
 			// this.oElementContext is owned by the super class; it is either set to null or it
 			// references an instance of sap.ui.model.odata.v2.Context
 			this.sRefreshGroupId = undefined;

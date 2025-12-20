@@ -553,7 +553,7 @@ sap.ui.define([
 	 * Provides the possibility to set a selection state for the table programmatically.
 	 *
 	 * @param {sap.ui.mdc.Table} oTable Instance of the table
-	 * @param {array<sap.ui.model.Context>} aContexts The set of contexts which should be flagged as selected
+	 * @param {Array<sap.ui.model.Context>} aContexts The set of contexts which should be flagged as selected
 	 * @private
 	 * @throws {Error} If the delegate cannot support the table/select configuration.
 	 */

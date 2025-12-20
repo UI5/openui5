@@ -30,7 +30,7 @@ sap.ui.define([
 	 * @extends sap.ui.model.ClientPropertyBinding
 	 * @protected
 	 */
-	var JSONPropertyBinding = ClientPropertyBinding.extend("sap.ui.model.json.JSONPropertyBinding", /** @lends sap.ui.model.JSONPropertyBinding.prototype */ {
+	var JSONPropertyBinding = ClientPropertyBinding.extend("sap.ui.model.json.JSONPropertyBinding", /** @lends sap.ui.model.json.JSONPropertyBinding.prototype */ {
 
 		constructor : function(oModel, sPath, oContext, mParameters){
 			ClientPropertyBinding.apply(this, arguments);

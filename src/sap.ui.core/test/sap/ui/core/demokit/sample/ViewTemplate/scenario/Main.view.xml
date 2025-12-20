@@ -10,21 +10,21 @@
 		<HBox alignItems="Center" wrap="Wrap">
 			<Label class="sapUiSmallMarginEnd" design="Bold" labelFor="selectEntitySet"
 				text="Select Entity Set"/>
-			<Select class="sapUiSmallMarginEnd" change="onChangeType" id="selectEntitySet"
+			<Select class="sapUiSmallMarginEnd" change=".onChangeType" id="selectEntitySet"
 				items="{ui>/entitySet}" selectedKey="{ui>/selectedEntitySet}">
 				<core:ListItem text="{ui>name}" key="{ui>name}"/>
 			</Select>
 			<Label class="sapUiSmallMarginEnd" design="Bold" labelFor="selectInstance"
 				text="Select Instance"/>
-			<Select class="sapUiSmallMarginEnd" id="selectInstance" change="onChangeInstance"
+			<Select class="sapUiSmallMarginEnd" id="selectInstance" change=".onChangeInstance"
 				selectedKey="{ui>/selectedInstance}">
 				<!-- aggregation items is bound in controller  -->
 			</Select>
 			<Button enabled="false" icon="{ui>/icon}" tooltip="{ui>/iconTooltip}"
 				type="Transparent"/>
-			<ToggleButton id="toggleSourceCode" icon="sap-icon://syntax" press="onSourceCode"
+			<ToggleButton id="toggleSourceCode" icon="sap-icon://syntax" press=".onSourceCode"
 				text="Source Code after Templating"/>
-			<CheckBox selected="{ui>/bindTexts}" select="onChangeType" text="bindTexts"/>
+			<CheckBox selected="{ui>/bindTexts}" select=".onChangeType" text="bindTexts"/>
 			<!-- triggers XML templating! -->
 		</HBox>
 		<Panel class="sapUiResponsiveMargin" expandable="false"

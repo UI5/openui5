@@ -44,7 +44,7 @@ sap.ui.define([
 	 * @since 1.53
 	 * @alias sap.ui.dt.plugin.ContextMenu
 	 */
-	const ContextMenu = Plugin.extend("sap.ui.dt.plugin.ContextMenu", /** @lends sap.ui.rta.plugin.ContextMenu.prototype */ {
+	const ContextMenu = Plugin.extend("sap.ui.dt.plugin.ContextMenu", /** @lends sap.ui.dt.plugin.ContextMenu.prototype */ {
 		metadata: {
 			library: "sap.ui.dt",
 			properties: {

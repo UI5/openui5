@@ -195,7 +195,7 @@
 					<Input editable="false" id="SO_2_ITEM::itemPosition" value="{ItemPosition}"/>
 					<Label labelFor="SO_2_ITEM::quantity" text="Quantity"/>
 					<Input id="SO_2_ITEM::quantity" value="{Quantity}"
-						change="rememberChangedSalesOrderContext"/>
+						change=".rememberChangedSalesOrderContext"/>
 					<Label text="Unit"/>
 					<Text text="{QuantityUnit}"/>
 				</form:SimpleForm>

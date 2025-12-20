@@ -9,6 +9,10 @@
 	color: #32363A;
 }
 
+ui-integration-card {
+	line-height: 1.05;
+}
+
 .topic h1 {
 	border-bottom: 1px solid #d9d9d9;
 	padding-bottom: 1rem;
@@ -134,11 +138,15 @@
 .topic table th,
 .topic table td {
 	text-align: left;
-	padding: 8px 18px;
 	border-bottom: 1px solid #E5E5E5;
 	border-top: 1px solid #E5E5E5;
 	line-height: 16px;
 	font-size: 14px;
+}
+
+.topic table:not(#tableCardExample table) th,
+.topic table:not(#tableCardExample table) td {
+	padding: 8px 18px;
 }
 
 .topic table:not(.plainFirstColumn) th:first-of-type,
@@ -228,4 +236,55 @@ code {
 
 .overview .imageContainer img {
 	padding: 0 0.5rem 0.5rem 0;
+}
+
+.cardsContainer {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1rem;
+	justify-content: start;
+	align-items: stretch;
+	width: 100%;
+	margin-bottom: 1rem;
+}
+
+#analyticalCardWithTooltips, 
+#analyticalNoDataCardWithTooltips,
+#iconFitTypeExample, 
+#formWithValidationExample,
+#analyticalBarNoDataCard,
+#analyticalBarCardExample,
+#donutCardExample,
+#donutNoDataCardExample {
+	.sapFCardHeaderMainWrapper {
+		flex-wrap: nowrap;
+	}
+} 
+
+.noDataCardExample {
+	min-height: 352px;
+}
+
+.card-width-medium {
+	width: 528px;
+}
+
+.card-width-small {
+	width: 352px;
+}
+
+.card-width-large {
+	width: 704px;
+}
+
+.hiddenCard {
+	display: none;
+}
+
+.hiddenNotice {
+	display: none;
+}
+
+.visibleNotice {
+	display: block;
 }

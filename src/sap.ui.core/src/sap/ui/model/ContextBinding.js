@@ -18,7 +18,7 @@ sap.ui.define(['./Binding'],
 	 * @param {string} sPath
 	 * @param {sap.ui.model.Context} oContext
 	 * @param {object} [mParameters]
-	 * @param {object} [oEvents] object defining event handlers
+	 * @param {object} [oEvents] <b>Deprecated as of version 1.144.0</b> - unused
 	 * @abstract
 	 * @public
 	 * @alias sap.ui.model.ContextBinding
@@ -26,8 +26,8 @@ sap.ui.define(['./Binding'],
 	 */
 	var ContextBinding = Binding.extend("sap.ui.model.ContextBinding", /** @lends sap.ui.model.ContextBinding.prototype */ {
 
-		constructor : function(oModel, sPath, oContext, mParameters, oEvents){
-			Binding.call(this, oModel, sPath, oContext, mParameters, oEvents);
+		constructor : function(oModel, sPath, oContext, mParameters){
+			Binding.call(this, oModel, sPath, oContext, mParameters);
 			this.oElementContext = null;
 			this.bInitial = true;
 		},

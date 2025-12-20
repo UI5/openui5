@@ -253,6 +253,10 @@ sap.ui.define([
 	 * example due to a filter), and the group ID must not have
 	 * {@link sap.ui.model.odata.v4.SubmitMode.API}. Such a deletion is not a pending change.
 	 *
+	 * When using data aggregation without group levels, single entities can be deleted
+	 * (@experimental as of version 1.144.0, see {@link #isAggregated}). The same restrictions as
+	 * for a recursive hierarchy apply.
+	 *
 	 * @param {string} [sGroupId]
 	 *   The group ID to be used for the DELETE request; if not specified, the update group ID for
 	 *   the context's binding is used, see {@link #getUpdateGroupId}. Since 1.81, if this context
@@ -288,10 +292,12 @@ sap.ui.define([
 	 *     <li> a <code>null</code> group ID is used with a context which is not
 	 *       {@link #isKeepAlive kept alive},
 	 *     <li> the context is already being deleted,
-	 *     <li> the context's binding is a list binding with data aggregation,
+	 *     <li> the context's binding is a list binding with data aggregation, and either has group
+	 *       levels or this context does not represent a single entity (see {@link #isAggregated}),
 	 *     <li> the context is transient but its binding is not a list binding ("upsert") and it
 	 *       therefore must be reset via {@link #resetChanges},
-	 *     <li> the restrictions for deleting from a recursive hierarchy (see above) are not met.
+	 *     <li> the restrictions for deleting from a recursive hierarchy or data aggregation (see
+	 *       above) are not met.
 	 *   </ul>
 	 *
 	 * @function
@@ -314,10 +320,10 @@ sap.ui.define([
 		if (this.isDeleted()) {
 			throw new Error("Must not delete twice: " + this);
 		}
-		if (_Helper.isDataAggregation(this.oBinding.mParameters)) {
-			throw new Error("Cannot delete " + this + " when using data aggregation");
+		this.oBinding.checkSuspended(); // do it here even if it is contained in #isAggregated
+		if (this.isAggregated() || this.oBinding.mParameters.$$aggregation?.groupLevels?.length) {
+			throw new Error("Unsupported on aggregated data: " + this);
 		}
-		this.oBinding.checkSuspended();
 		if (this.isTransient()) {
 			if (!this.oBinding.getHeaderContext) { // upsert
 				throw new Error("Cannot delete " + this);

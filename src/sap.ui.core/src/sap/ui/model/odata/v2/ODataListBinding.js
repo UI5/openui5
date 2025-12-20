@@ -192,7 +192,7 @@ sap.ui.define([
 	 * Attach event handler <code>fnFunction</code> to the 'createActivate' event of this binding.
 	 *
 	 * @param {function} fnFunction The function to call when the event occurs
-	 * @param {object} [oListener] Object on which to call the given function
+	 * @param {object} [oListener=this] Object on which to call the given function
 	 * @returns {this} Reference to <code>this</code> in order to allow method chaining
 	 *
 	 * @public
@@ -206,7 +206,7 @@ sap.ui.define([
 	 * Detach event handler <code>fnFunction</code> from the 'createActivate' event of this binding.
 	 *
 	 * @param {function} fnFunction The function to call when the event occurs
-	 * @param {object} [oListener] Object on which to call the given function
+	 * @param {object} [oListener=this] Object on which to call the given function
 	 * @returns {this} Reference to <code>this</code> in order to allow method chaining
 	 *
 	 * @public

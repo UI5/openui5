@@ -5,7 +5,7 @@
 	<title>Numeric Header</title>
 	
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<script src="../../../scripts/boot.js"></script>
+	<script data-require-ui5-noinit src="../../../scripts/boot.js"></script>
 </head>
 
 <body class="sapUiBody topicBody">
@@ -19,7 +19,10 @@
 				value visualization.
 				Using properties you can configure the title, subtitle, and status text.
 			</p>
-			<img class="cardHeadersImg" src="../../images/NumericHeaderExample.png" alt="Example of numeric header ">
+			<div class="cardsContainer">
+				<ui-integration-card id="numericHeaderExample" class="card-width-small" manifest="../manifests/numericHeader.manifest.json">
+				</ui-integration-card>
+			</div>
 
 			<h2 id="usage">Usage</h2>
 			<p>

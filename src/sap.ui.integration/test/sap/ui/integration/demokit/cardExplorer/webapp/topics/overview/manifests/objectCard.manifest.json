@@ -1,0 +1,171 @@
+{
+	"_version": "2.0.0",
+	"sap.app": {
+		"id": "card.explorer.object.card",
+		"type": "card",
+		"title": "Sample of an Object Card",
+		"subTitle": "Sample of an Object Card",
+		"applicationVersion": {
+			"version": "1.0.0"
+		},
+		"shortTitle": "A short title for this Card",
+		"info": "Additional information about this Card",
+		"description": "A long description for this Card",
+		"tags": {
+			"keywords": [
+				"Object",
+				"Card",
+				"Sample"
+			]
+		}
+	},
+	"sap.ui": {
+		"technology": "UI5",
+		"icons": {
+			"icon": "sap-icon://switch-classes"
+		}
+	},
+	"sap.card": {
+		"type": "Object",
+		"data": {
+			"json": {
+				"firstName": "Donna",
+				"lastName": "Moore",
+				"position": "Sales Executive",
+				"phone": "+1 202 555 5555",
+				"phoneTooltip": "Make a call",
+				"photo": "./images/DonnaMoore.png",
+				"agendaUrl": "/agenda",
+				"manager": {
+					"firstName": "Alain",
+					"lastName": "Chevalier",
+					"photo": "./images/Alain_Chevalier.png"
+				},
+				"company": {
+					"name": "Robert Brown Entertainment",
+					"address": "481 West Street, Anytown OH 4, USA",
+					"websiteTooltip": "Visit website",
+					"website": "https://sap.com",
+					"url": "https://sap.com"
+				}
+			}
+		},
+		"header": {
+			"icon": {
+				"src": "{photo}"
+			},
+			"title": "{firstName} {lastName}",
+			"subtitle": "{position}"
+		},
+		"content": {
+			"groups": [
+				{
+					"title": "Contact Details",
+					"items": [
+						{
+							"label": "First Name",
+							"value": "{firstName}"
+						},
+						{
+							"label": "Last Name",
+							"value": "{lastName}"
+						},
+						{
+							"label": "Phone",
+							"value": "{phone}",
+							"tooltip": "{phoneTooltip}",
+							"actions": [
+								{
+									"type": "Navigation",
+									"parameters": {
+										"url": "tel:{phone}"
+									}
+								}
+							]
+						},
+						{
+							"label": "Entertainment",
+							"value": "Partnerships & Sales Executive"
+						}
+					]
+				},
+				{
+					"title": "Company Details",
+					"items": [
+						{
+							"label": "Company Name",
+							"value": "{company/name}"
+						},
+						{
+							"label": "Address",
+							"value": "{company/address}"
+						},
+						{
+							"label": "Website",
+							"value": "{company/website}",
+							"tooltip": "{company/websiteTooltip}",
+							"actions": [
+								{
+									"type": "Navigation",
+									"parameters": {
+										"url": "{company/url}"
+									}
+								}
+							]
+						},
+						{
+							"label": "Rating",
+							"type": "RatingIndicator",
+							"value": 3.5
+						}
+					]
+				},
+				{
+					"title": "Organizational Details",
+					"items": [
+						{
+							"label": "Direct Manager",
+							"value": "{manager/firstName} {manager/lastName}",
+							"icon": {
+								"src": "{manager/photo}"
+							}
+						},
+						{
+							"label": "Department",
+							"value": "Sales & Business Development",
+							"icon": {
+								"src": "sap-icon://org-chart"
+							}
+						},
+						{
+							"label": "Location",
+							"value": "North America Region",
+							"icon": {
+								"src": "sap-icon://functional-location"
+							}
+						}
+					]
+				},
+				{
+					"title": "Role & Responsibilities",
+					"items": [
+						{
+							"label": "Primary Focus",
+							"value": "Develop and manage strategic entertainment partnerships",
+							"icon": {
+								"src": "sap-icon://target-group"
+							}
+						},
+						{
+							"label": "Key Responsibilities",
+							"value": "Client acquisition, contract negotiation, and revenue growth",
+							"icon": {
+								"src": "sap-icon://task"
+							}
+						}
+					]
+				}
+			]
+		}
+	}
+}

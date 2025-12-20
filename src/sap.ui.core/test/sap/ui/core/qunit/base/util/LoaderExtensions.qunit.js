@@ -6,7 +6,7 @@
 sap.ui.define(['sap/base/util/LoaderExtensions'], function(LoaderExtensions) {
 	"use strict";
 
-	var privateLoaderAPI = sap.ui.loader._;
+	const privateLoaderAPI = sap.ui.loader._;
 
 	QUnit.module("sap/base/util/LoaderExtensions");
 
@@ -30,17 +30,6 @@ sap.ui.define(['sap/base/util/LoaderExtensions'], function(LoaderExtensions) {
 			assert.ok(aModules.indexOf('my.required.module') != -1, "module is contained");
 			done();
 		});
-	});
-
-	QUnit.test("getAllRequiredModules (filtered)", function(assert) {
-		const aUnfilteredModules = LoaderExtensions.getAllRequiredModules();
-		assert.ok(Array.isArray(aUnfilteredModules), "should return an array");
-		/* @deprecated */
-		assert.ok(aUnfilteredModules.includes("sap.ui.core.CSSSize"), "unfiltered result contains deprecated module");
-
-		const aFilteredModules = LoaderExtensions.getAllRequiredModules(/* omitDeprecated */ true);
-		assert.ok(Array.isArray(aFilteredModules), "should return an array");
-		assert.notOk(aFilteredModules.includes("sap.ui.core.CSSSize"), "filtered result does not contain deprecated module");
 	});
 
 	QUnit.test("toURL - resolve ui5:// pseudo protocol", function(assert) {
@@ -94,5 +83,4 @@ sap.ui.define(['sap/base/util/LoaderExtensions'], function(LoaderExtensions) {
 		assert.equal(sUnmappedSlashesWithUrlParams, privateLoaderAPI.resolveURL("resources/other/namespace/not/registered/file/some.xml?param1=true&param2=5"), "unmapped paths with url params");
 
 	});
-
 });

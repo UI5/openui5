@@ -1,6 +1,7 @@
 <mvc:View
 	class="sapUiSizeCompact"
 	controllerName="sap.ui.core.sample.odata.v4.SalesOrders.Main"
+	core:require="{Decimal : 'sap/ui/model/odata/type/Decimal'}"
 	xmlns="sap.m"
 	xmlns:core="sap.ui.core"
 	xmlns:demo="sap.ui.core.sample.common"
@@ -33,7 +34,7 @@
 			<Button enabled="false" icon="sap-icon://hello-world"
 				press=".onUpdateFavoriteProduct" tooltip="Update with current time as HH:mm"/>
 			<Button enabled="{ui>/bRealOData}" icon="sap-icon://message-error"
-				press="produceTechnicalError" tooltip="Provoke read error"/>
+				press=".produceTechnicalError" tooltip="Provoke read error"/>
 			<ToolbarSpacer/>
 			<Label design="Bold" id="favoriteProductId::Label" labelFor="favoriteProductId"
 				text="Favorite Product ID:">
@@ -232,7 +233,7 @@
 					<ToolbarSpacer/>
 					<SearchField id="filterGrossAmount"
 						placeholder="Filter by gross amount greater than"
-						value="{path : 'ui>/filterValue', type : 'sap.ui.model.odata.type.Decimal',
+						value="{path : 'ui>/filterValue', type : 'Decimal',
 							constraints : {precision : 15, scale : 2, nullable : false}}"
 						visible="{ui>/bRealOData}" width="50%" search=".onFilter">
 						<layoutData>

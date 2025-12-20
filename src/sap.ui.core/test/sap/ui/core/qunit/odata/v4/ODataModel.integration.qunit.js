@@ -24236,6 +24236,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// Test ODLB#getCount (JIRA: CPOUI5ODATAV4-958)
 	// Test v4.Context#getFilter (JIRA: CPOUI5ODATAV4-2768)
 	// No late property on aggregated leaf (JIRA: CPOUI5ODATAV4-2756)
+	// Delete on aggregated data is not allowed, even w/o visual grouping (JIRA: CPOUI5ODATAV4-3229)
 	QUnit.test("Data Aggregation: $$aggregation w/ grand total w/ unit", function (assert) {
 		var oModel = this.createSalesOrdersModel({autoExpandSelect : true}),
 			sView = '\
@@ -24336,6 +24337,12 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 			const [, oContext] = oListBinding.getCurrentContexts();
 			assert.strictEqual(oContext.isAggregated(), true, "JIRA: CPOUI5ODATAV4-2760");
+			assert.strictEqual(oContext.isExpanded(), undefined);
+			assert.throws(function () {
+				// code under test (JIRA: CPOUI5ODATAV4-3229)
+				oContext.delete();
+			}, new Error("Unsupported on aggregated data: " + oContext));
+
 			that.oLogMock.expects("error")
 				.withArgs("Failed to drill-down into (LifecycleStatus='Z')/Note"
 					+ ", invalid segment: Note");
@@ -24350,14 +24357,17 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// predicates in case all key properties are available. Expect no unnecessary group levels in
 	// there!
 	// JIRA: CPOUI5ODATAV4-700
-	// Check that create, delete, and refresh are not supported.
+	// Check that create and refresh are not supported.
 	// JIRA: CPOUI5ODATAV4-1851
 	//
 	// If key properties are known, late properties are requested (JIRA: CPOUI5ODATAV4-2756)
 	// No late property on collapsed group header (JIRA: CPOUI5ODATAV4-2756)
+	// Delete a single entity (JIRA: CPOUI5ODATAV4-3229)
+	// When deleting an entity the count is decreased (JIRA: CPOUI5ODATAV4-3229)
 	QUnit.test("Data Aggregation: leaves' key predicates", function (assert) {
 		var oBinding,
 			oModel = this.createSalesOrdersModel({autoExpandSelect : true}),
+			oTable,
 			sView = '\
 <Table id="table" items="{path : \'/SalesOrderList\',\
 		parameters : {\
@@ -24398,11 +24408,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			.expectChange("salesOrderID", [null, "26", "25"]);
 
 		return this.createView(assert, sView, oModel).then(function () {
-			var oTable = that.oView.byId("table"),
-				aCurrentContexts;
-
+			oTable = that.oView.byId("table");
 			oBinding = oTable.getBinding("items");
-			aCurrentContexts = oBinding.getCurrentContexts();
+			const aCurrentContexts = oBinding.getCurrentContexts();
 
 			assert.deepEqual(aCurrentContexts.map(getPath), [
 				"/SalesOrderList()",
@@ -24422,11 +24430,6 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				// code under test (JIRA: CPOUI5ODATAV4-1851)
 				oBinding.create();
 			}, new Error("Cannot create in " + oBinding + " when using data aggregation"));
-
-			assert.throws(function () {
-				// code under test (JIRA: CPOUI5ODATAV4-1851)
-				aCurrentContexts[1].delete();
-			}, new Error("Cannot delete " + aCurrentContexts[1] + " when using data aggregation"));
 
 			assert.throws(function () {
 				// code under test (JIRA: CPOUI5ODATAV4-1851)
@@ -24463,6 +24466,21 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				that.waitForChanges(assert)
 			]);
 		}).then(function () {
+			assert.strictEqual(oBinding.getCount(), 2);
+
+			that.expectRequest("DELETE SalesOrderList('26')")
+				.expectChange("lifecycleStatus", [, "Y"])
+				.expectChange("grossAmount", [, "2"])
+				.expectChange("salesOrderID", [, "25"]);
+
+			return Promise.all([
+				// code under test (JIRA: CPOUI5ODATAV4-3229)
+				oBinding.getCurrentContexts()[1].delete(),
+				that.waitForChanges(assert, "delete")
+			]);
+		}).then(function () {
+			assert.strictEqual(oBinding.getCount(), 1);
+
 			that.expectRequest("SalesOrderList?$apply=groupby((LifecycleStatus))&$count=true"
 					+ "&$skip=0&$top=100", {
 					"@odata.count" : "2",
@@ -24474,7 +24492,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				.expectChange("isExpanded", [false, false])
 				.expectChange("isTotal", [false])
 				.expectChange("level", [1])
-				.expectChange("lifecycleStatus", ["Z", "Y"])
+				.expectChange("lifecycleStatus", ["Z"])
 				.expectChange("grossAmount", [undefined, undefined])
 				.expectChange("salesOrderID", [, null]);
 
@@ -26368,6 +26386,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// JIRA: CPOUI5ODATAV4-825
 	//
 	// All levels present as groups (JIRA: CPOUI5ODATAV4-2755)
+	// Delete with visual grouping is not allowed (JIRA: CPOUI5ODATAV4-3229)
 	QUnit.test("Data Aggregation: additionally via navigation", function (assert) {
 		var oTable,
 			sView = '\
@@ -26499,6 +26518,14 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				oTable.getRows()[3].getBindingContext().expand(),
 				that.waitForChanges(assert, "2nd expand")
 			]);
+		}).then(function () {
+			const oContext = oTable.getRows()[4].getBindingContext();
+			assert.strictEqual(oContext.isAggregated(), false);
+			assert.strictEqual(oContext.isExpanded(), undefined);
+			assert.throws(function () {
+				// code under test (JIRA: CPOUI5ODATAV4-3229)
+				oContext.delete();
+			}, new Error("Unsupported on aggregated data: " + oContext));
 		});
 	});
 

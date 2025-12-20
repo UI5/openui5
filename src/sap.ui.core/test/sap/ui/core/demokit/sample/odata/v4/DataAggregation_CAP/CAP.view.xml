@@ -1,6 +1,10 @@
 <mvc:View
 	class="sapUiSizeCompact"
 	controllerName="sap.ui.core.sample.odata.v4.DataAggregation_CAP.CAP"
+	core:require="{
+		Currency : 'sap/ui/model/odata/type/Currency',
+		Unit : 'sap/ui/model/odata/type/Unit'
+	}"
 	xmlns="sap.ui.table"
 	xmlns:core="sap.ui.core"
 	xmlns:form="sap.ui.layout.form"
@@ -117,7 +121,7 @@
 						path : '/##@@requestCurrencyCodes',
 						targetType : 'any'
 					}],
-					type : 'sap.ui.model.odata.type.Currency',
+					type : 'Currency',
 					formatOptions : { showMeasure : false }
 				}" wrapping="false"/>
 			</template>
@@ -157,7 +161,7 @@
 						path : '/##@@requestUnitsOfMeasure',
 						targetType : 'any'
 					}],
-					type : 'sap.ui.model.odata.type.Unit'
+					type : 'Unit'
 				}"/>
 			<m:Label text="Plane Type"/>
 			<m:Text text="{PlaneType}"/>
@@ -175,7 +179,7 @@
 						path : '/##@@requestCurrencyCodes',
 						targetType : 'any'
 					}],
-					type : 'sap.ui.model.odata.type.Currency'
+					type : 'Currency'
 				}"/>
 		</form:SimpleForm>
 	</m:VBox>

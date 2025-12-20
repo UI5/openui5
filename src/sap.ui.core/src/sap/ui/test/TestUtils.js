@@ -552,6 +552,7 @@ sap.ui.define([
 			 * @param {number} iCode - The response code
 			 * @param {object} oRequest - The request object
 			 * @param {string|Error} vMessage - The error
+			 * @param {string} [vMessage.target] - The error target
 			 * @returns {object} The reponse object
 			 */
 			function error(iCode, oRequest, vMessage) {
@@ -564,7 +565,8 @@ sap.ui.define([
 					message : JSON.stringify({
 						error : {
 							code : "TestUtils",
-							message : vMessage instanceof Error ? vMessage.message : vMessage
+							message : vMessage instanceof Error ? vMessage.message : vMessage,
+							target : vMessage instanceof Error ? vMessage.target : undefined
 						}
 					})
 				};

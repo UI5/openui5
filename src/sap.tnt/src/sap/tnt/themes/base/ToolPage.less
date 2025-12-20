@@ -8,15 +8,13 @@
 /* ========================================================================== */
 
 @_sap_tnt_ToolPage_AnimationDuration : 0.3s;
-@_sap_tnt_ToolPage_Background: darken(@sapUiBaseBG, 4);
+@_sap_tnt_ToolPage_Background: var(--sapBackgroundColor);
 @_sap_tnt_ToolPage_ContentBackgroundStandard: none;
 @_sap_tnt_ToolPage_ContentBackgroundSolid: none;
 @_sap_tnt_ToolPage_ContentBackgroundTransparent: none;
 @_sap_tnt_ToolPage_ContentBackgroundList: none;
-@_sap_tnt_ToolPage_AsideCollapsedPhoneTransform: -100%;
-@_sap_tnt_ToolPage_AsideCollapsedPhoneTransformRtl: 100%;
-@_sap_tnt_ToolPage_AsidePhoneTop: 0;
-@_sap_tnt_ToolPage_AsidePhoneWidth: auto;
+@_sap_tnt_ToolPage_AsideCollapsedLayoutSTransform: -100%;
+@_sap_tnt_ToolPage_AsideCollapsedLayoutSTransformRtl: 100%;
 @_sap_tnt_ToolHeader_Shadow: none;
 
 /* ========================================================================== */
@@ -78,23 +76,24 @@ html:not([data-sap-ui-animation='off']) .sapTntToolPageAside {
   transition: transform @_sap_tnt_ToolPage_AnimationDuration;
 }
 
-html.sap-phone {
-
+.sapTntToolPage-LayoutS {
   .sapTntToolPageAside {
     z-index: 2;
     position: absolute;
     left: 0;
     bottom: 0;
-    top: @_sap_tnt_ToolPage_AsidePhoneTop;
-    width:  @_sap_tnt_ToolPage_AsidePhoneWidth;
+    top: 0;
+    width: 100%;
   }
 
   .sapTntToolPageAsideCollapsed {
     .sapTntToolPageAside {
-      transform: translateX(@_sap_tnt_ToolPage_AsideCollapsedPhoneTransform);
+      transform: translateX(@_sap_tnt_ToolPage_AsideCollapsedLayoutSTransform);
     }
   }
 }
+
+
 
 /* ========================================================================== */
 /* Main container                                                             */
@@ -147,11 +146,9 @@ html.sap-phone {
 /* ========================================================================== */
 
 html[dir=rtl] {
-  &.sap-phone {
-    .sapTntToolPageAsideCollapsed {
-      .sapTntToolPageAside {
-        transform: translateX(@_sap_tnt_ToolPage_AsideCollapsedPhoneTransformRtl);
-      }
+  .sapTntToolPage-LayoutS .sapTntToolPageAsideCollapsed {
+    .sapTntToolPageAside {
+      transform: translateX(@_sap_tnt_ToolPage_AsideCollapsedLayoutSTransformRtl);
     }
   }
 }

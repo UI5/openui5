@@ -1,0 +1,178 @@
+{
+	"_version": "2.0.0",
+	"sap.app": {
+		"id": "card.explorer.line.card",
+		"type": "card",
+		"title": "Sample of a Line Chart",
+		"subTitle": "Sample of a Line Chart",
+		"applicationVersion": {
+			"version": "1.0.0"
+		},
+		"shortTitle": "A short title for this Card",
+		"info": "Additional information about this Card",
+		"description": "A long description for this Card",
+		"tags": {
+			"keywords": [
+				"Analytical",
+				"Card",
+				"Line",
+				"Sample"
+			]
+		}
+	},
+	"sap.ui": {
+		"technology": "UI5",
+		"icons": {
+			"icon": "sap-icon://line-chart"
+		}
+	},
+	"sap.card": {
+		"type": "Analytical",
+		"header": {
+			"type": "Numeric",
+			"data": {
+				"json": {
+					"number": "183.4",
+					"unit": "MM",
+					"trend": "Up",
+					"state": "Good",
+					"target": {
+						"number": 150,
+						"unit": "MM"
+					},
+					"deviation": {
+						"number": 37.6
+					},
+					"details": "Beginning of Q3"
+				}
+			},
+			"title": "Project Monthly Revenue",
+			"subtitle": "Values include taxes",
+			"unitOfMeasurement": "EUR",
+			"mainIndicator": {
+				"number": "{number}",
+				"unit": "{unit}",
+				"trend": "{trend}",
+				"state": "{state}"
+			},
+			"details": "{details}",
+			"sideIndicators": [
+				{
+					"title": "Target",
+					"number": "{target/number}",
+					"unit": "{target/unit}"
+				},
+				{
+					"title": "Deviation",
+					"number": "{deviation/number}",
+					"unit": "%",
+					"state": "{deviation/state}"
+				}
+			]
+		},
+		"content": {
+			"chartType": "Line",
+			"chartProperties": {
+				"title": {
+					"text": "July 2018",
+					"visible": true,
+					"alignment": "left"
+				},
+				"legend": {
+					"visible": "{legend/visible}"
+				},
+				"legendGroup": {
+					"layout": {
+						"position": "{legend/position}",
+						"alignment": "{legend/alignment}"
+					}
+				},
+				"plotArea": {
+					"dataLabel": {
+						"visible": true
+					}
+				},
+				"categoryAxis": {
+					"title": {
+						"visible": false
+					}
+				},
+				"valueAxis": {
+					"title": {
+						"visible": false
+					}
+				}
+			},
+			"data": {
+				"json": {
+					"dimensions": {
+						"dayLabel": "Days"
+					},
+					"measures": {
+						"revenueLabel": "Revenue"
+					},
+					"legend": {
+						"visible": true,
+						"position": "bottom",
+						"alignment": "topLeft"
+					},
+					"list": [
+						{
+							"Day": "July 1",
+							"Revenue": 0
+						},
+						{
+							"Day": "July 5",
+							"Revenue": 20
+						},
+						{
+							"Day": "July 10",
+							"Revenue": 24
+						},
+						{
+							"Day": "July 10",
+							"Revenue": 17
+						},
+						{
+							"Day": "July 10",
+							"Revenue": 25
+						},
+						{
+							"Day": "July 10",
+							"Revenue": 24
+						}
+					]
+				},
+				"path": "/list"
+			},
+			"dimensions": [
+				{
+					"name": "{dimensions/dayLabel}",
+					"value": "{Day}"
+				}
+			],
+			"measures": [
+				{
+					"name": "{measures/revenueLabel}",
+					"value": "{Revenue}"
+				}
+			],
+			"feeds": [
+				{
+					"uid": "valueAxis",
+					"type": "Measure",
+					"values": [
+						"{measures/revenueLabel}"
+					]
+				},
+				{
+					"uid": "categoryAxis",
+					"type": "Dimension",
+					"values": [
+						"{dimensions/dayLabel}"
+					]
+				}
+			]
+		}
+	}
+}

@@ -45,7 +45,7 @@ sap.ui.define([
 	 * @public
 	 * @alias sap.f.CardBase
 	 */
-	var CardBase = Control.extend("sap.f.CardBase", /** @lends sap.f.Card.prototype */ {
+	var CardBase = Control.extend("sap.f.CardBase", /** @lends sap.f.CardBase.prototype */ {
 		metadata: {
 			library: "sap.f",
 			interfaces: [

@@ -732,7 +732,7 @@ sap.ui.define([
 		 * @param {string} sPath The path pointing to the property that should be bound
 		 * @param {sap.ui.model.Context} [oContext] The context object for this databinding
 		 * @param {object} [mParameters] Additional model-specific parameters
-		 * @param {Object<string, function>} [oEvents] Event handlers can be passed to the binding ({change:myHandler})
+		 * @param {Object<string, function>} [oEvents] <b>Deprecated as of version 1.144.0</b> - unused
 		 *
 		 * @return {sap.ui.model.ContextBinding} The newly created binding
 		 * @public

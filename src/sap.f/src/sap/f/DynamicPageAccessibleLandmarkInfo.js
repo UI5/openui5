@@ -28,7 +28,7 @@ sap.ui.define(['sap/ui/core/Element', './library'],
 	 * @alias sap.f.DynamicPageAccessibleLandmarkInfo
 	 * @since 1.61
 	 */
-	var DynamicPageAccessibleLandmarkInfo = Element.extend("sap.f.DynamicPageAccessibleLandmarkInfo", /** @lends sap.f.DynamicAccessibleLandmarkInfo.prototype */ { metadata : {
+	var DynamicPageAccessibleLandmarkInfo = Element.extend("sap.f.DynamicPageAccessibleLandmarkInfo", /** @lends sap.f.DynamicPageAccessibleLandmarkInfo.prototype */ { metadata : {
 
 		library : "sap.f",
 		properties : {

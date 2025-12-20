@@ -8,7 +8,7 @@ sap.ui.define([
     "use strict";
 
     /**
-     * Base Delegate for {@link sap.ui.mdc.Geomap Geomap}. Extend this object in your project to use all functionalities of the {@link sap.ui.mdc.GeoMap GeoMap}.<br>
+     * Base Delegate for {@link sap.ui.mdc.Geomap Geomap}. Extend this object in your project to use all functionalities of the {@link sap.ui.mdc.Geomap Geomap}.<br>
      * This class provides method calls, that are called by the <code>geomap</code> for specific operations and overwrite the internal behavior.
      *
      * @namespace
@@ -33,7 +33,7 @@ sap.ui.define([
     /**
      * Notifies the inner geomap to zoom out.
      *
-     * @param {sap.ui.mdc.GeoMap} oGeoMap Reference to the geomap
+     * @param {sap.ui.mdc.Geomap} oGeomap Reference to the geomap
      *
      * @public
      */
@@ -166,7 +166,7 @@ sap.ui.define([
      * Returns the current geomap type.
      *
      * @param {sap.ui.mdc.Geomap} oGeomap Reference to the MDC geomap
-     * @returns {sap.ui.mdc.GeoMap.GeomapTypeObject[]} Information about the current geomap type
+     * @returns {sap.ui.mdc.Geomap.GeomapTypeObject[]} Information about the current geomap type
      * @throws {Error} Error thrown if inner geomap is not initialized yet
      *
      * @public
@@ -224,10 +224,10 @@ sap.ui.define([
      * The result of this function must be kept stable throughout the lifecycle of your application.
      * Any changes of the returned values might result in undesired effects.
      *
-     * <b>Note</b>: Existing properties (set via <code>sap.ui.mdc.GeoMap#setPropertyInfo</code>) must not be removed and their attributes must not be changed during the {@link module:sap/ui/mdc/GeoMapDelegate.fetchProperties fetchProperties} callback. Otherwise validation errors might occur whenever personalization-related control features (such as the opening of any personalization dialog) are activated.
+     * <b>Note</b>: Existing properties (set via <code>sap.ui.mdc.Geomap#setPropertyInfo</code>) must not be removed and their attributes must not be changed during the {@link module:sap/ui/mdc/GeomapDelegate.fetchProperties fetchProperties} callback. Otherwise validation errors might occur whenever personalization-related control features (such as the opening of any personalization dialog) are activated.
      *
      * @param {sap.ui.mdc.Geomap} oGeomap Reference to the geomap
-     * @returns {Promise<sap.ui.mdc.GeoMap.PropertyInfo[]>} Array of the property infos that is used within the geomap
+     * @returns {Promise<sap.ui.mdc.Geomap.PropertyInfo[]>} Array of the property infos that is used within the geomap
      *
      * @public
      */

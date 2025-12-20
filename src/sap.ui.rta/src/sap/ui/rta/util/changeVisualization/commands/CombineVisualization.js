@@ -26,7 +26,7 @@ sap.ui.define([
 	 * payload containing the combined elements.
 	 *
 	 * @param {object} mPayload - Change visualization description payload from the change handler
-	 * @param {array.<string>} mPayload.originalSelectors - Selectors of the elements that were combined
+	 * @param {Array<string>} mPayload.originalSelectors - Selectors of the elements that were combined
 	 * @param {string} sLabel - Current element label
 	 * @param {object} mPropertyBag - Additional properties
 	 * @param {sap.ui.core.Component} mPropertyBag.appComponent - Application component

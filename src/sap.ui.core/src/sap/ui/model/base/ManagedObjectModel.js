@@ -316,7 +316,7 @@ sap.ui.define([
 	 * @ui5-restricted sap.m, sap.ui.comp, sap.ui.core, sap.ui.fl, sap.ui.mdc
  	 * @since 1.58
 	 */
-	var ManagedObjectModel = JSONModel.extend("sap.ui.model.base.ManagedObjectModel", /** @lends sap.ui.mdc.model.base.ManagedObjectModel.prototype */
+	var ManagedObjectModel = JSONModel.extend("sap.ui.model.base.ManagedObjectModel", /** @lends sap.ui.model.base.ManagedObjectModel.prototype */
 		{
 			constructor: function (oObject, oData) {
 				if (!oData && typeof oData != "object") {

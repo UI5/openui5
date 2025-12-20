@@ -1,0 +1,181 @@
+{
+	"_version": "2.0.0",
+	"sap.app": {
+		"id": "card.explorer.actionslabels.list.card",
+		"type": "card",
+		"title": "Sample of a List With Action Labels",
+		"subTitle": "Sample of a List With Action Labels",
+		"applicationVersion": {
+			"version": "1.0.0"
+		},
+		"shortTitle": "A short title for this Card",
+		"info": "Additional information about this Card",
+		"description": "A long description for this Card",
+		"tags": {
+			"keywords": [
+				"List",
+				"Label",
+				"Card",
+				"Sample"
+			]
+		}
+	},
+	"sap.ui": {
+		"technology": "UI5",
+		"icons": {
+			"icon": "sap-icon://list"
+		}
+	},
+	"sap.card": {
+		"type": "List",
+		"extension": "./SampleExtension",
+		"header": {
+			"title": "{parameters>/title/value}",
+			"subtitle": "{parameters>/subtitle/value}",
+			"icon": {
+				"src": "sap-icon://desktop-mobile"
+			},
+			"status": {
+				"text": "{parameters>/maxItems/value} of 20"
+			}
+		},
+		"configuration": {
+			"parameters": {
+				"title": {
+					"value": "List Card with Top 4 Products"
+				},
+				"subtitle": {
+					"value": "This month's top-selling products"
+				},
+				"maxItems": {
+					"value": 3
+				}
+			}
+		},
+		"content": {
+			"data": {
+				"json": [
+					{
+						"Name": "ITelO Vault",
+						"Description": "Digital Organizer with State-of-the-Art Storage Encryption",
+						"Highlight": "Warning"
+					},
+					{
+						"Name": "Notebook Professional 15",
+						"Description": "Notebook Professional 15 with 2.80 GHz quad core, 15\" Multitouch LCD, 8 GB DDR3 RAM, 500 GB SSD - DVD Writer supporting DVD-R, +R, -RW, and -RAM formats, Windows 8 Pro",
+						"Highlight": "Success"
+					},
+					{
+						"Name": "Ergo Screen E-I",
+						"Description": "Optimum Hi-Resolution max. 1920 x 1080 @ 85Hz, Dot Pitch: 0.27mm",
+						"Highlight": "Information"
+					}
+				]
+			},
+			"maxItems": "{parameters>/maxItems/value}",
+			"item": {
+				"title": "{Name}",
+				"description": "{Description}",
+				"highlight": "{Highlight}",
+				"actionsStrip": [
+					{
+						"buttonType": "Transparent",
+						"text": "Add to Favorites",
+						"actions": [
+							{
+								"type": "Custom",
+								"parameters": {
+									"message": "The item has been successfully added to Favorites.",
+									"type": "Success",
+									"autoClose": true
+								}
+							}
+						]
+					},
+					{
+						"buttonType": "Transparent",
+						"text": "View Details",
+						"actions": [
+							{
+								"type": "Custom",
+								"parameters": {
+									"message": "No details available.",
+									"type": "Error",
+									"autoClose": true
+								}
+							}
+						]
+					},
+					{
+						"type": "Label",
+						"text": "Change",
+						"overflowPriority": "AlwaysOverflow"
+					},
+					{
+						"text": "Change Title",
+						"overflowPriority": "AlwaysOverflow",
+						"actions": [
+							{
+								"type": "Custom",
+								"parameters": {
+									"message": "This action is experimental.",
+									"type": "Warning",
+									"autoClose": true
+								}
+							}
+						]
+					},
+					{
+						"text": "Change Description",
+						"overflowPriority": "AlwaysOverflow",
+						"actions": [
+							{
+								"type": "Custom",
+								"parameters": {
+									"message": "This action is experimental.",
+									"type": "Warning",
+									"autoClose": true
+								}
+							}
+						]
+					},
+					{
+						"type": "Label",
+						"text": "Remove",
+						"overflowPriority": "AlwaysOverflow"
+					},
+					{
+						"buttonType": "Transparent",
+						"text": "Remove Title",
+						"overflowPriority": "AlwaysOverflow",
+						"actions": [
+							{
+								"type": "Custom",
+								"parameters": {
+									"message": "Title is removed.",
+									"type": "Information",
+									"autoClose": true
+								}
+							}
+						]
+					},
+					{
+						"buttonType": "Transparent",
+						"text": "Remove Description",
+						"overflowPriority": "AlwaysOverflow",
+						"actions": [
+							{
+								"type": "Custom",
+								"parameters": {
+									"message": "Description is removed.",
+									"type": "Information",
+									"autoClose": true
+								}
+							}
+						]
+					}
+				]
+			}
+		}
+	}
+}

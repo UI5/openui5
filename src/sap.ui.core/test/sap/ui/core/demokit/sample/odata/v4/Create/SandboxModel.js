@@ -75,6 +75,13 @@ sap.ui.define([
 	 */
 	function buildPostResponse(_aMatches, oResponse, oRequest) {
 		const oRequestBody = JSON.parse(oRequest.requestBody);
+		if (!(oRequestBody.BuyerID in mIdToCompanyName)) {
+			const oError
+				= new Error(`Business Partner with key '${oRequestBody.BuyerID}' does not exist`);
+			oError.target = "BuyerID";
+			throw oError;
+		}
+
 		iInitialId += 1;
 		oCurrentSalesOrder = {
 			BuyerID : oRequestBody.BuyerID,
@@ -89,7 +96,7 @@ sap.ui.define([
 
 		oCurrentSalesOrder.SO_2_BP = {
 			BusinessPartnerID : oCurrentSalesOrder.BuyerID,
-			CompanyName : mIdToCompanyName[oCurrentSalesOrder.BuyerID] ?? "n/a"
+			CompanyName : mIdToCompanyName[oCurrentSalesOrder.BuyerID]
 		};
 	}
 

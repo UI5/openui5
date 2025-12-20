@@ -22,14 +22,14 @@ sap.ui.define([
 	 *
 	 * @since 1.104
 	 */
-	const PersistenceProvider = CoreControl.extend("sap.m.p13n.PersistenceProvider", /** @lends sap.ui.mdc.p13n.PersistenceProvider.prototype */ {
+	const PersistenceProvider = CoreControl.extend("sap.m.p13n.PersistenceProvider", /** @lends sap.m.p13n.PersistenceProvider.prototype */ {
 		metadata: {
 			library: "sap.m",
 			designtime: "sap/m/designtime/PersistenceProvider.designtime",
 			properties: {
 				/**
 				 * Provides the mode setting for the <code>PersistenceProvider</code>.
-				 * Allowed options are {@link sap.ui.mdc.enum.PersistenceMode}.
+				 * Allowed options are {@link sap.m.p13n.enums.PersistenceMode}.
 				 *
 				 * <b>Note:</b> The <code>PersistenceMode</code> option must not be changed after changes have already been made and persisted for a control instance.
 				 * For example, changing the mode from <code>Global</code> to <code>Auto</code> might result in an incompatible mix of different types of changes.

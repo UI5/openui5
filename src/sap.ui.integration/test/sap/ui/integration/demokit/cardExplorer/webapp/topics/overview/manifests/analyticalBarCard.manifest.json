@@ -1,0 +1,217 @@
+{
+	"_version": "%LATEST_SCHEMA_VERSION%",
+	"sap.app": {
+		"id": "card.explorer.analytical.barWithReferenceLines.card",
+		"type": "card",
+		"title": "Sample of Bar Chart With Reference Lines",
+		"subTitle": "Sample of Bar Chart With Reference Lines",
+		"applicationVersion": {
+			"version": "1.0.0"
+		},
+		"shortTitle": "A short title for this Card",
+		"info": "Additional information about this Card",
+		"description": "A long description for this Card",
+		"tags": {
+			"keywords": [
+				"Analytical",
+				"Card",
+				"Bar",
+				"Sample"
+			]
+		}
+	},
+	"sap.ui": {
+		"technology": "UI5"
+	},
+	"sap.card": {
+		"type": "Analytical",
+		"header": {
+			"type": "Numeric",
+			"data": {
+				"json": {
+					"number": "-6.45",
+					"unit": "K",
+					"trend": "Down",
+					"state": "Error",
+					"target": {
+						"number": 100,
+						"unit": "K"
+					},
+					"deviation": {
+						"number": 34.7,
+						"state": "Critical"
+					},
+					"details": "Q1, 2018"
+				}
+			},
+			"title": "Milk Store's Profit",
+			"subtitle": "Analytical Bar Chart",
+			"unitOfMeasurement": "EUR",
+			"mainIndicator": {
+				"number": "{number}",
+				"unit": "{unit}",
+				"trend": "{trend}",
+				"state": "{state}"
+			},
+			"details": "{details}",
+			"sideIndicators": [
+				{
+					"title": "Target",
+					"number": "{target/number}",
+					"unit": "{target/unit}"
+				},
+				{
+					"title": "Deviation",
+					"number": "{deviation/number}",
+					"unit": "%",
+					"state": "{deviation/state}"
+				},
+				{
+					"title": "Previous Year",
+					"number": "37.5k",
+					"unit": "EUR"
+				},
+				{
+					"title": "Current Year",
+					"number": "34.7k",
+					"unit": "EUR"
+				}
+			]
+		},
+		"content": {
+			"data": {
+				"json": [
+					{
+						"Store Name": "BC Market",
+						"Profit": 28939.91,
+						"Revenue": 330030.97,
+						"Revenue Growth": -21091.06,
+						"Target": 20939.91
+					},
+					{
+						"Store Name": "A&A",
+						"Profit": 114037.59,
+						"Revenue": 222148.36,
+						"Revenue Growth": 8110.77,
+						"Target": 84037.59
+					},
+					{
+						"Store Name": "24-Seven",
+						"Profit": 335829.62,
+						"Revenue": 428214.13,
+						"Revenue Growth": 102384.51,
+						"Target": 235829
+					},
+					{
+						"Store Name": "Alexei's Specialties",
+						"Profit": -62037.49,
+						"Revenue": 131176.71,
+						"Revenue Growth": -33214.2,
+						"Target": 74037.59
+					},
+					{
+						"Store Name": "All-you-need Store",
+						"Profit": -22709.36,
+						"Revenue": 178466.82,
+						"Revenue Growth": -52176.18,
+						"Target": 12939.91
+					},
+					{
+						"Store Name": "Choices Franchise 1",
+						"Profit": 28939.91,
+						"Revenue": 330030.97,
+						"Revenue Growth": -21091.06,
+						"Target": 20939.91
+					},
+					{
+						"Store Name": "Choices Franchise 2",
+						"Profit": 202604.65,
+						"Revenue": 442991.59,
+						"Revenue Growth": 20386.94,
+						"Target": 160939.91
+					}
+				]
+			},
+			"chartType": "bar",
+			"chartProperties": {
+				"title": {
+					"visible": false
+				},
+				"legend": {
+					"visible": false
+				},
+				"plotArea": {
+					"referenceLine": {
+						"line": {
+							"valueAxis": [
+								{
+									"value": 40000,
+									"visible": true,
+									"label": {
+										"text": "Low Performance",
+										"visible": true,
+										"background": "sapUiNegativeElement"
+									},
+									"color": "sapUiNegativeElement"
+								},
+								{
+									"value": 120000,
+									"visible": true,
+									"label": {
+										"text": "Medium Performance",
+										"visible": true,
+										"background": "sapUiCriticalElement"
+									},
+									"color": "sapUiCriticalElement"
+								},
+								{
+									"value": 230000,
+									"visible": true,
+									"label": {
+										"text": "High Performance",
+										"visible": true,
+										"background": "sapUiPositiveElement"
+									},
+									"color": "sapUiPositiveElement"
+								}
+							]
+						}
+					}
+				}
+			},
+			"minHeight": "20rem",
+			"dimensions": [
+				{
+					"name": "Store Name",
+					"value": "{Store Name}"
+				}
+			],
+			"measures": [
+				{
+					"name": "Cost",
+					"value": "{Cost}"
+				},
+				{
+					"name": "Profit",
+					"value": "{Profit}"
+				}
+			],
+			"feeds": [
+				{
+					"uid": "valueAxis",
+					"type": "Measure",
+					"values": [
+						"Profit"
+					]
+				},
+				{
+					"uid": "categoryAxis",
+					"type": "Dimension",
+					"values": [
+						"Store Name"
+					]
+				}
+			]
+		}
+	}
+}

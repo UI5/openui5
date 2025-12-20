@@ -36,7 +36,7 @@ sap.ui.define([
 	"sap/m/p13n/Container",
 	"sap/m/table/columnmenu/MenuBase",
 	"sap/m/table/columnmenu/MenuRenderer"
-], function (
+], function(
 	ResponsivePopover,
 	Button,
 	OverflowToolbar,
@@ -73,6 +73,9 @@ sap.ui.define([
 	MenuRenderer
 ) {
 	"use strict";
+
+	// shortcut for sap.ui.core.TitleLevel
+	const TitleLevel = coreLibrary.TitleLevel;
 
 	var HasPopup = coreLibrary.aria.HasPopup;
 	var Category = library.table.columnmenu.Category;
@@ -569,7 +572,7 @@ sap.ui.define([
 
 		this._oItemsContainer.setListHeader(new OverflowToolbar({
 			content: [
-				new Title({text: sTitle})
+				new Title({text: sTitle, level: TitleLevel.H3})
 			]
 		}));
 		this._oItemsContainer.getHeader().addContentRight(new Button({
@@ -701,7 +704,7 @@ sap.ui.define([
 		if (aQuickActions.length) {
 			oList = new List({
 				headerToolbar: new OverflowToolbar({
-					content: [new Title({text: sTitle})]
+					content: [new Title({text: sTitle, level: TitleLevel.H3})]
 				}),
 				keyboardMode: "Edit",
 				items: []

@@ -128,7 +128,7 @@ sap.ui.define([
 	/**
 	 * Returns all available aggregation names containing the given action.
 	 * @param {string} sAction - action to search for the aggregations
-	 * @return {array.<string>} Returns the names of aggregations which contains the given action.
+	 * @return {Array<string>} Returns the names of aggregations which contains the given action.
 	 * @public
 	 */
 	ElementDesignTimeMetadata.prototype.getAggregationNamesWithAction = function(sAction) {

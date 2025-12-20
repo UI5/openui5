@@ -20,6 +20,9 @@ sap.ui.define([
 			 ToolPageRenderer) {
 	"use strict";
 
+	var TP_RANGE_SET = "TPRangeSet";
+	Device.media.initRangeSet(TP_RANGE_SET, [600], "px", ["S", "M"], true);
+
 	// shortcut for sap.m.PageBackgroundDesign
 	var PageBackgroundDesign = mLibrary.PageBackgroundDesign;
 
@@ -53,6 +56,8 @@ sap.ui.define([
 				/**
 				 * Indicates if the side menu is expanded.
 				 * Overrides the <code>expanded</code> property of the <code>sideContent</code> aggregation.
+				 * **Note:** By default, on small screens, the side content is collapsed to provide more space for the main content.
+				 *  On larger screens, it is expanded. This behavior can be overridden by setting this property.
 				 */
 				sideExpanded: {type: "boolean", group: "Misc", defaultValue: true},
 
@@ -121,9 +126,9 @@ sap.ui.define([
 	};
 
 	ToolPage.prototype.onAfterRendering = function () {
-		this._ResizeHandler = ResizeHandler.register(this.getDomRef(), this._mediaQueryHandler.bind(this));
+		this._resizeHandler = ResizeHandler.register(this.getDomRef(), this._resize.bind(this));
 
-		this._updateLastMediaQuery();
+		this._updateLayoutSettings();
 	};
 
 	/**
@@ -145,12 +150,11 @@ sap.ui.define([
 		this.setProperty("sideExpanded", bSideExpanded, true);
 
 		var oSideContent = this.getSideContent();
-		if (oSideContent) {
-			var bNewState = Device.system.phone ? true : bSideExpanded;
-			oSideContent.setExpanded(bNewState);
-		} else {
+		if (!oSideContent) {
 			return this;
 		}
+
+		oSideContent.setExpanded(bSideExpanded);
 
 		var oDomRef = this.getDomRef();
 		if (!oDomRef) {
@@ -170,9 +174,9 @@ sap.ui.define([
 	 * @private
 	 */
 	ToolPage.prototype._deregisterControl = function () {
-		if (this._ResizeHandler) {
-			ResizeHandler.deregister(this._ResizeHandler);
-			this._ResizeHandler = null;
+		if (this._resizeHandler) {
+			ResizeHandler.deregister(this._resizeHandler);
+			this._resizeHandler = null;
 		}
 	};
 
@@ -180,71 +184,36 @@ sap.ui.define([
 	 * Handles the change of the screen size.
 	 * @private
 	 */
-	ToolPage.prototype._mediaQueryHandler = function () {
-		var oSideContent = this.getSideContent();
+	ToolPage.prototype._resize = function () {
+		this._updateLayoutSettings();
+	};
 
-		if (oSideContent === null) {
+	ToolPage.prototype._updateLayoutSettings = function () {
+		const oMediaRange = this._getMediaRange();
+		const sClassName = "sapTntToolPage-Layout" + oMediaRange.name;
+
+		if (this._sCurrentLayoutClassName === sClassName) {
 			return;
 		}
 
-		this._currentMediaQuery = this._getDeviceAsString();
-
-		if (this._getLastMediaQuery() === this._currentMediaQuery) {
-			return;
+		if (this._sCurrentLayoutClassName) {
+			this.removeStyleClass(this._sCurrentLayoutClassName);
 		}
 
-		switch (this._currentMediaQuery) {
-			case "Combi":
-				this.setSideExpanded(true);
-				break;
-			case "Tablet":
-				this.setSideExpanded(false);
-				break;
-			case "Phone":
-				this.setSideExpanded(false);
-				oSideContent.setExpanded(true);
-				break;
-			default:
-				this.setSideExpanded(true);
-		}
+		this.setSideExpanded(this.isPropertyInitial("sideExpanded") ? !this._isLayoutS() : this.getSideExpanded());
 
-		this._updateLastMediaQuery();
+
+		this.addStyleClass(sClassName);
+
+		this._sCurrentLayoutClassName = sClassName;
 	};
 
-	/**
-	 * Returns the last media query.
-	 * @returns {undefined|string}
-	 * @private
-	 */
-	ToolPage.prototype._getLastMediaQuery = function () {
-		return this._lastMediaQuery;
+	ToolPage.prototype._getMediaRange = function () {
+		return Device.media.getCurrentRange(TP_RANGE_SET, window.innerWidth);
 	};
 
-	/**
-	 * Sets the last media query.
-	 * @returns {ToolPage}
-	 * @private
-	 */
-	ToolPage.prototype._updateLastMediaQuery = function () {
-		this._lastMediaQuery = this._getDeviceAsString();
-
-		return this;
-	};
-
-	ToolPage.prototype._getDeviceAsString = function () {
-		if (Device.system.combi) {
-			return "Combi";
-		}
-
-		if (Device.system.phone) {
-			return "Phone";
-		}
-
-		if (Device.system.tablet) {
-			return "Tablet";
-		}
-
-		return "Desktop";
+	ToolPage.prototype._isLayoutS = function () {
+		return this._getMediaRange().name === "S";
 	};
 
 	ToolPage.prototype._onContentChange = function(oChanges) {

@@ -12,7 +12,7 @@ sap.ui.define(
 	) {
 	"use strict";
 
-	var DataTableFilterDropDown = Control.extend("sap.ui.documentation.sdk.DataTableFilterDropDown", /** @lends sap.m.delegate.DateNavigation.prototype */ {
+	var DataTableFilterDropDown = Control.extend("sap.ui.documentation.sdk.DataTableFilterDropDown", /** @lends sap.ui.documentation.sdk.DataTableFilterDropDown.prototype */ {
 		metadata: {
 			properties: {
 				checked: { type: "array", defaultValue: [] },
