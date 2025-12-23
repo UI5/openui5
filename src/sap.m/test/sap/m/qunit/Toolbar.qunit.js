@@ -829,10 +829,11 @@ sap.ui.define([
 	QUnit.test("tests left/right arrow key navigation", function(assert) {
 		var oLabel = new Label({text : "text"}),
 			oButton = new Button({text : "text"}),
+			oMenuButton = new MenuButton({ text : "text", menu : new Menu({items: [new MenuItem({text: "item1"}), new MenuItem({text: "item2"})]}) }),
 			oLink = new Link({text : "text"}),
 			oTB = createToolbar({
 				Toolbar : {
-					content : [oLink, oLabel, oButton]
+					content : [oLink, oMenuButton, oLabel, oButton]
 				}
 			}),
 			oArrowRightEvent = new KeyboardEvent("keydown", { code: KeyCodes.ARROW_RIGHT }),
@@ -843,7 +844,15 @@ sap.ui.define([
 
 		oTB._moveFocus("forward", oArrowRightEvent);
 
+		assert.strictEqual(document.activeElement, oMenuButton._getButtonControl().getDomRef(), "The next interactive element inside the toolbar is focused on arrow right");
+
+		oTB._moveFocus("forward", oArrowRightEvent);
+
 		assert.strictEqual(document.activeElement, oButton.getDomRef(), "The next interactive element inside the toolbar is focused on arrow right");
+
+		oTB._moveFocus("backward", oArrowLeftEvent);
+
+		assert.strictEqual(document.activeElement, oMenuButton._getButtonControl().getDomRef(), "The previous interactive element inside the toolbar is focused on arrow left");
 
 		oTB._moveFocus("backward", oArrowLeftEvent);
 
@@ -851,6 +860,7 @@ sap.ui.define([
 
 		// Cleanup
 		oLabel.destroy();
+		oMenuButton.destroy();
 		oButton.destroy();
 		oLink.destroy();
 		oTB.destroy();
@@ -1001,8 +1011,8 @@ sap.ui.define([
 					content : [oTokenizer]
 				}
 			}),
-			oArrowUpEvent = new KeyboardEvent("keydown", { code: KeyCodes.ARROW_UP }),
-			oArrowDownEvent = new KeyboardEvent("keydown", { code: KeyCodes.ARROW_DOWN }),
+			oArrowUpEvent = new KeyboardEvent("keydown", { keyCode: KeyCodes.ARROW_UP }),
+			oArrowDownEvent = new KeyboardEvent("keydown", { keyCode: KeyCodes.ARROW_DOWN }),
 			oActiveDomElement = oTokenizer.getFocusDomRef();
 
 		var bShouldAllowOnArrowUp = oTB._shouldAllowDefaultBehavior(oActiveDomElement, oTokenizer, oArrowUpEvent);
