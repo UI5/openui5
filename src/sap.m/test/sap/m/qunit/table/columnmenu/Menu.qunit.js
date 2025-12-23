@@ -14,12 +14,12 @@ sap.ui.define([
 	"sap/ui/Device",
 	"sap/ui/core/Element",
 	"sap/ui/core/StaticArea",
+	"sap/ui/core/library",
 	"sap/ui/dom/containsOrEquals",
 	"sap/ui/qunit/QUnitUtils",
 	"sap/ui/qunit/utils/createAndAppendDiv",
 	"sap/ui/test/utils/nextUIUpdate",
-	"sap/ui/performance/trace/FESRHelper",
-	"sap/ui/core/library"
+	"sap/ui/performance/trace/FESRHelper"
 ], function(
 	Button,
 	IllustratedMessageSize,
@@ -35,17 +35,14 @@ sap.ui.define([
 	Device,
 	Element,
 	StaticArea,
+	coreLibrary,
 	containsOrEquals,
 	QUnitUtils,
 	createAndAppendDiv,
 	nextUIUpdate,
-	FESRHelper,
-	coreLibrary
+	FESRHelper
 ) {
 	"use strict";
-
-	// shortcut for sap.ui.core.TitleLevel
-	const TitleLevel = coreLibrary.TitleLevel;
 
 	createAndAppendDiv("content");
 
@@ -257,7 +254,7 @@ sap.ui.define([
 		let oGenericListTitle = this.oColumnMenu._oQuickGenericList.getHeaderToolbar().getTitleControl();
 		assert.equal(oGenericListTitle.getText(), this.oColumnMenu._getResourceText("table.COLUMNMENU_QUICK_GENERIC_ONLY_TITLE"),
 					"Quick actions list title is correct");
-		assert.equal(oGenericListTitle.getLevel(), TitleLevel.H3, "Quick actions list title has correct heading level");
+		assert.equal(oGenericListTitle.getLevel(), coreLibrary.TitleLevel.H3, "Quick actions list title has correct heading level");
 		sActionsListTitle = this.oColumnMenu._oItemsContainer._oNavigationList.getHeaderToolbar().getTitleControl().getText();
 		assert.equal(sActionsListTitle, this.oColumnMenu._getResourceText("table.COLUMNMENU_LIST_ITEMS_TITLE"), "Items list title is correct");
 		this.oColumnMenu.close();
@@ -270,7 +267,7 @@ sap.ui.define([
 		oGenericListTitle = this.oColumnMenu._oQuickGenericList.getHeaderToolbar().getTitleControl();
 		assert.equal(oGenericListTitle.getText(), this.oColumnMenu._getResourceText("table.COLUMNMENU_QUICK_GENERIC_TITLE"),
 					"Quick actions list title is correct");
-		assert.equal(oGenericListTitle.getLevel(), TitleLevel.H3, "Quick actions list title has correct heading level");
+		assert.equal(oGenericListTitle.getLevel(), coreLibrary.TitleLevel.H3, "Quick actions list title has correct heading level");
 
 	});
 

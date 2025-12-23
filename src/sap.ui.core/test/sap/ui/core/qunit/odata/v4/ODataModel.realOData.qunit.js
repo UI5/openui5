@@ -621,7 +621,9 @@ sap.ui.define([
 					sinon.match(sErrorMessage), "sap.ui.model.odata.v4.ODataContextBinding");
 			this.oLogMock.expects("error").twice()
 				.withExactArgs("Failed to invoke " + oSalesOrder1.getPath() + "/" + sInvoiceCreated,
-					sinon.match("500 Internal Server Error"),
+					// stack information is browser-dependent; not all browsers add the original
+					// message ("500 Internal Server Error") to the stack
+					sinon.match.string,
 					"sap.ui.model.odata.v4.ODataContextBinding");
 			this.oLogMock.expects("warning").twice() //TODO avoid this!
 				.withExactArgs("Unknown child R#V#C of " + sNamespace + "Container", "/R#V#C",
