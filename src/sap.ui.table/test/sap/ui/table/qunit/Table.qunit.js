@@ -670,37 +670,6 @@ sap.ui.define([
 		}());
 	});
 
-	/**
-	 * @deprecated As of version 1.119
-	 */
-	QUnit.test("Row height; After binding context update", function(assert) {
-		oTable.destroyRowMode();
-		oTable.removeAllColumns();
-		oTable.addColumn(new Column({template: new HeightTestControl()}));
-		oTable.addColumn(new Column({template: new HeightTestControl({height: "{height}"})}));
-		oTable.setFixedColumnCount(1);
-		oTable.setRowActionCount(1);
-		oTable.setRowActionTemplate(new RowAction());
-		oCore.applyChanges();
-
-		return new Promise(function(resolve) {
-			oTable.attachEventOnce("rowsUpdated", resolve);
-		}).then(function() {
-			// Updating only the content (property bindings of cells) without a binding change event for the rows is not supported.
-			oTable.getBinding().getModel().getData().modelData[oTable.getRows()[0].getIndex()].height = "88px";
-			oTable.getBinding().getModel().refresh(true);
-			return new Promise(function(resolve) {
-				oTable.attachEventOnce("rowsUpdated", resolve);
-			});
-		}).then(function() {
-			var aRowDomRefs = oTable.getRows()[0].getDomRefs();
-			assert.strictEqual(aRowDomRefs.rowSelector.getBoundingClientRect().height, 89, "Selector height is ok");
-			assert.strictEqual(aRowDomRefs.rowFixedPart.getBoundingClientRect().height, 89, "Fixed part height is ok");
-			assert.strictEqual(aRowDomRefs.rowScrollPart.getBoundingClientRect().height, 89, "Scrollable part height is ok");
-			assert.strictEqual(aRowDomRefs.rowAction.getBoundingClientRect().height, 89, "Action height is ok");
-		});
-	});
-
 	QUnit.test("Skip _updateTableSizes if table has no width", function(assert) {
 		var oDomRef = oTable.getDomRef();
 		var oResetRowHeights = sinon.spy(oTable, "_resetRowHeights"); // _resetRowHeights is used to check if a layout update was performed
