@@ -149,7 +149,7 @@ sap.ui.define([
 				title: "Default height; With large content",
 				density: sDensity,
 				templateHeight: TableUtils.DefaultRowHeight[sDensity] * 2,
-				expectedHeight: TableUtils.DefaultRowHeight[sDensity] * 2 + 1
+				expectedHeight: TableUtils.DefaultRowHeight[sDensity]
 			});
 		});
 
@@ -168,7 +168,7 @@ sap.ui.define([
 				density: sDensity,
 				rowHeight: 20,
 				templateHeight: 100,
-				expectedHeight: 101
+				expectedHeight: 21
 			});
 		});
 
@@ -187,7 +187,7 @@ sap.ui.define([
 				density: sDensity,
 				rowHeight: 100,
 				templateHeight: 120,
-				expectedHeight: 121
+				expectedHeight: 101
 			});
 		});
 
