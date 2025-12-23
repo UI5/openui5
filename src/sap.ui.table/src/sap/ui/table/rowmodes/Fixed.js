@@ -229,19 +229,12 @@ sap.ui.define([
 	FixedRowMode.prototype.renderCellContentStyles = function(oRM) {
 		let iRowContentHeight = this.getRowContentHeight();
 
-		/**
-		 * @deprecated As of version 1.119
-		 */
-		if (this.bLegacy) {
-			return;
-		}
-
 		if (iRowContentHeight <= 0) {
 			iRowContentHeight = this.getDefaultRowContentHeightOfTable();
 		}
 
 		if (iRowContentHeight > 0) {
-			oRM.style("max-height", iRowContentHeight + "px");
+			oRM.style("max-height", iRowContentHeight - 1 + "px");
 		}
 	};
 

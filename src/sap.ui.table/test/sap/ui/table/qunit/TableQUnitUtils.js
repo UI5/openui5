@@ -1459,6 +1459,11 @@ sap.ui.define([
 			mTestSettings.title + ": Scrollable part height is ok");
 		assert.strictEqual(aRowDomRefs.rowAction.getBoundingClientRect().height, mTestSettings.expectedHeight,
 			mTestSettings.title + ": Action height is ok");
+
+		if (!oTable.getVisibleRowCountMode()) {
+			const $FirstCellContentInRow = oTable.getRows()[0].getDomRef().querySelector("td > .sapUiTableCellInner");
+			assert.equal($FirstCellContentInRow.style.maxHeight, mTestSettings.expectedHeight - 2 + "px");
+		}
 	};
 
 	/**
