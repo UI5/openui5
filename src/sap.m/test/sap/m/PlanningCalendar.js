@@ -830,7 +830,7 @@ sap.ui.define([
 
 	var oIMNoData = new IllustratedMessage({
 		illustrationType: IllustratedMessageType.EmptyPlanningCalendar,
-		illustrationSize: IllustratedMessageSize.Dialog,
+		illustrationSize: IllustratedMessageSize.Medium,
 		title: "No Data",
 		description: "Try to add rows here"
 	});

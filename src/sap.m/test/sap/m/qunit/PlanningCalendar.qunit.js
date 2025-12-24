@@ -1771,7 +1771,7 @@ sap.ui.define([
 		var oTable = Element.getElementById("PC1-Table"),
 			oIMNoData = new IllustratedMessage({
 				illustrationType: IllustratedMessageType.EmptyPlanningCalendar,
-				illustrationSize: IllustratedMessageSize.Dialog
+				illustrationSize: IllustratedMessageSize.Medium
 			});
 
 		oPC1.setNoData(oIMNoData);

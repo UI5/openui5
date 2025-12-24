@@ -220,9 +220,8 @@ sap.ui.define([
 	 */
 	TableDelegate.onAfterRendering = function(oEvent) {
 		const oTable = this.getTable();
-		const bRenderedRows = oEvent && oEvent.isMarked("renderRows");
 
-		if (!bRenderedRows && oTable.getRows().length > 0) {
+		if (oTable.getRows().length > 0) {
 			this.fireRowsUpdated(TableUtils.RowsUpdateReason.Render);
 		}
 	};

@@ -3305,7 +3305,6 @@ sap.ui.define([
 				]
 			}),
 		oTable = new Table({
-			visibleRowCount: 2,
 			rows: "{/items}",
 			columns: [
 			new Column({

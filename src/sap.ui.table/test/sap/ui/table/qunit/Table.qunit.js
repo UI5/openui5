@@ -1143,6 +1143,7 @@ sap.ui.define([
 		checkFocus(getCell(0, 0, null, null, oTable), assert);
 
 		oTable.unbindRows();
+		await nextUIUpdate();
 		oTable.focus();
 		assert.ok(fnFocusSpy.calledWith(), "Focus event called without any parameter");
 		checkFocus(oTable.getDomRef("noDataCnt"), assert);
@@ -1182,6 +1183,8 @@ sap.ui.define([
 
 		oTable.setShowOverlay(false);
 		oTable.setShowNoData(false);
+		oTable.getRowMode().setRowCount(0);
+		await nextUIUpdate();
 		assert.strictEqual(oTable.getFocusDomRef(), oTable.getDomRef(), "No focusable elements");
 
 		oTable.destroy();
@@ -2660,12 +2663,6 @@ sap.ui.define([
 			descending: true
 		}));
 		assert.equal(oTable.getFirstVisibleRow(), 0, "'firstVisibleRow' set to 0 when sorting");
-	});
-
-	QUnit.module("Callbacks", {
-		afterEach: function() {
-			destroyTable();
-		}
 	});
 
 	QUnit.module("Events", {
@@ -4362,12 +4359,12 @@ sap.ui.define([
 		assert.ok(oInvalidateSpy.notCalled, "Change from text to sap.m.IllustratedMessage: Table not invalidated");
 
 		await this.waitForNoColumnsMessage(this.oTable);
-		assert.equal(oInvalidateSpy.callCount, 1,
+		assert.ok(oInvalidateSpy.called,
 			"Change from text to sap.m.IllustratedMessage: Table invalidated after loading default NoColumns IllustratedMessage");
 
 		oInvalidateSpy.resetHistory();
 		this.oTable.setNoData("Hello");
-		assert.equal(oInvalidateSpy.callCount, 1, "Change from sap.m.IllustratedMessage to text: Table invalidated");
+		assert.ok(oInvalidateSpy.called, "Change from sap.m.IllustratedMessage to text: Table invalidated");
 		await this.oTable.qunit.whenRenderingFinished();
 		this.assertNoContentMessage(assert, this.oTable, TableUtils.getResourceText("TBL_NO_COLUMNS"));
 

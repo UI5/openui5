@@ -178,7 +178,7 @@ sap.ui.define([
 			this.oTable.bindRows(this.oBindingInfo);
 
 			return this.checkRowsUpdated(assert, [
-				TableUtils.RowsUpdateReason.Change
+				TableUtils.RowsUpdateReason.Render
 			]);
 		});
 	});

@@ -36,10 +36,7 @@ sap.ui.define([
 		},
 		isLanguageInfoRequired: true,
 		loadFeatures(mPropertyBag) {
-			return BackendConnector.loadFeatures.call(this, mPropertyBag).then(function(oFeatures) {
-				oFeatures.isContextSharingEnabled = true;
-				return oFeatures;
-			});
+			return BackendConnector.loadFeatures.call(this, mPropertyBag);
 		},
 		loadFlexData(mPropertyBag) {
 			mPropertyBag.cacheable = true;

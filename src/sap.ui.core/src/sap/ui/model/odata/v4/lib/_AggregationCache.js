@@ -2539,7 +2539,7 @@ sap.ui.define([
 			this.oBackup.oFirstLevel = this.oFirstLevel;
 			this.oBackup.oGrandTotalPromise = this.oGrandTotalPromise;
 			this.oBackup.bUnifiedCache = this.bUnifiedCache;
-			this.bUnifiedCache = true;
+			this.bUnifiedCache = !!oAggregation.hierarchyQualifier;
 		} else {
 			this.oTreeState.reset();
 		}

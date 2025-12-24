@@ -1,4 +1,4 @@
-/*global describe,it,browser,element,by,takeScreenshot,expect,jQuery*/
+/*global describe,it,browser,element,by,takeScreenshot,expect*/
 
 describe('sap.m.ObjectStatus', function() {
 	"use strict";
@@ -50,7 +50,10 @@ describe('sap.m.ObjectStatus', function() {
 
 	it('should render properly the focus', function () {
 		browser.executeScript(function() { // scroll page down
-			jQuery(document.getElementById("activeStatus")).control(0).focus();
+			var element = document.getElementById("activeStatus");
+			if (element && element.focus) {
+				element.focus();
+			}
 		});
 		expect(takeScreenshot(element(by.id('activeStatusListItem')))).toLookAs('objectStatusActive_focus');
 	});

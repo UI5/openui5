@@ -5,12 +5,12 @@ sap.ui.define([
   "sap/m/ObjectHeader",
   "sap/ui/core/library",
   "sap/m/ObjectStatus",
+  "sap/m/ObjectMarker",
+  "sap/m/library",
   "sap/m/VBox",
   "sap/m/HBox",
-  "sap/m/library",
   "sap/m/Label",
   "sap/m/Switch",
-  "sap/m/ObjectMarker",
   "sap/m/ProgressIndicator",
   "sap/m/Popover",
   "sap/m/List",
@@ -29,12 +29,12 @@ sap.ui.define([
   ObjectHeader,
   coreLibrary,
   ObjectStatus,
+  ObjectMarker,
+  mobileLibrary,
   VBox,
   HBox,
-  mobileLibrary,
   Label,
   Switch,
-  ObjectMarker,
   ProgressIndicator,
   Popover,
   List,
@@ -55,11 +55,11 @@ sap.ui.define([
   // shortcut for sap.m.PlacementType
   const PlacementType = mobileLibrary.PlacementType;
 
-  // shortcut for sap.m.ObjectMarkerType
-  const ObjectMarkerType = mobileLibrary.ObjectMarkerType;
-
   // shortcut for sap.m.FlexAlignContent
   const FlexAlignContent = mobileLibrary.FlexAlignContent;
+
+  // shortcut for sap.m.ObjectMarkerType
+  const ObjectMarkerType = mobileLibrary.ObjectMarkerType;
 
   // shortcut for sap.ui.core.ValueState
   const ValueState = coreLibrary.ValueState;
@@ -207,7 +207,9 @@ sap.ui.define([
 			  new ObjectAttribute({
 				  text : "Ñagçyfox Contract #D1234567890"
 			  }) ],
-			  markFavorite : true
+			  markers: [
+				  new ObjectMarker({type: ObjectMarkerType.Favorite})
+			  ]
 		  });
 
   var oh4PressHandler = function(oEvent) {
@@ -346,7 +348,6 @@ sap.ui.define([
 	  }),
 	  new ProgressIndicator("oh10-pi", {
 		  visible : true,
-		  enabled : true,
 		  state : ValueState.NEUTRAL,
 		  displayValue : '80%',
 		  percentValue : 80,
@@ -360,7 +361,6 @@ sap.ui.define([
 	  }),
 	  new ProgressIndicator("oh10-pi2", {
 		  visible : true,
-		  enabled : true,
 		  state : ValueState.NEUTRAL,
 		  displayValue : '80%',
 		  percentValue : 80,
@@ -555,29 +555,33 @@ sap.ui.define([
 	  numberState : ValueState.Error,
 	  showTitleSelector : true,
 	  titleSelectorPress : oh16EventHandler,
-	  statuses : [ new ObjectStatus({
-		  text : "Order Shipping slow"
-	  }), new ProgressIndicator("oh18-pi", {
-		  visible : true,
-		  enabled : true,
-		  state : ValueState.NEUTRAL,
-		  displayValue : '56%',
-		  percentValue : 56,
-		  showValue : true,
-		  height : '22px' //1.375rem
-	  }), new ObjectStatus({
-		  text : "Productivity High"
-	  }), new ProgressIndicator("oh18-pi2", {
-		  visible : true,
-		  enabled : true,
-		  state : ValueState.NEUTRAL,
-		  displayValue : '90%',
-		  percentValue : 90,
-		  showValue : true,
-		  height : '22px' //1.375rem
-	  }), new ObjectStatus({
-		  text : "Quality Good"
-	  }) ],
+	  statuses : [
+		  new ObjectStatus({
+			  text : "Order Shipping slow"
+		  }),
+		  new ProgressIndicator("oh18-pi", {
+			  visible : true,
+			  state : ValueState.NEUTRAL,
+			  displayValue : '56%',
+			  percentValue : 56,
+			  showValue : true,
+			  height : '22px' //1.375rem
+		  }),
+		  new ObjectStatus({
+			  text : "Productivity High"
+		  }),
+		  new ProgressIndicator("oh18-pi2", {
+			  visible : true,
+			  state : ValueState.NEUTRAL,
+			  displayValue : '90%',
+			  percentValue : 90,
+			  showValue : true,
+			  height : '22px' //1.375rem
+		  }),
+		  new ObjectStatus({
+			  text : "Quality Good"
+		  })
+	  ],
 	  attributes : [ new ObjectAttribute({
 		  text : "Order Shipping Flag"
 	  }), new ObjectAttribute({
