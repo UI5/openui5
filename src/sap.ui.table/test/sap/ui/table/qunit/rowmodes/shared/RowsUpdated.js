@@ -202,9 +202,7 @@ sap.ui.define([
 		return this.oTable.qunit.whenRenderingFinished().then(() => {
 			this.resetRowsUpdatedSpy();
 			this.oTable.unbindRows();
-			return this.checkRowsUpdated(assert, [
-				TableUtils.RowsUpdateReason.Unbind
-			]);
+			return this.checkRowsUpdated(assert, []);
 		});
 	});
 
@@ -245,7 +243,7 @@ sap.ui.define([
 			this.resetRowsUpdatedSpy();
 			this.oTable.bindRows(this.oBindingInfo);
 			return this.checkRowsUpdated(assert, [
-				TableUtils.RowsUpdateReason.Change
+				TableUtils.RowsUpdateReason.Render
 			]);
 		});
 	});

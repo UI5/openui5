@@ -1213,24 +1213,14 @@ sap.ui.define([
 	};
 
 	Table.prototype.onBeforeRendering = function(oEvent) {
-		// The table can be re-rendered as part of the rendering of its parent, without being invalidated before.
-		this._bInvalid = true;
-
 		this._detachEvents();
-
-		if (oEvent && oEvent.isMarked("renderRows")) {
-			return;
-		}
-
+		this._adjustFirstVisibleRowToTotalRowCount();
 		this._cleanUpTimers();
 		this._aTableHeaders = []; // free references to DOM elements
 	};
 
 	Table.prototype.onAfterRendering = function(oEvent) {
-		const bRenderedRows = oEvent && oEvent.isMarked("renderRows");
-
 		this._bInvalid = false;
-
 		this._attachEvents();
 
 		// since the row is an element it has no own renderer. Anyway, logically it has a domref. Let the rows
@@ -1238,18 +1228,11 @@ sap.ui.define([
 		this._initRowDomRefs();
 
 		// enable/disable text selection for column headers
-		if (!this._bAllowColumnHeaderTextSelection && !bRenderedRows) {
+		if (!this._bAllowColumnHeaderTextSelection) {
 			this._disableTextSelection(this.$().find(".sapUiTableColHdrCnt"));
 		}
 
-		// If only the rows are rendered, the css flag is not removed while the positioning of the actions is reset. Therefore, the flag must be
-		// manually removed so that the actions are later correctly positioned.
-		this.getDomRef().classList.remove("sapUiTableRActFlexible");
-
-		if (!bRenderedRows) {
-			// needed for the column resize ruler
-			this._aTableHeaders = this.$().find(".sapUiTableColHdrCnt th");
-		}
+		this._aTableHeaders = this.$().find(".sapUiTableColHdrCnt th");
 
 		this._updateTableSizes(TableUtils.RowsUpdateReason.Render, true);
 		TableUtils.registerResizeHandler(this, "Table", this._onTableResize.bind(this));
@@ -1481,13 +1464,8 @@ sap.ui.define([
 	};
 
 	Table.prototype.applyFocusInfo = function(mFocusInfo) {
-		delete this._bApplyFocusInfoFailed;
 		if (mFocusInfo && mFocusInfo.customId) {
-			if (document.getElementById(mFocusInfo.customId)) {
-				jQuery(document.getElementById(mFocusInfo.customId)).trigger("focus");
-			} else {
-				this._bApplyFocusInfoFailed = true;
-			}
+			jQuery(document.getElementById(mFocusInfo.customId)).trigger("focus");
 		} else {
 			Control.prototype.applyFocusInfo.apply(this, arguments);
 		}

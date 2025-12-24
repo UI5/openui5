@@ -26,10 +26,7 @@ sap.ui.define([
 	 * @static
 	 * @protected
 	 */
-	var FileUploaderRenderer = {};
-
-	FileUploaderRenderer.apiVersion = 2;
-
+	var FileUploaderRenderer = {apiVersion: 2};
 
 	/**
 	 * Renders the HTML for the given control, using the provided {@link sap.ui.core.RenderManager}.

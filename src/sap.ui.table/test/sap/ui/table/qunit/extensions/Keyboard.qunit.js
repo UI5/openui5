@@ -482,7 +482,7 @@ sap.ui.define([
 		oTable.setModel(new JSONModel());
 	});
 
-	QUnit.test("Focus restoration and item navigation reinitialization", async function(assert) {
+	QUnit.test("Focus restoration", async function(assert) {
 		oTable.setRowActionTemplate(TableQUnitUtils.createRowAction(null));
 		oTable.setRowActionCount(1);
 		await nextUIUpdate();
@@ -502,61 +502,33 @@ sap.ui.define([
 		});
 
 		oKeyboardExtension._debug();
-		const oInitItemNavigationSpy = sinon.spy(oKeyboardExtension._ExtensionHelper, "_initItemNavigation");
 
 		await aTestElementIds.reduce(async function(acc, sId) {
 			await acc;
 
 			document.getElementById(sId).focus();
 
-			oInitItemNavigationSpy.resetHistory();
 			oOnFocusInSpy.resetHistory();
 			oTable.invalidate();
 			await nextUIUpdate();
 
-			assert.ok(oInitItemNavigationSpy.calledOnce, "Re-rendered when focus was on " + sId + ": The item navigation was reinitialized");
 			assert.strictEqual(document.activeElement.id, sId, "Re-rendered when focus was on " + sId + ": The correct element is focused");
 			assert.ok(oOnFocusInSpy.callCount <= 1,
 				"Re-rendered when focus was on " + sId + ": The onfocusin event was not triggered more than once");
-
-			oInitItemNavigationSpy.resetHistory();
-			oOnFocusInSpy.resetHistory();
-			oTable.getRowMode().renderTableRows();
-
-			assert.ok(oInitItemNavigationSpy.calledOnce, "Re-rendered rows when focus was on " + sId + ": The item navigation was reinitialized");
-			assert.strictEqual(document.activeElement.id, sId, "Re-rendered rows when focus was on " + sId + ": The correct element is focused");
-			assert.ok(oOnFocusInSpy.callCount <= 1,
-				"Re-rendered rows when focus was on " + sId + ": The onfocusin event was not triggered more than once");
 		}, Promise.resolve());
 
 		// Focus a cell in the TreeTable to check if the Table steals the focus.
 		const oFocusedElement = getCell(0, 0, true, null, oTreeTable)[0];
 
-		oInitItemNavigationSpy.resetHistory();
 		const oInvalidateItemNavigationSpy = sinon.spy(oKeyboardExtension, "invalidateItemNavigation");
 		oOnFocusInSpy.resetHistory();
 		oTable.invalidate();
 		await nextUIUpdate();
 
-		assert.ok(oInitItemNavigationSpy.notCalled,
-			"Re-rendered when focus was on an element outside the table: The item navigation was not reinitialized");
 		assert.ok(oInvalidateItemNavigationSpy.calledOnce,
 			"Re-rendered when focus was on an element outside the table: The item navigation was invalidated");
 		assert.strictEqual(document.activeElement.id, oFocusedElement.id,
 			"Re-rendered when focus was on an element outside the table: The correct element is focused");
-		assert.ok(oOnFocusInSpy.notCalled,
-			"Re-rendered when focus was on an element outside the table: The onfocusin event was not triggered");
-
-		oInitItemNavigationSpy.resetHistory();
-		oInvalidateItemNavigationSpy.resetHistory();
-		oTable.getRowMode().renderTableRows();
-
-		assert.ok(oInitItemNavigationSpy.notCalled,
-			"Re-rendered rows when focus was on an element outside the table: The item navigation was not reinitialized");
-		assert.ok(oInvalidateItemNavigationSpy.calledOnce,
-			"Re-rendered rows when focus was on an element outside the table: The item navigation was invalidated");
-		assert.strictEqual(document.activeElement.id, oFocusedElement.id,
-			"Re-rendered rows when focus was on an element outside the table: The correct element is focused");
 		assert.ok(oOnFocusInSpy.notCalled,
 			"Re-rendered when focus was on an element outside the table: The onfocusin event was not triggered");
 	});

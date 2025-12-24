@@ -4613,18 +4613,18 @@ sap.ui.define([
 	//*********************************************************************************************
 	[undefined, "~group~"].forEach(function (sGroupId) {
 		[false, true].forEach(function (bHasGrandTotal) {
-			var sTitle = "reset: sGroupId = " + sGroupId + ", has grand total = " + bHasGrandTotal;
+			[false, true].forEach(function (bDataAggregation) {
+		var sTitle = "reset: sGroupId = " + sGroupId + ", has grand total = " + bHasGrandTotal
+				+ ", data aggregation = " + bDataAggregation;
 
 		QUnit.test(sTitle, function (assert) {
-			var oCache = _AggregationCache.create(this.oRequestor, "~", "", {}, {
-					hierarchyQualifier : "X"
-				}),
+			var oCache = _AggregationCache.create(this.oRequestor, "~", "", {},
+				bDataAggregation ? {groupLevels : ["foo"]} : {hierarchyQualifier : "X"}),
 				oFirstLevel = oCache.oFirstLevel,
 				aKeptElementPredicates = ["foo", "bar"],
-				oNewAggregation = {
-					aggregate : "~aggregate~",
-					hierarchyQualifier : "Y"
-				},
+				oNewAggregation = bDataAggregation
+					? {aggregate : "~aggregate~"}
+					: {aggregate : "~aggregate~", hierarchyQualifier : "Y"},
 				sNewAggregation = JSON.stringify(oNewAggregation);
 
 			oCache.aElements.$byPredicate = {
@@ -4665,11 +4665,8 @@ sap.ui.define([
 			this.mock(_AggregationHelper).expects("hasGrandTotal").withExactArgs("~aggregate~")
 				.returns(bHasGrandTotal);
 			const oDoResetExpectation = this.mock(oCache).expects("doReset")
-				.withExactArgs({
-					aggregate : "~aggregate~",
-					hierarchyQualifier : "Y",
-					$ExpandLevels : "~sExpandLevels~"
-				}, bHasGrandTotal);
+				.withExactArgs(Object.assign({}, oNewAggregation, {$ExpandLevels : "~sExpandLevels~"}),
+					bHasGrandTotal);
 
 			// code under test
 			oCache.reset(aKeptElementPredicates, sGroupId, "~mQueryOptions~", oNewAggregation);
@@ -4705,15 +4702,16 @@ sap.ui.define([
 					bUnifiedCache : "~bUnifiedCache~"
 				});
 				assert.strictEqual(oCache.oBackup.oFirstLevel, oFirstLevel);
-				assert.strictEqual(oCache.bUnifiedCache, true);
+				assert.strictEqual(oCache.bUnifiedCache, !bDataAggregation);
 			}
 			assert.strictEqual(JSON.stringify(oNewAggregation), sNewAggregation, "unchanged");
 		});
+			});
 		});
 	});
 
 	//*********************************************************************************************
-	QUnit.test("reset: placeholder", function (assert) {
+	QUnit.test("reset: placeholder (recursive hierarchy only)", function (assert) {
 		var oAggregation = {
 				hierarchyQualifier : "X"
 			},
@@ -4741,17 +4739,20 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test("reset: Unsupported grouping via sorter", function (assert) {
-		var oCache = _AggregationCache.create(this.oRequestor, "~", "", {},
-				{hierarchyQualifier : "X"});
+	[false, true].forEach(function (bDataAggregation) {
+		QUnit.test("reset: Unsupported grouping via sorter, data aggreagtion = " + bDataAggregation,
+				function (assert) {
+			var oCache = _AggregationCache.create(this.oRequestor, "~", "", {},
+					bDataAggregation ? {groupLevels : ["foo"]} : {hierarchyQualifier : "X"});
 
-		this.mock(oCache.oFirstLevel).expects("reset").never();
-		this.mock(oCache).expects("doReset").never();
+			this.mock(oCache.oFirstLevel).expects("reset").never();
+			this.mock(oCache).expects("doReset").never();
 
-		assert.throws(function () {
-			// code under test
-			oCache.reset([], "", {}, undefined, /*bIsGrouped*/true);
-		}, new Error("Unsupported grouping via sorter"));
+			assert.throws(function () {
+				// code under test
+				oCache.reset([], "", {}, undefined, /*bIsGrouped*/true);
+			}, new Error("Unsupported grouping via sorter"));
+		});
 	});
 
 	//*********************************************************************************************

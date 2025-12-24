@@ -149,8 +149,59 @@ sap.ui.define([
 		});
 	});
 
-	QUnit.module("Visibility property set to false", {
-		async beforeEach() {
+	QUnit.module("Rendering tests", {
+		afterEach() {
+			this.oIFrame?.destroy();
+			sandbox.restore();
+		}
+	}, function() {
+		QUnit.test("When setting the size to absolute values", async function(assert) {
+			this.oIFrame = new IFrame({
+				width: "500px",
+				height: "50rem",
+				url: sOpenUI5Url
+			});
+			this.oIFrame.placeAt("qunit-fixture");
+			await nextUIUpdate();
+			const mIframeDimensions = this.oIFrame.getIFrameDomRef().getBoundingClientRect();
+			const rootFontSize = parseFloat(
+				getComputedStyle(document.documentElement).fontSize
+			);
+			assert.strictEqual(
+				mIframeDimensions.width,
+				500,
+				"then the iframe width is scaled correctly"
+			);
+			assert.strictEqual(
+				Math.round(mIframeDimensions.height / rootFontSize),
+				50,
+				"then the iframe height is scaled correctly"
+			);
+		});
+
+		QUnit.test("When setting the size to relative values", async function(assert) {
+			this.oIFrame = new IFrame({
+				width: "50%",
+				height: "50%",
+				url: sOpenUI5Url
+			});
+			this.oIFrame.placeAt("qunit-fixture");
+			await nextUIUpdate();
+			const mParentDimensions = this.oIFrame.getDomRef().parentNode.getBoundingClientRect();
+			const mIframeDimensions = this.oIFrame.getIFrameDomRef().getBoundingClientRect();
+			assert.strictEqual(
+				mIframeDimensions.width,
+				Math.round(mParentDimensions.width / 2),
+				"then the iframe width is scaled correctly"
+			);
+			assert.strictEqual(
+				mIframeDimensions.height,
+				Math.round(mParentDimensions.height / 2),
+				"then the iframe height is scaled correctly"
+			);
+		});
+
+		QUnit.test("IFrame should not be rendered", async function(assert) {
 			this.oIFrame = new IFrame({
 				width: sDefaultSize,
 				height: sDefaultSize,
@@ -159,13 +210,7 @@ sap.ui.define([
 			});
 			this.oIFrame.placeAt("qunit-fixture");
 			await nextUIUpdate();
-		},
-		afterEach() {
-			this.oIFrame.destroy();
-		}
-	}, function() {
-		QUnit.test("IFrame should not be rendered", function(assert) {
-			var oFixtureDom = document.getElementById("qunit-fixture");
+			const oFixtureDom = document.getElementById("qunit-fixture");
 			assert.strictEqual(!!oFixtureDom.querySelector("iframe"), false, "No iframe is being rendered");
 		});
 	});

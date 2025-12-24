@@ -27,23 +27,25 @@ sap.ui.define([
 			};
 			sandbox.stub(Utils, "sendRequest").resolves({ response: { someFeature: true } });
 			return KeyUserConnector.loadFeatures(mPropertyBag).then(function(oResponse) {
-				assert.deepEqual(oResponse, { isContextSharingEnabled: true, someFeature: true }, "the settings object is returned correctly");
+				assert.deepEqual(oResponse, { someFeature: true }, "the settings object is returned correctly");
 			});
 		});
 
-		QUnit.test("receives the flags 'isPublicLayerAvailable' false and 'isVariantAdaptationEnabled' false", function(assert) {
+		QUnit.test("receives the flags 'isPublicLayerAvailable' false, 'isVariantAdaptationEnabled' false and 'isContextSharingEnabled' false", function(assert) {
 			var mPropertyBag = {
 				url: "/flexKeyuser"
 			};
 			var oSettingsResponse = {
 				isPublicLayerAvailable: false,
-				isVariantAdaptationEnabled: false
+				isVariantAdaptationEnabled: false,
+				isContextSharingEnabled: false
 			};
 
 			sandbox.stub(Utils, "sendRequest").resolves({ response: oSettingsResponse });
 			return KeyUserConnector.loadFeatures(mPropertyBag).then(function(oResponse) {
 				assert.equal(oResponse.isPublicLayerAvailable, false, "the isPublicLayerAvailable is correct");
 				assert.equal(oResponse.isVariantAdaptationEnabled, false, "the isVariantAdaptationEnabled is correct");
+				assert.equal(oResponse.isContextSharingEnabled, false, "the isContextSharingEnabled is correct");
 			});
 		});
 

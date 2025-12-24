@@ -27368,6 +27368,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// suspended. The kept-alive context gets destroyed if the entity was deleted on the server.
 	// In case of a side-effects refresh the kept-alive entities are also refreshed.
 	// JIRA: CPOUI5ODATAV4-2757
+	//
+	// After a side-effects refresh follow-up requests, e.g. for expanding a node, are as expected.
+	// JIRA: CPOUI5ODATAV4-3284
 	QUnit.test("Data Aggregation: keep alive single entity", async function (assert) {
 		const oModel = this.createAggregationModel({autoExpandSelect : true});
 		const sView = `
@@ -27575,10 +27578,31 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			.expectChange("salesAmount", [, null])
 			.expectChange("currency", [, null]);
 
-		return Promise.all([
+		await Promise.all([
 			// code under test
 			oListBinding.getHeaderContext().requestSideEffects([""]),
 			this.waitForChanges(assert, "side-effects refresh")
+		]);
+
+		this.expectRequest("BusinessPartners?$apply=filter(Country eq 'A')"
+				+ "/groupby((Id,Name),aggregate(SalesAmount,Currency))"
+				+ "&$count=true&$skip=0&$top=3", {
+				"@odata.count" : "2",
+				value : [
+					{Id : 26, Name : "Foo", Currency : "EUR", SalesAmount : "61"},
+					{Id : 24, Name : "Baz", Currency : "EUR", SalesAmount : "20"}
+				]
+			})
+			.expectChange("country", [, "A", "A"])
+			.expectChange("id", [, "26", "24"])
+			.expectChange("name", [, "Foo", "Baz"])
+			.expectChange("salesAmount", [, "61", "20"])
+			.expectChange("currency", [, "EUR", "EUR"]);
+
+		await Promise.all([
+			// code under test (JIRA: CPOUI5ODATAV4-3284)
+			oListBinding.getCurrentContexts()[0].expand(),
+			this.waitForChanges(assert, "expand Country 'A' again")
 		]);
 	});
 

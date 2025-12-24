@@ -48,8 +48,8 @@ sap.ui.define([
 		// Assign a unique id to render a fresh dom element for the iframe on every rerender
 		// This will avoid that src changes add to the history as the src is always the initial value of the new element
 		oRm.openStart("iframe", `${oIFrame.getId()}-${uid()}`);
-		_setDimensionAsStyle(oRm, "width", oIFrame.getWidth());
-		_setDimensionAsStyle(oRm, "height", oIFrame.getHeight());
+		oRm.style("width", "100%");
+		oRm.style("height", "100%");
 		oRm.style("display", "block");
 		oRm.style("border", "none");
 

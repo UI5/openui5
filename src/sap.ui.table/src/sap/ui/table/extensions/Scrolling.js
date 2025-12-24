@@ -2162,14 +2162,6 @@ sap.ui.define([
 		},
 
 		onAfterRendering: function(oEvent) {
-			const oScrollExtension = this._getScrollExtension();
-			const bRenderedRows = oEvent != null && oEvent.isMarked("renderRows");
-
-			if (bRenderedRows) {
-				oScrollExtension.updateVerticalScrollbarHeight();
-				oScrollExtension.updateVerticalScrollHeight();
-			}
-
 			VerticalScrollingHelper.restoreScrollPosition(this, this.getBinding() != null);
 			HorizontalScrollingHelper.restoreScrollPosition(this);
 		},

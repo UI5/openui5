@@ -108,9 +108,9 @@ sap.ui.define([
 		await this.oTable.qunit.whenRenderingFinished();
 		this.oTable.bindRows({path: "/Products"});
 
-		// refreshRows, updateRows
+		// refreshRows, updateRows, render
 		return this.oTable.qunit.whenRenderingFinished().then(() => {
-			assert.equal(this.oGetContextsSpy.callCount, 2, "Call count of method to get contexts");
+			assert.equal(this.oGetContextsSpy.callCount, 3, "Call count of method to get contexts");
 			sinon.assert.alwaysCalledWithExactly(this.oGetContextsSpy, 0, 10, 10);
 		});
 	});

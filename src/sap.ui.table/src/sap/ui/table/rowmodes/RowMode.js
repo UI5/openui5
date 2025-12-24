@@ -5,13 +5,11 @@ sap.ui.define([
 	"../utils/TableUtils",
 	"sap/ui/core/Element",
 	"sap/ui/core/RenderManager",
-	"sap/ui/thirdparty/jquery",
 	"sap/ui/Device"
 ], function(
 	TableUtils,
 	Element,
 	RenderManager,
-	jQuery,
 	Device
 ) {
 	"use strict";
@@ -249,28 +247,19 @@ sap.ui.define([
 		}
 
 		_private(this).updateTableAsync.cancel(); // Update will be performed right now.
+		this.updateTableRows(); // Update the rows aggregation and the binding contexts of rows.
 
-		// Update the rows aggregation and the row's binding contexts.
-		oTable._adjustFirstVisibleRowToTotalRowCount(); // TODO: Move this to Table#onBeforeRendering as soon as #renderTableRows is removed
-		const bRowsAggregationChanged = this.updateTableRows();
+		const aRows = oTable.getRows();
 
-		if (oTable._bInvalid) {
-			// No need to update the DOM or fire the _rowsUpdated event if the table is about to rerender.
-			return;
+		if (!oTable._bInvalid && aRows.some((oRow) => !oRow.getDomRef())) {
+			// Rows might have been added to the table in the dataRequested listener without invalidating the table.
+			// In this case, invalidate the table to make sure the rows are rendered.
+			this.invalidate();
 		}
 
-		// Update the DOM.
-		this.applyTableStyles();
-		this.applyRowContainerStyles();
-		this.applyTableBottomPlaceholderStyles();
-
-		if (bRowsAggregationChanged || oTable.getRows().some(function(oRow) {
-			return oRow.getDomRef() == null;
-		})) {
-			this.renderTableRows();
-		}
-
-		if (bRowsAggregationChanged || oTable.getRows().length > 0) {
+		if (!oTable._bInvalid && aRows.length > 0) {
+			// If the table is invalid and therefore renders, the event will be fired after rendering.
+			// Otherwise, fire it now, because the binding contexts of the rows were updated.
 			this.fireRowsUpdated(sReason);
 		}
 	};
@@ -586,14 +575,12 @@ sap.ui.define([
 	 * binding contexts for new rows.
 	 * The row count is ignored if the rows are not bound and the NoData overlay is enabled. In this case, the rows aggregation will be emptied.
 	 *
-	 * @returns {boolean} Whether the rows aggregation of the table has been changed.
 	 * @private
 	 */
 	RowMode.prototype.updateTableRows = function() {
 		const oTable = this.getTable();
 		let aRows = oTable.getRows();
 		let iNewNumberOfRows = this.getComputedRowCounts().count;
-		let bRowsAggregationChanged = false;
 
 		// There is no need to have rows in the aggregation if the NoData overlay is enabled and no binding is available.
 		if (TableUtils.isNoDataVisible(oTable) && !oTable.getBinding()) {
@@ -613,14 +600,13 @@ sap.ui.define([
 		// Destroy rows if they are invalid, but keep the DOM in case the table is going to render.
 		// Becomes obsolete with CPOUIFTEAMB-1379
 		if (oTable._bRowAggregationInvalid) {
-			bRowsAggregationChanged = aRows.length > 0;
-			oTable.destroyAggregation("rows", oTable._bInvalid ? "KeepDom" : true);
+			oTable.destroyAggregation("rows", oTable._bInvalid ? "KeepDom" : undefined);
 			aRows = [];
 		}
 
 		if (iNewNumberOfRows === aRows.length) {
 			updateBindingContextsOfRows(this, aRows);
-			return bRowsAggregationChanged;
+			return;
 		}
 
 		TableUtils.dynamicCall(oTable._getSyncExtension, function(oSyncExtension) {
@@ -628,59 +614,7 @@ sap.ui.define([
 		});
 
 		updateRowsAggregation(this, iNewNumberOfRows);
-		bRowsAggregationChanged = true;
 		oTable._bRowAggregationInvalid = false;
-
-		return bRowsAggregationChanged;
-	};
-
-	/**
-	 * Renders the rows and their containers and writes the HTML to the DOM.
-	 *
-	 * @private
-	 */
-	RowMode.prototype.renderTableRows = function() {
-		const oTable = this.getTable();
-		const oTBody = oTable ? oTable.getDomRef("tableCCnt") : null;
-
-		if (!oTBody) {
-			return;
-		}
-
-		// make sure to call rendering event delegates even in case of DOM patching
-		const oBeforeRenderingEvent = jQuery.Event("BeforeRendering");
-		oBeforeRenderingEvent.setMarked("renderRows");
-		oBeforeRenderingEvent.srcControl = oTable;
-		oTable._handleEvent(oBeforeRenderingEvent);
-
-		const oRM = new RenderManager().getInterface();
-		const oRenderer = oTable.getRenderer();
-		oRenderer.renderTableCCnt(oRM, oTable);
-		oRM.flush(oTBody, false, false);
-		oRM.destroy();
-
-		// make sure to call rendering event delegates even in case of DOM patching
-		const oAfterRenderingEvent = jQuery.Event("AfterRendering");
-		oAfterRenderingEvent.setMarked("renderRows");
-		oAfterRenderingEvent.srcControl = oTable;
-		oTable._handleEvent(oAfterRenderingEvent);
-
-		const bHasRows = oTable.getRows().length > 0;
-		const oDomRef = oTable.getDomRef();
-		oDomRef.querySelector(".sapUiTableCtrlBefore").setAttribute("tabindex", bHasRows ? "0" : "-1");
-		oDomRef.querySelector(".sapUiTableCtrlAfter").setAttribute("tabindex", bHasRows ? "0" : "-1");
-
-		// In Safari, minWidths do not work for td's, so the width property needs to be set on the table.
-		// This does not work, when the table is in AutoRowMode and has many columns with only minWidth.
-		// The width of the content table is overwritten due to a second rerendering triggered in here.
-		// Therefore, the width is set of the content table is set back to be the same as the header table.
-		// BCP: 2380079867
-		if (Device.browser.safari) {
-			const oHdrCol = document.getElementById(oTable.getId() + "-header");
-			const oHdrCnt = document.getElementById(oTable.getId() + "-table");
-
-			oHdrCnt.style.width = oHdrCol.style.width;
-		}
 	};
 
 	/**
@@ -797,12 +731,12 @@ sap.ui.define([
 			updateBindingContextsOfRows(oMode, aRows);
 
 			aNewRows.forEach(function(oNewRow) {
-				oTable.addAggregation("rows", oNewRow, true);
+				oTable.addAggregation("rows", oNewRow);
 			});
 		} else {
 			// Remove rows that are not required.
 			for (let i = aRows.length - 1; i >= iNewNumberOfRows; i--) {
-				oTable.removeAggregation("rows", i, true);
+				oTable.removeAggregation("rows", i);
 			}
 
 			aRows.splice(iNewNumberOfRows);
@@ -857,12 +791,8 @@ sap.ui.define([
 	 * @this sap.ui.table.rowmodes.RowMode
 	 */
 	TableDelegate.onBeforeRendering = function(oEvent) {
-		const bRenderedRows = oEvent && oEvent.isMarked("renderRows");
-
-		if (!bRenderedRows) {
-			this._bFiredRowsUpdatedAfterRendering = false;
-			this.updateTable(TableUtils.RowsUpdateReason.Render);
-		}
+		this._bFiredRowsUpdatedAfterRendering = false;
+		this.updateTable(TableUtils.RowsUpdateReason.Render);
 	};
 
 	return RowMode;

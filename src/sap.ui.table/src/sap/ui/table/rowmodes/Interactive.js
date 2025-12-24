@@ -88,9 +88,19 @@ sap.ui.define([
 	 */
 	const ResizeHelper = {};
 
-	function setNewRowCount(iRowCount) {
-		_private(this).rowCount = iRowCount;
-		InvisibleMessage.getInstance().announce(TableUtils.getResourceText("TBL_RSZ_RESIZED", [iRowCount]));
+	function setNewRowCount(iRowCount, bAnnounceChange = true) {
+		const oInternalState = _private(this);
+
+		if (oInternalState.rowCount === iRowCount) {
+			return;
+		}
+
+		oInternalState.rowCount = iRowCount;
+		this.invalidate();
+
+		if (bAnnounceChange) {
+			InvisibleMessage.getInstance().announce(TableUtils.getResourceText("TBL_RSZ_RESIZED", [iRowCount]));
+		}
 	}
 
 	/**
@@ -326,9 +336,8 @@ sap.ui.define([
 	 */
 	TableDelegate.onAfterRendering = function(oEvent) {
 		const oTable = this.getTable();
-		const bRenderedRows = oEvent && oEvent.isMarked("renderRows");
 
-		if (!bRenderedRows && oTable.getRows().length > 0) {
+		if (oTable.getRows().length > 0) {
 			this.fireRowsUpdated(TableUtils.RowsUpdateReason.Render);
 		}
 
@@ -365,22 +374,18 @@ sap.ui.define([
 				case "ArrowUp":
 					oEvent.preventDefault();
 					setNewRowCount.call(this, Math.max(this.getActualRowCount() - 1, this.getMinRowCount()));
-					this.updateTable(TableUtils.RowsUpdateReason.Render);
 					break;
 				case "ArrowDown":
 					oEvent.preventDefault();
 					setNewRowCount.call(this, Math.min(this.getActualRowCount() + 1, this._getMaxRowCount()));
-					this.updateTable(TableUtils.RowsUpdateReason.Render);
 					break;
 				case "Home":
 					oEvent.preventDefault();
 					setNewRowCount.call(this, this.getMinRowCount());
-					this.updateTable(TableUtils.RowsUpdateReason.Render);
 					break;
 				case "End":
 					oEvent.preventDefault();
 					setNewRowCount.call(this, this._getMaxRowCount());
-					this.updateTable(TableUtils.RowsUpdateReason.Render);
 					break;
 				default:
 			}
@@ -393,6 +398,7 @@ sap.ui.define([
 		}
 
 		const iActualRowCount = this.getActualRowCount();
+
 		if (iActualRowCount === this._getMaxRowCount()) {
 			setNewRowCount.call(this, this.getMinRowCount());
 		} else if (iActualRowCount === this.getMinRowCount()) {
@@ -400,7 +406,6 @@ sap.ui.define([
 		} else {
 			setNewRowCount.call(this, this._getMaxRowCount());
 		}
-		this.updateTable(TableUtils.RowsUpdateReason.Render);
 	};
 
 	/**
@@ -456,7 +461,6 @@ sap.ui.define([
 		}
 
 		setNewRowCount.call(oMode, iNewRowCount);
-		oMode.updateTable(TableUtils.RowsUpdateReason.Render);
 
 		document.removeEventListener("touchmove", ResizeHelper.onResizerMove);
 		document.removeEventListener("mousemove", ResizeHelper.onResizerMove);
@@ -476,8 +480,7 @@ sap.ui.define([
 						shortcutText: TableUtils.getResourceText("TBL_RSZ_ROW_UP_SHORTCUT"),
 						select: function() {
 							const iRowCount = oMode.getActualRowCount();
-							_private(oMode).rowCount = Math.max(iRowCount - 1, oMode.getMinRowCount());
-							oMode.updateTable(TableUtils.RowsUpdateReason.Render);
+							setNewRowCount.call(oMode, Math.max(iRowCount - 1, oMode.getMinRowCount()), false);
 						}
 					}),
 					new MenuItem({
@@ -485,24 +488,21 @@ sap.ui.define([
 						shortcutText: TableUtils.getResourceText("TBL_RSZ_ROW_DOWN_SHORTCUT"),
 						select: function() {
 							const iRowCount = oMode.getActualRowCount();
-							_private(oMode).rowCount = Math.min(iRowCount + 1, oMode._getMaxRowCount());
-							oMode.updateTable(TableUtils.RowsUpdateReason.Render);
+							setNewRowCount.call(oMode, Math.min(iRowCount + 1, oMode._getMaxRowCount()), false);
 						}
 					}),
 					new MenuItem({
 						text: TableUtils.getResourceText("TBL_RSZ_MINIMIZE"),
 						shortcutText: TableUtils.getResourceText("TBL_RSZ_MINIMIZE_SHORTCUT"),
 						select: function() {
-							_private(oMode).rowCount = oMode.getMinRowCount();
-							oMode.updateTable(TableUtils.RowsUpdateReason.Render);
+							setNewRowCount.call(oMode, oMode.getMinRowCount(), false);
 						}
 					}),
 					new MenuItem({
 						text: TableUtils.getResourceText("TBL_RSZ_MAXIMIZE"),
 						shortcutText: TableUtils.getResourceText("TBL_RSZ_MAXIMIZE_SHORTCUT"),
 						select: function() {
-							_private(oMode).rowCount = oMode._getMaxRowCount();
-							oMode.updateTable(TableUtils.RowsUpdateReason.Render);
+							setNewRowCount.call(oMode, oMode._getMaxRowCount(), false);
 						}
 					})
 				],
