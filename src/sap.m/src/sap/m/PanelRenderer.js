@@ -33,10 +33,15 @@ sap.ui.define(["sap/m/library", "sap/ui/Device"],
 	};
 
 	PanelRenderer.startPanel = function (oRm, oControl) {
+		var bIsExpandable = oControl.getExpandable();
+
 		oRm.write("<div");
 		oRm.writeControlData(oControl);
 		oRm.addClass("sapMPanel");
 		oRm.writeClasses();
+		if (bIsExpandable) {
+                  oRm.addClass("sapMPanelExpandable");
+		}
 		oRm.addStyle("width", oControl.getWidth());
 		oRm.addStyle("height", oControl.getHeight());
 		oRm.writeStyles();
