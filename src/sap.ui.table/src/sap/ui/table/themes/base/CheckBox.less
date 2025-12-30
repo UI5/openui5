@@ -1,0 +1,51 @@
+/* ================================== */
+/* CSS for sap.ui.table/CheckBox      */
+/* Base theme                         */
+/* ================================== */
+
+@_sap_ui_table_CheckBox_Size: 1rem;
+@_sap_ui_table_CheckBox_SizeCozy: 1.375rem;
+@_sap_ui_table_CheckBox_CheckMarkColor: var(--sapContent_Selected_ForegroundColor);
+@_sap_ui_table_CheckBox_BackgroundColorHover: var(--sapField_Selector_Hover_Background);
+
+.sapUiTableCheckBox {
+	&::after {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		text-align: center;
+		content: '';
+		width: @_sap_ui_table_CheckBox_Size;
+		height: @_sap_ui_table_CheckBox_Size;
+		font-family: var(--sapContent_IconFontFamily);
+		font-size: 0.625rem;
+		border-radius: var(--sapField_BorderCornerRadius);
+		border: var(--sapField_BorderWidth) var(--sapField_Selector_BorderStyle) var(--sapField_BorderColor);
+		background-color: var(--sapField_Background);
+		color: @_sap_ui_table_CheckBox_CheckMarkColor;
+		box-sizing: border-box;
+		margin: auto;
+		position: absolute;
+		top: 0;
+		left: 0;
+		bottom: 0;
+		right: 0;
+
+		.sapUiSizeCozy & {
+			width: @_sap_ui_table_CheckBox_SizeCozy;
+			height: @_sap_ui_table_CheckBox_SizeCozy;
+			font-size: 1rem;
+		}
+	}
+
+	&.sapUiTableCheckBoxSelected::after {
+		content: '\e05b';
+		border-color: var(--sapContent_FocusColor);
+	}
+
+	&:hover::after {
+		border-color: var(--sapField_Hover_BorderColor);
+		background-color: @_sap_ui_table_CheckBox_BackgroundColorHover;
+		box-shadow: var(--sapContent_Interaction_Shadow);
+	}
+}

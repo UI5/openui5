@@ -171,7 +171,7 @@
 						<link>
 							<Link text="{i18n>IFRAME_ADDIFRAME_DIALOG_URL_INFO_LINKTEXT}"
 								target="_blank"
-								href="https://help.sap.com/docs/search?q=Embedding%20Content%20%28Object%20Pages%29"/>
+								href="{path: '/', formatter: '.formatDocumentationUrl'}"/>
 						</link>
 					</MessageStrip>
 				</VBox>

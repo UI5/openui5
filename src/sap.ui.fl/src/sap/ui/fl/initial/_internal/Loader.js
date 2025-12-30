@@ -229,8 +229,14 @@ sap.ui.define([
 
 		let oFlexData;
 		let oAuthors;
+		let bPreviouslyFilledData = false;
 		const sComponentName = ManifestUtils.getBaseComponentNameFromManifest(mPropertyBag.manifest);
 		if (bRequiresNewLoadRequest) {
+			// If relevant data was previously cached, initializing is still required to clean up the state
+			// e.g. when discarding a draft that contained all existing changes
+			bPreviouslyFilledData = _mCachedFlexData[sReference]
+				&& StorageUtils.isStorageResponseFilled(_mCachedFlexData[sReference].data.changes);
+
 			// the cache key cannot be used in case of a reinitialization
 			const sCacheKey = mPropertyBag.reInitialize
 				? undefined
@@ -250,6 +256,7 @@ sap.ui.define([
 			const oSettings = await Settings.getInstance();
 			oAuthors = oSettings.getIsVariantAuthorNameAvailable() ? await Storage.loadVariantsAuthors(sReference) : {};
 		} else {
+			bPreviouslyFilledData = _mCachedFlexData[sReference].parameters.previouslyFilledData;
 			oFlexData = await Storage.completeFlexData({
 				reference: sReference,
 				componentName: sComponentName,
@@ -276,7 +283,8 @@ sap.ui.define([
 				version: sVersion,
 				allContextsProvided: bAllContextsProvided,
 				adaptationId: sAdaptationId,
-				loaderCacheKey: uid()
+				loaderCacheKey: uid(),
+				previouslyFilledData: bPreviouslyFilledData
 			}
 		};
 

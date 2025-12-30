@@ -56,8 +56,7 @@ sap.ui.define([
 					} else {
 						this.waitFor({
 							check: function() {
-								return oTable.getDomRef("innerTable-selall")
-									?.querySelector(".sapUiTableSelAllVisible > .sapUiTableSelectAllCheckBox");
+								return oTable.getDomRef("innerTable-selall")?.querySelector(".sapUiTableCheckBox");
 							},
 							success: function() {
 								Opa5.assert.ok(true, "Table has 'Select All' check box");

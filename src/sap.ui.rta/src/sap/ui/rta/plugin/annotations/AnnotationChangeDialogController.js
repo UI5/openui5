@@ -13,7 +13,8 @@ sap.ui.define([
 	"sap/ui/layout/form/FormElement",
 	"sap/ui/model/Filter",
 	"sap/ui/model/FilterOperator",
-	"sap/ui/rta/plugin/annotations/AnnotationTypes"
+	"sap/ui/rta/plugin/annotations/AnnotationTypes",
+	"sap/ui/rta/Utils"
 ], function(
 	Input,
 	Label,
@@ -25,7 +26,8 @@ sap.ui.define([
 	FormElement,
 	Filter,
 	FilterOperator,
-	AnnotationTypes
+	AnnotationTypes,
+	RtaUtils
 ) {
 	"use strict";
 
@@ -45,6 +47,16 @@ sap.ui.define([
 		return new Promise((resolve) => {
 			this._fnResolveAfterClose = resolve;
 		});
+	};
+
+	AnnotationChangeDialogController.prototype.formatDocumentationUrl = function() {
+		const oDocumentationUrls = {
+			btpUrl: "https://help.sap.com/docs/ui5-flexibility-for-key-users/ui5-flexibility-for-key-users/making-ui-changes",
+			s4HanaCloudUrl: "https://help.sap.com/docs/SAP_S4HANA_CLOUD/4fc8d03390c342da8a60f8ee387bca1a/54270a390b194c3e97be2424592c3352.html",
+			s4HanaOnPremUrl: "https://help.sap.com/docs/ABAP_PLATFORM_NEW/a7b390faab1140c087b8926571e942b7/54270a390b194c3e97be2424592c3352.html"
+		};
+
+		return RtaUtils.getSystemSpecificDocumentationUrl(oDocumentationUrls);
 	};
 
 	AnnotationChangeDialogController.prototype.filterProperties = function(sQuery, bEquals) {

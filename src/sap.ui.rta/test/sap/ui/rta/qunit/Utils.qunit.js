@@ -11,6 +11,7 @@ sap.ui.define([
 	"sap/ui/dt/DesignTime",
 	"sap/ui/dt/OverlayRegistry",
 	"sap/ui/dt/OverlayUtil",
+	"sap/ui/fl/apply/api/FlexRuntimeInfoAPI",
 	"sap/ui/fl/Layer",
 	"sap/ui/fl/Utils",
 	"sap/ui/rta/util/BindingsExtractor",
@@ -32,6 +33,7 @@ sap.ui.define([
 	DesignTime,
 	OverlayRegistry,
 	OverlayUtil,
+	FlexRuntimeInfoAPI,
 	Layer,
 	FlexUtils,
 	BindingsExtractor,
@@ -625,6 +627,46 @@ sap.ui.define([
 					"then no action is emphasized"
 				);
 			}.bind(this));
+		});
+	});
+
+	QUnit.module("getSystemSpecificDocumentationUrl", {
+		beforeEach() {
+			this.oDocumentationUrls = {
+				btpUrl: "https://btp.example.com",
+				s4HanaCloudUrl: "https://s4hana-cloud.example.com",
+				s4HanaOnPremUrl: "https://s4hana-onprem.example.com"
+			};
+		},
+		afterEach() {
+			sandbox.restore();
+		}
+	}, function() {
+		QUnit.test("when called with BTP system (no system defined)", function(assert) {
+			sandbox.stub(FlexRuntimeInfoAPI, "getSystem").returns(undefined);
+			sandbox.stub(Utils, "isS4HanaCloud").returns(false);
+
+			const sResult = Utils.getSystemSpecificDocumentationUrl(this.oDocumentationUrls);
+
+			assert.strictEqual(sResult, "https://btp.example.com", "then the BTP URL is returned");
+		});
+
+		QUnit.test("when called with S/4HANA Cloud system", function(assert) {
+			sandbox.stub(FlexRuntimeInfoAPI, "getSystem").returns("S4HANA_CLOUD");
+			sandbox.stub(Utils, "isS4HanaCloud").returns(true);
+
+			const sResult = Utils.getSystemSpecificDocumentationUrl(this.oDocumentationUrls);
+
+			assert.strictEqual(sResult, "https://s4hana-cloud.example.com", "then the S/4HANA Cloud URL is returned");
+		});
+
+		QUnit.test("when called with S/4HANA On-Premise system", function(assert) {
+			sandbox.stub(FlexRuntimeInfoAPI, "getSystem").returns("S4HANA");
+			sandbox.stub(Utils, "isS4HanaCloud").returns(false);
+
+			const sResult = Utils.getSystemSpecificDocumentationUrl(this.oDocumentationUrls);
+
+			assert.strictEqual(sResult, "https://s4hana-onprem.example.com", "then the S/4HANA On-Premise URL is returned");
 		});
 	});
 

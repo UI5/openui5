@@ -131,13 +131,15 @@ sap.ui.define([
 		} else if (sLayer === Layer.USER) {
 			return true;
 		}
-		var oSettings = Settings.getInstanceOrUndef();
+		const oSettings = Settings.getInstanceOrUndef();
 
 		if (LayerUtils.isSapUiLayerParameterProvided()) {
 			sActiveLayer = LayerUtils.getCurrentLayer();
 		} else {sActiveLayer ||= oSettings.getIsPublicLayerAvailable() ? Layer.PUBLIC : Layer.CUSTOMER;}
-		var bLayerWritable = sLayer === sActiveLayer;
-		var bUserAuthorized = oSettings.getIsKeyUser() || isUserAuthor(sUserId);
+		// In the PUBLIC layer, the variant is only editable if the user is key user OR the author with variant sharing enabled
+		const bPublicLayerCheck = sActiveLayer !== Layer.PUBLIC || oSettings.getIsVariantSharingEnabled();
+		const bLayerWritable = sLayer === sActiveLayer;
+		const bUserAuthorized = oSettings.getIsKeyUser() || (isUserAuthor(sUserId) && bPublicLayerCheck);
 
 		return bLayerWritable && bUserAuthorized;
 	}
@@ -186,7 +188,7 @@ sap.ui.define([
 	};
 
 	/**
-	 * Checks whenever the variant can be renamed updating the entity or crating an <code>updateChange</code>.
+	 * Checks whenever the variant can be renamed updating the entity or creating an <code>updateChange</code>.
 	 * @param {sap.ui.fl.Layer} [sLayer] - Layer in which the edition may take place
 	 * @returns {boolean} <code>true</code> if the variant can be updated
 	 */
