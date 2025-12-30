@@ -45,17 +45,9 @@ sap.ui.define([
 		 */
 		getLearnMoreURL(sPath, aFeatureCollection) {
 			const iFeaturePageIndex = sPath.slice(-1);
-			const bIsS4Hana = !!FlexRuntimeInfoAPI.getSystem();
+			const oDocumentationUrls = aFeatureCollection[iFeaturePageIndex].documentationUrls;
 
-			if (bIsS4Hana) {
-				if (RtaUtils.isS4HanaCloud()) {
-					return aFeatureCollection[iFeaturePageIndex].documentationUrls.s4HanaCloudUrl;
-				}
-
-				return aFeatureCollection[iFeaturePageIndex].documentationUrls.s4HanaOnPremUrl;
-			}
-
-			return aFeatureCollection[iFeaturePageIndex].documentationUrls.btpUrl;
+			return RtaUtils.getSystemSpecificDocumentationUrl(oDocumentationUrls);
 		},
 
 		/**

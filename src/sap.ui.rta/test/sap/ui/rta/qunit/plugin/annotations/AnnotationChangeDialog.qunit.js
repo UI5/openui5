@@ -11,7 +11,9 @@ sap.ui.define([
 	"sap/ui/model/json/JSONModel",
 	"sap/ui/qunit/QUnitUtils",
 	"sap/ui/rta/plugin/annotations/AnnotationChangeDialog",
+	"sap/ui/rta/plugin/annotations/AnnotationChangeDialogController",
 	"sap/ui/rta/plugin/annotations/AnnotationTypes",
+	"sap/ui/rta/Utils",
 	"sap/ui/thirdparty/sinon-4",
 	"test-resources/sap/ui/rta/qunit/RtaQunitUtils"
 ], function(
@@ -25,7 +27,9 @@ sap.ui.define([
 	JSONModel,
 	QUnitUtils,
 	AnnotationChangeDialog,
+	AnnotationChangeDialogController,
 	AnnotationTypes,
+	RtaUtils,
 	sinon,
 	RtaQunitUtils
 ) {
@@ -675,6 +679,41 @@ sap.ui.define([
 				oCancelButton.firePress();
 			};
 			await openDialog(sandbox, oActionConfig, fnAfterOpen);
+		});
+	});
+
+	QUnit.module("formatDocumentationUrl", {
+		beforeEach() {
+			this.oController = new AnnotationChangeDialogController();
+		},
+		afterEach() {
+			this.oController.destroy();
+			sandbox.restore();
+		}
+	}, function() {
+		QUnit.test("when the documentation URL is set", function(assert) {
+			const oGetSystemSpecificDocumentationUrlStub = sandbox.stub(RtaUtils, "getSystemSpecificDocumentationUrl").returns("https://test.url/documentation");
+
+			const sResult = this.oController.formatDocumentationUrl();
+
+			assert.ok(oGetSystemSpecificDocumentationUrlStub.calledOnce, "then getSystemSpecificDocumentationUrl is called once");
+			const oCallArgs = oGetSystemSpecificDocumentationUrlStub.firstCall.args[0];
+			assert.strictEqual(
+				oCallArgs.btpUrl,
+				"https://help.sap.com/docs/ui5-flexibility-for-key-users/ui5-flexibility-for-key-users/making-ui-changes",
+				"then BTP URL is correct"
+			);
+			assert.strictEqual(
+				oCallArgs.s4HanaCloudUrl,
+				"https://help.sap.com/docs/SAP_S4HANA_CLOUD/4fc8d03390c342da8a60f8ee387bca1a/54270a390b194c3e97be2424592c3352.html",
+				"then S/4HANA Cloud URL is correct"
+			);
+			assert.strictEqual(
+				oCallArgs.s4HanaOnPremUrl,
+				"https://help.sap.com/docs/ABAP_PLATFORM_NEW/a7b390faab1140c087b8926571e942b7/54270a390b194c3e97be2424592c3352.html",
+				"then S/4HANA On-Premise URL is correct"
+			);
+			assert.strictEqual(sResult, "https://test.url/documentation", "then the result is returned from getSystemSpecificDocumentationUrl");
 		});
 	});
 

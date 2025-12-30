@@ -75,9 +75,8 @@ sap.ui.define([
 			assert.strictEqual(oDomRef.tagName, "DIV", "Root element is a div");
 			assert.strictEqual(oDomRef.getAttribute("id"), this.oHeaderSelector.getId(), "Root element has correct ID");
 			assert.strictEqual(oDomRef.children.length, 0, "No child elements when visible=false");
-			assert.notOk(oDomRef.classList.contains("sapUiTableSelAllVisible"), "No sapUiTableSelAllVisible class");
-			assert.notOk(oDomRef.classList.contains("sapUiTableSelAll"), "No sapUiTableSelAll class");
-			assert.notOk(oDomRef.classList.contains("sapUiTableSelAllDisabled"), "No sapUiTableSelAllDisabled class");
+			assert.ok(oDomRef.classList.contains("sapUiTableHeaderSelector"), "Has sapUiTableHeaderSelector class");
+			assert.notOk(oDomRef.classList.contains("sapUiTableHeaderSelectorDisabled"), "No sapUiTableHeaderSelectorDisabled class");
 			assert.notOk(oDomRef.hasAttribute("title"), "No title attribute");
 		};
 
@@ -141,20 +140,17 @@ sap.ui.define([
 		assert.ok(oDomRef.classList.contains("sapUiTableHeaderCell"), "Has sapUiTableHeaderCell class");
 		assert.ok(oDomRef.classList.contains("sapUiTableRowSelectionHeaderCell"), "Has sapUiTableRowSelectionHeaderCell class");
 
-		// Checkbox-specific classes
-		assert.ok(oDomRef.classList.contains("sapUiTableSelAllVisible"), "Has sapUiTableSelAllVisible class");
-		assert.ok(oDomRef.classList.contains("sapUiTableSelAll"), "Has sapUiTableSelAll class (not selected)");
-
-		assert.notOk(oDomRef.classList.contains("sapUiTableSelAllDisabled"), "No sapUiTableSelAllDisabled class");
+		assert.notOk(oDomRef.classList.contains("sapUiTableHeaderSelectorDisabled"), "No sapUiTableHeaderSelectorDisabled class");
 
 		// Default tooltip for checkbox
 		assert.ok(oDomRef.getAttribute("title"), TableUtils.getResourceText("TBL_SELECT_ALL"), "Default tooltip");
 
 		// Checkbox child element
-		const oCheckbox = oDomRef.querySelector(".sapUiTableSelectAllCheckBox");
+		const oCheckbox = oDomRef.querySelector(".sapUiTableCheckBox");
 		assert.ok(oCheckbox, "Checkbox div is rendered");
 		assert.strictEqual(oCheckbox.tagName, "DIV", "Checkbox is a div element");
-		assert.ok(oCheckbox.classList.contains("sapUiTableSelectAllCheckBox"), "Checkbox has correct CSS class");
+		assert.ok(oCheckbox.classList.contains("sapUiTableCheckBox"), "Checkbox has sapUiTableCheckBox class");
+		assert.notOk(oCheckbox.classList.contains("sapUiTableCheckBoxSelected"), "Checkbox has no sapUiTableCheckBoxSelected class");
 
 		assert.notOk(oDomRef.querySelector(".sapUiIcon"), "No icon element");
 	});
@@ -166,15 +162,14 @@ sap.ui.define([
 
 		const oDomRef = this.oHeaderSelector.getDomRef();
 
-		// Selected state: no sapUiTableSelAll class
-		assert.ok(oDomRef.classList.contains("sapUiTableSelAllVisible"), "Has sapUiTableSelAllVisible class");
-		assert.notOk(oDomRef.classList.contains("sapUiTableSelAll"), "No sapUiTableSelAll class when selected");
-
 		// Default tooltip for checkbox
 		assert.ok(oDomRef.getAttribute("title"), TableUtils.getResourceText("TBL_DESELECT_ALL"), "Default tooltip");
 
-		// Checkbox still rendered
-		assert.ok(oDomRef.querySelector(".sapUiTableSelectAllCheckBox"), "Checkbox div is rendered");
+		// Checkbox child element
+		const oCheckbox = oDomRef.querySelector(".sapUiTableCheckBox");
+		assert.ok(oCheckbox, "Checkbox div is rendered");
+		assert.ok(oCheckbox.classList.contains("sapUiTableCheckBox"), "Has sapUiTableCheckBox class");
+		assert.ok(oCheckbox.classList.contains("sapUiTableCheckBoxSelected"), "Has sapUiTableCheckBoxSelected class");
 	});
 
 	QUnit.test("type=checkbox, selected=false, enabled=false", async function(assert) {
@@ -184,15 +179,14 @@ sap.ui.define([
 
 		const oDomRef = this.oHeaderSelector.getDomRef();
 
-		// Disabled class
-		assert.ok(oDomRef.classList.contains("sapUiTableSelAllDisabled"), "Has sapUiTableSelAllDisabled class");
+		// Disabled class on root
+		assert.ok(oDomRef.classList.contains("sapUiTableHeaderSelectorDisabled"), "Has sapUiTableHeaderSelectorDisabled class");
 
-		// Other classes remain
-		assert.ok(oDomRef.classList.contains("sapUiTableSelAllVisible"), "Has sapUiTableSelAllVisible class");
-		assert.ok(oDomRef.classList.contains("sapUiTableSelAll"), "Has sapUiTableSelAll class (not selected)");
-
-		// Checkbox still rendered
-		assert.ok(oDomRef.querySelector(".sapUiTableSelectAllCheckBox"), "Checkbox div is rendered");
+		// Checkbox child element
+		const oCheckbox = oDomRef.querySelector(".sapUiTableCheckBox");
+		assert.ok(oCheckbox, "Checkbox div is rendered");
+		assert.ok(oCheckbox.classList.contains("sapUiTableCheckBox"), "Has sapUiTableCheckBox class");
+		assert.notOk(oCheckbox.classList.contains("sapUiTableCheckBoxSelected"), "No sapUiTableCheckBoxSelected class");
 	});
 
 	QUnit.test("type=checkbox, selected=true, enabled=false", async function(assert) {
@@ -203,13 +197,14 @@ sap.ui.define([
 
 		const oDomRef = this.oHeaderSelector.getDomRef();
 
-		// Disabled and selected classes
-		assert.ok(oDomRef.classList.contains("sapUiTableSelAllDisabled"), "Has sapUiTableSelAllDisabled class");
-		assert.ok(oDomRef.classList.contains("sapUiTableSelAllVisible"), "Has sapUiTableSelAllVisible class");
-		assert.notOk(oDomRef.classList.contains("sapUiTableSelAll"), "No sapUiTableSelAll class when selected");
+		// Disabled class on root
+		assert.ok(oDomRef.classList.contains("sapUiTableHeaderSelectorDisabled"), "Has sapUiTableHeaderSelectorDisabled class");
 
-		// Checkbox still rendered
-		assert.ok(oDomRef.querySelector(".sapUiTableSelectAllCheckBox"), "Checkbox div is rendered");
+		// Checkbox child element
+		const oCheckbox = oDomRef.querySelector(".sapUiTableCheckBox");
+		assert.ok(oCheckbox, "Checkbox div is rendered");
+		assert.ok(oCheckbox.classList.contains("sapUiTableCheckBox"), "Has sapUiTableCheckBox class");
+		assert.ok(oCheckbox.classList.contains("sapUiTableCheckBoxSelected"), "Has sapUiTableCheckBoxSelected class");
 	});
 
 	QUnit.test("type=checkbox with custom tooltip", async function(assert) {
@@ -234,11 +229,7 @@ sap.ui.define([
 		assert.ok(oDomRef.classList.contains("sapUiTableHeaderCell"), "Has sapUiTableHeaderCell class");
 		assert.ok(oDomRef.classList.contains("sapUiTableRowSelectionHeaderCell"), "Has sapUiTableRowSelectionHeaderCell class");
 
-		// No checkbox classes
-		assert.notOk(oDomRef.classList.contains("sapUiTableSelAllVisible"), "No sapUiTableSelAllVisible class");
-		assert.notOk(oDomRef.classList.contains("sapUiTableSelAll"), "No sapUiTableSelAll class");
-
-		assert.notOk(oDomRef.classList.contains("sapUiTableSelAllDisabled"), "No sapUiTableSelAllDisabled class");
+		assert.notOk(oDomRef.classList.contains("sapUiTableHeaderSelectorDisabled"), "No sapUiTableHeaderSelectorDisabled class");
 
 		// Icon is rendered
 		const oIcon = oDomRef.querySelector(".sapUiIcon");
@@ -246,7 +237,7 @@ sap.ui.define([
 		assert.ok(oIcon.classList.contains("sapUiTableHeaderSelectorIcon"), "Icon has sapUiTableHeaderSelectorIcon class");
 		assert.ok(!oIcon.hasAttribute("title"), "Icon has no title attribute");
 
-		assert.notOk(oDomRef.querySelector(".sapUiTableSelectAllCheckBox"), "No checkbox element");
+		assert.notOk(oDomRef.querySelector(".sapUiTableCheckBox"), "No checkbox element");
 		assert.notOk(oDomRef.hasAttribute("title"), "No title on container");
 	});
 
@@ -273,7 +264,7 @@ sap.ui.define([
 
 		const oDomRef = this.oHeaderSelector.getDomRef();
 
-		assert.ok(oDomRef.classList.contains("sapUiTableSelAllDisabled"), "Has sapUiTableSelAllDisabled class");
+		assert.ok(oDomRef.classList.contains("sapUiTableHeaderSelectorDisabled"), "Has sapUiTableHeaderSelectorDisabled class");
 
 		// Icon still rendered
 		const oIcon = oDomRef.querySelector(".sapUiIcon");
@@ -290,9 +281,8 @@ sap.ui.define([
 
 		const oDomRef = this.oHeaderSelector.getDomRef();
 
-		// Selected state doesn't affect custom type
-		assert.notOk(oDomRef.classList.contains("sapUiTableSelAll"), "No sapUiTableSelAll class");
-		assert.notOk(oDomRef.classList.contains("sapUiTableSelAllVisible"), "No sapUiTableSelAllVisible class");
+		// Selected state doesn't affect custom type - no checkbox element rendered
+		assert.notOk(oDomRef.querySelector(".sapUiTableCheckBox"), "No checkbox element");
 	});
 
 	QUnit.test("Switching from visible=false to visible=true", async function(assert) {
@@ -305,8 +295,7 @@ sap.ui.define([
 		await nextUIUpdate();
 
 		oDomRef = this.oHeaderSelector.getDomRef();
-		assert.ok(oDomRef.querySelector(".sapUiTableSelectAllCheckBox"), "Checkbox rendered after becoming visible");
-		assert.ok(oDomRef.classList.contains("sapUiTableSelAllVisible"), "Has visibility class");
+		assert.ok(oDomRef.querySelector(".sapUiTableCheckBox"), "Checkbox rendered after becoming visible");
 	});
 
 	QUnit.test("Switching from type=checkbox to type=custom", async function(assert) {
@@ -314,15 +303,14 @@ sap.ui.define([
 		await nextUIUpdate();
 
 		let oDomRef = this.oHeaderSelector.getDomRef();
-		assert.ok(oDomRef.querySelector(".sapUiTableSelectAllCheckBox"), "Initially has checkbox");
-		assert.ok(oDomRef.classList.contains("sapUiTableSelAllVisible"), "Has checkbox classes");
+		assert.ok(oDomRef.querySelector(".sapUiTableCheckBox"), "Initially has checkbox");
 
 		this.oHeaderSelector.setType("custom");
 		this.oHeaderSelector.setIcon("sap-icon://decline");
 		await nextUIUpdate();
 
 		oDomRef = this.oHeaderSelector.getDomRef();
-		assert.notOk(oDomRef.querySelector(".sapUiTableSelectAllCheckBox"), "No checkbox after switch");
+		assert.notOk(oDomRef.querySelector(".sapUiTableCheckBox"), "No checkbox after switch");
 		assert.ok(oDomRef.querySelector(".sapUiIcon"), "Has icon after switch");
 		assert.notOk(oDomRef.classList.contains("sapUiTableSelAllVisible"), "No checkbox classes");
 	});
@@ -340,9 +328,8 @@ sap.ui.define([
 		await nextUIUpdate();
 
 		oDomRef = this.oHeaderSelector.getDomRef();
-		assert.ok(oDomRef.querySelector(".sapUiTableSelectAllCheckBox"), "Has checkbox after switch");
+		assert.ok(oDomRef.querySelector(".sapUiTableCheckBox"), "Has checkbox after switch");
 		assert.notOk(oDomRef.querySelector(".sapUiIcon"), "No icon after switch");
-		assert.ok(oDomRef.classList.contains("sapUiTableSelAllVisible"), "Has checkbox classes");
 	});
 
 	QUnit.module("Accessibility", {

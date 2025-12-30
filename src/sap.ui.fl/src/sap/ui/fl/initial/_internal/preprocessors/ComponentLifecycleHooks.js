@@ -48,8 +48,15 @@ sap.ui.define([
 	ComponentLifecycleHooks._componentInstantiationPromises = new WeakMap();
 	ComponentLifecycleHooks._embeddedComponents = {};
 
+	// only initialize FlexState if there are any changes or if the data was previously filled,
+	// meaning it potentially needs to be cleaned up (e.g. when discarding a draft that contained all existing changes).
+	function isInitializeRelevant(oFlexData) {
+		// TODO: Rework logic so that previouslyFilledData is not needed anymore, todos#15
+		return StorageUtils.isStorageResponseFilled(oFlexData.data.changes) || oFlexData.parameters.previouslyFilledData;
+	}
+
 	async function checkForChangesAndInitializeFlexState(oConfig, oFlexData) {
-		if (StorageUtils.isStorageResponseFilled(oFlexData.data.changes)) {
+		if (isInitializeRelevant(oFlexData)) {
 			const FlexState = await requireAsync("sap/ui/fl/apply/_internal/flexState/FlexState");
 			await FlexState.initialize(oConfig);
 		}
@@ -129,7 +136,7 @@ sap.ui.define([
 			reference: sReference
 		});
 		const sComponentId = oComponent.getId();
-		if (StorageUtils.isStorageResponseFilled(oFlexData.data.changes)) {
+		if (isInitializeRelevant(oFlexData)) {
 			const FlexState = await requireAsync("sap/ui/fl/apply/_internal/flexState/FlexState");
 			await FlexState.initialize({
 				componentId: sComponentId,
@@ -268,7 +275,8 @@ sap.ui.define([
 				manifest: oManifest
 			};
 			const oFlexData = await Loader.getFlexData(mProperties);
-			if (!StorageUtils.isStorageResponseFilled(oFlexData.data.changes)) {
+
+			if (!isInitializeRelevant(oFlexData)) {
 				return [];
 			}
 
@@ -347,9 +355,8 @@ sap.ui.define([
 			manifest: oManifest,
 			skipLoadBundle: true
 		});
-		const bFlexObjectAvailable = StorageUtils.isStorageResponseFilled(oFlexData.data.changes);
 
-		if (bFlexObjectAvailable) {
+		if (isInitializeRelevant(oFlexData)) {
 			await checkForChangesAndInitializeFlexState({
 				...oConfig,
 				rawManifest: oManifest,

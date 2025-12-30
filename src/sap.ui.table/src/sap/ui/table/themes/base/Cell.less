@@ -167,7 +167,7 @@
 	}
 }
 
-.sapUiTableRowSelectionHeaderCell { /* Contains highlight and SelectAll selector. */
+.sapUiTableRowSelectionHeaderCell { /* Contains highlight and header selector. */
 	display: none;
 	vertical-align: bottom;
 	position: absolute;
@@ -216,19 +216,6 @@
 
 		.sapUiSizeCozy & {
 			width: calc(@_sap_ui_table_RowSelectorWidthCozy ~"+" @_sap_ui_table_RowHighlightWidth);
-		}
-	}
-
-	&.sapUiTableSelAllDisabled > * {
-		opacity: 0.3;
-		pointer-events: none;
-	}
-
-	&:not(.sapUiTableSelAllDisabled) {
-		cursor: pointer;
-
-		> * {
-			cursor: pointer;
 		}
 	}
 }

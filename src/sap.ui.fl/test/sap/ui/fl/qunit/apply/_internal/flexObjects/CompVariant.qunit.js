@@ -292,7 +292,7 @@ sap.ui.define([
 		expectedRenameEnabled: true,
 		expectedTranslationEnabled: false
 	}, {
-		testName: ", a variant in the PUBLIC layer and the user is its author",
+		testName: ", a variant in the PUBLIC layer, isVariantSharing enabled and the user is its author",
 		variant: {
 			layer: Layer.PUBLIC,
 			support: { user: "FRANK" },
@@ -301,12 +301,31 @@ sap.ui.define([
 			sourceClient: undefined
 		},
 		settings: {
-			isPublicLayerAvailable: true // testing the = false option is not a real case since the variant was written into it
+			isPublicLayerAvailable: true, // testing the = false option is not a real case since the variant was written into it
+			isVariantSharingEnabled: true
 		},
 		currentUser: "FRANK",
 		expectedEditEnabled: true,
 		expectedDeleteEnabled: true,
 		expectedRenameEnabled: true,
+		expectedTranslationEnabled: false
+	}, {
+		testName: ", a variant in the PUBLIC layer, isVariantSharing disabled and the user is its author",
+		variant: {
+			layer: Layer.PUBLIC,
+			support: { user: "FRANK" },
+			originalLanguage: "EN",
+			sourceSystem: undefined,
+			sourceClient: undefined
+		},
+		settings: {
+			isPublicLayerAvailable: true, // testing the = false option is not a real case since the variant was written into it
+			isVariantSharingEnabled: false
+		},
+		currentUser: "FRANK",
+		expectedEditEnabled: false,
+		expectedDeleteEnabled: false,
+		expectedRenameEnabled: false,
 		expectedTranslationEnabled: false
 	}, {
 		testName: ", a variant in the PUBLIC layer and the user is NOT its author",
@@ -335,7 +354,8 @@ sap.ui.define([
 			sourceClient: undefined
 		},
 		settings: {
-			isPublicLayerAvailable: true // testing the = false option is not a real case since the variant was written into it
+			isPublicLayerAvailable: true, // testing the = false option is not a real case since the variant was written into it
+			isVariantSharingEnabled: true
 		},
 		expectedEditEnabled: true,
 		expectedDeleteEnabled: true,
@@ -351,7 +371,8 @@ sap.ui.define([
 			sourceClient: undefined
 		},
 		settings: {
-			isPublicLayerAvailable: true // testing the = false option is not a real case since the variant was written into it
+			isPublicLayerAvailable: true, // testing the = false option is not a real case since the variant was written into it
+			isVariantSharingEnabled: true
 		},
 		currentUser: "FRANK",
 		expectedEditEnabled: true,

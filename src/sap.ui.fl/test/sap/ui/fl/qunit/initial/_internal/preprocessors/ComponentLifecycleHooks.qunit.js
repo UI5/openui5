@@ -967,6 +967,34 @@ sap.ui.define([
 			assert.strictEqual(this.oLoaderInitStub.callCount, 0, "Loader was not initialized");
 			assert.strictEqual(this.oFlexStateInitStub.callCount, 0, "FlexState was not initialized");
 		});
+
+		QUnit.test("hook gets called, storage response is empty and flexData was previously filled", async function(assert) {
+			this.oChangesAvailableStub.returns(false);
+			this.oLoaderInitStub.resolves({ data: {}, parameters: { previouslyFilledData: true } });
+			ComponentLifecycleHooks.modelCreatedHook({
+				model: this.oFakeModel1,
+				modelId: "someModelId",
+				ownerId: undefined,
+				factoryConfig: { id: "reuse-component" },
+				manifest: this.oAppComponent.getManifest()
+			});
+			await this.oSetAnnotationChangeStub1.getCall(0).args[0];
+			assert.ok(this.oFlexStateInitStub.calledOnce, "FlexState was initialized");
+		});
+
+		QUnit.test("hook gets called, storage response is empty and flexData was not previously filled", async function(assert) {
+			this.oChangesAvailableStub.returns(false);
+			this.oLoaderInitStub.resolves({ data: {}, parameters: { previouslyFilledData: false } });
+			ComponentLifecycleHooks.modelCreatedHook({
+				model: this.oFakeModel1,
+				modelId: "someModelId",
+				ownerId: undefined,
+				factoryConfig: { id: "reuse-component" },
+				manifest: this.oAppComponent.getManifest()
+			});
+			await this.oSetAnnotationChangeStub1.getCall(0).args[0];
+			assert.ok(this.oFlexStateInitStub.notCalled, "FlexState was not initialized");
+		});
 	});
 
 	QUnit.module("preprocessManifest", {

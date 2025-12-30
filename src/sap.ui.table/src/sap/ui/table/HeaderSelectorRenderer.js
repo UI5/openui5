@@ -30,6 +30,7 @@ sap.ui.define([
 		let sTooltip = oHeaderSelector.getTooltip_AsString();
 
 		rm.openStart("div", oHeaderSelector);
+		rm.class("sapUiTableHeaderSelector");
 
 		// For accessibility reasons, the HeaderSelector acts as the table cell and receives the focus instead of the actual cell.
 		rm.class("sapUiTableCell");
@@ -39,17 +40,14 @@ sap.ui.define([
 
 		if (bVisible) {
 			if (!oHeaderSelector.getEnabled()) {
-				rm.class("sapUiTableSelAllDisabled");
+				rm.class("sapUiTableHeaderSelectorDisabled");
 			}
 
 			if (sType === "checkbox") {
-				rm.class("sapUiTableSelAllVisible");
-
 				if (oHeaderSelector.getSelected()) {
 					sTooltip ??= TableUtils.getResourceText("TBL_DESELECT_ALL");
 				} else {
 					sTooltip ??= TableUtils.getResourceText("TBL_SELECT_ALL");
-					rm.class("sapUiTableSelAll");
 				}
 			}
 
@@ -70,7 +68,12 @@ sap.ui.define([
 				});
 			} else {
 				rm.openStart("div");
-				rm.class("sapUiTableSelectAllCheckBox");
+				rm.class("sapUiTableCheckBox");
+
+				if (oHeaderSelector.getSelected()) {
+					rm.class("sapUiTableCheckBoxSelected");
+				}
+
 				rm.openEnd();
 				rm.close("div");
 			}

@@ -34,6 +34,8 @@ sap.ui.define([
 	var sandbox = sinon.createSandbox();
 	const sReference = "my.reference";
 
+	document.getElementById("qunit-fixture").style.display = "none";
+
 	var oComponentData = {
 		startupParameters: {
 			hcpApplicationId: ["siteId"]
@@ -233,6 +235,7 @@ sap.ui.define([
 			});
 			assert.deepEqual(oFlexData2.data.changes, this.oExpectedFlexDataResponse, "the Loader loads data");
 			assert.strictEqual(this.oLoadFlexDataStub.callCount, 2, "the Storage.loadFlexData was called again");
+			assert.ok(oFlexData2.parameters.previouslyFilledData, "the previouslyFilledData parameter is true");
 		});
 
 		QUnit.test("when getFlexData is called twice for the same component without skipLoadBundle", async function(assert) {
@@ -674,6 +677,29 @@ sap.ui.define([
 			});
 			assert.deepEqual(oResult.data.authors, {}, "the authors are empty");
 		});
+
+		QUnit.test("check previouslyFilledData parameter persists when new request is not needed", async function(assert) {
+			await Loader.getFlexData({
+				manifest: this.oManifest,
+				reference: sReference,
+				componentData: oComponentData
+			});
+
+			await Loader.getFlexData({
+				manifest: this.oManifest,
+				reference: sReference,
+				componentData: oComponentData,
+				reInitialize: true
+			});
+
+			const oFlexData2 = await Loader.getFlexData({
+				manifest: this.oManifest,
+				reference: sReference,
+				componentData: oComponentData
+			});
+			assert.deepEqual(oFlexData2.data.changes, this.oExpectedCompleteFlexDataResponse, "the Loader loads data");
+			assert.ok(oFlexData2.parameters.previouslyFilledData, "the previouslyFilledData parameter is true");
+		});
 	});
 
 	QUnit.module("Given new connector configuration in bootstrap", {
@@ -1006,9 +1032,5 @@ sap.ui.define([
 				"the cache key was updated"
 			);
 		});
-	});
-
-	QUnit.done(function() {
-		document.getElementById("qunit-fixture").style.display = "none";
 	});
 });
