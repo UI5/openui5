@@ -5332,6 +5332,45 @@ sap.ui.define([
 		oInput.destroy();
 	});
 
+	QUnit.test("getLabels should not return duplicate labels when label is set via both ariaLabelledBy and setLabelFor", async function(assert) {
+		// Arrange
+		var oLabel = new Label({
+			id: "testLabel",
+			text: "Test Label",
+			showColon: true
+		});
+
+		var oInput = new Input({
+			ariaLabelledBy: oLabel  // Set ariaLabelledBy first
+		});
+
+		oInput.placeAt("content");
+		await nextUIUpdate();
+
+		// Act - Get labels BEFORE setLabelFor
+		var aLabelsBefor = oInput.getLabels();
+		var iLabelsCountBefore = aLabelsBefor.length;
+
+		// Assert
+		assert.strictEqual(iLabelsCountBefore, 1, "Before setLabelFor - the input has 1 label");
+		assert.strictEqual(aLabelsBefor[0].getId(), "testLabel", "The label ID is correct");
+
+		// Act - Call setLabelFor on the label
+		oLabel.setLabelFor(oInput);
+
+		// Get labels AFTER setLabelFor
+		var aLabelsAfter = oInput.getLabels();
+		var iLabelsCountAfter = aLabelsAfter.length;
+
+		// Assert - Should NOT have duplicates
+		assert.strictEqual(iLabelsCountAfter, 1, "After setLabelFor - the input should still have 1 label (no duplicates)");
+		assert.strictEqual(aLabelsAfter[0].getId(), "testLabel", "The label ID is correct");
+
+		// Cleanup
+		oLabel.destroy();
+		oInput.destroy();
+	});
+
 	QUnit.module("Cloning", {
 		beforeEach: function () {
 			this.oTabularInputToClone = createInputWithTabularSuggestions();

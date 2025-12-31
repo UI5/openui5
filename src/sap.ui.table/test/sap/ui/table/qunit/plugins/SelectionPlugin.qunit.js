@@ -12,10 +12,10 @@ sap.ui.define([
 	const TestPlugin = SelectionPlugin.extend("sap.ui.table.test.SelectionPlugin.TestSelectionPlugin", {
 		metadata: {
 			properties: {
-				headerSelectorType: {type: "string", defaultValue: "checkbox"},
+				headerSelectorType: {type: "string", defaultValue: "CheckBox"},
 				headerSelectorVisible: {type: "boolean", defaultValue: true},
 				headerSelectorEnabled: {type: "boolean", defaultValue: true},
-				headerSelectorSelected: {type: "boolean", defaultValue: false},
+				headerSelectorCheckBoxSelected: {type: "boolean", defaultValue: false},
 				headerSelectorIcon: {type: "string", defaultValue: null},
 				headerSelectorTooltip: {type: "string", defaultValue: "Test Tooltip"}
 			}
@@ -29,7 +29,7 @@ sap.ui.define([
 			oHeaderSelector?.setType(this.getHeaderSelectorType());
 			oHeaderSelector?.setVisible(this.getHeaderSelectorVisible());
 			oHeaderSelector?.setEnabled(this.getHeaderSelectorEnabled());
-			oHeaderSelector?.setSelected(this.getHeaderSelectorSelected());
+			oHeaderSelector?.setCheckBoxSelected(this.getHeaderSelectorCheckBoxSelected());
 			oHeaderSelector?.setIcon(this.getHeaderSelectorIcon());
 			oHeaderSelector?.setTooltip(this.getHeaderSelectorTooltip());
 		}
@@ -41,10 +41,10 @@ sap.ui.define([
 		const oTable = TableQUnitUtils.createTable({
 			dependents: [
 				new TestPlugin({
-					headerSelectorType: "custom",
+					headerSelectorType: "Icon",
 					headerSelectorVisible: true,
 					headerSelectorEnabled: false,
-					headerSelectorSelected: true,
+					headerSelectorCheckBoxSelected: true,
 					headerSelectorIcon: "sap-icon://accept",
 					headerSelectorTooltip: "Custom Tooltip"
 				})
@@ -52,10 +52,10 @@ sap.ui.define([
 		});
 		const oHeaderSelector = oTable._getHeaderSelector();
 
-		assert.strictEqual(oHeaderSelector.getType(), "custom", "HeaderSelector type correctly set by plugin");
+		assert.strictEqual(oHeaderSelector.getType(), "Icon", "HeaderSelector type correctly set by plugin");
 		assert.strictEqual(oHeaderSelector.getVisible(), true, "HeaderSelector visible correctly set by plugin");
 		assert.strictEqual(oHeaderSelector.getEnabled(), false, "HeaderSelector enabled correctly set by plugin");
-		assert.strictEqual(oHeaderSelector.getSelected(), true, "HeaderSelector selected correctly set by plugin");
+		assert.strictEqual(oHeaderSelector.getCheckBoxSelected(), true, "HeaderSelector checkboxSelected correctly set by plugin");
 		assert.strictEqual(oHeaderSelector.getIcon(), "sap-icon://accept", "HeaderSelector icon correctly set by plugin");
 		assert.strictEqual(oHeaderSelector.getTooltip(), "Custom Tooltip", "HeaderSelector tooltip correctly set by plugin");
 
@@ -70,23 +70,24 @@ sap.ui.define([
 		assert.strictEqual(oHeaderSelector.getType(), mProperties["type"].getDefaultValue(), "HeaderSelector type is default");
 		assert.strictEqual(oHeaderSelector.getVisible(), mProperties["visible"].getDefaultValue(), "HeaderSelector visible is default");
 		assert.strictEqual(oHeaderSelector.getEnabled(), mProperties["enabled"].getDefaultValue(), "HeaderSelector enabled is default");
-		assert.strictEqual(oHeaderSelector.getSelected(), mProperties["selected"].getDefaultValue(), "HeaderSelector selected is default");
+		assert.strictEqual(oHeaderSelector.getCheckBoxSelected(), mProperties["checkBoxSelected"].getDefaultValue(),
+			"HeaderSelector checkBoxSelected is default");
 		assert.strictEqual(oHeaderSelector.getIcon(), mProperties["icon"].getDefaultValue(), "HeaderSelector icon is default");
 		assert.strictEqual(oHeaderSelector.getTooltip(), null, "HeaderSelector tooltip is default");
 
 		oTable.addDependent(new TestPlugin({
-			headerSelectorType: "custom",
+			headerSelectorType: "Icon",
 			headerSelectorVisible: true,
 			headerSelectorEnabled: false,
-			headerSelectorSelected: true,
+			headerSelectorCheckBoxSelected: true,
 			headerSelectorIcon: "sap-icon://decline",
 			headerSelectorTooltip: "Custom Tooltip"
 		}));
 
-		assert.strictEqual(oHeaderSelector.getType(), "custom", "HeaderSelector type correctly set by plugin");
+		assert.strictEqual(oHeaderSelector.getType(), "Icon", "HeaderSelector type correctly set by plugin");
 		assert.strictEqual(oHeaderSelector.getVisible(), true, "HeaderSelector visible correctly set by plugin");
 		assert.strictEqual(oHeaderSelector.getEnabled(), false, "HeaderSelector enabled correctly set by plugin");
-		assert.strictEqual(oHeaderSelector.getSelected(), true, "HeaderSelector selected correctly set by plugin");
+		assert.strictEqual(oHeaderSelector.getCheckBoxSelected(), true, "HeaderSelector checkboxSelected correctly set by plugin");
 		assert.strictEqual(oHeaderSelector.getIcon(), "sap-icon://decline", "HeaderSelector icon correctly set by plugin");
 		assert.strictEqual(oHeaderSelector.getTooltip(), "Custom Tooltip", "HeaderSelector tooltip correctly set by plugin");
 
@@ -103,18 +104,18 @@ sap.ui.define([
 		// Remove first plugin and add second plugin with different configuration
 		oTable.removeDependent(oPlugin);
 		oTable.addDependent(new TestPlugin({
-			headerSelectorType: "custom",
+			headerSelectorType: "Icon",
 			headerSelectorVisible: true,
 			headerSelectorEnabled: false,
-			headerSelectorSelected: true,
+			headerSelectorCheckBoxSelected: true,
 			headerSelectorIcon: "sap-icon://accept",
 			headerSelectorTooltip: "Different Tooltip"
 		}));
 
-		assert.strictEqual(oHeaderSelector.getType(), "custom", "Type changed to custom");
+		assert.strictEqual(oHeaderSelector.getType(), "Icon", "Type changed to icon");
 		assert.strictEqual(oHeaderSelector.getVisible(), true, "Visible remains true");
 		assert.strictEqual(oHeaderSelector.getEnabled(), false, "Enabled changed to false");
-		assert.strictEqual(oHeaderSelector.getSelected(), true, "Selected changed to true");
+		assert.strictEqual(oHeaderSelector.getCheckBoxSelected(), true, "CheckboxSelected changed to true");
 		assert.strictEqual(oHeaderSelector.getIcon(), "sap-icon://accept", "Icon is set correctly");
 		assert.strictEqual(oHeaderSelector.getTooltip(), "Different Tooltip", "Tooltip changed correctly");
 
@@ -130,18 +131,18 @@ sap.ui.define([
 
 		// Add new main plugin
 		oTable.insertDependent(new TestPlugin({
-			headerSelectorType: "custom",
+			headerSelectorType: "Icon",
 			headerSelectorVisible: true,
 			headerSelectorEnabled: false,
-			headerSelectorSelected: true,
+			headerSelectorCheckBoxSelected: true,
 			headerSelectorIcon: "sap-icon://accept",
 			headerSelectorTooltip: "New Tooltip"
 		}), 0);
 
-		assert.strictEqual(oHeaderSelector.getType(), "custom", "Type changed to custom");
+		assert.strictEqual(oHeaderSelector.getType(), "Icon", "Type changed to icon");
 		assert.strictEqual(oHeaderSelector.getVisible(), true, "Visible remains true");
 		assert.strictEqual(oHeaderSelector.getEnabled(), false, "Enabled changed to false");
-		assert.strictEqual(oHeaderSelector.getSelected(), true, "Selected changed to true");
+		assert.strictEqual(oHeaderSelector.getCheckBoxSelected(), true, "CheckboxSelected changed to true");
 		assert.strictEqual(oHeaderSelector.getIcon(), "sap-icon://accept", "Icon is set correctly");
 		assert.strictEqual(oHeaderSelector.getTooltip(), "New Tooltip", "Tooltip changed correctly");
 
@@ -150,10 +151,10 @@ sap.ui.define([
 
 	QUnit.test("Plugin removed", function(assert) {
 		const oPlugin = new TestPlugin({
-			headerSelectorType: "custom",
+			headerSelectorType: "Icon",
 			headerSelectorVisible: true,
 			headerSelectorEnabled: false,
-			headerSelectorSelected: true,
+			headerSelectorCheckBoxSelected: true,
 			headerSelectorIcon: "sap-icon://accept",
 			headerSelectorTooltip: "Custom Tooltip"
 		});
@@ -168,7 +169,8 @@ sap.ui.define([
 		assert.strictEqual(oHeaderSelector.getType(), mProperties["type"].getDefaultValue(), "HeaderSelector type is default");
 		assert.strictEqual(oHeaderSelector.getVisible(), mProperties["visible"].getDefaultValue(), "HeaderSelector visible is default");
 		assert.strictEqual(oHeaderSelector.getEnabled(), mProperties["enabled"].getDefaultValue(), "HeaderSelector enabled is default");
-		assert.strictEqual(oHeaderSelector.getSelected(), mProperties["selected"].getDefaultValue(), "HeaderSelector selected is default");
+		assert.strictEqual(oHeaderSelector.getCheckBoxSelected(), mProperties["checkBoxSelected"].getDefaultValue(),
+			"HeaderSelector checkBoxSelected is default");
 		assert.strictEqual(oHeaderSelector.getIcon(), mProperties["icon"].getDefaultValue(), "HeaderSelector icon is default");
 		assert.strictEqual(oHeaderSelector.getTooltip(), null, "HeaderSelector tooltip is default");
 
@@ -180,10 +182,10 @@ sap.ui.define([
 		const oTable = TableQUnitUtils.createTable({
 			dependents: [
 				new TestPlugin({
-					headerSelectorType: "custom",
+					headerSelectorType: "Icon",
 					headerSelectorVisible: true,
 					headerSelectorEnabled: false,
-					headerSelectorSelected: true,
+					headerSelectorCheckBoxSelected: true,
 					headerSelectorIcon: "sap-icon://accept",
 					headerSelectorTooltip: "Custom Tooltip"
 				})
@@ -193,10 +195,10 @@ sap.ui.define([
 
 		oTable.getDependents()[0].setEnabled(false);
 
-		assert.strictEqual(oHeaderSelector.getType(), "custom", "HeaderSelector type");
+		assert.strictEqual(oHeaderSelector.getType(), "Icon", "HeaderSelector type");
 		assert.strictEqual(oHeaderSelector.getVisible(), false, "HeaderSelector visible");
 		assert.strictEqual(oHeaderSelector.getEnabled(), false, "HeaderSelector enabled");
-		assert.strictEqual(oHeaderSelector.getSelected(), true, "HeaderSelector selected");
+		assert.strictEqual(oHeaderSelector.getCheckBoxSelected(), true, "HeaderSelector checkBoxSelected");
 		assert.strictEqual(oHeaderSelector.getIcon(), "sap-icon://accept", "HeaderSelector icon");
 		assert.strictEqual(oHeaderSelector.getTooltip(), "Custom Tooltip", "HeaderSelector tooltip");
 		oTable.destroy();

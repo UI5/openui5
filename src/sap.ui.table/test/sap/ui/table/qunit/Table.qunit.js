@@ -386,22 +386,22 @@ sap.ui.define([
 		const sSelectAllTitleText = TableUtils.getResourceText("TBL_SELECT_ALL");
 
 		// Initially no rows are selected.
-		assert.ok(!oHeaderSelector.getSelected(), "Initial: The SelectAll checkbox is not checked");
+		assert.ok(!oHeaderSelector.getCheckBoxSelected(), "Initial: The SelectAll checkbox is not checked");
 		assert.strictEqual($SelectAll.attr("title"), sSelectAllTitleText, "Initial: The SelectAll title text is correct");
 
 		// Select all rows. The SelectAll checkbox should be checked.
 		oTable.selectAll();
-		assert.ok(oHeaderSelector.getSelected(), "Called selectAll: The SelectAll checkbox is checked");
+		assert.ok(oHeaderSelector.getCheckBoxSelected(), "Called selectAll: The SelectAll checkbox is checked");
 		assert.strictEqual($SelectAll.attr("title"), sSelectAllTitleText, "Called selectAll: The SelectAll title text is correct");
 
 		// Deselect the first row. The SelectAll checkbox should not be checked.
 		oTable.removeSelectionInterval(0, 0);
-		assert.ok(!oHeaderSelector.getSelected(), "Deselected the first row: The SelectAll checkbox is not checked");
+		assert.ok(!oHeaderSelector.getCheckBoxSelected(), "Deselected the first row: The SelectAll checkbox is not checked");
 		assert.strictEqual($SelectAll.attr("title"), sSelectAllTitleText, "Deselected the first row: The SelectAll title text is correct");
 
 		// Select the first row again. The SelectAll checkbox should be checked.
 		oTable.addSelectionInterval(0, 0);
-		assert.ok(oHeaderSelector.getSelected(), "Selected the first row again: The SelectAll checkbox is checked");
+		assert.ok(oHeaderSelector.getCheckBoxSelected(), "Selected the first row again: The SelectAll checkbox is checked");
 		assert.strictEqual($SelectAll.attr("title"), sSelectAllTitleText, "Selected the first row again: The SelectAll title text is correct");
 	});
 
@@ -2688,7 +2688,7 @@ sap.ui.define([
 					assert.equal(oEvent.getParameter("rowContext"), oTable.getContextByIndex(0), sTestCase + ": Parameter rowContext correct");
 					assert.deepEqual(oEvent.getParameter("rowIndices"), Array.apply(0, Array(200)).map(function(c, i) { return i; }),
 						sTestCase + ": Parameter rowIndices correct");
-					assert.ok(oHeaderSelector.getSelected(), "Select all icon is checked.");
+					assert.ok(oHeaderSelector.getCheckBoxSelected(), "Select all icon is checked.");
 					break;
 				case "userClearSelectAll":
 					assert.equal(oEvent.getParameter("selectAll"), undefined, sTestCase + ": Parameter selectAll correct");
@@ -2697,7 +2697,7 @@ sap.ui.define([
 					assert.equal(oEvent.getParameter("rowContext"), undefined, sTestCase + ": Parameter rowContext correct");
 					assert.deepEqual(oEvent.getParameter("rowIndices"), Array.apply(0, Array(200)).map(function(c, i) { return i; }),
 						sTestCase + ": Parameter rowIndices correct");
-					assert.ok(!oHeaderSelector.getSelected(), "Select all icon is not checked.");
+					assert.ok(!oHeaderSelector.getCheckBoxSelected(), "Select all icon is not checked.");
 					break;
 				case "APISelectAll":
 					assert.equal(oEvent.getParameter("selectAll"), true, sTestCase + ": Parameter selectAll correct");
@@ -2706,7 +2706,7 @@ sap.ui.define([
 					assert.equal(oEvent.getParameter("rowContext"), oTable.getContextByIndex(0), sTestCase + ": Parameter rowContext correct");
 					assert.deepEqual(oEvent.getParameter("rowIndices"), Array.apply(0, Array(200)).map(function(c, i) { return i; }),
 						sTestCase + ": Parameter rowIndices correct");
-					assert.ok(oHeaderSelector.getSelected(), "Select all icon is checked.");
+					assert.ok(oHeaderSelector.getCheckBoxSelected(), "Select all icon is checked.");
 					break;
 				case "APIClearSelectAll":
 					assert.equal(oEvent.getParameter("selectAll"), undefined, sTestCase + ": Parameter selectAll correct");
@@ -2715,7 +2715,7 @@ sap.ui.define([
 					assert.equal(oEvent.getParameter("rowContext"), undefined, sTestCase + ": Parameter rowContext correct");
 					assert.deepEqual(oEvent.getParameter("rowIndices"), Array.apply(0, Array(200)).map(function(c, i) { return i; }),
 						sTestCase + ": Parameter rowIndices correct");
-					assert.ok(!oHeaderSelector.getSelected(), "Select all icon is not checked.");
+					assert.ok(!oHeaderSelector.getCheckBoxSelected(), "Select all icon is not checked.");
 					break;
 				case "userSetSelectedIndex":
 					assert.equal(oEvent.getParameter("selectAll"), undefined, sTestCase + ": Parameter selectAll correct");
@@ -2723,7 +2723,7 @@ sap.ui.define([
 					assert.equal(oEvent.getParameter("rowIndex"), 0, sTestCase + ": Parameter rowIndex correct");
 					assert.equal(oEvent.getParameter("rowContext"), oTable.getContextByIndex(0), sTestCase + ": Parameter rowContext correct");
 					assert.deepEqual(oEvent.getParameter("rowIndices"), [0], sTestCase + ": Parameter rowIndices correct");
-					assert.ok(!oHeaderSelector.getSelected(), "Select all icon is not checked.");
+					assert.ok(!oHeaderSelector.getCheckBoxSelected(), "Select all icon is not checked.");
 					break;
 				case "userUnsetSelectedIndex":
 					assert.equal(oEvent.getParameter("selectAll"), undefined, sTestCase + ": Parameter selectAll correct");
@@ -2731,7 +2731,7 @@ sap.ui.define([
 					assert.equal(oEvent.getParameter("rowIndex"), 0, sTestCase + ": Parameter rowIndex correct");
 					assert.equal(oEvent.getParameter("rowContext"), oTable.getContextByIndex(0), sTestCase + ": Parameter rowContext correct");
 					assert.deepEqual(oEvent.getParameter("rowIndices"), [0], sTestCase + ": Parameter rowIndices correct");
-					assert.ok(!oHeaderSelector.getSelected(), "Select all icon is not checked.");
+					assert.ok(!oHeaderSelector.getCheckBoxSelected(), "Select all icon is not checked.");
 					break;
 				case "APISetSelectedIndex":
 					assert.equal(oEvent.getParameter("selectAll"), undefined, sTestCase + ": Parameter selectAll correct");
@@ -2739,7 +2739,7 @@ sap.ui.define([
 					assert.equal(oEvent.getParameter("rowIndex"), 0, sTestCase + ": Parameter rowIndex correct");
 					assert.equal(oEvent.getParameter("rowContext"), oTable.getContextByIndex(0), sTestCase + ": Parameter rowContext correct");
 					assert.deepEqual(oEvent.getParameter("rowIndices"), [0], sTestCase + ": Parameter rowIndices correct");
-					assert.ok(!oHeaderSelector.getSelected(), "Select all icon is not checked.");
+					assert.ok(!oHeaderSelector.getCheckBoxSelected(), "Select all icon is not checked.");
 					break;
 			}
 
@@ -2769,11 +2769,11 @@ sap.ui.define([
 	QUnit.test("Select All on Binding Change", async function(assert) {
 		const nextRowSelectionChange = TableQUnitUtils.nextEvent("rowSelectionChange", oTable);
 		const oHeaderSelector = oTable._getHeaderSelector();
-		assert.ok(!oHeaderSelector.getSelected(), "Select all icon is not checked.");
+		assert.ok(!oHeaderSelector.getCheckBoxSelected(), "Select all icon is not checked.");
 		oTable.$("selall").trigger("tap");
 		await nextRowSelectionChange;
 
-		assert.ok(oHeaderSelector.getSelected(), "Select all icon is checked.");
+		assert.ok(oHeaderSelector.getCheckBoxSelected(), "Select all icon is checked.");
 
 		let nextRowsUpdated = TableQUnitUtils.nextEvent("rowsUpdated", oTable);
 		const oModel = new JSONModel();
@@ -2782,13 +2782,13 @@ sap.ui.define([
 		oTable.bindRows("/modelData");
 		await nextRowsUpdated;
 
-		assert.ok(!oHeaderSelector.getSelected(), "Select all icon is not checked.");
+		assert.ok(!oHeaderSelector.getCheckBoxSelected(), "Select all icon is not checked.");
 
 		nextRowsUpdated = TableQUnitUtils.nextEvent("rowsUpdated", oTable);
 		oModel.setData({modelData: aData});
 		await nextRowsUpdated;
 
-		assert.ok(!oHeaderSelector.getSelected(), "Select all icon is not checked.");
+		assert.ok(!oHeaderSelector.getCheckBoxSelected(), "Select all icon is not checked.");
 	});
 
 	QUnit.module("Event: _rowsUpdated", {

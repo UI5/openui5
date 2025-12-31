@@ -36,16 +36,16 @@ sap.ui.define([
 				/**
 				 * Type of the header selector.
 				 *
-				 * "checkbox" - Renders a checkbox.
+				 * "CheckBox" - Renders a checkbox.
 				 * Supported properties: visible, enabled, tooltip (has default value based on selected state), selected
 				 *
-				 * "custom" - Renders a custom icon.
+				 * "Icon" - Renders an icon.
 				 * Supported properties: visible, enabled, tooltip, icon
 				 */
-				type: {type: "string", group: "Appearance", defaultValue: "checkbox"},
+				type: {type: "string", group: "Appearance", defaultValue: "CheckBox"},
 
 				/**
-				 * Whether the header selector should be visible.
+				 * Whether the header selector is visible.
 				 */
 				visible: {type: "boolean", group: "Appearance", defaultValue: false},
 
@@ -55,16 +55,16 @@ sap.ui.define([
 				enabled: {type: "boolean", group: "Behavior", defaultValue: true},
 
 				/**
-				 * Whether all selectable items are selected.
+				 * Whether the checkbox is selected.
 				 *
-				 * Only used if type is "checkbox".
+				 * Only used if type is "CheckBox".
 				 */
-				selected: {type: "boolean", group: "Appearance", defaultValue: false},
+				checkBoxSelected: {type: "boolean", group: "Appearance", defaultValue: false},
 
 				/**
 				 * Icon URI.
 				 *
-				 * Only used if type is "custom".
+				 * Only used if type is "Icon".
 				 */
 				icon: {type: "sap.ui.core.URI", group: "Appearance", defaultValue: ""}
 			}
@@ -79,7 +79,7 @@ sap.ui.define([
 		this.resetProperty("type");
 		this.resetProperty("visible");
 		this.resetProperty("enabled");
-		this.resetProperty("selected");
+		this.resetProperty("checkBoxSelected");
 		this.resetProperty("icon");
 		this.destroyTooltip();
 	};

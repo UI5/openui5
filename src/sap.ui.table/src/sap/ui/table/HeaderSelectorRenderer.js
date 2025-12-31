@@ -43,8 +43,8 @@ sap.ui.define([
 				rm.class("sapUiTableHeaderSelectorDisabled");
 			}
 
-			if (sType === "checkbox") {
-				if (oHeaderSelector.getSelected()) {
+			if (sType === "CheckBox") {
+				if (oHeaderSelector.getCheckBoxSelected()) {
 					sTooltip ??= TableUtils.getResourceText("TBL_DESELECT_ALL");
 				} else {
 					sTooltip ??= TableUtils.getResourceText("TBL_SELECT_ALL");
@@ -62,15 +62,15 @@ sap.ui.define([
 		rm.openEnd();
 
 		if (bVisible) {
-			if (sType === "custom") {
+			if (sType === "Icon") {
 				rm.icon(oHeaderSelector.getIcon(), ["sapUiTableHeaderSelectorIcon"], {
 					"title": null
 				});
-			} else {
+			} else if (sType === "CheckBox") {
 				rm.openStart("div");
 				rm.class("sapUiTableCheckBox");
 
-				if (oHeaderSelector.getSelected()) {
+				if (oHeaderSelector.getCheckBoxSelected()) {
 					rm.class("sapUiTableCheckBoxSelected");
 				}
 

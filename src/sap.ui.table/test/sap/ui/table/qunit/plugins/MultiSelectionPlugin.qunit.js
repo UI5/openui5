@@ -44,7 +44,8 @@ sap.ui.define([
 				assert.strictEqual(oHeaderSelector.getVisible(), mExpectedConfig.visible, sTitle + "; Visible: " + mExpectedConfig.visible);
 				assert.strictEqual(oHeaderSelector.getType(), mExpectedConfig.type, sTitle + "; Type: " + mExpectedConfig.type);
 				assert.strictEqual(oHeaderSelector.getEnabled(), mExpectedConfig.enabled, sTitle + "; Enabled: " + mExpectedConfig.enabled);
-				assert.strictEqual(oHeaderSelector.getSelected(), mExpectedConfig.selected, sTitle + "; Selected: " + mExpectedConfig.selected);
+				assert.strictEqual(oHeaderSelector.getCheckBoxSelected(),
+					mExpectedConfig.selected, sTitle + "; CheckBoxSelected: " + mExpectedConfig.selected);
 
 				if (mExpectedConfig.icon) {
 					assert.strictEqual(oHeaderSelector.getIcon(), IconPool.getIconURI(mExpectedConfig.icon),
@@ -91,7 +92,7 @@ sap.ui.define([
 		const oHeaderSelector = this.oTable._getHeaderSelector();
 
 		this.assertHeaderSelector(assert, oHeaderSelector, {
-			type: "custom",
+			type: "Icon",
 			icon: TableUtils.ThemeParameters.checkboxIcon,
 			visible: true,
 			enabled: true,
@@ -113,7 +114,7 @@ sap.ui.define([
 		oMultiSelectionPlugin.setShowHeaderSelector(true);
 		oMultiSelectionPlugin.setLimit(0);
 		this.assertHeaderSelector(assert, oHeaderSelector, {
-			type: "checkbox",
+			type: "CheckBox",
 			visible: true,
 			enabled: true,
 			selected: false,
@@ -122,7 +123,7 @@ sap.ui.define([
 
 		await oMultiSelectionPlugin.selectAll();
 		this.assertHeaderSelector(assert, oHeaderSelector, {
-			type: "checkbox",
+			type: "CheckBox",
 			visible: true,
 			enabled: true,
 			selected: true,
@@ -132,7 +133,7 @@ sap.ui.define([
 		oMultiSelectionPlugin.setLimit(1);
 		await oMultiSelectionPlugin.setSelectionInterval(1, 1);
 		this.assertHeaderSelector(assert, oHeaderSelector, {
-			type: "custom",
+			type: "Icon",
 			icon: TableUtils.ThemeParameters.clearSelectionIcon,
 			visible: true,
 			enabled: true,
@@ -315,7 +316,7 @@ sap.ui.define([
 		const oSelectionPlugin = oTable._getSelectionPlugin();
 
 		assert.ok(oSelectionPlugin.isA("sap.ui.table.plugins.MultiSelectionPlugin"), "MultiSelectionPlugin is initialised");
-		assert.strictEqual(oHeaderSelector.getType(), "custom", "HeaderSelector type is custom");
+		assert.strictEqual(oHeaderSelector.getType(), "Icon", "HeaderSelector type is icon");
 		assert.strictEqual(oHeaderSelector.getTooltip(), "Select All", "Tooltip is correct");
 		assert.strictEqual(oHeaderSelector.getEnabled(), true, "HeaderSelector is enabled");
 		assert.strictEqual(oHeaderSelector.getVisible(), true, "HeaderSelector is visible");
@@ -345,7 +346,7 @@ sap.ui.define([
 		await oTable.qunit.whenRenderingFinished();
 
 		assert.ok(oSetPropertySpy.calledOnceWithExactly("limit", 0, false), "setProperty called once with the correct parameters");
-		assert.strictEqual(oHeaderSelector.getType(), "checkbox", "HeaderSelector type is checkbox when limit is disabled");
+		assert.strictEqual(oHeaderSelector.getType(), "CheckBox", "HeaderSelector type is checkbox when limit is disabled");
 		assert.strictEqual(oHeaderSelector.getTooltip(), null, "Tooltip is correct");
 	});
 
@@ -1137,13 +1138,13 @@ sap.ui.define([
 		const iHighestSelectableIndex = oSelectionPlugin._getHighestSelectableIndex();
 		const oHeaderSelector = oTable._getHeaderSelector();
 
-		assert.equal(oHeaderSelector.getType(), "custom", "The headerSelector type is custom");
+		assert.equal(oHeaderSelector.getType(), "Icon", "The headerSelector type is icon");
 
 		oSelectionPlugin.setLimit(0);
 		oSelectionPlugin.attachSelectionChange(oSelectionChangeSpy);
 		await oTable.qunit.whenRenderingFinished();
 
-		assert.equal(oHeaderSelector.getType(), "checkbox", "The headerSelector type is checkbox");
+		assert.equal(oHeaderSelector.getType(), "CheckBox", "The headerSelector type is checkbox");
 
 		fnGetContexts.resetHistory();
 		oSelectionPlugin.attachEventOnce("selectionChange", function(oEvent) {
@@ -1185,7 +1186,7 @@ sap.ui.define([
 		oSelectionPlugin.attachSelectionChange(oSelectionChangeSpy);
 
 		await oTable.qunit.whenRenderingFinished();
-		assert.equal(oHeaderSelector.getType(), "custom", "The headerSelector type is correct");
+		assert.equal(oHeaderSelector.getType(), "Icon", "The headerSelector type is correct");
 
 		sinon.stub(oSelectionPlugin, "_getHighestSelectableIndex").returns(250); // simulate count is not available
 

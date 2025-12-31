@@ -116,8 +116,8 @@ sap.ui.define([
 
 		oHeaderSelector.setVisible(TableUtils.hasSelectAll(oPlugin.getControl()));
 		oHeaderSelector.setEnabled(true);
-		oHeaderSelector.setType("checkbox");
-		oHeaderSelector.setSelected(iSelectableCount > 0 && iSelectableCount === oPlugin.getSelectedCount());
+		oHeaderSelector.setType("CheckBox");
+		oHeaderSelector.setCheckBoxSelected(iSelectableCount > 0 && iSelectableCount === oPlugin.getSelectedCount());
 	}
 
 	function toggleSelectAll(oPlugin) {

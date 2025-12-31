@@ -657,10 +657,10 @@ sap.ui.define([
 
 			const sHeaderSelectorType = oHeaderSelector.getType();
 
-			if (sHeaderSelectorType === "checkbox") {
+			if (sHeaderSelectorType === "CheckBox") {
 				mAttributes["role"] = ["checkbox"];
-				mAttributes["aria-checked"] = oHeaderSelector.getSelected().toString();
-			} else if (sHeaderSelectorType === "custom") {
+				mAttributes["aria-checked"] = oHeaderSelector.getCheckBoxSelected().toString();
+			} else if (sHeaderSelectorType === "Icon") {
 				mAttributes["role"] = ["button"];
 			}
 

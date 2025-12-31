@@ -196,7 +196,9 @@ sap.ui.define([
 		assert.equal(oInnerCreationTemplate.getWrapping(), false, "creationTemplate: wrapping");
 
 		// Template without wrapping property
-		const MyControl = Control.extend("sap.ui.mdc.test.MyControl");
+		const MyControl = Control.extend("sap.ui.mdc.test.MyControl", {
+			renderer: null
+		});
 		this.oTable.addColumn(new Column({
 			template: new MyControl({text: "NoWrappingProperty"}),
 			creationTemplate: new MyControl({text: "NoWrappingProperty"})
