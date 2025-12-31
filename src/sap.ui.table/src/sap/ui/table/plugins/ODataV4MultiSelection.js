@@ -237,14 +237,14 @@ sap.ui.define([
 			return;
 		}
 
-		const sType = oPlugin._isLimitDisabled() ? "checkbox" : "custom";
+		const sType = oPlugin._isLimitDisabled() ? "CheckBox" : "Icon";
 		const iSelectableCount = getSelectableCount(oPlugin);
 		const iSelectedCount = oPlugin.getSelectedCount();
 		const bAllRowsSelected = areAllRowsSelected(iSelectableCount, iSelectedCount);
 		let sTooltip = null;
 		let sIcon = "";
 
-		if (sType === "custom") { // Default tooltip is used for type checkbox.
+		if (sType === "Icon") { // Default tooltip is used for type CheckBox.
 			sTooltip = iSelectedCount === 0 ? TableUtils.getResourceText("TBL_SELECT_ALL") : TableUtils.getResourceText("TBL_DESELECT_ALL");
 		}
 
@@ -259,7 +259,7 @@ sap.ui.define([
 		oHeaderSelector.setVisible(!oPlugin.getHideHeaderSelector());
 		oHeaderSelector.setEnabled(iSelectableCount !== 0);
 		oHeaderSelector.setType(sType);
-		oHeaderSelector.setSelected(bAllRowsSelected);
+		oHeaderSelector.setCheckBoxSelected(bAllRowsSelected);
 		oHeaderSelector.setTooltip(sTooltip);
 		oHeaderSelector.setIcon(sIcon);
 	}
@@ -311,10 +311,10 @@ sap.ui.define([
 			return;
 		}
 
-		if (oHeaderSelector.getType() === "checkbox") {
+		if (oHeaderSelector.getType() === "CheckBox") {
 			toggleSelectAll(this);
-		} else if (oHeaderSelector.getType() === "custom") {
-			if (this.getSelectedCount() > 0) {
+	} else if (oHeaderSelector.getType() === "Icon") {
+		if (this.getSelectedCount() > 0) {
 				this.clearSelection();
 			} else {
 				const oBinding = this.getControl().getBinding();

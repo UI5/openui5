@@ -15,6 +15,7 @@ sap.ui.define([
 	'sap/ui/Device',
 	'sap/ui/core/Popup',
 	"sap/ui/dom/containsOrEquals",
+	"sap/ui/core/LabelEnablement",
 	'./InputBaseRenderer',
 	'sap/base/Log',
 	"sap/ui/events/KeyCodes",
@@ -40,6 +41,7 @@ function(
 	Device,
 	Popup,
 	containsOrEquals,
+	LabelEnablement,
 	InputBaseRenderer,
 	log,
 	KeyCodes,
@@ -1234,17 +1236,15 @@ function(
 	 * @protected
 	 */
 	InputBase.prototype.getLabels = function() {
-		var aLabelIDs = this.getAriaLabelledBy().map(function(sLabelID) {
+		var aLabelIDs = this.getAriaLabelledBy()
+			.concat(LabelEnablement.getReferencingLabels(this));
+
+		aLabelIDs = aLabelIDs.filter(function(sId, iIndex) {
+			return aLabelIDs.indexOf(sId) === iIndex;
+		})
+		.map(function(sLabelID) {
 			return Element.getElementById(sLabelID);
 		});
-
-		var oLabelEnablement = sap.ui.require("sap/ui/core/LabelEnablement");
-
-		if (oLabelEnablement) {
-			aLabelIDs = aLabelIDs.concat(oLabelEnablement.getReferencingLabels(this).map(function(sLabelID) {
-				return Element.getElementById(sLabelID);
-			}));
-		}
 
 		return aLabelIDs;
 	};

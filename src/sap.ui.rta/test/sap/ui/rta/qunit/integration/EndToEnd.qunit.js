@@ -6,11 +6,12 @@ sap.ui.define([
 	"sap/ui/core/LabelEnablement",
 	"sap/ui/dt/OverlayRegistry",
 	"sap/ui/events/KeyCodes",
-	"sap/ui/qunit/QUnitUtils",
 	"sap/ui/test/utils/nextUIUpdate",
+	"sap/ui/qunit/QUnitUtils",
 	"sap/ui/rta/RuntimeAuthoring",
 	"sap/ui/rta/Utils",
 	"sap/ui/thirdparty/sinon-4",
+	"sap/ui/Device",
 	"test-resources/sap/ui/fl/api/FlexTestAPI"
 ], function(
 	RtaQunitUtils,
@@ -18,11 +19,12 @@ sap.ui.define([
 	LabelEnablement,
 	OverlayRegistry,
 	KeyCodes,
-	QUnitUtils,
 	nextUIUpdate,
+	QUnitUtils,
 	RuntimeAuthoring,
 	RtaUtils,
 	sinon,
+	Device,
 	FlexTestAPI
 ) {
 	"use strict";
@@ -31,14 +33,14 @@ sap.ui.define([
 	let oCompCont;
 	let oView;
 
-	function triggerKeydown(oTargetDomRef, iKeyCode, bShiftKey = false, bAltKey = false, bCtrlKey = false, bMetaKey = false) {
+	function triggerKeydown(oTargetDomRef, iKeyCode, bShiftKey = false, bAltKey = false, bCtrlOrMetaKey = false) {
+		const sCtrlKey = Device.os.macintosh ? "metaKey" : "ctrlKey";
 		const oEvent = new KeyboardEvent("keydown", {
 			keyCode: iKeyCode,
 			which: iKeyCode,
 			shiftKey: bShiftKey,
 			altKey: bAltKey,
-			ctrlKey: bCtrlKey,
-			metaKey: bMetaKey,
+			[sCtrlKey]: bCtrlOrMetaKey,
 			bubbles: true,
 			cancelable: true
 		});

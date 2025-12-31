@@ -1103,29 +1103,29 @@ sap.ui.define([
 	QUnit.test("Type and visibility", function(assert) {
 		const oHeaderSelector = this.oTable._getHeaderSelector();
 
-		assert.strictEqual(oHeaderSelector.getType(), "custom", "Default type");
+		assert.strictEqual(oHeaderSelector.getType(), "Icon", "Default type");
 		assert.strictEqual(oHeaderSelector.getVisible(), true, "Default visibility");
 
 		this.oSelectionPlugin.setHideHeaderSelector(true);
 		assert.strictEqual(oHeaderSelector.getVisible(), false, "Visibility when hidden");
 
 		this.oSelectionPlugin.setHideHeaderSelector(false);
-		assert.strictEqual(oHeaderSelector.getType(), "custom", "Type when shown again");
+		assert.strictEqual(oHeaderSelector.getType(), "Icon", "Type when shown again");
 		assert.strictEqual(oHeaderSelector.getVisible(), true, "Visibility when shown again");
 
 		this.oSelectionPlugin.setLimit(0);
-		assert.strictEqual(oHeaderSelector.getType(), "checkbox", "Type when limit disabled");
+		assert.strictEqual(oHeaderSelector.getType(), "CheckBox", "Type when limit disabled");
 		assert.strictEqual(oHeaderSelector.getVisible(), true, "Visibility when limit disabled");
 
 		this.oSelectionPlugin.setHideHeaderSelector(true);
 		assert.strictEqual(oHeaderSelector.getVisible(), false, "Visibility when hidden and limit disabled");
 
 		this.oSelectionPlugin.setHideHeaderSelector(false);
-		assert.strictEqual(oHeaderSelector.getType(), "checkbox", "Type when shown again and limit disabled");
+		assert.strictEqual(oHeaderSelector.getType(), "CheckBox", "Type when shown again and limit disabled");
 		assert.strictEqual(oHeaderSelector.getVisible(), true, "Visibility when shown again and limit disabled");
 
 		this.oSelectionPlugin.setLimit(100);
-		assert.strictEqual(oHeaderSelector.getType(), "custom", "Type when limit enabled again");
+		assert.strictEqual(oHeaderSelector.getType(), "Icon", "Type when limit enabled again");
 		assert.strictEqual(oHeaderSelector.getVisible(), true, "Visibility when limit enabled again");
 	});
 

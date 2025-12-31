@@ -241,9 +241,9 @@ sap.ui.define([
 
 	QUnit.test("Rebind when everything is selected", function(assert) {
 		this.oTable.selectAll();
-		assert.ok(this.oTable._getHeaderSelector().getSelected(), "HeaderSelector is selected before rebind");
+		assert.ok(this.oTable._getHeaderSelector().getCheckBoxSelected(), "HeaderSelector is selected before rebind");
 
 		this.oTable.bindRows(this.oTable.getBindingInfo("rows"));
-		assert.notOk(this.oTable._getHeaderSelector().getSelected(), "HeaderSelector is not selected after rebind");
+		assert.notOk(this.oTable._getHeaderSelector().getCheckBoxSelected(), "HeaderSelector is not selected after rebind");
 	});
 });

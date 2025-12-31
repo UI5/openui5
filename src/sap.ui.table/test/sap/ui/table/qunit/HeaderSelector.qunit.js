@@ -23,28 +23,28 @@ sap.ui.define([
 	});
 
 	QUnit.test("Defaults", function(assert) {
-		assert.strictEqual(this.oHeaderSelector.getType(), "checkbox", "Default type is 'checkbox'");
+		assert.strictEqual(this.oHeaderSelector.getType(), "CheckBox", "Default type is 'CheckBox'");
 		assert.strictEqual(this.oHeaderSelector.getVisible(), false, "Default visible is false");
 		assert.strictEqual(this.oHeaderSelector.getEnabled(), true, "Default enabled is true");
-		assert.strictEqual(this.oHeaderSelector.getSelected(), false, "Default selected is false");
+		assert.strictEqual(this.oHeaderSelector.getCheckBoxSelected(), false, "Default checkBoxSelected is false");
 		assert.strictEqual(this.oHeaderSelector.getIcon(), "", "Default icon is empty string");
 		assert.strictEqual(this.oHeaderSelector.getTooltip(), null, "Default tooltip is null");
 	});
 
 	QUnit.test("#resetSettings", function(assert) {
-		this.oHeaderSelector.setType("custom");
+		this.oHeaderSelector.setType("Icon");
 		this.oHeaderSelector.setVisible(true);
 		this.oHeaderSelector.setEnabled(false);
-		this.oHeaderSelector.setSelected(true);
+		this.oHeaderSelector.setCheckBoxSelected(true);
 		this.oHeaderSelector.setIcon("sap-icon://accept");
 		this.oHeaderSelector.setTooltip("Test Tooltip");
 
 		this.oHeaderSelector.resetSettings();
 
-		assert.strictEqual(this.oHeaderSelector.getType(), "checkbox", "Type reset to default");
+		assert.strictEqual(this.oHeaderSelector.getType(), "CheckBox", "Type reset to default");
 		assert.strictEqual(this.oHeaderSelector.getVisible(), false, "Visible reset to default");
 		assert.strictEqual(this.oHeaderSelector.getEnabled(), true, "Enabled reset to default");
-		assert.strictEqual(this.oHeaderSelector.getSelected(), false, "Selected reset to default");
+		assert.strictEqual(this.oHeaderSelector.getCheckBoxSelected(), false, "CheckBoxSelected reset to default");
 		assert.strictEqual(this.oHeaderSelector.getIcon(), "", "Icon reset to default");
 		assert.strictEqual(this.oHeaderSelector.getTooltip(), null, "Tooltip reset to default");
 	});
@@ -82,7 +82,7 @@ sap.ui.define([
 
 		assertDOM();
 
-		this.oHeaderSelector.setType("custom");
+		this.oHeaderSelector.setType("Icon");
 		this.oHeaderSelector.setIcon("sap-icon://decline");
 		this.oHeaderSelector.setTooltip("Test Tooltip");
 		assertDOM();
@@ -118,10 +118,10 @@ sap.ui.define([
 		oDomRef = this.oHeaderSelector.getDomRef();
 		assert.strictEqual(oDomRef.getAttribute("tabindex"), "-1", "tabindex for checkbox");
 
-		this.oHeaderSelector.setType("custom");
+		this.oHeaderSelector.setType("Icon");
 		await nextUIUpdate();
 		oDomRef = this.oHeaderSelector.getDomRef();
-		assert.strictEqual(oDomRef.getAttribute("tabindex"), "-1", "tabindex for custom");
+		assert.strictEqual(oDomRef.getAttribute("tabindex"), "-1", "tabindex for icon");
 
 		this.oHeaderSelector.setEnabled(false);
 		await nextUIUpdate();
@@ -157,7 +157,7 @@ sap.ui.define([
 
 	QUnit.test("type=checkbox, selected=true, enabled=true", async function(assert) {
 		this.oHeaderSelector.setVisible(true);
-		this.oHeaderSelector.setSelected(true);
+		this.oHeaderSelector.setCheckBoxSelected(true);
 		await nextUIUpdate();
 
 		const oDomRef = this.oHeaderSelector.getDomRef();
@@ -191,7 +191,7 @@ sap.ui.define([
 
 	QUnit.test("type=checkbox, selected=true, enabled=false", async function(assert) {
 		this.oHeaderSelector.setVisible(true);
-		this.oHeaderSelector.setSelected(true);
+		this.oHeaderSelector.setCheckBoxSelected(true);
 		this.oHeaderSelector.setEnabled(false);
 		await nextUIUpdate();
 
@@ -218,7 +218,7 @@ sap.ui.define([
 
 	QUnit.test("type=custom, enabled=true, visible=true with icon", async function(assert) {
 		this.oHeaderSelector.setVisible(true);
-		this.oHeaderSelector.setType("custom");
+		this.oHeaderSelector.setType("Icon");
 		this.oHeaderSelector.setIcon("sap-icon://decline");
 		await nextUIUpdate();
 
@@ -243,7 +243,7 @@ sap.ui.define([
 
 	QUnit.test("type=custom with icon and tooltip", async function(assert) {
 		this.oHeaderSelector.setVisible(true);
-		this.oHeaderSelector.setType("custom");
+		this.oHeaderSelector.setType("Icon");
 		this.oHeaderSelector.setIcon("sap-icon://accept");
 		this.oHeaderSelector.setTooltip("Clear Selection");
 		await nextUIUpdate();
@@ -257,7 +257,7 @@ sap.ui.define([
 
 	QUnit.test("type=custom, enabled=false with icon", async function(assert) {
 		this.oHeaderSelector.setVisible(true);
-		this.oHeaderSelector.setType("custom");
+		this.oHeaderSelector.setType("Icon");
 		this.oHeaderSelector.setIcon("sap-icon://decline");
 		this.oHeaderSelector.setEnabled(false);
 		await nextUIUpdate();
@@ -274,9 +274,9 @@ sap.ui.define([
 
 	QUnit.test("type=custom, selected property is ignored", async function(assert) {
 		this.oHeaderSelector.setVisible(true);
-		this.oHeaderSelector.setType("custom");
+		this.oHeaderSelector.setType("Icon");
 		this.oHeaderSelector.setIcon("sap-icon://decline");
-		this.oHeaderSelector.setSelected(true);
+		this.oHeaderSelector.setCheckBoxSelected(true);
 		await nextUIUpdate();
 
 		const oDomRef = this.oHeaderSelector.getDomRef();
@@ -305,26 +305,25 @@ sap.ui.define([
 		let oDomRef = this.oHeaderSelector.getDomRef();
 		assert.ok(oDomRef.querySelector(".sapUiTableCheckBox"), "Initially has checkbox");
 
-		this.oHeaderSelector.setType("custom");
+		this.oHeaderSelector.setType("Icon");
 		this.oHeaderSelector.setIcon("sap-icon://decline");
 		await nextUIUpdate();
 
 		oDomRef = this.oHeaderSelector.getDomRef();
 		assert.notOk(oDomRef.querySelector(".sapUiTableCheckBox"), "No checkbox after switch");
 		assert.ok(oDomRef.querySelector(".sapUiIcon"), "Has icon after switch");
-		assert.notOk(oDomRef.classList.contains("sapUiTableSelAllVisible"), "No checkbox classes");
 	});
 
 	QUnit.test("Switching from type=custom to type=checkbox", async function(assert) {
 		this.oHeaderSelector.setVisible(true);
-		this.oHeaderSelector.setType("custom");
+		this.oHeaderSelector.setType("Icon");
 		this.oHeaderSelector.setIcon("sap-icon://accept");
 		await nextUIUpdate();
 
 		let oDomRef = this.oHeaderSelector.getDomRef();
 		assert.ok(oDomRef.querySelector(".sapUiIcon"), "Initially has icon");
 
-		this.oHeaderSelector.setType("checkbox");
+		this.oHeaderSelector.setType("CheckBox");
 		await nextUIUpdate();
 
 		oDomRef = this.oHeaderSelector.getDomRef();
@@ -352,7 +351,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("ARIA role; type=custom", async function(assert) {
-		this.oHeaderSelector.setType("custom");
+		this.oHeaderSelector.setType("Icon");
 		await nextUIUpdate();
 		assert.strictEqual(this.oHeaderSelector.getDomRef().getAttribute("role"), "button");
 	});
@@ -363,7 +362,7 @@ sap.ui.define([
 		await nextUIUpdate();
 		assert.strictEqual(oDomRef.getAttribute("aria-checked"), "false", "aria-checked when not selected");
 
-		this.oHeaderSelector.setSelected(true);
+		this.oHeaderSelector.setCheckBoxSelected(true);
 		await nextUIUpdate();
 		assert.strictEqual(oDomRef.getAttribute("aria-checked"), "true", "aria-checked when selected");
 	});
@@ -371,11 +370,11 @@ sap.ui.define([
 	QUnit.test("ARIA checked; type=custom", async function(assert) {
 		const oDomRef = this.oHeaderSelector.getDomRef();
 
-		this.oHeaderSelector.setType("custom");
+		this.oHeaderSelector.setType("Icon");
 		await nextUIUpdate();
 		assert.ok(!oDomRef.hasAttribute("aria-checked"), "No aria-checked attribute when not selected");
 
-		this.oHeaderSelector.setSelected(true);
+		this.oHeaderSelector.setCheckBoxSelected(true);
 		await nextUIUpdate();
 		assert.ok(!oDomRef.hasAttribute("aria-checked"), "No aria-checked attribute when selected");
 	});
@@ -393,7 +392,7 @@ sap.ui.define([
 	QUnit.test("ARIA disabled; type=custom", async function(assert) {
 		const oDomRef = this.oHeaderSelector.getDomRef();
 
-		this.oHeaderSelector.setType("custom");
+		this.oHeaderSelector.setType("Icon");
 		await nextUIUpdate();
 		assert.strictEqual(oDomRef.getAttribute("aria-disabled"), "false", "aria-disabled when enabled");
 

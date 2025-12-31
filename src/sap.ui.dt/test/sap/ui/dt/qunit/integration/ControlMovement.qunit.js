@@ -1,35 +1,37 @@
 /* global QUnit */
 
 sap.ui.define([
-	"sap/ui/dt/plugin/ControlDragDrop",
-	"sap/ui/dt/plugin/CutPaste",
-	"sap/ui/dt/OverlayRegistry",
-	"sap/ui/dt/DesignTime",
 	"sap/m/Button",
 	"sap/m/ObjectAttribute",
 	"sap/m/ObjectHeader",
-	"sap/ui/layout/VerticalLayout",
 	"sap/m/Page",
 	"sap/m/SplitContainer",
-	"sap/ui/qunit/QUnitUtils",
+	"sap/ui/dt/plugin/ControlDragDrop",
+	"sap/ui/dt/plugin/CutPaste",
+	"sap/ui/dt/DesignTime",
+	"sap/ui/dt/OverlayRegistry",
 	"sap/ui/events/KeyCodes",
+	"sap/ui/layout/VerticalLayout",
+	"sap/ui/test/utils/nextUIUpdate",
+	"sap/ui/qunit/QUnitUtils",
 	"sap/ui/thirdparty/sinon-4",
-	"sap/ui/test/utils/nextUIUpdate"
+	"sap/ui/Device"
 ], function(
-	ControlDragDrop,
-	CutPaste,
-	OverlayRegistry,
-	DesignTime,
 	Button,
 	ObjectAttribute,
 	ObjectHeader,
-	VerticalLayout,
 	Page,
 	SplitContainer,
-	QUnitUtils,
+	ControlDragDrop,
+	CutPaste,
+	DesignTime,
+	OverlayRegistry,
 	KeyCodes,
+	VerticalLayout,
+	nextUIUpdate,
+	QUnitUtils,
 	sinon,
-	nextUIUpdate
+	Device
 ) {
 	"use strict";
 
@@ -45,14 +47,14 @@ sap.ui.define([
 		};
 	}
 
-	function triggerKeydown(oTargetDomRef, iKeyCode, bShiftKey = false, bAltKey = false, bCtrlKey = false, bMetaKey = false) {
+	function triggerKeydown(oTargetDomRef, iKeyCode, bShiftKey = false, bAltKey = false, bCtrlOrMetaKey = false) {
+		const sCtrlKey = Device.os.macintosh ? "metaKey" : "ctrlKey";
 		const oEvent = new KeyboardEvent("keydown", {
 			keyCode: iKeyCode,
 			which: iKeyCode,
 			shiftKey: bShiftKey,
 			altKey: bAltKey,
-			ctrlKey: bCtrlKey,
-			metaKey: bMetaKey,
+			[sCtrlKey]: bCtrlOrMetaKey,
 			bubbles: true,
 			cancelable: true
 		});
@@ -180,7 +182,7 @@ sap.ui.define([
 
 		QUnit.test("when the cut is triggered on a button overlay, that doesn't fit to ObjectHeader", function(assert) {
 			var done = assert.async();
-			triggerKeydown(this.oButtonOverlay.getDomRef(), KeyCodes.X, false, false, true, true);
+			triggerKeydown(this.oButtonOverlay.getDomRef(), KeyCodes.X, false, false, true);
 
 			this.oCutPaste.getElementMover().attachValidTargetZonesActivated(function() {
 				assert.ok(this.oLayoutAggregationOverlay.isTargetZone(), "the valid aggregation is marked as target zone");
@@ -195,14 +197,14 @@ sap.ui.define([
 		});
 
 		QUnit.test("when the cut is triggered on a non movable overlay (ObjectHeader)", function(assert) {
-			triggerKeydown(this.oObjectHeaderOverlay.getDomRef(), KeyCodes.X, false, false, true, true);
+			triggerKeydown(this.oObjectHeaderOverlay.getDomRef(), KeyCodes.X, false, false, true);
 
 			assert.ok(!this.oObjectHeaderOverlay.hasStyleClass("sapUiDtOverlayCutted"), "then the object header overlay is not marked with the cut style");
 			assert.ok(!this.oLayoutAggregationOverlay.isTargetZone(), "the valid aggregation is not marked as target zone");
 		});
 
 		QUnit.test("when the cut is triggered on an in this situation non movable overlay", function(assert) {
-			triggerKeydown(this.oNotMovableButtonOverlay.getDomRef(), KeyCodes.X, false, false, true, true);
+			triggerKeydown(this.oNotMovableButtonOverlay.getDomRef(), KeyCodes.X, false, false, true);
 
 			assert.ok(!this.oNotMovableButtonOverlay.hasStyleClass("sapUiDtOverlayCutted"), "then the button overlay is not marked with the cut style");
 			assert.ok(!this.oLayoutAggregationOverlay.isTargetZone(), "the valid aggregation is not marked as target zone");
@@ -210,7 +212,7 @@ sap.ui.define([
 
 		QUnit.test("when the cut is triggered on a button overlay,", function(assert) {
 			var done = assert.async();
-			triggerKeydown(this.oButtonOverlay.getDomRef(), KeyCodes.X, false, false, true, true);
+			triggerKeydown(this.oButtonOverlay.getDomRef(), KeyCodes.X, false, false, true);
 
 			this.oCutPaste.getElementMover().attachValidTargetZonesActivated(function() {
 				assert.ok(this.oCutPaste.isElementPasteable(this.oLayoutOverlay), "the target overlay of a valid element is pasteable");
@@ -232,8 +234,8 @@ sap.ui.define([
 
 		QUnit.test("and cut was triggered, when another cut is triggered, then", function(assert) {
 			var done = assert.async();
-			triggerKeydown(this.oButtonOverlay.getDomRef(), KeyCodes.X, false, false, true, true);
-			triggerKeydown(this.oObjectAttributeOverlay.getDomRef(), KeyCodes.X, false, false, true, true);
+			triggerKeydown(this.oButtonOverlay.getDomRef(), KeyCodes.X, false, false, true);
+			triggerKeydown(this.oObjectAttributeOverlay.getDomRef(), KeyCodes.X, false, false, true);
 
 			this.oCutPaste.getElementMover().attachEventOnce("validTargetZonesActivated", function() {
 				assert.ok(this.oLayoutAggregationOverlay.isTargetZone(), "the valid aggregation (layout) is marked as target zone");
@@ -346,10 +348,10 @@ sap.ui.define([
 
 		QUnit.test("and object attribute was cutted, when paste is triggered on the layout (control with target zone aggregation), then", function(assert) {
 			var done = assert.async();
-			triggerKeydown(this.oObjectAttributeOverlay.getDomRef(), KeyCodes.X, false, false, true, true);
+			triggerKeydown(this.oObjectAttributeOverlay.getDomRef(), KeyCodes.X, false, false, true);
 
 			this.oCutPaste.getElementMover().attachValidTargetZonesActivated(function() {
-				triggerKeydown(this.oLayoutOverlay.getDomRef(), KeyCodes.V, false, false, true, true);
+				triggerKeydown(this.oLayoutOverlay.getDomRef(), KeyCodes.V, false, false, true);
 				assert.equal(this.oObjectHeader.getAttributes().length, 0, "object attribute is removed from the header");
 				assert.equal(this.oLayout.getContent()[0].getId(), this.oObjectAttribute.getId(), "object attribute is inserted at the 1. position");
 				assert.equal(this.oLayout.getContent()[1].getId(), this.oObjectHeader.getId(), "object header is now at 2. position");
@@ -365,10 +367,10 @@ sap.ui.define([
 
 		QUnit.test("and object attribute was cutted, when paste is triggered on the button (control in a target zone aggregation), then", function(assert) {
 			var done = assert.async();
-			triggerKeydown(this.oObjectAttributeOverlay.getDomRef(), KeyCodes.X, false, false, true, true);
+			triggerKeydown(this.oObjectAttributeOverlay.getDomRef(), KeyCodes.X, false, false, true);
 
 			this.oCutPaste.getElementMover().attachValidTargetZonesActivated(function() {
-				triggerKeydown(this.oButtonOverlay.getDomRef(), KeyCodes.V, false, false, true, true);
+				triggerKeydown(this.oButtonOverlay.getDomRef(), KeyCodes.V, false, false, true);
 
 				assert.equal(this.oObjectHeader.getAttributes().length, 0, "object attribute is removed from the header");
 				assert.equal(this.oLayout.getContent()[0].getId(), this.oObjectHeader.getId(), "object header stays at 1. position");
@@ -386,7 +388,7 @@ sap.ui.define([
 
 		QUnit.test("and button was cutted, when paste is triggered on the object attribute (control in an invalid aggregation), then", function(assert) {
 			var done = assert.async();
-			triggerKeydown(this.oButtonOverlay.getDomRef(), KeyCodes.X, false, false, true, true);
+			triggerKeydown(this.oButtonOverlay.getDomRef(), KeyCodes.X, false, false, true);
 
 			this.oCutPaste.getElementMover().attachValidTargetZonesActivated(function() {
 				triggerKeydown(this.oObjectAttributeOverlay.getDomRef(), KeyCodes.V, false, false, true);
@@ -501,7 +503,7 @@ sap.ui.define([
 
 		QUnit.test("when the cut is triggered on the page overlay, that fit into both aggregations", function(assert) {
 			var done = assert.async();
-			triggerKeydown(this.oPage1Overlay.getDomRef(), KeyCodes.X, false, false, true, true);
+			triggerKeydown(this.oPage1Overlay.getDomRef(), KeyCodes.X, false, false, true);
 
 			this.oCutPaste.getElementMover().attachValidTargetZonesActivated(function() {
 				assert.ok(this.oSplitContainerMasterPagesAggregationOverlay.isTargetZone(), "both aggregations are marked as target zone");

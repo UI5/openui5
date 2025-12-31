@@ -30,6 +30,7 @@ function(
 			which: iKeyCode,
 			shiftKey: bShiftKey || false,
 			altKey: bAltKey || false,
+			// This test module deliberately distinguishes mac and win (meta vs ctrl key)
 			ctrlKey: bCtrlKey || false,
 			metaKey: bMetaKey || false
 		});

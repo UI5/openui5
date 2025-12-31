@@ -76,6 +76,7 @@ sap.ui.define([
 		oParams.which = oParams.keyCode;
 		oParams.shiftKey = bShiftKey;
 		oParams.altKey = bAltKey;
+		// This test module deliberately distinguishes mac and win (meta vs ctrl key)
 		oParams.metaKey = bMetaKey;
 		oParams.ctrlKey = bCtrlKey;
 		document.dispatchEvent(new KeyboardEvent("keydown", oParams));

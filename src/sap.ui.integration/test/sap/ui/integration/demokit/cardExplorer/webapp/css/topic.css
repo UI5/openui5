@@ -248,19 +248,6 @@ code {
 	margin-bottom: 1rem;
 }
 
-#analyticalCardWithTooltips, 
-#analyticalNoDataCardWithTooltips,
-#iconFitTypeExample, 
-#formWithValidationExample,
-#analyticalBarNoDataCard,
-#analyticalBarCardExample,
-#donutCardExample,
-#donutNoDataCardExample {
-	.sapFCardHeaderMainWrapper {
-		flex-wrap: nowrap;
-	}
-} 
-
 .noDataCardExample {
 	min-height: 352px;
 }
