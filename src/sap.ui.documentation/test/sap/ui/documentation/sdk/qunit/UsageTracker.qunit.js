@@ -130,7 +130,7 @@ function (UsageTracker, Localization) {
 
 	QUnit.module("session-start event", {
 		beforeEach: function () {
-			this.oTracker = new UsageTracker(new oFactory.getAppComponent());
+			this.oTracker = new UsageTracker(oFactory.getAppComponent());
 			this.sandbox = sinon.createSandbox();
 			this.sandbox.stub(this.oTracker, "_composeDefaultPageTitleFromRoute")
 				.returns(""); // not relevant to this test
@@ -182,7 +182,7 @@ function (UsageTracker, Localization) {
 
 	QUnit.module("page re-visit", {
 		beforeEach: function () {
-			this.oTracker = new UsageTracker(new oFactory.getAppComponent());
+			this.oTracker = new UsageTracker(oFactory.getAppComponent());
 			this.sandbox = sinon.createSandbox();
 			this.sandbox.stub(this.oTracker, "_composeDefaultPageTitleFromRoute")
 				.returns(""); // not relevant to this test
