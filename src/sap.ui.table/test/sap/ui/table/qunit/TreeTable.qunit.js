@@ -707,7 +707,7 @@ sap.ui.define([
 		beforeEach: function() {
 			this.oTable = TableQUnitUtils.createTable(TreeTable, {
 				rows: {path: "/"},
-				models: new TableQUnitUtils.createJSONModel(8),
+				models: TableQUnitUtils.createJSONModel(8),
 				rowMode: new FixedRowMode({rowCount: 5})
 			});
 			const oBinding = this.oTable.getBinding();

@@ -114,7 +114,7 @@ sap.ui.define([
 	 *
 	 * @public
 	 */
-	const FieldBase = Control.extend("sap.ui.mdc.field.FieldBase", /* @lends sap.ui.mdc.field.FieldBase.prototype */ {
+	const FieldBase = Control.extend("sap.ui.mdc.field.FieldBase", /** @lends sap.ui.mdc.field.FieldBase.prototype */ {
 		metadata: {
 			interfaces: [
 				"sap.ui.core.IFormContent",
