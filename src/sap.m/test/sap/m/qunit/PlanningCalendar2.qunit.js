@@ -726,7 +726,12 @@ sap.ui.define([
 	});
 
 	QUnit.test('today button is disabled when today is visible', function(assert) {
-		var oToday = UI5Date.getInstance();
+		// Fake a 'today' value that is within a 10 years range from oPC's start date.
+		// Otherwise, `_switchToDate` fails to navigate to it. The chosen value also must
+		// be outside oPC's current interval, otherwise no change is detected and the
+		// enabled state of the "today" button is not updated.
+		var oFakeNow = UI5Date.getInstance(2017, 0, 1),
+			clock = sinon.useFakeTimers(oFakeNow.getTime());
 		var oTodayBtn = _getTodayButton.call(this, this.oPC);
 
 		//assert
@@ -734,10 +739,13 @@ sap.ui.define([
 
 		//act
 		//_switchDate....
-		_switchToDate(this.oPC, this.oPCInterval, this.oPCInterval.getStartDate().getDate(), oToday.getMonth(), oToday.getFullYear());
+		_switchToDate(this.oPC, this.oPCInterval, this.oPCInterval.getStartDate().getDate(), oFakeNow.getMonth(), oFakeNow.getFullYear());
 
 		//assert
 		assert.equal(oTodayBtn.getEnabled(), false, 'today button is disabled when today is visible');
+
+		//cleanup
+		clock.restore();
 	});
 
 	QUnit.test('clicking today navigates to todays month', function(assert) {
