@@ -266,7 +266,7 @@ sap.ui.define([
 
 		const sFilterBarID = "container-v4demo---books--booksFilterBar";
 		// for the Filterbar the sFilterBarID can be Object instance or id string.
-		When.onTheMDCFilterBar.iPersonalizeFilter(sFilterBarID, {	Books: ["Author ID"] });
+		When.onTheMDCFilterBar.iPersonalizeFilter(sFilterBarID, { Books: ["Author ID"] });
 		//    When.onTheMDCChart.iPersonalizeFilter(sFilterBarID, [{key : "language_code", operator: "EQ", values: ["DE"], inputControl: "__component0---books--booksTable--filter--language_code"}]);
 		//TODO no assertions available
 		When.onTheMDCFilterBar.iResetThePersonalization(sFilterBarID);
@@ -274,7 +274,13 @@ sap.ui.define([
 		When.onTheMDCFilterBar.iEnterFilterValue(sFilterBarID, { // Why does this action always change FilterValues on the Adapt Filters dialog and not directly on the FB?
 			Books: {
 				label: "Author ID",
-				values: [ "101"] //, "102" ]
+				values: ["101"] //, "102" ]
+			}
+		});
+		When.onTheMDCFilterBar.iEnterFilterValue(sFilterBarID, { // Why does this action always change FilterValues on the Adapt Filters dialog and not directly on the FB?
+			Books: {
+				label: "Title",
+				values: ["Pride and Prejudice"]
 			}
 		});
 		Then.onTheMDCFilterBar.iShouldSeeFilters(sFilterBarID, {

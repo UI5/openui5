@@ -13,8 +13,7 @@ sap.ui.define([
 	"sap/ui/model/Filter",
 	"sap/ui/model/FilterOperator",
 	"sap/ui/rta/plugin/iframe/urlCleaner",
-	"sap/ui/rta/util/validateText",
-	"sap/ui/rta/Utils"
+	"sap/ui/rta/util/validateText"
 ], function(
 	Log,
 	Token,
@@ -27,8 +26,7 @@ sap.ui.define([
 	Filter,
 	FilterOperator,
 	urlCleaner,
-	validateText,
-	RtaUtils
+	validateText
 ) {
 	"use strict";
 
@@ -71,16 +69,6 @@ sap.ui.define([
 		constructor: function(oJSONModel, mSettings) {
 			this._oJSONModel = oJSONModel;
 			this._importSettings(mSettings);
-		},
-
-		formatDocumentationUrl() {
-			const oDocumentationUrls = {
-				btpUrl: "https://help.sap.com/docs/ui5-flexibility-for-key-users/ui5-flexibility-for-key-users/embedding-content",
-				s4HanaCloudUrl: "https://help.sap.com/docs/SAP_S4HANA_CLOUD/4fc8d03390c342da8a60f8ee387bca1a/8db25610e91342919fcf63d4e5868ae9.html",
-				s4HanaOnPremUrl: "https://help.sap.com/docs/ABAP_PLATFORM_NEW/a7b390faab1140c087b8926571e942b7/8db25610e91342919fcf63d4e5868ae9.html"
-			};
-
-			return RtaUtils.getSystemSpecificDocumentationUrl(oDocumentationUrls);
 		},
 
 		onBeforeOpen() {

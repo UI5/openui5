@@ -496,6 +496,23 @@ sap.ui.define([
 			}.bind(this));
 		},
 
+		iShouldSeeSelectedListFilterItems: function(aP13nFilterItems){
+			const aExpected = aP13nFilterItems.filter(function(o){ return !!o.selected; }).map(function(o){ return o.p13nItem; }).sort();
+			return this.waitFor({
+				searchOpenDialogs: true,
+				controlType: "sap.m.CustomListItem",
+				success: function(aCustomListItems){
+					const aActual = aCustomListItems.map(function(oItem){
+						return oItem.getContent()[0].getContent()[0].getText();
+					}).filter(function(s){ return !!s; }).sort();
+
+					aExpected.forEach(function(sExp){
+						Opa5.assert.ok(aActual.indexOf(sExp) !== -1, "Filter '" + sExp + "' is visible");
+					});
+				}
+			});
+		},
+
 		iShouldSeeP13nFilterItemsInPanel: function(aP13nFilterItems, sGroupName, bNoFilterField){
 			return waitForPanelInP13n.call(this, {
 				groupName: sGroupName,
@@ -721,6 +738,61 @@ sap.ui.define([
 					const oFilterConfig = aConditions[sFilterKey] && aConditions[sFilterKey][0];
 					Opa5.assert.deepEqual(oFilterConfig && oFilterConfig.values, aValues, "correct filter configuration found in view");
 				}
+			});
+		},
+		iShouldSeeFilterSearchResultInADP: function (sFilterName, sGroupName,  bGrouped) {
+			if (bGrouped === false || bGrouped === undefined) {
+				return this.waitFor({
+					controlType: "sap.m.CustomListItem",
+					check: function (aCustomListItems) {
+						return aCustomListItems.length === 1;
+					},
+					matchers: function(oCustomListItem) {
+						return sFilterName === oCustomListItem.getContent()[0].getContent()[0].getText();
+					},
+					success: function (oCustomListItem) {
+						Opa5.assert.ok(true, "The filter " + sFilterName + " is visible in the Adapt Filters dialog");
+					},
+					errorMessage: "The filter " + sFilterName + " is not found in the Adapt Filters dialog"
+				});
+			}
+			if (bGrouped) {
+				return this.waitFor({
+					controlType: "sap.m.GroupHeaderListItem",
+					check: function (aGroupHeaderListItems) {
+						return aGroupHeaderListItems.length === 1;
+					},
+					matchers: function(oGroupHeaderListItem) {
+						return sGroupName === oGroupHeaderListItem.getTitle();
+					},
+					success: function (oGroupHeaderListItem) {
+						this.waitFor({
+							controlType: "sap.m.CustomListItem",
+							matchers: function(oCustomListItem) {
+								return sFilterName === oCustomListItem.getContent()[0].getContent()[0].getText();
+							},
+							success: function (oCustomListItem) {
+								Opa5.assert.ok(true, "The filter " + sFilterName + " is visible in the Adapt Filters dialog");
+							},
+							errorMessage: "The filter " + sFilterName + " is not found in the Adapt Filters dialog"
+						});
+					},
+					errorMessage: "The group " + sGroupName + " is not found in the Adapt Filters dialog"
+				});
+			}
+		},
+		iShouldSeeValueStateInAdaptFiltersPanel: function (sFilterName, sCategory, sMessage) {
+			return this.waitFor({
+				controlType: "sap.ui.mdc.FilterField",
+				matchers: function(oFilterField) {
+					return sFilterName === oFilterField.getProperty("label");
+				},
+				success: function (oFilterField) {
+					Opa5.assert.equal(oFilterField[0].getValueState().toString(), sCategory, "The filter " + sFilterName + " has the correct value state category");
+					Opa5.assert.equal(oFilterField[0].getValueStateText(), sMessage, "The filter " + sFilterName + " has the correct value state message");
+				},
+				errorMessage: "The filter " + sFilterName + " is not found in the Adapt Filters dialog"
+
 			});
 		}
 	});

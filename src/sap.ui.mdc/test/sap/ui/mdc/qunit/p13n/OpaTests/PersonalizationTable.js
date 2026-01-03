@@ -190,7 +190,6 @@ sap.ui.define([
 
 			When.iPressOnButtonWithIcon(Arrangement.P13nDialog.Settings.Icon);
 			Then.thePersonalizationDialogOpens();
-
 			When.iSelectColumn("Country", undefined, aTableItems);
 
 			When.iClickOnTableItem("Country").and.iPressOnButtonWithIcon(Arrangement.P13nDialog.Settings.MoveToTop);
@@ -419,6 +418,7 @@ sap.ui.define([
 
 			When.iPressDialogOk();
 			Then.thePersonalizationDialogShouldBeClosed();
+			Then.iTeardownMyAppFrame();
 		});
 	};
 

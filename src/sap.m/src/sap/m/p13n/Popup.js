@@ -17,7 +17,8 @@ sap.ui.define([
 	"sap/ui/core/Lib",
 	"sap/ui/core/library",
 	"sap/ui/core/syncStyleClass",
-	"sap/ui/model/json/JSONModel"
+	"sap/ui/model/json/JSONModel",
+	"sap/ui/core/ShortcutHintsMixin"
 ], (
 	Control,
 	Button,
@@ -34,7 +35,8 @@ sap.ui.define([
 	Library,
 	coreLibrary,
 	syncStyleClass,
-	JSONModel
+	JSONModel,
+	ShortcutHintsMixin
 ) => {
 	"use strict";
 
@@ -111,6 +113,10 @@ sap.ui.define([
 				}
 			},
 			events: {
+				/**
+				 * This event is fired after the dialog has been opened.
+				 */
+				open: {},
 				/**
 				 * This event is fired after the dialog has been closed.
 				 */
@@ -254,6 +260,8 @@ sap.ui.define([
 		}
 
 		this._bIsOpen = true;
+
+		this.fireOpen();
 	};
 
 	Popup.prototype.addStyleClass = function(sStyleClass) {
@@ -265,6 +273,11 @@ sap.ui.define([
 	Popup.prototype.removeStyleClass = function(sStyleClass) {
 		this._aCustomStyles.splice(this._aCustomStyles.indexOf(sStyleClass), 1);
 		this._oPopup?.removeStyleClass(sStyleClass);
+	};
+
+	Popup.prototype.insertAdditionalButton = function(oButton, iIndex) {
+		this.insertAggregation("additionalButtons", oButton, iIndex, true);
+		this._oPopup.insertButton?.(oButton, iIndex);
 	};
 
 	/**
@@ -399,23 +412,13 @@ sap.ui.define([
 			content: bUseContainer ? this._getContainer() : aPanels[0],
 			escapeHandler: () => {
 				this._onClose(oContainer, "Escape");
-			},
-			buttons: [
-				new Button(this.getId() + this._getIdPrefix() + "-confirmBtn", {
-					text: mDialogSettings.confirm?.text ?? `{${this.LOCALIZATION_MODEL}>/confirmText}`,
-					type: "Emphasized",
-					press: () => {
-						this._onClose(oContainer, "Ok");
-					}
-
-				}), new Button(this.getId() + this._getIdPrefix() + "-cancelBtn", {
-					text: `{${this.LOCALIZATION_MODEL}>/cancelText}`,
-					press: () => {
-						this._onClose(oContainer, "Cancel");
-					}
-				})
-			]
+			}
 		});
+
+		const oConfirmBtn = this._createConfirmButton(oContainer);
+		const oCancelBtn = this._createCancelButton(oContainer);
+		oContainer.addButton(oConfirmBtn);
+		oContainer.addButton(oCancelBtn);
 
 		oContainer.setCustomHeader(this._createTitle());
 
@@ -424,6 +427,44 @@ sap.ui.define([
 		});
 
 		return oContainer;
+	};
+
+	Popup.prototype._createConfirmButton = function(oContainer) {
+		if (!this._oConfirmButton) {
+			this._oConfirmButton = new Button(this.getId() + this._getIdPrefix() + "-confirmBtn", {
+				text: `{${this.LOCALIZATION_MODEL}>/confirmText}`,
+				type: "Emphasized",
+				press: () => {
+					this._onClose(oContainer, "Ok");
+				}
+			});
+
+			const sMessage = Device.os.macintosh ?
+				this.oResourceBundle.getText("p13n.SHORTCUT_OK_MAC") :
+				this.oResourceBundle.getText("p13n.SHORTCUT_OK");
+			ShortcutHintsMixin.addConfig(this._oConfirmButton, {
+				addAccessibilityLabel: true,
+				message: sMessage
+			});
+		}
+		return this._oConfirmButton;
+	};
+
+	Popup.prototype._createCancelButton = function(oContainer) {
+		if (!this._oCancelButton) {
+			this._oCancelButton = new Button(this.getId() + this._getIdPrefix() + "-cancelBtn", {
+				text: `{${this.LOCALIZATION_MODEL}>/cancelText}`,
+				press: () => {
+					this._onClose(oContainer, "Cancel");
+				}
+			});
+
+			ShortcutHintsMixin.addConfig(this._oCancelButton, {
+				addAccessibilityLabel: true,
+				message: this.oResourceBundle.getText("p13n.SHORTCUT_CANCEL")
+			});
+		}
+		return this._oCancelButton;
 	};
 
 	Popup.prototype._getIdPrefix = () => {
@@ -507,9 +548,20 @@ sap.ui.define([
 		return this._oContainer;
 	};
 
+	/**
+	 * Closes the popup.
+	 * @param {sap.ui.core.Control} oContainer container to close
+	 * @param {string} sReason reason for closing the container
+	 *
+	 * @private
+	 * @ui5-restricted sap.ui.mdc
+	 */
 	Popup.prototype._onClose = function(oContainer, sReason) {
+		if (!oContainer && !this._oPopup) {
+			return;
+		}
 
-		oContainer.close();
+		(oContainer || this._oPopup).close();
 
 		this._bIsOpen = false;
 

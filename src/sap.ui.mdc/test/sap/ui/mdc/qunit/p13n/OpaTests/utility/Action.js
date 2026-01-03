@@ -4,6 +4,7 @@
 
 sap.ui.define([
 	"sap/ui/core/Lib",
+	"sap/ui/core/Element",
 	"sap/ui/test/Opa5",
 	"sap/ui/test/actions/Press",
 	"sap/ui/test/matchers/Properties",
@@ -13,9 +14,12 @@ sap.ui.define([
 	"test-resources/sap/ui/mdc/qunit/p13n/OpaTests/utility/Util",
 	"sap/ui/test/matchers/PropertyStrictEquals",
 	"test-resources/sap/ui/mdc/testutils/opa/p13n/waitForPanelInP13n",
+	"sap/ui/qunit/QUnitUtils",
 	"./actions/PressKey",
-	"sap/m/MessageBox"
-], function(Library, Opa5, Press, Properties, Ancestor, Descendant, EnterText, TestUtil, PropertyStrictEquals, waitForPanelInP13n, PressKey, MessageBox) {
+	"sap/ui/events/KeyCodes",
+	"sap/m/MessageBox",
+	"test-resources/sap/ui/mdc/testutils/opa/p13n/Actions"
+], function(Library, Element, Opa5, Press, Properties, Ancestor, Descendant, EnterText, TestUtil, PropertyStrictEquals, waitForPanelInP13n, QUnitUtils, PressKey, KeyCodes, MessageBox, P13nActions) {
 	"use strict";
 
 	function iPressResetInControl(sControl) {
@@ -35,6 +39,14 @@ sap.ui.define([
 			},
 			actions: new Press()
 		});
+	}
+
+	function checkIsNewUI() {
+		const oFrame = Opa5.getWindow();
+		if (oFrame && oFrame.location) {
+			const appFrameHasParam = new URLSearchParams(oFrame.location.search).get("sap-ui-xx-new-adapt-filters") === "true";
+			return appFrameHasParam;
+		}
 	}
 
 	/**
@@ -110,29 +122,7 @@ sap.ui.define([
 			});
 		},
 
-		iTogglePanelInDialog: function(sGroupName) {
-			const fiToggleFilterPanel = function(sGroupName, bModal) {
-				return waitForPanelInP13n.call(this, {
-					groupName: sGroupName,
-					modal: !!bModal,
-					success: function(oPanel) {
-						Opa5.assert.ok(oPanel, "Groupable Panel found in p13n Dialog");
-						this.waitFor({
-							controlType: "sap.m.Button",
-							matchers: [
-								new Ancestor(oPanel)
-							],
-							success: function(aButtons) {
-								new Press().executeOn(aButtons[0]);
-							}
-						});
-					}
-				});
-			};
-
-			return fiToggleFilterPanel.call(this, sGroupName, true);
-		},
-
+		//TODO: duplicate of method in src/sap.ui.mdc/test/sap/ui/mdc/qunit/table/OpaTests/pages/Actions.js
 		iSetP13nMode: function(sControl, aValue) {
 			return this.waitFor({
 				controlType: sControl,
@@ -173,7 +163,7 @@ sap.ui.define([
 
 		waitForP13nItem: function(oSettings) {
 			const bModal = oSettings.hasOwnProperty("modal") ? oSettings.modal : true;
-			const sItemNameSpace = oSettings.itemNameSpace || "sap.m.ColumnListItem";
+			const sItemNameSpace = oSettings.itemNameSpace || "sap.m.CustomListItem";
 			const sPopoverTitle = oSettings.title;
 			const sColumnName = oSettings.columnName;
 			const fSuccess = oSettings.success;
@@ -252,6 +242,21 @@ sap.ui.define([
 				}
 			});
 		},
+		iToogleEditAndSortMode: function(bEditMode) {
+			return this.waitFor({
+				controlType: "sap.m.Button",
+				searchOpenDialogs: true,
+				matchers: new PropertyStrictEquals({
+						name: "text",
+						value: bEditMode ? "Edit" : "Sort"
+					}),
+				actions: new Press(),
+				success: (oButton) => {
+					Opa5.assert.ok(oButton.length > 0, "Button found");
+					Opa5.assert.ok(true, "Mode has changed to:" + (bEditMode ? " Edit" : " Sort"));
+				}
+			});
+		},
 
 		iChangeComboBoxSelection: function(oComboBox, sNew, oSettings) {
 			new Press().executeOn(oComboBox);
@@ -282,21 +287,55 @@ sap.ui.define([
 			});
 		},
 
-		iEnterTextInFilterDialog: function(sFilterName, sText, bLive) {
+		iEnterTextInFilterDialogNEW: function(sFilterName, sText, bLive) {
 			return this.waitForP13nItem({
-				itemNameSpace: "sap.m.ListItemBase",
 				columnName: sFilterName,
 				modal: typeof bLive == "boolean" ? !bLive : true,
-				success: function(aItems) {
-					const oFilterField = aItems.length > 1 ? aItems[1].getContent()[1].getItems()[0] : aItems[0].getCells()[1];
+				success: (aItems) => {
+					const oAssociativeControl = aItems.length > 1 ? aItems[1].getContent()[1].getItems()[0] : aItems[0].getContent()[0].getContent()[1];
+					const oFilterField = oAssociativeControl._getInnerControl();
 					Opa5.assert.ok(oFilterField, "FilterField found");
-					setTimeout(function() {
+					setTimeout(() => {
 						new EnterText({
 							text: sText
 						}).executeOn(oFilterField);
 					});
 				}
 			});
+		},
+		iEnterTextInFilterDialog: function(sFilterName, sText, bLive) {
+			if (checkIsNewUI()) {
+				return this.waitForP13nItem({
+					itemNameSpace: "sap.m.ListItemBase",
+					columnName: sFilterName,
+					modal: typeof bLive == "boolean" ? !bLive : true,
+					success: function(aItems) {
+						const oFilterField = aItems[0].getContent()[0].getContent()[1].getItems()[0];
+						Opa5.assert.ok(oFilterField, "FilterField found");
+						setTimeout(function() {
+							new EnterText({
+								text: sText
+							}).executeOn(oFilterField);
+						});
+					}
+				});
+			} else {
+				return this.waitForP13nItem({
+					itemNameSpace: "sap.m.ListItemBase",
+					columnName: sFilterName,
+					modal: typeof bLive == "boolean" ? !bLive : true,
+					success: function(aItems) {
+						const oFilterField = aItems.length > 1 ? aItems[1].getContent()[1].getItems()[0] : aItems[0].getCells()[1];
+						Opa5.assert.ok(oFilterField, "FilterField found");
+						setTimeout(function() {
+							new EnterText({
+								text: sText
+							}).executeOn(oFilterField);
+						});
+					}
+				});
+			}
+
 		},
 
 		iPressOnButtonWithText: function(sText) {
@@ -318,25 +357,6 @@ sap.ui.define([
 					name: "icon",
 					value: sIcon
 				}),
-				actions: new Press()
-			});
-		},
-
-		iChangeAdaptFiltersView: function(sViewIcon) {
-			return this.waitFor({
-				controlType: "sap.m.Button",
-				searchOpenDialogs: true,
-				matchers: {
-					ancestor: {
-						controlType: "sap.ui.mdc.p13n.panels.AdaptFiltersPanel"
-					},
-					properties: {
-						icon: sViewIcon
-					}
-				},
-				success: function(aBtn) {
-					Opa5.assert.equal(aBtn.length, 1, "Adapt Filters Panel toggle found");
-				},
 				actions: new Press()
 			});
 		},
@@ -385,12 +405,12 @@ sap.ui.define([
 				title: sPopoverTitle,
 				items: aP13nItems,
 				modal: typeof bModal === "boolean" ? bModal : true,
-				itemNameSpace: bFilter ? "sap.m.CustomListItem" : undefined,
-				success: function(aColumnListItems) {
+				itemNameSpace: bFilter ? "sap.m.CustomListItem" : "sap.m.ColumnListItem",
+				success: (aColumnListItems) => {
 					const oColumnListItem = aColumnListItems[aColumnListItems.length - 1];
 					const oCheckBox = oColumnListItem.getMultiSelectControl();
 					new Press().executeOn(oCheckBox);
-					//optional array update
+
 					if (aP13nItems) {
 						const iIndex = oColumnListItem.getParent().getItems().indexOf(oColumnListItem);
 						aP13nItems[iIndex].selected = oCheckBox.getSelected();
@@ -404,9 +424,9 @@ sap.ui.define([
 				items: aP13nItems,
 				kind: "Dimension",
 				modal: typeof bModal === "boolean" ? bModal : true,
-				success: function(oComboBox) {
+				success: (oComboBox) => {
 					this.iChangeComboBoxSelection(oComboBox, sColumnName);
-				}.bind(this)
+				}
 			});
 		},
 		iAddMeasure: function(sColumnName, sPopoverTitle, aP13nItems, bModal) {
@@ -415,9 +435,9 @@ sap.ui.define([
 				items: aP13nItems,
 				kind: "Measure",
 				modal: typeof bModal === "boolean" ? bModal : true,
-				success: function(oComboBox) {
+				success: (oComboBox) => {
 					this.iChangeComboBoxSelection(oComboBox, sColumnName);
-				}.bind(this)
+				}
 			});
 		},
 		iRemoveDimension: function(sColumnName) {
@@ -756,6 +776,155 @@ sap.ui.define([
 				},
 				actions: new Press()
 			});
+		},
+		iDeselectColumn: function(sItemName, aP13nData) {
+			return this.waitFor({
+				searchOpenDialogs: true,
+				controlType: "sap.m.CustomListItem",
+				success: (aCustomListItems) => {
+					let oItem;
+					aCustomListItems.forEach((oCustomListItem) => {
+						if (oCustomListItem.getContent()[0].getContent()[0].getText() === sItemName) {
+							oItem = oCustomListItem;
+						}
+					});
+					Opa5.assert.ok(!!oItem, "ListItem for column " + sItemName + " found");
+					return this.waitFor({
+						controlType: "sap.m.ToggleButton",
+						success: (aToggleButtons) => {
+							const oToggleButton = aToggleButtons[0];
+							const bIsCurrentlySelected = oToggleButton.getPressed();
+							if (bIsCurrentlySelected) {
+								new Press().executeOn(oToggleButton);
+								//set Item in array to selected: false
+								if (aP13nData) {
+									aP13nData.forEach((oItem) => {
+										if (oItem.name === sItemName) {
+											oItem.selected = false;
+										}
+									});
+								}
+							}
+
+						}
+					});
+				},
+				errorMessage: "No Item found to deselect column '" + sItemName + "'"
+			});
+		},
+		iSearchForFilter: function(sFilterName) {
+			return this.waitFor({
+				controlType: "sap.m.SearchField",
+				searchOpenDialogs: true,
+				actions: new EnterText({
+					text: sFilterName
+				}),
+				success: (aSearchFields) => {
+					Opa5.assert.ok(aSearchFields.length > 0, "SearchField found");
+				},
+				errorMessage: "No SearchField found"
+			});
+		},
+
+		iResetTheAdaptFiltersDialog: function() {
+			return this.waitFor({
+				controlType: "sap.ui.mdc.FilterBar",
+				success: (aFilterBar) => {
+					const oFilterBar = aFilterBar[0];
+					return this.onTheMDCFilterBar.iResetThePersonalization(oFilterBar);
+				}
+			});
+		},
+
+		iEnterFilterValue: function(sFilterName, sGroupName, aValues) {
+			return this.waitFor({
+				controlType: "sap.ui.mdc.FilterBar",
+				success: (oFilterBar) => {
+					return this.onTheMDCFilterBar.iEnterFilterValue(oFilterBar[0], {
+						[sGroupName]: {
+							label: sFilterName,
+							values: aValues //, "102" ]
+						}
+		});
+				}
+			});
+		},
+
+		iPersonalizeFilterColumns: function(oSettings) {
+			return this.waitFor({
+				controlType: "sap.ui.mdc.FilterBar",
+				success: (aFilterBar) => {
+					const oFilterBar = aFilterBar[0];
+					this.onTheMDCFilterBar.iPersonalizeFilter(oFilterBar, oSettings);
+				}
+			});
+		},
+
+		iPersonalizeFilterColumnsWithRTA: function(oSettings) {
+
+			const fnOpenAdaptFiltersPanelWithRTA = function(oControl, oSettings) {
+				return this.waitFor({
+					controlType: "sap.m.MenuItem",
+					matchers: (oMenuItem) => {
+						return oMenuItem.getKey() === "CTX_SETTINGS";
+					},
+					success: (aMenuItem) => {
+						aMenuItem[0].getDomRef().click();
+						this.waitFor({
+							success: oSettings.success
+						});
+					},
+					errorMessage: "Did not find the Context Menu"
+				});
+			};
+
+			return this.waitFor({
+				controlType: "sap.ui.mdc.FilterBar",
+				success: (aFilterBar) => {
+					const oFilterBar = aFilterBar[0];
+					return P13nActions.iPersonalizeFilterBar.call(this, oFilterBar, oSettings, fnOpenAdaptFiltersPanelWithRTA);
+				}
+			});
+		},
+		iChangeAdaptFiltersView: function(sViewIcon) {
+			return this.waitFor({
+				controlType: "sap.m.Button",
+				searchOpenDialogs: true,
+				matchers: {
+					ancestor: {
+						controlType: "sap.ui.mdc.p13n.panels.AdaptFiltersPanel"
+					},
+					properties: {
+						icon: sViewIcon
+					}
+				},
+				success: function(aBtn) {
+					Opa5.assert.equal(aBtn.length, 1, "Adapt Filters Panel toggle found");
+				},
+				actions: new Press()
+			});
+		},
+		iTogglePanelInDialog: function(sGroupName) {
+			const fiToggleFilterPanel = function(sGroupName, bModal) {
+				return waitForPanelInP13n.call(this, {
+					groupName: sGroupName,
+					modal: !!bModal,
+					success: function(oPanel) {
+						Opa5.assert.ok(oPanel, "Groupable Panel found in p13n Dialog");
+						this.waitFor({
+							controlType: "sap.m.Button",
+							matchers: [
+								new Ancestor(oPanel)
+							],
+							success: function(aButtons) {
+								new Press().executeOn(aButtons[0]);
+							}
+						});
+					}
+				});
+			};
+
+			return fiToggleFilterPanel.call(this, sGroupName, true);
 		}
 	});
 

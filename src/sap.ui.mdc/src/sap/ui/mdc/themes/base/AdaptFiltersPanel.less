@@ -3,8 +3,13 @@
 /* Base theme                                    */
 /* ============================================= */
 
-.sapUiMDCAdaptFiltersPanel >div>section {
-	margin-top: 0.25rem;
+.sapUiMDCAdaptFiltersPanel .sapMITB {
+	padding-top: 0;
+}
+
+.sapUiMDCAdaptFiltersPanel .sapMITH {
+	border-bottom: none;
+	box-shadow: none;
 }
 
 //Change background color for the container control
@@ -29,4 +34,39 @@
 
 .sapUiMDCAdaptFiltersSearchBar {
 	padding-bottom: 0.25rem;
+}
+
+.sapMDialog > .sapMDialogSection:has(.sapUiMDCAdaptFiltersPanel) {
+	background: var(--sapBackgroundColor);
+}
+
+.sapUiMDCAdaptFiltersContentSortIcon {
+	cursor: grab;
+}
+
+.sapUiMDCAdaptFiltersPanelAddFilterSection {
+	padding: 0.125rem 0.5rem;
+	background: var(--sapList_Background);
+}
+
+:not(.sapUiRespGridMedia-Std-Phone) .sapUiMDCAdaptFiltersPanelFilterLabel {
+	text-align: end !important;
+}
+
+.sapUiRespGridMedia-Std-Phone .sapUiMDCAdaptFiltersPanelFilterLabel {
+	text-align: start !important;
+}
+
+.sapUiSizeCozy .sapUiMDCAdaptFiltersPanelFilterLabel,
+.sapUiSizeCozy .sapUiMDCAdaptFiltersContentSortIcon {
+	line-height: var(--sapElement_LineHeight);
+}
+
+.sapUiSizeCompact .sapUiMDCAdaptFiltersPanelFilterLabel,
+.sapUiSizeCompact .sapUiMDCAdaptFiltersContentSortIcon {
+	line-height: var(--sapElement_Compact_LineHeight);
+}
+
+.sapUiMDCAdaptFiltersPanel .sapMP13nQueryPanel .sapUiRespGrid {
+	display: block;
 }

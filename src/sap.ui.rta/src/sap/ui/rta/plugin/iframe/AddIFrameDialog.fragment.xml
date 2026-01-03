@@ -171,7 +171,7 @@
 						<link>
 							<Link text="{i18n>IFRAME_ADDIFRAME_DIALOG_URL_INFO_LINKTEXT}"
 								target="_blank"
-								href="{path: '/', formatter: '.formatDocumentationUrl'}"/>
+								href="{dialogInfo>/documentationUrl/value}"/>
 						</link>
 					</MessageStrip>
 				</VBox>

@@ -92,8 +92,10 @@ sap.ui.define(
 							this._oP13nFilter = new AdaptationFilterBar(this.getId() + "-p13nFilter", {
 								adaptationControl: this,
 								filterConditions: this.getFilterConditions(),
-								change: async function () {
-									await this.validate(true);
+								change: async function (oEvent) {
+									if (!oEvent.getParameter("_skipValidation")) {
+										await this.validate(true);
+									}
 								}
 							});
 

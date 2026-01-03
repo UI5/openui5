@@ -6,14 +6,16 @@ sap.ui.define([
 	"sap/ui/core/Lib",
 	"sap/ui/core/library",
 	"sap/ui/events/KeyCodes",
+	"sap/ui/fl/apply/api/FlexRuntimeInfoAPI",
 	"sap/ui/fl/Utils",
-	"sap/ui/model/Context",
 	"sap/ui/model/json/JSONModel",
 	"sap/ui/model/odata/v4/ODataModel",
-	"sap/ui/qunit/QUnitUtils",
+	"sap/ui/model/Context",
 	"sap/ui/test/utils/nextUIUpdate",
+	"sap/ui/qunit/QUnitUtils",
 	"sap/ui/rta/plugin/iframe/AddIFrameDialog",
 	"sap/ui/rta/plugin/iframe/AddIFrameDialogController",
+	"sap/ui/rta/Utils",
 	"sap/ui/thirdparty/sinon-4"
 ], function(
 	Button,
@@ -21,14 +23,16 @@ sap.ui.define([
 	Lib,
 	coreLibrary,
 	KeyCodes,
+	FlexRuntimeInfoAPI,
 	FlUtils,
-	Context,
 	JSONModel,
 	ODataModel,
-	QUnitUtils,
+	Context,
 	nextUIUpdate,
+	QUnitUtils,
 	AddIFrameDialog,
 	AddIFrameDialogController,
+	Utils,
 	sinon
 ) {
 	"use strict";
@@ -938,6 +942,24 @@ sap.ui.define([
 				frameUrl: "some_url"
 			}, oReferenceControl);
 		});
+
+		QUnit.test("when opened on a S/4HANA Cloud system", async function(assert) {
+			sandbox.stub(FlexRuntimeInfoAPI, "getSystem").returns("S4HANA_CLOUD");
+			sandbox.stub(Utils, "isS4HanaCloud").returns(true);
+
+			const oDialog = new AddIFrameDialog();
+			oDialog.attachOpened(function() {
+				const oDocumentationLink = Element.getElementById("sapUiRtaAddIFrameDialog_UrlInfoMessageStrip").getLink();
+				assert.strictEqual(
+					oDocumentationLink.getHref(),
+					"https://help.sap.com/docs/SAP_S4HANA_CLOUD/4fc8d03390c342da8a60f8ee387bca1a/8db25610e91342919fcf63d4e5868ae9.html",
+					"then the system-specific help link is displayed"
+				);
+				clickOnCancel();
+			}, this);
+			await oDialog.open(this.oDialogSettings, oReferenceControl);
+			oDialog.destroy();
+		});
 	});
 
 	QUnit.module("Given that an IFrameDialog is opened for a control that uses an OData V4 Model...", {
@@ -945,6 +967,7 @@ sap.ui.define([
 			this.oAddIFrameDialog = new AddIFrameDialog();
 		},
 		afterEach() {
+			this.oAddIFrameDialog.destroy();
 			sandbox.restore();
 		}
 	}, function() {
@@ -996,7 +1019,7 @@ sap.ui.define([
 				});
 				clickOnCancel();
 			}, this);
-			return this.oAddIFrameDialog.open(this.oDialogSettings, oReferenceControl);
+			return this.oAddIFrameDialog.open(this.oDialogSettings, oV4Control);
 		});
 	});
 

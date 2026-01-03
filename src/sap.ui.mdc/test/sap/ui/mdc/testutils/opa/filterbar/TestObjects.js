@@ -28,11 +28,8 @@ sap.ui.define([
 				 * 	<li>
 				 * 		Opens the personalization dialog of the given <code>sap.ui.mdc.FilterBar</code>.
 				 * 	</li>
-				 *  <li>
-				 * 		Navigates to the Group tab.
-				 * 	</li>
 				 * 	<li>
-				 * 		Opens all groups and selects / deselects all filter fields depending on <code>oSettings</code>. Only the labels defined in <code>oSettings</code> will be selected, others will be deselected.
+				 * 		Selects / deselects all filter fields depending on <code>oSettings</code>. Only the labels defined in <code>oSettings</code> will be selected, others will be deselected.
 				 * 	</li>
 				 * 	<li>
 				 * 		Closes the personalization dialog.
@@ -146,6 +143,20 @@ sap.ui.define([
 				iClearFilterValue: function(oFilterBar, sFilterLabel) {
 					return filterBarActions.iClearFilterValue.call(this, oFilterBar, sFilterLabel);
 				},
+				/**
+				 * OPA5 test action
+				 * Reorders a filter item in the adapt filters dialog by moving it relative to another item.
+				 * @memberof onTheMDCFilterBar
+				 * @method iReorderFilterItem
+				 * @param {string} sItemName Name/label of the filter item to be moved
+				 * @param {string} sTargetItemName Name/label of the target filter item to move relative to
+				 * @param {boolean} bBefore If true, moves the item before the target item; if false, moves it after the target item
+				 * @returns {Promise} OPA waitFor
+				 */
+				iReorderFilterItem: function(sItemName, sTargetItemName, bBefore) {
+					return p13nActions.iReorderFilterItem.apply(this, arguments);
+				},
+
 				/**
 				 * OPA5 test action
 				 * Changes the view of an open <code>sap.ui.mdc.p13n.panels.AdaptFiltersPanel</code> to the given view mode.

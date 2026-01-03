@@ -334,22 +334,22 @@ sap.ui.define([
 			});
 		});
 
-		QUnit.test("when trying to stop rta with error in saving changes,", function(assert) {
-			sandbox.stub(this.oRta, "_serializeToLrep").returns(Promise.reject());
-			this.oMessageBoxStub.resolves(this.oRta._getTextResources().getText("BTN_UNSAVED_CHANGES_ON_CLOSE_SAVE"));
+		QUnit.test("when trying to stop rta with error in saving changes,", async function(assert) {
+			sandbox.stub(this.oRta, "_serializeToLrep").returns(Promise.reject(new Error("serializeToLrep failed")));
+			this.oMessageBoxStub.reset(); // Reset to ignore guided tour messages
+			const oErrorStub = sandbox.stub(MessageBox, "error");
 
-			return this.oRta.stop(false).catch(function() {
-				assert.ok(true, "then the promise got rejected");
-				assert.ok(this.oRta, "RTA is still up and running");
-				assert.equal(this.oCommandStack.getAllExecutedCommands().length, 1, "1 command is still in the stack");
-				assert.equal(DOMUtil.isVisible(document.querySelector(".sapUiRtaToolbar")), true, "and the Toolbar is visible.");
-				assert.strictEqual(this.oMessageBoxStub.callCount, 1, "then the messagebox is called once");
-				assert.strictEqual(
-					this.oMessageBoxStub.getCall(0).args[1],
-					"MSG_UNSAVED_CHANGES_ON_CLOSE",
-					"then the expected messagebox is called"
-				);
-			}.bind(this));
+			await this.oRta.stop(false);
+			assert.ok(this.oRta, "RTA is still up and running");
+			assert.strictEqual(this.oCommandStack.getAllExecutedCommands().length, 1, "1 command is still in the stack");
+			assert.ok(DOMUtil.isVisible(document.querySelector(".sapUiRtaToolbar")), "and the toolbar is visible.");
+			assert.strictEqual(this.oMessageBoxStub.callCount, 1, "then the messagebox is called once");
+			assert.strictEqual(
+				this.oMessageBoxStub.getCall(0).args[1],
+				"MSG_UNSAVED_CHANGES_ON_CLOSE",
+				"then the expected messagebox was called"
+			);
+			assert.strictEqual(oErrorStub.callCount, 1, "then the error is displayed to the user");
 		});
 
 		QUnit.test("when stopping rta without saving changes,", function(assert) {

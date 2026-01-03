@@ -234,7 +234,14 @@ sap.ui.define([
 			...mSettings,
 			enableReset
 		});
-		return oDialog.getParent();
+
+		const oPopup = oDialog.getParent();
+		if (!(vPanelKeys instanceof Array)) {
+			const oController = this.getController(oControl, vPanelKeys);
+			oController?.enhancePopup?.(oPopup);
+		}
+
+		return oPopup;
 	};
 
 	/**
@@ -1472,7 +1479,7 @@ sap.ui.define([
 			});
 
 			if (aApplyChanges.length > 0) {
-				Engine.getInstance()._processChanges(oControl, mChangeMap);
+				return Engine.getInstance()._processChanges(oControl, mChangeMap);
 			}
 		});
 

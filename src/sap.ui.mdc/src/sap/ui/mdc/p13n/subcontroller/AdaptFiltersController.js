@@ -5,9 +5,14 @@
 sap.ui.define([
 	"./SelectionController",
 	"sap/ui/core/Lib",
-	"sap/ui/mdc/p13n/P13nBuilder"
-], (BaseController, Library, P13nBuilder) => {
+	"sap/m/library",
+	"sap/ui/mdc/p13n/P13nBuilder",
+	"sap/base/util/merge",
+	"sap/m/Button"
+], (BaseController, Library, mLibrary, P13nBuilder, merge, Button) => {
 	"use strict";
+
+	const { ButtonType } = mLibrary;
 
 	const AdaptFiltersController = BaseController.extend("sap.ui.mdc.p13n.subcontroller.AdaptFiltersController", {
 		constructor: function() {
@@ -48,6 +53,29 @@ sap.ui.define([
 			move: "moveFilter",
 			additional: ["addCondition", "removeCondition"]
 		};
+	};
+
+	AdaptFiltersController.prototype.enhancePopup = function(oPopup) {
+		const bIsNewAdaptFiltersUI = new URLSearchParams(window.location.search).get("sap-ui-xx-new-adapt-filters") === "true";
+		if (bIsNewAdaptFiltersUI) {
+			const oFilter = new Button({
+				text: "Filter",
+				press: () => {
+					const oAdaptationFilter =  this.getAdaptationControl().getInbuiltFilter();
+					if (!oAdaptationFilter) {
+						return;
+					}
+
+					oAdaptationFilter.cleanUpAllFilterFieldsInErrorState();
+					oAdaptationFilter.validate(true).then((oResult) => {
+						oPopup._onClose(null, "Filter");
+					}).catch(() => {});
+				},
+				type: ButtonType.Ghost
+			});
+			oPopup.insertAdditionalButton(oFilter, 1);
+		}
+
 	};
 
 	AdaptFiltersController.prototype.initAdaptationUI = function(oPropertyHelper) {

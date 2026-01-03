@@ -621,12 +621,14 @@ sap.ui.define([
 					priority: "High",
 					maxWidth: "16rem"
 				}),
-				change: () => {
-					TableUtil.announceTableUpdate(this.getTableInvisibleText().getText(), this._oListControl.getItems().length);
-				}
+				change: [this._announceSearchUpdate, this]
 			});
 		}
 		return this._oSearchField;
+	};
+
+	BasePanel.prototype._announceSearchUpdate = function() {
+		TableUtil.announceTableUpdate(this.getTableInvisibleText().getText(), this._oListControl.getItems().length);
 	};
 
 	/**

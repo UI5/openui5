@@ -21,15 +21,24 @@
     "lockFileMaintenance": {
         "enabled": true
     },
+    "rebaseWhen": "conflicted",
+    "osvVulnerabilityAlerts": true,
     "packageRules": [
+        {
+            "matchDatasources": ["npm"],
+            "minimumReleaseAge": "3 days"
+        },
         {
             "matchPackageNames": [
                 "@ui5/builder",
                 "@ui5/cli",
+                "@ui5/fs",
+                "@ui5/logger",
                 "@ui5/project",
                 "@ui5/server"
             ],
-            "groupName": "All UI5 CLI devDependencies"
+            "groupName": "All UI5 CLI devDependencies",
+            "minimumReleaseAge": null
         }
     ]
 }

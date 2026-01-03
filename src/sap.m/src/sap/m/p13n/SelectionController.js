@@ -160,6 +160,13 @@ sap.ui.define([
 	};
 
 	/**
+	 * Enhances the p13n popup. Can be used to add additional content to the popup.
+	 *
+	 * @param {sap.m.Dialog} oPopup The popup that is used to host the personalization UI
+	 */
+	SelectionController.prototype.enhancePopup = (oPopup) => {};
+
+	/**
 	 * The actual UI used for personalization.
 	 *
 	 * @param {sap.ui.mdc.util.PropertyHelper} oPropertyHelper The property helper instance
