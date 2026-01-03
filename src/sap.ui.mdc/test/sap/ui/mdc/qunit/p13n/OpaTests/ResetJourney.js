@@ -75,19 +75,18 @@ sap.ui.define([
 			//no changes --> reset is disabled
 			When.iPressButtonWithText(Arrangement.P13nDialog.AdaptFilter.button);
 			Then.checkResetEnablementInDialog(false);
-			When.iPressDialogOk();
-
-			When.onTheMDCFilterBar.iPersonalizeFilter(sFilterBarID, {Artists: ["Name"] });
+			When.onTheMDCFilterBar.iCloseTheAdaptFiltersDialogWithOk();
+			When.iEnterFilterValue("Name", "Artists", ["Test"]);
 
 			//some changes done --> reset is enabled
-			When.iPressButtonWithText(Arrangement.P13nDialog.AdaptFilter.button);
+			When.onTheMDCFilterBar.iPressOnTheAdaptFiltersButton();
 			Then.checkResetEnablementInDialog(true);
-			When.iPressDialogOk();
+			When.onTheMDCFilterBar.iCloseTheAdaptFiltersDialogWithOk();
 
 			When.onTheMDCFilterBar.iResetThePersonalization(sFilterBarID);
 
 			//reset executed --> reset disabled again
-			When.iPressButtonWithText(Arrangement.P13nDialog.AdaptFilter.button);
+			When.onTheMDCFilterBar.iPressOnTheAdaptFiltersButton();
 			Then.checkResetEnablementInDialog(false);
 			When.iPressDialogOk();
 

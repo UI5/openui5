@@ -268,14 +268,28 @@ sap.ui.define([
 				reset: function() {
 					this.getEngine().reset(this);
 					this._getConditionModel().checkUpdate(true);
-				}.bind(this)
-			})
-				.then((oPopup) => {
-					this._aAddedFilterFields = [];
-					this._aRemovedFilterFields = [];
-					oPopup.attachEventOnce("close", this._determineFilterFieldOnFocus.bind(this));
-					return oPopup;
+				}.bind(this),
+				open: () => {
+					const oAdaptationFilterBar = this.getInbuiltFilter();
+					if (oAdaptationFilterBar && this._checkIsNewUI()) {
+						oAdaptationFilterBar._validateAdaptationState();
+					}
+				}
+			}).then((oPopup) => {
+				this._aAddedFilterFields = [];
+				this._aRemovedFilterFields = [];
+				oPopup.attachEventOnce("close", this._determineFilterFieldOnFocus.bind(this));
+				return oPopup;
+			}).then((oPopup) => {
+				oPopup.attachEventOnce("close", (oEvent) => {
+					this.cleanUpAllFilterFieldsInErrorState();
+					const sReason = oEvent.getParameter("reason");
+					if (sReason === "Filter") {
+						this.triggerSearch();
+					}
 				});
+				return oPopup;
+			});
 		});
 
 	};
@@ -350,6 +364,13 @@ sap.ui.define([
 		}
 
 		return oState;
+	};
+
+	FilterBar.prototype._checkIsNewUI = function() {
+		if (this._bUseNewUI === undefined) {
+			this._bUseNewUI = new URLSearchParams(window.location.search).get("sap-ui-xx-new-adapt-filters") === "true";
+		}
+		return this._bUseNewUI;
 	};
 
 	FilterBar.prototype.exit = function() {

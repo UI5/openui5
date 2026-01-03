@@ -465,12 +465,13 @@ sap.ui.define([
 	AdaptationFilterBar.prototype.executeRemoves = function() {
 
 		const aExistingItems = this._oFilterBarLayout.getInner().getSelectedFields();
+		const aExistingItemKeys = aExistingItems.map((oItem) => oItem.name);
 		const aOriginalsToRemove = [];
 
 		Object.keys(this._mOriginalsForClone).forEach((sKey) => {
 			const oDelegate = this._getAdaptationControlInstance().getControlDelegate();
 
-			if (aExistingItems.indexOf(sKey) < 0) { //Originals that have not been selected --> use continue similar to 'ItemBaseFlex'
+			if (aExistingItemKeys.indexOf(sKey) < 0) { //Originals that have not been selected --> use continue similar to 'ItemBaseFlex'
 				const oRemovePromise = oDelegate.removeItem.call(oDelegate, this._getAdaptationControlInstance(), sKey).then((bContinue) => {
 					if (bContinue && this._mOriginalsForClone[sKey]) {
 						// destroy the item
@@ -517,8 +518,25 @@ sap.ui.define([
 
 		if (this._oFilterBarLayout.getInner().attachChange) {
 			this._oFilterBarLayout.getInner().attachChange((oEvt) => {
-				if (oEvt.getParameter("reason") === "Remove") {
-					const oItem = oEvt.getParameter("item");
+				const sReason = oEvt.getParameter("reason");
+				const oItem = oEvt.getParameter("item");
+
+				if (this._checkIsNewUI()) {
+					if (this._oFilterBarLayout.getInner().isA("sap.ui.mdc.p13n.panels.AdaptFiltersPanel")) {
+						if (sReason === "Show" || sReason === "Hide") {
+							this._checkFilterState(oItem);
+						} else if (sReason === "Filter") {
+							this._checkFilterValue(oItem);
+						}
+					}
+
+					if (sReason === "Add") {
+						this._checkFilterState(oItem);
+						this._checkFilterValue(oItem);
+					}
+				}
+
+				if (sReason === "Remove") {
 					const mConditions = {};
 					mConditions[this.mFilterFields[oItem.name].getPropertyKey()] = [];
 
@@ -531,7 +549,10 @@ sap.ui.define([
 						this.fireChange();
 					});
 				}
-				this.fireChange();
+
+				this.fireChange({
+					_skipValidation: this._oFilterBarLayout.getInner().isA("sap.ui.mdc.p13n.panels.AdaptFiltersPanel")
+				});
 			});
 		}
 		return this;
@@ -558,6 +579,79 @@ sap.ui.define([
 	AdaptationFilterBar.prototype._getAdaptationControlInstance = function() {
 		const sAdaptationControlId = this.getAdaptationControl();
 		return sAdaptationControlId && Element.getElementById(sAdaptationControlId);
+	};
+
+	AdaptationFilterBar.prototype._validateAdaptationState = function() {
+		const aItems = this.getP13nData().items;
+		if (!aItems || aItems.length === 0) {
+			return;
+		}
+
+		aItems.forEach((oItem) => {
+			if (this.mFilterFields && this.mFilterFields[oItem.name]) {
+				this._checkFilterState(oItem);
+				this._checkFilterValue(oItem);
+			}
+		});
+	};
+
+	AdaptationFilterBar.prototype._checkFilterState = function(oItem) {
+		const oFilterField = this.mFilterFields?.[oItem.name];
+		if (!oFilterField) {
+			return;
+		}
+
+		const bValueSet = oFilterField.getConditions().length > 0;
+		if (oItem.required && !oItem.visible && !bValueSet) {
+			// Case 1: Mandatory Filter: Invisible with no Value: Warning Message 1
+			oFilterField.setValueState(ValueState.Warning);
+			oFilterField.setValueStateText("Hiding required filters makes it difficult to filter data.");
+		} else if (!oItem.required && !oItem.visible && !bValueSet) {
+			// Case 2: Non-mandatory Filter: Invisible with no Value: Warning Message 2
+			oFilterField.setValueState(ValueState.Warning);
+			oFilterField.setValueStateText("If invisible and empty, this filter will be removed.");
+		} else if (!oItem.visible && bValueSet) {
+			// Case 3: Invisible with value: Information Message
+			oFilterField.setValueState(ValueState.Information);
+			oFilterField.setValueStateText("The filter will not show on the filter bar.");
+		} else {
+			oFilterField.setValueState(ValueState.None);
+			oFilterField.setValueStateText();
+		}
+	};
+
+	AdaptationFilterBar.prototype._checkFilterValue = function(oItem) {
+		const oFilterField = this.mFilterFields?.[oItem.name];
+		if (!oFilterField) {
+			return;
+		}
+
+		const bValueSet = oFilterField.getConditions().length > 0;
+		if (oItem.required && !bValueSet) {
+			// Case 1: Mandatory - Visible + No Value - Warning Message 3
+			// Case 2: Mandatory - Invisible + No Value - Warning Message 3
+			oFilterField.setValueState(ValueState.Warning);
+			oFilterField.setValueStateText(`${oItem.label} is a required filter.`);
+		} else if (!oItem.visible && !oItem.required && !bValueSet) {
+			// Case 3: Non-mandatory - Invisible + No Value - Warning Message 2
+			oFilterField.setValueState(ValueState.Warning);
+			oFilterField.setValueStateText("If invisible and empty, this filter will be removed.");
+		} else if (!oItem.visible && bValueSet) {
+			// Case 4: Mandatory - Invisible + Value - Information
+			// Case 5: Non-manadatory - Invisible + Value - Information
+			oFilterField.setValueState(ValueState.Information);
+			oFilterField.setValueStateText("The filter will not show on the filter bar.");
+		} else {
+			oFilterField.setValueState(ValueState.None);
+			oFilterField.setValueStateText();
+		}
+	};
+
+	AdaptationFilterBar.prototype._checkIsNewUI = function() {
+		if (this._bUseNewUI === undefined) {
+			this._bUseNewUI = new URLSearchParams(window.location.search).get("sap-ui-xx-new-adapt-filters") === "true";
+		}
+		return this._bUseNewUI;
 	};
 
 	AdaptationFilterBar.prototype.exit = function() {

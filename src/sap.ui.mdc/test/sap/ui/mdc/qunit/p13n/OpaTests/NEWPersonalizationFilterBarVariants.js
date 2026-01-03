@@ -60,7 +60,7 @@ sap.ui.define([
 		opaTestOrSkip("When I start the 'appUnderTestTable' app, the FilterBar should appear", function (Given, When, Then) {
 			//insert application
 			Given.iStartMyAppInAFrame({
-				source: 'test-resources/sap/ui/mdc/qunit/p13n/OpaTests/appUnderTestTable/TableOpaApp.html',
+				source: 'test-resources/sap/ui/mdc/qunit/p13n/OpaTests/appUnderTestTable/TableOpaApp.html?sap-ui-xx-new-adapt-filters=true',
 				autoWait: true
 			});
 			When.iLookAtTheScreen();
@@ -80,26 +80,21 @@ sap.ui.define([
 		// Define new FilterFields and enter values
 		// ----------------------------------------------------------------
 		opaTestOrSkip("When I press on 'Adapt Filters' button, I change the FilterField selection", function (Given, When, Then) {
-			When.iPressButtonWithText(Arrangement.P13nDialog.AdaptFilter.button);
-			When.iChangeAdaptFiltersView("sap-icon://group-2");
-			Then.thePersonalizationDialogOpens(false);
-
-			//add 2 new FilterFields
-			When.iSelectColumn("Country", null, oFilterItems["Artists"], true, true);
-			When.iSelectColumn("cityOfOrigin_city", null, oFilterItems["Artists"], true, true);
+			//add 3 new FilterFields
+			When.iPersonalizeFilterColumns({
+                Artists: ["Name", "Founding Year", "artistUUID", "Breakout Year", "Country", "cityOfOrigin_city"],
+                Countries: ["Country Name"]
+            });
 			oFilterItems["Artists"][3].selected = true;
 			oFilterItems["Artists"][2].selected = true;
+			oFilterItems["Countries"][2].selected = true;
 
 			//Enter some values
-			When.iEnterTextInFilterDialog("Founding Year", "1989");
+			When.iEnterFilterValue("Founding Year", "Artists", ["1989"]);
 			oFilterItems["Artists"][4].value = ["1989"];
-			When.iTogglePanelInDialog("Artists");
-			When.iTogglePanelInDialog("Countries");
-			When.iEnterTextInFilterDialog("Country Name", "DE");
+			When.iEnterFilterValue("Country Name", "Countries", ["DE"]);
 			oFilterItems["Countries"][2].value = ["DE"];
 
-			//close modal dialog
-			When.iPressDialogOk();
 
 			//check that variant is dirty
 			Then.theVariantManagementIsDirty(true);
@@ -121,7 +116,7 @@ sap.ui.define([
 		opaTestOrSkip("When I start the 'appUnderTestTable' app, the current variant should affect the FilterBar", function (Given, When, Then) {
 			//insert application
 			Given.iStartMyAppInAFrame({
-				source: 'test-resources/sap/ui/mdc/qunit/p13n/OpaTests/appUnderTestTable/TableOpaApp.html',
+				source: 'test-resources/sap/ui/mdc/qunit/p13n/OpaTests/appUnderTestTable/TableOpaApp.html?sap-ui-xx-new-adapt-filters=true',
 				autoWait: true
 			});
 			When.iLookAtTheScreen();
@@ -130,7 +125,7 @@ sap.ui.define([
 			Then.iShouldSeeButtonWithText(Arrangement.P13nDialog.AdaptFilter.go);
 
 			//check initially visible FilterFields
-			Then.iShouldSeeVisibleFiltersInOrderInFilterBar(["Name", "Founding Year", "artistUUID", "Breakout Year", "cityOfOrigin_city", "Country"]);
+			Then.iShouldSeeVisibleFiltersInOrderInFilterBar(["Name", "Founding Year", "artistUUID", "Breakout Year", "Country", "cityOfOrigin_city", "Country Name"]);
 
 			Then.theVariantManagementIsDirty(false);
 
@@ -140,12 +135,10 @@ sap.ui.define([
 
 		opaTestOrSkip("Recheck dialog", function (Given, When, Then) {
 			When.iPressButtonWithText(Arrangement.P13nDialog.AdaptFilter.getButtonCountText(2));
-			When.iChangeAdaptFiltersView("sap-icon://group-2");
+			When.onTheMDCFilterBar.iChangeAdaptFiltersView("Group");
 
-			Then.iShouldSeeP13nFilterItemsInPanel(oFilterItems["Artists"], "Artists");
-			When.iTogglePanelInDialog("Artists");
-			When.iTogglePanelInDialog("Countries");
-			Then.iShouldSeeP13nFilterItemsInPanel(oFilterItems["Countries"], "Countries");
+			Then.iShouldSeeSelectedListFilterItems(oFilterItems["Artists"]);
+			Then.iShouldSeeSelectedListFilterItems(oFilterItems["Countries"]);
 
 			//close modal dialog
 			When.iPressDialogOk();
@@ -161,11 +154,8 @@ sap.ui.define([
 			//Enter a different value
 			When.iEnterTextInFilterDialog("Country Name", "GB");
 
-			When.iTogglePanelInDialog("Countries");
-			When.iTogglePanelInDialog("Artists");
-
 			//deselect a selected field stored in the variant
-			When.iSelectColumn("Country", null, null, true, true);
+			When.iDeselectColumn("Country", oFilterItems["Countries"]);
 
 			//close modal dialog
 			When.iPressDialogOk();
@@ -184,10 +174,8 @@ sap.ui.define([
 			When.iConfirmResetWarning();
 
 			//The old values stored in the variant should be present in the dialog
-			Then.iShouldSeeP13nFilterItemsInPanel(oFilterItems["Artists"], "Artists");
-			When.iTogglePanelInDialog("Artists");
-			When.iTogglePanelInDialog("Countries");
-			Then.iShouldSeeP13nFilterItemsInPanel(oFilterItems["Countries"], "Countries");
+			Then.iShouldSeeSelectedListFilterItems(oFilterItems["Artists"]);
+			Then.iShouldSeeSelectedListFilterItems(oFilterItems["Countries"]);
 
 			//close modal dialog
 			When.iPressDialogOk();
@@ -199,7 +187,7 @@ sap.ui.define([
 		opaTestOrSkip("Check the 'FilterBarTest' variant after reset", function (Given, When, Then) {
 
 			//check visible FilterFields
-			Then.iShouldSeeVisibleFiltersInOrderInFilterBar(["Name", "Founding Year", "artistUUID", "Breakout Year", "cityOfOrigin_city", "Country"]);
+			Then.iShouldSeeVisibleFiltersInOrderInFilterBar(["Name", "Founding Year", "artistUUID", "Breakout Year", "Country", "cityOfOrigin_city", "Country Name"]);
 
 			//check if the correct variant is selected
 			Then.iShouldSeeSelectedVariant("FilterBarVariant");
@@ -216,17 +204,16 @@ sap.ui.define([
 			//check dialog + Filter values
 			When.iPressButtonWithText(Arrangement.P13nDialog.AdaptFilter.button);
 
-			//Check "Countries" Panel
+			//Check "Countries" FilterFields
 			oFilterItems["Countries"][2].value = null;
-			Then.iShouldSeeP13nFilterItemsInPanel(oFilterItems["Countries"], "Countries");
+			oFilterItems["Countries"][2].selected = false;
+			Then.iShouldSeeSelectedListFilterItems(oFilterItems["Countries"]);
 
-			//Check "Artists" Panel
-			When.iTogglePanelInDialog("Countries");
-			When.iTogglePanelInDialog("Artists");
+			//Check "Artists" FilterFields
 			oFilterItems["Artists"][4].value = null;
 			oFilterItems["Artists"][3].selected = false;
 			oFilterItems["Artists"][2].selected = false;
-			Then.iShouldSeeP13nFilterItemsInPanel(oFilterItems["Artists"], "Artists");
+			Then.iShouldSeeSelectedListFilterItems(oFilterItems["Artists"]);
 
 			Given.enableAndDeleteLrepLocalStorage();
 			Then.iTeardownMyAppFrame();

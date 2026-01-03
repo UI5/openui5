@@ -1,0 +1,99 @@
+sap.ui.define([
+	'sap/ui/test/Opa5',
+	'test-resources/sap/ui/mdc/qunit/p13n/OpaTests/utility/Arrangement',
+	'test-resources/sap/ui/mdc/qunit/p13n/OpaTests/utility/Util',
+	'test-resources/sap/ui/mdc/qunit/p13n/OpaTests/utility/Action',
+	'test-resources/sap/ui/mdc/qunit/p13n/OpaTests/utility/Assertion',
+	'sap/ui/Device',
+	'test-resources/sap/ui/rta/integration/pages/Adaptation'
+], function (Opa5, Arrangement, TestUtil, Action, Assertion, Device) {
+	'use strict';
+
+	return function (opaTestOrSkip) {
+		if (window.blanket) {
+			//window.blanket.options("sap-ui-cover-only", "sap/ui/mdc");
+			window.blanket.options("sap-ui-cover-never", "sap/viz");
+		}
+
+		Opa5.extendConfig({
+			arrangements: new Arrangement(),
+			actions: new Action(),
+			assertions: new Assertion(),
+			viewNamespace: "view.",
+			autoWait: true
+		});
+
+
+		// ----------------------------------------------------------------
+		// initialize application
+		// ----------------------------------------------------------------
+		opaTestOrSkip("When I start the 'appUnderTestTable' app, the FilterBar should appear and contain some items", function (Given, When, Then) {
+			//insert application
+			Given.iStartMyAppInAFrame({
+				source: 'test-resources/sap/ui/mdc/qunit/p13n/OpaTests/appUnderTestTable/TableOpaApp.html?sap-ui-xx-new-adapt-filters=true',
+				autoWait: true
+			});
+			When.iLookAtTheScreen();
+
+			Then.theVariantManagementIsDirty(false);
+		});
+
+		// ----------------------------------------------------------------
+		// start and enable RTA
+		// ----------------------------------------------------------------
+		opaTestOrSkip("When I enable key user adaptation, the App should change into 'RTA' mode", function(Given, When, Then){
+			When.iPressButtonWithText("Start RTA");
+			Then.onPageWithRTA.iShouldSeeTheToolbar();
+		});
+
+		// ----------------------------------------------------------------
+		// open RTA settings
+		// ----------------------------------------------------------------
+		opaTestOrSkip("When I press on the FilterBar, the settings context menu opens", function (Given, When, Then) {
+			When.iClickOnOverlayForControl("sap.ui.mdc.FilterBar");
+			Then.onPageWithRTA.iShouldSeetheContextMenu();
+			Then.onPageWithRTA.iShouldSeetheNumberOfContextMenuActions(3);
+		});
+
+		// ----------------------------------------------------------------
+		// open Personalization dialog
+		// ----------------------------------------------------------------
+		opaTestOrSkip("When I select items and change values in the personalization dialog, the changes are reflected after confirmation", function (Given, When, Then) {
+			When.iPersonalizeFilterColumnsWithRTA({
+				Artists: ["Name", "Founding Year", "artistUUID", "Breakout Year", "Country", "cityOfOrigin_city"]
+			});
+
+			Then.onPageWithRTA.iShouldSeeTheToolbar();
+
+			// Need to execute iClickOnOverlayForControl twice, because there is a bug, where clicking on it
+			// after opening the Adapt Filters view does nothing.
+			When.iClickOnOverlayForControl("sap.ui.mdc.FilterBar");
+			When.iClickOnOverlayForControl("sap.ui.mdc.FilterBar");
+			When.onPageWithRTA.iClickOnAContextMenuEntryWithKey("CTX_SETTINGS");
+			When.iEnterTextInFilterDialog("Founding Year", "1989");
+			When.iPressButtonWithText("OK");
+			Then.thePersonalizationDialogShouldBeClosed();
+			Then.iShouldSeeVisibleFiltersInOrderInFilterBar(["Name", "Founding Year", "artistUUID", "Breakout Year", "Country", "cityOfOrigin_city"]);
+			Then.iShouldSeeConditionValuesInFilterBar(["1989"], "foundingYear");
+		});
+
+		opaTestOrSkip("Quit RTA", function(Given, When, Then){
+			//Quit RTA
+			When.onPageWithRTA.iExitRtaMode();
+
+			//Just to check that runtime Dialog opens again (no more overlays)
+			When.iPressOnButtonWithIcon(Arrangement.P13nDialog.Settings.Icon);
+
+			//close Dialog
+			When.iPressDialogOk();
+			Then.thePersonalizationDialogShouldBeClosed();
+
+			//tear down app
+			When.onPageWithRTA.enableAndDeleteLrepLocalStorageAfterRta();
+			Then.iTeardownMyAppFrame();
+		});
+	};
+
+
+
+});

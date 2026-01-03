@@ -61,14 +61,12 @@ sap.ui.define([
             return oActions.iPressKeyOnTheFilterField.call(this, vIdentifier, KeyCodes.F4);
 		},
 
-		iNavigateOnTheFilterField: function(vIdentifier, keyCode) { // TODO: use key code or some step to define arrow key, pageUp....
+		iNavigateOnTheFilterField: function(vIdentifier, keyCode, oConfig) { // TODO: use key code or some step to define arrow key, pageUp....
 			return waitForFilterField.call(this,  Utils.enhanceWaitFor(vIdentifier, {
-				actions: (oFilterField) => {
+				success: (oFilterField) => {
 					oFilterField._oOldNavigateCondition = oFilterField._oNavigateCondition;
 					oFilterField.focus();
 					new TriggerEvent({event: "keydown", payload: {which: keyCode, keyCode: keyCode}}).executeOn(oFilterField.getCurrentContent()[0]); // doesnt work with focusdomref
-				},
-				success: (oFilterField) => {
 					waitForFilterField.call(this, Utils.enhanceWaitFor(oFilterField.getId(), {
 						matchers: (oFilterField) => {
 							if (oFilterField._oOldNavigateCondition !== oFilterField._oNavigateCondition) { // TODO: what about if end reached?
@@ -78,6 +76,10 @@ sap.ui.define([
 						},
 						success:(oFilterField) => {
 							Opa5.assert.ok(oFilterField, "Keyboard navigation on Field '" + oFilterField.getId() + "' executed.");
+							// Execute optional success callback while FilterField is still focused
+							if (oConfig && typeof oConfig.success === "function") {
+								oConfig.success.call(this, oFilterField);
+							}
 						}
 					}));
 				}

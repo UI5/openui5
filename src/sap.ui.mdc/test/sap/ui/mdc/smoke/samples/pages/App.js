@@ -23,39 +23,6 @@ sap.ui.define([
 
 	const oMDCBundle = Library.getResourceBundleFor("sap.ui.mdc");
 
-	function waitForOpenShowValues(oSettings) {
-		const fnCallSuccess = function() {
-            if (typeof oSettings.success === "function") {
-                oSettings.success.call(this);
-            }
-        };
-
-		return this.waitFor({
-			controlType: "sap.m.Dialog",
-			matchers: {
-				ancestor: {
-					controlType: "sap.ui.mdc.FilterBar",
-					visible: false
-				}
-			},
-			success:function(aAdaptFiltersPanel) {
-				Opa5.assert.equal(aAdaptFiltersPanel.length, 1, "Adapt Filters Panel found");
-				const sAdaptFiltersResourceBundleButtonText = oMDCBundle.getText("filterbar.ADAPT_HIDE_VALUE");
-				return this.waitFor({
-					controlType: "sap.m.Button",
-					properties: {
-						text: sAdaptFiltersResourceBundleButtonText
-					},
-					matchers: new Ancestor(aAdaptFiltersPanel[0]),
-					success : function(aBtn) {
-						Opa5.assert.equal(aBtn.length, 1, "Found an active 'Show Values' mode");
-						fnCallSuccess.call(this);
-					}
-				});
-			}
-		});
-	}
-
 	function waitForDialog(fnSuccess) {
 		return this.waitFor({
 			controlType: "sap.m.Dialog",
@@ -71,9 +38,7 @@ sap.ui.define([
 		onTheApp: {
 			actions: {
 				iChangeTheSliderValueInTheField: function(iValue, bIsFilterField, bInShowValues) {
-					function fnChangeSliderValue() {
 						return this.waitFor({
-							searchOpenDialogs: !!bInShowValues,
 							controlType: "sap.m.Slider",
 							success: function(aControl){
 								const oSlider = aControl[0];
@@ -87,22 +52,9 @@ sap.ui.define([
 							},
 							errorMessage: "The action could not be performed."
 						});
-					}
-
-					if (bInShowValues) {
-						return waitForOpenShowValues.call(this, {
-							success: function () {
-								fnChangeSliderValue.call(this);
-							}
-						});
-					}
-
-					return fnChangeSliderValue.call(this);
 				},
 				iChangeTheSegementedButtonValueInTheFilterField: function(sValue, bInShowValues) {
-					function fnChangeSegmentedButtonValue() {
 						return this.waitFor({
-							searchOpenDialogs: !!bInShowValues,
 							controlType: "sap.m.SegmentedButton",
 							success: function(aControl){
 								const oSegmentedButton = bInShowValues && aControl.length > 1 ? aControl[1] : aControl[0];
@@ -126,76 +78,41 @@ sap.ui.define([
 							},
 							errorMessage: "The action could not be performed."
 						});
-					}
-
-					if (bInShowValues) {
-						return waitForOpenShowValues.call(this, {
-							success: function () {
-								fnChangeSegmentedButtonValue.call(this);
-							}
-						});
-					}
-
-					return fnChangeSegmentedButtonValue.call(this);
 				},
 				iEnterTextOnTheMultiInputFilterField: function(sValue, bInShowValues) {
-					function fnChangeMultiInputValue() {
-						return this.waitFor({
-							searchOpenDialogs: !!bInShowValues,
-							controlType: "sap.m.MultiInput",
-							success: function(aControl){
-								const oMultiInput = aControl[0];
-								this.waitFor({
-									controlType: "sap.ui.mdc.FilterField",
-									matchers: new Descendant(oMultiInput),
-									actions: new EnterText({ text: sValue })
-								});
-							},
-							errorMessage: "The action could not be performed."
-						});
-					}
-
-					if (bInShowValues) {
-						return waitForOpenShowValues.call(this, {
-							success: function () {
-								fnChangeMultiInputValue.call(this);
-							}
-						});
-					}
-
-					return fnChangeMultiInputValue.call(this);
+					return this.waitFor({
+						searchOpenDialogs: !!bInShowValues,
+						controlType: "sap.m.MultiInput",
+						success: function(aControl){
+							const oMultiInput = aControl[0];
+							this.waitFor({
+								controlType: "sap.ui.mdc.FilterField",
+								matchers: new Descendant(oMultiInput),
+								actions: new EnterText({ text: sValue })
+							});
+						},
+						errorMessage: "The action could not be performed."
+					});
 
 				},
 				iPressKeyOnTheMultiInputFilterField: function(oKeyCode, bInShowValues) {
-					function fnPressKeyOnMultiInput() {
-						return this.waitFor({
-							searchOpenDialogs: !!bInShowValues,
-							controlType: "sap.m.MultiInput",
-							success: function(aControl){
-								const oMultiInput = aControl[0];
-								this.waitFor({
-									controlType: "sap.ui.mdc.FilterField",
-									matchers: new Descendant(oMultiInput),
-									actions: () => {
-										oMultiInput.focus();
-										new TriggerEvent({event: "keydown", payload: {which: oKeyCode, keyCode: oKeyCode}}).executeOn(oMultiInput); // doesnt work with focusdomref
-										Opa5.assert.ok(oMultiInput, "Key '" + oKeyCode + "' pressed on MultiInput '" + oMultiInput.getId() + "'");
-									}
-								});
-							},
-							errorMessage: "The action could not be performed."
-						});
-					}
-
-					if (bInShowValues) {
-						return waitForOpenShowValues.call(this, {
-							success: function () {
-								fnPressKeyOnMultiInput.call(this);
-							}
-						});
-					}
-
-					return fnPressKeyOnMultiInput.call(this);
+					return this.waitFor({
+						searchOpenDialogs: !!bInShowValues,
+						controlType: "sap.m.MultiInput",
+						success: function(aControl){
+							const oMultiInput = aControl[0];
+							this.waitFor({
+								controlType: "sap.ui.mdc.FilterField",
+								matchers: new Descendant(oMultiInput),
+								actions: () => {
+									oMultiInput.focus();
+									new TriggerEvent({event: "keydown", payload: {which: oKeyCode, keyCode: oKeyCode}}).executeOn(oMultiInput); // doesnt work with focusdomref
+									Opa5.assert.ok(oMultiInput, "Key '" + oKeyCode + "' pressed on MultiInput '" + oMultiInput.getId() + "'");
+								}
+							});
+						},
+						errorMessage: "The action could not be performed."
+					});
 				},
 				iChangeTheCheckBoxValueInTheField: function(bValue) {
 					return this.waitFor({

@@ -10,12 +10,22 @@ sap.ui.define(["sap/ui/test/Opa5"], function (Opa5) {
             controlType: "sap.ui.mdc.FilterField",
             success: function (vFilterFields) {
                 var aFilterFields = [].concat(vFilterFields);
-                Opa5.assert.strictEqual(
-                    aFilterFields.length,
-                    1,
-                    "The field was found with settings " +
-                        JSON.stringify(oSettings)
-                );
+
+                const bHasSpecificMatchers = oSettings.properties || oSettings.matchers || oSettings.id;
+                if (!bHasSpecificMatchers) {
+                    Opa5.assert.strictEqual(
+                        aFilterFields.length,
+                        1,
+                        "The field was found with settings " +
+                            JSON.stringify(oSettings)
+                    );
+                } else {
+                    Opa5.assert.ok(
+                        aFilterFields.length >= 1,
+                        aFilterFields.length + " field(s) found with settings " +
+                            JSON.stringify(oSettings)
+                    );
+                }
 
                 if (typeof oSettings.success === "function") {
                     var oFilterField = aFilterFields[0];

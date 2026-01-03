@@ -156,12 +156,16 @@ sap.ui.define([
 		Given.iStartMyAppInAFrame("test-resources/sap/ui/mdc/internal/TableWithFilterBar/index.html");
 
 		const oFilterBar = "container-v4demo---books--booksFilterBar";
+		Then.waitFor({
+			controlType: "sap.ui.mdc.FilterBar",
+			success: (oFilterBar) => {
+				When.onTheMDCFilterBar.iPersonalizeFilter(oFilterBar[0], {
+					Books: ["Author ID", "Title", "Stock range", "Created On", "Language", "Book ID"]
+				});
 
-		When.onTheMDCFilterBar.iPersonalizeFilter(oFilterBar, {
-			Books: [
-				"Author ID", "Title", "Stock range", "Created On", "Language", "Book ID"
-			]
+			}
 		});
+
 
 		Then.onTheMDCFilterBar.iShouldSeeFilters(oFilterBar, [
 			"Author ID", "Title", "Stock range", "Created On", "Language", "Book ID"

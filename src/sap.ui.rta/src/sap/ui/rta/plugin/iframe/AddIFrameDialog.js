@@ -37,10 +37,19 @@ sap.ui.define([
 			? _oTextResources.getText("IFRAME_ADDIFRAME_DIALOG_SELECT_ADDITIONAL_TEXT_PERCENT_SECTION")
 			: _oTextResources.getText("IFRAME_ADDIFRAME_DIALOG_SELECT_ADDITIONAL_TEXT_PERCENT_HEADER");
 
+		const mDocumentationUrls = {
+			btpUrl: "https://help.sap.com/docs/ui5-flexibility-for-key-users/ui5-flexibility-for-key-users/embedding-content",
+			s4HanaCloudUrl: "https://help.sap.com/docs/SAP_S4HANA_CLOUD/4fc8d03390c342da8a60f8ee387bca1a/8db25610e91342919fcf63d4e5868ae9.html",
+			s4HanaOnPremUrl: "https://help.sap.com/docs/ABAP_PLATFORM_NEW/a7b390faab1140c087b8926571e942b7/8db25610e91342919fcf63d4e5868ae9.html"
+		};
+
 		return new JSONModel({
 			dialogTitle: bSetUpdateTitle ?
 				_oTextResources.getText("IFRAME_ADDIFRAME_DIALOG_UPDATE_TITLE") :
 				_oTextResources.getText("IFRAME_ADDIFRAME_DIALOG_TITLE"),
+			documentationUrl: {
+				value: RtaUtils.getSystemSpecificDocumentationUrl(mDocumentationUrls)
+			},
 			asContainer: {
 				value: bAsContainer
 			},

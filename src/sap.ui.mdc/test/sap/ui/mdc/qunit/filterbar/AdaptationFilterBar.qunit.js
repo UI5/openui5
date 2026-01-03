@@ -577,7 +577,7 @@ sap.ui.define([
 
 		const oGroupPanel = oAdaptationFilterBar._oFilterBarLayout.getInner();
 		sinon.stub(oGroupPanel, "getSelectedFields").returns([
-			"key1"
+			{ name: "key1" }
 		]);
 
 
@@ -732,7 +732,8 @@ sap.ui.define([
 		const oGroupPanel = oAdaptationFilterBar._oFilterBarLayout.getInner();
 
 		sinon.stub(oGroupPanel, "getSelectedFields").returns([
-			"key1", "key2"
+			{ name: "key1" },
+			{ name: "key2" }
 		]);
 
 
@@ -764,7 +765,8 @@ sap.ui.define([
 				oAdaptationFilterBar.executeRemoves().then(function(){
 
 					//Call it again --> no more hooks should be executed
-					oAdaptationFilterBar.executeRemoves();
+					return oAdaptationFilterBar.executeRemoves();
+				}).then(function(){
 					assert.equal(oRemoveSpy.callCount, 1, "Correct amount of removes triggered");
 					AggregationBaseDelegate.removeItem.restore();
 					done();
@@ -964,6 +966,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Always destroy leftovers on exit", function(assert){
+
 		const done = assert.async();
 
 		this.oParent.getInbuiltFilter().setP13nData({
@@ -999,7 +1002,7 @@ sap.ui.define([
 		}.bind(this));
 	});
 
-	QUnit.test("Destroy leftover fields (also dynamically added ones)", function(assert){
+	QUnit.test("Destroy leftover fields (also dynamically added ones)", async function(assert){
 		const done = assert.async();
 
 		this.oParent.getInbuiltFilter().setP13nData({
@@ -1017,41 +1020,45 @@ sap.ui.define([
 			]
 		});
 
-		Promise.all([
+		await Promise.all([
 			//1) Init Parent (Delegate + PropertyHelper)
 			this.oParent.initPropertyHelper(),
 			this.oParent.initControlDelegate()
-		])
-		.then(function(){
+		]);
 
-			this.oParent.getInbuiltFilter().createFilterFields().then(function(oAdaptationFilterBar){
+		const oAdaptationFilterBar = await this.oParent.getInbuiltFilter().createFilterFields();
 
-				//Mock user interaction
-				// 1) Add the filterfield to the p13n model (usually triggered by user interaction with the AdaptationFilterBar)
-				// 2) Add the filterfield to the parent FilterBar --> check if the AdaptationFilterBar recognizes that the field has
-				// been added during runtime
-				const aP13nItems = oAdaptationFilterBar.getP13nData().items;
-				aP13nItems[1].visible = true;
-				oAdaptationFilterBar.setP13nData({items: aP13nItems});
-				this.oParent.addFilterItem(new FilterField({
-					propertyKey: "key2",
-					conditions: "{$filters>/conditions/key2}"
-				}));
+		// key2 should be created by the delegate and stored in _mOriginalsForClone
+		const oKey2Field = oAdaptationFilterBar._mOriginalsForClone["key2"];
+		//Mock user interaction
+		// 1) Mark key2 as visible to simulate user selecting it
+		// 2) This should prevent it from being removed
+		const aP13nItems = oAdaptationFilterBar.getP13nData().items;
+		aP13nItems[1].visible = true;
+		oAdaptationFilterBar.setP13nData({items: aP13nItems});
 
-				oAdaptationFilterBar.executeRemoves().then(function(){
+		// Stub getSelectedFields to ensure key2 is considered "selected/existing"
+		// This simulates that the layout has been updated with the visible change
+		const oGroupPanel = oAdaptationFilterBar._oFilterBarLayout.getInner();
+		sinon.stub(oGroupPanel, "getSelectedFields").returns([
+			{ name: "key1" },
+			{ name: "key2" }
+		]);
 
-					const oAddedField = oAdaptationFilterBar._mOriginalsForClone["key2"];
+		await oAdaptationFilterBar.executeRemoves();
 
-					assert.ok(oAddedField, "The AdaptationFilterBar noticed that the field has been added and did not trigger 'removeItem'");
+		// The field should still be in _mOriginalsForClone since it's now visible/selected
+		const oAddedField = oAdaptationFilterBar._mOriginalsForClone["key2"];
 
-					oAdaptationFilterBar.destroy();
+		assert.ok(oAddedField, "The AdaptationFilterBar kept the field since it was marked as visible and did not trigger 'removeItem'");
+		assert.strictEqual(oAddedField, oKey2Field, "The field reference is the same");
 
-					assert.ok(oAddedField.bIsDestroyed, "The field will be destroyed on cleaning up the AdaptationFilterBar");
+		oGroupPanel.getSelectedFields.restore();
 
-					done();
-				});
+		oAdaptationFilterBar.destroy();
 
-			}.bind(this));
-		}.bind(this));
+		assert.ok(oAddedField.bIsDestroyed, "The field will be destroyed on cleaning up the AdaptationFilterBar");
+
+		done();
 	});
 });

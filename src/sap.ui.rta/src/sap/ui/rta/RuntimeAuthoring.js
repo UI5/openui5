@@ -620,6 +620,7 @@ sap.ui.define([
 	 */
 	RuntimeAuthoring.prototype.stop = async function(bSkipSave, bSkipRestart, bSkipUnsavedChangesPrompt) {
 		let bUserCancelled;
+		let bExitFailed;
 		checkToolbarAndExecuteFunction.call(this, "setBusy", true);
 		try {
 			bSkipSave ||= !PersistenceWriteAPI.hasDirtyChanges({ selector: this.getRootControlInstance() });
@@ -660,13 +661,14 @@ sap.ui.define([
 			}
 			VersionsAPI.clearInstances();
 		} catch (vError) {
+			bExitFailed = true;
 			if (!bUserCancelled) {
 				showTechnicalError(vError);
 			}
 		}
 		checkToolbarAndExecuteFunction.call(this, "setBusy", false);
 		setBlockedOnRootElements.call(this, false);
-		if (!bUserCancelled) {
+		if (!bExitFailed) {
 			this._sStatus = STOPPED;
 			document.body.classList.remove("sapUiRtaMode");
 		}

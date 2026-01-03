@@ -319,12 +319,6 @@ sap.ui.define([
 		return Math.max(0, Math.floor(iViewportHeight - oTableDomRef.getBoundingClientRect().height + oRowContainer.getBoundingClientRect().height));
 	};
 
-	InteractiveRowMode.prototype.setRowCount = function(iRowCount) {
-		this.setProperty("rowCount", iRowCount);
-		setNewRowCount.call(this, iRowCount);
-		return this;
-	};
-
 	InteractiveRowMode.prototype.updateTable = function(sReason) {
 		this.getTable().getDomRef("heightResizer")?.setAttribute("aria-valuenow", this.getActualRowCount());
 
@@ -480,7 +474,7 @@ sap.ui.define([
 						shortcutText: TableUtils.getResourceText("TBL_RSZ_ROW_UP_SHORTCUT"),
 						select: function() {
 							const iRowCount = oMode.getActualRowCount();
-							setNewRowCount.call(oMode, Math.max(iRowCount - 1, oMode.getMinRowCount()), false);
+							setNewRowCount.call(oMode, Math.max(iRowCount - 1, oMode.getMinRowCount()), true);
 						}
 					}),
 					new MenuItem({
@@ -488,21 +482,21 @@ sap.ui.define([
 						shortcutText: TableUtils.getResourceText("TBL_RSZ_ROW_DOWN_SHORTCUT"),
 						select: function() {
 							const iRowCount = oMode.getActualRowCount();
-							setNewRowCount.call(oMode, Math.min(iRowCount + 1, oMode._getMaxRowCount()), false);
+							setNewRowCount.call(oMode, Math.min(iRowCount + 1, oMode._getMaxRowCount()), true);
 						}
 					}),
 					new MenuItem({
 						text: TableUtils.getResourceText("TBL_RSZ_MINIMIZE"),
 						shortcutText: TableUtils.getResourceText("TBL_RSZ_MINIMIZE_SHORTCUT"),
 						select: function() {
-							setNewRowCount.call(oMode, oMode.getMinRowCount(), false);
+							setNewRowCount.call(oMode, oMode.getMinRowCount(), true);
 						}
 					}),
 					new MenuItem({
 						text: TableUtils.getResourceText("TBL_RSZ_MAXIMIZE"),
 						shortcutText: TableUtils.getResourceText("TBL_RSZ_MAXIMIZE_SHORTCUT"),
 						select: function() {
-							setNewRowCount.call(oMode, oMode._getMaxRowCount(), false);
+							setNewRowCount.call(oMode, oMode._getMaxRowCount(), true);
 						}
 					})
 				],
