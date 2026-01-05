@@ -30,8 +30,9 @@ sap.ui.define([
 	"sap/m/Button",
 	"sap/m/ToggleButton",
 	"sap/ui/core/InvisibleText",
-	"sap/ui/Device"
-], (Library, JSONModel, QueryPanel, IconTabFilter, Icon, Sorter, OverflowToolbar, ToolbarSpacer, Title, Label, HBox, VBox, Filter, Item, ComboBox, List, CustomListItem, GroupHeaderListItem, Grid, GridData, SegmentedButton, SegmentedButtonItem, coreLib, TableUtil, CustomData, Button, ToggleButton, InvisibleText, Device) => {
+	"sap/ui/Device",
+	"sap/ui/layout/VerticalLayout"
+], (Library, JSONModel, QueryPanel, IconTabFilter, Icon, Sorter, OverflowToolbar, ToolbarSpacer, Title, Label, HBox, VBox, Filter, Item, ComboBox, List, CustomListItem, GroupHeaderListItem, Grid, GridData, SegmentedButton, SegmentedButtonItem, coreLib, TableUtil, CustomData, Button, ToggleButton, InvisibleText, Device, VerticalLayout) => {
 	"use strict";
 
 	const { ValueState } = coreLib;
@@ -192,7 +193,7 @@ sap.ui.define([
 	};
 
 	AdaptFiltersPanelContent.prototype._setInnerLayout = function() {
-		const oVBox = new sap.ui.layout.VerticalLayout({
+		const oVBox = new VerticalLayout({
 			width: "100%",
 			content: [
 				this._oListControl,

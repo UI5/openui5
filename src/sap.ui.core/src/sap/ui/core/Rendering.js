@@ -98,7 +98,7 @@ sap.ui.define([
 				const mUIAreasSnapshot = mUIAreas;
 				mUIAreas = {};
 				for (const sId in mUIAreasSnapshot) {
-					mUIAreasSnapshot[sId].rerender();
+					mUIAreasSnapshot[sId].rerender(false);
 				}
 
 			// eslint-disable-next-line no-unmodified-loop-condition

@@ -586,9 +586,10 @@ sap.ui.define([
 		 *
 		 * Either renders the whole <code>UIArea</code> or a set of descendant controls that have been invalidated.
 		 *
-		 * @param {boolean} bForce Whether a re-rendering of the <code>UIArea</code> should be enforced
+		 * @param {boolean} [bForce=false] Whether a re-rendering of the <code>UIArea</code> should be enforced
 		 * @return {boolean} Whether a redraw was necessary or not
 		 * @private
+		 * @ui5-restricted sap/ui/core/Rendering
 		 */
 		UIArea.prototype.rerender = function(bForce) {
 		   var that = this;

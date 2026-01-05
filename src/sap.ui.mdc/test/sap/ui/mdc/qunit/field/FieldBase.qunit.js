@@ -84,7 +84,9 @@ sap.ui.define([
 	"./FieldBaseDelegateODataDefaultTypes",
 	"test-resources/sap/m/qunit/plugins/ClipboardUtils",
 	"sap/ui/mdc/enums/RequestShowContainerReason",
-	"sap/ui/mdc/Control"
+	"sap/ui/mdc/Control",
+	/* jQuery Plugin "cursorPos"*/
+	"sap/ui/dom/jquery/cursorPos"
 ], (
 	Element,
 	FocusHandler,
@@ -5983,6 +5985,7 @@ sap.ui.define([
 			let oCondition = Condition.createItemCondition("I1", "Item1");
 			oValueHelp.fireTypeaheadSuggested({condition: oCondition, filterValue: "I", itemId: "myItem", items: 1, caseSensitive: true});
 			assert.equal(oContent._$input.val(), "Item1", "Output text");
+			// jQuery Plugin "cursorPos"
 			assert.equal(oContent._$input.cursorPos(), 1, "CursorPosition");
 			assert.equal(oContent.getFocusDomRef().selectionStart, 1, "Selection start");
 			assert.equal(oContent.getFocusDomRef().selectionEnd, 5, "Selection end");
@@ -6005,6 +6008,7 @@ sap.ui.define([
 			setTimeout(async () => { // to wait for Promises and opening
 				oValueHelp.fireTypeaheadSuggested({condition: oCondition, filterValue: "i", itemId: "myItem", items: 2, caseSensitive: true});
 				assert.equal(oContent._$input.val(), "i", "Output text");
+				// jQuery Plugin "cursorPos"
 				assert.equal(oContent._$input.cursorPos(), 1, "CursorPosition");
 				assert.equal(oContent.getFocusDomRef().selectionStart, 1, "Selection start");
 				assert.equal(oContent.getFocusDomRef().selectionEnd, 1, "Selection end");
@@ -6013,6 +6017,7 @@ sap.ui.define([
 				oVHContent.setCaseSensitive(false);
 				oValueHelp.fireTypeaheadSuggested({condition: oCondition, filterValue: "i", itemId: "myItem", items: 3, caseSensitive: false});
 				assert.equal(oContent._$input.val(), "i1", "Output text");
+				// jQuery Plugin "cursorPos"
 				assert.equal(oContent._$input.cursorPos(), 1, "CursorPosition");
 				assert.equal(oContent.getFocusDomRef().selectionStart, 1, "Selection start");
 				assert.equal(oContent.getFocusDomRef().selectionEnd, 2, "Selection end");
@@ -6031,6 +6036,7 @@ sap.ui.define([
 				setTimeout(async () => { // to wait for Promises and opening
 					oValueHelp.fireTypeaheadSuggested({condition: oCondition, filterValue: "I", itemId: "myItem", items: 4, caseSensitive: false});
 					assert.equal(oContent._$input.val(), "Item1", "Output text");
+					// jQuery Plugin "cursorPos"
 					assert.equal(oContent._$input.cursorPos(), 1, "CursorPosition");
 					assert.equal(oContent.getFocusDomRef().selectionStart, 1, "Selection start");
 					assert.equal(oContent.getFocusDomRef().selectionEnd, 5, "Selection end");
@@ -6039,6 +6045,7 @@ sap.ui.define([
 					oCondition = Condition.createItemCondition("I1", "myItem1");
 					oValueHelp.fireTypeaheadSuggested({condition: oCondition, filterValue: "I", itemId: "myItem", items: 5, caseSensitive: false});
 					assert.equal(oContent._$input.val(), "I1", "Output text");
+					// jQuery Plugin "cursorPos"
 					assert.equal(oContent._$input.cursorPos(), 1, "CursorPosition");
 					assert.equal(oContent.getFocusDomRef().selectionStart, 1, "Selection start");
 					assert.equal(oContent.getFocusDomRef().selectionEnd, 2, "Selection end");
@@ -6058,6 +6065,7 @@ sap.ui.define([
 						oCondition = Condition.createItemCondition("I1", "Item1");
 						oValueHelp.fireTypeaheadSuggested({condition: oCondition, filterValue: "I", itemId: "myItem", items: 6, caseSensitive: false});
 						assert.equal(oContent._$input.val(), "I1", "Output text");
+						// jQuery Plugin "cursorPos"
 						assert.equal(oContent._$input.cursorPos(), 1, "CursorPosition");
 						assert.equal(oContent.getFocusDomRef().selectionStart, 1, "Selection start");
 						assert.equal(oContent.getFocusDomRef().selectionEnd, 2, "Selection end");
@@ -6069,6 +6077,7 @@ sap.ui.define([
 						setTimeout(() => { // to wait for Promises and opening
 							oValueHelp.fireTypeaheadSuggested({condition: oCondition, filterValue: "I", itemId: "myItem", items: 7, caseSensitive: false}); // outdated FilterValue
 							assert.equal(oContent._$input.val(), "It", "Output text");
+							// jQuery Plugin "cursorPos"
 							assert.equal(oContent._$input.cursorPos(), 2, "CursorPosition");
 							assert.equal(oContent.getFocusDomRef().selectionStart, 2, "Selection start");
 							assert.equal(oContent.getFocusDomRef().selectionEnd, 2, "Selection end");
@@ -6076,6 +6085,7 @@ sap.ui.define([
 
 							oValueHelp.fireTypeaheadSuggested({condition: oCondition, filterValue: "It", itemId: "myItem", items: 8, caseSensitive: false}); // now description must be used
 							assert.equal(oContent._$input.val(), "Item1", "Output text");
+							// jQuery Plugin "cursorPos"
 							assert.equal(oContent._$input.cursorPos(), 2, "CursorPosition");
 							assert.equal(oContent.getFocusDomRef().selectionStart, 2, "Selection start");
 							assert.equal(oContent.getFocusDomRef().selectionEnd, 5, "Selection end");
@@ -6085,6 +6095,7 @@ sap.ui.define([
 							oContent.fireLiveChange({ value: "Ite" }); // don't wait for debounce
 							oValueHelp.fireTypeaheadSuggested({condition: oCondition, filterValue: "It", itemId: "myItem", items: 9, caseSensitive: false}); // outdated
 							assert.equal(oContent._$input.val(), "Ite", "Output text");
+							// jQuery Plugin "cursorPos"
 							assert.equal(oContent._$input.cursorPos(), 3, "CursorPosition");
 							assert.equal(oContent.getFocusDomRef().selectionStart, 3, "Selection start");
 							assert.equal(oContent.getFocusDomRef().selectionEnd, 3, "Selection end");
@@ -6097,6 +6108,7 @@ sap.ui.define([
 								oCondition = Condition.createItemCondition("I1", "Item1");
 								oValueHelp.fireTypeaheadSuggested({condition: oCondition, filterValue: "I", itemId: "myItem", items: 10, caseSensitive: false});
 								assert.equal(oContent._$input.val(), "=I", "Output text");
+								// jQuery Plugin "cursorPos"
 								assert.equal(oContent._$input.cursorPos(), 2, "CursorPosition");
 								assert.equal(oContent.getFocusDomRef().selectionStart, 2, "Selection start");
 								assert.equal(oContent.getFocusDomRef().selectionEnd, 2, "Selection end");
@@ -6108,6 +6120,7 @@ sap.ui.define([
 								setTimeout(() => { // to wait for Promises and opening
 									oValueHelp.fireTypeaheadSuggested({condition: null, filterValue: "XYZ", itemId: null, items: 0, caseSensitive: false});
 									assert.equal(oContent._$input.val(), "XYZ", "Output text");
+									// jQuery Plugin "cursorPos"
 									assert.equal(oContent._$input.cursorPos(), 3, "CursorPosition");
 									assert.equal(oContent.getFocusDomRef().selectionStart, 3, "Selection start");
 									assert.equal(oContent.getFocusDomRef().selectionEnd, 3, "Selection end");
