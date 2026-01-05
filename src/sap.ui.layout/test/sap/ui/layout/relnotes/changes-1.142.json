@@ -18,5 +18,15 @@
         "text": " SemanticFormElement: _updateDisplayText does no longer fail without available _displayField"
       }
     ]
+  },
+  "1.142.2": {
+    "date": "January 2026",
+    "notes": [
+      {
+        "id": "aaefcf67f4651ad72b7a74c3cc6a8c0781d95e4f",
+        "type": "FEATURE",
+        "text": " SimpleForm: use ColumnLayout as default"
+      }
+    ]
   }
 }

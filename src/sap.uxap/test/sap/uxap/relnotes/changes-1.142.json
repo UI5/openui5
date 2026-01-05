@@ -43,5 +43,15 @@
         "text": " sap.uxap.ObjectPageSubSection: prevent infinite rerendering loop"
       }
     ]
+  },
+  "1.142.2": {
+    "date": "January 2026",
+    "notes": [
+      {
+        "id": "641f512bd422fb7120a7e71c905397331c9e78d2",
+        "type": "FIX",
+        "text": " sap.uxap.ObjectPageSubSection: Form layout corruption on phone size fixed"
+      }
+    ]
   }
 }

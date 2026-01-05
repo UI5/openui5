@@ -208,5 +208,25 @@
         "text": " sap.m.DatePicker: close picker on context change"
       }
     ]
+  },
+  "1.142.2": {
+    "date": "January 2026",
+    "notes": [
+      {
+        "id": "2dcedbd4a87218d7a1a557c3b7c693f128c8dfbd",
+        "type": "FIX",
+        "text": " sap.m.ViewSettingsDialog: Remove redundant announcements from sort and group list items"
+      },
+      {
+        "id": "7dac59b71b9e86e865cd7f66cd3658a65430c76c",
+        "type": "FIX",
+        "text": " sap.m.Toolbar: exclude disabled controls from Toolbar navigation"
+      },
+      {
+        "id": "d7de522b3392cf6153f225369034e461471ab5e3",
+        "type": "FIX",
+        "text": " sap.m.Dialog: Screen reader and focus handling are improved"
+      }
+    ]
   }
 }
