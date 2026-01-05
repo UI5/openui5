@@ -150,6 +150,10 @@ sap.ui.define(["sap/ui/core/theming/ThemeHelper"], function(ThemeHelper) {
 				title: "Test Page for Bootstrap with a Custom Boot Task",
 				ui5: {
 					theme: "SapSampleTheme1",
+					themeRoots: {
+						"SapSampleTheme1": "test-resources/sap/ui/core/qunit/bootstrap/fixture/customThemes/",
+						"SapSampleTheme2": "test-resources/sap/ui/core/qunit/bootstrap/fixture/customThemes/"
+					},
 					libs: "sap.ui.core"
 				},
 				bootManifest: "boot/anothercustomboot.json@test-resources/sap/ui/core/qunit/bootstrap"
