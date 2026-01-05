@@ -84,16 +84,3 @@ See https://github.com/shootaroo/jit-grunt#static-mappings
 
 Warning: Task "replace:target" not found. Use --force to continue.
 ```
-
-
-Testing UI5
------------
-
-### Running the static code checks (ESLint)
-
-All UI5 code must conform to a certain ruleset which is checked with ESLint (http://eslint.org/).  
-To run an ESLint check, navigate to the root directory of the repository and execute:
-```
-grunt lint
-```
-Optionally, only a selected library can be checked or just a single file or directory, see [the documentation](tools.md) for details.

@@ -7,7 +7,6 @@
 sap.ui.define([
 	"sap/ui/core/ControlBehavior",
 	"sap/ui/core/Lib",
-	"sap/ui/thirdparty/jquery",
 	"sap/ui/mdc/ValueHelpDelegate",
 	"sap/ui/mdc/valuehelp/Dialog",
 	"sap/ui/mdc/valuehelp/base/Content",
@@ -27,7 +26,6 @@ sap.ui.define([
 ], (
 	ControlBehavior,
 	Library,
-	jQuery,
 	ValueHelpDelegate,
 	Dialog,
 	Content,
