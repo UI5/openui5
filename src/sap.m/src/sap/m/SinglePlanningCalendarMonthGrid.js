@@ -252,7 +252,11 @@ sap.ui.define([
 							/**
 							 * All appointments with changed selected state.
 							 */
-							appointments : {type : "sap.ui.unified.CalendarAppointment[]"}
+							appointments : {type : "sap.ui.unified.CalendarAppointment[]"},
+							/**
+							 * The original browser event.
+							 */
+							originalEvent: {type: "object"}
 
 						}
 					}
@@ -572,7 +576,8 @@ sap.ui.define([
 				this.fireEvent("cellPress", {startDate: oStartDate, endDate: oEndDate, originalEvent: oEvent.originalEvent});
 				this.fireAppointmentSelect({
 					appointment: undefined,
-					appointments: this._toggleAppointmentSelection(undefined, true)
+					appointments: this._toggleAppointmentSelection(undefined, true),
+					originalEvent: oEvent.originalEvent
 				});
 			} else if (bWeekNumberSelect) {
 				iTimestamp = parseInt(oFirstSiblingElement.getAttribute("sap-ui-date"));
@@ -602,7 +607,8 @@ sap.ui.define([
 
 				this.fireAppointmentSelect({
 					appointment: oSrcControl,
-					appointments: this._toggleAppointmentSelection(oSrcControl, !(oEvent.ctrlKey || oEvent.metaKey))
+					appointments: this._toggleAppointmentSelection(oSrcControl, !(oEvent.ctrlKey || oEvent.metaKey)),
+					originalEvent: oEvent.originalEvent
 				});
 			}
 		};
