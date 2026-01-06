@@ -8,6 +8,7 @@ sap.ui.define([
   "sap/m/Image",
   "sap/m/Text",
   "sap/m/SearchField",
+  "sap/m/SegmentedButtonItem",
   "sap/m/SegmentedButton",
   "sap/m/Select",
   "sap/ui/core/Item",
@@ -23,6 +24,7 @@ sap.ui.define([
   Image,
   Text,
   SearchField,
+  SegmentedButtonItem,
   SegmentedButton,
   Select,
   Item,
@@ -122,20 +124,14 @@ sap.ui.define([
 	  text: "Label",
 	  enabled: true
   });
-  var button4 = new Button('button4', {
-	  type: ButtonType.Default,
+  var segmentedButtonItem = new SegmentedButtonItem('segmentedButtonItem', {
 	  text: "Label",
-	  enabled: true
   });
-  var button5 = new Button('button5', {
-	  type: ButtonType.Default,
+  var segmentedButtonItem2 = new SegmentedButtonItem('segmentedButtonItem2', {
 	  text: "Label",
-	  enabled: true
   });
-  var button6 = new Button('button6', {
-	  type: ButtonType.Default,
+  var segmentedButtonItem3 = new SegmentedButtonItem('segmentedButtonItem3', {
 	  text: "Label",
-	  enabled: true
   });
 
   var Bar7 = new Bar({
@@ -150,8 +146,8 @@ sap.ui.define([
   var Bar8 = new Bar({
 	  contentLeft: [new Button({icon: "images/favorite_grey_24.png"})],
 	  contentMiddle: [new SegmentedButton('SegmentedBar', {
-						  buttons: [button4, button5, button6],
-						  selectedButton: button5
+						  items: [segmentedButtonItem, segmentedButtonItem2, segmentedButtonItem3],
+						  selectedButton: segmentedButtonItem2
 					  })],
 	  contentRight: [new Button({icon: "images/favorite_grey_24.png"})]
   });

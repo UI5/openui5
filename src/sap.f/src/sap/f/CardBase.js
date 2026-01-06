@@ -283,29 +283,79 @@ sap.ui.define([
 	/**
 	 * Gets the ids of the elements labelling the Card container.
 	 *
-	 * @return {string} sAriaLabelledBy ids of elements that have to be labelled
+	 * @return {string|undefined} IDs of elements that label the card, or undefined if no labelling is needed
 	 * @private
 	 */
 	CardBase.prototype._getAriaLabelledIds = function () {
 		var oHeader = this.getCardHeader();
-		const sBlockingMessageAriaLabelsIds = this._getBlockingMessageAriaLabelledByIds();
-		if (oHeader && oHeader.getVisible()) {
-			if (oHeader._getTitle && oHeader._getTitle()) {
-				if (sBlockingMessageAriaLabelsIds) {
-					return oHeader._getTitle().getId() + " " + sBlockingMessageAriaLabelsIds;
-				}
-				return oHeader._getTitle().getId();
-			}
-		} else if (oHeader?.getTitle()) {
-			if (!this._invisibleTitle) {
-				this._invisibleTitle = new InvisibleText({ id: this.getId() + "-invisibleTitle" });
-			}
-			this._invisibleTitle.setText(oHeader.getTitle());
+		var bIsHeaderVisible = this.isHeaderVisible(oHeader);
+		var bIsListItem = this.isRoleListItem();
 
-			return this._invisibleTitle.getId();
+		// Tile-like link variant cards don't need aria-labelledby when not in a list
+		if (this.isTileDisplayVariant() && this._getActualRole() === SemanticRole.Region) {
+			return undefined;
+		}
+
+		// For tile-like variant list items, point to the focusable header
+		if (bIsHeaderVisible && this.isTileDisplayVariant() && bIsListItem) {
+			return oHeader.getFocusableHeaderId();
+		}
+
+		// FIXME: Blocking message labelling is currently not working. Card is already renderd when blocking messsage is set. sBlockingMessageIds is always empty.
+		var sBlockingMessageIds = this._getBlockingMessageAriaLabelledByIds();
+
+		if (bIsHeaderVisible) {
+			if (oHeader._getTitle && oHeader._getTitle()) {
+				const sTitleId = oHeader._getTitle().getId();
+				return sBlockingMessageIds ? sTitleId + " " + sBlockingMessageIds : sTitleId;
+			}
+		} else if (oHeader?._getTitle  && oHeader.getTitle()) {
+			return this._getInvisibleTitleId(oHeader.getTitle());
 		}
 
 		return this._ariaText.getId();
+	};
+
+	/**
+	 * Checks if the card header is visible
+	 *
+	 * @param {sap.f.cards.IHeader} oHeader The card header
+	 * @return {boolean} True if the card header is visible
+	 * @private
+	 */
+	CardBase.prototype.isHeaderVisible = function (oHeader) {
+		return !!(oHeader &&
+			oHeader.getVisible());
+	};
+
+	/**
+	 * Gets the aria role of the card.
+	 *
+	 * @ui5-restricted
+	 * @private
+	 * @returns {string|undefined} The aria role of the card.
+	 */
+	CardBase.prototype.getAriaRole = function () {
+		if (this.isTileDisplayVariant() &&  this._getActualRole() === SemanticRole.Region) {
+			//no role for card like tiles in a non-list context
+			return undefined;
+		}
+		return this._getActualRole().toLowerCase();
+	};
+
+	/**
+	 * Gets an invisible text control for the card title.
+	 *
+	 * @param {string} sTitle The title text
+	 * @return {string} ID of the invisible text control
+	 * @private
+	 */
+	CardBase.prototype._getInvisibleTitleId = function (sTitle) {
+		if (!this._invisibleTitle) {
+			this._invisibleTitle = new InvisibleText({ id: this.getId() + "-invisibleTitle" });
+		}
+		this._invisibleTitle.setText(sTitle);
+		return this._invisibleTitle.getId();
 	};
 
 	/**
@@ -507,6 +557,15 @@ sap.ui.define([
 	 */
 	CardBase.prototype.getGridItemRole = function () {
 		return this._sGridItemRole;
+	};
+
+	/**
+	 * Returns the actual role of the card, depending on whether it is placed inside a grid container or not.
+	 * @returns {string} The actual role of the card.
+	 * @private
+	 */
+	CardBase.prototype._getActualRole = function () {
+		return this.getGridItemRole() || this.getSemanticRole();
 	};
 
 	CardBase.prototype.isRoleListItem = function () {

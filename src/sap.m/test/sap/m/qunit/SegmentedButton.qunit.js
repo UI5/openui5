@@ -73,14 +73,14 @@ sap.ui.define([
 			}),
 			oSBClone;
 
-		oSB.setSelectedButton(oSB.getButtons()[1]);
+		oSB.setSelectedItem(oSB.getItems()[1]);
 
 		//act
 		oSBClone = oSB.clone();
 
 		//assert
-		assert.equal(oSBClone.getButtons().length, oSB.getButtons().length, "cloning has the same number of buttons");
-		assert.equal(oSBClone.getSelectedButton(), oSBClone.getButtons()[1].getId(), "cloning has the same button selected");
+		assert.equal(oSBClone.getItems().length, oSB.getItems().length, "cloned segmented button has the same number of items");
+		assert.equal(oSBClone.getSelectedItem(), oSBClone.getItems()[1].getId(), "cloned segmented button has the same item selected");
 	});
 
 	/* =========================================================== */
@@ -114,7 +114,6 @@ sap.ui.define([
 	});
 
 	QUnit.test("Initialize with items aggregation", async function(assert) {
-
 		// Arrange
 		var oSegmentedButton = new SegmentedButton({
 			items: [
@@ -136,13 +135,11 @@ sap.ui.define([
 
 		// Assert
 		assert.strictEqual(oSegmentedButton.getItems().length, 3, "Control should have 3 items");
-		assert.strictEqual(oSegmentedButton.getButtons().length, 3, "Control should have 3 buttons from the button aggregation");
-		assert.strictEqual(oSegmentedButton.$().find("li").length, 3, "Control should have 3 buttons rendered");
+		assert.strictEqual(oSegmentedButton.getDomRef().querySelectorAll("li").length, 3, "Control should have 3 buttons rendered");
 
 		// Cleanup
 		oSegmentedButton.destroy();
 		await nextUIUpdate(this.clock);
-
 	});
 
 	QUnit.test("Items aggregation tooltip", async function(assert) {
@@ -165,13 +162,13 @@ sap.ui.define([
 		await nextUIUpdate(this.clock);
 
 		// Assert
-		var aButtons = oSegmentedButton.getButtons(),
-			$button1 = aButtons[0].$(),
-			$button2 = aButtons[1].$();
+		var oSegmentedButtonItems = oSegmentedButton.getItems(),
+			oItem = oSegmentedButtonItems[0].getDomRef(),
+			oItem2 = oSegmentedButtonItems[1].getDomRef();
 
 
-		assert.strictEqual($button1.attr("title"), "Tooltip 1", "First button should have a title with the setted value");
-		assert.strictEqual($button2.attr("title"), undefined, "There should be no title for the second button");
+		assert.strictEqual(oItem.getAttribute("title"), "Tooltip 1", "First button should have a title with the setted value");
+		assert.strictEqual(oItem2.getAttribute("title"), null, "There should be no title for the second button");
 
 		// Cleanup
 		oSegmentedButton.destroy();
@@ -179,7 +176,6 @@ sap.ui.define([
 	});
 
 	QUnit.test("Items aggregation visible property", async function(assert) {
-
 		// Arrange
 		var oSegmentedButton = new SegmentedButton({
 			items: [
@@ -205,22 +201,20 @@ sap.ui.define([
 
 		// Assert
 		assert.strictEqual(oSegmentedButton.getItems().length, 4, "Control should have 4 items");
-		assert.strictEqual(oSegmentedButton.getButtons().length, 4, "Control should have 4 buttons from the button aggregation");
-		assert.strictEqual(oSegmentedButton.$().find("li.sapMSegBBtn").length, 3, "Control should have 3 buttons visible");
-		assert.strictEqual(oSegmentedButton.$().find("li.sapUiHiddenPlaceholder").length, 1, "Control should have 1 button invisible");
+		assert.strictEqual(oSegmentedButton.getDomRef().querySelectorAll("li.sapMSegBBtn").length, 3, "Control should have 3 buttons visible");
+		assert.strictEqual(oSegmentedButton.getDomRef().querySelectorAll("li.sapUiHiddenPlaceholder").length, 1, "Control should have 1 button invisible");
 
 		//Act
 		oSegmentedButton.getItems()[3].setVisible(true);
 		await nextUIUpdate(this.clock);
 
 		//Assert
-		assert.strictEqual(oSegmentedButton.$().find("li.sapMSegBBtn").length, 4, "Control should have 4 buttons visible");
-		assert.strictEqual(oSegmentedButton.$().find("li.sapUiHiddenPlaceholder").length, 0, "Control should have 0 button invisible");
+		assert.strictEqual(oSegmentedButton.getDomRef().querySelectorAll("li.sapMSegBBtn").length, 4, "Control should have 4 buttons visible");
+		assert.strictEqual(oSegmentedButton.getDomRef().querySelectorAll("li.sapUiHiddenPlaceholder").length, 0, "Control should have 0 button invisible");
 
 		// Cleanup
 		oSegmentedButton.destroy();
 		await nextUIUpdate(this.clock);
-
 	});
 
 	QUnit.test("selectedKey is set correctly for invisible items and removes the selection from other items", async function(assert) {
@@ -250,15 +244,15 @@ sap.ui.define([
 		await nextUIUpdate(this.clock);
 
 		//Assert
-		assert.strictEqual(oSegmentedButton.$().find("li.sapMSegBBtn.sapMSegBBtnSel").length, 1, "1 selected button is rendered");
+		assert.strictEqual(oSegmentedButton.getDomRef().querySelectorAll("li.sapMSegBBtn.sapMSegBBtnSel").length, 1, "1 selected button is rendered");
 
 		//Act
 		oSegmentedButton.setSelectedKey("k2");
 		await nextUIUpdate(this.clock);
 
 		//Assert
-		assert.strictEqual(oSegmentedButton.getSelectedButton(), oSegmentedButton.getButtons()[1].getId(), "The invisible button is selected");
-		assert.strictEqual(oSegmentedButton.$().find("li.sapMSegBBtn.sapMSegBBtnSel").length, 0, "No selected buttons are rendered");
+		assert.strictEqual(oSegmentedButton.getSelectedItem(), oSegmentedButton.getItems()[1].getId(), "The invisible item is selected");
+		assert.strictEqual(oSegmentedButton.getDomRef().querySelectorAll("li.sapMSegBBtn.sapMSegBBtnSel").length, 0, "No selected buttons are rendered");
 
 		//Cleanup
 		oSegmentedButton.destroy();
@@ -267,7 +261,6 @@ sap.ui.define([
 	});
 
 	QUnit.test("Initialize with XML view", async function(assert) {
-
 		// Arrange
 		var xmlData = '<mvc:View\
 		xmlns="sap.m"\
@@ -294,9 +287,8 @@ sap.ui.define([
 
 		// Assert
 		assert.strictEqual(oSegmentedButton.getItems().length, 3, "Control should have 3 items");
-		assert.strictEqual(oSegmentedButton.getButtons().length, 3, "Control should have 3 buttons from the button aggregation");
-		assert.strictEqual(oSegmentedButton.$().find("li").length, 3, "Control should have 3 buttons rendered");
-		assert.strictEqual(oSegmentedButton.getButtons()[0].getText(), "Btn 1", "Button text should be equal to xml view ListItem text");
+		assert.strictEqual(oSegmentedButton.getDomRef().querySelectorAll("li").length, 3, "Control should have 3 buttons rendered");
+		assert.strictEqual(oSegmentedButton.getItems()[0].getText(), "Btn 1", "Button text should be equal to xml view ListItem text");
 		assert.strictEqual(oSegmentedButton.getSelectedKey(), "b2", "selectedKey should be 'b2'");
 
 		// Cleanup
@@ -307,7 +299,6 @@ sap.ui.define([
 	QUnit.test("ID's of internal elements properly set/rendered", async function(assert) {
 
 		var sItemIdComponent = "segmentedButtonItem-",
-			aButtons,
 			oSegmentedButton,
 			getExpectedButtonId,
 			getExpectedImageId,
@@ -343,24 +334,27 @@ sap.ui.define([
 		oSegmentedButton.placeAt("qunit-fixture");
 		await nextUIUpdate(this.clock);
 
-		aButtons = oSegmentedButton.getButtons();
+		const aItems = oSegmentedButton.getItems();
 
 		// Assert
-		for (;i < aButtons.length;i++) {
+		for (; i < aItems.length; i++) {
+			const oButton = aItems[i].oButton;
 			// Buttons
-			assert.strictEqual(aButtons[i].getId(), getExpectedButtonId(i),
+			assert.strictEqual(oButton.getId(), getExpectedButtonId(i),
 					"Internal button id should be equal to the expected id");
 
-			assert.strictEqual(aButtons[i].$().attr("id"), getExpectedButtonId(i),
+			assert.strictEqual(oButton.getDomRef().getAttribute("id"), getExpectedButtonId(i),
 					"Rendered button id should be equal to the expected id");
 
 			// Images|icons
-			assert.strictEqual(aButtons[i].$().find(".sapMBtnIcon").attr("id"), getExpectedImageId(i),
-					"Rendered image id should be equal to the expected id");
+			const  oIcon = oButton.getDomRef().querySelector(".sapMBtnIcon");
+			if (oIcon) {
+				assert.strictEqual(oIcon.getAttribute("id"), getExpectedImageId(i),
+						"Rendered image id should be equal to the expected id");
+			}
 		}
 
 		// Cleanup
-		aButtons = null;
 		oSegmentedButton.destroy();
 		await nextUIUpdate(this.clock);
 
@@ -369,14 +363,7 @@ sap.ui.define([
 	QUnit.test("Using the .sapMSegmentedButtonNoAutoWidth CSS class", async function (assert) {
 
 		// Arrange
-		var oSB,
-			aButtons,
-			iBtn1Width,
-			iBtn2Width,
-			iBtn3Width,
-			iBtn4Width;
-
-		oSB = new SegmentedButton({
+		const oSB = new SegmentedButton({
 			items: [
 					new SegmentedButtonItem({text: "All"}),
 					new SegmentedButtonItem({text: "Some long text"}),
@@ -387,12 +374,12 @@ sap.ui.define([
 
 		await nextUIUpdate(this.clock);
 
-		aButtons = oSB.getButtons();
+		const aItems = oSB.getItems();
 
-		iBtn1Width = Math.ceil(aButtons[0].getDomRef().getBoundingClientRect().width);
-		iBtn2Width = Math.ceil(aButtons[1].getDomRef().getBoundingClientRect().width);
-		iBtn3Width = Math.ceil(aButtons[2].getDomRef().getBoundingClientRect().width);
-		iBtn4Width = Math.ceil(aButtons[3].getDomRef().getBoundingClientRect().width);
+		const iBtn1Width = Math.ceil(aItems[0].getDomRef().getBoundingClientRect().width);
+		const iBtn2Width = Math.ceil(aItems[1].getDomRef().getBoundingClientRect().width);
+		const iBtn3Width = Math.ceil(aItems[2].getDomRef().getBoundingClientRect().width);
+		const iBtn4Width = Math.ceil(aItems[3].getDomRef().getBoundingClientRect().width);
 
 		// Assert
 		assert.ok(iBtn1Width > 0, "The width of the first button is greater than zero");
@@ -403,25 +390,20 @@ sap.ui.define([
 		assert.ok((iBtn4Width * 2) < iBtn3Width, "The width of the last button multiplied is greater than the third button");
 
 		// Cleanup
-		aButtons = null;
-		iBtn1Width = null;
-		iBtn2Width = null;
-		iBtn3Width = null;
-		iBtn4Width = null;
 		oSB.destroy();
-		oSB = null;
 		await nextUIUpdate(this.clock);
 
 	});
 
-	QUnit.test("Too long SegmentedButton inside the OveflowToolbar", async function (assert) {
+	QUnit.test("Too long SegmentedButton inside the OveflowToolbar", async function (assert) { //todo - remove?
 
 		// Arrange
 		var oSB,
 			oOTB,
-			iWidth = jQuery("#qunit-fixture").width();
+			oFixture = document.getElementById("qunit-fixture"),
+			iWidth = oFixture.offsetWidth;
 
-		jQuery("#qunit-fixture").css({ width: "160px" });
+		oFixture.style.width = "160px";
 
 		oSB = new SegmentedButton({
 			items: [
@@ -439,7 +421,7 @@ sap.ui.define([
 		assert.ok(oOTB._getOverflowButtonNeeded(), "The SegmentedButton is hidden and Overflow button is visible.");
 
 		// Cleanup
-		jQuery("#qunit-fixture").css({ width: iWidth });
+		document.getElementById("qunit-fixture").style.width = iWidth + "px";
 		oSB.destroy();
 		oSB = null;
 		oOTB.destroy();
@@ -482,7 +464,7 @@ sap.ui.define([
 		await nextUIUpdate(this.clock);
 
 		//act
-		oSB.getButtons()[1].firePress();
+		oSB.getItems()[1].oButton.firePress();
 
 		//assert
 		assert.ok(bFired, 'item fires press when a button is pressed');
@@ -704,7 +686,7 @@ sap.ui.define([
 	QUnit.test("selectedKey property on button press", async function(assert) {
 
 		// Arrange
-		var oSegmentedButton = new SegmentedButton({
+		const oSegmentedButton = new SegmentedButton({
 			items: [
 				new SegmentedButtonItem({
 					key: "b1",
@@ -721,10 +703,9 @@ sap.ui.define([
 		oSegmentedButton.placeAt("qunit-fixture");
 		await nextUIUpdate(this.clock);
 
-		// Act
-		// Click on the second button
-		oSegmentedButton.getButtons()[1].$().trigger("tap");
-		oSegmentedButton.getButtons()[1].$().trigger("click");
+		// Act - Click on the second button
+		const oSecondButton = oSegmentedButton.getItems()[1].oButton;
+		oSecondButton.firePress();
 
 		// Assert
 		assert.strictEqual(oSegmentedButton.getProperty("selectedKey"), "b2", "selectedKey property should be 'b2'");
@@ -765,8 +746,8 @@ sap.ui.define([
 		await nextUIUpdate(this.clock);
 
 		// Assert
-		var oButton = oSegmentedButton.getButtons()[0];
-		var $LI = jQuery(oSegmentedButton.$().find("li")[0]);
+		var oButton = oSegmentedButton.getItems()[0].oButton;
+		var oLI = oSegmentedButton.getDomRef().querySelector("li");
 
 		assert.strictEqual(oButton.getText(), "Btn changed", "Button text should have the new value");
 		assert.strictEqual(oButton.getIcon(), "sap-icon://attachment", "Button should have the new value");
@@ -775,11 +756,11 @@ sap.ui.define([
 		assert.strictEqual(oButton.getWidth(), "300px", "Button should have the new value");
 		assert.strictEqual(oSegmentedButton.getSelectedKey(), "changed", "SegmentedButton getSelectedKey() should return the new value");
 
-		assert.strictEqual($LI.text(), "Btn changed", "Rendered li text should have the new value");
-		assert.ok($LI.find(".sapMBtnIcon"), "Rendered li should contain a icon span");
-		assert.strictEqual($LI.attr("dir"), "rtl", "Rendered li should have attribute dir equal to 'rtl'");
-		assert.ok($LI.hasClass("sapMSegBBtnDis"), "Rendered li should have a disabled class");
-		assert.strictEqual($LI.outerWidth(), 300, "Rendered li width must be equal the new value");
+		assert.strictEqual(oLI.textContent, "Btn changed", "Rendered li text should have the new value");
+		assert.ok(oLI.querySelector(".sapMBtnIcon"), "Rendered li should contain a icon span");
+		assert.strictEqual(oLI.getAttribute("dir"), "rtl", "Rendered li should have attribute dir equal to 'rtl'");
+		assert.ok(oLI.classList.contains("sapMSegBBtnDis"), "Rendered li should have a disabled class");
+		assert.strictEqual(oLI.getBoundingClientRect().width, 300, "Rendered li width must be equal the new value");
 
 	});
 
@@ -809,48 +790,36 @@ sap.ui.define([
 	});
 
 	QUnit.test("addItem", async function (assert) {
-		// Arrange
-		var aItems,
-			aButtons;
+		const oFirstItem = new SegmentedButtonItem({text: "Button 1"});
+		const oSecondItem = new SegmentedButtonItem({text: "Button 2"});
 
-		// Act - add first item
-		this.oSB.addItem(new SegmentedButtonItem({text: "Button 1"}));
-		aItems = this.oSB.getButtons();
-		aButtons = this.oSB.getButtons();
+		this.oSB.addItem(oFirstItem);
 		await nextUIUpdate(this.clock);
 
 		// Assert
+		let aItems = this.oSB.getItems();
 		assert.strictEqual(aItems.length, 1, "There should be one item");
-		assert.strictEqual(aButtons.length, 1, "There should be one button created");
-		assert.strictEqual(aButtons[0].getText(), aItems[0].getText(), "The button text should equal the item test");
-		assert.strictEqual(this.oSB.getSelectedButton(), aButtons[0].getId(),
-			"The button created should be the selected button");
-		assert.ok(aButtons[0].getDomRef().classList.contains("sapMSegBtnLastVisibleButton"), "The last button have sapMSegBtnLastVisibleButton styleClass");
+		assert.strictEqual(aItems[0].getText(), oFirstItem.getText(),
+			"The item text is correct");
+		assert.strictEqual(this.oSB.getSelectedItem(), aItems[0].getId(),
+			"The item created should be selected");
+		assert.ok(aItems[0].getDomRef().classList.contains("sapMSegBtnLastVisibleButton"),
+			"The second button has the correct style class");
 
 		// Act - add second button and set selection to the newly added button
-		this.oSB.addItem(new SegmentedButtonItem({text: "Button 2"}));
-		aButtons = this.oSB.getButtons();
-		this.oSB.setSelectedButton(aButtons[1]);
+		this.oSB.addItem(oSecondItem);
+		this.oSB.setSelectedItem(oSecondItem);
 		await nextUIUpdate(this.clock);
 
 		// Assert
-		assert.strictEqual(this.oSB.getItems().length, 2, "There should be two items");
-		assert.strictEqual(aButtons.length, 2, "There should be two buttons created from items");
-		assert.strictEqual(this.oSB.getSelectedButton(), aButtons[1].getId(),
-			"The second button created should be selected");
-		assert.notOk(aButtons[0].getDomRef().classList.contains("sapMSegBtnLastVisibleButton"), "The old last button is remove styleClass sapMSegBtnLastVisibleButton");
-		assert.ok(aButtons[1].getDomRef().classList.contains("sapMSegBtnLastVisibleButton"), "The last button have correct style class");
-
-		// Act - add third item
-		this.oSB.addItem(new SegmentedButtonItem({text: "Button 3"}));
-		aButtons = this.oSB.getButtons();
-		await nextUIUpdate(this.clock);
-
-		// Assert
-		assert.strictEqual(this.oSB.getItems().length, 3, "There should be three items");
-		assert.strictEqual(aButtons.length, 3, "There should be three buttons");
-		assert.strictEqual(this.oSB.getSelectedButton(), aButtons[1].getId(),
-			"The second button should remain selected");
+		aItems = this.oSB.getItems();
+		assert.strictEqual(aItems.length, 2, "There should be two items");
+		assert.strictEqual(this.oSB.getSelectedItem(), aItems[1].getId(),
+			"The second item should be selected");
+		assert.notOk(oFirstItem.getDomRef().classList.contains("sapMSegBtnLastVisibleButton"),
+			"The first item no longer contains styleClass sapMSegBtnLastVisibleButton");
+		assert.ok(oSecondItem.getDomRef().classList.contains("sapMSegBtnLastVisibleButton"),
+			"The second item has the correct style class");
 	});
 
 	QUnit.test("removeItem", async function (assert){
@@ -869,8 +838,7 @@ sap.ui.define([
 
 		// Assert
 		assert.strictEqual(this.oSB.getItems().length, 2, "There are 2 items");
-		assert.strictEqual(this.oSB.getButtons().length, 2, "There are 2 buttons");
-		assert.strictEqual(this.oSB.$().find("li").length, 2, "There are 2 buttons rendered");
+		assert.strictEqual(this.oSB.getDomRef().querySelectorAll("li").length, 2, "There are 2 buttons rendered");
 		assert.strictEqual(this.oSB.getSelectedKey(), "b3", "Button with key 'b3' is selected");
 
 		// Act - remove Button 3
@@ -878,7 +846,7 @@ sap.ui.define([
 		await nextUIUpdate(this.clock);
 
 		// Assert
-		assert.strictEqual(this.oSB.getButtons().length, 1, "There is one button");
+		assert.strictEqual(this.oSB.getItems().length, 1, "There is 1 item");
 		assert.strictEqual(this.oSB.getSelectedKey(), "b1", "Button with key 'b1' is selected");
 
 		// Act - remove last button
@@ -886,16 +854,16 @@ sap.ui.define([
 		await nextUIUpdate(this.clock);
 
 		// Assert
-		assert.strictEqual(this.oSB.getButtons().length, 0, "There are no buttons");
+		assert.strictEqual(this.oSB.getItems().length, 0, "There are no items");
 		assert.strictEqual(this.oSB.getSelectedKey(), "", "There is no selected key");
-		assert.strictEqual(this.oSB.$().find("li").length, 0, "There are no buttons rendered");
+		assert.strictEqual(this.oSB.getDomRef().querySelectorAll("li").length, 0, "There are no buttons rendered");
 
 		// Act - adding an item after all ware removed
 		this.oSB.addItem(new SegmentedButtonItem({key: "b4", text: "Button 4"}));
 		await nextUIUpdate(this.clock);
 
 		// Assert
-		assert.strictEqual(this.oSB.$().find("li").length, 1, "There is one buttons rendered");
+		assert.strictEqual(this.oSB.getDomRef().querySelectorAll("li").length, 1, "There is one buttons rendered");
 		assert.strictEqual(this.oSB.getSelectedKey(), "b4", "Button with key 'b4' is selected");
 	});
 
@@ -930,9 +898,8 @@ sap.ui.define([
 
 		// Assert
 		assert.strictEqual(this.oSB.getItems().length, 3, "There are 3 items");
-		assert.strictEqual(this.oSB.getButtons().length, 3, "There are 3 buttons");
-		assert.strictEqual(this.oSB.$().find("li").length, 3, "There are 3 buttons rendered");
-		assert.strictEqual(this.oSB.getButtons()[1].getText(), "Button 3",
+		assert.strictEqual(this.oSB.getDomRef().querySelectorAll("li").length, 3, "There are 3 buttons rendered");
+		assert.strictEqual(this.oSB.getItems()[1].getText(), "Button 3",
 			"Button with text 'Button 3' should be the second button");
 	});
 
@@ -949,10 +916,9 @@ sap.ui.define([
 
 		// Assert
 		assert.strictEqual(this.oSB.getItems().length, 0, "There are 0 items");
-		assert.strictEqual(this.oSB.getButtons().length, 0, "There are 0 buttons");
 		assert.strictEqual(this.oSB.getSelectedKey(), "", "There is no selected key");
-		assert.strictEqual(this.oSB.getSelectedButton(), null, "There is no selected button");
-		assert.strictEqual(this.oSB.$().find("li").length, 0, "There are 0 buttons rendered");
+		assert.strictEqual(this.oSB.getSelectedItem(), null, "There is no selected items");
+		assert.strictEqual(this.oSB.getDomRef().querySelectorAll("li").length, 0, "There are 0 buttons rendered");
 	});
 
 	// BCP: 1880235141
@@ -1064,11 +1030,7 @@ sap.ui.define([
 
 	QUnit.test("_clearAutoWidthAppliedToControl private method", async function (assert) {
 		// Arrange
-		var oSB,
-			aButtons,
-			i;
-
-		oSB = new SegmentedButton({
+		const oSB = new SegmentedButton({
 			items: [
 				new SegmentedButtonItem({text: "Btn 1"}),
 				new SegmentedButtonItem({text: "Btn 2", width: "20px"}),
@@ -1077,38 +1039,35 @@ sap.ui.define([
 		}).placeAt("qunit-fixture");
 		await nextUIUpdate(this.clock);
 
-		aButtons = oSB.getButtons();
+		const aItems = oSB.getItems();
 
 		// Assert
-		assert.ok(oSB.$().attr("style").indexOf("width:") !== -1, "Auto width is applied to control");
-		for (i = 0;i < aButtons.length; i++) {
-			assert.ok(aButtons[i].$().attr("style").indexOf("width:") !== -1, "Auto|predefined width is applied to internal " +
-					"button");
+		assert.ok(oSB.getDomRef().getAttribute("style").indexOf("width:") !== -1, "Auto width is applied to control");
+		for (let i = 0; i < aItems.length; i++) {
+			assert.ok(aItems[i].getDomRef().getAttribute("style").indexOf("width:") !== -1, "Auto|predefined width is applied to internal item");
 		}
 
 		// Act
 		oSB._clearAutoWidthAppliedToControl();
 
 		// Assert
-		assert.notOk(oSB.$().attr("style"), "Auto width is removed from control");
-		assert.notOk(aButtons[0].$().attr("style"), "Auto width is removed from internal button");
-		assert.ok(aButtons[1].$().attr("style").indexOf("20px") !== -1, "Predefined width is not removed from internal button");
-		assert.notOk(aButtons[2].$().attr("style"), "Auto width is removed from internal button");
+		assert.notOk(oSB.getDomRef().getAttribute("style"), "Auto width is removed from control");
+		assert.notOk(aItems[0].getDomRef().getAttribute("style"), "Auto width is removed from internal button");
+		assert.ok(aItems[1].getDomRef().getAttribute("style").indexOf("20px") !== -1, "Predefined width is not removed from internal button");
+		assert.notOk(aItems[2].getDomRef().getAttribute("style"), "Auto width is removed from internal button");
 
 		// Act
 		oSB.setWidth("200px");
-		aButtons[0].setWidth("10px");
+		aItems[0].setWidth("10px");
 		await nextUIUpdate(this.clock);
 		oSB._clearAutoWidthAppliedToControl();
 
 		// Assert
-		assert.ok(oSB.$().attr("style").indexOf("200px") !== -1, "Control width is not cleared if predefined");
-		assert.ok(aButtons[0].$().attr("style").indexOf("10px") !== -1, "First button width is not cleared if predefined");
+		assert.ok(oSB.getDomRef().getAttribute("style").indexOf("200px") !== -1, "Control width is not cleared if predefined");
+		assert.ok(aItems[0].getDomRef().getAttribute("style").indexOf("10px") !== -1, "First button width is not cleared if predefined");
 
 		// Cleanup
 		oSB.destroy();
-		oSB = null;
-		aButtons = null;
 		await nextUIUpdate(this.clock);
 	});
 
@@ -1141,11 +1100,7 @@ sap.ui.define([
 
 	QUnit.test("_updateWidth private method", async function (assert) {
 		// Arrange
-		var oSB,
-			aButtons,
-			i;
-
-		oSB = new SegmentedButton({
+		const oSB = new SegmentedButton({
 			items: [
 				new SegmentedButtonItem({text: "Btn 1"}),
 				new SegmentedButtonItem({text: "Btn 2"}),
@@ -1156,22 +1111,22 @@ sap.ui.define([
 
 		await nextUIUpdate(this.clock);
 
-		aButtons = oSB.getButtons();
+		const aItems = oSB.getItems();
 
 		// Act
 		oSB._aWidths = [20, 20, 20, 20];
 		oSB._updateWidth();
 
 		// Assert
-		assert.strictEqual(oSB.$().attr("style"), "width: 81px;", "Result should be sum of all 4 button widths which is 80 " +
+		assert.strictEqual(oSB.getDomRef().getAttribute("style"), "width: 81px;", "Result should be sum of all 4 button widths which is 80 " +
 				"plus one pixel added for the border");
 
 		// Act
 		oSB.setWidth("400px");
 
 		// Assert
-		for (i = 0;i < aButtons.length;i++) {
-			assert.strictEqual(aButtons[i].$().attr("style"), "width: 25%;", "Width of all buttons should be 25%");
+		for (let i = 0; i < aItems.length; i++) {
+			assert.strictEqual(aItems[i].getDomRef().getAttribute("style"), "width: 25%;", "Width of all buttons should be 25%");
 		}
 
 		// Act
@@ -1179,13 +1134,11 @@ sap.ui.define([
 		oSB._updateWidth();
 
 		// Assert
-		assert.notOk(oSB.$().css("width") === "1px", "Corner case when all reported inner buttons width is 0 applied width " +
+		assert.notOk(window.getComputedStyle(oSB.getDomRef()).width === "1px", "Corner case when all reported inner buttons width is 0 applied width " +
 				"should not be 1px");
 
 		// Cleanup
-		aButtons = null;
 		oSB.destroy();
-		oSB = null;
 		await nextUIUpdate(this.clock);
 	});
 
@@ -1351,10 +1304,10 @@ sap.ui.define([
 		oModel.updateBindings(ChangeReason.Change);
 
 		// Assert
-		assert.strictEqual(oSegmentedButton.getButtons()[6].getEnabled(), oModel.getData().items[6].enabled,
+		assert.strictEqual(oSegmentedButton.getItems()[6].getEnabled(), oModel.getData().items[6].enabled,
 				"Button enabled property should be equal to Model enabled property after model update");
 
-		assert.strictEqual(oSegmentedButton.getButtons()[6].getText(), 'sLabel',
+		assert.strictEqual(oSegmentedButton.getItems()[6].getText(), 'sLabel',
 				"Button should have label: 'sLabel' after model update");
 
 		// Cleanup
@@ -1416,8 +1369,8 @@ sap.ui.define([
 
 		// Assert
 		assert.strictEqual(oSegmentedButton.getItems().length, 3, "Should have 3 items");
-		assert.strictEqual(oSegmentedButton.getButtons().length, 3, "Should have 3 buttons");
-		assert.strictEqual(oSegmentedButton.$().find("li").length, 3, "Should have 3 buttons rendered");
+
+		assert.strictEqual(oSegmentedButton.getDomRef().querySelectorAll("li").length, 3, "Should have 3 buttons rendered");
 		assert.strictEqual(oSegmentedButton.getSelectedKey(), "b1", "selectedKey should be the default first item key");
 		assert.strictEqual(oSegmentedButton.getItems()[0].getText(),
 				"Initial btn 1", "Button text should be equal to initial Model text");
@@ -1428,18 +1381,17 @@ sap.ui.define([
 
 		// Assert
 		assert.strictEqual(oSegmentedButton.getItems().length, 8, "Should have 8 items");
-		assert.strictEqual(oSegmentedButton.getButtons().length, 8, "Should have 8 buttons");
-		assert.strictEqual(oSegmentedButton.$().find("li").length, 8, "Should have 8 buttons rendered");
+
+		assert.strictEqual(oSegmentedButton.getDomRef().querySelectorAll("li").length, 8, "Should have 8 buttons rendered");
 		assert.strictEqual(oSegmentedButton.getSelectedKey(), "b7", "selectedKey should be equal to the second model selectedKey");
-		assert.strictEqual(oSegmentedButton.getButtons()[0].getText(), "btn 1",
-				"Button text should be equal to second Model text");
-		assert.strictEqual(oSegmentedButton.getButtons()[1].getEnabled(), false,
-				"Button enabled should be equal to second Model enabled");
-		assert.strictEqual(oSegmentedButton.getButtons()[2].getTextDirection(), TextDirection.RTL,
+		assert.strictEqual(oSegmentedButton.getItems()[0].getText(), "btn 1", "Button text should be equal to second Model text");
+
+		assert.strictEqual(oSegmentedButton.getItems()[1].getEnabled(), false, "Button enabled should be equal to second Model enabled");
+		assert.strictEqual(oSegmentedButton.getItems()[2].getTextDirection(), TextDirection.RTL,
 				"Button textDirection should be equal to second Model textDirection");
-		assert.strictEqual(jQuery(oSegmentedButton.$().find("li")[2]).attr("dir"), TextDirection.RTL.toLowerCase(),
+		assert.strictEqual(oSegmentedButton.getDomRef().querySelectorAll("li")[2].getAttribute("dir"), TextDirection.RTL.toLowerCase(),
 				"Button textDirection should be rendered to second Model textDirection");
-		assert.strictEqual(oSegmentedButton.getButtons()[3].getIcon(), "sap-icon://home",
+		assert.strictEqual(oSegmentedButton.getItems()[3].getIcon(), "sap-icon://home",
 				"Button icon should be equal to second Model icon");
 
 		// Cleanup
@@ -1825,7 +1777,7 @@ sap.ui.define([
 				this.oSBI
 			]
 		}),
-		aButtons = oSB.getButtons();
+		aItems = oSB.getItems();
 
 		this.oSBI.attachPress(function () {
 			// Assert
@@ -1833,7 +1785,7 @@ sap.ui.define([
 		});
 
 		// Act
-		aButtons[0].firePress();
+		aItems[0].firePress();
 	});
 
 	QUnit.test("Cleanup - standalone", function (assert) {
@@ -1945,14 +1897,14 @@ sap.ui.define([
 
 	QUnit.test("CustomData is rendered correct in the dom", function (assert) {
 		// Arrange
-		var aBtn = this.oSB.getButtons();
+		const aItems = this.oSB.getItems();
 
 		// Assert
-		assert.strictEqual(aBtn[0].getCustomData()[0].getKey(), "my", "There is CustomData with key 'my' in the first button");
-		assert.strictEqual(aBtn[0].$().data("my"), 1, "There is CustomData attribute with value '1' rendered on the first button");
-		assert.strictEqual(aBtn[1].$().data("my"), 2, "There is CustomData attribute with value '2' rendered on the second button");
-		assert.strictEqual(aBtn[2].getCustomData().length, 0, "There is no CustomData on the third button");
-		assert.strictEqual(aBtn[2].$().data("my"), undefined, "There is no CustomData rendered on the third button");
+		assert.strictEqual(aItems[0].getCustomData()[0].getKey(), "my", "There is CustomData with key 'my' in the first item");
+		assert.strictEqual(aItems[0].getDomRef().getAttribute("data-my"), "1", "There is CustomData attribute with value '1' rendered on the first item");
+		assert.strictEqual(aItems[1].getDomRef().getAttribute("data-my"), "2", "There is CustomData attribute with value '2' rendered on the second item");
+		assert.strictEqual(aItems[2].getCustomData().length, 0, "There is no CustomData on the third item");
+		assert.strictEqual(aItems[2].getDomRef().getAttribute("data-my"), null, "There is no CustomData rendered on the third item");
 	});
 
 	QUnit.test("Update of item's CustomData Value property must be reflected in the SegmentedButton", async function (assert) {
@@ -1961,25 +1913,21 @@ sap.ui.define([
 		await nextUIUpdate(this.clock);
 
 		// Assert
-		assert.strictEqual(this.oSB.getButtons()[0].$().data("my"), 2222, "The rendered CustomData on the first button should be updated");
+		assert.strictEqual(this.oSB.getItems()[0].getDomRef().getAttribute("data-my"), "2222", "The rendered CustomData on the first item should be updated");
 	});
 
 	QUnit.test("Update of item's CustomData Key property must be reflected in the SegmentedButton", async function (assert) {
-		// Arrange
-		var oFirstButton;
-
 		// Act - change the CustomData key of the item
 		this.oCD.setKey("yours");
 		await nextUIUpdate(this.clock);
 
-		// Get first button after update because it's regenerated
-		oFirstButton = this.oSB.getButtons()[0];
+		const oFirstItem = this.oSB.getItems()[0];
 
 		// Assert
-		assert.strictEqual(oFirstButton.$().data("my"), undefined,
-			"There should be no CustomData with key 'my' rendered on the first");
-		assert.strictEqual(oFirstButton.$().data("yours"), 1,
-			"There should be new CustomData with key 'yours' rendered on the first button");
+		assert.strictEqual(oFirstItem.getDomRef().getAttribute("data-my"), null,
+			"There should be no CustomData with key 'my' rendered on the first item");
+		assert.strictEqual(oFirstItem.getDomRef().getAttribute("data-yours"), "1",
+			"There should be new CustomData with key 'yours' rendered on the first item");
 	});
 
 	QUnit.test("Update of item's CustomData writeToDom property must be reflected in the SegmentedButton", async function (assert) {
@@ -1988,8 +1936,8 @@ sap.ui.define([
 		await nextUIUpdate(this.clock);
 
 		// Assert
-		assert.strictEqual(this.oSB.getButtons()[0].$().data(this.oCD.getKey()), undefined,
-			"There should be new CustomData with key 'yours' rendered on the first button");
+		assert.strictEqual(this.oSB.getItems()[0].getDomRef().getAttribute("data-" + this.oCD.getKey()), null,
+			"There should be no CustomData rendered on the first item when writeToDom is false");
 	});
 
 	QUnit.module("contentMode property", {
@@ -2011,29 +1959,29 @@ sap.ui.define([
 
 	QUnit.test("Default contentMode is EqualSized", function (assert) {
 		assert.strictEqual(this.oSegmentedButton.getContentMode(), "EqualSized", "Default contentMode is 'EqualSized'");
-		assert.ok(this.oSegmentedButton.$().hasClass("sapMSegBEqualSized"), "Root element has class for EqualSized mode");
+		assert.ok(this.oSegmentedButton.getDomRef().classList.contains("sapMSegBEqualSized"), "Root element has class for EqualSized mode");
 	});
 
 	QUnit.test("contentMode 'ContentFit' applies correct class", function (assert) {
 		this.oSegmentedButton.setContentMode("ContentFit");
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
 		assert.strictEqual(this.oSegmentedButton.getContentMode(), "ContentFit", "contentMode is set to 'ContentFit'");
-		assert.ok(this.oSegmentedButton.$().hasClass("sapMSegBContentFit"), "Root element has class for ContentFit mode");
+		assert.ok(this.oSegmentedButton.getDomRef().classList.contains("sapMSegBContentFit"), "Root element has class for ContentFit mode");
 	});
 
 	QUnit.test("contentMode 'EqualSized' makes all buttons equal width", function (assert) {
 		this.oSegmentedButton.setContentMode("EqualSized");
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
-		var buttons = this.oSegmentedButton.$().find(".sapMSegBBtn").toArray();
-		var widths = buttons.map(function (el) { return jQuery(el).outerWidth(); });
+		var buttons = Array.from(this.oSegmentedButton.getDomRef().querySelectorAll(".sapMSegBBtn"));
+		var widths = buttons.map(function (el) { return el.getBoundingClientRect().width; });
 		assert.ok(widths.every(function (w) { return w === widths[0]; }), "All buttons have equal width in EqualSized mode");
 	});
 
 	QUnit.test("contentMode 'ContentFit' makes buttons fit their content", function (assert) {
 		this.oSegmentedButton.setContentMode("ContentFit");
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
-		var buttons = this.oSegmentedButton.$().find(".sapMSegBBtn").toArray();
-		var widths = buttons.map(function (el) { return jQuery(el).outerWidth(); });
+		var buttons = Array.from(this.oSegmentedButton.getDomRef().querySelectorAll(".sapMSegBBtn"));
+		var widths = buttons.map(function (el) { return el.getBoundingClientRect().width; });
 		assert.notOk(widths.every(function (w) { return w === widths[0]; }), "Buttons have different widths in ContentFit mode");
 	});
 });

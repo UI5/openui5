@@ -6,15 +6,13 @@
 sap.ui.define([
 	"./library",
 	"./QuickViewBase",
-	"./NavContainer",
-	"./Page",
+
 	"./ScrollContainer",
 	"./QuickViewCardRenderer"
 ], function (
 	library,
 	QuickViewBase,
-	NavContainer,
-	Page,
+
 	ScrollContainer,
 	QuickViewCardRenderer
 ) {
@@ -62,11 +60,7 @@ sap.ui.define([
 	 * @private
 	 */
 	QuickViewCard.prototype.init = function() {
-		var oNavConfig = {
-			pages: [new Page()],
-			navigate: this._navigate.bind(this),
-			afterNavigate: this._afterNavigate.bind(this)
-		};
+		QuickViewBase.prototype.init.apply(this);
 
 		this._oNavContainerDelegate = {
 			onAfterRendering: function () {
@@ -78,8 +72,6 @@ sap.ui.define([
 				this._oNavContainer.removeEventDelegate(this._oNavContainerDelegate);
 			}.bind(this)
 		};
-
-		this._oNavContainer = new NavContainer(oNavConfig);
 	};
 
 	QuickViewCard.prototype.onBeforeRendering = function() {

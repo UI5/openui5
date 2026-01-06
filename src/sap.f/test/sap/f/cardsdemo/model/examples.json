@@ -327,6 +327,12 @@
 		"group": "Card Variants"
 	},
 	{
+		"title": "Tiles Variants in different containers",
+		"description": "Render cards as tiles in a grid container and in a list.",
+		"route": "tilesVariantsInContainer",
+		"group": "Card Variants"
+	},
+	{
 		"title": "Focus Full Card",
 		"description": "Demonstrates shifting focus to the entire card rather than to the header.",
 		"route": "focusFullCard",

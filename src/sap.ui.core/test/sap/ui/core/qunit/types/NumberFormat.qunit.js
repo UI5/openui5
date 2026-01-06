@@ -5780,4 +5780,153 @@ sap.ui.define([
 			assert.strictEqual(oFormat.format(sValue, "mass-kilogram"), sResult + " kg");
 		});
 	});
+
+	//*********************************************************************************************
+	QUnit.test("getNumberFromShortened: integrative test", function (assert) {
+		const oFormat = NumberFormat.getIntegerInstance();
+
+		// code under test
+		let oResult = oFormat.getNumberFromShortened("12.3K", false);
+
+		assert.deepEqual(oResult, {number: "12.3", factor: 1000});
+
+		// code under test
+		oResult = oFormat.getNumberFromShortened("12.3FOO", false);
+
+		assert.strictEqual(oResult, undefined);
+	});
+
+	//*********************************************************************************************
+	[true, false].forEach((bMatchIsFound) => {
+		QUnit.test(`getNumberFromShortened: ${bMatchIsFound ? "" : "no"} match is found`, function (assert) {
+			const oFormat = {
+				oLocaleData: {
+					getPluralCategories() {}
+				},
+				updateBestResult() {},
+				getNumberFromShortened() {}
+			};
+			this.mock(oFormat.oLocaleData).expects("getPluralCategories").withExactArgs().returns(["~aPluralCategories"]);
+			const oFormatMock = this.mock(oFormat);
+			let oResult;
+			const fnCustomMatcher = (oBestResult) => {
+				assert.ok(oBestResult.hasOwnProperty("number") && oBestResult.hasOwnProperty("factor"));
+				oResult ??= oBestResult;
+				oBestResult.number = bMatchIsFound ? "1" : undefined;
+				assert.strictEqual(oResult, oBestResult);
+			};
+			for (let iPowerOfTen = 10; iPowerOfTen < 1e15; iPowerOfTen *= 10) {
+				oFormatMock.expects("updateBestResult")
+					.withExactArgs(sinon.match.object, "~aPluralCategories", iPowerOfTen, "long", "~sValue")
+					.callsFake(fnCustomMatcher);
+				oFormatMock.expects("updateBestResult")
+					.withExactArgs(sinon.match.object, "~aPluralCategories", iPowerOfTen, "short", "~sValue")
+					.callsFake(fnCustomMatcher);
+			}
+
+			// code under test
+			assert.strictEqual(NumberFormat.prototype.getNumberFromShortened.call(oFormat, "~sValue", false),
+				bMatchIsFound ? oResult : undefined);
+		});
+	});
+
+	//*********************************************************************************************
+	QUnit.test("getNumberFromShortened: indian currency case", function (assert) {
+		const oFormat = {
+			oLocaleData: {
+				getPluralCategories() {}
+			},
+			updateBestResult() {},
+			getNumberFromShortened() {}
+		};
+		this.mock(oFormat.oLocaleData).expects("getPluralCategories").withExactArgs().returns(["~aPluralCategories"]);
+		let oRegularResult;
+		const fnCustomMatcherForRegularCase = (oBestResult) => {
+			assert.ok(oBestResult.hasOwnProperty("number") && oBestResult.hasOwnProperty("factor"));
+			oRegularResult ??= oBestResult;
+			assert.strictEqual(oRegularResult, oBestResult);
+		};
+		let oIndianResult;
+		const fnCustomMatcherForIndianCurrencyCase = (oBestIndianResult) => {
+			assert.ok(oBestIndianResult.hasOwnProperty("number") && oBestIndianResult.hasOwnProperty("factor"));
+			oBestIndianResult.number ??= "1";
+			oBestIndianResult.factor = 2;
+			oIndianResult ??= oBestIndianResult;
+			assert.strictEqual(oIndianResult, oBestIndianResult);
+		};
+		const oFormatMock = this.mock(oFormat);
+		for (let iPowerOfTen = 10; iPowerOfTen < 1e15; iPowerOfTen *= 10) {
+			oFormatMock.expects("updateBestResult")
+				.withExactArgs(sinon.match.object, "~aPluralCategories", iPowerOfTen, "short-indian", "~sValue")
+				.callsFake(fnCustomMatcherForIndianCurrencyCase);
+			oFormatMock.expects("updateBestResult")
+				.withExactArgs(sinon.match.object, "~aPluralCategories", iPowerOfTen, "long", "~sValue")
+				.callsFake(fnCustomMatcherForRegularCase);
+			oFormatMock.expects("updateBestResult")
+				.withExactArgs(sinon.match.object, "~aPluralCategories", iPowerOfTen, "short", "~sValue")
+				.callsFake(fnCustomMatcherForRegularCase);
+		}
+
+		// code under test
+		const oResult = NumberFormat.prototype.getNumberFromShortened.call(oFormat, "~sValue", true);
+
+		assert.strictEqual(oResult, oIndianResult);
+		assert.deepEqual(oResult, {number: "1", factor: 2});
+		assert.notStrictEqual(oResult, oRegularResult);
+		assert.notDeepEqual(oResult, oRegularResult);
+	});
+
+	//*********************************************************************************************
+	[
+		{
+			sTitle: "no CLDR format can be found",
+			sCompactPattern: undefined,
+			sNormalizedResult: undefined,
+			sPowerOfTen: "~sPowerOfTen"
+		}, {
+			sTitle: "CLDR format can be found, but no scale in the pattern",
+			sCompactPattern: "~sCldrFormat",
+			sNormalizedResult: "0",
+			sPowerOfTen: "~sPowerOfTen"
+		}, {
+			sTitle: "CLDR format can be found, but no match with scaling factor in value",
+			sCompactPattern: "~sCldrFormat",
+			sNormalizedResult: "0~NoMatchInValue",
+			sPowerOfTen: "~sPowerOfTen"
+		}, {
+			sTitle: "CLDR format can be found and match with scaling factor in value",
+			sCompactPattern: "0 K",
+			sNormalizedResult: "0K",
+			sPowerOfTen: "1000"
+		}
+	].forEach(({sTitle, sCompactPattern, sNormalizedResult, sPowerOfTen}) => {
+		QUnit.test(`updateBestResult: ${sTitle}`, function (assert) {
+			const oFormat = {
+				oLocaleData: {
+					getCompactDecimalPattern() {}
+				},
+				getFactor() {}
+			};
+
+			this.mock(oFormat.oLocaleData).expects("getCompactDecimalPattern")
+				.withExactArgs("~sStyle", sPowerOfTen, "~sPluralCategory")
+				.returns(sCompactPattern);
+			if (sNormalizedResult) {
+				this.mock(FormatUtils).expects("normalize")
+					.withExactArgs(sCompactPattern, true)
+					.returns(sNormalizedResult);
+			}
+			const oResult = {number: undefined, factor: 1};
+
+			// code under test
+			NumberFormat.prototype.updateBestResult.call(oFormat,
+				oResult, "~sPluralCategory", sPowerOfTen, "~sStyle", "1K");
+
+			if (oResult.number) {
+				assert.deepEqual(oResult, {number: "1", factor: 1000});
+			} else {
+				assert.deepEqual(oResult, {number: undefined, factor: 1});
+			}
+		});
+	});
 });

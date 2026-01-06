@@ -5795,7 +5795,7 @@ sap.ui.define([
 	QUnit.test("MultiComboBox aria-describedby attribute", async function(assert) {
 		var oItem1 = new Item({key: "Item1", text: "Item1"});
 		var oMultiComboBox = new MultiComboBox({
-			valueState: "Warning",
+			valueState: ValueState.Warning,
 			items: [oItem1],
 			selectedItems: [oItem1]
 		});
@@ -7293,6 +7293,36 @@ sap.ui.define([
 		// Cleanup
 		oMultiComboBox.destroy();
 		oTable.destroy();
+	});
+
+	QUnit.test("Value state should reset when selectedKeys are updated via model binding", async function(assert) {
+		var oModel = new JSONModel({
+			selectedKeys: []
+		});
+
+		var oMultiComboBox = new MultiComboBox({
+			items: [
+				new Item({ key: "item1", text: "Item 1" }),
+				new Item({ key: "item2", text: "Item 2" })
+			],
+			selectedKeys: "{/selectedKeys}"
+		});
+
+		oMultiComboBox.setModel(oModel);
+		oMultiComboBox.placeAt("MultiComboBoxContent");
+		await nextUIUpdate();
+
+		oMultiComboBox.setValueState("Error");
+		oMultiComboBox.setValueStateText("Error message");
+		await nextUIUpdate();
+
+		oModel.setProperty("/selectedKeys", ["item1"]);
+		await nextUIUpdate();
+
+		assert.strictEqual(oMultiComboBox.getValueState(), "None", "Value state should be reset to None");
+		assert.strictEqual(oMultiComboBox.getValueStateText(), "", "Value state text should be cleared");
+
+		oMultiComboBox.destroy();
 	});
 
 	QUnit.module("highlighting", {

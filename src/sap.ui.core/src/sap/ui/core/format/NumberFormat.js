@@ -77,6 +77,9 @@ sap.ui.define([
 	const rAllRTLCharacters = /[\u061c\u200e\u200f\u202a\u202b\u202c]/g;
 	// A regular expression that can be used to remove the left-to-right mark character
 	const rLeftToRightMark = /\u200e/;
+	// Array of all available power of tens for short formats, max:  100 000 000 000 000
+	const aPowerOfTens = [10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000,
+		10000000000, 100000000000, 1000000000000, 10000000000000, 100000000000000];
 
 	/*
 	 * Is used to validate existing grouping separators.
@@ -2183,7 +2186,7 @@ sap.ui.define([
 		// user will not input it this way. Also white spaces or grouping separator can be ignored by determining the value
 		sValue = sValue.replace(rAllWhiteSpaces, "");
 
-		oShort = getNumberFromShortened(sValue, this.oLocaleData, bIndianCurrency);
+		oShort = this.getNumberFromShortened(sValue, bIndianCurrency);
 		if (oShort) {
 			sValue = oShort.number;
 		}
@@ -2636,95 +2639,90 @@ sap.ui.define([
 	 * Parsed number: 123 * 1000 = 123000
 	 *
 	 * @param {string} sValue The value for which the short format shall be determined
-	 * @param {sap.ui.core.LocaleData} oLocaleData The locale data of this instance
 	 * @param {boolean} bIndianCurrency Whether the the value has to be treated as Indian currency
 	 *
 	 * @returns {{number: string, factor: number}|undefined}
 	 *   An object containing the number substring of the given <code>sValue</code>, e.g. <code>"123"</code> and
 	 *   the factor with which the determined number must be multiplied to resolve the short format;
 	 *   <code>undefined</code> if no short format is found for the given <code>sValue</code>
+	 *
+	 * @private
 	 */
-	function getNumberFromShortened(sValue, oLocaleData, bIndianCurrency) {
-		var sNumber,
-			iFactor = 1,
-			iKey = 10,
-			aPluralCategories = oLocaleData.getPluralCategories(),
-			sCldrFormat,
-			bestResult = {number: undefined, factor: iFactor},
-			fnGetFactor = function(sPlural, iKey, sStyle) {
-				sCldrFormat = oLocaleData.getCompactDecimalPattern(sStyle, iKey.toString(), sPlural);
+	NumberFormat.prototype.getNumberFromShortened = function (sValue, bIndianCurrency) {
+		const aPluralCategories = this.oLocaleData.getPluralCategories();
+		const oBestResult = {number: undefined, factor: 1};
+		const oIndianBestResult = {number: undefined, factor: 1};
 
-				if (sCldrFormat) {
-					// Note: CLDR uses a non-breaking space and right-to-left mark u+200f in the format string
-					sCldrFormat = FormatUtils.normalize(sCldrFormat, true);
-					//formatString may contain '.' (quoted to differentiate them decimal separator)
-					//which must be replaced with .
-					sCldrFormat = sCldrFormat.replace(/'.'/g, ".");
-					var match = sCldrFormat.match(rNumPlaceHolder);
-					if (match) {
-						// determine unit -> may be on the beginning e.g. for he
-						var sValueSubString = match[0];
-						var sUnit = sCldrFormat.replace(sValueSubString, "");
-						if (!sUnit) {
-							// If there's no scale defined in the pattern, skip the pattern
-							return;
-						}
-						var iIndex = sValue.indexOf(sUnit);
-						if (iIndex >= 0) {
-							// parse the number part like every other number and then use the factor to get the real number
-							sNumber = sValue.replace(sUnit, "");
-							iFactor = iKey;
-							// spanish numbers e.g. for MRD in format for "one" is "00 MRD" therefore factor needs to be adjusted
-							// german numbers e.g. for Mrd. in format for "one" is "0 Mrd." therefore number does not need to be adjusted
-							//    "0" => magnitude = key
-							//    "00"  => magnitude = key / 10
-							//    "000" => magnitude = key / 100
-							iFactor *= Math.pow(10, 1 - sValueSubString.length);
-
-							// if best result has no number yet or the new number is smaller that the current one set the new number as best result
-							if (bestResult.number === undefined || sNumber.length < bestResult.number.length) {
-								bestResult.number = sNumber;
-								bestResult.factor = iFactor;
-							}
-						}
-					}
+		for (const iPowerOfTen of aPowerOfTens) {
+			for (const sPluralCategory of aPluralCategories) {
+				if (bIndianCurrency) {
+					this.updateBestResult(oIndianBestResult, sPluralCategory, iPowerOfTen, "short-indian", sValue);
 				}
-			};
-		// For india currencies try lakhs/crores
-		if (bIndianCurrency) {
-			iKey = 10;
-			while (iKey < 1e15) {
-				for (var i = 0; i < aPluralCategories.length; i++) {
-					var sPluralCategory = aPluralCategories[i];
-					fnGetFactor(sPluralCategory, iKey, "short-indian");
-				}
-				iKey = iKey * 10;
+				this.updateBestResult(oBestResult, sPluralCategory, iPowerOfTen, "long", sValue);
+				this.updateBestResult(oBestResult, sPluralCategory, iPowerOfTen, "short", sValue);
 			}
 		}
-		// iterate over all formats. Max:  100 000 000 000 000
-		// find best result as format can have multiple matches:
-		// * value can be contained one in another (de-DE): "Million" and "Millionen"
-		// * end with each other (es-ES): "mil millones" and "millones"
-		if (!sNumber) {
-			["long", "short"].forEach(function(sStyle) {
-				iKey = 10;
-				while (iKey < 1e15) {
-					for (var i = 0; i < aPluralCategories.length; i++) {
-						var sPluralCategory = aPluralCategories[i];
-						fnGetFactor(sPluralCategory, iKey, sStyle);
+
+		if (oIndianBestResult.number) {
+			return oIndianBestResult;
+		} else if (oBestResult.number) {
+			return oBestResult;
+		}
+
+		return undefined;
+	};
+
+	/**
+	 * Updates the number and factor in the given reference object based on the plural category,
+	 * power of ten, and style with the best match if one can be found for a given value.
+	 *
+	 * @param {{number: string, factor: number}} oBestResult
+	 *   A reference in which the number and factor determined by this function will be stored
+	 * @param {"zero"|"one"|"two"|"few"|"many"} sPluralCategory
+	 *   The plural category
+	 * @param {int} iPowerOfTen
+	 *   The power of ten, max:  100 000 000 000 000
+	 * @param {"long"|"short"|"short-indian"} sStyle
+	 *   The style
+	 * @param {string} sValue
+	 *   The value for which the number and factor has to be determined
+	 *
+	 * @private
+	 */
+	NumberFormat.prototype.updateBestResult = function (oBestResult, sPluralCategory, iPowerOfTen, sStyle, sValue) {
+		let sCldrFormat = this.oLocaleData.getCompactDecimalPattern(sStyle, iPowerOfTen.toString(), sPluralCategory);
+
+		if (sCldrFormat) {
+			// Note: CLDR uses a non-breaking space and right-to-left mark u+200f in the format string
+			sCldrFormat = FormatUtils.normalize(sCldrFormat, true);
+			//formatString may contain '.' (quoted to differentiate them from decimal separator)
+			//which must be replaced with .
+			sCldrFormat = sCldrFormat.replace(/'.'/g, ".");
+			const aMatch = sCldrFormat.match(rNumPlaceHolder);
+			if (aMatch) {
+				// determine unit -> may be on the beginning e.g. for he
+				const sValueSubString = aMatch[0];
+				const sScalingFactor = sCldrFormat.replace(sValueSubString, "");
+				if (sScalingFactor && sValue.includes(sScalingFactor)) {
+					// parse the number part like every other number and then use the factor to get the real number
+					const sNumber = sValue.replace(sScalingFactor, "");
+					// spanish numbers e.g. for MRD in format for "one" is "00 MRD" therefore factor needs to be
+					// adjusted
+					// german numbers e.g. for Mrd. in format for "one" is "0 Mrd." therefore number does not need to
+					// be adjusted
+					//    "0" => magnitude = key
+					//    "00"  => magnitude = key / 10
+					//    "000" => magnitude = key / 100
+					const iFactor = iPowerOfTen * Math.pow(10, 1 - sValueSubString.length);
+
+					if (oBestResult.number === undefined || sNumber.length < oBestResult.number.length) {
+						oBestResult.number = sNumber;
+						oBestResult.factor = iFactor;
 					}
-					iKey = iKey * 10;
 				}
-			});
+			}
 		}
-
-		if (!sNumber) {
-			return;
-		}
-
-		return bestResult;
-
-	}
+	};
 
 	/**
 	 * Whether to show the currency code at the end based on the original format options and the global configuration.

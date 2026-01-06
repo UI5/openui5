@@ -1,0 +1,49 @@
+<mvc:View
+	controllerName="sap.f.cardsdemo.controller.TilesVariants"
+	xmlns="sap.m"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:f="sap.f"
+	xmlns:w="sap.ui.integration.widgets"
+	displayBlock="true">
+	<Page title="{i18n>appTitle}">
+		<subHeader>
+			<Toolbar>
+				<ToolbarSpacer/>
+				<Title text="Card as Tiles" />
+				<ToolbarSpacer/>
+			</Toolbar>
+		</subHeader>
+		<mvc:View viewName="sap.f.cardsdemo.view.common.CommonCardSettings" type="XML" async="true"></mvc:View>
+		<Panel headerText="Card as Tiles in Grid" class="sapUiSmallMargin">
+			<f:GridContainer>
+				<w:Card displayVariant="TileStandard" id="card1" manifest="{cardsPlayground>/playgroundBaseUrl}/cardcontent/tilesVariants/sample1.json" class="sapUiSmallMargin">
+					<w:layoutData>
+						<f:GridContainerItemLayoutData columns="3" minRows="3" />
+					</w:layoutData>
+				</w:Card>
+				<w:Card displayVariant="TileStandard" id="card3" manifest="{cardsPlayground>/playgroundBaseUrl}/cardcontent/tilesVariants/sample3.json" class="sapUiSmallMargin">
+					<w:layoutData>
+						<f:GridContainerItemLayoutData columns="3" minRows="3" />
+					</w:layoutData>
+				</w:Card>
+				<w:Card displayVariant="TileStandard" id="card7" manifest="{cardsPlayground>/playgroundBaseUrl}/cardcontent/tilesVariants/sample4.json" class="sapUiSmallMargin">
+					<w:layoutData>
+						<f:GridContainerItemLayoutData columns="3" minRows="3" />
+					</w:layoutData>
+				</w:Card>
+			</f:GridContainer>
+		</Panel>
+		<Panel headerText="Card as tiles in Panel" class="sapUiSmallMargin">
+			<w:Card displayVariant="TileStandardWide" width="360px" height="176px" id="card4" manifest="{cardsPlayground>/playgroundBaseUrl}/cardcontent/tilesVariants/sample1.json" class="sapUiSmallMargin"/>
+			<w:Card displayVariant="TileStandardWide" width="360px" height="176px" id="card5" manifest="{cardsPlayground>/playgroundBaseUrl}/cardcontent/tilesVariants/sample2.json" class="sapUiSmallMargin"/>
+			<w:Card displayVariant="TileStandardWide" width="360px" height="176px" id="card6" manifest="{cardsPlayground>/playgroundBaseUrl}/cardcontent/tilesVariants/sample3.json" class="sapUiSmallMargin"/>
+			<w:Card displayVariant="TileStandardWide" width="360px" height="176px" id="card8" manifest="{cardsPlayground>/playgroundBaseUrl}/cardcontent/tilesVariants/sample4.json" class="sapUiSmallMargin"/>
+			<w:Card displayVariant="TileStandardWide" width="360px" height="176px" id="card10" manifest="{cardsPlayground>/playgroundBaseUrl}/cardcontent/tilesVariants/sample5.json" class="sapUiSmallMargin"/>
+			<w:Card displayVariant="TileStandardWide" width="360px" height="176px" id="card22" manifest="{cardsPlayground>/playgroundBaseUrl}/cardcontent/tilesVariants/sample6.json" class="sapUiSmallMargin"/>
+			<w:Card displayVariant="TileStandardWide" width="360px" height="176px" id="card32" manifest="{cardsPlayground>/playgroundBaseUrl}/cardcontent/tilesVariants/sample7.json" class="sapUiSmallMargin"/>
+			<w:Card displayVariant="TileStandardWide" width="360px" height="176px" id="card36" manifest="{cardsPlayground>/playgroundBaseUrl}/cardcontent/tilesVariants/sample8.json" class="sapUiSmallMargin"/>
+			<w:Card displayVariant="TileStandardWide" width="360px" height="176px" id="card40" manifest="{cardsPlayground>/playgroundBaseUrl}/cardcontent/tilesVariants/sample9.json" class="sapUiSmallMargin"/>
+			<w:Card displayVariant="TileStandardWide" width="360px" height="176px" id="card45" manifest="{cardsPlayground>/playgroundBaseUrl}/cardcontent/tilesVariants/sample10.json" class="sapUiSmallMargin"/>
+		</Panel>
+	</Page>
+</mvc:View>

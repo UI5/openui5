@@ -100,7 +100,7 @@ sap.ui.define([
 			bHasContent = !!oContent,
 			bCardHeaderBottom = bHasHeader && oCard.getCardHeaderPosition() === HeaderPosition.Bottom,
 			sTooltip = oCard.getTooltip_AsString(),
-			sAriaRole = oCard.getGridItemRole() || oCard.getSemanticRole().toLowerCase();
+			sAriaRole = oCard.getAriaRole();
 
 		oRm.class("sapFCard")
 			.style("width", oCard.getWidth());

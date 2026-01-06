@@ -21,15 +21,7 @@
 			"icon": {
 				"src": "{icon/src}",
 				"shape": "{icon/shape}"
-			},
-			"actions": [
-				{
-					"type": "Navigation",
-					"parameters": {
-						"url": "http://sap.com"
-					}
-				}
-			]
+			}
 		},
 		"content": {
 			"data": {

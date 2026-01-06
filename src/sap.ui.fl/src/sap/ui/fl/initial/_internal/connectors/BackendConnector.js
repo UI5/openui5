@@ -38,7 +38,7 @@ sap.ui.define([
 		 * @returns {Promise<object>} Promise resolving with the raw JSON parsed server response of the flex data request
 		 */
 		sendRequest(mPropertyBag) {
-			var mParameters = _pick(mPropertyBag, ["version", "allContexts"]);
+			var mParameters = _pick(mPropertyBag, ["version", "allContexts", "adaptationId"]);
 
 			if (this.isLanguageInfoRequired) {
 				InitialUtils.addLanguageInfo(mParameters);

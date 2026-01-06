@@ -22,7 +22,7 @@ const MAX_INPUT_VALUE_LENGTH = 512;
 DatePickerRenderer.writeInnerValue = function(oRm, oDP) {
 	if (oDP._inPreferredUserInteraction()) {
 		oRm.attr("value", oDP._$input.val());
-	} else if (oDP._bValid || oDP._bOutOfAllowedRange) {
+	} else if (oDP._bValid || oDP._isValueOutOfRange()) {
 		oRm.attr("value", oDP._formatValue(oDP.getDateValue()));
 	} else {
 		oRm.attr("value", oDP.getValue());

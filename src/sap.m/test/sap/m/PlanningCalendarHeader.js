@@ -3,23 +3,24 @@ sap.ui.define([
 	'sap/m/PlanningCalendarHeader',
 	'sap/m/Button',
 	'sap/m/SegmentedButton',
+	'sap/m/SegmentedButtonItem',
 	'sap/m/App',
 	'sap/m/Page'
 ],
-function (Log, PlanningCalendarHeader, Button, SegmentedButton, App, Page) {
+function (Log, PlanningCalendarHeader, Button, SegmentedButton, SegmentedButtonItem, App, Page) {
 	"use strict";
 	var oPCHeader = new PlanningCalendarHeader("PlanningCalendarHeader",{
 		pickerText: "Picker text",
 		actions: [
 			new SegmentedButton('ViewSwitch1', {
-				buttons: [
-					new Button({
+				items: [
+					new SegmentedButtonItem({
 						text: "Days"
 					}),
-					new Button({
+					new SegmentedButtonItem({
 						text: "Week"
 					}),
-					new Button({
+					new SegmentedButtonItem({
 						text: "Months"
 					})
 				]}

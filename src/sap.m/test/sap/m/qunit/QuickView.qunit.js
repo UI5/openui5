@@ -1015,4 +1015,105 @@ sap.ui.define([
 		// Assert
 		assert.ok(this.oQuickView._oPopover.isOpen(), "After a link is clicked, the popup should stay opened with the content of the linked page.");
 	});
+
+	QUnit.module("NavContainer Aggregation", {
+		beforeEach: function () {
+			this.oQuickView = getQuickView();
+			this.oQuickView.setModel(oModel);
+			var that = this;
+			this.oButton = new Button({
+				text: "Open Quick View",
+				press: function () {
+					that.oQuickView.openBy(this);
+				}
+			});
+
+			oPage.addContent(this.oButton);
+			nextUIUpdate.runSync()/*fake timer is used in module*/;
+		},
+		afterEach: function () {
+			this.oButton.destroy();
+			this.oButton = null;
+
+			this.oQuickView.destroy();
+			this.oQuickView = null;
+		}
+	});
+
+	QUnit.test("NavContainer is initialized on QuickView creation", function (assert) {
+		// Assert
+		assert.ok(this.oQuickView._oNavContainer, "NavContainer instance should be created");
+		assert.ok(this.oQuickView._oNavContainer.isA("sap.m.NavContainer"), "Should be an instance of sap.m.NavContainer");
+	});
+
+	QUnit.test("NavContainer is set as aggregation", function (assert) {
+		// Act
+		var oNavContainer = this.oQuickView.getNavContainer();
+
+		// Assert
+		assert.ok(oNavContainer, "NavContainer should be retrievable via getAggregation");
+		assert.strictEqual(oNavContainer, this.oQuickView._oNavContainer, "Aggregation should reference the same instance as _oNavContainer");
+	});
+
+	QUnit.test("NavContainer navigation works correctly", function (assert) {
+		// Arrange
+		this.oButton.firePress();
+		this.clock.tick(500);
+
+		var oNavContainer = this.oQuickView.getNavContainer();
+		var sInitialPageId = oNavContainer.getCurrentPage().getId();
+
+		// Act - Navigate to second page
+		var oLink = this.oQuickView.getPages()[0].getPageContent().form.getContent().find(function(item){
+			return item.isA("sap.m.Link");
+		});
+
+		oLink.firePress();
+		this.clock.tick(500);
+
+		var sNewPageId = oNavContainer.getCurrentPage().getId();
+
+		// Assert
+		assert.notStrictEqual(sNewPageId, sInitialPageId, "Current page should have changed after navigation");
+	});
+
+	QUnit.test("NavContainer handles navigate event", function (assert) {
+		// Arrange
+		var fnNavigateSpy = sinon.spy();
+		this.oQuickView.attachNavigate(fnNavigateSpy);
+
+		// Act
+		this.oButton.firePress();
+		this.clock.tick(500);
+
+		var oLink = this.oQuickView.getPages()[0].getPageContent().form.getContent().find(function(item){
+			return item.isA("sap.m.Link");
+		});
+
+		oLink.firePress();
+		this.clock.tick(500);
+
+		// Assert
+		assert.ok(fnNavigateSpy.called, "Navigate event should be fired when navigating between pages");
+	});
+
+	QUnit.test("NavContainer handles afterNavigate event", function (assert) {
+		// Arrange
+		var fnAfterNavigateSpy = sinon.spy();
+		this.oQuickView.attachAfterNavigate(fnAfterNavigateSpy);
+
+		// Act
+		this.oButton.firePress();
+		this.clock.tick(500);
+
+		var oLink = this.oQuickView.getPages()[0].getPageContent().form.getContent().find(function(item){
+			return item.isA("sap.m.Link");
+		});
+
+		oLink.firePress();
+		this.clock.tick(500);
+
+		// Assert
+		assert.ok(fnAfterNavigateSpy.called, "AfterNavigate event should be fired after navigation is complete");
+	});
 });

@@ -116,7 +116,8 @@ sap.ui.define([
 		 * @param {object} mPropertyBag - Property bag
 		 * @param {string} mPropertyBag.appId - Id of the underlying app
 		 * @param {string} mPropertyBag.adaptationId - Id of the adaptation to be updated or removed
-		 * @param {object} mPropertyBag.payload - Payload object for the body of the request
+		 * @param {object} mPropertyBag.flexObject - Payload object for the body of the create or updated request
+		 * @param {object} mPropertyBag.flexObjects - Payload object for the body of the reorder request
 		 * @param {string} mPropertyBag.version - Version number to be used for loading the information about adaptations
 		 * @param {string} [mPropertyBag.parentVersion] - Indicates if changes should be based on a version
 		 */
@@ -130,7 +131,7 @@ sap.ui.define([
 				return WriteUtils.sendRequest(sUrl, "POST", {
 					tokenUrl: BtpServiceConnector.ROUTES.TOKEN,
 					initialConnector: InitialConnector,
-					payload: JSON.stringify(mPropertyBag.payload),
+					payload: JSON.stringify(mPropertyBag.flexObject),
 					dataType: "json",
 					contentType: "application/json; charset=utf-8"
 				});
@@ -144,7 +145,7 @@ sap.ui.define([
 				return WriteUtils.sendRequest(sUrl, "PUT", {
 					tokenUrl: BtpServiceConnector.ROUTES.TOKEN,
 					initialConnector: InitialConnector,
-					payload: JSON.stringify(mPropertyBag.payload),
+					payload: JSON.stringify(mPropertyBag.flexObjects),
 					dataType: "json",
 					contentType: "application/json; charset=utf-8"
 				});
@@ -159,7 +160,7 @@ sap.ui.define([
 				return WriteUtils.sendRequest(sUrl, "PUT", {
 					tokenUrl: BtpServiceConnector.ROUTES.TOKEN,
 					initialConnector: InitialConnector,
-					payload: JSON.stringify(mPropertyBag.payload),
+					payload: JSON.stringify(mPropertyBag.flexObject),
 					dataType: "json",
 					contentType: "application/json; charset=utf-8"
 				});

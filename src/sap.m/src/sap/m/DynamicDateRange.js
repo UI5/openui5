@@ -753,20 +753,28 @@ sap.ui.define([
 				this._removeAllListItemDelegates();
 				this._oOptionsList.destroyAggregation("items");
 
-				this._collectValueHelpItems(this._getOptions(), true).map(function(vOption) {
+				const aGroupSizes = [];
+				let iCurrentGroupIndex = -1;
+
+				this._collectValueHelpItems(this._getOptions(), true).forEach(function(vOption) {
+					let oItem;
 					// check if it's a group header
 					if (typeof (vOption) === "string") {
-						return this._createHeaderListItem(vOption);
+						aGroupSizes[++iCurrentGroupIndex] = 0;
+						oItem = this._createHeaderListItem(vOption);
+					} else {
+						aGroupSizes[iCurrentGroupIndex]++;
+
+						if (vOption.getKey() === "FROMDATETIME") {
+							vOption._bAdditionalTimeText = !!this._findOption("FROM");
+						} else if (vOption.getKey() === "TODATETIME") {
+							vOption._bAdditionalTimeText = !!this._findOption("TO");
+						} else if (vOption.getKey() === "DATETIMERANGE") {
+							vOption._bAdditionalTimeText = !!this._findOption("DATERANGE");
+						}
+						oItem = this._createListItem(vOption);
 					}
-					if (vOption.getKey() === "FROMDATETIME") {
-						vOption._bAdditionalTimeText = !!this._findOption("FROM");
-					} else if (vOption.getKey() === "TODATETIME") {
-						vOption._bAdditionalTimeText = !!this._findOption("TO");
-					} else if (vOption.getKey() === "DATETIMERANGE") {
-						vOption._bAdditionalTimeText = !!this._findOption("DATERANGE");
-					}
-					return this._createListItem(vOption);
-				}, this).forEach(function(oItem) {
+
 					oItem.addDelegate(this._oListItemDelegate, this);
 					this._oOptionsList.addItem(oItem);
 				}, this);
@@ -775,6 +783,42 @@ sap.ui.define([
 				this._oNavContainer.to(this._oNavContainer.getPages()[0]);
 
 				this._openPopup(oDomRef);
+
+				if (this.getEnableGroupHeaders()) {
+					this._updateOptionsListAccessibilityAttributes(aGroupSizes);
+				}
+			}
+		};
+
+		/**
+		 * Updates accessibility attributes for options list items with group-specific aria-setsize and aria-posinset.
+		 *
+		 * @param {Array<number>} aGroupSizes Array containing the size of each group
+		 * @private
+		 */
+		DynamicDateRange.prototype._updateOptionsListAccessibilityAttributes = function(aGroupSizes) {
+			const aOptionsListItems = this._oOptionsList.getItems();
+			const iItemCount = aOptionsListItems.length;
+
+			if (!iItemCount) {
+				return;
+			}
+
+			let iPositionInGroup = 1;
+			let iCurrentGroupIndex = -1;
+
+			for (let i = 0; i < iItemCount; i++) {
+				const oItem = aOptionsListItems[i];
+
+				if (oItem.isA("sap.m.GroupHeaderListItem")) {
+					iCurrentGroupIndex++;
+					iPositionInGroup = 1;
+				} else {
+					oItem.updateAccessibilityState({
+						"aria-setsize": aGroupSizes[iCurrentGroupIndex],
+						"aria-posinset": iPositionInGroup++
+					});
+				}
 			}
 		};
 

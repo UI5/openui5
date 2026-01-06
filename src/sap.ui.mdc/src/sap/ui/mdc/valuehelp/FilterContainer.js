@@ -55,7 +55,9 @@ sap.ui.define(
 			this.addAggregation("_layout", this.oLayout, true);
 		};
 
-		FilterContainer.prototype.exit = function() {
+		FilterContainer.prototype.exit = function () {
+			this.oLayout._oToolbar = null;
+			this.oLayout = null;
 			this.aLayoutItems.forEach((oItem) => {
 				oItem.destroy();
 			});
@@ -130,12 +132,6 @@ sap.ui.define(
 			}
 
 			this.getParent().setProperty("_showAllFiltersEnabled", !bShowAll && n > iThreshold);
-		};
-
-		FilterContainer.prototype.exit = function () {
-			this.oLayout._oToolbar = null;
-			this.oLayout = null;
-			this.aLayoutItems = null;
 		};
 
 		return FilterContainer;
