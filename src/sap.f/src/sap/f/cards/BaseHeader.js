@@ -527,11 +527,28 @@ sap.ui.define([
 		}
 
 		const oParent = this.getParent();
-		if (oParent && oParent.isA("sap.f.CardBase") && oParent.isRoleListItem()) {
+		if (this.isParentCard() && oParent.isRoleListItem()) {
 			return this.isInteractive();
 		}
 
 		return true;
+	};
+
+	/**
+	 * Checks whether the parent of the header is a card.
+	 * @returns {boolean} True if the parent is a card.
+	 */
+	BaseHeader.prototype.isParentCard = function() {
+		const oParent = this.getParent();
+		return oParent && oParent.isA("sap.f.CardBase");
+	};
+
+	/**
+	 * Gets the id of the focusable element in the header.
+	 */
+	BaseHeader.prototype.getFocusableHeaderId = function() {
+
+		return this.getId() + "-focusable";
 	};
 
 	BaseHeader.prototype._isInsideToolbar = function(oElement) {

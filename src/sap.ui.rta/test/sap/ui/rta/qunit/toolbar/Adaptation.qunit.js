@@ -259,12 +259,35 @@ sap.ui.define([
 			assert.notOk(this.oToolbar.getControl("switchAdaptations").getVisible(), "then the switch adaptations button is not visible");
 		});
 
-		QUnit.test("Given two context-based adaptation are available and the displayed adaptation is default (context-free) ", function(assert) {
+		QUnit.test("Given two context-based adaptation are available and the displayed adaptation is default (context-free) (ABAP Style)", function(assert) {
 			this.oAdaptationsModel = new JSONModel({
 				allAdaptations: [{ title: "Sales" }, { title: "Manager" }, { title: "" }],
 				adaptations: [{ title: "Sales" }, { title: "Manager" }],
 				count: 2,
 				displayedAdaptation: { title: "" }
+			});
+
+			this.oToolbar.setModel(this.oAdaptationsModel, "contextBasedAdaptations");
+			this.oToolbar.setModel(this.oToolbarControlsModel, "controls");
+			var oContextBasedAdaptationMenu = this.oToolbar.getControl("contextBasedAdaptationMenu");
+			assert.ok(oContextBasedAdaptationMenu.getEnabled(), "then the context-based adaptation menu is enabled");
+			var sExpectedTitle = this.oToolbar.getTextResources().getText(this.oToolbar.getTextResources().getText("TXT_DEFAULT_APP"));
+			assert.strictEqual(oContextBasedAdaptationMenu.getText(), sExpectedTitle, "then the menu text is rendered correctly ");
+			assert.ok(this.oToolbar.getControl("saveAsAdaptation").getEnabled(), "then the save as new adaptation button is enabled");
+			assert.ok(this.oToolbar.getControl("manageAdaptations").getEnabled(), "then the manage adaptations button is enabled");
+			assert.notOk(this.oToolbar.getControl("editAdaptation").getVisible(), "then the edit adaptations button is not visible");
+			assert.notOk(this.oToolbar.getControl("deleteAdaptation").getVisible(), "then the delete adaptations button is not visible");
+			var oSwitchAdaptationsButton = this.oToolbar.getControl("switchAdaptations");
+			assert.ok(oSwitchAdaptationsButton.getVisible(), "then the switch adaptations button is visible");
+			assert.strictEqual(oSwitchAdaptationsButton.getItems().length, 3, "number of adaptations to be switched is correct");
+		});
+
+		QUnit.test("Given two context-based adaptation are available and the displayed adaptation is default (context-free) (CF Style)", function(assert) {
+			this.oAdaptationsModel = new JSONModel({
+				allAdaptations: [{ title: "Sales" }, { title: "Manager" }, {}],
+				adaptations: [{ title: "Sales" }, { title: "Manager" }],
+				count: 2,
+				displayedAdaptation: {}
 			});
 
 			this.oToolbar.setModel(this.oAdaptationsModel, "contextBasedAdaptations");

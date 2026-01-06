@@ -4,35 +4,32 @@
 sap.ui.define([
 	"./BaseHeader",
 	"./NumericIndicators",
-	"sap/base/Log",
 	"sap/m/AvatarColor",
 	"sap/m/AvatarImageFitType",
 	"sap/m/AvatarShape",
 	"sap/m/AvatarSize",
 	"sap/m/Text",
-	"sap/m/ObjectStatus",
 	"sap/f/cards/NumericHeaderRenderer",
 	"sap/ui/core/library",
 	"sap/m/Avatar",
-	"sap/ui/core/InvisibleText"
+	"sap/f/library"
 ], function(
 	BaseHeader,
 	NumericIndicators,
-	Log,
 	AvatarColor,
 	AvatarImageFitType,
 	AvatarShape,
 	AvatarSize,
 	Text,
-	ObjectStatus,
 	NumericHeaderRenderer,
 	coreLibrary,
 	Avatar,
-	InvisibleText
+	fLibrary
 ) {
 	"use strict";
 
 	const ValueState = coreLibrary.ValueState;
+
 
 	/**
 	 * Constructor for a new <code>NumericHeader</code>.
@@ -515,7 +512,9 @@ sap.ui.define([
 			aIds.push(this.getParent()._ariaText.getId());
 		}
 
-		if (this.getTitle()) {
+		if (this.getTitle()
+			&& this.isParentCard()
+			&& this.getParent().isTileDisplayVariant()) {
 			aIds.push(this._getTitle().getId());
 		}
 

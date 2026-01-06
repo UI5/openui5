@@ -171,7 +171,7 @@ sap.ui.define([
 		}
 	}, function() {
 		QUnit.test("create route", async function(assert) {
-			const oPayload = {
+			const oFlexObject = {
 				id: "adpId123",
 				title: "My adapatation",
 				contexts: {
@@ -182,7 +182,7 @@ sap.ui.define([
 			const oSendRequestStub = sandbox.stub(WriteUtils, "sendRequest").resolves("response");
 			const oResult = await BtpServiceConnector.contextBasedAdaptation.create({
 				url: "my/url",
-				payload: oPayload,
+				flexObject: oFlexObject,
 				appId: "my/fancy/app",
 				parentVersion: "0"
 			});
@@ -192,14 +192,14 @@ sap.ui.define([
 			assert.deepEqual(_omit(aArgs[2], "initialConnector"), {
 				contentType: "application/json; charset=utf-8",
 				dataType: "json",
-				payload: JSON.stringify(oPayload),
+				payload: JSON.stringify(oFlexObject),
 				tokenUrl: BtpServiceConnector.ROUTES.TOKEN
 			});
 			assert.strictEqual(oResult, "response", "the function returns the response of the request");
 		});
 
 		QUnit.test("reorder route", async function(assert) {
-			const oPayload = {
+			const oFlexObjects = {
 				priorities: [
 					"id 1",
 					"id 2",
@@ -209,7 +209,7 @@ sap.ui.define([
 			const oSendRequestStub = sandbox.stub(WriteUtils, "sendRequest").resolves("response");
 			const oResult = await BtpServiceConnector.contextBasedAdaptation.reorder({
 				url: "my/url",
-				payload: oPayload,
+				flexObjects: oFlexObjects,
 				appId: "my/fancy/app",
 				parentVersion: "0"
 			});
@@ -219,14 +219,14 @@ sap.ui.define([
 			assert.deepEqual(_omit(aArgs[2], "initialConnector"), {
 				contentType: "application/json; charset=utf-8",
 				dataType: "json",
-				payload: JSON.stringify(oPayload),
+				payload: JSON.stringify(oFlexObjects),
 				tokenUrl: BtpServiceConnector.ROUTES.TOKEN
 			});
 			assert.strictEqual(oResult, "response", "the function returns the response of the request");
 		});
 
 		QUnit.test("update route", async function(assert) {
-			const oPayload = {
+			const oFlexObject = {
 				title: "My adapatation",
 				contexts: {
 					role: ["Keyuser", "Sales"]
@@ -236,7 +236,7 @@ sap.ui.define([
 			const oSendRequestStub = sandbox.stub(WriteUtils, "sendRequest").resolves("response");
 			const oResult = await BtpServiceConnector.contextBasedAdaptation.update({
 				url: "my/url",
-				payload: oPayload,
+				flexObject: oFlexObject,
 				appId: "my/fancy/app",
 				adaptationId: "adpId123",
 				parentVersion: "0"
@@ -247,7 +247,7 @@ sap.ui.define([
 			assert.deepEqual(_omit(aArgs[2], "initialConnector"), {
 				contentType: "application/json; charset=utf-8",
 				dataType: "json",
-				payload: JSON.stringify(oPayload),
+				payload: JSON.stringify(oFlexObject),
 				tokenUrl: BtpServiceConnector.ROUTES.TOKEN
 			});
 			assert.strictEqual(oResult, "response", "the function returns the response of the request");

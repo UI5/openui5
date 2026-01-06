@@ -2003,5 +2003,37 @@ sap.ui.define([
 		assert.strictEqual(this.ddr._getCustomGroupHeader("Test"), "Not a Test Group", "A new group is added");
 	});
 
+	QUnit.test("accessibility attributes for grouped items", async function(assert) {
+		// Arrange
+		this.ddr.setStandardOptions(["TODAY", "YESTERDAY", "LASTDAYS", "LASTWEEKS"]);
+		this.ddr.setEnableGroupHeaders(true);
+
+		// Act
+		this.ddr.open();
+		await nextUIUpdate();
+
+		// Assert
+		const aListItems = this.ddr._oOptionsList.getItems();
+		const oToday = aListItems[1].getDomRef();
+		const oYesterday = aListItems[2].getDomRef();
+		const oLastNextX = aListItems[4].getDomRef();
+
+		assert.equal(oToday.getAttribute("aria-setsize"), 2,
+			"'Single Dates' group should have 2 items (TODAY, YESTERDAY)");
+		assert.equal(oToday.getAttribute("aria-posinset"), 1,
+			"Today should be first item in the group");
+
+		assert.equal(oYesterday.getAttribute("aria-setsize"), 2,
+			"Group size is correctly applied on second item as well");
+		assert.equal(oYesterday.getAttribute("aria-posinset"), 2,
+			"Yesterday should be second item in the group");
+
+		assert.equal(oLastNextX.getAttribute("aria-setsize"), 1,
+			"'DateRanges' group should only 1 item (Last X Days/Weeks)");
+		assert.equal(oLastNextX.getAttribute("aria-posinset"), 1,
+			"'Last X Days/Weeks' should be first item in the group");
+
+	});
+
 });
 

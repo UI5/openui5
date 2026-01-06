@@ -332,7 +332,9 @@ sap.ui.define([
 			aIds.push(this.getParent()._ariaText.getId());
 		}
 
-		if (this.getTitle()) {
+		if (this.getTitle()
+			&& this.isParentCard()
+			&& this.getParent().isTileDisplayVariant()) {
 			aIds.push(this._getTitle().getId());
 		}
 

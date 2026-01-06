@@ -2607,12 +2607,80 @@ sap.ui.define([
 
 	QUnit.module("Private methods", {
 		beforeEach: function () {
-			this.oDP = new DatePicker();
+			this.oDP = new DatePicker({
+				valueFormat: "dd/MM/yyyy",
+				displayFormat: "dd/MM/yyyy"
+			});
 		},
 		afterEach: function () {
 			this.oDP.destroy();
 			this.oDP = null;
 		}
+	});
+
+	QUnit.test("_isValueOutOfRange: returns false for undefined input and dateValue", async function(assert) {
+		this.oDP.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		this.oDP._oMinDate = UI5Date.getInstance(2020, 0, 1);
+		this.oDP._oMaxDate = UI5Date.getInstance(2020, 11, 31);
+		this.oDP.updateDomValue("");  // simulate empty input
+		this.oDP.setProperty("dateValue", undefined);
+
+		assert.strictEqual(this.oDP._isValueOutOfRange(), false, "undefined input and dateValue returns false");
+	});
+
+	QUnit.test("_isValueOutOfRange: returns false for date in range", function(assert) {
+		this.oDP._oMinDate = UI5Date.getInstance(2020, 0, 1);
+		this.oDP._oMaxDate = UI5Date.getInstance(2020, 11, 31);
+		var oDate = UI5Date.getInstance(2020, 5, 15);
+		this.oDP.setProperty("dateValue", oDate);
+
+		assert.strictEqual(this.oDP._isValueOutOfRange(), false, "date in range returns false");
+	});
+
+	QUnit.test("_isValueOutOfRange: returns true for date below min", function(assert) {
+		this.oDP._oMinDate = UI5Date.getInstance(2020, 0, 1);
+		this.oDP._oMaxDate = UI5Date.getInstance(2020, 11, 31);
+		var oDate = UI5Date.getInstance(2019, 11, 31);
+		this.oDP.setProperty("dateValue", oDate);
+
+		assert.strictEqual(this.oDP._isValueOutOfRange(), true, "date below min returns true");
+	});
+
+	QUnit.test("_isValueOutOfRange: returns true for date above max", function(assert) {
+		this.oDP._oMinDate = UI5Date.getInstance(2020, 0, 1);
+		this.oDP._oMaxDate = UI5Date.getInstance(2020, 11, 31);
+		var oDate = UI5Date.getInstance(2021, 0, 1);
+		this.oDP.setProperty("dateValue", oDate);
+
+		assert.strictEqual(this.oDP._isValueOutOfRange(), true, "date above max returns true");
+	});
+
+	QUnit.test("_isValueOutOfRange: returns false for invalid input string", async function(assert) {
+		this.oDP.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		this.oDP._oMinDate = UI5Date.getInstance(2020, 0, 1);
+		this.oDP._oMaxDate = UI5Date.getInstance(2020, 11, 31);
+		this.oDP.updateDomValue("invalid date");
+
+		assert.strictEqual(this.oDP._isValueOutOfRange(), false, "invalid input string returns false");
+	});
+
+	QUnit.test("_isValueOutOfRange: returns correct value when there is valid date in input", async function(assert) {
+		this.oDP.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		this.oDP._oMinDate = UI5Date.getInstance(2020, 10, 1);
+		this.oDP._oMaxDate = UI5Date.getInstance(2020, 11, 31);
+		this.oDP.updateDomValue("01/09/2020");
+
+		assert.strictEqual(this.oDP._isValueOutOfRange(), true, "date below min returns true");
+
+		this.oDP.updateDomValue("01/11/2020");
+
+		assert.strictEqual(this.oDP._isValueOutOfRange(), false, "date in range returns false");
 	});
 
 	QUnit.test("_getVisibleDatesRange", function (assert) {
@@ -3164,11 +3232,11 @@ sap.ui.define([
 	QUnit.test("Value is formatted even when out ot min and max range", async function(assert) {
 		// Prepare
 		var oDP = new DatePicker("oDP", {
+			displayFormat: "MM-dd-yyyy",
+			valueFormat: "MM/dd/yyyy",
 			dateValue: UI5Date.getInstance(2021, 8, 1),
 			minDate: UI5Date.getInstance(2021, 10, 1),
-			maxDate: UI5Date.getInstance(2021, 11, 1),
-			displayFormat: "MM-dd-yyyy",
-			valueFormat: "MM/dd/yyyy"
+			maxDate: UI5Date.getInstance(2021, 11, 1)
 		}).placeAt("qunit-fixture");
 
 		// Act

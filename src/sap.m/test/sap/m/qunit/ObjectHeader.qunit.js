@@ -191,7 +191,6 @@ sap.ui.define([
 		// Arrange
 		var oProgIndicator = new ProgressIndicator(this.sID + "-pi", {
 			visible : true,
-			enabled : true,
 			state : ValueState.NEUTRAL,
 			displayValue : '80%',
 			percentValue : 80,

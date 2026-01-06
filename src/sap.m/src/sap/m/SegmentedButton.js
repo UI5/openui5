@@ -1072,19 +1072,20 @@ function(
 	};
 
 	SegmentedButton.prototype.clone = function () {
-		var sSelectedButtonId = this.getSelectedButton(),
+		const sSelectedItemId = this.getSelectedItem(),
+			aItems = this.getAggregation("items"),
 			aButtons = this.removeAllAggregation("buttons"),
-			oClone = Control.prototype.clone.apply(this, arguments),
-			iSelectedButtonIndex = aButtons.map(function(b) {
-				return b.getId();
-			}).indexOf(sSelectedButtonId),
-			i;
+			oClone = Control.prototype.clone.apply(this, arguments);
 
-		if (iSelectedButtonIndex > -1) {
-			oClone.setSelectedButton(oClone.getButtons()[iSelectedButtonIndex]);
+		const iSelectedItemIndex = aItems.findIndex(function(item) {
+				return item.getId() === sSelectedItemId;
+			});
+
+		if (iSelectedItemIndex > -1) {
+			oClone.setSelectedItem(oClone.getItems()[iSelectedItemIndex]);
 		}
 
-		for (i = 0; i < aButtons.length; i++) {
+		for (let i = 0; i < aButtons.length; i++) {
 			this.addAggregation("buttons", aButtons[i]);
 		}
 

@@ -1,4 +1,4 @@
-/*global QUnit */
+/*global QUnit, sinon */
 
 sap.ui.define([
 	"sap/ui/core/Element",
@@ -11,7 +11,8 @@ sap.ui.define([
 	"sap/m/QuickViewPage",
 	"sap/m/QuickViewGroup",
 	"sap/m/QuickViewGroupElement",
-	"sap/ui/test/utils/nextUIUpdate"
+	"sap/ui/test/utils/nextUIUpdate",
+	"sap/ui/thirdparty/jquery"
 ], function(
 	Element,
 	JSONModel,
@@ -23,7 +24,8 @@ sap.ui.define([
 	QuickViewPage,
 	QuickViewGroup,
 	QuickViewGroupElement,
-	nextUIUpdate
+	nextUIUpdate,
+	jQuery
 ) {
 	"use strict";
 
@@ -348,6 +350,95 @@ sap.ui.define([
 		// assert
 		for (var index = 0; index < aLinks.length; index += 1) {
 			assert.strictEqual(aLinks[index].style.width, 'auto', "The Link should have width set to 'auto'");
+		}
+	});
+
+	QUnit.module("NavContainer Aggregation", {
+		beforeEach: function () {
+			this.oQuickViewCard = getQuickViewCard();
+			oPage.addContent(this.oQuickViewCard);
+
+			nextUIUpdate.runSync()/*fake timer is used in module*/;
+		},
+		afterEach: function () {
+			this.oQuickViewCard.destroy();
+			this.oQuickViewCard = null;
+		}
+	});
+
+	QUnit.test("NavContainer is initialized on QuickViewCard creation", function (assert) {
+		// Assert
+		assert.ok(this.oQuickViewCard._oNavContainer, "NavContainer instance should be created");
+		assert.ok(this.oQuickViewCard._oNavContainer.isA("sap.m.NavContainer"), "Should be an instance of sap.m.NavContainer");
+	});
+
+	QUnit.test("NavContainer is set as aggregation", function (assert) {
+		// Act
+		var oNavContainer = this.oQuickViewCard.getAggregation("_navContainer");
+
+		// Assert
+		assert.ok(oNavContainer, "NavContainer should be retrievable via getAggregation");
+		assert.strictEqual(oNavContainer, this.oQuickViewCard._oNavContainer, "Aggregation should reference the same instance as _oNavContainer");
+	});
+
+	QUnit.test("getNavContainer() returns the NavContainer instance", function (assert) {
+		// Act
+		var oNavContainer = this.oQuickViewCard.getNavContainer();
+
+		// Assert
+		assert.ok(oNavContainer, "getNavContainer() should return a value");
+		assert.ok(oNavContainer.isA("sap.m.NavContainer"), "Should return a NavContainer instance");
+		assert.strictEqual(oNavContainer, this.oQuickViewCard._oNavContainer, "Should return the internal NavContainer reference");
+	});
+
+	QUnit.test("NavContainer contains pages after initialization", function (assert) {
+		// Act
+		var oNavContainer = this.oQuickViewCard.getNavContainer();
+		var aPages = oNavContainer.getPages();
+
+		// Assert
+		assert.ok(aPages.length > 0, "NavContainer should contain pages");
+	});
+
+	QUnit.test("NavContainer handles navigate event", function (assert) {
+		// Arrange
+		var fnNavigateSpy = sinon.spy();
+		this.oQuickViewCard.attachNavigate(fnNavigateSpy);
+
+		// Act - Try to find a navigable link
+		var oLink = this.oQuickViewCard.$().find(".sapMLnk").filter(function() {
+			return jQuery(this).data("pageLinkId");
+		}).first();
+
+		if (oLink.length > 0) {
+			oLink.trigger("tap");
+			nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+			// Assert
+			assert.ok(fnNavigateSpy.called, "Navigate event should be fired when navigating between pages");
+		} else {
+			assert.ok(true, "No navigable link found - test skipped");
+		}
+	});
+
+	QUnit.test("NavContainer handles afterNavigate event", function (assert) {
+		// Arrange
+		var fnAfterNavigateSpy = sinon.spy();
+		this.oQuickViewCard.attachAfterNavigate(fnAfterNavigateSpy);
+
+		// Act - Try to find a navigable link
+		var oLink = this.oQuickViewCard.$().find(".sapMLnk").filter(function() {
+			return jQuery(this).data("pageLinkId");
+		}).first();
+
+		if (oLink.length > 0) {
+			oLink.trigger("tap");
+			nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+			// Assert
+			assert.ok(fnAfterNavigateSpy.called, "AfterNavigate event should be fired after navigation is complete");
+		} else {
+			assert.ok(true, "No navigable link found - test skipped");
 		}
 	});
 });

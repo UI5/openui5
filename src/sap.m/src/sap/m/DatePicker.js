@@ -625,7 +625,7 @@ sap.ui.define([
 	 */
 	DatePicker.prototype.onsapescape = function(oEvent) {
 		var sLastValue = this.getLastValue(),
-			oDate = this._parseValue( this._getInputValue(), true),
+			oDate = this._parseValue(this._getInputValue(), true),
 			sValueFormatInputDate = this._formatValue(oDate, true);
 
 		if (sValueFormatInputDate !== sLastValue) {
@@ -795,7 +795,6 @@ sap.ui.define([
 			var oDateValue = this.getDateValue();
 			if (oDateValue && oDateValue.getTime() < oDate.getTime()) {
 				this._bValid = false;
-				this._bOutOfAllowedRange = true;
 				Log.warning("DateValue not in valid date range", this);
 			}
 		} else {
@@ -843,7 +842,6 @@ sap.ui.define([
 			var oDateValue = this.getDateValue();
 			if (oDateValue && oDateValue.getTime() > oDate.getTime()) {
 				this._bValid = false;
-				this._bOutOfAllowedRange = true;
 				Log.warning("DateValue not in valid date", this);
 			}
 		} else {
@@ -1093,6 +1091,26 @@ sap.ui.define([
 
 		return this;
 
+	};
+
+	/**
+	 * Checks if the current date value is outside the allowed min/max date range.
+	 *
+	 * @returns {boolean} True if the value is out of range, false otherwise.
+	 * @private
+	 */
+	DatePicker.prototype._isValueOutOfRange = function() {
+		const sDate = this._$input.val();
+		let oDate = this.getDateValue();
+		if (sDate) {
+			oDate = this._parseValue(sDate, true);
+			if (!oDate) {
+				return false;
+			}
+		}
+		const bIsLessThanMin = !!oDate && this._oMinDate && oDate.getTime() < this._oMinDate.getTime();
+		const bIsGreaterThanMax = !!oDate && this._oMaxDate && oDate.getTime() > this._oMaxDate.getTime();
+		return bIsLessThanMin || bIsGreaterThanMax;
 	};
 
 	DatePicker.prototype.onChange = function(oEvent) {
