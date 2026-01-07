@@ -1062,7 +1062,8 @@ sap.ui.define([
 			if (oTarget && oTarget.isA("sap.ui.unified.CalendarAppointment")) {
 				this.fireAppointmentSelect({
 					appointment: undefined,
-					appointments: this._toggleAppointmentSelection(undefined, true)
+					appointments: this._toggleAppointmentSelection(undefined, true),
+					originalEvent: oEvent.originalEvent
 				});
 				this._focusCellWithKeyboard(oTarget, iDirection);
 
@@ -1425,7 +1426,8 @@ sap.ui.define([
 				if (bHasSelectedApps) {
 					this.fireAppointmentSelect({
 						appointment: undefined,
-						appointments: this._toggleAppointmentSelection(undefined, true)
+						appointments: this._toggleAppointmentSelection(undefined, true),
+						originalEvent: oEvent.originalEvent
 					});
 				}
 			} else if (oControl && oControl.isA("sap.ui.unified.CalendarAppointment") && !oColumnGridHeaderCell && !bArrowNavigation) {
@@ -1444,7 +1446,8 @@ sap.ui.define([
 
 				this.fireAppointmentSelect({
 					appointment: oControl,
-					appointments: this._toggleAppointmentSelection(oControl, !(oEvent.ctrlKey || oEvent.metaKey))
+					appointments: this._toggleAppointmentSelection(oControl, !(oEvent.ctrlKey || oEvent.metaKey)),
+					originalEvent: oEvent.originalEvent
 				});
 			} else if (oColumnGridHeaderCell?.getAttribute("data-sap-day")) {
 				var oStartDateFromGrid = this._oFormatYyyymmdd.parse(oColumnGridHeaderCell.getAttribute("data-sap-day"));

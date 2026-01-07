@@ -2956,6 +2956,57 @@ sap.ui.define([
 		oMultiComboBox.destroy();
 	});
 
+	QUnit.test("Picker should close when invalid input is entered and text should not be auto-selected", async function(assert) {
+		this.clock = sinon.useFakeTimers();
+
+		const oMultiComboBox = new MultiComboBox({
+			items : [new Item({
+				key : "DZ",
+				text : "Algeria"
+			}), new Item({
+				key : "AR",
+				text : "Argentina"
+			})]
+		});
+
+		oMultiComboBox.placeAt("MultiComboBoxContent");
+		await nextUIUpdate(this.clock);
+
+		oMultiComboBox.focus();
+		oMultiComboBox.open();
+		this.clock.tick(500);
+
+		assert.ok(oMultiComboBox.isOpen(), "Picker should be open");
+
+		const oFakeEvent = {
+			target: {
+				value: "InvalidText"
+			},
+			setMarked: function () {},
+			srcControl: oMultiComboBox,
+			isMarked: function() { return false; }
+		};
+
+		oMultiComboBox.setValue("InvalidText");
+		oMultiComboBox.oninput(oFakeEvent);
+		this.clock.tick(500);
+
+		assert.notOk(oMultiComboBox.isOpen(), "Picker should close when invalid input is entered");
+		assert.strictEqual(oMultiComboBox.getValue(), "InvalidText", "Invalid input value should be preserved");
+		assert.strictEqual(oMultiComboBox.getValueState(), ValueState.Error, "Value state should be Error for invalid input");
+
+		const oInput = oMultiComboBox.getFocusDomRef();
+		const iSelectionStart = oInput.selectionStart;
+		const iSelectionEnd = oInput.selectionEnd;
+		const iValueLength = oMultiComboBox.getValue().length;
+
+		assert.strictEqual(iSelectionStart, iValueLength, "Selection start should be at the end of the text");
+		assert.strictEqual(iSelectionEnd, iValueLength, "Selection end should be at the end of the text");
+		assert.strictEqual(iSelectionStart, iSelectionEnd, "No text should be selected (selectionStart equals selectionEnd)");
+
+		oMultiComboBox.destroy();
+	});
+
 	QUnit.test("Scenario 'EVENT_VALUE_PASTE': CTRL+V 'Algeria' ", async function(assert) {
 		// system under test
 		var oMultiComboBox = new MultiComboBox({

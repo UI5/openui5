@@ -472,16 +472,13 @@ sap.ui.define([
 			mFixture : {
 			},
 			aRegExps : [{
-				regExp : /^GET \/sap\/opu\/odata4\/sap\/zsadl_anly_flight_v4\/default\/iwbep\/common\/0001\/\$metadata\?sap-language=..$/,
+				regExp : /^GET [\w\/]+\/default\/iwbep\/common\/0001\/\$metadata\?sap-language=..$/,
 				response : {source : "common.xml"}
 			}, {
-				regExp : /^GET \/sap\/opu\/odata4\/sap\/zsadl_anly_flight_v4\/default\/iwbep\/common\/0001\/Currencies\?sap-language=..&\$select=CurrencyCode,DecimalPlaces,Text,ISOCode$/,
+				regExp : /^GET [\w\/]+\/default\/iwbep\/common\/0001\/Currencies\?sap-language=..&\$select=CurrencyCode,DecimalPlaces,Text,ISOCode$/,
 				response : {source : "Currencies.json"}
 			}, {
-				regExp : /^GET \/sap\/opu\/odata4\/sap\/zsadl_anly_flight_v4\/srvd\/sap\/zsadl_anly_flight\/0001\/\$metadata\?sap-language=..$/,
-				response : {source : "metadata.xml"}
-			}, {
-				regExp : /^GET \/sap\/opu\/odata4\/sap\/zsadl_anly_flight_v4\/srvd\/sap\/zsadl_anly_flight\/0001\/Bookings\?(.*)$/,
+				regExp : /^GET [\w\/]+\/srvd\/sap\/zsadl_anly_flight\/0001\/Bookings\?(.*)$/,
 				response : {buildResponse : buildGetCollectionResponse}
 			}],
 			sSourceBase : "sap/ui/core/sample/odata/v4/MultiLevelExpand/data"

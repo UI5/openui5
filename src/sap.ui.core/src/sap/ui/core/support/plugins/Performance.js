@@ -548,6 +548,9 @@ sap.ui.define([
 			//filtered and modified data
 			var data = _applyFilters(_rawdata, filterOptions);
 
+			barRm.openStart("ol").openEnd();
+			barInfoRm.openStart("ol").openEnd();
+
 			//no data bar
 			if (data.length === 0) {
 				barRm.openStart("li")

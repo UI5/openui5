@@ -14,7 +14,7 @@ sap.ui.define([
 	var oMockData = {
 			sFilterBase : "/analytics/",
 			mFixture : {
-				"/analytics/Travels?$count=true&$select=BeginDate,BookingFee,CurrencyCode_code,CustomerName,Description,EndDate,TotalPrice,TravelID,TravelUUID&$expand=TravelStatus($select=code,name),to_Agency($select=AgencyID,Name),to_Booking($count=true;$top=0)&$skip=0&$top=110" : {
+				"Travels?$count=true&$select=BeginDate,BookingFee,CurrencyCode_code,CustomerName,Description,EndDate,TotalPrice,TravelID,TravelUUID&$expand=TravelStatus($select=code,name),to_Agency($select=AgencyID,Name),to_Booking($count=true;$top=0)&$skip=0&$top=110" : {
 					source : "Travels.json"
 				}
 			},

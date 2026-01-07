@@ -54,10 +54,19 @@ ui-integration-card {
 }
 
 .topic .navigation a {
-	padding: 8px 0 0 0;
 	font-size: 12px;
-	line-height: 14px;
+	line-height: 1.4;
 	display: inline-block;
+}
+
+.topic .navigation div {
+	padding-top: 3px;
+	margin-left: 2px;
+	margin-right: 2px;
+}
+
+.topic .navigation div:last-child {
+	margin-bottom: 2px;
 }
 
 .content {
@@ -87,27 +96,27 @@ ui-integration-card {
 }
 
 .navigation [data-indent='0'] a {
-	padding-left: 0;
+	margin-left: 0;
 }
 
 .navigation [data-indent='1'] a {
-	padding-left: 0.5rem;
+	margin-left: 0.5rem;
 }
 
 .navigation [data-indent='2'] a {
-	padding-left: 1rem;
+	margin-left: 1rem;
 }
 
 .navigation [data-indent='3'] a {
-	padding-left: 1.5rem;
+	margin-left: 1.5rem;
 }
 
 .navigation [data-indent='4'] a {
-	padding-left: 2rem;
+	margin-left: 2rem;
 }
 
 .navigation [data-indent='5'] a {
-	padding-left: 2.5rem;
+	margin-left: 2.5rem;
 }
 
 .cardInteractionImg {

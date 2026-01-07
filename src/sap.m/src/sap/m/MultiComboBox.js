@@ -1449,11 +1449,6 @@ function(
 		});
 
 		this.getAggregation("tokenizer").setRenderMode(bUseNarrow ? TokenizerRenderMode.Narrow : TokenizerRenderMode.Loose);
-
-		// show value state message when focus is in the input field
-		if (this.getValueState() == ValueState.Error && document.activeElement === this.getFocusDomRef()) {
-			this.selectText(0, this.getValue().length);
-		}
 	};
 
 	/**
@@ -3191,6 +3186,9 @@ function(
 
 		if (!bValidInputValue && sValue !== "" && !bCompositionEvent) {
 			this._handleFieldValidationState(oInput);
+			if (this.isOpen()) {
+				this.close();
+			}
 			return;
 		}
 

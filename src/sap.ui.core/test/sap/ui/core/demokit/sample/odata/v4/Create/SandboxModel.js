@@ -50,16 +50,13 @@ sap.ui.define([
 			sFilterBase : "/sap/opu/odata4/sap/zui5_testv4/default/sap/zui5_epm_sample/0002/",
 			mFixture : {},
 			aRegExps : [{
-				regExp : /^GET [\w\/.]+\$metadata(?:[\w?&\-=]+sap-language=..|)$/,
-				response : {source : "metadata.xml"}
-			}, {
-				regExp : /^GET \/sap\/opu\/odata4\/sap\/zui5_testv4\/default\/sap\/zui5_epm_sample\/0002\/SalesOrderList\?/,
+				regExp : /^GET [\w\/]+\/SalesOrderList\?/,
 				response : {message : {value : aData}}
 			}, {
-				regExp : /^POST \/sap\/opu\/odata4\/sap\/zui5_testv4\/default\/sap\/zui5_epm_sample\/0002\/SalesOrderList/,
+				regExp : /^POST [\w\/]+\/SalesOrderList/,
 				response : {buildResponse : buildPostResponse}
 			}, {
-				regExp : /^GET \/sap\/opu\/odata4\/sap\/zui5_testv4\/default\/sap\/zui5_epm_sample\/0002\/SalesOrderList\(/,
+				regExp : /^GET [\w\/]+\/SalesOrderList\(/,
 				response : {buildResponse : buildGetSingleResponse}
 			}],
 			sSourceBase : "sap/ui/core/sample/odata/v4/Create/data"

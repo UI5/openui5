@@ -28,7 +28,12 @@
 		{
 		  "control": "sap.f.GridContainer",
 		  "url": "GridContainer.html",
-		  "appComponent": "CA-UI5-CTR-ROD"
+		  "appComponent": "CA-UI5-CTR-ROD",
+		  "accTest": {
+				"name": "sap.f.GridContainer",
+				"title": "ACC test for sap.f.GridContainer",
+				"module": "./gridContainer.qunit"
+			}
 		},
 		{
 		  "control": "sap.f.ProductSwitch",

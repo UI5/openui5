@@ -277,24 +277,48 @@ function(
 		};
 
 		SplitButton.prototype.onsapup = function(oEvent) {
+			if (!this.getEnabled()) {
+				return;
+			}
+
+			oEvent.preventDefault();
 			this._fireKeyboardArrowPress();
 		};
 
 		SplitButton.prototype.onsapdown = function(oEvent) {
+			if (!this.getEnabled()) {
+				return;
+			}
+
+			oEvent.preventDefault();
 			this._fireKeyboardArrowPress();
 		};
 
 		SplitButton.prototype.onsapupmodifiers = function(oEvent) {
+			if (!this.getEnabled()) {
+				return;
+			}
+
+			oEvent.preventDefault();
 			this._fireKeyboardArrowPress();
 		};
 
 		SplitButton.prototype.onsapdownmodifiers = function(oEvent) {
+			if (!this.getEnabled()) {
+				return;
+			}
+
+			oEvent.preventDefault();
 			this._fireKeyboardArrowPress();
 			oEvent.stopImmediatePropagation();
 		};
 
 		//F4
 		SplitButton.prototype.onsapshow = function(oEvent) {
+			if (!this.getEnabled()) {
+				return;
+			}
+
 			this._getArrowButton().firePress();
 			oEvent.preventDefault();
 		};

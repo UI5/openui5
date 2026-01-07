@@ -34,6 +34,11 @@ sap.ui.define(["sap/ui/core/Lib"], function(Library) {
 		oRm.openStart("div", oControl)
 			.class("sapFCardContentPlaceholder")
 			.attr("tabindex", "0");
+
+		if (oControl.getWidth()) {
+			oRm.style("width", oControl.getWidth());
+		}
+
 		this.addOuterAttributes(oControl, oRm);
 
 		if (oControl.getRenderTooltip()) {

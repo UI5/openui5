@@ -771,6 +771,7 @@ sap.ui.define([
 		assert.ok(fnFireAppointmentSelectSpy.calledWithExactly({
 			appointment: oAppointment,
 			appointments: [oAppointment],
+			originalEvent: undefined,
 			id: oSPC.getId()
 		}), "Event was fired with the correct parameters");
 
@@ -810,6 +811,7 @@ sap.ui.define([
 		assert.ok(fnFireAppointmentSelectSpy.calledWithExactly({
 			appointment: undefined,
 			appointments: oSPC.getAggregation("appointments"),
+			originalEvent: undefined,
 			id: oSPC.getId()
 		}), "Event was fired with the correct parameters");
 
@@ -869,6 +871,7 @@ sap.ui.define([
 		assert.ok(fnFireAppointmentSelectSpy.calledWithExactly({
 			appointment: oAppointment,
 			appointments: [oAppointment],
+			originalEvent: undefined,
 			id: oSPC.getId()
 		}), "Event was fired with the correct parameters");
 
@@ -915,6 +918,7 @@ sap.ui.define([
 		assert.ok(fnFireAppointmentSelectSpy.calledWithExactly({
 			appointment: undefined,
 			appointments: oSPC.getAggregation("appointments"),
+			originalEvent: undefined,
 			id: oSPC.getId()
 		}), "Event was fired with the correct parameters");
 

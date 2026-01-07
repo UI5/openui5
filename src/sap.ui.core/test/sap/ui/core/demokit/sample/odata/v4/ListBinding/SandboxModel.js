@@ -54,9 +54,6 @@ sap.ui.define([
 				}
 			},
 			aRegExps : [{
-				regExp : /^GET [\w\/]+\/TEA_BUSI\/0001\/\$metadata\?sap-language=..$/,
-				response : {source : "metadata.xml"}
-			}, {
 				regExp : /^GET [\w\/]+\/tea_busi_product\/0001\/\$metadata\?sap-language=..$/,
 				response : {source : "metadata_product.xml"}
 			}, {
