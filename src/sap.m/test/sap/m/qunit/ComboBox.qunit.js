@@ -12,6 +12,8 @@ sap.ui.define([
 	"sap/m/FormattedText",
 	"sap/ui/core/Item",
 	"sap/ui/core/ListItem",
+	"sap/ui/table/Table",
+	"sap/ui/table/Column",
 	"sap/ui/core/SeparatorItem",
 	"sap/ui/model/Sorter",
 	"sap/ui/layout/form/SimpleForm",
@@ -49,6 +51,8 @@ sap.ui.define([
 	FormattedText,
 	Item,
 	ListItem,
+	Table,
+	Column,
 	SeparatorItem,
 	Sorter,
 	SimpleForm,
@@ -12707,6 +12711,53 @@ sap.ui.define([
 		oComboBox.destroy();
 	});
 
+	QUnit.test("Value state popup should close on picker open", async function (assert) {
+		// Arrange
+		const oComboBoxWithLongValueStateText = new ComboBox({
+			placeholder: "Choose your country",
+			valueState: "Warning",
+			valueStateText: "Warning message. Extra long text used as a warning message. Extra long text used as a warning message - 2 Extra long text used as a warning message - 3..",
+			items: [
+				new Item({
+					key: "0",
+					text: "item 0"
+				}),
+
+				new Item({
+					key: "1",
+					text: "item 1"
+				}),
+
+				new Item({
+					key: "2",
+					text: "item 2"
+				})
+			]
+		});
+
+		oComboBoxWithLongValueStateText.placeAt("content");
+		await nextUIUpdate(this.clock);
+
+		// Act
+		oComboBoxWithLongValueStateText.focus();
+		this.clock.tick(200);
+
+		// Assert
+		assert.strictEqual(oComboBoxWithLongValueStateText.getDomRef().classList.contains("sapMFocus"), true, "The visual focus is applied");
+		assert.ok(document.getElementById(oComboBoxWithLongValueStateText.getValueStateMessageId()), "ValueState Message is shown on focus");
+
+
+		oComboBoxWithLongValueStateText.open();
+		this.clock.tick(200);
+
+		// Assert
+		assert.notOk(document.getElementById(oComboBoxWithLongValueStateText.getValueStateMessageId()), "ValueState Message is hidden on picker open");
+		assert.strictEqual(oComboBoxWithLongValueStateText.getPicker().oPopup.getOpenState(), OpenState.OPEN, "The picker is open");
+
+		// Clean
+		oComboBoxWithLongValueStateText.destroy();
+	});
+
 	QUnit.test("Tapping on the disabled input shoould not apply the visual focus", async function (assert) {
 		// Arrange
 		var oComboBox = new ComboBox({
@@ -13111,6 +13162,56 @@ sap.ui.define([
 		// Cleanup
 		oComboBox.destroy();
 	});
+
+QUnit.test("Binding: ComboBox closes when binding context changes", async function(assert) {
+	// Prepare
+	var oModel = new JSONModel({
+		items: [
+			{ key: 1, text: "One" },
+			{ key: 2, text: "Two" },
+			{ key: 3, text: "Three" }
+		]
+	});
+
+	var oTable = new Table({
+		visibleRowCount: 2,
+		rows: "{/items}",
+		columns: [
+			new Column({
+				template: new ComboBox({
+					selectedKey: "{key}"
+				})
+			})
+		]
+	});
+
+	oTable.setModel(oModel);
+	oTable.placeAt("qunit-fixture");
+	await nextUIUpdate();
+
+	var oComboBox = oTable.getRows()[0].getCells()[0];
+
+	// Act - Open the ComboBox
+	oComboBox.open();
+	await nextUIUpdate();
+
+	var oPicker = oComboBox.getPicker();
+
+	// Assert picker is open
+	assert.ok(oPicker.isOpen(), "ComboBox picker is initially open");
+
+	// Act - Change the binding context
+	var oNewContext = oModel.getContext("/items/2");
+	oComboBox.setBindingContext(oNewContext);
+	await nextUIUpdate();
+
+	// Assert - ComboBox picker should close
+	assert.notOk(oPicker.isOpen(), "ComboBox closes when binding context changes");
+
+	// Cleanup
+	oComboBox.destroy();
+	oTable.destroy();
+});
 
 	QUnit.test("Bindings: selectedKey + No Value: should set the value to the matching item", async function (assert) {
 		// Setup
@@ -14040,6 +14141,42 @@ sap.ui.define([
 		fnRunAllTimersAndRestore(this.clock);
 	});
 
+	QUnit.test("Arrow toggles picker and focus stays on input", async function (assert) {
+		const oComboBox = new ComboBox({
+			items: [
+				new Item({ key: "1", text: "One" }),
+				new Item({ key: "2", text: "Two" })
+			]
+		});
+
+		oComboBox.placeAt("content");
+		await nextUIUpdate(this.clock);
+
+		// Act 1 — click arrow to open
+		oComboBox._handlePopupOpenAndItemsLoad(true);
+		await nextUIUpdate(this.clock);
+
+		const oPicker = oComboBox.getPicker();
+		assert.ok(oPicker.isOpen(), "Picker opens after clicking arrow");
+
+		// Act 2 — click arrow again to close
+		oComboBox._bShouldClosePicker = true;
+		oComboBox._handlePopupOpenAndItemsLoad(false);
+		await nextUIUpdate(this.clock);
+
+		assert.notOk(oPicker.isOpen(), "Picker closes after clicking arrow again");
+
+		// Assert 3 — input should keep focus
+		assert.strictEqual(
+			document.activeElement,
+			oComboBox.getFocusDomRef(),
+			"Focus remains on the ComboBox input after closing"
+		);
+
+		// Cleanup
+		oComboBox.destroy();
+	});
+
 	QUnit.test("it should load the items asynchronous when the End key is pressed and afterwards process the event", async function (assert) {
 		this.clock = sinon.useFakeTimers();
 		var done = assert.async();
@@ -14254,6 +14391,80 @@ sap.ui.define([
 
 		this.clock.runToLast();
 		this.clock.restore(); // Restore the normal timers because "dataReceived" function will timeout otherwise
+	});
+
+	QUnit.test("ComboBox with async items should NOT close picker on context change", async function (assert) {
+		this.clock = sinon.useFakeTimers();
+
+		const oModel = new JSONModel({
+			rows: [{ id: 1 }]
+		});
+
+		const oItemsModel = new JSONModel();
+		const iAutoRespondAfter = 10;
+
+		function fakeAsyncLoadItems() {
+			setTimeout(() => {
+				oItemsModel.setData({
+					items: [
+						{ key: 10, text: "Async One" },
+						{ key: 11, text: "Async Two" }
+					]
+				});
+			}, iAutoRespondAfter);
+		}
+
+		// ComboBox with async loading
+		const oComboBoxTemplate = new ComboBox({
+			items: {
+				path: "itemsModel>/items",
+				template: new Item({
+					key: "{itemsModel>key}",
+					text: "{itemsModel>text}"
+				})
+			},
+			loadItems: fakeAsyncLoadItems
+		});
+
+		// Table containing the ComboBox
+		const oTable = new Table({
+			visibleRowCount: 1,
+			rows: "{/rows}",
+			columns: [
+				new Column({
+					template: oComboBoxTemplate
+				})
+			]
+		});
+
+		oTable.setModel(oModel);
+		oTable.setModel(oItemsModel, "itemsModel");
+		oTable.placeAt("qunit-fixture");
+		await nextUIUpdate(this.clock);
+
+		const oComboBox = oTable.getRows()[0].getCells()[0];
+
+		oComboBox.open();
+		await nextUIUpdate(this.clock);
+		assert.ok(oComboBox.isOpen(), "Picker is open before async load");
+
+		oComboBox.loadItems();
+		// tick the clock ahead some ms millisecond (it should be at least more than the auto respond setting
+		// to make sure that the data from the OData model is available)
+		this.clock.tick(iAutoRespondAfter + 5);
+		await nextUIUpdate(this.clock);
+
+		assert.equal(oComboBox.getItems().length, 2, "Items loaded asynchronously");
+		assert.ok(oComboBox.hasLoadItemsEventListeners(), "ComboBox reports having loadItems listeners");
+
+		const oNewContext = oModel.getContext("/rows/0");
+		oComboBox.setBindingContext(oNewContext);
+		await nextUIUpdate(this.clock);
+
+		assert.ok(oComboBox.isOpen(), "Picker stays open when context changes during async load");
+
+		this.clock.restore();
+		oTable.destroy();
 	});
 
 	QUnit.module("General Interaction", {
