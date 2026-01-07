@@ -375,6 +375,38 @@ sap.ui.define([
 				"The New color box has correct tooltip text.");
 		});
 
+		QUnit.test("Color mode change announcement", async function (oAssert) {
+			var oRB = Library.getResourceBundleFor("sap.ui.unified");
+			var sExpectedAnnouncement;
+
+			// Arrange
+			this.oCP.setColorString("rgb(255,0,0)"); // Red color
+			await nextUIUpdate();
+
+			// Assert
+			sExpectedAnnouncement = oRB.getText("COLORPICKER_COLOR_MODE_CHANGED", ["RGB", "Red 255, Green 0, Blue 0, Alpha 1"]);
+			oAssert.strictEqual(sExpectedAnnouncement, this.oCP._getColorFieldsAnnouncementText("RGB"),
+				"The text announced on color mode change is correct.");
+
+			// Act - change color mode to HSV (default)
+			this.oCP._toggleFields();
+			await nextUIUpdate();
+
+			// Assert
+			sExpectedAnnouncement = oRB.getText("COLORPICKER_COLOR_MODE_CHANGED", ["HSV", "Hue 0, Saturation 100 Percentage, Value 100, Alpha 1"]);
+			oAssert.strictEqual(sExpectedAnnouncement, this.oCP._getColorFieldsAnnouncementText("HSV"),
+				"The text announced on color mode change is correct.");
+
+			// Act - set color mode to HSL
+			this.oCP.setMode(ColorPickerMode.HSL);
+			await nextUIUpdate();
+
+			// Assert
+			sExpectedAnnouncement = oRB.getText("COLORPICKER_COLOR_MODE_CHANGED", ["HSL", "Hue 0, Saturation 100 Percentage, Lightness 50 Percentage, Alpha 1"]);
+			oAssert.strictEqual(sExpectedAnnouncement, this.oCP._getColorFieldsAnnouncementText("HSL"),
+				"The text announced on color mode change is correct.");
+		});
+
 		QUnit.module("Private methods", {
 			beforeEach: function () {
 				this.oCP = new ColorPicker();

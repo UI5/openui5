@@ -197,6 +197,7 @@ sap.ui.define([
 		this._oAwaitedEvents = new Set();
 		this._bReady = false;
 		this._mObservers = {};
+		this._bChildCardOpenedInDialog = false;
 
 		this.setAggregation("_loadingProvider", new LoadingProvider());
 		this.awaitEvent("_dataReady");
@@ -276,6 +277,8 @@ sap.ui.define([
 			this._oOverflowHandler.destroy();
 			this._oOverflowHandler = null;
 		}
+
+		this._bChildCardOpenedInDialog = false;
 	};
 
 	/**
@@ -305,11 +308,12 @@ sap.ui.define([
 
 	/**
 	 * Called when card is opened inside a dialog as a result of Pagination or Show More action.
-	 * To be implemented by subclasses.
-	 * @virtual
 	 * @protected
 	 */
-	BaseContent.prototype.onOpenInDialog = function () { };
+	BaseContent.prototype.onOpenInDialog = function () {
+		this._bChildCardOpenedInDialog = true;
+		this.adjustLoadingPlaceholderWidth();
+	};
 
 	BaseContent.prototype.setLoadDependenciesPromise = function (oPromise) {
 		this._pLoadDependencies = oPromise;
@@ -318,6 +322,20 @@ sap.ui.define([
 		this._pLoadDependencies.then(function () {
 			this.fireEvent("_loadDependencies");
 		}.bind(this));
+	};
+
+
+	/**
+	 * Adjusts the loading placeholder width to match the content width when the card is opened in a dialog.
+	 * @private
+	 */
+	BaseContent.prototype.adjustLoadingPlaceholderWidth = function () {
+		const oChildCard = this.getCardInstance();
+		const oContentLoadingPlaceHolder = this.getAggregation("_loadingPlaceholder");
+
+		if (oChildCard && this?.getDomRef() && oContentLoadingPlaceHolder) {
+			oContentLoadingPlaceHolder.setWidth(this.getDomRef().getBoundingClientRect().width + "px");
+		}
 	};
 
 	BaseContent.prototype.getLoadDependenciesPromise = function () {
@@ -683,6 +701,9 @@ sap.ui.define([
 			return;
 		}
 
+		if (this._bChildCardOpenedInDialog) {
+			this.adjustLoadingPlaceholderWidth();
+		}
 		var oLoadingProvider = this.getAggregation("_loadingProvider"),
 			oCard = this.getCardInstance();
 

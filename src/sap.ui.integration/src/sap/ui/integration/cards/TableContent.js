@@ -190,6 +190,8 @@ sap.ui.define([
 	 * @override
 	 */
 	TableContent.prototype.onOpenInDialog = function () {
+		BaseListContent.prototype.onOpenInDialog.apply(this, arguments);
+
 		const oTable = this._getTable();
 		oTable.setWidth("auto");
 		oTable.setFixedLayout(false);

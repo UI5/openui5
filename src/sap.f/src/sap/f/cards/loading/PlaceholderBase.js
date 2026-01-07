@@ -44,7 +44,13 @@ sap.ui.define([
 				 * @private
 				 * @ui5-restricted sap.f.cards.loading.PlaceholderBase
 				 */
-				hasContent: { type: "boolean", defaultValue: true}
+				hasContent: { type: "boolean", defaultValue: true},
+
+				/**
+				 * Width of the placeholder
+				 * @public
+				 */
+				width: { type: "sap.ui.core.CSSSize", defaultValue: "" }
 			}
 		},
 

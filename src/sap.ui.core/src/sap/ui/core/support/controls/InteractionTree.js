@@ -132,6 +132,9 @@ sap.ui.define([
               interactions = this.interactions;
 
           if (!interactions || !interactions.length) {
+             rm.close("ul");
+             rm.close("div");
+
              return;
           }
 

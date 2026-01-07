@@ -260,7 +260,6 @@ sap.ui.define([
 	 *
 	 * @param {sap.ui.core.Control} oElement - The Control that gets rendered by the RenderManager
 	 * @param {object} mAriaProps - The mapping of "aria-" prefixed attributes
-	 * @protected
 	 */
 	OverflowToolbar.prototype.enhanceAccessibilityState = function (oElement, mAriaProps) {
 		Toolbar.prototype.enhanceAccessibilityState.apply(this, arguments);

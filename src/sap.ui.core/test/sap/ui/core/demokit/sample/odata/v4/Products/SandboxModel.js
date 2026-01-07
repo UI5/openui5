@@ -40,9 +40,6 @@ sap.ui.define([
 				}]
 			},
 			aRegExps : [{
-				regExp : /^GET [\w\/]+\/zui5_epm_sample\/0002\/\$metadata\?custom-option=value\&sap-language=..$/,
-				response : {source : "metadata.xml"}
-			}, {
 				regExp : /^GET [\w\/]+\/common\/0001\/\$metadata\?sap-language=..$/,
 				response : {source : "common_metadata.xml"}
 			}, {

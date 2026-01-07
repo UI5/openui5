@@ -53,7 +53,12 @@
 		{
 			"control": "sap.m.Carousel",
 			"url": "../CarouselLessPages.html",
-			"appComponent": "CA-UI5-CTR-ROD"
+			"appComponent": "CA-UI5-CTR-ROD",
+			"accTest": {
+				"name": "sap.m.Carousel",
+				"title": "ACC test for sap.m.Carousel",
+				"module": "./carousel.qunit"
+			}
 		},
 		{
 			"control": "sap.m.CheckBox",

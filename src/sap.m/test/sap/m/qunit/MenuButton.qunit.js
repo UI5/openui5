@@ -872,6 +872,7 @@ sap.ui.define([
 		oSplitButton.onsapup(oEvent);
 		assert.ok(fnArrowButtonPress.calledOnce, "Arrow button press fired for onsapup");
 		assert.ok(fnHandleButtonPress.calledOnce, "_handleButtonPress called after onsapup");
+		assert.equal(fnPreventDefaultSpy.callCount, 1, "'preventDefault' called after onsapup event");
 
 		fnArrowButtonPress.resetHistory();
 		fnHandleButtonPress.resetHistory();
@@ -880,6 +881,7 @@ sap.ui.define([
 		oSplitButton.onsapdown(oEvent);
 		assert.ok(fnArrowButtonPress.calledOnce, "Arrow button press fired for onsapdown");
 		assert.ok(fnHandleButtonPress.calledOnce, "_handleButtonPress called after onsapdown");
+		assert.equal(fnPreventDefaultSpy.callCount, 2, "'preventDefault' called after onsapdown event");
 
 		fnArrowButtonPress.resetHistory();
 		fnHandleButtonPress.resetHistory();
@@ -888,6 +890,7 @@ sap.ui.define([
 		oSplitButton.onsapupmodifiers(oEvent);
 		assert.ok(fnArrowButtonPress.calledOnce, "Arrow button press fired for onsapupmodifiers");
 		assert.ok(fnHandleButtonPress.calledOnce, "_handleButtonPress called after onsapupmodifiers");
+		assert.equal(fnPreventDefaultSpy.callCount, 3, "'preventDefault' called after onsapupmodifiers event");
 
 		fnArrowButtonPress.resetHistory();
 		fnHandleButtonPress.resetHistory();
@@ -897,6 +900,7 @@ sap.ui.define([
 		assert.ok(fnArrowButtonPress.calledOnce, "Arrow button press fired for onsapdownmodifiers");
 		assert.ok(fnHandleButtonPress.calledOnce, "_handleButtonPress called after onsapdownmodifiers");
 		assert.equal(fnStopPropagationSpy.callCount, 1, "'stopImmediatePropagation' called after onsapdownmodifiers event");
+		assert.equal(fnPreventDefaultSpy.callCount, 4, "'preventDefault' called after onsapdownmodifiers event");
 
 		fnArrowButtonPress.resetHistory();
 		fnHandleButtonPress.resetHistory();
@@ -906,7 +910,7 @@ sap.ui.define([
 		assert.ok(fnArrowButtonPress.calledOnce, "Arrow button press fired for onsapshow");
 		assert.ok(fnHandleButtonPress.calledOnce, "_handleButtonPress called after onsapshow");
 
-		assert.equal(fnPreventDefaultSpy.callCount, 1, "'preventDefault' called after onsapshow event");
+		assert.equal(fnPreventDefaultSpy.callCount, 5, "'preventDefault' called after onsapshow event");
 
 		// Cleanup
 		fnPreventDefaultSpy.restore();
@@ -1319,7 +1323,11 @@ sap.ui.define([
 		var oSplitButtonMain = this.sut._getTextButton(),
 			oSplitButtonArrow = this.sut._getArrowButton(),
 			oSpyTextButtonPress = this.spy(oSplitButtonMain, "firePress"),
-			oSpyArrowButtonPress = this.spy(oSplitButtonArrow, "firePress");
+			oSpyArrowButtonPress = this.spy(oSplitButtonArrow, "firePress"),
+			oEvent = {
+				preventDefault: function() {},
+				stopImmediatePropagation: function() {}
+			};
 
 		this.sut.placeAt("qunit-fixture");
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
@@ -1354,39 +1362,139 @@ sap.ui.define([
 		assert.notOk(oSplitButtonMain.$("inner").hasClass("sapMBtnActive"), "the main button is not active");
 
 		//Act
-		this.sut.onsapup();
+		this.sut.onsapup(oEvent);
 
 		//Assert
 		assert.strictEqual(oSpyTextButtonPress.callCount, 2, "Main button firePress not called");
 		assert.strictEqual(oSpyArrowButtonPress.callCount, 1, "Arrow button firePress called");
 
 		//Act
-		this.sut.onsapdown();
+		this.sut.onsapdown(oEvent);
 
 		//Assert
 		assert.strictEqual(oSpyTextButtonPress.callCount, 2, "Main button firePress not called");
 		assert.strictEqual(oSpyArrowButtonPress.callCount, 2, "Arrow button firePress called");
 
 		//Act
-		this.sut.onsapupmodifiers();
+		this.sut.onsapupmodifiers(oEvent);
 
 		//Assert
 		assert.strictEqual(oSpyTextButtonPress.callCount, 2, "Main button firePress not called");
 		assert.strictEqual(oSpyArrowButtonPress.callCount, 3, "Arrow button firePress called");
 
 		//Act
-		this.sut.onsapdownmodifiers({ stopImmediatePropagation: function() {} });
+		this.sut.onsapdownmodifiers(oEvent);
 
 		//Assert
 		assert.strictEqual(oSpyTextButtonPress.callCount, 2, "Main button firePress not called");
 		assert.strictEqual(oSpyArrowButtonPress.callCount, 4, "Arrow button firePress called");
 
 		//Act
-		this.sut.onsapshow({ preventDefault: function() {} });
+		this.sut.onsapshow(oEvent);
 
 		//Assert
 		assert.strictEqual(oSpyTextButtonPress.callCount, 2, "Main button firePress not called");
 		assert.strictEqual(oSpyArrowButtonPress.callCount, 5, "Arrow button firePress called");
+	});
+
+	QUnit.test("Keyboard handling", function(assert) {
+		var oSplitButtonMain = this.sut._getTextButton(),
+			oSplitButtonArrow = this.sut._getArrowButton(),
+			oSpyTextButtonPress = this.spy(oSplitButtonMain, "firePress"),
+			oSpyArrowButtonPress = this.spy(oSplitButtonArrow, "firePress"),
+			oEvent = {
+				preventDefault: function() {},
+				stopImmediatePropagation: function() {}
+			};
+
+		this.sut.placeAt("qunit-fixture");
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		//Act
+		this.keydown(KeyCodes.ENTER);
+
+		//Assert
+		assert.strictEqual(oSpyTextButtonPress.callCount, 1, "Main button firePress called");
+		assert.ok(oSplitButtonMain.$("inner").hasClass("sapMBtnActive"), "the main button is styled as active");
+
+		//Act
+		this.keyup(KeyCodes.ENTER);
+
+		//Assert
+		assert.strictEqual(oSpyTextButtonPress.callCount, 1, "Main button firePress called");
+		assert.notOk(oSplitButtonMain.$("inner").hasClass("sapMBtnActive"), "the main button is not active");
+
+		//Act
+		this.keydown(KeyCodes.SPACE);
+
+		//Assert
+		assert.strictEqual(oSpyTextButtonPress.callCount, 1, "Main button firePress called");
+		assert.ok(oSplitButtonMain.$("inner").hasClass("sapMBtnActive"), "the main button is styled as active");
+
+		//Act
+		this.keyup(KeyCodes.SPACE);
+
+		//Assert
+		assert.strictEqual(oSpyTextButtonPress.callCount, 2, "Main button firePress called");
+		assert.ok(!oSpyArrowButtonPress.called, "Arrow button firePress not called");
+		assert.notOk(oSplitButtonMain.$("inner").hasClass("sapMBtnActive"), "the main button is not active");
+
+		//Act
+		this.sut.onsapup(oEvent);
+
+		//Assert
+		assert.strictEqual(oSpyTextButtonPress.callCount, 2, "Main button firePress not called");
+		assert.strictEqual(oSpyArrowButtonPress.callCount, 1, "Arrow button firePress called");
+
+		//Act
+		this.sut.onsapdown(oEvent);
+
+		//Assert
+		assert.strictEqual(oSpyTextButtonPress.callCount, 2, "Main button firePress not called");
+		assert.strictEqual(oSpyArrowButtonPress.callCount, 2, "Arrow button firePress called");
+
+		//Act
+		this.sut.onsapupmodifiers(oEvent);
+
+		//Assert
+		assert.strictEqual(oSpyTextButtonPress.callCount, 2, "Main button firePress not called");
+		assert.strictEqual(oSpyArrowButtonPress.callCount, 3, "Arrow button firePress called");
+
+		//Act
+		this.sut.onsapdownmodifiers(oEvent);
+
+		//Assert
+		assert.strictEqual(oSpyTextButtonPress.callCount, 2, "Main button firePress not called");
+		assert.strictEqual(oSpyArrowButtonPress.callCount, 4, "Arrow button firePress called");
+
+		//Act
+		this.sut.onsapshow(oEvent);
+
+		//Assert
+		assert.strictEqual(oSpyTextButtonPress.callCount, 2, "Main button firePress not called");
+		assert.strictEqual(oSpyArrowButtonPress.callCount, 5, "Arrow button firePress called");
+
+		// Test when button is disabled
+		this.sut.setEnabled(false);
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		var oSpyFireKeyboardArrowPress = this.spy(this.sut, "_fireKeyboardArrowPress");
+		var oSpyPreventDefault = this.spy(oEvent, "preventDefault");
+
+		//Act - try keyboard actions on disabled button
+		this.sut.onsapup(oEvent);
+		this.sut.onsapdown(oEvent);
+		this.sut.onsapupmodifiers(oEvent);
+		this.sut.onsapdownmodifiers(oEvent);
+		this.sut.onsapshow(oEvent);
+
+		//Assert - verify nothing was triggered
+		assert.strictEqual(oSpyFireKeyboardArrowPress.callCount, 0, "_fireKeyboardArrowPress not called when button is disabled");
+		assert.strictEqual(oSpyPreventDefault.callCount, 0, "preventDefault not called when button is disabled");
+
+		// Cleanup
+		oSpyFireKeyboardArrowPress.restore();
+		oSpyPreventDefault.restore();
 	});
 
 	QUnit.module("Other");

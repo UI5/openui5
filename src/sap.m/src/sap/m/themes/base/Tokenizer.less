@@ -145,8 +145,12 @@
 	min-width: 5rem;
 	max-width: 40rem;
 
-	.sapMListUl > .sapMLIB.sapMSLIWrapping {
-		min-height: 2.5rem;
+	.sapMListUl > .sapMLIB {
+		border-bottom: none;
+
+		&.sapMSLIWrapping {
+			min-height: 2.5rem;
+		}
 	}
 
 	.sapMSLIWrapping > .sapMLIBContent > .sapMSLIDiv {

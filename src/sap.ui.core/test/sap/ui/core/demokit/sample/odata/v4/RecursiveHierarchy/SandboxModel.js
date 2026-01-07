@@ -14,37 +14,34 @@ sap.ui.define([
 			sFilterBase : "/sap/opu/odata4/IWBEP/TEA/default/IWBEP/TEA_BUSI/0001/",
 			mFixture : {},
 			aRegExps : [{
-				regExp : /^GET \/sap\/opu\/odata4\/IWBEP\/TEA\/default\/IWBEP\/TEA_BUSI\/0001\/EMPLOYEES\/\$count.*$/,
+				regExp : /^GET [\w\/]+\/EMPLOYEES\/\$count.*$/,
 				response : {buildResponse : buildCountResponse}
 			}, {
-				regExp : /^DELETE \/sap\/opu\/odata4\/IWBEP\/TEA\/default\/IWBEP\/TEA_BUSI\/0001\/EMPLOYEES\('([^']*)'\)$/,
+				regExp : /^DELETE [\w\/]+\/EMPLOYEES\('([^']*)'\)$/,
 				response : {buildResponse : buildDeleteResponse, code : 204}
 			}, {
-				regExp : /^GET [\w\/.]+\$metadata([\w?&\-=]+sap-language=..|)$/,
-				response : {source : "metadata.xml"}
-			}, {
-				regExp : /^GET \/sap\/opu\/odata4\/IWBEP\/TEA\/default\/IWBEP\/TEA_BUSI\/0001\/EMPLOYEES\?(.*)$/,
+				regExp : /^GET [\w\/]+\/EMPLOYEES\?(.*)$/,
 				response : {buildResponse : buildGetCollectionResponse}
 			}, {
-				regExp : /^GET \/sap\/opu\/odata4\/IWBEP\/TEA\/default\/IWBEP\/TEA_BUSI\/0001\/EMPLOYEES\('([^']*)'\)\?(.*)$/,
+				regExp : /^GET [\w\/]+\/EMPLOYEES\('([^']*)'\)\?(.*)$/,
 				response : {buildResponse : buildGetSingleResponse}
 			}, {
-				regExp : /^PATCH \/sap\/opu\/odata4\/IWBEP\/TEA\/default\/IWBEP\/TEA_BUSI\/0001\/EMPLOYEES\('([^']*)'\)$/,
+				regExp : /^PATCH [\w\/]+\/EMPLOYEES\('([^']*)'\)$/,
 				response : {buildResponse : buildPatchResponse, code : 204}
 			}, {
-				regExp : /^PATCH \/sap\/opu\/odata4\/IWBEP\/TEA\/default\/IWBEP\/TEA_BUSI\/0001\/\$.*/,
+				regExp : /^PATCH [\w\/]+\/\$.*/,
 				response : {buildResponse : buildPatchResponse, code : 204}
 			}, {
-				regExp : /^POST \/sap\/opu\/odata4\/IWBEP\/TEA\/default\/IWBEP\/TEA_BUSI\/0001\/EMPLOYEES$/,
+				regExp : /^POST [\w\/]+\/EMPLOYEES$/,
 				response : {buildResponse : buildPostResponse}
 			}, {
-				regExp : /^POST \/sap\/opu\/odata4\/IWBEP\/TEA\/default\/IWBEP\/TEA_BUSI\/0001\/\$.*\/com\.sap\.gateway\.default\.iwbep\.tea_busi\.v0001\.__FAKE__AcChangeNextSibling$/,
+				regExp : /^POST [\w\/]+\/\$.*\/.*__FAKE__AcChangeNextSibling$/,
 				response : {buildResponse : buildChangeNextSiblingResponse}
 			}, {
-				regExp : /^POST \/sap\/opu\/odata4\/IWBEP\/TEA\/default\/IWBEP\/TEA_BUSI\/0001\/EMPLOYEES\('([^']*)'\)\/com\.sap\.gateway\.default\.iwbep\.tea_busi\.v0001\.__FAKE__AcChangeNextSibling$/,
+				regExp : /^POST [\w\/]+\/EMPLOYEES\('([^']*)'\)\/.*__FAKE__AcChangeNextSibling$/,
 				response : {buildResponse : buildChangeNextSiblingResponse}
 			}, {
-				regExp : /^POST \/sap\/opu\/odata4\/IWBEP\/TEA\/default\/IWBEP\/TEA_BUSI\/0001\/EMPLOYEES\('([^']*)'\)\/com\.sap\.gateway\.default\.iwbep\.tea_busi\.v0001\.__FAKE___AcCopy\?\$select=ID$$/,
+				regExp : /^POST [\w\/]+\/EMPLOYEES\('([^']*)'\)\/.*__FAKE___AcCopy\?\$select=ID$$/,
 				response : {buildResponse : buildCopyResponse}
 			}],
 			sSourceBase : "sap/ui/core/sample/odata/v4/RecursiveHierarchy/data"

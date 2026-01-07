@@ -113,10 +113,7 @@ sap.ui.define([
 			sFilterBase : "/sap/opu/odata4/IWBEP/TEA/default/IWBEP/TEA_BUSI/0001/",
 			mFixture : {
 			},
-			aRegExps : [{
-				regExp : /^GET [\w\/.]+\$metadata[\w?&\-=]+sap-language=..$/,
-				response : {source : "metadata.xml"}
-			}],
+			aRegExps : [],
 			sSourceBase : "sap/ui/core/sample/odata/v4/GridTable/data"
 		},
 		iRevision = 0,

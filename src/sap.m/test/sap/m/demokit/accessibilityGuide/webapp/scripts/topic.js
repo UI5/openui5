@@ -8,6 +8,7 @@
 	}, false);
 
 	resolveDemokitLinks();
+	setupLinkHandlers();
 
 	function resolveDemokitLinks() {
 		var aLinks = document.getElementsByTagName("a"),
@@ -36,5 +37,29 @@
 		}
 
 		return sDemokitUrl + "#" + sUrl;
+	}
+
+	function setupLinkHandlers() {
+		const aLinks = document.querySelectorAll('a[href^="#"]');
+
+		for (let i = 0; i < aLinks.length; i++) {
+			const oLink = aLinks[i];
+
+			oLink.addEventListener("click", function(event) {
+				const sHref = this.getAttribute("href");
+
+				if (sHref && sHref.startsWith("#")) {
+					const sTargetId = sHref.substring(1);
+					const oHeading = document.getElementById(sTargetId);
+
+					if (oHeading && window.parent && window.parent !== window) {
+						window.parent.postMessage({
+							channel: "updateURL",
+							targetId: sTargetId
+						}, window.location.origin);
+					}
+				}
+			});
+		}
 	}
 })();

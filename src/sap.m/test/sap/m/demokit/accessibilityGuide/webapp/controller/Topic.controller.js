@@ -1,9 +1,11 @@
 sap.ui.define([
 	"sap/ui/demo/accessibilityGuide/controller/BaseController",
-	"../util/LibLoading"
+	"../util/LibLoading",
+	"../model/OverviewNavigationModel"
 ], function (
 	BaseController,
-	LibLoading
+	LibLoading,
+	OverviewNavigationModel
 ) {
 	"use strict";
 
@@ -17,11 +19,12 @@ sap.ui.define([
 		},
 
 		/**
-		 * Adds event listener for "bootFinished" event of the topic iframe.
-		 * Only handles initial loading of the iframe.
+		 * Adds event listener for messages from the topic iframe.
+		 * Handles both initial loading and URL updates from TOC links.
 		 */
 		onFrameSourceChange: function () {
-			window.addEventListener("message", this._fnOnFrameMessageHandler, { once: true });
+			window.removeEventListener("message", this._fnOnFrameMessageHandler);
+			window.addEventListener("message", this._fnOnFrameMessageHandler);
 		},
 
 		onExit: function () {
@@ -32,8 +35,33 @@ sap.ui.define([
 		_onFrameMessage: function (oEvent) {
 			if (oEvent.data === "bootFinished") {
 				this._onFrameLoaded();
+			} else if (oEvent.data.channel === "updateURL") {
+				this._updateURLHash(oEvent.data.targetId);
 			}
 		},
+
+		_updateURLHash: function (sTargetId) {
+			const oRouter = this.getRouter();
+			const sCurrentHash = oRouter.getHashChanger().getHash();
+			const oRouteInfo = oRouter.getRouteInfoByHash(sCurrentHash);
+
+			if (!oRouteInfo || !oRouteInfo.name) {
+				return;
+			}
+
+			const oArgs = oRouteInfo.arguments || {};
+			const mNewArgs = {
+				topic: oArgs.topic,
+				id: sTargetId
+			};
+
+			if (oArgs.subTopic && this.isSubTopic(oArgs.subTopic)) {
+				mNewArgs.subTopic = oArgs.subTopic;
+			}
+
+			oRouter.navTo(oRouteInfo.name, mNewArgs, true);
+		},
+
 		onBeforeRendering: function() {
 			if (!LibLoading.bCommonsLibAvailable) {
 				this.getView().addStyleClass("sapSuiteUiCommonsView");
@@ -73,6 +101,21 @@ sap.ui.define([
 			}
 
 			return null;
+		},
+
+		/**
+		 * Checks if the given key is subtopic key
+		 * @param {string} sKey The key to check
+		 * @returns {boolean} True if the key is a subtopic
+		 */
+		isSubTopic: function (sKey) {
+			const aNavEntries = OverviewNavigationModel.getProperty('/navigation');
+
+			return aNavEntries.some(function (oNavEntry) {
+				return oNavEntry.items && oNavEntry.items.some(function (oSubEntry) {
+					return oSubEntry.key === sKey;
+				});
+			});
 		}
 	});
 

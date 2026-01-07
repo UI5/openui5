@@ -534,6 +534,60 @@ sap.ui.define([
 		assert.ok(oDialog.isOpen(), "Dialog is open");
 	});
 
+	QUnit.module("Child card - loading placeholder", {
+		beforeEach: function () {
+			this.oHost = new Host({
+				resolveDestination: function (sName) {
+					switch (sName) {
+						case "Northwind_V4":
+							return Promise.resolve("https://services.odata.org/V4/Northwind/Northwind.svc");
+						default:
+							return null;
+					}
+				}
+			});
+		},
+		afterEach: function () {
+			this.oHost.destroy();
+		}
+	});
+
+	QUnit.test("Loading placeholder should have width when card opens in dialog", async function (assert) {
+		// Arrange
+		const oCard = new Card({
+			host: this.oHost,
+			manifest: "test-resources/sap/ui/integration/qunit/manifests/showCardHeader/manifest.json"
+		});
+		oCard.placeAt(DOM_RENDER_LOCATION);
+
+		await nextCardReadyEvent(oCard);
+		await nextUIUpdate();
+
+		// Act
+		const oButton = oCard.getCardFooter().getAggregation("_showMore");
+		oButton.firePress();
+		const oDialog = oCard.getDependents()[0];
+		await nextDialogAfterOpenEvent(oDialog);
+		await nextUIUpdate();
+
+		// Assert - check loading placeholder has width set
+		const oChildCard = oDialog.getContent()[0];
+		const oContent = oChildCard.getCardContent();
+		const oLoadingPlaceholder = oContent.getAggregation("_loadingPlaceholder");
+
+		oChildCard.refresh();
+
+		await nextCardReadyEvent(oChildCard);
+		await nextUIUpdate();
+
+		// Assert - check loading placeholder still has width after refresh
+		const sWidthAfterRefresh = oLoadingPlaceholder.getWidth();
+		assert.strictEqual(sWidthAfterRefresh, oChildCard.getCardContent().getDomRef().offsetWidth + "px","Loading placeholder has width property set after refresh");
+
+		// Clean up
+		oCard.destroy();
+	});
+
 	QUnit.module("Dialog Header", {
 		beforeEach: function () {
 			this.oHost = new Host({

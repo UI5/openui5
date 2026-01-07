@@ -582,9 +582,6 @@ sap.ui.define([
 				}
 			},
 			aRegExps : [{
-				regExp : /^GET [\w\/]+\/zui5_epm_sample\/0002\/\$metadata\?custom-option=value\&sap-language=..$/,
-				response : {source : "metadata.xml"}
-			}, {
 				regExp : /^GET [-\w\/;='.]+\.ET-SALESORDER.CURRENCY_CODE'\/\$metadata\?sap-language=..$/,
 				response : {source : "VH_CurrencyCode.xml"}
 			}, {

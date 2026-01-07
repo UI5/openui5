@@ -27,9 +27,6 @@ sap.ui.define([
 				}
 			},
 			aRegExps : [{
-				regExp : /^GET [\w\/]+\/zui5_epm_sample\/0002\/\$metadata\?sap-language=..$/,
-				response : {source : "metadata.xml"}
-			}, {
 				regExp : /^GET [-\w\/;='.]+\.ET-BUSINESSPARTNER.BP_ROLE'\/\$metadata\?sap-language=..$/,
 				response : {source : "metadata_bp_role.xml"}
 			}, {

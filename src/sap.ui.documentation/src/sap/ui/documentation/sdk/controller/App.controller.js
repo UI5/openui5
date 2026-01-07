@@ -457,20 +457,37 @@ sap.ui.define([
 		_updateMessagesModel: function(oMessagesData) {
 			var oMessageCookie = this._oConfigUtil.getCookieValue(this._oCookieNames.DEMOKIT_IMPORTANT_MESSAGES_READ),
 				iVisibleMessagesCount = 0,
-				sFullVersion = this._getFullVersion(),
+				sCurrURL,
+				sFullVersion,
 				sRegExpValidator;
 
-			oMessagesData.messages.length && oMessagesData.messages.forEach(function(message) {
-				message.isMessageVisible = message.mandatory || ((new Date(message.expire).getTime() - new Date()) > 0 &&
-					!oMessageCookie.includes(message.id));
+			if (oMessagesData.messages.length) {
+				sCurrURL = this._getCurrentURL();
+				sFullVersion = this._getFullVersion();
+				oMessagesData.messages.forEach(function(message) {
+					var bExpired = !!message.expire && (new Date().getTime() - new Date(message.expire).getTime()) > 0,
+						bPostponed = !!message.postpone && (new Date(message.postpone).getTime() - new Date()) > 0;
 
-					if (message.isMessageVisible && message.versionValidator) {
-						sRegExpValidator = new RegExp(message.versionValidator);
-						message.isMessageVisible = sRegExpValidator.test(sFullVersion);
+					message.isMessageVisible = message.mandatory || (
+						!bPostponed &&
+						!bExpired &&
+						!oMessageCookie.includes(message.id));
+
+						if (message.isMessageVisible && message.versionValidator) {
+							sRegExpValidator = new RegExp(message.versionValidator);
+							message.isMessageVisible = sRegExpValidator.test(sFullVersion);
+						}
+
+						if (message.isMessageVisible && message.urlValidator) {
+							sRegExpValidator = new RegExp(message.urlValidator);
+							message.isMessageVisible = sRegExpValidator.test(sCurrURL);
+						}
+
+					if (message.isMessageVisible) {
+						iVisibleMessagesCount++;
 					}
-
-				message.isMessageVisible && iVisibleMessagesCount++;
-			});
+				});
+			}
 
 			oMessagesData.iVisibleMessagesCount = iVisibleMessagesCount;
 

@@ -63,7 +63,9 @@ sap.ui.define([
 			 *   The base path for relative filter URLs in <code>oMockData.mFixture</code>, see
 			 *   {@link sap.ui.test.TestUtils.setupODataV4Server}
 			 * @param {object[]} [oMockData.aRegExps]
-			 *   The regular expression array for {@link sap.ui.test.TestUtils.setupODataV4Server}
+			 *   The regular expression array for {@link sap.ui.test.TestUtils.setupODataV4Server};
+			 *   adds a regular expression for $metadata requests with "metadata.xml" as response
+			 *   source
 			 * @param {string} oMockData.sSourceBase
 			 *   The base path for <code>source</code> values in the <code>oMockData.mFixture</code>
 			 *   , see {@link sap.ui.test.TestUtils.setupODataV4Server}
@@ -75,13 +77,14 @@ sap.ui.define([
 					oSandbox;
 
 				if (!TestUtils.isRealOData()) {
-					oMockData.aRegExps ??= [{
-						regExp : /^GET [\w\/.]+\$metadata([\w?&\-=]+sap-language=..|)$/,
+					const aRegExps = oMockData.aRegExps?.slice() ?? [];
+					aRegExps.push({
+						regExp : /^GET [\w\/.]+\/\$metadata([\w?&\-=]+sap-language=..|)$/,
 						response : {source : "metadata.xml"}
-					}];
+					});
 					oSandbox = sinon.sandbox.create();
 					TestUtils.setupODataV4Server(oSandbox, oMockData.mFixture,
-						oMockData.sSourceBase, oMockData.sFilterBase, oMockData.aRegExps);
+						oMockData.sSourceBase, oMockData.sFilterBase, aRegExps);
 				}
 				oModel = new ODataModel(mModelParameters);
 				oModel.restoreSandbox = () => {

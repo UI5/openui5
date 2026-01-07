@@ -418,7 +418,11 @@ function(
 						 * All appointments with changed selected state.
 						 * @since 1.67.0
 						 */
-						appointments : {type : "sap.ui.unified.CalendarAppointment[]"}
+						appointments : {type : "sap.ui.unified.CalendarAppointment[]"},
+						/**
+						 * The original browser event.
+						 */
+						originalEvent: {type: "object"}
 
 					}
 				},
@@ -1352,7 +1356,8 @@ function(
 		var fnHandleAppointmentSelect = function(oEvent) {
 			this.fireAppointmentSelect({
 				appointment: oEvent.getParameter("appointment"),
-				appointments: oEvent.getParameter("appointments")
+				appointments: oEvent.getParameter("appointments"),
+				originalEvent: oEvent.getParameter("originalEvent")
 			});
 		};
 		var fnHandleAppointmentDrop = function(oEvent) {
