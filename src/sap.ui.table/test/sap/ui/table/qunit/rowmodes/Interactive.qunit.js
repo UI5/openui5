@@ -39,7 +39,7 @@ sap.ui.define([
 	const aDensities = ["sapUiSizeCozy", "sapUiSizeCompact", "sapUiSizeCondensed", undefined];
 
 	TableQUnitUtils.setDefaultSettings({
-		rowMode: new InteractiveRowMode(),
+		rowMode: new InteractiveRowMode({rowCount: 10}),
 		rows: {path: "/"}
 	});
 
@@ -427,6 +427,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Context menu", function(assert) {
+		const oAnnounceChangeSpy = sinon.spy(InvisibleMessage.prototype, "announce");
 		const oResizerDomRef = this.oTable.getDomRef("heightResizer");
 		const oMode = this.oTable.getRowMode();
 		oMode.setMaxRowCount(15);
@@ -446,6 +447,9 @@ sap.ui.define([
 		qutils.triggerMouseEvent(aMenuItems[0].getDomRef(), "click");
 		iRowCount--;
 		assert.equal(oMode.getActualRowCount(), iRowCount, "On menu item press row count decreases by 1");
+		assert.ok(oAnnounceChangeSpy.calledOnceWithExactly(TableUtils.getResourceText("TBL_RSZ_RESIZED", [iRowCount])),
+			"Resize is announced with the correct number of rows");
+		oAnnounceChangeSpy.resetHistory();
 
 		qutils.triggerMouseEvent(oResizerDomRef, "contextmenu");
 		assert.equal(aMenuItems[1].getText(), TableUtils.getResourceText("TBL_RSZ_ROW_DOWN"), "Item 2 has the correct text");
@@ -454,20 +458,31 @@ sap.ui.define([
 		qutils.triggerMouseEvent(aMenuItems[1].getDomRef(), "click");
 		iRowCount++;
 		assert.equal(oMode.getActualRowCount(), iRowCount, "On menu item press row count increases by 1");
+		assert.ok(oAnnounceChangeSpy.calledOnceWithExactly(TableUtils.getResourceText("TBL_RSZ_RESIZED", [iRowCount])),
+			"Resize is announced with the correct number of rows");
+		oAnnounceChangeSpy.resetHistory();
 
 		qutils.triggerMouseEvent(oResizerDomRef, "contextmenu");
 		assert.equal(aMenuItems[2].getText(), TableUtils.getResourceText("TBL_RSZ_MINIMIZE"), "Item 3 has the correct text");
 		assert.equal(aMenuItems[2].getShortcutText(), TableUtils.getResourceText("TBL_RSZ_MINIMIZE_SHORTCUT"),
 			"Item 3 has the correct shortcut text");
 		qutils.triggerMouseEvent(aMenuItems[2].getDomRef(), "click");
-		assert.equal(oMode.getActualRowCount(), oMode.getMinRowCount(), "On menu item press row count increases to minRowCount");
+		iRowCount = oMode.getMinRowCount();
+		assert.equal(oMode.getActualRowCount(), iRowCount, "On menu item press row count increases to minRowCount");
+		assert.ok(oAnnounceChangeSpy.calledOnceWithExactly(TableUtils.getResourceText("TBL_RSZ_RESIZED", [iRowCount])),
+			"Resize is announced with the correct number of rows");
+		oAnnounceChangeSpy.resetHistory();
 
 		qutils.triggerMouseEvent(oResizerDomRef, "contextmenu");
 		assert.equal(aMenuItems[3].getText(), TableUtils.getResourceText("TBL_RSZ_MAXIMIZE"), "Item 4 has the correct text");
 		assert.equal(aMenuItems[3].getShortcutText(), TableUtils.getResourceText("TBL_RSZ_MAXIMIZE_SHORTCUT"),
 			"Item 4 has the correct shortcut text");
 		qutils.triggerMouseEvent(aMenuItems[3].getDomRef(), "click");
-		assert.equal(oMode.getActualRowCount(), oMode.getMaxRowCount(), "On menu item press row count increases to maxRowCount");
+		iRowCount = oMode.getMaxRowCount();
+		assert.equal(oMode.getActualRowCount(), iRowCount, "On menu item press row count increases to maxRowCount");
+		assert.ok(oAnnounceChangeSpy.calledOnceWithExactly(TableUtils.getResourceText("TBL_RSZ_RESIZED", [iRowCount])),
+			"Resize is announced with the correct number of rows");
+		oAnnounceChangeSpy.restore();
 
 		assert.notOk(oResizerDomRef.classList.contains("sapUiTableHeightResizerActive"), "The resizer is not active");
 		assert.notOk(oMenu.isOpen(), "The context menu is closed");
