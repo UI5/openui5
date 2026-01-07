@@ -189,10 +189,14 @@ sap.ui.define([
 			this.oVM.placeAt("qunit-fixture");
 			sap.ui.getCore().applyChanges();
 			page.addContent(this.oVM);
+
+			this.clock = sinon.useFakeTimers();
 		},
 		afterEach: function() {
 			page.removeContent(this.oVM);
 			this.oVM.destroy();
+			this.clock.restore();
+			delete this.clock;
 		}
 	});
 
@@ -299,6 +303,7 @@ sap.ui.define([
 			fOriginalCall(oEvent);
 			sap.ui.getCore().applyChanges();
 
+			this.clock.tick(110); //wait until open triggered
 			var oItem =  this.oVM.oVariantList.getItems()[0];
 			var oTarget = this.oVM.oVariantList.getDomRef();
 
@@ -356,6 +361,7 @@ sap.ui.define([
 			fOriginalCall(oEvent);
 			sap.ui.getCore().applyChanges();
 
+			this.clock.tick(110); //wait until open triggered
 			assert.ok(this.oVM.oVariantSaveBtn.getVisible(), "should be visible");
 
 			var oTarget = this.oVM.oVariantSaveBtn.getFocusDomRef();
@@ -604,7 +610,7 @@ sap.ui.define([
 		sap.ui.getCore().applyChanges();
 	});
 
-	QUnit.test("check opening the varian list display in simulated designmode", function(assert) {
+	QUnit.test("check opening the variant list display in simulated designmode", function(assert) {
 		this.oVM.addItem(new VariantItem({key: "1", title:"One"}));
 
 		sinon.stub(this.oVM, "_openVariantList");
@@ -631,6 +637,7 @@ sap.ui.define([
 			page.removeContent(this.oVM);
 			this.oVM.destroy();
 			this.clock.restore();
+			delete this.clock;
 		}
 	});
 	QUnit.test("check opens", function(assert) {
@@ -675,6 +682,7 @@ sap.ui.define([
 			fOriginalCall(oEvent);
 			sap.ui.getCore().applyChanges();
 
+			this.clock.tick(110); //wait until open triggered
 			var oTarget = this.oVM.oVariantSaveAsBtn.getFocusDomRef();
 			assert.ok(oTarget);
 			QUnitUtils.triggerTouchEvent("tap", oTarget, {
@@ -732,6 +740,7 @@ sap.ui.define([
 			fOriginalCall(oEvent);
 			sap.ui.getCore().applyChanges();
 
+			this.clock.tick(110); //wait until open triggered
 			var oTarget = this.oVM.oVariantSaveAsBtn.getFocusDomRef();
 			assert.ok(oTarget);
 			QUnitUtils.triggerTouchEvent("tap", oTarget, {
@@ -787,6 +796,7 @@ sap.ui.define([
 			fOriginalCall(oEvent);
 			sap.ui.getCore().applyChanges();
 
+			this.clock.tick(110); //wait until open triggered
 			var oTarget = this.oVM.oVariantSaveAsBtn.getFocusDomRef();
 			assert.ok(oTarget);
 			QUnitUtils.triggerTouchEvent("tap", oTarget, {
@@ -865,10 +875,10 @@ sap.ui.define([
 
 		var fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
 		sinon.stub(this.oVM, "_openVariantList").callsFake(function (oEvent) {
-
 			fOriginalCall(oEvent);
 			sap.ui.getCore().applyChanges();
 
+			this.clock.tick(110); //wait until open triggered
 			var oTarget = this.oVM.oVariantSaveAsBtn.getFocusDomRef();
 			assert.ok(oTarget);
 			QUnitUtils.triggerTouchEvent("tap", oTarget, {
@@ -934,6 +944,7 @@ sap.ui.define([
 			fOriginalCall(oEvent);
 			sap.ui.getCore().applyChanges();
 
+			this.clock.tick(110); //wait until open triggered
 			var oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
 			assert.ok(oTarget);
 			QUnitUtils.triggerTouchEvent("tap", oTarget, {
@@ -990,6 +1001,7 @@ sap.ui.define([
 			fOriginalCall(oEvent);
 			sap.ui.getCore().applyChanges();
 
+			this.clock.tick(110); //wait until open triggered
 			var oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
 			assert.ok(oTarget);
 			QUnitUtils.triggerTouchEvent("tap", oTarget, {
@@ -1122,6 +1134,7 @@ sap.ui.define([
 			fOriginalCall(oEvent);
 			sap.ui.getCore().applyChanges();
 
+			this.clock.tick(110); //wait until open triggered
 			var oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
 			assert.ok(oTarget);
 			QUnitUtils.triggerTouchEvent("tap", oTarget, {
@@ -1299,6 +1312,7 @@ sap.ui.define([
 			fOriginalCall(oEvent);
 			sap.ui.getCore().applyChanges();
 
+			this.clock.tick(110); //wait until open triggered
 			var oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
 			assert.ok(oTarget);
 			QUnitUtils.triggerTouchEvent("tap", oTarget, {
@@ -1436,6 +1450,7 @@ sap.ui.define([
 			fOriginalCall(oEvent);
 			sap.ui.getCore().applyChanges();
 
+			this.clock.tick(110); //wait until open triggered
 			var oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
 			assert.ok(oTarget);
 			QUnitUtils.triggerTouchEvent("tap", oTarget, {
@@ -1526,6 +1541,7 @@ sap.ui.define([
 			fOriginalCall(oEvent);
 			sap.ui.getCore().applyChanges();
 
+			this.clock.tick(110); //wait until open triggered
 			var oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
 			assert.ok(oTarget);
 			QUnitUtils.triggerTouchEvent("tap", oTarget, {
@@ -1590,6 +1606,7 @@ sap.ui.define([
 			this.oVM.destroy();
 
 			this.clock.restore();
+			delete this.clock;
 		}
 	});
 
