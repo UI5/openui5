@@ -1251,6 +1251,20 @@ sap.ui.define([
 		oSPC.destroy();
 	});
 
+	QUnit.test("_updateViewSwitchLabelFor is called during onAfterRendering", function (assert) {
+		var oSPC = new SinglePlanningCalendar(),
+			oHeader = oSPC._getHeader(),
+			oUpdateLabelSpy = sinon.spy(oHeader, "_updateViewSwitchLabelFor");
+
+		oSPC.placeAt("qunit-fixture");
+		oCore.applyChanges();
+
+		assert.ok(oUpdateLabelSpy.calledOnce, "_updateViewSwitchLabelFor was called during initial rendering");
+
+		oUpdateLabelSpy.restore();
+		oSPC.destroy();
+	});
+
 	QUnit.test("Initial classes for stickyMode: None (Default)", function (assert) {
 		// Prepare
 		var oSPC = new SinglePlanningCalendar(),
