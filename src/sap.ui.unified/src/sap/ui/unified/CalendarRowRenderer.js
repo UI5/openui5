@@ -264,9 +264,10 @@ sap.ui.define([
 	};
 
 	CalendarRowRenderer.renderInterval = function(oRm, oRow, iInterval, iWidth,  aIntervalHeaders, aNonWorkingItems, iStartOffset, iNonWorkingMax, aNonWorkingSubItems, iSubStartOffset, iNonWorkingSubMax, bFirstOfType, bLastOfType){
-		const oStartDateInterval = oRow.getStartDate();
+		const oStartDateInterval = UI5Date.getInstance(oRow.getStartDate());
 		const oCellStartDate = UI5Date.getInstance(oStartDateInterval);
 		oCellStartDate.setHours(iInterval + iStartOffset, 0, 0, 0);
+		oStartDateInterval.setHours(oStartDateInterval.getHours() + iInterval);
 
 		var sId = oRow.getId() + "-AppsInt" + iInterval;
 		var i;
