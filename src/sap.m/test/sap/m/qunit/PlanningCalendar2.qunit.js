@@ -2655,6 +2655,28 @@ sap.ui.define([
 		assert.deepEqual(newAppPos.endDate, UI5Date.getInstance(2017, 10, 13, 3, 30, 0), "Correct new end position");
 	});
 
+	QUnit.test("_updateViewSwitchLabelFor is called when handleResize is triggered manually", async function (assert) {
+		var oPC = new PlanningCalendar(),
+			oHeader = oPC._getHeader(),
+			oUpdateLabelSpy;
+
+		oPC.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		// Create spy after rendering to focus on manual resize behavior
+		oUpdateLabelSpy = sinon.spy(oHeader, "_updateViewSwitchLabelFor");
+
+		// Manually trigger handleResize
+		oPC._resizeProxy({
+			size: { width: 800, height: 600 }
+		});
+
+		assert.ok(oUpdateLabelSpy.calledOnce, "_updateViewSwitchLabelFor was called when handleResize is triggered");
+
+		oUpdateLabelSpy.restore();
+		oPC.destroy();
+	});
+
 	QUnit.module("Resize Appointments", {
 		beforeEach: function () {
 			this.oPCRow = new PlanningCalendar();
