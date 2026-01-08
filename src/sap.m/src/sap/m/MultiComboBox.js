@@ -2168,8 +2168,10 @@ function(
 		this._removeSelection(aTokens);
 
 		if (aItemsBeforeRemoval.length !== ListHelpers.getSelectableItems(this.getItems())) {
-			!this.isPickerDialog() && !this.isFocusInTokenizer() && this.focus();
 			this.fireChangeEvent("");
+			if (!this.isPickerDialog() && !this.isFocusInTokenizer()){
+				setTimeout(() => this.focus(), 0);
+			}
 		}
 	};
 
@@ -2180,8 +2182,6 @@ function(
 	 * @private
 	 */
 	MultiComboBox.prototype._removeSelection = function (aTokens) {
-		var oTokenizer = this.getAggregation("tokenizer");
-
 		aTokens.forEach(function (oToken) {
 			var oItem = (oToken && this._getItemByToken(oToken));
 
@@ -2202,14 +2202,15 @@ function(
 			});
 
 			oToken.destroy();
+		}, this);
 
-			if (this.getSelectedItems().length > 0) {
-				var aTokens = oTokenizer.getTokens();
-				aTokens[aTokens.length - 1].focus();
-			} else {
+		setTimeout(() => {
+			// If all tokens are removed, focus should go to the input with a little delay in order for DOM to update and proper ARIA announcement to be made
+			const oTokenizer = this.getAggregation("tokenizer");
+			if (!oTokenizer || !oTokenizer.getTokens().length) {
 				this.focus();
 			}
-		}, this);
+		}, 0);
 	};
 
 	/**
