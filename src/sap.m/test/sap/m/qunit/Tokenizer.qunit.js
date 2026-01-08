@@ -850,22 +850,32 @@ sap.ui.define([
 	});
 
 	QUnit.test("Should focus the closest token after multiple token deletion", async function (assert) {
-		var oToken;
+		const iTokenToDelete = 1;
+
 		var oTokenizer = new Tokenizer({
-			width: "300px"
+			width: "300px",
+			tokenDelete: function() {
+				var aTokens = oTokenizer.getTokens();
+				oTokenizer.removeToken(aTokens[iTokenToDelete]);
+			}
 		}).placeAt("content");
 
-		oTokenizer.addToken(new Token({text: "Token 1", key: "0001", selected: true}));
+		const oFirstSelectedToken = new Token({text: "Token 1", key: "0001", selected: true});
+
+		oTokenizer.addToken(oFirstSelectedToken);
 		oTokenizer.addToken(new Token({text: "Token 2", key: "0002",  selected: true}));
 		oTokenizer.addToken(new Token({text: "Token 3", key: "0003"}));
 
 		await nextUIUpdate();
 
-		oToken = oTokenizer.getTokens()[1];
+		var oToken = oTokenizer.getTokens()[iTokenToDelete];
 		oToken.focus();
 
 		qutils.triggerKeydown(oToken.getDomRef(), KeyCodes.DELETE);
-		assert.strictEqual(oTokenizer.getTokens()[2].getDomRef(), document.activeElement, "The closest token should be focused");
+
+		await nextUIUpdate();
+
+		assert.strictEqual(oFirstSelectedToken.getDomRef(), document.activeElement, "The non-deleted selected token is now focused");
 
 		oTokenizer.destroy();
 	});
@@ -987,6 +997,40 @@ sap.ui.define([
 		oTokenizer.getTokensPopup().close();
 		assert.ok(oRenderModeChangeSpy.calledWithMatch({renderMode: "Narrow"}), "Should fire renderModeChange event when collapsing after nMore popover is closed");
 
+		oTokenizer.destroy();
+	});
+
+	QUnit.test("Next token is not focused until deleted token is actually removed", async function(assert) {
+		this.clock = sinon.useFakeTimers();
+		var oTokenizer = new Tokenizer({
+			width: "300px"
+		}).placeAt("content");
+
+		var oToken1, oToken2;
+
+		oTokenizer.addToken(oToken1 = new Token({ text: "Token 1", key: "0001"}));
+		oTokenizer.addToken(oToken2 = new Token({ text: "Token 2", key: "0002"}));
+		oTokenizer.addToken(new Token({ text: "Token 3", key: "0003"}));
+
+		oTokenizer.placeAt("content");
+		await nextUIUpdate(this.clock);
+
+		oToken1.getDomRef().focus();
+		this.clock.tick(200);
+		qutils.triggerKeydown( oToken1.getDomRef(), KeyCodes.DELETE);
+
+		this.clock.tick(100);
+
+		assert.strictEqual(oTokenizer.getTokens().length, 3, "Tokens are not removed yet.");
+		assert.strictEqual(document.activeElement, oToken1.getDomRef(), "The focus is still on the deleted token.");
+
+		oTokenizer.removeToken(oToken1);
+		this.clock.tick(100);
+
+		assert.strictEqual(oTokenizer.getTokens().length, 2, "Token is removed.");
+		assert.strictEqual(document.activeElement, oToken2.getDomRef(), "The focus is moved to the adjacent token.");
+
+		this.clock.restore();
 		oTokenizer.destroy();
 	});
 
