@@ -642,6 +642,7 @@ sap.ui.define([
 		assert.ok(fnFireAppointmentSelectSpy.calledWithExactly({
 			appointment: oAppointment,
 			appointments: [oAppointment],
+			originalEvent: undefined,
 			id: oGrid.getId()
 		}), "Event was fired with the correct parameters");
 
@@ -681,6 +682,7 @@ sap.ui.define([
 		assert.ok(fnFireAppointmentSelectSpy.calledWith({
 			appointment: undefined,
 			appointments: oGrid.getAggregation("appointments"),
+			originalEvent: undefined,
 			id: oGrid.getId()
 		}), "Event was fired with the correct parameters");
 
