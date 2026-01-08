@@ -92,4 +92,22 @@ describe("sap.m.Popover", function () {
 
 		expect(takeScreenshot()).toLookAs("inner-popover-closed-click");
 	});
+
+	it("Should open popover with keyboard focusable scroller", function () {
+		element(by.id("btn17")).click();
+
+		expect(takeScreenshot()).toLookAs("keyboard-focusable-scroller-popover");
+	});
+
+	it("Should open popover with scroller with button inside", function () {
+		element(by.id("btn18")).click();
+
+		expect(takeScreenshot()).toLookAs("btn-with-scroller-popover");
+	});
+
+	it("Should open popover with keyboard focusable scroller", function () {
+		element(by.id("btn19")).click();
+
+		expect(takeScreenshot()).toLookAs("keyboard-focusable-scroller-popover");
+	});
 });

@@ -269,8 +269,7 @@ sap.ui.define([
 
 		const oPopover = new ResponsivePopover({
 			id: this.getId() + "-btnSelectionButtonPopover",
-			placement: PlacementType.VerticalPreferredBottom,
-			contentWidth: "25rem"
+			placement: PlacementType.VerticalPreferredBottom
 		});
 
 		oPopover.addStyleClass("sapUiMDCSelectionButton");

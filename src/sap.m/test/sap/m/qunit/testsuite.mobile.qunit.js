@@ -2357,6 +2357,17 @@ sap.ui.define([
 				group: "Designtime"
 			},
 
+			"designtime/SelectSegmentedButtonItem": {
+				title: "SelectSegmentedButtonItem - sap.m - end user adaptation",
+				ui5: {
+					libs: ["sap.m", "sap.ui.rta"]
+				},
+				sinon: {
+					useFakeTimers: true,
+					group: "Designtime"
+				}
+			},
+
 			"designtime/Select": {
 				title: "QUnit Page for sap.m.Select design time",
 				ui5: {

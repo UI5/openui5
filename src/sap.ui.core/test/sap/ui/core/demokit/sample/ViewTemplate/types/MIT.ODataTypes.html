@@ -5,101 +5,932 @@
 		<title>Manual Integration Test: OData Types</title>
 	</head>
 	<body>
-		<h1>Manual Integration Test: Test Validation.Minimum on Edm.Decimal</h1>
+		<h1>Manual Integration Test: OData Types Validation</h1>
 		<h2>DESCRIPTION</h2>
-		Test the behavior when you enter incorrect values.
+		<p>Test the validation behavior of all OData type input fields with invalid and valid values.</p>
+
+		<p><strong>Automated Tests:</strong> All manual tests described here are automated in <code>Opa.qunit.js</code>.</p>
+
 		<h2>PREPARATION</h2>
-		To check console errors, open the developer tools before you start the application. Check
-		with each step that there are no errors and warnings.
 
-		<h3>Testing With Mock Data</h3>
-		Start the OData Types application with one of the following URLs; adjust host and port if
-		necessary:
-		<ul>
-			<li> As sample preview in the SDK: http://&lt;host>:&lt;port>/sapui5-sdk-dist/#/sample/sap.ui.core.sample.ViewTemplate.types/preview</li>
-			<li> Local: <a href="http://localhost:8080/test-resources/sap/ui/core/demokit/sample/common/index.html?component=ViewTemplate.types">http://&lt;host>:&lt;port>/test-resources/sap/ui/core/demokit/sample/common/index.html?component=ViewTemplate.types</a></li>
-		</ul>
+			To check console errors open the developer tools before starting the application and
+			check with each step, that there are no errors and warnings.
 
-		<h3>Testing Against back end System</h3>
-		Configure your Web IDE to execute the OData Types application against an ABAP back end
-		system.<br>
-		Start the OData Types application with the following URL; adjust host and port if necessary:
-		<ul>
-			<li>Local: <a href="http://localhost:8080/test-resources/sap/ui/core/demokit/sample/common/index.html?component=ViewTemplate.types&amp;realOData=true">http://&lt;host>:&lt;port>/test-resources/sap/ui/core/demokit/sample/common/index.html?component=ViewTemplate.types&amp;realOData=true</a></li>
-		</ul>
+		<h3>Testing with mock data</h3>
+		Start the OData Types application
+		URL (adjust host and port if necessary):
+			<ul>
+				<li> as sample preview in the SDK: http://&lt;host>:&lt;port>/sapui5-sdk-dist/#/sample/sap.ui.core.sample.ViewTemplate.types/preview</li>
+				<li> local: <a href="http://localhost:8080/test-resources/sap/ui/core/demokit/sample/common/index.html?component=ViewTemplate.types">http://&lt;host>:&lt;port>/test-resources/sap/ui/core/demokit/sample/common/index.html?component=ViewTemplate.types</a></li>
+			</ul>
 
-		<h2>REALIZE AND CHECK</h2>
-		<h3>OData V4 Model tests</h3>
+		<h3>Testing with back end</h3>
+		Configure your IDE to be able to run the OData Types application against an ABAP back
+		end system. Start the OData Types application URL (adjust host and port if necessary):
+			<ul>
+				<li>local: <a href="http://localhost:8080/test-resources/sap/ui/core/demokit/sample/common/index.html?component=ViewTemplate.types&amp;realOData=true">http://&lt;host>:&lt;port>/test-resources/sap/ui/core/demokit/sample/common/index.html?component=ViewTemplate.types&amp;realOData=true</a></li>
+			</ul>
+
+	<h2>REALIZE and CHECK</h2>
+
+	<h3>General Testing Instructions</h3>
+	<p><strong>Note:</strong> The application groups fields by OData type. Each section below corresponds to a visual section in the UI.</p>
+
+	<p><strong>How to test fields in tables below:</strong></p>
+	<ol>
+		<li>Locate the field in the UI using the <strong>Field Label</strong> from the table.</li>
+		<li>For fields with <strong>Invalid Value</strong> column: Enter the invalid value, press <code>Enter</code> or <code>Tab</code>. <b>Check:</b> Field shows <strong>error state</strong> (red border).</li>
+		<li>Enter the <strong>Valid Value</strong>, press <code>Enter</code> or <code>Tab</code>. <b>Check:</b> Error state is cleared (border is normal), value is accepted.</li>
+		<li>For fields with <strong>Test Action</strong> column: Follow the specific action described and verify the expected result.</li>
+		<li><strong>Note:</strong> Error messages are NOT checked (only error state). Exceptions: Fields with specific error message noted in table.</li>
+	</ol>
+
+	<p><strong>Special Behaviors:</strong></p>
+	<ul>
+		<li><strong>parseEmptyValueToZero: true</strong> - Empty string converts to <code>0</code>.</li>
+		<li><strong>parseKeepsEmptyString: true</strong> - Empty string is valid and preserved.</li>
+		<li><strong>Picker controls</strong> (DatePicker/DateTimePicker/TimePicker) - Type directly or use picker dialog.</li>
+		<li><strong>Read-only fields</strong> - Not editable, not tested.</li>
+	</ul>
+
+	<p><strong>Buttons:</strong> <code>V4</code> = switch to OData V4 model | <code>Messages</code> = show all errors | <code>Reset Model</code>/<code>Reset ContextBinding</code> = restore original values | <code>Save</code> = save changes (with real OData only)</p>
+
+	<h3>sap.ui.model.odata.type.Boolean</h3>
+	<p><strong>Setup:</strong> Press the <code>V4</code> button to switch to OData V4 model.</p>
+	<table>
+		<thead>
+			<tr>
+				<th>Field Label</th>
+				<th>Invalid Value</th>
+				<th>Expected State</th>
+				<th>Valid Value</th>
+				<th>Expected Result</th>
+			</tr>
+		</thead>
+			<tbody>
+				<tr>
+					<td>sap.ui.model.odata.type.Boolean Input Field, true</td>
+					<td>NotABoolean</td>
+					<td class="error">Error state</td>
+					<td>Yes</td>
+					<td class="success">No error</td>
+				</tr>
+				<tr>
+					<td>sap.ui.model.odata.type.Boolean Input Field, NOT nullable</td>
+					<td>(empty)</td>
+					<td class="error">Error state</td>
+					<td>No</td>
+					<td class="success">No error</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<h3>DateTime variants</h3>
+		<p>This section contains multiple date/time related fields including Date, DateTime, DateTimeOffset, Time, and TimeOfDay types.</p>
+
+		<h4>DateRange (DateInterval Type)</h4>
+		<p><strong>Setup:</strong> Press <code>V4</code> button.</p>
+		<table>
+			<thead>
+				<tr>
+					<th>Field Label</th>
+					<th>Valid Value</th>
+					<th>Expected Result</th>
+					<th>Special Notes</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>DateRange</td>
+					<td>Apr 19, 2029 – Apr 20, 2029</td>
+					<td class="success">No error</td>
+					<td>Use EN DASH (–) not hyphen (-). Complex multi-part binding.</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<h4>V4 Date Types</h4>
+		<p><strong>Setup:</strong> Press <code>V4</code> button.</p>
+		<table>
+			<thead>
+				<tr>
+					<th>Field Label</th>
+					<th>Invalid Value</th>
+					<th>Expected State</th>
+					<th>Valid Value</th>
+					<th>Expected Result</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>Date</td>
+					<td>InvalidDate</td>
+					<td class="error">Error state</td>
+					<td>Apr 19, 2029</td>
+					<td class="success">No error</td>
+				</tr>
+				<tr>
+					<td>Date, nullable: false</td>
+					<td>(empty)</td>
+					<td class="error">Error state</td>
+					<td>May 20, 2030</td>
+					<td class="success">No error</td>
+				</tr>
+				<tr>
+					<td>Date, style: "short"</td>
+					<td>32/13/2029</td>
+					<td class="error">Error state</td>
+					<td>4/19/29</td>
+					<td class="success">No error</td>
+				</tr>
+				<tr>
+					<td>Date, relative: "true"</td>
+					<td>BadDate</td>
+					<td class="error">Error state</td>
+					<td>Apr 19, 2029</td>
+					<td class="success">No error</td>
+				</tr>
+				<tr>
+					<td>Date, bound property dateValue (DatePicker)</td>
+					<td>Invalid</td>
+					<td class="error">Error state</td>
+					<td>Apr 19, 2029</td>
+					<td class="success">No error</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<h4>V2 DateTime Types</h4>
+		<p><strong>Setup:</strong> Reload application to use default V2 model (no button press needed).</p>
+		<table>
+			<thead>
+				<tr>
+					<th>Field Label</th>
+					<th>Invalid Value</th>
+					<th>Expected State</th>
+					<th>Valid Value</th>
+					<th>Expected Result</th>
+					<th>Special Notes</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>DateTime</td>
+					<td>InvalidDate</td>
+					<td class="error">Error state</td>
+					<td>Apr 19, 2029, 8:25:21 AM</td>
+					<td class="success">No error</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>DateTime, nullable: false</td>
+					<td>(empty)</td>
+					<td class="error">Error state</td>
+					<td>May 20, 2030, 9:30:00 AM</td>
+					<td class="success">No error</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>DateTime, style: "long"</td>
+					<td>BadDate</td>
+					<td class="error">Error state</td>
+					<td>April 19, 2029, 8:25:21 AM GMT+02:00</td>
+					<td class="success">No error</td>
+					<td>Note: Comma after year, format GMT+02:00</td>
+				</tr>
+				<tr>
+					<td>DateTime, style: "long", UTC</td>
+					<td>InvalidDate</td>
+					<td class="error">Error state</td>
+					<td>April 19, 2029, 6:25:21 AM GMTZ</td>
+					<td class="success">No error</td>
+					<td>Note: Format GMTZ (with Z)</td>
+				</tr>
+				<tr>
+					<td>DateTime, displayFormat: "Date"</td>
+					<td>BadDate</td>
+					<td class="error">Error state</td>
+					<td>Apr 19, 2029</td>
+					<td class="success">No error</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>DateTime, displayFormat: "Date", nullable: false</td>
+					<td>(empty)</td>
+					<td class="error">Error state</td>
+					<td>May 20, 2030</td>
+					<td class="success">No error</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>Date (wrong type, read-only), style: "short"</td>
+					<td>32/13/29</td>
+					<td class="error">Error state</td>
+					<td>4/19/29</td>
+					<td class="success">No error</td>
+					<td>V4 type on V2 service - read-only</td>
+				</tr>
+				<tr>
+					<td>Date (wrong type, read-only), bound property dateValue (DatePicker)</td>
+					<td>Invalid</td>
+					<td class="error">Error state</td>
+					<td>Apr 19, 2029</td>
+					<td class="success">No error</td>
+					<td>V4 type on V2 service - read-only</td>
+				</tr>
+				<tr>
+					<td>DateTime, bound property dateValue (DateTimePicker)</td>
+					<td>Invalid</td>
+					<td class="error">Error state</td>
+					<td>Apr 19, 2029, 8:25:21 AM</td>
+					<td class="success">No error</td>
+					<td></td>
+				</tr>
+			</tbody>
+		</table>
+
+		<h4>DateTimeOffset Types</h4>
+		<p><strong>Setup:</strong> Press <code>V4</code> button (works in both V2/V4, test in V4 mode).</p>
+		<table>
+			<thead>
+				<tr>
+					<th>Field Label</th>
+					<th>Invalid Value</th>
+					<th>Expected State</th>
+					<th>Valid Value</th>
+					<th>Expected Result</th>
+					<th>Special Notes</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>DateTimeOffset</td>
+					<td>BadDate</td>
+					<td class="error">Error state</td>
+					<td>Apr 19, 2029, 8:25:21 AM</td>
+					<td class="success">No error</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>DateTimeOffset, nullable: false</td>
+					<td>(empty)</td>
+					<td class="error">Error state</td>
+					<td>May 20, 2030, 10:30:00 AM</td>
+					<td class="success">No error</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>DateTimeOffset, style: "long"</td>
+					<td>Invalid</td>
+					<td class="error">Error state</td>
+					<td>April 19, 2029, 8:25:21 AM GMT+02:00</td>
+					<td class="success">No error</td>
+					<td>Comma after year, format GMT+02:00</td>
+				</tr>
+				<tr>
+					<td>DateTimeOffset, style: "long", UTC</td>
+					<td>BadDate</td>
+					<td class="error">Error state</td>
+					<td>April 19, 2029, 6:25:21 AM GMTZ</td>
+					<td class="success">No error</td>
+					<td>Format GMTZ (with Z)</td>
+				</tr>
+				<tr>
+					<td>DateTimeOffset, bound property dateValue (DateTimePicker)</td>
+					<td>Invalid</td>
+					<td class="error">Error state</td>
+					<td>Apr 19, 2029, 8:25:21 AM</td>
+					<td class="success">No error</td>
+					<td></td>
+				</tr>
+			</tbody>
+		</table>
+
+		<h4>Time Types (V2)</h4>
+		<p><strong>Setup:</strong> Reload application to use default V2 model.</p>
+		<table>
+			<thead>
+				<tr>
+					<th>Field Label</th>
+					<th>Invalid Value</th>
+					<th>Expected State</th>
+					<th>Valid Value</th>
+					<th>Expected Result</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>Time</td>
+					<td>25:00:00</td>
+					<td class="error">Error state</td>
+					<td>8:25:21 AM</td>
+					<td class="success">No error</td>
+				</tr>
+				<tr>
+					<td>Time, nullable: false</td>
+					<td>(empty)</td>
+					<td class="error">Error state</td>
+					<td>9:30:00 AM</td>
+					<td class="success">No error</td>
+				</tr>
+				<tr>
+					<td>Time, style: "short"</td>
+					<td>BadTime</td>
+					<td class="error">Error state</td>
+					<td>8:25 AM</td>
+					<td class="success">No error</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<h4>TimeOfDay Types (V4)</h4>
+		<p><strong>Setup:</strong> Press <code>V4</code> button.</p>
+		<table>
+			<thead>
+				<tr>
+					<th>Field Label</th>
+					<th>Invalid Value</th>
+					<th>Expected State</th>
+					<th>Valid Value</th>
+					<th>Expected Result</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>TimeOfDay</td>
+					<td>25:00:00</td>
+					<td class="error">Error state</td>
+					<td>8:25:21 AM</td>
+					<td class="success">No error</td>
+				</tr>
+				<tr>
+					<td>TimeOfDay, nullable: false, style: "medium"</td>
+					<td>(empty)</td>
+					<td class="error">Error state</td>
+					<td>9:30:45 AM</td>
+					<td class="success">No error</td>
+				</tr>
+				<tr>
+					<td>TimeOfDay, style: "short"</td>
+					<td>BadTime</td>
+					<td class="error">Error state</td>
+					<td>8:25 AM</td>
+					<td class="success">No error</td>
+				</tr>
+				<tr>
+					<td>TimeOfDay, style: "long"</td>
+					<td>25:00</td>
+					<td class="error">Error state</td>
+					<td>8:25:21 AM</td>
+					<td class="success">No error</td>
+				</tr>
+				<tr>
+					<td>TimeOfDay, relative: "true"</td>
+					<td>BadTime</td>
+					<td class="error">Error state</td>
+					<td>8:25:21 AM</td>
+					<td class="success">No error</td>
+				</tr>
+				<tr>
+					<td>TimeOfDay bound property dateValue (TimePicker)</td>
+					<td>Invalid</td>
+					<td class="error">Error state</td>
+					<td>8:25:21 AM</td>
+					<td class="success">No error</td>
+				</tr>
+			</tbody>
+		</table>
+
+
+		<h3>sap.ui.model.odata.type.Decimal</h3>
+		<p><strong>Setup:</strong> Press <code>V4</code> button.</p>
+		<table>
+			<thead>
+				<tr>
+					<th>Field Label</th>
+					<th>Invalid Value</th>
+					<th>Expected State</th>
+					<th>Valid Value</th>
+					<th>Expected Result</th>
+					<th>Special Notes</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>scale: 3</td>
+					<td>ABC</td>
+					<td class="error">Error state</td>
+					<td>123.456</td>
+					<td class="success">No error</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>precision: 10, scale: variable, nullable: false</td>
+					<td>(empty)</td>
+					<td class="error">Error state</td>
+					<td>12345.678</td>
+					<td class="success">No error</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>precision: 10, scale: floating, nullable: false</td>
+					<td>(empty)</td>
+					<td class="error">Error state</td>
+					<td>123.45</td>
+					<td class="success">No error</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>precision: 10, scale: 3</td>
+					<td>1.2345</td>
+					<td class="error">Error state</td>
+					<td>123.456</td>
+					<td class="success">No error</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>scale: default (0), nullable: false</td>
+					<td>1.5</td>
+					<td class="error">Error state</td>
+					<td>123</td>
+					<td class="success">No error</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>scale: 0, nullable: false, parseEmptyValueToZero: true</td>
+					<td>n/a</td>
+					<td>n/a</td>
+					<td>(empty)</td>
+					<td class="success">Value becomes 0</td>
+					<td>Empty string accepted</td>
+				</tr>
+				<tr>
+					<td>scale: variable, style: short, shortDecimals: 3</td>
+					<td>(empty)</td>
+					<td class="error">Error state</td>
+					<td>9876.5</td>
+					<td class="success">No error</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>precision: 10, scale: 3, minimum: 100 (exclusive), maximum: 1000</td>
+					<td>100</td>
+					<td class="error">Enter a number greater than 100.000</td>
+					<td>101</td>
+					<td class="success">No error</td>
+					<td>Minimum is exclusive</td>
+				</tr>
+				<tr>
+					<td>scale: equal to value's scale</td>
+					<td>1.2</td>
+					<td class="error">Error state</td>
+					<td>0.12345</td>
+					<td class="success">No error</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>StepInput: min: 0, max: 99, scale: 0</td>
+					<td>102</td>
+					<td class="error">Enter a number with a maximum value of 99</td>
+					<td>99</td>
+					<td class="success">No error</td>
+					<td>Also test 1.234 → error (no decimals allowed)</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<h3>sap.ui.model.odata.type.Double</h3>
+		<p><strong>Setup:</strong> Press <code>V4</code> button.</p>
+		<table>
+			<thead>
+				<tr>
+					<th>Field Label</th>
+					<th>Invalid Value</th>
+					<th>Expected State</th>
+					<th>Valid Value</th>
+					<th>Expected Result</th>
+					<th>Special Notes</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>Double</td>
+					<td>XYZ</td>
+					<td class="error">Error state</td>
+					<td>123.456</td>
+					<td class="success">No error</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>Double, nullable: false</td>
+					<td>(empty)</td>
+					<td class="error">Error state</td>
+					<td>789.012</td>
+					<td class="success">No error</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>Double, parseEmptyValueToZero: true</td>
+					<td>n/a</td>
+					<td>n/a</td>
+					<td>(empty)</td>
+					<td class="success">Value becomes 0</td>
+					<td>Empty string accepted</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<h3>sap.ui.model.odata.type.Single</h3>
+		<p><strong>Setup:</strong> Press <code>V4</code> button.</p>
+		<table>
+			<thead>
+				<tr>
+					<th>Field Label</th>
+					<th>Invalid Value</th>
+					<th>Expected State</th>
+					<th>Valid Value</th>
+					<th>Expected Result</th>
+					<th>Special Notes</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>Single</td>
+					<td>ABC</td>
+					<td class="error">Error state</td>
+					<td>12.34</td>
+					<td class="success">No error</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>Single, nullable: false</td>
+					<td>(empty)</td>
+					<td class="error">Error state</td>
+					<td>56.78</td>
+					<td class="success">No error</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>Single, parseEmptyValueToZero: true</td>
+					<td>n/a</td>
+					<td>n/a</td>
+					<td>(empty)</td>
+					<td class="success">Value becomes 0</td>
+					<td>Empty string accepted</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<h3>sap.ui.model.odata.type.Guid</h3>
+		<p><strong>Setup:</strong> Press <code>V4</code> button.</p>
+		<table>
+			<thead>
+				<tr>
+					<th>Field Label</th>
+					<th>Invalid Value</th>
+					<th>Expected State</th>
+					<th>Valid Value</th>
+					<th>Expected Result</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>Guid</td>
+					<td>not-a-guid</td>
+					<td class="error">Error state</td>
+					<td>12345678-1234-1234-1234-123456789012</td>
+					<td class="success">No error</td>
+				</tr>
+				<tr>
+					<td>Guid, nullable: false</td>
+					<td>(empty)</td>
+					<td class="error">Error state</td>
+					<td>87654321-4321-4321-4321-210987654321</td>
+					<td class="success">No error</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<h3>Integer-Based Data Types</h3>
+		<p><strong>Setup:</strong> Press <code>V4</code> button.</p>
+		<table>
+			<thead>
+				<tr>
+					<th>Field Label</th>
+					<th>Invalid Value</th>
+					<th>Expected State</th>
+					<th>Valid Value</th>
+					<th>Expected Result</th>
+					<th>Special Notes</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td colspan="6" style="background-color: #f0f0f0; font-weight: bold;">Byte (range: 0-255)</td>
+				</tr>
+				<tr>
+					<td>Byte</td>
+					<td>256</td>
+					<td class="error">Error state</td>
+					<td>123</td>
+					<td class="success">No error</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>Byte, nullable: false</td>
+					<td>(empty)</td>
+					<td class="error">Error state</td>
+					<td>250</td>
+					<td class="success">No error</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td colspan="6" style="background-color: #f0f0f0; font-weight: bold;">Int16</td>
+				</tr>
+				<tr>
+					<td>Int16</td>
+					<td>ABC</td>
+					<td class="error">Error state</td>
+					<td>12345</td>
+					<td class="success">No error</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>Int16, nullable: false</td>
+					<td>(empty)</td>
+					<td class="error">Error state</td>
+					<td>32000</td>
+					<td class="success">No error</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td colspan="6" style="background-color: #f0f0f0; font-weight: bold;">Int32</td>
+				</tr>
+				<tr>
+					<td>Int32</td>
+					<td>XYZ</td>
+					<td class="error">Error state</td>
+					<td>123456</td>
+					<td class="success">No error</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>Int32, nullable: false</td>
+					<td>(empty)</td>
+					<td class="error">Error state</td>
+					<td>2000000</td>
+					<td class="success">No error</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td colspan="6" style="background-color: #f0f0f0; font-weight: bold;">Int64</td>
+				</tr>
+				<tr>
+					<td>Int64 (various fields)</td>
+					<td>ABC or (empty) for nullable: false</td>
+					<td class="error">Error state</td>
+					<td>9876543 / 1234567890</td>
+					<td class="success">No error</td>
+					<td>4 fields total with different constraints</td>
+				</tr>
+				<tr>
+					<td colspan="6" style="background-color: #f0f0f0; font-weight: bold;">SByte</td>
+				</tr>
+				<tr>
+					<td>SByte</td>
+					<td>ABC</td>
+					<td class="error">Error state</td>
+					<td>123</td>
+					<td class="success">No error</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>SByte, nullable: false</td>
+					<td>(empty)</td>
+					<td class="error">Error state</td>
+					<td>100</td>
+					<td class="success">No error</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td colspan="6" style="background-color: #f0f0f0; font-weight: bold;">Fields with parseEmptyValueToZero</td>
+				</tr>
+				<tr>
+					<td>Various integer types with parseEmptyValueToZero: true</td>
+					<td>n/a</td>
+					<td>n/a</td>
+					<td>(empty)</td>
+					<td class="success">Value becomes 0</td>
+					<td>5 fields (Byte, Int16, Int32, Int64, SByte)</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<h3>sap.ui.model.odata.type.String</h3>
+		<p><strong>Setup:</strong> Press <code>V4</code> button.</p>
+		<table>
+			<thead>
+				<tr>
+					<th>Field Label</th>
+					<th>Invalid Value</th>
+					<th>Expected State</th>
+					<th>Valid Value</th>
+					<th>Expected Result</th>
+					<th>Special Notes</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>String, maxLength: 40</td>
+					<td>Text longer than 40 characters</td>
+					<td class="error">Error state</td>
+					<td>Test String</td>
+					<td class="success">No error</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>String, nullable: false</td>
+					<td>(empty)</td>
+					<td class="error">Error state</td>
+					<td>Required String</td>
+					<td class="success">No error</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>String with digit sequence constraints (NUMC)</td>
+					<td>ABC or ABC123</td>
+					<td class="error">Error state</td>
+					<td>1234567 / 9876543</td>
+					<td class="success">No error</td>
+					<td>Multiple fields with different lengths</td>
+				</tr>
+				<tr>
+					<td>String, parseKeepsEmptyString: true</td>
+					<td>n/a</td>
+					<td>n/a</td>
+					<td>(empty)</td>
+					<td class="success">Empty string preserved</td>
+					<td>Empty is valid, not an error</td>
+				</tr>
+				<tr>
+					<td>String, maxLength: 128</td>
+					<td>Text longer than 128 characters</td>
+					<td class="error">Error state</td>
+					<td>Europe/Berlin</td>
+					<td class="success">No error</td>
+					<td></td>
+				</tr>
+			</tbody>
+		</table>
+
+		<h3>sap.ui.model.odata.type.DateTimeWithTimezone</h3>
+		<p><strong>Setup:</strong> Reload application to use default V2 model.</p>
+		<p><strong>Note:</strong> Some fields show timezone in the value, others hide it. Read-only fields (I76-I81) are not tested.</p>
+		<table>
+			<thead>
+				<tr>
+					<th>Field Label</th>
+					<th>Test Action</th>
+					<th>Expected Result</th>
+					<th>Special Notes</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td colspan="4" style="background-color: #f0f0f0; font-weight: bold;">Input Fields (editable)</td>
+				</tr>
+				<tr>
+					<td>Edm.DateTime (no format option)</td>
+					<td>Enter: Apr 19, 2029, 8:25:21 AM Europe/Berlin</td>
+					<td class="success">No error</td>
+					<td>Shows date, time and timezone</td>
+				</tr>
+				<tr>
+					<td>Edm.DateTime (2 fields) - First field</td>
+					<td>Enter: Apr 19, 2029, 8:25:21 AM</td>
+					<td class="success">No error</td>
+					<td>Date/time without timezone</td>
+				</tr>
+				<tr>
+					<td>Edm.DateTime (2 fields) - Second field</td>
+					<td>Enter: Europe/Berlin</td>
+					<td class="success">No error</td>
+					<td>Timezone only</td>
+				</tr>
+				<tr>
+					<td colspan="4" style="background-color: #f0f0f0; font-weight: bold;">Additional DateTimeWithTimezone Input Fields</td>
+				</tr>
+				<tr>
+					<td>Multiple Edm.DateTime fields with various parts configurations</td>
+					<td>Enter: Apr 19, 2029, 8:25:21 AM (for datetime parts) or Europe/Berlin (for timezone parts)</td>
+					<td class="success">No error for all fields</td>
+					<td>Various combinations of showDate, showTime, showTimezone</td>
+				</tr>
+				<tr>
+					<td colspan="4" style="background-color: #f0f0f0; font-weight: bold;">DateTimePicker Fields with Timezone Display</td>
+				</tr>
+				<tr>
+					<td>Edm.DateTime (no format option) - DateTimePicker (value)</td>
+					<td>Check value state only</td>
+					<td class="success">No error</td>
+					<td>Pre-filled, timezone shown in value</td>
+				</tr>
+				<tr>
+					<td>Edm.DateTime (no format option) - DateTimePicker (dateValue)</td>
+					<td>Enter: Apr 19, 2029, 8:25:21 AM</td>
+					<td class="success">No error</td>
+					<td>Timezone hidden from input</td>
+				</tr>
+				<tr>
+					<td>Edm.DateTime (showTimezone: false) - DateTimePicker (value)</td>
+					<td>Check value state only</td>
+					<td class="success">No error</td>
+					<td>Pre-filled, timezone shown in value</td>
+				</tr>
+				<tr>
+					<td>Edm.DateTime (showTimezone: false) - DateTimePicker (dateValue)</td>
+					<td>Enter: Apr 19, 2029, 8:25:21 AM</td>
+					<td class="success">No error</td>
+					<td>Timezone hidden from input</td>
+				</tr>
+				<tr>
+					<td>Edm.DateTime (showTimezone: false, V2) - DateTimePicker</td>
+					<td>Enter: Apr 19, 2029, 8:25:21 AM</td>
+					<td class="success">No error</td>
+					<td>V2 specific, timezone hidden</td>
+				</tr>
+				<tr>
+					<td colspan="4" style="background-color: #e0e0e0; font-style: italic;">Note: Fields with editable="false" (I76-I81: 6 read-only fields) are not tested</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<h3>Identification (V4 Template-generated fields)</h3>
+		<p><strong>Setup:</strong> Press <code>V4</code> button, scroll to bottom of page.</p>
+		<table>
+			<thead>
+				<tr>
+					<th>Field Label</th>
+					<th>Test Action</th>
+					<th>Expected Result</th>
+					<th>Special Notes</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>Duration</td>
+					<td>Enter any value (e.g. "10 sec")</td>
+					<td class="error">Field becomes dirty, Message Popover shows: "Type 'sap.ui.model.odata.type.Raw' does not support parsing"</td>
+					<td>Raw type cannot parse. Press <code>Reset Model</code> to clear</td>
+				</tr>
+				<tr>
+					<td>String40 (maxLength: 40, parseKeepsEmptyString)</td>
+					<td>Leave empty or clear</td>
+					<td class="success">No error, empty string preserved</td>
+					<td>Empty is valid</td>
+				</tr>
+				<tr>
+					<td>TimezoneID</td>
+					<td>Enter "Europe/Berlin"</td>
+					<td class="success">No error, DateTimeOffset field in same section updates display</td>
+					<td>Affects other field in section</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<h2>ADDITIONAL TESTS</h2>
+
+		<h3>Reset and Message Handling</h3>
 		<ol>
-			<li>Start the application.</li>
-			<li>Press <code>V4</code> Button.</li>
-			<li>Enter invalid values in one or more of the data fields.</li>
-			<li><b>Check</b>: You get validation errors with appropriate error messages.</li>
-			<li><b>Check</b>: The data state of the related control is erroneous, this means that
-				the control now is displayed with a red border and if it gets the foccus, you see
-				the same error message highlighted beside the control.</li>
-			<li>Press <code>Reset Model</code> or <code>Reset ContextBinding</code>.</li>
-			<li><b>Check</b>: The validation errors are gone and the old values are displayed.</li>
-			<li>Enter again invalid values in one or more of the data fields.</li>
-			<li><b>Check</b>: You get validation errors with appropriate error messages.</li>
-			<li>Correct errors by entering valid values.</li>
-			<li><b>Check</b>: The validation errors are gone.</li>
-			<li>Enter 100 in the field labeled <code>precision: 10, scale: 3, minimum: 100
-				(exclusive), maximum: 1000</code>.</li>
-			<li><b>Check</b>: You get an error with the message "Enter a number greater than
-				100.000".</li>
-			<li>Correct the error by entering a valid value, e.g. 101</li>
-			<li><b>Check</b>: The validation error is gone.</li>
-			<li>Enter an empty value in the field labeled <code>scale: default (0), nullable=false,
-				parseEmptyValueToZero=true</code>.</li>
-			<li><b>Check</b>: No validation error is shown.</li>
-			<li><b>Check</b>: The value of the field is set to <code>0</code>.</li>
-			<li>Enter an empty value in the field labeled <code>sap.ui.model.odata.type.Int16, nullable=false,
-				parseEmptyValueToZero=true</code>.</li>
-			<li><b>Check</b>: No validation error is shown.</li>
-			<li><b>Check</b>: The value of the field is set to <code>0</code>.</li>
-			<li>Enter 102 in the field labeled <code>stepInput: min: 0 max: 99 scale: 0</code>.</li>
-			<li><b>Check</b>: You get an invalid data state "Enter a number with a maximum value of
-				99".</li>
-			<li>Correct the error by entering a valid value, e.g. 99</li>
-			<li>Enter 1.234 in the field labeled <code>stepInput: min: 0 max: 99 scale: 0</code>.
-				</li>
-			<li><b>Check</b>: You get an invalid data state "Enter a number with no decimal places".
-				</li>
-			<li>Correct the error by entering a valid value, e.g. 98</li>
-			<li><b>Check</b>: The validation error is gone.</li>
-			<li>Enter any value in the field labeled <code>Duration</code>.</li>
-			<li><b>Check</b>: You get an error with the message "Type
-				'sap.ui.model.odata.type.Raw' does not support formatting".</li>
-			<li>Press <code>Reset Model</code> or <code>Reset ContextBinding</code>.</li>
-			<li><b>Check</b>: The error is gone.</li>
-			<li>Enter "Apr 19, 2029" in the date date picker labeled with
-				<code>Date, bound property dateValue</code>.</li>
-			<li><b>Check</b>: There is no error displayed.</li>
-			<li>Enter "Apr 19, 2029, 8:25:21 AM" in the date time picker labeled with
-				<code>DateTimeOffset, bound property dateValue</code>.</li>
-			<li><b>Check</b>: There is no error displayed.</li>
-			<li>Enter "Europe/Berlin" in the field labeled with <code>TimezoneID</code> in the
-				section <code>com.sap.vocabularies.UI.v1.Identification</code>.</li>
-			<li><b>Check</b>: The field labeled with <code>DateTimeOffset</code> in the same section
-				has the value "Apr 19, 2029, 8:25:21 AM Europe/Berlin".</li>
+			<li>Enter invalid values in multiple fields across different sections.</li>
+			<li><b>Check:</b> All validation errors are displayed correctly in their respective fields.</li>
+			<li>Press the <code>Messages</code> button.</li>
+			<li><b>Check:</b> The message popover displays all validation errors.</li>
+			<li>Correct some errors by entering valid values.</li>
+			<li><b>Check:</b> Corrected errors are removed from the message popover.</li>
+			<li>Press <code>Reset Model</code> or <code>Reset ContextBinding</code> button.</li>
+			<li><b>Check:</b> All remaining validation errors are cleared and original values are restored.</li>
 		</ol>
-		<h3>Real OData tests</h3>
+
+		<h3>Real OData Tests (with Back End)</h3>
 		<ol>
-			<li>Start the app with URL parameter "realOData=true".</li>
-			<li>Enter valid values in the input fields.</li>
+			<li>Start the app with URL parameter <code>realOData=true</code>.</li>
+			<li>Enter valid values in various input fields across different type sections.</li>
+			<li>Press the <code>Save</code> button.</li>
+			<li><b>Check:</b> Success message is displayed.</li>
+			<li>Reload the application.</li>
+			<li><b>Check:</b> The previously saved values appear in the fields.</li>
+			<li>Press the <code>V4</code> button.</li>
+			<li>Clear the field <code>String40</code> in the Identification section (leave empty).</li>
+			<li><b>Check:</b> The input field is empty.</li>
 			<li>Press <code>Save</code>.</li>
-			<li>Reload the application and <b>Check</b> whether the before saved values appear.</li>
-			<li>Clear the field labeled <code>String40</code></li>
-			<li><b>Check</b>: The input field is empty.</li>
-			<li>Press <code>Save</code>.</li>
-			<li><b>Check</b>: No error occurs.</li>
-			<li>Reload the application and <b>Check</b> whether the field is still empty.</li>
-			<li>Press <code>Reset</code>.</li>
-			<li><b>Check</b> whether the default values provided by the service appear.</li>
-			<li>Reload the application and <b>Check</b> whether the default values still appear.
-			  </li>
-			<li>Press <code>V4</code> button and test the same within for OData v4 model.</li>
-		</ol>
-	</body>
+			<li><b>Check:</b> No error occurs (empty string is valid due to parseKeepsEmptyString).</li>
+			<li>Reload the application.</li>
+			<li><b>Check:</b> The field is still empty.</li>
+		<li>Press <code>Reset</code>.</li>
+		<li><b>Check:</b> Default values provided by the service appear.</li>
+		<li>Reload the application.</li>
+		<li><b>Check:</b> The default values still appear.</li>
+	</ol>
+</body>
 </html>

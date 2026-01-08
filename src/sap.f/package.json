@@ -24,7 +24,6 @@
     "@ui5/webcomponents-icons": "2.15.0",
     "@ui5/webcomponents-icons-business-suite": "2.15.0",
     "@ui5/webcomponents-icons-tnt": "2.15.0",
-    "@ui5/cli": "4.0.36",
     "fs-extra": "11.3.2",
     "ui5-tooling-modules": "3.33.7"
   },
