@@ -591,6 +591,7 @@ sap.ui.define([
 					 "hideControl": "default",
 					 "unhideControl": "default"
 				 },
+				 "sap.m.SegmentedButton": "sap/m/flexibility/SegmentedButton",
 				 "sap.m.Slider": {
 					 "hideControl": "default",
 					 "unhideControl": "default"
