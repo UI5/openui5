@@ -276,6 +276,7 @@ sap.ui.define([
 		this._oTokensWidthMap = {};
 		this._oIndicator = null;
 		this._bShouldRenderTabIndex = null;
+		this._oTokenToFocusAfterDelete = null;
 		this._oScroller = new ScrollEnablement(this, this.getId() + "-scrollContainer", {
 			horizontal : true,
 			vertical : false,
@@ -298,16 +299,12 @@ sap.ui.define([
 		this.attachEvent("delete", function(oEvent) {
 			var oToken = oEvent.getSource();
 			var aSelectedTokens = this.getSelectedTokens();
-			var oTokenToFocus = !!aSelectedTokens.length && aSelectedTokens[aSelectedTokens.indexOf(oToken) + 1] || aSelectedTokens[aSelectedTokens.indexOf(oToken) - 1];
+			this._oTokenToFocusAfterDelete = this._getTokenToFocusAfterDelete(oToken, true);
 
 			this._fireCompatibilityEvents(oToken, aSelectedTokens);
 			this.fireEvent("tokenDelete", {
 				tokens: [oToken]
 			});
-
-			if (oTokenToFocus) {
-				oTokenToFocus.focus();
-			}
 
 			oEvent.cancelBubble();
 		}, this);
@@ -968,7 +965,7 @@ sap.ui.define([
 	 */
 	Tokenizer.prototype.onAfterRendering = function() {
 		var sRenderMode = this.getRenderMode();
-		var oTokenToFocus = this._getTokenToFocus();
+		var oFocusableToken = this._getTokenToFocus();
 
 		this._oIndicator = this.$().find(".sapMTokenizerIndicator");
 
@@ -989,8 +986,13 @@ sap.ui.define([
 			});
 		}
 
-		if (oTokenToFocus && oTokenToFocus.getDomRef() && this.getEffectiveTabIndex()) {
-			oTokenToFocus.getDomRef().setAttribute("tabindex", "0");
+		if (oFocusableToken && oFocusableToken.getDomRef() && this.getEffectiveTabIndex()) {
+			oFocusableToken.getDomRef().setAttribute("tabindex", "0");
+		}
+
+		if (this._oTokenToFocusAfterDelete) {
+			this._oTokenToFocusAfterDelete.focus();
+			this._oTokenToFocusAfterDelete = null;
 		}
 
 		if (this._bFocusFirstToken) {
@@ -1040,6 +1042,25 @@ sap.ui.define([
 		return aVisibleTokens.find((oToken) => oToken.getSelected()) || aVisibleTokens[0];
 	};
 
+	Tokenizer.prototype._getTokenToFocusAfterDelete = function (oFocusedToken, bFromClick) {
+		var aTokens = this._getVisibleTokens();
+
+		if (aTokens.length === 1) {
+			return null;
+		}
+
+		var aSelectedTokens = this.getSelectedTokens();
+
+		if (bFromClick && aSelectedTokens.length > 1) {
+			return aSelectedTokens[aSelectedTokens.indexOf(oFocusedToken) + 1] || aSelectedTokens[aSelectedTokens.indexOf(oFocusedToken) - 1];
+		} else {
+			// all selected tokens should be deleted so we have to move the focus to the next/previous non-selected token closest to the focused one
+			var iFocusedTokenIndex = aTokens.indexOf(oFocusedToken);
+			return aTokens.find(( oToken, oIndex ) => { return oIndex > iFocusedTokenIndex && !aSelectedTokens.includes( oToken ); }) ||
+				aTokens.slice().reverse().find(( oToken, oIndex ) => { return (aTokens.length - 1 - oIndex) < iFocusedTokenIndex && !aSelectedTokens.includes( oToken ); });
+		}
+	};
+
 	/**
 	 * Handles the setting of collapsed state.
 	 *
@@ -1084,19 +1105,13 @@ sap.ui.define([
 	};
 
 	Tokenizer.prototype.onsapbackspace = function (oEvent) {
-		var aSelectedTokens = this.getSelectedTokens();
 		var oFocusedToken = this.getTokens().filter(function (oToken) {
 			return oToken.getFocusDomRef() === document.activeElement;
 		})[0];
-		var aTokens = this.getTokens();
-		var aDeletingTokens = aSelectedTokens.length ? aSelectedTokens : [oFocusedToken];
-		var oTokenToFocus = !!aSelectedTokens.length && aTokens[aSelectedTokens.indexOf(oFocusedToken) + 1] || aTokens[aSelectedTokens.indexOf(oFocusedToken) - 1];
+		var aDeletingTokens = this.getSelectedTokens().length ? this.getSelectedTokens() : [oFocusedToken];
+		this._oTokenToFocusAfterDelete = this._getTokenToFocusAfterDelete(oFocusedToken, false);
 
 		oEvent.preventDefault();
-
-		if (oTokenToFocus) {
-			oTokenToFocus.focus();
-		}
 
 		return this.fireTokenDelete({
 			tokens: aDeletingTokens,
