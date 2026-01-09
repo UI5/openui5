@@ -72,7 +72,7 @@ sap.ui.define([
 		assert.ok(this.oColSearch.oVariantList, "List should exist");
 	});
 
-	QUnit.test("testing subheader and search field visiblity", function(assert) {
+	QUnit.test("testing subheader and search field visiblity", async function(assert) {
 		// arrange
 		this.oColSearch.placeAt("mdcColSearchcontent");
 		oCore.applyChanges();
@@ -83,6 +83,7 @@ sap.ui.define([
 		this.oColSearch.addItem(new Item({key: "cs2", text: "col Search 2"}));
 
 		this.oColSearch.onclick();
+		await new Promise((resolve) => {setTimeout(resolve, 100);}); //wait until open triggered
 
 		// Assert
 		assert.ok(!this.oColSearch.oVariantSelectionPage.getShowSubHeader(), "Subheader should not be visible");
@@ -90,6 +91,7 @@ sap.ui.define([
 			this.oColSearch.addItem(new Item({key: "cs" + i, text: "col Search " + i}));
 		}
 		this.oColSearch.onclick();
+		await new Promise((resolve) => {setTimeout(resolve, 100);}); //wait until open triggered
 		assert.ok(this.oColSearch.oVariantSelectionPage.getShowSubHeader(), "Subheader should be visible when more than 9 items exist");
 	});
 
@@ -121,7 +123,7 @@ sap.ui.define([
 		assert.equal(this.oColSearch.oVariantList.getItems().length, 10, "all items should be avaiable/visible after search in the list");
 	});
 
-	QUnit.test("testing open popover via keyboard", function(assert) {
+	QUnit.test("testing open popover via keyboard", async function(assert) {
 		// arrange
 		this.oColSearch.placeAt("mdcColSearchcontent");
 		oCore.applyChanges();
@@ -132,6 +134,7 @@ sap.ui.define([
 		this.oColSearch.addItem(new Item({key: "cs2", text: "col Search 2"}));
 
 		this.oColSearch.onkeyup({which : keyCodes.F4});
+		await new Promise((resolve) => {setTimeout(resolve, 100);}); //wait until open triggered
 		oCore.applyChanges();
 
 		// Assert
