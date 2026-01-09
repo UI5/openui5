@@ -83,6 +83,7 @@ sap.ui.define([
 		this.oColSearch.addItem(new Item({key: "cs2", text: "col Search 2"}));
 
 		this.oColSearch.onclick();
+		await new Promise((resolve) => {setTimeout(resolve, 100);}); //wait until open triggered
 
 		// Assert
 		assert.ok(!this.oColSearch.oVariantSelectionPage.getShowSubHeader(), "Subheader should not be visible");
@@ -90,6 +91,7 @@ sap.ui.define([
 			this.oColSearch.addItem(new Item({key: "cs" + i, text: "col Search " + i}));
 		}
 		this.oColSearch.onclick();
+		await new Promise((resolve) => {setTimeout(resolve, 100);}); //wait until open triggered
 		assert.ok(this.oColSearch.oVariantSelectionPage.getShowSubHeader(), "Subheader should be visible when more than 9 items exist");
 	});
 
@@ -141,6 +143,7 @@ sap.ui.define([
 		this.oColSearch.addItem(new Item({key: "cs2", text: "col Search 2"}));
 
 		this.oColSearch.onkeyup({which : keyCodes.F4});
+		await new Promise((resolve) => {setTimeout(resolve, 100);}); //wait until open triggered
 		await nextUIUpdate();
 
 		// Assert

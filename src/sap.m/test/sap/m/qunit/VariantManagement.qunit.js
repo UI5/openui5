@@ -410,10 +410,11 @@ sap.ui.define([
 		});
 
 		var fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
-		sinon.stub(this.oVM, "_openVariantList").callsFake(function (oEvent) {
+		sinon.stub(this.oVM, "_openVariantList").callsFake(async function (oEvent) {
 
 			fOriginalCall(oEvent);
 
+			await new Promise((resolve) => {setTimeout(resolve, 100);}); //wait until open triggered
 			assert.ok(this.oVM.oVariantSaveBtn.getVisible(), "should be visible");
 
 			var oTarget = this.oVM.oVariantSaveBtn.getFocusDomRef();
@@ -626,7 +627,7 @@ sap.ui.define([
 		this.oVM.onclick();
 	});
 
-	QUnit.test("check opening the varian list display in simulated designmode", function(assert) {
+	QUnit.test("check opening the variant list display in simulated designmode", function(assert) {
 		this.oVM.addItem(new VariantItem({key: "1", title:"One"}));
 
 		sinon.stub(this.oVM, "_openVariantList");
@@ -640,7 +641,7 @@ sap.ui.define([
         assert.ok(this.oVM._openVariantList.called);
 	});
 
-	QUnit.test("check no data available", function(assert) {
+	QUnit.test("check no data available", async function(assert) {
 		this.oVM.onclick();
 		assert.ok(!this.oVM.oVariantList.getVisible(), "list is invisible");
 		assert.ok(this.oVM.oNodataTextLayout.getVisible(), "no data text is visible");
@@ -649,6 +650,7 @@ sap.ui.define([
 		this.oVM.addItem(new VariantItem({key: "1", title:"View1"}));
 
 		this.oVM.onclick();
+		await new Promise((resolve) => {setTimeout(resolve, 100);}); //wait until opened
 		assert.ok(this.oVM.oVariantList.getVisible(), "list is visible");
 		assert.ok(!this.oVM.oNodataTextLayout.getVisible(), "no data text is invisible");
 
@@ -728,10 +730,11 @@ sap.ui.define([
 		}.bind(this));
 
 		var fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
-		sinon.stub(this.oVM, "_openVariantList").callsFake(function (oEvent) {
+		sinon.stub(this.oVM, "_openVariantList").callsFake(async function (oEvent) {
 
 			fOriginalCall(oEvent);
 
+			await new Promise((resolve) => {setTimeout(resolve, 100);}); //wait until open triggered
 			var oTarget = this.oVM.oVariantSaveAsBtn.getFocusDomRef();
 			assert.ok(oTarget);
 			QUnitUtils.triggerTouchEvent("tap", oTarget, {
@@ -776,10 +779,11 @@ sap.ui.define([
 		}.bind(this));
 
 		var fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
-		sinon.stub(this.oVM, "_openVariantList").callsFake(function (oEvent) {
+		sinon.stub(this.oVM, "_openVariantList").callsFake(async function (oEvent) {
 
 			fOriginalCall(oEvent);
 
+			await new Promise((resolve) => {setTimeout(resolve, 100);}); //wait until open triggered
 			var oTarget = this.oVM.oVariantSaveAsBtn.getFocusDomRef();
 			assert.ok(oTarget);
 			QUnitUtils.triggerTouchEvent("tap", oTarget, {
@@ -822,10 +826,11 @@ sap.ui.define([
 		}.bind(this));
 
 		var fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
-		sinon.stub(this.oVM, "_openVariantList").callsFake(function (oEvent) {
+		sinon.stub(this.oVM, "_openVariantList").callsFake(async function (oEvent) {
 
 			fOriginalCall(oEvent);
 
+			await new Promise((resolve) => {setTimeout(resolve, 100);}); //wait until open triggered
 			var oTarget = this.oVM.oVariantSaveAsBtn.getFocusDomRef();
 			assert.ok(oTarget);
 			QUnitUtils.triggerTouchEvent("tap", oTarget, {
@@ -896,9 +901,10 @@ sap.ui.define([
 		}.bind(this));
 
 		var fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
-		sinon.stub(this.oVM, "_openVariantList").callsFake(function (oEvent) {
+		sinon.stub(this.oVM, "_openVariantList").callsFake(async function (oEvent) {
 			fOriginalCall(oEvent);
 
+			await new Promise((resolve) => {setTimeout(resolve, 100);}); //wait until open triggered
 			var oTarget = this.oVM.oVariantSaveAsBtn.getFocusDomRef();
 			assert.ok(oTarget);
 			QUnitUtils.triggerTouchEvent("tap", oTarget, {
@@ -952,10 +958,11 @@ sap.ui.define([
 		}.bind(this));
 
 		var fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
-		sinon.stub(this.oVM, "_openVariantList").callsFake(function (oEvent) {
+		sinon.stub(this.oVM, "_openVariantList").callsFake(async function (oEvent) {
 
 			fOriginalCall(oEvent);
 
+			await new Promise((resolve) => {setTimeout(resolve, 100);}); //wait until open triggered
 			var oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
 			assert.ok(oTarget);
 			QUnitUtils.triggerTouchEvent("tap", oTarget, {
@@ -1000,10 +1007,11 @@ sap.ui.define([
 		}.bind(this));
 
 		var fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
-		sinon.stub(this.oVM, "_openVariantList").callsFake(function (oEvent) {
+		sinon.stub(this.oVM, "_openVariantList").callsFake(async function (oEvent) {
 
 			fOriginalCall(oEvent);
 
+			await new Promise((resolve) => {setTimeout(resolve, 100);}); //wait until open triggered
 			var oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
 			assert.ok(oTarget);
 			QUnitUtils.triggerTouchEvent("tap", oTarget, {
@@ -1124,10 +1132,11 @@ sap.ui.define([
 		}.bind(this));
 
 		var fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
-		sinon.stub(this.oVM, "_openVariantList").callsFake(function (oEvent) {
+		sinon.stub(this.oVM, "_openVariantList").callsFake(async function (oEvent) {
 
 			fOriginalCall(oEvent);
 
+			await new Promise((resolve) => {setTimeout(resolve, 100);}); //wait until open triggered
 			var oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
 			assert.ok(oTarget);
 			QUnitUtils.triggerTouchEvent("tap", oTarget, {
@@ -1285,6 +1294,7 @@ sap.ui.define([
 
 			fOriginalCall(oEvent);
 
+			await new Promise((resolve) => {setTimeout(resolve, 100);}); //wait until open triggered
 			var oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
 			assert.ok(oTarget);
 			QUnitUtils.triggerTouchEvent("tap", oTarget, {
@@ -1397,10 +1407,11 @@ sap.ui.define([
 
 
 		var fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
-		sinon.stub(this.oVM, "_openVariantList").callsFake(function (oEvent) {
+		sinon.stub(this.oVM, "_openVariantList").callsFake(async function (oEvent) {
 
 			fOriginalCall(oEvent);
 
+			await new Promise((resolve) => {setTimeout(resolve, 100);}); //wait until open triggered
 			var oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
 			assert.ok(oTarget);
 			QUnitUtils.triggerTouchEvent("tap", oTarget, {
@@ -1473,10 +1484,11 @@ sap.ui.define([
 
 
 		var fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
-		sinon.stub(this.oVM, "_openVariantList").callsFake(function (oEvent) {
+		sinon.stub(this.oVM, "_openVariantList").callsFake(async function (oEvent) {
 
 			fOriginalCall(oEvent);
 
+			await new Promise((resolve) => {setTimeout(resolve, 100);}); //wait until open triggered
 			var oTarget = this.oVM.oVariantManageBtn.getFocusDomRef();
 			assert.ok(oTarget);
 			QUnitUtils.triggerTouchEvent("tap", oTarget, {
