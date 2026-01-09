@@ -49,7 +49,6 @@ sap.ui.define([
 	 * @author SAP SE
 	 * @version ${version}
 	 * @since 1.123
-	 * @experimental
 	 * @private
 	 */
 	const ToolbarControlFactory = {};

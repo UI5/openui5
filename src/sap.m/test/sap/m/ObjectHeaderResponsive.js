@@ -651,7 +651,6 @@ sap.ui.define([
 		  text : "Order Shipping slow"
 	  }), new ProgressIndicator("oh18-pi", {
 		  visible : true,
-		  enabled : true,
 		  state : ValueState.NEUTRAL,
 		  //displayValue : '56%',
 		  percentValue : 56,
@@ -662,7 +661,6 @@ sap.ui.define([
 		  text : "High"
 	  }), new ProgressIndicator("oh18-pi2", {
 		  visible : true,
-		  enabled : true,
 		  state : ValueState.NEUTRAL,
 		  //displayValue : '90%',
 		  percentValue : 90,
@@ -732,7 +730,6 @@ sap.ui.define([
 		  text : "Order Shipping slow"
 	  }), new ProgressIndicator("oh18-piSmall", {
 		  visible : true,
-		  enabled : true,
 		  state : ValueState.NEUTRAL,
 		  //displayValue : '56%',
 		  percentValue : 56,
@@ -743,7 +740,6 @@ sap.ui.define([
 		  text : "High"
 	  }), new ProgressIndicator("oh18-pi2Small", {
 		  visible : true,
-		  enabled : true,
 		  state : ValueState.NEUTRAL,
 		  //displayValue : '90%',
 		  percentValue : 90,
@@ -918,51 +914,46 @@ sap.ui.define([
   });
   oh10.addStyleClass("sapUiResponsivePadding--header");
 
-  Library.load("sap.suite.ui.commons").then(() => {
+  Library.load("sap.suite.ui.microchart").then(() => {
 	  sap.ui.require([
 		  "sap/ui/core/Fragment",
-		  "sap/suite/ui/commons/HeaderContainer",
-		  "sap/suite/ui/commons/HeaderCell",
-		  "sap/suite/ui/commons/HeaderCellItem",
-		  "sap/suite/ui/commons/ComparisonChart",
-		  "sap/suite/ui/commons/ComparisonData"
-	  ], function(Fragment, HeaderContainer, HeaderCell, HeaderCellItem, ComparisonChart, ComparisonData) {
+		  "sap/m/HeaderContainer",
+		  "sap/m/VBox",
+		  "sap/suite/ui/microchart/ComparisonMicroChart",
+		  "sap/suite/ui/microchart/ComparisonMicroChartData"
+	  ], function(Fragment, HeaderContainer, VBox, ComparisonMicroChart, ComparisonMicroChartData) {
 
 		  var hc9 = new HeaderContainer({
 			  scrollStep: 200,
 			  scrollTime: 500,
-			  items: [
-				  new HeaderCell({
-					  north: new HeaderCellItem({
-						  height: "90%",
-						  content: new ComparisonChart({
+			  content: [
+				  new VBox({
+					  items: [
+						  new ComparisonMicroChart({
 							  size: "S",
 							  scale: "M",
 							  data: [
-								  new ComparisonData({
+								  new ComparisonMicroChartData({
 									  title: "Americas",
 									  value: 234,
 									  color: "Good"
 								  }),
-								  new ComparisonData({
+								  new ComparisonMicroChartData({
 									  title: "EMEA",
 									  value: 97,
 									  color: "Error"
 								  }),
-								  new ComparisonData({
+								  new ComparisonMicroChartData({
 									  title: "APAC",
 									  value: 197,
 									  color: "Critical"
 								  })
 							  ]
-						  })
-					  }),
-					  south: new HeaderCellItem({
-						  height: "10%",
-						  content: new Label({
+						  }),
+						  new Label({
 							  text: "EUR, Compare across regions"
 						  })
-					  })
+					  ]
 				  })
 			  ]
 		  });
@@ -971,120 +962,62 @@ sap.ui.define([
 		  oh9.setHeaderContainer(hc9);
 
 		  var xml = '' +
-		  '<HeaderContainer xmlns="sap.suite.ui.commons" xmlns:m="sap.m" scrollStep="200" scrollTime="500">' +
-		  '	<items>' +
-		  '		<HeaderCell>' +
-		  '			<north>' +
-		  '				<HeaderCellItem height="90%">' +
-		  '					<content>' +
-		  '						<ComparisonChart size="S" scale="M">' +
-		  '					        <data>' +
-		  '					        	<ComparisonData	title="Americas" value="234" color="Good"/>' +
-		  '					        	<ComparisonData	title="EMEA" value="97" color="Error"/>' +
-		  '					        	<ComparisonData	title="APAC" value="197" color="Critical"/>' +
-		  '					        </data>' +
-		  '				        </ComparisonChart>' +
-		  '					</content>' +
-		  '				</HeaderCellItem>' +
-		  '			</north>' +
-		  '			<south>' +
-		  '				<HeaderCellItem height="10%">' +
-		  '					<content>' +
-		  '						<m:Label text="EUR, Compare across regions" />' +
-		  '					</content>' +
-		  '				</HeaderCellItem>' +
-		  '			</south>' +
-		  '		</HeaderCell>' +
-		  '		<HeaderCell>' +
-		  '			<north>' +
-		  '				<HeaderCellItem height="90%">' +
-		  '					<content>' +
-		  '						<NumericContent size="S" scale="M" value="1.96" valueColor="Error" indicator="Up"/>' +
-		  '					</content>' +
-		  '				</HeaderCellItem>' +
-		  '			</north>' +
-		  '			<south>' +
-		  '				<HeaderCellItem height="10%">' +
-		  '					<content>' +
-		  '						<m:Label text="EUR, Current Quarter" />' +
-		  '					</content>' +
-		  '				</HeaderCellItem>' +
-		  '			</south>' +
-		  '		</HeaderCell>' +
-		  '		<HeaderCell>' +
-		  '			<north>' +
-		  '				<HeaderCellItem height="90%">' +
-		  '					<content>' +
-		  '						<BulletChart size="S" scale="M" targetValue="75" targetValueLabel="75c" minValue="0" maxValue="150">' +
-		  '							<actual>' +
-		  '								<BulletChartData value="125" color="Error"/>' +
-		  '							</actual>' +
-		  '							<thresholds>' +
-		  '								<BulletChartData value="35" color="Critical"/>' +
-		  '								<BulletChartData value="115" color="Error"/>' +
-		  '							</thresholds>' +
-		  '						</BulletChart> ' +
-		  '					</content>' +
-		  '				</HeaderCellItem>' +
-		  '			</north>' +
-		  '			<south>' +
-		  '				<HeaderCellItem height="10%">' +
-		  '					<content>' +
-		  '						<m:Label text="EUR, Current and Target" />' +
-		  '					</content>' +
-		  '				</HeaderCellItem>' +
-		  '			</south>' +
-		  '		</HeaderCell>' +
-		  '		<HeaderCell>' +
-		  '			<north>' +
-		  '				<HeaderCellItem height="90%">' +
-		  '					<content>' +
-		  '						<NumericContent size="S" value="3" icon="sap-icon://travel-expense" />' +
-		  '					</content>' +
-		  '				</HeaderCellItem>' +
-		  '			</north>' +
-		  '			<south>' +
-		  '				<HeaderCellItem height="10%">' +
-		  '					<content>' +
-		  '						<m:Label text="Leave Requests" />' +
-		  '					</content>' +
-		  '				</HeaderCellItem>' +
-		  '			</south>' +
-		  '		</HeaderCell>' +
-		  '		<HeaderCell>' +
-		  '			<north>' +
-		  '				<HeaderCellItem height="90%">' +
-		  '					<content>' +
-		  '						<NumericContent size="S" value="9" icon="sap-icon://locked" /> ' +
-		  '					</content>' +
-		  '				</HeaderCellItem>' +
-		  '			</north>' +
-		  '			<south>' +
-		  '				<HeaderCellItem height="10%">' +
-		  '					<content>' +
-		  '						<m:Label text="Hours since last Activity" />' +
-		  '					</content>' +
-		  '				</HeaderCellItem>' +
-		  '			</south>' +
-		  '		</HeaderCell>' +
-		  '		<HeaderCell>' +
-		  '			<north>' +
-		  '				<HeaderCellItem height="90%">' +
-		  '					<content>' +
-		  '						<NumericContent size="S" scale="M" value="1.25" valueColor="Good" indicator="Up"/>' +
-		  '					</content>' +
-		  '				</HeaderCellItem>' +
-		  '			</north>' +
-		  '			<south>' +
-		  '				<HeaderCellItem height="10%">' +
-		  '					<content>' +
-		  '						<m:Label text="EUR, Current Quarter" />' +
-		  '					</content>' +
-		  '				</HeaderCellItem>' +
-		  '			</south>' +
-		  '		</HeaderCell>' +
-		  '	</items>' +
-		  '</HeaderContainer>';
+		  '<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:micro="sap.suite.ui.microchart">' +
+		  '	<HeaderContainer scrollStep="200" scrollTime="500">' +
+		  '		<content>' +
+		  '			<VBox>' +
+		  '				<items>' +
+		  '					<micro:ComparisonMicroChart size="S" scale="M">' +
+		  '						<micro:data>' +
+		  '							<micro:ComparisonMicroChartData title="Americas" value="234" color="Good"/>' +
+		  '							<micro:ComparisonMicroChartData title="EMEA" value="97" color="Error"/>' +
+		  '							<micro:ComparisonMicroChartData title="APAC" value="197" color="Critical"/>' +
+		  '						</micro:data>' +
+		  '					</micro:ComparisonMicroChart>' +
+		  '					<Label text="EUR, Compare across regions" />' +
+		  '				</items>' +
+		  '			</VBox>' +
+		  '			<VBox>' +
+		  '				<items>' +
+		  '					<NumericContent value="1.96" scale="M" valueColor="Error" indicator="Up"/>' +
+		  '					<Label text="EUR, Current Quarter" />' +
+		  '				</items>' +
+		  '			</VBox>' +
+		  '			<VBox>' +
+		  '				<items>' +
+		  '					<micro:BulletMicroChart size="S" scale="M" targetValue="75" targetValueLabel="75c" minValue="0" maxValue="150">' +
+		  '						<micro:actual>' +
+		  '							<micro:BulletMicroChartData value="125" color="Error"/>' +
+		  '						</micro:actual>' +
+		  '						<micro:thresholds>' +
+		  '							<micro:BulletMicroChartData value="35" color="Critical"/>' +
+		  '							<micro:BulletMicroChartData value="115" color="Error"/>' +
+		  '						</micro:thresholds>' +
+		  '					</micro:BulletMicroChart>' +
+		  '					<Label text="EUR, Current and Target" />' +
+		  '				</items>' +
+		  '			</VBox>' +
+		  '			<VBox>' +
+		  '				<items>' +
+		  '					<NumericContent value="3" icon="sap-icon://travel-expense" />' +
+		  '					<Label text="Leave Requests" />' +
+		  '				</items>' +
+		  '			</VBox>' +
+		  '			<VBox>' +
+		  '				<items>' +
+		  '					<NumericContent value="9" icon="sap-icon://locked" />' +
+		  '					<Label text="Hours since last Activity" />' +
+		  '				</items>' +
+		  '			</VBox>' +
+		  '			<VBox>' +
+		  '				<items>' +
+		  '					<NumericContent value="1.25" scale="M" valueColor="Good" indicator="Up"/>' +
+		  '					<Label text="EUR, Current Quarter" />' +
+		  '				</items>' +
+		  '			</VBox>' +
+		  '		</content>' +
+		  '	</HeaderContainer>' +
+		  '</core:FragmentDefinition>';
 
 		  Fragment.load({
 			  definition: xml
@@ -1094,13 +1027,13 @@ sap.ui.define([
 		  });
 	  });
   }, function(err) {
-	  console.info("This test page requires the library 'sap.suite.ui.commons' to display the HeaderContainer control inside the ObjectHeader which is not available.");
+	  console.info("This test page requires the library 'sap.suite.ui.microchart' to display the HeaderContainer control inside the ObjectHeader which is not available.");
 	  oh9.setHeaderContainer(
 		  new HeaderContainer({
 			  content: [
 				  new Text({
 					  textAlign: TextAlign.Center,
-					  text: "sap.suite.ui.commons library is missing"
+					  text: "sap.suite.ui.microchart library is missing"
 				  }).addStyleClass("missingControl sapThemeBrand-asBorderColor")
 			  ]
 		  })
@@ -1110,7 +1043,7 @@ sap.ui.define([
 			  content: [
 				  new Text({
 					  textAlign: TextAlign.Center,
-					  text: "sap.suite.ui.commons library is missing"
+					  text: "sap.suite.ui.microchart library is missing"
 				  }).addStyleClass("missingControl sapThemeBrand-asBorderColor")
 			  ]
 		  })

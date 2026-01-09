@@ -17,9 +17,8 @@ sap.ui.define([
      * @author SAP SE
      * @alias module:sap/ui/mdc/odata/v4/GeomapDelegate
      * @extends module:sap/ui/mdc/GeomapDelegate
-     * @since 1.140
      *
-     * @experimental
+     * @ui5-experimental-since 1.142
      * @private
      * @ui5-restricted sap.fe, sap.ui.mdc
      *
@@ -37,7 +36,7 @@ sap.ui.define([
      * @param {string} sRole Role of the new item (if available)
      * @returns {Promise<sap.ui.mdc.geomap.Item>} Created MDC Item
      *
-     * @experimental
+     * @ui5-experimental-since 1.142
      * @private
      * @ui5-restricted sap.fe, sap.ui.mdc
      */

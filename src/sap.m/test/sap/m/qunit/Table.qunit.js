@@ -37,8 +37,9 @@ sap.ui.define([
 	"sap/m/RatingIndicator",
 	"sap/ui/core/Item",
 	"sap/m/TextArea",
-	"sap/ui/core/Control"
-], function(Localization, IllustratedMessageType, Element, Library, qutils, nextUIUpdate, KeyCodes, JSONModel, Device, Filter, Sorter, InvisibleText, ListBase, Table, Column, Label, Link, Toolbar, ToolbarSpacer, Button, Input, ColumnListItem, ListItemAction, Text, Title, ScrollContainer, library, GroupHeaderListItem, VerticalLayout, Message, jQuery, IllustratedMessage, ComboBox, CheckBox, RatingIndicator, Item, TextArea, Control) {
+	"sap/ui/core/Control",
+	"sap/m/plugins/ColumnAIAction"
+], function(Localization, IllustratedMessageType, Element, Library, qutils, nextUIUpdate, KeyCodes, JSONModel, Device, Filter, Sorter, InvisibleText, ListBase, Table, Column, Label, Link, Toolbar, ToolbarSpacer, Button, Input, ColumnListItem, ListItemAction, Text, Title, ScrollContainer, library, GroupHeaderListItem, VerticalLayout, Message, jQuery, IllustratedMessage, ComboBox, CheckBox, RatingIndicator, Item, TextArea, Control, ColumnAIAction) {
 	"use strict";
 
 	const TestControl = Control.extend("sap.m.test.TestControl", {
@@ -1162,8 +1163,11 @@ sap.ui.define([
 		// _setHeaderAnnouncement() test
 		let $tblHeader = sut.$("tblHeader").trigger("focus");
 		let oInvisibleText = document.getElementById($tblHeader.attr("aria-labelledby"));
-		assert.equal(oInvisibleText.innerHTML, oResourceBundle.getText("ACC_CTR_TYPE_HEADER_ROW") + " . Name " +
-			oResourceBundle.getText("CONTROL_IN_COLUMN_REQUIRED") +  " . Color . Number .", "Custom announcement for header with required content");
+		assert.equal(
+			oInvisibleText.innerHTML,
+			oResourceBundle.getText("ACC_CTR_TYPE_HEADER_ROW") + " . Name . Color . Number .",
+			"Custom announcement for header without required content"
+		);
 		assert.ok(oColumnHeader.hasListeners("_change"), "Property change event handler is added");
 		assert.ok(oColumnHeader._isInColumnHeaderContext , "Label is marked as column header label");
 		assert.equal(oColumn.$().attr("aria-describedby"), InvisibleText.getStaticId("sap.m", "CONTROL_IN_COLUMN_REQUIRED"),
@@ -1246,7 +1250,7 @@ sap.ui.define([
 
 		const $tblHeader = sut.$("tblHeader").trigger("focus");
 		const oInvisibleText = document.getElementById($tblHeader.attr("aria-labelledby"));
-		assert.equal(oInvisibleText.innerHTML, oResourceBundle.getText("ACC_CTR_TYPE_HEADER_ROW") + " . Column A " + oResourceBundle.getText("CONTROL_IN_COLUMN_REQUIRED") + " .", "Text correctly assigned for screen reader announcement");
+		assert.equal(oInvisibleText.innerHTML, oResourceBundle.getText("ACC_CTR_TYPE_HEADER_ROW") + " . Column A .", "Text correctly assigned for screen reader announcement");
 		assert.equal(oColumn.$().attr("aria-describedby"), InvisibleText.getStaticId("sap.m", "CONTROL_IN_COLUMN_REQUIRED"), "Required state added as aria-describedby");
 
 		sut.destroy();
@@ -1365,7 +1369,7 @@ sap.ui.define([
 			cells: [
 				new Label({required: true, text: "Max"}),
 				new Label({text: "Mustermann"}),
-				new CheckBox()
+				new CheckBox({required: true})
 			]
 		});
 		const oBundle = Library.getResourceBundleFor("sap.m");
@@ -1384,25 +1388,97 @@ sap.ui.define([
 		const sRequired = oBundle.getText("ELEMENT_REQUIRED");
 
 		assert.strictEqual(oListItem.getContentAnnouncement(),
-							"First Name Max " + sRequired + " . Last Name Mustermann . Available Checkbox Not Checked",
+							"First Name Max . Last Name Mustermann . Available Checkbox Not Checked " + sRequired,
 							"Content announcement for ColumnListItem");
 		assert.strictEqual(oListItem.getAccessibilityInfo().description,
-							oBundle.getText("LIST_ITEM_NAVIGATION") + " . " + "First Name Max " + sRequired + " . Last Name Mustermann . Available Checkbox Not Checked",
+							oBundle.getText("LIST_ITEM_NAVIGATION") + " . " + "First Name Max . Last Name Mustermann . Available Checkbox Not Checked " + sRequired,
 							"Announcement of required state");
 
 		aColumns[0].setOrder(1);
 		aColumns[1].setOrder(0);
 		assert.strictEqual(oListItem.getContentAnnouncement(),
-							"Last Name Mustermann . First Name Max " + sRequired + " . Available Checkbox Not Checked",
+							"Last Name Mustermann . First Name Max . Available Checkbox Not Checked " + sRequired,
 							"Accessibility order is updated");
 
-		assert.strictEqual(oListItem.getContentAnnouncementOfCell(aColumns[0]), "Max Required");
+		assert.strictEqual(oListItem.getContentAnnouncementOfCell(aColumns[0]), "Max");
 		assert.strictEqual(oListItem.getContentAnnouncementOfCell(aColumns[1]), "Mustermann");
-		assert.strictEqual(oListItem.getContentAnnouncementOfCell(aColumns[2]), "Checkbox Not Checked");
+		assert.strictEqual(oListItem.getContentAnnouncementOfCell(aColumns[2]), "Checkbox Not Checked " + sRequired);
 
 		const oVisiblePopinStub = sinon.stub(oTable, "_getVisiblePopin").returns([aColumns[1], aColumns[2]]);
-		assert.strictEqual(oListItem.getContentAnnouncementOfPopin(), "Last Name Mustermann . Available Checkbox Not Checked");
+		assert.strictEqual(oListItem.getContentAnnouncementOfPopin(), "Last Name Mustermann . Available Checkbox Not Checked " + sRequired);
 		oVisiblePopinStub.reset();
+		oTable.destroy();
+	});
+
+	QUnit.test("Custom announcement of Column and ColumnListItem", async function(assert) {
+		const oACC = ListBase.getInvisibleText();
+		const oCLI = new ColumnListItem({
+			cells: [
+				new Label({text: "Cell1"}),
+				new Input({value: "Cell2"})
+			],
+			actions: [
+				new ListItemAction({
+					type: "Delete"
+				})
+			]
+		});
+		const oTable = new Table({
+			items: oCLI,
+			itemActionCount: 1,
+			columns: [
+				new Column({
+					header: new Label({
+						required: true,
+						text: "Col1",
+						tooltip: "Tooltip1"
+					}),
+					dependents: new ColumnAIAction()
+				}),
+				new Column({
+					header: new Label({
+						required: true,
+						text: "Col2",
+						tooltip: "Tooltip2"
+					}),
+					dependents: new ColumnAIAction()
+				})
+			]
+		}).placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		oCLI.focus();
+		assert.equal(oACC.getText(), "Row . 2 of 2 . Col1 Cell1 . Col2 Input Cell2 . 1 action available", "Column details are not provided when the row is focused");
+
+		qutils.triggerKeydown(document.activeElement, "ARROW_RIGHT");
+		assert.equal(oACC.getText(), "Cell1", "No column details for cells and no 'includes' announcement for plain text");
+
+		qutils.triggerKeydown(document.activeElement, "ARROW_RIGHT");
+		assert.equal(oACC.getText(), "Includes Input Cell2", "No column details but 'includes' is announced since the cell is interactive");
+
+		qutils.triggerKeydown(document.activeElement, "ARROW_UP");
+		assert.equal(oACC.getText(), "Col2 Tooltip2 Generated by AI", "Tooltip and AI-Notice are announced for the 2nd column header");
+		assert.equal(document.activeElement.getAttribute("aria-describedby"), InvisibleText.getStaticId("sap.m", "CONTROL_IN_COLUMN_REQUIRED"), "Required state added as aria-describedby");
+
+		qutils.triggerKeydown(document.activeElement, "ARROW_LEFT");
+		assert.equal(oACC.getText(), "Col1 Tooltip1 Generated by AI", "Tooltip and AI-Notice are announced for the 1st column header");
+		assert.equal(document.activeElement.getAttribute("aria-describedby"), InvisibleText.getStaticId("sap.m", "CONTROL_IN_COLUMN_REQUIRED"), "Required state added as aria-describedby");
+
+		qutils.triggerKeydown(document.activeElement, "ARROW_LEFT");
+		const sRowActionsText = Library.getResourceBundleFor("sap.m").getText("TABLE_ROW_ACTIONS");
+		assert.equal(oACC.getText(), "Column Header Row . Col1 . Col2 . " + sRowActionsText, "Column details are not provided when the header row is focused and row action column is announced");
+
+		oTable.getColumns()[1].setDemandPopin(true);
+		oTable.getColumns()[1].setMinScreenWidth("100000px");
+		await nextUIUpdate();
+
+		qutils.triggerKeydown(document.activeElement, "ARROW_DOWN");
+		qutils.triggerKeydown(document.activeElement, "ARROW_RIGHT");
+		qutils.triggerKeydown(document.activeElement, "ARROW_RIGHT");
+		qutils.triggerKeydown(document.activeElement, "ARROW_RIGHT");
+		assert.ok(document.activeElement.classList.contains("sapMListTblSubCnt"), "Focus is on the popin");
+		assert.equal(oACC.getText(), "Includes Col2 Tooltip2 Generated by AI Input Cell2", "Tooltip and AI-Notice of the corresponding popin cell are announced. Required is not announced since it will be announced by the input");
+
 		oTable.destroy();
 	});
 
@@ -4349,7 +4425,7 @@ sap.ui.define([
 		this.testCell(this.o1stItem.getDomRef("ModeCell"), iColumnsLength + 2);
 		this.testCell(this.oTable.getDomRef("tblFootModeCol"), iColumnsLength + 2);
 
-		assert.equal(this.oTable.getDomRef("tblHeadModeCol").textContent, this.oRB.getText("TABLE_ROW_ACTION"));
+		assert.equal(this.oTable.getDomRef("tblHeadModeCol").textContent, this.oRB.getText("TABLE_ROW_ACTIONS"));
 		assert.ok(this.oTable.getDomRef("tblHeadModeCol").querySelector(".sapMTableScreenReaderOnly"), "sapMTableScreenReaderOnly class is added‚");
 	});
 
@@ -4525,7 +4601,7 @@ sap.ui.define([
 
 	QUnit.test("Rendering", async function(assert) {
 		const oRB = Library.getResourceBundleFor("sap.m");
-		const ROW_ACTION = oRB.getText("TABLE_ROW_ACTION");
+		const ROW_ACTION = oRB.getText("TABLE_ROW_ACTIONS");
 		const CONTROL_EMPTY = oRB.getText("CONTROL_EMPTY");
 		const ONE_ACTION_AVAILABLE = oRB.getText("LIST_ITEM_SINGLE_ACTION");
 		const TWO_ACTIONS_AVAILABLE = oRB.getText("LIST_ITEM_MULTIPLE_ACTIONS", [2]);

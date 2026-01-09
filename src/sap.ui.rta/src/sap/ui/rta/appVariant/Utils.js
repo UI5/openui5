@@ -24,8 +24,8 @@ sap.ui.define([
 		.then(function(oNavigationService) {
 			return oNavigationService.getLinks([oNavigationParams]);
 		})
-		.catch(function(vError) {
-			throw new Error(`Error retrieving ushell service Navigation: ${vError}`);
+		.catch(function(oError) {
+			throw new Error(`Error retrieving ushell service Navigation: ${oError.message}`, { cause: oError });
 		});
 	};
 

@@ -11,6 +11,7 @@ sap.ui.define([
 	"sap/ui/fl/apply/api/FlexRuntimeInfoAPI",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/initial/_internal/Settings",
+	"sap/ui/fl/util/CancelError",
 	"sap/ui/fl/write/_internal/appVariant/AppVariantFactory",
 	"sap/ui/fl/write/_internal/appVariant/AppVariantInlineChangeFactory",
 	"sap/ui/fl/write/_internal/flexState/FlexObjectManager",
@@ -25,6 +26,7 @@ sap.ui.define([
 	FlexRuntimeInfoAPI,
 	ManifestUtils,
 	Settings,
+	CancelError,
 	AppVariantFactory,
 	AppVariantInlineChangeFactory,
 	FlexObjectManager,
@@ -46,7 +48,7 @@ sap.ui.define([
 					)
 				)
 			) {
-				return Promise.reject("Package must be provided or is valid");
+				return Promise.reject(new Error("Package must be provided or is valid"));
 			}
 
 			// (Transport Validation) Writing, updating or deleting content in onPremise systems in all layers must require a transport unless the package is not local object
@@ -59,7 +61,7 @@ sap.ui.define([
 				&& !mPropertyBag.transport
 				&& !oSettings.getIsAtoEnabled()
 			) {
-				return Promise.reject("Transport must be provided");
+				return Promise.reject(new Error("Transport must be provided"));
 			}
 
 			// Smart business must pass transport information in case of onPremise systems unless app variant is not intended to be saved as local object
@@ -342,16 +344,16 @@ sap.ui.define([
 			.then(function(oAppVariant) {
 				return oAppVariant.submit()
 				.catch(function(oError) {
-					if (oError === "cancel") {
-						return Promise.reject("cancel");
+					if (oError instanceof CancelError) {
+						return Promise.reject(oError);
 					}
 					oError.messageKey = "MSG_DELETE_APP_VARIANT_FAILED";
 					throw oError;
 				});
 			})
 			.catch(function(oError) {
-				if (oError === "cancel") {
-					return Promise.reject("cancel");
+				if (oError instanceof CancelError) {
+					return Promise.reject(oError);
 				}
 				Log.error("the app variant could not be deleted.", oError.message || oError);
 				throw oError;

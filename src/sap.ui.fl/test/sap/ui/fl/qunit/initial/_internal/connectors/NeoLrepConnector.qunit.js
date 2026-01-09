@@ -38,8 +38,12 @@ sap.ui.define([
 
 		QUnit.test("given loadVariantsAuthors is called", function(assert) {
 			return NeoLrepConnector.loadVariantsAuthors().then(function() {
-			}).catch((sError) => {
-				assert.equal(sError, "loadVariantsAuthors is not implemented", "correct error is returned");
+			}).catch((oError) => {
+				assert.strictEqual(
+					oError.message,
+					"loadVariantsAuthors is not implemented",
+					"correct error is returned"
+				);
 			});
 		});
 	});

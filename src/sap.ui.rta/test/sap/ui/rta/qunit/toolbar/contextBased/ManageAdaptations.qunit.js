@@ -230,7 +230,7 @@ sap.ui.define([
 
 				assert.strictEqual(oReorderStub.callCount, 0, "reorder stub is not called");
 
-				this.oShowMessageBoxStub.returns(Promise.reject("cancel"));
+				this.oShowMessageBoxStub.resolves(MessageBox.Action.CANCEL);
 				this.oSaveButton.firePress();
 
 				return new Promise(function(resolve) {

@@ -35,7 +35,7 @@ sap.ui.define([
 		const sFunctionName = aArgs.shift();
 		const oImplementation = getImplementationForCurrentScenario();
 		if (!oImplementation) {
-			return Promise.reject("Could not determine field extensibility scenario");
+			return Promise.reject(new Error("Could not determine field extensibility scenario"));
 		}
 		return Promise.resolve(oImplementation[sFunctionName].apply(null, aArgs));
 	}

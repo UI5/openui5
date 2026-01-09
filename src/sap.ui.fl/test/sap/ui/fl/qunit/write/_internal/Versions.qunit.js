@@ -575,8 +575,8 @@ sap.ui.define([
 
 			return Versions.initialize(mPropertyBag)
 			.then(Versions.activate.bind(undefined, mPropertyBag))
-			.catch(function(sErrorMessage) {
-				assert.equal(sErrorMessage, "Version is already active", "then the promise is rejected with an error message");
+			.catch(function(oError) {
+				assert.strictEqual(oError.message, "Version is already active", "then the promise is rejected with an error message");
 			});
 		});
 

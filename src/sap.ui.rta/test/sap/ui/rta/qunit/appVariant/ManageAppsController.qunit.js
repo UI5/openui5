@@ -174,12 +174,13 @@ sap.ui.define([
 			var showMessageWhenNoAppVariantsSpy = sandbox.stub(oManageAppsController, "_showMessageWhenNoAppVariantsExist");
 
 			sandbox.stub(RtaUtils, "showMessageBox").resolves();
-			sandbox.stub(AppVariantUtils, "showRelevantDialog").returns(Promise.reject(false));
-			var getAppVariantOverviewSpy = sandbox.stub(AppVariantOverviewUtils, "getAppVariantOverview").returns(Promise.reject("Server error"));
+			sandbox.stub(AppVariantUtils, "showRelevantDialog").returns(Promise.reject(new Error("test error")));
+			const getAppVariantOverviewSpy = sandbox.stub(AppVariantOverviewUtils, "getAppVariantOverview")
+			.returns(Promise.reject(new Error("Server error")));
 			sandbox.stub(Log, "error").callThrough().withArgs("App variant error: ", "Server error").returns();
 
-			return oManageAppsController.onInit().catch(function(bSuccess) {
-				assert.equal(bSuccess, false, "Error: An unexpected exception occurred");
+			return oManageAppsController.onInit().catch(function(oError) {
+				assert.strictEqual(oError.message, "test error", "an error is thrown");
 				assert.ok(highlightAppVariantSpy.notCalled, "the _highlightNewCreatedAppVariant method is not called");
 				assert.ok(getAppVariantOverviewSpy.calledOnce, "the getAppVariantOverview method is called once");
 				assert.ok(showMessageWhenNoAppVariantsSpy.notCalled, "the showMessageWhenNoAppVariantsSpy method is not called");

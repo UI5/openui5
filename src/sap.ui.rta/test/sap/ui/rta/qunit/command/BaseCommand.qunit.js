@@ -295,14 +295,15 @@ sap.ui.define([
 			var fnStackModifiedSpy = sinon.spy();
 			this.stack.attachModified(fnStackModifiedSpy);
 			this.failingCommand.execute = function() {
+				// Simulate command failing without proper error
+				// eslint-disable-next-line prefer-promise-reject-errors
 				return Promise.reject();
 			};
-			var oStandardError = new Error("Executing of the change failed.");
 			return this.stack.pushAndExecute(this.failingCommand)
 
 			.catch(function(oError) {
 				assert.ok(this.stack.isEmpty(), "and the command stack is still empty");
-				assert.equal(oError.message, oStandardError.message, "an error is rejected and caught");
+				assert.strictEqual(oError.message, "Executing of the change failed.", "the standard error is thrown");
 				assert.strictEqual(oError.command, this.failingCommand, "and the command is part of the error");
 				assert.equal(oError.index, 0, "and the index is part of the error");
 				assert.equal(fnStackModifiedSpy.callCount, 0, "the modify stack listener is not called");
@@ -978,7 +979,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("When executing a failing command", function(assert) {
-			sinon.stub(this.command, "execute").returns(Promise.reject());
+			sinon.stub(this.command, "execute").returns(Promise.reject(new Error("Command failed")));
 
 			this.stack.push(this.command);
 			return this.stack.execute()

@@ -6,13 +6,14 @@
 sap.ui.define([
 	"sap/ui/core/Element",
 	"sap/ui/core/library",
+	"sap/ui/core/Lib",
 	"./library",
 	"./ListItemBase",
 	"./ColumnListItemRenderer",
 	// jQuery custom selectors ":sapFocusable", ":sapTabbable"
 	"sap/ui/dom/jquery/Selectors"
 ],
-	function(Element, coreLibrary, library, ListItemBase, ColumnListItemRenderer) {
+	function(Element, coreLibrary, Lib, library, ListItemBase, ColumnListItemRenderer) {
 	"use strict";
 
 
@@ -261,11 +262,13 @@ sap.ui.define([
 		let sOutput = ListItemBase.getAccessibilityText(oCell, true);
 
 		if (bIncludeHeader) {
-			const oHeader = oColumn.getHeader();
-			if (oHeader && oHeader.getVisible()) {
-				sOutput = ListItemBase.getAccessibilityText(oHeader) + " " + sOutput;
-			}
+			const bPopinFocused = document.activeElement.classList.contains("sapMListTblSubCnt");
+			const sColumnDescription = oColumn.getAccessibilityDescription(!bPopinFocused);
+			sOutput = sColumnDescription + " " + sOutput;
+		} else if (oCell.$().parent().find(":sapTabbable").length > 0) {
+			sOutput = Lib.getResourceBundleFor("sap.m").getText("TABLE_CELL_INCLUDES", [sOutput]);
 		}
+
 		return sOutput;
 	}
 
@@ -275,7 +278,12 @@ sap.ui.define([
 			return getAnnouncementForColumn(oColumn, aCells, true);
 		});
 
-		return aOutput.filter(Boolean).join(" . ").trim();
+		let sOutput = aOutput.filter(Boolean).join(" . ").trim();
+		if (this.$Popin().find(":sapTabbable").length > 0) {
+			sOutput = Lib.getResourceBundleFor("sap.m").getText("TABLE_CELL_INCLUDES", [sOutput]);
+		}
+
+		return sOutput;
 	};
 
 	ColumnListItem.prototype.getContentAnnouncementOfRowAction = function() {

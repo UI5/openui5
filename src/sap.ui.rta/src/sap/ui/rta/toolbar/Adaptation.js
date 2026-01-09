@@ -14,6 +14,7 @@ sap.ui.define([
 	"sap/ui/core/Popup",
 	"sap/ui/fl/apply/api/FlexRuntimeInfoAPI",
 	"sap/ui/fl/initial/api/Version",
+	"sap/ui/fl/util/CancelError",
 	"sap/ui/fl/write/api/ContextBasedAdaptationsAPI",
 	"sap/ui/model/json/JSONModel",
 	"sap/ui/performance/Measurement",
@@ -40,6 +41,7 @@ sap.ui.define([
 	Popup,
 	FlexRuntimeInfoAPI,
 	Version,
+	CancelError,
 	ContextBasedAdaptationsAPI,
 	JSONModel,
 	Measurement,
@@ -471,7 +473,7 @@ sap.ui.define([
 	}
 
 	function handleError(oError) {
-		if (oError !== "cancel") {
+		if (!(oError instanceof CancelError)) {
 			Utils.showMessageBox("error", "MSG_LREP_TRANSFER_ERROR", { error: oError });
 			Log.error(`sap.ui.rta: ${oError.stack || oError.message || oError}`);
 		}

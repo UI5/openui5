@@ -73,10 +73,10 @@ sap.ui.define([
 			});
 		});
 
-		QUnit.test("When stubing checkFlpCustomizingIsReady(\"VALID_IAM_ID\") to return false in the last call,", function(assert) {
+		QUnit.test("When stubing checkCatalogCustomizingIsReady(\"VALID_IAM_ID\") to return false in the last call,", function(assert) {
 			var oS4HanaCloudBackend = new S4HanaCloudBackend();
 
-			// Stubbing checkFlpCustomizingIsReady
+			// Stubbing checkCatalogCustomizingIsReady
 			var checkCatalogCustomizingIsReadyStub = sandbox.stub(oS4HanaCloudBackend, "checkCatalogCustomizingIsReady");
 			checkCatalogCustomizingIsReadyStub.withArgs("VALID_IAM_ID").onFirstCall().resolves(false);
 			checkCatalogCustomizingIsReadyStub.onSecondCall().resolves(false);
@@ -88,13 +88,18 @@ sap.ui.define([
 			});
 		});
 
-		QUnit.test("When stubing checkFlpCustomizingIsReady(\"VALID_IAM_ID\") to throw an error,", function(assert) {
+		QUnit.test("When stubing checkCatalogCustomizingIsReady(\"VALID_IAM_ID\") to throw an error,", function(assert) {
 			var oS4HanaCloudBackend = new S4HanaCloudBackend();
 			sandbox.stub(oS4HanaCloudBackend, "checkCatalogCustomizingIsReady").rejects(new Error("locked"));
 
 			return oS4HanaCloudBackend.notifyFlpCustomizingIsReady("VALID_IAM_ID", true)
-			.catch(function(oResult) {
-				assert.deepEqual(oResult, { iamAppId: "VALID_IAM_ID", error: "locked" }, "then the final status is as expected");
+			.catch(function(oError) {
+				assert.strictEqual(
+					oError.message,
+					"Catalog publishing failed for app variant creation. AppVarStatus is locked",
+					"then the correct error is thrown"
+				);
+				assert.strictEqual(oError.iamAppId, "VALID_IAM_ID", "then the IAM id is available on the error");
 			});
 		});
 

@@ -1025,23 +1025,25 @@ sap.ui.define([
 			}
 		}
 
-		this.getColumns(true).forEach(function(oColumn, i) {
+		this.getColumns(true).forEach(function(oColumn) {
 			if (!oColumn.getVisible() || oColumn.isHidden()) {
 				return;
 			}
 
-			var oHeader = oColumn.getHeader();
-			if (oHeader && oHeader.getVisible()) {
-				sAnnouncement += ListItemBase.getAccessibilityText(oHeader, false /* bDetectEmpty */, true /* bHeaderAnnouncement */) + " . ";
-			}
+			sAnnouncement += oColumn.getAccessibilityDescription(true) + " . ";
 		});
+
+		const oRowAction = this.getDomRef("tblHeader").querySelector(".sapMTableScreenReaderOnly");
+		if (oRowAction) {
+			sAnnouncement += oRowAction.textContent;
+		}
 
 		this.updateInvisibleText(sAnnouncement);
 	};
 
 	Table.prototype._setFooterAnnouncement = function() {
 		var sAnnouncement = Library.getResourceBundleFor("sap.m").getText("ACC_CTR_TYPE_FOOTER_ROW") + " ";
-		this.getColumns(true).forEach(function(oColumn, i) {
+		this.getColumns(true).forEach(function(oColumn) {
 			if (!oColumn.getVisible() || oColumn.isHidden()) {
 				return;
 			}
@@ -1049,11 +1051,7 @@ sap.ui.define([
 			var oFooter = oColumn.getFooter();
 			if (oFooter && oFooter.getVisible()) {
 				// announce header as well
-				var oHeader = oColumn.getHeader();
-				if (oHeader && oHeader.getVisible()) {
-					sAnnouncement += ListItemBase.getAccessibilityText(oHeader) + " ";
-				}
-
+				sAnnouncement += oColumn.getAccessibilityDescription(true) + " ";
 				sAnnouncement += ListItemBase.getAccessibilityText(oFooter) + " ";
 			}
 		});

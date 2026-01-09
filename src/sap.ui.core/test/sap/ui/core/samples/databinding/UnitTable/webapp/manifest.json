@@ -1,39 +1,40 @@
 {
-	"_version": "2.0.0",
-	"sap.app": {
-		"id": "sap.ui.core.samples.unittable",
-		"type": "application",
-		"i18n": "i18n/i18n.properties",
-		"title": "Unit Table",
-		"description": "Sample for Unit Tables",
-		"applicationVersion": {
-			"version": "${version}"
-		}
-	},
-	"sap.ui": {
-		"technology": "UI5",
-		"icons": {},
-		"deviceTypes": {
-			"desktop": true,
-			"tablet": true,
-			"phone": true
-		}
-	},
-	"sap.ui5": {
-		"rootView": {
-			"viewName": "sap.ui.core.samples.unittable.view.UnitTable",
-			"id": "UnitTable"
+	"_version" : "2.0.0",
+	"sap.app" : {
+		"ach" : "CA-UI5-COR",
+		"applicationVersion" : {
+			"version" : "${version}"
 		},
-		"dependencies": {
-			"minUI5Version": "2.0.0",
-			"libs": {
-				"sap.ui.core": {},
-				"sap.m": {}
+		"description" : "Sample for Unit Tables",
+		"id" : "sap.ui.core.samples.unittable",
+		"i18n" : "i18n/i18n.properties",
+		"title" : "Unit Table",
+		"type" : "application"
+	},
+	"sap.ui" : {
+		"deviceTypes" : {
+			"desktop" : true
+		},
+		"icons" : {},
+		"technology" : "UI5"
+	},
+	"sap.ui5" : {
+		"contentDensities" : {
+			"compact" : true,
+			"cozy" : true
+		},
+		"dependencies" : {
+			"minUI5Version" : "1.136.0",
+			"libs" : {
+				"sap.m" : {},
+				"sap.ui.core" : {}
 			}
 		},
-		"contentDensities": {
-			"compact": true,
-			"cozy": true
+		"rootView" : {
+			"async" : true,
+			"id" : "UnitTable",
+			"type" : "XML",
+			"viewName" : "sap.ui.core.samples.unittable.view.UnitTable"
 		}
 	}
 }

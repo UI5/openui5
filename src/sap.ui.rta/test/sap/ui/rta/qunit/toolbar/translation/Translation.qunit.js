@@ -342,7 +342,7 @@ sap.ui.define([
 
 					sandbox.stub(MessageBox, "error").callsFake(done);
 					sandbox.stub(TranslationAPI, "uploadTranslationTexts").callsFake(function() {
-						return Promise.reject("all broken");
+						return Promise.reject(new Error("all broken"));
 					});
 
 					var oUploadButton = getUploadDialogControl(this.oToolbar, "uploadTranslation");

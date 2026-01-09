@@ -23,7 +23,7 @@ sap.ui.define([
 		Then.onAnyPage.iTeardownMyUIComponentInTheEnd();
 
 		Then.onTheMainPage.checkNumberOfEntries(2);
-		When.onTheMainPage.pressCreateNewSalesOrderButton();
+		When.onTheMainPage.pressButton("createSalesOrderButton");
 		Then.onTheMainPage.checkFirstEntry({
 			SalesOrderID : "",
 			Buyer : " (0100000000)",
@@ -35,7 +35,7 @@ sap.ui.define([
 		});
 		Then.onTheMainPage.checkNumberOfEntries(3);
 		Then.onTheMainPage.checkDialogIsOpen(true);
-		When.onTheCreateNewSalesOrderDialog.changeInputValue("noteInput", "New note");
+		When.onTheMainPage.changeInputValue("noteInput", "New note");
 		Then.onTheMainPage.checkFirstEntry({
 			SalesOrderID : "",
 			Buyer : " (0100000000)",
@@ -44,11 +44,11 @@ sap.ui.define([
 			Note : "New note",
 			LifecycleStatus : ""
 		});
-		When.onTheCreateNewSalesOrderDialog.pressButton("cancelButton");
+		When.onTheMainPage.pressButton("cancelButton");
 		Then.onTheMainPage.checkDialogIsOpen(false);
 		Then.onTheMainPage.checkNumberOfEntries(2);
 
-		When.onTheMainPage.pressCreateNewSalesOrderButton();
+		When.onTheMainPage.pressButton("createSalesOrderButton");
 		Then.onTheMainPage.checkFirstEntry({
 			SalesOrderID : "",
 			Buyer : " (0100000000)",
@@ -60,35 +60,35 @@ sap.ui.define([
 		Then.onTheMainPage.checkNumberOfEntries(3);
 		Then.onTheMainPage.checkDialogIsOpen(true);
 
-		When.onTheCreateNewSalesOrderDialog.changeInputValue("buyerIdInput", "FOO");
-		When.onTheCreateNewSalesOrderDialog.pressButton("saveButton");
+		When.onTheMainPage.changeInputValue("buyerIdInput", "FOO");
+		When.onTheMainPage.pressButton("saveButton");
 		Then.onTheMainPage.checkDialogIsOpen(true);
-		Then.onTheCreateNewSalesOrderDialog.checkInputValueState("buyerIdInput", "Error");
+		Then.onTheMainPage.checkInputValueState("buyerIdInput", "Error");
 		//TODO check error message?
 		//TODO find a better place? value state should change, if possible
 
-		When.onTheCreateNewSalesOrderDialog.changeInputValue("buyerIdInput", "");
-		When.onTheCreateNewSalesOrderDialog.pressButton("saveButton");
+		When.onTheMainPage.changeInputValue("buyerIdInput", "");
+		When.onTheMainPage.pressButton("saveButton");
 		Then.onTheMainPage.checkDialogIsOpen(true);
-		Then.onTheCreateNewSalesOrderDialog.checkInputValueState("buyerIdInput", "Error");
-		When.onTheCreateNewSalesOrderDialog.changeInputValue("buyerIdInput", "0100000004");
+		Then.onTheMainPage.checkInputValueState("buyerIdInput", "Error");
+		When.onTheMainPage.changeInputValue("buyerIdInput", "0100000004");
 		// Note: the backend error has not yet been removed
-		Then.onTheCreateNewSalesOrderDialog.checkInputValueState("buyerIdInput", "Error");
+		Then.onTheMainPage.checkInputValueState("buyerIdInput", "Error");
 
-		When.onTheCreateNewSalesOrderDialog.changeInputValue("currencyInput", "");
-		When.onTheCreateNewSalesOrderDialog.pressButton("saveButton");
+		When.onTheMainPage.changeInputValue("currencyInput", "");
+		When.onTheMainPage.pressButton("saveButton");
 		Then.onTheMainPage.checkDialogIsOpen(true);
-		Then.onTheCreateNewSalesOrderDialog.checkInputValueState("currencyInput", "Error");
-		When.onTheCreateNewSalesOrderDialog.changeInputValue("currencyInput", "USD");
-		Then.onTheCreateNewSalesOrderDialog.checkInputValueState("currencyInput", "None");
+		Then.onTheMainPage.checkInputValueState("currencyInput", "Error");
+		When.onTheMainPage.changeInputValue("currencyInput", "USD");
+		Then.onTheMainPage.checkInputValueState("currencyInput", "None");
 
-		When.onTheCreateNewSalesOrderDialog.changeInputValue("noteInput", "New note");
-		When.onTheCreateNewSalesOrderDialog.pressButton("saveButton");
+		When.onTheMainPage.changeInputValue("noteInput", "New note");
+		When.onTheMainPage.pressButton("saveButton");
 		// Note: "Save" removes the backend error, but the dialog closes too fast
-		// Then.onTheCreateNewSalesOrderDialog.checkInputValueState("buyerIdInput", "None");
+		// Then.onTheMainPage.checkInputValueState("buyerIdInput", "None");
 		Then.onTheMainPage.checkDialogIsOpen(false);
 		Then.onTheMainPage.checkSuccessMessageIsVisible(true);
-		When.onTheSuccessMessageBox.pressOkButton();
+		When.onAnyPage.pressOkButton();
 		Then.onTheMainPage.checkSuccessMessageIsVisible(false);
 		Then.onTheMainPage.checkFirstEntry({
 			SalesOrderID : "0500000002",

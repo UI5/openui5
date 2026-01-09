@@ -14,7 +14,6 @@ sap.ui.define(["sap/ui/base/DataType"], (DataType) => {
 	 * @since 1.115
 	 * @enum {string}
 	 * @public
-	 * @experimental As of version 1.115
 	 */
 	const ChartToolbarActionType = {
 		/**

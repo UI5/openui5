@@ -4,32 +4,34 @@ sap.ui.define([
 	"sap/m/MessageBox",
 	"sap/ui/core/BusyIndicator",
 	"sap/ui/core/Lib",
-	"sap/ui/thirdparty/sinon-4",
 	"sap/ui/fl/apply/_internal/flexObjects/FlexObjectFactory",
 	"sap/ui/fl/initial/_internal/connectors/LrepConnector",
 	"sap/ui/fl/initial/_internal/connectors/Utils",
+	"sap/ui/fl/initial/_internal/Settings",
 	"sap/ui/fl/initial/api/Version",
+	"sap/ui/fl/util/CancelError",
 	"sap/ui/fl/write/_internal/connectors/LrepConnector",
 	"sap/ui/fl/write/_internal/connectors/Utils",
 	"sap/ui/fl/write/_internal/transport/TransportSelection",
-	"sap/ui/fl/initial/_internal/Settings",
 	"sap/ui/fl/Layer",
-	"sap/ui/fl/Utils"
+	"sap/ui/fl/Utils",
+	"sap/ui/thirdparty/sinon-4"
 ], function(
 	MessageBox,
 	BusyIndicator,
 	Lib,
-	sinon,
 	FlexObjectFactory,
 	InitialLrepConnector,
 	InitialUtils,
+	Settings,
 	Version,
+	CancelError,
 	WriteLrepConnector,
 	WriteUtils,
 	TransportSelection,
-	Settings,
 	Layer,
-	FlexUtils
+	FlexUtils,
+	sinon
 ) {
 	"use strict";
 
@@ -1518,7 +1520,7 @@ sap.ui.define([
 			return WriteLrepConnector.appVariant.remove(mPropertyBag).then(function() {},
 				function(oError) {
 					assert.ok(oStubOpenTransportSelection.calledOnce);
-					assert.equal(oError, "cancel", "promise rejected with cancel value");
+					assert.ok(oError instanceof CancelError, "promise rejected with a CancelError");
 					TransportSelection.prototype.openTransportSelection.restore();
 				});
 		});

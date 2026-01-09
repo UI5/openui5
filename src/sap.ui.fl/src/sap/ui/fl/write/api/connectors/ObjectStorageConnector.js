@@ -373,7 +373,7 @@ sap.ui.define([
 		 * @inheritDoc
 		 */
 		loadVariantsAuthors() {
-			return Promise.reject("loadVariantsAuthors is not implemented");
+			return Promise.reject(new Error("loadVariantsAuthors is not implemented"));
 		},
 
 		/**
@@ -607,7 +607,7 @@ sap.ui.define([
 				const aVersions = await this.versions.load.call(this, mPropertyBag);
 				const sDraftVersionId = aVersions.find((oVersion) => oVersion.isDraft)?.id;
 				if (!sDraftVersionId) {
-					return Promise.reject("no version to discard");
+					return Promise.reject(new Error("no version to discard"));
 				}
 
 				const aFiles = await loadDataFromStorage(mPropertyBag);

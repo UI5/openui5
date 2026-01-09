@@ -176,14 +176,14 @@ function(
 		renderer: ListItemBaseRenderer
 	});
 
-	ListItemBase.getAccessibilityText = function(oControl, bDetectEmpty, bHeaderAnnouncement) {
-		var oBundle = Library.getResourceBundleFor("sap.m");
+	ListItemBase.getAccessibilityText = function(oControl, bDetectEmpty, bLessDetails) {
+		const oBundle = Library.getResourceBundleFor("sap.m");
 
 		if (!oControl || !oControl.getVisible || !oControl.getVisible()) {
 			return bDetectEmpty ? oBundle.getText("CONTROL_EMPTY") : "";
 		}
 
-		var oAccInfo;
+		let oAccInfo;
 		if (oControl.getAccessibilityInfo) {
 			oAccInfo = oControl.getAccessibilityInfo();
 		}
@@ -191,30 +191,42 @@ function(
 			oAccInfo = this.getDefaultAccessibilityInfo(oControl.getDomRef());
 		}
 
-		oAccInfo = jQuery.extend({
+		oAccInfo = {
 			type: "",
 			description: "",
-			children: []
-		}, oAccInfo);
+			children: [],
+			...oAccInfo
+		};
 
-		var sText = oAccInfo.type + " " + oAccInfo.description + " ",
-			sTooltip = oControl.getTooltip_AsString();
+		let sText = "";
+		if (oAccInfo.type) {
+			sText += oAccInfo.type + " ";
+		}
+		if (oAccInfo.description) {
+			sText += oAccInfo.description + " ";
+		}
 
-		if (oAccInfo.required === true) {
-			sText += oBundle.getText(bHeaderAnnouncement ? "CONTROL_IN_COLUMN_REQUIRED" : "ELEMENT_REQUIRED") + " ";
-		}
-		if (oAccInfo.enabled === false) {
-			sText += oBundle.getText("CONTROL_DISABLED") + " ";
-		}
-		if (oAccInfo.editable === false) {
-			sText += oBundle.getText("CONTROL_READONLY") + " ";
-		}
-		if (!oAccInfo.type && sTooltip && sText.indexOf(sTooltip) == -1) {
-			sText = sTooltip + " " + sText;
+		if (!bLessDetails) {
+			if (oAccInfo.type) {
+				if (oAccInfo.required === true) {
+					sText += oBundle.getText("ELEMENT_REQUIRED") + " ";
+				}
+				if (oAccInfo.enabled === false) {
+					sText += oBundle.getText("CONTROL_DISABLED") + " ";
+				}
+				if (oAccInfo.editable === false) {
+					sText += oBundle.getText("CONTROL_READONLY") + " ";
+				}
+			} else {
+				const sTooltip = oControl.getTooltip_AsString();
+				if (sTooltip && !sText.includes(sTooltip)) {
+					sText += sTooltip + " ";
+				}
+			}
 		}
 
 		oAccInfo.children.forEach(function(oChild) {
-			sText += ListItemBase.getAccessibilityText(oChild) + " ";
+			sText += ListItemBase.getAccessibilityText(oChild, false, bLessDetails) + " ";
 		});
 
 		sText = sText.trim();

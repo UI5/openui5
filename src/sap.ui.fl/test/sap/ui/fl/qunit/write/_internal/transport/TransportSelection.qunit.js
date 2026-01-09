@@ -1,26 +1,28 @@
 /* global QUnit */
 
 sap.ui.define([
+	"sap/ui/core/BusyIndicator",
+	"sap/ui/core/Control",
 	"sap/ui/fl/apply/_internal/flexObjects/FlexObjectFactory",
+	"sap/ui/fl/util/CancelError",
 	"sap/ui/fl/write/_internal/appVariant/AppVariant",
-	"sap/ui/fl/write/_internal/transport/TransportSelection",
-	"sap/ui/fl/write/_internal/transport/Transports",
 	"sap/ui/fl/write/_internal/connectors/Utils",
+	"sap/ui/fl/write/_internal/transport/Transports",
+	"sap/ui/fl/write/_internal/transport/TransportSelection",
 	"sap/ui/fl/Layer",
 	"sap/ui/fl/Utils",
-	"sap/ui/core/Control",
-	"sap/ui/core/BusyIndicator",
 	"sap/ui/thirdparty/sinon-4"
 ], function(
+	BusyIndicator,
+	Control,
 	FlexObjectFactory,
+	CancelError,
 	AppVariant,
-	TransportSelection,
-	Transports,
 	WriteUtils,
+	Transports,
+	TransportSelection,
 	Layer,
 	FlUtils,
-	Control,
-	BusyIndicator,
 	sinon
 ) {
 	"use strict";
@@ -461,7 +463,7 @@ sap.ui.define([
 			});
 		});
 
-		QUnit.test('setTransports should rejects with a "cancel" string if the transport dialog is cancelled', function(assert) {
+		QUnit.test("when setTransports is called and the transport dialog is cancelled", function(assert) {
 			var oRootControl = new Control();
 			var aChanges = [
 				FlexObjectFactory.createFromFileContent({
@@ -475,7 +477,7 @@ sap.ui.define([
 			sandbox.stub(oTransportSelection, "openTransportSelection").resolves("cancel");
 
 			return oTransportSelection.setTransports(aChanges, oRootControl).catch(function(oError) {
-				assert.equal(oError, "cancel");
+				assert.ok(oError instanceof CancelError, "then the method rejects with a CancelError");
 			});
 		});
 	});

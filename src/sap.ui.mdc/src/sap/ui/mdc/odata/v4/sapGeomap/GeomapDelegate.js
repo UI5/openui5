@@ -52,7 +52,7 @@ sap.ui.define([
 	 *
 	 * @param {sap.ui.mdc.Geomap} oGeomap Reference to the MDC geomap
 	 * @returns {array} Array of the property infos to be used within MDC geomap
-	 * @experimental
+	 * @ui5-experimental-since 1.142
 	 * @private
 	 * @ui5-restricted sap.fe, sap.ui.mdc
 	 */
@@ -62,20 +62,20 @@ sap.ui.define([
 		let pCreatePropertyInfos;
 
 		if (!oModel) {
-			pCreatePropertyInfos = new Promise(function (resolve) {
+			pCreatePropertyInfos = new Promise((resolve) => {
 				oGeomap.attachModelContextChange({
 					resolver: resolve
 				}, onModelContextChange, this);
-			}.bind(this)).then(function (oModel) {
+			}).then((oModel) => {
 				return GeomapDelegate._createPropertyInfos(oGeomap, oModel);
 			});
 		} else {
 			pCreatePropertyInfos = GeomapDelegate._createPropertyInfos(oGeomap, oModel);
 		}
 
-		return pCreatePropertyInfos.then(function (aProperties) {
+		return pCreatePropertyInfos.then((aProperties) => {
 			if (oGeomap.data) {
-				oGeomap.awaitPropertyHelper().then(function (oPropertyHelper) {
+				oGeomap.awaitPropertyHelper().then((oPropertyHelper) => {
 					oPropertyHelper.setProperties(aProperties);
 					oGeomap.setPropertyInfo(aProperties);
 				});
@@ -100,7 +100,7 @@ sap.ui.define([
 	 * @param {sap.ui.mdc.Geomap} oGeomap Reference to the MDC geomap
 	 * @returns {object} BindingInfo object
 	 *
-	 * @experimental
+	 * @ui5-experimental-since 1.142
 	 * @private
 	 * @ui5-restricted sap.fe, sap.ui.mdc
 	 */
@@ -112,7 +112,7 @@ sap.ui.define([
 	};
 
 	GeomapDelegate.initializeGeomap = function (oGeomap) {
-		return new Promise(function (resolve, reject) {
+		return new Promise((resolve, reject) => {
 			GeomapDelegate._createContentFromPropertyInfos(oGeomap);
 			resolve(oGeomap);
 		});
@@ -120,7 +120,7 @@ sap.ui.define([
 
 
 	GeomapDelegate.initPropertyHelper = function (oChart) {
-		return new Promise(function (resolve) {
+		return new Promise((resolve) => {
 			resolve(new PropertyHelper([]));
 		});
 	};
@@ -147,7 +147,7 @@ sap.ui.define([
 
 	// called when a new item will be added (via Settings dialog)
 	GeomapDelegate.addItem = function (oGeomap, sPropertyKey, mPropertyBag) {
-		return new Promise(function (resolve, reject) {
+		return new Promise((resolve, reject) => {
 			resolve();
 		});
 	};

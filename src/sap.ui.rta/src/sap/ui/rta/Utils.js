@@ -13,6 +13,7 @@ sap.ui.define([
 	"sap/ui/dt/OverlayUtil",
 	"sap/ui/fl/apply/api/FlexRuntimeInfoAPI",
 	"sap/ui/fl/initial/api/Version",
+	"sap/ui/fl/util/CancelError",
 	"sap/ui/fl/Layer",
 	"sap/ui/fl/LayerUtils",
 	"sap/ui/fl/Utils",
@@ -30,6 +31,7 @@ sap.ui.define([
 	OverlayUtil,
 	FlexRuntimeInfoAPI,
 	Version,
+	CancelError,
 	Layer,
 	FlexLayerUtils,
 	FlexUtils,
@@ -553,7 +555,7 @@ sap.ui.define([
 		})
 		.then(function(sAction) {
 			if (sAction !== MessageBox.Action.OK) {
-				throw "cancel";
+				throw new CancelError();
 			}
 			return true;
 		});

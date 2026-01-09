@@ -204,6 +204,19 @@ sap.ui.define([
 						},
 						viewName : Opa.getContext().sViewName
 					});
+				},
+				pressOkButton : function () {
+					this.waitFor({
+						actions : new Press(),
+						controlType : "sap.m.Button",
+						matchers : function (oButton) {
+							return oButton.getText() === "OK";
+						},
+						searchOpenDialogs : true,
+						success : function () {
+							Opa5.assert.ok(true, "OK button pressed");
+						}
+					});
 				}
 			},
 			assertions : {

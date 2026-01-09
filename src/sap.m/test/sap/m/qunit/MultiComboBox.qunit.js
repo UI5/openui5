@@ -5805,7 +5805,7 @@ sap.ui.define([
 		oMultiComboBox.placeAt("MultiComboBoxContent");
 
 		// assert
-		assert.strictEqual(oInvisibleText.getText(), oResourceBundle.getText("TOKENIZER_ARIA_NO_TOKENS"), "'MultiComboBox no tokens' text is set.");
+		assert.strictEqual(oInvisibleText.getText(), oResourceBundle.getText("TOKENIZER_ARIA_NO_TOKENS"), "'MultiComboBox no tokens selected' text is set.");
 
 		// act
 		oMultiComboBox.setSelectedKeys(["Item1"]);

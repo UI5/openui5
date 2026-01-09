@@ -5,20 +5,22 @@ sap.ui.define([
 	"sap/ui/base/ManagedObject",
 	"sap/ui/core/Element",
 	"sap/ui/core/Fragment",
+	"sap/ui/fl/util/CancelError",
 	"sap/ui/model/json/JSONModel",
+	"sap/ui/model/resource/ResourceModel",
 	"sap/ui/model/Filter",
 	"sap/ui/model/FilterOperator",
-	"sap/ui/model/resource/ResourceModel",
 	"sap/ui/model/Sorter",
 	"sap/ui/rta/Utils"
 ], function(
 	ManagedObject,
 	Element,
 	Fragment,
+	CancelError,
 	JSONModel,
+	ResourceModel,
 	Filter,
 	FilterOperator,
-	ResourceModel,
 	Sorter,
 	Utils
 ) {
@@ -159,7 +161,7 @@ sap.ui.define([
 		});
 		this._oDialog.close();
 		// indicate that the dialog has been closed without choosing to add any fields (canceled)
-		this._fnRejectOnDialogCancel();
+		this._fnRejectOnDialogCancel(new CancelError());
 	};
 
 	AddElementsDialog.prototype.setElements = function(aElements) {

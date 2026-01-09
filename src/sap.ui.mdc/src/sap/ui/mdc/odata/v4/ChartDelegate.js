@@ -19,7 +19,6 @@ sap.ui.define([
 	 * @extends module:sap/ui/mdc/ChartDelegate
 	 * @since 1.88
 	 *
-	 * @experimental
 	 * @private
 	 * @ui5-restricted sap.fe, sap.ui.mdc
 	 *

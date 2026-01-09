@@ -222,7 +222,7 @@ sap.ui.define([
 										}
 										resolve(); // existence is tested by resolving
 									} else {
-										reject();
+										reject(new Error(`Request rejected with status ${xhr.status}`));
 									}
 								}
 							};
@@ -248,7 +248,7 @@ sap.ui.define([
 									assert.ok(xhr.responseXML.documentElement && xhr.responseXML.documentElement.localName === "FragmentDefinition", `File ${sCreateTemplate} exists and starts with a FragmentDefinition node`);
 									resolve();
 								} else {
-									reject();
+									reject(new Error(`XHR rejected with status ${xhr.status}`));
 								}
 							}
 						};

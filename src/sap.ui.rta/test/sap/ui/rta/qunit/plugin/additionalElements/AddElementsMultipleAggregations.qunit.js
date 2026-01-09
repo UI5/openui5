@@ -6,18 +6,19 @@ sap.ui.define([
 	"sap/ui/dt/DesignTime",
 	"sap/ui/dt/ElementUtil",
 	"sap/ui/dt/OverlayRegistry",
+	"sap/ui/fl/util/CancelError",
 	"sap/ui/layout/VerticalLayout",
+	"sap/ui/test/utils/nextUIUpdate",
 	"sap/ui/rta/command/CommandFactory",
 	"sap/ui/rta/plugin/additionalElements/AddElementsDialog",
 	"sap/ui/rta/plugin/additionalElements/AdditionalElementsAnalyzer",
 	"sap/ui/rta/plugin/additionalElements/AdditionalElementsPlugin",
 	"sap/ui/rta/plugin/Plugin",
+	"sap/ui/thirdparty/sinon-4",
 	"sap/uxap/ObjectPageLayout",
 	"sap/uxap/ObjectPageSection",
 	"sap/uxap/ObjectPageSubSection",
-	"sap/ui/thirdparty/sinon-4",
-	"test-resources/sap/ui/rta/qunit/RtaQunitUtils",
-	"sap/ui/test/utils/nextUIUpdate"
+	"test-resources/sap/ui/rta/qunit/RtaQunitUtils"
 ], function(
 	Bar,
 	Button,
@@ -25,18 +26,19 @@ sap.ui.define([
 	DesignTime,
 	ElementUtil,
 	OverlayRegistry,
+	CancelError,
 	VerticalLayout,
+	nextUIUpdate,
 	CommandFactory,
 	AddElementsDialog,
 	AdditionalElementsAnalyzer,
 	AdditionalElementsPlugin,
 	RTAPlugin,
+	sinon,
 	ObjectPageLayout,
 	ObjectPageSection,
 	ObjectPageSubSection,
-	sinon,
-	RtaQunitUtils,
-	nextUIUpdate
+	RtaQunitUtils
 ) {
 	"use strict";
 
@@ -103,7 +105,7 @@ sap.ui.define([
 		}
 	}, function() {
 		QUnit.test("when getting the available elements for the contentLeft aggregation of the Bar clicking on the Bar", function(assert) {
-			sandbox.stub(this.oDialog, "open").returns(Promise.reject());
+			sandbox.stub(this.oDialog, "open").returns(Promise.reject(new CancelError()));
 			this.oDialogSetElementsSpy = sandbox.spy(this.oDialog, "setElements");
 
 			return this.oPlugin.showAvailableElements(false, "contentLeft", [this.oBarOverlay])
@@ -127,7 +129,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("when getting the available elements for the contentLeft aggregation of the Bar clicking on one element from the same aggregation", function(assert) {
-			sandbox.stub(this.oDialog, "open").returns(Promise.reject());
+			sandbox.stub(this.oDialog, "open").returns(Promise.reject(new CancelError()));
 			this.oDialogSetElementsSpy = sandbox.spy(this.oDialog, "setElements");
 
 			return this.oPlugin.showAvailableElements(true, "contentLeft", [this.oVisibleLeftButtonOverlay])
@@ -151,7 +153,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("when getting the available elements for the contentMiddle aggregation (all elements visible) of the Bar clicking on one element from the same aggregation", function(assert) {
-			sandbox.stub(this.oDialog, "open").returns(Promise.reject());
+			sandbox.stub(this.oDialog, "open").returns(Promise.reject(new CancelError()));
 			this.oDialogSetElementsSpy = sandbox.spy(this.oDialog, "setElements");
 			this.oVisibleMiddleButton1Overlay = OverlayRegistry.getOverlay(this.oVisibleMiddleButton1);
 
@@ -176,7 +178,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("when getting the available elements after all available elements were displayed and then one is hidden again", async function(assert) {
-			sandbox.stub(this.oDialog, "open").returns(Promise.reject());
+			sandbox.stub(this.oDialog, "open").returns(Promise.reject(new CancelError()));
 			this.oDialogSetElementsSpy = sandbox.spy(this.oDialog, "setElements");
 
 			// This is to ensure that the isEditableCheck happens even if the button visibility is not completely finished
@@ -290,7 +292,7 @@ sap.ui.define([
 
 		QUnit.test("when getting the available elements for the contentRight aggregation and this aggregation is not valid for the middle button which was made invisible", async function(assert) {
 			const done = assert.async();
-			sandbox.stub(this.oDialog, "open").returns(Promise.reject());
+			sandbox.stub(this.oDialog, "open").returns(Promise.reject(new CancelError()));
 			this.oDialogSetElementsSpy = sandbox.spy(this.oDialog, "setElements");
 			this.oVisibleRightButtonOverlay = OverlayRegistry.getOverlay(this.oVisibleRightButton);
 			let bWasCalled = false;

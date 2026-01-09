@@ -505,7 +505,8 @@ sap.ui.define([
 			const oShowMessageStub = sandbox.stub(AppVariantUtils, "showMessage").resolves();
 			const oTriggerCatalogPublishing = sandbox.stub(AppVariantManager.prototype, "triggerCatalogPublishing").resolves(oPublishingResponse);
 			const oNotifyKeyUserWhenPublishingIsReady = sandbox.stub(AppVariantManager.prototype, "notifyKeyUserWhenPublishingIsReady").resolves();
-			const oDeleteAppVariantStub = sandbox.stub(AppVariantWriteAPI, "deleteAppVariant").returns(Promise.reject("Delete Error"));
+			const oDeleteError = new Error("Delete Error");
+			const oDeleteAppVariantStub = sandbox.stub(AppVariantWriteAPI, "deleteAppVariant").rejects(oDeleteError);
 
 			const oCatchErrorDialog = sandbox.spy(AppVariantUtils, "catchErrorDialog");
 
@@ -513,7 +514,7 @@ sap.ui.define([
 				mParameters.onClose("Close");
 			});
 
-			sandbox.stub(Log, "error").callThrough().withArgs("App variant error: ", "Delete Error").returns();
+			sandbox.stub(Log, "error").callThrough().withArgs("App variant error: ", oDeleteError.stack).returns();
 
 			return RtaAppVariantFeature.onDeleteFromOverviewDialog("AppVarId", false, Layer.CUSTOMER).then(function() {
 				assert.equal(oDeleteAppVariantStub.callCount, 1, "then the AppVariantWriteAPI.deleteAppVariant method is called once");
@@ -720,14 +721,15 @@ sap.ui.define([
 			sandbox.stub(RtaAppVariantFeature, "_determineSelector").returns(this.oAppComponent);
 			const oProcessSaveAsDialog = sandbox.stub(AppVariantManager.prototype, "processSaveAsDialog").resolves(oAppVariantData);
 
-			const oSaveAsAppVariantStub = sandbox.stub(AppVariantWriteAPI, "saveAs").returns(Promise.reject({ saveAsFailed: true }));
+			const oSaveAsFailedError = new Error("Save as failed");
+			const oSaveAsAppVariantStub = sandbox.stub(AppVariantWriteAPI, "saveAs").rejects(oSaveAsFailedError);
 			const oCatchErrorDialog = sandbox.spy(AppVariantUtils, "catchErrorDialog");
 
 			sandbox.stub(MessageBox, "show").callsFake(function(sText, mParameters) {
 				mParameters.onClose("Close");
 			});
 
-			sandbox.stub(Log, "error").callThrough().withArgs("App variant error: ", { saveAsFailed: true }).returns();
+			sandbox.stub(Log, "error").callThrough().withArgs("App variant error: ", oSaveAsFailedError.stack).returns();
 
 			const oGetOverviewSpy = sandbox.stub(RtaAppVariantFeature, "onGetOverview").resolves();
 

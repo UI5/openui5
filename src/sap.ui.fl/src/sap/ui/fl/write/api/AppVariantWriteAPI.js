@@ -20,7 +20,7 @@ sap.ui.define([
 
 	var _callAppVariantFunction = function(sFunctionName, mPropertyBag) {
 		if (!mPropertyBag.layer) {
-			return Promise.reject("Layer must be provided");
+			return Promise.reject(new Error("Layer must be provided"));
 		}
 
 		mPropertyBag.reference = ManifestUtils.getFlexReferenceForSelector(mPropertyBag.selector);
@@ -54,10 +54,10 @@ sap.ui.define([
 		 */
 		saveAs(mPropertyBag) {
 			if (!mPropertyBag.layer) {
-				return Promise.reject("Layer must be provided");
+				return Promise.reject(new Error("Layer must be provided"));
 			}
 			if (!mPropertyBag.id) {
-				return Promise.reject("App variant ID must be provided");
+				return Promise.reject(new Error("App variant ID must be provided"));
 			}
 			mPropertyBag.reference = ManifestUtils.getFlexReferenceForSelector(mPropertyBag.selector);
 			return FeaturesAPI.isVersioningEnabled(mPropertyBag.layer)
@@ -81,7 +81,7 @@ sap.ui.define([
 		 */
 		deleteAppVariant(mPropertyBag) {
 			if (!mPropertyBag.layer) {
-				return Promise.reject("Layer must be provided");
+				return Promise.reject(new Error("Layer must be provided"));
 			}
 			mPropertyBag.id = ManifestUtils.getFlexReferenceForSelector(mPropertyBag.selector);
 
@@ -99,7 +99,7 @@ sap.ui.define([
 		 */
 		listAllAppVariants(mPropertyBag) {
 			if (!mPropertyBag.layer) {
-				return Promise.reject("Layer must be provided");
+				return Promise.reject(new Error("Layer must be provided"));
 			}
 			return _callAppVariantFunction("list", mPropertyBag);
 		},
@@ -115,10 +115,10 @@ sap.ui.define([
 		 */
 		getManifest(mPropertyBag) {
 			if (!mPropertyBag.layer) {
-				return Promise.reject("Layer must be provided");
+				return Promise.reject(new Error("Layer must be provided"));
 			}
 			if (!mPropertyBag.appVarUrl) {
-				return Promise.reject("appVarUrl must be provided");
+				return Promise.reject(new Error("appVarUrl must be provided"));
 			}
 			// Since this method is only called for Save As App Variant scenario on ABAP platform, the direct usage of write LrepConnector is triggered.
 			return LrepConnector.appVariant.getManifest(mPropertyBag);
@@ -137,13 +137,13 @@ sap.ui.define([
 		 */
 		assignCatalogs(mPropertyBag) {
 			if (!mPropertyBag.layer) {
-				return Promise.reject("Layer must be provided");
+				return Promise.reject(new Error("Layer must be provided"));
 			}
 			if (!mPropertyBag.assignFromAppId) {
-				return Promise.reject("assignFromAppId must be provided");
+				return Promise.reject(new Error("assignFromAppId must be provided"));
 			}
 			if (!mPropertyBag.action) {
-				return Promise.reject("action must be provided");
+				return Promise.reject(new Error("action must be provided"));
 			}
 			return _callAppVariantFunction("assignCatalogs", mPropertyBag);
 		},
@@ -160,10 +160,10 @@ sap.ui.define([
 		 */
 		unassignCatalogs(mPropertyBag) {
 			if (!mPropertyBag.layer) {
-				return Promise.reject("Layer must be provided");
+				return Promise.reject(new Error("Layer must be provided"));
 			}
 			if (!mPropertyBag.action) {
-				return Promise.reject("action must be provided");
+				return Promise.reject(new Error("action must be provided"));
 			}
 			return _callAppVariantFunction("unassignCatalogs", mPropertyBag);
 		}

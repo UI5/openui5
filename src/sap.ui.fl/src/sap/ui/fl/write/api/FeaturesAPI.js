@@ -187,7 +187,7 @@ sap.ui.define([
 		 */
 		async setSeenFeatureIds(mPropertyBag) {
 			if (!(await this.isSeenFeaturesAvailable())) {
-				return Promise.reject("The backend does not support saving seen features.");
+				return Promise.reject(new Error("The backend does not support saving seen features."));
 			}
 			return Storage.setSeenFeatureIds(mPropertyBag);
 		},

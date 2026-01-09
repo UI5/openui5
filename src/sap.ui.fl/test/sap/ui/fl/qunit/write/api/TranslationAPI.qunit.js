@@ -40,8 +40,8 @@ sap.ui.define([
 				appComponent: "reference",
 				layer: Layer.CUSTOMER
 			};
-			return TranslationAPI.getTexts(mPropertyBag).catch(function(sRejectionMessage) {
-				assert.equal(sRejectionMessage, "No sourceLanguage was provided", "then the rejection message is passed");
+			return TranslationAPI.getTexts(mPropertyBag).catch(function(oError) {
+				assert.strictEqual(oError.message, "No sourceLanguage was provided", "then the rejection message is passed");
 			});
 		});
 
@@ -52,8 +52,8 @@ sap.ui.define([
 				appComponent: "reference",
 				layer: Layer.CUSTOMER
 			};
-			return TranslationAPI.getTexts(mPropertyBag).catch(function(sRejectionMessage) {
-				assert.equal(sRejectionMessage, "No targetLanguage was provided", "then the rejection message is passed");
+			return TranslationAPI.getTexts(mPropertyBag).catch(function(oError) {
+				assert.strictEqual(oError.message, "No targetLanguage was provided", "then the rejection message is passed");
 			});
 		});
 
@@ -63,8 +63,8 @@ sap.ui.define([
 				selector: this.oControl,
 				appComponent: "reference"
 			};
-			return TranslationAPI.getSourceLanguages(mPropertyBag).catch(function(sRejectionMessage) {
-				assert.equal(sRejectionMessage, "No layer was provided", "then the rejection message is passed");
+			return TranslationAPI.getSourceLanguages(mPropertyBag).catch(function(oError) {
+				assert.strictEqual(oError.message, "No layer was provided", "then the rejection message is passed");
 			});
 		});
 
@@ -73,8 +73,8 @@ sap.ui.define([
 				reference: "reference",
 				layer: Layer.CUSTOMER
 			};
-			return TranslationAPI.getSourceLanguages(mPropertyBag).catch(function(sRejectionMessage) {
-				assert.equal(sRejectionMessage, "No selector was provided", "then the rejection message is passed");
+			return TranslationAPI.getSourceLanguages(mPropertyBag).catch(function(oError) {
+				assert.strictEqual(oError.message, "No selector was provided", "then the rejection message is passed");
 			});
 		});
 
@@ -83,8 +83,8 @@ sap.ui.define([
 				reference: "reference",
 				selector: this.oControl
 			};
-			return TranslationAPI.getSourceLanguages(mPropertyBag).catch(function(sRejectionMessage) {
-				assert.equal(sRejectionMessage, "No layer was provided", "then the rejection message is passed");
+			return TranslationAPI.getSourceLanguages(mPropertyBag).catch(function(oError) {
+				assert.strictEqual(oError.message, "No layer was provided", "then the rejection message is passed");
 			});
 		});
 
@@ -92,8 +92,8 @@ sap.ui.define([
 			var mPropertyBag = {
 				payload: {}
 			};
-			return TranslationAPI.uploadTranslationTexts(mPropertyBag).catch(function(sRejectionMessage) {
-				assert.equal(sRejectionMessage, "No layer was provided", "then the rejection message is passed");
+			return TranslationAPI.uploadTranslationTexts(mPropertyBag).catch(function(oError) {
+				assert.strictEqual(oError.message, "No layer was provided", "then the rejection message is passed");
 			});
 		});
 
@@ -101,8 +101,8 @@ sap.ui.define([
 			var mPropertyBag = {
 				layer: Layer.CUSTOMER
 			};
-			return TranslationAPI.uploadTranslationTexts(mPropertyBag).catch(function(sRejectionMessage) {
-				assert.equal(sRejectionMessage, "No payload was provided", "then the rejection message is passed");
+			return TranslationAPI.uploadTranslationTexts(mPropertyBag).catch(function(oError) {
+				assert.strictEqual(oError.message, "No payload was provided", "then the rejection message is passed");
 			});
 		});
 	});

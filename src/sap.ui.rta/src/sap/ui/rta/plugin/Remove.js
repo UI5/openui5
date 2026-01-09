@@ -3,19 +3,21 @@
  */
 
 sap.ui.define([
-	"sap/ui/rta/plugin/Plugin",
-	"sap/ui/rta/Utils",
-	"sap/ui/rta/command/CompositeCommand",
+	"sap/base/Log",
 	"sap/ui/dt/OverlayRegistry",
 	"sap/ui/events/KeyCodes",
-	"sap/base/Log"
+	"sap/ui/fl/util/CancelError",
+	"sap/ui/rta/command/CompositeCommand",
+	"sap/ui/rta/plugin/Plugin",
+	"sap/ui/rta/Utils"
 ], function(
-	Plugin,
-	Utils,
-	CompositeCommand,
+	Log,
 	OverlayRegistry,
 	KeyCodes,
-	Log
+	CancelError,
+	CompositeCommand,
+	Plugin,
+	Utils
 ) {
 	"use strict";
 
@@ -239,7 +241,7 @@ sap.ui.define([
 				})
 				.then(function(bConfirmed) {
 					if (!bConfirmed) {
-						throw Error("Cancelled");
+						throw new CancelError();
 					}
 
 					return this._getRemoveCommand(oRemovedElement, oDesignTimeMetadata, sVariantManagementReference);
@@ -248,7 +250,7 @@ sap.ui.define([
 					oCompositeCommand.addCommand(oCommand);
 				})
 				.catch(function(oError) {
-					if (oError && oError.message === "Cancelled") {
+					if (oError && oError instanceof CancelError) {
 						if (aElementOverlays.length === 1) {
 							oNextOverlaySelection = oOverlay;
 						}

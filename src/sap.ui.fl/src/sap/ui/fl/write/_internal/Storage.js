@@ -64,7 +64,7 @@ sap.ui.define([
 	 */
 	function _getConnectorConfigByLayer(sLayer) {
 		if (!sLayer) {
-			return Promise.reject("No layer was provided");
+			return Promise.reject(new Error("No layer was provided"));
 		}
 		return _getWriteConnectors()
 		.then(findConnectorConfigForLayer.bind(this, sLayer));
@@ -80,7 +80,7 @@ sap.ui.define([
 						if (bDraftEnabled) {
 							resolve();
 						} else {
-							reject(`Draft is not supported for the given layer: ${mPropertyBag.layer}`);
+							reject(new Error(`Draft is not supported for the given layer: ${mPropertyBag.layer}`));
 						}
 					});
 				});
@@ -239,7 +239,7 @@ sap.ui.define([
 		const mProperties = { ...mPropertyBag };
 		const mCondense = await prepareCondensingForConnector(mProperties);
 		if (!mCondense) {
-			return Promise.reject("No changes were provided");
+			return Promise.reject(new Error("No changes were provided"));
 		}
 		if (mCondense.create || mCondense.reorder || mCondense.update || mCondense.delete) {
 			let aCreatedChanges = [];

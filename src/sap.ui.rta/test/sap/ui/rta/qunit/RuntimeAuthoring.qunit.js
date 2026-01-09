@@ -310,7 +310,7 @@ sap.ui.define([
 		QUnit.test("when saving RTA without exiting with error in saving changes,", function(assert) {
 			const fnDone = assert.async();
 			const oMessageToastShowSpy = sandbox.spy(MessageToast, "show");
-			sandbox.stub(this.oRta, "_serializeToLrep").returns(Promise.reject("Test Exception"));
+			sandbox.stub(this.oRta, "_serializeToLrep").returns(Promise.reject(new Error("Test Exception")));
 			const oMessageBoxErrorStub = sandbox.stub(MessageBox, "error")
 			.resolves(this.oRta._getTextResources().getText("BTN_UNSAVED_CHANGES_ON_CLOSE_SAVE"));
 			const sExpectedErrorMessage = this.oRta._getTextResources().getText("MSG_LREP_TRANSFER_ERROR");

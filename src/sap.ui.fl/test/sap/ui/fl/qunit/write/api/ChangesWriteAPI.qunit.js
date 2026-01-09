@@ -382,8 +382,8 @@ sap.ui.define([
 		QUnit.test("when apply is called without element", function(assert) {
 			return ChangesWriteAPI.apply({
 				element: "notAnElement"
-			}).catch((sErrorText) => {
-				assert.strictEqual(sErrorText, "Please provide an Element", "the function rejects with an error text");
+			}).catch((oError) => {
+				assert.strictEqual(oError.message, "Please provide an Element", "the function rejects with an error text");
 			});
 		});
 

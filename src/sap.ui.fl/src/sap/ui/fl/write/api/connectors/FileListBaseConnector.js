@@ -33,7 +33,7 @@ sap.ui.define([
 		 * i.e.: <code>["/some/url/id_12345_123_propertyChange.change", "/some/url/id_67890_456_.ctrl_variant", ...]</code>
 		 */
 		getFileList(/* sReference */) {
-			return Promise.reject("not implemented");
+			return Promise.reject(new Error("not implemented"));
 		},
 		layers: [],
 		/**

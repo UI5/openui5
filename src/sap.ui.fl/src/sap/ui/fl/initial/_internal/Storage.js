@@ -185,7 +185,7 @@ sap.ui.define([
 	 */
 	Storage.completeFlexData = function(mPropertyBag) {
 		if (!mPropertyBag || !mPropertyBag.reference) {
-			return Promise.reject("No reference was provided");
+			return Promise.reject(new Error("No reference was provided"));
 		}
 
 		return Promise.all([_loadFlexDataFromStaticFileConnector(mPropertyBag), mPropertyBag.partialFlexData])
@@ -207,7 +207,7 @@ sap.ui.define([
 	 */
 	Storage.loadFlexData = function(mPropertyBag) {
 		if (!mPropertyBag || !mPropertyBag.reference) {
-			return Promise.reject("No reference was provided");
+			return Promise.reject(new Error("No reference was provided"));
 		}
 
 		return StorageUtils.getLoadConnectors(mPropertyBag.skipLoadBundle)
@@ -223,7 +223,7 @@ sap.ui.define([
 	 */
 	Storage.loadVariantsAuthors = function(sReference) {
 		if (!sReference) {
-			return Promise.reject("No reference was provided");
+			return Promise.reject(new Error("No reference was provided"));
 		}
 		return StorageUtils.getLoadConnectors()
 		.then(loadVariantsAuthorsFromConnectors.bind(this, sReference));

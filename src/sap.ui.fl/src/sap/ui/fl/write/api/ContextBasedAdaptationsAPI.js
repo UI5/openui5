@@ -106,10 +106,10 @@ sap.ui.define([
 	ContextBasedAdaptationsAPI.initialize = function(mPropertyBag) {
 		_oResourceBundle ||= Lib.getResourceBundleFor("sap.ui.fl");
 		if (!mPropertyBag.layer) {
-			return Promise.reject("No layer was provided");
+			return Promise.reject(new Error("No layer was provided"));
 		}
 		if (!mPropertyBag.control) {
-			return Promise.reject("No control was provided");
+			return Promise.reject(new Error("No control was provided"));
 		}
 		var sReference = getFlexReferenceForControl(mPropertyBag.control);
 		mPropertyBag.reference = sReference;
@@ -885,13 +885,13 @@ sap.ui.define([
 	 */
 	ContextBasedAdaptationsAPI.create = function(mPropertyBag) {
 		if (!mPropertyBag.layer) {
-			return Promise.reject("No layer was provided");
+			return Promise.reject(new Error("No layer was provided"));
 		}
 		if (!mPropertyBag.control) {
-			return Promise.reject("No control was provided");
+			return Promise.reject(new Error("No control was provided"));
 		}
 		if (!mPropertyBag.contextBasedAdaptation) {
-			return Promise.reject("No contextBasedAdaptation was provided");
+			return Promise.reject(new Error("No contextBasedAdaptation was provided"));
 		}
 		mPropertyBag.contextBasedAdaptation.id = FlexUtils.createDefaultFileName();
 		mPropertyBag.appId = getFlexReferenceForControl(mPropertyBag.control);
@@ -932,16 +932,16 @@ sap.ui.define([
 	 */
 	ContextBasedAdaptationsAPI.update = function(mPropertyBag) {
 		if (!mPropertyBag.layer) {
-			return Promise.reject("No layer was provided");
+			return Promise.reject(new Error("No layer was provided"));
 		}
 		if (!mPropertyBag.control) {
-			return Promise.reject("No control was provided");
+			return Promise.reject(new Error("No control was provided"));
 		}
 		if (!mPropertyBag.contextBasedAdaptation) {
-			return Promise.reject("No contextBasedAdaptation was provided");
+			return Promise.reject(new Error("No contextBasedAdaptation was provided"));
 		}
 		if (!mPropertyBag.adaptationId) {
-			return Promise.reject("No adaptationId was provided");
+			return Promise.reject(new Error("No adaptationId was provided"));
 		}
 		mPropertyBag.appId = getFlexReferenceForControl(mPropertyBag.control);
 		return Storage.contextBasedAdaptation.update({
@@ -969,13 +969,13 @@ sap.ui.define([
 	 */
 	ContextBasedAdaptationsAPI.reorder = function(mPropertyBag) {
 		if (!mPropertyBag.layer) {
-			return Promise.reject("No layer was provided");
+			return Promise.reject(new Error("No layer was provided"));
 		}
 		if (!mPropertyBag.control) {
-			return Promise.reject("No control was provided");
+			return Promise.reject(new Error("No control was provided"));
 		}
 		if (!mPropertyBag.parameters || !mPropertyBag.parameters.priorities) {
-			return Promise.reject("No valid priority list was provided");
+			return Promise.reject(new Error("No valid priority list was provided"));
 		}
 		mPropertyBag.appId = getFlexReferenceForControl(mPropertyBag.control);
 		return Storage.contextBasedAdaptation.reorder({
@@ -1000,10 +1000,10 @@ sap.ui.define([
 	 */
 	ContextBasedAdaptationsAPI.load = function(mPropertyBag) {
 		if (!mPropertyBag.layer) {
-			return Promise.reject("No layer was provided");
+			return Promise.reject(new Error("No layer was provided"));
 		}
 		if (!mPropertyBag.control) {
-			return Promise.reject("No control was provided");
+			return Promise.reject(new Error("No control was provided"));
 		}
 		mPropertyBag.appId = getFlexReferenceForControl(mPropertyBag.control);
 		return Storage.contextBasedAdaptation.load({
@@ -1029,13 +1029,13 @@ sap.ui.define([
 	 */
 	ContextBasedAdaptationsAPI.remove = function(mPropertyBag) {
 		if (!mPropertyBag.layer) {
-			return Promise.reject("No layer was provided");
+			return Promise.reject(new Error("No layer was provided"));
 		}
 		if (!mPropertyBag.control) {
-			return Promise.reject("No control was provided");
+			return Promise.reject(new Error("No control was provided"));
 		}
 		if (!mPropertyBag.adaptationId) {
-			return Promise.reject("No adaptationId was provided");
+			return Promise.reject(new Error("No adaptationId was provided"));
 		}
 		mPropertyBag.appId = getFlexReferenceForControl(mPropertyBag.control);
 		return Storage.contextBasedAdaptation.remove({

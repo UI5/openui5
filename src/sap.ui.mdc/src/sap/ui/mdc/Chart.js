@@ -86,7 +86,6 @@ sap.ui.define([
 		 * @alias sap.ui.mdc.Chart
 		 * @see {@link topic:1dd2aa91115d43409452a271d11be95b sap.ui.mdc}
 		 * @see {@link topic:52d065ab8bb740c58c834a0c985e3b9e Chart Building Block (OData V4)}
-		 * @experimental As of version 1.88
 		 */
 		const Chart = Control.extend("sap.ui.mdc.Chart", /** @lends sap.ui.mdc.Chart.prototype */ {
 			metadata: {
@@ -132,7 +131,6 @@ sap.ui.define([
 					 * }</code></pre>
 					 * <b>Note:</b> Ensure that the related file can be requested (any required library has to be loaded before that).<br>
 					 * Do not bind or modify the module. This property can only be configured during control initialization.
-					 * @experimental
 					 */
 					delegate: {
 						type: "object",
@@ -489,7 +487,6 @@ sap.ui.define([
 		 * @property {string} role
 		 * 	Defines the role that the property visualizes inside the chart
 		 * @public
-		 * @experimental As of version 1.80
 		 */
 
 
@@ -1315,7 +1312,6 @@ sap.ui.define([
 		 * Checks the enablement of the zoom buttons in the toolbar.
 		 * <b>Note:</b> Buttons will be disabled if no zoom state is available or if it is disabled.
 		 *
-		 * @experimental
 		 * @private
 		 */
 		Chart.prototype._updateZoomButtons = function() {

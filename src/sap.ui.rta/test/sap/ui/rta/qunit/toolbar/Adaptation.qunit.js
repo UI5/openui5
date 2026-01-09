@@ -401,7 +401,7 @@ sap.ui.define([
 				backendDraft: true,
 				displayedVersion: "12345"
 			});
-			this.oShowMessageBoxStub.returns(Promise.reject("cancel"));
+			this.oShowMessageBoxStub.resolves(MessageBox.Action.CANCEL);
 
 			this.oToolbar.getControl("saveAsAdaptation").firePress();
 
