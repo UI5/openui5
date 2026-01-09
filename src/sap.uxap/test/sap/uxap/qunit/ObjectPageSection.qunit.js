@@ -807,29 +807,27 @@ function(Element, nextUIUpdate, jQuery, XMLView, library, ObjectPageLayout, Obje
 			oLastSectionFirstSubsection.getTitle(), "aria-labelledby is updated properly"); //labelled by the subsection title
 	});
 
-	QUnit.test("Test aria-level attribute", async function(assert) {
+	QUnit.test("Test title heading element", async function(assert) {
 		assert.expect(3);
 		var oSectionWithOneSubsection = this.ObjectPageSectionView.byId("SectionWithSubSection"),
-			oSectionHeader = oSectionWithOneSubsection.$().find(".sapUxAPObjectPageSectionHeader"),
-			sDefaultAriaLevel = "3",
-			sNewAriaLevel = "5";
+			oSectionHeader = oSectionWithOneSubsection.$().find(".sapUxAPObjectPageSectionHeader");
 
 		// assert
-		assert.strictEqual(oSectionHeader.attr("aria-level"), sDefaultAriaLevel, "default aria-level is set");
+		assert.strictEqual(oSectionHeader.find("h3").length, 1, "default H3 heading element is rendered");
 
 		// act
 		oSectionWithOneSubsection.setTitleLevel("H5");
 		await nextUIUpdate();
 
 		// assert
-		assert.strictEqual(oSectionHeader.attr("aria-level"), sNewAriaLevel, "aria-level is correctly set");
+		assert.strictEqual(oSectionHeader.find("h5").length, 1, "H5 heading element is correctly rendered");
 
 		// act
 		oSectionWithOneSubsection.setTitleLevel("Auto");
 		await nextUIUpdate();
 
 		// assert
-		assert.strictEqual(oSectionHeader.attr("aria-level"), sDefaultAriaLevel, "default aria-level is set when titleLevel is set to Auto");
+		assert.strictEqual(oSectionHeader.find("h3").length, 1, "default H3 heading element is rendered when titleLevel is set to Auto");
 
 	});
 
