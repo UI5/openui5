@@ -5,6 +5,7 @@ sap.ui.define([
 	"sap/base/i18n/Formatting",
 	"sap/ui/core/Lib",
 	"sap/ui/unified/calendar/Month",
+	"sap/ui/unified/calendar/DatesRow",
 	"sap/ui/qunit/utils/nextUIUpdate",
 	"sap/ui/unified/calendar/CalendarDate",
 	"sap/ui/unified/CalendarLegend",
@@ -26,6 +27,7 @@ sap.ui.define([
 	Formatting,
 	Library,
 	Month,
+	DatesRow,
 	nextUIUpdate,
 	CalendarDate,
 	CalendarLegend,
@@ -1607,4 +1609,31 @@ sap.ui.define([
 		});
 
 	})();
+
+	QUnit.module("DatesRow Accessibility", {
+		beforeEach: async function () {
+			this.oDatesRow = new DatesRow({
+				showDayNamesLine: true,
+				startDate: UI5Date.getInstance(2024, 0, 1),
+				days: 7
+			});
+			this.oDatesRow.placeAt("qunit-fixture");
+			await nextUIUpdate();
+		},
+		afterEach: function () {
+			this.oDatesRow.destroy();
+		}
+	});
+
+	QUnit.test("DatesRow day cells reference day name header in aria-describedby", function (assert) {
+		// Act
+		var $firstDayCell = jQuery("#" + this.oDatesRow.getId() + "-20240101");
+		var sDescribedBy = $firstDayCell.attr("aria-describedby");
+		var sDayNameHeaderId = this.oDatesRow.getId() + "-WH0";
+
+		// Assert
+		assert.ok(sDescribedBy && sDescribedBy.indexOf(sDayNameHeaderId) > -1,
+			"aria-describedby contains day name header ID: " + sDayNameHeaderId);
+	});
+
 });
