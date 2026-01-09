@@ -308,109 +308,105 @@ sap.ui.define([
 		}
 
 		async function buildCommand(assert, oAction) {
-			try {
-				let sCommandName = oAction.name;
-				let oAggregationDesignTimeMetadata;
-				let oMovedElement;
-				let oTargetControl = await getControlFromActionMap.call(this, oAction);
-				const mParameter = getParameterMap.call(this, oAction.parameter);
-				const oControlWithDesigntimeActionDefinition = await getDesigntimeActionControl.call(this, oAction);
+			let sCommandName = oAction.name;
+			let oAggregationDesignTimeMetadata;
+			let oMovedElement;
+			let oTargetControl = await getControlFromActionMap.call(this, oAction);
+			const mParameter = getParameterMap.call(this, oAction.parameter);
+			const oControlWithDesigntimeActionDefinition = await getDesigntimeActionControl.call(this, oAction);
 
-				await startDesigntime.call(this);
+			await startDesigntime.call(this);
 
-				// gather data for the designtime check and the command factory
-				let oControlOverlay = OverlayRegistry.getOverlay(oControlWithDesigntimeActionDefinition || oTargetControl);
-				if (!oControlOverlay) {
-					throw new Error(
-						`The provided control ${oTargetControl.getId()}does not have any overlay existing during test execution. `
+			// gather data for the designtime check and the command factory
+			let oControlOverlay = OverlayRegistry.getOverlay(oControlWithDesigntimeActionDefinition || oTargetControl);
+			if (!oControlOverlay) {
+				throw new Error(
+					`The provided control ${oTargetControl.getId()}does not have any overlay existing during test execution. `
 						+ "With this testsetup it is no possible to check for designtime action definition. In some cases it is not "
 						+ "possible to identify the control with the designtime metadata automatically just by the given 'action.control'. "
 						+ "In this case please provide the 'action.designtimeActionControl' property with a valid control containing "
 						+ "the designtime metadata definition for this check."
-					);
-				}
-				let oElementDesignTimeMetadata = oControlOverlay.getDesignTimeMetadata();
-				const oResponsibleElement = oElementDesignTimeMetadata.getResponsibleElement(oTargetControl);
-				if (mOptions.label) {
-					assert.strictEqual(
-						oElementDesignTimeMetadata.getLabel(oTargetControl),
-						mOptions.label,
-						"then the control label is correct"
-					);
-				}
-				if (oAction.name === "move") {
-					oMovedElement = mParameter.movedElements[0].element || mParameter.movedElements[0].id;
-					const oElementOverlay = OverlayRegistry.getOverlay(oMovedElement);
-					const oRelevantContainer = oElementOverlay.getRelevantContainer();
-					oTargetControl = oRelevantContainer;
-					oElementDesignTimeMetadata = oElementOverlay.getParentAggregationOverlay().getDesignTimeMetadata();
-				} else if (Array.isArray(oAction.name)) {
-					const aAddActions = oElementDesignTimeMetadata.getActionDataFromAggregations(
-						oAction.name[0],
-						oTargetControl,
-						undefined,
-						oAction.name[1]
-					);
-					const oAggregationOverlay = oControlOverlay.getAggregationOverlay(aAddActions[0].aggregation);
-					oElementDesignTimeMetadata = oAggregationOverlay.getDesignTimeMetadata();
-					sCommandName = "addDelegateProperty";
-				} else if (oAction.name === "createContainer" || oAction.name === "addIFrame") {
-					const aCreateContainerActions = oElementDesignTimeMetadata.getActionDataFromAggregations(
-						oAction.name,
-						oControlWithDesigntimeActionDefinition || oTargetControl
-					);
-					const oAggregationOverlay = oControlOverlay.getAggregationOverlay(aCreateContainerActions[0].aggregation);
-					oAggregationDesignTimeMetadata = oAggregationOverlay.getDesignTimeMetadata();
-				} else if (oResponsibleElement) {
-					if (oAction.name === "reveal") {
-						oTargetControl = oAction.revealedElement(this.oView);
-						oControlOverlay = OverlayRegistry.getOverlay(oAction.revealedElement(this.oView));
-						oElementDesignTimeMetadata = oControlOverlay.getDesignTimeMetadata();
-						if (oAction.label) {
-							const oRevealAction = oElementDesignTimeMetadata.getAction("reveal");
-							assert.strictEqual(oRevealAction.getLabel(oTargetControl), oAction.label,
-								"then the control label is correct");
-						}
-					} else {
-						oTargetControl = oResponsibleElement;
-						oControlOverlay = OverlayRegistry.getOverlay(oTargetControl);
-						oElementDesignTimeMetadata = oControlOverlay.getDesignTimeMetadata();
-						oTargetControl.getMetadata().loadDesignTime(oTargetControl);
-					}
-				}
-
-				// additional check if the required action definition exists
-				// into the responsible control designtime metadata
-				checkDesigntimeMetadata(
-					assert,
-					oAction,
-					oTargetControl,
-					oMovedElement,
-					oElementDesignTimeMetadata,
-					oAggregationDesignTimeMetadata
 				);
-
-				const oCommandFactory = new CommandFactory({
-					flexSettings: {
-						layer: mOptions.layer || Layer.CUSTOMER
-					}
-				});
-				const oCommand = await oCommandFactory.getCommandFor(
-					oTargetControl,
-					sCommandName,
-					mParameter,
-					oElementDesignTimeMetadata
-				);
-
-				assert.ok(
-					oCommand,
-					"then the registration for action to change type, the registration for change and " +
-					`control type to change handler is available and ${mOptions.action.name} is a valid action`
-				);
-				return oCommand;
-			} catch (oMessage) {
-				throw new Error(oMessage);
 			}
+			let oElementDesignTimeMetadata = oControlOverlay.getDesignTimeMetadata();
+			const oResponsibleElement = oElementDesignTimeMetadata.getResponsibleElement(oTargetControl);
+			if (mOptions.label) {
+				assert.strictEqual(
+					oElementDesignTimeMetadata.getLabel(oTargetControl),
+					mOptions.label,
+					"then the control label is correct"
+				);
+			}
+			if (oAction.name === "move") {
+				oMovedElement = mParameter.movedElements[0].element || mParameter.movedElements[0].id;
+				const oElementOverlay = OverlayRegistry.getOverlay(oMovedElement);
+				const oRelevantContainer = oElementOverlay.getRelevantContainer();
+				oTargetControl = oRelevantContainer;
+				oElementDesignTimeMetadata = oElementOverlay.getParentAggregationOverlay().getDesignTimeMetadata();
+			} else if (Array.isArray(oAction.name)) {
+				const aAddActions = oElementDesignTimeMetadata.getActionDataFromAggregations(
+					oAction.name[0],
+					oTargetControl,
+					undefined,
+					oAction.name[1]
+				);
+				const oAggregationOverlay = oControlOverlay.getAggregationOverlay(aAddActions[0].aggregation);
+				oElementDesignTimeMetadata = oAggregationOverlay.getDesignTimeMetadata();
+				sCommandName = "addDelegateProperty";
+			} else if (oAction.name === "createContainer" || oAction.name === "addIFrame") {
+				const aCreateContainerActions = oElementDesignTimeMetadata.getActionDataFromAggregations(
+					oAction.name,
+					oControlWithDesigntimeActionDefinition || oTargetControl
+				);
+				const oAggregationOverlay = oControlOverlay.getAggregationOverlay(aCreateContainerActions[0].aggregation);
+				oAggregationDesignTimeMetadata = oAggregationOverlay.getDesignTimeMetadata();
+			} else if (oResponsibleElement) {
+				if (oAction.name === "reveal") {
+					oTargetControl = oAction.revealedElement(this.oView);
+					oControlOverlay = OverlayRegistry.getOverlay(oAction.revealedElement(this.oView));
+					oElementDesignTimeMetadata = oControlOverlay.getDesignTimeMetadata();
+					if (oAction.label) {
+						const oRevealAction = oElementDesignTimeMetadata.getAction("reveal");
+						assert.strictEqual(oRevealAction.getLabel(oTargetControl), oAction.label,
+							"then the control label is correct");
+					}
+				} else {
+					oTargetControl = oResponsibleElement;
+					oControlOverlay = OverlayRegistry.getOverlay(oTargetControl);
+					oElementDesignTimeMetadata = oControlOverlay.getDesignTimeMetadata();
+					oTargetControl.getMetadata().loadDesignTime(oTargetControl);
+				}
+			}
+
+			// additional check if the required action definition exists
+			// into the responsible control designtime metadata
+			checkDesigntimeMetadata(
+				assert,
+				oAction,
+				oTargetControl,
+				oMovedElement,
+				oElementDesignTimeMetadata,
+				oAggregationDesignTimeMetadata
+			);
+
+			const oCommandFactory = new CommandFactory({
+				flexSettings: {
+					layer: mOptions.layer || Layer.CUSTOMER
+				}
+			});
+			const oCommand = await oCommandFactory.getCommandFor(
+				oTargetControl,
+				sCommandName,
+				mParameter,
+				oElementDesignTimeMetadata
+			);
+
+			assert.ok(
+				oCommand,
+				"then the registration for action to change type, the registration for change and " +
+					`control type to change handler is available and ${mOptions.action.name} is a valid action`
+			);
+			return oCommand;
 		}
 
 		function executeCommands(aCommands) {

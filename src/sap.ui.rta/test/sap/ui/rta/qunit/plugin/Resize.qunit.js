@@ -138,7 +138,7 @@ sap.ui.define([
 				if (mPropertyBag.changeType === sChangeType) {
 					return Promise.resolve();
 				}
-				return Promise.reject();
+				return Promise.reject(new Error("Invalid change type"));
 			});
 			this.oColumn0Overlay.setDesignTimeMetadata({
 				actions: {

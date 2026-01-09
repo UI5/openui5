@@ -2105,14 +2105,14 @@ sap.ui.define([
 			description: "Description"
 		};
 
-		assert.equal(ListItemBase.getAccessibilityText(oCtr1), "Tooltip  Description", "Tooltip + Description");
+		assert.equal(ListItemBase.getAccessibilityText(oCtr1), "Description Tooltip", "Description + Tooltip");
 
 		oAccInfo = {
 			type: "Type",
 			description: "Description"
 		};
 
-		assert.equal(ListItemBase.getAccessibilityText(oCtr1), "Type Description", "Tooltip + Type + Description");
+		assert.equal(ListItemBase.getAccessibilityText(oCtr1), "Type Description", "(No Tooltip) Type + Description");
 
 		oAccInfo = {
 			description: "Description&Tooltip"
@@ -2123,20 +2123,23 @@ sap.ui.define([
 		oCtr1.setTooltip(null);
 		await nextUIUpdate();
 		oAccInfo = {
+			type: "Type",
 			description: "Description",
 			enabled: false
 		};
 
-		assert.equal(ListItemBase.getAccessibilityText(oCtr1), "Description " + oRb.getText("CONTROL_DISABLED"), "Disabled");
+		assert.equal(ListItemBase.getAccessibilityText(oCtr1), "Type Description " + oRb.getText("CONTROL_DISABLED"), "Disabled");
 
 		oAccInfo = {
+			type: "Type",
 			description: "Description",
 			editable: false
 		};
 
-		assert.equal(ListItemBase.getAccessibilityText(oCtr1), "Description " + oRb.getText("CONTROL_READONLY"), "Readonly");
+		assert.equal(ListItemBase.getAccessibilityText(oCtr1), "Type Description " + oRb.getText("CONTROL_READONLY"), "Readonly");
 
 		oAccInfo = {
+			type: "Type",
 			description: "Description",
 			editable: false,
 			children: [oCtr2, oCtr3]
@@ -2144,7 +2147,7 @@ sap.ui.define([
 		oCtr2.getAccessibilityInfo = fGetAccessibilityInfo2;
 		oCtr3.getAccessibilityInfo = fGetAccessibilityInfo2;
 
-		assert.equal(ListItemBase.getAccessibilityText(oCtr1), "Description " + oRb.getText("CONTROL_READONLY") + " UVW XYZ", "Children");
+		assert.equal(ListItemBase.getAccessibilityText(oCtr1), "Type Description " + oRb.getText("CONTROL_READONLY") + " UVW XYZ", "Children");
 
 		oCtr1.destroy();
 		oCtr2.destroy();

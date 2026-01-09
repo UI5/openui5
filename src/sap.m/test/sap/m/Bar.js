@@ -147,7 +147,7 @@ sap.ui.define([
 	  contentLeft: [new Button({icon: "images/favorite_grey_24.png"})],
 	  contentMiddle: [new SegmentedButton('SegmentedBar', {
 						  items: [segmentedButtonItem, segmentedButtonItem2, segmentedButtonItem3],
-						  selectedButton: segmentedButtonItem2
+						  selectedItem: segmentedButtonItem2
 					  })],
 	  contentRight: [new Button({icon: "images/favorite_grey_24.png"})]
   });

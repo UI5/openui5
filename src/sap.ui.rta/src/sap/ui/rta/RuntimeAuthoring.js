@@ -20,6 +20,7 @@ sap.ui.define([
 	"sap/ui/fl/apply/api/FlexRuntimeInfoAPI",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/initial/api/Version",
+	"sap/ui/fl/util/CancelError",
 	"sap/ui/fl/write/api/ContextBasedAdaptationsAPI",
 	"sap/ui/fl/write/api/ControlPersonalizationWriteAPI",
 	"sap/ui/fl/write/api/FeaturesAPI",
@@ -68,6 +69,7 @@ sap.ui.define([
 	FlexRuntimeInfoAPI,
 	ManifestUtils,
 	Version,
+	CancelError,
 	ContextBasedAdaptationsAPI,
 	ControlPersonalizationWriteAPI,
 	FeaturesAPI,
@@ -1130,9 +1132,9 @@ sap.ui.define([
 
 	function showTechnicalError(vError) {
 		BusyIndicator.hide();
-		const sErrorMessage = vError.userMessage || vError.stack || vError.message || vError.status || vError;
+		const sErrorMessage = vError?.userMessage || vError?.stack || vError?.message || vError?.status || vError;
 		const oTextResources = Lib.getResourceBundleFor("sap.ui.rta");
-		Log.error("Failed to transfer changes", sErrorMessage);
+		Log.error(`Failed to transfer changes: ${sErrorMessage}`, vError);
 		const sMsg = `${oTextResources.getText("MSG_LREP_TRANSFER_ERROR")}
 			${oTextResources.getText("MSG_ERROR_REASON", [sErrorMessage])}`;
 		MessageBox.error(sMsg, {
@@ -1746,7 +1748,7 @@ sap.ui.define([
 			return ReloadManager.triggerReload(oReloadInfo);
 		}.bind(this))
 		.catch(function(oError) {
-			if (oError !== "cancel") {
+			if (!(oError instanceof CancelError)) {
 				Utils.showMessageBox("error", "MSG_RESTORE_FAILED", { error: oError });
 			}
 		});

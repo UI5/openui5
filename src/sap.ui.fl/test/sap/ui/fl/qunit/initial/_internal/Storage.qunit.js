@@ -189,8 +189,8 @@ sap.ui.define([
 	}, function() {
 		QUnit.test("without reference param", function(assert) {
 			return Storage.loadVariantsAuthors().then(function() {
-			}).catch((sError) => {
-				assert.equal(sError, "No reference was provided", "correct error is returned");
+			}).catch((oError) => {
+				assert.strictEqual(oError.message, "No reference was provided", "correct error is returned");
 			});
 		});
 

@@ -68,9 +68,12 @@ sap.ui.define([
 					}
 				// ... Reject if publishing return an error or is locked
 				}).catch(function(oError) {
-					var sText = bAppVarCreation ? "creation" : "deletion";
-					Log.error(`Catalog publishing failed for app variant ${sText}. AppVarStatus is ${oError.message}`);
-					reject({ iamAppId: sIamAppId, error: oError.message });
+					const sText = bAppVarCreation ? "creation" : "deletion";
+					const oNewError = new Error(`Catalog publishing failed for app variant ${sText}. AppVarStatus is ${oError.message}`);
+					oNewError.iamAppId = sIamAppId;
+					oNewError.cause = oError;
+					Log.error(oNewError.message, oNewError);
+					reject(oNewError);
 				});
 			}
 

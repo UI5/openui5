@@ -3,21 +3,23 @@
  */
 
 sap.ui.define([
-	"sap/ui/core/Lib",
-	"sap/ui/rta/plugin/BaseCreate",
-	"sap/ui/fl/Utils",
-	"sap/ui/dt/Util",
 	"sap/base/util/uid",
 	"sap/ui/core/IconPool",
-	"sap/ui/rta/plugin/iframe/AddIFrameDialog"
+	"sap/ui/core/Lib",
+	"sap/ui/dt/Util",
+	"sap/ui/fl/util/CancelError",
+	"sap/ui/fl/Utils",
+	"sap/ui/rta/plugin/iframe/AddIFrameDialog",
+	"sap/ui/rta/plugin/BaseCreate"
 ], function(
-	Lib,
-	BaseCreate,
-	FlexUtils,
-	DtUtil,
 	uid,
 	IconPool,
-	AddIFrameDialog
+	Lib,
+	DtUtil,
+	CancelError,
+	FlexUtils,
+	AddIFrameDialog,
+	BaseCreate
 ) {
 	"use strict";
 
@@ -87,7 +89,7 @@ sap.ui.define([
 		})
 		.then(function(mSettings) {
 			if (!mSettings) {
-				return Promise.reject(); // Cancel
+				throw new CancelError();
 			}
 			mSettings.index = iIndex;
 			mSettings.aggregation = oAction.aggregation;

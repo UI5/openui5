@@ -189,7 +189,6 @@ sap.ui.define([
 	 * Creates the popover
 	 * @returns {sap.m.ResponsivePopover} the instance of the created popover
 	 *
-	 * @experimental
 	 * @private
 	 * @ui5-restricted sap.ui.mdc
 	 */

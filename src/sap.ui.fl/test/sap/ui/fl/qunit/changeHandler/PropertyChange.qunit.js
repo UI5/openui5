@@ -124,7 +124,7 @@ sap.ui.define([
 
 			return this.oChangeHandler.applyChange(this.oChange, this.oButton, { modifier: JsControlTreeModifier })
 			.catch(function(oError) {
-				assert.equal(oError.message, "Applying property changes failed: Error: testError", "applyChange throws the correct error");
+				assert.strictEqual(oError.message, "Applying property changes failed: testError", "applyChange throws the correct error");
 			});
 		});
 

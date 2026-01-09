@@ -907,7 +907,7 @@ sap.ui.define([
 			ChangeUtils.getChangeHandler.restore();
 			sandbox.stub(ChangeUtils, "getChangeHandler")
 			.onFirstCall().resolves({
-				applyChange: () => Promise.reject(),
+				applyChange: () => Promise.reject(new Error()),
 				revertChange() {},
 				completeChangeContent() {}
 			})

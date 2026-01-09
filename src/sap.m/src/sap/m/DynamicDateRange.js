@@ -753,18 +753,17 @@ sap.ui.define([
 				this._removeAllListItemDelegates();
 				this._oOptionsList.destroyAggregation("items");
 
-				const aGroupSizes = [];
-				let iCurrentGroupIndex = -1;
+				let oCurrentGroupHeader;
 
 				this._collectValueHelpItems(this._getOptions(), true).forEach(function(vOption) {
 					let oItem;
 					// check if it's a group header
 					if (typeof (vOption) === "string") {
-						aGroupSizes[++iCurrentGroupIndex] = 0;
-						oItem = this._createHeaderListItem(vOption);
+						// Create and add group header using ListBase.addItemGroup
+						const oGroupData = { text: vOption };
+						oCurrentGroupHeader = this._oOptionsList.addItemGroup(oGroupData, null, true);
+						oCurrentGroupHeader.addDelegate(this._oListItemDelegate, this);
 					} else {
-						aGroupSizes[iCurrentGroupIndex]++;
-
 						if (vOption.getKey() === "FROMDATETIME") {
 							vOption._bAdditionalTimeText = !!this._findOption("FROM");
 						} else if (vOption.getKey() === "TODATETIME") {
@@ -773,54 +772,19 @@ sap.ui.define([
 							vOption._bAdditionalTimeText = !!this._findOption("DATERANGE");
 						}
 						oItem = this._createListItem(vOption);
+						oItem.addDelegate(this._oListItemDelegate, this);
+						this._oOptionsList.addItem(oItem);
 					}
-
-					oItem.addDelegate(this._oListItemDelegate, this);
-					this._oOptionsList.addItem(oItem);
 				}, this);
 
 				//reset value help page
 				this._oNavContainer.to(this._oNavContainer.getPages()[0]);
 
 				this._openPopup(oDomRef);
-
-				if (this.getEnableGroupHeaders()) {
-					this._updateOptionsListAccessibilityAttributes(aGroupSizes);
-				}
 			}
 		};
 
-		/**
-		 * Updates accessibility attributes for options list items with group-specific aria-setsize and aria-posinset.
-		 *
-		 * @param {Array<number>} aGroupSizes Array containing the size of each group
-		 * @private
-		 */
-		DynamicDateRange.prototype._updateOptionsListAccessibilityAttributes = function(aGroupSizes) {
-			const aOptionsListItems = this._oOptionsList.getItems();
-			const iItemCount = aOptionsListItems.length;
 
-			if (!iItemCount) {
-				return;
-			}
-
-			let iPositionInGroup = 1;
-			let iCurrentGroupIndex = -1;
-
-			for (let i = 0; i < iItemCount; i++) {
-				const oItem = aOptionsListItems[i];
-
-				if (oItem.isA("sap.m.GroupHeaderListItem")) {
-					iCurrentGroupIndex++;
-					iPositionInGroup = 1;
-				} else {
-					oItem.updateAccessibilityState({
-						"aria-setsize": aGroupSizes[iCurrentGroupIndex],
-						"aria-posinset": iPositionInGroup++
-					});
-				}
-			}
-		};
 
 		/**
 		 * Searches if there is an option with the given key included.
@@ -1488,13 +1452,6 @@ sap.ui.define([
 			});
 		};
 
-		DynamicDateRange.prototype._createHeaderListItem = function(sHeader) {
-			var oHeader = new GroupHeaderListItem();
-			oHeader.setTitle(sHeader);
-			oHeader._bGroupHeader = true;
-
-			return oHeader;
-		};
 
 		DynamicDateRange.prototype._handleOptionPress = function(oEvent) {
 			var sOptionKey = oEvent.getSource().getOptionKey(),
@@ -1668,7 +1625,6 @@ sap.ui.define([
 					mode: ListMode.SingleSelectMaster
 				});
 
-				this._oOptionsList.applyAriaRole("listbox");
 			}
 
 			if (!this._oNavContainer) {

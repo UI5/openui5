@@ -95,7 +95,7 @@ sap.ui.define([
 					}
 				});
 
-				sandbox.stub(Utils, "getUShellService").withArgs("Navigation").returns(Promise.reject("DummyService"));
+				sandbox.stub(Utils, "getUShellService").withArgs("Navigation").returns(Promise.reject(new Error("DummyService")));
 
 				return FeaturesAPI.isSaveAsAvailable(Layer.CUSTOMER).then(function(bReturnValue) {
 					assert.strictEqual(bReturnValue, false, "then false is returned");
@@ -170,7 +170,7 @@ sap.ui.define([
 						seenFeatureIds: ["feature1"]
 					});
 				} catch (oError) {
-					oResult = oError;
+					oResult = oError.message;
 				}
 				assert.deepEqual(oResult,
 					bValueToBeSet ? ["feature1"] : "The backend does not support saving seen features.",

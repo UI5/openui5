@@ -508,7 +508,7 @@ sap.ui.define([
 				return Promise.resolve();
 			};
 			const fnReject = function() {
-				return Promise.reject();
+				return Promise.reject(new Error());
 			};
 
 			// Resolved promises

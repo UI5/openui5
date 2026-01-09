@@ -30,7 +30,7 @@ sap.ui.define([], function() {
 		 * @ui5-restricted SAP Web IDE (Visual Editor), UX Tools
 		 */
 		loadFlexData(/* mPropertyBag */) {
-			return Promise.reject("loadFlexData is not implemented");
+			return Promise.reject(new Error("loadFlexData is not implemented"));
 		},
 
 		/**
@@ -39,7 +39,7 @@ sap.ui.define([], function() {
 		 * @returns {Promise<object>} Resolves with an object containing the data for the flex features
 		 */
 		loadFeatures() {
-			return Promise.reject("loadFeatures is not implemented");
+			return Promise.reject(new Error("loadFeatures is not implemented"));
 		},
 
 		/**
@@ -51,7 +51,7 @@ sap.ui.define([], function() {
 		 * @returns {Promise<object>} Resolves with a map between variant IDs and their authors' names containing the data for the flex features
 		 */
 		loadVariantsAuthors() {
-			return Promise.reject("loadVariantsAuthors is not implemented");
+			return Promise.reject(new Error("loadVariantsAuthors is not implemented"));
 		},
 
 		/**
@@ -65,7 +65,7 @@ sap.ui.define([], function() {
 		 * @returns {Promise<object>} Resolves with the data for variant
 		 */
 		loadFlVariant() {
-			return Promise.reject("loadFlVariant is not implemented");
+			return Promise.reject(new Error("loadFlVariant is not implemented"));
 		}
 	};
 

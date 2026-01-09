@@ -310,7 +310,7 @@ sap.ui.define([
 		var bDraftExists = _doesDraftExistInVersions(aVersions);
 		var sActiveVersion = oModel.getProperty("/activeVersion");
 		if (mPropertyBag.displayedVersion === sActiveVersion) {
-			return Promise.reject("Version is already active");
+			return Promise.reject(new Error("Version is already active"));
 		}
 		mPropertyBag.version = mPropertyBag.displayedVersion;
 

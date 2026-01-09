@@ -348,7 +348,7 @@ sap.ui.define([
 			};
 
 			return VersionsAPI.loadVersionForApplication(mPropertyBag).catch((oError) => {
-				assert.equal(oError.message, "No control was provided", "then an Error is thrown");
+				assert.strictEqual(oError.message, "No control was provided", "then an Error is thrown");
 			});
 		});
 
@@ -358,7 +358,7 @@ sap.ui.define([
 			};
 
 			return VersionsAPI.loadVersionForApplication(mPropertyBag).catch((oError) => {
-				assert.equal(oError.message, "No layer was provided", "then an Error is thrown");
+				assert.strictEqual(oError.message, "No layer was provided", "then an Error is thrown");
 			});
 		});
 
@@ -547,8 +547,8 @@ sap.ui.define([
 			var mPropertyBag = {
 				layer: Layer.CUSTOMER
 			};
-			return VersionsAPI.activate(mPropertyBag).catch(function(sErrorMessage) {
-				assert.equal(sErrorMessage, "No control was provided", "then an Error is thrown");
+			return VersionsAPI.activate(mPropertyBag).catch(function(oError) {
+				assert.strictEqual(oError.message, "No control was provided", "then an Error is thrown");
 			});
 		});
 
@@ -557,8 +557,8 @@ sap.ui.define([
 				control: new Control()
 			};
 
-			return VersionsAPI.activate(mPropertyBag).catch(function(sErrorMessage) {
-				assert.equal(sErrorMessage, "No layer was provided", "then an Error is thrown");
+			return VersionsAPI.activate(mPropertyBag).catch(function(oError) {
+				assert.strictEqual(oError.message, "No layer was provided", "then an Error is thrown");
 			});
 		});
 
@@ -568,8 +568,8 @@ sap.ui.define([
 				control: new Control()
 			};
 
-			return VersionsAPI.activate(mPropertyBag).catch(function(sErrorMessage) {
-				assert.equal(sErrorMessage, "No version title was provided", "then an Error is thrown");
+			return VersionsAPI.activate(mPropertyBag).catch(function(oError) {
+				assert.strictEqual(oError.message, "No version title was provided", "then an Error is thrown");
 			});
 		});
 
@@ -619,8 +619,8 @@ sap.ui.define([
 				layer: Layer.CUSTOMER
 			};
 
-			return VersionsAPI.discardDraft(mPropertyBag).catch(function(sErrorMessage) {
-				assert.equal(sErrorMessage, "No control was provided", "then an Error is thrown");
+			return VersionsAPI.discardDraft(mPropertyBag).catch(function(oError) {
+				assert.strictEqual(oError.message, "No control was provided", "then an Error is thrown");
 			});
 		});
 		QUnit.test("when no layer is provided", function(assert) {
@@ -628,8 +628,8 @@ sap.ui.define([
 				control: new Control()
 			};
 
-			return VersionsAPI.discardDraft(mPropertyBag).catch(function(sErrorMessage) {
-				assert.equal(sErrorMessage, "No layer was provided", "then an Error is thrown");
+			return VersionsAPI.discardDraft(mPropertyBag).catch(function(oError) {
+				assert.strictEqual(oError.message, "No layer was provided", "then an Error is thrown");
 			});
 		});
 
@@ -771,8 +771,8 @@ sap.ui.define([
 				layer: Layer.CUSTOMER
 			};
 
-			return VersionsAPI.publish(mPropertyBag).catch(function(sErrorMessage) {
-				assert.equal(sErrorMessage, "No selector was provided", "then an Error is thrown");
+			return VersionsAPI.publish(mPropertyBag).catch(function(oError) {
+				assert.strictEqual(oError.message, "No selector was provided", "then an Error is thrown");
 			});
 		});
 
@@ -781,8 +781,8 @@ sap.ui.define([
 				selector: new Control()
 			};
 
-			return VersionsAPI.publish(mPropertyBag).catch(function(sErrorMessage) {
-				assert.equal(sErrorMessage, "No layer was provided", "then an Error is thrown");
+			return VersionsAPI.publish(mPropertyBag).catch(function(oError) {
+				assert.strictEqual(oError.message, "No layer was provided", "then an Error is thrown");
 			});
 		});
 
@@ -792,8 +792,8 @@ sap.ui.define([
 				layer: "CUSTOMER"
 			};
 
-			return VersionsAPI.publish(mPropertyBag).catch(function(sErrorMessage) {
-				assert.equal(sErrorMessage, "No version was provided", "then an Error is thrown");
+			return VersionsAPI.publish(mPropertyBag).catch(function(oError) {
+				assert.strictEqual(oError.message, "No version was provided", "then an Error is thrown");
 			});
 		});
 

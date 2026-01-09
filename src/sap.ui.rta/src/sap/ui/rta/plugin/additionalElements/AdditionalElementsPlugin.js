@@ -10,6 +10,7 @@ sap.ui.define([
 	"sap/ui/core/Lib",
 	"sap/ui/dt/OverlayRegistry",
 	"sap/ui/dt/OverlayUtil",
+	"sap/ui/fl/util/CancelError",
 	"sap/ui/fl/write/api/FieldExtensibility",
 	"sap/ui/rta/plugin/additionalElements/ActionExtractor",
 	"sap/ui/rta/plugin/additionalElements/AddElementsDialog",
@@ -26,6 +27,7 @@ sap.ui.define([
 	Lib,
 	OverlayRegistry,
 	OverlayUtil,
+	CancelError,
 	FieldExtensibility,
 	ActionExtractor,
 	AddElementsDialog,
@@ -321,8 +323,7 @@ sap.ui.define([
 				const oOverlayToFocus = OverlayRegistry.getOverlay(vSiblingElement) || oResponsibleElementOverlay;
 				oOverlayToFocus.focus();
 			} catch (oError) {
-				// no error means canceled dialog
-				if (oError instanceof Error) {
+				if (!(oError instanceof CancelError)) {
 					throw oError;
 				}
 			}

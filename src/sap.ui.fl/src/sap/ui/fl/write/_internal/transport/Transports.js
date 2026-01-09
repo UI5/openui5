@@ -65,7 +65,7 @@ sap.ui.define([
 					return Promise.resolve(oResponse.response);
 				}
 
-				return Promise.reject("response is empty");
+				return Promise.reject(new Error("response is empty"));
 			});
 		},
 

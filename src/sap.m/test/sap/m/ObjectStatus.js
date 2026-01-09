@@ -3,6 +3,7 @@ sap.ui.define([
   "sap/m/ObjectHeader",
   "sap/m/List",
   "sap/m/ObjectListItem",
+  "sap/m/ObjectMarker",
   "sap/uxap/ObjectPageLayout",
   "sap/uxap/ObjectPageHeader",
   "sap/m/MessageToast",
@@ -27,6 +28,7 @@ sap.ui.define([
   ObjectHeader,
   List,
   ObjectListItem,
+  ObjectMarker,
   ObjectPageLayout,
   ObjectPageHeader,
   MessageToast,
@@ -189,8 +191,9 @@ sap.ui.define([
 	  numberUnit: "Euro",
 	  firstStatus: new ObjectStatus({text: "Positive Ñagçyfox", state: "Success", tooltip: "Status tip", icon: "sap-icon://alert", active:true}),
 	  secondStatus: new ObjectStatus({text: "Negative Ñagçyfox", state: "Error", tooltip: "Status tip", active:true, inverted:true}),
-	  showMarkers: true,
-	  markFavorite: true
+	  markers: [
+		  new ObjectMarker({type: "Favorite"})
+	  ]
   });
   var oOli2 = new ObjectListItem("activeStatusListItem", {
 	  type: "Navigation",
@@ -199,8 +202,9 @@ sap.ui.define([
 	  numberUnit: "Euro",
 	  firstStatus: new ObjectStatus("activeStatus", {text: "Positive Ñagçyfox", state: "Success", tooltip: "Status tip", active:true}),
 	  secondStatus: new ObjectStatus({text: "Negative Ñagçyfox", state: "Information", tooltip: "Status tip", icon: "sap-icon://alert", active:true, inverted:true}),
-	  showMarkers: true,
-	  markFavorite: true
+	  markers: [
+		  new ObjectMarker({type: "Favorite"})
+	  ]
   });
   var oOli3 = new ObjectListItem({
 	  type: "Detail",
@@ -209,8 +213,9 @@ sap.ui.define([
 	  numberUnit: "Euro",
 	  firstStatus: new ObjectStatus({text: "Positive Ñagçyfox", state: "Warning", tooltip: "Status tip", active:true, inverted:true}),
 	  secondStatus: new ObjectStatus({text: "Negative Ñagçyfox", state: "Warning", tooltip: "Status tip", icon: "sap-icon://alert", active:true}),
-	  showMarkers: true,
-	  markFavorite: true
+	  markers: [
+		  new ObjectMarker({type: "Favorite"})
+	  ]
   });
   oList.addItem(oOli);
   oList.addItem(oOli2);
@@ -221,7 +226,6 @@ sap.ui.define([
 	  showHeaderContent:true,
 	  showTitleInHeaderContent:true,
 	  headerTitle: new ObjectPageHeader({
-		  headerDesign:"Light",
 		  isActionAreaAlwaysVisible:true,
 		  isObjectSubtitleAlwaysVisible:false,
 		  isObjectTitleAlwaysVisible:false,

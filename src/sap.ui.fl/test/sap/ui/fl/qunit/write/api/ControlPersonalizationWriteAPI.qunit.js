@@ -913,15 +913,15 @@ sap.ui.define([
 	}, function() {
 		QUnit.test("when called without a property bag", function(assert) {
 			return ControlPersonalizationWriteAPI.restore()
-			.catch(function(sMessage) {
-				assert.equal(sMessage, "No selector was provided", "then a rejection with the correct message was done");
+			.catch(function(oError) {
+				assert.strictEqual(oError.message, "No selector was provided", "then a rejection with the correct message was done");
 			});
 		});
 
 		QUnit.test("when called without a selector", function(assert) {
 			return ControlPersonalizationWriteAPI.restore({})
-			.catch(function(sMessage) {
-				assert.equal(sMessage, "No selector was provided", "then a rejection with the correct message was done");
+			.catch(function(oError) {
+				assert.strictEqual(oError.message, "No selector was provided", "then a rejection with the correct message was done");
 			});
 		});
 
@@ -931,8 +931,12 @@ sap.ui.define([
 			return ControlPersonalizationWriteAPI.restore({
 				selector: this.oControl
 			})
-			.catch(function(sMessage) {
-				assert.equal(sMessage, "App Component could not be determined", "then a rejection with the correct message was done");
+			.catch(function(oError) {
+				assert.strictEqual(
+					oError.message,
+					"App Component could not be determined",
+					"then a rejection with the correct message was done"
+				);
 			});
 		});
 

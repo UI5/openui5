@@ -63,8 +63,8 @@ sap.ui.define([
 				flexObjects: []
 			};
 
-			return Storage.write(mPropertyBag).catch(function(sErrorMessage) {
-				assert.strictEqual(sErrorMessage, "No layer was provided", "then an Error is thrown");
+			return Storage.write(mPropertyBag).catch(function(oError) {
+				assert.strictEqual(oError.message, "No layer was provided", "then an Error is thrown");
 			});
 		});
 
@@ -275,8 +275,10 @@ sap.ui.define([
 			};
 
 			return Storage.write(mPropertyBag)
-			.catch(function(sRejectionMessage) {
-				assert.strictEqual(sRejectionMessage, "Draft is not supported for the given layer: CUSTOMER",
+			.catch(function(oError) {
+				assert.strictEqual(
+					oError.message,
+					"Draft is not supported for the given layer: CUSTOMER",
 					"then request is rejected with an error message");
 			});
 		});
@@ -392,8 +394,8 @@ sap.ui.define([
 				reference: "reference"
 			};
 
-			return Storage.condense(mPropertyBag).catch(function(sErrorMessage) {
-				assert.strictEqual(sErrorMessage, "No layer was provided", "then an Error is thrown");
+			return Storage.condense(mPropertyBag).catch(function(oError) {
+				assert.strictEqual(oError.message, "No layer was provided", "then an Error is thrown");
 			});
 		});
 
@@ -403,8 +405,8 @@ sap.ui.define([
 				reference: "reference"
 			};
 
-			return Storage.condense(mPropertyBag).catch(function(sErrorMessage) {
-				assert.strictEqual(sErrorMessage, "No changes were provided", "then an Error is thrown");
+			return Storage.condense(mPropertyBag).catch(function(oError) {
+				assert.strictEqual(oError.message, "No changes were provided", "then an Error is thrown");
 			});
 		});
 
@@ -976,8 +978,12 @@ sap.ui.define([
 				{ connector: "JsObjectConnector" }
 			]);
 
-			return Storage.contextBasedAdaptation.create(mPropertyBag).catch(function(sRejectionMessage) {
-				assert.strictEqual(sRejectionMessage, "contextBasedAdaptation.create is not implemented", "then the rejection message is passed");
+			return Storage.contextBasedAdaptation.create(mPropertyBag).catch(function(oError) {
+				assert.strictEqual(
+					oError.message,
+					"contextBasedAdaptation.create is not implemented",
+					"then the rejection message is passed"
+				);
 			});
 		});
 
@@ -991,8 +997,12 @@ sap.ui.define([
 				{ connector: "KeyUserConnector" }
 			]);
 
-			return Storage.contextBasedAdaptation.create(mPropertyBag).catch(function(sRejectionMessage) {
-				assert.strictEqual(sRejectionMessage, "contextBasedAdaptation.create is not implemented", "then the rejection message is passed");
+			return Storage.contextBasedAdaptation.create(mPropertyBag).catch(function(oError) {
+				assert.strictEqual(
+					oError.message,
+					"contextBasedAdaptation.create is not implemented",
+					"then the rejection message is passed"
+				);
 			});
 		});
 	});
@@ -1045,8 +1055,12 @@ sap.ui.define([
 
 			sandbox.stub(FlexConfiguration, "getFlexibilityServices").returns([{ connector: "JsObjectConnector" }]);
 
-			return Storage.contextBasedAdaptation.reorder(mPropertyBag).catch(function(sRejectionMessage) {
-				assert.strictEqual(sRejectionMessage, "contextBasedAdaptation.reorder is not implemented", "then the rejection message is passed");
+			return Storage.contextBasedAdaptation.reorder(mPropertyBag).catch(function(oError) {
+				assert.strictEqual(
+					oError.message,
+					"contextBasedAdaptation.reorder is not implemented",
+					"then the rejection message is passed"
+				);
 			});
 		});
 
@@ -1060,8 +1074,12 @@ sap.ui.define([
 				{ connector: "KeyUserConnector" }
 			]);
 
-			return Storage.contextBasedAdaptation.reorder(mPropertyBag).catch(function(sRejectionMessage) {
-				assert.strictEqual(sRejectionMessage, "contextBasedAdaptation.reorder is not implemented", "then the rejection message is passed");
+			return Storage.contextBasedAdaptation.reorder(mPropertyBag).catch(function(oError) {
+				assert.strictEqual(
+					oError.message,
+					"contextBasedAdaptation.reorder is not implemented",
+					"then the rejection message is passed"
+				);
 			});
 		});
 	});
@@ -1133,8 +1151,12 @@ sap.ui.define([
 				{ connector: "JsObjectConnector" }
 			]);
 
-			return Storage.contextBasedAdaptation.load(mPropertyBag).catch(function(sRejectionMessage) {
-				assert.strictEqual(sRejectionMessage, "contextBasedAdaptation.load is not implemented", "then the rejection message is passed");
+			return Storage.contextBasedAdaptation.load(mPropertyBag).catch(function(oError) {
+				assert.strictEqual(
+					oError.message,
+					"contextBasedAdaptation.load is not implemented",
+					"then the rejection message is passed"
+				);
 			});
 		});
 
@@ -1148,8 +1170,12 @@ sap.ui.define([
 				{ connector: "KeyUserConnector" }
 			]);
 
-			return Storage.contextBasedAdaptation.load(mPropertyBag).catch(function(sRejectionMessage) {
-				assert.strictEqual(sRejectionMessage, "contextBasedAdaptation.load is not implemented", "then the rejection message is passed");
+			return Storage.contextBasedAdaptation.load(mPropertyBag).catch(function(oError) {
+				assert.strictEqual(
+					oError.message,
+					"contextBasedAdaptation.load is not implemented",
+					"then the rejection message is passed"
+				);
 			});
 		});
 	});
@@ -1188,8 +1214,12 @@ sap.ui.define([
 				{ loadConnector: "someConnector", writeConnector: "my/connectors/BaseConnector" }
 			]);
 
-			return Storage.versions.load(mPropertyBag).catch(function(sRejectionMessage) {
-				assert.strictEqual(sRejectionMessage, "versions.load is not implemented", "then the rejection message is passed");
+			return Storage.versions.load(mPropertyBag).catch(function(oError) {
+				assert.strictEqual(
+					oError.message,
+					"versions.load is not implemented",
+					"then the rejection message is passed"
+				);
 			});
 		});
 	});
@@ -1228,8 +1258,12 @@ sap.ui.define([
 				{ loadConnector: "someConnector", writeConnector: "my/connectors/BaseConnector" }
 			]);
 
-			return Storage.versions.activate(mPropertyBag).catch(function(sRejectionMessage) {
-				assert.strictEqual(sRejectionMessage, "versions.activate is not implemented", "then the rejection message is passed");
+			return Storage.versions.activate(mPropertyBag).catch(function(oError) {
+				assert.strictEqual(
+					oError.message,
+					"versions.activate is not implemented",
+					"then the rejection message is passed"
+				);
 			});
 		});
 	});
@@ -1267,8 +1301,12 @@ sap.ui.define([
 				{ loadConnector: "someConnector", writeConnector: "my/connectors/BaseConnector" }
 			]);
 
-			return Storage.versions.discardDraft(mPropertyBag).catch(function(sRejectionMessage) {
-				assert.strictEqual(sRejectionMessage, "versions.discardDraft is not implemented", "then the rejection message is passed");
+			return Storage.versions.discardDraft(mPropertyBag).catch(function(oError) {
+				assert.strictEqual(
+					oError.message,
+					"versions.discardDraft is not implemented",
+					"then the rejection message is passed"
+				);
 			});
 		});
 	});
@@ -1306,8 +1344,8 @@ sap.ui.define([
 				{ connector: "JsObjectConnector" }
 			]);
 
-			return Storage.versions.publish(mPropertyBag).catch(function(sRejectionMessage) {
-				assert.ok(sRejectionMessage, "then rejection message is passed");
+			return Storage.versions.publish(mPropertyBag).catch(function(oError) {
+				assert.ok(oError, "then rejection message is passed");
 			});
 		});
 	});
@@ -1330,8 +1368,8 @@ sap.ui.define([
 				reference: "reference"
 			};
 
-			return Storage.reset(mPropertyBag).catch(function(sErrorMessage) {
-				assert.strictEqual(sErrorMessage, "No layer was provided", "then an Error is thrown");
+			return Storage.reset(mPropertyBag).catch(function(oError) {
+				assert.strictEqual(oError.message, "No layer was provided", "then an Error is thrown");
 			});
 		});
 
@@ -1636,8 +1674,12 @@ sap.ui.define([
 				layer: Layer.CUSTOMER
 			};
 
-			return Storage.translation.getSourceLanguages(mPropertyBag).catch(function(sRejectionMessage) {
-				assert.strictEqual(sRejectionMessage, "translation.getSourceLanguages is not implemented", "then the rejection message is passed");
+			return Storage.translation.getSourceLanguages(mPropertyBag).catch(function(oError) {
+				assert.strictEqual(
+					oError.message,
+					"translation.getSourceLanguages is not implemented",
+					"then the rejection message is passed"
+				);
 			});
 		});
 	});
@@ -1675,8 +1717,12 @@ sap.ui.define([
 				layer: Layer.CUSTOMER
 			};
 
-			return Storage.translation.getTexts(mPropertyBag).catch(function(sRejectionMessage) {
-				assert.strictEqual(sRejectionMessage, "translation.getTexts is not implemented", "then the rejection message is passed");
+			return Storage.translation.getTexts(mPropertyBag).catch(function(oError) {
+				assert.strictEqual(
+					oError.message,
+					"translation.getTexts is not implemented",
+					"then the rejection message is passed"
+				);
 			});
 		});
 	});
@@ -1712,8 +1758,12 @@ sap.ui.define([
 				payload: {}
 			};
 
-			return Storage.translation.postTranslationTexts(mPropertyBag).catch(function(sRejectionMessage) {
-				assert.strictEqual(sRejectionMessage, "translation.postTranslationTexts is not implemented", "then the rejection message is passed");
+			return Storage.translation.postTranslationTexts(mPropertyBag).catch(function(oError) {
+				assert.strictEqual(
+					oError.message,
+					"translation.postTranslationTexts is not implemented",
+					"then the rejection message is passed"
+				);
 			});
 		});
 	});

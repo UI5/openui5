@@ -8,31 +8,33 @@ sap.ui.define([
 	"sap/base/util/restricted/_isEqual",
 	"sap/base/util/restricted/_union",
 	"sap/base/Log",
-	"sap/ui/base/ManagedObject",
-	"sap/ui/core/Fragment",
-	"sap/ui/fl/write/api/ContextBasedAdaptationsAPI",
 	"sap/m/ColumnListItem",
-	"sap/ui/rta/Utils",
+	"sap/ui/base/ManagedObject",
+	"sap/ui/core/date/UI5Date",
+	"sap/ui/core/Fragment",
+	"sap/ui/fl/util/CancelError",
+	"sap/ui/fl/write/api/ContextBasedAdaptationsAPI",
+	"sap/ui/model/json/JSONModel",
 	"sap/ui/model/Filter",
 	"sap/ui/model/FilterOperator",
-	"sap/ui/model/json/JSONModel",
-	"sap/ui/core/date/UI5Date",
-	"sap/ui/performance/Measurement"
+	"sap/ui/performance/Measurement",
+	"sap/ui/rta/Utils"
 ], function(
 	Localization,
 	_isEqual,
 	_union,
 	Log,
-	ManagedObject,
-	Fragment,
-	ContextBasedAdaptationsAPI,
 	ColumnListItem,
-	Utils,
+	ManagedObject,
+	UI5Date,
+	Fragment,
+	CancelError,
+	ContextBasedAdaptationsAPI,
+	JSONModel,
 	Filter,
 	FilterOperator,
-	JSONModel,
-	UI5Date,
-	Measurement
+	Measurement,
+	Utils
 ) {
 	"use strict";
 
@@ -379,7 +381,7 @@ sap.ui.define([
 			onCloseDialog.call(this);
 		}.bind(this))
 		.catch(function(oError) {
-			if (oError !== "cancel") {
+			if (!(oError instanceof CancelError)) {
 				Utils.showMessageBox("error", "MSG_LREP_TRANSFER_ERROR", { titleKey: "BTN_MANAGE_APP_CTX", error: oError });
 				Log.error(`sap.ui.rta: ${oError.stack || oError.message || oError}`);
 			}

@@ -334,7 +334,7 @@ sap.ui.define([
 				oBackendOperation = LrepConnector.appVariant.remove(mPropertyBag);
 				break;
 			default:
-				return Promise.reject("Please provide a valid operation.");
+				return Promise.reject(new Error("Please provide a valid operation."));
 		}
 
 		return oBackendOperation.then(function(oResult) {

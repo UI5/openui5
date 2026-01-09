@@ -330,7 +330,6 @@ sap.ui.define([
 	 * Depending on which chart is used, the panel might offer different functionality.
 	 * @param {sap.ui.mdc.Chart} oChart Reference to the chart
 	 * @returns {sap.ui.core.Control} Adaptation UI to be used
-	 * @experimental
 	 * @private
 	 * @ui5-restricted sap.fe, sap.ui.mdc
 	 */
@@ -401,7 +400,6 @@ sap.ui.define([
 	 * @param {object} oSortProperty Sorting information
 	 * @returns {sap.ui.model.Sorter} Sorter for given item
 	 *
-	 * @experimental
 	 * @private
 	 * @ui5-restricted sap.fe, sap.ui.mdc
 	 */
@@ -519,7 +517,6 @@ sap.ui.define([
 	 * @param {string} sRole Role of the new item (if available)
  	 * @returns {Promise<sap.ui.mdc.chart.Item>} Created Item
 	 *
-	 * @experimental
 	 * @private
 	 * @ui5-restricted sap.fe, sap.ui.mdc
 	 */
@@ -543,7 +540,6 @@ sap.ui.define([
 	 * @param {string} sRole Role of the new item (if available)
 	 * @returns {sap.ui.mdc.chart.Item} Created Item
 	 *
-	 * @experimental
 	 * @private
 	 * @ui5-restricted sap.fe, sap.ui.mdc
 	 */
@@ -611,7 +607,6 @@ sap.ui.define([
 	 * @param {sap.ui.mdc.Chart} oChart Reference to the chart
 	 * @returns {Promise} Resolved once chart content has been created
 	 *
-	 * @experimental
 	 * @private
 	 * @ui5-restricted sap.fe, sap.ui.mdc
 	 */
@@ -744,7 +739,6 @@ sap.ui.define([
 	 * @param {sap.ui.mdc.chart.Item} oItem item to prepare coloring for
 	 * @returns {Promise} resolved, once coloring is prepared
 	 *
-	 * @experimental
 	 * @private
 	 * @ui5-restricted sap.fe, sap.ui.mdc
 	 */
@@ -790,7 +784,6 @@ sap.ui.define([
 	 * @param {sap.ui.mdc.chart.Item} oItem Item to add criticality to
 	 * @returns {Promise} Resolved once criticality is added
 	 *
-	 * @experimental
 	 * @private
 	 * @ui5-restricted sap.ui.mdc
 	 */
@@ -850,7 +843,6 @@ sap.ui.define([
 	 * @param {array} aVisibleDimensions Visible dimensions for inner chart
 	 * @param {array} aVisibleMeasures Visible measures for inner chart
 	 *
-	 * @experimental
 	 * @private
 	 * @ui5-restricted sap.fe
 	 */
@@ -908,7 +900,6 @@ sap.ui.define([
 	 *
 	 * @param {sap.chart.Chart} oChart Inner chart
 	 *
-	 * @experimental
 	 * @private
 	 * @ui5-restricted sap.fe, sap.ui.mdc
 	 */
@@ -1223,7 +1214,6 @@ sap.ui.define([
 	 * @param {sap.ui.mdc.Chart} oChart Reference to the chart
 	 * @param {object} oBindingInfo Binding info object
 	 *
-	 * @experimental
 	 * @private
 	 * @ui5-restricted sap.fe, sap.ui.mdc
 	 */
@@ -1262,7 +1252,6 @@ sap.ui.define([
 	 * @param {sap.ui.mdc.Chart} oChart Reference to the chart
 	 * @param {sap.ui.mdc.chart.Item} oItem Chart item to be added to the inner chart
 	 *
-	 * @experimental
 	 * @private
 	 * @ui5-restricted sap.fe, sap.ui.mdc
 	 */
@@ -1280,7 +1269,6 @@ sap.ui.define([
 	 * @param {sap.ui.mdc.Chart} oChart Reference to the chart
 	 * @param {sap.ui.mdc.chart.Item} oItem Chart item to be added to the inner chart
 	 *
-	 * @experimental
 	 * @private
 	 * @ui5-restricted sap.fe, sap.ui.mdc
 	 */
@@ -1513,7 +1501,6 @@ sap.ui.define([
 	 * @param {sap.ui.mdc.Chart} oChart Reference to the chart
 	 * @returns {array} Array containing available sorters
 	 *
-	 * @experimental
 	 * @private
 	 * @ui5-restricted sap.ui.mdc
 	 */
@@ -1629,7 +1616,6 @@ sap.ui.define([
      * @param {string} sDesc Description provided by the metadata
      * @returns {string} Label which should be shown on the chart axis
      *
-     * @experimental
      * @private
      * @ui5-restricted sap.fe, sap.ui.mdc
      */

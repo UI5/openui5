@@ -38,7 +38,7 @@ sap.ui.define([
 
 	function _validateAndAdjustPropertyBag(mPropertyBag) {
 		if (!mPropertyBag.appId) {
-			return Promise.reject("App Variant ID must be provided");
+			return Promise.reject(new Error("App Variant ID must be provided"));
 		}
 
 		mPropertyBag.selector = {
@@ -86,15 +86,15 @@ sap.ui.define([
 		 */
 		create(mPropertyBag) {
 			if (!mPropertyBag.layer) {
-				return Promise.reject("Layer must be provided");
+				return Promise.reject(new Error("Layer must be provided"));
 			}
 
 			if (!mPropertyBag.selector || !mPropertyBag.selector.appId) {
-				return Promise.reject("selector.appId must be provided");
+				return Promise.reject(new Error("selector.appId must be provided"));
 			}
 
 			if (!mPropertyBag.id) {
-				return Promise.reject("App variant ID must be provided");
+				return Promise.reject(new Error("App variant ID must be provided"));
 			}
 
 			mPropertyBag.reference = ManifestUtils.getFlexReferenceForSelector(mPropertyBag.selector);
@@ -152,7 +152,7 @@ sap.ui.define([
 		 */
 		getDesignTimeVariant(mPropertyBag) {
 			if (!mPropertyBag.id) {
-				return Promise.reject("App Variant ID must be provided");
+				return Promise.reject(new Error("App Variant ID must be provided"));
 			}
 			return AppVariantFactory.load(mPropertyBag);
 		},
@@ -169,10 +169,10 @@ sap.ui.define([
 		 */
 		getRunTimeVariant(mPropertyBag) {
 			if (!mPropertyBag.appId) {
-				return Promise.reject("Reference App ID must be provided");
+				return Promise.reject(new Error("Reference App ID must be provided"));
 			}
 			if (!mPropertyBag.id) {
-				return Promise.reject("App Variant ID must be provided");
+				return Promise.reject(new Error("App Variant ID must be provided"));
 			}
 
 			var sAppUrl = `/sap/bc/lrep/content/apps/${mPropertyBag.appId}/appVariants/${mPropertyBag.id}/manifest.appdescr_variant`;
@@ -196,10 +196,10 @@ sap.ui.define([
 		 */
 		createDescriptorInlineChanges(mPropertyBag) {
 			if (!mPropertyBag.appId) {
-				return Promise.reject("appId must be provided");
+				return Promise.reject(new Error("appId must be provided"));
 			}
 			if (!mPropertyBag.changeSpecificData) {
-				return Promise.reject("changeSpecificData must be provided");
+				return Promise.reject(new Error("changeSpecificData must be provided"));
 			}
 			mPropertyBag.selector = {
 				appId: mPropertyBag.appId
@@ -220,10 +220,10 @@ sap.ui.define([
 		 */
 		add(mPropertyBag) {
 			if (!mPropertyBag.appId) {
-				return Promise.reject("appId must be provided");
+				return Promise.reject(new Error("appId must be provided"));
 			}
 			if (!mPropertyBag.change) {
-				return Promise.reject("Change instance must be provided");
+				return Promise.reject(new Error("Change instance must be provided"));
 			}
 			mPropertyBag.selector = {
 				appId: mPropertyBag.appId

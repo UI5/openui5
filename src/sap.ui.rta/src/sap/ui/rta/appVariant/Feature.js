@@ -7,6 +7,7 @@ sap.ui.define([
 	"sap/ui/core/BusyIndicator",
 	"sap/ui/core/EventBus",
 	"sap/ui/fl/apply/api/FlexRuntimeInfoAPI",
+	"sap/ui/fl/util/CancelError",
 	"sap/ui/fl/write/_internal/appVariant/AppVariantFactory",
 	"sap/ui/fl/write/api/FeaturesAPI",
 	"sap/ui/fl/Utils",
@@ -17,6 +18,7 @@ sap.ui.define([
 	BusyIndicator,
 	EventBus,
 	FlexRuntimeInfoAPI,
+	CancelError,
 	AppVariantFactory,
 	FeaturesAPI,
 	FlexUtils,
@@ -77,7 +79,7 @@ sap.ui.define([
 				const sMessage = AppVariantUtils.getText("MSG_BASE_APP_CATALOGS_NOT_FOUND", sAppVariantId);
 				const sTitle = AppVariantUtils.getText("HEADER_SAVE_APP_VARIANT_FAILED");
 				showMessageBox(sMessage, { title: sTitle }, "error");
-				return Promise.reject();
+				return Promise.reject(new Error(sMessage));
 			}
 			return oAppVariantManager.notifyKeyUserWhenPublishingIsReady(oResult.response.IAMId, sAppVariantId, true);
 		}
@@ -364,8 +366,8 @@ sap.ui.define([
 					const fnDeleteAppVariant = function() {
 						return oAppVariantManager.deleteAppVariant(sAppVariantId)
 						.catch(function(oError) {
-							if (oError === "cancel") {
-								return Promise.reject("cancel");
+							if (oError instanceof CancelError) {
+								return Promise.reject(oError);
 							}
 							let sMessageKey = oError.messageKey;
 							sMessageKey ||= "MSG_DELETE_APP_VARIANT_FAILED";
@@ -417,7 +419,7 @@ sap.ui.define([
 					.then(fnDeleteSuccessMessage)
 					.then(fnTriggerS4HanaRefresh.bind(this))
 					.catch(function(oError) {
-						if (oError === "cancel") {
+						if (oError instanceof CancelError) {
 							return false;
 						}
 						if (bIsS4HanaCloud) {

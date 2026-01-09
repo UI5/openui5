@@ -5,6 +5,7 @@
 sap.ui.define([
 	"sap/ui/core/BusyIndicator",
 	"sap/ui/fl/initial/_internal/Settings",
+	"sap/ui/fl/util/CancelError",
 	"sap/ui/fl/write/_internal/transport/TransportDialog",
 	"sap/ui/fl/write/_internal/transport/Transports",
 	"sap/ui/fl/Layer",
@@ -13,6 +14,7 @@ sap.ui.define([
 ], function(
 	BusyIndicator,
 	FlexSettings,
+	CancelError,
 	TransportDialog,
 	Transports,
 	Layer,
@@ -277,7 +279,7 @@ sap.ui.define([
 					};
 					return that.openTransportSelection(oTransportInfo, oControl).then(function(oTransportInfo) {
 						if (oTransportInfo === "cancel") {
-							return Promise.reject("cancel");
+							return Promise.reject(new CancelError());
 						}
 						oCurrentChange.setRequest(oTransportInfo.transport);
 

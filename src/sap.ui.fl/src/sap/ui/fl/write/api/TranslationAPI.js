@@ -59,16 +59,16 @@ sap.ui.define([
 	 */
 	TranslationAPI.getTexts = function(mPropertyBag) {
 		if (!mPropertyBag.selector) {
-			return Promise.reject("No selector was provided");
+			return Promise.reject(new Error("No selector was provided"));
 		}
 		if (!mPropertyBag.sourceLanguage) {
-			return Promise.reject("No sourceLanguage was provided");
+			return Promise.reject(new Error("No sourceLanguage was provided"));
 		}
 		if (!mPropertyBag.targetLanguage) {
-			return Promise.reject("No targetLanguage was provided");
+			return Promise.reject(new Error("No targetLanguage was provided"));
 		}
 		if (!mPropertyBag.layer) {
-			return Promise.reject("No layer was provided");
+			return Promise.reject(new Error("No layer was provided"));
 		}
 
 		var oAppComponent = Utils.getAppComponentForControl(mPropertyBag.selector);
@@ -90,10 +90,10 @@ sap.ui.define([
 	 */
 	TranslationAPI.getSourceLanguages = function(mPropertyBag) {
 		if (!mPropertyBag.selector) {
-			return Promise.reject("No selector was provided");
+			return Promise.reject(new Error("No selector was provided"));
 		}
 		if (!mPropertyBag.layer) {
-			return Promise.reject("No layer was provided");
+			return Promise.reject(new Error("No layer was provided"));
 		}
 
 		var oAppComponent = Utils.getAppComponentForControl(mPropertyBag.selector);
@@ -120,10 +120,10 @@ sap.ui.define([
 	 */
 	TranslationAPI.uploadTranslationTexts = function(mPropertyBag) {
 		if (!mPropertyBag.layer) {
-			return Promise.reject("No layer was provided");
+			return Promise.reject(new Error("No layer was provided"));
 		}
 		if (!mPropertyBag.payload) {
-			return Promise.reject("No payload was provided");
+			return Promise.reject(new Error("No payload was provided"));
 		}
 
 		return Promise.resolve()

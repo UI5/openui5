@@ -166,7 +166,7 @@ sap.ui.define([
                      * }</code></pre>
                      * <b>Note:</b> Ensure that the related file can be requested (any required library has to be loaded before that).<br>
                      * Do not bind or modify the module. This property can only be configured during control initialization.
-                     * @experimental
+                     * @ui5-experimental-since 1.142
                      */
                     delegate: {
                         type: "object",
@@ -251,7 +251,7 @@ sap.ui.define([
          * @property {object} [constraints]
          * Defines if any constraints are applied to the property.
          * @public
-         * @experimental As of version 1.142
+         * @ui5-experimental-since 1.142
          */
 
 

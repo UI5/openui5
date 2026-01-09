@@ -255,24 +255,24 @@ TableRenderer.renderColumns = function(rm, oTable, sType) {
 
 	const iActionCount = oTable._getItemActionCount();
 	if (iActionCount > 0) {
-		openStartCell("Actions", "ActionsCol", "TABLE_ROW_ACTION");
+		openStartCell("Actions", "ActionsCol", "TABLE_ROW_ACTIONS");
 		rm.class(`sapMTable${iActionCount}ActionsCol`);
 		rm.openEnd();
-		this.hideFromScreenReader(rm, "TABLE_ROW_ACTION");
+		this.hideFromScreenReader(rm, "TABLE_ROW_ACTIONS");
 		rm.close(sCellTag);
 		iIndex++;
 	}
 
 	if (oTable.doItemsNeedTypeColumn()) {
 		openStartCell("Nav", "NavCol").openEnd();
-		this.hideFromScreenReader(rm, "TABLE_ROW_ACTION");
+		this.hideFromScreenReader(rm, "TABLE_ROW_ACTIONS");
 		rm.close(sCellTag);
 		iIndex++;
 	}
 
 	if (iActionCount === -1 && iModeOrder == 1) {
 		openStartCell("ModeCol", "SelCol").openEnd();
-		this.hideFromScreenReader(rm, sMode == "Delete" ? "TABLE_ROW_ACTION" : "TABLE_SELECTION_COLUMNHEADER");
+		this.hideFromScreenReader(rm, sMode == "Delete" ? "TABLE_ROW_ACTIONS" : "TABLE_SELECTION_COLUMNHEADER");
 		rm.close(sCellTag);
 		iIndex++;
 	}

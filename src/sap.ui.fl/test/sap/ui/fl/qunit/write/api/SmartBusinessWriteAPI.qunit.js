@@ -912,20 +912,20 @@ sap.ui.define([
 			};
 			return SmartBusinessWriteAPI.create(_omit(mPropertyBag, ["id"]))
 			.catch((oError) => {
-				assert.ok(oError.indexOf("App variant ID must be provided") > -1, "when 'id' is missing then an error is thrown");
+				assert.ok(oError.message.indexOf("App variant ID must be provided") > -1, "when 'id' is missing then an error is thrown");
 			})
 			.then(SmartBusinessWriteAPI.create.bind(SmartBusinessWriteAPI, _omit(mPropertyBag, ["layer"])))
 			.catch((oError) => {
-				assert.ok(oError.indexOf("Layer must be provided") > -1, "when 'layer' is missing then an error is thrown");
+				assert.ok(oError.message.indexOf("Layer must be provided") > -1, "when 'layer' is missing then an error is thrown");
 			})
 			.then(SmartBusinessWriteAPI.create.bind(SmartBusinessWriteAPI, _omit(mPropertyBag, ["selector"])))
 			.catch((oError) => {
-				assert.ok(oError.indexOf("selector.appId must be provided") > -1,
+				assert.ok(oError.message.indexOf("selector.appId must be provided") > -1,
 					"when 'selector' is missing then an error is thrown");
 			})
 			.then(SmartBusinessWriteAPI.create.bind(SmartBusinessWriteAPI, _omit(mPropertyBag, ["selector.appId"])))
 			.catch((oError) => {
-				assert.ok(oError.indexOf("selector.appId must be provided") > -1,
+				assert.ok(oError.message.indexOf("selector.appId must be provided") > -1,
 					"when 'selector.appId' is missing then an error is thrown");
 			});
 		});
@@ -934,7 +934,7 @@ sap.ui.define([
 			const mPropertyBag = {};
 			return SmartBusinessWriteAPI.update(mPropertyBag)
 			.catch((oError) => {
-				assert.ok(oError.indexOf("App Variant ID must be provided") > -1, "when 'appId' is missing then an error is thrown");
+				assert.ok(oError.message.indexOf("App Variant ID must be provided") > -1, "when 'appId' is missing then an error is thrown");
 			});
 		});
 
@@ -942,7 +942,7 @@ sap.ui.define([
 			const mPropertyBag = {};
 			return SmartBusinessWriteAPI.remove(mPropertyBag)
 			.catch((oError) => {
-				assert.ok(oError.indexOf("App Variant ID must be provided") > -1, "when 'appId' is missing then an error is thrown");
+				assert.ok(oError.message.indexOf("App Variant ID must be provided") > -1, "when 'appId' is missing then an error is thrown");
 			});
 		});
 
@@ -954,13 +954,13 @@ sap.ui.define([
 			return SmartBusinessWriteAPI.createDescriptorChangeString(_omit(mPropertyBag, ["changeSpecificData"]))
 			.catch((oError) => {
 				assert.ok(
-					oError.indexOf("changeSpecificData must be provided") > -1,
+					oError.message.indexOf("changeSpecificData must be provided") > -1,
 					"when 'changeSpecificData' is missing then an error is thrown"
 				);
 			})
 			.then(SmartBusinessWriteAPI.createDescriptorChangeString.bind(SmartBusinessWriteAPI, _omit(mPropertyBag, ["appId"])))
 			.catch((oError) => {
-				assert.ok(oError.indexOf("appId must be provided") > -1, "when 'appId' is missing then an error is thrown");
+				assert.ok(oError.message.indexOf("appId must be provided") > -1, "when 'appId' is missing then an error is thrown");
 			});
 		});
 
@@ -971,12 +971,12 @@ sap.ui.define([
 			};
 			return SmartBusinessWriteAPI.add(_omit(mPropertyBag, ["appId"]))
 			.catch((oError) => {
-				assert.ok(oError.indexOf("appId must be provided") > -1, "when 'appId' is missing then an error is thrown");
+				assert.ok(oError.message.indexOf("appId must be provided") > -1, "when 'appId' is missing then an error is thrown");
 			})
 			.then(SmartBusinessWriteAPI.add.bind(SmartBusinessWriteAPI, _omit(mPropertyBag, ["change"])))
 			.catch((oError) => {
 				assert.ok(
-					oError.indexOf("Change instance must be provided") > -1,
+					oError.message.indexOf("Change instance must be provided") > -1,
 					"when 'change' instance is missing then an error is thrown"
 				);
 			});
@@ -990,7 +990,7 @@ sap.ui.define([
 			const oAppvariantFactoryLoadStub = sandbox.stub(AppVariantFactory, "load").resolves({});
 			return SmartBusinessWriteAPI.getDesignTimeVariant(_omit(mPropertyBag, ["id"]))
 			.catch((oError) => {
-				assert.ok(oError.indexOf("App Variant ID must be provided") > -1, "when 'id' is missing then an error is thrown");
+				assert.ok(oError.message.indexOf("App Variant ID must be provided") > -1, "when 'id' is missing then an error is thrown");
 			})
 			.then(SmartBusinessWriteAPI.getDesignTimeVariant.bind(SmartBusinessWriteAPI, mPropertyBag))
 			.then(() => {
@@ -1006,11 +1006,11 @@ sap.ui.define([
 			const oLrepConnectorGetManifestStub = sandbox.stub(LrepConnector.appVariant, "getManifest").resolves({});
 			return SmartBusinessWriteAPI.getRunTimeVariant(_omit(mPropertyBag, ["appId"]))
 			.catch((oError) => {
-				assert.ok(oError.indexOf("Reference App ID must be provided") > -1, "when 'appId' is missing then an error is thrown");
+				assert.ok(oError.message.indexOf("Reference App ID must be provided") > -1, "when 'appId' is missing then an error is thrown");
 			})
 			.then(SmartBusinessWriteAPI.getRunTimeVariant.bind(SmartBusinessWriteAPI, _omit(mPropertyBag, ["id"])))
 			.catch((oError) => {
-				assert.ok(oError.indexOf("App Variant ID must be provided") > -1, "when 'id' is missing then an error is thrown");
+				assert.ok(oError.message.indexOf("App Variant ID must be provided") > -1, "when 'id' is missing then an error is thrown");
 			})
 			.then(SmartBusinessWriteAPI.getRunTimeVariant.bind(SmartBusinessWriteAPI, mPropertyBag))
 			.then(() => {

@@ -3,37 +3,39 @@
  */
 
 sap.ui.define([
+	"sap/base/util/restricted/_pick",
 	"sap/base/util/merge",
+	"sap/base/Log",
+	"sap/m/MessageBox",
+	"sap/ui/core/BusyIndicator",
+	"sap/ui/core/Component",
 	"sap/ui/core/Lib",
-	"sap/ui/fl/write/connectors/BaseConnector",
 	"sap/ui/fl/initial/_internal/connectors/LrepConnector",
 	"sap/ui/fl/initial/_internal/connectors/Utils",
 	"sap/ui/fl/initial/_internal/Settings",
+	"sap/ui/fl/util/CancelError",
 	"sap/ui/fl/write/_internal/connectors/Utils",
 	"sap/ui/fl/write/_internal/transport/TransportSelection",
+	"sap/ui/fl/write/connectors/BaseConnector",
 	"sap/ui/fl/Layer",
-	"sap/ui/fl/Utils",
-	"sap/ui/core/Component",
-	"sap/ui/core/BusyIndicator",
-	"sap/base/Log",
-	"sap/m/MessageBox",
-	"sap/base/util/restricted/_pick"
+	"sap/ui/fl/Utils"
 ], function(
+	_pick,
 	merge,
+	Log,
+	MessageBox,
+	BusyIndicator,
+	Component,
 	Lib,
-	BaseConnector,
 	InitialConnector,
 	InitialUtils,
 	Settings,
+	CancelError,
 	WriteUtils,
 	TransportSelection,
+	BaseConnector,
 	Layer,
-	Utils,
-	Component,
-	BusyIndicator,
-	Log,
-	MessageBox,
-	_pick
+	Utils
 ) {
 	"use strict";
 
@@ -149,7 +151,7 @@ sap.ui.define([
 		}
 		return oTransportSelectionPromise.then(function(oTransportInfo) {
 			if (oTransportInfo === "cancel") {
-				return Promise.reject("cancel");
+				return Promise.reject(new CancelError());
 			}
 			if (oTransportInfo && oTransportInfo.transport !== undefined) {
 				return oTransportInfo.transport;

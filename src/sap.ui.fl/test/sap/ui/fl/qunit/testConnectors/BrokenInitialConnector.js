@@ -10,7 +10,7 @@ sap.ui.define([], function() {
 	 */
 	return {
 		loadFlexData() {
-			return Promise.reject();
+			return Promise.reject(new Error());
 		},
 		testInitialCheckProperty: true
 	};

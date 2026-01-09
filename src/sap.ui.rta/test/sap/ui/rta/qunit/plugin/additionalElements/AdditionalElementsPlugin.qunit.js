@@ -16,6 +16,7 @@ sap.ui.define([
 	"sap/ui/dt/Util",
 	"sap/ui/fl/apply/_internal/DelegateMediator",
 	"sap/ui/fl/apply/api/DelegateMediatorAPI",
+	"sap/ui/fl/util/CancelError",
 	"sap/ui/fl/write/api/ChangesWriteAPI",
 	"sap/ui/fl/write/api/FieldExtensibility",
 	"sap/ui/layout/VerticalLayout",
@@ -45,6 +46,7 @@ sap.ui.define([
 	DtUtil,
 	DelegateMediator,
 	DelegateMediatorAPI,
+	CancelError,
 	ChangesWriteAPI,
 	FieldExtensibility,
 	VerticalLayout,
@@ -2329,7 +2331,7 @@ sap.ui.define([
 	}
 
 	function givenThePluginWithCancelClosingDialog() {
-		givenThePluginWithDialogClosing.call(this, Promise.reject());
+		givenThePluginWithDialogClosing.call(this, Promise.reject(new CancelError()));
 	}
 
 	function givenThePluginWithOKClosingDialog() {

@@ -36,7 +36,7 @@ sap.ui.define([
 		 * @returns {Promise} Resolves as soon as the writing is completed without data
 		 */
 		write(/* mPropertyBag */) {
-			return Promise.reject("write is not implemented");
+			return Promise.reject(new Error("write is not implemented"));
 		},
 
 		/**
@@ -54,7 +54,7 @@ sap.ui.define([
 		 * @returns {Promise} Resolves as soon as the writing is completed without data
 		 */
 		condense(/* mPropertyBag */) {
-			return Promise.reject("condense is not implemented");
+			return Promise.reject(new Error("condense is not implemented"));
 		},
 
 		/**
@@ -68,7 +68,7 @@ sap.ui.define([
 		 * @returns {Promise} Resolves as soon as the writing is completed without data
 		 */
 		update(/* mPropertyBag */) {
-			return Promise.reject("write is not implemented");
+			return Promise.reject(new Error("write is not implemented"));
 		},
 
 		/**
@@ -82,7 +82,7 @@ sap.ui.define([
 		 * @returns {Promise} Resolves as soon as the deletion is completed without data
 		 */
 		remove(/* mPropertyBag */) {
-			return Promise.reject("remove is not implemented");
+			return Promise.reject(new Error("remove is not implemented"));
 		},
 
 		/**
@@ -98,7 +98,7 @@ sap.ui.define([
 		 * @returns {Promise} Resolves as soon as the reset is completed without data
 		 */
 		reset(/* mPropertyBag */) {
-			return Promise.reject("reset is not implemented");
+			return Promise.reject(new Error("reset is not implemented"));
 		},
 
 		/**
@@ -112,7 +112,7 @@ sap.ui.define([
 		 * @returns {Promise} Resolves as soon as the publish is completed without data
 		 */
 		publish(/* mPropertyBag */) {
-			return Promise.reject("publish is not implemented");
+			return Promise.reject(new Error("publish is not implemented"));
 		},
 
 		/**
@@ -138,7 +138,7 @@ sap.ui.define([
 		 * @returns {Promise<object>} Resolves with a list of viewed features
 		 */
 		getSeenFeatureIds(/* mPropertyBag */) {
-			return Promise.reject("getSeenFeatureIds is not implemented");
+			return Promise.reject(new Error("getSeenFeatureIds is not implemented"));
 		},
 
 		/**
@@ -151,7 +151,7 @@ sap.ui.define([
 		 * @returns {Promise<object>} Resolves with a list of viewed features
 		 */
 		setSeenFeatureIds(/* mPropertyBag */) {
-			return Promise.reject("setSeenFeatureIds is not implemented");
+			return Promise.reject(new Error("setSeenFeatureIds is not implemented"));
 		},
 
 		/**
@@ -164,7 +164,7 @@ sap.ui.define([
 		 * @returns {Promise<undefined>} Promise that resolves as soon as the deletion was completed
 		 */
 		deleteUserVariantsForVM(/* mPropertyBag */) {
-			return Promise.reject("deleteUserVariantsForVM is not implemented");
+			return Promise.reject(new Error("deleteUserVariantsForVM is not implemented"));
 		},
 
 		/**
@@ -183,7 +183,7 @@ sap.ui.define([
 		 * @returns {Promise<object>} Promise resolves as soon as context has been retrieved
 		 */
 		getContexts(/* mPropertyBag */) {
-			return Promise.reject("getContexts is not implemented");
+			return Promise.reject(new Error("getContexts is not implemented"));
 		},
 
 		/**
@@ -194,24 +194,24 @@ sap.ui.define([
 		 * @returns {Promise<object>} Promise resolves as soon as context descriptions have has been retrieved
 		 */
 		loadContextDescriptions(/* mPropertyBag */) {
-			return Promise.reject("loadContextDescriptions is not implemented");
+			return Promise.reject(new Error("loadContextDescriptions is not implemented"));
 		},
 
 		contextBasedAdaptation: {
 			create() {
-				return Promise.reject("contextBasedAdaptation.create is not implemented");
+				return Promise.reject(new Error("contextBasedAdaptation.create is not implemented"));
 			},
 			reorder() {
-				return Promise.reject("contextBasedAdaptation.reorder is not implemented");
+				return Promise.reject(new Error("contextBasedAdaptation.reorder is not implemented"));
 			},
 			load() {
-				return Promise.reject("contextBasedAdaptation.load is not implemented");
+				return Promise.reject(new Error("contextBasedAdaptation.load is not implemented"));
 			},
 			update() {
-				return Promise.reject("contextBasedAdaptation.update is not implemented");
+				return Promise.reject(new Error("contextBasedAdaptation.update is not implemented"));
 			},
 			remove() {
-				return Promise.reject("contextBasedAdaptation.remove is not implemented");
+				return Promise.reject(new Error("contextBasedAdaptation.remove is not implemented"));
 			}
 		},
 		versions: {
@@ -224,7 +224,7 @@ sap.ui.define([
 			 * @returns {Promise<sap.ui.fl.Version[]>} Resolves with an object containing the data for the versions
 			 */
 			load() {
-				return Promise.reject("versions.load is not implemented");
+				return Promise.reject(new Error("versions.load is not implemented"));
 			},
 
 			/**
@@ -237,7 +237,7 @@ sap.ui.define([
 			 * @returns {Promise<sap.ui.fl.Version>} Resolves with list of versions after the activation took place.
 			 */
 			activate() {
-				return Promise.reject("versions.activate is not implemented");
+				return Promise.reject(new Error("versions.activate is not implemented"));
 			},
 
 			/**
@@ -249,7 +249,7 @@ sap.ui.define([
 			 * @returns {Promise} Resolves after the draft is discarded.
 			 */
 			discardDraft() {
-				return Promise.reject("versions.discardDraft is not implemented");
+				return Promise.reject(new Error("versions.discardDraft is not implemented"));
 			}
 		},
 
@@ -264,7 +264,7 @@ sap.ui.define([
 			 * rejects if an error occurs
 			 */
 			getSourceLanguages() {
-				return Promise.reject("translation.getSourceLanguages is not implemented");
+				return Promise.reject(new Error("translation.getSourceLanguages is not implemented"));
 			},
 
 			/**
@@ -279,7 +279,7 @@ sap.ui.define([
 			 * rejects if an error occurs
 			 */
 			getTexts() {
-				return Promise.reject("translation.getTexts is not implemented");
+				return Promise.reject(new Error("translation.getTexts is not implemented"));
 			},
 
 			/**
@@ -292,7 +292,7 @@ sap.ui.define([
 			 * rejects if an error occurs or a parameter is missing
 			 */
 			postTranslationTexts() {
-				return Promise.reject("translation.postTranslationTexts is not implemented");
+				return Promise.reject(new Error("translation.postTranslationTexts is not implemented"));
 			}
 		}
 	};

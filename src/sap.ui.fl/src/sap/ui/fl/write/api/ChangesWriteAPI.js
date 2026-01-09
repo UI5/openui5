@@ -244,7 +244,7 @@ sap.ui.define([
 	 */
 	ChangesWriteAPI.apply = function(mPropertyBag) {
 		if (!(mPropertyBag.element instanceof Element)) {
-			return Promise.reject("Please provide an Element");
+			return Promise.reject(new Error("Please provide an Element"));
 		}
 
 		mPropertyBag.appComponent = Utils.getAppComponentForSelector(mPropertyBag.element);

@@ -218,7 +218,7 @@ sap.ui.define([
 		.then(function() {
 			const fnFragmentHandler = mPropertyBag.fragmentHandler || this.getFragmentHandler();
 			if (!fnFragmentHandler) {
-				return Promise.reject("Fragment handler function is not available in the handler");
+				throw new Error("Fragment handler function is not available in the handler");
 			}
 			const oOverlay = aElementOverlays[0];
 			const oElement = oOverlay.getElement();
@@ -228,10 +228,10 @@ sap.ui.define([
 
 		.then(function(mExtensionData) {
 			if (!mExtensionData.extensionPointName || !(typeof mExtensionData.extensionPointName === "string")) {
-				return Promise.reject("Extension point name is not selected!");
+				throw new Error("Extension point name is not selected!");
 			}
 			if (!mExtensionData.fragmentPath || !(typeof mExtensionData.fragmentPath === "string")) {
-				return Promise.reject("Fragment path is not available");
+				throw new Error("Fragment path is not available");
 			}
 			return mExtensionData;
 		})

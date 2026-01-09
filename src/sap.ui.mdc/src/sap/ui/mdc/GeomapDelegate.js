@@ -45,7 +45,7 @@ sap.ui.define([
      * @typedef {object} sap.ui.mdc.geomap.ZoomState
      * @property {boolean} enabled Zooming is enabled if set to <code>true</code>
      * @property {number} currentZoomLevel Current zoom level of the geomap in percent (between 0 and 1)
-     * @experimental As of version 1.142
+     * @ui5-experimental-since 1.142
      * @public
      */
 
@@ -158,7 +158,7 @@ sap.ui.define([
      * @property {sap.ui.core.URI} icon URI for the icon for the current geomap type
      * @property {string} text Name of the current geomap type
      * @property {boolean} selected Whether the geomap type is the one currently used
-     * @experimental As of version 1.142
+     * @ui5-experimental-since 1.142
      * @public
      */
 

@@ -288,13 +288,13 @@ sap.ui.define([
 		 */
 		async restore(mPropertyBag) {
 			if (!mPropertyBag || !mPropertyBag.selector) {
-				return Promise.reject("No selector was provided");
+				return Promise.reject(new Error("No selector was provided"));
 			}
 
 			var oAppComponent = Utils.getAppComponentForControl(mPropertyBag.selector);
 
 			if (!oAppComponent) {
-				return Promise.reject("App Component could not be determined");
+				return Promise.reject(new Error("App Component could not be determined"));
 			}
 
 			const sReference = FlexRuntimeInfoAPI.getFlexReference({ element: mPropertyBag.selector });

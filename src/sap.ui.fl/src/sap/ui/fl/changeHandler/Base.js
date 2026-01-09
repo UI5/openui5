@@ -50,7 +50,7 @@ sap.ui.define([
 			try {
 				return await oModifier.instantiateFragment(sFragment, sIdPrefix, oView);
 			} catch (oError) {
-				throw new Error(`The following XML Fragment could not be instantiated: ${sFragment} Reason: ${oError.message}`);
+				throw new Error(`The following XML Fragment could not be instantiated: ${sFragment} Reason: ${oError.message}`, { cause: oError });
 			}
 		},
 

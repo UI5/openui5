@@ -214,7 +214,7 @@ sap.ui.define([
 		const oS4HanaCloudBackend = new S4HanaCloudBackend();
 		return oS4HanaCloudBackend.notifyFlpCustomizingIsReady(sIamId, bCreation).catch(function(oError) {
 			let sMessageKey = bCreation ? "MSG_TILE_CREATION_FAILED" : "MSG_DELETE_APP_VARIANT_FAILED";
-			if (!bCreation && oError.error === "locked") {
+			if (!bCreation && oError.message === "locked") {
 				sMessageKey = "MSG_CATALOGS_LOCKED";
 			}
 			return AppVariantUtils.catchErrorDialog(oError, sMessageKey, sAppVarId);

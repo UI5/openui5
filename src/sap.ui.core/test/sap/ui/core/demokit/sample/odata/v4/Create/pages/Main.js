@@ -3,33 +3,20 @@
  */
 sap.ui.define([
 	"sap/ui/core/sample/common/Helper",
-	"sap/ui/test/Opa5",
-	"sap/ui/test/actions/Press"
-], function (Helper, Opa5, Press) {
+	"sap/ui/test/Opa5"
+], function (Helper, Opa5) {
 	"use strict";
 
 	const sViewName = "sap.ui.core.sample.odata.v4.Create.Main";
 
 	Opa5.createPageObjects({
-		onTheCreateNewSalesOrderDialog : {
+		onTheMainPage : {
 			actions : {
 				changeInputValue : function (sInputId, sInput) {
 					Helper.changeInputValue(this, sViewName, sInputId, sInput);
 				},
 				pressButton : function (sButtonId) {
 					Helper.pressButton(this, sViewName, sButtonId);
-				}
-			},
-			assertions : {
-				checkInputValueState : function (sInputId, sValueState) {
-					Helper.checkValueState(this, sViewName, sInputId, sValueState);
-				}
-			}
-		},
-		onTheMainPage : {
-			actions : {
-				pressCreateNewSalesOrderButton : function () {
-					Helper.pressButton(this, sViewName, "createSalesOrderButton");
 				}
 			},
 			assertions : {
@@ -60,6 +47,9 @@ sap.ui.define([
 						visible : false
 					});
 				},
+				checkInputValueState : function (sInputId, sValueState) {
+					Helper.checkValueState(this, sViewName, sInputId, sValueState);
+				},
 				checkNumberOfEntries : function (iExpectedLength) {
 					this.waitFor({
 						id : "salesOrderList",
@@ -82,23 +72,6 @@ sap.ui.define([
 								"Success MessageBox is visible: " + bExpected);
 						},
 						visible : false
-					});
-				}
-			}
-		},
-		onTheSuccessMessageBox : {
-			actions : {
-				pressOkButton : function () {
-					this.waitFor({
-						actions : new Press(),
-						controlType : "sap.m.Button",
-						matchers : function (oButton) {
-							return oButton.getText() === "OK";
-						},
-						searchOpenDialogs : true,
-						success : function () {
-							Opa5.assert.ok(true, "OK button pressed");
-						}
 					});
 				}
 			}

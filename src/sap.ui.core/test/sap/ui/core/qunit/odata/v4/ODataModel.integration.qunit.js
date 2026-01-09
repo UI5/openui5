@@ -6483,7 +6483,7 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	// Scenario: One-way property binding for an object of entity(!) type. Check that no access to
-	// internals is possible (see {@link _Helper.publicClone}).
+	// internals is possible (see _Helper.publicClone).
 	// JIRA: CPOUI5ODATAV4-2661
 	QUnit.test("CPOUI5ODATAV4-2661: OneWay - publicClone", async function (assert) {
 		const oModel = this.createTeaBusiModel({autoExpandSelect : true});
@@ -41523,9 +41523,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// value. A binding to $count updates automatically.
 	// If the creation is cancelled, no count request is sent. If the creation fails, the count
 	// request is also retried together with the creation.
-	// If <code>oHeaderContext.requestProperty("$count")</code> is called after creating a node, the
-	// $count promise resolves with the updated count only after the creation was successful or has
-	// been cancelled. The $count promise does not resolve if the creation failed.
+	// If oHeaderContext.requestProperty("$count") is called after creating a node, the $count
+	// promise resolves with the updated count only after the creation was successful or has been
+	// cancelled. The $count promise does not resolve if the creation failed.
 	// JIRA: CPOUI5ODATAV4-3081
 	QUnit.test("Recursive Hierarchy: create updates count", async function (assert) {
 		const oModel = this.createTeaBusiModel({autoExpandSelect : true});
@@ -53204,7 +53204,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	//
 	// - PATCH and "ActivationAction" are sent in the same $batch (change set does not matter here).
 	// Refresh destroys both the draft and the active version (unrealistic) and calls
-	// <code>fnOnBeforeDestroy</code>.
+	// fnOnBeforeDestroy.
 	// JIRA: CPOUI5ODATAV4-347
 	// The "items" table is refreshed after activation (JIRA: CPOUI5ODATAV4-1355)
 	// oInactiveArtistContext.delete(null); can be used to remove messages for the draft that
@@ -58520,11 +58520,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// based on the "com.sap.vocabularies.CodeList.v1.UnitsOfMeasure" on the service's entity
 	// container.
 	// JIRA: CPOUI5UISERVICESV3-1711
-	// Scenario 2: With the binding parameter <code>$$ignoreMessages</code> the application
-	// developer can control whether model messages are displayed at the control. For
-	// <code>sap.ui.model.odata.type.Currency</code> and <code>sap.ui.model.odata.type.Unit</code>
-	// the parameter <code>$$ignoreMessages</code> is determined automatically based on the format
-	// option <code>showMeasure</code>. Manual setting of <code>$$ignoreMessages</code> wins over
+	// Scenario 2: With the binding parameter $$ignoreMessages the application developer can control
+	// whether model messages are displayed at the control. For sap.ui.model.odata.type.Currency
+	// and sap.ui.model.odata.type.Unit the parameter $$ignoreMessages is determined automatically
+	// based on the format option "showMeasure". Manual setting of $$ignoreMessages wins over
 	// automatic determination.
 	// No own test as unit value list is cached in a private cache
 	// JIRA: CPOUI5MODELS-302
@@ -58710,11 +58709,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// based on the "com.sap.vocabularies.CodeList.v1.CurrencyCodes" on the service's entity
 	// container.
 	// JIRA: CPOUI5UISERVICESV3-1733
-	// Scenario 2: With the binding parameter <code>$$ignoreMessages</code> the application
-	// developer can control whether model messages are displayed at the control. For
-	// <code>sap.ui.model.odata.type.Currency</code> and <code>sap.ui.model.odata.type.Unit</code>
-	// the parameter <code>$$ignoreMessages</code> is determined automatically based on the format
-	// option <code>showMeasure</code>. Manual setting of <code>$$ignoreMessages</code> wins over
+	// Scenario 2: With the binding parameter $$ignoreMessages the application developer can control
+	// whether model messages are displayed at the control. For sap.ui.model.odata.type.Currency
+	// and sap.ui.model.odata.type.Unit the parameter $$ignoreMessages is determined automatically
+	// based on the format option "showMeasure". Manual setting of $$ignoreMessages wins over
 	// automatic determination.
 	// No own test as currency value list is cached in a private cache
 	// JIRA: CPOUI5MODELS-302
@@ -67791,10 +67789,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	});
 
 	//*********************************************************************************************
-	// Scenario: With the binding parameter <code>$$ignoreMessages</code> the application developer
-	// can control whether messages are displayed at the control. It works for
-	// <code>sap.ui.model.odata.v4.ODataPropertyBinding</code>s and composite bindings containing
-	// such bindings.
+	// Scenario: With the binding parameter $$ignoreMessages the application developer can control
+	// whether messages are displayed at the control. It works for ODPrBs and composite bindings
+	// containing such bindings.
 	// JIRA: CPOUI5MODELS-290
 	QUnit.test("ODataPropertyBindings and CompositeBindings: $$ignoreMessages", function (assert) {
 		var oModel = this.createTeaBusiModel({autoExpandSelect : true}),

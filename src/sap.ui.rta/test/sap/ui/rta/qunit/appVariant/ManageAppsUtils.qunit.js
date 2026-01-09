@@ -369,7 +369,7 @@ sap.ui.define([
 			};
 
 			this.oUshellContainerStub.getServiceAsync = function() {
-				return Promise.reject("Failed to get service");
+				return Promise.reject(new Error("Failed to get service"));
 			};
 
 			return AppVariantOverviewUtils.getAppVariantOverviewAttributes(oAppVariantInfo, true, this.oI18n)

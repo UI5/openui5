@@ -105,10 +105,10 @@ sap.ui.define([
 	 */
 	VersionsAPI.initialize = function(mPropertyBag) {
 		if (!mPropertyBag.control) {
-			return Promise.reject("No control was provided");
+			return Promise.reject(new Error("No control was provided"));
 		}
 		if (!mPropertyBag.layer) {
-			return Promise.reject("No layer was provided");
+			return Promise.reject(new Error("No layer was provided"));
 		}
 
 		var oAppComponent = Utils.getAppComponentForControl(mPropertyBag.control);
@@ -260,18 +260,18 @@ sap.ui.define([
 	 */
 	VersionsAPI.activate = function(mPropertyBag) {
 		if (!mPropertyBag.control) {
-			return Promise.reject("No control was provided");
+			return Promise.reject(new Error("No control was provided"));
 		}
 		if (!mPropertyBag.layer) {
-			return Promise.reject("No layer was provided");
+			return Promise.reject(new Error("No layer was provided"));
 		}
 		if (!mPropertyBag.title) {
-			return Promise.reject("No version title was provided");
+			return Promise.reject(new Error("No version title was provided"));
 		}
 
 		const sReference = getFlexReferenceForControl(mPropertyBag.control);
 		if (doDirtyChangesExist(sReference)) {
-			return Promise.reject("Unsaved changes exist");
+			return Promise.reject(new Error("Unsaved changes exist"));
 		}
 
 		const oFlexInfo = FlexInfoSession.getByReference(sReference);
@@ -312,10 +312,10 @@ sap.ui.define([
 		}
 
 		if (!mPropertyBag.control) {
-			return Promise.reject("No control was provided");
+			return Promise.reject(new Error("No control was provided"));
 		}
 		if (!mPropertyBag.layer) {
-			return Promise.reject("No layer was provided");
+			return Promise.reject(new Error("No layer was provided"));
 		}
 		return Versions.discardDraft({
 			reference: sReference,
@@ -366,13 +366,13 @@ sap.ui.define([
 	 */
 	VersionsAPI.publish = function(mPropertyBag) {
 		if (!mPropertyBag.selector) {
-			return Promise.reject("No selector was provided");
+			return Promise.reject(new Error("No selector was provided"));
 		}
 		if (!mPropertyBag.layer) {
-			return Promise.reject("No layer was provided");
+			return Promise.reject(new Error("No layer was provided"));
 		}
 		if (!mPropertyBag.version) {
-			return Promise.reject("No version was provided");
+			return Promise.reject(new Error("No version was provided"));
 		}
 		mPropertyBag.styleClass ||= "";
 		mPropertyBag.reference = getFlexReferenceForControl(mPropertyBag.selector);

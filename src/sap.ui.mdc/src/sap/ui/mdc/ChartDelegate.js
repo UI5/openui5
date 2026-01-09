@@ -17,7 +17,6 @@ sap.ui.define([
 	 * @mixes module:sap/ui/mdc/mixin/delegate/FilterIntegrationDefault
 	 * @since 1.88
 	 * @public
-	 * @experimental As of version 1.88
 	 *
 	 */
 	const ChartDelegate = Object.assign({}, AggregationBaseDelegate, FilterIntegrationDefault);

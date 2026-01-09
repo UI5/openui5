@@ -119,9 +119,6 @@ sap.ui.define([
   var oi1 = new ObjectIdentifier("oi1", {
 	  title : "Gummib\u00E4" + "r\u00E7" + "he\u00D1",
 	  text : "Gummib\u00E4" + "r\u00E7" + "he\u00D1 bla bla bla bla bla bla bla bla bla silly table",
-	  badgeNotes : true,
-	  badgePeople : true,
-	  badgeAttachments : true,
 	  visible : true
   });
 
@@ -138,9 +135,6 @@ sap.ui.define([
   var oi2 = new ObjectIdentifier("oi2", {
 	  title : "Gummib\u00E4" + "r\u00E7" + "he\u00D1" + "are what I need most of all",
 	  text : "Tiny Text",
-	  badgeNotes : true,
-	  badgePeople : true,
-	  badgeAttachments : true,
 	  visible : true
   });
 
@@ -148,9 +142,6 @@ sap.ui.define([
 	  title : "Gummib\u00E4" + "r\u00E7" + "he\u00D1" + "are what I need most of all",
 	  titleActive : "{/true}",
 	  text : "Tiny Text",
-	  badgeNotes : true,
-	  badgePeople : true,
-	  badgeAttachments : true,
 	  visible : true
   });
 
@@ -191,9 +182,6 @@ sap.ui.define([
   var oi8 = new ObjectIdentifier("oi8", {
 	  title : "OI with textDirection set to LTR",
 	  text : "+49 (9) 1234567",
-	  badgeNotes : true,
-	  badgePeople : true,
-	  badgeAttachments : true,
 	  textDirection: TextDirection.LTR
   });
 
@@ -230,8 +218,6 @@ sap.ui.define([
 			  title : "{Name}",
 			  text : "{ProductId}",
 			  titleActive : "{active}",
-			  badgeNotes : true,
-			  badgeAttachments : true,
 			  emptyIndicatorMode: "On"
 		  }),
 		  new Text({
@@ -255,9 +241,6 @@ sap.ui.define([
 	  title : "Some active long title that should wrap. Some active long title that should wrap.",
 	  titleActive : true,
 	  text : "Tiny Text",
-	  badgeNotes : true,
-	  badgePeople : true,
-	  badgeAttachments : true,
 	  visible : true
   });
 

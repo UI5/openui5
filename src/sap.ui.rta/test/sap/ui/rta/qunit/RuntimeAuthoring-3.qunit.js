@@ -6,8 +6,8 @@ sap.ui.define([
 	"sap/m/Button",
 	"sap/m/MessageBox",
 	"sap/m/Page",
-	"sap/ui/base/EventProvider",
 	"sap/ui/base/Event",
+	"sap/ui/base/EventProvider",
 	"sap/ui/base/ManagedObjectMetadata",
 	"sap/ui/core/Lib",
 	"sap/ui/dt/DesignTime",
@@ -16,12 +16,13 @@ sap.ui.define([
 	"sap/ui/events/KeyCodes",
 	"sap/ui/fl/apply/api/FlexRuntimeInfoAPI",
 	"sap/ui/fl/initial/_internal/preprocessors/ComponentLifecycleHooks",
+	"sap/ui/fl/util/CancelError",
 	"sap/ui/fl/write/api/PersistenceWriteAPI",
 	"sap/ui/fl/Layer",
 	"sap/ui/fl/Utils",
 	"sap/ui/model/json/JSONModel",
-	"sap/ui/rta/util/ReloadManager",
 	"sap/ui/rta/service/index",
+	"sap/ui/rta/util/ReloadManager",
 	"sap/ui/rta/RuntimeAuthoring",
 	"sap/ui/rta/Utils",
 	"sap/ui/thirdparty/sinon-4",
@@ -33,8 +34,8 @@ sap.ui.define([
 	Button,
 	MessageBox,
 	Page,
-	EventProvider,
 	Event,
+	EventProvider,
 	ManagedObjectMetadata,
 	Lib,
 	DesignTime,
@@ -43,12 +44,13 @@ sap.ui.define([
 	KeyCodes,
 	FlexRuntimeInfoAPI,
 	ComponentLifecycleHooks,
+	CancelError,
 	PersistenceWriteAPI,
 	Layer,
 	FlUtils,
 	JSONModel,
-	ReloadManager,
 	mServicesDictionary,
+	ReloadManager,
 	RuntimeAuthoring,
 	Utils,
 	sinon,
@@ -926,14 +928,18 @@ sap.ui.define([
 			var oFlexInfoResponse = { allContextsProvided: true, isResetEnabled: false, isPublishEnabled: false };
 			window.sessionStorage.setItem(sInfoSessionName, JSON.stringify(oFlexInfoResponse));
 
-			sandbox.stub(PersistenceWriteAPI, "reset").returns(Promise.reject("Error"));
+			sandbox.stub(PersistenceWriteAPI, "reset").returns(Promise.reject(new Error("Reset failed")));
 
 			return this.oRta.restore().then(function() {
 				assert.equal(this.oReloadPageStub.callCount, 0, "then page reload is not triggered");
 				var sFlexInfoFromSession = window.sessionStorage.getItem(sInfoSessionName);
 				assert.equal(sFlexInfoFromSession, JSON.stringify(oFlexInfoResponse), "then flex info from session storage still exists");
 				assert.equal(this.oShowMessageBoxStub.callCount, 2, "error messages is shown");
-				assert.strictEqual(this.oShowMessageBoxStub.lastCall.args[2].error, "Error", "and a message box shows the error to the user");
+				assert.strictEqual(
+					this.oShowMessageBoxStub.lastCall.args[2].error.message,
+					"Reset failed",
+					"and a message box shows the error to the user"
+				);
 			}.bind(this));
 		});
 
@@ -943,7 +949,7 @@ sap.ui.define([
 			var oFlexInfoResponse = { allContextsProvided: true, isResetEnabled: false, isPublishEnabled: false };
 			window.sessionStorage.setItem(sInfoSessionName, JSON.stringify(oFlexInfoResponse));
 
-			sandbox.stub(PersistenceWriteAPI, "reset").returns(Promise.reject("cancel"));
+			sandbox.stub(PersistenceWriteAPI, "reset").returns(Promise.reject(new CancelError()));
 
 			return this.oRta.restore().then(function() {
 				assert.equal(this.oReloadPageStub.callCount, 0, "then page reload is not triggered");

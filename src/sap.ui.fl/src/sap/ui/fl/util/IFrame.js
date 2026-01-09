@@ -131,7 +131,7 @@ sap.ui.define([
 		},
 
 		waitForInit() {
-			return this._oInitializePromise ? this._oInitializePromise : Promise.reject();
+			return this._oInitializePromise ? this._oInitializePromise : Promise.reject(new Error("Control not initialized"));
 		},
 
 		setUrl(sUrl) {

@@ -157,12 +157,7 @@ sap.ui.define([
 	  title: "RESPONSIVE OBJECT HEADER",
 	  number: "624,00",
 	  numberUnit: "Euro",
-  //    numberDirection: "LTR",
-  //    numberTextAlign: "???",
 	  fullScreenOptimized: false,
-	  showMarkers: false,
-	  markFlagged: true,
-	  markFavorite: true,
 	  numberState: ValueState.Success,
 	  attributes: aAttrs3,
 	  statuses: [
