@@ -21,7 +21,8 @@ builder:
               - "!sap/ui/fl/"        # ... except the modules from sap/ui/fl
               - "**/designtime/"     #
               - "**/*.designtime.js" # also exclude all designtime ...
-              - "**/*.support.js"    # ... and support files
+              - "**/support/"        # ... and support files
+              - "**/*.support.js"    #
             resolve: false
           - mode: preload
             name: sap/ui/fl/library-preload

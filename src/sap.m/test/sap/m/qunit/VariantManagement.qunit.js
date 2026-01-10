@@ -6,8 +6,9 @@ sap.ui.define([
 	"sap/ui/fl/write/api/ContextSharingAPI",
 	'sap/ui/qunit/QUnitUtils',
 	"sap/ui/test/utils/nextUIUpdate",
-	"sap/m/library"
-], function(VariantItem, VariantManagement, Element, ContextSharingAPI, QUnitUtils, nextUIUpdate, mobileLibrary) {
+	"sap/m/library",
+	"sap/ui/events/KeyCodes"
+], function(VariantItem, VariantManagement, Element, ContextSharingAPI, QUnitUtils, nextUIUpdate, mobileLibrary, KeyCodes) {
 	"use strict";
 
 	// shortcut for sap.m.Sticky
@@ -842,14 +843,54 @@ sap.ui.define([
 		this.oVM.onclick();
 	});
 
-	QUnit.test("check event 'save'", function(assert) {
+	QUnit.test("check text selection in save as dialog", function(assert) {
 
+		_createSaveAsDialog.call(this, assert);
+		var fOriginalSaveAsCall = this.oVM._openSaveAsDialog.bind(this.oVM);
+
+		sinon.stub(this.oVM, "_openSaveAsDialog").callsFake(async (oEvent) => {
+			fOriginalSaveAsCall(oEvent);
+
+			// Check if the whole text is selected
+			assert.ok(this.oVM.oInputName.getSelectedText().length === this.oVM.oInputName.getValue().length, "text should be selected");
+
+			// Close the dialog to finish the test
+			this.oVM._cancelPressed();
+
+			await nextUIUpdate();
+		});
+
+	});
+
+	QUnit.test("check event 'save' on save button press", function(assert) {
+
+		var triggerAction = (target) => {
+			QUnitUtils.triggerTouchEvent("tap", target, {
+				srcControl: null
+			});
+		};
+		_checkSaveAction.call(this, assert, triggerAction);
+	});
+
+	QUnit.test("check event 'save' on enter key press", function(assert) {
+
+		var triggerAction = (target) => {
+			QUnitUtils.triggerKeydown(target, KeyCodes.ENTER);
+		};
+
+		_checkSaveAction.call(this, assert, triggerAction);
+
+	});
+
+	/**
+	 * Creates the Save As dialog with mocked data
+	 * @param {QUnit.Assert} assert - QUnit assert object
+	 */
+	function _createSaveAsDialog(assert) {
+		// Add variant items
 		this.oVM.addItem(new VariantItem({key: "1", title:"One"}));
 		this.oVM.addItem(new VariantItem({key: "2", title:"Two"}));
 
-		this.oVM.setSelectedKey("2");
-
-		var done = assert.async();
 
 		this.oVM.attachSave(function(oEvent) {
 			var mParameters = oEvent.getParameters();
@@ -860,19 +901,28 @@ sap.ui.define([
 			assert.ok(mParameters.public, "public flag expected");
 			assert.ok(!mParameters.overwrite, "overwrite should be false");
 			assert.equal(mParameters.name, "New", "name expected");
-
-			//done();
 		});
 
 		this.oVM._createSaveAsDialog();
 		assert.ok(this.oVM.oSaveAsDialog);
+	}
+
+	/**
+	 * Test function to check 'save' event
+	 * @param {QUnit.Assert} assert - QUnit assert object
+	 * @param {VoidFunction} triggerAction - function to trigger the save action (either click or keypress)
+	 */
+	function _checkSaveAction(assert, triggerAction) {
+		_createSaveAsDialog.call(this, assert);
+		var done = assert.async();
 
 		this.oVM.oSaveAsDialog.attachAfterClose(function(oEvent) {
 			done();
 		});
 
 		var fOriginalSaveAsCall = this.oVM._openSaveAsDialog.bind(this.oVM);
-		sinon.stub(this.oVM, "_openSaveAsDialog").callsFake(async function (oEvent) {
+
+		sinon.stub(this.oVM, "_openSaveAsDialog").callsFake(async (oEvent) => {
 
 			fOriginalSaveAsCall(oEvent);
 
@@ -888,20 +938,17 @@ sap.ui.define([
 			assert.ok(this.oVM.oExecuteOnSelect, "should exists");
 			this.oVM.oExecuteOnSelect.setSelected(true);
 
-			//await nextUIUpdate();
-
-			assert.ok(this.oVM.oSaveSave, "should exists");
 			var oTarget = this.oVM.oSaveSave.getFocusDomRef();
 			assert.ok(oTarget);
-			QUnitUtils.triggerTouchEvent("tap", oTarget, {
-				srcControl: null
-			});
+			// Use the provided triggerAction function to simulate user action
+			triggerAction(oTarget);
+
 			await nextUIUpdate();
 
-		}.bind(this));
+		});
 
 		var fOriginalCall = this.oVM._openVariantList.bind(this.oVM);
-		sinon.stub(this.oVM, "_openVariantList").callsFake(async function (oEvent) {
+		sinon.stub(this.oVM, "_openVariantList").callsFake(async(oEvent) => {
 			fOriginalCall(oEvent);
 
 			await new Promise((resolve) => {setTimeout(resolve, 100);}); //wait until open triggered
@@ -910,12 +957,10 @@ sap.ui.define([
 			QUnitUtils.triggerTouchEvent("tap", oTarget, {
 				srcControl: null
 			});
-
-		}.bind(this));
+		});
 
 		this.oVM.onclick();
-	});
-
+	}
 
 	QUnit.module("VariantManagement Manage dialog", {
 		beforeEach: async function() {
@@ -1500,15 +1545,28 @@ sap.ui.define([
 		this.oVM.onclick();
 	});
 
+	QUnit.test('check manage dialog Save shortcut key', function(assert) {
+
+		_createMockVariantManagementDialog.call(this);
+
+		sinon.stub(this.oVM, "_openManagementDialog").callsFake(async function (oEvent) {
+
+			// simulate Enter key press on Save button
+			var oTarget = this.oVM.oManagementSave.getFocusDomRef();
+			assert.ok(oTarget);
+			QUnitUtils.triggerKeydown(oTarget, KeyCodes.ENTER, false, false, true);
+
+			await nextUIUpdate();
+
+		}).bind(this);
+
+		assert.ok(this.oVM._handleManageSavePressed(), "expected no errors");
+
+	});
+
 	QUnit.test("check manage dialog Save behavour", function(assert) {
-		this.oVM.addItem(new VariantItem({key: "1", title:"One", rename: false, sharing: "Public", executeOnSelect: true, author: "A"}));
-		this.oVM.addItem(new VariantItem({key: "2", title:"Two", remove: true, sharing: "Private", author: "B"}));
-		this.oVM.addItem(new VariantItem({key: "3", title:"Three", favorite: true, remove: true, sharing: "Private", executeOnSelect: true, author: "A"}));
-		this.oVM.addItem(new VariantItem({key: "4", title:"Four", favorite: false, rename: false, sharing: "Public", author: "B"}));
+		_createMockVariantManagementDialog.call(this);
 
-		this.oVM.setDefaultKey("3");
-
-		this.oVM._openManagementDialog();
 		assert.ok(this.oVM._handleManageSavePressed(), "expected no errors");
 
 		var oRow = this.oVM._getRowForKey("3");
@@ -1524,6 +1582,18 @@ sap.ui.define([
 		this.oVM._handleManageDeletePressed(oView);
 		assert.ok(this.oVM._handleManageSavePressed(), "expected no errors");
 	});
+
+	function _createMockVariantManagementDialog() {
+		this.oVM.addItem(new VariantItem({key: "1", title:"One", rename: false, sharing: "Public", executeOnSelect: true, author: "A"}));
+		this.oVM.addItem(new VariantItem({key: "2", title:"Two", remove: true, sharing: "Private", author: "B"}));
+		this.oVM.addItem(new VariantItem({key: "3", title:"Three", favorite: true, remove: true, sharing: "Private", executeOnSelect: true, author: "A"}));
+		this.oVM.addItem(new VariantItem({key: "4", title:"Four", favorite: false, rename: false, sharing: "Public", author: "B"}));
+
+		this.oVM.setDefaultKey("3");
+
+		this.oVM._openManagementDialog();
+	}
+
 
 	QUnit.module("VariantManagement _findNextFocusTargetAfterDelete", {
 		beforeEach: async function() {

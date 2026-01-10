@@ -993,6 +993,14 @@ sap.ui.define([
 		};
 
 		MenuButton.prototype.onsapup = function(oEvent) {
+			const sPressedButtonCode = oEvent?.keyCode;
+			const bArrowKey = sPressedButtonCode === KeyCodes?.ARROW_DOWN || sPressedButtonCode === KeyCodes?.ARROW_UP;
+			const bOpenByArrowKeyPress = bArrowKey && !oEvent?.ctrlKey && (oEvent?.altKey || oEvent?.metaKey);
+
+			if (bArrowKey && !bOpenByArrowKeyPress) {
+				return;
+			}
+
 			this.openMenuByKeyboard();
 			// If there is a different behavior defined in the parent container for the same event,
 			// then use only the defined behavior in the MenuButton.
@@ -1001,6 +1009,14 @@ sap.ui.define([
 		};
 
 		MenuButton.prototype.onsapdown = function(oEvent) {
+			const sPressedButtonCode = oEvent?.keyCode;
+			const bArrowKey = sPressedButtonCode === KeyCodes?.ARROW_DOWN || sPressedButtonCode === KeyCodes?.ARROW_UP;
+			const bOpenByArrowKeyPress = bArrowKey && !oEvent?.ctrlKey && (oEvent?.altKey || oEvent?.metaKey);
+
+			if (bArrowKey && !bOpenByArrowKeyPress) {
+				return;
+			}
+
 			this.openMenuByKeyboard();
 			oEvent.stopPropagation();
 		};

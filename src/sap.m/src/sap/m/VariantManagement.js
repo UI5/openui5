@@ -8,6 +8,7 @@ sap.ui.define([
 	"sap/m/IllustratedMessageType",
 	"sap/ui/core/Element",
 	"sap/ui/core/Lib",
+	'sap/ui/core/ShortcutHintsMixin',
 	"sap/ui/model/json/JSONModel",
 	"sap/ui/model/base/ManagedObjectModel",
 	"sap/ui/model/Filter",
@@ -53,6 +54,7 @@ sap.ui.define([
 	IllustratedMessageType,
 	Element,
 	Library,
+	ShortcutHintsMixin,
 	JSONModel,
 	ManagedObjectModel,
 	Filter,
@@ -551,6 +553,8 @@ sap.ui.define([
 
 		this._oRb = Library.getResourceBundleFor("sap.m");
 
+		// Check whether device is Macintosh
+		this.deviceIsMac = Device.os.macintosh;
 
         this._oManagedObjectModel = new ManagedObjectModel(this);
         this.setModel(this._oManagedObjectModel, "$mVariants");
@@ -1065,7 +1069,7 @@ sap.ui.define([
 	};
 
 	VariantManagement.prototype.onkeyup = function(oEvent) {
-		if (oEvent.which === KeyCodes.F4 || oEvent.which === KeyCodes.SPACE || oEvent.altKey === true && oEvent.which === KeyCodes.ARROW_UP || oEvent.altKey === true && oEvent.which === KeyCodes.ARROW_DOWN) {
+		if (oEvent.keyCode === KeyCodes.F4 || oEvent.keyCode === KeyCodes.SPACE || oEvent.altKey === true && oEvent.keyCode === KeyCodes.ARROW_UP || oEvent.altKey === true && oEvent.keyCode === KeyCodes.ARROW_DOWN) {
 			this._oCtrlRef = this._obtainControl(oEvent);
 			this._openVariantList();
 		}
@@ -1229,6 +1233,10 @@ sap.ui.define([
 				priority: OverflowToolbarPriority.Low
 			})
 		});
+		ShortcutHintsMixin.addConfig(this.oVariantSaveBtn, {
+			addAccessibilityLabel: true,
+			message: this._getSaveTooltipText("SAVE_MAIN")
+		}, this);
 
 		this.oVariantSaveAsBtn = new Button(this.getId() + "-saveas", {
 			text: this._oRb.getText("VARIANT_MANAGEMENT_SAVEAS"),
@@ -1260,7 +1268,7 @@ sap.ui.define([
 				path: "/hasNoData",
 				model: VariantManagement.INNER_MODEL_NAME,
 				formatter: function(bValue) {
-					return !bValue;
+					 return !bValue;
 				}
 			},
 			itemPress: function(oEvent) {
@@ -1360,6 +1368,22 @@ sap.ui.define([
 			}.bind(this),
 			contentHeight: "300px"
 		});
+
+		this.oVariantPopOver.addEventDelegate({
+			onkeydown: function(oEvent) {
+				const bCtrlKey = this.deviceIsMac ? oEvent.metaKey : oEvent.ctrlKey;
+
+				// Use CTRL / CMD + S to trigger the Save action
+				if ( oEvent.keyCode == KeyCodes.S && (oEvent.shiftKey === false) && (oEvent.altKey === false) && (bCtrlKey === true)) {
+					if (this.oVariantSaveBtn?.getVisible() && this.oVariantSaveBtn?.getEnabled()) {
+						oEvent.preventDefault();
+						oEvent.stopPropagation();
+						this._handleVariantSave();
+					}
+				}
+			}
+
+		}, this);
 
 		this.oVariantPopOver.addStyleClass("sapMVarMngmtPopover");
 		if (this.oVariantLayout.$().closest(".sapUiSizeCompact").length > 0) {
@@ -1560,25 +1584,20 @@ sap.ui.define([
 			this.oSaveSave = new Button(this.getId() + "-variantsave", {
 				text: this._oRb.getText("VARIANT_MANAGEMENT_SAVE"),
 				type: ButtonType.Emphasized,
-				press: function() {
-					if (!this._bSaveOngoing) {
-						this._checkVariantNameConstraints(this.oInputName);
-
-						if (this.oInputName.getValueState() === "Error") {
-							this.oInputName.focus();
-							return;
-						}
-
-						this._bSaveOngoing = true;
-						this._bSaveCanceled = false;
-						var bReturn = this._handleVariantSaveAs(this.oInputName.getValue());
-						if (!bReturn) {
-							this._bSaveOngoing = false;
-						}
-					}
-				}.bind(this),
+				press: this._fireVariantSaveAsEvent.bind(this),
 				enabled: true
 			});
+
+			this.oSaveAsCancel = new Button(this.getId() + "-variantcancel", {
+					text: this._oRb.getText("VARIANT_MANAGEMENT_CANCEL"),
+					press: this._cancelPressed.bind(this)
+			});
+
+			ShortcutHintsMixin.addConfig(this.oSaveSave, {
+				addAccessibilityLabel: true,
+				message: this._getSaveTooltipText("SAVE")
+			}, this);
+
 			var oSaveAsDialogOptionsGrid = new Grid({
 				defaultSpan: "L12 M12 S12"
 			});
@@ -1607,10 +1626,7 @@ sap.ui.define([
 
 				}.bind(this),
 				beginButton: this.oSaveSave,
-				endButton: new Button(this.getId() + "-variantcancel", {
-					text: this._oRb.getText("VARIANT_MANAGEMENT_CANCEL"),
-					press: this._cancelPressed.bind(this)
-				}),
+				endButton: this.oSaveAsCancel,
 				content: [
 					oLabelName, this.oInputName, oSaveAsDialogOptionsGrid
 				],
@@ -1629,6 +1645,27 @@ sap.ui.define([
 			}
 
 			this.addDependent(this.oSaveAsDialog);
+
+			// Use submit event to allow enter pressing for save
+			this.oInputName.attachSubmit(this._fireVariantSaveAsEvent, this);
+		}
+	};
+
+	VariantManagement.prototype._fireVariantSaveAsEvent = function() {
+		if (!this._bSaveOngoing) {
+			this._checkVariantNameConstraints(this.oInputName);
+
+			if (this.oInputName.getValueState() === ValueState.Error) {
+				this.oInputName.focus();
+				return;
+			}
+
+			this._bSaveOngoing = true;
+			this._bSaveCanceled = false;
+			const bReturn = this._handleVariantSaveAs(this.oInputName.getValue());
+			if (!bReturn) {
+				this._bSaveOngoing = false;
+			}
 		}
 	};
 
@@ -1840,6 +1877,7 @@ sap.ui.define([
 		if (!bDoNotOpen) {
 			this.oSaveAsDialog.open();
 		}
+		this.oInputName.selectText(0, this.getSelectedVariantText(this.getSelectedKey()).length);
 	};
 
 	VariantManagement.prototype._handleVariantSaveAs = function(sNewVariantName) {
@@ -2141,6 +2179,11 @@ sap.ui.define([
 				}.bind(this)
 			});
 
+			ShortcutHintsMixin.addConfig(this.oManagementSave, {
+				addAccessibilityLabel: true,
+				message: this._getSaveTooltipText("SAVE")
+			}, this);
+
 			this.oManagementCancel = new Button(this.getId() + "-managementcancel", {
 				text: this._oRb.getText("VARIANT_MANAGEMENT_CANCEL"),
 				press: function() {
@@ -2179,6 +2222,7 @@ sap.ui.define([
 			};
 
 			this._oSearchFieldOnMgmtDialog = new SearchField();
+
 			this._oSearchFieldOnMgmtDialog.attachLiveChange(function(oEvent) {
 				this._triggerSearchInManageDialog(oEvent, this.oManagementTable);
 			}.bind(this));
@@ -2199,9 +2243,35 @@ sap.ui.define([
 			if (this.oVariantLayout.$().closest(".sapUiSizeCompact").length > 0) {
 				this.oManagementDialog.addStyleClass("sapUiSizeCompact");
 			}
+
+			// Attach keydown event to the search field, as its overrides corresponding keydown events, to handle Ctrl+Enter (or Cmd+Enter on Mac) to trigger Save action
+			this._oSearchFieldOnMgmtDialog.addEventDelegate({
+				// there is no onsapenter event for SearchField, so we need to use onkeydown
+				onkeydown: (oEvent) => {
+					if (oEvent.keyCode === KeyCodes.ENTER){
+						this._handleManagementDialogKeydown(oEvent);
+					}
+				}
+			}, this);
+
 			this.addDependent(this.oManagementDialog);
 
 			this._rebindVMTable(true);
+		}
+	};
+
+	VariantManagement.prototype._getSaveTooltipText = function(sTextType) {
+		const sTextKey = `VARIANT_MANAGEMENT_${sTextType}_TT${this.deviceIsMac ? "_MAC" : ""}`;
+		return this._oRb.getText(sTextKey);
+	};
+
+	VariantManagement.prototype._handleManagementDialogKeydown = function(oEvent) {
+		// on macintosh os cmd-key is used instead of ctrl-key
+		var bCtrlKey = this.deviceIsMac ? oEvent.metaKey : oEvent.ctrlKey;
+		if ( (oEvent.shiftKey === false) && (oEvent.altKey === false) && (bCtrlKey === true)){
+			this.oManagementSave.firePress();
+			oEvent.stopPropagation();
+			oEvent.preventDefault();
 		}
 	};
 
@@ -2757,7 +2827,6 @@ sap.ui.define([
 
 		this.fireManage(this._collectManageData());
 
-		// the manage views dialog may be deleted.
 		if (this.oManagementDialog) {
 			this._resumeManagementTableBinding();
 		}

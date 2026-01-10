@@ -298,9 +298,11 @@ sap.ui.define([
 
 		return oContentPromise.then((oContent) => {
 			return oMdcTableWrapper.onBeforeShow(true).then(() => {
-				return oMdcTableWrapper.awaitListBinding().then(() => {
+				return oMdcTableWrapper.awaitListBinding().then(async () => {
 					oMdcTableWrapper.onShow(true);
 					const oSelectionPlugin = oTable._oTable._getSelectionPlugin();
+
+					await new Promise((resolve) => {setTimeout(resolve, 0);});
 
 					return oSelectionPlugin.setSelectedIndex(2).then(() => {
 						assert.ok(oMdcTableWrapper._handleSelectionChange.calledTwice, "MDCTable _handleSelectionChange was called twice"); // Once by Table._setSelectedContexts, second time by setSelectedIndex
@@ -359,8 +361,10 @@ sap.ui.define([
 
 
 		return oPrepareContentPromise.then((oContent) => {
-			return oMdcTableWrapper.awaitListBinding().then(() => {
+			return oMdcTableWrapper.awaitListBinding().then(async () => {
 				const oSelectionPlugin = oTable._oTable._getSelectionPlugin();
+
+				await new Promise((resolve) => {setTimeout(resolve, 0);});
 
 				return oSelectionPlugin.addSelectionInterval(0,2).then(() => {
 					assert.ok(oMdcTableWrapper._handleSelectionChange.called, "MDCTable _handleSelectionChange was called");
@@ -486,10 +490,12 @@ sap.ui.define([
 
 		return oContentPromise.then((oContent) => {
 			return oMdcTableWrapper.onBeforeShow(true).then(() => {
-				return oMdcTableWrapper.awaitListBinding().then(() => {
+				return oMdcTableWrapper.awaitListBinding().then(async () => {
 					oMdcTableWrapper.onShow(true);
 					const oInnerTable = oTable._oTable;
 					const aTableItems = oInnerTable?.getItems();
+
+					await new Promise((resolve) => {setTimeout(resolve, 0);});
 
 					oInnerTable?.setSelectedItem(aTableItems?.[2], true, true);
 					assert.ok(oMdcTableWrapper._handleSelectionChange.called, "MDCTable _handleSelectionChange was called");
@@ -560,6 +566,8 @@ sap.ui.define([
 					oMdcTableWrapper.onShow(true);
 					const oInnerTable = oTable._oTable;
 					const aTableItems = oInnerTable?.getItems();
+
+					await new Promise((resolve) => {setTimeout(resolve, 0);});
 
 					oInnerTable?.setSelectedItem(aTableItems?.[2], true, true);
 					assert.ok(oMdcTableWrapper._handleSelectionChange.called, "MDCTable _handleSelectionChange was called");

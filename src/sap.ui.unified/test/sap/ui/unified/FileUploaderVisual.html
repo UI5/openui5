@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>FileUploader - sap.ui.unified</title>
+		<script src="shared-config.js"></script>
+		<script id="sap-ui-bootstrap"
+				src="../../../../resources/sap-ui-core.js"
+				data-sap-ui-libs="sap.m, sap.ui.unified, sap.ui.layout"
+				data-sap-ui-on-init="module:local/FileUploaderVisual"
+				data-sap-ui-resource-roots='{
+					"local": "./"
+				}'
+		>
+		</script>
+
+		<script id="myXml" type="text/xml">
+			<mvc:View xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" xmlns:unified="sap.ui.unified" controllerName="myController" displayBlock="true">
+				<App>
+					<Page title="Fileuploader Example">
+						<OverflowToolbar>
+							<Button text="Action" />
+							<unified:FileUploader buttonOnly="true" uploadButtonText="Upload"/>
+							<unified:FileUploader buttonOnly="false" uploadButtonText="Upload"/>
+						</OverflowToolbar>
+						<unified:FileUploader buttonOnly="true" uploadButtonText="Upload"/>
+						<unified:FileUploader buttonOnly="false" uploadButtonText="Upload"/>
+					</Page>
+				</App>
+			</mvc:View>
+		</script>
+
+		
+
+	</head>
+	<body id="content" class="sapUiBody">
+	</body>
+</html>

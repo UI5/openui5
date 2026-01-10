@@ -88,6 +88,7 @@ sap.ui.define([
 				onAfterRendering: function() {
 					oObjectPageLayout._adjustTitlePositioning();
 					this._clearAnchorBarFixedHeight(oAnchorBar);
+					this._applyAriaAttributes();
 				}.bind(this)
 			});
 
@@ -137,6 +138,8 @@ sap.ui.define([
 			$oAnchorBar.attr("aria-label", oFormattedLandmarkInfo.label);
 		} else if (this._oLandmarkInfo?.getNavigationRole() !== coreLibrary.AccessibleLandmarkRole.None) {
 			$oAnchorBar.attr("aria-label", oRb.getText("NAVIGATION_ROLE_DESCRIPTION"));
+		} else {
+			$oAnchorBar.removeAttr("aria-label");
 		}
 	};
 

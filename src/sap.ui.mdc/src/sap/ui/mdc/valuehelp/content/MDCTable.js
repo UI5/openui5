@@ -99,7 +99,9 @@ sap.ui.define([
 				return this._isContextSelected(oContext, this.getConditions());
 			}));
 		}
-		this._bSelectionIsUpdating = false;
+		setTimeout(() => {
+			this._bSelectionIsUpdating = false;
+		}, 0);
 	};
 
 	MDCTable.prototype.handleConditionsUpdate = function(oChanges) {

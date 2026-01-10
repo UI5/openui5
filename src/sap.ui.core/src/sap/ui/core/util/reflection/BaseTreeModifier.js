@@ -976,7 +976,6 @@ sap.ui.define([
 		 * @param {string} sExtensionPointName - Name of the extension point
 		 * @param {sap.ui.core.mvc.View|Element} oView - View control or XML node of the view
 		 * @returns {Promise<{parent: object, aggregation: string, index: number, defaultContent: array}>} - Object containing parent control, aggregation name, index and the defaultContent of the extension point if exists. It is wrapped in a Promise
-		 * @experimental
 		 */
 		getExtensionPointInfo: function(sExtensionPointName, oView) {}
 	};

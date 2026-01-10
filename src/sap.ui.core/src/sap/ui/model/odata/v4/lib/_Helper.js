@@ -2881,11 +2881,12 @@ sap.ui.define([
 
 		/**
 		 * Updates the old object with the new object. Only existing properties of the old object
-		 * are updated. Fires change events for all changed properties. The function recursively
-		 * handles modified, added or removed structural properties and fires change events for all
-		 * modified/added/removed primitive properties therein. Also fires change events for new
-		 * advertised actions. It also fires for each collection encountered, no matter if changed
-		 * or not.
+		 * are updated. Properties with pending user input are not updated (see
+		 * <code>bUpdating</code> property of {@link _Helper.makeUpdateData}). Fires change events
+		 * for all changed properties. The function recursively handles modified, added or removed
+		 * structural properties and fires change events for all modified/added/removed primitive
+		 * properties therein. Also fires change events for new advertised actions. It also fires
+		 * for each collection encountered, no matter if changed or not.
 		 *
 		 * Restrictions:
 		 * - oOldObject and oNewObject are expected to have the same structure: when there is an
@@ -2931,7 +2932,8 @@ sap.ui.define([
 							_Helper.fireChanges(mChangeListeners, sPropertyPath, vNewProperty,
 								false);
 						}
-					} else if (vOldProperty !== vNewProperty) {
+					} else if (vOldProperty !== vNewProperty
+							&& !oOldObject[sProperty + "@$ui5.updating"]) {
 						oOldObject[sProperty] = vNewProperty;
 						if (vOldProperty && typeof vOldProperty === "object") {
 							// a structural property was removed

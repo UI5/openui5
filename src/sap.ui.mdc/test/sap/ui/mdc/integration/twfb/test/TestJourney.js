@@ -2,20 +2,24 @@
  * ${copyright}
  */
 
-/* global QUnit */
+/* global QUnit, sinon */
 
 sap.ui.define([
 	"sap/ui/test/Opa5",
 	"test-resources/sap/ui/mdc/testutils/opa/valueHelp/Actions",
 	"test-resources/sap/ui/mdc/testutils/opa/filterfield/Actions",
 	"sap/ui/test/opaQunit",
-	"sap/ui/events/KeyCodes"
+	"sap/ui/events/KeyCodes",
+	"sap/ui/test/actions/Press",
+	"sap/ui/test/matchers/PropertyStrictEquals"
 ], function(
 	Opa5,
 	ValueHelpActions,
 	FilterFieldActions,
 	opaTest,
-	KeyCodes
+	KeyCodes,
+	Press,
+	PropertyStrictEquals
 ) {
 	"use strict";
 
@@ -417,6 +421,64 @@ sap.ui.define([
 		//I press the Go button (or press enter in the search field)
 		When.onTheMDCFilterBar.iExpectSearch(sFilterBarID);
 
+		Then.iTeardownMyAppFrame();
+	});
+
+	opaTest("twfb - when resetting invalid field with variant management, no error should occur", function(Given, When, Then) {
+		Given.iStartMyAppInAFrame({source: "test-resources/sap/ui/mdc/internal/TableWithFilterBar/index.html"});
+
+		const sAppBaseId = "container-v4demo---books";
+		const sFilterBarId = sAppBaseId + "--booksFilterBar";
+		const sSearchButtonId = sFilterBarId + "-btnSearch";
+		const sVariantManagementId = sAppBaseId + "--IDVariantManagementOfTable-vm-trigger";
+
+		// Enter invalid value into Language filter field
+		When.onTheMDCFilterField.iEnterTextOnTheFilterField({ label: "Language" }, "1234");
+
+		// Open variant management and reset to standard variant
+		When.waitFor({
+			id: sVariantManagementId,
+			success: function (oVariantBtn) {
+				new Press().executeOn(oVariantBtn);
+
+				When.waitFor({
+					controlType: "sap.ui.core.Item",
+					matchers: new PropertyStrictEquals({name: "text", value: "Standard"}),
+					success: function(aItems) {
+						// reset to standard variant
+						new Press().executeOn(aItems[0]);
+
+						// Verify filter field has been reset
+						Then.onTheMDCFilterField.iShouldSeeTheFilterFieldWithValues({ label: "Language" }, "");
+
+						When.waitFor({
+							id: sFilterBarId,
+							success: function (oFilterBar) {
+								// If an error message is shown, it is called from within visualizeValidationState in the FilterBar delegate
+								const visualizeSpy = sinon.spy(oFilterBar.getControlDelegate(), "visualizeValidationState");
+
+								When.waitFor({
+									id: sSearchButtonId,
+									success: function (oSearchBtn) {
+										// Trigger the "go" button
+										new Press().executeOn(oSearchBtn);
+
+										// Give some time to the filterBar to process the search and call the delegate methods
+										When.iWaitForPromise(new Promise(function (resolve) { setTimeout(resolve, 100);})).then(() => {
+											// Verify that visualizeValidationState was called with a "NoError" status
+											Opa5.assert.strictEqual(visualizeSpy.getCall(0).args[1].status, "NoError", "No error message box shown");
+											visualizeSpy.restore();
+										});
+									}
+								});
+							}
+						});
+					}
+				});
+			}
+		});
+
+		// Reset the app
 		Then.iTeardownMyAppFrame();
 	});
 

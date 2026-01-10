@@ -817,10 +817,12 @@ sap.ui.define([
 	QUnit.test("updateExisting: simple", function (assert) {
 		var oCacheData = {
 				"@$ui5._" : {predicate : "('1')"},
+				AnotherNote : null,
 				DeliveryDate : null,
-				SalesOrderItemID : "000100",
 				Note : "old",
-				AnotherNote : null
+				QuantityUnit : "EA", // don't update if there is a pending user input
+				"QuantityUnit@$ui5.updating" : true,
+				SalesOrderItemID : "000100"
 			},
 			mChangeListeners = {},
 			oHelperMock = this.mock(_Helper);
@@ -833,18 +835,21 @@ sap.ui.define([
 
 		// code under test
 		_Helper.updateExisting(mChangeListeners, "SO_2_SOITEM", oCacheData, {
+			AnotherNote : "newAnotherNote",
 			DeliveryDate : null,
-			Note : "new",
 			Foo : "bar",
-			AnotherNote : "newAnotherNote"
+			Note : "new",
+			QuantityUnit : "PC"
 		});
 
 		assert.deepEqual(oCacheData, {
 			"@$ui5._" : {predicate : "('1')"},
+			AnotherNote : "newAnotherNote",
 			DeliveryDate : null,
-			SalesOrderItemID : "000100",
 			Note : "new",
-			AnotherNote : "newAnotherNote"
+			QuantityUnit : "EA",
+			"QuantityUnit@$ui5.updating" : true,
+			SalesOrderItemID : "000100"
 		});
 	});
 

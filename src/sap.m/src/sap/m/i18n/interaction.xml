@@ -204,13 +204,25 @@
 			<kbd>Alt + ArrowUp</kbd>
 			<kbd>Alt + ArrowDown</kbd>
 			<description>
-				<p>Opens the variant management.</p>
-			</description>
+				<p>Opens the view management.</p>
+			</description> 
 		</interaction>
 		<interaction>
 			<kbd>PageUp</kbd>
 			<description>
-				<p>Closes the error popover of the variant management</p>
+				<p>Closes the error popover of the view management</p>
+			</description>
+		</interaction>
+		<interaction>
+			<kbd>Ctrl + Enter</kbd>
+			<description>
+				<p>Saves the new view in the Save As dialog.</p>
+			</description>
+		</interaction>
+		<interaction>
+			<kbd>Ctrl + S</kbd>
+			<description>
+				<p>Saves the changes made to the views.</p>
 			</description>
 		</interaction>
 	</control-interactions>
