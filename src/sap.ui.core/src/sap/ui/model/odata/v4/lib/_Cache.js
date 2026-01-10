@@ -587,6 +587,10 @@ sap.ui.define([
 						that.mLateExpandSelect || that.mQueryOptions, sPath
 					).$select;
 				}
+				// update all existing properties (including the properties of the initial data)
+				// except properties with pending user input
+				_Helper.updateExisting(that.mChangeListeners, sResultingPath, oEntityData,
+					oCreatedEntity);
 				// update selected properties (or in case of a deep create all of them incl.
 				// single-valued navigation properties), ETags, and predicates
 				_Helper.updateSelected(that.mChangeListeners, sResultingPath, oEntityData,

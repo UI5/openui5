@@ -198,7 +198,14 @@ sap.ui.define([
 
 	QUnit.test("MenuButton (Split) aria-expanded attribute", function (assert) {
 		this.sut.setButtonMode("Split");
-		var oButton = this.sut._getButtonControl()._getArrowButton();
+		const oButton = this.sut._getButtonControl()._getArrowButton();
+		const oFakeEvent = {
+			originalEvent: {
+				keyCode: 40,
+				metaKey: true
+			}
+		};
+
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
 
 		// assert
@@ -206,7 +213,7 @@ sap.ui.define([
 			"aria-expanded is initially set to false on the internal button");
 
 		// act
-		oButton.firePress();
+		oButton.firePress(oFakeEvent);
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
 
 		// assert
@@ -236,13 +243,19 @@ sap.ui.define([
 
 	QUnit.test("MenuButton in Split aria-controls placement", function (assert) {
 		this.sut.setButtonMode(MenuButtonMode.Split);
+		const oFakeEvent = {
+			originalEvent: {
+				keyCode: 40,
+				metaKey: true
+			}
+		};
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
 
 		var oArrowButton = this.sut._getButtonControl()._getArrowButton(),
 			oArrowButtonDomRef = oArrowButton.getDomRef(),
 			sId = `${this.sut.getMenu().getId()}-rp-popover`;
 
-		oArrowButton.firePress();
+		oArrowButton.firePress(oFakeEvent);
 		assert.strictEqual(oArrowButtonDomRef.getAttribute("aria-controls"), sId,
 		"aria-controls is placed on the internal arrow button and it holds the menu's id");
 
@@ -811,6 +824,8 @@ sap.ui.define([
 	QUnit.test("Open with keyboard", function(assert) {
 		var fnHandleButtonPress = sinon.spy(this.sut, "_handleButtonPress"),
 			oEvent = {
+				keyCode: 40,
+				metaKey: true,
 				stopPropagation: function() {}
 			},
 			fnStopPropagationSpy = sinon.spy(oEvent, "stopPropagation"),
@@ -855,6 +870,9 @@ sap.ui.define([
 	QUnit.test("Open with keyboard in split mode", function(assert) {
 		var fnHandleButtonPress = sinon.spy(this.sut, "_handleButtonPress"),
 			oEvent = {
+					originalEvent: {keyCode: 40,
+					metaKey: true
+				},
 				preventDefault: function() {},
 				stopImmediatePropagation: function() {}
 			},
@@ -1068,9 +1086,15 @@ sap.ui.define([
 			beforeMenuOpen : function () {}
 		});
 		this.sut.placeAt("content");
+		const oFakeEvent = {
+			originalEvent: {
+				keyCode: 40,
+				metaKey: true
+			}
+		};
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
 
-		var fnFireDefaultAction = sinon.spy(this.sut, "fireDefaultAction"),
+		const fnFireDefaultAction = sinon.spy(this.sut, "fireDefaultAction"),
 			fnFireBeforeMenuOpen = sinon.spy(this.sut, "fireBeforeMenuOpen");
 		this.sut.getAggregation('_button').firePress();
 
@@ -1079,10 +1103,12 @@ sap.ui.define([
 		assert.strictEqual(jQuery('.sapMMenuBtnSplit').length, 1, 'Split button rendered');
 		assert.strictEqual(fnFireDefaultAction.calledOnce, true, 'Default action called.');
 
-		this.sut.getAggregation('_button').getAggregation('_arrowButton').firePress();
+		this.sut.getAggregation('_button').getAggregation('_arrowButton').firePress(oFakeEvent);
 		assert.strictEqual(fnFireBeforeMenuOpen.calledOnce, true, 'BeforeMenuOpen event fired.');
 
-		var handlerCalled = 0;
+		this.sut.getAggregation('_button').getAggregation('_arrowButton').firePress(oFakeEvent);
+
+		let handlerCalled = 0;
 		this.oMenu = new Menu({
 			items : [
 				new MenuItem({text: 'item1'}),
@@ -1093,7 +1119,7 @@ sap.ui.define([
 			}
 		});
 		this.sut.setMenu(this.oMenu);
-		this.sut.getAggregation('_button')._getArrowButton().firePress();
+		this.sut.getAggregation('_button')._getArrowButton().firePress(oFakeEvent);
 		this.clock.tick(1000);
 		this.sut.getMenu().fireItemSelected({item: this.sut.getMenu().getItems()[0]});
 		this.clock.tick(1000);

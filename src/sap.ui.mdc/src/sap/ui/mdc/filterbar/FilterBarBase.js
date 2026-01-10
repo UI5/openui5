@@ -1993,6 +1993,9 @@ sap.ui.define([
 				//clean-up fields in error state
 				this.cleanUpAllFilterFieldsInErrorState();
 
+				// Clear internally tracked changes of FilterFields for async validation
+				this._aFIChanges = null;
+
 				// ensure that the initial filters are applied --> only trigger search & validate when no filterbar changes exists.
 				// Filterbar specific changes will be handled via _onModifications.
 				if (this._bInitialFiltersApplied && ((aAffectedControllers.indexOf("Filter") === -1))) {

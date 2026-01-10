@@ -11250,6 +11250,11 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// Scenario: Create a sales order w/o key properties, enter a note, then submit the batch
 	//
 	// When using bSkipRefresh, the created() promise must not wait for that GET (BCP: 2270083632)
+	//
+	// If an entity is created with initial data and after creation the server returns an updated
+	// value for that initial data, the value is taken into the cache even if the updated property
+	// is not part of $select.
+	// SNOW: DINC0641799
 	[false, true].forEach(function (bSkipRefresh) {
 		QUnit.test("Create with user input - bSkipRefresh: " + bSkipRefresh, function (assert) {
 			var oCreatedContext,
@@ -11290,14 +11295,17 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					.expectChange("buyerID", ["24", "23"]);
 
 				oCreatedContext = oTable.getBinding("items")
-					.create({BuyerID : "24", Note : "bar"}, bSkipRefresh);
+					.create({BillingStatus : "", BuyerID : "24", Note : "bar"}, bSkipRefresh);
 				oTable.getItems()[0].getCells()[0].getBinding("value").setValue("baz");
+
+				assert.strictEqual(oCreatedContext.getProperty("BillingStatus"), "");
 
 				return that.waitForChanges(assert);
 			}).then(function () {
 				that.expectRequest("POST SalesOrderList", {
-						payload : {BuyerID : "24", Note : "baz"}
+						payload : {BillingStatus : "", BuyerID : "24", Note : "baz"}
 					}, {
+						BillingStatus : "N", // updated property which is not part of $select
 						// no BuyerID (JIRA: CPOUI5ODATAV4-1503)
 						Note : "from server",
 						SalesOrderID : "43"
@@ -11344,12 +11352,27 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					bSkipRefresh ? undefined : "456");
 
 				if (bSkipRefresh) {
+					// code under test - updated server value is taken into the cache even if the
+					// property is not part of $select (SNOW: DINC0641799)
+					assert.strictEqual(oCreatedContext.getProperty("BillingStatus"), "N");
+
 					that.expectChange("companyName", ["ACM"]);
 
 					fnResolve();
 
 					return that.waitForChanges(assert);
 				}
+
+				that.oLogMock.expects("error")
+					.withExactArgs("Failed to drill-down into ('43')/BillingStatus,"
+							+ " invalid segment: BillingStatus",
+						sSalesOrderService + "SalesOrderList?$select=BuyerID,Note,SalesOrderID"
+							+ "&$expand=SO_2_BP($select=BusinessPartnerID,CompanyName)",
+						"sap.ui.model.odata.v4.lib._Cache");
+
+				// code under test - after refresh BillingStatus is gone as it is not in $select;
+				// property needs to be requested separately
+				assert.strictEqual(oCreatedContext.getProperty("BillingStatus"), undefined);
 			}).then(function () {
 				assert.strictEqual(oCreatedContext.getProperty("SO_2_BP/BusinessPartnerID"), "456");
 			});

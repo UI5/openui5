@@ -45,8 +45,7 @@
 					<f:actions>
 						<Button
 							text="Edit"
-							type="Emphasized"
-							press="toggleAreaPriority" />
+							type="Emphasized"/>
 						<Button
 							text="Delete"
 							type="Transparent" />

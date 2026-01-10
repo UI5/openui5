@@ -10,6 +10,7 @@ module.exports = [
 	"CalendarMultipleMonths.spec.js",
 	"CalendarSingleDaySelection.spec.js",
 	"ColorPickerVisual.spec.js",
+	"FileUploaderVisual.spec.js",
 	"MenuVisual.spec.js",
 	"YearRangePicker.spec.js"
 ];

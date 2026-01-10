@@ -141,7 +141,7 @@ sap.ui.define([
 		oColSearch.addItem(new Item({key: "cs1", text: "col Search 1"}));
 		oColSearch.addItem(new Item({key: "cs2", text: "col Search 2"}));
 
-		oColSearch.onkeyup({which : keyCodes.F4});
+		oColSearch.onkeyup({keyCode : keyCodes.F4});
 		await new Promise((resolve) => {setTimeout(resolve, 100);}); //wait until open triggered
 		await nextUIUpdate();
 

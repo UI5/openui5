@@ -9471,10 +9471,6 @@ sap.ui.define([
 				oCacheMock = this.mock(oCache),
 				oCancelNestedExpectation,
 				aCollection = [],
-				oCountChangeListener = {
-					onChange : function () {},
-					setDeregisterChangeListener : function () {}
-				},
 				oCreatePromise,
 				oGroupLock = {getGroupId : function () {}},
 				oHelperMock = this.mock(_Helper),
@@ -9494,11 +9490,12 @@ sap.ui.define([
 				sTransientPredicate = "($uid=id-1-23)",
 				oTransientPromiseWrapper,
 				mTypeForMetaPath = {},
-				oUpdateNestedExpectation;
+				oUpdateExistingExpectation,
+				oUpdateNestedExpectation,
+				oUpdateSelectedExpectation;
 
 			oCache.fetchValue = function () {};
 			oCache.mLateExpandSelect = mLateExpandSelect;
-			aCollection.$count = 0;
 			aCollection.$created = 0;
 			oHelperMock.expects("clone").withExactArgs(sinon.match.same(oInitialData))
 				.returns(oPostBody);
@@ -9512,6 +9509,9 @@ sap.ui.define([
 				.callThrough();
 			oCacheMock.expects("getValue").withExactArgs(sPathInCache).returns(aCollection);
 			this.mock(oGroupLock).expects("getGroupId").withExactArgs().returns("updateGroup");
+			oHelperMock.expects("addToCount")
+				.withExactArgs(sinon.match.same(oCache.mChangeListeners), "('0')/TEAM_2_EMPLOYEES",
+					sinon.match.same(aCollection), 1);
 			oHelperMock.expects("setPrivateAnnotation")
 				.withExactArgs(sinon.match.same(oInitialData), "transient", "updateGroup")
 				.callThrough();
@@ -9528,7 +9528,6 @@ sap.ui.define([
 				.resolves(oPostResult);
 			this.mock(oCache).expects("fetchTypes").withExactArgs()
 				.returns(SyncPromise.resolve(mTypeForMetaPath));
-			this.mock(oCountChangeListener).expects("onChange");
 			this.mock(oCache).expects("visitResponse")
 				.withExactArgs(sinon.match.same(oPostResult), sinon.match.same(mTypeForMetaPath),
 					"/TEAMS/TEAM_2_EMPLOYEES", sPathInCache + sTransientPredicate, undefined, true);
@@ -9562,7 +9561,11 @@ sap.ui.define([
 					sinon.match.same(oInitialData), sinon.match.same(oPostResult),
 					"~$select~")
 				.returns(bDeepCreate);
-			oHelperMock.expects("updateSelected")
+			oUpdateExistingExpectation = oHelperMock.expects("updateExisting")
+				.withExactArgs(sinon.match.same(oCache.mChangeListeners),
+					sPathInCache + (bMissingPredicate ? sTransientPredicate : sPredicate),
+					sinon.match.same(oInitialData), sinon.match.same(oPostResult));
+			oUpdateSelectedExpectation = oHelperMock.expects("updateSelected")
 				.withExactArgs(sinon.match.same(oCache.mChangeListeners),
 					sPathInCache + (bMissingPredicate ? sTransientPredicate : sPredicate),
 					sinon.match.same(oInitialData), sinon.match.same(oPostResult),
@@ -9578,8 +9581,6 @@ sap.ui.define([
 			oHelperMock.expects("setPrivateAnnotation")
 				.withExactArgs(sinon.match.same(oInitialData), "deepCreate", bDeepCreate)
 				.callThrough();
-			// count is already updated when creating the transient entity
-			oCache.registerChangeListener(sPathInCache + "/$count", oCountChangeListener);
 
 			// code under test
 			oCreatePromise = oCache.create(oGroupLock, SyncPromise.resolve(sPostPath), sPathInCache,
@@ -9588,20 +9589,15 @@ sap.ui.define([
 			// initial data is synchronously available
 			assert.strictEqual(aCollection[0], oInitialData);
 			assert.strictEqual(aCollection.$byPredicate[sTransientPredicate], oInitialData);
-			assert.strictEqual(aCollection.$count, 1);
 			assert.strictEqual(aCollection.$created, 1);
 
 			oTransientPromiseWrapper = SyncPromise.resolve(oInitialData["@$ui5._"].transient);
 			assert.ok(oTransientPromiseWrapper.isPending()); // of course...
 
 			// request is added to mPostRequests
-			assert.ok(_Helper.addByPath.calledTwice);
-			sinon.assert.calledWithExactly(_Helper.addByPath.firstCall,
-				{"('0')/TEAM_2_EMPLOYEES/$count" : [oCountChangeListener]},
-				"('0')/TEAM_2_EMPLOYEES/$count", sinon.match.same(oCountChangeListener));
-			sinon.assert.calledWithExactly(_Helper.addByPath.secondCall,
-				sinon.match.same(oCache.mPostRequests), sPathInCache,
-				sinon.match.same(oInitialData));
+			assert.ok(
+				_Helper.addByPath.calledOnceWithExactly(sinon.match.same(oCache.mPostRequests),
+					sPathInCache, sinon.match.same(oInitialData)));
 
 			oCache.registerChangeListener(sPathInCache + sTransientPredicate + "/Name", {
 				onChange : function () {
@@ -9631,7 +9627,6 @@ sap.ui.define([
 					Name : "John Doe"
 				});
 				assert.strictEqual(aCollection[0].ID, "7", "from Server");
-				assert.strictEqual(aCollection.$count, 1);
 				assert.deepEqual(aSelectForPath, ["ID", "Name"], "$select unchanged");
 				if (bDropTransientElement) {
 					assert.notOk(sPredicate in aCollection.$byPredicate);
@@ -9647,7 +9642,8 @@ sap.ui.define([
 				sinon.assert.calledOnceWithExactly(_Helper.removeByPath,
 					sinon.match.same(oCache.mPostRequests), sPathInCache,
 					sinon.match.same(oInitialData));
-				sinon.assert.callOrder(oCancelNestedExpectation, oUpdateNestedExpectation);
+				sinon.assert.callOrder(oCancelNestedExpectation, oUpdateNestedExpectation,
+					oUpdateExistingExpectation, oUpdateSelectedExpectation);
 			});
 		});
 			});
@@ -10056,6 +10052,9 @@ sap.ui.define([
 		oCacheMock.expects("visitResponse")
 			.withExactArgs(sinon.match.same(oPostResult), sinon.match.same(mTypeForMetaPath),
 				"/Employees", sTransientPredicate, undefined, true);
+		oHelperMock.expects("updateExisting")
+			.withExactArgs(sinon.match.same(oCache.mChangeListeners), sTransientPredicate,
+				sinon.match.same(oCache.aElements[0]), sinon.match.same(oPostResult));
 		oHelperMock.expects("updateSelected")
 			.withExactArgs(sinon.match.same(oCache.mChangeListeners), sTransientPredicate,
 				sinon.match.same(oCache.aElements[0]), sinon.match.same(oPostResult), undefined,
@@ -10464,6 +10463,10 @@ sap.ui.define([
 			.withExactArgs(sinon.match.same(oCache.mChangeListeners), sTransientPredicate,
 				sinon.match.same(oCache.aElements[bAtEndOfCreated ? 1 : 0]), {Name : "foo"})
 			.callThrough();
+		oHelperMock.expects("updateExisting")
+			.withExactArgs(sinon.match.same(oCache.mChangeListeners), sTransientPredicate,
+				sinon.match.same(oCache.aElements[bAtEndOfCreated ? 1 : 0]),
+				sinon.match.same(oResponseData));
 		oHelperMock.expects("updateSelected")
 			.withExactArgs(sinon.match.same(oCache.mChangeListeners), sTransientPredicate,
 				sinon.match.same(oCache.aElements[bAtEndOfCreated ? 1 : 0]),

@@ -19,6 +19,7 @@
 		.sapMInputBaseContentWrapper {
 			box-shadow: none !important; /* cannot remove !important because of different DOM structure and impossibility to override the selector that originally introduces border-shadow */
  			border: var(--sapField_BorderWidth) var(--sapField_BorderStyle) var(--sapField_BorderColor);
+			border-radius: --sapButton_BorderCornerRadius;
  			background: transparent;
 			padding: 0;
 			height: 100%;
@@ -180,6 +181,22 @@
 	height: 3rem;
 }
 
+/* Vertical alignment of button-only FileUploader in Bar */
+/* ensure FileUploader in Bar (sapMBarChild) centers its content */
+.sapUiFup.sapUiFupButtonOnly.sapMBarChild {
+	display: inline-flex;
+	align-items: center;
+	height: var(--sapElement_Height);
+}
+
+/* make the button full height and remove its vertical margin */
+.sapUiFup.sapUiFupButtonOnly .sapMBtn {
+	margin: 0;
+	height: var(--sapElement_Height);
+	align-items: center;
+	justify-content: center;
+}
+
 .sapUiSizeCompact {
 
 	.sapUiFup.sapMBarChild {
@@ -203,7 +220,6 @@
 
 		.sapUiFupTokenizer {
 			padding-inline: 0.125rem 4.25rem;
-
 		}
 
 		.sapMTokenizer .sapMTokenizerScrollContainer {
@@ -211,6 +227,14 @@
 		}
 	}
 
+	.sapMBarChild .sapUiFup.sapUiFupButtonOnly,
+	.sapUiFup.sapUiFupButtonOnly.sapMBarChild {
+		height: var(--sapElement_Compact_Height);
+	}
+	/* make the button full height and remove its vertical margin */
+	.sapUiFup.sapUiFupButtonOnly .sapMBtn {
+		height: var(--sapElement_Compact_Height);
+	}
 }
 
 .sapUiCFUM .sapUiFupInputMask,

@@ -279,7 +279,7 @@ sap.ui.define([
 			sinon.stub(this._oVM, "_openVariantList");
 
 			this._oVM.onkeyup({
-				which: 32
+				keyCode: 32
 			});
 
 			assert.ok(this._oVM._openVariantList.called);

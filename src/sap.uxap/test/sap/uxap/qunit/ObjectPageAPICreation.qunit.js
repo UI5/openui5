@@ -4060,6 +4060,37 @@ function(
 		oObjectPage.destroy();
 	});
 
+	QUnit.test("ObjectPage landmark info aria-label is applied to dynamically shown anchor bar", async function(assert) {
+	var oObjectPage = helpers.generateObjectPageWithContent(oFactory, 1, true),
+		oLandmarkInfo = new ObjectPageAccessibleLandmarkInfo({
+			navigationRole: "Navigation",
+			navigationLabel: "Custom Navigation Label"
+		}),
+		oSubSection = oFactory.getSubSection(1, oFactory.getBlocks()),
+		oNewSection = oFactory.getSection(2, null, oSubSection);
+
+	oObjectPage.setLandmarkInfo(oLandmarkInfo);
+	oObjectPage.placeAt('qunit-fixture');
+	await nextUIUpdate();
+
+	// Initially with 1 section, anchor bar exists but is empty
+	var oAnchorBar = oObjectPage.getAggregation("_anchorBar");
+	assert.ok(oAnchorBar, "Anchor bar aggregation exists.");
+	assert.strictEqual(oAnchorBar.getItems().length, 0, "Anchor bar is empty with only one section.");
+
+	// Add a second section dynamically to trigger anchor bar population
+	oObjectPage.addSection(oNewSection);
+	await nextUIUpdate();
+
+	// Now anchor bar should be populated and have the correct aria-label
+	assert.strictEqual(oAnchorBar.getItems().length, 2, "Anchor bar now has items after adding second section.");
+
+	var $anchorBar = oAnchorBar.$();
+	assert.strictEqual($anchorBar.attr("role"), "navigation", "Navigation role is set correctly on dynamically shown anchor bar.");
+	assert.strictEqual($anchorBar.attr("aria-label"), "Custom Navigation Label", "Navigation label is set correctly on dynamically shown anchor bar.");
+
+	oObjectPage.destroy();
+});
 
 	QUnit.module("ObjectPageLayout - API - headerContentPinned property", {
 		beforeEach: async function () {

@@ -8,6 +8,24 @@
 	height: var(--sapElement_Height);
 }
 
+.sapMFocus.sapMInputBase.sapUiFupButtonOnly .sapMInputBaseContentWrapper:not(.sapMInputBaseDisabledWrapper) {
+	&::before {
+		border: 0.125rem solid var(--sapContent_FocusColor);
+		border-radius: 0.375rem;
+		left: 0.0625rem;
+		top: 0.0625rem;
+		right: 0.0625rem;
+		bottom: 0.0625rem;
+	}
+}
+
+.sapUiFup .sapMInputBase.sapUiFupButtonOnly .sapMInputBaseContentWrapper {
+	margin: 0;
+	height: 100%;
+	display: inline-flex;
+	align-items: center;
+}
+
 .sapUiSizeCompact {
 
 	.sapUiFup,
