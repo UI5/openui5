@@ -46,8 +46,7 @@
 									type="Transparent"/>
 							<m:Button
 									text="Toggle Footer"
-									type="Transparent"
-									press="onToggleFooter"/>
+									type="Transparent"/>
 							<m:Button
 									icon="sap-icon://action"
 									type="Transparent"/>

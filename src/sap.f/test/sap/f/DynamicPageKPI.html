@@ -1,22 +1,22 @@
 <!DOCTYPE HTML>
 <html>
 <head><meta charset="utf-8">
-    <title>sap.f.DynamicPage test page</title>
+	<title>sap.f.DynamicPage test page</title>
 
-    <script src="shared-config.js"></script>
-    <script id="sap-ui-bootstrap"
-            src="../../../resources/sap-ui-core.js"
-            data-sap-ui-libs="sap.m, sap.f"
-            data-sap-ui-on-init="module:local/DynamicPageKPI"
-            data-sap-ui-resource-roots='{
-            	"local": "./"
-            }'
-    >
-    </script>
+	<script src="shared-config.js"></script>
+	<script id="sap-ui-bootstrap"
+			src="../../../resources/sap-ui-core.js"
+			data-sap-ui-libs="sap.m, sap.f"
+			data-sap-ui-on-init="module:local/DynamicPageKPI"
+			data-sap-ui-resource-roots='{
+				"local": "./"
+			}'
+	>
+	</script>
 
-    <link rel="stylesheet" href="./DynamicPageKPI.css">
+	<link rel="stylesheet" href="./DynamicPageKPI.css">
 
-    <script id="view1" type="text/xml">
+	<script id="view1" type="text/xml">
 		<core:View
 			id="view1"
 			height="100%"
@@ -33,40 +33,39 @@
 							<Title text="This is the complete list of my products"/>
 						</f:heading>
 						<f:expandedContent>
-                            <Text text="This is a subheading about the long complete list of products"/>
-                        </f:expandedContent>
+							<Text text="This is a subheading about the long complete list of products"/>
+						</f:expandedContent>
 						<f:content>
-                            <OverflowToolbar>
-                                <Button text="KPI 1" />
-                                <Button text="KPI 2" />
-                                <Button text="KPI 3" />
-                                <Button text="KPI 4" />
-                                <Button text="KPI 5" />
-                                <Button text="KPI 6" />
-                                <Button text="KPI 7" />
-                                <Button text="KPI 8" />
-                                <Button text="KPI 9" />
-                                <Button text="KPI 10" />
-                            </OverflowToolbar>
-					    </f:content>
-					    <f:actions>
-                            <Button
-                                    text="Edit"
-                                    type="Emphasized"/>
-                            <Button
-                                    text="Delete"
-                                    type="Transparent"/>
-                            <Button
-                                    text="Copy"
-                                    type="Transparent"/>
-                            <Button
-                                    text="Toggle Footer"
-                                    type="Transparent"
-                                    press="onToggleFooter"/>
-                            <Button
-                                    icon="sap-icon://action"
-                                    type="Transparent"/>
-                        </f:actions>
+							<OverflowToolbar>
+								<Button text="KPI 1" />
+								<Button text="KPI 2" />
+								<Button text="KPI 3" />
+								<Button text="KPI 4" />
+								<Button text="KPI 5" />
+								<Button text="KPI 6" />
+								<Button text="KPI 7" />
+								<Button text="KPI 8" />
+								<Button text="KPI 9" />
+								<Button text="KPI 10" />
+							</OverflowToolbar>
+						</f:content>
+						<f:actions>
+							<Button
+									text="Edit"
+									type="Emphasized"/>
+							<Button
+									text="Delete"
+									type="Transparent"/>
+							<Button
+									text="Copy"
+									type="Transparent"/>
+							<Button
+									text="Toggle Footer"
+									type="Transparent"/>
+							<Button
+									icon="sap-icon://action"
+									type="Transparent"/>
+						</f:actions>
 					</f:DynamicPageTitle>
 				</f:title>
 

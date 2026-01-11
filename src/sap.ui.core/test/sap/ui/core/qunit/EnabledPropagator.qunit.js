@@ -7,15 +7,18 @@ sap.ui.define([
 	"use strict";
 
 	var CustomControl = Control.extend("CustomControl", {
-		renderer: function(oRM, oControl) {
-			oRM.openStart("button", oControl);
+		renderer: {
+			apiVersion: 2,
+			render: function(oRM, oControl) {
+				oRM.openStart("button", oControl);
 
-			if (!oControl.getEnabled()) {
-				oRM.attr("disabled", "");
+				if (!oControl.getEnabled()) {
+					oRM.attr("disabled", "");
+				}
+
+				oRM.openEnd();
+				oRM.close("button");
 			}
-
-			oRM.openEnd();
-			oRM.close("button");
 		}
 	});
 
@@ -26,15 +29,18 @@ sap.ui.define([
 				enabled: {type: 'boolean', defaultValue: true}
 			}
 		},
-		renderer: function(oRM, oControl) {
-			oRM.openStart("button", oControl);
+		renderer: {
+			apiVersion: 2,
+			render: function(oRM, oControl) {
+				oRM.openStart("button", oControl);
 
-			if (!oControl.getEnabled()) {
-				oRM.attr("disabled", "");
+				if (!oControl.getEnabled()) {
+					oRM.attr("disabled", "");
+				}
+
+				oRM.openEnd();
+				oRM.close("button");
 			}
-
-			oRM.openEnd();
-			oRM.close("button");
 		}
 	});
 	var CustomContainerControl = Control.extend("CustomContainerControl", {
@@ -47,12 +53,15 @@ sap.ui.define([
 				content: {type: "sap.ui.core.Control", multiple: false}
 			}
 		},
-		renderer: function(oRM, oControl) {
-			oRM.openStart("div", oControl);
-			oRM.attr("tabindex", "0");
-			oRM.openEnd();
-			oRM.renderControl(oControl.getContent());
-			oRM.close("div");
+		renderer: {
+			apiVersion: 2,
+			render: function(oRM, oControl) {
+				oRM.openStart("div", oControl);
+				oRM.attr("tabindex", "0");
+				oRM.openEnd();
+				oRM.renderControl(oControl.getContent());
+				oRM.close("div");
+			}
 		}
 	});
 

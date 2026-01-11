@@ -310,7 +310,7 @@ sap.ui.define(['sap/ui/base/ManagedObject', 'sap/ui/base/ManagedObjectObserver',
 				}
 			},
 
-			renderer: function(oRm, oControl) {}
+			renderer: null // no renderer needed
 		});
 
 

@@ -68,8 +68,6 @@ sap.ui.define([
 				});
 		},
 
-		renderer: function () {
-			D3Chart.prototype.getRenderer().render.apply(this, arguments);
-		}
+		renderer: D3Chart.prototype.getRenderer()
 	});
 });

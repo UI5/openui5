@@ -81,14 +81,17 @@ sap.ui.define([
 			});
 		},
 
-		renderer(oRm, oControl) {
-			oRm.openStart("div", oControl);
-			oRm.class("myAppDemoWTProductRating");
-			oRm.openEnd();
-			oRm.renderControl(oControl.getAggregation("_rating"));
-			oRm.renderControl(oControl.getAggregation("_label"));
-			oRm.renderControl(oControl.getAggregation("_button"));
-			oRm.close("div");
+		renderer: {
+			apiVersion: 2,
+			render(oRm, oControl) {
+				oRm.openStart("div", oControl);
+				oRm.class("myAppDemoWTProductRating");
+				oRm.openEnd();
+				oRm.renderControl(oControl.getAggregation("_rating"));
+				oRm.renderControl(oControl.getAggregation("_label"));
+				oRm.renderControl(oControl.getAggregation("_button"));
+				oRm.close("div");
+			}
 		}
 	});
 });

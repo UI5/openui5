@@ -9,9 +9,7 @@ sap.ui.define(['sap/ui/core/Control'], function(Control) {
 		init: function() {
 			//initialize
 		},
-		renderer: function() {
-			//render
-		}
+		renderer: null // no renderer needed
 	});
 
 	BadControl.prototype.toString = function() {
