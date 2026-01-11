@@ -25,7 +25,7 @@ sap.ui.define([
 		getTitleId: function () {
 			return this.getReturnTitleId() ? this.getId() + "-Title" : undefined;
 		},
-		renderer: function () {}
+		renderer: null // no renderer needed
 	});
 
 	// Add title propagation support to the test control

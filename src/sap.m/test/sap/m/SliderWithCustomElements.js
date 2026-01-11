@@ -67,55 +67,58 @@ sap.ui.define([
 			  dateValue: { type: "float", defaultValue: 0 }
 		  }
 	  },
-	  renderer: function (oRm, oControl) {
-		  // its a recommendation to you the base renderer as it has some special responsive behavior
-		  SliderTooltipBaseRenderer.render.apply({
-			  renderTooltipContent: function (oRm, oControl) {
+	  renderer: {
+		  apiVersion: 2,
+		  render: function (oRm, oControl) {
+			  // its a recommendation to you the base renderer as it has some special responsive behavior
+			  SliderTooltipBaseRenderer.render.apply({
+				  renderTooltipContent: function (oRm, oControl) {
 
-				  // you can write any DOM here - render controls or anything you want
-				  // (inline elements are not recommended as you need to style them on your own)
-				  oRm.openStart("<div", oControl.getId() + "-inner");
-				  oRm.class("sapCustomSliderTooltip");
+					  // you can write any DOM here - render controls or anything you want
+					  // (inline elements are not recommended as you need to style them on your own)
+					  oRm.openStart("<div", oControl.getId() + "-inner");
+					  oRm.class("sapCustomSliderTooltip");
 
-				  if (!oControl.getShowButtons()) {
-					  oRm.class("sapCustomTooltipWitouthButtons");
-				  }
-				  oRm.openEnd();
-
-				  // keep the value of each tooltip as a property
-				  var fValue = oControl.getValue();
-
-				  // you can write some value from a property here
-				  oRm.openStart("div", oControl.getId() + "-value");
-				  oRm.class("sapCustomTooltipValue");
-				  oRm.openEnd();
-
-				  // display the value
-				  oRm.text(oControl.aDays[fValue % 7] + " " + fValue + " May");
-				  oRm.close("div");
-
-				  if (oControl.getShowButtons()) {
-					  oRm.openStart("div");
-					  oRm.class("sapCustomTooltipButtons");
+					  if (!oControl.getShowButtons()) {
+						  oRm.class("sapCustomTooltipWitouthButtons");
+					  }
 					  oRm.openEnd();
 
-					  oRm.openStart("span")
-						  .class("sapCustomTooltipButton")
-						  .class("sapCustomTooltipButtonUp")
-						  .openEnd()
-						  .close("span");
-					  oRm.openStart("span")
-						  .class("sapCustomTooltipButton")
-						  .class("sapCustomTooltipButtonDown")
-						  .openEnd()
-						  .close("span");
+					  // keep the value of each tooltip as a property
+					  var fValue = oControl.getValue();
 
+					  // you can write some value from a property here
+					  oRm.openStart("div", oControl.getId() + "-value");
+					  oRm.class("sapCustomTooltipValue");
+					  oRm.openEnd();
+
+					  // display the value
+					  oRm.text(oControl.aDays[fValue % 7] + " " + fValue + " May");
 					  oRm.close("div");
 
+					  if (oControl.getShowButtons()) {
+						  oRm.openStart("div");
+						  oRm.class("sapCustomTooltipButtons");
+						  oRm.openEnd();
+
+						  oRm.openStart("span")
+							  .class("sapCustomTooltipButton")
+							  .class("sapCustomTooltipButtonUp")
+							  .openEnd()
+							  .close("span");
+						  oRm.openStart("span")
+							  .class("sapCustomTooltipButton")
+							  .class("sapCustomTooltipButtonDown")
+							  .openEnd()
+							  .close("span");
+
+						  oRm.close("div");
+
+					  }
+					  oRm.close("div");
 				  }
-				  oRm.close("div");
-			  }
-		  }, arguments);
+			  }, arguments)
+		  }
 	  }
   });
 

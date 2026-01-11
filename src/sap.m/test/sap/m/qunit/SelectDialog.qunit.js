@@ -952,9 +952,7 @@ sap.ui.define([
 			var done = assert.async(),
 				CustomItem = StandardListItem.extend("sap.my.custom.SelectDialogListItem", {
 					metadata: {},
-					renderer: function () {
-						StandardListItemRenderer.render.apply(this, arguments);
-					}
+					renderer: StandardListItemRenderer // inherit renderer
 				}),
 				oSelectionChangeSpy = this.spy(this.oSelectDialog._oList, "fireSelectionChange");
 

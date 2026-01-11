@@ -912,10 +912,13 @@ function(
 			oDummyControl,
 			done = assert.async(),
 			DummyControl = Control.extend("sap.m.DummyControl", {
-				renderer: function(oRm) {
-					oRm.openStart("div");
-					oRm.openEnd();
-					oRm.close("div");
+				renderer: {
+					apiVersion: 2,
+					render: function(oRm) {
+						oRm.openStart("div");
+						oRm.openEnd();
+						oRm.close("div");
+					}
 				}
 			});
 

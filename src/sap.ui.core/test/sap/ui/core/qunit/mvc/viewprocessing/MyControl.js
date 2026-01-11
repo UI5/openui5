@@ -18,9 +18,7 @@ sap.ui.define(['sap/ui/core/Control', './MyGlobal'], function(Control, MyGlobal)
 		init: function() {
 			//initialize
 		},
-		renderer: function() {
-			//render
-		}
+		renderer: null // no renderer needed
 	});
 
 	MyControl.prototype.toString = function() {

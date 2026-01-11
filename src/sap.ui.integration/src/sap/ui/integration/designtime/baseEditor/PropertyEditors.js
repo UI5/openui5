@@ -323,11 +323,14 @@ sap.ui.define([
 			}
 		},
 
-		renderer: function (oRm, oControl) {
-			oRm.openStart("div", oControl);
-			oRm.openEnd();
-			oRm.renderControl(oControl.getContent());
-			oRm.close("div");
+		renderer: {
+			apiVersion: 2,
+			render: function (oRm, oControl) {
+				oRm.openStart("div", oControl);
+				oRm.openEnd();
+				oRm.renderControl(oControl.getContent());
+				oRm.close("div");
+			}
 		}
 	});
 

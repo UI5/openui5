@@ -4047,10 +4047,13 @@ sap.ui.define([
 		// Arrange
 		var CustomButtonWithNoWidth = Button.extend("CustomButtonWithNoWidth", {
 			interfaces: ["sap.m.IOverflowToolbarContent"],
-			renderer: function (oRm, oControl) {
-				oRm.openStart("div", oControl);
-				oRm.openEnd();
-				oRm.close("div");
+			renderer: {
+				apiVersion: 2,
+				render: function (oRm, oControl) {
+					oRm.openStart("div", oControl);
+					oRm.openEnd();
+					oRm.close("div");
+				}
 			},
 			getOverflowToolbarConfig: function() {
 				return {
