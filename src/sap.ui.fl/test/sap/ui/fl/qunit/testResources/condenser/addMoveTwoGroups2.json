@@ -104,44 +104,6 @@
 		"creation": "2020-01-26T08:39:32.292Z"
 	},
 	{
-		"fileName": "id_1579855106890_42_moveControls",
-		"changeType": "moveControls",
-		"reference": "sap.ui.rta.test",
-		"content": {
-			"movedElements": [
-				{
-					"selector": {
-						"id": "idMain1--GeneralLedgerDocument_Header_AccountingDocumentKeyComplex_ComplexProperty01",
-						"idIsLocal": true
-					},
-					"sourceIndex": 2,
-					"targetIndex": 1
-				}
-			],
-			"source": {
-				"selector": {
-					"aggregation": "formElements",
-					"type": "sap.ui.comp.smartform.Group",
-					"id": "idMain1--GeneralLedgerDocument",
-					"idIsLocal": true
-				}
-			},
-			"target": {
-				"selector": {
-					"aggregation": "formElements",
-					"type": "sap.ui.comp.smartform.Group",
-					"id": "idMain1--Dates",
-					"idIsLocal": true
-				}
-			}
-		},
-		"selector": {
-			"id": "idMain1--MainForm",
-			"idIsLocal": true
-		},
-		"creation": "2020-01-27T08:39:32.292Z"
-	},
-	{
 		"fileName": "id_1579855106890_43_moveControls",
 		"changeType": "moveControls",
 		"reference": "sap.ui.rta.test",
