@@ -10,6 +10,7 @@ sap.ui.define([
 	"./ListItemBase",
 	"./CheckBox",
 	"./TableRenderer",
+	"./plugins/PluginBase",
 	"sap/ui/base/Object",
 	"sap/ui/core/ResizeHandler",
 	"sap/ui/core/util/PasteHelper",
@@ -22,7 +23,7 @@ sap.ui.define([
     // jQuery custom selectors ":sapTabbable"
 	"sap/ui/dom/jquery/Selectors"
 ],
-	function(ControlBehavior, library, ListBase, ListItemBase, CheckBox, TableRenderer, BaseObject, ResizeHandler, PasteHelper, jQuery, ListBaseRenderer, Icon, Util, Library, Log) {
+	function(ControlBehavior, library, ListBase, ListItemBase, CheckBox, TableRenderer, PluginBase, BaseObject, ResizeHandler, PasteHelper, jQuery, ListBaseRenderer, Icon, Util, Library, Log) {
 	"use strict";
 
 
@@ -331,15 +332,7 @@ sap.ui.define([
 	};
 
 	Table.prototype._applyContextualWidth = function(iWidth) {
-		iWidth = parseFloat(iWidth) || 0;
-
-		// when hiddenInPopin is configured, the table size increases due to popins and later decreases as popins are removed due to hiddenInPopin
-		// this can cause scrollbar to appear and disappear causing popin and popout jumping
-		// hence, the table does not change the contextual width if it is less than or equal to 16 (approx. scrollbar size)
-		if (Math.abs(this._oContextualSettings.contextualWidth - iWidth) <= 16) {
-			return;
-		}
-
+		iWidth = parseFloat(iWidth);
 		if (iWidth && this._oContextualSettings.contextualWidth != iWidth) {
 			this._applyContextualSettings({
 				contextualWidth : iWidth
@@ -1226,7 +1219,6 @@ sap.ui.define([
 			return;
 		}
 
-		var aItems = this.getItems();
 		var mPrioColumns = {
 			High: [],
 			Medium: [],
@@ -1246,48 +1238,36 @@ sap.ui.define([
 
 		aPrioColumns.reduce(function(fTotalWidth, aColumns) {
 			return Table._updateAccumulatedWidth(aColumns, oMostImportantColumn, fTotalWidth);
-		}, this._getInitialAccumulatedWidth(aItems));
+		}, this._getInitialAccumulatedWidth());
 	};
 
 	/**
 	 * Returns the sum of internal columns that are created by the table like "Mode" & "Type" as a float value.
 	 * This is required for accurately calculating the <code>minScreenWidth</code> property of the columns when the <code>autoPopinMode=true</code>.
 	 *
-	 * @param {sap.m.ColumnListItem[]} aItems - table items
 	 * @returns {float} initial accumulated width
 	 * @private
 	 */
-	Table.prototype._getInitialAccumulatedWidth = function(aItems) {
-		// check if table has inset
-		var iInset = this.getInset() ? 4 : 0;
+	Table.prototype._getInitialAccumulatedWidth = function() {
+		const fInsetWidth = this.getInset() ? 4 : 0;
+		const fTypeWidth = this.doItemsNeedTypeColumn() ? 2.75 : 0;
+		const iModeOrder = ListBaseRenderer.ModeOrder[this.getMode()];
+		const bCompact = this.$().closest(".sapUiSizeCompact").length > 0;
 
-		var $this = this.$(),
-			iThemeDensityWidth = 3;
-
-		if ($this.closest(".sapUiSizeCompact").length || jQuery(document.body).hasClass("sapUiSizeCompact")) {
-			iThemeDensityWidth = 2;
-		} else {
-			var bThemeDensityWidthFound = false;
-			$this.find(".sapMTableTH[aria-hidden=true]:not(.sapMListTblHighlightCol):not(.sapMListTblDummyCell):not(.sapMListTblNavigatedCol)").get().forEach(function(oTH) {
-				var iWidth = jQuery(oTH).width();
-				if (!bThemeDensityWidthFound && iWidth > 0) {
-					iThemeDensityWidth = iWidth / parseFloat(library.BaseFontSize);
-					bThemeDensityWidthFound = true;
-				}
-			});
+		let fGap = 0.75; // highlight and navigated column tolerance + border and padding
+		const fModeWidth = Math.abs(iModeOrder) * (bCompact ? 2 : 2.75);
+		if (iModeOrder > -1) {
+			fGap += 0.5; // if the selection column is not the first column then we add 0.5rem padding
 		}
 
-		// check if selection control is available
-		var iSelectionWidth = ListBaseRenderer.ModeOrder[this.getMode()] ? iThemeDensityWidth : 0;
+		const oColumnResizer = PluginBase.getPlugin(this, "sap.m.plugins.ColumnResizer");
+		if (oColumnResizer?.getEnabled()) {
+			const aResizableColumns = this.getColumns().filter((oColumn) => oColumn.getVisible() && !oColumn.isHidden());
+			const fBaseFontSize = parseFloat(library.BaseFontSize) || 16;
+			fGap += aResizableColumns.length / fBaseFontSize; // 1px border per resizable column
+		}
 
-		// check if actions are available on the item
-		var iActionWidth = aItems.some(function(oItem) {
-			var sType = oItem.getType();
-			return sType === "Detail" || sType === "DetailAndActive" || sType === "Navigation";
-		}) ? iThemeDensityWidth : 0;
-
-		// borders = ~0.25rem
-		return iInset + iSelectionWidth + iActionWidth + 0.25;
+		return fInsetWidth + fModeWidth + fTypeWidth + fGap;
 	};
 
 	/**

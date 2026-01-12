@@ -36,8 +36,9 @@ sap.ui.define([
 	"sap/m/RatingIndicator",
 	"sap/ui/core/Item",
 	"sap/m/TextArea",
-	"sap/ui/core/Control"
-], function(Localization, Element, Library, qutils, nextUIUpdate, KeyCodes, JSONModel, Device, Filter, Sorter, InvisibleText, DragDropInfo, ListBase, Table, Column, Label, Link, Toolbar, ToolbarSpacer, Button, Input, ColumnListItem, Text, Title, ScrollContainer, library, GroupHeaderListItem, VerticalLayout, Message, jQuery, IllustratedMessage, ComboBox, CheckBox, RatingIndicator, Item, TextArea, Control) {
+	"sap/ui/core/Control",
+	"sap/m/plugins/ColumnResizer"
+], function(Localization, Element, Library, qutils, nextUIUpdate, KeyCodes, JSONModel, Device, Filter, Sorter, InvisibleText, DragDropInfo, ListBase, Table, Column, Label, Link, Toolbar, ToolbarSpacer, Button, Input, ColumnListItem, Text, Title, ScrollContainer, library, GroupHeaderListItem, VerticalLayout, Message, jQuery, IllustratedMessage, ComboBox, CheckBox, RatingIndicator, Item, TextArea, Control, ColumnResizer) {
 	"use strict";
 
 	const TestControl = Control.extend("sap.m.test.TestControl", {
@@ -2859,10 +2860,9 @@ sap.ui.define([
 		});
 		await nextUIUpdate();
 		const aColumns = oTable.getColumns();
-		const aItems = oTable.getItems();
 
-		// expected value is 6, 3(rem) for selection column and 3(rem) for the navigation column
-		let fInitAccumulatedWidth = oTable._getInitialAccumulatedWidth(aItems);
+		// 2.75rem for the selection column and 2.75rem for the navigation column + 0.75rem initial gap
+		let fInitAccumulatedWidth = oTable._getInitialAccumulatedWidth();
 		assert.strictEqual(fInitAccumulatedWidth, 6.25, "Initial accumulated width based on table setup is " + fInitAccumulatedWidth + "rem");
 
 		const fAccumulatedWidth = Table._updateAccumulatedWidth(aColumns, false, fInitAccumulatedWidth);
@@ -2871,14 +2871,21 @@ sap.ui.define([
 
 		oTable.setInset(true);
 		await nextUIUpdate();
-		fInitAccumulatedWidth = oTable._getInitialAccumulatedWidth(aItems);
-		assert.strictEqual(fInitAccumulatedWidth, 10.25, "Initial accumulated width is " + fAccumulatedWidth + "rem");
+		fInitAccumulatedWidth = oTable._getInitialAccumulatedWidth(); // 4rem for the inset
+		assert.strictEqual(fInitAccumulatedWidth, 10.25, "Initial accumulated width is " + fInitAccumulatedWidth + "rem after setting inset to true");
 
 		document.getElementById("qunit-fixture").classList.add("sapUiSizeCompact");
 		oTable.placeAt("qunit-fixture");
 		await nextUIUpdate();
-		fInitAccumulatedWidth = oTable._getInitialAccumulatedWidth(aItems);
-		assert.strictEqual(fInitAccumulatedWidth, 8.25, "Initial accumulated width is " + fInitAccumulatedWidth + "rem. Since compact theme density is applied");
+		fInitAccumulatedWidth = oTable._getInitialAccumulatedWidth();
+		assert.strictEqual(fInitAccumulatedWidth, 9.5, "Initial accumulated width is " + fInitAccumulatedWidth + "rem. Since compact theme density is applied");
+
+		oTable.addDependent(new ColumnResizer());
+		await nextUIUpdate();
+		fInitAccumulatedWidth = oTable._getInitialAccumulatedWidth(); // Column resizer adds 1px (0.0625rem) border per column here we have two columns
+		assert.strictEqual(fInitAccumulatedWidth, 9.625, "Initial accumulated width is " + fInitAccumulatedWidth + "rem after ColumnResizer is added");
+
+
 		oTable.destroy();
 	});
 
