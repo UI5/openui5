@@ -320,5 +320,15 @@
         "text": " sap.f.DynamicPageTitle: Fix flaky focus test in Safari"
       }
     ]
+  },
+  "1.120.40": {
+    "date": "January 2026",
+    "notes": [
+      {
+        "id": "40a16f1b09ddc048d7fcb1beaf08aef0e029bf9e",
+        "type": "FIX",
+        "text": " sap.f.FlexibleColumnLayout: Store begin column width"
+      }
+    ]
   }
 }

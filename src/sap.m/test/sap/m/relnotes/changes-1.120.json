@@ -1386,5 +1386,55 @@
         "text": " sap.m.DatePicker: close picker on context change"
       }
     ]
+  },
+  "1.120.40": {
+    "date": "January 2026",
+    "notes": [
+      {
+        "id": "89031dd20d718128c896b263a08e715848f3c6bd",
+        "type": "FIX",
+        "text": " sap.m.SinglePlanningCalendar: Add the browser event information to the UI5 event"
+      },
+      {
+        "id": "017f148f8cf05ed46a7b134500eae56a17e137a3",
+        "type": "FIX",
+        "text": " VariantManagement: \"expanded\" not announced"
+      },
+      {
+        "id": "3449ce16d693f5b4f603f78839beea95f4eda2ec",
+        "type": "FIX",
+        "text": " sap.m.PlanningCalendarHeader: add visible label to the view switch"
+      },
+      {
+        "id": "d69adb19b44e275ccc740d648793f12e5464fd55",
+        "type": "FIX",
+        "text": " sap.m.Button: Default type is shown correctly in Info bar"
+      },
+      {
+        "id": "609ca744bf342849ce59feafee7e7ab331d70ebe",
+        "type": "FIX",
+        "text": " m.Table: Focus on popin area should not scroll on the main row"
+      },
+      {
+        "id": "4d00c5f2803eaa3910128c989b013628970d3898",
+        "type": "FIX",
+        "text": " sap.m.ViewSettingsDialog: Remove redundant announcements from sort and group list items"
+      },
+      {
+        "id": "9a23982272f32302bb9646f94659b997061f0174",
+        "type": "FIX",
+        "text": " sap.m.ComboBoxBase: Value state popup is now hidden when the picker is opened"
+      },
+      {
+        "id": "ab944f89f4c58fd2f5fab472dcf708c4a02596e9",
+        "type": "FIX",
+        "text": " sap.m.Page: Fix failing tests"
+      },
+      {
+        "id": "644c9344f8e8cefb7e8ac27318c92ebe12188b5b",
+        "type": "FIX",
+        "text": " We now trigger a fetch call to load PDF content and determine PDF availability in the PDFViewer"
+      }
+    ]
   }
 }

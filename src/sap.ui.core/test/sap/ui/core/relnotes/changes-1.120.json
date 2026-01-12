@@ -1078,5 +1078,20 @@
         "text": " sap/ui/thirdparty: bump RequireJS to 2.3.7"
       }
     ]
+  },
+  "1.120.40": {
+    "date": "January 2026",
+    "notes": [
+      {
+        "id": "609ca744bf342849ce59feafee7e7ab331d70ebe",
+        "type": "FIX",
+        "text": " m.Table: Focus on popin area should not scroll on the main row"
+      },
+      {
+        "id": "41f22e0a63b1f0031ba9b4fcd52a7101058bce2e",
+        "type": "FIX",
+        "text": " sap/ui/model/type/Unit.js: if quantity part is integer, decimals defaults to '0', may be overwritten"
+      }
+    ]
   }
 }

@@ -189,5 +189,15 @@
         "text": " sap.ui.unified.Calendar: works correctly now"
       }
     ]
+  },
+  "1.120.40": {
+    "date": "January 2026",
+    "notes": [
+      {
+        "id": "aa89d739ef903410ac44d6894abb2fb57176b036",
+        "type": "FIX",
+        "text": " sap.ui.unified.CalendarLegend: Add correct type for translation key"
+      }
+    ]
   }
 }

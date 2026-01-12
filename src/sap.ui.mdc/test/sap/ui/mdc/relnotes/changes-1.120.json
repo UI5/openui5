@@ -245,5 +245,15 @@
         "text": " Table: Remove renderWhitespace restriction"
       }
     ]
+  },
+  "1.120.40": {
+    "date": "January 2026",
+    "notes": [
+      {
+        "id": "017f148f8cf05ed46a7b134500eae56a17e137a3",
+        "type": "FIX",
+        "text": " VariantManagement: \"expanded\" not announced"
+      }
+    ]
   }
 }
