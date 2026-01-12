@@ -6468,6 +6468,55 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
+	// Scenario: A view contains a table with a relative binding. In one of the table columns there
+	// is another Table control with a relative binding. Ensure that the metadata is available
+	// before binding the view with an absolute path. Immediately after that, rebind the outer table
+	// using an absolute path. This destroys its relative list binding and a new absolute list
+	// binding is created. This must not break the scenario.
+	//
+	// SNOW: CS20260011383971
+	QUnit.test("SNOW: CS20260011383971", async function (assert) {
+		const oModel = this.createSalesOrdersModel({autoExpandSelect : true});
+		const sView = `
+<Table id="table" items="{path : 'BP_2_SO', templateShareable : true}">
+	<Text text="{Note}"/> <!-- Note is added synchronously to mAggregatedQueryOptions -->
+	<Table items="{path : 'SO_2_SOITEM', templateShareable : false}">
+		<!-- SO_2_SOITEM/ItemPosition is added asynchronously to mAggregatedQueryOptions -->
+		<Text text="{ItemPosition}"/>
+	</Table>
+</Table>`;
+
+		await this.createView(assert, sView, oModel);
+
+		// ensure that the metadata is available; auto-$expand/$select determination is then done
+		// partly synchronously and partly asynchronously when binding the view
+		await oModel.getMetaModel().requestObject("/");
+
+		this.expectRequest("BusinessPartnerList('42')/BP_2_SO?"
+				+ "$select=Note,SalesOrderID&$expand=SO_2_SOITEM($select=ItemPosition,SalesOrderID)"
+				+ "&$skip=0&$top=100", {
+				value : [{
+					Note : "First order",
+					SalesOrderID : "1",
+					SO_2_SOITEM : [{ItemPosition : "0010", SalesOrderID : "1"}]
+				}]
+			});
+
+		// code under test - the relative binding of the table gets a context and starts
+		// auto-$expand/$select determination, which is partly asynchronous
+		this.oView.setBindingContext(oModel.createBindingContext("/BusinessPartnerList('42')"));
+
+		const oTable = this.oView.byId("table");
+		// code under test - rebinding the table destroys the relative list binding
+		oTable.bindItems({
+			...oTable.getBindingInfo("items"),
+			path : "/BusinessPartnerList('42')/BP_2_SO"
+		});
+
+		await this.waitForChanges(assert);
+	});
+
+	//*********************************************************************************************
 	// Scenario: Refresh single row in a list below a return value context. Ensure that
 	// refreshSingle is able to calculate the key predicates in its response and a subsequent PATCH
 	// is possible.
