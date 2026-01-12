@@ -198,7 +198,6 @@ sap.ui.define([
 		return new Page("area-" + sBackground.toLowerCase(), {
 			title: sBackground + " BlockLayout",
 			showNavButton: Device.system.phone,
-			navButtonText: "Back",
 			navButtonPress: function () {
 				Element.getElementById("block-layout-demo").backDetail();
 			},

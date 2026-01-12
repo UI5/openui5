@@ -55,7 +55,6 @@
 				id="standardListPage"
 				title="Standard List with Icon"
 				showNavButton="true"
-				navButtonText="Back"
 				navButtonPress="onNavBackButtonPress">
 				<content>
 					<core:Fragment id="sliConfigurationDialog" fragmentName="sap.m.acc.list.fragment.Config" type="XML"/>
@@ -92,7 +91,6 @@
 				id="standardListAvatarPage"
 				title="Standard List with Avatar"
 				showNavButton="true"
-				navButtonText="Back"
 				navButtonPress="onNavBackButtonPress">
 				<content>
 					<core:Fragment id="slaConfigurationDialog" fragmentName="sap.m.acc.list.fragment.Config" type="XML"/>
@@ -174,7 +172,6 @@
 				id="groupedListPage"
 				title="Grouped List"
 				showNavButton="true"
-				navButtonText="Back"
 				navButtonPress="onNavBackButtonPress" >
 				<content>
 					<core:Fragment id="glConfigurationDialog" fragmentName="sap.m.acc.list.fragment.Config" type="XML"/>
@@ -206,7 +203,6 @@
 				id="displayListPage"
 				title="Display List"
 				showNavButton="true"
-				navButtonText="Back"
 				navButtonPress="onNavBackButtonPress" >
 				<content>
 					<List
@@ -235,7 +231,6 @@
 				id="inputListPage"
 				title="Input List"
 				showNavButton="true"
-				navButtonText="Back"
 				navButtonPress="onNavBackButtonPress" >
 				<content>
 					<List

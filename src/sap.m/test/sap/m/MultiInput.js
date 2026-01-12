@@ -18,6 +18,7 @@ sap.ui.define([
 	"sap/ui/core/Theming",
 	"sap/ui/table/Table",
 	"sap/ui/table/Column",
+	"sap/ui/table/rowmodes/Fixed",
 	"sap/m/CheckBox",
 	"sap/ui/layout/form/SimpleForm",
 	"sap/m/FormattedText",
@@ -32,7 +33,7 @@ sap.ui.define([
 	"sap/ui/core/SeparatorItem",
 	"sap/m/ToolbarSpacer",
 	"sap/m/Title"
-], function(JSONModel, App, Button, Column, ColumnListItem, Label, List, MessageBox, MessageToast, MultiInput, Page, StandardListItem, Table, Text, Token, coreLibrary, Theming, GridTable, GridTableColumn, CheckBox, SimpleForm, FormattedText, Link, Dialog, Popup, ToggleButton, SelectDialog, Tokenizer, Sorter, Item, SeparatorItem, ToolbarSpacer, Title) {
+], function(JSONModel, App, Button, Column, ColumnListItem, Label, List, MessageBox, MessageToast, MultiInput, Page, StandardListItem, Table, Text, Token, coreLibrary, Theming, GridTable, GridTableColumn, GridTableFixedRowMode, CheckBox, SimpleForm, FormattedText, Link, Dialog, Popup, ToggleButton, SelectDialog, Tokenizer, Sorter, Item, SeparatorItem, ToolbarSpacer, Title) {
 	"use strict";
 
 	// shortcut for sap.ui.core.ValueState
@@ -780,8 +781,9 @@ sap.ui.define([
 	]);
 
 	var oCondensedTable = new GridTable("condensed-table", {
-		visibleRowCount: 2,
-		visibleRowCountMode: "Fixed",
+		rowMode: new GridTableFixedRowMode({
+			rowCount: 2
+		}),
 		rows: "{/modelData}"
 	}).addStyleClass("sapUiMediumMarginBottom");
 

@@ -7,10 +7,12 @@ sap.ui.define([
 	"sap/ui/core/mvc/XMLView",
 	"sap/ui/model/json/JSONModel",
 	"sap/ui/table/Table",
+	"sap/ui/table/rowmodes/Auto",
 	"sap/ui/table/Column",
+	"sap/m/Label",
 	"sap/m/Text"
 ],
-	async function(jQuery, App, Page, XMLView, JSONModel, Table, Column, Text) {
+	async function(jQuery, App, Page, XMLView, JSONModel, Table, Auto, Column, Label, Text) {
 		"use strict";
 
 		var oApp = new App(),
@@ -34,13 +36,16 @@ sap.ui.define([
 
 		var oTable1 = new Table("testUITable",{
 			rows:"{model>/rows}",
-			visibleRowCountMode: "Auto",
-			minAutoRowCount: 2
+			rowMode: new Auto({
+				minRowCount: 2
+			})
 		});
 		oTable1.setModel(oModel,"model");
 
 		oTable1.addColumn(new Column({
-			label: "col01",
+			label: new Label({
+				text: "col01"
+			}),
 			autoResizable: true,
 			template: new Text({
 				text:"{model>text1}"
@@ -48,14 +53,18 @@ sap.ui.define([
 		}));
 
 		oTable1.addColumn(new Column({
-			label: "col02",
+			label: new Label({
+				text: "col02"
+			}),
 			autoResizable: true,
 			template: new Text({
 				text:"{model>text2}"
 			})
 		}));
 		oTable1.addColumn(new Column({
-			label: "col03",
+			label: new Label({
+				text: "col03"
+			}),
 			autoResizable: true,
 			template: new Text({
 				text:"{model>text3}"

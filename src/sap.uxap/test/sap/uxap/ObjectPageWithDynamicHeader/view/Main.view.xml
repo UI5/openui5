@@ -132,7 +132,7 @@
 						<m:ObjectAttribute class="sapUiTinyMarginBottom"
 							title="Fallback Variant Name"
 							text="AC_NEW_VARIANT2_LONG_LONG_LONG"
-							active="true" press="onNavigateToFallbackVariantPress" visible="true" />
+							active="true" visible="true" />
 						<m:ObjectAttribute class="sapUiTinyMarginBottom"
 							title="Fallback Variant Name"
 							text="AC_NEW_VARIANT2_LONG_LONG_LONG"

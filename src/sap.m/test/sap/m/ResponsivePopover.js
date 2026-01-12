@@ -303,7 +303,6 @@ sap.ui.define([
 	  title: "Detail Page",
 	  showNavButton: true,
 	  showHeader: true,
-	  navButtonText: "listPage",
 	  navButtonPress: function(){ oNavContainer.back(); },
 	  content: [
 		  new Button("closeButton1", {

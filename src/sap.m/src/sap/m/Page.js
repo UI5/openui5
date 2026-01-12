@@ -198,7 +198,7 @@ function(
 					/**
 					 * The (optional) custom header of this page.
 					 * Use this aggregation only when a custom header is constructed where the default header consisting of title text + nav button is not sufficient.
-					 * If this aggregation is set, the simple properties "title", "showNavButton", "NavButtonText" and "icon" are not used.
+					 * If this aggregation is set, the simple properties "title", "showNavButton", "navButtonText" and "icon" are not used.
 					 */
 					customHeader: {type: "sap.m.IBar", multiple: false},
 

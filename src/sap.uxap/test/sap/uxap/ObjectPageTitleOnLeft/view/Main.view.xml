@@ -13,12 +13,10 @@
 				<ObjectPageHeader id="headerForTest"
 					objectTitle="Long title that wraps and goes over more lines"
 					showTitleSelector="true"
-					titleSelectorPress="handleTitleSelectorPress"
 					showMarkers="true"
 					markFavorite="true"
 					markLocked="true"
 					markFlagged="true"
-					markLockedPress="handleMarkLockedPress"
 					objectSubtitle="Long subtitle that wraps and goes over more lines"
 					objectImageShape="Circle"
 					objectImageURI="./images/imageID_275314.png">
@@ -36,8 +34,8 @@
 					</actions>
 					<breadcrumbs>
 						<m:Breadcrumbs>
-							<m:Link text="Page 1 a very long link" press="handleLink1Press" />
-							<m:Link text="Page 2 long link" press="handleLink2Press" />
+							<m:Link text="Page 1 a very long link"/>
+							<m:Link text="Page 2 long link"/>
 						</m:Breadcrumbs>
 					</breadcrumbs>
 				</ObjectPageHeader>

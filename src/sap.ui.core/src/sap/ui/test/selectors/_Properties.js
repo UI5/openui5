@@ -63,47 +63,67 @@ sap.ui.define([
         "name",
         "info",
         "tooltip",
-        "value", // sap.m.InputBase
-        "valueState", // sap.m.CheckBox
-        "valueStateText", // sap.m.InputBase
-        "type", // sap.m.Button
+        // sap.m.InputBase
+        "value",
+        // sap.m.CheckBox
+        "valueState",
+        // sap.m.InputBase
+        "valueStateText",
+        // sap.m.Button
+        "type",
         "number",
         "icon",
-        "src", // sap.ui.core.Icon
+        // sap.ui.core.Icon
+        "src",
         "customIcon",
         "iconAlt",
         "iconTooltip",
         "placeholder",
         "key",
         "description",
-        "selectedItemId", // sap.m.ComboBox
-        "selectedKey", // sap.m.ComboBox, sap.m.IconTabBar
-        "selectedKeys", // sap.m.MultiComboBox
-        "cancelButtonText", // sap.m.ActionSheet, sap.m.BusyDialog
-        "currentLocationText", // sap.m.Breadcrumbs
-        "label", // sap.m.DisplayListItem
+        // sap.m.ComboBox
+        "selectedItemId",
+        // sap.m.ComboBox, sap.m.IconTabBar
+        "selectedKey",
+        // sap.m.MultiComboBox
+        "selectedKeys",
+        // sap.m.ActionSheet, sap.m.BusyDialog
+        "cancelButtonText",
+        // sap.m.Breadcrumbs
+        "currentLocationText",
+        // sap.m.DisplayListItem
+        "label",
         "contentText",
         "buttonTooltip",
-        "htmlText", // sap.m.FormattedText
-        "header", // sap.m.GenericTile
-        "headerText", // sap.m.ListBase
+        // sap.m.FormattedText
+        "htmlText",
+        // sap.m.GenericTile
+        "header",
+        // sap.m.ListBase
+        "headerText",
         "footerText",
         "subheader",
         "failedText",
         "imageDescription",
         "count",
-        "alt", // sap.m.Image
-        "href", // sap.m.Link
-        "intro", // sap.m.ObjectListItem
-        "navButtonText", // sap.m.Page
+        // sap.m.Image
+        "alt",
+        // sap.m.Link
+        "href",
+        // sap.m.ObjectListItem
+        "intro",
         "editable",
         "active",
         "noDataText",
-        "customTextOff", // sap.m.Switch
+        // sap.m.Switch
+        "customTextOff",
         "customTextOn",
-        "pressed", // sap.m.ToggleButton'
-        "url", // sap.m.UploadCollectionItem
-        "fileName" // sap.m.UploadCollectionItem
+        // sap.m.ToggleButton'
+        "pressed",
+        // sap.m.UploadCollectionItem
+        "url",
+        // sap.m.UploadCollectionItem
+        "fileName"
     ];
 
     return _Properties;

@@ -75,7 +75,6 @@ sap.ui.define([
 			})
 		],
 		showNavButton: Device.system.phone,
-		navButtonText: "Back",
 		landmarkInfo: new PageAccessibleLandmarkInfo({
 			rootLabel: "Detail 1",
 			headerLabel: "Detail 1 Header",
@@ -145,7 +144,6 @@ sap.ui.define([
 			})
 		],
 		showNavButton: true,
-		navButtonText: "Back",
 		navButtonPress: function() {
 			oSplitApp.backDetail();
 		},
@@ -181,7 +179,6 @@ sap.ui.define([
 		title: "Detail 2",
 		backgroundDesign: PageBackgroundDesign.Solid,
 		showNavButton: true,
-		navButtonText: "Back",
 		landmarkInfo: new PageAccessibleLandmarkInfo({
 			rootLabel: "Detail 2",
 			headerLabel: "Detail 2 Header"
@@ -213,7 +210,6 @@ sap.ui.define([
 			footerLabel: "Master Footer"
 		}),
 		backgroundDesign: PageBackgroundDesign.List,
-		icon: "images/SAPUI5.jpg",
 		content: [
 			new List({
 				items: [
@@ -278,7 +274,6 @@ sap.ui.define([
 		navButtonPress: function() {
 			oSplitApp.backMaster();
 		},
-		icon: "images/SAPUI5.jpg",
 		content: [
 			new List({
 				mode: Device.system.phone ? ListMode.None : ListMode.SingleSelectMaster,

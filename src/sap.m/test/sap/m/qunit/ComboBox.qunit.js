@@ -14,6 +14,7 @@ sap.ui.define([
 	"sap/ui/core/ListItem",
 	"sap/ui/table/Table",
 	"sap/ui/table/Column",
+	"sap/ui/table/rowmodes/Fixed",
 	"sap/ui/core/SeparatorItem",
 	"sap/ui/model/Sorter",
 	"sap/ui/layout/form/SimpleForm",
@@ -53,6 +54,7 @@ sap.ui.define([
 	ListItem,
 	Table,
 	Column,
+	FixedRowMode,
 	SeparatorItem,
 	Sorter,
 	SimpleForm,
@@ -13174,7 +13176,9 @@ sap.ui.define([
 		});
 
 		var oTable = new Table({
-			visibleRowCount: 2,
+			rowMode: new FixedRowMode({
+				rowCount: 2
+			}),
 			rows: "{/items}",
 			columns: [
 				new Column({
