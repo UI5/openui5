@@ -41,9 +41,13 @@ sap.ui.define([
 		 *
 		 * @param {string[]} aContainerElements - Array with the Ids of the current elements in the container
 		 * @param {object} oCondenserInfo - Condenser specific information
+		 * @param {string[]} aInitialElementIds - Array with the Ids of the initial elements in the container
+		 * @param {string} sContainerKey - Container being simulated
 		 */
-		simulate(aContainerElements, oCondenserInfo) {
-			aContainerElements.splice(oCondenserInfo.getTargetIndex(oCondenserInfo.change), 0, oCondenserInfo.affectedControl);
+		simulate(aContainerElements, oCondenserInfo, aInitialElementIds, sContainerKey) {
+			if (sContainerKey === oCondenserInfo.targetContainer) {
+				aContainerElements.splice(oCondenserInfo.getTargetIndex(oCondenserInfo.change), 0, oCondenserInfo.affectedControl);
+			}
 		}
 	};
 });
