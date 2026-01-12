@@ -138,7 +138,6 @@ sap.ui.define([
 		title : "Detail Page",
 		titleLevel: "H1",
 		showNavButton : true,
-		navButtonText : "Back",
 		navButtonPress : function() {
 			app.back();
 		}
@@ -180,7 +179,6 @@ sap.ui.define([
 		titleLevel: "H1",
 		enableScrolling: true,
 		showNavButton : true,
-		navButtonText : "Back",
 		navButtonPress : function() {
 			app.back();
 		},
@@ -229,7 +227,6 @@ sap.ui.define([
 		titleLevel: "H1",
 		enableScrolling: true,
 		showNavButton : true,
-		navButtonText : "Back",
 		navButtonPress : function(){ app.back(); },
 		footer : new OverflowToolbar({
 			content : [
@@ -294,7 +291,6 @@ sap.ui.define([
 		titleLevel: "H1",
 		enableScrolling: true,
 		showNavButton : true,
-		navButtonText : "Back",
 		navButtonPress : function(){ app.back(); },
 		footer : new OverflowToolbar({
 			content : [

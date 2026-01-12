@@ -111,12 +111,10 @@ sap.ui.define([
 		title:"Page 2",
 		titleLevel: "H1",
 		showNavButton: true,
-		navButtonText: "Page 1",
 		navButtonPress: function() {
 			app.back();
 			MessageToast.show("Navigate to Page 1");
 		},
-		icon: "images/SAPUI5.jpg",
 		enableScrolling: false,
 		content : [ new Button({
 			text : "SLIDE to Page 3",
@@ -179,12 +177,10 @@ sap.ui.define([
 		title:"Page 3",
 		titleLevel: "H1",
 		showNavButton: true,
-		navButtonText: "Home",
 		navButtonPress: function() {
 			app.backToTop();
 			MessageToast.show("Navigate to Page 1");
 		},
-		icon: "images/SAPUI5.jpg",
 		content : [
 			new Button({text : "Back to Page 2", press:function(){
 				app.back({myBackPayload:Element.getElementById("p3input").getValue()});

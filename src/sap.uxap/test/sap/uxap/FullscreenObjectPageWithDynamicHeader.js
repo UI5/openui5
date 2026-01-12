@@ -6,11 +6,12 @@ sap.ui.define([
 	"sap/ui/core/mvc/XMLView",
 	"sap/ui/model/json/JSONModel",
 	"sap/ui/table/Table",
+	"sap/ui/table/rowmodes/Auto",
 	"sap/ui/table/Column",
 	"sap/m/Label",
 	"sap/m/Text",
 	"sap/ui/thirdparty/jquery"
-], async function(App, Page, XMLView, JSONModel, Table, Column, Label, Text, jQuery) {
+], async function(App, Page, XMLView, JSONModel, Table, Auto, Column, Label, Text, jQuery) {
 	"use strict";
 	var oApp = new App(),
 		myView = await XMLView.create({definition:jQuery('#view1').html()}),
@@ -49,8 +50,9 @@ sap.ui.define([
 
 	var oTable1 = new Table("testUITable",{
 		rows:"{model>/rows}",
-		visibleRowCountMode: "Auto",
-		minAutoRowCount: 2
+		rowMode: new Auto({
+			minRowCount: 2
+		})
 	});
 	oTable1.setModel(oModel,"model");
 

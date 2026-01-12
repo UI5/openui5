@@ -74,9 +74,7 @@ sap.ui.define([
 		titleLevel: "H1",
 		backgroundDesign:"Standard",
 		showNavButton: true,
-		navButtonText: "Page 1",
 		navButtonPress: function(){ app.back(); },
-		icon: "sap-icon://favorite",
 		enableScrolling: false,
 		headerContent: new Button({
 			text : "Options",
