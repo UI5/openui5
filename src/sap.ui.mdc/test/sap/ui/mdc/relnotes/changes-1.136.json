@@ -113,5 +113,15 @@
         "text": " Field: if ComboBox-Like wrong accessibility info"
       }
     ]
+  },
+  "1.136.12": {
+    "date": "January 2026",
+    "notes": [
+      {
+        "id": "f5c0e7e5b7acba4e0f016ac57095c2e7784834e8",
+        "type": "FIX",
+        "text": " VariantManagement: \"expanded\" not announced"
+      }
+    ]
   }
 }

@@ -523,5 +523,35 @@
         "text": " sap.m.Toolbar: exclude disabled controls from Toolbar navigation"
       }
     ]
+  },
+  "1.136.12": {
+    "date": "January 2026",
+    "notes": [
+      {
+        "id": "2e10f802738b2469bc1edfea05ae748030b56a5d",
+        "type": "FIX",
+        "text": " sap.m.SinglePlanningCalendar: Add the browser event information to the UI5 event"
+      },
+      {
+        "id": "f5c0e7e5b7acba4e0f016ac57095c2e7784834e8",
+        "type": "FIX",
+        "text": " VariantManagement: \"expanded\" not announced"
+      },
+      {
+        "id": "0170962d5f0d3fb7f607618f2b067d8b8c75b58c",
+        "type": "FIX",
+        "text": " sap.m.PlanningCalendarHeader: add visible label to the view switch"
+      },
+      {
+        "id": "4a6525c8a12ecdbebe11bf23efa4f09f7f4ca72d",
+        "type": "FIX",
+        "text": " sap.m.Dialog: Screen reader and focus handling are improved"
+      },
+      {
+        "id": "7dc41b5570ec2b37b3c095c71635469d21c9ef40",
+        "type": "FIX",
+        "text": " sap.m.ComboBoxBase: Value state popup is now hidden when the picker is opened"
+      }
+    ]
   }
 }

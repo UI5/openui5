@@ -133,5 +133,20 @@
         "text": " sap.uxap.ObjectPageLayout: Fix wrong title in AnchorBar"
       }
     ]
+  },
+  "1.136.12": {
+    "date": "January 2026",
+    "notes": [
+      {
+        "id": "03c335b04377ee526e658abe0de130f1acb02c91",
+        "type": "FIX",
+        "text": " sap.uxap.ObjectPageSection: Remove unnecessary attributes"
+      },
+      {
+        "id": "df63ce0a9bde0318ca1efe448e81f5f57f6b78e7",
+        "type": "FIX",
+        "text": " sap.uxap.ObjectPageSubsection: No role for promoted subsection"
+      }
+    ]
   }
 }
