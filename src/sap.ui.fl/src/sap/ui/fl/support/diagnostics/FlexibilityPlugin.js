@@ -85,7 +85,8 @@ sap.ui.define([
 		if (oSupportStub.isToolStub()) {
 			this.oFlexDataModel = new JSONModel();
 			this.oToolSettingsModel = new JSONModel({
-				anonymizeData: true
+				anonymizeData: true,
+				exportFullData: true
 			});
 			renderToolPlugin.call(this);
 		}
@@ -94,9 +95,16 @@ sap.ui.define([
 	/**
 	 * Sends an event to the application plugin requesting the collection of flexibility data.
 	 * @param {boolean} bAnonymizeData - Whether user-related data should be anonymized
+	 * @param {boolean} bExportFullData - Whether a full data set should be exported instead of a reduced one
 	 */
-	FlexibilityPlugin.prototype.sendGetDataEvent = function(bAnonymizeData) {
-		Support.getStub().sendEvent(`${this.getId()}GetData`, { anonymizeData: bAnonymizeData });
+	FlexibilityPlugin.prototype.sendGetDataEvent = function(bAnonymizeData, bExportFullData) {
+		Support.getStub().sendEvent(
+			`${this.getId()}GetData`,
+			{
+				anonymizeData: bAnonymizeData,
+				exportFullData: bExportFullData
+			}
+		);
 	};
 
 	/**
@@ -106,7 +114,11 @@ sap.ui.define([
 	FlexibilityPlugin.prototype.onsapUiSupportFlexibilityPluginGetData = async function(oEvent) {
 		try {
 			const bAnonymizeData = oEvent.getParameter("anonymizeData");
-			const oFlexData = await FlexibilityDataExtractor.extractFlexibilityData(bAnonymizeData);
+			const bExportFullData = oEvent.getParameter("exportFullData");
+			const oFlexData = await FlexibilityDataExtractor.extractFlexibilityData(
+				bAnonymizeData,
+				bExportFullData
+			);
 			// Send the data back to the tool
 			this._oStub.sendEvent(`${this.getId()}SetData`, oFlexData);
 		} catch (oError) {

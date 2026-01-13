@@ -18,10 +18,12 @@ sap.ui.define([
 	 */
 	return Controller.extend("sap.ui.fl.support.diagnostics.Flexibility", {
 		onDownloadPress() {
-			const bAnonymizeData = this.getView().getModel("flexToolSettings").getProperty("/anonymizeData");
+			const oFlexToolSettingsModel = this.getView().getModel("flexToolSettings");
+			const bAnonymizeData = oFlexToolSettingsModel.getProperty("/anonymizeData");
+			const bExportFullData = oFlexToolSettingsModel.getProperty("/exportFullData");
 			const oFlexibilityPlugin = this.getView().getViewData().plugin;
 			// The download is handled by the plugin
-			oFlexibilityPlugin.sendGetDataEvent(bAnonymizeData);
+			oFlexibilityPlugin.sendGetDataEvent(bAnonymizeData, bExportFullData);
 		}
 	});
 });

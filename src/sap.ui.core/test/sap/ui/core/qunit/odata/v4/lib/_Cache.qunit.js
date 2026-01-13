@@ -3459,7 +3459,7 @@ sap.ui.define([
 		]
 	}, {
 		lateExpandSelect : {$expand : {TEAM_2_EMPLOYEES : null}},
-		options : "n/a",
+		options : {$expand : {"n/a" : null}},
 		types : ["/TEAMS", "/TEAMS/TEAM_2_EMPLOYEES"]
 	}].forEach(function (oFixture, i) {
 		QUnit.test("Cache#fetchTypes #" + i, function (assert) {
@@ -5063,6 +5063,7 @@ sap.ui.define([
 	QUnit.test("Cache#setLateQueryOptions", function (assert) {
 		var oCache = new _Cache(this.oRequestor, "Employees('31')", {});
 
+		oCache.oTypePromise = "~oTypePromise~";
 		assert.strictEqual(oCache.mLateExpandSelect, null);
 
 		// code under test
@@ -5078,27 +5079,25 @@ sap.ui.define([
 			$expand : {n : {$select : "p3"}},
 			$select : ["p1", "p2"]
 		});
+		assert.strictEqual(oCache.oTypePromise, "~oTypePromise~");
 
 		// code under test
-		oCache.setLateQueryOptions({$expand : {n : {$select : "p3"}}});
+		oCache.setLateQueryOptions({$expand : {n : {$select : "p3"}}}, /*bInvalidateTypes*/false);
 
 		assert.deepEqual(oCache.mLateExpandSelect, {
 			$expand : {n : {$select : "p3"}},
 			$select : undefined
 		});
+		assert.strictEqual(oCache.oTypePromise, "~oTypePromise~");
 
 		// code under test
-		oCache.setLateQueryOptions({$select : ["p1", "p2"]});
+		oCache.setLateQueryOptions({$select : ["p1", "p2"]}, /*bInvalidateTypes*/true);
 
 		assert.deepEqual(oCache.mLateExpandSelect, {
 			$expand : undefined,
 			$select : ["p1", "p2"]
 		});
-
-		// code under test
-		oCache.setLateQueryOptions(null);
-
-		assert.strictEqual(oCache.mLateExpandSelect, null);
+		assert.strictEqual(oCache.oTypePromise, undefined);
 	});
 
 	//*********************************************************************************************

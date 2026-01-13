@@ -20,6 +20,11 @@
 			text="Anonymize User IDs"
 			selected="{flexToolSettings>/anonymizeData}"
 			class="sapUiSmallMarginBottom"/>
+		<CheckBox
+			id="fullDataExportCheckbox"
+			text="Export Full Data Set"
+			selected="{flexToolSettings>/exportFullData}"
+			class="sapUiSmallMarginBottom"/>
 		<Button
 			id="downloadButton"
 			text="Download Flexibility Data"

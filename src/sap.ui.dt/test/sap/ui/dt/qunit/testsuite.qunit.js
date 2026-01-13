@@ -15,6 +15,7 @@ sap.ui.define(function() {
 			},
 			coverage: {
 				only: ["sap/ui/dt"],
+				instrumenter: "istanbul",
 				branchTracking: true
 			},
 			page: "test-resources/sap/ui/dt/qunit/testsandbox.qunit.html?test={name}",

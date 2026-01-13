@@ -1,6 +1,8 @@
 /*global QUnit, */
 sap.ui.define([
+	"sap/ui/core/Element",
 	"sap/ui/test/utils/nextUIUpdate",
+	"sap/ui/thirdparty/jquery",
 	"sap/ui/model/json/JSONModel",
 	"sap/m/Title",
 	"sap/uxap/ObjectPageDynamicHeaderTitle",
@@ -8,7 +10,9 @@ sap.ui.define([
 	"sap/uxap/ObjectPageSection",
 	"sap/uxap/ObjectPageSubSection"
 ], async function(
+	Element,
 	nextUIUpdate,
+	jQuery,
 	JSONModel,
 	Title,
 	ObjectPageDynamicHeaderTitle,
@@ -354,5 +358,107 @@ sap.ui.define([
 				fnDone();
 			}, 400);
 		}.bind(this));
+	});
+
+	QUnit.test("_unStashControlsAsync preserves control order with different resolution times", function (assert) {
+		// Setup
+		var fnDone = assert.async(),
+			oSubSection = new ObjectPageSubSection("testSubSection" + jQuery.now()),
+			aUnstashedControls = [], // Array to track controls in the order they were unstashed
+			aFinalBlockIds = [], // Array to track the final order of blocks in the aggregation
+			oAddAggregationSpy;
+
+		// Create mock stashed controls
+		var oMockStashedControl1 = {
+			getId: function() { return "control1"; },
+			unstash: function() {
+				// Mock the first control to unstash LAST (slowest)
+				return new Promise(function(resolve) {
+					setTimeout(function() {
+						var oUnstashedControl = new Title({text: "Control 1", id: "control1"});
+						aUnstashedControls.push("control1");
+						resolve(oUnstashedControl);
+					}, 30);
+				});
+			},
+			isStashed: function() { return true; }
+		};
+
+		var oMockStashedControl2 = {
+			getId: function() { return "control2"; },
+			unstash: function() {
+				// Mock the second control to unstash SECOND
+				return new Promise(function(resolve) {
+					setTimeout(function() {
+						var oUnstashedControl = new Title({text: "Control 2", id: "control2"});
+						aUnstashedControls.push("control2");
+						resolve(oUnstashedControl);
+					}, 20);
+				});
+			},
+			isStashed: function() { return true; }
+		};
+
+		var oMockStashedControl3 = {
+			getId: function() { return "control3"; },
+			unstash: function() {
+				// Mock the third control to unstash FIRST (fastest)
+				return new Promise(function(resolve) {
+					setTimeout(function() {
+						var oUnstashedControl = new Title({text: "Control 3", id: "control3"});
+						aUnstashedControls.push("control3");
+						resolve(oUnstashedControl);
+					}, 10);
+				});
+			},
+			isStashed: function() { return true; }
+		};
+
+		// Setup the SubSection with stashed controls in the expected order
+		oSubSection._aStashedControls = [
+			{aggregationName: "blocks", control: oMockStashedControl1},
+			{aggregationName: "blocks", control: oMockStashedControl2},
+			{aggregationName: "blocks", control: oMockStashedControl3}
+		];
+
+		// Spy on addAggregation to verify the implementation
+		oAddAggregationSpy = this.spy(oSubSection, "addAggregation");
+
+		// Override getElementById to return our unstashed controls
+		this.stub(Element, "getElementById").callsFake(function(sId) {
+			if (sId === "control1") { return Element.getElementById("control1"); }
+			if (sId === "control2") { return Element.getElementById("control2"); }
+			if (sId === "control3") { return Element.getElementById("control3"); }
+			return null;
+		});
+
+		// Act: Call the actual _unStashControlsAsync method
+		oSubSection._unStashControlsAsync().then(function() {
+			// Get the final order of blocks in the aggregation
+			oSubSection.getBlocks().forEach(function(oBlock) {
+				aFinalBlockIds.push(oBlock.getId());
+			});
+
+			// Assert
+
+			// Verify unstashing happened in the reverse order (control3, control2, control1)
+			// This proves our mocking worked correctly
+			assert.strictEqual(aUnstashedControls.length, 3, "Three controls were unstashed");
+			assert.strictEqual(aUnstashedControls[0], "control3", "Control 3 was unstashed first");
+			assert.strictEqual(aUnstashedControls[1], "control2", "Control 2 was unstashed second");
+			assert.strictEqual(aUnstashedControls[2], "control1", "Control 1 was unstashed last");
+
+			// Verify addAggregation was called for each control
+			assert.strictEqual(oAddAggregationSpy.callCount, 3, "addAggregation called three times");
+
+			// Most importantly - verify the final order of blocks matches the original definition
+			// despite being unstashed in reverse order
+			assert.deepEqual(aFinalBlockIds, ["control1", "control2", "control3"],
+				"Final order of blocks matches original definition");
+
+			// Clean up
+			oSubSection.destroy();
+			fnDone();
+		});
 	});
 });

@@ -373,7 +373,7 @@ sap.ui.define([
 	 * Retrieves the cached flexibility data for a specific reference.
 	 *
 	 * @param {string} sReference - The flex reference for which to retrieve the cached data.
-	 * @returns {Promise<object>} A promise that resolves with the cached flexibility data or an empty object if not found.
+	 * @returns {object} The cached flexibility data or an empty object if not found.
 	 */
 	Loader.getCachedFlexData = function(sReference) {
 		// TODO return copy of the data once the CompVariantManager does not mutate it anymore

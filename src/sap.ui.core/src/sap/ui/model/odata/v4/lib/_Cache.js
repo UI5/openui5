@@ -2032,23 +2032,25 @@ sap.ui.define([
 	 * Remembers only $expand and $select, and ignores others.
 	 *
 	 * @param {object} mQueryOptions
-	 *   The new late query options or <code>null</code> to reset
+	 *   The new late query options
+	 * @param {boolean} [bInvalidateTypes]
+	 *   Whether to invalidate the cached type information to force re-fetching, see
+	 *   {@link #fetchTypes}
 	 *
 	 * @public
 	 * @see #hasSentRequest
 	 */
-	_Cache.prototype.setLateQueryOptions = function (mQueryOptions) {
+	_Cache.prototype.setLateQueryOptions = function (mQueryOptions, bInvalidateTypes) {
 		// this.checkSharedRequest(); // don't do that here! it might work well enough
-		if (mQueryOptions) {
-			this.mLateExpandSelect = {
-				// must contain both properties for requestSideEffects
-				// ensure that $select precedes $expand in the resulting query
-				$select : mQueryOptions.$select,
-				$expand : mQueryOptions.$expand
-			};
-		} else {
-			this.mLateExpandSelect = null;
+		if (bInvalidateTypes) {
+			this.oTypePromise = undefined;
 		}
+		this.mLateExpandSelect = {
+			// must contain both properties for requestSideEffects
+			// ensure that $select precedes $expand in the resulting query
+			$select : mQueryOptions.$select,
+			$expand : mQueryOptions.$expand
+		};
 	};
 
 	/**
