@@ -96,36 +96,42 @@ sap.ui.define([
 	function addSampleUrl(oEvent) {
 		var oInput = document.getElementById("sampleurl");
 		var sUrl = oInput.value;
-		var oResult = undefined/*jQuery*/.sap.sjax({type : 'HEAD', url : sUrl});
-		if ( !oResult.success ) {
-			/* eslint-disable no-alert */
-			alert(sUrl + " does not exist (" + oResult.error + ")");
-			/* eslint-enable no-alert */
-			return;
-		}
+		fetch(sUrl, { method: 'HEAD' })
+			.then(function(response) {
+				if (!response.ok) {
+					// eslint-disable-next-line no-alert
+					alert(sUrl + " does not exist (HTTP " + response.status + ")");
+					return;
+				}
 
-		var oEmptynessHint = document.getElementById("#custom-tests-empty");
-		if ( oEmptynessHint ) {
-			oEmptynessHint.parentNode.removeChild(oEmptynessHint);
-		}
+				var oEmptynessHint = document.getElementById("#custom-tests-empty");
+				if ( oEmptynessHint ) {
+					oEmptynessHint.parentNode.removeChild(oEmptynessHint);
+				}
 
-		var oCustomSample = document.createElement("div");
-		oCustomSample.className = "leaf";
-		var oNewSampleDomRef = document.createElement("a");
-		oNewSampleDomRef.href = sUrl;
-		oNewSampleDomRef.dataset.href = sUrl;
-		oNewSampleDomRef.target = "sap-ui-ContentWindow";
-		oNewSampleDomRef.title = sUrl;
-		var sText = sUrl;
-		if ( sText.length > 40 && sText.lastIndexOf('/') >= 0 ) {
-			sText = "..." + sText.slice(sText.lastIndexOf('/'));
-		}
-		oNewSampleDomRef.textContent = sText;
-		oCustomSample.appendChild(oNewSampleDomRef);
-		var oCustomTests = document.getElementById("custom-tests");
-		oCustomTests.insertBefore(oCustomSample, oCustomTests.firstChild);
-		triggerLink(oNewSampleDomRef);
-		document.getElementById("samples").scrollTop = document.getElementById("samples").scrollHeight;
+				var oCustomSample = document.createElement("div");
+				oCustomSample.className = "leaf";
+				var oNewSampleDomRef = document.createElement("a");
+				oNewSampleDomRef.href = sUrl;
+				oNewSampleDomRef.dataset.href = sUrl;
+				oNewSampleDomRef.target = "sap-ui-ContentWindow";
+				oNewSampleDomRef.title = sUrl;
+				var sText = sUrl;
+				if ( sText.length > 40 && sText.lastIndexOf('/') >= 0 ) {
+					sText = "..." + sText.slice(sText.lastIndexOf('/'));
+				}
+				oNewSampleDomRef.textContent = sText;
+				oCustomSample.appendChild(oNewSampleDomRef);
+				var oCustomTests = document.getElementById("custom-tests");
+				oCustomTests.insertBefore(oCustomSample, oCustomTests.firstChild);
+				triggerLink(oNewSampleDomRef);
+				document.getElementById("samples").scrollTop = document.getElementById("samples").scrollHeight;
+			})
+			.catch(function(error) {
+				/* eslint-disable no-alert */
+				alert(sUrl + " does not exist (" + error + ")");
+				/* eslint-enable no-alert */
+			});
 	}
 
 	function toggleNode(oEvent) {
@@ -281,12 +287,9 @@ sap.ui.define([
 	}
 
 	function fetchJSON(sUrl) {
-		return Promise.resolve(
-			undefined/*jQuery*/.ajax({
-				url: sUrl,
-				dataType : "json"
-			})
-		);
+		return fetch(sUrl).then(function(response) {
+			return response.json();
+		});
 	}
 
 	var testsFromDiscoveryService;
