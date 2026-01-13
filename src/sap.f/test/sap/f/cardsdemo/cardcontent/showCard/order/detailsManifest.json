@@ -30,7 +30,7 @@
 		"type": "Object",
 		"data": {
 			"request": {
-				"url": "{{destinations.myDestination}}/Orders",
+				"url": "{{mainDestinations.myDestination}}/Orders",
 				"parameters": {
 					"$format": "json",
 					"$filter": "OrderID eq {parameters>/orderId/value}"
@@ -39,14 +39,10 @@
 			"path": "/value/0"
 		},
 		"configuration": {
-			"destinations": {
-				"myDestination": {
-					"name": "Northwind_V4"
-				}
-			},
+			"useMainDestinations": true,
 			"parameters": {
 				"orderId": {
-					"value": 10249
+					"value": null
 				}
 			}
 		},

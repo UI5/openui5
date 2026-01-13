@@ -382,7 +382,7 @@ sap.ui.define([
 			oOldCache.setActive(false);
 		}
 		if (this.mLateQueryOptions) {
-			oCache.setLateQueryOptions(this.mLateQueryOptions);
+			oCache.setLateQueryOptions(this.mLateQueryOptions, /*bInvalidateTypes*/true);
 		}
 		this.oCache = oCache;
 

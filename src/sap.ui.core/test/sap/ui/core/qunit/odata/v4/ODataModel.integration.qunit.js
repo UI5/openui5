@@ -6022,10 +6022,10 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	// Scenario: A late property is requested for an equipment item from a table, then the context
-	// is changed to a different employee. The equipment context from the table is a keep alive
-	// context and is refreshed. The late property is edited afterwards. Check that the correct
-	// PATCH request is sent.
+	// Scenario: A late property is requested for an equipment item from a table after changing the
+	// employee. Then the context is changed back to the first employee. The equipment context from
+	// the table is a keep alive context and is refreshed. The late property is edited afterwards.
+	// Check that the correct PATCH request is sent.
 	// SNOW: DINC0649002
 	QUnit.test("SNOW: DINC0649002", async function (assert) {
 		const oModel = this.createTeaBusiModel({autoExpandSelect : true});
@@ -6043,22 +6043,32 @@ sap.ui.define([
 
 		await this.createView(assert, sView, oModel);
 
-		this.expectRequest("EMPLOYEES('0')?$select=ID,Name", {ID : "0", Name : "Frederic Fall"})
-			.expectRequest("EMPLOYEES('0')/EMPLOYEE_2_EQUIPMENTS?$select=Category,ID"
+		this.expectRequest("EMPLOYEES('1')?$select=ID,Name", {ID : "0", Name : "Frederic Fall"})
+			.expectRequest("EMPLOYEES('1')/EMPLOYEE_2_EQUIPMENTS?$select=Category,ID"
 				+ "&$skip=0&$top=100", {value : [{Category : "Electronics", ID : 99}]})
 			.expectChange("name", "Frederic Fall")
 			.expectChange("category", ["Electronics"]);
 
 		const oForm = this.oView.byId("form");
-		oForm.setBindingContext(oModel.createBindingContext("/EMPLOYEES('0')"));
+		oForm.setBindingContext(oModel.createBindingContext("/EMPLOYEES('1')"));
 
 		await this.waitForChanges(assert, "resolve binding");
 
-		this.expectRequest("EMPLOYEES('0')/EMPLOYEE_2_EQUIPMENTS(Category='Electronics',ID=99)"
+		this.expectRequest("EMPLOYEES('0')?$select=ID,Name", {ID : "1", Name : "Jonathan Smith"})
+			.expectRequest("EMPLOYEES('0')/EMPLOYEE_2_EQUIPMENTS?$select=Category,ID"
+				+ "&$skip=0&$top=100", {value : [{Category : "Vehicle", ID : 59}]})
+			.expectChange("name", "Jonathan Smith")
+			.expectChange("category", ["Vehicle"]);
+
+		oForm.setBindingContext(oModel.createBindingContext("/EMPLOYEES('0')"));
+
+		await this.waitForChanges(assert, "change context");
+
+		this.expectRequest("EMPLOYEES('0')/EMPLOYEE_2_EQUIPMENTS(Category='Vehicle',ID=59)"
 				+ "?$select=EQUIPMENT_2_PRODUCT&$expand=EQUIPMENT_2_PRODUCT($select=ID,Name)", {
 				EQUIPMENT_2_PRODUCT : {
 					ID : 1,
-					Name : "Notebook Basic 15"
+					Name : "VW Golf 2.0"
 				}
 			});
 
@@ -6068,29 +6078,22 @@ sap.ui.define([
 			this.waitForChanges(assert, "request late property")
 		]);
 
-		assert.strictEqual(sName, "Notebook Basic 15");
+		assert.strictEqual(sName, "VW Golf 2.0");
 
-		this.expectRequest("EMPLOYEES('1')?$select=ID,Name", {ID : "1", Name : "Jonathan Smith"})
-			.expectRequest("EMPLOYEES('1')/EMPLOYEE_2_EQUIPMENTS?$select=Category,ID"
-				+ "&$skip=0&$top=100", {
-				value : [
-					{Category : "Vehicle", ID : 59}
-				]
-			})
-			.expectChange("name", "Jonathan Smith")
-			.expectChange("category", ["Vehicle"]);
+		this.expectChange("name", "Frederic Fall")
+			.expectChange("category", ["Electronics"]);
 
 		oForm.setBindingContext(oModel.createBindingContext("/EMPLOYEES('1')"));
 
-		await this.waitForChanges(assert, "change context");
+		await this.waitForChanges(assert, "back to first employee");
 
-		this.expectRequest("EMPLOYEES('1')/EMPLOYEE_2_EQUIPMENTS(Category='Vehicle',ID=59)"
+		this.expectRequest("EMPLOYEES('1')/EMPLOYEE_2_EQUIPMENTS(Category='Electronics',ID=99)"
 				+ "?$select=Category,ID&$expand=EQUIPMENT_2_PRODUCT($select=ID,Name)", {
-				Category : "Vehicle",
-				ID : 59,
+				Category : "Electronics",
+				ID : 99,
 				EQUIPMENT_2_PRODUCT : {
 					ID : 2,
-					Name : "VW Golf 2.0"
+					Name : "Notebook Basic 16"
 				}
 			});
 
@@ -6105,11 +6108,11 @@ sap.ui.define([
 
 		this.expectRequest("PATCH com.sap.gateway.default.iwbep.tea_busi_product.v0001.Container%2F"
 				+ "Products(2)", {
-				payload : {Name : "VW ID.Golf"}
+				payload : {Name : "Smartphone X"}
 			}, oDONT_CARE);
 
 		await Promise.all([
-			oContext.setProperty("EQUIPMENT_2_PRODUCT/Name", "VW ID.Golf"),
+			oContext.setProperty("EQUIPMENT_2_PRODUCT/Name", "Smartphone X"),
 			this.waitForChanges(assert, "patch")
 		]);
 	});

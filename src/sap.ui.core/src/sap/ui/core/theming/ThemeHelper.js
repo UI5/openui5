@@ -143,6 +143,7 @@ sap.ui.define([
 			if (sTheme) {
 				// extract the theme variant if given: "_hcb", "_hcw", "_dark"
 				sVariant = sTheme.match(rThemeVariantPattern)?.[0] || "";
+				Log.warning(`The configured theme '${sTheme}' is not yet or no longer supported in this version. The valid fallback theme is '${DEFAULT_THEME}${sVariant}'.`, "Theming");
 			} else {
 				sVariant = bDarkMode ? "_dark" : "";
 			}
@@ -151,7 +152,6 @@ sap.ui.define([
 
 			mThemeFallbacks[sTheme] = sNewTheme;
 
-			Log.warning(`The configured theme '${sTheme}' is not yet or no longer supported in this version. The valid fallback theme is '${sNewTheme}'.`, "Theming");
 		}
 
 		return sNewTheme;

@@ -727,23 +727,41 @@ sap.ui.define([
 	});
 
 	ObjectPageSubSection.prototype._unStashControlsAsync = function () {
-		var oUnstashedControl;
+		var aControlsToAdd = [];
 
 		if (!this._bUnstashed) {
-			this._aStashedControls.forEach(function (oControlHandle) {
+			// Create an array of promises that will resolve with the controls and their metadata
+			this._aStashedControls.forEach(function (oControlHandle, index) {
 				var oUnstashResult = Promise.resolve(oControlHandle.control.unstash(true));
 				this._aUnStashedControls.push(
 					oUnstashResult.then(function () {
-						oUnstashedControl = Element.getElementById(oControlHandle.control.getId());
-						this.addAggregation(oControlHandle.aggregationName, oUnstashedControl, true);
-					}.bind(this))
+						var oUnstashedControl = Element.getElementById(oControlHandle.control.getId());
+						// Store the control with its metadata instead of adding it immediately
+						aControlsToAdd.push({
+							control: oUnstashedControl,
+							aggregationName: oControlHandle.aggregationName,
+							index: index
+						});
+					})
 				);
 			}.bind(this));
 
 			this._bUnstashed = true;
 		}
 
+		// After all controls are unstashed, add them in the original order
 		return Promise.all(this._aUnStashedControls).then(() => {
+			// Sort by original index to ensure correct order
+			aControlsToAdd.sort(function(a, b) {
+				return a.index - b.index;
+			});
+
+			// Add the controls in the correct order
+			aControlsToAdd.forEach(function(oControlData) {
+				this.addAggregation(oControlData.aggregationName, oControlData.control, true);
+			}.bind(this));
+
+			// Clean up
 			this._bUnstashed = false;
 			this._aUnStashedControls = [];
 			this._aStashedControls = [];

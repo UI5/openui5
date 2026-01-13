@@ -1797,10 +1797,10 @@ sap.ui.define([
 			.withExactArgs(false);
 		this.mock(oOldCache).expects("setLateQueryOptions")
 			.exactly(bHasLateQueryOptions && bOldCacheIsReused ? 1 : 0)
-			.withExactArgs(sinon.match.same(mLateQueryOptions));
+			.withExactArgs(sinon.match.same(mLateQueryOptions), true);
 		this.mock(oCache).expects("setLateQueryOptions")
 			.exactly(bHasLateQueryOptions && !bOldCacheIsReused ? 1 : 0)
-			.withExactArgs(sinon.match.same(mLateQueryOptions));
+			.withExactArgs(sinon.match.same(mLateQueryOptions), true);
 
 		assert.strictEqual(
 			// code under test
@@ -1871,7 +1871,7 @@ sap.ui.define([
 				"~bSideEffectsRefresh~", sinon.match.same(oOldCache))
 			.returns(oCache);
 		this.mock(oCache).expects("setLateQueryOptions").exactly(bHasLateQueryOptions ? 1 : 0)
-			.withExactArgs(sinon.match.same(mLateQueryOptions));
+			.withExactArgs(sinon.match.same(mLateQueryOptions), true);
 		this.mock(oBinding).expects("deregisterChangeListener").withExactArgs();
 		this.mock(oOldCache).expects("setActive").withExactArgs(false);
 
@@ -1934,7 +1934,7 @@ sap.ui.define([
 		}
 		this.mock(oCache).expects("setActive").withExactArgs(true);
 		this.mock(oCache).expects("setLateQueryOptions").exactly(bHasLateQueryOptions ? 1 : 0)
-			.withExactArgs(sinon.match.same(mLateQueryOptions));
+			.withExactArgs(sinon.match.same(mLateQueryOptions), true);
 
 		assert.strictEqual(
 			// code under test

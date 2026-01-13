@@ -26,8 +26,6 @@ sap.ui.define([
 		oRm.openEnd();
 		if (sText) {
 			oRm.text(sText);
-		} else {
-			oRm.text("."); // This is a workaround for a Chrome bug, BCP: 2370127818
 		}
 		oRm.close("span");
 	};

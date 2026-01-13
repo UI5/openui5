@@ -22,6 +22,7 @@ sap.ui.define([
 			},
 			coverage: {
 				only: ["sap/ui/rta"],
+				instrumenter: "istanbul",
 				branchTracking: true
 			},
 			page: "test-resources/sap/ui/rta/qunit/testsandbox.qunit.html?testsuite={suite}&test={name}",

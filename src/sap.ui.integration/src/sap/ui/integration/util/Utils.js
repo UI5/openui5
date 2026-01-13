@@ -61,7 +61,7 @@ sap.ui.define([
 	 * @returns {string} language code
 	 */
 	Utils.getLocalizationLanguage = function() {
-		var language = Localization.getLanguage().replaceAll('_', '-');
+		var language = Localization.getLanguageTag().toString();
 		return Utils.languageMapping[language] || language;
 	};
 

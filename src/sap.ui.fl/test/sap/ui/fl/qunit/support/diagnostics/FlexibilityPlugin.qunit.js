@@ -97,6 +97,7 @@ sap.ui.define([
 		assert.ok(this.oPlugin.oFlexDataModel instanceof JSONModel, "Flex data model is created");
 		assert.ok(this.oPlugin.oToolSettingsModel instanceof JSONModel, "Tool settings model is created");
 		assert.strictEqual(this.oPlugin.oToolSettingsModel.getData().anonymizeData, true, "Anonymize data is true by default");
+		assert.strictEqual(this.oPlugin.oToolSettingsModel.getData().exportFullData, true, "Export full data is true by default");
 		assert.ok(XMLView.create.calledOnce, "XMLView is created");
 		assert.ok(oMockView.placeAt.calledWith({}), "View is placed correctly");
 	});
@@ -110,17 +111,20 @@ sap.ui.define([
 		assert.ok(true, "Application plugin initializes without errors");
 	});
 
-	QUnit.test("sendGetDataEvent - sends event with anonymization setting", function(assert) {
+	QUnit.test("sendGetDataEvent - sends event with anonymization and reduced data settings", function(assert) {
 		oSandbox.stub(Support, "getStub").returns({
 			sendEvent: oSandbox.stub()
 		});
 		this.oPlugin = new FlexibilityPlugin(this.oSupportStub);
 
-		this.oPlugin.sendGetDataEvent(true);
+		this.oPlugin.sendGetDataEvent(true, false);
 
 		assert.ok(
-			Support.getStub().sendEvent.calledWith("sapUiSupportFlexibilityPluginGetData", { anonymizeData: true }),
-			"GetData event is sent with anonymization"
+			Support.getStub().sendEvent.calledWith(
+				"sapUiSupportFlexibilityPluginGetData",
+				{ anonymizeData: true, exportFullData: false }
+			),
+			"GetData event is sent with anonymization and reduced data"
 		);
 	});
 
@@ -138,10 +142,11 @@ sap.ui.define([
 
 		await this.oPlugin.onsapUiSupportFlexibilityPluginGetData(oMockEvent);
 
-		assert.ok(oMockEvent.getParameter.calledWith("anonymizeData"), "Event parameter is retrieved");
+		assert.ok(oMockEvent.getParameter.calledWith("anonymizeData"), "First Event parameter is retrieved");
+		assert.ok(oMockEvent.getParameter.calledWith("exportFullData"), "Second Event parameter is retrieved");
 		assert.ok(
-			FlexibilityDataExtractor.extractFlexibilityData.calledWith(true),
-			"FlexibilityDataExtractor is called with anonymization"
+			FlexibilityDataExtractor.extractFlexibilityData.calledWith(true, true),
+			"FlexibilityDataExtractor is called with anonymization and full data"
 		);
 		assert.ok(
 			this.oSupportStub.sendEvent.calledWith("sapUiSupportFlexibilityPluginSetData", oMockFlexData),

@@ -419,11 +419,13 @@ MonthRenderer.renderDay = function(oRm, oMonth, oDay, oHelper, bOtherMonth, bWee
 	CalendarUtils._checkCalendarDate(oDay);
 	var oSecondaryDay = new CalendarDate(oDay, oHelper.sSecondaryCalendarType),
 		bSelectable = oMonth._getAriaRole() === "gridcell" && oMonth._getSelectableAccessibilitySemantics(),
+		sDayDescription = bSelectable ? oMonth._getDayDescription() : "",
+		sDayNameId = (!bDayName && iNumber >= 0) ? oHelper.sId + "-WH" + iNumber : "",
 		mAccProps = {
 			role: oMonth._getAriaRole(),
 			selected: bSelectable ? false : null,
 			label: "",
-			describedby: bSelectable ? oMonth._getDayDescription() : null
+			describedby: `${sDayDescription} ${sDayNameId}`.trim() || ""
 		},
 		bBeforeFirstYear = oDay._bBeforeFirstYear,
 		sAriaType = "",

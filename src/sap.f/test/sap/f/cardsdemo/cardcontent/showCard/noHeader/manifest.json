@@ -1,7 +1,7 @@
 {
 	"_version": "2.0.0",
 	"sap.app": {
-		"id": "sap.f.cardsdemo.showCard.order",
+		"id": "sap.f.cardsdemo.showCard.noHeader",
 		"type": "card",
 		"title": "Sample of an Snack Card",
 		"subTitle": "Sample of an Snack Card",

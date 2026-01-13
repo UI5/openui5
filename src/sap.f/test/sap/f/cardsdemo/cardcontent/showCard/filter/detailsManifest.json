@@ -30,7 +30,7 @@
 		"type": "List",
 		"data": {
 			"request": {
-				"url": "{{destinations.myDestination}}/Products",
+				"url": "{{mainDestinations.myDestination}}/Products",
 				"parameters": {
 					"$format": "json",
 					"$count": true,
@@ -46,11 +46,7 @@
 					"placeholder": "Name"
 				}
 			},
-			"destinations": {
-				"myDestination": {
-					"name": "Northwind_V4"
-				}
-			}
+			"useMainDestinations": true
 		},
 		"header": {
 			"type": "Default",

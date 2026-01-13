@@ -4001,4 +4001,567 @@ sap.ui.define([
 
 		oCard.startManifestProcessing();
 	});
+
+	QUnit.module("Resolve Destinations", {
+	});
+
+	QUnit.test("Sync resolution", async function (assert) {
+		// Arrange
+		const oManifest = {
+			"sap.app": {
+				"id": "test1"
+			},
+			"sap.card": {
+				"type": "List",
+				"configuration": {
+					"destinations": {
+						"contentDestination": {
+							"name": "contentDestination"
+						},
+						"headerDestination": {
+							"name": "headerDestination"
+						},
+						"imageDestination": {
+							"name": "imageDestination"
+						},
+						"emptyDestination": {
+							"name": "emptyDestination"
+						},
+						"navigationDestination": {
+							"name": "navigationDestination"
+						},
+						"innerDestination": {
+							"name": "innerDestination"
+						}
+					}
+				},
+				"header": {
+					"title": "{{destinations.innerDestination}} {title}",
+					"data": {
+						"request": {
+							"url": "{{destinations.headerDestination}}/header.json"
+						}
+					}
+				},
+				"content": {
+					"data": {
+						"request": {
+							"url": "{{destinations.contentDestination}}/items.json"
+						}
+					},
+					"item": {
+						"title": "{Name}",
+						"icon": {
+							"src": "{{destinations.imageDestination}}/{Image}"
+						},
+						"actions": [
+							{
+								"type": "Navigation",
+								"parameters": {
+									"product": "{{destinations.navigationDestination}}/{Name}",
+									"empty": "{{destinations.emptyDestination}}/empty"
+								}
+							}
+						]
+					}
+				}
+			}
+		};
+
+		const oHost = new Host({
+			resolveDestination: function(sDestinationName) {
+				switch (sDestinationName) {
+					case "contentDestination":
+					case "headerDestination":
+						return "qunit/testResources/cardWithDestinations/";
+					case "imageDestination":
+						return "qunit/testResources/images/";
+					case "emptyDestination":
+						return "";
+					case "navigationDestination":
+						return "https://some.domain.com" + "test1";
+					case "innerDestination":
+						return "Some text";
+					default:
+						return null;
+				}
+			}
+		});
+
+		const oCard = new SkeletonCard({
+			manifest: oManifest,
+			host: oHost,
+			baseUrl: "test-resources/sap/ui/integration/"
+		});
+
+		// Act
+		const oRes = await ManifestResolver.resolveCard(oCard);
+		const sExpectedIcon = "test-resources/sap/ui/integration/qunit/testResources/images/Woman_avatar_01.png";
+
+		// Assert
+		assert.strictEqual(oRes["sap.card"].header.title, "Some text Card Title", "header destination is resolved successfully");
+		assert.strictEqual(oRes["sap.card"].content.groups[0].items[0].icon.src, sExpectedIcon, "The icon path is correct.");
+		assert.strictEqual(oRes["sap.card"].content.groups[0].items[0].actions[0].parameters.product, "https://some.domain.comtest1/Notebook Basic 15", "Navigation destination is resolved successfully");
+		assert.strictEqual(oRes["sap.card"].content.groups[0].items[0].actions[0].parameters.empty, "/empty", "Empty destination is resolved successfully");
+
+		// Clean up
+		oHost.destroy();
+		oCard.destroy();
+	});
+
+	QUnit.test("Async resolution", async function (assert) {
+		// Arrange
+		const oManifest = {
+			"sap.app": {
+				"id": "test1"
+			},
+			"sap.card": {
+				"type": "List",
+				"configuration": {
+					"destinations": {
+						"contentDestination": {
+							"name": "contentDestination"
+						},
+						"headerDestination": {
+							"name": "headerDestination"
+						},
+						"imageDestination": {
+							"name": "imageDestination"
+						},
+						"emptyDestination": {
+							"name": "emptyDestination"
+						},
+						"navigationDestination": {
+							"name": "navigationDestination"
+						},
+						"innerDestination": {
+							"name": "innerDestination"
+						}
+					}
+				},
+				"header": {
+					"title": "{{destinations.innerDestination}} {title}",
+					"data": {
+						"request": {
+							"url": "{{destinations.headerDestination}}/header.json"
+						}
+					}
+				},
+				"content": {
+					"data": {
+						"request": {
+							"url": "{{destinations.contentDestination}}/items.json"
+						}
+					},
+					"item": {
+						"title": "{Name}",
+						"icon": {
+							"src": "{{destinations.imageDestination}}/{Image}"
+						},
+						"actions": [
+							{
+								"type": "Navigation",
+								"parameters": {
+									"product": "{{destinations.navigationDestination}}/{Name}",
+									"empty": "{{destinations.emptyDestination}}/empty"
+								}
+							}
+						]
+					}
+				}
+			}
+		};
+
+		const oAsyncHost = new Host({
+			resolveDestination: function(sDestinationName) {
+				switch (sDestinationName) {
+					case "contentDestination":
+					case "headerDestination":
+						return new Promise(function (resolve) {
+							setTimeout(function () {
+								resolve("qunit/testResources/cardWithDestinations/");
+							}, 10);
+						});
+					case "imageDestination":
+						return "qunit/testResources/images/";
+					case "emptyDestination":
+						return new Promise(function (resolve) {
+							setTimeout(function () {
+								resolve("");
+							}, 10);
+						});
+					case "navigationDestination":
+						return new Promise(function (resolve) {
+							setTimeout(function () {
+								resolve("https://some.domain.com" + "test1");
+							}, 10);
+						});
+					case "innerDestination":
+						return new Promise(function (resolve) {
+							setTimeout(function () {
+								resolve("Some text");
+							}, 10);
+						});
+					default:
+						return null;
+				}
+			}
+		});
+
+		const oCard = new SkeletonCard({
+			manifest: oManifest,
+			host: oAsyncHost,
+			baseUrl: "test-resources/sap/ui/integration/"
+		});
+
+		// Act
+		const oRes = await ManifestResolver.resolveCard(oCard);
+		const sExpectedIcon = "test-resources/sap/ui/integration/qunit/testResources/images/Woman_avatar_01.png";
+
+		// Assert
+		assert.strictEqual(oRes["sap.card"].header.title, "Some text Card Title", "header destination is resolved successfully");
+		assert.strictEqual(oRes["sap.card"].content.groups[0].items[0].icon.src, sExpectedIcon, "The icon path is correct.");
+		assert.strictEqual(oRes["sap.card"].content.groups[0].items[0].actions[0].parameters.product, "https://some.domain.comtest1/Notebook Basic 15", "Navigation destination is resolved successfully");
+		assert.strictEqual(oRes["sap.card"].content.groups[0].items[0].actions[0].parameters.empty, "/empty", "Empty destination is resolved successfully");
+
+		// Clean up
+		oAsyncHost.destroy();
+		oCard.destroy();
+	});
+
+	QUnit.test("Invalid host", async function (assert) {
+		// Arrange
+		const oManifest = {
+			"sap.app": {
+				"id": "test1"
+			},
+			"sap.card": {
+				"type": "List",
+				"header": {
+					"title": "{title}",
+					"subtitle": "{{destinations.myDestination}} {subTitle}",
+					"data": {
+						"request": {
+							"url": "{{destinations.asyncDestination}}/header.json"
+						}
+					}
+				},
+				"content": {
+					"data": {
+						"request": {
+							"url": "{{destinations.myDestination}}/items.json"
+						}
+					},
+					"item": {
+						"title": "{Name}"
+					}
+				}
+			}
+		};
+
+		const oInvalidHost = new Host({
+			resolveDestination: function() {
+				return undefined;
+			}
+		});
+
+		const oCard = new SkeletonCard({
+			manifest: oManifest,
+			host: oInvalidHost,
+			baseUrl: "test-resources/sap/ui/integration/"
+		});
+
+		// Act
+		const oRes = await ManifestResolver.resolveCard(oCard);
+
+		// Assert
+		assert.notOk(oRes["sap.card"].content.groups, "The data request is unsuccessful due to invalid destination.");
+		assert.notOk(oRes["sap.card"].header.title, "Header destination is not resolved successfully");
+		assert.notOk(oRes["sap.card"].header.subtitle, "Subtitle destination is not resolved");
+
+		// Clean up
+		oInvalidHost.destroy();
+		oCard.destroy();
+	});
+
+	QUnit.test("Mixed valid and invalid destinations", async function (assert) {
+		// Arrange
+		const oManifest = {
+			"sap.app": {
+				"id": "test1"
+			},
+			"sap.card": {
+				"type": "List",
+				"configuration": {
+					"destinations": {
+						"contentDestination": {
+							"name": "contentDestination"
+						},
+						"headerDestination": {
+							"name": "headerDestination"
+						}
+					}
+				},
+				"header": {
+					"title": "{title}",
+					"data": {
+						"request": {
+							"url": "{{destinations.headerDestination}}/header.json"
+						}
+					}
+				},
+				"content": {
+					"data": {
+						"request": {
+							"url": "{{destinations.contentDestination}}/items.json"
+						}
+					},
+					"item": {
+						"title": "{Name}",
+						"icon": {
+							"src": "{{destinations.invalidDestination}}/{Image}"
+						}
+					}
+				}
+			}
+		};
+
+		const oPartialHost = new Host({
+			resolveDestination: function(sDestinationName) {
+				switch (sDestinationName) {
+					case "contentDestination":
+					case "headerDestination":
+						return "qunit/testResources/cardWithDestinations/";
+					default:
+						return null;
+				}
+			}
+		});
+
+		const oCard = new SkeletonCard({
+			manifest: oManifest,
+			host: oPartialHost,
+			baseUrl: "test-resources/sap/ui/integration/"
+		});
+
+		// Act
+		const oRes = await ManifestResolver.resolveCard(oCard);
+		const sFirstItemIcon = oRes["sap.card"].content.groups[0].items[0].icon.src;
+
+		// Assert
+		assert.ok(oRes["sap.card"].content.groups[0].items.length, "The data request is successful.");
+		assert.strictEqual(oRes["sap.card"].header.title, "Card Title", "header destination is resolved successfully");
+		assert.notOk(sFirstItemIcon, "The icon path is not resolved.");
+
+		// Clean up
+		oPartialHost.destroy();
+		oCard.destroy();
+	});
+
+	QUnit.test("No host provided", async function (assert) {
+		// Arrange
+		const oManifest = {
+			"sap.app": {
+				"id": "test1"
+			},
+			"sap.card": {
+				"type": "List",
+				"configuration": {
+					"destinations": {
+						"contentDestination": {
+							"name": "contentDestination"
+						}
+					}
+				},
+				"header": {
+					"title": "{title}",
+					"data": {
+						"request": {
+							"url": "{{destinations.contentDestination}}/header.json"
+						}
+					}
+				},
+				"content": {
+					"data": {
+						"request": {
+							"url": "{{destinations.contentDestination}}/items.json"
+						}
+					},
+					"item": {
+						"title": "{Name}"
+					}
+				}
+			}
+		};
+
+		const oCard = new SkeletonCard({
+			manifest: oManifest,
+			baseUrl: "test-resources/sap/ui/integration/"
+		});
+
+		// Act
+		const oRes = await ManifestResolver.resolveCard(oCard);
+
+		// Assert
+		assert.notOk(oRes["sap.card"].content.groups, "The data request is unsuccessful.");
+		assert.notOk(oRes["sap.card"].header.title, "destination is not resolved successfully");
+
+		// Clean up
+		oCard.destroy();
+	});
+
+	QUnit.module("Resolve Destinations - Default URL", {
+	});
+
+	QUnit.test("Default URL with host returning null", async function (assert) {
+		// Arrange
+		const oManifest = {
+			"sap.app": {
+				"id": "test1"
+			},
+			"sap.card": {
+				"type": "List",
+				"configuration": {
+					"destinations": {
+						"test1": {
+							"name": "Test1Name",
+							"defaultUrl": "test1/url"
+						},
+						"test2": {
+							"defaultUrl": "test2/url"
+						}
+					}
+				},
+				"header": {
+					"title": "{{destinations.test1}}"
+				},
+				"content": {
+					"data": {
+						"json": [
+							{
+								"url1": "{{destinations.test1}}",
+								"url2": "{{destinations.test2}}"
+							}
+						]
+					},
+					"item": {
+						"title": "{url1}",
+						"description": "{url2}"
+					}
+				}
+			}
+		};
+
+		const oHost = new Host({
+			resolveDestination: function() {
+				return null;
+			}
+		});
+
+		const oCard = new SkeletonCard({
+			manifest: oManifest,
+			host: oHost,
+			baseUrl: "test-resources/sap/ui/integration/"
+		});
+
+		// Act
+		const oRes = await ManifestResolver.resolveCard(oCard);
+
+		// Assert
+		assert.strictEqual(oRes["sap.card"].header.title, "test1/url", "Default url for test1 is correct.");
+		assert.strictEqual(oRes["sap.card"].content.groups[0].items[0].title, "test1/url", "Default url for test1 is correct.");
+		assert.strictEqual(oRes["sap.card"].content.groups[0].items[0].description, "test2/url", "Default url for test2 is correct.");
+
+		// Clean up
+		oHost.destroy();
+		oCard.destroy();
+	});
+
+	QUnit.test("Default URL without host", async function (assert) {
+		// Arrange
+		const oManifest = {
+			"sap.app": {
+				"id": "test1"
+			},
+			"sap.card": {
+				"type": "List",
+				"configuration": {
+					"destinations": {
+						"test1": {
+							"name": "Test1Name",
+							"defaultUrl": "test1/url"
+						}
+					}
+				},
+				"header": {
+					"title": "{{destinations.test1}}"
+				},
+				"content": {
+					"data": {
+						"json": []
+					},
+					"item": {
+						"title": "test"
+					}
+				}
+			}
+		};
+
+		const oCard = new SkeletonCard({
+			manifest: oManifest,
+			baseUrl: "test-resources/sap/ui/integration/"
+		});
+
+		// Act
+		const oRes = await ManifestResolver.resolveCard(oCard);
+
+		// Assert
+		assert.strictEqual(oRes["sap.card"].header.title, "test1/url", "Default url for test1 is correct.");
+
+		// Clean up
+		oCard.destroy();
+	});
+
+	QUnit.test("Missing default URL and name", async function (assert) {
+		// Arrange
+		const oManifest = {
+			"sap.app": {
+				"id": "test1"
+			},
+			"sap.card": {
+				"type": "List",
+				"configuration": {
+					"destinations": {
+						"test3": { }
+					}
+				},
+				"header": {
+					"title": "{{destinations.test3}}"
+				},
+				"content": {
+					"data": {
+						"json": []
+					},
+					"item": {
+						"title": "test"
+					}
+				}
+			}
+		};
+
+		const oCard = new SkeletonCard({
+			manifest: oManifest,
+			baseUrl: "test-resources/sap/ui/integration/"
+		});
+
+		// Act
+		const oRes = await ManifestResolver.resolveCard(oCard);
+
+		// Assert
+		assert.ok(oRes["sap.card"].header.title === "" || oRes["sap.card"].header.title.includes("{{destinations.test3}}"), "Destination without name or defaultUrl is not resolved");
+
+		// Clean up
+		oCard.destroy();
+	});
+
 });
