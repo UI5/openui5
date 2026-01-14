@@ -543,6 +543,30 @@ sap.ui.define([
 					"Dynamic Page doesn't have the " + DynamicPage.NAVIGATION_CLASS_NAME + ", " +
 					"when we don't have StickySubheaderProvider.");
 		});
+
+		QUnit.test("Sticky subheader gets 'sapFDynamicPageStickySubheader' class", function (assert) {
+			// Assert
+			var oStickySubheader = this.oDynamicPage._oStickySubheader;
+			assert.ok(oStickySubheader, "Sticky subheader is available");
+			assert.ok(oStickySubheader.hasStyleClass("sapFDynamicPageStickySubheader"),
+				"'sapFDynamicPageStickySubheader' class is added to the sticky subheader");
+		});
+
+		QUnit.test("'sapFDynamicPageStickySubheader' class survives subheader re-render", async function (assert) {
+			// Arrange
+			var oStickySubheader = this.oDynamicPage._oStickySubheader;
+			assert.ok(oStickySubheader.hasStyleClass("sapFDynamicPageStickySubheader"),
+				"'sapFDynamicPageStickySubheader' class is present before re-render");
+
+			// Act
+			oStickySubheader.invalidate();
+			await nextUIUpdate();
+
+			// Assert
+			assert.ok(oStickySubheader.hasStyleClass("sapFDynamicPageStickySubheader"),
+				"'sapFDynamicPageStickySubheader' class is still present after re-render");
+		});
+
 		QUnit.module("DynamicPage - scrollToElement", {
 			beforeEach: function () {
 				// Arrange
