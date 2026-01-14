@@ -4876,22 +4876,12 @@ sap.ui.define([
 			oRequestor = _Requestor.create("/sServiceUrl/", oModelInterface, {}, {}, "4.0"),
 			sResourcePath = "Product(42)/to_bar";
 
-		oHelperMock.expects("clone").withExactArgs(aMessages[0]).returns("~clone0~");
-		oHelperMock.expects("clone").withExactArgs(aMessages[1]).returns("~clone1~");
-		oHelperMock.expects("makeAbsolute")
-			.withExactArgs("~longtextUrl~", "/sServiceUrl/~sRequestUrl~")
-			.returns("~absolute longtextUrl~");
+		oHelperMock.expects("makeAbsoluteLongtextUrl")
+			.withExactArgs(aMessages[0], "/sServiceUrl/~sRequestUrl~");
+		oHelperMock.expects("makeAbsoluteLongtextUrl")
+			.withExactArgs(aMessages[1], "/sServiceUrl/~sRequestUrl~");
 		this.mock(oModelInterface).expects("reportTransitionMessages")
-			.withExactArgs([{
-				"@$ui5.originalMessage" : "~clone0~",
-				code : "42",
-				message : "Test"
-			}, {
-				"@$ui5.originalMessage" : "~clone1~",
-				code : "43",
-				longtextUrl : "~absolute longtextUrl~",
-				type : "Warning"
-			}], sResourcePath);
+			.withExactArgs(aMessages, sResourcePath);
 
 		// code under test
 		oRequestor.reportHeaderMessages(sResourcePath, sMessages, null, "~sRequestUrl~");
@@ -4901,8 +4891,7 @@ sap.ui.define([
 	QUnit.test("reportHeaderMessages without messages", function () {
 		var oRequestor = _Requestor.create("/", oModelInterface, {}, {}, "4.0");
 
-		this.mock(_Helper).expects("clone").never();
-		this.mock(_Helper).expects("makeAbsolute").never();
+		this.mock(_Helper).expects("makeAbsoluteLongtextUrl").never();
 		this.mock(oModelInterface).expects("reportTransitionMessages").never();
 
 		// code under test
@@ -4912,8 +4901,7 @@ sap.ui.define([
 	//*****************************************************************************************
 	QUnit.test("reportHeaderMessages for 'R#V#C'", function () {
 		const oRequestor = _Requestor.create("/", oModelInterface, {}, {}, "4.0");
-		this.mock(_Helper).expects("clone").never();
-		this.mock(_Helper).expects("makeAbsolute").never();
+		this.mock(_Helper).expects("makeAbsoluteLongtextUrl").never();
 		this.mock(oModelInterface).expects("reportTransitionMessages").never();
 		const aMessages = [{code : "42", message : "Test"}, {code : "43", type : "Warning"}];
 		const sMessages = JSON.stringify(aMessages);

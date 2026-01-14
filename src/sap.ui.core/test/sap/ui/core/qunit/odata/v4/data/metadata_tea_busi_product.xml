@@ -30,6 +30,7 @@
 				<Property Name="SupplierIdentifier" Type="Edm.Int32" Nullable="false"/>
 				<Property Name="ProductPicture"
 					Type="com.sap.gateway.default.iwbep.tea_busi_product.v0001.ComplexTypePicture" Nullable="false"/>
+				<Property Name="__FAKE__Messages" Type="Collection(com.sap.gateway.default.zui5_epm_sample.v0002.Message)" />
 				<NavigationProperty Name="PRODUCT_2_CATEGORY"
 					Type="Collection(com.sap.gateway.default.iwbep.tea_busi_product.v0001.Category)"/>
 				<NavigationProperty Name="PRODUCT_2_SUPPLIER"
@@ -73,6 +74,9 @@
 			<Annotations Target="SAP__self.Category/CategoryName">
 				<Annotation Term="SAP__common.Label" String="char 50"/>
 				<Annotation Term="SAP__common.QuickInfo" String="TEA V4 - Char 50"/>
+			</Annotations>
+			<Annotations Target="SAP__self.Product">
+				<Annotation Term="com.sap.vocabularies.Common.v1.Messages" Path="__FAKE__Messages" />
 			</Annotations>
 			<Annotations Target="SAP__self.Product/ID">
 				<Annotation Term="SAP__common.Label" String="Product ID"/>

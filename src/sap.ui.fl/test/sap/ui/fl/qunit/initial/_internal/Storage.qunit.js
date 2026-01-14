@@ -102,14 +102,11 @@ sap.ui.define([
 			]);
 
 			const oExpectedResponse = {
-				isKeyUser: true,
-				versioning: {
-					CUSTOMER: false
-				}
+				isKeyUser: true
 			};
 			const oLogResolveSpy = sandbox.spy(StorageUtils, "logAndResolveDefault");
 
-			return Storage.loadFeatures().then(function(oResponse) {
+			return Storage.loadFeatures({}).then(function(oResponse) {
 				assert.strictEqual(oLrepConnectorLoadFeaturesStub.callCount, 1, "the loadFeatures was triggered once");
 				assert.strictEqual(oJsObjectConnectorLoadFeaturesStub.callCount, 1, "the loadFeatures was triggered once");
 				assert.strictEqual(oLogResolveSpy.callCount, 2, "the logAndResolveDefault called twice");
@@ -127,7 +124,7 @@ sap.ui.define([
 				{ connector: "JsObjectConnector" }
 			]);
 
-			return Storage.loadFeatures().then(function() {
+			return Storage.loadFeatures({}).then(function() {
 				assert.strictEqual(oLrepConnectorLoadFeaturesStub.callCount, 1, "the loadFeatures was triggered once");
 				const oLrepConnectorCallArgs = oLrepConnectorLoadFeaturesStub.getCall(0).args[0];
 				assert.deepEqual(oLrepConnectorCallArgs, { url: sUrl }, "the url was passed");
@@ -150,7 +147,7 @@ sap.ui.define([
 				system: "foo"
 			});
 
-			return Storage.loadFeatures().then(function(mFeatures) {
+			return Storage.loadFeatures({}).then(function(mFeatures) {
 				assert.strictEqual(mFeatures.isKeyUser, true, "the property of the LrepConnector was added");
 				assert.strictEqual(mFeatures.system, "foo", "the property of the JsObjectConnector was added");
 			});
@@ -169,7 +166,7 @@ sap.ui.define([
 				isProductiveSystem: true
 			});
 
-			return Storage.loadFeatures().then(function(mFeatures) {
+			return Storage.loadFeatures({}).then(function(mFeatures) {
 				assert.strictEqual(mFeatures.isProductiveSystem, true, "the property was overruled by the second connector");
 			});
 		});

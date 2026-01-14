@@ -3493,6 +3493,7 @@ sap.ui.define([
 	QUnit.test("destroy", function (assert) {
 		var oBinding = new ODataParentBinding();
 
+		oBinding.mAggregatedQueryOptions = "~mAggregatedQueryOptions~";
 		oBinding.aChildCanUseCachePromises = [{}, {}];
 		oBinding.mChildPathsReducedToParent = "~mChildPathsReducedToParent~";
 		oBinding.mLateQueryOptions = {};
@@ -3503,7 +3504,7 @@ sap.ui.define([
 		// code under test
 		oBinding.destroy();
 
-		assert.strictEqual(oBinding.mAggregatedQueryOptions, undefined);
+		assert.deepEqual(oBinding.mAggregatedQueryOptions, {});
 		assert.deepEqual(oBinding.aChildCanUseCachePromises, []);
 		assert.deepEqual(oBinding.mChildPathsReducedToParent, {});
 		assert.strictEqual(oBinding.mLateQueryOptions, undefined);

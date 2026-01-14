@@ -90,17 +90,16 @@
 }
 
 .sapUiCalHead {
-
 	.sapUiCalHeadPrev,
 	.sapUiCalHeadNext,
 	.sapUiCalHeadToday {
+		position: absolute;
+		line-height: 1;
+		width: 2.5rem;
 
 		&:not(.sapUiCalDsbl) .sapUiIcon {
 			cursor: pointer;
 		}
-
-		position: absolute;
-		width: 2.5rem;
 	}
 
 	.sapUiCalHeadNext {
@@ -109,21 +108,32 @@
 }
 
 .sapUiCalHead.sapUiCalHeaderWithTodayButton {
-
 	.sapUiCalHeadPrev,
 	.sapUiCalHeadNext,
 	.sapUiCalHeadToday {
 		position: initial;
 		width: 2rem;
 	}
+
+	.sapUiCalHeadB1 {
+		margin-left: 0.5rem;
+	}
+
+	.sapUiCalHeadB2 {
+		margin-left: 0.25rem;
+	}
+
+	.sapUiCalHeadNext,
+	.sapUiCalHeadToday {
+		margin-left: 0.5rem;
+	}
 }
 
 .sapUiSizeCompact .sapUiCalHead {
-
 	.sapUiCalHeadPrev,
 	.sapUiCalHeadNext,
 	.sapUiCalHeadToday {
-		width: 2rem;
+		width: 1.5rem;
 	}
 
 	.sapUiCalHeadNext {
@@ -131,12 +141,34 @@
 	}
 }
 
-.sapUiSizeCompact .sapUiCalHead.sapUiCalHeaderWithTodayButton {
+.sapUiCal.sapUiCalMulti .sapUiCalHead.sapUiCalHeaderWithTodayButton {
+	.sapUiCalHeadB1 {
+		margin-left: calc(~"50% - 11rem");
+		margin-right: 0;
+	}
 
-	.sapUiCalHeadPrev,
-	.sapUiCalHeadNext,
-	.sapUiCalHeadToday {
-		width: 1.5rem;
+	.sapUiCalHeadB2 {
+		margin-right: calc(~"50% - 13.75rem");
+	}
+}
+
+
+.sapUiSizeCompact {
+	.sapUiCal.sapUiCalMulti .sapUiCalHead.sapUiCalHeaderWithTodayButton {
+		.sapUiCalHeadPrev,
+		.sapUiCalHeadNext,
+		.sapUiCalHeadToday {
+			width: 1.5rem;
+		}
+
+		.sapUiCalHeadB1 {
+			margin-left: calc(~"50% - 8rem");
+			margin-right: 0;
+		}
+
+		.sapUiCalHeadB2 {
+			margin-right: calc(~"50% - 10.75rem");
+		}
 	}
 }
 
@@ -147,6 +179,16 @@
 .sapUiCalHead.sapUiCalHeaderWithTodayButton {
 	display: flex;
 	justify-content: space-evenly;
+}
+
+.sapUiSizeCompact .sapUiCal .sapUiCalHead {
+	.sapUiCalHeadB1 {
+		margin-right: 0.25rem;
+	}
+
+	.sapUiCalHeadB2 {
+		margin-left: 0.25rem;
+	}
 }
 
 /* no default (browser) outline, if device needs focus visualization its defined later */
@@ -209,8 +251,15 @@ html.sap-desktop .sapUiCalHead > button.sapUiCalDsbl:focus,
 .sapUiCalYearPicker {
 	width: auto; /* +1rem padding left and right = 320 px*/
 	display: flex;
+	gap: 0.25rem;
 	flex-direction: column;
 	justify-content: center;
+
+	& > div {
+		display: flex;
+		gap: 0.25rem;
+		justify-content: center;
+	}
 }
 
 .sapUiCalMulti {
@@ -398,13 +447,14 @@ html.sap-desktop .sapUiCalHead > button.sapUiCalDsbl:focus,
 
 .sapUiCalContentOver{
 	background-color: var(--sapBlockLayer_Background);
-	opacity: 0.15;
+	opacity: var(--sapBlockLayer_Opacity);
 	top: 0;
-	left: 0;
-	right: 0;
+	left: -0.5rem;
+	right: -0.5rem;
 	bottom: 0;
 	position: absolute;
 	outline: 0 none;
+	z-index: 11;
 }
 
 .sapUiCalContent > .sapUiCalMonthPicker,
@@ -511,14 +561,14 @@ html.sap-desktop .sapUiCalHead > button.sapUiCalDsbl:focus,
 			display: flex;
 			justify-content: space-between;
 		}
+	}
 
-		.sapUiCalHeadNext {
-			right: 0;
-		}
+	.sapUiCalHeadNext {
+		right: 0;
+	}
 
-		.sapUiCalHeadPrev {
-			left: 0;
-		}
+	.sapUiCalHeadPrev {
+		left: 0;
 	}
 
 	.sapUiCal .sapUiCalMonthView {
@@ -666,7 +716,7 @@ html[dir='rtl'] .sapUiCalTwoMonthsTwoColumns .sapUiCalHeadB4 {
 .sapUiSizeCompact .sapUiCalTwoMonthsTwoColumns .sapUiCalHeadB3,
 .sapUiCalTwoMonthsTwoColumnsJaZh .sapUiCalHeadB4:not(.sapUiCalSingleYearButton),
 .sapUiCalTwoMonthsTwoColumns .sapUiCalHeadB3 {
-	margin-left: 6.25rem;
+	margin-left: 5rem;
 }
 
 .sapUiCalItemNow > .sapUiCalItemText {
@@ -715,7 +765,7 @@ html[dir='rtl'] .sapUiCalTwoMonthsTwoColumns .sapUiCalHeadB4 {
 .sapUiCalMulti > .sapUiCalContent > .sapUiCalYearPicker {
 	top: 0.25rem;
 	bottom: auto;
-	padding: 1rem;
+	padding: 0.875rem;
 	margin-left: -10rem;
 }
 
@@ -829,6 +879,16 @@ html[dir='rtl'] .sapUiCalTwoMonthsTwoColumns .sapUiCalHeadB4 {
 	}
 }
 
+.sapUiCalMulti .sapUiCalHead {
+	.sapUiCalHeadB1 {
+		margin-right: 0.25rem;
+	}
+
+	.sapUiCalHeadB2 {
+		margin-left: 0.25rem;
+	}
+}
+
 /*** compact mode (desktop size) ***/
 
 .sapUiSizeCompact .sapUiCal,
@@ -853,6 +913,7 @@ html[dir='rtl'] .sapUiCalTwoMonthsTwoColumns .sapUiCalHeadB4 {
 }
 
 .sapUiSizeCompact .sapUiCalHead {
+	box-sizing: border-box;
 	height: 2rem;
 	padding: 0;
 }
@@ -1036,6 +1097,16 @@ html[dir='rtl'] .sapUiCalTwoMonthsTwoColumns .sapUiCalHeadB4 {
 	min-height: 6.5rem;
 }
 
+.sapUiSizeCompact.sapUiCalMulti:not(.sapUiCalTwoMonthsInOneColumn) {
+	.sapUiCalHeadB1 {
+		margin-left: calc(~"50% - 11.75rem");
+	}
+
+	.sapUiCalHeadB2 {
+		margin-right: calc(~"50% - 13.25rem");
+	}
+}
+
 /*** Phone ***/
 /* make calendar full-screen if on popup (DatePicker), but not if stand alone */
 html.sap-phone [data-sap-ui-popup] .sapUiCal > .sapUiCalContent > .sapUiCalMonthPicker,
@@ -1059,53 +1130,87 @@ html.sap-phone [data-sap-ui-popup] .sapUiCal > .sapUiCalContent > .sapUiCalYearP
 		justify-content: space-evenly;
 	}
 
-	.sapUiCalHead.sapUiCalHeaderWithTodayButton .sapUiCalHeadBPlaceholder {
-		width:100%;
+	.sapUiCalHead.sapUiCalHeaderWithTodayButton {
+		.sapUiCalHeadBPlaceholder {
+			width:100%;
+		}
+
+		.sapUiCalHeadNext,
+		.sapUiCalHeadToday {
+			margin-left: 0.5rem;
+		}
 	}
 
 	& .sapUiCalHeadB.sapUiCalHeadB1 {
 		margin-right: 0.25rem;
 	}
 
-	& .sapUiCalHeadB.sapUiCalHeadB4 {
-		margin-left: 0.25rem;
+	& .sapUiCalHead .sapUiCalHeadB.sapUiCalHeadB4 {
+		margin-left: 0;
+	}
+
+	& .sapUiCalHead:not(.sapUiCalHeaderWithTodayButton) {
+		.sapUiCalHeadB3 {
+			margin-left: 4.5rem;
+		}
+		.sapUiCalHeadB4 {
+			margin-left: 0;
+		}
 	}
 
 	& .sapUiCalHeadB.sapUiCalHeadB2.sapUiCalHeadBFirst {
 		margin-left: 0.25rem;
-		margin-right: calc(~"25% - 6rem");
-	}
-
-	& .sapUiCalHeadB.sapUiCalHeadB3.sapUiCalHeadBLast {
-		margin-right: 0.25rem;
-		margin-left: calc(~"25% - 6rem");
+		margin-right: calc(~"25% - 7rem");
 	}
 
 	.sapUiCalHeadB.sapUiCalHeadB2.sapUiCalSingleYearButton,
 	.sapUiCalHeadB.sapUiCalHeadB4.sapUiCalSingleYearButton {
 		width: 12rem;
-		margin-left: calc(~"25% - 6rem");
 	}
 
 	.sapUiCalContent > .sapUiCalMonthPicker, .sapUiCalContent > .sapUiCalYearPicker {
+		position: absolute;
+		margin-left: 0;
 		left: 50%;
+		top: 50%;
+		transform: translate(-50%, -50%);
+		box-shadow: var(--sapContent_Shadow1);
+		border-radius: var(--sapPopover_BorderCornerRadius);
+		z-index: 12;
 	}
 }
 
 .sapUiCal.sapUiCalMulti .sapUiCalContent > .sapUiCalMonthPicker,
 .sapUiCal.sapUiCalMulti .sapUiCalContent > .sapUiCalYearPicker {
+	position: absolute;
+	margin-left: 0;
 	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	box-shadow: var(--sapContent_Shadow1);
+	border-radius: var(--sapPopover_BorderCornerRadius);
+	z-index: 12;
 }
 
 .sapUiSizeCompact {
 
 	.sapUiCal {
 
-		.sapUiCalHead {
+		.sapUiCalHead.sapUiCalTwoMonthsInOneColumn {
 
 			.sapUiCalHeadB2.sapUiCalSingleYearButton,
 			.sapUiCalHeadB4.sapUiCalSingleYearButton {
 				width: 11rem;
+			}
+
+			.sapUiCalHeadB1 {
+				margin-right: 0.25rem;
+				width: 5.25rem;
+			}
+
+			.sapUiCalHeadB2 {
+				margin-left: 0.25rem;
+				width: 5.25rem;
 			}
 		}
 

@@ -295,7 +295,7 @@ sap.ui.define([
 			};
 			const oGetFlexSettingsStub = sandbox.stub(oSettings.getMetadata(), "getProperties").returns({
 				sampleKey: { _sGetter: "mySampleGetter" },
-				versioning: { _sGetter: "getVersioning" }
+				versioning: { _sGetter: "getIsVersioningEnabled" }
 			});
 			const oFlexSettings = await SupportAPI.getFlexSettings();
 

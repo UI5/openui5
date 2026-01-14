@@ -26,7 +26,6 @@ sap.ui.define([
 	 * @version ${version}
 	 *
 	 * @private
-	 * @experimental
 	 * @since 1.83
 	 */
     const PropertyHelper = PropertyHelperBase.extend("ChartJSPropertyHelper", {

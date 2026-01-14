@@ -3204,12 +3204,9 @@ sap.ui.define([
 
 		// Update the roles
 		const oOldCell = oRow.removeCell(VariantManagement.COLUMN_ROLES_IDX);
+		oOldCell?.destroy();
 		const oRoleCell = this._createRolesCell(this._findVariantItem(oContext), oContext);
-
-		if (oOldCell) {
-			oOldCell.destroy();
-			oRow.insertCell(oRoleCell, VariantManagement.COLUMN_ROLES_IDX);
-		}
+		oRow.insertCell(oRoleCell, VariantManagement.COLUMN_ROLES_IDX);
 
 		// Update the default state of the button and the default key
 		if (oRoleCell.isA("sap.m.HBox") && this._isRestricted(oItem.getContexts())) {

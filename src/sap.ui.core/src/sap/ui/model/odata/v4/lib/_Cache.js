@@ -2520,8 +2520,7 @@ sap.ui.define([
 				that.checkSharedRequest();
 				mPathToODataMessages[sInstancePath] = aMessages;
 				aMessages.forEach(function (oMessage) {
-					oMessage.longtextUrl
-						&&= _Helper.makeAbsolute(oMessage.longtextUrl, sContextUrl);
+					_Helper.makeAbsoluteLongtextUrl(oMessage, sContextUrl);
 				});
 			}
 		}

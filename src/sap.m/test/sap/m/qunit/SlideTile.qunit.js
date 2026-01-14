@@ -1149,6 +1149,20 @@ var FrameType = library.FrameType;
 		}
 	});
 
+	QUnit.test("Slide Tile content gets adjusted dynamically with 100 width, articleType and frameType as Stretch for more than 800px", async function (assert) {
+        this.oSlideTile = this.createSlideTile().placeAt("qunit-fixture");
+        this.oSlideTile.setWidth("100%");
+        await nextUIUpdate();
+        Device.resize.width = 600;
+        document.getElementById("qunit-fixture").style.width = "600px";
+        qutils.triggerEvent("resize", this.oSlideTile.getDomRef(), {});
+        assert.notOk(this.oSlideTile.hasStyleClass("sapMSTLargeScreen"), "The class is not present");
+        Device.resize.width = 900;
+        document.getElementById("qunit-fixture").style.width = "900px";
+        qutils.triggerEvent("resize", this.oSlideTile.getDomRef(), {});
+        assert.ok(this.oSlideTile.hasStyleClass("sapMSTLargeScreen"), "The class is present");
+    });
+
 	QUnit.test("Slide Tile should have the class sapMSTLargeScreen if its more than 800px", async function(assert) {
 		this.oSlideTile = this.createSlideTile().placeAt("qunit-fixture");
 		await nextUIUpdate();

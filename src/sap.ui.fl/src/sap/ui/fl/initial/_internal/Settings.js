@@ -6,11 +6,13 @@ sap.ui.define([
 	"sap/base/Log",
 	"sap/ui/base/ManagedObject",
 	"sap/ui/fl/initial/_internal/Storage",
+	"sap/ui/fl/Layer",
 	"sap/ui/fl/Utils"
 ], function(
 	Log,
 	ManagedObject,
 	Storage,
+	Layer,
 	Utils
 ) {
 	"use strict";
@@ -32,7 +34,8 @@ sap.ui.define([
 	}
 
 	/**
-	 * Holds all the system settings
+	 * Holds all the system settings. Properties are classified as information or write operation.
+	 * Write operations must have a layer configuration to determine which layers support the feature
 	 *
 	 * @class Settings class
 	 * @extends sap.ui.base.ManagedObject
@@ -150,6 +153,11 @@ sap.ui.define([
 				isVariantSharingEnabled: { type: "boolean", defaultValue: false },
 
 				/**
+				 * Indicates per layer if draft handling is enabled
+				 */
+				isVersioningEnabled: { type: "boolean", defaultValue: false },
+
+				/**
 				 * Indicates system Id of the ABAP backend system
 				 */
 				system: { type: "string" },
@@ -162,12 +170,7 @@ sap.ui.define([
 				/**
 				 * User Id, only set by the CF service
 				 */
-				userId: { type: "string" },
-
-				/**
-				 * Indicates per layer if draft handling is enabled
-				 */
-				versioning: { type: "object", defaultValue: {} }
+				userId: { type: "string" }
 			}
 		},
 		constructor: function(...aArgs) {
@@ -180,8 +183,23 @@ sap.ui.define([
 		}
 	});
 
+	const oLayerConfig = {
+		isAnnotationChangeEnabled: [Layer.CUSTOMER],
+		isAppVariantSaveAsEnabled: [Layer.CUSTOMER],
+		isCondensingEnabled: [Layer.USER, Layer.PUBLIC, Layer.CUSTOMER, Layer.CUSTOMER_BASE, Layer.VENDOR],
+		isContextBasedAdaptationEnabled: [Layer.CUSTOMER],
+		isKeyUser: [Layer.CUSTOMER],
+		isKeyUserTranslationEnabled: [Layer.CUSTOMER],
+		isLocalResetEnabled: [Layer.CUSTOMER, Layer.CUSTOMER_BASE, Layer.VENDOR],
+		isPublicFlVariantEnabled: [Layer.PUBLIC],
+		isPublishAvailable: [Layer.CUSTOMER],
+		isSeenFeaturesAvailable: [Layer.CUSTOMER],
+		isVariantPersonalizationEnabled: [Layer.USER],
+		isVersioningEnabled: [Layer.CUSTOMER]
+	};
+
 	function loadSettings() {
-		oLoadSettingsPromise = Storage.loadFeatures().then(async function(oLoadedSettings) {
+		oLoadSettingsPromise = Storage.loadFeatures(oLayerConfig).then(async function(oLoadedSettings) {
 			const oSettingsProperties = Object.assign({}, oLoadedSettings);
 			if (oSettingsProperties.logonUser) {
 				oSettingsProperties.userId = oSettingsProperties.logonUser;

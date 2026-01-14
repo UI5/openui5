@@ -12,15 +12,9 @@ sap.ui.define([
 	async function getSettings() {
 		const oSettings = await Settings.getInstance();
 		return Object.entries(oSettings.getMetadata().getProperties()).map(function([sKey, oProperty]) {
-			let vValue = oSettings[oProperty._sGetter]();
-
-			if (sKey === "versioning") {
-				vValue = vValue.CUSTOMER || vValue.ALL;
-			}
-
 			return {
 				key: sKey,
-				value: vValue
+				value: oSettings[oProperty._sGetter]()
 			};
 		});
 	}

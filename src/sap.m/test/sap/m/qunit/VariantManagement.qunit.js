@@ -4,11 +4,12 @@ sap.ui.define([
 	"sap/m/VariantManagement",
 	"sap/ui/core/Element",
 	"sap/ui/fl/write/api/ContextSharingAPI",
-	'sap/ui/qunit/QUnitUtils',
+	"sap/ui/qunit/QUnitUtils",
+	"sap/ui/model/json/JSONModel",
 	"sap/ui/test/utils/nextUIUpdate",
 	"sap/m/library",
 	"sap/ui/events/KeyCodes"
-], function(VariantItem, VariantManagement, Element, ContextSharingAPI, QUnitUtils, nextUIUpdate, mobileLibrary, KeyCodes) {
+], function(VariantItem, VariantManagement, Element, ContextSharingAPI, QUnitUtils, JSONModel, nextUIUpdate, mobileLibrary, KeyCodes) {
 	"use strict";
 
 	// shortcut for sap.m.Sticky
@@ -2228,6 +2229,103 @@ sap.ui.define([
 			//}.bind(this));
 		}.bind(this));
 
+	});
+
+	QUnit.test("check changing roles inside SaveAs dialog", async function(assert) {
+		const oRb = this.oVM._oRb;
+		const done = assert.async();
+
+		const oModel = new JSONModel({
+			items: [
+				{ key: "1", title:"One", rename: false, sharing: "Public", executeOnSelect: true, author: "A", visible: true },
+				{ key: "2", title:"Two", contexts: {role: ["test"]}, remove: true, sharing: "Private", author: "B", visible: true },
+				{ key: "3", title:"Three", contexts: {role: []}, favorite: true, remove: true, sharing: "Private", executeOnSelect: true, oauthor: "A", visible: true },
+				{ key: "4", title:"Four", contexts: {role: []}, favorite: false, rename: false, sharing: "Public", author: "B", visible: true }
+			]
+		});
+		this.oVM.setModel(oModel);
+
+		this.oVM.bindAggregation("items", {
+			path: "/items",
+			template: new VariantItem({
+				key: "{key}",
+				title: "{title}",
+				contexts: "{contexts}",
+				rename: "{rename}",
+				remove: "{remove}",
+				favorite: "{favorite}",
+				sharing: "{sharing}",
+				executeOnSelect: "{executeOnSelect}"
+			})
+		});
+
+		this.oVM.setDefaultKey("3");
+
+		await nextUIUpdate();
+
+		this.oVM.attachManage((oEvent) => {
+			const mParameters = oEvent.getParameters();
+			assert.ok(mParameters);
+			assert.ok(this.oCompContainer, "context sharing component exists");
+			done();
+		});
+
+		assert.ok(!this.oVM.getSupportContexts());
+		this.oVM.setSupportContexts(true);
+
+		this.oVM._sStyleClass = "STYLECLASS";
+		this.oVM._createManagementDialog();
+		assert.ok(this.oVM.oManagementDialog, "manage dialog should exists.");
+
+		this.oVM.oManagementDialog.attachAfterOpen(async () => {
+			const aItems = this.oVM.oManagementTable.getItems();
+			assert.ok(aItems, "items in the management table exists");
+			assert.equal(aItems.length, 4,  "expected count of items in the management table exists");
+
+			const oItem = aItems[2]; // 3rd item
+			const oRolesCell = oItem.getCells()[5];
+			assert.ok(oRolesCell, "expected contexts element");
+			assert.ok(oRolesCell.isA("sap.m.HBox"), "item with contexts");
+
+			const oText = oRolesCell.getItems()[0];
+			assert.equal(oText.getText(), oRb.getText("VARIANT_MANAGEMENT_VISIBILITY_NON_RESTRICTED"), "non restricted expected");
+			const oIcon = oRolesCell.getItems()[1];
+
+			QUnitUtils.triggerTouchEvent("click", oIcon.getFocusDomRef(), {
+				srcControl: null
+			});
+
+			await nextUIUpdate();
+		});
+
+		const fOriginalManageCall = this.oVM._openManagementDialog.bind(this.oVM);
+		sinon.stub(this.oVM, "_openManagementDialog").callsFake(() => {
+			fOriginalManageCall();
+			assert.ok(this.oVM.oManagementTable, "management table exists");
+		});
+
+		sinon.stub(this.oVM, "_openRolesDialog").callsFake(async (oItem) => {
+			const oBindingContext = oItem.getBindingContext();
+			assert.equal(oBindingContext.getProperty("key"), "3", "expected item for key 3");
+
+			oBindingContext.setProperty("contexts", { role: ["test"] });
+			await nextUIUpdate();
+
+			// Close Management Dialog
+			const oSaveTarget = this.oVM.oManagementSave.getFocusDomRef();
+			assert.ok(oSaveTarget, "dom ref of save button of manage dialog ob tained");
+			QUnitUtils.triggerTouchEvent("tap", oSaveTarget, {
+				srcControl: null
+			});
+
+			await nextUIUpdate();
+		});
+
+		const oContextSharing = ContextSharingAPI.createComponent({ layer: "CUSTOMER" });
+		oContextSharing.then((oCompContainer) => {
+			this.oCompContainer = oCompContainer;
+			this.oVM.openManagementDialog(false, "STYLECLASS", oContextSharing);
+		});
 	});
 
 });

@@ -5,6 +5,8 @@ sap.ui.define([
 	"sap/ui/base/ManagedObject",
 	"sap/ui/fl/initial/_internal/Settings",
 	"sap/ui/fl/initial/_internal/Storage",
+	"sap/ui/fl/initial/_internal/StorageUtils",
+	"sap/ui/fl/Layer",
 	"sap/ui/fl/Utils",
 	"sap/ui/thirdparty/sinon-4"
 ], (
@@ -12,13 +14,15 @@ sap.ui.define([
 	ManagedObject,
 	Settings,
 	Storage,
+	StorageUtils,
+	Layer,
 	Utils,
 	sinon
 ) => {
 	"use strict";
 	const sandbox = sinon.createSandbox();
 
-	QUnit.module("Settings", {
+	QUnit.module("Settings with Storage stubbed", {
 		beforeEach() {
 			this.oLoadFeaturesStub = sandbox.stub(Storage, "loadFeatures").resolves({
 				isKeyUser: true
@@ -120,6 +124,77 @@ sap.ui.define([
 				"Unknown settings received from the backend: thisDoesNotExist, anotherUnknownSetting",
 				"then the warning message is correct"
 			);
+		});
+	});
+
+	QUnit.module("Settings with Connector responses stubbed", {
+		beforeEach() {
+			sandbox.stub(StorageUtils, "getLoadConnectors").returns([
+				{
+					connector: "LrepConnector",
+					layers: [],
+					url: "/sap/bc/lrep",
+					loadConnectorModule: {
+						loadFeatures: () => {
+							return Promise.resolve({
+								isKeyUser: false,
+								isAppVariantSaveAsEnabled: true,
+								isContextBasedAdaptationEnabled: true,
+								isCondensingEnabled: false
+							});
+						}
+					}
+				},
+				{
+					applyConnector: "open/ux/preview/client/flp/WorkspaceConnector",
+					writeConnector: "open/ux/preview/client/flp/WorkspaceConnector",
+					custom: true,
+					layers: [
+						Layer.VENDOR,
+						Layer.CUSTOMER_BASE
+					],
+					loadConnectorModule: {
+						loadFeatures: () => {
+							return Promise.resolve({
+								isCondensingEnabled: true,
+								isAppVariantSaveAsEnabled: false,
+								isContextBasedAdaptationEnabled: true,
+								isLocalResetEnabled: true,
+								isPublicFlVariantEnabled: true
+							});
+						}
+					}
+				},
+				{
+					connector: "LocalStorageConnector",
+					layers: [
+						Layer.CUSTOMER,
+						Layer.USER
+					],
+					loadConnectorModule: {
+						loadFeatures: () => {
+							return Promise.resolve({
+								isAppVariantSaveAsEnabled: true,
+								isContextBasedAdaptationEnabled: false,
+								isLocalResetEnabled: false
+							});
+						}
+					}
+				}
+			]);
+		},
+		afterEach() {
+			sandbox.restore();
+		}
+	}, function() {
+		QUnit.test("with multiple connectors returning same values", async function(assert) {
+			const oSettings = await Settings.getInstance();
+			assert.strictEqual(oSettings.getIsKeyUser(), false, "then the isKeyUser setting is correct");
+			assert.strictEqual(oSettings.getIsAppVariantSaveAsEnabled(), true, "then isAppVariantSaveAsEnabled is correct");
+			assert.strictEqual(oSettings.getIsCondensingEnabled(), true, "then isCondensingEnabled is correct");
+			assert.strictEqual(oSettings.getIsContextBasedAdaptationEnabled(), false, "then isContextBasedAdaptationEnabled is correct");
+			assert.strictEqual(oSettings.getIsLocalResetEnabled(), false, "with multiple correct connectors the last value is used");
+			assert.strictEqual(oSettings.getIsPublicFlVariantEnabled(), false, "the default value is used");
 		});
 	});
 

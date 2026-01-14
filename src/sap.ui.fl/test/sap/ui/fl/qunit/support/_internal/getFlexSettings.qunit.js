@@ -3,12 +3,10 @@
 sap.ui.define([
 	"sap/ui/fl/initial/_internal/Settings",
 	"sap/ui/fl/support/_internal/getFlexSettings",
-	"sap/ui/fl/Utils",
 	"sap/ui/thirdparty/sinon-4"
 ], function(
 	Settings,
 	getFlexSettings,
-	Utils,
 	sinon
 ) {
 	"use strict";
@@ -27,10 +25,6 @@ sap.ui.define([
 	QUnit.module("getFlexSettings", {
 		beforeEach() {
 			this.oSettings = {
-				versioning: {
-					CUSTOMER: false,
-					ALL: false
-				},
 				isKeyUser: true,
 				isLocalResetEnabled: false
 			};
@@ -40,30 +34,9 @@ sap.ui.define([
 			sandbox.restore();
 		}
 	}, function() {
-		QUnit.test("with no versioning in CUSTOMER or ALL", async function(assert) {
+		QUnit.test("with some settings", async function(assert) {
 			const aSettings = await getFlexSettings("dummyComponent");
 			checkPropertiesInSettings(assert, aSettings, [
-				{ key: "versioning", value: false },
-				{ key: "isKeyUser", value: true },
-				{ key: "isLocalResetEnabled", value: false }
-			]);
-		});
-
-		QUnit.test("with versioning in CUSTOMER", async function(assert) {
-			this.oSettings.versioning.CUSTOMER = true;
-			const aSettings = await getFlexSettings("dummyComponent");
-			checkPropertiesInSettings(assert, aSettings, [
-				{ key: "versioning", value: true },
-				{ key: "isKeyUser", value: true },
-				{ key: "isLocalResetEnabled", value: false }
-			]);
-		});
-
-		QUnit.test("with versioning in ALL", async function(assert) {
-			this.oSettings.versioning.ALL = true;
-			const aSettings = await getFlexSettings("dummyComponent");
-			checkPropertiesInSettings(assert, aSettings, [
-				{ key: "versioning", value: true },
 				{ key: "isKeyUser", value: true },
 				{ key: "isLocalResetEnabled", value: false }
 			]);

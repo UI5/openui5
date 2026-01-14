@@ -118,7 +118,7 @@ sap.ui.define([
 		},
 
 		/**
-		 * Checks if the data storing implementation for a given layer is capable of handling versioning.
+		 * Checks if versioning (draft handling) is enabled and the passed layer is CUSTOMER.
 		 *
 		 * @param {string} sLayer - Layer to check for the draft versioning
 		 * @returns {Promise<boolean>} Resolves to a boolean indicating if versioning is enabled
@@ -127,8 +127,7 @@ sap.ui.define([
 		 */
 		async isVersioningEnabled(sLayer) {
 			const oSettings = await Settings.getInstance();
-			const oVersionInfo = oSettings.getVersioning();
-			return !!(oVersionInfo[sLayer] || oVersionInfo.ALL);
+			return sLayer === Layer.CUSTOMER ? oSettings.getIsVersioningEnabled() : false;
 		},
 
 		/**

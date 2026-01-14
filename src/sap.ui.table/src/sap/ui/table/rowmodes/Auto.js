@@ -324,7 +324,7 @@ sap.ui.define([
 		}
 
 		if (iRowContentHeight > 0) {
-			oRM.style("max-height", iRowContentHeight + "px");
+			oRM.style("max-height", iRowContentHeight - 1 + "px");
 		}
 	};
 
