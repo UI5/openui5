@@ -1909,7 +1909,8 @@ sap.ui.define([
 	});
 
 	QUnit.test("Role listbox should be applied", function(assert) {
-		assert.strictEqual(this.tokenizer.$().attr("role"), "listbox", "Tokenizer has role listbox");
+		const sInnerContainerId = this.tokenizer.getId() + "-scrollContainer";
+		assert.strictEqual(this.tokenizer.$().find(`#${sInnerContainerId}`).attr("role"), "listbox", "Tokenizer inner container has role listbox");
 	});
 
 	QUnit.test("aria-hidden attribute", async function(assert) {
