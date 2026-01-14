@@ -111,7 +111,7 @@ html.sap-desktop .sapUiCalHead > .sapUiCalHeadB:focus,
 .sapUiCalHead .sapUiCalHeadNext,
 .sapUiCalHead .sapUiCalHeadToday {
 	border-radius: 0.5rem;
-
+	border: 0.0625rem solid var(--sapButton_BorderColor);
 }
 
 .sapUiCalHead .sapUiCalHeadPrev:hover,
@@ -150,7 +150,6 @@ html.sap-desktop .sapUiCalHead > .sapUiCalHeadB:active {
 
 .sapUiCalYearPicker,
 .sapUiCalMonthPicker {
-
 	.sapUiCalItem {
 		outline: 0.0625rem solid var(--sapButton_Lite_BorderColor);
 		outline-offset: -0.125rem;
@@ -637,10 +636,11 @@ html.sap-desktop .sapUiCalItemSelBetween:focus:not(:hover) {
 	.sapUiCalMonthSecType .sapUiCalItem.sapUiCalItemNow > .sapUiCalItemText {
 		line-height: 1.25rem;
 	}
-
-	.sapUiCalHead > button {
-		margin: 0.1875rem 0;
-		height: 1.625rem;
+	.sapUiCalHead {
+		& > button {
+			margin: 0.1875rem 0;
+			height: 1.625rem;
+		}
 	}
 
 	.sapUiCalMonthSecType .sapUiCalItem.sapUiCalItemNow.sapUiCalItemSelBetween > .sapUiCalItemText {

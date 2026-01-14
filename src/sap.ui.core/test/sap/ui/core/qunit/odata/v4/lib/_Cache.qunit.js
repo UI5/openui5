@@ -4075,7 +4075,7 @@ sap.ui.define([
 				}]
 			},
 			mExpectedMessages = {
-				"" : [{longtextUrl : "/~/EntitySet('42')/Longtext(1)"}]
+				"" : oData.messages
 			},
 			oType = {
 				"@com.sap.vocabularies.Common.v1.Messages" : {$Path : "messages"},
@@ -4091,6 +4091,8 @@ sap.ui.define([
 		mExpectedMessages[""].$count = 1;
 		mExpectedMessages[""].$created = 0;
 		this.mock(oCache).expects("checkSharedRequest").withExactArgs();
+		this.mock(_Helper).expects("makeAbsoluteLongtextUrl")
+			.withExactArgs(sinon.match.same(oData.messages[0]), "/~/EntitySet('42')/Navigation");
 		this.oModelInterfaceMock.expects("reportStateMessages")
 			.withExactArgs("original/resource/path", mExpectedMessages, undefined);
 
@@ -4136,11 +4138,12 @@ sap.ui.define([
 				}
 			},
 			mExpectedMessages = {
-				"" : [{longtextUrl : "/~/Longtext(1)"}],
-				foo : [{longtextUrl : "/foo/Longtext(2)"}],
-				"foo/bar" : [{longtextUrl : "/foo/Longtext(3)"}],
-				"foo/baz" : [{longtextUrl : "/foo/baz/Longtext(4)"}]
+				"" : oData.messages,
+				foo : oData.foo.messages,
+				"foo/bar" : oData.foo.bar.messages,
+				"foo/baz" : oData.foo.baz.messages
 			},
+			oHelperMock = this.mock(_Helper),
 			oType = {
 				"@com.sap.vocabularies.Common.v1.Messages" : {$Path : "messages"},
 				$Key : ["id"],
@@ -4160,6 +4163,14 @@ sap.ui.define([
 			mExpectedMessages[sKey].$created = 0;
 		}
 		this.mock(oCache).expects("checkSharedRequest").withExactArgs().exactly(4);
+		oHelperMock.expects("makeAbsoluteLongtextUrl")
+			.withExactArgs(sinon.match.same(oData.messages[0]), "/~/$metadata#foo");
+		oHelperMock.expects("makeAbsoluteLongtextUrl")
+			.withExactArgs(sinon.match.same(oData.foo.messages[0]), "/foo/context");
+		oHelperMock.expects("makeAbsoluteLongtextUrl")
+			.withExactArgs(sinon.match.same(oData.foo.bar.messages[0]), "/foo/context");
+		oHelperMock.expects("makeAbsoluteLongtextUrl")
+			.withExactArgs(sinon.match.same(oData.foo.baz.messages[0]), "/foo/baz/context");
 		this.oModelInterfaceMock.expects("reportStateMessages")
 			.withExactArgs("original/resource/path", mExpectedMessages, undefined);
 
@@ -4168,13 +4179,9 @@ sap.ui.define([
 
 		// check adjusted cache
 		assert.strictEqual(oData["picture@odata.mediaReadLink"], "/~/img_42.jpg");
-		assert.strictEqual(oData.messages[0].longtextUrl, "/~/Longtext(1)");
 		assert.strictEqual(oData.foo["picture@odata.mediaReadLink"], "/foo/img_43.jpg");
-		assert.strictEqual(oData.foo.messages[0].longtextUrl, "/foo/Longtext(2)");
 		assert.strictEqual(oData.foo.bar["picture@odata.mediaReadLink"], "/foo/img_44.jpg");
-		assert.strictEqual(oData.foo.bar.messages[0].longtextUrl, "/foo/Longtext(3)");
 		assert.strictEqual(oData.foo.baz["picture@odata.mediaReadLink"], "/foo/baz/img_45.jpg");
-		assert.strictEqual(oData.foo.baz.messages[0].longtextUrl, "/foo/baz/Longtext(4)");
 	});
 
 	//*********************************************************************************************
@@ -4208,10 +4215,11 @@ sap.ui.define([
 				}]
 			},
 			mExpectedMessages = {
-				"(1)" : [{longtextUrl : "/~/Longtext(1)"}],
-				"(1)/foo(2)" : [{longtextUrl : "/foo/Longtext(2)"}],
-				"(1)/foo(2)/bar(3)" : [{longtextUrl : "/foo/bar/Longtext(3)"}]
+				"(1)" : oData.value[0].messages,
+				"(1)/foo(2)" : oData.value[0].foo[0].messages,
+				"(1)/foo(2)/bar(3)" : oData.value[0].foo[0].bar[0].messages
 			},
+			oHelperMock = this.mock(_Helper),
 			oType = {
 				"@com.sap.vocabularies.Common.v1.Messages" : {$Path : "messages"},
 				$Key : ["id"],
@@ -4230,6 +4238,13 @@ sap.ui.define([
 			mExpectedMessages[sKey].$created = 0;
 		}
 		this.mock(oCache).expects("checkSharedRequest").withExactArgs().thrice();
+		oHelperMock.expects("makeAbsoluteLongtextUrl")
+			.withExactArgs(sinon.match.same(oData.value[0].messages[0]), "/~/$metadata#foo");
+		oHelperMock.expects("makeAbsoluteLongtextUrl")
+			.withExactArgs(sinon.match.same(oData.value[0].foo[0].messages[0]), "/foo/context");
+		oHelperMock.expects("makeAbsoluteLongtextUrl")
+			.withExactArgs(sinon.match.same(oData.value[0].foo[0].bar[0].messages[0]),
+				"/foo/bar/context");
 		this.oModelInterfaceMock.expects("reportStateMessages")
 			.withExactArgs("original/resource/path", mExpectedMessages, ["(1)"]);
 
@@ -4238,13 +4253,9 @@ sap.ui.define([
 
 		// check adjusted cache
 		assert.strictEqual(oData.value[0]["picture@odata.mediaReadLink"], "/~/img_1.jpg");
-		assert.strictEqual(oData.value[0].messages[0].longtextUrl, "/~/Longtext(1)");
 		assert.strictEqual(oData.value[0].foo[0]["picture@odata.mediaReadLink"], "/foo/img_2.jpg");
-		assert.strictEqual(oData.value[0].foo[0].messages[0].longtextUrl, "/foo/Longtext(2)");
 		assert.strictEqual(oData.value[0].foo[0].bar[0]["picture@odata.mediaReadLink"],
 			"/foo/bar/img_3.jpg");
-		assert.strictEqual(oData.value[0].foo[0].bar[0].messages[0].longtextUrl,
-			"/foo/bar/Longtext(3)");
 	});
 
 	//*********************************************************************************************

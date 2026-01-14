@@ -1492,16 +1492,13 @@ sap.ui.define([
 	 *   the longtext URL
 	 * @param {string} [sCachePath]
 	 *   The cache-relative path to the entity; used to resolve the targets
-	 * @param {object} [oOriginalMessage=oRawMessage]
-	 *   The original message object which is used to create the technical details
 	 * @returns {sap.ui.core.message.Message}
 	 *   The created UI5 message object
 	 *
 	 * @private
 	 */
 	// eslint-disable-next-line valid-jsdoc -- .@$ui5. is not understood properly
-	ODataModel.prototype.createUI5Message = function (oRawMessage, sResourcePath, sCachePath,
-			oOriginalMessage = oRawMessage) {
+	ODataModel.prototype.createUI5Message = function (oRawMessage, sResourcePath, sCachePath) {
 		var bIsBound = typeof oRawMessage.target === "string",
 			sMessageLongtextUrl = oRawMessage.longtextUrl,
 			aTargets,
@@ -1536,7 +1533,7 @@ sap.ui.define([
 			// Note: "" instead of undefined makes filtering easier (agreement with FE!)
 			target : bIsBound ? aTargets : "",
 			technical : oRawMessage.technical,
-			technicalDetails : _Helper.createTechnicalDetails(oOriginalMessage),
+			technicalDetails : _Helper.createTechnicalDetails(oRawMessage),
 			type : aMessageTypes[oRawMessage.numericSeverity] || MessageType.None
 		});
 	};
@@ -2652,16 +2649,15 @@ sap.ui.define([
 		}
 
 		const aUI5Messages = aMessages.map((oMessage) => {
-			const oOriginalMessage = oMessage;
+			oMessage["@$ui5.originalMessage"] ??= _Helper.clone(oMessage);
+			oMessage.transition = true;
 			if (oOperationMetadata) {
-				oMessage = _Helper.clone(oMessage);
 				// make targets absolute, will not be adjusted again in #createUI5Message
 				_Helper.adjustTargets(oMessage, oOperationMetadata, undefined, sContextPath,
 					sOriginalResourcePath);
 			}
-			oMessage.transition = true;
 
-			return this.createUI5Message(oMessage, sResourcePath, undefined, oOriginalMessage);
+			return this.createUI5Message(oMessage, sResourcePath);
 		});
 		if (!bSilent) {
 			Messaging.updateMessages(undefined, aUI5Messages);

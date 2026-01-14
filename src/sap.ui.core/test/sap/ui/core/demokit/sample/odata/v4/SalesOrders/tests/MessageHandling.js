@@ -98,8 +98,7 @@ sap.ui.define([
 					},
 					"@Common.TransactionId" : "A9DFB82A2D7B0240E0058CB109CEBFBC",
 					"@Common.Timestamp" : "20170320071538.918157",
-					longtextUrl : "/sap/opu/odata4/sap/zui5_testv4/default/sap/zui5_epm_sample"
-						+ "/0002/SalesOrderList('0500000001')/Messages(1)",
+					longtextUrl : "SalesOrderList('0500000001')/Messages(1)",
 					message : "Enter customer reference if available",
 					numericSeverity : 3,
 					target : "Note",

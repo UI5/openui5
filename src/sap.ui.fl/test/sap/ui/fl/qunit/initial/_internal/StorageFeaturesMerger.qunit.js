@@ -3,13 +3,11 @@
 sap.ui.define([
 	"sap/ui/thirdparty/sinon-4",
 	"sap/ui/fl/Layer",
-	"sap/ui/fl/initial/_internal/StorageFeaturesMerger",
-	"sap/base/Log"
+	"sap/ui/fl/initial/_internal/StorageFeaturesMerger"
 ], function(
 	sinon,
 	Layer,
-	StorageFeaturesMerger,
-	Log
+	StorageFeaturesMerger
 ) {
 	"use strict";
 
@@ -23,7 +21,7 @@ sap.ui.define([
 		QUnit.test("mergeResults with empty aResponse", function(assert) {
 			var aResponse = [];
 
-			var oResult = StorageFeaturesMerger.mergeResults(aResponse);
+			var oResult = StorageFeaturesMerger.mergeResults(aResponse, {});
 			assert.deepEqual(oResult, {}, "empty response");
 		});
 
@@ -34,8 +32,7 @@ sap.ui.define([
 			};
 			var oResponse2 = {
 				layers: [Layer.CUSTOMER],
-				features: { isKeyUser: true, isKeyUserTranslationEnabled: true },
-				isContextSharingEnabled: true
+				features: { isKeyUser: true, isKeyUserTranslationEnabled: true, isProductiveSystem: true }
 			};
 			var oResponse3 = {
 				layers: [],
@@ -43,38 +40,62 @@ sap.ui.define([
 			};
 			var aResponse = [oResponse1, oResponse2, oResponse3];
 
-			var oResult = StorageFeaturesMerger.mergeResults(aResponse);
+			var oResult = StorageFeaturesMerger.mergeResults(aResponse, {});
 
 			assert.equal(oResult.newKey, true, "get new key");
 			assert.equal(oResult.isKeyUser, true, "last isKeyUser is true");
-			assert.equal(oResult.isProductiveSystem, false, "isProductiveSystem is false");
+			assert.equal(oResult.isProductiveSystem, true, "isProductiveSystem is true");
 			assert.equal(oResult.isKeyUserTranslationEnabled, true, "isKeyUserTranslationEnabled is true");
-			assert.equal(oResult.isContextSharingEnabled, true, "isContextSharingEnabled is true");
 			assert.equal(oResult.isVariantAuthorNameAvailable, true, "isVariantAuthorNameAvailable is true");
 		});
 
-		QUnit.test("mergeResults handles the versioning flags", function(assert) {
-			var oResponse1 = {
-				layers: [Layer.VENDOR, Layer.CUSTOMER_BASE],
-				features: { isVersioningEnabled: false }
+		QUnit.test("mergeResults with different values for a Key User write operations", function(assert) {
+			// isAnnotationChangeEnabled is enabled for the CUSTOMER layer only
+			const oResponse1 = {
+				layers: ["ALL"],
+				features: { isAnnotationChangeEnabled: false }
 			};
-			var oResponse2 = {
-				layers: [Layer.CUSTOMER],
-				features: { isVersioningEnabled: true }
+			const oResponse2 = {
+				layers: [],
+				features: { isAnnotationChangeEnabled: true }
 			};
-			var oResponse3 = {
-				layers: [Layer.USER],
-				features: { isVersioningEnabled: false }
+			const oResponse3 = {
+				layers: ["USER"],
+				features: { isAnnotationChangeEnabled: true, foobar: false }
 			};
-			var aResponse = [oResponse1, oResponse2, oResponse3];
+			const oResponse4 = {
+				features: { isAnnotationChangeEnabled: true, foobar: true }
+			};
+			const oLayerConfiguration = {
+				isAnnotationChangeEnabled: [Layer.CUSTOMER],
+				foobar: [Layer.USER]
+			};
+			const oResult = StorageFeaturesMerger.mergeResults([oResponse1, oResponse2, oResponse3, oResponse4], oLayerConfiguration);
 
-			var oResult = StorageFeaturesMerger.mergeResults(aResponse);
+			assert.strictEqual(oResult.isAnnotationChangeEnabled, false, "the value with the correct layer is taken");
+			assert.strictEqual(oResult.foobar, false, "the value with the correct layer is taken");
+		});
 
-			assert.equal(oResult.versioning.VENDOR, undefined);
-			assert.equal(oResult.versioning.CUSTOMER_BASE, undefined);
-			assert.equal(oResult.versioning.PARTNER, undefined);
-			assert.equal(oResult.versioning.CUSTOMER, true);
-			assert.equal(oResult.versioning.USER, undefined);
+		QUnit.test("mergeResults with different values for a Key User write operations", function(assert) {
+			// isAnnotationChangeEnabled is enabled for the CUSTOMER layer only
+			const oResponse1 = {
+				layers: ["CUSTOMER"],
+				features: { isAnnotationChangeEnabled: false }
+			};
+			const oResponse2 = {
+				layers: [],
+				features: { isAnnotationChangeEnabled: true }
+			};
+			const oResponse3 = {
+				layers: ["USER"],
+				features: { isAnnotationChangeEnabled: true }
+			};
+			const oLayerConfiguration = {
+				isAnnotationChangeEnabled: [Layer.CUSTOMER]
+			};
+			const oResult = StorageFeaturesMerger.mergeResults([oResponse1, oResponse2, oResponse3], oLayerConfiguration);
+
+			assert.strictEqual(oResult.isAnnotationChangeEnabled, false, "the value with the correct layer is taken");
 		});
 	});
 
@@ -181,8 +202,6 @@ sap.ui.define([
 			expectedValue: true
 		}].forEach(function(oTestSetup) {
 			QUnit.test(`merge handles the layer specific key user flag: ${oTestSetup.description}`, (assert) => {
-				const oLogMock = sandbox.stub(Log, "warning");
-
 				const aConnectors = oTestSetup.connectors.map((oConnector) => {
 					const oFeatures = {};
 
@@ -196,10 +215,9 @@ sap.ui.define([
 					};
 				});
 
-				const oResult = StorageFeaturesMerger.mergeResults(aConnectors);
+				const oResult = StorageFeaturesMerger.mergeResults(aConnectors, { isKeyUser: [Layer.CUSTOMER] });
 
 				assert.equal(oResult.isKeyUser, oTestSetup.expectedValue);
-				assert.equal(oLogMock.callCount, oTestSetup.expectedLogs);
 			});
 		});
 	});

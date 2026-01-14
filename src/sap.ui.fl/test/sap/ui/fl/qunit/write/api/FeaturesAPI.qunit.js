@@ -125,15 +125,7 @@ sap.ui.define([
 			QUnit.test(`when isVersioningEnabled(sLayer) is called in a ${
 				bValueToBeSet ? "draft enabled" : "non draft enabled"} layer`, async function(assert) {
 				sandbox.stub(Settings, "getInstance").resolves({
-					getVersioning() {
-						return bValueToBeSet ? {
-							[Layer.CUSTOMER]: true,
-							ALL: false
-						} : {
-							[Layer.CUSTOMER]: false,
-							ALL: false
-						};
-					}
+					getIsVersioningEnabled: () => bValueToBeSet
 				});
 				const bVersioningEnabled1 = await FeaturesAPI.isVersioningEnabled(Layer.CUSTOMER);
 				assert.strictEqual(bVersioningEnabled1, bValueToBeSet, `then ${bValueToBeSet} is returned`);

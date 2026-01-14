@@ -75,8 +75,7 @@ sap.ui.define(function () {
 			"lib/_V4MetadataConverter" : {},
 			// the following tests must all be named "OPA.*" so that 1Ring ignores them
 			"OPA.Create" : {
-				module : ["sap/ui/core/sample/odata/v4/Create/Opa.qunit"],
-				realOData : false // requires stable test data
+				module : ["sap/ui/core/sample/odata/v4/Create/Opa.qunit"]
 			},
 			"OPA.DataAggregation" : {
 				module : ["sap/ui/core/sample/odata/v4/DataAggregation/Opa.qunit"],

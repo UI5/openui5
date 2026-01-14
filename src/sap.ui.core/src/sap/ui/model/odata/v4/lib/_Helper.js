@@ -2299,6 +2299,26 @@ sap.ui.define([
 		},
 
 		/**
+		 * Makes the given message's longtext URL absolute. Clones and keeps the original message
+		 * only if needed.
+		 *
+		 * @param {object} oMessage - An object potentially containing a longtext URL
+		 * @param {string} [oMessage.longtextUrl] - The longtext URL
+		 * @param {string} sBase - The absolute or root-relative base URL
+		 *
+		 * @public
+		 */
+		makeAbsoluteLongtextUrl : function (oMessage, sBase) {
+			if (oMessage.longtextUrl) {
+				const sAbsoluteLongtextURL = _Helper.makeAbsolute(oMessage.longtextUrl, sBase);
+				if (oMessage.longtextUrl !== sAbsoluteLongtextURL) {
+					oMessage["@$ui5.originalMessage"] ??= _Helper.clone(oMessage);
+					oMessage.longtextUrl = sAbsoluteLongtextURL;
+				}
+			}
+		},
+
+		/**
 		 * Make the given absolute path relative to the given base path. The paths must be OData
 		 * resource paths (ABNF rule resourcePath).
 		 *

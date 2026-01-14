@@ -269,15 +269,9 @@ sap.ui.define([
 			this.getDomRef().setAttribute("aria-describedby",this.getAggregation("_invisibleText").getId());
 		}
 
-		var bIsScreenLarge = this.getDomRef()?.offsetWidth >= 800;
-		this.toggleStyleClass("sapMSTLargeScreen",bIsScreenLarge);
+
 		this.toggleStyleClass("sapMSTPhone",Device.system.phone);
-		if (bIsScreenLarge) {
-			this.getTiles().forEach((oTile) => oTile._setHeaderContentBackgroundImage());
-		}
-		if (this.getDomRef()?.offsetHeight < 180) {
-			this.addStyleClass("sapMSTSmallScreen");
-		}
+
 	};
 
 	/**
@@ -472,6 +466,16 @@ sap.ui.define([
 			} else {
 				this.$().removeClass("sapMTileSmallPhone");
 			}
+			/* Slide Tile content gets adjusted dynamically with 100% width, articleType and frameType as Stretch for more than 800px */
+            var bIsScreenLarge = this.getDomRef()?.offsetWidth >= 800;
+            this.toggleStyleClass("sapMSTLargeScreen", bIsScreenLarge);
+            if (bIsScreenLarge) {
+                this.getTiles().forEach((oTile) => oTile._setHeaderContentBackgroundImage());
+            }
+            /* Apply 4px padding between the title and the image of the slide tile when height is less than 180px */
+            if (this.getDomRef()?.offsetHeight < 180) {
+                this.addStyleClass("sapMSTSmallScreen");
+            }
 		}.bind(this);
 
 		jQuery(window).on("resize", fnCheckMedia);

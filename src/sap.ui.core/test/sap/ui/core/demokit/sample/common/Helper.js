@@ -5,12 +5,13 @@
 sap.ui.define("sap/ui/core/sample/common/Helper", [
 	"sap/base/Log",
 	"sap/base/i18n/Localization",
+	"sap/ui/test/Opa",
 	"sap/ui/test/Opa5",
 	"sap/ui/test/actions/EnterText",
 	"sap/ui/test/actions/Press",
 	"sap/ui/test/matchers/Interactable",
 	"sap/ui/test/TestUtils"
-], function (Log, Localization, Opa5, EnterText, Press, Interactable, TestUtils) {
+], function (Log, Localization, Opa, Opa5, EnterText, Press, Interactable, TestUtils) {
 	"use strict";
 	var aCleanupTasks = [],
 		Helper;
@@ -303,10 +304,16 @@ sap.ui.define("sap/ui/core/sample/common/Helper", [
 		 *  Whether Opa5 will only search for controls in open dialogs
 		 * @param {number} [iRow]
 		 *  The row number (zero based) of the control if the control is within a collection
+		 * @param {boolean} [bNoAutoWait]
+		 *   Allows this check even while async work happens
 		 */
 		checkValueState : function (oOpa5, sViewName, sID, sValueState, sValueStateText,
-				bSearchOpenDialogs, iRow) {
+				bSearchOpenDialogs, iRow, bNoAutoWait) {
+			if (bNoAutoWait && Opa.config.executionDelay) {
+				return; // give up (found no way to make this combination work)
+			}
 			oOpa5.waitFor({
+				autoWait : !bNoAutoWait,
 				id : sID,
 				matchers : iRow === undefined ? undefined : function (oControl) {
 					return oControl.getBindingContext().getIndex() === iRow;

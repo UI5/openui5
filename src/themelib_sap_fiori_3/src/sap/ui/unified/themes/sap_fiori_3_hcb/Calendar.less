@@ -15,6 +15,10 @@
 	height: 2.875rem;
 }
 
+.sapUiCalHead > button {
+	border: 0.0625rem solid var(--sapButton_BorderColor);
+}
+
 html.sap-desktop .sapUiCalHead > .sapUiCalHeadB:focus,
 html.sap-desktop .sapUiCalHead > .sapUiCalHeadNext:focus,
 html.sap-desktop .sapUiCalHead > .sapUiCalHeadPrev:focus {
@@ -241,6 +245,13 @@ html.sap-desktop .sapUiCalItemSel:not(.sapUiCalItemNow):not(.sapUiCalItemSelBetw
 
 .sapUiCalMonthPicker,
 .sapUiCalYearPicker {
+	display: flex;
+	gap: 0.25rem;
+
+	& > div {
+		display: flex;
+		gap: 0.25rem;
+	}
 
 	.sapUiCalItem.sapUiCalItemDsbl {
 		opacity: var(--sapContent_DisabledOpacity);

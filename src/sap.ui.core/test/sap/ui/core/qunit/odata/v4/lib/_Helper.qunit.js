@@ -2334,6 +2334,72 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
+	QUnit.test("makeAbsoluteLongtextUrl", function (assert) {
+		const oMessage = {longtextUrl : "relative/path"};
+		this.mock(_Helper).expects("makeAbsolute").withExactArgs("relative/path", "/base/")
+			.returns("/base/relative/path");
+		this.mock(_Helper).expects("clone").withExactArgs(sinon.match.same(oMessage))
+			.returns("~clone~");
+
+		assert.strictEqual(
+			// code under test
+			_Helper.makeAbsoluteLongtextUrl(oMessage, "/base/"),
+			undefined, "no return value");
+
+		assert.deepEqual(oMessage, {
+			"@$ui5.originalMessage" : "~clone~",
+			longtextUrl : "/base/relative/path"
+		});
+	});
+
+	//*********************************************************************************************
+	QUnit.test("makeAbsoluteLongtextUrl: already cloned", function (assert) {
+		const oMessage = {
+			"@$ui5.originalMessage" : "~clone~",
+			longtextUrl : "relative/path"
+		};
+		this.mock(_Helper).expects("makeAbsolute").withExactArgs("relative/path", "/base/")
+			.returns("/absolute/path");
+		this.mock(_Helper).expects("clone").never();
+
+		assert.strictEqual(
+			// code under test
+			_Helper.makeAbsoluteLongtextUrl(oMessage, "/base/"),
+			undefined, "no return value");
+
+		assert.deepEqual(oMessage, {
+			"@$ui5.originalMessage" : "~clone~",
+			longtextUrl : "/absolute/path"
+		});
+	});
+
+	//*********************************************************************************************
+	QUnit.test("makeAbsoluteLongtextUrl: no clone needed", function (assert) {
+		const oMessage = {longtextUrl : "/absolute/path"};
+		this.mock(_Helper).expects("makeAbsolute").withExactArgs("/absolute/path", "/base/")
+			.returns("/absolute/path");
+		this.mock(_Helper).expects("clone").never();
+
+		assert.strictEqual(
+			// code under test
+			_Helper.makeAbsoluteLongtextUrl(oMessage, "/base/"),
+			undefined, "no return value");
+
+		assert.deepEqual(oMessage, {longtextUrl : "/absolute/path"});
+	});
+
+	//*********************************************************************************************
+	QUnit.test("makeAbsoluteLongtextUrl: nothing to do", function (assert) {
+		this.mock(_Helper).expects("makeAbsolute").never();
+		this.mock(_Helper).expects("clone").never();
+
+		assert.strictEqual(
+			// code under test
+			_Helper.makeAbsoluteLongtextUrl({}),
+			undefined, "no return value");
+	});
+
+	//*********************************************************************************************
 	QUnit.test("makeRelativePath", function (assert) {
 		assert.strictEqual(_Helper.makeRelativePath("/foo/baz", "/foo/bar"), "baz");
 		assert.strictEqual(_Helper.makeRelativePath("/foo/bar/qux", "/foo/baz"), "bar/qux");

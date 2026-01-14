@@ -31,7 +31,7 @@ sap.ui.define([
 	 * @ui5-restricted sap.ui.fl
 	 */
 
-	function _loadFlexDataFromConnectors(mPropertyBag, aConnectors) {
+	function loadFlexDataFromConnectors(mPropertyBag, aConnectors) {
 		const aConnectorPromises = aConnectors.map(function(oConnectorConfig) {
 			const oConnectorSpecificPropertyBag = {
 				...mPropertyBag,
@@ -82,7 +82,7 @@ sap.ui.define([
 		return Promise.all(aConnectorPromises);
 	}
 
-	function _flattenResponses(aResponses) {
+	function flattenResponses(aResponses) {
 		var aFlattenedResponses = [];
 
 		aResponses.forEach(function(oResponse) {
@@ -96,25 +96,25 @@ sap.ui.define([
 		return aFlattenedResponses;
 	}
 
-	function _disassembleVariantSectionsIfNecessary(aResponses) {
+	function disassembleVariantSectionsIfNecessary(aResponses) {
 		return aResponses.map(function(oResponse) {
 			return storageResultDisassemble(oResponse);
 		});
 	}
 
-	function _flattenAndMergeResultPromise(aResponses) {
+	function flattenAndMergeResultPromise(aResponses) {
 		return Promise.resolve(aResponses)
-		.then(_flattenResponses)
-		.then(_disassembleVariantSectionsIfNecessary)
-		.then(_flattenResponses)
+		.then(flattenResponses)
+		.then(disassembleVariantSectionsIfNecessary)
+		.then(flattenResponses)
 		.then(StorageResultMerger.merge);
 	}
 
-	function _loadFlexDataFromStaticFileConnector(mPropertyBag) {
-		return StorageUtils.getStaticFileConnector().then(_loadFlexDataFromConnectors.bind(this, mPropertyBag));
+	function loadFlexDataFromStaticFileConnector(mPropertyBag) {
+		return StorageUtils.getStaticFileConnector().then(loadFlexDataFromConnectors.bind(this, mPropertyBag));
 	}
 
-	function _sendLoadFeaturesToConnector(aConnectors) {
+	function sendLoadFeaturesToConnector(aConnectors) {
 		var aConnectorPromises = aConnectors.map(function(oConnectorConfig) {
 			// Tolerance for connectors that do not have loadFeature implemented
 			if (!oConnectorConfig?.loadConnectorModule?.loadFeatures) {
@@ -166,12 +166,13 @@ sap.ui.define([
 	/**
 	 * Provides the information which features are provided based on the responses of the involved connectors.
 	 *
+	 * @param {object} oLayerConfig - Layer Configuration for write operations
 	 * @returns {Promise<Object>} Map feature flags and additional provided information from the connectors
 	 */
-	Storage.loadFeatures = function() {
-		return StorageUtils.getLoadConnectors()
-		.then(_sendLoadFeaturesToConnector)
-		.then(StorageFeaturesMerger.mergeResults);
+	Storage.loadFeatures = async function(oLayerConfig) {
+		const oLoadConnectors = await StorageUtils.getLoadConnectors();
+		const aResponses = await sendLoadFeaturesToConnector(oLoadConnectors);
+		return StorageFeaturesMerger.mergeResults(aResponses, oLayerConfig);
 	};
 
 	/**
@@ -188,8 +189,8 @@ sap.ui.define([
 			return Promise.reject(new Error("No reference was provided"));
 		}
 
-		return Promise.all([_loadFlexDataFromStaticFileConnector(mPropertyBag), mPropertyBag.partialFlexData])
-		.then(_flattenAndMergeResultPromise);
+		return Promise.all([loadFlexDataFromStaticFileConnector(mPropertyBag), mPropertyBag.partialFlexData])
+		.then(flattenAndMergeResultPromise);
 	};
 
 	/**
@@ -211,8 +212,8 @@ sap.ui.define([
 		}
 
 		return StorageUtils.getLoadConnectors(mPropertyBag.skipLoadBundle)
-		.then(_loadFlexDataFromConnectors.bind(this, mPropertyBag))
-		.then(_flattenAndMergeResultPromise);
+		.then(loadFlexDataFromConnectors.bind(this, mPropertyBag))
+		.then(flattenAndMergeResultPromise);
 	};
 
 	/**

@@ -2177,6 +2177,21 @@ sap.ui.define([
 		oTokenizer.destroy();
 	});
 
+	QUnit.test("Checks Dialog's Cancel and OK buttons", async function (assert) {
+		this.stubPlatform();
+		const oTokenizer = this.createTokenizer();
+
+		oTokenizer.placeAt("content");
+		await nextUIUpdate();
+
+		const oRPO = oTokenizer.getTokensPopup();
+
+		assert.strictEqual(oRPO.getTitle(), Library1.getResourceBundleFor("sap.m").getText("COMBOBOX_PICKER_TITLE"), "Default title should be taken from Resource Bundle");
+		assert.strictEqual(oRPO.getBeginButton().getText(), Library1.getResourceBundleFor("sap.m").getText("SUGGESTIONSPOPOVER_CLOSE_BUTTON"), "OK button is rendered correctly");
+		assert.strictEqual(oRPO.getEndButton().getText(), Library1.getResourceBundleFor("sap.m").getText("TOKENIZER_CANCEL_BUTTON"), "Cancel button is rendered correctly");
+		oTokenizer.destroy();
+	});
+
 	QUnit.test("Checks Dialog's custom title", async function (assert) {
 		this.stubPlatform();
 		var oTokenizer = this.createTokenizer();

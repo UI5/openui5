@@ -1849,9 +1849,7 @@ sap.ui.define([
 			} else {
 				const sAbsoluteRequestUrl = this.sServiceUrl + sRequestUrl;
 				aMessages.forEach((oMessage) => {
-					oMessage["@$ui5.originalMessage"] = _Helper.clone(oMessage);
-					oMessage.longtextUrl
-						&&= _Helper.makeAbsolute(oMessage.longtextUrl, sAbsoluteRequestUrl);
+					_Helper.makeAbsoluteLongtextUrl(oMessage, sAbsoluteRequestUrl);
 				});
 				this.oModelInterface.reportTransitionMessages(aMessages, sResourcePath);
 			}

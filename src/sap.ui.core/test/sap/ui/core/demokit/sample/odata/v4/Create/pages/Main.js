@@ -39,16 +39,23 @@ sap.ui.define([
 							const aKeys = ["SalesOrderID", "Buyer", "GrossAmount", "Currency",
 								"Note", "LifecycleStatus"];
 							aKeys.forEach((sKey, i) => {
-								Opa5.assert.strictEqual(aCells[i].getText(), oExpectedData[sKey],
-									"New entry contains expected data for " + sKey);
+								if (sKey in oExpectedData) {
+									Opa5.assert.strictEqual(aCells[i].getText(),
+										oExpectedData[sKey],
+										"New entry contains expected data for " + sKey);
+								}
 							});
 						},
 						viewName : sViewName,
 						visible : false
 					});
 				},
-				checkInputValueState : function (sInputId, sValueState) {
-					Helper.checkValueState(this, sViewName, sInputId, sValueState);
+				checkInputValueState : function (sInputId, sValueState, sValueStateText) {
+					Helper.checkValueState(this, sViewName, sInputId, sValueState, sValueStateText);
+				},
+				checkInputValueStateNoWait : function (sInputId) {
+					Helper.checkValueState(this, sViewName, sInputId, "None", undefined, false,
+						undefined, /*bNoAutoWait*/true);
 				},
 				checkNumberOfEntries : function (iExpectedLength) {
 					this.waitFor({

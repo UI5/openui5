@@ -44,31 +44,41 @@
 				<code>Buyer ID</code>.</li>
 			<li>Press the <code>Save</code> button.</li>
 			<li><b>Check:</b> The dialog for creating a new entry is still open.</li>
-			<li><b>Check:</b> The <code>Buyer ID</code> field is red, indicating an error.</li>
-			<li>Set the <code>Buyer ID</code> by entering <code>0100000004</code>.</li>
+			<li><b>Check:</b> The <code>Buyer ID</code> field is red, indicating an error:
+				"Enter a text with a maximum of 10 characters and spaces"</li>
+			<li>Set the <code>Buyer ID</code> by entering <code>FOO</code>.</li>
 			<li>Remove the focus from <code>Buyer ID</code>.</li>
 			<li><b>Check:</b> The <code>Buyer ID</code> has the value state <code>None</code>.</li>
 			<li>Remove the default value of <code>EUR</code> for the <code>Currency</code>.</li>
 			<li>Press the <code>Save</code> button.</li>
 			<li><b>Check:</b> The dialog for creating a new entry is still open.</li>
-			<li><b>Check:</b> The <code>Currency</code> field is red, indicating an error.</li>
+			<li><b>Check:</b> The <code>Currency</code> field is red, indicating an error:
+				"Enter a text with a maximum of 5 characters and spaces"</li>
 			<li>Set the <code>Currency</code> by entering <code>USD</code>.</li>
 			<li>Remove the focus from <code>Currency</code>.</li>
 			<li><b>Check:</b> The <code>Currency</code> has the value state <code>None</code>.</li>
 			<li>Set the <code>Note</code> by entering <code>New note</code>.</li>
 			<li>Press the <code>Save</code> button.</li>
+			<li><b>Check:</b> The dialog for creating a new entry is still open.</li>
+			<li><b>Check:</b> The <code>Buyer ID</code> field is red, indicating an error:
+				"Business Partner with key 'FOO' does not exist"</li>
+			<li>Set the <code>Buyer ID</code> by entering <code>0100000004</code>.</li>
+			<li>Press the <code>Save</code> button.</li>
+			<li><b>Check:</b> The <code>Buyer ID</code> has the value state <code>None</code>
+				(as long as the dialog is still visible).</li>
 			<li><b>Check:</b> The dialog for creating a new entry closes.</li>
 			<li><b>Check:</b> The dialog with the success message opens.</li>
 			<li>Press the <code>OK</code> button.</li>
 			<li><b>Check:</b> The dialog with the success message closes.</li>
-			<li><b>Check:</b> The first entry of the table contains</li>
-			<ul>
-				<li>the entered data for the <code>Buyer ID</code> of the <code>Buyer</code>,
-					<code>Currency</code> and <code>Note</code>.</li>
-				<li>the automatically provided data for the <code>Company Name</code> of the
-					<code>Buyer</code>, <code>Sales Order ID</code>, <code>Gross Amount</code>,
-					<code>Lifecycle Status</code> and <code>Created At</code></li>
-			</ul>
+			<li><b>Check:</b> The first entry of the table contains
+				<ul>
+					<li>the entered data for the <code>Buyer ID</code> of the <code>Buyer</code>,
+						<code>Currency</code> and <code>Note</code>.</li>
+					<li>the automatically provided data for the <code>Company Name</code> of the
+						<code>Buyer</code>, <code>Sales Order ID</code>, <code>Gross Amount</code>,
+						<code>Lifecycle Status</code> and <code>Created At</code></li>
+				</ul>
+			</li>
 		</ol>
 	</body>
 </html>
