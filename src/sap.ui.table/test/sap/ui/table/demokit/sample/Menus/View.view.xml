@@ -16,8 +16,7 @@
 				rows="{/ProductCollection}"
 				enableColumnFreeze="{ui>/showFreezeMenuEntry}"
 				enableCellFilter="{ui>/enableCellFilter}"
-				columnSelect="onColumnSelect"
-				cellContextmenu="onProductIdCellContextMenu"
+				beforeOpenContextMenu="onProductIdCellContextMenu"
 				ariaLabelledBy="title">
 				<extension>
 					<m:OverflowToolbar style="Clear">
@@ -62,8 +61,7 @@
 					</Column>
 					<Column
 						id="image"
-						width="9rem"
-						columnMenuOpen="onColumnMenuOpen">
+						width="9rem">
 						<m:Label text="Image" />
 						<template>
 							<m:Link text="Show Image" href="{ProductPicUrl}" target="_blank"/>

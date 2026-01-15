@@ -102,7 +102,7 @@
 			return;
 		}
 
-		window.sap.ui.require(["/ui5loader-autoconfig", "sap/ui/core/Core", "sap/ui/core/Lib"],
+		window.sap.ui.require(["ui5loader-autoconfig", "sap/ui/core/Core", "sap/ui/core/Lib"],
 			function (config, _Core, _Lib) {
 				Core = _Core;
 				Lib = _Lib;

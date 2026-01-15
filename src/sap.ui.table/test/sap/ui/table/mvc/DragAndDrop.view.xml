@@ -8,9 +8,13 @@
 	<HBox renderType="Bare">
 		<items>
 			<table:Table id="table"
-						 title="Table - Reorder rows and drag to TreeTable"
 						 width="50%"
 						 rows="{/listData}">
+				<table:extension>
+					<OverflowToolbar style="Clear">
+						<Title id="tableTitle" text="Table - Reorder rows and drag to TreeTable"/>
+					</OverflowToolbar>
+				</table:extension>
 				<table:columns>
 					<table:Column width="120px" sortProperty="lastName" filterProperty="lastName">
 						<table:label>
@@ -177,11 +181,19 @@
 			<ToolbarSpacer width="1rem"/>
 			<table:TreeTable
 				id="treetable"
-				title="TreeTable - Reorder rows and drag to Table"
 				width="50%"
-				expandFirstLevel="true"
-				rows="{/treeData/root}"
+				rows="{
+					path: '/treeData/root',
+					parameters: {
+						numberOfExpandedLevels: 1
+					}
+				}"
 				groupHeaderProperty="name">
+				<table:extension>
+					<OverflowToolbar style="Clear">
+						<Title id="treeTitle" text="TreeTable - Reorder rows and drag to Table"/>
+					</OverflowToolbar>
+				</table:extension>
 				<table:columns>
 					<table:Column width="300px" sortProperty="name" filterProperty="name">
 						<table:label>

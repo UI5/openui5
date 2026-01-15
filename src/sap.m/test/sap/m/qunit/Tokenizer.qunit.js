@@ -17,8 +17,9 @@ sap.ui.define([
 	"sap/m/library",
 	"sap/ui/model/json/JSONModel",
 	"sap/ui/thirdparty/jquery",
-	"sap/m/Panel"
-], function(nextUIUpdate, Element, Library1, qutils, createAndAppendDiv, Tokenizer, Token, Dialog, Label, MultiInput, Event, Device, KeyCodes, Library, JSONModel, jQuery, Panel) {
+	"sap/m/Panel",
+	"sap/m/Button"
+], function(nextUIUpdate, Element, Library1, qutils, createAndAppendDiv, Tokenizer, Token, Dialog, Label, MultiInput, Event, Device, KeyCodes, Library, JSONModel, jQuery, Panel, Button) {
 	"use strict";
 
 	createAndAppendDiv("content");
@@ -869,19 +870,31 @@ sap.ui.define([
 	});
 
 	QUnit.test("Should render and not focus disabled tokenizer", async function(assert) {
-		var oTokenizer = new Tokenizer({
-			width: "300px",
-			enabled: false
+		const oButton = new Button({
+			text: "focus"
 		}).placeAt("content");
 
-		oTokenizer.addToken(new Token({text: "Token 1", key: "0001"}));
-		oTokenizer.addToken(new Token({text: "Token 2", key: "0002"}));
+		const oTokenizer = new Tokenizer({
+			enabled: false,
+			tokens: [
+				new Token({ text: "One" }),
+				new Token({ text: "Two" })
+			]
+		}).placeAt("content");
+		await nextUIUpdate();
+
+		oButton.focus();
+		await nextUIUpdate();
+
+		oTokenizer.getDomRef().focus();
 		await nextUIUpdate();
 
 		assert.ok(oTokenizer.getDomRef().classList.contains("sapMTokenizerDisabled"), "The aria-expanded attribute should be true");
 		assert.ok(oTokenizer.getTokens()[0].getDomRef().getAttribute("tabindex"), "-1", "tabindex should be -1");
+		assert.strictEqual(document.activeElement, oButton.getDomRef(),"Disabled Tokenizer must not receive focus");
 
 		oTokenizer.destroy();
+		oButton.destroy();
 	});
 
 	QUnit.test("Should not throw exception on rendering when first token is hidden", async function(assert) {
@@ -1873,7 +1886,8 @@ sap.ui.define([
 	});
 
 	QUnit.test("Role listbox should be applied", function(assert) {
-		assert.strictEqual(this.tokenizer.$().attr("role"), "listbox", "Tokenizer has role listbox");
+		const sInnerContainerId = this.tokenizer.getId() + "-scrollContainer";
+		assert.strictEqual(this.tokenizer.$().find(`#${sInnerContainerId}`).attr("role"), "listbox", "Tokenizer inner container has role listbox");
 	});
 
 	QUnit.test("aria-hidden attribute", async function(assert) {

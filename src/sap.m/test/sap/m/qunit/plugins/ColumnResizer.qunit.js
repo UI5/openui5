@@ -170,6 +170,7 @@ sap.ui.define([
 		oMatchMediaStub.withArgs("(hover:none)").returns({
 			matches: false
 		});
+		oMatchMediaStub.callThrough();
 
 		const oColumnResizer = new ColumnResizer();
 		this.oTable.addDependent(oColumnResizer);
@@ -187,6 +188,7 @@ sap.ui.define([
 		oMatchMediaStub.withArgs("(hover:none)").returns({
 			matches: true
 		});
+		oMatchMediaStub.callThrough();
 
 		const oColumnResizer = new ColumnResizer();
 		this.oTable.addDependent(oColumnResizer);
@@ -276,6 +278,7 @@ sap.ui.define([
 		oMatchMediaStub.withArgs("(hover:none)").returns({
 			matches: true
 		});
+		oMatchMediaStub.callThrough();
 
 		this.oColumnResizer.startResizing(oColumnDomRef);
 		assert.strictEqual(this.oColumnResizer._oHandle.childElementCount, 1, "Resize handle circle child element is visible since its a tablet/phone device");
@@ -695,6 +698,7 @@ sap.ui.define([
 		oMatchMediaStub.withArgs("(hover:none)").returns({
 			matches: true
 		});
+		oMatchMediaStub.callThrough();
 
 		const oResizerQuickAction = this.oColumnResizer.getColumnResizeQuickAction(oColumn, oColumnMenu);
 		assert.ok(oResizerQuickAction.isA("sap.m.table.columnmenu.QuickAction"), "sap.m.table.columnmenu.QuickAction instance returned");

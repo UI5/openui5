@@ -44,7 +44,6 @@ sap.ui.define([
 
   // create the Table control
   const oTable = new Table({
-	  editable: false,
 	  selectionMode: SelectionMode.MultiToggle,
 	  selectionBehavior: SelectionBehavior.RowSelector,
 	  rowMode: new Fixed({

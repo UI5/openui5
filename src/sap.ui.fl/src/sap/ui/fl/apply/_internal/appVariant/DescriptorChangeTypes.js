@@ -24,7 +24,6 @@ sap.ui.define([
 				"appdescr_app_addNewDataSource",
 				"appdescr_app_changeDataSource",
 				"appdescr_app_removeDataSource",
-				"appdescr_app_addAnnotationsToOData",
 				"appdescr_app_addTechnicalAttributes",
 				"appdescr_app_removeTechnicalAttributes",
 				"appdescr_app_setTitle",

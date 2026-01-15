@@ -24156,6 +24156,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// Multiple (additional) groups on leaf level (JIRA: CPOUI5ODATAV4-2755)
 	// Keep currency filter close to filter on aggregate (JIRA: CPOUI5ODATAV4-2796)
 	// No late property on subtotal (JIRA: CPOUI5ODATAV4-2756)
+	// Automatic type detection of client-side instance annotations (JIRA: CPOUI5ODATAV4-2754)
 	QUnit.test("Data Aggregation: $$aggregation w/ groupLevels, paging", function (assert) {
 		var sFilterOnAggregate // JIRA: CPOUI5ODATAV4-713, CPOUI5ODATAV4-2796
 			= "filter(CurrencyCode eq 'EUR')"
@@ -24189,9 +24190,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			$orderby : \'LifecycleStatus desc,ItemPosition asc\'\
 		}\
 	}" threshold="0" visibleRowCount="3">\
-	<Text id="isExpanded" text="{= %{@$ui5.node.isExpanded} }"/>\
-	<Text id="isTotal" text="{= %{@$ui5.node.isTotal} }"/>\
-	<Text id="level" text="{= %{@$ui5.node.level} }"/>\
+	<Text id="isExpanded" text="{@$ui5.node.isExpanded}"/>\
+	<Text id="isTotal" text="{@$ui5.node.isTotal}"/>\
+	<Text id="level" text="{@$ui5.node.level}"/>\
 	<Text id="lifecycleStatus" text="{LifecycleStatus}"/>\
 	<Text id="grossAmount" text="{= %{GrossAmount}}"/>\
 </t:Table>',
@@ -24212,9 +24213,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				]
 			})
 			.expectChange("count")
-			.expectChange("isExpanded", [false, false, false])
-			.expectChange("isTotal", [true, true, true])
-			.expectChange("level", [1, 1, 1])
+			.expectChange("isExpanded", ["No", "No", "No"])
+			.expectChange("isTotal", ["Yes", "Yes", "Yes"])
+			.expectChange("level", ["1", "1", "1"])
 			.expectChange("grossAmount", ["1", "2", "3"])
 			.expectChange("lifecycleStatus", ["Z", "Y", "X"]);
 
@@ -24268,9 +24269,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						{CurrencyCode : "EUR", GrossAmount : "9", LifecycleStatus : "R"}
 					]
 				})
-				.expectChange("isExpanded", [,,,,,,, false, false, false])
-				.expectChange("isTotal", [,,,,,,, true, true, true])
-				.expectChange("level", [,,,,,,, 1, 1, 1])
+				.expectChange("isExpanded", [,,,,,,, "No", "No", "No"])
+				.expectChange("isTotal", [,,,,,,, "Yes", "Yes", "Yes"])
+				.expectChange("level", [,,,,,,, "1", "1", "1"])
 				.expectChange("grossAmount", [,,,,,,, "7", "8", "9"])
 				.expectChange("lifecycleStatus", [,,,,,,, "T", "S", "R"]);
 
@@ -24290,9 +24291,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					]
 				})
 				.expectChange("count", "26")
-				.expectChange("isExpanded", [undefined, undefined, undefined])
-				.expectChange("isTotal", [undefined, undefined, undefined]) // only leaves
-				.expectChange("level", [undefined, undefined, undefined]) // no grouping
+				.expectChange("isExpanded", [null, null, null])
+				.expectChange("isTotal", [null, null, null]) // only leaves
+				.expectChange("level", [null, null, null]) // no grouping
 				.expectChange("lifecycleStatus", ["Z", "Y", "X"]);
 
 			oTable.removeColumn(4).destroy(); // GrossAmount
