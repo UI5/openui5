@@ -83,25 +83,6 @@ sap.ui.define([
 			return oModel;
 		},
 
-		onColumnSelect: function(oEvent) {
-			const oCurrentColumn = oEvent.getParameter("column");
-			const oImageColumn = this.byId("image");
-			if (oCurrentColumn === oImageColumn) {
-				MessageToast.show("Column header " + oCurrentColumn.getLabel().getText() + " pressed.");
-			}
-		},
-
-		onColumnMenuOpen: function(oEvent) {
-			const oCurrentColumn = oEvent.getSource();
-			const oImageColumn = this.byId("image");
-			if (oCurrentColumn !== oImageColumn) {
-				return;
-			}
-
-			//Just skip opening the column Menu on column "Image"
-			oEvent.preventDefault();
-		},
-
 		onProductIdCellContextMenu: function(oEvent) {
 			if (Device.support.touch) {
 				return; //Do not use context menus on touch devices

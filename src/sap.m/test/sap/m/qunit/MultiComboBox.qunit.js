@@ -5237,8 +5237,15 @@ sap.ui.define([
 		oMultiComboBox.onfocusout(oFakeEvent);
 
 		// assert
-		assert.ok(oStub.called, "change should be called");
-		assert.ok(oStub.calledWith("", { value: "A" }), "change should be called with empty values");
+		assert.notOk(oStub.called, "change should not be called when value is not changed");
+
+		// act
+		qutils.triggerCharacterInput(oMultiComboBox.getFocusDomRef(), "bc");
+
+		oMultiComboBox.onfocusout(oFakeEvent);
+
+		// assertions
+		assert.ok(oStub.calledWith("Abc", { value: "Abc" }), "change should be called");
 
 		// cleanup
 		oMultiComboBox.destroy();

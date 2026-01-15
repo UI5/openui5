@@ -2300,9 +2300,15 @@ function(
 		var oPicker = this.getPicker(),
 			oFocusTarget = oEvent.relatedTarget;
 
-		// If focus target is outside of picker and the picker is fully opened
+		// If focus target is outside of picker and the control, fire change event if value has changed
 		if (!containsOrEquals(oPicker?.getDomRef(), oFocusTarget) && !containsOrEquals(this.getDomRef(), oFocusTarget)) {
-				this.fireChangeEvent("", { value: this.getValue() });
+			var sCurrentValue = this.getValue();
+			var sLastValue = this.getLastValue();
+
+			if (sCurrentValue !== sLastValue) {
+				this.fireChangeEvent(sCurrentValue, { value: sCurrentValue });
+				this.setLastValue(sCurrentValue);
+			}
 		}
 	};
 

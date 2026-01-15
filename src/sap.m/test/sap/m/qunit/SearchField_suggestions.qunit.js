@@ -320,6 +320,11 @@ sap.ui.define([
 
 		this.clock.tick(400);
 		assert.strictEqual(fnFireSuggest.callCount, 1,  "Suggest should be fired ones");
+
+		oSF.onInput();
+
+		this.clock.tick(400);
+		assert.strictEqual(fnFireSuggest.callCount, 1,  "Suggest should not be fired if the value is not changed");
 	});
 
 	QUnit.module("Clean up");

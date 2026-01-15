@@ -262,6 +262,9 @@ sap.ui.define([
 	SearchField.prototype.init = function() {
 		// last changed value
 		this._lastValue = "";
+
+		// last suggested value
+		this._lastSuggestedValue = "";
 	};
 
 	SearchField.prototype.getFocusDomRef = function() {
@@ -367,6 +370,7 @@ sap.ui.define([
 			return;
 		}
 
+		this._lastSuggestedValue = "";
 		this._updateValue(value);
 		updateSuggestions(this);
 		this.fireLiveChange({newValue: value});
@@ -588,18 +592,24 @@ sap.ui.define([
 	 * @param {jQuery.Event} oEvent jQuery Event
 	 * @private
 	 */
-	SearchField.prototype.onInput = function() {
+	SearchField.prototype.onInput = function(oEvent) {
 		var value = this.getInputElement().value;
 
 		this._updateValue(value);
 		this.fireLiveChange({newValue: value});
+
 		if (this.getEnableSuggestions()) {
 			if (this._iSuggestDelay) {
 				clearTimeout(this._iSuggestDelay);
 			}
 
-			this._iSuggestDelay = setTimeout(function(){
-				this.fireSuggest({suggestValue: value});
+			this._iSuggestDelay = setTimeout(function() {
+				if (this._lastSuggestedValue !== value) {
+					this.fireSuggest({suggestValue: value});
+				}
+
+				this._lastSuggestedValue = value;
+
 				updateSuggestions(this);
 				this._iSuggestDelay = null;
 			}.bind(this), 400);
@@ -945,6 +955,7 @@ sap.ui.define([
 			if (!oSF._oSuggest) {
 				oSF._oSuggest = new Suggest(oSF);
 			}
+
 			oSF._oSuggest.open();
 		}
 	}

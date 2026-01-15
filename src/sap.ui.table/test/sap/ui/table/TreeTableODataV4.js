@@ -71,9 +71,11 @@ sap.ui.define([
 				]
 			})
 		],
-		plugins: new ODataV4MultiSelection({
-			enableNotification: true
-		}),
+		dependents: [
+			new ODataV4MultiSelection({
+				enableNotification: true
+			})
+		],
 		visibleRowCountMode: "Auto"
 	});
 	oTable._oProxy._bEnableV4 = true;

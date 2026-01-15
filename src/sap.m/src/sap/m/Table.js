@@ -10,6 +10,7 @@ sap.ui.define([
 	"./ListItemBase",
 	"./CheckBox",
 	"./TableRenderer",
+	"./plugins/PluginBase",
 	"sap/ui/base/Object",
 	"sap/ui/core/ResizeHandler",
 	"sap/ui/core/util/PasteHelper",
@@ -21,7 +22,7 @@ sap.ui.define([
 	// jQuery custom selectors ":sapTabbable"
 	"sap/ui/dom/jquery/Selectors"
 ],
-	function(ControlBehavior, library, ListBase, ListItemBase, CheckBox, TableRenderer, BaseObject, ResizeHandler, PasteHelper, jQuery, ListBaseRenderer, Icon, Util, Library) {
+	function(ControlBehavior, library, ListBase, ListItemBase, CheckBox, TableRenderer, PluginBase, BaseObject, ResizeHandler, PasteHelper, jQuery, ListBaseRenderer, Icon, Util, Library) {
 	"use strict";
 
 
@@ -330,15 +331,7 @@ sap.ui.define([
 	};
 
 	Table.prototype._applyContextualWidth = function(iWidth) {
-		iWidth = parseFloat(iWidth) || 0;
-
-		// when hiddenInPopin is configured, the table size increases due to popins and later decreases as popins are removed due to hiddenInPopin
-		// this can cause scrollbar to appear and disappear causing popin and popout jumping
-		// hence, the table does not change the contextual width if it is less than or equal to 16 (approx. scrollbar size)
-		if (Math.abs(this._oContextualSettings.contextualWidth - iWidth) <= 16) {
-			return;
-		}
-
+		iWidth = parseFloat(iWidth);
 		if (iWidth && this._oContextualSettings.contextualWidth != iWidth) {
 			this._applyContextualSettings({
 				contextualWidth : iWidth
@@ -1248,31 +1241,37 @@ sap.ui.define([
 	 * @private
 	 */
 	Table.prototype._getInitialAccumulatedWidth = function() {
-		// check if compact mode is enabled
+		const fInsetWidth = this.getInset() ? 4 : 0;
+		const fTypeWidth = this.doItemsNeedTypeColumn() ? 2.75 : 0;
+		const iModeOrder = ListBaseRenderer.ModeOrder[this.getMode()];
 		const bCompact = this.$().closest(".sapUiSizeCompact").length > 0;
-		const iThemeDensityWidth = bCompact ? 2 : 3;
 
-		// check if table has inset
-		const iInset = this.getInset() ? 4 : 0;
+		let fGap = 0.75; // highlight and navigated column tolerance + border and padding
+		let fModeWidth = Math.abs(iModeOrder) * (bCompact ? 2 : 2.75);
+		if (iModeOrder > -1) {
+			fGap += 0.5; // if the selection column is not the first column then we add 0.5rem padding
+		}
 
-		// check if item types are rendered
-		const iTypeWidth = this.doItemsNeedTypeColumn() ? iThemeDensityWidth : 0;
+		const oColumnResizer = PluginBase.getPlugin(this, "sap.m.plugins.ColumnResizer");
+		if (oColumnResizer?.getEnabled()) {
+			const aResizableColumns = this.getColumns().filter((oColumn) => oColumn.getVisible() && !oColumn.isHidden());
+			const fBaseFontSize = parseFloat(library.BaseFontSize) || 16;
+			fGap += aResizableColumns.length / fBaseFontSize; // 1px border per resizable column
+		}
 
-		// check if selection control is available
-		let iModeWidth = ListBaseRenderer.ModeOrder[this.getMode()] ? iThemeDensityWidth : 0;
-
-		// check item actions
-		let iItemActionWidth = 0;
+		let fItemActionWidth = 0;
 		const iItemActionCount = this._getItemActionCount();
 		if (iItemActionCount > -1) {
-			iItemActionWidth = iItemActionCount * (bCompact ? 2.5 : 2.75);
+			fItemActionWidth = iItemActionCount * (bCompact ? 2.5 : 2.75);
+			if (iItemActionCount === 2) {
+				fItemActionWidth -= 0.375;
+			}
 			if (this.getMode() === "Delete") {
-				iModeWidth = 0;
+				fModeWidth = 0; // delete mode is inactive when custom actions are present
 			}
 		}
 
-		// borders = ~0.25rem
-		return iInset + iTypeWidth + iModeWidth + iItemActionWidth + 0.25;
+		return fInsetWidth + fModeWidth + fItemActionWidth + fTypeWidth + fGap;
 	};
 
 	/**

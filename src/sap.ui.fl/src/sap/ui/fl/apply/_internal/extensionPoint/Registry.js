@@ -30,9 +30,16 @@ sap.ui.define([
 
 	function onParentDestroy(oEvent) {
 		var sParentId = oEvent.object.getId();
+		// Keep them in the list of EPs by view to ensure that they can still be accessed when the template gets deleted
 		mExtensionPointsByParent[sParentId].forEach(function(oExtensionPoint) {
 			mExtensionPointsByViewId[oExtensionPoint.view.getId()][oExtensionPoint.name].bParentIsDestroyed = true;
 		});
+		// Remove from the list of EPs by parent as the original parent is destroyed and thus
+		// no longer reachable
+		// This is necessary to ensure that a new control with the same stable ID doesn't receive
+		// outdated duplicate EPs from the old one
+		delete mObservers[sParentId];
+		delete mExtensionPointsByParent[sParentId];
 	}
 
 	function onAggregationChange(oEvent) {

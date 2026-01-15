@@ -58,7 +58,6 @@ sap.ui.define([
 		  sortProperty: "lastName",
 		  filterProperty: "lastName",
 		  width: "100px",
-		  flexible: false,
 		  autoResizable: true,
 		  resizable: true
 	  }));
@@ -75,7 +74,6 @@ sap.ui.define([
 		  sortProperty: "name",
 		  filterProperty: "name",
 		  width: "100px",
-		  flexible: false,
 		  autoResizable: true,
 		  resizable: true
 	  }));
@@ -91,7 +89,6 @@ sap.ui.define([
 		  sortProperty: "objStatusState",
 		  filterProperty: "objStatusState",
 		  width: "100px",
-		  flexible: true,
 		  autoResizable: true,
 		  resizable: true
 	  }));
@@ -106,7 +103,6 @@ sap.ui.define([
 		  template: new Icon({src: "sap-icon://account", decorative: false}),
 		  hAlign: HorizontalAlign.Center,
 		  width: "100px",
-		  flexible: true,
 		  autoResizable: true,
 		  resizable: true
 	  }));
@@ -118,7 +114,6 @@ sap.ui.define([
 		  ],
 		  template: new Label({text: "{gender}"}),
 		  width: "100px",
-		  flexible: false,
 		  autoResizable: true,
 		  resizable: true
 	  }));
@@ -127,7 +122,6 @@ sap.ui.define([
 		  label: new Label({text: "Checked"}),
 		  template: new CheckBox({selected: "{checked}", text: "{checked}"}),
 		  width: "100px",
-		  flexible: false,
 		  autoResizable: true,
 		  resizable: true
 	  }));

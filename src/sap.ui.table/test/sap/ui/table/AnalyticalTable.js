@@ -1,22 +1,22 @@
 // Note: the HTML page 'AnalyticalTable.html' loads this module via data-sap-ui-on-init
 
 sap.ui.define([
-	"sap/ui/core/message/MessageType",
 	"sap/m/Button",
-	"sap/ui/table/AnalyticalTable",
-	"sap/ui/table/library",
-	"sap/ui/table/AnalyticalColumn",
-	"sap/ui/unified/Currency",
-	"sap/ui/model/type/String",
 	"sap/m/Label",
 	"sap/m/Text",
+	"sap/m/Title",
+	"sap/ui/core/message/MessageType",
 	"sap/ui/model/odata/v2/ODataModel",
-	"sap/ui/table/RowSettings"
-], function(MessageType, Button, AnalyticalTable, tableLibrary, AnalyticalColumn, Currency, TypeString, Label, Text, ODataModel, RowSettings) {
+	"sap/ui/model/type/String",
+	"sap/ui/table/AnalyticalColumn",
+	"sap/ui/table/AnalyticalTable",
+	"sap/ui/table/library",
+	"sap/ui/table/RowSettings",
+	"sap/ui/unified/Currency"
+], function(Button, Label, Text, Title, MessageType, ODataModel, StringType, AnalyticalColumn, AnalyticalTable, TableLibrary, RowSettings, Currency) {
 	"use strict";
 
-	// shortcut for sap.ui.table.SelectionMode
-	const SelectionMode = tableLibrary.SelectionMode;
+	const SelectionMode = TableLibrary.SelectionMode;
 
 	/*global TABLESETTINGS */
 	(new Button({
@@ -24,7 +24,11 @@ sap.ui.define([
 	})).placeAt("content");
 
 	const oTable = new AnalyticalTable({
-		title: "Title of the Table",
+		extension:[
+			new Title({
+				text: "Title of the Table"
+			})
+		],
 		footer: "Footer of the Table",
 		selectionMode: SelectionMode.MultiToggle
 	});
@@ -51,10 +55,8 @@ sap.ui.define([
 	function getTemplate(sField) {
 		switch (sField) {
 			case "PlannedCosts":
-				return new Currency({value: {path: sField, type: new TypeString()}});
+				return new Currency({value: {path: sField, type: new StringType()}});
 			case "Currency":
-				//return new sap.m.Text({text: "{" + sField + "}", wrapping: false});
-				//return new sap.m.Link({text: "{" + sField + "}"});
 				return new Label({text: "{" + sField + "}"});
 			default:
 				return new Text({text: "{" + sField + "}", wrapping: false});

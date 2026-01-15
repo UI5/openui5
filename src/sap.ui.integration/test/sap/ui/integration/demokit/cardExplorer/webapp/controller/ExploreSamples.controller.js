@@ -510,7 +510,8 @@ sap.ui.define([
 						id: "msgstrip_EoM_BASEditor",
 						showIcon: true,
 						type: "Warning",
-						text: "BAS Editor is end of maintenance since version 1.138"
+						text: "BAS Editor is end of maintenance since version 1.138",
+						visible: "{= ${settings>/editorType} === 'VISUAL' }"
 					});
 					this.byId("editPage").addContent(oMessageStrip);
 					this._oVisualEditor = new BASEditor({
@@ -915,7 +916,7 @@ sap.ui.define([
 			}
 
 			MessageToast.show(sMessage, {
-				at: "center center",
+				at: "CenterCenter",
 				width: "25rem"
 			});
 

@@ -62,10 +62,7 @@ TokenizerRenderer.renderInnerContent = function(oRm, oControl) {
 
 	this.addWidthStyles(oRm, oControl);
 
-	var oAccAttributes = {
-		role: "listbox"
-	}; // additional accessibility attributes
-
+	var oAccAttributes = {};
 	//ARIA attributes
 	oAccAttributes.labelledby = {
 		value: InvisibleText.getStaticId("sap.m", "TOKENIZER_ARIA_LABEL"),
@@ -93,6 +90,10 @@ TokenizerRenderer.renderInnerContent = function(oRm, oControl) {
 	}
 
 	oRm.openStart("div", oControl.getId() + "-scrollContainer");
+
+	// CS20250010881646 - Append the role to the scroll container which contains the tokens
+	oRm.attr("role", "listbox");
+
 	oRm.class(bMultiLine ? "sapMTokenizerMultiLineContainer" : "sapMTokenizerScrollContainer");
 
 	if (oControl.getHiddenTokensCount() === oControl.getTokens().length) {

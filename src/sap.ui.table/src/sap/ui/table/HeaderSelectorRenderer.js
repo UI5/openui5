@@ -4,9 +4,11 @@
 
 // Provides default renderer for control sap.ui.table.HeaderSelector
 sap.ui.define([
-	"./utils/TableUtils"
+	"./utils/TableUtils",
+	"sap/ui/core/IconPool"
 ], function(
-	TableUtils
+	TableUtils,
+	IconPool
 ) {
 	"use strict";
 

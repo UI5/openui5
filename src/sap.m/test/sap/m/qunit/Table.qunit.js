@@ -38,8 +38,9 @@ sap.ui.define([
 	"sap/ui/core/Item",
 	"sap/m/TextArea",
 	"sap/ui/core/Control",
-	"sap/m/plugins/ColumnAIAction"
-], function(Localization, IllustratedMessageType, Element, Library, qutils, nextUIUpdate, KeyCodes, JSONModel, Device, Filter, Sorter, InvisibleText, ListBase, Table, Column, Label, Link, Toolbar, ToolbarSpacer, Button, Input, ColumnListItem, ListItemAction, Text, Title, ScrollContainer, library, GroupHeaderListItem, VerticalLayout, Message, jQuery, IllustratedMessage, ComboBox, CheckBox, RatingIndicator, Item, TextArea, Control, ColumnAIAction) {
+	"sap/m/plugins/ColumnAIAction",
+	"sap/m/plugins/ColumnResizer"
+], function(Localization, IllustratedMessageType, Element, Library, qutils, nextUIUpdate, KeyCodes, JSONModel, Device, Filter, Sorter, InvisibleText, ListBase, Table, Column, Label, Link, Toolbar, ToolbarSpacer, Button, Input, ColumnListItem, ListItemAction, Text, Title, ScrollContainer, library, GroupHeaderListItem, VerticalLayout, Message, jQuery, IllustratedMessage, ComboBox, CheckBox, RatingIndicator, Item, TextArea, Control, ColumnAIAction, ColumnResizer) {
 	"use strict";
 
 	const TestControl = Control.extend("sap.m.test.TestControl", {
@@ -2968,7 +2969,7 @@ sap.ui.define([
 		const aColumns = oTable.getColumns();
 		const aItems = oTable.getItems();
 
-		// expected value is 6, 3(rem) for selection column and 3(rem) for the navigation column
+		// 2.75rem for the selection column and 2.75rem for the navigation column + 0.75rem initial gap
 		let fInitAccumulatedWidth = oTable._getInitialAccumulatedWidth();
 		assert.strictEqual(fInitAccumulatedWidth, 6.25, "Initial accumulated width based on table setup is " + fInitAccumulatedWidth + "rem");
 
@@ -2978,26 +2979,42 @@ sap.ui.define([
 
 		oTable.setInset(true);
 		await nextUIUpdate();
-		fInitAccumulatedWidth = oTable._getInitialAccumulatedWidth();
-		assert.strictEqual(fInitAccumulatedWidth, 10.25, "Initial accumulated width is " + fAccumulatedWidth + "rem");
+		fInitAccumulatedWidth = oTable._getInitialAccumulatedWidth(); // 4rem for the inset
+		assert.strictEqual(fInitAccumulatedWidth, 10.25, "Initial accumulated width is " + fInitAccumulatedWidth + "rem after setting inset to true");
 
 		aItems[0].addAction(new ListItemAction({type: "Edit"}));
 		aItems[0].addAction(new ListItemAction({type: "Delete"}));
 		oTable.setItemActionCount(2);
 		await nextUIUpdate();
-		fInitAccumulatedWidth = oTable._getInitialAccumulatedWidth();
-		assert.strictEqual(fInitAccumulatedWidth, 15.75, "Initial accumulated width is " + fAccumulatedWidth + "rem. Since two custom actions are added");
+		fInitAccumulatedWidth = oTable._getInitialAccumulatedWidth(); // 2.75rem * 2 actions - 0.375rem reduction = 5.125rem for the two custom actions
+		assert.strictEqual(fInitAccumulatedWidth, 15.375, "Initial accumulated width is " + fInitAccumulatedWidth + "rem after two custom actions are added");
+
+		oTable.setItemActionCount(1);
+		await nextUIUpdate();
+		fInitAccumulatedWidth = oTable._getInitialAccumulatedWidth(); // 2.75rem for one custom action
+		assert.strictEqual(fInitAccumulatedWidth, 13, "Initial accumulated width is " + fInitAccumulatedWidth + "rem after one custom action is removed");
+
+		aItems[0].setHighlight("Warning");
+		aItems[0].setNavigated(true);
+		await nextUIUpdate();
+		fInitAccumulatedWidth = oTable._getInitialAccumulatedWidth(); // nothing changed navigated and highlight columns are in the initial tolerance
+		assert.strictEqual(fInitAccumulatedWidth, 13, "Initial accumulated width is " + fInitAccumulatedWidth + "rem after hightlight column is shown");
 
 		document.getElementById("qunit-fixture").classList.add("sapUiSizeCompact");
 		oTable.placeAt("qunit-fixture");
 		await nextUIUpdate();
-		fInitAccumulatedWidth = oTable._getInitialAccumulatedWidth();
-		assert.strictEqual(fInitAccumulatedWidth, 13.25, "Initial accumulated width is " + fInitAccumulatedWidth + "rem. Since compact theme density is applied");
+		fInitAccumulatedWidth = oTable._getInitialAccumulatedWidth(); // compact size reduction of 1rem (0.25rem for action and 0.75 rem for the selection column
+		assert.strictEqual(fInitAccumulatedWidth, 12, "Initial accumulated width is " + fInitAccumulatedWidth + "rem. Since compact theme density is applied");
 
 		oTable.setMode("Delete");
 		await nextUIUpdate();
-		fInitAccumulatedWidth = oTable._getInitialAccumulatedWidth();
-		assert.strictEqual(fInitAccumulatedWidth, 11.25, "Initial accumulated width is " + fAccumulatedWidth + "rem. Since Delete mode wont be rendered");
+		fInitAccumulatedWidth = oTable._getInitialAccumulatedWidth(); // no selection column(2rem) anymore, delete column (2rem) is also not rendered because of custom actions but the first column now has 0.5rem more padding
+		assert.strictEqual(fInitAccumulatedWidth, 10.5, "Initial accumulated width is " + fInitAccumulatedWidth + "rem. Since Delete mode wont be rendered");
+
+		oTable.addDependent(new ColumnResizer());
+		await nextUIUpdate();
+		fInitAccumulatedWidth = oTable._getInitialAccumulatedWidth(); // Column resizer adds 1px (0.0625rem) border per column here we have two columns
+		assert.strictEqual(fInitAccumulatedWidth, 10.625, "Initial accumulated width is " + fInitAccumulatedWidth + "rem after ColumnResizer is added");
 
 		oTable.destroy();
 	});

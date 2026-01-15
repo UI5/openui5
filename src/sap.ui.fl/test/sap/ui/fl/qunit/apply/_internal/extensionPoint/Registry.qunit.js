@@ -49,7 +49,7 @@ sap.ui.define([
 		beforeEach() {
 			sandbox.stub(Processor, "applyExtensionPoint");
 
-			var sXmlString =
+			this.sXmlString =
 				"<mvc:View xmlns:mvc=\"sap.ui.core.mvc\"  xmlns:core=\"sap.ui.core\" xmlns=\"sap.m\">" +
 					"<HBox id=\"hbox\">" +
 						"<items>" +
@@ -78,7 +78,7 @@ sap.ui.define([
 						"</items>" +
 					"</HBox>" +
 				"</mvc:View>";
-			return XMLView.create({ id: "testComponent---myView", definition: sXmlString })
+			return XMLView.create({ id: "testComponent---myView", definition: this.sXmlString })
 			.then(function(oXMLView) {
 				this.oXMLView = oXMLView;
 				[this.oHBox, this.oPanel, this.oHBoxWithSingleEP] = this.oXMLView.getContent();
@@ -291,21 +291,85 @@ sap.ui.define([
 			var mExtensionPointInfo2 = _createAndRegisterExtensionPoint(this.oXMLView, sExtensionPointName2, this.oPanel, "content", 0);
 			var sParentId1 = mExtensionPointInfo1.targetControl.getId();
 			var sParentId2 = mExtensionPointInfo2.targetControl.getId();
-			assert.deepEqual(ExtensionPointRegistry.getExtensionPointInfoByParentId(sParentId1), [mExtensionPointInfo1],
-				"then before destroy the correct extension point info is returned for parent1");
-			assert.deepEqual(ExtensionPointRegistry.getExtensionPointInfoByParentId(sParentId2), [mExtensionPointInfo2],
-				"then before destroy the correct extension point info is returned for parent2");
+			assert.deepEqual(
+				ExtensionPointRegistry.getExtensionPointInfoByParentId(sParentId1),
+				[mExtensionPointInfo1],
+				"then initially the correct extension point info is returned for parent1"
+			);
+			assert.deepEqual(
+				ExtensionPointRegistry.getExtensionPointInfoByParentId(sParentId2),
+				[mExtensionPointInfo2],
+				"then initially the correct extension point info is returned for parent2"
+			);
+			assert.deepEqual(
+				ExtensionPointRegistry.getExtensionPointInfoByViewId(this.oXMLView.getId()),
+				{ [sExtensionPointName1]: mExtensionPointInfo1, [sExtensionPointName2]: mExtensionPointInfo2 },
+				"then initially both extension points are returned for the view"
+			);
 			this.oPanel.destroy();
-			var aReturnedExtensionPoints = ExtensionPointRegistry.getExtensionPointInfoByParentId(sParentId1);
-			assert.deepEqual(aReturnedExtensionPoints, [mExtensionPointInfo1],
-				"then after destroy parent2 control the extension point info for parent1 is still available");
-			assert.notOk(aReturnedExtensionPoints[0].bParentIsDestroyed, "and is not marked as destroyed");
-			aReturnedExtensionPoints = ExtensionPointRegistry.getExtensionPointInfoByParentId(sParentId2);
-			assert.deepEqual(aReturnedExtensionPoints, [mExtensionPointInfo2],
-				"then after destroy parent2 control the extension point info is still available");
-			assert.ok(aReturnedExtensionPoints[0].bParentIsDestroyed, "and is marked as destroyed");
-			assert.deepEqual(ExtensionPointRegistry.getExtensionPointInfo(sExtensionPointName2, this.oXMLView), mExtensionPointInfo2,
-				"then after destroy parent2 control the extension point info is still available");
+			const aExtensionPointsParent1 = ExtensionPointRegistry.getExtensionPointInfoByParentId(sParentId1);
+			assert.deepEqual(
+				aExtensionPointsParent1,
+				[mExtensionPointInfo1],
+				"then after destroying parent2, the extension point info for parent1 is still available"
+			);
+			assert.notOk(aExtensionPointsParent1[0].bParentIsDestroyed, "then EP1 is not marked as destroyed");
+			const aExtensionPointsParent2 = ExtensionPointRegistry.getExtensionPointInfoByParentId(sParentId2);
+			assert.deepEqual(
+				aExtensionPointsParent2,
+				[],
+				"then after destroying parent2, the extension point info can no longer be retrieved via the parent"
+			);
+			const aExtensionPointsByView = ExtensionPointRegistry.getExtensionPointInfoByViewId(this.oXMLView.getId());
+			assert.deepEqual(
+				aExtensionPointsByView,
+				{ [sExtensionPointName1]: mExtensionPointInfo1, [sExtensionPointName2]: mExtensionPointInfo2 },
+				"then after destroying parent2, both extension points are still returned for the view"
+			);
+			assert.ok(aExtensionPointsByView[sExtensionPointName2].bParentIsDestroyed, "then EP2 is marked as destroyed");
+			assert.deepEqual(
+				ExtensionPointRegistry.getExtensionPointInfo(sExtensionPointName2, this.oXMLView),
+				mExtensionPointInfo2,
+				"then after destroying parent2, the extension point info can still be fetched directly"
+			);
+		});
+
+		QUnit.test("when destroying and recreating the parent control of an extension point", async function(assert) {
+			const mExtensionPointInfo1 = _createAndRegisterExtensionPoint(this.oXMLView, sExtensionPointName1, this.oHBox, "items", 1);
+			const sParentId1 = mExtensionPointInfo1.targetControl.getId();
+			this.oXMLView.destroy();
+
+			const aExtensionPointsByView = ExtensionPointRegistry.getExtensionPointInfoByViewId(this.oXMLView.getId());
+			assert.deepEqual(
+				aExtensionPointsByView,
+				{ [sExtensionPointName1]: mExtensionPointInfo1 },
+				"then after destroying the control, the EP is still returned for the view"
+			);
+			assert.ok(aExtensionPointsByView[sExtensionPointName1].bParentIsDestroyed, "then the EP is marked as destroyed");
+
+			// Recreate with same stable IDs
+			const oNewXMLView = await XMLView.create({ id: "testComponent---myView", definition: this.sXmlString });
+			const mNewExtensionPointInfo = _createAndRegisterExtensionPoint(this.oXMLView, sExtensionPointName1, this.oHBox, "items", 1);
+			const aExtensionPointsByParent = ExtensionPointRegistry.getExtensionPointInfoByParentId(sParentId1);
+			assert.deepEqual(
+				aExtensionPointsByParent,
+				[mNewExtensionPointInfo],
+				"then initially the correct extension point info is returned for parent1"
+			);
+			assert.notOk(aExtensionPointsByParent[0].bParentIsDestroyed, "then the EP is not marked as destroyed");
+
+			const aNewExtensionPointsByView = ExtensionPointRegistry.getExtensionPointInfoByViewId(this.oXMLView.getId());
+			assert.deepEqual(
+				aNewExtensionPointsByView,
+				{ [sExtensionPointName1]: mNewExtensionPointInfo },
+				"then after destroying the control, the EP is still returned for the view"
+			);
+			assert.notOk(
+				aNewExtensionPointsByView[sExtensionPointName1].bParentIsDestroyed,
+				"then the new EP is registered for the view and no longer marked as destroyed"
+			);
+
+			oNewXMLView.destroy();
 		});
 
 		QUnit.test("when destroying a default control of an extension point (e.g. because another content is added to it)", function(assert) {
