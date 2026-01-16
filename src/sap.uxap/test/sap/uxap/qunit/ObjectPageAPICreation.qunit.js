@@ -3389,6 +3389,34 @@ function (
 		helpers.renderObject(oObjectPage);
 	});
 
+	QUnit.test("_updateMedia called with proper arguments onAfterRendering when _hasDynamicTitle", function (assert) {
+
+		// Arrange
+		var oObjectPage = oFactory.getObjectPageLayoutWithOneVisibleSection(),
+			oUpdateMediaSpy,
+			fnDone = assert.async();
+
+		assert.expect(1);
+		oObjectPage.setHeaderTitle(oFactory.getObjectPageDynamicHeaderTitle());
+
+		oObjectPage.attachEventOnce("onAfterRenderingDOMReady", function() {
+
+			oUpdateMediaSpy = sinon.spy(oObjectPage, "_updateMedia");
+
+			oObjectPage.onAfterRendering();
+
+			assert.strictEqual(oUpdateMediaSpy.getCalls()[0].args[1],
+				ObjectPageLayout.DYNAMIC_HEADERS_MEDIA,
+				"_updateMedia is correctly called with dynamic headers args when needed");
+
+			oObjectPage.destroy();
+			oUpdateMediaSpy.restore();
+			fnDone();
+		});
+
+		helpers.renderObject(oObjectPage);
+	});
+
 	QUnit.test("BCP:1870298358 - _getScrollableViewportHeight method should acquire the exact height", function (assert) {
 
 		// Arrange

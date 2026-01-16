@@ -1154,6 +1154,7 @@ sap.ui.define([
 
 		if (this._hasDynamicTitle()) {
 			this.addStyleClass("sapUxAPObjectPageHasDynamicTitle");
+			this._updateMedia(iWidth, ObjectPageLayout.DYNAMIC_HEADERS_MEDIA);
 		}
 
 		if (iWidth > 0) {
@@ -2477,7 +2478,10 @@ sap.ui.define([
 				var sCurrentMediaClass = oMedia[sMedia],
 					bEnable = sMediaClass === sCurrentMediaClass;
 
-				this.toggleStyleClass(sCurrentMediaClass, bEnable);
+				// Only toggle if the class state actually needs to change to avoid unnecessary DOM manipulation
+				if (this.hasStyleClass(sCurrentMediaClass) !== bEnable) {
+					this.toggleStyleClass(sCurrentMediaClass, bEnable);
+				}
 			}, this);
 		}.bind(this),
 		mBreakpoints = ObjectPageLayout.BREAK_POINTS;
