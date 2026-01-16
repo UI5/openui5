@@ -555,7 +555,8 @@ sap.ui.define([
 		};
 		const oFeedbackUrlParams = await FlexRuntimeInfoAPI.getFeedbackInformation(mPropertyBag);
 		oUrlParams.set("version", oFeedbackUrlParams.version);
-		oUrlParams.set("feature", (oFeedbackUrlParams.connector === "KeyUserConnector" ? "BTP" : "ABAP"));
+		const bCF = oFeedbackUrlParams.connector === "KeyUserConnector" || oFeedbackUrlParams.connector === "BtpServiceConnector";
+		oUrlParams.set("feature", bCF ? "BTP" : "ABAP");
 		oUrlParams.set("appId", oFeedbackUrlParams.appId);
 		oUrlParams.set("appVersion", oFeedbackUrlParams.appVersion);
 		// Add product filter for qualtrics colleagues

@@ -19,6 +19,7 @@ sap.ui.define([
 	"sap/ui/fl/initial/_internal/Settings",
 	"sap/ui/fl/initial/_internal/Storage",
 	"sap/ui/fl/initial/_internal/StorageUtils",
+	"sap/ui/fl/support/api/SupportAPI",
 	"sap/ui/fl/Layer",
 	"sap/ui/fl/Utils",
 	"sap/ui/thirdparty/sinon-4"
@@ -41,6 +42,7 @@ sap.ui.define([
 	Settings,
 	Storage,
 	StorageUtils,
+	SupportAPI,
 	Layer,
 	Utils,
 	sinon
@@ -235,6 +237,7 @@ sap.ui.define([
 			sandbox.stub(Settings, "getInstance").resolves({
 				getIsVariantAuthorNameAvailable: () => false
 			});
+			this.oInitMessageBrokerStub = sandbox.stub(SupportAPI, "initializeMessageBrokerForComponent").resolves();
 		},
 		afterEach() {
 			cleanup.call(this);
@@ -252,6 +255,7 @@ sap.ui.define([
 				reference: sReference
 			}), "Loader was called with the correct parameters");
 			assert.strictEqual(this.oVMInitStub.callCount, 1, "the VModel was initialized");
+			assert.ok(this.oInitMessageBrokerStub.notCalled, "SupportAPI.initializeMessageBrokerForComponent not called outside of debug mode");
 		});
 
 		QUnit.test("when getChangesAndPropagate() is called for an embedded component with a preexisting VariantModel on its application component", function(assert) {
@@ -484,6 +488,13 @@ sap.ui.define([
 
 			await ComponentLifecycleHooks.instanceCreatedHook(oComponent, {});
 			assert.equal(oComponent.setModel.callCount, 0, "setModel was not called");
+		});
+
+		QUnit.test("when in debug mode", async function(assert) {
+			window["sap-ui-debug"] = true;
+			await ComponentLifecycleHooks.instanceCreatedHook(this.oAppComponent, { asyncHints: true, id: sReference });
+			assert.strictEqual(this.oInitMessageBrokerStub.callCount, 1, "SupportAPI.initializeMessageBrokerForComponent was called once");
+			delete window["sap-ui-debug"];
 		});
 	});
 

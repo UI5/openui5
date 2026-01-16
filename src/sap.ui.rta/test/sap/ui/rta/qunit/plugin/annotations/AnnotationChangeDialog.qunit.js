@@ -11,8 +11,8 @@ sap.ui.define([
 	"sap/ui/model/json/JSONModel",
 	"sap/ui/qunit/QUnitUtils",
 	"sap/ui/rta/plugin/annotations/AnnotationChangeDialog",
-	"sap/ui/rta/plugin/annotations/AnnotationChangeDialogController",
 	"sap/ui/rta/plugin/annotations/AnnotationTypes",
+	"sap/ui/rta/plugin/annotations/DocumentedAnnotationChanges",
 	"sap/ui/rta/Utils",
 	"sap/ui/thirdparty/sinon-4",
 	"test-resources/sap/ui/rta/qunit/RtaQunitUtils"
@@ -27,8 +27,8 @@ sap.ui.define([
 	JSONModel,
 	QUnitUtils,
 	AnnotationChangeDialog,
-	AnnotationChangeDialogController,
 	AnnotationTypes,
+	DocumentedAnnotationChanges,
 	RtaUtils,
 	sinon,
 	RtaQunitUtils
@@ -174,6 +174,7 @@ sap.ui.define([
 			this.oDialog = new AnnotationChangeDialog();
 			this.oTestControl = new Control("testControl");
 			this.oComponent = RtaQunitUtils.createAndStubAppComponent(sandbox);
+			this.oGetDocumentationUrl = sandbox.stub(RtaUtils, "getSystemSpecificDocumentationUrl");
 		},
 		afterEach() {
 			this.oDialog.destroy();
@@ -182,7 +183,7 @@ sap.ui.define([
 			sandbox.restore();
 		}
 	}, function() {
-		QUnit.test("When the dialog is opened", async function(assert) {
+		QUnit.test("When the dialog is opened for a textArrangement action", async function(assert) {
 			const oTestDelegate = createValueListTestDelegate();
 			const oActionConfig = {
 				title: "Change Text Arrangement",
@@ -190,10 +191,16 @@ sap.ui.define([
 				type: AnnotationTypes.ValueListType,
 				control: { id: "testControl" },
 				annotation: "testAnnotation",
-				delegate: oTestDelegate
+				delegate: oTestDelegate,
+				featureKey: DocumentedAnnotationChanges.TextArrangement
 			};
 			const oDelegateSpy = sandbox.spy(oTestDelegate, "getAnnotationsChangeInfo");
 			const fnAfterOpen = () => {
+				assert.ok(this.oGetDocumentationUrl.calledWith({
+					btpUrl: "https://help.sap.com/docs/ui5-flexibility-for-key-users/ui5-flexibility-for-key-users/making-ui-changes#changing-the-text-arrangement",
+					s4HanaCloudUrl: "https://help.sap.com/docs/SAP_S4HANA_CLOUD/4fc8d03390c342da8a60f8ee387bca1a/54270a390b194c3e97be2424592c3352.html#changing-the-text-arrangement",
+					s4HanaOnPremUrl: "https://help.sap.com/docs/ABAP_PLATFORM_NEW/a7b390faab1140c087b8926571e942b7/54270a390b194c3e97be2424592c3352.html#changing-the-text-arrangement"
+				}), "the documentation url is requested with the correct links");
 				const aFormElements = Element.getElementById("sapUiRtaChangeAnnotationDialog_propertyList").getFormElements();
 
 				// Initial rendering checks
@@ -489,6 +496,12 @@ sap.ui.define([
 				delegate: oTestDelegate
 			};
 			const fnAfterOpen = () => {
+				assert.ok(this.oGetDocumentationUrl.calledWith({
+					btpUrl: "https://help.sap.com/docs/ui5-flexibility-for-key-users/ui5-flexibility-for-key-users/making-ui-changes",
+					s4HanaCloudUrl: "https://help.sap.com/docs/SAP_S4HANA_CLOUD/4fc8d03390c342da8a60f8ee387bca1a/54270a390b194c3e97be2424592c3352.html",
+					s4HanaOnPremUrl: "https://help.sap.com/docs/ABAP_PLATFORM_NEW/a7b390faab1140c087b8926571e942b7/54270a390b194c3e97be2424592c3352.html"
+				}), "the documentation url is requested with the correct links");
+
 				const aFormElements = Element.getElementById("sapUiRtaChangeAnnotationDialog_propertyList").getFormElements();
 				const aVisibleFields = aFormElements[0].getFields().filter((oField) => oField.getVisible());
 				assert.strictEqual(aVisibleFields.length, 1, "then only one input field is visible based on the type");
@@ -512,9 +525,16 @@ sap.ui.define([
 			const oActionConfig = {
 				title: "Change Some String Prop",
 				type: AnnotationTypes.StringType,
-				delegate: oTestDelegate
+				delegate: oTestDelegate,
+				featureKey: DocumentedAnnotationChanges.Rename
 			};
 			const fnAfterOpen = () => {
+				assert.ok(this.oGetDocumentationUrl.calledWith({
+					btpUrl: "https://help.sap.com/docs/ui5-flexibility-for-key-users/ui5-flexibility-for-key-users/making-ui-changes#renaming-a-ui-element",
+					s4HanaCloudUrl: "https://help.sap.com/docs/SAP_S4HANA_CLOUD/4fc8d03390c342da8a60f8ee387bca1a/54270a390b194c3e97be2424592c3352.html#renaming-a-ui-element",
+					s4HanaOnPremUrl: "https://help.sap.com/docs/ABAP_PLATFORM_NEW/a7b390faab1140c087b8926571e942b7/54270a390b194c3e97be2424592c3352.html#renaming-a-ui-element"
+				}), "the documentation url is requested with the correct links");
+
 				const aFormElements = Element.getElementById("sapUiRtaChangeAnnotationDialog_propertyList").getFormElements();
 				const aVisibleFields = aFormElements[1].getFields().filter((oField) => oField.getVisible());
 				assert.strictEqual(aVisibleFields.length, 1, "then only one input field is visible based on the type");
@@ -679,41 +699,6 @@ sap.ui.define([
 				oCancelButton.firePress();
 			};
 			await openDialog(sandbox, oActionConfig, fnAfterOpen);
-		});
-	});
-
-	QUnit.module("formatDocumentationUrl", {
-		beforeEach() {
-			this.oController = new AnnotationChangeDialogController();
-		},
-		afterEach() {
-			this.oController.destroy();
-			sandbox.restore();
-		}
-	}, function() {
-		QUnit.test("when the documentation URL is set", function(assert) {
-			const oGetSystemSpecificDocumentationUrlStub = sandbox.stub(RtaUtils, "getSystemSpecificDocumentationUrl").returns("https://test.url/documentation");
-
-			const sResult = this.oController.formatDocumentationUrl();
-
-			assert.ok(oGetSystemSpecificDocumentationUrlStub.calledOnce, "then getSystemSpecificDocumentationUrl is called once");
-			const oCallArgs = oGetSystemSpecificDocumentationUrlStub.firstCall.args[0];
-			assert.strictEqual(
-				oCallArgs.btpUrl,
-				"https://help.sap.com/docs/ui5-flexibility-for-key-users/ui5-flexibility-for-key-users/making-ui-changes",
-				"then BTP URL is correct"
-			);
-			assert.strictEqual(
-				oCallArgs.s4HanaCloudUrl,
-				"https://help.sap.com/docs/SAP_S4HANA_CLOUD/4fc8d03390c342da8a60f8ee387bca1a/54270a390b194c3e97be2424592c3352.html",
-				"then S/4HANA Cloud URL is correct"
-			);
-			assert.strictEqual(
-				oCallArgs.s4HanaOnPremUrl,
-				"https://help.sap.com/docs/ABAP_PLATFORM_NEW/a7b390faab1140c087b8926571e942b7/54270a390b194c3e97be2424592c3352.html",
-				"then S/4HANA On-Premise URL is correct"
-			);
-			assert.strictEqual(sResult, "https://test.url/documentation", "then the result is returned from getSystemSpecificDocumentationUrl");
 		});
 	});
 

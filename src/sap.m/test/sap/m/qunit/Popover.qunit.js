@@ -179,6 +179,18 @@ sap.ui.define([
 		clock.restore();
 	}
 
+	function nextAfterOpenEvent(oPopover) {
+		return new Promise(function (resolve) {
+			oPopover.attachEventOnce("afterOpen", resolve);
+		});
+	}
+
+	function nextAfterCloseEvent(oPopover) {
+		return new Promise(function (resolve) {
+			oPopover.attachEventOnce("afterClose", resolve);
+		});
+	}
+
 	QUnit.module("Initial Check");
 
 	QUnit.test("Initialization", function (assert){
@@ -2391,9 +2403,9 @@ sap.ui.define([
 
 		assert.ok(!containsOrEquals(oInput.getDomRef(), document.activeElement), "focus is not in input anymore");
 
-		runAllFakeTimersAndRestore(this.clock);
 		oPopover.destroy();
 		oButton.destroy();
+		runAllFakeTimersAndRestore(this.clock);
 	});
 
 	QUnit.test("Focus should be taken out of Popover after closed on mobile", async function (assert) {
@@ -2426,9 +2438,9 @@ sap.ui.define([
 
 		assert.ok(!containsOrEquals(oInput.getDomRef(), document.activeElement), "focus is not in input anymore");
 
-		runAllFakeTimersAndRestore(this.clock);
 		oPopover.destroy();
 		oButton.destroy();
+		runAllFakeTimersAndRestore(this.clock);
 	});
 
 	QUnit.test("Do not fire close events when destroyed", function (assert) {
@@ -2451,8 +2463,8 @@ sap.ui.define([
 		assert.strictEqual(afterCloseSpy.called, false, "On destruction do not call afterClose event");
 
 		//Clean
-		runAllFakeTimersAndRestore(this.clock);
 		oPopover.destroy();
+		runAllFakeTimersAndRestore(this.clock);
 	});
 
 	QUnit.test("beforeClose should be fired if the Popover is auto-closed and the focus is still inside but the DOM of the element that opened it no longer exists", async function (assert) {
@@ -2490,11 +2502,10 @@ sap.ui.define([
 		assert.strictEqual(oBeforeCloseSpy.called, true, "beforeClose event is fired");
 
 		// Clean
-		runAllFakeTimersAndRestore(this.clock);
-
 		oPopover.destroy();
 		oOpenButton.destroy();
 		oCloseButton.destroy();
+		runAllFakeTimersAndRestore(this.clock);
 	});
 
 	QUnit.test("Do not fire close events when already closed.", async function (assert) {
@@ -2643,7 +2654,6 @@ sap.ui.define([
 	}
 
 	QUnit.test("Popover is auto-closed if the opener is currently not visible", async function (assert) {
-		this.clock = sinon.useFakeTimers();
 		// Arrange
 		var oOpenButton = new Button({
 			text: "Open Popover"
@@ -2667,23 +2677,22 @@ sap.ui.define([
 		oPopover._followOfTolerance = 100000000;
 
 		// Act
-		await nextUIUpdate(this.clock);
+		await nextUIUpdate();
 		oPopover.openBy(oOpenButton);
-		await nextUIUpdate(this.clock);
-		this.clock.tick(500);
+		await nextAfterOpenEvent(oPopover);
+		await nextUIUpdate();
 
 		oOpenButton.getDomRef().style.position = "absolute";
 		oOpenButton.getDomRef().style.width = "80px";
 
 		Popup.checkDocking.call(oPopover.oPopup);
 
-		this.clock.tick(500);
+		await nextAfterCloseEvent(oPopover);
+
 		// Assert
 		assert.notOk(oPopover.isOpen(), "Popover is auto closed");
 
 		// Clean
-		runAllFakeTimersAndRestore(this.clock);
-
 		oPopover.destroy();
 		oOpenButton.destroy();
 		oOtherButton.destroy();
@@ -2773,7 +2782,6 @@ sap.ui.define([
 
 	QUnit.module("Popover scroll width",{
 		beforeEach: async function() {
-			this.clock = sinon.useFakeTimers();
 			this.oButton = new Button().placeAt("content");
 			this.oPopover = new Popover({
 				title: 'Will have vertical scroll',
@@ -2803,10 +2811,9 @@ sap.ui.define([
 				]
 			});
 
-			await nextUIUpdate(this.clock);
+			await nextUIUpdate();
 		},
 		afterEach: function() {
-			runAllFakeTimersAndRestore(this.clock);
 			this.oPopover.destroy();
 			this.oButton.destroy();
 		}
@@ -2814,10 +2821,9 @@ sap.ui.define([
 
 	QUnit.test("Item texts are not truncated when width is auto", async function(assert) {
 		this.oPopover.openBy(this.oButton);
-		this.clock.tick(500);
-		this.clock.tick(1); // also process nested setTimeout calls
 
-		await nextUIUpdate(this.clock);
+		await nextAfterOpenEvent(this.oPopover);
+		await nextUIUpdate();
 
 		var $longTextItem = this.oPopover.$().find("#longTextItem .sapMSLITitleOnly");
 
@@ -2829,10 +2835,10 @@ sap.ui.define([
 
 	QUnit.test("Text is truncated when width is too small", async function(assert) {
 		this.oPopover.setContentWidth("20rem");
-		await nextUIUpdate(this.clock);
 
 		this.oPopover.openBy(this.oButton);
-		this.clock.tick(500);
+		await nextAfterOpenEvent(this.oPopover);
+		await nextUIUpdate();
 
 		var $longTextItem = this.oPopover.$().find("#longTextItem .sapMSLITitleOnly");
 
@@ -2859,7 +2865,8 @@ sap.ui.define([
 		});
 
 		oPopover.openBy(this.oButton);
-		this.clock.tick(500);
+		await nextAfterOpenEvent(oPopover);
+		await nextUIUpdate();
 
 		const iHeightAfterOpen = oPopover.getDomRef("cont").getBoundingClientRect().height;
 
@@ -2867,12 +2874,11 @@ sap.ui.define([
 
 		// act
 		oPopover.invalidate();
-		await nextUIUpdate(this.clock);
+		await nextUIUpdate();
 
 		assert.ok(oPopover.getDomRef("cont").getBoundingClientRect().height >= iHeightAfterOpen, "Height is preserved after invalidation");
 
 		// clean up
-		runAllFakeTimersAndRestore(this.clock);
 		oPopover.destroy();
 	});
 

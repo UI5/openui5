@@ -10,6 +10,8 @@ sap.ui.define([
 	"sap/ui/model/json/JSONModel",
 	"sap/ui/model/resource/ResourceModel",
 	"sap/ui/rta/plugin/annotations/AnnotationChangeDialogController",
+	"sap/ui/rta/plugin/annotations/AnnotationTypes",
+	"sap/ui/rta/plugin/annotations/DocumentedAnnotationChanges",
 	"sap/ui/rta/Utils"
 ], function(
 	ManagedObject,
@@ -19,6 +21,8 @@ sap.ui.define([
 	JSONModel,
 	ResourceModel,
 	AnnotationChangeDialogController,
+	AnnotationTypes,
+	DocumentedAnnotationChanges,
 	RtaUtils
 ) {
 	"use strict";
@@ -53,6 +57,25 @@ sap.ui.define([
 			const sAnnotationPath = oChange.getContent().annotationPath;
 			replaceValue(aProperties, sAnnotationPath, bObjectAsKey ? JSON.stringify(oChange.getValue()) : oChange.getValue());
 		});
+	}
+
+	function getDocumentationUrl(sFeatureKey) {
+		const oDocumentationUrls = {
+			btpUrl: "https://help.sap.com/docs/ui5-flexibility-for-key-users/ui5-flexibility-for-key-users/making-ui-changes",
+			s4HanaCloudUrl: "https://help.sap.com/docs/SAP_S4HANA_CLOUD/4fc8d03390c342da8a60f8ee387bca1a/54270a390b194c3e97be2424592c3352.html",
+			s4HanaOnPremUrl: "https://help.sap.com/docs/ABAP_PLATFORM_NEW/a7b390faab1140c087b8926571e942b7/54270a390b194c3e97be2424592c3352.html"
+		};
+		if (sFeatureKey === DocumentedAnnotationChanges.Rename) {
+			oDocumentationUrls.btpUrl += "#renaming-a-ui-element";
+			oDocumentationUrls.s4HanaCloudUrl += "#renaming-a-ui-element";
+			oDocumentationUrls.s4HanaOnPremUrl += "#renaming-a-ui-element";
+		} else if (sFeatureKey === DocumentedAnnotationChanges.TextArrangement) {
+			oDocumentationUrls.btpUrl += "#changing-the-text-arrangement";
+			oDocumentationUrls.s4HanaCloudUrl += "#changing-the-text-arrangement";
+			oDocumentationUrls.s4HanaOnPremUrl += "#changing-the-text-arrangement";
+		}
+
+		return RtaUtils.getSystemSpecificDocumentationUrl(oDocumentationUrls);
 	}
 
 	AnnotationChangeDialog.prototype._createDialog = async function() {
@@ -138,7 +161,8 @@ sap.ui.define([
 			control: oControl,
 			annotation: sAnnotation,
 			description: sAnnotationDescription,
-			singleRename: bSingleRename
+			singleRename: bSingleRename,
+			featureKey: sFeatureKey
 		} = mPropertyBag;
 		const {
 			serviceUrl: sServiceUrl,
@@ -204,7 +228,8 @@ sap.ui.define([
 			singleRename: bSingleRename || false,
 			possibleValues: aPossibleValues,
 			valueType: sAnnotationValueType,
-			serviceUrl: sServiceUrl
+			serviceUrl: sServiceUrl,
+			documentationUrl: getDocumentationUrl(sFeatureKey)
 		});
 		if (sFilterText) {
 			this._oController.filterProperties(sFilterText, !!bSingleRename);

@@ -1,10 +1,8 @@
 /* global QUnit */
 
 sap.ui.define([
-	"sap/base/Log",
 	"sap/ui/core/Component",
 	"sap/ui/core/ComponentContainer",
-	"sap/ui/core/HTML",
 	"sap/ui/fl/apply/_internal/flexState/changes/UIChangesState",
 	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
 	"sap/ui/fl/apply/_internal/flexState/FlexObjectState",
@@ -16,10 +14,8 @@ sap.ui.define([
 	"sap/ui/fl/Utils",
 	"sap/ui/thirdparty/sinon-4"
 ], function(
-	Log,
 	Component,
 	ComponentContainer,
-	HTML,
 	UIChangesState,
 	VariantManagementState,
 	FlexObjectState,
@@ -34,98 +30,6 @@ sap.ui.define([
 	"use strict";
 
 	const sandbox = sinon.createSandbox();
-
-	function setupIFrameTest({ id, setDataHelpId }, bSkipInsideModuleStubs) {
-		return async function() {
-			const sUrl = new URL("support/api/testPage.html", document.location.href).toString();
-			this.oIFrame = new HTML(id, {
-				content: `<iframe src="${sUrl}"></iframe>`
-			});
-			this.oIFrame.placeAt("qunit-fixture");
-			sandbox.stub(Utils, "getUshellContainer").returns(true);
-			sandbox.stub(Utils, "getUShellService").resolves({
-				getCurrentApplication: () => {
-					return {
-						getIntent: () => {
-							return {
-								semanticObject: "semanticObject",
-								action: "action"
-							};
-						}
-					};
-				}
-			});
-
-			// wait for the app inside the iframe to be ready
-			let bReady = false;
-			do {
-				if (this.oIFrame.getDomRef()?.contentWindow?.flSupportTestAppReady) {
-					await this.oIFrame.getDomRef().contentWindow.flSupportTestAppReady;
-					bReady = true;
-				} else {
-					await new Promise((resolve) => {
-						setTimeout(resolve, 16);
-					});
-				}
-			} while (!bReady);
-
-			if (setDataHelpId) {
-				this.oIFrame.getDomRef().setAttribute("data-help-id", "application-semanticObject-action");
-			}
-
-			// stub the modules inside the iframe
-			if (bSkipInsideModuleStubs) {
-				return;
-			}
-			const oInsideIFrameModules = await new Promise((resolve) => {
-				this.oIFrame.getDomRef().contentWindow.sap.ui.require([
-					"sap/ui/fl/Utils",
-					"sap/ui/fl/initial/_internal/ManifestUtils",
-					"sap/ui/fl/apply/_internal/flexState/changes/UIChangesState"
-				], (FlUtils, ManifestUtils, UIChangesState) => {
-					resolve({ FlUtils, ManifestUtils, UIChangesState });
-				});
-			});
-			sandbox.stub(oInsideIFrameModules.FlUtils, "getUShellService").resolves({
-				getCurrentApplication: () => {
-					return {
-						componentInstance: {
-							oContainer: {
-								getComponentInstance: () => {
-									return "myInsideIFrameComponentInstance";
-								}
-							}
-						}
-					};
-				}
-			});
-			sandbox.stub(oInsideIFrameModules.ManifestUtils, "getFlexReferenceForControl").returns("myInsideIFrameFlexReference");
-			sandbox.stub(oInsideIFrameModules.UIChangesState, "getAllUIChanges").resolves(["myInsideIFrameChange"]);
-		};
-	}
-
-	QUnit.module("When the SupportAPI is called with the app running in an iframe", {
-		afterEach() {
-			sandbox.restore();
-			this.oIFrame.destroy();
-		}
-	}, function() {
-		QUnit.test("when getAllUIChanges is called (retrieved by id)", async function(assert) {
-			await setupIFrameTest({ id: "application-semanticObject-action", setDataHelpId: false }).call(this);
-			const aAllChanges = await SupportAPI.getAllUIChanges();
-			assert.deepEqual(aAllChanges, ["myInsideIFrameChange"], "then the change from the iFrame (retrieved by id) is returned");
-		});
-
-		QUnit.test("when getAllUIChanges is called (retrieved by data-help-id)", async function(assert) {
-			await setupIFrameTest({ id: "not-the-expected-id", setDataHelpId: true }).call(this);
-			const aAllChanges = await SupportAPI.getAllUIChanges();
-			assert.deepEqual(
-				aAllChanges,
-				["myInsideIFrameChange"],
-				"then the change from the iFrame (retrieved by data-help-id) is returned"
-			);
-		});
-	});
 
 	QUnit.module("When the SupportAPI is called with a standalone app without iframe", {
 		async beforeEach() {
@@ -339,60 +243,59 @@ sap.ui.define([
 		});
 	});
 
-	QUnit.module("When the SupportAPI is called without an app but available FLP sandbox", {
+	QUnit.module("When the SupportAPI is called and component not found (possible cFLP scenario - app in iframe)", {
 		beforeEach() {
 			sandbox.stub(Utils, "getUshellContainer").returns(true);
-			sandbox.stub(Utils, "getUShellService").resolves({
+			this.oGetUShellServiceStub = sandbox.stub(Utils, "getUShellService")
+			.withArgs("AppLifeCycle").resolves({
 				getCurrentApplication: () => {
-					return {
-						getIntent: () => {
-							return {
-								semanticObject: "semanticObject",
-								action: "action"
-							};
-						}
-					};
+					return {};
 				}
 			});
-			this.oLogErrorStub = sandbox.stub(Log, "error");
+			this.oPublishStub = sandbox.stub();
+			this.oGetUShellServiceStub.withArgs("MessageBroker").resolves({
+				publish: this.oPublishStub
+			});
 		},
 		afterEach() {
 			sandbox.restore();
 		}
 	}, function() {
-		QUnit.test("when getAllUIChanges is called", function(assert) {
-			const oGetAllChangesStub = sandbox.stub(UIChangesState, "getAllUIChanges").returns(["myFlpChange"]);
-			return SupportAPI.getAllUIChanges()
-			.catch(function(oError) {
-				assert.strictEqual(oError.message, "Possible cFLP scenario, but the iFrame can't be found", "then an error is thrown");
-				assert.strictEqual(oGetAllChangesStub.callCount, 0, "then no changes are fetched");
-				assert.ok(
-					this.oLogErrorStub.calledWith("Possible cFLP scenario, but the iFrame can't be found"),
-					"then an error is logged"
-				);
-			}.bind(this));
-		});
-
-		QUnit.test("when getApplicationComponent is called", function(assert) {
-			return SupportAPI.getApplicationComponent()
-			.catch(function(oError) {
-				assert.strictEqual(oError.message, "Possible cFLP scenario, but the iFrame can't be found", "then an error is thrown");
-				assert.ok(
-					this.oLogErrorStub.calledWith("Possible cFLP scenario, but the iFrame can't be found"),
-					"then an error is logged"
-				);
-			}.bind(this));
+		QUnit.test("when getFlexObjectInfos (example function) is called", async function(assert) {
+			const oResult = await SupportAPI.getFlexObjectInfos();
+			assert.strictEqual(
+				oResult, undefined, "then nothing is returned because the function is not called, only a message published"
+			);
+			assert.strictEqual(
+				this.oPublishStub.getCall(0).args[0],
+				"flex.support.channel",
+				"then the correct channel ID is used to publish the message"
+			);
+			assert.strictEqual(
+				this.oPublishStub.getCall(0).args[1],
+				"FlexSupportClient",
+				"then the correct support client ID is used to publish the message"
+			);
+			assert.strictEqual(
+				this.oPublishStub.getCall(0).args[2],
+				"getFlexObjectInfos",
+				"then the correct message ID is used to publish the message"
+			);
+			assert.deepEqual(
+				this.oPublishStub.getCall(0).args[3],
+				["FlexAppClient"],
+				"then the correct app client ID is used to publish the message"
+			);
 		});
 	});
 
-	QUnit.module("When the SupportAPI is called with standalone app and without application container defined", {
+	QUnit.module("Error handling when component not found (possible cFLP scenario)", {
 		beforeEach() {
-			sandbox.stub(Utils, "getUshellContainer").returns(false);
-			sandbox.stub(Utils, "getUShellService").resolves({
+			sandbox.stub(Utils, "getUshellContainer").returns(true);
+			this.oGetUShellServiceStub = sandbox.stub(Utils, "getUShellService")
+			.withArgs("AppLifeCycle").resolves({
 				getCurrentApplication: () => {
-					return {
-						componentInstance: null
-					};
+					return {};
 				}
 			});
 		},
@@ -400,81 +303,166 @@ sap.ui.define([
 			sandbox.restore();
 		}
 	}, function() {
-		QUnit.test("when getAllUIChanges is called", function(assert) {
-			return SupportAPI.getAllUIChanges()
-			.catch(function(oError) {
-				assert.strictEqual(oError.message, "No application component found", "then an error is thrown");
-			});
-		});
-
-		QUnit.test("when getApplicationComponent is called", function(assert) {
-			return SupportAPI.getApplicationComponent()
-			.catch(function(oError) {
-				assert.strictEqual(oError.message, "No application component found", "then an error is thrown");
-			});
+		QUnit.test("when MessageBroker service is not available", async function(assert) {
+			this.oGetUShellServiceStub.withArgs("MessageBroker").resolves(undefined);
+			const fnDone = assert.async();
+			try {
+				await SupportAPI.getFlexObjectInfos();
+			} catch (oError) {
+				assert.strictEqual(
+					oError.message,
+					"Component not found (possible cFLP scenario) but MessageBroker service is not available",
+					"then the correct error is thrown"
+				);
+				fnDone();
+			}
 		});
 	});
 
-	QUnit.module("When the SupportAPI is called with cFLP scenario but component in iFrame is null", {
+	QUnit.module("Different messages received with Message Broker(e.g. cFLP scenario)", {
+		beforeEach() {
+			sandbox.stub(Utils, "getUshellContainer").returns(true);
+			this.oGetUShellServiceStub = sandbox.stub(Utils, "getUShellService")
+			.withArgs("MessageBroker").resolves({
+				subscribe: sandbox.stub().callsFake((sAppClientId, aChannels, onFlexMessageReceived) => {
+					this.onMessageReceived = onFlexMessageReceived;
+				}),
+				connect: sandbox.stub().resolves()
+			})
+			.withArgs("AppLifeCycle").resolves({
+				getCurrentApplication: () => {
+					// No component instance, simulating cFLP scenario
+					return {};
+				}
+			});
+		},
 		afterEach() {
-			this.oIFrame?.destroy();
 			sandbox.restore();
 		}
 	}, function() {
-		QUnit.test("when getAllUIChanges is called and component in iFrame is null", async function(assert) {
-			await setupIFrameTest({ id: "application-semanticObject-action" }, true).call(this);
-
-			// Stub the Utils module inside the iFrame to return null componentInstance
-			const oIFrameWindow = this.oIFrame.getDomRef().contentWindow;
-			const oInsideIFrameModules = await new Promise((resolve) => {
-				oIFrameWindow.sap.ui.require([
-					"sap/ui/fl/Utils"
-				], (FlUtils) => {
-					resolve({ FlUtils });
-				});
+		QUnit.test("check initializeMessageBrokerForComponent", async function(assert) {
+			const fnDone = assert.async();
+			this.oGetUShellServiceStub.withArgs("MessageBroker").resolves({
+				connect: sandbox.stub().callsFake((sClientId, fnCallback) => {
+					assert.strictEqual(sClientId, "FlexAppClient", "then the correct client ID is used to connect");
+					assert.strictEqual(fnCallback(), undefined, "then the callback is set correctly");
+					return Promise.resolve();
+				}),
+				subscribe: sandbox.stub().callsFake((sAppClientId, aChannels, onFlexMessageReceived) => {
+					assert.strictEqual(sAppClientId, "FlexAppClient", "then the correct client ID is used to subscribe");
+					assert.deepEqual(aChannels, [{ channelId: "flex.support.channel" }], "then the correct channel is used to subscribe");
+					assert.ok(typeof onFlexMessageReceived === "function", "then the message handler function is set");
+					fnDone();
+				})
 			});
-
-			// Override the existing stub to return null componentInstance
-			sandbox.stub(oInsideIFrameModules.FlUtils, "getUShellService").resolves({
-				getCurrentApplication: () => {
-					return {
-						componentInstance: null
-					};
-				}
-			});
-
-			return SupportAPI.getAllUIChanges()
-			.catch(function(oError) {
-				assert.strictEqual(oError.message, "No application component found", "then an error is thrown");
-			});
+			// Simulate client subscription to the message broker (e.g. during component initialization)
+			await SupportAPI.initializeMessageBrokerForComponent();
 		});
 
-		QUnit.test("when getApplicationComponent is called and component in iFrame is null", async function(assert) {
-			await setupIFrameTest({ id: "application-semanticObject-action" }, true).call(this);
-
-			// Stub the Utils module inside the iFrame to return null componentInstance
-			const oIFrameWindow = this.oIFrame.getDomRef().contentWindow;
-			const oInsideIFrameModules = await new Promise((resolve) => {
-				oIFrameWindow.sap.ui.require([
-					"sap/ui/fl/Utils"
-				], (FlUtils) => {
-					resolve({ FlUtils });
-				});
+		QUnit.test("when message getFlexObjectInfos is received", async function(assert) {
+			// Simulate client subscription to the message broker (e.g. during component initialization)
+			await SupportAPI.initializeMessageBrokerForComponent();
+			const fnDone = assert.async();
+			sandbox.stub(SupportAPI, "getFlexObjectInfos").resolves("dummyResult");
+			sandbox.stub(console, "log").callsFake((loggedValue) => {
+				assert.deepEqual(
+					loggedValue, "dummyResult", "then 'getFlexObjectInfos' result is logged in the console"
+				);
+				fnDone();
 			});
+			this.onMessageReceived("FlexSupportClient", "flex.support.channel", "getFlexObjectInfos");
+		});
+	});
 
-			// Override the existing stub to return null componentInstance
-			sandbox.stub(oInsideIFrameModules.FlUtils, "getUShellService").resolves({
+	QUnit.module("When SupportAPI.checkAndPrepareMessageBroker is called", {
+		beforeEach() {
+			sandbox.stub(Utils, "getUshellContainer").returns(true);
+			this.oSubscribeStub = sandbox.stub().resolves();
+			this.oConnectStub = sandbox.stub().resolves();
+			this.oGetUShellServiceStub = sandbox.stub(Utils, "getUShellService")
+			.withArgs("MessageBroker").resolves({
+				subscribe: this.oSubscribeStub,
+				connect: this.oConnectStub
+			});
+		},
+		afterEach() {
+			sandbox.restore();
+		}
+
+	}, function() {
+		QUnit.test("and component is found", async function(assert) {
+			this.oGetUShellServiceStub.withArgs("AppLifeCycle").resolves({
 				getCurrentApplication: () => {
 					return {
-						componentInstance: null
+						componentInstance: "dummyComponent"
 					};
 				}
 			});
+			await SupportAPI.checkAndPrepareMessageBroker();
+			assert.notOk(
+				this.oConnectStub.called,
+				"then MessageBroker connect is not called"
+			);
+			assert.notOk(
+				this.oSubscribeStub.called,
+				"then MessageBroker subscribe is not called"
+			);
+		});
 
-			return SupportAPI.getApplicationComponent()
-			.catch(function(oError) {
-				assert.strictEqual(oError.message, "No application component found", "then an error is thrown");
+		QUnit.test("and component is not found", async function(assert) {
+			this.oGetUShellServiceStub.withArgs("AppLifeCycle").resolves({
+				getCurrentApplication: () => {
+					return {};
+				}
 			});
+			await SupportAPI.checkAndPrepareMessageBroker();
+			assert.ok(
+				this.oConnectStub.calledWith("FlexSupportClient"),
+				"then MessageBroker.connect is called with correct client ID"
+			);
+			assert.ok(
+				this.oSubscribeStub.calledWith(
+					"FlexSupportClient",
+					[{ channelId: "flex.support.channel" }]
+				),
+				"then MessageBroker.subscribe is called with correct client ID and channel"
+			);
+		});
+
+		QUnit.test("and component is not found and Message Broker is already connected", async function(assert) {
+			this.oGetUShellServiceStub.withArgs("AppLifeCycle").resolves({
+				getCurrentApplication: () => {
+					return {};
+				}
+			});
+			this.oConnectStub.throws(new Error("Client is already connected"));
+			await SupportAPI.checkAndPrepareMessageBroker();
+			assert.ok(
+				this.oSubscribeStub.notCalled,
+				"then MessageBroker subscribe is not called"
+			);
+		});
+
+		QUnit.test("and component is not found and Message Broker connection fails", async function(assert) {
+			this.oGetUShellServiceStub.withArgs("AppLifeCycle").resolves({
+				getCurrentApplication: () => {
+					return {};
+				}
+			});
+			this.oConnectStub.throws(new Error("Some other connection error"));
+			try {
+				await SupportAPI.checkAndPrepareMessageBroker();
+			} catch (oError) {
+				assert.strictEqual(
+					oError.message,
+					"Some other connection error",
+					"then the correct error is thrown"
+				);
+			}
+			assert.notOk(
+				this.oSubscribeStub.called,
+				"then MessageBroker subscribe is not called"
+			);
 		});
 	});
 

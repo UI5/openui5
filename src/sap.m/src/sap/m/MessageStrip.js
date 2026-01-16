@@ -419,7 +419,7 @@ sap.ui.define([
 			sColorSet = MessageStripColorSet.Default;
 		}
 
-		return `${sRootClass} ${mColorSetClasses[sColorSet]}`;
+		return `${sRootClass} ${mColorSetClasses[sColorSet]}`.split(" ");
 	};
 
 	MessageStrip.prototype.exit = function () {

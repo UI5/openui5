@@ -1018,53 +1018,55 @@ sap.ui.define([
 			}.bind(this));
 		});
 
-		QUnit.test("when being on a system with KeyUserConnector", function(assert) {
-			sandbox.stub(FlexRuntimeInfoAPI, "getFeedbackInformation").returns({
-				appId: "someAppId",
-				appVersion: "someAppVersion",
-				connector: "KeyUserConnector",
-				version: "someVersion"
+		["KeyUserConnector", "BtpServiceConnector"].forEach(function(sConnectorName) {
+			QUnit.test(`when being on a system with ${sConnectorName}`, function(assert) {
+				sandbox.stub(FlexRuntimeInfoAPI, "getFeedbackInformation").returns({
+					appId: "someAppId",
+					appVersion: "someAppVersion",
+					connector: sConnectorName,
+					version: "someVersion"
+				});
+				return createAndStartRTA.call(this)
+				.then(async function() {
+					assert.ok(
+						this.oToolbar.getControl("feedback").getVisible(),
+						"then the feedback button is enabled"
+					);
+					return await this.oToolbar.showFeedbackForm();
+				}.bind(this))
+				.then(function() {
+					var oIframeURL = new URL(this.oToolbar._oFeedbackDialog.getContent()[0].getBindingInfo("url").binding.getValue());
+					assert.ok(
+						oIframeURL.pathname.endsWith("SV_4MANxRymEIl9K06"),
+						"then the proper form id is passed"
+					);
+					assert.strictEqual(
+						oIframeURL.searchParams.get("version"),
+						"someVersion",
+						"then the proper version is passed"
+					);
+					assert.strictEqual(
+						oIframeURL.searchParams.get("feature"),
+						"BTP",
+						"then the proper platform is passed"
+					);
+					assert.strictEqual(
+						oIframeURL.searchParams.get("appId"),
+						"someAppId",
+						"then the proper app id is passed"
+					);
+					assert.strictEqual(
+						oIframeURL.searchParams.get("appVersion"),
+						"someAppVersion",
+						"then the proper app version is passed"
+					);
+					assert.strictEqual(
+						oIframeURL.searchParams.get("product_filter"),
+						"Key%20User%20Adaptation",
+						"then the proper product filter is passed"
+					);
+				}.bind(this));
 			});
-			return createAndStartRTA.call(this)
-			.then(async function() {
-				assert.ok(
-					this.oToolbar.getControl("feedback").getVisible(),
-					"then the feedback button is enabled"
-				);
-				return await this.oToolbar.showFeedbackForm();
-			}.bind(this))
-			.then(function() {
-				var oIframeURL = new URL(this.oToolbar._oFeedbackDialog.getContent()[0].getBindingInfo("url").binding.getValue());
-				assert.ok(
-					oIframeURL.pathname.endsWith("SV_4MANxRymEIl9K06"),
-					"then the proper form id is passed"
-				);
-				assert.strictEqual(
-					oIframeURL.searchParams.get("version"),
-					"someVersion",
-					"then the proper version is passed"
-				);
-				assert.strictEqual(
-					oIframeURL.searchParams.get("feature"),
-					"BTP",
-					"then the proper platform is passed"
-				);
-				assert.strictEqual(
-					oIframeURL.searchParams.get("appId"),
-					"someAppId",
-					"then the proper app id is passed"
-				);
-				assert.strictEqual(
-					oIframeURL.searchParams.get("appVersion"),
-					"someAppVersion",
-					"then the proper app version is passed"
-				);
-				assert.strictEqual(
-					oIframeURL.searchParams.get("product_filter"),
-					"Key%20User%20Adaptation",
-					"then the proper product filter is passed"
-				);
-			}.bind(this));
 		});
 
 		QUnit.test("when being on a system with LrepConnector", function(assert) {

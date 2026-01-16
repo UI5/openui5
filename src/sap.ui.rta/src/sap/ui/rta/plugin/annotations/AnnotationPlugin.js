@@ -184,9 +184,10 @@ sap.ui.define([
 	 *
 	 * @param {sap.ui.dt.ElementOverlay[]} aElementOverlays - Target Overlays of the action
 	 * @param {object} oAction - The action object defined in the designtime
+	 * @param {string} sKey - Key of the action, used to display the specific documentation link
 	 * @return {Promise} Resolves with the creation of the commands
 	 */
-	AnnotationPlugin.prototype.handler = async function(aElementOverlays, oAction) {
+	AnnotationPlugin.prototype.handler = async function(aElementOverlays, oAction, sKey) {
 		const oElementOverlay = aElementOverlays[0];
 		const oElement = oElementOverlay.getElement();
 
@@ -199,7 +200,8 @@ sap.ui.define([
 				annotation: oAction.annotation,
 				description: oAction.description,
 				singleRename: oAction.singleRename,
-				controlBasedRenameChangeType: oAction.controlBasedRenameChangeType
+				controlBasedRenameChangeType: oAction.controlBasedRenameChangeType,
+				featureKey: sKey
 			});
 
 			if (aAnnotationChanges.length) {
@@ -270,7 +272,7 @@ sap.ui.define([
 							typeof oAction.isEnabled === "function" && oAction.isEnabled(aElementOverlays[0].getElement())
 							|| (oAction.isEnabled !== false) && this.isEnabled(aElementOverlays)
 						),
-						handler: this.handler.bind(this, aElementOverlays, oAction),
+						handler: this.handler.bind(this, aElementOverlays, oAction, sKey),
 						additionalInfo: this._getAdditionalInfo(oResponsibleElementOverlay, oAction)
 					});
 				}

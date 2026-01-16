@@ -42,17 +42,18 @@ sap.ui.define([
 				iTargetIndex = aContainerElementIds.indexOf(oCondenserInfo.affectedControl);
 				CondenserUtils.shiftElement(aContainerElementIds, iTargetIndex, oCondenserInfo.sourceIndex);
 			} else {
-				aContainerElementIds = CondenserUtils.getInitialUIContainerElementIds(
+				// This function assigns the returning array to mUIReconstructions - so modifying the array modifies the map content
+				const aTargetInitialContainerElementIds = CondenserUtils.getInitialUIContainerElementIds(
 					mUIReconstructions, oCondenserInfo.targetContainer,
 					oCondenserInfo.targetAggregation, aTargetContainerElementIds
 				);
-				iTargetIndex = aContainerElementIds.indexOf(oCondenserInfo.affectedControl);
-				aContainerElementIds.splice(iTargetIndex, 1);
-				aContainerElementIds = CondenserUtils.getInitialUIContainerElementIds(
+				iTargetIndex = aTargetInitialContainerElementIds.indexOf(oCondenserInfo.affectedControl);
+				aTargetInitialContainerElementIds.splice(iTargetIndex, 1);
+				const aSourceInitialContainerElementIds = CondenserUtils.getInitialUIContainerElementIds(
 					mUIReconstructions, oCondenserInfo.sourceContainer,
 					oCondenserInfo.sourceAggregation, aSourceContainerElementIds
 				);
-				aContainerElementIds.splice(oCondenserInfo.sourceIndex, 0, oCondenserInfo.affectedControl);
+				aSourceInitialContainerElementIds.splice(oCondenserInfo.sourceIndex, 0, oCondenserInfo.affectedControl);
 			}
 		},
 
@@ -62,9 +63,11 @@ sap.ui.define([
 		 * @param {string[]} aContainerElements - Array with the Ids of the current elements in the container
 		 * @param {object} oCondenserInfo - Condenser specific information
 		 * @param {string[]} aInitialUIElementIds - Array with the Ids of the initial elements in the container
+		 * @param {string} sContainerKey - Container being simulated
 		 */
-		simulate(aContainerElements, oCondenserInfo, aInitialUIElementIds) {
+		simulate(aContainerElements, oCondenserInfo, aInitialUIElementIds, sContainerKey) {
 			const sAffectedControlId = oCondenserInfo.affectedControl;
+			const bMoveWithinSameContainer = sContainerKey === oCondenserInfo.targetContainer;
 			const iInitialSourceIndex = aInitialUIElementIds.indexOf(sAffectedControlId);
 			// the move itself should not extend the array, just replace the placeholder
 			CondenserUtils.extendElementsArray(aContainerElements, iInitialSourceIndex, undefined, sAffectedControlId);
@@ -76,13 +79,16 @@ sap.ui.define([
 			if (iInitialSourceIndex === -1) {
 				aContainerElements.splice(iTargetIndex, 0, sAffectedControlId);
 			} else {
-				aContainerElements.splice(iTargetIndex, 0, aContainerElements.splice(iCurrentSourceIndex, 1)[0]);
+				const sRemovedElement = aContainerElements.splice(iCurrentSourceIndex, 1)[0];
+				if (bMoveWithinSameContainer) {
+					aContainerElements.splice(iTargetIndex, 0, sRemovedElement);
+				}
 			}
 
-			// changes with the same current source and target can be deleted, if the simulation is successful
-			oCondenserInfo.sameIndex = iCurrentSourceIndex === iTargetIndex;
+			// changes with the same current source and target index in the same container can be deleted, if the simulation is successful
+			oCondenserInfo.sameIndex = bMoveWithinSameContainer && (iCurrentSourceIndex === iTargetIndex);
 
-			// to enable a revert in the same session the previous index has to be saved during the simulation
+			// to enable a revert in the same session the previous index must be saved during the simulation
 			oCondenserInfo.revertIndex = iCurrentSourceIndex;
 		}
 	};

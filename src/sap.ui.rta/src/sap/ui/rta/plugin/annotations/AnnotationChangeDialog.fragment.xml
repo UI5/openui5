@@ -24,7 +24,7 @@
 					<link>
 						<Link text="{i18n>ANNOTATION_CHANGE_DIALOG_WARNING_MORE_INFO}"
 							target="_blank"
-							href="{path: '/', formatter: '.formatDocumentationUrl'}"/>
+							href="{/documentationUrl}"/>
 					</link>
 				</MessageStrip>
 				<Label
