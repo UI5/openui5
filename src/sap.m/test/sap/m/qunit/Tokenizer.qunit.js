@@ -1970,14 +1970,46 @@ sap.ui.define([
 
 	QUnit.test("aria-readonly attribute", async function(assert) {
 		// Assert
-		assert.ok(!this.tokenizer.$().attr("aria-readonly"), "Tokenizer has no aria-readonly attribute");
+		const sInnerContainerId = this.tokenizer.getId() + "-scrollContainer";
+		assert.ok(!this.tokenizer.$().find(`#${sInnerContainerId}`).attr("aria-readonly"), "Tokenizer has no aria-readonly attribute");
 
 		// Act
 		this.tokenizer.setEditable(false);
 		await nextUIUpdate();
 
 		// Assert
-		assert.strictEqual(this.tokenizer.$().attr("aria-readonly"), "true", "Tokenizer has aria-readonly attribute set.");
+		assert.strictEqual(this.tokenizer.$().find(`#${sInnerContainerId}`).attr("aria-readonly"), "true", "Tokenizer has aria-readonly attribute set.");
+	});
+
+	// CS20250010881646
+	QUnit.test("aria-describedby attribute", async function(assert) {
+		// Assert
+		const sInnerContainerId = this.tokenizer.getId() + "-scrollContainer";
+		assert.ok(!this.tokenizer.$().find(`#${sInnerContainerId}`).attr("aria-describedby"), "Tokenizer has no aria-describedby attribute");
+
+		// Act
+		this.tokenizer.addAriaDescribedBy(new Label({ text: "Custom Description" }));
+		await nextUIUpdate();
+
+		// Assert
+		assert.ok(this.tokenizer.$().find(`#${sInnerContainerId}`).attr("aria-describedby"), "Tokenizer has aria-describedby attribute set.");
+	});
+
+	// CS20250010881646
+	QUnit.test("aria-labelledby attribute", async function(assert) {
+		// Assert
+		const sInnerContainerId = this.tokenizer.getId() + "-scrollContainer";
+		let aAriaLabelledByIds = this.tokenizer.$().find(`#${sInnerContainerId}`).attr("aria-labelledby").split(" ");
+		assert.strictEqual(aAriaLabelledByIds.length, 1 , "Tokenizer has the default aria-labelledby attribute set");
+
+		// Act
+		this.tokenizer.addAriaLabelledBy(new Label("customLabel", { text: "Custom Description" }));
+		await nextUIUpdate();
+
+		// Assert
+		aAriaLabelledByIds = this.tokenizer.$().find(`#${sInnerContainerId}`).attr("aria-labelledby").split(" ");
+		assert.strictEqual(aAriaLabelledByIds.length, 2 , "Tokenizer has custom aria-labelledby attribute set");
+		assert.strictEqual(aAriaLabelledByIds.find((id) => id === "customLabel"), "customLabel", "Custom label is present in aria-labelledby attribute");
 	});
 
 	QUnit.test("posinset and setsize ARIA attributes are set on the Tokens", async function(assert) {
