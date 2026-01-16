@@ -335,9 +335,10 @@ sap.ui.define([
 				}
 			];
 
-			sandbox.stub(this.oAnnotationPlugin._oDialog, "openDialogAndHandleChanges").resolves(aAnnotationChanges);
+			const oOpenStub = sandbox.stub(this.oAnnotationPlugin._oDialog, "openDialogAndHandleChanges").resolves(aAnnotationChanges);
 
 			this.oAnnotationPlugin.attachEventOnce("elementModified", function(oEvent) {
+				assert.strictEqual(oOpenStub.lastCall.args[0].featureKey, "annotationChange1", "the correct feature key was passed");
 				const oCompositeCommand = oEvent.getParameter("command");
 				const aCommands = oCompositeCommand.getCommands();
 				assert.strictEqual(aCommands.length, 4, "then the composite command contains four annotation commands");

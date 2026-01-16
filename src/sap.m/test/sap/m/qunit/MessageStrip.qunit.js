@@ -33,17 +33,21 @@ sap.ui.define([
 		}
 	});
 
-	QUnit.test("Initialization", async function(assert) {
-		// act
+	QUnit.test("Initialization", async function (assert) {
+		const assertSpy = sinon.spy(console, "assert");
+
 		this.oMessageStrip.setShowIcon(true);
 		this.oMessageStrip.setShowCloseButton(true);
 		await nextUIUpdate();
 
-		// assert
+		//assert
 		assert.ok(this.oMessageStrip, "MessageStrip should be rendered");
 		assert.strictEqual(jQuery(CLASS_CLOSE_BUTTON).length, 1, "Close Button should be rendered");
 		assert.strictEqual(jQuery(CLASS_TEXT_MESSAGE).length, 1, "Text wrapper div should be rendered");
 		assert.strictEqual(jQuery(CLASS_ICON).length, 1, "Icon div should be rendered");
+		assert.strictEqual(assertSpy.called, false, "No ui5 assertion should be triggered");
+
+		assertSpy.restore();
 	});
 
 	QUnit.test("Default values", function(assert) {

@@ -174,7 +174,7 @@ sap.ui.define([
 	}
 
 	/**
-	 * Simulates the set of changes and checks if the simulation is equal to the target state
+	 * Simulates the set of changes and checks if the simulation is equal to the target state on given container.
 	 *
 	 * @param {string} sContainerKey - Selector ID of the container
 	 * @param {string} sAggregationName - Name of the aggregation
@@ -187,12 +187,13 @@ sap.ui.define([
 		const mUISimulatedStates = {};
 
 		aCondenserInfos.forEach((oCondenserInfo) => {
-			const sContainerKey = oCondenserInfo.targetContainer;
 			mUISimulatedStates[sContainerKey] ||= {};
 			const mUIAggregationState = mUISimulatedStates[sContainerKey];
 			mUIAggregationState[sAggregationName] ||= Utils.initializeArrayWithPlaceholders(0, aInitialUIElementIds.length - 1);
 
-			INDEX_RELATED[oCondenserInfo.classification].simulate(mUIAggregationState[sAggregationName], oCondenserInfo, aInitialUIElementIds);
+			INDEX_RELATED[oCondenserInfo.classification].simulate(
+				mUIAggregationState[sAggregationName], oCondenserInfo, aInitialUIElementIds, sContainerKey
+			);
 		});
 
 		const aSortedUIElementIds = mUISimulatedStates[sContainerKey][sAggregationName];

@@ -1000,8 +1000,6 @@ sap.ui.define([
 	Card.prototype.createManifest = function (vManifest, sBaseUrl) {
 		var mOptions = {};
 
-		this._isManifestReady = false;
-
 		if (typeof vManifest === "string") {
 			mOptions.manifestUrl = vManifest;
 			vManifest = null;
@@ -1485,6 +1483,8 @@ sap.ui.define([
 	 * @param {boolean} [bResetInternalModels=true] If true, the internal models will be reset.
 	 */
 	Card.prototype._cleanupOldManifest = function(bResetInternalModels = true) {
+		this._isManifestReady = false;
+
 		if (this._fnOnModelChange) {
 			this.getModel().detachEvent("change", this._fnOnModelChange, this);
 			delete this._fnOnModelChange;

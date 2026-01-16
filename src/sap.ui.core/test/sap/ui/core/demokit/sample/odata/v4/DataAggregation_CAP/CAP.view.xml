@@ -135,7 +135,7 @@
 		<Column hAlign="End" width="5em">
 			<m:Label text="G.L.C." tooltip="Group Level Count"/>
 			<template>
-				<m:Label text="{= %{@$ui5.node.groupLevelCount} }"/>
+				<m:Label text="{@$ui5.node.groupLevelCount}"/>
 			</template>
 		</Column>
 		<Column width="4em">

@@ -56,8 +56,8 @@ sap.ui.define([
 				/**
 				 * Indicates if the side menu is expanded.
 				 * Overrides the <code>expanded</code> property of the <code>sideContent</code> aggregation.
-				 * **Note:** By default, on small screens, the side content is collapsed to provide more space for the main content.
-				 *  On larger screens, it is expanded. This behavior can be overridden by setting this property.
+				 * **Note:** By default, on mobile phone devices and small screens, the side content is collapsed to provide more space for the main content.
+				 *  On larger screens, excluding mobile phone devices, it is expanded. This behavior can be overridden by setting this property.
 				 */
 				sideExpanded: {type: "boolean", group: "Misc", defaultValue: true},
 
@@ -209,7 +209,7 @@ sap.ui.define([
 	};
 
 	ToolPage.prototype._getMediaRange = function () {
-		return Device.media.getCurrentRange(TP_RANGE_SET, window.innerWidth);
+		return Device.system.phone ? { name: "S" } : Device.media.getCurrentRange(TP_RANGE_SET, window.innerWidth);
 	};
 
 	ToolPage.prototype._isLayoutS = function () {

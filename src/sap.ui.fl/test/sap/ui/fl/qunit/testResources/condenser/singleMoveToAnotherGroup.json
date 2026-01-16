@@ -1,0 +1,40 @@
+[
+	{
+		"fileName": "id_1579503260976_42_moveControls",
+		"changeType": "moveControls",
+		"reference": "sap.ui.rta.test",
+		"content": {
+			"movedElements": [
+				{
+					"selector": {
+						"id": "idMain1--GeneralLedgerDocument.Name",
+						"idIsLocal": true
+					},
+					"sourceIndex": 0,
+					"targetIndex": 0
+				}
+			],
+			"source": {
+				"selector": {
+					"aggregation": "formElements",
+					"type": "sap.ui.comp.smartform.Group",
+					"id": "idMain1--GeneralLedgerDocument",
+					"idIsLocal": true
+				}
+			},
+			"target": {
+				"selector": {
+					"aggregation": "formElements",
+					"type": "sap.ui.comp.smartform.Group",
+					"id": "idMain1--Dates",
+					"idIsLocal": true
+				}
+			}
+		},
+		"selector": {
+			"id": "idMain1--MainForm",
+			"idIsLocal": true
+		},
+		"creation": "2020-01-20T06:54:42.760Z"
+	}
+]

@@ -44,14 +44,13 @@
 		<Column hAlign="End" width="5em">
 			<m:Label text="Level"/>
 			<template>
-				<m:Text wrapping="false" text="{= %{@$ui5.node.level} }"/><!-- Note: type not
-				really useful here -->
+				<m:Text wrapping="false" text="{@$ui5.node.level}"/>
 			</template>
 		</Column>
 		<Column hAlign="Center" width="5em">
 			<m:Label text="Group Level Count"/>
 			<template>
-				<m:Label text="{= %{@$ui5.node.groupLevelCount} }"/>
+				<m:Label text="{@$ui5.node.groupLevelCount}"/>
 			</template>
 		</Column>
 		<Column width="4em">
@@ -126,7 +125,7 @@
 		<Column hAlign="Center" width="5em">
 			<m:Label text="Is Total"/>
 			<template>
-				<m:CheckBox selected="{= %{@$ui5.node.isTotal} }" editable="false"/>
+				<m:CheckBox selected="{@$ui5.node.isTotal}" editable="false"/>
 			</template>
 		</Column>
 		<Column width="4em">

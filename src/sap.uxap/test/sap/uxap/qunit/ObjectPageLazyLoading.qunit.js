@@ -1,8 +1,7 @@
 /*global QUnit, */
 sap.ui.define([
-	"sap/ui/core/Element",
 	"sap/ui/test/utils/nextUIUpdate",
-	"sap/ui/thirdparty/jquery",
+	"sap/ui/core/Element",
 	"sap/ui/model/json/JSONModel",
 	"sap/m/Title",
 	"sap/uxap/ObjectPageDynamicHeaderTitle",
@@ -10,9 +9,8 @@ sap.ui.define([
 	"sap/uxap/ObjectPageSection",
 	"sap/uxap/ObjectPageSubSection"
 ], async function(
-	Element,
 	nextUIUpdate,
-	jQuery,
+	Element,
 	JSONModel,
 	Title,
 	ObjectPageDynamicHeaderTitle,
@@ -363,7 +361,7 @@ sap.ui.define([
 	QUnit.test("_unStashControlsAsync preserves control order with different resolution times", function (assert) {
 		// Setup
 		var fnDone = assert.async(),
-			oSubSection = new ObjectPageSubSection("testSubSection" + jQuery.now()),
+			oSubSection = new ObjectPageSubSection(),
 			aUnstashedControls = [], // Array to track controls in the order they were unstashed
 			aFinalBlockIds = [], // Array to track the final order of blocks in the aggregation
 			oAddAggregationSpy;
@@ -424,11 +422,14 @@ sap.ui.define([
 		// Spy on addAggregation to verify the implementation
 		oAddAggregationSpy = this.spy(oSubSection, "addAggregation");
 
+		// Keep a reference to the original getElementById function
+		var fnOriginalGetElementById = Element.getElementById;
+
 		// Override getElementById to return our unstashed controls
 		this.stub(Element, "getElementById").callsFake(function(sId) {
-			if (sId === "control1") { return Element.getElementById("control1"); }
-			if (sId === "control2") { return Element.getElementById("control2"); }
-			if (sId === "control3") { return Element.getElementById("control3"); }
+			if (sId === "control1") { return fnOriginalGetElementById("control1"); }
+			if (sId === "control2") { return fnOriginalGetElementById("control2"); }
+			if (sId === "control3") { return fnOriginalGetElementById("control3"); }
 			return null;
 		});
 

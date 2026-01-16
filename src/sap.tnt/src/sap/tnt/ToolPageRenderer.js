@@ -29,7 +29,7 @@ sap.ui.define([
 			oRM.class("sapTntToolPageWithSideContent");
 		}
 
-		if (window.innerWidth < 600) {
+		if (oControl._isLayoutS()) {
 			oRM.class("sapTntToolPage-LayoutS");
 		}
 
@@ -88,7 +88,7 @@ sap.ui.define([
 	ToolPageRenderer.renderContent = function (oRM, oControl) {
 		oRM.openStart("div").class("sapTntToolPageContentWrapper");
 
-		if (window.innerWidth < 600 || !oControl.getSideExpanded()) {
+		if (oControl._isLayoutS() || !oControl.getSideExpanded()) {
 			oRM.class("sapTntToolPageAsideCollapsed");
 		}
 

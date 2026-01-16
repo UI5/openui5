@@ -6,6 +6,7 @@ sap.ui.define([
 	"sap/base/Log",
 	"sap/ui/core/Component",
 	"sap/ui/core/Lib",
+	"sap/ui/core/Supportability",
 	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
 	"sap/ui/fl/initial/_internal/Loader",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
@@ -20,6 +21,7 @@ sap.ui.define([
 	Log,
 	Component,
 	Lib,
+	Supportability,
 	ControlVariantApplyAPI,
 	Loader,
 	ManifestUtils,
@@ -159,6 +161,12 @@ sap.ui.define([
 		}
 		// if there are only changes in the draft, RTA restart is relevant even without changes in the current storage response
 		await checkForRtaStartOnDraftAndReturnResult(oComponent);
+
+		// initialize the Support Message Client (Message Broker Communication) only in debug mode
+		if (Supportability.isDebugModeEnabled()) {
+			const SupportAPI = await requireAsync("sap/ui/fl/support/api/SupportAPI");
+			SupportAPI.initializeMessageBrokerForComponent();
+		}
 	}
 
 	// the current sinon version used in UI5 does not support stubbing the constructor

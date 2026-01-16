@@ -306,6 +306,16 @@ sap.ui.define([
 			assert.notOk(sCardAriaLabelledBy.indexOf(oHeader._getTitle().getId()) > -1, "Card aria-labelledby should not contain the title ID");
 		});
 
+		QUnit.test("Set manifest to null", function (assert) {
+			var oCardDomRef = this.oCard.getDomRef();
+			var oHeader = this.oCard.getCardHeader();
+
+			this.oCard.setManifest(null);
+
+			assert.ok(oCardDomRef, "Card wrapper is rendered");
+			assert.notOk(oHeader.getDomRef(), "Header is not rendered");
+		});
+
 		QUnit.module("Card with semanticRole - listitem without href in header", {
 			beforeEach: async function() {
 				this.oCard = new Card({

@@ -47,7 +47,7 @@
 		<Column hAlign="End" width="5em">
 			<m:Label text="Level"/>
 			<template>
-				<m:Text text="{= %{@$ui5.node.level} }" wrapping="false"/>
+				<m:Text text="{@$ui5.node.level}" wrapping="false"/>
 			</template>
 		</Column>
 		<Column width="3.14em">
@@ -195,7 +195,7 @@
 		<Column hAlign="End" width="5em">
 			<m:Label text="Level"/>
 			<template>
-				<m:Text text="{= %{@$ui5.node.level} }" wrapping="false"/>
+				<m:Text text="{@$ui5.node.level}" wrapping="false"/>
 			</template>
 		</Column>
 		<Column>
