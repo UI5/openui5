@@ -63,15 +63,16 @@ sap.ui.define(['sap/ui/Device', 'sap/ui/core/InvisibleText'],
 
 		this.addWidthStyles(oRm, oControl);
 
-		var oAccAttributes = {};
+		var oAccAttributes = {
+			role: "listbox"
+		}; // additional accessibility attributes
+
 		//ARIA attributes
 		oAccAttributes.labelledby = {
 			value: InvisibleText.getStaticId("sap.m", "TOKENIZER_ARIA_LABEL"),
 			append: true
 		};
 
-		// aria-readonly is not valid for the current role of the tokenizer.
-		oRm.accessibilityState(oControl, oAccAttributes);
 		oRm.openEnd(); // div element
 		oRm.renderControl(oControl.getAggregation("_tokensInfo"));
 
@@ -92,8 +93,8 @@ sap.ui.define(['sap/ui/Device', 'sap/ui/core/InvisibleText'],
 
 		oRm.openStart("div", oControl.getId() + "-scrollContainer");
 
-		// CS20250010881646 - Append the role to the scroll container which contains the tokens
-		oRm.attr("role", "listbox");
+		// CS20250010881646 - Render the accessibility state like role, aria-labelledby and aria-describedby to the scroll container instead of the root div
+		oRm.accessibilityState(oControl, oAccAttributes);
 
 		oRm.class(bMultiLine ? "sapMTokenizerMultiLineContainer" : "sapMTokenizerScrollContainer");
 
