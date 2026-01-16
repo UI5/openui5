@@ -6521,7 +6521,6 @@ sap.ui.define([
 			rowMode: new FixedRowMode({
 				rowCount: 5
 			}),
-			rows: {suspended: true},
 			columns: [
 				TableQUnitUtils.createTextColumn()
 			]
