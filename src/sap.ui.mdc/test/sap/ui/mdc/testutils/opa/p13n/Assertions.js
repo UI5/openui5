@@ -181,7 +181,7 @@ sap.ui.define([
 					icon: Util.icons.settings
 				}));
 				aDialogMatchers.push(new Properties({
-					title: oMDCBundle.getText("p13nDialog.VIEW_SETTINGS")
+					title: oMBundle.getText("P13NDIALOG_VIEW_SETTINGS")
 				}));
 
 				waitForP13nButtonWithMatchers.call(this, {

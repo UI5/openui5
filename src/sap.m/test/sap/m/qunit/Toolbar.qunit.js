@@ -12,6 +12,7 @@ sap.ui.define([
 	"sap/m/Tokenizer",
 	"sap/m/Token",
 	"sap/m/Select",
+	"sap/m/MultiComboBox",
 	"sap/ui/core/Item",
 	"sap/m/Title",
 	"sap/m/Input",
@@ -44,6 +45,7 @@ sap.ui.define([
 	Tokenizer,
 	Token,
 	Select,
+	MultiComboBox,
 	Item,
 	Title,
 	Input,
@@ -1009,20 +1011,33 @@ sap.ui.define([
 
 	QUnit.test("_shouldAllowDefaultBehavior on up/down arrow key navigation", function(assert) {
 		var oTokenizer = new Tokenizer({tokens : [new Token({text: "Token 1"}), new Token({text: "Token 2"})]}),
+			oMultiComboBox = new MultiComboBox({items: [new Item({text: "Item 1"}), new Item({text: "Item 2"})]}),
 			oTB = createToolbar({
 				Toolbar : {
-					content : [oTokenizer]
+					content : [oTokenizer, oMultiComboBox]
 				}
 			}),
 			oArrowUpEvent = new KeyboardEvent("keydown", { keyCode: KeyCodes.ARROW_UP }),
-			oArrowDownEvent = new KeyboardEvent("keydown", { keyCode: KeyCodes.ARROW_DOWN }),
-			oActiveDomElement = oTokenizer.getFocusDomRef();
+			oArrowDownEvent = new KeyboardEvent("keydown", { keyCode: KeyCodes.ARROW_DOWN });
 
-		var bShouldAllowOnArrowUp = oTB._shouldAllowDefaultBehavior(oActiveDomElement, oTokenizer, oArrowUpEvent);
-		assert.ok(bShouldAllowOnArrowUp, "The tokenizer should allow default behavior on arrow up");
+		// Test controls array
+		var aControls = [
+			{ control: oTokenizer, name: "tokenizer" },
+			{ control: oMultiComboBox, name: "multiComboBox" }
+		];
 
-		var bShouldAllowOnArrowDown = oTB._shouldAllowDefaultBehavior(oActiveDomElement, oTokenizer, oArrowDownEvent);
-		assert.ok(bShouldAllowOnArrowDown, "The tokenizer should not allow default behavior on arrow down");
+		// Iterate through both controls
+		aControls.forEach(function(oControlInfo) {
+			var oControl = oControlInfo.control;
+			var sControlName = oControlInfo.name;
+			var oActiveDomElement = oControl.getFocusDomRef();
+
+			var bShouldAllowOnArrowUp = oTB._shouldAllowDefaultBehavior(oActiveDomElement, oControl, oArrowUpEvent);
+			assert.ok(bShouldAllowOnArrowUp, "The " + sControlName + " should allow default behavior on arrow up");
+
+			var bShouldAllowOnArrowDown = oTB._shouldAllowDefaultBehavior(oActiveDomElement, oControl, oArrowDownEvent);
+			assert.ok(bShouldAllowOnArrowDown, "The " + sControlName + " should allow default behavior on arrow down");
+		});
 
 		// Cleanup
 		oTB.destroy();

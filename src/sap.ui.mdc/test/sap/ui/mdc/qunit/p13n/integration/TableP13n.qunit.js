@@ -4,6 +4,7 @@ sap.ui.define([
 ], function (Engine, Library, Table, TableDelegate, Button, Column, FilterField, FlexModificationHandler, TestModificationHandler) {
 	"use strict";
 	const oResourceBundle = Library.getResourceBundleFor("sap.ui.mdc");
+	const oMResourceBundle = Library.getResourceBundleFor("sap.m");
 
 	QUnit.module("Engine API tests showUI Table", {
 		beforeEach: function () {
@@ -112,7 +113,7 @@ sap.ui.define([
 			//check container
 			assert.ok(oP13nControl, "Container has been created");
 			assert.ok(oP13nControl.isA("sap.m.Dialog"));
-			assert.equal(oP13nControl.getTitle(), oResourceBundle.getText("p13nDialog.VIEW_SETTINGS"), "Correct title has been set");
+			assert.equal(oP13nControl.getTitle(), oMResourceBundle.getText("P13NDIALOG_VIEW_SETTINGS"), "Correct title has been set");
 			assert.ok(Engine.getInstance().hasActiveP13n(this.oTable),"dialog is open");
 
 			//check inner control (should be a wrapper)

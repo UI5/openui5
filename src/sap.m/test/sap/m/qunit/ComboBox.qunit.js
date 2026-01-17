@@ -5014,8 +5014,6 @@ sap.ui.define([
 		assert.strictEqual(aEndIcons.length, 2, "There are two end icons.");
 		assert.strictEqual(aEndIcons[0].getAlt(), sClearIconAltText, "The first icon is the clear icon.");
 		assert.ok(aEndIcons[0].hasStyleClass("sapMComboBoxBaseClearIcon"), "The correct CSS class was added to the clear icon.");
-		assert.strictEqual(aEndIcons[0].getVisible(), false, "The clear icon is not visible");
-		assert.strictEqual(aEndIcons[1].getVisible(), true, "The arrow icon is visible");
 
 		oComboBox.destroy();
 	});
@@ -13540,23 +13538,49 @@ sap.ui.define([
 			showClearIcon: true,
 			value: "test"
 		});
-		var oSpy;
 
 		oComboBox.placeAt("content");
 		await nextUIUpdate();
-
-		oSpy = this.spy(oComboBox._oClearIcon, "setVisible");
 
 		// Act
 		oComboBox.setShowClearIcon(false);
 		await nextUIUpdate();
 
 		// Assert
-		assert.strictEqual(oSpy.callCount, 1, "setVisible was called exactly 1 time");
-		assert.strictEqual(oSpy.calledWith(false), true, "setVisible was called with 'false' as parameter");
+		assert.ok(oComboBox._oClearIcon.hasStyleClass("sapMComboBoxBaseHideClearIcon"), "Clear icon has the hide CSS class");
 
 		// Clean
-		oSpy.restore();
+		oComboBox.destroy();
+	});
+
+	QUnit.test("Clear icon visibility is set correctly", async function (assert) {
+		var oComboBox = new ComboBox({
+			showClearIcon: true,
+			items: [
+				new Item({
+					key: "GER",
+					text: "Germany"
+				})
+			]
+		});
+
+		oComboBox.placeAt("content");
+		await nextUIUpdate();
+
+		var oClearIcon = oComboBox._oClearIcon;
+
+		assert.ok(oClearIcon.hasStyleClass("sapMComboBoxBaseHideClearIcon"), "Clear icon has the hide CSS class when there is no value");
+
+		oComboBox.setValue("Germany");
+		await nextUIUpdate();
+
+		assert.notOk(oClearIcon.hasStyleClass("sapMComboBoxBaseHideClearIcon"), "Clear icon does not have the hide CSS class when there is a value");
+
+		oComboBox.setValue("");
+		await nextUIUpdate();
+
+		assert.ok(oClearIcon.hasStyleClass("sapMComboBoxBaseHideClearIcon"), "Clear icon has the hide CSS class when value is cleared");
+
 		oComboBox.destroy();
 	});
 

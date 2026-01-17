@@ -449,7 +449,7 @@ function(
 	 * @param {jQuery.Event} oEvent - the keyboard event.
 	 */
 	Link.prototype.onkeyup = function (oEvent) {
-		if (oEvent.which === KeyCodes.SPACE) {
+		if (oEvent.which === KeyCodes.SPACE && this._bPressedSpace) {
 			if (!this._bPressedEscapeOrShift) {
 				this._handlePress(oEvent);
 

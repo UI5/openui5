@@ -1591,8 +1591,8 @@ sap.ui.define([
 
 		if (oOldCache && oOldCache.getResourcePath() === sResourcePath
 				&& oOldCache.$deepResourcePath === sDeepResourcePath) {
-			aKeepAlivePredicates = this.getKeepAlivePredicates();
-			if (this.iCreatedContexts || this.iDeletedContexts || aKeepAlivePredicates.length
+			const bHasEffectivelyKeptAlive = this.hasEffectivelyKeptAlive();
+			if (this.iCreatedContexts || this.iDeletedContexts || bHasEffectivelyKeptAlive
 					// the cache in a recursive hierarchy must be reused (to keep the tree state)
 					// but immediately after #setAggregation it might still be a _CollectionCache
 					|| this.mParameters.$$aggregation?.hierarchyQualifier
@@ -1602,6 +1602,9 @@ sap.ui.define([
 					bSideEffectsRefresh = true;
 					oOldCache.resetOutOfPlace();
 				}
+				aKeepAlivePredicates = bHasEffectivelyKeptAlive
+					? this.getKeepAlivePredicates()
+					: [];
 				// Note: #inheritQueryOptions as called below should not matter in case of own
 				// requests, which are a precondition for kept-alive elements
 				oOldCache.reset(aKeepAlivePredicates, bSideEffectsRefresh ? sGroupId : undefined,
@@ -3427,6 +3430,19 @@ sap.ui.define([
 	};
 
 	/**
+	 * Tells whether this list binding has at least one context that is effectively kept alive.
+	 *
+	 * @returns {boolean} Whether it has a context effectively kept alive
+	 *
+	 * @private
+	 */
+	ODataListBinding.prototype.hasEffectivelyKeptAlive = function () {
+		return Object.values(this.mPreviousContextsByPath)
+				.some((oContext) => oContext.isEffectivelyKeptAlive())
+			|| this.aContexts.some((oContext) => oContext.isEffectivelyKeptAlive());
+	};
+
+	/**
 	 * Returns true if the binding has {@link sap.ui.model.Filter.NONE} in its filters.
 	 *
 	 * @returns {boolean} Whether there is a {@link sap.ui.model.Filter.NONE}
@@ -4985,7 +5001,7 @@ sap.ui.define([
 		}
 		const bOldUseCase = useCase(this.mParameters.$$aggregation);
 		const bNewUseCase = useCase(oAggregation);
-		if (bOldUseCase !== bNewUseCase && this.getKeepAlivePredicates().length) {
+		if (bOldUseCase !== bNewUseCase && this.hasEffectivelyKeptAlive()) {
 			throw new Error("Cannot set $$aggregation due to a kept-alive context");
 		}
 

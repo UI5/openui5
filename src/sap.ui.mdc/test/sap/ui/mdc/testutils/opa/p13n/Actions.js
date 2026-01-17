@@ -43,7 +43,6 @@ sap.ui.define([
 ) {
 	"use strict";
 
-	var oMDCBundle = Library.getResourceBundleFor("sap.ui.mdc");
 	var oMBundle = Library.getResourceBundleFor("sap.m");
 
 	function checkIsNewUI() {
@@ -87,7 +86,7 @@ sap.ui.define([
 					icon: Util.icons.settings
 				}));
 				aDialogMatchers.push(new Properties({
-					title: oMDCBundle.getText("p13nDialog.VIEW_SETTINGS")
+					title: oMBundle.getText("P13NDIALOG_VIEW_SETTINGS")
 				}));
 
 				waitForP13nButtonWithMatchers.call(this, {
@@ -705,7 +704,7 @@ sap.ui.define([
 			return iOpenThePersonalizationDialog.call(this, oControl, oSettings);
 		},
 		iCloseThePersonalizationDialogWithCancel: function(oControl, oSettings) {
-			const sDialogTitle = oMDCBundle.getText("p13nDialog.VIEW_SETTINGS");
+			const sDialogTitle = oMBundle.getText("P13NDIALOG_VIEW_SETTINGS");
 			return waitForP13nDialog.call(this, {
 				matchers: [new Properties({
 					title: sDialogTitle
@@ -1420,7 +1419,7 @@ sap.ui.define([
 		},
 		iActivateShowSelected: function(bActivated) {
 			const sLabel = oMBundle.getText("p13n.SHOW_SELECTED");
-			const sDialogTitle = oMDCBundle.getText("p13nDialog.VIEW_SETTINGS");
+			const sDialogTitle = oMBundle.getText("P13NDIALOG_VIEW_SETTINGS");
 			return waitForP13nDialog.call(this, {
 				matchers: [new Properties({
 					title: sDialogTitle
@@ -1432,7 +1431,7 @@ sap.ui.define([
 		},
 		iActivateHideDescriptions: function(bActivated) {
 			const sLabel = oMBundle.getText("p13n.HIDE_DESCRIPTIONS");
-			const sDialogTitle = oMDCBundle.getText("p13nDialog.VIEW_SETTINGS");
+			const sDialogTitle = oMBundle.getText("P13NDIALOG_VIEW_SETTINGS");
 			return waitForP13nDialog.call(this, {
 				matchers: [new Properties({
 					title: sDialogTitle

@@ -12,7 +12,7 @@ sap.ui.define([
 ], function(Opa5, Press, Log, Ancestor, PropertyStrictEquals, Properties, p13nUtil, waitForP13nButtonWithMatchers, waitForP13nDialog, Library) {
 	"use strict";
 
-	var oMDCBundle = Library.getResourceBundleFor("sap.ui.mdc");
+	var oMBundle = Library.getResourceBundleFor("sap.m");
 
 	var waitForMDCChartWithId = function(sId, oSettings) {
 		return this.waitFor({
@@ -111,7 +111,7 @@ sap.ui.define([
 						icon: p13nUtil.icons.settings
 					}));
 					aDialogMatchers.push(new Properties({
-						title: oMDCBundle.getText("p13nDialog.VIEW_SETTINGS")
+						title: oMBundle.getText("P13NDIALOG_VIEW_SETTINGS")
 					}));
 
 					waitForP13nButtonWithMatchers.call(this, {
