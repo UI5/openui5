@@ -570,6 +570,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Press SPACE Key on Sender", function (assert) {
+		qutils.triggerKeydown(oFeedList.getItems()[9]._oLinkControl.getId(), KeyCodes.SPACE, false, false, false);
 		qutils.triggerKeyup(oFeedList.getItems()[9]._oLinkControl.getId(), KeyCodes.SPACE, false, false, false);
 		assert.equal(oFeedList.getItems()[9].getSender(), "Event was fired", "Sender Press event was fired");
 		oFeedList.getItems()[9].setSender("Jack Jones");
@@ -581,8 +582,10 @@ sap.ui.define([
 	});
 
 	QUnit.test("Press SPACE Key on MORE", function (assert) {
+		qutils.triggerKeydown(oFeedList.getItems()[9]._oLinkExpandCollapse.getId(), KeyCodes.SPACE, false, false, false);
 		qutils.triggerKeyup(oFeedList.getItems()[9]._oLinkExpandCollapse.getId(), KeyCodes.SPACE, false, false, false);
 		assert.ok(oFeedList.getItems()[9].$("realtext").text() === oFeedList.getItems()[9]._sFullText, "the expanded text displayed ");
+		qutils.triggerKeydown(oFeedList.getItems()[9]._oLinkExpandCollapse.getId(), KeyCodes.SPACE, false, false, false);
 		qutils.triggerKeyup(oFeedList.getItems()[9]._oLinkExpandCollapse.getId(), KeyCodes.SPACE, false, false, false);
 		assert.ok(oFeedList.getItems()[9].$("realtext").text() === oFeedList.getItems()[9]._sShortText, "the collapsed text displayed ");
 	});

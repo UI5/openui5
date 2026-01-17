@@ -107,12 +107,32 @@ sap.ui.define([
 
 	QUnit.test("Space event should fire press event on keyup", function (assert) {
 		assert.expect(3); // verifies the event handler was executed
+		qutils.triggerKeydown(oLink1.getDomRef(), KeyCodes.SPACE); // first trigger keydown event on the link
 		qutils.triggerKeyup(oLink1.getDomRef(), KeyCodes.SPACE);
 	});
 
 	QUnit.test("Space event should not fire press on keydown", function (assert) {
 		assert.expect(0); // verifies the event handler was NOT executed
 		qutils.triggerKeydown(oLink1.getDomRef(), KeyCodes.SPACE);
+	});
+
+	QUnit.test("Space event should not fire press on keyup if there was no keydown on the link", async function(assert) {
+		// System under Test
+		var pressSpy = this.spy(),
+			oLink = new Link({
+				press: pressSpy
+			}).placeAt("qunit-fixture");
+
+		await nextUIUpdate(this.clock);
+
+		// Action
+		qutils.triggerKeyup(oLink.getDomRef(), KeyCodes.SPACE);
+
+		// Assert
+		assert.equal(pressSpy.callCount, 0, "Press event should not be fired");
+
+		// Cleanup
+		oLink.destroy();
 	});
 
 	QUnit.test("Space event should not fire press if escape is pressed and released after the Space is released", async function(assert) {

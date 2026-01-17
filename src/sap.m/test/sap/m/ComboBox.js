@@ -745,6 +745,15 @@ sap.ui.define([
 		selectedKey: "GER"
 	});
 
+	var oComboBoxClearIcon = new ComboBox("box_clear_icon",{
+	showClearIcon: true,
+	items: {
+		path: "/items",
+		template: oItemTemplate
+	},
+});
+
+
 	var oComboBoxSuccess = new ComboBox("box_success",{
 		valueState: ValueState.Success,
 		items: {
@@ -957,6 +966,10 @@ sap.ui.define([
 
 			new HTML({ content: "<h3>Read only</h3>" }),
 			oComboBoxReadOnly,
+			new HTML({ content: "<hr>" }),
+
+			new HTML({ content: "<h3>Clear icon</h3>" }),
+			oComboBoxClearIcon,
 			new HTML({ content: "<hr>" }),
 
 			new HTML("title_warning",{ content: "<h3>Warning state (with label and placeholder)</h3>" }),

@@ -1,5 +1,6 @@
 <!-- include core:FragmentDefinition for testing purposes -->
 <core:FragmentDefinition
+	template:require="{AH : 'sap/ui/model/odata/AnnotationHelper'}"
 	xmlns="sap.m"
 	xmlns:core="sap.ui.core"
 	xmlns:scenario="sap.ui.core.sample.ViewTemplate.scenario"

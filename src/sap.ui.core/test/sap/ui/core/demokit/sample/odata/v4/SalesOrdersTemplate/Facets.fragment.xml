@@ -2,7 +2,6 @@
 	template:require="{AH : 'sap/ui/model/odata/v4/AnnotationHelper'}"
 	xmlns="sap.m"
 	xmlns:core="sap.ui.core"
-	xmlns:scenario="sap.ui.core.sample.ViewTemplate.scenario"
 	xmlns:template="http://schemas.sap.com/sapui5/extension/sap.ui.core.template/1">
 	<!-- Note: "facets>" MUST point to Collection(com.sap.vocabularies.UI.v1.Facet) -->
 	<template:repeat list="{facets>}" var="facet">
@@ -18,11 +17,10 @@
 			</template:then>
 			<template:else>
 				<!-- if test="{:= ${facet>$Type} === 'com.sap.vocabularies.UI.v1.ReferenceFacet' }" -->
-				<!-- Note: alias "AH" is used only once to test both ways! -->
 				<Text text="Facet: {facet>Label},
-				 Target: {facet>Target/$AnnotationPath},
-				 isMultiple: {facet>Target/$AnnotationPath@@AH.isMultiple},
-				 getNavigationPath: {facet>Target/$AnnotationPath@@sap.ui.model.odata.v4.AnnotationHelper.getNavigationPath}"/>
+					Target: {facet>Target/$AnnotationPath},
+					isMultiple: {facet>Target/$AnnotationPath@@AH.isMultiple},
+					getNavigationPath: {facet>Target/$AnnotationPath@@AH.getNavigationPath}"/>
 			</template:else>
 		</template:if>
 	</template:repeat>

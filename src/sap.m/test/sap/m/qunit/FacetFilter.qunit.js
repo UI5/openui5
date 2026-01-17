@@ -3009,6 +3009,46 @@ sap.ui.define([
 		oFF.destroy();
 	});
 
+	QUnit.test("Event delegate is attached during init", function (assert) {
+		// Arrange
+		var oAddDelegateSpy = sinon.spy(FacetFilter.prototype, "addEventDelegate");
+
+		// Act - create a new FacetFilter instance
+		var oNewFacetFilter = new FacetFilter({
+			type: FacetFilterType.Simple
+		});
+
+		// Assert
+		assert.ok(oAddDelegateSpy.calledOnce, "addEventDelegate was called once during init");
+		assert.ok(oAddDelegateSpy.calledWith(sinon.match.object, oNewFacetFilter),
+			"addEventDelegate was called with delegate object and control context");
+
+		var oDelegate = oAddDelegateSpy.getCall(0).args[0];
+		assert.ok(oDelegate.hasOwnProperty("onclick"), "Delegate has onclick handler");
+		assert.strictEqual(typeof oDelegate.onclick, "function", "onclick is a function");
+
+		// Cleanup
+		oAddDelegateSpy.restore();
+		oNewFacetFilter.destroy();
+	});
+
+	QUnit.test("Event delegate is removed on exit", function (assert) {
+		// Arrange
+		var oRemoveDelegateSpy = sinon.spy(FacetFilter.prototype, "removeEventDelegate");
+		var oNewFacetFilter = new FacetFilter({
+			type: FacetFilterType.Simple
+		});
+
+		// Act
+		oNewFacetFilter.destroy();
+
+		// Assert
+		assert.ok(oRemoveDelegateSpy.calledOnce, "removeEventDelegate was called once during destroy");
+
+		// Cleanup
+		oRemoveDelegateSpy.restore();
+	});
+
 	// Helper functions
 
 	var oSCHelper = {

@@ -437,7 +437,7 @@ sap.ui.define([
 			.withExactArgs("$$aggregation", "~oAggregation~").returns(false);
 		this.mock(oBinding).expects("hasFilterNone").withExactArgs().returns(false);
 		this.mock(oBinding).expects("hasPendingChanges").withExactArgs().returns(true);
-		this.mock(oBinding).expects("getKeepAlivePredicates").never();
+		this.mock(oBinding).expects("hasEffectivelyKeptAlive").never();
 		this.mock(oBinding).expects("applyParameters").never();
 
 		assert.throws(function () {
@@ -455,7 +455,7 @@ sap.ui.define([
 			.withExactArgs("$$aggregation", "~oAggregation~").returns(false);
 		this.mock(oBinding).expects("hasFilterNone").withExactArgs().returns(true);
 		this.mock(oBinding).expects("hasPendingChanges").never();
-		this.mock(oBinding).expects("getKeepAlivePredicates").never();
+		this.mock(oBinding).expects("hasEffectivelyKeptAlive").never();
 		this.mock(oBinding).expects("applyParameters").never();
 
 		assert.throws(function () {
@@ -473,7 +473,7 @@ sap.ui.define([
 			.withExactArgs("$$aggregation", "~oAggregation~").returns(true);
 		this.mock(oBinding).expects("hasFilterNone").never();
 		this.mock(oBinding).expects("hasPendingChanges").never();
-		this.mock(oBinding).expects("getKeepAlivePredicates").never();
+		this.mock(oBinding).expects("hasEffectivelyKeptAlive").never();
 		this.mock(oBinding).expects("applyParameters").never();
 
 		// code under test
@@ -522,8 +522,8 @@ sap.ui.define([
 		this.mock(oBinding).expects("isUnchangedParameter")
 			.withExactArgs("$$aggregation", sinon.match.same(oNewAggregation)).returns(false);
 		this.mock(oBinding).expects("hasPendingChanges").withExactArgs().returns(false);
-		this.mock(oBinding).expects("getKeepAlivePredicates").exactly(i === j ? 0 : 1)
-			.withExactArgs().returns(["('0')"]);
+		this.mock(oBinding).expects("hasEffectivelyKeptAlive").exactly(i === j ? 0 : 1)
+			.withExactArgs().returns(true);
 		this.mock(oBinding).expects("resetKeepAlive").never();
 		this.mock(_Helper).expects("clone")
 			.exactly(i === j && oNewAggregation !== undefined ? 1 : 0)
@@ -566,7 +566,7 @@ sap.ui.define([
 			// it is not relevant here whether these methods are called, and how
 			applyParameters : () => {},
 			checkTransient : () => {},
-			getKeepAlivePredicates : () => [],
+			hasEffectivelyKeptAlive : () => false,
 			hasFilterNone : () => false,
 			hasPendingChanges : () => false,
 			isUnchangedParameter : () => false
@@ -595,7 +595,7 @@ sap.ui.define([
 		this.mock(oBinding).expects("isUnchangedParameter").withExactArgs("$$aggregation", null)
 			.returns(false);
 		// Note: this is an artefact due to undefined !== null
-		this.mock(oBinding).expects("getKeepAlivePredicates").withExactArgs().returns([]);
+		this.mock(oBinding).expects("hasEffectivelyKeptAlive").withExactArgs().returns(false);
 		this.mock(oBinding).expects("resetKeepAlive").never();
 		this.mock(_Helper).expects("clone").withExactArgs(null).returns(null);
 		// idea: #setAggregation(o) is like #changeParameters({$$aggregation : o})
@@ -629,8 +629,8 @@ sap.ui.define([
 		}
 		this.mock(oBinding).expects("isUnchangedParameter")
 			.withExactArgs("$$aggregation", sinon.match.same(oAggregation)).returns(false);
-		this.mock(oBinding).expects("getKeepAlivePredicates").exactly(oAggregation ? 0 : 1)
-			.withExactArgs().returns([]);
+		this.mock(oBinding).expects("hasEffectivelyKeptAlive").exactly(oAggregation ? 0 : 1)
+			.withExactArgs().returns(false);
 		this.mock(oBinding).expects("resetKeepAlive").never();
 		this.mock(_Helper).expects("clone").exactly(oAggregation ? 1 : 0)
 			.withExactArgs(sinon.match.same(oAggregation))
@@ -7382,6 +7382,7 @@ sap.ui.define([
 
 		oBinding.mParameters.$$aggregation = "~$$aggregation~";
 		this.mock(oOldCache).expects("getResourcePath").withExactArgs().returns("resource/path");
+		this.mock(oBinding).expects("hasEffectivelyKeptAlive").withExactArgs().returns(true);
 		this.mock(oBinding).expects("getKeepAlivePredicates").withExactArgs()
 			.returns(aPredicates);
 		this.mock(oBinding).expects("isGrouped").withExactArgs().returns("~isGrouped~");
@@ -7419,6 +7420,8 @@ sap.ui.define([
 		oBinding[sProperty] = 1;
 		oBinding.bResetViaSideEffects = true;
 		this.mock(oOldCache).expects("getResourcePath").withExactArgs().returns("resource/path");
+		this.mock(oBinding).expects("hasEffectivelyKeptAlive").withExactArgs().returns(false);
+		this.mock(oBinding).expects("getKeepAlivePredicates").never();
 		this.mock(oBinding).expects("isGrouped").withExactArgs().returns("~isGrouped~");
 		this.mock(oOldCache).expects("reset")
 			.withExactArgs([], "myGroup", "~queryOptions~", undefined, "~isGrouped~");
@@ -7454,7 +7457,8 @@ sap.ui.define([
 			Object.setPrototypeOf(oOldCache, _AggregationCache.prototype);
 		}
 		this.mock(oOldCache).expects("getResourcePath").withExactArgs().returns("resource/path");
-		this.mock(oBinding).expects("getKeepAlivePredicates").withExactArgs().returns([]);
+		this.mock(oBinding).expects("hasEffectivelyKeptAlive").withExactArgs().returns(false);
+		this.mock(oBinding).expects("getKeepAlivePredicates").never();
 		this.mock(oBinding).expects("isGrouped").withExactArgs().returns("~isGrouped~");
 		this.mock(oBinding).expects("getGroupId")
 			.exactly((bAggregationCache && bResetViaSideEffects) ? 1 : 0)
@@ -7533,7 +7537,7 @@ sap.ui.define([
 		if (bWithOld) {
 			this.mock(oOldCache).expects("getResourcePath").withExactArgs()
 				.returns("resource/path");
-			oBindingMock.expects("getKeepAlivePredicates").withExactArgs().returns([]);
+			oBindingMock.expects("hasEffectivelyKeptAlive").withExactArgs().returns(false);
 		}
 		oBindingMock.expects("validateSelection").never();
 		oBindingMock.expects("inheritQueryOptions")
@@ -7598,6 +7602,7 @@ sap.ui.define([
 		oBinding.mParameters.$$separate = "~$$separate~";
 		this.mock(oOldCache).expects("getResourcePath").withExactArgs()
 			.returns(bDeep ? "resource/path" : "W.R.O.N.G.");
+		this.mock(oBinding).expects("hasEffectivelyKeptAlive").never();
 		this.mock(oBinding).expects("getKeepAlivePredicates").never();
 		this.mock(oBinding).expects("inheritQueryOptions")
 			.withExactArgs("~queryOptions~", "~context~").returns("~mergedQueryOptions~");
@@ -7635,6 +7640,8 @@ sap.ui.define([
 			oBinding.mParameters.$$separate = oFixture.separate;
 		}
 
+		this.mock(oBinding).expects("hasEffectivelyKeptAlive").never();
+		this.mock(oBinding).expects("getKeepAlivePredicates").never();
 		this.mock(oBinding).expects("inheritQueryOptions")
 			.withExactArgs("~queryOptions~", "~context~").returns("~mergedQueryOptions~");
 		this.mock(oBinding).expects("getCacheAndMoveKeepAliveContexts")
@@ -12357,6 +12364,69 @@ sap.ui.define([
 		oBinding.onChange();
 
 		assert.strictEqual(oBinding.sResumeAction, "onChange");
+	});
+
+	//*********************************************************************************************
+	QUnit.test("hasEffectivelyKeptAlive: mPreviousContextsByPath", function (assert) {
+		const oBinding = this.bindList("/n/a"); // absolute, but path is irrelevant
+
+		// code under test
+		assert.strictEqual(oBinding.hasEffectivelyKeptAlive(), false);
+
+		const oContext0 = {
+			isEffectivelyKeptAlive : function () {}
+		};
+		const oContext1 = {
+			isEffectivelyKeptAlive : function () {}
+		};
+		const oContext2 = {
+			isEffectivelyKeptAlive : function () {}
+		};
+		this.mock(oContext0).expects("isEffectivelyKeptAlive").withExactArgs().returns(false);
+		this.mock(oContext1).expects("isEffectivelyKeptAlive").withExactArgs().returns(true);
+		this.mock(oContext2).expects("isEffectivelyKeptAlive").never(); // "click bait" ;-)
+		oBinding.mPreviousContextsByPath = {
+			a : oContext0,
+			b : oContext1,
+			c : oContext2
+		};
+		oBinding.aContexts = [oContext2];
+
+		// code under test
+		assert.strictEqual(oBinding.hasEffectivelyKeptAlive(), true);
+	});
+
+	//*********************************************************************************************
+	QUnit.test("hasEffectivelyKeptAlive: aContexts", function (assert) {
+		const oContext0 = {
+			isEffectivelyKeptAlive : function () {}
+		};
+		const oContext1 = {
+			isEffectivelyKeptAlive : function () {}
+		};
+		const oContext2 = {
+			isEffectivelyKeptAlive : function () {}
+		};
+		const oContext3 = {
+			isEffectivelyKeptAlive : function () {}
+		};
+		const oContext4 = {
+			isEffectivelyKeptAlive : function () {}
+		};
+		this.mock(oContext0).expects("isEffectivelyKeptAlive").withExactArgs().returns(false);
+		this.mock(oContext1).expects("isEffectivelyKeptAlive").withExactArgs().returns(false);
+		this.mock(oContext2).expects("isEffectivelyKeptAlive").withExactArgs().returns(false);
+		this.mock(oContext3).expects("isEffectivelyKeptAlive").withExactArgs().returns(true);
+		this.mock(oContext4).expects("isEffectivelyKeptAlive").never(); // "click bait" ;-)
+		const oBinding = this.bindList("/n/a"); // absolute, but path is irrelevant
+		oBinding.mPreviousContextsByPath = {
+			a : oContext0,
+			b : oContext1
+		};
+		oBinding.aContexts = [oContext2, oContext3, oContext4];
+
+		// code under test
+		assert.strictEqual(oBinding.hasEffectivelyKeptAlive(), true);
 	});
 
 	//*********************************************************************************************
