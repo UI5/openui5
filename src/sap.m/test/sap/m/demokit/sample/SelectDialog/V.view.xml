@@ -91,7 +91,6 @@
 			value="Astro Phone 6"
 			placeholder="Enter Product ..."
 			showValueHelp="true"
-			valueHelpOnly="true"
 			valueHelpRequest=".onValueHelpRequest"
 			class="sapUiSmallMarginBottom"
 			width="15rem" />

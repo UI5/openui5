@@ -61,6 +61,7 @@ sap.ui.define([
 					bBookingID = oUriParameters.has("BookingID"),
 					sFilter = oUriParameters.get("filter"),
 					sGrandTotalAtBottomOnly = oUriParameters.get("grandTotalAtBottomOnly"),
+					sGroupLevels = oUriParameters.get("groupLevels"),
 					sSort = oUriParameters.get("sort"),
 					sSubtotalsAtBottomOnly = oUriParameters.get("subtotalsAtBottomOnly"),
 					oTable = this.byId("table"),
@@ -95,6 +96,17 @@ sap.ui.define([
 				};
 				if (bBookingID) { // leaf level is individual bookings
 					this._oAggregation.groupLevels.push("BookingID");
+				}
+				if (sGroupLevels !== null) {
+					this._oAggregation.groupLevels.forEach((sGroupLevel) => {
+						// ensure that all groups are defined to avoid drill-down errors
+						this._oAggregation.group[sGroupLevel] ??= {};
+					});
+					if (sGroupLevels === "") {
+						delete this._oAggregation.groupLevels;
+					} else {
+						this._oAggregation.groupLevels = sGroupLevels.split(",");
+					}
 				}
 				this.getView().setModel(oRowsBinding.getModel(), "header");
 				this.getView().setBindingContext(oRowsBinding.getHeaderContext(), "header");
@@ -141,6 +153,10 @@ sap.ui.define([
 
 		onRefresh : function () {
 			this.byId("table").getBinding("rows").refresh();
+		},
+
+		onRefreshBooking : function () {
+			this.byId("details").getBindingContext().refresh();
 		},
 
 		onSearch : function () {

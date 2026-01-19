@@ -4151,33 +4151,43 @@ sap.ui.define([
 	 * @returns {sap.ui.base.SyncPromise<void>}
 	 *   A promise which resolves without a defined value when the entity is updated in the cache,
 	 *   or rejects if the refresh failed.
-	 * @throws {Error}
-	 *   If the given context does not represent a single entity (see {@link #getHeaderContext}), or
-	 *   if <code>bAllowRemoval</code> is combined with <code>bWithMessages</code> or with a
-	 *   recursive hierarchy
+	 * @throws {Error} If
+	 *   <ul>
+	 *     <li> the given context does not represent a single entity (see
+	 *       {@link #getHeaderContext}),
+	 *     <li> the context is not effectively kept alive and currently not part of the recursive
+	 *       hierarchy,
+	 *     <li> data aggregation with <code>groupLevels</code> (see {@link #setAggregation}) is
+	 *       used,
+	 *     <li> <code>bAllowRemoval</code> is either combined with <code>bWithMessages</code> or
+	 *       with "$$aggregation".
+	 *   </ul>
 	 *
 	 * @private
 	 */
 	ODataListBinding.prototype.refreshSingle = function (oContext, sGroupId, bLocked, bAllowRemoval,
 			bKeepCacheOnError, bWithMessages) {
-		var sContextPath = oContext.getPath(),
+		var oAggregation = this.mParameters.$$aggregation,
+			sContextPath = oContext.getPath(),
 			sResourcePathPrefix = sContextPath.slice(1),
 			that = this;
 
 		if (oContext === this.oHeaderContext) {
 			throw new Error("Unsupported header context: " + oContext);
 		}
-		if (this.mParameters.$$aggregation?.hierarchyQualifier) {
-			if (!oContext.isEffectivelyKeptAlive()
-					&& this.aContexts[oContext.iIndex] !== oContext) {
-				throw new Error("Not currently part of the hierarchy: " + oContext);
-			}
-			if (bAllowRemoval) {
-				throw new Error("Unsupported parameter bAllowRemoval: " + bAllowRemoval);
+		if (bAllowRemoval) {
+			if (bWithMessages) {
+				throw new Error("Unsupported: bAllowRemoval && bWithMessages");
+			} else if (oAggregation) {
+				throw new Error("Unsupported: bAllowRemoval && $$aggregation");
 			}
 		}
-		if (bAllowRemoval && bWithMessages) {
-			throw new Error("Unsupported: bAllowRemoval && bWithMessages");
+		if (oAggregation?.hierarchyQualifier && !oContext.isEffectivelyKeptAlive()
+				&& this.aContexts[oContext.iIndex] !== oContext) {
+			throw new Error("Not currently part of the hierarchy: " + oContext);
+		}
+		if (oAggregation?.groupLevels?.length) {
+			throw new Error("Unsupported for data aggregation with groupLevels: " + this);
 		}
 
 		return this.withCache(function (oCache, sPath, oBinding) {

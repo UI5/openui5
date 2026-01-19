@@ -45,12 +45,7 @@ sap.ui.define([
 	var oEventList = new List();
 	var fEventWriter = function (eventArgs) {
 		var type = eventArgs.getParameter("type");
-		var item = null;
-		if (type === "tokensChanged") {
-			item = new StandardListItem({ title: "type of TokenChange event: " + type + " added: " + eventArgs.getParameter("addedTokens").length + " removed: " + eventArgs.getParameter("removedTokens").length });
-		} else {
-			item = new StandardListItem({ title: "type of TokenChange event: " + type });
-		}
+		var item = new StandardListItem({ title: "type of tokenUpdate event: " + type });
 		oEventList.addItem(item);
 	};
 	//*******************************
@@ -64,7 +59,7 @@ sap.ui.define([
 		oMultiInputCustomValidator = new MultiInput("multiInputCustomValidator", {
 			placeholder: "tokens validated by custom validator",
 			valueHelpRequest: fValueHelpRequested,
-			tokenChange: fEventWriter,
+			tokenUpdate: fEventWriter,
 			width: "85%",
 			ariaLabelledBy: "singleLineMode-label"
 		});
@@ -99,7 +94,7 @@ sap.ui.define([
 	var oMultiInputCustomAsyncValidator = new MultiInput("multiInputCustomAsyncValidator", {
 		placeholder: "tokens get validated asynchronously after 500ms + 500ms",
 		valueHelpRequest: fValueHelpRequested,
-		tokenChange: fEventWriter,
+		tokenUpdate: fEventWriter,
 		ariaLabelledBy: "singleLineMode-label"
 	});
 
@@ -116,7 +111,7 @@ sap.ui.define([
 	var oChangeTextValidatorMultiInput = new MultiInput("textChangedMI", {
 		placeholder: "token text changed by validator",
 		valueHelpRequest: fValueHelpRequested,
-		tokenChange: fEventWriter,
+		tokenUpdate: fEventWriter,
 		width: "85%",
 		ariaLabelledBy: "singleLineMode-label"
 	}),
@@ -376,8 +371,7 @@ sap.ui.define([
 
 	// MultiInput in a SimpleForm
 	var oSimpleFormMultiInput = new MultiInput("simpleFormMultiInput", {
-		width: "65%",
-		enableMultiLineMode: true
+		width: "65%"
 	});
 
 	oSimpleFormMultiInput.setTokens([
@@ -671,7 +665,6 @@ sap.ui.define([
 
 	var multiInputWithSelectDialog = new MultiInput("multiInputWithSelectDialog", {
 		valueHelpRequest: openSelectDialog,
-		enableMultiLineMode: true,
 		tokens: [
 			new Token("testtoken", {
 				key: "Key1",
@@ -969,6 +962,7 @@ sap.ui.define([
 			theCompactMode,
 			oMultiInputCustomValidator,
 			oCheckBoxAcceptValidation,
+			oEventList,
 			oMultiInputCustomAsyncValidator,
 			oChangeTextValidatorMultiInput,
 			new Label({ labelFor: oTabularSuggestMultiInput.getId(), text: "Tabular Suggest MultiInput: ", width: "100%" }),

@@ -1000,23 +1000,6 @@ sap.ui.define([
 					  new Input({value: "ValueHelp", showValueHelp: true, valueHelpRequest: function(evt) { MessageBox.alert("Value help requested"); }}).addStyleClass('myInput'),
 					  new Input({value: "ValueHelp + Status", showValueHelp: true, valueState : "Error", valueHelpRequest: function(evt) { MessageBox.alert("Value help requested"); }}).addStyleClass('myInput'),
 					  new Input({
-						  value: "ValueHelpOnly",
-						  showValueHelp: true,
-						  valueHelpOnly: true,
-						  valueHelpRequest: function(evt) {
-							  MessageBox.alert("Value help requested");
-						  }
-					  }),
-					  new Input({
-						  value: "ValueHelpOnly + Status",
-						  showValueHelp: true,
-						  valueHelpOnly: true,
-						  valueState : "Warning",
-						  valueHelpRequest: function(evt) {
-							  MessageBox.alert("Value help requested");
-						  }
-					  }),
-					  new Input({
 						  value: "Custom value help icon",
 						  showValueHelp: true,
 						  valueHelpIconSrc: "sap-icon://arrow-left",
@@ -1184,7 +1167,6 @@ sap.ui.define([
 		  new Input({type: "Url", placeholder : "Url"}).addStyleClass('myInput'),
 		  new Input({type: "Password", placeholder : "Password"}).addStyleClass('myInput'),
 		  new Input({type: "Text", placeholder : "ValueHelp", showValueHelp: true, valueHelpRequest: function(evt) { MessageBox.alert("Value help requested"); }}).addStyleClass('myInput'),
-		  new Input({type: "Text", placeholder : "ValueHelpOnly", showValueHelp: true, valueHelpOnly: true, valueHelpRequest: function(evt) { MessageBox.alert("Value help requested"); }})
 	  ],
 	  footer: createFooter()
   });
@@ -1226,9 +1208,6 @@ sap.ui.define([
 
   list.addItem(new InputListItem({label: 'ValueHelp+Status', content: [
 	  new Input({value: "ValueHelp + Status", showValueHelp: true, valueState : "Warning", valueHelpRequest: function(evt) { MessageBox.alert("Value help requested"); }})
-  ]}));
-  list.addItem(new InputListItem({label: 'ValueHelpOnly', content: [
-	  new Input({value: "ValueHelpOnly", showValueHelp: true, valueHelpOnly: true, valueHelpRequest: function(evt) { MessageBox.alert("Value help requested"); }})
   ]}));
   page3.addContent(list);
 

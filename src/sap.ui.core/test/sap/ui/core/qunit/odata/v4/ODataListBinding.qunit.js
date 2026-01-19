@@ -7988,8 +7988,9 @@ sap.ui.define([
 	//*********************************************************************************************
 [false, true].forEach(function (bSameCache) {
 	[false, true].forEach(function (bKeepCacheOnError) {
-		// 0: no $$aggregation, 1: no hierarchyQualifier, 2: isEffectivelyKeptAlive, 3: not present
-		[0, 1, 2, 3].forEach(function (iCase) {
+		// 0: no $$aggregation, 1: no hierarchyQualifier and no groupLevels, 2: empty groupLevels,
+		// 3: isEffectivelyKeptAlive, 4: not present
+		[0, 1, 2, 3, 4].forEach(function (iCase) {
 			const sTitle = "refreshSingle: bSameCache=" + bSameCache + ", bKeepCacheOnError="
 				+ bKeepCacheOnError + ", $$aggregation case #" + iCase;
 
@@ -8026,16 +8027,19 @@ sap.ui.define([
 		oContext = oBinding.aContexts[2];
 		oBinding.oCache = oCache;
 		oBinding.oCachePromise = SyncPromise.resolve(oCache);
-		this.mock(oContext).expects("isEffectivelyKeptAlive").exactly(iCase > 1 ? 1 : 0)
-			.withExactArgs().returns(iCase === 2);
+		this.mock(oContext).expects("isEffectivelyKeptAlive").exactly(iCase > 2 ? 1 : 0)
+			.withExactArgs().returns(iCase === 3);
 		if (iCase) {
 			// Note: autoExpandSelect at model would be required for hierarchyQualifier, but that
 			// leads too far :-(
 			oBinding.mParameters.$$aggregation = {};
-			if (iCase !== 1) {
+			if (iCase !== 1 && iCase !== 2) {
 				oBinding.mParameters.$$aggregation.hierarchyQualifier = "X";
 			}
-			if (iCase !== 3) {
+			if (iCase === 2) {
+				oBinding.mParameters.$$aggregation.groupLevels = [];
+			}
+			if (iCase !== 4) {
 				delete oBinding.aContexts[2];
 				bAllowRemoval = false; // MUST have the same effect as undefined
 			}
@@ -8517,19 +8521,30 @@ sap.ui.define([
 	QUnit.test("refreshSingle: Unsupported parameter bAllowRemoval", function (assert) {
 		var oBinding = this.bindList("/EMPLOYEES"),
 			oContext = {
-				getPath : function () { return "n/a"; },
-				isEffectivelyKeptAlive : mustBeMocked
+				getPath : function () { return "n/a"; }
 			};
 
-		// Note: autoExpandSelect at model would be required for hierarchyQualifier, but that leads
-		// too far :-(
-		oBinding.mParameters.$$aggregation = {hierarchyQualifier : "X"};
-		this.mock(oContext).expects("isEffectivelyKeptAlive").withExactArgs().returns(true);
+		oBinding.mParameters.$$aggregation = {};
 
 		assert.throws(function () {
 			// code under test
 			oBinding.refreshSingle(oContext, "n/a", /*bLocked*/undefined, /*bAllowRemoval*/true);
-		}, new Error("Unsupported parameter bAllowRemoval: true"));
+		}, new Error("Unsupported: bAllowRemoval && $$aggregation"));
+	});
+
+	//*********************************************************************************************
+	QUnit.test("refreshSingle: data aggregation with groupLevels", function (assert) {
+		const oBinding = this.bindList("/EMPLOYEES");
+		const oContext = {
+			getPath : function () { return "n/a"; }
+		};
+
+		oBinding.mParameters.$$aggregation = {groupLevels : ["Foo"]};
+
+		assert.throws(function () {
+			// code under test
+			oBinding.refreshSingle(oContext);
+		}, new Error("Unsupported for data aggregation with groupLevels: " + oBinding));
 	});
 
 	//*********************************************************************************************

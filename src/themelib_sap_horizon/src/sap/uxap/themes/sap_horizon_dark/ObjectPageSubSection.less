@@ -17,11 +17,13 @@
 
 /* responsive paddings */
 .sapUxAPObjectPageLayout.sapUiResponsiveContentPadding {
+
 	&.sapUxAPObjectPageLayout-Std-Tablet .sapUxAPBlockContainer,
 	&.sapUxAPObjectPageLayout-Std-Desktop .sapUxAPBlockContainer {
 		padding-left: 2rem;
 		padding-right: 2rem;
 	}
+
 	&.sapUxAPObjectPageLayout-Std-Desktop-XL .sapUxAPBlockContainer {
 		padding-left: 3rem;
 		padding-right: 3rem;
@@ -30,29 +32,29 @@
 
 /* compact size */
 .sapUiSizeCompact {
+
 	.sapUxAPObjectPageLayout-Std-Tablet .sapUxAPBlockContainerr{
 		padding-bottom: 1rem;
 	}
 }
 
-// =====================================
-// =====================================
-// Delta Styles for Horizon
-// =====================================
+/* ========================= */
+/* Delta Styles for Horizon  */
+/* ========================= */
 
-// Page Sub Section Focus
+/* Page Sub Section Focus */
 .sapUxAPObjectPageSubSectionFocusable:focus .sapUxAPObjectPageSubSectionFocusSpan {
 	content: '';
 	position: absolute;
 	display: block;
 	inset: 0;
-	border: @sapUiContentFocusWidth @sapUiContentFocusStyle @sapUiContentFocusColor;
+	border: var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);
 	z-index: 6;
 	pointer-events: none;
 }
 
 .sapUxAPObjectPageLayout-Std-Phone .sapUxAPObjectPageSubSection .sapUiRespGrid.sapUiRespGridHSpace1 {
-    padding: 0.5rem 0.5rem 0.5rem 0.5rem;
+	padding: 0.5rem 0.5rem 0.5rem 0.5rem;
 
 }
 
@@ -61,20 +63,21 @@ div[class^="sapUiRespGrid"]:first-child > .sapUxAPObjectPageSubSection:not(.sapU
 	padding-top: 0;
 }
 
-// =====================================
-// Object Page spacing fixes - To help address the too much white space customer feedback
-// =====================================
+/* ======================================================================================= */
+/* Object Page spacing fixes - To help address the too much white space customer feedback  */
+/* ======================================================================================= */
+
 .sapUxAPObjectPageLayout-Std-Tablet .sapUxAPBlockContainer,
 .sapUiSizeCompact .sapUxAPObjectPageLayout-Std-Phone .sapUxAPBlockContainer {
-    padding: 0.5rem 0.5rem 0rem 0rem;
+	padding: 0.5rem 0.5rem 0rem 0rem;
 }
 
 .sapUiSizeCompact .sapUxAPObjectPageLayout-Std-Desktop .sapUxAPBlockContainer {
-    padding: 0.5rem 0.5rem 0.5rem 0.5rem;
+	padding: 0.5rem 0.5rem 0.5rem 0.5rem;
 }
 
 .sapUxAPObjectPageLayout-Std-Desktop .sapUxAPBlockContainer {
-    padding: 0;
+	padding: 0;
 }
 
 .sapUxAPBlockContainer .sapUxAPObjectPageSubSectionAlignContent {

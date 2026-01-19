@@ -473,12 +473,12 @@ sap.ui.define(function() {
 	 *
 	 * @typedef {object} module:sap/ui/test/starter/config.CoverageConfiguration
 	 *
-	 * @property {string[]} [only]
-	 *     List of modules or packages that should be instrumented. If not given, all modules are instrumented.
+	 * @property {string|string[]} [only]
+	 *     A single module or package name, or a list of such names, that should be instrumented. If not given, all modules are instrumented.
 	 *     Default is null
 	 *
-	 * @property {string[]} [never]
-	 *     List of modules or packages that never should be instrumented.
+	 * @property {string|string[]} [never]
+	 *     A single module or package name, or a list of such names, that never should be instrumented.
 	 *     Default is null
 	 *
 	 * @property {boolean} [branchTracking=false]

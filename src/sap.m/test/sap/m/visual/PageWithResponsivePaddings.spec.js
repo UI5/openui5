@@ -1,24 +1,9 @@
-/*global beforeAll,describe,it,element,by,takeScreenshot,expect,browser,sap_ui_core_Element:true,sap_ui_thirdparty_jQuery:true */
+/*global describe,it,element,by,takeScreenshot,expect,browser*/
 
 describe("sap.m.PageWithResponsivePaddings", function () {
 	"use strict";
 
 	browser.testrunner.currentSuite.meta.controlName = "sap.m.Page";
-
-	beforeAll(function() {
-		browser.executeScript(function() {
-			return new Promise(function(resolve) {
-				sap.ui.require([
-					"sap/ui/core/Element",
-					"sap/ui/thirdparty/jquery"
-				], function(Element, jQuery) {
-					sap_ui_core_Element = Element;
-					sap_ui_thirdparty_jQuery = jQuery;
-					resolve();
-				});
-			});
-		});
-	});
 
 	it("Should load test page", function () {
 		expect(takeScreenshot()).toLookAs("initial");
@@ -26,32 +11,32 @@ describe("sap.m.PageWithResponsivePaddings", function () {
 
 	it("Should load test page with size S", function () {
 		browser.executeScript(function() {
-			var oPageDomRef = sap_ui_core_Element.getElementById("page").getDomRef();
-			sap_ui_thirdparty_jQuery(oPageDomRef).css("width", "580px");
+			var oPageDomRef = document.getElementById("page");
+			oPageDomRef.style.width = "580px";
 		});
 		expect(takeScreenshot()).toLookAs("page-size-S");
 	});
 
 	it("Should load test page with size M", function () {
 		browser.executeScript(function() {
-			var oPageDomRef = sap_ui_core_Element.getElementById("page").getDomRef();
-			sap_ui_thirdparty_jQuery(oPageDomRef).css("width", "1000px");
+			var oPageDomRef = document.getElementById("page");
+			oPageDomRef.style.width = "1000px";
 		});
 		expect(takeScreenshot()).toLookAs("page-size-M");
 	});
 
 	it("Should load test page with size L", function () {
 		browser.executeScript(function() {
-			var oPageDomRef = sap_ui_core_Element.getElementById("page").getDomRef();
-			sap_ui_thirdparty_jQuery(oPageDomRef).css("width", "1430px");
+			var oPageDomRef = document.getElementById("page");
+			oPageDomRef.style.width = "1430px";
 		});
 		expect(takeScreenshot()).toLookAs("page-size-L");
 	});
 
 	it("Should load test page with size XL", function () {
 		browser.executeScript(function() {
-			var oPageDomRef = sap_ui_core_Element.getElementById("page").getDomRef();
-			sap_ui_thirdparty_jQuery(oPageDomRef).css("width", "1500px");
+			var oPageDomRef = document.getElementById("page");
+			oPageDomRef.style.width = "1500px";
 		});
 		expect(takeScreenshot()).toLookAs("page-size-XL");
 	});
@@ -64,32 +49,32 @@ describe("sap.m.PageWithResponsivePaddings", function () {
 
 	it("Should load test page with floating footer and size S", function () {
 		browser.executeScript(function() {
-            var oPageDomRef = sap_ui_core_Element.getElementById("page").getDomRef();
-			sap_ui_thirdparty_jQuery(oPageDomRef).css("width", "580px");
+            var oPageDomRef = document.getElementById("page");
+			oPageDomRef.style.width = "580px";
 		});
 		expect(takeScreenshot()).toLookAs("page-floating-footer-size-S");
 	});
 
 	it("Should load test page with floating footer and size M", function () {
 		browser.executeScript(function() {
-			var oPageDomRef = sap_ui_core_Element.getElementById("page").getDomRef();
-			sap_ui_thirdparty_jQuery(oPageDomRef).css("width", "1000px");
+			var oPageDomRef = document.getElementById("page");
+			oPageDomRef.style.width = "1000px";
 		});
 		expect(takeScreenshot()).toLookAs("page-floating-footer-size-M");
 	});
 
 	it("Should load test page with floating footer and size L", function () {
 		browser.executeScript(function() {
-			var oPageDomRef = sap_ui_core_Element.getElementById("page").getDomRef();
-			sap_ui_thirdparty_jQuery(oPageDomRef).css("width", "1430px");
+			var oPageDomRef = document.getElementById("page");
+			oPageDomRef.style.width = "1430px";
 		});
 		expect(takeScreenshot()).toLookAs("page-floating-footer-size-L");
 	});
 
 	it("Should load test page with floating footer and size XL", function () {
 		browser.executeScript(function() {
-			var oPageDomRef = sap_ui_core_Element.getElementById("page").getDomRef();
-			sap_ui_thirdparty_jQuery(oPageDomRef).css("width", "1500px");
+			var oPageDomRef = document.getElementById("page");
+			oPageDomRef.style.width = "1500px";
 		});
 		expect(takeScreenshot()).toLookAs("page-floating-footer-size-XL");
 	});
