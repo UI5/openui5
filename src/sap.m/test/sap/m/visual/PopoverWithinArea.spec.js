@@ -1,9 +1,22 @@
-/*global describe,it,element,by,takeScreenshot,expect,browser,protractor*/
+/*global beforeAll,describe,it,element,by,takeScreenshot,expect,browser,protractor,sap_ui_Device:true */
 
 describe("sap.m.PopoverWithinArea", function () {
 	"use strict";
 
 	browser.testrunner.currentSuite.meta.controlName = 'sap.m.Popover';
+
+	beforeAll(function() {
+		browser.executeScript(function() {
+			return new Promise(function(resolve) {
+				sap.ui.require([
+					"sap/ui/Device"
+				], function(Device) {
+					sap_ui_Device = Device;
+					resolve();
+				});
+			});
+		});
+	});
 
 	var bPhone = null;
 	var _resolvePopover = function () {
@@ -18,7 +31,7 @@ describe("sap.m.PopoverWithinArea", function () {
 
 	it("Should load test page", function () {
 		browser.executeScript(function () {
-			return sap.ui.Device.system.phone;
+			return sap_ui_Device.system.phone;
 		}).then(function (response) {
 			bPhone = response;
 		});

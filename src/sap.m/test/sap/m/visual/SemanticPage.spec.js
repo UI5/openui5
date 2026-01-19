@@ -1,9 +1,24 @@
-/*global describe,it,element,by,takeScreenshot,browser,expect*/
+/*global beforeAll,describe,it,element,by,takeScreenshot,expect,browser,sap_ui_Device:true,sap_ui_core_Element:true */
 
 describe("sap.m.SemanticPage", function() {
 	"use strict";
 
 	browser.testrunner.currentSuite.meta.controlName = 'sap.m.semantic.SemanticPage';
+
+	beforeAll(function() {
+		browser.executeScript(function() {
+			return new Promise(function(resolve) {
+				sap.ui.require([
+					"sap/ui/Device",
+					"sap/ui/core/Element"
+				], function(Device, Element) {
+					sap_ui_Device = Device;
+					sap_ui_core_Element = Element;
+					resolve();
+				});
+			});
+		});
+	});
 
 	//const
 	var _PAGE_TYPE = {
@@ -13,59 +28,59 @@ describe("sap.m.SemanticPage", function() {
 
 	// mobile support help functions
 	_showMenu = function() {
-			browser.executeScript(function() {
+		browser.executeScript(function() {
 
-				var oDevice = sap.ui.require("sap/ui/Device"),
-					bPhone = oDevice.system.phone,
-					bTablet = oDevice.system.tablet,
+			var oDevice = sap.ui.require("sap/ui/Device"),
+				bPhone = oDevice.system.phone,
+				bTablet = oDevice.system.tablet,
 
-				_showPhoneMenu = function() {
-					sap.ui.getCore().byId/*Not inside AMD call*/("myApp")/*Not inside AMD call*/.toMaster("menuPage"); //nav to menu-page
-				},
-				_showTabletMenu = function() {
-					sap.ui.getCore().byId/*Not inside AMD call*/("semanticPageContainer")/*Not inside AMD call*/.hideMaster();
-					sap.ui.getCore().byId/*Not inside AMD call*/("myApp")/*Not inside AMD call*/.showMaster();
-				};
+			_showPhoneMenu = function() {
+				sap_ui_core_Element.getElementById("myApp").toMaster("menuPage"); //nav to menu-page
+			},
+			_showTabletMenu = function() {
+				sap_ui_core_Element.getElementById("semanticPageContainer").hideMaster();
+				sap_ui_core_Element.getElementById("myApp").showMaster();
+			};
 
-				if (bPhone) {
-					_showPhoneMenu();
-				} else if (bTablet) {
-					_showTabletMenu();
-				}
+			if (bPhone) {
+				_showPhoneMenu();
+			} else if (bTablet) {
+				_showTabletMenu();
+			}
 
-			}).then(function() {
-				element(by.id("menuPage-title-inner")).click(); //wait for menu-page content to show
-			});
+		}).then(function() {
+			element(by.id("menuPage-title-inner")).click(); //wait for menu-page content to show
+		});
 	},
 
 	_showPageType = function(sType) {
 
 		browser.executeScript(function() {
 
-			var bPhone = sap.ui.Device.system.phone,
-				bTablet = sap.ui.Device.system.tablet,
+			var bPhone = sap_ui_Device.system.phone,
+				bTablet = sap_ui_Device.system.tablet,
 				sPageType = arguments[0],
 
 				showPageOnPhone = function() {
-					sap.ui.getCore().byId/*Not inside AMD call*/("myApp")/*Not inside AMD call*/.toDetail("semanticPageContainer"); //nav to semantic (master/detail) pages container
+					sap_ui_core_Element.getElementById("myApp").toDetail("semanticPageContainer"); //nav to semantic (master/detail) pages container
 
 					if (sPageType === "MASTER") { //nav to requested (master/detail) semantic page type
-						sap.ui.getCore().byId/*Not inside AMD call*/("semanticPageContainer")/*Not inside AMD call*/.toMaster("master");
+						sap_ui_core_Element.getElementById("semanticPageContainer").toMaster("master");
 						return "master";
 					} else if (sPageType === "DETAIL") {
-						sap.ui.getCore().byId/*Not inside AMD call*/("semanticPageContainer")/*Not inside AMD call*/.toDetail("detail");
+						sap_ui_core_Element.getElementById("semanticPageContainer").toDetail("detail");
 						return "detail";
 					}
 				},
 
 				showPageOnTablet = function() {
-					sap.ui.getCore().byId/*Not inside AMD call*/("myApp")/*Not inside AMD call*/.hideMaster();
+					sap_ui_core_Element.getElementById("myApp").hideMaster();
 
 					if (sPageType === "MASTER") {
-						sap.ui.getCore().byId/*Not inside AMD call*/("semanticPageContainer")/*Not inside AMD call*/.showMaster();
+						sap_ui_core_Element.getElementById("semanticPageContainer").showMaster();
 						return "master";
 					} else if (sPageType === "DETAIL") {
-						sap.ui.getCore().byId/*Not inside AMD call*/("semanticPageContainer")/*Not inside AMD call*/.hideMaster();
+						sap_ui_core_Element.getElementById("semanticPageContainer").hideMaster();
 						return "detail";
 					}
 				};

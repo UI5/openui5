@@ -203,7 +203,14 @@ sap.ui.require(["sap/base/util/fetch"], function (fetch) {
 				method: 'HEAD'
 			}).then(function (oPreloadResponse) {
 				bPreloadActive = !!oPreloadResponse.ok && hasRequest('sap/m/library-preload.js');
-			}).finally(function () {
+			}).catch(function() {
+				// ignore fetch errors
+			}).then(function () {
+				return new Promise((resolve, reject) => {
+					// load a module that has no dependency to sap/m/Table to enforce preloads with 1-chunk
+					sap.ui.require(["sap/m/Label"], () => resolve(), reject);
+				});
+			}).then(function() {
 				if ( bPreloadActive ) {
 					assert.ok(!!sap.ui.loader._.getModuleState('sap/m/Table.js'), "Table resource should be in status 'loaded' (as preloads are active)");
 				}

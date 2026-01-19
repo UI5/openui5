@@ -20,7 +20,7 @@ Here are some general principles for writing comments:
 
 For an example of how to create a class, see [Example for Defining a Class](classexample.md).
 
-Also see the [list of common JSDoc pitfalls](guidelines/jsdocpitfalls.md).
+Also see the [list of common JSDoc pitfalls](jsdocpitfalls.md).
 ## Descriptions
 
 A documentation comment should provide the following content:
@@ -83,12 +83,12 @@ The table provides an overview of the most common inline and HTML tags.
 
 | Tag | Use | Example | How to Use / Details | Type of Tag |
 | --- | --- | ------- | -------------------- | ----------- |
-| `{@link}` | Links within API Reference | `{@link sap.ui.generic.app.navigation.service.NavError Error}` </br> `{@link sap.ui.comp.smarttable.SmartTable#event:beforeRebindTable}` | To replace the path with a display text, use it like this: `{@link <path> space <display text>}`. You can also use `#myMethod` for links within a class or control to individual methods, for example. The leading hash will then be removed automatically. For other links, use the required syntax, for example, `#event:name`. | Inline |
+| `{@link}` | Links within API Reference | `{@link sap.m.SegmentedButtonItem SegmentedButtonItem}` <br> `{@link sap.m.Input#event:press}` | To replace the path with a display text, use it like this: `{@link <path> space <display text>}`. You can also use `#myMethod` as a path for links within a class or control to individual methods, for example. The leading hash will then be removed automatically. For other links, use the required syntax, for example, `#event:name`. | Inline |
 | Empty line | Creates a paragraph | | Using `<p>` is not necessary, since empty lines are used to define paragraphs. | HTML |
 | `<code>…</code>` | Technical entities (optional) | `the <code>Button</code> control` | | HTML |
 | `<pre>…</pre>` | Code samples | | | HTML |
-| <pre>`<ul>`</br>`<li>…</li>`</br>`<li>…</li>`</br>`</ul>`</pre> | Unordered lists | | | HTML |
-| <pre>`<ol>`</br>`<li>…</li>`</br>`<li>…</li>`</br>`</ol>`</pre> | Ordered lists | | | HTML |
+| <pre>`<ul>`<br>`<li>…</li>`<br>`<li>…</li>`<br>`</ul>`</pre> | Unordered lists | | | HTML |
+| <pre>`<ol>`<br>`<li>…</li>`<br>`<li>…</li>`<br>`</ol>`</pre> | Ordered lists | | | HTML |
 | `<strong>…</strong>` or `<b>…</b>` | Bold font | | | HTML |
 | `<i>…</i>` | Italics | | | HTML |
 | `&nbsp;` | Non-breaking space | | | HTML |
@@ -101,18 +101,19 @@ You can also use block tags in your comments.
 
 The table provides an overview of the most common block tags.
 
-| Tag | Use | Example | How to Use / Details |
+| Tag | Use | Example | Guidelines |
 | --- | --- | ------- | -------------------- |
-| `@param` | Adds parameters | `@param {string} statement The SQL statement to be prepared` | Begin description with a capital letter. |
-| `@returns` | Adds return values | `@returns {type1\|type2\|...} Description` | Begin description with a capital letter. |
+| `@param` | Adds the description of a parameter | `@param {string} statement The SQL statement to be prepared` | Begin description with a capital letter. |
+| `@returns` | Adds the description of the return value if available | `@returns {type1\|type2\|...} Description` | Begin description with a capital letter. |
 | `@throws` | Adds the description of an exception if an error occurs | `@throws {type} Description` | Begin description with a capital letter. |
-| `@author` | Adds the name of the developer responsible for the code | `@author Max Mustermann` | This is an optional tag that is not displayed in JSDoc. If you need to use the version tag, use ${version} so you don't have to update this manually for each new version. |
-| `@version` | Names the version for an entity | `@version 14.1.2` | This is an optional tag that is not displayed in JSDoc. Use ${version} so you don't have to update this manually for each new version. |
-| `@see` | Adds information (for example, link to documentation or the SAP Fiori Design Guidelines) in the header section of the **API Reference** | `@see path`</br> `@see free text`</br> `@see {@link topic:bed8274140d04fc0b9bcb2db42d8bac2 Smart Table}`</br> `@see {@link fiori:/flexible-column-layout/ Flexible Column Layout}` | `@see {@link topic:loio <semantic control name>}` provides a link to the documentation (developer guide). If there are several `@see` tags with documentation links, only the first one is shown in the header. The other ones are displayed under *Documentation Links* in the *Overview* section. For more generic topics that are not directly related to a class or control, use inline links. |
-| `@since` | Adds the version in which an entity was first introduced | `@since 1.30` | Be as specific as possible (without mentioning patch levels for new development), since this information is useful even for internal purposes. For example, mention 1.27, even though this is not an external release. |
-| `@deprecated` | Adds the version in which an entity was deprecated | `@deprecated As of version 1.28, replaced by {@link class name}.`</br>**or**</br>`@deprecated As of version 1.28, the concept has been discarded.`</br>**or**</br>`@deprecated As of version 1.28 with no replacement.` | Be as specific as possible (without mentioning patch levels) since this information is useful even for internal purposes. Indicate either what replaces the deprecated entity or mention that the concept has been discarded. |
-| `@experimental` | Classifies an entity that is not ready for production use yet, but available for testing purposes | `@experimental As of version 1.56` | The example provides the following output: **Experimental API since 1.56** Hence, no separate `@since` tag is required. Similar to deprecations, the patch level usually should be omitted.|
-| `@example` | Inserts a code sample after the comment | <pre>/**</br>* ...</br>* @example</br>* var id = myjob.schedules.add({</br>* description: "Added at runtime, run every 10 minutes",</br>* xscron: "* * * * * *\/10 0",</br>* parameter: {</br>* a: "c"</pre> | The code sample is inserted automatically with `<pre>`. It is always inserted right after the comment. To insert an example somewhere else, for example, in the middle of a comment, use `<pre>`. You can add a header for the example by using `<caption>`.|
+| `@author` | Adds the name of the developer responsible for the code | `@author Max Mustermann` | This is an optional tag that is not displayed in JSDoc. |
+| `@version` | Names the version for an entity | `@version 14.1.2` | This is an optional tag that is not displayed in JSDoc. Use `${version}` so you don't have to update this manually for each new version. |
+| `@see` | Adds a reference entry into the header of the **API Reference**. The reference can be: <ul><li>A link to an OpenUI5 documenation topic</li><li>A link to an SAP Fiori design guideline</li><li>A cross-reference to another entity</li><li>A link defined by a URL</li><li>A text entry with no link</li></ul> | `@see {@link topic:loio label}`<br> `@see {@link fiori:pathOrURL label}`<br> `@see package.class#member`<br> `@see path`<br> `@see free text`<br> | The placement of ` @see`content depends on where the tag is used: <br><br> In a class contructor doclet: <ul><li>`@see {@link topic:...}` populates the *Documentation* field in the header.</li><li>`@see {@link fiori:...}` populates the *UX Guidelines* field in the header.</li></ul> Only the first tag of each of these types is used for the header. All other `@see` tags are grouped under the heading *Documentation links* in the Overview section.<br><br> In all other doclets (e.g. for methods, events, properties), `@see` tags generate a *References:* section. <br><br> For contextual links within a description, rather use an inline {@link ...} tag. The `@see` tag is best for creating a separate list of high-level references. |
+| `@ui5-experimental-since` | Marks an entity as experimental, indicating it is not yet stable for production use. <p><blockquote><h3>Note:</h3>An entity marked as experimental should be stabilized or removed within 3 to 6 months and must not be part of an LTS version.</blockquote></p>  | `@ui5-experimental-since 1.138` | It must always follow the syntax `@ui5-experimental-since <major.minor>`, specifying the release version when the API was initially published. It must never be used together with `@since`. |
+| `@since` | Adds the version with which a stable entity was first introduced | `@since 1.30` | A mandatory tag for all stable, visible APIs. It must always follow the syntax `@since <major.minor>`, specifying the release version when the API was initially published. For feature downports, also the patch version where it was downported first must be added (`@since <major.minor.patch>`). The tag must never be used together with `@ui5-experimental-since`. |
+| `@deprecated` | Indicates an entity as deprecated, discouraging its use and indicating that it may be removed in a future version. | `@deprecated As of version 1.28, replaced by {@link class name}.`<br>`@deprecated As of version 1.28, the concept has been abandoned.` | This tag's description must not be empty and must adhere to a specific format:<ul><li>The version of deprecation: Begin with the exact phrasing `As of version <major.minor>` (e.g., As of version 1.138). This precise syntax is mandatory for tooling.</li><li>Successor API (if applicable): If a replacement exists, clearly state it using `replaced by {@link ...}`.</li><li>No successor (if applicable): If no replacement exists, provide a statement explaining why, such as `The concept has been abandoned.`</li></ul> |
+| `@experimental` | **Deprecated.** This tag has been replaced by `@ui5-experimental-since` | *(Do not use)* | |
+| `@example` | Provides a code example demonstrating the usage of the API. | <pre>/**<br>* ...<br>* @example<br>* var id = myjob.schedules.add({<br>* description: "Added at runtime, run every 10 minutes",<br>* xscron: "* * * * * *\/10 0",<br>* parameter: {<br>* a: "c"</pre> | The code sample is inserted automatically with `<pre>`. It is always inserted right after the comment. To insert an example somewhere else, for example, in the middle of a comment, use `<pre>`. You can add a header for the example by using `<caption>`.|
 
 ### Tips for Using Block Tags
 
@@ -122,21 +123,32 @@ The table provides an overview of the most common block tags.
 
 For more information about tags, see the general standards and guidelines for API documentation under [Java and JavaScript Tags](https://github.com/SAP-docs/api-style-guide/blob/main/docs/40-java-javascript-and-msnet/java-and-javascript-tags-6d32db8.md).
 
+### Guidelines for experimental APIs
+
+To ensure effective lifecycle management of experimental APIs and features, a clearly defined timeframe for experimentation is essential:
+- Aim to stabilize experimental features within 3-6 months. This timeframe may be adjusted based on complexity, feedback volume and quality, and the impact of potential changes.
+- The inclusion of experimental features in LTS versions is generally disallowed. LTS versions are crafted to offer a high degree of stability and predictability, catering to consumers who depend on these versions for sustained use.
+- In exceptional cases (e.g., critical user demand, unique project requirements), extending the experimental status may be justifiable.
+Explicit approval from the SAPUI5 program team is required for such extensions. **Details on how you apply a duration extension for your API can be found in the SAP-internal BLI FIORITECHP1-34825.**
+
+> **Note**:
+> Experimental APIs that exceed the 6-month regulation without an approved exception will be automatically switched to public status.
+
 ## Links to API Documentation
 
 To refer to another entity within the **API Reference**, you can use `{@link}` in combination with the reference types shown in the table below.
 
 | Type of Reference | Description | Example | Comment |
 | ----------------- | ----------- | ------- | ------- |
-| `full.path.ClassName` | Refers to a class, interface, enumeration, or namespace that has a global name | `{@link sap.ui.comp.smarttable.SmartTable}` | |
-| `full.path.ClassName#method` | Refers to an instance method of a class | `{@link sap.ui.comp.smarttable.SmartTable#getHeader}` | `.prototype.` and `#` are interchangeable |
+| `full.path.ClassName` | Refers to a class, interface, enumeration, or namespace that has a global name | `{@link sap.ui.core.mvc.View}` | |
+| `full.path.ClassName#method` | Refers to an instance method of a class | `{@link sap.ui.core.mvc.View#byId}` | `.prototype.` and `#` are interchangeable |
 | `full.path.ClassName.prototype.method` | Refers to an instance method of a class | | |
 | `full.path.ClassName.method` | Refers to a static method (or any other static property) | | |
 | `module:full/module/name#method` | Refers to an instance method from a class that does not expose a global name | | |
 | `module:full/module/name.method` | Refers to a static method from a module that does not expose a global name | | |
-| `#method` | Refers to an instance method **within** a class | `#getHeader` | You must use this type of reference **within** an API that you are documenting, for example, within the SmartTable control documentation, if you want to link to a method that belongs to the control itself. |
+| `#method` | Refers to an instance method **within** a class | `#byId` | You can use this shorthand notation **within** an API that you are documenting, for example, within the `View` control documentation, if you want to link to a method that belongs to the control itself. |
 | `#.method` | Refers to a static method **within** a class | | |
-| `full.path.ClassName#event:name` | Refers to an event fired by an instance of a class | `sap.ui.comp.smarttable.SmartTable#event:beforeRebindTable` | |
+| `full.path.ClassName#event:name` | Refers to an event fired by an instance of a class | `sap.m.Button#event:press` | |
 | `#event:name` | Refers to an event **within** a class | | |
 | `full.path.ClassName#annotation:name` | Refers to an instance annotation of a class | | |
 | `#annotation:name` | Refers to an annotation **within** a class | | |
