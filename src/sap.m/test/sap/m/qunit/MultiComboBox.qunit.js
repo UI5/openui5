@@ -5628,35 +5628,23 @@ sap.ui.define([
 		}).placeAt("MultiComboBoxContent");
 
 		await nextUIUpdate(this.clock);
-		this.clock.tick(10);
+		oMCB.focus();
 
-		oMCB.open();
-		await nextUIUpdate(this.clock);
-		this.clock.tick(300);
+		// we focus the last token with BACKSPACE
+		qutils.triggerKeydown(oMCB.getDomRef(), KeyCodes.BACKSPACE);
 
-		var triggerBackspaceOnLastToken = async function () {
+		this.clock.tick(200);
+
+		var triggerBackspaceOnLastToken = function () {
 			var aTokens = oMCB.getAggregation("tokenizer").getTokens();
+			const iLastTokenIndex = aTokens.length - 1;
 
-			aTokens[aTokens.length - 1].focus();
-			await nextUIUpdate(this.clock);
-			this.clock.tick(10);
-
-			qutils.triggerKeydown(aTokens[aTokens.length - 1].getDomRef(), KeyCodes.BACKSPACE);
-			await nextUIUpdate(this.clock);
-			this.clock.tick(10);
+			qutils.triggerKeydown(aTokens[iLastTokenIndex].getDomRef(), KeyCodes.BACKSPACE);
+			this.clock.tick(200);
 		}.bind(this);
 
-		await triggerBackspaceOnLastToken();
-		await nextUIUpdate(this.clock);
-
-		// arrange
-		oMCB._iFocusedIndex = 1;
-
-		await triggerBackspaceOnLastToken();
-		await nextUIUpdate(this.clock);
-
-		// arrange
-		oMCB._iFocusedIndex = 0;
+		triggerBackspaceOnLastToken();
+		triggerBackspaceOnLastToken();
 
 		assert.strictEqual(document.activeElement, oMCB.getAggregation("tokenizer").getTokens()[0].getDomRef(), "First token is focused");
 
@@ -7367,22 +7355,23 @@ sap.ui.define([
 				new Item({ key: "item1", text: "Item 1" }),
 				new Item({ key: "item2", text: "Item 2" })
 			],
-			selectedKeys: "{/selectedKeys}"
+			selectedKeys: "{/selectedKeys}",
+			valueState: ValueState.Warning,
+			valueStateText: "Warning message"
 		});
 
 		oMultiComboBox.setModel(oModel);
 		oMultiComboBox.placeAt("MultiComboBoxContent");
 		await nextUIUpdate();
 
-		oMultiComboBox.setValueState("Error");
-		oMultiComboBox.setValueStateText("Error message");
+		oMultiComboBox.setValue("Just an invalid value");
 		await nextUIUpdate();
 
 		oModel.setProperty("/selectedKeys", ["item1"]);
 		await nextUIUpdate();
 
-		assert.strictEqual(oMultiComboBox.getValueState(), "None", "Value state should be reset to None");
-		assert.strictEqual(oMultiComboBox.getValueStateText(), "", "Value state text should be cleared");
+		assert.strictEqual(oMultiComboBox.getValueState(), "Warning", "Value state should be reset to None");
+		assert.strictEqual(oMultiComboBox.getValueStateText(), "Warning message", "Value state text should be cleared");
 
 		oMultiComboBox.destroy();
 	});

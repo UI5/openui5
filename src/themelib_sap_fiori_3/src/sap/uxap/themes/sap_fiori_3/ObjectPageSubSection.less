@@ -1,19 +1,19 @@
 /* ============================================== */
 /* CSS for control sap.uxap/ObjectPageSubSection  */
-/* Fiori 3 theme                                  */
+/* Quartz Light theme                             */
 /* ============================================== */
 
 .sapUxAPObjectPageSubSectionTitleUppercase {
 	text-transform: uppercase;
 }
 
-// Page Sub Section Focus
+/* Page Sub Section Focus */
 .sapUxAPObjectPageSubSectionFocusable:focus .sapUxAPObjectPageSubSectionFocusSpan {
 	content: '';
 	position: absolute;
 	display: block;
 	inset: 0;
-	border: @sapUiContentFocusWidth @sapUiContentFocusStyle @sapUiContentFocusColor;
+	border: var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);
 	z-index: 6;
 	pointer-events: none;
 }
@@ -21,13 +21,16 @@
 .sapUxAPObjectPageLayout-Std-Desktop .sapUxAPBlockContainer {
 	padding: 0 1rem;
 }
+
 /* responsive paddings */
 .sapUxAPObjectPageLayout.sapUiResponsiveContentPadding {
+
 	&.sapUxAPObjectPageLayout-Std-Tablet .sapUxAPBlockContainer,
 	&.sapUxAPObjectPageLayout-Std-Desktop .sapUxAPBlockContainer {
 		padding-left: 2rem;
 		padding-right: 2rem;
 	}
+
 	&.sapUxAPObjectPageLayout-Std-Desktop-XL .sapUxAPBlockContainer {
 		padding-left: 3rem;
 		padding-right: 3rem;
@@ -35,12 +38,12 @@
 }
 
 .sapUxAPObjectPageSubSectionHeaderActions .sapMIBar .sapMBtnInner:not(.sapMBtnTransparent):not(.sapMToggleBtnPressed):not(.sapMBtnEmphasized):not(.sapMBtnAccept):not(.sapMBtnAttention):not(.sapMBtnReject):not(.sapMBtnActive):not(.sapMBtnGhost) {
-	border-color: @sapUiButtonBorderColor;
+	border-color: var(--sapButton_BorderColor);
 }
 
 .sapUxAPObjectPageSubSectionHeaderActions .sapMIBar .sapMBtn:not(:hover) .sapMBtnInner.sapMBtnDefault:not(.sapMToggleBtnPressed),
 .sapUxAPObjectPageSubSectionHeaderActions .sapMIBar .sapMBtn:not(:hover) .sapMBtnInner.sapMBtnDefault {
-	background-color: @sapUiButtonBackground;
+	background-color: var(--sapButton_Background);
 }
 
 .sapUxAPBlockContainer .sapUxAPObjectPageSubSectionAlignContent {

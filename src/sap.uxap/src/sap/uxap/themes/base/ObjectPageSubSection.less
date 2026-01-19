@@ -23,8 +23,9 @@
 }
 
 .sapUxAPObjectPageSubSection .sapUxAPObjectPageSubSectionHeader {
+
 	.sapMTB.sapUxAPObjectPageSubSectionHeaderToolbar {
-		background-color: @sapUiGlobalBackgroundColor;
+		background-color: var(--sapBackgroundColor);
 		height: auto;
 		min-height: 2.75rem;
 	}
@@ -44,11 +45,11 @@
 }
 
 .sapUxAPObjectPageSubSectionHeader .sapMIBar :not(.sapMBtnDisabled)>.sapMBtnInner.sapMBtnActive {
-	border-color: @sapUiButtonActiveBorderColor;
+	border-color: var(--sapButton_Active_BorderColor);
 }
 
 .sapUxAPObjectPageSubSectionHeader .sapMIBar.sapMBtn:hover>.sapMBtnHoverable {
-	background-color: @sapUiButtonHoverBackground;
+	background-color: var(--sapButton_Hover_Background);
 }
 
 .sapUxAPObjectPageSubSectionHeader {
@@ -111,6 +112,7 @@ Doing so will result in less generated CSS, as well as less future maintanance i
 */
 
 .sapUxAPObjectPageLayout:not(.sapUxAPObjectPageLayout-Std-Phone):not(.sapUxAPObjectPageLayout-Std-Tablet) {
+
 	.sapUxAPObjectPageSubSectionHeader.titleOnLeftLayout {
 		box-sizing: border-box;
 		width: 25%;
@@ -151,12 +153,15 @@ Doing so will result in less generated CSS, as well as less future maintanance i
 }
 
 .sapUxAPBlockContainer {
-	.sapUiFormResGrid>.sapUiFormTitle {
+
+	.sapUiFormResGrid > .sapUiFormTitle {
 		padding: 0;
 	}
-	.sapUiFormResGrid.sapUiFormToolbar >.sapMTB {
+
+	.sapUiFormResGrid.sapUiFormToolbar > .sapMTB {
 		padding: 0;
 	}
+
 	.sapUxAPObjectPageSubSectionAlignContent {
 		margin-left: -@sapUiMarginSmall;
 		margin-right: -@sapUiMarginSmall;
@@ -166,11 +171,14 @@ Doing so will result in less generated CSS, as well as less future maintanance i
 .sapUxAPBlockContainer {
 	padding: 0 2rem;
 }
+
 .sapUxAPObjectPageLayout-Std-Tablet .sapUxAPBlockContainer {
 	padding: 0 1rem;
 }
+
 .sapUxAPObjectPageLayout-Std-Phone .sapUxAPBlockContainer {
 	padding: 0 1rem;
+
 	.sapUxAPObjectPageSubSectionAlignContent {
 		margin-left: -@sapUiMarginSmall;
 		margin-right: -@sapUiMarginSmall;
@@ -179,6 +187,7 @@ Doing so will result in less generated CSS, as well as less future maintanance i
 
 
 .sapUxAPObjectPageLayout-Std-Phone .sapUxAPObjectPageSubSection {
+
 	.sapUiRespGrid.sapUiRespGridMedia-Std-Phone.sapUiRespGridHSpace1 {
 		padding: 0;
 	}
@@ -186,6 +195,7 @@ Doing so will result in less generated CSS, as well as less future maintanance i
 		margin: 0;
 		width: 100%;
 	}
+
 	.sapUxAPBlockBase {
 		margin-bottom: 1rem;
 	}
@@ -197,6 +207,7 @@ Doing so will result in less generated CSS, as well as less future maintanance i
 }
 
 .sapUxAPObjectPageSubSectionFitContainer {
+
 	.sapUxAPBlockContainer,
 	.sapUxAPBlockContainer > .sapUiRespGrid,
 	.sapUxAPBlockContainer > .sapUiRespGrid > *,
@@ -216,10 +227,8 @@ Doing so will result in less generated CSS, as well as less future maintanance i
 	}
 }
 
-
-
-// Styles needed for wrapTitle property
-.sapUxAPObjectPageSubSection .sapUxAPObjectPageSubSectionHeader .sapUxAPObjectPageSubSectionTitle  {
+/* Styles needed for wrapTitle property */
+.sapUxAPObjectPageSubSection .sapUxAPObjectPageSubSectionHeader .sapUxAPObjectPageSubSectionTitle {
 	height: auto;
 	line-height: normal;
 }

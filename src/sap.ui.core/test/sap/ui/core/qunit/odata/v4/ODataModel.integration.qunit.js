@@ -24482,13 +24482,16 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// predicates in case all key properties are available. Expect no unnecessary group levels in
 	// there!
 	// JIRA: CPOUI5ODATAV4-700
-	// Check that create and refresh are not supported.
+	// Check that create is not supported.
 	// JIRA: CPOUI5ODATAV4-1851
 	//
 	// If key properties are known, late properties are requested (JIRA: CPOUI5ODATAV4-2756)
 	// No late property on collapsed group header (JIRA: CPOUI5ODATAV4-2756)
 	// Delete a single entity (JIRA: CPOUI5ODATAV4-3229)
 	// When deleting an entity the count is decreased (JIRA: CPOUI5ODATAV4-3229)
+	//
+	// Refreshing a single entity without bAllowRemoval is allowed if there is no visual grouping.
+	// JIRA: CPOUI5ODATAV4-3257
 	QUnit.test("Data Aggregation: leaves' key predicates", function (assert) {
 		var oBinding,
 			oModel = this.createSalesOrdersModel({autoExpandSelect : true}),
@@ -24557,9 +24560,14 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			}, new Error("Cannot create in " + oBinding + " when using data aggregation"));
 
 			assert.throws(function () {
-				// code under test (JIRA: CPOUI5ODATAV4-1851)
-				aCurrentContexts[1].requestRefresh();
-			}, new Error("Cannot refresh " + aCurrentContexts[1] + " when using data aggregation"));
+				// code under test (JIRA: CPOUI5ODATAV4-3257)
+				aCurrentContexts[0].requestRefresh();
+			}, new Error("Unsupported on aggregated data: " + aCurrentContexts[0]));
+
+			assert.throws(function () {
+				// code under test (JIRA: CPOUI5ODATAV4-3257)
+				aCurrentContexts[1].requestRefresh(undefined, true);
+			}, new Error("Unsupported: bAllowRemoval && $$aggregation"));
 
 			that.expectChange("lifecycleStatus", [, "Z*"])
 				.expectRequest("PATCH SalesOrderList('26')", {
@@ -24606,6 +24614,17 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		}).then(function () {
 			assert.strictEqual(oBinding.getCount(), 1);
 
+			that.expectRequest("SalesOrderList('25')"
+					+ "?$select=GrossAmount,LifecycleStatus,Note,SalesOrderID",
+					{GrossAmount : "3", LifecycleStatus : "Y", Note : "Late", SalesOrderID : "25"})
+				.expectChange("grossAmount", [, "3"]);
+
+			return Promise.all([
+				// code under test (JIRA: CPOUI5ODATAV4-3257)
+				oBinding.getCurrentContexts()[1].requestRefresh(),
+				that.waitForChanges(assert, "requestRefresh")
+			]);
+		}).then(function () {
 			that.expectRequest("SalesOrderList?$apply=groupby((LifecycleStatus))&$count=true"
 					+ "&$skip=0&$top=100", {
 					"@odata.count" : "2",
@@ -27496,6 +27515,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	//
 	// After a side-effects refresh follow-up requests, e.g. for expanding a node, are as expected.
 	// JIRA: CPOUI5ODATAV4-3284
+	//
+	// Context#refresh of a single entity is still not allowed if visual grouping is used.
+	// JIRA: CPOUI5ODATAV4-3257
 	QUnit.test("Data Aggregation: keep alive single entity", async function (assert) {
 		const oModel = this.createAggregationModel({autoExpandSelect : true});
 		const sView = `
@@ -27729,6 +27751,12 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			oListBinding.getCurrentContexts()[0].expand(),
 			this.waitForChanges(assert, "expand Country 'A' again")
 		]);
+
+		assert.throws(() => {
+			// code under test
+			oContext26.refresh();
+		}, new Error("Unsupported for data aggregation with groupLevels: " + sODLB
+			+ ": /BusinessPartners"));
 	});
 
 	//*********************************************************************************************
@@ -29914,7 +29942,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				assert.throws(function () {
 					// code under test (JIRA: CPOUI5ODATAV4-2515)
 					oRoot.requestRefresh(undefined, true);
-				}, new Error("Unsupported parameter bAllowRemoval: true"));
+				}, new Error("Unsupported: bAllowRemoval && $$aggregation"));
 
 				that.expectRequest("Artists(ArtistID='0',IsActiveEntity=true)"
 						+ "?$select=ArtistID,IsActiveEntity,defaultChannel"

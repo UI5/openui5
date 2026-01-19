@@ -46,9 +46,10 @@ sap.ui.define([
 
   //*******************************
   var oEventList = new List();
-  var fEventWriter = function(eventArgs){
-	  var type = eventArgs.getParameter("type");
-	  var item = new StandardListItem({title: "token: " + type});
+  var fTokenDelete = function(eventArgs){
+	  var tokens = eventArgs.getParameter("tokens");
+	  var keyCode = eventArgs.getParameter("keyCode");
+	  var item = new StandardListItem({title: `tokenDelete fired for ${tokens.length} tokens. KeyCode: ${keyCode ? keyCode : "N/A"}`});
 	  oEventList.addItem(item);
   };
   var OverflowToolbarPriority = OverflowToolbarPriority0;
@@ -69,7 +70,7 @@ sap.ui.define([
 		  new Token({text: "Token 11", key: "0011"}),
 		  new Token({text: "Token 12", key: "0012"})
 	  ],
-	  tokenChange: fEventWriter
+	  tokenDelete: fTokenDelete
   });
 
   oTokenizer0.addAriaLabelledBy(new Label({ text: "Custom Title" }));
@@ -111,7 +112,7 @@ sap.ui.define([
 		  new Token({text: "Token 11", key: "0011"}),
 		  new Token({text: "Token 12", key: "0012"})
 	  ],
-	  tokenChange: fEventWriter
+	  tokenDelete: fTokenDelete
   });
   //*******************************
   var oTokenizer2 = new Tokenizer("notEditableTokenizer",{
@@ -130,7 +131,7 @@ sap.ui.define([
 		  new Token({text: "Token 12", key: "0012"})
 	  ],
 	  editable: false,
-	  tokenChange: fEventWriter
+	  tokenDelete: fTokenDelete
   });
   //*******************************
   var oTokenizer3 = new Tokenizer("editableAndNotEditable",{
@@ -202,7 +203,7 @@ sap.ui.define([
 		  new Token({text: "Token 11", key: "0011"}),
 		  new Token({text: "Token 12", key: "0012"})
 	  ],
-	  tokenChange: fEventWriter,
+	  tokenDelete: fTokenDelete,
 	  layoutData: new OverflowToolbarLayoutData({
 		  priority: OverflowToolbarPriority.Low,
 		  shrinkable: true,
@@ -218,7 +219,7 @@ sap.ui.define([
 		  new Token({text: "Token 4 - long text example", key: "0004"}),
 		  new Token({text: "Token 5", key: "0005"})
 	  ],
-	  tokenChange: fEventWriter
+	  tokenDelete: fTokenDelete
   });
 
   const oToolbarTokenizer = new Toolbar("toolbar-tokenizer", {

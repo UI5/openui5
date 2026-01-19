@@ -7,7 +7,6 @@
 		liveChange="_onLiveChange"
 		showSuggestion="true"
 		showValueHelp="true"
-		valueHelpOnly="{= ${config/codeType} === 'javascript'}"
 		valueHelpRequest="_openCodeEditor"
 	/>
 </core:FragmentDefinition>

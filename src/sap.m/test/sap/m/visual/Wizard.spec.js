@@ -152,7 +152,7 @@ describe("sap.m.Wizard", function() {
 
 	it("Should open action sheet when 1 step is truncated", function () {
 		browser.executeScript(function() {
-			sap.ui.core.Element.getElementById("linear-wiz").setWidth("1100px");
+			sap_ui_core_Element.getElementById("linear-wiz").setWidth("1100px");
 		});
 
 		element(by.css("#linear-wiz ul.sapMWizardProgressNavList li:last-child")).click();

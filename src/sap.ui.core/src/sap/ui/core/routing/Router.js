@@ -1514,8 +1514,7 @@ sap.ui.define([
 		 * @param {sap.ui.core.routing.Router} oRouter The instance of the router
 		 * @function
 		 * @private
-		 * @ui5-restricted
-		 * @experimental Since 1.58
+		 * @ui5-restricted sap.ui.core.support.usage.EventBroadcaster
 		 */
 		Router._interceptRouteMatched = undefined;
 

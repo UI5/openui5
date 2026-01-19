@@ -203,7 +203,6 @@ sap.ui.define([
 
 	//Maximum three tokens
 	var oMultiInput8 = new MultiInput("multiInputNoPlaceholder", {
-		enableMultiLineMode: true,
 		maxTokens: 3,
 		width: "50%",
 		ariaLabelledBy: "labelMaxTokens"

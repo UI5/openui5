@@ -49,18 +49,6 @@
 				valueHelpRequest="handleValueHelp"
 			/>
 
-			<Label text="Product with Value Help Only" labelFor="productInputVHO"/>
-			<Input
-				id="productInputVHO"
-				class="sapUiSmallMarginBottom"
-				type="Text"
-				placeholder="Enter product"
-				enabled="true"
-				editable="true"
-				showValueHelp="true"
-				valueHelpOnly="true"
-				valueHelpRequest="handleValueHelp"
-			/>
 		</l:content>
 	</l:VerticalLayout>
 </mvc:View>

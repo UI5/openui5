@@ -24,7 +24,6 @@ sap.ui.define([], function() {
 		 * @function
 		 * @private
 		 * @ui5-restricted sap.ui.core.support.usage.EventBroadcaster
-		 * @experimental Since 1.58
 		 */
 		interceptEvent: null
 	};

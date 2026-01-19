@@ -1836,8 +1836,7 @@ sap.ui.define([
 		oSpy = this.spy(oMI, "_manageListsVisibility");
 
 		oMultiInput1 = new MultiInput({
-			showValueHelp: true,
-			valueHelpOnly: true
+			showValueHelp: true
 		});
 		oMultiInput1.placeAt("content");
 		await nextUIUpdate(this.clock);

@@ -11,7 +11,10 @@ function iLiner() {
 			oPre,
 			sCaption;
 
-		document.querySelectorAll('pre').forEach(window.hljs.highlightElement);
+		document.querySelectorAll('pre').forEach((el) => {
+			el.classList.add("cardExplorerSnippet");
+			window.hljs.highlightElement(el);
+		});
 
 		for (i = 0; i < aPreElements.length; i++) {
 			oPre = aPreElements[i];

@@ -1583,6 +1583,10 @@ sap.ui.define([
 	 * Refreshes the single entity represented by this context. Use {@link #requestRefresh} if you
 	 * want to wait for the refresh.
 	 *
+	 * When using data aggregation without <code>groupLevels</code> (see
+	 * {@link sap.ui.model.odata.v4.ODataListBinding#setAggregation}), single entities (see
+	 * {@link #isAggregated}) can be refreshed (@experimental as of version 1.145.0).
+	 *
 	 * @param {string} [sGroupId]
 	 *   The group ID to be used for the refresh; if not specified, the group ID for the context's
 	 *   binding is used, see {@link #getGroupId}.
@@ -1604,10 +1608,12 @@ sap.ui.define([
 	 *       <ul>
 	 *         <li> {@link #isInactive is inactive},
 	 *         <li> {@link #hasPendingChanges has pending changes},
-	 *         <li> does not represent a single entity (see
+	 *         <li> does not represent a single entity (see {@link #isAggregated} and
 	 *           {@link sap.ui.model.odata.v4.ODataListBinding#getHeaderContext}),
+	 *         <li> is not effectively kept alive and currently not part of the recursive hierarchy,
 	 *       </ul>
-	 *     <li> the binding is a list binding with data aggregation,
+	 *     <li> the context's binding is a list binding with data aggregation which has
+	 *       <code>groupLevels</code>,
 	 *     <li> the binding's root binding is suspended,
 	 *     <li> the <code>bAllowRemoval</code> parameter is set for a context belonging to a context
 	 *       binding or to a list binding with "$$aggregation".
@@ -1834,7 +1840,7 @@ sap.ui.define([
 	 * @param {string} [sGroupId]
 	 *   The group ID to be used
 	 * @param {boolean} [bAllowRemoval]
-	 *   Allows to remove the context
+	 *   Allows to remove the context, see {@link #refresh} for details
 	 * @returns {Promise<void>}
 	 *   A promise which is resolved without a defined result when the refresh is finished, or
 	 *   rejected with an error if the refresh failed
@@ -1848,10 +1854,10 @@ sap.ui.define([
 		var oPromise;
 
 		_Helper.checkGroupId(sGroupId);
-		if (_Helper.isDataAggregation(this.oBinding.mParameters)) {
-			throw new Error("Cannot refresh " + this + " when using data aggregation");
+		this.oBinding.checkSuspended(); // do it here even if it is contained in #isAggregated
+		if (this.isAggregated()) {
+			throw new Error("Unsupported on aggregated data: " + this);
 		}
-		this.oBinding.checkSuspended();
 		if (this.hasPendingChanges()) {
 			throw new Error("Cannot refresh entity due to pending changes: " + this);
 		}
@@ -2320,6 +2326,7 @@ sap.ui.define([
 	 * <ul>
 	 *   <li> can be used as a binding context,
 	 *   <li> can be used for updating data (see {@link #setProperty}),
+	 *   <li> can be refreshed (see {@link #refresh} and {@link #requestRefresh}),
 	 *   <li> is refreshed when its list binding's
 	 *     {@link sap.ui.model.odata.v4.ODataListBinding#refresh}) is called, and
 	 *   <li> is refreshed when {@link #requestSideEffects}) is called on its list binding's header

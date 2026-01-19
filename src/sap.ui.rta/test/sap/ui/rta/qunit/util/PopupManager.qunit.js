@@ -180,6 +180,12 @@ sap.ui.define([
 
 	QUnit.module("Given RTA instance is initialized", {
 		async beforeEach() {
+			// Set up a custom within area before RTA initialization
+			this.oCustomWithinArea = document.createElement("div");
+			this.oCustomWithinArea.id = "customWithinArea";
+			document.body.appendChild(this.oCustomWithinArea);
+			Popup.setWithinArea(this.oCustomWithinArea);
+
 			// mock RTA instance
 			this.oRta = new RuntimeAuthoring({
 				rootControl: oComp.getAggregation("rootControl")
@@ -571,6 +577,38 @@ sap.ui.define([
 				done();
 			}.bind(this));
 			this.oPopover.openBy(oComponentContainer);
+		});
+
+		QUnit.test("when _onModeChange is called, Popup.setWithinArea is set correctly", function(assert) {
+			const oSetWithinAreaSpy = sandbox.spy(Popup, "setWithinArea");
+			const oRootElement = this.oRta.getRootControlInstance();
+
+			assert.strictEqual(
+				this.oRta.getPopupManager()._oOriginalWithinAreaValue,
+				this.oCustomWithinArea,
+				"then the original within area value is stored"
+			);
+
+			let oEvent = new Event("testevent", this.oRta, { mode: "navigation" });
+			this.oRta.getPopupManager()._onModeChange(oEvent);
+
+			assert.strictEqual(oSetWithinAreaSpy.callCount, 1, "then Popup.setWithinArea was called once");
+			const oExpectedElement = oRootElement.getRootControl ? oRootElement.getRootControl() : oRootElement;
+			assert.strictEqual(
+				oSetWithinAreaSpy.firstCall.args[0],
+				oExpectedElement,
+				"then Popup.setWithinArea was called with the root control element in navigation mode"
+			);
+
+			oEvent = new Event("testevent", this.oRta, { mode: "adaptation" });
+			this.oRta.getPopupManager()._onModeChange(oEvent);
+
+			assert.strictEqual(oSetWithinAreaSpy.callCount, 2, "then Popup.setWithinArea was called twice");
+			assert.strictEqual(
+				oSetWithinAreaSpy.secondCall.args[0],
+				this.oRta.getPopupManager()._oOriginalWithinAreaValue,
+				"then Popup.setWithinArea was called with the original within area value in adaptation mode"
+			);
 		});
 	});
 

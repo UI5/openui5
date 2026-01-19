@@ -147,7 +147,15 @@
 	</Table>
 
 	<m:VBox id="details" visible="{ui>/bBookingID}">
-		<form:SimpleForm columnsL="3" layout="ColumnLayout" title="Booking Details">
+		<form:SimpleForm columnsL="3" layout="ColumnLayout">
+			<form:toolbar>
+				<m:Toolbar>
+					<m:Title text="Booking Details"/>
+					<m:ToolbarSpacer/>
+					<m:Button icon="sap-icon://refresh" tooltip="Refresh"
+						press=".onRefreshBooking"/>
+				</m:Toolbar>
+			</form:toolbar>
 			<m:Label text="Booking"/>
 			<m:Text text="{TravelID} / {BookingID}"/>
 			<m:Label text="Departure"/>
@@ -192,6 +200,8 @@
 				USD,FlightPrice GT 1234&lt;/code>
 			&lt;li> &lt;code>grandTotalAtBottomOnly&lt;/code> - Optional boolean (empty, false, or
 				true) or &lt;code>off&lt;/code> to turn off grand totals
+			&lt;li> &lt;code>groupLevels&lt;/code> - Optional comma separated list of properties to
+				overwrite the default grouping; if empty, grouping is disabled
 			&lt;li> &lt;code>sort&lt;/code> - Comma separated list of UI5-like sorter conditions,
 				for example &lt;code>status,FlightPrice desc&lt;/code>
 			&lt;li> &lt;code>subtotalsAtBottomOnly&lt;/code> - Optional boolean (empty, false, or
