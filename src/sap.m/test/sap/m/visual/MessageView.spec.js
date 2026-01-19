@@ -1,4 +1,4 @@
-/*global describe,it,element,by,takeScreenshot,expect,browser*/
+/*global beforeAll,describe,it,element,by,takeScreenshot,expect,browser,sap_ui_Device:true,sap_ui_core_Element:true*/
 
 describe('sap.m.MessageView', function() {
 	"use strict";
@@ -6,14 +6,28 @@ describe('sap.m.MessageView', function() {
 	var app, compactBtn, overflowBtn,
 		bPhone = null;
 
+	beforeAll(function() {
+		browser.executeScript(function() {
+			return new Promise(function(resolve) {
+				sap.ui.require([
+					"sap/ui/Device",
+					"sap/ui/core/Element"
+				], function(Device, Element) {
+					sap_ui_Device = Device;
+					sap_ui_core_Element = Element;
+					resolve();
+				});
+			});
+		});
+	});
 	it('should load test page', function () {
 		browser.executeScript(function () {
-			app = sap.ui.core.Element.getElementById("split-app");
-			compactBtn = sap.ui.core.Element.getElementById("compactMode");
-			overflowBtn = sap.ui.core.Element.getElementById("overflow-tb")._getOverflowButton();
+			app = sap_ui_core_Element.getElementById("split-app");
+			compactBtn = sap_ui_core_Element.getElementById("compactMode");
+			overflowBtn = sap_ui_core_Element.getElementById("overflow-tb")._getOverflowButton();
 		});
 		browser.executeScript(function () {
-			return sap.ui.Device.system.phone;
+			return sap_ui_Device.system.phone;
 		}).then(function (response) {
 			bPhone = response;
 		});

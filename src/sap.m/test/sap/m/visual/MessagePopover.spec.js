@@ -1,7 +1,20 @@
-/*global describe,it,element,by,takeScreenshot,expect,browser*/
+/*global beforeAll,describe,it,element,by,takeScreenshot,expect,browser,sap_ui_Device:true */
 
 describe("sap.m.MessagePopover", function () {
 	"use strict";
+
+	beforeAll(function() {
+		browser.executeScript(function() {
+			return new Promise(function(resolve) {
+				sap.ui.require([
+					"sap/ui/Device"
+				], function(Device) {
+					sap_ui_Device = Device;
+					resolve();
+				});
+			});
+		});
+	});
 
 	var bPhone = null;
 	var _resolvePopover = function () {
@@ -13,7 +26,7 @@ describe("sap.m.MessagePopover", function () {
 
 	it("should load test page", function () {
 		browser.executeScript(function () {
-			return sap.ui.Device.system.phone;
+			return sap_ui_Device.system.phone;
 		}).then(function (response) {
 			bPhone = response;
 		});
