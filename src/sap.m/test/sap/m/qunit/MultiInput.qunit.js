@@ -3031,6 +3031,25 @@ sap.ui.define([
 		assert.ok(oIndicator.hasClass("sapUiHidden"), "The n-more label is hidden on focusin.");
 	});
 
+	QUnit.test("'bTokenIsAdded' and '_sProposedItemText' should be reset, popover should close on focus out", function (assert) {
+		var	oEventMock = {
+			target : this.multiInput.getDomRef("inner")
+		};
+
+		this.multiInput._bTokenIsAdded = true;
+		this.multiInput._sProposedItemText = "Example typed-ahead value";
+
+		this.multiInput.onfocusin(oEventMock);
+
+		Core.applyChanges();
+
+		assert.equal(this.multiInput._bTokenIsAdded, false, "bTokenIsAdded flag is reset on focusin.");
+
+		this.multiInput.onsapfocusleave(oEventMock);
+
+		assert.strictEqual(this.multiInput._sProposedItemText, null, "Typed-ahead text should be reset");
+	});
+
 	QUnit.test("RenderMode behaviour against different interactions", function (assert) {
 		var oTokenizer = this.multiInput.getAggregation("tokenizer"),
 			oTokenizerSpy;
