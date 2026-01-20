@@ -27,7 +27,6 @@
 
 	.sapMSliderInner .sapMSliderHandle {
 		background: var(--sapSlider_RangeHandleBackground);
-		top: -.6875rem;
 	}
 
 	.sapMSliderInner:not(.sapMSliderInnerDisabled) .sapMSliderHandle {
@@ -44,7 +43,6 @@
 				border: 0.125rem solid var(--sapContent_FocusColor);
 				outline: none;
 				box-shadow: none;
-				top: -.6875rem;
 			}
 		}
 
@@ -53,7 +51,6 @@
 			border: 0.125rem solid var(--sapContent_FocusColor);
 			outline: none;
 			box-shadow: none;
-			top: -.6875rem;
 		}
 	}
 
@@ -67,6 +64,20 @@
 	background-color: var(--sapContent_MeasureIndicatorColor);
 }
 
+.sapMRangeSlider .sapMSliderLabels {
+	width: 100%;
+	position: absolute;
+	top: 2.125rem;
+}
+
+.sapMRangeSlider .sapMSliderTickLabel .sapMSliderLabel {
+	top: 1rem;
+}
+
+.sapMRangeSlider .sapMSliderRangeLabel {
+	padding-top: 0.4375rem;
+}
+
 .sapUiSizeCompact {
 
 	.sapMRangeSlider.sapMSlider .sapMSliderInner:not(.sapMSliderInnerDisabled) .sapMSliderHandle.sapMSliderHandlePressed {
@@ -76,7 +87,6 @@
 			border: 0.125rem solid var(--sapContent_FocusColor);
 			outline: none;
 			box-shadow: none;
-			top: -0.5rem;
 		}
 	}
 
@@ -85,11 +95,6 @@
 		border: 0.125rem solid var(--sapContent_FocusColor);
 		outline: none;
 		box-shadow: none;
-		top: -0.5rem;
-	}
-
-	.sapMRangeSlider.sapMSlider .sapMSliderInner .sapMSliderHandle {
-		top: -0.5rem;
 	}
 
 	.sapMRangeSlider.sapMSlider .sapMSliderInner .sapMSliderHandle:not(.sapMSliderHandlePressed):not(.sapMRangeSlider.sapMSlider .sapMSliderInner:not(.sapMSliderInnerDisabled) .sapMSliderHandle:focus)::after {

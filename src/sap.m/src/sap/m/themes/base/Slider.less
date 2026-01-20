@@ -9,8 +9,9 @@
 @_sap_m_Slider_Height_Compact: 2rem;
 @_sap_m_Slider_Progress: .1875rem;
 @_sap_m_Slider_Progress_Border: 0px;
-@_sap_m_Slider_Top_Bottom_Padding: calc(@_sap_m_Slider_Height - @_sap_m_Slider_Progress - (2 * @_sap_m_Slider_Progress_Border));
-@_sap_m_Slider_Top_Bottom_Padding_Compact: calc(@_sap_m_Slider_Height_Compact - @_sap_m_Slider_Progress - (2 * @_sap_m_Slider_Progress_Border));
+@_sap_m_Slider_Track_Total_Height: @_sap_m_Slider_Progress + (2 * @_sap_m_Slider_Progress_Border);
+@_sap_m_Slider_Top_Bottom_Padding: @_sap_m_Slider_Height - @_sap_m_Slider_Track_Total_Height;
+@_sap_m_Slider_Top_Bottom_Padding_Compact: @_sap_m_Slider_Height_Compact - @_sap_m_Slider_Track_Total_Height;
 
 .sapMSlider {
 	display: inline-block;
@@ -63,8 +64,8 @@
 	list-style: none;
 	position: absolute;
 	top: -0.75rem;
-	left: 0;
-	right: 0;
+	left: -0.0625rem; /* Compensate for border on left */
+	right: -0.0625rem; /* Compensate for border on right */
 	display: flex;
 	height: 1.75rem;
 	z-index: 0;
@@ -122,9 +123,9 @@
 /* slider handle */
 .sapMSliderHandle {
 	margin-left: -1rem;
-	top: -0.875rem;
 	height: 2rem;
 	width: 2rem;
+	top: (@_sap_m_Slider_Track_Total_Height - 2rem ) / 2;
 	direction: ltr;
 	cursor: pointer;
 
@@ -163,7 +164,7 @@
 		height: 1.625rem;
 		width: 1.625rem;
 		margin-left: -0.8125rem;
-		top: -0.75rem;
+		top: (@_sap_m_Slider_Track_Total_Height - 1.625rem ) / 2;
 	}
 
 	.sapMSliderTickmarks {

@@ -83,6 +83,7 @@ sap.ui.define(['./SliderUtilities', "sap/base/i18n/Localization", "sap/ui/core/I
 		oRm.openStart("div", oSlider.getId() + "-progress");
 		this.addProgressIndicatorClass(oRm, oSlider);
 		oRm.style("width", oSlider._sProgressValue);
+		oRm.style("border", oSlider._sProgressValue === "0%" ? "none" : "");
 		oRm.attr("aria-hidden", "true");
 		oRm.openEnd().close("div");
 	};
