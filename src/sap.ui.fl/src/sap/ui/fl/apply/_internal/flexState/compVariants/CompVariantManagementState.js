@@ -120,12 +120,14 @@ sap.ui.define([
 		parentDataSelector: oCompEntitiesDataSelector,
 		executeFunction(aFlexObjects, mPropertyBag) {
 			return aFlexObjects.filter((oFlexObject) =>
-				(oFlexObject.getPersistencyKey?.() || oFlexObject.getSelector?.().persistencyKey) === mPropertyBag.persistencyKey
+				oFlexObject.getPersistencyKey?.() === mPropertyBag.persistencyKey ||
+				oFlexObject.getSelector?.().persistencyKey === mPropertyBag.persistencyKey
 			);
 		},
 		checkInvalidation(mParameters, oUpdateInfo) {
 			const oFlexObject = oUpdateInfo.updatedObject;
-			return (oFlexObject?.getPersistencyKey?.() || oFlexObject.getSelector?.().persistencyKey) === mParameters.persistencyKey;
+			return oFlexObject.getPersistencyKey?.() === mParameters.persistencyKey ||
+				oFlexObject.getSelector?.().persistencyKey === mParameters.persistencyKey;
 		}
 	});
 

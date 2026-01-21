@@ -146,8 +146,12 @@ sap.ui.define([
 				layer: Layer.CUSTOMER
 			});
 			stubFlexObjectsSelector([oSetDefaultChange1]);
+			// making sure the getDefaultChanges DataSelector is properly handling an empty String as persistency key
 			assert.deepEqual(CompVariantManagementState.getDefaultChanges(
-				{reference: "myApp", persistencyKey: sPersistencyKey}), [oSetDefaultChange1], "the set default change gets returned");
+				{ reference: "myApp", persistencyKey: sPersistencyKey }), [oSetDefaultChange1], "the set default change gets returned from getDefaultChanges");
+			// making sure the getCompEntitiesByPersistencyKey DataSelector is properly handling an empty String as persistency key
+			assert.deepEqual(CompVariantManagementState.getCompEntitiesByPersistencyKey(
+				{ reference: "myApp", persistencyKey: sPersistencyKey }), [oSetDefaultChange1], "the set default change gets returned from getCompEntitiesByPersistencyKey");
 		});
 	});
 
