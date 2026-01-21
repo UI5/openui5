@@ -751,6 +751,25 @@ sap.ui.define([
 	};
 
 	/**
+	 * Cloning a View is not supported and will throw an Error.
+	 *
+	 * Views should not be cloned or used as binding templates. Instead, create new instances
+	 * using the appropriate View factory method such as {@link sap.ui.core.mvc.XMLView.create}.
+	 *
+	 * @param {string} [sIdSuffix] Suffix to be appended to the cloned element ID
+	 * @param {string[]} [aLocalIds] Array of local IDs within the cloned hierarchy (internally used)
+	 * @returns {this} Reference to the newly created clone
+	 *
+	 * @throws {Error} Always throws - cloning Views is not supported
+	 * @public
+	 * @deprecated As of version 1.120. Use the corresponding View factory instead, e.g. {@link sap.ui.core.mvc.XMLView.create}
+	 * @ui5-not-supported
+	 */
+	View.prototype.clone = function(sIdSuffix, aLocalIds) {
+		throw new Error("Cloning a View and/or using a View as a binding template is not supported. Please call the corresponding View factory instead, e.g. XMLView.create()");
+	};
+
+	/**
 	 * Returns the preprocessors for this view instance.
 	 *
 	 * @returns {Object<string,sap.ui.core.mvc.View.Preprocessor[]>} A map containing the view preprocessors, keyed by their type
