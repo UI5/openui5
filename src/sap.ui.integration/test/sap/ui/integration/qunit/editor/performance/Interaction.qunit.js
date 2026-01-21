@@ -184,7 +184,6 @@ sap.ui.define([
 		}
 	};
 
-	Localization.setLanguage("en");
 	document.body.className = document.body.className + " sapUiSizeCompact ";
 
 	QUnit.module("Values via online request (Mock)", {
@@ -897,7 +896,7 @@ sap.ui.define([
 			return new Promise(function (resolve, reject) {
 				var start = new Date();
 				var time = 0;
-				that.oEditor = EditorQunitUtils.createEditor("en");
+				that.oEditor = EditorQunitUtils.createEditor();
 				that.oEditor.setMode("admin");
 				that.oEditor.setAllowSettings(true);
 				that.oEditor.setAllowDynamicValues(true);

@@ -1035,6 +1035,40 @@ sap.ui.define([
 		},
 
 		/**
+		 * Returns the property metadata for a filter which has an alias as path. The EDM type is
+		 * determined either based on the filter value's type (number, boolean, null) or falls back
+		 * to the alias' original property type.
+		 *
+		 * @param {sap.ui.model.Filter} oFilter
+		 *   A filter for which the EDM type should be determined
+		 * @param {object} oAggregation
+		 *   An object holding the information needed for data aggregation; see {@link .buildApply}
+		 * @param {string} sResolvedPath
+		 *   The resolved meta path for <code>oFilter</code>
+		 * @returns {{$Type: string}|undefined}
+		 *   An object containing the determined EDM type; or <code>undefined</code> if no type
+		 *   could be found
+		 *
+		 * @public
+		 */
+		getPropertyMetadataForFilter : function (oFilter, oAggregation, sResolvedPath) {
+			const sAlias = oFilter.getPath();
+			const sOriginalPropertyName = oAggregation?.aggregate?.[sAlias]?.name;
+			if (!sOriginalPropertyName) {
+				return;
+			}
+
+			const vValue = oFilter.getValue1();
+			if (typeof vValue === "number" || vValue === null) { // null: type is irrelevant
+				return {$Type : "Edm.Decimal"};
+			} else if (typeof vValue === "boolean") {
+				return {$Type : "Edm.Boolean"};
+			}
+			const sPath = sResolvedPath.slice(0, -sAlias.length) + sOriginalPropertyName;
+			return oAggregation.$fetchMetadata(sPath).getResult();
+		},
+
+		/**
 		 * Creates the query options for requesting the data (all required $selects for UI) of
 		 * out-of-place nodes. The result is also used to check whether they still have the same
 		 * parent (resp. still are root).

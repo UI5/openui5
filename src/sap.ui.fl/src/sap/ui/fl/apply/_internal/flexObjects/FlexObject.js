@@ -46,6 +46,7 @@ sap.ui.define([
 	 * @property {string} sourceSystem - ABAP source system
 	 * @property {string} sourceClient - ABAP source client
 	 * @property {string} user - Username who created the flex object
+	 * @property {string} userId - cf service local User id who created the flex object
 	 * @property {string} sapui5Version - UI5 version in which the flex object was created
 	 * @property {string} sourceChangeFileName - File name of the source flex object in case of a copied flex object
 	 * @property {string} compositeCommand - Unique ID that defines which flex objects belong together in a composite command
@@ -173,6 +174,7 @@ sap.ui.define([
 			"supportInformation.sourceSystem": "sourceSystem",
 			"supportInformation.sourceClient": "sourceClient",
 			"supportInformation.user": "support.user",
+			"supportInformation.userId": "support.userId",
 			"supportInformation.sapui5Version": "support.sapui5Version",
 			"supportInformation.sourceChangeFileName": "support.sourceChangeFileName",
 			"supportInformation.compositeCommand": "support.compositeCommand",

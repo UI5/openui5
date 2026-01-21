@@ -208,7 +208,7 @@ sap.ui.define([
 		QUnit.test("does not store the default executeOnSelection and favorite and contexts", function(assert) {
 			var sPersistencyKey = "persistency.key";
 			sandbox.stub(Utils, "createDefaultFileName").returns("someFileName");
-			sandbox.stub(Settings.getInstanceOrUndef(), "getUserId").returns("currentUser");
+			sandbox.stub(Settings.getInstanceOrUndef(), "getUser").returns("currentUser");
 			var mPropertyBag = {
 				reference: sComponentId,
 				componentId: sComponentId,
@@ -244,7 +244,7 @@ sap.ui.define([
 
 		QUnit.test("also stores passed executeOnSelection, favorite, contexts and author", function(assert) {
 			sandbox.stub(Settings, "getInstanceOrUndef").returns({
-				getUserId() {return "test user";},
+				getUser() {return "test user";},
 				getIsPublicLayerAvailable() {return false;}
 			});
 			var sPersistencyKey = "persistency.key";
@@ -289,7 +289,7 @@ sap.ui.define([
 
 		QUnit.test("two variants as CUSTOMER and first variant don't save content of second but keep his own", function(assert) {
 			const sPersistencyKey = "persistency.key";
-			sandbox.stub(Settings.getInstanceOrUndef(), "getUserId").returns("currentUser");
+			sandbox.stub(Settings.getInstanceOrUndef(), "getUser").returns("currentUser");
 			const mPropertyBag = {
 				reference: sComponentId,
 				componentId: sComponentId,
@@ -373,7 +373,7 @@ sap.ui.define([
 
 		QUnit.test("one VENDOR variant and an update in the CUSTOMER layer", function(assert) {
 			const sPersistencyKey = "persistency.key";
-			sandbox.stub(Settings.getInstanceOrUndef(), "getUserId").returns("currentUser");
+			sandbox.stub(Settings.getInstanceOrUndef(), "getUser").returns("currentUser");
 			const oVendorView = CompVariantManager.addVariant({
 				reference: sComponentId,
 				componentId: sComponentId,
@@ -1157,7 +1157,7 @@ sap.ui.define([
 				componentId: sComponentId
 			});
 			sandbox.stub(Settings, "getInstanceOrUndef").returns({
-				getUserId() {return "test user";},
+				getUser() {return "test user";},
 				isPublicLayerAvailable() {return false;}
 			});
 			this.sPersistencyKey = "persistency.key";

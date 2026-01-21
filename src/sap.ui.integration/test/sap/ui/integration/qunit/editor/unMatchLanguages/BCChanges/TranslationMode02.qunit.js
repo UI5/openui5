@@ -21,7 +21,6 @@ sap.ui.define([
 
 	var sBaseUrl = "test-resources/sap/ui/integration/qunit/editor/jsons/withDesigntime/sap.card/";
 
-	Localization.setLanguage("en");
 	document.body.className = document.body.className + " sapUiSizeCompact ";
 
 	var _oTextsWithBCChangeOfString1 = {
@@ -199,7 +198,6 @@ sap.ui.define([
 			},
 			afterEach: function () {
 				EditorQunitUtils.afterEachTest(this.oEditor, sandbox);
-				Localization.setLanguage("en");
 			}
 		}, function () {
 			Object.keys(oEditorLanguages).forEach(function(sEditorLanguage) {

@@ -43,7 +43,6 @@ sap.ui.define([
 
 	var sBaseUrl = "test-resources/sap/ui/integration/qunit/editor/jsons/withDesigntime/sap.card/";
 
-	Localization.setLanguage("en");
 	document.body.className = document.body.className + " sapUiSizeCompact ";
 
 	QUnit.module("Lazy loading", {
@@ -308,7 +307,6 @@ sap.ui.define([
 
 	QUnit.module("Defined in DT", {
 		beforeEach: function () {
-			Localization.setLanguage("en");
 			this.oEditor = EditorQunitUtils.beforeEachTest();
 		},
 		afterEach: function () {
@@ -549,7 +547,6 @@ sap.ui.define([
 
 	QUnit.module("Position start", {
 		beforeEach: function () {
-			Localization.setLanguage("en");
 			this.oEditor = EditorQunitUtils.beforeEachTest();
 		},
 		afterEach: function () {
@@ -1351,7 +1348,6 @@ sap.ui.define([
 
 	QUnit.module("Sorter", {
 		beforeEach: function () {
-			Localization.setLanguage("en");
 			this.oEditor = EditorQunitUtils.beforeEachTest();
 		},
 		afterEach: function () {
@@ -1502,7 +1498,6 @@ sap.ui.define([
 
 	QUnit.module("Filter", {
 		beforeEach: function () {
-			Localization.setLanguage("en");
 			this.oEditor = EditorQunitUtils.beforeEachTest();
 		},
 		afterEach: function () {

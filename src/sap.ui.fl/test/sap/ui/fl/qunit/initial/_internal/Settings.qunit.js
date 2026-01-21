@@ -50,7 +50,18 @@ sap.ui.define([
 			assert.ok(Settings.getInstanceOrUndef(), "then the settings instance is available");
 		});
 
-		QUnit.test("retrieveUserId with logonUser", async function(assert) {
+		QUnit.test("retrieve userId with localUserid", async function(assert) {
+			this.oLoadFeaturesStub.restore();
+			this.oLoadFeaturesStub = sandbox.stub(Storage, "loadFeatures").resolves({
+				localUserId: "testUserId123"
+			});
+			sandbox.stub(Utils, "getUshellContainer");
+			const oSettings = await Settings.getInstance();
+			assert.strictEqual(oSettings.getUser(), "", "then the user name is not set");
+			assert.strictEqual(oSettings.getUserId(), "testUserId123", "then the cf user id is available");
+		});
+
+		QUnit.test("retrieve User with logonUser", async function(assert) {
 			this.oLoadFeaturesStub.restore();
 			this.oLoadFeaturesStub = sandbox.stub(Storage, "loadFeatures").resolves({
 				logonUser: "testUser"
@@ -58,10 +69,11 @@ sap.ui.define([
 			sandbox.stub(Utils, "getUshellContainer");
 			const oSettings = await Settings.getInstance();
 			assert.strictEqual(Utils.getUshellContainer.callCount, 0, "then the ushell container is not called");
-			assert.strictEqual(oSettings.getUserId(), "testUser", "then the user id is available");
+			assert.strictEqual(oSettings.getUser(), "testUser", "then the user name is available");
+			assert.strictEqual(oSettings.getUserId(), oSettings.getUser(), "then the cf user id is not available");
 		});
 
-		QUnit.test("retrieveUserId without logonUser but with ushell container", async function(assert) {
+		QUnit.test("retrieveUser without logonUser but with ushell container", async function(assert) {
 			sandbox.stub(Utils, "getUshellContainer").returns(true);
 			sandbox.stub(Utils, "getUShellService").resolves({
 				getUser: () => ({
@@ -69,15 +81,15 @@ sap.ui.define([
 				})
 			});
 			const oSettings = await Settings.getInstance();
-			assert.strictEqual(oSettings.getUserId(), "testUser", "then the user id is available");
+			assert.strictEqual(oSettings.getUser(), "testUser", "then the user id is available");
 		});
 
-		QUnit.test("retrieveUserId without logonUser and with ushell throwing an error", async function(assert) {
+		QUnit.test("retrieveUser without logonUser and with ushell throwing an error", async function(assert) {
 			sandbox.stub(Utils, "getUshellContainer").returns(true);
 			sandbox.stub(Log, "error");
 			sandbox.stub(Utils, "getUShellService").rejects("fancyError");
 			const oSettings = await Settings.getInstance();
-			assert.strictEqual(oSettings.getUserId(), "", "then the user id is not available");
+			assert.strictEqual(oSettings.getUser(), "", "then the user id is not available");
 			assert.strictEqual(Log.error.callCount, 1, "then the error is logged");
 		});
 

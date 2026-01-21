@@ -39,7 +39,6 @@ sap.ui.define([
 
 	var sBaseUrl = "test-resources/sap/ui/integration/qunit/editor/jsons/withDesigntime/sap.card/";
 
-	Localization.setLanguage("en");
 	document.body.className = document.body.className + " sapUiSizeCompact ";
 
 	QUnit.module("Check settings UI for Admin", {
@@ -1873,7 +1872,6 @@ sap.ui.define([
 
 	QUnit.module("Transform to a variant for Page Admin", {
 		beforeEach: function () {
-			Localization.setLanguage("en");
 			this.oEditor = EditorQunitUtils.beforeEachTest();
 			this.oEditor.setAllowSettings(true);
 		},

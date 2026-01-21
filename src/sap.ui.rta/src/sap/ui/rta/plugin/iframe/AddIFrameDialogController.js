@@ -2,9 +2,9 @@
  * ${copyright}
  */
 sap.ui.define([
+	"sap/base/util/Deferred",
 	"sap/base/Log",
 	"sap/m/Token",
-	"sap/ui/base/BindingParser",
 	"sap/ui/core/mvc/Controller",
 	"sap/ui/core/Element",
 	"sap/ui/core/Lib",
@@ -15,9 +15,9 @@ sap.ui.define([
 	"sap/ui/rta/plugin/iframe/urlCleaner",
 	"sap/ui/rta/util/validateText"
 ], function(
+	Deferred,
 	Log,
 	Token,
-	BindingParser,
 	Controller,
 	Element,
 	Lib,
@@ -72,13 +72,7 @@ sap.ui.define([
 		},
 
 		onBeforeOpen() {
-			if (this._buildPreviewURL()) {
-				// If a URL is set initially (updateIframe), validate it
-				this.onValidateUrl();
-			} else {
-				// Disable the save button but don't show an error message
-				this._checkIfAllFieldsValid(false);
-			}
+			this._oJSONModel.setProperty("/initialFrameUrl/value", this._oJSONModel.getProperty("/frameUrl/value"));
 			// Configure the MultiInput field
 			// This syntax is the suggested way by the UI5 documentation to trigger a submit on the input field on focus loss
 			const oMultiInput = Element.getElementById("sapUiRtaAddIFrameDialog_AddAdditionalParametersInput");
@@ -86,6 +80,7 @@ sap.ui.define([
 		},
 
 		onSwitchChange() {
+			this._checkIfAllFieldsValid(true);
 			this._oJSONModel.setProperty("/settingsUpdate/value", true);
 		},
 
@@ -110,6 +105,7 @@ sap.ui.define([
 
 			this._oJSONModel.setProperty("/advancedSettings/value/additionalSandboxParameters", aSandboxParameters);
 			this._oJSONModel.setProperty("/settingsUpdate/value", true);
+			this._checkIfAllFieldsValid(true);
 		},
 
 		/**
@@ -134,8 +130,8 @@ sap.ui.define([
 		/**
 		 * Event handler for save button
 		 */
-		onSavePress() {
-			const sUrl = this._buildPreviewURL();
+		async onSavePress() {
+			const sUrl = await this._buildPreviewURL();
 			if (isValidUrl(sUrl).result && this._areAllTextFieldsValid() && this._areAllValueStateNones()) {
 				this._close(this._buildReturnedSettings());
 			} else {
@@ -146,9 +142,9 @@ sap.ui.define([
 		/**
 		 * Event handler for Show Preview button
 		 */
-		onPreviewPress() {
+		async onPreviewPress() {
 			const sReturnedURL = this._buildReturnedURL();
-			const sURL = this._buildPreviewURL();
+			const sURL = await this._buildPreviewURL();
 
 			if (!isValidUrl(sURL).result) {
 				return;
@@ -210,6 +206,7 @@ sap.ui.define([
 			// Extract "/frameWidth" or "/frameHeight" from the binding path (e.g. /frameWidth/value)
 			const sPropertyName = sPropertyPath.replace(/\/value$/, "");
 			setNewPreviewSize.call(this, sPropertyName);
+			this._checkIfAllFieldsValid(true);
 		},
 
 		/**
@@ -224,6 +221,7 @@ sap.ui.define([
 			// Extract "/frameWidth" or "/frameHeight" from the binding path (e.g. /frameWidthUnit/value)
 			const sPropertyName = sPropertyPath.replace(/Unit\/value$/, "");
 			setNewPreviewSize.call(this, sPropertyName);
+			this._checkIfAllFieldsValid(true);
 		},
 
 		/**
@@ -232,6 +230,7 @@ sap.ui.define([
 		 * @private
 		 */
 		_buildPreviewURL() {
+			const oValidationPromise = new Deferred();
 			const sUrl = this._buildReturnedURL();
 			const oResolver = Element.getElementById("sapUiRtaAddIFrameDialog_PreviewLinkResolver");
 			try {
@@ -241,17 +240,24 @@ sap.ui.define([
 				// value is a plain string, which can then lead to problems with two-way bindings
 				// where the new plain value would leak back into the model
 				// In this case the old binding has to be cleaned up explicitly
-				if (!BindingParser.complexParser(sUrl)) {
-					oResolver.unbindProperty("text");
-				}
+				oResolver.unbindProperty("text");
 
 				oResolver.applySettings({
 					text: sUrl
 				});
+				const oBinding = oResolver.getBinding("text");
+				if (oBinding?.isA("sap.ui.model.odata.v4.ODataPropertyBinding")) {
+					// V4 bindings are asynchronous, so we need to wait for the change event
+					oBinding.attachEventOnce("change", () => {
+						oValidationPromise.resolve(oResolver.getText());
+					});
+				} else {
+					oValidationPromise.resolve(oResolver.getText());
+				}
 			} catch (err) {
 				return undefined;
 			}
-			return oResolver.getText();
+			return oValidationPromise.promise;
 		},
 
 		/**
@@ -291,6 +297,12 @@ sap.ui.define([
 			return urlCleaner(this._oJSONModel.getProperty("/frameUrl/value"));
 		},
 
+		/**
+		 * Triggers the validation of all fields and updates the "areAllFieldsValid" property in the model
+		 * This property is also used to enable/disable the Save button, hence the check must be called after every update on the dialog
+		 *
+		 * @param {boolean} bExternalValidationSuccess - Whether external validation was successful
+		 */
 		_checkIfAllFieldsValid(bExternalValidationSuccess) {
 			const bAllFieldsValid = (
 				bExternalValidationSuccess
@@ -301,8 +313,8 @@ sap.ui.define([
 			this._oJSONModel.setProperty("/areAllFieldsValid", bAllFieldsValid);
 		},
 
-		onValidateUrl() {
-			const sUrl = this._buildPreviewURL();
+		async onValidateUrl() {
+			const sUrl = await this._buildPreviewURL();
 			const { result: bResult, error: sError } = isValidUrl(sUrl);
 			if (bResult) {
 				this._oJSONModel.setProperty("/frameUrlError/value", "");

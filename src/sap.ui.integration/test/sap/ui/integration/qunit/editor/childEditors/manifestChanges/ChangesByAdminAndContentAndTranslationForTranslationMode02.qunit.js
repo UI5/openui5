@@ -26,7 +26,6 @@ sap.ui.define([
 
 	var sBaseUrl = "test-resources/sap/ui/integration/qunit/editor/jsons/withDesigntime/sap.card/childEditors/";
 
-	Localization.setLanguage("en");
 	document.body.className = document.body.className + " sapUiSizeCompact ";
 
 	var _aCoreLanguages = [
@@ -268,14 +267,6 @@ sap.ui.define([
 		}
 	};
 
-	function destroyEditor(oEditor) {
-		oEditor.destroy();
-		var oContent = document.getElementById("content");
-		if (oContent) {
-			oContent.innerHTML = "";
-			document.body.style.zIndex = "unset";
-		}
-	}
 
 	QUnit.module("translation mode", {
 		before: function () {
@@ -469,7 +460,7 @@ sap.ui.define([
 															":layer": 10
 														}, "Editor settings are OK");
 
-														destroyEditor(that.oEditor);
+														EditorQunitUtils.destroyEditor(that.oEditor);
 														resolve();
 													});
 												});

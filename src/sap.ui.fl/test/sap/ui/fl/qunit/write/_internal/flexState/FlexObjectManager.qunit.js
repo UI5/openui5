@@ -176,7 +176,7 @@ sap.ui.define([
 				getIsPublicLayerAvailable() {
 					return true;
 				},
-				getUserId() {
+				getUser() {
 					return "USER_ID";
 				}
 			});
@@ -371,7 +371,7 @@ sap.ui.define([
 				getIsPublicLayerAvailable() {
 					return true;
 				},
-				getUserId() {
+				getUser() {
 					return "USER_ID";
 				}
 			});

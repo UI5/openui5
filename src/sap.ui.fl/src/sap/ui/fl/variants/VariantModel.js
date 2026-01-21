@@ -18,6 +18,7 @@ sap.ui.define([
 	"sap/ui/fl/apply/_internal/flexState/changes/DependencyHandler",
 	"sap/ui/fl/apply/_internal/flexState/controlVariants/VariantManagementState",
 	"sap/ui/fl/apply/_internal/flexState/FlexObjectState",
+	"sap/ui/fl/apply/_internal/flexObjects/Variant",
 	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/initial/_internal/Settings",
 	"sap/ui/fl/Layer",
@@ -41,6 +42,7 @@ sap.ui.define([
 	DependencyHandler,
 	VariantManagementState,
 	FlexObjectState,
+	Variant,
 	ManifestUtils,
 	Settings,
 	Layer,
@@ -76,10 +78,7 @@ sap.ui.define([
 	function updatePublicVariantPropertiesWithSettings(oVariant) {
 		var oSettings = Settings.getInstanceOrUndef();
 		var bUserIsAuthorized = oSettings &&
-			(oSettings.getIsKeyUser() || !oSettings.getUserId() ||
-			(oSettings.getIsPublicFlVariantEnabled() &&
-				oSettings.getUserId().toUpperCase() === oVariant.instance.getSupportInformation().user.toUpperCase()
-			));
+			(oSettings.getIsKeyUser() || (oSettings.getIsPublicFlVariantEnabled() && oVariant.instance.isUserAuthor()));
 		oVariant.remove = bUserIsAuthorized;
 		oVariant.rename = bUserIsAuthorized;
 		oVariant.change = bUserIsAuthorized;

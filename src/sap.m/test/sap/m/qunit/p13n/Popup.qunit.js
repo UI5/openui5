@@ -210,6 +210,39 @@ sap.ui.define([
 		assert.ok(bIsCompact, "The compact style class has been propagated to the Popup");
 	});
 
+	QUnit.test("Check 'onBeforeClose'", function(assert) {
+
+		const oCustomSelectionPanel = new SelectionPanel({
+			title: "My SelectionPanel"
+		});
+		oCustomSelectionPanel.onBeforeClose = function() { // fake onBeforeClose implementation
+			return Promise.resolve();
+		};
+		sinon.spy(oCustomSelectionPanel, "onBeforeClose");
+		const oCustomSortPanel = new SortPanel({
+			title: "My SortPanel"
+		});
+
+		const sSelectionPanelKey = "customSelection";
+		const sSortPanelKey = "customSort";
+
+		this.oPopup.addPanel(oCustomSelectionPanel, sSelectionPanelKey);
+		this.oPopup.addPanel(oCustomSortPanel, sSortPanelKey);
+
+		//Check OK
+		this.oPopup.open(this.oSource);
+		this.oPopup._oPopup.getButtons()[0].firePress();
+		assert.ok(oCustomSelectionPanel.onBeforeClose.calledOnce, "onBeforeClose called once for Ok");
+		assert.ok(oCustomSelectionPanel.onBeforeClose.calledWith("Ok"), "onBeforeClose called with Reason 'Ok'");
+
+		//Check Cancel
+		oCustomSelectionPanel.onBeforeClose.reset();
+		this.oPopup.open(this.oSource);
+		this.oPopup._oPopup.getButtons()[1].firePress();
+		assert.ok(oCustomSelectionPanel.onBeforeClose.calledOnce, "onBeforeClose called once for Cancel");
+		assert.ok(oCustomSelectionPanel.onBeforeClose.calledWith("Cancel"), "onBeforeClose called with Reason 'Cancel'");
+	});
+
 	QUnit.module("p13n.Popup check events & parameters", {
 		beforeEach: async function() {
 			var oPopup = new P13nPopup();

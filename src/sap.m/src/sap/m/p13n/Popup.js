@@ -556,9 +556,20 @@ sap.ui.define([
 	 * @private
 	 * @ui5-restricted sap.ui.mdc
 	 */
-	Popup.prototype._onClose = function(oContainer, sReason) {
+	Popup.prototype._onClose = async function(oContainer, sReason) {
 		if (!oContainer && !this._oPopup) {
 			return;
+		}
+
+		const aPanels = this.getPanels();
+		const aPromises = [];
+		aPanels.forEach((oPanel) => {
+			if (oPanel.onBeforeClose instanceof Function) {
+				aPromises.push(oPanel.onBeforeClose(sReason));
+			}
+		});
+		if (aPromises.length > 0) {
+			await Promise.all(aPromises);
 		}
 
 		(oContainer || this._oPopup).close();

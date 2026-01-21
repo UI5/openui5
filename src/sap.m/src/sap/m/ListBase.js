@@ -1721,6 +1721,26 @@ function(
 		}
 	};
 
+	ListBase.prototype._getSelectionCount = function() {
+		const oBinding = this.getBinding("items");
+		if (oBinding && this.getRememberSelections()) {
+			if (oBinding.getSelectionCount) {
+				return oBinding.getSelectionCount();
+			}
+			if (this._aSelectedPaths.length) {
+				const oModel = oBinding.getModel();
+				if (oModel.hasContext) {
+					return this._aSelectedPaths.filter((sPath) => oModel.hasContext(sPath)).length;
+				}
+				if (oModel.getContext) {
+					return this._aSelectedPaths.filter((sPath) => oModel.getContext(sPath).getObject()).length;
+				}
+			}
+		}
+
+		return this.getSelectedItems().length;
+	};
+
 	ListBase.prototype._destroyGrowingDelegate = function() {
 		if (this._oGrowingDelegate) {
 			this._oGrowingDelegate.destroy();

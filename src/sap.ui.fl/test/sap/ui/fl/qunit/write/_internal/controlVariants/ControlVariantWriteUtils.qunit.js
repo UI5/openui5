@@ -98,7 +98,7 @@ sap.ui.define([
 			sandbox.stub(Settings, "getInstanceOrUndef").callsFake(() => {
 				return {
 					getIsCondensingEnabled: () => true,
-					getUserId: () => "testUser"
+					getUser: () => "testUser"
 				};
 			});
 			const sReference = "appReference";
@@ -137,7 +137,7 @@ sap.ui.define([
 			sandbox.stub(Settings, "getInstanceOrUndef").callsFake(() => {
 				return {
 					getIsCondensingEnabled: () => false,
-					getUserId: () => "testUser"
+					getUser: () => "testUser"
 				};
 			});
 			const sReference = "appReference";

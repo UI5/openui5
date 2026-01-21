@@ -2297,14 +2297,24 @@ sap.ui.define([
 					AnnotationHelper : `sap/ui/model/odata/AnnotationHelper`
 				}, this),
 				`<Text id="first" text="{formatter: 'MyHelper.bar', path: '/flag'}"/>`,
+				// a leading dot in front of a required resource is ignored
+				`<Text id="second" text="{formatter: '.MyHelper.bar', path: '/flag'}"/>`,
 				`<Fragment fragmentName="innerFragment" type="XML"/>`,
 				`<In id="last"/>`,
 				`</FragmentDefinition>`
 			];
 
 			this.expectLoad(true, `myFragment`, xml(assert, aFragmentContent));
-			this.expectLoad(true, `innerFragment`,
-				xml(assert, [`<In xmlns="sap.ui.core" id="inner"/>`]));
+			const aInnerFragmentContent = [
+				`<FragmentDefinition xmlns="sap.ui.core">`,
+				`<In id="inner"/>`,
+				// template:require for MyHelper is inherited
+				`<Text id="third" text="{formatter: 'MyHelper.bar', path: '/flag'}"/>`,
+				// a leading dot in front of an inherited required resource is ignored
+				`<Text id="fourth" text="{formatter: '.MyHelper.bar', path: '/flag'}"/>`,
+				`</FragmentDefinition>`
+			];
+			this.expectLoad(true, `innerFragment`, xml(assert, aInnerFragmentContent));
 			this.expectLoad(true, `yetAnotherFragment`,
 				xml(assert, [`<In xmlns="sap.ui.core" id="yetAnother"/>`]));
 
@@ -2312,7 +2322,10 @@ sap.ui.define([
 				{m : `[ 0] Start processing qux`},
 				{m : `[ 1] fragmentName = myFragment`, d : 1},
 				{m : `[ 1] text = *true*`, d : aFragmentContent[1]},
-				{m : `[ 2] fragmentName = innerFragment`, d : aFragmentContent[2]},
+				{m : `[ 1] text = *true*`, d : aFragmentContent[2]},
+				{m : `[ 2] fragmentName = innerFragment`, d : aFragmentContent[3]},
+				{m : `[ 2] text = *true*`, d : aInnerFragmentContent[2]},
+				{m : `[ 2] text = *true*`, d : aInnerFragmentContent[3]},
 				{m : `[ 2] Finished`, d : `</Fragment>`},
 				{m : `[ 1] Finished`, d : `</Fragment>`},
 				{m : `[ 1] fragmentName = yetAnotherFragment`, d : 2},
@@ -2327,7 +2340,10 @@ sap.ui.define([
 				models : new JSONModel({flag : true})
 			}, [
 				`<Text id="first" text="*true*"/>`,
+				`<Text id="second" text="*true*"/>`,
 				`<In id="inner"/>`,
+				`<Text id="third" text="*true*"/>`,
+				`<Text id="fourth" text="*true*"/>`,
 				`<In id="last"/>`,
 				`<In id="yetAnother"/>`
 			], true);
@@ -2763,13 +2779,13 @@ sap.ui.define([
 				`<Label text="{formatter: '.foo', path: '/'}"/>`,
 				`<template:alias name=".foo" value="Helper.foo">`,
 					`<Text text="{formatter: '.foo', path: '/'}"/>`,
-					// redefine existing alias
-					`<template:alias name=".foo" value="Helper.bar">`,
+					// redefine existing alias - name doesn't need to start with a dot
+					`<template:alias name="foo" value="Helper.bar">`,
 						`<Text text="{formatter: '.foo', path: '/'}"/>`,
 						`<Label text="{formatter: 'Helper.checkScope', path: '/'}"/>`,
 					`</template:alias>`,
-					// old value must be used again
-					`<Text text="{formatter: '.foo', path: '/'}"/>`,
+					// old value must be used again - alias usage doesn't need to start with a dot
+					`<Text text="{formatter: 'foo', path: '/'}"/>`,
 				`</template:alias>`,
 				// <template:repeat> uses scope
 				`<template:repeat list="{path: '/', factory: '.bar'}"/>`,

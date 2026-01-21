@@ -74,16 +74,23 @@ sap.ui.define([
 			frameHeightUnit: {
 				value: "vh"
 			},
+			// The URL entered by the user (without resolving bindings)
 			frameUrl: {
 				value: "",
 				valueState: ValueState.None
 			},
+			// URL value when the dialog was opened (without resolving bindings), to detect changes for update
+			initialFrameUrl: {
+				value: ""
+			},
+			// URL value when the last preview was generated (with resolved bindings), to control the preview button state
 			previousFrameUrl: {
 				value: ""
 			},
 			frameUrlError: {
 				value: undefined
 			},
+			// URL used for the iframe preview (with resolved bindings)
 			previewUrl: { value: "" },
 			parameters: { value: [] },
 			unitsOfWidthMeasure: [{

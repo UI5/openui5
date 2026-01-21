@@ -26,7 +26,6 @@ sap.ui.define([
 
 	var sBaseUrl = "test-resources/sap/ui/integration/qunit/editor/jsons/withDesigntime/sap.card/childEditors/";
 
-	Localization.setLanguage("en");
 	document.body.className = document.body.className + " sapUiSizeCompact ";
 
 	var _aCheckedLanguages = [
@@ -246,14 +245,6 @@ sap.ui.define([
 		}
 	};
 
-	function destroyEditor(oEditor) {
-		oEditor.destroy();
-		var oContent = document.getElementById("content");
-		if (oContent) {
-			oContent.innerHTML = "";
-			document.body.style.zIndex = "unset";
-		}
-	}
 
 	QUnit.module("main -> child1 -> child1-1 -> child1-2", {
 		before: function () {
@@ -740,7 +731,7 @@ sap.ui.define([
 																	oCancelButton1.firePress();
 
 																	await nextUIUpdate();
-																	destroyEditor(that.oEditor);
+																	EditorQunitUtils.destroyEditor(that.oEditor);
 																	resolve();
 																});
 																oValueHelpIconOfTitle.firePress();
@@ -1075,7 +1066,7 @@ sap.ui.define([
 														oCancelButton1 = oTranslationPopover1.getFooter().getContent()[2];
 														oCancelButton1.firePress();
 
-														destroyEditor(that.oEditor);
+														EditorQunitUtils.destroyEditor(that.oEditor);
 														resolve();
 													});
 													oValueHelpIconOfTitle.firePress();

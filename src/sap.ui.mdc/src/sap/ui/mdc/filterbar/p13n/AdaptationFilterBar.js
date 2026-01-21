@@ -654,6 +654,29 @@ sap.ui.define([
 		return this._bUseNewUI;
 	};
 
+	AdaptationFilterBar.prototype.onBeforeClose = function(sReason) {
+		if (sReason !== "Ok") {
+			return Promise.resolve();
+		}
+
+		// clear filters with error state
+		const aKeys = [];
+		this.getFilterItems().forEach((oFilterField) => {
+			if (oFilterField.getValueState() === ValueState.Error && oFilterField.getValueStateText() !== this._getRequiredFilterFieldValueText(oFilterField)) {
+				aKeys.push(oFilterField.getPropertyKey());
+			}
+		});
+		if (aKeys.length > 0) {
+			const oConditionModel = this._getConditionModel();
+			aKeys.forEach((sKey) => {
+				oConditionModel.removeAllConditions(sKey);
+			});
+			return this._getWaitForChangesPromise(); // wait for changes to be applied
+		} else {
+			return Promise.resolve();
+		}
+	};
+
 	AdaptationFilterBar.prototype.exit = function() {
 		this.getEngine().defaultProviderRegistry.detach(this);
 		FilterBarBase.prototype.exit.apply(this, arguments);

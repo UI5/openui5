@@ -19,23 +19,23 @@
 	}
 
 	&.sapUiIntLCIOneLine .sapUiIntLCIIconAndLines {
-		height: calc(2.75rem ~"-" @_sap_ui_integration_ListContentItem_BottomBorderHeight);
+		min-height: calc(2.75rem ~"-" @_sap_ui_integration_ListContentItem_BottomBorderHeight);
 		align-items: center;
 	}
 
 	&.sapUiIntLCIOneLine.sapUiIntLCIWithActionsStrip .sapUiIntLCIIconAndLines {
-		height: 2.75rem;
+		min-height: 2.75rem;
 	}
 
 	&.sapUiIntLCITwoLines .sapUiIntLCIIconAndLines,
 	&.sapUiIntLCIOneLine.sapUiIntLCIThumbnail .sapUiIntLCIIconAndLines {
-		height: calc(5rem ~"-" @_sap_ui_integration_ListContentItem_BottomBorderHeight);
+		min-height: calc(5rem ~"-" @_sap_ui_integration_ListContentItem_BottomBorderHeight);
 		align-items: center;
 	}
 
 	&.sapUiIntLCITwoLines.sapUiIntLCIWithActionsStrip .sapUiIntLCIIconAndLines,
 	&.sapUiIntLCIOneLine.sapUiIntLCIThumbnail.sapUiIntLCIWithActionsStrip .sapUiIntLCIIconAndLines {
-		height: 5rem;
+		min-height: 5rem;
 	}
 
 	&.sapUiIntLCIMultipleLines {
@@ -157,14 +157,14 @@
 .sapUiSizeCompact .sapUiIntLCI {
 
 	&.sapUiIntLCIOneLine .sapUiIntLCIIconAndLines {
-		height: calc(2rem ~"-" @_sap_ui_integration_ListContentItem_BottomBorderHeight);
+		min-height: calc(2rem ~"-" @_sap_ui_integration_ListContentItem_BottomBorderHeight);
 	}
 
 	&.sapUiIntLCIOneLine.sapUiIntLCIWithActionsStrip .sapUiIntLCIIconAndLines {
-		height: 2rem;
+		min-height: 2rem;
 	}
 
 	&.sapUiIntLCIOneLine.sapUiIntLCIThumbnail .sapUiIntLCIIconAndLines {
-		height: 5rem;
+		min-height: 5rem;
 	}
 }

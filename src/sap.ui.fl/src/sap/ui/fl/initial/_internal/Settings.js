@@ -168,7 +168,12 @@ sap.ui.define([
 				systemType: { type: "string" },
 
 				/**
-				 * User Id, only set by the CF service
+				 * Logon user
+				 */
+				user: { type: "string" },
+
+				/**
+				 * ID used to identify the current user
 				 */
 				userId: { type: "string" }
 			}
@@ -202,10 +207,18 @@ sap.ui.define([
 		oLoadSettingsPromise = Storage.loadFeatures(oLayerConfig).then(async function(oLoadedSettings) {
 			const oSettingsProperties = Object.assign({}, oLoadedSettings);
 			if (oSettingsProperties.logonUser) {
-				oSettingsProperties.userId = oSettingsProperties.logonUser;
+				oSettingsProperties.user = oSettingsProperties.logonUser;
 				delete oSettingsProperties.logonUser;
 			} else {
-				oSettingsProperties.userId = await retrieveUserId();
+				// for abap
+				oSettingsProperties.user = await retrieveUserId();
+			}
+			// only in CF the localUserId is set
+			if (oSettingsProperties.localUserId) {
+				oSettingsProperties.userId = oSettingsProperties.localUserId;
+				delete oSettingsProperties.localUserId;
+			} else {
+				oSettingsProperties.userId = oSettingsProperties.user;
 			}
 
 			// to keep the properties to a minimum, delete no longer used properties

@@ -27505,6 +27505,113 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	});
 
 	//*********************************************************************************************
+	// Scenario: Binding-specific parameter $$aggregation is used; no visual grouping, leaf level is
+	// aggregated. The aggregated data is defined via an alias (with/as). ODLB#filter can be used to
+	// filter by the alias name. The filter literal's value type (string, numeric) is automatically
+	// determined based on the given filter value or the alias' original type.
+	// JIRA: CPOUI5ODATAV4-2518
+	QUnit.test("Data Aggregation: filter by alias w/o groupLevels", async function (assert) {
+		const oModel = this.createAggregationModel({autoExpandSelect : true});
+		const sView = `
+<t:Table id="table" rows="{
+			path : '/BusinessPartners',
+			parameters : {
+				$$aggregation : {
+					aggregate : {
+						FirstRegion : {
+							name : 'Region',
+							with : 'min'
+						},
+						SalesNumberSum : {
+							name : 'SalesNumber',
+							with : 'sum'
+						}
+					},
+					group : {
+						Country : {}
+					}
+				}
+			}
+		}" threshold="0" visibleRowCount="3">
+	<Text id="country" text="{Country}"/>
+	<Text id="firstRegion" text="{= %{FirstRegion} }"/>
+	<Text id="salesNumberSum" text="{= %{SalesNumberSum} }"/>
+</t:Table>`;
+
+		const sUrl = "BusinessPartners?$apply=groupby((Country),aggregate("
+			+ "Region with min as FirstRegion,SalesNumber with sum as SalesNumberSum))";
+		const oResponse = {
+			value : [{
+				Country : "DE",
+				FirstRegion : "BB",
+				SalesNumberSum : "10"
+			}, {
+				Country : "US",
+				FirstRegion : "AK",
+				SalesNumberSum : "20"
+			}]
+		};
+		this.expectRequest(sUrl + "&$skip=0&$top=3", oResponse)
+			.expectChange("country", ["DE", "US"])
+			.expectChange("firstRegion", ["BB", "AK"])
+			.expectChange("salesNumberSum", ["10", "20"]);
+
+		await this.createView(assert, sView, oModel);
+
+		const oListBinding = this.oView.byId("table").getBinding("rows");
+		const checkFilter = async (oFilter, sFilter, sTitle) => {
+			// keep same response for simplification; it's enough to only verify filter literal
+			this.expectRequest(sUrl + "&$filter=" + sFilter + "&$skip=0&$top=3", oResponse);
+
+			// code under test
+			oListBinding.filter(oFilter);
+
+			await this.waitForChanges(assert, sTitle);
+		};
+
+		await checkFilter(new Filter("SalesNumberSum", FilterOperator.EQ, 42),
+			"SalesNumberSum eq 42", "number");
+
+		await checkFilter(new Filter("SalesNumberSum", FilterOperator.EQ, "42"),
+			"SalesNumberSum eq 42", "number (as string)");
+
+		await checkFilter(new Filter("SalesNumberSum", FilterOperator.EQ, true),
+			"SalesNumberSum eq true", "boolean");
+
+		await checkFilter(new Filter("SalesNumberSum", FilterOperator.EQ, null),
+			"SalesNumberSum eq null", "null");
+
+		await checkFilter(new Filter("SalesNumberSum", FilterOperator.EQ, "2020-01-01"),
+			"SalesNumberSum eq 2020-01-01", "date");
+
+		await checkFilter(new Filter("SalesNumberSum", FilterOperator.EQ, "foo"),
+			"SalesNumberSum eq foo", "string, but original type is not string");
+
+		await checkFilter(new Filter("FirstRegion", FilterOperator.EQ, "foo"),
+			"FirstRegion eq 'foo'", "string, original type is string");
+
+		const sErrorMessage = "Type cannot be determined, no metadata for path:"
+			+ " /BusinessPartners/UnknownAlias";
+		this.oLogMock.expects("error")
+			.withExactArgs(sErrorMessage, sinon.match(sErrorMessage),
+				"sap.ui.model.odata.v4.ODataModel");
+		this.oLogMock.expects("error")
+			.withExactArgs("Failed to get contexts for /aggregation/BusinessPartners with start"
+					+ " index 0 and length 3",
+				sinon.match(sErrorMessage), sODLB);
+		this.expectMessages([{
+				message : sErrorMessage,
+				persistent : true,
+				technical : true,
+				type : "Error"
+			}]);
+
+		oListBinding.filter(new Filter("UnknownAlias", FilterOperator.EQ, 42));
+
+		await this.waitForChanges(assert, "unknown alias");
+	});
+
+	//*********************************************************************************************
 	// Scenario: Binding-specific parameter $$aggregation is used and single entities are shown on
 	// leaf level. Allow Context#setKeepAlive only on single entity and ensure that properties of a
 	// single entity can be modified even if the single entity is currently not visible in the list.

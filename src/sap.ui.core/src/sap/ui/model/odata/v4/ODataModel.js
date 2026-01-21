@@ -1857,20 +1857,18 @@ sap.ui.define([
 	 * @see #constructor
 	 */
 	ODataModel.prototype.getGroupProperty = function (sGroupId, sPropertyName) {
-		switch (sPropertyName) {
-			case "submit":
-				if (sGroupId.startsWith("$auto.")) {
-					return SubmitMode.Auto;
-				}
-				if (sGroupId === "$single") {
-					return "Single";
-				}
-				return this.mGroupProperties[sGroupId]
-					? this.mGroupProperties[sGroupId].submit
-					: SubmitMode.API;
-			default:
-				throw new Error("Unsupported group property: '" + sPropertyName + "'");
+		if (sPropertyName !== "submit") {
+			throw new Error("Unsupported group property: '" + sPropertyName + "'");
 		}
+		if (sGroupId.startsWith("$auto.")) {
+			return SubmitMode.Auto;
+		}
+		if (sGroupId === "$single") {
+			return "Single";
+		}
+		return this.mGroupProperties[sGroupId]
+			? this.mGroupProperties[sGroupId].submit
+			: SubmitMode.API;
 	};
 
 	/**

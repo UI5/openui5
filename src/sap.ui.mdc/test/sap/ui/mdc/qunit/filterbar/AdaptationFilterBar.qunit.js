@@ -16,7 +16,9 @@ sap.ui.define([
 	"sap/ui/mdc/p13n/subcontroller/FilterController",
 	"sap/ui/mdc/util/PropertyHelper",
 	"sap/ui/mdc/enums/OperatorName",
-	"sap/ui/mdc/enums/FilterBarValidationStatus"
+	"sap/ui/mdc/enums/FilterBarValidationStatus",
+	"sap/ui/mdc/condition/Condition",
+	"sap/ui/core/library"
 ], function (
 	AdaptationFilterBar,
 	FlexUtil,
@@ -33,9 +35,13 @@ sap.ui.define([
 	FilterController,
 	PropertyHelper,
 	OperatorName,
-	FilterBarValidationStatus
+	FilterBarValidationStatus,
+	Condition,
+	coreLibrary
 ) {
 	"use strict";
+
+	const { ValueState } = coreLibrary;
 
 	let oAdaptationFilterBar;
 	QUnit.module("AdaptationFilterBar - MDC Control specific tests", {
@@ -164,6 +170,74 @@ sap.ui.define([
 				done();
 			});
 
+		});
+	});
+
+	function _prepareOnBeforeCloseTest() {
+		const oConditionModel = this.oAdaptationFilterBar._getConditionModel();
+		oConditionModel.addCondition("key1", Condition.createCondition(OperatorName.EQ, ["Test 1"]));
+		oConditionModel.addCondition("key2", Condition.createCondition(OperatorName.EQ, ["Test 2"]));
+
+		const oFF1 = new FilterField("FF1", {
+			conditions: "{$filters>/conditions/key1}",
+			propertyKey: "key1",
+			valueState: ValueState.Error,
+			valueStateText: "Test Error"
+		});
+		const oFF2 = new FilterField("FF2", {
+			conditions: "{$filters>/conditions/key2}",
+			propertyKey: "key2"
+		});
+		this.oAdaptationFilterBar.addFilterItem(oFF1);
+		this.oAdaptationFilterBar.addFilterItem(oFF2);
+	}
+
+	QUnit.test("onBeforeClose with 'Ok'", function(assert) {
+		// arrange
+		_prepareOnBeforeCloseTest.call(this);
+		const that = this;
+		return this.oTestTable.awaitControlDelegate().then(function(oDelegate) {
+			let fResolve;
+			const oWaitForChangesPromise = new Promise(function(resolve) {fResolve = resolve;});
+			const oEngineSpy = sinon.stub(that.oAdaptationFilterBar.getEngine(), "waitForChanges").returns(oWaitForChangesPromise); // just to check call, inside configuation fails -> but not needed to test this functionality
+			// act
+			const oPromise = that.oAdaptationFilterBar.onBeforeClose("Ok");
+			// checks
+			assert.equal(oPromise, oWaitForChangesPromise, "WaitForChanges promise returned");
+			fResolve();
+			oPromise.then(() => {
+				const oConditionModel = that.oAdaptationFilterBar._getConditionModel();
+				assert.equal(oConditionModel.getConditions("key1").length, 0, "No Conditions for key1");
+				assert.equal(oConditionModel.getConditions("key2").length, 1, "1 Condition for key2");
+				assert.ok(oEngineSpy.calledOnce, "Engine.waitForChanges has been called once");
+				oEngineSpy.restore();
+			});
+			return oPromise;
+		});
+	});
+
+	QUnit.test("onBeforeClose with 'Cancel'", function(assert) {
+		// arrange
+		_prepareOnBeforeCloseTest.call(this);
+		const that = this;
+		return this.oTestTable.awaitControlDelegate().then(function(oDelegate) {
+			let fResolve;
+			const oWaitForChangesPromise = new Promise(function(resolve) {fResolve = resolve;});
+			const oEngineSpy = sinon.stub(that.oAdaptationFilterBar.getEngine(), "waitForChanges").returns(oWaitForChangesPromise); // just to check call, inside configuation fails -> but not needed to test this functionality
+			// act
+			const oPromise = that.oAdaptationFilterBar.onBeforeClose("Cancel");
+			// checks
+			assert.ok(oPromise instanceof Promise, "Promise returned");
+			assert.notEqual(oPromise, oWaitForChangesPromise, "WaitForChanges promise not returned");
+			fResolve();
+			oPromise.then(() => {
+				const oConditionModel = that.oAdaptationFilterBar._getConditionModel();
+				assert.equal(oConditionModel.getConditions("key1").length, 1, "1 Condition for key1");
+				assert.equal(oConditionModel.getConditions("key2").length, 1, "1 Condition for key2");
+				assert.ok(oEngineSpy.notCalled, "Engine.waitForChanges has not been called");
+				oEngineSpy.restore();
+			});
+			return oPromise;
 		});
 	});
 

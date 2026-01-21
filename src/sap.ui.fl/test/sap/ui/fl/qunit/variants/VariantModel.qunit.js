@@ -80,7 +80,11 @@ sap.ui.define([
 			variantReference: mVariantProperties.variantReference,
 			variantManagementReference: mVariantProperties.variantManagementReference || sVMReference,
 			variantName: mVariantProperties.title,
-			contexts: mVariantProperties.contexts
+			contexts: mVariantProperties.contexts,
+			support: {
+				userId: mVariantProperties.userId
+			}
+
 		});
 	}
 
@@ -125,6 +129,7 @@ sap.ui.define([
 					}),
 					createVariant({
 						author: "Me",
+						userId: "Me123",
 						key: "variant1",
 						layer: Layer.PUBLIC,
 						variantReference: sVMReference,
@@ -135,6 +140,7 @@ sap.ui.define([
 					}),
 					createVariant({
 						author: "Not Me",
+						userId: "NotMe123",
 						key: "variant2",
 						layer: Layer.PUBLIC,
 						variantReference: sVMReference,
@@ -384,6 +390,9 @@ sap.ui.define([
 				getIsVariantPersonalizationEnabled() {
 					return false;
 				},
+				getUser() {
+					return undefined;
+				},
 				getUserId() {
 					return undefined;
 				}
@@ -409,15 +418,19 @@ sap.ui.define([
 		});
 
 		QUnit.test("when calling 'setModelPropertiesForControl' of a PUBLIC variant", function(assert) {
-			var bIsKeyUser = false;
-			var bIsPublicFlVariantEnabled = true;
-			var sUserId;
+			let bIsKeyUser = false;
+			let bIsPublicFlVariantEnabled = true;
+			let sUser;
+			let sUserId;
 			sandbox.stub(Settings, "getInstanceOrUndef").returns({
 				getIsKeyUser() {
 					return bIsKeyUser;
 				},
 				getIsPublicFlVariantEnabled() {
 					return bIsPublicFlVariantEnabled;
+				},
+				getUser() {
+					return sUser;
 				},
 				getUserId() {
 					return sUserId;
@@ -449,7 +462,7 @@ sap.ui.define([
 				"a public view editor can changed another users PUBLIC variant in case the user cannot be determined"
 			);
 
-			sUserId = "OtherPerson";
+			sUser = "OtherPerson";
 			this.oModel.setModelPropertiesForControl(sVMReference, false, this.oVMControl);
 			assert.strictEqual(oVMData.variants[3].rename, false, "a public view editor cannot renamed another users PUBLIC variant");
 			assert.strictEqual(oVMData.variants[3].remove, false, "a public view editor cannot removed another users PUBLIC variant");
@@ -463,7 +476,7 @@ sap.ui.define([
 			assert.strictEqual(oVMData.variants[3].change, true, "a key user can changed another users PUBLIC variant");
 
 			bIsKeyUser = false;
-			sUserId = "Me";
+			sUser = "Me";
 			this.oModel.setModelPropertiesForControl(sVMReference, false, this.oVMControl);
 			assert.strictEqual(oVMData.variants[3].rename, false, "a end user cannot renamed its own users PUBLIC variant");
 			assert.strictEqual(oVMData.variants[3].remove, false, "a end user cannot removed its own users PUBLIC variant");
@@ -471,6 +484,30 @@ sap.ui.define([
 			assert.strictEqual(oVMData.variants[4].rename, true, "a end user can renamed its own users variant");
 			assert.strictEqual(oVMData.variants[4].remove, true, "a end user can removed its own users variant");
 			assert.strictEqual(oVMData.variants[4].change, true, "a end user can changed its own users variant");
+
+			bIsKeyUser = false;
+			sUser = "OtherPerson";
+			sUserId = "OtherPerson";
+			bIsPublicFlVariantEnabled = true;
+			this.oModel.setModelPropertiesForControl(sVMReference, false, this.oVMControl);
+			assert.strictEqual(oVMData.variants[2].rename, false, "Xa public view editor cannot renamed another users PUBLIC variant");
+			assert.strictEqual(oVMData.variants[2].remove, false, "Xa public view editor cannot removed another users PUBLIC variant");
+			assert.strictEqual(oVMData.variants[2].change, false, "Xa public view editor cannot changed another users PUBLIC variant");
+			assert.strictEqual(oVMData.variants[3].rename, false, "Xa end user can renamed its own users variant");
+			assert.strictEqual(oVMData.variants[3].remove, false, "Xa end user can removed its own users variant");
+			assert.strictEqual(oVMData.variants[3].change, false, "Xa end user can changed its own users variant");
+
+			bIsKeyUser = false;
+			sUser = "OtherPerson";
+			sUserId = "Me123";
+			bIsPublicFlVariantEnabled = true;
+			this.oModel.setModelPropertiesForControl(sVMReference, false, this.oVMControl);
+			assert.strictEqual(oVMData.variants[2].rename, true, "Xa public view editor cannot renamed another users PUBLIC variant");
+			assert.strictEqual(oVMData.variants[2].remove, true, "Xa public view editor cannot removed another users PUBLIC variant");
+			assert.strictEqual(oVMData.variants[2].change, true, "Xa public view editor cannot changed another users PUBLIC variant");
+			assert.strictEqual(oVMData.variants[3].rename, false, "Xa end user can renamed its own users variant");
+			assert.strictEqual(oVMData.variants[3].remove, false, "Xa end user can removed its own users variant");
+			assert.strictEqual(oVMData.variants[3].change, false, "Xa end user can changed its own users variant");
 
 			Settings.getInstanceOrUndef.restore();
 		});

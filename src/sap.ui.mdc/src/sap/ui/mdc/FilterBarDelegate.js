@@ -125,6 +125,7 @@ sap.ui.define([
 	/**
 	 * A validator to evaluate the <code>FilterBar</code> state.
 	 *
+	 * <b>Note:</b> Conditions of filters with error will be removed if shown on P13n dialog.
 	 * @public
 	 * @param {sap.ui.mdc.FilterBar} oFilterBar Instance of the {@link sap.ui.mdc.FilterBar FilterBar} control
 	 * @param {map} [mValidation] Object describing the validation result. This object is only provided when called from the {@link sap.ui.mdc.FilterBar FilterBar}

@@ -46,7 +46,6 @@ sap.ui.define([
 
 	var sBaseUrl = "test-resources/sap/ui/integration/qunit/editor/jsons/withDesigntime/sap.card/";
 
-	Localization.setLanguage("en");
 	document.body.className = document.body.className + " sapUiSizeCompact ";
 
 	QUnit.module("multi fields", {
@@ -92,7 +91,7 @@ sap.ui.define([
 			return new Promise(function (resolve, reject) {
 				count++;
 				start = new Date();
-				var oEditor = EditorQunitUtils.createEditor("en");
+				var oEditor = EditorQunitUtils.createEditor();
 				oEditor.setMode("admin");
 				oEditor.setAllowSettings(true);
 				oEditor.setAllowDynamicValues(true);
@@ -161,7 +160,7 @@ sap.ui.define([
 							EditorQunitUtils.destroyEditor(oEditor);
 							count++;
 							start = new Date();
-							oEditor = EditorQunitUtils.createEditor("en");
+							oEditor = EditorQunitUtils.createEditor();
 							oEditor.setMode("admin");
 							oEditor.setAllowSettings(true);
 							oEditor.setAllowDynamicValues(true);
@@ -230,7 +229,7 @@ sap.ui.define([
 										EditorQunitUtils.destroyEditor(oEditor);
 										count++;
 										start = new Date();
-										oEditor = EditorQunitUtils.createEditor("en");
+										oEditor = EditorQunitUtils.createEditor();
 										oEditor.setMode("admin");
 										oEditor.setAllowSettings(true);
 										oEditor.setAllowDynamicValues(true);
@@ -299,7 +298,7 @@ sap.ui.define([
 													EditorQunitUtils.destroyEditor(oEditor);
 													count++;
 													start = new Date();
-													oEditor = EditorQunitUtils.createEditor("en");
+													oEditor = EditorQunitUtils.createEditor();
 													oEditor.setMode("admin");
 													oEditor.setAllowSettings(true);
 													oEditor.setAllowDynamicValues(true);
@@ -368,7 +367,7 @@ sap.ui.define([
 																EditorQunitUtils.destroyEditor(oEditor);
 																count++;
 																start = new Date();
-																oEditor = EditorQunitUtils.createEditor("en");
+																oEditor = EditorQunitUtils.createEditor();
 																oEditor.setMode("admin");
 																oEditor.setAllowSettings(true);
 																oEditor.setAllowDynamicValues(true);
@@ -485,7 +484,7 @@ sap.ui.define([
 			return new Promise(function (resolve, reject) {
 				count++;
 				start = new Date();
-				var oEditor = EditorQunitUtils.createEditor("en");
+				var oEditor = EditorQunitUtils.createEditor();
 				oEditor.setMode("admin");
 				oEditor.setAllowSettings(true);
 				oEditor.setAllowDynamicValues(true);
@@ -522,7 +521,7 @@ sap.ui.define([
 							EditorQunitUtils.destroyEditor(oEditor);
 							count++;
 							start = new Date();
-							oEditor = EditorQunitUtils.createEditor("en");
+							oEditor = EditorQunitUtils.createEditor();
 							oEditor.setMode("admin");
 							oEditor.setAllowSettings(true);
 							oEditor.setAllowDynamicValues(true);
@@ -559,7 +558,7 @@ sap.ui.define([
 										EditorQunitUtils.destroyEditor(oEditor);
 										count++;
 										start = new Date();
-										oEditor = EditorQunitUtils.createEditor("en");
+										oEditor = EditorQunitUtils.createEditor();
 										oEditor.setMode("admin");
 										oEditor.setAllowSettings(true);
 										oEditor.setAllowDynamicValues(true);
@@ -596,7 +595,7 @@ sap.ui.define([
 													EditorQunitUtils.destroyEditor(oEditor);
 													count++;
 													start = new Date();
-													oEditor = EditorQunitUtils.createEditor("en");
+													oEditor = EditorQunitUtils.createEditor();
 													oEditor.setMode("admin");
 													oEditor.setAllowSettings(true);
 													oEditor.setAllowDynamicValues(true);
@@ -633,7 +632,7 @@ sap.ui.define([
 																EditorQunitUtils.destroyEditor(oEditor);
 																count++;
 																start = new Date();
-																oEditor = EditorQunitUtils.createEditor("en");
+																oEditor = EditorQunitUtils.createEditor();
 																oEditor.setMode("admin");
 																oEditor.setAllowSettings(true);
 																oEditor.setAllowDynamicValues(true);
@@ -718,7 +717,7 @@ sap.ui.define([
 			return new Promise(function (resolve, reject) {
 				count++;
 				start = new Date();
-				var oEditor = EditorQunitUtils.createEditor("en");
+				var oEditor = EditorQunitUtils.createEditor();
 				oEditor.setMode("admin");
 				oEditor.setAllowSettings(true);
 				oEditor.setAllowDynamicValues(true);
@@ -757,7 +756,7 @@ sap.ui.define([
 							EditorQunitUtils.destroyEditor(oEditor);
 							count++;
 							start = new Date();
-							oEditor = EditorQunitUtils.createEditor("en");
+							oEditor = EditorQunitUtils.createEditor();
 							oEditor.setMode("admin");
 							oEditor.setAllowSettings(true);
 							oEditor.setAllowDynamicValues(true);
@@ -796,7 +795,7 @@ sap.ui.define([
 										EditorQunitUtils.destroyEditor(oEditor);
 										count++;
 										start = new Date();
-										oEditor = EditorQunitUtils.createEditor("en");
+										oEditor = EditorQunitUtils.createEditor();
 										oEditor.setMode("admin");
 										oEditor.setAllowSettings(true);
 										oEditor.setAllowDynamicValues(true);
@@ -835,7 +834,7 @@ sap.ui.define([
 													EditorQunitUtils.destroyEditor(oEditor);
 													count++;
 													start = new Date();
-													oEditor = EditorQunitUtils.createEditor("en");
+													oEditor = EditorQunitUtils.createEditor();
 													oEditor.setMode("admin");
 													oEditor.setAllowSettings(true);
 													oEditor.setAllowDynamicValues(true);
@@ -874,7 +873,7 @@ sap.ui.define([
 																EditorQunitUtils.destroyEditor(oEditor);
 																count++;
 																start = new Date();
-																oEditor = EditorQunitUtils.createEditor("en");
+																oEditor = EditorQunitUtils.createEditor();
 																oEditor.setMode("admin");
 																oEditor.setAllowSettings(true);
 																oEditor.setAllowDynamicValues(true);
@@ -973,7 +972,7 @@ sap.ui.define([
 			return new Promise(function (resolve, reject) {
 				count++;
 				start = new Date();
-				var oEditor = EditorQunitUtils.createEditor("en");
+				var oEditor = EditorQunitUtils.createEditor();
 				oEditor.setMode("admin");
 				oEditor.setAllowSettings(true);
 				oEditor.setAllowDynamicValues(true);
@@ -1027,7 +1026,7 @@ sap.ui.define([
 							EditorQunitUtils.destroyEditor(oEditor);
 							count++;
 							start = new Date();
-							oEditor = EditorQunitUtils.createEditor("en");
+							oEditor = EditorQunitUtils.createEditor();
 							oEditor.setMode("admin");
 							oEditor.setAllowSettings(true);
 							oEditor.setAllowDynamicValues(true);
@@ -1081,7 +1080,7 @@ sap.ui.define([
 										EditorQunitUtils.destroyEditor(oEditor);
 										count++;
 										start = new Date();
-										oEditor = EditorQunitUtils.createEditor("en");
+										oEditor = EditorQunitUtils.createEditor();
 										oEditor.setMode("admin");
 										oEditor.setAllowSettings(true);
 										oEditor.setAllowDynamicValues(true);
@@ -1135,7 +1134,7 @@ sap.ui.define([
 													EditorQunitUtils.destroyEditor(oEditor);
 													count++;
 													start = new Date();
-													oEditor = EditorQunitUtils.createEditor("en");
+													oEditor = EditorQunitUtils.createEditor();
 													oEditor.setMode("admin");
 													oEditor.setAllowSettings(true);
 													oEditor.setAllowDynamicValues(true);
@@ -1189,7 +1188,7 @@ sap.ui.define([
 																EditorQunitUtils.destroyEditor(oEditor);
 																count++;
 																start = new Date();
-																oEditor = EditorQunitUtils.createEditor("en");
+																oEditor = EditorQunitUtils.createEditor();
 																oEditor.setMode("admin");
 																oEditor.setAllowSettings(true);
 																oEditor.setAllowDynamicValues(true);
@@ -1309,7 +1308,7 @@ sap.ui.define([
 			return new Promise(function (resolve, reject) {
 				count++;
 				start = new Date();
-				var oEditor = EditorQunitUtils.createEditor("en");
+				var oEditor = EditorQunitUtils.createEditor();
 				oEditor.setMode("admin");
 				oEditor.setAllowSettings(true);
 				oEditor.setAllowDynamicValues(true);
@@ -1350,7 +1349,7 @@ sap.ui.define([
 							EditorQunitUtils.destroyEditor(oEditor);
 							count++;
 							start = new Date();
-							oEditor = EditorQunitUtils.createEditor("en");
+							oEditor = EditorQunitUtils.createEditor();
 							oEditor.setMode("admin");
 							oEditor.setAllowSettings(true);
 							oEditor.setAllowDynamicValues(true);
@@ -1391,7 +1390,7 @@ sap.ui.define([
 										EditorQunitUtils.destroyEditor(oEditor);
 										count++;
 										start = new Date();
-										oEditor = EditorQunitUtils.createEditor("en");
+										oEditor = EditorQunitUtils.createEditor();
 										oEditor.setMode("admin");
 										oEditor.setAllowSettings(true);
 										oEditor.setAllowDynamicValues(true);
@@ -1432,7 +1431,7 @@ sap.ui.define([
 													EditorQunitUtils.destroyEditor(oEditor);
 													count++;
 													start = new Date();
-													oEditor = EditorQunitUtils.createEditor("en");
+													oEditor = EditorQunitUtils.createEditor();
 													oEditor.setMode("admin");
 													oEditor.setAllowSettings(true);
 													oEditor.setAllowDynamicValues(true);
@@ -1473,7 +1472,7 @@ sap.ui.define([
 																EditorQunitUtils.destroyEditor(oEditor);
 																count++;
 																start = new Date();
-																oEditor = EditorQunitUtils.createEditor("en");
+																oEditor = EditorQunitUtils.createEditor();
 																oEditor.setMode("admin");
 																oEditor.setAllowSettings(true);
 																oEditor.setAllowDynamicValues(true);
@@ -1627,7 +1626,7 @@ sap.ui.define([
 			return new Promise(function (resolve, reject) {
 				count++;
 				start = new Date();
-				var oEditor = EditorQunitUtils.createEditor("en");
+				var oEditor = EditorQunitUtils.createEditor();
 				oEditor.setMode("admin");
 				oEditor.setAllowSettings(true);
 				oEditor.setAllowDynamicValues(true);
@@ -1827,7 +1826,7 @@ sap.ui.define([
 							EditorQunitUtils.destroyEditor(oEditor);
 							count++;
 							start = new Date();
-							oEditor = EditorQunitUtils.createEditor("en");
+							oEditor = EditorQunitUtils.createEditor();
 							oEditor.setMode("admin");
 							oEditor.setAllowSettings(true);
 							oEditor.setAllowDynamicValues(true);
@@ -1896,7 +1895,7 @@ sap.ui.define([
 										EditorQunitUtils.destroyEditor(oEditor);
 										count++;
 										start = new Date();
-										oEditor = EditorQunitUtils.createEditor("en");
+										oEditor = EditorQunitUtils.createEditor();
 										oEditor.setMode("admin");
 										oEditor.setAllowSettings(true);
 										oEditor.setAllowDynamicValues(true);
@@ -1965,7 +1964,7 @@ sap.ui.define([
 													EditorQunitUtils.destroyEditor(oEditor);
 													count++;
 													start = new Date();
-													oEditor = EditorQunitUtils.createEditor("en");
+													oEditor = EditorQunitUtils.createEditor();
 													oEditor.setMode("admin");
 													oEditor.setAllowSettings(true);
 													oEditor.setAllowDynamicValues(true);
@@ -2034,7 +2033,7 @@ sap.ui.define([
 																EditorQunitUtils.destroyEditor(oEditor);
 																count++;
 																start = new Date();
-																oEditor = EditorQunitUtils.createEditor("en");
+																oEditor = EditorQunitUtils.createEditor();
 																oEditor.setMode("admin");
 																oEditor.setAllowSettings(true);
 																oEditor.setAllowDynamicValues(true);

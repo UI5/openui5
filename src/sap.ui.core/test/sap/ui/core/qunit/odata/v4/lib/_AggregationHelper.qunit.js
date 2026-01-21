@@ -2904,4 +2904,59 @@ sap.ui.define([
 		assert.strictEqual(JSON.stringify(mQueryOptions), sQueryOptionsJSON, "unchanged");
 	});
 });
+
+	//*********************************************************************************************
+	QUnit.test("getPropertyMetadataForFilter", function (assert) {
+		const oAggregation = {
+			aggregate : {alias : {name : "originalProperty"}},
+			$fetchMetadata : mustBeMocked
+		};
+
+		assert.deepEqual(
+			// code under test
+			_AggregationHelper.getPropertyMetadataForFilter(
+				new Filter("alias", FilterOperator.EQ, 42), oAggregation, "n/a"),
+			{$Type : "Edm.Decimal"});
+
+		assert.deepEqual(
+			// code under test
+			_AggregationHelper.getPropertyMetadataForFilter(
+				new Filter("alias", FilterOperator.EQ, null), oAggregation, "n/a"),
+			{$Type : "Edm.Decimal"});
+
+		assert.deepEqual(
+			// code under test
+			_AggregationHelper.getPropertyMetadataForFilter(
+				new Filter("alias", FilterOperator.EQ, true), oAggregation, "n/a"),
+			{$Type : "Edm.Boolean"});
+
+		this.mock(oAggregation).expects("$fetchMetadata")
+			.withExactArgs("/path/alias/originalProperty") // only last segment replaced
+			.returns(SyncPromise.resolve("~oPropertyMetadata~"));
+
+		assert.deepEqual(
+			// code under test
+			_AggregationHelper.getPropertyMetadataForFilter(
+				new Filter("alias", FilterOperator.EQ, "foo"), oAggregation,
+				// ensure to replace the alias name at the end of the path only
+				"/path/alias/alias"),
+			"~oPropertyMetadata~");
+	});
+
+	//*********************************************************************************************
+[
+	undefined, // no aggregation
+	{hierarchyQualifier : "X"}, // recursive hierarchy
+	{aggregate : {}}, // filter path not aggregated
+	{aggregate : {foo : {grandTotal : true}}} // property found, but is not an alias
+].forEach(function (oAggregation, i) {
+	QUnit.test("getPropertyMetadataForFilter: not an alias #" + i, function (assert) {
+		const oFilter = new Filter("foo", FilterOperator.EQ, "n/a");
+
+		assert.strictEqual(
+			// code under test
+			_AggregationHelper.getPropertyMetadataForFilter(oFilter, oAggregation, "n/a"),
+			undefined);
+	});
+});
 });

@@ -233,9 +233,9 @@ sap.ui.define([
 			oChangeSpecificData.support = {
 				user: "SAP"
 			};
-		} else if (Settings.getInstanceOrUndef()?.getUserId()) {
+		} else if (Settings.getInstanceOrUndef()?.getUser()) {
 			oChangeSpecificData.support = {
-				user: Settings.getInstanceOrUndef().getUserId()
+				user: Settings.getInstanceOrUndef().getUser()
 			};
 		}
 	}

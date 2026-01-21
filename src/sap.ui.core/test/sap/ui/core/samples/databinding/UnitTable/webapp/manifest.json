@@ -31,7 +31,6 @@
 			}
 		},
 		"rootView" : {
-			"async" : true,
 			"id" : "UnitTable",
 			"type" : "XML",
 			"viewName" : "sap.ui.core.samples.unittable.view.UnitTable"

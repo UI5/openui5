@@ -171,7 +171,6 @@ sap.ui.define([
 			"zh-TW": "String4 繁體 Content"
 		}
 	};
-	Localization.setLanguage("en");
 	document.body.className = document.body.className + " sapUiSizeCompact ";
 
 	QUnit.module("content mode", {
