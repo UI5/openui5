@@ -3,10 +3,12 @@
  */
 sap.ui.define([
 	"sap/ui/fl/apply/_internal/flexObjects/getVariantAuthor",
-	"sap/ui/fl/apply/_internal/flexObjects/FlexObject"
+	"sap/ui/fl/apply/_internal/flexObjects/FlexObject",
+	"sap/ui/fl/initial/_internal/Settings"
 ], function(
 	getVariantAuthor,
-	FlexObject
+	FlexObject,
+	Settings
 ) {
 	"use strict";
 
@@ -141,6 +143,14 @@ sap.ui.define([
 
 	Variant.prototype.canBeCondensed = function() {
 		return false;
+	};
+
+	Variant.prototype.isUserAuthor = function() {
+		var oSettings = Settings.getInstanceOrUndef();
+		const sAuthor = this.getSupportInformation().userId || this.getSupportInformation().user || "";
+		const sUser = oSettings && oSettings.getUser();
+		const sUserId = oSettings && oSettings.getUserId();
+		return !sUser || (!!sAuthor && !!sUser && sUser.toUpperCase() === sAuthor.toUpperCase()) || (!!sAuthor && !!sUserId && sUserId.toUpperCase() === sAuthor.toUpperCase());
 	};
 
 	return Variant;

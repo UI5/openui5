@@ -1,3 +1,8 @@
+/* =========================================== */
+/* CSS for control sap.ui.unified.IndexPicker  */
+/* Base theme                                  */
+/* =========================================== */
+
 .sapMIP {
 	margin: 0.5rem;
 
@@ -20,17 +25,17 @@
 html.sap-desktop .sapMIP .sapUiCalItem:focus > .sapUiCalItemText,
 html.sap-desktop .sapMIP .sapUiCalItem:focus,
 html.sap-desktop .sapMIP .sapUiCalItemSel.sapUiCalItemSelBetween:focus {
-	outline: 0.0625rem dotted @sapUiContentFocusColor;
+	outline: 0.0625rem dotted var(--sapContent_FocusColor);
 	outline-offset: -0.25rem;
 }
 
-html.sap-desktop .sapMIP .sapUiCalItemSel:focus{
-	outline-color: @sapUiContentContrastFocusColor;
-	background-color: @sapUiContentSelectedBackground;
+html.sap-desktop .sapMIP .sapUiCalItemSel:focus {
+	outline-color: var(--sapContent_ContrastFocusColor);
+	background-color: var(--sapContent_Selected_Background);
 }
 
-html.sap-desktop .sapMIP .sapUiCalItemSel:active{
-	outline-color: @sapUiContentContrastFocusColor;
-	background-color: @sapUiContentSelectedBackground;
-	color: @sapUiContentContrastTextColor;
+html.sap-desktop .sapMIP .sapUiCalItemSel:active {
+	outline-color: var(--sapContent_ContrastFocusColor);
+	background-color: var(--sapContent_Selected_Background);
+	color: var(--sapContent_ContrastTextColor);
 }

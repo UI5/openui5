@@ -179,7 +179,8 @@ sap.ui.define([
 		QUnit.test("when calling setResponse", function(assert) {
 			this.oFlexObject.setResponse({
 				support: {
-					user: "TESTUSER"
+					user: "TESTUSER",
+					userId: "UserId123"
 				}
 			});
 			assert.strictEqual(
@@ -190,7 +191,12 @@ sap.ui.define([
 			assert.strictEqual(
 				this.oFlexObject.getSupportInformation().user,
 				"TESTUSER",
-				"then the flexObject is updated"
+				"then the flexObject is updated with the correct user"
+			);
+			assert.strictEqual(
+				this.oFlexObject.getSupportInformation().userId,
+				"UserId123",
+				"then the flexObject is updated with the correct userId"
 			);
 		});
 

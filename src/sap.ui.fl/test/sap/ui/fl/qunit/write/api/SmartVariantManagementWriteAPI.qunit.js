@@ -795,7 +795,7 @@ sap.ui.define([
 					getIsVersioningEnabled() {
 						return false;
 					},
-					getUserId() {},
+					getUser() {},
 					getIsVariantAuthorNameAvailable() {
 						return false;
 					}

@@ -28,7 +28,7 @@ sap.ui.define([
 	}, function() {
 		QUnit.test("get variant authors", function(assert) {
 			sandbox.stub(Settings, "getInstanceOrUndef").returns({
-				getUserId() { return "userA";}
+				getUser() { return "userA";}
 			});
 			sandbox.stub(Loader, "getCachedFlexData").returns({
 				authors: {

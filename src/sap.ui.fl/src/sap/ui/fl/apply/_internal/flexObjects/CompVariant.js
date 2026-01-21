@@ -112,20 +112,14 @@ sap.ui.define([
 		return CompVariant.getMappingInfo();
 	};
 
-	function isUserAuthor(sAuthor) {
-		var oSettings = Settings.getInstanceOrUndef();
-		var vUserId = oSettings?.getUserId();
-		return !vUserId || !sAuthor || vUserId.toUpperCase() === sAuthor.toUpperCase();
-	}
-
 	/**
 	 * Checks if the the variant can be modified due to its layer and the user's authorization.
 	 * @param {sap.ui.fl.Layer} sLayer - Layer of the variant
 	 * @param {sap.ui.fl.Layer} [sActiveLayer] - Layer in which the operation may take place
-	 * @param {string} sUserId - ID of the variants creator
+	 * @param {string} sUser - User of the variants creator
 	 * @returns {boolean} <code>true</code> if the variant is read only
 	 */
-	 function checkLayerAndUserAuthorization(sLayer, sActiveLayer, sUserId) {
+	 function checkLayerAndUserAuthorization(sLayer, sActiveLayer, bIsUserAuthor) {
 		if (sActiveLayer) {
 			return sLayer === sActiveLayer;
 		} else if (sLayer === Layer.USER) {
@@ -139,7 +133,7 @@ sap.ui.define([
 		// In the PUBLIC layer, the variant is only editable if the user is key user OR the author with variant sharing enabled
 		const bPublicLayerCheck = sActiveLayer !== Layer.PUBLIC || oSettings.getIsVariantSharingEnabled();
 		const bLayerWritable = sLayer === sActiveLayer;
-		const bUserAuthorized = oSettings.getIsKeyUser() || (isUserAuthor(sUserId) && bPublicLayerCheck);
+		const bUserAuthorized = oSettings.getIsKeyUser() || (bIsUserAuthor && bPublicLayerCheck);
 
 		return bLayerWritable && bUserAuthorized;
 	}
@@ -209,7 +203,8 @@ sap.ui.define([
 			this.getSupportInformation().sourceSystem,
 			this.getSupportInformation().sourceClient
 		);
-		var bUserAuthorized = checkLayerAndUserAuthorization(this.getLayer(), sActiveLayer, this.getOwnerId());
+		const bIsUserAuthor = this.isUserAuthor();
+		var bUserAuthorized = checkLayerAndUserAuthorization(this.getLayer(), sActiveLayer, bIsUserAuthor);
 		return bDeveloperLayer || bOriginSystem && bUserAuthorized;
 	};
 
@@ -223,8 +218,9 @@ sap.ui.define([
 			this.getSupportInformation().sourceSystem,
 			this.getSupportInformation().sourceClient
 		);
+		const bIsUserAuthor = this.isUserAuthor();
 		return bOriginSystem
-			&& checkLayerAndUserAuthorization(this.getLayer(), sLayer, this.getOwnerId())
+			&& checkLayerAndUserAuthorization(this.getLayer(), sLayer, bIsUserAuthor)
 			&& !this.getStandardVariant();
 	};
 
@@ -269,7 +265,7 @@ sap.ui.define([
 	 * @returns {string} User ID
 	 */
 	CompVariant.prototype.getOwnerId = function() {
-		return this.getSupportInformation().user || "";
+		return this.getSupportInformation().userId || this.getSupportInformation().user || "";
 	};
 
 	/**

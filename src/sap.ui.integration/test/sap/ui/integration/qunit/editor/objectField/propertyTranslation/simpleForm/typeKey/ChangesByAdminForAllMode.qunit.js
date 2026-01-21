@@ -150,7 +150,6 @@ sap.ui.define([
 			"default": "string2"
 		}
 	};
-	Localization.setLanguage("en");
 	document.body.className = document.body.className + " sapUiSizeCompact ";
 
 	QUnit.module("all mode", {

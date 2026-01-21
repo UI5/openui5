@@ -36,7 +36,7 @@ sap.ui.define([
 		const oSettings = Settings.getInstanceOrUndef();
 		const mMapIdsNames = Loader.getCachedFlexData(sReference).authors || {};
 
-		if (sLayer === Layer.USER || sAuthor === oSettings?.getUserId()) {
+		if (sLayer === Layer.USER || sAuthor === oSettings?.getUser()) {
 			return Lib.getResourceBundleFor("sap.ui.fl").getText("VARIANT_SELF_OWNER_NAME");
 		}
 

@@ -3262,7 +3262,7 @@ sap.ui.define([
 			.withExactArgs("~sResourcePathPrefix~");
 		this.mock(oBinding).expects("createRefreshPromise").withExactArgs()
 			.returns(Promise.reject("~oError~"));
-		this.mock(oBinding.oCache).expects("reset").withExactArgs([]);
+		this.mock(oBinding.oCache).expects("reset").withExactArgs({});
 		this.mock(oBinding).expects("fetchCache").never();
 		this.mock(oBinding).expects("refreshKeptElements").never();
 
@@ -6548,6 +6548,7 @@ sap.ui.define([
 			this.oMetaModelMock.expects("fetchObject")
 				.withExactArgs("/resolved/path")
 				.returns(SyncPromise.resolve(oPropertyMetadata));
+			this.mock(_AggregationHelper).expects("getPropertyMetadataForFilter").never();
 			oHelperMock.expects("formatLiteral").withExactArgs("SAP", sType)
 				.returns("'SAP'");
 			if (oFixture.op === FilterOperator.BT || oFixture.op === FilterOperator.NB) {
@@ -6598,6 +6599,7 @@ sap.ui.define([
 				this.oMetaModelMock.expects("fetchObject")
 					.withExactArgs("/resolved/path2")
 					.returns(SyncPromise.resolve({$Type : "Edm.Decimal"}));
+				this.mock(_AggregationHelper).expects("getPropertyMetadataForFilter").never();
 				oHelperMock.expects("formatLiteral").withExactArgs("SAP", "Edm.String")
 					.returns("'SAP'");
 				oHelperMock.expects("formatLiteral").withExactArgs(12345, "Edm.Decimal")
@@ -6661,6 +6663,7 @@ sap.ui.define([
 		this.oMetaModelMock.expects("fetchObject")
 			.withExactArgs("/resolved/path")
 			.returns(SyncPromise.resolve(oPropertyMetadata));
+		this.mock(_AggregationHelper).expects("getPropertyMetadataForFilter").never();
 		this.mock(_Helper).expects("formatLiteral").withExactArgs("SAP", "Edm.String")
 			.returns("'SAP'");
 		oBinding.aApplicationFilters = [new Filter("SO_2_BP/CompanyName", "invalid", "SAP")];
@@ -6688,8 +6691,11 @@ sap.ui.define([
 		this.oMetaModelMock.expects("fetchObject")
 			.withExactArgs("/resolved/path")
 			.returns(SyncPromise.resolve());
-		oBinding.aApplicationFilters = [new Filter("SO_2_BP/CompanyName", FilterOperator.EQ,
-			"SAP")];
+		const oFilter = new Filter("SO_2_BP/CompanyName", FilterOperator.EQ, "SAP");
+		this.mock(_AggregationHelper).expects("getPropertyMetadataForFilter")
+			.withExactArgs(sinon.match.same(oFilter), undefined, "/resolved/path")
+			.returns(undefined);
+		oBinding.aApplicationFilters = [oFilter];
 
 		return oBinding.fetchFilter().then(function () {
 			assert.ok(false);
@@ -6697,6 +6703,28 @@ sap.ui.define([
 			assert.strictEqual(oError.message, "Type cannot be determined, no metadata for path: "
 				+ "/resolved/path");
 		});
+	});
+
+	//*********************************************************************************************
+	QUnit.test("fetchFilter: alias fallback", function (assert) {
+		const oBinding = this.bindList("/SalesOrderList");
+		const oMetaContext = {getPath : function () { return "/SalesOrderList"; }};
+
+		this.oMetaModelMock.expects("getMetaContext")
+			.withExactArgs("/SalesOrderList").returns(oMetaContext);
+		this.oMetaModelMock.expects("resolve")
+			.withExactArgs("Alias", sinon.match.same(oMetaContext))
+			.returns("/resolved/path");
+		this.oMetaModelMock.expects("fetchObject")
+			.withExactArgs("/resolved/path")
+			.returns(SyncPromise.resolve());
+		const oFilter = new Filter("Alias", FilterOperator.EQ, 42);
+		this.mock(_AggregationHelper).expects("getPropertyMetadataForFilter")
+			.withExactArgs(sinon.match.same(oFilter), undefined, "/resolved/path")
+			.returns({$Type : "Edm.Decimal"});
+		oBinding.aApplicationFilters = [oFilter];
+
+		assert.deepEqual(oBinding.fetchFilter().getResult(), ["Alias eq 42", undefined, undefined]);
 	});
 
 	//*********************************************************************************************
@@ -6717,6 +6745,7 @@ sap.ui.define([
 			// call getMetaContext only if there are filters
 			this.oMetaModelMock.expects("getMetaContext").withExactArgs(oBinding.sPath)
 				.returns("~");
+			this.mock(_AggregationHelper).expects("getPropertyMetadataForFilter").never();
 			oFixture.filters.forEach((vFilter) => {
 				var sPath,
 					sValue;
@@ -6774,6 +6803,7 @@ sap.ui.define([
 			oPromise = Promise.resolve(oPropertyMetadata);
 
 		oMetaModelMock.expects("getMetaContext").withExactArgs(oBinding.sPath).returns("~");
+		this.mock(_AggregationHelper).expects("getPropertyMetadataForFilter").never();
 
 		oMetaModelMock.expects("resolve").withExactArgs("p0.0", "~").returns("/resolved/p0.0");
 		oMetaModelMock.expects("fetchObject").withExactArgs("/resolved/p0.0").returns(oPromise);
@@ -6963,6 +6993,7 @@ sap.ui.define([
 				this.oMetaModelMock.expects("getMetaContext")
 					.withExactArgs(oBinding.sPath)
 					.returns("~");
+				this.mock(_AggregationHelper).expects("getPropertyMetadataForFilter").never();
 
 				aFetchObjectKeys.forEach((sObjectPath) => {
 					this.oMetaModelMock.expects("resolve")
@@ -7000,6 +7031,7 @@ sap.ui.define([
 			.returns(SyncPromise.resolve({
 				$Type : "Type0"
 			}));
+		this.mock(_AggregationHelper).expects("getPropertyMetadataForFilter").never();
 
 		// code under test
 		return oBinding.fetchFilter().then(function (aFilterValues) {
@@ -7019,6 +7051,7 @@ sap.ui.define([
 		this.oMetaModelMock.expects("resolve").withExactArgs("p0.0", "~").returns("/resolved/p0.0");
 		this.oMetaModelMock.expects("fetchObject").withExactArgs("/resolved/p0.0")
 			.returns(oPromise);
+		this.mock(_AggregationHelper).expects("getPropertyMetadataForFilter").never();
 
 		this.oMetaModelMock.expects("resolve").withExactArgs("p1.0", "~").returns("/resolved/p1.0");
 		this.oMetaModelMock.expects("fetchObject").withExactArgs("/resolved/p1.0")
@@ -7045,6 +7078,7 @@ sap.ui.define([
 			.returns("/resolved/path");
 		this.oMetaModelMock.expects("fetchObject").withExactArgs("/resolved/path")
 			.returns(oPromise);
+		this.mock(_AggregationHelper).expects("getPropertyMetadataForFilter").never();
 		oBinding.aApplicationFilters = [new Filter("AmountIn%E2%82%AC", FilterOperator.GT, "1000")];
 
 		return oBinding.fetchFilter().then(function (aFilterValues) {
@@ -7114,6 +7148,7 @@ sap.ui.define([
 			}
 
 			this.oMetaModelMock.expects("fetchObject").atLeast(0).returns(oPromise);
+			this.mock(_AggregationHelper).expects("getPropertyMetadataForFilter").never();
 			oBinding.aApplicationFilters = buildFilters(oFixture.filters);
 
 			// code under test
@@ -7273,6 +7308,7 @@ sap.ui.define([
 			.atLeast(0).returns("/resolved/a");
 		this.oMetaModelMock.expects("fetchObject").withExactArgs("/resolved/a").atLeast(0)
 			.returns(Promise.resolve({$Type : "Edm.Decimal"}));
+		this.mock(_AggregationHelper).expects("getPropertyMetadataForFilter").never();
 		this.oMetaModelMock.expects("resolve").withExactArgs("b", sinon.match.same(oMetaContext))
 			.atLeast(0).returns("/resolved/b");
 		this.oMetaModelMock.expects("fetchObject").withExactArgs("/resolved/b").atLeast(0)
@@ -7377,18 +7413,17 @@ sap.ui.define([
 				reset : function () {},
 				// no resetOutOfPlace
 				setQueryOptions : function () {}
-			},
-			aPredicates = ["('0')", "('2')"];
+			};
 
 		oBinding.mParameters.$$aggregation = "~$$aggregation~";
 		this.mock(oOldCache).expects("getResourcePath").withExactArgs().returns("resource/path");
 		this.mock(oBinding).expects("hasEffectivelyKeptAlive").withExactArgs().returns(true);
 		this.mock(oBinding).expects("getKeepAlivePredicates").withExactArgs()
-			.returns(aPredicates);
+			.returns("~mKeepAlivePredicates~");
 		this.mock(oBinding).expects("isGrouped").withExactArgs().returns("~isGrouped~");
 		this.mock(oBinding).expects("getGroupId").never();
 		const oResetCall = this.mock(oOldCache).expects("reset")
-			.withExactArgs(sinon.match.same(aPredicates),
+			.withExactArgs("~mKeepAlivePredicates~",
 				bSideEffectsRefresh ? "myGroup" : undefined, "~queryOptions~",
 				"~$$aggregation~", "~isGrouped~");
 		const oValidationCall = this.mock(oBinding).expects("validateSelection")
@@ -7424,7 +7459,7 @@ sap.ui.define([
 		this.mock(oBinding).expects("getKeepAlivePredicates").never();
 		this.mock(oBinding).expects("isGrouped").withExactArgs().returns("~isGrouped~");
 		this.mock(oOldCache).expects("reset")
-			.withExactArgs([], "myGroup", "~queryOptions~", undefined, "~isGrouped~");
+			.withExactArgs({}, "myGroup", "~queryOptions~", undefined, "~isGrouped~");
 		this.mock(_AggregationCache).expects("create").never();
 
 		assert.strictEqual(
@@ -7466,7 +7501,7 @@ sap.ui.define([
 		this.mock(oOldCache).expects("resetOutOfPlace")
 			.exactly((bAggregationCache && bResetViaSideEffects) ? 1 : 0);
 		this.mock(oOldCache).expects("reset").exactly(bAggregationCache ? 1 : 0)
-			.withExactArgs([], bAggregationCache && bResetViaSideEffects ? "resetGroup" : undefined,
+			.withExactArgs({}, bAggregationCache && bResetViaSideEffects ? "resetGroup" : undefined,
 				"~queryOptions~", sinon.match.same(oBinding.mParameters.$$aggregation),
 				"~isGrouped~");
 		this.mock(oBinding).expects("inheritQueryOptions").exactly(bAggregationCache ? 0 : 1)
@@ -7547,7 +7582,7 @@ sap.ui.define([
 			.returns(bFromModel ? oCache : undefined);
 		if (bFromModel && bAggregation) {
 			oGetExpectation = oBindingMock.expects("getKeepAlivePredicates").withExactArgs()
-				.returns(["(1)", "(3)"]);
+				.returns({"(1)" : true, "(3)" : true});
 			oCacheMock.expects("getValue").withExactArgs("(1)").returns("~1~");
 			oCacheMock.expects("getValue").withExactArgs("(3)").returns("~3~");
 			oCacheMock.expects("setActive").withExactArgs(false);
@@ -8736,7 +8771,7 @@ sap.ui.define([
 		oBinding.sResumeAction = "resetCache";
 		this.mock(oBinding).expects("getDependentBindings").never();
 		this.mock(oBinding).expects("removeCachesAndMessages").withExactArgs("");
-		this.mock(oBinding.oCache).expects("reset").withExactArgs([]);
+		this.mock(oBinding.oCache).expects("reset").withExactArgs({});
 		this.mock(oBinding).expects("onChange").never();
 		this.mock(oBinding).expects("fetchCache").never();
 		this.mock(oBinding).expects("refreshKeptElements").never();
@@ -12485,16 +12520,8 @@ sap.ui.define([
 
 		assert.deepEqual(
 			oBinding.getKeepAlivePredicates(), // code under test
-			["('0')", "('2')", "('4')"]
+			{"('0')" : true, "('2')" : true, "('4')" : true}
 		);
-	});
-
-	//*********************************************************************************************
-	QUnit.test("getKeepAlivePredicates: unresolved", function (assert) {
-		var oBinding = this.bindList("n/a"); // relative, but path is irrelevant
-
-		// code under test
-		assert.deepEqual(oBinding.getKeepAlivePredicates(), []);
 	});
 
 	//*********************************************************************************************

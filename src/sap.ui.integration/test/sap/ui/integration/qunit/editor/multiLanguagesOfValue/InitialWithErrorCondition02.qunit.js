@@ -30,7 +30,6 @@ sap.ui.define([
 	QUnit.config.reorder = false;
 
 	var sBaseUrl = "test-resources/sap/ui/integration/qunit/editor/jsons/withDesigntime/sap.card/";
-	Localization.setLanguage("en");
 	document.body.className = document.body.className + " sapUiSizeCompact ";
 	var _oManifestWithi18nOriginFileOnly = {
 		"sap.app": {
@@ -106,7 +105,7 @@ sap.ui.define([
 			var that = this;
 			//Fallback language
 			return new Promise(function (resolve, reject) {
-				that.oEditor = EditorQunitUtils.createEditor("en");
+				that.oEditor = EditorQunitUtils.createEditor();
 				that.oEditor.setMode("admin");
 				that.oEditor.setAllowSettings(true);
 				that.oEditor.setAllowDynamicValues(true);
@@ -236,7 +235,7 @@ sap.ui.define([
 			var that = this;
 			//Fallback language
 			return new Promise(function (resolve, reject) {
-				that.oEditor = EditorQunitUtils.createEditor("en");
+				that.oEditor = EditorQunitUtils.createEditor();
 				that.oEditor.setMode("content");
 				that.oEditor.setAllowSettings(true);
 				that.oEditor.setAllowDynamicValues(true);
@@ -366,7 +365,7 @@ sap.ui.define([
 			var that = this;
 			//Fallback language
 			return new Promise(function (resolve, reject) {
-				that.oEditor = EditorQunitUtils.createEditor("en");
+				that.oEditor = EditorQunitUtils.createEditor();
 				that.oEditor.setMode("all");
 				that.oEditor.setAllowSettings(true);
 				that.oEditor.setAllowDynamicValues(true);

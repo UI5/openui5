@@ -3492,6 +3492,18 @@ sap.ui.define([
 	  */
 
 	 /**
+	  * Optional hook that will be executed when the panel is used by a <code>sap.m.p13n.Popup</code> that is called before the popup is closed
+	  *
+	  * @param {string} sReason reason for closing the container
+	  * @returns {Promise} A Promise that is fullfilled if the panel is ready to be closed
+	  *
+	  * @function
+	  * @name sap.m.p13n.IContent.onBeforeClose?
+	  * @public
+	  * @since 1.145
+	  */
+
+	 /**
 	  * Type of popup used in the <code>sap.m.p13n.Popup</code>.
 	  *
 	  * @enum {string}

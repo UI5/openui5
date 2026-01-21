@@ -557,7 +557,7 @@ sap.ui.define([
 
 			this._bHadFocus = (vInsert == false) && oDomRef.contains(document.activeElement);
 			this._oRM.flush(oDomRef, false, this._getDomIndex(vInsert));
-			this._bHadFocus && this._oControl.focus();
+			this._bHadFocus && this._oControl.focus({preventScroll: true});
 			if (!this._oControl.getBusy()) {
 				this._bHadFocus = false;
 			}
@@ -848,7 +848,7 @@ sap.ui.define([
 				// or to the item if the focus was on the items container
 				if (this._bHadFocus) {
 					this._bHadFocus = false;
-					jQuery(this._oControl.getNavigationRoot()).trigger("focus");
+					this._oControl.getNavigationRoot()?.focus({preventScroll: true});
 				} else if (!this._iFocusTimer && oTriggerDomRef && oTriggerDomRef.contains(document.activeElement)) {
 					var oFocusTarget = aItems[this._iLastItemsCount] || aItems[iItemsLength - 1] || oControl;
 					this._iFocusTimer = setTimeout(function() {

@@ -27,7 +27,6 @@ sap.ui.define([
 		async: false
 	});
 
-	Localization.setLanguage("en");
 	document.body.className = document.body.className + " sapUiSizeCompact ";
 
 	var _oAdminChangeBase = {
@@ -124,7 +123,6 @@ sap.ui.define([
 			},
 			afterEach: function () {
 				EditorQunitUtils.afterEachTest(this.oEditor, sandbox);
-				Localization.setLanguage("en");
 			}
 		}, function () {
 			QUnit.test("1 string parameter with Admin translations", function (assert) {

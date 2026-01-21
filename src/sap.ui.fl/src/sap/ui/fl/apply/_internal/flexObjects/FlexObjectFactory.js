@@ -100,7 +100,7 @@ sap.ui.define([
 		}
 		const sUser = mProperties.user ||
 			(!LayerUtils.isDeveloperLayer(mProperties.layer)
-				? Settings.getInstanceOrUndef()?.getUserId()
+				? Settings.getInstanceOrUndef()?.getUser()
 				: undefined);
 
 		return {
@@ -119,7 +119,8 @@ sap.ui.define([
 				sourceSystem: mProperties.sourceSystem,
 				sourceClient: mProperties.sourceClient,
 				originalLanguage: mProperties.originalLanguage,
-				user: sUser
+				user: sUser,
+				userId: mProperties.support && mProperties.support.userId
 			},
 			flexObjectMetadata: {
 				changeType: sChangeType,

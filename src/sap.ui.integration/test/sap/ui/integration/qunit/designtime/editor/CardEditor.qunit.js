@@ -45,27 +45,6 @@ sap.ui.define([
 
 	var sBaseUrl = "test-resources/sap/ui/integration/qunit/designtime/editor/cards/";
 
-	function createEditor(sLanguage, oDesigntime) {
-		sLanguage = sLanguage || "en";
-		Localization.setLanguage(sLanguage);
-		var oCardEditor = new CardEditor({
-			designtime: oDesigntime
-		});
-		var oContent = document.getElementById("content");
-		if (!oContent) {
-			oContent = document.createElement("div");
-			oContent.style.position = "absolute";
-			oContent.style.top = "200px";
-			oContent.style.background = "white";
-
-			oContent.setAttribute("id", "content");
-			document.body.appendChild(oContent);
-			document.body.style.zIndex = 1000;
-		}
-		oCardEditor.placeAt(oContent);
-		return oCardEditor;
-	}
-
 	function getDefaultContextModel(oResourceBundle) {
 		return {
 			empty: {
@@ -310,7 +289,6 @@ sap.ui.define([
 		}
 	};
 
-	Localization.setLanguage("en");
 	document.body.className = document.body.className + " sapUiSizeCompact ";
 
 	QUnit.module("Create an editor based on a card instance", {
@@ -570,7 +548,7 @@ sap.ui.define([
 						}
 					}
 				};
-				this.oCardEditor = createEditor("en", {
+				this.oCardEditor = EditorQunitUtils.createEditor("en", {
 					"form": {
 						"items": {
 							"stringArrayParameter": {
@@ -618,7 +596,7 @@ sap.ui.define([
 							}
 						}
 					}
-				});
+				}, "CardEditor");
 				this.oCardEditor.setMode("admin");
 				this.oCardEditor.setAllowSettings(true);
 				this.oCardEditor.setAllowDynamicValues(true);
@@ -722,7 +700,7 @@ sap.ui.define([
 				}
 			};
 			return new Promise(function (resolve, reject) {
-				this.oCardEditor = createEditor("en", {
+				this.oCardEditor = EditorQunitUtils.createEditor("en", {
 					"form": {
 						"items": {
 							"boolean": {
@@ -751,7 +729,7 @@ sap.ui.define([
 							}
 						}
 					}
-				});
+				}, "CardEditor");
 				this.oCardEditor.setMode("admin");
 				this.oCardEditor.setAllowSettings(true);
 				this.oCardEditor.setAllowDynamicValues(true);
@@ -802,7 +780,7 @@ sap.ui.define([
 				}
 			};
 			return new Promise(function (resolve, reject) {
-				this.oCardEditor = createEditor("en", {
+				this.oCardEditor = EditorQunitUtils.createEditor("en", {
 					"form": {
 						"items": {
 							"boolean": {
@@ -841,7 +819,7 @@ sap.ui.define([
 							}
 						}
 					}
-				});
+				}, "CardEditor");
 				this.oCardEditor.setMode("admin");
 				this.oCardEditor.setAllowSettings(true);
 				this.oCardEditor.setAllowDynamicValues(true);
@@ -1476,7 +1454,6 @@ sap.ui.define([
 
 	QUnit.module("Card Preview With changes", {
 		beforeEach: function () {
-			Localization.setLanguage("en");
 			this.oCardEditor = EditorQunitUtils.beforeEachTest(undefined, undefined, "CardEditor");
 		},
 		afterEach: function () {

@@ -193,7 +193,7 @@
 							id="sapUiRtaAddIFrameDialog_PreviewButton"
 							class="sapUiRtaAddIFrameDialogPreviewButton"
 							press="onPreviewPress"
-							enabled="{= !${dialogInfo>/frameUrlError/value} &amp;&amp; (${dialogInfo>/previousFrameUrl/value} !== ${dialogInfo>/frameUrl/value} || ${dialogInfo>/settingsUpdate/value})}"
+							enabled="{= !${dialogInfo>/frameUrlError/value} &amp;&amp; ${dialogInfo>/frameUrl/value} !== '' &amp;&amp; (${dialogInfo>/previousFrameUrl/value} !== ${dialogInfo>/frameUrl/value} || ${dialogInfo>/settingsUpdate/value})}"
 							icon="{=${dialogInfo>/previousFrameUrl/value} ? 'sap-icon://refresh' : null }"
 							type="{= !${dialogInfo>/frameUrlError/value} &amp;&amp; (${dialogInfo>/previousFrameUrl/value} !== ${dialogInfo>/frameUrl/value} || ${dialogInfo>/settingsUpdate/value}) ? 'Emphasized' : 'Default' }"
 							/>
@@ -480,7 +480,7 @@
 				type="Emphasized"
 				text="{i18n>IFRAME_ADDIFRAME_DIALOG_BUTTON_SAVE}"
 				press="onSavePress"
-				enabled="{= !!${dialogInfo>/areAllFieldsValid}}"
+				enabled="{= !!${dialogInfo>/areAllFieldsValid} }"
 			/>
 		</beginButton>
 		<endButton>

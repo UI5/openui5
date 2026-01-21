@@ -158,7 +158,7 @@ sap.ui.define([
 		}
 
 		if (bPriceConditionPresent && !bCurrencyConditionPresent) {
-			oPriceFilterField?.setValueState(ValueState.Warning);
+			oPriceFilterField?.setValueState(ValueState.Error);
 			oPriceFilterField?.setValueStateText("Please select a Currency!");
 
 			return FilterBarValidationStatus.RequiredHasNoValue;

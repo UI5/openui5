@@ -621,7 +621,7 @@ sap.ui.define([
 		this.oModelInterfaceMock.expects("updateMessages")
 			.withExactArgs(sinon.match.same(aMessages));
 		this.mock(oCache).expects("reset").exactly(oFixture.bFailure && oFixture.bInactive ? 1 : 0)
-			.withExactArgs([]);
+			.withExactArgs({});
 		this.oRequestorMock.expects("request")
 			.withExactArgs("DELETE", "EMPLOYEES('1')", sinon.match.same(oGroupLock), {
 					"If-Match" : "etag"
@@ -11755,7 +11755,7 @@ sap.ui.define([
 });
 
 	//*********************************************************************************************
-[[], ["('3')"]].forEach(function (aKeptElementPredicates, i) {
+[{}, {"('3')" : true}].forEach(function (mKeptElementPredicates, i) {
 	[undefined, "myGroup", "$auto"].forEach(function (sGroupId) {
 		[false, true].forEach(function (bDeleted) {
 			var sTitle = "CollectionCache#reset/restore; #" + i + ", sGroupId = " + sGroupId
@@ -11846,7 +11846,7 @@ sap.ui.define([
 		oCacheMock.expects("setQueryOptions").never();
 
 		// code under test
-		oCache.reset(aKeptElementPredicates.slice(), sGroupId);
+		oCache.reset({...mKeptElementPredicates}, sGroupId);
 
 		assert.throws(function () {
 			// code under test
@@ -12013,7 +12013,7 @@ sap.ui.define([
 			});
 
 		// code under test
-		oCache.reset([], undefined, "~mQueryOptions~");
+		oCache.reset({}, undefined, "~mQueryOptions~");
 
 		assert.deepEqual(oCache.aReadRequests, [
 			{iStart : 1, iEnd : 2, bObsolete : true},

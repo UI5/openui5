@@ -870,7 +870,8 @@ sap.ui.define([
 	}));
 
 	QUnit.test("List should clear selection when the binding is filtered or sorted", async function(assert) {
-		assert.equal(this.oList.getSelectedItems().length, 1, "Only one items is selected initially");
+		assert.equal(this.oList.getSelectedItems().length, 1, "Only one item is selected initially");
+		assert.equal(this.oList._getSelectionCount(), 1, "Only one item is selected initially");
 		const selectedContexts = this.oList.getSelectedContexts();
 		this.oList.selectAll();
 		assert.equal(this.oList.getSelectedItems().length, 16, "Now all items are selected");
@@ -906,6 +907,31 @@ sap.ui.define([
 		this.oList.getBinding("items").filter(new Filter("ProductId", FilterOperator.EQ, productId));
 		await ui5Event("updateFinished", this.oList);
 		assert.ok(this.oList.getItems()[0].getSelected(), "Previous selection is still available");
+	});
+
+	QUnit.module("rememberSelections=true", Object.assign({}, oModuleConfig, {
+		beforeEach: async function() {
+			this.oList = await createList({ rememberSelections: true, mode: "MultiSelect", growing: true, growingThreshold: 4 });
+			this.oList.setModel(createODataModel());
+			await ui5Event("updateFinished", this.oList);
+		}
+	}));
+
+	QUnit.test("Selection count should respect rememberSelections", async function(assert) {
+		this.oList.selectAll();
+		assert.equal(this.oList._getSelectionCount(), 4, "All items are selected");
+		const productId = this.oList.getItems()[1].getBindingContext().getProperty("ProductId");
+
+		this.oList.getBinding("items").filter(new Filter("ProductId", FilterOperator.EQ, productId));
+		await ui5Event("updateFinished", this.oList);
+		assert.ok(this.oList.getItems()[0].getSelected(), "Previous selection is retained");
+		assert.equal(this.oList._getSelectionCount(), 4, "Previous selection is not forgotten despite filtering");
+
+		this.oList.removeSelections();
+		assert.equal(this.oList._getSelectionCount(), 3, "Current visible selection is removed");
+
+		this.oList.removeSelections(true);
+		assert.equal(this.oList._getSelectionCount(), 0, "All selections are removed");
 	});
 
 	QUnit.module("ItemsPool", Object.assign({}, oModuleConfig, {

@@ -26,7 +26,6 @@ sap.ui.define([
 
 	var sBaseUrl = "test-resources/sap/ui/integration/qunit/editor/jsons/withDesigntime/sap.card/childEditors/";
 
-	Localization.setLanguage("en");
 	document.body.className = document.body.className + " sapUiSizeCompact ";
 
 	var _aCoreLanguages = [
@@ -174,14 +173,6 @@ sap.ui.define([
 		}
 	};
 
-	function destroyEditor(oEditor) {
-		oEditor.destroy();
-		var oContent = document.getElementById("content");
-		if (oContent) {
-			oContent.innerHTML = "";
-			document.body.style.zIndex = "unset";
-		}
-	}
 
 	QUnit.module("translation mode", {
 		before: function () {
@@ -206,7 +197,7 @@ sap.ui.define([
 				var sCaseTitle = "Core: " + sCoreLanguageKey + ", Editor: " + sEditorLanguageKey + ", main -> child2 -> child2-1";
 				QUnit.test(sCaseTitle, function (assert) {
 					var that = this;
-					that.oEditor = EditorQunitUtils.createEditor(sCoreLanguageKey, undefined,"CardEditor");
+					that.oEditor = EditorQunitUtils.createEditor(sCoreLanguageKey, undefined, "CardEditor");
 					that.oEditor.setMode("translation");
 					that.oEditor.setLanguage(sEditorLanguageKey);
 					that.oEditor.setCard({
@@ -321,7 +312,7 @@ sap.ui.define([
 													":layer": 10
 												}, "Editor settings are OK");
 
-												destroyEditor(that.oEditor);
+												EditorQunitUtils.destroyEditor(that.oEditor);
 												resolve();
 											});
 										});

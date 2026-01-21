@@ -170,7 +170,7 @@ sap.ui.define([
 					// an active cache must let the list binding reset to be told about kept-alive
 					// elements, an inactive cache however has no binding and no kept-alive
 					// elements
-					that.reset([]);
+					that.reset({});
 				}
 			}
 
@@ -4004,8 +4004,8 @@ sap.ui.define([
 	 * alive: all kept-alive elements identified by the given key predicates as well as all
 	 * transient and deleted elements on top level.
 	 *
-	 * @param {string[]} aKeptElementPredicates
-	 *   The key predicates for all kept-alive elements
+	 * @param {Object<boolean>} mKeptElementPredicates
+	 *   The set of key predicates for all kept-alive elements - it's MODIFIED here!
 	 * @param {string} [sGroupId]
 	 *   The group ID used for a side-effects refresh; if given, only inline creation
 	 *   rows and transient elements with a different batch group shall be kept in place and a
@@ -4024,7 +4024,7 @@ sap.ui.define([
 	 * @public
 	 * @see _Cache#hasPendingChangesForPath
 	 */
-	_CollectionCache.prototype.reset = function (aKeptElementPredicates, sGroupId, mQueryOptions,
+	_CollectionCache.prototype.reset = function (mKeptElementPredicates, sGroupId, mQueryOptions,
 			_oAggregation, _bIsGrouped) {
 		var mByPredicate = this.aElements.$byPredicate,
 			mChangeListeners = this.mChangeListeners,
@@ -4060,8 +4060,9 @@ sap.ui.define([
 					? "@$ui5.context.isInactive" in oElement
 						|| sTransientGroup && sTransientGroup !== sGroupId
 					: sTransientGroup) {
-				aKeptElementPredicates.push(_Helper.getPrivateAnnotation(oElement, "predicate")
-					|| _Helper.getPrivateAnnotation(oElement, "transientPredicate"));
+				const sPredicate = _Helper.getPrivateAnnotation(oElement, "predicate")
+					|| _Helper.getPrivateAnnotation(oElement, "transientPredicate");
+				mKeptElementPredicates[sPredicate] = true;
 				this.aElements[iCreated] = oElement;
 				iCreated += 1;
 			} else { // Note: inactive elements are always kept
@@ -4070,7 +4071,7 @@ sap.ui.define([
 		}
 		Object.keys(mByPredicate).forEach(function (sPredicate) {
 			if ("@$ui5.context.isDeleted" in mByPredicate[sPredicate]) {
-				aKeptElementPredicates.push(sPredicate);
+				mKeptElementPredicates[sPredicate] = true;
 			}
 		});
 		this.mChangeListeners = {};
@@ -4082,13 +4083,13 @@ sap.ui.define([
 		this.iLimit = Infinity;
 
 		Object.keys(mChangeListeners).forEach(function (sPath) {
-			if (sPath === "$count" || aKeptElementPredicates.includes(sPath.split("/")[0])) {
+			if (sPath === "$count" || mKeptElementPredicates[sPath.split("/")[0]]) {
 				that.mChangeListeners[sPath] = mChangeListeners[sPath];
 			}
 		});
-		aKeptElementPredicates.forEach(function (sPredicate) {
+		for (const sPredicate in mKeptElementPredicates) {
 			that.aElements.$byPredicate[sPredicate] = mByPredicate[sPredicate];
-		});
+		}
 		// Beware: fireChange can initiate a read which must not be obsoleted
 		this.aReadRequests?.forEach((oReadRequest) => {
 			oReadRequest.bObsolete = true;

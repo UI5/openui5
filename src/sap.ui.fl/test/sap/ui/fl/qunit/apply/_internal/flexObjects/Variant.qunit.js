@@ -127,6 +127,19 @@ sap.ui.define([
 			assert.strictEqual(oBaseVariant.getAuthor(), "new name", "then the variant author name is updated"
 			);
 		});
+
+		QUnit.test("after variant author has been set", function(assert) {
+			this.mFileContent = {
+				layer: "USER",
+				support: {
+					user: "A"
+				}
+			};
+			var oBaseVariant = FlexObjectFactory.createFromFileContent(this.mFileContent, Variant);
+			oBaseVariant.setAuthor("new name");
+			assert.strictEqual(oBaseVariant.getAuthor(), "new name", "then the variant author name is updated"
+			);
+		});
 	});
 
 	QUnit.done(function() {

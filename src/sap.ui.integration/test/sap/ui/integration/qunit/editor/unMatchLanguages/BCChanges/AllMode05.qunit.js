@@ -27,7 +27,6 @@ sap.ui.define([
 		async: false
 	});
 
-	Localization.setLanguage("en");
 	document.body.className = document.body.className + " sapUiSizeCompact ";
 
 	var _oTextsWIthBCChange = {
@@ -145,7 +144,6 @@ sap.ui.define([
 			},
 			afterEach: function () {
 				EditorQunitUtils.afterEachTest(this.oEditor, sandbox);
-				Localization.setLanguage("en");
 			}
 		}, function () {
 			QUnit.test("1 string parameter with Content BC change, Translation change", function (assert) {

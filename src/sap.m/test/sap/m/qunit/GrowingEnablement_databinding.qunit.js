@@ -278,12 +278,16 @@ sap.ui.define([
 		const oBinding = oList.getBinding("items");
 
 		assert.equal(oList.getItems().length, 2, "List has 2 items");
+		assert.equal(oList._getSelectionCount(), 0, "List has no selection initially");
 		const aContexts = oBinding.getAllCurrentContexts();
 		const fnContextClass = aContexts[0].constructor.prototype;
 		const oContextSetSelectedSpy = this.spy(fnContextClass, "setSelected");
 		const oGetAllCurrentContextsSpy = this.spy(oBinding, "getAllCurrentContexts");
+		const oGetSelectionCountSpy = this.spy(oBinding, "getSelectionCount");
 
 		oList.selectAll();
+		assert.equal(oList._getSelectionCount(), 2, "All items are selected");
+		assert.equal(oGetSelectionCountSpy.callCount, 1, "getSelectionCount is called once to retrieve selection count");
 		assert.ok(oContextSetSelectedSpy.firstCall.calledOn(aContexts[0]), "setSelected is called on the first context");
 		assert.ok(oContextSetSelectedSpy.firstCall.calledWith(true), "setSelected(true) is called on the first context");
 		assert.ok(oContextSetSelectedSpy.secondCall.calledOn(aContexts[1]), "setSelected is called on the second context");
@@ -298,6 +302,8 @@ sap.ui.define([
 		oGetAllCurrentContextsSpy.resetHistory();
 
 		oList.removeSelections();
+		assert.equal(oList._getSelectionCount(), 0, "No items are selected after removeSelections call");
+		assert.equal(oGetSelectionCountSpy.callCount, 2, "getSelectionCount is called again to retrieve selection count");
 		assert.ok(oGetAllCurrentContextsSpy.notCalled, "getAllCurrentContexts is not called since bAll parameter is not set");
 
 		oList.removeSelections(true);
@@ -310,6 +316,8 @@ sap.ui.define([
 		oContextSetSelectedSpy.resetHistory();
 
 		oList.getItems()[1].setSelected(true);
+		assert.equal(oList._getSelectionCount(), 1, "The second item is selected");
+		assert.equal(oGetSelectionCountSpy.callCount, 3, "getSelectionCount is called again to retrieve selection count");
 		assert.ok(oContextSetSelectedSpy.calledOn(aContexts[1]), "setSelected is called on the second context");
 		assert.ok(oContextSetSelectedSpy.calledWith(true), "setSelected(true) is called on the second context");
 		oContextSetSelectedSpy.resetHistory();
@@ -321,9 +329,12 @@ sap.ui.define([
 		);
 
 		oList.getItems()[1].setSelected(false);
+		assert.equal(oList._getSelectionCount(), 0, "The second item is deselected");
+		assert.equal(oGetSelectionCountSpy.callCount, 4, "getSelectionCount is called again to retrieve selection count");
 		assert.ok(oContextSetSelectedSpy.calledOn(aContexts[1]), "setSelected is called on the second context");
 		assert.ok(oContextSetSelectedSpy.calledWith(false), "setSelected(false) is called on the second context");
 		oContextSetSelectedSpy.resetHistory();
+		oGetSelectionCountSpy.resetHistory();
 
 		assert.deepEqual(
 			oList.getSelectedContexts(true),

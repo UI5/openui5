@@ -140,7 +140,6 @@ sap.ui.define([
 			"zh-CN": "String1 简体 Content"
 		}
 	};
-	Localization.setLanguage("en");
 	document.body.className = document.body.className + " sapUiSizeCompact ";
 
 	QUnit.module("all mode", {

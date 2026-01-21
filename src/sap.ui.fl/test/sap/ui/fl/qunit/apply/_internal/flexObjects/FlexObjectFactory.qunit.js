@@ -123,6 +123,8 @@ sap.ui.define([
 				"then root level properties are properly mapped"
 			);
 			assert.strictEqual(oFlexObject.getPersistencyKey(), oFileContent.persistencyKey, "then the persistencyKey is set correctly");
+			assert.equal(oFlexObject.getSupportInformation().userId, undefined, "no userId is set");
+			assert.equal(oFlexObject.getSupportInformation().user, undefined, "no user is set");
 		});
 
 		QUnit.test("when a CompVariant with a normal persistencyKey is created", function(assert) {
@@ -138,7 +140,8 @@ sap.ui.define([
 				executeOnSelection: false,
 				namespace: "apps/sap.ui.demoapps.rta.fiorielements/changes/",
 				support: {
-					sapui5Version: "1.100.0-SNAPSHOT"
+					sapui5Version: "1.100.0-SNAPSHOT",
+					userId: "userId123"
 				},
 				someUnknownProperty: "shouldNotLeadToProblems"
 			};
@@ -155,6 +158,7 @@ sap.ui.define([
 				"then root level properties are properly mapped"
 			);
 			assert.strictEqual(oFlexObject.getPersistencyKey(), oFileContent.persistencyKey, "then the persistencyKey is set correctly");
+			assert.equal(oFlexObject.getSupportInformation().userId, "userId123", "userId is set correctly");
 		});
 
 		[{

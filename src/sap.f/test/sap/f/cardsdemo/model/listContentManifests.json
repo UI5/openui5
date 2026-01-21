@@ -1271,5 +1271,150 @@
 		  }
 		}
 	  }
+	},
+	"largeInfoTextWithDescription" : {
+		"sap.app": {
+			"id": "sap.ui5.test.cardeditor.listcard",
+			"type": "card"
+		},
+		"sap.card": {
+			"type": "List",
+			"configuration": {
+				"parameters": {
+					"maxItems": {
+						"value": 3
+					}
+				}
+			},
+			"header": {
+				"title": "Large Info Texts with Description",
+				"icon": {
+					"src": "sap-icon://add-document",
+					"shape": "Circle",
+					"backgroundColor": ""
+				}
+			},
+			"data": {
+				"json": [
+					{
+						"CustomerID": "ALFKI",
+						"CompanyName": "Alfreds Futterkiste",
+						"Address": "Obere Str. 57",
+						"City": "Berlin",
+						"Country": "Germany"
+					},
+					{
+						"CustomerID": "ANATR",
+						"CompanyName": "Ana Trujillo Emparedados y helados",
+						"Address": "Avda. de la Constituci\u00f3n 2222",
+						"City": "M\u00e9xico D.F.",
+						"Country": "Mexico"
+					},
+					{
+						"CustomerID": "ANTON",
+						"CompanyName": "Antonio Moreno Taquer\u00eda",
+						"Address": "Mataderos  2312",
+						"City": "M\u00e9xico D.F.",
+						"Country": "Mexico"
+					},
+					{
+						"CustomerID": "AROUT",
+						"CompanyName": "Around the Horn",
+						"Address": "120 Hanover Sq.",
+						"City": "London",
+						"Country": "UK"
+					},
+					{
+						"CustomerID": "BERGS",
+						"CompanyName": "Berglunds snabbk\u00f6p",
+						"Address": "Berguvsv\u00e4gen  8",
+						"City": "Lule\u00e5",
+						"Country": "Sweden"
+					}
+				]
+			},
+			"content": {
+				"item": {
+					"title": "{CustomerID}",
+					"description": "Trainer: {CompanyName}",
+					"info": {
+						"value": "Location: {Country} - {City} - {Address}"
+					}
+				},
+				"maxItems": "{parameters>/maxItems/value}"
+			}
+		}
+	},
+	"largeInfoText" : {
+		"sap.app": {
+			"id": "sap.ui5.test.cardeditor.listcard",
+			"type": "card"
+		},
+		"sap.card": {
+			"type": "List",
+			"configuration": {
+				"parameters": {
+					"maxItems": {
+						"value": 3
+					}
+				}
+			},
+			"header": {
+				"title": "Large Info Texts no Description",
+				"icon": {
+					"src": "sap-icon://add-document",
+					"shape": "Circle",
+					"backgroundColor": ""
+				}
+			},
+			"data": {
+				"json": [
+					{
+						"CustomerID": "ALFKI",
+						"CompanyName": "Alfreds Futterkiste",
+						"Address": "Obere Str. 57",
+						"City": "Berlin",
+						"Country": "Germany"
+					},
+					{
+						"CustomerID": "ANATR",
+						"CompanyName": "Ana Trujillo Emparedados y helados",
+						"Address": "Avda. de la Constituci\u00f3n 2222",
+						"City": "M\u00e9xico D.F.",
+						"Country": "Mexico"
+					},
+					{
+						"CustomerID": "ANTON",
+						"CompanyName": "Antonio Moreno Taquer\u00eda",
+						"Address": "Mataderos  2312",
+						"City": "M\u00e9xico D.F.",
+						"Country": "Mexico"
+					},
+					{
+						"CustomerID": "AROUT",
+						"CompanyName": "Around the Horn",
+						"Address": "120 Hanover Sq.",
+						"City": "London",
+						"Country": "UK"
+					},
+					{
+						"CustomerID": "BERGS",
+						"CompanyName": "Berglunds snabbk\u00f6p",
+						"Address": "Berguvsv\u00e4gen  8",
+						"City": "Lule\u00e5",
+						"Country": "Sweden"
+					}
+				]
+			},
+			"content": {
+				"item": {
+					"title": "{CustomerID}",
+					"info": {
+						"value": "Location: {Country} - {City} - {Address}"
+					}
+				},
+				"maxItems": "{parameters>/maxItems/value}"
+			}
+		}
 	}
 }

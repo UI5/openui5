@@ -3199,7 +3199,7 @@ sap.ui.define([
 				.withExactArgs(sinon.match.same(oGroupLock), "~path~", "~iLevels~")
 				.callThrough(); // for code under test
 			oCacheMock.expects("expand").exactly(bStale ? 0 : 1)
-				.withExactArgs(sinon.match.same(_GroupLock.$cached), sinon.match.same(aSpliced[2]))
+				.withExactArgs(sinon.match.same(_GroupLock.$cached), sinon.match.same(aSpliced[2]), 1)
 				.returns(SyncPromise.resolve(100));
 			if (bStale) {
 				oCacheMock.expects("isSelectionDifferent")
@@ -3571,7 +3571,6 @@ sap.ui.define([
 						groupLevels : ["foo"]
 					},
 				oCache = _AggregationCache.create(this.oRequestor, "~", "", {}, oAggregation),
-				oCacheMock = this.mock(oCache),
 				bCollapseBottom = bUntilEnd || bSubtotalsAtBottom, // whether bottom line is affected
 				oCollapsed = {
 					"@$ui5.node.isExpanded" : false,
@@ -3612,7 +3611,8 @@ sap.ui.define([
 					A : "10" // placeholder for an aggregate with subtotals
 				}, {
 					"@$ui5._" : {predicate : "('5')"}
-				}];
+				}],
+				mKeptElementPredicates = {"('4')" : true};
 
 			if (bSubtotalsAtBottom) {
 				oAggregation.subtotalsAtBottomOnly = bSubtotalsAtBottomOnly;
@@ -3634,30 +3634,20 @@ sap.ui.define([
 				"($uid=1-234)" : aElements[4],
 				"('5')" : aElements[5]
 			};
-			oCacheMock.expects("getValue").withExactArgs("~path~").returns(aElements[1]);
+			this.mock(oCache).expects("getValue").withExactArgs("~path~").returns(aElements[1]);
 			this.mock(_Helper).expects("updateAll")
 				.withExactArgs(sinon.match.same(oCache.mChangeListeners), "~path~",
 					sinon.match.same(aElements[1]), sinon.match.same(oCollapsed))
 				.callThrough();
 			this.mock(oCache.oTreeState).expects("collapse")
 				.withExactArgs(sinon.match.same(aElements[1]), false, undefined);
-			oCacheMock.expects("countDescendants")
+			this.mock(oCache).expects("countDescendants")
 				.withExactArgs(sinon.match.same(aElements[1]), 1).returns(bUntilEnd ? 4 : 3);
 
-			oCacheMock.expects("isSelectionDifferent")
-				.withExactArgs(sinon.match.same(aElements[2])).returns(false);
-			oCacheMock.expects("isSelectionDifferent")
-				.withExactArgs(sinon.match.same(aElements[3])).returns(false);
-			oCacheMock.expects("isSelectionDifferent")
-				.withExactArgs(sinon.match.same(aElements[4])).returns(true);
-			oCacheMock.expects("isSelectionDifferent")
-				.withExactArgs(sinon.match.same(aElements[5]))
-				.exactly(bCollapseBottom ? 1 : 0)
-				.returns(false);
-
-			// code under test
-			assert.strictEqual(oCache.collapse("~path~"), bCollapseBottom ? 4 : 3,
-				"number of removed elements");
+			assert.strictEqual(
+				// code under test
+				oCache.collapse("~path~", undefined, undefined, undefined, mKeptElementPredicates),
+				bCollapseBottom ? 4 : 3, "number of removed elements");
 
 			if (bCollapseBottom) { // last element was also a child, not a sibling
 				aExpectedElements.pop();
@@ -3693,10 +3683,8 @@ sap.ui.define([
 		[1, 2].forEach(function (iExpandTo) {
 			[false, true].forEach(function (bSilent) {
 				[false, true].forEach(function (bNested) {
-					[false, true].forEach(function (bKeptAlive) {
-						const sTitle = "collapse all, bUnifiedCache=" + bUnifiedCache + ", expandTo="
-							+ iExpandTo + ", bSilent=" + bSilent + ", bNested=" + bNested
-							+ ", bKeptAlive=" + bKeptAlive;
+					const sTitle = "collapse all, bUnifiedCache=" + bUnifiedCache + ", expandTo="
+						+ iExpandTo + ", bSilent=" + bSilent + ", bNested=" + bNested;
 
 		QUnit.test(sTitle, function (assert) {
 			const oCache = _AggregationCache.create(this.oRequestor, "~", "", {},
@@ -3761,10 +3749,10 @@ sap.ui.define([
 				"('99')" : aElements[8]
 			};
 			const oCacheMock = this.mock(oCache);
-			const aKeptElementPredicates = Object.freeze(bKeptAlive ? ["n/a", "('3')", "..."] : []);
+			const mKeptElementPredicates = Object.freeze({"('3')" : true});
 			oCacheMock.expects("collapse")
 				.withExactArgs("~path~", "~oGroupLock~", bSilent, bNested,
-					sinon.match.same(aKeptElementPredicates))
+					sinon.match.same(mKeptElementPredicates))
 				.callThrough();
 			oCacheMock.expects("getValue").withExactArgs("~path~").returns(aElements[1]);
 			this.mock(_AggregationHelper).expects("getCollapsedObject")
@@ -3777,26 +3765,20 @@ sap.ui.define([
 				.withExactArgs(sinon.match.same(aElements[1]), true, bNested);
 			oCacheMock.expects("countDescendants")
 				.withExactArgs(sinon.match.same(aElements[1]), 1).returns(6);
-			oCacheMock.expects("isSelectionDifferent")
-				.withExactArgs(sinon.match.same(aElements[2])).returns(false);
-			oCacheMock.expects("isSelectionDifferent")
-				.withExactArgs(sinon.match.same(aElements[3])).returns(!bKeptAlive);
 			oCacheMock.expects("collapse").withExactArgs("('4')", "~oGroupLock~", bSilent, true,
-					sinon.match.same(aKeptElementPredicates))
+					sinon.match.same(mKeptElementPredicates))
 				.callsFake(function () {
 					oCache.aElements.splice(5, 2);
 					oCache.aElements.$count -= 2;
 
 					return 2;
 				});
-			oCacheMock.expects("isSelectionDifferent")
-				.withExactArgs(sinon.match.same(aElements[4])).returns(false);
 			oCacheMock.expects("validateAndDeleteExpandInfo").exactly(bNested ? 0 : 1)
 				.withExactArgs("~oGroupLock~", sinon.match.same(aElements[1]));
 
 			assert.strictEqual(
 				// code under test
-				oCache.collapse("~path~", "~oGroupLock~", bSilent, bNested, aKeptElementPredicates),
+				oCache.collapse("~path~", "~oGroupLock~", bSilent, bNested, mKeptElementPredicates),
 				6);
 
 			assert.deepEqual(oCache.aElements, aExpectedElements);
@@ -3804,12 +3786,11 @@ sap.ui.define([
 			assert.deepEqual(oCache.aElements.$byPredicate, {
 				"('0')" : aExpectedElements[0],
 				"('1')" : aExpectedElements[1],
-				"('3')" : aElements[3], // because its selection is different
+				"('3')" : aElements[3], // because it's kept alive
 				"($uid=1-24)" : aElements[3],
 				"('99')" : aElements[8]
 			});
 		});
-					});
 				});
 			});
 		});
@@ -4621,7 +4602,7 @@ sap.ui.define([
 			var oCache = _AggregationCache.create(this.oRequestor, "~", "", {},
 				bDataAggregation ? {groupLevels : ["foo"]} : {hierarchyQualifier : "X"}),
 				oFirstLevel = oCache.oFirstLevel,
-				aKeptElementPredicates = ["foo", "bar"],
+				mKeptElementPredicates = {foo : true, bar : true},
 				oNewAggregation = bDataAggregation
 					? {aggregate : "~aggregate~"}
 					: {aggregate : "~aggregate~", hierarchyQualifier : "Y"},
@@ -4654,7 +4635,7 @@ sap.ui.define([
 			oCache.bUnifiedCache = "~bUnifiedCache~";
 			oCache.oGrandTotalPromise = "~oGrandTotalPromise~";
 			const oResetExpectation = this.mock(oCache.oFirstLevel).expects("reset").on(oCache)
-				.withExactArgs(sinon.match.same(aKeptElementPredicates), sGroupId, "~mQueryOptions~")
+				.withExactArgs(sinon.match.same(mKeptElementPredicates), sGroupId, "~mQueryOptions~")
 				.callsFake(function () {
 					oCache.oBackup = sGroupId ? {} : null;
 				});
@@ -4669,7 +4650,7 @@ sap.ui.define([
 					bHasGrandTotal);
 
 			// code under test
-			oCache.reset(aKeptElementPredicates, sGroupId, "~mQueryOptions~", oNewAggregation);
+			oCache.reset(mKeptElementPredicates, sGroupId, "~mQueryOptions~", oNewAggregation);
 
 			if (!sGroupId) {
 				sinon.assert.callOrder(oTreeStateResetExpectation, oGetExpandLevelsExpectation);
@@ -4717,8 +4698,7 @@ sap.ui.define([
 			},
 			oCache = _AggregationCache.create(this.oRequestor, "~", "", {}, oAggregation),
 			sToString = oCache.sToString,
-			oFirstLevel = oCache.oFirstLevel,
-			aKeptElementPredicates = ["foo"];
+			oFirstLevel = oCache.oFirstLevel;
 
 		oCache.aElements.$byPredicate = {foo : {}};
 		this.mock(_Helper).expects("hasPrivateAnnotation")
@@ -4729,7 +4709,7 @@ sap.ui.define([
 
 		assert.throws(function () {
 			// code under test
-			oCache.reset(aKeptElementPredicates);
+			oCache.reset({foo : true});
 		}, new Error("Unexpected placeholder"));
 
 		assert.strictEqual(oCache.oAggregation, oAggregation, "unchanged");
@@ -4750,7 +4730,7 @@ sap.ui.define([
 
 			assert.throws(function () {
 				// code under test
-				oCache.reset([], "", {}, undefined, /*bIsGrouped*/true);
+				oCache.reset({}, "", {}, undefined, /*bIsGrouped*/true);
 			}, new Error("Unsupported grouping via sorter"));
 		});
 	});
@@ -5595,7 +5575,7 @@ sap.ui.define([
 			const oCollapseExpectation = oCacheMock.expects("collapse").exactly(bChildExpanded ? 1 : 0)
 				.withExactArgs("('23')").returns("~collapseCount~");
 			oCacheMock.expects("expand").exactly(bNewParentExpanded === false ? 1 : 0)
-				.withExactArgs(sinon.match.same(_GroupLock.$cached), "('42')")
+				.withExactArgs(sinon.match.same(_GroupLock.$cached), "('42')", 1)
 				.returns(SyncPromise.resolve(47));
 			oHelperMock.expects("updateAll")
 				.exactly(oParentNode && bNewParentExpanded === undefined ? 1 : 0)
@@ -7523,7 +7503,7 @@ sap.ui.define([
 				assert.strictEqual(oCache.aElements.indexOf(oNode3), 5, "not yet moved");
 			});
 		this.mock(oCache).expects("expand")
-			.withExactArgs(sinon.match.same(_GroupLock.$cached), "~predicate3~")
+			.withExactArgs(sinon.match.same(_GroupLock.$cached), "~predicate3~", 1)
 			.callsFake(function () {
 				assert.strictEqual(oCache.aElements.indexOf(oNode3), 2,
 					"moved immediately behind parent (snapshot)");

@@ -382,10 +382,10 @@ sap.ui.define([
 		});
 
 		QUnit.test("When URL parameter values contain characters that need to be encoded", function(assert) {
-			this.oAddIFrameDialog.attachOpened(function() {
+			this.oAddIFrameDialog.attachOpened(async function() {
 				const sUrl = "https://example.com/{ProductCategory}";
 				this.oAddIFrameDialog._oJSONModel.setProperty("/frameUrl/value", sUrl);
-				this.oAddIFrameDialog._oController.onPreviewPress();
+				await this.oAddIFrameDialog._oController.onPreviewPress();
 				const oIFrame = Element.getElementById("sapUiRtaAddIFrameDialog_PreviewFrame");
 				assert.strictEqual(
 					oIFrame.getUrl(),
@@ -408,7 +408,7 @@ sap.ui.define([
 					this.oAddIFrameDialog._oJSONModel.setProperty("/frameUrl/value", sUrl);
 				}
 				this.oDialogSettings.parameters.forEach(checkParam.bind(this));
-				sUrl = this.oAddIFrameDialog._oController._buildPreviewURL(
+				sUrl = await this.oAddIFrameDialog._oController._buildPreviewURL(
 					this.oAddIFrameDialog._oJSONModel.getProperty("/frameUrl/value")
 				);
 				assert.strictEqual(
@@ -429,13 +429,14 @@ sap.ui.define([
 			assert.strictEqual(oResponse, undefined, "The promise returns no setting");
 		});
 
-		QUnit.test("The Save-Button is only enabled when URL is entered", function(assert) {
+		QUnit.test("The Save button is only enabled when URL is entered", function(assert) {
 			this.oAddIFrameDialog.attachOpened(function() {
 				const oData = this.oAddIFrameDialog._oJSONModel.getData();
+				const oSaveButton = Element.getElementById("sapUiRtaAddIFrameDialogSaveButton");
 				const bButtonEnabledFirstUrl = !!oData.frameUrl.value;
-				assert.notOk(Element.getElementById("sapUiRtaAddIFrameDialogSaveButton").getEnabled(), "Initial state is disabled");
+				assert.notOk(oSaveButton.getEnabled(), "Initial state is disabled");
 				assert.strictEqual(
-					Element.getElementById("sapUiRtaAddIFrameDialogSaveButton").getEnabled(),
+					oSaveButton.getEnabled(),
 					bButtonEnabledFirstUrl,
 					"Initial state of URL-Textarea is empty"
 				);
@@ -443,7 +444,7 @@ sap.ui.define([
 				const bButtonEnabledSecondUrl = !!oData.frameUrl.value;
 				updateSaveButtonEnablement(!!oData.frameUrl.value);
 				assert.strictEqual(
-					Element.getElementById("sapUiRtaAddIFrameDialogSaveButton").getEnabled(),
+					oSaveButton.getEnabled(),
 					bButtonEnabledSecondUrl,
 					"Button is enabled wheen URL-Textarea is not empty"
 				);
@@ -508,7 +509,7 @@ sap.ui.define([
 				const oPreviewIframe = Element.getElementById("sapUiRtaAddIFrameDialog_PreviewFrame");
 				await setTextAreaValue(this.oAddIFrameDialog._oDialog, "someUrl");
 				oAllowFormsSwitch.setState(true);
-				this.oAddIFrameDialog._oController.onPreviewPress();
+				await this.oAddIFrameDialog._oController.onPreviewPress();
 				await nextUIUpdate();
 				assert.ok(
 					oPreviewIframe.getIFrameDomRef().sandbox.contains("allow-forms"),
@@ -516,7 +517,7 @@ sap.ui.define([
 				);
 				oAllowFormsSwitch.setState(false);
 				oAllowFormsSwitch.fireChange();
-				this.oAddIFrameDialog._oController.onPreviewPress();
+				await this.oAddIFrameDialog._oController.onPreviewPress();
 				await nextUIUpdate();
 				assert.notOk(
 					oPreviewIframe.getIFrameDomRef().sandbox.contains("allow-forms"),
@@ -535,7 +536,7 @@ sap.ui.define([
 
 				// eslint-disable-next-line no-script-url
 				await setTextAreaValue(this.oAddIFrameDialog._oDialog, "javascript:someJs");
-				this.oAddIFrameDialog._oController.onPreviewPress();
+				await this.oAddIFrameDialog._oController.onPreviewPress();
 				assert.strictEqual(oUrlTextArea.getValueState(), ValueState.Error, "then an error is displayed");
 				assert.strictEqual(
 					this.oAddIFrameDialog._oJSONModel.getProperty("/previewUrl/value"),
@@ -634,7 +635,7 @@ sap.ui.define([
 			this.oAddIFrameDialog.attachOpened(async () => {
 				const oPreviewLink = Element.getElementById("sapUiRtaAddIFrameDialog_PreviewLink");
 				await setTextAreaValue(this.oAddIFrameDialog._oDialog, "https://www.example.com/{$user>/fullName}");
-				this.oAddIFrameDialog._oController.onPreviewPress();
+				await this.oAddIFrameDialog._oController.onPreviewPress();
 				assert.strictEqual(
 					oPreviewLink.getText(),
 					"https://www.example.com/Test%20User",
@@ -649,7 +650,7 @@ sap.ui.define([
 			this.oAddIFrameDialog.attachOpened(async () => {
 				const oPreviewLink = Element.getElementById("sapUiRtaAddIFrameDialog_PreviewLink");
 				await setTextAreaValue(this.oAddIFrameDialog._oDialog, "https://www.example.com/{= ${ProductCategory}}");
-				this.oAddIFrameDialog._oController.onPreviewPress();
+				await this.oAddIFrameDialog._oController.onPreviewPress();
 				assert.strictEqual(
 					oPreviewLink.getText(),
 					"https://www.example.com/Ice%20Cream",
@@ -664,7 +665,7 @@ sap.ui.define([
 			this.oAddIFrameDialog.attachOpened(async () => {
 				const oPreviewLink = Element.getElementById("sapUiRtaAddIFrameDialog_PreviewLink");
 				await setTextAreaValue(this.oAddIFrameDialog._oDialog, "potato.html");
-				this.oAddIFrameDialog._oController.onPreviewPress();
+				await this.oAddIFrameDialog._oController.onPreviewPress();
 				assert.strictEqual(
 					oPreviewLink.getText(),
 					`${window.location.href.substring(0, window.location.href.indexOf("qunit/") + 6)}potato.html`,
@@ -675,11 +676,12 @@ sap.ui.define([
 			return this.oAddIFrameDialog.open(mTestURLBuilderData, oReferenceControl);
 		});
 
-		QUnit.test("When OK button is clicked then the promise should return settings", async function(assert) {
+		QUnit.test("When Save button is clicked then the promise should return settings", async function(assert) {
 			this.oAddIFrameDialog.attachOpened(function() {
 				aTextInputFields.forEach(function(sFieldName) {
 					this.oAddIFrameDialog._oJSONModel.getData()[sFieldName].value = "Text entered";
 				}, this);
+				this.oAddIFrameDialog._oController._checkIfAllFieldsValid(true);
 				clickOnSave();
 			}, this);
 			const oResponse = await this.oAddIFrameDialog.open(
@@ -701,6 +703,7 @@ sap.ui.define([
 					Element.getElementById("sapUiRtaAddIFrameDialog_ContainerTitle").getVisible(),
 					"then the title section is not visible"
 				);
+				this.oAddIFrameDialog._oController._checkIfAllFieldsValid(true);
 				clickOnSave();
 			}, this);
 
@@ -753,6 +756,7 @@ sap.ui.define([
 					const oAdvancedSettings = this.oAddIFrameDialog._oJSONModel.getProperty("/advancedSettings/value");
 					assert.strictEqual(oAdvancedSettings.allowForms, true, "then the model is set correctly");
 				}, this);
+				this.oAddIFrameDialog._oController._checkIfAllFieldsValid(true);
 				clickOnSave();
 			}, this);
 			const oResponse = await this.oAddIFrameDialog.open(
@@ -782,7 +786,7 @@ sap.ui.define([
 				});
 				oData.frameWidthUnit.value = "rem";
 				oData.frameHeightUnit.value = "vh";
-				updateSaveButtonEnablement(!!oData.frameUrl.value);
+				this.oAddIFrameDialog._oController._checkIfAllFieldsValid(true);
 				clickOnSave();
 			}, this);
 			const oResponse = await this.oAddIFrameDialog.open(
@@ -850,7 +854,10 @@ sap.ui.define([
 				const oHeightValueArea = Element.getElementById("sapUiRtaAddIFrameDialog_HeightInput");
 				const oSaveButton = Element.getElementById("sapUiRtaAddIFrameDialogSaveButton");
 
-				assert.strictEqual(oSaveButton.getEnabled(), true, "then the save button is enabled at first");
+				assert.strictEqual(oSaveButton.getEnabled(), false, "then the save button is disabled when the dialog is opened");
+				this.oAddIFrameDialog._oController._checkIfAllFieldsValid(true);
+				assert.strictEqual(oSaveButton.getEnabled(), true, "then the save button is enabled when all fields are valid");
+
 				oTitleValueArea.setValue("");
 				QUnitUtils.triggerEvent("input", oTitleValueArea.getFocusDomRef());
 				await nextUIUpdate();
@@ -965,6 +972,30 @@ sap.ui.define([
 	QUnit.module("Given that an IFrameDialog is opened for a control that uses an OData V4 Model...", {
 		beforeEach() {
 			this.oAddIFrameDialog = new AddIFrameDialog();
+			this.sBindingPath = "/IceCream(0)/name";
+			this.oModel = new ODataModel({ serviceUrl: "DummyURL/" });
+			const oOriginalMetaModel = this.oModel.getMetaModel();
+			this.oModel.getMetaModel = () => {
+				oOriginalMetaModel.getMetaPath = () => {
+					return "/IceCream";
+				};
+				oOriginalMetaModel.requestObject = () => {
+					return Promise.resolve("Edm.String");
+				};
+				return oOriginalMetaModel;
+			};
+			this.oV4Control = new Button();
+			this.oV4Control.setModel(this.oModel);
+			sandbox.stub(this.oV4Control, "getBindingContext").returns({
+				getModel: () => this.oModel,
+				getObject: () => {
+					return {
+						name: "Twister"
+					};
+				},
+				getPath: () => this.sBindingPath
+
+			});
 		},
 		afterEach() {
 			this.oAddIFrameDialog.destroy();
@@ -972,38 +1003,23 @@ sap.ui.define([
 		}
 	}, function() {
 		QUnit.test("When AddIFrameDialog gets initialized and open is called,", async function(assert) {
-			const sBindingPath = "/IceCream(0)/name";
-			const oModel = new ODataModel({ serviceUrl: "DummyURL/" });
-			oModel.getMetaModel = () => {
-				return {
-					getMetaPath: (sPath) => {
-						assert.equal(sPath, sBindingPath, "then the binding path is passed as parameter");
-						return "/IceCream";
-					},
-					requestObject: (sPath) => {
-						assert.equal(sPath, "/IceCream/name/$Type", "then the property type is requested");
-						return Promise.resolve("Edm.String");
-					}
+			const oOriginalMetaModel = this.oModel.getMetaModel();
+			this.oModel.getMetaModel = () => {
+				oOriginalMetaModel.getMetaPath = (sPath) => {
+					assert.equal(sPath, this.sBindingPath, "then the binding path is passed as parameter");
+					return "/IceCream";
 				};
+				oOriginalMetaModel.requestObject = (sPath) => {
+					assert.equal(sPath, "/IceCream/name/$Type", "then the property type is requested");
+					return Promise.resolve("Edm.String");
+				};
+				return oOriginalMetaModel;
 			};
-			const oV4Control = new Button();
-			oV4Control.setModel(oModel);
-			sandbox.stub(oV4Control, "getBindingContext").returns({
-				getModel: () => oModel,
-				getObject: () => {
-					return {
-						name: "Twister"
-					};
-				},
-				getPath: () => sBindingPath
-
-			});
-			const mParameters = await AddIFrameDialog.buildUrlBuilderParametersFor(oV4Control);
+			const mParameters = await AddIFrameDialog.buildUrlBuilderParametersFor(this.oV4Control);
 			this.oDialogSettings = {
 				parameters: mParameters,
 				asContainer: true
 			};
-
 			this.oAddIFrameDialog.attachOpened(function() {
 				this.oDialogSettings.parameters.forEach((oParam) => {
 					assert.strictEqual(
@@ -1019,7 +1035,33 @@ sap.ui.define([
 				});
 				clickOnCancel();
 			}, this);
-			return this.oAddIFrameDialog.open(this.oDialogSettings, oV4Control);
+
+			await this.oAddIFrameDialog.open(this.oDialogSettings, this.oV4Control);
+		});
+
+		QUnit.test("When the URL is built with an OData V4 parameter", function(assert) {
+			function checkEvent(sEventName, fnHandler, oListener) {
+				if (sEventName === "change") {
+					assert.ok(true, "then the change event is attached to the resolver");
+					fnHandler.call(oListener);
+				} else {
+					this.attachEventOnce(sEventName, fnHandler, oListener);
+				}
+			}
+
+			this.oAddIFrameDialog.attachOpened(async function() {
+				const oResolver = Element.getElementById("sapUiRtaAddIFrameDialog_PreviewLinkResolver");
+				const oGetBindingStub = sandbox.stub(oResolver, "getBinding").callsFake((...aArgs) => {
+					const oBinding = oGetBindingStub.wrappedMethod.apply(oResolver, aArgs);
+					sandbox.stub(oBinding, "attachEventOnce").callsFake(checkEvent.bind(oBinding));
+					return oBinding;
+				});
+				const sUrl = "{IceCreamName}";
+				this.oAddIFrameDialog._oJSONModel.setProperty("/frameUrl/value", sUrl);
+				await this.oAddIFrameDialog._oController.onPreviewPress();
+				clickOnCancel();
+			}, this);
+			return this.oAddIFrameDialog.open(this.oDialogSettings, this.oV4Control);
 		});
 	});
 

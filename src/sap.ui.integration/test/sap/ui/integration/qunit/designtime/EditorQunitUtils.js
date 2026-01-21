@@ -165,11 +165,13 @@ sap.ui.define([
 		}
 		if (sEditorType === "CardEditor") {
 			oEditor = new CardEditor({
-				designtime: oDesigntime
+				designtime: oDesigntime,
+				language: sLanguage
 			});
 		} else {
 			oEditor = new Editor({
-				designtime: oDesigntime
+				designtime: oDesigntime,
+				language: sLanguage
 			});
 		}
 		oEditor.placeAt(oContent);
@@ -183,6 +185,7 @@ sap.ui.define([
 			oContent.innerHTML = "";
 			document.body.style.zIndex = "unset";
 		}
+		Localization.setLanguage("en");
 	};
 
 	EditorQunitUtils.oResponseDataOfMockServer = {

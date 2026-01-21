@@ -59,7 +59,7 @@ sap.ui.define([
 	QUnit.module("UIChange Creation", {
 		beforeEach() {
 			sandbox.stub(Settings, "getInstanceOrUndef").returns({
-				getUserId() {
+				getUser() {
 					return "userId";
 				}
 			});

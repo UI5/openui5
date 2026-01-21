@@ -89,7 +89,6 @@ sap.ui.define([
 			"fr-CA": "String 4 French CA"
 		}
 	};
-	Localization.setLanguage("en");
 	document.body.className = document.body.className + " sapUiSizeCompact ";
 
 	QUnit.module("Basic", {

@@ -529,6 +529,51 @@ sap.ui.define([
 		expectedRenameEnabled: false,
 		expectedTranslationEnabled: true
 	}, {
+		testName: "and a variant in the PUBLIC layer and an available PUBLIC layer where the cf user id is different",
+		variant: {
+			layer: Layer.PUBLIC,
+			support: {
+				user: "PAUL_not_use",
+				userId: "frank123"
+			},
+			originalLanguage: "DE",
+			sourceSystem: undefined,
+			sourceClient: undefined
+		},
+		settings: {
+			isKeyUser: false,
+			isPublicLayerAvailable: true
+		},
+		currentUser: "PAUL_not_use",
+		currentUserId: "paul123",
+		expectedEditEnabled: false,
+		expectedDeleteEnabled: false,
+		expectedRenameEnabled: false,
+		expectedTranslationEnabled: false
+	}, {
+		testName: "and a variant in the PUBLIC layer and an available PUBLIC layer where the cf user id is the same",
+		variant: {
+			layer: Layer.PUBLIC,
+			support: {
+				user: "FRANK_not_use",
+				userId: "paul123"
+			},
+			originalLanguage: "DE",
+			sourceSystem: undefined,
+			sourceClient: undefined
+		},
+		settings: {
+			isKeyUser: false,
+			isPublicLayerAvailable: true,
+			isVariantSharingEnabled: true
+		},
+		currentUser: "PAUL",
+		currentUserId: "paul123",
+		expectedEditEnabled: true,
+		expectedDeleteEnabled: true,
+		expectedRenameEnabled: true,
+		expectedTranslationEnabled: false
+	}, {
 		testName: "Given a VENDOR variant with a set sap-ui-layer=VENDOR parameter when isReadOnly is called",
 		variant: {
 			layer: Layer.VENDOR,
@@ -549,7 +594,11 @@ sap.ui.define([
 		sapUiLayerUrlParameter: Layer.VENDOR
 	}];
 
-	function stubCurrentUser(sUserId) {
+	function stubCurrentUser(sUser) {
+		sandbox.stub(Settings.prototype, "getUser").returns(sUser);
+	}
+
+	function stubCurrentUserId(sUserId) {
 		sandbox.stub(Settings.prototype, "getUserId").returns(sUserId);
 	}
 
@@ -642,6 +691,7 @@ sap.ui.define([
 				// mocked settings
 				sandbox.stub(Settings, "getInstanceOrUndef").returns(new Settings(mTestSetup.settings));
 				stubCurrentUser(mTestSetup.currentUser);
+				stubCurrentUserId(mTestSetup.currentUserId);
 				if (mTestSetup.sapUiLayerUrlParameter) {
 					sandbox.stub(URLSearchParams.prototype, "get").returns(
 						mTestSetup.sapUiLayerUrlParameter
