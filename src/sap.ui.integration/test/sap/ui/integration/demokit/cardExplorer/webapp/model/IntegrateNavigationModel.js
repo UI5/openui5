@@ -25,16 +25,40 @@ sap.ui.define([
 				key: 'api'
 			},
 			{
-				title: 'Handle Actions',
-				icon: 'sap-icon://SAP-icons-TNT/aggregator',
+				title: 'Destinations',
+				icon: 'sap-icon://connected',
 				target: 'integrate',
-				key: 'handleActions'
+				key: 'destinations'
 			},
 			{
 				title: 'Layouts',
 				icon: 'sap-icon://SAP-icons-TNT/auto-layout',
 				target: 'integrate',
 				key: 'layouts'
+			},
+			{
+				title: 'Host Actions',
+				icon: 'sap-icon://overflow',
+				target: 'integrate',
+				key: 'hostActions'
+			},
+			{
+				title: 'Handle Actions',
+				icon: 'sap-icon://SAP-icons-TNT/aggregator',
+				target: 'integrate',
+				key: 'handleActions'
+			},
+			{
+				title: 'Card Interactions',
+				icon: 'sap-icon://action',
+				target: 'integrate',
+				key: 'interactions'
+			},
+			{
+				title: 'Text Badge',
+				icon: 'sap-icon://badge',
+				target: 'integrate',
+				key: 'badge'
 			},
 			{
 				title: 'Caching',
@@ -51,12 +75,6 @@ sap.ui.define([
 				experimental: true
 			},
 			{
-				title: 'Destinations',
-				icon: 'sap-icon://connected',
-				target: 'integrate',
-				key: 'destinations'
-			},
-			{
 				title: 'OAuth 3LO',
 				icon: 'sap-icon://validate',
 				target: 'integrate',
@@ -64,28 +82,10 @@ sap.ui.define([
 				experimental: true
 			},
 			{
-				title: 'Host Actions',
-				icon: 'sap-icon://overflow',
-				target: 'integrate',
-				key: 'hostActions'
-			},
-			{
-				title: 'Text Badge',
-				icon: 'sap-icon://badge',
-				target: 'integrate',
-				key: 'badge'
-			},
-			{
 				title: 'Troubleshooting',
 				icon: 'sap-icon://wrench',
 				target: 'integrate',
 				key: 'troubleshooting'
-			},
-			{
-				title: 'Card Interactions',
-				icon: 'sap-icon://action',
-				target: 'integrate',
-				key: 'interactions'
 			}
 		]
 	});

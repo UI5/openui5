@@ -788,6 +788,75 @@ sap.ui.define([
 		});
 	});
 
+	QUnit.test("_checkFilterState and _checkFilterValue should not be called when inner layout is not AdaptFiltersPanel", function(assert){
+		const done = assert.async();
+		this.prepareTestSetup(false);
+
+		const oFilterPanel = oAdaptationFilterBar._oFilterBarLayout.getInner();
+
+		oAdaptationFilterBar.setP13nData({
+			items: [
+				{
+					name: "key1",
+					visible: true
+				},
+				{
+					name: "key2",
+					visible: false
+				}
+			]
+		});
+
+		Promise.all([
+			this.oParent.initPropertyHelper(this.createPropertyHelper()),
+			this.oParent.initControlDelegate()
+		])
+		.then(function(){
+			oAdaptationFilterBar.createFilterFields().then(function(){
+
+				const oCheckFilterStateSpy = sinon.spy(oAdaptationFilterBar, "_checkFilterState");
+				const oCheckFilterValueSpy = sinon.spy(oAdaptationFilterBar, "_checkFilterValue");
+
+				assert.notOk(oFilterPanel.isA("sap.ui.mdc.p13n.panels.AdaptFiltersPanel"), "Inner layout is not AdaptFiltersPanel");
+
+				oFilterPanel.fireChange({
+					item: {
+						name: "key1"
+					},
+					reason: "Show"
+				});
+
+				oFilterPanel.fireChange({
+					item: {
+						name: "key2"
+					},
+					reason: "Hide"
+				});
+
+				oFilterPanel.fireChange({
+					item: {
+						name: "key1"
+					},
+					reason: "Filter"
+				});
+
+				oFilterPanel.fireChange({
+					item: {
+						name: "key2"
+					},
+					reason: "Add"
+				});
+				assert.equal(oCheckFilterStateSpy.notCalled, true,"_checkFilterState was not called when inner layout is not AdaptFiltersPanel");
+				assert.equal(oCheckFilterValueSpy.notCalled, true,  "_checkFilterValue was not called when inner layout is not AdaptFiltersPanel");
+
+				// Clean up
+				oCheckFilterStateSpy.restore();
+				oCheckFilterValueSpy.restore();
+				done();
+			});
+		});
+	});
+
 	QUnit.test("Test '_checkFunctionality' - check 'remove' hook executions, but change the selection before", function(assert){
 		const done = assert.async(1);
 		this.prepareTestSetup(true);

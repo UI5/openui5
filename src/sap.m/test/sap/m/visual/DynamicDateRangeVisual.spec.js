@@ -74,8 +74,10 @@ describe("sap.m.DynamicDateRangeVisual", function() {
 		aListItems = element.all(by.css("#DDR2-RP-popover .sapMListItems .sapMSLI"));
 
 		aListItems.get(13).click(); // select the date range option
+		browser.actions().sendKeys(protractor.Key.TAB).perform();
 		expect(takeScreenshot()).toLookAs("date_range_ui");
 
+		browser.actions().sendKeys(protractor.Key.TAB).perform();
 		browser.actions().sendKeys(protractor.Key.TAB).perform();
 		browser.actions().sendKeys(protractor.Key.TAB).perform();
 
@@ -94,8 +96,10 @@ describe("sap.m.DynamicDateRangeVisual", function() {
 
 		oValueHelp.click();
 		aListItems.get(15).click(); // select "from" date option
+		browser.actions().sendKeys(protractor.Key.TAB).perform();
 		expect(takeScreenshot()).toLookAs("from_date_ui");
 
+		browser.actions().sendKeys(protractor.Key.TAB).perform();
 		browser.actions().sendKeys(protractor.Key.TAB).perform();
 		browser.actions().sendKeys(protractor.Key.TAB).perform();
 		browser.actions().sendKeys(protractor.Key.ENTER).perform(); // select date
@@ -117,11 +121,21 @@ describe("sap.m.DynamicDateRangeVisual", function() {
 		browser.actions().sendKeys(protractor.Key.TAB).perform();
 		browser.actions().sendKeys(protractor.Key.ENTER).perform(); // get back to suggestions popover
 
+	}, iDefaultTimeout);
+
+	it("Month in year options", function() {
+		var oValueHelp = element(by.id("DDR2-input-vhi")),
+			aListItems;
+
 		oValueHelp.click();
+		aListItems = element.all(by.css("#DDR2-RP-popover .sapMListItems .sapMSLI"));
+
 		aListItems.get(28).click(); // select "month in year" option
 		expect(takeScreenshot()).toLookAs("monthinyear_ui");
 		var shiftTab = protractor.Key.chord(protractor.Key.SHIFT, protractor.Key.TAB);
 		browser.actions().sendKeys(shiftTab).perform();
+		browser.actions().sendKeys(shiftTab).perform();
+
 		browser.actions().sendKeys(protractor.Key.ENTER).perform();
 		browser.actions().sendKeys(protractor.Key.ARROW_DOWN).perform();
 		browser.actions().sendKeys(protractor.Key.ARROW_DOWN).perform();

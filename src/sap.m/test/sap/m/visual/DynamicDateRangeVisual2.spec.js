@@ -21,6 +21,15 @@ describe("sap.m.DynamicDateRangeVisual2", function() {
 		browser.actions().sendKeys(protractor.Key.ENTER).perform();
 
 		expect(takeScreenshot()).toLookAs("time_picker_loaded");
+		browser.actions().sendKeys(protractor.Key.ESCAPE).perform();
+	}, iDefaultTimeout);
+
+	it("DDR popup is resized", function() {
+		var oValueHelp = element(by.id("DDRLessOptions-input-vhi"));
+
+		oValueHelp.click();
+
+		expect(takeScreenshot()).toLookAs("ddr_popup_resized");
 	}, iDefaultTimeout);
 
 	it("DateTime option", function() {
@@ -31,44 +40,37 @@ describe("sap.m.DynamicDateRangeVisual2", function() {
 		expect(takeScreenshot()).toLookAs("datetime_options_list");
 
 		aListItems = element.all(by.css("#DDR4-RP-popover .sapMListItems .sapMSLI"));
-		aListItems.get(0).click(); // select Date and Time
+		aListItems.get(12).click(); // select Date and Time
 		expect(takeScreenshot()).toLookAs("datetime_options_datepicker");
 
-		browser.actions().sendKeys(protractor.Key.TAB).perform();
+		browser.actions().sendKeys(protractor.Key.ARROW_RIGHT).perform();
 		browser.actions().sendKeys(protractor.Key.ENTER).perform();
 		expect(takeScreenshot()).toLookAs("datetime_options_timepicker");
 
-		var shiftTab = protractor.Key.chord(protractor.Key.SHIFT, protractor.Key.TAB);
-		browser.actions().sendKeys(shiftTab).perform();
-		browser.actions().sendKeys(shiftTab).perform();
-		browser.actions().sendKeys(protractor.Key.ENTER).perform();
+		browser.actions().sendKeys(protractor.Key.ESCAPE).perform();
+	}, iDefaultTimeout);
 
-		aListItems.get(15).click(); // select From Date and Time
+	it("From DateTime option", function() {
+		var oValueHelp = element(by.id("DDR4-input-vhi")),
+			aListItems = element.all(by.css("#DDR4-RP-popover .sapMListItems .sapMSLI"));
+
+		oValueHelp.click();
+		aListItems.get(17).click(); // select From Date and Time
 		expect(takeScreenshot()).toLookAs("fromdatetime_option_datepicker");
+		browser.actions().sendKeys(protractor.Key.TAB).perform();
+		browser.actions().sendKeys(protractor.Key.TAB).perform();
+		browser.actions().sendKeys(protractor.Key.TAB).perform();
+		browser.actions().sendKeys(protractor.Key.TAB).perform();
 		browser.actions().sendKeys(protractor.Key.TAB).perform();
 		browser.actions().sendKeys(protractor.Key.ENTER).perform(); // select date and move to time part
 		expect(takeScreenshot()).toLookAs("fromdatetime_option_timepicker");
-		browser.actions().sendKeys(protractor.Key.TAB).perform();
-		browser.actions().sendKeys(protractor.Key.TAB).perform();
+		browser.actions().sendKeys(protractor.Key.SPACE).perform();
+		browser.actions().sendKeys(protractor.Key.SPACE).perform();
 		browser.actions().sendKeys(protractor.Key.TAB).perform();
 		browser.actions().sendKeys(protractor.Key.TAB).perform();
 		browser.actions().sendKeys(protractor.Key.ENTER).perform();// select time and close popover
+		browser.actions().sendKeys(protractor.Key.TAB).perform();
 		expect(takeScreenshot()).toLookAs("fromdatetime_option_selected");
-		browser.actions().sendKeys(protractor.Key.TAB).perform();
-		browser.actions().sendKeys(protractor.Key.ENTER).perform();
-
-		oValueHelp.click();
-		aListItems.get(17).click(); // select To Date and Time
-		expect(takeScreenshot()).toLookAs("todatetime_option_datepicker");
-		browser.actions().sendKeys(protractor.Key.TAB).perform();
-		browser.actions().sendKeys(protractor.Key.ENTER).perform(); // select date and move to time part
-		expect(takeScreenshot()).toLookAs("todatetime_option_timepicker");
-		browser.actions().sendKeys(protractor.Key.TAB).perform();
-		browser.actions().sendKeys(protractor.Key.TAB).perform();
-		browser.actions().sendKeys(protractor.Key.TAB).perform();
-		browser.actions().sendKeys(protractor.Key.TAB).perform();
-		browser.actions().sendKeys(protractor.Key.ENTER).perform();// select time and close popover
-		expect(takeScreenshot()).toLookAs("todatetime_option_selected");
 
 		browser.actions().sendKeys(protractor.Key.ESCAPE).perform();
 	}, iDefaultTimeout);

@@ -1167,8 +1167,8 @@ sap.ui.define([
 		 */
 		fireChange : function (mChangeListeners, sPropertyPath, vValue, bForceUpdate, bInArray) {
 			function inform(aChangeListeners, vValue0) {
-				for (let i = 0; i < aChangeListeners.length; i += 1) {
-					aChangeListeners[i].onChange(vValue0, bForceUpdate);
+				for (const oChangeListener of aChangeListeners) {
+					oChangeListener.onChange(vValue0, bForceUpdate);
 				}
 			}
 

@@ -536,7 +536,7 @@ sap.ui.define([
 		if (!_Helper.isEmptyObject(this.mRunningChangeRequests) // running change requests
 			|| Object.keys(this.mBatchQueue).some(function (sGroupId) { // pending requests
 				return that.mBatchQueue[sGroupId].some(function (vRequest) {
-					return Array.isArray(vRequest) ? vRequest.length : true;
+					return Array.isArray(vRequest) ? vRequest.length > 0 : true;
 				});
 			})
 			|| this.aLockedGroupLocks.some(function (oGroupLock) { // announced requests

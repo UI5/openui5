@@ -851,6 +851,56 @@ sap.ui.define([
 		return Controller.create({ name: sController });
 	}
 
+	const sXmlNestedAggregation =
+		'<mvc:View xmlns:mvc="sap.ui.core.mvc" xmlns:core="sap.ui.core" xmlns="sap.m">' +
+			'<Table items="{/ProductCollection}" id="TBL">' +
+				"<items>" +
+					'<ColumnListItem id="CLI">' + // AggregationBindingTemplate for Table items binding
+						'<Text text="{text}" />' +
+						'<core:ExtensionPoint name="NestedEP">' + // EP is part of the cells aggregation of the CLI (no binding)
+							'<Text text="NestedEP Default" />' +
+						"</core:ExtensionPoint>" +
+					"</ColumnListItem>" +
+				"</items>" +
+			"</Table>" +
+		"</mvc:View>";
+
+	QUnit.module("Given an aggregation inside an aggregationBindingTemplate", {
+		afterEach() {
+			return afterEachExtensionPoint.call(this);
+		}
+	}, function() {
+		QUnit.test("when there are no binding instances", async function(assert) {
+			// Empty data used for table binding -> No instances
+			const oController = await createController("nestedTestController", { ProductCollection: [] });
+			await beforeEachExtensionPoint.call(this, sXmlNestedAggregation, oController);
+
+			const aOutline = await this.oOutline.get();
+			assert.strictEqual(aOutline[0].elements[0].name, "NestedEP", "then the nested EP is displayed directly on the view");
+		});
+
+		QUnit.test("when there are binding instances", async function(assert) {
+			const oController = await createController("nestedTestController", { ProductCollection: [{ text: "First item" }] });
+			await beforeEachExtensionPoint.call(this, sXmlNestedAggregation, oController);
+
+			const aOutline = await this.oOutline.get();
+			assert.strictEqual(aOutline[0].elements[0].name, "NestedEP", "then the nested EP is still displayed directly on the view");
+			const oTableItemsAggregation = aOutline[0].elements[1].elements[0].elements[1];
+			assert.strictEqual(oTableItemsAggregation.type, "aggregation");
+			const oColumnListItemCells = oTableItemsAggregation.elements[0].elements[0];
+			assert.strictEqual(
+				oColumnListItemCells.elements[0].instanceName,
+				"First item",
+				"Then the aggregation instance is part of the outline"
+			);
+			assert.strictEqual(
+				oColumnListItemCells.elements[1].instanceName,
+				"NestedEP Default",
+				"Then the EP default content is part of the outline"
+			);
+		});
+	});
+
 	QUnit.module("Given that xmlView with table and extensionPoint (RuntimeAuthoring and outline service are started) - Template case", {
 		afterEach() {
 			return afterEachExtensionPoint.call(this);
