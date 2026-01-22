@@ -2,7 +2,7 @@
 
 sap.ui.define([
 	"sap/base/util/merge",
-	"sap/base/Log",
+	"sap/base/util/uid",
 	"sap/ui/core/UIComponent",
 	"sap/ui/fl/apply/_internal/flexObjects/FlexObjectFactory",
 	"sap/ui/fl/apply/_internal/flexState/DataSelector",
@@ -13,14 +13,14 @@ sap.ui.define([
 	"sap/ui/fl/initial/_internal/FlexInfoSession",
 	"sap/ui/fl/initial/_internal/Storage",
 	"sap/ui/fl/initial/_internal/StorageUtils",
+	"sap/ui/fl/ChangePersistenceFactory",
 	"sap/ui/fl/Layer",
 	"sap/ui/fl/LayerUtils",
 	"sap/ui/fl/Utils",
-	"sap/ui/fl/ChangePersistenceFactory",
 	"sap/ui/thirdparty/sinon-4"
 ], function(
 	merge,
-	Log,
+	uid,
 	UIComponent,
 	FlexObjectFactory,
 	DataSelector,
@@ -31,10 +31,10 @@ sap.ui.define([
 	FlexInfoSession,
 	Storage,
 	StorageUtils,
+	ChangePersistenceFactory,
 	Layer,
 	LayerUtils,
 	Utils,
-	ChangePersistenceFactory,
 	sinon
 ) {
 	"use strict";
@@ -43,7 +43,8 @@ sap.ui.define([
 	var sReference = "sap.ui.fl.reference";
 	var sComponentId = "componentId";
 	var mEmptyResponse = {
-		changes: StorageUtils.getEmptyFlexDataResponse()
+		changes: StorageUtils.getEmptyFlexDataResponse(),
+		cacheKey: uid()
 	};
 
 	function mockPrepareFunctions(sMapName) {
@@ -1285,6 +1286,7 @@ sap.ui.define([
 		}
 	}, function() {
 		QUnit.test("with all operations at once", async function(assert) {
+			const sOldCacheKey = (await FlexState.getStorageResponse(sReference)).cacheKey;
 			const oFlexObjectsDataSelector = FlexState.getFlexObjectsDataSelector();
 			let aFlexObjects = oFlexObjectsDataSelector.get({ reference: sReference });
 			assert.strictEqual(aFlexObjects.length, 8, "initially there are 8 flexObjects");
@@ -1308,6 +1310,8 @@ sap.ui.define([
 				{type: "ui2", newData: "ui2"}
 			]);
 			const oStorageResponse = await FlexState.getStorageResponse(sReference);
+			const sNewCacheKey = oStorageResponse.cacheKey;
+			assert.notEqual(sOldCacheKey, sNewCacheKey, "the cacheKey was updated");
 			assert.strictEqual(oStorageResponse.changes.changes.length, 2, "UIChange was added");
 			assert.strictEqual(oStorageResponse.changes.variantDependentControlChanges.length, 2, "variant dependent UIChange was added");
 			assert.strictEqual(oStorageResponse.changes.comp.changes.length, 2, "comp change was added");

@@ -8,6 +8,7 @@ sap.ui.define([
 	"sap/base/util/each",
 	"sap/base/util/merge",
 	"sap/base/util/ObjectPath",
+	"sap/base/util/uid",
 	"sap/base/Log",
 	"sap/ui/core/Component",
 	"sap/ui/fl/apply/_internal/flexObjects/FlexObjectFactory",
@@ -28,6 +29,7 @@ sap.ui.define([
 	each,
 	merge,
 	ObjectPath,
+	uid,
 	Log,
 	Component,
 	FlexObjectFactory,
@@ -369,10 +371,6 @@ sap.ui.define([
 			componentData: mPropertyBag.componentData,
 			partialFlexState: mPropertyBag.partialFlexState
 		});
-
-		// no further changes to storageResponse properties allowed
-		Object.freeze(_mInstances[mPropertyBag.reference].storageResponse);
-		Object.freeze(_mInstances[mPropertyBag.reference].unfilteredStorageResponse);
 	}
 
 	function storeInfoInSession(sReference, mResponse) {
@@ -623,6 +621,15 @@ sap.ui.define([
 		});
 		if (aFlexObjectUpdates.length > 0) {
 			oFlexObjectsDataSelector.checkUpdate({ reference: sReference }, aFlexObjectUpdates);
+		}
+		// if there is an update to the cached storage response, the cache key provided by the backend is no longer valid
+		if (aUpdates.length && _mInstances[sReference].unfilteredStorageResponse.cacheKey) {
+			const sNewCacheKey = uid();
+			// only the cacheKey in the root is used, but it's duplicated in the changes object
+			_mInstances[sReference].unfilteredStorageResponse.cacheKey = sNewCacheKey;
+			_mInstances[sReference].unfilteredStorageResponse.changes.cacheKey = sNewCacheKey;
+			_mInstances[sReference].storageResponse.cacheKey = sNewCacheKey;
+			_mInstances[sReference].storageResponse.changes.cacheKey = sNewCacheKey;
 		}
 	};
 
