@@ -74,6 +74,7 @@ sap.ui.define([
   });
 
   oTokenizer0.addAriaLabelledBy(new Label({ text: "Custom Title" }));
+  oTokenizer0.addAriaDescribedBy(new Label({ text: "Custom Description" }));
 
   //*******************************
   var oTokenizer01 = new Tokenizer("readonlyTokenizerNarrow", {

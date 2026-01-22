@@ -101,9 +101,19 @@ sap.ui.define([
 					new Button("btnEtcGMT12", {
 						text: "Etc/GMT+12",
 						press: handleTimezoneButtonPress
+					}),
+					new DynamicDateRange("DDRLessOptions", {
+						width: '300px'
 					})
 				]
 			})
 		]
 	}).placeAt("body");
+	var oDynamicDateRange = Element.getElementById("DDRLessOptions");
+	oDynamicDateRange.setStandardOptions([
+		"DATE",
+		"TODAY",
+		"YESTERDAY",
+		"TOMORROW"
+	]);
 });

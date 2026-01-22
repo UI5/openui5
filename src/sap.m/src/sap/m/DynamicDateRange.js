@@ -568,6 +568,10 @@ sap.ui.define([
 		var aLastIncludedOptions = ["LASTMINUTESINCLUDED", "LASTHOURSINCLUDED", "LASTDAYSINCLUDED", "LASTWEEKSINCLUDED", "LASTMONTHSINCLUDED", "LASTQUARTERSINCLUDED", "LASTYEARSINCLUDED"];
 		var aNextIncludedOptions = ["NEXTMINUTESINCLUDED", "NEXTHOURSINCLUDED", "NEXTDAYSINCLUDED", "NEXTWEEKSINCLUDED", "NEXTMONTHSINCLUDED", "NEXTQUARTERSINCLUDED", "NEXTYEARSINCLUDED"];
 
+		const POPUP_HEADER_HEIGHT = 45;
+		const POPUP_LIST_ITEM_HEIGHT = 51;
+		const POPUP_LIST_ITEM_COMPACT_HEIGHT = 49;
+
 		DynamicDateRange.prototype.init = function() {
 			var bValueHelpDecorative = !Device.support.touch || Device.system.desktop ? true : false;
 			this._oInput = new DynamicDateRangeInput(this.getId() + "-input", {
@@ -1268,11 +1272,19 @@ sap.ui.define([
 			return this._calendarParser;
 		};
 
+		DynamicDateRange.prototype._getPopupHeight = function() {
+			if (document.body.classList.contains("sapUiSizeCompact") || this.hasStyleClass("sapUiSizeCompact") || this.getDomRef()?.closest(".sapUiSizeCompact")) {
+				return this.getStandardOptions().length * POPUP_LIST_ITEM_COMPACT_HEIGHT + POPUP_HEADER_HEIGHT + "px";
+			} else {
+				return this.getStandardOptions().length * POPUP_LIST_ITEM_HEIGHT + POPUP_HEADER_HEIGHT + "px";
+			}
+		};
+
 		DynamicDateRange.prototype._createPopup = function() {
 			if (!this._oPopup) {
 				this._oPopup = new ResponsivePopover(this.getId() + "-RP", {
 					//read the documentation about those two - the page addapts its size to its container...
-					contentHeight: '512px',
+					contentHeight: this._getPopupHeight(),
 					contentWidth: '320px',
 					showCloseButton: false,
 					showArrow: false,

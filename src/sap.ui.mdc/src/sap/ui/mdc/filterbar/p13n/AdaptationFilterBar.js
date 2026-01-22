@@ -528,12 +528,12 @@ sap.ui.define([
 						} else if (sReason === "Filter") {
 							this._checkFilterValue(oItem);
 						}
+						if (sReason === "Add") {
+							this._checkFilterState(oItem);
+							this._checkFilterValue(oItem);
+						}
 					}
 
-					if (sReason === "Add") {
-						this._checkFilterState(oItem);
-						this._checkFilterValue(oItem);
-					}
 				}
 
 				if (sReason === "Remove") {

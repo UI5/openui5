@@ -182,12 +182,12 @@ sap.ui.define([
 			};
 		};
 
-		oOutline._enrichExtensionPointData = function(oData, oOverlay) {
+		oOutline._enrichExtensionPointData = function(oData, oOverlay, bIsPartOfTemplate) {
 			var bIsDesignMode = DesignTime.isDesignModeEnabled();
 			if (!bIsDesignMode) {
 				return undefined;
 			}
-			if (oData.type === "aggregation") {
+			if (oData.type === "aggregation" && !bIsPartOfTemplate) {
 				var aExtensionPoints = this._getExtensionPoints(oData)
 				.sort(function(mExtensionPointA, mExtensionPointB) {
 					return mExtensionPointB.index - mExtensionPointA.index;
@@ -257,9 +257,10 @@ sap.ui.define([
 		 * @param {int} [iDepth] - Level of children to traverse
 		 * @param {sap.ui.dt.Overlay} [oParentOverlay] - Parent overlay (if present) for the passed overlay
 		 * @param {object} [mTemplateData] - Propagates template data to the aggregation template clones
+		 * @param {boolean} [bNestedInTemplate] - Whether the overlay is nested inside a template
 		 * @returns {OutlineObject} Outline model data
 		 */
-		oOutline._getChildrenNodes = function(oOverlay, iDepth, oParentOverlay, mTemplateData) {
+		oOutline._getChildrenNodes = function(oOverlay, iDepth, oParentOverlay, mTemplateData, bNestedInTemplate) {
 			var bValidDepth = DtUtil.isInteger(iDepth);
 			var mAggregationTemplates = {};
 
@@ -293,11 +294,18 @@ sap.ui.define([
 				// decrement depth for children nodes
 				iDepth = bValidDepth ? iDepth - 1 : iDepth;
 
+				const bIsPartOfTemplate = bNestedInTemplate || oData.type === "aggregationBindingTemplate";
 				var mInnerTemplateData = {};
 				oData.elements = aChildren
 				.map(function(oChildOverlay) {
 					var mNextTemplateData = getTemplateData(oChildOverlay, mTemplateData, mInnerTemplateData);
-					var oNextData = this._getChildrenNodes(oChildOverlay, iDepth, oChildOverlay.getParent(), mNextTemplateData);
+					const oNextData = this._getChildrenNodes(
+						oChildOverlay,
+						iDepth,
+						oChildOverlay.getParent(),
+						mNextTemplateData,
+						bIsPartOfTemplate
+					);
 					if (oNextData.type === "aggregationBindingTemplate") {
 						var sAggregationName = mAggregationTemplates[oChildOverlay.getId()];
 						mInnerTemplateData[sAggregationName] = merge({}, oNextData);
@@ -309,7 +317,7 @@ sap.ui.define([
 				});
 
 				// get extension point information if available
-				this._enrichExtensionPointData(oData, oOverlay);
+				this._enrichExtensionPointData(oData, oOverlay, bIsPartOfTemplate);
 			}
 
 			return cleanupData(oData);
