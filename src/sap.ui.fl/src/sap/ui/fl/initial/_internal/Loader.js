@@ -6,6 +6,7 @@ sap.ui.define([
 	"sap/base/util/Deferred",
 	"sap/base/util/merge",
 	"sap/base/util/ObjectPath",
+	"sap/base/util/uid",
 	"sap/base/Log",
 	"sap/ui/base/ManagedObject",
 	"sap/ui/fl/initial/_internal/FlexInfoSession",
@@ -17,6 +18,7 @@ sap.ui.define([
 	Deferred,
 	merge,
 	ObjectPath,
+	uid,
 	Log,
 	ManagedObject,
 	FlexInfoSession,
@@ -264,7 +266,7 @@ sap.ui.define([
 	 * @returns {object} The empty Flex Data object
 	 */
 	Loader.initializeEmptyCache = function(sReference) {
-		const oInitialFlexData = { changes: StorageUtils.getEmptyFlexDataResponse() };
+		const oInitialFlexData = { changes: StorageUtils.getEmptyFlexDataResponse(), cacheKey: uid() };
 		_mCachedFlexData[sReference] = {
 			data: oInitialFlexData,
 			parameters: {
@@ -323,6 +325,14 @@ sap.ui.define([
 	 */
 	Loader.updateCachedResponse = function(sReference, aUpdates) {
 		StorageUtils.updateStorageResponse(_mCachedFlexData[sReference].data, aUpdates);
+
+		if (aUpdates.length && _mCachedFlexData[sReference].data.cacheKey) {
+			// if there is an update to the cached storage response, the cache key provided by the backend is no longer valid
+			const sNewCacheKey = uid();
+			// only the cacheKey in the root is used, but it's duplicated in the changes object
+			_mCachedFlexData[sReference].data.cacheKey = sNewCacheKey;
+			_mCachedFlexData[sReference].data.changes.cacheKey = sNewCacheKey;
+		}
 	};
 
 	/**

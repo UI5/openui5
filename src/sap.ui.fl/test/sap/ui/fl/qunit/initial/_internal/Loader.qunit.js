@@ -846,7 +846,9 @@ sap.ui.define([
 
 			// Step 1: add some changes to the cache
 			Loader.updateCachedResponse(sReference, aUpdates);
-			const oCachedData = Loader.getCachedFlexData(sReference).changes;
+			const oCachedFlexData = Loader.getCachedFlexData(sReference);
+			const sFirstCacheKey = oCachedFlexData.cacheKey;
+			const oCachedData = oCachedFlexData.changes;
 			assert.strictEqual(oCachedData.changes.length, 1, "one UI change is stored");
 			assert.strictEqual(oCachedData.changes[0].fileName, "uiChange1", "the UI change is stored");
 			assert.strictEqual(oCachedData.variantDependentControlChanges.length, 1, "one variant dependent UI change is stored");
@@ -890,7 +892,9 @@ sap.ui.define([
 				flexObject: oUpdatedChange
 			});
 			Loader.updateCachedResponse(sReference, aSecondUpdates);
-			const oCachedData2 = Loader.getCachedFlexData(sReference).changes;
+			const oCachedFlexData2 = Loader.getCachedFlexData(sReference);
+			assert.notEqual(sFirstCacheKey, oCachedFlexData2.cacheKey, "the cacheKey was updated");
+			const oCachedData2 = oCachedFlexData2.changes;
 			assert.strictEqual(oCachedData2.changes.length, 0, "the UI change is deleted");
 			assert.strictEqual(oCachedData2.variantDependentControlChanges.length, 0, "the variant dependent UI change is deleted");
 			assert.strictEqual(oCachedData2.variantChanges.length, 0, "the variant change is deleted");
