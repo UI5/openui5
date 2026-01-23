@@ -206,23 +206,24 @@ sap.ui.define([
 	 * @ui5-restricted sap.ui.core
 	 */
 	function includeLibraryTheme(libraryInfo) {
-		const { libName, version } = libraryInfo;
+		const { skipCss, libName, version } = libraryInfo;
 		assert(typeof libName === "string", "libName must be a string");
 
 		if (libName === "sap.ui.core") {
 			CORE_VERSION = version;
 		}
 
-		if (!mAllLoadedLibraries.has(libName)) {
-			const oLibInfo = getLibraryInfo({
-				libName
-			});
+		const oLibInfo = getLibraryInfo({
+			libName
+		});
 
-			updateThemeUrl({
-				libInfo: oLibInfo,
-				suppressFOUC: true
-			});
+		updateThemeUrl({
+			libInfo: oLibInfo,
+			suppressFOUC: true,
+			skipCss
+		});
 
+		if (!oLibInfo.cssLinkElement) {
 			// if parameters have been used, update them with the new style sheet
 			sap.ui.require("sap/ui/core/theming/Parameters")?._addLibraryTheme(oLibInfo.id);
 		}
@@ -246,8 +247,10 @@ sap.ui.define([
 	 * @param {boolean} params.suppressFOUC - Whether to suppress Flash of Unstyled Content (FOUC) handling.
 	 * @param {boolean} params.force - Whether to including stylesheet regardless the baseUrl is identical or not.
 	 *                                 Use the old URL to prevent unnecessary requests.
+	 * @param {boolean} params.skipCss - Whether to suppress loading the library CSS. Only a placeholder will be added,
+	 *                                   to ensure the correct order of the applied CSS.
 	 */
-	function updateThemeUrl({libInfo, theme, suppressFOUC, force}) {
+	function updateThemeUrl({libInfo, theme, suppressFOUC, force, skipCss}) {
 		if (!sUi5Version && isVersionInfoNeeded()) {
 			Log.error("UI5 theming lifecycle requires valid version information when a theming service is active. Please check why the version info could not be loaded in this system.", undefined, MODULE_NAME);
 		}
@@ -270,7 +273,7 @@ sap.ui.define([
 				fnAddFoucmarker(libInfo.linkId);
 			}
 			const pCssLoaded = libInfo.getUrl(theme).urlPromise.then((sUrl) => {
-				if (sUrl) {
+				if (sUrl && !skipCss) {
 					Log.debug(`Add new CSS for library ${libInfo.id} with URL: ${sUrl}`, undefined, MODULE_NAME);
 					return includeStylesheet({
 						url: force ? sOldUrl : sUrl,
@@ -290,6 +293,9 @@ sap.ui.define([
 						document.head.insertBefore(oLink, document.getElementById(CUSTOM_ID));
 					}
 					libInfo.cssLinkElement = oLink;
+					// Abort loading in case we only want to add a placeholder
+					// to avoid post-processing incl. fireApplied
+					libInfo.cssLoaded.aborted = skipCss;
 					return Promise.reject();
 				}
 			});

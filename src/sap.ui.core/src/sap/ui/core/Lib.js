@@ -131,15 +131,17 @@ sap.ui.define([
 	/**
 	 * Load the Library css
 	 * @param {sap/ui/core/Lib} oLib The library instance to load the css for
+	 * @param {boolean} skipCss Whether the library CSS should be loaded or not
 	 */
-	function loadLibraryCss(oLib) {
+	function loadLibraryCss(oLib, skipCss) {
 		includeLibraryTheme({
 			libName: oLib.name,
 			// TODO: Consider removing the version parameter here, as theming always requires the distribution version.
 			// The library version only matches the distribution version by coincidence and is not relevant for theming.
-			version: oLib.version || oLib.oManifest?.["sap.app"]?.applicationVersion?.version
+			version: oLib.version || oLib.oManifest?.["sap.app"]?.applicationVersion?.version,
+			skipCss
 		});
-		oLib.cssLoaded = true;
+		oLib.cssRequested = !skipCss;
 	}
 
 	/**
@@ -405,8 +407,8 @@ sap.ui.define([
 			//all manifest promises
 			Promise.all(aDependentLibCss).then(() => {
 				// load css
-				if (!this.cssLoaded && this.oManifest["sap.ui5"].library && this.oManifest["sap.ui5"].library.css !== false) {
-					loadLibraryCss(this);
+				if (!this.cssRequested && this.oManifest["sap.ui5"].library && this.oManifest["sap.ui5"].library.css !== false) {
+					loadLibraryCss(this, mOptions.skipCss);
 				}
 				this._loadingStatus.cssLoaded.resolve();
 			});
@@ -939,7 +941,7 @@ sap.ui.define([
 		DataType.registerInterfaceTypes(oLib.interfaces);
 
 		// can be removed if all libs declare their dependencies correctly and all libs are loaded before using it...
-		if (!oLib.noLibraryCSS && !oLib.cssLoaded) {
+		if (!oLib.noLibraryCSS && !oLib.cssRequested) {
 			loadLibraryCss(oLib);
 		}
 
@@ -1055,6 +1057,7 @@ sap.ui.define([
 	 * @param {object} [mOptions] The options object that contains the following properties
 	 * @param {boolean} [mOptions.preloadOnly] Whether to skip executing the entry module(s) after preloading the
 	 *  library/libraries
+	 * @param {boolean} [mOptions.skipCss] Whether to load the library CSS files when preloading only
 	 * @return {Promise<Array<sap.ui.core.Lib>>|Array<sap.ui.core.Lib>} A promise that resolves with an
 	 *  array of library instances in async mode or an array of library instances in sync mode
 	 * @private

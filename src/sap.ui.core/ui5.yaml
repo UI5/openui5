@@ -54,6 +54,7 @@ builder:
             - sap/ui/base/config/
             - sap/ui/core/boot/config.js
             - sap/ui/core/boot/boot.json
+            - sap/ui/core/theming/ThemeManager.js
             - sap/ui/core/Core.js
             resolve: true
           - mode: require
@@ -84,6 +85,7 @@ builder:
               - sap/ui/core/boot/DOM.js
               - "sap/ui/core/util/_LocalizationHelper"
               - sap/ui/core/boot/FieldHelpEndpoint.js
+              - sap/ui/core/boot/KeyboardInteractionEndpoint.js
               - sap/ui/core/boot/FrameOptions.js
               - "sap/ui/security/FrameOptions"
               - "sap/ui/security/Security"
@@ -126,14 +128,15 @@ builder:
               #- "jquery.sap.*.js"
 
               # include only thirdparty that is very likely to be used
-              - "sap/ui/thirdparty/crossroads.js"
-              - "sap/ui/thirdparty/caja-html-sanitizer.js"
-              - "sap/ui/thirdparty/hasher.js"
-              - "sap/ui/thirdparty/signals.js"
-              - "sap/ui/thirdparty/jquery-mobile-custom.js"
-              - "sap/ui/thirdparty/jqueryui/jquery-ui-core.js"
-              - "sap/ui/thirdparty/jqueryui/jquery-ui-datepicker.js"
-              - "sap/ui/thirdparty/jqueryui/jquery-ui-position.js"
+              - "!sap/ui/thirdparty/"
+              #- "sap/ui/thirdparty/crossroads.js"
+              #- "sap/ui/thirdparty/caja-html-sanitizer.js"
+              #- "sap/ui/thirdparty/hasher.js"
+              #- "sap/ui/thirdparty/signals.js"
+              #- "sap/ui/thirdparty/jquery-mobile-custom.js"
+              #- "sap/ui/thirdparty/jqueryui/jquery-ui-core.js"
+              #- "sap/ui/thirdparty/jqueryui/jquery-ui-datepicker.js"
+              #- "sap/ui/thirdparty/jqueryui/jquery-ui-position.js"
 
               # exclude all merged files as well as the top level jQuery copy (not visible in OpenUI5)
               - "!sap-*.js"
