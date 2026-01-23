@@ -1,6 +1,7 @@
 /*global QUnit */
 sap.ui.define([
 	"sap/m/PlanningCalendarHeader",
+	"sap/m/Text",
 	"sap/ui/qunit/utils/nextUIUpdate",
 	"sap/ui/unified/Calendar",
 	"sap/ui/unified/calendar/CustomMonthPicker",
@@ -8,6 +9,7 @@ sap.ui.define([
 	"sap/m/SegmentedButtonItem"
 ], function(
 	PlanningCalendarHeader,
+	Text,
 	nextUIUpdate,
 	Calendar,
 	CustomMonthPicker,
@@ -30,6 +32,33 @@ sap.ui.define([
 		assert.ok(oCalendar instanceof Calendar, "Calendar is instantiated");
 		assert.ok(oCustomMonthPicker instanceof CustomMonthPicker, "CustomMonthPicker is instantiated");
 		assert.ok(oCustomYearPicker instanceof CustomYearPicker, "CustomYearPicker is instantiated");
+
+		// Clean
+		oPCHeader.destroy();
+	});
+
+	QUnit.test("Aggregation _actionToolbar retains 4 controls when removing all actions.", function (assert) {
+		// Prepare
+		var oPCHeader = new PlanningCalendarHeader(),
+			oToolbar = oPCHeader.getAggregation("_actionsToolbar"),
+			aToolbarContent = oToolbar.getContent();
+
+		// Assert
+		assert.strictEqual(aToolbarContent.length, 4, "Actions toolbar has 4 content items by default");
+
+		// Act
+		oPCHeader.addAction(new Text({text: "Action"}));
+		aToolbarContent = oToolbar.getContent();
+
+		// Assert
+		assert.strictEqual(aToolbarContent.length, 5, "Actions toolbar has 5 content items after adding an action");
+
+		// Act
+		oPCHeader.removeAllActions();
+		aToolbarContent = oToolbar.getContent();
+
+		// Assert
+		assert.strictEqual(aToolbarContent.length, 4, "Actions toolbar has 4 content items after removing all actions");
 
 		// Clean
 		oPCHeader.destroy();
