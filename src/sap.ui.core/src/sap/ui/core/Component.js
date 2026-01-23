@@ -2852,18 +2852,10 @@ sap.ui.define([
 			// lookup the required libraries
 			var mLibs = oManifest.getEntry("/sap.ui5/dependencies/libs");
 			if (mLibs) {
-				var aLibs = [];
-				// filter the lazy libs
-				for (var sLibName in mLibs) {
-					if (!mLibs[sLibName].lazy) {
-						aLibs.push(sLibName);
-					}
-				}
+				var aLibs = Object.keys(mLibs);
 				if (aLibs.length > 0) {
 					Log.info("Component \"" + sComponentName + "\" is loading libraries: \"" + aLibs.join(", ") + "\"");
-					fnCollect(Library._load(aLibs, {
-						sync: false
-					}));
+					fnCollect(Library._load(aLibs));
 				}
 			}
 

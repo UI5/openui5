@@ -16,22 +16,48 @@ builder:
       - "sap/f/thirdparty/**"
   bundles:
     - bundleDefinition:
-        name: sap/f/library-preload.js
+        name: sap/f/_library-content.js
         sections:
+          - mode: provided
+            filters: &filters-for-externals
+              - "**/"                    # assume everything as provided ...
+              - "!sap/f/"                # ... except the modules from sap/f
+              - "sap/f/**/manifest.json" # never bundle manifest (manifest first)
+              - "**/designtime/"         #
+              - "**/*.designtime.js"     # also exclude all designtime ...
+              - "**/*.support.js"        # ... and support files
+            resolve: false
+          - mode: provided
+            filters: &filters-library-preload
+              - "sap/f/library.js"
+            resolve: true
           - mode: preload
-            name: sap/f/library-preload.js
-            filters:
+            filters: &filters-library-content
               - sap/f/
-              - sap/f/**/manifest.json
-              - "!sap/f/**/*-preload.js" # exclude all bundles
-              - "!sap/f/designtime/"
-              - "!sap/f/**/*.designtime.js"
-              - "!sap/f/**/*.support.js"
               - "!sap/f/gen/"
               - "!sap/f/thirdparty/"
             resolve: false
             resolveConditional: false
             renderer: true
+      bundleOptions:
+        optimize: true
+    - bundleDefinition:
+        name: sap/f/library-preload.js
+        sections:
+          - mode: provided
+            filters: *filters-for-externals
+            resolve: false
+          - mode: preload
+            name: sap/f/library-preload.js
+            filters: *filters-library-preload
+            resolve: true
+            resolveConditional: false
+            renderer: true
+          - mode: bundleInfo
+            name: sap/f/_library-content.js
+            filters: *filters-library-content
+            resolve: false
+            resolveConditional: false
           - mode: bundleInfo
             name: sap/f/library-webcomponents-preload.js
             filters:
@@ -54,3 +80,4 @@ builder:
             renderer: true
       bundleOptions:
         optimize: true
+

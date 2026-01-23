@@ -200,12 +200,10 @@ sap.ui.define(['sap/base/util/LoaderExtensions'], function (LoaderExtensions) {
 				oVersionInfo.libraries.forEach(function(oLib, i) {
 					mKnownLibs[oLib.name] = {};
 
-					var mDeps = oLib.manifestHints && oLib.manifestHints.dependencies &&
+					const mDeps = oLib.manifestHints && oLib.manifestHints.dependencies &&
 								oLib.manifestHints.dependencies.libs;
-					for (var sDep in mDeps) {
-						if (!mDeps[sDep].lazy) {
-							mKnownLibs[oLib.name][sDep] = true;
-						}
+					for (const sDep in mDeps) {
+						mKnownLibs[oLib.name][sDep] = true;
 					}
 				});
 			}
@@ -249,28 +247,12 @@ sap.ui.define(['sap/base/util/LoaderExtensions'], function (LoaderExtensions) {
 	VersionInfo._getTransitiveDependencyForLibraries = function(aLibraries) {
 
 		transformVersionInfo();
-		const closure = Object.create(null);
+		const mClosure = aLibraries.reduce(function(all, lib) {
+			all[lib.name] = true;
+			return Object.assign(all, mKnownLibs?.[lib.name]);
+		}, {});
 
-		function addLibDependency(name, lazy) {
-			if (closure[name] == null ) {
-				closure[name] = {name, ...lazy && {lazy}};
-			} else if (closure[name].lazy && !lazy) {
-				delete closure[name].lazy;
-			}
-		}
-
-		for (const {name, lazy} of aLibraries) {
-			addLibDependency(name, lazy);
-			if (mKnownLibs?.[name]) {
-				for (const depName in mKnownLibs[name]) {
-					// Dependencies in `mKnownLibs` are always eager.
-					// They only inherit lazyness from the entry in aLibraries
-					addLibDependency(depName, lazy);
-				}
-			}
-		}
-
-		return Object.values(closure);
+		return Object.keys(mClosure);
 	};
 
 	/**

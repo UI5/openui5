@@ -226,22 +226,22 @@ sap.ui.define([
 		return VersionInfo.load().then(function() {
 			assert.deepSortedByNameEqual(
 				VersionInfo._getTransitiveDependencyForLibraries([{name: "sap.ui.core"}]),
-				[{name: "sap.ui.core"}],
+				["sap.ui.core"],
 				"transitive dependencies for sap.ui.core");
 
 			assert.deepSortedByNameEqual(
 				VersionInfo._getTransitiveDependencyForLibraries([{name: "sap.m"}]),
-				[{name: "sap.m"}, {name: "sap.ui.core"}, {name: "sap.ui.layout"}],
+				["sap.m", "sap.ui.core", "sap.ui.layout", "sap.ui.unified"],
 				"transitive dependencies for sap.m");
 
 			assert.deepSortedByNameEqual(
 				VersionInfo._getTransitiveDependencyForLibraries([{name: "sap.ui.documentation"}]),
-				[{name: "sap.m"}, {name: "sap.ui.core"}, {name: "sap.ui.documentation"}, {name: "sap.ui.layout"}],
+				["sap.ui.documentation", "sap.m", "sap.ui.core", "sap.ui.layout", "sap.ui.unified"],
 				"transitive dependencies for sap.ui.documentation");
 
 			assert.deepSortedByNameEqual(
 				VersionInfo._getTransitiveDependencyForLibraries([{name: "sap.ui.unified"}, {name: "sap.ui.documentation"}]),
-				[{name: "sap.m"}, {name: "sap.ui.core"}, {name: "sap.ui.documentation"}, {name: "sap.ui.layout"}, {name: "sap.ui.unified"}],
+				["sap.ui.unified", "sap.ui.core", "sap.ui.layout", "sap.ui.documentation", "sap.m"],
 				"merged transitive dependencies for sap.ui.unified and sap.ui.documentation");
 
 			this.checkVersionInfoRequest(assert);
