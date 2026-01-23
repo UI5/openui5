@@ -1,6 +1,5 @@
 /* global QUnit */
 sap.ui.define([
-	"sap/base/i18n/Localization",
 	"sap/base/util/merge",
 	"sap-ui-integration-editor",
 	"sap/ui/integration/editor/Editor",
@@ -12,7 +11,6 @@ sap.ui.define([
 	"sap/ui/events/KeyCodes",
 	"qunit/designtime/EditorQunitUtils"
 ], function (
-	Localization,
 	merge,
 	x,
 	Editor,
@@ -69,32 +67,32 @@ sap.ui.define([
 	var _oExpectedValues = {
 		"string1": {
 			"default": "String1 Value Translation",
-			"defaultOri_in_trans": "String 1 English",
-			"default_in_transpopup": "String 1 English",
-			"en": "String 1 English",
-			"es-MX": "String 1 Spanish MX",
-			"fr": "String 1 French",
-			"fr-FR": "String 1 French",
-			"fr-CA": "String 1 French CA"
+			"defaultOri_in_trans": "String 1 in i18n en",
+			"default_in_transpopup": "String 1 in i18n en",
+			"en": "String 1 in i18n en",
+			"es-MX": "String 1 in i18n es-MX",
+			"fr": "String 1 in i18n fr",
+			"fr-FR": "String 1 in i18n fr",
+			"fr-CA": "String 1 in i18n fr-CA"
 		},
 		"string3": {
 			"default": "String 3"
 		},
 		"string4": {
 			"default": "String4 Value Translation",
-			"defaultOri_in_trans": "String 4 English",
-			"default_in_transpopup": "String 4 English",
-			"fr": "String 4 French",
-			"fr-CA": "String 4 French CA",
-			"fr-FR": "String 4 French"
+			"defaultOri_in_trans": "String 4 in i18n en",
+			"default_in_transpopup": "String 4 in i18n en",
+			"fr": "String 4 in i18n fr",
+			"fr-CA": "String 4 in i18n fr-CA",
+			"fr-FR": "String 4 in i18n fr"
 		},
 		"string5": {
-			"default": "String 5 English",
-			"en": "String 5 English",
-			"en-US": "String 5 US English",
-			"fr-CA": "String 5 French CA",
-			"fr": "String 5 French",
-			"fr-FR": "String 5 French"
+			"default": "String 5 in i18n en",
+			"en": "String 5 in i18n en",
+			"en-US": "String 5 in i18n en-US",
+			"fr-CA": "String 5 in i18n fr-CA",
+			"fr": "String 5 in i18n fr",
+			"fr-FR": "String 5 in i18n fr"
 		}
 	};
 	var _aCoreLanguages = [

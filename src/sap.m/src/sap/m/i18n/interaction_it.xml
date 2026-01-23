@@ -130,11 +130,19 @@
 	<control-interactions>
 		<control name="sap.m.VariantManagement"/>
 		<interaction> <kbd>F4</kbd> <kbd>Spacebar</kbd> <kbd>Alt + ArrowUp</kbd> <kbd>Alt + ArrowDown</kbd> <description>
-				<p>Apre la gestione delle varianti.</p>
-			</description>
+				<p>Apre la gestione view.</p>
+			</description> 
 		</interaction>
 		<interaction> <kbd>PageUp</kbd> <description>
-				<p>Chiude il popover di errore della gestione varianti</p>
+				<p>Chiude il popover di errore per la gestione view</p>
+			</description>
+		</interaction>
+		<interaction> <kbd>Ctrl + Enter</kbd> <description>
+				<p>Salva la nuova view nella finestra di dialogo Salva con nome.</p>
+			</description>
+		</interaction>
+		<interaction> <kbd>Ctrl + S</kbd> <description>
+				<p>Salva le modifiche apportate alle view.</p>
 			</description>
 		</interaction>
 	</control-interactions>

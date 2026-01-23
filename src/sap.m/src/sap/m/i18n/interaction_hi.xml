@@ -130,11 +130,19 @@
 	<control-interactions>
 		<control name="sap.m.VariantManagement"/>
 		<interaction> <kbd>F4</kbd> <kbd>Spacebar</kbd> <kbd>Alt + ArrowUp</kbd> <kbd>Alt + ArrowDown</kbd> <description>
-				<p>भिन्नरूप प्रबंधन खोलता है.</p>
-			</description>
+				<p>दृश्य प्रबंधन खोलता है.</p>
+			</description> 
 		</interaction>
 		<interaction> <kbd>PageUp</kbd> <description>
-				<p>भिन्नरूप प्रबंधन के त्रुटि पॉपओवर को बंद करता है</p>
+				<p>दृश्य प्रबंधन के लिए त्रुटि पॉपओवर को बंद करता है</p>
+			</description>
+		</interaction>
+		<interaction> <kbd>Ctrl + Enter</kbd> <description>
+				<p>नए दृश्य को इसके रूप में सहेजें डायलॉग में सहेजता है.</p>
+			</description>
+		</interaction>
+		<interaction> <kbd>Ctrl + S</kbd> <description>
+				<p>दृश्य में किए गए परिवर्तन सहेजता है.</p>
 			</description>
 		</interaction>
 	</control-interactions>

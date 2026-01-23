@@ -3691,7 +3691,7 @@ sap.ui.define([
 
 	});
 
-	QUnit.test("async test request events - batch with one changeset", function(assert) {
+	QUnit.test("async test request events - batch with one change set", function(assert) {
 		var done = assert.async();
 		var oModel = initModel(sURI, {
 			json: true,
@@ -3722,7 +3722,7 @@ sap.ui.define([
 		});
 	});
 
-	QUnit.test("async test request events - batch with two changeset", function(assert) {
+	QUnit.test("async test request events - batch with two change sets", function(assert) {
 		var done = assert.async();
 		var oModel = initModel(sURI, {
 			json: true,
@@ -3755,7 +3755,7 @@ sap.ui.define([
 		});
 	});
 
-	QUnit.test("async test request events - batch with two changeset, one failing", function(assert) {
+	QUnit.test("async test request events - batch with two change sets, one failing", function(assert) {
 		var done = assert.async();
 		var oModel = initModel(sURI, {
 			json: true,

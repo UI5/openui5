@@ -1,7 +1,6 @@
 /* eslint-disable no-loop-func */
 /* global QUnit */
 sap.ui.define([
-	"sap/base/i18n/Localization",
 	"sap/base/util/merge",
 	"sap-ui-integration-editor",
 	"sap/ui/integration/editor/Editor",
@@ -13,7 +12,6 @@ sap.ui.define([
 	"sap/ui/events/KeyCodes",
 	"qunit/designtime/EditorQunitUtils"
 ], function (
-	Localization,
 	merge,
 	x,
 	Editor,
@@ -66,26 +64,26 @@ sap.ui.define([
 	};
 	var _oExpectedValues = {
 		"string1": {
-			"default_in_en": "String 1 English",
-			"en": "String 1 English",
-			"en-GB": "String 1 English",
-			"en-US": "String 1 US English",
-			"es-MX": "String 1 Spanish MX",
-			"fr": "String 1 French",
-			"fr-FR": "String 1 French",
-			"fr-CA": "String 1 French CA"
+			"default_in_en": "String 1 in i18n en",
+			"en": "String 1 in i18n en",
+			"en-GB": "String 1 in i18n en",
+			"en-US": "String 1 in i18n en-US",
+			"es-MX": "String 1 in i18n es-MX",
+			"fr": "String 1 in i18n fr",
+			"fr-FR": "String 1 in i18n fr",
+			"fr-CA": "String 1 in i18n fr-CA"
 		},
 		"string3": {
 			"default_in_en": "String 3"
 		},
 		"string4": {
-			"default_in_en": "String 4 English",
-			"en": "String 4 English",
-			"en-GB": "String 4 English",
-			"en-US": "String 4 US English",
-			"fr": "String 4 French",
-			"fr-FR": "String 4 French",
-			"fr-CA": "String 4 French CA"
+			"default_in_en": "String 4 in i18n en",
+			"en": "String 4 in i18n en",
+			"en-GB": "String 4 in i18n en",
+			"en-US": "String 4 in i18n en-US",
+			"fr": "String 4 in i18n fr",
+			"fr-FR": "String 4 in i18n fr",
+			"fr-CA": "String 4 in i18n fr-CA"
 		}
 	};
 	var _aCoreLanguages = [

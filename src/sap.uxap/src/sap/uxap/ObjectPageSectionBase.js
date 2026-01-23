@@ -54,7 +54,12 @@ sap.ui.define([
 				 *
 				 * <b>Note:</b> If a subsection is the only one (or the only one visible) within a section, its title is
 				 * displayed instead of the section title. This behavior is true even if the <code>showTitle</code>
-				 * propeprty of {@link sap.uxap.ObjectPageSubSection} is set to <code>false</code>.
+				 * property of {@link sap.uxap.ObjectPageSubSection} is set to <code>false</code>.
+				 *
+				 * <b>Note:</b> To avoid accessibility issues, always set a <code>title</code> on
+				 * {@link sap.uxap.ObjectPageSubSection}, especially when a section contains multiple subsections.
+				 * If no <code>title</code> is set on a subsection, the anchor bar button popover will appear empty, which will
+				 * lead to accessibility violations.
 				 */
 				title: {type: "string", group: "Appearance", defaultValue: null},
 

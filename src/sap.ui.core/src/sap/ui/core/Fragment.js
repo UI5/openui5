@@ -147,16 +147,6 @@ function(
 
 		constructor: function(sId, mSettings) {
 			ManagedObject.apply(this, arguments);
-
-			// When async, the fragment content is already passed to the constructor
-			if (!this._bAsync) {
-				if (this._aContent && this._aContent.length == 1) {
-					// in case of only one control, return it directly
-					return this._aContent[0];
-				} else {
-					return this._aContent;
-				}
-			}
 		}
 	});
 
@@ -192,8 +182,6 @@ function(
 		if (mSettings.oController) {
 			this.oController = mSettings.oController;
 		}
-
-		this._bAsync = mSettings.async || false;
 
 		// remember the ID which has been explicitly given in the factory function
 		this._sExplicitId = mSettings.sId || mSettings.id;
@@ -560,11 +548,7 @@ function(
 				}
 			};
 
-			// finally trigger the actual XML processing and control creation
-			// IMPORTANT:
-			// this call can be triggered with both "async = true" and "async = false"
-			// In case of sync processing, the XMLTemplateProcessor makes sure to only use SyncPromises.
-			var pContentPromise = XMLTemplateProcessor.parseTemplatePromise(this._xContent, this, this._bAsync, oParseConfig).then(function(aContent) {
+			var pContentPromise = XMLTemplateProcessor.parseTemplatePromise(this._xContent, this, true, oParseConfig).then(function(aContent) {
 				this._aContent = aContent;
 				/*
 				 * If content was parsed and an objectBinding at the fragment was defined
@@ -582,21 +566,7 @@ function(
 
 				return this._aContent.length > 1 ? this._aContent : this._aContent[0];
 			}.bind(this));
-			// in sync case we must get a SyncPromise and need to unwrap for error logging
-			if (!this._bAsync) {
-				try {
-					pContentPromise.unwrap();
-				} catch (e) {
-					throw new Error(this.getMetadata().getName() +
-							": An Error occured during XML processing of '" +
-							(mSettings.fragmentName || mSettings.fragmentContent) +
-							"' with id '" +
-							this.getId() +
-							"'", {
-						cause: e
-					});
-				}
-			}
+
 			return pContentPromise;
 		}
 	});

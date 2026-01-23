@@ -130,11 +130,19 @@
 	<control-interactions>
 		<control name="sap.m.VariantManagement"/>
 		<interaction> <kbd>F4</kbd> <kbd>Spacebar</kbd> <kbd>Alt + ArrowUp</kbd> <kbd>Alt + ArrowDown</kbd> <description>
-				<p>Отваря управлението на варианти.</p>
-			</description>
+				<p>Отваря управлението на изгледи.</p>
+			</description> 
 		</interaction>
 		<interaction> <kbd>PageUp</kbd> <description>
-				<p>Затваря изскачащия прозорец на управлението на варианти</p>
+				<p>Затваря изскачащия прозорец за грешка за управлението на изгледи</p>
+			</description>
+		</interaction>
+		<interaction> <kbd>Ctrl + Enter</kbd> <description>
+				<p>Запазва новия изглед в диалоговия прозорец „Запазване като“.</p>
+			</description>
+		</interaction>
+		<interaction> <kbd>Ctrl + S</kbd> <description>
+				<p>Запазва промените, направени по изгледите.</p>
 			</description>
 		</interaction>
 	</control-interactions>

@@ -130,11 +130,19 @@
 	<control-interactions>
 		<control name="sap.m.VariantManagement"/>
 		<interaction> <kbd>F4</kbd> <kbd>Spacebar</kbd> <kbd>Alt + ArrowUp</kbd> <kbd>Alt + ArrowDown</kbd> <description>
-				<p>เปิดการจัดการชุดตัวเลือก</p>
-			</description>
+				<p>เปิดการจัดการมุมมอง</p>
+			</description> 
 		</interaction>
 		<interaction> <kbd>PageUp</kbd> <description>
-				<p>ปิด Popover ข้อผิดพลาดของการจัดการชุดตัวเลือก</p>
+				<p>ปิด Popover ข้อผิดพลาดสำหรับการจัดการมุมมอง</p>
+			</description>
+		</interaction>
+		<interaction> <kbd>Ctrl + Enter</kbd> <description>
+				<p>เก็บบันทึกมุมมองใหม่ในไดอะลอก 'เก็บบันทึกเป็น'</p>
+			</description>
+		</interaction>
+		<interaction> <kbd>Ctrl + S</kbd> <description>
+				<p>เก็บบันทึกการเปลี่ยนแปลงที่ทำในมุมมอง</p>
 			</description>
 		</interaction>
 	</control-interactions>

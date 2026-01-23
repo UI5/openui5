@@ -1,12 +1,10 @@
 /* global QUnit */
 sap.ui.define([
-	"sap/base/i18n/Localization",
 	"sap/ui/thirdparty/sinon-4",
 	"qunit/designtime/EditorQunitUtils",
 	"sap/ui/integration/util/Utils",
 	"sap/base/util/deepClone"
 ], function (
-	Localization,
 	sinon,
 	EditorQunitUtils,
 	Utils,

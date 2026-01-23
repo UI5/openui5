@@ -525,7 +525,7 @@ sap.ui.define([
 
 		// Act
 		oPC.addToolbarContent(new Button({text: "TEST"}));
-		oPC.insertToolbarContent(new Label({text: "TEST"}));
+		oPC.insertToolbarContent(new Label({text: "TEST"}), 1);
 		await nextUIUpdate();
 
 		// Assert
@@ -540,7 +540,6 @@ sap.ui.define([
 		assert.notOk(oPCHeaderToolbar.getVisible(), "PlanningCalendarHeader: Toolbar is not visible");
 
 		// Assert
-		assert.notOk(oPC._oHeaderObserver, "The ManagedObjectObserver not exists, because remove all toolbar content.");
 		assert.equal(oPC.getToolbarContent().length, 0, "PlanningCalendarHeader: Toolbar has two elements");
 
 		// Clean up
@@ -576,6 +575,7 @@ sap.ui.define([
 
 		// Clean up
 		oPC.destroy();
+		await nextUIUpdate();
 	});
 
 	QUnit.test("PlannigCalendarHeaderToolbar possibility to change Title text", async function(assert) {
@@ -585,36 +585,19 @@ sap.ui.define([
 			oButton = new Button({text: "ButtonTest"});
 			await nextUIUpdate();
 
-		assert.notOk(oPC._oHeaderObserver, "The ManagedObjectObserver not exists, because a Title not added.");
-
 		// Act
 		oPC.addToolbarContent(oTitle);
 		oPC.addToolbarContent(oButton);
 		await nextUIUpdate();
 
 		// Assert
-		assert.ok(oPC._oHeaderObserver, "The ManagedObjectObserver exists, because add title.");
-		assert.equal(oPC._getHeader().getTitle(), "TEST", "PlanningCalendarHeader: header's title is correct");
+		assert.equal(oPC._getHeader().getTitle().getText(), "TEST", "PlanningCalendarHeader: header's title is correct");
 
 		// Act
 		oTitle.setText("new TEST");
 
 		// Assert
-		assert.equal(oPC._getHeader().getTitle(),"new TEST", "PlanningCalendarHeader: header's text has change correctly");
-
-		// Act
-		oPC.removeToolbarContent(oButton);
-		await nextUIUpdate();
-
-		// Assert
-		assert.ok(oPC._oHeaderObserver, "The ManagedObjectObserver exists correctly");
-
-		// Act
-		oPC.removeToolbarContent(oTitle);
-		await nextUIUpdate();
-
-		// Assert
-		assert.notOk(oPC._oHeaderObserver, "The ManagedObjectObserver not exists, because remove Title from toolbar content.");
+		assert.equal(oPC._getHeader().getTitle().getText(),"new TEST", "PlanningCalendarHeader: header's text has change correctly");
 
 		// Clean up
 		oPC.destroy();

@@ -130,11 +130,19 @@
 	<control-interactions>
 		<control name="sap.m.VariantManagement"/>
 		<interaction> <kbd>F4</kbd> <kbd>Spacebar</kbd> <kbd>Alt + ArrowUp</kbd> <kbd>Alt + ArrowDown</kbd> <description>
-				<p>Открывает управление вариантами.</p>
-			</description>
+				<p>Открывает управление ракурсами.</p>
+			</description> 
 		</interaction>
 		<interaction> <kbd>PageUp</kbd> <description>
-				<p>Закрывает всплывающее окно ошибки управления вариантами</p>
+				<p>Закрывает всплывающее окно ошибки для управления ракурсами.</p>
+			</description>
+		</interaction>
+		<interaction> <kbd>Ctrl + Enter</kbd> <description>
+				<p>Сохраняет новый ракурс в диалоговом окне 'Сохранить как'.</p>
+			</description>
+		</interaction>
+		<interaction> <kbd>Ctrl + S</kbd> <description>
+				<p>Сохраняет изменения этих ракурсов.</p>
 			</description>
 		</interaction>
 	</control-interactions>

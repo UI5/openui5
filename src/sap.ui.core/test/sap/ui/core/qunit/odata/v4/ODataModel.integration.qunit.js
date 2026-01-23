@@ -27620,8 +27620,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// In case of a side-effects refresh the kept-alive entities are also refreshed.
 	// JIRA: CPOUI5ODATAV4-2757
 	//
-	// After a side-effects refresh follow-up requests, e.g. for expanding a node, are as expected.
-	// JIRA: CPOUI5ODATAV4-3284
+	// A context can still be expanded after a side-effects refresh (JIRA: CPOUI5ODATAV4-3284)
 	//
 	// Context#refresh of a single entity is still not allowed if visual grouping is used.
 	// JIRA: CPOUI5ODATAV4-3257

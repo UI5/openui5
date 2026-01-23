@@ -1,6 +1,5 @@
 /* global QUnit */
 sap.ui.define([
-	"sap/base/i18n/Localization",
 	"sap/ui/core/Element",
 	"sap/ui/core/Lib",
 	"sap/ui/integration/editor/Editor",
@@ -13,7 +12,6 @@ sap.ui.define([
 	"./testLib/SharedExtension",
 	"qunit/designtime/EditorQunitUtils"
 ], function(
-	Localization,
 	Element,
 	Library,
 	Editor,

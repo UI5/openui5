@@ -483,14 +483,12 @@ sap.ui.define("ODataTreeBindingFakeService", ["sap/base/Log"], function(Log) {
 								request.respond(code, headers, data);
 							}
 						}, responseDelay);
-					} else {
-						if (!request.aborted) {
+					} else if (!request.aborted) {
 							if (window.fakeResponded) {
 								window.fakeResponded();
 							}
 							request.respond(code, headers, data);
 						}
-					}
 				}
 
 				// CSRF Token handling
@@ -576,7 +574,7 @@ sap.ui.define("ODataTreeBindingFakeService", ["sap/base/Log"], function(Log) {
 								}
 							}
 							if (failed) {
-								batchResponses.push([500, oJSONHeaders, "Changeset failed"]);
+								batchResponses.push([500, oJSONHeaders, "Change set failed"]);
 							} else {
 								batchResponses.push(nestedResponses);
 							}

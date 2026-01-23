@@ -100,8 +100,8 @@ sap.ui.define([
 				/**
 				 * The list of Subsections.
 				 *
- 				 * Note: If multiple subsections are used, it is highly recommended to set a title for the section
-				 * for accessibility reasons.
+				 * <b>Note:</b> If you use multiple subsections, set a <code>title</code> for each
+				 * subsection to avoid accessibility violations.
 				 */
 				subSections: {type: "sap.uxap.ObjectPageSubSection", multiple: true, singularName: "subSection", forwarding: {getter: "_getGrid", aggregation: "content"}},
 

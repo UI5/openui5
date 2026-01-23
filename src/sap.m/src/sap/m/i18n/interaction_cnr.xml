@@ -130,11 +130,19 @@
 	<control-interactions>
 		<control name="sap.m.VariantManagement"/>
 		<interaction> <kbd>F4</kbd> <kbd>Spacebar</kbd> <kbd>Alt + ArrowUp</kbd> <kbd>Alt + ArrowDown</kbd> <description>
-				<p>Otvara upravljanje varijantom.</p>
-			</description>
+				<p>Otvara upravljanje pogledima.</p>
+			</description> 
 		</interaction>
 		<interaction> <kbd>PageUp</kbd> <description>
-				<p>Zatvara iskačući prozor greške upravljanja varijantom</p>
+				<p>Zatvara iskačući prozor greške za upravljanje pogledima</p>
+			</description>
+		</interaction>
+		<interaction> <kbd>Ctrl + Enter</kbd> <description>
+				<p>Snima novi pogled u dijalogu Sačuvaj kao.</p>
+			</description>
+		</interaction>
+		<interaction> <kbd>Ctrl + S</kbd> <description>
+				<p>Snima promjene pogleda.</p>
 			</description>
 		</interaction>
 	</control-interactions>

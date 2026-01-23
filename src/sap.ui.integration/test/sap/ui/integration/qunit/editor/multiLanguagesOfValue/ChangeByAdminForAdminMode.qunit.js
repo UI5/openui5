@@ -1,6 +1,5 @@
 /* global QUnit */
 sap.ui.define([
-	"sap/base/i18n/Localization",
 	"sap/base/util/merge",
 	"sap-ui-integration-editor",
 	"sap/ui/integration/editor/Editor",
@@ -12,7 +11,6 @@ sap.ui.define([
 	"sap/ui/events/KeyCodes",
 	"qunit/designtime/EditorQunitUtils"
 ], function (
-	Localization,
 	merge,
 	x,
 	Editor,
@@ -85,13 +83,13 @@ sap.ui.define([
 	};
 	var _oExpectedValues = {
 		"string1": {
-			"default_in_en": "String 1 English",
+			"default_in_en": "String 1 in i18n en",
 			"en": "String1 EN Admin",
-			"en-GB": "String 1 English",
-			"es-MX": "String 1 Spanish MX",
+			"en-GB": "String 1 in i18n en",
+			"es-MX": "String 1 in i18n es-MX",
 			"fr": "String1 FR Admin",
-			"fr-CA": "String 1 French CA",
-			"fr-FR": "String 1 French",
+			"fr-CA": "String 1 in i18n fr-CA",
+			"fr-FR": "String 1 in i18n fr",
 			"ru": "String1 RU Admin",
 			"zh-CN": "String1 简体 Admin"
 		},
@@ -102,12 +100,12 @@ sap.ui.define([
 			"zh-TW": "String3 繁體 Admin"
 		},
 		"string4": {
-			"default_in_en": "String 4 English",
-			"en": "String 4 English",
-			"en-GB": "String 4 English",
+			"default_in_en": "String 4 in i18n en",
+			"en": "String 4 in i18n en",
+			"en-GB": "String 4 in i18n en",
 			"fr": "String4 FR Admin",
-			"fr-CA": "String 4 French CA",
-			"fr-FR": "String 4 French",
+			"fr-CA": "String 4 in i18n fr-CA",
+			"fr-FR": "String 4 in i18n fr",
 			"zh-CN": "String4 简体 Admin"
 		}
 	};
@@ -148,16 +146,16 @@ sap.ui.define([
 					var oField4 = that.oEditor.getAggregation("_formContent")[8];
 					EditorQunitUtils.isReady(that.oEditor).then(function () {
 						assert.ok(that.oEditor.isReady(), "Editor is ready");
-						assert.equal(oLabel1.getText(), "Label 1 English", "Label1: Label 1 English");
+						assert.equal(oLabel1.getText(), "Label 1 in i18n en", "Label1: Label 1 in i18n en");
 						assert.equal(oField1.getAggregation("_field").getValue(), _oExpectedValues["string1"]["en"], "oField1: String1 Value");
 						assert.ok(oField1.getAggregation("_field").isA("sap.m.Input"), "oField1: Input control");
-						assert.equal(oLabel2.getText(), "Label 2 English", "Label2: Label 2 English");
+						assert.equal(oLabel2.getText(), "Label 2 in i18n en", "Label2: Label 2 in i18n en");
 						assert.equal(oField2.getAggregation("_field").getValue(), "String2 Value Admin", "oField2: String2 Value Admin");
 						assert.ok(oField2.getAggregation("_field").isA("sap.m.Input"), "oField2: Input control");
-						assert.equal(oLabel3.getText(), "Label 3 English", "Label3: Label 3 English");
+						assert.equal(oLabel3.getText(), "Label 3 in i18n en", "Label3: Label 3 in i18n en");
 						assert.equal(oField3.getAggregation("_field").getValue(), _oExpectedValues["string3"]["en"], "oField3: String3 Value");
 						assert.ok(oField3.getAggregation("_field").isA("sap.m.Input"), "oField3: Input control");
-						assert.equal(oLabel4.getText(), "Label 4 English", "Label4: Label 4 English");
+						assert.equal(oLabel4.getText(), "Label 4 in i18n en", "Label4: Label 4 in i18n en");
 						assert.equal(oField4.getAggregation("_field").getValue(), _oExpectedValues["string4"]["en"], "oField4: String4 Value");
 						assert.ok(oField4.getAggregation("_field").isA("sap.m.Input"), "oField4: Input control");
 
@@ -267,16 +265,16 @@ sap.ui.define([
 					var oField4 = that.oEditor.getAggregation("_formContent")[8];
 					EditorQunitUtils.isReady(that.oEditor).then(function () {
 						assert.ok(that.oEditor.isReady(), "Editor is ready");
-						assert.equal(oLabel1.getText(), "Label 1 English", "Label1: Label 1 English");
+						assert.equal(oLabel1.getText(), "Label 1 in i18n en", "Label1: Label 1 in i18n en");
 						assert.equal(oField1.getAggregation("_field").getValue(), _oExpectedValues["string1"]["en-GB"], "oField1: String1 Value");
 						assert.ok(oField1.getAggregation("_field").isA("sap.m.Input"), "oField1: Input control");
-						assert.equal(oLabel2.getText(), "Label 2 English", "Label2: Label 2 English");
+						assert.equal(oLabel2.getText(), "Label 2 in i18n en", "Label2: Label 2 in i18n en");
 						assert.equal(oField2.getAggregation("_field").getValue(), "String2 Value Admin", "oField2: String2 Value Admin");
 						assert.ok(oField2.getAggregation("_field").isA("sap.m.Input"), "oField2: Input control");
-						assert.equal(oLabel3.getText(), "Label 3 English", "Label3: Label 3 English");
+						assert.equal(oLabel3.getText(), "Label 3 in i18n en", "Label3: Label 3 in i18n en");
 						assert.equal(oField3.getAggregation("_field").getValue(), "String 3", "oField3: String3 Value");
 						assert.ok(oField3.getAggregation("_field").isA("sap.m.Input"), "oField3: Input control");
-						assert.equal(oLabel4.getText(), "Label 4 English", "Label4: Label 4 English");
+						assert.equal(oLabel4.getText(), "Label 4 in i18n en", "Label4: Label 4 in i18n en");
 						assert.equal(oField4.getAggregation("_field").getValue(), _oExpectedValues["string4"]["en-GB"], "oField4: String4 Value");
 						assert.ok(oField4.getAggregation("_field").isA("sap.m.Input"), "oField4: Input control");
 
@@ -386,16 +384,16 @@ sap.ui.define([
 					var oField4 = that.oEditor.getAggregation("_formContent")[8];
 					EditorQunitUtils.isReady(that.oEditor).then(function () {
 						assert.ok(that.oEditor.isReady(), "Editor is ready");
-						assert.equal(oLabel1.getText(), "Label 1 French", "Label1: Label 1 French");
+						assert.equal(oLabel1.getText(), "Label 1 in i18n fr", "Label1: Label 1 in i18n fr");
 						assert.equal(oField1.getAggregation("_field").getValue(), _oExpectedValues["string1"]["fr"], "oField1: String1 Value");
 						assert.ok(oField1.getAggregation("_field").isA("sap.m.Input"), "oField1: Input control");
-						assert.equal(oLabel2.getText(), "Label 2 French", "Label2: Label 2 French");
+						assert.equal(oLabel2.getText(), "Label 2 in i18n fr", "Label2: Label 2 in i18n fr");
 						assert.equal(oField2.getAggregation("_field").getValue(), "String2 Value Admin", "oField2: String2 Value Admin");
 						assert.ok(oField2.getAggregation("_field").isA("sap.m.Input"), "oField2: Input control");
-						assert.equal(oLabel3.getText(), "Label 3 French", "Label3: Label 3 French");
+						assert.equal(oLabel3.getText(), "Label 3 in i18n fr", "Label3: Label 3 in i18n fr");
 						assert.equal(oField3.getAggregation("_field").getValue(), "String 3", "oField3: String3 Value");
 						assert.ok(oField3.getAggregation("_field").isA("sap.m.Input"), "oField3: Input control");
-						assert.equal(oLabel4.getText(), "Label 4 French", "Label4: Label 4 French");
+						assert.equal(oLabel4.getText(), "Label 4 in i18n fr", "Label4: Label 4 in i18n fr");
 						assert.equal(oField4.getAggregation("_field").getValue(), _oExpectedValues["string4"]["fr"], "oField4: String4 Value");
 						assert.ok(oField4.getAggregation("_field").isA("sap.m.Input"), "oField4: Input control");
 
@@ -505,17 +503,17 @@ sap.ui.define([
 					var oField4 = that.oEditor.getAggregation("_formContent")[8];
 					EditorQunitUtils.isReady(that.oEditor).then(function () {
 						assert.ok(that.oEditor.isReady(), "Editor is ready");
-						assert.equal(oLabel1.getText(), "Label 1 English", "Label1: Label 1 English");
+						assert.equal(oLabel1.getText(), "Label 1 in i18n en", "Label1: Label 1 in i18n en");
 						assert.equal(oField1.getAggregation("_field").getValue(), _oExpectedValues["string1"]["ru"], "oField1: String1 Value");
 						assert.ok(oField1.getAggregation("_field").isA("sap.m.Input"), "oField1: Input control");
-						assert.equal(oLabel2.getText(), "Label 2 English", "Label2: Label 2 English");
+						assert.equal(oLabel2.getText(), "Label 2 in i18n en", "Label2: Label 2 in i18n en");
 						assert.equal(oField2.getAggregation("_field").getValue(), "String2 Value Admin", "oField2: String2 Value Admin");
 						assert.ok(oField2.getAggregation("_field").isA("sap.m.Input"), "oField2: Input control");
-						assert.equal(oLabel3.getText(), "Label 3 English", "Label3: Label 3 English");
+						assert.equal(oLabel3.getText(), "Label 3 in i18n en", "Label3: Label 3 in i18n en");
 						assert.equal(oField3.getAggregation("_field").getValue(), _oExpectedValues["string3"]["ru"], "oField3: String3 Value");
 						assert.ok(oField3.getAggregation("_field").isA("sap.m.Input"), "oField3: Input control");
-						assert.equal(oLabel4.getText(), "Label 4 English", "Label4: Label 4 English");
-						assert.equal(oField4.getAggregation("_field").getValue(), "String 4 English", "oField4: String4 Value");
+						assert.equal(oLabel4.getText(), "Label 4 in i18n en", "Label4: Label 4 in i18n en");
+						assert.equal(oField4.getAggregation("_field").getValue(), "String 4 in i18n en", "oField4: String4 Value");
 						assert.ok(oField4.getAggregation("_field").isA("sap.m.Input"), "oField4: Input control");
 
 						var oValueHelpIcon1 = oField1.getAggregation("_field")._oValueHelpIcon;
@@ -571,7 +569,7 @@ sap.ui.define([
 								oField4.attachEventOnce("translationPopoverOpened", function () {
 									var oTranslationPopover4 = oField4._oTranslationPopover;
 									var aHeaderItems4 = oTranslationPopover4.getCustomHeader().getItems();
-									assert.equal(aHeaderItems4[2].getItems()[1].getValue(), "String 4 English", "oTranslationPopover4 Header: String4 Value");
+									assert.equal(aHeaderItems4[2].getItems()[1].getValue(), "String 4 in i18n en", "oTranslationPopover4 Header: String4 Value");
 									assert.ok(aHeaderItems4[2].getItems()[1].getEditable() === false, "oTranslationPopover4 Header: Editable false");
 									assert.ok(oTranslationPopover4.getContent()[0].isA("sap.m.List"), "oTranslationPopover4 Content: List");
 									var oLanguageItems4 = oTranslationPopover4.getContent()[0].getItems();
@@ -624,16 +622,16 @@ sap.ui.define([
 					var oField4 = that.oEditor.getAggregation("_formContent")[8];
 					EditorQunitUtils.isReady(that.oEditor).then(function () {
 						assert.ok(that.oEditor.isReady(), "Editor is ready");
-						assert.equal(oLabel1.getText(), "Label 1 English", "Label1: Label 1 English");
+						assert.equal(oLabel1.getText(), "Label 1 in i18n en", "Label1: Label 1 in i18n en");
 						assert.equal(oField1.getAggregation("_field").getValue(), _oExpectedValues["string1"]["zh-CN"], "oField1: String1 Value");
 						assert.ok(oField1.getAggregation("_field").isA("sap.m.Input"), "oField1: Input control");
-						assert.equal(oLabel2.getText(), "Label 2 English", "Label2: Label 2 English");
+						assert.equal(oLabel2.getText(), "Label 2 in i18n en", "Label2: Label 2 in i18n en");
 						assert.equal(oField2.getAggregation("_field").getValue(), "String2 Value Admin", "oField2: String2 Value Admin");
 						assert.ok(oField2.getAggregation("_field").isA("sap.m.Input"), "oField2: Input control");
-						assert.equal(oLabel3.getText(), "Label 3 English", "Label3: Label 3 English");
+						assert.equal(oLabel3.getText(), "Label 3 in i18n en", "Label3: Label 3 in i18n en");
 						assert.equal(oField3.getAggregation("_field").getValue(), "String 3", "oField3: String3 Value");
 						assert.ok(oField3.getAggregation("_field").isA("sap.m.Input"), "oField3: Input control");
-						assert.equal(oLabel4.getText(), "Label 4 English", "Label4: Label 4 English");
+						assert.equal(oLabel4.getText(), "Label 4 in i18n en", "Label4: Label 4 in i18n en");
 						assert.equal(oField4.getAggregation("_field").getValue(), _oExpectedValues["string4"]["zh-CN"], "oField4: String4 Value");
 						assert.ok(oField4.getAggregation("_field").isA("sap.m.Input"), "oField4: Input control");
 
@@ -743,17 +741,17 @@ sap.ui.define([
 					var oField4 = that.oEditor.getAggregation("_formContent")[8];
 					EditorQunitUtils.isReady(that.oEditor).then(function () {
 						assert.ok(that.oEditor.isReady(), "Editor is ready");
-						assert.equal(oLabel1.getText(), "Label 1 English", "Label1: Label 1 English");
-						assert.equal(oField1.getAggregation("_field").getValue(), "String 1 English", "oField1: String1 Value");
+						assert.equal(oLabel1.getText(), "Label 1 in i18n en", "Label1: Label 1 in i18n en");
+						assert.equal(oField1.getAggregation("_field").getValue(), "String 1 in i18n en", "oField1: String1 Value");
 						assert.ok(oField1.getAggregation("_field").isA("sap.m.Input"), "oField1: Input control");
-						assert.equal(oLabel2.getText(), "Label 2 English", "Label2: Label 2 English");
+						assert.equal(oLabel2.getText(), "Label 2 in i18n en", "Label2: Label 2 in i18n en");
 						assert.equal(oField2.getAggregation("_field").getValue(), "String2 Value Admin", "oField2: String2 Value Admin");
 						assert.ok(oField2.getAggregation("_field").isA("sap.m.Input"), "oField2: Input control");
-						assert.equal(oLabel3.getText(), "Label 3 English", "Label3: Label 3 English");
+						assert.equal(oLabel3.getText(), "Label 3 in i18n en", "Label3: Label 3 in i18n en");
 						assert.equal(oField3.getAggregation("_field").getValue(), _oExpectedValues["string3"]["zh-TW"], "oField3: String3 Value");
 						assert.ok(oField3.getAggregation("_field").isA("sap.m.Input"), "oField3: Input control");
-						assert.equal(oLabel4.getText(), "Label 4 English", "Label4: Label 4 English");
-						assert.equal(oField4.getAggregation("_field").getValue(), "String 4 English", "oField4: String4 Value");
+						assert.equal(oLabel4.getText(), "Label 4 in i18n en", "Label4: Label 4 in i18n en");
+						assert.equal(oField4.getAggregation("_field").getValue(), "String 4 in i18n en", "oField4: String4 Value");
 						assert.ok(oField4.getAggregation("_field").isA("sap.m.Input"), "oField4: Input control");
 
 						var oValueHelpIcon1 = oField1.getAggregation("_field")._oValueHelpIcon;
@@ -765,7 +763,7 @@ sap.ui.define([
 							assert.equal(aHeaderItems1[0].getText(), that.oEditor._oResourceBundle.getText("EDITOR_FIELD_TRANSLATION_LIST_POPOVER_TITLE"), "oTranslationPopover1 Header: Title");
 							assert.equal(aHeaderItems1[1].getText(), that.oEditor._oResourceBundle.getText("EDITOR_FIELD_TRANSLATION_LIST_POPOVER_CURRENTLANGUAGE"), "oTranslationPopover1 Header: Current Language");
 							assert.equal(aHeaderItems1[2].getItems()[0].getText(), "繁體中文", "oTranslationPopover1 Header: 繁體中文");
-							assert.equal(aHeaderItems1[2].getItems()[1].getValue(), "String 1 English", "oTranslationPopover1 Header: String1 Value");
+							assert.equal(aHeaderItems1[2].getItems()[1].getValue(), "String 1 in i18n en", "oTranslationPopover1 Header: String1 Value");
 							assert.equal(aHeaderItems1[2].getItems()[1].getEditable(), false, "oTranslationPopover1 Header: Editable false");
 							assert.equal(aHeaderItems1[3].getText(), that.oEditor._oResourceBundle.getText("EDITOR_FIELD_TRANSLATION_LIST_POPOVER_OTHERLANGUAGES"), "oTranslationPopover1 Header: Other Languages");
 							assert.ok(oTranslationPopover1.getContent()[0].isA("sap.m.List"), "oTranslationPopover1 Content: List");
@@ -809,7 +807,7 @@ sap.ui.define([
 								oField4.attachEventOnce("translationPopoverOpened", function () {
 									var oTranslationPopover4 = oField4._oTranslationPopover;
 									var aHeaderItems4 = oTranslationPopover4.getCustomHeader().getItems();
-									assert.equal(aHeaderItems4[2].getItems()[1].getValue(), "String 4 English", "oTranslationPopover4 Header: String4 Value");
+									assert.equal(aHeaderItems4[2].getItems()[1].getValue(), "String 4 in i18n en", "oTranslationPopover4 Header: String4 Value");
 									assert.ok(aHeaderItems4[2].getItems()[1].getEditable() === false, "oTranslationPopover4 Header: Editable false");
 									assert.ok(oTranslationPopover4.getContent()[0].isA("sap.m.List"), "oTranslationPopover4 Content: List");
 									var oLanguageItems4 = oTranslationPopover4.getContent()[0].getItems();
@@ -862,17 +860,17 @@ sap.ui.define([
 					var oField4 = that.oEditor.getAggregation("_formContent")[8];
 					EditorQunitUtils.isReady(that.oEditor).then(function () {
 						assert.ok(that.oEditor.isReady(), "Editor is ready");
-						assert.equal(oLabel1.getText(), "Label 1 English", "Label1: Label 1 English");
-						assert.equal(oField1.getAggregation("_field").getValue(), "String 1 English", "oField1: String1 Value");
+						assert.equal(oLabel1.getText(), "Label 1 in i18n en", "Label1: Label 1 in i18n en");
+						assert.equal(oField1.getAggregation("_field").getValue(), "String 1 in i18n en", "oField1: String1 Value");
 						assert.ok(oField1.getAggregation("_field").isA("sap.m.Input"), "oField1: Input control");
-						assert.equal(oLabel2.getText(), "Label 2 English", "Label2: Label 2 English");
+						assert.equal(oLabel2.getText(), "Label 2 in i18n en", "Label2: Label 2 in i18n en");
 						assert.equal(oField2.getAggregation("_field").getValue(), "String2 Value Admin", "oField2: String2 Value Admin");
 						assert.ok(oField2.getAggregation("_field").isA("sap.m.Input"), "oField2: Input control");
-						assert.equal(oLabel3.getText(), "Label 3 English", "Label3: Label 3 English");
+						assert.equal(oLabel3.getText(), "Label 3 in i18n en", "Label3: Label 3 in i18n en");
 						assert.equal(oField3.getAggregation("_field").getValue(), "String 3", "oField3: String3 Value");
 						assert.ok(oField3.getAggregation("_field").isA("sap.m.Input"), "oField3: Input control");
-						assert.equal(oLabel4.getText(), "Label 4 English", "Label4: Label 4 English");
-						assert.equal(oField4.getAggregation("_field").getValue(), "String 4 English", "oField4: String4 Value");
+						assert.equal(oLabel4.getText(), "Label 4 in i18n en", "Label4: Label 4 in i18n en");
+						assert.equal(oField4.getAggregation("_field").getValue(), "String 4 in i18n en", "oField4: String4 Value");
 						assert.ok(oField4.getAggregation("_field").isA("sap.m.Input"), "oField4: Input control");
 
 						var oValueHelpIcon1 = oField1.getAggregation("_field")._oValueHelpIcon;
@@ -884,7 +882,7 @@ sap.ui.define([
 							assert.equal(aHeaderItems1[0].getText(), that.oEditor._oResourceBundle.getText("EDITOR_FIELD_TRANSLATION_LIST_POPOVER_TITLE"), "oTranslationPopover1 Header: Title");
 							assert.equal(aHeaderItems1[1].getText(), that.oEditor._oResourceBundle.getText("EDITOR_FIELD_TRANSLATION_LIST_POPOVER_CURRENTLANGUAGE"), "oTranslationPopover1 Header: Current Language");
 							assert.equal(aHeaderItems1[2].getItems()[0].getText(), "Deutsch", "oTranslationPopover1 Header: Deutsch");
-							assert.equal(aHeaderItems1[2].getItems()[1].getValue(), "String 1 English", "oTranslationPopover1 Header: String1 Value");
+							assert.equal(aHeaderItems1[2].getItems()[1].getValue(), "String 1 in i18n en", "oTranslationPopover1 Header: String1 Value");
 							assert.equal(aHeaderItems1[2].getItems()[1].getEditable(), false, "oTranslationPopover1 Header: Editable false");
 							assert.equal(aHeaderItems1[3].getText(), that.oEditor._oResourceBundle.getText("EDITOR_FIELD_TRANSLATION_LIST_POPOVER_OTHERLANGUAGES"), "oTranslationPopover1 Header: Other Languages");
 							assert.ok(oTranslationPopover1.getContent()[0].isA("sap.m.List"), "oTranslationPopover1 Content: List");
@@ -928,7 +926,7 @@ sap.ui.define([
 								oField4.attachEventOnce("translationPopoverOpened", function () {
 									var oTranslationPopover4 = oField4._oTranslationPopover;
 									var aHeaderItems4 = oTranslationPopover4.getCustomHeader().getItems();
-									assert.equal(aHeaderItems4[2].getItems()[1].getValue(), "String 4 English", "oTranslationPopover4 Header: String4 Value");
+									assert.equal(aHeaderItems4[2].getItems()[1].getValue(), "String 4 in i18n en", "oTranslationPopover4 Header: String4 Value");
 									assert.ok(aHeaderItems4[2].getItems()[1].getEditable() === false, "oTranslationPopover4 Header: Editable false");
 									assert.ok(oTranslationPopover4.getContent()[0].isA("sap.m.List"), "oTranslationPopover4 Content: List");
 									var oLanguageItems4 = oTranslationPopover4.getContent()[0].getItems();

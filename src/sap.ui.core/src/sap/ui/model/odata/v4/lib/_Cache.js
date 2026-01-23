@@ -584,7 +584,7 @@ sap.ui.define([
 					_Helper.getPrivateAnnotation(oEntityData, "select"));
 				if (!bDeepCreate) { // after a deep create the complete response is accepted
 					aSelect = _Helper.getQueryOptionsForPath(
-						that.mLateExpandSelect || that.mQueryOptions, sPath
+						that.mLateExpandSelect ?? that.mQueryOptions, sPath
 					).$select;
 				}
 				// update all existing properties (including the properties of the initial data)
@@ -999,7 +999,7 @@ sap.ui.define([
 			}
 		}
 
-		if (!(this.mLateExpandSelect || this.mQueryOptions && this.mQueryOptions.$select)) {
+		if (!(this.mLateExpandSelect ?? this.mQueryOptions?.$select)) {
 			return false; // no autoExpandSelect
 		}
 
@@ -1125,7 +1125,7 @@ sap.ui.define([
 			aPromises = [];
 			mTypeForMetaPath = {};
 			aPromises.push(this.oRequestor.fetchType(mTypeForMetaPath, this.sMetaPath));
-			fetchExpandedTypes(this.sMetaPath, this.mLateExpandSelect || this.mQueryOptions);
+			fetchExpandedTypes(this.sMetaPath, this.mLateExpandSelect ?? this.mQueryOptions);
 			this.oTypePromise = SyncPromise.all(aPromises).then(function () {
 				return mTypeForMetaPath;
 			});
@@ -4808,7 +4808,7 @@ sap.ui.define([
 
 		return oMetadataPromise.then(function () {
 			if (!that.oMetadataPromise) {
-				mLateExpandSelect = that.oSingleton.mLateExpandSelect || {};
+				mLateExpandSelect = that.oSingleton.mLateExpandSelect ?? {};
 				_Helper.aggregateExpandSelect(mLateExpandSelect,
 					_Helper.wrapChildQueryOptions("/" + that.oSingleton.sResourcePath,
 						that.sRelativePath, {}, that.oRequestor.getModelInterface().fetchMetadata));

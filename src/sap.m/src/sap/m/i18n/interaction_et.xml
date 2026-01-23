@@ -130,11 +130,19 @@
 	<control-interactions>
 		<control name="sap.m.VariantManagement"/>
 		<interaction> <kbd>F4</kbd> <kbd>Spacebar</kbd> <kbd>Alt + ArrowUp</kbd> <kbd>Alt + ArrowDown</kbd> <description>
-				<p>Avab variandihalduse.</p>
-			</description>
+				<p>Avab vaatehalduse.</p>
+			</description> 
 		</interaction>
 		<interaction> <kbd>PageUp</kbd> <description>
-				<p>Sulgeb variandihalduse tõrkehüpiku</p>
+				<p>Sulgeb vaatehalduse tõrkehüpiku</p>
+			</description>
+		</interaction>
+		<interaction> <kbd>Ctrl + Enter</kbd> <description>
+				<p>Salvestab uue vaate nimega salvestamise dialoogis.</p>
+			</description>
+		</interaction>
+		<interaction> <kbd>Ctrl + S</kbd> <description>
+				<p>Salvestab vaadetes tehtud muudatused.</p>
 			</description>
 		</interaction>
 	</control-interactions>

@@ -130,11 +130,19 @@
 	<control-interactions>
 		<control name="sap.m.VariantManagement"/>
 		<interaction> <kbd>F4</kbd> <kbd>Spacebar</kbd> <kbd>Alt + ArrowUp</kbd> <kbd>Alt + ArrowDown</kbd> <description>
-				<p>변형 관리를 엽니다.</p>
-			</description>
+				<p>뷰 관리를 엽니다.</p>
+			</description> 
 		</interaction>
 		<interaction> <kbd>PageUp</kbd> <description>
-				<p>변형 관리의 오류 팝오버를 닫습니다.</p>
+				<p>뷰 관리의 오류 팝오버를 닫습니다.</p>
+			</description>
+		</interaction>
+		<interaction> <kbd>Ctrl + Enter</kbd> <description>
+				<p>대화 상자로 저장에서 신규 뷰를 저장합니다.</p>
+			</description>
+		</interaction>
+		<interaction> <kbd>Ctrl + S</kbd> <description>
+				<p>뷰에 대한 변경사항을 저장합니다.</p>
 			</description>
 		</interaction>
 	</control-interactions>

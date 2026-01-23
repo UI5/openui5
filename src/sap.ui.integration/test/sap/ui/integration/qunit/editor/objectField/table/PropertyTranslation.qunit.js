@@ -1,7 +1,6 @@
 /* global QUnit */
 sap.ui.define([
 	"sap-ui-integration-editor",
-	"sap/base/i18n/Localization",
 	"sap/ui/integration/editor/Editor",
 	"sap/ui/integration/Host",
 	"sap/ui/thirdparty/sinon-4",
@@ -12,7 +11,6 @@ sap.ui.define([
 	"qunit/designtime/EditorQunitUtils"
 ], function (
 	x,
-	Localization,
 	Editor,
 	Host,
 	sinon,
@@ -99,7 +97,7 @@ sap.ui.define([
 						var oAddButton = oToolbar.getContent()[1];
 						assert.ok(oAddButton.getVisible(), "Table toolbar: add button visible");
 						var oKeyColumn = oTable.getColumns()[1];
-						assert.equal(oKeyColumn.getLabel().getText(), "translated key en", "Column key: key label text translated");
+						assert.equal(oKeyColumn.getLabel().getText(), "translated key in i18n en", "Column key: key label text translated");
 						oAddButton.firePress();
 						EditorQunitUtils.wait().then(function () {
 							var oSimpleForm = oField._oObjectDetailsPopover.getContent()[0].getPages()[0].getContent()[0];
@@ -108,7 +106,7 @@ sap.ui.define([
 							assert.equal(oContents.length, 16, "SimpleForm: length");
 							var oFormLabel = oContents[0];
 							var oFormField = oContents[1];
-							assert.equal(oFormLabel.getText(), "translated key en", "SimpleForm label1: key label text translated");
+							assert.equal(oFormLabel.getText(), "translated key in i18n en", "SimpleForm label1: key label text translated");
 							assert.ok(oFormLabel.getVisible(), "SimpleForm label1: Visible");
 							assert.ok(oFormField.isA("sap.m.Input"), "SimpleForm Field1: Input Field");
 							assert.ok(oFormField.getVisible(), "SimpleForm Field1: Visible");
@@ -145,7 +143,7 @@ sap.ui.define([
 									var oNewRow = oTable.getRows()[4];
 									assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oNewRow.getBindingContext().getObject()), oNewObject), "Table: new row in the bottom");
 									var oTextCell = oNewRow.getCells()[3];
-									assert.equal(oTextCell.getText(), "translated text01 en", "Row: Text cell value");
+									assert.equal(oTextCell.getText(), "translated text01 in i18n en", "Row: Text cell value");
 									var oSelectionCell10 = oNewRow.getCells()[0];
 									assert.ok(oSelectionCell10.getSelected(), "Row 10: Cell 1 is not selected");
 									resolve();
@@ -191,7 +189,7 @@ sap.ui.define([
 						var oAddButton = oToolbar.getContent()[1];
 						assert.ok(oAddButton.getVisible(), "Table toolbar: add button visible");
 						var oKeyColumn = oTable.getColumns()[1];
-						assert.equal(oKeyColumn.getLabel().getText(), "translated key France", "Column key: key label text translated");
+						assert.equal(oKeyColumn.getLabel().getText(), "translated key in i18n fr", "Column key: key label text translated");
 						oAddButton.firePress();
 						EditorQunitUtils.wait().then(function () {
 							var oSimpleForm = oField._oObjectDetailsPopover.getContent()[0].getPages()[0].getContent()[0];
@@ -200,7 +198,7 @@ sap.ui.define([
 							assert.equal(oContents.length, 16, "SimpleForm: length");
 							var oFormLabel = oContents[0];
 							var oFormField = oContents[1];
-							assert.equal(oFormLabel.getText(), "translated key France", "SimpleForm label1: key label text translated");
+							assert.equal(oFormLabel.getText(), "translated key in i18n fr", "SimpleForm label1: key label text translated");
 							assert.ok(oFormLabel.getVisible(), "SimpleForm label1: Visible");
 							assert.ok(oFormField.isA("sap.m.Input"), "SimpleForm Field1: Input Field");
 							assert.ok(oFormField.getVisible(), "SimpleForm Field1: Visible");
@@ -237,7 +235,7 @@ sap.ui.define([
 									var oNewRow = oTable.getRows()[4];
 									assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oNewRow.getBindingContext().getObject()), oNewObject), "Table: new row in the bottom");
 									var oTextCell = oNewRow.getCells()[3];
-									assert.equal(oTextCell.getText(), "translated text01 France", "Row: Text cell value");
+									assert.equal(oTextCell.getText(), "translated text01 in i18n fr", "Row: Text cell value");
 									var oSelectionCell10 = oNewRow.getCells()[0];
 									assert.ok(oSelectionCell10.getSelected(), "Row 10: Cell 1 is not selected");
 									resolve();
@@ -283,7 +281,7 @@ sap.ui.define([
 						var oAddButton = oToolbar.getContent()[1];
 						assert.ok(oAddButton.getVisible(), "Table toolbar: add button visible");
 						var oKeyColumn = oTable.getColumns()[1];
-						assert.equal(oKeyColumn.getLabel().getText(), "translated key en", "Column key: key label text translated");
+						assert.equal(oKeyColumn.getLabel().getText(), "translated key in i18n en", "Column key: key label text translated");
 						oAddButton.firePress();
 						EditorQunitUtils.wait().then(function () {
 							var oSimpleForm = oField._oObjectDetailsPopover.getContent()[0].getPages()[0].getContent()[0];
@@ -292,7 +290,7 @@ sap.ui.define([
 							assert.equal(oContents.length, 16, "SimpleForm: length");
 							var oFormLabel = oContents[0];
 							var oFormField = oContents[1];
-							assert.equal(oFormLabel.getText(), "translated key en", "SimpleForm label1: key label text translated");
+							assert.equal(oFormLabel.getText(), "translated key in i18n en", "SimpleForm label1: key label text translated");
 							assert.ok(oFormLabel.getVisible(), "SimpleForm label1: Visible");
 							assert.ok(oFormField.isA("sap.m.Input"), "SimpleForm Field1: Input Field");
 							assert.ok(oFormField.getVisible(), "SimpleForm Field1: Visible");
@@ -330,7 +328,7 @@ sap.ui.define([
 									var oNewRow = oTable.getRows()[4];
 									assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oNewRow.getBindingContext().getObject()), oNewObject), "Table: new row in the bottom");
 									var oTextCell = oNewRow.getCells()[3];
-									assert.equal(oTextCell.getText(), "translated text02 en", "Row: Text cell value");
+									assert.equal(oTextCell.getText(), "translated text02 in i18n en", "Row: Text cell value");
 									var oSelectionCell10 = oNewRow.getCells()[0];
 									assert.ok(oSelectionCell10.getSelected(), "Row 10: Cell 1 is not selected");
 									resolve();
@@ -376,7 +374,7 @@ sap.ui.define([
 						var oAddButton = oToolbar.getContent()[1];
 						assert.ok(oAddButton.getVisible(), "Table toolbar: add button visible");
 						var oKeyColumn = oTable.getColumns()[1];
-						assert.equal(oKeyColumn.getLabel().getText(), "translated key France", "Column key: key label text translated");
+						assert.equal(oKeyColumn.getLabel().getText(), "translated key in i18n fr", "Column key: key label text translated");
 						oAddButton.firePress();
 						EditorQunitUtils.wait().then(function () {
 							var oSimpleForm = oField._oObjectDetailsPopover.getContent()[0].getPages()[0].getContent()[0];
@@ -385,7 +383,7 @@ sap.ui.define([
 							assert.equal(oContents.length, 16, "SimpleForm: length");
 							var oFormLabel = oContents[0];
 							var oFormField = oContents[1];
-							assert.equal(oFormLabel.getText(), "translated key France", "SimpleForm label1: key label text translated");
+							assert.equal(oFormLabel.getText(), "translated key in i18n fr", "SimpleForm label1: key label text translated");
 							assert.ok(oFormLabel.getVisible(), "SimpleForm label1: Visible");
 							assert.ok(oFormField.isA("sap.m.Input"), "SimpleForm Field1: Input Field");
 							assert.ok(oFormField.getVisible(), "SimpleForm Field1: Visible");
@@ -423,7 +421,7 @@ sap.ui.define([
 									var oNewRow = oTable.getRows()[4];
 									assert.ok(deepEqual(EditorQunitUtils.cleanUUID(oNewRow.getBindingContext().getObject()), oNewObject), "Table: new row in the bottom");
 									var oTextCell = oNewRow.getCells()[3];
-									assert.equal(oTextCell.getText(), "translated text02 France", "Row: Text cell value");
+									assert.equal(oTextCell.getText(), "translated text02 in i18n fr", "Row: Text cell value");
 									var oSelectionCell10 = oNewRow.getCells()[0];
 									assert.ok(oSelectionCell10.getSelected(), "Row 10: Cell 1 is not selected");
 									resolve();

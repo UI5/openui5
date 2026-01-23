@@ -376,15 +376,25 @@ sap.ui.define([
 		});
 
 		QUnit.test("Color mode change announcement", async function (oAssert) {
-			var oRB = Library.getResourceBundleFor("sap.ui.unified");
-			var sExpectedAnnouncement;
+			const oRB = Library.getResourceBundleFor("sap.ui.unified");
+			const sRedText = oRB.getText("COLORPICKER_RED");
+			const sGreenText = oRB.getText("COLORPICKER_GREEN");
+			const sBlueText = oRB.getText("COLORPICKER_BLUE");
+			const sHueText = oRB.getText("COLORPICKER_HUE");
+			const sSatText = oRB.getText("COLORPICKER_SAT");
+			const sValText = oRB.getText("COLORPICKER_VALUE");
+			const sLightnessText = oRB.getText("COLORPICKER_LIGHTNESS");
+			const sAlphaText = oRB.getText("COLORPICKER_ALPHA");
+			const sPercentageText = oRB.getText("COLORPICKER_PERCENTAGE");
+			let sExpectedAnnouncement;
 
 			// Arrange
 			this.oCP.setColorString("rgb(255,0,0)"); // Red color
 			await nextUIUpdate();
 
 			// Assert
-			sExpectedAnnouncement = oRB.getText("COLORPICKER_COLOR_MODE_CHANGED", ["RGB", "Red 255, Green 0, Blue 0, Alpha 1"]);
+			let sText = `${sRedText} 255, ${sGreenText} 0, ${sBlueText} 0, ${sAlphaText} 1`;
+			sExpectedAnnouncement = oRB.getText("COLORPICKER_COLOR_MODE_CHANGED", ["RGB", sText]);
 			oAssert.strictEqual(sExpectedAnnouncement, this.oCP._getColorFieldsAnnouncementText("RGB"),
 				"The text announced on color mode change is correct.");
 
@@ -393,7 +403,8 @@ sap.ui.define([
 			await nextUIUpdate();
 
 			// Assert
-			sExpectedAnnouncement = oRB.getText("COLORPICKER_COLOR_MODE_CHANGED", ["HSV", "Hue 0, Saturation 100 Percentage, Value 100, Alpha 1"]);
+			sText = `${sHueText} 0, ${sSatText} 100 ${sPercentageText}, ${sValText} 100, ${sAlphaText} 1`;
+			sExpectedAnnouncement = oRB.getText("COLORPICKER_COLOR_MODE_CHANGED", ["HSV", sText]);
 			oAssert.strictEqual(sExpectedAnnouncement, this.oCP._getColorFieldsAnnouncementText("HSV"),
 				"The text announced on color mode change is correct.");
 
@@ -402,7 +413,8 @@ sap.ui.define([
 			await nextUIUpdate();
 
 			// Assert
-			sExpectedAnnouncement = oRB.getText("COLORPICKER_COLOR_MODE_CHANGED", ["HSL", "Hue 0, Saturation 100 Percentage, Lightness 50 Percentage, Alpha 1"]);
+			sText = `${sHueText} 0, ${sSatText} 100 ${sPercentageText}, ${sLightnessText} 50 ${sPercentageText}, ${sAlphaText} 1`;
+			sExpectedAnnouncement = oRB.getText("COLORPICKER_COLOR_MODE_CHANGED", ["HSL", sText]);
 			oAssert.strictEqual(sExpectedAnnouncement, this.oCP._getColorFieldsAnnouncementText("HSL"),
 				"The text announced on color mode change is correct.");
 		});

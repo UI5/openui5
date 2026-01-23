@@ -130,11 +130,19 @@
 	<control-interactions>
 		<control name="sap.m.VariantManagement"/>
 		<interaction> <kbd>F4</kbd> <kbd>Spacebar</kbd> <kbd>Alt + ArrowUp</kbd> <kbd>Alt + ArrowDown</kbd> <description>
-				<p>فتح إدارة المتغيرات.</p>
-			</description>
+				<p>فتح إدارة العروض.</p>
+			</description> 
 		</interaction>
 		<interaction> <kbd>PageUp</kbd> <description>
-				<p>إغلاق الإطار المنبثق للخطأ لإدارة المتغيرات</p>
+				<p>إغلاق الإطار المنبثق للخطأ لإدارة العروض</p>
+			</description>
+		</interaction>
+		<interaction> <kbd>Ctrl + Enter</kbd> <description>
+				<p>حفظ العرض الجديد في مربع الحوار &quot;حفظ باسم&quot;.</p>
+			</description>
+		</interaction>
+		<interaction> <kbd>Ctrl + S</kbd> <description>
+				<p>حفظ التغييرات التي تم إجراؤها على العروض.</p>
 			</description>
 		</interaction>
 	</control-interactions>

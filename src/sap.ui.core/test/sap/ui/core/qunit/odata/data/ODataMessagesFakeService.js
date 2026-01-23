@@ -522,13 +522,13 @@ var mPredefinedServiceResponses = {
 
 		var aContentParts = sBatchContent.replace(sSeparator + "--", "").trim().split(sSeparator).slice(1);
 
-		// TODO: Handle changesets correctly
+		// TODO: Handle change sets correctly
 		if (aContentParts.length == 1) {
 			sBatchContent = aContentParts[0];
 			aMatches = sBatchContent.match(/^.*boundary=([^\n]*)/m);
 
 			if (!aMatches || !aMatches[1]) {
-				throw new Error("Changeset did not contain separator");
+				throw new Error("Change set did not contain separator");
 			}
 
 			sSeparator = aMatches[1].trim();

@@ -1,6 +1,5 @@
 /* global QUnit */
 sap.ui.define([
-	"sap/base/i18n/Localization",
 	"sap/ui/integration/editor/Editor",
 	"sap/ui/integration/Designtime",
 	"sap/ui/integration/Host",
@@ -9,7 +8,6 @@ sap.ui.define([
 	"./jsons/withDesigntime/sap.card/DataExtensionImpl",
 	"qunit/designtime/EditorQunitUtils"
 ], function (
-	Localization,
 	Editor,
 	Designtime,
 	Host,

@@ -1,6 +1,5 @@
 /* global QUnit */
 sap.ui.define([
-	"sap/base/i18n/Localization",
 	"sap/base/util/merge",
 	"sap-ui-integration-editor",
 	"sap/ui/integration/editor/Editor",
@@ -16,7 +15,6 @@ sap.ui.define([
 	"qunit/designtime/EditorQunitUtils",
 	"sap/ui/test/utils/nextUIUpdate"
 ], function (
-	Localization,
 	merge,
 	x,
 	Editor,
@@ -344,7 +342,7 @@ sap.ui.define([
 							resetButton.firePress();
 							EditorQunitUtils.wait().then(function () {
 								//this is delayed not to give time to show the tokenizer
-								// assert.equal(oField.getAggregation("_field").getValue(), "StringParameter Value Trans in i18n", "Field: Value is reset");
+								// assert.equal(oField.getAggregation("_field").getValue(), "StringParameter Value Trans in i18n en", "Field: Value is reset");
 								assert.equal(oField.getAggregation("_field").getValue(), "{{STRINGPARAMETERVALUE}}", "Field: Value is reset");
 								resolve();
 							});
@@ -1468,7 +1466,7 @@ sap.ui.define([
 					var oLabel = this.oEditor.getAggregation("_formContent")[1];
 					var oField = this.oEditor.getAggregation("_formContent")[2];
 					assert.ok(oLabel.isA("sap.m.Label"), "Label: Form content contains a Label");
-					assert.equal(oLabel.getText(), "StringLabelTrans", "Label: Has label text");
+					assert.equal(oLabel.getText(), "StringLabelTrans in i18n en", "Label: Has label text");
 					assert.ok(oField.isA("sap.ui.integration.editor.fields.StringField"), "Field: String Field");
 					assert.ok(oField.getAggregation("_field").isA("sap.m.Input"), "Field: Editable changed from admin change");
 					assert.ok(oField.getAggregation("_field").getEditable() === true, "Field: Is editable");
@@ -1645,7 +1643,7 @@ sap.ui.define([
 					var oLabel = oEditor.getAggregation("_formContent")[1];
 					var oField = oEditor.getAggregation("_formContent")[2];
 					assert.ok(oLabel.isA("sap.m.Label"), "Label: Form content contains a Label");
-					assert.equal(oLabel.getText(), "StringLabelTrans", "Label: Has label text");
+					assert.equal(oLabel.getText(), "StringLabelTrans in i18n en", "Label: Has label text");
 					assert.ok(oField.isA("sap.ui.integration.editor.fields.StringField"), "Field: String Field");
 					assert.ok(oField.getAggregation("_field").isA("sap.m.Input"), "Field: Editable changed from admin change");
 					assert.ok(oField.getAggregation("_field").getEditable() === true, "Field: Is editable");
@@ -1822,7 +1820,7 @@ sap.ui.define([
 					var oLabel = oEditor.getAggregation("_formContent")[1];
 					var oField = oEditor.getAggregation("_formContent")[2];
 					assert.ok(oLabel.isA("sap.m.Label"), "Label: Form content contains a Label");
-					assert.equal(oLabel.getText(), "StringLabelTrans", "Label: Has label text");
+					assert.equal(oLabel.getText(), "StringLabelTrans in i18n en", "Label: Has label text");
 					assert.ok(oField.isA("sap.ui.integration.editor.fields.StringField"), "Field: String Field");
 					assert.ok(oField.getAggregation("_field").isA("sap.m.Input"), "Field: Editable changed from admin change");
 					assert.ok(oField.getAggregation("_field").getEditable() === true, "Field: Is editable");

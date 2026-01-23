@@ -1,6 +1,5 @@
 /* global QUnit */
 sap.ui.define([
-	"sap/base/i18n/Localization",
 	"sap-ui-integration-editor",
 	"sap/ui/core/Element",
 	"sap/ui/integration/editor/Editor",
@@ -13,7 +12,6 @@ sap.ui.define([
 	"sap/base/util/deepEqual",
 	"sap/base/util/deepClone"
 ], function(
-	Localization,
 	x,
 	Element,
 	Editor,
@@ -73,7 +71,7 @@ sap.ui.define([
 						assert.equal(oTitleLabel.getText(), "cardTitle", "Title Label: Has label text");
 						assert.ok(oTitleField.isA("sap.ui.integration.editor.fields.StringField"), "Title Field: String Field");
 						assert.ok(oTitleField.getAggregation("_field").isA("sap.m.Input"), "Title Field: Control is an Input");
-						assert.equal(oTitleField.getAggregation("_field").getValue(), "Trans Card Title en", "Title Field: String Value");
+						assert.equal(oTitleField.getAggregation("_field").getValue(), "Trans Card Title in i18n en", "Title Field: String Value");
 
 						var oMaxItemLabel = aFormContents[3];
 						var oMaxItemField = aFormContents[4];
@@ -227,7 +225,7 @@ sap.ui.define([
 						assert.equal(oTitleLabel.getText(), "cardTitle", "Title Label: Has label text");
 						assert.ok(oTitleField.isA("sap.ui.integration.editor.fields.StringField"), "Title Field: String Field");
 						assert.ok(oTitleFieldControl.isA("sap.m.Input"), "Title Field: Control is an Input");
-						assert.equal(oTitleFieldControl.getValue(), "Trans Card Title en", "Title Field: String Value");
+						assert.equal(oTitleFieldControl.getValue(), "Trans Card Title in i18n en", "Title Field: String Value");
 						oTitleFieldControl.setValue("string value 1");
 						oTitleFieldControl.fireChange({ value: "string value 1"});
 						assert.equal(oTitleFieldControl.getValue(), "string value 1", "Title Field: Has new value");
@@ -547,7 +545,7 @@ sap.ui.define([
 						assert.equal(oTitleLabel.getText(), "cardTitle", "Title Label: Has label text");
 						assert.ok(oTitleField.isA("sap.ui.integration.editor.fields.StringField"), "Title Field: String Field");
 						assert.ok(oTitleFieldControl.isA("sap.m.Input"), "Title Field: Control is an Input");
-						assert.equal(oTitleFieldControl.getValue(), "Trans Card Title en", "Title Field: String Value");
+						assert.equal(oTitleFieldControl.getValue(), "Trans Card Title in i18n en", "Title Field: String Value");
 						oTitleFieldControl.setValue("string value 1");
 						oTitleFieldControl.fireChange({ value: "string value 1"});
 						assert.equal(oTitleFieldControl.getValue(), "string value 1", "Title Field: Has new value");
@@ -1062,7 +1060,7 @@ sap.ui.define([
 								assert.equal(oTitleLabel.getText(), "cardTitle", "Title Label: Has label text");
 								assert.ok(oTitleField.isA("sap.ui.integration.editor.fields.StringField"), "Title Field: String Field");
 								assert.ok(oTitleFieldControl.isA("sap.m.Input"), "Title Field: Control is an Input");
-								assert.equal(oTitleFieldControl.getValue(), "Trans Card Title en", "Title Field: String Value");
+								assert.equal(oTitleFieldControl.getValue(), "Trans Card Title in i18n en", "Title Field: String Value");
 								oTitleFieldControl.setValue("string value 1");
 								oTitleFieldControl.fireChange({ value: "string value 1"});
 								assert.equal(oTitleFieldControl.getValue(), "string value 1", "Title Field: Has new value");
@@ -1538,7 +1536,7 @@ sap.ui.define([
 										assert.equal(oTitleLabel.getText(), "cardTitle", "Title Label: Has label text");
 										assert.ok(oTitleField.isA("sap.ui.integration.editor.fields.StringField"), "Title Field: String Field");
 										assert.ok(oTitleFieldControl.isA("sap.m.Input"), "Title Field: Control is an Input");
-										assert.equal(oTitleFieldControl.getValue(), "Trans Card Title en", "Title Field: String Value");
+										assert.equal(oTitleFieldControl.getValue(), "Trans Card Title in i18n en", "Title Field: String Value");
 										oTitleFieldControl.setValue("string value 1");
 										oTitleFieldControl.fireChange({ value: "string value 1"});
 										assert.equal(oTitleFieldControl.getValue(), "string value 1", "Title Field: Has new value");
@@ -1893,7 +1891,7 @@ sap.ui.define([
 								assert.equal(oTitleLabel.getText(), "cardTitle", "Title Label: Has label text");
 								assert.ok(oTitleField.isA("sap.ui.integration.editor.fields.StringField"), "Title Field: String Field");
 								assert.ok(oTitleFieldControl.isA("sap.m.Input"), "Title Field: Control is an Input");
-								assert.equal(oTitleFieldControl.getValue(), "Trans Card Title en", "Title Field: String Value");
+								assert.equal(oTitleFieldControl.getValue(), "Trans Card Title in i18n en", "Title Field: String Value");
 								oTitleFieldControl.setValue("string value 1");
 								oTitleFieldControl.fireChange({ value: "string value 1"});
 								assert.equal(oTitleFieldControl.getValue(), "string value 1", "Title Field: Has new value");
@@ -2485,7 +2483,7 @@ sap.ui.define([
 								assert.equal(oTitleLabel.getText(), "cardTitle", "Title Label: Has label text");
 								assert.ok(oTitleField.isA("sap.ui.integration.editor.fields.StringField"), "Title Field: String Field");
 								assert.ok(oTitleFieldControl.isA("sap.m.Input"), "Title Field: Control is an Input");
-								assert.equal(oTitleFieldControl.getValue(), "Trans Card Title en", "Title Field: String Value");
+								assert.equal(oTitleFieldControl.getValue(), "Trans Card Title in i18n en", "Title Field: String Value");
 								oTitleFieldControl.setValue("string value 1");
 								oTitleFieldControl.fireChange({ value: "string value 1"});
 								assert.equal(oTitleFieldControl.getValue(), "string value 1", "Title Field: Has new value");
@@ -3280,7 +3278,7 @@ sap.ui.define([
 						assert.equal(oTitleLabel.getText(), "cardTitle", "Title Label: Has label text");
 						assert.ok(oTitleField.isA("sap.ui.integration.editor.fields.StringField"), "Title Field: String Field");
 						assert.ok(oTitleField.getAggregation("_field").isA("sap.m.Input"), "Title Field: Control is an Input");
-						assert.equal(oTitleField.getAggregation("_field").getValue(), "Trans Card Title en", "Title Field: String Value");
+						assert.equal(oTitleField.getAggregation("_field").getValue(), "Trans Card Title in i18n en", "Title Field: String Value");
 
 						var oMaxItemLabel = aFormContents[3];
 						var oMaxItemField = aFormContents[4];
@@ -3420,7 +3418,7 @@ sap.ui.define([
 						assert.equal(oTitleLabel.getText(), "cardTitle", "Title Label: Has label text");
 						assert.ok(oTitleField.isA("sap.ui.integration.editor.fields.StringField"), "Title Field: String Field");
 						assert.ok(oTitleFieldControl.isA("sap.m.Input"), "Title Field: Control is an Input");
-						assert.equal(oTitleFieldControl.getValue(), "Trans Card Title en", "Title Field: String Value");
+						assert.equal(oTitleFieldControl.getValue(), "Trans Card Title in i18n en", "Title Field: String Value");
 						oTitleFieldControl.setValue("string value 1");
 						oTitleFieldControl.fireChange({ value: "string value 1"});
 						assert.equal(oTitleFieldControl.getValue(), "string value 1", "Title Field: Has new value");
@@ -3722,7 +3720,7 @@ sap.ui.define([
 						assert.equal(oTitleLabel.getText(), "cardTitle", "Title Label: Has label text");
 						assert.ok(oTitleField.isA("sap.ui.integration.editor.fields.StringField"), "Title Field: String Field");
 						assert.ok(oTitleFieldControl.isA("sap.m.Input"), "Title Field: Control is an Input");
-						assert.equal(oTitleFieldControl.getValue(), "Trans Card Title en", "Title Field: String Value");
+						assert.equal(oTitleFieldControl.getValue(), "Trans Card Title in i18n en", "Title Field: String Value");
 						oTitleFieldControl.setValue("string value 1");
 						oTitleFieldControl.fireChange({ value: "string value 1"});
 						assert.equal(oTitleFieldControl.getValue(), "string value 1", "Title Field: Has new value");
@@ -4211,7 +4209,7 @@ sap.ui.define([
 								assert.equal(oTitleLabel.getText(), "cardTitle", "Title Label: Has label text");
 								assert.ok(oTitleField.isA("sap.ui.integration.editor.fields.StringField"), "Title Field: String Field");
 								assert.ok(oTitleFieldControl.isA("sap.m.Input"), "Title Field: Control is an Input");
-								assert.equal(oTitleFieldControl.getValue(), "Trans Card Title en", "Title Field: String Value");
+								assert.equal(oTitleFieldControl.getValue(), "Trans Card Title in i18n en", "Title Field: String Value");
 								oTitleFieldControl.setValue("string value 1");
 								oTitleFieldControl.fireChange({ value: "string value 1"});
 								assert.equal(oTitleFieldControl.getValue(), "string value 1", "Title Field: Has new value");
@@ -4673,7 +4671,7 @@ sap.ui.define([
 										assert.equal(oTitleLabel.getText(), "cardTitle", "Title Label: Has label text");
 										assert.ok(oTitleField.isA("sap.ui.integration.editor.fields.StringField"), "Title Field: String Field");
 										assert.ok(oTitleFieldControl.isA("sap.m.Input"), "Title Field: Control is an Input");
-										assert.equal(oTitleFieldControl.getValue(), "Trans Card Title en", "Title Field: String Value");
+										assert.equal(oTitleFieldControl.getValue(), "Trans Card Title in i18n en", "Title Field: String Value");
 										oTitleFieldControl.setValue("string value 1");
 										oTitleFieldControl.fireChange({ value: "string value 1"});
 										assert.equal(oTitleFieldControl.getValue(), "string value 1", "Title Field: Has new value");
@@ -5018,7 +5016,7 @@ sap.ui.define([
 								assert.equal(oTitleLabel.getText(), "cardTitle", "Title Label: Has label text");
 								assert.ok(oTitleField.isA("sap.ui.integration.editor.fields.StringField"), "Title Field: String Field");
 								assert.ok(oTitleFieldControl.isA("sap.m.Input"), "Title Field: Control is an Input");
-								assert.equal(oTitleFieldControl.getValue(), "Trans Card Title en", "Title Field: String Value");
+								assert.equal(oTitleFieldControl.getValue(), "Trans Card Title in i18n en", "Title Field: String Value");
 								oTitleFieldControl.setValue("string value 1");
 								oTitleFieldControl.fireChange({ value: "string value 1"});
 								assert.equal(oTitleFieldControl.getValue(), "string value 1", "Title Field: Has new value");
@@ -5590,7 +5588,7 @@ sap.ui.define([
 								assert.equal(oTitleLabel.getText(), "cardTitle", "Title Label: Has label text");
 								assert.ok(oTitleField.isA("sap.ui.integration.editor.fields.StringField"), "Title Field: String Field");
 								assert.ok(oTitleFieldControl.isA("sap.m.Input"), "Title Field: Control is an Input");
-								assert.equal(oTitleFieldControl.getValue(), "Trans Card Title en", "Title Field: String Value");
+								assert.equal(oTitleFieldControl.getValue(), "Trans Card Title in i18n en", "Title Field: String Value");
 								oTitleFieldControl.setValue("string value 1");
 								oTitleFieldControl.fireChange({ value: "string value 1"});
 								assert.equal(oTitleFieldControl.getValue(), "string value 1", "Title Field: Has new value");

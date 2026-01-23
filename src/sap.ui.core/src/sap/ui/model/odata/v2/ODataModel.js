@@ -3820,7 +3820,7 @@ sap.ui.define([
 						//changeSet failed
 						if (oResponse.message) {
 							for (j = 0; j < aRequests[i].length; j++) {
-								// ensure that messages are reported for each request in a changeset
+								// ensure that messages are reported for each request in a change set
 								// as we cannot assign the error to a specific request
 								oResponse.$reported = false;
 								oRequestObject = aRequests[i][j];
@@ -5211,7 +5211,7 @@ sap.ui.define([
 	 * @param {Object<string,string>} [mParameters.headers] A map of headers for this request
 	 * @param {string} [mParameters.batchGroupId] <b>Deprecated as of version 1.31.0</b>, use <code>groupId</code> instead
 	 * @param {string} [mParameters.groupId] ID of a request group; requests belonging to the same group will be bundled in one batch request
-	 * @param {string} [mParameters.changeSetId] ID of the <code>ChangeSet</code> that this request should belong to
+	 * @param {string} [mParameters.changeSetId] ID of the change set that this request should belong to
 	 * @param {boolean} [mParameters.refreshAfterChange] Since 1.46; defines whether to update all bindings after submitting this change operation.
 	 *   See {@link #setRefreshAfterChange}. If given, this overrules the model-wide <code>refreshAfterChange</code> flag for this operation only.
 	 * @return {{abort: function(): void}} An object which has an <code>abort</code> function to abort the current request.
@@ -5296,7 +5296,7 @@ sap.ui.define([
 	 * @param {Object<string,string>} [mParameters.headers] A map of headers for this request
 	 * @param {string} [mParameters.batchGroupId] <b>Deprecated as of version 1.31.0</b>, use <code>groupId</code> instead
 	 * @param {string} [mParameters.groupId] ID of a request group; requests belonging to the same group will be bundled in one batch request
-	 * @param {string} [mParameters.changeSetId] ID of the <code>ChangeSet</code> that this request should belong to
+	 * @param {string} [mParameters.changeSetId] ID of the change set that this request should belong to
 	 * @param {boolean} [mParameters.refreshAfterChange] Since 1.46; defines whether to update all bindings after submitting this change operation.
 	 *   See {@link #setRefreshAfterChange}. If given, this overrules the model-wide <code>refreshAfterChange</code> flag for this operation only.
 	 * @return {{abort: function(): void}} An object which has an <code>abort</code> function to abort the current request.
@@ -5387,7 +5387,7 @@ sap.ui.define([
 	 *   ID of a request group; requests belonging to the same group will be bundled in one batch
 	 *   request
 	 * @param {string} [mParameters.changeSetId]
-	 *   ID of the <code>ChangeSet</code> that this request should belong to
+	 *   ID of the change set that this request should belong to
 	 * @param {boolean} [mParameters.refreshAfterChange]
 	 *   Since 1.46; defines whether to update all bindings after submitting this change operation,
 	 *   see {@link #setRefreshAfterChange}. If given, this overrules the model-wide
@@ -5508,7 +5508,7 @@ sap.ui.define([
 	 *     <li><code>{object} mParameters.response</code>: A copy of the OData response object</li>
 	 *   </ul>
 	 * @param {string} [mParameters.changeSetId]
-	 *   ID of the <code>ChangeSet</code> that this request belongs to
+	 *   ID of the change set that this request belongs to
 	 * @param {function} [mParameters.error]
 	 *   A callback function which is called when the request failed. The handler can have the
 	 *   parameter: <code>oError</code> which contains additional error information.
@@ -5529,7 +5529,7 @@ sap.ui.define([
 	 *     <li>the function import returns a single entity,</li>
 	 *     <li>the back-end service must support the "Content-ID" header,</li>
 	 *     <li>the back end must allow GET requests relative to this content ID outside the
-	 *       changeset within the <code>$batch</code> request.</li>
+	 *       change set within the <code>$batch</code> request.</li>
 	 *   </ul>
 	 *   The success and error callback functions are called only once, even if there are two
 	 *   requests in the <code>$batch</code> related to a single call of {@link #callFunction}.
@@ -7181,7 +7181,7 @@ sap.ui.define([
 	 * The parameter <code>expand</code> is supported since 1.78.0. If this parameter is set, the
 	 * given navigation properties are expanded automatically with the same $batch request in which
 	 * the POST request for the creation is contained. Ensure that the batch mode is used and the
-	 * back-end service supports GET requests relative to a content ID outside the changeset.
+	 * back-end service supports GET requests relative to a content ID outside the change set.
 	 * The success and error callback functions are called only once, even if there are two requests
 	 * in the <code>$batch</code> related to a single call of {@link #createEntry}:
 	 * <ul>
@@ -7225,7 +7225,7 @@ sap.ui.define([
 	 * @param {string} [mParameters.batchGroupId]
 	 *   <b>Deprecated as of version 1.31.0</b>, use <code>groupId</code> instead
 	 * @param {string} [mParameters.changeSetId]
-	 *   The ID of the <code>ChangeSet</code> that this request should belong to
+	 *   The ID of the change set that this request should belong to
 	 * @param {sap.ui.model.Context} [mParameters.context]
 	 *   The binding context
 	 * @param {function} [mParameters.created]
@@ -7246,7 +7246,7 @@ sap.ui.define([
 	 *     <li>batch mode must be enabled; see constructor parameter <code>useBatch</code>,</li>
 	 *     <li>the back-end service must support the "Content-ID" header,</li>
 	 *     <li>the back end must allow GET requests relative to this content ID outside the
-	 *       changeset within the <code>$batch</code> request.</li>
+	 *       change set within the <code>$batch</code> request.</li>
 	 *   </ul>
 	 * @param {string} [mParameters.groupId]
 	 *   The ID of a request group; requests belonging to the same group will be bundled in one

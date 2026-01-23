@@ -1,6 +1,5 @@
 /* global QUnit */
 sap.ui.define([
-	"sap/base/i18n/Localization",
 	"sap/base/util/merge",
 	"sap-ui-integration-editor",
 	"sap/ui/core/Element",
@@ -15,7 +14,6 @@ sap.ui.define([
 	"sap/base/i18n/ResourceBundle",
 	"qunit/designtime/EditorQunitUtils"
 ], function(
-	Localization,
 	merge,
 	x,
 	Element,
@@ -1234,7 +1232,7 @@ sap.ui.define([
 					var oLabel = this.oEditor.getAggregation("_formContent")[1];
 					var oField = this.oEditor.getAggregation("_formContent")[2];
 					assert.ok(oLabel.isA("sap.m.Label"), "Label 1: Form content contains a Label");
-					assert.equal(oLabel.getText(), "Label 1 English", "Label 1: Has label text");
+					assert.equal(oLabel.getText(), "Label 1 in i18n en", "Label 1: Has label text");
 					assert.ok(oField.isA("sap.ui.integration.editor.fields.StringField"), "Field 1: String Field");
 					EditorQunitUtils.isReady(this.oEditor).then(function () {
 						assert.ok(this.oEditor.isReady(), "Editor is ready");

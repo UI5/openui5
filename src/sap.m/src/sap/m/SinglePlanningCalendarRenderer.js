@@ -21,14 +21,14 @@ sap.ui.define([], function() {
 	SinglePlanningCalendarRenderer.render = function(oRm, oCalendar){
 		var oHeader = oCalendar._getHeader(),
 			oGrid = oCalendar._getCurrentGrid(),
-			sTitleId = `${oHeader.getId()}-Title`;
+			sTitleId = oHeader.getTitle().getId();
 
 		oRm.openStart("div", oCalendar);
 		oRm.accessibilityState({
 			role: "region",
 			roledescription: oCalendar._oRB.getText("SPC_CONTROL_NAME"),
 			labelledby: {
-				value: `${sTitleId}`,
+				value: sTitleId,
 				append: true
 			}
 		});

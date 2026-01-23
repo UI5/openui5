@@ -130,11 +130,19 @@
 	<control-interactions>
 		<control name="sap.m.VariantManagement"/>
 		<interaction> <kbd>F4</kbd> <kbd>Spacebar</kbd> <kbd>Alt + ArrowUp</kbd> <kbd>Alt + ArrowDown</kbd> <description>
-				<p>פותח את ניהול הווריאנטים.</p>
-			</description>
+				<p>פותח את ניהול התצוגה</p>
+			</description> 
 		</interaction>
 		<interaction> <kbd>PageUp</kbd> <description>
-				<p>סוגר את popover השגיאה של ניהול הווריאנטים.</p>
+				<p>סוגר את popover השגיאה של ניהול התצוגה.</p>
+			</description>
+		</interaction>
+		<interaction> <kbd>Ctrl + Enter</kbd> <description>
+				<p>שומר את התצוגה החדשה בדיאלוג 'שמור בשם'.</p>
+			</description>
+		</interaction>
+		<interaction> <kbd>Ctrl + S</kbd> <description>
+				<p>שומר את השינויים שביצעת בתצוגות.</p>
 			</description>
 		</interaction>
 	</control-interactions>
@@ -158,7 +166,7 @@
 				<p><kbd>ArrowUp</kbd></p>
 				<p>מעביר את הפריט מיקום אחד למעלה אם זמין.</p>
 				<p><kbd>ArrowDown</kbd></p>
-				<p>מעביר את הפריט מיקום אחד למטה, אם זמין.</p>
+				<p>מעביר את הפריט מיקום אחד למטה אם זמין.</p>
 			</description>
 		</interaction>
 	</control-interactions>

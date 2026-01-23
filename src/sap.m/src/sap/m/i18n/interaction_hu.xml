@@ -130,11 +130,19 @@
 	<control-interactions>
 		<control name="sap.m.VariantManagement"/>
 		<interaction> <kbd>F4</kbd> <kbd>Spacebar</kbd> <kbd>Alt + ArrowUp</kbd> <kbd>Alt + ArrowDown</kbd> <description>
-				<p>Megnyitja a változatkezelést.</p>
-			</description>
+				<p>Megnyitja a nézetkezelést.</p>
+			</description> 
 		</interaction>
 		<interaction> <kbd>PageUp</kbd> <description>
-				<p>Bezárja a változatkezelés előugró ablakát.</p>
+				<p>Bezárja a nézetkezelés előugró ablakát.</p>
+			</description>
+		</interaction>
+		<interaction> <kbd>Ctrl + Enter</kbd> <description>
+				<p>Menti az új nézetet a Mentés másként dialógusablakban.</p>
+			</description>
+		</interaction>
+		<interaction> <kbd>Ctrl + S</kbd> <description>
+				<p>Menti a nézetek módosításait.</p>
 			</description>
 		</interaction>
 	</control-interactions>

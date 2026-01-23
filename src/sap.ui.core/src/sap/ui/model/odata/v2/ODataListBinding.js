@@ -1914,7 +1914,7 @@ sap.ui.define([
 	 *   where only the subset given below is supported. In case of deep create, <b>none</b> of the
 	 *   parameters in <code>mParameters</code> must be set.
 	 * @param {string} [mParameters.changeSetId]
-	 *   The ID of the <code>ChangeSet</code> that this request should belong to
+	 *   The ID of the change set that this request should belong to
 	 * @param {function} [mParameters.error]
 	 *   The error callback function
 	 * @param {string} [mParameters.expand]

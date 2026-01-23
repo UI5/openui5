@@ -312,18 +312,6 @@ sap.ui.define([
 	 *
 	 * @param {Element} xmlNode the XML element representing the View/Fragment
 	 * @param {sap.ui.core.mvc.XMLView|sap.ui.core.Fragment} oView the View/Fragment which corresponds to the parsed XML
-	 * @param {object} mSettings The settings object that is given to the view's factory method
-	 * @return {Array} an array containing Controls and/or plain HTML element strings
-	 */
-	XMLTemplateProcessor.parseTemplate = function(xmlNode, oView, mSettings) {
-		return XMLTemplateProcessor.parseTemplatePromise(xmlNode, oView, false, { settings: mSettings }).unwrap();
-	};
-
-	/**
-	 * Parses a complete XML template definition (full node hierarchy)
-	 *
-	 * @param {Element} xmlNode the XML element representing the View/Fragment
-	 * @param {sap.ui.core.mvc.XMLView|sap.ui.core.Fragment} oView the View/Fragment which corresponds to the parsed XML
 	 * @param {boolean} bAsync Whether or not to perform the template processing asynchronously
 	 * @param {object} oParseConfig parse configuration options, e.g. settings pre-processor
 	 * @return {Promise} with an array containing Controls and/or plain HTML element strings

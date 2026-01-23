@@ -1794,7 +1794,7 @@ sap.ui.define([
 		oPlanningCalendar.placeAt("qunit-fixture");
 		await nextUIUpdate();
 
-		var sExpectedAriaLabelBy = `${oPlanningCalendar._getHeader().getId()}"-Title`,
+		var sExpectedAriaLabelBy = oPlanningCalendar._getHeader().getTitle().getId(),
 			sCalendarAriaLabelBy = oPlanningCalendar.getDomRef().getAttribute("aria-labelledby"),
 			sTableAriaLabelBy = oPlanningCalendar.getAggregation("table").getDomRef().querySelector(`[id="${oPlanningCalendar.getId()}-Table-listUl"]`).getAttribute("aria-labelledby");
 

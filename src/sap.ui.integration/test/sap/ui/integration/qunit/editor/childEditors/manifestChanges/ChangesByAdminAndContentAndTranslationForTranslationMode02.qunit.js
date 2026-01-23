@@ -1,6 +1,5 @@
 /* global QUnit */
 sap.ui.define([
-	"sap/base/i18n/Localization",
 	"sap-ui-integration-editor",
 	"sap/ui/integration/editor/Editor",
 	"sap/ui/integration/designtime/editor/CardEditor",
@@ -10,7 +9,6 @@ sap.ui.define([
 	"./../../ContextHost",
 	"qunit/designtime/EditorQunitUtils"
 ], function(
-	Localization,
 	x,
 	Editor,
 	CardEditor,
@@ -223,40 +221,62 @@ sap.ui.define([
 	var _oExpectedCardTitleValues = {
 		"main": {
 			"default": "cardTitle Translation - main",
-			"defaultOri_in_trans": "Trans Card Title en",
-			"de-CH": "Trans Card Title de-CH",
+			"defaultOri_in_trans": "Trans Card Title in i18n en",
+			"da": "Trans Card Title in i18n da",
+			"de-CH": "Trans Card Title in i18n de-CH",
 			"en": "cardTitle EN Content - main",
 			"fr": "cardTitle FR Admin - main",
+			"fr-CA": "Trans Card Title in i18n fr",
+			"fr-FR": "Trans Card Title in i18n fr",
+			"pl": "Trans Card Title in i18n pl",
 			"ru": "cardTitle RU Content - main",
 			"zh-CN": "cardTitle 简体 Admin - main",
 			"zh-TW": "cardTitle 繁體 Content - main"
 		},
 		"child1": {
 			"default": "cardTitle Translation - child1",
-			"defaultOri_in_trans": "Trans Card Title en",
-			"de-CH": "Trans Card Title de-CH",
+			"defaultOri_in_trans": "Trans Card Title in i18n en",
+			"da": "Trans Card Title in i18n da",
+			"de-CH": "Trans Card Title in i18n de-CH",
 			"en": "cardTitle EN Admin - child1",
+			"fr": "Trans Card Title in i18n fr",
+			"fr-CA": "Trans Card Title in i18n fr",
+			"fr-FR": "Trans Card Title in i18n fr",
+			"pl": "Trans Card Title in i18n pl",
 			"zh-CN": "cardTitle 简体 Admin - child1"
 		},
 		"child1-1": {
-			"default": "Trans Card Title en",
-			"defaultOri_in_trans": "Trans Card Title en",
-			"de-CH": "Trans Card Title de-CH",
+			"default": "Trans Card Title in i18n en",
+			"defaultOri_in_trans": "Trans Card Title in i18n en",
+			"da": "Trans Card Title in i18n da",
+			"de-CH": "Trans Card Title in i18n de-CH",
 			"fr": "cardTitle FR Content - child1-1",
+			"fr-CA": "Trans Card Title in i18n fr",
+			"fr-FR": "Trans Card Title in i18n fr",
+			"pl": "Trans Card Title in i18n pl",
 			"ru": "cardTitle RU Content - child1-1"
 		},
 		"child1-2": {
 			"default": "cardTitle Translation - child1-2",
-			"defaultOri_in_trans": "Trans Card Title en",
-			"de-CH": "Trans Card Title de-CH",
+			"defaultOri_in_trans": "Trans Card Title in i18n en",
+			"da": "Trans Card Title in i18n da",
+			"de-CH": "Trans Card Title in i18n de-CH",
 			"fr": "cardTitle FR Admin - child1-2",
+			"fr-CA": "Trans Card Title in i18n fr",
+			"fr-FR": "Trans Card Title in i18n fr",
+			"pl": "Trans Card Title in i18n pl",
 			"ru": "cardTitle RU Admin - child1-2"
 		},
 		"child2": {
-			"default": "Trans Card Title en",
-			"defaultOri_in_trans": "Trans Card Title en",
+			"default": "Trans Card Title in i18n en",
+			"defaultOri_in_trans": "Trans Card Title in i18n en",
+			"da": "Trans Card Title in i18n da",
 			"en": "cardTitle EN Content - child2",
-			"de-CH": "Trans Card Title de-CH",
+			"de-CH": "Trans Card Title in i18n de-CH",
+			"fr": "Trans Card Title in i18n fr",
+			"fr-CA": "Trans Card Title in i18n fr",
+			"fr-FR": "Trans Card Title in i18n fr",
+			"pl": "Trans Card Title in i18n pl",
 			"zh-CN": "cardTitle 简体 Content - child2"
 		},
 		"child2-1": {

@@ -1225,7 +1225,7 @@ sap.ui.define([
 		oModel.attachMetadataLoaded(this, fnTest);
 	});
 
-	QUnit.test("test oDataModel Two Way 2 changes deferred with using changeBatchGroups and single=true (= 2 changesets)", function(assert) {
+	QUnit.test("test oDataModel Two Way 2 changes deferred with using changeBatchGroups and single=true (= 2 change sets)", function(assert) {
 		var done = assert.async();
 		oModel = initModel();
 		oModel.setRefreshAfterChange(false);
@@ -1264,7 +1264,7 @@ sap.ui.define([
 					assert.equal(oModel.getProperty("/ProductSet('AD-1000')/Name"), "NewValue", "Two Way check");
 					assert.equal(oModel.getProperty("/ProductSet('HT-1000')/Name"), "NewValue2", "Two Way check");
 
-					assert.equal(oParams.__batchResponses.length,2, "should be 2 changesets");
+					assert.equal(oParams.__batchResponses.length,2, "should be 2 change sets");
 					assert.equal(oParams.__batchResponses[0].__changeResponses.length,1, "should be 1 response");
 					assert.equal(oParams.__batchResponses[0].__changeResponses[0].statusCode,"204", "statuscode OK");
 					assert.equal(oParams.__batchResponses[1].__changeResponses.length,1, "should be 1 response");
@@ -1280,7 +1280,7 @@ sap.ui.define([
 		oModel.attachMetadataLoaded(this, fnTest);
 	});
 
-	QUnit.test("test oDataModel Two Way 2 changes deferred with using changeBatchGroups and single=false (= 1 changeset)", function(assert) {
+	QUnit.test("test oDataModel Two Way 2 changes deferred with using changeBatchGroups and single=false (= 1 change set)", function(assert) {
 		var done = assert.async();
 		oModel = initModel();
 		oModel.setRefreshAfterChange(false);
@@ -1319,7 +1319,7 @@ sap.ui.define([
 					assert.equal(oModel.getProperty("/ProductSet('AD-1000')/Name"), "NewValue", "Two Way check");
 					assert.equal(oModel.getProperty("/ProductSet('HT-1000')/Name"), "NewValue2", "Two Way check");
 
-					assert.equal(oParams.__batchResponses.length,1, "should be 1 changesets");
+					assert.equal(oParams.__batchResponses.length,1, "should be 1 change sets");
 					assert.equal(oParams.__batchResponses[0].__changeResponses.length,2, "should be 2 responses");
 					assert.equal(oParams.__batchResponses[0].__changeResponses[0].statusCode,"204", "statuscode OK");
 					assert.equal(oParams.__batchResponses[0].__changeResponses[1].statusCode,"204", "statuscode OK");

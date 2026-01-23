@@ -1049,7 +1049,7 @@ function(
 	 * @private
 	 */
 	MultiInput.prototype.onsapfocusleave = function (oEvent) {
-		var oPopup = this._getSuggestionsPopoverPopup(),
+		var oPopover = this._getSuggestionsPopoverPopup(),
 			oTokenizer = this.getAggregation("tokenizer"),
 			oSelectedItemsPopup = oTokenizer.getTokensPopup(),
 			bNewFocusIsInSuggestionPopup = false,
@@ -1060,10 +1060,11 @@ function(
 			bFocusIsInSelectedItemPopup;
 
 
-		if (oPopup && oPopup.isA("sap.m.Popover")) {
+		if (oPopover && oPopover.isA("sap.m.Popover")) {
+
 			if (oEvent.relatedControlId) {
 				oRelatedControlDomRef = Element.getElementById(oEvent.relatedControlId).getFocusDomRef();
-				bNewFocusIsInSuggestionPopup = containsOrEquals(oPopup.getFocusDomRef(), oRelatedControlDomRef);
+				bNewFocusIsInSuggestionPopup = containsOrEquals(oPopover.getFocusDomRef(), oRelatedControlDomRef);
 				bNewFocusIsInTokenizer = containsOrEquals(oTokenizer.getFocusDomRef(), oRelatedControlDomRef);
 
 				if (oSelectedItemsPopup) {
@@ -1082,8 +1083,12 @@ function(
 
 		bFocusedOut = !bNewFocusIsInSuggestionPopup && oEvent.relatedControlId !== this.getId() && !bNewFocusIsInTokenizer;
 
-		if (bFocusedOut && ((this.isMobileDevice() && !this.getShowSuggestion()) || !this.isMobileDevice())) {
-			this._validateCurrentText(true);
+		if (bFocusedOut) {
+			if ((this.isMobileDevice() && !this.getShowSuggestion()) || !this.isMobileDevice()) {
+				this._validateCurrentText(true);
+			}
+
+			this._sProposedItemText = null;
 		}
 
 		if (!this.isMobileDevice() 								// not phone
@@ -1141,6 +1146,7 @@ function(
 		this._deregisterTokenizerResizeHandler();
 
 		this._bValueHelpOpen = false; //This means the ValueHelp is closed and the focus is back. So, reset that var
+		this._bTokenIsAdded = false;
 
 		if (oEvent.target === this.getFocusDomRef()) {
 			Input.prototype.onfocusin.apply(this, arguments);

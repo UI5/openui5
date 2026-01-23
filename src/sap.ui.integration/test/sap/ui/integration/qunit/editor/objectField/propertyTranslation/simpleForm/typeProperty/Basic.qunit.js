@@ -1,7 +1,6 @@
 /* global QUnit */
 sap.ui.define([
 	"sap-ui-integration-editor",
-	"sap/base/i18n/Localization",
 	"sap/ui/integration/editor/Editor",
 	"sap/ui/integration/Host",
 	"sap/ui/thirdparty/sinon-4",
@@ -11,7 +10,6 @@ sap.ui.define([
 	"qunit/designtime/EditorQunitUtils"
 ], function (
 	x,
-	Localization,
 	Editor,
 	Host,
 	sinon,
@@ -53,40 +51,40 @@ sap.ui.define([
 
 	var _oOriginExpectedValues = {
 		"string1": {
-			"default": "String 1 English",
-			"en": "String 1 English",
-			"en-US": "String 1 US English",
-			"es-MX": "String 1 Spanish MX",
-			"fr": "String 1 French",
-			"fr-FR": "String 1 French",
-			"fr-CA": "String 1 French CA"
+			"default": "String 1 in i18n en",
+			"en": "String 1 in i18n en",
+			"en-US": "String 1 in i18n en-US",
+			"es-MX": "String 1 in i18n es-MX",
+			"fr": "String 1 in i18n fr",
+			"fr-FR": "String 1 in i18n fr",
+			"fr-CA": "String 1 in i18n fr-CA"
 		},
 		"string2": {
-			"default": "String 2 English",
-			"en": "String 2 English",
-			"en-US": "String 2 US English",
-			"es-MX": "String 2 Spanish MX",
-			"fr": "String 2 French",
-			"fr-FR": "String 2 French",
-			"fr-CA": "String 2 French CA"
+			"default": "String 2 in i18n en",
+			"en": "String 2 in i18n en",
+			"en-US": "String 2 in i18n en-US",
+			"es-MX": "String 2 in i18n es-MX",
+			"fr": "String 2 in i18n fr",
+			"fr-FR": "String 2 in i18n fr",
+			"fr-CA": "String 2 in i18n fr-CA"
 		},
 		"string3": {
-			"default": "String 3 English",
-			"en": "String 3 English",
-			"en-US": "String 3 US English",
-			"es": "String 3 Spanish",
-			"es-MX": "String 3 Spanish",
-			"fr": "String 3 French",
-			"fr-FR": "String 3 French",
-			"fr-CA": "String 3 French CA"
+			"default": "String 3 in i18n en",
+			"en": "String 3 in i18n en",
+			"en-US": "String 3 in i18n en-US",
+			"es": "String 3 in i18n es",
+			"es-MX": "String 3 in i18n es",
+			"fr": "String 3 in i18n fr",
+			"fr-FR": "String 3 in i18n fr",
+			"fr-CA": "String 3 in i18n fr-CA"
 		},
 		"string4": {
-			"default": "String 4 English",
-			"en": "String 4 English",
-			"en-US": "String 4 US English",
-			"fr": "String 4 French",
-			"fr-FR": "String 1 French",
-			"fr-CA": "String 4 French CA"
+			"default": "String 4 in i18n en",
+			"en": "String 4 in i18n en",
+			"en-US": "String 4 in i18n en-US",
+			"fr": "String 4 in i18n fr",
+			"fr-FR": "String 1 in i18n fr",
+			"fr-CA": "String 4 in i18n fr-CA"
 		}
 	};
 	document.body.className = document.body.className + " sapUiSizeCompact ";

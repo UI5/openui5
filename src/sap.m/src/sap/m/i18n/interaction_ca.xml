@@ -130,11 +130,19 @@
 	<control-interactions>
 		<control name="sap.m.VariantManagement"/>
 		<interaction> <kbd>F4</kbd> <kbd>Spacebar</kbd> <kbd>Alt + ArrowUp</kbd> <kbd>Alt + ArrowDown</kbd> <description>
-				<p>Obre la gestió de variants.</p>
-			</description>
+				<p>Obre la gestió de vistes.</p>
+			</description> 
 		</interaction>
 		<interaction> <kbd>PageUp</kbd> <description>
-				<p>Tanca la finestra emergent d'errors de la gestió de variants</p>
+				<p>Tanca la finestra emergent d'errors de la gestió de vistes</p>
+			</description>
+		</interaction>
+		<interaction> <kbd>Ctrl + Enter</kbd> <description>
+				<p>Desa la vista nova en el diàleg &quot;Desar com a&quot;.</p>
+			</description>
+		</interaction>
+		<interaction> <kbd>Ctrl + S</kbd> <description>
+				<p>Desa les modificacions fetes a les vistes.</p>
 			</description>
 		</interaction>
 	</control-interactions>
