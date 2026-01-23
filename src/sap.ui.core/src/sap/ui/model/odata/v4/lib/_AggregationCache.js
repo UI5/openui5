@@ -792,8 +792,8 @@ sap.ui.define([
 	 *   The group node or its path relative to the cache; a group node instance (instead of a path)
 	 *   MUST only be given in case of "expanding" continued
 	 * @param {number} iLevels
-	 *   The number of levels to expand, <code>iLevels >= Number.MAX_SAFE_INTEGER</code> can be
-	 *   used to expand all levels
+	 *   The number of levels to expand, either 1 or <code>iLevels >= Number.MAX_SAFE_INTEGER</code>
+	 *   which can be used to expand all levels
 	 * @param {function} [fnDataRequested]
 	 *   The function is called just before the back-end request is sent.
 	 *   If no back-end request is needed, the function is not called.
@@ -871,8 +871,7 @@ sap.ui.define([
 			});
 			return SyncPromise.resolve(iCount);
 		}
-		if (this.bUnifiedCache || iLevels > 1
-				|| oGroupNode["@$ui5.node.level"] < this.oAggregation.expandTo) {
+		if (this.bUnifiedCache || oGroupNode["@$ui5.node.level"] < this.oAggregation.expandTo) {
 			return SyncPromise.resolve(-1); // refresh needed
 		}
 

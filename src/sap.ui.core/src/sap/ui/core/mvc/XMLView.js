@@ -420,11 +420,11 @@ sap.ui.define([
 		}
 
 		/**
-		* This function initialized the view settings.
-		*
-		* @param {object} mSettings with view settings
-		* @returns {Promise|null} will be returned if running in async mode
-		*/
+		 * This function initialized the view settings.
+		 *
+		 * @param {object} mSettings with view settings
+		 * @returns {Promise|null} will be returned if running in async mode
+		 */
 		XMLView.prototype.initViewSettings = function(mSettings) {
 			var that = this, _xContent;
 
@@ -515,15 +515,11 @@ sap.ui.define([
 			// either template name or XML node is given
 			if (mSettings.viewName) {
 				var sResourceName = mSettings.viewName.replace(/\./g, "/") + ".view.xml";
-				if (mSettings.async) {
-					// in async mode we need to return here as processing takes place in Promise callbacks
-					if (mSettings.cache && XMLView._bUseCache) {
-						return processCache(sResourceName, mSettings.cache).then(processView);
-					} else {
-						return loadResourceAsync(sResourceName).then(runPreprocessorsAsync).then(processView);
-					}
+				// in async mode we need to return here as processing takes place in Promise callbacks
+				if (mSettings.cache && XMLView._bUseCache) {
+					return processCache(sResourceName, mSettings.cache).then(processView);
 				} else {
-					_xContent = LoaderExtensions.loadResource(sResourceName).documentElement;
+					return loadResourceAsync(sResourceName).then(runPreprocessorsAsync).then(processView);
 				}
 			} else if (mSettings.viewContent) {
 				if (mSettings.viewContent.nodeType === window.Node.DOCUMENT_NODE) { // Check for XML Document
@@ -535,24 +531,8 @@ sap.ui.define([
 				_xContent = mSettings.xmlNode;
 			}
 
-			if (mSettings.async) {
-				// a normal Promise:
-				return runPreprocessorsAsync(_xContent).then(processView);
-			} else {
-				// a SyncPromise
-				_xContent = this.runPreprocessor("xml", _xContent, true);
-				_xContent = runViewxmlPreprocessor(_xContent, false);
-				// if the _xContent is a SyncPromise we have to extract the _xContent
-				// and make sure we throw any occurring errors further
-				if (_xContent && typeof _xContent.getResult === 'function') {
-					if (_xContent.isRejected()) {
-						// sync promises store the error within the result if they are rejected
-						throw _xContent.getResult();
-					}
-					_xContent = _xContent.getResult();
-				}
-				processView(_xContent);
-			}
+			// a normal Promise:
+			return runPreprocessorsAsync(_xContent).then(processView);
 		};
 
 		XMLView.prototype.onBeforeRendering = function() {
@@ -586,18 +566,14 @@ sap.ui.define([
 			}
 
 			// parse the XML tree
-			if (!this.oAsyncState) {
-				this._aParsedContent = fnRunWithPreprocessor(XMLTemplateProcessor.parseTemplate.bind(null, this._xContent, this, mSettings));
-			} else {
-				var fnDone = Interaction.notifyAsyncStep("VIEW PROCESSING");
-				return XMLTemplateProcessor.parseTemplatePromise(this._xContent, this, true, {
-					fnRunWithPreprocessor: fnRunWithPreprocessor
-				}).then(function(aParsedContent) {
-					that._aParsedContent = aParsedContent;
-					// allow rendering of preserve content
-					delete that.oAsyncState.suppressPreserve;
-				}).finally(fnDone);
-			}
+			var fnDone = Interaction.notifyAsyncStep("VIEW PROCESSING");
+			return XMLTemplateProcessor.parseTemplatePromise(this._xContent, this, true, {
+				fnRunWithPreprocessor: fnRunWithPreprocessor
+			}).then(function(aParsedContent) {
+				that._aParsedContent = aParsedContent;
+				// allow rendering of preserve content
+				delete that.oAsyncState.suppressPreserve;
+			}).finally(fnDone);
 		};
 
 		XMLView.prototype.getControllerName = function() {

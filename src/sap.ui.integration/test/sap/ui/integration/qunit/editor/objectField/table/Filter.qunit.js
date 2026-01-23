@@ -1,7 +1,6 @@
 /* global QUnit */
 sap.ui.define([
 	"sap-ui-integration-editor",
-	"sap/base/i18n/Localization",
 	"sap/ui/integration/editor/Editor",
 	"sap/ui/integration/Host",
 	"sap/ui/thirdparty/sinon-4",
@@ -11,7 +10,6 @@ sap.ui.define([
 	"qunit/designtime/EditorQunitUtils"
 ], function (
 	x,
-	Localization,
 	Editor,
 	Host,
 	sinon,

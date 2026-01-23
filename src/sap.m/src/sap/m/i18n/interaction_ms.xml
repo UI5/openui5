@@ -130,11 +130,19 @@
 	<control-interactions>
 		<control name="sap.m.VariantManagement"/>
 		<interaction> <kbd>F4</kbd> <kbd>Spacebar</kbd> <kbd>Alt + ArrowUp</kbd> <kbd>Alt + ArrowDown</kbd> <description>
-				<p>Buka pengurusan varian.</p>
-			</description>
+				<p>Membuka pengurusan paparan.</p>
+			</description> 
 		</interaction>
 		<interaction> <kbd>PageUp</kbd> <description>
-				<p>Tutup timbul ralat bagi pengurusan varian</p>
+				<p>Menutup popover ralat bagi pengurusan paparan</p>
+			</description>
+		</interaction>
+		<interaction> <kbd>Ctrl + Enter</kbd> <description>
+				<p>Menyimpan paparan baharu dalam dialog Simpan Sebagai.</p>
+			</description>
+		</interaction>
+		<interaction> <kbd>Ctrl + S</kbd> <description>
+				<p>Menyimpan perubahan yang dibuat pada paparan.</p>
 			</description>
 		</interaction>
 	</control-interactions>
@@ -158,7 +166,7 @@
 				<p><kbd>ArrowUp</kbd></p>
 				<p>Alihkan item ke satu kedudukan atas jika tersedia.</p>
 				<p><kbd>ArrowDown</kbd></p>
-				<p>Alihkan item ke satu kedudukan bawah, jika tersedia.</p>
+				<p>Alihkan item ke satu kedudukan bawah jika tersedia.</p>
 			</description>
 		</interaction>
 	</control-interactions>

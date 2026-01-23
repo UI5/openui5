@@ -1,6 +1,5 @@
 /* global QUnit */
 sap.ui.define([
-	"sap/base/i18n/Localization",
 	"sap/base/util/merge",
 	"sap-ui-integration-editor",
 	"sap/ui/integration/editor/Editor",
@@ -12,7 +11,6 @@ sap.ui.define([
 	"sap/ui/events/KeyCodes",
 	"qunit/designtime/EditorQunitUtils"
 ], function (
-	Localization,
 	merge,
 	x,
 	Editor,
@@ -84,12 +82,12 @@ sap.ui.define([
 			"defaultOri_in_trans": "String4 Value Content"
 		},
 		"string5": {
-			"default": "String 5 English",
-			"en": "String 5 English",
-			"en-US": "String 5 US English",
-			"fr-CA": "String 5 French CA",
-			"fr-FR": "String 5 French",
-			"fr": "String 5 French"
+			"default": "String 5 in i18n en",
+			"en": "String 5 in i18n en",
+			"en-US": "String 5 in i18n en-US",
+			"fr-CA": "String 5 in i18n fr-CA",
+			"fr-FR": "String 5 in i18n fr",
+			"fr": "String 5 in i18n fr"
 		}
 	};
 	var _aCoreLanguages = [

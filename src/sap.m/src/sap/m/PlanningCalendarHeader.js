@@ -4,9 +4,6 @@
 
 // Provides control sap.m.PlanningCalendarHeader.
 sap.ui.define([
-	"sap/base/i18n/Localization",
-	'sap/ui/core/Element',
-	'sap/ui/core/Control',
 	'./library',
 	'./Toolbar',
 	'./AssociativeOverflowToolbar',
@@ -18,24 +15,23 @@ sap.ui.define([
 	'./Label',
 	'./OverflowToolbarLayoutData',
 	'./SegmentedButton',
-	"sap/ui/core/Lib",
+	'./PlanningCalendarHeaderRenderer',
+	'sap/ui/core/Lib',
+	'sap/ui/core/Element',
+	'sap/ui/core/Control',
 	'sap/ui/unified/Calendar',
 	'sap/ui/unified/calendar/CustomMonthPicker',
 	'sap/ui/unified/calendar/CustomYearPicker',
 	'sap/ui/unified/calendar/IndexPicker',
 	'sap/base/i18n/date/CalendarType',
 	'sap/base/i18n/date/CalendarWeekNumbering',
-	'sap/ui/unified/calendar/CalendarDate',
+	'sap/base/i18n/Localization',
 	'sap/ui/core/IconPool',
 	'sap/ui/core/InvisibleText',
 	'sap/ui/core/library',
-	'./PlanningCalendarHeaderRenderer',
 	'sap/ui/core/date/UI5Date'
 ],
 function(
-	Localization,
-	Element,
-	Control,
 	library,
 	Toolbar,
 	AssociativeOverflowToolbar,
@@ -47,25 +43,23 @@ function(
 	Label,
 	OverflowToolbarLayoutData,
 	SegmentedButton,
+	PlanningCalendarHeaderRenderer,
 	Library,
+	Element,
+	Control,
 	Calendar,
 	CustomMonthPicker,
 	CustomYearPicker,
 	IndexPicker,
 	_CalendarType, // type of `_primaryCalendarType` and `_secondaryCalendarType`
 	_CalendarWeekNumbering, // type of `calendarWeekNumbering`
-	CalendarDate,
+	Localization,
 	IconPool,
 	InvisibleText,
 	coreLibrary,
-	PlanningCalendarHeaderRenderer,
 	UI5Date
 ) {
 	"use strict";
-
-	// shortcut for sap.ui.core.TitleLevel
-	var TitleLevel = coreLibrary.TitleLevel;
-
 
 	/**
 	 * Constructor for a new <code>PlanningCalendarHeader</code>.
@@ -119,12 +113,6 @@ function(
 			library : "sap.m",
 
 			properties : {
-
-				/**
-				 * Determines the title of the <code>PlanningCalendarHeader</code>.
-				 */
-				title: { type: "string", group: "Appearance", defaultValue: "" },
-
 				/**
 				 * Determines the start date used in the calendar picker, as a UI5Date or JavaScript Date object. It is considered as a local date.
 				 * The time part will be ignored. The current date is used as default.
@@ -148,24 +136,6 @@ function(
 				 * @since 1.110.0
 				 */
 				calendarWeekNumbering : { type : "sap.base.i18n.date.CalendarWeekNumbering", group : "Appearance", defaultValue: null},
-
-				/**
-				 * Defines the semantic level of the title.
-				 * This information is e.g. used by assistive technologies like screenreaders to create a hierarchical site map for faster navigation.
-				 * Depending on this setting either an HTML h1-h6 element is used or when using level <code>Auto</code> no explicit level information is written (HTML5 header element).
-				 * This property does not influence the style of the control. Use the property <code>titleStyle</code> for this purpose instead.
-				 *
-				 * <b>Note:</b> this property will be overridden if there is title element associated and it has <code>level</code> property set.
-				 */
-				level : {type : "sap.ui.core.TitleLevel", group : "Appearance", defaultValue : TitleLevel.Auto},
-
-				/**
-				 * Defines the style of the title.
-				 * When using the <code>Auto</code> styling, the appearance of the title depends on the current position of the title (e.g. inside a <code>Toolbar</code>).
-				 * This default behavior can be overridden by setting a different style explicitly.
-				 * The actual appearance of the title and the different styles always depends on the theme being used.
-				 */
-				titleStyle : {type : "sap.ui.core.TitleLevel", group : "Appearance", defaultValue : TitleLevel.Auto},
 
 				/**
 				 * If set, the calendar type is used for display.
@@ -297,23 +267,18 @@ function(
 	});
 
 	// Number of items to be skipped when removing content from actions aggregation.
-	// In the _actionsToolbar content are placed the sap.m.Title control, containing the value from the title property,
-	// a sap.m.ToolbarSpacer and a sap.m.SegmentedButton, used for navigation through the views in the calendar.
+	// In the _actionsToolbar content are placed the sap.m.Title control,
+	// a sap.m.ToolbarSpacer, sap.m.Label and a sap.m.SegmentedButton, used for navigation through the views in the calendar.
 	// The other controls in this aggregation are forwarded from the actions aggregation of the
-	// sap.m.SinglePlanningCalendar. Therefore when manipulations of the latter are needed, the first three controls
+	// sap.m.SinglePlanningCalendar. Therefore when manipulations of the latter are needed, the first four controls
 	// must be skipped. (ex. when removeAllActions is used)
-	var RESERVED_ACTIONS_ITEMS_COUNT = 3;
+	const RESERVED_ACTIONS_ITEMS_COUNT = 4;
 
 	PlanningCalendarHeader.prototype.init = function() {
-
-		var sOPHId = this.getId(),
+		const sOPHId = this.getId(),
 			sNavToolbarId = sOPHId + "-NavToolbar",
 			oRB = Library.getResourceBundleFor("sap.m"),
-			sCalendarType = this.getProperty("_primaryCalendarType"),
-			oPicker,
-			oCalendarPicker,
-			oMonthPicker,
-			oYearPicker;
+			sCalendarType = this.getProperty("_primaryCalendarType");
 
 		this.setAggregation("_actionsToolbar", new AssociativeOverflowToolbar(sOPHId + "-ActionsToolbar", {})
 			.addStyleClass("sapMPCHeadActionsToolbar")
@@ -344,7 +309,7 @@ function(
 				this.firePressNext();
 			}.bind(this)
 		});
-		oCalendarPicker = new Calendar(sOPHId + "-Cal", {
+		const oCalendarPicker = new Calendar(sOPHId + "-Cal", {
 			calendarWeekNumbering: this.getCalendarWeekNumbering(),
 			primaryCalendarType: sCalendarType
 		});
@@ -363,7 +328,7 @@ function(
 
 		this.setAssociation("currentPicker", oCalendarPicker);
 
-		oMonthPicker = new CustomMonthPicker(sOPHId + "-MonthCal", {
+		const oMonthPicker = new CustomMonthPicker(sOPHId + "-MonthCal", {
 			primaryCalendarType: sCalendarType
 		});
 		oMonthPicker.attachEvent("select", this._handlePickerDateSelect, this);
@@ -371,7 +336,7 @@ function(
 		this.setAggregation("_monthPicker", oMonthPicker);
 		this._oMonthPicker = oMonthPicker;
 
-		oYearPicker = new CustomYearPicker(sOPHId + "-YearCal", {
+		const oYearPicker = new CustomYearPicker(sOPHId + "-YearCal", {
 			primaryCalendarType: sCalendarType
 		});
 		oYearPicker.attachEvent("select", this._handlePickerDateSelect, this);
@@ -379,7 +344,7 @@ function(
 		this.setAggregation("_yearPicker", oYearPicker);
 		this._oYearPicker = oYearPicker;
 
-		var oIndexPicker = new IndexPicker(sOPHId + "-IndexPicker");
+		const oIndexPicker = new IndexPicker(sOPHId + "-IndexPicker");
 		oIndexPicker.attachEvent("select", this._handleIndexPickerSelect, this);
 		this.setAggregation("_indexPicker", oIndexPicker);
 		this._oIndexPicker = oIndexPicker;
@@ -391,10 +356,10 @@ function(
 			ariaLabelledBy: InvisibleText.getStaticId("sap.m", "PCH_SELECT_RANGE"),
 			press: function () {
 				if (this.fireEvent("_pickerButtonPress", {}, true)) {
-					var oDate = this.getStartDate() || UI5Date.getInstance(),
-						sCurrentPickerId = this.getAssociation("currentPicker"),
+					let oDate = this.getStartDate() || UI5Date.getInstance(),
 						oMinDate;
-					oPicker = Element.getElementById(sCurrentPickerId);
+					const sCurrentPickerId = this.getAssociation("currentPicker");
+					const oPicker = Element.getElementById(sCurrentPickerId);
 					if (oPicker instanceof Calendar) {
 						oMinDate = oPicker.getMinDate();
 						if (oMinDate && oMinDate.getTime() > oDate.getTime()) {
@@ -423,6 +388,10 @@ function(
 
 	PlanningCalendarHeader.prototype.exit = function () {
 		this._getActionsToolbar().removeAllContent();
+		if (this._oDefaultTitle) {
+			this._oDefaultTitle.destroy();
+			this._oDefaultTitle = null;
+		}
 		if (this._oTitle) {
 			this._oTitle.destroy();
 			this._oTitle = null;
@@ -457,9 +426,10 @@ function(
 	};
 
 	PlanningCalendarHeader.prototype.onBeforeRendering = function () {
-		var oViewSwitch = this._getOrCreateViewSwitch();
-		var bVisible = !!this.getActions().length || !!this.getTitle() || oViewSwitch.getItems().length > 1;
-		var sSecondaryCalendarType = this.getProperty("_secondaryCalendarType");
+		const bVisibleTitle = this.getAggregation("_actionsToolbar").getContent()[0].getVisible();
+		const oViewSwitch = this._getOrCreateViewSwitch();
+		const bVisible = !!this.getActions().length || bVisibleTitle || oViewSwitch.getItems().length > 1;
+		const sSecondaryCalendarType = this.getProperty("_secondaryCalendarType");
 		this._getActionsToolbar().setVisible(bVisible);
 
 		this.setPrimaryCalendarTypeToPickers(this.getProperty("_primaryCalendarType"));
@@ -468,32 +438,25 @@ function(
 		}
 	};
 
-	PlanningCalendarHeader.prototype.setTitle = function (sTitle) {
-		const oInnerTitle = this._getOrCreateTitleControl();
-		oInnerTitle.setText(sTitle).setVisible(!!sTitle);
-
-		return this.setProperty("title", sTitle);
-	};
-
-	PlanningCalendarHeader.prototype.setLevel = function (eLevel) {
-		const oInnerTitle = this._getOrCreateTitleControl();
-		oInnerTitle.setLevel(eLevel);
-
-		return this.setProperty("level", eLevel);
-	};
-
-	PlanningCalendarHeader.prototype.setTitleStyle = function (eTitleStyle) {
-		const oInnerTitle = this._getOrCreateTitleControl();
-		oInnerTitle.setTitleStyle(eTitleStyle);
-
-		return this.setProperty("titleStyle", eTitleStyle);
+	PlanningCalendarHeader.prototype._changeTitle = function (oTitle) {
+		this.fireEvent("_titleChange", { title: oTitle }, true, this);
+		const oCurrentTitle = this._getActionsToolbar().getContent()[0];
+		this._getActionsToolbar().removeContent(oCurrentTitle);
+		return this._getActionsToolbar().insertContent(oTitle, 0);
 	};
 
 	PlanningCalendarHeader.prototype.addAction = function (oAction) {
 		if (!oAction) {
 			return this;
 		}
-		this._getActionsToolbar().addContent(oAction);
+
+		if (oAction.isA("sap.m.Title")) {
+			this._changeTitle(oAction);
+
+			this._oTitle = oAction;
+		} else {
+			this._getActionsToolbar().addContent(oAction);
+		}
 
 		return this.addAggregation("actions", oAction);
 	};
@@ -502,6 +465,12 @@ function(
 		if (!oAction) {
 			return this;
 		}
+
+		if (oAction.isA("sap.m.Title")) {
+			this._oTitle = oAction;
+			return this._changeTitle(oAction);
+		}
+
 		this._getActionsToolbar().insertContent(oAction, iIndex + RESERVED_ACTIONS_ITEMS_COUNT);
 
 		return this.insertAggregation("actions", oAction, iIndex);
@@ -511,29 +480,45 @@ function(
 		if (!oAction) {
 			return this;
 		}
+
+		if (oAction.isA("sap.m.Title") && this._oTitle === oAction) {
+			this._oTitle = null;
+			this._changeTitle(this._getOrCreateTitleControl());
+		}
 		this._getActionsToolbar().removeContent(oAction);
 
 		return this.removeAggregation("actions", oAction);
+	};
+
+	PlanningCalendarHeader.prototype.getTitle = function () {
+		if (this._oTitle) {
+			return this._oTitle;
+		}
+
+		return this._getOrCreateTitleControl();
 	};
 
 	PlanningCalendarHeader.prototype.removeAllActions = function () {
 		var oActionsToolbar = this._getActionsToolbar(),
 			oActionsToolbarContent = oActionsToolbar.getContent();
 
+		if (oActionsToolbarContent[0] === this._oTitle) {
+			this._oTitle = null;
+			this._changeTitle(this._getOrCreateTitleControl());
+		}
+
 		for (var i = RESERVED_ACTIONS_ITEMS_COUNT; i < oActionsToolbarContent.length; i++) {
 			oActionsToolbar.removeContent(oActionsToolbarContent[i]);
 		}
-
 		return this.removeAllAggregation("actions");
 	};
 
 	PlanningCalendarHeader.prototype.destroyActions = function () {
-		var oActionsToolbar = this._getActionsToolbar(),
-			oActionsToolbarContent = oActionsToolbar.getContent(),
-			oRemovedContentItem;
+		const oActionsToolbar = this._getActionsToolbar(),
+			oActionsToolbarContent = oActionsToolbar.getContent();
 
 		for (var i = RESERVED_ACTIONS_ITEMS_COUNT; i < oActionsToolbarContent.length; i++) {
-			oRemovedContentItem = oActionsToolbar.removeContent(oActionsToolbarContent[i]);
+			const oRemovedContentItem = oActionsToolbar.removeContent(oActionsToolbarContent[i]);
 			oRemovedContentItem.destroy();
 		}
 
@@ -585,11 +570,11 @@ function(
 	 * @private
 	 */
 	PlanningCalendarHeader.prototype._getOrCreateTitleControl = function () {
-		if (!this._oTitle) {
-			this._oTitle = new Title(this.getId() + "-Title", { visible: false });
+		if (!this._oDefaultTitle) {
+			this._oDefaultTitle = new Title(this.getId() + "-Title", { visible: false });
 		}
 
-		return this._oTitle;
+		return this._oDefaultTitle;
 	};
 
 	/**
@@ -670,12 +655,12 @@ function(
 	 * @private
 	 */
 	PlanningCalendarHeader.prototype._updateViewSwitchLabelFor = function () {
-		var oViewSwitch = this._getOrCreateViewSwitch();
-		var oViewSwitchLabel = this._getOrCreateViewSwitchLabel();
+		const oViewSwitch = this._getOrCreateViewSwitch();
+		const oViewSwitchLabel = this._getOrCreateViewSwitchLabel();
 
 		// Check if the SegmentedButton is in overflow mode (select mode)
 		// Use _bInOverflow property first, fallback to CSS class check for robustness
-		var bIsSelectMode = oViewSwitch._bInOverflow || oViewSwitch.hasStyleClass("sapMSegBSelectWrapper");
+		const bIsSelectMode = oViewSwitch._bInOverflow || oViewSwitch.hasStyleClass("sapMSegBSelectWrapper");
 
 		if (bIsSelectMode) {
 			// In select mode (overflow): show label and set labelFor to select element
@@ -703,7 +688,7 @@ function(
 	 * @private
 	 */
 	PlanningCalendarHeader.prototype._handlePickerDateSelect = function () {
-		var sCurrentPickerId = this.getAssociation("currentPicker"),
+		const sCurrentPickerId = this.getAssociation("currentPicker"),
 			oPicker = Element.getElementById(sCurrentPickerId),
 			oSelectedDate = oPicker.getSelectedDates()[0].getStartDate();
 
@@ -716,9 +701,9 @@ function(
 	};
 
 	PlanningCalendarHeader.prototype._handleIndexPickerSelect = function (oEvent) {
-		var iSelectedIndex = this._oIndexPicker.getSelectedIndex();
-		var oSelectedDate = UI5Date.getInstance(this._oCalendar.getMinDate());
-		var oRelativeInfo = this._getRelativeInfo();
+		const iSelectedIndex = this._oIndexPicker.getSelectedIndex();
+		const oSelectedDate = UI5Date.getInstance(this._oCalendar.getMinDate());
+		const oRelativeInfo = this._getRelativeInfo();
 
 		oSelectedDate.setDate(oSelectedDate.getDate() + iSelectedIndex * oRelativeInfo.iIntervalSize);
 
@@ -742,19 +727,17 @@ function(
 	 * @private
 	 */
 	PlanningCalendarHeader.prototype._openCalendarPickerPopup = function(oPicker){
-		var aContent, oContent, sAccessibleNameId;
-
 		if (!this._oPopup) {
 			this._oPopup = this._createPopup();
 		}
 
-		aContent = this._oPopup.getContent();
-		sAccessibleNameId = InvisibleText.getStaticId("sap.m", this._getPopoverAccessibleName());
+		const aContent = this._oPopup.getContent();
+		const sAccessibleNameId = InvisibleText.getStaticId("sap.m", this._getPopoverAccessibleName());
 		this._oPopup.removeAllAssociation("ariaLabelledBy");
 		this._oPopup.addAriaLabelledBy(sAccessibleNameId);
 
 		if (aContent.length) {
-			oContent = this._oPopup.getContent()[0];
+			const oContent = this._oPopup.getContent()[0];
 			if (oContent.isA("sap.ui.unified.internal.CustomYearPicker")) {
 				this.setAggregation("_yearPicker", this._oPopup.removeAllContent()[0]);
 			} else if (oContent.isA("sap.ui.unified.internal.CustomMonthPicker")) {
@@ -768,12 +751,12 @@ function(
 		this._oPopup.addContent(oPicker);
 
 		this._oPopup.attachAfterOpen(function () {
-			var $Popover = this._oPopup.$();
-			var iOffsetX = Math.floor(($Popover.width() - this._oPickerBtn.$().width()) / 2);
+			const $Popover = this._oPopup.$();
+			const iOffsetX = Math.floor(($Popover.width() - this._oPickerBtn.$().width()) / 2);
 
 			this._oPopup.setOffsetX(Localization.getRTL() ? iOffsetX : -iOffsetX);
 
-			var iOffsetY = this._oPickerBtn.$().height();
+			const iOffsetY = this._oPickerBtn.$().height();
 
 			this._oPopup.setOffsetY(this._oPopup._getCalculatedPlacement() === "Top" ? iOffsetY : -iOffsetY);
 			this._oPopup.getContent()[0].focus();
@@ -787,7 +770,7 @@ function(
 	 * @private
 	 */
 	PlanningCalendarHeader.prototype._createPopup = function () {
-		var oPopover = new Popover({
+		const oPopover = new Popover({
 			placement: "VerticalPreferredBottom",
 			showHeader: false,
 			showArrow: false,
@@ -810,7 +793,7 @@ function(
 	 * @returns {string} The message bundle key
 	 */
 	PlanningCalendarHeader.prototype._getPopoverAccessibleName = function() {
-		var sPickerName = Element.getElementById(this.getAssociation("currentPicker")).getMetadata().getName();
+		const sPickerName = Element.getElementById(this.getAssociation("currentPicker")).getMetadata().getName();
 
 		switch (sPickerName) {
 			case "sap.ui.unified.internal.CustomYearPicker":
@@ -850,7 +833,7 @@ function(
 	 * @private
 	 */
 	PlanningCalendarHeader.prototype._handlePickerCancelEvent = function () {
-		var oPickerBtnDomRef = this._oPickerBtn.getDomRef();
+		const oPickerBtnDomRef = this._oPickerBtn.getDomRef();
 
 		this.fireCancel();
 		this._closeCalendarPickerPopup();

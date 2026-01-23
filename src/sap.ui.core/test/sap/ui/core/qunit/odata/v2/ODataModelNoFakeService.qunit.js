@@ -4460,10 +4460,10 @@ sap.ui.define([
 			var oBatchRequest = {},
 				oBatchRequestHandle = {abort : function () {/*not relevant for this test*/}},
 				oBatchResponse = {headers : "~headers", statusCode : 200},
-				oChangesetError = {message : "complete changeset failed"},
+				oChangeSetError = {message : "complete change set failed"},
 				oData = {__batchResponses : [
-					oChangesetError
-					// don't care about successful requests in the changeset in this test
+					oChangeSetError
+					// don't care about successful requests in the change set in this test
 				]},
 				oError = {message : "an error message", $ownReason : bOwnReason},
 				fnHandleError,
@@ -4491,7 +4491,7 @@ sap.ui.define([
 				oRequest1 = {parts : [oPart1_0, oPart1_1]},
 				oRequest2 = {parts : [oPart2_0]},
 				aRequests = [
-					// changeset
+					// change set
 					[oRequest1, oRequest2],
 					// single request
 					oRequest0
@@ -4546,18 +4546,18 @@ sap.ui.define([
 
 			oModelMock.expects("_processError") // for oRequest1 - part 0
 				.withExactArgs(sinon.match.same(oPart1_0.request),
-					sinon.match.same(oChangesetError).and(sinon.match({$reported : false})),
+					sinon.match.same(oChangeSetError).and(sinon.match({$reported : false})),
 					"~fnErrorPart1_0")
 				.callsFake(function (oRequest, oResponse, fnError0) {
 					oResponse.$reported = true;
 				});
 			oModelMock.expects("_processError") // for oRequest1 - part 1
 				.withExactArgs(sinon.match.same(oPart1_1.request),
-					sinon.match.same(oChangesetError).and(sinon.match({$reported : true})),
+					sinon.match.same(oChangeSetError).and(sinon.match({$reported : true})),
 					"~fnErrorPart1_1");
 			oModelMock.expects("_processError") // for oRequest2
 				.withExactArgs(sinon.match.same(oPart2_0.request),
-					sinon.match.same(oChangesetError).and(sinon.match({$reported : false})),
+					sinon.match.same(oChangeSetError).and(sinon.match({$reported : false})),
 					"~fnErrorPart2_0");
 			oModelMock.expects("_invalidatePathCache").withExactArgs();
 			oModelMock.expects("checkUpdate").withExactArgs(false, false, {/*mGetEntities*/});
@@ -4608,7 +4608,7 @@ sap.ui.define([
 				oRequest1 = {parts : [oPart1_NoErrorHandler, oPart1_WithErrorHandler]},
 				oRequest2 = {parts : [oPart2_WithErrorHandler, oPart2_AlreadyAborted]},
 				aRequests = [
-					// changeset
+					// change set
 					[oRequest1, oRequest2],
 					// single request
 					oRequest0

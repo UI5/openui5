@@ -1,7 +1,6 @@
 /* global QUnit */
 sap.ui.define([
 	"sap-ui-integration-editor",
-	"sap/base/i18n/Localization",
 	"sap/ui/integration/editor/Editor",
 	"sap/ui/integration/Host",
 	"sap/ui/thirdparty/sinon-4",
@@ -10,7 +9,6 @@ sap.ui.define([
 	"qunit/designtime/EditorQunitUtils"
 ], function (
 	x,
-	Localization,
 	Editor,
 	Host,
 	sinon,
@@ -137,13 +135,13 @@ sap.ui.define([
 	};
 	var _oExpectedValuesOfChangesFromAdmin = {
 		"objectWithPropertiesDefined1": {
-			"default": "String 1 English",
+			"default": "String 1 in i18n en",
 			"en": "String1 EN Admin",
-			"en-US": "String 1 US English",
-			"es-MX": "String 1 Spanish MX",
+			"en-US": "String 1 in i18n en-US",
+			"es-MX": "String 1 in i18n es-MX",
 			"fr": "String1 FR Admin",
-			"fr-FR": "String 1 French",
-			"fr-CA": "String 1 French CA",
+			"fr-FR": "String 1 in i18n fr",
+			"fr-CA": "String 1 in i18n fr-CA",
 			"zh-CN": "String1 简体 Admin"
 		},
 		"objectWithPropertiesDefined2": {

@@ -816,7 +816,7 @@ sap.ui.define([
 					demandPopin: true
 				})
 			],
-			ariaLabelledBy: sId + "-Descr"
+			ariaLabelledBy: `${sId}-Descr ${this.oHeader?.getTitle()?.getId()}`
 		});
 		oTable.attachEvent("selectionChange", handleTableSelectionChange, this);
 
@@ -1073,9 +1073,16 @@ sap.ui.define([
 		oHeader.attachEvent("pressToday", this._handleTodayPress, this);
 		oHeader.attachEvent("pressNext", this._handlePressArrow, this);
 		oHeader.attachEvent("dateSelect", this._handleDateSelect, this);
+		oHeader.attachEvent("_titleChange", this._handleTitleChange, this);
 
 		return this;
 	};
+
+	PlanningCalendar.prototype._handleTitleChange = function (oEvent) {
+		const oTitle = oEvent.getParameter("title");
+		this.getDomRef()?.setAttribute("aria-labelledby", oTitle.getId());
+	};
+
 
 	/**
 	 * Handler for the pressPrevious and pressNext events in the _header aggregation.
@@ -1451,104 +1458,6 @@ sap.ui.define([
 		// adjust offset only if the control is rendered
 		if (this.getDomRef()) {
 			this._adjustColumnHeadersTopOffset();
-		}
-	};
-
-	PlanningCalendar.prototype.addToolbarContent = function(oContent) {
-		this._prepareHeaderTitle(oContent);
-		this.addAggregation("toolbarContent", oContent);
-
-		return this;
-	 };
-
-	PlanningCalendar.prototype.insertToolbarContent = function(oContent, iIndex) {
-		this._prepareHeaderTitle(oContent);
-		this.insertAggregation("toolbarContent", oContent, iIndex);
-
-		return this;
-	};
-
-	PlanningCalendar.prototype.removeToolbarContent = function(oContent) {
-		var oRemoved;
-
-		if (oContent && oContent.isA("sap.m.Title")) {
-			this._getHeader().setTitle("");
-			this._disconnectAndDestroyHeaderObserver();
-		} else {
-			oRemoved = this.removeAggregation("toolbarContent", oContent);
-		}
-
-		return oRemoved;
-	};
-
-	PlanningCalendar.prototype.removeAllToolbarContent = function() {
-		var aRemoved = this.removeAllAggregation("toolbarContent");
-		this._getHeader().setTitle("");
-		this._disconnectAndDestroyHeaderObserver();
-		return aRemoved;
-	};
-
-	PlanningCalendar.prototype.destroyToolbarContent = function() {
-		var destroyed = this.destroyAggregation("toolbarContent");
-		this._getHeader().setTitle("");
-		this._disconnectAndDestroyHeaderObserver();
-		return destroyed;
-	};
-
-	/**
-	* Returns the ManagedObjectObserver for the title.
-	*
-	* @return {sap.ui.base.ManagedObjectObserver} The header observer object
-	* @private
-	*/
-	PlanningCalendar.prototype._getHeaderObserver = function () {
-		if (!this._oHeaderObserver) {
-			this._oHeaderObserver = new ManagedObjectObserver(this._handleTitleTextChange.bind(this));
-		}
-		return this._oHeaderObserver;
-	};
-
-	/**
-	* Observes the text property of the title.
-	*
-	* @param {sap.m.Title} oTitle text property will be observed
-	* @private
-	*/
-	PlanningCalendar.prototype._observeHeaderTitleText = function (oTitle) {
-		this._getHeaderObserver().observe(oTitle, {
-			properties: ["text"]
-		});
-	};
-
-	PlanningCalendar.prototype._prepareHeaderTitle = function (oTitle) {
-		if (oTitle && oTitle.isA("sap.m.Title")) {
-			this._observeHeaderTitleText(oTitle);
-			const oHeader = this._getHeader(),
-				sLabel = `${this._getHeader().getId()}-Title`,
-				oLevel = oTitle.getLevel(),
-				oTitleStyle = oTitle.getTitleStyle();
-			oHeader.setTitle(oTitle.getText());
-			oHeader.setLevel(oLevel);
-			oHeader.setTitleStyle(oTitleStyle);
-			oTitle.setVisible(false);
-			this.addAriaLabelledBy(sLabel);
-		}
-	};
-
-	PlanningCalendar.prototype._handleTitleTextChange = function (oChanges) {
-	   this._getHeader().setTitle(oChanges.current);
-   };
-
-	/**
-	 * Disconnects and destroys the ManagedObjectObserver observing title's text.
-	 *
-	 * @private
-	 */
-	PlanningCalendar.prototype._disconnectAndDestroyHeaderObserver = function () {
-		if (this._oHeaderObserver) {
-			this._oHeaderObserver.disconnect();
-			this._oHeaderObserver.destroy();
-			this._oHeaderObserver = null;
 		}
 	};
 
@@ -2784,7 +2693,7 @@ sap.ui.define([
 
 		var oTable = this.getAggregation("table");
 		oTable.removeAllAriaLabelledBy();
-		oTable.addAriaLabelledBy(this.getId() + "-Descr");
+		oTable.addAriaLabelledBy(`${this.getId()}-Descr ${this.oHeader?.getTitle()?.getId()}`);
 
 		return this;
 

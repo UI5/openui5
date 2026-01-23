@@ -641,7 +641,6 @@ function(
 		if (this.getFirstDayOfWeek() !== -1 && this.getCalendarWeekNumbering()) {
 			Log.warning("Both properties firstDayOfWeek and calendarWeekNumbering should not be used at the same time!");
 		}
-
 	};
 
 	/**
@@ -727,9 +726,15 @@ function(
 	 */
 
 	SinglePlanningCalendar.prototype.setTitle = function (sTitle) {
-		this._getHeader().setTitle(sTitle);
-
+		this.setHeaderTitle(sTitle);
 		return this.setProperty("title", sTitle);
+	};
+
+	SinglePlanningCalendar.prototype.setHeaderTitle = function (sTitle) {
+		const oTitle = this._getHeader().getTitle();
+		oTitle && oTitle.setText(sTitle);
+		oTitle && oTitle.setVisible(true);
+		return this;
 	};
 
 	SinglePlanningCalendar.prototype.setScaleFactor = function(iScaleFactor) {
@@ -1315,8 +1320,14 @@ function(
 		oHeader.attachEvent("pressToday", this._handlePressToday, this);
 		oHeader.attachEvent("pressNext", this._handlePressArrow, this);
 		oHeader.attachEvent("dateSelect", this._handleCalendarPickerDateSelect, this);
+		oHeader.attachEvent("_titleChange", this._handleTitleChange, this);
 
 		return this;
+	};
+
+	SinglePlanningCalendar.prototype._handleTitleChange = function (oEvent) {
+		const oTitle = oEvent.getParameter("title");
+		this.getDomRef()?.setAttribute("aria-labelledby", oTitle.getId());
 	};
 
 	/**

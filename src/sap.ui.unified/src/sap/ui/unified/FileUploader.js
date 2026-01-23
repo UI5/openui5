@@ -816,7 +816,7 @@ sap.ui.define([
 
 		if (!oBrowseIcon) {
 			oBrowseIcon = new Icon(this.getId() + "-fu_browse_icon", {
-				src: "sap-icon://value-help",
+				src: "sap-icon://browse-folder",
 				press: this._onBrowseIconPress.bind(this),
 				noTabStop: true
 			});

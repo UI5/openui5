@@ -65,7 +65,7 @@ sap.ui.define([
 		oSPC.setTitle(sTitle);
 
 		//assert
-		assert.equal(oSPC._getHeader().getTitle(), sTitle, "The title is set correctly");
+		assert.equal(oSPC._getHeader().getTitle().getText(), sTitle, "The title is set correctly");
 
 		//clean up
 		oSPC.destroy();
@@ -2042,7 +2042,7 @@ sap.ui.define([
 	QUnit.test("Root element ARIA", async function (assert) {
 		// Prepare
 		var oSPC = new SinglePlanningCalendar(),
-			sHeaderId = oSPC._getHeader()._getOrCreateTitleControl().getId(),
+			sHeaderId = oSPC._getHeader().getTitle().getId(),
 			$oSPCRef,
 			aAriaLabelledBy;
 
@@ -2065,7 +2065,7 @@ sap.ui.define([
 	QUnit.test("Toolbars ARIA", async function (assert) {
 		// Prepare
 		var oSPC = new SinglePlanningCalendar({
-				title: "A random title"		// Actions toolbar will be hidden without it
+				title: "A random title" // Actions toolbar will be hidden without it
 			}),
 			oHeader = oSPC._getHeader(),
 			oActionsToolbar = oHeader.getAggregation("_actionsToolbar"),

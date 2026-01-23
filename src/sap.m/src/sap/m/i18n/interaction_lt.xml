@@ -130,11 +130,19 @@
 	<control-interactions>
 		<control name="sap.m.VariantManagement"/>
 		<interaction> <kbd>F4</kbd> <kbd>Spacebar</kbd> <kbd>Alt + ArrowUp</kbd> <kbd>Alt + ArrowDown</kbd> <description>
-				<p>Atidaromas variantų valdymas.</p>
-			</description>
+				<p>Atidaro rakurso valdymą.</p>
+			</description> 
 		</interaction>
 		<interaction> <kbd>PageUp</kbd> <description>
-				<p>Uždaromas variantų valdymo klaidos iškylantysis langas</p>
+				<p>Uždaromas rakurso valdymo klaidos iškylantysis langas</p>
+			</description>
+		</interaction>
+		<interaction> <kbd>Ctrl + Enter</kbd> <description>
+				<p>Dialogo lange „Įrašyti kaip“ įrašomas naujas rakursas.</p>
+			</description>
+		</interaction>
+		<interaction> <kbd>Ctrl + S</kbd> <description>
+				<p>Įrašo rakursuose atliktus pakeitimus.</p>
 			</description>
 		</interaction>
 	</control-interactions>

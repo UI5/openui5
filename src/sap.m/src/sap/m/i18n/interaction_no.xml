@@ -130,11 +130,19 @@
 	<control-interactions>
 		<control name="sap.m.VariantManagement"/>
 		<interaction> <kbd>F4</kbd> <kbd>Spacebar</kbd> <kbd>Alt + ArrowUp</kbd> <kbd>Alt + ArrowDown</kbd> <description>
-				<p>Åpner variantadministrasjon.</p>
-			</description>
+				<p>Åpner visningsadministrasjon.</p>
+			</description> 
 		</interaction>
 		<interaction> <kbd>PageUp</kbd> <description>
-				<p>Lukker feil-popoveren i variantadministrasjon.</p>
+				<p>Lukker feil-popoveren for visningsadministrasjon.</p>
+			</description>
+		</interaction>
+		<interaction> <kbd>Ctrl + Enter</kbd> <description>
+				<p>Lagrer den nye visningen i dialogen Lagre som.</p>
+			</description>
+		</interaction>
+		<interaction> <kbd>Ctrl + S</kbd> <description>
+				<p>Lagrer endringene som er gjort i visningene.</p>
 			</description>
 		</interaction>
 	</control-interactions>
@@ -158,7 +166,7 @@
 				<p><kbd>ArrowUp</kbd></p>
 				<p>Flytter elementet én posisjon opp hvis tilgjengelig.</p>
 				<p><kbd>ArrowDown</kbd></p>
-				<p>Flytter elementet én posisjon ned, hvis tilgjengelig.</p>
+				<p>Flytter elementet én posisjon ned hvis tilgjengelig.</p>
 			</description>
 		</interaction>
 	</control-interactions>

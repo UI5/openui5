@@ -3308,33 +3308,6 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	[2, 42].forEach(function (iLevels) {
-		QUnit.test("expand: refresh needed, iLevels=" + iLevels, function (assert) {
-			const oCache = _AggregationCache.create(this.oRequestor, "~", "", {}, {
-				hierarchyQualifier : "X"
-			});
-			const oGroupNode = {};
-
-			// ensure the collection cache cannot read data
-			_Helper.setPrivateAnnotation(oGroupNode, "cache", "~oGroupLevelCache~");
-			this.mock(oCache).expects("getValue").withExactArgs("~path~").returns(oGroupNode);
-			this.mock(_Helper).expects("updateAll")
-				.withExactArgs(sinon.match.same(oCache.mChangeListeners), "~path~",
-					sinon.match.same(oGroupNode), {"@$ui5.node.isExpanded" : true});
-			this.mock(oCache.oTreeState).expects("expand")
-				.withExactArgs(sinon.match.same(oGroupNode), iLevels);
-			this.mock(oCache).expects("createGroupLevelCache").never();
-
-			// code under test
-			return oCache.expand(
-				"~oGroupLock~", "~path~", iLevels, "~fnDataRequested~")
-			.then(function (iCount) {
-				assert.strictEqual(iCount, -1);
-			});
-		});
-	});
-
-	//*********************************************************************************************
 	QUnit.test("expand: refresh needed, oFirstLevel without aSpliced", function (assert) {
 		const oCache = _AggregationCache.create(this.oRequestor, "~", "", {}, {
 			expandTo : 5,

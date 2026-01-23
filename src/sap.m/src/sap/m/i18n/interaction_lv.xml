@@ -130,11 +130,19 @@
 	<control-interactions>
 		<control name="sap.m.VariantManagement"/>
 		<interaction> <kbd>F4</kbd> <kbd>Spacebar</kbd> <kbd>Alt + ArrowUp</kbd> <kbd>Alt + ArrowDown</kbd> <description>
-				<p>Atver variantu pārvaldību.</p>
-			</description>
+				<p>Atver skatu pārvaldību.</p>
+			</description> 
 		</interaction>
 		<interaction> <kbd>PageUp</kbd> <description>
-				<p>Aizver variantu pārvaldības kļūdas uznirstošo logu</p>
+				<p>Aizver kļūdas uznirstošo logu skatu pārvaldībai</p>
+			</description>
+		</interaction>
+		<interaction> <kbd>Ctrl + Enter</kbd> <description>
+				<p>Saglabā jauno skatu dialogā “Saglabāt kā”.</p>
+			</description>
+		</interaction>
+		<interaction> <kbd>Ctrl + S</kbd> <description>
+				<p>Saglabā skatiem veiktās izmaiņas.</p>
 			</description>
 		</interaction>
 	</control-interactions>

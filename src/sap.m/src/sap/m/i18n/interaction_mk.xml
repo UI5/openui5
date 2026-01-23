@@ -130,11 +130,19 @@
 	<control-interactions>
 		<control name="sap.m.VariantManagement"/>
 		<interaction> <kbd>F4</kbd> <kbd>Spacebar</kbd> <kbd>Alt + ArrowUp</kbd> <kbd>Alt + ArrowDown</kbd> <description>
-				<p>Го отвора управувањето со варијанти.</p>
-			</description>
+				<p>Го отвара управувањето со прикази.</p>
+			</description> 
 		</interaction>
 		<interaction> <kbd>PageUp</kbd> <description>
-				<p>Го затвора скок-прозорецот за грешка во управувањето со варијанти</p>
+				<p>Го затвора скок-прозорецот за грешки во управувањето со прикази</p>
+			</description>
+		</interaction>
+		<interaction> <kbd>Ctrl + Enter</kbd> <description>
+				<p>Го зачувува новиот приказ во дијалогот „Зачувај како“.</p>
+			</description>
+		</interaction>
+		<interaction> <kbd>Ctrl + S</kbd> <description>
+				<p>Ги зачувува промените на приказите.</p>
 			</description>
 		</interaction>
 	</control-interactions>
@@ -142,9 +150,9 @@
 		<control name="sap.m.p13n.SelectionPanel"/>
 		<interaction> <kbd>ArrowUp</kbd> <kbd>ArrowDown</kbd> <kbd>Home</kbd> <kbd>End</kbd> <description>
 				<p><kbd>ArrowUp</kbd></p>
-				<p>Ја преместува ставката една позиција нагоре, ако е достапно.</p>
+				<p>Ја преместува ставката една позиција нагоре ако е достапно.</p>
 				<p><kbd>ArrowDown</kbd></p>
-				<p>Ја преместува ставката една позиција надолу, ако е достапно.</p>
+				<p>Ја преместува ставката една позиција надолу ако е достапно.</p>
 				<p><kbd>Home</kbd></p>
 				<p>Ја преместува ставката нагоре, ако е достапно.</p>
 				<p><kbd>End</kbd></p>
@@ -156,9 +164,9 @@
 		<control name="sap.m.p13n.SortPanel"/>
 		<interaction> <kbd>ArrowUp</kbd> <kbd>ArrowDown</kbd> <description>
 				<p><kbd>ArrowUp</kbd></p>
-				<p>Ја преместува ставката една позиција нагоре, ако е достапно.</p>
+				<p>Ја преместува ставката една позиција нагоре ако е достапно.</p>
 				<p><kbd>ArrowDown</kbd></p>
-				<p>Ја преместува ставката една позиција надолу, ако е достапно.</p>
+				<p>Ја преместува ставката една позиција надолу ако е достапно.</p>
 			</description>
 		</interaction>
 	</control-interactions>
@@ -166,9 +174,9 @@
 		<control name="sap.m.p13n.GroupPanel"/>
 		<interaction> <kbd>ArrowUp</kbd> <kbd>ArrowDown</kbd> <description>
 				<p><kbd>ArrowUp</kbd></p>
-				<p>Ја преместува ставката една позиција нагоре, ако е достапно.</p>
+				<p>Ја преместува ставката една позиција нагоре ако е достапно.</p>
 				<p><kbd>ArrowDown</kbd></p>
-				<p>Ја преместува ставката една позиција надолу, ако е достапно.</p>
+				<p>Ја преместува ставката една позиција надолу ако е достапно.</p>
 			</description>
 		</interaction>
 	</control-interactions>

@@ -1,6 +1,5 @@
 /* global QUnit */
 sap.ui.define([
-	"sap/base/i18n/Localization",
 	"sap-ui-integration-editor",
 	"sap/ui/core/Element",
 	"sap/ui/integration/editor/Editor",
@@ -11,7 +10,6 @@ sap.ui.define([
 	"./../ContextHost",
 	"qunit/designtime/EditorQunitUtils"
 ], function(
-	Localization,
 	x,
 	Element,
 	Editor,
@@ -67,7 +65,7 @@ sap.ui.define([
 						assert.equal(oTitleLabel.getText(), "cardTitle", "Title Label: Has label text");
 						assert.ok(oTitleField.isA("sap.ui.integration.editor.fields.StringField"), "Title Field: String Field");
 						assert.ok(oTitleField.getAggregation("_field").isA("sap.m.Input"), "Title Field: Control is an Input");
-						assert.equal(oTitleField.getAggregation("_field").getValue(), "Trans Card Title en", "Title Field: String Value");
+						assert.equal(oTitleField.getAggregation("_field").getValue(), "Trans Card Title in i18n en", "Title Field: String Value");
 
 						var oMaxItemLabel = aFormContents[3];
 						var oMaxItemField = aFormContents[4];
@@ -204,7 +202,7 @@ sap.ui.define([
 						assert.equal(oTitleLabel.getText(), "cardTitle", "Title Label: Has label text");
 						assert.ok(oTitleField.isA("sap.ui.integration.editor.fields.StringField"), "Title Field: String Field");
 						assert.ok(oTitleField.getAggregation("_field").isA("sap.m.Input"), "Title Field: Control is an Input");
-						assert.equal(oTitleField.getAggregation("_field").getValue(), "Trans Card Title en", "Title Field: String Value");
+						assert.equal(oTitleField.getAggregation("_field").getValue(), "Trans Card Title in i18n en", "Title Field: String Value");
 
 						var oMaxItemLabel = aFormContents[3];
 						var oMaxItemField = aFormContents[4];
@@ -330,10 +328,10 @@ sap.ui.define([
 						assert.equal(oTitleLabel.getText(), "cardTitle", "Title Label: Has label text");
 						assert.ok(oTitleFieldOri.isA("sap.ui.integration.editor.fields.StringField"), "Title Field Ori: String Field");
 						assert.ok(oTitleFieldOri.getAggregation("_field").isA("sap.m.Text"), "Title Field Ori: Control is an Text");
-						assert.equal(oTitleFieldOri.getAggregation("_field").getText(), "Trans Card Title en", "Title Field Ori: String Value");
+						assert.equal(oTitleFieldOri.getAggregation("_field").getText(), "Trans Card Title in i18n en", "Title Field Ori: String Value");
 						assert.ok(oTitleField.isA("sap.ui.integration.editor.fields.StringField"), "Title Field: String Field");
 						assert.ok(oTitleField.getAggregation("_field").isA("sap.m.Input"), "Title Field: Control is an Input");
-						assert.equal(oTitleField.getAggregation("_field").getValue(), "Trans Card Title en", "Title Field: String Value");
+						assert.equal(oTitleField.getAggregation("_field").getValue(), "Trans Card Title in i18n en", "Title Field: String Value");
 
 						assert.ok(that.oEditor._oChildTree, "Child tree is created");
 						assert.equal(that.oEditor._oChildTree.getItems().length, 3, "Child tree initial length is OK");
@@ -415,7 +413,7 @@ sap.ui.define([
 						assert.equal(oTitleLabel.getText(), "cardTitle", "Title Label: Has label text");
 						assert.ok(oTitleField.isA("sap.ui.integration.editor.fields.StringField"), "Title Field: String Field");
 						assert.ok(oTitleField.getAggregation("_field").isA("sap.m.Input"), "Title Field: Control is an Input");
-						assert.equal(oTitleField.getAggregation("_field").getValue(), "Trans Card Title en", "Title Field: String Value");
+						assert.equal(oTitleField.getAggregation("_field").getValue(), "Trans Card Title in i18n en", "Title Field: String Value");
 
 						var oMaxItemLabel = aFormContents[3];
 						var oMaxItemField = aFormContents[4];
@@ -563,7 +561,7 @@ sap.ui.define([
 					assert.ok(oLabel.isA("sap.m.Label"), "Label: Form content contains a Label");
 					assert.equal(oLabel.getText(), "cardTitle", "Label: Has label text");
 					assert.ok(oField.isA("sap.ui.integration.editor.fields.StringField"), "Field: String Field");
-					assert.equal(oField.getAggregation("_field").getValue(), "Trans Card Title en", "Field: String Value");
+					assert.equal(oField.getAggregation("_field").getValue(), "Trans Card Title in i18n en", "Field: String Value");
 					EditorQunitUtils.isReady(that.oEditor).then(async function () {
 						assert.ok(that.oEditor.isReady(), "Editor is ready");
 						assert.ok(that.oEditor._oChildTree, "Child tree is created");
@@ -647,7 +645,7 @@ sap.ui.define([
 					assert.ok(oLabel.isA("sap.m.Label"), "Label: Form content contains a Label");
 					assert.equal(oLabel.getText(), "cardTitle", "Label: Has label text");
 					assert.ok(oField.isA("sap.ui.integration.editor.fields.StringField"), "Field: String Field");
-					assert.equal(oField.getAggregation("_field").getValue(), "Trans Card Title en", "Field: String Value");
+					assert.equal(oField.getAggregation("_field").getValue(), "Trans Card Title in i18n en", "Field: String Value");
 					EditorQunitUtils.isReady(that.oEditor).then(async function () {
 						assert.ok(that.oEditor.isReady(), "Editor is ready");
 						assert.ok(that.oEditor._oChildTree, "Child tree is created");
@@ -738,7 +736,7 @@ sap.ui.define([
 					assert.ok(oLabel.isA("sap.m.Label"), "Label: Form content contains a Label");
 					assert.equal(oLabel.getText(), "cardTitle", "Label: Has label text");
 					assert.ok(oField.isA("sap.ui.integration.editor.fields.StringField"), "Field: String Field");
-					assert.equal(oField.getAggregation("_field").getValue(), "Trans Card Title en", "Field: String Value");
+					assert.equal(oField.getAggregation("_field").getValue(), "Trans Card Title in i18n en", "Field: String Value");
 					EditorQunitUtils.isReady(that.oEditor).then(async function () {
 						assert.ok(that.oEditor.isReady(), "Editor is ready");
 						assert.ok(that.oEditor._oChildTree, "Child tree is created");
@@ -818,7 +816,7 @@ sap.ui.define([
 					assert.ok(oLabel.isA("sap.m.Label"), "Label: Form content contains a Label");
 					assert.equal(oLabel.getText(), "cardTitle", "Label: Has label text");
 					assert.ok(oField.isA("sap.ui.integration.editor.fields.StringField"), "Field: String Field");
-					assert.equal(oField.getAggregation("_field").getValue(), "Trans Card Title en", "Field: String Value");
+					assert.equal(oField.getAggregation("_field").getValue(), "Trans Card Title in i18n en", "Field: String Value");
 					EditorQunitUtils.isReady(that.oEditor).then(async function () {
 						assert.ok(that.oEditor.isReady(), "Editor is ready");
 						assert.ok(that.oEditor._oChildTree, "Child tree is created");
@@ -922,7 +920,7 @@ sap.ui.define([
 					assert.ok(oLabel.isA("sap.m.Label"), "Label: Form content contains a Label");
 					assert.equal(oLabel.getText(), "cardTitle", "Label: Has label text");
 					assert.ok(oField.isA("sap.ui.integration.editor.fields.StringField"), "Field: String Field");
-					assert.equal(oField.getAggregation("_field").getValue(), "Trans Card Title en", "Field: String Value");
+					assert.equal(oField.getAggregation("_field").getValue(), "Trans Card Title in i18n en", "Field: String Value");
 					EditorQunitUtils.isReady(that.oEditor).then(async function () {
 						assert.ok(that.oEditor.isReady(), "Editor is ready");
 						assert.ok(that.oEditor._oChildTree, "Child tree is created");
@@ -1006,7 +1004,7 @@ sap.ui.define([
 					assert.ok(oLabel.isA("sap.m.Label"), "Label: Form content contains a Label");
 					assert.equal(oLabel.getText(), "cardTitle", "Label: Has label text");
 					assert.ok(oField.isA("sap.ui.integration.editor.fields.StringField"), "Field: String Field");
-					assert.equal(oField.getAggregation("_field").getValue(), "Trans Card Title en", "Field: String Value");
+					assert.equal(oField.getAggregation("_field").getValue(), "Trans Card Title in i18n en", "Field: String Value");
 					EditorQunitUtils.isReady(that.oEditor).then(async function () {
 						assert.ok(that.oEditor.isReady(), "Editor is ready");
 						assert.ok(that.oEditor._oChildTree, "Child tree is created");
@@ -1097,7 +1095,7 @@ sap.ui.define([
 					assert.ok(oLabel.isA("sap.m.Label"), "Label: Form content contains a Label");
 					assert.equal(oLabel.getText(), "cardTitle", "Label: Has label text");
 					assert.ok(oField.isA("sap.ui.integration.editor.fields.StringField"), "Field: String Field");
-					assert.equal(oField.getAggregation("_field").getValue(), "Trans Card Title en", "Field: String Value");
+					assert.equal(oField.getAggregation("_field").getValue(), "Trans Card Title in i18n en", "Field: String Value");
 					EditorQunitUtils.isReady(that.oEditor).then(async function () {
 						assert.ok(that.oEditor.isReady(), "Editor is ready");
 						assert.ok(that.oEditor._oChildTree, "Child tree is created");
@@ -1177,7 +1175,7 @@ sap.ui.define([
 					assert.ok(oLabel.isA("sap.m.Label"), "Label: Form content contains a Label");
 					assert.equal(oLabel.getText(), "cardTitle", "Label: Has label text");
 					assert.ok(oField.isA("sap.ui.integration.editor.fields.StringField"), "Field: String Field");
-					assert.equal(oField.getAggregation("_field").getValue(), "Trans Card Title en", "Field: String Value");
+					assert.equal(oField.getAggregation("_field").getValue(), "Trans Card Title in i18n en", "Field: String Value");
 					EditorQunitUtils.isReady(that.oEditor).then(async function () {
 						assert.ok(that.oEditor.isReady(), "Editor is ready");
 						assert.ok(that.oEditor._oChildTree, "Child tree is created");
@@ -1286,10 +1284,10 @@ sap.ui.define([
 						assert.equal(oTitleLabel.getText(), "cardTitle", "Title Label: Has label text");
 						assert.ok(oTitleFieldOri.isA("sap.ui.integration.editor.fields.StringField"), "Title Field Ori: String Field");
 						assert.ok(oTitleFieldOri.getAggregation("_field").isA("sap.m.Text"), "Title Field Ori: Control is an Text");
-						assert.equal(oTitleFieldOri.getAggregation("_field").getText(), "Trans Card Title en", "Title Field Ori: String Value");
+						assert.equal(oTitleFieldOri.getAggregation("_field").getText(), "Trans Card Title in i18n en", "Title Field Ori: String Value");
 						assert.ok(oTitleField.isA("sap.ui.integration.editor.fields.StringField"), "Title Field: String Field");
 						assert.ok(oTitleField.getAggregation("_field").isA("sap.m.Input"), "Title Field: Control is an Input");
-						assert.equal(oTitleField.getAggregation("_field").getValue(), "Trans Card Title en", "Title Field: String Value");
+						assert.equal(oTitleField.getAggregation("_field").getValue(), "Trans Card Title in i18n en", "Title Field: String Value");
 
 						assert.ok(that.oEditor._oChildTree, "Child tree is created");
 						assert.equal(that.oEditor._oChildTree.getItems().length, 3, "Child tree initial length is OK");
@@ -1377,10 +1375,10 @@ sap.ui.define([
 						assert.equal(oTitleLabel.getText(), "cardTitle", "Title Label: Has label text");
 						assert.ok(oTitleFieldOri.isA("sap.ui.integration.editor.fields.StringField"), "Title Field Ori: String Field");
 						assert.ok(oTitleFieldOri.getAggregation("_field").isA("sap.m.Text"), "Title Field Ori: Control is an Text");
-						assert.equal(oTitleFieldOri.getAggregation("_field").getText(), "Trans Card Title en", "Title Field Ori: String Value");
+						assert.equal(oTitleFieldOri.getAggregation("_field").getText(), "Trans Card Title in i18n en", "Title Field Ori: String Value");
 						assert.ok(oTitleField.isA("sap.ui.integration.editor.fields.StringField"), "Title Field: String Field");
 						assert.ok(oTitleField.getAggregation("_field").isA("sap.m.Input"), "Title Field: Control is an Input");
-						assert.equal(oTitleField.getAggregation("_field").getValue(), "Trans Card Title en", "Title Field: String Value");
+						assert.equal(oTitleField.getAggregation("_field").getValue(), "Trans Card Title in i18n en", "Title Field: String Value");
 
 						assert.ok(that.oEditor._oChildTree, "Child tree is created");
 						assert.equal(that.oEditor._oChildTree.getItems().length, 3, "Child tree initial length is OK");
@@ -1475,10 +1473,10 @@ sap.ui.define([
 						assert.equal(oTitleLabel.getText(), "cardTitle", "Title Label: Has label text");
 						assert.ok(oTitleFieldOri.isA("sap.ui.integration.editor.fields.StringField"), "Title Field Ori: String Field");
 						assert.ok(oTitleFieldOri.getAggregation("_field").isA("sap.m.Text"), "Title Field Ori: Control is an Text");
-						assert.equal(oTitleFieldOri.getAggregation("_field").getText(), "Trans Card Title en", "Title Field Ori: String Value");
+						assert.equal(oTitleFieldOri.getAggregation("_field").getText(), "Trans Card Title in i18n en", "Title Field Ori: String Value");
 						assert.ok(oTitleField.isA("sap.ui.integration.editor.fields.StringField"), "Title Field: String Field");
 						assert.ok(oTitleField.getAggregation("_field").isA("sap.m.Input"), "Title Field: Control is an Input");
-						assert.equal(oTitleField.getAggregation("_field").getValue(), "Trans Card Title en", "Title Field: String Value");
+						assert.equal(oTitleField.getAggregation("_field").getValue(), "Trans Card Title in i18n en", "Title Field: String Value");
 
 						assert.ok(that.oEditor._oChildTree, "Child tree is created");
 						assert.equal(that.oEditor._oChildTree.getItems().length, 3, "Child tree initial length is OK");
@@ -1562,10 +1560,10 @@ sap.ui.define([
 						assert.equal(oTitleLabel.getText(), "cardTitle", "Title Label: Has label text");
 						assert.ok(oTitleFieldOri.isA("sap.ui.integration.editor.fields.StringField"), "Title Field Ori: String Field");
 						assert.ok(oTitleFieldOri.getAggregation("_field").isA("sap.m.Text"), "Title Field Ori: Control is an Text");
-						assert.equal(oTitleFieldOri.getAggregation("_field").getText(), "Trans Card Title en", "Title Field Ori: String Value");
+						assert.equal(oTitleFieldOri.getAggregation("_field").getText(), "Trans Card Title in i18n en", "Title Field Ori: String Value");
 						assert.ok(oTitleField.isA("sap.ui.integration.editor.fields.StringField"), "Title Field: String Field");
 						assert.ok(oTitleField.getAggregation("_field").isA("sap.m.Input"), "Title Field: Control is an Input");
-						assert.equal(oTitleField.getAggregation("_field").getValue(), "Trans Card Title en", "Title Field: String Value");
+						assert.equal(oTitleField.getAggregation("_field").getValue(), "Trans Card Title in i18n en", "Title Field: String Value");
 
 						assert.ok(that.oEditor._oChildTree, "Child tree is created");
 						assert.equal(that.oEditor._oChildTree.getItems().length, 3, "Child tree initial length is OK");
@@ -1668,7 +1666,7 @@ sap.ui.define([
 					assert.ok(oLabel.isA("sap.m.Label"), "Label: Form content contains a Label");
 					assert.equal(oLabel.getText(), "cardTitle", "Label: Has label text");
 					assert.ok(oField.isA("sap.ui.integration.editor.fields.StringField"), "Field: String Field");
-					assert.equal(oField.getAggregation("_field").getValue(), "Trans Card Title en", "Field: String Value");
+					assert.equal(oField.getAggregation("_field").getValue(), "Trans Card Title in i18n en", "Field: String Value");
 					EditorQunitUtils.isReady(that.oEditor).then(async function () {
 						assert.ok(that.oEditor.isReady(), "Editor is ready");
 						assert.ok(that.oEditor._oChildTree, "Child tree is created");
@@ -1752,7 +1750,7 @@ sap.ui.define([
 					assert.ok(oLabel.isA("sap.m.Label"), "Label: Form content contains a Label");
 					assert.equal(oLabel.getText(), "cardTitle", "Label: Has label text");
 					assert.ok(oField.isA("sap.ui.integration.editor.fields.StringField"), "Field: String Field");
-					assert.equal(oField.getAggregation("_field").getValue(), "Trans Card Title en", "Field: String Value");
+					assert.equal(oField.getAggregation("_field").getValue(), "Trans Card Title in i18n en", "Field: String Value");
 					EditorQunitUtils.isReady(that.oEditor).then(async function () {
 						assert.ok(that.oEditor.isReady(), "Editor is ready");
 						assert.ok(that.oEditor._oChildTree, "Child tree is created");
@@ -1843,7 +1841,7 @@ sap.ui.define([
 					assert.ok(oLabel.isA("sap.m.Label"), "Label: Form content contains a Label");
 					assert.equal(oLabel.getText(), "cardTitle", "Label: Has label text");
 					assert.ok(oField.isA("sap.ui.integration.editor.fields.StringField"), "Field: String Field");
-					assert.equal(oField.getAggregation("_field").getValue(), "Trans Card Title en", "Field: String Value");
+					assert.equal(oField.getAggregation("_field").getValue(), "Trans Card Title in i18n en", "Field: String Value");
 					EditorQunitUtils.isReady(that.oEditor).then(async function () {
 						assert.ok(that.oEditor.isReady(), "Editor is ready");
 						assert.ok(that.oEditor._oChildTree, "Child tree is created");
@@ -1923,7 +1921,7 @@ sap.ui.define([
 					assert.ok(oLabel.isA("sap.m.Label"), "Label: Form content contains a Label");
 					assert.equal(oLabel.getText(), "cardTitle", "Label: Has label text");
 					assert.ok(oField.isA("sap.ui.integration.editor.fields.StringField"), "Field: String Field");
-					assert.equal(oField.getAggregation("_field").getValue(), "Trans Card Title en", "Field: String Value");
+					assert.equal(oField.getAggregation("_field").getValue(), "Trans Card Title in i18n en", "Field: String Value");
 					EditorQunitUtils.isReady(that.oEditor).then(async function () {
 						assert.ok(that.oEditor.isReady(), "Editor is ready");
 						assert.ok(that.oEditor._oChildTree, "Child tree is created");

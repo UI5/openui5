@@ -130,11 +130,19 @@
 	<control-interactions>
 		<control name="sap.m.VariantManagement"/>
 		<interaction> <kbd>F4</kbd> <kbd>Spacebar</kbd> <kbd>Alt + ArrowUp</kbd> <kbd>Alt + ArrowDown</kbd> <description>
-				<p>Otwiera zarządzanie wariantami.</p>
-			</description>
+				<p>Otwiera zarządzanie widokami.</p>
+			</description> 
 		</interaction>
 		<interaction> <kbd>PageUp</kbd> <description>
-				<p>Zamyka okno podręczne błędu zarządzania wariantami</p>
+				<p>Zamyka okno podręczne błędu dla zarządzania widokami</p>
+			</description>
+		</interaction>
+		<interaction> <kbd>Ctrl + Enter</kbd> <description>
+				<p>Zapisuje nowy widok w oknie dialogowym Zapisz jako.</p>
+			</description>
+		</interaction>
+		<interaction> <kbd>Ctrl + S</kbd> <description>
+				<p>Zapisuje zmiany wprowadzone w widokach.</p>
 			</description>
 		</interaction>
 	</control-interactions>

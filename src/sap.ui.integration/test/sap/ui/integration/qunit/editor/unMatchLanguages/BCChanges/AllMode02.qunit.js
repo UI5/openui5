@@ -1,13 +1,11 @@
 /* global QUnit */
 sap.ui.define([
-	"sap/base/i18n/Localization",
 	"sap/ui/thirdparty/sinon-4",
 	"qunit/designtime/EditorQunitUtils",
 	"sap/ui/integration/util/Utils",
 	"sap/base/util/deepClone",
 	"sap/base/util/LoaderExtensions"
 ], function (
-	Localization,
 	sinon,
 	EditorQunitUtils,
 	Utils,
@@ -202,7 +200,7 @@ sap.ui.define([
 											sExpectedValue = "StringParameter Value Trans in i18n " + sLanguageKey;
 										}
 										if (sLanguageKey.startsWith("fr")) {
-											sExpectedValue = "StringParameter Value Trans in i18n France";
+											sExpectedValue = "StringParameter Value Trans in i18n fr";
 										}
 									}
 									var sCurrentValue = oLanguageItems1[i].getContent()[0].getItems()[1].getValue();
@@ -281,7 +279,7 @@ sap.ui.define([
 											sExpectedValue = "StringParameter Value Trans in i18n " + sLanguageKey;
 										}
 										if (sLanguageKey.startsWith("fr")) {
-											sExpectedValue = "StringParameter Value Trans in i18n France";
+											sExpectedValue = "StringParameter Value Trans in i18n fr";
 										}
 									}
 									var sCurrentValue = oLanguageItems1[i].getContent()[0].getItems()[1].getValue();

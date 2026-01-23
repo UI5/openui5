@@ -1,6 +1,5 @@
 /* global QUnit */
 sap.ui.define([
-	"sap/base/i18n/Localization",
 	"sap/base/util/merge",
 	"sap-ui-integration-editor",
 	"sap/ui/integration/editor/Editor",
@@ -12,7 +11,6 @@ sap.ui.define([
 	"sap/ui/events/KeyCodes",
 	"qunit/designtime/EditorQunitUtils"
 ], function (
-	Localization,
 	merge,
 	x,
 	Editor,
@@ -108,13 +106,13 @@ sap.ui.define([
 	};
 	var _oExpectedValues = {
 		"string1": {
-			"default_in_en": "String 1 English",
+			"default_in_en": "String 1 in i18n en",
 			"en": "String1 EN Content",
-			"en-GB": "String 1 English",
-			"es-MX": "String 1 Spanish MX",
+			"en-GB": "String 1 in i18n en",
+			"es-MX": "String 1 in i18n es-MX",
 			"fr": "String1 FR Admin",
-			"fr-CA": "String 1 French CA",
-			"fr-FR": "String 1 French",
+			"fr-CA": "String 1 in i18n fr-CA",
+			"fr-FR": "String 1 in i18n fr",
 			"ru": "String1 RU Admin",
 			"zh-CN": "String1 简体 Content"
 		},
@@ -126,12 +124,12 @@ sap.ui.define([
 			"zh-TW": "String3 繁體 Content"
 		},
 		"string4": {
-			"default_in_en": "String 4 English",
-			"en": "String 4 English",
-			"en-GB": "String 4 English",
+			"default_in_en": "String 4 in i18n en",
+			"en": "String 4 in i18n en",
+			"en-GB": "String 4 in i18n en",
 			"fr": "String4 FR Admin",
-			"fr-CA": "String 4 French CA",
-			"fr-FR": "String 4 French",
+			"fr-CA": "String 4 in i18n fr-CA",
+			"fr-FR": "String 4 in i18n fr",
 			"ru": "String4 RU Content",
 			"zh-CN": "String4 简体 Content"
 		}

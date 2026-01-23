@@ -5398,7 +5398,7 @@ usePreliminaryContext : false}}">\
 	//*********************************************************************************************
 	// Scenario: Create two new entities and reload the collection in the same $batch. Test the
 	// successfully creation and the creation of the first entity fails which leads to single error
-	// response for the changeset. Ensure that test framework processes the requests as expected.
+	// response for the change set. Ensure that test framework processes the requests as expected.
 	// JIRA: CPOUI5MODELS-198
 	[{
 		aExpectedMessages : [],

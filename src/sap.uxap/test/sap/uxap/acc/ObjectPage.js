@@ -112,53 +112,12 @@ sap.ui.define([
 				title: "Section Title",
 				subSections: [
 					new ObjectPageSubSection({
-						blocks: new Label({ text: "First subsection without title" })
-					}),
-					new ObjectPageSubSection({
-						blocks: new Label({ text: "Second subsection without title" })
-					})
-				]
-			}),
-
-			new ObjectPageSection({
-				title: "Section Title",
-				subSections: [
-					new ObjectPageSubSection({
 						title: "First Subsection Title",
 						blocks: new Label({ text: "First subsection with title" })
 					}),
 					new ObjectPageSubSection({
-						blocks: new Label({ text: "Second subsection without title" })
-					})
-				]
-			}),
-
-			new ObjectPageSection({
-				title: "Section Title",
-				subSections: [
-					new ObjectPageSubSection({
-						title: "Hidden Subsection Title",
-						showTitle: false,
-						blocks: new Label({ text: "First subsection with hidden title" })
-					}),
-					new ObjectPageSubSection({
-						blocks: new Label({ text: "Second subsection without title" })
-					})
-				]
-			}),
-
-			new ObjectPageSection({
-				title: "Section Title",
-				subSections: [
-					new ObjectPageSubSection({
-						title: "Hidden First Subsection Title",
-						showTitle: false,
-						blocks: new Label({ text: "First subsection with hidden title" })
-					}),
-					new ObjectPageSubSection({
-						title: "Hidden Second Subsection Title",
-						showTitle: false,
-						blocks: new Label({ text: "Second subsection with hidden title" })
+						title: "Second Subsection Title",
+						blocks: new Label({ text: "Second subsection with title" })
 					})
 				]
 			})

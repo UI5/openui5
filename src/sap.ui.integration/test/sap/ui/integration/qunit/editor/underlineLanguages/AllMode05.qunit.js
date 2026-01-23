@@ -1,13 +1,11 @@
 /* global QUnit */
 sap.ui.define([
-	"sap/base/i18n/Localization",
 	"sap/ui/thirdparty/sinon-4",
 	"qunit/designtime/EditorQunitUtils",
 	"sap/ui/integration/util/Utils",
 	"sap/base/util/deepClone",
 	"sap/base/util/LoaderExtensions"
 ], function (
-	Localization,
 	sinon,
 	EditorQunitUtils,
 	Utils,
@@ -102,9 +100,9 @@ sap.ui.define([
 		"da": "da",
 		"de-CH": "de-CH",
 		"de-DE": "de-DE",
-		"fr": "France",
+		"fr": "fr",
 		"fr-CA": "fr-CA",
-		"fr-FR": "France",
+		"fr-FR": "fr",
 		"hi": "hi",
 		"hu": "hu",
 		"id": "id",

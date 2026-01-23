@@ -130,11 +130,19 @@
 	<control-interactions>
 		<control name="sap.m.VariantManagement"/>
 		<interaction> <kbd>F4</kbd> <kbd>Spacebar</kbd> <kbd>Alt + ArrowUp</kbd> <kbd>Alt + ArrowDown</kbd> <description>
-				<p>Åbner variantstyringen.</p>
-			</description>
+				<p>Åbner visningsadministrationen.</p>
+			</description> 
 		</interaction>
 		<interaction> <kbd>PageUp</kbd> <description>
-				<p>Lukker fejl-popoveren i variantstyringen</p>
+				<p>Lukker fejl-popoveren for visningsadministration</p>
+			</description>
+		</interaction>
+		<interaction> <kbd>Ctrl + Enter</kbd> <description>
+				<p>Gemmer den nye visning i dialogen Gem som.</p>
+			</description>
+		</interaction>
+		<interaction> <kbd>Ctrl + S</kbd> <description>
+				<p>Gemmer de foretagne ændringer af visningerne.</p>
 			</description>
 		</interaction>
 	</control-interactions>

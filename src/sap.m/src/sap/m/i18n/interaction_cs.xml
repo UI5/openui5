@@ -130,11 +130,19 @@
 	<control-interactions>
 		<control name="sap.m.VariantManagement"/>
 		<interaction> <kbd>F4</kbd> <kbd>Spacebar</kbd> <kbd>Alt + ArrowUp</kbd> <kbd>Alt + ArrowDown</kbd> <description>
-				<p>Otevře správu variant.</p>
-			</description>
+				<p>Otevře správu zobrazení.</p>
+			</description> 
 		</interaction>
 		<interaction> <kbd>PageUp</kbd> <description>
-				<p>Zavře překryvné okno chyb správy variant</p>
+				<p>Zavře překryvné okno chyb správy zobrazení</p>
+			</description>
+		</interaction>
+		<interaction> <kbd>Ctrl + Enter</kbd> <description>
+				<p>Uloží nový pohled v dialogu Uložit jako.</p>
+			</description>
+		</interaction>
+		<interaction> <kbd>Ctrl + S</kbd> <description>
+				<p>Uloží provedené změny pohledů.</p>
 			</description>
 		</interaction>
 	</control-interactions>

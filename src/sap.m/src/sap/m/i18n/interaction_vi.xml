@@ -130,11 +130,19 @@
 	<control-interactions>
 		<control name="sap.m.VariantManagement"/>
 		<interaction> <kbd>F4</kbd> <kbd>Spacebar</kbd> <kbd>Alt + ArrowUp</kbd> <kbd>Alt + ArrowDown</kbd> <description>
-				<p>Mở quản lý biến thể.</p>
-			</description>
+				<p>Mở quản lý màn hình.</p>
+			</description> 
 		</interaction>
 		<interaction> <kbd>PageUp</kbd> <description>
-				<p>Đóng cửa sổ thông báo lỗi của quản lý biến thể</p>
+				<p>Đóng cửa sổ thông báo lỗi cho quản lý màn hình</p>
+			</description>
+		</interaction>
+		<interaction> <kbd>Ctrl + Enter</kbd> <description>
+				<p>Lưu màn hình mới trong hộp thoại Lưu dưới dạng.</p>
+			</description>
+		</interaction>
+		<interaction> <kbd>Ctrl + S</kbd> <description>
+				<p>Lưu các thay đổi đã thực hiện đối với các màn hình.</p>
 			</description>
 		</interaction>
 	</control-interactions>
@@ -158,7 +166,7 @@
 				<p><kbd>ArrowUp</kbd></p>
 				<p>Di chuyển mục lên một vị trí nếu có sẵn.</p>
 				<p><kbd>ArrowDown</kbd></p>
-				<p>Di chuyển mục xuống một vị trí, nếu có sẵn.</p>
+				<p>Di chuyển mục xuống một vị trí nếu có sẵn.</p>
 			</description>
 		</interaction>
 	</control-interactions>

@@ -1,6 +1,5 @@
 /* global QUnit */
 sap.ui.define([
-	"sap/base/i18n/Localization",
 	"sap/base/util/merge",
 	"sap-ui-integration-editor",
 	"sap/ui/integration/editor/Editor",
@@ -12,7 +11,6 @@ sap.ui.define([
 	"sap/ui/events/KeyCodes",
 	"qunit/designtime/EditorQunitUtils"
 ], function (
-	Localization,
 	merge,
 	x,
 	Editor,
@@ -84,12 +82,12 @@ sap.ui.define([
 			"default": "String4 Value Admin"
 		},
 		"string5": {
-			"default": "String 5 English",
-			"en": "String 5 English",
-			"en-US": "String 5 US English",
-			"fr-CA": "String 5 French CA",
-			"fr-FR": "String 5 French",
-			"fr": "String 5 French"
+			"default": "String 5 in i18n en",
+			"en": "String 5 in i18n en",
+			"en-US": "String 5 in i18n en-US",
+			"fr-CA": "String 5 in i18n fr-CA",
+			"fr-FR": "String 5 in i18n fr",
+			"fr": "String 5 in i18n fr"
 		}
 	};
 
@@ -131,19 +129,19 @@ sap.ui.define([
 					var oField5 = that.oEditor.getAggregation("_formContent")[10];
 					EditorQunitUtils.isReady(that.oEditor).then(function () {
 						assert.ok(that.oEditor.isReady(), "Editor is ready");
-						assert.equal(oLabel1.getText(), "Label 1 English", "Label1: Label 1 English");
+						assert.equal(oLabel1.getText(), "Label 1 in i18n en", "Label1: Label 1 in i18n en");
 						assert.equal(oField1.getAggregation("_field").getValue(), "String1 Value Translation", "oField1: String1 Value");
 						assert.ok(oField1.getAggregation("_field").isA("sap.m.Input"), "oField1: Input control");
-						assert.equal(oLabel2.getText(), "Label 2 English", "Label2: Label 2 English");
+						assert.equal(oLabel2.getText(), "Label 2 in i18n en", "Label2: Label 2 in i18n en");
 						assert.equal(oField2.getAggregation("_field").getValue(), "String2 Value Admin", "oField2: String2 Value Admin");
 						assert.ok(oField2.getAggregation("_field").isA("sap.m.Input"), "oField2: Input control");
-						assert.equal(oLabel3.getText(), "Label 3 English", "Label3: Label 3 English");
+						assert.equal(oLabel3.getText(), "Label 3 in i18n en", "Label3: Label 3 in i18n en");
 						assert.equal(oField3.getAggregation("_field").getValue(), "String 3", "oField3: String3 Value");
 						assert.ok(oField3.getAggregation("_field").isA("sap.m.Input"), "oField3: Input control");
-						assert.equal(oLabel4.getText(), "Label 4 English", "Label4: Label 4 English");
+						assert.equal(oLabel4.getText(), "Label 4 in i18n en", "Label4: Label 4 in i18n en");
 						assert.equal(oField4.getAggregation("_field").getValue(), "String4 Value Admin", "oField4: String4 Value");
 						assert.ok(oField4.getAggregation("_field").isA("sap.m.Input"), "oField4: Input control");
-						assert.equal(oLabel5.getText(), "Label 5 English", "Label5: Label 5 English");
+						assert.equal(oLabel5.getText(), "Label 5 in i18n en", "Label5: Label 5 in i18n en");
 						assert.equal(oField5.getAggregation("_field").getValue(), _oExpectedValues["string5"]["en"], "oField5: String5 Value");
 						assert.ok(oField5.getAggregation("_field").isA("sap.m.Input"), "oField5: Input control");
 
@@ -278,19 +276,19 @@ sap.ui.define([
 					var oField5 = that.oEditor.getAggregation("_formContent")[10];
 					EditorQunitUtils.isReady(that.oEditor).then(function () {
 						assert.ok(that.oEditor.isReady(), "Editor is ready");
-						assert.equal(oLabel1.getText(), "Label 1 English", "Label1: Label 1 English");
+						assert.equal(oLabel1.getText(), "Label 1 in i18n en", "Label1: Label 1 in i18n en");
 						assert.equal(oField1.getAggregation("_field").getValue(), "String1 Value Translation", "oField1: String1 Value");
 						assert.ok(oField1.getAggregation("_field").isA("sap.m.Input"), "oField1: Input control");
-						assert.equal(oLabel2.getText(), "Label 2 English", "Label2: Label 2 English");
+						assert.equal(oLabel2.getText(), "Label 2 in i18n en", "Label2: Label 2 in i18n en");
 						assert.equal(oField2.getAggregation("_field").getValue(), "String2 Value Admin", "oField2: String2 Value Admin");
 						assert.ok(oField2.getAggregation("_field").isA("sap.m.Input"), "oField2: Input control");
-						assert.equal(oLabel3.getText(), "Label 3 English", "Label3: Label 3 English");
+						assert.equal(oLabel3.getText(), "Label 3 in i18n en", "Label3: Label 3 in i18n en");
 						assert.equal(oField3.getAggregation("_field").getValue(), "String 3", "oField3: String3 Value");
 						assert.ok(oField3.getAggregation("_field").isA("sap.m.Input"), "oField3: Input control");
-						assert.equal(oLabel4.getText(), "Label 4 English", "Label4: Label 4 English");
+						assert.equal(oLabel4.getText(), "Label 4 in i18n en", "Label4: Label 4 in i18n en");
 						assert.equal(oField4.getAggregation("_field").getValue(), "String4 Value Admin", "oField4: String4 Value");
 						assert.ok(oField4.getAggregation("_field").isA("sap.m.Input"), "oField4: Input control");
-						assert.equal(oLabel5.getText(), "Label 5 English", "Label5: Label 5 English");
+						assert.equal(oLabel5.getText(), "Label 5 in i18n en", "Label5: Label 5 in i18n en");
 						assert.equal(oField5.getAggregation("_field").getValue(), _oExpectedValues["string5"]["en"], "oField5: String5 Value");
 						assert.ok(oField5.getAggregation("_field").isA("sap.m.Input"), "oField5: Input control");
 
@@ -425,19 +423,19 @@ sap.ui.define([
 					var oField5 = that.oEditor.getAggregation("_formContent")[10];
 					EditorQunitUtils.isReady(that.oEditor).then(function () {
 						assert.ok(that.oEditor.isReady(), "Editor is ready");
-						assert.equal(oLabel1.getText(), "Label 1 French", "Label1: Label 1 French");
+						assert.equal(oLabel1.getText(), "Label 1 in i18n fr", "Label1: Label 1 in i18n fr");
 						assert.equal(oField1.getAggregation("_field").getValue(), "String1 Value Translation", "oField1: String1 Value");
 						assert.ok(oField1.getAggregation("_field").isA("sap.m.Input"), "oField1: Input control");
-						assert.equal(oLabel2.getText(), "Label 2 French", "Label2: Label 2 French");
+						assert.equal(oLabel2.getText(), "Label 2 in i18n fr", "Label2: Label 2 in i18n fr");
 						assert.equal(oField2.getAggregation("_field").getValue(), "String2 Value Admin", "oField2: String2 Value Admin");
 						assert.ok(oField2.getAggregation("_field").isA("sap.m.Input"), "oField2: Input control");
-						assert.equal(oLabel3.getText(), "Label 3 French", "Label3: Label 3 French");
+						assert.equal(oLabel3.getText(), "Label 3 in i18n fr", "Label3: Label 3 in i18n fr");
 						assert.equal(oField3.getAggregation("_field").getValue(), "String 3", "oField3: String3 Value");
 						assert.ok(oField3.getAggregation("_field").isA("sap.m.Input"), "oField3: Input control");
-						assert.equal(oLabel4.getText(), "Label 4 French", "Label4: Label 4 French");
+						assert.equal(oLabel4.getText(), "Label 4 in i18n fr", "Label4: Label 4 in i18n fr");
 						assert.equal(oField4.getAggregation("_field").getValue(), "String4 Value Admin", "oField4: String4 Value");
 						assert.ok(oField4.getAggregation("_field").isA("sap.m.Input"), "oField4: Input control");
-						assert.equal(oLabel5.getText(), "Label 5 French", "Label5: Label 5 French");
+						assert.equal(oLabel5.getText(), "Label 5 in i18n fr", "Label5: Label 5 in i18n fr");
 						assert.equal(oField5.getAggregation("_field").getValue(), _oExpectedValues["string5"]["fr"], "oField5: String5 Value");
 						assert.ok(oField5.getAggregation("_field").isA("sap.m.Input"), "oField5: Input control");
 
@@ -572,19 +570,19 @@ sap.ui.define([
 					var oField5 = that.oEditor.getAggregation("_formContent")[10];
 					EditorQunitUtils.isReady(that.oEditor).then(function () {
 						assert.ok(that.oEditor.isReady(), "Editor is ready");
-						assert.equal(oLabel1.getText(), "Label 1 English", "Label1: Label 1 English");
+						assert.equal(oLabel1.getText(), "Label 1 in i18n en", "Label1: Label 1 in i18n en");
 						assert.equal(oField1.getAggregation("_field").getValue(), "String1 Value Translation", "oField1: String1 Value");
 						assert.ok(oField1.getAggregation("_field").isA("sap.m.Input"), "oField1: Input control");
-						assert.equal(oLabel2.getText(), "Label 2 English", "Label2: Label 2 English");
+						assert.equal(oLabel2.getText(), "Label 2 in i18n en", "Label2: Label 2 in i18n en");
 						assert.equal(oField2.getAggregation("_field").getValue(), "String2 Value Admin", "oField2: String2 Value Admin");
 						assert.ok(oField2.getAggregation("_field").isA("sap.m.Input"), "oField2: Input control");
-						assert.equal(oLabel3.getText(), "Label 3 English", "Label3: Label 3 English");
+						assert.equal(oLabel3.getText(), "Label 3 in i18n en", "Label3: Label 3 in i18n en");
 						assert.equal(oField3.getAggregation("_field").getValue(), "String 3", "oField3: String3 Value");
 						assert.ok(oField3.getAggregation("_field").isA("sap.m.Input"), "oField3: Input control");
-						assert.equal(oLabel4.getText(), "Label 4 English", "Label4: Label 4 English");
+						assert.equal(oLabel4.getText(), "Label 4 in i18n en", "Label4: Label 4 in i18n en");
 						assert.equal(oField4.getAggregation("_field").getValue(), "String4 Value Admin", "oField4: String4 Value");
 						assert.ok(oField4.getAggregation("_field").isA("sap.m.Input"), "oField4: Input control");
-						assert.equal(oLabel5.getText(), "Label 5 English", "Label5: Label 5 English");
+						assert.equal(oLabel5.getText(), "Label 5 in i18n en", "Label5: Label 5 in i18n en");
 						assert.equal(oField5.getAggregation("_field").getValue(), _oExpectedValues["string5"]["en"], "oField5: String5 Value");
 						assert.ok(oField5.getAggregation("_field").isA("sap.m.Input"), "oField5: Input control");
 
@@ -719,19 +717,19 @@ sap.ui.define([
 					var oField5 = that.oEditor.getAggregation("_formContent")[10];
 					EditorQunitUtils.isReady(that.oEditor).then(function () {
 						assert.ok(that.oEditor.isReady(), "Editor is ready");
-						assert.equal(oLabel1.getText(), "Label 1 English", "Label1: Label 1 English");
+						assert.equal(oLabel1.getText(), "Label 1 in i18n en", "Label1: Label 1 in i18n en");
 						assert.equal(oField1.getAggregation("_field").getValue(), "String1 Value Translation", "oField1: String1 Value");
 						assert.ok(oField1.getAggregation("_field").isA("sap.m.Input"), "oField1: Input control");
-						assert.equal(oLabel2.getText(), "Label 2 English", "Label2: Label 2 English");
+						assert.equal(oLabel2.getText(), "Label 2 in i18n en", "Label2: Label 2 in i18n en");
 						assert.equal(oField2.getAggregation("_field").getValue(), "String2 Value Admin", "oField2: String2 Value Admin");
 						assert.ok(oField2.getAggregation("_field").isA("sap.m.Input"), "oField2: Input control");
-						assert.equal(oLabel3.getText(), "Label 3 English", "Label3: Label 3 English");
+						assert.equal(oLabel3.getText(), "Label 3 in i18n en", "Label3: Label 3 in i18n en");
 						assert.equal(oField3.getAggregation("_field").getValue(), "String 3", "oField3: String3 Value");
 						assert.ok(oField3.getAggregation("_field").isA("sap.m.Input"), "oField3: Input control");
-						assert.equal(oLabel4.getText(), "Label 4 English", "Label4: Label 4 English");
+						assert.equal(oLabel4.getText(), "Label 4 in i18n en", "Label4: Label 4 in i18n en");
 						assert.equal(oField4.getAggregation("_field").getValue(), "String4 Value Admin", "oField4: String4 Value");
 						assert.ok(oField4.getAggregation("_field").isA("sap.m.Input"), "oField4: Input control");
-						assert.equal(oLabel5.getText(), "Label 5 English", "Label5: Label 5 English");
+						assert.equal(oLabel5.getText(), "Label 5 in i18n en", "Label5: Label 5 in i18n en");
 						assert.equal(oField5.getAggregation("_field").getValue(), _oExpectedValues["string5"]["en"], "oField5: String5 Value");
 						assert.ok(oField5.getAggregation("_field").isA("sap.m.Input"), "oField5: Input control");
 

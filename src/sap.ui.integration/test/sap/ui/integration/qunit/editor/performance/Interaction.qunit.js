@@ -1,6 +1,5 @@
 /* global QUnit */
 sap.ui.define([
-	"sap/base/i18n/Localization",
 	"sap/ui/core/Element",
 	"sap/ui/core/Lib",
 	"sap/ui/integration/editor/Editor",
@@ -15,7 +14,6 @@ sap.ui.define([
 	"sap/base/util/deepEqual",
 	"sap/base/util/deepClone"
 ], function(
-	Localization,
 	Element,
 	Library,
 	Editor,
@@ -867,13 +865,13 @@ sap.ui.define([
 			};
 			var _oExpectedValues = {
 				"string1": {
-					"default_in_en": "String 1 English",
+					"default_in_en": "String 1 in i18n en",
 					"en": "String1 EN Admin",
-					"en-GB": "String 1 English",
-					"es-MX": "String 1 Spanish MX",
+					"en-GB": "String 1 in i18n en",
+					"es-MX": "String 1 in i18n es-MX",
 					"fr": "String1 FR Admin",
-					"fr-CA": "String 1 French CA",
-					"fr-FR": "String 1 French",
+					"fr-CA": "String 1 in i18n fr-CA",
+					"fr-FR": "String 1 in i18n fr",
 					"ru": "String1 RU Admin",
 					"zh-CN": "String1 简体 Admin"
 				},
@@ -884,12 +882,12 @@ sap.ui.define([
 					"zh-TW": "String3 繁體 Admin"
 				},
 				"string4": {
-					"default_in_en": "String 4 English",
-					"en": "String 4 English",
-					"en-GB": "String 4 English",
+					"default_in_en": "String 4 in i18n en",
+					"en": "String 4 in i18n en",
+					"en-GB": "String 4 in i18n en",
 					"fr": "String4 FR Admin",
-					"fr-CA": "String 4 French CA",
-					"fr-FR": "String 4 French",
+					"fr-CA": "String 4 in i18n fr-CA",
+					"fr-FR": "String 4 in i18n fr",
 					"zh-CN": "String4 简体 Admin"
 				}
 			};
@@ -922,16 +920,16 @@ sap.ui.define([
 						time = new Date().getTime() - start.getTime();
 						assert.ok(time < EditorQunitUtils.performance.complexInteraction, "Performance - Ready : " + time + "ms OK");
 						assert.ok(that.oEditor.isReady(), "Editor is ready");
-						assert.equal(oLabel1.getText(), "Label 1 English", "Label1: Label 1 English");
+						assert.equal(oLabel1.getText(), "Label 1 in i18n en", "Label1: Label 1 in i18n en");
 						assert.equal(oField1.getAggregation("_field").getValue(), _oExpectedValues["string1"]["en"], "oField1: String1 Value");
 						assert.ok(oField1.getAggregation("_field").isA("sap.m.Input"), "oField1: Input control");
-						assert.equal(oLabel2.getText(), "Label 2 English", "Label2: Label 2 English");
+						assert.equal(oLabel2.getText(), "Label 2 in i18n en", "Label2: Label 2 in i18n en");
 						assert.equal(oField2.getAggregation("_field").getValue(), "String2 Value Admin", "oField2: String2 Value Admin");
 						assert.ok(oField2.getAggregation("_field").isA("sap.m.Input"), "oField2: Input control");
-						assert.equal(oLabel3.getText(), "Label 3 English", "Label3: Label 3 English");
+						assert.equal(oLabel3.getText(), "Label 3 in i18n en", "Label3: Label 3 in i18n en");
 						assert.equal(oField3.getAggregation("_field").getValue(), _oExpectedValues["string3"]["en"], "oField3: String3 Value");
 						assert.ok(oField3.getAggregation("_field").isA("sap.m.Input"), "oField3: Input control");
-						assert.equal(oLabel4.getText(), "Label 4 English", "Label4: Label 4 English");
+						assert.equal(oLabel4.getText(), "Label 4 in i18n en", "Label4: Label 4 in i18n en");
 						assert.equal(oField4.getAggregation("_field").getValue(), _oExpectedValues["string4"]["en"], "oField4: String4 Value");
 						assert.ok(oField4.getAggregation("_field").isA("sap.m.Input"), "oField4: Input control");
 
@@ -1052,40 +1050,40 @@ sap.ui.define([
 			};
 			var _oOriginExpectedValues = {
 				"string1": {
-					"default": "String 1 English",
-					"en": "String 1 English",
-					"en-US": "String 1 US English",
-					"es-MX": "String 1 Spanish MX",
-					"fr": "String 1 French",
-					"fr-FR": "String 1 French",
-					"fr-CA": "String 1 French CA"
+					"default": "String 1 in i18n en",
+					"en": "String 1 in i18n en",
+					"en-US": "String 1 in i18n en-US",
+					"es-MX": "String 1 in i18n es-MX",
+					"fr": "String 1 in i18n fr",
+					"fr-FR": "String 1 in i18n fr",
+					"fr-CA": "String 1 in i18n fr-CA"
 				},
 				"string2": {
-					"default": "String 2 English",
-					"en": "String 2 English",
-					"en-US": "String 2 US English",
-					"es-MX": "String 2 Spanish MX",
-					"fr": "String 2 French",
-					"fr-FR": "String 2 French",
-					"fr-CA": "String 2 French CA"
+					"default": "String 2 in i18n en",
+					"en": "String 2 in i18n en",
+					"en-US": "String 2 in i18n en-US",
+					"es-MX": "String 2 in i18n es-MX",
+					"fr": "String 2 in i18n fr",
+					"fr-FR": "String 2 in i18n fr",
+					"fr-CA": "String 2 in i18n fr-CA"
 				},
 				"string3": {
-					"default": "String 3 English",
-					"en": "String 3 English",
-					"en-US": "String 3 US English",
-					"es": "String 3 Spanish",
-					"es-MX": "String 3 Spanish",
-					"fr": "String 3 French",
-					"fr-FR": "String 3 French",
-					"fr-CA": "String 3 French CA"
+					"default": "String 3 in i18n en",
+					"en": "String 3 in i18n en",
+					"en-US": "String 3 in i18n en-US",
+					"es": "String 3 in i18n es",
+					"es-MX": "String 3 in i18n es",
+					"fr": "String 3 in i18n fr",
+					"fr-FR": "String 3 in i18n fr",
+					"fr-CA": "String 3 in i18n fr-CA"
 				},
 				"string4": {
-					"default": "String 4 English",
-					"en": "String 4 English",
-					"en-US": "String 4 US English",
-					"fr": "String 4 French",
-					"fr-FR": "String 1 French",
-					"fr-CA": "String 4 French CA"
+					"default": "String 4 in i18n en",
+					"en": "String 4 in i18n en",
+					"en-US": "String 4 in i18n en-US",
+					"fr": "String 4 in i18n fr",
+					"fr-FR": "String 1 in i18n fr",
+					"fr-CA": "String 4 in i18n fr-CA"
 				}
 			};
 			var start = new Date();

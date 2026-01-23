@@ -130,11 +130,19 @@
 	<control-interactions>
 		<control name="sap.m.VariantManagement"/>
 		<interaction> <kbd>F4</kbd> <kbd>Spacebar</kbd> <kbd>Alt + ArrowUp</kbd> <kbd>Alt + ArrowDown</kbd> <description>
-				<p>Ouvre la gestion des variantes.</p>
-			</description>
+				<p>Ouvre la gestion des vues.</p>
+			</description> 
 		</interaction>
 		<interaction> <kbd>PageUp</kbd> <description>
-				<p>Ferme la fenêtre contextuelle d'erreur de la gestion des variantes.</p>
+				<p>Ferme la fenêtre contextuelle d'erreur pour la gestion des vues.</p>
+			</description>
+		</interaction>
+		<interaction> <kbd>Ctrl + Enter</kbd> <description>
+				<p>Sauvegarde la nouvelle vue dans le dialogue Sauvegarder sous.</p>
+			</description>
+		</interaction>
+		<interaction> <kbd>Ctrl + S</kbd> <description>
+				<p>Sauvegarde les modifications apportées aux vues.</p>
 			</description>
 		</interaction>
 	</control-interactions>
@@ -142,13 +150,13 @@
 		<control name="sap.m.p13n.SelectionPanel"/>
 		<interaction> <kbd>ArrowUp</kbd> <kbd>ArrowDown</kbd> <kbd>Home</kbd> <kbd>End</kbd> <description>
 				<p><kbd>ArrowUp</kbd></p>
-				<p>Déplace l'élément d'une position vers le haut si disponible.</p>
+				<p>Déplace l'élément d'une position vers le haut, si disponible.</p>
 				<p><kbd>ArrowDown</kbd></p>
-				<p>Déplace l'élément d'une position vers le bas si disponible.</p>
+				<p>Déplace l'élément d'une position vers le bas, si disponible.</p>
 				<p><kbd>Home</kbd></p>
-				<p>Déplace l'élément tout en haut si disponible.</p>
+				<p>Déplace l'élément tout en haut, si disponible.</p>
 				<p><kbd>End</kbd></p>
-				<p>Déplace l'élément tout en bas si disponible.</p>
+				<p>Déplace l'élément tout en bas, si disponible.</p>
 			</description>
 		</interaction>
 	</control-interactions>
@@ -156,9 +164,9 @@
 		<control name="sap.m.p13n.SortPanel"/>
 		<interaction> <kbd>ArrowUp</kbd> <kbd>ArrowDown</kbd> <description>
 				<p><kbd>ArrowUp</kbd></p>
-				<p>Déplace l'élément d'une position vers le haut si disponible.</p>
+				<p>Déplace l'élément d'une position vers le haut, si disponible.</p>
 				<p><kbd>ArrowDown</kbd></p>
-				<p>Déplace l'élément d'une position vers le bas si disponible.</p>
+				<p>Déplace l'élément d'une position vers le bas, si disponible.</p>
 			</description>
 		</interaction>
 	</control-interactions>
@@ -166,9 +174,9 @@
 		<control name="sap.m.p13n.GroupPanel"/>
 		<interaction> <kbd>ArrowUp</kbd> <kbd>ArrowDown</kbd> <description>
 				<p><kbd>ArrowUp</kbd></p>
-				<p>Déplace l'élément d'une position vers le haut si disponible.</p>
+				<p>Déplace l'élément d'une position vers le haut, si disponible.</p>
 				<p><kbd>ArrowDown</kbd></p>
-				<p>Déplace l'élément d'une position vers le bas si disponible.</p>
+				<p>Déplace l'élément d'une position vers le bas, si disponible.</p>
 			</description>
 		</interaction>
 	</control-interactions>

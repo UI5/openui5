@@ -175,7 +175,7 @@ sap.ui.define([
 					var oLabel = this.oEditor.getAggregation("_formContent")[1];
 					var oField = this.oEditor.getAggregation("_formContent")[2];
 					assert.ok(oLabel.isA("sap.m.Label"), "Label: Form content contains a Label");
-					assert.equal(oLabel.getText(), "StringLabelTrans", "Label: Has translated text");
+					assert.equal(oLabel.getText(), "StringLabelTrans in i18n en", "Label: Has translated text");
 					assert.ok(oField.isA("sap.ui.integration.editor.fields.StringField"), "Field: String Field");
 					resolve();
 				}.bind(this));
@@ -189,7 +189,7 @@ sap.ui.define([
 					var oLabel = this.oEditor.getAggregation("_formContent")[1];
 					var oField = this.oEditor.getAggregation("_formContent")[2];
 					assert.ok(oLabel.isA("sap.m.Label"), "Label: Form content contains a Label");
-					assert.equal(oLabel.getText(), "StringLabelTrans", "Label: Has translated text");
+					assert.equal(oLabel.getText(), "StringLabelTrans in i18n en", "Label: Has translated text");
 					assert.ok(oField.isA("sap.ui.integration.editor.fields.StringField"), "Field: String Field");
 					resolve();
 				}.bind(this));
@@ -204,7 +204,7 @@ sap.ui.define([
 					var oLabel = this.oEditor.getAggregation("_formContent")[1];
 					var oField = this.oEditor.getAggregation("_formContent")[2];
 					assert.ok(oLabel.isA("sap.m.Label"), "Label: Form content contains a Label");
-					assert.equal(oLabel.getText(), "StringLabelTrans", "Label: Has translated text");
+					assert.equal(oLabel.getText(), "StringLabelTrans in i18n en", "Label: Has translated text");
 					assert.ok(oField.isA("sap.ui.integration.editor.fields.StringField"), "Field: String Field");
 					resolve();
 				}.bind(this));

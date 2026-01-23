@@ -130,45 +130,53 @@
 	<control-interactions>
 		<control name="sap.m.VariantManagement"/>
 		<interaction>⁪⁪⁪‌‌​​​‌‌‌‍‍​‌‌​‌‌‌​​‌‌​‍​‍‌​‍‌‍​‍‍‌‍​‌​‍‍‌⁪ <kbd>F4</kbd> <kbd>Spacebar</kbd> <kbd>Alt + ArrowUp</kbd> <kbd>Alt + ArrowDown</kbd> ⁪⁪<description>
-				<p>⁪⁪⁪‌‍​​‌‌​​​‍​‍‌​‌​‍​‍​​​‍‌​‌‌‌‌​​​‌‌​‌​‍​⁪Opens the variant management.⁪⁪</p>
-			</description>
+				<p>⁪⁪⁪‌‍​​‌‌​​​‍​‍‌​‌​‍​‍​​​‍‌​‌‌‌‌​​​‌‌​‌​‍​⁪Opens the view management.⁪⁪</p>
+			</description> 
 		</interaction>
 		<interaction>⁪⁪⁪‌​‌‌‍‌‍‌‌‍​​​​​‍‍‍‌‍‍‌‌‌‌‍‍‌‌​‍​‍‍​‌‌‍‍​​⁪ <kbd>PageUp</kbd> ⁪⁪<description>
-				<p>⁪⁪⁪‌‌‌‌‍​​​‌‍‌‍‌​​‌‍‍‍‌​​‍​‍‍​‍​‍‌​​‍‌‌​‍‌‍‍⁪Closes the error popover of the variant management⁪⁪</p>
+				<p>⁪⁪⁪‌‌‌‌‍​​​‌‍‌‍‌​​‌‍‍‍‌​​‍​‍‍​‍​‍‌​​‍‌‌​‍‌‍‍⁪Closes the error popover for view management⁪⁪</p>
+			</description>
+		</interaction>
+		<interaction>⁪⁪⁪‌‌‌‌‍‌‌​‍‍​‌​‌​‌​​‌​‍​‍‌‍‍‍‌‍‌​​‍‍‍​‍‌‌⁪ <kbd>Ctrl + Enter</kbd> ⁪⁪<description>
+				<p>⁪⁪⁪‌‌​​‌​​‍​​‌‍​‍​‌‌‌​‌‍‌​‍‌​​‍‍​​‍‍​‌‍‌​‌‌‌⁪Saves the new view in the Save As dialog.⁪⁪</p>
+			</description>
+		</interaction>
+		<interaction>⁪⁪⁪‍​​‍‍‍​‍​​‌‌‍​‍‍‍‌‍‌‌‌‍‍‍‍‌‍‍‍​‍​​‌​‌​​​⁪ <kbd>Ctrl + S</kbd> ⁪⁪<description>
+				<p>⁪⁪⁪‌​‍‍‌​‍‍‌‌​​​‍‍‍​‌​​‍​​‍​‌‌‍​‍‍‍‍‍‌‌‍‌‍‌⁪Saves the changes made to the views.⁪⁪</p>
 			</description>
 		</interaction>
 	</control-interactions>
 	<control-interactions>
 		<control name="sap.m.p13n.SelectionPanel"/>
-		<interaction>⁪⁪⁪‌‌‌‌‍‌‌​‍‍​‌​‌​‌​​‌​‍​‍‌‍‍‍‌‍‌​​‍‍‍​‍‌‌⁪ <kbd>ArrowUp</kbd> <kbd>ArrowDown</kbd> <kbd>Home</kbd> <kbd>End</kbd> ⁪⁪<description>
-				<p>⁪⁪⁪‌‌​​‌​​‍​​‌‍​‍​‌‌‌​‌‍‌​‍‌​​‍‍​​‍‍​‌‍‌​‌‌‌⁪<kbd>ArrowUp</kbd>⁪⁪</p>
-				<p>⁪⁪⁪‍​​‍‍‍​‍​​‌‌‍​‍‍‍‌‍‌‌‌‍‍‍‍‌‍‍‍​‍​​‌​‌​​​⁪Moves the item one position up if available.⁪⁪</p>
-				<p>⁪⁪⁪‌​‍‍‌​‍‍‌‌​​​‍‍‍​‌​​‍​​‍​‌‌‍​‍‍‍‍‍‌‌‍‌‍‌⁪<kbd>ArrowDown</kbd>⁪⁪</p>
-				<p>⁪⁪⁪‌‍‍​‍‍‌‍‍‌‍‍‌‍‌‍​‍‍‌​‌‌‍​‍‌‌​‌​​‌​​​‌‍​‍⁪Moves the item one position down if available.⁪⁪</p>
-				<p>⁪⁪⁪‌​​‌‍‍​‍‍‍​​‍​‌​​‌‌‍‍​‌‌​​​‌‍​‍‌‍‌‍‍‌‍⁪<kbd>Home</kbd>⁪⁪</p>
-				<p>⁪⁪⁪‍‍‍​‌‍​​‌‍‍‍​​​‍‌​‌​‌‍​‌‌​‌‍‌​‍‌‍‌‍​​‍​‍⁪Moves the item to the top if available.⁪⁪</p>
-				<p>⁪⁪⁪‌​‌​‌‌‌​‌‌​‌​​​​‌​‍‌​‍​‍‌‍‍‌​​‌‌​‌​‌​‌‍‌‍⁪<kbd>End</kbd>⁪⁪</p>
-				<p>⁪⁪⁪‍‍​‌‍​‍​​​​‌‍​‌‌​‌‌‌‌‌​‌‍​‍‌‍​‌‍‌‍‌‌​​‌‍⁪Moves the item to the end if available.⁪⁪</p>
+		<interaction>⁪⁪⁪‌‍‍​‍‍‌‍‍‌‍‍‌‍‌‍​‍‍‌​‌‌‍​‍‌‌​‌​​‌​​​‌‍​‍⁪ <kbd>ArrowUp</kbd> <kbd>ArrowDown</kbd> <kbd>Home</kbd> <kbd>End</kbd> ⁪⁪<description>
+				<p>⁪⁪⁪‌​​‌‍‍​‍‍‍​​‍​‌​​‌‌‍‍​‌‌​​​‌‍​‍‌‍‌‍‍‌‍⁪<kbd>ArrowUp</kbd>⁪⁪</p>
+				<p>⁪⁪⁪‍‍‍​‌‍​​‌‍‍‍​​​‍‌​‌​‌‍​‌‌​‌‍‌​‍‌‍‌‍​​‍​‍⁪Moves the item one position up if available.⁪⁪</p>
+				<p>⁪⁪⁪‌​‌​‌‌‌​‌‌​‌​​​​‌​‍‌​‍​‍‌‍‍‌​​‌‌​‌​‌​‌‍‌‍⁪<kbd>ArrowDown</kbd>⁪⁪</p>
+				<p>⁪⁪⁪‍‍​‌‍​‍​​​​‌‍​‌‌​‌‌‌‌‌​‌‍​‍‌‍​‌‍‌‍‌‌​​‌‍⁪Moves the item one position down if available.⁪⁪</p>
+				<p>⁪⁪⁪‍​‍‌‍‌‌​‌‌‍​​‌​‍‍‌​‌‌​‌‌​‍‍​​‌‍‌​‌​‍​‌​⁪<kbd>Home</kbd>⁪⁪</p>
+				<p>⁪⁪⁪‌​‍​‌​​‌‍‌​‌‌​​​‌‍​‍‌‌‍‍‍‍‌‌‍​‌​‌‍​​‍‍‌‍‌⁪Moves the item to the top if available.⁪⁪</p>
+				<p>⁪⁪⁪‌​‍‍‌‌​‌‍‌‌‍‍​​‌​‍‍‌‍‍​‌‌​‌‍‌‍‌‌​​​‌‌‍​‍⁪<kbd>End</kbd>⁪⁪</p>
+				<p>⁪⁪⁪‌‌​​‌‌​‍​‍‍‌‍​‍‍​‍‍‍​‍‌‌‌‍‌​​​​​​‍‍‍​‌‌⁪Moves the item to the end if available.⁪⁪</p>
 			</description>
 		</interaction>
 	</control-interactions>
 	<control-interactions>
 		<control name="sap.m.p13n.SortPanel"/>
-		<interaction>⁪⁪⁪‍​‍‌‍‌‌​‌‌‍​​‌​‍‍‌​‌‌​‌‌​‍‍​​‌‍‌​‌​‍​‌​⁪ <kbd>ArrowUp</kbd> <kbd>ArrowDown</kbd> ⁪⁪<description>
-				<p>⁪⁪⁪‌​‍​‌​​‌‍‌​‌‌​​​‌‍​‍‌‌‍‍‍‍‌‌‍​‌​‌‍​​‍‍‌‍‌⁪<kbd>ArrowUp</kbd>⁪⁪</p>
-				<p>⁪⁪⁪‌​‍‍‌‌​‌‍‌‌‍‍​​‌​‍‍‌‍‍​‌‌​‌‍‌‍‌‌​​​‌‌‍​‍⁪Moves the item one position up if available.⁪⁪</p>
-				<p>⁪⁪⁪‌‌​​‌‌​‍​‍‍‌‍​‍‍​‍‍‍​‍‌‌‌‍‌​​​​​​‍‍‍​‌‌⁪<kbd>ArrowDown</kbd>⁪⁪</p>
-				<p>⁪⁪⁪‌‍‌‌‍‌‌‍‍‌‍‌​​‍​‌​​‍‌‌​‌​​​​​‍‌‌‌​​‍‍‍‍⁪Moves the item one position down, if available.⁪⁪</p>
+		<interaction>⁪⁪⁪‌‍‌‌‍‌‌‍‍‌‍‌​​‍​‌​​‍‌‌​‌​​​​​‍‌‌‌​​‍‍‍‍⁪ <kbd>ArrowUp</kbd> <kbd>ArrowDown</kbd> ⁪⁪<description>
+				<p>⁪⁪⁪‍‍‍‍​​‍​‌​‍‍‌‍‍‌‌‍‍​‍‌​​​​‍‍​‌​‌​‍​‌‌‌‌‌⁪<kbd>ArrowUp</kbd>⁪⁪</p>
+				<p>⁪⁪⁪‌​‍‌‌​​‌‌​​‌​‌‍​​‌‍‍​‌​‌‍​​‍‍‍​‍‌‍​‌​​​‌​⁪Moves the item one position up if available.⁪⁪</p>
+				<p>⁪⁪⁪‍‍‌‍‍​‍‌‍‌​​‌‌‍​‌‌‌‌‍‌​‌‌​‌‌​‍​​‌‌‍‌‌‌‍‌⁪<kbd>ArrowDown</kbd>⁪⁪</p>
+				<p>⁪⁪⁪‌‌‌​‌‌​‌​​‌‌​‌‌‌​‍‍‍‍‍​‌‌‌‍​‍‍‌‍‍​‌‌‍‍​‌​⁪Moves the item one position down if available.⁪⁪</p>
 			</description>
 		</interaction>
 	</control-interactions>
 	<control-interactions>
 		<control name="sap.m.p13n.GroupPanel"/>
-		<interaction>⁪⁪⁪‍‍‍‍​​‍​‌​‍‍‌‍‍‌‌‍‍​‍‌​​​​‍‍​‌​‌​‍​‌‌‌‌‌⁪ <kbd>ArrowUp</kbd> <kbd>ArrowDown</kbd> ⁪⁪<description>
-				<p>⁪⁪⁪‌​‍‌‌​​‌‌​​‌​‌‍​​‌‍‍​‌​‌‍​​‍‍‍​‍‌‍​‌​​​‌​⁪<kbd>ArrowUp</kbd>⁪⁪</p>
-				<p>⁪⁪⁪‍‍‌‍‍​‍‌‍‌​​‌‌‍​‌‌‌‌‍‌​‌‌​‌‌​‍​​‌‌‍‌‌‌‍‌⁪Moves the item one position up if available.⁪⁪</p>
-				<p>⁪⁪⁪‌‌‌​‌‌​‌​​‌‌​‌‌‌​‍‍‍‍‍​‌‌‌‍​‍‍‌‍‍​‌‌‍‍​‌​⁪<kbd>ArrowDown</kbd>⁪⁪</p>
-				<p>⁪⁪⁪‌‌‌​​​‍‌‍‌‌​‍​​‍​‍‍‍‍‍​‌‌‌‍​‍​‍‌​‍‍​‌‍​​‍⁪Moves the item one position down if available.⁪⁪</p>
+		<interaction>⁪⁪⁪‌‌‌​​​‍‌‍‌‌​‍​​‍​‍‍‍‍‍​‌‌‌‍​‍​‍‌​‍‍​‌‍​​‍⁪ <kbd>ArrowUp</kbd> <kbd>ArrowDown</kbd> ⁪⁪<description>
+				<p>⁪⁪⁪‌‍‌‌‍​‍​‍‍​‌‌‍‍​‍​‌‌​‍​‍​​‌​‍‍‌‍​‌‌‌‌‌​‌⁪<kbd>ArrowUp</kbd>⁪⁪</p>
+				<p>⁪⁪⁪‌‌​‍​‍‌​​‌‌‌​‍​‌​‌‍​‍‌​‌‌‌​​​‌‍‌‍‌‍‍‌​​‍‍⁪Moves the item one position up if available.⁪⁪</p>
+				<p>⁪⁪⁪‌​‌‍‍‍‍​‍‌‍‍‍​​‌​​‌‌‌‍‌‍‌‍‌‌​‍​​‌​‍‌‌‌​‍​⁪<kbd>ArrowDown</kbd>⁪⁪</p>
+				<p>⁪⁪⁪‍‍‌‌​​‌‍‌‌‍‍‍​‌‌‍​‍​‌​​​​‍‍‌‍‍‍‍​‌‌‌​​​‌⁪Moves the item one position down if available.⁪⁪</p>
 			</description>
 		</interaction>
 	</control-interactions>

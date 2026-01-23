@@ -470,9 +470,6 @@ sap.ui.define([
 			}
 
 			if (oController) {
-				if (!oThis.oAsyncState) {
-					throw new Error("The view " + oThis.sViewName + " runs in sync mode and therefore cannot use async controller extensions!");
-				}
 				return oController.then(connectToView);
 			}
 		} else {
@@ -482,16 +479,14 @@ sap.ui.define([
 	};
 
 	/**
-	* Initialize the View and connect (create if no instance is given) the Controller
-	*
-	* @param {object} mSettings settings for the view
-	* @param {object.string} mSettings.viewData view data
-	* @param {object.string} mSettings.viewName view name
-	* @param {object.boolean} [mSettings.async] set the view to load a view resource asynchronously
-	* @private
-	*/
+	 * Initialize the View and connect (create if no instance is given) the Controller
+	 *
+	 * @param {object} mSettings settings for the view
+	 * @param {object.string} mSettings.viewData view data
+	 * @param {object.string} mSettings.viewName view name
+	 * @private
+	 */
 	View.prototype._initCompositeSupport = function(mSettings) {
-
 		mSettings = mSettings || {};
 
 		// if preprocessors available and this != XMLView
@@ -513,10 +508,7 @@ sap.ui.define([
 
 		initPreprocessorQueues(this, mSettings);
 
-		// create a Promise that represents the view initialization state
-		if (mSettings.async) {
-			initAsyncState(this);
-		}
+		initAsyncState(this);
 
 		// view modifications
 		// check if there are custom properties configured for this view, and only if there are, create a settings preprocessor applying these
@@ -586,44 +578,34 @@ sap.ui.define([
 			}
 		};
 
-		if (mSettings.async) {
-			// async processing starts here
-			this.oAsyncState.promise = this.initViewSettings(mSettings)
-				.then(function() {
-					return fnPropagateOwner(createAndConnectController.bind(null, that, mSettings), true);
-				})
-				.then(function() {
-					return fnPropagateOwner(fnFireOnControllerConnected.bind(null, mSettings), true);
-				})
-				.then(function() {
-					// attach after controller and control tree are fully initialized
-					return fnAttachControllerToViewEvents(that);
-				})
-				.then(function() {
-					return that.runPreprocessor("controls", that, false);
-				})
-				.then(function() {
-					return fnPropagateOwner(that.fireAfterInit.bind(that), true);
-				})
-				.then(function() {
-					// async processing ends by resolving with the view
-					return that;
-				})
-				.catch(function(e) {
-					// deregister an erroneous instance from the Core's Elements registry
-					// in sync Views this is done automatically by the ManagedObject constructor
-					this.deregister();
-					throw e;
-				}.bind(this));
-		} else {
-			this.initViewSettings(mSettings);
-			createAndConnectController(this, mSettings);
-			fnFireOnControllerConnected(mSettings);
-			fnAttachControllerToViewEvents(this);
-
-			this.runPreprocessor("controls", this, true);
-			this.fireAfterInit();
-		}
+		// async processing starts here
+		this.oAsyncState.promise = this.initViewSettings(mSettings)
+			.then(function() {
+				return fnPropagateOwner(createAndConnectController.bind(null, that, mSettings), true);
+			})
+			.then(function() {
+				return fnPropagateOwner(fnFireOnControllerConnected.bind(null, mSettings), true);
+			})
+			.then(function() {
+				// attach after controller and control tree are fully initialized
+				return fnAttachControllerToViewEvents(that);
+			})
+			.then(function() {
+				return that.runPreprocessor("controls", that, false);
+			})
+			.then(function() {
+				return fnPropagateOwner(that.fireAfterInit.bind(that), true);
+			})
+			.then(function() {
+				// async processing ends by resolving with the view
+				return that;
+			})
+			.catch(function(e) {
+				// deregister an erroneous instance from the Core's Elements registry
+				// in sync Views this is done automatically by the ManagedObject constructor
+				this.deregister();
+				throw e;
+			}.bind(this));
 	};
 
 	/**
@@ -809,48 +791,32 @@ sap.ui.define([
 	 *   the type of preprocessor, e.g. "raw", "xml" or "controls"
 	 * @param {object|string|Element} vSource
 	 *   the view source as a JSON object, a raw text, an XML document element or a Promise resolving with those
-	 * @param {boolean} [bSync]
-	 *   describes the view execution, true if sync
 	 * @returns {Promise|object|string|Element}
 	 *   a promise resolving with the processed source or an error | the source when bSync=true
 	 * @protected
 	 */
-	View.prototype.runPreprocessor = function(sType, vSource, bSync) {
-
-		var oViewInfo = this.getPreprocessorInfo(bSync),
+	View.prototype.runPreprocessor = function(sType, vSource) {
+		var oViewInfo = this.getPreprocessorInfo(false),
 			aPreprocessors = this.mPreprocessors && this.mPreprocessors[sType] || [],
-			fnProcess,
 			fnAppendPreprocessor,
 			pChain;
 
-		// in async case we need a promise chain
-		if (!bSync) {
-			fnAppendPreprocessor = function (oViewInfo, oPreprocessor) {
-				// the Promise's success handler with bound oViewInfo and mSettings
-				return function(vSource) {
-					return oPreprocessor.preprocessor
-						.then(function(oPreprocessorImpl) {
-							return oPreprocessorImpl.process(vSource, oViewInfo, oPreprocessor._settings);
-						});
-				};
+		fnAppendPreprocessor = function (oViewInfo, oPreprocessor) {
+			// the Promise's success handler with bound oViewInfo and mSettings
+			return function(vSource) {
+				return oPreprocessor.preprocessor
+					.then(function(oPreprocessorImpl) {
+						return oPreprocessorImpl.process(vSource, oViewInfo, oPreprocessor._settings);
+					});
 			};
-			pChain = Promise.resolve(vSource);
-		}
+		};
+		pChain = Promise.resolve(vSource);
 
 		for (var i = 0, l = aPreprocessors.length; i < l; i++) {
-			if (bSync && aPreprocessors[i]._syncSupport === true) {
-				fnProcess = aPreprocessors[i].preprocessor.process;
-				// run preprocessor directly in sync mode
-				vSource = fnProcess(vSource, oViewInfo, aPreprocessors[i]._settings);
-			} else if (!bSync) {
-				// append future preprocessor run to promise chain
-				pChain = pChain.then(fnAppendPreprocessor(oViewInfo, aPreprocessors[i]));
-			} else {
-				Log.debug("Async \"" + sType + "\"-preprocessor was skipped in sync view execution for " +
-					this.getMetadata().getClass()._sType + "View", this.getId());
-			}
+			// append future preprocessor run to promise chain
+			pChain = pChain.then(fnAppendPreprocessor(oViewInfo, aPreprocessors[i]));
 		}
-		return bSync ? vSource : pChain;
+		return pChain;
 	};
 
 	function initGlobalPreprocessorsRegistry(sType, sViewType) {

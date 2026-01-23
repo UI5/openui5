@@ -245,10 +245,6 @@ sap.ui.define([
 	};
 
 	async function fetchModelChanges(oPropertyBag) {
-		// if there is the owner property, the model is part of a reuse component.
-		// but the changes must still be fetched for the app component
-		const oOwnerComponent = oPropertyBag.owner && Component.getComponentById(oPropertyBag.owner.id);
-
 		// the functionality still works without component Id, but the FlexState will be initialized again
 		// once the component Id is set. This will happen in the instanceCreated hook.
 		// This can only be improved once the generated component instance Id is available in the factory config
@@ -257,16 +253,26 @@ sap.ui.define([
 			return [];
 		}
 
-		const oManifest = oOwnerComponent?.getManifest() || oPropertyBag.manifest;
+		// all components can have an owner component, no matter if they are a re-use component or an application (e.g. in MyInbox)
+		// the owner component is only relevant if the created component is not of type 'application'
+		// in case of re-use components the owner property must be set for further processing
+		const oOwnerComponent = oPropertyBag.owner && Component.getComponentById(oPropertyBag.owner.id);
+		const bUseOwnerComponent = !Utils.isApplication(oPropertyBag.manifest);
+		if (bUseOwnerComponent && !oOwnerComponent) {
+			return [];
+		}
+
+		const oManifest = bUseOwnerComponent ? oOwnerComponent.getManifest() : oPropertyBag.manifest;
 		if (!Utils.isApplication(oManifest)) {
 			return [];
 		}
 
-		const sAppComponentId = oPropertyBag.owner?.id || oPropertyBag.factoryConfig.id || oPropertyBag.factoryConfig.settings?.id;
-
-		const oComponentData = oOwnerComponent?.getComponentData()
-			|| oPropertyBag.factoryConfig.componentData
-			|| oPropertyBag.factoryConfig.settings?.componentData;
+		const sAppComponentId = bUseOwnerComponent ?
+			oPropertyBag.owner.id :
+			oPropertyBag.factoryConfig.id || oPropertyBag.factoryConfig.settings?.id;
+		const oComponentData = bUseOwnerComponent ?
+			oOwnerComponent.getComponentData() :
+			oPropertyBag.factoryConfig.componentData || oPropertyBag.factoryConfig.settings?.componentData;
 		const sReference = ManifestUtils.getFlexReference({
 			manifest: oManifest,
 			componentData: oComponentData
@@ -276,7 +282,7 @@ sap.ui.define([
 			// skipLoadBundle has to be true as there is no guarantee that the flex bundle is already available at this point
 			const mProperties = {
 				componentData: oComponentData,
-				asyncHints: oPropertyBag.owner?.config.asyncHints || oPropertyBag.factoryConfig.asyncHints,
+				asyncHints: bUseOwnerComponent ? oPropertyBag.owner.config.asyncHints : oPropertyBag.factoryConfig.asyncHints,
 				componentId: sAppComponentId,
 				reference: sReference,
 				skipLoadBundle: true,

@@ -130,11 +130,19 @@
 	<control-interactions>
 		<control name="sap.m.VariantManagement"/>
 		<interaction> <kbd>F4</kbd> <kbd>Spacebar</kbd> <kbd>Alt + ArrowUp</kbd> <kbd>Alt + ArrowDown</kbd> <description>
-				<p>Avaa varianttien hallinnan.</p>
-			</description>
+				<p>Avaa näkymänhallinnan.</p>
+			</description> 
 		</interaction>
 		<interaction> <kbd>PageUp</kbd> <description>
-				<p>Sulkee varianttien hallinnan virheiden popoverin</p>
+				<p>Sulkee näkymänhallinnan virheiden popoverin</p>
+			</description>
+		</interaction>
+		<interaction> <kbd>Ctrl + Enter</kbd> <description>
+				<p>Tallentaa uuden näkymän Tallenna nimellä -valintaikkunassa.</p>
+			</description>
+		</interaction>
+		<interaction> <kbd>Ctrl + S</kbd> <description>
+				<p>Tallentaa näkymiin tehdyt muutokset.</p>
 			</description>
 		</interaction>
 	</control-interactions>

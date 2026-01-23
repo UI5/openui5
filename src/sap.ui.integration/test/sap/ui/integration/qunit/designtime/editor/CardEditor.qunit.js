@@ -1,6 +1,5 @@
 /* global QUnit */
 sap.ui.define([
-	"sap/base/i18n/Localization",
 	"sap/base/util/merge",
 	"sap-ui-integration-card-editor",
 	"sap/ui/core/Element",
@@ -19,7 +18,6 @@ sap.ui.define([
 	"./cards/DataExtensionImpl",
 	"qunit/designtime/EditorQunitUtils"
 ], function(
-	Localization,
 	merge,
 	x,
 	Element,
@@ -314,7 +312,7 @@ sap.ui.define([
 					var oLabel = this.oCardEditor.getAggregation("_formContent")[1];
 					var oField = this.oCardEditor.getAggregation("_formContent")[2];
 					assert.ok(oLabel.isA("sap.m.Label"), "Label: Form content contains a Label");
-					assert.equal(oLabel.getText(), "StringLabelTrans", "Label: Has translated label text");
+					assert.equal(oLabel.getText(), "StringLabelTrans in i18n en", "Label: Has translated label text");
 					assert.ok(oField.isA("sap.ui.integration.editor.fields.StringField"), "Field: String Field");
 					resolve();
 				}.bind(this));
@@ -330,7 +328,7 @@ sap.ui.define([
 					var oLabel = this.oCardEditor.getAggregation("_formContent")[1];
 					var oField = this.oCardEditor.getAggregation("_formContent")[2];
 					assert.ok(oLabel.isA("sap.m.Label"), "Label: Form content contains a Label");
-					assert.equal(oLabel.getText(), "StringLabelTrans", "Label: Has translated label text");
+					assert.equal(oLabel.getText(), "StringLabelTrans in i18n en", "Label: Has translated label text");
 					assert.ok(oField.isA("sap.ui.integration.editor.fields.StringField"), "Field: String Field");
 					oField._descriptionIcon.onmouseover();
 					var oDescriptionText = this.oCardEditor._getPopover().getContent()[0];
@@ -353,7 +351,7 @@ sap.ui.define([
 					var oGeneralPanel = this.oCardEditor.getAggregation("_formContent")[0].getAggregation("_field");
 					assert.equal(oGeneralPanel.getHeaderText(), "General Settings", "The header text of General group is correct, the resource bundle in the card editor is loaded correctly.");
 					assert.ok(oLabel.isA("sap.m.Label"), "Label: Form content contains a Label");
-					assert.equal(oLabel.getText(), "StringLabelTrans", "Label: Has translated label text, the resource bundle in the user's card is loaded.");
+					assert.equal(oLabel.getText(), "StringLabelTrans in i18n en", "Label: Has translated label text, the resource bundle in the user's card is loaded.");
 					assert.ok(oField.isA("sap.ui.integration.editor.fields.StringField"), "Field: String Field");
 					oField._descriptionIcon.onmouseover();
 					var oDescriptionText = this.oCardEditor._getPopover().getContent()[0];
@@ -1502,7 +1500,7 @@ sap.ui.define([
 					var oLabel = this.oCardEditor.getAggregation("_formContent")[1];
 					var oField = this.oCardEditor.getAggregation("_formContent")[2];
 					assert.ok(oLabel.isA("sap.m.Label"), "Label: Form content contains a Label");
-					assert.equal(oLabel.getText(), "StringLabelTrans", "Label: Has label text");
+					assert.equal(oLabel.getText(), "StringLabelTrans in i18n en", "Label: Has label text");
 					assert.ok(oField.isA("sap.ui.integration.editor.fields.StringField"), "Field: String Field");
 					assert.equal(oField.getAggregation("_field").getValue(), "String1 EN Admin", "Field: Value from admin change");
 					var cardPreview = this.oCardEditor.getAggregation("_preview");
@@ -1562,7 +1560,7 @@ sap.ui.define([
 					var oLabel = this.oCardEditor.getAggregation("_formContent")[1];
 					var oField = this.oCardEditor.getAggregation("_formContent")[2];
 					assert.ok(oLabel.isA("sap.m.Label"), "Label: Form content contains a Label");
-					assert.equal(oLabel.getText(), "StringLabelTrans", "Label: Has label text");
+					assert.equal(oLabel.getText(), "StringLabelTrans in i18n en", "Label: Has label text");
 					assert.ok(oField.isA("sap.ui.integration.editor.fields.StringField"), "Field: String Field");
 					assert.equal(oField.getAggregation("_field").getValue(), "String1 EN Admin", "Field: Value from admin change");
 					var cardPreview = this.oCardEditor.getAggregation("_preview");
@@ -1628,7 +1626,7 @@ sap.ui.define([
 					var oLabel = this.oCardEditor.getAggregation("_formContent")[1];
 					var oField = this.oCardEditor.getAggregation("_formContent")[2];
 					assert.ok(oLabel.isA("sap.m.Label"), "Label: Form content contains a Label");
-					assert.equal(oLabel.getText(), "StringLabelTrans", "Label: Has label text");
+					assert.equal(oLabel.getText(), "StringLabelTrans in i18n en", "Label: Has label text");
 					assert.ok(oField.isA("sap.ui.integration.editor.fields.StringField"), "Field: String Field");
 					assert.equal(oField.getAggregation("_field").getValue(), "String1 EN Admin", "Field: Value from admin change");
 					var cardPreview = this.oCardEditor.getAggregation("_preview");
@@ -1699,7 +1697,7 @@ sap.ui.define([
 					var oLabel = this.oCardEditor.getAggregation("_formContent")[1];
 					var oField = this.oCardEditor.getAggregation("_formContent")[2];
 					assert.ok(oLabel.isA("sap.m.Label"), "Label: Form content contains a Label");
-					assert.equal(oLabel.getText(), "StringLabelTrans", "Label: Has label text");
+					assert.equal(oLabel.getText(), "StringLabelTrans in i18n en", "Label: Has label text");
 					assert.ok(oField.isA("sap.ui.integration.editor.fields.StringField"), "Field: String Field");
 					assert.equal(oField.getAggregation("_field").getValue(), "String1 EN Content", "Field: Value from content change");
 					var cardPreview = this.oCardEditor.getAggregation("_preview");
@@ -1767,7 +1765,7 @@ sap.ui.define([
 					var oLabel = this.oCardEditor.getAggregation("_formContent")[1];
 					var oField = this.oCardEditor.getAggregation("_formContent")[2];
 					assert.ok(oLabel.isA("sap.m.Label"), "Label: Form content contains a Label");
-					assert.equal(oLabel.getText(), "StringLabelTrans", "Label: Has label text");
+					assert.equal(oLabel.getText(), "StringLabelTrans in i18n en", "Label: Has label text");
 					assert.ok(oField.isA("sap.ui.integration.editor.fields.StringField"), "Field: String Field");
 					var oInput = oField.getAggregation("_field");
 					assert.equal(oInput.getValue(), "String1 EN Content", "Field: Value from content change");
@@ -1843,7 +1841,7 @@ sap.ui.define([
 					var oLabel = this.oCardEditor.getAggregation("_formContent")[1];
 					var oField = this.oCardEditor.getAggregation("_formContent")[2];
 					assert.ok(oLabel.isA("sap.m.Label"), "Label: Form content contains a Label");
-					assert.equal(oLabel.getText(), "StringLabelTrans", "Label: Has label text");
+					assert.equal(oLabel.getText(), "StringLabelTrans in i18n en", "Label: Has label text");
 					assert.ok(oField.isA("sap.ui.integration.editor.fields.StringField"), "Field: String Field");
 					var oInput = oField.getAggregation("_field");
 					assert.equal(oInput.getValue(), "String1 EN Content", "Field: Value from content change");

@@ -878,7 +878,10 @@ sap.ui.define([
 					id: this.oAppComponent.getId(),
 					config: { asyncHints: oAsyncHints }
 				},
-				manifest: this.oAppComponent.getManifest()
+				manifest: new Manifest({
+					"_version": "2.0.0",
+					"sap.app": { type: "component", id: "embeddedReference" }
+				})
 			});
 			await this.oFetchModelChangesPromise1;
 
@@ -933,25 +936,6 @@ sap.ui.define([
 			assert.strictEqual(Log.error.callCount, 1, "an error was logged");
 		});
 
-		QUnit.test("hook gets called for a component which is not an application", async function(assert) {
-			const oAsyncHints = { foobar: "baz" };
-			ComponentLifecycleHooks.modelCreatedHook({
-				model: this.oFakeModel1,
-				modelId: "someModelId",
-				factoryConfig: { id: "reuse-component", asyncHints: oAsyncHints, componentData: { foo: "bar" } },
-				ownerId: undefined,
-				manifest: new Manifest({
-					"_version": "2.0.0",
-					"sap.app": { type: "component" }
-				})
-			});
-
-			const aAnnoChangesModel = await this.oSetAnnotationChangeStub1.getCall(0).args[0];
-			assert.strictEqual(aAnnoChangesModel.length, 0, "the model was set with no annotation change");
-			assert.strictEqual(this.oLoaderInitStub.callCount, 0, "Loader was not initialized");
-			assert.strictEqual(this.oFlexStateInitStub.callCount, 0, "FlexState was not initialized");
-		});
-
 		QUnit.test("hook gets called for an embedded component which is not an application", async function(assert) {
 			const oAsyncHints = { foobar: "baz" };
 			sandbox.stub(Component, "getComponentById").returns({
@@ -971,6 +955,73 @@ sap.ui.define([
 						asyncHints: oAsyncHints
 					}
 				}
+			});
+
+			const aAnnoChangesModel = await this.oSetAnnotationChangeStub1.getCall(0).args[0];
+			assert.strictEqual(aAnnoChangesModel.length, 0, "the model was set with no annotation change");
+			assert.strictEqual(this.oLoaderInitStub.callCount, 0, "Loader was not initialized");
+			assert.strictEqual(this.oFlexStateInitStub.callCount, 0, "FlexState was not initialized");
+		});
+
+		QUnit.test("hook gets called for an embedded application", async function(assert) {
+			const oOwnerAsyncHints = { foobar: "baz" };
+			const oInnerAsyncHints = { bar: "baz" };
+			sandbox.stub(Component, "getComponentById")
+			.withArgs("ownerComponentId")
+			.returns({
+				getManifest: () => new Manifest({
+					"_version": "2.0.0",
+					"sap.app": { type: "application", id: "ownerReference" }
+				}),
+				getComponentData: () => oOwnerAsyncHints
+			});
+			this.oChangesAvailableStub.returns(true);
+			ComponentLifecycleHooks.modelCreatedHook({
+				model: this.oFakeModel1,
+				modelId: "someModelId",
+				factoryConfig: { id: this.oAppComponent.getId(), asyncHints: oInnerAsyncHints, componentData: oInnerAsyncHints },
+				owner: {
+					id: "ownerComponentId",
+					config: {
+						asyncHints: oOwnerAsyncHints
+					}
+				},
+				manifest: this.oAppComponent.getManifest()
+			});
+			await this.oFetchModelChangesPromise1;
+
+			assert.strictEqual(this.oFlexStateInitStub.callCount, 1, "FlexState was initialized once");
+			assert.deepEqual(this.oFlexStateInitStub.getCall(0).args[0], {
+				componentData: oInnerAsyncHints,
+				asyncHints: oInnerAsyncHints,
+				componentId: this.oAppComponent.getId(),
+				reference: this.oAppComponent.getId(),
+				skipLoadBundle: true,
+				manifest: this.oAppComponent.getManifest()
+			}, "FlexState was initialized with the correct parameters");
+
+			assert.ok(this.oSetAnnotationChangeStub1.calledOnce, "the promise was set on the first model");
+			const aAnnoChangesModel1 = await this.oSetAnnotationChangeStub1.getCall(0).args[0];
+			assert.strictEqual(aAnnoChangesModel1.length, 1, "the first model was set with the correct annotation change");
+			assert.deepEqual(
+				aAnnoChangesModel1[0],
+				{ path: this.oAnnotationChanges[0].getContent().annotationPath, value: this.oAnnotationChanges[0].getContent().value },
+				"the first model was set with the correct annotation change"
+			);
+		});
+
+		QUnit.test("hook gets called for an embedded component without owner component", async function(assert) {
+			sandbox.stub(Component, "getComponentById").returns({
+				getManifest: () => new Manifest({
+					"_version": "2.0.0",
+					"sap.app": { type: "component" }
+				}),
+				getComponentData: () => ({ foo: "bar" })
+			});
+			ComponentLifecycleHooks.modelCreatedHook({
+				model: this.oFakeModel1,
+				modelId: "someModelId",
+				factoryConfig: { id: "reuse-component" }
 			});
 
 			const aAnnoChangesModel = await this.oSetAnnotationChangeStub1.getCall(0).args[0];

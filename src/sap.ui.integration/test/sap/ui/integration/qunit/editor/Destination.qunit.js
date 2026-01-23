@@ -1,6 +1,5 @@
 /* global QUnit */
 sap.ui.define([
-	"sap/base/i18n/Localization",
 	"sap/base/util/merge",
 	"sap-ui-integration-editor",
 	"sap/ui/core/Element",
@@ -18,7 +17,6 @@ sap.ui.define([
 	"sap/ui/integration/formatters/IconFormatter",
 	"qunit/designtime/EditorQunitUtils"
 ], function(
-	Localization,
 	merge,
 	x,
 	Element,

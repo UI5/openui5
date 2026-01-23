@@ -130,11 +130,19 @@
 	<control-interactions>
 		<control name="sap.m.VariantManagement"/>
 		<interaction> <kbd>F4</kbd> <kbd>Spacebar</kbd> <kbd>Alt + ArrowUp</kbd> <kbd>Alt + ArrowDown</kbd> <description>
-				<p>Deschide gestiunea de variante.</p>
-			</description>
+				<p>Deschide gestionarea imaginilor.</p>
+			</description> 
 		</interaction>
 		<interaction> <kbd>PageUp</kbd> <description>
-				<p>Închide fereastra popover de eroare a gestiunii de variante.</p>
+				<p>Închide fereastra popover de erori pentru gestionarea imaginilor.</p>
+			</description>
+		</interaction>
+		<interaction> <kbd>Ctrl + Enter</kbd> <description>
+				<p>Salvează imaginea nouă în dialogul Salvare ca.</p>
+			</description>
+		</interaction>
+		<interaction> <kbd>Ctrl + S</kbd> <description>
+				<p>Salvează modificările efectuate la imagini.</p>
 			</description>
 		</interaction>
 	</control-interactions>
