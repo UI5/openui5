@@ -548,7 +548,7 @@ function(
 				}
 			};
 
-			var pContentPromise = XMLTemplateProcessor.parseTemplatePromise(this._xContent, this, true, oParseConfig).then(function(aContent) {
+			var pContentPromise = XMLTemplateProcessor.parseTemplatePromise(this._xContent, this, oParseConfig).then(function(aContent) {
 				this._aContent = aContent;
 				/*
 				 * If content was parsed and an objectBinding at the fragment was defined

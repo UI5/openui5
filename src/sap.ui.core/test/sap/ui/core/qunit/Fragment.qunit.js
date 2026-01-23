@@ -654,13 +654,12 @@ sap.ui.define([
 	});
 
 	QUnit.test("Load XML Fragment from file", function (assert) {
-		assert.expect(3);
+		assert.expect(2);
 		return Fragment.load({
 			name: "testdata.fragments.XMLTestFragmentNoController"
 		}).then(function (oFragment) {
 			assert.ok(oFragment, "Fragment should be loaded");
 			assert.equal(this.loadTemplatePromiseSpy.callCount, 1, "XMLTemplateProcessor.loadTemplatePromise should be called once");
-			assert.ok(this.parseTemplatePromiseSpy.getCall(0).args[2], "XMLTemplateProcessor.parseTemplatePromise should be called with async=true");
 
 			oFragment.destroy();
 		}.bind(this));
@@ -681,31 +680,8 @@ sap.ui.define([
 		}.bind(this));
 	});
 
-	QUnit.test("Load XML Fragment from file with nested fragments and a nested async view containing fragments of type 'JS' and 'XML'", async function (assert) {
-		assert.expect(8);
-		const oView = await Fragment.load({
-			name: "testdata.fragments.nested.XMLFragment_Level0"
-		});
-
-		assert.ok(oView, "Deepest nested View in Fragment chain should be created");
-
-		// wait for nested view to finish
-		await oView.loaded();
-
-		// expectations of template processor calls
-		assert.equal(this.parseTemplatePromiseSpy.callCount, 6, "XMLTemplateProcessor.loadTemplatePromise should be called six times");
-		assert.ok(this.parseTemplatePromiseSpy.getCall(0).args[2], "First call of XMLTemplateProcessor.parseTemplatePromise should be called with async=true");
-		assert.ok(this.parseTemplatePromiseSpy.getCall(1).args[2], "Second call of XMLTemplateProcessor.parseTemplatePromise should be called with async=true");
-		assert.ok(this.parseTemplatePromiseSpy.getCall(2).args[2], "Third call of XMLTemplateProcessor.parseTemplatePromise should be called with async=true");
-		assert.ok(this.parseTemplatePromiseSpy.getCall(3).args[2], "Fourth call of XMLTemplateProcessor.parseTemplatePromise should be called with async=true");
-		assert.ok(this.parseTemplatePromiseSpy.getCall(4).args[2], "Fifth call of XMLTemplateProcessor.parseTemplatePromise should be called with async=true");
-		assert.ok(this.parseTemplatePromiseSpy.getCall(5).args[2], "Sixth call of XMLTemplateProcessor.parseTemplatePromise should be called with async=true");
-
-		oView.destroy();
-	});
-
 	QUnit.test("Load XML View from file with nested fragments of type 'JS' and 'XML'", function (assert) {
-		assert.expect(21);
+		assert.expect(15);
 		return View.create({
 			viewName: "testdata.fragments.nested.XMLViewWithFragments",
 			type: ViewType.XML
@@ -714,14 +690,8 @@ sap.ui.define([
 				assert.equal(this.loadTemplatePromiseSpy.callCount, 2, "XMLTemplateProcessor.loadTemplatePromise should be called two times (only for the nested XML fragments)");
 
 				assert.equal(this.parseTemplatePromiseSpy.callCount, 3, "XMLTemplateProcessor.loadTemplatePromise should be called three times (for the XML View and the nested XML Fragments)");
-				assert.ok(this.parseTemplatePromiseSpy.getCall(0).args[2], "First call of XMLTemplateProcessor.parseTemplatePromise should be called with async=true");
-				assert.ok(this.parseTemplatePromiseSpy.getCall(1).args[2], "Second call of XMLTemplateProcessor.parseTemplatePromise should be called with async=true");
-				assert.ok(this.parseTemplatePromiseSpy.getCall(2).args[2], "Third call of XMLTemplateProcessor.parseTemplatePromise should be called with async=true");
 
 				assert.equal(this.loadResourceSpy.callCount, 3, "LoaderExtension.loadResource should be called five times (for the XML View, the nested XML Fragments)");
-				assert.ok(this.loadResourceSpy.getCall(0).args[1].async, "First call of LoaderExtension.loadResource should be called with async=true");
-				assert.ok(this.loadResourceSpy.getCall(1).args[1].async, "Second call of LoaderExtension.loadResource should be called with async=true");
-				assert.ok(this.loadResourceSpy.getCall(2).args[1].async, "Third call of LoaderExtension.loadResource should be called with async=true");
 
 				var aCalls = this.requireSpy.getCalls().filter(function (oCall) {return oCall.args.length === 3 && oCall.args[0][0].endsWith("fragment");});
 				assert.equal(aCalls.length, 4, "sap.ui.require should be called two times with 3 arguments (for the JS fragment require)");

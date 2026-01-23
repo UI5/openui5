@@ -567,7 +567,7 @@ sap.ui.define([
 
 			// parse the XML tree
 			var fnDone = Interaction.notifyAsyncStep("VIEW PROCESSING");
-			return XMLTemplateProcessor.parseTemplatePromise(this._xContent, this, true, {
+			return XMLTemplateProcessor.parseTemplatePromise(this._xContent, this, {
 				fnRunWithPreprocessor: fnRunWithPreprocessor
 			}).then(function(aParsedContent) {
 				that._aParsedContent = aParsedContent;

@@ -778,10 +778,6 @@ sap.ui.define([
 
 			// check call count of XMLTP
 			assert.equal(this.oXMLTPSpy.callCount, 3, "3 async XMLViews or Fragments processed.");
-			// check async flags of the XMLTP start, arguments order: (0: xmlNode, 1: view/fragment instance, 2: bAsync, 3: oParseConfig)
-			assert.strictEqual(this.oXMLTPSpy.args[0][2], true, "Async root View.");
-			assert.strictEqual(this.oXMLTPSpy.args[1][2], true, "Async nested View from 'ExtPointFromView'.");
-			assert.strictEqual(this.oXMLTPSpy.args[2][2], true, "Async nested Fragment from 'ExtPointFromFragment'.");
 
 			// content amount
 			var aViewContent = oView.getContent();

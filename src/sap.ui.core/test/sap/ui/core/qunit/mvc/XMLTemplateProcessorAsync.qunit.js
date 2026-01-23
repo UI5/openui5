@@ -57,9 +57,9 @@ sap.ui.define([
 	QUnit.test("create Controls", function(assert) {
 		assert.expect(2);
 		var done = assert.async();
-		XMLTemplateProcessor.enrichTemplateIdsPromise(this.xView, this.oRootView, true).then(function() {
+		XMLTemplateProcessor.enrichTemplateIdsPromise(this.xView, this.oRootView).then(function() {
 			assert.ok(!this.oRootView.byId("button"), "no control has been created yet");
-			XMLTemplateProcessor.parseTemplatePromise(this.xView, this.oRootView, true).then(function() {
+			XMLTemplateProcessor.parseTemplatePromise(this.xView, this.oRootView).then(function() {
 				assert.ok(this.oRootView.byId("button"), "button control is created");
 				done();
 			}.bind(this));
@@ -69,9 +69,9 @@ sap.ui.define([
 	QUnit.test("do not create stashed Controls", function(assert) {
 		assert.expect(2);
 		var done = assert.async();
-		XMLTemplateProcessor.enrichTemplateIdsPromise(this.xView, this.oRootView,true).then(function() {
+		XMLTemplateProcessor.enrichTemplateIdsPromise(this.xView, this.oRootView).then(function() {
 			assert.ok(!this.oRootView.byId("stashedButton"), "no stashed control has been created yet");
-			XMLTemplateProcessor.parseTemplatePromise(this.xView, this.oRootView, true).then(function() {
+			XMLTemplateProcessor.parseTemplatePromise(this.xView, this.oRootView).then(function() {
 				assert.ok(this.oRootView.byId("stashedButton"), "stashed button control is created");
 				done();
 			}.bind(this));
@@ -85,9 +85,9 @@ sap.ui.define([
 		// Preferrably we should test with a spy on "ExtensionPoint", but due
 		// to the AMD module handling it is not possible to place one
 		var node = jQuery(this.xView).find("#extensionButton")[0];
-		XMLTemplateProcessor.enrichTemplateIdsPromise(this.xView, this.oRootView, true).then(function() {
+		XMLTemplateProcessor.enrichTemplateIdsPromise(this.xView, this.oRootView).then(function() {
 			assert.equal(node.getAttribute("id"), "extensionButton", "id was not enriched");
-			XMLTemplateProcessor.parseTemplatePromise(this.xView, this.oRootView, true).then(function() {
+			XMLTemplateProcessor.parseTemplatePromise(this.xView, this.oRootView).then(function() {
 				assert.ok(this.oRootView.byId("extensionButton"), "extension button is created");
 				done();
 			}.bind(this));

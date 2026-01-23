@@ -155,13 +155,6 @@ sap.ui.define([
 	var CUSTOM_DATA_NAMESPACE = "http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1";
 
 	/**
-	 * An XML namespace that can be used by tooling to add attributes with support information to an element.
-	 * @const
-	 * @private
-	 */
-	var SUPPORT_INFO_NAMESPACE = "http://schemas.sap.com/sapui5/extension/sap.ui.core.support.Support.info/1";
-
-	/**
 	 * An XML namespace that denotes the XML composite definition.
 	 * Processing of such nodes is skipped.
 	 * @const
@@ -302,7 +295,7 @@ sap.ui.define([
 	 * @private
 	 */
 	XMLTemplateProcessor.enrichTemplateIdsPromise = function(xmlNode, oView) {
-		return parseTemplate(xmlNode, oView, true, undefined, true).then(function() {
+		return parseTemplate(xmlNode, oView, true).then(function() {
 			return xmlNode;
 		});
 	};
@@ -312,14 +305,13 @@ sap.ui.define([
 	 *
 	 * @param {Element} xmlNode the XML element representing the View/Fragment
 	 * @param {sap.ui.core.mvc.XMLView|sap.ui.core.Fragment} oView the View/Fragment which corresponds to the parsed XML
-	 * @param {boolean} bAsync Whether or not to perform the template processing asynchronously
 	 * @param {object} oParseConfig parse configuration options, e.g. settings pre-processor
 	 * @return {Promise} with an array containing Controls and/or plain HTML element strings
 	 * @private
 	 * @ui5-restricted sap.ui.core.Fragment, sap.ui.core.mvc.XMLView
 	 */
-	XMLTemplateProcessor.parseTemplatePromise = function(xmlNode, oView, _bAsync, oParseConfig) {
-		return parseTemplate(xmlNode, oView, false, oParseConfig, true).then(function(vResult) {
+	XMLTemplateProcessor.parseTemplatePromise = function(xmlNode, oView, oParseConfig) {
+		return parseTemplate(xmlNode, oView, false, oParseConfig).then(function(vResult) {
 			// vResult is the result array of the XMLTP's parsing.
 			// Elements in vResult can be:
 			//  * RenderManager Call (Array)
@@ -1039,7 +1031,7 @@ sap.ui.define([
 									key: sLocalName,
 									value: parseScalarType("any", sValue, sLocalName, oView._oContainingView.oController, oRequireModules, aTypePromises, mAdditionalBindableValues)
 								}));
-							} else if (sNamespace === SUPPORT_INFO_NAMESPACE) {} else if (sNamespace && sNamespace.startsWith(PREPROCESSOR_NAMESPACE_PREFIX)) {
+							} else if (sNamespace && sNamespace.startsWith(PREPROCESSOR_NAMESPACE_PREFIX)) {
 								Log.debug(oView + ": XMLView parser ignored preprocessor attribute '" + sName + "' (value: '" + sValue + "')");
 							} else if (sNamespace === UI5_INTERNAL_NAMESPACE && localName(attr) === "invisible") {
 								oInfo = mKnownSettings.visible;
