@@ -1,3 +1,6 @@
+#connectionCheck, #connectionCheck div {display:block}
+.connectionCheckOK {color: green; font-weight: bold}
+.connectionCheckFailed {color: red; font-weight: bold}
 .failed {background-color: red}
 .hidden {display: none}
 .running {font-weight: bold}

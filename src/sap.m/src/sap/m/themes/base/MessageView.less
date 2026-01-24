@@ -79,6 +79,7 @@
 		font-family: var(--sapFontFamily);
 		font-size:  @sapMFontMediumSize;
 		color: var(--sapContent_LabelColor);
+		overflow: visible;
 	}
 
 	.sapMSLITitle {
@@ -86,6 +87,12 @@
 		font-size: var(--sapFontHeader5Size);
 		font-weight: @sapUiFontHeaderWeight;
 		color: var(--sapGroup_TitleTextColor);
+		overflow: visible;
+	}
+
+	.sapMMsgViewItem.sapMSLIWrapping > .sapMLIBContent,
+	.sapMMsgViewItem.sapMSLIWrapping > .sapMLIBContent > .sapMSLIDiv {
+		overflow: visible;
 	}
 
 	.sapMSLITitleOnly {

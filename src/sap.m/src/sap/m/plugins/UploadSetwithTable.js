@@ -483,15 +483,6 @@ sap.ui.define([
 		this.fireOnDeactivated({control: oControl});
 	};
 
-	UploadSetwithTable.prototype.exit = function() {
-		this.getConfig("cleanupPluginInstanceSettings", this.getControl(), this);
-		PluginBase.prototype.exit.call(this);
-	};
-
-	UploadSetwithTable.prototype.setParent = function() {
-		PluginBase.prototype.setParent.apply(this, arguments);
-	};
-
 	// Overriden Setter methods
 
 	UploadSetwithTable.prototype.setFileTypes = function (aNewTypes) {

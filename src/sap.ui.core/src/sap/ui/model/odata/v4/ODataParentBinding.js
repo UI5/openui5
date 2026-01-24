@@ -575,7 +575,7 @@ sap.ui.define([
 	 * @param {boolean} bPreventBubbling
 	 *   Whether the dataRequested and dataReceived events related to the refresh must not be
 	 *   bubbled up to the model
-	 * @returns {Promise} The created promise
+	 * @returns {Promise<any>} The created promise
 	 *
 	 * @see #isRefreshWithoutBubbling
 	 * @see #resolveRefreshPromise
@@ -1419,8 +1419,8 @@ sap.ui.define([
 	 * If there is a refresh promise created by {@link #createRefreshPromise}, it is resolved with
 	 * the given promise and cleared. Does not reject the refresh promise with a canceled error.
 	 *
-	 * @param {Promise} oPromise - The promise to resolve with
-	 * @returns {Promise} oPromise for chaining
+	 * @param {Promise<any>} oPromise - The promise to resolve with
+	 * @returns {Promise<any>} oPromise for chaining
 	 *
 	 * @private
 	 */

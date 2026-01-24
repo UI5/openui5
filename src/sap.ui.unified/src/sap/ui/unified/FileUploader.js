@@ -1365,14 +1365,20 @@ sap.ui.define([
 			const oForm = this.getDomRef("fu_form");
 
 			//reseting the input fields if setValue("") is called, also for undefined and null
-			if (this.oFileUpload && /* is visible: */ oForm && !sValue) {
+			if (this.oFileUpload && !sValue) {
 				// some browsers do not allow to clear the value of the fileuploader control
 				// therefore we utilize the form and reset the values inside this form and
 				// apply the additionalData again afterwards
-				oForm.reset();
+				if (oForm) {
+					oForm.reset();
+					//keep the additional data on the form
+					jQuery(this.FUDataEl).val(this.getAdditionalData());
+				} else {
+					// If the form doesn't exist (e.g., FileUploader is invisible),
+					// directly clear the files using DataTransfer
+					this.oFileUpload.files = new DataTransfer().files;
+				}
 				this._selectedFileNames = [];
-				//keep the additional data on the form
-				jQuery(this.FUDataEl).val(this.getAdditionalData());
 			}
 			// only fire event when triggered by user interaction
 			if (bFireEvent) {

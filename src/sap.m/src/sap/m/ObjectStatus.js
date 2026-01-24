@@ -289,6 +289,8 @@ sap.ui.define([
 	ObjectStatus.prototype.ontap = function(oEvent) {
 		if (this._isClickable(oEvent)) {
 			this.firePress();
+			// mark the event that it is handled by the control
+			oEvent.setMarked();
 		}
 	};
 

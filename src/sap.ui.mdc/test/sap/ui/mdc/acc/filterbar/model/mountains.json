@@ -204,143 +204,143 @@
 	"ranges": [
 		{
 			"range": "Mahalangur Himalaya",
-			"country": ["CN", "NP"]
+			"countries": ["CN", "NP"]
 		},
 		{
 			"range": "Baltoro Karakoram",
-			"country": ["CN", "PK"]
+			"countries": ["CN", "PK"]
 		},
 		{
 			"range": "Kangchenjunga Himalaya",
-			"country": ["CN", "IN", "NP"]
+			"countries": ["CN", "IN", "NP"]
 		},
 		{
 			"range": "Dhaulagiri Himalaya",
-			"country": ["NP"]
+			"countries": ["NP"]
 		},
 		{
 			"range": "Manaslu Himalaya",
-			"country": ["NP"]
+			"countries": ["NP"]
 		},
 		{
 			"range": "Nanga Parbat Himalaya",
-			"country": ["PK"]
+			"countries": ["PK"]
 		},
 		{
 			"range": "Annapurna Himalaya",
-			"country": ["NP"]
+			"countries": ["NP"]
 		},
 		{
 			"range": "Jugal Himalaya",
-			"country": ["CN"]
+			"countries": ["CN"]
 		},
 		{
 			"range": "Hispar Karakoram",
-			"country": ["PK"]
+			"countries": ["PK"]
 		},
 		{
 			"range": "Masherbrum Karakoram",
-			"country": ["PK"]
+			"countries": ["PK"]
 		},
 		{
 			"range": "Garhwal Himalaya",
-			"country": ["CN", "IN"]
+			"countries": ["CN", "IN"]
 		},
 		{
 			"range": "Batura Karakoram",
-			"country": ["PK"]
+			"countries": ["PK"]
 		},
 		{
 			"range": "Rakaposhi-Haramosh Karakoram",
-			"country": ["PK"]
+			"countries": ["PK"]
 		},
 		{
 			"range": "Assam Himalaya",
-			"country": ["CN"]
+			"countries": ["CN"]
 		},
 		{
 			"range": "Saltoro Karakoram",
-			"country": ["IN", "PK"]
+			"countries": ["IN", "PK"]
 		},
 		{
 			"range": "Hindu Kush",
-			"country": ["AF", "PK"]
+			"countries": ["AF", "PK"]
 		},
 		{
 			"range": "Langtang Himalaya",
-			"country": ["CN", "NP"]
+			"countries": ["CN", "NP"]
 		},
 		{
 			"range": "Nalakankar Himalaya",
-			"country": ["CN"]
+			"countries": ["CN"]
 		},
 		{
 			"range": "Saser Karakoram",
-			"country": ["IN"]
+			"countries": ["IN"]
 		},
 		{
 			"range": "Kongur Shan (Eastern Pamirs)",
-			"country": ["CN"]
+			"countries": ["CN"]
 		},
 		{
 			"range": "Kula Kangri Himalaya",
-			"country": ["BT", "CN"]
+			"countries": ["BT", "CN"]
 		},
 		{
 			"range": "Daxue Mountains (Hengduan Shan)",
-			"country": ["CN"]
+			"countries": ["CN"]
 		},
 		{
 			"range": "Rimo Karakoram",
-			"country": ["IN"]
+			"countries": ["IN"]
 		},
 		{
 			"range": "Muztagata (Eastern Pamirs)",
-			"country": ["CN"]
+			"countries": ["CN"]
 		},
 		{
 			"range": "Pamir (Academy of Sciences Range)",
-			"country": ["TJ"]
+			"countries": ["TJ"]
 		},
 		{
 			"range": "Siachen Karakoram",
-			"country": ["CN", "IN", "PK"]
+			"countries": ["CN", "IN", "PK"]
 		},
 		{
 			"range": "Tian Shan",
-			"country": ["CN", "KG"]
+			"countries": ["CN", "KG"]
 		},
 		{
 			"range": "Ganesh Himalaya",
-			"country": ["CN", "NP"]
+			"countries": ["CN", "NP"]
 		},
 		{
 			"range": "Labuche Himalaya",
-			"country": ["CN"]
+			"countries": ["CN"]
 		},
 		{
 			"range": "Jomolhari Himalaya",
-			"country": ["BT", "CN"]
+			"countries": ["BT", "CN"]
 		},
 		{
 			"range": "Yengisogat Karakoram",
-			"country": ["CN"]
+			"countries": ["CN"]
 		},
 		{
 			"range": "Panmah Karakoram",
-			"country": ["PK"]
+			"countries": ["PK"]
 		},
 		{
 			"range": "Baiku Himalaya",
-			"country": ["CN"]
+			"countries": ["CN"]
 		},
 		{
 			"range": "Lunana Himalaya",
-			"country": ["BT", "CN"]
+			"countries": ["BT", "CN"]
 		},
 		{
 			"range": "Nagarze Himalaya",
-			"country": ["CN"]
+			"countries": ["CN"]
 		}
 	],
 	"mountains": [

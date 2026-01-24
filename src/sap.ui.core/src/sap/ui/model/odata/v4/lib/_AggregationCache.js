@@ -342,6 +342,9 @@ sap.ui.define([
 	 *
 	 * @param {string} sGroupNodePath
 	 *   The group node path relative to the cache
+	 * @param {Object<boolean>} mKeptElementPredicates
+	 *   The set of key predicates for all (effectively) kept-alive elements incl. exceptions of
+	 *   selection
 	 * @param {sap.ui.model.odata.v4.lib._GroupLock} [oGroupLock]
 	 *   An unlocked lock for the group to associate the clean-up request with; this indicates
 	 *   whether to collapse the node and all its descendants
@@ -349,17 +352,14 @@ sap.ui.define([
 	 *   Whether no ("change") events should be fired
 	 * @param {boolean} [bNested]
 	 *   Whether the "collapse all" was performed at an ancestor
-	 * @param {Object<boolean>} [mKeptElementPredicates]
-	 *   The set of key predicates for all (effectively) kept-alive elements incl. exceptions of
-	 *   selection
 	 * @returns {number}
 	 *   The number of descendant nodes that were affected
 	 *
 	 * @public
 	 * @see #expand
 	 */
-	_AggregationCache.prototype.collapse = function (sGroupNodePath, oGroupLock, bSilent, bNested,
-			mKeptElementPredicates) {
+	_AggregationCache.prototype.collapse = function (sGroupNodePath, mKeptElementPredicates,
+			oGroupLock, bSilent, bNested) {
 		const oGroupNode = this.getValue(sGroupNodePath);
 		const oCollapsed = _AggregationHelper.getCollapsedObject(oGroupNode);
 		_Helper.updateAll(bSilent ? {} : this.mChangeListeners, sGroupNodePath, oGroupNode,
@@ -387,7 +387,7 @@ sap.ui.define([
 			const sPredicate = _Helper.getPrivateAnnotation(oElement, "predicate");
 			if (bAll && oElement["@$ui5.node.isExpanded"]) {
 				iRemaining
-					-= this.collapse(sPredicate, oGroupLock, bSilent, true, mKeptElementPredicates);
+					-= this.collapse(sPredicate, mKeptElementPredicates, oGroupLock, bSilent, true);
 			}
 			if (!mKeptElementPredicates?.[sPredicate]) {
 				delete aElements.$byPredicate[sPredicate];
@@ -794,6 +794,9 @@ sap.ui.define([
 	 * @param {number} iLevels
 	 *   The number of levels to expand, either 1 or <code>iLevels >= Number.MAX_SAFE_INTEGER</code>
 	 *   which can be used to expand all levels
+	 * @param {Object<boolean>} mKeptElementPredicates
+	 *   The set of key predicates for all (effectively) kept-alive elements incl. exceptions of
+	 *   selection
 	 * @param {function} [fnDataRequested]
 	 *   The function is called just before the back-end request is sent.
 	 *   If no back-end request is needed, the function is not called.
@@ -806,7 +809,7 @@ sap.ui.define([
 	 * @see #collapse
 	 */
 	_AggregationCache.prototype.expand = function (oGroupLock, vGroupNodeOrPath, iLevels,
-			fnDataRequested) {
+			mKeptElementPredicates, fnDataRequested) {
 		var iCount,
 			oGroupNode = typeof vGroupNodeOrPath === "string"
 				? this.getValue(vGroupNodeOrPath)
@@ -853,7 +856,7 @@ sap.ui.define([
 					}
 				}
 				if (!_Helper.hasPrivateAnnotation(oElement, "placeholder")) {
-					if (aSpliced.$stale && !that.isSelectionDifferent(oElement)) {
+					if (aSpliced.$stale && !mKeptElementPredicates[sPredicate]) {
 						that.turnIntoPlaceholder(oElement, sPredicate);
 					} else {
 						that.aElements.$byPredicate[sPredicate] = oElement;
@@ -864,7 +867,8 @@ sap.ui.define([
 						}
 						if (_Helper.hasPrivateAnnotation(oElement, "expanding")) {
 							_Helper.deletePrivateAnnotation(oElement, "expanding");
-							iCount += that.expand(_GroupLock.$cached, oElement, 1).getResult();
+							// no mKeptElementPredicates needed, "expanding" nodes have no "spliced"
+							iCount += that.expand(_GroupLock.$cached, oElement, 1, {}).getResult();
 						}
 					}
 				}
@@ -1522,20 +1526,6 @@ sap.ui.define([
 	};
 
 	/**
-	 * Determines if the "@$ui5.context.isSelected" annotation of the given element differs from the
-	 * annotation at the collection. Note: A missing annotation is treated as <code>false</code>.
-	 *
-	 * @param {object} oElement - The element
-	 * @returns {boolean} Whether the selection state of the element differs from the collection
-	 *
-	 * @private
-	 */
-	_AggregationCache.prototype.isSelectionDifferent = function (oElement) {
-		return (oElement["@$ui5.context.isSelected"] ?? false)
-				!== (this.aElements["@$ui5.context.isSelected"] ?? false);
-	};
-
-	/**
 	 * Determines the list of elements determined by the given predicates. All other elements are
 	 * turned into placeholders (lazily), except transient ones.
 	 *
@@ -1602,6 +1592,9 @@ sap.ui.define([
 	 *
 	 * @param {sap.ui.model.odata.v4.lib._GroupLock} oGroupLock
 	 *   A lock for the group to associate the requests with
+	 * @param {Object<boolean>} mKeptElementPredicates
+	 *   The set of key predicates for all (effectively) kept-alive elements incl. exceptions of
+	 *   selection
 	 * @param {string} sChildPath
 	 *   The (child) node's canonical resource path (relative to the service)
 	 * @param {string} sNonCanonicalChildPath
@@ -1632,8 +1625,8 @@ sap.ui.define([
 	 *
 	 * @public
 	 */
-	_AggregationCache.prototype.move = function (oGroupLock, sChildPath, sNonCanonicalChildPath,
-			sParentPath, sSiblingPath, bRequestSiblingRank, bCopy) {
+	_AggregationCache.prototype.move = function (oGroupLock, mKeptElementPredicates, sChildPath,
+			sNonCanonicalChildPath, sParentPath, sSiblingPath, bRequestSiblingRank, bCopy) {
 		let bRefreshNeeded = !this.bUnifiedCache;
 
 		const sChildPredicate = sChildPath.slice(sChildPath.indexOf("("));
@@ -1748,13 +1741,14 @@ sap.ui.define([
 		} else {
 			oPromise = oPromise.then(([oPatchResult,, iRank]) => {
 				const iCount = oChildNode["@$ui5.node.isExpanded"]
-					? this.collapse(sChildPredicate)
+					? this.collapse(sChildPredicate, {}) // no mKeptElementPredicates needed
 					: undefined;
 
 				let iResult = 1;
 				switch (oParentNode ? oParentNode["@$ui5.node.isExpanded"] : true) {
 					case false:
-						iResult = this.expand(_GroupLock.$cached, sParentPredicate, 1).unwrap() + 1;
+						iResult = this.expand(_GroupLock.$cached, sParentPredicate, 1,
+							mKeptElementPredicates).unwrap() + 1;
 						// fall through
 					case true:
 						break;
@@ -1812,13 +1806,13 @@ sap.ui.define([
 				this.oTreeState.stillOutOfPlace(oNode, sNodePredicate);
 				const bExpanded = oNode["@$ui5.node.isExpanded"];
 				if (bExpanded) {
-					this.collapse(sNodePredicate);
+					this.collapse(sNodePredicate, {}); // no mKeptElementPredicates needed
 				}
 				const iNodeIndex = this.aElements.indexOf(oNode);
 				this.aElements.splice(iNodeIndex, 1);
 				this.aElements.splice(iParentIndex + 1, 0, oNode);
-				if (bExpanded) {
-					this.expand(_GroupLock.$cached, sNodePredicate, 1);
+				if (bExpanded) { // no mKeptElementPredicates needed
+					this.expand(_GroupLock.$cached, sNodePredicate, 1, {});
 				}
 			}
 		});
@@ -2330,7 +2324,7 @@ sap.ui.define([
 	 * @param {sap.ui.model.odata.v4.lib._GroupLock} oGroupLock
 	 *   An original lock for the group ID to be used for the GET request, to be cloned via
 	 *   {@link sap.ui.model.odata.v4.lib._GroupLock#getUnlockedCopy}
-	 * @returns {Promise[]}
+	 * @returns {Array<Promise<object>>}
 	 *   The request promises
 	 *
 	 * @private

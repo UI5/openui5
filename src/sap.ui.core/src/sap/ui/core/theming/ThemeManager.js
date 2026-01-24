@@ -336,23 +336,23 @@ sap.ui.define([
 	 * @param {boolean} suppressFOUC - Whether to suppress Flash of Unstyled Content during theme changes
 	 */
 	function includeStyleSheetPostProcessing(libInfo, cssLoadededPromise, suppressFOUC) {
-		libInfo.cssLoaded = cssLoadededPromise.finally(function() {
-			if (!libInfo.cssLoaded.aborted) {
+		const cssLoaded = libInfo.cssLoaded = cssLoadededPromise.finally(function() {
+			if (!cssLoaded.aborted) {
 				libInfo.finishedLoading = true;
 				document.querySelector(`link[data-sap-ui-foucmarker='${libInfo.linkId}']`)?.remove();
 				libInfo.cssLinkElement = document.getElementById(`${libInfo.linkId}`);
 				Log.debug(`New stylesheet loaded and old stylesheet removed for library: ${libInfo.id}`, undefined, MODULE_NAME);
 			}
 		}).then(function() {
-			if (!libInfo.cssLoaded.aborted) {
+			if (!cssLoaded.aborted) {
 				handleThemeSucceeded(libInfo.id);
 			}
 		}).catch(function() {
-			if (!libInfo.cssLoaded.aborted) {
+			if (!cssLoaded.aborted) {
 				handleThemeFailed(libInfo.id);
 			}
 		}).finally(function() {
-			if (!libInfo.cssLoaded.aborted) {
+			if (!cssLoaded.aborted) {
 				handleThemeFinished(libInfo.id);
 				pAllCssRequests = Promise.allSettled([...mAllLoadedLibraries.values()].map((libInfo) => libInfo.cssLoaded));
 				pAllCssRequests.finally(function() {

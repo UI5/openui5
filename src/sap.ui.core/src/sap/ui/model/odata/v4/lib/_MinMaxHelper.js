@@ -62,7 +62,7 @@ sap.ui.define([
 			 * Gets the <code>Promise</code> which resolves with a map of minimum and maximum
 			 * values.
 			 *
-			 * @returns {Promise}
+			 * @returns {Promise<Object<{max:any,min:any}>|undefined>}
 			 *   A <code>Promise</code> which resolves with a map of minimum and maximum values for
 			 *   requested measures, or <code>undefined</code> if no minimum or maximum is
 			 *   requested. The key of the map is the measure property name and the value is an

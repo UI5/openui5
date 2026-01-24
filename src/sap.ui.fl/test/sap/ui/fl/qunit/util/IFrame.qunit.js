@@ -274,6 +274,17 @@ sap.ui.define([
 			await nextUIUpdate();
 			checkUrl(assert, this.oIFrame, sSapUI5Url);
 		});
+
+		QUnit.test("URL should be unbound on update", function(assert) {
+			const sOriginalModelValue = this.oModel.getData().flavor;
+			this.oIFrame.applySettings({ url: "{model>/flavor}" });
+			this.oIFrame.applySettings({ url: "some plain text" });
+			assert.strictEqual(
+				this.oModel.getData().flavor,
+				sOriginalModelValue,
+				"no data leaks back through old bindings"
+			);
+		});
 	});
 
 	QUnit.module("UserInfo binding (UserInfo service available)", {

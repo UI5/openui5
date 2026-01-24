@@ -420,7 +420,7 @@ sap.ui.define([
 	/**
 	 * Requests changes to annotations.
 	 *
-	 * @returns {Promise<Array<object>>|sap.ui.base.SyncPromise<undefined>}
+	 * @returns {Promise<Array<object>>|sap.ui.base.SyncPromise<void>}
 	 *   A promise resolving with an optional array of change objects defining a metamodel path and
 	 *   a value to be set for that path
 	 *
@@ -2101,7 +2101,7 @@ sap.ui.define([
 	 * none, an error is given, and a {@link #setRetryAfterHandler handler} is known.
 	 *
 	 * @param {Error} [oRetryAfterError] - A "Retry-After" error from a back-end call
-	 * @returns {Promise|null} The current "Retry-After" promise
+	 * @returns {Promise<void>|null} The current "Retry-After" promise
 	 *
 	 * @private
 	 */
@@ -2981,7 +2981,7 @@ sap.ui.define([
 	 * is rejected with the same <code>Error</code> reason as previously passed to the handler, then
 	 * this reason is reported to the message model.
 	 *
-	 * @param {function(Error):Promise<undefined>} fnRetryAfter
+	 * @param {function(Error):Promise<void>} fnRetryAfter
 	 *   A "Retry-After" handler
 	 *
 	 * @public

@@ -2269,7 +2269,7 @@ sap.ui.define([
 	 *   Absolute path that points to the annotation
 	 * @param {sap.ui.model.odata.v4.Context} oContext
 	 *   Context to resolve edm:Path references contained in the annotation
-	 * @returns {Promise}
+	 * @returns {Promise<Object<object>>}
 	 *   A promise which is resolved with the filtered map of qualifier to value list mapping
 	 *   objects
 	 *
@@ -2780,7 +2780,7 @@ sap.ui.define([
 	 *   If present, it must point to this meta model's root entity container, that is,
 	 *   <code>oDetails.context.getModel() === this</code> and
 	 *   <code>oDetails.context.getPath() === "/"</code>
-	 * @returns {Promise}
+	 * @returns {Promise<Object<{StandardCode:string,Text:string,UnitSpecificScale:number}>|null>}
 	 *   A promise resolving with the customizing which is a map from the code key to an object with
 	 *   the following properties:
 	 *   <ul>
@@ -2964,7 +2964,7 @@ sap.ui.define([
 	 *   If present, it must point to this meta model's root entity container, that is,
 	 *   <code>oDetails.context.getModel() === this</code> and
 	 *   <code>oDetails.context.getPath() === "/"</code>
-	 * @returns {Promise<Object<string,{StandardCode: string, Text: string, UnitSpecificScale: string}>|null>}
+	 * @returns {Promise<Object<{StandardCode:string,Text:string,UnitSpecificScale:number}>|null>}
 	 *   A promise resolving with the currency customizing which is a map from currency key to an
 	 *   object with the following properties:
 	 *   <ul>
@@ -3316,7 +3316,7 @@ sap.ui.define([
 	 *   If present, it must point to this meta model's root entity container, that is,
 	 *   <code>oDetails.context.getModel() === this</code> and
 	 *   <code>oDetails.context.getPath() === "/"</code>
-	 * @returns {Promise<Object<string,{StandardCode: string, Text: string, UnitSpecificScale: string}>|null>}
+	 * @returns {Promise<Object<{StandardCode:string,Text:string,UnitSpecificScale:number}>|null>}
 	 *   A promise resolving with the unit customizing which is a map from unit key to an object
 	 *   with the following properties:
 	 *   <ul>
@@ -3365,7 +3365,7 @@ sap.ui.define([
 	 *   Absolute path that points to the given annotation
 	 * @param {sap.ui.model.odata.v4.Context} oContext
 	 *   Context to resolve edm:Path references contained in the given annotation
-	 * @returns {Promise}
+	 * @returns {Promise<any>}
 	 *   A promise that resolves with the value of the dynamic expression
 	 *
 	 * @private

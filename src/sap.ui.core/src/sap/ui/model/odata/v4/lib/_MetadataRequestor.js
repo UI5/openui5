@@ -52,7 +52,7 @@ sap.ui.define([
 				 *   Whether to just read the metadata document, but not yet convert it from XML to
 				 *   JSON. For any given URL, this is useful in an optional early call that precedes
 				 *   a normal call without this flag.
-				 * @returns {Promise}
+				 * @returns {Promise<object>}
 				 *   A promise fulfilled with the metadata as a JSON object, enriched with a
 				 *   <code>$Date</code>, <code>$ETag</code> or <code>$LastModified</code> property
 				 *   that contains the value of the response header "Date", "ETag" or

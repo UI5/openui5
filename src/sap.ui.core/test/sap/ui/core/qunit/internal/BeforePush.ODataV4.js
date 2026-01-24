@@ -19,6 +19,7 @@ sap.ui.define([
 				s1Ring + "&module=sap.ui.model.odata.v4.ODataModel.realOData"
 			]
 		},
+		sSalesOrderService = "/sap/opu/odata4/sap/zui5_testv4/default/sap/zui5_epm_sample/0002/",
 		mTests = {
 			[s1Ring] : "full", // the test runs in IFrames where no coverage is checked
 			[s1Ring + "&module=sap.ui.model.odata.v4.ODataModel.realOData"] : "integration",
@@ -65,9 +66,8 @@ sap.ui.define([
 	}
 
 	async function resetSalesOrders(fnSetStatus) {
-		fnSetStatus("Resetting SalesOrders data...");
-		const sService = "/sap/opu/odata4/sap/zui5_testv4/default/sap/zui5_epm_sample/0002/";
-		const oHeaderResponse = await fetch(sService, {
+		fnSetStatus("Resetting SalesOrders data (" + sSalesOrderService + ") ...");
+		const oHeaderResponse = await fetch(sSalesOrderService, {
 			method : "HEAD",
 			headers : {"X-CSRF-Token" : "Fetch"}
 		});
@@ -75,7 +75,7 @@ sap.ui.define([
 			fnSetStatus(failed("Head", oHeaderResponse));
 			return;
 		}
-		const oActionResponse = await fetch(`${sService}RegenerateEPMData`, {
+		const oActionResponse = await fetch(`${sSalesOrderService}RegenerateEPMData`, {
 			method : "POST",
 			headers : {"X-CSRF-Token" : oHeaderResponse.headers.get("X-CSRF-Token")}
 		});
@@ -114,6 +114,10 @@ sap.ui.define([
 			"Reset SalesOrders Data" : resetSalesOrders
 		},
 		apps : mApps,
+		serviceURLs : [
+			sSalesOrderService,
+			"/analytics/"
+		],
 		tests: mTests
 	};
 });

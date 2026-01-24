@@ -128,7 +128,7 @@ sap.ui.define([
 
 	/**
 	 * @param {sap.ui.dt.ElementOverlay} oElementOverlay - Overlay to be checked for editable
-	 * @returns {boolean} True if it's editable
+	 * @returns {boolean} <code>true</code> if it's editable
 	 * @private
 	 */
 	AnnotationPlugin.prototype._isEditable = function(oElementOverlay) {
@@ -157,7 +157,7 @@ sap.ui.define([
 	 * @public
 	 */
 	AnnotationPlugin.prototype.isEnabled = function(aElementOverlays) {
-		if (aElementOverlays.length !== 1) {
+		if (!this.isAvailable(aElementOverlays) || aElementOverlays.length !== 1) {
 			return false;
 		}
 

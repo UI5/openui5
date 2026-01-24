@@ -317,7 +317,7 @@ sap.ui.define([
 			// the resize handle does not disappear in the initial mousedown and mouseup event
 			// this will also prevent column press event to trigger
 			setTimeout(() => {
-				this._oHandle.remove();
+				this._oHandle?.remove();
 			}, 300);
 		}
 

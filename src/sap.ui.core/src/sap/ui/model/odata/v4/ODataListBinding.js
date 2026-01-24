@@ -779,7 +779,7 @@ sap.ui.define([
 
 		iCount ??= this.oCache.collapse(
 			_Helper.getRelativePath(oContext.getPath(), this.oHeaderContext.getPath()),
-			bAll ? this.lockGroup() : undefined, bSilent, false, this.getKeepAlivePredicates());
+			this.getKeepAlivePredicates(), bAll ? this.lockGroup() : undefined, bSilent, false);
 
 		if (iCount > 0) {
 			const aContexts = this.aContexts;
@@ -1777,7 +1777,7 @@ sap.ui.define([
 		let bDataRequested = false;
 		const sPath = _Helper.getRelativePath(oContext.getPath(), this.oHeaderContext.getPath());
 
-		return this.oCache.expand(this.lockGroup(), sPath, iLevels,
+		return this.oCache.expand(this.lockGroup(), sPath, iLevels, this.getKeepAlivePredicates(),
 			/*fnDataRequested*/ () => {
 				bDataRequested = true;
 				this.fireDataRequested();
@@ -3822,9 +3822,9 @@ sap.ui.define([
 		const sUpdateGroupId = this.getUpdateGroupId();
 		const oGroupLock = this.lockGroup(sUpdateGroupId, true, true); // after #getCanonicalPath!
 		const bUpdateSiblingIndex = oSiblingContext?.isEffectivelyKeptAlive();
-		const {promise : oPromise, refresh : bRefresh} = this.oCache.move(oGroupLock, sChildPath,
-			oChildContext.getPath().slice(1), sParentPath, sSiblingPath, bUpdateSiblingIndex,
-			bCopy);
+		const {promise : oPromise, refresh : bRefresh} = this.oCache.move(oGroupLock,
+			this.getKeepAlivePredicates(), sChildPath, oChildContext.getPath().slice(1),
+			sParentPath, sSiblingPath, bUpdateSiblingIndex, bCopy);
 
 		if (bRefresh) {
 			return SyncPromise.all([
@@ -4595,8 +4595,8 @@ sap.ui.define([
 		 * Adds an error handler to the given promise which reports errors to the model and ignores
 		 * cancellations.
 		 *
-		 * @param {Promise} oPromise - A promise
-		 * @returns {Promise} A promise including an error handler
+		 * @param {Promise<any>} oPromise - A promise
+		 * @returns {Promise<any>} A promise including an error handler
 		 */
 		function reportError(oPromise) {
 			return oPromise.catch(function (oError) {

@@ -1079,6 +1079,25 @@ sap.ui.define([
 		assert.strictEqual(oEvent.getMark(), true, "Event was marked so the parent control will know that it will be handled by the ObjectStatus");
 	});
 
+	QUnit.test("ObjectStatus marks the Event on tap", async function(assert) {
+		// Arrange
+		var oEvent = new jQuery.Event();
+		var oObjectStatus = new ObjectStatus({
+			icon: "sap-icon://alert",
+			active: true
+		});
+
+		// Act
+		oObjectStatus.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		oEvent.target = oObjectStatus.$().find(".sapMObjStatusIcon")[0];
+		oObjectStatus.ontap(oEvent);
+
+		assert.strictEqual(oEvent.getMark(), true, "Event was marked so the parent control will know that it will be handled by the ObjectStatus");
+		oObjectStatus.destroy();
+	});
+
 	QUnit.module("Keyboard handling");
 
 	QUnit.test("Enter", async function(assert) {

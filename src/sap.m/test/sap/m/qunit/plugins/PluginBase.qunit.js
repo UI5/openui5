@@ -132,6 +132,8 @@ sap.ui.define([
 		assert.ok(this.oPlugin.isActive(), "Active");
 		assert.ok(oOnActivate.calledAfter(oOnDeactivate),  "First deactivate, then activate");
 
+		this.oPluginMock.expects("onDeactivate").once().withExactArgs(oOtherControl);
+
 		oOtherControl.destroy();
 	});
 
@@ -146,13 +148,24 @@ sap.ui.define([
 		assert.notOk(this.oPlugin.isActive(), "Not active");
 	});
 
-	QUnit.test("Destroy", function(assert) {
+	QUnit.test("Destroy plugin", function(assert) {
 		this.oControl.addDependent(this.oPlugin);
 
 		this.oPluginMock.expects("onActivate").never();
 		this.oPluginMock.expects("onDeactivate").once().withExactArgs(this.oControl);
 
 		this.oPlugin.destroy();
+
+		assert.notOk(this.oPlugin.isActive(), "Not active");
+	});
+
+	QUnit.test("Destroy control", function(assert) {
+		this.oControl.addDependent(this.oPlugin);
+
+		this.oPluginMock.expects("onActivate").never();
+		this.oPluginMock.expects("onDeactivate").once().withExactArgs(this.oControl);
+
+		this.oControl.destroy();
 
 		assert.notOk(this.oPlugin.isActive(), "Not active");
 	});

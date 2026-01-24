@@ -5050,6 +5050,7 @@ sap.ui.define([
 		  * The mask will always be enforced for any time patterns.
 		  * <b>Note:</b> The mask functions correctly only with fixed-length time formats.
 		  * Using the <code>Enforce</code> value with time formats that do not have a fixed length may lead to unpredictable behavior.
+		  * @public
 		  */
 		 Enforce: "Enforce",
 
