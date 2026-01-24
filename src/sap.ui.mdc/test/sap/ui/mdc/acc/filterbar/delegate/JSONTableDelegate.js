@@ -1,14 +1,20 @@
 /* eslint-disable require-await */
 sap.ui.define([
+	"sap/ui/core/Element",
 	"sap/ui/mdc/TableDelegate",
 	"sap/ui/mdc/table/Column",
 	"sap/m/Text",
+	"sap/ui/model/Filter",
+	"sap/ui/model/FilterOperator",
 	"../model/metadata/JSONPropertyInfo",
 	"./JSONTableFilterDelegate"
 ], function (
+	Element,
 	TableDelegate,
 	Column,
 	Text,
+	Filter,
+	FilterOperator,
 	JSONPropertyInfo,
 	JSONTableFilterDelegate
 ) {
@@ -16,8 +22,12 @@ sap.ui.define([
 
 	const JSONTableDelegate = Object.assign({}, TableDelegate);
 
-	JSONTableDelegate.fetchProperties = async () =>
-		JSONPropertyInfo.filter((oPI) => oPI.key !== "$search");
+	JSONTableDelegate.fetchProperties = async (oTable) => {
+		const oPayload = oTable.getPayload();
+		const sBindingPath = oPayload?.bindingPath;
+		const aParts = sBindingPath?.split(">/");
+		return JSONPropertyInfo[aParts[1]].filter((oPI) => oPI.key !== "$search");
+	};
 
 	JSONTableDelegate.getFilterDelegate = () => JSONTableFilterDelegate;
 
@@ -35,7 +45,8 @@ sap.ui.define([
 	};
 
 	JSONTableDelegate.addItem = async (oTable, sPropertyKey) => {
-		const oPropertyInfo = JSONPropertyInfo.find((oPI) => oPI.key === sPropertyKey);
+		const aPropertiyInfos = await JSONTableDelegate.fetchProperties(oTable);
+		const oPropertyInfo = aPropertiyInfos.find((oPI) => oPI.key === sPropertyKey);
 		const sId = oTable.getId() + "---col-" + sPropertyKey;
 		return await _createColumn(sId, oPropertyInfo);
 	};
@@ -43,6 +54,37 @@ sap.ui.define([
 	JSONTableDelegate.updateBindingInfo = (oTable, oBindingInfo) => {
 		TableDelegate.updateBindingInfo.call(JSONTableDelegate, oTable, oBindingInfo);
 		oBindingInfo.path = oTable.getPayload().bindingPath;
+
+		// add search filter
+		const sFilter = oTable.getFilter();
+		const oFilterBar = sFilter && Element.getElementById(sFilter);
+		const sSearch = oFilterBar?.getSearch();
+		if (sSearch) {
+			const oPayload = oTable.getPayload();
+			const aSearchKeys = oPayload.searchKeys || [];
+			const aFilters = [];
+			let oSearchFilter;
+			aSearchKeys.forEach((sPropertyKey) => {
+				aFilters.push(new Filter(sPropertyKey, FilterOperator.Contains, sSearch));
+			});
+			if (aFilters.length > 1) {
+				oSearchFilter = new Filter({
+					filters: aFilters,
+					and: false
+				});
+			} else {
+				oSearchFilter = aFilters[0];
+			}
+			if (oBindingInfo.filters?.length > 0) {
+				oBindingInfo.filters = new Filter({
+					filters: [oBindingInfo.filters, oSearchFilter],
+					and: true
+				});
+			} else {
+				oBindingInfo.filters = oSearchFilter;
+			}
+		}
+
 	};
 
 	return JSONTableDelegate;

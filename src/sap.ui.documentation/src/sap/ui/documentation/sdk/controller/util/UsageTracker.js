@@ -24,8 +24,10 @@ sap.ui.define(
             const oURL = new URL(sURL),
                 sSectionTitle = oRouter.getRouteTopLevelTitle(oRouteConfig);
 
+            var sHash = oURL.hash.replace(/\.html/, '');
+
             this.url = sURL;
-            this.name = oURL.pathname + oURL.hash;
+            this.name = oURL.pathname + sHash;
             this.section = sSectionTitle || "/";
             this.title = undefined;
             this.language = oUserLanguageTag.language;
@@ -248,6 +250,7 @@ sap.ui.define(
                  * Triggered when router does not find the route
                  */
                 _logPageNotFound: function (sHash) {
+                    sHash = sHash.replace(/\.html/, '');
                     this._addToLogs({
                         event: "errorPage",
                         page: {
@@ -272,9 +275,10 @@ sap.ui.define(
                         oPageInfo = new PageInfo(oRouteConfig, this._oRouter);
                     } else {
                         var oURL = new URL(window.location.href);
+                        var sHash = oURL.hash.replace(/\.html/, '');
                         oPageInfo = {
                             url: window.location.href,
-                            name: oURL.pathname + oURL.hash,
+                            name: oURL.pathname + sHash,
                             section: "/"
                         };
                     }

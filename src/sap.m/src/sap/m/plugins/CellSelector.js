@@ -360,22 +360,11 @@ sap.ui.define([
 		if (this._oSession) {
 			this.removeSelection();
 			this._oSession = null;
-			this._mTimeouts = null;
 		}
 
+		this._mTimeouts = null;
 		this._deregisterEvents();
 		this._onSelectableChange();
-	};
-
-	CellSelector.prototype.exit = function() {
-		if (this.getControl()  && !this.getControl().isDestroyed() && this._oSession) {
-			this.removeSelection();
-		}
-		this._deregisterEvents();
-		this._oSession = null;
-		this._mTimeouts = null;
-
-		PluginBase.prototype.exit.call(this);
 	};
 
 	/**

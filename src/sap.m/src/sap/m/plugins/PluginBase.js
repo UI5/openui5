@@ -246,19 +246,24 @@ sap.ui.define(["sap/ui/core/Element"], function(Element) {
 	PluginBase.prototype.onDeactivate = function(oControl) {};
 
 	/**
+	 * Deactivates the plugin when the plugin is destroyed.
+	 *
+	 * @override
+	 */
+	PluginBase.prototype.exit = function() {
+		Element.prototype.exit.call(this);
+		this._deactivate();
+	};
+
+	/**
 	 * Activates or deactivates the plugin when the parent of the plugin is set.
 	 *
 	 * @override
 	 */
 	PluginBase.prototype.setParent = function() {
 		this._deactivate();
-
 		Element.prototype.setParent.apply(this, arguments);
-
-		if (this.getEnabled()) {
-			this._activate();
-		}
-
+		this._activate();
 		return this;
 	};
 
@@ -300,7 +305,7 @@ sap.ui.define(["sap/ui/core/Element"], function(Element) {
 	 * Internal plugin activation handler
 	 */
 	PluginBase.prototype._activate = function() {
-		if (this._bActive) {
+		if (this._bActive || !this.getEnabled()) {
 			return;
 		}
 

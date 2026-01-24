@@ -1580,7 +1580,7 @@ sap.ui.define([
 	 *   loaded because they may have changed due to side effects of a previous update
 	 * @param {sap.ui.model.odata.v4.Context} [oContext]
 	 *   The context for which to request side effects; if missing, the whole binding is affected
-	 * @param {Promise[]} aPromises
+	 * @param {Array<sap.ui.base.SyncPromise<void>>} aPromises
 	 *   List of (sync) promises which is extended for each call to
 	 *   {@link sap.ui.model.odata.v4.ODataParentBinding#requestSideEffects} or
 	 *   {@link #refreshInternal}

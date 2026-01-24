@@ -1369,7 +1369,7 @@ sap.ui.define([
 	 *
 	 * @param {string} sGroupId
 	 *   ID of the group which should be sent as an OData batch request
-	 * @returns {Promise}
+	 * @returns {Promise<void>}
 	 *   A promise on the outcome of the HTTP request resolving with <code>undefined</code>; it is
 	 *   rejected with an error if the batch request itself fails
 	 * @throws {Error}
@@ -1520,7 +1520,7 @@ sap.ui.define([
 	 *
 	 * @param {object[]} aRequests The requests of the current batch
 	 * @param {string} sGroupId The group ID
-	 * @returns {Promise|undefined}
+	 * @returns {Promise<object[]>|undefined}
 	 *   The optimistic batch result or <code>undefined</code> if the batch should be sent
 	 *   normally. <code>undefined</code> can have the following reasons:
 	 *   <ul>
@@ -1777,7 +1777,7 @@ sap.ui.define([
 	 * Removes the pending PATCH or DELETE request for the given promise from its group. Only
 	 * requests for which the <code>$cancel</code> callback is defined are removed.
 	 *
-	 * @param {Promise} oPromise
+	 * @param {Promise<any>} oPromise
 	 *   A promise that has been returned for a PATCH or DELETE request. That request will be
 	 *   rejected with an error with property <code>canceled = true</code>.
 	 * @throws {Error}
@@ -1921,7 +1921,7 @@ sap.ui.define([
 	 *   Function which is called during merging of GET or PATCH requests. If a merged request has a
 	 *   function given, this function will be called and its return value is given to the one
 	 *   remaining request's function as a parameter. See also <code>vOwner</code>.
-	 * @returns {Promise}
+	 * @returns {Promise<object>}
 	 *   A promise on the outcome of the HTTP request; it will be rejected with an error having the
 	 *   property <code>canceled = true</code> instead of sending a request if
 	 *   <code>oGroupLock</code> is already canceled.
@@ -2054,7 +2054,7 @@ sap.ui.define([
 	 * @param {object[]} aRequests The requests
 	 * @param {string} sGroupId The group ID
 	 * @param {boolean} bHasChanges Whether the batch contains change requests
-	 * @returns {Promise} A promise on the responses
+	 * @returns {Promise<object[]>} A promise on the responses
 	 *
 	 * @private
 	 */
@@ -2123,7 +2123,7 @@ sap.ui.define([
 	 *   Data to be sent to the server
 	 * @param {string} [sOriginalResourcePath]
 	 *  The path by which the resource has originally been requested; MUST NOT be "R#V#C"!
-	 * @returns {Promise}
+	 * @returns {Promise<{body:object,contentType:string,messages:string,resourcePath:string}>}
 	 *   A promise that is resolved with an object having the properties body, contentType, messages
 	 *   and resourcePath. The body is already an object if the contentType is "application/json".
 	 *   The messages are retrieved from the "sap-messages" response header. The promise is rejected

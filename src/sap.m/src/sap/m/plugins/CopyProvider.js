@@ -244,10 +244,15 @@ sap.ui.define(["./PluginBase", "sap/base/Log", "sap/base/strings/formatMessage",
 
 	CopyProvider.prototype.setParent = function() {
 		PluginBase.prototype.setParent.apply(this, arguments);
-		if (!this.getParent() && this._oCopyButton) {
-			this._oCopyButton.destroy(true);
-			this._oCopyButton = null;
+		if (!this.getParent()) {
+			this._destroyCopyButton();
 		}
+	};
+
+	CopyProvider.prototype.exit = function() {
+		PluginBase.prototype.exit.call(this);
+		this._mColumnClipboardSettings = null;
+		this._destroyCopyButton();
 	};
 
 	/**
@@ -283,16 +288,6 @@ sap.ui.define(["./PluginBase", "sap/base/Log", "sap/base/strings/formatMessage",
 			});
 		}
 		return this._oCopyButton;
-	};
-
-	CopyProvider.prototype.exit = function() {
-		if (this._oCopyButton) {
-			this._oCopyButton.destroy(true);
-			this._oCopyButton = null;
-		}
-		if (this._mColumnClipboardSettings) {
-			this._mColumnClipboardSettings = null;
-		}
 	};
 
 	/**
@@ -522,6 +517,13 @@ sap.ui.define(["./PluginBase", "sap/base/Log", "sap/base/strings/formatMessage",
 			this.getConfig("hasSelection", this.getControl()) ||
 			this.getPlugin("sap.m.plugins.CellSelector")?.hasSelection()
 		);
+	};
+
+	CopyProvider.prototype._destroyCopyButton = function() {
+		if (this._oCopyButton) {
+			this._oCopyButton.destroy();
+			this._oCopyButton = null;
+		}
 	};
 
 	CopyProvider.prototype._getEffectiveVisible = function() {

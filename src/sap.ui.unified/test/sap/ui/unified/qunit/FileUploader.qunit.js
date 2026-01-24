@@ -1311,6 +1311,45 @@ sap.ui.define([
 		oFileUploader.destroy();
 	});
 
+	QUnit.test("setValue('') clears file selection when FileUploader is invisible", async function (assert) {
+		// Prepare
+		var oFileUploader = new FileUploader(),
+			file = new File(["test"], "test.txt", {
+				type: "text/plain"
+			});
+
+		oFileUploader.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		const oFileInput = oFileUploader.getDomRef("fu");
+
+		// Simulate file selection
+		var oTransfer = new DataTransfer();
+		oTransfer.items.add(file);
+		oFileInput.files = oTransfer.files;
+		oFileUploader.setValue(file.name);
+		await nextUIUpdate();
+
+		// Assert file is selected
+		assert.equal(oFileUploader.getValue(), "test.txt", "File name is set correctly");
+		assert.equal(oFileInput.files.length, 1, "File is selected");
+
+		// Hide the FileUploader
+		oFileUploader.setVisible(false);
+		await nextUIUpdate();
+
+		// Act - clear the value while invisible
+		oFileUploader.setValue("");
+		await nextUIUpdate();
+
+		// Assert - both value and file selection should be cleared
+		assert.equal(oFileUploader.getValue(), "", "Value is cleared");
+		assert.equal(oFileInput.files.length, 0, "File selection is cleared even though FileUploader is invisible");
+
+		// Cleanup
+		oFileUploader.destroy();
+	});
+
 	/**
 	 * Test private functions
 	 */

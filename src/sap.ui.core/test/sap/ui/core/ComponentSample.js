@@ -12,7 +12,7 @@ sap.ui.define([
   });
 
   var oComponent = await Component.create({
-	  manifestUrl: "samples/components/sample/manifest.json"
+	  manifest: "samples/components/sample/manifest.json"
   });
 
   var oContainer = new ComponentContainer({

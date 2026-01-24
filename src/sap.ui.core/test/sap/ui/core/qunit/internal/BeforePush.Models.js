@@ -156,6 +156,9 @@ sap.ui.define([
 
 	return {
 		apps : mApps,
+		serviceURLs : [
+			"/sap/opu/odata/sap/ZUI5_GWSAMPLE_BASIC/"
+		],
 		tests: mTests
 	};
 });

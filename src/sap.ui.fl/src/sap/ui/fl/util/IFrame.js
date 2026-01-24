@@ -161,9 +161,8 @@ sap.ui.define([
 		},
 
 		applySettings(mSettings, ...aOtherArgs) {
-			const { url, ...mOtherSettings } = mSettings || {};
-			Control.prototype.applySettings.apply(this, [mOtherSettings, ...aOtherArgs]);
-			Control.prototype.applySettings.apply(this, [{ url }, ...aOtherArgs]);
+			this.unbindProperty("url");
+			Control.prototype.applySettings.apply(this, [mSettings, ...aOtherArgs]);
 			if (mSettings) {
 				let mMergedSettings = { ...this.getProperty("_settings") || {} };
 				if (mSettings._settings) {

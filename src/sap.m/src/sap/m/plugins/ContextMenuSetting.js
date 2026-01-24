@@ -52,6 +52,7 @@ sap.ui.define([
 	};
 
 	ContextMenuSetting.prototype.exit = function() {
+		PluginBase.prototype.exit.call(this);
 		this._oObserver.destroy();
 		this._oObserver = null;
 	};

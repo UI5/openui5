@@ -29298,7 +29298,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				.expectChange("salesNumber", [, "200", "300"]);
 
 			// Note: while #requestRefresh does not keep the tree state and thus implicitly collapses,
-			// this still poses some addt'l complication w.r.t. _AC#isSelectionDifferent
+			// this still poses some addt'l complication w.r.t. ODLB#getKeepAlivePredicates
 			oContextA.collapse();
 
 			await this.waitForChanges(assert, "collapse 'A' again");
@@ -29584,7 +29584,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				.expectChange("salesNumber", [,, "200"]);
 
 			// Note: while #requestRefresh does not keep the tree state and thus implicitly collapses,
-			// this still poses some addt'l complication w.r.t. _AC#isSelectionDifferent
+			// this still poses some addt'l complication w.r.t. ODLB#getKeepAlivePredicates
 			oContextA.collapse();
 
 			await this.waitForChanges(assert, "collapse 'A' again");
@@ -32139,6 +32139,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	//
 	// #setAggregation before resolving the ODLB (JIRA: CPOUI5ODATAV4-2408)
 	// Collapse root and then PATCH the kept-alive child (SNOW: DINC0702621)
+	// Request a side effect (not refresh!) and expand again (JIRA: CPOUI5ODATAV4-3311)
 	[false, true].forEach(function (bSuspended) {
 		var sTitle = "Recursive Hierarchy: getKeepAliveContext, suspended = " + bSuspended;
 
@@ -32170,7 +32171,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 			// 1 Beta
 			//   2 Kappa
-			//   3 Lambda (getKeepAliveContext)
+			//   3 Lambda (1st getKeepAliveContext)
+			//   4 Mu (2nd getKeepAliveContext)
 
 			this.expectChange("age")
 				.expectChange("name");
@@ -32224,10 +32226,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						+ ",NodeProperty='ID',Levels=2)"
 						+ "&$select=DescendantCount,DistanceFromRoot,DrillState,ID,MANAGER_ID,Name"
 						+ "&$count=true&$skip=0&$top=3", {
-						"@odata.count" : "3",
+						"@odata.count" : "4",
 						value : [{
 							"@odata.etag" : "etag1",
-							DescendantCount : "2",
+							DescendantCount : "3",
 							DistanceFromRoot : "0",
 							DrillState : "expanded",
 							ID : "1",
@@ -32273,7 +32275,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					[true, 1, "1", "", "Beta"],
 					[undefined, 2, "2", "1", "Kappa"],
 					[undefined, 2, "3", "1", "Lambda"]
-				]);
+				], 4);
 				assert.strictEqual(oListBinding.getAllCurrentContexts()[2], oContext, "reused");
 				assert.strictEqual(oContext.isKeepAlive(), true, "still kept alive");
 				assert.deepEqual(oContext.getObject(), {
@@ -32296,12 +32298,12 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					}, "merged");
 
 				//TODO what a stupid request :-(
-				that.expectRequest("EMPLOYEES('5')?$select=ID", {
-						ID : "5"
+				that.expectRequest("EMPLOYEES('4')?$select=ID", {
+						ID : "4"
 					});
 
 				// code under test
-				oModel.getKeepAliveContext("/EMPLOYEES('5')");
+				oModel.getKeepAliveContext("/EMPLOYEES('4')");
 
 				return that.waitForChanges(assert, "ODLB#getKeepAliveContext");
 			}).then(function () {
@@ -32311,7 +32313,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			}).then(function () {
 				checkTable("after collapse", assert, oTable, [
 					"/EMPLOYEES('1')",
-					"/EMPLOYEES('5')",
+					"/EMPLOYEES('4')",
 					"/EMPLOYEES('3')"
 				], [
 					[false, 1, "1", "", "Beta"]
@@ -32332,6 +32334,84 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				oContext.setProperty("Name", "Lambda (Λλ)");
 
 				return that.waitForChanges(assert, "PATCH");
+			}).then(function () {
+				that.expectRequest("EMPLOYEES?$select=ID,Name"
+						+ "&$filter=ID eq '1' or ID eq '3' or ID eq '4'&$top=3", {
+						value : [{
+							"@odata.etag" : "etag1.1",
+							ID : "1",
+							Name : "Beta #1"
+
+						}, {
+							"@odata.etag" : "etag3.1",
+							ID : "3",
+							Name : "Lambda #1"
+						}, {
+							"@odata.etag" : "etag4.1",
+							ID : "4",
+							Name : "Mu #1"
+						}]
+					})
+					.expectChange("name", "Lambda #1");
+
+				return Promise.all([
+					// preparation (JIRA: CPOUI5ODATAV4-3311)
+					oListBinding.getHeaderContext().requestSideEffects(["Name"]),
+					that.waitForChanges(assert, "side effect while collapsed")
+				]);
+			}).then(function () {
+				that.expectRequest("EMPLOYEES?$apply=com.sap.vocabularies.Hierarchy.v1.TopLevels("
+						+ "HierarchyNodes=$root/EMPLOYEES,HierarchyQualifier='OrgChart'"
+						+ ",NodeProperty='ID',Levels=2)"
+						+ "&$select=DescendantCount,DistanceFromRoot,DrillState,ID,MANAGER_ID,Name"
+						+ "&$skip=1&$top=1", {
+						value : [{
+							"@odata.etag" : "etag2.1",
+							DescendantCount : "0",
+							DistanceFromRoot : "1",
+							DrillState : "leaf",
+							ID : "2",
+							MANAGER_ID : "1",
+							Name : "Kappa #1"
+						}]
+					});
+
+				return Promise.all([
+					// code under test (JIRA: CPOUI5ODATAV4-3311)
+					oListBinding.getCurrentContexts()[0].expand(),
+					that.waitForChanges(assert, "expand again")
+				]);
+			}).then(function () {
+				checkTable("after expand", assert, oTable, [
+					"/EMPLOYEES('1')",
+					"/EMPLOYEES('2')",
+					"/EMPLOYEES('3')",
+					"/EMPLOYEES('4')"
+				], [
+					[true, 1, "1", "", "Beta #1"],
+					[undefined, 2, "2", "1", "Kappa #1"],
+					[undefined, 2, "3", "1", "Lambda #1"]
+				]);
+				assert.strictEqual(oListBinding.getAllCurrentContexts()[2], oContext, "reused");
+				assert.strictEqual(oContext.isKeepAlive(), true, "still kept alive");
+				assert.deepEqual(oContext.getObject(), {
+						"@odata.etag" : "etag3.1",
+						// "@$ui5.node.isExpanded" : undefined,
+						"@$ui5.node.level" : 2,
+						AGE : 57,
+						ID : "3",
+						MANAGER_ID : "1",
+						Name : "Lambda #1",
+						ROOM_ID : "3.0",
+						__CT__FAKE__Message : {
+							__FAKE__Messages : [{
+								message : "You're looking younger than ever!",
+								numericSeverity : 2,
+								target : "AGE",
+								transition : false
+							}]
+						}
+					}, "merged again");
 			});
 		});
 	});
@@ -37479,6 +37559,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// as well.
 	// JIRA: CPOUI5ODATAV4-2325
 	//
+	// Request a side effect to make "spliced" $stale, but keep the contained nodes alive or
+	// effectively alive via selection.
+	// JIRA: CPOUI5ODATAV4-3311
+	//
 	// Move "Kappa" so that "Beta" becomes its parent, thus expanding it again, then check the
 	// level of the latter's children.
 	// JIRA: CPOUI5ODATAV4-2326
@@ -37610,6 +37694,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			let oBeta = oTable.getRows()[1].getBindingContext();
 			const oOmega = oTable.getRows()[6].getBindingContext();
 
+			// preparation (JIRA: CPOUI5ODATAV4-3311)
+			oTable.getRows()[2].getBindingContext().setKeepAlive(true); // Gamma
+			oTable.getRows()[3].getBindingContext().setSelected(true); // Zeta
+
 			this.expectChange("id", [,, "2", "3", "9"]);
 
 			oBeta.collapse();
@@ -37621,14 +37709,16 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				"/EMPLOYEES('1')",
 				"/EMPLOYEES('2')",
 				"/EMPLOYEES('3')",
-				"/EMPLOYEES('9')"
+				"/EMPLOYEES('9')",
+				"/EMPLOYEES('1.1')", // keep alive
+				"/EMPLOYEES('1.2')" // selected
 			], [
 				[true, 1, "0", "", "Alpha", 60],
 				[false, 2, "1", "0", "Beta", 55],
 				[undefined, 2, "2", "0", "Kappa", 56],
 				[undefined, 2, "3", "0", "Lambda", 57],
 				[undefined, 1, "9", "", "Omega", 69]
-			]);
+			], 5);
 
 			if (bMoveCollapsed) {
 				this.expectChange("id", [, "9"]);
@@ -37662,14 +37752,16 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					"/EMPLOYEES('1')",
 					"/EMPLOYEES('2')",
 					"/EMPLOYEES('3')",
-					"/EMPLOYEES('9')"
+					"/EMPLOYEES('9')",
+					"/EMPLOYEES('1.1')", // keep alive
+					"/EMPLOYEES('1.2')" // selected
 				], [
 					[true, 1, "0", "", "Alpha", 60],
 					[false, 2, "1", "0", "Beta", 55],
 					[undefined, 2, "2", "0", "Kappa", 56],
 					[undefined, 2, "3", "0", "Lambda", 57],
 					[undefined, 1, "9", "", "Omega", 69]
-				]);
+				], 5);
 				assert.strictEqual(oTable.getRows()[1].getBindingContext(), oBeta, "unchanged");
 
 				// wait for UI changes caused by "change" event above
@@ -37732,18 +37824,51 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				"/EMPLOYEES('0')",
 				"/EMPLOYEES('1')",
 				"/EMPLOYEES('2')",
-				"/EMPLOYEES('3')"
+				"/EMPLOYEES('3')",
+				"/EMPLOYEES('1.1')", // keep alive
+				"/EMPLOYEES('1.2')" // selected
 			], [
 				[true, 1, "9", "", "Omega", 69],
 				[true, 2, "0", ""/*TODO "9"*/, "Alpha", 60],
 				[false, 3, "1", "0", "Beta", 55],
 				[undefined, 3, "2", "0", "Kappa", 56],
 				[undefined, 3, "3", "0", "Lambda", 57]
-			]);
+			], 5);
 			oBeta = oTable.getRows()[2].getBindingContext();
 			const oKappa = oTable.getRows()[3].getBindingContext();
 			checkPersisted(assert, oKappa);
 			assert.strictEqual(oAlpha.getIndex(), 1);
+
+			this.expectRequest("EMPLOYEES?$select=ID,Name&$filter=ID eq '0' or ID eq '1' or ID eq '1.1'"
+					+ " or ID eq '1.2' or ID eq '2' or ID eq '3' or ID eq '9'&$top=7", {
+					value : [{
+						ID : "0",
+						Name : "Alpha"
+					}, {
+						ID : "1",
+						Name : "Beta"
+					}, {
+						ID : "1.1",
+						Name : "Gamma"
+					}, {
+						ID : "1.2",
+						Name : "Zeta"
+					}, {
+						ID : "2",
+						Name : "Kappa"
+					}, {
+						ID : "3",
+						Name : "Lambda"
+					}, {
+						ID : "9",
+						Name : "Omega"
+					}]
+				});
+
+			await Promise.all([
+				oAlpha.getBinding().getHeaderContext().requestSideEffects(["Name"]),
+				this.waitForChanges(assert, "side effect for Name (JIRA: CPOUI5ODATAV4-3311)")
+			]);
 
 			// 9 Omega
 			//   0 Alpha
@@ -37756,7 +37881,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					[, "change", {reason : "change"}]
 				])
 				.expectRequest("PATCH EMPLOYEES('2')", {
-					batchNo : bMoveCollapsed ? 3 : 4,
+					batchNo : bMoveCollapsed ? 4 : 5,
 					headers : {
 						Prefer : "return=minimal"
 					},
@@ -37765,7 +37890,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					}
 				}, oNO_CONTENT)
 				.expectRequest(sBaseUrl + "&$filter=ID eq '2'&$select=LimitedRank", {
-					batchNo : bMoveCollapsed ? 3 : 4
+					batchNo : bMoveCollapsed ? 4 : 5
 				}, {
 					value : [{
 						LimitedRank : "4" // Edm.Int64
@@ -37824,7 +37949,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					[, "change", {reason : "change"}]
 				])
 				.expectRequest("PATCH EMPLOYEES('0')", {
-					batchNo : bMoveCollapsed ? 4 : 5,
+					batchNo : bMoveCollapsed ? 5 : 6,
 					headers : {
 						Prefer : "return=minimal"
 					},
@@ -37833,7 +37958,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					}
 				}, oNO_CONTENT)
 				.expectRequest(sBaseUrl + "&$filter=ID eq '0'&$select=LimitedRank", {
-					batchNo : bMoveCollapsed ? 4 : 5
+					batchNo : bMoveCollapsed ? 5 : 6
 				}, {
 					value : [{
 						LimitedRank : "1" // Edm.Int64
@@ -37870,9 +37995,11 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// Scenario: Show the top pyramid of a recursive hierarchy, expanded to level 2. Expand a node,
 	// collapse another. Move a leaf; this causes a side-effects refresh in order to turn the cache
 	// into a unified cache. Afterwards, move a node with children first to a collapsed new parent,
-	// then to a leaf at the edge of the top pyramid. Finally, collapse that former leaf, move
-	// another node to it, and request a side-effects refresh to check the tree state.
+	// then to a leaf at the edge of the top pyramid. Finally, collapse that former leaf, (*), move
+	// another node to it. Observe side-effects request to check the tree state.
 	// JIRA: CPOUI5ODATAV4-2466
+	//
+	// (*) Request a side effect to make "spliced" $stale (JIRA: CPOUI5ODATAV4-3311)
 	QUnit.test("Recursive Hierarchy: move w/ expandTo : 2", async function (assert) {
 		const sBaseUrl = "EMPLOYEES?$apply=com.sap.vocabularies.Hierarchy.v1.TopLevels("
 			+ "HierarchyNodes=$root/EMPLOYEES,HierarchyQualifier='OrgChart',NodeProperty='ID'"
@@ -38344,6 +38471,28 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		]);
 		const oAlpha = oTable.getRows()[0].getBindingContext();
 
+		this.expectRequest("EMPLOYEES?$select=ID,Name"
+				+ "&$filter=ID eq '0' or ID eq '2' or ID eq '8' or ID eq '9'&$top=4", {
+				value : [{
+					ID : "0",
+					Name : "Alpha #1"
+				}, {
+					ID : "2",
+					Name : "Epsilon #1"
+				}, {
+					ID : "8",
+					Name : "Eta #1"
+				}, {
+					ID : "9",
+					Name : "Theta #1"
+				}]
+			});
+
+		await Promise.all([
+			oAlpha.getBinding().getHeaderContext().requestSideEffects(["Name"], "$auto"),
+			this.waitForChanges(assert, "side effect for Name (JIRA: CPOUI5ODATAV4-3311)")
+		]);
+
 		// 8 Eta
 		//   9 Theta (expanded by move)
 		//     1 Beta
@@ -38352,7 +38501,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		//       1.2 Delta
 		//     0 Alpha (moved here)
 		//       2 Epsilon
-		this.expectRequest("#6 PATCH EMPLOYEES('0')", {
+		this.expectRequest("#7 PATCH EMPLOYEES('0')", {
 				headers : {
 					Prefer : "return=minimal"
 				},
@@ -38360,14 +38509,45 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					"EMPLOYEE_2_MANAGER@odata.bind" : "EMPLOYEES('9')"
 				}
 			}, oNO_CONTENT)
-			.expectRequest("#6 " + sBaseUrl.slice(0, -1) + ",ExpandLevels=" // Note: Levels=2
+			// Note: Levels=2; Theta properly expanded (again)
+			.expectRequest("#7 " + sBaseUrl.slice(0, -1) + ",ExpandLevels="
 				+ JSON.stringify([{NodeID : "1", Levels : 1}, {NodeID : "9", Levels : 1}])
 				+ ")&$filter=ID eq '0'&$select=LimitedRank", {
 				value : [{
 					LimitedRank : "6" // Edm.Int64
 				}]
 			})
-			.expectChange("id", ["8", "9", "1", "1.1", "3", "1.2", "0", "2"]);
+			.expectChange("id", ["8", "9",,,,, "0", "2"])
+			.expectRequest("#8 " + sBaseUrl.slice(0, -1) + ",ExpandLevels="
+				+ JSON.stringify([{NodeID : "1", Levels : 1}, {NodeID : "9", Levels : 1}])
+				+ ")&$select=DescendantCount,DistanceFromRoot,DrillState,ID,Name&$skip=2&$top=4", {
+				value : [{
+					DescendantCount : "3",
+					DistanceFromRoot : "2",
+					DrillState : "expanded",
+					ID : "1",
+					Name : "Beta #1"
+				}, {
+					DescendantCount : "0",
+					DistanceFromRoot : "3",
+					DrillState : "leaf",
+					ID : "1.1",
+					Name : "Gamma #1"
+				}, {
+					DescendantCount : "0",
+					DistanceFromRoot : "3",
+					DrillState : "leaf",
+					ID : "3",
+					Name : "Zeta #1"
+				}, {
+					DescendantCount : "0",
+					DistanceFromRoot : "3",
+					DrillState : "leaf",
+					ID : "1.2",
+					Name : "Delta #1"
+				}]
+			})
+			.expectChange("id", [,, "1", "1.1", "3", "1.2"]);
 
 		await Promise.all([
 			// code under test
@@ -38386,34 +38566,14 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			"/EMPLOYEES('0')",
 			"/EMPLOYEES('2')"
 		], [
-			[true, 1, "8", "Eta"],
-			[true, 2, "9", "Theta"],
-			[true, 3, "1", "Beta"],
-			[undefined, 4, "1.1", "Gamma"],
-			[undefined, 4, "3", "Zeta"],
-			[undefined, 4, "1.2", "Delta"],
-			[true, 3, "0", "Alpha"],
-			[undefined, 4, "2", "Epsilon"]
-		]);
-
-		// Note: Levels=2; Theta properly expanded (again)
-		this.expectRequest("#7 " + sBaseUrl.slice(0, -1) + ",ExpandLevels="
-				+ JSON.stringify([{NodeID : "1", Levels : 1}, {NodeID : "9", Levels : 1}])
-				+ ")&$select=DescendantCount,DistanceFromRoot,DrillState,ID,Name"
-				+ "&$count=true&$skip=0&$top=10", {
-				"@odata.count" : "0",
-				value : []
-			});
-
-		await Promise.all([
-			// code under test
-			oAlpha.getBinding().getHeaderContext().requestSideEffects([""]),
-			oModel.submitBatch("update"),
-			this.waitForChanges(assert, "side-effects refresh")
-		]);
-
-		checkTable("after side-effects refresh", assert, oTable, [], [
-			[undefined, undefined, "", ""] // all empty
+			[true, 1, "8", "Eta #1"],
+			[true, 2, "9", "Theta #1"],
+			[true, 3, "1", "Beta #1"],
+			[undefined, 4, "1.1", "Gamma #1"],
+			[undefined, 4, "3", "Zeta #1"],
+			[undefined, 4, "1.2", "Delta #1"],
+			[true, 3, "0", "Alpha #1"],
+			[undefined, 4, "2", "Epsilon #1"]
 		]);
 	});
 
@@ -42595,7 +42755,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				[true, 3, "1.1", "Gamma"]
 			], 14);
 			const oAlpha = oTable.getRows()[0].getBindingContext();
-			let oBeta = oTable.getRows()[1].getBindingContext();
+			const oBeta = oTable.getRows()[1].getBindingContext();
 			const oListBinding = oAlpha.getBinding();
 			assert.strictEqual(oBeta.getIndex(), 1);
 
@@ -42649,7 +42809,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				[undefined, 3, "3.1", "Theta"],
 				[undefined, 3, "3.2", "Iota"]
 			], 14);
-			let oEta = oTable.getRows()[0].getBindingContext();
+			const oEta = oTable.getRows()[0].getBindingContext();
 
 			// 0 Alpha
 			//   2 Zeta (loaded later)
@@ -42827,9 +42987,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					[undefined, 2, "10.1", "Gimel"]
 				]);
 
+			oBeta.setKeepAlive(true);
+
 			// code under test
-			oEta.collapse(); // Note: this eventually destroys oBeta!
-			oBeta = null;
+			oEta.collapse(); // Note: this MUST NOT destroy oBeta!
 
 			await this.checkAllContexts("after collapse Eta", assert, oListBinding,
 				["@$ui5.node.isExpanded", "@$ui5.node.level", "ArtistID", "Name"], [
@@ -42842,9 +43003,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					[undefined, 2, "10.1", "Gimel"]
 				]);
 
+			oEta.setKeepAlive(true);
+
 			// code under test
-			oAlpha.collapse(); // Note: this eventually destroys oEta!
-			oEta = null;
+			oAlpha.collapse(); // Note: this MUST NOT destroy oEta!
 
 			await this.checkAllContexts("after collapse Alpha", assert, oListBinding,
 				["@$ui5.node.isExpanded", "@$ui5.node.level", "ArtistID", "Name"], [
@@ -42855,7 +43017,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				]);
 			const [, oAleph, oBeth, oGimel] = oListBinding.getAllCurrentContexts();
 
-			// 0 Alpha
+			// 0 Alpha (collapsed)
 			//   2 Zeta
 			//   3 Eta
 			//     3.1 Theta
@@ -42985,8 +43147,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					[undefined, 2, "10", "Beth"]
 				]);
 
-			oEta = oListBinding.getAllCurrentContexts()[2];
-			assert.strictEqual(oEta.getProperty("Name"), "Eta", "double check that index was right");
+			assert.strictEqual(oListBinding.getAllCurrentContexts()[2], oEta);
 
 			// code under test
 			await oEta.expand();
@@ -43009,8 +43170,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					[undefined, 2, "10", "Beth"]
 				]);
 
-			oBeta = oListBinding.getAllCurrentContexts()[5];
-			assert.strictEqual(oBeta.getProperty("Name"), "Beta", "double check that index was right");
+			assert.strictEqual(oListBinding.getAllCurrentContexts()[5], oBeta);
 
 			if (bMakeRoot) {
 				this.expectRequest("#9 PATCH Artists(ArtistID='1',IsActiveEntity=false)", {

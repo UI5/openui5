@@ -42,7 +42,6 @@
 	"use strict";
 	var mParameters = getQueryParameters(),
 		sLastKey = "BeforePush." + mParameters.team + ".last",
-		sServiceDocument = "/sap/opu/odata4/sap/zui5_testv4/default/sap/zui5_epm_sample/0002/",
 		mVariants = {
 			"All tests" : {},
 			"Integration tests only" : {integrationTestsOnly : true},
@@ -62,6 +61,27 @@
 			oButton.innerText = sTitle;
 			oButton.onclick = fnAction.bind(null, setStatus);
 			oDiv.appendChild(oButton);
+		}
+	}
+
+	// If called without a status a new line for a connection check is added with the given text;
+	// call it again with a status to appended the status with the given text to the current
+	// connection check line.
+	function addToConnectionCheck(sText, bStatus) {
+		const oElement = document.getElementById("connectionCheck");
+		if (bStatus === undefined) {
+			// First call: create a new line with the description
+			const oLineDiv = document.createElement("div");
+			oLineDiv.appendChild(document.createTextNode(sText));
+			oElement.appendChild(oLineDiv);
+		} else {
+			const oLineDiv = oElement.lastChild;
+			const oStatusSpan = document.createElement("span");
+			oStatusSpan.classList.add("status");
+			oStatusSpan.classList.add(bStatus ? "connectionCheckOK" : "connectionCheckFailed");
+			oStatusSpan.appendChild(document.createTextNode(bStatus ? "\u2714" : "\u2716"));
+			oLineDiv.appendChild(oStatusSpan);
+			oLineDiv.appendChild(document.createTextNode(" " + sText));
 		}
 	}
 
@@ -466,19 +486,34 @@
 		document.getElementById("variants").classList.remove("hidden");
 	}
 
-	// For the onload handler and the button "Run"
-	function verifyConnectionAndRun(mTests, bRealOData) {
-		// send a request to the service document from the v4 sample service to ensure that
-		// the credentials are known before running the test suite.
-		fetch(sServiceDocument, {method : "HEAD"}).then(function (oResponse) {
-			if (oResponse.ok) {
-				runTests(mTests, bRealOData);
-			} else {
-				setStatus("Could not access the real OData server: "
-					+ oResponse.status + " " + oResponse.statusText);
-				variants();
+	// verify the given service URL and return a Promise, that resolves if the service document can
+	// be fetched and rejects with an error otherwise
+	function verifyConnection(sServiceURL) {
+		addToConnectionCheck("Check Service '" + sServiceURL + "' ... ");
+
+		// send a request to the service document from the given service URL to ensure that the
+		// credentials are known before running the test suite.
+		return fetch(sServiceURL, {method : "HEAD"}).then(function (oResponse) {
+			addToConnectionCheck(oResponse.status + " " + oResponse.statusText,
+				oResponse.ok);
+			if (!oResponse.ok) {
+				throw new Error("Service not reachable: " + sServiceURL);
 			}
+			return oResponse.ok;
 		});
+	}
+
+	// For the onload handler
+	async function verifyConnectionAndRun(mTests, bRealOData, aServiceURLs) {
+		try {
+			for (const sServiceURL of aServiceURLs) {
+				await verifyConnection(sServiceURL);
+			}
+			runTests(mTests, bRealOData);
+		} catch (oError) {
+			setStatus(oError.message);
+			variants();
+		}
 	}
 
 	// configure the UI5 loader
@@ -510,10 +545,10 @@
 					runTests(oConfig.tests, false);
 					break;
 				case "true":
-					verifyConnectionAndRun(oConfig.tests, true);
+					verifyConnectionAndRun(oConfig.tests, true, oConfig.serviceURLs);
 					break;
 				default:
-					verifyConnectionAndRun(oConfig.tests);
+					verifyConnectionAndRun(oConfig.tests, undefined, oConfig.serviceURLs);
 			}
 		});
 	});

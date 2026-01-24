@@ -1289,7 +1289,8 @@ sap.ui.define([
 	 * Returns a promise that is pending while DELETEs or POSTs are being sent, or
 	 * <code>null</code> in case no such requests are currently being sent.
 	 *
-	 * @returns {Promise|null} A promise that is pending while DELETEs or POSTs are being sent
+	 * @returns {Promise<void>|null}
+	 *   A promise that is pending while DELETEs or POSTs are being sent
 	 *
 	 * @public
 	 * @see #addPendingRequest
@@ -3100,7 +3101,7 @@ sap.ui.define([
 	 * @param {object} oResult - The result of the GET request (only used for annotations)
 	 * @param {object[]} oResult.value - Only used to access the original length incl. iFiltered
 	 * @param {number} iFiltered - Number of newly created elements contained in the given result
-	 * @returns {Promise|undefined}
+	 * @returns {Promise<number>|undefined}
 	 *   A promise that resolves if the count has been determined or <code>undefined</code> if no
 	 *   request needed
 	 *

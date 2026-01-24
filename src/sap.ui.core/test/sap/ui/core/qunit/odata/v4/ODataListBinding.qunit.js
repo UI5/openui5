@@ -10403,10 +10403,12 @@ sap.ui.define([
 			.returns("~bindingpath~");
 		this.mock(_Helper).expects("getRelativePath")
 			.withExactArgs("~contextpath~", "~bindingpath~").returns("~cachepath~");
+		this.mock(oBinding).expects("getKeepAlivePredicates").withExactArgs()
+			.returns("~mKeepAlivePredicates~");
 
 		oExpectation = this.mock(oBinding.oCache).expects("expand")
 			.withExactArgs(sinon.match.same(oGroupLock), "~cachepath~", iLevels,
-				sinon.match.func)
+				"~mKeepAlivePredicates~", sinon.match.func)
 			.returns(Promise.resolve().then(function () {
 				if (bSuccess) {
 					that.mock(oContext).expects("getModelIndex").exactly(iCount > 0 ? 1 : 0)
@@ -10455,7 +10457,7 @@ sap.ui.define([
 		that.mock(oBinding).expects("fireDataRequested").exactly(bDataRequested ? 1 : 0)
 			.withExactArgs();
 		if (bDataRequested) {
-			oExpectation.args[0][3]();
+			oExpectation.args[0][4]();
 		}
 
 		return oPromise;
@@ -10477,6 +10479,7 @@ sap.ui.define([
 		oBinding.aContexts = [, oContext];
 
 		this.mock(oBinding).expects("checkSuspended").withExactArgs();
+		this.mock(oBinding).expects("getKeepAlivePredicates").never();
 
 		assert.throws(function () {
 			// code under test
@@ -10493,6 +10496,7 @@ sap.ui.define([
 		oBinding.aContexts = [oContext];
 
 		this.mock(oBinding).expects("checkSuspended").twice().withExactArgs();
+		this.mock(oBinding).expects("getKeepAlivePredicates").never();
 
 		[2, 42].forEach((iLevels) => {
 			assert.throws(function () {
@@ -10611,8 +10615,8 @@ sap.ui.define([
 			.withExactArgs().returns("~predicates~");
 		oCollapseExpectation = this.mock(oBinding.oCache).expects("collapse")
 			.exactly(bCountGiven ? 0 : 1)
-			.withExactArgs("~cachepath~", bAll ? "~oGroupLock~" : undefined,
-				bSilent, false, "~predicates~")
+			.withExactArgs("~cachepath~", "~predicates~", bAll ? "~oGroupLock~" : undefined,
+				bSilent, false)
 			.returns(iCount);
 		oFireChangeExpectation = this.mock(oBinding).expects("_fireChange")
 			.exactly(iCount && !bSilent ? 1 : 0)
@@ -12078,13 +12082,15 @@ sap.ui.define([
 		this.mock(oBinding).expects("getUpdateGroupId").withExactArgs().returns("~group~");
 		this.mock(oBinding).expects("lockGroup").withExactArgs("~group~", true, true)
 			.returns("~oGroupLock~");
+		this.mock(oBinding).expects("getKeepAlivePredicates").withExactArgs()
+			.returns("~mKeepAlivePredicates~");
 		const oCache = {
 			move : mustBeMocked
 		};
 		oBinding.oCache = oCache;
-		this.mock(oCache).expects("move").withExactArgs("~oGroupLock~", "~child~",
-				"~childNonCanonical~", bMakeRoot ? null : "~parent~", undefined, undefined,
-				"~copy~")
+		this.mock(oCache).expects("move").withExactArgs("~oGroupLock~", "~mKeepAlivePredicates~",
+				"~child~", "~childNonCanonical~", bMakeRoot ? null : "~parent~", undefined,
+				undefined, "~copy~")
 			.returns({promise : new SyncPromise((resolve) => {
 				setTimeout(() => {
 					if (oParentContext) {
@@ -12192,6 +12198,8 @@ sap.ui.define([
 		this.mock(oBinding).expects("getUpdateGroupId").withExactArgs().returns("~group~");
 		const oLockGroupExpectation = this.mock(oBinding).expects("lockGroup")
 			.withExactArgs("~group~", true, true).returns("~oGroupLock~");
+		this.mock(oBinding).expects("getKeepAlivePredicates").withExactArgs()
+			.returns("~mKeepAlivePredicates~");
 		const oCache = {
 			move : mustBeMocked
 		};
@@ -12202,8 +12210,8 @@ sap.ui.define([
 			bCopy ? Promise.resolve("~copyIndex~") : undefined
 		]);
 		this.mock(oCache).expects("move")
-			.withExactArgs("~oGroupLock~", "~child~", "~childNonCanonical~",
-				bMakeRoot ? null : "~parent~", sSiblingPath,
+			.withExactArgs("~oGroupLock~", "~mKeepAlivePredicates~", "~child~",
+				"~childNonCanonical~", bMakeRoot ? null : "~parent~", sSiblingPath,
 				oSiblingContext ? bUpdateSiblingIndex : undefined, bCopy)
 			.returns({promise : "A", refresh : true});
 		this.mock(oBinding).expects("requestSideEffects").withExactArgs("~group~", [""])
@@ -12257,13 +12265,15 @@ sap.ui.define([
 		this.mock(oBinding).expects("getUpdateGroupId").withExactArgs().returns("~group~");
 		this.mock(oBinding).expects("lockGroup").withExactArgs("~group~", true, true)
 			.returns("~oGroupLock~");
+		this.mock(oBinding).expects("getKeepAlivePredicates").withExactArgs()
+			.returns("~mKeepAlivePredicates~");
 		const oCache = {
 			move : mustBeMocked
 		};
 		oBinding.oCache = oCache;
 		this.mock(oCache).expects("move")
-			.withExactArgs("~oGroupLock~", "~child~", "~childNonCanonical~", "~parent~", undefined,
-				undefined, "~copy~")
+			.withExactArgs("~oGroupLock~", "~mKeepAlivePredicates~", "~child~",
+				"~childNonCanonical~", "~parent~", undefined, undefined, "~copy~")
 			.returns({promise : SyncPromise.reject("~error~"), refresh : false});
 		this.mock(oBinding).expects("expand").never();
 
@@ -12295,13 +12305,15 @@ sap.ui.define([
 		this.mock(oBinding).expects("getUpdateGroupId").withExactArgs().returns("~group~");
 		this.mock(oBinding).expects("lockGroup").withExactArgs("~group~", true, true)
 			.returns("~oGroupLock~");
+		this.mock(oBinding).expects("getKeepAlivePredicates").withExactArgs()
+			.returns("~mKeepAlivePredicates~");
 		const oCache = {
 			move : mustBeMocked
 		};
 		oBinding.oCache = oCache;
 		this.mock(oCache).expects("move")
-			.withExactArgs("~oGroupLock~", "~child~", "~childNonCanonical~", null, undefined,
-				undefined, "~copy~")
+			.withExactArgs("~oGroupLock~", "~mKeepAlivePredicates~", "~child~",
+				"~childNonCanonical~", null, undefined, undefined, "~copy~")
 			.returns({promise : SyncPromise.resolve([1, 43, "~iCollapseCount~"]), refresh : false});
 		this.mock(oBinding).expects("requestSideEffects").never();
 		this.mock(oBinding).expects("insertGap").never();

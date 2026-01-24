@@ -34,8 +34,9 @@ sap.ui.define([
 	const sandbox = sinon.createSandbox();
 	const oMockedAppComponent = RtaQunitUtils.createAndStubAppComponent(sinon);
 
-	function configureDefaultActionAndUpdateOverlay() {
-		this.oButtonOverlay.setDesignTimeMetadata({
+	function configureDefaultActionAndUpdateOverlay(oTargetOverlay) {
+		oTargetOverlay ||= this.oButtonOverlay;
+		oTargetOverlay.setDesignTimeMetadata({
 			actions: {
 				annotation: {
 					annotationChange1: {
@@ -45,8 +46,9 @@ sap.ui.define([
 				}
 			}
 		});
-		this.oAnnotationPlugin.deregisterElementOverlay(this.oButtonOverlay);
-		this.oAnnotationPlugin.registerElementOverlay(this.oButtonOverlay);
+
+		this.oAnnotationPlugin.deregisterElementOverlay(oTargetOverlay);
+		this.oAnnotationPlugin.registerElementOverlay(oTargetOverlay);
 	}
 
 	QUnit.module("Given a design time and annotation plugin are instantiated", {
@@ -231,16 +233,17 @@ sap.ui.define([
 			assert.strictEqual(aMenuItems[3].rank, 15, "then the third menu item rank is correct");
 		});
 
-		QUnit.test("When an overlay has an annotation action in the designtime metadata but the control has no stable ID", function(assert) {
-			configureDefaultActionAndUpdateOverlay.call(this);
+		QUnit.test("When an overlay has an annotation action in the designtime metadata and the control has no stable ID", function(assert) {
+			configureDefaultActionAndUpdateOverlay.call(this, this.oButtonNoStableIDOverlay);
+			assert.ok(this.oAnnotationPlugin.getAction(this.oButtonNoStableIDOverlay), "the action is defined");
 
 			assert.strictEqual(
 				this.oAnnotationPlugin.isAvailable([this.oButtonNoStableIDOverlay]),
-				false,
-				"then isAvailable returns false"
+				true,
+				"then isAvailable returns true"
 			);
-			assert.strictEqual(this.oAnnotationPlugin.isEnabled([this.oButtonNoStableIDOverlay]), false, "then isEnabled returns false");
-			assert.strictEqual(this.oAnnotationPlugin._isEditable(this.oButtonNoStableIDOverlay), false, "then _isEditable returns false");
+			assert.strictEqual(this.oAnnotationPlugin.isEnabled([this.oButtonNoStableIDOverlay]), true, "then isEnabled returns true");
+			assert.strictEqual(this.oAnnotationPlugin._isEditable(this.oButtonNoStableIDOverlay), true, "then _isEditable returns true");
 		});
 
 		QUnit.test("When the designtime metadata has an invalid value for icon", async function(assert) {
