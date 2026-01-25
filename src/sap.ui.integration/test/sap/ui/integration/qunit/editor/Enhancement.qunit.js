@@ -1004,12 +1004,15 @@ sap.ui.define([
 						assert.ok(oControl.getModel("contextflat"), "Input: contextflat context");
 						assert.equal(oControl.getValue(), "Card Title Default", "Input: Value");
 						oControl.setValue("Card Title New");
+						oControl.fireChange({ value: "Card Title New"});
 						EditorQunitUtils.wait().then(function () {
 							assert.equal(oControl.getValue(), "Card Title New", "Input: Value changed");
 							var oSettings = oControl.getModel("currentSettings");
-							assert.equal(oSettings.getProperty("/form/items/cardTitle/value"), "Card Title New", "Settings: Value changed");
+							assert.equal(oSettings.getProperty("/form/items/cardTitle/value"), "Card Title New", "Settings: Value changed in field settings");
+							var oEditorSettings = this.oEditor.getCurrentSettings();
+							assert.equal(oEditorSettings.texts.en[oField.getConfiguration().manifestpath], "Card Title New", "Editor: Value changed in editor settings");
 							resolve();
-						});
+						}.bind(this));
 					}.bind(this));
 				}.bind(this));
 			}.bind(this));
