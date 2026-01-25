@@ -128,9 +128,6 @@ sap.ui.require([
 			number: "624,00",
 			numberUnit: "Euro",
 			fullScreenOptimized: false,
-			showMarkers: false,
-			markFlagged: true,
-			markFavorite: true,
 			numberState: ValueState.Success,
 			attributes: [
 				new ObjectAttribute({

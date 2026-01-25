@@ -197,7 +197,7 @@ sap.ui.define([
 		});
 
 		QUnit.test("1 string parameter and translatable label (i18n binding syntax) (as json)", function (assert) {
-			this.oEditor.setJson({ baseUrl: sBaseUrl, manifest: { "sap.app": { "id": "test.sample", "i18n": "i18n/i18n.properties", "title": "{{STRINGLABEL}}" }, "sap.card": { "type": "List", "configuration": { "parameters": { "stringParameter": { "type": "string", "label": "{i18n>STRINGLABEL}" } } } } } });
+			this.oEditor.setJson({ baseUrl: sBaseUrl, manifest: { "sap.app": { "id": "test.sample", "i18n": "../i18n/i18n.properties", "title": "{{STRINGLABEL}}" }, "sap.card": { "type": "List", "configuration": { "parameters": { "stringParameter": { "type": "string", "label": "{i18n>STRINGLABEL}" } } } } } });
 			return new Promise(function (resolve, reject) {
 				EditorQunitUtils.isFieldReady(this.oEditor).then(function () {
 					assert.ok(this.oEditor.isFieldReady(), "Editor fields are ready");
