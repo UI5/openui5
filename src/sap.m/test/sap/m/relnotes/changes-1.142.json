@@ -228,5 +228,65 @@
         "text": " sap.m.Dialog: Screen reader and focus handling are improved"
       }
     ]
+  },
+  "1.142.3": {
+    "date": "January 2026",
+    "notes": [
+      {
+        "id": "c64468cb6f1ee4bd4379bd2b090fd7f48393b168",
+        "type": "FIX",
+        "text": "sap.m.MultiInput: Token addition is now reset on focusin"
+      },
+      {
+        "id": "6487bfd74b77993776094b3bc660c02f6e895fda",
+        "type": "FIX",
+        "text": " sap.m.Tokenizer: The aria-labelledby attribute is now correctly set"
+      },
+      {
+        "id": "02ea8d22071376abdc129e71a886543584162429",
+        "type": "FIX",
+        "text": " sap.m.MultiComboBox: After deletion next focused token is announced with correct position"
+      },
+      {
+        "id": "31bb4fd53984c413c480f4b193568c561641e365",
+        "type": "FIX",
+        "text": " sap.m Tokenizer: Ensure role \"listbox\" is applied to the correct container"
+      },
+      {
+        "id": "e268972e991850b089c9f7017acee787a2340935",
+        "type": "FIX",
+        "text": " sap.m.TimePicker: aria-description attribute is added."
+      },
+      {
+        "id": "6157abcce1c75bfb01ab848f4c84db9949138b31",
+        "type": "FIX",
+        "text": " VariantManagement: \"expanded\" not announced"
+      },
+      {
+        "id": "44d390245ef41fb48803250bf16acbc450df126a",
+        "type": "FIX",
+        "text": " sap.m.PlanningCalendarHeader: add visible label to the view switch"
+      },
+      {
+        "id": "a24e0833a690fd0187ede559a36cb5d978d680e9",
+        "type": "FIX",
+        "text": " sap.m.ComboBoxBase: Value state popup is now hidden when the picker is opened"
+      },
+      {
+        "id": "2dcedbd4a87218d7a1a557c3b7c693f128c8dfbd",
+        "type": "FIX",
+        "text": " sap.m.ViewSettingsDialog: Remove redundant announcements from sort and group list items"
+      },
+      {
+        "id": "7dac59b71b9e86e865cd7f66cd3658a65430c76c",
+        "type": "FIX",
+        "text": " sap.m.Toolbar: exclude disabled controls from Toolbar navigation"
+      },
+      {
+        "id": "d7de522b3392cf6153f225369034e461471ab5e3",
+        "type": "FIX",
+        "text": " sap.m.Dialog: Screen reader and focus handling are improved"
+      }
+    ]
   }
 }

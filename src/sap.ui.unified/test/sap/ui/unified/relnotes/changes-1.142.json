@@ -1,0 +1,12 @@
+{
+  "1.142.3": {
+    "date": "January 2026",
+    "notes": [
+      {
+        "id": "b8306328c31925b510c581bcde37e6c31b54dd56",
+        "type": "FIX",
+        "text": " sap.ui.uniifed.calendar.DatesRow: adjust day names describedby references"
+      }
+    ]
+  }
+}
