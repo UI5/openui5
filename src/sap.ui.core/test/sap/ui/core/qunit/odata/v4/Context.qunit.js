@@ -2836,8 +2836,10 @@ sap.ui.define([
 				{$NavigationPropertyPath : "EMPLOYEE_2_MANAGER"},
 				{$PropertyPath : "Address/*"},
 				{$NavigationPropertyPath : ""},
+				{$Null : null},
 				{$PropertyPath : "*"},
 				"",
+				null,
 				"*",
 				"EMPLOYEE_2_TEAM/*",
 				"MANAGER_ID"
@@ -2876,7 +2878,7 @@ sap.ui.define([
 			.returns(["/base/EMPLOYEE_2_MANAGER"]);
 		oMetaModelMock.expects("getAllPathReductions")
 			.withExactArgs("/EMPLOYEES('42')/Address/*", "/base").returns(["/base/Address/*"]);
-		oMetaModelMock.expects("getAllPathReductions").twice()
+		oMetaModelMock.expects("getAllPathReductions").exactly(4)
 			.withExactArgs("/EMPLOYEES('42')", "/base").returns(["/base/"]);
 		oMetaModelMock.expects("getAllPathReductions").twice()
 			.withExactArgs("/EMPLOYEES('42')/*", "/base").returns(["/base/*"]);
@@ -2888,7 +2890,7 @@ sap.ui.define([
 		this.mock(_Helper).expects("filterPaths")
 			.withExactArgs(aAbsolutePaths, [
 				"/base/TEAM_ID", "/reduced/TEAM_ID", "/base/EMPLOYEE_2_MANAGER",
-				"/base/Address/*", "/base/", "/base/*", "/base/", "/base/*",
+				"/base/Address/*", "/base/", "/base/", "/base/*", "/base/", "/base/", "/base/*",
 				"/base/EMPLOYEE_2_TEAM/*", "/base/MANAGER_ID"
 			])
 			.returns(aFilteredPaths);
