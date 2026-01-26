@@ -3,12 +3,13 @@
 <head><meta charset="utf-8">
 	<title>RuntimeAuthoring Test Page With View</title>
 
+	<base href="../../../">
 	<script id="sap-ui-bootstrap"
-			src="../../../resources/sap-ui-core.js"
+			src="resources/sap-ui-core.js"
 			data-sap-ui-flexibility-services='[
 				{
 					"connector": "ObjectPathConnector",
-					"path": "./mockdata/FakeLrepConnector.json"
+					"path": "test-resources/sap/m/mockdata/FakeLrepConnector.json"
 				},
 				{
 					"connector": "LocalStorageConnector"
@@ -17,10 +18,10 @@
 			data-sap-ui-libs="sap.m, sap.ui.layout, sap.ui.fl, sap.ui.dt, sap.ui.rta"
 			data-sap-ui-on-init="module:local/RuntimeAuthoringTestPageWithView"
 			data-sap-ui-resource-roots='{
-				"local": "./"
+				"test-resources": "test-resources",
+				"local": "test-resources/sap/m/"
 			}'
-	>
-	</script>
+	></script>
 
 	
 </head>

@@ -39,27 +39,27 @@ sap.ui.define([
 			EditorQunitUtils.destroyMockServer();
 		},
 		beforeEach: function () {
-			this.oEditor = EditorQunitUtils.beforeEachTest(undefined, undefined,"CardEditor");
-			this.oEditor.setMode("translation");
+			this.oCardEditor = EditorQunitUtils.beforeEachTest(undefined, undefined,"CardEditor");
+			this.oCardEditor.setMode("translation");
 		},
 		afterEach: function () {
-			EditorQunitUtils.afterEachTest(this.oEditor, sandbox);
+			EditorQunitUtils.afterEachTest(this.oCardEditor, sandbox);
 		}
 	}, function () {
 		QUnit.test("click and load child1", function (assert) {
 			var that = this;
-			that.oEditor.setCard({
+			that.oCardEditor.setCard({
 				baseUrl: sBaseUrl,
 				host: "contexthost",
 				manifest: sBaseUrl + "manifest.json"
 			});
 			return new Promise(function (resolve, reject) {
-				EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-					assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready");
-					var aFormContents = that.oEditor.getAggregation("_formContent");
-					assert.equal(aFormContents.length, 5, "Editor: form content length is OK");
-					EditorQunitUtils.isReady(that.oEditor).then(function () {
-						assert.ok(that.oEditor.isReady(), "Editor is ready");
+				EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+					assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready");
+					var aFormContents = that.oCardEditor.getAggregation("_formContent");
+					assert.equal(aFormContents.length, 5, "Card Editor: form content length is OK");
+					EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+						assert.ok(that.oCardEditor.isReady(), "Card Editor is ready");
 
 						var oTitleLabel = aFormContents[2];
 						var oTitleFieldOri = aFormContents[3];
@@ -73,11 +73,11 @@ sap.ui.define([
 						assert.ok(oTitleField.getAggregation("_field").isA("sap.m.Input"), "Title Field: Control is an Input");
 						assert.equal(oTitleField.getAggregation("_field").getValue(), "Trans Card Title in i18n en", "Title Field: String Value");
 
-						assert.ok(that.oEditor._oChildTree, "Child tree is created");
-						assert.equal(that.oEditor._oChildTree.getItems().length, 3, "Child tree initial length is OK");
-						var oItem0 = that.oEditor._oChildTree.getItems()[0];
-						var oItem1 = that.oEditor._oChildTree.getItems()[1];
-						var oItem2 = that.oEditor._oChildTree.getItems()[2];
+						assert.ok(that.oCardEditor._oChildTree, "Child tree is created");
+						assert.equal(that.oCardEditor._oChildTree.getItems().length, 3, "Child tree initial length is OK");
+						var oItem0 = that.oCardEditor._oChildTree.getItems()[0];
+						var oItem1 = that.oCardEditor._oChildTree.getItems()[1];
+						var oItem2 = that.oCardEditor._oChildTree.getItems()[2];
 						assert.equal(oItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.ok(oItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -89,14 +89,14 @@ sap.ui.define([
 						assert.ok(!oItem2.isLeaf(), "Child tree item 2 is leaf: false");
 
 						// simulate to click child1
-						that.oEditor._oChildTree.onItemPress(oItem1, oItem1);
-						EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-							assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready again");
-							aFormContents = that.oEditor.getAggregation("_formContent");
-							assert.equal(aFormContents.length, 5, "Editor: form content length is OK");
+						that.oCardEditor._oChildTree.onItemPress(oItem1, oItem1);
+						EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+							assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready again");
+							aFormContents = that.oCardEditor.getAggregation("_formContent");
+							assert.equal(aFormContents.length, 5, "Card Editor: form content length is OK");
 
-							EditorQunitUtils.isReady(that.oEditor).then(function () {
-								assert.ok(that.oEditor.isReady(), "Editor is ready again");
+							EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+								assert.ok(that.oCardEditor.isReady(), "Card Editor is ready again");
 
 								oTitleLabel = aFormContents[2];
 								oTitleFieldOri = aFormContents[3];
@@ -110,12 +110,12 @@ sap.ui.define([
 								assert.ok(oTitleField.getAggregation("_field").isA("sap.m.Input"), "Title Field: Control is an Input");
 								assert.equal(oTitleField.getAggregation("_field").getValue(), "Trans Card Title in i18n en", "Title Field: String Value");
 
-								assert.equal(that.oEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
-								var oNewItem0 = that.oEditor._oChildTree.getItems()[0];
-								var oNewItem1 = that.oEditor._oChildTree.getItems()[1];
-								var oNewItem2 = that.oEditor._oChildTree.getItems()[2];
-								var oNewItem3 = that.oEditor._oChildTree.getItems()[3];
-								var oNewItem4 = that.oEditor._oChildTree.getItems()[4];
+								assert.equal(that.oCardEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
+								var oNewItem0 = that.oCardEditor._oChildTree.getItems()[0];
+								var oNewItem1 = that.oCardEditor._oChildTree.getItems()[1];
+								var oNewItem2 = that.oCardEditor._oChildTree.getItems()[2];
+								var oNewItem3 = that.oCardEditor._oChildTree.getItems()[3];
+								var oNewItem4 = that.oCardEditor._oChildTree.getItems()[4];
 								assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 								assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 								assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -142,18 +142,18 @@ sap.ui.define([
 
 		QUnit.test("click and load child1, then back to main", function (assert) {
 			var that = this;
-			that.oEditor.setCard({
+			that.oCardEditor.setCard({
 				baseUrl: sBaseUrl,
 				host: "contexthost",
 				manifest: sBaseUrl + "manifest.json"
 			});
 			return new Promise(function (resolve, reject) {
-				EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-					assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready");
-					var aFormContents = that.oEditor.getAggregation("_formContent");
-					assert.equal(aFormContents.length, 5, "Editor: form content length is OK");
-					EditorQunitUtils.isReady(that.oEditor).then(function () {
-						assert.ok(that.oEditor.isReady(), "Editor is ready");
+				EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+					assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready");
+					var aFormContents = that.oCardEditor.getAggregation("_formContent");
+					assert.equal(aFormContents.length, 5, "Card Editor: form content length is OK");
+					EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+						assert.ok(that.oCardEditor.isReady(), "Card Editor is ready");
 
 						var oTitleLabel = aFormContents[2];
 						var oTitleFieldOri = aFormContents[3];
@@ -167,11 +167,11 @@ sap.ui.define([
 						assert.ok(oTitleField.getAggregation("_field").isA("sap.m.Input"), "Title Field: Control is an Input");
 						assert.equal(oTitleField.getAggregation("_field").getValue(), "Trans Card Title in i18n en", "Title Field: String Value");
 
-						assert.ok(that.oEditor._oChildTree, "Child tree is created");
-						assert.equal(that.oEditor._oChildTree.getItems().length, 3, "Child tree initial length is OK");
-						var oItem0 = that.oEditor._oChildTree.getItems()[0];
-						var oItem1 = that.oEditor._oChildTree.getItems()[1];
-						var oItem2 = that.oEditor._oChildTree.getItems()[2];
+						assert.ok(that.oCardEditor._oChildTree, "Child tree is created");
+						assert.equal(that.oCardEditor._oChildTree.getItems().length, 3, "Child tree initial length is OK");
+						var oItem0 = that.oCardEditor._oChildTree.getItems()[0];
+						var oItem1 = that.oCardEditor._oChildTree.getItems()[1];
+						var oItem2 = that.oCardEditor._oChildTree.getItems()[2];
 						assert.equal(oItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.ok(oItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -183,14 +183,14 @@ sap.ui.define([
 						assert.ok(!oItem2.isLeaf(), "Child tree item 2 is leaf: false");
 
 						// simulate to click child1
-						that.oEditor._oChildTree.onItemPress(oItem1, oItem1);
-						EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-							assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready again");
-							aFormContents = that.oEditor.getAggregation("_formContent");
-							assert.equal(aFormContents.length, 5, "Editor: form content length is OK");
+						that.oCardEditor._oChildTree.onItemPress(oItem1, oItem1);
+						EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+							assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready again");
+							aFormContents = that.oCardEditor.getAggregation("_formContent");
+							assert.equal(aFormContents.length, 5, "Card Editor: form content length is OK");
 
-							EditorQunitUtils.isReady(that.oEditor).then(function () {
-								assert.ok(that.oEditor.isReady(), "Editor is ready again");
+							EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+								assert.ok(that.oCardEditor.isReady(), "Card Editor is ready again");
 
 								oTitleLabel = aFormContents[2];
 								oTitleFieldOri = aFormContents[3];
@@ -204,12 +204,12 @@ sap.ui.define([
 								assert.ok(oTitleField.getAggregation("_field").isA("sap.m.Input"), "Title Field: Control is an Input");
 								assert.equal(oTitleField.getAggregation("_field").getValue(), "Trans Card Title in i18n en", "Title Field: String Value");
 
-								assert.equal(that.oEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
-								var oNewItem0 = that.oEditor._oChildTree.getItems()[0];
-								var oNewItem1 = that.oEditor._oChildTree.getItems()[1];
-								var oNewItem2 = that.oEditor._oChildTree.getItems()[2];
-								var oNewItem3 = that.oEditor._oChildTree.getItems()[3];
-								var oNewItem4 = that.oEditor._oChildTree.getItems()[4];
+								assert.equal(that.oCardEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
+								var oNewItem0 = that.oCardEditor._oChildTree.getItems()[0];
+								var oNewItem1 = that.oCardEditor._oChildTree.getItems()[1];
+								var oNewItem2 = that.oCardEditor._oChildTree.getItems()[2];
+								var oNewItem3 = that.oCardEditor._oChildTree.getItems()[3];
+								var oNewItem4 = that.oCardEditor._oChildTree.getItems()[4];
 								assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 								assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 								assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -227,13 +227,13 @@ sap.ui.define([
 								assert.ok(!oNewItem4.isLeaf(), "Child tree item 4 is leaf: false");
 
 								// simulate to click main
-								that.oEditor._oChildTree.onItemPress(oNewItem0, oNewItem0);
-								EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-									assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready again after back to main");
-									var aFormContents = that.oEditor.getAggregation("_formContent");
-									assert.equal(aFormContents.length, 5, "Editor: form content length is OK");
-									EditorQunitUtils.isReady(that.oEditor).then(function () {
-										assert.ok(that.oEditor.isReady(), "Editor is ready again after back to main");
+								that.oCardEditor._oChildTree.onItemPress(oNewItem0, oNewItem0);
+								EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+									assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready again after back to main");
+									var aFormContents = that.oCardEditor.getAggregation("_formContent");
+									assert.equal(aFormContents.length, 5, "Card Editor: form content length is OK");
+									EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+										assert.ok(that.oCardEditor.isReady(), "Card Editor is ready again after back to main");
 
 										var oTitleLabel = aFormContents[2];
 										var oTitleFieldOri = aFormContents[3];
@@ -247,12 +247,12 @@ sap.ui.define([
 										assert.ok(oTitleField.getAggregation("_field").isA("sap.m.Input"), "Title Field: Control is an Input");
 										assert.equal(oTitleField.getAggregation("_field").getValue(), "Trans Card Title in i18n en", "Title Field: String Value");
 
-										assert.equal(that.oEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
-										oNewItem0 = that.oEditor._oChildTree.getItems()[0];
-										oNewItem1 = that.oEditor._oChildTree.getItems()[1];
-										oNewItem2 = that.oEditor._oChildTree.getItems()[2];
-										oNewItem3 = that.oEditor._oChildTree.getItems()[3];
-										oNewItem4 = that.oEditor._oChildTree.getItems()[4];
+										assert.equal(that.oCardEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
+										oNewItem0 = that.oCardEditor._oChildTree.getItems()[0];
+										oNewItem1 = that.oCardEditor._oChildTree.getItems()[1];
+										oNewItem2 = that.oCardEditor._oChildTree.getItems()[2];
+										oNewItem3 = that.oCardEditor._oChildTree.getItems()[3];
+										oNewItem4 = that.oCardEditor._oChildTree.getItems()[4];
 										assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 										assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 										assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -281,18 +281,18 @@ sap.ui.define([
 
 		QUnit.test("click and load child1, then child1-1", function (assert) {
 			var that = this;
-			that.oEditor.setCard({
+			that.oCardEditor.setCard({
 				baseUrl: sBaseUrl,
 				host: "contexthost",
 				manifest: sBaseUrl + "manifest.json"
 			});
 			return new Promise(function (resolve, reject) {
-				EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-					assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready");
-					var aFormContents = that.oEditor.getAggregation("_formContent");
-					assert.equal(aFormContents.length, 5, "Editor: form content length is OK");
-					EditorQunitUtils.isReady(that.oEditor).then(function () {
-						assert.ok(that.oEditor.isReady(), "Editor is ready");
+				EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+					assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready");
+					var aFormContents = that.oCardEditor.getAggregation("_formContent");
+					assert.equal(aFormContents.length, 5, "Card Editor: form content length is OK");
+					EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+						assert.ok(that.oCardEditor.isReady(), "Card Editor is ready");
 
 						var oTitleLabel = aFormContents[2];
 						var oTitleFieldOri = aFormContents[3];
@@ -306,11 +306,11 @@ sap.ui.define([
 						assert.ok(oTitleField.getAggregation("_field").isA("sap.m.Input"), "Title Field: Control is an Input");
 						assert.equal(oTitleField.getAggregation("_field").getValue(), "Trans Card Title in i18n en", "Title Field: String Value");
 
-						assert.ok(that.oEditor._oChildTree, "Child tree is created");
-						assert.equal(that.oEditor._oChildTree.getItems().length, 3, "Child tree initial length is OK");
-						var oItem0 = that.oEditor._oChildTree.getItems()[0];
-						var oItem1 = that.oEditor._oChildTree.getItems()[1];
-						var oItem2 = that.oEditor._oChildTree.getItems()[2];
+						assert.ok(that.oCardEditor._oChildTree, "Child tree is created");
+						assert.equal(that.oCardEditor._oChildTree.getItems().length, 3, "Child tree initial length is OK");
+						var oItem0 = that.oCardEditor._oChildTree.getItems()[0];
+						var oItem1 = that.oCardEditor._oChildTree.getItems()[1];
+						var oItem2 = that.oCardEditor._oChildTree.getItems()[2];
 						assert.equal(oItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.ok(oItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -322,14 +322,14 @@ sap.ui.define([
 						assert.ok(!oItem2.isLeaf(), "Child tree item 2 is leaf: false");
 
 						// simulate to click child1
-						that.oEditor._oChildTree.onItemPress(oItem1, oItem1);
-						EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-							assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready again");
-							aFormContents = that.oEditor.getAggregation("_formContent");
-							assert.equal(aFormContents.length, 5, "Editor: form content length is OK");
+						that.oCardEditor._oChildTree.onItemPress(oItem1, oItem1);
+						EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+							assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready again");
+							aFormContents = that.oCardEditor.getAggregation("_formContent");
+							assert.equal(aFormContents.length, 5, "Card Editor: form content length is OK");
 
-							EditorQunitUtils.isReady(that.oEditor).then(function () {
-								assert.ok(that.oEditor.isReady(), "Editor is ready again");
+							EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+								assert.ok(that.oCardEditor.isReady(), "Card Editor is ready again");
 
 								oTitleLabel = aFormContents[2];
 								oTitleFieldOri = aFormContents[3];
@@ -343,12 +343,12 @@ sap.ui.define([
 								assert.ok(oTitleField.getAggregation("_field").isA("sap.m.Input"), "Title Field: Control is an Input");
 								assert.equal(oTitleField.getAggregation("_field").getValue(), "Trans Card Title in i18n en", "Title Field: String Value");
 
-								assert.equal(that.oEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
-								var oNewItem0 = that.oEditor._oChildTree.getItems()[0];
-								var oNewItem1 = that.oEditor._oChildTree.getItems()[1];
-								var oNewItem2 = that.oEditor._oChildTree.getItems()[2];
-								var oNewItem3 = that.oEditor._oChildTree.getItems()[3];
-								var oNewItem4 = that.oEditor._oChildTree.getItems()[4];
+								assert.equal(that.oCardEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
+								var oNewItem0 = that.oCardEditor._oChildTree.getItems()[0];
+								var oNewItem1 = that.oCardEditor._oChildTree.getItems()[1];
+								var oNewItem2 = that.oCardEditor._oChildTree.getItems()[2];
+								var oNewItem3 = that.oCardEditor._oChildTree.getItems()[3];
+								var oNewItem4 = that.oCardEditor._oChildTree.getItems()[4];
 								assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 								assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 								assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -366,14 +366,14 @@ sap.ui.define([
 								assert.ok(!oNewItem4.isLeaf(), "Child tree item 4 is leaf: false");
 
 								// simulate to click child1-1
-								that.oEditor._oChildTree.onItemPress(oNewItem2, oNewItem2);
-								EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-									assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready again too");
-									aFormContents = that.oEditor.getAggregation("_formContent");
-									assert.equal(aFormContents.length, 5, "Editor: form content length is OK");
+								that.oCardEditor._oChildTree.onItemPress(oNewItem2, oNewItem2);
+								EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+									assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready again too");
+									aFormContents = that.oCardEditor.getAggregation("_formContent");
+									assert.equal(aFormContents.length, 5, "Card Editor: form content length is OK");
 
-									EditorQunitUtils.isReady(that.oEditor).then(function () {
-										assert.ok(that.oEditor.isReady(), "Editor is ready again too");
+									EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+										assert.ok(that.oCardEditor.isReady(), "Card Editor is ready again too");
 
 										oTitleLabel = aFormContents[2];
 										oTitleFieldOri = aFormContents[3];
@@ -387,12 +387,12 @@ sap.ui.define([
 										assert.ok(oTitleField.getAggregation("_field").isA("sap.m.Input"), "Title Field: Control is an Input");
 										assert.equal(oTitleField.getAggregation("_field").getValue(), "Trans Card Title in i18n en", "Title Field: String Value");
 
-										assert.equal(that.oEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
-										oNewItem0 = that.oEditor._oChildTree.getItems()[0];
-										oNewItem1 = that.oEditor._oChildTree.getItems()[1];
-										oNewItem2 = that.oEditor._oChildTree.getItems()[2];
-										oNewItem3 = that.oEditor._oChildTree.getItems()[3];
-										oNewItem4 = that.oEditor._oChildTree.getItems()[4];
+										assert.equal(that.oCardEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
+										oNewItem0 = that.oCardEditor._oChildTree.getItems()[0];
+										oNewItem1 = that.oCardEditor._oChildTree.getItems()[1];
+										oNewItem2 = that.oCardEditor._oChildTree.getItems()[2];
+										oNewItem3 = that.oCardEditor._oChildTree.getItems()[3];
+										oNewItem4 = that.oCardEditor._oChildTree.getItems()[4];
 										assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 										assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 										assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -421,18 +421,18 @@ sap.ui.define([
 
 		QUnit.test("click and load child1, then child1-1, then back to main", function (assert) {
 			var that = this;
-			that.oEditor.setCard({
+			that.oCardEditor.setCard({
 				baseUrl: sBaseUrl,
 				host: "contexthost",
 				manifest: sBaseUrl + "manifest.json"
 			});
 			return new Promise(function (resolve, reject) {
-				EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-					assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready");
-					var aFormContents = that.oEditor.getAggregation("_formContent");
-					assert.equal(aFormContents.length, 5, "Editor: form content length is OK");
-					EditorQunitUtils.isReady(that.oEditor).then(function () {
-						assert.ok(that.oEditor.isReady(), "Editor is ready");
+				EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+					assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready");
+					var aFormContents = that.oCardEditor.getAggregation("_formContent");
+					assert.equal(aFormContents.length, 5, "Card Editor: form content length is OK");
+					EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+						assert.ok(that.oCardEditor.isReady(), "Card Editor is ready");
 
 						var oTitleLabel = aFormContents[2];
 						var oTitleFieldOri = aFormContents[3];
@@ -446,11 +446,11 @@ sap.ui.define([
 						assert.ok(oTitleField.getAggregation("_field").isA("sap.m.Input"), "Title Field: Control is an Input");
 						assert.equal(oTitleField.getAggregation("_field").getValue(), "Trans Card Title in i18n en", "Title Field: String Value");
 
-						assert.ok(that.oEditor._oChildTree, "Child tree is created");
-						assert.equal(that.oEditor._oChildTree.getItems().length, 3, "Child tree initial length is OK");
-						var oItem0 = that.oEditor._oChildTree.getItems()[0];
-						var oItem1 = that.oEditor._oChildTree.getItems()[1];
-						var oItem2 = that.oEditor._oChildTree.getItems()[2];
+						assert.ok(that.oCardEditor._oChildTree, "Child tree is created");
+						assert.equal(that.oCardEditor._oChildTree.getItems().length, 3, "Child tree initial length is OK");
+						var oItem0 = that.oCardEditor._oChildTree.getItems()[0];
+						var oItem1 = that.oCardEditor._oChildTree.getItems()[1];
+						var oItem2 = that.oCardEditor._oChildTree.getItems()[2];
 						assert.equal(oItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.ok(oItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -462,14 +462,14 @@ sap.ui.define([
 						assert.ok(!oItem2.isLeaf(), "Child tree item 2 is leaf: false");
 
 						// simulate to click child1
-						that.oEditor._oChildTree.onItemPress(oItem1, oItem1);
-						EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-							assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready again");
-							aFormContents = that.oEditor.getAggregation("_formContent");
-							assert.equal(aFormContents.length, 5, "Editor: form content length is OK");
+						that.oCardEditor._oChildTree.onItemPress(oItem1, oItem1);
+						EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+							assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready again");
+							aFormContents = that.oCardEditor.getAggregation("_formContent");
+							assert.equal(aFormContents.length, 5, "Card Editor: form content length is OK");
 
-							EditorQunitUtils.isReady(that.oEditor).then(function () {
-								assert.ok(that.oEditor.isReady(), "Editor is ready again");
+							EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+								assert.ok(that.oCardEditor.isReady(), "Card Editor is ready again");
 
 								oTitleLabel = aFormContents[2];
 								oTitleFieldOri = aFormContents[3];
@@ -483,12 +483,12 @@ sap.ui.define([
 								assert.ok(oTitleField.getAggregation("_field").isA("sap.m.Input"), "Title Field: Control is an Input");
 								assert.equal(oTitleField.getAggregation("_field").getValue(), "Trans Card Title in i18n en", "Title Field: String Value");
 
-								assert.equal(that.oEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
-								var oNewItem0 = that.oEditor._oChildTree.getItems()[0];
-								var oNewItem1 = that.oEditor._oChildTree.getItems()[1];
-								var oNewItem2 = that.oEditor._oChildTree.getItems()[2];
-								var oNewItem3 = that.oEditor._oChildTree.getItems()[3];
-								var oNewItem4 = that.oEditor._oChildTree.getItems()[4];
+								assert.equal(that.oCardEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
+								var oNewItem0 = that.oCardEditor._oChildTree.getItems()[0];
+								var oNewItem1 = that.oCardEditor._oChildTree.getItems()[1];
+								var oNewItem2 = that.oCardEditor._oChildTree.getItems()[2];
+								var oNewItem3 = that.oCardEditor._oChildTree.getItems()[3];
+								var oNewItem4 = that.oCardEditor._oChildTree.getItems()[4];
 								assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 								assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 								assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -506,14 +506,14 @@ sap.ui.define([
 								assert.ok(!oNewItem4.isLeaf(), "Child tree item 4 is leaf: false");
 
 								// simulate to click child1-1
-								that.oEditor._oChildTree.onItemPress(oNewItem2, oNewItem2);
-								EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-									assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready again too");
-									aFormContents = that.oEditor.getAggregation("_formContent");
-									assert.equal(aFormContents.length, 5, "Editor: form content length is OK");
+								that.oCardEditor._oChildTree.onItemPress(oNewItem2, oNewItem2);
+								EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+									assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready again too");
+									aFormContents = that.oCardEditor.getAggregation("_formContent");
+									assert.equal(aFormContents.length, 5, "Card Editor: form content length is OK");
 
-									EditorQunitUtils.isReady(that.oEditor).then(function () {
-										assert.ok(that.oEditor.isReady(), "Editor is ready again too");
+									EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+										assert.ok(that.oCardEditor.isReady(), "Card Editor is ready again too");
 
 										oTitleLabel = aFormContents[2];
 										oTitleFieldOri = aFormContents[3];
@@ -527,12 +527,12 @@ sap.ui.define([
 										assert.ok(oTitleField.getAggregation("_field").isA("sap.m.Input"), "Title Field: Control is an Input");
 										assert.equal(oTitleField.getAggregation("_field").getValue(), "Trans Card Title in i18n en", "Title Field: String Value");
 
-										assert.equal(that.oEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
-										oNewItem0 = that.oEditor._oChildTree.getItems()[0];
-										oNewItem1 = that.oEditor._oChildTree.getItems()[1];
-										oNewItem2 = that.oEditor._oChildTree.getItems()[2];
-										oNewItem3 = that.oEditor._oChildTree.getItems()[3];
-										oNewItem4 = that.oEditor._oChildTree.getItems()[4];
+										assert.equal(that.oCardEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
+										oNewItem0 = that.oCardEditor._oChildTree.getItems()[0];
+										oNewItem1 = that.oCardEditor._oChildTree.getItems()[1];
+										oNewItem2 = that.oCardEditor._oChildTree.getItems()[2];
+										oNewItem3 = that.oCardEditor._oChildTree.getItems()[3];
+										oNewItem4 = that.oCardEditor._oChildTree.getItems()[4];
 										assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 										assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 										assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -550,13 +550,13 @@ sap.ui.define([
 										assert.ok(!oNewItem4.isLeaf(), "Child tree item 4 is leaf: false");
 
 										// simulate to click main
-										that.oEditor._oChildTree.onItemPress(oNewItem0, oNewItem0);
-										EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-											assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready again after back to main");
-											var aFormContents = that.oEditor.getAggregation("_formContent");
-											assert.equal(aFormContents.length, 5, "Editor: form content length is OK");
-											EditorQunitUtils.isReady(that.oEditor).then(function () {
-												assert.ok(that.oEditor.isReady(), "Editor is ready again after back to main");
+										that.oCardEditor._oChildTree.onItemPress(oNewItem0, oNewItem0);
+										EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+											assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready again after back to main");
+											var aFormContents = that.oCardEditor.getAggregation("_formContent");
+											assert.equal(aFormContents.length, 5, "Card Editor: form content length is OK");
+											EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+												assert.ok(that.oCardEditor.isReady(), "Card Editor is ready again after back to main");
 
 												var oTitleLabel = aFormContents[2];
 												var oTitleFieldOri = aFormContents[3];
@@ -570,12 +570,12 @@ sap.ui.define([
 												assert.ok(oTitleField.getAggregation("_field").isA("sap.m.Input"), "Title Field: Control is an Input");
 												assert.equal(oTitleField.getAggregation("_field").getValue(), "Trans Card Title in i18n en", "Title Field: String Value");
 
-												assert.equal(that.oEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
-												oNewItem0 = that.oEditor._oChildTree.getItems()[0];
-												oNewItem1 = that.oEditor._oChildTree.getItems()[1];
-												oNewItem2 = that.oEditor._oChildTree.getItems()[2];
-												oNewItem3 = that.oEditor._oChildTree.getItems()[3];
-												oNewItem4 = that.oEditor._oChildTree.getItems()[4];
+												assert.equal(that.oCardEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
+												oNewItem0 = that.oCardEditor._oChildTree.getItems()[0];
+												oNewItem1 = that.oCardEditor._oChildTree.getItems()[1];
+												oNewItem2 = that.oCardEditor._oChildTree.getItems()[2];
+												oNewItem3 = that.oCardEditor._oChildTree.getItems()[3];
+												oNewItem4 = that.oCardEditor._oChildTree.getItems()[4];
 												assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 												assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 												assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -606,18 +606,18 @@ sap.ui.define([
 
 		QUnit.test("click and load child1, then child1-2", function (assert) {
 			var that = this;
-			that.oEditor.setCard({
+			that.oCardEditor.setCard({
 				baseUrl: sBaseUrl,
 				host: "contexthost",
 				manifest: sBaseUrl + "manifest.json"
 			});
 			return new Promise(function (resolve, reject) {
-				EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-					assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready");
-					var aFormContents = that.oEditor.getAggregation("_formContent");
-					assert.equal(aFormContents.length, 5, "Editor: form content length is OK");
-					EditorQunitUtils.isReady(that.oEditor).then(function () {
-						assert.ok(that.oEditor.isReady(), "Editor is ready");
+				EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+					assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready");
+					var aFormContents = that.oCardEditor.getAggregation("_formContent");
+					assert.equal(aFormContents.length, 5, "Card Editor: form content length is OK");
+					EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+						assert.ok(that.oCardEditor.isReady(), "Card Editor is ready");
 
 						var oTitleLabel = aFormContents[2];
 						var oTitleFieldOri = aFormContents[3];
@@ -631,11 +631,11 @@ sap.ui.define([
 						assert.ok(oTitleField.getAggregation("_field").isA("sap.m.Input"), "Title Field: Control is an Input");
 						assert.equal(oTitleField.getAggregation("_field").getValue(), "Trans Card Title in i18n en", "Title Field: String Value");
 
-						assert.ok(that.oEditor._oChildTree, "Child tree is created");
-						assert.equal(that.oEditor._oChildTree.getItems().length, 3, "Child tree initial length is OK");
-						var oItem0 = that.oEditor._oChildTree.getItems()[0];
-						var oItem1 = that.oEditor._oChildTree.getItems()[1];
-						var oItem2 = that.oEditor._oChildTree.getItems()[2];
+						assert.ok(that.oCardEditor._oChildTree, "Child tree is created");
+						assert.equal(that.oCardEditor._oChildTree.getItems().length, 3, "Child tree initial length is OK");
+						var oItem0 = that.oCardEditor._oChildTree.getItems()[0];
+						var oItem1 = that.oCardEditor._oChildTree.getItems()[1];
+						var oItem2 = that.oCardEditor._oChildTree.getItems()[2];
 						assert.equal(oItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.ok(oItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -647,14 +647,14 @@ sap.ui.define([
 						assert.ok(!oItem2.isLeaf(), "Child tree item 2 is leaf: false");
 
 						// simulate to click child1
-						that.oEditor._oChildTree.onItemPress(oItem1, oItem1);
-						EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-							assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready again");
-							aFormContents = that.oEditor.getAggregation("_formContent");
-							assert.equal(aFormContents.length, 5, "Editor: form content length is OK");
+						that.oCardEditor._oChildTree.onItemPress(oItem1, oItem1);
+						EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+							assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready again");
+							aFormContents = that.oCardEditor.getAggregation("_formContent");
+							assert.equal(aFormContents.length, 5, "Card Editor: form content length is OK");
 
-							EditorQunitUtils.isReady(that.oEditor).then(function () {
-								assert.ok(that.oEditor.isReady(), "Editor is ready again");
+							EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+								assert.ok(that.oCardEditor.isReady(), "Card Editor is ready again");
 
 								oTitleLabel = aFormContents[2];
 								oTitleFieldOri = aFormContents[3];
@@ -668,12 +668,12 @@ sap.ui.define([
 								assert.ok(oTitleField.getAggregation("_field").isA("sap.m.Input"), "Title Field: Control is an Input");
 								assert.equal(oTitleField.getAggregation("_field").getValue(), "Trans Card Title in i18n en", "Title Field: String Value");
 
-								assert.equal(that.oEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
-								var oNewItem0 = that.oEditor._oChildTree.getItems()[0];
-								var oNewItem1 = that.oEditor._oChildTree.getItems()[1];
-								var oNewItem2 = that.oEditor._oChildTree.getItems()[2];
-								var oNewItem3 = that.oEditor._oChildTree.getItems()[3];
-								var oNewItem4 = that.oEditor._oChildTree.getItems()[4];
+								assert.equal(that.oCardEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
+								var oNewItem0 = that.oCardEditor._oChildTree.getItems()[0];
+								var oNewItem1 = that.oCardEditor._oChildTree.getItems()[1];
+								var oNewItem2 = that.oCardEditor._oChildTree.getItems()[2];
+								var oNewItem3 = that.oCardEditor._oChildTree.getItems()[3];
+								var oNewItem4 = that.oCardEditor._oChildTree.getItems()[4];
 								assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 								assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 								assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -691,14 +691,14 @@ sap.ui.define([
 								assert.ok(!oNewItem4.isLeaf(), "Child tree item 4 is leaf: false");
 
 								// simulate to click child1-2
-								that.oEditor._oChildTree.onItemPress(oNewItem3, oNewItem3);
-								EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-									assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready again too");
-									aFormContents = that.oEditor.getAggregation("_formContent");
-									assert.equal(aFormContents.length, 5, "Editor: form content length is OK");
+								that.oCardEditor._oChildTree.onItemPress(oNewItem3, oNewItem3);
+								EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+									assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready again too");
+									aFormContents = that.oCardEditor.getAggregation("_formContent");
+									assert.equal(aFormContents.length, 5, "Card Editor: form content length is OK");
 
-									EditorQunitUtils.isReady(that.oEditor).then(function () {
-										assert.ok(that.oEditor.isReady(), "Editor is ready again too");
+									EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+										assert.ok(that.oCardEditor.isReady(), "Card Editor is ready again too");
 
 										oTitleLabel = aFormContents[2];
 										oTitleFieldOri = aFormContents[3];
@@ -712,12 +712,12 @@ sap.ui.define([
 										assert.ok(oTitleField.getAggregation("_field").isA("sap.m.Input"), "Title Field: Control is an Input");
 										assert.equal(oTitleField.getAggregation("_field").getValue(), "Trans Card Title in i18n en", "Title Field: String Value");
 
-										assert.equal(that.oEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
-										oNewItem0 = that.oEditor._oChildTree.getItems()[0];
-										oNewItem1 = that.oEditor._oChildTree.getItems()[1];
-										oNewItem2 = that.oEditor._oChildTree.getItems()[2];
-										oNewItem3 = that.oEditor._oChildTree.getItems()[3];
-										oNewItem4 = that.oEditor._oChildTree.getItems()[4];
+										assert.equal(that.oCardEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
+										oNewItem0 = that.oCardEditor._oChildTree.getItems()[0];
+										oNewItem1 = that.oCardEditor._oChildTree.getItems()[1];
+										oNewItem2 = that.oCardEditor._oChildTree.getItems()[2];
+										oNewItem3 = that.oCardEditor._oChildTree.getItems()[3];
+										oNewItem4 = that.oCardEditor._oChildTree.getItems()[4];
 										assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 										assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 										assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -746,18 +746,18 @@ sap.ui.define([
 
 		QUnit.test("click and load child1, then child1-2, then back to main", function (assert) {
 			var that = this;
-			that.oEditor.setCard({
+			that.oCardEditor.setCard({
 				baseUrl: sBaseUrl,
 				host: "contexthost",
 				manifest: sBaseUrl + "manifest.json"
 			});
 			return new Promise(function (resolve, reject) {
-				EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-					assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready");
-					var aFormContents = that.oEditor.getAggregation("_formContent");
-					assert.equal(aFormContents.length, 5, "Editor: form content length is OK");
-					EditorQunitUtils.isReady(that.oEditor).then(function () {
-						assert.ok(that.oEditor.isReady(), "Editor is ready");
+				EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+					assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready");
+					var aFormContents = that.oCardEditor.getAggregation("_formContent");
+					assert.equal(aFormContents.length, 5, "Card Editor: form content length is OK");
+					EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+						assert.ok(that.oCardEditor.isReady(), "Card Editor is ready");
 
 						var oTitleLabel = aFormContents[2];
 						var oTitleFieldOri = aFormContents[3];
@@ -771,11 +771,11 @@ sap.ui.define([
 						assert.ok(oTitleField.getAggregation("_field").isA("sap.m.Input"), "Title Field: Control is an Input");
 						assert.equal(oTitleField.getAggregation("_field").getValue(), "Trans Card Title in i18n en", "Title Field: String Value");
 
-						assert.ok(that.oEditor._oChildTree, "Child tree is created");
-						assert.equal(that.oEditor._oChildTree.getItems().length, 3, "Child tree initial length is OK");
-						var oItem0 = that.oEditor._oChildTree.getItems()[0];
-						var oItem1 = that.oEditor._oChildTree.getItems()[1];
-						var oItem2 = that.oEditor._oChildTree.getItems()[2];
+						assert.ok(that.oCardEditor._oChildTree, "Child tree is created");
+						assert.equal(that.oCardEditor._oChildTree.getItems().length, 3, "Child tree initial length is OK");
+						var oItem0 = that.oCardEditor._oChildTree.getItems()[0];
+						var oItem1 = that.oCardEditor._oChildTree.getItems()[1];
+						var oItem2 = that.oCardEditor._oChildTree.getItems()[2];
 						assert.equal(oItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.ok(oItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -787,14 +787,14 @@ sap.ui.define([
 						assert.ok(!oItem2.isLeaf(), "Child tree item 2 is leaf: false");
 
 						// simulate to click child1
-						that.oEditor._oChildTree.onItemPress(oItem1, oItem1);
-						EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-							assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready again");
-							aFormContents = that.oEditor.getAggregation("_formContent");
-							assert.equal(aFormContents.length, 5, "Editor: form content length is OK");
+						that.oCardEditor._oChildTree.onItemPress(oItem1, oItem1);
+						EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+							assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready again");
+							aFormContents = that.oCardEditor.getAggregation("_formContent");
+							assert.equal(aFormContents.length, 5, "Card Editor: form content length is OK");
 
-							EditorQunitUtils.isReady(that.oEditor).then(function () {
-								assert.ok(that.oEditor.isReady(), "Editor is ready again");
+							EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+								assert.ok(that.oCardEditor.isReady(), "Card Editor is ready again");
 
 								oTitleLabel = aFormContents[2];
 								oTitleFieldOri = aFormContents[3];
@@ -808,12 +808,12 @@ sap.ui.define([
 								assert.ok(oTitleField.getAggregation("_field").isA("sap.m.Input"), "Title Field: Control is an Input");
 								assert.equal(oTitleField.getAggregation("_field").getValue(), "Trans Card Title in i18n en", "Title Field: String Value");
 
-								assert.equal(that.oEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
-								var oNewItem0 = that.oEditor._oChildTree.getItems()[0];
-								var oNewItem1 = that.oEditor._oChildTree.getItems()[1];
-								var oNewItem2 = that.oEditor._oChildTree.getItems()[2];
-								var oNewItem3 = that.oEditor._oChildTree.getItems()[3];
-								var oNewItem4 = that.oEditor._oChildTree.getItems()[4];
+								assert.equal(that.oCardEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
+								var oNewItem0 = that.oCardEditor._oChildTree.getItems()[0];
+								var oNewItem1 = that.oCardEditor._oChildTree.getItems()[1];
+								var oNewItem2 = that.oCardEditor._oChildTree.getItems()[2];
+								var oNewItem3 = that.oCardEditor._oChildTree.getItems()[3];
+								var oNewItem4 = that.oCardEditor._oChildTree.getItems()[4];
 								assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 								assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 								assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -831,14 +831,14 @@ sap.ui.define([
 								assert.ok(!oNewItem4.isLeaf(), "Child tree item 4 is leaf: false");
 
 								// simulate to click child1-2
-								that.oEditor._oChildTree.onItemPress(oNewItem3, oNewItem3);
-								EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-									assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready again too");
-									aFormContents = that.oEditor.getAggregation("_formContent");
-									assert.equal(aFormContents.length, 5, "Editor: form content length is OK");
+								that.oCardEditor._oChildTree.onItemPress(oNewItem3, oNewItem3);
+								EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+									assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready again too");
+									aFormContents = that.oCardEditor.getAggregation("_formContent");
+									assert.equal(aFormContents.length, 5, "Card Editor: form content length is OK");
 
-									EditorQunitUtils.isReady(that.oEditor).then(function () {
-										assert.ok(that.oEditor.isReady(), "Editor is ready again too");
+									EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+										assert.ok(that.oCardEditor.isReady(), "Card Editor is ready again too");
 
 										oTitleLabel = aFormContents[2];
 										oTitleFieldOri = aFormContents[3];
@@ -852,12 +852,12 @@ sap.ui.define([
 										assert.ok(oTitleField.getAggregation("_field").isA("sap.m.Input"), "Title Field: Control is an Input");
 										assert.equal(oTitleField.getAggregation("_field").getValue(), "Trans Card Title in i18n en", "Title Field: String Value");
 
-										assert.equal(that.oEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
-										oNewItem0 = that.oEditor._oChildTree.getItems()[0];
-										oNewItem1 = that.oEditor._oChildTree.getItems()[1];
-										oNewItem2 = that.oEditor._oChildTree.getItems()[2];
-										oNewItem3 = that.oEditor._oChildTree.getItems()[3];
-										oNewItem4 = that.oEditor._oChildTree.getItems()[4];
+										assert.equal(that.oCardEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
+										oNewItem0 = that.oCardEditor._oChildTree.getItems()[0];
+										oNewItem1 = that.oCardEditor._oChildTree.getItems()[1];
+										oNewItem2 = that.oCardEditor._oChildTree.getItems()[2];
+										oNewItem3 = that.oCardEditor._oChildTree.getItems()[3];
+										oNewItem4 = that.oCardEditor._oChildTree.getItems()[4];
 										assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 										assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 										assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -875,13 +875,13 @@ sap.ui.define([
 										assert.ok(!oNewItem4.isLeaf(), "Child tree item 4 is leaf: false");
 
 										// simulate to click main
-										that.oEditor._oChildTree.onItemPress(oNewItem0, oNewItem0);
-										EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-											assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready again after back to main");
-											var aFormContents = that.oEditor.getAggregation("_formContent");
-											assert.equal(aFormContents.length, 5, "Editor: form content length is OK");
-											EditorQunitUtils.isReady(that.oEditor).then(function () {
-												assert.ok(that.oEditor.isReady(), "Editor is ready again after back to main");
+										that.oCardEditor._oChildTree.onItemPress(oNewItem0, oNewItem0);
+										EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+											assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready again after back to main");
+											var aFormContents = that.oCardEditor.getAggregation("_formContent");
+											assert.equal(aFormContents.length, 5, "Card Editor: form content length is OK");
+											EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+												assert.ok(that.oCardEditor.isReady(), "Card Editor is ready again after back to main");
 
 												var oTitleLabel = aFormContents[2];
 												var oTitleFieldOri = aFormContents[3];
@@ -895,12 +895,12 @@ sap.ui.define([
 												assert.ok(oTitleField.getAggregation("_field").isA("sap.m.Input"), "Title Field: Control is an Input");
 												assert.equal(oTitleField.getAggregation("_field").getValue(), "Trans Card Title in i18n en", "Title Field: String Value");
 
-												assert.equal(that.oEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
-												oNewItem0 = that.oEditor._oChildTree.getItems()[0];
-												oNewItem1 = that.oEditor._oChildTree.getItems()[1];
-												oNewItem2 = that.oEditor._oChildTree.getItems()[2];
-												oNewItem3 = that.oEditor._oChildTree.getItems()[3];
-												oNewItem4 = that.oEditor._oChildTree.getItems()[4];
+												assert.equal(that.oCardEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
+												oNewItem0 = that.oCardEditor._oChildTree.getItems()[0];
+												oNewItem1 = that.oCardEditor._oChildTree.getItems()[1];
+												oNewItem2 = that.oCardEditor._oChildTree.getItems()[2];
+												oNewItem3 = that.oCardEditor._oChildTree.getItems()[3];
+												oNewItem4 = that.oCardEditor._oChildTree.getItems()[4];
 												assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 												assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 												assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -931,18 +931,18 @@ sap.ui.define([
 
 		QUnit.test("click and load child2", function (assert) {
 			var that = this;
-			that.oEditor.setCard({
+			that.oCardEditor.setCard({
 				baseUrl: sBaseUrl,
 				host: "contexthost",
 				manifest: sBaseUrl + "manifest.json"
 			});
 			return new Promise(function (resolve, reject) {
-				EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-					assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready");
-					var aFormContents = that.oEditor.getAggregation("_formContent");
-					assert.equal(aFormContents.length, 5, "Editor: form content length is OK");
-					EditorQunitUtils.isReady(that.oEditor).then(function () {
-						assert.ok(that.oEditor.isReady(), "Editor is ready");
+				EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+					assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready");
+					var aFormContents = that.oCardEditor.getAggregation("_formContent");
+					assert.equal(aFormContents.length, 5, "Card Editor: form content length is OK");
+					EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+						assert.ok(that.oCardEditor.isReady(), "Card Editor is ready");
 
 						var oTitleLabel = aFormContents[2];
 						var oTitleFieldOri = aFormContents[3];
@@ -956,11 +956,11 @@ sap.ui.define([
 						assert.ok(oTitleField.getAggregation("_field").isA("sap.m.Input"), "Title Field: Control is an Input");
 						assert.equal(oTitleField.getAggregation("_field").getValue(), "Trans Card Title in i18n en", "Title Field: String Value");
 
-						assert.ok(that.oEditor._oChildTree, "Child tree is created");
-						assert.equal(that.oEditor._oChildTree.getItems().length, 3, "Child tree initial length is OK");
-						var oItem0 = that.oEditor._oChildTree.getItems()[0];
-						var oItem1 = that.oEditor._oChildTree.getItems()[1];
-						var oItem2 = that.oEditor._oChildTree.getItems()[2];
+						assert.ok(that.oCardEditor._oChildTree, "Child tree is created");
+						assert.equal(that.oCardEditor._oChildTree.getItems().length, 3, "Child tree initial length is OK");
+						var oItem0 = that.oCardEditor._oChildTree.getItems()[0];
+						var oItem1 = that.oCardEditor._oChildTree.getItems()[1];
+						var oItem2 = that.oCardEditor._oChildTree.getItems()[2];
 						assert.equal(oItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.ok(oItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -972,14 +972,14 @@ sap.ui.define([
 						assert.ok(!oItem2.isLeaf(), "Child tree item 2 is leaf: false");
 
 						// simulate to click child2
-						that.oEditor._oChildTree.onItemPress(oItem2, oItem2);
-						EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-							assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready again");
-							aFormContents = that.oEditor.getAggregation("_formContent");
-							assert.equal(aFormContents.length, 5, "Editor: form content length is OK");
+						that.oCardEditor._oChildTree.onItemPress(oItem2, oItem2);
+						EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+							assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready again");
+							aFormContents = that.oCardEditor.getAggregation("_formContent");
+							assert.equal(aFormContents.length, 5, "Card Editor: form content length is OK");
 
-							EditorQunitUtils.isReady(that.oEditor).then(function () {
-								assert.ok(that.oEditor.isReady(), "Editor is ready again");
+							EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+								assert.ok(that.oCardEditor.isReady(), "Card Editor is ready again");
 
 								oTitleLabel = aFormContents[2];
 								oTitleFieldOri = aFormContents[3];
@@ -993,11 +993,11 @@ sap.ui.define([
 								assert.ok(oTitleField.getAggregation("_field").isA("sap.m.Input"), "Title Field: Control is an Input");
 								assert.equal(oTitleField.getAggregation("_field").getValue(), "Trans Card Title in i18n en", "Title Field: String Value");
 
-								assert.equal(that.oEditor._oChildTree.getItems().length, 4, "Child tree length is OK after clicking child2");
-								var oNewItem0 = that.oEditor._oChildTree.getItems()[0];
-								var oNewItem1 = that.oEditor._oChildTree.getItems()[1];
-								var oNewItem2 = that.oEditor._oChildTree.getItems()[2];
-								var oNewItem3 = that.oEditor._oChildTree.getItems()[3];
+								assert.equal(that.oCardEditor._oChildTree.getItems().length, 4, "Child tree length is OK after clicking child2");
+								var oNewItem0 = that.oCardEditor._oChildTree.getItems()[0];
+								var oNewItem1 = that.oCardEditor._oChildTree.getItems()[1];
+								var oNewItem2 = that.oCardEditor._oChildTree.getItems()[2];
+								var oNewItem3 = that.oCardEditor._oChildTree.getItems()[3];
 								assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 								assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 								assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -1021,18 +1021,18 @@ sap.ui.define([
 
 		QUnit.test("click and load child2, then back to main", function (assert) {
 			var that = this;
-			that.oEditor.setCard({
+			that.oCardEditor.setCard({
 				baseUrl: sBaseUrl,
 				host: "contexthost",
 				manifest: sBaseUrl + "manifest.json"
 			});
 			return new Promise(function (resolve, reject) {
-				EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-					assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready");
-					var aFormContents = that.oEditor.getAggregation("_formContent");
-					assert.equal(aFormContents.length, 5, "Editor: form content length is OK");
-					EditorQunitUtils.isReady(that.oEditor).then(function () {
-						assert.ok(that.oEditor.isReady(), "Editor is ready");
+				EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+					assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready");
+					var aFormContents = that.oCardEditor.getAggregation("_formContent");
+					assert.equal(aFormContents.length, 5, "Card Editor: form content length is OK");
+					EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+						assert.ok(that.oCardEditor.isReady(), "Card Editor is ready");
 
 						var oTitleLabel = aFormContents[2];
 						var oTitleFieldOri = aFormContents[3];
@@ -1046,11 +1046,11 @@ sap.ui.define([
 						assert.ok(oTitleField.getAggregation("_field").isA("sap.m.Input"), "Title Field: Control is an Input");
 						assert.equal(oTitleField.getAggregation("_field").getValue(), "Trans Card Title in i18n en", "Title Field: String Value");
 
-						assert.ok(that.oEditor._oChildTree, "Child tree is created");
-						assert.equal(that.oEditor._oChildTree.getItems().length, 3, "Child tree initial length is OK");
-						var oItem0 = that.oEditor._oChildTree.getItems()[0];
-						var oItem1 = that.oEditor._oChildTree.getItems()[1];
-						var oItem2 = that.oEditor._oChildTree.getItems()[2];
+						assert.ok(that.oCardEditor._oChildTree, "Child tree is created");
+						assert.equal(that.oCardEditor._oChildTree.getItems().length, 3, "Child tree initial length is OK");
+						var oItem0 = that.oCardEditor._oChildTree.getItems()[0];
+						var oItem1 = that.oCardEditor._oChildTree.getItems()[1];
+						var oItem2 = that.oCardEditor._oChildTree.getItems()[2];
 						assert.equal(oItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.ok(oItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -1062,14 +1062,14 @@ sap.ui.define([
 						assert.ok(!oItem2.isLeaf(), "Child tree item 2 is leaf: false");
 
 						// simulate to click child2
-						that.oEditor._oChildTree.onItemPress(oItem2, oItem2);
-						EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-							assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready again");
-							aFormContents = that.oEditor.getAggregation("_formContent");
-							assert.equal(aFormContents.length, 5, "Editor: form content length is OK");
+						that.oCardEditor._oChildTree.onItemPress(oItem2, oItem2);
+						EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+							assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready again");
+							aFormContents = that.oCardEditor.getAggregation("_formContent");
+							assert.equal(aFormContents.length, 5, "Card Editor: form content length is OK");
 
-							EditorQunitUtils.isReady(that.oEditor).then(function () {
-								assert.ok(that.oEditor.isReady(), "Editor is ready again");
+							EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+								assert.ok(that.oCardEditor.isReady(), "Card Editor is ready again");
 
 								oTitleLabel = aFormContents[2];
 								oTitleFieldOri = aFormContents[3];
@@ -1083,11 +1083,11 @@ sap.ui.define([
 								assert.ok(oTitleField.getAggregation("_field").isA("sap.m.Input"), "Title Field: Control is an Input");
 								assert.equal(oTitleField.getAggregation("_field").getValue(), "Trans Card Title in i18n en", "Title Field: String Value");
 
-								assert.equal(that.oEditor._oChildTree.getItems().length, 4, "Child tree length is OK after clicking child2");
-								var oNewItem0 = that.oEditor._oChildTree.getItems()[0];
-								var oNewItem1 = that.oEditor._oChildTree.getItems()[1];
-								var oNewItem2 = that.oEditor._oChildTree.getItems()[2];
-								var oNewItem3 = that.oEditor._oChildTree.getItems()[3];
+								assert.equal(that.oCardEditor._oChildTree.getItems().length, 4, "Child tree length is OK after clicking child2");
+								var oNewItem0 = that.oCardEditor._oChildTree.getItems()[0];
+								var oNewItem1 = that.oCardEditor._oChildTree.getItems()[1];
+								var oNewItem2 = that.oCardEditor._oChildTree.getItems()[2];
+								var oNewItem3 = that.oCardEditor._oChildTree.getItems()[3];
 								assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 								assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 								assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -1102,13 +1102,13 @@ sap.ui.define([
 								assert.ok(oNewItem3.isLeaf(), "Child tree item 3 is leaf: false");
 
 								// simulate to click main
-								that.oEditor._oChildTree.onItemPress(oNewItem0, oNewItem0);
-								EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-									assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready again after back to main");
-									var aFormContents = that.oEditor.getAggregation("_formContent");
-									assert.equal(aFormContents.length, 5, "Editor: form content length is OK");
-									EditorQunitUtils.isReady(that.oEditor).then(function () {
-										assert.ok(that.oEditor.isReady(), "Editor is ready again after back to main");
+								that.oCardEditor._oChildTree.onItemPress(oNewItem0, oNewItem0);
+								EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+									assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready again after back to main");
+									var aFormContents = that.oCardEditor.getAggregation("_formContent");
+									assert.equal(aFormContents.length, 5, "Card Editor: form content length is OK");
+									EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+										assert.ok(that.oCardEditor.isReady(), "Card Editor is ready again after back to main");
 
 										var oTitleLabel = aFormContents[2];
 										var oTitleFieldOri = aFormContents[3];
@@ -1122,11 +1122,11 @@ sap.ui.define([
 										assert.ok(oTitleField.getAggregation("_field").isA("sap.m.Input"), "Title Field: Control is an Input");
 										assert.equal(oTitleField.getAggregation("_field").getValue(), "Trans Card Title in i18n en", "Title Field: String Value");
 
-										assert.equal(that.oEditor._oChildTree.getItems().length, 4, "Child tree length is OK after clicking child2");
-										oNewItem0 = that.oEditor._oChildTree.getItems()[0];
-										oNewItem1 = that.oEditor._oChildTree.getItems()[1];
-										oNewItem2 = that.oEditor._oChildTree.getItems()[2];
-										oNewItem3 = that.oEditor._oChildTree.getItems()[3];
+										assert.equal(that.oCardEditor._oChildTree.getItems().length, 4, "Child tree length is OK after clicking child2");
+										oNewItem0 = that.oCardEditor._oChildTree.getItems()[0];
+										oNewItem1 = that.oCardEditor._oChildTree.getItems()[1];
+										oNewItem2 = that.oCardEditor._oChildTree.getItems()[2];
+										oNewItem3 = that.oCardEditor._oChildTree.getItems()[3];
 										assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 										assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 										assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -1152,18 +1152,18 @@ sap.ui.define([
 
 		QUnit.test("expand child1 then click child1-1", function (assert) {
 			var that = this;
-			that.oEditor.setCard({
+			that.oCardEditor.setCard({
 				baseUrl: sBaseUrl,
 				host: "contexthost",
 				manifest: sBaseUrl + "manifest.json"
 			});
 			return new Promise(function (resolve, reject) {
-				EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-					assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready");
-					var aFormContents = that.oEditor.getAggregation("_formContent");
-					assert.equal(aFormContents.length, 5, "Editor: form content length is OK");
-					EditorQunitUtils.isReady(that.oEditor).then(async function () {
-						assert.ok(that.oEditor.isReady(), "Editor is ready");
+				EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+					assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready");
+					var aFormContents = that.oCardEditor.getAggregation("_formContent");
+					assert.equal(aFormContents.length, 5, "Card Editor: form content length is OK");
+					EditorQunitUtils.isReady(that.oCardEditor).then(async function () {
+						assert.ok(that.oCardEditor.isReady(), "Card Editor is ready");
 
 						var oTitleLabel = aFormContents[2];
 						var oTitleFieldOri = aFormContents[3];
@@ -1177,11 +1177,11 @@ sap.ui.define([
 						assert.ok(oTitleField.getAggregation("_field").isA("sap.m.Input"), "Title Field: Control is an Input");
 						assert.equal(oTitleField.getAggregation("_field").getValue(), "Trans Card Title in i18n en", "Title Field: String Value");
 
-						assert.ok(that.oEditor._oChildTree, "Child tree is created");
-						assert.equal(that.oEditor._oChildTree.getItems().length, 3, "Child tree initial length is OK");
-						var oItem0 = that.oEditor._oChildTree.getItems()[0];
-						var oItem1 = that.oEditor._oChildTree.getItems()[1];
-						var oItem2 = that.oEditor._oChildTree.getItems()[2];
+						assert.ok(that.oCardEditor._oChildTree, "Child tree is created");
+						assert.equal(that.oCardEditor._oChildTree.getItems().length, 3, "Child tree initial length is OK");
+						var oItem0 = that.oCardEditor._oChildTree.getItems()[0];
+						var oItem1 = that.oCardEditor._oChildTree.getItems()[1];
+						var oItem2 = that.oCardEditor._oChildTree.getItems()[2];
 						assert.equal(oItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.ok(oItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -1196,12 +1196,12 @@ sap.ui.define([
 						var oArrow = Element.getElementById(oItem1.getId() + "-expander");
 						oArrow.firePress();
 						await nextUIUpdate();
-						assert.equal(that.oEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
-						var oNewItem0 = that.oEditor._oChildTree.getItems()[0];
-						var oNewItem1 = that.oEditor._oChildTree.getItems()[1];
-						var oNewItem2 = that.oEditor._oChildTree.getItems()[2];
-						var oNewItem3 = that.oEditor._oChildTree.getItems()[3];
-						var oNewItem4 = that.oEditor._oChildTree.getItems()[4];
+						assert.equal(that.oCardEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
+						var oNewItem0 = that.oCardEditor._oChildTree.getItems()[0];
+						var oNewItem1 = that.oCardEditor._oChildTree.getItems()[1];
+						var oNewItem2 = that.oCardEditor._oChildTree.getItems()[2];
+						var oNewItem3 = that.oCardEditor._oChildTree.getItems()[3];
+						var oNewItem4 = that.oCardEditor._oChildTree.getItems()[4];
 						assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.equal(oNewItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -1214,14 +1214,14 @@ sap.ui.define([
 						assert.ok(!oNewItem4.getExpanded(), "Child tree item 4 expanded: false");
 
 						// simulate to click child1-1
-						that.oEditor._oChildTree.onItemPress(oNewItem2, oNewItem2);
-						EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-							assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready again too");
-							var aFormContents = that.oEditor.getAggregation("_formContent");
-							assert.equal(aFormContents.length, 5, "Editor: form content length is OK");
+						that.oCardEditor._oChildTree.onItemPress(oNewItem2, oNewItem2);
+						EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+							assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready again too");
+							var aFormContents = that.oCardEditor.getAggregation("_formContent");
+							assert.equal(aFormContents.length, 5, "Card Editor: form content length is OK");
 
-							EditorQunitUtils.isReady(that.oEditor).then(function () {
-								assert.ok(that.oEditor.isReady(), "Editor is ready again too");
+							EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+								assert.ok(that.oCardEditor.isReady(), "Card Editor is ready again too");
 
 								oTitleLabel = aFormContents[2];
 								oTitleFieldOri = aFormContents[3];
@@ -1235,12 +1235,12 @@ sap.ui.define([
 								assert.ok(oTitleField.getAggregation("_field").isA("sap.m.Input"), "Title Field: Control is an Input");
 								assert.equal(oTitleField.getAggregation("_field").getValue(), "Trans Card Title in i18n en", "Title Field: String Value");
 
-								assert.equal(that.oEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
-								oNewItem0 = that.oEditor._oChildTree.getItems()[0];
-								oNewItem1 = that.oEditor._oChildTree.getItems()[1];
-								oNewItem2 = that.oEditor._oChildTree.getItems()[2];
-								oNewItem3 = that.oEditor._oChildTree.getItems()[3];
-								oNewItem4 = that.oEditor._oChildTree.getItems()[4];
+								assert.equal(that.oCardEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
+								oNewItem0 = that.oCardEditor._oChildTree.getItems()[0];
+								oNewItem1 = that.oCardEditor._oChildTree.getItems()[1];
+								oNewItem2 = that.oCardEditor._oChildTree.getItems()[2];
+								oNewItem3 = that.oCardEditor._oChildTree.getItems()[3];
+								oNewItem4 = that.oCardEditor._oChildTree.getItems()[4];
 								assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 								assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 								assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -1267,18 +1267,18 @@ sap.ui.define([
 
 		QUnit.test("expand child1 then click child1-2", function (assert) {
 			var that = this;
-			that.oEditor.setCard({
+			that.oCardEditor.setCard({
 				baseUrl: sBaseUrl,
 				host: "contexthost",
 				manifest: sBaseUrl + "manifest.json"
 			});
 			return new Promise(function (resolve, reject) {
-				EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-					assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready");
-					var aFormContents = that.oEditor.getAggregation("_formContent");
-					assert.equal(aFormContents.length, 5, "Editor: form content length is OK");
-					EditorQunitUtils.isReady(that.oEditor).then(async function () {
-						assert.ok(that.oEditor.isReady(), "Editor is ready");
+				EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+					assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready");
+					var aFormContents = that.oCardEditor.getAggregation("_formContent");
+					assert.equal(aFormContents.length, 5, "Card Editor: form content length is OK");
+					EditorQunitUtils.isReady(that.oCardEditor).then(async function () {
+						assert.ok(that.oCardEditor.isReady(), "Card Editor is ready");
 
 						var oTitleLabel = aFormContents[2];
 						var oTitleFieldOri = aFormContents[3];
@@ -1292,11 +1292,11 @@ sap.ui.define([
 						assert.ok(oTitleField.getAggregation("_field").isA("sap.m.Input"), "Title Field: Control is an Input");
 						assert.equal(oTitleField.getAggregation("_field").getValue(), "Trans Card Title in i18n en", "Title Field: String Value");
 
-						assert.ok(that.oEditor._oChildTree, "Child tree is created");
-						assert.equal(that.oEditor._oChildTree.getItems().length, 3, "Child tree initial length is OK");
-						var oItem0 = that.oEditor._oChildTree.getItems()[0];
-						var oItem1 = that.oEditor._oChildTree.getItems()[1];
-						var oItem2 = that.oEditor._oChildTree.getItems()[2];
+						assert.ok(that.oCardEditor._oChildTree, "Child tree is created");
+						assert.equal(that.oCardEditor._oChildTree.getItems().length, 3, "Child tree initial length is OK");
+						var oItem0 = that.oCardEditor._oChildTree.getItems()[0];
+						var oItem1 = that.oCardEditor._oChildTree.getItems()[1];
+						var oItem2 = that.oCardEditor._oChildTree.getItems()[2];
 						assert.equal(oItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.ok(oItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -1311,12 +1311,12 @@ sap.ui.define([
 						var oArrow = Element.getElementById(oItem1.getId() + "-expander");
 						oArrow.firePress();
 						await nextUIUpdate();
-						assert.equal(that.oEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
-						var oNewItem0 = that.oEditor._oChildTree.getItems()[0];
-						var oNewItem1 = that.oEditor._oChildTree.getItems()[1];
-						var oNewItem2 = that.oEditor._oChildTree.getItems()[2];
-						var oNewItem3 = that.oEditor._oChildTree.getItems()[3];
-						var oNewItem4 = that.oEditor._oChildTree.getItems()[4];
+						assert.equal(that.oCardEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
+						var oNewItem0 = that.oCardEditor._oChildTree.getItems()[0];
+						var oNewItem1 = that.oCardEditor._oChildTree.getItems()[1];
+						var oNewItem2 = that.oCardEditor._oChildTree.getItems()[2];
+						var oNewItem3 = that.oCardEditor._oChildTree.getItems()[3];
+						var oNewItem4 = that.oCardEditor._oChildTree.getItems()[4];
 						assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.equal(oNewItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -1329,14 +1329,14 @@ sap.ui.define([
 						assert.ok(!oNewItem4.getExpanded(), "Child tree item 4 expanded: false");
 
 						// simulate to click child1-2
-						that.oEditor._oChildTree.onItemPress(oNewItem3, oNewItem3);
-						EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-							assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready again too");
-							aFormContents = that.oEditor.getAggregation("_formContent");
-							assert.equal(aFormContents.length, 5, "Editor: form content length is OK");
+						that.oCardEditor._oChildTree.onItemPress(oNewItem3, oNewItem3);
+						EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+							assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready again too");
+							aFormContents = that.oCardEditor.getAggregation("_formContent");
+							assert.equal(aFormContents.length, 5, "Card Editor: form content length is OK");
 
-							EditorQunitUtils.isReady(that.oEditor).then(function () {
-								assert.ok(that.oEditor.isReady(), "Editor is ready again too");
+							EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+								assert.ok(that.oCardEditor.isReady(), "Card Editor is ready again too");
 
 								oTitleLabel = aFormContents[2];
 								oTitleFieldOri = aFormContents[3];
@@ -1350,12 +1350,12 @@ sap.ui.define([
 								assert.ok(oTitleField.getAggregation("_field").isA("sap.m.Input"), "Title Field: Control is an Input");
 								assert.equal(oTitleField.getAggregation("_field").getValue(), "Trans Card Title in i18n en", "Title Field: String Value");
 
-								assert.equal(that.oEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
-								oNewItem0 = that.oEditor._oChildTree.getItems()[0];
-								oNewItem1 = that.oEditor._oChildTree.getItems()[1];
-								oNewItem2 = that.oEditor._oChildTree.getItems()[2];
-								oNewItem3 = that.oEditor._oChildTree.getItems()[3];
-								oNewItem4 = that.oEditor._oChildTree.getItems()[4];
+								assert.equal(that.oCardEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
+								oNewItem0 = that.oCardEditor._oChildTree.getItems()[0];
+								oNewItem1 = that.oCardEditor._oChildTree.getItems()[1];
+								oNewItem2 = that.oCardEditor._oChildTree.getItems()[2];
+								oNewItem3 = that.oCardEditor._oChildTree.getItems()[3];
+								oNewItem4 = that.oCardEditor._oChildTree.getItems()[4];
 								assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 								assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 								assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -1389,27 +1389,27 @@ sap.ui.define([
 			EditorQunitUtils.destroyMockServer();
 		},
 		beforeEach: function () {
-			this.oEditor = EditorQunitUtils.beforeEachTest(undefined, undefined,"CardEditor");
-			this.oEditor.setMode("all");
+			this.oCardEditor = EditorQunitUtils.beforeEachTest(undefined, undefined,"CardEditor");
+			this.oCardEditor.setMode("all");
 		},
 		afterEach: function () {
-			EditorQunitUtils.afterEachTest(this.oEditor, sandbox);
+			EditorQunitUtils.afterEachTest(this.oCardEditor, sandbox);
 		}
 	}, function () {
 		QUnit.test("click and load child1", function (assert) {
 			var that = this;
-			that.oEditor.setCard({
+			that.oCardEditor.setCard({
 				baseUrl: sBaseUrl,
 				host: "contexthost",
 				manifest: sBaseUrl + "manifest.json"
 			});
 			return new Promise(function (resolve, reject) {
-				EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-					assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready");
-					var aFormContents = that.oEditor.getAggregation("_formContent");
-					assert.equal(aFormContents.length, 16, "Editor: form content length is OK");
-					EditorQunitUtils.isReady(that.oEditor).then(function () {
-						assert.ok(that.oEditor.isReady(), "Editor is ready");
+				EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+					assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready");
+					var aFormContents = that.oCardEditor.getAggregation("_formContent");
+					assert.equal(aFormContents.length, 16, "Card Editor: form content length is OK");
+					EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+						assert.ok(that.oCardEditor.isReady(), "Card Editor is ready");
 
 						var oTitleLabel = aFormContents[1];
 						var oTitleField = aFormContents[2];
@@ -1474,11 +1474,11 @@ sap.ui.define([
 						assert.equal(oDestinationMockLabel.getText(), "mock_request", "Label: Has mock_request label from destination settings name");
 						assert.ok(oDestinationMockField.isA("sap.ui.integration.editor.fields.DestinationField"), "Field: Destination Field");
 
-						assert.ok(that.oEditor._oChildTree, "Child tree is created");
-						assert.equal(that.oEditor._oChildTree.getItems().length, 3, "Child tree initial length is OK");
-						var oItem0 = that.oEditor._oChildTree.getItems()[0];
-						var oItem1 = that.oEditor._oChildTree.getItems()[1];
-						var oItem2 = that.oEditor._oChildTree.getItems()[2];
+						assert.ok(that.oCardEditor._oChildTree, "Child tree is created");
+						assert.equal(that.oCardEditor._oChildTree.getItems().length, 3, "Child tree initial length is OK");
+						var oItem0 = that.oCardEditor._oChildTree.getItems()[0];
+						var oItem1 = that.oCardEditor._oChildTree.getItems()[1];
+						var oItem2 = that.oCardEditor._oChildTree.getItems()[2];
 						assert.equal(oItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.ok(oItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -1490,14 +1490,14 @@ sap.ui.define([
 						assert.ok(!oItem2.isLeaf(), "Child tree item 2 is leaf: false");
 
 						// simulate to click child1
-						that.oEditor._oChildTree.onItemPress(oItem1, oItem1);
-						EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-							assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready again");
-							aFormContents = that.oEditor.getAggregation("_formContent");
-							assert.equal(aFormContents.length, 11, "Editor: form content length is OK");
+						that.oCardEditor._oChildTree.onItemPress(oItem1, oItem1);
+						EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+							assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready again");
+							aFormContents = that.oCardEditor.getAggregation("_formContent");
+							assert.equal(aFormContents.length, 11, "Card Editor: form content length is OK");
 
-							EditorQunitUtils.isReady(that.oEditor).then(function () {
-								assert.ok(that.oEditor.isReady(), "Editor is ready again");
+							EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+								assert.ok(that.oCardEditor.isReady(), "Card Editor is ready again");
 
 								oTitleLabel = aFormContents[1];
 								oTitleField = aFormContents[2];
@@ -1550,12 +1550,12 @@ sap.ui.define([
 								assert.equal(oObjectsFieldControl.getBinding().getCount(), 8, "Objects Field Table: value length is 8");
 								assert.ok(oObjectsFieldControl.getSelectedIndices().length === 0, "Objects Field Table: no selected row");
 
-								assert.equal(that.oEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
-								var oNewItem0 = that.oEditor._oChildTree.getItems()[0];
-								var oNewItem1 = that.oEditor._oChildTree.getItems()[1];
-								var oNewItem2 = that.oEditor._oChildTree.getItems()[2];
-								var oNewItem3 = that.oEditor._oChildTree.getItems()[3];
-								var oNewItem4 = that.oEditor._oChildTree.getItems()[4];
+								assert.equal(that.oCardEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
+								var oNewItem0 = that.oCardEditor._oChildTree.getItems()[0];
+								var oNewItem1 = that.oCardEditor._oChildTree.getItems()[1];
+								var oNewItem2 = that.oCardEditor._oChildTree.getItems()[2];
+								var oNewItem3 = that.oCardEditor._oChildTree.getItems()[3];
+								var oNewItem4 = that.oCardEditor._oChildTree.getItems()[4];
 								assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 								assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 								assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -1582,18 +1582,18 @@ sap.ui.define([
 
 		QUnit.test("click and load child1, then back to main", function (assert) {
 			var that = this;
-			that.oEditor.setCard({
+			that.oCardEditor.setCard({
 				baseUrl: sBaseUrl,
 				host: "contexthost",
 				manifest: sBaseUrl + "manifest.json"
 			});
 			return new Promise(function (resolve, reject) {
-				EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-					assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready");
-					var aFormContents = that.oEditor.getAggregation("_formContent");
-					assert.equal(aFormContents.length, 16, "Editor: form content length is OK");
-					EditorQunitUtils.isReady(that.oEditor).then(function () {
-						assert.ok(that.oEditor.isReady(), "Editor is ready");
+				EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+					assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready");
+					var aFormContents = that.oCardEditor.getAggregation("_formContent");
+					assert.equal(aFormContents.length, 16, "Card Editor: form content length is OK");
+					EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+						assert.ok(that.oCardEditor.isReady(), "Card Editor is ready");
 
 						var oTitleLabel = aFormContents[1];
 						var oTitleField = aFormContents[2];
@@ -1658,11 +1658,11 @@ sap.ui.define([
 						assert.equal(oDestinationMockLabel.getText(), "mock_request", "Label: Has mock_request label from destination settings name");
 						assert.ok(oDestinationMockField.isA("sap.ui.integration.editor.fields.DestinationField"), "Field: Destination Field");
 
-						assert.ok(that.oEditor._oChildTree, "Child tree is created");
-						assert.equal(that.oEditor._oChildTree.getItems().length, 3, "Child tree initial length is OK");
-						var oItem0 = that.oEditor._oChildTree.getItems()[0];
-						var oItem1 = that.oEditor._oChildTree.getItems()[1];
-						var oItem2 = that.oEditor._oChildTree.getItems()[2];
+						assert.ok(that.oCardEditor._oChildTree, "Child tree is created");
+						assert.equal(that.oCardEditor._oChildTree.getItems().length, 3, "Child tree initial length is OK");
+						var oItem0 = that.oCardEditor._oChildTree.getItems()[0];
+						var oItem1 = that.oCardEditor._oChildTree.getItems()[1];
+						var oItem2 = that.oCardEditor._oChildTree.getItems()[2];
 						assert.equal(oItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.ok(oItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -1674,14 +1674,14 @@ sap.ui.define([
 						assert.ok(!oItem2.isLeaf(), "Child tree item 2 is leaf: false");
 
 						// simulate to click child1
-						that.oEditor._oChildTree.onItemPress(oItem1, oItem1);
-						EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-							assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready again");
-							aFormContents = that.oEditor.getAggregation("_formContent");
-							assert.equal(aFormContents.length, 11, "Editor: form content length is OK");
+						that.oCardEditor._oChildTree.onItemPress(oItem1, oItem1);
+						EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+							assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready again");
+							aFormContents = that.oCardEditor.getAggregation("_formContent");
+							assert.equal(aFormContents.length, 11, "Card Editor: form content length is OK");
 
-							EditorQunitUtils.isReady(that.oEditor).then(function () {
-								assert.ok(that.oEditor.isReady(), "Editor is ready again");
+							EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+								assert.ok(that.oCardEditor.isReady(), "Card Editor is ready again");
 
 								oTitleLabel = aFormContents[1];
 								oTitleField = aFormContents[2];
@@ -1734,12 +1734,12 @@ sap.ui.define([
 								assert.equal(oObjectsFieldControl.getBinding().getCount(), 8, "Objects Field Table: value length is 8");
 								assert.ok(oObjectsFieldControl.getSelectedIndices().length === 0, "Objects Field Table: no selected row");
 
-								assert.equal(that.oEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
-								var oNewItem0 = that.oEditor._oChildTree.getItems()[0];
-								var oNewItem1 = that.oEditor._oChildTree.getItems()[1];
-								var oNewItem2 = that.oEditor._oChildTree.getItems()[2];
-								var oNewItem3 = that.oEditor._oChildTree.getItems()[3];
-								var oNewItem4 = that.oEditor._oChildTree.getItems()[4];
+								assert.equal(that.oCardEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
+								var oNewItem0 = that.oCardEditor._oChildTree.getItems()[0];
+								var oNewItem1 = that.oCardEditor._oChildTree.getItems()[1];
+								var oNewItem2 = that.oCardEditor._oChildTree.getItems()[2];
+								var oNewItem3 = that.oCardEditor._oChildTree.getItems()[3];
+								var oNewItem4 = that.oCardEditor._oChildTree.getItems()[4];
 								assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 								assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 								assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -1757,14 +1757,14 @@ sap.ui.define([
 								assert.ok(!oNewItem4.isLeaf(), "Child tree item 4 is leaf: false");
 
 								// simulate to click main
-								that.oEditor._oChildTree.onItemPress(oNewItem0, oNewItem0);
-								EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-									assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready again after back to main");
-									aFormContents = that.oEditor.getAggregation("_formContent");
-									assert.equal(aFormContents.length, 16, "Editor: form content length is OK");
+								that.oCardEditor._oChildTree.onItemPress(oNewItem0, oNewItem0);
+								EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+									assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready again after back to main");
+									aFormContents = that.oCardEditor.getAggregation("_formContent");
+									assert.equal(aFormContents.length, 16, "Card Editor: form content length is OK");
 
-									EditorQunitUtils.isReady(that.oEditor).then(function () {
-										assert.ok(that.oEditor.isReady(), "Editor is ready again after back to main");
+									EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+										assert.ok(that.oCardEditor.isReady(), "Card Editor is ready again after back to main");
 
 										oTitleLabel = aFormContents[1];
 										oTitleField = aFormContents[2];
@@ -1829,12 +1829,12 @@ sap.ui.define([
 										assert.equal(oDestinationMockLabel.getText(), "mock_request", "Label: Has mock_request label from destination settings name");
 										assert.ok(oDestinationMockField.isA("sap.ui.integration.editor.fields.DestinationField"), "Field: Destination Field");
 
-										assert.equal(that.oEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
-										oNewItem0 = that.oEditor._oChildTree.getItems()[0];
-										oNewItem1 = that.oEditor._oChildTree.getItems()[1];
-										oNewItem2 = that.oEditor._oChildTree.getItems()[2];
-										oNewItem3 = that.oEditor._oChildTree.getItems()[3];
-										oNewItem4 = that.oEditor._oChildTree.getItems()[4];
+										assert.equal(that.oCardEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
+										oNewItem0 = that.oCardEditor._oChildTree.getItems()[0];
+										oNewItem1 = that.oCardEditor._oChildTree.getItems()[1];
+										oNewItem2 = that.oCardEditor._oChildTree.getItems()[2];
+										oNewItem3 = that.oCardEditor._oChildTree.getItems()[3];
+										oNewItem4 = that.oCardEditor._oChildTree.getItems()[4];
 										assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 										assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 										assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -1863,18 +1863,18 @@ sap.ui.define([
 
 		QUnit.test("click and load child1, then child1-1", function (assert) {
 			var that = this;
-			that.oEditor.setCard({
+			that.oCardEditor.setCard({
 				baseUrl: sBaseUrl,
 				host: "contexthost",
 				manifest: sBaseUrl + "manifest.json"
 			});
 			return new Promise(function (resolve, reject) {
-				EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-					assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready");
-					var aFormContents = that.oEditor.getAggregation("_formContent");
-					assert.equal(aFormContents.length, 16, "Editor: form content length is OK");
-					EditorQunitUtils.isReady(that.oEditor).then(function () {
-						assert.ok(that.oEditor.isReady(), "Editor is ready");
+				EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+					assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready");
+					var aFormContents = that.oCardEditor.getAggregation("_formContent");
+					assert.equal(aFormContents.length, 16, "Card Editor: form content length is OK");
+					EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+						assert.ok(that.oCardEditor.isReady(), "Card Editor is ready");
 
 						var oTitleLabel = aFormContents[1];
 						var oTitleField = aFormContents[2];
@@ -1939,11 +1939,11 @@ sap.ui.define([
 						assert.equal(oDestinationMockLabel.getText(), "mock_request", "Label: Has mock_request label from destination settings name");
 						assert.ok(oDestinationMockField.isA("sap.ui.integration.editor.fields.DestinationField"), "Field: Destination Field");
 
-						assert.ok(that.oEditor._oChildTree, "Child tree is created");
-						assert.equal(that.oEditor._oChildTree.getItems().length, 3, "Child tree initial length is OK");
-						var oItem0 = that.oEditor._oChildTree.getItems()[0];
-						var oItem1 = that.oEditor._oChildTree.getItems()[1];
-						var oItem2 = that.oEditor._oChildTree.getItems()[2];
+						assert.ok(that.oCardEditor._oChildTree, "Child tree is created");
+						assert.equal(that.oCardEditor._oChildTree.getItems().length, 3, "Child tree initial length is OK");
+						var oItem0 = that.oCardEditor._oChildTree.getItems()[0];
+						var oItem1 = that.oCardEditor._oChildTree.getItems()[1];
+						var oItem2 = that.oCardEditor._oChildTree.getItems()[2];
 						assert.equal(oItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.ok(oItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -1955,14 +1955,14 @@ sap.ui.define([
 						assert.ok(!oItem2.isLeaf(), "Child tree item 2 is leaf: false");
 
 						// simulate to click child1
-						that.oEditor._oChildTree.onItemPress(oItem1, oItem1);
-						EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-							assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready again");
-							aFormContents = that.oEditor.getAggregation("_formContent");
-							assert.equal(aFormContents.length, 11, "Editor: form content length is OK");
+						that.oCardEditor._oChildTree.onItemPress(oItem1, oItem1);
+						EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+							assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready again");
+							aFormContents = that.oCardEditor.getAggregation("_formContent");
+							assert.equal(aFormContents.length, 11, "Card Editor: form content length is OK");
 
-							EditorQunitUtils.isReady(that.oEditor).then(function () {
-								assert.ok(that.oEditor.isReady(), "Editor is ready again");
+							EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+								assert.ok(that.oCardEditor.isReady(), "Card Editor is ready again");
 
 								oTitleLabel = aFormContents[1];
 								oTitleField = aFormContents[2];
@@ -2015,12 +2015,12 @@ sap.ui.define([
 								assert.equal(oObjectsFieldControl.getBinding().getCount(), 8, "Objects Field Table: value length is 8");
 								assert.ok(oObjectsFieldControl.getSelectedIndices().length === 0, "Objects Field Table: no selected row");
 
-								assert.equal(that.oEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
-								var oNewItem0 = that.oEditor._oChildTree.getItems()[0];
-								var oNewItem1 = that.oEditor._oChildTree.getItems()[1];
-								var oNewItem2 = that.oEditor._oChildTree.getItems()[2];
-								var oNewItem3 = that.oEditor._oChildTree.getItems()[3];
-								var oNewItem4 = that.oEditor._oChildTree.getItems()[4];
+								assert.equal(that.oCardEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
+								var oNewItem0 = that.oCardEditor._oChildTree.getItems()[0];
+								var oNewItem1 = that.oCardEditor._oChildTree.getItems()[1];
+								var oNewItem2 = that.oCardEditor._oChildTree.getItems()[2];
+								var oNewItem3 = that.oCardEditor._oChildTree.getItems()[3];
+								var oNewItem4 = that.oCardEditor._oChildTree.getItems()[4];
 								assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 								assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 								assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -2038,14 +2038,14 @@ sap.ui.define([
 								assert.ok(!oNewItem4.isLeaf(), "Child tree item 4 is leaf: false");
 
 								// simulate to click child1-1
-								that.oEditor._oChildTree.onItemPress(oNewItem2, oNewItem2);
-								EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-									assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready again too");
-									aFormContents = that.oEditor.getAggregation("_formContent");
-									assert.equal(aFormContents.length, 9, "Editor: form content length is OK");
+								that.oCardEditor._oChildTree.onItemPress(oNewItem2, oNewItem2);
+								EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+									assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready again too");
+									aFormContents = that.oCardEditor.getAggregation("_formContent");
+									assert.equal(aFormContents.length, 9, "Card Editor: form content length is OK");
 
-									EditorQunitUtils.isReady(that.oEditor).then(function () {
-										assert.ok(that.oEditor.isReady(), "Editor is ready again too");
+									EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+										assert.ok(that.oCardEditor.isReady(), "Card Editor is ready again too");
 
 										oTitleLabel = aFormContents[1];
 										oTitleField = aFormContents[2];
@@ -2085,12 +2085,12 @@ sap.ui.define([
 										assert.equal(oEmployeeFieldControl.getSelectedKey(), 2, "Employee Field: Key Value");
 										assert.equal(oEmployeeFieldControl.getValue(), "FirstName2 LastName2", "Employee Field: String Value");
 
-										assert.equal(that.oEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
-										oNewItem0 = that.oEditor._oChildTree.getItems()[0];
-										oNewItem1 = that.oEditor._oChildTree.getItems()[1];
-										oNewItem2 = that.oEditor._oChildTree.getItems()[2];
-										oNewItem3 = that.oEditor._oChildTree.getItems()[3];
-										oNewItem4 = that.oEditor._oChildTree.getItems()[4];
+										assert.equal(that.oCardEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
+										oNewItem0 = that.oCardEditor._oChildTree.getItems()[0];
+										oNewItem1 = that.oCardEditor._oChildTree.getItems()[1];
+										oNewItem2 = that.oCardEditor._oChildTree.getItems()[2];
+										oNewItem3 = that.oCardEditor._oChildTree.getItems()[3];
+										oNewItem4 = that.oCardEditor._oChildTree.getItems()[4];
 										assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 										assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 										assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -2119,18 +2119,18 @@ sap.ui.define([
 
 		QUnit.test("click and load child1, then child1-1, then back to main", function (assert) {
 			var that = this;
-			that.oEditor.setCard({
+			that.oCardEditor.setCard({
 				baseUrl: sBaseUrl,
 				host: "contexthost",
 				manifest: sBaseUrl + "manifest.json"
 			});
 			return new Promise(function (resolve, reject) {
-				EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-					assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready");
-					var aFormContents = that.oEditor.getAggregation("_formContent");
-					assert.equal(aFormContents.length, 16, "Editor: form content length is OK");
-					EditorQunitUtils.isReady(that.oEditor).then(function () {
-						assert.ok(that.oEditor.isReady(), "Editor is ready");
+				EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+					assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready");
+					var aFormContents = that.oCardEditor.getAggregation("_formContent");
+					assert.equal(aFormContents.length, 16, "Card Editor: form content length is OK");
+					EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+						assert.ok(that.oCardEditor.isReady(), "Card Editor is ready");
 
 						var oTitleLabel = aFormContents[1];
 						var oTitleField = aFormContents[2];
@@ -2195,11 +2195,11 @@ sap.ui.define([
 						assert.equal(oDestinationMockLabel.getText(), "mock_request", "Label: Has mock_request label from destination settings name");
 						assert.ok(oDestinationMockField.isA("sap.ui.integration.editor.fields.DestinationField"), "Field: Destination Field");
 
-						assert.ok(that.oEditor._oChildTree, "Child tree is created");
-						assert.equal(that.oEditor._oChildTree.getItems().length, 3, "Child tree initial length is OK");
-						var oItem0 = that.oEditor._oChildTree.getItems()[0];
-						var oItem1 = that.oEditor._oChildTree.getItems()[1];
-						var oItem2 = that.oEditor._oChildTree.getItems()[2];
+						assert.ok(that.oCardEditor._oChildTree, "Child tree is created");
+						assert.equal(that.oCardEditor._oChildTree.getItems().length, 3, "Child tree initial length is OK");
+						var oItem0 = that.oCardEditor._oChildTree.getItems()[0];
+						var oItem1 = that.oCardEditor._oChildTree.getItems()[1];
+						var oItem2 = that.oCardEditor._oChildTree.getItems()[2];
 						assert.equal(oItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.ok(oItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -2211,14 +2211,14 @@ sap.ui.define([
 						assert.ok(!oItem2.isLeaf(), "Child tree item 2 is leaf: false");
 
 						// simulate to click child1
-						that.oEditor._oChildTree.onItemPress(oItem1, oItem1);
-						EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-							assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready again");
-							aFormContents = that.oEditor.getAggregation("_formContent");
-							assert.equal(aFormContents.length, 11, "Editor: form content length is OK");
+						that.oCardEditor._oChildTree.onItemPress(oItem1, oItem1);
+						EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+							assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready again");
+							aFormContents = that.oCardEditor.getAggregation("_formContent");
+							assert.equal(aFormContents.length, 11, "Card Editor: form content length is OK");
 
-							EditorQunitUtils.isReady(that.oEditor).then(function () {
-								assert.ok(that.oEditor.isReady(), "Editor is ready again");
+							EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+								assert.ok(that.oCardEditor.isReady(), "Card Editor is ready again");
 
 								oTitleLabel = aFormContents[1];
 								oTitleField = aFormContents[2];
@@ -2271,12 +2271,12 @@ sap.ui.define([
 								assert.equal(oObjectsFieldControl.getBinding().getCount(), 8, "Objects Field Table: value length is 8");
 								assert.ok(oObjectsFieldControl.getSelectedIndices().length === 0, "Objects Field Table: no selected row");
 
-								assert.equal(that.oEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
-								var oNewItem0 = that.oEditor._oChildTree.getItems()[0];
-								var oNewItem1 = that.oEditor._oChildTree.getItems()[1];
-								var oNewItem2 = that.oEditor._oChildTree.getItems()[2];
-								var oNewItem3 = that.oEditor._oChildTree.getItems()[3];
-								var oNewItem4 = that.oEditor._oChildTree.getItems()[4];
+								assert.equal(that.oCardEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
+								var oNewItem0 = that.oCardEditor._oChildTree.getItems()[0];
+								var oNewItem1 = that.oCardEditor._oChildTree.getItems()[1];
+								var oNewItem2 = that.oCardEditor._oChildTree.getItems()[2];
+								var oNewItem3 = that.oCardEditor._oChildTree.getItems()[3];
+								var oNewItem4 = that.oCardEditor._oChildTree.getItems()[4];
 								assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 								assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 								assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -2294,14 +2294,14 @@ sap.ui.define([
 								assert.ok(!oNewItem4.isLeaf(), "Child tree item 4 is leaf: false");
 
 								// simulate to click child1-1
-								that.oEditor._oChildTree.onItemPress(oNewItem2, oNewItem2);
-								EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-									assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready again too");
-									aFormContents = that.oEditor.getAggregation("_formContent");
-									assert.equal(aFormContents.length, 9, "Editor: form content length is OK");
+								that.oCardEditor._oChildTree.onItemPress(oNewItem2, oNewItem2);
+								EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+									assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready again too");
+									aFormContents = that.oCardEditor.getAggregation("_formContent");
+									assert.equal(aFormContents.length, 9, "Card Editor: form content length is OK");
 
-									EditorQunitUtils.isReady(that.oEditor).then(function () {
-										assert.ok(that.oEditor.isReady(), "Editor is ready again too");
+									EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+										assert.ok(that.oCardEditor.isReady(), "Card Editor is ready again too");
 
 										oTitleLabel = aFormContents[1];
 										oTitleField = aFormContents[2];
@@ -2341,12 +2341,12 @@ sap.ui.define([
 										assert.equal(oEmployeeFieldControl.getSelectedKey(), 2, "Employee Field: Key Value");
 										assert.equal(oEmployeeFieldControl.getValue(), "FirstName2 LastName2", "Employee Field: String Value");
 
-										assert.equal(that.oEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
-										oNewItem0 = that.oEditor._oChildTree.getItems()[0];
-										oNewItem1 = that.oEditor._oChildTree.getItems()[1];
-										oNewItem2 = that.oEditor._oChildTree.getItems()[2];
-										oNewItem3 = that.oEditor._oChildTree.getItems()[3];
-										oNewItem4 = that.oEditor._oChildTree.getItems()[4];
+										assert.equal(that.oCardEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
+										oNewItem0 = that.oCardEditor._oChildTree.getItems()[0];
+										oNewItem1 = that.oCardEditor._oChildTree.getItems()[1];
+										oNewItem2 = that.oCardEditor._oChildTree.getItems()[2];
+										oNewItem3 = that.oCardEditor._oChildTree.getItems()[3];
+										oNewItem4 = that.oCardEditor._oChildTree.getItems()[4];
 										assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 										assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 										assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -2364,14 +2364,14 @@ sap.ui.define([
 										assert.ok(!oNewItem4.isLeaf(), "Child tree item 4 is leaf: false");
 
 										// simulate to click main
-										that.oEditor._oChildTree.onItemPress(oNewItem0, oNewItem0);
-										EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-											assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready again after back to main");
-											aFormContents = that.oEditor.getAggregation("_formContent");
-											assert.equal(aFormContents.length, 16, "Editor: form content length is OK");
+										that.oCardEditor._oChildTree.onItemPress(oNewItem0, oNewItem0);
+										EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+											assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready again after back to main");
+											aFormContents = that.oCardEditor.getAggregation("_formContent");
+											assert.equal(aFormContents.length, 16, "Card Editor: form content length is OK");
 
-											EditorQunitUtils.isReady(that.oEditor).then(function () {
-												assert.ok(that.oEditor.isReady(), "Editor is ready again after back to main");
+											EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+												assert.ok(that.oCardEditor.isReady(), "Card Editor is ready again after back to main");
 
 												oTitleLabel = aFormContents[1];
 												oTitleField = aFormContents[2];
@@ -2436,12 +2436,12 @@ sap.ui.define([
 												assert.equal(oDestinationMockLabel.getText(), "mock_request", "Label: Has mock_request label from destination settings name");
 												assert.ok(oDestinationMockField.isA("sap.ui.integration.editor.fields.DestinationField"), "Field: Destination Field");
 
-												assert.equal(that.oEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
-												oNewItem0 = that.oEditor._oChildTree.getItems()[0];
-												oNewItem1 = that.oEditor._oChildTree.getItems()[1];
-												oNewItem2 = that.oEditor._oChildTree.getItems()[2];
-												oNewItem3 = that.oEditor._oChildTree.getItems()[3];
-												oNewItem4 = that.oEditor._oChildTree.getItems()[4];
+												assert.equal(that.oCardEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
+												oNewItem0 = that.oCardEditor._oChildTree.getItems()[0];
+												oNewItem1 = that.oCardEditor._oChildTree.getItems()[1];
+												oNewItem2 = that.oCardEditor._oChildTree.getItems()[2];
+												oNewItem3 = that.oCardEditor._oChildTree.getItems()[3];
+												oNewItem4 = that.oCardEditor._oChildTree.getItems()[4];
 												assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 												assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 												assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -2472,18 +2472,18 @@ sap.ui.define([
 
 		QUnit.test("click and load child1, then child1-2", function (assert) {
 			var that = this;
-			that.oEditor.setCard({
+			that.oCardEditor.setCard({
 				baseUrl: sBaseUrl,
 				host: "contexthost",
 				manifest: sBaseUrl + "manifest.json"
 			});
 			return new Promise(function (resolve, reject) {
-				EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-					assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready");
-					var aFormContents = that.oEditor.getAggregation("_formContent");
-					assert.equal(aFormContents.length, 16, "Editor: form content length is OK");
-					EditorQunitUtils.isReady(that.oEditor).then(function () {
-						assert.ok(that.oEditor.isReady(), "Editor is ready");
+				EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+					assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready");
+					var aFormContents = that.oCardEditor.getAggregation("_formContent");
+					assert.equal(aFormContents.length, 16, "Card Editor: form content length is OK");
+					EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+						assert.ok(that.oCardEditor.isReady(), "Card Editor is ready");
 
 						var oTitleLabel = aFormContents[1];
 						var oTitleField = aFormContents[2];
@@ -2548,11 +2548,11 @@ sap.ui.define([
 						assert.equal(oDestinationMockLabel.getText(), "mock_request", "Label: Has mock_request label from destination settings name");
 						assert.ok(oDestinationMockField.isA("sap.ui.integration.editor.fields.DestinationField"), "Field: Destination Field");
 
-						assert.ok(that.oEditor._oChildTree, "Child tree is created");
-						assert.equal(that.oEditor._oChildTree.getItems().length, 3, "Child tree initial length is OK");
-						var oItem0 = that.oEditor._oChildTree.getItems()[0];
-						var oItem1 = that.oEditor._oChildTree.getItems()[1];
-						var oItem2 = that.oEditor._oChildTree.getItems()[2];
+						assert.ok(that.oCardEditor._oChildTree, "Child tree is created");
+						assert.equal(that.oCardEditor._oChildTree.getItems().length, 3, "Child tree initial length is OK");
+						var oItem0 = that.oCardEditor._oChildTree.getItems()[0];
+						var oItem1 = that.oCardEditor._oChildTree.getItems()[1];
+						var oItem2 = that.oCardEditor._oChildTree.getItems()[2];
 						assert.equal(oItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.ok(oItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -2564,14 +2564,14 @@ sap.ui.define([
 						assert.ok(!oItem2.isLeaf(), "Child tree item 2 is leaf: false");
 
 						// simulate to click child1
-						that.oEditor._oChildTree.onItemPress(oItem1, oItem1);
-						EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-							assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready again");
-							aFormContents = that.oEditor.getAggregation("_formContent");
-							assert.equal(aFormContents.length, 11, "Editor: form content length is OK");
+						that.oCardEditor._oChildTree.onItemPress(oItem1, oItem1);
+						EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+							assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready again");
+							aFormContents = that.oCardEditor.getAggregation("_formContent");
+							assert.equal(aFormContents.length, 11, "Card Editor: form content length is OK");
 
-							EditorQunitUtils.isReady(that.oEditor).then(function () {
-								assert.ok(that.oEditor.isReady(), "Editor is ready again");
+							EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+								assert.ok(that.oCardEditor.isReady(), "Card Editor is ready again");
 
 								oTitleLabel = aFormContents[1];
 								oTitleField = aFormContents[2];
@@ -2624,12 +2624,12 @@ sap.ui.define([
 								assert.equal(oObjectsFieldControl.getBinding().getCount(), 8, "Objects Field Table: value length is 8");
 								assert.ok(oObjectsFieldControl.getSelectedIndices().length === 0, "Objects Field Table: no selected row");
 
-								assert.equal(that.oEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
-								var oNewItem0 = that.oEditor._oChildTree.getItems()[0];
-								var oNewItem1 = that.oEditor._oChildTree.getItems()[1];
-								var oNewItem2 = that.oEditor._oChildTree.getItems()[2];
-								var oNewItem3 = that.oEditor._oChildTree.getItems()[3];
-								var oNewItem4 = that.oEditor._oChildTree.getItems()[4];
+								assert.equal(that.oCardEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
+								var oNewItem0 = that.oCardEditor._oChildTree.getItems()[0];
+								var oNewItem1 = that.oCardEditor._oChildTree.getItems()[1];
+								var oNewItem2 = that.oCardEditor._oChildTree.getItems()[2];
+								var oNewItem3 = that.oCardEditor._oChildTree.getItems()[3];
+								var oNewItem4 = that.oCardEditor._oChildTree.getItems()[4];
 								assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 								assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 								assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -2647,14 +2647,14 @@ sap.ui.define([
 								assert.ok(!oNewItem4.isLeaf(), "Child tree item 4 is leaf: false");
 
 								// simulate to click child1-2
-								that.oEditor._oChildTree.onItemPress(oNewItem3, oNewItem3);
-								EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-									assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready again too");
-									aFormContents = that.oEditor.getAggregation("_formContent");
-									assert.equal(aFormContents.length, 7, "Editor: form content length is OK");
+								that.oCardEditor._oChildTree.onItemPress(oNewItem3, oNewItem3);
+								EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+									assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready again too");
+									aFormContents = that.oCardEditor.getAggregation("_formContent");
+									assert.equal(aFormContents.length, 7, "Card Editor: form content length is OK");
 
-									EditorQunitUtils.isReady(that.oEditor).then(function () {
-										assert.ok(that.oEditor.isReady(), "Editor is ready again too");
+									EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+										assert.ok(that.oCardEditor.isReady(), "Card Editor is ready again too");
 
 										oTitleLabel = aFormContents[1];
 										oTitleField = aFormContents[2];
@@ -2683,12 +2683,12 @@ sap.ui.define([
 										assert.equal(oOrderFieldControl.getSelectedKey(), "1", "Order Field: Key Value");
 										assert.equal(oOrderFieldControl.getValue(), "1-a-1", "Order Field: String Value");
 
-										assert.equal(that.oEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
-										oNewItem0 = that.oEditor._oChildTree.getItems()[0];
-										oNewItem1 = that.oEditor._oChildTree.getItems()[1];
-										oNewItem2 = that.oEditor._oChildTree.getItems()[2];
-										oNewItem3 = that.oEditor._oChildTree.getItems()[3];
-										oNewItem4 = that.oEditor._oChildTree.getItems()[4];
+										assert.equal(that.oCardEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
+										oNewItem0 = that.oCardEditor._oChildTree.getItems()[0];
+										oNewItem1 = that.oCardEditor._oChildTree.getItems()[1];
+										oNewItem2 = that.oCardEditor._oChildTree.getItems()[2];
+										oNewItem3 = that.oCardEditor._oChildTree.getItems()[3];
+										oNewItem4 = that.oCardEditor._oChildTree.getItems()[4];
 										assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 										assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 										assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -2717,18 +2717,18 @@ sap.ui.define([
 
 		QUnit.test("click and load child1, then child1-2, then back to main", function (assert) {
 			var that = this;
-			that.oEditor.setCard({
+			that.oCardEditor.setCard({
 				baseUrl: sBaseUrl,
 				host: "contexthost",
 				manifest: sBaseUrl + "manifest.json"
 			});
 			return new Promise(function (resolve, reject) {
-				EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-					assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready");
-					var aFormContents = that.oEditor.getAggregation("_formContent");
-					assert.equal(aFormContents.length, 16, "Editor: form content length is OK");
-					EditorQunitUtils.isReady(that.oEditor).then(function () {
-						assert.ok(that.oEditor.isReady(), "Editor is ready");
+				EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+					assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready");
+					var aFormContents = that.oCardEditor.getAggregation("_formContent");
+					assert.equal(aFormContents.length, 16, "Card Editor: form content length is OK");
+					EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+						assert.ok(that.oCardEditor.isReady(), "Card Editor is ready");
 
 						var oTitleLabel = aFormContents[1];
 						var oTitleField = aFormContents[2];
@@ -2793,11 +2793,11 @@ sap.ui.define([
 						assert.equal(oDestinationMockLabel.getText(), "mock_request", "Label: Has mock_request label from destination settings name");
 						assert.ok(oDestinationMockField.isA("sap.ui.integration.editor.fields.DestinationField"), "Field: Destination Field");
 
-						assert.ok(that.oEditor._oChildTree, "Child tree is created");
-						assert.equal(that.oEditor._oChildTree.getItems().length, 3, "Child tree initial length is OK");
-						var oItem0 = that.oEditor._oChildTree.getItems()[0];
-						var oItem1 = that.oEditor._oChildTree.getItems()[1];
-						var oItem2 = that.oEditor._oChildTree.getItems()[2];
+						assert.ok(that.oCardEditor._oChildTree, "Child tree is created");
+						assert.equal(that.oCardEditor._oChildTree.getItems().length, 3, "Child tree initial length is OK");
+						var oItem0 = that.oCardEditor._oChildTree.getItems()[0];
+						var oItem1 = that.oCardEditor._oChildTree.getItems()[1];
+						var oItem2 = that.oCardEditor._oChildTree.getItems()[2];
 						assert.equal(oItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.ok(oItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -2809,14 +2809,14 @@ sap.ui.define([
 						assert.ok(!oItem2.isLeaf(), "Child tree item 2 is leaf: false");
 
 						// simulate to click child1
-						that.oEditor._oChildTree.onItemPress(oItem1, oItem1);
-						EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-							assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready again");
-							aFormContents = that.oEditor.getAggregation("_formContent");
-							assert.equal(aFormContents.length, 11, "Editor: form content length is OK");
+						that.oCardEditor._oChildTree.onItemPress(oItem1, oItem1);
+						EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+							assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready again");
+							aFormContents = that.oCardEditor.getAggregation("_formContent");
+							assert.equal(aFormContents.length, 11, "Card Editor: form content length is OK");
 
-							EditorQunitUtils.isReady(that.oEditor).then(function () {
-								assert.ok(that.oEditor.isReady(), "Editor is ready again");
+							EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+								assert.ok(that.oCardEditor.isReady(), "Card Editor is ready again");
 
 								oTitleLabel = aFormContents[1];
 								oTitleField = aFormContents[2];
@@ -2869,12 +2869,12 @@ sap.ui.define([
 								assert.equal(oObjectsFieldControl.getBinding().getCount(), 8, "Objects Field Table: value length is 8");
 								assert.ok(oObjectsFieldControl.getSelectedIndices().length === 0, "Objects Field Table: no selected row");
 
-								assert.equal(that.oEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
-								var oNewItem0 = that.oEditor._oChildTree.getItems()[0];
-								var oNewItem1 = that.oEditor._oChildTree.getItems()[1];
-								var oNewItem2 = that.oEditor._oChildTree.getItems()[2];
-								var oNewItem3 = that.oEditor._oChildTree.getItems()[3];
-								var oNewItem4 = that.oEditor._oChildTree.getItems()[4];
+								assert.equal(that.oCardEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
+								var oNewItem0 = that.oCardEditor._oChildTree.getItems()[0];
+								var oNewItem1 = that.oCardEditor._oChildTree.getItems()[1];
+								var oNewItem2 = that.oCardEditor._oChildTree.getItems()[2];
+								var oNewItem3 = that.oCardEditor._oChildTree.getItems()[3];
+								var oNewItem4 = that.oCardEditor._oChildTree.getItems()[4];
 								assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 								assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 								assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -2892,14 +2892,14 @@ sap.ui.define([
 								assert.ok(!oNewItem4.isLeaf(), "Child tree item 4 is leaf: false");
 
 								// simulate to click child1-2
-								that.oEditor._oChildTree.onItemPress(oNewItem3, oNewItem3);
-								EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-									assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready again too");
-									aFormContents = that.oEditor.getAggregation("_formContent");
-									assert.equal(aFormContents.length, 7, "Editor: form content length is OK");
+								that.oCardEditor._oChildTree.onItemPress(oNewItem3, oNewItem3);
+								EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+									assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready again too");
+									aFormContents = that.oCardEditor.getAggregation("_formContent");
+									assert.equal(aFormContents.length, 7, "Card Editor: form content length is OK");
 
-									EditorQunitUtils.isReady(that.oEditor).then(function () {
-										assert.ok(that.oEditor.isReady(), "Editor is ready again too");
+									EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+										assert.ok(that.oCardEditor.isReady(), "Card Editor is ready again too");
 
 										oTitleLabel = aFormContents[1];
 										oTitleField = aFormContents[2];
@@ -2928,12 +2928,12 @@ sap.ui.define([
 										assert.equal(oOrderFieldControl.getSelectedKey(), "1", "Order Field: Key Value");
 										assert.equal(oOrderFieldControl.getValue(), "1-a-1", "Order Field: String Value");
 
-										assert.equal(that.oEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
-										oNewItem0 = that.oEditor._oChildTree.getItems()[0];
-										oNewItem1 = that.oEditor._oChildTree.getItems()[1];
-										oNewItem2 = that.oEditor._oChildTree.getItems()[2];
-										oNewItem3 = that.oEditor._oChildTree.getItems()[3];
-										oNewItem4 = that.oEditor._oChildTree.getItems()[4];
+										assert.equal(that.oCardEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
+										oNewItem0 = that.oCardEditor._oChildTree.getItems()[0];
+										oNewItem1 = that.oCardEditor._oChildTree.getItems()[1];
+										oNewItem2 = that.oCardEditor._oChildTree.getItems()[2];
+										oNewItem3 = that.oCardEditor._oChildTree.getItems()[3];
+										oNewItem4 = that.oCardEditor._oChildTree.getItems()[4];
 										assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 										assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 										assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -2951,14 +2951,14 @@ sap.ui.define([
 										assert.ok(!oNewItem4.isLeaf(), "Child tree item 4 is leaf: false");
 
 										// simulate to click main
-										that.oEditor._oChildTree.onItemPress(oNewItem0, oNewItem0);
-										EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-											assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready again after back to main");
-											aFormContents = that.oEditor.getAggregation("_formContent");
-											assert.equal(aFormContents.length, 16, "Editor: form content length is OK");
+										that.oCardEditor._oChildTree.onItemPress(oNewItem0, oNewItem0);
+										EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+											assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready again after back to main");
+											aFormContents = that.oCardEditor.getAggregation("_formContent");
+											assert.equal(aFormContents.length, 16, "Card Editor: form content length is OK");
 
-											EditorQunitUtils.isReady(that.oEditor).then(function () {
-												assert.ok(that.oEditor.isReady(), "Editor is ready again after back to main");
+											EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+												assert.ok(that.oCardEditor.isReady(), "Card Editor is ready again after back to main");
 
 												oTitleLabel = aFormContents[1];
 												oTitleField = aFormContents[2];
@@ -3023,12 +3023,12 @@ sap.ui.define([
 												assert.equal(oDestinationMockLabel.getText(), "mock_request", "Label: Has mock_request label from destination settings name");
 												assert.ok(oDestinationMockField.isA("sap.ui.integration.editor.fields.DestinationField"), "Field: Destination Field");
 
-												assert.equal(that.oEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
-												oNewItem0 = that.oEditor._oChildTree.getItems()[0];
-												oNewItem1 = that.oEditor._oChildTree.getItems()[1];
-												oNewItem2 = that.oEditor._oChildTree.getItems()[2];
-												oNewItem3 = that.oEditor._oChildTree.getItems()[3];
-												oNewItem4 = that.oEditor._oChildTree.getItems()[4];
+												assert.equal(that.oCardEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
+												oNewItem0 = that.oCardEditor._oChildTree.getItems()[0];
+												oNewItem1 = that.oCardEditor._oChildTree.getItems()[1];
+												oNewItem2 = that.oCardEditor._oChildTree.getItems()[2];
+												oNewItem3 = that.oCardEditor._oChildTree.getItems()[3];
+												oNewItem4 = that.oCardEditor._oChildTree.getItems()[4];
 												assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 												assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 												assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -3059,18 +3059,18 @@ sap.ui.define([
 
 		QUnit.test("click and load child2", function (assert) {
 			var that = this;
-			that.oEditor.setCard({
+			that.oCardEditor.setCard({
 				baseUrl: sBaseUrl,
 				host: "contexthost",
 				manifest: sBaseUrl + "manifest.json"
 			});
 			return new Promise(function (resolve, reject) {
-				EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-					assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready");
-					var aFormContents = that.oEditor.getAggregation("_formContent");
-					assert.equal(aFormContents.length, 16, "Editor: form content length is OK");
-					EditorQunitUtils.isReady(that.oEditor).then(function () {
-						assert.ok(that.oEditor.isReady(), "Editor is ready");
+				EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+					assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready");
+					var aFormContents = that.oCardEditor.getAggregation("_formContent");
+					assert.equal(aFormContents.length, 16, "Card Editor: form content length is OK");
+					EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+						assert.ok(that.oCardEditor.isReady(), "Card Editor is ready");
 
 						var oTitleLabel = aFormContents[1];
 						var oTitleField = aFormContents[2];
@@ -3135,11 +3135,11 @@ sap.ui.define([
 						assert.equal(oDestinationMockLabel.getText(), "mock_request", "Label: Has mock_request label from destination settings name");
 						assert.ok(oDestinationMockField.isA("sap.ui.integration.editor.fields.DestinationField"), "Field: Destination Field");
 
-						assert.ok(that.oEditor._oChildTree, "Child tree is created");
-						assert.equal(that.oEditor._oChildTree.getItems().length, 3, "Child tree initial length is OK");
-						var oItem0 = that.oEditor._oChildTree.getItems()[0];
-						var oItem1 = that.oEditor._oChildTree.getItems()[1];
-						var oItem2 = that.oEditor._oChildTree.getItems()[2];
+						assert.ok(that.oCardEditor._oChildTree, "Child tree is created");
+						assert.equal(that.oCardEditor._oChildTree.getItems().length, 3, "Child tree initial length is OK");
+						var oItem0 = that.oCardEditor._oChildTree.getItems()[0];
+						var oItem1 = that.oCardEditor._oChildTree.getItems()[1];
+						var oItem2 = that.oCardEditor._oChildTree.getItems()[2];
 						assert.equal(oItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.ok(oItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -3151,14 +3151,14 @@ sap.ui.define([
 						assert.ok(!oItem2.isLeaf(), "Child tree item 2 is leaf: false");
 
 						// simulate to click child2
-						that.oEditor._oChildTree.onItemPress(oItem2, oItem2);
-						EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-							assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready again");
-							aFormContents = that.oEditor.getAggregation("_formContent");
-							assert.equal(aFormContents.length, 5, "Editor: form content length is OK");
+						that.oCardEditor._oChildTree.onItemPress(oItem2, oItem2);
+						EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+							assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready again");
+							aFormContents = that.oCardEditor.getAggregation("_formContent");
+							assert.equal(aFormContents.length, 5, "Card Editor: form content length is OK");
 
-							EditorQunitUtils.isReady(that.oEditor).then(function () {
-								assert.ok(that.oEditor.isReady(), "Editor is ready again");
+							EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+								assert.ok(that.oCardEditor.isReady(), "Card Editor is ready again");
 
 								oTitleLabel = aFormContents[1];
 								oTitleField = aFormContents[2];
@@ -3176,11 +3176,11 @@ sap.ui.define([
 								assert.ok(oMaxItemField.getAggregation("_field").isA("sap.m.Slider"), "MaxItem Field: Control is a Slider");
 								assert.equal(oMaxItemField.getAggregation("_field").getValue(), 5, "MaxItem Field: Integer Value");
 
-								assert.equal(that.oEditor._oChildTree.getItems().length, 4, "Child tree length is OK after clicking child2");
-								var oNewItem0 = that.oEditor._oChildTree.getItems()[0];
-								var oNewItem1 = that.oEditor._oChildTree.getItems()[1];
-								var oNewItem2 = that.oEditor._oChildTree.getItems()[2];
-								var oNewItem3 = that.oEditor._oChildTree.getItems()[3];
+								assert.equal(that.oCardEditor._oChildTree.getItems().length, 4, "Child tree length is OK after clicking child2");
+								var oNewItem0 = that.oCardEditor._oChildTree.getItems()[0];
+								var oNewItem1 = that.oCardEditor._oChildTree.getItems()[1];
+								var oNewItem2 = that.oCardEditor._oChildTree.getItems()[2];
+								var oNewItem3 = that.oCardEditor._oChildTree.getItems()[3];
 								assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 								assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 								assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -3204,18 +3204,18 @@ sap.ui.define([
 
 		QUnit.test("click and load child2, then back to main", function (assert) {
 			var that = this;
-			that.oEditor.setCard({
+			that.oCardEditor.setCard({
 				baseUrl: sBaseUrl,
 				host: "contexthost",
 				manifest: sBaseUrl + "manifest.json"
 			});
 			return new Promise(function (resolve, reject) {
-				EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-					assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready");
-					var aFormContents = that.oEditor.getAggregation("_formContent");
-					assert.equal(aFormContents.length, 16, "Editor: form content length is OK");
-					EditorQunitUtils.isReady(that.oEditor).then(function () {
-						assert.ok(that.oEditor.isReady(), "Editor is ready");
+				EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+					assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready");
+					var aFormContents = that.oCardEditor.getAggregation("_formContent");
+					assert.equal(aFormContents.length, 16, "Card Editor: form content length is OK");
+					EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+						assert.ok(that.oCardEditor.isReady(), "Card Editor is ready");
 
 						var oTitleLabel = aFormContents[1];
 						var oTitleField = aFormContents[2];
@@ -3280,11 +3280,11 @@ sap.ui.define([
 						assert.equal(oDestinationMockLabel.getText(), "mock_request", "Label: Has mock_request label from destination settings name");
 						assert.ok(oDestinationMockField.isA("sap.ui.integration.editor.fields.DestinationField"), "Field: Destination Field");
 
-						assert.ok(that.oEditor._oChildTree, "Child tree is created");
-						assert.equal(that.oEditor._oChildTree.getItems().length, 3, "Child tree initial length is OK");
-						var oItem0 = that.oEditor._oChildTree.getItems()[0];
-						var oItem1 = that.oEditor._oChildTree.getItems()[1];
-						var oItem2 = that.oEditor._oChildTree.getItems()[2];
+						assert.ok(that.oCardEditor._oChildTree, "Child tree is created");
+						assert.equal(that.oCardEditor._oChildTree.getItems().length, 3, "Child tree initial length is OK");
+						var oItem0 = that.oCardEditor._oChildTree.getItems()[0];
+						var oItem1 = that.oCardEditor._oChildTree.getItems()[1];
+						var oItem2 = that.oCardEditor._oChildTree.getItems()[2];
 						assert.equal(oItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.ok(oItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -3296,14 +3296,14 @@ sap.ui.define([
 						assert.ok(!oItem2.isLeaf(), "Child tree item 2 is leaf: false");
 
 						// simulate to click child2
-						that.oEditor._oChildTree.onItemPress(oItem2, oItem2);
-						EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-							assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready again");
-							aFormContents = that.oEditor.getAggregation("_formContent");
-							assert.equal(aFormContents.length, 5, "Editor: form content length is OK");
+						that.oCardEditor._oChildTree.onItemPress(oItem2, oItem2);
+						EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+							assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready again");
+							aFormContents = that.oCardEditor.getAggregation("_formContent");
+							assert.equal(aFormContents.length, 5, "Card Editor: form content length is OK");
 
-							EditorQunitUtils.isReady(that.oEditor).then(function () {
-								assert.ok(that.oEditor.isReady(), "Editor is ready again");
+							EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+								assert.ok(that.oCardEditor.isReady(), "Card Editor is ready again");
 
 								oTitleLabel = aFormContents[1];
 								oTitleField = aFormContents[2];
@@ -3321,11 +3321,11 @@ sap.ui.define([
 								assert.ok(oMaxItemField.getAggregation("_field").isA("sap.m.Slider"), "MaxItem Field: Control is a Slider");
 								assert.equal(oMaxItemField.getAggregation("_field").getValue(), 5, "MaxItem Field: Integer Value");
 
-								assert.equal(that.oEditor._oChildTree.getItems().length, 4, "Child tree length is OK after clicking child2");
-								var oNewItem0 = that.oEditor._oChildTree.getItems()[0];
-								var oNewItem1 = that.oEditor._oChildTree.getItems()[1];
-								var oNewItem2 = that.oEditor._oChildTree.getItems()[2];
-								var oNewItem3 = that.oEditor._oChildTree.getItems()[3];
+								assert.equal(that.oCardEditor._oChildTree.getItems().length, 4, "Child tree length is OK after clicking child2");
+								var oNewItem0 = that.oCardEditor._oChildTree.getItems()[0];
+								var oNewItem1 = that.oCardEditor._oChildTree.getItems()[1];
+								var oNewItem2 = that.oCardEditor._oChildTree.getItems()[2];
+								var oNewItem3 = that.oCardEditor._oChildTree.getItems()[3];
 								assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 								assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 								assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -3340,14 +3340,14 @@ sap.ui.define([
 								assert.ok(oNewItem3.isLeaf(), "Child tree item 3 is leaf: false");
 
 								// simulate to click main
-								that.oEditor._oChildTree.onItemPress(oNewItem0, oNewItem0);
-								EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-									assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready again after back to main");
-									aFormContents = that.oEditor.getAggregation("_formContent");
-									assert.equal(aFormContents.length, 16, "Editor: form content length is OK");
+								that.oCardEditor._oChildTree.onItemPress(oNewItem0, oNewItem0);
+								EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+									assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready again after back to main");
+									aFormContents = that.oCardEditor.getAggregation("_formContent");
+									assert.equal(aFormContents.length, 16, "Card Editor: form content length is OK");
 
-									EditorQunitUtils.isReady(that.oEditor).then(function () {
-										assert.ok(that.oEditor.isReady(), "Editor is ready again after back to main");
+									EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+										assert.ok(that.oCardEditor.isReady(), "Card Editor is ready again after back to main");
 
 										oTitleLabel = aFormContents[1];
 										oTitleField = aFormContents[2];
@@ -3412,11 +3412,11 @@ sap.ui.define([
 										assert.equal(oDestinationMockLabel.getText(), "mock_request", "Label: Has mock_request label from destination settings name");
 										assert.ok(oDestinationMockField.isA("sap.ui.integration.editor.fields.DestinationField"), "Field: Destination Field");
 
-										assert.equal(that.oEditor._oChildTree.getItems().length, 4, "Child tree length is OK after clicking child2");
-										oNewItem0 = that.oEditor._oChildTree.getItems()[0];
-										oNewItem1 = that.oEditor._oChildTree.getItems()[1];
-										oNewItem2 = that.oEditor._oChildTree.getItems()[2];
-										oNewItem3 = that.oEditor._oChildTree.getItems()[3];
+										assert.equal(that.oCardEditor._oChildTree.getItems().length, 4, "Child tree length is OK after clicking child2");
+										oNewItem0 = that.oCardEditor._oChildTree.getItems()[0];
+										oNewItem1 = that.oCardEditor._oChildTree.getItems()[1];
+										oNewItem2 = that.oCardEditor._oChildTree.getItems()[2];
+										oNewItem3 = that.oCardEditor._oChildTree.getItems()[3];
 										assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 										assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 										assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -3442,18 +3442,18 @@ sap.ui.define([
 
 		QUnit.test("expand child1 then click child1-1", function (assert) {
 			var that = this;
-			that.oEditor.setCard({
+			that.oCardEditor.setCard({
 				baseUrl: sBaseUrl,
 				host: "contexthost",
 				manifest: sBaseUrl + "manifest.json"
 			});
 			return new Promise(function (resolve, reject) {
-				EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-					assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready");
-					var aFormContents = that.oEditor.getAggregation("_formContent");
-					assert.equal(aFormContents.length, 16, "Editor: form content length is OK");
-					EditorQunitUtils.isReady(that.oEditor).then(async function () {
-						assert.ok(that.oEditor.isReady(), "Editor is ready");
+				EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+					assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready");
+					var aFormContents = that.oCardEditor.getAggregation("_formContent");
+					assert.equal(aFormContents.length, 16, "Card Editor: form content length is OK");
+					EditorQunitUtils.isReady(that.oCardEditor).then(async function () {
+						assert.ok(that.oCardEditor.isReady(), "Card Editor is ready");
 						var oTitleLabel = aFormContents[1];
 						var oTitleField = aFormContents[2];
 						assert.ok(oTitleLabel.isA("sap.m.Label"), "Title Label: Form content contains a Label");
@@ -3517,11 +3517,11 @@ sap.ui.define([
 						assert.equal(oDestinationMockLabel.getText(), "mock_request", "Label: Has mock_request label from destination settings name");
 						assert.ok(oDestinationMockField.isA("sap.ui.integration.editor.fields.DestinationField"), "Field: Destination Field");
 
-						assert.ok(that.oEditor._oChildTree, "Child tree is created");
-						assert.equal(that.oEditor._oChildTree.getItems().length, 3, "Child tree initial length is OK");
-						var oItem0 = that.oEditor._oChildTree.getItems()[0];
-						var oItem1 = that.oEditor._oChildTree.getItems()[1];
-						var oItem2 = that.oEditor._oChildTree.getItems()[2];
+						assert.ok(that.oCardEditor._oChildTree, "Child tree is created");
+						assert.equal(that.oCardEditor._oChildTree.getItems().length, 3, "Child tree initial length is OK");
+						var oItem0 = that.oCardEditor._oChildTree.getItems()[0];
+						var oItem1 = that.oCardEditor._oChildTree.getItems()[1];
+						var oItem2 = that.oCardEditor._oChildTree.getItems()[2];
 						assert.equal(oItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.ok(oItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -3536,12 +3536,12 @@ sap.ui.define([
 						var oArrow = Element.getElementById(oItem1.getId() + "-expander");
 						oArrow.firePress();
 						await nextUIUpdate();
-						assert.equal(that.oEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
-						var oNewItem0 = that.oEditor._oChildTree.getItems()[0];
-						var oNewItem1 = that.oEditor._oChildTree.getItems()[1];
-						var oNewItem2 = that.oEditor._oChildTree.getItems()[2];
-						var oNewItem3 = that.oEditor._oChildTree.getItems()[3];
-						var oNewItem4 = that.oEditor._oChildTree.getItems()[4];
+						assert.equal(that.oCardEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
+						var oNewItem0 = that.oCardEditor._oChildTree.getItems()[0];
+						var oNewItem1 = that.oCardEditor._oChildTree.getItems()[1];
+						var oNewItem2 = that.oCardEditor._oChildTree.getItems()[2];
+						var oNewItem3 = that.oCardEditor._oChildTree.getItems()[3];
+						var oNewItem4 = that.oCardEditor._oChildTree.getItems()[4];
 						assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.equal(oNewItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -3554,14 +3554,14 @@ sap.ui.define([
 						assert.ok(!oNewItem4.getExpanded(), "Child tree item 4 expanded: false");
 
 						// simulate to click child1-1
-						that.oEditor._oChildTree.onItemPress(oNewItem2, oNewItem2);
-						EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-							assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready again too");
-							var aFormContents = that.oEditor.getAggregation("_formContent");
-							assert.equal(aFormContents.length, 9, "Editor: form content length is OK");
+						that.oCardEditor._oChildTree.onItemPress(oNewItem2, oNewItem2);
+						EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+							assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready again too");
+							var aFormContents = that.oCardEditor.getAggregation("_formContent");
+							assert.equal(aFormContents.length, 9, "Card Editor: form content length is OK");
 
-							EditorQunitUtils.isReady(that.oEditor).then(function () {
-								assert.ok(that.oEditor.isReady(), "Editor is ready again too");
+							EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+								assert.ok(that.oCardEditor.isReady(), "Card Editor is ready again too");
 
 								oTitleLabel = aFormContents[1];
 								oTitleField = aFormContents[2];
@@ -3601,12 +3601,12 @@ sap.ui.define([
 								assert.equal(oEmployeeFieldControl.getSelectedKey(), 2, "Employee Field: Key Value");
 								assert.equal(oEmployeeFieldControl.getValue(), "FirstName2 LastName2", "Employee Field: String Value");
 
-								assert.equal(that.oEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
-								oNewItem0 = that.oEditor._oChildTree.getItems()[0];
-								oNewItem1 = that.oEditor._oChildTree.getItems()[1];
-								oNewItem2 = that.oEditor._oChildTree.getItems()[2];
-								oNewItem3 = that.oEditor._oChildTree.getItems()[3];
-								oNewItem4 = that.oEditor._oChildTree.getItems()[4];
+								assert.equal(that.oCardEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
+								oNewItem0 = that.oCardEditor._oChildTree.getItems()[0];
+								oNewItem1 = that.oCardEditor._oChildTree.getItems()[1];
+								oNewItem2 = that.oCardEditor._oChildTree.getItems()[2];
+								oNewItem3 = that.oCardEditor._oChildTree.getItems()[3];
+								oNewItem4 = that.oCardEditor._oChildTree.getItems()[4];
 								assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 								assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 								assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -3633,18 +3633,18 @@ sap.ui.define([
 
 		QUnit.test("expand child1 then click child1-2", function (assert) {
 			var that = this;
-			that.oEditor.setCard({
+			that.oCardEditor.setCard({
 				baseUrl: sBaseUrl,
 				host: "contexthost",
 				manifest: sBaseUrl + "manifest.json"
 			});
 			return new Promise(function (resolve, reject) {
-				EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-					assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready");
-					var aFormContents = that.oEditor.getAggregation("_formContent");
-					assert.equal(aFormContents.length, 16, "Editor: form content length is OK");
-					EditorQunitUtils.isReady(that.oEditor).then(async function () {
-						assert.ok(that.oEditor.isReady(), "Editor is ready");
+				EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+					assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready");
+					var aFormContents = that.oCardEditor.getAggregation("_formContent");
+					assert.equal(aFormContents.length, 16, "Card Editor: form content length is OK");
+					EditorQunitUtils.isReady(that.oCardEditor).then(async function () {
+						assert.ok(that.oCardEditor.isReady(), "Card Editor is ready");
 						var oTitleLabel = aFormContents[1];
 						var oTitleField = aFormContents[2];
 						assert.ok(oTitleLabel.isA("sap.m.Label"), "Title Label: Form content contains a Label");
@@ -3708,11 +3708,11 @@ sap.ui.define([
 						assert.equal(oDestinationMockLabel.getText(), "mock_request", "Label: Has mock_request label from destination settings name");
 						assert.ok(oDestinationMockField.isA("sap.ui.integration.editor.fields.DestinationField"), "Field: Destination Field");
 
-						assert.ok(that.oEditor._oChildTree, "Child tree is created");
-						assert.equal(that.oEditor._oChildTree.getItems().length, 3, "Child tree initial length is OK");
-						var oItem0 = that.oEditor._oChildTree.getItems()[0];
-						var oItem1 = that.oEditor._oChildTree.getItems()[1];
-						var oItem2 = that.oEditor._oChildTree.getItems()[2];
+						assert.ok(that.oCardEditor._oChildTree, "Child tree is created");
+						assert.equal(that.oCardEditor._oChildTree.getItems().length, 3, "Child tree initial length is OK");
+						var oItem0 = that.oCardEditor._oChildTree.getItems()[0];
+						var oItem1 = that.oCardEditor._oChildTree.getItems()[1];
+						var oItem2 = that.oCardEditor._oChildTree.getItems()[2];
 						assert.equal(oItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.ok(oItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -3727,12 +3727,12 @@ sap.ui.define([
 						var oArrow = Element.getElementById(oItem1.getId() + "-expander");
 						oArrow.firePress();
 						await nextUIUpdate();
-						assert.equal(that.oEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
-						var oNewItem0 = that.oEditor._oChildTree.getItems()[0];
-						var oNewItem1 = that.oEditor._oChildTree.getItems()[1];
-						var oNewItem2 = that.oEditor._oChildTree.getItems()[2];
-						var oNewItem3 = that.oEditor._oChildTree.getItems()[3];
-						var oNewItem4 = that.oEditor._oChildTree.getItems()[4];
+						assert.equal(that.oCardEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
+						var oNewItem0 = that.oCardEditor._oChildTree.getItems()[0];
+						var oNewItem1 = that.oCardEditor._oChildTree.getItems()[1];
+						var oNewItem2 = that.oCardEditor._oChildTree.getItems()[2];
+						var oNewItem3 = that.oCardEditor._oChildTree.getItems()[3];
+						var oNewItem4 = that.oCardEditor._oChildTree.getItems()[4];
 						assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 						assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 						assert.equal(oNewItem1.getTitle(), "Child1 (in config)", "Child tree item 1 title is OK");
@@ -3745,14 +3745,14 @@ sap.ui.define([
 						assert.ok(!oNewItem4.getExpanded(), "Child tree item 4 expanded: false");
 
 						// simulate to click child1-2
-						that.oEditor._oChildTree.onItemPress(oNewItem3, oNewItem3);
-						EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-							assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready again too");
-							aFormContents = that.oEditor.getAggregation("_formContent");
-							assert.equal(aFormContents.length, 7, "Editor: form content length is OK");
+						that.oCardEditor._oChildTree.onItemPress(oNewItem3, oNewItem3);
+						EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+							assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready again too");
+							aFormContents = that.oCardEditor.getAggregation("_formContent");
+							assert.equal(aFormContents.length, 7, "Card Editor: form content length is OK");
 
-							EditorQunitUtils.isReady(that.oEditor).then(function () {
-								assert.ok(that.oEditor.isReady(), "Editor is ready again too");
+							EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+								assert.ok(that.oCardEditor.isReady(), "Card Editor is ready again too");
 
 								oTitleLabel = aFormContents[1];
 								oTitleField = aFormContents[2];
@@ -3781,12 +3781,12 @@ sap.ui.define([
 								assert.equal(oOrderFieldControl.getSelectedKey(), "1", "Order Field: Key Value");
 								assert.equal(oOrderFieldControl.getValue(), "1-a-1", "Order Field: String Value");
 
-								assert.equal(that.oEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
-								oNewItem0 = that.oEditor._oChildTree.getItems()[0];
-								oNewItem1 = that.oEditor._oChildTree.getItems()[1];
-								oNewItem2 = that.oEditor._oChildTree.getItems()[2];
-								oNewItem3 = that.oEditor._oChildTree.getItems()[3];
-								oNewItem4 = that.oEditor._oChildTree.getItems()[4];
+								assert.equal(that.oCardEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
+								oNewItem0 = that.oCardEditor._oChildTree.getItems()[0];
+								oNewItem1 = that.oCardEditor._oChildTree.getItems()[1];
+								oNewItem2 = that.oCardEditor._oChildTree.getItems()[2];
+								oNewItem3 = that.oCardEditor._oChildTree.getItems()[3];
+								oNewItem4 = that.oCardEditor._oChildTree.getItems()[4];
 								assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 								assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 								assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
