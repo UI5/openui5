@@ -1,3 +1,5 @@
+// ui5lint-disable prefer-test-starter -- file is named *.qunit.js, but is a beforeBootstrap file used via test starter
+
 (function() {
     "use strict";
     let resolve;
