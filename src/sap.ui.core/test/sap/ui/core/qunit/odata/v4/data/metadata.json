@@ -750,6 +750,10 @@
 					"DistanceFromRootProperty": {"$PropertyPath": "DistanceFromRoot"},
 					"DrillStateProperty": {"$PropertyPath": "DrillState"},
 					"LimitedDescendantCountProperty": {"$PropertyPath": "DescendantCount"}
+				},
+				"@com.sap.vocabularies.Common.v1.SideEffects#n/a" : {
+					"SourceEntities" : [null],
+					"TargetEntities" : [{"$Null" : null, "@self.Reason": "Private"}]
 				}
 			},
 			"com.sap.gateway.default.iwbep.tea_busi.v0001.Worker/LOCATION/COUNTRY" : {

@@ -406,6 +406,22 @@
 						<PropertyValue Property="LimitedDescendantCountProperty" PropertyPath="DescendantCount"/>
 					</Record>
 				</Annotation>
+				<Annotation Qualifier="n/a" Term="com.sap.vocabularies.Common.v1.SideEffects">
+					<Record>
+						<PropertyValue Property="SourceEntities">
+							<Collection>
+								<Null/>
+							</Collection>
+						</PropertyValue>
+						<PropertyValue Property="TargetEntities">
+							<Collection>
+								<Null>
+									<Annotation Term="self.Reason" String="Private" />
+								</Null>
+							</Collection>
+						</PropertyValue>
+					</Record>
+				</Annotation>
 			</Annotations>
 		</Schema>
 	</edmx:DataServices>
