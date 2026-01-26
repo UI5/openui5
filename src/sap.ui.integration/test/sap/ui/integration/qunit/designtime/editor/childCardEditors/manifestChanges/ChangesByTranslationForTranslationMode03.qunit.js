@@ -40,7 +40,7 @@ sap.ui.define([
 			"description": "Español de México"
 		}
 	];
-	var _aEditorLanguages = [
+	var _aCardEditorLanguages = [
 		{
 			"key": "en",
 			"description": "English"
@@ -175,34 +175,34 @@ sap.ui.define([
 	}, function () {
 		_aCoreLanguages.forEach(function(oCoreLanguage) {
 			var sCoreLanguageKey = oCoreLanguage.key;
-			_aEditorLanguages.forEach(function(oEditorLanguage) {
-				var sEditorLanguageKey = oEditorLanguage.key;
+			_aCardEditorLanguages.forEach(function(oCardEditorLanguage) {
+				var sEditorLanguageKey = oCardEditorLanguage.key;
 				var sCaseTitle = "Core: " + sCoreLanguageKey + ", Editor: " + sEditorLanguageKey + ", main -> child2 -> child2-1";
 				QUnit.test(sCaseTitle, function (assert) {
 					var that = this;
-					that.oEditor = EditorQunitUtils.createEditor(sCoreLanguageKey, undefined, "CardEditor");
-					that.oEditor.setMode("translation");
-					that.oEditor.setLanguage(sEditorLanguageKey);
-					that.oEditor.setCard({
+					that.oCardEditor = EditorQunitUtils.createEditor(sCoreLanguageKey, undefined, "CardEditor");
+					that.oCardEditor.setMode("translation");
+					that.oCardEditor.setLanguage(sEditorLanguageKey);
+					that.oCardEditor.setCard({
 						baseUrl: sBaseUrl,
 						host: "contexthost",
 						manifest: sBaseUrl + "manifest.json",
 						manifestChanges: [_oTranslationChanges]
 					});
 					return new Promise(function (resolve, reject) {
-						EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-							assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready");
-							var aFormContents = that.oEditor.getAggregation("_formContent");
-							assert.equal(aFormContents.length, 5, "Editor: form content length is OK");
-							EditorQunitUtils.isReady(that.oEditor).then(function () {
-								assert.ok(that.oEditor.isReady(), "Editor is ready");
+						EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+							assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready");
+							var aFormContents = that.oCardEditor.getAggregation("_formContent");
+							assert.equal(aFormContents.length, 5, "Card Editor: form content length is OK");
+							EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+								assert.ok(that.oCardEditor.isReady(), "Card Editor is ready");
 
-								var oSettings = that.oEditor.getCurrentSettings();
+								var oSettings = that.oCardEditor.getCurrentSettings();
 								assert.deepEqual(oSettings, {
 									"/sap.card/configuration/parameters/cardTitle/value": "cardTitle Translation - main",
 									":errors": false,
 									":layer": 10
-								}, "Editor settings are OK");
+								}, "Card Editor settings are OK");
 
 								var oTitleLabel = aFormContents[2];
 								var oTitleFieldOri = aFormContents[3];
@@ -220,16 +220,16 @@ sap.ui.define([
 								assert.equal(oTitleFieldControl.getValue(), sTitleTransValue, "Title Field: String Value");
 
 								// simulate to click child2
-								assert.equal(that.oEditor._oChildTree.getItems().length, 3, "Child tree initial length is OK");
-								var oItem2 = that.oEditor._oChildTree.getItems()[2];
-								that.oEditor._oChildTree.onItemPress(oItem2, oItem2);
-								EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-									assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready again");
-									aFormContents = that.oEditor.getAggregation("_formContent");
-									assert.equal(aFormContents.length, 5, "Editor: form content length is OK");
+								assert.equal(that.oCardEditor._oChildTree.getItems().length, 3, "Child tree initial length is OK");
+								var oItem2 = that.oCardEditor._oChildTree.getItems()[2];
+								that.oCardEditor._oChildTree.onItemPress(oItem2, oItem2);
+								EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+									assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready again");
+									aFormContents = that.oCardEditor.getAggregation("_formContent");
+									assert.equal(aFormContents.length, 5, "Card Editor: form content length is OK");
 
-									EditorQunitUtils.isReady(that.oEditor).then(function () {
-										assert.ok(that.oEditor.isReady(), "Editor is ready again");
+									EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+										assert.ok(that.oCardEditor.isReady(), "Card Editor is ready again");
 
 										oTitleLabel = aFormContents[2];
 										oTitleFieldOri = aFormContents[3];
@@ -246,7 +246,7 @@ sap.ui.define([
 										assert.ok(oTitleFieldControl.isA("sap.m.Input"), "Title Field: Control is an Input");
 										assert.equal(oTitleFieldControl.getValue(), sTitleTransValue, "Title Field: String Value");
 
-										oSettings = that.oEditor.getCurrentSettings();
+										oSettings = that.oCardEditor.getCurrentSettings();
 										assert.deepEqual(oSettings, {
 											"/sap.card/configuration/childCards/child2/_manifestChanges": {
 												":errors": false,
@@ -255,19 +255,19 @@ sap.ui.define([
 											"/sap.card/configuration/parameters/cardTitle/value": "cardTitle Translation - main",
 											":errors": false,
 											":layer": 10
-										}, "Editor settings are OK");
+										}, "Card Editor settings are OK");
 
 										// simulate to click child2-1
-										assert.equal(that.oEditor._oChildTree.getItems().length, 4, "Child tree length is OK after clicking child2");
-										var oNewItem3 = that.oEditor._oChildTree.getItems()[3];
-										that.oEditor._oChildTree.onItemPress(oNewItem3, oNewItem3);
-										EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-											assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready again too");
-											aFormContents = that.oEditor.getAggregation("_formContent");
-											assert.equal(aFormContents.length, 5, "Editor: form content length is OK");
+										assert.equal(that.oCardEditor._oChildTree.getItems().length, 4, "Child tree length is OK after clicking child2");
+										var oNewItem3 = that.oCardEditor._oChildTree.getItems()[3];
+										that.oCardEditor._oChildTree.onItemPress(oNewItem3, oNewItem3);
+										EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+											assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready again too");
+											aFormContents = that.oCardEditor.getAggregation("_formContent");
+											assert.equal(aFormContents.length, 5, "Card Editor: form content length is OK");
 
-											EditorQunitUtils.isReady(that.oEditor).then(function () {
-												assert.ok(that.oEditor.isReady(), "Editor is ready again too");
+											EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+												assert.ok(that.oCardEditor.isReady(), "Card Editor is ready again too");
 
 												oTitleLabel = aFormContents[2];
 												oTitleFieldOri = aFormContents[3];
@@ -283,7 +283,7 @@ sap.ui.define([
 												assert.ok(oTitleFieldControl.isA("sap.m.Input"), "Title Field: Control is an Input");
 												assert.equal(oTitleFieldControl.getValue(), sTitleTransValue, "Title Field: String Value");
 
-												oSettings = that.oEditor.getCurrentSettings();
+												oSettings = that.oCardEditor.getCurrentSettings();
 												assert.deepEqual(oSettings, {
 													"/sap.card/configuration/childCards/child2/_manifestChanges": {
 														"/sap.card/configuration/childCards/child2-1/_manifestChanges": {
@@ -297,9 +297,9 @@ sap.ui.define([
 													"/sap.card/configuration/parameters/cardTitle/value": "cardTitle Translation - main",
 													":errors": false,
 													":layer": 10
-												}, "Editor settings are OK");
+												}, "Card Editor settings are OK");
 
-												EditorQunitUtils.destroyEditor(that.oEditor);
+												EditorQunitUtils.destroyEditor(that.oCardEditor);
 												resolve();
 											});
 										});

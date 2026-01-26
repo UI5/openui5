@@ -48,7 +48,7 @@
 							<t:rowMode>
 								<trm:Auto rowContentHeight="32"/>
 							</t:rowMode>
-							<t:toolbar>
+							<t:extension>
 								<OverflowToolbar>
 									<ToolbarSpacer />
 									<SearchField width="12rem" />
@@ -63,7 +63,7 @@
 									<Button icon="sap-icon://group-2" type="Transparent" />
 									<Button icon="sap-icon://action-settings" type="Transparent" />
 								</OverflowToolbar>
-							</t:toolbar>
+							</t:extension>
 							<t:columns>
 								<t:AnalyticalColumn />
 								<t:AnalyticalColumn />

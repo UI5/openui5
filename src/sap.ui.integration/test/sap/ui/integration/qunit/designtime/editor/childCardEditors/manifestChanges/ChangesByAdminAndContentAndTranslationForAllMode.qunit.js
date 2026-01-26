@@ -287,21 +287,21 @@ sap.ui.define([
 			var sCaseTitle = "in " + sLanguageKey + " (" + oLanguage.description + "): ";
 			QUnit.test(sCaseTitle, function (assert) {
 				var that = this;
-				that.oEditor = EditorQunitUtils.createEditor(sLanguageKey, undefined, "CardEditor");
-				that.oEditor.setMode("all");
-				that.oEditor.setCard({
+				that.oCardEditor = EditorQunitUtils.createEditor(sLanguageKey, undefined, "CardEditor");
+				that.oCardEditor.setMode("all");
+				that.oCardEditor.setCard({
 					baseUrl: sBaseUrl,
 					host: "contexthost",
 					manifest: sBaseUrl + "manifest.json",
 					manifestChanges: [_oAdminChanges, _oContentChanges, _oTranslationChanges]
 				});
 				return new Promise(function (resolve, reject) {
-					EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-						assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready");
-						var aFormContents = that.oEditor.getAggregation("_formContent");
-						assert.equal(aFormContents.length, 16, "Editor: form content length is OK");
-						EditorQunitUtils.isReady(that.oEditor).then(function () {
-							assert.ok(that.oEditor.isReady(), "Editor is ready");
+					EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+						assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready");
+						var aFormContents = that.oCardEditor.getAggregation("_formContent");
+						assert.equal(aFormContents.length, 16, "Card Editor: form content length is OK");
+						EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+							assert.ok(that.oCardEditor.isReady(), "Card Editor is ready");
 
 							var oMaxItemLabel = aFormContents[3];
 							var oMaxItemField = aFormContents[4];
@@ -346,11 +346,11 @@ sap.ui.define([
 							assert.equal(oObjectsFieldControl.getBinding().getCount(), 8, "Objects Field Table: value length is 8");
 							assert.ok(oObjectsFieldControl.getSelectedIndices().length === 0, "Objects Field Table: no selected row");
 
-							assert.ok(that.oEditor._oChildTree, "Child tree is created");
-							assert.equal(that.oEditor._oChildTree.getItems().length, 3, "Child tree initial length is OK");
-							var oItem0 = that.oEditor._oChildTree.getItems()[0];
-							var oItem1 = that.oEditor._oChildTree.getItems()[1];
-							var oItem2 = that.oEditor._oChildTree.getItems()[2];
+							assert.ok(that.oCardEditor._oChildTree, "Child tree is created");
+							assert.equal(that.oCardEditor._oChildTree.getItems().length, 3, "Child tree initial length is OK");
+							var oItem0 = that.oCardEditor._oChildTree.getItems()[0];
+							var oItem1 = that.oCardEditor._oChildTree.getItems()[1];
+							var oItem2 = that.oCardEditor._oChildTree.getItems()[2];
 							assert.equal(oItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 							assert.ok(oItem0.getExpanded(), "Child tree item 0 expanded: true");
 							assert.ok(oItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -361,13 +361,13 @@ sap.ui.define([
 							assert.ok(!oItem2.getExpanded(), "Child tree item 2 expanded: false");
 							assert.ok(!oItem2.isLeaf(), "Child tree item 2 is leaf: false");
 
-							var oSettings = that.oEditor.getCurrentSettings();
+							var oSettings = that.oCardEditor.getCurrentSettings();
 							assert.deepEqual(oSettings, {
 								"/sap.card/configuration/destinations/mock_request/name": "mock_request",
 								"/sap.card/configuration/destinations/northwind/name": "Northwind",
 								":errors": false,
 								":layer": 20
-							}, "Editor settings are OK");
+							}, "Card Editor settings are OK");
 
 							var oTitleLabel = aFormContents[1];
 							var oTitleField = aFormContents[2];
@@ -384,12 +384,12 @@ sap.ui.define([
 							oTitleField.attachEventOnce("translationPopoverOpened",async function () {
 								var oTranslationPopover1 = oTitleField._oTranslationPopover;
 								var aHeaderItems1 = oTranslationPopover1.getCustomHeader().getItems();
-								assert.equal(aHeaderItems1[0].getText(), that.oEditor._oResourceBundle.getText("EDITOR_FIELD_TRANSLATION_LIST_POPOVER_TITLE"), "oTranslationPopover1 Header: Title");
-								assert.equal(aHeaderItems1[1].getText(), that.oEditor._oResourceBundle.getText("EDITOR_FIELD_TRANSLATION_LIST_POPOVER_CURRENTLANGUAGE"), "oTranslationPopover1 Header: Current Language");
+								assert.equal(aHeaderItems1[0].getText(), that.oCardEditor._oResourceBundle.getText("EDITOR_FIELD_TRANSLATION_LIST_POPOVER_TITLE"), "oTranslationPopover1 Header: Title");
+								assert.equal(aHeaderItems1[1].getText(), that.oCardEditor._oResourceBundle.getText("EDITOR_FIELD_TRANSLATION_LIST_POPOVER_CURRENTLANGUAGE"), "oTranslationPopover1 Header: Current Language");
 								assert.equal(aHeaderItems1[2].getItems()[0].getText(), oLanguage.description, "oTranslationPopover1 Header: English");
 								assert.equal(aHeaderItems1[2].getItems()[1].getValue(), "cardTitle Translation - main", "oTranslationPopover1 Header: Title Value");
 								assert.equal(aHeaderItems1[2].getItems()[1].getEditable(), false, "oTranslationPopover1 Header: Editable false");
-								assert.equal(aHeaderItems1[3].getText(), that.oEditor._oResourceBundle.getText("EDITOR_FIELD_TRANSLATION_LIST_POPOVER_OTHERLANGUAGES"), "oTranslationPopover1 Header: Other Languages");
+								assert.equal(aHeaderItems1[3].getText(), that.oCardEditor._oResourceBundle.getText("EDITOR_FIELD_TRANSLATION_LIST_POPOVER_OTHERLANGUAGES"), "oTranslationPopover1 Header: Other Languages");
 								assert.ok(oTranslationPopover1.getContent()[0].isA("sap.m.List"), "oTranslationPopover1 Content: List");
 								var oLanguageItems1 = oTranslationPopover1.getContent()[0].getItems();
 								assert.equal(oLanguageItems1.length, 48, "oTranslationPopover1 Content: length");
@@ -405,14 +405,14 @@ sap.ui.define([
 								await nextUIUpdate();
 
 								// simulate to click child1
-								that.oEditor._oChildTree.onItemPress(oItem1, oItem1);
-								EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-									assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready again");
-									aFormContents = that.oEditor.getAggregation("_formContent");
-									assert.equal(aFormContents.length, 11, "Editor: form content length is OK");
+								that.oCardEditor._oChildTree.onItemPress(oItem1, oItem1);
+								EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+									assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready again");
+									aFormContents = that.oCardEditor.getAggregation("_formContent");
+									assert.equal(aFormContents.length, 11, "Card Editor: form content length is OK");
 
-									EditorQunitUtils.isReady(that.oEditor).then(function () {
-										assert.ok(that.oEditor.isReady(), "Editor is ready again");
+									EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+										assert.ok(that.oCardEditor.isReady(), "Card Editor is ready again");
 
 										oMaxItemLabel = aFormContents[3];
 										oMaxItemField = aFormContents[4];
@@ -457,12 +457,12 @@ sap.ui.define([
 										assert.equal(oObjectsFieldControl.getBinding().getCount(), 8, "Objects Field Table: value length is 8");
 										assert.ok(oObjectsFieldControl.getSelectedIndices().length === 0, "Objects Field Table: no selected row");
 
-										assert.equal(that.oEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
-										var oNewItem0 = that.oEditor._oChildTree.getItems()[0];
-										var oNewItem1 = that.oEditor._oChildTree.getItems()[1];
-										var oNewItem2 = that.oEditor._oChildTree.getItems()[2];
-										var oNewItem3 = that.oEditor._oChildTree.getItems()[3];
-										var oNewItem4 = that.oEditor._oChildTree.getItems()[4];
+										assert.equal(that.oCardEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
+										var oNewItem0 = that.oCardEditor._oChildTree.getItems()[0];
+										var oNewItem1 = that.oCardEditor._oChildTree.getItems()[1];
+										var oNewItem2 = that.oCardEditor._oChildTree.getItems()[2];
+										var oNewItem3 = that.oCardEditor._oChildTree.getItems()[3];
+										var oNewItem4 = that.oCardEditor._oChildTree.getItems()[4];
 										assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 										assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 										assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -479,7 +479,7 @@ sap.ui.define([
 										assert.ok(!oNewItem4.getExpanded(), "Child tree item 4 expanded: false");
 										assert.ok(!oNewItem4.isLeaf(), "Child tree item 4 is leaf: false");
 
-										oSettings = that.oEditor.getCurrentSettings();
+										oSettings = that.oCardEditor.getCurrentSettings();
 										assert.deepEqual(oSettings, {
 											"/sap.card/configuration/childCards/child1/_manifestChanges": {
 												"/sap.card/configuration/parameters/Employee/value": "1",
@@ -490,7 +490,7 @@ sap.ui.define([
 											"/sap.card/configuration/destinations/northwind/name": "Northwind",
 											":errors": false,
 											":layer": 20
-										}, "Editor settings are OK");
+										}, "Card Editor settings are OK");
 
 										oTitleLabel = aFormContents[1];
 										oTitleField = aFormContents[2];
@@ -507,12 +507,12 @@ sap.ui.define([
 										oTitleField.attachEventOnce("translationPopoverOpened",async function () {
 											oTranslationPopover1 = oTitleField._oTranslationPopover;
 											aHeaderItems1 = oTranslationPopover1.getCustomHeader().getItems();
-											assert.equal(aHeaderItems1[0].getText(), that.oEditor._oResourceBundle.getText("EDITOR_FIELD_TRANSLATION_LIST_POPOVER_TITLE"), "oTranslationPopover1 Header: Title");
-											assert.equal(aHeaderItems1[1].getText(), that.oEditor._oResourceBundle.getText("EDITOR_FIELD_TRANSLATION_LIST_POPOVER_CURRENTLANGUAGE"), "oTranslationPopover1 Header: Current Language");
+											assert.equal(aHeaderItems1[0].getText(), that.oCardEditor._oResourceBundle.getText("EDITOR_FIELD_TRANSLATION_LIST_POPOVER_TITLE"), "oTranslationPopover1 Header: Title");
+											assert.equal(aHeaderItems1[1].getText(), that.oCardEditor._oResourceBundle.getText("EDITOR_FIELD_TRANSLATION_LIST_POPOVER_CURRENTLANGUAGE"), "oTranslationPopover1 Header: Current Language");
 											assert.equal(aHeaderItems1[2].getItems()[0].getText(), oLanguage.description, "oTranslationPopover1 Header: English");
 											assert.equal(aHeaderItems1[2].getItems()[1].getValue(), "cardTitle Translation - child1", "oTranslationPopover1 Header: Title Value");
 											assert.equal(aHeaderItems1[2].getItems()[1].getEditable(), false, "oTranslationPopover1 Header: Editable false");
-											assert.equal(aHeaderItems1[3].getText(), that.oEditor._oResourceBundle.getText("EDITOR_FIELD_TRANSLATION_LIST_POPOVER_OTHERLANGUAGES"), "oTranslationPopover1 Header: Other Languages");
+											assert.equal(aHeaderItems1[3].getText(), that.oCardEditor._oResourceBundle.getText("EDITOR_FIELD_TRANSLATION_LIST_POPOVER_OTHERLANGUAGES"), "oTranslationPopover1 Header: Other Languages");
 											assert.ok(oTranslationPopover1.getContent()[0].isA("sap.m.List"), "oTranslationPopover1 Content: List");
 											oLanguageItems1 = oTranslationPopover1.getContent()[0].getItems();
 											assert.equal(oLanguageItems1.length, 48, "oTranslationPopover1 Content: length");
@@ -528,14 +528,14 @@ sap.ui.define([
 											await nextUIUpdate();
 
 											// simulate to click child1-1
-											that.oEditor._oChildTree.onItemPress(oNewItem2, oNewItem2);
-											EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-												assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready again too");
-												aFormContents = that.oEditor.getAggregation("_formContent");
-												assert.equal(aFormContents.length, 9, "Editor: form content length is OK");
+											that.oCardEditor._oChildTree.onItemPress(oNewItem2, oNewItem2);
+											EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+												assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready again too");
+												aFormContents = that.oCardEditor.getAggregation("_formContent");
+												assert.equal(aFormContents.length, 9, "Card Editor: form content length is OK");
 
-												EditorQunitUtils.isReady(that.oEditor).then(function () {
-													assert.ok(that.oEditor.isReady(), "Editor is ready again too");
+												EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+													assert.ok(that.oCardEditor.isReady(), "Card Editor is ready again too");
 
 													oMaxItemLabel = aFormContents[3];
 													oMaxItemField = aFormContents[4];
@@ -567,12 +567,12 @@ sap.ui.define([
 													assert.equal(oEmployeeFieldControl.getSelectedKey(), 3, "Employee Field: Key Value");
 													assert.equal(oEmployeeFieldControl.getValue(), "FirstName3 LastName3", "Employee Field: String Value");
 
-													assert.equal(that.oEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
-													oNewItem0 = that.oEditor._oChildTree.getItems()[0];
-													oNewItem1 = that.oEditor._oChildTree.getItems()[1];
-													oNewItem2 = that.oEditor._oChildTree.getItems()[2];
-													oNewItem3 = that.oEditor._oChildTree.getItems()[3];
-													oNewItem4 = that.oEditor._oChildTree.getItems()[4];
+													assert.equal(that.oCardEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
+													oNewItem0 = that.oCardEditor._oChildTree.getItems()[0];
+													oNewItem1 = that.oCardEditor._oChildTree.getItems()[1];
+													oNewItem2 = that.oCardEditor._oChildTree.getItems()[2];
+													oNewItem3 = that.oCardEditor._oChildTree.getItems()[3];
+													oNewItem4 = that.oCardEditor._oChildTree.getItems()[4];
 													assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 													assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 													assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -589,7 +589,7 @@ sap.ui.define([
 													assert.ok(!oNewItem4.getExpanded(), "Child tree item 4 expanded: false");
 													assert.ok(!oNewItem4.isLeaf(), "Child tree item 4 is leaf: false");
 
-													oSettings = that.oEditor.getCurrentSettings();
+													oSettings = that.oCardEditor.getCurrentSettings();
 													assert.deepEqual(oSettings, {
 														"/sap.card/configuration/childCards/child1/_manifestChanges": {
 															"/sap.card/configuration/parameters/Employee/value": "1",
@@ -604,7 +604,7 @@ sap.ui.define([
 														"/sap.card/configuration/destinations/northwind/name": "Northwind",
 														":errors": false,
 														":layer": 20
-													}, "Editor settings are OK");
+													}, "Card Editor settings are OK");
 
 													oTitleLabel = aFormContents[1];
 													oTitleField = aFormContents[2];
@@ -622,13 +622,13 @@ sap.ui.define([
 													oTitleField.attachEventOnce("translationPopoverOpened",async function () {
 														oTranslationPopover1 = oTitleField._oTranslationPopover;
 														aHeaderItems1 = oTranslationPopover1.getCustomHeader().getItems();
-														assert.equal(aHeaderItems1[0].getText(), that.oEditor._oResourceBundle.getText("EDITOR_FIELD_TRANSLATION_LIST_POPOVER_TITLE"), "oTranslationPopover1 Header: Title");
-														assert.equal(aHeaderItems1[1].getText(), that.oEditor._oResourceBundle.getText("EDITOR_FIELD_TRANSLATION_LIST_POPOVER_CURRENTLANGUAGE"), "oTranslationPopover1 Header: Current Language");
+														assert.equal(aHeaderItems1[0].getText(), that.oCardEditor._oResourceBundle.getText("EDITOR_FIELD_TRANSLATION_LIST_POPOVER_TITLE"), "oTranslationPopover1 Header: Title");
+														assert.equal(aHeaderItems1[1].getText(), that.oCardEditor._oResourceBundle.getText("EDITOR_FIELD_TRANSLATION_LIST_POPOVER_CURRENTLANGUAGE"), "oTranslationPopover1 Header: Current Language");
 														assert.equal(aHeaderItems1[2].getItems()[0].getText(), oLanguage.description, "oTranslationPopover1 Header: English");
 														var sExpectedValueInPopoverTitle = _oExpectedCardTitleValues["child1-1"][sLanguageKey] || _oExpectedCardTitleValues["child1-1"]["default"];
 														assert.equal(aHeaderItems1[2].getItems()[1].getValue(), sExpectedValueInPopoverTitle, "oTranslationPopover1 Header: Title Value");
 														assert.equal(aHeaderItems1[2].getItems()[1].getEditable(), false, "oTranslationPopover1 Header: Editable false");
-														assert.equal(aHeaderItems1[3].getText(), that.oEditor._oResourceBundle.getText("EDITOR_FIELD_TRANSLATION_LIST_POPOVER_OTHERLANGUAGES"), "oTranslationPopover1 Header: Other Languages");
+														assert.equal(aHeaderItems1[3].getText(), that.oCardEditor._oResourceBundle.getText("EDITOR_FIELD_TRANSLATION_LIST_POPOVER_OTHERLANGUAGES"), "oTranslationPopover1 Header: Other Languages");
 														assert.ok(oTranslationPopover1.getContent()[0].isA("sap.m.List"), "oTranslationPopover1 Content: List");
 														oLanguageItems1 = oTranslationPopover1.getContent()[0].getItems();
 														assert.equal(oLanguageItems1.length, 48, "oTranslationPopover1 Content: length");
@@ -644,14 +644,14 @@ sap.ui.define([
 														await nextUIUpdate();
 
 														// simulate to click child1-2
-														that.oEditor._oChildTree.onItemPress(oNewItem3, oNewItem3);
-														EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-															assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready again too");
-															aFormContents = that.oEditor.getAggregation("_formContent");
-															assert.equal(aFormContents.length, 7, "Editor: form content length is OK");
+														that.oCardEditor._oChildTree.onItemPress(oNewItem3, oNewItem3);
+														EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+															assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready again too");
+															aFormContents = that.oCardEditor.getAggregation("_formContent");
+															assert.equal(aFormContents.length, 7, "Card Editor: form content length is OK");
 
-															EditorQunitUtils.isReady(that.oEditor).then(function () {
-																assert.ok(that.oEditor.isReady(), "Editor is ready again too");
+															EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+																assert.ok(that.oCardEditor.isReady(), "Card Editor is ready again too");
 
 																oMaxItemLabel = aFormContents[3];
 																oMaxItemField = aFormContents[4];
@@ -672,12 +672,12 @@ sap.ui.define([
 																assert.equal(oOrderFieldControl.getSelectedKey(), "1", "Order Field: Key Value");
 																assert.equal(oOrderFieldControl.getValue(), "1-a-1", "Order Field: String Value");
 
-																assert.equal(that.oEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
-																oNewItem0 = that.oEditor._oChildTree.getItems()[0];
-																oNewItem1 = that.oEditor._oChildTree.getItems()[1];
-																oNewItem2 = that.oEditor._oChildTree.getItems()[2];
-																oNewItem3 = that.oEditor._oChildTree.getItems()[3];
-																oNewItem4 = that.oEditor._oChildTree.getItems()[4];
+																assert.equal(that.oCardEditor._oChildTree.getItems().length, 5, "Child tree length is OK after expand child1");
+																oNewItem0 = that.oCardEditor._oChildTree.getItems()[0];
+																oNewItem1 = that.oCardEditor._oChildTree.getItems()[1];
+																oNewItem2 = that.oCardEditor._oChildTree.getItems()[2];
+																oNewItem3 = that.oCardEditor._oChildTree.getItems()[3];
+																oNewItem4 = that.oCardEditor._oChildTree.getItems()[4];
 																assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 																assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 																assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -694,7 +694,7 @@ sap.ui.define([
 																assert.ok(!oNewItem4.getExpanded(), "Child tree item 4 expanded: false");
 																assert.ok(!oNewItem4.isLeaf(), "Child tree item 4 is leaf: false");
 
-																oSettings = that.oEditor.getCurrentSettings();
+																oSettings = that.oCardEditor.getCurrentSettings();
 																assert.deepEqual(oSettings, {
 																	"/sap.card/configuration/childCards/child1/_manifestChanges": {
 																		"/sap.card/configuration/parameters/Employee/value": "1",
@@ -715,7 +715,7 @@ sap.ui.define([
 																	"/sap.card/configuration/destinations/northwind/name": "Northwind",
 																	":errors": false,
 																	":layer": 20
-																}, "Editor settings are OK");
+																}, "Card Editor settings are OK");
 
 																oTitleLabel = aFormContents[1];
 																oTitleField = aFormContents[2];
@@ -732,12 +732,12 @@ sap.ui.define([
 																oTitleField.attachEventOnce("translationPopoverOpened",async function () {
 																	oTranslationPopover1 = oTitleField._oTranslationPopover;
 																	aHeaderItems1 = oTranslationPopover1.getCustomHeader().getItems();
-																	assert.equal(aHeaderItems1[0].getText(), that.oEditor._oResourceBundle.getText("EDITOR_FIELD_TRANSLATION_LIST_POPOVER_TITLE"), "oTranslationPopover1 Header: Title");
-																	assert.equal(aHeaderItems1[1].getText(), that.oEditor._oResourceBundle.getText("EDITOR_FIELD_TRANSLATION_LIST_POPOVER_CURRENTLANGUAGE"), "oTranslationPopover1 Header: Current Language");
+																	assert.equal(aHeaderItems1[0].getText(), that.oCardEditor._oResourceBundle.getText("EDITOR_FIELD_TRANSLATION_LIST_POPOVER_TITLE"), "oTranslationPopover1 Header: Title");
+																	assert.equal(aHeaderItems1[1].getText(), that.oCardEditor._oResourceBundle.getText("EDITOR_FIELD_TRANSLATION_LIST_POPOVER_CURRENTLANGUAGE"), "oTranslationPopover1 Header: Current Language");
 																	assert.equal(aHeaderItems1[2].getItems()[0].getText(), oLanguage.description, "oTranslationPopover1 Header: English");
 																	assert.equal(aHeaderItems1[2].getItems()[1].getValue(), "cardTitle Translation - child1-2", "oTranslationPopover1 Header: Title Value");
 																	assert.equal(aHeaderItems1[2].getItems()[1].getEditable(), false, "oTranslationPopover1 Header: Editable false");
-																	assert.equal(aHeaderItems1[3].getText(), that.oEditor._oResourceBundle.getText("EDITOR_FIELD_TRANSLATION_LIST_POPOVER_OTHERLANGUAGES"), "oTranslationPopover1 Header: Other Languages");
+																	assert.equal(aHeaderItems1[3].getText(), that.oCardEditor._oResourceBundle.getText("EDITOR_FIELD_TRANSLATION_LIST_POPOVER_OTHERLANGUAGES"), "oTranslationPopover1 Header: Other Languages");
 																	assert.ok(oTranslationPopover1.getContent()[0].isA("sap.m.List"), "oTranslationPopover1 Content: List");
 																	oLanguageItems1 = oTranslationPopover1.getContent()[0].getItems();
 																	assert.equal(oLanguageItems1.length, 48, "oTranslationPopover1 Content: length");
@@ -751,7 +751,7 @@ sap.ui.define([
 																	oCancelButton1.firePress();
 
 																	await nextUIUpdate();
-																	EditorQunitUtils.destroyEditor(that.oEditor);
+																	EditorQunitUtils.destroyEditor(that.oCardEditor);
 																	resolve();
 																});
 																oValueHelpIconOfTitle.firePress();
@@ -799,21 +799,21 @@ sap.ui.define([
 			var sCaseTitle = "in " + sLanguageKey + " (" + oLanguage.description + "): main -> child2 -> child2-1";
 			QUnit.test(sCaseTitle, function (assert) {
 				var that = this;
-				that.oEditor = EditorQunitUtils.createEditor(sLanguageKey, undefined, "CardEditor");
-				that.oEditor.setMode("all");
-				that.oEditor.setCard({
+				that.oCardEditor = EditorQunitUtils.createEditor(sLanguageKey, undefined, "CardEditor");
+				that.oCardEditor.setMode("all");
+				that.oCardEditor.setCard({
 					baseUrl: sBaseUrl,
 					host: "contexthost",
 					manifest: sBaseUrl + "manifest.json",
 					manifestChanges: [_oAdminChanges, _oContentChanges, _oTranslationChanges]
 				});
 				return new Promise(function (resolve, reject) {
-					EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-						assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready");
-						var aFormContents = that.oEditor.getAggregation("_formContent");
-						assert.equal(aFormContents.length, 16, "Editor: form content length is OK");
-						EditorQunitUtils.isReady(that.oEditor).then(function () {
-							assert.ok(that.oEditor.isReady(), "Editor is ready");
+					EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+						assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready");
+						var aFormContents = that.oCardEditor.getAggregation("_formContent");
+						assert.equal(aFormContents.length, 16, "Card Editor: form content length is OK");
+						EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+							assert.ok(that.oCardEditor.isReady(), "Card Editor is ready");
 
 							var oMaxItemLabel = aFormContents[3];
 							var oMaxItemField = aFormContents[4];
@@ -858,11 +858,11 @@ sap.ui.define([
 							assert.equal(oObjectsFieldControl.getBinding().getCount(), 8, "Objects Field Table: value length is 8");
 							assert.ok(oObjectsFieldControl.getSelectedIndices().length === 0, "Objects Field Table: no selected row");
 
-							assert.ok(that.oEditor._oChildTree, "Child tree is created");
-							assert.equal(that.oEditor._oChildTree.getItems().length, 3, "Child tree initial length is OK");
-							var oItem0 = that.oEditor._oChildTree.getItems()[0];
-							var oItem1 = that.oEditor._oChildTree.getItems()[1];
-							var oItem2 = that.oEditor._oChildTree.getItems()[2];
+							assert.ok(that.oCardEditor._oChildTree, "Child tree is created");
+							assert.equal(that.oCardEditor._oChildTree.getItems().length, 3, "Child tree initial length is OK");
+							var oItem0 = that.oCardEditor._oChildTree.getItems()[0];
+							var oItem1 = that.oCardEditor._oChildTree.getItems()[1];
+							var oItem2 = that.oCardEditor._oChildTree.getItems()[2];
 							assert.equal(oItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 							assert.ok(oItem0.getExpanded(), "Child tree item 0 expanded: true");
 							assert.ok(oItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -873,13 +873,13 @@ sap.ui.define([
 							assert.ok(!oItem2.getExpanded(), "Child tree item 2 expanded: false");
 							assert.ok(!oItem2.isLeaf(), "Child tree item 2 is leaf: false");
 
-							var oSettings = that.oEditor.getCurrentSettings();
+							var oSettings = that.oCardEditor.getCurrentSettings();
 							assert.deepEqual(oSettings, {
 								"/sap.card/configuration/destinations/mock_request/name": "mock_request",
 								"/sap.card/configuration/destinations/northwind/name": "Northwind",
 								":errors": false,
 								":layer": 20
-							}, "Editor settings are OK");
+							}, "Card Editor settings are OK");
 
 							var oTitleLabel = aFormContents[1];
 							var oTitleField = aFormContents[2];
@@ -896,12 +896,12 @@ sap.ui.define([
 							oTitleField.attachEventOnce("translationPopoverOpened",async function () {
 								var oTranslationPopover1 = oTitleField._oTranslationPopover;
 								var aHeaderItems1 = oTranslationPopover1.getCustomHeader().getItems();
-								assert.equal(aHeaderItems1[0].getText(), that.oEditor._oResourceBundle.getText("EDITOR_FIELD_TRANSLATION_LIST_POPOVER_TITLE"), "oTranslationPopover1 Header: Title");
-								assert.equal(aHeaderItems1[1].getText(), that.oEditor._oResourceBundle.getText("EDITOR_FIELD_TRANSLATION_LIST_POPOVER_CURRENTLANGUAGE"), "oTranslationPopover1 Header: Current Language");
+								assert.equal(aHeaderItems1[0].getText(), that.oCardEditor._oResourceBundle.getText("EDITOR_FIELD_TRANSLATION_LIST_POPOVER_TITLE"), "oTranslationPopover1 Header: Title");
+								assert.equal(aHeaderItems1[1].getText(), that.oCardEditor._oResourceBundle.getText("EDITOR_FIELD_TRANSLATION_LIST_POPOVER_CURRENTLANGUAGE"), "oTranslationPopover1 Header: Current Language");
 								assert.equal(aHeaderItems1[2].getItems()[0].getText(), oLanguage.description, "oTranslationPopover1 Header: English");
 								assert.equal(aHeaderItems1[2].getItems()[1].getValue(), "cardTitle Translation - main", "oTranslationPopover1 Header: Title Value");
 								assert.equal(aHeaderItems1[2].getItems()[1].getEditable(), false, "oTranslationPopover1 Header: Editable false");
-								assert.equal(aHeaderItems1[3].getText(), that.oEditor._oResourceBundle.getText("EDITOR_FIELD_TRANSLATION_LIST_POPOVER_OTHERLANGUAGES"), "oTranslationPopover1 Header: Other Languages");
+								assert.equal(aHeaderItems1[3].getText(), that.oCardEditor._oResourceBundle.getText("EDITOR_FIELD_TRANSLATION_LIST_POPOVER_OTHERLANGUAGES"), "oTranslationPopover1 Header: Other Languages");
 								assert.ok(oTranslationPopover1.getContent()[0].isA("sap.m.List"), "oTranslationPopover1 Content: List");
 								var oLanguageItems1 = oTranslationPopover1.getContent()[0].getItems();
 								assert.equal(oLanguageItems1.length, 48, "oTranslationPopover1 Content: length");
@@ -917,14 +917,14 @@ sap.ui.define([
 								await nextUIUpdate();
 
 								// simulate to click child2
-								that.oEditor._oChildTree.onItemPress(oItem2, oItem2);
-								EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-									assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready again");
-									aFormContents = that.oEditor.getAggregation("_formContent");
-									assert.equal(aFormContents.length, 5, "Editor: form content length is OK");
+								that.oCardEditor._oChildTree.onItemPress(oItem2, oItem2);
+								EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+									assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready again");
+									aFormContents = that.oCardEditor.getAggregation("_formContent");
+									assert.equal(aFormContents.length, 5, "Card Editor: form content length is OK");
 
-									EditorQunitUtils.isReady(that.oEditor).then(function () {
-										assert.ok(that.oEditor.isReady(), "Editor is ready again");
+									EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+										assert.ok(that.oCardEditor.isReady(), "Card Editor is ready again");
 
 										oMaxItemLabel = aFormContents[3];
 										oMaxItemField = aFormContents[4];
@@ -934,11 +934,11 @@ sap.ui.define([
 										assert.ok(oMaxItemField.getAggregation("_field").isA("sap.m.Slider"), "MaxItem Field: Control is a Slider");
 										assert.equal(oMaxItemField.getAggregation("_field").getValue(), 3, "MaxItem Field: Integer Value");
 
-										assert.equal(that.oEditor._oChildTree.getItems().length, 4, "Child tree length is OK after clicking child2");
-										var oNewItem0 = that.oEditor._oChildTree.getItems()[0];
-										var oNewItem1 = that.oEditor._oChildTree.getItems()[1];
-										var oNewItem2 = that.oEditor._oChildTree.getItems()[2];
-										var oNewItem3 = that.oEditor._oChildTree.getItems()[3];
+										assert.equal(that.oCardEditor._oChildTree.getItems().length, 4, "Child tree length is OK after clicking child2");
+										var oNewItem0 = that.oCardEditor._oChildTree.getItems()[0];
+										var oNewItem1 = that.oCardEditor._oChildTree.getItems()[1];
+										var oNewItem2 = that.oCardEditor._oChildTree.getItems()[2];
+										var oNewItem3 = that.oCardEditor._oChildTree.getItems()[3];
 										assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 										assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 										assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -952,7 +952,7 @@ sap.ui.define([
 										assert.ok(!oNewItem3.getExpanded(), "Child tree item 3 expanded: false");
 										assert.ok(oNewItem3.isLeaf(), "Child tree item 3 is leaf: false");
 
-										oSettings = that.oEditor.getCurrentSettings();
+										oSettings = that.oCardEditor.getCurrentSettings();
 										assert.deepEqual(oSettings, {
 											"/sap.card/configuration/childCards/child2/_manifestChanges": {
 												":errors": false,
@@ -962,7 +962,7 @@ sap.ui.define([
 											"/sap.card/configuration/destinations/northwind/name": "Northwind",
 											":errors": false,
 											":layer": 20
-										}, "Editor settings are OK");
+										}, "Card Editor settings are OK");
 
 										oTitleLabel = aFormContents[1];
 										oTitleField = aFormContents[2];
@@ -980,13 +980,13 @@ sap.ui.define([
 										oTitleField.attachEventOnce("translationPopoverOpened",async function () {
 											oTranslationPopover1 = oTitleField._oTranslationPopover;
 											aHeaderItems1 = oTranslationPopover1.getCustomHeader().getItems();
-											assert.equal(aHeaderItems1[0].getText(), that.oEditor._oResourceBundle.getText("EDITOR_FIELD_TRANSLATION_LIST_POPOVER_TITLE"), "oTranslationPopover1 Header: Title");
-											assert.equal(aHeaderItems1[1].getText(), that.oEditor._oResourceBundle.getText("EDITOR_FIELD_TRANSLATION_LIST_POPOVER_CURRENTLANGUAGE"), "oTranslationPopover1 Header: Current Language");
+											assert.equal(aHeaderItems1[0].getText(), that.oCardEditor._oResourceBundle.getText("EDITOR_FIELD_TRANSLATION_LIST_POPOVER_TITLE"), "oTranslationPopover1 Header: Title");
+											assert.equal(aHeaderItems1[1].getText(), that.oCardEditor._oResourceBundle.getText("EDITOR_FIELD_TRANSLATION_LIST_POPOVER_CURRENTLANGUAGE"), "oTranslationPopover1 Header: Current Language");
 											assert.equal(aHeaderItems1[2].getItems()[0].getText(), oLanguage.description, "oTranslationPopover1 Header: English");
 											var sExpectedValueInPopoverTitle = _oExpectedCardTitleValues["child2"][sLanguageKey] || _oExpectedCardTitleValues["child2"]["default"];
 											assert.equal(aHeaderItems1[2].getItems()[1].getValue(), sExpectedValueInPopoverTitle, "oTranslationPopover1 Header: Title Value");
 											assert.equal(aHeaderItems1[2].getItems()[1].getEditable(), false, "oTranslationPopover1 Header: Editable false");
-											assert.equal(aHeaderItems1[3].getText(), that.oEditor._oResourceBundle.getText("EDITOR_FIELD_TRANSLATION_LIST_POPOVER_OTHERLANGUAGES"), "oTranslationPopover1 Header: Other Languages");
+											assert.equal(aHeaderItems1[3].getText(), that.oCardEditor._oResourceBundle.getText("EDITOR_FIELD_TRANSLATION_LIST_POPOVER_OTHERLANGUAGES"), "oTranslationPopover1 Header: Other Languages");
 											assert.ok(oTranslationPopover1.getContent()[0].isA("sap.m.List"), "oTranslationPopover1 Content: List");
 											oLanguageItems1 = oTranslationPopover1.getContent()[0].getItems();
 											assert.equal(oLanguageItems1.length, 48, "oTranslationPopover1 Content: length");
@@ -1002,14 +1002,14 @@ sap.ui.define([
 											await nextUIUpdate();
 
 											// simulate to click child2-1
-											that.oEditor._oChildTree.onItemPress(oNewItem3, oNewItem3);
-											EditorQunitUtils.isFieldReady(that.oEditor).then(function () {
-												assert.ok(that.oEditor.isFieldReady(), "Editor fields are ready again too");
-												aFormContents = that.oEditor.getAggregation("_formContent");
-												assert.equal(aFormContents.length, 5, "Editor: form content length is OK");
+											that.oCardEditor._oChildTree.onItemPress(oNewItem3, oNewItem3);
+											EditorQunitUtils.isFieldReady(that.oCardEditor).then(function () {
+												assert.ok(that.oCardEditor.isFieldReady(), "Card Editor fields are ready again too");
+												aFormContents = that.oCardEditor.getAggregation("_formContent");
+												assert.equal(aFormContents.length, 5, "Card Editor: form content length is OK");
 
-												EditorQunitUtils.isReady(that.oEditor).then(function () {
-													assert.ok(that.oEditor.isReady(), "Editor is ready again too");
+												EditorQunitUtils.isReady(that.oCardEditor).then(function () {
+													assert.ok(that.oCardEditor.isReady(), "Card Editor is ready again too");
 
 													var oStringLabel = aFormContents[3];
 													var oStringField = aFormContents[4];
@@ -1019,11 +1019,11 @@ sap.ui.define([
 													assert.ok(oStringField.getAggregation("_field").isA("sap.m.Input"), "String Field: Control is a Input");
 													assert.equal(oStringField.getAggregation("_field").getValue(), "StringValue Content Child2-1", "String Field: String Value");
 
-													assert.equal(that.oEditor._oChildTree.getItems().length, 4, "Child tree length is OK after expand child1");
-													oNewItem0 = that.oEditor._oChildTree.getItems()[0];
-													oNewItem1 = that.oEditor._oChildTree.getItems()[1];
-													oNewItem2 = that.oEditor._oChildTree.getItems()[2];
-													oNewItem3 = that.oEditor._oChildTree.getItems()[3];
+													assert.equal(that.oCardEditor._oChildTree.getItems().length, 4, "Child tree length is OK after expand child1");
+													oNewItem0 = that.oCardEditor._oChildTree.getItems()[0];
+													oNewItem1 = that.oCardEditor._oChildTree.getItems()[1];
+													oNewItem2 = that.oCardEditor._oChildTree.getItems()[2];
+													oNewItem3 = that.oCardEditor._oChildTree.getItems()[3];
 													assert.equal(oNewItem0.getTitle(), "Main Card", "Child tree item 0 title is OK");
 													assert.ok(oNewItem0.getExpanded(), "Child tree item 0 expanded: true");
 													assert.ok(oNewItem0.isTopLevel(), "Child tree item 1 is top level: true");
@@ -1037,7 +1037,7 @@ sap.ui.define([
 													assert.ok(!oNewItem3.getExpanded(), "Child tree item 3 expanded: false");
 													assert.ok(oNewItem3.isLeaf(), "Child tree item 3 is leaf: true");
 
-													oSettings = that.oEditor.getCurrentSettings();
+													oSettings = that.oCardEditor.getCurrentSettings();
 													assert.deepEqual(oSettings, {
 														"/sap.card/configuration/childCards/child2/_manifestChanges": {
 															"/sap.card/configuration/childCards/child2-1/_manifestChanges": {
@@ -1051,7 +1051,7 @@ sap.ui.define([
 														"/sap.card/configuration/destinations/northwind/name": "Northwind",
 														":errors": false,
 														":layer": 20
-													}, "Editor settings are OK");
+													}, "Card Editor settings are OK");
 
 													oTitleLabel = aFormContents[1];
 													oTitleField = aFormContents[2];
@@ -1068,12 +1068,12 @@ sap.ui.define([
 													oTitleField.attachEventOnce("translationPopoverOpened",function () {
 														oTranslationPopover1 = oTitleField._oTranslationPopover;
 														aHeaderItems1 = oTranslationPopover1.getCustomHeader().getItems();
-														assert.equal(aHeaderItems1[0].getText(), that.oEditor._oResourceBundle.getText("EDITOR_FIELD_TRANSLATION_LIST_POPOVER_TITLE"), "oTranslationPopover1 Header: Title");
-														assert.equal(aHeaderItems1[1].getText(), that.oEditor._oResourceBundle.getText("EDITOR_FIELD_TRANSLATION_LIST_POPOVER_CURRENTLANGUAGE"), "oTranslationPopover1 Header: Current Language");
+														assert.equal(aHeaderItems1[0].getText(), that.oCardEditor._oResourceBundle.getText("EDITOR_FIELD_TRANSLATION_LIST_POPOVER_TITLE"), "oTranslationPopover1 Header: Title");
+														assert.equal(aHeaderItems1[1].getText(), that.oCardEditor._oResourceBundle.getText("EDITOR_FIELD_TRANSLATION_LIST_POPOVER_CURRENTLANGUAGE"), "oTranslationPopover1 Header: Current Language");
 														assert.equal(aHeaderItems1[2].getItems()[0].getText(), oLanguage.description, "oTranslationPopover1 Header: English");
 														assert.equal(aHeaderItems1[2].getItems()[1].getValue(), "cardTitle Translation - child2-1", "oTranslationPopover1 Header: Title Value");
 														assert.equal(aHeaderItems1[2].getItems()[1].getEditable(), false, "oTranslationPopover1 Header: Editable false");
-														assert.equal(aHeaderItems1[3].getText(), that.oEditor._oResourceBundle.getText("EDITOR_FIELD_TRANSLATION_LIST_POPOVER_OTHERLANGUAGES"), "oTranslationPopover1 Header: Other Languages");
+														assert.equal(aHeaderItems1[3].getText(), that.oCardEditor._oResourceBundle.getText("EDITOR_FIELD_TRANSLATION_LIST_POPOVER_OTHERLANGUAGES"), "oTranslationPopover1 Header: Other Languages");
 														assert.ok(oTranslationPopover1.getContent()[0].isA("sap.m.List"), "oTranslationPopover1 Content: List");
 														oLanguageItems1 = oTranslationPopover1.getContent()[0].getItems();
 														assert.equal(oLanguageItems1.length, 48, "oTranslationPopover1 Content: length");
@@ -1086,7 +1086,7 @@ sap.ui.define([
 														oCancelButton1 = oTranslationPopover1.getFooter().getContent()[2];
 														oCancelButton1.firePress();
 
-														EditorQunitUtils.destroyEditor(that.oEditor);
+														EditorQunitUtils.destroyEditor(that.oCardEditor);
 														resolve();
 													});
 													oValueHelpIconOfTitle.firePress();

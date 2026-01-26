@@ -289,7 +289,7 @@ sap.ui.define([
 
 	document.body.className = document.body.className + " sapUiSizeCompact ";
 
-	QUnit.module("Create an editor based on a card instance", {
+	QUnit.module("Create a card editor based on a card instance", {
 		beforeEach: function () {
 			this.oCardEditor = EditorQunitUtils.beforeEachTest(undefined, undefined, "CardEditor");
 		},
@@ -407,7 +407,7 @@ sap.ui.define([
 					assert.ok(oEmployeeField.getAggregation("_field").isA("sap.m.ComboBox"), "Field: DataGotFromCardExtension is ComboBox");
 
 					EditorQunitUtils.isReady(this.oCardEditor).then(function () {
-						assert.ok(this.oCardEditor.isReady(), "Editor is ready");
+						assert.ok(this.oCardEditor.isReady(), "Card Editor is ready");
 						assert.equal(oCustomerField.getAggregation("_field").getItems().length, 4, "Field: DataGotFromExtensionRequest lenght is OK");
 						assert.equal(oEmployeeField.getAggregation("_field").getItems().length, 4, "Field: DataGotFromCardExtension lenght is OK");
 						resolve();
@@ -465,7 +465,7 @@ sap.ui.define([
 					assert.ok(oEmployeeField.getAggregation("_field").isA("sap.m.ComboBox"), "Field: DataGotFromCardExtension is ComboBox");
 
 					EditorQunitUtils.isReady(this.oCardEditor).then(function () {
-						assert.ok(this.oCardEditor.isReady(), "Editor is ready");
+						assert.ok(this.oCardEditor.isReady(), "Card Editor is ready");
 						assert.equal(oCustomerField.getAggregation("_field").getItems().length, 4, "Field: DataGotFromExtensionRequest lenght is OK");
 						assert.equal(oEmployeeField.getAggregation("_field").getItems().length, 4, "Field: DataGotFromCardExtension lenght is OK");
 						resolve();
@@ -1010,7 +1010,7 @@ sap.ui.define([
 				this.oCardEditor.attachFieldReady(function () {
 					assert.ok(this.oCardEditor.isFieldReady(), "Card Editor fields are ready");
 					EditorQunitUtils.isReady(this.oCardEditor).then(function () {
-						assert.ok(this.oCardEditor.isReady(), "Editor is ready");
+						assert.ok(this.oCardEditor.isReady(), "Card Editor is ready");
 						var cardPreview = this.oCardEditor.getAggregation("_preview");
 						var card = cardPreview._getCardPreview();
 						assert.equal(card, null, "Preview mode card is OK");
@@ -1259,9 +1259,9 @@ sap.ui.define([
 					var cardPreview = this.oCardEditor.getAggregation("_preview");
 					cardPreview.addEventDelegate({
 						onAfterRendering: function () {
-							var oEditorDom = this.oCardEditor.getDomRef();
-							assert.equal(oEditorDom.children.length, 2, "Editor children length: OK");
-							assert.equal(oEditorDom.children[1].id, cardPreview.getId(), "Preview Position: OK");
+							var oCardEditorDom = this.oCardEditor.getDomRef();
+							assert.equal(oCardEditorDom.children.length, 2, "Card Editor children length: OK");
+							assert.equal(oCardEditorDom.children[1].id, cardPreview.getId(), "Preview Position: OK");
 
 							var SizeToggleButton = cardPreview._oSizeToggleButton;
 							assert.ok(SizeToggleButton.getDomRef(), "Preview size button: Button is OK");
@@ -1304,9 +1304,9 @@ sap.ui.define([
 					var cardPreview = this.oCardEditor.getAggregation("_preview");
 					cardPreview.addEventDelegate({
 						onAfterRendering: function () {
-							var oEditorDom = this.oCardEditor.getDomRef();
-							assert.equal(oEditorDom.children.length, 2, "Editor children length: OK");
-							assert.equal(oEditorDom.children[0].id, cardPreview.getId(), "Preview Position: OK");
+							var oCardEditorDom = this.oCardEditor.getDomRef();
+							assert.equal(oCardEditorDom.children.length, 2, "Card Editor children length: OK");
+							assert.equal(oCardEditorDom.children[0].id, cardPreview.getId(), "Preview Position: OK");
 
 							var SizeToggleButton = cardPreview._oSizeToggleButton;
 							assert.equal(SizeToggleButton, null, "Preview size button: Button is OK");
@@ -1346,9 +1346,9 @@ sap.ui.define([
 					var cardPreview = this.oCardEditor.getAggregation("_preview");
 					cardPreview.addEventDelegate({
 						onAfterRendering: function () {
-							var oEditorDom = this.oCardEditor.getDomRef();
-							assert.equal(oEditorDom.children.length, 2, "Editor children length: OK");
-							assert.equal(oEditorDom.children[1].id, cardPreview.getId(), "Preview Position: OK");
+							var oCardEditorDom = this.oCardEditor.getDomRef();
+							assert.equal(oCardEditorDom.children.length, 2, "Card Editor children length: OK");
+							assert.equal(oCardEditorDom.children[1].id, cardPreview.getId(), "Preview Position: OK");
 
 							var SizeToggleButton = cardPreview._oSizeToggleButton;
 							assert.equal(SizeToggleButton, null, "Preview size button: Button is OK");
@@ -1388,9 +1388,9 @@ sap.ui.define([
 					var cardPreview = this.oCardEditor.getAggregation("_preview");
 					cardPreview.addEventDelegate({
 						onAfterRendering: function () {
-							var oEditorDom = this.oCardEditor.getDomRef();
-							assert.equal(oEditorDom.children.length, 2, "Editor children length: OK");
-							assert.equal(oEditorDom.children[0].id, cardPreview.getId(), "Preview Position: OK");
+							var oCardEditorDom = this.oCardEditor.getDomRef();
+							assert.equal(oCardEditorDom.children.length, 2, "Card Editor children length: OK");
+							assert.equal(oCardEditorDom.children[0].id, cardPreview.getId(), "Preview Position: OK");
 
 							var SizeToggleButton = cardPreview._oSizeToggleButton;
 							assert.ok(SizeToggleButton.getDomRef(), "Preview size button: Button is OK");
@@ -1433,9 +1433,9 @@ sap.ui.define([
 					var cardPreview = this.oCardEditor.getAggregation("_preview");
 					cardPreview.addEventDelegate({
 						onAfterRendering: function () {
-							var oEditorDom = this.oCardEditor.getDomRef();
-							assert.equal(oEditorDom.children.length, 2, "Editor children length: OK");
-							assert.equal(oEditorDom.children[1].id, cardPreview.getId(), "Preview Position: OK");
+							var oCardEditorDom = this.oCardEditor.getDomRef();
+							assert.equal(oCardEditorDom.children.length, 2, "Card Editor children length: OK");
+							assert.equal(oCardEditorDom.children[1].id, cardPreview.getId(), "Preview Position: OK");
 
 							var SizeToggleButton = cardPreview._oSizeToggleButton;
 							assert.ok(SizeToggleButton.getDomRef(), "Preview size button: Button is OK");

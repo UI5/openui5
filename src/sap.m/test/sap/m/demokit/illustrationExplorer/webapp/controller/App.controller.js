@@ -189,7 +189,7 @@ sap.ui.define([
             const oResourceBundle = this.getResourceBundle();
             const oSideContentContainer = this.byId("sideContentContainer");
             const oWelcomeMessage = new IllustratedMessage({
-                illustrationType: IllustratedMessageType.SearchFolder,
+                illustrationType: IllustratedMessageType.NoSearchResults,
                 title: oResourceBundle.getText("welcomeMessageTitle"),
                 description: oResourceBundle.getText("welcomeMessageDescription")
             });

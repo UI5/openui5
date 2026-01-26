@@ -20,7 +20,8 @@ sap.ui.define([
 			aggregations: {
 				menu: { type: "sap.m.Menu", multiple: false }
 			}
-		}
+		},
+		renderer: null // no renderer needed as the column menu is a popup-like control
 	});
 
 	/**
