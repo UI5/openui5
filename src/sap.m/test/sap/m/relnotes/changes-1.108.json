@@ -1972,5 +1972,25 @@
         "text": " sap.m.ComboBox: Picker now closes on table scroll"
       }
     ]
+  },
+  "1.108.48": {
+    "date": "January 2026",
+    "notes": [
+      {
+        "id": "8e48b2d9fe94947aee5f4c96d8d34d5ba3c74d47",
+        "type": "FIX",
+        "text": "sap.m.MultiInput: Token addition is now reset on focusin"
+      },
+      {
+        "id": "04a88df0798a018a5dd63adf460e19be72a79901",
+        "type": "FIX",
+        "text": " sap.m.Button: Default type is shown correctly in Info bar"
+      },
+      {
+        "id": "be7abb6a9ca8cbcca29ed5cf6352f884f8f6fdd8",
+        "type": "FIX",
+        "text": " sap.m.ComboBoxBase: Value state popup is now hidden when the picker is opened"
+      }
+    ]
   }
 }

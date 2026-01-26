@@ -571,5 +571,15 @@
         "text": " sap.m.Button: has correct css parameters for active Emphasized"
       }
     ]
+  },
+  "1.108.48": {
+    "date": "January 2026",
+    "notes": [
+      {
+        "id": "cda03662d3f8113aa79dd64a2c37ae237f098356",
+        "type": "FIX",
+        "text": " sap.m.ValueStateMessage: Warning icon name corrected"
+      }
+    ]
   }
 }

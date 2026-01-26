@@ -201,5 +201,15 @@
         "text": " MDC: Include AdaptationFilterBar triggerSearch before invalidation"
       }
     ]
+  },
+  "1.108.48": {
+    "date": "January 2026",
+    "notes": [
+      {
+        "id": "e7b623aa8f186fdaefb385955f647eb38857e7c7",
+        "type": "FIX",
+        "text": " MDCTable should use Context.getIndex if available to determine the context's position in the binding."
+      }
+    ]
   }
 }
