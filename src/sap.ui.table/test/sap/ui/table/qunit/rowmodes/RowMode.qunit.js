@@ -38,9 +38,6 @@ sap.ui.define([
 			this.delegate = {
 				onBeforeRendering: function() {
 					this.updateTable();
-				},
-				onAfterRendering: function() {
-					this.fireRowsUpdated();
 				}
 			};
 			TableUtils.addDelegate(this.getTable(), this.delegate, this);

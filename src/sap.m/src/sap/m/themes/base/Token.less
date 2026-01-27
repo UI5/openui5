@@ -41,6 +41,12 @@ html.sap-desktop .sapMToken:not(.sapMTokenReadOnly):hover {
 	border: var(--sapButton_BorderWidth) solid var(--sapButton_Hover_BorderColor);
 }
 
+.sapMToken:focus-visible,
+.sapMToken .sapMTokenIcon > .sapUiIconTitle:focus-visible {
+	outline: none;
+	box-shadow: none;
+}
+
 .sapMTokenText {
 	display: inline-block;
 	overflow: hidden;
@@ -103,8 +109,8 @@ html.sap-desktop .sapMToken:not(.sapMTokenReadOnly):hover {
 }
 
 html.sap-desktop .sapMToken.sapMTokenSelected:not(.sapMTokenReadOnly):hover {
-	background: @sapUiToggleButtonPressedHoverBackground;
-	border: 1px solid @sapUiToggleButtonPressedHoverBorderColor;
+	background: var(--sapButton_Selected_Hover_Background);
+	border: var(--sapButton_BorderWidth) solid var(--sapButton_Selected_BorderColor);
 }
 
 .sapMTokenSelected,

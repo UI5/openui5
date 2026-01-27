@@ -3,21 +3,24 @@
  */
 
 sap.ui.define([
-	"sap/base/Log",
 	"sap/base/util/isEmptyObject",
 	"sap/base/util/isPlainObject",
+	"sap/base/Log",
+	"sap/ui/core/Lib",
 	"sap/ui/fl/support/api/SupportAPI",
 	"sap/ui/VersionInfo"
 ], function(
-	Log,
 	isEmptyObject,
 	isPlainObject,
+	Log,
+	Lib,
 	SupportAPI,
 	VersionInfo
 ) {
 	"use strict";
 
 	const oUserMap = new Map();
+	let sOwnUserName;
 
 	function isValidObject(vValue) {
 		return typeof vValue === "object"
@@ -26,21 +29,30 @@ sap.ui.define([
 		&& !isEmptyObject(vValue);
 	}
 
-	// The settings object contains currently one property for anonymization: "userId"
 	function anonymizeSettingsObject(bAnonymizeUsers, aFlexSettings) {
 		if (bAnonymizeUsers && aFlexSettings) {
 			aFlexSettings.forEach((oSetting) => {
 				oSetting.value = anonymizeValue(oSetting.key, oSetting.value);
+				if (oSetting.key === "user") {
+					sOwnUserName = oSetting.value;
+				}
 			});
 		}
 		return aFlexSettings;
 	}
 
-	// Currently, only "userId" and "user" properties are relevant for anonymization in Flex Objects.
+	// Currently, only "userId", "user", and "author" properties are relevant for anonymization in Flex Objects / Settings.
 	// If other properties are identified, it might be better to list them in the FlexObject and
 	// retrieve them from there.
 	function anonymizeValue(sKey, vValue) {
-		if (["userId", "user"].includes(sKey) && typeof vValue === "string") {
+		if (
+			sKey === "author"
+			&& typeof vValue === "string"
+			&& vValue === Lib.getResourceBundleFor("sap.ui.fl").getText("VARIANT_SELF_OWNER_NAME")
+		) {
+			return sOwnUserName;
+		}
+		if (["userId", "user", "author"].includes(sKey) && typeof vValue === "string") {
 			if (!oUserMap.has(vValue)) {
 				const sAnonymizedUser = `USER_${oUserMap.size + 1}`;
 				oUserMap.set(vValue, sAnonymizedUser);
@@ -187,6 +199,7 @@ sap.ui.define([
 		async extractFlexibilityData(bAnonymizeUsers, bExportFullData) {
 			let oFlexData = {};
 			oUserMap.clear();
+			sOwnUserName = "";
 
 			// Version the data format to support future changes
 			oFlexData.extractorVersion = "2.0";

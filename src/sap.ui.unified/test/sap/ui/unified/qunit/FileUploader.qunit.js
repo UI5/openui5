@@ -586,7 +586,7 @@ sap.ui.define([
 		await nextUIUpdate();
 
 		// assert (only tooltip type of string are added via the 'title' attribute)
-		assert.equal(oFileUploader.oFileUpload.getAttribute("title"), oFileUploader._getNoFileChosenText(), "The title attribute is set to default 'no file chosen' value");
+		assert.equal(oFileUploader.oFileUpload.getAttribute("title"), oFileUploader._getEffectivePlaceholder(), "The title attribute is set to default 'no file chosen' value");
 		assert.equal(oFileUploader.$().find(".sapUiFupInputMask")[0].getAttribute("title"), null, "The title attribute is not set");
 
 		// cleanup
@@ -987,7 +987,7 @@ sap.ui.define([
 
 	QUnit.test("Test 'title' attribute in different scenarios", async function (assert){
 		var oFileUploader = new FileUploader(),
-			sDefaultTitle = oFileUploader._getNoFileChosenText(),
+			sDefaultTitle = oFileUploader._getEffectivePlaceholder(),
 			sFileName = "test.txt",
 			sTooltip = "My tooltip";
 
@@ -1741,6 +1741,32 @@ sap.ui.define([
 		// cleanup
 		oLabel.destroy();
 		aLabelledBy.forEach(function(oControl){ oControl.destroy(); });
+		oFileUploader.destroy();
+		await nextUIUpdate();
+	});
+
+	QUnit.test("ariaLabel: button-only file uploader", async function(assert) {
+		// setup
+		const oFileUploader = new FileUploader({
+			buttonOnly: true
+		});
+		oFileUploader.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		// assert
+		const sExpectedTooltip = oFileUploader._getBrowseIconTooltip();
+		assert.strictEqual(
+			oFileUploader.oFileUpload.getAttribute("title"),
+			sExpectedTooltip,
+			"Input type file has the same default tooltip as the button"
+		);
+		assert.strictEqual(
+			oFileUploader.oBrowse.getTooltip(),
+			sExpectedTooltip,
+			"Browse button has the expected default tooltip"
+		);
+
+		// cleanup
 		oFileUploader.destroy();
 		await nextUIUpdate();
 	});

@@ -138,15 +138,6 @@ sap.ui.define([
 			oRm.renderControl(oFileUploader.oBrowse);
 		}
 
-		if (bButtonOnly && oFileUploader._selectedFileNames.length === 0) {
-			const sName = oFileUploader.getId() + "-fu-no-file-chosen";
-			oRm.openStart("div", sName);
-			oRm.class("sapUiPseudoInvisibleText");
-			oRm.openEnd();
-			oRm.text(oFileUploader._getNoFileChosenText());
-			oRm.close("div");
-		}
-
 		oRm.openStart("span", oFileUploader.getId() + "-AccDescr");
 		oRm.class("sapUiInvisibleText");
 		oRm.attr("aria-hidden", "true");

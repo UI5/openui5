@@ -292,15 +292,7 @@ sap.ui.define([
 	}
 
 	function testAriaDescriptionsForFocusedDataCell(oTable, oCellElement, iRow, iCol, assert, mParams, bExpanded = false) {
-		const bGroup = !!mParams.group;
 		const aDescriptions = [];
-		const oRow = oTable.getRows()[iRow];
-		const oCell = oRow.getCells()[iCol];
-		const iIndex = Column.ofCell(oCell).getIndex();
-
-		if (iIndex === 0 && oCellElement.querySelectorAll(".sapUiTableTreeIcon:not(.sapUiTableTreeIconLeaf)").length === 1 || bGroup) {
-			aDescriptions.push(oTable.getId() + (bExpanded ? "-rowcollapsetext" : "-rowexpandtext"));
-		}
 
 		assert.strictEqual(
 			(oCellElement.getAttribute("aria-describedby") || "").trim(),
@@ -548,8 +540,6 @@ sap.ui.define([
 			assert.ok(!oCell.hasAttribute("title"), "Data cells have no title");
 		}
 
-		assert.ok(this.oTable.getRows()[0].getDomRef("rowselecttext"), "Has row selection text");
-
 		TableQUnitUtils.setFocusOutsideOfTable(assert);
 		await TableQUnitUtils.wait(100);
 		testAriaLabelsForNonFocusedDataCell(this.oTable, this.oTable.qunit.getDataCell(0, -1), 0, this.oTable.getColumns().length - 1, assert);
@@ -599,8 +589,6 @@ sap.ui.define([
 			assert.ok(!oCell.hasAttribute("title"), "Data cells have no title");
 		}
 
-		assert.notOk(this.oTable.getRows()[0].getDomRef("rowselecttext"), "Has row selection text");
-
 		TableQUnitUtils.setFocusOutsideOfTable(assert);
 		await TableQUnitUtils.wait(100);
 		testAriaLabelsForNonFocusedDataCell(this.oTable, this.oTable.qunit.getDataCell(0, -1), 0, this.oTable.getColumns().length - 1, assert);
@@ -639,8 +627,6 @@ sap.ui.define([
 			});
 			assert.ok(!oCell.hasAttribute("title"), "Data cells have no title");
 		}
-
-		assert.notOk(this.oTable.getRows()[0].getDomRef("rowselecttext"), "Has row selection text");
 
 		TableQUnitUtils.setFocusOutsideOfTable(assert);
 		await TableQUnitUtils.wait(100);
@@ -1028,7 +1014,6 @@ sap.ui.define([
 			const bRowChange = !!mParams.rowChange;
 			const bGroup = !!mParams.group;
 			const bSum = !!mParams.sum;
-			const bExpanded = !!mParams.expanded;
 			const sTableId = this.oTable.getId();
 			const oRow = this.oTable.getRows()[iRow];
 			const sRowId = oRow.getId();
@@ -1038,11 +1023,9 @@ sap.ui.define([
 				if (bGroup) {
 					aLabels.push(sTableId + "-ariarowgrouplabel");
 					aLabels.push(sRowId + "-groupHeader");
-					aLabels.push(sTableId + (bExpanded ? "-rowcollapsetext" : "-rowexpandtext"));
 				} else if (bSum) {
 					aLabels.push(sTableId + "-ariagrandtotallabel");
 				} else {
-					aLabels.push(sRowId + "-rowselecttext");
 					aLabels.push(sRowId + "-highlighttext");
 				}
 
@@ -1124,7 +1107,6 @@ sap.ui.define([
 		oCell.focus();
 		assert.notOk(oCell.hasAttribute("aria-describedby"), "Has aria-describedby");
 		assert.notOk(oCell.hasAttribute("title"), "Has title");
-		assert.notOk(this.oTable.getRows()[0].getDomRef("rowselecttext"), "Has row selection text");
 
 		TableQUnitUtils.setFocusOutsideOfTable(assert);
 		await TableQUnitUtils.wait(100);
@@ -1140,7 +1122,6 @@ sap.ui.define([
 		this.testAriaLabels(oCell, 0, assert, {group: true, focus: true, firstTime: true});
 
 		assert.notOk(oCell.hasAttribute("title"), "Has title");
-		assert.notOk(this.oTable.getRows()[0].getDomRef("rowselecttext"), "Has row selection text");
 
 		await this.oTable.qunit.setRowStates([{type: Row.prototype.Type.GroupHeader, expandable: true, expanded: true}]);
 
@@ -1201,72 +1182,6 @@ sap.ui.define([
 		checkAriaSelected(this.oTable.qunit.getRowHeaderCell(1).getAttribute("aria-selected"), false, assert);
 	});
 
-	QUnit.test("Selector text", async function(assert) {
-		const oRow = this.oTable.getRows()[0];
-		const oRowSelectorText = oRow.getDomRef("rowselecttext");
-		const sSelectedText = TableUtils.getResourceText("TBL_ROW_DESELECT_KEY");
-		const sNotSelectedText = TableUtils.getResourceText("TBL_ROW_SELECT_KEY");
-		const sNoSelectionText = "";
-		const oSelectionPlugin = new TableQUnitUtils.TestSelectionPlugin();
-
-		this.oTable.setSelectionBehavior(library.SelectionBehavior.Row);
-		this.oTable.addDependent(oSelectionPlugin);
-		oSelectionPlugin.setSelected(oRow, true);
-		await this.oTable.qunit.whenRenderingFinished();
-
-		assert.equal(oRowSelectorText.innerText, sSelectedText, `SelectionMode ${this.oTable.getSelectionMode()}`);
-		oSelectionPlugin.setSelected(oRow, false);
-		assert.equal(oRowSelectorText.innerText, sNotSelectedText, `SelectionMode ${this.oTable.getSelectionMode()}`);
-
-		oSelectionPlugin.setSelected(oRow, true);
-		this.oTable.setProperty("selectionMode", SelectionMode.Single);
-		await this.oTable.qunit.whenRenderingFinished();
-
-		assert.equal(oRowSelectorText.innerText, sSelectedText, `SelectionMode ${this.oTable.getSelectionMode()}`);
-		oSelectionPlugin.setSelected(oRow, false);
-		assert.equal(oRowSelectorText.innerText, sNotSelectedText, `SelectionMode ${this.oTable.getSelectionMode()}`);
-
-		this.oTable.setProperty("selectionMode", SelectionMode.None);
-		oSelectionPlugin.setSelected(oRow, true);
-		await this.oTable.qunit.whenRenderingFinished();
-
-		assert.equal(oRowSelectorText.innerText, sNoSelectionText, `SelectionMode ${this.oTable.getSelectionMode()}`);
-
-		this.oTable.setProperty("selectionMode", SelectionMode.MultiToggle);
-		this.oTable.getModel().setData([]);
-		await this.oTable.qunit.whenRenderingFinished();
-
-		assert.notOk(oRow.getDomRef("rowselectText"), `SelectionMode ${this.oTable.getSelectionMode()} - Empty row`);
-	});
-
-	QUnit.test("Selector text with CellSelector plugin", async function(assert) {
-		const oRow = this.oTable.getRows()[0];
-		const oRowSelectorText = oRow.getDomRef("rowselecttext");
-		const sSelectedText = TableUtils.getResourceText("TBL_ROW_DESELECT_KEY_ALTERNATIVE");
-		const sNotSelectedText = TableUtils.getResourceText("TBL_ROW_SELECT_KEY_ALTERNATIVE");
-		const oSelectionPlugin = new TableQUnitUtils.TestSelectionPlugin();
-
-		this.oTable.addDependent(oSelectionPlugin);
-		this.oTable.addDependent(new CellSelector());
-		this.oTable.setSelectionBehavior(library.SelectionBehavior.Row);
-
-		await this.oTable.qunit.whenRenderingFinished();
-		assert.equal(oRowSelectorText.innerText, sNotSelectedText, "not selected row");
-		oSelectionPlugin.setSelected(oRow, true);
-		assert.equal(oRowSelectorText.innerText, sSelectedText, "selected row");
-	});
-
-	QUnit.test("Expand/collapse text with CellSelector plugin", function(assert) {
-		assert.equal(this.oTable.$("rowexpandtext").text(), TableUtils.getResourceText("TBL_ROW_EXPAND_KEY"), "Expand text is correct");
-		assert.equal(this.oTable.$("rowcollapsetext").text(), TableUtils.getResourceText("TBL_ROW_COLLAPSE_KEY"), "Collapse text is correct");
-
-		this.oTable.addDependent(new CellSelector());
-		assert.equal(this.oTable.$("rowexpandtext").text(), TableUtils.getResourceText("TBL_ROW_EXPAND_KEY_ALTERNATIVE"),
-			"Expand text is correct with CellSelector");
-		assert.equal(this.oTable.$("rowcollapsetext").text(), TableUtils.getResourceText("TBL_ROW_COLLAPSE_KEY_ALTERNATIVE"),
-			"Collapse text is correct with CellSelector");
-	});
-
 	QUnit.module("Row Actions", {
 		beforeEach: async function() {
 			this.oTable = TableQUnitUtils.createTable({
@@ -1292,7 +1207,6 @@ sap.ui.define([
 			const bRowChange = !!mParams.rowChange;
 			const bGroup = !!mParams.group;
 			const bSum = !!mParams.sum;
-			const bExpanded = !!mParams.expanded;
 			const sTableId = this.oTable.getId();
 			const oRow = this.oTable.getRows()[iRow];
 			const sRowId = oRow.getId();
@@ -1306,7 +1220,6 @@ sap.ui.define([
 				if (bGroup) {
 					aLabels.push(sTableId + "-ariarowgrouplabel");
 					aLabels.push(sRowId + "-groupHeader");
-					aLabels.push(sTableId + (bExpanded ? "-rowcollapsetext" : "-rowexpandtext"));
 				} else if (bSum) {
 					aLabels.push(sTableId + "-ariagrandtotallabel");
 				}
@@ -1415,7 +1328,6 @@ sap.ui.define([
 		this.testAriaLabels(oCell, 0, assert, {group: true, focus: true, firstTime: true});
 
 		assert.notOk(oCell.hasAttribute("title"), "Has title");
-		assert.notOk(this.oTable.getRows()[0].getDomRef("rowselecttext"), "Has row selection text");
 
 		await this.oTable.qunit.setRowStates([{type: Row.prototype.Type.GroupHeader, expandable: true, expanded: true, contentHidden: true}]);
 
@@ -1941,7 +1853,7 @@ sap.ui.define([
 		const aHiddenTexts = [
 			"ariarowgrouplabel", "ariagrandtotallabel", "ariagrouptotallabel", "cellacc", "ariacolmenu", "ariacolspan", "ariacolfiltered",
 			"ariacolsortedasc", "ariacolsorteddes", "ariafixedcolumn", "ariainvalid", "ariaselection", "ariashowcolmenu", "ariahidecolmenu",
-			"rowexpandtext", "rowcollapsetext", "rownavigatedtext", "ariarequired"
+			"rownavigatedtext", "ariarequired"
 		];
 		let $Elem = oTable.$().find(".sapUiTableHiddenTexts");
 		assert.strictEqual($Elem.length, 1, "Hidden Text Area available");
@@ -1997,6 +1909,11 @@ sap.ui.define([
 		const sCollapseButtonText = TableUtils.getResourceText("TBL_COLLAPSE_BUTTON");
 		sCellAccText = TableUtils.getResourceText("TBL_CELL_INCLUDES", [sCollapseButtonText]).concat(" TYPE_A2 DESCRIPTION_A2 Read Only");
 		assert.equal(oTreeTable.$("cellacc").text(), sCellAccText, "TreeTable: HiddenText cellacc for expanded row is correct");
+
+		$Cell = getCell(2, 0, true, null, oTreeTable);
+		assert.equal(oTreeTable.$("cellacc").text(), TableUtils.getResourceText("TBL_LEAF") + " " +
+			TableUtils.getResourceText("TBL_CELL_INCLUDES", ["TYPE_ASUB2 DESCRIPTION_ASUB2 Read Only"]),
+			"TreeTable: HiddenText cellacc for leaf node is correct");
 	});
 
 	QUnit.test("Highlight texts", async function(assert) {

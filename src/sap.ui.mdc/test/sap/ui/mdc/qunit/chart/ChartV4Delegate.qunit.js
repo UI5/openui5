@@ -1484,6 +1484,14 @@ function(
         const oChartImplementationContainer = new ChartImplementationContainer({
             noDataContent: oVBox
         });
+        let iCount = 0;
+        this.oMDCChart._oChartTypeBtn = {
+            setEnabled: (bFlag) => {
+                if (bFlag) {
+                    iCount++;
+                }
+            }
+        };
         const oInnerChart = ChartDelegate._getChart(this.oMDCChart);
         const oMockTypes =  {available : [{chart: "bar"}, {chart: "column"}], unavailable: [{chart: "bar", error: {"Measure": 1}}]};
         const oStub = sinon.stub(oInnerChart, "getAvailableChartTypes").returns(oMockTypes);
@@ -1504,6 +1512,8 @@ function(
         // Assert buttons visibility
         assert.equal(aAdditionalContent[0].getVisible(), true, "First Additional Content button should be visible");
         assert.equal(aAdditionalContent[1].getVisible(), true, "Second Additional Content button should be visible");
+        // Assert chart type button state
+        assert.equal(iCount, 1, "Chart type button is disabled.");
 
         // Arrange
         oStub.returns({unavailable: []});
@@ -1514,7 +1524,6 @@ function(
         // Assert
         assert.equal(oChartImplementationContainer.getNoDataContent(), oVBox, "No data content should be restored to VBox");
         assert.equal(oChartImplementationContainer.getShowNoDataStruct(), false, "No Data should not be visible");
-
 
         // Cleanup
         oStub.restore();

@@ -100,10 +100,6 @@ sap.ui.define([
 			_writeAccText(oRm, sTableId, "ariashowcolmenu", TableUtils.getResourceText("TBL_COL_VISBILITY_MENUITEM_SHOW"));
 			// aria description for column vsisiblity menu item (Hide Column)
 			_writeAccText(oRm, sTableId, "ariahidecolmenu", TableUtils.getResourceText("TBL_COL_VISBILITY_MENUITEM_HIDE"));
-			// aria description for row expansion via keyboard
-			_writeAccText(oRm, sTableId, "rowexpandtext", TableUtils.getResourceText("TBL_ROW_EXPAND_KEY"));
-			// aria description for row collapse via keyboard
-			_writeAccText(oRm, sTableId, "rowcollapsetext", TableUtils.getResourceText("TBL_ROW_COLLAPSE_KEY"));
 			// aria description for column with required content
 			_writeAccText(oRm, sTableId, "ariarequired", TableUtils.getResourceText("TBL_COL_REQUIRED"));
 
@@ -155,26 +151,6 @@ sap.ui.define([
 					oRm.attr(sKey.toLowerCase(), oValue);
 				}
 			}
-		},
-
-		/**
-		 * Renders the default row selector content.
-		 *
-		 * @param {sap.ui.core.RenderManager} oRm The RenderManager that can be used for writing to the Render-Output-Buffer.
-		 * @param {sap.ui.table.Table} oTable Instance of the table.
-		 * @param {sap.ui.table.Row} oRow Instance of the row.
-		 * @see sap.ui.table.TableRenderer.writeRowSelectorContent
-		 * @public
-		 */
-		writeAccRowSelectorText: function(oRm, oTable, oRow) {
-			if (!oTable._getAccExtension().getAccMode() || oRow.isGroupHeader() || oRow.isSummary()) {
-				return;
-			}
-
-			const mKeyboardTexts = oTable._getAccExtension().getKeyboardTexts();
-			const sText = oRow._isSelected() ? mKeyboardTexts.rowDeselect : mKeyboardTexts.rowSelect;
-
-			_writeAccText(oRm, oRow.getId(), "rowselecttext", oRow.isEmpty() ? "" : sText, ["sapUiTableAriaRowSel"]);
 		},
 
 		/**

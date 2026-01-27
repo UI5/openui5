@@ -31,31 +31,37 @@ sap.ui.define("my/own/Controller", [
 });
 
 sap.ui.define("my/own/View", [
+	"sap/m/Bar",
 	"sap/m/Button",
 	"sap/m/Input",
 	"sap/m/Menu",
 	"sap/m/MenuItem",
 	"sap/m/MenuButton",
+	"sap/m/OverflowToolbar",
 	"sap/m/Text",
 	"sap/m/Toolbar",
 	"sap/m/ToolbarSpacer",
 	"sap/ui/core/mvc/View",
 	"sap/ui/layout/form/Form",
 	"sap/ui/layout/form/FormContainer",
-	"sap/ui/layout/form/FormElement"
+	"sap/ui/layout/form/FormElement",
+	"sap/ui/layout/form/ResponsiveGridLayout"
 ], (
+	Bar,
 	Button,
 	Input,
 	Menu,
 	MenuItem,
 	MenuButton,
+	OverflowToolbar,
 	Text,
 	Toolbar,
 	ToolbarSpacer,
 	View,
 	Form,
 	FormContainer,
-	FormElement
+	FormElement,
+	ResponsiveGridLayout
 ) => {
 	return View.extend("my.own.view", {
 		getControllerName() {
@@ -94,7 +100,7 @@ sap.ui.define("my/own/View", [
 						})
 					]
 				}),
-				new sap.m.Bar({
+				new Bar({
 					id: "bar0",
 					contentLeft: [
 						new Text({
@@ -122,7 +128,7 @@ sap.ui.define("my/own/View", [
 						})
 					]
 				}),
-				new sap.m.OverflowToolbar({
+				new OverflowToolbar({
 					id: "overflowtb0",
 					content: [
 						new Button({
@@ -163,7 +169,7 @@ sap.ui.define("my/own/View", [
 				new Form({
 					id: "form",
 					title: "Form",
-					layout: new sap.ui.layout.form.GridLayout(),
+					layout: new ResponsiveGridLayout(),
 					formContainers: [
 						new FormContainer({
 							id: "formContainer",
@@ -171,18 +177,20 @@ sap.ui.define("my/own/View", [
 								new FormElement({
 									id: "formElement",
 									label: "Name",
-									fields: [new Input({
-												value: "{Name}"
-											}
-									)]
+									fields: [
+										new Input({
+											value: "{Name}"
+										})
+									]
 								}),
-								new sap.ui.layout.form.FormElement({
+								new FormElement({
 									id: "formElement2",
 									label: "CompanyId",
-									fields: [new Input({
-												value: "{CompanyId}"
-											}
-									)]
+									fields: [
+										new Input({
+											value: "{CompanyId}"
+										})
+									]
 								})
 							]
 						})

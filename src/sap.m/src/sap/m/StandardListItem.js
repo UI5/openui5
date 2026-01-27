@@ -64,6 +64,7 @@ sap.ui.define([
 
 				/**
 				 * Defines the list item icon.
+				 * <b>Note:</b> The icon is decorative. For more advanced use cases and configuration options, use the <code>avatar</code> aggregation.
 				 */
 				icon : {type : "sap.ui.core.URI", group : "Misc", defaultValue : null},
 

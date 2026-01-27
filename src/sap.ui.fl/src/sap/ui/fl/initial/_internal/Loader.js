@@ -265,6 +265,7 @@ sap.ui.define([
 			oAuthors = _mCachedFlexData[sReference].data.authors;
 		}
 
+		// The next line is used by the Flex Support Tool to set breakpoints - please adjust the tool if you change it!
 		const oFlexDataCopy = Object.assign({}, oFlexData);
 		applyDeactivateChanges(oFlexDataCopy);
 		filterInvalidFileNames(oFlexDataCopy);
@@ -272,7 +273,6 @@ sap.ui.define([
 
 		const oFormattedFlexData = {
 			changes: oFlexDataCopy,
-			cacheKey: oFlexDataCopy.cacheKey,
 			authors: oAuthors
 		};
 
@@ -283,7 +283,7 @@ sap.ui.define([
 				version: sVersion,
 				allContextsProvided: bAllContextsProvided,
 				adaptationId: sAdaptationId,
-				loaderCacheKey: uid(),
+				loaderCacheKey: oFlexDataCopy.cacheKey || uid(),
 				previouslyFilledData: bPreviouslyFilledData
 			}
 		};
@@ -377,7 +377,7 @@ sap.ui.define([
 	 */
 	Loader.getCachedFlexData = function(sReference) {
 		// TODO return copy of the data once the CompVariantManager does not mutate it anymore
-		return _mCachedFlexData[sReference]?.data || {};
+		return _mCachedFlexData[sReference] || {};
 	};
 
 	/**

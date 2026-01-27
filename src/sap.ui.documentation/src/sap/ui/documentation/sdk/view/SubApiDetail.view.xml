@@ -295,7 +295,7 @@
 												<m:Text text="{defaultValue}"/>
 												<layout:VerticalLayout width="100%">
 													<custom:JSDocText sanitizeContent="false" text="{description}"/>
-													<layout:HorizontalLayout width="100%">
+													<layout:HorizontalLayout>
 														<m:ObjectStatus text="Visibility: {parts : [{path : 'visibility'}, {path : 'allowedFor'}], formatter : '.formatter.formatVisibility'}"
 															state="{= ${visibility} === 'public' ? 'Success' : 'Warning'}"/>
 														<core:Icon
@@ -512,7 +512,7 @@
 
 												<custom:JSDocText sanitizeContent="false" text="{path: 'event>description', formatter: '.formatter.escapeSettingsValue'}"/>
 
-												<layout:HorizontalLayout width="100%">
+												<layout:HorizontalLayout>
 													<m:ObjectStatus text="Visibility: {parts : [{path : 'event>visibility'}, {path : 'event>allowedFor'}], formatter : '.formatter.formatVisibility'}"
 													state="{= ${event>visibility} === 'public' ? 'Success' : 'Warning'}" class="sapUiSmallMarginBottom"/>
 													<core:Icon
@@ -627,7 +627,7 @@
 													</layout:VerticalLayout>
 
 													<m:FlexBox class="sapUiTinyMarginBottom">
-														<layout:HorizontalLayout width="100%">
+														<layout:HorizontalLayout>
 														<m:ObjectStatus text="Visibility: {parts : [{path : 'method>visibility'}, {path : 'method>allowedFor'}], formatter : '.formatter.formatVisibility'}"
 														state="{= ${method>visibility} === 'public' ? 'Success' : 'Warning'}"/>
 														<core:Icon

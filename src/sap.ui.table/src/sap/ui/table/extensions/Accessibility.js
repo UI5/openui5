@@ -447,7 +447,7 @@ sap.ui.define([
 			let sText = "";
 			if (oInfo) {
 				sText = oInfo.description;
-				if (bIsTreeColumnCell && !bHidden) {
+				if (bIsTreeColumnCell && !bHidden && oTableInstances.row.isExpandable()) {
 					const sExpandCollapseButtonText = oTableInstances.row.isExpanded() ?
 						TableUtils.getResourceText("TBL_COLLAPSE_BUTTON") : TableUtils.getResourceText("TBL_EXPAND_BUTTON");
 
@@ -470,13 +470,6 @@ sap.ui.define([
 					if (bIsGroupHeader && bRowChange) {
 						aLabels.splice(1, 0, sRowId + "-groupHeader");
 					}
-					const bContainsTreeIcon = $Cell.find(".sapUiTableTreeIcon").not(".sapUiTableTreeIconLeaf").length === 1;
-
-					if ((bContainsTreeIcon || bIsGroupHeader) && (bRowChange || bColChange)) {
-						aDescriptions.push(oTable.getId() + (!oRow.isExpanded() ? "-rowexpandtext" : "-rowcollapsetext"));
-					} else if (!bHidden && !bIsGroupHeader && !bIsSummary && TableUtils.isRowSelectionAllowed(oTable) && bRowChange) {
-						aLabels.push(sRowId + "-rowselecttext");
-					}
 				}
 			);
 		},
@@ -495,8 +488,6 @@ sap.ui.define([
 			const aLabels = [].concat(aDefaultLabels);
 
 			if (!oRow.isSummary() && !oRow.isGroupHeader() && !oRow.isContentHidden()) {
-				aLabels.push(sRowId + "-rowselecttext");
-
 				if (TableUtils.hasRowHighlights(oTable) && oChangeInfo.rowChange) {
 					aLabels.push(sRowId + "-highlighttext");
 				}
@@ -505,7 +496,6 @@ sap.ui.define([
 			if (oRow.isGroupHeader()) {
 				aLabels.push(sTableId + "-ariarowgrouplabel");
 				aLabels.push(sRowId + "-groupHeader");
-				aLabels.push(sTableId + (oRow.isExpanded() ? "-rowcollapsetext" : "-rowexpandtext"));
 			}
 
 			if (oRow.isTotalSummary()) {
@@ -571,7 +561,6 @@ sap.ui.define([
 
 			if (bIsGroupHeader) {
 				aLabels.push(sTableId + "-ariarowgrouplabel");
-				aLabels.push(sTableId + (oRow.isExpanded() ? "-rowcollapsetext" : "-rowexpandtext"));
 			}
 
 			if (oRow.isTotalSummary()) {
@@ -1389,10 +1378,8 @@ sap.ui.define([
 		}
 
 		const $Ref = oRow.getDomRefs(true);
-		let sTextKeyboard = "";
 
 		if (!oRow.isEmpty() && !oRow.isGroupHeader() && !oRow.isSummary()) {
-			const mKeyboardTexts = this.getKeyboardTexts();
 			const bIsSelected = oRow._isSelected();
 
 			if ($Ref.row) {
@@ -1400,12 +1387,6 @@ sap.ui.define([
 					$Ref.row.children(".sapUiTableCell")
 				).attr("aria-selected", bIsSelected ? "true" : "false");
 			}
-
-			sTextKeyboard = bIsSelected ? mKeyboardTexts.rowDeselect : mKeyboardTexts.rowSelect;
-		}
-
-		if ($Ref.rowSelectorText) {
-			$Ref.rowSelectorText.text(sTextKeyboard);
 		}
 	};
 
@@ -1491,37 +1472,6 @@ sap.ui.define([
 				oTable.$().find("[data-sap-ui-table-acc-covered*='nodata']").removeAttr("aria-hidden");
 			}
 		}
-	};
-
-	/**
-	 * Retrieve descriptions for keyboard interactions.
-	 *
-	 * @returns {{rowSelect: string, rowDeselect: string}} Text descriptions.
-	 * @public
-	 */
-	AccExtension.prototype.getKeyboardTexts = function() {
-		const sSelectionMode = this.getTable().getSelectionMode();
-
-		if (sSelectionMode === SelectionMode.None) {
-			return {
-				rowSelect: "",
-				rowDeselect: ""
-			};
-		}
-
-		return this.getSelectionTexts();
-	};
-
-	/**
-	 * Retrieve the resource texts for row selection.
-	 *
-	 * @returns {{rowSelect: string, rowDeselect: string}} The resource texts for row selection.
-	 */
-	AccExtension.prototype.getSelectionTexts = function() {
-		return {
-			rowSelect: TableUtils.getResourceText("TBL_ROW_SELECT_KEY"),
-			rowDeselect: TableUtils.getResourceText("TBL_ROW_DESELECT_KEY")
-		};
 	};
 
 	/**

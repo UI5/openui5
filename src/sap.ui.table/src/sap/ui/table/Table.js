@@ -1238,6 +1238,10 @@ sap.ui.define([
 		TableUtils.registerResizeHandler(this, "Table", this._onTableResize.bind(this));
 
 		this._bFirstRendering = false;
+
+		if (this._bContextsAvailable && this.getRows().length > 0) {
+			this._fireRowsUpdated(TableUtils.RowsUpdateReason.Render);
+		}
 	};
 
 	Table.prototype.invalidate = function() {

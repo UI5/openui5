@@ -94,9 +94,9 @@ sap.ui.define([
 		}
 		const oAppComponent = Utils.getAppComponentForSelector(aComplexSelectors[0].selector);
 		const sFlexReference = ManifestUtils.getFlexReferenceForControl(oAppComponent);
-		const oFlexData = Loader.getCachedFlexData(sFlexReference);
+		const oFlexData = Loader.getCachedFlexData(sFlexReference).data;
 		// The FlexState is only available if there are changes. Without changes there is no need to check further
-		if (!StorageUtils.isStorageResponseFilled(oFlexData.changes)) {
+		if (!StorageUtils.isStorageResponseFilled(oFlexData?.changes)) {
 			return undefined;
 		}
 		const FlexObjectState = await requireAsync("sap/ui/fl/apply/_internal/flexState/FlexObjectState");

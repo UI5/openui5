@@ -41,49 +41,42 @@ sap.ui.define([
 					.setFilterProperty("Name")
 				]
 			}, mSettings), (oTable) => {
-				oTable.qunit.aRowsUpdatedEvents = [];
-				oTable.attachEvent("_rowsUpdated", (oEvent) => {
-					oTable.qunit.aRowsUpdatedEvents.push(oEvent.getParameter("reason"));
+				oTable.qunit.iRowsUpdatedEvents = 0;
+				oTable.attachEvent("rowsUpdated", () => {
+					oTable.qunit.iRowsUpdatedEvents++;
 				});
 			});
 
 			return this.oTable;
 		},
-		checkRowsUpdated: function(assert, aExpectedReasons, iDelay) {
+		checkRowsUpdated: function(assert, iExpectedCalls, iDelay) {
 			return new Promise((resolve) => {
 				setTimeout(() => {
-					assert.deepEqual(this.oTable.qunit.aRowsUpdatedEvents, aExpectedReasons,
-						aExpectedReasons.length > 0
-							? "The event _rowsUpdated has been fired in order with reasons: " + aExpectedReasons.join(", ")
-							: "The event _rowsUpdated has not been fired"
-					);
+					assert.equal(this.oTable.qunit.iRowsUpdatedEvents, iExpectedCalls,
+						`The event rowsUpdated has been fired ${iExpectedCalls} times`);
 					resolve();
 				}, iDelay == null ? 500 : iDelay);
 			});
 		},
 		resetRowsUpdatedSpy: function() {
-			this.oTable.qunit.aRowsUpdatedEvents = [];
+			this.oTable.qunit.iRowsUpdatedEvents = 0;
 		}
 	});
 
 	QUnit.test("Initial rendering", function(assert) {
 		this.createTable();
-		return this.checkRowsUpdated(assert, [
-			TableUtils.RowsUpdateReason.Render
-		]);
+		return this.checkRowsUpdated(assert, 1);
 	});
 
 	QUnit.test("Initial rendering in invisible container", function(assert) {
 		return TableQUnitUtils.hideTestContainer().then(() => {
 			this.createTable();
-			return this.checkRowsUpdated(assert, [
-				TableUtils.RowsUpdateReason.Render
-			]);
+			return this.checkRowsUpdated(assert, 1);
 		}).then(() => {
 			this.resetRowsUpdatedSpy();
 			return TableQUnitUtils.showTestContainer();
 		}).then(() => {
-			return this.checkRowsUpdated(assert, []);
+			return this.checkRowsUpdated(assert, 0);
 		});
 	});
 
@@ -95,10 +88,7 @@ sap.ui.define([
 			this.oTable.invalidate();
 			this.oTable.getBinding().refresh(true);
 			await this.oTable.qunit.whenRenderingFinished();
-
-			return this.checkRowsUpdated(assert, [
-				TableUtils.RowsUpdateReason.Render
-			]);
+			return this.checkRowsUpdated(assert, 1);
 		});
 	});
 
@@ -108,10 +98,7 @@ sap.ui.define([
 		return this.oTable.qunit.whenBindingChange().then(this.oTable.qunit.whenRenderingFinished).then(() => {
 			this.resetRowsUpdatedSpy();
 			this.oTable.getBinding().refresh(true);
-
-			return this.checkRowsUpdated(assert, [
-				TableUtils.RowsUpdateReason.Change
-			]);
+			return this.checkRowsUpdated(assert, 1);
 		});
 	});
 
@@ -121,10 +108,7 @@ sap.ui.define([
 		return this.oTable.qunit.whenBindingChange().then(this.oTable.qunit.whenRenderingFinished).then(() => {
 			this.resetRowsUpdatedSpy();
 			this.oTable.sort(this.oTable.getColumns()[0], "Ascending");
-
-			return this.checkRowsUpdated(assert, [
-				TableUtils.RowsUpdateReason.Render
-			]);
+			return this.checkRowsUpdated(assert, 1);
 		});
 	});
 
@@ -134,10 +118,7 @@ sap.ui.define([
 		return this.oTable.qunit.whenBindingChange().then(this.oTable.qunit.whenRenderingFinished).then(() => {
 			this.resetRowsUpdatedSpy();
 			this.oTable.getBinding().sort(new Sorter(this.oTable.getColumns()[0].getSortProperty()));
-
-			return this.checkRowsUpdated(assert, [
-				TableUtils.RowsUpdateReason.Sort
-			]);
+			return this.checkRowsUpdated(assert, 1);
 		});
 	});
 
@@ -147,10 +128,7 @@ sap.ui.define([
 		return this.oTable.qunit.whenBindingChange().then(this.oTable.qunit.whenRenderingFinished).then(() => {
 			this.resetRowsUpdatedSpy();
 			this.oTable.filter(this.oTable.getColumns()[0], "test");
-
-			return this.checkRowsUpdated(assert, [
-				TableUtils.RowsUpdateReason.Render
-			]);
+			return this.checkRowsUpdated(assert, 1);
 		});
 	});
 
@@ -160,10 +138,7 @@ sap.ui.define([
 		return this.oTable.qunit.whenBindingChange().then(this.oTable.qunit.whenRenderingFinished).then(() => {
 			this.resetRowsUpdatedSpy();
 			this.oTable.getBinding().filter(new Filter(this.oTable.getColumns()[0].getFilterProperty(), "Contains", "test"));
-
-			return this.checkRowsUpdated(assert, [
-				TableUtils.RowsUpdateReason.Filter
-			]);
+			return this.checkRowsUpdated(assert, 1);
 		});
 	});
 
@@ -176,10 +151,7 @@ sap.ui.define([
 		}).then(this.oTable.qunit.whenRenderingFinished).then(() => {
 			this.resetRowsUpdatedSpy();
 			this.oTable.bindRows(this.oBindingInfo);
-
-			return this.checkRowsUpdated(assert, [
-				TableUtils.RowsUpdateReason.Render
-			]);
+			return this.checkRowsUpdated(assert, 1);
 		});
 	});
 

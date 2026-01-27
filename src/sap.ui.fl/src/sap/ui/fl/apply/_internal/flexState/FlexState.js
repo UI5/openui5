@@ -737,7 +737,7 @@ sap.ui.define([
 	FlexState.getStorageResponse = async function(sReference) {
 		if (_mInitPromises[sReference]) {
 			await _mInitPromises[sReference].promise;
-			return Loader.getCachedFlexData(sReference);
+			return Loader.getCachedFlexData(sReference).data;
 		}
 		return undefined;
 	};

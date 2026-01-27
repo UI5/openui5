@@ -61,7 +61,8 @@ sap.ui.define([
 							value: "sap-icon://download"
 						}),
 						success : function (aButtons) {
-							var oControllerPrototype = Opa5.getWindow().sap.ui.documentation.sdk.controller.SampleBaseController.prototype,
+							const oControllerClass = Opa5.getWindow().sap.ui.require("sap/ui/documentation/sdk/controller/SampleBaseController");
+							var oControllerPrototype = oControllerClass.prototype,
 							oAssert =  Opa5.assert,
 							fnDone = oAssert.async(),
 							oOpenFileStub = sinon.stub(oControllerPrototype, "_openGeneratedFile", function() {
@@ -72,7 +73,7 @@ sap.ui.define([
 							aButtons[0].fireEvent("press");
 							return this.waitFor({
 								viewName: "Code",
-								controlType: "sap.ui.unified.MenuItem",
+								controlType: "sap.m.MenuItem",
 								matchers : new PropertyStrictEquals({
 									name: "icon",
 									value: "sap-icon://attachment-zip-file"

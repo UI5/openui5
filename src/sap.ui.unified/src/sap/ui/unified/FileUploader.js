@@ -757,7 +757,7 @@ sap.ui.define([
 			if (sTooltip) {
 				this.oFileUpload.setAttribute("title", sTooltip);
 			} else {
-				this.oFileUpload.setAttribute("title", this.getValue() ? this.getValue() : this._getNoFileChosenText());
+				this.oFileUpload.setAttribute("title", this.getValue() ? this.getValue() : this._getEffectivePlaceholder());
 			}
 		}
 		return this;
@@ -1359,7 +1359,7 @@ sap.ui.define([
 			// to change the value of file uploader INPUT elements)
 			this.setProperty("value", sValue, bUpload);
 			if (this.oFileUpload && !this.getTooltip_AsString()) {
-				this.oFileUpload.setAttribute("title", sValue ? sValue : this._getNoFileChosenText());
+				this.oFileUpload.setAttribute("title", sValue ? sValue : this._getEffectivePlaceholder());
 			}
 
 			const oForm = this.getDomRef("fu_form");
@@ -2188,19 +2188,6 @@ sap.ui.define([
    };
 
 	/**
-	 * Helper to retrieve the I18N text for the tooltip when there is no file chosen.
-	 * @private
-	 */
-	FileUploader.prototype._getNoFileChosenText = function() {
-	   // as the text is the same for all FileUploaders, get it only once
-	   if (!FileUploader.prototype._sNoFileChosenText) {
-		   FileUploader.prototype._sNoFileChosenText = this.oRb.getText("FILEUPLOADER_NO_FILE_CHOSEN");
-	   }
-
-	   return FileUploader.prototype._sNoFileChosenText ? FileUploader.prototype._sNoFileChosenText : "No file chosen";
-   };
-
-	/**
 	 * Checks whether the Tokenizer is present and has tokens.
 	 * @private
 	 * @returns {boolean} whether the Tokenizer is present and has tokens.
@@ -2305,7 +2292,15 @@ sap.ui.define([
 			bEnabled = this.getEnabled(),
 			sAriaRoleDescription = this._getAriaRoleDescription(),
 			aCombinedLabels = this._getCombinedLabelIds(),
-			aAriaDescribedBy = this._getAriaDescribedByIds();
+			aAriaDescribedBy = this._getAriaDescribedByIds(),
+			sTooltip = this.getTooltip_AsString(),
+			sValue = this.getValue(),
+			sLabel = sTooltip || sValue || this._getEffectivePlaceholder();
+
+		if (sLabel) {
+			aAttributes.push(`title="${encodeXML(sLabel)}" `);
+			aAttributes.push(`aria-label="${encodeXML(sLabel)}" `);
+		}
 
 		// Aria-labelledby
 		if (aCombinedLabels.length > 0) {
@@ -2369,13 +2364,6 @@ sap.ui.define([
 			aFileUpload.push('tabindex="0" ');
 
 			aFileUpload.push('size="1" ');
-
-			if (this.getTooltip_AsString() ) {
-				aFileUpload.push('title="' + encodeXML(this.getTooltip_AsString()) + '" ');
-			} else {
-				// only if there is no tooltip, then set value or default tooltip as fallback
-				aFileUpload.push('title="' + encodeXML(this.getValue() ? this.getValue() : this._getNoFileChosenText()) + '" ');
-			}
 
 			if (!this.getEnabled()) {
 				aFileUpload.push('disabled="disabled" ');

@@ -68,14 +68,28 @@ sap.ui.define([
 		});
 
 		QUnit.test("with cacheKey but without variants", async function(assert) {
-			sandbox.stub(Loader, "getCachedFlexData").returns({ cacheKey: 'W/"abc123"', changes: { changes: ["foo"] } });
+			sandbox.stub(Loader, "getCachedFlexData").returns({
+				data: {
+					changes: { changes: ["foo"] }
+				},
+				parameters: {
+					loaderCacheKey: 'W/"abc123"'
+				}
+			});
 			sandbox.stub(VariantManagementState, "getAllCurrentVariants").returns([]);
 			const vCacheKey = await XmlPreprocessor.getCacheKey({ componentId: "validComponent" });
 			assert.strictEqual(vCacheKey, "abc123", "the correct cache key is returned");
 		});
 
 		QUnit.test("with cacheKey and multiple variants", async function(assert) {
-			sandbox.stub(Loader, "getCachedFlexData").returns({ cacheKey: 'W/"abc123"', changes: { changes: ["foo"] } });
+			sandbox.stub(Loader, "getCachedFlexData").returns({
+				data: {
+					changes: { changes: ["foo"] }
+				},
+				parameters: {
+					loaderCacheKey: 'W/"abc123"'
+				}
+			});
 			sandbox.stub(VariantManagementState, "getAllCurrentVariants").returns([
 				{
 					getId: () => "otherVariant",
@@ -208,7 +222,8 @@ sap.ui.define([
 
 		QUnit.test("skips processing when there are no changes", async function(assert) {
 			sandbox.stub(Loader, "getCachedFlexData").returns({
-				changes: StorageUtils.getEmptyFlexDataResponse()
+				data: { changes: StorageUtils.getEmptyFlexDataResponse() },
+				parameters: { loaderCacheKey: "" }
 			});
 			sandbox.spy(StorageUtils, "isStorageResponseFilled");
 			const oAppComponent = RtaQunitUtils.createAndStubAppComponent(sandbox, sReference);

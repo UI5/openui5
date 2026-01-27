@@ -70,7 +70,11 @@
 				<mdct:Column
 					propertyKey="location"
 					header="Location">
-					<m:ObjectStatus text="{location}" state="{= ${location} === 'Headquarters' ? 'None' : 'Information' }"/>
+					<m:ObjectStatus
+						text="{location}"
+						icon="{= ${location} === 'Headquarters' ? 'sap-icon://building' : ${location} === 'Remote' ? 'sap-icon://globe' : 'sap-icon://functional-location' }"
+						state="{= ${location} === 'Headquarters' ? 'None' : 'Warning' }"
+						stateAnnouncementText=""/>
 				</mdct:Column>
 				<mdct:Column
 					propertyKey="hireDate"
@@ -81,7 +85,7 @@
 					propertyKey="email"
 					header="E-Mail"
 					minWidth="20rem">
-					<m:Link text="{email}" href="mailto:{email}"/>
+					<m:Link text="{email}" href="mailto:{email}" reactiveAreaMode="Overlay"/>
 					<mdct:extendedSettings>
 						<mdct:ResponsiveColumnSettings importance="Low" />
 					</mdct:extendedSettings>

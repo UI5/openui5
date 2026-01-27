@@ -6,21 +6,28 @@ sap.ui.define(function () {
 		defaults: {
 			qunit: {
 				version: 2
+			},
+			module: "test-resources/sap/ui/documentation/sdk/integration/{name}.qunit",
+			ui5: {
+				language: "en",
+				libs: "sap.m",
+				animation: "false",
+				compatVersion: "edge"
 			}
 		},
 
 		tests: {
-			// "OpaTestsComponent": {
-			// 	group: "Demo Kit Opa Tests",
-			// 	page: "test-resources/sap/ui/documentation/sdk/integration/opaTestsWithComponent.qunit.html"
-			// },
-
-			// Skipped because of failing infra voter caused by Ie41fc471cb048348c7b44ff6daee067cc655b8d8
-			// Also see comments in change Ie39e5bf436b23af3271509b1e41de993d4287089
-			// "OpaTestsIframe": {
-			// 	group: "Demo Kit Opa Tests",
-			// 	page: "test-resources/sap/ui/documentation/sdk/integration/opaTestsWithIFrame.qunit.html"
-			// }
+			"opaTestsWithComponent": {
+				group: "Integration Tests",
+				title: "Opa test using an embedded Component"
+			},
+			"opaTestsWithIFrame": {
+				group: "Integration Tests",
+				title: "Opa test using an IFrame",
+				ui5: {
+					frameOptions: 'deny'
+				}
+			}
 		}
 	};
 });

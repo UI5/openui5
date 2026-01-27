@@ -2,7 +2,6 @@
 
 sap.ui.define([
 	"sap/ui/core/Lib",
-	"sap/ui/fl/apply/_internal/flexObjects/FlexObjectFactory",
 	"sap/ui/fl/apply/_internal/flexObjects/getVariantAuthor",
 	"sap/ui/fl/initial/_internal/Loader",
 	"sap/ui/fl/initial/_internal/Settings",
@@ -10,7 +9,6 @@ sap.ui.define([
 	"sap/ui/thirdparty/sinon-4"
 ], function(
 	Lib,
-	FlexObjectFactory,
 	getVariantAuthor,
 	Loader,
 	Settings,
@@ -31,8 +29,10 @@ sap.ui.define([
 				getUser() { return "userA";}
 			});
 			sandbox.stub(Loader, "getCachedFlexData").returns({
-				authors: {
-					userD: "Name of user D"
+				data: {
+					authors: {
+						userD: "Name of user D"
+					}
 				}
 			});
 			assert.equal(getVariantAuthor("userB", Layer.USER, undefined), sYou, "user variant always has You as author");

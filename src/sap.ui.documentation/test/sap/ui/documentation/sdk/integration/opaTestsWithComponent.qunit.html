@@ -1,31 +1,12 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Opa tests for Demokit 2.0</title>
 		<meta charset="utf-8">
 		<base href="../../../../../../">
-		<link rel="stylesheet" href="test-resources/sap/ui/documentation/sdk/integration/opaTestsWithComponent.qunit.css">
-		<!-- The namespace sap.ui.demo.cart.test.arrangement.Arrangement is used to run the IFrame or the component without changes to the test code -->
-		<script id="sap-ui-bootstrap"
-				src="resources/sap-ui-core.js"
-				data-sap-ui-animation-mode="minimal"
-				data-sap-ui-language="en"
-				data-sap-ui-libs="sap.m"
-				data-sap-ui-on-init="module:local/opaTestsWithComponent.qunit"
-				data-sap-ui-resource-roots='{
-					"sap.ui.demo.mock": "test-resources/sap/ui/documentation/sdk/",
-					"sap.ui.documentation.sdk.test": "test-resources/sap/ui/documentation/sdk/integration",
-					"sap.ui.documentation.sdk.test.arrangement.Arrangement": "test-resources/sap/ui/documentation/sdk/integration/arrangement/component/Arrangement",
-					"local": "test-resources/sap/ui/documentation/sdk/integration/"
-				}'
-		>
-		</script>
-		<script src="resources/sap/ui/thirdparty/qunit-2.js"></script>
-		<script src="./documentation-config.js">
-			// documentation-test-config.js can be used for local testing configuration
-			// E.g. changing application URL. See arrangement/iframe/Arrangement.js
-		</script>
-		
+		<script src="resources/sap/ui/test/starter/runTest.js"
+				data-sap-ui-testsuite="test-resources/sap/ui/documentation/sdk/qunit/testsuite.demokit.qunit"
+				data-sap-ui-test="opaTestsWithComponent"
+		></script>
 	</head>
 	<body>
 		<div id="qunit"></div>

@@ -4,49 +4,50 @@ sap.ui.define([
 	"sap/ui/fl/apply/_internal/flexObjects/FlexObjectFactory",
 	"sap/ui/fl/support/api/SupportAPI",
 	"sap/ui/fl/support/diagnostics/FlexibilityDataExtractor",
+	"sap/ui/thirdparty/sinon-4",
 	"sap/ui/VersionInfo",
-	"sap/ui/thirdparty/sinon-4"
+	"test-resources/sap/ui/rta/qunit/RtaQunitUtils"
 ], function(
 	Log,
 	FlexObjectFactory,
 	SupportAPI,
 	FlexibilityDataExtractor,
+	sinon,
 	VersionInfo,
-	sinon
+	RtaQunitUtils
 ) {
 	"use strict";
 
 	const oSandbox = sinon.createSandbox();
 	document.getElementById("qunit-fixture").style.display = "none";
+	const sReference = "myReference";
+	const oAppComponent = RtaQunitUtils.createAndStubAppComponent(sinon, sReference, {
+		"_version": "2.0.0",
 
-	function getMockAppComponent() {
-		const oMockManifestObject = {
-			getEntry: oSandbox.stub()
-		};
-		oMockManifestObject.getEntry.withArgs("/sap.app/applicationVersion/version").returns("1.2.3");
-		oMockManifestObject.getEntry.withArgs("/sap.app/ach").returns("CA-UI5-FL");
-
-		return {
-			getManifestObject: oSandbox.stub().returns(oMockManifestObject)
-		};
-	}
+		"sap.app": {
+			applicationVersion: {
+				version: "1.2.3"
+			},
+			ach: "CA-UI5-FL",
+			type: "application"
+		}
+	});
 
 	QUnit.module("sap.ui.fl.support.diagnostics.FlexibilityDataExtractor", {
 		beforeEach() {
 			oSandbox.stub(VersionInfo, "load").resolves({ version: "1.120.0" });
+			this.oMockFlexSettings = [
+				{ key: "userId", value: "JohnDoesEmail" },
+				{ key: "user", value: "JohnDoesEmail" },
+				{ key: "developerMode", value: true }
+			];
+			oSandbox.stub(SupportAPI, "getFlexSettings").resolves(this.oMockFlexSettings);
 		},
 		afterEach() {
 			oSandbox.restore();
 		}
 	}, function() {
 		QUnit.test("extractFlexibilityData - returns complete data structure without anonymization", async function(assert) {
-			const oMockAppComponent = getMockAppComponent();
-
-			const oMockFlexSettings = [
-				{ key: "userId", value: "JohnDoesEmail" },
-				{ key: "developerMode", value: true }
-			];
-
 			const aMockChangeDependencies = [
 				{ changeId: "change1", dependencies: ["change2"], user: "JohnDoesEmail" },
 				{ changeId: "change2", dependencies: [], user: "JaneSmithsEmail" }
@@ -57,8 +58,6 @@ sap.ui.define([
 				{ id: "object2", type: "change", user: "myEmail2" }
 			];
 
-			oSandbox.stub(SupportAPI, "getApplicationComponent").resolves(oMockAppComponent);
-			oSandbox.stub(SupportAPI, "getFlexSettings").resolves(oMockFlexSettings);
 			oSandbox.stub(SupportAPI, "getChangeDependencies").resolves(aMockChangeDependencies);
 			oSandbox.stub(SupportAPI, "getFlexObjectInfos").resolves(aMockFlexObjectInfos);
 
@@ -70,7 +69,7 @@ sap.ui.define([
 			assert.strictEqual(oResult.ui5Version, "1.120.0", "UI5 version is extracted correctly from VersionInfo");
 			assert.strictEqual(oResult.appVersion, "1.2.3", "App version is extracted correctly");
 			assert.strictEqual(oResult.appACH, "CA-UI5-FL", "App ACH is extracted correctly");
-			assert.deepEqual(oResult.flexSettings, oMockFlexSettings, "Flex settings are extracted correctly");
+			assert.deepEqual(oResult.flexSettings, this.oMockFlexSettings, "Flex settings are extracted correctly");
 			assert.deepEqual(oResult.changeDependencies, aMockChangeDependencies, "Change dependencies are extracted correctly");
 			assert.deepEqual(oResult.flexObjectInfos, aMockFlexObjectInfos, "Flex object infos are extracted correctly");
 
@@ -89,13 +88,6 @@ sap.ui.define([
 		});
 
 		QUnit.test("extractFlexibilityData - returns anonymized data structure when requested", async function(assert) {
-			const oMockAppComponent = getMockAppComponent();
-
-			const oMockFlexSettings = [
-				{ key: "userId", value: "JohnDoesEmail" },
-				{ key: "developerMode", value: true }
-			];
-
 			const oMockChangeDependencies = {
 				aAppliedChanges: ["change1", "change2"],
 				mChangesEntries: {
@@ -105,12 +97,12 @@ sap.ui.define([
 			};
 
 			const aMockFlexObjectInfos = [
-				FlexObjectFactory.createFlexObject({ id: "object1", type: "variant", user: "JohnDoesEmail" }),
-				FlexObjectFactory.createFlexObject({ id: "object2", type: "change", user: "TestersEmail" })
+				FlexObjectFactory.createFlVariant({ id: "object1", user: "JohnDoesEmail" }),
+				FlexObjectFactory.createFlVariant({ id: "object2", user: "JohnDoesEmail" }),
+				FlexObjectFactory.createFlVariant({ id: "object3", user: "OtherUser" }),
+				FlexObjectFactory.createUIChange({ id: "object2", user: "TestersEmail" })
 			];
 
-			oSandbox.stub(SupportAPI, "getApplicationComponent").resolves(oMockAppComponent);
-			oSandbox.stub(SupportAPI, "getFlexSettings").resolves(oMockFlexSettings);
 			oSandbox.stub(SupportAPI, "getChangeDependencies").resolves(oMockChangeDependencies);
 			oSandbox.stub(SupportAPI, "getFlexObjectInfos").resolves(aMockFlexObjectInfos);
 
@@ -123,7 +115,8 @@ sap.ui.define([
 
 			// Verify data is anonymized when bAnonymizeUsers is true
 			assert.strictEqual(oResult.flexSettings[0].value, "USER_1", "userId in flexSettings is anonymized");
-			assert.strictEqual(oResult.flexSettings[1].value, true, "Non-user setting is unchanged");
+			assert.strictEqual(oResult.flexSettings[1].value, "USER_1", "user in flexSettings is anonymized");
+			assert.strictEqual(oResult.flexSettings[2].value, true, "Non-user setting is unchanged");
 			assert.strictEqual(
 				oResult.changeDependencies.mChangesEntries.change1.user,
 				"USER_1",
@@ -140,15 +133,38 @@ sap.ui.define([
 				"User in flex object infos is anonymized consistently"
 			);
 			assert.strictEqual(
+				oResult.flexObjectInfos[0].mProperties.author,
+				"USER_1",
+				"Author in flex object infos is anonymized consistently"
+			);
+			assert.strictEqual(
 				oResult.flexObjectInfos[1].mProperties.supportInformation.user,
+				"USER_1",
+				"User in flex object infos is anonymized consistently"
+			);
+			assert.strictEqual(
+				oResult.flexObjectInfos[1].mProperties.author,
+				"USER_1",
+				"Author in flex object infos is anonymized consistently"
+			);
+			assert.strictEqual(
+				oResult.flexObjectInfos[2].mProperties.supportInformation.user,
 				"USER_3",
+				"Different user in flex object infos gets different anonymized value"
+			);
+			assert.strictEqual(
+				oResult.flexObjectInfos[2].mProperties.author,
+				"USER_3",
+				"Author in flex object infos is anonymized consistently"
+			);
+			assert.strictEqual(
+				oResult.flexObjectInfos[3].mProperties.supportInformation.user,
+				"USER_4",
 				"Different user in flex object infos gets different anonymized value"
 			);
 		});
 
 		QUnit.test("extractFlexibilityData - no mutation of original data during anonymization", async function(assert) {
-			const oMockAppComponent = getMockAppComponent();
-
 			const oChange1 = FlexObjectFactory.createFlexObject({ id: "object1", type: "variant", user: "JohnDoesEmail" });
 			const oMockChangeDependencies = {
 				aAppliedChanges: ["change1", "change2"],
@@ -160,8 +176,6 @@ sap.ui.define([
 				oChange1
 			];
 
-			oSandbox.stub(SupportAPI, "getApplicationComponent").resolves(oMockAppComponent);
-			oSandbox.stub(SupportAPI, "getFlexSettings").resolves([]);
 			// Change dependencies and flex object infos share same object reference
 			// Anonymization must not touch the same object reference twice
 			oSandbox.stub(SupportAPI, "getChangeDependencies").resolves(oMockChangeDependencies);
@@ -192,13 +206,6 @@ sap.ui.define([
 		});
 
 		function mockSupportAPIFunctions() {
-			const oMockAppComponent = getMockAppComponent();
-
-			const oMockFlexSettings = [
-				{ key: "userId", value: "JohnDoesEmail" },
-				{ key: "developerMode", value: true }
-			];
-
 			const oChange1 = FlexObjectFactory.createUIChange({ id: "change1", type: "variant", user: "JohnDoesEmail" });
 			oChange1.setApplyState("applied");
 			const oChange2 = FlexObjectFactory.createUIChange(
@@ -222,17 +229,11 @@ sap.ui.define([
 				allFlexObjects: [oChange1, oChange2]
 			};
 
-			oSandbox.stub(SupportAPI, "getApplicationComponent").resolves(oMockAppComponent);
-			oSandbox.stub(SupportAPI, "getFlexSettings").resolves(oMockFlexSettings);
 			oSandbox.stub(SupportAPI, "getFlexObjectInfos").resolves(oMockFlexObjectInfos);
-
-			return {
-				oMockFlexSettings
-			};
 		}
 
 		QUnit.test("extractFlexibilityData - exports reduced dataset without anonymization", async function(assert) {
-			const { oMockCachedFlexData, oMockFlexSettings } = mockSupportAPIFunctions();
+			mockSupportAPIFunctions();
 			const dStartTime = new Date();
 			const oResult = await FlexibilityDataExtractor.extractFlexibilityData(false, false);
 			const dEndTime = new Date();
@@ -252,9 +253,8 @@ sap.ui.define([
 			assert.ok(dParsedTimestamp <= dEndTime, "Timestamp is not after test end");
 
 			// Verify reduced dataset structure
-			assert.deepEqual(oResult.cachedBackendResponse, oMockCachedFlexData, "Cached backend response is included");
 			assert.ok(oResult.flexObjectInfos, "Flex object infos structure is present");
-			assert.deepEqual(oResult.flexSettings, oMockFlexSettings, "Flex settings are extracted correctly");
+			assert.deepEqual(oResult.flexSettings, this.oMockFlexSettings, "Flex settings are extracted correctly");
 
 			// Verify liveDependencyMap is processed correctly (IDs extracted)
 			assert.deepEqual(
@@ -306,7 +306,8 @@ sap.ui.define([
 
 			// Verify data is anonymized when bAnonymizeUsers is true
 			assert.strictEqual(oResult.flexSettings[0].value, "USER_1", "userId in flexSettings is anonymized");
-			assert.strictEqual(oResult.flexSettings[1].value, true, "Non-user setting is unchanged");
+			assert.strictEqual(oResult.flexSettings[1].value, "USER_1", "user in flexSettings is anonymized");
+			assert.strictEqual(oResult.flexSettings[2].value, true, "Non-user setting is unchanged");
 			assert.strictEqual(
 				oResult.flexObjectInfos.allFlexObjectFileContents[0].support.user,
 				"USER_1",
@@ -323,5 +324,10 @@ sap.ui.define([
 				"User name covered in array in revert data is anonymized consistently"
 			);
 		});
+	});
+
+	QUnit.done(function() {
+		oAppComponent._restoreGetAppComponentStub();
+		document.getElementById("qunit-fixture").style.display = "none";
 	});
 });

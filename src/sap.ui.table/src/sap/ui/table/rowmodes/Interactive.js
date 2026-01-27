@@ -319,24 +319,14 @@ sap.ui.define([
 		return Math.max(0, Math.floor(iViewportHeight - oTableDomRef.getBoundingClientRect().height + oRowContainer.getBoundingClientRect().height));
 	};
 
-	InteractiveRowMode.prototype.updateTable = function(sReason) {
-		this.getTable().getDomRef("heightResizer")?.setAttribute("aria-valuenow", this.getActualRowCount());
-
-		RowMode.prototype.updateTable.apply(this, arguments);
-	};
-
 	/**
 	 * @this sap.ui.table.rowmodes.Interactive
 	 */
 	TableDelegate.onAfterRendering = function(oEvent) {
-		const oTable = this.getTable();
+		const oHeightResizer = this.getTable().getDomRef("heightResizer");
 
-		if (oTable.getRows().length > 0) {
-			this.fireRowsUpdated(TableUtils.RowsUpdateReason.Render);
-		}
-
-		const oResizerDomRef = oTable.getDomRef("heightResizer");
-		oResizerDomRef.setAttribute("aria-valuemax", this._getMaxRowCount());
+		oHeightResizer.setAttribute("aria-valuemax", this._getMaxRowCount());
+		oHeightResizer.setAttribute("aria-valuenow", this.getActualRowCount());
 	};
 
 	/**

@@ -32,11 +32,6 @@ sap.ui.define([
 		rows: {path: "/"}
 	});
 
-	function waitForResizeHandler() {
-		// Give the table time to react. Default interval of IntervalTrigger singleton that is used by the ResizeHandler is 200ms.
-		return TableQUnitUtils.wait(250);
-	}
-
 	QUnit.module("Automatic row count adjustment", {
 		beforeEach: function() {
 			this.oTable = TableQUnitUtils.createTable({
@@ -72,54 +67,44 @@ sap.ui.define([
 		});
 	});
 
-	QUnit.test("Changing visibility of an extension", function(assert) {
-		const that = this;
-
+	QUnit.test("Changing visibility of an extension", async function(assert) {
 		this.oTable.getExtension()[0].setVisible(false);
+		await this.oTable.qunit.whenNextRenderingFinished();
+		assert.equal(this.oTable.getRows().length, 15, "Row count after hiding an extension");
 
-		return waitForResizeHandler().then(this.oTable.qunit.whenRenderingFinished).then(function() {
-			assert.equal(that.oTable.getRows().length, 15, "Row count after hiding an extension");
-			that.oTable.getExtension()[0].setVisible(true);
-		}).then(waitForResizeHandler).then(this.oTable.qunit.whenRenderingFinished).then(function() {
-			assert.equal(that.oTable.getRows().length, 13, "Row count after showing an extension");
-		});
+		this.oTable.getExtension()[0].setVisible(true);
+		await this.oTable.qunit.whenNextRenderingFinished();
+		assert.equal(this.oTable.getRows().length, 13, "Row count after showing an extension");
 	});
 
-	QUnit.test("Changing visibility of the footer", function(assert) {
-		const that = this;
-
+	QUnit.test("Changing visibility of the footer", async function(assert) {
 		this.oTable.getFooter().setVisible(false);
+		await this.oTable.qunit.whenNextRenderingFinished();
+		assert.equal(this.oTable.getRows().length, 15, "Row count after hiding the footer");
 
-		return waitForResizeHandler().then(this.oTable.qunit.whenRenderingFinished).then(function() {
-			assert.equal(that.oTable.getRows().length, 15, "Row count after hiding the footer");
-			that.oTable.getFooter().setVisible(true);
-		}).then(waitForResizeHandler).then(this.oTable.qunit.whenRenderingFinished).then(function() {
-			assert.equal(that.oTable.getRows().length, 13, "Row count after showing the footer");
-		});
+		this.oTable.getFooter().setVisible(true);
+		await this.oTable.qunit.whenNextRenderingFinished();
+		assert.equal(this.oTable.getRows().length, 13, "Row count after showing the footer");
 	});
 
-	QUnit.test("Changing visibility of the creation row", function(assert) {
-		const that = this;
-
+	QUnit.test("Changing visibility of the creation row", async function(assert) {
 		this.oTable.getCreationRow().setVisible(false);
+		await this.oTable.qunit.whenRenderingFinished(() => this.oTable.getRows().length === 14);
+		assert.equal(this.oTable.getRows().length, 14, "Row count after hiding the creation row");
 
-		return waitForResizeHandler().then(this.oTable.qunit.whenRenderingFinished).then(function() {
-			assert.equal(that.oTable.getRows().length, 14, "Row count after hiding the creation row");
-			that.oTable.getCreationRow().setVisible(true);
-		}).then(waitForResizeHandler).then(this.oTable.qunit.whenRenderingFinished).then(function() {
-			assert.equal(that.oTable.getRows().length, 13, "Row count after showing the creation row");
-		});
+		this.oTable.getCreationRow().setVisible(true);
+		await this.oTable.qunit.whenRenderingFinished(() => this.oTable.getRows().length === 13);
+		assert.equal(this.oTable.getRows().length, 13, "Row count after showing the creation row");
 	});
 
 	QUnit.test("Elements with margins", async function(assert) {
+		const oTableContainer = this.oTable.getDomRef().parentNode;
+
 		this.oTable.getExtension()[0].addStyleClass("sapUiLargeMargin");
 		this.oTable.addExtension(this.oTable.getExtension()[0].clone());
 		this.oTable.getFooter().addStyleClass("sapUiLargeMargin");
 		this.oTable.destroyAggregation("creationRow");
-		await this.oTable.qunit.whenRenderingFinished();
-
-		const oTableContainer = this.oTable.getDomRef().parentNode;
-
+		await this.oTable.qunit.whenRenderingFinished(() => oTableContainer.clientHeight === oTableContainer.scrollHeight);
 		assert.equal(oTableContainer.clientHeight, oTableContainer.scrollHeight, "The table container has no vertical overflow");
 	});
 
@@ -440,30 +425,14 @@ sap.ui.define([
 	}
 
 	function RowsUpdatedTestInvisibleRerenderWithBinding(assert, fnOriginalTest) {
-		this.createTable();
-		return this.oTable.qunit.whenRenderingFinished().then(() => {
-			this.resetRowsUpdatedSpy();
-			return TableQUnitUtils.hideTestContainer();
-		}).then(() => {
-			this.oTable.invalidate();
-			return this.checkRowsUpdated(assert, []);
-		}).then(() => {
-			this.resetRowsUpdatedSpy();
-			return TableQUnitUtils.showTestContainer();
-		}).then(() => {
-			return new Promise((resolve) => {
-				this.oTable.attachEventOnce("_rowsUpdated", resolve);
-			});
-		}).then(() => {
-			return this.checkRowsUpdated(assert, [
-				TableUtils.RowsUpdateReason.Render
-			]);
-		}).then(() => {
+		return fnOriginalTest().then(() => {
 			this.resetRowsUpdatedSpy();
 			return TableQUnitUtils.hideTestContainer();
 		}).then(() => {
 			this.oTable.getRowMode().setRowContentHeight(this.oTable._getDefaultRowHeight() + 20); // The table will show less rows.
-			return this.checkRowsUpdated(assert, []);
+			return this.checkRowsUpdated(assert, [
+				TableUtils.RowsUpdateReason.Render // Due to invalidation on property change
+			]);
 		}).then(() => {
 			this.resetRowsUpdatedSpy();
 			return TableQUnitUtils.showTestContainer();
