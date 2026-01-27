@@ -1,25 +1,28 @@
-// Note: the HTML page 'opaTestsWithComponent.qunit.html' loads this module via data-sap-ui-on-init
-
-// we want to be able to load our tests asynchronously - pause QUnit until we loaded everything
-QUnit.config.autostart = false;
-// Demo Kit in static navigation mode
-window['sap-ui-documentation-static'] = true;
-//We preset the path to api-index.json file to be the local mock folder
-window['sap-ui-documentation-config'] = {
-	apiInfoRootURL: 'test-resources/sap/ui/documentation/sdk/integration/mock/docs/api/api-index.json'
-};
-
-"use strict";
-
 sap.ui.define([
-	"sap/ui/documentation/sdk/test/configureOpa",
-	"sap/ui/documentation/sdk/test/AllJourneys",
+	"require",
+	"sap/ui/test/Opa5",
 	"sap/ui/documentation/sdk/controller/util/APIInfo",
-
-], function (configureOpa, AllJourneys, APIInfo) {
+	"sap/ui/dom/includeStylesheet",
+	"./arrangement/component/Arrangement",
+	"./configureOpa",
+	"./AllJourneys"
+], function (require, Opa5, APIInfo, includeStylesheet, Arrangement) {
 	"use strict";
-	// configuration has been applied and the tests in the journeys have been loaded - start QUnit
 
-	APIInfo._setRoot('test-resources/sap/ui/documentation/sdk/integration/mock');
-	QUnit.start();
+	includeStylesheet(require.toUrl('./opaTestsWithComponent.qunit.css'));
+
+	const mockUrl = require.toUrl('./mock');
+
+	// Demo Kit in static navigation mode
+	globalThis['sap-ui-documentation-static'] = true;
+	//We preset the path to api-index.json file to be the local mock folder
+	globalThis['sap-ui-documentation-config'] = {
+		apiInfoRootURL: sap.ui.require.toUrl(`${mockUrl}/docs/api/api-index.json`)
+	};
+	APIInfo._setRoot(mockUrl);
+
+	// use the specific arrangement for the component-based scenario
+	Opa5.extendConfig({
+		arrangements : new Arrangement()
+	});
 });

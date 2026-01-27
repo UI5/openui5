@@ -813,4 +813,67 @@ function(AnimationMode, ControlBehavior, Element, nextUIUpdate, jQuery, KeyCodes
 		// Assert
 		assert.ok(oSpy.notCalled, "restoring focus is skipped");
 	});
+
+	QUnit.module("Sections outside viewport", {
+		beforeEach: function (assert) {
+			var done = assert.async();
+			XMLView.create({
+				id: "UxAP-12-ObjectPageDynamicHeader",
+				viewName: "view.UxAP-12-ObjectPageDynamicHeader"
+			}).then(function (oView) {
+				this.oView = oView;
+				this.oObjectPage = oView.byId("ObjectPageLayout");
+				done();
+			}.bind(this));
+		},
+		afterEach: function () {
+			this.oView.destroy();
+			this.oObjectPage = null;
+		}
+	});
+
+	QUnit.test("scrolls to focused section", async function(assert) {
+		assert.expect(4); //number of assertions
+		// Arrange
+		var fnDone = assert.async(),
+			oObjectPage = this.oObjectPage,
+			oFirstVisibleSection = oObjectPage.getSections()[0],
+			iFirstVisibleSectionOffsetTop,
+			fnOnDomReady = function () {
+				resizePageToSmallHeight();
+
+				// Assert initial state
+				iFirstVisibleSectionOffsetTop = oFirstVisibleSection.getDomRef().offsetTop;
+				assert.ok(iFirstVisibleSectionOffsetTop > oObjectPage.$().height(), "first visible section is below the viewport");
+				assert.strictEqual(oObjectPage._$opWrapper.scrollTop(), 0, "initially scrolled to top");
+
+				// Act
+				oFirstVisibleSection.getDomRef().focus();
+
+				waitForScroll().then(function (iNewScrollTop) {
+					// Assert
+					assert.ok(iNewScrollTop >= iFirstVisibleSectionOffsetTop, "scrolled down to focused section");
+					assert.ok(oObjectPage._isClosestScrolledSection(oFirstVisibleSection.getId()), "scrolled down to focused section");
+
+					fnDone();
+				});
+			},
+			resizePageToSmallHeight = function () {
+				//make the page smaller so that only the title+header area is visible in the viewport
+				var iHeaderHeight = oObjectPage._$titleArea.get(0).offsetHeight;
+				oObjectPage.$().height(iHeaderHeight);
+			},
+			waitForScroll = function () {
+				return new Promise(function (resolve) {
+					oObjectPage._$opWrapper.get(0).addEventListener("scroll", function(oEvent) {
+						resolve(oEvent.target.scrollTop);
+					});
+				});
+			};
+
+		// Arrange
+		oObjectPage.attachEventOnce("onAfterRenderingDOMReady", fnOnDomReady);
+		this.oView.placeAt("qunit-fixture");
+		await nextUIUpdate();
+	});
 });

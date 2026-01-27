@@ -362,14 +362,12 @@ sap.ui.define([
 		return testWithStableRowCount(() => {
 			return TableQUnitUtils.hideTestContainer().then(() => {
 				this.createTable();
-				return this.checkRowsUpdated(assert, []);
+				return this.checkRowsUpdated(assert, 0);
 			}).then(() => {
 				this.resetRowsUpdatedSpy();
 				return TableQUnitUtils.showTestContainer();
 			}).then(() => {
-				return this.checkRowsUpdated(assert, [
-					TableUtils.RowsUpdateReason.Render
-				]);
+				return this.checkRowsUpdated(assert, 1);
 			});
 		});
 	}

@@ -2,8 +2,9 @@
  global QUnit
  */
 sap.ui.define([
+	'sap/ui/test/Opa5',
 	'sap/ui/test/opaQunit'
-], function (opaTest) {
+], function (Opa5, opaTest) {
 	"use strict";
 
 	QUnit.module("Samples Journey");
@@ -64,7 +65,7 @@ sap.ui.define([
 	});
 
 	opaTest("Should teardown my app", function(Given, When, Then) {
-		expect(0); // eslint-disable-line no-undef
+		Opa5.assert.expect(0);
 		Then.iTeardownMyApp();
 	});
 

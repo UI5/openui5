@@ -80,6 +80,11 @@ sap.ui.define([
 		onAvatarPress: function (oEvent) {
 			const oAvatar = oEvent.getSource();
 			MessageToast.show(`Avatar of ${oAvatar.getParent().getTitle()} is pressed`);
+		},
+
+		onDisplayListItemPress: function (oEvent) {
+			const oItem = oEvent.getSource();
+			MessageToast.show(`Display List Item ${oItem.getLabel()} is pressed`);
 		}
 	});
 

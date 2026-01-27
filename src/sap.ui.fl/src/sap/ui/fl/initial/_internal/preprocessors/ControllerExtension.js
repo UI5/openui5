@@ -106,7 +106,7 @@ sap.ui.define([
 			var sFlexReference = ManifestUtils.getFlexReferenceForControl(oAppComponent);
 
 			return Loader.waitForInitialization(sFlexReference).then(async function() {
-				const oFlexData = Loader.getCachedFlexData(sFlexReference);
+				const oFlexData = Loader.getCachedFlexData(sFlexReference).data;
 				if (!StorageUtils.isStorageResponseFilled(oFlexData?.changes)) {
 					return [];
 				}

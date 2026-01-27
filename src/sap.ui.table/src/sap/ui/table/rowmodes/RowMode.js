@@ -46,20 +46,6 @@ sap.ui.define([
 
 	RowMode.prototype.init = function() {
 		/*
-		 * Flag indicating whether the first _rowsUpdated event after rendering was fired.
-		 *
-		 * @type {boolean}
-		 */
-		this._bFiredRowsUpdatedAfterRendering = false;
-
-		/*
-		 * Flag indicating whether the row mode is currently listening for the first _rowsUpdated event after rendering.
-		 *
-		 * @type {boolean}
-		 */
-		_private(this).bListeningForFirstRowsUpdatedAfterRendering = false;
-
-		/*
 		 * Flag indicating whether the NoData text of the table is disabled.
 		 *
 		 * @type {boolean}
@@ -257,10 +243,10 @@ sap.ui.define([
 			this.invalidate();
 		}
 
-		if (!oTable._bInvalid && aRows.length > 0) {
-			// If the table is invalid and therefore renders, the event will be fired after rendering.
-			// Otherwise, fire it now, because the binding contexts of the rows were updated.
-			this.fireRowsUpdated(sReason);
+		// If the table is invalid and therefore renders, the event will be fired after rendering.
+		// Otherwise, fire it now, because the binding contexts of the rows were updated.
+		if (!oTable._bInvalid && oTable._bContextsAvailable && aRows.length > 0) {
+			oTable._fireRowsUpdated(sReason);
 		}
 	};
 
@@ -631,38 +617,6 @@ sap.ui.define([
 	};
 
 	/**
-	 * Fires the <code>_rowsUpdated</code> event of the table if no update of the binding contexts of rows is to be expected.
-	 * The first event after a rendering is always fired with reason "Render", regardless of the provided reason.
-	 *
-	 * @param {sap.ui.table.TableUtils.RowsUpdateReason} [sReason=sap.ui.table.TableUtils.RowsUpdateReason.Unknown]
-	 * The reason why the rows have been updated.
-	 * @private
-	 */
-	RowMode.prototype.fireRowsUpdated = function(sReason) {
-		const oTable = this.getTable();
-
-		if (!oTable || !oTable._bContextsAvailable) {
-			return;
-		}
-
-		// The first _rowsUpdated event after rendering should be fired with reason "Render".
-		if (!this._bFiredRowsUpdatedAfterRendering) {
-			sReason = TableUtils.RowsUpdateReason.Render;
-
-			if (!_private(this).bListeningForFirstRowsUpdatedAfterRendering) {
-				_private(this).bListeningForFirstRowsUpdatedAfterRendering = true;
-
-				oTable.attachEvent("_rowsUpdated", function() {
-					this._bFiredRowsUpdatedAfterRendering = true;
-					_private(this).bListeningForFirstRowsUpdatedAfterRendering = false;
-				}.bind(this));
-			}
-		}
-
-		oTable._fireRowsUpdated(sReason);
-	};
-
-	/**
 	 * Disables the "NoData" text of the table. The table will no longer show this text, even if its property
 	 * {@link sap.ui.table.Table#getShowNoData showNoData} is set to <code>true</code>. The text is hidden if it is currently shown. Has no effect for
 	 * the text that is shown when the table has no visible columns.
@@ -791,7 +745,6 @@ sap.ui.define([
 	 * @this sap.ui.table.rowmodes.RowMode
 	 */
 	TableDelegate.onBeforeRendering = function(oEvent) {
-		this._bFiredRowsUpdatedAfterRendering = false;
 		this.updateTable(TableUtils.RowsUpdateReason.Render);
 	};
 

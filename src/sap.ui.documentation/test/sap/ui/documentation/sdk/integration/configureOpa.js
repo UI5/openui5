@@ -1,26 +1,20 @@
 sap.ui.define([
 	"sap/ui/test/Opa5",
-	"sap/ui/documentation/sdk/test/arrangement/Arrangement",
-	// QUnit additions
-	"sap/ui/qunit/qunit-2-css",
-	"sap/ui/qunit/qunit-junit",
-	// Page Objects
-	"sap/ui/documentation/sdk/test/pageobjects/App",
-	"sap/ui/documentation/sdk/test/pageobjects/Welcome",
-	"sap/ui/documentation/sdk/test/pageobjects/TopicMaster",
-	"sap/ui/documentation/sdk/test/pageobjects/ApiMaster",
-	"sap/ui/documentation/sdk/test/pageobjects/ControlsMaster",
-	"sap/ui/documentation/sdk/test/pageobjects/DemoApps",
-	"sap/ui/documentation/sdk/test/pageobjects/ApiDetail",
-	"sap/ui/documentation/sdk/test/pageobjects/SubApiDetail",
-	"sap/ui/documentation/sdk/test/pageobjects/Entity",
-	"sap/ui/documentation/sdk/test/pageobjects/Sample",
-	"sap/ui/documentation/sdk/test/pageobjects/Code"
-], function (Opa5, Arrangement) {
+	"./pageobjects/App",
+	"./pageobjects/Welcome",
+	"./pageobjects/TopicMaster",
+	"./pageobjects/ApiMaster",
+	"./pageobjects/ControlsMaster",
+	"./pageobjects/DemoApps",
+	"./pageobjects/ApiDetail",
+	"./pageobjects/SubApiDetail",
+	"./pageobjects/Entity",
+	"./pageobjects/Sample",
+	"./pageobjects/Code"
+], function (Opa5) {
 	"use strict";
 
 	Opa5.extendConfig({
-		arrangements : new Arrangement(),
 		actions: new Opa5({
 			iLookAtTheScreen : function () {
 				return this;

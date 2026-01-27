@@ -1,9 +1,9 @@
-sap.ui.define(['sap/ui/test/Opa5', './BaseArrangement'], function (Opa5, BaseArrangement) {
+sap.ui.define(['sap/ui/test/Opa5', '../BaseArrangement'], function (Opa5, BaseArrangement) {
 	"use strict";
 
-	return BaseArrangement.extend("sap.ui.documentation.sdk.test.arrangement.WellcomeJourneyArrangement", {
+	return BaseArrangement.extend("test-resources.sap.ui.documentation.sdk.integration.arrangement.iframe.Arrangement", {
 		iStartMyApp : function (sAdditionalUrlParameters) {
-			var appRootURL = "../index.html";
+			let appRootURL = sap.ui.require.toUrl("test-resources/sap/ui/documentation/sdk/index.html");
 
 			// if configuration file is used, appRootURL can be changed
 			// for local testing purposes. See opaTestsWithIFrame.qunit.html

@@ -102,8 +102,8 @@ sap.ui.define([
 			const sReference = ManifestUtils.getFlexReferenceForControl(oAppComponent);
 
 			await Loader.waitForInitialization(sReference);
-			const oFlexData = Loader.getCachedFlexData(sReference);
-			if (!StorageUtils.isStorageResponseFilled(oFlexData.changes)) {
+			const oFlexData = Loader.getCachedFlexData(sReference).data;
+			if (!StorageUtils.isStorageResponseFilled(oFlexData?.changes)) {
 				return oView;
 			}
 
@@ -165,8 +165,8 @@ sap.ui.define([
 		if (sFlexReference) {
 			await Loader.waitForInitialization(sFlexReference);
 			const oFlexData = Loader.getCachedFlexData(sFlexReference);
-			if (oFlexData && oFlexData.cacheKey && StorageUtils.isStorageResponseFilled(oFlexData.changes)) {
-				sCacheKey = trimEtag(oFlexData.cacheKey);
+			if (oFlexData.parameters?.loaderCacheKey && StorageUtils.isStorageResponseFilled(oFlexData.data?.changes)) {
+				sCacheKey = trimEtag(oFlexData.parameters.loaderCacheKey);
 
 				// If there are no changes, the standard variant is created after the variant management control is instantiated
 				// When the cache key is calculated before this happens, the standard variant id is unknown

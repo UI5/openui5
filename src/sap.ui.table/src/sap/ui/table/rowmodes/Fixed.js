@@ -66,18 +66,6 @@ sap.ui.define([
 		}
 	});
 
-	const TableDelegate = {};
-
-	FixedRowMode.prototype.attachEvents = function() {
-		RowMode.prototype.attachEvents.apply(this, arguments);
-		TableUtils.addDelegate(this.getTable(), TableDelegate, this);
-	};
-
-	FixedRowMode.prototype.detachEvents = function() {
-		RowMode.prototype.detachEvents.apply(this, arguments);
-		this.getTable()?.removeEventDelegate(TableDelegate);
-	};
-
 	FixedRowMode.prototype.registerHooks = function() {
 		RowMode.prototype.registerHooks.apply(this, arguments);
 		TableUtils.Hook.register(this.getTable(), TableUtils.Hook.Keys.Table.RefreshRows, this._onTableRefreshRows, this);
@@ -212,17 +200,6 @@ sap.ui.define([
 
 			this.initTableRowsAfterDataRequested(iRowCount);
 			this.getRowContexts(iRowCount); // Trigger data request.
-		}
-	};
-
-	/**
-	 * @this sap.ui.table.rowmodes.Fixed
-	 */
-	TableDelegate.onAfterRendering = function(oEvent) {
-		const oTable = this.getTable();
-
-		if (oTable.getRows().length > 0) {
-			this.fireRowsUpdated(TableUtils.RowsUpdateReason.Render);
 		}
 	};
 

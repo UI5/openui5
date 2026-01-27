@@ -1,7 +1,7 @@
 sap.ui.define(['sap/ui/test/Opa5'], function (Opa5) {
 	"use strict";
 
-	var BaseArrangement = Opa5.extend("sap.ui.documentation.sdk.test.arrangement.BaseArrangement", {
+	var BaseArrangement = Opa5.extend("test-resources.sap.ui.documentation.sdk.integration.arrangement.BaseArrangement", {
 
 		iClearAllData: function() {
 			clearAllCookies();

@@ -52,11 +52,12 @@ sap.ui.define([
 		Loader.getFlexData.restore?.();
 		Loader.getCachedFlexData.restore?.();
 		const oReturn = merge({}, mEmptyResponse, oResponse);
-		sandbox.stub(Loader, "getCachedFlexData").returns(oResponse);
-		return sandbox.stub(Loader, "getFlexData").resolves({
+		const oLoaderReturn = {
 			data: oReturn,
 			parameters: {}
-		});
+		};
+		sandbox.stub(Loader, "getCachedFlexData").returns(oLoaderReturn);
+		return sandbox.stub(Loader, "getFlexData").resolves(oLoaderReturn);
 	}
 
 	function mockPrepareFunctions(sMapName) {

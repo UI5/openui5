@@ -367,17 +367,20 @@ sap.ui.define([
 	};
 
 	/**
-	 * Starts the automatic row count mode. An initial row count adjustment is performed. A resize listener then detects height changes. When this
-	 * occurs, the row count is also adjusted. The row count is calculated and applied based on the available vertical space.
+	 * Starts the automatic row count adjustment if not already running. An initial row count adjustment is done when started. Afterwards, the row
+	 * count is adjusted on resize.
+	 * The row count is calculated based on the available vertical space.
 	 *
 	 * @private
 	 */
 	AutoRowMode.prototype.startAutoRowMode = function() {
-		_private(this).adjustRowCountToAvailableSpaceAsync(TableUtils.RowsUpdateReason.Render, true);
+		if (!_private(this).bRowCountAutoAdjustmentActive) {
+			_private(this).adjustRowCountToAvailableSpaceAsync(TableUtils.RowsUpdateReason.Render, true);
+		}
 	};
 
 	/**
-	 * Stops the automatic row count mode.
+	 * Stops the automatic row count adjustment.
 	 *
 	 * @private
 	 */
@@ -401,6 +404,7 @@ sap.ui.define([
 			TableUtils.registerResizeHandler(oTable, "AutoRowMode", this.onResize.bind(this), null, bOnTableParent === true);
 			TableUtils.registerResizeHandler(oTable, "AutoRowMode-BeforeTable", this.onResize.bind(this), "before");
 			TableUtils.registerResizeHandler(oTable, "AutoRowMode-AfterTable", this.onResize.bind(this), "after");
+			TableUtils.registerResizeHandler(oTable, "AutoRowMode-CreationRowContainer", this.onResize.bind(this), "creationRowContainer");
 		}
 	};
 
@@ -413,7 +417,12 @@ sap.ui.define([
 		const oTable = this.getTable();
 
 		if (oTable) {
-			TableUtils.deregisterResizeHandler(oTable, ["AutoRowMode, AutoRowMode-BeforeTable, AutoRowMode-AfterTable"]);
+			TableUtils.deregisterResizeHandler(oTable, [
+				"AutoRowMode",
+				"AutoRowMode-BeforeTable",
+				"AutoRowMode-AfterTable",
+				"AutoRowMode-CreationRowContainer"
+			]);
 		}
 	};
 
@@ -465,7 +474,7 @@ sap.ui.define([
 		const oTable = this.getTable();
 		const oTableDomRef = oTable ? oTable.getDomRef() : null;
 
-		if (!oTable || oTable._bInvalid || !oTableDomRef || !TableUtils.isThemeApplied()) {
+		if (!oTable || !oTableDomRef || !TableUtils.isThemeApplied()) {
 			signalEndTableUpdate(this);
 			return;
 		}
@@ -484,7 +493,6 @@ sap.ui.define([
 		}
 
 		const iNewHeight = this.determineAvailableSpace();
-		const oOldRowCount = this.getConfiguredRowCount();
 		const iNewRowCount = Math.floor(iNewHeight / getRowHeight(this));
 		const iOldComputedRowCount = this.getComputedRowCounts().count;
 
@@ -493,18 +501,6 @@ sap.ui.define([
 
 		if (iOldComputedRowCount !== iNewComputedRowCount) {
 			this.invalidate();
-		} else {
-			// TODO: The check for reason=Zoom can be removed once the table is changed to a div-based layout.
-			if (oOldRowCount !== iNewRowCount || sReason === TableUtils.RowsUpdateReason.Zoom) {
-				this.applyTableStyles();
-				this.applyRowContainerStyles();
-				this.applyTableBottomPlaceholderStyles();
-			}
-
-			if (!this._bFiredRowsUpdatedAfterRendering && oTable.getRows().length > 0) {
-				// Even if the row count does not change, the rows updated event still needs to be fired after rendering.
-				this.fireRowsUpdated(sReason);
-			}
 		}
 
 		if (bStartAutomaticAdjustment) {
@@ -565,14 +561,6 @@ sap.ui.define([
 		}
 
 		return _private(this).iLastAvailableSpace;
-	};
-
-	/**
-	 * @param {sap.ui.base.Event} oEvent The event object of the <code>beforeRendering</code> event
-	 * @this sap.ui.table.rowmodes.Auto
-	 */
-	TableDelegate.onBeforeRendering = function(oEvent) {
-		this.stopAutoRowMode();
 	};
 
 	/**

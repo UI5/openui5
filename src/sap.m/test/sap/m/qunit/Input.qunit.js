@@ -949,8 +949,7 @@ sap.ui.define([
 		// Assert
 		assert.strictEqual(oGetSpy.called, true, "_getTypedInValue was called.");
 		assert.strictEqual(oGetSpy.firstCall.returnValue, "Te", "_getTypedInValue returned the correct result.");
-		assert.strictEqual(oSetSpy.callCount, 1, "Input's value was set once.");
-		assert.strictEqual(oSetSpy.firstCall.args[0], "Te", "The input's value was reset to the initially typed by the user input.");
+		assert.strictEqual(oInput.getFocusDomRef().value, "Te", "Input's value is correct.");
 
 		// Cleanup
 		oInput.destroy();
@@ -984,6 +983,57 @@ sap.ui.define([
 
 		// Assert
 		assert.strictEqual(oInput._sProposedItemText, null, "_sProposedItemText was set to 'null'.");
+
+		// Cleanup
+		oInput.destroy();
+	});
+
+	QUnit.test("ESC followed by focus out should fire change event with user's typed value", async function (assert) {
+		this.clock = sinon.useFakeTimers();
+		// Arrange
+		var changeHandler = this.spy();
+		var oInput = new Input({
+			showSuggestion: true,
+			change: changeHandler,
+			suggestionItems: [
+				new Item({key: "key1", text: "Text 1"}),
+				new Item({key: "key2", text: "Text 2"}),
+				new Item({key: "key3", text: "Text 3"})
+			]
+		});
+		var oNextInput = new Input();
+
+		oInput.placeAt("content");
+		oNextInput.placeAt("content");
+		await nextUIUpdate(this.clock);
+
+		// Act - simulate user typing which triggers autocomplete
+		oInput._bDoTypeAhead = true;
+		qutils.triggerEvent("focus", oInput.getFocusDomRef());
+		qutils.triggerCharacterInput(oInput.getFocusDomRef(), "Te");
+		qutils.triggerEvent("input", oInput.getFocusDomRef());
+		oInput._getSuggestionsPopover().getPopover().open();
+		this.clock.tick(300);
+
+
+		// Verify autocomplete happened
+		assert.strictEqual(oInput.getValue(), "Text 1", "Autocomplete should have completed the text");
+
+		// Act - press ESC to reset
+		qutils.triggerKeydown(oInput.getDomRef(), KeyCodes.ESCAPE);
+		this.clock.tick(300);
+
+		// Verify ESC reset the value
+		assert.strictEqual(oInput.getValue(), "Te", "ESC should reset value to user's typed input");
+		assert.strictEqual(changeHandler.callCount, 0, "Change event should not have fired yet");
+
+		// Act - focus out should trigger change event
+		oNextInput.focus();
+		this.clock.tick(300);
+
+		// Assert
+		assert.strictEqual(changeHandler.callCount, 1, "Change event should have been fired on focus out");
+		assert.strictEqual(changeHandler.getCall(0).args[0].getParameter("value"), "Te", "Change event should contain the user's typed value");
 
 		// Cleanup
 		oInput.destroy();

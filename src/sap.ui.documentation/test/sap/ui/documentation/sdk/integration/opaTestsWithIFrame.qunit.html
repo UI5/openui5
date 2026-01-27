@@ -1,21 +1,12 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Opa tests for Demokit 2.0 - with iFrame</title>
 		<meta charset="utf-8">
-
-		<script id="sap-ui-bootstrap"
-				src="../../../../../../../resources/sap-ui-core.js"
-				data-sap-ui-frame-options="deny"
-				data-sap-ui-resource-roots='{
-					"sap.ui.documentation.sdk.test": "./",
-					"sap.ui.documentation.sdk.test.arrangement.Arrangement": "./arrangement/iframe/Arrangement"
-				}'
-		>
-		</script>
-		<script src="../../../../../../../resources/sap/ui/thirdparty/qunit-2.js"></script>
-		<script src="./opaTestsWithIFrame.js"></script>
-
+		<base href="../../../../../../">
+		<script src="resources/sap/ui/test/starter/runTest.js"
+				data-sap-ui-testsuite="test-resources/sap/ui/documentation/sdk/qunit/testsuite.demokit.qunit"
+				data-sap-ui-test="opaTestsWithIFrame"
+		></script>
 	</head>
 	<body>
 		<div id="qunit"></div>

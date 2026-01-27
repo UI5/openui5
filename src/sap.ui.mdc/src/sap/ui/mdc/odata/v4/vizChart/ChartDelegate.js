@@ -1189,8 +1189,10 @@ sap.ui.define([
 				if (bIsTypeButton && oInnerChart._getVisibleMeasures()?.length === 0) {
 					oError["Measure"] = 0;
 					oTypeButton.setVisible(false);
+					oChart?._oChartTypeBtn?.setEnabled(false);
 				} else {
 					oTypeButton.setVisible(true);
+					oChart?._oChartTypeBtn?.setEnabled(true);
 				}
 				this._sErrorMsg = ChartUtil.getErrorMessageForMissingMeasuresAndDimensions(sChartType, oError);
 				oIllustratedMessage.setDescription(this._sErrorMsg);
@@ -1203,6 +1205,7 @@ sap.ui.define([
 					oChartImplementationContainer.setNoDataContent(this._oNoDataContent);
 				}
 				oChartImplementationContainer.setShowNoDataStruct(false);
+				oChart?._oChartTypeBtn?.setEnabled(true);
 			}
 		}
 	};

@@ -105,8 +105,10 @@ sap.ui.define([
 				}
 			};
 			sandbox.stub(Loader, "getCachedFlexData").returns({
-				authors: {
-					C: "NameC"
+				data: {
+					authors: {
+						C: "NameC"
+					}
 				}
 			});
 			const oFlVariant = new Variant(this.mFileContent);

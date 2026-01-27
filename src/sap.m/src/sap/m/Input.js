@@ -1399,7 +1399,7 @@ function(
 
 			// revert autocompleted value on desktop
 			if (this._getTypedInValue() !== this.getValue()) {
-				this.setValue(this._getTypedInValue());
+				this.$("inner").val(this._getTypedInValue());
 			}
 			return; // override InputBase.onsapescape()
 		}

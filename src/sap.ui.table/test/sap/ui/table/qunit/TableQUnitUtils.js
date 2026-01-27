@@ -513,13 +513,38 @@ sap.ui.define([
 		/**
 		 * Returns a promise that resolves when no rendering is to be expected or when an ongoing rendering is finished.
 		 *
+		 * @param {function():boolean} [fnCheck]
+		 *     A function that is called after rendering is finished. If it returns <code>false</code>, we wait for the next rendering to be finished
+		 *     and execute the check function again. This cycle continues until either the check function returns <code>true</code> or a timeout
+		 *     occurs.
 		 * @returns {Promise} A promise.
 		 */
-		oTable.qunit.whenRenderingFinished = function() {
+		oTable.qunit.whenRenderingFinished = async function(fnCheck) {
 			if (oTable.qunit.pRenderingFinishedCurrent == null) {
 				initRenderingFinishedPromise("Current", waitForFinalDOMUpdates);
 			}
-			return oTable.qunit.pRenderingFinishedCurrent;
+
+			await oTable.qunit.pRenderingFinishedCurrent;
+
+			if (!(fnCheck instanceof Function)) { // TODO: Some tests incorrectly pass a non-function here
+				return;
+			}
+
+			await new ExpiringPromise(1000, async (resolve, reject) => {
+				try {
+					while (fnCheck() !== true) {
+						await oTable.qunit.whenRenderingFinished();
+					}
+					resolve();
+				} catch (oError) {
+					reject(oError);
+				}
+			}).catch((oError) => {
+				if (oError instanceof TimeoutError) {
+					return; // This timeout is not a real error so we resolve the promise normally.
+				}
+				throw oError;
+			});
 		};
 		oTable.qunit.pRenderingFinishedCurrent = null;
 

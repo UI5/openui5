@@ -12,35 +12,35 @@
 				<content>
 					<List id="standardListItemList" headerText="List Overview">
 						<items>
-							<StandardListItem title="Standard List with Icon" type="Navigation" press="onOverviewListItemPress">
+							<StandardListItem title="Standard List with Icon" type="Navigation" wrapping="true" press="onOverviewListItemPress">
 								<customData>
 									<core:CustomData
 										key="target"
 										value="standardListPage" />
 								</customData>
 							</StandardListItem>
-							<StandardListItem title="Standard List with Avatar" type="Navigation" press="onOverviewListItemPress">
+							<StandardListItem title="Standard List with Avatar" type="Navigation" wrapping="true" press="onOverviewListItemPress">
 								<customData>
 									<core:CustomData
 										key="target"
 										value="standardListAvatarPage" />
 								</customData>
 							</StandardListItem>
-							<StandardListItem title="Grouped List" type="Navigation" press="onOverviewListItemPress">
+							<StandardListItem title="Grouped List" type="Navigation" wrapping="true" press="onOverviewListItemPress">
 								<customData>
 									<core:CustomData
 										key="target"
 										value="groupedListPage" />
 								</customData>
 							</StandardListItem>
-							<StandardListItem title="Display List" type="Navigation" press="onOverviewListItemPress">
+							<StandardListItem title="Display List" type="Navigation" wrapping="true" press="onOverviewListItemPress">
 								<customData>
 									<core:CustomData
 										key="target"
 										value="displayListPage" />
 								</customData>
 							</StandardListItem>
-							<StandardListItem title="Input List" type="Navigation" press="onOverviewListItemPress">
+							<StandardListItem title="Input List" type="Navigation" wrapping="true" press="onOverviewListItemPress">
 								<customData>
 									<core:CustomData
 										key="target"
@@ -75,9 +75,11 @@
 								icon="{names>icon}"
 								iconInset="false"
 								highlight="{names>highlight}"
+								highlightText=" "
 								info="{names>info}"
 								infoState="{names>highlight}"
 								infoStateInverted="true"
+								wrapping="true"
 								press="onStandardListIconItemPress">
 								<actions>
 									<core:Fragment fragmentName="sap.m.acc.list.fragment.Actions" type="XML"/>
@@ -97,22 +99,24 @@
 					<List
 						id="standardListAvatar"
 						mode="{listConfig>/selectionMode}"
-						headerText="Products"
+						headerText="Employees"
 						itemActionCount="{= ${listConfig>/showRowActions} ? 2 : 0 }"
 						itemActionPress=".onItemActionPress">
 						<items>
 							<StandardListItem
-								title="{products>/ProductCollection/0/Name}"
-								description="Active avatar with press event handler and square shape"
+								title="Alain Chevalier"
+								description="Active avatar with press event handler"
 								iconDensityAware="false"
 								iconInset="false"
-								adaptTitleSize="false" >
+								adaptTitleSize="false"
+								wrapping="true">
 								<avatar>
 									<Avatar
-										src="./images/HT-1000.jpg"
+										src="../../images/Alain_Chevalier.png"
 										displayShape="Square"
 										imageFitType="Cover"
 										showBorder="true"
+										wrapping="true"
 										press="onAvatarPress"/>
 									</avatar>
 								<actions>
@@ -121,13 +125,15 @@
 							</StandardListItem>
 							<!-- set this item's description be empty -->
 							<StandardListItem
-								title="{products>/ProductCollection/1/Name}"
-								description="Active Avatar with press event handler and round shape"
+								title="Donna Moore"
+								description="Active Avatar with press event handler"
 								iconInset="false"
-								adaptTitleSize="false" >
+								adaptTitleSize="false"
+								wrapping="true">
 								<avatar>
 									<Avatar
-										src="./images/HT-1000.jpg"
+										src="../../images/Donna_Moore.png"
+										displayShape="Square"
 										showBorder="true"
 										press="onAvatarPress"/>
 								</avatar>
@@ -136,16 +142,18 @@
 								</actions>
 							</StandardListItem>
 							<StandardListItem
-								title="{products>/ProductCollection/2/Name}"
-								description="Non active Avatar"
+								title="Elena Petrova"
+								description="Active Avatar with press event handler"
 								iconDensityAware="false"
-								iconInset="true"
-								adaptTitleSize="false" >
+								iconInset="false"
+								adaptTitleSize="false"
+								wrapping="true">
 								<avatar>
 									<Avatar
-										src="./images/HT-1000.jpg"
+										src="../../images/Elena_Petrova.png"
 										displayShape="Square"
-										showBorder="true"/>
+										showBorder="true"
+										press="onAvatarPress"/>
 								</avatar>
 								<actions>
 									<core:Fragment fragmentName="sap.m.acc.list.fragment.Actions" type="XML"/>
@@ -153,12 +161,18 @@
 							</StandardListItem>
 							<!-- don't specify a description for this item -->
 							<StandardListItem
-								title="{products>/ProductCollection/3/Name}"
-								description="Icon"
-								icon="./images/HT-1000.jpg"
+								title="John Miller"
+								description="Non-active Avatar"
 								iconDensityAware="false"
 								iconInset="false"
-								adaptTitleSize="false">
+								adaptTitleSize="false"
+								wrapping="true">
+								<avatar>
+									<Avatar
+										src="../../images/John_Miller.png"
+										displayShape="Square"
+										showBorder="true"/>
+								</avatar>
 								<actions>
 									<core:Fragment fragmentName="sap.m.acc.list.fragment.Actions" type="XML"/>
 								</actions>
@@ -177,6 +191,7 @@
 					<core:Fragment id="glConfigurationDialog" fragmentName="sap.m.acc.list.fragment.Config" type="XML"/>
 					<List
 						id="groupedList"
+						headerText="Products"
 						items="{
 							path: 'products>/ProductCollection',
 							sorter: {
@@ -191,7 +206,8 @@
 						itemActionPress=".onItemActionPress">
 						<StandardListItem
 							title="{products>Name}"
-							description="{products>ProductId}">
+							description="{products>ProductId}"
+							wrapping="true">
 							<actions>
 								<core:Fragment fragmentName="sap.m.acc.list.fragment.Actions" type="XML"/>
 							</actions>
@@ -212,18 +228,20 @@
 						headerText="Address">
 						<DisplayListItem
 							label="Name"
-							value="{supplier>SupplierName}" />
+							value="{supplier>SupplierName}"/>
 						<DisplayListItem
 							label="Street"
-							value="{supplier>Street} {supplier>HouseNumber}" />
+							value="{supplier>Street} {supplier>HouseNumber}"/>
 						<DisplayListItem
 							label="City"
 							value="{supplier>ZIPCode} {supplier>City}"
-							type="Navigation"/>
+							type="Navigation"
+							press="onDisplayListItemPress"/>
 						<DisplayListItem
 							label="Country"
 							value="{supplier>Country}"
-							type="Navigation" />
+							type="Navigation"
+							press="onDisplayListItemPress"/>
 					</List>
 				</content>
 			</Page>
@@ -237,33 +255,33 @@
 						id="inputList"
 						headerText="Title"
 						mode="None">
-						<InputListItem label="WLAN">
+						<InputListItem label="WLAN" wrapping="true">
 							<Switch state="true" />
 						</InputListItem>
-						<InputListItem label="Flight Mode">
+						<InputListItem label="Flight Mode" wrapping="true">
 							<CheckBox selected="true" />
 						</InputListItem>
-						<InputListItem label="High Performance">
+						<InputListItem label="High Performance" wrapping="true">
 							<RadioButton
 								groupName="GroupInputListItem"
 								selected="true" />
 						</InputListItem>
-						<InputListItem label="Battery Saving">
+						<InputListItem label="Battery Saving" wrapping="true">
 							<RadioButton
 								groupName="GroupInputListItem" />
 						</InputListItem>
-						<InputListItem label="Price (EUR)">
+						<InputListItem label="Price (EUR)" wrapping="true">
 							<Input
 								placeholder="Price"
 								value="799"
 								type="Number" />
 						</InputListItem>
-						<InputListItem label="Address">
+						<InputListItem label="Address" wrapping="true">
 							<Input
 								placeholder="Address"
 								value="Main Rd, Manchester" />
 						</InputListItem>
-						<InputListItem label="Country">
+						<InputListItem label="Country" wrapping="true">
 							<Select>
 								<core:Item key="GR" text="Greece" />
 								<core:Item key="MX" text="Mexico" />
@@ -272,9 +290,9 @@
 								<core:Item key="NL" text="Netherlands" />
 							</Select>
 						</InputListItem>
-						<InputListItem label="Volume">
+						<InputListItem id="volume" label="Volume" wrapping="true">
 							<HBox justifyContent="End">
-								<Slider min="0" max="10" value="7" width="200px" />
+								<Slider min="0" max="10" value="7" width="200px" ariaLabelledBy="volume-label" />
 							</HBox>
 						</InputListItem>
 					</List>

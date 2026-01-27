@@ -1,8 +1,8 @@
 sap.ui.define([
 	'sap/ui/test/Opa5',
 	'sap/ui/test/matchers/PropertyStrictEquals',
-	'sap/ui/documentation/sdk/test/pageobjects/util/sortUtil',
-	'sap/ui/documentation/sdk/test/pageobjects/matchers',
+	'./util/sortUtil',
+	'./matchers',
 	'sap/ui/thirdparty/jquery',
 	'sap/base/util/extend'
 ], function (Opa5, PropertyStrictEquals, sortCheck, matchers, jQuery, extend) {

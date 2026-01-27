@@ -61,7 +61,7 @@ sap.ui.define([
 			this.getView().setModel(oTableConfigModel, "tableConfig");
 		},
 		formatHighlight: function(location) {
-			return location !== "Headquarters" ? MessageType.Information : MessageType.None;
+			return location !== "Headquarters" ? MessageType.Warning : MessageType.None;
 		},
 		formatHighlightText: function(location) {
 			return location !== "Headquarters" ? "Employee works at a remote location" : null;
