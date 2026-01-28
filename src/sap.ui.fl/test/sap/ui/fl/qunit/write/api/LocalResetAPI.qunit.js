@@ -147,6 +147,7 @@ sap.ui.define([
 				// Simulate deletion to validate that the state is restored
 				FlexObjectManager.deleteFlexObjects({
 					reference: sReference,
+					componentId: sReference,
 					flexObjects: aArguments.flexObjects
 				});
 				return Promise.resolve();

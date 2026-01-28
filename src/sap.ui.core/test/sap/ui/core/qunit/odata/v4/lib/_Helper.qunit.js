@@ -1571,6 +1571,7 @@ sap.ui.define([
 			},
 			oHelperMock = this.mock(_Helper),
 			oNewValue = {
+				"@$ui5._" : {ignore : true},
 				ignore : {}, // nothing selected here
 				nested : {}
 			},
@@ -1899,12 +1900,19 @@ sap.ui.define([
 });
 
 	//*********************************************************************************************
-	QUnit.test("updateAll: properties", function (assert) {
+[false, true].forEach((bHasPredicate) => {
+	[false, true].forEach((bAllowSame) => {
+		const sTitle = "updateAll: properties, has key predicate : " + bHasPredicate
+			+ ", check bAllowSame=" + bAllowSame;
+		if (!bHasPredicate && bAllowSame) {
+			return;
+		}
+
+	QUnit.test(sTitle, function (assert) {
 		var mChangeListeners = {},
 			oHelperMock = this.mock(_Helper),
 			oSource = {
 				"@$ui5._" : {
-					predicate : "('1')",
 					ignore : true
 				},
 				changed : "new",
@@ -1917,12 +1925,18 @@ sap.ui.define([
 				unchanged : "same"
 			},
 			oUpdatedTarget = {
-				"@$ui5._" : {predicate : "('1')"},
 				changed : "new",
 				fromNull : "new",
 				unchanged : "same"
 			};
 
+		if (bHasPredicate) {
+			_Helper.setPrivateAnnotation(oSource, "predicate", "('1')");
+			_Helper.setPrivateAnnotation(oUpdatedTarget, "predicate", "('1')");
+		}
+		if (bAllowSame) {
+			_Helper.setPrivateAnnotation(oTarget, "predicate", "('1')");
+		}
 		oHelperMock.expects("buildPath").withExactArgs("path", "@$ui5._");
 		oHelperMock.expects("buildPath").withExactArgs("path", "changed").returns("~changed");
 		oHelperMock.expects("buildPath").withExactArgs("path", "fromNull").returns("~fromNull");
@@ -1937,6 +1951,8 @@ sap.ui.define([
 
 		assert.deepEqual(oTarget, oUpdatedTarget);
 	});
+	});
+});
 
 	//*********************************************************************************************
 	QUnit.test("updateAll: recursion", function (assert) {
@@ -2755,6 +2771,19 @@ sap.ui.define([
 			// code under test
 			_Helper.copyPrivateAnnotation(oSource, "bar", oTarget);
 		}, new Error("Must not overwrite: bar"));
+	});
+
+	//*********************************************************************************************
+	QUnit.test("copyPrivateAnnotation: bAllowSame", function (assert) {
+		const oSource = {};
+		_Helper.setPrivateAnnotation(oSource, "foo", 42);
+		const oTarget = {};
+		_Helper.setPrivateAnnotation(oTarget, "foo", 42);
+
+		// code under test
+		_Helper.copyPrivateAnnotation(oSource, "foo", oTarget, /*bAllowSame*/true);
+
+		assert.strictEqual(_Helper.getPrivateAnnotation(oTarget, "foo"), 42);
 	});
 
 	//*********************************************************************************************

@@ -651,11 +651,11 @@ sap.ui.define([
 
 		function createDeleteVariantStub() {
 			return sandbox.stub(ControlVariantWriteUtils, "deleteVariant")
-			.withArgs("flexReference", "vmReference", "draftVariant")
+			.withArgs("flexReference", oComponent.getId(), "vmReference", "draftVariant")
 			.returns(["DraftObject1", "DraftObject2"])
-			.withArgs("flexReference", "vmReference", "dirtyVariant")
+			.withArgs("flexReference", oComponent.getId(), "vmReference", "dirtyVariant")
 			.returns(["DirtyObject1", "DirtyObject2"])
-			.withArgs("flexReference", "vmReference", "anotherVariant")
+			.withArgs("flexReference", oComponent.getId(), "vmReference", "anotherVariant")
 			.returns(["AnotherObject1", "AnotherObject2"]);
 		}
 
@@ -716,7 +716,7 @@ sap.ui.define([
 				forceDelete: true
 			});
 			assert.ok(
-				oDeleteVariantStub.calledWith("flexReference", "vmReference", "anotherVariant"),
+				oDeleteVariantStub.calledWith("flexReference", oComponent.getId(), "vmReference", "anotherVariant"),
 				"then the delete function is called for the variant that is neither dirty nor draft"
 			);
 			assert.deepEqual(

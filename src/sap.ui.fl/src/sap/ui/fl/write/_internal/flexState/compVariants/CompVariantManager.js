@@ -268,6 +268,7 @@ sap.ui.define([
 	 *
 	 * @param {object} mPropertyBag - Map of parameters, see below
 	 * @param {string} mPropertyBag.reference - Flex reference of the application
+	 * @param {string} mPropertyBag.componentId - Id of the application instance
 	 * @param {string} mPropertyBag.persistencyKey - ID of the variant management internal identifier
 	 * @param {string} mPropertyBag.defaultVariantId - ID of the variant which should be selected at start-up
 	 * @param {string} [mPropertyBag.generator] - Generator of changes
@@ -305,7 +306,7 @@ sap.ui.define([
 			oChange.addRevertInfo(new RevertData({
 				type: CompVariantManager.operationType.NewChange
 			}));
-			FlexState.addDirtyFlexObjects(mPropertyBag.reference, [oChange]);
+			FlexState.addDirtyFlexObjects(mPropertyBag.reference, [oChange], mPropertyBag.componentId);
 		} else {
 			oChange.addRevertInfo(new RevertData({
 				type: CompVariantManager.operationType.ContentUpdate,
@@ -345,6 +346,7 @@ sap.ui.define([
 	 *
 	 * @param {object} mPropertyBag - Object with parameters as properties
 	 * @param {string} mPropertyBag.reference - Flex reference of the application
+	 * @param {string} mPropertyBag.componentId - Id of the application instance
 	 * @param {string} mPropertyBag.persistencyKey - ID of the variant management internal identifier
 	 * @param {sap.ui.comp.smartvariants.SmartVariantManagement|
 	 *            sap.ui.comp.smartfilterbar.SmartFilterBar|
@@ -374,14 +376,13 @@ sap.ui.define([
 		}
 
 		const oChangeSpecificData = mPropertyBag.changeSpecificData;
-
 		oChangeSpecificData.layer = determineLayer(oChangeSpecificData);
 		oChangeSpecificData.changeType = oChangeSpecificData.type;
 		oChangeSpecificData.texts = getTexts(oChangeSpecificData);
 		setAuthor(oChangeSpecificData);
 		const oFileContent = { ...oChangeSpecificData, ...(_omit(mPropertyBag, "changeSpecificData")) };
 		const oCompVariantInstance = FlexObjectFactory.createCompVariant(oFileContent);
-		FlexState.addDirtyFlexObjects(mPropertyBag.reference, [oCompVariantInstance]);
+		FlexState.addDirtyFlexObjects(mPropertyBag.reference, [oCompVariantInstance], mPropertyBag.componentId);
 		if (oChangeSpecificData.layer !== Layer.USER && oChangeSpecificData.layer !== Layer.PUBLIC) {
 			mPropertyBag.id = mPropertyBag.control.getCurrentVariantId();
 			revertAllVariantUpdate(CompVariantManagementState.getVariant(mPropertyBag));
@@ -394,6 +395,7 @@ sap.ui.define([
 	 *
 	 * @param {object} mPropertyBag - Object with parameters as properties
 	 * @param {string} mPropertyBag.reference - Flex reference of the application
+	 * @param {string} mPropertyBag.componentId - Id of the application instance
 	 * @param {string} mPropertyBag.persistencyKey - Key of the variant management
 	 * @param {string} mPropertyBag.id - ID of the variant
 	 * @param {string} [mPropertyBag.packageName] - ID of the package in which the update should be transported - only valid for sap-ui-layer=VENDOR use case
@@ -551,7 +553,7 @@ sap.ui.define([
 			if (mPropertyBag.transportId) {
 				oChange.setRequest(mPropertyBag.transportId);
 			}
-			FlexState.addDirtyFlexObjects(mPropertyBag.reference, [oChange]);
+			FlexState.addDirtyFlexObjects(mPropertyBag.reference, [oChange], mPropertyBag.componentId);
 			storeRevertDataInVariant(mPropertyBag, oVariant, CompVariantManager.operationType.NewChange, oChange);
 			applyChangesOnVariant(oVariant, [oChange]);
 			CompVariantManagementState.getCompEntitiesDataSelector().checkUpdate({ reference: mPropertyBag.reference });

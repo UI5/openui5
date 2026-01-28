@@ -1023,8 +1023,6 @@ sap.ui.define([
 				});
 				oNewChange.setRevertData("revertData");
 				const oLoaderInitializeEmptyCacheSpy = sandbox.spy(Loader, "initializeEmptyCache");
-				// When initialize already happened, the component ID is not required
-				this.sComponentId = bInitFlexState ? undefined : this.sComponentId;
 				FlexState.addDirtyFlexObjects(sReference, [oNewChange], this.sComponentId);
 
 				assert.strictEqual(

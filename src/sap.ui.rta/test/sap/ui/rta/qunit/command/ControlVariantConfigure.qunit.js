@@ -140,7 +140,7 @@ sap.ui.define([
 
 			await oConfigureCommand.undo();
 			assert.ok(
-				oRestoreDeletedFlexObjectsStub.calledWith({ reference: "Dummy", flexObjects: aDummyDeletedFlexObjects }),
+				oRestoreDeletedFlexObjectsStub.calledWith({ reference: "Dummy", componentId: "Dummy", flexObjects: aDummyDeletedFlexObjects }),
 				"the flex objects got restored"
 			);
 			assert.strictEqual(this.oDeleteVariantChangeStub.callCount, 5, "all changes got removed");

@@ -730,6 +730,11 @@ sap.ui.define([
 		return sNewHref;
 	};
 
+	DocumentationRouter.prototype.destroy = function () {
+		this.detachPopstateHandler();
+		Router.prototype.destroy.apply(this, arguments);
+	};
+
 	// util
 	function getClosestParentLink(oAnchorElement, bSameWindow, iMaxDrillUp) {
 		var bIsAnchor = isAnchorElement(oAnchorElement, bSameWindow), iDrillUp = 0;

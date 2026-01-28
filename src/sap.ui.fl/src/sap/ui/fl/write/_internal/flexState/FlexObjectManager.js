@@ -116,7 +116,7 @@ sap.ui.define([
 		return bCondenseAnyLayer || [Layer.CUSTOMER, Layer.PUBLIC, Layer.USER].includes(aChanges[0].getLayer());
 	}
 
-	function updateCacheAndDeleteUnsavedChanges(aAllChanges, aCondensedChanges, bSkipUpdateCache, bAlreadyDeletedViaCondense, sReference) {
+	function updateCacheAndDeleteUnsavedChanges(aAllChanges, aCondensedChanges, bSkipUpdateCache, bAlreadyDeletedViaCondense, sReference, sComponentId) {
 		const aUpdates = aCondensedChanges.map((oDirtyChange) => createStorageUpdate(oDirtyChange, bSkipUpdateCache))
 		.filter(Boolean);
 
@@ -131,6 +131,7 @@ sap.ui.define([
 			} else {
 				FlexObjectManager.deleteFlexObjects({
 					reference: sReference,
+					componentId: sComponentId,
 					flexObjects: [oChange]
 				});
 			}
@@ -316,7 +317,8 @@ sap.ui.define([
 				aCondensedChanges,
 				mPropertyBag.skipUpdateCache,
 				bIsCondensingEnabled,
-				mPropertyBag.reference
+				mPropertyBag.reference,
+				mPropertyBag.appComponent.getId()
 			);
 			return oResponse || { response: [] };
 		}
@@ -528,6 +530,7 @@ sap.ui.define([
 	 *
 	 * @param {object} mPropertyBag - Object with parameters as properties
 	 * @param {string} mPropertyBag.reference - Flex reference of the application
+	 * @param {string} mPropertyBag.componentId - Id of the application instance
 	 * @param {sap.ui.fl.apply._internal.flexObjects.FlexObject[]} mPropertyBag.flexObjects - Flex objects to be deleted
 	 */
 	FlexObjectManager.deleteFlexObjects = function(mPropertyBag) {
@@ -562,6 +565,7 @@ sap.ui.define([
 	 *
 	 * @param {object} mPropertyBag - Object with parameters as properties
 	 * @param {string} mPropertyBag.reference - Flex reference of the application
+	 * @param {string} mPropertyBag.componentId - Id of the application instance
 	 * @param {sap.ui.fl.apply._internal.flexObjects.FlexObject[]} mPropertyBag.flexObjects - Flex objects to be restored
 	 */
 	FlexObjectManager.restoreDeletedFlexObjects = function(mPropertyBag) {

@@ -151,7 +151,11 @@ sap.ui.define([
 		// Determine items that are currently not visible in the filterbar, but should be visible in the panel
 		const aFilteredInvisibleItems = aP13nData.filter((oItem) => oItem.isFiltered && !oItem.visible).slice();
 		aFilteredInvisibleItems.forEach((oItem) => {
-			const oOldItem = this._getP13nModel().getProperty("/items").find((oExistingItem) => oExistingItem.name === oItem.name);
+			const aExistingItems = this._getP13nModel().getProperty("/items");
+			if (!aExistingItems) {
+				return;
+			}
+			const oOldItem = aExistingItems.find((oExistingItem) => oExistingItem.name === oItem.name);
 
 			if (!oOldItem || oOldItem.position == -1) {
 				return;

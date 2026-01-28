@@ -1053,6 +1053,170 @@ if (sModeName === "Modern") {
 		assert.ok(fnChangeSpy.calledOnce, "Change event fired on panel");
 		fnChangeSpy.restore();
 	});
+
+	QUnit.test("Test _enhanceP13nData: re-insert filtered invisible items at their old position", async function(assert){
+		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
+		this.oAFPanel.switchView("list");
+		await nextUIUpdate();
+
+		const oViewContent = this.oAFPanel.getCurrentViewContent();
+
+		const aTestData = [
+			{name: "field1", label: "Field 1", position: 0, visible: true, isFiltered: false},
+			{name: "field2", label: "Field 2", position: 1, visible: true, isFiltered: false},
+			{name: "field3", label: "Field 3", position: 2, visible: false, isFiltered: true},
+			{name: "field4", label: "Field 4", position: 3, visible: true, isFiltered: false},
+			{name: "field5", label: "Field 5", position: 4, visible: true, isFiltered: false}
+		];
+
+		// Set existing items in the model (simulating previous state where field3 was at position 2)
+		oViewContent._getP13nModel().setProperty("/items", [
+			{name: "field1", position: 0},
+			{name: "field2", position: 1},
+			{name: "field3", position: 2},
+			{name: "field4", position: 3},
+			{name: "field5", position: 4}
+		]);
+
+		// Act:
+		const aEnhancedData = oViewContent._enhanceP13nData(aTestData);
+
+		// Assert: Check that field3 maintains its old position
+		const oField3 = aEnhancedData.find((oItem) => oItem.name === "field3");
+		assert.equal(oField3.position, 2, "Filtered invisible item field3 maintains position 2");
+
+		const aPositions = aEnhancedData.map((oItem) => oItem.position);
+		const aSortedPositions = [...aPositions].sort((a, b) => {
+			if (a === -1) {
+				return 1;
+			}
+			if (b === -1) {
+				return -1;
+			}
+			return a - b;
+		});
+		assert.deepEqual(aPositions, aSortedPositions, "Items are sorted by position");
+	});
+
+	QUnit.test("Test _enhanceP13nData: handle multiple filtered invisible items", async function(assert){
+		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
+		this.oAFPanel.switchView("list");
+		await nextUIUpdate();
+
+		const oViewContent = this.oAFPanel.getCurrentViewContent();
+
+		const aTestData = [
+			{name: "field1", label: "Field 1", position: 0, visible: true, isFiltered: false},
+			{name: "field2", label: "Field 2", position: 1, visible: false, isFiltered: true},
+			{name: "field3", label: "Field 3", position: 2, visible: false, isFiltered: true},
+			{name: "field4", label: "Field 4", position: 3, visible: true, isFiltered: false}
+		];
+
+		oViewContent._getP13nModel().setProperty("/items", [
+			{name: "field1", position: 0},
+			{name: "field2", position: 1},
+			{name: "field3", position: 2},
+			{name: "field4", position: 3}
+		]);
+
+		// Act
+		const aEnhancedData = oViewContent._enhanceP13nData(aTestData);
+
+		// Assert:
+		const oField2 = aEnhancedData.find((oItem) => oItem.name === "field2");
+		const oField3 = aEnhancedData.find((oItem) => oItem.name === "field3");
+
+		assert.equal(oField2.position, 1, "First filtered invisible item maintains position 1");
+		assert.equal(oField3.position, 2, "Second filtered invisible item maintains position 2");
+	});
+
+	QUnit.test("Test _enhanceP13nData: ignore items with position -1", async function(assert){
+		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
+		this.oAFPanel.switchView("list");
+		await nextUIUpdate();
+
+		const oViewContent = this.oAFPanel.getCurrentViewContent();
+
+		const aTestData = [
+			{name: "field1", label: "Field 1", position: 0, visible: true, isFiltered: false},
+			{name: "field2", label: "Field 2", position: 1, visible: false, isFiltered: true}
+		];
+
+		oViewContent._getP13nModel().setProperty("/items", [
+			{name: "field1", position: 0},
+			{name: "field2", position: -1} // Not positioned
+		]);
+
+		// Act
+		const aEnhancedData = oViewContent._enhanceP13nData(aTestData);
+
+		// Assert:
+		const oField2 = aEnhancedData.find((oItem) => oItem.name === "field2");
+		assert.ok(oField2, "Field2 exists in enhanced data");
+		assert.ok(!oField2.oldPosition, "oldPosition temporary variable is cleaned up");
+	});
+
+	QUnit.test("Test _enhanceP13nData: position shifting for subsequent items", async function(assert){
+		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
+		this.oAFPanel.switchView("list");
+		await nextUIUpdate();
+
+		const oViewContent = this.oAFPanel.getCurrentViewContent();
+
+		// Setup:
+		const aTestData = [
+			{name: "field1", label: "Field 1", position: 0, visible: true, isFiltered: false},
+			{name: "field2", label: "Field 2", position: 2, visible: true, isFiltered: false}, // Will be shifted
+			{name: "field3", label: "Field 3", position: 1, visible: false, isFiltered: true}  // Will be inserted at position 1
+		];
+
+		oViewContent._getP13nModel().setProperty("/items", [
+			{name: "field1", position: 0},
+			{name: "field2", position: 1}, // Currently at position 1
+			{name: "field3", position: 1}  // Old position 1, now filtered
+		]);
+
+		// Act
+		const aEnhancedData = oViewContent._enhanceP13nData(aTestData);
+
+		// Assert:
+		const oField3 = aEnhancedData.find((oItem) => oItem.name === "field3");
+		assert.equal(oField3.position, 1, "Filtered item field3 is at position 1");
+
+		const aSortedByPosition = [...aEnhancedData].sort((a, b) => {
+			if (a.position === -1) {
+				return 1;
+			}
+			if (b.position === -1) {
+				return -1;
+			}
+			return a.position - b.position;
+		});
+		assert.deepEqual(aEnhancedData, aSortedByPosition, "Enhanced data is correctly sorted");
+	});
+
+	QUnit.test("Test _enhanceP13nData: no existing items in model", async function(assert){
+		this.oAFPanel.setP13nModel(new JSONModel(this.oP13nData));
+		this.oAFPanel.switchView("list");
+		await nextUIUpdate();
+
+		const oViewContent = this.oAFPanel.getCurrentViewContent();
+
+		const aTestData = [
+			{name: "field1", label: "Field 1", position: 0, visible: true, isFiltered: false},
+			{name: "field2", label: "Field 2", position: 1, visible: false, isFiltered: true}
+		];
+
+		// Clear existing items
+		oViewContent._getP13nModel().setProperty("/items", null);
+
+		// Act
+		const aEnhancedData = oViewContent._enhanceP13nData(aTestData);
+
+		// Assert:
+		assert.ok(aEnhancedData, "Enhanced data is returned");
+		assert.equal(aEnhancedData.length, 2, "All items are present");
+	});
 }
 
 	QUnit.module(`${sModeName} - 'AdaptFiltersPanel' instance with a custom model name`,{

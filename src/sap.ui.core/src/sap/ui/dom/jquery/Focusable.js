@@ -8,8 +8,8 @@ sap.ui.define([
 	"./hasTabIndex" // provides jQuery.fn.hasTabIndex
 ], function(Device, jQuery, isHidden) {
 	"use strict";
-/**
-	 * @type {WeakMap<Element, {bIsScrollable: boolean, scrollHeight: number, scrollWidth: number}>}
+	/**
+	 * @type {WeakMap<Element, {isScrollable: boolean, scrollHeight: number, scrollWidth: number, clientHeight: number, clientWidth: number}>}
 	 * @private
 	 * A WeakMap to cache the scrollable state and dimensions of DOM elements.
 	 * This helps to avoid expensive style recalculations.
@@ -25,6 +25,11 @@ sap.ui.define([
 	 * @private
 	 */
 	function isScrollable(oDomRef) {
+		// Safety check - make sure we have a valid Element
+		if (!oDomRef || !(oDomRef instanceof Element)) {
+			return false;
+		}
+
 		// Don't make scroll containers focusable in Safari due to known issues
 		if (Device.browser.safari) {
 			return false;
@@ -74,6 +79,17 @@ sap.ui.define([
 	}
 
 	/**
+	 * Checks if a given DOM element is focusable.
+	 *
+	 * @param {Element} oElement The DOM element to check.
+	 * @returns {boolean} `true` if the element is focusable, `false` otherwise.
+	 * @private
+	 */
+	function isFocusable(oElement) {
+		return !isHidden(oElement) && jQuery(oElement).hasTabIndex();
+	}
+
+	/**
 	 * This module provides the following API:
 	 * <ul>
 	 * <li>{@link jQuery#firstFocusableDomRef}</li>
@@ -88,7 +104,10 @@ sap.ui.define([
 	/**
 	 * Searches for a descendant of the given node that is an Element and focusable and visible.
 	 *
-	 * The search is executed 'depth first'.
+	 * The search is executed 'depth first'. For elements with shadow DOM, the shadow root is
+	 * traversed instead of light DOM children. Slotted elements within HTMLSlotElement are
+	 * also traversed. The search direction (forward/backward) is applied consistently across
+	 * light DOM, shadow DOM, and slotted elements.
 	 *
 	 * @param {Node} oContainer Node to search for a focusable descendant
 	 * @param {boolean} bForward Whether to search forward (true) or backwards (false)
@@ -106,6 +125,21 @@ sap.ui.define([
 		const bIncludeSelf = !!mOptions?.includeSelf,
 			bIncludeScroller = !!mOptions?.includeScroller;
 
+		// If the container itself is an HTMLElement with a shadow root (and we're not including self),
+		// prioritize traversing the shadow root over light DOM children.
+		// Note: Slotted elements in the light DOM are projected into the shadow DOM via slot elements,
+		// so they will be found when we traverse the shadow DOM tree.
+		if (!bIncludeSelf && oContainer instanceof HTMLElement && oContainer.shadowRoot) {
+			oFocusableDescendant = findFocusableDomRef(oContainer.shadowRoot, bForward, {
+				includeScroller: bIncludeScroller
+			});
+			if (oFocusableDescendant) {
+				return oFocusableDescendant;
+			}
+			// If nothing found in shadow root, return null (don't check light DOM as it's encapsulated)
+			return null;
+		}
+
 		if (bIncludeSelf) {
 			oChild = oContainer;
 		} else {
@@ -113,22 +147,39 @@ sap.ui.define([
 		}
 
 		while (oChild) {
-			if (oChild.nodeType == 1 && !isHidden(oChild)) {
-				if (jQuery(oChild).hasTabIndex()) {
-					return oChild;
-				}
+			const bIsSlot = oChild instanceof HTMLSlotElement;
 
-				oFocusableDescendant = findFocusableDomRef(oChild, bForward, {
-					includeScroller: bIncludeScroller
-				});
+			if (oChild.nodeType == 1 && isFocusable(oChild)) {
+				return oChild;
+			}
+
+			if (oChild.nodeType == 1 && (bIsSlot || !isHidden(oChild))) {
+				if (bIsSlot) {
+					// Handle slotted elements
+					const aAssigned = oChild.assignedElements({ flatten: true });
+					const aIterable = bForward ? aAssigned : aAssigned.reverse();
+					for (const oSlotted of aIterable) {
+						oFocusableDescendant = findFocusableDomRef(oSlotted, bForward, {
+							includeSelf: true,
+							includeScroller: bIncludeScroller
+						});
+						if (oFocusableDescendant) {
+							return oFocusableDescendant;
+						}
+					}
+				} else {
+					// Handle light DOM children (original logic)
+					oFocusableDescendant = findFocusableDomRef(oChild, bForward, {
+						includeScroller: bIncludeScroller
+					});
+					if (oFocusableDescendant) {
+						return oFocusableDescendant;
+					}
+				}
 
 				// check if it is a keyboard focusable scroll container
 				if (bIncludeScroller && !oFocusableDescendant && isScrollable(oChild)) {
 					return oChild;
-				}
-
-				if (oFocusableDescendant) {
-					return oFocusableDescendant;
 				}
 			}
 
@@ -195,4 +246,3 @@ sap.ui.define([
 	return jQuery;
 
 });
-

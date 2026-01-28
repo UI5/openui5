@@ -344,6 +344,7 @@ sap.ui.define([
 			});
 			const mPropertyBagSecond = {
 				reference: sComponentId,
+				componentId: sComponentId,
 				persistencyKey: sPersistencyKey,
 				changeSpecificData: {
 					content: { filter: "second update" },
@@ -399,6 +400,7 @@ sap.ui.define([
 					filter: "first update"
 				},
 				reference: sComponentId,
+				componentId: sComponentId,
 				persistencyKey: sPersistencyKey
 			});
 			const oFlexObjectDataSelector = FlexState.getFlexObjectsDataSelector();
@@ -407,6 +409,7 @@ sap.ui.define([
 
 			const oCustomerView = CompVariantManager.addVariant({
 				reference: sComponentId,
+				componentId: sComponentId,
 				persistencyKey: sPersistencyKey,
 				changeSpecificData: {
 					content: { filter: "second update" },
@@ -477,6 +480,7 @@ sap.ui.define([
 				},
 				layer: Layer.PUBLIC,
 				reference: sComponentId,
+				componentId: sComponentId,
 				persistencyKey: sPersistencyKey,
 				control: {
 					getCurrentVariantId() {
@@ -494,6 +498,7 @@ sap.ui.define([
 				isUserDependent: true,
 				favorite: true,
 				reference: sComponentId,
+				componentId: sComponentId,
 				persistencyKey: sPersistencyKey
 			});
 			CompVariantManager.updateVariant({
@@ -503,6 +508,7 @@ sap.ui.define([
 					filter: "abc"
 				},
 				reference: sComponentId,
+				componentId: sComponentId,
 				persistencyKey: sPersistencyKey
 			});
 			CompVariantManager.updateVariant({
@@ -510,6 +516,7 @@ sap.ui.define([
 				isUserDependent: true,
 				favorite: false,
 				reference: sComponentId,
+				componentId: sComponentId,
 				persistencyKey: sPersistencyKey
 			});
 			assert.equal(
@@ -578,6 +585,7 @@ sap.ui.define([
 					content: {}
 				},
 				reference: sComponentId,
+				componentId: sComponentId,
 				persistencyKey: sPersistencyKey,
 				control: {
 					getCurrentVariantId() {
@@ -598,11 +606,13 @@ sap.ui.define([
 				isUserDependent: true,
 				favorite: true,
 				reference: sComponentId,
+				componentId: sComponentId,
 				persistencyKey: sPersistencyKey
 			});
 			assert.equal(FlexObjectManager.hasDirtyFlexObjects({ reference: sComponentId }), true, "hasDirtyChanges is true after update variant");
 			CompVariantManager.setDefault({
 				reference: sComponentId,
+				componentId: sComponentId,
 				persistencyKey: sPersistencyKey,
 				defaultVariantId: "id_123_pageVariant",
 				conntent: {}
@@ -695,6 +705,7 @@ sap.ui.define([
 					content: {}
 				},
 				reference: sComponentId,
+				componentId: sComponentId,
 				persistencyKey: sPersistencyKey,
 				control: {
 					getCurrentVariantId() {
@@ -743,6 +754,7 @@ sap.ui.define([
 				},
 				layer: Layer.CUSTOMER,
 				reference: sComponentId,
+				componentId: sComponentId,
 				persistencyKey: sPersistencyKey,
 				control: {
 					getCurrentVariantId() {
@@ -753,6 +765,7 @@ sap.ui.define([
 
 			CompVariantManager.updateVariant({
 				reference: sComponentId,
+				componentId: sComponentId,
 				persistencyKey: sPersistencyKey,
 				id: oVariant.getId(),
 				favorite: true,
@@ -761,6 +774,7 @@ sap.ui.define([
 
 			CompVariantManager.updateVariant({
 				reference: sComponentId,
+				componentId: sComponentId,
 				persistencyKey: sPersistencyKey,
 				id: oVariant.getId(),
 				favorite: false,
@@ -769,6 +783,7 @@ sap.ui.define([
 
 			CompVariantManager.removeVariant({
 				reference: sComponentId,
+				componentId: sComponentId,
 				persistencyKey: sPersistencyKey,
 				id: oVariant.getId(),
 				layer: Layer.CUSTOMER
@@ -820,6 +835,7 @@ sap.ui.define([
 
 			var oChange = CompVariantManager.setDefault({
 				reference: sComponentId,
+				componentId: sComponentId,
 				defaultVariantId: this.sVariantId1,
 				persistencyKey: this.sPersistencyKey,
 				layer: Layer.CUSTOMER,
@@ -848,6 +864,7 @@ sap.ui.define([
 
 			var oChange2 = CompVariantManager.setDefault({
 				reference: sComponentId,
+				componentId: sComponentId,
 				defaultVariantId: this.sVariantId2,
 				persistencyKey: this.sPersistencyKey,
 				layer: Layer.CUSTOMER,
@@ -880,6 +897,7 @@ sap.ui.define([
 		QUnit.test("Given setDefault is called once for USER layer and once for CUSTOMER layer", function(assert) {
 			var oChange = CompVariantManager.setDefault({
 				reference: sComponentId,
+				componentId: sComponentId,
 				defaultVariantId: this.sVariantId1,
 				persistencyKey: this.sPersistencyKey,
 				layer: Layer.CUSTOMER
@@ -888,6 +906,7 @@ sap.ui.define([
 
 			var oChange2 = CompVariantManager.setDefault({
 				reference: sComponentId,
+				componentId: sComponentId,
 				defaultVariantId: this.sVariantId2,
 				persistencyKey: this.sPersistencyKey,
 				layer: Layer.USER
@@ -905,6 +924,7 @@ sap.ui.define([
 		QUnit.test("Given setDefault is called with a already transported Change", function(assert) {
 			var oChange = CompVariantManager.setDefault({
 				reference: sComponentId,
+				componentId: sComponentId,
 				defaultVariantId: this.sVariantId1,
 				persistencyKey: this.sPersistencyKey,
 				layer: Layer.CUSTOMER
@@ -916,6 +936,7 @@ sap.ui.define([
 
 			var oChange2 = CompVariantManager.setDefault({
 				reference: sComponentId,
+				componentId: sComponentId,
 				defaultVariantId: this.sVariantId2,
 				persistencyKey: this.sPersistencyKey,
 				layer: Layer.CUSTOMER
@@ -934,6 +955,7 @@ sap.ui.define([
 		QUnit.test("Given I have a USER Layer setDefault and create a CUSTOMER setDefault", function(assert) {
 			var oChange = CompVariantManager.setDefault({
 				reference: sComponentId,
+				componentId: sComponentId,
 				defaultVariantId: this.sVariantId1,
 				persistencyKey: this.sPersistencyKey,
 				layer: Layer.USER
@@ -942,6 +964,7 @@ sap.ui.define([
 
 			var oChange2 = CompVariantManager.setDefault({
 				reference: sComponentId,
+				componentId: sComponentId,
 				defaultVariantId: this.sVariantId2,
 				persistencyKey: this.sPersistencyKey,
 				layer: Layer.CUSTOMER
@@ -975,6 +998,7 @@ sap.ui.define([
 					favorite: true
 				},
 				reference: sComponentId,
+				componentId: sComponentId,
 				persistencyKey: this.sPersistencyKey,
 				control: {
 					getCurrentVariantId() {
@@ -1014,6 +1038,7 @@ sap.ui.define([
 			// Set favorite to false
 			CompVariantManager.updateVariant({
 				reference: sComponentId,
+				componentId: sComponentId,
 				persistencyKey: this.sPersistencyKey,
 				id: this.oVariant.getVariantId(),
 				favorite: false,
@@ -1041,6 +1066,7 @@ sap.ui.define([
 			// Set favorite to false
 			CompVariantManager.updateVariant({
 				reference: sComponentId,
+				componentId: sComponentId,
 				persistencyKey: this.sPersistencyKey,
 				id: this.oVariant.getVariantId(),
 				favorite: false,
@@ -1061,6 +1087,7 @@ sap.ui.define([
 			var oUpdatedContent = { test: "wee" };
 			CompVariantManager.updateVariant({
 				reference: sComponentId,
+				componentId: sComponentId,
 				persistencyKey: this.sPersistencyKey,
 				id: this.oVariant.getVariantId(),
 				favorite: false,
@@ -1075,6 +1102,7 @@ sap.ui.define([
 			assert.strictEqual(this.oVariant.getExecuteOnSelection(), true, "the executeOnSelection is correct");
 			CompVariantManager.updateVariant({
 				reference: sComponentId,
+				componentId: sComponentId,
 				persistencyKey: this.sPersistencyKey,
 				id: this.oVariant.getVariantId(),
 				favorite: true,
@@ -1094,6 +1122,7 @@ sap.ui.define([
 			// the non-updatable change
 			CompVariantManager.updateVariant({
 				reference: sComponentId,
+				componentId: sComponentId,
 				persistencyKey: this.sPersistencyKey,
 				id: this.oVariant.getVariantId(),
 				favorite: false,
@@ -1109,6 +1138,7 @@ sap.ui.define([
 			// because the update is within another layer, the previous change cannot be updated
 			CompVariantManager.updateVariant({
 				reference: sComponentId,
+				componentId: sComponentId,
 				persistencyKey: this.sPersistencyKey,
 				id: this.oVariant.getVariantId(),
 				favorite: true,
@@ -1130,11 +1160,13 @@ sap.ui.define([
 					favorite: false
 				},
 				reference: sComponentId,
+				componentId: sComponentId,
 				persistencyKey: this.sPersistencyKey
 			};
 			var oPublicVariant = CompVariantManager.addVariant(oPublicVariantData);
 			CompVariantManager.updateVariant({
 				reference: sComponentId,
+				componentId: sComponentId,
 				persistencyKey: this.sPersistencyKey,
 				id: oPublicVariant.getVariantId(),
 				favorite: true,
@@ -1175,6 +1207,7 @@ sap.ui.define([
 					favorite: true
 				},
 				reference: sComponentId,
+				componentId: sComponentId,
 				persistencyKey: this.sPersistencyKey,
 				control: {
 					getCurrentVariantId() {
@@ -1193,6 +1226,7 @@ sap.ui.define([
 					favorite: true
 				},
 				reference: sComponentId,
+				componentId: sComponentId,
 				persistencyKey: this.sPersistencyKey,
 				control: {
 					getCurrentVariantId() {
@@ -1224,6 +1258,7 @@ sap.ui.define([
 				CompVariantManager.updateVariant({
 					id: sVariantId,
 					reference: sComponentId,
+					componentId: sComponentId,
 					persistencyKey: this.sPersistencyKey,
 					layer: Layer.CUSTOMER,
 					favorite: false,
@@ -1245,6 +1280,7 @@ sap.ui.define([
 				CompVariantManager.updateVariant({
 					id: sVariantId,
 					reference: sComponentId,
+					componentId: sComponentId,
 					persistencyKey: this.sPersistencyKey,
 					layer: Layer.CUSTOMER,
 					content: {
@@ -1291,6 +1327,7 @@ sap.ui.define([
 				CompVariantManager.updateVariant({
 					id: sNewVariantId,
 					reference: sComponentId,
+					componentId: sComponentId,
 					persistencyKey: this.sPersistencyKey,
 					layer: Layer.CUSTOMER,
 					content: {
@@ -1307,6 +1344,7 @@ sap.ui.define([
 				CompVariantManager.updateVariant({
 					id: sNewVariantId,
 					reference: sComponentId,
+					componentId: sComponentId,
 					persistencyKey: this.sPersistencyKey,
 					layer: Layer.CUSTOMER,
 					action: CompVariantManager.updateActionType.SAVE
@@ -1320,6 +1358,7 @@ sap.ui.define([
 				CompVariantManager.updateVariant({
 					id: sNewVariantId,
 					reference: sComponentId,
+					componentId: sComponentId,
 					persistencyKey: this.sPersistencyKey,
 					layer: Layer.CUSTOMER,
 					content: {
@@ -1387,6 +1426,7 @@ sap.ui.define([
 				CompVariantManager.updateVariant({
 					id: sNewVariantId,
 					reference: sComponentId,
+					componentId: sComponentId,
 					persistencyKey: this.sPersistencyKey,
 					layer: Layer.CUSTOMER,
 					favorite: false,
@@ -1401,6 +1441,7 @@ sap.ui.define([
 				CompVariantManager.updateVariant({
 					id: sNewVariantId,
 					reference: sComponentId,
+					componentId: sComponentId,
 					persistencyKey: this.sPersistencyKey,
 					layer: Layer.CUSTOMER,
 					action: CompVariantManager.updateActionType.SAVE
@@ -1418,6 +1459,7 @@ sap.ui.define([
 				CompVariantManager.updateVariant({
 					id: sNewVariantId,
 					reference: sComponentId,
+					componentId: sComponentId,
 					persistencyKey: this.sPersistencyKey,
 					layer: Layer.CUSTOMER,
 					content: {
@@ -1439,6 +1481,7 @@ sap.ui.define([
 				CompVariantManager.updateVariant({
 					id: sNewVariantId,
 					reference: sComponentId,
+					componentId: sComponentId,
 					persistencyKey: this.sPersistencyKey,
 					layer: Layer.CUSTOMER,
 					action: CompVariantManager.updateActionType.SAVE
@@ -1480,6 +1523,7 @@ sap.ui.define([
 				CompVariantManager.updateVariant({
 					id: sNewVariantId,
 					reference: sComponentId,
+					componentId: sComponentId,
 					persistencyKey: this.sPersistencyKey,
 					layer: Layer.CUSTOMER,
 					name: "myNewName",
@@ -1524,6 +1568,7 @@ sap.ui.define([
 					favorite: true
 				},
 				reference: sComponentId,
+				componentId: sComponentId,
 				persistencyKey: this.sPersistencyKey,
 				control: {
 					getCurrentVariantId() {
@@ -1551,6 +1596,7 @@ sap.ui.define([
 			);
 			CompVariantManager.updateVariant({
 				reference: sComponentId,
+				componentId: sComponentId,
 				persistencyKey: this.sPersistencyKey,
 				id: oVariant.getVariantId(),
 				executeOnSelection: true,
@@ -1567,6 +1613,7 @@ sap.ui.define([
 
 			CompVariantManager.updateVariant({
 				reference: sComponentId,
+				componentId: sComponentId,
 				persistencyKey: this.sPersistencyKey,
 				id: oVariant.getVariantId(),
 				favorite: false,
@@ -1616,6 +1663,7 @@ sap.ui.define([
 			CompVariantManager.updateVariant({
 				id: sVariantId,
 				reference: sComponentId,
+				componentId: sComponentId,
 				persistencyKey: this.sPersistencyKey,
 				layer: Layer.CUSTOMER,
 				favorite: false,
@@ -1631,6 +1679,7 @@ sap.ui.define([
 			CompVariantManager.updateVariant({
 				id: sVariantId,
 				reference: sComponentId,
+				componentId: sComponentId,
 				persistencyKey: this.sPersistencyKey,
 				layer: Layer.CUSTOMER,
 				favorite: true,
@@ -1669,6 +1718,7 @@ sap.ui.define([
 			CompVariantManager.updateVariant({
 				id: sVariantId,
 				reference: sComponentId,
+				componentId: sComponentId,
 				persistencyKey: this.sPersistencyKey,
 				favorite: false,
 				layer: Layer.CUSTOMER,
@@ -1738,6 +1788,7 @@ sap.ui.define([
 					isUserDependent: true,
 					id: sVariantId,
 					reference: sComponentId,
+					componentId: sComponentId,
 					layer: Layer.CUSTOMER,
 					persistencyKey: this.sPersistencyKey,
 					favorite: true,
@@ -1754,6 +1805,7 @@ sap.ui.define([
 					isUserDependent: true,
 					id: sVariantId,
 					reference: sComponentId,
+					componentId: sComponentId,
 					persistencyKey: this.sPersistencyKey,
 					layer: Layer.USER,
 					favorite: false,
@@ -1794,6 +1846,7 @@ sap.ui.define([
 					isUserDependent: true,
 					id: sVariantId,
 					reference: sComponentId,
+					componentId: sComponentId,
 					persistencyKey: this.sPersistencyKey,
 					favorite: false,
 					content: {
@@ -1856,6 +1909,7 @@ sap.ui.define([
 			// adding a change to test, that the remove-function not existent in changes is not called = the test does not die
 			CompVariantManager.updateVariant({
 				reference: sComponentId,
+				componentId: sComponentId,
 				executeOnSelection: true,
 				persistencyKey: this.sPersistencyKey,
 				id: oVariant.getVariantId(),
@@ -1979,6 +2033,7 @@ sap.ui.define([
 
 			CompVariantManager.updateVariant({
 				reference: sComponentId,
+				componentId: sComponentId,
 				persistencyKey: this.sPersistencyKey,
 				id: oStandardVariant.getVariantId(),
 				executeOnSelection: true
@@ -2016,6 +2071,7 @@ sap.ui.define([
 
 			CompVariantManager.updateVariant({
 				reference: sComponentId,
+				componentId: sComponentId,
 				persistencyKey: this.sPersistencyKey,
 				id: oStandardVariant.getVariantId(),
 				executeOnSelection: true
@@ -2065,6 +2121,7 @@ sap.ui.define([
 					executeOnSelection: false
 				},
 				reference: sComponentId,
+				componentId: sComponentId,
 				persistencyKey: this.sPersistencyKey,
 				control: {
 					getCurrentVariantId() {
@@ -2087,6 +2144,7 @@ sap.ui.define([
 			sandbox.stub(this.oVariant, "getState").returns(States.LifecycleState.UPDATED);
 			CompVariantManager.updateVariant({
 				reference: sComponentId,
+				componentId: sComponentId,
 				persistencyKey: this.sPersistencyKey,
 				id: this.oVariant.getId(),
 				executeOnSelection: true,
@@ -2107,6 +2165,7 @@ sap.ui.define([
 
 			CompVariantManager.updateVariant({
 				reference: sComponentId,
+				componentId: sComponentId,
 				persistencyKey: this.sPersistencyKey,
 				id: this.oVariant.getId(),
 				executeOnSelection: true,
@@ -2130,6 +2189,7 @@ sap.ui.define([
 			var oSetExecuteOnSelectionSpy = sandbox.spy(this.oVariant, "setExecuteOnSelection");
 			CompVariantManager.updateVariant({
 				reference: sComponentId,
+				componentId: sComponentId,
 				persistencyKey: this.sPersistencyKey,
 				id: this.oVariant.getId(),
 				executeOnSelection: true,
@@ -2137,6 +2197,7 @@ sap.ui.define([
 			});
 			CompVariantManager.updateVariant({
 				reference: sComponentId,
+				componentId: sComponentId,
 				persistencyKey: this.sPersistencyKey,
 				id: this.oVariant.getId(),
 				content: oUpdatedContent,
@@ -2172,6 +2233,7 @@ sap.ui.define([
 					layer: Layer.CUSTOMER
 				},
 				reference: sComponentId,
+				componentId: sComponentId,
 				persistencyKey: sPersistencyKey,
 				control: {
 					getCurrentVariantId() {
@@ -2181,6 +2243,7 @@ sap.ui.define([
 			});
 			CompVariantManager.updateVariant({
 				reference: sComponentId,
+				componentId: sComponentId,
 				persistencyKey: sPersistencyKey,
 				id: this.oVariant.getId(),
 				executeOnSelection: true,
@@ -2188,6 +2251,7 @@ sap.ui.define([
 			});
 			CompVariantManager.setDefault({
 				reference: sComponentId,
+				componentId: sComponentId,
 				persistencyKey: sPersistencyKey,
 				defaultVariantId: "id_123_pageVariant",
 				conntent: {},

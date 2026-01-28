@@ -371,6 +371,7 @@ sap.ui.define([
 
 		FlexObjectManager.deleteFlexObjects({
 			reference: sFlexReference,
+			componentId: oAppComponent.getId(),
 			flexObjects: aFlexObjects
 		});
 		return Promise.resolve();

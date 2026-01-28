@@ -14,7 +14,6 @@ sap.ui.define([
 	"sap/ui/fl/apply/_internal/flexState/FlexObjectState",
 	"sap/ui/fl/apply/_internal/flexState/FlexState",
 	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
-	"sap/ui/fl/initial/_internal/ManifestUtils",
 	"sap/ui/fl/initial/_internal/Settings",
 	"sap/ui/fl/variants/VariantManagement",
 	"sap/ui/fl/variants/VariantManager",
@@ -40,7 +39,6 @@ sap.ui.define([
 	FlexObjectState,
 	FlexState,
 	ControlVariantApplyAPI,
-	ManifestUtils,
 	Settings,
 	VariantManagement,
 	VariantManager,
@@ -481,11 +479,11 @@ sap.ui.define([
 
 			sandbox.stub(FlexObjectManager, "saveFlexObjects").callsFake((oPropertyBag) => {
 				assert.ok(
-					oDeleteVariantSpy.calledWith(sReference, sVMReference, "variant3"),
+					oDeleteVariantSpy.calledWith(sReference, sReference, sVMReference, "variant3"),
 					"then the variant and related objects were deleted"
 				);
 				assert.notOk(
-					oDeleteVariantSpy.calledWith(sReference, sVMReference, "variant2"),
+					oDeleteVariantSpy.calledWith(sReference, sReference, sVMReference, "variant2"),
 					"then the PUBLIC variant is only hidden and not deleted"
 				);
 
@@ -552,7 +550,7 @@ sap.ui.define([
 			);
 			assert.ok(
 				oDeleteFlexObjectsSpy.calledWith({
-					reference: sReference, flexObjects: aChanges.reverse()
+					reference: sReference, componentId: sReference, flexObjects: aChanges.reverse()
 				}), // the last change is reverted first
 				"then dirty changes from source variant were deleted from the persistence (in the right order)"
 			);
@@ -623,7 +621,7 @@ sap.ui.define([
 			);
 			assert.ok(
 				oDeleteFlexObjectsSpy.calledWith({
-					reference: sReference, flexObjects: aChanges.reverse()
+					reference: sReference, componentId: sReference, flexObjects: aChanges.reverse()
 				}), // the last change is reverted first
 				"then dirty changes from source variant were deleted from the persistence (in the right order)"
 			);
@@ -742,7 +740,7 @@ sap.ui.define([
 			);
 			assert.ok(
 				oDeleteFlexObjectsSpy.calledWith({
-					reference: sReference, flexObjects: aChanges.reverse()
+					reference: sReference, componentId: sReference, flexObjects: aChanges.reverse()
 				}), // the last change is reverted first
 				"then dirty changes from source variant were deleted from the persistence (in the right order)"
 			);
@@ -807,7 +805,7 @@ sap.ui.define([
 			);
 			assert.ok(
 				oDeleteFlexObjectsSpy.calledWith({
-					reference: sReference, flexObjects: aChanges.reverse()
+					reference: sReference, componentId: sReference, flexObjects: aChanges.reverse()
 				}), // the last change is reverted first
 				"then dirty changes from source variant were deleted from the persistence (in the right order)"
 			);

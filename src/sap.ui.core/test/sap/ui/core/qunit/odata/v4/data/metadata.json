@@ -812,6 +812,10 @@
 				"@com.sap.vocabularies.Hierarchy.v1.RecursiveHierarchyActions#OrgChart" : {
 					"ChangeNextSiblingAction" : "com.sap.gateway.default.iwbep.tea_busi.v0001.__FAKE__AcChangeNextSibling",
 					"CopyAction": "com.sap.gateway.default.iwbep.tea_busi.v0001.__FAKE__AcCopy"
+				},
+				"@com.sap.vocabularies.Common.v1.SideEffects#n/a" : {
+					"SourceEntities" : [null],
+					"TargetEntities" : [{"$Null" : null, "@self.Reason": "Private"}]
 				}
 			},
 			"com.sap.gateway.default.iwbep.tea_busi.v0001.Worker/LOCATION/COUNTRY" : {

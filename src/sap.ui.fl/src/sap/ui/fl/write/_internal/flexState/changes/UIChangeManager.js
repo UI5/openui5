@@ -95,6 +95,7 @@ sap.ui.define([
 	UIChangeManager.restoreDeletedChanges = function(sReference, aChanges, oAppComponent) {
 		FlexObjectManager.restoreDeletedFlexObjects({
 			reference: sReference,
+			componentId: oAppComponent.getId(),
 			flexObjects: aChanges
 		});
 		const aDirtyChanges = aChanges.filter((oChange) => oChange.getState() !== States.LifecycleState.PERSISTED);
