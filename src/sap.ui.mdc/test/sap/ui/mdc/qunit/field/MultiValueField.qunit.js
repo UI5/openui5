@@ -357,6 +357,39 @@ sap.ui.define([
 		assert.equal(aTokens.length, 1, "Tokens created");
 		assert.equal(aTokens[0].getText(), "0", "Token0 text"); // as Integer formats undefined into 0
 
+		// no description without ValueHelp
+		oModel.setData({
+			items: [{key: 1, description: null}] // fake pending data
+		});
+		oModel.checkUpdate(true);
+
+		await new Promise((resolve) => {setTimeout(resolve,0);});
+
+		// ui5lint-disable-next-line no-deprecated-api
+		aConditions = oFieldEdit.getConditions();
+		assert.equal(aConditions.length, 1, "Conditions created");
+		assert.equal(aConditions[0].operator, OperatorName.EQ, "Condition0 operator");
+		assert.equal(aConditions[0].values[0], 1, "Condition0 value0");
+		assert.equal(aConditions[0].values.length, 1, "Condition0 no value1");
+		assert.equal(aConditions[0].validated, ConditionValidated.NotValidated, "Condition0 validated");
+
+		// no description with ValueHelp
+		oFieldEdit.setValueHelp("X"); // just set dummy to have ValueHelp
+		oModel.setData({
+			items: [{key: 2, description: null}] // fake pending data
+		});
+		oModel.checkUpdate(true);
+
+		await new Promise((resolve) => {setTimeout(resolve,0);});
+
+		// ui5lint-disable-next-line no-deprecated-api
+		aConditions = oFieldEdit.getConditions();
+		assert.equal(aConditions.length, 1, "Conditions created");
+		assert.equal(aConditions[0].operator, OperatorName.EQ, "Condition0 operator");
+		assert.equal(aConditions[0].values[0], 2, "Condition0 value0");
+		assert.equal(aConditions[0].values.length, 1, "Condition0 no value1");
+		assert.equal(aConditions[0].validated, ConditionValidated.Validated, "Condition0 validated");
+
 	});
 
 	QUnit.module("user interaction", {
@@ -522,8 +555,8 @@ sap.ui.define([
 		let aConditions = oField.getConditions();
 		assert.equal(aConditions.length, 4, "Conditions created");
 		assert.equal(aConditions[3].values[0], 10, "Condition3 value0");
-		assert.equal(aConditions[3].values[1], undefined, "Condition3 value1");
-		assert.equal(aConditions[3].validated, ConditionValidated.Validated, "Condition3 validated");
+		assert.equal(aConditions[3].values.length, 1, "Condition3  no value1");
+		assert.equal(aConditions[3].validated, ConditionValidated.NotValidated, "Condition3 validated");
 
 		oContent.setDOMValue("10");
 		qutils.triggerKeydown(oContent.getFocusDomRef().id, KeyCodes.ENTER, false, false, false);
@@ -534,8 +567,8 @@ sap.ui.define([
 		aConditions = oField.getConditions();
 		assert.equal(aConditions.length, 4, "Conditions created");
 		assert.equal(aConditions[3].values[0], 10, "Condition3 value0");
-		assert.equal(aConditions[3].values[1], undefined, "Condition3 value1");
-		assert.equal(aConditions[3].validated, ConditionValidated.Validated, "Condition3 validated");
+		assert.equal(aConditions[3].values.length, 1, "Condition3  no value1");
+		assert.equal(aConditions[3].validated, ConditionValidated.NotValidated, "Condition3 validated");
 		assert.equal(iParseError, 1, "ParseError fired");
 
 		oField.destroy();

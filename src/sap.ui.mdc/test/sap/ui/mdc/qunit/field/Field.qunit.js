@@ -455,27 +455,54 @@ sap.ui.define([
 		sinon.spy(oDelegate, "createCondition");
 
 		oFieldEdit.setValue("Test");
-		oFieldEdit.setAdditionalValue("Hello");
 
 		return new Promise((resolve) => {
 			setTimeout(() => { // async set of condition
 				assert.ok(oDelegate.createCondition.called, "createCondition was called");
 				assert.ok(oDelegate.createConditionPayload.called, "createConditionPayload was called");
 				assert.equal(oDelegate.createCondition.lastCall.args[1], oFieldEdit, "Correct control instance was given");
-				assert.deepEqual(oDelegate.createCondition.lastCall.args[2], ["Test", "Hello"], "Correct value configuration was given");
-				assert.deepEqual(oDelegate.createCondition.lastCall.args[3], {
-					"operator": OperatorName.EQ,
-					"values": [
-						"Test"
-					],
-					"isEmpty": null,
-					"validated": "Validated",
-					"payload": oTestPayload
-				}, "Correct current condition was given");
-				assert.deepEqual(oFieldEdit.getConditions()[0].payload, oTestPayload, "Correct payload found on updated condition");
-				oDelegate.createConditionPayload.restore();
-				oDelegate.createCondition.restore();
-				resolve();
+				assert.deepEqual(oDelegate.createCondition.lastCall.args[2], ["Test", null], "Correct value configuration was given");
+				assert.deepEqual(oDelegate.createCondition.lastCall.args[3], undefined, "Correct current condition was given");
+				const oCondition = oFieldEdit.getConditions()[0];
+				assert.deepEqual(oCondition.payload, oTestPayload, "Correct payload found on updated condition");
+				assert.deepEqual(oCondition.validated, ConditionValidated.NotValidated, "Correct validated on updated condition");
+				oDelegate.createCondition.resetHistory();
+				oDelegate.createConditionPayload.resetHistory();
+
+				oFieldEdit.setAdditionalValue("Hello");
+				setTimeout(() => { // async set of condition
+					assert.ok(oDelegate.createCondition.called, "createCondition was called");
+					assert.ok(oDelegate.createConditionPayload.called, "createConditionPayload was called");
+					assert.equal(oDelegate.createCondition.lastCall.args[1], oFieldEdit, "Correct control instance was given");
+					assert.deepEqual(oDelegate.createCondition.lastCall.args[2], ["Test", "Hello"], "Correct value configuration was given");
+					assert.deepEqual(oDelegate.createCondition.lastCall.args[3], {
+						"operator": OperatorName.EQ,
+						"values": [
+							"Test"
+						],
+						"isEmpty": null,
+						"validated": ConditionValidated.NotValidated, // as Display=Value no timeout
+						"payload": oTestPayload
+					}, "Correct current condition was given");
+					const oCondition = oFieldEdit.getConditions()[0];
+					assert.deepEqual(oCondition.payload, oTestPayload, "Correct payload found on updated condition");
+					assert.deepEqual(oCondition.validated, ConditionValidated.Validated, "Correct validated on updated condition");
+					oDelegate.createCondition.resetHistory();
+					oDelegate.createConditionPayload.resetHistory();
+
+					oFieldEdit.setValueHelp("X"); // jut set dummy to test condition creation
+					oFieldEdit.setValue("Test 2");
+					oFieldEdit.setAdditionalValue(null);
+
+					setTimeout(() => { // async set of condition
+						const oCondition = oFieldEdit.getConditions()[0];
+						assert.deepEqual(oCondition.payload, oTestPayload, "Correct payload found on updated condition");
+						assert.deepEqual(oCondition.validated, ConditionValidated.Validated, "Correct validated on updated condition");
+						oDelegate.createConditionPayload.restore();
+						oDelegate.createCondition.restore();
+						resolve();
+					}, 0);
+				}, 0);
 			}, 0);
 		});
 	});

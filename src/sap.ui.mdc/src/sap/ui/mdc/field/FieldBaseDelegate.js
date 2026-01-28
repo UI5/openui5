@@ -11,19 +11,23 @@ sap.ui.define([
 	'sap/ui/mdc/DefaultTypeMap',
 	'sap/ui/mdc/condition/Condition',
 	'sap/ui/mdc/condition/FilterOperatorUtil',
+	'sap/ui/mdc/enums/BaseType',
 	'sap/ui/mdc/enums/ConditionValidated',
 	'sap/ui/mdc/enums/FieldDisplay',
+	'sap/ui/mdc/enums/OperatorName',
 	'sap/ui/model/FormatException',
-	'sap/ui/mdc/enums/OperatorName'
+	'sap/base/util/deepEqual'
 ], (
 	BaseDelegate,
 	DefaultTypeMap,
 	Condition,
 	FilterOperatorUtil,
+	BaseType,
 	ConditionValidated,
 	FieldDisplay,
+	OperatorName,
 	FormatException,
-	OperatorName
+	deepEqual
 ) => {
 	"use strict";
 
@@ -85,7 +89,8 @@ sap.ui.define([
 	};
 
 	/**
-	 * Enables applications to control condition updates based on <code>value</code> / <code>additionalvalue</code> property changes.
+	 * Enables applications to control condition updates based on {@link sap.ui.mdc.Field#getValue value} / {@link sap.ui.mdc.Field#getAdditionalValue additionalValue} property changes of a {@link sap.ui.mdc.Field Field}
+	 * or {@link sap.ui.mdc.field.MultiValueFieldItem#getKey key} / {@link sap.ui.mdc.field.MultiValueFieldItem#getDescription description} property changes of a {@link sap.ui.mdc.MultiValueField MultiValueField}.
 	 * <br/>By default, this method returns a condition with an <code>EQ</code> operator.
 	 *
 	 * <b>Note:</b> Custom implementations of this method may lead to intransparency as a field's condition may then differ from the state of the <code>value</code> / <code>additionalvalue</code> properties.
@@ -101,7 +106,16 @@ sap.ui.define([
 	 */
 	FieldBaseDelegate.createCondition = function(oField, oControl, aValues, oCurrentCondition) {
 		const oNextCondition = Condition.createItemCondition(aValues[0], aValues[1], undefined, undefined, this.createConditionPayload(oField, oControl, aValues));
-		oNextCondition.validated = ConditionValidated.Validated;
+
+		if (oCurrentCondition && deepEqual(oNextCondition.values, oCurrentCondition.values)) {
+			// If same data like current condition use validated of current condition
+			oNextCondition.validated = oCurrentCondition.validated;
+		} else if (oField.getValueHelp() || oField.getBaseType() === BaseType.Boolean) {
+			// if a ValueHelp is available conditions are set to "Validated" to show them as selected in the ValueHelp table
+			// Boolean values are always validated as here a Default-ValueHelp is used
+			oNextCondition.validated = ConditionValidated.Validated;
+		}
+
 		return oNextCondition;
 	};
 
