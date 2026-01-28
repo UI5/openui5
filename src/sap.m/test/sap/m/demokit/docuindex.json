@@ -971,6 +971,8 @@
 		  "since": "1.12",
 		  "samples": [
 			"sap.m.sample.ObjectNumber",
+			"sap.m.sample.ObjectNumberCurrency",
+			"sap.m.sample.ObjectNumberUnit",
 			"sap.m.sample.Table"
 		  ]
 		},
@@ -2507,8 +2509,18 @@
 		},
 		{
 		  "id": "sap.m.sample.ObjectNumber",
-		  "name": "Object Number",
+		  "name": "Object Number - Default Mode",
 		  "description": "The object number is a small building block representing an important, numerical attribute of an object together with it's unit. Often it is used in the last column of a table."
+		},
+		{
+		  "id": "sap.m.sample.ObjectNumberCurrency",
+		  "name": "Object Number - Currency Mode",
+		  "description": "Shows ObjectNumber with displayMode Currency, demonstrating currency symbol vs ISO code rendering and decimal alignment across different currencies."
+		},
+		{
+		  "id": "sap.m.sample.ObjectNumberUnit",
+		  "name": "Object Number - Unit Mode",
+		  "description": "Shows ObjectNumber with displayMode Unit, demonstrating measurement values with localized unit labels and decimal alignment."
 		},
 		{
 		  "id": "sap.m.sample.ObjectStatus",

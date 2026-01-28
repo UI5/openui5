@@ -4,32 +4,36 @@
 
 // Provides control sap.m.ObjectNumber.
 sap.ui.define([
-	'./library',
-	'sap/ui/core/Control',
+	"./library",
+	"sap/ui/core/Control",
 	"sap/ui/core/Lib",
-	'sap/ui/core/library',
+	"sap/ui/core/library",
 	"sap/ui/core/LabelEnablement",
 	"sap/ui/events/KeyCodes",
-	'./ObjectNumberRenderer'
+	"sap/ui/core/format/NumberFormat",
+	"./ObjectNumberRenderer"
 ],
-	function(library, Control, Library, coreLibrary, LabelEnablement, KeyCodes, ObjectNumberRenderer) {
+	function(library, Control, Library, coreLibrary, LabelEnablement, KeyCodes, NumberFormat, ObjectNumberRenderer) {
 	"use strict";
 
 
 	// shortcut for sap.ui.core.TextAlign
-	var TextAlign = coreLibrary.TextAlign;
+	const TextAlign = coreLibrary.TextAlign;
 
 	// shortcut for sap.ui.core.TextDirection
-	var TextDirection = coreLibrary.TextDirection;
+	const TextDirection = coreLibrary.TextDirection;
 
 	// shortcut for sap.ui.core.ValueState
-	var ValueState = coreLibrary.ValueState;
+	const ValueState = coreLibrary.ValueState;
 
 	// shortcut for sap.m.EmptyIndicatorMode
-	var EmptyIndicatorMode = library.EmptyIndicatorMode;
+	const EmptyIndicatorMode = library.EmptyIndicatorMode;
 
 	// shortcut for sap.m.ReactiveAreaMode
-	var ReactiveAreaMode = library.ReactiveAreaMode;
+	const ReactiveAreaMode = library.ReactiveAreaMode;
+
+	// shortcut for sap.m.ObjectNumberDisplayMode
+	const ObjectNumberDisplayMode = library.ObjectNumberDisplayMode;
 
 	/**
 	 * Constructor for a new ObjectNumber.
@@ -133,6 +137,33 @@ sap.ui.define([
 				inverted : {type : "boolean", group : "Misc", defaultValue : false},
 
 				/**
+				 * Defines the display mode of the <code>ObjectNumber</code> control.
+				 *
+				 * @since 1.154
+				 */
+				displayMode : {type : "sap.m.ObjectNumberDisplayMode", group : "Misc", defaultValue : ObjectNumberDisplayMode.Default},
+
+				/**
+				 * Defines the space that is available for the precision of the various currencies.
+				 *
+				 * In <code>Currency</code> display mode, this property reserves empty space after the decimal point
+				 * without affecting the actual formatting — the number of displayed decimal digits is determined by
+				 * the CLDR settings for each currency.
+				 * In <code>Unit</code> display mode, the number is formatted to exactly the specified number of digits
+				 * after the decimal point.
+				 * @since 1.154
+				 */
+				maxPrecision : {type : "int", group : "Appearance"},
+
+				/**
+				 * Displays the currency symbol instead of the ISO currency code.
+				 *
+				 * <b>Note:</b> This property only has an effect when the <code>displayMode</code> is set to <code>Currency</code>.
+				 * @since 1.154
+				 */
+				useSymbol : {type : "boolean", group : "Appearance", defaultValue : true},
+
+				/**
 				 * Specifies if an empty indicator should be displayed when there is no number.
 				 *
 				 * @since 1.89
@@ -164,6 +195,29 @@ sap.ui.define([
 		renderer: ObjectNumberRenderer
 	});
 
+	//Whitespace characters to align values
+	ObjectNumber.FIGURE_SPACE = '\u2007';
+	ObjectNumber.PUNCTUATION_SPACE = '\u2008';
+
+	/**
+	 * Initializes the control.
+	 *
+	 * @public
+	 */
+	ObjectNumber.prototype.init = function() {
+		this._oFormat = NumberFormat.getCurrencyInstance({
+			showMeasure: false
+		});
+	};
+
+	/**
+	 * Called from parent if the control is destroyed.
+	 *
+	 * @private
+	 */
+	ObjectNumber.prototype.exit = function () {
+		this._oFormat = null;
+	};
 
 	// returns translated text for the state
 	ObjectNumber.prototype._getStateText = function() {
@@ -285,6 +339,85 @@ sap.ui.define([
 		} else if (oEvent.which === KeyCodes.ESCAPE){
 			this._bPressedSpace = false;
 		}
+	};
+
+	/**
+	 * The formatted number part.
+	 *
+	 * @type {string}
+	 * @returns {string} The formatted number part
+	 * @private
+	 */
+	ObjectNumber.prototype._getFormattedNumber = function() {
+		var sUnit = this.getUnit(),
+			iMaxPrecision = this.getMaxPrecision(),
+			bMaxPrecisionValidValue = !iMaxPrecision && iMaxPrecision !== 0;
+
+		if (sUnit === "*") {
+			return "";
+		}
+
+		if (this.getDisplayMode() === ObjectNumberDisplayMode.Unit) {
+			const iDecimals = bMaxPrecisionValidValue ? 0 : iMaxPrecision;
+			return NumberFormat.getFloatInstance({
+				minFractionDigits: iDecimals,
+				maxFractionDigits: iDecimals
+			}).format(this.getNumber());
+		}
+
+		// Currency mode
+		var iPadding, iUnitDigits, sFormattedUnitValue;
+		iUnitDigits = this._oFormat.oLocaleData.getCurrencyDigits(sUnit);
+		if (bMaxPrecisionValidValue) {
+			iMaxPrecision = iUnitDigits;
+		}
+
+		// Should recalculate iMaxPrecision in order to fix an edge case where decimal precision is not removed
+		// Note: Take into account currencies that do not have decimal values. Example: JPY
+		iMaxPrecision = (iMaxPrecision <= 0 && iUnitDigits > 0 ? iMaxPrecision - 1 : iMaxPrecision);
+		iPadding = iMaxPrecision - iUnitDigits;
+		sFormattedUnitValue = this._oFormat.format(this.getNumber(), sUnit);
+		if (iPadding == iMaxPrecision && iMaxPrecision > 0) {
+			sFormattedUnitValue += ObjectNumber.PUNCTUATION_SPACE;
+		}
+
+		// create spaces
+		if (iPadding > 0) {
+			sFormattedUnitValue = sFormattedUnitValue.padEnd(sFormattedUnitValue.length + iPadding, ObjectNumber.FIGURE_SPACE);
+		} else if (iPadding < 0) {
+			sFormattedUnitValue = sFormattedUnitValue.substr(0, sFormattedUnitValue.length + iPadding);
+		}
+
+		return sFormattedUnitValue;
+	};
+
+	/**
+	 * Gets symbol of the currency, if available.
+	 *
+	 * @param {string} sUnit - unit value
+	 * @type {string}
+	 * @private
+	 */
+	ObjectNumber.prototype._getCurrencySymbol = function(sUnit) {
+		return this._oFormat.oLocaleData.getCurrencySymbol(sUnit);
+	};
+
+	/**
+	 * Gets the proper unit text to be rendered depending on the <code>displayMode</code> and <code>useSymbol</code> properties of the control.
+	 * @returns {string} Currency symbol or ISO 4217 code
+	 * @private
+	 */
+	ObjectNumber.prototype._getUnit = function () {
+		let sUnit = this.getUnit();
+
+		/**
+		 * @deprecated as of version 1.16.1
+		 */
+		if (!sUnit) {
+			sUnit = this.getNumberUnit();
+		}
+
+		return this.getUseSymbol() && this.getDisplayMode() === ObjectNumberDisplayMode.Currency ? this._getCurrencySymbol(sUnit) : sUnit;
 	};
 
 	/**

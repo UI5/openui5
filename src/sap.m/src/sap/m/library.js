@@ -159,6 +159,7 @@ sap.ui.define([
 			"sap.m.ObjectHeaderPictureShape",
 			"sap.m.ObjectMarkerType",
 			"sap.m.ObjectMarkerVisibility",
+			"sap.m.ObjectNumberDisplayMode",
 			"sap.m.OverflowToolbarPriority",
 			"sap.m.P13nPopupMode",
 			"sap.m.P13nPanelType",
@@ -5395,6 +5396,39 @@ sap.ui.define([
 
 
 	/**
+	 * Display modes of the {@link sap.m.ObjectNumber} control.
+	 *
+	 * @enum {string}
+	 * @public
+	 * @since 1.154
+	 */
+	thisLib.ObjectNumberDisplayMode = {
+
+		/**
+		 * The control displays a number and unit in the standard way.
+		 * @public
+		 */
+		Default : "Default",
+
+		/**
+		 * The control acts as a currency value — numbers are formatted via <code>NumberFormat.getCurrencyInstance</code>,
+		 * the unit is resolved to a currency symbol, and column alignment is managed via CSS.
+		 * @public
+		 */
+		Currency : "Currency",
+
+		/**
+		 * The control acts as a measurement value — numbers are formatted via <code>NumberFormat.getUnitInstance</code>,
+		 * decimals are aligned to <code>maxPrecision</code>, the raw unit string is shown as-is, and column alignment
+		 * is managed via CSS. Decimal alignment across rows assumes homogeneous units within a column.
+		 * @public
+		 */
+		Unit : "Unit"
+
+	};
+
+
+	/**
 	 * Directions for swipe event.
 	 *
 	 * @enum {string}
@@ -7148,6 +7182,7 @@ sap.ui.define([
 	DataType.registerEnum("sap.m.ObjectHeaderPictureShape", thisLib.ObjectHeaderPictureShape);
 	DataType.registerEnum("sap.m.ObjectMarkerType", thisLib.ObjectMarkerType);
 	DataType.registerEnum("sap.m.ObjectMarkerVisibility", thisLib.ObjectMarkerVisibility);
+	DataType.registerEnum("sap.m.ObjectNumberDisplayMode", thisLib.ObjectNumberDisplayMode);
 	DataType.registerEnum("sap.m.OverflowToolbarPriority", thisLib.OverflowToolbarPriority);
 	DataType.registerEnum("sap.m.P13nPopupMode", thisLib.P13nPopupMode);
 	DataType.registerEnum("sap.m.P13nPanelType", thisLib.P13nPanelType);

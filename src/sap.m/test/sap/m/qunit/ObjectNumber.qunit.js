@@ -16,22 +16,25 @@ sap.ui.define([
 	"use strict";
 
 	// shortcut for sap.ui.core.TextAlign
-	var TextAlign = coreLibrary.TextAlign;
+	const TextAlign = coreLibrary.TextAlign;
 
 	// shortcut for sap.ui.core.TextDirection
-	var TextDirection = coreLibrary.TextDirection;
+	const TextDirection = coreLibrary.TextDirection;
 
 	// shortcut for sap.ui.core.ValueState
-	var ValueState = coreLibrary.ValueState;
+	const ValueState = coreLibrary.ValueState;
 
 	// shortcut for sap.m.EmptyIndicatorMode
-	var EmptyIndicatorMode = mobileLibrary.EmptyIndicatorMode;
+	const EmptyIndicatorMode = mobileLibrary.EmptyIndicatorMode;
 
 	// shortcut for sap.m.ReactiveAreaMode
-	var ReactiveAreaMode = mobileLibrary.ReactiveAreaMode;
+	const ReactiveAreaMode = mobileLibrary.ReactiveAreaMode;
+
+	// shortcut for sap.m.ObjectNumberDisplayMode
+	const ObjectNumberDisplayMode = mobileLibrary.ObjectNumberDisplayMode;
 
 	// shortcut for library resource bundle
-	var oRb = Library.getResourceBundleFor("sap.m");
+	const oRb = Library.getResourceBundleFor("sap.m");
 
 	createAndAppendDiv("content");
 
@@ -548,5 +551,121 @@ sap.ui.define([
 
 		//Assert
 		assert.strictEqual(this.oObjectNumber.getDomRef().childNodes[0].textContent, "12", "Empty indicator is not rendered");
+	});
+
+	QUnit.module("Display modes", {
+		beforeEach: async function() {
+			this.oON = new ObjectNumber({ number: "5", unit: "kg" });
+			this.oON.placeAt("qunit-fixture");
+			await nextUIUpdate();
+		},
+		afterEach: function() {
+			this.oON.destroy();
+		}
+	});
+
+	QUnit.test("Unit mode: root CSS class is applied", async function(assert) {
+		this.oON.setDisplayMode(ObjectNumberDisplayMode.Unit);
+		await nextUIUpdate();
+
+		assert.ok(this.oON.getDomRef().classList.contains("sapMObjectNumberUnitMode"),
+			"sapMObjectNumberUnitMode class is present");
+		assert.notOk(this.oON.getDomRef().classList.contains("sapMObjectNumberCurrency"),
+			"sapMObjectNumberCurrency class is not present");
+	});
+
+	QUnit.test("Unit mode: raw unit string is rendered as-is", async function(assert) {
+		this.oON.setDisplayMode(ObjectNumberDisplayMode.Unit);
+		await nextUIUpdate();
+
+		const sUnitText = this.oON.getDomRef().querySelector(".sapMObjectNumberUnit").textContent;
+		assert.strictEqual(sUnitText, ObjectNumber.FIGURE_SPACE + "kg", "Raw unit string is rendered with figure space prefix");
+	});
+
+	QUnit.test("Unit mode: number formatted to maxPrecision decimals", async function(assert) {
+		this.oON.setDisplayMode(ObjectNumberDisplayMode.Unit);
+		this.oON.setMaxPrecision(2);
+		await nextUIUpdate();
+
+		const sNumberText = this.oON.getDomRef().querySelector(".sapMObjectNumberText").textContent;
+		assert.strictEqual(sNumberText, "5.00", "Number is formatted to 2 decimal places");
+	});
+
+	QUnit.test("Unit mode: no decimal padding when maxPrecision is unset", async function(assert) {
+		this.oON.setDisplayMode(ObjectNumberDisplayMode.Unit);
+		await nextUIUpdate();
+
+		const sNumberText = this.oON.getDomRef().querySelector(".sapMObjectNumberText").textContent;
+		assert.strictEqual(sNumberText, "5", "No padding when maxPrecision is unset");
+	});
+
+	QUnit.test("Unit mode: useSymbol has no effect", async function(assert) {
+		this.oON.setDisplayMode(ObjectNumberDisplayMode.Unit);
+		this.oON.setUseSymbol(true);
+		await nextUIUpdate();
+
+		const sUnitText = this.oON.getDomRef().querySelector(".sapMObjectNumberUnit").textContent;
+		assert.strictEqual(sUnitText, ObjectNumber.FIGURE_SPACE + "kg", "useSymbol is ignored — raw unit string is shown with figure space prefix");
+	});
+
+	QUnit.test("Currency mode: sapMObjectNumberCurrency class is applied", async function(assert) {
+		this.oON.setDisplayMode(ObjectNumberDisplayMode.Currency);
+		this.oON.setUnit("USD");
+		await nextUIUpdate();
+
+		assert.ok(this.oON.getDomRef().classList.contains("sapMObjectNumberCurrency"),
+			"sapMObjectNumberCurrency class is present");
+		assert.notOk(this.oON.getDomRef().classList.contains("sapMObjectNumberUnitMode"),
+			"sapMObjectNumberUnitMode class is not present");
+	});
+
+	QUnit.test("Currency mode: useSymbol shows currency symbol", async function(assert) {
+		this.oON.setDisplayMode(ObjectNumberDisplayMode.Currency);
+		this.oON.setUnit("USD");
+		this.oON.setUseSymbol(true);
+		await nextUIUpdate();
+
+		const sUnitText = this.oON.getDomRef().querySelector(".sapMObjectNumberUnit").textContent;
+		assert.strictEqual(sUnitText, "$", "USD currency symbol is rendered");
+	});
+
+	QUnit.test("Currency mode: useSymbol false shows ISO code", async function(assert) {
+		this.oON.setDisplayMode(ObjectNumberDisplayMode.Currency);
+		this.oON.setUnit("USD");
+		this.oON.setUseSymbol(false);
+		await nextUIUpdate();
+
+		const sUnitText = this.oON.getDomRef().querySelector(".sapMObjectNumberUnit").textContent;
+		assert.strictEqual(sUnitText, "USD", "ISO code is shown when useSymbol is false");
+	});
+
+	QUnit.test("Currency mode: maxPrecision adds figure-space padding beyond CLDR digits", async function(assert) {
+		this.oON.setDisplayMode(ObjectNumberDisplayMode.Currency);
+		this.oON.setUnit("USD"); // CLDR: 2 decimal digits
+		this.oON.setMaxPrecision(4); // 2 extra digits → 2 figure spaces appended
+		await nextUIUpdate();
+
+		const sNumberText = this.oON.getDomRef().querySelector(".sapMObjectNumberText").textContent;
+		const iFigureSpaces = (sNumberText.match(new RegExp(ObjectNumber.FIGURE_SPACE, "g")) || []).length;
+		assert.strictEqual(iFigureSpaces, 2, "Two figure spaces are appended for 2 extra reserved digits");
+	});
+
+	QUnit.test("Currency mode: maxPrecision unset uses CLDR digits with no extra padding", async function(assert) {
+		this.oON.setDisplayMode(ObjectNumberDisplayMode.Currency);
+		this.oON.setUnit("USD"); // CLDR: 2 decimal digits
+		await nextUIUpdate();
+
+		const sNumberText = this.oON.getDomRef().querySelector(".sapMObjectNumberText").textContent;
+		const iFigureSpaces = (sNumberText.match(new RegExp(ObjectNumber.FIGURE_SPACE, "g")) || []).length;
+		assert.strictEqual(iFigureSpaces, 0, "No padding when maxPrecision is not set");
+	});
+
+	QUnit.test("Currency mode: '*' unit renders empty number text", async function(assert) {
+		this.oON.setDisplayMode(ObjectNumberDisplayMode.Currency);
+		this.oON.setUnit("*");
+		await nextUIUpdate();
+
+		const sNumberText = this.oON.getDomRef().querySelector(".sapMObjectNumberText").textContent;
+		assert.strictEqual(sNumberText, "", "Number text is empty for '*' currency");
 	});
 });

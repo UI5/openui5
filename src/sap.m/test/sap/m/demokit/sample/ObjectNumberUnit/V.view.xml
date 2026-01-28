@@ -1,0 +1,50 @@
+<mvc:View
+	controllerName="sap.m.sample.ObjectNumberUnit.C"
+	xmlns:l="sap.ui.layout"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m">
+
+	<l:VerticalLayout
+		class="sapUiContentPadding"
+		width="100%">
+
+		<Label text="Unit Mode" class="sapUiSmallMarginTop" design="Bold" />
+		<l:HorizontalLayout class="sapUiContentPadding">
+			<ObjectNumber
+				class="sapUiSmallMarginEnd"
+				displayMode="Unit"
+				binding="{/items/0}"
+				number="{number}"
+				unit="{unit}" />
+			<ObjectNumber
+				class="sapUiSmallMarginEnd"
+				displayMode="Unit"
+				binding="{/items/1}"
+				number="{number}"
+				unit="{unit}"
+				state="Error" />
+			<ObjectNumber
+				class="sapUiSmallMarginEnd"
+				displayMode="Unit"
+				binding="{/items/2}"
+				number="{number}"
+				unit="{unit}"
+				state="Warning" />
+			<ObjectNumber
+				class="sapUiSmallMarginEnd"
+				displayMode="Unit"
+				binding="{/items/3}"
+				number="{number}"
+				unit="{unit}"
+				state="Success" />
+			<ObjectNumber
+				displayMode="Unit"
+				binding="{/items/4}"
+				number="{number}"
+				unit="{unit}"
+				state="Information" />
+		</l:HorizontalLayout>
+
+	</l:VerticalLayout>
+
+</mvc:View>
