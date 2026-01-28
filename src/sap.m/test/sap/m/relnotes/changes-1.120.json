@@ -1436,5 +1436,25 @@
         "text": " We now trigger a fetch call to load PDF content and determine PDF availability in the PDFViewer"
       }
     ]
+  },
+  "1.120.41": {
+    "date": "January 2026",
+    "notes": [
+      {
+        "id": "b6b299b844165586ec22e8ba5af638dde246983e",
+        "type": "FIX",
+        "text": " sap.m.DynamicDate: uses its own text for min and max validation"
+      },
+      {
+        "id": "6fdb66c6bb8c52ce7b3421d41e1a76ea6157d7c5",
+        "type": "FIX",
+        "text": " sap.m.PlanningCalendarHeader: Correct reserved slot calculation"
+      },
+      {
+        "id": "786b9434c2a4cf437c8ba75582c048e8c0e445b3",
+        "type": "FIX",
+        "text": "sap.m.MultiInput: Token addition is now reset on focusin"
+      }
+    ]
   }
 }

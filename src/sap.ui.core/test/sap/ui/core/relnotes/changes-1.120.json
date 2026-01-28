@@ -1093,5 +1093,15 @@
         "text": " sap/ui/model/type/Unit.js: if quantity part is integer, decimals defaults to '0', may be overwritten"
       }
     ]
+  },
+  "1.120.41": {
+    "date": "January 2026",
+    "notes": [
+      {
+        "id": "42376ccd46ff3ae5d23a23fc2f23c961e7404542",
+        "type": "FIX",
+        "text": " test/sap/ui/core/qunit/i18n/UI5Date.qunit.js: Fix failing test for JS Date API \"toTemporalInstant\""
+      }
+    ]
   }
 }

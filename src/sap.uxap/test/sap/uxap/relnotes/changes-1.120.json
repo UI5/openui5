@@ -172,5 +172,15 @@
         "text": " sap.uxap.ObjectPageLayout: Improve accessibility behavior"
       }
     ]
+  },
+  "1.120.41": {
+    "date": "January 2026",
+    "notes": [
+      {
+        "id": "9d250830462597240acfb479a21d80b7f9cb7cb0",
+        "type": "FIX",
+        "text": " sap.uxap.ObjectPageLayout: Fix initial title rendering in FCL"
+      }
+    ]
   }
 }
