@@ -945,6 +945,29 @@ sap.ui.define([
 		oSI2.destroy();
 	});
 
+	QUnit.test("Formating floating point number when the number starts with decimal separator", function (assert) {
+		var oInput = this.stepInput._getInput();
+		var oChangeSpy = sinon.spy();
+		this.stepInput.attachChange(oChangeSpy);
+
+		this.stepInput.setValue(0.4);
+		oCore.applyChanges();
+
+		// act
+		oInput.onfocusin();
+		oInput._$input.trigger("focus").val(".3").trigger("input");
+		oInput.fireChange({ value: ".3" });
+		oCore.applyChanges();
+
+		// assert
+		assert.strictEqual(oChangeSpy.callCount, 1, "Change event fired once for '.3'");
+		assert.strictEqual(oInput.getValue(), "0.3", "Input is formatted to '0.3'");
+		assert.strictEqual(this.stepInput.getValue(), 0.3, "StepInput numeric value is 0.3");
+
+		// cleanup
+		this.stepInput.detachChange(oChangeSpy);
+	});
+
 	QUnit.test("entering a dot('.') as a separator does not clear the entry value", function (assert) {
 		// Prepare
 		var oEvent = {
