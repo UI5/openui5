@@ -628,6 +628,29 @@ html.sap-desktop .sapUiCalItemOtherMonth:not(.sapUiCalItemSel) :not(.sapUiCalWee
 	}
 }
 
+.sapUiCalSecType {
+
+	.sapUiCalMonthPicker,
+	.sapUiCalYearPicker {
+
+		.sapUiCalItem.sapUiCalItemDsbl {
+			opacity: var(--sapContent_DisabledOpacity);
+		}
+
+		.sapUiCalItem:focus {
+			line-height: 2.875rem;
+		}
+
+		&.sapUiCalMonthSecType .sapUiCalItem:focus {
+			line-height: 1.875rem;
+
+			.sapUiCalItemSecText {
+				line-height: 0.625rem;
+			}
+		}
+	}
+}
+
 .sapUiSizeCompact {
 
 	.sapUiCalMonthPicker,
@@ -635,6 +658,24 @@ html.sap-desktop .sapUiCalItemOtherMonth:not(.sapUiCalItemSel) :not(.sapUiCalWee
 
 		.sapUiCalItem:focus {
 			line-height: 1.875rem;
+		}
+	}
+
+	.sapUiCalSecType {
+		.sapUiCalMonthPicker,
+		.sapUiCalYearPicker {
+
+			.sapUiCalItem:focus {
+				line-height: 1.375rem;
+			}
+
+			&.sapUiCalMonthSecType .sapUiCalItem {
+				line-height: 1.375rem;
+
+				.sapUiCalItemSecText {
+					line-height: 0.625rem;
+				}
+			}
 		}
 	}
 }

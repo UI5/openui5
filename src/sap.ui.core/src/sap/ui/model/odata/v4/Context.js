@@ -1965,7 +1965,9 @@ sap.ui.define([
 	 *   Since 1.82.0, absolute paths are supported. Absolute paths must start with the entity
 	 *   container (example "/com.sap.gateway.default.iwbep.tea_busi.v0001.Container/TEAMS") of the
 	 *   service. All (navigation) properties in the complete model matching such an absolute path
-	 *   are updated. Since 1.85.0, "14.3.11 Expression edm:String" is accepted as well.
+	 *   are updated. Since 1.85.0, "14.3.11 Expression edm:String" is accepted as well. Since
+	 *   1.145.0, you can use <code>null</code> values (and <code>{$Null : null}</code>) as synonyms
+	 *   for empty navigation property paths.
 	 *
 	 *   Since 1.108.8, a property path matching the "com.sap.vocabularies.Common.v1.Messages"
 	 *   annotation of a list binding's entity type is treated specially for a row context of a list
@@ -2067,7 +2069,12 @@ sap.ui.define([
 
 		sEntityContainer = "/" + sEntityContainer + "/";
 		aPathExpressions.map(function (vPath) {
-			if (vPath && typeof vPath === "object") {
+			if (vPath === null) {
+				return "";
+			} else if (typeof vPath === "object") {
+				if (vPath.$Null === null) {
+					return "";
+				}
 				if (isPropertyPath(vPath.$PropertyPath)) {
 					return vPath.$PropertyPath;
 				}

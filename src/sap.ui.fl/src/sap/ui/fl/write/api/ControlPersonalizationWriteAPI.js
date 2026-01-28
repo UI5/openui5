@@ -217,6 +217,7 @@ sap.ui.define([
 					.catch(function(oError) {
 						FlexObjectManager.deleteFlexObjects({
 							reference: sFlexReference,
+							componentId: oAppComponent.getId(),
 							flexObjects: [oChange.changeInstance]
 						});
 						Log.error("A Change was not applied successfully. Reason: ", oError.message);

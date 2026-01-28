@@ -141,8 +141,7 @@ sap.ui.define([
 
 		DynamicDate.prototype.validateValue = function(oValue) {
 			if (this.oConstraints) {
-				var oBundle = Library.getResourceBundleFor("sap.ui.core"),
-					oMBundle = Library.getResourceBundleFor("sap.m"),
+				var 	oMBundle = Library.getResourceBundleFor("sap.m"),
 					aViolatedConstraints = [],
 					aMessages = [],
 					oOption = DynamicDateUtil.getOption(oValue.operator),
@@ -163,14 +162,14 @@ sap.ui.define([
 								if (iTimestamp < iConstraintValue) {
 									aViolatedConstraints.push("minimum");
 									aMessages.push(oMBundle.getText(sErrorGenericTextKey, [UI5Date.getInstance(iTimestamp).toDateString()]));
-									aMessages.push(oBundle.getText("Date.Minimum", [UI5Date.getInstance(iConstraintValue).toDateString()]));
+									aMessages.push(oMBundle.getText("DynamicDate.Minimum", [UI5Date.getInstance(iConstraintValue).toDateString()]));
 								}
 								break;
 							case "maximum":
 								if (iTimestamp > iConstraintValue) {
 									aViolatedConstraints.push("maximum");
 									aMessages.push(oMBundle.getText(sErrorGenericTextKey, [UI5Date.getInstance(iTimestamp).toDateString()]));
-									aMessages.push(oBundle.getText("Date.Maximum", [UI5Date.getInstance(iConstraintValue).toDateString()]));
+									aMessages.push(oMBundle.getText("DynamicDate.Maximum", [UI5Date.getInstance(iConstraintValue).toDateString()]));
 								}
 								break;
 						}

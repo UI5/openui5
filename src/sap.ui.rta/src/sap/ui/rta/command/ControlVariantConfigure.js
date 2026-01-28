@@ -117,6 +117,7 @@ sap.ui.define([
 		const sFlexReference = FlexRuntimeInfoAPI.getFlexReference({ element: this.getControl() });
 		ChangesWriteAPI.restoreDeletedFlexObjects({
 			reference: sFlexReference,
+			componentId: this.oAppComponent.getId(),
 			flexObjects: this._aDeletedFlexObjects
 		});
 		delete this._aDeletedFlexObjects;

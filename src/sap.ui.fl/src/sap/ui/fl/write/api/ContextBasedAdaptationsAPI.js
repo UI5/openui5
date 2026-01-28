@@ -471,10 +471,12 @@ sap.ui.define([
 	 * @returns {object} Returns the change as JSON object
 	 */
 	function createChangeSetVisibleFalseToRestrictedVariant(oVariant, mPropertyBag, contextBasedAdaptationId, VariantManager) {
+		const oAppComponent = FlexUtils.getAppComponentForControl(mPropertyBag.control);
 		if (oVariant.isA("sap.ui.fl.apply._internal.flexObjects.CompVariant")) {
 			var sPersistencyKey = oVariant.getPersistencyKey();
 			oVariant = CompVariantManager.updateVariant({
 				reference: mPropertyBag.appId,
+				componentId: oAppComponent.getId(),
 				persistencyKey: sPersistencyKey,
 				id: oVariant.getId(),
 				layer: mPropertyBag.layer,
@@ -485,7 +487,6 @@ sap.ui.define([
 			return CompVariantManagementState.getVariantChanges(oVariant).reverse()[0].convertToFileContent();
 		}
 		// Fl variant
-		var oAppComponent = FlexUtils.getAppComponentForControl(mPropertyBag.control);
 		var oChange = VariantManager.createVariantChange(
 			oVariant.getVariantManagementReference(),
 			{

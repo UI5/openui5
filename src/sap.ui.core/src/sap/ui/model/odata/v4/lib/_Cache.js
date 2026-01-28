@@ -2484,8 +2484,9 @@ sap.ui.define([
 	 * predicates for all entities in the result. Collects and reports OData messages via
 	 * {@link sap.ui.model.odata.v4.lib._Requestor#reportStateMessages}.
 	 *
-	 * @param {any} oRoot An OData response, arrays or simple values are wrapped into an object as
-	 *   property "value"
+	 * @param {object|null} oRoot
+	 *   An OData response (arrays or simple values should already be wrapped into an object as
+	 *   property "value"); <code>null</code> could result from 204 No Content
 	 * @param {object} mTypeForMetaPath A map from absolute meta path to entity type (as delivered
 	 *   by {@link #fetchTypes})
 	 * @param {string} [sRootMetaPath=this.sMetaPath] The absolute meta path for <code>oRoot</code>
@@ -2647,11 +2648,15 @@ sap.ui.define([
 			});
 		}
 
+		if (!oRoot || _Helper.hasPrivateAnnotation(oRoot, "visited")) {
+			return;
+		}
+		_Helper.setPrivateAnnotation(oRoot, "visited", true);
 		if (iStart !== undefined) {
 			aCachePaths = [];
 			visitArray(oRoot.value, sRootMetaPath || this.sMetaPath, "",
 				buildContextUrl(sRequestUrl, oRoot["@odata.context"]));
-		} else if (oRoot && typeof oRoot === "object") {
+		} else {
 			visitInstance(oRoot, sRootMetaPath || this.sMetaPath, sRootPath || "", sRequestUrl);
 		}
 		if (bHasMessages && !this.bSharedRequest) {

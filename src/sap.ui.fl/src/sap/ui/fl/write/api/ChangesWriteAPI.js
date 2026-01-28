@@ -396,7 +396,7 @@ sap.ui.define([
 			));
 		}
 		return aVariantsToBeDeleted
-		.map((sVariantId) => (ControlVariantWriteUtils.deleteVariant(sFlexReference, sVariantManagementReference, sVariantId)))
+		.map((sVariantId) => (ControlVariantWriteUtils.deleteVariant(sFlexReference, oAppComponent.getId(), sVariantManagementReference, sVariantId)))
 		.flat();
 	};
 
@@ -407,6 +407,7 @@ sap.ui.define([
 	 *
 	 * @param {object} mPropertyBag - Object with parameters as properties
 	 * @param {string} mPropertyBag.reference - Flex reference of the application
+	 * @param {string} mPropertyBag.componentId - Id of the application instance
 	 * @param {sap.ui.fl.apply._internal.flexObjects.FlexObject[]} mPropertyBag.flexObjects - FlexObjects to be restored
 	 * @private
 	 * @ui5-restricted sap.ui.fl, sap.ui.rta, similar tools

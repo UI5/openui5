@@ -206,6 +206,7 @@ sap.ui.define([
 
 			FlexObjectManager.deleteFlexObjects({
 				reference: mPropertyBag.reference,
+				componentId: mPropertyBag.appComponent.getId(),
 				flexObjects: aVariantDirtyChanges
 			});
 		}
@@ -448,7 +449,7 @@ sap.ui.define([
 				vReference: sVariantKey
 			});
 			if (oVariant.layer === Layer.USER) {
-				return ControlVariantWriteUtils.deleteVariant(sFlexReference, sVMReference, sVariantKey);
+				return ControlVariantWriteUtils.deleteVariant(sFlexReference, oAppComponent.getId(), sVMReference, sVariantKey);
 			}
 			return [];
 		})
@@ -595,6 +596,7 @@ sap.ui.define([
 				const oException = oReturn.error || new Error("The change could not be applied.");
 				FlexObjectManager.deleteFlexObjects({
 					reference: sFlexReference,
+					componentId: oAppComponent.getId(),
 					flexObjects: [oChange]
 				});
 				throw oException;
@@ -657,6 +659,7 @@ sap.ui.define([
 		});
 		FlexObjectManager.deleteFlexObjects({
 			reference: sFlexReference,
+			componentId: mPropertyBag.appComponent.getId(),
 			flexObjects: aChangesToBeDeleted
 		});
 	};
@@ -707,6 +710,7 @@ sap.ui.define([
 		oVariantModel.setVariantProperties(sVariantManagementReference, mPropertyBag);
 		FlexObjectManager.deleteFlexObjects({
 			reference: oVariantModel.sFlexReference,
+			componentId: mPropertyBag.appComponent.getId(),
 			flexObjects: [oChange]
 		});
 	};

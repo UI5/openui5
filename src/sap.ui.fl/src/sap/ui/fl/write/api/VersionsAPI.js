@@ -306,6 +306,7 @@ sap.ui.define([
 			const aDirtyChanges = FlexObjectState.getDirtyFlexObjects(sReference);
 			FlexObjectManager.deleteFlexObjects({
 				reference: sReference,
+				componentId: oAppComponent.getId(),
 				flexObjects: aDirtyChanges
 			});
 			return aDirtyChanges.length > 0;

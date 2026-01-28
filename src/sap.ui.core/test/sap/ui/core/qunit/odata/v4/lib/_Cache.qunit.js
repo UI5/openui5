@@ -3510,7 +3510,7 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test("Cache#visitResponse: key predicates: ignore simple values", function () {
+	QUnit.test("Cache#visitResponse: key predicates: ignore null values", function () {
 		var oCache = new _Cache(this.oRequestor, "TEAMS('42')/Foo"),
 			oCacheMock = this.mock(oCache),
 			oInstance = {results : ["Business Suite"]},
@@ -3520,23 +3520,11 @@ sap.ui.define([
 		oCacheMock.expects("calculateKeyPredicate").never();
 
 		// code under test
-		oCache.visitResponse("Business Suite", mTypeForMetaPath);
-
-		// code under test
 		oCache.visitResponse({value : ["Business Suite"]}, mTypeForMetaPath, undefined,
 			undefined, 0);
 
 		// code under test
-		oCache.visitResponse(undefined, mTypeForMetaPath);
-
-		// code under test
 		oCache.visitResponse(null, mTypeForMetaPath);
-
-		// code under test
-		oCache.visitResponse("", mTypeForMetaPath);
-
-		// code under test
-		oCache.visitResponse(true, mTypeForMetaPath);
 
 		oCacheMock.expects("calculateKeyPredicate")
 			.withExactArgs(sinon.match.same(oInstance), sinon.match.same(mTypeForMetaPath),
@@ -3744,6 +3732,9 @@ sap.ui.define([
 			.withExactArgs("original/resource/path", mExpectedMessages, undefined);
 
 		// code under test
+		oCache.visitResponse(oData, mTypeForMetaPath);
+
+		// code under test (2nd call needs to be ignored!)
 		oCache.visitResponse(oData, mTypeForMetaPath);
 	});
 
@@ -9966,6 +9957,7 @@ sap.ui.define([
 
 			// code under test
 			return oCache.read(0, 5, 0, oGroupLock1).then(function (oResult2) {
+				delete oSuccess["@$ui5._"]; // ignore "visited"
 				assert.deepEqual(oResult2, oSuccess);
 			});
 		});

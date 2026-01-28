@@ -433,7 +433,7 @@
 	}
 }
 
-.sapTntNLI:not(.sapTntNLIDisabled, .sapTntNLIFirstLevel.sapTntNLIInPopover.sapTntNLIUnselectable):hover {
+.sapTntNLI:not(.sapTntNLIDisabled, .sapTntNLIFirstLevel.sapTntNLIInPopover.sapTntNLIUnselectable, .sapTntNLISelected):hover {
 	background-color: var(--sapList_Hover_Background);
 }
 
@@ -522,7 +522,7 @@
 .sapTntNLISelected .sapTntNLI:hover,
 .sapTntNLISelected.sapTntNLI.sapTntNLIFirstLevel:hover,
 .sapTntNLISelected.sapTntNLISecondLevel.sapTntNLISecondLevel:hover {
-	background-color: @sapUiListSelectionHoverBackground;
+	background-color: var(--sapList_Hover_SelectionBackground);
 }
 
 .sapTntNL:not(.sapTntNLPopup) .sapTntNLI {

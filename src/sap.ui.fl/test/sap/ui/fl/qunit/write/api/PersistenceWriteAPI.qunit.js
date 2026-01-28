@@ -538,7 +538,7 @@ sap.ui.define([
 			);
 			assert.ok(
 				oDeleteFlexObjectsStub.calledWith({
-					reference: sReference, flexObjects: mPropertyBag.flexObjects
+					reference: sReference, componentId: sReference, flexObjects: mPropertyBag.flexObjects
 				}), "then the flex persistence was called with correct parameters"
 			);
 		});
@@ -637,7 +637,7 @@ sap.ui.define([
 			);
 			assert.ok(
 				oDeleteFlexObjectsStub.calledWith({
-					reference: sReference, flexObjects: mPropertyBag.flexObjects
+					reference: sReference, componentId: sReference, flexObjects: mPropertyBag.flexObjects
 				}), "then the flex persistence was called with correct parameters"
 			);
 		});

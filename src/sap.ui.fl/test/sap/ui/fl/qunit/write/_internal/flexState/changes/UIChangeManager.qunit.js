@@ -108,6 +108,7 @@ sap.ui.define([
 			);
 			assert.ok(oRestoreDeletedFlexObjectsStub.calledWith({
 				reference: sReference,
+				componentId: sReference,
 				flexObjects: aChanges
 			}), "restoreDeletedFlexObjects is called with the proper parameters");
 			assert.strictEqual(oAddChangeToMapStub.callCount, 3, "addRuntimeChangeToMap is called three times");

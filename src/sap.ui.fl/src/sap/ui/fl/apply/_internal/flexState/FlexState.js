@@ -656,14 +656,11 @@ sap.ui.define([
 	 *
 	 * @param {string} sReference - Flexibility reference of the app
 	 * @param {Array<sap.ui.fl.apply._internal.flexObjects.FlexObject>} aFlexObjects - Flex objects
-	 * @param {string} [sComponentId] - ID of the component, required if an empty state needs to be initialized
+	 * @param {string} sComponentId - ID of the component
 	 * @returns {sap.ui.fl.apply._internal.flexObjects.FlexObject[]} The flex objects that were added
 	 */
 	FlexState.addDirtyFlexObjects = function(sReference, aFlexObjects, sComponentId) {
-		// TODO: Check why sComponentId is optional here todos#13
-		if (sComponentId) {
-			initializeEmptyStateIfNeeded(sReference, sComponentId);
-		}
+		initializeEmptyStateIfNeeded(sReference, sComponentId);
 		const sAdaptationLayer = FlexInfoSession.getByReference(sReference).adaptationLayer;
 		const aFilteredFlexObjects = aFlexObjects
 		.filter((oFlexObject) => !sAdaptationLayer || !LayerUtils.isOverLayer(oFlexObject.getLayer(), sAdaptationLayer))

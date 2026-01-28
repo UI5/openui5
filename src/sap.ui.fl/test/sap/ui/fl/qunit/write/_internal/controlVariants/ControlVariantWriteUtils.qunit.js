@@ -2,7 +2,6 @@
 
 sap.ui.define([
 	"sap/ui/fl/apply/_internal/flexObjects/FlexObjectFactory",
-	"sap/ui/fl/apply/_internal/flexState/FlexState",
 	"sap/ui/fl/initial/_internal/Settings",
 	"sap/ui/fl/write/_internal/controlVariants/ControlVariantWriteUtils",
 	"sap/ui/fl/write/_internal/flexState/FlexObjectManager",
@@ -11,7 +10,6 @@ sap.ui.define([
 	"test-resources/sap/ui/fl/qunit/FlQUnitUtils"
 ], function(
 	FlexObjectFactory,
-	FlexState,
 	Settings,
 	ControlVariantWriteUtils,
 	FlexObjectManager,
@@ -102,6 +100,7 @@ sap.ui.define([
 				};
 			});
 			const sReference = "appReference";
+			const sComponentId = "componentId";
 			const sVMReference = "vmReference";
 			const sVariantReference = "variant1";
 
@@ -118,7 +117,7 @@ sap.ui.define([
 			const aExpectedChanges = [oVariant, oVMChange, oSetVisibleVariantChange, oSetTitleVariantChange, oVMDependentChange];
 
 			sandbox.stub(FlexObjectManager, "deleteFlexObjects");
-			const aDeletedChanges = ControlVariantWriteUtils.deleteVariant(sReference, sVMReference, sVariantReference);
+			const aDeletedChanges = ControlVariantWriteUtils.deleteVariant(sReference, sComponentId, sVMReference, sVariantReference);
 			assert.deepEqual(
 				aDeletedChanges.map((oChange) => oChange.getId()),
 				aExpectedChanges.map((oChange) => oChange.getId()),
@@ -127,6 +126,7 @@ sap.ui.define([
 			assert.ok(
 				FlexObjectManager.deleteFlexObjects.calledWith({
 					reference: sReference,
+					componentId: sComponentId,
 					flexObjects: aExpectedChanges
 				}),
 				"then FlexObjectManager.deleteFlexObjects is called with the correct parameters"
@@ -141,13 +141,14 @@ sap.ui.define([
 				};
 			});
 			const sReference = "appReference";
+			const sComponentId = "componentId";
 			const sVMReference = "vmReference";
 			const sVariantReference = "variant1";
 
 			const aAllChanges = createFlexObjects(sReference, sVMReference);
 			FlQUnitUtils.stubFlexObjectsSelector(sandbox, aAllChanges);
 			sandbox.stub(FlexObjectManager, "deleteFlexObjects");
-			const aDeletedChanges = ControlVariantWriteUtils.deleteVariant(sReference, sVMReference, sVariantReference);
+			const aDeletedChanges = ControlVariantWriteUtils.deleteVariant(sReference, sComponentId, sVMReference, sVariantReference);
 			assert.strictEqual(aDeletedChanges.length, 0, "then no changes are returned");
 		});
 	});

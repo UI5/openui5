@@ -20,11 +20,12 @@ sap.ui.define([
 	 * or for USER layer variants or CUSTOMER layer variants which are part of a draft (not activated).
 	 *
 	 * @param {string} sReference - Flex reference
+	 * @param {string} sComponentId - Id of the application instance
 	 * @param {string} sVMReference - Variant management reference
 	 * @param {string} sVariantReference - Variant reference
 	 * @returns {sap.ui.fl.apply._internal.flexObjects.FlexObject[]} - Array of flex objects that were deleted
 	 */
-	ControlVariantWriteUtils.deleteVariant = function(sReference, sVMReference, sVariantReference) {
+	ControlVariantWriteUtils.deleteVariant = function(sReference, sComponentId, sVMReference, sVariantReference) {
 		// Deletion of variant-related objects is only supported for backends with condensing enabled
 		if (!Settings.getInstanceOrUndef()?.getIsCondensingEnabled()) {
 			return [];
@@ -47,6 +48,7 @@ sap.ui.define([
 
 		FlexObjectManager.deleteFlexObjects({
 			reference: sReference,
+			componentId: sComponentId,
 			flexObjects: aFlexObjectsToDelete
 		});
 

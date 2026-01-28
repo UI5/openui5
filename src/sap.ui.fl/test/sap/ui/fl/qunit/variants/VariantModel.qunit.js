@@ -757,7 +757,7 @@ sap.ui.define([
 			const oSetPropertiesStub = sandbox.stub(this.oModel, "setVariantProperties");
 			VariantManager.deleteVariantChange(sVMReference, mPropertyBag, fnChangeStub());
 			assert.ok(oDeleteFlexObjectsStub.calledWith({
-				reference: sReference, flexObjects: [fnChangeStub()]
+				reference: sReference, componentId: sReference, flexObjects: [fnChangeStub()]
 			}), "then deleteFlexObjects called with the passed change");
 			assert.ok(oSetPropertiesStub.calledWith(sVMReference, mPropertyBag), "the correct properties were passed");
 		});

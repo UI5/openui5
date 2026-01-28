@@ -493,7 +493,7 @@ sap.ui.define([
 			this._marginBottom = 0;
 
 			this._arrowOffset = 0;
-			this._offsets = ["0 0", "0 0", "0 0", "0 0"];
+			this._offsets = ["0 0", "8 0", "0 0", "0 0"];
 
 			this._myPositions = ["begin bottom", "begin top", "begin top", "end top"];
 			this._atPositions = ["begin top", "end top", "begin bottom", "begin top"];
@@ -607,6 +607,7 @@ sap.ui.define([
 			showHeader: false,
 			horizontalScrolling: false,
 			verticalScrolling: true,
+			showArrow: false,
 			initialFocus: oSelectedItem,
 			afterClose: () => {
 				if (this._oPopover) {

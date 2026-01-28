@@ -516,16 +516,22 @@ sap.ui.define([
 		 *   namespace "@$ui5._")
 		 * @param {object} oTarget
 		 *   Any object
+		 * @param {boolean} [bAllowSame]
+		 *   Whether overwriting is allowed as long as the value is the same
 		 * @throws {Error}
 		 *   If the annotation to be copied is already present at the target, no matter if the value
-		 *   is the same or not
+		 *   is the same or not (unless <code>bAllowSame</code> is given)
 		 *
 		 * @public
 		 */
-		copyPrivateAnnotation : function (oSource, sAnnotation, oTarget) {
+		copyPrivateAnnotation : function (oSource, sAnnotation, oTarget, bAllowSame) {
 			if (_Helper.hasPrivateAnnotation(oSource, sAnnotation)) {
 				if (_Helper.hasPrivateAnnotation(oTarget, sAnnotation)) {
-					throw new Error("Must not overwrite: " + sAnnotation);
+					if (!bAllowSame
+						|| _Helper.getPrivateAnnotation(oSource, sAnnotation)
+							!== _Helper.getPrivateAnnotation(oTarget, sAnnotation)) {
+						throw new Error("Must not overwrite: " + sAnnotation);
+					}
 				}
 				_Helper.setPrivateAnnotation(oTarget, sAnnotation,
 					_Helper.getPrivateAnnotation(oSource, sAnnotation));
@@ -2845,11 +2851,13 @@ sap.ui.define([
 
 		/**
 		 * Updates the target object with the source object. All properties of the source object are
-		 * taken into account. Fires change events for all changed properties. The function
+		 * taken into account (*). Fires change events for all changed properties. The function
 		 * recursively handles modified, added or removed structural properties (or single-valued
 		 * navigation properties) and fires change events for all modified/added/removed primitive
 		 * properties therein. It also fires for each collection encountered, no matter if changed
 		 * or not.
+		 *
+		 * (*) The key predicate is also copied over, but w/o change event.
 		 *
 		 * Restrictions:
 		 * - oTarget and oSource are expected to have the same structure: when there is an
@@ -2874,8 +2882,7 @@ sap.ui.define([
 					vTargetProperty = oTarget[sProperty];
 
 				if (sProperty === "@$ui5._") {
-					_Helper.setPrivateAnnotation(oTarget, "predicate",
-						_Helper.getPrivateAnnotation(oSource, "predicate"));
+					_Helper.copyPrivateAnnotation(oSource, "predicate", oTarget, true);
 				} else if (Array.isArray(vSourceProperty)) {
 					// copy complete collection
 					oTarget[sProperty] = vSourceProperty;
@@ -3200,6 +3207,9 @@ sap.ui.define([
 					}
 					if (sProperty === "@$ui5._") {
 						sSourcePredicate = _Helper.getPrivateAnnotation(oSource, "predicate");
+						if (!sSourcePredicate) {
+							return;
+						}
 						if (fnCheckKeyPredicate && fnCheckKeyPredicate(sPath)) {
 							sTargetPredicate = _Helper.getPrivateAnnotation(oTarget, "predicate");
 							if (sSourcePredicate !== sTargetPredicate) {

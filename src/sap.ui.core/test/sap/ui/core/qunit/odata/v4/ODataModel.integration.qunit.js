@@ -1903,9 +1903,9 @@ sap.ui.define([
 						return {
 							headers : mHeaders,
 							status : oResponse.status || 200,
-							responseText : typeof oResponse.body === "object"
+							responseText : oResponse.body && typeof oResponse.body === "object"
 								? JSON.stringify(oResponse.body) // content type "application/json"
-								: oResponse.body // keep string for "text/plain"
+								: oResponse.body // keep string for "text/plain" or null for 204
 						};
 					});
 				}
@@ -2058,7 +2058,8 @@ sap.ui.define([
 					}
 
 					if (oResponseBody === oNO_CONTENT) { // late conversion in case of Promise
-						oResponseBody = undefined;
+						// Note: see _Requestor#sendRequest, which is replaced by checkRequest here!
+						oResponseBody = null; // 204 No Content
 					} else if (typeof oResponseBody === "number") {
 						oResponseBody = String(oResponseBody);
 					} else if (oResponseBody !== undefined && typeof oResponseBody !== "object"
@@ -2390,10 +2391,11 @@ sap.ui.define([
 		 *
 		 * @param {object} oExpectedMessage The expected message with properties corresponding
 		 *   to the getters of sap.ui.core.message.Message: message and type are required; code,
-		 *   descriptionUrl, persistent (default false), target (default ""), technical (default
-		 *   false) are optional; technicalDetails is only compared if given
+		 *   descriptionUrl, persistent (default false), target (default "") or targets, technical
+		 *   (default false) are optional; technicalDetails is only compared if given
 		 * @param {boolean} [bHasMatcher] Whether the expected message has a Sinon.JS matcher
 		 * @returns {object} The test instance for chaining
+		 * @throws {Error} If both target and targets are given
 		 */
 		expectMessage : function (oExpectedMessage, bHasMatcher) {
 			const aTargets = oExpectedMessage.targets || [oExpectedMessage.target || ""];
@@ -2426,10 +2428,11 @@ sap.ui.define([
 		 *
 		 * @param {object[]} aExpectedMessages The expected messages with properties corresponding
 		 *   to the getters of sap.ui.core.message.Message: message and type are required; code,
-		 *   descriptionUrl, persistent (default false), target (default ""), technical (default
-		 *   false) are optional; technicalDetails is only compared if given
+		 *   descriptionUrl, persistent (default false), target (default "") or targets, technical
+		 *   (default false) are optional; technicalDetails is only compared if given
 		 * @param {boolean} [bHasMatcher] Whether the expected messages have a Sinon.JS matcher
 		 * @returns {object} The test instance for chaining
+		 * @throws {Error} If both target and targets are given
 		 *
 		 * @see #expectMessage
 		 */
@@ -2581,7 +2584,8 @@ sap.ui.define([
 				unexpectedResponse();
 			}
 			if (vResponse === oNO_CONTENT) { // early conversion for $direct
-				vResponse = vRequest.response = undefined; // 204 No Content
+				// Note: see _Requestor#sendRequest, which is replaced by checkRequest here!
+				vResponse = vRequest.response = null; // 204 No Content
 			} else if (vRequest.method === "DELETE") {
 				if (vResponse && !(vResponse instanceof Error || vResponse instanceof Promise)) {
 					// Note: oNO_CONTENT and oNO_RESPONSE MUST not be used for DELETE
@@ -3301,6 +3305,8 @@ sap.ui.define([
 		//*********************************************************************************************
 		// Scenario: dataRequested/dataReceived on context binding and model. Check the initial request
 		// (incl. cancelBubble), refresh and requestSideEffects
+		//
+		// Use null instead of empty navigation property path (JIRA: CPOUI5ODATAV4-3315)
 		QUnit.test("CPOUI5ODATAV4-1671: ODCB: " + sTitle, function (assert) {
 			var oBinding,
 				sView = '\
@@ -3354,8 +3360,8 @@ sap.ui.define([
 
 						return Promise.all([
 							// code under test
-							oBinding.getBoundContext().requestSideEffects([""]),
-							that.waitForChanges(assert, "requestSideEffects")
+							oBinding.getBoundContext().requestSideEffects([null]),
+							that.waitForChanges(assert, "requestSideEffects (JIRA: CPOUI5ODATAV4-3315)")
 						]);
 					}).then(function () {
 						checkEvents(assert, false);
@@ -3367,6 +3373,8 @@ sap.ui.define([
 		//*********************************************************************************************
 		// Scenario: dataRequested/dataReceived on list binding and model. Check the initial request
 		// (incl. cancelBubble), refresh and requestSideEffects
+		//
+		// Use null instead of empty navigation property path (JIRA: CPOUI5ODATAV4-3315)
 		QUnit.test("CPOUI5ODATAV4-1671: ODLB: " + sTitle, function (assert) {
 			var oBinding,
 				sView = '\
@@ -3424,8 +3432,8 @@ sap.ui.define([
 
 						return Promise.all([
 							// code under test
-							oBinding.getHeaderContext().requestSideEffects([""]),
-							that.waitForChanges(assert, "requestSideEffects")
+							oBinding.getHeaderContext().requestSideEffects([{$Null : null}]),
+							that.waitForChanges(assert, "requestSideEffects (JIRA: CPOUI5ODATAV4-3315)")
 						]);
 					}).then(function () {
 						checkEvents(assert, false);
@@ -67786,7 +67794,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				.expectRequest("Artists(ArtistUUID=xyz,IsActiveEntity=false)/BestPublication"
 					+ "?$select=Price,PublicationID", oNO_CONTENT)
 				.expectChange("price", null)
-				.expectChange("currency", sGroupId === "$direct" ? null : "");
+				.expectChange("currency", "");
 
 			return this.createView(assert, sView, oModel);
 		});
@@ -82334,6 +82342,112 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			oTeamContext.requestSideEffects([""]),
 			this.waitForChanges(assert, "bind table + side-effects refresh")
 		]);
+	});
+
+	//*********************************************************************************************
+	// Scenario: An object page shows many "late properties", the response contains some messages.
+	// Make sure each message is processed just once.
+	// JIRA: CPOUI5ODATAV4-3323
+	QUnit.test("CPOUI5ODATAV4-3323", async function (assert) {
+		const fnSpyCreate = this.spy(ODataModel.prototype, "createUI5Message");
+		const fnSpyUpdate = this.spy(Messaging, "updateMessages");
+		const oModel = this.createTeaBusiModel({autoExpandSelect : true});
+		const sView = `
+<FlexBox id="objectPage">
+	<Text text="{ID}"/>
+	<Text text="{Name}"/>
+	<Text text="{AGE}"/>
+	<Text text="{ENTRYDATE}"/>
+	<Text text="{MANAGER_ID}"/>
+	<Text text="{TEAM_ID}"/>
+	<Text text="{Is_Manager}"/>
+	<Text text="{LAST_MODIFIED_AT}"/>
+	<Text text="{= JSON.stringify(%{LOCATION}) }"/>
+	<Text text="{= JSON.stringify(%{SALARY}) }"/>
+</FlexBox>`;
+
+		await this.createView(assert, sView, oModel);
+
+		this.expectRequest("EMPLOYEES('1')?$select=AGE,ENTRYDATE,ID,Is_Manager,LAST_MODIFIED_AT"
+				+ ",LOCATION,MANAGER_ID,Name,SALARY,TEAM_ID,__CT__FAKE__Message/__FAKE__Messages", {
+				AGE : 42,
+				ENTRYDATE : "2020-01-01",
+				ID : "1",
+				Is_Manager : false,
+				LAST_MODIFIED_AT : "2024-01-01T12:00:00Z",
+				LOCATION : {
+					City : {
+						CITYNAME : "Walldorf",
+						POSTALCODE : "69190"
+					},
+					COUNTRY : "DE"
+				},
+				MANAGER_ID : "Manager_01",
+				Name : "Frederic Fall",
+				SALARY : {
+					BASIC_SALARY_CURR : "EUR",
+					BONUS_CURR : "DEM",
+					MONTHLY_BASIC_SALARY_AMOUNT : "1234",
+					YEARLY_BONUS_AMOUNT : "567"
+				},
+				TEAM_ID : "Team_01",
+				__CT__FAKE__Message : {
+					__FAKE__Messages : [{
+						target : "AGE",
+						code : "1",
+						message : "Text #1",
+						numericSeverity : 1,
+						transition : false
+					}, {
+						target : "ENTRYDATE",
+						code : "2",
+						message : "Text #2",
+						numericSeverity : 2,
+						transition : false
+					}, {
+						target : "LAST_MODIFIED_AT",
+						code : "3",
+						message : "Text #3",
+						numericSeverity : 3,
+						transition : false
+					}, {
+						target : "LOCATION",
+						code : "4",
+						message : "Text #4",
+						numericSeverity : 4,
+						transition : false
+					}]
+				}
+			})
+			.expectMessages([{
+				code : "1",
+				message : "Text #1",
+				target : "/EMPLOYEES('1')/AGE",
+				type : "Success"
+			}, {
+				code : "2",
+				message : "Text #2",
+				target : "/EMPLOYEES('1')/ENTRYDATE",
+				type : "Information"
+			}, {
+				code : "3",
+				message : "Text #3",
+				target : "/EMPLOYEES('1')/LAST_MODIFIED_AT",
+				type : "Warning"
+			}, {
+				code : "4",
+				message : "Text #4",
+				target : "/EMPLOYEES('1')/LOCATION",
+				type : "Error"
+			}]);
+
+		this.oView.byId("objectPage").setBindingContext(
+			oModel.getKeepAliveContext("/EMPLOYEES('1')", true));
+
+		await this.waitForChanges(assert, "set binding context");
+
+		assert.strictEqual(fnSpyCreate.callCount, 4, "ODM#createUI5Message"); // was: 44
+		assert.strictEqual(fnSpyUpdate.callCount, 1, "Messaging#updateMessages"); // was: 11
 	});
 
 	//*********************************************************************************************
