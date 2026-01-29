@@ -595,21 +595,37 @@ function(
 		 * Changes the value of the control and fires the change event.
 		 *
 		 * @param {boolean} bForce If true, will force value change
-		 * @param {boolean} bShouldFormat If true, will format the value
 		 * @returns {this} Reference to the control instance for chaining
 		 * @private
 		 */
-		StepInput.prototype._changeValue = function (bForce, bShouldFormat = false) {
+		StepInput.prototype._changeValue = function (bForce) {
 			this._verifyValue();
 			this._bValueStatePreset = false;
-			if ((this._fTempValue != this._fOldValue) || bForce) {
+
+			// Handle the special case where string representation needs formatting
+			let bShouldFireChange = (this._fTempValue != this._fOldValue && this._isValueWithCorrectPrecision(this._sTempValue)) || bForce;
+
+			// Check if we need to format string representation (e.g., ".50" -> "0.50")
+			if (!bShouldFireChange && this._sTempValue && typeof this._sTempValue === 'string') {
+				const fParsedInput = this._parseNumber(this._sTempValue);
+				const sFormattedValue = this._getFormattedValue(this._fTempValue);
+				// Round the parsed input according to displayValuePrecision so inputs like
+				// ".4" with displayValuePrecision=0 are treated as 0 after rounding.
+				const iPrecision = this.getDisplayValuePrecision();
+				const fParsedRounded = !isNaN(fParsedInput) ? Math.round(fParsedInput * Math.pow(10, iPrecision)) / Math.pow(10, iPrecision) : NaN;
+
+				if (!isNaN(fParsedInput) && !isNaN(fParsedRounded) &&
+					fParsedRounded === this._fTempValue &&
+					this._isValueWithCorrectPrecision(this._sTempValue) &&
+					this._sTempValue !== sFormattedValue) {
+					bShouldFireChange = true;
+				}
+			}
+
+			if (bShouldFireChange) {
 				// change the value and fire the event
-				const bIsValueWithValidPrecision = this._isValueWithCorrectPrecision(this._sTempValue || "");
-				const fFormattedValue = this._getFormattedValue(this._fTempValue);
-				const fValueToSet = bIsValueWithValidPrecision || bShouldFormat ? fFormattedValue : this._sTempValue;
 				this.setValue(this._fTempValue);
-				this._getInput().setValue(fValueToSet);
-				this._sTempValue = bIsValueWithValidPrecision ? fValueToSet.toString() : this._sTempValue;
+				this._getInput().setValue(this._getFormattedValue());
 				this.fireChange({value: this._fTempValue});
 			} else {
 				// just update the visual value and buttons
@@ -633,7 +649,7 @@ function(
 				this._bDelayedEventFire = false;
 				this._changeValueWithStep(fMultiplier);
 				this._btndown = false;
-				this._changeValue(false, true);
+				this._changeValue();
 			} else {
 				// long click, skip it
 				this._bSpinStarted = false;
@@ -779,7 +795,7 @@ function(
 				sMessage = this.getValueStateText() ? this.getValueStateText() : oCoreMessageBundle.getText("Float.Invalid");
 			} else if (!this._isValueWithCorrectPrecision(sValue)) {
 				aViolatedConstraints.push("precision");
-				sMessage = this.getValueStateText() ? this.getValueStateText() : oCoreMessageBundle.getText("EnterNumberWithPrecision", [this.getDisplayValuePrecision()]);
+				sMessage = oCoreMessageBundle.getText("EnterNumberWithPrecision", [this.getDisplayValuePrecision()]);
 			}
 
 			if (sMessage) {
@@ -1308,17 +1324,23 @@ function(
 
 		StepInput.prototype._isValueWithCorrectPrecision = function (sValue) {
 			const sDecimalSeparator = Device.system.desktop ? this._getNumberFormatter().oFormatOptions.decimalSeparator : ".",
-				iDecimalMark = sValue.indexOf(sDecimalSeparator),
 				iCharsSet = this.getDisplayValuePrecision();
 
-			if (iDecimalMark > 0 && iCharsSet >= 0) { //only for decimals
-				const sEventValueAfterTheDecimal = sValue.split(sDecimalSeparator)[1],
+			// If the value starts with the decimal separator, normalize it to "0.xxx" for the precision check
+			if (sValue && sValue.indexOf(sDecimalSeparator) === 0) {
+				sValue = `0${sValue}`;
+			}
+
+			const iDecimalMark = sValue?.indexOf(sDecimalSeparator);
+
+			if (iDecimalMark >= 0 && iCharsSet >= 0) { // only for decimals
+				const sEventValueAfterTheDecimal = sValue?.split(sDecimalSeparator)[1],
 					iCharsAfterTheDecimalSign = sEventValueAfterTheDecimal ? sEventValueAfterTheDecimal.length : 0;
 
-					//if the characters after the decimal are more than the displayValuePrecision -> keep the current value after the decimal
-					if (iCharsAfterTheDecimalSign > iCharsSet) {
-						return false;
-					}
+				// if the characters after the decimal are more or less than the displayValuePrecision -> invalid
+				if (iCharsAfterTheDecimalSign !== iCharsSet) {
+					return false;
+				}
 			}
 
 			return true;

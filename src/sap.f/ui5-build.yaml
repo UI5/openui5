@@ -35,6 +35,7 @@ customConfiguration:
       - "@ui5/webcomponents-fiori/dist/UserMenu"
       - "@ui5/webcomponents-fiori/dist/UserMenuItem"
       - "@ui5/webcomponents-fiori/dist/UserMenuAccount"
+      - "@ui5/webcomponents-fiori/dist/illustrations/UnableToUpload"
       - "@ui5/webcomponents-icons/AllIcons"
       - "@ui5/webcomponents-icons-tnt/AllIcons"
       - "@ui5/webcomponents-icons-business-suite/AllIcons"

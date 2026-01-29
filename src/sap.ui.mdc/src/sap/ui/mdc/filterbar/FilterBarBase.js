@@ -160,8 +160,10 @@ sap.ui.define([
 
 					/**
 					 * Specifies the filter metadata.<br>
+					 * The format is the same as the return type of the {@link module:sap/ui/mdc/FilterBarDelegate.fetchProperties fetchProperties} delegate function.<br>
+					 * Properties specified here must be consistent with properties returned by the {@link module:sap/ui/mdc/FilterBarDelegate.fetchProperties fetchProperties} callback, otherwise validation errors might occur.<br>
+					 * Metadata for initially rendered {@link sap.ui.mdc.FilterField FilterFields} (those in the <code>filterItems</code> aggregation) should be specified here, rather than in the <code>FilterField</code> configuration.<br>
 					 * <b>Note</b>: This property must not be bound.<br>
-					 * <b>Note</b>: This property is used exclusively for SAPUI5 flexibility/ Fiori Elements. Do not use it otherwise.<br>
 					 * <b>Node</b>: Please check {@link sap.ui.mdc.filterbar.PropertyInfo} for more information about the supported inner elements.
 					 * <b>Note</b>: Existing properties (set via <code>sap.ui.mdc.filterbar.FilterBarBase#setPropertyInfo</code>) must not be removed and their attributes must not be changed during the {@link module:sap/ui/mdc/FilterBarDelegate.fetchProperties fetchProperties} callback. Otherwise validation errors might occur whenever personalization-related control features (such as the opening of any personalization dialog) are activated.
 					 *
@@ -351,6 +353,7 @@ sap.ui.define([
 			this._aOngoingChangeAppliance = [];
 			this._bSearchTriggered = false;
 			this._bIgnoreQueuing = false; // used to overrule the default behaviour of suspendSelection
+			this._mEnhancedFilterFields = new WeakMap();
 		};
 
 		/**
@@ -439,29 +442,45 @@ sap.ui.define([
 			this._applySettings(mSettings, oScope);
 			Promise.all([this.awaitPropertyHelper()]).then(() => {
 				if (!this._bIsBeingDestroyed) {
-					this._applyInitialFilterConditions();
-					this.getFilterItems().forEach((oFilterField) => {
-						this._enhanceFilterField(oFilterField);
-					});
+					if (PropertyInfoValidator._isValidationFeatureFlagEnabled) {
+						this._applyInitialFilterConditions().then(() => {
+							this.getFilterItems().forEach((oFilterField) => {
+								this._enhanceFilterField(oFilterField);
+							});
 
-					const oBasicSearchField = this.getBasicSearchField();
-					if (oBasicSearchField) {
-						this._enhanceBasicSearchField(oBasicSearchField);
+							const oBasicSearchField = this.getBasicSearchField();
+							if (oBasicSearchField) {
+								this._enhanceBasicSearchField(oBasicSearchField);
+							}
+						});
+					} else {
+						this._applyInitialFilterConditions();
+						this.getFilterItems().forEach((oFilterField) => {
+							this._enhanceFilterField(oFilterField);
+						});
+
+						const oBasicSearchField = this.getBasicSearchField();
+						if (oBasicSearchField) {
+							this._enhanceBasicSearchField(oBasicSearchField);
+						}
 					}
 				}
 			});
 		};
 
 		FilterBarBase.prototype._validatePropertyInfos = function(aPropertyInfos, aFilterItems) {
+			this._bHasMetadataPropertiesOnFilterFields = false; // If any FilterField sets metadata properties, this should be done on every FilterField
 			aFilterItems.forEach((oFilterItem) => {
 				const sPropertyKey = oFilterItem.getPropertyKey();
 				const fnIsPropertyInfo = (oPropertyInfo) => {
 					return oPropertyInfo.name === sPropertyKey;
 				};
-				if (sPropertyKey && aPropertyInfos.some(fnIsPropertyInfo)) {
+				//if (sPropertyKey) {
+				if (sPropertyKey && (PropertyInfoValidator._isValidationFeatureFlagEnabled || aPropertyInfos.some(fnIsPropertyInfo))) {
 					const oPropertyInfo = aPropertyInfos.find(fnIsPropertyInfo);
 					PropertyInfoValidator.comparePropertyInfoWithControl(oFilterItem, oPropertyInfo);
 				}
+				this._bHasMetadataPropertiesOnFilterFields ||= PropertyInfoValidator.hasPropertiesOnControl(oFilterItem);
 			});
 		};
 
@@ -1665,6 +1684,7 @@ sap.ui.define([
 							oChanges.child.detachChange(this._handleFilterItemChanges, this);
 							oChanges.child.detachSubmit(this._handleFilterItemSubmit, this);
 							this._filterItemRemoved(oChanges.child);
+							this._mEnhancedFilterFields.delete(oChanges.child);
 							break;
 						default:
 							Log.error("operation " + oChanges.mutation + " not yet implemented");
@@ -1678,6 +1698,7 @@ sap.ui.define([
 						case "remove":
 							oChanges.child.detachSubmit(this._handleFilterItemSubmit, this);
 							this._removeFilterFieldFromContent(oChanges.child);
+							this._mEnhancedFilterFields.delete(oChanges.child);
 							break;
 						default:
 							Log.error("operation " + oChanges.mutation + " not yet implemented");
@@ -1774,7 +1795,7 @@ sap.ui.define([
 		};
 
 		FilterBarBase.prototype._enhanceFilterField = function(oFilterField) {
-			if (oFilterField) {
+			if (oFilterField && !this._mEnhancedFilterFields.get(oFilterField)) {
 				const sPropertyKey = oFilterField.getPropertyKey();
 
 				if (!sPropertyKey) {
@@ -1789,14 +1810,18 @@ sap.ui.define([
 					});
 				}
 
-				let oFilterFieldPropertyInfo = this._getPropertyByName(sPropertyKey);
-				const aPropertyInfos = this.getPropertyInfo();
-				if (!oFilterFieldPropertyInfo && aPropertyInfos.length > 0) { // the data in propertyInfo may still not be propagated to property helper, so we check also directly
-					oFilterFieldPropertyInfo = aPropertyInfos.find((oPropertyInfo) => (oPropertyInfo.key === sPropertyKey) || (oPropertyInfo.name === sPropertyKey));
+				const oFilterFieldPropertyInfo = this._getPropertyByName(sPropertyKey, true);
+
+				if (PropertyInfoValidator._isValidationFeatureFlagEnabled) {
+					if (this._bHasMetadataPropertiesOnFilterFields && !PropertyInfoValidator.hasPropertiesOnControl(oFilterField)) {
+						// If any FilterField has explicitly set properties, this should be the case on all FilterFields
+						Log.warning("Filter field with the id = '" + oFilterField.getId() + "' has no metadata properties although another FilterField has.");
+					}
 				}
 
 				if (!oFilterFieldPropertyInfo) {
-					if (!this.isA("sap.ui.mdc.valuehelp.FilterBar")) { // vh.FB does not support 'propertyInfo'...
+					//if (!this.isA("sap.ui.mdc.valuehelp.FilterBar") && this._bHasMetadataPropertiesOnFilterFields && sPropertyKey !== "$search") { // vh.FB does not support 'propertyInfo'...
+					if (!this.isA("sap.ui.mdc.valuehelp.FilterBar") && (!PropertyInfoValidator._isValidationFeatureFlagEnabled || (this._bHasMetadataPropertiesOnFilterFields && sPropertyKey !== "$search"))) { // vh.FB does not support 'propertyInfo'...
 						Log.warning("Property '" + sPropertyKey + "' does not exist for filter field with the id = '" + oFilterField.getId() + "' on filter bar='" + this.getId() + "'");
 					}
 					PropertyInfoValidator.checkMandatoryProperties(oFilterField);
@@ -1806,6 +1831,8 @@ sap.ui.define([
 
 				PropertyInfoValidator.compareControlWithPropertyInfo(oFilterField, oFilterFieldPropertyInfo);
 				// no display, no valueHelp, no additionalDataType, no tooltip, no operators, no defaultOperator, no caseSensitive
+
+				this._mEnhancedFilterFields.set(oFilterField, true);
 
 				oFilterField.triggerCheckCreateInternalContent();
 			}
@@ -1916,7 +1943,7 @@ sap.ui.define([
 
 			this._bIgnoreChanges = true;
 
-			this._applyFilterConditionsChanges().then(() => {
+			return this._applyFilterConditionsChanges().then(() => {
 				this._bIgnoreChanges = false;
 				this._reportModelChange({
 					triggerFilterUpdate: true,
@@ -2143,6 +2170,8 @@ sap.ui.define([
 			this._aFIChanges = null;
 
 			this._aOngoingChangeAppliance = null;
+
+			this._mEnhancedFilterFields = null;
 		};
 
 		/**

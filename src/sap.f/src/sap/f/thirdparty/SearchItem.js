@@ -1,4 +1,4 @@
-sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/parameters-bundle.css2', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/Tag', 'sap/f/thirdparty/Button2', 'sap/f/thirdparty/information', 'sap/f/thirdparty/SearchItem.css', 'sap/f/thirdparty/generateHighlightedMarkup', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/i18n-defaults', 'sap/f/thirdparty/FocusableElements', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/encodeXML', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/willShowContent', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/toLowercaseEnumValue', 'sap/f/thirdparty/BusyIndicator', 'sap/f/thirdparty/Label', 'sap/f/thirdparty/parameters-bundle.css3'], (function (webcomponentsBase, ListItemBase, parametersBundle_css, Icon, Tag, Button, information, SearchItem_css, generateHighlightedMarkup, eventStrict, i18nDefaults, FocusableElements, parametersBundle_css$1, encodeXML, Icons, willShowContent, i18nDefaults$1, AccessibilityTextsHelper, toLowercaseEnumValue, BusyIndicator, Label, parametersBundle_css$2) { 'use strict';
+sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/parameters-bundle.css2', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/Tag', 'sap/f/thirdparty/Button2', 'sap/f/thirdparty/information', 'sap/f/thirdparty/SearchItem.css', 'sap/f/thirdparty/generateHighlightedMarkup', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/i18n-defaults', 'sap/f/thirdparty/FocusableElements', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/encodeXML', 'sap/f/thirdparty/Theme', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/willShowContent', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/toLowercaseEnumValue', 'sap/f/thirdparty/BusyIndicator', 'sap/f/thirdparty/Label', 'sap/f/thirdparty/parameters-bundle.css3'], (function (webcomponentsBase, ListItemBase, parametersBundle_css, Icon, Tag, Button, information, SearchItem_css, generateHighlightedMarkup, eventStrict, i18nDefaults, FocusableElements, parametersBundle_css$1, encodeXML, Theme, Icons, willShowContent, i18nDefaults$1, AccessibilityTextsHelper, toLowercaseEnumValue, BusyIndicator, Label, parametersBundle_css$2) { 'use strict';
 
     function SearchFieldTemplate() {
         return (parametersBundle_css.jsx("li", { part: "native-li", class: "ui5-li-root ui5-li--focusable", "aria-selected": this.selected, role: "option", "data-sap-focus-ref": true, draggable: this.movable, tabindex: this._effectiveTabIndex, onFocusIn: this._onfocusin, onFocusOut: this._onfocusout, onKeyUp: this._onkeyup, onKeyDown: this._onkeydown, onClick: this._onclick, children: parametersBundle_css.jsx("div", { part: "content", class: "ui5-search-item-content", children: parametersBundle_css.jsxs("div", { class: "ui5-search-item-begin-content", children: [this.image.length > 0 && !this.icon &&
@@ -145,8 +145,8 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/ListItemBase'
         eventStrict.l("delete")
     ], SearchItem);
     SearchItem.define();
-    var SearchItem$1 = SearchItem;
+    var SearchItem_default = SearchItem;
 
-    return SearchItem$1;
+    return SearchItem_default;
 
 }));

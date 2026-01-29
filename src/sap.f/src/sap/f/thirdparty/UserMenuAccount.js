@@ -1,4 +1,4 @@
-sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Icons'], (function (webcomponentsBase, Icons) { 'use strict';
+sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Theme', 'sap/f/thirdparty/Icons'], (function (webcomponentsBase, Theme, Icons) { 'use strict';
 
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -107,8 +107,8 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Icons'], (fun
          */
     ], UserMenuAccount);
     UserMenuAccount.define();
-    var UserMenuAccount$1 = UserMenuAccount;
+    var UserMenuAccount_default = UserMenuAccount;
 
-    return UserMenuAccount$1;
+    return UserMenuAccount_default;
 
 }));

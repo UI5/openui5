@@ -49,7 +49,13 @@
 						filtersChanged="onFiltersChanged" search="onSearch"
 						filterConditions='\{"stock" : [\{"operator":"BT","values":[100,50000]}]\}'
 						propertyInfo='[\{"name": "stock", "dataType":"Edm.Int32", "maxConditions": 1, "required": false, "label": "Stock range", "group": "CatalogService.Books", "groupLabel": "Books"\},
-						               \{"name": "author_ID", "dataType":"Edm.Int32", "required":false, "label":"Author ID", "formatOptions":\{"groupingEnabled":false\}, "group": "CatalogService.Books", "groupLabel": "Books"\}]'
+						               \{"name": "author_ID", "dataType":"Edm.Int32", "required":false, "label":"Author ID", "formatOptions":\{"groupingEnabled":false\}, "group": "CatalogService.Books", "groupLabel": "Books"\},
+									   \{"name": "title", "dataType":"Edm.String", "required":false, "label":"Title", "constraints": \{"maxLength": 1111\}, "caseSensitive": false, "group": "CatalogService.Books", "groupLabel": "Books"\},
+									   \{"name": "published", "dataType":"Edm.Date", "maxConditions": -1, "required":false, "label":"Published", "group": "CatalogService.Books", "groupLabel": "Books"\},
+									   \{"name": "language_code", "dataType":"Edm.String", "maxConditions": 1, "required":false, "label":"Language", "constraints": \{"nullable": false, "maxLength": 3\}, "group": "CatalogService.Books", "groupLabel": "Books"\},
+									   \{"name": "genre_code", "dataType":"Edm.String", "maxConditions": -1, "required":false, "label":"Genre", "constraints": \{"maxLength": 1111\}, "group": "CatalogService.Books", "groupLabel": "Books"\},
+									   \{"name": "subgenre_code", "dataType":"Edm.String", "maxConditions": -1, "required":false, "label":"Sub Genre", "constraints": \{"maxLength": 1111\}, "group": "CatalogService.Books", "groupLabel": "Books"\}
+									]'
 						liveMode="false"
 						delegate='\{"name": "sap/ui/v4demo/delegate/Books.FB.delegate", "payload": \{"collectionName": "Books"\}\}'
 						p13nMode="Item,Value">
@@ -794,17 +800,16 @@
 
 							<mdc:FilterField
 								delegate='\{"name": "sap/ui/v4demo/delegate/FieldBase.delegate", "payload": \{\}\}'
-								id="ff2" label="Title"
+								id="ff2" 
 								conditions="{$filters>/conditions/title}"
 								propertyKey="title"
 								valueHelp="FH4" />
 
 							<mdc:FilterField
 								delegate='\{"name": "delegates/odata/v4/FieldBaseDelegate", "payload": \{\}\}'
-								id="ff3" label="Stock range"
+								id="ff3" 
 								conditions="{$filters>/conditions/stock}"
 								propertyKey="stock"
-								maxConditions="1"
 								operators="BT">
 								<mdc:contentEdit>
 									<demo:CustomRangeSlider
@@ -815,39 +820,34 @@
 
 							<mdc:FilterField
 								delegate='\{"name": "delegates/odata/v4/FieldBaseDelegate", "payload": \{\}\}'
-								id="ff4" label="Published"
-								dataType="Edm.Date" dataTypeConstraints='\{"V4": true\}'
+								id="ff4"
 								conditions="{$filters>/conditions/published}"
 								propertyKey="published"
-								maxConditions="-1" valueHelp="FHPublished"
+								valueHelp="FHPublished"
 								operators="EQ,GT,LT,BT,MEDIEVAL,RENAISSANCE,MODERN,LASTYEAR"
 								defaultOperator="RENAISSANCE" />
 
 							<mdc:FilterField
 								delegate='\{"name": "sap/ui/v4demo/delegate/FieldBase.delegate", "payload": \{"autoCompleteCaseSensitive": "key"\}\}'
-								id="ff5" label="Language" display="Description"
-								dataType="Edm.String"
-								dataTypeConstraints="{nullable: false, maxLength: 3}"
+								id="ff5" display="Description"
 								conditions="{$filters>/conditions/language_code}"
 								propertyKey="language_code"
-								maxConditions="1" valueHelp="FHLanguage" />
+								valueHelp="FHLanguage" />
 
 							<mdc:FilterField
 								delegate='\{"name": "sap/ui/v4demo/delegate/FieldBase.delegate", "payload": \{"acceptAnySuggestions": "true"\}\}'
-								id="ff7" label="Genre"
+								id="ff7" 
 								conditions="{$filters>/conditions/genre_code}"
 								propertyKey="genre_code"
-								dataType="Edm.String"
-								required="false" valueHelp="FHGenre"
+								valueHelp="FHGenre"
 								display="Description" />
 
 							<mdc:FilterField
 								delegate='\{"name": "delegates/odata/v4/FieldBaseDelegate", "payload": \{\}\}'
-								id="ff8" label="Sub Genre"
+								id="ff8" 
 								conditions="{$filters>/conditions/subgenre_code}"
 								propertyKey="subgenre_code"
-								dataType="Edm.String"
-								required="false" valueHelp="FHSubGenre"
+								valueHelp="FHSubGenre"
 								display="Description" />
 						</mdc:filterItems>
 					</mdc:FilterBar>

@@ -12,6 +12,7 @@ sap.ui.define([
 	"sap/ui/core/Lib",
 	'sap/ui/core/library',
 	'./SelectDialogBase',
+	'sap/ui/dom/detectTextSelection',
 	'sap/ui/core/InvisibleText',
 	'sap/ui/core/InvisibleMessage',
 	'sap/ui/core/StaticArea',
@@ -32,6 +33,7 @@ sap.ui.define([
 	Library,
 	CoreLibrary,
 	SelectDialogBase,
+	detectTextSelection,
 	InvisibleText,
 	InvisibleMessage,
 	StaticArea,
@@ -1324,6 +1326,10 @@ sap.ui.define([
 	};
 
 	TableSelectDialog.prototype._tableColumnsEventDelegates = function (oEvent) {
+		if (detectTextSelection(this.getDomRef())) {
+			return;
+		}
+
 		let oTarget = oEvent.target.closest(".sapMLIB"),
 				oListItem;
 

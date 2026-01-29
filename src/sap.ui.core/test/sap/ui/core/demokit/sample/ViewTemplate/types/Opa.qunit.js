@@ -291,8 +291,9 @@ sap.ui.require([
 		When.onTheMainPage.enterStepInputValue("stepInput", "102");
 		Then.onTheMainPage.checkStepInputValueState("stepInput", ValueState.Error,
 			oBundle.getText("EnterNumberMax", ["99"]));
-		When.onTheMainPage.enterStepInputValue("stepInput", "1.234", "1");
-		Then.onTheMainPage.checkStepInputValueState("stepInput", ValueState.None, "");
+		When.onTheMainPage.enterStepInputValue("stepInput", "1.234", "102");
+		Then.onTheMainPage.checkStepInputValueState("stepInput", ValueState.Error,
+			oBundle.getText("EnterNumberWithPrecision", ["0"]));
 		When.onTheMainPage.enterStepInputValue("stepInput", "0");
 		Then.onTheMainPage.checkStepInputValueState("stepInput", ValueState.None);
 

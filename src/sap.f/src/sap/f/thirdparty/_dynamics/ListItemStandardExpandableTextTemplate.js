@@ -1,4 +1,4 @@
-sap.ui.define(['exports', 'sap/f/thirdparty/parameters-bundle.css2', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/Text', 'sap/f/thirdparty/Link', 'sap/f/thirdparty/Button2', 'sap/f/thirdparty/ResponsivePopover', 'sap/f/thirdparty/willShowContent', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/toLowercaseEnumValue', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/BusyIndicator', 'sap/f/thirdparty/Label', 'sap/f/thirdparty/information', 'sap/f/thirdparty/Title', 'sap/f/thirdparty/ValueState', 'sap/f/thirdparty/FocusableElements', 'sap/f/thirdparty/ListItemBase'], (function (exports, parametersBundle_css, webcomponentsBase, parametersBundle_css$1, Icons, i18nDefaults, Text, Link, Button, ResponsivePopover, willShowContent, eventStrict, AccessibilityTextsHelper, toLowercaseEnumValue, Icon, BusyIndicator, Label, information, Title, ValueState, FocusableElements, ListItemBase) { 'use strict';
+sap.ui.define(['exports', 'sap/f/thirdparty/parameters-bundle.css2', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/Theme', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/Text', 'sap/f/thirdparty/Link', 'sap/f/thirdparty/Button2', 'sap/f/thirdparty/ResponsivePopover', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/willShowContent', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/toLowercaseEnumValue', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/BusyIndicator', 'sap/f/thirdparty/Label', 'sap/f/thirdparty/information', 'sap/f/thirdparty/Title', 'sap/f/thirdparty/ValueState', 'sap/f/thirdparty/FocusableElements', 'sap/f/thirdparty/ListItemBase'], (function (exports, parametersBundle_css, webcomponentsBase, parametersBundle_css$1, Theme, i18nDefaults, Text, Link, Button, ResponsivePopover, Icons, willShowContent, eventStrict, AccessibilityTextsHelper, toLowercaseEnumValue, Icon, BusyIndicator, Label, information, Title, ValueState, FocusableElements, ListItemBase) { 'use strict';
 
     /**
      * Overflow Mode.
@@ -24,8 +24,8 @@ sap.ui.define(['exports', 'sap/f/thirdparty/parameters-bundle.css2', 'sap/f/thir
                             parametersBundle_css.jsxs(ResponsivePopover.ResponsivePopover, { open: this._expanded, opener: "toggle", accessibleNameRef: "popover-text", contentOnlyOnDesktop: true, _hideHeader: true, class: "ui5-exp-text-popover", onClose: this._handlePopoverClose, children: [parametersBundle_css.jsx(Text.Text, { id: "popover-text", children: this.text }), parametersBundle_css.jsx("div", { slot: "footer", class: "ui5-exp-text-footer", children: parametersBundle_css.jsx(Button.Button, { design: "Transparent", onClick: this._handleCloseButtonClick, children: this._closeButtonText }) })] })] })] }));
     }
 
-    Icons.p("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
-    Icons.p("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme);
+    Theme.p("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
+    Theme.p("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme);
     var ExpandableTextCss = `:host{display:inline-block;font-family:var(--sapFontFamily);font-size:var(--sapFontSize);color:var(--sapTextColor)}:host([hidden]){display:none}.ui5-exp-text-text{display:inline}.ui5-exp-text-text,.ui5-exp-text-toggle{font-family:inherit;font-size:inherit}.ui5-exp-text-text,.ui5-exp-text-ellipsis{color:inherit}.ui5-exp-text-popover::part(content){padding-inline:1rem}.ui5-exp-text-footer{width:100%;display:flex;align-items:center;justify-content:flex-end}
 `;
 
@@ -136,7 +136,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/parameters-bundle.css2', 'sap/f/thir
             return undefined;
         }
         _handlePopoverClose() {
-            if (!Icons.d()) {
+            if (!Theme.d()) {
                 this._expanded = false;
             }
         }

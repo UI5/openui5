@@ -40,7 +40,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents.dist.MenuItem",
       {
         metadata: {
-          tag: "ui5-menu-item-68f7652d",
+          tag: "ui5-menu-item-0df29cf2",
 
           namespace: "sap.f.gen.ui5.webcomponents",
 

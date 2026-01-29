@@ -1,4 +1,4 @@
-sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/parameters-bundle.css2', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/toLowercaseEnumValue', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/i18n-defaults2'], (function (exports, webcomponentsBase, eventStrict, parametersBundle_css, AccessibilityTextsHelper, parametersBundle_css$1, Icons, toLowercaseEnumValue, Icon, i18nDefaults) { 'use strict';
+sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/parameters-bundle.css2', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/Theme', 'sap/f/thirdparty/toLowercaseEnumValue', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/i18n-defaults2'], (function (exports, webcomponentsBase, eventStrict, parametersBundle_css, AccessibilityTextsHelper, parametersBundle_css$1, Theme, toLowercaseEnumValue, Icon, i18nDefaults) { 'use strict';
 
     /**
      * Different link designs.
@@ -31,8 +31,8 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/ev
                     parametersBundle_css.jsx(Icon.Icon, { class: "ui5-link-end-icon", name: this.endIcon, mode: "Decorative", part: "endIcon" })] }));
     }
 
-    Icons.p("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
-    Icons.p("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme);
+    Theme.p("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
+    Theme.p("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme);
     var linkCss = `.ui5-hidden-text{position:absolute;clip:rect(1px,1px,1px,1px);user-select:none;left:-1000px;top:-1000px;pointer-events:none;font-size:0}:host(:not([hidden])){display:inline-flex}:host{max-width:100%;color:var(--sapLinkColor);font-family:var(--sapFontFamily);font-size:var(--sapFontSize);cursor:pointer;outline:none;text-decoration:var(--_ui5-v2-15-0_link_text_decoration);text-shadow:var(--sapContent_TextShadow);white-space:normal;overflow-wrap:break-word}:host(:hover){color:var(--sapLink_Hover_Color);text-decoration:var(--_ui5-v2-15-0_link_hover_text_decoration)}:host(:active){color:var(--sapLink_Active_Color);text-decoration:var(--_ui5-v2-15-0_link_active_text_decoration)}:host([disabled]){pointer-events:none}:host([disabled]) .ui5-link-root{text-shadow:none;outline:none;cursor:default;pointer-events:none;opacity:var(--sapContent_DisabledOpacity)}:host([design="Emphasized"]) .ui5-link-root{font-family:var(--sapFontBoldFamily)}:host([design="Subtle"]){color:var(--sapLink_SubtleColor);text-decoration:var(--_ui5-v2-15-0_link_subtle_text_decoration)}:host([design="Subtle"]:hover:not(:active)){color:var(--sapLink_SubtleColor);text-decoration:var(--_ui5-v2-15-0_link_subtle_text_decoration_hover)}:host([wrapping-type="None"]){white-space:nowrap;overflow-wrap:normal}.ui5-link-root{max-width:100%;display:inline-block;position:relative;overflow:hidden;text-overflow:ellipsis;outline:none;white-space:inherit;overflow-wrap:inherit;text-decoration:inherit;color:inherit}:host([wrapping-type="None"][end-icon]) .ui5-link-root{display:inline-flex;align-items:end}:host .ui5-link-root{outline-offset:-.0625rem;border-radius:var(--_ui5-v2-15-0_link_focus_border-radius)}.ui5-link-icon,.ui5-link-end-icon{color:inherit;flex-shrink:0}.ui5-link-icon{float:inline-start;margin-inline-end:.125rem}.ui5-link-end-icon{margin-inline-start:.125rem;vertical-align:bottom}.ui5-link-text{overflow:hidden;text-overflow:ellipsis}.ui5-link-root:focus-visible,:host([desktop]) .ui5-link-root:focus-within,:host([design="Subtle"]) .ui5-link-root:focus-visible,:host([design="Subtle"][desktop]) .ui5-link-root:focus-within{background-color:var(--_ui5-v2-15-0_link_focus_background_color);outline:var(--_ui5-v2-15-0_link_outline);border-radius:var(--_ui5-v2-15-0_link_focus_border-radius);text-shadow:none;color:var(--_ui5-v2-15-0_link_focus_color)}:host(:not([desktop])) .ui5-link-root:focus-visible,:host([desktop]:focus-within),:host([design="Subtle"][desktop]:focus-within){text-decoration:var(--_ui5-v2-15-0_link_focus_text_decoration)}:host([desktop]:hover:not(:active):focus-within),:host([design="Subtle"][desktop]:hover:not(:active):focus-within){color:var(--_ui5-v2-15-0_link_focused_hover_text_color);text-decoration:var(--_ui5-v2-15-0_link_focused_hover_text_decoration)}:host([interactive-area-size="Large"]) .ui5-link-root{line-height:var(--_ui5-v2-15-0_link_large_interactive_area_height)}:host([interactive-area-size="Large"])::part(icon),:host([interactive-area-size="Large"])::part(endIcon){height:var(--_ui5-v2-15-0_link_large_interactive_area_height)}
 `;
 
@@ -151,7 +151,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/ev
             this._dummyAnchor = document.createElement("a");
         }
         onEnterDOM() {
-            if (Icons.f()) {
+            if (Theme.f()) {
                 this.setAttribute("desktop", "");
             }
         }
@@ -163,9 +163,9 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/ev
         }
         _isCrossOrigin(href) {
             this._dummyAnchor.href = href;
-            return !(this._dummyAnchor.hostname === Icons.i()
-                && this._dummyAnchor.port === Icons.c()
-                && this._dummyAnchor.protocol === Icons.a());
+            return !(this._dummyAnchor.hostname === Theme.i()
+                && this._dummyAnchor.port === Theme.c()
+                && this._dummyAnchor.protocol === Theme.a());
         }
         get effectiveTabIndex() {
             if (this.forcedTabIndex) {

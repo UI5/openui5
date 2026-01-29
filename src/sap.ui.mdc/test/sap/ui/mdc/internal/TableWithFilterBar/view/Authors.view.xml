@@ -41,7 +41,20 @@
 			<f2:DynamicPageHeader>
 				<f2:content>
 
-			<mdc:FilterBar id="authorsFilterBar" variantBackreference="IDVariantManagementOfTable" filtersChanged="onFiltersChanged" liveMode="false" delegate='\{"name": "sap/ui/v4demo/delegate/Authors.FB.delegate", "payload": \{"collectionName": "Authors"\}\}' p13nMode="Item,Value">
+			<mdc:FilterBar id="authorsFilterBar"
+				variantBackreference="IDVariantManagementOfTable"
+				filtersChanged="onFiltersChanged" 
+				liveMode="false" 
+				delegate='\{"name": "sap/ui/v4demo/delegate/Authors.FB.delegate", "payload": \{"collectionName": "Authors"\}\}' 
+				propertyInfo='[
+					\{"name": "name", "label": "Name", "dataType": "Edm.String", "constraints": \{"maxLength": 111\}, "group": "CatalogService.Authors", "groupLabel": "Authors"\},
+					\{"name": "dateOfBirth", "label": "Date of Birth", "dataType": "Edm.Date", "maxConditions": -1, "group": "CatalogService.Authors", "groupLabel": "Authors"\},
+					\{"name": "dateOfDeath", "label": "Date of death", "dataType": "Edm.Date", "maxConditions": 1, "group": "CatalogService.Authors", "groupLabel": "Authors"\},
+					\{"name": "countryOfOrigin_code", "label": "Country of origin", "dataType": "Edm.String", "constraints": \{"maxLength": 3\}, "group": "CatalogService.Authors", "groupLabel": "Authors"\},
+					\{"name": "regionOfOrigin_code", "label": "Region of origin", "dataType": "Edm.String", "constraints": \{"maxLength": 3\}, "group": "CatalogService.Authors", "groupLabel": "Authors"\},
+					\{"name": "cityOfOrigin_city", "label": "City of origin", "dataType": "Edm.String", "constraints": \{"maxLength": 3\}, "group": "CatalogService.Authors", "groupLabel": "Authors"\}
+				]'
+				p13nMode="Item,Value">
 				<mdc:dependents>
 					<mdc:ValueHelp
 						id="FVH_Generic_Multi"
@@ -341,12 +354,12 @@
 				</mdc:basicSearchField>
 
 				<mdc:filterItems>
-					<mdc:FilterField delegate='\{"name": "delegates/odata/v4/FieldBaseDelegate", "payload": \{\}\}' id="ff2" label="Name" conditions="{$filters>/conditions/name}" propertyKey="name" valueHelp="fhName" dataType="sap.ui.model.odata.type.String" defaultOperator="StartsWith" />
-					<mdc:FilterField delegate='\{"name": "delegates/odata/v4/FieldBaseDelegate", "payload": \{\}\}' id="ff3" label="Date of birth" operators="TODAY,TOTODAY,RENAISSANCE,MEDIEVAL,MODERN,CUSTOMRANGE,NOTINRANGE,CustomDateEmpty,CustomDateNotEmpty" maxConditions="-1" conditions="{$filters>/conditions/dateOfBirth}" propertyKey="dateOfBirth" dataType="sap.ui.model.odata.type.Date" />
-					<mdc:FilterField delegate='\{"name": "delegates/odata/v4/FieldBaseDelegate", "payload": \{\}\}' id="ff1" label="Date of death" conditions="{$filters>/conditions/dateOfDeath}" propertyKey="dateOfDeath" maxConditions="1" dataType="sap.ui.model.odata.type.Date" />
-					<mdc:FilterField delegate='\{"name": "sap/ui/v4demo/delegate/FieldBase.delegate", "payload": \{"pasteDescription": true\}\}' id="ff4" label="Country of origin" conditions="{$filters>/conditions/countryOfOrigin_code}" propertyKey="countryOfOrigin_code" valueHelp="IOFFVHCountry" display="ValueDescription" dataType="sap.ui.model.odata.type.String" dataTypeConstraints='\{"maxLength": 3\}' operators="EQ" />
-					<mdc:FilterField delegate='\{"name": "delegates/odata/v4/FieldBaseDelegate", "payload": \{\}\}' id="ff5" label="Region of origin" conditions="{$filters>/conditions/regionOfOrigin_code}" propertyKey="regionOfOrigin_code" valueHelp="IOFFVHRegion" display="ValueDescription" dataType="sap.ui.model.odata.type.String" dataTypeConstraints='\{"maxLength": 3\}'/>
-					<mdc:FilterField delegate='\{"name": "delegates/odata/v4/FieldBaseDelegate", "payload": \{\}\}' id="ff6" label="City of origin" conditions="{$filters>/conditions/cityOfOrigin_city}" propertyKey="cityOfOrigin_city" valueHelp="IOFFVHCity" display="ValueDescription" dataType="sap.ui.model.odata.type.String" dataTypeConstraints='\{"maxLength": 3\}'/>
+					<mdc:FilterField delegate='\{"name": "delegates/odata/v4/FieldBaseDelegate", "payload": \{\}\}' id="ff2" conditions="{$filters>/conditions/name}" propertyKey="name" valueHelp="fhName" defaultOperator="StartsWith" />
+					<mdc:FilterField delegate='\{"name": "delegates/odata/v4/FieldBaseDelegate", "payload": \{\}\}' id="ff3" operators="TODAY,TOTODAY,RENAISSANCE,MEDIEVAL,MODERN,CUSTOMRANGE,NOTINRANGE,CustomDateEmpty,CustomDateNotEmpty" conditions="{$filters>/conditions/dateOfBirth}" propertyKey="dateOfBirth" />
+					<mdc:FilterField delegate='\{"name": "delegates/odata/v4/FieldBaseDelegate", "payload": \{\}\}' id="ff1" conditions="{$filters>/conditions/dateOfDeath}" propertyKey="dateOfDeath" />
+					<mdc:FilterField delegate='\{"name": "sap/ui/v4demo/delegate/FieldBase.delegate", "payload": \{"pasteDescription": true\}\}' id="ff4" conditions="{$filters>/conditions/countryOfOrigin_code}" propertyKey="countryOfOrigin_code" valueHelp="IOFFVHCountry" display="ValueDescription" operators="EQ" />
+					<mdc:FilterField delegate='\{"name": "delegates/odata/v4/FieldBaseDelegate", "payload": \{\}\}' id="ff5" conditions="{$filters>/conditions/regionOfOrigin_code}" propertyKey="regionOfOrigin_code" valueHelp="IOFFVHRegion" display="ValueDescription" />
+					<mdc:FilterField delegate='\{"name": "delegates/odata/v4/FieldBaseDelegate", "payload": \{\}\}' id="ff6" conditions="{$filters>/conditions/cityOfOrigin_city}" propertyKey="cityOfOrigin_city" valueHelp="IOFFVHCity" display="ValueDescription" />
 				</mdc:filterItems>
 
 			</mdc:FilterBar>

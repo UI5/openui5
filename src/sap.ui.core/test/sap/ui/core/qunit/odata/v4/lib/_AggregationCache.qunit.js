@@ -1096,7 +1096,7 @@ sap.ui.define([
 			oHelperMock.expects("getKeyFilter").withExactArgs(oNode, "/Foo", "~Types~")
 				.returns("~Key~");
 			this.mock(this.oRequestor).expects("buildQueryString")
-				.withExactArgs(null, {$apply : "ancestors($root/path,X,NodeID,filter(~Key~),1)"})
+				.withExactArgs("/Foo", {$apply : "ancestors($root/path,X,NodeID,filter(~Key~),1)"})
 				.returns("?~QueryString~");
 			this.mock(this.oRequestor).expects("request")
 				.withExactArgs("GET", "Foo?~QueryString~", "~oGroupLock~")
@@ -1192,7 +1192,7 @@ sap.ui.define([
 		this.mock(_Helper).expects("getKeyFilter").withExactArgs(oNode, "/Foo", "~Types~")
 			.returns("~Key~");
 		this.mock(this.oRequestor).expects("buildQueryString")
-			.withExactArgs(null, {$apply : "ancestors($root/path,X,NodeID,filter(~Key~),1)"})
+			.withExactArgs("/Foo", {$apply : "ancestors($root/path,X,NodeID,filter(~Key~),1)"})
 			.returns("?~QueryString~");
 		this.mock(this.oRequestor).expects("request")
 			.withExactArgs("GET", "Foo?~QueryString~", "~oGroupLock~")
@@ -1246,7 +1246,7 @@ sap.ui.define([
 		this.mock(_Helper).expects("getKeyFilter").withExactArgs(oNode, "/Foo", "~Types~")
 			.returns("~Key~");
 		this.mock(this.oRequestor).expects("buildQueryString")
-			.withExactArgs(null, {$apply : "ancestors($root/path,X,NodeID,filter(~Key~),1)"})
+			.withExactArgs("/Foo", {$apply : "ancestors($root/path,X,NodeID,filter(~Key~),1)"})
 			.returns("?~QueryString~");
 		const oError = new Error();
 		this.mock(this.oRequestor).expects("request")
@@ -1703,7 +1703,7 @@ sap.ui.define([
 				// simulate that the count request failed because another request in the $batch failed
 				oError.cause = "~cause~";
 			}
-			this.mock(this.oRequestor).expects("buildQueryString").withExactArgs(null, {})
+			this.mock(this.oRequestor).expects("buildQueryString").withExactArgs("/~", {})
 				.returns("?~query~");
 			this.mock(oGroupLock).expects("getUnlockedCopy").withExactArgs()
 				.returns("~oGroupLockCopy~");
@@ -1790,7 +1790,7 @@ sap.ui.define([
 				$restore : mustBeMocked // must not be called
 			};
 			this.mock(this.oRequestor).expects("buildQueryString")
-				.withExactArgs(null, oFixture.mExpectedQueryOptions).returns("?~query~");
+				.withExactArgs("/~", oFixture.mExpectedQueryOptions).returns("?~query~");
 			this.mock(oGroupLock).expects("getUnlockedCopy").withExactArgs()
 				.returns("~oGroupLockCopy~");
 			this.mock(this.oRequestor).expects("request")
@@ -7399,7 +7399,7 @@ sap.ui.define([
 				mExpectedQueryOptions.$orderby = "Ltd_Rank desc";
 			}
 			this.mock(this.oRequestor).expects("buildQueryString")
-				.withExactArgs("", mExpectedQueryOptions, false, true, true).returns("?~sQuery~");
+				.withExactArgs("/Foo", mExpectedQueryOptions, false, true, true).returns("?~sQuery~");
 			const oSibling = {
 				// Note: actually set by calculateKeyPredicate from DistanceFromRoot, but never mind
 				"@$ui5.node.level" : bWrongLevel ? 8 : 7

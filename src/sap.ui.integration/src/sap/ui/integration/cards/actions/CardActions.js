@@ -4,6 +4,7 @@
 sap.ui.define([
 	"sap/ui/integration/library",
 	"sap/base/Log",
+	"sap/ui/dom/detectTextSelection",
 	"sap/ui/base/BindingInfo",
 	"sap/ui/base/ManagedObject",
 	"sap/ui/integration/cards/actions/CustomAction",
@@ -20,6 +21,7 @@ sap.ui.define([
 ], function (
 	library,
 	Log,
+	detectTextSelection,
 	BindingInfo,
 	ManagedObject,
 	CustomAction,
@@ -35,17 +37,6 @@ sap.ui.define([
 	HideCardAction
 ) {
 	"use strict";
-
-	function detectTextSelection(oDomRef) {
-		if (!oDomRef || typeof window === "undefined" || typeof window.getSelection !== "function") {
-			return false;
-		}
-
-		const oSelection = window.getSelection();
-		const sTextSelection = oSelection.toString().replace("\n", "");
-
-		return sTextSelection && (oDomRef !== oSelection.focusNode && oDomRef.contains(oSelection.focusNode));
-	}
 
 	function _getServiceName(vService) {
 		if (vService && typeof vService === "object") {

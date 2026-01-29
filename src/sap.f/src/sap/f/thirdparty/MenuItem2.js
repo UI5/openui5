@@ -1,4 +1,4 @@
-sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/parameters-bundle.css2', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/information', 'sap/f/thirdparty/ListItemCustom', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/ResponsivePopover', 'sap/f/thirdparty/Button2', 'sap/f/thirdparty/List', 'sap/f/thirdparty/BusyIndicator', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/i18n-defaults2'], (function (exports, webcomponentsBase, parametersBundle_css, eventStrict, parametersBundle_css$1, Icons, information, ListItemCustom, ListItemBase, ResponsivePopover, Button, List, BusyIndicator, Icon, i18nDefaults) { 'use strict';
+sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/parameters-bundle.css2', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/Theme', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/information', 'sap/f/thirdparty/ListItemCustom', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/ResponsivePopover', 'sap/f/thirdparty/Button2', 'sap/f/thirdparty/List', 'sap/f/thirdparty/BusyIndicator', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/i18n-defaults2'], (function (exports, webcomponentsBase, parametersBundle_css, eventStrict, parametersBundle_css$1, Theme, Icons, information, ListItemCustom, ListItemBase, ResponsivePopover, Button, List, BusyIndicator, Icon, i18nDefaults) { 'use strict';
 
 	const name$1 = "nav-back";
 	const pathData$1 = "M375.5 426q9 9 9 22.5t-9 22.5q-10 10-23 10t-23-10l-192-192q-9-9-9-22.5t9-22.5l191-193q10-10 23-10t22 10q10 9 10 22t-10 23l-157 159q-5 5-5 11.5t5 11.5z";
@@ -49,8 +49,8 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/pa
 	    return (parametersBundle_css.jsx(ListItemCustom.ListItemCustom, { class: "ui5-menu-separator", _forcedAccessibleRole: "separator", disabled: true }));
 	}
 
-	Icons.p("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
-	Icons.p("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme);
+	Theme.p("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
+	Theme.p("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme);
 	var menuSeparatorCss = `:host{border-top:.0625rem solid var(--sapGroup_ContentBorderColor);min-height:.125rem}.ui5-menu-separator{border:inherit;min-height:inherit;background:inherit;opacity:1}
 `;
 
@@ -279,8 +279,8 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/pa
 	    return this.hasSubmenu && parametersBundle_css.jsxs(ResponsivePopover.ResponsivePopover, { id: `${this._id}-menu-rp`, class: "ui5-menu-rp ui5-menu-rp-sub-menu", preventInitialFocus: true, preventFocusRestore: true, hideArrow: true, allowTargetOverlap: true, placement: this.placement, verticalAlign: "Top", accessibleName: this.acessibleNameText, onBeforeOpen: this._beforePopoverOpen, onOpen: this._afterPopoverOpen, onBeforeClose: this._beforePopoverClose, onClose: this._afterPopoverClose, children: [this.isPhone && (parametersBundle_css.jsx(parametersBundle_css.Fragment, { children: parametersBundle_css.jsxs("div", { slot: "header", class: "ui5-menu-dialog-header", children: [parametersBundle_css.jsx(Button.Button, { icon: navBackIcon, class: "ui5-menu-back-button", design: "Transparent", "aria-label": this.labelBack, onClick: this._close }), parametersBundle_css.jsx("div", { class: "ui5-menu-dialog-title", children: parametersBundle_css.jsx("div", { children: this.text }) }), parametersBundle_css.jsx(Button.Button, { icon: information.decline, design: "Transparent", "aria-label": this.labelClose, onClick: this._closeAll })] }) })), parametersBundle_css.jsx("div", { id: `${this._id}-menu-main`, children: this.items.length ? (parametersBundle_css.jsx(List.List, { id: `${this._id}-menu-list`, selectionMode: "None", separators: "None", accessibleRole: "Menu", loading: this.loading, loadingDelay: this.loadingDelay, onMouseOver: this._itemMouseOver, onKeyDown: this._itemKeyDown, onKeyUp: this._itemKeyUp, "onui5-close-menu": this._close, "onui5-exit-end-content": this._navigateOutOfEndContent, children: parametersBundle_css.jsx("slot", {}) })) : this.loading && parametersBundle_css.jsx(BusyIndicator.BusyIndicator, { id: `${this._id}-menu-busy-indicator`, delay: this.loadingDelay, class: "ui5-menu-busy-indicator", active: true }) })] });
 	}
 
-	Icons.p("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
-	Icons.p("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme);
+	Theme.p("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
+	Theme.p("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme);
 	var menuItemCss = `:host{line-height:initial}::slotted([ui5-menu-item]){line-height:inherit}.ui5-menu-rp[ui5-responsive-popover]::part(header),.ui5-menu-rp[ui5-responsive-popover]::part(content),.ui5-menu-rp[ui5-responsive-popover]::part(footer){padding:0}.ui5-menu-rp[ui5-responsive-popover]{box-shadow:var(--sapContent_Shadow1);border-radius:var(--_ui5-v2-15-0_menu_popover_border_radius)}.ui5-menu-busy-indicator{width:100%}.ui5-menu-dialog-header{display:flex;height:var(--_ui5-v2-15-0-responsive_popover_header_height);align-items:center;justify-content:space-between;padding:0px 1rem;width:100%;overflow:hidden}.ui5-menu-dialog-title{display:flex;flex-direction:row;align-items:center;justify-content:flex-start;width:calc(100% - 6.5rem);padding-right:1rem;font-family:var(--sapFontHeaderFamily)}.ui5-menu-dialog-title>h1{display:inline-block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:var(--sapFontHeader5Size)}.ui5-menu-back-button{margin-right:1rem}.ui5-menu-rp.ui5-menu-rp-sub-menu{margin-top:.25rem;margin-inline:var(--_ui5-v2-15-0_menu_submenu_margin_offset)}.ui5-menu-rp.ui5-menu-rp-sub-menu[actual-placement=Start]{margin-top:.25rem;margin-inline:var(--_ui5-v2-15-0_menu_submenu_placement_type_left_margin_offset)}:host([disabled]){pointer-events:initial;opacity:initial}:host([disabled])::part(content){opacity:var(--_ui5-v2-15-0-listitembase_disabled_opacity)}:host([disabled][actionable]:not([active]):not([selected]):hover),:host([disabled][active][actionable]){background:var(--ui5-v2-15-0-listitem-background-color)}:host([active]:not([disabled])),:host([active]:not([disabled])):hover{background-color:var(--sapList_Active_Background)}:host(:not([active]):not([selected]):not([disabled]):hover){background-color:var(--sapList_Hover_Background)}:host([disabled][active][actionable]) .ui5-li-root .ui5-li-icon{color:var(--sapContent_NonInteractiveIconColor)}:host([active]:not([disabled]))::part(content),:host([active]:not([disabled]))::part(additional-text),:host([active]:not([disabled])) .ui5-li-root .ui5-li-icon{color:var(--sapList_Active_TextColor)}:host([focused]:not([active]):not([disabled])){background-color:var(--sapList_Hover_Background)}:host::part(additional-text){margin:unset;margin-inline-start:1rem;color:var(--sapContent_LabelColor);min-width:max-content}.ui5-menu-item-text{width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;pointer-events:none;display:inline-block}.ui5-menu-item-dummy-icon{visibility:hidden}:host::part(title){font-size:var(--sapFontSize);padding-top:.125rem}:host([icon]:not([is-phone]))::part(title),:host([is-phone]:not([icon=""]))::part(title){padding-top:0}:host(:not([is-phone]))::part(native-li){user-select:none;padding:var(--_ui5-v2-15-0_menu_item_padding)}:host::part(content){padding-inline-end:.25rem}.ui5-menu-item-submenu-icon{min-width:var(--_ui5-v2-15-0_list_item_icon_size);min-height:var(--_ui5-v2-15-0_list_item_icon_size);display:inline-block;vertical-align:middle;pointer-events:none}.ui5-menu-item-icon-end{display:inline-block;vertical-align:middle;padding-inline-start:.5rem;pointer-events:none;position:absolute;inset-inline-end:var(--_ui5-v2-15-0_menu_item_submenu_icon_right)}.ui5-menu-item-submenu-icon .ui5-menu-item-icon-end{color:var(--sapContent_NonInteractiveIconColor)}.ui5-menu-item-dummy-icon{min-width:var(--_ui5-v2-15-0_list_item_icon_size);min-height:var(--_ui5-v2-15-0_list_item_icon_size);display:inline-block;vertical-align:middle;padding-inline-end:.75rem;pointer-events:none}.ui5-menu-item-checked{padding-inline-start:.5rem;padding-inline-end:0;font-weight:400;text-align:center}.ui5-menu-item-icon-checked{color:var(--sapContent_BusyColor);padding-top:.25rem}
 `;
 
@@ -415,7 +415,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/pa
 	        return this.text;
 	    }
 	    get isPhone() {
-	        return Icons.d();
+	        return Theme.d();
 	    }
 	    get labelBack() {
 	        return MenuItem_1.i18nBundle.getText(i18nDefaults.MENU_BACK_BUTTON_ARIA_LABEL);
@@ -435,7 +435,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/pa
 	        });
 	    }
 	    async focus(focusOptions) {
-	        await Icons.f$1();
+	        await Theme.f$1();
 	        if (this.hasSubmenu && this.isSubMenuOpen) {
 	            const menuItems = this._allMenuItems;
 	            return menuItems[0] && menuItems[0].focus(focusOptions);
@@ -525,7 +525,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/pa
 	        });
 	    }
 	    _itemMouseOver(e) {
-	        if (!Icons.f()) {
+	        if (!Theme.f()) {
 	            return;
 	        }
 	        const item = e.target;
@@ -614,7 +614,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/pa
 	        this.selected = false;
 	        if (e.detail.escPressed) {
 	            this.focus();
-	            if (Icons.d()) {
+	            if (Theme.d()) {
 	                this.fireDecoratorEvent("close-menu");
 	            }
 	        }

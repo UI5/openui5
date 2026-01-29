@@ -1,4 +1,4 @@
-sap.ui.define(['require', 'exports', 'sap/f/thirdparty/Icons'], (function (require, exports, Icons) { 'use strict';
+sap.ui.define(['require', 'exports', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/Theme'], (function (require, exports, Icons, Theme) { 'use strict';
 
     const loadIconsBundle = async (collection) => {
         let iconData;

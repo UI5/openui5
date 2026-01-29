@@ -18,6 +18,10 @@ sap.ui.define(function() {
 			module: "test-resources/sap/ui/core/qunit/{name}.qunit"
 		},
 		tests: {
+			"dom/detectTextSelection": {
+				title: "sap/ui/dom/detectTextSelection"
+			},
+
 			"dom/findTabbable": {
 				title: "sap/ui/dom/findTabbable"
 			},

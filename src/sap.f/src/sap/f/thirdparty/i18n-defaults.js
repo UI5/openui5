@@ -37,6 +37,8 @@ sap.ui.define(['exports'], (function (exports) { 'use strict';
 	const SHELLBAR_CANCEL = { key: "SHELLBAR_CANCEL", defaultText: "Cancel" };
 	const IM_TITLE_BEFORESEARCH = { key: "IM_TITLE_BEFORESEARCH", defaultText: "Let''s get some results" };
 	const IM_SUBTITLE_BEFORESEARCH = { key: "IM_SUBTITLE_BEFORESEARCH", defaultText: "Start by providing your search criteria." };
+	const IM_TITLE_UNABLETOUPLOAD = { key: "IM_TITLE_UNABLETOUPLOAD", defaultText: "Unable to upload data" };
+	const IM_SUBTITLE_UNABLETOUPLOAD = { key: "IM_SUBTITLE_UNABLETOUPLOAD", defaultText: "Check your Internet connection. If that doesn’t help, check the file format and file size. Otherwise contact your administrator." };
 	const SEARCH_FIELD_SCOPE_SELECT_LABEL = { key: "SEARCH_FIELD_SCOPE_SELECT_LABEL", defaultText: "Select Scope" };
 	const SEARCH_FIELD_LABEL = { key: "SEARCH_FIELD_LABEL", defaultText: "Search Field" };
 	const SEARCH_FIELD_CLEAR_ICON = { key: "SEARCH_FIELD_CLEAR_ICON", defaultText: "Clear Search" };
@@ -59,7 +61,9 @@ sap.ui.define(['exports'], (function (exports) { 'use strict';
 	const USER_MENU_ACTIONS_TXT = { key: "USER_MENU_ACTIONS_TXT", defaultText: "Actions" };
 
 	exports.IM_SUBTITLE_BEFORESEARCH = IM_SUBTITLE_BEFORESEARCH;
+	exports.IM_SUBTITLE_UNABLETOUPLOAD = IM_SUBTITLE_UNABLETOUPLOAD;
 	exports.IM_TITLE_BEFORESEARCH = IM_TITLE_BEFORESEARCH;
+	exports.IM_TITLE_UNABLETOUPLOAD = IM_TITLE_UNABLETOUPLOAD;
 	exports.NOTIFICATION_LIST_ACCESSIBLE_NAME = NOTIFICATION_LIST_ACCESSIBLE_NAME;
 	exports.NOTIFICATION_LIST_GROUP_COLLAPSED = NOTIFICATION_LIST_GROUP_COLLAPSED;
 	exports.NOTIFICATION_LIST_GROUP_EXPANDED = NOTIFICATION_LIST_GROUP_EXPANDED;

@@ -1,4 +1,4 @@
-sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/ListItemCustom', 'sap/f/thirdparty/parameters-bundle.css2', 'sap/f/thirdparty/ResponsivePopover', 'sap/f/thirdparty/MenuItem2', 'sap/f/thirdparty/List', 'sap/f/thirdparty/BusyIndicator', 'sap/f/thirdparty/Button2', 'sap/f/thirdparty/information', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/FocusableElements', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/ListItemAdditionalText.css', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/ValueState', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/Label', 'sap/f/thirdparty/Title', 'sap/f/thirdparty/toLowercaseEnumValue', 'sap/f/thirdparty/ListItemGroup', 'sap/f/thirdparty/WrappingType', 'sap/f/thirdparty/willShowContent'], (function (webcomponentsBase, eventStrict, Icons, parametersBundle_css$1, ListItemCustom, parametersBundle_css, ResponsivePopover, MenuItem, List, BusyIndicator, Button, information, i18nDefaults, FocusableElements, ListItemBase, ListItemAdditionalText_css, Icon, ValueState, AccessibilityTextsHelper, Label, Title, toLowercaseEnumValue, ListItemGroup, WrappingType, willShowContent) { 'use strict';
+sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/Theme', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/ListItemCustom', 'sap/f/thirdparty/parameters-bundle.css2', 'sap/f/thirdparty/ResponsivePopover', 'sap/f/thirdparty/MenuItem2', 'sap/f/thirdparty/List', 'sap/f/thirdparty/BusyIndicator', 'sap/f/thirdparty/Button2', 'sap/f/thirdparty/information', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/FocusableElements', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/ListItemAdditionalText.css', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/ValueState', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/Label', 'sap/f/thirdparty/Title', 'sap/f/thirdparty/toLowercaseEnumValue', 'sap/f/thirdparty/ListItemGroup', 'sap/f/thirdparty/WrappingType', 'sap/f/thirdparty/willShowContent'], (function (webcomponentsBase, eventStrict, Theme, parametersBundle_css$1, ListItemCustom, parametersBundle_css, ResponsivePopover, MenuItem, List, BusyIndicator, Button, information, i18nDefaults, Icons, FocusableElements, ListItemBase, ListItemAdditionalText_css, Icon, ValueState, AccessibilityTextsHelper, Label, Title, toLowercaseEnumValue, ListItemGroup, WrappingType, willShowContent) { 'use strict';
 
     function MenuTemplate() {
         return (parametersBundle_css.jsxs(ResponsivePopover.ResponsivePopover, { id: `${this._id}-menu-rp`, class: "ui5-menu-rp", placement: "Bottom", verticalAlign: "Bottom", horizontalAlign: this.horizontalAlign, opener: this.opener, open: this.open, preventInitialFocus: true, hideArrow: true, allowTargetOverlap: true, accessibleName: this.acessibleNameText, onBeforeOpen: this._beforePopoverOpen, onOpen: this._afterPopoverOpen, onBeforeClose: this._beforePopoverClose, onClose: this._afterPopoverClose, children: [this.isPhone &&
@@ -7,8 +7,8 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/event-strict'
                         : this.loading && (parametersBundle_css.jsx(BusyIndicator.BusyIndicator, { id: `${this._id}-menu-busy-indicator`, delay: this.loadingDelay, class: "ui5-menu-busy-indicator", active: true })) })] }));
     }
 
-    Icons.p("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
-    Icons.p("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme);
+    Theme.p("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
+    Theme.p("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme);
     var menuCss = `:host{line-height:initial}::slotted([ui5-menu-item]){line-height:inherit}.ui5-menu-rp[ui5-responsive-popover]::part(header),.ui5-menu-rp[ui5-responsive-popover]::part(content),.ui5-menu-rp[ui5-responsive-popover]::part(footer){padding:0}.ui5-menu-rp[ui5-responsive-popover]{box-shadow:var(--sapContent_Shadow1);border-radius:var(--_ui5-v2-15-0_menu_popover_border_radius)}.ui5-menu-busy-indicator{width:100%}.ui5-menu-dialog-header{display:flex;height:var(--_ui5-v2-15-0-responsive_popover_header_height);align-items:center;justify-content:space-between;padding:0px 1rem;width:100%;overflow:hidden}.ui5-menu-dialog-title{display:flex;flex-direction:row;align-items:center;justify-content:flex-start;width:calc(100% - 6.5rem);padding-right:1rem;font-family:var(--sapFontHeaderFamily)}.ui5-menu-dialog-title>h1{display:inline-block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:var(--sapFontHeader5Size)}.ui5-menu-back-button{margin-right:1rem}
 `;
 
@@ -102,7 +102,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/event-strict'
             return Menu_1.i18nBundle.getText(i18nDefaults.MENU_CLOSE_BUTTON_ARIA_LABEL);
         }
         get isPhone() {
-            return Icons.d();
+            return Theme.d();
         }
         get _popover() {
             return this.shadowRoot.querySelector("[ui5-responsive-popover]");
@@ -180,7 +180,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/event-strict'
             item.selected = true;
         }
         _itemMouseOver(e) {
-            if (!Icons.f()) {
+            if (!Theme.f()) {
                 return;
             }
             const item = e.target;
@@ -192,7 +192,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/event-strict'
             this._startOpenTimeout(item);
         }
         async focus(focusOptions) {
-            await Icons.f$1();
+            await Theme.f$1();
             const firstMenuItem = this._allMenuItems[0];
             if (firstMenuItem) {
                 return firstMenuItem.focus(focusOptions);

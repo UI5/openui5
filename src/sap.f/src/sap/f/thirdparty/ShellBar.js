@@ -1,4 +1,4 @@
-sap.ui.define(['require', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/parameters-bundle.css2', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/ListItemCustom', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/WrappingType', 'sap/f/thirdparty/List', 'sap/f/thirdparty/ResponsivePopover', 'sap/f/thirdparty/Button2', 'sap/f/thirdparty/Tag', 'sap/f/thirdparty/Menu', 'sap/f/thirdparty/slim-arrow-down', 'sap/f/thirdparty/overflow', 'sap/f/thirdparty/parameters-bundle.css3', 'sap/f/thirdparty/i18n-defaults', 'sap/f/thirdparty/FocusableElements', 'sap/f/thirdparty/information', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/ListItemAdditionalText.css', 'sap/f/thirdparty/ValueState', 'sap/f/thirdparty/Label', 'sap/f/thirdparty/toLowercaseEnumValue', 'sap/f/thirdparty/ListItemGroup', 'sap/f/thirdparty/BusyIndicator', 'sap/f/thirdparty/willShowContent', 'sap/f/thirdparty/Title', 'sap/f/thirdparty/MenuItem2'], (function (require, webcomponentsBase, Icons, eventStrict, parametersBundle_css$1, parametersBundle_css, AccessibilityTextsHelper, ListItemBase, ListItemCustom, Icon, WrappingType, List, ResponsivePopover, Button, Tag, Menu, slimArrowDown, overflow, parametersBundle_css$2, i18nDefaults, FocusableElements, information, i18nDefaults$1, ListItemAdditionalText_css, ValueState, Label, toLowercaseEnumValue, ListItemGroup, BusyIndicator, willShowContent, Title, MenuItem) { 'use strict';
+sap.ui.define(['require', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Theme', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/parameters-bundle.css2', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/ListItemCustom', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/WrappingType', 'sap/f/thirdparty/List', 'sap/f/thirdparty/ResponsivePopover', 'sap/f/thirdparty/Button2', 'sap/f/thirdparty/Tag', 'sap/f/thirdparty/Menu', 'sap/f/thirdparty/slim-arrow-down', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/overflow', 'sap/f/thirdparty/parameters-bundle.css3', 'sap/f/thirdparty/i18n-defaults', 'sap/f/thirdparty/FocusableElements', 'sap/f/thirdparty/information', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/ListItemAdditionalText.css', 'sap/f/thirdparty/ValueState', 'sap/f/thirdparty/Label', 'sap/f/thirdparty/toLowercaseEnumValue', 'sap/f/thirdparty/ListItemGroup', 'sap/f/thirdparty/BusyIndicator', 'sap/f/thirdparty/willShowContent', 'sap/f/thirdparty/Title', 'sap/f/thirdparty/MenuItem2'], (function (require, webcomponentsBase, Theme, eventStrict, parametersBundle_css$1, parametersBundle_css, AccessibilityTextsHelper, ListItemBase, ListItemCustom, Icon, WrappingType, List, ResponsivePopover, Button, Tag, Menu, slimArrowDown, Icons, overflow, parametersBundle_css$2, i18nDefaults, FocusableElements, information, i18nDefaults$1, ListItemAdditionalText_css, ValueState, Label, toLowercaseEnumValue, ListItemGroup, BusyIndicator, willShowContent, Title, MenuItem) { 'use strict';
 
     const predefinedHooks = {
         imageBegin,
@@ -250,8 +250,8 @@ sap.ui.define(['require', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Ic
         return parametersBundle_css.jsx(Tag.Tag, { design: "Critical", "hide-state-icon": true, children: this.effectiveText });
     }
 
-    Icons.p("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
-    Icons.p("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme);
+    Theme.p("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
+    Theme.p("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme);
     var buttonBadgeCss = `[ui5-tag]::part(root){border:.0625rem solid var(--sapContent_BadgeBorderColor);background-color:var(--sapContent_BadgeBackground);color:var(--sapContent_BadgeTextColor);height:1rem;border-radius:.5rem;display:flex;align-items:center}:host([design="AttentionDot"]) [ui5-tag]::part(root){min-width:var(--_ui5-v2-15-0-button-badge-diameter);min-height:var(--_ui5-v2-15-0-button-badge-diameter);height:var(--_ui5-v2-15-0-button-badge-diameter);width:var(--_ui5-v2-15-0-button-badge-diameter);border-radius:100%}
 `;
 
@@ -434,13 +434,13 @@ sap.ui.define(['require', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Ic
         return (parametersBundle_css.jsxs("div", { role: this.accLogoRole, class: "ui5-shellbar-logo-area", onClick: this._logoPress, tabIndex: 0, onKeyDown: this._logoKeydown, onKeyUp: this._logoKeyup, "aria-label": this.accessibilityAttributes.branding?.name || this._logoAreaText, children: [this.hasLogo && (parametersBundle_css.jsx("span", { class: "ui5-shellbar-logo", title: this._logoText, "data-ui5-stable": "logo", children: parametersBundle_css.jsx("slot", { name: "logo" }) })), parametersBundle_css.jsx("div", { class: "ui5-shellbar-headings", children: this.primaryTitle && (parametersBundle_css.jsx("h1", { class: "ui5-shellbar-title", children: parametersBundle_css.jsx("bdi", { children: this.primaryTitle }) })) })] }));
     }
 
-    Icons.p("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
-    Icons.p("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s" + "-" + "f" + "i" + "o" + "r" + "i", "sap_horizon", async () => parametersBundle_css$2.defaultTheme);
+    Theme.p("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
+    Theme.p("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s" + "-" + "f" + "i" + "o" + "r" + "i", "sap_horizon", async () => parametersBundle_css$2.defaultTheme);
     var shellBarStyles = `.ui5-hidden-text{position:absolute;clip:rect(1px,1px,1px,1px);user-select:none;left:-1000px;top:-1000px;pointer-events:none;font-size:0}:host(:not([hidden])){display:inline-block;width:100%;max-width:100%;background:var(--sapShellColor);box-sizing:border-box}:host{--_ui5-v2-15-0_input_placeholder_color: var(--sapShell_InteractiveTextColor);--_ui5-v2-15-0_input_border_radius: var(--_ui5-v2-15-0_shellbar_input_border_radius);--_ui5-v2-15-0_input_focus_border_radius: var(--_ui5-v2-15-0_shellbar_input_focus_border_radius);--_ui5-v2-15-0_input_background_color: var(--_ui5-v2-15-0_shellbar_input_background_color);--_ui5-v2-15-0_input_focus_outline_color: var(--_ui5-v2-15-0_shellbar_input_focus_outline_color);--_ui5-v2-15-0_input_margin_top_bottom: 0;box-shadow:inset 0 -.0625rem 0 0 var(--sapPageHeader_BorderColor);--_ui5-v2-15-0_button_base_min_width: 2.25rem;--_ui5-v2-15-0_button_base_padding: .5625rem;--_ui5-v2-15-0_button_base_height: var(--sapElement_Height);--_ui5-v2-15-0-button-badge-diameter: .75rem}.ui5-shellbar-root{position:relative;display:flex;justify-content:space-between;align-items:center;height:var(--_ui5-v2-15-0_shellbar_root_height);font-family:var(--sapFontFamily);font-size:var(--sapFontSize);font-weight:400;box-sizing:border-box}.ui5-shellbar-menu-button,.ui5-shellbar-button,.ui5-shellbar-image-button,::slotted([ui5-toggle-button]:not([slot^="content"])),::slotted([ui5-button]:not([slot^="content"])){height:2.25rem;padding:0;margin-inline-start:var(--_ui5-v2-15-0-shellbar-overflow-button-margin);border:.0625rem solid var(--sapButton_Lite_BorderColor);background:var(--sapButton_Lite_Background);outline-color:var(--_ui5-v2-15-0_shellbar_logo_outline_color);color:var(--sapShell_TextColor);box-sizing:border-box;cursor:pointer;border-radius:var(--_ui5-v2-15-0_shellbar_button_border_radius);position:relative;font-weight:700;white-space:initial;overflow:initial;text-overflow:initial;line-height:inherit;letter-spacing:inherit;word-spacing:inherit}::slotted([ui5-toggle-button][slot="assistant"]){margin-inline-start:0}.ui5-shellbar-assistant-button{margin-inline-start:var(--_ui5-v2-15-0-shellbar-overflow-button-margin)}::slotted([ui5-button][slot="startButton"]){margin-inline-start:0}::slotted([ui5-toggle-button]:hover),::slotted([ui5-button]:hover),.ui5-shellbar-menu-button.ui5-shellbar-menu-button--interactive:hover,.ui5-shellbar-button:hover,.ui5-shellbar-image-button:hover,::slotted([ui5-button][slot="midContent"]:hover){background:var(--sapShell_Hover_Background);border-color:var(--sapButton_Lite_Hover_BorderColor);color:var(--sapShell_TextColor)}::slotted([ui5-toggle-button][slot="assistant"][pressed]),::slotted([ui5-toggle-button][slot="assistant"][pressed]:hover:not([active])){color:var(--sapShell_Assistant_ForegroundColor)}::slotted([ui5-toggle-button][active]),::slotted([ui5-button][active]),.ui5-shellbar-menu-button.ui5-shellbar-menu-button--interactive:active,.ui5-shellbar-button[active],.ui5-shellbar-image-button:active{background:var(--sapShell_Active_Background);border-color:var(--sapButton_Lite_Active_BorderColor);color:var(--_ui5-v2-15-0_shellbar_button_active_color)}:host([desktop]) .ui5-shellbar-menu-button.ui5-shellbar-menu-button--interactive:focus,.ui5-shellbar-menu-button.ui5-shellbar-menu-button--interactive:focus-visible{outline:var(--_ui5-v2-15-0_shellbar_logo_outline);outline-offset:var(--_ui5-v2-15-0_shellbar_outline_offset)}slot[name=profile]{min-width:0}::slotted([ui5-avatar][slot="profile"]){display:block;width:2rem;height:2rem;min-width:0;min-height:2rem;font-size:var(--_ui5-v2-15-0_avatar_fontsize_XS);font-weight:400}.ui5-shellbar-menu-button.ui5-shellbar-menu-button--interactive::-moz-focus-inner{border:none}.ui5-shellbar-menu-button-arrow,.ui5-shellbar-menu-button-title,.ui5-shellbar-title{display:inline-block;font-family:var(--sapFontSemiboldDuplexFamily);margin:0;font-size:var(--_ui5-v2-15-0_shellbar_menu_button_title_font_size);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--sapShell_SubBrand_TextColor)}:host(:not([primary-title])) .ui5-shellbar-menu-button{min-width:2.25rem;justify-content:center}.ui5-shellbar-secondary-title{display:inline-block;font-size:var(--sapFontSmallSize);color:var(--sapShell_TextColor);font-weight:400;text-overflow:ellipsis;white-space:nowrap;overflow:hidden;margin:0;text-align:start}.ui5-shellbar-headings{display:flex;flex-direction:column;justify-content:center;height:100%;overflow:hidden;margin-inline-start:.25rem}.ui5-shellbar-menu-button--interactive .ui5-shellbar-menu-button-arrow{margin-inline-start:.375rem}.ui5-shellbar-overflow-container{display:flex;justify-content:center;align-items:center;height:100%;overflow:hidden}.ui5-shellbar-overflow-container-middle{align-self:flex-start;height:var(--_ui5-v2-15-0_shellbar_overflow_container_middle_height);width:0;flex-shrink:0}.ui5-shellbar-mid-content{height:var(--_ui5-v2-15-0_shellbar_overflow_container_middle_height)}:host([breakpoint-size="S"]) .ui5-shellbar-menu-button{margin-inline-start:0}:host([breakpoint-size="S"]){padding:0 1rem}:host([breakpoint-size="S"]) .ui5-shellbar-search-full-width-wrapper{padding:0 1rem}:host([breakpoint-size="M"]){padding:0 2rem}:host([breakpoint-size="M"]) .ui5-shellbar-search-full-width-wrapper{padding:0 2rem}:host([breakpoint-size="L"]){padding:0 2rem}:host([breakpoint-size="XL"]){padding:0 3rem}:host([breakpoint-size="XXL"]){padding:0 3rem}.ui5-shellbar-logo{overflow:hidden;cursor:pointer;max-height:2rem}.ui5-shellbar-logo-area{overflow:hidden;display:flex;align-items:center;padding:.25rem .5rem .25rem .25rem;box-sizing:border-box;cursor:pointer;background:var(--sapButton_Lite_Background);border:1px solid var(--sapButton_Lite_BorderColor);color:var(--sapShell_TextColor);margin-inline-start:.125rem}.ui5-shellbar-logo:focus,.ui5-shellbar-logo-area:focus{outline:var(--_ui5-v2-15-0_shellbar_logo_outline);border-radius:var(--_ui5-v2-15-0_shellbar_logo_border_radius)}.ui5-shellbar-overflow-container>.ui5-shellbar-logo:hover,.ui5-shellbar-logo-area:hover{box-shadow:var(--_ui5-v2-15-0_shellbar_button_box_shadow);border-radius:var(--_ui5-v2-15-0_shellbar_logo_border_radius)}.ui5-shellbar-logo-area:active:focus{background:var(--sapShell_Active_Background);border:1px solid var(--sapButton_Lite_Active_BorderColor);color:var(--sapShell_Active_TextColor)}.ui5-shellbar-menu-button.ui5-shellbar-menu-button--interactive:hover{box-shadow:var(--_ui5-v2-15-0_shellbar_button_box_shadow)}.ui5-shellbar-menu-button.ui5-shellbar-menu-button--interactive:active{box-shadow:var(--_ui5-v2-15-0_shellbar_button_box_shadow_active)}.ui5-shellbar-menu-button.ui5-shellbar-menu-button--interactive:active .ui5-shellbar-menu-button-arrow,.ui5-shellbar-menu-button.ui5-shellbar-menu-button--interactive:active .ui5-shellbar-menu-button-title{color:var(--sapShell_Active_TextColor)}.ui5-shellbar-menu-button .ui5-shellbar-logo:hover{box-shadow:none}.ui5-shellbar-button{width:2.5rem;box-sizing:border-box}.ui5-shellbar-button,::slotted([ui5-button][slot="startButton"]){--_ui5-v2-15-0_button_focused_border: var(--_ui5-v2-15-0_shellbar_button_focused_border)}.ui5-shellbar-cancel-button,.ui5-shellbar-cancel-button:hover{color:var(--_ui5-v2-15-0-shellbar_cancel-button-color)}.ui5-shellbar-image-button{display:flex;justify-content:center;align-items:center;min-width:auto;height:2.5rem;--_ui5-v2-15-0_button_focused_border_radius: var(--_ui5-v2-15-0_shellbar_image_button_border_radius);border-radius:var(--_ui5-v2-15-0_shellbar_image_button_border_radius)}.ui5-shellbar-overflow-container-left{padding:0;justify-content:flex-start;max-width:75%;flex-shrink:0}.ui5-shellbar-overflow-container-left>:nth-child(n){margin-inline-end:.5rem}.ui5-shellbar-menu-button{white-space:nowrap;overflow:hidden;display:flex;align-items:center;padding:.25rem .5rem;cursor:text;-webkit-user-select:text;-moz-user-select:text;user-select:text}.ui5-shellbar-menu-button.ui5-shellbar-menu-button--interactive{-webkit-user-select:none;-moz-user-select:none;user-select:none;cursor:pointer;background:var(--sapButton_Lite_Background);border:var(--_ui5-v2-15-0_shellbar_button_border);color:var(--sapShell_TextColor)}:host(:not([with-logo])) .ui5-shellbar-menu-button{margin-inline-start:0}.ui5-shellbar-overflow-container-right{flex-grow:1;justify-content:flex-end}.ui5-shellbar-overflow-container-right .ui5-shellbar-overflow-container-right-child{display:flex;justify-content:flex-end;height:inherit;align-items:center}.ui5-shellbar-overflow-container-right-inner{display:flex;flex-grow:1}.ui5-shellbar-content-items{display:flex;justify-content:center;align-items:center;flex-grow:1;min-width:max-content}.ui5-shellbar-spacer{flex-grow:1;height:1px;flex-basis:1rem;flex-shrink:1}.ui5-shellbar-separator{flex-grow:0;flex-shrink:0;height:var(--_ui5-v2-15-0-shellbar-separator-height);width:1px;background-color:var(--_ui5-v2-15-0-shellbar_separator-color)}.ui5-shellbar-separator-end{margin-inline-start:.5rem}:host([breakpoint-size="S"]) .ui5-shellbar-overflow-container-right{padding-inline-start:0}::slotted([hidden]){visibility:hidden;order:-1;position:absolute}.ui5-shellbar-content-item{display:flex;align-items:center;flex-shrink:0;padding-inline-start:var(--_ui5-v2-15-0-shellbar-content-margin-start)}.ui5-shellbar-overflow-container-right-child .ui5-shellbar-bell-button [slot=badge],.ui5-shellbar-overflow-container-right-child .ui5-shellbar-custom-item [slot=badge]{inset-inline-end:var(--_ui5-v2-15-0-shellbar-notification-btn-count-offset)}.ui5-shellbar-menu-button{margin-inline-start:.5rem}.ui5-shellbar-search-field{padding-inline-start:var(--_ui5-v2-15-0-shellbar-content-margin-start);min-width:var(--_ui5-v2-15-0_shellbar_search_field_width);align-items:center;flex-grow:1;margin-inline-start:.5rem}.ui5-shellbar-overflow-container-right-child>:first-child{margin-inline-start:0}.ui5-shellbar-search-full-width-wrapper .ui5-shellbar-search-full-field{height:2.25rem;width:100%}.ui5-shellbar-search-full-width-wrapper{position:absolute;bottom:.0625rem;left:0;background:var(--sapShellColor);height:100%;width:100%;z-index:1001;display:flex;align-items:center;box-sizing:border-box}.ui5-shellbar-search-full-width-wrapper .ui5-shellbar-button{width:auto}.ui5-shellbar-search-full-width-wrapper ::slotted([ui5-shellbar-search]){max-width:unset}::slotted([ui5-input]){background:var(--_ui5-v2-15-0_shellbar_search_field_background);border:var(--_ui5-v2-15-0_shellbar_search_field_border);box-shadow:var(--_ui5-v2-15-0_shellbar_search_field_box_shadow);color:var(--_ui5-v2-15-0_shellbar_search_field_color);height:2.25rem;width:100%;min-width:var(--_ui5-v2-15-0_shellbar_search_field_width)}:host([breakpoint-size="M"]) ::slotted([ui5-input]),:host([breakpoint-size="S"]) ::slotted([ui5-input]){min-width:1rem}:host([breakpoint-size="M"][show-search-field]) .ui5-shellbar-overflow-container-right-child{flex-grow:1}::slotted([ui5-input]:hover){background:var(--_ui5-v2-15-0_shellbar_search_field_background_hover);box-shadow:var(--_ui5-v2-15-0_shellbar_search_field_box_shadow_hover)}::slotted([ui5-input][focused]){outline:var(--_ui5-v2-15-0_shellbar_search_field_outline_focused)}::slotted([slot="logo"]){max-height:2rem;pointer-events:none}.ui5-shellbar-co-pilot-placeholder{width:2.75rem;height:2.75rem}.ui5-shellbar-coPilot-pressed,.ui5-shellbar-coPilot-pressed:hover{color:var(--sapShell_Assistant_ForegroundColor)}::slotted([ui5-button][slot="startButton"]){margin-inline:0 .5rem;justify-content:center;align-items:center}::slotted([ui5-button][data-profile-btn]){width:auto}::slotted(.ui5-shellbar-hidden-button),.ui5-shellbar-hidden-button,.ui5-shellbar-invisible-button{visibility:hidden;order:-1;opacity:0;min-width:0;width:0;margin:0;padding:0;padding-inline-start:0;border:0;margin-inline-start:0}
 `;
 
-    Icons.p("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
-    Icons.p("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s" + "-" + "f" + "i" + "o" + "r" + "i", "sap_horizon", async () => parametersBundle_css$2.defaultTheme);
+    Theme.p("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
+    Theme.p("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s" + "-" + "f" + "i" + "o" + "r" + "i", "sap_horizon", async () => parametersBundle_css$2.defaultTheme);
     var ShellBarPopoverCss = `.ui5-shellbar-menu-popover::part(content),.ui5-shellbar-overflow-popover::part(content){padding:0}.ui5-shellbar-overflow-popover [ui5-li]::part(icon){color:var(--sapList_TextColor)}.ui5-shellbar-overflow-popover [ui5-li]::part(title){font-size:var(--sapFontSize)}.ui5-shellbar-overflow-popover [ui5-li]:after{position:relative;width:fit-content;height:1rem;min-width:1rem;background:var(--sapContent_BadgeBackground);border:var(--_ui5-v2-15-0_shellbar_button_badge_border);color:var(--sapContent_BadgeTextColor);bottom:calc(100% + .0625rem);left:1.25rem;padding:0 .3125rem;border-radius:.5rem;display:flex;justify-content:center;align-items:center;font-size:var(--sapFontSmallSize);font-family:var(--sapFontFamily);z-index:2;box-sizing:border-box;pointer-events:none}.ui5-shellbar-overflow-popover [ui5-li][data-count]:after{content:attr(data-count)}
 `;
 
@@ -630,7 +630,7 @@ sap.ui.define(['require', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Ic
                 this._detachSearchFieldListeners(e.target);
                 return;
             }
-            if (Icons.d()) {
+            if (Theme.d()) {
                 this.setSearchState(true);
             }
         }
@@ -639,7 +639,7 @@ sap.ui.define(['require', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Ic
                 this._detachSearchFieldListeners(e.target);
                 return;
             }
-            if (Icons.d()) {
+            if (Theme.d()) {
                 this.setSearchState(false);
             }
         }
@@ -652,7 +652,7 @@ sap.ui.define(['require', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Ic
             // - On mobile, the search opens on its own (we don’t interfere).
             // - If there’s already a value, onSearch is responsible for triggering the search (we don’t interfere)
             // - If the field is closed, we must open it regardless.
-            if (Icons.d() || (this.search?.value && this.showSearchField)) {
+            if (Theme.d() || (this.search?.value && this.showSearchField)) {
                 return;
             }
             this.setSearchState(!this.showSearchField);
@@ -801,7 +801,7 @@ sap.ui.define(['require', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Ic
         }
         domCalculatedValues(cssVar) {
             const shellbarComputerStyle = getComputedStyle(this.getDomRef());
-            return this._calculateCSSREMValue(shellbarComputerStyle, Icons.d$1(cssVar)); // px
+            return this._calculateCSSREMValue(shellbarComputerStyle, Theme.d$1(cssVar)); // px
         }
         onBeforeRendering() {
             this.withLogo = this.hasLogo;
@@ -820,7 +820,7 @@ sap.ui.define(['require', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Ic
                 this._autoRestoreSearchField = true;
             }
             if (isSelfCollapsibleSearch(this.search)) {
-                if (Icons.d()) {
+                if (Theme.d()) {
                     this.search.open = this.showSearchField;
                 }
                 else {
@@ -839,7 +839,7 @@ sap.ui.define(['require', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Ic
                 return;
             }
             this.showSearchField = expanded;
-            await Icons.f$1();
+            await Theme.f$1();
             this.fireDecoratorEvent("search-field-toggle", { expanded });
         }
         onAfterRendering() {
@@ -849,7 +849,7 @@ sap.ui.define(['require', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Ic
         }
         async onInitialRendering() {
             if (this._isInitialRendering) {
-                await Icons.f$1();
+                await Theme.f$1();
                 if (this.autoSearchField) {
                     this._updateSearchFieldState();
                 }
@@ -935,7 +935,7 @@ sap.ui.define(['require', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Ic
         }
         onEnterDOM() {
             webcomponentsBase.f.register(this, this._handleResize);
-            if (Icons.f()) {
+            if (Theme.f()) {
                 this.setAttribute("desktop", "");
             }
             this._attachSearchFieldListeners(this.search);
@@ -992,7 +992,7 @@ sap.ui.define(['require', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Ic
                 this.closeOverflow();
                 // wait for DOM to be updated when ui5-popover is closed, otherwise if Enter key is hold
                 // there will be no visual indication that this has happened
-                await Icons.f$1();
+                await Theme.f$1();
             }
             this._defaultItemPressPrevented = false;
         }
@@ -1095,7 +1095,7 @@ sap.ui.define(['require', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Ic
          * @since 2.10.0
          */
         async getSearchButtonDomRef() {
-            await Icons.f$1();
+            await Theme.f$1();
             return this.shadowRoot.querySelector(`*[data-ui5-stable="toggle-search"]`);
         }
         _getContentInfo() {
@@ -1802,8 +1802,8 @@ sap.ui.define(['require', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Ic
         return false;
     };
     ShellBar.define();
-    var ShellBar$1 = ShellBar;
+    var ShellBar_default = ShellBar;
 
-    return ShellBar$1;
+    return ShellBar_default;
 
 }));

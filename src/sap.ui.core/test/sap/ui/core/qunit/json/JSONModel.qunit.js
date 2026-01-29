@@ -354,7 +354,7 @@ sap.ui.define([
 		var listItems = oLB.getItems();
 		assert.equal(listItems.length, 7, "length of items");
 
-		const aTeamMembers = oModel.getObject("/teamMembers");
+		const aTeamMembers = oModel.getProperty("/teamMembers");
 		listItems.forEach( function(item, i) {
 			assert.equal(item.getTitle(), aTeamMembers[i].firstName, "firstName");
 			assert.equal(item.getDescription(), aTeamMembers[i].lastName, "lastName");
