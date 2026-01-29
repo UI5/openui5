@@ -301,21 +301,36 @@ sap.ui.define([
 	}
 
 	function _updateCondition() {
-
 		const aItems = this.getItems();
 		const aConditions = [];
+		const aCurrentConditions = this.getConditions();
+		const oDelegate = this.getControlDelegate();
+		let iIndex = 0;
+		let bChanged = aItems.length !== aCurrentConditions.length;
 
-		for (let i = 0; i < aItems.length; i++) {
-			const oItem = aItems[i];
-			const oCondition = Condition.createItemCondition(_getInternalValue(oItem, "key"), _getInternalValue(oItem, "description"));
-			oCondition.validated = ConditionValidated.Validated; // see every value set from outside as validated (to determine description, if needed)
+		for (const oItem of aItems) {
+			const oCurrentCondition = aCurrentConditions[iIndex];
+			const vKey = _getInternalValue(oItem, "key");
+			const vDescription = _getInternalValue(oItem, "description");
+			let oCondition;
+			if (vKey === undefined && vDescription === undefined) {
+				// item exist but binding for key and description pending or has no values right now -> just create dummy condition for index.
+				oCondition = Condition.createCondition(OperatorName.EQ, [vKey, vDescription], undefined, undefined, ConditionValidated.NotValidated, undefined);
+			} else {
+				oCondition = oDelegate.createCondition(this, this, [vKey, vDescription], oCurrentCondition);
+			}
 			aConditions.push(oCondition);
+			if (!oCurrentCondition || !Condition.compareConditions(oCurrentCondition, oCondition)) { // We do a full comparison here as FilterOperatorUtils.compareConditions may ignore text changes
+				bChanged = true;
+			}
+			iIndex++;
 		}
-		// TODO: update conditions only if really changed
-		this._bConditionsUpdateFromItems = true;
-		this.setConditions(aConditions);
-		this._bConditionsUpdateFromItems = false;
 
+		if (bChanged) {
+			this._bConditionsUpdateFromItems = true;
+			this.setConditions(aConditions);
+			this._bConditionsUpdateFromItems = false;
+		}
 	}
 
 	function _getInternalValue(oItem, sProperty) {
