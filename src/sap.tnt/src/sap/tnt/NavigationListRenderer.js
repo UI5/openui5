@@ -65,6 +65,9 @@ sap.ui.define([
 		// ARIA
 		role = !expanded && !control.hasStyleClass("sapTntNavLIPopup") ? 'menubar' : 'tree';
 
+		const oParent = control.getParent();
+		const bIsFixed = oParent.getAggregation("fixedItem") && oParent.getAggregation("fixedItem") === control;
+
 		rm.attr("role", role);
 
 		if (role === 'menubar') {
@@ -73,6 +76,8 @@ sap.ui.define([
 		} else {
 			rm.attr("aria-roledescription", oRB.getText("NAVIGATION_LIST_ITEM_ROLE_DESCRIPTION_TREE"));
 		}
+
+		rm.attr("aria-label", oRB.getText(bIsFixed ? "SIDE_NAVIGATION_FIXED_LIST_LABEL" : "SIDE_NAVIGATION_FLEXIBLE_LIST_LABEL"));
 		rm.openEnd();
 
 		// Rendering visible groups
