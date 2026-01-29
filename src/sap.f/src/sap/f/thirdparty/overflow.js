@@ -1,4 +1,4 @@
-sap.ui.define(['exports', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/information'], (function (exports, Icons, information) { 'use strict';
+sap.ui.define(['exports', 'sap/f/thirdparty/Theme', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/information'], (function (exports, Theme, Icons, information) { 'use strict';
 
 	const name$1 = "overflow";
 	const pathData$1 = "M448 192q26 0 45 19t19 45-19 45-45 19-45-19-19-45 19-45 45-19zm0 96q14 0 23-9t9-23-9-23-23-9-23 9-9 23 9 23 23 9zm-192-96q26 0 45 19t19 45-19 45-45 19-45-19-19-45 19-45 45-19zm0 96q14 0 23-9t9-23-9-23-23-9-23 9-9 23 9 23 23 9zM64 192q26 0 45 19t19 45-19 45-45 19-45-19-19-45 19-45 45-19zm0 96q14 0 23-9t9-23-9-23-23-9-23 9-9 23 9 23 23 9z";

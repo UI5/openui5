@@ -1,4 +1,4 @@
-sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/parameters-bundle.css2', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/List', 'sap/f/thirdparty/NotificationListGroupItem', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/parameters-bundle.css3', 'sap/f/thirdparty/i18n-defaults', 'sap/f/thirdparty/toLowercaseEnumValue', 'sap/f/thirdparty/ListItemGroup', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/WrappingType', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/BusyIndicator', 'sap/f/thirdparty/willShowContent', 'sap/f/thirdparty/Label', 'sap/f/thirdparty/NotificationListItemBase', 'sap/f/thirdparty/FocusableElements', 'sap/f/thirdparty/Icon'], (function (webcomponentsBase, parametersBundle_css, eventStrict, parametersBundle_css$2, List, NotificationListGroupItem, Icons, parametersBundle_css$1, i18nDefaults, toLowercaseEnumValue, ListItemGroup, ListItemBase, i18nDefaults$1, WrappingType, AccessibilityTextsHelper, BusyIndicator, willShowContent, Label, NotificationListItemBase, FocusableElements, Icon) { 'use strict';
+sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/parameters-bundle.css2', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/List', 'sap/f/thirdparty/NotificationListGroupItem', 'sap/f/thirdparty/Theme', 'sap/f/thirdparty/parameters-bundle.css3', 'sap/f/thirdparty/i18n-defaults', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/toLowercaseEnumValue', 'sap/f/thirdparty/ListItemGroup', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/WrappingType', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/BusyIndicator', 'sap/f/thirdparty/willShowContent', 'sap/f/thirdparty/Label', 'sap/f/thirdparty/NotificationListItemBase', 'sap/f/thirdparty/FocusableElements', 'sap/f/thirdparty/Icon'], (function (webcomponentsBase, parametersBundle_css, eventStrict, parametersBundle_css$2, List, NotificationListGroupItem, Theme, parametersBundle_css$1, i18nDefaults, Icons, toLowercaseEnumValue, ListItemGroup, ListItemBase, i18nDefaults$1, WrappingType, AccessibilityTextsHelper, BusyIndicator, willShowContent, Label, NotificationListItemBase, FocusableElements, Icon) { 'use strict';
 
     var __decorate$1 = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -159,8 +159,8 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/parameters-bu
         return (parametersBundle_css.jsx(NotificationListInternal$1, { accessibleName: this._accessibleName, noDataText: this.noDataText, onItemClick: this._onItemClick, onItemClose: this._onItemClose, onItemToggle: this._onItemToggle, onLoadMore: this._onLoadMore, children: parametersBundle_css.jsx("slot", {}) }));
     }
 
-    Icons.p("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
-    Icons.p("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s" + "-" + "f" + "i" + "o" + "r" + "i", "sap_horizon", async () => parametersBundle_css$1.defaultTheme);
+    Theme.p("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
+    Theme.p("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s" + "-" + "f" + "i" + "o" + "r" + "i", "sap_horizon", async () => parametersBundle_css$1.defaultTheme);
     var NotificationListCss = `:host(:not([hidden])){display:block}[ui5-notification-list-internal]{height:100%}
 `;
 
@@ -284,8 +284,8 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/parameters-bu
         })
     ], NotificationList);
     NotificationList.define();
-    var NotificationList$1 = NotificationList;
+    var NotificationList_default = NotificationList;
 
-    return NotificationList$1;
+    return NotificationList_default;
 
 }));

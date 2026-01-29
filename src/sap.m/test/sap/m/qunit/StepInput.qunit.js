@@ -715,8 +715,8 @@ sap.ui.define([
 
 		//act
 		oInput.onfocusin();
-		oInput._$input.trigger("focus").val("1.2").trigger("input");
-		oInput.fireChange({ value: "1.2" });
+		oInput._$input.trigger("focus").val("1.20").trigger("input");
+		oInput.fireChange({ value: "1.20" });
 		nextUIUpdate.runSync()/*fake timer is used in module*/;
 
 		//assert
@@ -1058,6 +1058,30 @@ sap.ui.define([
 
 		oSI.destroy();
 		oSI2.destroy();
+	});
+
+	QUnit.test("Formating floating point number when the number in front of the seperator is removed", function (assert) {
+		// arrange
+		var oInput = this.stepInput._getInput();
+		var oChangeSpy = sinon.spy();
+		this.stepInput.attachChange(oChangeSpy);
+
+		this.stepInput.setValue(0.5);
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		// act
+		oInput.onfocusin();
+		oInput._$input.trigger("focus").val(".5").trigger("input");
+		oInput.fireChange({ value: ".5" });
+		nextUIUpdate.runSync()/*fake timer is used in module*/;
+
+		// assert
+		assert.strictEqual(oChangeSpy.callCount, 1, "Change event fired once for '.5'");
+		assert.strictEqual(oInput.getValue(), "0.5", "Input is formatted to '0.5'");
+		assert.strictEqual(this.stepInput.getValue(), 0.5, "StepInput numeric value is 0.5");
+
+		// cleanup
+		this.stepInput.detachChange(oChangeSpy);
 	});
 
 	QUnit.test("entering a dot('.') as a separator does not clear the entry value", function (assert) {

@@ -279,5 +279,13 @@ sap.ui.define([
         return aInitiallyVisibleProperties;
     };
 
+    /**
+     * Creates a new independent delegate instance.
+     * Use this in app delegates to avoid mutation of the shared base delegate.
+     * @returns {object} A new delegate object with all methods copied
+     */
+    GeomapDelegate.createDelegate = function() {
+    };
+
     return GeomapDelegate;
 });

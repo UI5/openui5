@@ -1,4 +1,4 @@
-sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Icons'], (function (webcomponentsBase, Icons) { 'use strict';
+sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Theme', 'sap/f/thirdparty/Icons'], (function (webcomponentsBase, Theme, Icons) { 'use strict';
 
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -32,8 +32,8 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/Icons'], (fun
         webcomponentsBase.m("ui5-search-scope")
     ], SearchScope);
     SearchScope.define();
-    var SearchScope$1 = SearchScope;
+    var SearchScope_default = SearchScope;
 
-    return SearchScope$1;
+    return SearchScope_default;
 
 }));

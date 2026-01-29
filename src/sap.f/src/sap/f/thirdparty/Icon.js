@@ -1,4 +1,4 @@
-sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/parameters-bundle.css2', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/parameters-bundle.css'], (function (exports, webcomponentsBase, parametersBundle_css, eventStrict, Icons, parametersBundle_css$1) { 'use strict';
+sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/parameters-bundle.css2', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/Theme', 'sap/f/thirdparty/parameters-bundle.css'], (function (exports, webcomponentsBase, parametersBundle_css, eventStrict, Icons, Theme, parametersBundle_css$1) { 'use strict';
 
     function IconTemplate() {
         return (parametersBundle_css.jsxs("svg", { class: "ui5-icon-root", part: "root", tabindex: this._tabIndex, dir: this._dir, viewBox: this.viewBox, role: this.effectiveAccessibleRole, focusable: "false", preserveAspectRatio: "xMidYMid meet", "aria-label": this.effectiveAccessibleName, "aria-hidden": this.effectiveAriaHidden, xmlns: "http://www.w3.org/2000/svg", onKeyDown: this._onkeydown, onKeyUp: this._onkeyup, children: [this.hasIconTooltip &&
@@ -44,8 +44,8 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/pa
     })(IconMode || (IconMode = {}));
     var IconMode$1 = IconMode;
 
-    Icons.p("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
-    Icons.p("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme);
+    Theme.p("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
+    Theme.p("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css$1.defaultTheme);
     var iconCss = `:host{-webkit-tap-highlight-color:rgba(0,0,0,0)}:host([hidden]){display:none}:host([invalid]){display:none}:host(:not([hidden]).ui5_hovered){opacity:.7}:host{display:inline-block;width:1rem;height:1rem;color:var(--sapContent_IconColor);fill:currentColor;outline:none}:host([design="Contrast"]){color:var(--sapContent_ContrastIconColor)}:host([design="Critical"]){color:var(--sapCriticalElementColor)}:host([design="Information"]){color:var(--sapInformativeElementColor)}:host([design="Negative"]){color:var(--sapNegativeElementColor)}:host([design="Neutral"]){color:var(--sapNeutralElementColor)}:host([design="NonInteractive"]){color:var(--sapContent_NonInteractiveIconColor)}:host([design="Positive"]){color:var(--sapPositiveElementColor)}:host([mode="Interactive"][desktop]) .ui5-icon-root:focus,:host([mode="Interactive"]) .ui5-icon-root:focus-visible{outline:var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);border-radius:var(--ui5-v2-15-0-icon-focus-border-radius)}.ui5-icon-root{display:flex;height:100%;width:100%;outline:none;vertical-align:top}:host([mode="Interactive"]){cursor:pointer}.ui5-icon-root:not([dir=ltr])>g{transform:var(--_ui5-v2-15-0_icon_transform_scale);transform-origin:center}
 `;
 
@@ -199,7 +199,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/pa
             }
         }
         onEnterDOM() {
-            if (Icons.f()) {
+            if (Theme.f()) {
                 this.setAttribute("desktop", "");
             }
         }
@@ -242,7 +242,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/pa
             }
             else if (this.accData) {
                 if (this.packageName) {
-                    const i18nBundle = await Icons.f$2(this.packageName);
+                    const i18nBundle = await Icons.f(this.packageName);
                     this.effectiveAccessibleName = i18nBundle.getText(this.accData) || undefined;
                 }
                 else {

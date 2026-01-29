@@ -7,13 +7,14 @@ sap.ui.define([
 	"sap/ui/core/Element",
 	"sap/ui/core/library",
 	"sap/ui/core/Lib",
+	"sap/ui/dom/detectTextSelection",
 	"./library",
 	"./ListItemBase",
 	"./ColumnListItemRenderer",
 	// jQuery custom selectors ":sapFocusable", ":sapTabbable"
 	"sap/ui/dom/jquery/Selectors"
 ],
-	function(Element, coreLibrary, Lib, library, ListItemBase, ColumnListItemRenderer) {
+	function(Element, coreLibrary, Lib, detectTextSelection, library, ListItemBase, ColumnListItemRenderer) {
 	"use strict";
 
 
@@ -86,7 +87,7 @@ sap.ui.define([
 	var TablePopin = Element.extend("sap.m.TablePopin", {
 		ontap: function(oEvent) {
 			// prevent the tap event if selection is done within the popin control
-			if (oEvent.isMarked() || ListItemBase.detectTextSelection(this.getDomRef())) {
+			if (oEvent.isMarked() || detectTextSelection(this.getDomRef())) {
 				return oEvent.stopImmediatePropagation(true);
 			}
 		},

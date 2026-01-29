@@ -999,7 +999,7 @@ sap.ui.define([
 			+ "," + this.oAggregation.hierarchyQualifier + "," + this.oAggregation.$NodeProperty
 			+ ",filter(" + sFilter + "),1)";
 		const sQueryString = this.sResourcePath
-			+ this.oRequestor.buildQueryString(/*sMetaPath*/null, mQueryOptions);
+			+ this.oRequestor.buildQueryString(this.sMetaPath, mQueryOptions);
 
 		oPromise = this.oRequestor.request("GET", sQueryString, oGroupLock)
 			.then(async (oResult) => {
@@ -1985,20 +1985,19 @@ sap.ui.define([
 			delete this.oCountPromise.$resolve;
 
 			mQueryOptions = Object.assign({}, this.mQueryOptions);
-			// // drop collection related system query options (except $filter,$search)
+			// drop collection related system query options (except $filter, $search)
 			delete mQueryOptions.$apply;
 			delete mQueryOptions.$count;
-			// keep mQueryOptions.$filter;
 			delete mQueryOptions.$expand;
+			// keep mQueryOptions.$filter;
 			delete mQueryOptions.$orderby;
 			if (this.oAggregation.search) {
 				// Note: A recursive hierarchy cannot be combined with "$search"
 				mQueryOptions.$search = this.oAggregation.search;
 			}
 			delete mQueryOptions.$select;
-			// Note: sMetaPath only needed for $filter by V42, but V42 cannot work here!
 			sResourcePath = this.sResourcePath + "/$count"
-				+ this.oRequestor.buildQueryString(/*sMetaPath*/null, mQueryOptions);
+				+ this.oRequestor.buildQueryString(this.sMetaPath, mQueryOptions);
 
 			return this.oRequestor.request("GET", sResourcePath, oGroupLock.getUnlockedCopy())
 				.then((iCount) => { // Note: iCount is already of type number here
@@ -2483,7 +2482,7 @@ sap.ui.define([
 		mQueryOptions.$select = [...mQueryOptions.$select, this.oAggregation.$LimitedRank];
 		delete mQueryOptions.$count;
 		const sResourcePath = this.sResourcePath
-			+ this.oRequestor.buildQueryString("", mQueryOptions, false, true, true);
+			+ this.oRequestor.buildQueryString(this.sMetaPath, mQueryOptions, false, true, true);
 
 		const oResult = await this.oRequestor.request("GET", sResourcePath, oGroupLock);
 

@@ -10,12 +10,27 @@ sap.ui.define([
 ) => {
 	"use strict";
 
+	// Maps property names in control to property names in property info
 	const MANDATORY_PROPERTIES = {
 		"dataType": "dataType",
 		"dataTypeConstraints": "constraints",
 		"dataTypeFormatOptions": "formatOptions",
 		"label": "label",
 		"maxConditions": "maxConditions"
+	};
+
+	// All properties that can be set in a sap.ui.mdc.filterbar.PropertyInfo object
+	const ALL_PROPERTIES = {
+		...MANDATORY_PROPERTIES,
+		"required": "required",
+		"hiddenFilter": "hiddenFilter",
+		"path": "path",
+		"caseSensitive": "caseSensitive",
+		"key": "key",
+		"tooltip": "tooltip",
+		"visible": "visible",
+		"group": "group",
+		"groupLabel": "groupLabel"
 	};
 
 	/**
@@ -28,6 +43,8 @@ sap.ui.define([
 	 * @alias sap.ui.mdc.filterbar.PropertyInfoValidator
 	 */
 	const PropertyInfoValidator = {};
+
+	PropertyInfoValidator._isValidationFeatureFlagEnabled = new URLSearchParams(window.location.search).get("sap-ui-xx-enableNewPropertyInfoValidation") == "true";
 
 	PropertyInfoValidator._getPropertyInfoPropertyName = function(sPropertyName) {
 		return MANDATORY_PROPERTIES[sPropertyName] ?? sPropertyName;
@@ -60,7 +77,10 @@ sap.ui.define([
 			return false;
 		}
 
-		if (oControl.isPropertyInitial(sPropertyName)) {
+		// as bound propertys are never initial even if there is no existing binding right now check the binding too
+		if (oControl.isBound(sPropertyName) && !oControl.getBinding(sPropertyName) && !Object.hasOwn(oControl.mProperties, sPropertyName)) {
+			return false;
+		} else if (oControl.isPropertyInitial(sPropertyName)) {
 			return false;
 		}
 
@@ -94,20 +114,32 @@ sap.ui.define([
 
 	/**
 	 * Checks if all defined properties in <code>oPropertyInfo</code> are NOT initial on the given <code>Control</code>.
+	 *
+	 * If no <code>oPropertyInfo</code> is given, it is checked if all mandatory (necessary for rendering) properties are not initial on the <code>Control</code>.
 	 * @param {sap.ui.mdc.Control} oControl Control instance to be checked.
 	 * @param {object} oPropertyInfo Property Info object to be checked.
 	 * @returns {void}
 	 */
 	PropertyInfoValidator.comparePropertyInfoWithControl = (oControl, oPropertyInfo) => {
-		if (!oControl || !oPropertyInfo) {
+		//if (!oControl) {
+		if (!oControl || (!PropertyInfoValidator._isValidationFeatureFlagEnabled && !oPropertyInfo)) {
 			return;
 		}
 
-		const aIgnoredKeys = [
-			"name", "key", "group", "groupLabel"
-		];
+		if (PropertyInfoValidator._isValidationFeatureFlagEnabled) {
+			if (!oPropertyInfo) {
+				if (!PropertyInfoValidator.checkMandatoryProperties(oControl)) {
+					Log.error(`sap.ui.mdc.util.PropertyInfoValidator: No PropertyInfo given for Control '${oControl.getId()}'!`);
+				}
+
+				return;
+			}
+		}
+
+		const aPropertiesOnControl = Object.keys(oControl.getMetadata().getAllProperties())
+			.map((sPropertyName) => PropertyInfoValidator._getPropertyInfoPropertyName(sPropertyName));
 		const aPropertyInfoProperties = Object.keys(oPropertyInfo).filter((sKey) => {
-			return !aIgnoredKeys.includes(sKey);
+			return aPropertiesOnControl.includes(sKey);
 		});
 
 		if (!aPropertyInfoProperties.length) {
@@ -119,7 +151,8 @@ sap.ui.define([
 			return !oControl.isPropertyInitial(sTranslatedPropertyName);
 		});
 
-		if (aPropertyInfoProperties.length > aDefinedPropertiesOnControl.length) {
+		// if the control defines any properties, they must be defined in the propertyInfo as well
+		if (aPropertyInfoProperties.length > aDefinedPropertiesOnControl.length && aDefinedPropertiesOnControl.length > 0) {
 			Log.error(`sap.ui.mdc.util.PropertyInfoValidator: the propertyInfo for Control '${oControl.getId()}' contains more information than the control itself!`);
 		}
 	};
@@ -158,6 +191,24 @@ sap.ui.define([
 					}
 			}
 		}
+	};
+
+	/**
+	 * Checks if any properties that can be defined in property info are set (not initial) on the given <code>Control</code>.
+	 * @param {sap.ui.mdc.Control} oControl Control instance to be checked.
+	 * @returns {boolean} Whether any properties are set.
+	 */
+	PropertyInfoValidator.hasPropertiesOnControl = (oControl) => {
+		if (!oControl) {
+			return false;
+		}
+
+		const aPropertyInfoProperties = Object.values(ALL_PROPERTIES);
+		// get all legal properties on control that are definable in property info, that is, metadata
+		const aPropertiesOnControl = Object.keys(oControl.getMetadata().getAllProperties())
+			.filter((sPropertyName) => aPropertyInfoProperties.includes(PropertyInfoValidator._getPropertyInfoPropertyName(sPropertyName)));
+
+		return aPropertiesOnControl.some((sPropertyName) => !oControl.isPropertyInitial(sPropertyName));
 	};
 
 	return PropertyInfoValidator;

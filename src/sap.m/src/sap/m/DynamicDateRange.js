@@ -568,6 +568,7 @@ sap.ui.define([
 		var aLastIncludedOptions = ["LASTMINUTESINCLUDED", "LASTHOURSINCLUDED", "LASTDAYSINCLUDED", "LASTWEEKSINCLUDED", "LASTMONTHSINCLUDED", "LASTQUARTERSINCLUDED", "LASTYEARSINCLUDED"];
 		var aNextIncludedOptions = ["NEXTMINUTESINCLUDED", "NEXTHOURSINCLUDED", "NEXTDAYSINCLUDED", "NEXTWEEKSINCLUDED", "NEXTMONTHSINCLUDED", "NEXTQUARTERSINCLUDED", "NEXTYEARSINCLUDED"];
 
+		const POPUP_MAX_HEIGHT = 512;
 		const POPUP_HEADER_HEIGHT = 45;
 		const POPUP_LIST_ITEM_HEIGHT = 51;
 		const POPUP_LIST_ITEM_COMPACT_HEIGHT = 49;
@@ -1273,11 +1274,13 @@ sap.ui.define([
 		};
 
 		DynamicDateRange.prototype._getPopupHeight = function() {
+			let height;
 			if (document.body.classList.contains("sapUiSizeCompact") || this.hasStyleClass("sapUiSizeCompact") || this.getDomRef()?.closest(".sapUiSizeCompact")) {
-				return this.getStandardOptions().length * POPUP_LIST_ITEM_COMPACT_HEIGHT + POPUP_HEADER_HEIGHT + "px";
+				height = this.getStandardOptions().length * POPUP_LIST_ITEM_COMPACT_HEIGHT + POPUP_HEADER_HEIGHT;
 			} else {
-				return this.getStandardOptions().length * POPUP_LIST_ITEM_HEIGHT + POPUP_HEADER_HEIGHT + "px";
+				height = this.getStandardOptions().length * POPUP_LIST_ITEM_HEIGHT + POPUP_HEADER_HEIGHT;
 			}
+			return (height < POPUP_MAX_HEIGHT) ? height + "px" : POPUP_MAX_HEIGHT + "px";
 		};
 
 		DynamicDateRange.prototype._createPopup = function() {

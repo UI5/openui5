@@ -982,6 +982,67 @@ sap.ui.define([
 		oTableSelectDialog._oDialog.close();
 	});
 
+	QUnit.test("Selection should not fire when text is selected", function (assert) {
+		const done = assert.async();
+
+		const aData1 = [];
+		for (let i = 0; i < 5; i++) {
+			aData1.push({text : "Item" + i });
+		}
+		const oTableSelectDialog = new TableSelectDialog({
+			columns: [
+				new Column({
+					styleClass: "name",
+					hAlign: "Left",
+					header: new Label({
+						text: "Name"
+					})
+				})
+			]
+		});
+		oTableSelectDialog.setModel(new JSONModel(aData1));
+		oTableSelectDialog.bindItems("/", new ColumnListItem({
+			cells : [
+				new Label({text : "{text}"})
+			]
+		}));
+
+		const oFireSelectionChangeSpy = this.spy(oTableSelectDialog, "fireSelectionChange");
+
+		oTableSelectDialog.open();
+
+		const oItemDomRef = oTableSelectDialog._oDialog.getDomRef().querySelector(".sapMListTblCell .sapMLabelInner bdi");
+
+		// Simulate text selection in the header
+		const oRange = document.createRange();
+		const oTextNode = oItemDomRef.childNodes[0];
+		if (oTextNode && oTextNode.nodeType === Node.TEXT_NODE) {
+			oRange.selectNodeContents(oTextNode);
+		} else {
+			oRange.selectNodeContents(oItemDomRef);
+		}
+		const oSelection = window.getSelection();
+		oSelection.removeAllRanges();
+		oSelection.addRange(oRange);
+
+		const oCustomListItem = oTableSelectDialog.getItems()[0];
+		const oDelegates = oTableSelectDialog._oItemDelegate;
+
+		oDelegates.ontap({
+			getParameters: function () { },
+			srcControl: oCustomListItem,
+			target: oCustomListItem.getDomRef()
+		});
+
+		assert.ok(oFireSelectionChangeSpy.notCalled, "selectionChangeEvent should not be fired when text is selected.");
+
+		oTableSelectDialog._oDialog.attachAfterClose(function (oEvent) {
+			oTableSelectDialog.destroy();
+			done();
+		});
+		oTableSelectDialog._oDialog.close();
+	});
+
 	QUnit.module("Single select dialog with rememberSelections", {
 		beforeEach: function () {
 			this.oTableSelectDialog = new TableSelectDialog({

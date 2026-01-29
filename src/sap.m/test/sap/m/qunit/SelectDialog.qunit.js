@@ -1033,6 +1033,55 @@ sap.ui.define([
 			oDialogCloseSpy.restore();
 		});
 
+		QUnit.test("Selection should not fire when text is selected", async function (assert) {
+			const oFireSelectionChangeSpy = this.spy(this.oSelectDialog, "fireSelectionChange");
+
+			bindItems(this.oSelectDialog, {
+				oData: this.mockupData,
+				path: "/items",
+				template: new StandardListItem({title: "{Title}" })
+			});
+
+			await nextUIUpdate();
+
+			// Act
+			this.oSelectDialog.open();
+			this.clock.tick(350);
+
+			const oItemDomRef = this.oSelectDialog._oDialog.getDomRef().querySelector(".sapMSLITitleOnly");
+
+			// Simulate text selection in the header
+			const oRange = document.createRange();
+			const oTextNode = oItemDomRef.childNodes[0];
+			if (oTextNode && oTextNode.nodeType === Node.TEXT_NODE) {
+				oRange.selectNodeContents(oTextNode);
+			} else {
+				oRange.selectNodeContents(oItemDomRef);
+			}
+			const oSelection = window.getSelection();
+			oSelection.removeAllRanges();
+			oSelection.addRange(oRange);
+
+			const oCustomListItem = this.oSelectDialog.getItems()[0];
+			const oDelegates = this.oSelectDialog._getListItemsEventDelegates();
+
+			oDelegates.ontap({
+				getParameters: function () { },
+				srcControl: oCustomListItem,
+				target: oCustomListItem.getDomRef()
+			});
+
+			// Assert
+			assert.ok(oFireSelectionChangeSpy.notCalled, "selectionChangeEvent should not be fired when text is selected.");
+
+			// Cleanup
+			this.oSelectDialog.destroyItems();
+			oFireSelectionChangeSpy.restore();
+
+			this.oSelectDialog._oDialog.close();
+			this.clock.tick(350);
+		});
+
 		QUnit.test("Clicking on a group heder should not close the select dialog", function (assert) {
 			// Arrange
 			bindItems(this.oSelectDialog, { oData: this.mockupData, path: "/items", template: createTemplateListItem() });

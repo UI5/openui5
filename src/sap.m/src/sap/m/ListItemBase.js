@@ -5,6 +5,7 @@
 // Provides control sap.m.ListItemBase.
 sap.ui.define([
 	"sap/ui/base/DataType",
+	"sap/ui/dom/detectTextSelection",
 	"sap/ui/model/BindingMode",
 	"sap/ui/Device",
 	"sap/ui/core/Control",
@@ -27,6 +28,7 @@ sap.ui.define([
 ],
 function(
 	DataType,
+	detectTextSelection,
 	BindingMode,
 	Device,
 	Control,
@@ -950,20 +952,6 @@ function(
 		this.informList("ActiveChange", bActive);
 	};
 
-	/**
-	 * Detect text selection.
-	 *
-	 * @param {HTMLElement} oDomRef DOM element of the control
-	 * @returns {boolean} true if text selection is done within the control else false
-	 * @private
-	 */
-	ListItemBase.detectTextSelection = function(oDomRef) {
-		var oSelection = window.getSelection(),
-			sTextSelection = oSelection.toString().replace("\n", "");
-
-		return sTextSelection && (oDomRef !== oSelection.focusNode && oDomRef.contains(oSelection.focusNode));
-	};
-
 	ListItemBase.prototype.ontap = function(oEvent) {
 
 		// do not handle already handled events
@@ -972,7 +960,7 @@ function(
 		}
 
 		// do not handle in case of text selection within the list item
-		if (ListItemBase.detectTextSelection(this.getDomRef())) {
+		if (detectTextSelection(this.getDomRef())) {
 			return;
 		}
 

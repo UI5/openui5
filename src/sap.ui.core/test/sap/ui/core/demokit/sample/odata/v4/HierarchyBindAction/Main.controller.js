@@ -139,6 +139,20 @@ sap.ui.define([
 			}
 		},
 
+		/**
+		 * Opens the move dialog to select a new parent or to specify a sibling position.
+		 *
+		 * @param {sap.ui.base.Event} oEvent
+		 *   The event object
+		 * @param {string|null} vNextSibling
+		 *   Specifies the nextSibling for Context#move. The following values are supported:
+		 *   - "": Sets the nextSibling to undefined. The sibling position of a moved node is
+		 *     determined by the server. The opened dialog will ask for a new parent.
+		 *   - null: Sets the nextSibling to null. A node is moved to the last sibling position. The
+		 *     opened dialog will ask for a new parent.
+		 *   - "?": The opened dialog will ask for a specific nextSibling. The new parent is derived
+		 *     from the new nextSibling.
+		 */
 		onMove(oEvent, vNextSibling) {
 			this._oNode = oEvent.getSource().getBindingContext();
 			this._vNextSibling = vNextSibling === "" ? undefined : vNextSibling;

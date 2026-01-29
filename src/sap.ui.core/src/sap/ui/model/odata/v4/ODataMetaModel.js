@@ -41,9 +41,9 @@ sap.ui.define([
 	"sap/ui/model/odata/type/TimeOfDay"
 ], function (AnnotationHelper, ValueListType, _Helper, assert, Log, JSTokenizer, ObjectPath,
 		ManagedObject, SyncPromise, BindingMode, ChangeReason, ClientListBinding, BaseContext,
-		ContextBinding, MetaModel, PropertyBinding, OperationMode, Boolean, Byte, EdmDate,
+		ContextBinding, MetaModel, PropertyBinding, OperationMode, EdmBoolean, Byte, EdmDate,
 		DateTimeOffset, Decimal, Double, Guid, Int16, Int32, Int64, Raw, SByte, Single, Stream,
-		String, TimeOfDay) {
+		EdmString, TimeOfDay) {
 	"use strict";
 	/*eslint max-nested-callbacks: 0 */
 
@@ -116,7 +116,7 @@ sap.ui.define([
 			messageChange : true
 		},
 		mUi5TypeForEdmType = {
-			"Edm.Boolean" : {Type : Boolean},
+			"Edm.Boolean" : {Type : EdmBoolean},
 			"Edm.Byte" : {Type : Byte},
 			"Edm.Date" : {Type : EdmDate},
 			"Edm.DateTimeOffset" : {
@@ -151,7 +151,7 @@ sap.ui.define([
 					"@com.sap.vocabularies.Common.v1.IsDigitSequence" : "isDigitSequence",
 					$MaxLength : "maxLength"
 				},
-				Type : String
+				Type : EdmString
 			},
 			"Edm.TimeOfDay" : {
 				constraints : {
@@ -1828,7 +1828,7 @@ sap.ui.define([
 			}
 			if (sLastSegment.startsWith("@$ui5.context.is")
 					|| sLastSegment.startsWith("@$ui5.node.is")) {
-				oBooleanType ??= new Boolean();
+				oBooleanType ??= new EdmBoolean();
 				return SyncPromise.resolve(oBooleanType);
 			}
 		}

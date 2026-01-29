@@ -11,6 +11,8 @@ sap.ui.define([
 
 	QUnit.module("checkMandatoryProperty");
 
+	PropertyInfoValidator._isValidationFeatureFlagEnabled = true;
+
 	const sCheckMandatoryPropertWarningText = "sap.ui.mdc.util.PropertyInfoValidator:checkMandatoryProperty either Control or property name are not defined.";
 
 	QUnit.test("should return false when oControl is not set", function (assert) {
@@ -35,10 +37,12 @@ sap.ui.define([
 		const fnGetIdStub = sinon.stub().returns(sId);
 		const fnGetPropertyStub = sinon.stub().returns(true);
 		const fnIsPropertyInitialStub = sinon.stub().returns(true);
+		const fnIsBoundStub = sinon.stub().returns(false);
 		const oControlMock = {
 			getId: fnGetIdStub,
 			getProperty: fnGetPropertyStub,
-			isPropertyInitial: fnIsPropertyInitialStub
+			isPropertyInitial: fnIsPropertyInitialStub,
+			isBound: fnIsBoundStub
 		};
 
 		["", undefined, null, false].forEach((vIncorrectValue) => {
@@ -62,10 +66,12 @@ sap.ui.define([
 		const fnGetIdStub = sinon.stub().returns(sId);
 		const fnGetPropertyStub = sinon.stub().returns(true);
 		const fnIsPropertyInitialStub = sinon.stub().returns(true);
+		const fnIsBoundStub = sinon.stub().returns(false);
 		const oControlMock = {
 			getId: fnGetIdStub,
 			getProperty: fnGetPropertyStub,
-			isPropertyInitial: fnIsPropertyInitialStub
+			isPropertyInitial: fnIsPropertyInitialStub,
+			isBound: fnIsBoundStub
 		};
 
 		const sPropertyName = "testPropertyName";
@@ -88,10 +94,12 @@ sap.ui.define([
 		const fnGetIdStub = sinon.stub().returns(sId);
 		const fnGetPropertyStub = sinon.stub().returns(true);
 		const fnIsPropertyInitialStub = sinon.stub().returns(false);
+		const fnIsBoundStub = sinon.stub().returns(false);
 		const oControlMock = {
 			getId: fnGetIdStub,
 			getProperty: fnGetPropertyStub,
-			isPropertyInitial: fnIsPropertyInitialStub
+			isPropertyInitial: fnIsPropertyInitialStub,
+			isBound: fnIsBoundStub
 		};
 
 		const sPropertyName = "testPropertyName";
@@ -118,10 +126,14 @@ sap.ui.define([
 			const fnGetIdStub = sinon.stub().returns(sId);
 			const fnGetPropertyStub = sinon.stub().returns(vFalseValue);
 			const fnIsPropertyInitialStub = sinon.stub().returns(false);
+			const fnIsBoundStub = sinon.stub().returns(false);
+			const fngetBindingStub = sinon.stub().returns(undefined);
 			const oControlMock = {
 				getId: fnGetIdStub,
 				getProperty: fnGetPropertyStub,
-				isPropertyInitial: fnIsPropertyInitialStub
+				isPropertyInitial: fnIsPropertyInitialStub,
+				isBound: fnIsBoundStub,
+				getBinding: fngetBindingStub
 			};
 
 			assert.ok(fnIsPropertyInitialStub.notCalled, "should not call 'isPropertyInitial' initially");
@@ -132,12 +144,86 @@ sap.ui.define([
 
 			assert.ok(fnIsPropertyInitialStub.calledOnce, "should call 'isPropertyInitial'");
 			assert.ok(fnIsPropertyInitialStub.calledWith(sPropertyName), "should call 'isPropertyInitial' with correct property name");
+			assert.ok(fnIsBoundStub.calledOnce, "should call 'isBound'");
+			assert.ok(fnIsBoundStub.calledWith(sPropertyName), "should call 'isBound' with correct property name");
+			assert.ok(fngetBindingStub.notCalled, "should not call 'getBinding'");
 			assert.ok(fnLogErrorSpy.calledOnce, "should log an error");
 			assert.ok(fnLogErrorSpy.calledWith(`sap.ui.mdc.util.PropertyInfoValidator: Control '${sId}' is missing mandatory property '${sPropertyName}'`), "should correct error message");
 			assert.notOk(bReturnValue, "should return false");
 
 			fnLogErrorSpy.restore();
 		});
+	});
+
+	QUnit.test("should not log an error and return false when given property is bound but binding not ready", function (assert) {
+		const fnLogErrorSpy = sinon.spy(Log, "error");
+
+		const sId = "__control0";
+		const fnGetIdStub = sinon.stub().returns(sId);
+		const sPropertyName = "testProperty";
+		const fnGetPropertyStub = sinon.stub().withArgs(sPropertyName).returns(true);
+		const fnIsPropertyInitialStub = sinon.stub().returns(true);
+		const fnIsBoundStub = sinon.stub().returns(true);
+		const fngetBindingStub = sinon.stub().returns(undefined);
+		const oControlMock = {
+			getId: fnGetIdStub,
+			getProperty: fnGetPropertyStub,
+			isPropertyInitial: fnIsPropertyInitialStub,
+			isBound: fnIsBoundStub,
+			getBinding: fngetBindingStub,
+			mProperties: {}
+		};
+
+		assert.ok(fnIsPropertyInitialStub.notCalled, "should not call 'isPropertyInitial' initially");
+		assert.ok(fnLogErrorSpy.notCalled, "should not log an error initially");
+
+		const bReturnValue = PropertyInfoValidator.checkMandatoryProperty(oControlMock, sPropertyName);
+
+		assert.ok(fnIsPropertyInitialStub.notCalled, "should not call 'isPropertyInitial'");
+		assert.ok(fnIsBoundStub.calledOnce, "should call 'isBound'");
+		assert.ok(fnIsBoundStub.calledWith(sPropertyName), "should call 'isBound' with correct property name");
+		assert.ok(fngetBindingStub.calledOnce, "should call 'getBinding'");
+		assert.ok(fngetBindingStub.calledWith(sPropertyName), "should call 'getBinding' with correct property name");
+		assert.ok(fnLogErrorSpy.notCalled, "should not log an error");
+		assert.notOk(bReturnValue, "should return false");
+		assert.ok(fnGetIdStub.notCalled, "should not call 'getId'");
+		fnLogErrorSpy.restore();
+	});
+
+	QUnit.test("should not log an error and return true when given property is bound and binding is ready", function (assert) {
+		const fnLogErrorSpy = sinon.spy(Log, "error");
+
+		const sId = "__control0";
+		const fnGetIdStub = sinon.stub().returns(sId);
+		const sPropertyName = "testProperty";
+		const fnGetPropertyStub = sinon.stub().withArgs(sPropertyName).returns(true);
+		const fnIsPropertyInitialStub = sinon.stub().returns(false);
+		const fnIsBoundStub = sinon.stub().returns(true);
+		const fngetBindingStub = sinon.stub().returns({}); // just return an object
+		const oControlMock = {
+			getId: fnGetIdStub,
+			getProperty: fnGetPropertyStub,
+			isPropertyInitial: fnIsPropertyInitialStub,
+			isBound: fnIsBoundStub,
+			getBinding: fngetBindingStub,
+			mProperties: {"testProperty": true}
+		};
+
+		assert.ok(fnIsPropertyInitialStub.notCalled, "should not call 'isPropertyInitial' initially");
+		assert.ok(fnLogErrorSpy.notCalled, "should not log an error initially");
+
+		const bReturnValue = PropertyInfoValidator.checkMandatoryProperty(oControlMock, sPropertyName);
+
+		assert.ok(fnIsPropertyInitialStub.calledOnce, "should call 'isPropertyInitial'");
+		assert.ok(fnIsPropertyInitialStub.calledWith(sPropertyName), "should call 'isPropertyInitial' with correct property name");
+		assert.ok(fnIsBoundStub.calledOnce, "should call 'isBound'");
+		assert.ok(fnIsBoundStub.calledWith(sPropertyName), "should call 'isBound' with correct property name");
+		assert.ok(fngetBindingStub.calledOnce, "should call 'getBinding'");
+		assert.ok(fngetBindingStub.calledWith(sPropertyName), "should call 'getBinding' with correct property name");
+		assert.ok(fnLogErrorSpy.notCalled, "should not log an error");
+		assert.ok(bReturnValue, "should return true");
+		assert.ok(fnGetIdStub.notCalled, "should not call 'getId'");
+		fnLogErrorSpy.restore();
 	});
 
 	QUnit.test("should not log an error and return true when given property is set", function (assert) {
@@ -148,10 +234,12 @@ sap.ui.define([
 		const sPropertyName = "testProperty";
 		const fnGetPropertyStub = sinon.stub().withArgs(sPropertyName).returns(true);
 		const fnIsPropertyInitialStub = sinon.stub().returns(false);
+		const fnIsBoundStub = sinon.stub().returns(false);
 		const oControlMock = {
 			getId: fnGetIdStub,
 			getProperty: fnGetPropertyStub,
-			isPropertyInitial: fnIsPropertyInitialStub
+			isPropertyInitial: fnIsPropertyInitialStub,
+			isBound: fnIsBoundStub
 		};
 
 		assert.ok(fnIsPropertyInitialStub.notCalled, "should not call 'isPropertyInitial' initially");
@@ -240,19 +328,53 @@ sap.ui.define([
 		fnObjectKeysSpy.restore();
 	});
 
-	QUnit.test("should do nothing when oPropertyInfo is not provided", function(assert) {
+	QUnit.test("should do nothing when oPropertyInfo is not provided, but all mandatory properties are not initial on oControl", function(assert) {
 		const fnLogErrorSpy = sinon.spy(Log, "error");
 		const fnObjectKeysSpy = sinon.spy(Object, "keys");
 
 		assert.ok(fnObjectKeysSpy.notCalled, "should not get keys of oPropertyInfo initially");
 		assert.ok(fnLogErrorSpy.notCalled, "should not Log an error initially");
 
-		PropertyInfoValidator.comparePropertyInfoWithControl({}, undefined);
-		PropertyInfoValidator.comparePropertyInfoWithControl({}, null);
-		PropertyInfoValidator.comparePropertyInfoWithControl({}, false);
+		const fnIsPropertyInitialStub = sinon.stub().returns(false);
+		const getPropertyStub = sinon.stub().returns("some value");
+		const fnIsBoundStub = sinon.stub().returns(false);
 
-		assert.ok(fnObjectKeysSpy.notCalled, "should not get keys of oPropertyInfo");
+		const oControlMock = {
+			isPropertyInitial: fnIsPropertyInitialStub,
+			getProperty: getPropertyStub,
+			isBound: fnIsBoundStub
+		};
+
+		PropertyInfoValidator.comparePropertyInfoWithControl(oControlMock, undefined);
+		PropertyInfoValidator.comparePropertyInfoWithControl(oControlMock, null);
+		PropertyInfoValidator.comparePropertyInfoWithControl(oControlMock, false);
+
 		assert.ok(fnLogErrorSpy.notCalled, "should not Log an error");
+
+		fnLogErrorSpy.restore();
+		fnObjectKeysSpy.restore();
+	});
+
+	QUnit.test("should log error when oPropertyInfo is not provided and oControl has not all mandatory properties", function(assert) {
+		const fnLogErrorSpy = sinon.spy(Log, "error");
+		const fnObjectKeysSpy = sinon.spy(Object, "keys");
+
+		assert.ok(fnObjectKeysSpy.notCalled, "should not get keys of oPropertyInfo initially");
+		assert.ok(fnLogErrorSpy.notCalled, "should not Log an error initially");
+
+		const fnIsPropertyInitialStub = sinon.stub().returns(true);
+		const fnIsBoundStub = sinon.stub().returns(false);
+		const oControlMock = {
+			isPropertyInitial: fnIsPropertyInitialStub,
+			getId: () => "__control0",
+			isBound: fnIsBoundStub
+		};
+
+		PropertyInfoValidator.comparePropertyInfoWithControl(oControlMock, undefined);
+		PropertyInfoValidator.comparePropertyInfoWithControl(oControlMock, null);
+		PropertyInfoValidator.comparePropertyInfoWithControl(oControlMock, false);
+
+		assert.ok(fnLogErrorSpy.called, "should Log an error");
 
 		fnLogErrorSpy.restore();
 		fnObjectKeysSpy.restore();
@@ -266,8 +388,12 @@ sap.ui.define([
 			"key": "keyValue"
 		};
 		const fnIsPropertyInitialStub = sinon.stub();
+		const fnGetMetadataStub = sinon.stub().returns({
+			getAllProperties: () => { return {}; }
+		});
 		const oControlMock = {
-			isPropertyInitial: fnIsPropertyInitialStub
+			isPropertyInitial: fnIsPropertyInitialStub,
+			getMetadata: fnGetMetadataStub
 		};
 
 		assert.ok(fnObjectKeysSpy.notCalled, "should not get keys of oPropertyInfo initially");
@@ -276,7 +402,7 @@ sap.ui.define([
 
 		PropertyInfoValidator.comparePropertyInfoWithControl(oControlMock, oPropertyInfo);
 
-		assert.ok(fnObjectKeysSpy.calledOnce, "should call 'keys'");
+		assert.ok(fnObjectKeysSpy.called, "should call 'keys'");
 		assert.ok(fnObjectKeysSpy.calledWith(oPropertyInfo), "should get keys of oPropertyInfo");
 		assert.ok(fnIsPropertyInitialStub.notCalled, "should not call 'isPropertyInitial'");
 		assert.ok(fnLogErrorSpy.notCalled, "should not Log an error");
@@ -299,8 +425,14 @@ sap.ui.define([
 		const fnIsPropertyInitialStub = sinon.stub();
 		fnIsPropertyInitialStub.returns(true);
 		fnIsPropertyInitialStub.withArgs(sPropertyName).returns(false);
+		const fnGetMetadataStub = sinon.stub().returns({
+			getAllProperties: () => ({
+					[sPropertyName]: { name: sPropertyName }
+				})
+		});
 		const oControlMock = {
-			isPropertyInitial: fnIsPropertyInitialStub
+			isPropertyInitial: fnIsPropertyInitialStub,
+			getMetadata: fnGetMetadataStub
 		};
 
 		assert.ok(fnObjectKeysSpy.notCalled, "should not get keys of oPropertyInfo initially");
@@ -309,7 +441,7 @@ sap.ui.define([
 
 		PropertyInfoValidator.comparePropertyInfoWithControl(oControlMock, oPropertyInfo);
 
-		assert.ok(fnObjectKeysSpy.calledOnce, "should call 'keys'");
+		assert.ok(fnObjectKeysSpy.called, "should call 'keys'");
 		assert.ok(fnObjectKeysSpy.calledWith(oPropertyInfo), "should get keys of oPropertyInfo");
 		assert.ok(fnIsPropertyInitialStub.calledOnce, "should call 'isPropertyInitial'");
 		assert.ok(fnIsPropertyInitialStub.calledWith(sPropertyName), `should call 'isPropertyInitial' with '${sPropertyName}'`);
@@ -337,9 +469,16 @@ sap.ui.define([
 		fnIsPropertyInitialStub.withArgs(sPropertyName0).returns(false);
 		const sId = "__control0";
 		const fnGetIdStub = sinon.stub().returns(sId);
+		const fnGetMetadataStub = sinon.stub().returns({
+			getAllProperties: () => ({
+				[sPropertyName0]: { name: sPropertyName0 },
+				[sPropertyName1]: { name: sPropertyName1 }
+			})
+		});
 		const oControlMock = {
 			isPropertyInitial: fnIsPropertyInitialStub,
-			getId: fnGetIdStub
+			getId: fnGetIdStub,
+			getMetadata: fnGetMetadataStub
 		};
 
 		assert.ok(fnLogErrorSpy.notCalled, "should not Log an error initially");
@@ -348,13 +487,59 @@ sap.ui.define([
 
 		PropertyInfoValidator.comparePropertyInfoWithControl(oControlMock, oPropertyInfo);
 
-		assert.ok(fnObjectKeysSpy.calledOnce, "should call 'keys'");
+		assert.ok(fnObjectKeysSpy.called, "should call 'keys'");
 		assert.ok(fnObjectKeysSpy.calledWith(oPropertyInfo), "should get keys of oPropertyInfo");
 		assert.ok(fnIsPropertyInitialStub.calledTwice, "should call 'isPropertyInitial'");
 		assert.ok(fnIsPropertyInitialStub.calledWith(sPropertyName0), `should call 'isPropertyInitial' with '${sPropertyName0}'`);
 		assert.ok(fnIsPropertyInitialStub.calledWith(sPropertyName1), `should call 'isPropertyInitial' with '${sPropertyName1}'`);
 		assert.ok(fnLogErrorSpy.calledOnce, "should Log an error");
 		assert.ok(fnLogErrorSpy.calledWith(`sap.ui.mdc.util.PropertyInfoValidator: the propertyInfo for Control '${sId}' contains more information than the control itself!`), "should Log correct error");
+
+		fnLogErrorSpy.restore();
+		fnObjectKeysSpy.restore();
+	});
+
+	QUnit.test("should do nothing if the oControl sets no metadata properties explicitly", function(assert) {
+		const fnLogErrorSpy = sinon.spy(Log, "error");
+		const fnObjectKeysSpy = sinon.spy(Object, "keys");
+
+		const sPropertyName0 = "__property0",
+			sPropertyName1 = "__property1";
+		const oPropertyInfo = {
+			"name": "nameValue",
+			"key": "keyValue"
+		};
+		oPropertyInfo[sPropertyName0] = "propertyValue";
+		oPropertyInfo[sPropertyName1] = "propertyValue";
+
+		const fnIsPropertyInitialStub = sinon.stub();
+		fnIsPropertyInitialStub.returns(true);
+		const sId = "__control0";
+		const fnGetIdStub = sinon.stub().returns(sId);
+		const fnGetMetadataStub = sinon.stub().returns({
+			getAllProperties: () => ({
+				[sPropertyName0]: { name: sPropertyName0 },
+				[sPropertyName1]: { name: sPropertyName1 }
+			})
+		});
+		const oControlMock = {
+			isPropertyInitial: fnIsPropertyInitialStub,
+			getId: fnGetIdStub,
+			getMetadata: fnGetMetadataStub
+		};
+
+		assert.ok(fnLogErrorSpy.notCalled, "should not Log an error initially");
+		assert.ok(fnObjectKeysSpy.notCalled, "should not get keys of oPropertyInfo initially");
+		assert.ok(fnIsPropertyInitialStub.notCalled, "should not call 'isPropertyInitial' initially");
+
+		PropertyInfoValidator.comparePropertyInfoWithControl(oControlMock, oPropertyInfo);
+
+		assert.ok(fnObjectKeysSpy.called, "should call 'keys'");
+		assert.ok(fnObjectKeysSpy.calledWith(oPropertyInfo), "should get keys of oPropertyInfo");
+		assert.ok(fnIsPropertyInitialStub.calledTwice, "should call 'isPropertyInitial'");
+		assert.ok(fnIsPropertyInitialStub.calledWith(sPropertyName0), `should call 'isPropertyInitial' with '${sPropertyName0}'`);
+		assert.ok(fnIsPropertyInitialStub.calledWith(sPropertyName1), `should call 'isPropertyInitial' with '${sPropertyName1}'`);
+		assert.ok(fnLogErrorSpy.notCalled, "should not Log an error");
 
 		fnLogErrorSpy.restore();
 		fnObjectKeysSpy.restore();
@@ -381,9 +566,16 @@ sap.ui.define([
 		fnIsPropertyInitialStub.withArgs(sMappedPropertyName).returns(false);
 		const sId = "__control0";
 		const fnGetIdStub = sinon.stub().returns(sId);
+		const fnGetMetadataStub = sinon.stub().returns({
+			getAllProperties: () => ({
+				[sPropertyName0]: { name: sPropertyName0 },
+				[sPropertyName1]: { name: sPropertyName1 }
+			})
+		});
 		const oControlMock = {
 			isPropertyInitial: fnIsPropertyInitialStub,
-			getId: fnGetIdStub
+			getId: fnGetIdStub,
+			getMetadata: fnGetMetadataStub
 		};
 
 		assert.ok(fnGetPropertyNameFromPropertyInfo.notCalled, "should not call 'getPropertyNameFromPropertyInfo' initially");
@@ -646,6 +838,71 @@ sap.ui.define([
 			fnLogErrorSpy.restore();
 			fnGetPropertyInfoPropertyNameStub.restore();
 		});
+	});
+
+	QUnit.module("hasPropertiesOnControl");
+
+	// All properties that can be set in a sap.ui.mdc.filterbar.PropertyInfo object
+	const ALL_PROPERTIES = {
+		...MANDATORY_PROPERTIES,
+		"required": "required",
+		"hiddenFilter": "hiddenFilter",
+		"path": "path",
+		"caseSensitive": "caseSensitive",
+		"key": "key",
+		"tooltip": "tooltip",
+		"visible": "visible",
+		"group": "group",
+		"groupLabel": "groupLabel"
+	};
+
+	QUnit.test("should return false, if all PropertyInfo properties are initial on control", function(assert) {
+		const fnIsPropertyInitialStub = sinon.stub();
+		fnIsPropertyInitialStub.returns(true);
+
+		fnIsPropertyInitialStub.withArgs("irrelevantProperty").returns(false);
+
+		const fnGetMetadataStub = sinon.stub().returns({
+			getAllProperties: () => Object.keys(ALL_PROPERTIES).reduce((oResult, sPropertyName) => {
+				oResult[sPropertyName] = { name: sPropertyName };
+				return oResult;
+			}, {})
+		});
+		const oControlMock = {
+			isPropertyInitial: fnIsPropertyInitialStub,
+			getMetadata: fnGetMetadataStub
+		};
+
+			const bActualResult = PropertyInfoValidator.hasPropertiesOnControl(oControlMock);
+
+			assert.notOk(bActualResult, `should return false when all PropertyInfo properties are initial on control`);
+	});
+
+	QUnit.test("should return true, if any PropertyInfo property is not initial on control", function(assert) {
+		const fnIsPropertyInitialStub = sinon.stub();
+		fnIsPropertyInitialStub.returns(true);
+
+		const fnGetMetadataStub = sinon.stub().returns({
+			getAllProperties: () => Object.keys(ALL_PROPERTIES).reduce((oResult, sPropertyName) => {
+				oResult[sPropertyName] = { name: sPropertyName };
+				return oResult;
+			}, {})
+		});
+		const oControlMock = {
+			isPropertyInitial: fnIsPropertyInitialStub,
+			getMetadata: fnGetMetadataStub
+		};
+
+		Object.entries(ALL_PROPERTIES).forEach(([sControlPropertyName, _sPropertyInfoPropertyName]) => {
+			fnIsPropertyInitialStub.withArgs(sControlPropertyName).returns(false);
+
+			const bActualResult = PropertyInfoValidator.hasPropertiesOnControl(oControlMock);
+
+			assert.ok(bActualResult, `should return true when property '${sControlPropertyName}' is not initial on control`);
+
+			fnIsPropertyInitialStub.withArgs(sControlPropertyName).returns(true);
+		});
+
 	});
 
 });

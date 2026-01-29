@@ -226,8 +226,16 @@ sap.ui.define([
 		this._oPropertyHelperClass = PropertyHelperClass;
 	};
 
-	PropertyHelperMixin._getPropertyByName = function(sName) {
-		return this._oPropertyHelper && this._oPropertyHelper.getProperty(sName);
+	PropertyHelperMixin._getPropertyByName = function(sName, bFromStore) {
+		if (this._oPropertyHelper) {
+			return this._oPropertyHelper.getProperty(sName);
+		}
+
+		if (bFromStore && this._sPropertyInfoStore) {
+			return this.getProperty(this._sPropertyInfoStore)?.find((oPropertyInfo) => {
+				return oPropertyInfo.key === sName;
+			});
+		}
 	};
 
 	PropertyHelperMixin._getPropertyByNameAsync = function(sName) {

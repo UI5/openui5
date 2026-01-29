@@ -47,6 +47,11 @@ sap.ui.define([
 		return oGeomap.getModel(GeomapDelegate._getMetadataInfo(oGeomap).model);
 	};
 
+	function _onModelContextChange(oGeomap) {
+		oGeomap.detachModelContextChange(oGeomap._onModelContextChange);
+		oGeomap.getControlDelegate()._createContentFromPropertyInfos(oGeomap);
+	}
+
 	/**
 	 * Returns the relevant property infos based on the metadata used with the MDC geomap instance.
 	 *
@@ -58,7 +63,7 @@ sap.ui.define([
 	 */
 	GeomapDelegate.fetchProperties = (oGeomap) => {
 
-		const oModel = GeomapDelegate._getModel(oGeomap);
+		const oModel = oGeomap.getModel();
 		let pCreatePropertyInfos;
 
 		if (!oModel) {
@@ -67,10 +72,10 @@ sap.ui.define([
 					resolver: resolve
 				}, onModelContextChange, this);
 			}).then((oModel) => {
-				return GeomapDelegate._createPropertyInfos(oGeomap, oModel);
+				return oGeomap.getControlDelegate()._createPropertyInfos(oGeomap, oModel);
 			});
 		} else {
-			pCreatePropertyInfos = GeomapDelegate._createPropertyInfos(oGeomap, oModel);
+			pCreatePropertyInfos = oGeomap.getControlDelegate()._createPropertyInfos(oGeomap, oModel);
 		}
 
 		return pCreatePropertyInfos.then((aProperties) => {
@@ -78,6 +83,11 @@ sap.ui.define([
 				oGeomap.awaitPropertyHelper().then((oPropertyHelper) => {
 					oPropertyHelper.setProperties(aProperties);
 					oGeomap.setPropertyInfo(aProperties);
+
+
+					oGeomap._onModelContextChange = _onModelContextChange.bind(null, oGeomap);
+					oGeomap.attachModelContextChange(oGeomap._onModelContextChange);
+
 				});
 			}
 			return aProperties;
@@ -86,7 +96,7 @@ sap.ui.define([
 
 	function onModelContextChange(oEvent, oData) {
 		const oGeomap = oEvent.getSource();
-		const oModel = this._getModel(oGeomap);
+		const oModel = oGeomap.getModel();
 
 		if (oModel) {
 			oGeomap.detachModelContextChange(onModelContextChange);
@@ -107,13 +117,13 @@ sap.ui.define([
 	GeomapDelegate.getBindingInfo = function (oGeomap) {
 
 		return {
-			path: "/" + GeomapDelegate._getMetadataInfo(oGeomap).collectionName
+			path: "/" + oGeomap.getControlDelegate()._getMetadataInfo(oGeomap).collectionName
 		};
 	};
 
 	GeomapDelegate.initializeGeomap = function (oGeomap) {
 		return new Promise((resolve, reject) => {
-			GeomapDelegate._createContentFromPropertyInfos(oGeomap);
+			oGeomap.getControlDelegate()._createContentFromPropertyInfos(oGeomap);
 			resolve(oGeomap);
 		});
 	};
@@ -131,9 +141,9 @@ sap.ui.define([
 	 */
 	GeomapDelegate.createInitialGeomapContent = function (oGeomap) {
 		const oGeomapInstance = oGeomap.getAggregation("_geomap");
-		const oState = GeomapDelegate._getState(oGeomap);
+		const oState = oGeomap.getControlDelegate()._getState(oGeomap);
 		oState.innerGeomap = oGeomapInstance;
-		GeomapDelegate._setState(oGeomap, oState);
+		oGeomap.getControlDelegate()._setState(oGeomap, oState);
 	};
 
 	// Gets internal property infos by exact property name
@@ -179,7 +189,7 @@ sap.ui.define([
 				Log.info("Inserting item to geomap: " + oChange);
 			}
 
-			GeomapDelegate.rebind(oGeomap, GeomapDelegate.getBindingInfo(oGeomap));
+			oGeomap.getControlDelegate().rebind(oGeomap, oGeomap.getControlDelegate().getBindingInfo(oGeomap));
 		}
 	};
 
@@ -189,7 +199,7 @@ sap.ui.define([
 	 * @param oBindingInfo
 	 */
 	GeomapDelegate.updateBindingInfo = function (oGeomap, oBindingInfo) {
-		GeoMapDelegate.updateBindingInfo.call(GeomapDelegate, oGeomap, oBindingInfo);
+		oGeomap.getControlDelegate().updateBindingInfo.call(GeomapDelegate, oGeomap, oBindingInfo);
 		oBindingInfo.path = "/" + oGeomap.getPayload().collectionName;
 	};
 
@@ -264,6 +274,15 @@ sap.ui.define([
 
 	GeomapDelegate.rebind = function (oGeomap, oBindingInfo) {
 		return;
+	};
+
+	/**
+	 * Creates a new independent delegate instance.
+	 * Use this in app delegates to avoid mutation of the shared base delegate.
+	 * @returns {object} A new delegate object with all methods copied
+	 */
+	GeomapDelegate.createDelegate = function() {
+		return Object.assign({}, GeomapDelegate);
 	};
 
 	return GeomapDelegate;

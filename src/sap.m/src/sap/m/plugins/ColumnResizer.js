@@ -8,6 +8,7 @@ sap.ui.define([
 	"sap/ui/core/Element",
 	"sap/ui/core/InvisibleText",
 	"sap/ui/Device",
+	"sap/ui/dom/detectTextSelection",
 	"sap/m/table/columnmenu/QuickAction",
 	"sap/m/table/columnmenu/QuickResize",
 	"sap/m/Button",
@@ -15,7 +16,7 @@ sap.ui.define([
 	"sap/ui/thirdparty/jquery",
 	// jQuery Plugin "aria"
 	"sap/ui/dom/jquery/Aria"
-], function(PluginBase, Localization, Element, InvisibleText, Device, QuickAction, QuickResize, Button, Library, jQuery) {
+], function(PluginBase, Localization, Element, InvisibleText, Device, detectTextSelection, QuickAction, QuickResize, Button, Library, jQuery) {
 	"use strict";
 
 	/**
@@ -437,7 +438,7 @@ sap.ui.define([
 	 */
 	ColumnResizer.prototype._onLeftRightModifiersKeyDown = function(oEvent, iDistanceX) {
 		// prevent column resize when there is text selection in the column header
-		if (!oEvent.shiftKey || oEvent.ctrlKey || oEvent.metaKey || oEvent.altKey || ColumnResizer.detectTextSelection(oEvent.target)) {
+		if (!oEvent.shiftKey || oEvent.ctrlKey || oEvent.metaKey || oEvent.altKey || detectTextSelection(oEvent.target)) {
 			return;
 		}
 
@@ -453,13 +454,6 @@ sap.ui.define([
 		this._setColumnWidth();
 		this._endResizeSession();
 		oEvent.stopImmediatePropagation(true);
-	};
-
-	ColumnResizer.detectTextSelection = function(oDomRef) {
-		var oSelection = window.getSelection(),
-			sTextSelection = oSelection.toString().replace("/n", "");
-
-		return sTextSelection && (oDomRef !== oSelection.focusNode && oDomRef.contains(oSelection.focusNode));
 	};
 
 	/**

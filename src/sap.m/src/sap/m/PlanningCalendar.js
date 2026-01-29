@@ -816,7 +816,7 @@ sap.ui.define([
 					demandPopin: true
 				})
 			],
-			ariaLabelledBy: `${sId}-Descr ${this.oHeader?.getTitle()?.getId()}`
+			ariaLabelledBy: `${this.getId()}-Descr`
 		});
 		oTable.attachEvent("selectionChange", handleTableSelectionChange, this);
 
@@ -1080,7 +1080,9 @@ sap.ui.define([
 
 	PlanningCalendar.prototype._handleTitleChange = function (oEvent) {
 		const oTitle = oEvent.getParameter("title");
-		this.getDomRef()?.setAttribute("aria-labelledby", oTitle.getId());
+		const sTitleId = oTitle?.getId() || "";
+		this.getDomRef()?.setAttribute("aria-labelledby", sTitleId);
+		this._resetTableLabelledBy(oTitle);
 	};
 
 
@@ -2688,15 +2690,28 @@ sap.ui.define([
 	};
 
 	PlanningCalendar.prototype.removeAllAriaLabelledBy = function() {
-
+		const oHeader = this.getAggregation("header");
+		const oTitle = oHeader?.getTitle();
 		this.removeAllAssociation("ariaLabelledBy", true);
-
-		var oTable = this.getAggregation("table");
-		oTable.removeAllAriaLabelledBy();
-		oTable.addAriaLabelledBy(`${this.getId()}-Descr ${this.oHeader?.getTitle()?.getId()}`);
+		this._resetTableLabelledBy(oTitle);
 
 		return this;
+	};
 
+	/**
+	 * Gets the internal table aggregation, retrieves the title ID if available, and constructs an invisible description ID.
+	 * This is a private helper method for managing accessibility-related IDs within the PlanningCalendar control.
+	 *
+	 * @param {sap.m.Title} [oTitle] - The title control instance used to retrieve the ID for accessibility purposes
+	 * @private
+	 */
+	PlanningCalendar.prototype._resetTableLabelledBy = function(oTitle) {
+		const oTable = this.getAggregation("table"),
+			sTitleId = oTitle?.getId() || "",
+			sInvisibleDescrId = `${this.getId()}-Descr`;
+
+		oTable.removeAllAriaLabelledBy();
+		oTable.addAriaLabelledBy(`${sInvisibleDescrId} ${sTitleId}`.trim());
 	};
 
 	PlanningCalendar.prototype.invalidate = function(oOrigin) {

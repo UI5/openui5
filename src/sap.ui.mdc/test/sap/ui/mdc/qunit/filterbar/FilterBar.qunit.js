@@ -20,7 +20,9 @@ sap.ui.define([
 	"test-resources/sap/m/qunit/p13n/TestModificationHandler",
 	"sap/ui/mdc/enums/ConditionValidated",
 	"sap/ui/mdc/enums/OperatorName",
-	"sap/ui/core/Lib"
+	"sap/ui/core/Lib",
+	"sap/ui/mdc/filterbar/PropertyInfoValidator",
+	"sap/base/Log"
 ], function(
 	FBTestDelegate,
 	Localization,
@@ -40,7 +42,9 @@ sap.ui.define([
 	TestModificationHandler,
 	ConditionValidated,
 	OperatorName,
-	Library
+	Library,
+	PropertyInfoValidator,
+	Log
 ) {
 	"use strict";
 
@@ -1668,4 +1672,264 @@ sap.ui.define([
 		done();
 	});
 
+	QUnit.module("FilterBar PropertyInfo Validation", {
+		beforeEach: function() {
+			this.oErrorSpy = sinon.spy(Log, "error");
+			this.oWarningSpy = sinon.spy(Log, "warning");
+			this.oApplySettingsSpy = sinon.spy(FilterBar.prototype, "applySettings");
+
+			PropertyInfoValidator._isValidationFeatureFlagEnabled = true;
+
+			this.oFB = null;
+
+			if (FlexUtil.handleChanges.restore) {
+				FlexUtil.handleChanges.restore();
+			}
+		},
+		afterEach: function() {
+			this.oErrorSpy.restore();
+			this.oWarningSpy.restore();
+			this.oApplySettingsSpy.restore();
+
+			if (this.oFB) {
+				this.oFB.destroy();
+				this.oFB = null;
+			}
+		}
+	});
+
+	const makeMockPropertyInfo = (name) => ({name, label: "label", dataType: "Edm.String", maxConditions: 1, required: false});
+	const makeReducedMockPropertyInfo = (name) => ({name, label: "label"});
+
+	QUnit.test("Should not log anything, if PropertyInfo is set and FilterFields only set propertyKey", function(assert) {
+		const oFilterField1 = new FilterField({
+			propertyKey: "field1"
+		});
+		const oFilterField2 = new FilterField({
+			propertyKey: "field2"
+		});
+
+		const oPropertyInfo = [
+			makeMockPropertyInfo("field1"),
+			makeMockPropertyInfo("field2")
+		];
+
+		this.oFB = new FilterBar({
+			delegate: { name: "test-resources/sap/ui/mdc/qunit/filterbar/UnitTestMetadataDelegate", payload: { modelName: undefined, collectionName: "test" } },
+			propertyInfo: oPropertyInfo,
+			filterItems: [oFilterField1, oFilterField2]
+		});
+
+		assert.ok(this.oApplySettingsSpy.calledOnce, "FilterBar.applySettings called once");
+		assert.ok(this.oErrorSpy.notCalled, "No Error logged");
+		assert.ok(this.oWarningSpy.notCalled, "No Warning logged");
+	});
+
+	QUnit.test("Should not log anything, if PropertyInfo is set for a small selection of properties only and FilterFields only set propertyKey", function(assert) {
+		const oFilterField1 = new FilterField({
+			propertyKey: "field1"
+		});
+		const oFilterField2 = new FilterField({
+			propertyKey: "field2"
+		});
+
+		const oPropertyInfo = [
+			makeReducedMockPropertyInfo("field1"),
+			makeReducedMockPropertyInfo("field2")
+		];
+
+		this.oFB = new FilterBar({
+			delegate: { name: "test-resources/sap/ui/mdc/qunit/filterbar/UnitTestMetadataDelegate", payload: { modelName: undefined, collectionName: "test" } },
+			propertyInfo: oPropertyInfo,
+			filterItems: [oFilterField1, oFilterField2]
+		});
+
+		assert.ok(this.oApplySettingsSpy.calledOnce, "FilterBar.applySettings called once");
+		assert.ok(this.oErrorSpy.notCalled, "No Error logged");
+		assert.ok(this.oWarningSpy.notCalled, "No Warning logged");
+	});
+
+	QUnit.test("Should set FilterField label from PropertyInfo, if only propertyKey is set on FilterField", function(assert) {
+		const oFilterField1 = new FilterField({
+			propertyKey: "field1"
+		});
+		const oFilterField2 = new FilterField({
+			propertyKey: "field2"
+		});
+
+		const oPropertyInfo = [
+			makeMockPropertyInfo("field1"),
+			makeMockPropertyInfo("field2")
+		];
+
+		this.oFB = new FilterBar({
+			delegate: { name: "test-resources/sap/ui/mdc/qunit/filterbar/UnitTestMetadataDelegate", payload: { modelName: undefined, collectionName: "test" } },
+			propertyInfo: oPropertyInfo,
+			filterItems: [oFilterField1, oFilterField2]
+		});
+
+		assert.strictEqual(oFilterField1.getLabel(), "label", "Label set from PropertyInfo");
+		assert.strictEqual(oFilterField2.getLabel(), "label", "Label set from PropertyInfo");
+	});
+
+	QUnit.test("Should log warning, if FilterField sets metadata property that is not contained in matching PropertyInfo", function(assert) {
+		const oFilterField1 = new FilterField({
+			propertyKey: "field1"
+		});
+		const oFilterField2 = new FilterField({
+			propertyKey: "field2",
+			maxConditions: 1
+		});
+
+		const oPropertyInfo = [
+			makeMockPropertyInfo("field1"),
+			makeReducedMockPropertyInfo("field2")
+		];
+
+		this.oFB = new FilterBar({
+			delegate: { name: "test-resources/sap/ui/mdc/qunit/filterbar/UnitTestMetadataDelegate", payload: { modelName: undefined, collectionName: "test" } },
+			propertyInfo: oPropertyInfo,
+			filterItems: [oFilterField1, oFilterField2]
+		});
+
+		assert.ok(this.oApplySettingsSpy.calledOnce, "FilterBar.applySettings called once");
+		assert.ok(this.oErrorSpy.notCalled, "No Error logged");
+		assert.ok(this.oWarningSpy.called, "Warning logged");
+	});
+
+	QUnit.test("Should log error, if FilterField sets metadata property, and value in PropertyInfo does not match", function(assert) {
+		const oFilterField1 = new FilterField({
+			propertyKey: "field1",
+			label: "Field 1"
+		});
+
+		const oPropertyInfo = [
+			makeMockPropertyInfo("field1")
+		];
+
+		this.oFB = new FilterBar({
+			delegate: { name: "test-resources/sap/ui/mdc/qunit/filterbar/UnitTestMetadataDelegate", payload: { modelName: undefined, collectionName: "test" } },
+			propertyInfo: oPropertyInfo,
+			filterItems: [oFilterField1]
+		});
+
+		assert.ok(this.oApplySettingsSpy.calledOnce, "FilterBar.applySettings called once");
+		assert.ok(this.oErrorSpy.called, "Error logged");
+		assert.ok(this.oWarningSpy.notCalled, "No Warning logged");
+	});
+
+	QUnit.test("Should log error, if FilterField has no metadata, and PropertyInfo does not contain metadata either", function(assert) {
+		const oFilterField1 = new FilterField({
+			propertyKey: "field1"
+		});
+		const oFilterField2 = new FilterField({
+			propertyKey: "field2"
+		});
+
+		const oPropertyInfo = [
+			makeMockPropertyInfo("field1")
+		];
+
+		this.oFB = new FilterBar({
+			delegate: { name: "test-resources/sap/ui/mdc/qunit/filterbar/UnitTestMetadataDelegate", payload: { modelName: undefined, collectionName: "test" } },
+			propertyInfo: oPropertyInfo,
+			filterItems: [oFilterField1, oFilterField2]
+		});
+
+		assert.ok(this.oApplySettingsSpy.calledOnce, "FilterBar.applySettings called once");
+		assert.ok(this.oErrorSpy.called, "Error logged");
+		assert.ok(this.oWarningSpy.notCalled, "No Warning logged");
+	});
+
+	QUnit.test("Should not log, if FilterField sets metadata properties, and values in PropertyInfo match", function(assert) {
+		const oFilterField1 = new FilterField({
+			propertyKey: "field1",
+			label: "label",
+			dataType: "Edm.String",
+			maxConditions: 1,
+			required: false
+		});
+
+		const oPropertyInfo = [
+			makeMockPropertyInfo("field1")
+		];
+
+		this.oFB = new FilterBar({
+			delegate: { name: "test-resources/sap/ui/mdc/qunit/filterbar/UnitTestMetadataDelegate", payload: { modelName: undefined, collectionName: "test" } },
+			propertyInfo: oPropertyInfo,
+			filterItems: [oFilterField1]
+		});
+
+		assert.ok(this.oApplySettingsSpy.calledOnce, "FilterBar.applySettings called once");
+		assert.ok(this.oErrorSpy.notCalled, "No Error logged");
+		assert.ok(this.oWarningSpy.notCalled, "No Warning logged");
+	});
+
+	QUnit.test("Should log warning, if FilterField sets metadata properties, values in PropertyInfo match, but another FilterField does not set metadata explicitly", function(assert) {
+		const oFilterField1 = new FilterField({
+			propertyKey: "field1",
+			label: "label",
+			dataType: "Edm.String",
+			maxConditions: 1,
+			required: false
+		});
+		const oFilterField2 = new FilterField({
+			propertyKey: "field2"
+		});
+
+		const oPropertyInfo = [
+			makeMockPropertyInfo("field1"),
+			makeMockPropertyInfo("field2")
+		];
+
+		this.oFB = new FilterBar({
+			delegate: { name: "test-resources/sap/ui/mdc/qunit/filterbar/UnitTestMetadataDelegate", payload: { modelName: undefined, collectionName: "test" } },
+			propertyInfo: oPropertyInfo,
+			filterItems: [oFilterField1, oFilterField2]
+		});
+
+		assert.ok(this.oApplySettingsSpy.calledOnce, "FilterBar.applySettings called once");
+		assert.ok(this.oErrorSpy.notCalled, "No Error logged");
+		assert.ok(this.oWarningSpy.called, "Warning logged");
+	});
+
+	QUnit.test("Should log warning, if PropertyInfo not set, but FilterField sets all metadata required for initial rendering", function(assert) {
+		const oFilterField1 = new FilterField({
+			propertyKey: "field1",
+			label: "label",
+			dataType: "Edm.String",
+			dataTypeConstraints: {},
+			dataTypeFormatOptions: {},
+			maxConditions: 1,
+			required: false
+		});
+
+		const oPropertyInfo = [
+		];
+
+		this.oFB = new FilterBar({
+			delegate: { name: "test-resources/sap/ui/mdc/qunit/filterbar/UnitTestMetadataDelegate", payload: { modelName: undefined, collectionName: "test" } },
+			propertyInfo: oPropertyInfo,
+			filterItems: [oFilterField1]
+		});
+
+		assert.ok(this.oApplySettingsSpy.calledOnce, "FilterBar.applySettings called once");
+		assert.ok(this.oErrorSpy.notCalled, "No Error logged");
+		assert.ok(this.oWarningSpy.called, "Warning logged");
+	});
+
+	QUnit.test("Should not log, if PropertyInfo not set, and no FilterField has metadata", function(assert) {
+		const oFilterField1 = new FilterField({
+			propertyKey: "field1"
+		});
+
+		this.oFB = new FilterBar({
+			delegate: { name: "test-resources/sap/ui/mdc/qunit/filterbar/UnitTestMetadataDelegate", payload: { modelName: undefined, collectionName: "test" } },
+			filterItems: [oFilterField1]
+		});
+
+		assert.ok(this.oApplySettingsSpy.calledOnce, "FilterBar.applySettings called once");
+		assert.ok(this.oErrorSpy.notCalled, "No Error logged");
+		assert.ok(this.oWarningSpy.notCalled, "No Warning logged");
+	});
 });

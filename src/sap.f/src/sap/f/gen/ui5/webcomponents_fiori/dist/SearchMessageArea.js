@@ -25,7 +25,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents_fiori.dist.SearchMessageArea",
       {
         metadata: {
-          tag: "ui5-search-message-area-68f7652d",
+          tag: "ui5-search-message-area-0df29cf2",
 
           namespace: "sap.f.gen.ui5.webcomponents_fiori",
 

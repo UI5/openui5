@@ -1,4 +1,4 @@
-sap.ui.define(['exports', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/information'], (function (exports, Icons, information$1) { 'use strict';
+sap.ui.define(['exports', 'sap/f/thirdparty/Theme', 'sap/f/thirdparty/information'], (function (exports, Theme, information$1) { 'use strict';
 
 	var error = "error";
 

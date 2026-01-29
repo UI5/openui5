@@ -138,7 +138,7 @@ sap.ui.define([
 	}
 
 	FieldBaseDelegate.parsePasteDataToConditions = function(oField, aParsedData, oSettings) {
-		if (oField.getPayload()?.pasteDescription) {
+		if (oField?.getPayload()?.pasteDescription) {
 
 			let iCount = 0;
 

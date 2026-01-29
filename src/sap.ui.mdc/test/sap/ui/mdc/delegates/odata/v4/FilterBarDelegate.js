@@ -21,8 +21,9 @@ sap.ui.define([
 	'sap/ui/core/util/reflection/JsControlTreeModifier',
 	'sap/base/Log',
 	'sap/ui/mdc/odata/v4/TypeMap',
+	'sap/ui/mdc/filterbar/PropertyInfoValidator',
 	'delegates/util/DelegateCache'
-], function(ODataMetaModelUtil, Element, FieldDisplay, OperatorName, FlUtils, FilterBarDelegate, merge, FilterOperatorUtil, ModelOperator, Filter, IdentifierUtil, JsControlTreeModifier, Log, ODataV4TypeMap, DelegateCache) {
+], function(ODataMetaModelUtil, Element, FieldDisplay, OperatorName, FlUtils, FilterBarDelegate, merge, FilterOperatorUtil, ModelOperator, Filter, IdentifierUtil, JsControlTreeModifier, Log, ODataV4TypeMap, PropertyInfoValidator, DelegateCache) {
 	"use strict";
 
 	var ODataFilterBarDelegate = Object.assign({}, FilterBarDelegate);
@@ -244,12 +245,15 @@ sap.ui.define([
 					oModifier.setProperty(oFilterField, "tooltip", oProperty.tooltip);
 				}
 
-				if (oProperty.constraints) {
-					oModifier.setProperty(oFilterField, "dataTypeConstraints", oProperty.constraints);
-				}
+				if (!PropertyInfoValidator._isValidationFeatureFlagEnabled) {
+					if (oProperty.constraints) {
+						oModifier.setProperty(oFilterField, "dataTypeConstraints", oProperty.constraints);
+					}
 
-				if (oProperty.formatOptions) {
-					oModifier.setProperty(oFilterField, "dataTypeFormatOptions", oProperty.formatOptions);
+					if (oProperty.formatOptions) {
+						oModifier.setProperty(oFilterField, "dataTypeFormatOptions", oProperty.formatOptions);
+					}
+
 				}
 
 				return oFilterField;

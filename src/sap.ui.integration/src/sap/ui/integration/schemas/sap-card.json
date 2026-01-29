@@ -115,6 +115,7 @@
         },
         "filters": {
           "description": "Map of filters",
+          "type": "object",
           "additionalProperties": {
             "oneOf": [
               {

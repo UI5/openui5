@@ -1,7 +1,7 @@
 <mvc:View
 	class="sapUiSizeCompact"
 	controllerName="sap.ui.core.sample.odata.v4.ListBinding.Main"
-	core:require="{StringType : 'sap/ui/model/odata/type/String'}"
+	core:require="{EdmString : 'sap/ui/model/odata/type/String'}"
 	xmlns="sap.m"
 	xmlns:app="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1"
 	xmlns:core="sap.ui.core"
@@ -153,7 +153,7 @@
 			<Text text="{LOCATION/City/CITYNAME}"/>
 			<Input value="{ENTRYDATE}"/>
 			<!-- Note: automatic type determination cannot work here and invokes a warning -->
-			<Text text="{path : '@odata.etag', type : 'StringType'}"/>
+			<Text text="{path : '@odata.etag', type : 'EdmString'}"/>
 			<Button icon="sap-icon://delete" text="Delete" press=".onDeleteEmployee"/>
 		</ColumnListItem>
 	</Table>

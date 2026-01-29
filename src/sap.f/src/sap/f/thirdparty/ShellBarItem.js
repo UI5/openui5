@@ -1,4 +1,4 @@
-sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/Icons'], (function (webcomponentsBase, eventStrict, Icons) { 'use strict';
+sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/Theme', 'sap/f/thirdparty/Icons'], (function (webcomponentsBase, eventStrict, Theme, Icons) { 'use strict';
 
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -82,8 +82,8 @@ sap.ui.define(['sap/f/thirdparty/webcomponents', 'sap/f/thirdparty/event-strict'
         })
     ], ShellBarItem);
     ShellBarItem.define();
-    var ShellBarItem$1 = ShellBarItem;
+    var ShellBarItem_default = ShellBarItem;
 
-    return ShellBarItem$1;
+    return ShellBarItem_default;
 
 }));
