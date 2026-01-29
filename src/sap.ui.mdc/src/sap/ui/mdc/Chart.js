@@ -192,7 +192,6 @@ sap.ui.define([
 						defaultValue: []
 					},
 
-					//TODO: Do we really need this? Should be avoided.
 					/**
 					 * Defines the minimum width of the chart.
 					 */
@@ -203,7 +202,6 @@ sap.ui.define([
 						invalidate: true
 					},
 
-					//TODO: Do we really need this? Should be avoided.
 					/**
 					 * Defines the minimum height of the chart.
 					 */
@@ -630,7 +628,6 @@ sap.ui.define([
 				aInitPromises.push(this.retrieveInbuiltFilter());
 			}
 
-			//TODO: Refactor this so we use awaitPropertyHelper
 			Promise.all(aInitPromises).then(() => {
 				if (!this.isDestroyed()) {
 					this._initInnerControls();
@@ -752,7 +749,6 @@ sap.ui.define([
 					aP13nMode.splice(iIdx, 1);
 				}
 
-				//TODO: Move this to p13n functionality?
 				if (this.isPropertyHelperFinal()) {
 					this.getEngine().show(this, aP13nMode);
 				} else {
@@ -789,7 +785,6 @@ sap.ui.define([
 				oChartTypeBtn.setTooltip(oChartTypeInfo.text);
 				oChartTypeBtn.setIcon(oChartType.icon);
 
-				//TODO should be done in the chart, the control should only raise an event
 				sap.ui.require([
 					"sap/ui/mdc/flexibility/Chart.flexibility"
 				], (ChartFlex) => {
@@ -927,7 +922,7 @@ sap.ui.define([
 							});
 
 							if (bNoConditions && this.getAggregation("_toolbar")) {
-								//TODO this.getAggregation("_toolbar").getSettingsButton().focus();
+								// this.getAggregation("_toolbar").getSettingsButton().focus();
 							}
 
 						});
@@ -941,8 +936,8 @@ sap.ui.define([
 						state: {},
 						applyAbsolute: ProcessingStrategy.FullReplace
 					});
-					//Focus handling, setting the focus back to the setting button
-					//TODO this._getToolbar().getSettingsButton().focus();
+					// Focus handling, setting the focus back to the setting button
+					// this._getToolbar().getSettingsButton().focus();
 				}.bind(this)
 			}));
 
@@ -1182,10 +1177,6 @@ sap.ui.define([
 		Chart.prototype._rebind = async function(bForceRefresh) {
 
 			if (!this._bInnerChartReady) {
-				//TODO: This can lead to a race conditition when the "Go" button is pressed while the inner chart still intializes
-				//TODO: Check whether we really need this since we insantiate the inner chart right away
-				//this._initInnerControls();
-
 				//Wait with rebind until inner chart is ready
 				await this.initialized();
 			}
@@ -1454,7 +1445,6 @@ sap.ui.define([
 		 * @private
 		 * @ui5-restricted sap.ui.mdc
 		 */
-		//TODO is this function used?
 		Chart.prototype.getAllowedRolesForKinds = function() {
 			return this.getControlDelegate().getAllowedRolesForKinds();
 		};
@@ -1499,7 +1489,6 @@ sap.ui.define([
 		 * @private
 		 */
 		Chart.prototype._propagatePropertiesToInnerChart = function() {
-			//TODO: Can this be set by constructor of inner chart?
 			this.setLegendVisible(this.getLegendVisible());
 			this.setShowChartTooltip(this.getShowChartTooltip());
 			this.setChartType(this.getChartType());
@@ -1658,7 +1647,7 @@ sap.ui.define([
 				aProperties.push({
 					key: sPropertyKey,
 					name: sPropertyKey,
-					role: oItem.getRole() // TODO: not part of sap.ui.mdc.State?
+					role: oItem.getRole()
 				});
 
 			});

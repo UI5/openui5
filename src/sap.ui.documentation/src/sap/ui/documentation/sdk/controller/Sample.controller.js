@@ -95,6 +95,8 @@ sap.ui.define([
 				this.bus = EventBus.getInstance();
 				this.setDefaultSampleTheme();
 
+				this._fnOnMessage = this.onMessage.bind(this);
+
 				this.getOwnerComponent()._sSampleIframeOrigin = ResourcesUtil.getConfig() !== "." ? ResourcesUtil.getResourceOrigin() : window.origin;
 			},
 
@@ -645,7 +647,7 @@ sap.ui.define([
 			 * @private
 			 */
 			_onBeforeIframeRendering: function() {
-				window.removeEventListener("message", this.onMessage.bind(this));
+				window.removeEventListener("message", this._fnOnMessage);
 			},
 
 			/**
@@ -661,7 +663,7 @@ sap.ui.define([
 						this.fResolve({});
 					}.bind(this), CONSTANTS.EXTERNAL_SAMPLE_RENDERING_DELAY);
 				} else {
-					window.addEventListener("message", this.onMessage.bind(this));
+					window.addEventListener("message", this._fnOnMessage);
 				}
 			},
 
@@ -852,6 +854,10 @@ sap.ui.define([
 
 				this.oRouter.myNavToWithoutHash("sap.ui.documentation.sdk.view.SampleNotFound", "XML", false);
 				setTimeout(this.appendPageTitle.bind(this, sNotFoundTitle));
+			},
+
+			onExit: function() {
+				window.removeEventListener("message", this._fnOnMessage);
 			}
 		});
 	}

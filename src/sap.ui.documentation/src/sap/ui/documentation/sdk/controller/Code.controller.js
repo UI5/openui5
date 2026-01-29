@@ -52,6 +52,7 @@ sap.ui.define(
 			},
 
 			onExit: function () {
+				SampleController.prototype.onExit.call(this);
 				this._deregisterResize();
 			},
 

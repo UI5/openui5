@@ -34,7 +34,8 @@ sap.ui.define([
 				wrapping: true
 			}),
 			new DateTimePicker("DTP1", {
-				change: handleChange
+				change: handleChange,
+				valueStateText: "Please enter a valid date and time for Meeting Appointment."
 			}),
 
 			// Custom value format scenario
@@ -46,10 +47,12 @@ sap.ui.define([
 			new DateTimePicker("DTP2", {
 				value: "2016-02-16,12-50-30",
 				valueFormat: "yyyy-MM-dd,HH-mm-ss",
-				displayFormat: "long/short",
+//				displayFormat: "long/short",
+				displayFormat: "EEEE, MMMM d, yyyy 'at' HH:mm",
 				showCurrentDateButton: true,
 				showCurrentTimeButton: true,
-				change: handleChange
+				change: handleChange,
+				valueStateText: "Please enter a valid date and time for Project Deadline."
 			}),
 
 			// Secondary calendar type scenario (Islamic calendar)
@@ -62,7 +65,8 @@ sap.ui.define([
 				secondaryCalendarType: "Islamic",
 				showCurrentDateButton: true,
 				showCurrentTimeButton: true,
-				change: handleChange
+				change: handleChange,
+				valueStateText: "Please enter a valid date and time for Event Date."
 			}),
 
 			// 24-hour format without AM/PM
@@ -75,7 +79,8 @@ sap.ui.define([
 				displayFormat: "dd/MM/yyyy HH:mm:ss",
 				showCurrentDateButton: true,
 				showCurrentTimeButton: true,
-				change: handleChange
+				change: handleChange,
+				valueStateText: "Please enter a valid date and time for System Maintenance Window."
 			}),
 
 			// Timezone scenario
@@ -89,7 +94,8 @@ sap.ui.define([
 				timezone: "America/New_York",
 				showCurrentDateButton: true,
 				showCurrentTimeButton: true,
-				change: handleChange
+				change: handleChange,
+				valueStateText: "Please enter a valid date and time for International Conference Call."
 			}),
 
 			// Custom steps scenario
@@ -103,7 +109,8 @@ sap.ui.define([
 				secondsStep: 30,
 				displayFormat: "EEE, MMM d, yyyy 'at' HH:mm",
 				showCurrentTimeButton: true,
-				change: handleChange
+				change: handleChange,
+				valueStateText: "Please enter a valid date and time for Train Schedule."
 			}),
 
 			// Min/Max date range scenario
@@ -118,7 +125,8 @@ sap.ui.define([
 				displayFormat: "EEEE, MMMM d, yyyy 'at' h:mm a",
 				showCurrentDateButton: true,
 				showCurrentTimeButton: true,
-				change: handleChange
+				change: handleChange,
+				valueStateText: "Please enter a valid date and time for Vacation Booking."
 			}),
 
 			// Different display format styles
@@ -131,7 +139,8 @@ sap.ui.define([
 				displayFormat: "medium/medium",
 				showCurrentDateButton: true,
 				showCurrentTimeButton: true,
-				change: handleChange
+				change: handleChange,
+				valueStateText: "Please enter a valid date and time for Flight Departure."
 			}),
 
 			// Disabled state for comparison
@@ -156,7 +165,8 @@ sap.ui.define([
 				placeholder: "When will your event take place?",
 				showCurrentDateButton: true,
 				showCurrentTimeButton: true,
-				change: handleChange
+				change: handleChange,
+				valueStateText: "Please enter a valid date and time for Custom Event."
 			}),
 
 			// Error state scenario

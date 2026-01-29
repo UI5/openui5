@@ -138,39 +138,6 @@ sap.ui.define([
 		}
 	});
 
-	QUnit.test("Read scoped parameters (from testlibs.themeParameters.lib6)", async function(assert) {
-		var oControl = new Control(), done = assert.async();
-
-		await Library.load({name: "testlibs.themeParameters.lib6"});
-
-		const callback = function (sParamValue) {
-			assert.equal(sParamValue, "#ababab", "No scope set - default value should get returned");
-			oControl.addStyleClass("sapTestScope");
-
-			assert.equal(Parameters.get({
-				name: "sapUiAsyncThemeParamWithScopeForLib6",
-				scopeElement: oControl
-			}), "#222222", "Scope set directly on control - scoped param should be returned");
-
-			assert.equal(Parameters.get({
-				name: "sapUiAsyncThemeParamWithoutScopeForLib6",
-				scopeElement: oControl
-			}), "#aaaaaa", "Scope set directly on control but no scoped value defined - default value should get returned");
-
-			assert.strictEqual(checkLibraryParametersJsonRequestForLib("6").length, 0, "library-parameters.json not requested for testlibs.themeParameters.lib6");
-
-			done();
-		};
-		const sParamValue = Parameters.get({
-			name: "sapUiAsyncThemeParamWithScopeForLib6",
-			scopeElement: oControl,
-			callback
-		});
-		if (sParamValue) {
-			callback(sParamValue);
-		}
-	});
-
 	QUnit.test("Read multiple given parameters (including undefined param name)", async function (assert) {
 		var done = assert.async();
 		var oControl = new Control();
@@ -179,8 +146,6 @@ sap.ui.define([
 		await Library.load({ name: "testlibs.themeParameters.lib7" });
 
 		Theming.attachAppliedOnce((oEvent) => {
-			oControl.addStyleClass("sapTestScope");
-
 			const errorSpy = sinon.spy(Log, "error");
 			const expectedError = "sap.ui.core.theming.Parameters: The following parameters could not be found: \"sapUiNotExistingTestParam\"";
 
@@ -279,51 +244,6 @@ sap.ui.define([
 		};
 
 		await Library.load({name:"testlibs.themeParameters.lib10"});
-
-		Theming.attachApplied(fnAssertApplied);
-	});
-
-	QUnit.test("getActiveScopesFor: Check scope chain for given rendered control", async function(assert) {
-		// Also need to expect the assert from afterEach
-		assert.expect(13);
-		var done = assert.async();
-
-		var oInnerIcon1 =  new Icon();
-		var oInnerIcon2 =  new Icon();
-		oInnerIcon2.addStyleClass("TestScope1");
-		var oOuterIcon1 =  new Icon();
-		var oOuterIcon2 =  new Icon();
-		oOuterIcon2.addStyleClass("TestScope1");
-		var oInnerBar = new Bar({ contentLeft: [oInnerIcon1, oInnerIcon2] });
-		oInnerBar.addStyleClass("TestScope1");
-		var oOuterBar = new Bar({ contentLeft: oInnerBar, contentRight: [oOuterIcon1, oOuterIcon2] });
-		oOuterBar.addStyleClass("TestScope2"); // No valid TestScope ==> only checking that this is not part of the ScopeChain
-		oOuterBar.placeAt("qunit-fixture");
-
-		await nextUIUpdate();
-
-		var fnAssertApplied = async function () {
-			// CSS is loaded and scope 'TestScope1' is defined therefore different scope chains expected
-			assert.deepEqual(Parameters.getActiveScopesFor(oOuterBar, true), [], "OuterBar - no own scope - empty scope chain");
-			assert.deepEqual(Parameters.getActiveScopesFor(oInnerBar, true), [["TestScope1"]], "InnerBar - TestScope1 - [['TestScope1']]");
-			assert.deepEqual(Parameters.getActiveScopesFor(oOuterIcon1, true), [], "InnerIcon1 - no own scope - empty scope chain");
-			assert.deepEqual(Parameters.getActiveScopesFor(oOuterIcon2, true), [["TestScope1"]], "OuterIcon2 - TestScope1 - [['TestScope1']]");
-			assert.deepEqual(Parameters.getActiveScopesFor(oInnerIcon1, true), [["TestScope1"]], "InnerIcon1 - no own scope - [['TestScope1']]");
-			assert.deepEqual(Parameters.getActiveScopesFor(oInnerIcon2, true), [["TestScope1"], ["TestScope1"]], "InnerIcon2 - TestScope1 - [['TestScope1'], ['TestScope1']]");
-
-			assert.deepEqual(await Parameters_getAsync("sapUiThemeParam1ForLib11", oOuterBar), "#111213", "OuterBar - no own scope - default scope value #111213");
-			assert.deepEqual(await Parameters_getAsync("sapUiThemeParam1ForLib11", oInnerBar), "#312111", "InnerBar - TestScope1 - TestScope1 value #312111");
-			assert.deepEqual(await Parameters_getAsync("sapUiThemeParam1ForLib11", oOuterIcon1), "#111213", "OuterBar - no own scope - default scope value #111213");
-			assert.deepEqual(await Parameters_getAsync("sapUiThemeParam1ForLib11", oOuterIcon2), "#312111", "OuterIcon2 - TestScope1 - TestScope1 value #312111");
-			assert.deepEqual(await Parameters_getAsync("sapUiThemeParam1ForLib11", oInnerIcon1), "#312111", "InnerIcon1 - no own scope - TestScope1 value #312111");
-			assert.deepEqual(await Parameters_getAsync("sapUiThemeParam1ForLib11", oInnerIcon2), "#312111", "InnerIcon2 - TestScope1 - TestScope1 value #312111");
-
-			oOuterBar.destroy();
-			Theming.detachApplied(fnAssertApplied);
-			done();
-		};
-
-		await Library.load({name: "testlibs.themeParameters.lib11" });
 
 		Theming.attachApplied(fnAssertApplied);
 	});

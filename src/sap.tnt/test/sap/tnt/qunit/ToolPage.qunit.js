@@ -877,6 +877,68 @@ sap.ui.define([
 		oSpy.restore();
 	});
 
+	QUnit.test("Side navigation auto-closes when item is selected on small screen", async function (assert) {
+		Object.defineProperty(window, 'innerWidth', {
+			writable: true,
+			configurable: true,
+			value: 400
+		});
+
+		// Recreate ToolPage to trigger the layout update on init
+		this.toolPage.destroy();
+		this.toolPage = null;
+		this.toolPage = getToolPage();
+		this.toolPage.setSideExpanded(true); // Explicitly expand for testing
+		oPage.addContent(this.toolPage);
+		await nextUIUpdate(this.clock);
+
+		const oSideNavigation = this.toolPage.getSideContent();
+		const oNavigationList = oSideNavigation.getItem();
+		const aItems = oNavigationList.getItems();
+		const oFirstItem = aItems[0];
+		const oFirstChildItem = oFirstItem.getItems()[0];
+
+		assert.strictEqual(this.toolPage.getSideExpanded(), true, "ToolPage should be expanded initially");
+
+		// Act
+		oSideNavigation.fireItemSelect({ item: oFirstChildItem });
+		await nextUIUpdate(this.clock);
+
+		// Assert
+		assert.strictEqual(this.toolPage.getSideExpanded(), false, "ToolPage should be collapsed after item selection on small screen");
+	});
+
+	QUnit.test("Side navigation does NOT auto-close on large screen", async function (assert) {
+		Object.defineProperty(window, 'innerWidth', {
+			writable: true,
+			configurable: true,
+			value: 800
+		});
+
+		// Recreate ToolPage to trigger the layout update on init
+		this.toolPage.destroy();
+		this.toolPage = null;
+		this.toolPage = getToolPage();
+		this.toolPage.setSideExpanded(true);
+		oPage.addContent(this.toolPage);
+		await nextUIUpdate(this.clock);
+
+		const oSideNavigation = this.toolPage.getSideContent();
+		const oNavigationList = oSideNavigation.getItem();
+		const aItems = oNavigationList.getItems();
+		const oFirstItem = aItems[0];
+		const oFirstChildItem = oFirstItem.getItems()[0];
+
+		assert.strictEqual(this.toolPage.getSideExpanded(), true, "ToolPage should be expanded initially");
+
+		// Act
+		oSideNavigation.fireItemSelect({ item: oFirstChildItem });
+		await nextUIUpdate(this.clock);
+
+		// Assert
+		assert.strictEqual(this.toolPage.getSideExpanded(), true, "ToolPage should remain expanded after item selection on large screen");
+	});
+
 	QUnit.module("Header and subheader restrictions");
 
 	QUnit.test("There are no restrictions for header and subheader", async function (assert) {

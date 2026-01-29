@@ -220,15 +220,33 @@ sap.ui.define([
 		switch (oChanges.mutation) {
 			case "insert":
 				this._oContentVisibilityObserver.observe(oChanges.child, { properties: ["visible"] });
+				if (oChanges.name === "sideContent" && oChanges.child && oChanges.child.isA("sap.tnt.SideNavigation")) {
+					oChanges.child.attachItemSelect(this._onSideNavigationItemSelect, this);
+				}
 				break;
 			case "remove":
 				this._oContentVisibilityObserver.unobserve(oChanges.child, { properties: ["visible"] });
+				if (oChanges.name === "sideContent" && oChanges.child && oChanges.child.isA("sap.tnt.SideNavigation")) {
+					oChanges.child.detachItemSelect(this._onSideNavigationItemSelect, this);
+				}
 				break;
 		}
 	};
 
 	ToolPage.prototype._onContentVisibilityChange = function(oChanges) {
 		this.invalidate();
+	};
+
+	/**
+	 * Handles the itemSelect event from the SideNavigation.
+	 * Auto-collapses the side navigation on small screens (< 600px) when an item is selected.
+	 * @param {sap.ui.base.Event} oEvent The itemSelect event
+	 * @private
+	 */
+	ToolPage.prototype._onSideNavigationItemSelect = function(oEvent) {
+		if (this._isLayoutS()) {
+			this.setSideExpanded(false);
+		}
 	};
 
 	return ToolPage;

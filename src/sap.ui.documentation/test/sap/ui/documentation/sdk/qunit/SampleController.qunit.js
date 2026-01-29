@@ -88,4 +88,27 @@ function (
 		assert.strictEqual(oIFrameUrl.searchParams.get("sap-ui-xx-sample-lib"), sSampleLib, "sample origin is correct");
 	});
 
+	QUnit.module("onExit", {
+		beforeEach: function () {
+			this.controller = new SampleController();
+			this.controller._fnOnMessage = function() {}; // Simulate the bound handler
+		},
+		afterEach: function () {
+			this.controller.destroy();
+			this.controller = null;
+		}
+	});
+
+	QUnit.test("removes message event listener on exit", function (assert) {
+		// Arrange
+		var spy = this.spy(window, "removeEventListener");
+
+		// Act
+		this.controller.onExit();
+
+		// Assert
+		assert.ok(spy.calledWith("message", this.controller._fnOnMessage),
+			"removeEventListener should be called with 'message' event and the bound handler");
+	});
+
 });

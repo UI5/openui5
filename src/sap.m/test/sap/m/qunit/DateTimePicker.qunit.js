@@ -1110,6 +1110,48 @@ sap.ui.define([
 		oDTP.destroy();
 	});
 
+	QUnit.test("_validateDayOfWeekConsistency", function (assert) {
+		// Arrange
+		var oDTP = new DateTimePicker(),
+			oTestDate = UI5Date.getInstance(2016, 1, 16, 12, 50, 0); // Tuesday, February 16, 2016 at 12:50
+
+		// Test 1: Should return true when no display format contains day-of-week patterns
+		oDTP.setDisplayFormat("MMM d, yyyy 'at' h:mm a");
+
+		// Act & Assert
+		assert.ok(oDTP._validateDayOfWeekConsistency("Feb 16, 2016 at 12:50 PM", oTestDate),
+			"Returns true for formats without day-of-week patterns");
+
+		// Test 2: Should return true for correct day-of-week
+		oDTP.setDisplayFormat("EEEE, MMMM d, yyyy 'at' h:mm a");
+
+		// Act & Assert
+		assert.ok(oDTP._validateDayOfWeekConsistency("Tuesday, February 16, 2016 at 12:50 PM", oTestDate),
+			"Returns true for correct day-of-week");
+
+		// Test 3: Should return false for incorrect day-of-week
+		assert.notOk(oDTP._validateDayOfWeekConsistency("Monday, February 16, 2016 at 12:50 PM", oTestDate),
+			"Returns false for incorrect day-of-week");
+
+		// Test 4: Should return true for null/empty values
+		assert.ok(oDTP._validateDayOfWeekConsistency(null, oTestDate),
+			"Returns true for null input value");
+		assert.ok(oDTP._validateDayOfWeekConsistency("", oTestDate),
+			"Returns true for empty input value");
+		assert.ok(oDTP._validateDayOfWeekConsistency("test", null),
+			"Returns true for null date");
+
+		// Test 5: Should return true for abbreviated day names (EEE)
+		oDTP.setDisplayFormat("EEE, MMM d, yyyy");
+		assert.ok(oDTP._validateDayOfWeekConsistency("Tue, Feb 16, 2016", oTestDate),
+			"Returns true for correct abbreviated day-of-week");
+		assert.notOk(oDTP._validateDayOfWeekConsistency("Mon, Feb 16, 2016", oTestDate),
+			"Returns false for incorrect abbreviated day-of-week");
+
+		// Clean
+		oDTP.destroy();
+	});
+
 	QUnit.module("Timezones");
 
 	QUnit.test("dateValue + timezone", function(assert) {

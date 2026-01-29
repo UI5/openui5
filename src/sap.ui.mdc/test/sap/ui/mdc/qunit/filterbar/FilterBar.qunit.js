@@ -1698,8 +1698,14 @@ sap.ui.define([
 		}
 	});
 
-	const makeMockPropertyInfo = (name) => ({name, label: "label", dataType: "Edm.String", maxConditions: 1, required: false});
-	const makeReducedMockPropertyInfo = (name) => ({name, label: "label"});
+	const makeMockPropertyInfo = (name) => ({
+		key: name,
+		label: "label",
+		dataType: "Edm.String",
+		maxConditions: 1,
+		required: false}
+	);
+	const makeReducedMockPropertyInfo = (name) => ({key: name, label: "label"});
 
 	QUnit.test("Should not log anything, if PropertyInfo is set and FilterFields only set propertyKey", function(assert) {
 		const oFilterField1 = new FilterField({
@@ -1749,7 +1755,7 @@ sap.ui.define([
 		assert.ok(this.oWarningSpy.notCalled, "No Warning logged");
 	});
 
-	QUnit.test("Should set FilterField label from PropertyInfo, if only propertyKey is set on FilterField", function(assert) {
+	QUnit.test("Should set FilterField label from PropertyInfo, if only propertyKey is set on FilterField", async function(assert) {
 		const oFilterField1 = new FilterField({
 			propertyKey: "field1"
 		});
@@ -1767,6 +1773,8 @@ sap.ui.define([
 			propertyInfo: oPropertyInfo,
 			filterItems: [oFilterField1, oFilterField2]
 		});
+
+		await this.oFB.initialized();
 
 		assert.strictEqual(oFilterField1.getLabel(), "label", "Label set from PropertyInfo");
 		assert.strictEqual(oFilterField2.getLabel(), "label", "Label set from PropertyInfo");

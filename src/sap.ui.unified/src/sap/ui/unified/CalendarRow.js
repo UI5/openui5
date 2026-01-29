@@ -1453,6 +1453,11 @@ sap.ui.define([
 
 			for (i = 0; i < aAppointments.length; i++) {
 				oAppointment = aAppointments[i];
+
+				if (!oAppointment || !oAppointment.getStartDate()) {
+					continue;
+				}
+
 				var oAppointmentStartDate = CalendarUtils._createUniversalUTCDate(oAppointment.getStartDate(), undefined, true);
 				oAppointmentStartDate.setUTCSeconds(0); // ignore seconds
 				oAppointmentStartDate.setUTCMilliseconds(0); // ignore milliseconds
