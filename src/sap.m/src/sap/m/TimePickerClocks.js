@@ -345,7 +345,10 @@ sap.ui.define([
 				// AM/PM
 				oEvent.preventDefault();
 				oAmPm = this._getFormatButton();
-				oAmPm && oAmPm.setSelectedKey(iKey === KeyCodes.P ? "pm" : "am");
+				if (oAmPm) {
+					oAmPm.setSelectedKey(iKey === KeyCodes.P ? "pm" : "am");
+					oAmPm.fireSelectionChange();
+				}
 			} else if (iKey === KeyCodes.SPACE && !this._spaceKeyDown) {
 				// check if the SPACE is pressed over the hours/minutes/seconds Buttons and return if it is not
 				if (!bEventTargetOverButtons) {
@@ -557,11 +560,21 @@ sap.ui.define([
 		/**
 		 * Returns focus to the recently focused input in order to keep entering of numbers.
 		 *
+		 * @param {Event} oEvent the click event
 		 * @private
 		 */
-		TimePickerClocks.prototype._focusActiveButton = function() {
+		TimePickerClocks.prototype._focusActiveButton = function(oEvent) {
 			var aButtons = this.getAggregation("_buttons"),
-				iActiveClock = this._getActiveClockIndex();
+				iActiveClock = this._getActiveClockIndex(),
+				oAmPmButton = this._getFormatButton();
+
+			// Don't refocus if click originated from AM/PM button
+			if (oEvent && oAmPmButton && oEvent.target) {
+				var oAmPmDomRef = oAmPmButton.getDomRef();
+				if (oAmPmDomRef && oAmPmDomRef.contains(oEvent.target)) {
+					return;
+				}
+			}
 
 			aButtons && aButtons[iActiveClock] && aButtons[iActiveClock].focus();
 			this._performInitialFocus = false;
@@ -1138,6 +1151,11 @@ sap.ui.define([
 				return;
 			}
 
+			// Prevent switching while animation is in progress
+			if (this._isSwitching && !bSkipAnimation) {
+				return;
+			}
+
 			const oCurrentClock = this._getActiveClock(),
 				oNewClock = this.getAggregation("_clocks")[iNewClock],
 				aButtons = this.getAggregation("_buttons");
@@ -1160,6 +1178,7 @@ sap.ui.define([
 				aButtons[iNewClock].setPressed(true);
 				aButtons[iNewClock].focus();
 			} else {
+				this._isSwitching = true;
 				oCurrentClock.getDomRef().querySelector(".sapMTPCItems .sapMTPCNumber").addEventListener("animationend", jQuery.proxy(this._swapClocks, this, this._activeClock, iNewClock), {once: true});
 				oCurrentClock.setSkipAnimation(false).setFadeOut(true);
 			}
@@ -1174,13 +1193,18 @@ sap.ui.define([
 
 			if (bIsTherePrevClock) {
 				oPrevClock.setFadeIn(false).setFadeOut(false).setSkipAnimation(false);
-				aButtons[iPrevClock].setPressed(false);
+				aButtons.forEach(function(button, index) {
+					button.setPressed(false);
+				});
 			}
 
 			this._activeClock = iNextClock;
 			oNextClock.setFadeIn(true);
 			aButtons[iNextClock].setPressed(true);
 			aButtons[iNextClock].focus();
+
+			// Clear the switching flag to allow next switch
+			this._isSwitching = false;
 		};
 
 		/**

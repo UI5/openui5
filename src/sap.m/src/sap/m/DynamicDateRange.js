@@ -1671,13 +1671,13 @@ sap.ui.define([
 				)[0];
 
 			if (!oOption) {
-				if (aLastOptions.indexOf(oValue.operator) > -1) {
+				if (this.lastOptionsIndex(oValue.operator) > -1) {
 					oOption = aOptions.filter(
-						function (oItem) { return oItem.getOptionKey && oItem.getOptionKey() === aLastOptions[0];}
+						function (oItem) { return oItem.getOptionKey && StandardDynamicDateOption.LastXKeys.indexOf(oItem.getOptionKey()) !== -1;}
 					)[0];
 				} else if (this.nextOptionsIndex(oValue.operator) > -1) {
 					oOption = aOptions.filter(
-						function (oItem) { return oItem.getOptionKey && oItem.getOptionKey() === aNextOptions[0];}
+						function (oItem) { return oItem.getOptionKey && StandardDynamicDateOption.NextXKeys.indexOf(oItem.getOptionKey()) !== -1;}
 					)[0];
 				}
 			}

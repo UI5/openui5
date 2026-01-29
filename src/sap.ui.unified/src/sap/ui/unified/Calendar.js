@@ -1684,6 +1684,33 @@ sap.ui.define([
 	};
 
 	/**
+	 * Returns secondary calendar year(s) text if there is secondaryCalendarType set.
+	 * @private
+	 */
+	Calendar.prototype._getSecondaryYearText = function() {
+		if (!this._getSecondaryCalendarType()){
+			return "";
+		}
+
+		const oSecondaryYears = this._getDisplayedSecondaryYears();
+		let sSecondaryYearText = "";
+
+		// Add null checks to prevent errors when secondary years are undefined
+		if (!oSecondaryYears || !oSecondaryYears.start || !oSecondaryYears.end) {
+			return "";
+		}
+
+		if (oSecondaryYears.start.getYear() === oSecondaryYears.end.getYear()) {
+			sSecondaryYearText = this._oYearFormatSecondary.format(oSecondaryYears.start.toUTCJSDate(), true);
+		} else {
+			const  sPattern = this._getLocaleData().getIntervalPattern();
+			sSecondaryYearText = sPattern.replace(/\{0\}/, this._oYearFormatSecondary.format(oSecondaryYears.start.toUTCJSDate(), true))
+				.replace(/\{1\}/, this._oYearFormatSecondary.format(oSecondaryYears.end.toUTCJSDate(), true));
+		}
+		return sSecondaryYearText;
+	};
+
+	/**
 	 * Calculates the year picker button text in secondary calendar type.
 	 * @private
 	 */
@@ -1691,16 +1718,8 @@ sap.ui.define([
 		if (!this._getSecondaryCalendarType()){
 			return;
 		}
-		var oSecondaryYears = this._getDisplayedSecondaryYears();
-		if (oSecondaryYears.start.getYear() === oSecondaryYears.end.getYear()) {
-			this._updateHeadersYearAdditionalText(this._oYearFormatSecondary.format(oSecondaryYears.start.toUTCJSDate(), true));
-		} else {
-			var oLocaleData = this._getLocaleData();
-			var sPattern = oLocaleData.getIntervalPattern();
-			var sSecondaryMonthInfo = sPattern.replace(/\{0\}/, this._oYearFormatSecondary.format(oSecondaryYears.start.toUTCJSDate(), true))
-				.replace(/\{1\}/, this._oYearFormatSecondary.format(oSecondaryYears.end.toUTCJSDate(), true));
-			this._updateHeadersYearAdditionalText(sSecondaryMonthInfo);
-		}
+
+		this._updateHeadersYearAdditionalText(this._getSecondaryYearText());
 	};
 
 	/**
@@ -2633,6 +2652,8 @@ sap.ui.define([
 			oSecondMonthHeader = this.getAggregation("secondMonthHeader"),
 			sFirstHeaderText = sFirstHeaderYear,
 			sSecondHeaderText = sSecondHeaderYear || sFirstHeaderYear,
+			sFirstYearLabelText = [sFirstHeaderText, this._getSecondaryYearText()].filter(Boolean).join(", "),
+			sSecondYearLabelText = [sSecondHeaderText, this._getSecondaryYearText()].filter(Boolean).join(", "),
 			sPrimaryCalendarType = this._getPrimaryCalendarType(),
 			sFirstYear, sSecondYear;
 
@@ -2641,9 +2662,9 @@ sap.ui.define([
 		var sYearRangeShortcut = this._oResourceBundle.getText("CALENDAR_HEADER_YEAR_RANGE_BUTTON_SHORTCUT");
 
 		// Regular year button labels and tooltips
-		var sFirstYearLabel = this._oResourceBundle.getText("CALENDAR_HEADER_YEAR_BUTTON", [sFirstHeaderText]);
+		var sFirstYearLabel = this._oResourceBundle.getText("CALENDAR_HEADER_YEAR_BUTTON", [sFirstYearLabelText]);
 		var sFirstYearTooltip = `${sFirstYearLabel} (${sYearShortcut})`;
-		var sSecondYearLabel = this._oResourceBundle.getText("CALENDAR_HEADER_YEAR_BUTTON", [sSecondHeaderText]);
+		var sSecondYearLabel = this._oResourceBundle.getText("CALENDAR_HEADER_YEAR_BUTTON", [sSecondYearLabelText]);
 		var sSecondYearTooltip = `${sSecondYearLabel} (${sYearShortcut})`;
 
 		// Year range labels and tooltips (will be updated if in year picker mode)
@@ -2678,14 +2699,27 @@ sap.ui.define([
 					sFirstHeaderText = sFirstYear + " - " + sSecondYear;
 				}
 
-				// Update year range labels for year picker mode
+				// Update year range labels for year picker mode with secondary calendar support
+				var sSecondaryYearRangeText = "";
+				if (this._getSecondaryCalendarType()) {
+					var oSecondaryFirstYear = new CalendarDate(oFirstDate, this._getSecondaryCalendarType());
+					var oSecondarySecondYear = new CalendarDate(oSecondDate, this._getSecondaryCalendarType());
+					// Add null checks for secondary year dates
+					if (oSecondaryFirstYear && oSecondarySecondYear) {
+						var sFirstSecondaryYear = this._oYearFormatSecondary.format(oSecondaryFirstYear.toUTCJSDate(), true);
+						var sSecondSecondaryYear = this._oYearFormatSecondary.format(oSecondarySecondYear.toUTCJSDate(), true);
+						sSecondaryYearRangeText = sFirstSecondaryYear + " - " + sSecondSecondaryYear;
+					}
+				}
+
+				var sYearRangeLabelText = [sFirstYear + " - " + sSecondYear, sSecondaryYearRangeText].filter(Boolean).join(", ");
 				sYearRangeLabel = this._oResourceBundle.getText("CALENDAR_HEADER_YEAR_RANGE_BUTTON", [sFirstYear, sSecondYear]);
 				sYearRangeTooltip = `${sYearRangeLabel} (${sYearRangeShortcut})`;
 
 				// Set properties for button4 when in year picker mode (always set accessibility properties when button4 is used)
 				oHeader.setProperty("_tooltipButton4", sYearRangeTooltip);
 				oHeader.setProperty("_keyShortcutButton4", sYearRangeShortcut);
-				oHeader.setProperty("_descriptionButton4", sYearRangeLabel);
+				oHeader.setProperty("_descriptionButton4", sYearRangeLabelText);
 				this._setHeaderCurrentPicker(CURRENT_PICKERS.YEAR_PICKER);
 		} else if (this._iMode === 1 && oMonthPicker) {
 			this._setHeaderCurrentPicker(CURRENT_PICKERS.MONTH_PICKER);
@@ -2704,7 +2738,7 @@ sap.ui.define([
 		var sSecondHeaderYearLabel, sSecondHeaderYearTooltip;
 
 		if (this._iMode === 2 && oYearPicker) {
-			sSecondHeaderYearLabel = sYearRangeLabel;
+			sSecondHeaderYearLabel = sYearRangeLabelText;
 			sSecondHeaderYearTooltip = sYearRangeTooltip;
 		} else {
 			sSecondHeaderYearLabel = sSecondYearLabel;
@@ -2719,14 +2753,14 @@ sap.ui.define([
 		oSecondMonthHeader.setProperty("_descriptionButton2", sSecondHeaderYearLabel);
 
 		oHeader.setTextButton2(sFirstHeaderText);
-		oHeader.setAriaLabelButton2(this._iMode === 2 && oYearPicker ? sYearRangeLabel : sFirstYearLabel);
+		oHeader.setAriaLabelButton2(this._iMode === 2 && oYearPicker ? sYearRangeLabelText : sFirstYearLabel);
 		oHeader.setProperty("_tooltipButton2", this._iMode === 2 && oYearPicker ? sYearRangeTooltip : sFirstYearTooltip);
-		oHeader.setProperty("_descriptionButton2", this._iMode === 2 && oYearPicker ? sYearRangeLabel : sFirstYearLabel);
+		oHeader.setProperty("_descriptionButton2", this._iMode === 2 && oYearPicker ? sYearRangeLabelText : sFirstYearLabel);
 
 		// In single header with two months scenario, button2 should represent the second month's year
 		if (this._isTwoMonthsInTwoColumns() && sSecondHeaderText !== sFirstHeaderText) {
 			// Button2 shows second month year, so update its accessibility properties
-			var sButton2Label = this._iMode === 2 && oYearPicker ? sYearRangeLabel : sSecondYearLabel;
+			var sButton2Label = this._iMode === 2 && oYearPicker ? sYearRangeLabelText : sSecondYearLabel;
 			var sButton2Tooltip = this._iMode === 2 && oYearPicker ? sYearRangeTooltip : sSecondYearTooltip;
 			var sButton2Shortcut = this._iMode === 2 && oYearPicker ? sYearRangeShortcut : sYearShortcut;
 
@@ -2743,9 +2777,24 @@ sap.ui.define([
 				// In year picker mode, extract years from the range string for button4
 				var aYears = sSecondHeaderText.split(" - ");
 				if (aYears.length === 2) {
+					// Create secondary year range text for button4
+					var sButton4SecondaryYearText = "";
+					if (this._getSecondaryCalendarType()) {
+						var oButton4FirstDate = new CalendarDate(oFirstDate, this._getSecondaryCalendarType());
+						var oButton4SecondDate = new CalendarDate(oSecondDate, this._getSecondaryCalendarType());
+						// Add null checks for button4 secondary year dates
+						if (oButton4FirstDate && oButton4SecondDate) {
+							var sButton4FirstSecondaryYear = this._oYearFormatSecondary.format(oButton4FirstDate.toUTCJSDate(), true);
+							var sButton4SecondSecondaryYear = this._oYearFormatSecondary.format(oButton4SecondDate.toUTCJSDate(), true);
+							sButton4SecondaryYearText = sButton4FirstSecondaryYear + " - " + sButton4SecondSecondaryYear;
+						}
+					}
+					var sButton4LabelText = [aYears[0] + " - " + aYears[1], sButton4SecondaryYearText].filter(Boolean).join(", ");
 					sButton4Label = this._oResourceBundle.getText("CALENDAR_HEADER_YEAR_RANGE_BUTTON", aYears);
 					sButton4Tooltip = `${sButton4Label} (${sYearRangeShortcut})`;
 					sButton4Shortcut = sYearRangeShortcut;
+					// Use the full label text with secondary years for accessibility
+					sButton4Label = sButton4LabelText;
 				} else {
 					// Fallback if string format is unexpected
 					sButton4Label = sSecondYearLabel;

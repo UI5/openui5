@@ -692,7 +692,7 @@ sap.ui.define([
 		 * Map of event names and ids, that are provided by this class
 		 * @private
 		 */
-		Core.M_EVENTS = {ControlEvent: "ControlEvent", UIUpdated: "UIUpdated", ThemeChanged: "ThemeChanged", ThemeScopingChanged: "themeScopingChanged", LocalizationChanged: "localizationChanged",
+		Core.M_EVENTS = {ControlEvent: "ControlEvent", UIUpdated: "UIUpdated", ThemeChanged: "ThemeChanged", LocalizationChanged: "localizationChanged",
 				LibraryChanged : "libraryChanged",
 				ValidationError : "validationError", ParseError : "parseError", FormatError : "formatError", ValidationSuccess : "validationSuccess"};
 
@@ -909,18 +909,6 @@ sap.ui.define([
 		Theming.attachApplied(function(oEvent) {
 			// notify the listeners via a control event
 			_oEventProvider && _oEventProvider.fireEvent(Core.M_EVENTS.ThemeChanged, BaseEvent.getParameters(oEvent));
-		});
-
-		Core.prototype.attachThemeScopingChanged = function(fnFunction, oListener) {
-			_oEventProvider.attachEvent(Core.M_EVENTS.ThemeScopingChanged, fnFunction, oListener);
-		};
-
-		Core.prototype.detachThemeScopingChanged = function(fnFunction, oListener) {
-			_oEventProvider.detachEvent(Core.M_EVENTS.ThemeScopingChanged, fnFunction, oListener);
-		};
-
-		Theming.attachThemeScopingChanged(function(oEvent) {
-			_oEventProvider.fireEvent(Core.M_EVENTS.ThemeScopingChanged, BaseEvent.getParameters(oEvent));
 		});
 
 		Library.attachLibraryChanged(function(oEvent) {

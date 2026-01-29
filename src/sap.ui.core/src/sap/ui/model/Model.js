@@ -696,26 +696,30 @@ sap.ui.define([
 		 */
 
 		/**
+		 * Returns the value of the property for the given <code>sPath</code> and <code>oContext</code>.
+		 *
 		 * @abstract
 		 *
 		 * @name sap.ui.model.Model.prototype.getProperty
 		 * @function
-		 * @param {string} sPath The path to where to read the attribute value
-		 * @param {sap.ui.model.Context} [oContext] The context with which the path should be resolved
+		 * @param {string} sPath The path to the attribute value you want to read
+		 * @param {sap.ui.model.Context} [oContext] The context that resolves the path
 		 *
-		 * @returns {any} Value of the addressed property
+		 * @returns {any} The value of the addressed property
 		 * @public
 		 */
 
 		/**
+		 * Returns the value of the property for the given <code>sPath</code> and <code>oContext</code>.
+		 *
 		 * @abstract
 		 *
-		 * @param {string} sPath Path to where to read the object
-		 * @param {sap.ui.model.Context} [oContext] Context with which the path should be resolved
+		 * @param {string} sPath The path to the object you want to read
+		 * @param {sap.ui.model.Context} [oContext] The context that resolves the path
 		 * @param {object} [mParameters] Additional model-specific parameters
 		 *
 		 * @returns {any|undefined}
-		 *   The value for the given path/context or <code>undefined</code> if data could not be found
+		 *   The the value of the property for the given path/context or <code>undefined</code> if data could not be found
 		 * @public
 		 */
 		Model.prototype.getObject = function(sPath, oContext, mParameters) {
@@ -1140,9 +1144,11 @@ sap.ui.define([
 		 * The original value is the value that was last responded by a server if using a server model
 		 * implementation.
 		 *
-		 * @param {string} sPath Path/name of the property
-		 * @param {sap.ui.model.Context} [oContext] Context if available to access the property value
-		 * @returns {any} vValue The value of the property
+		 * @abstract
+		 *
+		 * @param {string} sPath The path/name of the property
+		 * @param {sap.ui.model.Context} [oContext] Context for accessing the property value
+		 * @returns {any} The value of the property
 		 * @public
 		 */
 		Model.prototype.getOriginalProperty = function(sPath, oContext) {

@@ -220,22 +220,15 @@ sap.ui.define([
 			CORE_VERSION = version;
 		}
 
-		if (!mAllLoadedLibraries.has(libName)) {
-			const oLibInfo = getLibraryInfo({
-				libName,
-				variant
-			});
+		const oLibInfo = getLibraryInfo({
+			libName,
+			variant
+		});
 
-			if (!oLibInfo.cssLinkElement) {
-				updateThemeUrl({
-					libInfo: oLibInfo,
-					suppressFOUC: true
-				});
-
-				// if parameters have been used, update them with the new style sheet
-				sap.ui.require("sap/ui/core/theming/Parameters")?._addLibraryTheme(oLibInfo.id);
-			}
-		}
+		updateThemeUrl({
+			libInfo: oLibInfo,
+			suppressFOUC: true
+		});
 	}
 
 	/**
@@ -262,7 +255,7 @@ sap.ui.define([
 			Log.error("UI5 theming lifecycle requires valid version information when a theming service is active. Please check why the version info could not be loaded in this system.", undefined, MODULE_NAME);
 		}
 		// Compare the link including the UI5 version only if it is already available; otherwise, compare the link without the version to prevent unnecessary requests.
-		const sOldUrl = libInfo.cssLinkElement?.getAttribute("href");
+		const sOldUrl = libInfo.cssLinkElement?.href;
 		const sOldUrlWoVersion = sOldUrl?.replace(/\?.*/, "");
 		const sUrl = libInfo.getUrl(theme).baseUrl;
 		if (!sUrl || sOldUrlWoVersion !== sUrl || force) {

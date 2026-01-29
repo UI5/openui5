@@ -403,7 +403,7 @@ sap.ui.define([
 	};
 
 	/**
-	 * Returns the value for the property with the given path and context.
+	 * Returns the value for the given <code>sPath</code> and <code>oContext</code>.
 	 *
 	 * @param {string} sPath
 	 *   The path to the property
@@ -419,7 +419,7 @@ sap.ui.define([
 	};
 
 	/**
-	 * Returns the value for the property with the given path and context.
+	 * Returns the value for the given <code>sPath</code> and <code>oContext</code>.
 	 *
 	 * @param {string} sPath
 	 *   The path to the property
@@ -481,13 +481,13 @@ sap.ui.define([
 	};
 
 	/**
-	 * Returns the object for the given <code>sPath</code> and <code>oContext</code>.
+	 * Returns the value of the property for the given <code>sPath</code> and <code>oContext</code>.
 	 *
 	 * @param {string} sPath The path to the object you want to read
 	 * @param {sap.ui.model.Context} [oContext] The context that resolves the path
 	 *
 	 * @returns {any|null|undefined}
-	 *   The value of the property for the given <code>sPath</code> and <code>oContext</code>.
+	 *   The value for the given <code>sPath</code> and <code>oContext</code>.
 	 *   If the property path derived from the given <code>sPath</code> and <code>oContext</code> is
 	 *   absolute (starts with a "/") but does not lead to a property in the data structure,
 	 *   <code>undefined</code> is returned. If the property <code>sPath</code> is not absolute, <code>null</code>

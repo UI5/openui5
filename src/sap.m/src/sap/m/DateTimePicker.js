@@ -108,7 +108,7 @@ sap.ui.define([
 	 * <ul><li>Use the <code>value</code> property if you want to bind the
 	 * <code>DateTimePicker</code> to a model using the
 	 * <code>sap.ui.model.type.DateTime</code></li>
-     * <caption> binding the <code>value</code> property by using types </caption>
+	 * <caption> binding the <code>value</code> property by using types </caption>
 	 * <pre>
 	 * // UI5Date imported from sap/ui/core/date/UI5Date
 	 * new sap.ui.model.json.JSONModel({
@@ -124,7 +124,7 @@ sap.ui.define([
 	 * </pre>
 	 * <li>Use the <code>value</code> property if the date is provided as a string from
 	 * the backend or inside the app (for example, as ABAP type DATS field)</li>
-     * <caption> binding the <code>value</code> property by using types </caption>
+	 * <caption> binding the <code>value</code> property by using types </caption>
 	 * <pre>
 	 * new sap.ui.model.json.JSONModel({date:"2022-11-10-12-10-10"});
 	 *
@@ -895,16 +895,57 @@ sap.ui.define([
 	};
 
 	DateTimePicker.prototype._parseValue = function(sValue, bDisplayFormat, sTimezone) {
+		var oDate;
 
 		if (this._isTimezoneBinding()) {
-			var aParsedDate = this._getFormatterWithTimezoneInstance().parse(sValue, sTimezone || this._getTimezone(true));
-			if (aParsedDate) {
-				return aParsedDate[0];
-			}
-			return null;
+			var aParsedResult = this._getFormatterWithTimezoneInstance().parse(
+				sValue,
+				sTimezone || this._getTimezone(true)
+			);
+			oDate = aParsedResult ? aParsedResult[0] : null;
+		} else {
+			oDate = DatePicker.prototype._parseValue.apply(this, arguments);
 		}
 
-		return DatePicker.prototype._parseValue.apply(this, arguments);
+		// Validate format consistency (only for display format parsing)
+		if (oDate && bDisplayFormat && !this._validateDayOfWeekConsistency(sValue, oDate)) {
+			return null; // Invalid format, return null to trigger error state
+		}
+
+		return oDate;
+	};
+
+	/**
+	 * Validates that the input string is consistent with the display format by comparing
+	 * it with what the formatter would produce for the same parsed date.
+	 * Only validates when the display format contains day-of-week patterns to prevent
+	 * auto-correction of incorrect day names.
+	 * @param {string} sValue The input string entered by the user
+	 * @param {Date} oDate The parsed date object
+	 * @returns {boolean} true if format is consistent, false if there are inconsistencies
+	 * @private
+	 */
+	DateTimePicker.prototype._validateDayOfWeekConsistency = function(sValue, oDate) {
+		if (!sValue || !oDate) {
+			return true;
+		}
+
+		// Get the formatter - it resolves styles to actual patterns
+		var oFormatter = this._getFormatter(true);
+		var aFormatArray = oFormatter.aFormatArray;
+
+		// Check if format contains day-of-week using the parsed pattern
+		var bHasDayOfWeek = aFormatArray.some(function(oPart) {
+			return oPart.type === "dayNameInWeek";
+		});
+
+		if (!bHasDayOfWeek) {
+			return true;
+		}
+
+		// Compare formatted output with input
+		var sExpectedValue = oFormatter.format(oDate);
+		return sExpectedValue === sValue;
 	};
 
 	DateTimePicker.prototype._formatValue = function(oDate, bValueFormat, sTimezone) {
@@ -1210,6 +1251,16 @@ sap.ui.define([
 	function _handleAfterOpen(oEvent){
 		this._oClocks._showFirstClock();
 		this._oCalendar.focus();
+		this._bTimeSelected = false;
+
+		this._oClocks.getAggregation("_clocks").forEach(function(oClock) {
+			oClock.attachChange(_handleClocksChange, this);
+		}, this);
+
+		const oAmPmButton = this._oClocks.getAggregation("_buttonAmPm");
+		if (oAmPmButton) {
+			oAmPmButton.attachSelectionChange(_handleClocksChange, this);
+		}
 
 		Device.media.attachHandler(this._handleWindowResize, this);
 		this.fireAfterValueHelpOpen();
@@ -1259,9 +1310,16 @@ sap.ui.define([
 	}
 
 	function _handleCalendarSelect(oEvent) {
-		this._oPopupContent.switchToTime();
-		this._oPopupContent.getClocks()._focusActiveButton();
+		if (!this._bTimeSelected) {
+			this._oPopupContent.switchToTime();
+			this._oPopupContent.getClocks()._focusActiveButton();
+		}
+
 		this._oOKButton.setEnabled(true);
+	}
+
+	function _handleClocksChange(oEvent) {
+		this._bTimeSelected = true;
 	}
 
 	return DateTimePicker;

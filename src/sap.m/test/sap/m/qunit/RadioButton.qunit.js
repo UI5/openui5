@@ -1185,6 +1185,7 @@ sap.ui.define([
 
 			assert.notOk(this.oRB.$().hasClass(sClass), sClass + " class is not added when radio button is disabled");
 		}
+		assert.notOk(this.oRB.$().find("input")[0].getAttribute("readonly"), "The input element does not have the readonly attribute when the radio button is disabled");
 	});
 
 	QUnit.test("Enabled radio button, not editable", function (assert) {

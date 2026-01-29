@@ -49,6 +49,12 @@ sap.ui.define([], function() {
 				}
 			},
 
+			"CodeController": {
+				coverage: {
+					only : ["sap/ui/documentation/sdk/controller/Code.controller"]
+				}
+			},
+
 			"LiveEditorOutput": {
 				coverage: {
 					only : ["sap/ui/documentation/sdk/util/LiveEditorOutput.html"]

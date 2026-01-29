@@ -146,9 +146,11 @@ sap.ui.define([
 			oRM.attr("checked", "checked");
 		}
 
-		if (this.isButtonReadOnly(oRadioButton)) {
-			oRM.attr("readonly", "readonly");
+		// if the radio button is disabled, it should be displayed as disabled only
+		if (!oRadioButton.getEnabled()) {
 			oRM.attr("disabled", "disabled");
+		} else if (this.isButtonReadOnly(oRadioButton)) {
+			oRM.attr("readonly", "readonly");
 		}
 
 		oRM.voidEnd();
