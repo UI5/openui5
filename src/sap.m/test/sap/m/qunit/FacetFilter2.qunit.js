@@ -802,12 +802,12 @@ sap.ui.define([
 
 
 	QUnit.test("Keyboard", async function(assert) {
-
-		var oFF = await createFF(oFF);
-		assert.ok(oFF.$().find(":sapTabbable").length == 4, "Total 4 tabbable fields");
-		var oEvent = new jQuery.Event();
+		const oEvent = new jQuery.Event();
 
 //home
+		let oFF = await createFF();
+		assert.ok(oFF.$().find(":sapTabbable").length == 4, "Total 4 tabbable fields");
+
 		oEvent.target = oFF.$().find(":sapTabbable")[0];
 		oFF.oItemNavigation.setFocusedIndex(0);
 		oFF.onsaphome(oEvent);
@@ -820,63 +820,73 @@ sap.ui.define([
 		oEvent.target = oFF.$().find(":sapTabbable")[2];
 		oFF.onsaphome(oEvent);
 		assert.ok(oFF.oItemNavigation.getFocusedIndex() == 0, "keyboard onsaphome tested - focus on List1");
+		destroyFF(oFF);
 
 //onsapincreasemodifiers - page down
-		var oFF = await createFF(oFF);
+		oFF = await createFF();
 		oEvent.target = oFF.$().find(":sapTabbable")[0];
 		oEvent.which = KeyCodes.ARROW_RIGHT;
 		oFF.onsapincreasemodifiers(oEvent);
 		assert.ok(oFF.oItemNavigation.getFocusedIndex() == 2, "keyboard onsapincreasemodifiers tested - focus on add button");
+		destroyFF(oFF);
 
-		var oFF = await createFF(oFF);
+		oFF = await createFF();
 		oEvent.target = oFF.$().find(":sapTabbable")[1];
 		oEvent.which = KeyCodes.ARROW_RIGHT;
 		oFF.onsapincreasemodifiers(oEvent);
 		assert.ok(oFF.oItemNavigation.getFocusedIndex() == 2, "keyboard onsapincreasemodifiers tested - focus on add button");
+		destroyFF(oFF);
 
-		var oFF = await createFF(oFF);
+		oFF = await createFF();
 		oEvent.target = oFF.$().find(":sapTabbable")[2];
 		oEvent.which = KeyCodes.ARROW_RIGHT;
 		oFF.onsapincreasemodifiers(oEvent);
 		assert.ok(oFF.oItemNavigation.getFocusedIndex() == 2, "keyboard onsapincreasemodifiers tested - focus on add button");
+		destroyFF(oFF);
 
 //onsapdecreasemodifiers - page up
-		var oFF = await createFF(oFF);
+		oFF = await createFF();
 		oEvent.target = oFF.$().find(":sapTabbable")[1];
 		oEvent.which = KeyCodes.ARROW_LEFT;
 		oFF.onsapdecreasemodifiers(oEvent);
 		assert.ok(oFF.oItemNavigation.getFocusedIndex() == 0, "keyboard onsapdecreasemodifiers tested - focus on List1");
+		destroyFF(oFF);
 
-		var oFF = await createFF(oFF);
+		oFF = await createFF();
 		oEvent.target = oFF.$().find(":sapTabbable")[2];
 		oEvent.which = KeyCodes.ARROW_LEFT;
 		oFF.onsapdecreasemodifiers(oEvent);
 		assert.ok(oFF.oItemNavigation.getFocusedIndex() == 0, "keyboard onsapdecreasemodifiers tested - focus on List1");
+		destroyFF(oFF);
 
-		var oFF = await createFF(oFF);
+		oFF = await createFF();
 		oEvent.target = oFF.$().find(":sapTabbable")[0];
 		oEvent.which = KeyCodes.ARROW_LEFT;
 		oFF.onsapdecreasemodifiers(oEvent);
 		assert.ok(oFF.oItemNavigation.getFocusedIndex() == 0, "keyboard onsapdecreasemodifiers tested - focus on List1");
+		destroyFF(oFF);
 
 //onsapupmodifiers
-		var oFF = await createFF(oFF);
+		oFF = await createFF();
 		oEvent.target = oFF.$().find(":sapTabbable")[2];
 		oFF.onsapupmodifiers(oEvent);
 		assert.ok(oFF.oItemNavigation.getFocusedIndex() == 0, "keyboard onsapupmodifiers tested - focus on List1");
+		destroyFF(oFF);
 
-		var oFF = await createFF(oFF);
+		oFF = await createFF();
 		oEvent.target = oFF.$().find(":sapTabbable")[1];
 		oFF.oItemNavigation.setFocusedIndex(1);
 		oFF.onsapupmodifiers(oEvent);
 		assert.ok(oFF.oItemNavigation.getFocusedIndex() == 0, "keyboard onsapupmodifiers tested - focus on List1");
+		destroyFF(oFF);
 
-		var oFF = await createFF(oFF);
+		oFF = await createFF();
 		oEvent.target = oFF.$().find(":sapTabbable")[0];
 		oFF.onsapupmodifiers(oEvent);
 		assert.ok(oFF.oItemNavigation.getFocusedIndex() == 0, "keyboard onsapupmodifiers tested - focus on List1");
+		destroyFF(oFF);
 
-		var oFF = await createFF(oFF);
+		oFF = await createFF();
 		oEvent.target = oFF.$().find(":sapTabbable")[0];
 		oFF.onsapdownmodifiers(oEvent);
 		assert.ok(oFF.oItemNavigation.getFocusedIndex() == 2, "keyboard onsapdownmodifiers tested - focus on Add button");
@@ -892,71 +902,87 @@ sap.ui.define([
 		oEvent.target = oFF.$().find(":sapTabbable")[2];
 		oFF.onsapdownmodifiers(oEvent);
 		assert.ok(oFF.oItemNavigation.getFocusedIndex() == 2, "keyboard onsapdownmodifiers event tested - focus on Add button");
+		destroyFF(oFF);
 
 //onsappagedow
-		var oFF = await createFF(oFF);
+		oFF = await createFF();
 //  	var sapTabbable = oFF.$().find(":sapTabbable");
 		oEvent.target = oFF.$().find(":sapTabbable")[2];
 		oFF.oItemNavigation.setFocusedIndex(2);
 		assert.ok(jQuery(oFF.onsappagedown(oEvent)), "keyboard onsappagedown tested - case 1");
+		destroyFF(oFF);
 
-		var oFF = await createFF(oFF);
+		oFF = await createFF();
 		oFF.oItemNavigation.setFocusedIndex(0);
 		oEvent.target = oFF.$().find(":sapTabbable")[0];
 		assert.ok(jQuery(oFF.onsappagedown(oEvent)), "keyboard onsappagedown tested - case 2");
+		destroyFF(oFF);
 
 //onsaptabnext
-		var oFF = await createFF(oFF);
+		oFF = await createFF();
 		oEvent.target = oFF.$().find(":sapTabbable")[0];
 		assert.ok(jQuery(oFF.onsaptabnext(oEvent)), "keyboard onsaptabnext tested - case 1");
+		destroyFF(oFF);
 
-		var oFF = await createFF(oFF);
+		oFF = await createFF();
 		oFF._invalidateFlag = true;
 		oEvent.target = oFF.$().find(":sapTabbable")[3];
 		assert.ok(jQuery(oFF.onsaptabnext(oEvent)), "keyboard onsaptabnext tested - case 2");
+		destroyFF(oFF);
 
-		var oFF = await createFF(oFF);
+		oFF = await createFF();
 		oFF._closePopoverFlag = true;
 		oEvent.target = oFF.$().find(":sapTabbable")[3];
 		assert.ok(jQuery(oFF.onsaptabnext(oEvent)), "keyboard onsaptabnext tested - case 3");
+		destroyFF(oFF);
 //onsapend
-		var oFF = await createFF(oFF);
+		oFF = await createFF();
 		oEvent.target = oFF.$().find(":sapTabbable")[0];
 		oFF.onsapend(oEvent);
 //		assert.ok(oFF.oItemNavigation.getFocusedIndex() == 2, "keyboard onsapend tested - focus on add button");
 		assert.ok(jQuery(oFF.onsapend(oEvent)), "keyboard onsapend tested - case 1");
+		destroyFF(oFF);
 
-		var oFF = await createFF(oFF);
+		oFF = await createFF();
 		oFF._addTarget = null;
 		oEvent.target = oFF.$().find(":sapTabbable")[0];
 		assert.ok(jQuery(oFF.onsapend(oEvent)), "keyboard onsapend tested - case 2");
+		destroyFF(oFF);
 
 //onsappageup
-		var oFF = await createFF(oFF);
+		oFF = await createFF();
 		oEvent.target = oFF.$().find(":sapTabbable")[3];
 		oFF.onsappageup(oEvent);
 		assert.ok(jQuery(oFF.onsappageup(oEvent)), "keyboard onsappageup tested");
+		destroyFF(oFF);
 
 //expand
+		oFF = await createFF();
 		oFF.oItemNavigation.setFocusedIndex(0);
 		oFF.onsapexpand(oEvent);
 		assert.ok(oFF.oItemNavigation.getFocusedIndex() == 1, "keyboard onsapexpand tested - focus on List2");
+		destroyFF(oFF);
 
-		var oFF = await createFF(oFF);
+		oFF = await createFF();
 		oFF.oItemNavigation.setFocusedIndex(1);
 		oFF.onsapexpand(oEvent);
 		assert.ok(oFF.oItemNavigation.getFocusedIndex() == 2, "keyboard onsapexpand tested - focus on Add button");
+		destroyFF(oFF);
 
-		var oFF = await createFF(oFF);
+		oFF = await createFF();
 		oFF.oItemNavigation.setFocusedIndex(2);
 		oFF.onsapexpand(oEvent);
 		assert.ok(oFF.oItemNavigation.getFocusedIndex() == 2, "keyboard onsapexpand tested - focus on Add button");
+		destroyFF(oFF);
 
 //collapse
-		var oFF = await createFF(oFF);
+		oFF = await createFF();
 		oFF.oItemNavigation.setFocusedIndex(2);
 		oFF.onsapcollapse(oEvent);
 		assert.ok(oFF.oItemNavigation.getFocusedIndex() == 1, "keyboard onsapcollapse tested - focus on List2");
+		destroyFF(oFF);
+
+		oFF = await createFF();
 
 		oFF.oItemNavigation.setFocusedIndex(1);
 		oFF.onsapcollapse(oEvent);
@@ -965,46 +991,53 @@ sap.ui.define([
 		oFF.oItemNavigation.setFocusedIndex(0);
 		oFF.onsapcollapse(oEvent);
 		assert.ok(oFF.oItemNavigation.getFocusedIndex() == 0, "keyboard onsapcollapse tested - focus on list 1");
+		destroyFF(oFF);
 
 //tabprev
-		var oFF = await createFF(oFF);
+		oFF = await createFF();
 		oEvent.target = oFF.$().find(":sapTabbable")[3];
 		oFF.onsaptabprevious(oEvent);
 //		assert.ok(oFF.oItemNavigation.getFocusedIndex() == 0, "keyboard onsaptabprevious tested");
 		assert.ok(jQuery(oFF.onsaptabprevious(oEvent)), "keyboard onsaptabprevious tested - case 1");
+		destroyFF(oFF);
 
-		var oFF = await createFF(oFF);
+		oFF = await createFF();
 		oEvent.target = oFF.$().find(":sapTabbable")[3];
 		oFF._previousTarget = oFF.$().find(":sapTabbable")[1];
 		oFF.onsaptabprevious(oEvent);
 //		assert.ok(oFF.oItemNavigation.getFocusedIndex() == 1, "keyboard onsaptabprevious tested");
 		assert.ok(jQuery(oFF.onsaptabprevious(oEvent)), "keyboard onsaptabprevious tested - case 2");
+		destroyFF(oFF);
 
-		var oFF = await createFF(oFF);
+		oFF = await createFF();
 		oEvent.target = oFF.$().find(":sapTabbable")[3];
 		oFF._previousTarget = oFF.$().find(":sapTabbable")[0];
 		oFF.onsaptabprevious(oEvent);
 //		assert.ok(oFF.oItemNavigation.getFocusedIndex() == 0, "keyboard onsaptabprevious tested");
 		assert.ok(jQuery(oFF.onsaptabprevious(oEvent)), "keyboard onsaptabprevious tested - case 3");
+		destroyFF(oFF);
 
-		var oFF = await createFF(oFF);
+		oFF = await createFF();
 		oEvent.target = oFF.$().find(":sapTabbable")[3];
 		oFF._previousTarget = oFF.$().find(":sapTabbable")[2];
 		oFF.onsaptabprevious(oEvent);
 //		assert.ok(oFF.oItemNavigation.getFocusedIndex() == 2, "keyboard onsaptabprevious tested");
 		assert.ok(jQuery(oFF.onsaptabprevious(oEvent)), "keyboard onsaptabprevious tested - case 4");
+		destroyFF(oFF);
 
-		var oFF = await createFF(oFF);
+		oFF = await createFF();
 		oEvent.target = oFF.$().find(":sapTabbable")[2];
 //		assert.ok(jQuery(oFF.onsaptabprevious(oEvent)), "keyboard onsaptabprevious tested");
 		assert.ok(jQuery(oFF.onsaptabprevious(oEvent)), "keyboard onsaptabprevious tested - case 5");
+		destroyFF(oFF);
 
 //down
-		var oFF = await createFF(oFF);
+		oFF = await createFF();
 		oEvent.target = oFF.$().find(":sapTabbable")[1];
 		assert.ok(jQuery(oFF.onsapdown(oEvent)), "keyboard onsapdown tested - case 1");
+		destroyFF(oFF);
 
-		var oFF = await createFF(oFF);
+		oFF = await createFF();
 		oEvent.target = oFF.$().find(":sapTabbable")[3];
 		assert.ok(jQuery(oFF.onsapdown(oEvent)), "keyboard onsapdown tested - case2 ");
 
@@ -1012,133 +1045,138 @@ sap.ui.define([
 		oFF.oItemNavigation.setFocusedIndex(1);
 		oEvent.target = oFF.$().find(":sapTabbable")[0];
 		assert.ok(jQuery(oFF.onsapescape(oEvent)), "keyboard onsapescape tested - case 1");
+		destroyFF(oFF);
 
-		var oFF = await createFF(oFF);
+		oFF = await createFF();
 		oEvent.target = oFF.$().find(":sapTabbable")[3];
 		assert.ok(jQuery(oFF.onsapescape(oEvent)), "keyboard onsapescape tested - case2");
+		destroyFF(oFF);
 
 //onsapup
 		//*why need to comment out oEvent.hover in facetfilter.js -?????
-		var oFF = await createFF(oFF);
+		oFF = await createFF();
 		oFF.oItemNavigation.setFocusedIndex(1);
 		oEvent.target = oFF.$().find(":sapTabbable")[1];
 		assert.ok(jQuery(oFF.onsapup(oEvent)), "keyboard onsapup tested - case 1");
+		destroyFF(oFF);
 
-		var oFF = await createFF(oFF);
+		oFF = await createFF();
 		oEvent.target = oFF.$().find(":sapTabbable")[3];
 		assert.ok(jQuery(oFF.onsapup(oEvent)), "keyboard onsapup tested - case 2");
 //		assert.ok(jQuery(oEvent.target).trigger("focus"), "keyboard onsapup tested");
+		destroyFF(oFF);
 
 //onsapleft
 		//*why need to comment out oEvent.hover in facetfilter.js -?????
-		var oFF = await createFF(oFF);
+		oFF = await createFF();
 		oFF.oItemNavigation.setFocusedIndex(1);
 		oEvent.target = oFF.$().find(":sapTabbable")[1];
 		oFF.onsapleft(oEvent);
 		assert.ok(oFF.oItemNavigation.getFocusedIndex() == 1, "keyboard onsapleft tested - case 1");
+		destroyFF(oFF);
 
-		var oFF = await createFF(oFF);
+		oFF = await createFF();
 		oEvent.target = oFF.$().find(":sapTabbable")[3];
 		assert.ok(jQuery(oFF.onsapleft(oEvent)), "keyboard onsapleft tested - case 2");
+		destroyFF(oFF);
 
 //onsapright
-		var oFF = await createFF(oFF);
+		oFF = await createFF();
 		oEvent.target = oFF.$().find(":sapTabbable")[1];
 		assert.ok(jQuery(oFF.onsapright(oEvent)), "keyboard onsaprigh tested - case 1");
+		destroyFF(oFF);
 
-		var oFF = await createFF(oFF);
+		oFF = await createFF();
 		oEvent.target = oFF.$().find(":sapTabbable")[3];
 		assert.ok(jQuery(oFF.onsapright(oEvent)), "keyboard onsaprigh tested - case 2");
+		destroyFF(oFF);
 
 //onsapdelete
-		var oFF = await createFF(oFF);
+		oFF = await createFF();
 		oEvent.target = oFF.$().find(":sapTabbable")[0];
 		oFF.onsapdelete(oEvent);
 		assert.equal(oFF.getLists()[0].getActive(), false, "keyboard onsapdelete tested - list1 deleted");
 		assert.equal(oFF.getAggregation("buttons").length, 2, "There should be two buttons in the 'buttons' aggregation");
 		assert.equal(oFF.getAggregation("removeFacetIcons").length, 2, "There should be two remove icons in the aggregation");
+		destroyFF(oFF);
 
-		var oFF = await createFF(oFF);
+		oFF = await createFF();
 		oEvent.target = oFF.$().find(":sapTabbable")[1];
 		oFF.onsapdelete(oEvent);
 		assert.equal(oFF.getLists()[1].getActive(), false, "keyboard onsapdelete tested - list2 deleted");
 		assert.equal(oFF.getAggregation("buttons").length, 2, "There should be two buttons in the 'buttons' aggregation");
 		assert.equal(oFF.getAggregation("removeFacetIcons").length, 2, "There should be two remove icons in the aggregation");
+		destroyFF(oFF);
 
-
-		var oFF = await createFF(oFF);
+		oFF = await createFF();
 		oEvent.target = oFF.$().find(":sapTabbable")[2];
 		oFF.onsapdelete(oEvent);
 		assert.ok(oFF.getAggregation("addFacetButton"), "keyboard onsapdelete tested - can't delete addFacetButton");
+		destroyFF(oFF);
 
-		var oFF = await createFF(oFF);
+		oFF = await createFF();
 		oEvent.target = oFF.$().find(":sapTabbable")[3];
 		oFF.onsapdelete(oEvent);
 		assert.ok(oFF.getAggregation("resetButton"), "keyboard onsapdelete tested - can't delete resetbutton");
+		destroyFF(oFF);
 
-		var oFF = await createFF(oFF);
+		oFF = await createFF();
 		oFF.setShowPersonalization(false);
 		oEvent.target = oFF.$().find(":sapTabbable")[0];
 		assert.equal(oFF.getLists()[0].getActive(), true, "keyboard onsapdelete tested - no delete allowed, list1 active");
 		assert.equal(oFF.getAggregation("buttons").length, 2, "There should be two buttons in the 'buttons' aggregation");
 		assert.equal(oFF.getAggregation("removeFacetIcons").length, 2, "There should be two remove icons in the aggregation");
+		destroyFF(oFF);
 
-		var oFF = await createFF(oFF);
-		var oList = oFF.getLists()[1];
+		oFF = await createFF();
+		const oList = oFF.getLists()[1];
 		oList.setShowRemoveFacetIcon(false);
 		oEvent.target = oFF.$().find(":sapTabbable")[1];
 		assert.equal(oFF.getLists()[1].getActive(), true, "keyboard onsapdelete tested - no delete allowed, list2 active");
 		assert.equal(oFF.getAggregation("buttons").length, 2, "There should be two buttons in the 'buttons' aggregation");
 		assert.equal(oFF.getAggregation("removeFacetIcons").length, 2, "There should be two remove icons in the aggregation");
+		destroyFF(oFF);
 
 		//one of list is inactive
-		var oFF = await createFF(oFF, [
-			new FacetFilterList("list101"),
-			new FacetFilterList("list102", {active: false}),
-			new FacetFilterList("list103") ]);
+		oFF = await createFF([
+			new FacetFilterList(),
+			new FacetFilterList({active: false}),
+			new FacetFilterList() ]);
 
 		oEvent.target = oFF.$().find(":sapTabbable")[1];//this should be the 3th list, as the second is not active
 		oFF.onsapdelete(oEvent);
 		assert.equal(oFF.getLists()[2].getActive(), false, "keyboard onsapdelete when one of list is inactive tested - list103 deleted(should be inactive)");
 		assert.equal(oFF.getAggregation("buttons").length, 2, "keyboard onsapdelete when one of list is inactive tested - There should be two buttons in the 'buttons' aggregation");
 		assert.equal(oFF.getAggregation("removeFacetIcons").length, 2, "keyboard onsapdelete when one of list is inactive tested - There should be two remove icons in the aggregation");
+		destroyFF(oFF);
 
-		var oFF = await createFF(oFF);
+		oFF = await createFF();
 		oFF.getLists()[1].setActive(false);
 		oFF.getLists()[0].setActive(false);
 		oFF.oItemNavigation.setFocusedIndex(0);
 		assert.ok(jQuery(oFF.onsapdelete(oEvent)), "keyboard onsapdelete tested");
-
 		destroyFF(oFF);
 
 	});
 
 
 
-	async function createFF(oFF, aLists) {
-
-		if (oFF) {
-			oFF.destroy();
-			await nextUIUpdate();
-		}
-
-		var oFF = new FacetFilter("someid");
+	async function createFF(aLists) {
+		const oFF = new FacetFilter();
 		oFF.setShowPersonalization(true);
 		if (!aLists) {
-			oFF.addList(new FacetFilterList("list1"));
-			oFF.addList(new FacetFilterList("list2"));
+			oFF.addList(new FacetFilterList());
+			oFF.addList(new FacetFilterList());
 		} else {
 			aLists.forEach(function(oList) {
 				oFF.addList(oList);
 			});
 		}
 
-//		oFF._createResetButton();
 		oFF.placeAt("content");
 		await nextUIUpdate();
 		oFF._startItemNavigation();
 		return oFF;
-
 	}
 	//////////////////////////////////////end////////////////////////////////////////////////////////////
 
@@ -2440,14 +2478,14 @@ sap.ui.define([
 	// BCP: 1880222185
 	QUnit.test("RootDomRef is set to the ItemNavigation", async function (assert) {
 		// Arrange
-		var oFF = new FacetFilter({
+		const oFF = new FacetFilter({
 			type: "Simple",
 			lists: [
-				new FacetFilterList("list1", {
+				new FacetFilterList({
 					key: "item1",
 					title: "Item 1"
 				}),
-				new FacetFilterList("list2", {
+				new FacetFilterList({
 					key: "item2",
 					title: "Item 2"
 				})
@@ -2471,11 +2509,11 @@ sap.ui.define([
 		var oFF = new FacetFilter({
 			type: "Simple",
 			lists: [
-				new FacetFilterList("list1", {
+				new FacetFilterList({
 					key: "item1",
 					title: "Item 1"
 				}),
-				new FacetFilterList("list2", {
+				new FacetFilterList({
 					key: "item2",
 					title: "Item 2"
 				})
