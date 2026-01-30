@@ -91,9 +91,11 @@
 					]
 				})
 			],
-            plugins: new ODataV4Selection({
-                enableNotification: true
-            }),
+			dependents: [
+				new ODataV4Selection({
+					enableNotification: true
+				})
+			],
 			visibleRowCountMode: "Auto"
 		});
 		oTable._oProxy._bEnableV4 = true;
