@@ -3504,7 +3504,6 @@ sap.ui.define([
 		//don't apply parallax effects if there are not enough space for it
 		if (!bShouldPreserveHeaderInTitleArea && ((oHeader && this.getShowHeaderContent()) || this.getShowAnchorBar())) {
 			this._toggleHeader(bShouldStick, !!(oEvent && oEvent.type === "scroll"));
-			this._scrollTo(iScrollTop); // to avoid snap/unsnap caused by the change in header height when there is a difference between the snapped and expanded title heights
 		}
 
 		if (!bShouldPreserveHeaderInTitleArea) {
@@ -3777,7 +3776,19 @@ sap.ui.define([
 	 * @returns this
 	 */
 	ObjectPageLayout.prototype._moveAnchorBarToTitleArea = function () {
+		// Prevent browser from auto-adjusting scrollTop when removing anchorBar would shrink scrollable content
+		var bNeedsPlaceholder = this._needsAnchorBarPlaceholderForScrollPreservation();
+
+		if (bNeedsPlaceholder) {
+			this._$anchorBar.css("height", this.iAnchorBarHeight + "px");
+		}
+
 		this._$anchorBar.children().appendTo(this._$stickyAnchorBar);
+
+		if (bNeedsPlaceholder) {
+			this._adjustTitlePositioning();
+			this._$anchorBar.css("height", "");
+		}
 
 		this._toggleHeaderStyleRules(true);
 
@@ -3788,6 +3799,27 @@ sap.ui.define([
 		}
 
 		return this;
+	};
+
+	/**
+	 * Checks if anchorBar placeholder is needed to prevent unwanted scroll adjustment.
+	 * When removing the anchorBar from scroll container would cause scrollHeight - offsetHeight < scrollTop,
+	 * the browser auto-adjusts scrollTop, which we want to prevent.
+	 * @private
+	 * @returns {boolean} true if placeholder is needed
+	 */
+	ObjectPageLayout.prototype._needsAnchorBarPlaceholderForScrollPreservation = function () {
+		var oWrapper = this._$opWrapper && this._$opWrapper[0],
+			iScrollTop = oWrapper && this._$opWrapper.scrollTop();
+
+		if (!iScrollTop) {
+			return false;
+		}
+
+		var iCurrentMaxScroll = oWrapper.scrollHeight - oWrapper.offsetHeight,
+			iMaxScrollAfterRemoval = iCurrentMaxScroll - this.iAnchorBarHeight;
+
+		return iMaxScrollAfterRemoval < iScrollTop;
 	};
 
 	/**

@@ -65,15 +65,26 @@
 
 		<sections>
 			<ObjectPageSection titleUppercase="false" id="goals" title="2014 Goals Plan">
-			<subSections>
-				<ObjectPageSubSection id="goalsSS1" titleUppercase="false">
-					<blocks>
-						<m:Panel height="1200px" headerText="Goal 1">
-							<m:Text text="Description of Goal 1"/>
-						</m:Panel>
-					</blocks>
-				</ObjectPageSubSection>
-			</subSections>
+				<subSections>
+					<ObjectPageSubSection id="goalsSS1" titleUppercase="false">
+						<blocks>
+							<m:Panel id="testPanel" height="860px" headerText="Goal 1">
+								<m:Text text="Description of Goal 1"/>
+							</m:Panel>
+						</blocks>
+					</ObjectPageSubSection>
+				</subSections>
+				</ObjectPageSection>
+				<ObjectPageSection titleUppercase="false"  title="Section2">
+				<subSections>
+					<ObjectPageSubSection  titleUppercase="false">
+						<blocks>
+							<m:Panel headerText="Goal 1">
+								<m:Text text="Description of Goal 2"/>
+							</m:Panel>
+						</blocks>
+					</ObjectPageSubSection>
+				</subSections>
 			</ObjectPageSection>
 		</sections>
 	</ObjectPageLayout>

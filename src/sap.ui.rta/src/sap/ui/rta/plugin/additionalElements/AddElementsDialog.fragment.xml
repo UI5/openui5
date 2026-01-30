@@ -64,25 +64,8 @@
 					id="rta_addElementsDialogList"
 					mode="MultiSelect"
 					includeItemInSelection="true"
-					growing="true"
-					growingScrollToLoad="true"
-					items="{ path: '/elements', sorter: { path: 'label', descending: false}, templateShareable: false }"
-					noDataText="{i18n>MSG_NO_FIELDS}">
-					<CustomListItem
-						class="sapUIRtaListItem"
-						type="Active"
-						selected="{selected}"
-						tooltip="{tooltip}">
-						<VBox>
-							<Label
-								design="Standard"
-								text="{= ${parentPropertyName} &amp;&amp; ${duplicateName} ? ${label} + ' (' + ${parentPropertyName} + ')' : ${label} }"/>
-							<Label
-								text="{= ${originalLabel} ? ${i18n>LBL_FREP}.replace('{0}', ${originalLabel}) : ''}"
-								visible="{= !!${originalLabel} }"/>
-						</VBox>
-					</CustomListItem>
-				</List>
+					items="{ path: '/elementsFlat', factory: '._createListItem' }"
+					noDataText="{i18n>MSG_NO_FIELDS}"/>
 			</ScrollContainer>
 		</content>
 	</Dialog>

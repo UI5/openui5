@@ -587,7 +587,8 @@ sap.ui.define([
 				}, function (oError0) { // Note: it's OK that this fails
 					assert.strictEqual(oError0.message,
 						"Error occurred while processing the request");
-					assert.strictEqual(oError0.resourcePath, "R#V#C"); //TODO useful?
+					assert.strictEqual(oError0.resourcePath,
+						oSalesOrder1.getPath().slice(1) + "/" + sInvoiceCreated.slice(0, -5));
 				})
 			];
 		}
@@ -623,9 +624,6 @@ sap.ui.define([
 				.withExactArgs("Failed to invoke " + oSalesOrder1.getPath() + "/" + sInvoiceCreated,
 					sinon.match("Error occurred while processing the request"),
 					"sap.ui.model.odata.v4.ODataContextBinding");
-			this.oLogMock.expects("warning").twice() //TODO avoid this!
-				.withExactArgs("Unknown child R#V#C of " + sNamespace + "Container", "/R#V#C",
-					"sap.ui.model.odata.v4.ODataMetaModel");
 
 			await Promise.all([
 				oConfirm1.invoke("$auto", false,

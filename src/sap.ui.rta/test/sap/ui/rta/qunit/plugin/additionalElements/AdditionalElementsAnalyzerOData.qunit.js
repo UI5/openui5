@@ -316,6 +316,64 @@ function(
 			});
 		});
 
+		QUnit.test("when invisible elements are enhanced, entityTypeDisplayName is passed from delegate property", function(assert) {
+			var mTestData = givenSomeControlsRepresentPropertiesWithoutBindings();
+
+			var sEntityTypeDisplayName = "Person";
+			var mActionsObject = {
+				aggregation: "formElements",
+				reveal: {
+					elements: [{
+						action: {},
+						element: mTestData.invisible
+					}]
+				},
+				addViaDelegate: {
+					action: {},
+					relevantContainer: mTestData.form,
+					delegateInfo: {
+						payload: {},
+						delegate: {
+							getPropertyInfo() {
+								return Promise.resolve([{
+									name: "Property01",
+									bindingPath: "Property01",
+									label: "Address"
+								}, {
+									name: "Property02",
+									bindingPath: "Property02",
+									label: "Some Label",
+									entityTypeDisplayName: sEntityTypeDisplayName
+								}]);
+							},
+							getRepresentedProperties() {
+								return Promise.resolve([{
+									id: "visible-representing-Property01",
+									bindingPaths: ["Property01"]
+								}, {
+									id: "invisible-representing-Property02",
+									bindingPaths: ["Property02"]
+								}]);
+							}
+						}
+					}
+				}
+			};
+
+			return AdditionalElementsAnalyzer.enhanceInvisibleElements(
+				mTestData.container, mActionsObject
+			).then(function(aAdditionalElements) {
+				assert.equal(aAdditionalElements.length, 1, "then single invisible element is returned");
+				assert.equal(
+					aAdditionalElements[0].entityTypeDisplayName,
+					sEntityTypeDisplayName,
+					"then the entityTypeDisplayName is set from the delegate property"
+				);
+			}).then(function() {
+				mTestData.form.destroy();
+			});
+		});
+
 		QUnit.test("when getting unrepresented elements from delegate implementing getRepresentedProperties", function(assert) {
 			var mTestData = givenSomeControlsRepresentPropertiesWithoutBindings();
 
@@ -397,6 +455,78 @@ function(
 			return AdditionalElementsAnalyzer.getUnrepresentedDelegateProperties(mTestData.container, mActionsObject).then(function(aAdditionalElements) {
 				assert.equal(aAdditionalElements.length, 1, "then single unrepresented property is returned");
 				assert.equal(aAdditionalElements[0].name, "Property03", "then the element is enhanced by metadata information like original label");
+			}).then(function() {
+				mTestData.form.destroy();
+			});
+		});
+
+		QUnit.test("when properties have the same label but different entity types, they should not be marked as duplicates", function(assert) {
+			const mTestData = givenSomeControlsRepresentPropertiesWithoutBindings();
+
+			const mActionsObject = {
+				relevantContainer: mTestData.form,
+				action: {
+					aggregation: "formElements"
+				},
+				delegateInfo: {
+					payload: {},
+					delegate: {
+						getPropertyInfo() {
+							return Promise.resolve([
+								{
+									name: "Property01",
+									bindingPath: "Property01",
+									entityType: "EntityType01",
+									label: "Same Label",
+									tooltip: "Property from EntityType01",
+									entityTypeDisplayName: "Entity Type A"
+								},
+								{
+									name: "Property02",
+									bindingPath: "Property02",
+									entityType: "EntityType02",
+									label: "Same Label",
+									tooltip: "Property from EntityType02",
+									entityTypeDisplayName: "Entity Type B"
+								},
+								{
+									name: "Property03",
+									bindingPath: "Property03",
+									entityType: "EntityType01",
+									label: "Same Label",
+									tooltip: "Another property from EntityType01 with same entity type display name",
+									entityTypeDisplayName: "Entity Type A"
+								},
+								{
+									name: "Property04",
+									bindingPath: "Property04",
+									entityType: "EntityType01",
+									label: "Same Label",
+									tooltip: "Another property from EntityType01 with different entity type display name",
+									entityTypeDisplayName: "Entity Type A-2"
+								}
+							]);
+						}
+					}
+				}
+			};
+
+			return AdditionalElementsAnalyzer.getUnrepresentedDelegateProperties(
+				mTestData.container, mActionsObject
+			).then(function(aAdditionalElements) {
+				const oProperty01 = aAdditionalElements.find(function(el) { return el.name === "Property01"; });
+				const oProperty02 = aAdditionalElements.find(function(el) { return el.name === "Property02"; });
+				const oProperty03 = aAdditionalElements.find(function(el) { return el.name === "Property03"; });
+				const oProperty04 = aAdditionalElements.find(function(el) { return el.name === "Property04"; });
+
+				assert.ok(oProperty01.duplicateName,
+					"Property01 is marked as duplicate (same label and same entityTypeDisplayName as Property03)");
+				assert.notOk(oProperty02.duplicateName,
+					"Property02 is NOT marked as duplicate (same label but different entityTypeDisplayName)");
+				assert.ok(oProperty03.duplicateName,
+					"Property03 is marked as duplicate (same label and same entityTypeDisplayName as Property01)");
+				assert.notOk(oProperty04.duplicateName,
+					"Property04 is NOT marked as duplicate (same label but different entityTypeDisplayName)");
 			}).then(function() {
 				mTestData.form.destroy();
 			});

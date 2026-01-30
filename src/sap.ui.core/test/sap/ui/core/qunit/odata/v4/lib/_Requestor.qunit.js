@@ -1769,9 +1769,9 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test("request: sOriginalPath, $batch", function () {
-		var sOriginalPath = "TEAM('0')/TEAM_2_EMPLOYEES",
-			oRequestor = _Requestor.create("/", oModelInterface, {}, {}, "4.0"),
+["TEAM('0')/TEAM_2_EMPLOYEES", "R#V#C"].forEach((sOriginalPath, i) => {
+	QUnit.test("request: sOriginalPath=" + sOriginalPath + ", $batch", function () {
+		var oRequestor = _Requestor.create("/", oModelInterface, {}, {}, "4.0"),
 			oResponse = {
 				headers : "~headers~",
 				status : 500
@@ -1783,7 +1783,7 @@ sap.ui.define([
 		this.mock(oModelInterface).expects("onHttpResponse").withExactArgs("~headers~");
 		this.mock(_Helper).expects("createError")
 			.withExactArgs(sinon.match.same(oResponse), "Communication error", "/EMPLOYEES",
-				sOriginalPath)
+				i === 0 ? sOriginalPath : "EMPLOYEES")
 			.returns(new Error());
 
 		// code under test
@@ -1793,6 +1793,7 @@ sap.ui.define([
 			oRequestor.processBatch("groupId")
 		]);
 	});
+});
 
 	//*********************************************************************************************
 	QUnit.test("request(...): batch group id and change sets", function () {

@@ -3,7 +3,6 @@
  */
 
 sap.ui.define([
-	"sap/base/strings/hash",
 	"sap/base/util/restricted/_uniqBy",
 	"sap/base/util/each",
 	"sap/base/util/merge",
@@ -11,11 +10,11 @@ sap.ui.define([
 	"sap/ui/fl/Utils",
 	"sap/ui/fl/initial/api/Version",
 	"sap/ui/fl/write/connectors/BaseConnector",
+	"sap/ui/fl/initial/_internal/connectors/Utils",
 	"sap/ui/fl/initial/_internal/StorageUtils",
 	"sap/ui/fl/apply/_internal/connectors/ObjectStorageUtils",
 	"sap/ui/fl/write/_internal/init"
 ], function(
-	hash,
 	_uniqBy,
 	each,
 	merge,
@@ -23,6 +22,7 @@ sap.ui.define([
 	Utils,
 	Version,
 	BaseConnector,
+	ConnectorUtils,
 	StorageUtils,
 	ObjectStorageUtils
 ) {
@@ -78,12 +78,6 @@ sap.ui.define([
 			oFlexObject.creation = new Date(nCreationTimestamp).toISOString();
 		}
 		return oFlexObject;
-	}
-
-	function calculateCacheKey(aFlexObjects) {
-		return hash(aFlexObjects.reduce(function(sKey, oFlexObject) {
-			return sKey + new Date(oFlexObject.creation).getTime();
-		}, ""));
 	}
 
 	/* the structure of create and update is like
@@ -270,7 +264,7 @@ sap.ui.define([
 			const mGroupedFlexObjects = StorageUtils.getGroupedFlexObjects(aSortedFilteredFlexObjects);
 			const aResponses = StorageUtils.filterAndSortResponses(mGroupedFlexObjects);
 			if (aResponses.length) {
-				aResponses[0].cacheKey = calculateCacheKey(aSortedFilteredFlexObjects);
+				aResponses[0].cacheKey = ConnectorUtils.calculateCacheKey(aSortedFilteredFlexObjects);
 			}
 			return aResponses;
 		},
