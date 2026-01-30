@@ -17,7 +17,9 @@ sap.ui.define([
     "sap/ui/commons/layout/MatrixLayoutRow",
     "sap/ui/commons/Button",
     "sap/ui/commons/layout/MatrixLayout",
-    "sap/ui/events/KeyCodes"
+    "sap/ui/events/KeyCodes",
+    "sap/ui/core/ControlBehavior",
+    "sap/ui/core/Configuration"
 ], function(
     qutils,
 	createAndAppendDiv,
@@ -36,7 +38,9 @@ sap.ui.define([
 	MatrixLayoutRow,
 	Button,
 	MatrixLayout,
-	KeyCodes
+	KeyCodes,
+	ControlBehavior,
+	Configuration
 ) {
 	"use strict";
 
@@ -56,6 +60,7 @@ sap.ui.define([
 	// prepare DOM
 	createAndAppendDiv("uiArea1");
 
+	ControlBehavior.setAnimationMode(Configuration.AnimationMode.none);
 
 	// helper function to create a row with label and text
 	function createLMatrixLayoutRowRow(sLabel, sText) {
@@ -240,7 +245,7 @@ sap.ui.define([
 
 	QUnit.test("OpenNew Event", function(assert) {
 		assert.expect(1);
-		qutils.triggerMouseEvent(oThingInspector.$("openNew"), "click", 1, 1, 1, 1);
+		qutils.triggerMouseEvent(oThingInspector.getDomRef("openNew"), "click", 1, 1, 1, 1);
 	});
 
 	QUnit.test("OpenNew via Keyboard Event", function(assert) {
@@ -252,16 +257,16 @@ sap.ui.define([
 	QUnit.test("ActionSelected Event", function(assert) {
 		assert.expect(2);
 		action = "delete";
-		qutils.triggerMouseEvent(oThingInspector.$("actionBar-deleteButton"), "click", 1, 1, 1, 1);
+		qutils.triggerMouseEvent(oThingInspector.getDomRef("actionBar-deleteButton"), "click", 1, 1, 1, 1);
 	});
 
 	QUnit.test("FavoriteSelected Event", function(assert) {
 		assert.expect(7);
 		assert.ok(!oThingInspector.getFavoriteState(), "Favorite State is false");
 		action = "favorite";
-		qutils.triggerMouseEvent(oThingInspector.$("actionBar-Favorite"), "click", 1, 1, 1, 1);
+		qutils.triggerMouseEvent(oThingInspector.getDomRef("actionBar-Favorite"), "click", 1, 1, 1, 1);
 		assert.ok(oThingInspector.getFavoriteState(), "Favorite State is true");
-		qutils.triggerMouseEvent(oThingInspector.$("actionBar-Favorite"), "click", 1, 1, 1, 1);
+		qutils.triggerMouseEvent(oThingInspector.getDomRef("actionBar-Favorite"), "click", 1, 1, 1, 1);
 		assert.ok(!oThingInspector.getFavoriteState(), "Favorite State is false");
 	});
 
@@ -277,7 +282,7 @@ sap.ui.define([
 		action = "favorite";
 		setTimeout(function() {
 			assert.ok(!oThingInspector.getDomRef("favorite"), "Action not rendered anymore");
-			qutils.triggerMouseEvent(oThingInspector.$("favorite"), "click", 1, 1, 1, 1);
+			qutils.triggerMouseEvent(oThingInspector.getDomRef("favorite"), "click", 1, 1, 1, 1);
 			done();
 		},500);
 	});
@@ -286,9 +291,9 @@ sap.ui.define([
 		assert.expect(7);
 		assert.ok(!oThingInspector.getFlagState(), "Flag State is false");
 		action = "flag";
-		qutils.triggerMouseEvent(oThingInspector.$("actionBar-Flag"), "click", 1, 1, 1, 1);
+		qutils.triggerMouseEvent(oThingInspector.getDomRef("actionBar-Flag"), "click", 1, 1, 1, 1);
 		assert.ok(oThingInspector.getFlagState(), "Flag State is true");
-		qutils.triggerMouseEvent(oThingInspector.$("actionBar-Flag"), "click", 1, 1, 1, 1);
+		qutils.triggerMouseEvent(oThingInspector.getDomRef("actionBar-Flag"), "click", 1, 1, 1, 1);
 		assert.ok(!oThingInspector.getFlagState(), "Flag State is false");
 	});
 
@@ -296,7 +301,6 @@ sap.ui.define([
 		assert.expect(7);
 		assert.ok(!oThingInspector.getFlagState(), "Flag State is false");
 		action = "flag";
-		//oThingInspector.$("flag").trigger("focus");
 		qutils.triggerKeyboardEvent(oThingInspector.getId() + "-actionBar-Flag", KeyCodes.ENTER, false, false, false);
 		assert.ok(oThingInspector.getFlagState(), "Flag State is true");
 		qutils.triggerKeyboardEvent(oThingInspector.getId() + "-actionBar-Flag", KeyCodes.SPACE, false, false, false);
@@ -315,53 +319,57 @@ sap.ui.define([
 		action = "flag";
 		setTimeout(function() {
 			assert.ok(!oThingInspector.getDomRef("actionBar-Flag"), "Action not rendered anymore");
-			qutils.triggerMouseEvent(oThingInspector.$("actionBar-Flag"), "click", 1, 1, 1, 1);
+			qutils.triggerMouseEvent(oThingInspector.getDomRef("actionBar-Flag"), "click", 1, 1, 1, 1);
 			done();
 		},500);
 	});
 
 	QUnit.test("UpdateSelected Event", function(assert) {
-		var done = assert.async();
-		assert.expect(2);
+		assert.expect(4);
 		action = "update";
-		qutils.triggerMouseEvent(oThingInspector.$("actionBar-Update"), "click", 1, 1, 1, 1);
-		setTimeout(function() {
-			assert.ok(oThingInspector.getDomRef("actionBar-UpdateActionPopup"), "Rendered update popup should exist in the page");
-			//click again should hide comment popup
-			qutils.triggerMouseEvent(oThingInspector.$("actionBar-Update"), "click", 1, 1, 1, 1);
-			setTimeout(function() {
-				assert.equal(oThingInspector.$("actionBar-UpdateActionPopup").length, 0,
-						"Rendered update popup was removed in the page");
-				done();
-			}, 500);
-		}, 500);
+
+		// Prepare - Verify update popup exists in ActionBar
+		var oActionBar = oThingInspector.getActionBar();
+		assert.ok(oActionBar, "ActionBar exists");
+		assert.ok(oActionBar._oUpdatePopup, "Update popup should be initialized");
+
+		// Act & Assert - Click should open comment popup
+		qutils.triggerMouseEvent(oThingInspector.getDomRef("actionBar-Update"), "click");
+
+		assert.ok(oActionBar._oUpdatePopup.isOpen(), "Update popup opened successfully");
+
+		// Act & Assert - Second click should close comment popup
+		qutils.triggerMouseEvent(oThingInspector.getDomRef("actionBar-Update"), "click");
+		assert.notOk(oActionBar._oUpdatePopup.isOpen(), "Update popup closed successfully after second click");
 	});
 
 	QUnit.test("FeedSubmit Event", function(assert) {
-		var done = assert.async();
 		assert.expect(5);
 		action = "update";
-		qutils.triggerMouseEvent(oThingInspector.$("actionBar-Update"), "click", 1, 1, 1, 1);
-		setTimeout(function() {
-			assert.ok(oThingInspector.getDomRef("actionBar-UpdateActionPopup"), "Rendered update popup should exist in the page");
-			jQuery(jQuery(".sapUiFeederInput")[0]).trigger("focus");
-			setTimeout(function() {
-				jQuery(".sapUiFeederInput")[0].innerHTML = "my feed entry";
-				setTimeout(function() {
-					jQuery(jQuery(".sapUiFeederInput")[0]).trigger("keyup");
-					setTimeout(function() {
-						//click on feed submit button should hide comment popup
-						qutils.triggerMouseEvent(oThingInspector.$('actionBar-Feeder-send'), "click", 1, 1, 1, 1);
-						setTimeout(function() {
-							assert.ok(oThingInspector.$("actionBar-UpdateActionPopup"), "Rendered comment popup should exist in the page");
-							assert.equal(oThingInspector.$("actionBar-UpdateActionPopup").length, 0,
-									"Rendered update popup was removed in the page");
-							done();
-						}, 500);
-					}, 500);
-				}, 500);
-			}, 500);
-		}, 500);
+
+		// Prepare - Spy on the feedSubmit event
+		var oSpy = this.spy();
+		oThingInspector.attachEventOnce("feedSubmit", oSpy);
+
+		// Prepare - Open the update popup
+		var oActionBar = oThingInspector.getActionBar();
+		qutils.triggerMouseEvent(oThingInspector.getDomRef("actionBar-Update"), "click");
+		assert.ok(oActionBar._oUpdatePopup.isOpen(), "Update popup opened successfully");
+
+		// Act - Type text and submit feed entry
+		var oFeeder = oActionBar._feeder;
+		var oFeederInput = oFeeder.getDomRef("input");
+
+		oFeederInput.innerHTML = "my feed entry";
+		qutils.triggerKeyup(oFeederInput);
+
+		// Click the submit button
+		var oSendButton = oFeeder.getDomRef("send");
+		qutils.triggerMouseEvent(oSendButton, "click");
+
+		// Assert - Verify event was fired and received correct parameters
+		assert.ok(oSpy.calledOnce, "FeedSubmit event was fired once");
+		assert.equal(oSpy.firstCall.args[0].getParameter("text"), "my feed entry", "Event received correct text parameter");
 	});
 
 	QUnit.test("Disable Update Action", function(assert) {
@@ -376,27 +384,36 @@ sap.ui.define([
 		action = "update";
 		setTimeout(function() {
 			assert.ok(!oThingInspector.getDomRef("update"), "Action not rendered anymore");
-			qutils.triggerMouseEvent(oThingInspector.$("update"), "click", 1, 1, 1, 1);
+			qutils.triggerMouseEvent(oThingInspector.getDomRef("update"), "click", 1, 1, 1, 1);
 			done();
 		},500);
 	});
 
 	QUnit.test("Open Method", function(assert) {
-		var done = assert.async();
-		assert.expect(5);
+		assert.expect(7);
 		facet = "overview";
-		oThingInspector.close();
+
+		// Prepare - Ensure ThingInspector is closed first
+		if (oThingInspector.isOpen()){
+			oThingInspector.close();
+		}
+		assert.notOk(oThingInspector.isOpen(), "ThingInspector is closed");
+
+		// Verify button doesn't exist yet
+		var sButtonId = oThingInspector.getId() + facet + "FacetButton";
+		assert.notOk(window.document.getElementById(sButtonId), "Button should not exist before opening");
+
 		oThingInspector.setSelectedFacet(null);
-		setTimeout(function() {
-			oThingInspector.open();
-			assert.ok(oThingInspector.isOpen(), "Rendered ThingInspector is open");
-			setTimeout(
-					function() {
-						assert.ok(window.document.getElementById(oThingInspector.getId() + facet + "FacetButton"), "Rendered Facet Content for facet " + facet
-								+ " should exist in the page");
-						done();
-					}, 500);
-		}, 500);
+
+		// Act - Open the ThingInspector
+		oThingInspector.open();
+
+		//Assert - ThingInspector is open
+		assert.ok(oThingInspector.isOpen(), "ThingInspector is open");
+
+		// Assert - DynamicFacetContent is created for the selected facet
+		assert.ok(window.document.getElementById(sButtonId),
+			"Rendered Facet Content for facet " + facet + " should exist in the page after opening");
 	});
 
 	QUnit.test("FacetSelected Event", function(assert) {
@@ -418,10 +435,10 @@ sap.ui.define([
 		assert.equal(oThingInspector.getFollowState(), FollowActionState.Default, "Follow State is sap.ui.ux3.FollowActionState.Default");
 		action = "follow";
 		// trigger follow
-		qutils.triggerMouseEvent(oThingInspector.$("actionBar-Follow"), "click", 1, 1, 1, 1);
+		qutils.triggerMouseEvent(oThingInspector.getDomRef("actionBar-Follow"), "click", 1, 1, 1, 1);
 		assert.equal(oThingInspector.getFollowState(), FollowActionState.Follow, "Follow State is sap.ui.ux3.FollowActionState.Follow");
 		// menu must exist after click
-		qutils.triggerMouseEvent(oThingInspector.$("actionBar-Follow"), "click", 1, 1, 1, 1);
+		qutils.triggerMouseEvent(oThingInspector.getDomRef("actionBar-Follow"), "click", 1, 1, 1, 1);
 		assert.ok(oThingInspector.getDomRef("actionBar-followActionMenu"), "Rendered Follow Action menu should exist in the page");
 
 		setTimeout(function() {
@@ -429,11 +446,11 @@ sap.ui.define([
 			assert.ok(oThingInspector.getDomRef("actionBar-holdState"), "Rendered Follow Action menu with holdState should exist in the page");
 			assert.ok(oThingInspector.getDomRef("actionBar-unfollowState"), "Rendered Follow Action menu with unfollowState should exist in the page");
 			// trigger hold
-			qutils.triggerMouseEvent(oThingInspector.$("actionBar-holdState"), "click", 1, 1, 1, 1);
+			qutils.triggerMouseEvent(oThingInspector.getDomRef("actionBar-holdState"), "click", 1, 1, 1, 1);
 			setTimeout(function() {
 				assert.equal(oThingInspector.getFollowState(), FollowActionState.Hold, "Follow State is sap.ui.ux3.FollowActionState.Hold");
 				// menu must exist after click
-				qutils.triggerMouseEvent(oThingInspector.$("actionBar-Follow"), "click", 1, 1, 1, 1);
+				qutils.triggerMouseEvent(oThingInspector.getDomRef("actionBar-Follow"), "click", 1, 1, 1, 1);
 				assert.ok(oThingInspector.getDomRef("actionBar-followActionMenu"), "Rendered Follow Action menu should exist in the page");
 
 				setTimeout(
@@ -476,22 +493,26 @@ sap.ui.define([
 		action = "follow";
 		setTimeout(function() {
 			assert.ok(!oThingInspector.getDomRef("follow"), "Action not rendered anymore");
-			qutils.triggerMouseEvent(oThingInspector.$("follow"), "click", 1, 1, 1, 1);
+			qutils.triggerMouseEvent(oThingInspector.getDomRef("follow"), "click", 1, 1, 1, 1);
 			done();
 		},500);
 	});
 
 	// at the end close
 	QUnit.test("Close Event", function(assert) {
-		var done = assert.async();
 		assert.expect(3);
-		assert.ok(oThingInspector.isOpen(), "Rendered ThingInspector is open");
 
-		qutils.triggerMouseEvent(oThingInspector.$("close"), "click", 1, 1, 1, 1);
-		setTimeout(function() {
-			assert.ok(!oThingInspector.isOpen(), "Rendered ThingInspector is not open");
-			done();
-		}, 500);
+		// Prepare - Ensure ThingInspector is open first
+		if (!oThingInspector.isOpen()) {
+			oThingInspector.open();
+		}
+		assert.ok(oThingInspector.isOpen(), "ThingInspector is initially open");
+
+		// Act - Close the ThingInspector
+		qutils.triggerMouseEvent(oThingInspector.getDomRef("close"), "click", 1, 1, 1, 1);
+
+		// Assert - ThingInspector is closed
+		assert.ok(!oThingInspector.isOpen(), "ThingInspector is closed");
 	});
 
 	QUnit.test("Destroy and remove control", function(assert) {
