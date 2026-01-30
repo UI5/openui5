@@ -207,6 +207,76 @@ sap.ui.define([
 			});
 		});
 	});
+
+	QUnit.module("calculateCacheKey", {
+		afterEach() {
+			sandbox.restore();
+		}
+	}, function() {
+		QUnit.test("when calculateCacheKey is called with an empty array", function(assert) {
+			const aFlexObjects = [];
+			const iResult = Utils.calculateCacheKey(aFlexObjects);
+			assert.strictEqual(iResult, 0, "an empty string hashes to 0");
+		});
+
+		QUnit.test("when calculateCacheKey is called with a single flex object", function(assert) {
+			const aFlexObjects = [
+				{ creation: "2025-01-15T10:30:00.000Z" }
+			];
+			const iResult = Utils.calculateCacheKey(aFlexObjects);
+			assert.strictEqual(typeof iResult, "number", "the result is a number");
+		});
+
+		QUnit.test("when calculateCacheKey is called with multiple flex objects", function(assert) {
+			const aFlexObjects = [
+				{ creation: "2025-01-15T10:30:00.000Z" },
+				{ creation: "2025-01-16T14:45:00.000Z" },
+				{ creation: "2025-01-17T09:00:00.000Z" }
+			];
+			const iResult = Utils.calculateCacheKey(aFlexObjects);
+			assert.strictEqual(typeof iResult, "number", "the result is a number");
+		});
+
+		QUnit.test("when calculateCacheKey returns different hashes for different creation dates", function(assert) {
+			const aFlexObjects1 = [
+				{ creation: "2025-01-15T10:30:00.000Z" }
+			];
+			const aFlexObjects2 = [
+				{ creation: "2025-01-16T10:30:00.000Z" }
+			];
+			const iResult1 = Utils.calculateCacheKey(aFlexObjects1);
+			const iResult2 = Utils.calculateCacheKey(aFlexObjects2);
+			assert.notStrictEqual(iResult1, iResult2, "different creation dates produce different hashes");
+		});
+
+		QUnit.test("when calculateCacheKey returns the same hash for the same creation dates", function(assert) {
+			const aFlexObjects1 = [
+				{ creation: "2025-01-15T10:30:00.000Z" },
+				{ creation: "2025-01-16T14:45:00.000Z" }
+			];
+			const aFlexObjects2 = [
+				{ creation: "2025-01-15T10:30:00.000Z" },
+				{ creation: "2025-01-16T14:45:00.000Z" }
+			];
+			const iResult1 = Utils.calculateCacheKey(aFlexObjects1);
+			const iResult2 = Utils.calculateCacheKey(aFlexObjects2);
+			assert.strictEqual(iResult1, iResult2, "same creation dates produce the same hash");
+		});
+
+		QUnit.test("when calculateCacheKey returns different hashes for different order of flex objects", function(assert) {
+			const aFlexObjects1 = [
+				{ creation: "2025-01-15T10:30:00.000Z" },
+				{ creation: "2025-01-16T14:45:00.000Z" }
+			];
+			const aFlexObjects2 = [
+				{ creation: "2025-01-16T14:45:00.000Z" },
+				{ creation: "2025-01-15T10:30:00.000Z" }
+			];
+			const iResult1 = Utils.calculateCacheKey(aFlexObjects1);
+			const iResult2 = Utils.calculateCacheKey(aFlexObjects2);
+			assert.notStrictEqual(iResult1, iResult2, "different order produces different hashes");
+		});
+	});
 });
 QUnit.done(function() {
 	"use strict";

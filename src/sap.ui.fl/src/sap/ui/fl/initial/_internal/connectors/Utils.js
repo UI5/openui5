@@ -3,13 +3,15 @@
  */
 
 sap.ui.define([
-	"sap/ui/core/Lib",
 	"sap/base/i18n/Localization",
-	"sap/base/security/encodeURLParameters"
+	"sap/base/security/encodeURLParameters",
+	"sap/base/strings/hash",
+	"sap/ui/core/Lib"
 ], function(
-	Lib,
 	Localization,
-	encodeURLParameters
+	encodeURLParameters,
+	hash,
+	Lib
 ) {
 	"use strict";
 
@@ -255,6 +257,18 @@ sap.ui.define([
 					xhr.send();
 				}
 			});
+		},
+
+		/**
+		 * Calculates hash key based on the creation dates of the flex objects.
+		 *
+		 * @param {sap.ui.fl.apply._internal.flexObjects.FlexObject[]} aFlexObjects - Array of flex objects
+		 * @returns {int} Hash key
+		 */
+		calculateCacheKey(aFlexObjects) {
+			return hash(aFlexObjects.reduce(function(sKey, oFlexObject) {
+				return sKey + new Date(oFlexObject.creation).getTime();
+			}, ""));
 		}
 	};
 });

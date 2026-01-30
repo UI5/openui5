@@ -3,18 +3,26 @@
  */
 
 sap.ui.define([
-	"sap/base/Log",
+	"sap/base/strings/hash",
 	"sap/base/util/LoaderExtensions",
 	"sap/base/util/merge",
+	"sap/base/util/ObjectPath",
+	"sap/base/Log",
 	"sap/ui/core/Component",
 	"sap/ui/core/Supportability",
+	"sap/ui/fl/initial/_internal/connectors/Utils",
+	"sap/ui/fl/initial/_internal/StorageUtils",
 	"sap/ui/fl/interfaces/BaseLoadConnector"
 ], function(
-	Log,
+	hash,
 	LoaderExtensions,
 	merge,
+	ObjectPath,
+	Log,
 	Component,
 	Supportability,
+	ConnectorUtils,
+	StorageUtils,
 	BaseConnector
 ) {
 	"use strict";
@@ -56,27 +64,34 @@ sap.ui.define([
 		 * @returns {Promise<Object>} Resolving with an object containing a data contained in the bundle
 		 */
 		loadFlexData(mPropertyBag) {
-			var sComponentName = mPropertyBag.componentName;
-
 			// fallback in case the loadFlexData was called without passing the component name
-			sComponentName ||= mPropertyBag.reference.replace(/.Component/g, "");
+			const sComponentName = mPropertyBag.componentName || mPropertyBag.reference.replace(/.Component/g, "");
 
-			var oFlexBundle = getBundle(sComponentName, "flexibility-bundle");
+			let oFlexData;
+			const oFlexBundle = getBundle(sComponentName, "flexibility-bundle");
 			if (oFlexBundle) {
 				// TODO: remove as soon as the client also does the separation of compVariants and changes
 				oFlexBundle.changes = oFlexBundle.changes.concat(oFlexBundle.compVariants);
 				delete oFlexBundle.compVariants;
-				return Promise.resolve(oFlexBundle);
+				oFlexData = oFlexBundle;
 			}
 
-			var oChangesBundle = getBundle(sComponentName, "changes-bundle");
+			const oChangesBundle = getBundle(sComponentName, "changes-bundle");
 			if (oChangesBundle) {
-				return Promise.resolve({
+				oFlexData = {
 					changes: oChangesBundle
-				});
+				};
 			}
 
-			return Promise.resolve();
+			if (StorageUtils.isStorageResponseFilled(oFlexData)) {
+				// Collect all flex objects to calculate the cacheKey
+				const aFlexObjects = StorageUtils.getAllFlexObjectNamespaces().reduce(function(aFlexObjects, sKey) {
+					const aCurrentFlexObjects = ObjectPath.get(sKey, oFlexData);
+					return aCurrentFlexObjects?.length ? aFlexObjects.concat(aCurrentFlexObjects) : aFlexObjects;
+				}, []);
+				oFlexData.cacheKey = ConnectorUtils.calculateCacheKey(aFlexObjects);
+			}
+			return Promise.resolve(oFlexData);
 		},
 
 		loadFeatures() {

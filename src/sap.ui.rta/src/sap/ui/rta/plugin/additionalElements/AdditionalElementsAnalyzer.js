@@ -121,7 +121,7 @@ sap.ui.define([
 	}
 
 	function oPropertyToAdditionalElementInfo(oProperty) {
-		return {
+		const oReturn = {
 			selected: false,
 			label: oProperty.label || oProperty.name,
 			parentPropertyName: oProperty.parentPropertyName ? oProperty.parentPropertyName : "",
@@ -134,6 +134,10 @@ sap.ui.define([
 			name: oProperty.name,
 			bindingPath: oProperty.bindingPath
 		};
+		if (oProperty.entityTypeDisplayName) {
+			oReturn.entityTypeDisplayName = oProperty.entityTypeDisplayName;
+		}
+		return oReturn;
 	}
 
 	function getLabel(oElement, mAction) {
@@ -150,7 +154,7 @@ sap.ui.define([
 	function elementToAdditionalElementInfo(mData) {
 		const oElement = mData.element;
 		const sLabel = getLabel(oElement, mData.action);
-		return {
+		const oReturn = {
 			selected: false,
 			label: oElement.__label || sLabel,
 			tooltip: oElement.__tooltip || sLabel || oElement.__bindingPath,
@@ -163,6 +167,10 @@ sap.ui.define([
 			elementId: oElement.getId(),
 			sourceAggregation: mData.sourceAggregation
 		};
+		if (oElement.__entityTypeDisplayName) {
+			oReturn.entityTypeDisplayName = oElement.__entityTypeDisplayName;
+		}
+		return oReturn;
 	}
 
 	/**
@@ -189,17 +197,36 @@ sap.ui.define([
 		return [oElement];
 	}
 
+	/**
+	 * Marks properties with duplicate labels within the same entity type display name.
+	 * The same entity can have different contexts (e.g. peer and manager both from Person entity),
+	 * that's why we use the display name and not the entity type itself.
+	 *
+	 * @param {object[]} aProperties - Array of property objects
+	 * @returns {object[]} - The same array with duplicateName flag set where applicable
+	 */
 	function checkForDuplicateProperties(aProperties) {
-		aProperties.forEach(function(oModelProperty, index, aProperties) {
-			if (oModelProperty.duplicateName !== true) {
-				for (let j = index + 1; j < aProperties.length - 1; j++) {
-					if (oModelProperty.label === aProperties[j].label) {
-						oModelProperty.duplicateName = true;
-						aProperties[j].duplicateName = true;
-					}
-				}
+		// Group properties by entityType and label to find duplicates
+		const mLabelsByEntityTypeDisplayName = {};
+
+		aProperties.forEach(function(oProperty) {
+			const sEntityTypeDisplayName = oProperty.entityTypeDisplayName || "";
+			const sLabel = oProperty.label || "";
+			const sKey = `${sEntityTypeDisplayName}|||${sLabel}`;
+
+			mLabelsByEntityTypeDisplayName[sKey] ||= [];
+			mLabelsByEntityTypeDisplayName[sKey].push(oProperty);
+		});
+
+		// Mark properties as duplicates if there are multiple with the same entityType display name and label
+		Object.values(mLabelsByEntityTypeDisplayName).forEach(function(aPropertiesWithSameLabel) {
+			if (aPropertiesWithSameLabel.length > 1) {
+				aPropertiesWithSameLabel.forEach(function(oProperty) {
+					oProperty.duplicateName = true;
+				});
 			}
 		});
+
 		return aProperties;
 	}
 
@@ -312,8 +339,10 @@ sap.ui.define([
 	 */
 	function enhanceInvisibleElement(oInvisibleElement, mSomeItem) {
 		oInvisibleElement.__originalLabel = mSomeItem.label;
-
 		oInvisibleElement.__tooltip = mSomeItem.tooltip;
+		if (mSomeItem.entityTypeDisplayName) {
+			oInvisibleElement.__entityTypeDisplayName = mSomeItem.entityTypeDisplayName;
+		}
 
 		// found element
 		oInvisibleElement.__bindingPath = mSomeItem.name;

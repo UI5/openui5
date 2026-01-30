@@ -193,8 +193,12 @@ sap.ui.define([
 			// open context menu (context menu) and select add field
 			RtaQunitUtils.openContextMenuWithKeyboard.call(this, this.oCompanyCodeFieldOverlay).then(async function() {
 				oDialog.attachOpened(async function() {
-					const oFieldToAdd = oDialog._oList.getItems()[1];
-					const sFieldToAddText = oFieldToAdd.getContent()[0].getItems()[0].getText();
+					// Skip group header items and get the first selectable (non-header) item
+					const aListItems = oDialog._oList.getItems();
+					const oFieldToAdd = aListItems.find((oItem) => !oItem.isA("sap.m.GroupHeaderListItem"));
+					// Get the label text from the FormattedText control and strip HTML tags
+					const sHtmlText = oFieldToAdd.getContent()[0].getItems()[0].getHtmlText();
+					const sFieldToAddText = sHtmlText.replace(/<[^>]*>/g, "");
 
 					// observer gets called when the Group changes. Then the new field is on the UI.
 					const oObserver = new MutationObserver(function() {

@@ -150,10 +150,10 @@ sap.ui.define([
 
 				// render appointments which started in previous rows
 				if (j === 0) {
-					this.renderAppointments(oRm, oControl, aPreviousWeekAppsPerDay[iCellIndex], j, aMoreCountPerCell[iCellIndex], oDensitySizes, i, oDay, aCells);
+					this.renderAppointments(oRm, oControl, aPreviousWeekAppsPerDay[iCellIndex], j, aMoreCountPerCell[iCellIndex], oDensitySizes, i, oDay, aCells, iCellIndex);
 				}
 
-				this.renderAppointments(oRm, oControl, aAppsPerDay[iCellIndex], j, aMoreCountPerCell[iCellIndex], oDensitySizes, i, oDay, aCells);
+				this.renderAppointments(oRm, oControl, aAppsPerDay[iCellIndex], j, aMoreCountPerCell[iCellIndex], oDensitySizes, i, oDay, aCells, iCellIndex);
 			}
 
 			oRm.close("div"); // end appointments
@@ -162,21 +162,20 @@ sap.ui.define([
 			for (j = 0; j < iColumns; j++) {
 				iCellIndex = i * iColumns + j;
 				oDay = aCells[iCellIndex];
-				this.renderDay(oRm, oControl, oDay, oLocaleData, aMoreCountPerCell[iCellIndex], iCellIndex, iWeekNumber);
+				this.renderDay(oRm, oControl, oDay, iCellIndex, iWeekNumber);
 			}
 			oRm.close("div"); // end cells
 			oRm.close("div"); // end grid
 		}
 	};
 
-	SinglePlanningCalendarMonthGridRenderer.renderDay = function(oRm, oControl, oDay, oLocaleData, more, iCellIndex, iWeekNumber) {
+	SinglePlanningCalendarMonthGridRenderer.renderDay = function(oRm, oControl, oDay, iCellIndex, iWeekNumber) {
 		var aSpecialDates = oControl._getSpecialDates(),
 			aDayTypes = Month.prototype._getDateTypes.call(oControl, oDay),
 			oFormat = oControl._getDateFormatter(),
 			bToday = oDay.isSame(CalendarDate.fromLocalJSDate(UI5Date.getInstance())),
 			oType,
-			sLegendItemType,
-			sMoreLinkDescId;
+			sLegendItemType;
 
 		oRm.openStart("div");
 		oRm.class("sapMSPCMonthDay");
@@ -230,23 +229,6 @@ sap.ui.define([
 		oRm.text(oDay.getDate());
 		oRm.close("div");
 
-		if (more) {
-			sMoreLinkDescId = oFormat.format(oDay.toLocalJSDate()) + "-MoreLinkDesc";
-			oRm.openStart("div");
-			oRm.class("sapMSPCMonthLnkMore");
-			oRm.openEnd();
-
-			oRm.renderControl(oControl._getMoreLink(more, oDay, iCellIndex, sMoreLinkDescId));
-
-			oRm.openStart("span", sMoreLinkDescId);
-			oRm.class("sapUiInvisibleText");
-			oRm.openEnd();
-			oRm.text(oControl._getMoreLinkDescription(more, oDay.toLocalJSDate()));
-			oRm.close("span");
-
-			oRm.close("div");
-		}
-
 		oRm.openStart("span", oFormat.format(oDay.toLocalJSDate()) + "-Descr");
 		oRm.class("sapUiInvisibleText");
 		oRm.openEnd();
@@ -267,7 +249,7 @@ sap.ui.define([
 		oRm.close("div");
 	};
 
-	SinglePlanningCalendarMonthGridRenderer.renderAppointments = function(oRm, oControl, apps, iColumn, iMore, oDensitySizes, iRow, oDay, aDays) {
+	SinglePlanningCalendarMonthGridRenderer.renderAppointments = function(oRm, oControl, apps, iColumn, iMore, oDensitySizes, iRow, oDay, aDays, iCellIndex) {
 		var MAX_APPS = oControl._getMaxAppointments(),
 			iMaxLvl = iMore ? MAX_APPS - 2 : MAX_APPS - 1,
 			iColumns = oControl._getColumns(),
@@ -281,10 +263,16 @@ sap.ui.define([
 
 			if (oApp.level <= iMaxLvl) {
 				bRenderDateOutsideRow = oApp._nextDay > iRowEndIndex;
+
 				if (oApp._nextDay === undefined || bRenderDateOutsideRow) {
 					continue;
 				}
+
 				this.renderAppointment(oRm, oControl, oApp, iColumn, oDensitySizes, iRow, oDay);
+
+				if (oApp.level === iMaxLvl && iMore) {
+					this.renderMoreLink(oRm, oControl, iMore, oDay, iColumn, iColumns, oApp, oDensitySizes, iCellIndex);
+				}
 			} else if (oApp._overflows) {
 				//If it's an overflowing appointment, start from first available level of next day.
 				oApp.level = oApp._nextDayLevel;
@@ -293,6 +281,7 @@ sap.ui.define([
 				}
 			}
 		}
+
 	};
 
 	SinglePlanningCalendarMonthGridRenderer.renderAppointment = function(oRm, oControl, app, iColumn, oDensitySizes, iRow, oDay) {
@@ -365,19 +354,7 @@ sap.ui.define([
 				iLevel = app.level;
 			}
 
-			if (sThemeName.includes("horizon")){
-				if (oToday) {
-					iBorderThickness = sThemeName.indexOf("_hc") ? 0.4375 : 0.0625;
-				} else {
-					iBorderThickness = sThemeName.indexOf("_hc") ? 0.1875 : 0.0625;
-				}
-			} else {
-				if (oToday) {
-					iBorderThickness = sThemeName.indexOf("_hc") ? 0.3125 : 0.0625;
-				} else {
-					iBorderThickness = sThemeName.indexOf("_hc") ? 0.125 : 0.0625;
-				}
-			}
+			iBorderThickness = this.getBorderThickness(sThemeName, oToday);
 
 		iRight = iRight < 0 ? 0 : iRight;
 
@@ -433,6 +410,7 @@ sap.ui.define([
 				oRm.style("border-left-color", sColor);
 			}
 		}
+
 		oRm.style(bIsRTL ? "right" : "left", "calc(" + (iColumn * 100) / iColumns + "% + " + iBorderThickness + "rem)");
 		oRm.style(bIsRTL ? "left" : "right", "calc(" + (iRight * 100) / iColumns + "% + " + iBorderThickness + "rem)");
 		oRm.style("top", (iLevel * oDensitySizes.appHeight + oDensitySizes.cellHeaderHeight) + "rem");
@@ -509,6 +487,51 @@ sap.ui.define([
 
 		oRm.close("div");
 		oRm.close("div");
+	};
+
+	SinglePlanningCalendarMonthGridRenderer.renderMoreLink = function(oRm, oControl, iMore, oDay, iColumn, iColumns, app, oDensitySizes, iCellIndex) {
+			const oFormat = oControl._getDateFormatter();
+			const sMoreLinkDescId = oFormat.format(oDay.toLocalJSDate()) + "-MoreLinkDesc";
+			const oToday = oDay && oDay.isSame(CalendarDate.fromLocalJSDate(UI5Date.getInstance()));
+			const iBorderThickness = this.getBorderThickness(Theming.getTheme(), oToday);
+			const iLevel = app.level;
+			const iRight = iColumns - iColumn - 1;
+			const bIsRTL = Localization.getRTL();
+
+			oRm.openStart("div");
+			oRm.attr("role", "listitem");
+			oRm.class("sapMSPCMonthLnkMore");
+			oRm.style(bIsRTL ? "right" : "left", "calc(" + ((iColumn) * 100) / (iColumns) + "% + " + iBorderThickness + "rem)");
+			oRm.style(bIsRTL ? "left" : "right", "calc(" + ((iRight ) * 100) / (iColumns) + "% + " + iBorderThickness + "rem)");
+			oRm.style("top", ((iLevel + 1) * oDensitySizes.appHeight + oDensitySizes.cellHeaderHeight) + "rem");
+			oRm.style("z-index", "1");
+			oRm.openEnd();
+
+			oRm.renderControl(oControl._getMoreLink(iMore, oDay, iCellIndex, sMoreLinkDescId));
+
+			oRm.openStart("span", sMoreLinkDescId);
+			oRm.class("sapUiInvisibleText");
+			oRm.openEnd();
+			oRm.text(oControl._getMoreLinkDescription(iMore, oDay.toLocalJSDate()));
+			oRm.close("span");
+
+			oRm.close("div");
+	};
+
+	SinglePlanningCalendarMonthGridRenderer.getBorderThickness = function(sThemeName, oToday) {
+		if (sThemeName.includes("horizon")){
+			if (oToday) {
+				return sThemeName.indexOf("_hc") ? 0.4375 : 0.0625;
+			}
+
+			return sThemeName.indexOf("_hc") ? 0.1875 : 0.0625;
+		}
+
+		if (oToday) {
+			return sThemeName.indexOf("_hc") ? 0.3125 : 0.0625;
+		}
+
+		return  sThemeName.indexOf("_hc") ? 0.125 : 0.0625;
 	};
 
 	SinglePlanningCalendarMonthGridRenderer.renderDayNames = function(oRm, oControl, oLocaleData) {

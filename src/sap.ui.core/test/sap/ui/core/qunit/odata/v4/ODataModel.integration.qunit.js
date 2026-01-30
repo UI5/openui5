@@ -77895,8 +77895,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	//*********************************************************************************************
 	// Scenario: A return value context is destroyed as soon as a new cache is created during
 	// #invoke, no matter what happens after that.
-	//
 	// JIRA: CPOUI5ODATAV4-1687
+	//
+	// An operation w/ R.V.C. fails and transition messages are reported (JIRA: CPOUI5ODATAV4-3337)
 	QUnit.test("JIRA: CPOUI5ODATAV4-1687", function (assert) {
 		var oActionBinding,
 			sActionName = "com.sap.gateway.default.iwbep.tea_busi.v0001.AcChangeTeamOfEmployee",
@@ -77958,6 +77959,50 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		}).then(function (aResults) {
 			assert.strictEqual(aResults[0], undefined, "no R.V.C. w/o key predicate");
 			assert.strictEqual(oReturnValueContext.getModel(), undefined, "destroyed");
+
+			that.expectRequest("POST EMPLOYEES('2')/" + sActionName, {
+					payload : {TeamID : "TEAM_0815"}
+				}, createErrorInsideBatch({
+					details : [{
+						"@Common.additionalTargets" : ["$Parameter/EMPLOYEE/Name"],
+						code : "08/15",
+						message : "Wrong team for you",
+						target : "TeamID", // Note: "$Parameter/" is optional in error case
+						"@SAP__common.numericSeverity" : 4
+					}]
+				}))
+				.expectMessages([{
+					code : "08/15",
+					message : "Wrong team for you",
+					persistent : true,
+					targets : [
+						oActionBinding.getResolvedPath() + "/$Parameter/TeamID",
+						"/EMPLOYEES('2')/Name"
+					],
+					type : "Error"
+				}, {
+					code : "CODE",
+					message : "Request intentionally failed",
+					persistent : true,
+					technical : true,
+					type : "Error"
+				}]);
+			that.oLogMock.expects("error")
+				.withExactArgs("Failed to invoke " + oActionBinding.getResolvedPath(),
+					sinon.match("Request intentionally failed"), sODCB);
+
+			return Promise.all([
+				// code under test
+				oActionBinding.invoke().then(function () {
+					assert.ok(false);
+				}, function (oError0) {
+					assert.strictEqual(oError0.message, "Request intentionally failed");
+					assert.strictEqual(oError0.requestUrl,
+						sTeaBusi + "EMPLOYEES('2')/" + sActionName);
+					assert.strictEqual(oError0.resourcePath, "EMPLOYEES('2')/" + sActionName);
+				}),
+				that.waitForChanges(assert, "JIRA: CPOUI5ODATAV4-3337")
+			]);
 		});
 	});
 

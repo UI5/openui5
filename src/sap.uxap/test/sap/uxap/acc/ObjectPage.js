@@ -62,7 +62,7 @@ sap.ui.define([
 		headerContent: [
 			new Label({ text: "Hello! I am Denise and I use UxAP", wrapping: true }),
 			new ObjectAttribute({
-				title: "Phone",
+				title: "Telephone number",
 				customContent: new Link({ text: "+33 6 4512 5158", ariaLabelledBy: ["phone-inv-text"] }),
 				active: true
 			})

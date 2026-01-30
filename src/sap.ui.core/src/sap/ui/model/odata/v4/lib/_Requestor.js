@@ -1439,7 +1439,7 @@ sap.ui.define([
 					// $resourcePath are undefined
 					oCause = _Helper.createError(vResponse, "Communication error",
 						vRequest.url ? that.sServiceUrl + vRequest.url : undefined,
-						vRequest.$resourcePath);
+						vRequest.$resourcePath === "R#V#C" ? vRequest.url : vRequest.$resourcePath);
 					if (Array.isArray(vRequest)) {
 						_Helper.decomposeError(oCause, vRequest, that.sServiceUrl)
 							.forEach(function (oError, i) {

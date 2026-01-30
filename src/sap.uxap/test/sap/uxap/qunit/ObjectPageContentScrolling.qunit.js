@@ -544,26 +544,32 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 		}
 	});
 
-	QUnit.test("Scroll position readjusted when header is snapped", function (assert) {
+	QUnit.test("Scroll position preserved when header is snapped (integration test)", function (assert) {
 		var fnDone = assert.async(),
 			iScrollPosition,
-			oSpy;
+			iScrollPositionAfterSnap,
+			iSnapThreshold;
 
 		this.oObjectPage = this.oObjectPageContentScrollingView.byId("ObjectPageLayout");
 		this.oObjectPage.attachEventOnce("onAfterRenderingDOMReady", function() {
 
-			iScrollPosition = this.oObjectPage._getSnapPosition() - 10;
+			iSnapThreshold = this.oObjectPage._getSnapPosition();
+			// Scroll to a position that will trigger header snap
+			// and is close to the threshold where scroll preservation issue occurs
+			iScrollPosition = iSnapThreshold + 10;
 
-			// Act - scroll to a position just after snap
+			// Act - scroll to trigger header snap
 			this.oObjectPage._scrollTo(iScrollPosition);
-			oSpy = this.spy(this.oObjectPage, "_scrollTo");
 
 			// simulate scroll event fired immediately after the scrollTo call
+			// this synchronously triggers _moveAnchorBarToTitleArea and the snap logic
 			this.oObjectPage._onScroll({target: {scrollTop: iScrollPosition}});
 
-			// Assert
-			assert.strictEqual(oSpy.callCount, 1, "scrollTo is called once - for the readjusted scroll position");
-			assert.strictEqual(oSpy.getCall(0).args[0], iScrollPosition, "scroll position is readjusted to scroll position");
+			// Assert immediately - the snap operation is synchronous
+			iScrollPositionAfterSnap = this.oObjectPage._$opWrapper.scrollTop();
+			assert.ok(this.oObjectPage._bStickyAnchorBar, "header is snapped");
+			assert.strictEqual(Math.round(iScrollPositionAfterSnap), Math.round(iScrollPosition),
+				"scroll position is preserved (not adjusted due to anchorBar removal)");
 			fnDone();
 		}.bind(this));
 	});
@@ -1684,5 +1690,87 @@ function(nextUIUpdate, ObjectPageSubSection, ObjectPageSection, ObjectPageLayout
 				oHeaderContent.classList.contains("sapUxAPObjectPageHeaderDetailsHidden") &&
 				oHeaderContent.style["overflow"] == "hidden";
 	}
+
+	QUnit.module("AnchorBar scroll preservation during header snap");
+
+	QUnit.test("_needsAnchorBarPlaceholderForScrollPreservation returns false when sufficient scroll space remains", function(assert) {
+		var oObjectPage = oFactory.getObjectPage();
+
+		// Mock: scrollHeight=1000, offsetHeight=500 -> maxScroll=500
+		// scrollTop=100, anchorBarHeight=48 -> maxScrollAfterRemoval=452
+		// 452 > 100, so no placeholder needed
+		oObjectPage._$opWrapper = {
+			0: {
+				scrollHeight: 1000,
+				offsetHeight: 500
+			},
+			scrollTop: function() { return 100; }
+		};
+		oObjectPage.iAnchorBarHeight = 48;
+
+		// Act & Assert
+		assert.strictEqual(oObjectPage._needsAnchorBarPlaceholderForScrollPreservation(), false,
+			"Returns false when sufficient scroll space remains after anchorBar removal");
+
+		oObjectPage.destroy();
+	});
+
+	QUnit.test("_needsAnchorBarPlaceholderForScrollPreservation returns true when insufficient scroll space", function(assert) {
+		var oObjectPage = oFactory.getObjectPage();
+
+		// Mock: scrollHeight=1000, offsetHeight=500 -> maxScroll=500
+		// scrollTop=480, anchorBarHeight=48 -> maxScrollAfterRemoval=452
+		// 452 < 480, so placeholder IS needed
+		oObjectPage._$opWrapper = {
+			0: {
+				scrollHeight: 1000,
+				offsetHeight: 500
+			},
+			scrollTop: function() { return 480; }
+		};
+		oObjectPage.iAnchorBarHeight = 48;
+
+		// Act & Assert
+		assert.strictEqual(oObjectPage._needsAnchorBarPlaceholderForScrollPreservation(), true,
+			"Returns true when insufficient scroll space would remain after anchorBar removal");
+
+		oObjectPage.destroy();
+	});
+
+	QUnit.test("_moveAnchorBarToTitleArea preserves scroll by using placeholder when needed", function(assert) {
+		var oObjectPage = oFactory.getObjectPage();
+
+		// Setup
+		oObjectPage._$opWrapper = {
+			0: {
+				scrollHeight: 1000,
+				offsetHeight: 500
+			},
+			scrollTop: function() { return 480; }
+		};
+		oObjectPage.iAnchorBarHeight = 48;
+		oObjectPage._$anchorBar = {
+			css: sinon.stub(),
+			children: function() {
+				return { appendTo: sinon.stub() };
+			}
+		};
+		oObjectPage._$stickyAnchorBar = {};
+		oObjectPage._adjustTitlePositioning = sinon.stub();
+		oObjectPage._toggleHeaderStyleRules = sinon.stub();
+
+		// Act
+		oObjectPage._moveAnchorBarToTitleArea();
+
+		// Assert
+		assert.ok(oObjectPage._$anchorBar.css.calledWith("height", "48px"),
+			"Placeholder height is set before moving anchorBar");
+		assert.ok(oObjectPage._adjustTitlePositioning.called,
+			"Layout adjustment is called while placeholder is active");
+		assert.ok(oObjectPage._$anchorBar.css.calledWith("height", ""),
+			"Placeholder height is removed after layout adjustment");
+
+		oObjectPage.destroy();
+	});
 
 });

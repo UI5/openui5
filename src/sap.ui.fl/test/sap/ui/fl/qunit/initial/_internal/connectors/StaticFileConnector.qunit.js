@@ -3,6 +3,7 @@
 sap.ui.define([
 	"sap/ui/thirdparty/sinon-4",
 	"sap/ui/fl/initial/_internal/connectors/StaticFileConnector",
+	"sap/ui/fl/initial/_internal/connectors/Utils",
 	"sap/base/Log",
 	"sap/base/util/LoaderExtensions",
 	"sap/ui/core/Component",
@@ -10,6 +11,7 @@ sap.ui.define([
 ], function(
 	sinon,
 	StaticFileConnector,
+	ConnectorUtils,
 	Log,
 	LoaderExtensions,
 	Component,
@@ -143,6 +145,60 @@ sap.ui.define([
 		QUnit.test("given loadVariantsAuthors is called", async function(assert) {
 			const oReturn = await StaticFileConnector.loadVariantsAuthors();
 			assert.deepEqual(oReturn, {}, "an empty object is returned");
+		});
+	});
+
+	QUnit.module("cacheKey calculation", {
+		afterEach() {
+			sandbox.restore();
+		}
+	}, function() {
+		QUnit.test("when flex data contains multiple flex object types, all are included in cacheKey calculation", async function(assert) {
+			sap.ui.require.preload({
+				"test/app/cachekey3/changes/flexibility-bundle.json": JSON.stringify({
+					changes: [{ dummy: true, creation: "2025-01-15T10:30:00.000Z" }],
+					compVariants: [],
+					variants: [{ dummy: true, creation: "2025-01-16T10:30:00.000Z" }],
+					variantChanges: [{ dummy: true, creation: "2025-01-17T10:30:00.000Z" }],
+					variantDependentControlChanges: [],
+					variantManagementChanges: []
+				})
+			});
+
+			const oCalculateCacheKeySpy = sandbox.spy(ConnectorUtils, "calculateCacheKey");
+
+			const oResult = await StaticFileConnector.loadFlexData({
+				reference: "test.app.cachekey3",
+				componentName: "test.app.cachekey3"
+			});
+
+			assert.ok(oCalculateCacheKeySpy.calledOnce, "calculateCacheKey was called");
+			const aFlexObjects = oCalculateCacheKeySpy.getCall(0).args[0];
+			assert.strictEqual(aFlexObjects.length, 3, "three flex objects were passed to calculateCacheKey");
+			assert.strictEqual(typeof oResult.cacheKey, "number", "cacheKey is created as a number");
+		});
+
+		QUnit.test("when same flex data is loaded twice, cacheKey is the same", async function(assert) {
+			sap.ui.require.preload({
+				"test/app/cachekey4/changes/flexibility-bundle.json": JSON.stringify({
+					changes: [
+						{ dummy: true, creation: "2025-01-15T10:30:00.000Z" }
+					],
+					compVariants: []
+				})
+			});
+
+			const oResult1 = await StaticFileConnector.loadFlexData({
+				reference: "test.app.cachekey4",
+				componentName: "test.app.cachekey4"
+			});
+
+			const oResult2 = await StaticFileConnector.loadFlexData({
+				reference: "test.app.cachekey4",
+				componentName: "test.app.cachekey4"
+			});
+
+			assert.strictEqual(oResult1.cacheKey, oResult2.cacheKey, "cacheKey is the same for identical data");
 		});
 	});
 
