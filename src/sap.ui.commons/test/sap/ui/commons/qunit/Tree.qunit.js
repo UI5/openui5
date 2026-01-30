@@ -909,6 +909,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Store references to the selected hidden children", function(assert) {
+		var done = assert.async();
 		var oDeepTree = new Tree("tr2tree", {
 			nodes: [
 				new TreeNode("tr2node1", {
@@ -947,17 +948,30 @@ sap.ui.define([
 		var oNode1111 = sap.ui.getCore().byId("tr2node1111");
 
 		oNode1111.select();
+
+		// Ensure no async animation interferes: stub duration before collapsing/expanding
+		var oStub = this.stub(TreeNode, "ANIMATION_DURATION").value(0);
+
 		oDeepTree.collapseAll();
 
-		this.stub(TreeNode, "ANIMATION_DURATION").value(0);
+		// Expand the parent synchronously (animation duration is 0 due to the stub)
 		oNode1.expand();
 
-		assert.equal(oNode1.getSelectedForNodes().length, 0, "References of its selected hidden children removed when expanded.");
-		assert.equal(oNode11.getSelectedForNodes().length, 1, "Node references propagated to the first collapsed parent of the selected hidden children.");
-		assert.equal(oNode11.getSelectedForNodes()[0], "tr2node1111", "Node references propagated to the first collapsed parent of the selected hidden children.");
-		assert.equal(oNode111.getSelectedForNodes().length, 0, "Node references not propagated to the other collapsed parents of the selected hidden children.");
+		// Use a short delay to allow any browser-specific event handling to complete
+		setTimeout(function() {
+			try {
+				assert.equal(oNode1.getSelectedForNodes().length, 0, "References of its selected hidden children removed when expanded.");
+				assert.equal(oNode11.getSelectedForNodes().length, 1, "Node references propagated to the first collapsed parent of the selected hidden children.");
+				assert.equal(oNode11.getSelectedForNodes()[0], "tr2node1111", "Node references propagated to the first collapsed parent of the selected hidden children.");
+				assert.equal(oNode111.getSelectedForNodes().length, 0, "Node references not propagated to the other collapsed parents of the selected hidden children.");
+			} finally {
+				// cleanup: restore global and destroy tree
+				oStub.restore();
+				oDeepTree.destroy();
+				done();
+			}
+		}, 20);
 
-		oDeepTree.destroy();
 	});
 
 	QUnit.module("Helper methods", {
