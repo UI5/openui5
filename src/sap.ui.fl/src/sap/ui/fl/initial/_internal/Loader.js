@@ -177,6 +177,20 @@ sap.ui.define([
 	}
 
 	/**
+	 * Check if flex info session needs to be deleted based on RTA restart property, saveChangeKeepSession and cached flex data.
+	 * In case of a hard browser reload within RTA, the flex info session must be cleared to request correct information.
+	 * If this is not done correctly, parameters like version or adaptationId might be stale and lead to incorrect loading of flex data.
+	 *
+	 * @param {object} oFlexInfoSession - The flex info session object
+	 * @param {string} sReference - The flex reference for which to clear the session
+	 * @returns {boolean} whether the flex info session needs to be cleared
+	 */
+	function needToDeleteFlexInfoSession(oFlexInfoSession, sReference) {
+		const bIsRtaStarting = !!Object.keys(window.sessionStorage).some((sKey) => sKey.startsWith("sap.ui.rta.restart."));
+		return !bIsRtaStarting && !oFlexInfoSession.saveChangeKeepSession && !_mCachedFlexData[sReference];
+	}
+
+	/**
 	 * Provides the flex data for a given application based on the configured connectors.
 	 * This function needs a manifest object, async hints and either an ID to an instantiated component or component data as parameter.
 	 * The fetched data is cached statically in the Loader class. Together with the data, all parameters that have been used
@@ -194,12 +208,6 @@ sap.ui.define([
 	 */
 	Loader.getFlexData = async function(mPropertyBag) {
 		const sReference = mPropertyBag.reference || ManifestUtils.getFlexReference(mPropertyBag);
-		// the FlexInfoSession is used to adjust the parameters of the request
-		let oFlexInfoSession = FlexInfoSession.getByReference(sReference);
-		const sVersion = oFlexInfoSession.version;
-		const sAdaptationId = oFlexInfoSession.displayedAdaptationId;
-		const bAllContextsProvided = oFlexInfoSession.allContextsProvided;
-
 		const oOldInitPromise = _mInitPromises[sReference];
 		const oNewInitPromise = new Deferred();
 		_mInitPromises[sReference] = oNewInitPromise;
@@ -207,6 +215,16 @@ sap.ui.define([
 		if (oOldInitPromise) {
 			await oOldInitPromise.promise;
 		}
+
+		let oFlexInfoSession = FlexInfoSession.getByReference(sReference);
+		if (needToDeleteFlexInfoSession(oFlexInfoSession, sReference)) {
+			FlexInfoSession.removeByReference(sReference);
+			oFlexInfoSession = FlexInfoSession.getByReference(sReference);
+		}
+		// the FlexInfoSession is used to adjust the parameters of the request
+		const sVersion = oFlexInfoSession.version;
+		const sAdaptationId = oFlexInfoSession.displayedAdaptationId;
+		const bAllContextsProvided = oFlexInfoSession.allContextsProvided;
 
 		const bRequiresNewLoadRequest =
 			mPropertyBag.reInitialize

@@ -3,7 +3,7 @@
 		xmlns:unified="sap.ui.unified"
 		controllerName="sap.ui.rta.contextBased.Page"
 		xmlns="sap.m">
-		<VBox id="qunit-fixture"></VBox>
+	<VBox id="qunit-fixture"></VBox>
 	<VBox class="sapUiSmallMargin">
 		<Button id="openManageAdaptationsDialogButton" text="Open Manage Context-Based Adaptation Dialog" press="onManageAdaptations"/>
 	</VBox>
