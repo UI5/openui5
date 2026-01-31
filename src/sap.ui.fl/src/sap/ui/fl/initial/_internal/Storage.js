@@ -33,13 +33,13 @@ sap.ui.define([
 
 	function loadFlexDataFromConnectors(mPropertyBag, aConnectors) {
 		const aConnectorPromises = aConnectors.map(function(oConnectorConfig) {
+			const oFlexInfoSession = FlexInfoSession.getByReference(mPropertyBag.reference);
 			const oConnectorSpecificPropertyBag = {
 				...mPropertyBag,
 				url: oConnectorConfig.url,
 				path: oConnectorConfig.path
 			};
 
-			const oFlexInfoSession = FlexInfoSession.getByReference(mPropertyBag.reference);
 			if (
 				!oConnectorConfig.layers
 				|| (
@@ -56,11 +56,6 @@ sap.ui.define([
 				if (!oConnectorSpecificPropertyBag.version && oFlexInfoSession.version) {
 					oConnectorSpecificPropertyBag.version = oFlexInfoSession.version;
 				}
-			}
-			const bIsRtaStarting = !!Object.keys(window.sessionStorage).filter((sKey) => sKey.startsWith("sap.ui.rta.restart.")).length;
-			// save change and activate version do not trigger a reload, need saveChangeKeepSession to keep values in the session
-			if (!bIsRtaStarting && !oFlexInfoSession.saveChangeKeepSession) {
-				FlexInfoSession.removeByReference(mPropertyBag.reference);
 			}
 			// Disable cacheKey when request data for a specific version
 			if (oConnectorSpecificPropertyBag.version) {

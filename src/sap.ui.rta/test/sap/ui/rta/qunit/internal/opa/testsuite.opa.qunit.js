@@ -22,6 +22,9 @@ sap.ui.define(function() {
 			"contextBased/integration/ManageAdaptationsDialogJourney": {
 				title: "Manage Context-Based Adaptation"
 			},
+			"rtaReload/integration/SimpleRTAReloadJourney": {
+				title: "Simple RTA Reload"
+			},
 			"contextBased/integration/SaveAsAdaptationDialogJourney": {
 				title: "SaveAs Context-Based Adaptation"
 			},

@@ -148,6 +148,7 @@ sap.ui.define([
 			Loader.clearCache(sReference);
 			sandbox.restore();
 			FlexInfoSession.removeByReference(sReference);
+			window.sessionStorage.removeItem("sap.ui.rta.restart.CUSTOMER");
 		}
 	}, function() {
 		QUnit.test("when getFlexData is called with all information", async function(assert) {
@@ -155,6 +156,7 @@ sap.ui.define([
 				version: Version.Number.Draft,
 				displayedAdaptationId: "id_1234"
 			}, sReference);
+			window.sessionStorage.setItem("sap.ui.rta.restart.CUSTOMER", true);
 
 			var oExpectedProperties = {
 				reference: sReference,
@@ -450,6 +452,8 @@ sap.ui.define([
 			FlexInfoSession.setByReference({
 				allContextsProvided: true
 			}, sReference);
+			window.sessionStorage.setItem("sap.ui.rta.restart.CUSTOMER", true);
+
 			await Loader.getFlexData({
 				manifest: this.oManifest,
 				reference: sReference,
@@ -494,6 +498,8 @@ sap.ui.define([
 			FlexInfoSession.setByReference({
 				displayedAdaptationId: "firstAdaptationId"
 			}, sReference);
+			window.sessionStorage.setItem("sap.ui.rta.restart.CUSTOMER", true);
+
 			await Loader.getFlexData({
 				manifest: this.oManifest,
 				reference: sReference,
@@ -549,6 +555,153 @@ sap.ui.define([
 				componentData: oComponentData
 			});
 			assert.strictEqual(this.oLoadFlexDataStub.callCount, 1, "the Storage.loadFlexData was called");
+		});
+
+		QUnit.test("when getFlexData is called with sap.ui.rta.restart, saveChangeKeepSession not set and an empty _mCachedFlexData", async function(assert) {
+			const sVersionID = "versionID";
+			FlexInfoSession.setByReference({
+				allContextsProvided: false,
+				version: sVersionID
+			}, sReference);
+
+			let oFlexInfoSession = FlexInfoSession.getByReference(sReference);
+			assert.strictEqual(oFlexInfoSession.allContextsProvided, false, "the FlexInfoSession is set before getFlexData");
+			assert.strictEqual(oFlexInfoSession.version, sVersionID, "the FlexInfoSession is set before getFlexData");
+
+			await Loader.getFlexData({
+				manifest: this.oManifest,
+				reference: sReference,
+				componentData: oComponentData
+			});
+
+			assert.strictEqual(this.oLoadFlexDataStub.getCalls().length, 1, "the flex data request is called once");
+			assert.strictEqual(this.oLoadFlexDataStub.getCall(0).args[0].version, undefined, "the version is undefined to loadFlexData");
+			oFlexInfoSession = FlexInfoSession.getByReference(sReference);
+			assert.deepEqual(oFlexInfoSession, { foo: "bar" }, "the FlexInfoSession is cleared before filled with flex data content");
+		});
+
+		QUnit.test("when getFlexData is called with sap.ui.rta.restart, saveChangeKeepSession not set and filled _mCachedFlexData", async function(assert) {
+			await Loader.getFlexData({
+				manifest: this.oManifest,
+				reference: sReference,
+				componentData: oComponentData
+			});
+
+			let oFlexInfoSession = FlexInfoSession.getByReference(sReference);
+			oFlexInfoSession.key = "value";
+			FlexInfoSession.setByReference(oFlexInfoSession, sReference);
+
+			assert.strictEqual(this.oLoadFlexDataStub.getCalls().length, 1, "the flex data request is called once");
+			assert.strictEqual(oFlexInfoSession.foo, "bar", "the FlexInfoSession is set before getFlexData");
+			assert.strictEqual(oFlexInfoSession.key, "value", "the FlexInfoSession is set before getFlexData");
+
+			await Loader.getFlexData({
+				manifest: this.oManifest,
+				reference: sReference,
+				componentData: oComponentData
+			});
+
+			oFlexInfoSession = FlexInfoSession.getByReference(sReference);
+			assert.strictEqual(this.oLoadFlexDataStub.getCalls().length, 1, "the flex data request is called once");
+			assert.deepEqual(oFlexInfoSession, { foo: "bar", key: "value" }, "the FlexInfoSession is not cleared");
+		});
+
+		QUnit.test("when getFlexData is called with sap.ui.rta.restart set, saveChangeKeepSession not set and empty _mCachedFlexData", async function(assert) {
+			const sVersionID = "versionID";
+			window.sessionStorage.setItem("sap.ui.rta.restart.CUSTOMER", true);
+			FlexInfoSession.setByReference({
+				allContextsProvided: false,
+				version: sVersionID
+			}, sReference);
+
+			let oFlexInfoSession = FlexInfoSession.getByReference(sReference);
+			assert.strictEqual(oFlexInfoSession.allContextsProvided, false, "the FlexInfoSession is set before getFlexData");
+			assert.strictEqual(oFlexInfoSession.version, sVersionID, "the FlexInfoSession is set before getFlexData");
+
+			await Loader.getFlexData({
+				manifest: this.oManifest,
+				reference: sReference,
+				componentData: oComponentData
+			});
+
+			oFlexInfoSession = FlexInfoSession.getByReference(sReference);
+			assert.strictEqual(this.oLoadFlexDataStub.getCalls().length, 1, "the flex data request is called once");
+			assert.strictEqual(this.oLoadFlexDataStub.getCall(0).args[0].version, "versionID", "the version is undefined to loadFlexData");
+			assert.deepEqual(oFlexInfoSession,
+				{
+					allContextsProvided: false,
+					version: sVersionID,
+					foo: "bar"
+				}, "the FlexInfoSession is not cleared before filled again");
+		});
+
+		QUnit.test("when getFlexData is called with sap.ui.rta.restart is not set, saveChangeKeepSession set and empty _mCachedFlexData", async function(assert) {
+			const sVersionID = "versionID";
+			FlexInfoSession.setByReference({
+				allContextsProvided: false,
+				version: sVersionID,
+				saveChangeKeepSession: true
+			}, sReference);
+
+			let oFlexInfoSession = FlexInfoSession.getByReference(sReference);
+			assert.strictEqual(oFlexInfoSession.allContextsProvided, false, "the FlexInfoSession is set before getFlexData");
+			assert.strictEqual(oFlexInfoSession.version, sVersionID, "the FlexInfoSession is set before getFlexData");
+			assert.strictEqual(oFlexInfoSession.saveChangeKeepSession, true, "the FlexInfoSession is set before getFlexData");
+
+			await Loader.getFlexData({
+				manifest: this.oManifest,
+				reference: sReference,
+				componentData: oComponentData
+			});
+
+			oFlexInfoSession = FlexInfoSession.getByReference(sReference);
+			assert.strictEqual(this.oLoadFlexDataStub.getCalls().length, 1, "the flex data request is called once");
+			assert.strictEqual(this.oLoadFlexDataStub.getCall(0).args[0].version, sVersionID, "the version is undefined to loadFlexData");
+			assert.deepEqual(oFlexInfoSession,
+				{
+					allContextsProvided: false,
+					version: sVersionID,
+					foo: "bar",
+					saveChangeKeepSession: true
+				}, "the FlexInfoSession is not cleared before filled again");
+		});
+
+		QUnit.test("when getFlexData is called with sap.ui.rta.restart, saveChangeKeepSession set and filled _mCachedFlexData", async function(assert) {
+			const sVersionID = "versionID";
+			await Loader.getFlexData({
+				manifest: this.oManifest,
+				reference: sReference,
+				componentData: oComponentData
+			});
+
+			window.sessionStorage.setItem("sap.ui.rta.restart.CUSTOMER", true);
+			FlexInfoSession.setByReference({
+				allContextsProvided: false,
+				version: sVersionID,
+				saveChangeKeepSession: true
+			}, sReference);
+
+			let oFlexInfoSession = FlexInfoSession.getByReference(sReference);
+			assert.strictEqual(oFlexInfoSession.allContextsProvided, false, "the FlexInfoSession is set before getFlexData");
+			assert.strictEqual(oFlexInfoSession.version, sVersionID, "the FlexInfoSession is set before getFlexData");
+			assert.strictEqual(oFlexInfoSession.saveChangeKeepSession, true, "the FlexInfoSession is set before getFlexData");
+
+			await Loader.getFlexData({
+				manifest: this.oManifest,
+				reference: sReference,
+				componentData: oComponentData
+			});
+
+			assert.strictEqual(this.oLoadFlexDataStub.getCalls().length, 2, "the flex data request is called twice");
+			assert.strictEqual(this.oLoadFlexDataStub.getCall(1).args[0].version, sVersionID, "the flex data request is called with versionID");
+			oFlexInfoSession = FlexInfoSession.getByReference(sReference);
+			assert.deepEqual(oFlexInfoSession,
+				{
+					allContextsProvided: false,
+					version: sVersionID,
+					foo: "bar",
+					saveChangeKeepSession: true
+				}, "the FlexInfoSession is not cleared before filled again");
 		});
 
 		[{

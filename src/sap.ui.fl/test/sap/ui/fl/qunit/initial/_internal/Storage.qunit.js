@@ -768,7 +768,7 @@ sap.ui.define([
 				reference: sFlexReference,
 				version: Version.Number.Draft
 			}).then(function() {
-				assert.deepEqual(FlexInfoSession.getByReference(sFlexReference), {}, "then the flex info session is cleared");
+				assert.notDeepEqual(FlexInfoSession.getByReference(sFlexReference), {}, "then the flex info session is not cleared");
 			});
 		});
 	});
@@ -908,9 +908,6 @@ sap.ui.define([
 				assert.equal(oStaticFileConnectorStub.getCall(0).args[0].version, undefined, "the StaticFileConnector has the version property NOT set");
 				assert.equal(oJsObjectConnectorStub.getCall(0).args[0].version, undefined, "the connector NOT in charge for draft layer has the version property NOT set");
 				assert.equal(oLrepConnectorStub.getCall(0).args[0].version, Version.Number.Draft, "the connector for draft layer has the version property set");
-				assert.equal(FlexInfoSession.getByReference(sFlexReference).version, undefined, "version is deleted in flex info session");
-				assert.equal(FlexInfoSession.getByReference(sFlexReference).maxLayer, undefined, "max layer is deleted in flex info session");
-				assert.equal(FlexInfoSession.getByReference(sFlexReference).initialAllContexts, undefined, "initialAllContexts is not in the flex info session");
 			});
 		});
 
