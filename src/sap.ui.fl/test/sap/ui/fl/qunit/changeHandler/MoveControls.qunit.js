@@ -905,7 +905,7 @@ sap.ui.define([
 			});
 			this.oUiComponentContainer.placeAt("qunit-fixture");
 
-			return oViewPromise.then(function(oView) {
+			return oViewPromise.then(async function(oView) {
 				this.oRootControl = oView;
 				this.oGlobalLayout = this.oRootControl.byId(myLayoutId);
 				var oGlobalLayoutId = this.oGlobalLayout.getId();
@@ -919,7 +919,7 @@ sap.ui.define([
 
 				var oDOMParser = new DOMParser();
 				var oXmlDocument = oDOMParser.parseFromString(oXmlString, "application/xml").childNodes[0];
-				this.oXmlView = XMLTemplateProcessor.enrichTemplateIds(oXmlDocument, this.oRootControl);
+				this.oXmlView = await XMLTemplateProcessor.enrichTemplateIdsPromise(oXmlDocument, this.oRootControl);
 
 				[this.oXmlLayout] = this.oXmlView.childNodes[0].childNodes;
 				[this.oXmlObjectHeader] = this.oXmlLayout.childNodes;
