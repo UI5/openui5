@@ -226,22 +226,6 @@ sap.ui.define([
 	 */
 	var XMLTemplateProcessor = {};
 
-	/**   API METHODS ***/
-
-
-	/**
-	 * Loads an XML template using the module loading mechanism and returns the root XML element of the XML
-	 * document.
-	 *
-	 * @param {string} sTemplateName the template/fragment/view resource to be loaded
-	 * @param {string} [sExtension] the file extension, e.g. "fragment"
-	 * @return {Element} an XML document root element
-	 */
-	XMLTemplateProcessor.loadTemplate = function(sTemplateName, sExtension) {
-		var sResourceName = sTemplateName.replace(/\./g, "/") + ("." + (sExtension || "view") + ".xml");
-		return LoaderExtensions.loadResource(sResourceName).documentElement;
-	};
-
 	/**
 	 * Loads an XML template using the module loading mechanism and returns a Promise, which resolves with the root XML element of the XML
 	 * document.
@@ -278,19 +262,6 @@ sap.ui.define([
 				}
 			}
 		}
-	};
-
-	/**
-	 * Parses a complete XML template definition (full node hierarchy) and resolves the ids to their full qualification
-	 *
-	 * @param {Element} xmlNode the XML element representing the View/Fragment
-	 * @param {sap.ui.core.mvc.XMLView|sap.ui.core.Fragment} oView the View/Fragment which corresponds to the parsed XML
-	 * @return {Element} The element enriched with the full ids
-	 * @protected
-	 */
-	XMLTemplateProcessor.enrichTemplateIds = function(xmlNode, oView) {
-		XMLTemplateProcessor.enrichTemplateIdsPromise(xmlNode, oView, false);
-		return xmlNode;
 	};
 
 	/**

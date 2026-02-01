@@ -514,20 +514,10 @@ function(
 		init: function(mSettings) {
 			this._aContent = [];
 			// use specified content or load the content definition
-			if (mSettings.fragmentContent) {
-				if (typeof (mSettings.fragmentContent) === "string") {
-					this._xContent = XMLHelper.parse(mSettings.fragmentContent).documentElement;
-				} else {
-					this._xContent = mSettings.fragmentContent;
-				}
+			if (typeof (mSettings.fragmentContent) === "string") {
+				this._xContent = XMLHelper.parse(mSettings.fragmentContent).documentElement;
 			} else {
-				Log.warning("Synchronous loading of fragment, due to Fragment.init() call for '" + mSettings.fragmentName + "'. Use 'sap/ui/core/Fragment' module with Fragment.load() instead.", "SyncXHR", null, function() {
-					return {
-						type: "SyncXHR",
-						name: "Fragment"
-					};
-				});
-				this._xContent = XMLTemplateProcessor.loadTemplate(mSettings.fragmentName, "fragment");
+				this._xContent = mSettings.fragmentContent;
 			}
 
 			this._oContainingView = this._sExplicitId ? this : (mSettings.containingView || this);

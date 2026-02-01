@@ -402,14 +402,12 @@ sap.ui.define([
 			return typeof vPropertyValue === "string" ? vPropertyValue.replace(/([\\\{\}])/g, "\\$1") : vPropertyValue;
 		},
 
-		_templateFragment: function(sFragmentName, mPreprocessorSettings) {
-			return Promise.resolve(
-				// process might be sync, therefore stay async and wrap result in a promise
-				XMLPreprocessor.process(
-					XMLTemplateProcessor.loadTemplate(sFragmentName, "fragment"),
-					{ name: sFragmentName },
-					mPreprocessorSettings
-				)
+		_templateFragment: async function(sFragmentName, mPreprocessorSettings) {
+			const oRootElement = await XMLTemplateProcessor.loadTemplatePromise(sFragmentName, "fragment");
+			return XMLPreprocessor.process(
+				oRootElement,
+				{ name: sFragmentName },
+				mPreprocessorSettings
 			);
 		},
 		/**
