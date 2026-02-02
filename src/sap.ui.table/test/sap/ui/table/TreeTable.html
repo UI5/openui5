@@ -15,89 +15,104 @@
 <script src="Settings.js"></script>
 
 <script>
-	/*global TABLESETTINGS */
+	sap.ui.define([
+		"sap/ui/table/library",
+		"sap/ui/table/TreeTable",
+		"sap/ui/table/Column",
+		"sap/m/Button",
+		"sap/m/CheckBox",
+		"sap/m/ProgressIndicator",
+		"sap/m/Text",
+		"sap/m/Title",
+		"sap/ui/table/utils/TableUtils",
+		"sap/m/Toolbar",
+		"sap/ui/model/json/JSONModel",
+		"sap/base/Log"
+	], function(library, TreeTable, Column, Button, CheckBox, ProgressIndicator, Text, Title, TableUtils, Toolbar, JSONModel, Log) {
+		const SelectionMode = library.SelectionMode;
 
-	(new sap.m.Button({
-		text: "Just a Button before"
-	})).placeAt("content");
+		/*global TABLESETTINGS */
+		(new Button({
+			text: "Just a Button before"
+		})).placeAt("content");
 
-	const oTable = new sap.ui.table.TreeTable({
-		expandFirstLevel: true,
-		title: "Title of the TreeTable",
-		footer: "Footer of the Table",
-		groupHeaderProperty: "name",
-		selectionMode: sap.ui.table.SelectionMode.MultiToggle,
-		columns: [
-			new sap.ui.table.Column(
-					{label: "Name", template: new sap.m.Text({text: "{name}", wrapping: false}), filterProperty: "name", sortProperty: "name"}),
-			new sap.ui.table.Column({label: "Description", template: "description", sortProperty: "description"}),
-			new sap.ui.table.Column({label: "Available", template: new sap.m.CheckBox({selected: "{checked}"})}),
-			new sap.ui.table.Column({label: "ProgressIndicator", template: new sap.m.ProgressIndicator({
-				displayValue: "50",
-				percentValue: "10",
-				showaValue: true,
-				width: "100%"
-			})})
-		]
-	});
+		const oTable = new TreeTable({
+			expandFirstLevel: true,
+			title: "Title of the TreeTable",
+			footer: "Footer of the Table",
+			groupHeaderProperty: "name",
+			selectionMode: SelectionMode.MultiToggle,
+			columns: [
+				new Column(
+						{label: "Name", template: new Text({text: "{name}", wrapping: false}), filterProperty: "name", sortProperty: "name"}),
+				new Column({label: "Description", template: "description", sortProperty: "description"}),
+				new Column({label: "Available", template: new CheckBox({selected: "{checked}"})}),
+				new Column({label: "ProgressIndicator", template: new ProgressIndicator({
+					displayValue: "50",
+					percentValue: "10",
+					showaValue: true,
+					width: "100%"
+				})})
+			]
+		});
 
-	oTable.setToolbar(new sap.m.Toolbar({
-		content: [
-			new sap.m.Button({
-				text: "Expand",
-				press: function() {
-					var oSelectionPlugin = oTable._getSelectionPlugin();
-					var iSelectedIndex = oSelectionPlugin.getSelectedIndex();
-					oTable.expand(iSelectedIndex);
-					oSelectionPlugin.setSelectedIndex(iSelectedIndex);
+		oTable.setToolbar(new Toolbar({
+			content: [
+				new Button({
+					text: "Expand",
+					press: function() {
+						var oSelectionPlugin = oTable._getSelectionPlugin();
+						var iSelectedIndex = oSelectionPlugin.getSelectedIndex();
+						oTable.expand(iSelectedIndex);
+						oSelectionPlugin.setSelectedIndex(iSelectedIndex);
+					}
+				}),
+				new Button({
+					text: "Collapse",
+					press: function() {
+						var oSelectionPlugin = oTable._getSelectionPlugin();
+						var iSelectedIndex = oSelectionPlugin.getSelectedIndex();
+						oTable.collapse(iSelectedIndex);
+						oSelectionPlugin.setSelectedIndex(iSelectedIndex);
+					}
+				})
+			]
+		}));
+
+		oTable.attachToggleOpenState(function(oEvent) {
+			Log.info("ToggleOpenState: rowIndex: " + oEvent.getParameter("rowIndex") +
+								" - rowContext: " + oEvent.getParameter("rowContext") +
+								" - expanded? " + oEvent.getParameter("expanded"));
+		});
+
+		oTable.attachRowSelectionChange(function(oEvent) {
+			Log.info("RowSelectionChange: rowIndex: " + oEvent.getParameter("rowIndex") +
+								" - rowContext: " + oEvent.getParameter("rowContext"));
+		});
+
+		// set Model and bind Table
+		const oModel = new JSONModel();
+		oModel.setData(TABLESETTINGS.treeTestData);
+		oTable.setModel(oModel);
+		oTable.bindRows("/root");
+		oTable.placeAt("content");
+		(new Button({text: "Just a Button after"})).placeAt("content");
+
+		TABLESETTINGS.init(oTable, function(oButton) {
+			oTable.getToolbar().addContent(oButton);
+		}, {
+			FLATMODE: {
+				text: "Flat Mode (protected)",
+				value: function(oTable) {
+					return TableUtils.Grouping.isInFlatMode(oTable);
+				},
+				input: "boolean",
+				action: function(oTable, bValue) {
+					oTable.setUseFlatMode(!!bValue);
 				}
-			}),
-			new sap.m.Button({
-				text: "Collapse",
-				press: function() {
-					var oSelectionPlugin = oTable._getSelectionPlugin();
-					var iSelectedIndex = oSelectionPlugin.getSelectedIndex();
-					oTable.collapse(iSelectedIndex);
-					oSelectionPlugin.setSelectedIndex(iSelectedIndex);
-				}
-			})
-		]
-	}));
-
-	oTable.attachToggleOpenState(function(oEvent) {
-		jQuery.sap.log.info("ToggleOpenState: rowIndex: " + oEvent.getParameter("rowIndex") +
-							" - rowContext: " + oEvent.getParameter("rowContext") +
-							" - expanded? " + oEvent.getParameter("expanded"));
-	});
-
-	oTable.attachRowSelectionChange(function(oEvent) {
-		jQuery.sap.log.info("RowSelectionChange: rowIndex: " + oEvent.getParameter("rowIndex") +
-							" - rowContext: " + oEvent.getParameter("rowContext"));
-	});
-
-	// set Model and bind Table
-	const oModel = new sap.ui.model.json.JSONModel();
-	oModel.setData(TABLESETTINGS.treeTestData);
-	oTable.setModel(oModel);
-	oTable.bindRows("/root");
-	oTable.placeAt("content");
-	(new sap.m.Button({text: "Just a Button after"})).placeAt("content");
-
-	TABLESETTINGS.init(oTable, function(oButton) {
-		oTable.getToolbar().addContent(oButton);
-	}, {
-		FLATMODE: {
-			text: "Flat Mode (protected)",
-			value: function(oTable) {
-				return sap.ui.table.utils.TableUtils.Grouping.isInFlatMode(oTable);
-			},
-			input: "boolean",
-			action: function(oTable, bValue) {
-				oTable.setUseFlatMode(!!bValue);
 			}
-		}
+		});
 	});
-
 </script>
 </head>
 <body class="sapUiBody sapUiSizeCozy">

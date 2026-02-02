@@ -1,6 +1,7 @@
 <mvc:View
 	controllerName="sap.ui.table.sample.SelectCopyPaste.Controller"
 	xmlns="sap.ui.table"
+	xmlns:trm="sap.ui.table.rowmodes"
 	xmlns:mvc="sap.ui.core.mvc"
 	xmlns:u="sap.ui.unified"
 	xmlns:c="sap.ui.core"
@@ -13,7 +14,6 @@
 		<m:content>
 			<Table
 				id="table"
-				visibleRowCount="7"
 				enableSelectAll="false"
 				rows="{
 					path: '/ProductSet',
@@ -23,9 +23,12 @@
 				enableBusyIndicator="true"
 				ariaLabelledBy="title"
 				paste="onPaste">
-				<plugins>
+				<dependents>
 					<plugins.MultiSelectionPlugin limit="100" enableNotification="true" selectionMode="MultiToggle"/>
-				</plugins>
+				</dependents>
+				<rowMode>
+					<trm:Fixed rowCount="7" />
+				</rowMode>
 				<noData>
 					<m:BusyIndicator class="sapUiMediumMargin"/>
 				</noData>
