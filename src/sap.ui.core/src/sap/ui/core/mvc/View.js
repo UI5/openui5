@@ -394,7 +394,7 @@ sap.ui.define([
 		var oViewClass = oView.getMetadata().getClass();
 
 		function resolvePreprocessors(oPreprocessor) {
-			oPreprocessor.preprocessor = initPreprocessor(oPreprocessor, mSettings.async);
+			oPreprocessor.preprocessor = initPreprocessor(oPreprocessor);
 		}
 
 		// shallow copy to avoid issues when manipulating the internal object structure

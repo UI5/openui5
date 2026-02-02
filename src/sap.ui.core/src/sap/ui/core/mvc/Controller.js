@@ -377,7 +377,7 @@ sap.ui.define([
 		 * @returns {Promise<Object>} Promise on the loaded controller extension
 		 */
 		function fnGetExtensionControllerAsync(sControllerName) {
-			return loadControllerClass(sControllerName, sViewId, true).then(function(oExtControllerDef) {
+			return loadControllerClass(sControllerName, sViewId).then(function(oExtControllerDef) {
 				// loadControllerClass resolves with the base sap/ui/core/mvc/Controller class,
 				// in case 'sControllerName' is not a module but was defined with sap.ui.controller("...", {})
 				oExtControllerDef = mRegistry[sControllerName] || oExtControllerDef;
@@ -431,7 +431,7 @@ sap.ui.define([
 	 * @since 1.56.0
 	 */
 	Controller.create = function (mOptions) {
-		return controllerFactory(mOptions.name, undefined, mOptions._viewId, true);
+		return controllerFactory(mOptions.name, undefined, mOptions._viewId);
 	};
 
 	/**
@@ -448,7 +448,7 @@ sap.ui.define([
 		}
 
 		if (!oControllerImpl) {
-			return loadControllerClass(sName, sViewId, true)
+			return loadControllerClass(sName, sViewId)
 				.then(function(ControllerClass) {
 					return instantiateController(ControllerClass, sName);
 				})

@@ -273,7 +273,7 @@ sap.ui.define([
 	 * @private
 	 */
 	XMLTemplateProcessor.enrichTemplateIdsPromise = function(xmlNode, oView) {
-		return parseTemplate(xmlNode, oView, true, undefined, true).then(function() {
+		return parseTemplate(xmlNode, oView, true, undefined).then(function() {
 			return xmlNode;
 		});
 	};
@@ -290,7 +290,7 @@ sap.ui.define([
 	 * @ui5-restricted sap.ui.core.Fragment, sap.ui.core.mvc.XMLView
 	 */
 	XMLTemplateProcessor.parseTemplatePromise = function(xmlNode, oView, _bAsync, oParseConfig) {
-		return parseTemplate(xmlNode, oView, false, oParseConfig, true).then(function(vResult) {
+		return parseTemplate(xmlNode, oView, false, oParseConfig).then(function(vResult) {
 			// vResult is the result array of the XMLTP's parsing.
 			// Elements in vResult can be:
 			//  * RenderManager Call (Array)
@@ -512,7 +512,7 @@ sap.ui.define([
 		// later this intermediate state with promises gets resolved to a flat array containing only strings and controls
 		var aResult = [],
 			sInternalPrefix = findNamespacePrefix(xmlNode, UI5_INTERNAL_NAMESPACE, "__ui5"),
-			pResultChain = parseAndLoadRequireContext(xmlNode, true) || SyncPromise.resolve(),
+			pResultChain = parseAndLoadRequireContext(xmlNode) || SyncPromise.resolve(),
 			collectControl = (pContent) => aResult.push(pContent);
 
 		// object containing reserved values for binding formatter functions.
@@ -658,7 +658,7 @@ sap.ui.define([
 					if (childNode.nodeType === 1 /* Element Node*/) {
 						return createControls(childNode, mOptions.chain, null /*closest binding*/, undefined /* aggregation info*/, { rootArea: true });
 					}
-				}, true);
+				});
 
 				pResultChain = pChain.then(function() {
 					return handleChildren(node, {
@@ -918,7 +918,7 @@ sap.ui.define([
 			var oMetadata = oClass.getMetadata();
 			var mKnownSettings = oMetadata.getAllSettings();
 
-			var pSelfRequireContext = !bRootArea ? parseAndLoadRequireContext(node, true) : undefined;
+			var pSelfRequireContext = !bRootArea ? parseAndLoadRequireContext(node) : undefined;
 
 			// create new promise only when the current node has core:require defined
 			if (pSelfRequireContext) {
@@ -1141,7 +1141,7 @@ sap.ui.define([
 			 * @private
 			 */
 			// the actual handleChildren function depends on the processing mode
-			var handleChildren = getHandleChildrenStrategy(handleChild, true);
+			var handleChildren = getHandleChildrenStrategy(handleChild);
 
 			/**
 			 * @return {Promise} resolving to an array with 0..n controls created from a node
@@ -1382,7 +1382,7 @@ sap.ui.define([
 						}
 
 						// check if we need to hand the ExtensionPoint info to the ExtensionProvider
-						pProvider = fnTriggerExtensionPointProvider(oInstance, mAggregationsWithExtensionPoints, true);
+						pProvider = fnTriggerExtensionPointProvider(oInstance, mAggregationsWithExtensionPoints);
 
 						return oInstance;
 					};

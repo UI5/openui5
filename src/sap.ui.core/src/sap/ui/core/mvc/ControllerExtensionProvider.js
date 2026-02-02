@@ -153,7 +153,7 @@ sap.ui.define(["sap/ui/core/Component"], function(Component) {
 
 		// 2. Read extensions from externally defined ExtensionProvider (if registered)
 		if (ControllerExtensionProvider._sExtensionProvider) {
-			return loadExtensionProvider(true).then(function (oExternalProvider) {
+			return loadExtensionProvider().then(function (oExternalProvider) {
 				return oExternalProvider.getControllerExtensions(sControllerName, sComponentId, true, sViewId);
 			}).then(function(aExternalExtensions) {
 				// add provider-extensions

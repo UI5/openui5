@@ -2396,7 +2396,7 @@ sap.ui.define([
 			}
 
 			// Some services may demand immediate startup
-			var aPromises = activateServices(oInstance, vConfig.async);
+			var aPromises = activateServices(oInstance);
 
 			if (vConfig.async) {
 				return notifyOnInstanceCreated(oInstance, vConfig)
@@ -2883,7 +2883,7 @@ sap.ui.define([
 			// lookup the extended component and preload it
 			var sExtendedComponent = oManifest.getEntry("/sap.ui5/extends/component");
 			if (sExtendedComponent) {
-				fnCollect(preload(sExtendedComponent, true));
+				fnCollect(preload(sExtendedComponent));
 			}
 
 			// lookup the non-lazy components from component dependencies
@@ -2913,7 +2913,7 @@ sap.ui.define([
 			// preload the collected components
 			if (aComponents.length > 0) {
 				aComponents.forEach(function(sComponentName) {
-					fnCollect(preload(sComponentName, true));
+					fnCollect(preload(sComponentName));
 				});
 			}
 
@@ -2998,13 +2998,13 @@ sap.ui.define([
 		// if a hint about "used" components is given, preload those components
 		if ( hints.components ) {
 			Object.keys(hints.components).forEach(function(sComp) {
-				collect(preload(processOptions(hints.components[sComp]), true));
+				collect(preload(processOptions(hints.components[sComp])));
 			});
 		}
 
 		// preload the component itself
 		if (!oManifest) {
-			collect(preload(sName, true));
+			collect(preload(sName));
 		} else {
 			var aI18nProperties = [];
 			// // we have a manifest, so we can register the module path for the component
@@ -3074,7 +3074,7 @@ sap.ui.define([
 				var sEmbeddedBy = oManifest.getEntry("/sap.app/embeddedBy");
 				var sComponentName = oManifest.getComponentName();
 				if (!sEmbeddedBy) {
-					pPreload = preload(sComponentName, true);
+					pPreload = preload(sComponentName);
 				} else if (!sap.ui.loader._.getModuleState(getControllerModuleName() + ".js")) {
 					Log.warning(
 						"Component '" + sComponentName + "' is defined to be embedded in a library or another component" +
@@ -3239,7 +3239,7 @@ sap.ui.define([
 						// read the component name from the manifest and
 						// preload the dependencies defined in the manifest
 						sName = oManifest.getComponentName();
-						return preloadDependencies(sName, oManifest, true);
+						return preloadDependencies(sName, oManifest);
 					} else {
 						// Set oManifest to undefined in case the loadManifest request failed
 						// This should be only the case if manifestFirst is true but there was
