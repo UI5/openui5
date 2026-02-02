@@ -1351,7 +1351,7 @@
 
 			aQueueCopy.forEach((oEntry) => {
 				// start to resolve the dependencies
-				executeModuleDefinition(oEntry.name, oEntry.deps, oEntry.factory, oEntry._export, /* bAsync = */ true);
+				executeModuleDefinition(oEntry.name, oEntry.deps, oEntry.factory);
 			});
 
 			if ( sModuleName != null && !oRequestedModule.settled ) {
@@ -1519,7 +1519,7 @@
 			}, function(oErr) {
 				// Note: in async mode, this 'throw' will reject the promise returned by requireAll
 				throw oModule.failWith("Failed to resolve dependencies of {id}", oErr);
-			}, true);
+			});
 		}
 
 		// when there's bundle information for the module
@@ -1553,7 +1553,7 @@
 				oModule.async = true;
 				bExecutedNow = true;
 				measure && measure.start(sModuleName, "Require module " + sModuleName + " (preloaded)", ["require"]);
-				execModule(sModuleName, true);
+				execModule(sModuleName);
 				measure && measure.end(sModuleName);
 			}
 
@@ -1863,7 +1863,7 @@
 		// Note: dependencies will be resolved and converted from RJS to URN inside requireAll
 		requireAll(oModule, aDependencies, oModule.data ? scheduleExecution(onSuccess) : onSuccess, function(oErr) {
 			oModule.failWith("Failed to resolve dependencies of {id}", oErr);
-		}, true);
+		});
 
 	}
 
@@ -1928,7 +1928,7 @@
 			log.debug(`module names don't match: requested: ${sModuleName}, defined: ${oCurrentExecInfo.name}`);
 			Module.get(oCurrentExecInfo.name).addAlias(sModuleName);
 		}
-		executeModuleDefinition(sResourceName, aDependencies, vFactory, false, /* bAsync = */ false);
+		executeModuleDefinition(sResourceName, aDependencies, vFactory);
 
 	}
 
@@ -2000,7 +2000,7 @@
 				} else {
 					throw oErr;
 				}
-			}, true);
+			});
 
 			// return undefined;
 		};
