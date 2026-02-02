@@ -138,11 +138,11 @@
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + Enter</kbd> <description>
-				<p>Saves the new view in the Save As dialog.</p>
+				<p>Sichert die neue Ansicht im Dialog &quot;Sichern als&quot;.</p>
 			</description>
 		</interaction>
 		<interaction> <kbd>Ctrl + S</kbd> <description>
-				<p>Sichert die an den Ansichten vorgenommenen Änderungen.</p>
+				<p>Sichert die Änderungen, die an den Ansichten vorgenommenen wurden.</p>
 			</description>
 		</interaction>
 	</control-interactions>

@@ -154,9 +154,9 @@
 				<p><kbd>ArrowDown</kbd></p>
 				<p>Varsa öğeyi bir konum aşağı taşır.</p>
 				<p><kbd>Home</kbd></p>
-				<p>Varsa öğeyi bir yukarı taşır.</p>
+				<p>Varsa öğeyi en üste taşır.</p>
 				<p><kbd>End</kbd></p>
-				<p>Varsa öğeyi bir aşağı taşır.</p>
+				<p>Varsa öğeyi en sona taşır.</p>
 			</description>
 		</interaction>
 	</control-interactions>
