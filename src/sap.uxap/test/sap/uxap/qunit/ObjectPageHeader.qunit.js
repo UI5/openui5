@@ -626,6 +626,7 @@ function (jQuery, Core, IconPool, ObjectPageLayout, ObjectPageHeader, ObjectPage
 			};
 
 		oActionButton.attachPress(fnPressOutside);
+		QUtils.triggerKeydown(oActionButton.getId(), "SPACE");
 		QUtils.triggerKeyup(oActionButton.getId(), "SPACE");
 
 		oActionButton.detachPress(fnPressOutside);
