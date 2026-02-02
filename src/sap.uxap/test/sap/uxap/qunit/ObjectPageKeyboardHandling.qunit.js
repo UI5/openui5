@@ -565,6 +565,7 @@ function(jQuery, Core, Configuration, KeyCodes, QUtils, Device, F6Navigation, XM
 			});
 			$anchorBarButton.trigger("focus");
 
+			QUtils.triggerKeydown($anchorBarButton, sKeyPressed);
 			QUtils.triggerKeyup($anchorBarButton, sKeyPressed);
 		}.bind(this), 0);
 	});
