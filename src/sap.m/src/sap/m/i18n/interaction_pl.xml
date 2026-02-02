@@ -154,9 +154,9 @@
 				<p><kbd>ArrowDown</kbd></p>
 				<p>Powoduje przesunięcie elementu o jedną pozycję w dół, jeśli jest dostępna.</p>
 				<p><kbd>Home</kbd></p>
-				<p>Powoduje przesunięcie elementu do szczytu, jeśli jest dostępny.</p>
+				<p>Powoduje przesunięcie elementu do góry, jeśli jest dostępna.</p>
 				<p><kbd>End</kbd></p>
-				<p>Powoduje przesunięcie elementu do końca, jeśli jest dostępny.</p>
+				<p>Powoduje przesunięcie elementu do dołu, jeśli jest dostępny.</p>
 			</description>
 		</interaction>
 	</control-interactions>

@@ -154,9 +154,9 @@
 				<p><kbd>ArrowDown</kbd></p>
 				<p>Abbassa l'elemento di una posizione, se disponibile.</p>
 				<p><kbd>Home</kbd></p>
-				<p>Sposta l'elemento in cima. se disponibile.</p>
+				<p>Sposta l'elemento in cima, se disponibile.</p>
 				<p><kbd>End</kbd></p>
-				<p>Sposta l'elemento in fondo. se disponibile.</p>
+				<p>Sposta l'elemento in fondo, se disponibile.</p>
 			</description>
 		</interaction>
 	</control-interactions>

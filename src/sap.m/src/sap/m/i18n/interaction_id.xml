@@ -154,9 +154,9 @@
 				<p><kbd>ArrowDown</kbd></p>
 				<p>Memindahkan item satu posisi ke bawah jika memungkinkan.</p>
 				<p><kbd>Home</kbd></p>
-				<p>Memindahkan item satu posisi teratas jika memungkinkan.</p>
+				<p>Memindahkan item ke posisi teratas jika memungkinkan.</p>
 				<p><kbd>End</kbd></p>
-				<p>Memindahkan item satu posisi terakhir jika memungkinkan.</p>
+				<p>Memindahkan item ke posisi terakhir jika memungkinkan.</p>
 			</description>
 		</interaction>
 	</control-interactions>
