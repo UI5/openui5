@@ -3786,5 +3786,15 @@
         "text": " sap/ui/core/qunit/DateFormat.qunit.html: Fix failing year two digits tests"
       }
     ]
+  },
+  "1.38.67": {
+    "date": "February 2026",
+    "notes": [
+      {
+        "id": "eadfee36eeff64ead10ed5ba98a5e039e88a3a47",
+        "type": "FIX",
+        "text": " sap/ui/thirdparty: bump RequireJS to 2.3.7"
+      }
+    ]
   }
 }
