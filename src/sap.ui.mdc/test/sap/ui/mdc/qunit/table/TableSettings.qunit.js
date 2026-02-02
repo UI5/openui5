@@ -295,12 +295,12 @@ sap.ui.define([
 	QUnit.test("ResponsiveTable without settings", function(assert) {
 		const that = this;
 
-		return createView("ResponsiveTableType").then(function(oView) {
+		return createView("ResponsiveTableType").then(async function(oView) {
 			that.oView = oView;
 			that.oTable = that.oView.byId('myTable');
 
-			return that.oTable.initialized();
-		}).then(function() {
+			return await that.oTable.initialized();
+		}).then(async function() {
 			// Check default values for settings
 			assert.equal(that.oTable._oTable.getItems().length, 2, "The table contains 2 rows");
 			assert.equal(that.oTable.getRowSettings(), null, "No row settings defined");
@@ -314,7 +314,7 @@ sap.ui.define([
 			let oTableRowSettings = new RowSettings();
 			oTableRowSettings.setNavigated(true);
 			oTableRowSettings.setHighlight("Error");
-			that.oTable.setRowSettings(oTableRowSettings);
+			await that.oTable.setRowSettings(oTableRowSettings);
 			Core.applyChanges();
 
 			oItem = that.oTable._oTable.getItems()[0];
@@ -325,7 +325,7 @@ sap.ui.define([
 			oTableRowSettings = new RowSettings();
 			oTableRowSettings.bindProperty("navigated", {path: 'description', type : 'sap.ui.model.type.Boolean', formatter: formatNavigated});
 			oTableRowSettings.bindProperty("highlight", {path: 'description', formatter: formatHighlight});
-			that.oTable.setRowSettings(oTableRowSettings);
+			await that.oTable.setRowSettings(oTableRowSettings);
 			Core.applyChanges();
 
 			oItem = that.oTable._oTable.getItems()[0];
@@ -341,12 +341,12 @@ sap.ui.define([
 	QUnit.test("ResponsiveTable with settings in XML", function(assert) {
 		const that = this;
 
-		return createView("ResponsiveTableType", "navigated='true' highlight='Warning'").then(function(oView) {
+		return createView("ResponsiveTableType", "navigated='true' highlight='Warning'").then(async function(oView) {
 			that.oView = oView;
 			that.oTable = that.oView.byId('myTable');
 
-			return that.oTable.initialized();
-		}).then(function() {
+			return await that.oTable.initialized();
+		}).then(async function() {
 			// Check default values for settings
 			assert.equal(that.oTable._oTable.getItems().length, 2, "The table contains 2 rows");
 			assert.ok(that.oTable.getRowSettings() != null, "Row settings defined");
@@ -360,7 +360,7 @@ sap.ui.define([
 			const oTableRowSettings = new RowSettings();
 			oTableRowSettings.bindProperty("navigated", {path: 'description', type : 'sap.ui.model.type.Boolean', formatter: formatNavigated});
 			oTableRowSettings.bindProperty("highlight", {path: 'description', formatter: formatHighlight});
-			that.oTable.setRowSettings(oTableRowSettings);
+			await that.oTable.setRowSettings(oTableRowSettings);
 			Core.applyChanges();
 
 			oItem = that.oTable._oTable.getItems()[0];
@@ -382,20 +382,20 @@ sap.ui.define([
 			iCalled++;
 		}
 
-		return createView("ResponsiveTableType").then(function(oView) {
+		return createView("ResponsiveTableType").then(async function(oView) {
 			that.oView = oView;
 			that.oTable = that.oView.byId("myTable");
 			oFireRowPressSpy = sinon.spy(that.oTable, "fireRowPress");
 
-			return that.oTable.initialized();
-		}).then(function() {
+			return await that.oTable.initialized();
+		}).then(async function() {
 			let oRowSettings = new RowSettings({
 				rowActions: [new RowActionItem({type: "Navigation"})]
 			});
 			let oItems;
 
 			oRowSettings.getRowActions()[0].attachEvent("press", testOnFirePress);
-			that.oTable.setRowSettings(oRowSettings);
+			await that.oTable.setRowSettings(oRowSettings);
 			Core.applyChanges();
 
 			assert.equal(that.oTable.getRowSettings().getRowActions().length, 1, "The row settings contain 1 row action");
@@ -407,7 +407,7 @@ sap.ui.define([
 			iCalled = 0;
 
 			oRowSettings = new RowSettings();
-			that.oTable.setRowSettings(oRowSettings);
+			await that.oTable.setRowSettings(oRowSettings);
 			Core.applyChanges();
 
 			assert.equal(that.oTable.getRowSettings().getRowActions().length, 0, "The row settings contain none row action");
@@ -432,7 +432,7 @@ sap.ui.define([
 				template: oRowActionTemplate,
 				templateShareable: false
 			});
-			that.oTable.setRowSettings(oRowSettings);
+			await that.oTable.setRowSettings(oRowSettings);
 			Core.applyChanges();
 
 			oFireRowPressSpy.restore();
