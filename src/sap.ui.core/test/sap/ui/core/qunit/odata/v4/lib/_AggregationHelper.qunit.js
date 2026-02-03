@@ -973,6 +973,21 @@ sap.ui.define([
 			+ "/concat(aggregate(Amount),groupby((A,B,C),aggregate(Amount)))",
 		sFollowUpApply : "search(covfefe)/groupby((A,B,C),filter(~filterOnAggregate~))"
 			+ "/groupby((A,B,C),aggregate(Amount))"
+	}, {
+		oAggregation : {
+			aggregate : {
+				Amount : {grandTotal : true}
+			},
+			group : {
+				N_A : {}
+			},
+			search : "covfefe"
+		},
+		iLevel : -1, // grand total only
+		mQueryOptions : {
+			$$filterBeforeAggregate : "~filterBeforeAggregate~"
+		},
+		sApply : "filter(~filterBeforeAggregate~)/search(covfefe)/aggregate(Amount)"
 	}].forEach(function (oFixture) {
 		QUnit.test("buildApply with " + oFixture.sApply, function (assert) {
 			var mAlias2MeasureAndMethod = {},
@@ -986,6 +1001,16 @@ sap.ui.define([
 			// code under test
 			mResult = _AggregationHelper.buildApply(oFixture.oAggregation, oFixture.mQueryOptions,
 				iLevel, false, mAlias2MeasureAndMethod);
+
+			assert.deepEqual(mResult, {$apply : oFixture.sApply}, "sApply");
+			assert.deepEqual(mAlias2MeasureAndMethod,
+				oFixture.mExpectedAlias2MeasureAndMethod || {}, "mAlias2MeasureAndMethod");
+
+			mAlias2MeasureAndMethod = {};
+
+			// code under test - bFollowUp defaults to false and iLevel defaults to 0
+			mResult = _AggregationHelper.buildApply(oFixture.oAggregation, oFixture.mQueryOptions,
+				iLevel === 0 ? undefined : iLevel, undefined, mAlias2MeasureAndMethod);
 
 			assert.deepEqual(mResult, {$apply : oFixture.sApply}, "sApply");
 			assert.deepEqual(mAlias2MeasureAndMethod,

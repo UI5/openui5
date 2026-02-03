@@ -183,8 +183,8 @@ sap.ui.define([
 			// create new "creation row"
 			this.setNewEntryContext();
 
-			const oUriParameters = new URLSearchParams(window.location.search);
-			if (oUriParameters.get("clearSelectionOnFilter") === "false") {
+			const oURLSearchParams = new URLSearchParams(window.location.search);
+			if (oURLSearchParams.get("clearSelectionOnFilter") === "false") {
 				const oBindingInfo = this.byId("ProductList").getBindingInfo("items");
 				delete oBindingInfo.parameters.$$clearSelectionOnFilter;
 				this.byId("ProductList").bindItems(oBindingInfo);
@@ -193,7 +193,7 @@ sap.ui.define([
 			oView.setModel(oModel, "header");
 			oView.setBindingContext(oListBinding.getHeaderContext(), "header");
 
-			const sLogLevel = oUriParameters.has("logAsWarning") ? "warning" : "info";
+			const sLogLevel = oURLSearchParams.has("logAsWarning") ? "warning" : "info";
 			oListBinding.attachSelectionChanged((oEvent) => {
 				const oContext = oEvent.getParameter("context");
 				const iSelectionCount = oContext.getBinding().getSelectionCount();

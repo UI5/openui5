@@ -26,8 +26,8 @@ sap.ui.define([
 
 			oMetaModel.setDefaultBindingMode("OneWay");
 
-			const oUriParameters = new URLSearchParams(window.location.search);
-			if (oUriParameters.has("setAnnotationChangePromise")) {
+			const oURLSearchParams = new URLSearchParams(window.location.search);
+			if (oURLSearchParams.has("setAnnotationChangePromise")) {
 				// Note: path must start from EntityContainer of metadata.xml!
 				const aAnnotationChanges = [];
 

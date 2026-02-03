@@ -249,8 +249,8 @@ sap.ui.define([
 			sParameter,
 			mQueryParams,
 			sServiceUrl,
-			mUriParameters,
-			sUrlParameters,
+			mURLParameters,
+			sURLParameters,
 			that = this;
 
 		// do not pass any parameters to Model
@@ -272,7 +272,7 @@ sap.ui.define([
 		}
 		// we don't expect the sServiceUrl to contain a "#" hash part, because it is not relevant
 		// for OData requests
-		[sServiceUrl, sUrlParameters] = sServiceUrl.split("?");
+		[sServiceUrl, sURLParameters] = sServiceUrl.split("?");
 		if (sServiceUrl.at(-1) !== "/") {
 			throw new Error("Service root URL must end with '/'");
 		}
@@ -281,14 +281,14 @@ sap.ui.define([
 				+ mParameters.operationMode);
 		}
 		this.sOperationMode = mParameters.operationMode;
-		mUriParameters = _Helper.getUrlParameters(sUrlParameters);
-		// Note: strict checking for model's URI parameters, but "sap-*" is allowed
-		mUriParameters = this.buildQueryOptions(mUriParameters, false, true);
+		mURLParameters = _Helper.getUrlParameters(sURLParameters);
+		// Note: strict checking for model's URL parameters, but "sap-*" is allowed
+		mURLParameters = this.buildQueryOptions(mURLParameters, false, true);
 		// BEWARE: these are shared across all bindings!
-		this.mUriParameters = mUriParameters;
+		this.mURLParameters = mURLParameters;
 		if (Supportability.isStatisticsEnabled()) {
 			// Note: this way, "sap-statistics" is not sent within $batch
-			mUriParameters = Object.assign({"sap-statistics" : true}, mUriParameters);
+			mURLParameters = Object.assign({"sap-statistics" : true}, mURLParameters);
 		}
 		this.sServiceUrl = sServiceUrl;
 		this.sGroupId = mParameters.groupId;
@@ -333,7 +333,7 @@ sap.ui.define([
 		this.mHeaders = {"Accept-Language" : sLanguageTag};
 		this.mMetadataHeaders = {"Accept-Language" : sLanguageTag};
 
-		mQueryParams = Object.assign({}, mUriParameters, mParameters.metadataUrlParams);
+		mQueryParams = Object.assign({}, mURLParameters, mParameters.metadataUrlParams);
 		const fnGetOrCreateRetryAfterPromise = this.getOrCreateRetryAfterPromise.bind(this);
 		this.oMetaModel = new ODataMetaModel(
 			_MetadataRequestor.create(this.mMetadataHeaders, sODataVersion,
@@ -374,7 +374,7 @@ sap.ui.define([
 			}
 		};
 		this.oRequestor = _Requestor.create(this.sServiceUrl, this.oInterface, this.mHeaders,
-			mUriParameters, sODataVersion, mParameters.withCredentials);
+			mURLParameters, sODataVersion, mParameters.withCredentials);
 		this.changeHttpHeaders(mParameters.httpHeaders);
 		this.bEarlyRequests = mParameters.earlyRequests;
 		if (this.bEarlyRequests) {
@@ -1605,7 +1605,7 @@ sap.ui.define([
 
 		return oPromise.then(function (aResults) {
 			return that.oRequestor.request("DELETE",
-					aResults[0].slice(1) + _Helper.buildQuery(that.mUriParameters),
+					aResults[0].slice(1) + _Helper.buildQuery(that.mURLParameters),
 					that.lockGroup(sGroupId, that, true, true),
 					{"If-Match" : aResults[1]}
 			).catch(function (oError) {

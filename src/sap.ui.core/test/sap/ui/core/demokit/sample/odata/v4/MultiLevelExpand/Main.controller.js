@@ -100,18 +100,18 @@ sap.ui.define([
 		onInit : function () {
 			// initialization has to wait for view model/context propagation
 			this.getView().attachEventOnce("modelContextChange", function () {
-				var oUriParameters = new URLSearchParams(window.location.search),
-					sExpandTo = oUriParameters.get("expandTo"),
-					sFilter = oUriParameters.get("filter"),
-					sFirstVisibleRow = oUriParameters.get("firstVisibleRow") || "0",
-					sGrandTotalAtBottomOnly = oUriParameters.get("grandTotalAtBottomOnly"),
-					sLeafCount = oUriParameters.get("leafCount"),
-					sSort = oUriParameters.get("sort"),
-					sSubtotalsAtBottomOnly = oUriParameters.get("subtotalsAtBottomOnly"),
+				var oURLSearchParams = new URLSearchParams(window.location.search),
+					sExpandTo = oURLSearchParams.get("expandTo"),
+					sFilter = oURLSearchParams.get("filter"),
+					sFirstVisibleRow = oURLSearchParams.get("firstVisibleRow") || "0",
+					sGrandTotalAtBottomOnly = oURLSearchParams.get("grandTotalAtBottomOnly"),
+					sLeafCount = oURLSearchParams.get("leafCount"),
+					sSort = oURLSearchParams.get("sort"),
+					sSubtotalsAtBottomOnly = oURLSearchParams.get("subtotalsAtBottomOnly"),
 					oTable = this.byId("table"),
-					sThreshold = oUriParameters.get("threshold") || "100",
+					sThreshold = oURLSearchParams.get("threshold") || "100",
 					oRowsBinding = oTable.getBinding("rows"),
-					sVisibleRowCount = oUriParameters.get("visibleRowCount");
+					sVisibleRowCount = oURLSearchParams.get("visibleRowCount");
 
 				this.getView().setModel(new JSONModel({
 					iMessages : 0,

@@ -71,23 +71,23 @@ sap.ui.define([
 
 			// initialization has to wait for view model/context propagation
 			this.getView().attachEventOnce("modelContextChange", function () {
-				const oUriParameters = new URLSearchParams(window.location.search);
+				const oURLSearchParams = new URLSearchParams(window.location.search);
 				const sExpandTo = TestUtils.retrieveData( // controlled by OPA
 						"sap.ui.core.sample.odata.v4.RecursiveHierarchy.expandTo")
-					|| oUriParameters.get("expandTo");
+					|| oURLSearchParams.get("expandTo");
 				this._oAggregation = {
 					expandTo : sExpandTo === "*"
 						? Number.MAX_SAFE_INTEGER
 						: parseFloat(sExpandTo || "3"), // Note: parseInt("1E16") === 1
 					hierarchyQualifier : "OrgChart"
 				};
-				if (oUriParameters.has("createInPlace")) {
+				if (oURLSearchParams.has("createInPlace")) {
 					this._oAggregation.createInPlace = true;
 				}
 				let sTreeTable;
 				switch (TestUtils.retrieveData( // controlled by OPA
 							"sap.ui.core.sample.odata.v4.RecursiveHierarchy.TreeTable")
-						|| oUriParameters.get("TreeTable")) {
+						|| oURLSearchParams.get("TreeTable")) {
 					case "both":
 						break;
 					case "N":
@@ -98,11 +98,11 @@ sap.ui.define([
 				}
 				const sVisibleRowCount = TestUtils.retrieveData( // controlled by OPA
 						"sap.ui.core.sample.odata.v4.RecursiveHierarchy.visibleRowCount")
-					|| oUriParameters.get("visibleRowCount");
+					|| oURLSearchParams.get("visibleRowCount");
 				const sThreshold = TestUtils.retrieveData( // controlled by OPA
 						"sap.ui.core.sample.odata.v4.RecursiveHierarchy.threshold")
-					|| oUriParameters.get("threshold") || "0";
-				const sFirstVisibleRow = oUriParameters.get("firstVisibleRow") || "0";
+					|| oURLSearchParams.get("threshold") || "0";
+				const sFirstVisibleRow = oURLSearchParams.get("firstVisibleRow") || "0";
 
 				const oTable = this.byId("table");
 				if (sTreeTable === "Y") {

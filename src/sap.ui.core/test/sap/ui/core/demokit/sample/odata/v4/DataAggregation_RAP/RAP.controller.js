@@ -57,17 +57,17 @@ sap.ui.define([
 		onInit : function () {
 			// initialization has to wait for view model/context propagation
 			this.getView().attachEventOnce("modelContextChange", function () {
-				var oUriParameters = new URLSearchParams(window.location.search),
-					bBookingID = oUriParameters.has("BookingID"),
-					sFilter = oUriParameters.get("filter"),
-					sGrandTotalAtBottomOnly = oUriParameters.get("grandTotalAtBottomOnly"),
-					sGroupLevels = oUriParameters.get("groupLevels"),
-					sSort = oUriParameters.get("sort"),
-					sSubtotalsAtBottomOnly = oUriParameters.get("subtotalsAtBottomOnly"),
+				var oURLSearchParams = new URLSearchParams(window.location.search),
+					bBookingID = oURLSearchParams.has("BookingID"),
+					sFilter = oURLSearchParams.get("filter"),
+					sGrandTotalAtBottomOnly = oURLSearchParams.get("grandTotalAtBottomOnly"),
+					sGroupLevels = oURLSearchParams.get("groupLevels"),
+					sSort = oURLSearchParams.get("sort"),
+					sSubtotalsAtBottomOnly = oURLSearchParams.get("subtotalsAtBottomOnly"),
 					oTable = this.byId("table"),
-					sThreshold = oUriParameters.get("threshold") || "100",
+					sThreshold = oURLSearchParams.get("threshold") || "100",
 					oRowsBinding = oTable.getBinding("rows"),
-					sVisibleRowCount = oUriParameters.get("visibleRowCount");
+					sVisibleRowCount = oURLSearchParams.get("visibleRowCount");
 
 				this.getView().setModel(new JSONModel({
 					bBookingID : bBookingID,

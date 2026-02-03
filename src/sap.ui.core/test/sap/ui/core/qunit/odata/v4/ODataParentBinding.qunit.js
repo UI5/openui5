@@ -1293,7 +1293,7 @@ sap.ui.define([
 						fetchMetadata : fnFetchMetadata
 					},
 					resolve : function () {},
-					mUriParameters : {}
+					mURLParameters : {}
 				},
 				mParameters : {},
 				sPath : "navigation"
@@ -1425,7 +1425,7 @@ sap.ui.define([
 						fetchMetadata : fnFetchMetadata
 					},
 					resolve : function () {},
-					mUriParameters : {}
+					mURLParameters : {}
 				},
 				mParameters : {},
 				sPath : "/Set",
@@ -1487,7 +1487,7 @@ sap.ui.define([
 				.returns(oCache1);
 		} else if (!oFixture.operation) {
 			oHelperMock.expects("merge").withExactArgs({},
-				sinon.match.same(oBinding.oModel.mUriParameters),
+				sinon.match.same(oBinding.oModel.mURLParameters),
 				sinon.match.same(oBinding.mAggregatedQueryOptions)).returns(mNewQueryOptions);
 			oCache0Mock.expects("setQueryOptions").withExactArgs(mNewQueryOptions);
 		}

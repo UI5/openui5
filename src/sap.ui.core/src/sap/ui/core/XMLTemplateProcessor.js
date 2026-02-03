@@ -219,6 +219,22 @@ sap.ui.define([
 	 */
 	var XMLTemplateProcessor = {};
 
+	/**   API METHODS ***/
+
+
+	/**
+	 * Loads an XML template using the module loading mechanism and returns the root XML element of the XML
+	 * document.
+	 *
+	 * @param {string} sTemplateName the template/fragment/view resource to be loaded
+	 * @param {string} [sExtension] the file extension, e.g. "fragment"
+	 * @return {Element} an XML document root element
+	 */
+	XMLTemplateProcessor.loadTemplate = function(sTemplateName, sExtension) {
+		var sResourceName = sTemplateName.replace(/\./g, "/") + ("." + (sExtension || "view") + ".xml");
+		return LoaderExtensions.loadResource(sResourceName).documentElement;
+	};
+
 	/**
 	 * Loads an XML template using the module loading mechanism and returns a Promise, which resolves with the root XML element of the XML
 	 * document.

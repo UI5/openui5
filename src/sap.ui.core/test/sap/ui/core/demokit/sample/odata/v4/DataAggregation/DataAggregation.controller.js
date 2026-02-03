@@ -26,25 +26,25 @@ sap.ui.define([
 		onInit : function () {
 			// initialization has to wait for view model/context propagation
 			this.getView().attachEventOnce("modelContextChange", function () {
-				var oUriParameters = new URLSearchParams(window.location.search),
+				var oURLSearchParams = new URLSearchParams(window.location.search),
 					sFilter = TestUtils.retrieveData( // controlled by OPA
 							"sap.ui.core.sample.odata.v4.DataAggregation.filter")
-						|| oUriParameters.get("filter"),
+						|| oURLSearchParams.get("filter"),
 					sGrandTotalAtBottomOnly = TestUtils.retrieveData( // controlled by OPA
 							"sap.ui.core.sample.odata.v4.DataAggregation.grandTotalAtBottomOnly")
-						|| oUriParameters.get("grandTotalAtBottomOnly"),
+						|| oURLSearchParams.get("grandTotalAtBottomOnly"),
 					sLeafCount = TestUtils.retrieveData( // controlled by OPA
 							"sap.ui.core.sample.odata.v4.DataAggregation.leafCount")
-						|| oUriParameters.get("leafCount"),
+						|| oURLSearchParams.get("leafCount"),
 					sSubtotalsAtBottomOnly = TestUtils.retrieveData( // controlled by OPA
 							"sap.ui.core.sample.odata.v4.DataAggregation.subtotalsAtBottomOnly")
-						|| oUriParameters.get("subtotalsAtBottomOnly"),
+						|| oURLSearchParams.get("subtotalsAtBottomOnly"),
 					oTable = this.byId("table"),
 					oTitle = this.byId("title"),
 					oRowsBinding = oTable.getBinding("rows"),
 					sVisibleRowCount = TestUtils.retrieveData( // controlled by OPA
 							"sap.ui.core.sample.odata.v4.DataAggregation.visibleRowCount")
-						|| oUriParameters.get("visibleRowCount");
+						|| oURLSearchParams.get("visibleRowCount");
 
 				this.getView().setModel(new JSONModel({
 					iMessages : 0,

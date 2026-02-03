@@ -1583,9 +1583,11 @@ sap.ui.define([
 	 * Refreshes the single entity represented by this context. Use {@link #requestRefresh} if you
 	 * want to wait for the refresh.
 	 *
-	 * When using data aggregation without <code>groupLevels</code> (see
+	 * When using data aggregation without <code>groupLevels</code> and without
+	 * <code>"grandTotal like 1.84"</code> (see
 	 * {@link sap.ui.model.odata.v4.ODataListBinding#setAggregation}), single entities (see
-	 * {@link #isAggregated}) can be refreshed (@experimental as of version 1.145.0).
+	 * {@link #isAggregated}) can be refreshed and the grand total is updated accordingly
+	 * (@experimental as of version 1.145.0).
 	 *
 	 * @param {string} [sGroupId]
 	 *   The group ID to be used for the refresh; if not specified, the group ID for the context's
@@ -1613,7 +1615,7 @@ sap.ui.define([
 	 *         <li> is not effectively kept alive and currently not part of the recursive hierarchy,
 	 *       </ul>
 	 *     <li> the context's binding is a list binding with data aggregation which has
-	 *       <code>groupLevels</code>,
+	 *       <code>groupLevels</code> or <code>"grandTotal like 1.84"</code>,
 	 *     <li> the binding's root binding is suspended,
 	 *     <li> the <code>bAllowRemoval</code> parameter is set for a context belonging to a context
 	 *       binding or to a list binding with "$$aggregation".

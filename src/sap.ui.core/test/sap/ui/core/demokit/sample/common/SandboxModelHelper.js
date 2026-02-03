@@ -17,19 +17,19 @@ sap.ui.define([
 			 * @param {object} mParameters
 			 *   The original OData V4 model's constructor parameters
 			 * @param {string} [sUpdateGroupId]
-			 *   Replaces mParameter.updateGroupId, - win's over URI parameter <code>updateGroupId
+			 *   Replaces mParameter.updateGroupId, - win's over URL parameter <code>updateGroupId
 			 *   </code> if supplied
 			 * @returns {object} The adapted model parameters as a clone
 			 */
 			adaptModelParameters : function (mParameters, sUpdateGroupId) {
-				var oUriParameters = new URLSearchParams(window.location.search);
+				var oURLSearchParams = new URLSearchParams(window.location.search);
 
 				// clone: do not modify constructor call parameter
 				return Object.assign({}, mParameters, {
-					earlyRequests : oUriParameters.get("earlyRequests") !== "false",
-					groupId : oUriParameters.get("$direct") ? "$direct" : mParameters.groupId,
+					earlyRequests : oURLSearchParams.get("earlyRequests") !== "false",
+					groupId : oURLSearchParams.get("$direct") ? "$direct" : mParameters.groupId,
 					serviceUrl : mParameters.serviceUrl,
-					updateGroupId : sUpdateGroupId || oUriParameters.get("updateGroupId")
+					updateGroupId : sUpdateGroupId || oURLSearchParams.get("updateGroupId")
 						|| mParameters.updateGroupId
 				});
 			},

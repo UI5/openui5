@@ -1956,7 +1956,7 @@ sap.ui.define([
 	 * @private
 	 */
 	ODataListBinding.prototype.fetchDownloadUrl = function () {
-		var mUriParameters = this.oModel.mUriParameters;
+		var mURLParameters = this.oModel.mURLParameters;
 
 		this.checkTransient();
 		if (!this.isResolved()) {
@@ -1978,7 +1978,7 @@ sap.ui.define([
 		}
 
 		return this.withCache(function (oCache, sPath) {
-			return oCache.getDownloadUrl(sPath, mUriParameters, mAdditionalExpand);
+			return oCache.getDownloadUrl(sPath, mURLParameters, mAdditionalExpand);
 		});
 	};
 

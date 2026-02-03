@@ -571,21 +571,21 @@ sap.ui.define([
 	QUnit.test("buildQuery and decoding", function (assert) {
 		var sComplexString = "",
 			i,
-			sUri;
+			sURL;
 
 		for (i = 32; i < 127; i += 1) {
 			sComplexString += String.fromCharCode(i);
 		}
 
 		// code under test
-		sUri = _Helper.buildQuery({foo : sComplexString});
+		sURL = _Helper.buildQuery({foo : sComplexString});
 
-		assert.strictEqual(decodeURIComponent(sUri), `?foo=${sComplexString}`);
+		assert.strictEqual(decodeURIComponent(sURL), `?foo=${sComplexString}`);
 
 		// code under test
-		sUri = _Helper.buildQuery({[sComplexString] : "foo"});
+		sURL = _Helper.buildQuery({[sComplexString] : "foo"});
 
-		assert.strictEqual(decodeURIComponent(sUri), `?${sComplexString}=foo`);
+		assert.strictEqual(decodeURIComponent(sURL), `?${sComplexString}=foo`);
 	});
 
 	//*********************************************************************************************
@@ -2336,16 +2336,16 @@ sap.ui.define([
 		// relative URL
 
 		// root of baseURI to make it independent of the test environment
-		const sBaseUri = new URL("/", document.baseURI).toString();
+		const sBaseURL = new URL("/", document.baseURI).toString();
 
 		assert.strictEqual(
 			// code under test: absolute sUrl has baseURI as origin
-			_Helper.makeAbsolute(sBaseUri + "alternative/bar", "/service/"),
+			_Helper.makeAbsolute(sBaseURL + "alternative/bar", "/service/"),
 			"/alternative/bar");
 
 		assert.strictEqual(
 			// code under test: root relative but sBase has baseURI as origin
-			_Helper.makeAbsolute("/alternative/bar", sBaseUri + "service/"),
+			_Helper.makeAbsolute("/alternative/bar", sBaseURL + "service/"),
 			"/alternative/bar");
 	});
 

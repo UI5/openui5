@@ -538,7 +538,7 @@ sap.ui.define([
 	 * @private
 	 */
 	ODataContextBinding.prototype.computeOperationQueryOptions = function () {
-		return Object.assign({}, this.oModel.mUriParameters, this.getQueryOptionsFromParameters());
+		return Object.assign({}, this.oModel.mURLParameters, this.getQueryOptionsFromParameters());
 	};
 
 	/**

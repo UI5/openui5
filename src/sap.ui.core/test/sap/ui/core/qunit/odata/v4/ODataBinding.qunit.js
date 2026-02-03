@@ -1095,7 +1095,7 @@ sap.ui.define([
 					oRequestor : {
 						ready : function () { return SyncPromise.resolve(); }
 					},
-					mUriParameters : {},
+					mURLParameters : {},
 					getReporter : getForbiddenReporter,
 					waitForKeepAliveBinding : mustBeMocked
 				},
@@ -1158,7 +1158,7 @@ sap.ui.define([
 						oRequestor : {
 							ready : function () { return SyncPromise.resolve(); }
 						},
-						mUriParameters : {},
+						mURLParameters : {},
 						getReporter : getForbiddenReporter,
 						waitForKeepAliveBinding : mustBeMocked
 					},
@@ -1232,7 +1232,7 @@ sap.ui.define([
 				doCreateCache : function () {},
 				oModel : {
 					oRequestor : oRequestor,
-					mUriParameters : {},
+					mURLParameters : {},
 					getReporter : getForbiddenReporter,
 					waitForKeepAliveBinding : mustBeMocked
 				},
@@ -1299,7 +1299,7 @@ sap.ui.define([
 							oRequestor : {
 								ready : function () { return SyncPromise.resolve(); }
 							},
-							mUriParameters : {},
+							mURLParameters : {},
 							getReporter : getForbiddenReporter
 						},
 						sPath : "relative",
@@ -1321,7 +1321,7 @@ sap.ui.define([
 					.withExactArgs(sinon.match.same(oContext))
 					.returns(SyncPromise.resolve("resourcePath/relative"));
 				this.mock(Object).expects("assign")
-					.withExactArgs({}, sinon.match.same(oBinding.oModel.mUriParameters),
+					.withExactArgs({}, sinon.match.same(oBinding.oModel.mURLParameters),
 						sinon.match.same(mLocalQueryOptions))
 					.returns(mResultingQueryOptions);
 				oBindingMock.expects("doCreateCache")
@@ -1443,7 +1443,7 @@ sap.ui.define([
 					oRequestor : {
 						ready : function () { return SyncPromise.resolve(); }
 					},
-					mUriParameters : {},
+					mURLParameters : {},
 					waitForKeepAliveBinding : mustBeMocked
 				},
 				sPath : "relative",
@@ -1540,7 +1540,7 @@ sap.ui.define([
 					oRequestor : {
 						ready : function () { return SyncPromise.resolve(); }
 					},
-					mUriParameters : {}
+					mURLParameters : {}
 				},
 				bRelative : true,
 				toString : function () { return "MyBinding"; }
@@ -1768,7 +1768,7 @@ sap.ui.define([
 				doCreateCache : function () {},
 				mLateQueryOptions : bHasLateQueryOptions ? mLateQueryOptions : undefined,
 				oModel : {
-					mUriParameters : {}
+					mURLParameters : {}
 				},
 				bRelative : false
 			}),
@@ -1784,7 +1784,7 @@ sap.ui.define([
 			mQueryOptions = {};
 
 		this.mock(Object).expects("assign")
-			.withExactArgs({}, sinon.match.same(oBinding.oModel.mUriParameters),
+			.withExactArgs({}, sinon.match.same(oBinding.oModel.mURLParameters),
 				sinon.match.same(mQueryOptions))
 			.returns(mMergedQueryOptions);
 		this.mock(oBinding).expects("doCreateCache")
@@ -1831,7 +1831,7 @@ sap.ui.define([
 				mLateQueryOptions : bHasLateQueryOptions ? mLateQueryOptions : undefined,
 				oModel : {
 					resolve : function () {},
-					mUriParameters : {}
+					mURLParameters : {}
 				},
 				sPath : "relative",
 				bRelative : true
@@ -1859,7 +1859,7 @@ sap.ui.define([
 			oBinding.mCacheByResourcePath = {foo : "bar"};
 		}
 		this.mock(Object).expects("assign")
-			.withExactArgs({}, sinon.match.same(oBinding.oModel.mUriParameters),
+			.withExactArgs({}, sinon.match.same(oBinding.oModel.mURLParameters),
 				sinon.match.same(mQueryOptions))
 			.returns(mMergedQueryOptions);
 		this.mock(oBinding.oModel).expects("resolve")
@@ -1913,7 +1913,7 @@ sap.ui.define([
 				mLateQueryOptions : bHasLateQueryOptions ? mLateQueryOptions : undefined,
 				oModel : {
 					resolve : function () {},
-					mUriParameters : {}
+					mURLParameters : {}
 				},
 				sPath : "relative",
 				bRelative : true
@@ -1952,7 +1952,7 @@ sap.ui.define([
 				doCreateCache : function () {},
 				oModel : {
 					resolve : function () {},
-					mUriParameters : {}
+					mURLParameters : {}
 				},
 				mParameters : {},
 				sPath : "relative",
@@ -1974,7 +1974,7 @@ sap.ui.define([
 		oBinding.mCacheByResourcePath = {};
 		oBinding.mCacheByResourcePath["/resource/path"] = oCache0;
 		this.mock(Object).expects("assign")
-			.withExactArgs({}, sinon.match.same(oBinding.oModel.mUriParameters),
+			.withExactArgs({}, sinon.match.same(oBinding.oModel.mURLParameters),
 				sinon.match.same(mQueryOptions)).returns(mMergedQueryOptions);
 		this.mock(oContext).expects("getGeneration").withExactArgs().returns(42);
 		this.mock(oBinding.oModel).expects("resolve")

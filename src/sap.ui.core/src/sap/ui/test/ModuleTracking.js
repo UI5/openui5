@@ -342,17 +342,17 @@
 					}
 				});
 
-			const oParams = new URLSearchParams(document.location.search);
+			const oURLSearchParams = new URLSearchParams(document.location.search);
 
 			// add a button to clear the filter
-			if (oParams.has("filter")) {
+			if (oURLSearchParams.has("filter")) {
 				const oClearFilter = document.createElement("button");
 
 				oClearFilter.type = "button";
 				oClearFilter.innerText = "\u2715"; // X
 				oClearFilter.addEventListener("click", (ev) => {
-					oParams.delete("filter");
-					document.location.search = oParams.toString()
+					oURLSearchParams.delete("filter");
+					document.location.search = oURLSearchParams.toString()
 						.replace(rSearchParamWithoutValue, '');
 
 				});
@@ -381,13 +381,13 @@
 
 			// "Run all tests" in "Rerunning selected tests" case: Same href as document, but remove
 			// testId
-			const oParams = new URLSearchParams(document.location.search);
-			if (oParams.has("testId")) {
+			const oURLSearchParams = new URLSearchParams(document.location.search);
+			if (oURLSearchParams.has("testId")) {
 				const oClearFilter = document.querySelector("#qunit-clearFilter");
 				if (oClearFilter) {
-					oParams.delete("testId");
+					oURLSearchParams.delete("testId");
 					const oRunModulesURL = new URL(document.location.href);
-					oRunModulesURL.search = oParams.toString()
+					oRunModulesURL.search = oURLSearchParams.toString()
 						.replace(rSearchParamWithoutValue, '');
 					oClearFilter.href = oRunModulesURL;
 				}

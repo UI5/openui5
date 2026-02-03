@@ -1192,17 +1192,11 @@ sap.ui.define([
 				 *   <code>oWithControl</code>)
 				 */
 				function insertFragment(sFragmentName, oElement, oWithControl) {
-					var oFragmentPromise, fnLoad,
+					var oFragmentPromise,
+						fnLoad = oViewInfo.sync
+							? XMLTemplateProcessor.loadTemplate
+							: XMLTemplateProcessor.loadTemplatePromise,
 						sPreviousName = sCurrentName;
-
-					/**
-					 * @ui5-transform-hint replace-param oViewInfo.sync false
-					*/
-					if (oViewInfo.sync) {
-						fnLoad = XMLTemplateProcessor.loadTemplate;
-					} else {
-						fnLoad = XMLTemplateProcessor.loadTemplatePromise;
-					}
 
 					// Note: It is perfectly valid to include the very same fragment again, as long as
 					// the context is changed. So we check for cycles at the current "with" control.
